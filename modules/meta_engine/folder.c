@@ -43,6 +43,15 @@
 #   define MAX_PATH 250
 #endif
 
+static const char* cover_files[] = {
+    "Folder.jpg",           /* Windows */
+    "AlbumArtSmall.jpg",    /* Windows */
+    ".folder.png",          /* KDE?    */
+    "cover.jpg",            /* rockbox */
+};
+
+static const int i_covers = (sizeof(cover_files)/sizeof(cover_files[0]));
+
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -55,7 +64,8 @@ static int FindMeta( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( N_( "Folder" ) )
     set_description( N_("Folder meta data") )
-
+    add_file( "album-art-filename", NULL, NULL,
+        N_("Album art filename"), N_("Filename to look for album art in current directory"), false );
     set_capability( "art finder", 90 )
     set_callbacks( FindMeta, NULL )
 vlc_module_end ()
@@ -67,9 +77,10 @@ static int FindMeta( vlc_object_t *p_this )
     input_item_t *p_item = (input_item_t *)p_this->p_private;
     bool b_have_art = false;
 
-    int i = 0;
+    int i;
     struct stat a;
     char psz_filename[MAX_PATH];
+
     if( !p_item )
         return VLC_EGENERIC;
 
@@ -77,43 +88,37 @@ static int FindMeta( vlc_object_t *p_this )
     if( !psz_dir )
         return VLC_EGENERIC;
 
-    char *psz_buf = strrchr( psz_dir, '/' );
-    if( psz_buf )
-    {
-        psz_buf++;
-        *psz_buf = '\0';
-    }
-    else
-    {
-        *psz_dir = '\0';
-    }
-
     char *psz_path = psz_dir;
-    if( !strncmp( psz_path, "file://", 7 ) )
-        psz_path += 7;
-
-    for( i = 0; b_have_art == false && i < 3; i++ )
+    if( strncmp( psz_path, "file://", 7 ) || !decode_URI( psz_path + 7 ) )
     {
-        switch( i )
+        free( psz_dir );
+        return VLC_EGENERIC;
+    }
+
+#if defined(WIN32) && !defined(UNDER_CE)
+    psz_path += 8;
+#else
+    psz_path += 7;
+#endif
+
+    char *psz_buf = strrchr( psz_path, '/' );
+    if( psz_buf )
+        *++psz_buf = '\0';
+    else
+        *psz_path = '\0'; /* relative path */
+
+    for( i = -1; !b_have_art && i < i_covers; i++ )
+    {
+        if( i == -1 ) /* higher priority : configured filename */
         {
-            case 0:
-            /* Windows Folder.jpg */
-            snprintf( psz_filename, MAX_PATH,
-                      "%sFolder.jpg", psz_path );
-            break;
-
-            case 1:
-            /* Windows AlbumArtSmall.jpg == small version of Folder.jpg */
-            snprintf( psz_filename, MAX_PATH,
-                  "%sAlbumArtSmall.jpg", psz_path );
-            break;
-
-            case 2:
-            /* KDE (?) .folder.png */
-            snprintf( psz_filename, MAX_PATH,
-                  "%s.folder.png", psz_path );
-            break;
+            char *psz_userfile = config_GetPsz( p_this, "filename" );
+            if( !psz_userfile )
+                continue;
+            snprintf( psz_filename, MAX_PATH, "%s%s", psz_path, psz_userfile );
+            free( psz_userfile );
         }
+        else
+            snprintf( psz_filename, MAX_PATH, "%s%s", psz_path, cover_files[i] );
 
         if( utf8_stat( psz_filename, &a ) != -1 )
         {
