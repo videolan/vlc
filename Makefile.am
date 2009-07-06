@@ -887,30 +887,17 @@ package-win-common-strip: package-win32-base-debug
 	for i in "" vlc-$(VERSION)/*$(LIBEXT) ; \
       do if test -n "$$i" ; then \
       $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
-      $(OBJCOPY) --strip-debug "$$i" ; \
+      $(OBJCOPY) --strip-all "$$i" ; \
       $(OBJCOPY) --add-gnu-debuglink="$$i.dbg" "$$i" ; \
 	  mv "$$i.dbg" "$(win32_debugdir)"; \
     fi; done
-
-if BUILD_MOZILLA
-	$(OBJCOPY) --only-keep-debug "$(npvlc)" "$(npvlc).dbg"
-	$(OBJCOPY) --strip-debug "$(npvlc)"
-	$(OBJCOPY) --add-gnu-debuglink="$(npvlc).dbg" "$(npvlc)"
-	mv "$(npvlc).dbg" "$(win32_debugdir)"
-endif
-if BUILD_ACTIVEX
-	$(OBJCOPY) --only-keep-debug "$(axvlc)" "$(axvlc).dbg"
-	$(OBJCOPY) --strip-debug "$(axvlc)"
-	$(OBJCOPY) --add-gnu-debuglink="$(axvlc).dbg" "$(axvlc)"
-	mv "$(axvlc).dbg" "$(win32_debugdir)"
-endif
 
 #strip all plugins dll
 package-win32-base: package-win-common-strip
 	for i in "" $(win32_destdir)/plugins/*$(LIBEXT) ; \
 	  do if test -n "$$i" ; then \
 	  $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
-	  $(OBJCOPY) --strip-debug "$$i" ; \
+	  $(OBJCOPY) --strip-all "$$i" ; \
 	  $(OBJCOPY) --add-gnu-debuglink="$$i.dbg" "$$i" ; \
 	  mv "$$i.dbg" "$(win32_debugdir)"; \
 	fi ; done
