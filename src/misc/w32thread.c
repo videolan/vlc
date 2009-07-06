@@ -320,7 +320,7 @@ void vlc_rwlock_destroy (vlc_rwlock_t *lock)
 void vlc_rwlock_rdlock (vlc_rwlock_t *lock)
 {
     vlc_mutex_lock (&lock->mutex);
-    while (lock->writers > 0) /* Favor writers to avoid starving */
+    while (lock->writer != 0)
         vlc_cond_wait (&lock->read_wait, &lock->mutex);
     if (lock->readers == ULONG_MAX)
         abort ();
