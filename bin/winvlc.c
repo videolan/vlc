@@ -120,10 +120,31 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         return 1;
 
     char *argv[argc + 1];
+    BOOL crash_handling = TRUE;
+    int j = 0;
     for (int i = 0; i < argc; i++)
-        argv[i] = FromWide (wargv[i]);
+    {
+        if(!wcscmp(wargv[i], L"--no-crashdump"))
+        {
+            crash_handling = FALSE;
+        }
+        else
+        {
+            argv[j] = FromWide (wargv[i]);
+            j++;
+        }
+    }
+
+    argc = j;
     argv[argc] = NULL;
     LocalFree (wargv);
+
+    if(crash_handling)
+    {
+        check_crashdump();
+        SetUnhandledExceptionFilter(vlc_exception_filter);
+    }
+
 #else
     char **argv, psz_cmdline[wcslen(lpCmdLine) * 4];
 
@@ -136,11 +157,6 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     libvlc_exception_t ex, dummy;
     libvlc_exception_init (&ex);
     libvlc_exception_init (&dummy);
-
-#if !defined( UNDER_CE )
-    check_crashdump();
-    SetUnhandledExceptionFilter(vlc_exception_filter);
-#endif
 
     /* Initialize libvlc */
     libvlc_instance_t *vlc;
