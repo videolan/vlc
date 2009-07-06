@@ -339,6 +339,7 @@ void vlc_rwlock_wrlock (vlc_rwlock_t *lock)
     lock->writers++;
     while ((lock->readers > 0) || (lock->writer != 0))
         vlc_cond_wait (&lock->write_wait, &lock->mutex);
+    lock->writers--;
     lock->writer = GetCurrentThreadId ();
     vlc_mutex_unlock (&lock->mutex);
 }
@@ -352,11 +353,7 @@ void vlc_rwlock_unlock (vlc_rwlock_t *lock)
     if (lock->readers > 0)
         lock->readers--; /* Read unlock */
     else
-    {
         lock->writer = 0; /* Write unlock */
-        assert (lock->writers > 0);
-        lock->writers--;
-    }
 
     if (lock->writers > 0)
     {
