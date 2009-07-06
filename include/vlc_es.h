@@ -283,7 +283,7 @@ enum es_format_category_e
 VLC_EXPORT( void, video_format_FixRgb, ( video_format_t * ) );
 
 /**
- * This funtion will initialize a es_format_t structure.
+ * This function will initialize a es_format_t structure.
  */
 VLC_EXPORT( void, es_format_Init, ( es_format_t *, int i_cat, vlc_fourcc_t i_codec ) );
 
