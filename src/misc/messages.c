@@ -187,7 +187,6 @@ void msg_Destroy (libvlc_int_t *p_libvlc)
 
 struct msg_subscription_t
 {
-    vlc_thread_t    thread;
     libvlc_int_t   *instance;
     msg_callback_t  func;
     msg_cb_data_t  *opaque;
