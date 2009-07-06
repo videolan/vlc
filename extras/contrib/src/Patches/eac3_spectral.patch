@@ -1,8 +1,8 @@
-Index: ffmpeg/libavcodec/ac3dec.c
+Index: ac3dec.c
 ===================================================================
---- ffmpeg/libavcodec/ac3dec.c	(révision 19328)
-+++ ffmpeg/libavcodec/ac3dec.c	(copie de travail)
-@@ -819,15 +819,99 @@
+--- ac3dec.c	(revision 19357)
++++ ac3dec.c	(working copy)
+@@ -819,15 +819,100 @@
  
      /* spectral extension strategy */
      if (s->eac3 && (!blk || get_bits1(gbc))) {
@@ -46,6 +46,7 @@ Index: ffmpeg/libavcodec/ac3dec.c
 +                s->channel_in_spx[ch] = 0;
 +                s->first_spx_coords[ch] = 1;
 +            }
++        }
          if (get_bits1(gbc)) {
              av_log_missing_feature(s->avctx, "Spectral extension", 1);
              return -1;
@@ -104,7 +105,7 @@ Index: ffmpeg/libavcodec/ac3dec.c
      /* coupling strategy */
      if (s->eac3 ? s->cpl_strategy_exists[blk] : get_bits1(gbc)) {
          memset(bit_alloc_stages, 3, AC3_MAX_CHANNELS);
-@@ -863,9 +947,9 @@
+@@ -863,9 +948,9 @@
                  s->phase_flags_in_use = get_bits1(gbc);
  
              /* coupling frequency range */
@@ -116,7 +117,7 @@ Index: ffmpeg/libavcodec/ac3dec.c
              if (cpl_start_subband >= cpl_end_subband) {
                  av_log(s->avctx, AV_LOG_ERROR, "invalid coupling range (%d >= %d)\n",
                         cpl_start_subband, cpl_end_subband);
-@@ -938,8 +1022,11 @@
+@@ -938,8 +1023,11 @@
      if (channel_mode == AC3_CHMODE_STEREO) {
          if ((s->eac3 && !blk) || get_bits1(gbc)) {
              s->num_rematrixing_bands = 4;
@@ -129,7 +130,7 @@ Index: ffmpeg/libavcodec/ac3dec.c
              for(bnd=0; bnd<s->num_rematrixing_bands; bnd++)
                  s->rematrixing_flags[bnd] = get_bits1(gbc);
          } else if (!blk) {
-@@ -964,6 +1051,8 @@
+@@ -964,6 +1052,8 @@
              int prev = s->end_freq[ch];
              if (s->channel_in_cpl[ch])
                  s->end_freq[ch] = s->start_freq[CPL_CH];
@@ -138,7 +139,7 @@ Index: ffmpeg/libavcodec/ac3dec.c
              else {
                  int bandwidth_code = get_bits(gbc, 6);
                  if (bandwidth_code > 60) {
-@@ -1160,8 +1249,6 @@
+@@ -1160,8 +1254,6 @@
  
      /* TODO: generate enhanced coupling coordinates and uncouple */
  
@@ -147,7 +148,7 @@ Index: ffmpeg/libavcodec/ac3dec.c
      /* recover coefficients if rematrixing is in use */
      if(s->channel_mode == AC3_CHMODE_STEREO)
          do_rematrixing(s);
-@@ -1177,6 +1264,10 @@
+@@ -1177,6 +1269,10 @@
          s->dsp.int32_to_float_fmul_scalar(s->transform_coeffs[ch], s->fixed_coeffs[ch], gain, 256);
      }
  
@@ -158,10 +159,10 @@ Index: ffmpeg/libavcodec/ac3dec.c
      /* downmix and MDCT. order depends on whether block switching is used for
         any channel in this block. this is because coefficients for the long
         and short transforms cannot be mixed. */
-Index: ffmpeg/libavcodec/ac3dec.h
+Index: ac3dec.h
 ===================================================================
---- ffmpeg/libavcodec/ac3dec.h	(révision 19328)
-+++ ffmpeg/libavcodec/ac3dec.h	(copie de travail)
+--- ac3dec.h	(revision 19357)
++++ ac3dec.h	(working copy)
 @@ -42,6 +42,7 @@
  #define AC3_MAX_COEFS   256
  #define AC3_BLOCK_SIZE  256
@@ -206,10 +207,10 @@ Index: ffmpeg/libavcodec/ac3dec.h
 +void ff_eac3_apply_spectral_extension(AC3DecodeContext *s);
 +
  #endif /* AVCODEC_AC3DEC_H */
-Index: ffmpeg/libavcodec/eac3dec.c
+Index: eac3dec.c
 ===================================================================
---- ffmpeg/libavcodec/eac3dec.c	(révision 19328)
-+++ ffmpeg/libavcodec/eac3dec.c	(copie de travail)
+--- eac3dec.c	(revision 19357)
++++ eac3dec.c	(working copy)
 @@ -23,10 +23,6 @@
  /*
   * There are several features of E-AC-3 that this decoder does not yet support.
@@ -339,10 +340,10 @@ Index: ffmpeg/libavcodec/eac3dec.c
          s->first_cpl_coords[ch] = 1;
      }
      s->first_cpl_leak = 1;
-Index: ffmpeg/libavcodec/ac3dec_data.c
+Index: ac3dec_data.c
 ===================================================================
---- ffmpeg/libavcodec/ac3dec_data.c	(révision 19328)
-+++ ffmpeg/libavcodec/ac3dec_data.c	(copie de travail)
+--- ac3dec_data.c	(revision 19357)
++++ ac3dec_data.c	(working copy)
 @@ -1127,6 +1127,51 @@
  { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1 };
  
@@ -395,10 +396,10 @@ Index: ffmpeg/libavcodec/ac3dec_data.c
   * Table of bin locations for rematrixing bands
   * reference: Section 7.5.2 Rematrixing : Frequency Band Definitions
   */
-Index: ffmpeg/libavcodec/ac3dec_data.h
+Index: ac3dec_data.h
 ===================================================================
---- ffmpeg/libavcodec/ac3dec_data.h	(révision 19328)
-+++ ffmpeg/libavcodec/ac3dec_data.h	(copie de travail)
+--- ac3dec_data.h	(revision 19357)
++++ ac3dec_data.h	(working copy)
 @@ -34,6 +34,8 @@
  extern const int16_t (* const ff_eac3_mantissa_vq[8])[6];
  extern const uint8_t ff_eac3_frm_expstr[32][6];
