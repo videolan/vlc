@@ -69,6 +69,30 @@ static void vlm_Destructor( vlm_t *p_vlm );
 static void* Manage( void * );
 static int vlm_MediaVodControl( void *, vod_media_t *, const char *, int, va_list );
 
+static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval,
+                       void *p_data )
+{
+    input_thread_t *p_input = (input_thread_t *)p_this;
+    vlm_t *p_vlm = libvlc_priv( p_input->p_libvlc )->p_vlm;
+    vlm_media_sys_t *p_media = p_data;
+    const char *psz_instance_name = NULL;
+
+    if( newval.i_int == INPUT_EVENT_STATE )
+    {
+        for( int i = 0; i < p_media->i_instance; i++ )
+        {
+            if( p_media->instance[i]->p_input == p_input )
+            {
+                psz_instance_name = p_media->instance[i]->psz_name;
+                break;
+            }
+        }
+        vlm_SendEventMediaInstanceState( p_vlm, p_media->cfg.id, p_media->cfg.psz_name, psz_instance_name, var_GetInteger( p_input, "state" ) );
+    }
+    return VLC_SUCCESS;
+}
+
 /*****************************************************************************
  * vlm_New:
  *****************************************************************************/
@@ -168,14 +192,13 @@ void vlm_Delete( vlm_t *p_vlm )
  *****************************************************************************/
 static void vlm_Destructor( vlm_t *p_vlm )
 {
-    libvlc_priv (p_vlm->p_libvlc)->p_vlm = NULL;
-
     vlm_ControlInternal( p_vlm, VLM_CLEAR_MEDIAS );
     TAB_CLEAN( p_vlm->i_media, p_vlm->media );
 
     vlm_ControlInternal( p_vlm, VLM_CLEAR_SCHEDULES );
     TAB_CLEAN( p_vlm->schedule, p_vlm->schedule );
 
+    libvlc_priv(p_vlm->p_libvlc)->p_vlm = NULL;
     vlc_object_kill( p_vlm );
     /*vlc_cancel( p_vlm->thread ); */
     vlc_join( p_vlm->thread, NULL );
@@ -771,7 +794,7 @@ static vlm_media_instance_sys_t *vlm_MediaInstanceNew( vlm_t *p_vlm, const char 
 
     return p_instance;
 }
-static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instance_sys_t *p_instance, const char *psz_name )
+static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instance_sys_t *p_instance, vlm_media_sys_t *p_media )
 {
     input_thread_t *p_input = p_instance->p_input;
     if( p_input )
@@ -780,13 +803,14 @@ static void vlm_MediaInstanceDelete( vlm_t *p_vlm, int64_t id, vlm_media_instanc
 
         input_Stop( p_input, true );
         vlc_thread_join( p_input );
+        var_DelCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
 
         p_resource = input_DetachResource( p_input );
         input_resource_Delete( p_resource );
 
         vlc_object_release( p_input );
 
-        vlm_SendEventMediaInstanceStopped( p_vlm, id, psz_name );
+        vlm_SendEventMediaInstanceStopped( p_vlm, id, p_media->cfg.psz_name );
     }
     if( p_instance->p_input_resource )
         input_resource_Delete( p_instance->p_input_resource );
@@ -863,6 +887,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
         input_Stop( p_input, !p_input->b_eof && !p_input->b_error );
         vlc_thread_join( p_input );
+        var_DelCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
 
         p_instance->p_input_resource = input_DetachResource( p_input );
 
@@ -883,17 +908,22 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
     {
         p_instance->p_input = input_Create( p_vlm->p_libvlc, p_instance->p_item,
                                             psz_log, p_instance->p_input_resource );
-        if( p_instance->p_input && input_Start( p_instance->p_input ) )
+        if( p_instance->p_input )
         {
-            vlc_object_release( p_instance->p_input );
-            p_instance->p_input = NULL;
+            var_AddCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
+            if( input_Start( p_instance->p_input ) != VLC_SUCCESS )
+            {
+                var_DelCallback( p_instance->p_input, "intf-event", InputEvent, p_media );
+                vlc_object_release( p_instance->p_input );
+                p_instance->p_input = NULL;
+            }
         }
         p_instance->p_input_resource = NULL;
 
         if( !p_instance->p_input )
         {
             TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
-            vlm_MediaInstanceDelete( p_vlm, id, p_instance, p_media->cfg.psz_name );
+            vlm_MediaInstanceDelete( p_vlm, id, p_instance, p_media );
         }
         else
         {
@@ -919,7 +949,7 @@ static int vlm_ControlMediaInstanceStop( vlm_t *p_vlm, int64_t id, const char *p
 
     TAB_REMOVE( p_media->i_instance, p_media->instance, p_instance );
 
-    vlm_MediaInstanceDelete( p_vlm, id, p_instance, p_media->cfg.psz_name );
+    vlm_MediaInstanceDelete( p_vlm, id, p_instance, p_media );
 
     return VLC_SUCCESS;
 }
