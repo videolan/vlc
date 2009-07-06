@@ -111,7 +111,7 @@ typedef struct
     int64_t        id;                /* Media ID */
     const char    *psz_name;          /* Media name */
     const char    *psz_instance_name; /* Instance name or NULL */
-    input_state_e  input_state;       /* input instance event type */
+    input_state_e  input_state;       /* Input instance event type */
 } vlm_event_t;
 
 /** VLM control query */
