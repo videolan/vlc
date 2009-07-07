@@ -179,12 +179,10 @@ VLC_EXPORT( int, __var_TriggerCallback, ( vlc_object_t *, const char * ) );
  * __var_AddCallback() with automatic casting
  */
 #define var_AddCallback(a,b,c,d) __var_AddCallback( VLC_OBJECT(a), b, c, d )
-
 /**
  * __var_DelCallback() with automatic casting
  */
 #define var_DelCallback(a,b,c,d) __var_DelCallback( VLC_OBJECT(a), b, c, d )
-
 /**
  * __var_TriggerCallback() with automatic casting
  */
@@ -207,7 +205,7 @@ static inline int __var_SetInteger( vlc_object_t *p_obj, const char *psz_name, i
     val.i_int = i;
     return var_SetChecked( p_obj, psz_name, VLC_VAR_INTEGER, val );
 }
-#define var_SetInteger(a,b,c)   __var_SetInteger( VLC_OBJECT(a),b,c)
+
 /**
  * Set the value of an boolean variable
  *
@@ -276,7 +274,6 @@ static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
     val.b_bool = true;
     return var_SetChecked( p_obj, psz_name, VLC_VAR_VOID, val );
 }
-#define var_SetVoid(a,b)        __var_SetVoid( VLC_OBJECT(a),b)
 
 /**
  * Set the value of a pointer variable
@@ -286,20 +283,21 @@ static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
  * \param ptr The new pointer value of this variable
  */
 static inline
-int var_SetAddress( vlc_object_t *p_obj, const char *psz_name, void *ptr )
+int __var_SetAddress( vlc_object_t *p_obj, const char *psz_name, void *ptr )
 {
     vlc_value_t val;
     val.p_address = ptr;
     return var_SetChecked( p_obj, psz_name, VLC_VAR_ADDRESS, val );
 }
-#define var_SetAddress(o, n, p) var_SetAddress(VLC_OBJECT(o), n, p)
 
-
+/**
+ * __var_SetInteger() with automatic casting
+ */
+#define var_SetInteger(a,b,c)   __var_SetInteger( VLC_OBJECT(a),b,c)
 /**
  * __var_SetBool() with automatic casting
  */
-#define var_SetBool(a,b,c)   __var_SetBool( VLC_OBJECT(a),b,c)
-
+#define var_SetBool(a,b,c)      __var_SetBool( VLC_OBJECT(a),b,c)
 /**
  * __var_SetTime() with automatic casting
  */
@@ -311,7 +309,16 @@ int var_SetAddress( vlc_object_t *p_obj, const char *psz_name, void *ptr )
 /**
  * __var_SetString() with automatic casting
  */
-#define var_SetString(a,b,c)     __var_SetString( VLC_OBJECT(a),b,c)
+#define var_SetString(a,b,c)    __var_SetString( VLC_OBJECT(a),b,c)
+/**
+ * __var_SetVoid() with automatic casting
+ */
+#define var_SetVoid(a,b)        __var_SetVoid( VLC_OBJECT(a),b)
+/**
+ * __var_SetAddress() with automatic casting
+ */
+#define var_SetAddress(o, n, p) __var_SetAddress(VLC_OBJECT(o), n, p)
+
 
 /**
  * Get an integer value
