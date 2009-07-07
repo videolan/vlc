@@ -70,7 +70,7 @@ DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-fast-install \
 	--disable-dbus \
 	--disable-dvd --disable-mad --disable-libmpeg2 \
-	--disable-ffmpeg --disable-faad --disable-wxwidgets --disable-skins2 \
+	--disable-ffmpeg --disable-faad --disable-skins2 \
 	--disable-live555 \
 	--disable-fribidi --disable-glx
 
@@ -370,7 +370,7 @@ endif
 # Building aliases
 ###############################################################################
 
-ALL_ALIASES = cvlc rvlc svlc wxvlc qvlc nvlc mvlc
+ALL_ALIASES = cvlc rvlc svlc qvlc nvlc mvlc
 bin_SCRIPTS = $(ALIASES)
 CLEANFILES += $(ALIASES) $(noinst_SCRIPTS)
 EXTRA_SCRIPTS = $(ALL_ALIASES)
@@ -387,9 +387,6 @@ rvlc: make-alias Makefile
 
 svlc: make-alias Makefile
 	$(MKALIAS) skins2
-
-wxvlc: make-alias Makefile
-	$(MKALIAS) wx
 
 qvlc: make-alias Makefile
 	$(MKALIAS) qt4

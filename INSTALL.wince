@@ -74,8 +74,8 @@ CC="arm-wince-pe-gcc -mcpu=xscale" \
    ../configure --host=arm-wince-pe --target=arm-wince-pe \
     --build=i686-linux --prefix=/usr/local/wince \
     --disable-sdl --disable-gtk --disable-dvdnav --disable-dvdread \
-    --disable-nls --disable-sout --disable-vlm --disable-wxwindows \
-    --disable-a52 --disable-libmpeg2 --disable-freetype --disable-fribidi \
+    --disable-nls --disable-sout --disable-vlm --disable-a52 \
+    --disable-libmpeg2 --disable-freetype --disable-fribidi \
     --disable-mad --disable-plugins --enable-optimize-memory \
     --with-freetype-config-path=/usr/local/wince-xscale/bin \
     --with-fribidi-config-path=/usr/local/wince-xscale/bin \
