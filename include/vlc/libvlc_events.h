@@ -99,6 +99,12 @@ enum libvlc_event_type_t {
     libvlc_VlmMediaChanged,
     libvlc_VlmMediaInstanceStarted,
     libvlc_VlmMediaInstanceStopped,
+    libvlc_VlmMediaInstanceStatusInit,
+    libvlc_VlmMediaInstanceStatusOpening,
+    libvlc_VlmMediaInstanceStatusPlaying,
+    libvlc_VlmMediaInstanceStatusPause,
+    libvlc_VlmMediaInstanceStatusEnd,
+    libvlc_VlmMediaInstanceStatusError,
     /* New event types HERE */
 };
 
@@ -223,8 +229,8 @@ struct libvlc_event_t
         struct
         {
             const char * psz_media_name;
+            const char * psz_instance_name;
         } vlm_media_event;
-
     } u;
 };
 
