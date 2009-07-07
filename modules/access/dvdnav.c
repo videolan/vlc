@@ -1041,15 +1041,14 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
             }
 
             vlc_mutex_lock( p_mutex );
-            val.i_int = hl.sx; var_Set( p_sys->p_input, "x-start", val );
-            val.i_int = hl.ex; var_Set( p_sys->p_input, "x-end", val );
-            val.i_int = hl.sy; var_Set( p_sys->p_input, "y-start", val );
-            val.i_int = hl.ey; var_Set( p_sys->p_input, "y-end", val );
+            var_SetInteger( p_sys->p_input, "x-start", hl.sx );
+            var_SetInteger( p_sys->p_input, "x-end",  hl.ex );
+            var_SetInteger( p_sys->p_input, "y-start", hl.sy );
+            var_SetInteger( p_sys->p_input, "y-end", hl.ey );
 
-            val.p_address = (void *)p_sys->palette;
-            var_Set( p_sys->p_input, "menu-palette", val );
+            var_SetAddress( p_sys->p_input, "menu-palette", p_sys->palette );
 
-            val.b_bool = true; var_Set( p_sys->p_input, "highlight", val );
+            var_SetBool( p_sys->p_input, "highlight", true );
             vlc_mutex_unlock( p_mutex );
 
             msg_Dbg( p_demux, "buttonUpdate %d", i_button );
@@ -1061,8 +1060,7 @@ static void ButtonUpdate( demux_t *p_demux, bool b_mode )
 
             /* Show all */
             vlc_mutex_lock( p_mutex );
-            val.b_bool = false;
-            var_Set( p_sys->p_input, "highlight", val );
+            var_SetBool( p_sys->p_input, "highlight", false );
             vlc_mutex_unlock( p_mutex );
         }
     }
