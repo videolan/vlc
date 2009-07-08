@@ -2920,9 +2920,8 @@ IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
         return NULL;
     }
 
-    /* Allocate shared memory segment - 0776 set the access permission
-     * rights (like umask), they are not yet supported by all X servers */
-    p_shm->shmid = shmget( IPC_PRIVATE, DATA_SIZE(p_image), IPC_CREAT | 0776 );
+    /* Allocate shared memory segment. */
+    p_shm->shmid = shmget( IPC_PRIVATE, DATA_SIZE(p_image), IPC_CREAT | 0600 );
     if( p_shm->shmid < 0 )
     {
         msg_Err( p_vout, "cannot allocate shared image data (%m)" );
