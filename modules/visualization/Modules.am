@@ -1,3 +1,3 @@
 SUBDIRS = visual galaktos
 SOURCES_goom = goom.c
-SOURCES_goom = projectm.cpp
+SOURCES_projectm = projectm.cpp
