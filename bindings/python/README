@@ -11,7 +11,7 @@ mc=vlc.MediaControl('--plugin-path /path/to/vlc/directory'.split())
 For vlc.Instance:
 i=vlc.Instance('--plugin-path /path/to/vlc/directory'.split())
 
-* Skeleton generation (for developpers of the module):
+* Skeleton generation (for developers of the module):
 
 ** For method bindings:
 

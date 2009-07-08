@@ -259,7 +259,7 @@ struct vlc_cleanup_t
 };
 
 /* This macros opens a code block on purpose. This is needed for multiple
- * calls within a single function. This also prevent Win32 developpers from
+ * calls within a single function. This also prevent Win32 developers from
  * writing code that would break on POSIX (POSIX opens a block as well). */
 # define vlc_cleanup_push( routine, arg ) \
     do { \

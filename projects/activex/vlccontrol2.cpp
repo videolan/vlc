@@ -2816,7 +2816,7 @@ STDMETHODIMP VLCControl2::get_Toolbar(VARIANT_BOOL *visible)
         return E_POINTER;
 
     /*
-     * Note to developpers
+     * Note to developers
      *
      * Returning the _b_toolbar is closer to the method specification.
      * But returning True when toolbar is not implemented so not displayed

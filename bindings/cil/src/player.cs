@@ -9,7 +9,7 @@
  *
  * @defgroup Internals LibVLC internals
  * This covers internal marshalling functions to use the native LibVLC.
- * Only VLC developpers should need to read this section.
+ * Only VLC developers should need to read this section.
  */
 
 /**********************************************************************
