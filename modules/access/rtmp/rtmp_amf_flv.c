@@ -430,10 +430,10 @@ rtmp_connect_active( rtmp_control_thread_t *p_thread )
     free( tmp_buffer );
 
     tmp_buffer = amf_encode_object_variable( "swfUrl",
-         AMF_DATATYPE_STRING, "file:///mac.flv" );
+         AMF_DATATYPE_STRING, p_thread->psz_swf_url );
     rtmp_body_append( rtmp_body, tmp_buffer,
         AMF_DATATYPE_SIZE_OBJECT_VARIABLE + strlen( "swfUrl" ) +
-        AMF_DATATYPE_SIZE_STRING + strlen( "file:///mac.flv" ) );
+        AMF_DATATYPE_SIZE_STRING + strlen( p_thread->psz_swf_url ) );
     free( tmp_buffer );
 
     if( asprintf( &tmp_url, "rtmp://%s", p_thread->url.psz_buffer ) == -1 )
@@ -479,10 +479,10 @@ rtmp_connect_active( rtmp_control_thread_t *p_thread )
     free( tmp_buffer );
 
     tmp_buffer = amf_encode_object_variable( "pageUrl",
-        AMF_DATATYPE_STRING, "file:///mac.html" );
+        AMF_DATATYPE_STRING, p_thread->psz_page_url );
     rtmp_body_append( rtmp_body, tmp_buffer,
         AMF_DATATYPE_SIZE_OBJECT_VARIABLE + strlen( "pageUrl" ) +
-        AMF_DATATYPE_SIZE_STRING + strlen( "file:///mac.html" ) );
+        AMF_DATATYPE_SIZE_STRING + strlen( p_thread->psz_page_url ) );
     free( tmp_buffer );
 
     tmp_buffer = amf_encode_object_variable( "objectEncoding",

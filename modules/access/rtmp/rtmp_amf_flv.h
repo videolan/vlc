@@ -58,6 +58,9 @@ struct rtmp_control_thread_t
     char *psz_application;
     char *psz_media;
 
+    char *psz_swf_url;
+    char *psz_page_url;
+
     block_fifo_t *p_fifo_input;
     block_fifo_t *p_empty_blocks;
 
@@ -65,9 +68,9 @@ struct rtmp_control_thread_t
     vlc_cond_t  wait;
 
     int result_connect;
-	int result_publish;
+    int result_publish;
     int result_play;
-	int result_stop;
+    int result_stop;
 
     double stream_client_id;
     double stream_server_id;
