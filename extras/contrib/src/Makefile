@@ -2464,8 +2464,13 @@ DISTCLEAN_PKG += asa.git.tar.gz
 fluidsynth-$(FLUID_VERSION).tar.gz:
 	$(WGET) $(FLUID_URL)
 
+
 fluidsynth: fluidsynth-$(FLUID_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_WIN32
+	patch -p0 < Patches/fluid-win32.patch
+	cd $@; ./autogen.sh
+endif
 
 .fluid: fluidsynth
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
