@@ -339,7 +339,14 @@ rtmp_handshake_active( vlc_object_t *p_this, int fd )
 
     p_write[0] = RTMP_HANDSHAKE;
     for( i = 0; i < RTMP_HANDSHAKE_BODY_SIZE; i++ )
-        p_write[i + 1] = i & 0xFF;
+    {
+        if (i < 8)
+        {
+            p_write[i + 1] = 0x00;
+        } else {
+            p_write[i + 1] = rand() & 0xFF;
+        }
+    }
 
     /* Send handshake*/
     i_ret = net_Write( p_this, fd, NULL, p_write, RTMP_HANDSHAKE_BODY_SIZE + 1 );
