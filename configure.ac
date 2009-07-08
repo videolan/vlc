@@ -5232,6 +5232,23 @@ then
 fi
 
 dnl
+dnl libprojectM visualization plugin
+dnl
+AC_ARG_ENABLE(projectm,
+  [  --enable-projectm          projectM visualization plugin (default disabled)])
+AS_IF([test "${enable_projectm}" = "yes"],
+  [
+    PKG_CHECK_MODULES(PROJECTM, libprojectM,
+    [
+      VLC_ADD_PLUGIN([projectm])
+      VLC_ADD_CXXFLAGS([projectm],[$PROJECTM_CFLAGS])
+      VLC_ADD_LIBS([projectm],[$PROJECTM_LIBS])
+      ],[
+      AC_MSG_WARN(libprojectM library not found)
+    ])
+  ])
+
+dnl
 dnl  AtmoLight (homebrew AmbiLight)
 dnl
 if test "${SYS}" = "mingw32" -o "${SYS}" = "linux"; then

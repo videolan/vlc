@@ -136,6 +136,13 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
             var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
         }
 
+        /* Look for libprojectM plugin */
+        if( module_exists( "projectm" ) )
+        {
+            val.psz_string = (char*)"projectm"; text.psz_string = (char*)"projectM";
+            var_Change( p_aout, "visual", VLC_VAR_ADDCHOICE, &val, &text );
+        }
+
         if( var_Get( p_aout, "effect-list", &val ) == VLC_SUCCESS )
         {
             var_SetString( p_aout, "visual", val.psz_string );
@@ -854,6 +861,7 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
         ChangeFiltersString( p_aout, "audio-visual", "goom", false );
         ChangeFiltersString( p_aout, "audio-visual", "visual", false );
         ChangeFiltersString( p_aout, "audio-visual", "galaktos", false );
+        ChangeFiltersString( p_aout, "audio-visual", "projectm", false );
     }
     else
     {
@@ -861,13 +869,21 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
         {
             ChangeFiltersString( p_aout, "audio-visual", "visual", false );
             ChangeFiltersString( p_aout, "audio-visual", "goom", true );
-            ChangeFiltersString( p_aout, "audio-visual", "galaktos", false);
+            ChangeFiltersString( p_aout, "audio-visual", "galaktos", false );
+            ChangeFiltersString( p_aout, "audio-visual", "projectm", false );
         }
         else if( !strcmp( "galaktos", psz_mode ) )
         {
             ChangeFiltersString( p_aout, "audio-visual", "visual", false );
             ChangeFiltersString( p_aout, "audio-visual", "goom", false );
             ChangeFiltersString( p_aout, "audio-visual", "galaktos", true );
+        }
+        else if( !strcmp( "projectm", psz_mode ) )
+        {
+            ChangeFiltersString( p_aout, "audio-visual", "visual", false );
+            ChangeFiltersString( p_aout, "audio-visual", "goom", false );
+            ChangeFiltersString( p_aout, "audio-visual", "galaktos", false );
+            ChangeFiltersString( p_aout, "audio-visual", "projectm", true );
         }
         else
         {
@@ -876,7 +892,8 @@ static int VisualizationCallback( vlc_object_t *p_this, char const *psz_cmd,
 
             ChangeFiltersString( p_aout, "audio-visual", "goom", false );
             ChangeFiltersString( p_aout, "audio-visual", "visual", true );
-            ChangeFiltersString( p_aout, "audio-visual", "galaktos", false);
+            ChangeFiltersString( p_aout, "audio-visual", "galaktos", false );
+            ChangeFiltersString( p_aout, "audio-visual", "projectm", false );
         }
     }
 
