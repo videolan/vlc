@@ -1,0 +1,11 @@
+--- fluidsynth/src/Makefile.am	2007-11-11 21:06:28.000000000 +0100
++++ fluidsynth.old/src/Makefile.am	2009-07-08 17:48:53.000000000 +0200
+@@ -39,7 +39,7 @@
+ 	config_win32.h fluid_jack.c
+ 
+ lib_LTLIBRARIES = libfluidsynth.la
+-bin_PROGRAMS = fluidsynth 
++bin_PROGRAMS = 
+ 
+ libfluidsynth_la_SOURCES = \
+ 	$(fluid_alsa) \
