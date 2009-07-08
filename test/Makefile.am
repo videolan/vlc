@@ -13,7 +13,7 @@ check_PROGRAMS = \
 	test_libvlc_media_list \
 	test_libvlc_media_list_player \
 	test_libvlc_media_player \
-	test_libvlc_variables \
+	test_src_misc_variables \
         $(NULL)
 
 # Disabled test:
@@ -76,10 +76,10 @@ test_libvlc_meta_LDADD = $(top_builddir)/src/libvlc.la
 test_libvlc_meta_CFLAGS = $(CFLAGS_tests)
 test_libvlc_meta_LDFLAGS = $(LDFLAGS_tests)
 
-test_libvlc_variables_SOURCES = libvlc/variables.c
-test_libvlc_variables_LDADD = $(top_builddir)/src/libvlc.la
-test_libvlc_variables_CFLAGS = $(CFLAGS_tests)
-test_libvlc_variables_LDFLAGS = $(LDFLAGS_tests)
+test_src_misc_variables_SOURCES = src/misc/variables.c
+test_src_misc_variables_LDADD = $(top_builddir)/src/libvlc.la
+test_src_misc_variables_CFLAGS = $(CFLAGS_tests)
+test_src_misc_variables_LDFLAGS = $(LDFLAGS_tests)
 
 checkall:
 	$(MAKE) check_PROGRAMS="$(check_PROGRAMS) $(EXTRA_PROGRAMS)" check

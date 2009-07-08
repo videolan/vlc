@@ -23,7 +23,7 @@
 
 #include <limits.h>
 
-#include "test.h"
+#include "../../libvlc/test.h"
 #include <../src/control/libvlc_internal.h>
 
 const char *psz_var_name[] = { "a", "abcdef", "abcdefg", "abc123", "abc-123", "é€!!" };
