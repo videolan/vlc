@@ -1,6 +1,27 @@
---- /libogg-1.1.3/configure.in	2005-11-28 05:26:07.000000000 +0100
-+++ libogg/configure.in	2006-07-11 19:52:15.000000000 +0200
-@@ -45,27 +45,27 @@
+--- libogg/configure.in	2009-07-08 18:56:26.000000000 +0200
++++ libogg.new/configure.in	2009-07-08 18:55:50.000000000 +0200
+@@ -28,17 +28,17 @@
+         case $host in 
+         *-*-irix*)
+                 DEBUG="-g -signed" 
+-                CFLAGS="-O2 -w -signed"
++                EXTRA_CFLAGS="-O2 -w -signed"
+                 PROFILE="-p -g3 -O2 -signed"
+ 		;;
+         sparc-sun-solaris*)
+                 DEBUG="-v -g"
+-                CFLAGS="-xO4 -fast -w -fsimple -native -xcg92"
++                EXTRA_CFLAGS="-xO4 -fast -w -fsimple -native -xcg92"
+                 PROFILE="-v -xpg -g -xO4 -fast -native -fsimple -xcg92 -Dsuncc"
+ 		;;
+         *)
+                 DEBUG="-g"
+-                CFLAGS="-O"
++                EXTRA_CFLAGS="-O"
+                 PROFILE="-g -p" 
+ 		;;
+         esac
+@@ -46,36 +46,36 @@
          case $host in 
          *-*-linux*)
                  DEBUG="-g -Wall -fsigned-char"
@@ -9,10 +30,22 @@
                  PROFILE="-Wall -W -pg -g -O20 -ffast-math -fsigned-char"
  		;;
          sparc-sun-*)
-                 DEBUG="-g -Wall -fsigned-char -mv8"
--                CFLAGS="-O20 -ffast-math -fsigned-char -mv8"
-+                EXTRA_CFLAGS="-O20 -ffast-math -fsigned-char -mv8"
-                 PROFILE="-pg -g -O20 -fsigned-char -mv8" 
+                 sparc_cpu=""
+                 AC_MSG_CHECKING([if gcc supports -mv8])
+-                old_cflags="$CFLAGS"
+-                CFLAGS="$CFLAGS -mv8"
++                old_EXTRA_CFLAGS="$CFLAGS"
++                EXTRA_CFLAGS="$CFLAGS -mv8"
+                 AC_TRY_COMPILE(, [return 0;], [
+                         AC_MSG_RESULT([yes])
+                         sparc_cpu="-mv8"
+                 ])
+-                CFLAGS="$old_cflags"
++                EXTRA_CFLAGS="$old_cflags"
+                 DEBUG="-g -Wall -fsigned-char $sparc_cpu"
+-                CFLAGS="-O20 -ffast-math -fsigned-char $sparc_cpu"
++                EXTRA_CFLAGS="-O20 -ffast-math -fsigned-char $sparc_cpu"
+                 PROFILE="-pg -g -O20 -fsigned-char $sparc_cpu" 
  		;;
  	*-*-darwin*)
  		DEBUG="-fno-common -g -Wall -fsigned-char"
