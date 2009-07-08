@@ -1709,6 +1709,9 @@ AM_CONDITIONAL(ENABLE_SOUT, [test "${enable_sout}" != "no"])
 
 AC_ARG_ENABLE(switcher,
   [  --enable-switcher       Stream-out switcher plugin (default disabled)])
+AS_IF([test "${enable_switcher}" = "yes"], [
+  VLC_ADD_PLUGIN([stream_out_switcher])
+])
 
 dnl Check for libshout
 AC_ARG_ENABLE(shout,
