@@ -1078,7 +1078,8 @@ static int Play( demux_t *p_demux )
 
     /* Retrieve the starttime if possible */
     p_sys->i_npt_start = p_sys->ms->playStartTime();
-    p_sys->i_npt_length = p_sys->ms->playEndTime();
+    if( p_sys->ms->playEndTime() > 0 )
+        p_sys->i_npt_length = p_sys->ms->playEndTime();
 
     msg_Dbg( p_demux, "play start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
     return VLC_SUCCESS;
@@ -1286,7 +1287,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->i_npt = p_sys->i_npt_start = p_sys->ms->playStartTime();
 
                 /* Retrieve the duration if possible */
-                p_sys->i_npt_length = p_sys->ms->playEndTime();
+                if( p_sys->ms->playEndTime() > 0 )
+                    p_sys->i_npt_length = p_sys->ms->playEndTime();
 
                 msg_Dbg( p_demux, "seek start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
                 return VLC_SUCCESS;
@@ -1421,7 +1423,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             p_sys->i_npt_start = p_sys->ms->playStartTime();
 
             /* Retrieve the duration if possible */
-            p_sys->i_npt_length = p_sys->ms->playEndTime();
+            if( p_sys->ms->playEndTime() )
+                p_sys->i_npt_length = p_sys->ms->playEndTime();
 
             msg_Dbg( p_demux, "pause start: %f stop:%f", p_sys->i_npt_start, p_sys->i_npt_length );
             return VLC_SUCCESS;
