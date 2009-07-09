@@ -418,7 +418,7 @@ static void ParseExecute( httpd_file_sys_t *p_args, char *p_buffer,
         state = "stop";
     }
 
-    aout_VolumeGet( p_args->p_intf, &i_volume );
+    aout_VolumeGet( p_sys->p_playlist, &i_volume );
     sprintf( volume, "%d", (int)i_volume );
 
     p_args->vars = mvar_New( "variables", "" );
