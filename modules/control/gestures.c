@@ -275,18 +275,18 @@ static void RunIntf( intf_thread_t *p_intf )
 
             case UP:
                 msg_Dbg(p_intf, "Louder");
-                aout_VolumeUp( p_intf, 1, NULL );
+                aout_VolumeUp( p_playlist, 1, NULL );
                 break;
 
             case DOWN:
                 msg_Dbg(p_intf, "Quieter");
-                aout_VolumeDown( p_intf, 1, NULL );
+                aout_VolumeDown( p_playlist, 1, NULL );
                 break;
 
             case GESTURE(UP,DOWN,NONE,NONE):
             case GESTURE(DOWN,UP,NONE,NONE):
                 msg_Dbg( p_intf, "Mute sound" );
-                aout_ToggleMute( p_intf, NULL );
+                aout_ToggleMute( p_playlist, NULL );
                 break;
 
             case GESTURE(UP,RIGHT,NONE,NONE):
