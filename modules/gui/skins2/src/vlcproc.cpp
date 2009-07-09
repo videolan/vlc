@@ -258,7 +258,7 @@ void VlcProc::refreshAudio()
 
     // Refresh sound volume
     audio_volume_t volume;
-    aout_VolumeGet( getIntf(), &volume );
+    aout_VolumeGet( getIntf()->p_sys->p_playlist, &volume );
     Volume *pVolume = (Volume*)m_cVarVolume.get();
     pVolume->set( (double)volume * 2.0 / AOUT_VOLUME_MAX );
 

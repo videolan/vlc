@@ -111,18 +111,24 @@ void CmdFaster::execute()
 
 void CmdMute::execute()
 {
-    aout_TogleMute( getIntf(), NULL );
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+
+    aout_TogleMute( pPlaylist, NULL );
 }
 
 
 void CmdVolumeUp::execute()
 {
-    aout_VolumeUp( getIntf(), 1, NULL );
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+
+    aout_VolumeUp( pPlaylist, 1, NULL );
 }
 
 
 void CmdVolumeDown::execute()
 {
-    aout_VolumeDown( getIntf(), 1, NULL );
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+
+    aout_VolumeDown( pPlaylist, 1, NULL );
 }
 
