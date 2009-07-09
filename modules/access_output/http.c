@@ -217,10 +217,10 @@ static int Open( vlc_object_t *p_this )
     /* SSL support */
     if( p_access->psz_access && !strcmp( p_access->psz_access, "https" ) )
     {
-        psz_cert = config_GetPsz( p_this, SOUT_CFG_PREFIX"cert" );
-        psz_key = config_GetPsz( p_this, SOUT_CFG_PREFIX"key" );
-        psz_ca = config_GetPsz( p_this, SOUT_CFG_PREFIX"ca" );
-        psz_crl = config_GetPsz( p_this, SOUT_CFG_PREFIX"crl" );
+        psz_cert = var_CreateGetNonEmptyString( p_this, SOUT_CFG_PREFIX"cert" );
+        psz_key = var_CreateGetNonEmptyString( p_this, SOUT_CFG_PREFIX"key" );
+        psz_ca = var_CreateGetNonEmptyString( p_this, SOUT_CFG_PREFIX"ca" );
+        psz_crl = var_CreateGetNonEmptyString( p_this, SOUT_CFG_PREFIX"crl" );
 
         if( i_bind_port <= 0 )
             i_bind_port = DEFAULT_SSL_PORT;
