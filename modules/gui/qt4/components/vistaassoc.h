@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vistaext.h : "Vista file associations support"
  ****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
+ * Copyright (C) 2009 the VideoLAN team
  * $Id$
  *
  * Authors: Geoffroy Couprie <geal@videolan.org>
