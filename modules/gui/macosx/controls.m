@@ -420,10 +420,13 @@
 - (IBAction)volumeSliderUpdated:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
+    playlist_t * p_playlist = pl_Hold( p_intf );
     audio_volume_t i_volume = (audio_volume_t)[sender intValue];
-    int i_volume_step = 0;
+    int i_volume_step;
+
     i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
-    aout_VolumeSet( p_intf, i_volume * i_volume_step );
+    aout_VolumeSet( p_playlist, i_volume * i_volume_step );
+    pl_Release( p_playlist );
     /* Manage volume status */
     [o_main manageVolumeSlider];
 }

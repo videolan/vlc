@@ -1612,7 +1612,10 @@ static void manage_cleanup( void * args )
 - (void)manageVolumeSlider
 {
     audio_volume_t i_volume;
-    aout_VolumeGet( p_intf, &i_volume );
+    playlist_t * p_playlist = pl_Hold( p_intf );
+
+    aout_VolumeGet( p_playlist, &i_volume );
+    pl_Release( p_intf );
 
     if( i_volume != i_lastShownVolume )
     {
