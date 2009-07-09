@@ -26,7 +26,6 @@ aout_FormatPrepare
 aout_FormatPrint
 aout_FormatPrintChannels
 aout_OutputNextBuffer
-aout_VisualChange
 __aout_VolumeDown
 __aout_VolumeGet
 __aout_VolumeInfos

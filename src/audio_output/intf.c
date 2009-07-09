@@ -499,15 +499,3 @@ void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
     if( p_aout )
         vlc_object_release( p_aout );
 }
-
-/**
- * Change audio visualization
- * -1 goes backwards, +1 goes forward
- */
-char *aout_VisualChange( vlc_object_t *p_this, int i_skip )
-{
-    (void)p_this; (void)i_skip;
-    msg_Err( p_this, "FIXME: %s (%s %d) isn't implemented.", __func__,
-             __FILE__, __LINE__ );
-    return strdup("foobar");
-}

@@ -460,11 +460,6 @@ VLC_EXPORT( void, aout_EnableFilter, (vlc_object_t *, const char *, bool ));
 #define aout_EnableFilter( o, n, b ) \
         aout_EnableFilter( VLC_OBJECT(o), n, b )
 
-#define aout_VisualNext(a) aout_VisualChange( VLC_OBJECT(a),1 )
-#define aout_VisualPrev(a) aout_VisualChange( VLC_OBJECT(a),-1 )
-
-VLC_EXPORT( char *, aout_VisualChange, (vlc_object_t *, int ) );
-
 /* */
 VLC_EXPORT( vout_thread_t *, aout_filter_RequestVout, ( aout_filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt ) );
 
