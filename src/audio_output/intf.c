@@ -228,12 +228,12 @@ int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
 }
 
 /*****************************************************************************
- * aout_VolumeMute : Mute/un-mute the output volume
+ * aout_ToggleMute : Mute/un-mute the output volume
  *****************************************************************************
  * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
  * function (muted => 0).
  *****************************************************************************/
-int __aout_VolumeMute( vlc_object_t * p_object, audio_volume_t * pi_volume )
+int __aout_ToggleMute( vlc_object_t * p_object, audio_volume_t * pi_volume )
 {
     int i_result;
     audio_volume_t i_volume;

@@ -542,7 +542,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
             break;
 
         case VOLUME_MUTE:
-            aout_VolumeMute( p_intf, NULL );
+            aout_ToggleMute( p_intf, NULL );
             break;
 
         case SELECT_CHANNEL:

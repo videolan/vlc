@@ -197,7 +197,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_VOL_MUTE:
         {
             audio_volume_t i_newvol = -1;
-            aout_VolumeMute( p_intf, &i_newvol );
+            aout_ToggleMute( p_intf, &i_newvol );
             if( p_vout )
             {
                 if( i_newvol == 0 )

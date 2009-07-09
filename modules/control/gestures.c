@@ -286,7 +286,7 @@ static void RunIntf( intf_thread_t *p_intf )
             case GESTURE(UP,DOWN,NONE,NONE):
             case GESTURE(DOWN,UP,NONE,NONE):
                 msg_Dbg( p_intf, "Mute sound" );
-                aout_VolumeMute( p_intf, NULL );
+                aout_ToggleMute( p_intf, NULL );
                 break;
 
             case GESTURE(UP,RIGHT,NONE,NONE):

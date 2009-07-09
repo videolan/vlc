@@ -111,7 +111,7 @@ void CmdFaster::execute()
 
 void CmdMute::execute()
 {
-    aout_VolumeMute( getIntf(), NULL );
+    aout_TogleMute( getIntf(), NULL );
 }
 
 

@@ -30,7 +30,7 @@ aout_VisualChange
 __aout_VolumeDown
 __aout_VolumeGet
 __aout_VolumeInfos
-__aout_VolumeMute
+__aout_ToggleMute
 aout_VolumeNoneInit
 __aout_VolumeSet
 aout_VolumeSoftInit
