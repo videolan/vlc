@@ -179,7 +179,6 @@ void Close ( vlc_object_t *p_this )
 static void RunIntf( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_t * p_playlist = NULL;
     int canc = vlc_savecancel();
     input_thread_t *p_input;
 
@@ -199,13 +198,12 @@ static void RunIntf( intf_thread_t *p_intf )
             /* If you modify this, please try to follow this convention:
                Start with LEFT, RIGHT for playback related commands
                and UP, DOWN, for other commands */
+            playlist_t * p_playlist = pl_Hold( p_intf );
             switch( p_sys->i_pattern )
             {
             case LEFT:
                 msg_Dbg( p_intf, "Go backward in the movie!" );
-                p_playlist = pl_Hold( p_intf );
                 p_input = playlist_CurrentInput( p_playlist );
-                pl_Release( p_intf );
                 if( p_input )
                 {
                     i_interval = config_GetInt( p_intf , "short-jump-size" );
@@ -220,10 +218,7 @@ static void RunIntf( intf_thread_t *p_intf )
 
             case RIGHT:
                 msg_Dbg( p_intf, "Go forward in the movie!" );
-                p_playlist = pl_Hold( p_intf );
                 p_input = playlist_CurrentInput( p_playlist );
-                pl_Release( p_intf );
-
                 if( p_input )
                 {
                     i_interval = config_GetInt( p_intf , "short-jump-size" );
@@ -238,9 +233,7 @@ static void RunIntf( intf_thread_t *p_intf )
 
             case GESTURE(LEFT,UP,NONE,NONE):
                 msg_Dbg( p_intf, "Going slower." );
-                p_playlist = pl_Hold( p_intf );
                 p_input = playlist_CurrentInput( p_playlist );
-                pl_Release( p_intf );
                 if( p_input )
                 {
                     var_SetVoid( p_input, "rate-slower" );
@@ -250,9 +243,7 @@ static void RunIntf( intf_thread_t *p_intf )
 
             case GESTURE(RIGHT,UP,NONE,NONE):
                 msg_Dbg( p_intf, "Going faster." );
-                p_playlist = pl_Hold( p_intf );
                 p_input = playlist_CurrentInput( p_playlist );
-                pl_Release( p_intf );
                 if( p_input )
                 {
                     var_SetVoid( p_input, "rate-faster" );
@@ -263,9 +254,7 @@ static void RunIntf( intf_thread_t *p_intf )
             case GESTURE(LEFT,RIGHT,NONE,NONE):
             case GESTURE(RIGHT,LEFT,NONE,NONE):
                 msg_Dbg( p_intf, "Play/Pause" );
-                p_playlist = pl_Hold( p_intf );
                 p_input = playlist_CurrentInput( p_playlist );
-                pl_Release( p_intf );
  
                 if( p_input )
                 {
@@ -277,15 +266,11 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
 
             case GESTURE(LEFT,DOWN,NONE,NONE):
-                p_playlist = pl_Hold( p_intf );
                 playlist_Prev( p_playlist );
-                pl_Release( p_intf );
                 break;
 
             case GESTURE(RIGHT,DOWN,NONE,NONE):
-                p_playlist = pl_Hold( p_intf );
                 playlist_Next( p_playlist );
-                pl_Release( p_intf );
                 break;
 
             case UP:
@@ -309,10 +294,7 @@ static void RunIntf( intf_thread_t *p_intf )
                     vlc_value_t val, list, list2;
                     int i_count, i;
 
-                    p_playlist = pl_Hold( p_intf );
                     p_input = playlist_CurrentInput( p_playlist );
-                    pl_Release( p_intf );
-
                     if( !p_input )
                         break;
 
@@ -352,10 +334,7 @@ static void RunIntf( intf_thread_t *p_intf )
                     vlc_value_t val, list, list2;
                     int i_count, i;
 
-                    p_playlist = pl_Hold( p_intf );
                     p_input = playlist_CurrentInput( p_playlist );
-                    pl_Release( p_intf );
-
                     if( !p_input )
                         break;
 
@@ -417,6 +396,7 @@ static void RunIntf( intf_thread_t *p_intf )
             p_sys->i_num_gestures = 0;
             p_sys->i_pattern = 0;
             p_sys->b_got_gesture = false;
+            pl_Release( p_intf );
         }
 
         /*
@@ -434,7 +414,7 @@ static void RunIntf( intf_thread_t *p_intf )
 
         if( p_sys->p_vout == NULL )
         {
-            p_playlist = pl_Hold( p_intf );
+            playlist_t *p_playlist = pl_Hold( p_intf );
             p_input = playlist_CurrentInput( p_playlist );
             pl_Release( p_intf );
             if( p_input )
