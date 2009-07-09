@@ -923,12 +923,9 @@ void Equalizer::updateUIFromCore()
 void Equalizer::enable()
 {
     bool en = ui.enableCheck->isChecked();
-    aout_EnableFilter( VLC_OBJECT( p_intf ), "equalizer",
-                       en ? true : false );
-//    aout_EnableFilter( VLC_OBJECT( p_intf ), "upmixer",
-//                       en ? true : false );
-//     aout_EnableFilter( VLC_OBJECT( p_intf ), "vsurround",
-//                       en ? true : false );
+    aout_EnableFilter( THEPL, "equalizer", en );
+//    aout_EnableFilter( THEPL, "upmixer", en );
+//     aout_EnableFilter( THEPL, "vsurround", en );
     enable( en );
 
     if( presetsComboBox->currentIndex() < 0 )

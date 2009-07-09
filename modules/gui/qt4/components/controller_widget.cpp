@@ -133,7 +133,9 @@ void SoundWidget::updateVolume( int i_sliderVolume )
     if( !b_my_volume )
     {
         int i_res = i_sliderVolume  * (AOUT_VOLUME_MAX / 2) / VOLUME_MAX;
-        aout_VolumeSet( p_intf, i_res );
+        playlist_t *p_playlist = pl_Hold( p_intf );
+        aout_VolumeSet( p_playlist, i_res );
+        pl_Release( p_intf );
     }
     if( i_sliderVolume == 0 )
     {
@@ -154,7 +156,10 @@ void SoundWidget::updateVolume()
 {
     /* Audio part */
     audio_volume_t i_volume;
-    aout_VolumeGet( p_intf, &i_volume );
+    playlist_t *p_playlist = pl_Hold( p_intf );
+
+    aout_VolumeGet( p_playlist, &i_volume );
+    pl_Release( p_intf );
     i_volume = ( ( i_volume + 1 ) *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
     int i_gauge = volumeSlider->value();
     b_my_volume = false;
@@ -184,7 +189,10 @@ bool SoundWidget::eventFilter( QObject *obj, QEvent *e )
         }
         else
         {
-            aout_ToggleMute( p_intf, NULL );
+            playlist_t *p_playlist = pl_Hold( p_intf );
+
+            aout_ToggleMute( p_playlist, NULL );
+            pl_Release( p_intf );
         }
         e->accept();
         return true;
