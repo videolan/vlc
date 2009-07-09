@@ -457,6 +457,8 @@ VLC_EXPORT( int, aout_FindAndRestart, ( vlc_object_t *, const char *, vlc_value_
 VLC_EXPORT( int, aout_ChannelsRestart, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
 
 VLC_EXPORT( void, aout_EnableFilter, (vlc_object_t *, const char *, bool ));
+#define aout_EnableFilter( o, n, b ) \
+        aout_EnableFilter( VLC_OBJECT(o), n, b )
 
 #define aout_VisualNext(a) aout_VisualChange( VLC_OBJECT(a),1 )
 #define aout_VisualPrev(a) aout_VisualChange( VLC_OBJECT(a),-1 )

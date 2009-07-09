@@ -478,6 +478,7 @@ int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
     return 0;
 }
 
+#undef aout_EnableFilter
 /** Enable or disable an audio filter
  * \param p_this a vlc object
  * \param psz_name name of the filter
