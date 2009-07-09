@@ -202,30 +202,6 @@ VlcProc::~VlcProc()
 
 void VlcProc::manage()
 {
-#ifdef WIN32
-    if( !vlc_object_alive( getIntf() ) &&
-        !getIntf()->p_sys->b_exitRequested )
-    {
-        getIntf()->p_sys->b_exitRequested = true;
-
-        // explicitly stop the playlist
-        playlist_Stop( getIntf()->p_sys->p_playlist );
-
-        if( !VoutManager::instance( getIntf() )->hasVout() )
-            getIntf()->p_sys->b_exitOK = true;
-    }
-
-    if( getIntf()->p_sys->b_exitOK )
-    {
-        // Get the instance of OSFactory
-        OSFactory *pOsFactory = OSFactory::instance( getIntf() );
-
-        // Exit the main OS loop
-        pOsFactory->getOSLoop()->exit();
-
-        return;
-    }
-#else
     // Did the user request to quit vlc ?
     if( !vlc_object_alive( getIntf() ) )
     {
@@ -237,7 +213,6 @@ void VlcProc::manage()
 
         return;
     }
-#endif
 
     refreshPlaylist();
     refreshAudio();

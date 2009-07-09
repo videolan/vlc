@@ -81,7 +81,6 @@ static int onTaskBarChange( vlc_object_t *pObj, const char *pVariable,
                             vlc_value_t oldVal, vlc_value_t newVal,
                             void *pParam );
 
-
 static struct
 {
     intf_thread_t *intf;
@@ -96,9 +95,9 @@ static int Open( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
     // Allocate instance and initialize some members
-    p_intf->p_sys = (intf_sys_t *) malloc( sizeof( intf_sys_t ) );
+    p_intf->p_sys = (intf_sys_t *) calloc( 1, sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
-        return( VLC_ENOMEM );
+        return VLC_ENOMEM;
 
     p_intf->pf_run = Run;
 
@@ -122,80 +121,110 @@ static int Open( vlc_object_t *p_this )
     p_intf->p_sys->p_vlcProc = NULL;
     p_intf->p_sys->p_repository = NULL;
 
-#ifdef WIN32
-    p_intf->p_sys->b_exitRequested = false;
-    p_intf->p_sys->b_exitOK = false;
-#endif
-
     // No theme yet
     p_intf->p_sys->p_theme = NULL;
 
     // Create a variable to be notified of skins to be loaded
     var_Create( p_intf, "skin-to-load", VLC_VAR_STRING );
 
-    // Initialize singletons
-    if( OSFactory::instance( p_intf ) == NULL )
-    {
-        msg_Err( p_intf, "cannot initialize OSFactory" );
-        pl_Release( p_intf );
-#if 0
-        msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-#endif
-        return VLC_EGENERIC;
-    }
-    if( AsyncQueue::instance( p_intf ) == NULL )
-    {
-        msg_Err( p_intf, "cannot initialize AsyncQueue" );
-        pl_Release( p_intf );
-#if 0
-        msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-#endif
-        return VLC_EGENERIC;
-    }
-    if( Interpreter::instance( p_intf ) == NULL )
-    {
-        msg_Err( p_intf, "cannot instanciate Interpreter" );
-        pl_Release( p_intf );
-#if 0
-        msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-#endif
-        return VLC_EGENERIC;
-    }
-    if( VarManager::instance( p_intf ) == NULL )
-    {
-        msg_Err( p_intf, "cannot instanciate VarManager" );
-        pl_Release( p_intf );
-#if 0
-        msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-#endif
-        return VLC_EGENERIC;
-    }
-    if( VlcProc::instance( p_intf ) == NULL )
-    {
-        msg_Err( p_intf, "cannot initialize VLCProc" );
-        pl_Release( p_intf );
-#if 0
-        msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-#endif
-        return VLC_EGENERIC;
-    }
-    if( VoutManager::instance( p_intf ) == NULL )
-    {
-        msg_Err( p_intf, "cannot instanciate VoutManager" );
-        pl_Release( p_intf );
-        return VLC_EGENERIC;
-    }
     vlc_mutex_lock( &skin_load.mutex );
     skin_load.intf = p_intf;
     vlc_mutex_unlock( &skin_load.mutex );
 
-    Dialogs::instance( p_intf );
-    ThemeRepository::instance( p_intf );
+    return VLC_SUCCESS;
+}
+
+//---------------------------------------------------------------------------
+// Close: destroy interface
+//---------------------------------------------------------------------------
+static void Close( vlc_object_t *p_this )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)p_this;
+
+    msg_Dbg( p_intf, "closing skins2 module" );
+
+    vlc_mutex_lock( &skin_load.mutex );
+    skin_load.intf = NULL;
+    vlc_mutex_unlock( &skin_load.mutex);
+
+    if( p_intf->p_sys->p_playlist )
+        pl_Release( p_this );
+
+    // Unsubscribe from messages bank
+#if 0
+    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
+#endif
+
+    // Destroy structure
+    free( p_intf->p_sys );
+}
+
+
+//---------------------------------------------------------------------------
+// Run: main loop
+//---------------------------------------------------------------------------
+static void Run( intf_thread_t *p_intf )
+{
+    int canc = vlc_savecancel();
+
+    bool b_error = false;
+    char *skin_last = NULL;
+    ThemeLoader *pLoader = NULL;
+    OSLoop *loop = NULL;
+
+    // Initialize singletons
+    if( OSFactory::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "cannot initialize OSFactory" );
+        b_error = true;
+        goto end;
+    }
+    if( AsyncQueue::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "cannot initialize AsyncQueue" );
+        b_error = true;
+        goto end;
+    }
+    if( Interpreter::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "cannot instanciate Interpreter" );
+        b_error = true;
+        goto end;
+    }
+    if( VarManager::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "cannot instanciate VarManager" );
+        b_error = true;
+        goto end;
+    }
+    if( VlcProc::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "cannot initialize VLCProc" );
+        b_error = true;
+        goto end;
+    }
+    if( VoutManager::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "cannot instanciate VoutManager" );
+        b_error = true;
+        goto end;
+    }
+    if( ThemeRepository::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "cannot instanciate ThemeRepository" );
+        b_error = true;
+        goto end;
+    }
+    if( Dialogs::instance( p_intf ) == NULL )
+    {
+        msg_Err( p_intf, "cannot instanciate qt4 dialogs provider" );
+        b_error = true;
+        goto end;
+    }
 
     // Load a theme
-    char *skin_last = config_GetPsz( p_intf, "skins2-last" );
-
-    ThemeLoader *pLoader = new ThemeLoader( p_intf );
+    skin_last = config_GetPsz( p_intf, "skins2-last" );
+    pLoader = new ThemeLoader( p_intf );
 
     if( !skin_last || !*skin_last || !pLoader->load( skin_last ) )
     {
@@ -234,94 +263,46 @@ static int Open( vlc_object_t *p_this )
             }
         }
     }
-    delete pLoader;
 
+    delete pLoader;
     free( skin_last );
 
-#ifdef WIN32
-
-    p_intf->b_should_run_on_first_thread = true;
-
-    // enqueue a command to automatically start the first playlist item
-    AsyncQueue *pQueue = AsyncQueue::instance( p_intf );
-    CmdPlaylistFirst *pCmd = new CmdPlaylistFirst( p_intf );
-    pQueue->push( CmdGenericPtr( pCmd ) );
-
-#endif
-
-    return( VLC_SUCCESS );
-}
-
-//---------------------------------------------------------------------------
-// Close: destroy interface
-//---------------------------------------------------------------------------
-static void Close( vlc_object_t *p_this )
-{
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-
-    msg_Dbg( p_intf, "closing skins2 module" );
-
-    vlc_mutex_lock( &skin_load.mutex );
-    skin_load.intf = NULL;
-    vlc_mutex_unlock( &skin_load.mutex);
-
-    if( p_intf->p_sys->p_theme )
-    {
-        delete p_intf->p_sys->p_theme;
-        p_intf->p_sys->p_theme = NULL;
-        msg_Dbg( p_intf, "current theme deleted" );
-    }
-
-    // Destroy "singleton" objects
-    OSFactory::instance( p_intf )->destroyOSLoop();
-    ThemeRepository::destroy( p_intf );
-    VoutManager::destroy( p_intf );
-    //Dialogs::destroy( p_intf );
-    Interpreter::destroy( p_intf );
-    AsyncQueue::destroy( p_intf );
-    VarManager::destroy( p_intf );
-    VlcProc::destroy( p_intf );
-    OSFactory::destroy( p_intf );
-
-    if( p_intf->p_sys->p_playlist )
-    {
-        vlc_object_release( p_intf->p_sys->p_playlist );
-    }
-
-    // Unsubscribe from messages bank
-#if 0
-    msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
-#endif
-
-    // Destroy structure
-    free( p_intf->p_sys );
-}
-
-
-//---------------------------------------------------------------------------
-// Run: main loop
-//---------------------------------------------------------------------------
-static void Run( intf_thread_t *p_intf )
-{
-    int canc = vlc_savecancel();
-
     // Get the instance of OSLoop
-    OSLoop *loop = OSFactory::instance( p_intf )->getOSLoop();
+    loop = OSFactory::instance( p_intf )->getOSLoop();
 
     // Enter the main event loop
     loop->run();
 
-    // Delete the theme and save the configuration of the windows
-    if( p_intf->p_sys->p_theme )
-    {
-        p_intf->p_sys->p_theme->saveConfig();
-    }
-
-    // cannot be called in "Close", because it refcounts skins2
-    Dialogs::destroy( p_intf );
+    // Destroy OSLoop
+    OSFactory::instance( p_intf )->destroyOSLoop();
 
     // save config file
     config_SaveConfigFile( p_intf, NULL );
+
+    // save and delete the theme
+    if( p_intf->p_sys->p_theme )
+    {
+        p_intf->p_sys->p_theme->saveConfig();
+
+        delete p_intf->p_sys->p_theme;
+        p_intf->p_sys->p_theme = NULL;
+
+        msg_Dbg( p_intf, "current theme deleted" );
+    }
+
+end:
+    // Destroy "singleton" objects
+    Dialogs::destroy( p_intf );
+    ThemeRepository::destroy( p_intf );
+    VoutManager::destroy( p_intf );
+    VlcProc::destroy( p_intf );
+    VarManager::destroy( p_intf );
+    Interpreter::destroy( p_intf );
+    AsyncQueue::destroy( p_intf );
+    OSFactory::destroy( p_intf );
+
+    if( b_error )
+        libvlc_Quit( p_intf->p_libvlc );
 
     vlc_restorecancel(canc);
 }
