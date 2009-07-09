@@ -236,8 +236,12 @@ DBUS_METHOD( VolumeGet )
     OUT_ARGUMENTS;
     dbus_int32_t i_dbus_vol;
     audio_volume_t i_vol;
+
     /* 2nd argument of aout_VolumeGet is int32 */
-    aout_VolumeGet( (vlc_object_t*) p_this, &i_vol );
+    playlist_t *p_playlist = pl_Hold( ((vlc_object_t*) p_this) );
+    aout_VolumeGet( p_playlist, &i_vol );
+    pl_Release( ((vlc_object_t*) p_this) );
+
     double f_vol = 100. * i_vol / AOUT_VOLUME_MAX;
     i_dbus_vol = round( f_vol );
     ADD_INT32( &i_dbus_vol );
@@ -268,8 +272,9 @@ DBUS_METHOD( VolumeSet )
 
     double f_vol = AOUT_VOLUME_MAX * i_dbus_vol / 100.;
     i_vol = round( f_vol );
-    aout_VolumeSet( (vlc_object_t*) p_this, i_vol );
-
+    playlist_t *p_playlist = pl_Hold( ((vlc_object_t*) p_this) );
+    aout_VolumeSet( p_playlist, i_vol );
+    pl_Release( ((vlc_object_t*) p_this) );
     REPLY_SEND;
 }
 
