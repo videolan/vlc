@@ -788,7 +788,9 @@ void Interface::OnChange( int wp )
 
 void Interface::VolumeChange( int i_volume )
 {
-    aout_VolumeSet( p_intf, i_volume * AOUT_VOLUME_MAX / 200 / 2 );
+    playlist_t * p_playlist = pl_Hold( p_intf );
+    aout_VolumeSet( p_playlist, i_volume * AOUT_VOLUME_MAX / 200 / 2 );
+    pl_Release( p_intf );
 }
 
 void Interface::VolumeUpdate()
@@ -797,7 +799,9 @@ void Interface::VolumeUpdate()
 
     if( b_volume_hold ) return;
 
+    playlist_t * p_playlist = pl_Hold( p_intf );
     aout_VolumeGet( p_intf, &i_volume );
+    pl_Release( p_intf );
 
     int i_volume_ctrl = 200 - i_volume * 200 * 2 / AOUT_VOLUME_MAX;
 
