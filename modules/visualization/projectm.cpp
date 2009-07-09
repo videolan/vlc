@@ -122,7 +122,7 @@ static int initOpenGL( projectm_thread_t *p_thread )
 
     /* Initialize the opengl object */
     video_format_Setup( &p_thread->p_opengl->fmt_in, VLC_CODEC_RGB32,
-                        640, 460, 1 );
+                        p_thread->i_width, p_thread->i_height, 1 );
     p_thread->p_opengl->i_window_width = p_thread->i_width;
     p_thread->p_opengl->i_window_height = p_thread->i_height;
     p_thread->p_opengl->render.i_width = p_thread->i_width;
