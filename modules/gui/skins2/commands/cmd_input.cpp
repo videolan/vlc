@@ -113,7 +113,7 @@ void CmdMute::execute()
 {
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
 
-    aout_TogleMute( pPlaylist, NULL );
+    aout_ToggleMute( pPlaylist, NULL );
 }
 
 
