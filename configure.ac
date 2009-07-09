@@ -4966,7 +4966,7 @@ AS_IF([test "${enable_qt4}" != "no"], [
     AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "cygwin" -a "${SYS}" != "darwin"], [
         VLC_ADD_LIBS([qt4],[$QT4_LIBS -lX11])
     ], [
-        VLC_ADD_LIBS([qt4],[$QT4_LIBS])
+        VLC_ADD_LIBS([qt4],[$QT4_LIBS -lole32])
     ])
     QT4LOCALEDIR="$($PKG_CONFIG --variable=prefix QtCore)/share/qt4/translations/"
     AC_SUBST(QT4LOCALEDIR)

@@ -46,6 +46,10 @@
 
 #define ICON_HEIGHT 64
 
+#ifdef WIN32
+#include "vistaassoc.h"
+#endif
+
 /*********************************************************************
  * The List of categories
  *********************************************************************/
@@ -810,6 +814,28 @@ bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
 
 void SPrefsPanel::assoDialog()
 {
+    OSVERSIONINFO winVer;
+    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    //Vista specific file associations
+    if( GetVersionEx(&winVer) && winVer.dwMajorVersion > 5 )
+    {
+            LPAPPASSOCREGUI p_appassoc;
+            CoInitialize( 0 );
+
+            if( S_OK == CoCreateInstance( &clsid_IApplication2,
+                        NULL, CLSCTX_INPROC_SERVER,
+                        &IID_IApplicationAssociationRegistrationUI,
+                        (void **)&p_appassoc) )
+            {
+                if(S_OK == p_appassoc->vt->LaunchAdvancedAssociationUI(p_appassoc, L"VLC" ) )
+                {
+                    CoUninitialize();
+                    return;
+                }
+            }
+
+            CoUninitialize();
+    }
     QDialog *d = new QDialog( this );
     QGridLayout *assoLayout = new QGridLayout( d );
 
