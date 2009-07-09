@@ -1195,12 +1195,12 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             ReturnTrue;
 
         case 'a':
-            aout_VolumeUp( p_intf, 1, NULL );
+            aout_VolumeUp( p_playlist, 1, NULL );
             clear();
             ReturnTrue;
 
         case 'z':
-            aout_VolumeDown( p_intf, 1, NULL );
+            aout_VolumeDown( p_playlist, 1, NULL );
             clear();
             ReturnTrue;
 
@@ -1547,7 +1547,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             mvnprintw( y++, 0, COLS, _(" Position : %s/%s (%.2f%%)"), buf1, buf2, p_sys->f_slider );
 
             /* Volume */
-            aout_VolumeGet( p_intf, &i_volume );
+            aout_VolumeGet( p_playlist, &i_volume );
             mvnprintw( y++, 0, COLS, _(" Volume   : %i%%"), i_volume*200/AOUT_VOLUME_MAX );
 
             /* Title */
