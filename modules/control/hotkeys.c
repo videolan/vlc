@@ -181,7 +181,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_VOL_UP:
         {
             audio_volume_t i_newvol;
-            aout_VolumeUp( p_intf, 1, &i_newvol );
+            aout_VolumeUp( p_playlist, 1, &i_newvol );
             DisplayVolume( p_intf, p_vout, i_newvol );
             break;
         }
@@ -189,7 +189,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_VOL_DOWN:
         {
             audio_volume_t i_newvol;
-            aout_VolumeDown( p_intf, 1, &i_newvol );
+            aout_VolumeDown( p_playlist, 1, &i_newvol );
             DisplayVolume( p_intf, p_vout, i_newvol );
             break;
         }
@@ -197,7 +197,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_VOL_MUTE:
         {
             audio_volume_t i_newvol = -1;
-            aout_ToggleMute( p_intf, &i_newvol );
+            aout_ToggleMute( p_playlist, &i_newvol );
             if( p_vout )
             {
                 if( i_newvol == 0 )
