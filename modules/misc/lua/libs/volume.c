@@ -72,7 +72,7 @@ static int vlclua_volume_get( lua_State *L )
 static int vlclua_volume_up( lua_State *L )
 {
     audio_volume_t i_volume;
-    aout_VolumeUp( vlclua_get_playlist_internal( L );
+    aout_VolumeUp( vlclua_get_playlist_internal( L ),
                    luaL_optint( L, 1, 1 ),
                    &i_volume );
     lua_pushnumber( L, i_volume );
