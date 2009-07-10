@@ -26,10 +26,10 @@ aout_FormatPrepare
 aout_FormatPrint
 aout_FormatPrintChannels
 aout_OutputNextBuffer
+__aout_ToggleMute
 __aout_VolumeDown
 __aout_VolumeGet
 __aout_VolumeInfos
-__aout_ToggleMute
 aout_VolumeNoneInit
 __aout_VolumeSet
 aout_VolumeSoftInit
