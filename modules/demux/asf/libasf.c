@@ -108,7 +108,7 @@ static char *AsfObjectHelperReadString( const uint8_t *p_peek, int i_peek, uint8
             int i;
             for( i = 0; i < i_size/2; i++ )
                 psz_string[i] = GetWLE( &p_data[2*i] );
-            psz_string[i_size/2] = '\0'; \
+            psz_string[i_size/2] = '\0';
         }
     }
     else
