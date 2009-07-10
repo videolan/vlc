@@ -148,7 +148,6 @@ ifdef HAVE_DARWIN_OS
 X264CONF += --enable-pic
 FFMPEGCONF += --cc=$(CC)
 FFMPEGCONF += --arch=$(ARCH)
-FFMPEGCONF += --disable-libfaac
 ifdef HAVE_DARWIN_10
 FFMPEGCONF += --cpu=core2
 X264CONF+=--host=x86_64-apple-darwin10
@@ -922,24 +921,6 @@ CLEAN_PKG += faad2
 DISTCLEAN_PKG += faad2-$(FAAD2_VERSION).tar.gz
 
 # ***************************************************************************
-# faac
-# ***************************************************************************
-
-faac-$(FAAC_VERSION).tar.gz:
-	$(WGET) $(FAAC_URL)
-
-faac: faac-$(FAAC_VERSION).tar.gz
-	$(EXTRACT_GZ)
-
-.faac: faac
-	(cd $<; ./bootstrap && $(HOSTCC) ./configure $(HOSTCONF) --without-mp4v2 --prefix=$(PREFIX) --disable-shared && make && make install)
-	touch $@
-
-CLEAN_FILE += .faac
-CLEAN_PKG += faac
-DISTCLEAN_PKG += faac-$(FAAC_VERSION).tar.gz
-
-# ***************************************************************************
 # lame
 # ***************************************************************************
 
@@ -1129,7 +1110,7 @@ else
 ifdef HAVE_UCLIBC
 .ffmpeg: ffmpeg
 else
-.ffmpeg: ffmpeg .faac .lame .gsm
+.ffmpeg: ffmpeg .lame .gsm
 endif
 endif
 	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)

@@ -3,7 +3,7 @@ ifeq ($(HOST),$(BUILD))
 # Native build: we need perl, autoconf, etc first
 all: .perl .autoconf .automake .libtool .iconv .intl .freetype .fribidi \
 	.a52 .mpeg2 .id3tag .mad .ogg .vorbis .vorbisenc .theora \
-	.flac .speex .faad .faac .lame .ebml .matroska .ffmpeg .dvdcss \
+	.flac .speex .faad .lame .ebml .matroska .ffmpeg .dvdcss \
 	.dvdnav .dvbpsi .dca .aclocal
    #.speex seems
 else
