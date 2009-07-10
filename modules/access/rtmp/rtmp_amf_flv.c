@@ -15,9 +15,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -33,6 +33,7 @@
 #include <vlc_network.h> /* DOWN: #include <network.h> */
 #include <vlc_url.h>
 #include <vlc_block.h>
+#include <vlc_rand.h>
 
 #include <stdlib.h>
 #include <stdint.h>
@@ -338,18 +339,14 @@ rtmp_handshake_active( vlc_object_t *p_this, int fd )
     int i;
 
     p_write[0] = RTMP_HANDSHAKE;
-    for( i = 0; i < RTMP_HANDSHAKE_BODY_SIZE; i++ )
-    {
-        if (i < 8)
-        {
-            p_write[i + 1] = 0x00;
-        } else {
-            p_write[i + 1] = rand() & 0xFF;
-        }
-    }
+
+    for( i = 0; i < 8; i++ )
+        p_write[i + 1] = 0x00;
+
+    vlc_rand_bytes( p_write+1+8, RTMP_HANDSHAKE_BODY_SIZE-8 );
 
     /* Send handshake*/
-    i_ret = net_Write( p_this, fd, NULL, p_write, RTMP_HANDSHAKE_BODY_SIZE + 1 );
+    i_ret = net_Write( p_this, fd, NULL, p_write, RTMP_HANDSHAKE_BODY_SIZE+1 );
     if( i_ret != RTMP_HANDSHAKE_BODY_SIZE + 1 )
     {
         msg_Err( p_this, "failed to send handshake" );
