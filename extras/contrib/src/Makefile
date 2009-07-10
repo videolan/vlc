@@ -2497,7 +2497,7 @@ schroedinger: schroedinger-$(SCHROED_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .schroedinger: schroedinger .liboil
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-thread=none --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-thread=none --disable-gstreamer --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make -C schroedinger && make -C schroedinger install)
 	touch $@
 
 CLEAN_FILE += .schroedinger
