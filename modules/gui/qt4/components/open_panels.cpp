@@ -1158,8 +1158,7 @@ void CaptureOpenPanel::updateMRL()
         mrl += " :v4l-frequency=" + QString::number( v4lFreq->value() );
         break;
     case V4L2_DEVICE:
-        fileList << "v4l2://";
-        mrl += " :v4l2-dev=" + v4l2VideoDevice->text();
+        fileList << "v4l2://" + v4l2VideoDevice->text();
         mrl += " :input-slave=alsa://" + v4l2AudioDevice->text();
         mrl += " :v4l2-standard=" + QString::number( v4l2StdBox->currentIndex() );
         break;
