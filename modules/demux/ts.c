@@ -3852,21 +3852,18 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         }
         else if( p_dr->i_tag == 0x05 )
         {
-            if( p_dr->i_tag == 0x05 )
+            /* Registration Descriptor */
+            if( p_dr->i_length != 4 )
             {
-                /* Registration Descriptor */
-                if( p_dr->i_length != 4 )
+                msg_Warn( p_demux, "invalid Registration Descriptor" );
+            }
+            else
+            {
+                msg_Dbg( p_demux, " * descriptor : registration %4.4s", p_dr->p_data );
+                if( !memcmp( p_dr->p_data, "HDMV", 4 ) )
                 {
-                    msg_Warn( p_demux, "invalid Registration Descriptor" );
-                }
-                else
-                {
-                    msg_Dbg( p_demux, " * descriptor : registration %4.4s", p_dr->p_data );
-                    if( !memcmp( p_dr->p_data, "HDMV", 4 ) )
-                    {
-                        /* Blu-Ray */
-                        b_hdmv = true;
-                    }
+                    /* Blu-Ray */
+                    b_hdmv = true;
                 }
             }
         }
