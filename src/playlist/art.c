@@ -63,65 +63,64 @@ static void ArtCacheCreateDir( const char *psz_dir )
     utf8_mkdir( psz_dir, 0700 );
 }
 
-static void ArtCacheGetDirPath( char *psz_dir,
-                                const char *psz_title,
-                                const char *psz_artist, const char *psz_album )
+static char* ArtCacheGetDirPath( const char *psz_title, const char *psz_artist,
+                                 const char *psz_album )
 {
+    char *psz_dir;
     char *psz_cachedir = config_GetCacheDir();
 
     if( !EMPTY_STR(psz_artist) && !EMPTY_STR(psz_album) )
     {
         char *psz_album_sanitized = filename_sanitize( psz_album );
         char *psz_artist_sanitized = filename_sanitize( psz_artist );
-        snprintf( psz_dir, PATH_MAX, "%s" DIR_SEP
-                  "art" DIR_SEP "artistalbum" DIR_SEP "%s" DIR_SEP "%s",
-                  psz_cachedir, psz_artist_sanitized, psz_album_sanitized );
+        if( asprintf( &psz_dir, "%s" DIR_SEP "art" DIR_SEP "artistalbum"
+                      DIR_SEP "%s" DIR_SEP "%s", psz_cachedir,
+                      psz_artist_sanitized, psz_album_sanitized ) == -1 )
+            psz_dir = NULL;
         free( psz_album_sanitized );
         free( psz_artist_sanitized );
     }
     else
     {
         char * psz_title_sanitized = filename_sanitize( psz_title );
-        snprintf( psz_dir, PATH_MAX, "%s" DIR_SEP
-                  "art" DIR_SEP "title" DIR_SEP "%s",
-                  psz_cachedir, psz_title_sanitized );
+        if( asprintf( &psz_dir, "%s" DIR_SEP "art" DIR_SEP "title" DIR_SEP
+                      "%s", psz_cachedir, psz_title_sanitized ) == -1 )
+            psz_dir = NULL;
         free( psz_title_sanitized );
     }
     free( psz_cachedir );
+    return psz_dir;
 }
 
 static char *ArtCachePath( input_item_t *p_item )
 {
-    char psz_path[PATH_MAX+1]; /* FIXME */
+    char* psz_path = NULL;
+    const char *psz_artist;
+    const char *psz_album;
+    const char *psz_title;
 
     vlc_mutex_lock( &p_item->lock );
 
     if( !p_item->p_meta )
         p_item->p_meta = vlc_meta_New();
     if( !p_item->p_meta )
-    {
-        vlc_mutex_unlock( &p_item->lock );
-        return NULL;
-    }
+        goto end;
 
-    const char *psz_artist = vlc_meta_Get( p_item->p_meta, vlc_meta_Artist );
-    const char *psz_album = vlc_meta_Get( p_item->p_meta, vlc_meta_Album );
-    const char *psz_title = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
+    psz_artist = vlc_meta_Get( p_item->p_meta, vlc_meta_Artist );
+    psz_album = vlc_meta_Get( p_item->p_meta, vlc_meta_Album );
+    psz_title = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
 
     if( !psz_title )
         psz_title = p_item->psz_name;
 
     if( (!psz_artist || !psz_album ) && !psz_title )
-    {
-        vlc_mutex_unlock( &p_item->lock );
-        return NULL;
-    }
+        goto end;
 
-    ArtCacheGetDirPath( psz_path, psz_title, psz_artist, psz_album );
+    psz_path = ArtCacheGetDirPath( psz_title, psz_artist, psz_album );
 
+end:
     vlc_mutex_unlock( &p_item->lock );
-
-    return strdup( psz_path );
+    return psz_path;
 }
 
 static char *ArtCacheName( input_item_t *p_item, const char *psz_type )
