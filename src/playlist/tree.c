@@ -144,7 +144,7 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
     }
 
     /* Delete the children */
-    for( i =  p_root->i_children - 1 ; i >= 0; i-- )
+    for( i = p_root->i_children - 1 ; i >= 0; i-- )
     {
         if( p_root->pp_children[i]->i_children > -1 )
         {
@@ -333,30 +333,6 @@ playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
 /**********************************************************************
  * Tree walking functions
  **********************************************************************/
-
-playlist_item_t *playlist_GetLastLeaf(playlist_t *p_playlist,
-                                      playlist_item_t *p_root )
-{
-    PL_ASSERT_LOCKED;
-    int i;
-    playlist_item_t *p_item;
-    for ( i = p_root->i_children - 1; i >= 0; i-- )
-    {
-        if( p_root->pp_children[i]->i_children == -1 )
-            return p_root->pp_children[i];
-        else if( p_root->pp_children[i]->i_children > 0)
-        {
-             p_item = playlist_GetLastLeaf( p_playlist,
-                                            p_root->pp_children[i] );
-            if ( p_item != NULL )
-                return p_item;
-        }
-        else if( i == 0 )
-            return NULL;
-    }
-    return NULL;
-}
-
 /**
  * Finds the next item to play
  *
@@ -415,7 +391,7 @@ playlist_item_t *playlist_GetPrevLeaf( playlist_t *p_playlist,
     PL_ASSERT_LOCKED;
     playlist_item_t *p_prev;
 
-    PL_DEBUG2( "finding previous os %s within %s", PLI_NAME( p_item ),
+    PL_DEBUG2( "finding previous of %s within %s", PLI_NAME( p_item ),
                                                    PLI_NAME( p_root ) );
     assert( p_root && p_root->i_children != -1 );
 

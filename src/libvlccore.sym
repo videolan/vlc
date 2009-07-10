@@ -315,7 +315,6 @@ playlist_CurrentInput
 playlist_CurrentPlayingItem
 playlist_DeleteFromInput
 playlist_Export
-playlist_GetLastLeaf
 playlist_GetNextLeaf
 playlist_GetPreferredNode
 playlist_GetPrevLeaf
