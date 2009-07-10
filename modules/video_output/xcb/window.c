@@ -27,8 +27,8 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <poll.h>
-#include <unistd.h> /* gethostname() */
-#include <limits.h> /* HOST_NAME_MAX */
+#include <unistd.h> /* gethostname() and sysconf() */
+#include <limits.h> /* _POSIX_HOST_NAME_MAX */
 
 #include <xcb/xcb.h>
 typedef xcb_atom_t Atom;
@@ -96,13 +96,18 @@ void set_ascii_prop (xcb_connection_t *conn, xcb_window_t window,
 static inline
 void set_hostname_prop (xcb_connection_t *conn, xcb_window_t window)
 {
-    char hostname[HOST_NAME_MAX];
+    char* hostname;
+    long host_name_max = sysconf (_SC_HOST_NAME_MAX);
+    if (host_name_max <= 0) host_name_max = _POSIX_HOST_NAME_MAX;
+    hostname = malloc (host_name_max);
+    if(!hostname) return;
 
-    if (gethostname (hostname, sizeof (hostname)) == 0)
+    if (gethostname (hostname, host_name_max) == 0)
     {
-        hostname[sizeof (hostname) - 1] = '\0';
+        hostname[host_name_max - 1] = '\0';
         set_ascii_prop (conn, window, XA_WM_CLIENT_MACHINE, hostname);
     }
+    free(hostname);
 }
 
 static inline
