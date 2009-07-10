@@ -588,7 +588,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
     }
 
     /* Receive the http header */
-    if( ( psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL ) ) == NULL )
+    if( ( psz = net_Gets( p_access, p_sys->fd, NULL ) ) == NULL )
     {
         msg_Err( p_access, "failed to read answer" );
         goto error;
@@ -825,7 +825,7 @@ static int Start( access_t *p_access, int64_t i_pos )
         return VLC_EGENERIC;
     }
 
-    psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
+    psz = net_Gets( p_access, p_sys->fd, NULL );
     if( psz == NULL )
     {
         msg_Err( p_access, "cannot read data 0" );

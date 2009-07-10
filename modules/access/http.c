@@ -715,7 +715,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
         if( p_sys->i_chunk <= 0 )
         {
-            char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, p_sys->p_vs );
+            char *psz = net_Gets( p_access, p_sys->fd, p_sys->p_vs );
             /* read the chunk header */
             if( psz == NULL )
             {
@@ -778,7 +778,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             if( p_sys->i_chunk <= 0 )
             {
                 /* read the empty line */
-                char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, p_sys->p_vs );
+                char *psz = net_Gets( p_access, p_sys->fd, p_sys->p_vs );
                 free( psz );
             }
         }
@@ -1103,7 +1103,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
                         p_sys->i_version,
                         p_sys->url.psz_host, p_sys->url.i_port);
 
-            psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
+            psz = net_Gets( p_access, p_sys->fd, NULL );
             if( psz == NULL )
             {
                 msg_Err( p_access, "cannot establish HTTP/TLS tunnel" );
@@ -1123,7 +1123,7 @@ static int Connect( access_t *p_access, int64_t i_tell )
 
             do
             {
-                psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, NULL );
+                psz = net_Gets( p_access, p_sys->fd, NULL );
                 if( psz == NULL )
                 {
                     msg_Err( p_access, "HTTP proxy connection failed" );
@@ -1264,7 +1264,7 @@ static int Request( access_t *p_access, int64_t i_tell )
     }
 
     /* Read Answer */
-    if( ( psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, pvs ) ) == NULL )
+    if( ( psz = net_Gets( p_access, p_sys->fd, pvs ) ) == NULL )
     {
         msg_Err( p_access, "failed to read answer" );
         goto error;
@@ -1312,7 +1312,7 @@ static int Request( access_t *p_access, int64_t i_tell )
 
     for( ;; )
     {
-        char *psz = net_Gets( VLC_OBJECT(p_access), p_sys->fd, pvs );
+        char *psz = net_Gets( p_access, p_sys->fd, pvs );
         char *p;
 
         if( psz == NULL )
