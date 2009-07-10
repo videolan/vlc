@@ -173,12 +173,12 @@ def Repeat(widget):
 def Shuffle(widget):
     global shuffle
     shuffle = not shuffle
-    tracklist.Random(shuffle)
+    tracklist.SetRandom(shuffle)
 
 def Loop(widget):
     global loop
     loop = not loop
-    tracklist.Loop(loop)
+    tracklist.SetLoop(loop)
 
 # update status display
 def update(widget):
