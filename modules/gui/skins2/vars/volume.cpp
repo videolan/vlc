@@ -49,7 +49,7 @@ void Volume::set( float percentage )
     {
         VarPercent::set( percentage );
 
-        aout_VolumeSet( getIntf()->p_sys->p_playlist(),
+        aout_VolumeSet( getIntf()->p_sys->p_playlist,
                         (int)(get() * AOUT_VOLUME_MAX / 2.0) );
     }
 }
