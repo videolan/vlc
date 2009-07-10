@@ -66,6 +66,7 @@ $Id$
  * cddax: input module to read audio CDs via libcdio
  * cdg: CD-G decoder
  * chain: Video filtering using a chain of video filter modules
+ * chorus_flanger: variable delay audio filter
  * clone: Clone video filter
  * cmml: Continuous Media Markup Language annotations/hyperlinks decoder
  * colorthres:  Theshold color based on similarity to reference color Video filter
@@ -246,6 +247,7 @@ $Id$
  * portaudio: audio output module that uses the portaudio library (www.portaudio.com)
  * postproc: Video post processing filter
  * probe_hal: HAL probing module
+ * projectm: visualisation using libprojectM
  * ps: input module for MPEG PS decapsulation
  * psychedelic: Psychedelic video filter
  * pulse: PulseAudio audio output module
@@ -349,6 +351,7 @@ $Id$
  * vc1: VC-1 Video demuxer
  * vcd: input module for accessing Video CDs
  * vcdx: input module for accessing Video CDs with navigation & stills
+ * video_filter_wrapper: a "video filter2/splitter" with mouse to "video filter" wrapper
  * visual: visualisation system
  * vmem: memory video driver
  * vobsub: VobSUB subtitles demuxer
@@ -367,7 +370,6 @@ $Id$
  * wingdi: WIN 32 / WIN CE GDI video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
  * x11: video output module using the X11 API
- * x11_screen: Screen capture module
  * x264: H264 video decoder using X264
  * xa: XA demuxer
  * xml: LibXML xml parser
