@@ -24,7 +24,6 @@
 
 #include <signal.h>
 #include <time.h>
-#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -101,15 +100,8 @@ static void *SigThread (void *data)
 
     do
     {
-        switch (sigwait (&set, &signum))
-        {
-            case EINTR:
-                continue;
-            case 0:
-                break;
-            default:
-                assert (0);
-        }
+        sigwait (&set, &signum);
+
 #ifdef __APPLE__
         /* In Mac OS X up to 10.5 sigwait (among others) is not a pthread
          * cancellation point */
