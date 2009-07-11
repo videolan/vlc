@@ -360,7 +360,6 @@ static mtime_t GetMoviePTS( demux_sys_t *p_sys )
         {
             if( i_time < 0 ) i_time = tk->i_time;
             else i_time = __MIN( i_time, tk->i_time );
-            break;
         }
     }
 
