@@ -100,7 +100,7 @@ static void *SigThread (void *data)
 
     do
     {
-        sigwait (&set, &signum);
+        while (sigwait (&set, &signum));
 
 #ifdef __APPLE__
         /* In Mac OS X up to 10.5 sigwait (among others) is not a pthread
