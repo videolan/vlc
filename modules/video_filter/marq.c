@@ -111,7 +111,7 @@ struct filter_sys_t
                             "0 (remains forever).")
 #define REFRESH_TEXT N_("Refresh period in ms")
 #define REFRESH_LONGTEXT N_("Number of milliseconds between string updates. " \
-                            "This is mainly usefull when using meta data " \
+                            "This is mainly useful when using meta data " \
                             "or time format string sequences.")
 #define OPACITY_TEXT N_("Opacity")
 #define OPACITY_LONGTEXT N_("Opacity (inverse of transparency) of " \

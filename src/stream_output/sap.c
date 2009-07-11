@@ -373,7 +373,7 @@ int SAP_Add (sap_handler_t *p_sap, session_descriptor_t *p_session)
 
     /* SAPv1, not encrypted, not compressed */
     psz_head[0] = 0x20;
-    psz_head[1] = 0x00; /* No authentification length */
+    psz_head[1] = 0x00; /* No authentication length */
 
     i_hash = mdate();
     psz_head[2] = i_hash >> 8; /* Msg id hash */

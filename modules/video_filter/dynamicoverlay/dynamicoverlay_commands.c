@@ -442,7 +442,7 @@ static int exec_DataSharedMem( filter_t *p_filter,
         if( (p_params->i_height != 1) || (p_params->i_width < 1) )
         {
             msg_Err( p_filter,
-                     "Invalid width and/or height. when specifing text height "
+                     "Invalid width and/or height. when specifying text height "
                      "must be 1 and width the number of bytes in the string, "
                      "including the null terminator" );
             return VLC_EGENERIC;

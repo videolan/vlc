@@ -531,12 +531,12 @@ static const char *const ppsz_pos_descriptions[] =
 
 #define CUSTOM_CROP_RATIOS_TEXT N_("Custom crop ratios list")
 #define CUSTOM_CROP_RATIOS_LONGTEXT N_( \
-    "Comma seperated list of crop ratios which will be added in the " \
+    "Comma separated list of crop ratios which will be added in the " \
     "interface's crop ratios list.")
 
 #define CUSTOM_ASPECT_RATIOS_TEXT N_("Custom aspect ratios list")
 #define CUSTOM_ASPECT_RATIOS_LONGTEXT N_( \
-    "Comma seperated list of aspect ratios which will be added in the " \
+    "Comma separated list of aspect ratios which will be added in the " \
     "interface's aspect ratio list.")
 
 #define HDTV_FIX_TEXT N_("Fix HDTV height")
@@ -630,7 +630,7 @@ static const char *const ppsz_clock_descriptions[] =
 
 #define MIFACE_ADDR_TEXT N_("IPv4 multicast output interface address")
 #define MIFACE_ADDR_LONGTEXT N_( \
-    "IPv4 adress for the default multicast interface. This overrides " \
+    "IPv4 address for the default multicast interface. This overrides " \
     "the routing table.")
 
 #define DSCP_TEXT N_("DiffServ Code Point")

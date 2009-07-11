@@ -77,7 +77,7 @@
 #ifdef SCREEN_MOUSE
 #define MOUSE_TEXT N_( "Mouse pointer image" )
 #define MOUSE_LONGTEXT N_( \
-    "If specifed, will use the image to draw the mouse pointer on the " \
+    "If specified, will use the image to draw the mouse pointer on the " \
     "capture." )
 #endif
 

@@ -422,7 +422,7 @@ static int SocksNegotiate( vlc_object_t *p_obj,
             msg_Err( p_obj, "socks: unsupported authentication method %x",
                      buffer[0] );
         else
-            msg_Err( p_obj, "socks: authentification needed" );
+            msg_Err( p_obj, "socks: authentication needed" );
         return VLC_EGENERIC;
     }
 

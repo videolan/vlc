@@ -737,7 +737,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                     }
                     else
                     {
-                        msg_Err( &sys.demuxer, "inconsistant theora extradata" );
+                        msg_Err( &sys.demuxer, "inconsistent theora extradata" );
                     }
                 }
                 else {

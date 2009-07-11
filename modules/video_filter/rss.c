@@ -126,7 +126,7 @@ struct filter_sys_t
 };
 
 #define MSG_TEXT N_("Feed URLs")
-#define MSG_LONGTEXT N_("RSS/Atom feed '|' (pipe) seperated URLs.")
+#define MSG_LONGTEXT N_("RSS/Atom feed '|' (pipe) separated URLs.")
 #define SPEED_TEXT N_("Speed of feeds")
 #define SPEED_LONGTEXT N_("Speed of the RSS/Atom feeds in microseconds (bigger is slower).")
 #define LENGTH_TEXT N_("Max length")
