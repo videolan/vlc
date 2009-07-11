@@ -395,8 +395,14 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 if( !p_pic )
                 {
                     Reset( p_dec );
-                    block_Release( p_block );
-                    return NULL;
+
+                    p_pic = DpbNewPicture( p_dec );
+                    if( !p_pic )
+                    {
+                        mpeg2_reset( p_sys->p_mpeg2dec, 1 );
+                        block_Release( p_block );
+                        return NULL;
+                    }
                 }
             }
 
@@ -614,7 +620,7 @@ static void Reset( decoder_t *p_dec )
     decoder_sys_t *p_sys = p_dec->p_sys;
 
     cc_Flush( &p_sys->cc );
-    mpeg2_reset( p_sys->p_mpeg2dec, p_sys->p_info->sequence != NULL );
+    mpeg2_reset( p_sys->p_mpeg2dec, 0 );
     DpbClean( p_dec );
 }
 
