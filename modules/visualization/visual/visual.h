@@ -78,4 +78,4 @@ int spectrometer_Run
 
 /* Default vout size */
 #define VOUT_WIDTH 800
-#define VOUT_HEIGHT 480
+#define VOUT_HEIGHT 640
