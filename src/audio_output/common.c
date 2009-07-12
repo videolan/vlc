@@ -197,6 +197,8 @@ const char * aout_FormatPrintChannels( const audio_sample_format_t * p_format )
 {
     switch ( p_format->i_physical_channels & AOUT_CHAN_PHYSMASK )
     {
+    case AOUT_CHAN_LEFT:
+    case AOUT_CHAN_RIGHT:
     case AOUT_CHAN_CENTER:
         if ( (p_format->i_original_channels & AOUT_CHAN_CENTER)
               || (p_format->i_original_channels
