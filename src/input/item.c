@@ -33,7 +33,7 @@
 
 #include "item.h"
 
-static void GuessType( input_item_t *p_item );
+static int GuessType( const input_item_t *p_item );
 
 /** Stuff moved out of vlc_input.h -- FIXME: should probably not be inline
  * anyway. */
@@ -361,7 +361,7 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
     free( p_i->psz_uri );
     p_i->psz_uri = strdup( psz_uri );
 
-    GuessType( p_i );
+    p_i->i_type = GuessType( p_i );
 
     if( !p_i->psz_name && p_i->i_type == ITEM_TYPE_FILE )
     {
@@ -810,45 +810,48 @@ input_item_t *input_item_NewWithType( vlc_object_t *p_obj, const char *psz_uri,
     return p_input;
 }
 
-/* Guess the type of the item using the beginning of the mrl */
-static void GuessType( input_item_t *p_item)
+struct item_type_entry
 {
-    int i;
-    static struct { const char *psz_search; int i_type; }  types_array[] =
-    {
-        { "http", ITEM_TYPE_NET },
-        { "dvd", ITEM_TYPE_DISC },
-        { "cdda", ITEM_TYPE_CDDA },
-        { "mms", ITEM_TYPE_NET },
-        { "rtsp", ITEM_TYPE_NET },
-        { "udp", ITEM_TYPE_NET },
-        { "rtp", ITEM_TYPE_NET },
-        { "vcd", ITEM_TYPE_DISC },
-        { "v4l", ITEM_TYPE_CARD },
-        { "dshow", ITEM_TYPE_CARD },
-        { "pvr", ITEM_TYPE_CARD },
-        { "dvb", ITEM_TYPE_CARD },
-        { "qpsk", ITEM_TYPE_CARD },
-        { "sdp", ITEM_TYPE_NET },
-        { "ftp", ITEM_TYPE_NET },
-        { "smb", ITEM_TYPE_NET },
-        { NULL, 0 }
+    const char psz_scheme[7];
+    uint8_t    i_type;
+};
+
+static int typecmp( const void *key, const void *entry )
+{
+    const struct item_type_entry *type = entry;
+    const char *uri = key, *scheme = type->psz_scheme;
+
+    return strncmp( uri, scheme, strlen( scheme ) );
+}
+
+/* Guess the type of the item using the beginning of the mrl */
+static int GuessType( const input_item_t *p_item )
+{
+    static const struct item_type_entry tab[] =
+    {   /* /!\ Alphabetical order /!\ */
+        { "cdda",   ITEM_TYPE_CDDA },
+        { "dshow",  ITEM_TYPE_CARD },
+        { "dvb",    ITEM_TYPE_CARD },
+        { "dvd",    ITEM_TYPE_DISC },
+        { "ftp",    ITEM_TYPE_NET },
+        { "http",   ITEM_TYPE_NET },
+        { "mms",    ITEM_TYPE_NET },
+        { "pvr",    ITEM_TYPE_CARD },
+        { "qpsk",   ITEM_TYPE_CARD },
+        { "rtp",    ITEM_TYPE_NET },
+        { "rtsp",   ITEM_TYPE_NET },
+        { "sdp",    ITEM_TYPE_NET },
+        { "smb",    ITEM_TYPE_NET },
+        { "udp",    ITEM_TYPE_NET },
+        { "v4l",    ITEM_TYPE_CARD },
+        { "vcd",    ITEM_TYPE_DISC },
     };
+    const struct item_type_entry *e;
 
-    if( !p_item->psz_uri || !strstr( p_item->psz_uri, "://" ) )
-    {
-        p_item->i_type = ITEM_TYPE_FILE;
-        return;
-    }
+    if( !strstr( p_item->psz_uri, "://" ) )
+        return ITEM_TYPE_FILE;
 
-    for( i = 0; types_array[i].psz_search != NULL; i++ )
-    {
-        if( !strncmp( p_item->psz_uri, types_array[i].psz_search,
-                      strlen( types_array[i].psz_search ) ) )
-        {
-            p_item->i_type = types_array[i].i_type;
-            return;
-        }
-    }
-    p_item->i_type = ITEM_TYPE_FILE;
+    e = bsearch( p_item->psz_uri, tab, sizeof( tab ) / sizeof( tab[0] ),
+                 sizeof( tab[0] ), typecmp );
+    return e ? e->i_type : ITEM_TYPE_FILE;
 }
