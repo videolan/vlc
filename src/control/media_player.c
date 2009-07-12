@@ -494,12 +494,14 @@ libvlc_media_player_get_media(
                             libvlc_media_player_t *p_mi,
                             libvlc_exception_t *p_e )
 {
+    libvlc_media_t *p_m;
     VLC_UNUSED(p_e);
 
-    if( !p_mi->p_md )
-        return NULL;
-
-    libvlc_media_retain( p_mi->p_md );
+    vlc_mutex_lock( &p_mi->object_lock );
+    p_m = p_mi->p_md;
+    if( p_m )
+        libvlc_media_retain( p_mi->p_md );
+    vlc_mutex_unlock( &p_mi->object_lock );
     return p_mi->p_md;
 }
 
