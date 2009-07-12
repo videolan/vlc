@@ -829,22 +829,49 @@ static int GuessType( const input_item_t *p_item )
 {
     static const struct item_type_entry tab[] =
     {   /* /!\ Alphabetical order /!\ */
+        /* Short match work, not just exact match */
+        { "alsa",   ITEM_TYPE_CARD },
+        { "atsc",   ITEM_TYPE_CARD },
+        { "bd",     ITEM_TYPE_DISC },
+        { "cable",  ITEM_TYPE_CARD },
         { "cdda",   ITEM_TYPE_CDDA },
+        { "dc1394", ITEM_TYPE_CARD },
+        { "dccp",   ITEM_TYPE_NET },
+        { "dir",    ITEM_TYPE_DIRECTORY },
         { "dshow",  ITEM_TYPE_CARD },
+        { "dv",     ITEM_TYPE_CARD },
         { "dvb",    ITEM_TYPE_CARD },
         { "dvd",    ITEM_TYPE_DISC },
         { "ftp",    ITEM_TYPE_NET },
         { "http",   ITEM_TYPE_NET },
+        { "icyx",   ITEM_TYPE_NET },
+        { "itpc",   ITEM_TYPE_NET },
+        { "jack",   ITEM_TYPE_CARD },
+        { "live",   ITEM_TYPE_NET }, /* livedotcom */
         { "mms",    ITEM_TYPE_NET },
+        { "mtp",    ITEM_TYPE_DISC },
+        { "ofdm",   ITEM_TYPE_CARD },
+        { "oss",    ITEM_TYPE_CARD },
+        { "pnm",    ITEM_TYPE_NET },
         { "pvr",    ITEM_TYPE_CARD },
+        { "qam",    ITEM_TYPE_CARD },
         { "qpsk",   ITEM_TYPE_CARD },
-        { "rtp",    ITEM_TYPE_NET },
-        { "rtsp",   ITEM_TYPE_NET },
+        { "qtcapt", ITEM_TYPE_CARD }, /* qtcapture */
+        { "raw139", ITEM_TYPE_CARD }, /* raw1394 */
+        { "rt",     ITEM_TYPE_NET }, /* rtp, rtsp, rtmp */
+        { "satell", ITEM_TYPE_CARD }, /* sattelite */
+        { "screen", ITEM_TYPE_CARD },
         { "sdp",    ITEM_TYPE_NET },
         { "smb",    ITEM_TYPE_NET },
-        { "udp",    ITEM_TYPE_NET },
+        { "svcd",   ITEM_TYPE_DISC },
+        { "tcp",    ITEM_TYPE_NET },
+        { "terres", ITEM_TYPE_CARD }, /* terrestrial */
+        { "udp",    ITEM_TYPE_NET },  /* udplite too */
+        { "unsv",   ITEM_TYPE_NET },
+        { "usdigi", ITEM_TYPE_CARD }, /* usdigital */
         { "v4l",    ITEM_TYPE_CARD },
         { "vcd",    ITEM_TYPE_DISC },
+        { "window", ITEM_TYPE_CARD },
     };
     const struct item_type_entry *e;
 
