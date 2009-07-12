@@ -75,9 +75,9 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
     set_capability( "visualization", 0 )
-    add_integer( "goom-width", 320, NULL,
+    add_integer( "goom-width", 800, NULL,
                  WIDTH_TEXT, RES_LONGTEXT, false )
-    add_integer( "goom-height", 240, NULL,
+    add_integer( "goom-height", 640, NULL,
                  HEIGHT_TEXT, RES_LONGTEXT, false )
     add_integer( "goom-speed", 6, NULL,
                  SPEED_TEXT, SPEED_LONGTEXT, false )

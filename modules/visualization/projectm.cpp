@@ -57,7 +57,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_AUDIO_VISUAL )
     add_file( "projectm-config", "/usr/share/projectM/config.inp", NULL,
                 CONFIG_TEXT, CONFIG_LONGTEXT, true )
-    add_integer( "projectm-width", 640, NULL, WIDTH_TEXT, WIDTH_LONGTEXT,
+    add_integer( "projectm-width", 720, NULL, WIDTH_TEXT, WIDTH_LONGTEXT,
                  false )
     add_integer( "projectm-height", 480, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
                  false )

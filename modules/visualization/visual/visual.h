@@ -77,5 +77,5 @@ int spectrometer_Run
         (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
 
 /* Default vout size */
-#define VOUT_WIDTH 533
-#define VOUT_HEIGHT 400
+#define VOUT_WIDTH 800
+#define VOUT_HEIGHT 480
