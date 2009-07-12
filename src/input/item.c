@@ -363,7 +363,10 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
 
     p_i->i_type = GuessType( p_i );
 
-    if( !p_i->psz_name && p_i->i_type == ITEM_TYPE_FILE )
+    if( p_i->psz_name )
+        ;
+    else
+    if( p_i->i_type == ITEM_TYPE_FILE || p_i->i_type == ITEM_TYPE_DIRECTORY )
     {
         const char *psz_filename = strrchr( p_i->psz_uri, '/' );
 
@@ -376,12 +379,11 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
         if( p_i->psz_name )
             decode_URI( p_i->psz_name );
     }
-
-    /* The name is NULL: fill it with everything except login and password */
-    if( !p_i->psz_name )
-    {
+    else
+    {   /* Strip login and password from title */
         int r;
         vlc_url_t url;
+
         vlc_UrlParse( &url, psz_uri, 0 );
         if( url.psz_protocol )
         {
