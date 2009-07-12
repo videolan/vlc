@@ -1079,15 +1079,37 @@ char *make_URI (const char *path)
     }
     else
 #endif
-#if 0
-    /* Windows UNC paths (file://host/share/path instead of file:///path) */
     if (!strncmp (path, "\\\\", 2))
-    {
-        path += 2;
-        buf = strdup ("file://");
+    {   /* Windows UNC paths */
+#ifndef WIN32
+        /* \\host\share\path -> smb://host/share/path */
+        if (strchr (path + 2, '\\') != NULL)
+        {   /* Convert antislashes to slashes */
+            char *dup = strdup (path);
+            if (dup == NULL)
+                return NULL;
+            for (size_t i = 2; dup[i]; i++)
+                if (dup[i] == '\\')
+                    dup[i] = DIR_SEP_CHAR;
+
+            char *ret = make_URI (dup);
+            free (dup);
+            return ret;
+        }
+# define SMB_SCHEME "smb"
+#else
+        /* \\host\share\path -> file://host/share/path */
+# define SMB_SCHEME "file"
+#endif
+        size_t hostlen = strcspn (path + 2, DIR_SEP);
+
+        buf = malloc (sizeof (SMB_SCHEME) + 3 + hostlen);
+        if (buf != NULL)
+            snprintf (buf, sizeof (SMB_SCHEME) + 3 + hostlen,
+                      SMB_SCHEME"://%s", path + 2);
+        path += 2 + hostlen;
     }
     else
-#endif
     if (path[0] != DIR_SEP_CHAR)
     {   /* Relative path: prepend the current working directory */
         char cwd[PATH_MAX];
