@@ -274,7 +274,7 @@ void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
     /* Move the reference point */
     if( cl->b_has_reference )
     {
-        cl->last.i_system = ClockStreamToSystem( cl, cl->last.i_stream );
+        cl->last.i_system = ClockStreamToSystem( cl, cl->last.i_stream + AvgGet( &cl->drift ) );
         cl->ref = cl->last;
     }
 
@@ -318,7 +318,7 @@ mtime_t input_clock_GetWakeup( input_clock_t *cl )
 
     /* Synchronized, we can wait */
     if( cl->b_has_reference )
-        i_wakeup = ClockStreamToSystem( cl, cl->last.i_stream );
+        i_wakeup = ClockStreamToSystem( cl, cl->last.i_stream + AvgGet( &cl->drift ) );
 
     vlc_mutex_unlock( &cl->lock );
 
