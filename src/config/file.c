@@ -430,12 +430,18 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     file = config_OpenConfigFile( p_this );
     if( file != NULL )
     {
-        /* look for file size */
-        fseek( file, 0L, SEEK_END );
-        i_sizebuf = ftell( file );
-        fseek( file, 0L, SEEK_SET );
-        if( i_sizebuf >= LONG_MAX )
-            i_sizebuf = 0;
+        struct stat st;
+
+        /* Some users make vlcrc read-only to prevent changes.
+         * The atomic replacement scheme breaks this "feature",
+         * so we check for read-only by hand. */
+        if (fstat (fileno (file), &st)
+         || !(st.st_mode & S_IWUSR))
+        {
+            msg_Err (p_this, "configuration file is read-only");
+            goto error;
+        }
+        i_sizebuf = ( st.st_size < LONG_MAX ) ? st.st_size : 0;
     }
 
     p_bigbuffer = p_index = malloc( i_sizebuf+1 );
