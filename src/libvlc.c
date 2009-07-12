@@ -1158,7 +1158,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
     if( intf_Create( p_libvlc, psz_module ? psz_module : "$intf" ) )
     {
         msg_Err( p_libvlc, "interface \"%s\" initialization failed",
-                 psz_module );
+                 psz_module ? psz_module : "default" );
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
