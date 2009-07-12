@@ -408,10 +408,6 @@ void input_item_SetURI( input_item_t *p_i, const char *psz_uri )
         vlc_UrlClean( &url );
         if( -1==r )
             p_i->psz_name=NULL; /* recover from undefined value */
-
-        /* Make the name more readable */
-        if( p_i->psz_name )
-            decode_URI( p_i->psz_name );
     }
 
     vlc_mutex_unlock( &p_i->lock );
