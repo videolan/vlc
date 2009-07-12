@@ -201,6 +201,6 @@ static const iso639_lang_t p_languages[] =
     { N_( "Yoruba" ),           "",            "yo", "yor", "yor" },
     { N_( "Zhuang" ),           "",            "za", "zha", "zha" },
     { N_( "Zulu" ),             "",            "zu", "zul", "zul" },
-    { NULL, NULL, NULL, NULL, NULL }
+    { NULL,                   NULL,            "",   "",    "" }
 };
 
