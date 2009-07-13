@@ -234,6 +234,7 @@ static int CreateVout( vlc_object_t *p_this )
     var_AddCallback( p_sys->p_vout, "mouse-moved", SendEvents, p_vout );
     var_AddCallback( p_sys->p_vout, "mouse-clicked", SendEvents, p_vout );
     var_AddCallback( p_sys->p_vout, "mouse-button-down", SendEvents, p_vout );
+    var_AddCallback( p_sys->p_vout, "video-on-top", SendEvents, p_vout );
     var_AddCallback( p_vout, "autoscale", SendEvents, p_sys->p_vout );
     var_AddCallback( p_vout, "scale", SendEvents, p_sys->p_vout );
 
