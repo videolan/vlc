@@ -195,7 +195,7 @@ void vlc_release (gc_object_t *p_gc)
     assert (refs != (uintptr_t)(-1)); /* reference underflow?! */
     if (refs == 0)
     {
-#ifdef USE_SYNC
+#if defined (__GCC_HAVE_SYNC_COMPARE_AND_SWAP_4)
 #elif defined (WIN32) && defined (__GNUC__)
 #elif defined(__APPLE__)
 #else
