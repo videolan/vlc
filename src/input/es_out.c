@@ -2589,7 +2589,7 @@ static char *LanguageGetCode( const char *psz_lang )
     }
 
     if( pl->psz_eng_name != NULL )
-        return strdup( pl->psz_eng_name );
+        return strdup( pl->psz_iso639_1 );
 
     return strdup("??");
 }
