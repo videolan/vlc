@@ -2212,6 +2212,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             int            i_group = 0;
             int64_t        i_pcr;
 
+            /* Search program */
             if( i_query == ES_OUT_SET_PCR )
             {
                 p_pgrm = p_sys->p_pgrm;
@@ -2233,14 +2234,28 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 return VLC_EGENERIC;
             }
 
-            /* search program
-             * TODO do not use mdate() but proper stream acquisition date */
+            /* TODO do not use mdate() but proper stream acquisition date */
+            bool b_late;
             input_clock_Update( p_pgrm->p_clock, VLC_OBJECT(p_sys->p_input),
+                                &b_late,
                                 p_sys->p_input->p->b_can_pace_control || p_sys->b_buffering, i_pcr, mdate() );
-            /* Check buffering state on master clock update */
-            if( p_sys->b_buffering && p_pgrm == p_sys->p_pgrm )
-                EsOutDecodersStopBuffering( out, false );
 
+            if( p_pgrm == p_sys->p_pgrm )
+            {
+                if( p_sys->b_buffering )
+                {
+                    /* Check buffering state on master clock update */
+                    EsOutDecodersStopBuffering( out, false );
+                }
+                else if( b_late )
+                {
+                    /* Force a rebufferization when we are too late */
+                    msg_Err( p_sys->p_input, "ES_OUT_SET_(GROUP_)PCR  is called too late" );
+                    /* It is not really good, as we throw away already buffered data
+                     * TODO have a mean to correctly reenter bufferization */
+                    EsOutChangePosition( out );
+                }
+            }
             return VLC_SUCCESS;
         }
 

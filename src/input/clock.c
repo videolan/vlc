@@ -197,8 +197,9 @@ void input_clock_Delete( input_clock_t *cl )
  *  i_ck_stream: date in stream clock
  *  i_ck_system: date in system clock
  *****************************************************************************/
-void input_clock_Update( input_clock_t *cl,
-                         vlc_object_t *p_log, bool b_can_pace_control,
+void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
+                         bool *pb_late,
+                         bool b_can_pace_control,
                          mtime_t i_ck_stream, mtime_t i_ck_system )
 {
     bool b_reset_reference = false;
@@ -246,6 +247,11 @@ void input_clock_Update( input_clock_t *cl,
         cl->i_next_drift_update = i_ck_system + CLOCK_FREQ/5; /* FIXME why that */
     }
     cl->last = clock_point_Create( i_ck_stream, i_ck_system );
+
+    /* It does not take the decoder latency into account but it is not really
+     * the goal of the clock here */
+    const mtime_t i_system_expected = ClockStreamToSystem( cl, i_ck_stream + AvgGet( &cl->drift ) );
+    *pb_late = i_system_expected < i_ck_system - cl->i_pts_delay;
 
     vlc_mutex_unlock( &cl->lock );
 }
