@@ -110,6 +110,13 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
                              " This option only works with Windows and " \
                              "X11 with composite extensions." )
 
+#define OPACITY_FS_TEXT N_( "Fullscreen controller opacity opacity between 0.1 and 1." )
+#define OPACITY_FS_LONGTEXT N_( "Sets the fullscreen controller opacity between 0.1 and 1 " \
+                             "for main interface, playlist and extended panel."\
+                             " This option only works with Windows and " \
+                             "X11 with composite extensions." )
+
+
 #define ERROR_TEXT N_( "Show unimportant error and warnings dialogs" )
 
 #define UPDATER_TEXT N_( "Activate the updates availability notification" )
@@ -180,6 +187,8 @@ vlc_module_begin ()
 
     add_float_with_range( "qt-opacity", 1., 0.1, 1., NULL, OPACITY_TEXT,
                           OPACITY_LONGTEXT, false )
+    add_float_with_range( "qt-fs-opacity", 0.8, 0.1, 1., NULL, OPACITY_FS_TEXT,
+                          OPACITY_FS_LONGTEXT, false )
 
     add_bool( "qt-system-tray", true, NULL, SYSTRAY_TEXT,
               SYSTRAY_LONGTEXT, false)

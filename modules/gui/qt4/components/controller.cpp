@@ -761,7 +761,7 @@ void FullscreenControllerWidget::showFSC()
     }
 
 #if HAVE_TRANSPARENCY
-    setWindowOpacity( DEFAULT_OPACITY );
+    setWindowOpacity( config_GetFloat( p_intf, "qt-fs-opacity" )  );
 #endif
 
     show();
