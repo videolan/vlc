@@ -1,25 +1,3 @@
-diff -ruN fontconfig/src/fcinit.c fontconfig.good/src/fcinit.c
---- fontconfig/src/fcinit.c	2009-06-06 00:59:27.000000000 +0200
-+++ fontconfig.good/src/fcinit.c	2009-07-07 01:33:48.000000000 +0200
-@@ -24,6 +24,7 @@
- 
- #include "fcint.h"
- #include <stdlib.h>
-+# include <shlobj.h>
- 
- static FcConfig *
- FcInitFallbackConfig (void)
-@@ -35,7 +36,9 @@
- 	goto bail0;
-     if (!FcConfigAddDir (config, (FcChar8 *) FC_DEFAULT_FONTS))
- 	goto bail1;
--    if (!FcConfigAddCacheDir (config, (FcChar8 *) FC_CACHEDIR))
-+    char dir[MAX_PATH];
-+    SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, dir );
-+    if (!FcConfigAddCacheDir (config, (FcChar8 *)dir))
- 	goto bail1;
-     return config;
- 
 diff -ruN fontconfig/src/fcint.h fontconfig.good/src/fcint.h
 --- fontconfig/src/fcint.h	2009-06-24 19:52:13.000000000 +0200
 +++ fontconfig.good/src/fcint.h	2009-07-03 00:13:56.000000000 +0200
@@ -52,3 +30,25 @@ diff -ruN fontconfig/src/fcint.h fontconfig.good/src/fcint.h
  	$(INSTALL) fontconfig.def $(DESTDIR)$(libdir)/fontconfig.def
  
  uninstall-libtool-import-lib:
+--- fontconfig/src/fcinit.c	2009-06-06 00:59:27.000000000 +0200
++++ fontconfig.good/src/fcinit.c	2009-07-13 14:58:37.000000000 +0200
+@@ -24,6 +24,7 @@
+ 
+ #include "fcint.h"
+ #include <stdlib.h>
++# include <shlobj.h>
+ 
+ static FcConfig *
+ FcInitFallbackConfig (void)
+@@ -35,7 +36,10 @@
+ 	goto bail0;
+     if (!FcConfigAddDir (config, (FcChar8 *) FC_DEFAULT_FONTS))
+ 	goto bail1;
+-    if (!FcConfigAddCacheDir (config, (FcChar8 *) FC_CACHEDIR))
++    char dir[MAX_PATH+5];
++    SHGetFolderPath( NULL, CSIDL_APPDATA, NULL, 0, dir );
++    strncat( dir, "\\vlc", 4 );
++    if (!FcConfigAddCacheDir (config, (FcChar8 *)dir))
+ 	goto bail1;
+     return config;
+ 
