@@ -2578,7 +2578,7 @@ static char *LanguageGetCode( const char *psz_lang )
     if( psz_lang == NULL || *psz_lang == '\0' )
         return strdup("??");
 
-    for( pl = p_languages; pl->psz_iso639_1 != NULL; pl++ )
+    for( pl = p_languages; pl->psz_eng_name != NULL; pl++ )
     {
         if( !strcasecmp( pl->psz_eng_name, psz_lang ) ||
             !strcasecmp( pl->psz_native_name, psz_lang ) ||
@@ -2588,8 +2588,8 @@ static char *LanguageGetCode( const char *psz_lang )
             break;
     }
 
-    if( pl->psz_iso639_1 != NULL )
-        return strdup( pl->psz_iso639_1 );
+    if( pl->psz_eng_name != NULL )
+        return strdup( pl->psz_eng_name );
 
     return strdup("??");
 }
