@@ -174,7 +174,6 @@ int Activate ( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     char *        psz_display;
-    vlc_value_t   val;
 #if defined(MODULE_NAME_IS_xvmc)
     char *psz_value;
 #endif
@@ -443,8 +442,7 @@ int Activate ( vlc_object_t *p_this )
 
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
-    var_Get( p_vout, "video-on-top", &val );
-    var_Set( p_vout, "video-on-top", val );
+    var_TriggerCallback( p_vout, "video-on-top" );
 
     return VLC_SUCCESS;
 }
