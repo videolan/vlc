@@ -196,26 +196,6 @@ static int CreateVout( vlc_object_t *p_this )
     var_Create( p_sys->p_vout, "video-deco",
                 VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
-    psz = var_CreateGetString( p_vout, "opengl-provider" );
-    p_sys->p_vout->p_module =
-        module_need( p_sys->p_vout, "opengl provider", psz, false );
-    free( psz );
-    if( p_sys->p_vout->p_module == NULL )
-    {
-        msg_Warn( p_vout, "No OpenGL provider found" );
-        vlc_object_detach( p_sys->p_vout );
-        vlc_object_release( p_sys->p_vout );
-        free( p_sys );
-        return VLC_ENOOBJ;
-    }
-
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = Manage;
-    p_vout->pf_render = Render;
-    p_vout->pf_display = DisplayVideo;
-    p_vout->pf_control = Control;
-
     /* Forward events from the opengl provider */
     var_Create( p_sys->p_vout, "mouse-x", VLC_VAR_INTEGER );
     var_Create( p_sys->p_vout, "mouse-y", VLC_VAR_INTEGER );
@@ -237,6 +217,27 @@ static int CreateVout( vlc_object_t *p_this )
     var_AddCallback( p_sys->p_vout, "video-on-top", SendEvents, p_vout );
     var_AddCallback( p_vout, "autoscale", SendEvents, p_sys->p_vout );
     var_AddCallback( p_vout, "scale", SendEvents, p_sys->p_vout );
+
+    psz = var_CreateGetString( p_vout, "opengl-provider" );
+    p_sys->p_vout->p_module =
+        module_need( p_sys->p_vout, "opengl provider", psz, false );
+    free( psz );
+    if( p_sys->p_vout->p_module == NULL )
+    {
+        msg_Warn( p_vout, "No OpenGL provider found" );
+        vlc_object_detach( p_sys->p_vout );
+        /* no need for var_DelCallback here :-) */
+        vlc_object_release( p_sys->p_vout );
+        free( p_sys );
+        return VLC_ENOOBJ;
+    }
+
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
+    p_vout->pf_render = Render;
+    p_vout->pf_display = DisplayVideo;
+    p_vout->pf_control = Control;
 
     return VLC_SUCCESS;
 }
