@@ -911,7 +911,7 @@ static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var )
     if( ( p = strchr( psz_lang, ',' ) ) )
         *p = '\0';
 
-    for( pl = p_languages; pl->psz_iso639_1 != NULL; pl++ )
+    for( pl = p_languages; pl->psz_eng_name != NULL; pl++ )
     {
         if( *psz_lang == '\0' )
             continue;
@@ -925,8 +925,8 @@ static char *DemuxGetLanguageCode( demux_t *p_demux, const char *psz_var )
 
     free( psz_lang );
 
-    if( pl->psz_iso639_1 != NULL )
-        return strdup( pl->psz_iso639_1 );
+    if( pl->psz_eng_name != NULL )
+        return strdup( pl->psz_eng_name );
 
     return strdup(LANGUAGE_DEFAULT);
 }
