@@ -121,5 +121,11 @@ int input_clock_GetState( input_clock_t *,
 void input_clock_SetJitter( input_clock_t *,
                             mtime_t i_pts_delay, int i_cr_average );
 
+/**
+ * This function returns an estimation of the pts_delay needed to avoid rebufferization.
+ * XXX in the current implementation, the pts_delay will never be decreased.
+ */
+mtime_t input_clock_GetJitter( input_clock_t * );
+
 #endif
 

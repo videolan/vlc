@@ -2249,11 +2249,23 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 }
                 else if( b_late )
                 {
+                    mtime_t i_pts_delay = input_clock_GetJitter( p_pgrm->p_clock );
+
+                    /* Avoid dangerously high value */
+                    const mtime_t i_pts_delay_max = 30000000;
+                    if( i_pts_delay > i_pts_delay_max )
+                        i_pts_delay = __MAX( i_pts_delay_max, p_sys->i_pts_delay );
+
                     /* Force a rebufferization when we are too late */
-                    msg_Err( p_sys->p_input, "ES_OUT_SET_(GROUP_)PCR  is called too late" );
+                    msg_Err( p_sys->p_input,
+                             "ES_OUT_SET_(GROUP_)PCR  is called too late, increasing pts_delay to %d ms",
+                             (int)(i_pts_delay/1000) );
+
                     /* It is not really good, as we throw away already buffered data
                      * TODO have a mean to correctly reenter bufferization */
-                    EsOutChangePosition( out );
+                    es_out_Control( out, ES_OUT_RESET_PCR );
+
+                    es_out_Control( out, ES_OUT_SET_JITTER, i_pts_delay, p_sys->i_cr_average );
                 }
             }
             return VLC_SUCCESS;

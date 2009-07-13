@@ -123,6 +123,9 @@ static inline clock_point_t clock_point_Create( mtime_t i_stream, mtime_t i_syst
 }
 
 /* */
+#define INPUT_CLOCK_LATE_COUNT (3)
+
+/* */
 struct input_clock_t
 {
     /* */
@@ -142,6 +145,13 @@ struct input_clock_t
     /* Clock drift */
     mtime_t i_next_drift_update;
     average_t drift;
+
+    /* Late statistics */
+    struct
+    {
+        mtime_t  pi_value[INPUT_CLOCK_LATE_COUNT];
+        unsigned i_index;
+    } late;
 
     /* Current modifiers */
     int     i_rate;
@@ -172,6 +182,10 @@ input_clock_t *input_clock_New( int i_rate )
 
     cl->i_next_drift_update = VLC_TS_INVALID;
     AvgInit( &cl->drift, 10 );
+
+    cl->late.i_index = 0;
+    for( int i = 0; i < INPUT_CLOCK_LATE_COUNT; i++ )
+        cl->late.pi_value[i] = 0;
 
     cl->i_rate = i_rate;
     cl->i_pts_delay = 0;
@@ -251,7 +265,13 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
     /* It does not take the decoder latency into account but it is not really
      * the goal of the clock here */
     const mtime_t i_system_expected = ClockStreamToSystem( cl, i_ck_stream + AvgGet( &cl->drift ) );
-    *pb_late = i_system_expected < i_ck_system - cl->i_pts_delay;
+    const mtime_t i_late = ( i_ck_system - cl->i_pts_delay ) - i_system_expected;
+    *pb_late = i_late > 0;
+    if( i_late > 0 )
+    {
+        cl->late.pi_value[cl->late.i_index] = i_late;
+        cl->late.i_index = ( cl->late.i_index + 1 ) % INPUT_CLOCK_LATE_COUNT;
+    }
 
     vlc_mutex_unlock( &cl->lock );
 }
@@ -437,6 +457,14 @@ void input_clock_SetJitter( input_clock_t *cl,
 {
     vlc_mutex_lock( &cl->lock );
 
+    /* Update late observations */
+    const mtime_t i_delay_delta = i_pts_delay - cl->i_pts_delay;
+    for( int i = 0; i < INPUT_CLOCK_LATE_COUNT; i++ )
+    {
+        if( cl->late.pi_value[i] > 0 )
+            cl->late.pi_value[i] = __MAX( cl->late.pi_value[i] - i_delay_delta, 0 );
+    }
+
     /* TODO always save the value, and when rebuffering use the new one if smaller
      * TODO when increasing -> force rebuffering
      */
@@ -451,6 +479,28 @@ void input_clock_SetJitter( input_clock_t *cl,
         AvgRescale( &cl->drift, i_cr_average );
 
     vlc_mutex_unlock( &cl->lock );
+}
+
+mtime_t input_clock_GetJitter( input_clock_t *cl )
+{
+    vlc_mutex_lock( &cl->lock );
+
+#if INPUT_CLOCK_LATE_COUNT != 3
+#   error "unsupported INPUT_CLOCK_LATE_COUNT"
+#endif
+    /* Find the median of the last late values
+     * It works pretty well at rejecting bad values
+     *
+     * XXX we only increase pts_delay over time, decreasing it is
+     * not that easy if we want to be robust.
+     */
+    const mtime_t *p = cl->late.pi_value;
+    mtime_t i_late_median = p[0] + p[1] + p[2] - __MIN(__MIN(p[0],p[1]),p[2]) - __MAX(__MAX(p[0],p[1]),p[2]);
+    mtime_t i_pts_delay = cl->i_pts_delay ;
+
+    vlc_mutex_unlock( &cl->lock );
+
+    return i_pts_delay + i_late_median;
 }
 
 /*****************************************************************************
