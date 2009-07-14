@@ -396,7 +396,7 @@ int input_clock_ConvertTS( input_clock_t *cl,
 
     /* Check ts validity */
     if( i_ts_bound != INT64_MAX &&
-        *pi_ts0 > VLC_TS_INVALID && *pi_ts0 >= mdate() + cl->i_pts_delay + i_ts_bound )
+        *pi_ts0 > VLC_TS_INVALID && *pi_ts0 >= mdate() + i_pts_delay + i_ts_bound )
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
