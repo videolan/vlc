@@ -1116,6 +1116,7 @@ if BUILD_MOZILLA
 # Create Installer
 	rm -rf "$(top_builddir)/macosx-plugin-instdata/"; true
 	mkdir -p "$(top_builddir)/macosx-plugin-instdata"
+	rm -f "$(top_builddir)/projects/mozilla/VLC Plugin.plugin/Contents/MacOS/modules/libmacosx_plugin.dylib" 
 	cp -R "$(top_builddir)/projects/mozilla/VLC Plugin.plugin" "$(top_builddir)/macosx-plugin-instdata"
 	rm -rf "$(top_builddir)/VLC Internet Plug-In.pkg"
 	export PACKAGEMAKER=
