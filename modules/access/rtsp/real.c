@@ -50,7 +50,7 @@ static const unsigned char xor_table[] = {
 #define MAX(x,y) ((x>y) ? x : y)
 
 /* XXX find a better place for this */
-static inline void *_realloc(void *p, size_t sz)
+static inline void *realloc_(void *p, size_t sz)
 {
     void *n = realloc(p, sz);
     if( !n )
@@ -697,27 +697,27 @@ rmff_header_t  *real_setup_and_get_header(rtsp_client_t *rtsp_session, int bandw
 
   /* setup our streams */
   real_calc_response_and_checksum (challenge2, checksum, challenge1);
-  buf = _realloc(buf, strlen(challenge2) + strlen(checksum) + 32);
+  buf = realloc_(buf, strlen(challenge2) + strlen(checksum) + 32);
   if( !buf ) goto error;
   sprintf(buf, "RealChallenge2: %s, sd=%s", challenge2, checksum);
   rtsp_schedule_field(rtsp_session, buf);
-  buf = _realloc(buf, strlen(session_id) + 32);
+  buf = realloc_(buf, strlen(session_id) + 32);
   if( !buf ) goto error;
   sprintf(buf, "If-Match: %s", session_id);
   rtsp_schedule_field(rtsp_session, buf);
   rtsp_schedule_field(rtsp_session, "Transport: x-pn-tng/tcp;mode=play,rtp/avp/tcp;unicast;mode=play");
-  buf = _realloc(buf, strlen(mrl) + 32);
+  buf = realloc_(buf, strlen(mrl) + 32);
   if( !buf ) goto error;
   sprintf(buf, "%s/streamid=0", mrl);
   rtsp_request_setup(rtsp_session,buf);
 
   if (h->prop->num_streams > 1) {
     rtsp_schedule_field(rtsp_session, "Transport: x-pn-tng/tcp;mode=play,rtp/avp/tcp;unicast;mode=play");
-    buf = _realloc(buf, strlen(session_id) + 32);
+    buf = realloc_(buf, strlen(session_id) + 32);
     if( !buf ) goto error;
     sprintf(buf, "If-Match: %s", session_id);
     rtsp_schedule_field(rtsp_session, buf);
-    buf = _realloc(buf, strlen(mrl) + 32);
+    buf = realloc_(buf, strlen(mrl) + 32);
     if( !buf ) goto error;
     sprintf(buf, "%s/streamid=1", mrl);
     rtsp_request_setup(rtsp_session,buf);
