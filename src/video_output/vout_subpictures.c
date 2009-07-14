@@ -1581,7 +1581,7 @@ static void SpuRenderRegion( spu_t *p_spu,
                       p_region_picture, SpuRegionAlpha( p_subpic, p_region ) ) )
     {
         msg_Err( p_spu, "blending %4.4s to %4.4s failed",
-                 (char *)&p_sys->p_blend->fmt_out.video.i_chroma,
+                 (char *)&p_sys->p_blend->fmt_in.video.i_chroma,
                  (char *)&p_sys->p_blend->fmt_out.video.i_chroma );
     }
 
