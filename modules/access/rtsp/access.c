@@ -73,9 +73,6 @@ static int     Control( access_t *, int, va_list );
 
 struct access_sys_t
 {
-    bool b_seekable;
-    bool b_pace_control;
-
     rtsp_client_t *p_rtsp;
 
     int fd;
@@ -319,31 +316,22 @@ static int Seek( access_t *p_access, int64_t i_pos )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    bool        *pb_bool;
-    int64_t     *pi_64;
-
     switch( i_query )
     {
         /* */
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
-            pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = false;//p_sys->b_seekable;
-            break;
-
         case ACCESS_CAN_PAUSE:
-            pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = false;
+            *va_arg( args, bool* ) = false;
             break;
 
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = true;//p_sys->b_pace_control;
+            *va_arg( args, bool* ) = true;
             break;
 
         case ACCESS_GET_PTS_DELAY:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = (int64_t)var_GetInteger(p_access,"realrtsp-caching")*1000;
+            *va_arg( args, int64_t * ) =
+                    (int64_t)var_GetInteger(p_access,"realrtsp-caching")*1000;
             break;
 
         /* */
