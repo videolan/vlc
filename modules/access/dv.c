@@ -303,33 +303,27 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    access_sys_t *p_sys = p_access->p_sys;
-    bool   *pb_bool;
-    int64_t      *pi_64;
-
     switch( i_query )
     {
         /* */
         case ACCESS_CAN_PAUSE:
-            pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = true;
+            *va_arg( args, bool* ) = true;
             break;
 
        case ACCESS_CAN_SEEK:
        case ACCESS_CAN_FASTSEEK:
        case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = false;
+            *va_arg( args, bool* ) = false;
             break;
 
         case ACCESS_GET_PTS_DELAY:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = (int64_t)var_GetInteger( p_access, "dv-caching" ) * 1000;
+            *va_arg( args, int64_t * )
+                   = (int64_t)var_GetInteger( p_access, "dv-caching" ) * 1000;
             break;
 
         /* */
         case ACCESS_SET_PAUSE_STATE:
-            AVCPause( p_access, p_sys->i_node );
+            AVCPause( p_access, p_access->p_sys->i_node );
             break;
 
         case ACCESS_GET_TITLE_INFO:
@@ -642,10 +636,8 @@ static int AVCPlay( access_t *p_access, int phyID )
     access_sys_t *p_sys = p_access->p_sys;
 
     msg_Dbg( p_access, "send play command over Digital Video control channel" );
-    if( !p_sys->p_avc1394 )
-        return 0;
 
-    if( phyID >= 0 )
+    if( p_sys->p_avc1394 && phyID >= 0 )
     {
         if( !avc1394_vcr_is_recording( p_sys->p_avc1394, phyID ) &&
             avc1394_vcr_is_playing( p_sys->p_avc1394, phyID ) != AVC1394_VCR_OPERAND_PLAY_FORWARD )
@@ -658,10 +650,7 @@ static int AVCPause( access_t *p_access, int phyID )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
-    if( !p_sys->p_avc1394 )
-        return 0;
-
-    if( phyID >= 0 )
+    if( p_sys->p_avc1394 && phyID >= 0 )
     {
         if( !avc1394_vcr_is_recording( p_sys->p_avc1394, phyID ) &&
             ( avc1394_vcr_is_playing( p_sys->p_avc1394, phyID ) != AVC1394_VCR_OPERAND_PLAY_FORWARD_PAUSE ) )
@@ -676,10 +665,8 @@ static int AVCStop( access_t *p_access, int phyID )
     access_sys_t *p_sys = p_access->p_sys;
 
     msg_Dbg( p_access, "closing Digital Video control channel" );
-    if( !p_sys->p_avc1394 )
-        return 0;
 
-    if ( phyID >= 0 )
+    if ( p_sys->p_avc1394 && phyID >= 0 )
         avc1394_vcr_stop( p_sys->p_avc1394, phyID );
 
     return 0;
