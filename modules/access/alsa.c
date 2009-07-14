@@ -271,7 +271,7 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_CAN_SEEK:
         case DEMUX_SET_PAUSE_STATE:
         case DEMUX_CAN_CONTROL_PACE:
-            *va_arg( args, bool * ) = true;
+            *va_arg( args, bool * ) = false;
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
