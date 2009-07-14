@@ -241,9 +241,6 @@ static void Close( vlc_object_t *p_this )
 static int Control( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    bool   *pb_bool;
-    int          *pi_int;
-    int64_t      *pi_64;
     input_title_t ***ppp_title;
     int i;
 
@@ -254,14 +251,13 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = true;
+            *va_arg( args, bool* ) = true;
             break;
 
         /* */
         case ACCESS_GET_PTS_DELAY:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = (int64_t)var_GetInteger(p_access,"vcd-caching") * 1000;
+            *va_arg( args, int64_t * )
+                     = (int64_t)var_GetInteger(p_access,"vcd-caching") * 1000;
             break;
 
         /* */
@@ -269,11 +265,10 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_GET_TITLE_INFO:
-            ppp_title = (input_title_t***)va_arg( args, input_title_t*** );
-            pi_int    = (int*)va_arg( args, int* );
+            ppp_title = va_arg( args, input_title_t*** );
+            *va_arg( args, int* ) = p_sys->i_titles;
 
             /* Duplicate title infos */
-            *pi_int = p_sys->i_titles;
             *ppp_title = malloc( sizeof(input_title_t **) * p_sys->i_titles );
             for( i = 0; i < p_sys->i_titles; i++ )
             {
@@ -282,7 +277,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
             break;
 
         case ACCESS_SET_TITLE:
-            i = (int)va_arg( args, int );
+            i = va_arg( args, int );
             if( i != p_access->info.i_title )
             {
                 /* Update info */
@@ -301,7 +296,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         case ACCESS_SET_SEEKPOINT:
         {
             input_title_t *t = p_sys->title[p_access->info.i_title];
-            i = (int)va_arg( args, int );
+            i = va_arg( args, int );
             if( t->i_seekpoint > 0 )
             {
                 p_access->info.i_update |= INPUT_UPDATE_SEEKPOINT;

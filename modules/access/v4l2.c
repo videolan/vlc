@@ -1087,10 +1087,6 @@ static int AccessOpen( vlc_object_t * p_this )
  *****************************************************************************/
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-    bool *pb;
-    int64_t    *pi64;
-
     switch( i_query )
     {
         /* Special for access_demux */
@@ -1098,18 +1094,15 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_CAN_SEEK:
         case DEMUX_SET_PAUSE_STATE:
         case DEMUX_CAN_CONTROL_PACE:
-            pb = (bool*)va_arg( args, bool * );
-            *pb = false;
+            *va_arg( args, bool * ) = false;
             return VLC_SUCCESS;
 
         case DEMUX_GET_PTS_DELAY:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = (int64_t)p_sys->i_cache * 1000;
+            *va_arg(args,int64_t *) = (int64_t)p_demux->p_sys->i_cache*1000;
             return VLC_SUCCESS;
 
         case DEMUX_GET_TIME:
-            pi64 = (int64_t*)va_arg( args, int64_t * );
-            *pi64 = mdate();
+            *va_arg( args, int64_t * ) = mdate();
             return VLC_SUCCESS;
 
         /* TODO implement others */
@@ -1125,8 +1118,6 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
  *****************************************************************************/
 static int AccessControl( access_t *p_access, int i_query, va_list args )
 {
-    bool    *pb_bool;
-    int64_t *pi_64;
     demux_sys_t  *p_sys = (demux_sys_t *) p_access->p_sys;
 
     switch( i_query )
@@ -1134,22 +1125,14 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_CAN_SEEK:
         case ACCESS_CAN_FASTSEEK:
-            pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = false;
-            break;
         case ACCESS_CAN_PAUSE:
-            pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = false;
-            break;
         case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = false;
+            *va_arg( args, bool* ) = false;
             break;
 
         /* */
         case ACCESS_GET_PTS_DELAY:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = (int64_t) p_sys->i_cache * 1000;
+            *va_arg(args,int64_t *) = (int64_t)p_sys->i_cache*1000;
             break;
 
         /* */

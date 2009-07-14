@@ -312,22 +312,18 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
  *****************************************************************************/
 static int Control( access_t *p_access, int i_query, va_list args )
 {
-    bool        *pb_bool;
-    int64_t     *pi_64;
-
     switch( i_query )
     {
     case ACCESS_CAN_SEEK:
     case ACCESS_CAN_FASTSEEK:
     case ACCESS_CAN_PAUSE:
     case ACCESS_CAN_CONTROL_PACE:
-        pb_bool = (bool*)va_arg( args, bool* );
-        *pb_bool = true;
+        *va_arg( args, bool* ) = true;
         break;
 
     case ACCESS_GET_PTS_DELAY:
-        pi_64 = (int64_t*)va_arg( args, int64_t * );
-        *pi_64 = (int64_t)var_GetInteger( p_access, "smb-caching" ) * 1000;
+        *va_arg( args, int64_t * )
+                  = (int64_t)var_GetInteger( p_access, "smb-caching" ) * 1000;
         break;
 
     case ACCESS_SET_PAUSE_STATE:

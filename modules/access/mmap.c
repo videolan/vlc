@@ -286,13 +286,13 @@ static int Control (access_t *p_access, int query, va_list args)
         case ACCESS_CAN_FASTSEEK:
         case ACCESS_CAN_PAUSE:
         case ACCESS_CAN_CONTROL_PACE:
-            *((bool *)va_arg (args, bool *)) = true;
+            *va_arg(args, bool *) = true;
             return VLC_SUCCESS;
 
         case ACCESS_GET_PTS_DELAY:
         {
             int delay_ms = var_CreateGetInteger (p_access, "file-caching");
-            *((int64_t *)va_arg (args, int64_t *)) = delay_ms * INT64_C (1000);
+            *va_arg(args, int64_t *) = delay_ms * INT64_C (1000);
             return VLC_SUCCESS;
         }
 
