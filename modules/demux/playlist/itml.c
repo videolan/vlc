@@ -451,6 +451,7 @@ static bool save_data SIMPLE_INTERFACE
         long i_num = atol( psz_value );
         p_track->duration = (mtime_t) i_num*1000;
     }
+#undef SAVE_INFO
     return true;
 }
 
@@ -464,15 +465,15 @@ static bool add_meta( input_item_t *p_input_item,
     if( !p_input_item || !p_track )
         return false;
 
-#define SET_INFO( func, prop ) \
-    if( p_track->prop ) { func( p_input_item, p_track->prop ); }
-
-    SET_INFO( input_item_SetTitle, name )
-    SET_INFO( input_item_SetArtist, artist )
-    SET_INFO( input_item_SetAlbum, album )
-    SET_INFO( input_item_SetGenre, genre )
-    SET_INFO( input_item_SetTrackNum, trackNum )
-    SET_INFO( input_item_SetDuration, duration )
+#define SET_INFO( type, prop ) \
+    if( p_track->prop ) {input_item_Set##type( p_input_item, p_track->prop );}
+    SET_INFO( Title, name )
+    SET_INFO( Artist, artist )
+    SET_INFO( Album, album )
+    SET_INFO( Genre, genre )
+    SET_INFO( TrackNum, trackNum )
+    SET_INFO( Duration, duration )
+#undef SET_INFO
     return true;
 }
 
