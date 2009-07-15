@@ -179,7 +179,7 @@ static int Open( vlc_object_t *p_this )
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
     /* p_access->psz_path = "hostname:port/filename" */
-    psz_bind_addr = psz_parser = strdup( p_access->psz_path );
+    psz_bind_addr = strdup( p_access->psz_path );
 
     i_bind_port = 0;
 

@@ -67,7 +67,6 @@ vlc_module_end ()
 static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
-    decoder_sys_t *p_sys;
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_PNG &&
         p_dec->fmt_in.i_codec != VLC_FOURCC('M','P','N','G') )
@@ -76,8 +75,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_dec->p_sys = p_sys =
-          (decoder_sys_t *)malloc(sizeof(decoder_sys_t)) ) == NULL )
+    if( ( p_dec->p_sys = malloc(sizeof(decoder_sys_t)) ) == NULL )
         return VLC_ENOMEM;
 
     /* Set output properties */
@@ -150,7 +148,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         block_Release( p_block ); *pp_block = NULL;
         return NULL;
     }
- 
+
     p_info = png_create_info_struct( p_png );
     if( p_info == NULL )
     {
@@ -166,7 +164,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         block_Release( p_block ); *pp_block = NULL;
         return NULL;
     }
- 
+
     /* libpng longjmp's there in case of error */
     if( setjmp( png_jmpbuf( p_png ) ) )
         goto error;
