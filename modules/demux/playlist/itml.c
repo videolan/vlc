@@ -144,7 +144,8 @@ static bool parse_plist_node COMPLEX_INTERFACE
         if( !psz_name || !psz_value )
         {
             msg_Err( p_demux, "invalid xml stream @ <plist>" );
-            FREE_ATT();
+            free( psz_name );
+            free( psz_value );
             return false;
         }
         /* attribute: version */
@@ -158,8 +159,10 @@ static bool parse_plist_node COMPLEX_INTERFACE
         else
             msg_Warn( p_demux, "invalid <plist> attribute:\"%s\"", psz_name);
 
-        FREE_ATT();
+        free( psz_name );
+        free( psz_value );
     }
+
     /* attribute version is mandatory !!! */
     if( !b_version_found )
         msg_Warn( p_demux, "<plist> requires \"version\" attribute" );
