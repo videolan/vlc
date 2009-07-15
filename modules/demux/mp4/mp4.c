@@ -207,7 +207,6 @@ static inline int64_t MP4_TrackGetDTS( demux_t *p_demux, mp4_track_t *p_track )
         else
         {
             i_dts += i_sample * chunk.p_sample_delta_dts[i_index];
-            i_sample = 0;
             break;
         }
     }

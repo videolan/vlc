@@ -146,8 +146,6 @@ VCDReadBlock( access_t * p_access )
     int          i_read;
     uint8_t     *p_buf;
 
-    i_read = 0;
-
     dbg_print( (INPUT_DBG_LSN), "lsn: %lu",
                (long unsigned int) p_vcdplayer->i_lsn );
 

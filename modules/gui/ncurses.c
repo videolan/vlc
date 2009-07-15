@@ -2449,7 +2449,6 @@ static void Eject( intf_thread_t *p_intf )
     }
 
     /* Remove what we have after @ */
-    psz_parser = psz_device;
     for( psz_parser = psz_device ; *psz_parser ; psz_parser++ )
     {
         if( *psz_parser == '@' )
