@@ -44,6 +44,21 @@ static void decode (const char *in, const char *out)
     }
 }
 
+static void encode (const char *in, const char *out)
+{
+    char *buf;
+
+    printf ("\"%s\" -> \"%s\" ?\n", in, out);
+    buf = convert_xml_special_chars (in);
+
+    if (strcmp (buf, out))
+    {
+        printf (" ERROR: got \"%s\"\n", buf);
+        exit (2);
+    }
+    free (buf);
+}
+
 int main (void)
 {
     (void)setvbuf (stdout, NULL, _IONBF, 0);
@@ -58,6 +73,9 @@ int main (void)
     /* tests with invalid input */
     decode ("&<\"'", "&<\"'");
     decode ("&oelig", "&oelig");
+
+    encode ("", "");
+    encode ("a'àc\"çe&én<ño>ö1:", "a&#39;àc&quot;çe&amp;én&lt;ño&gt;ö1:");
 
     return 0;
 }
