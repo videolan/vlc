@@ -67,7 +67,7 @@ void Close_iTML( vlc_object_t *p_this )
  */
 int Demux( demux_t *p_demux )
 {
-    xml_t *p_xml = NULL;
+    xml_t *p_xml;
     xml_reader_t *p_xml_reader = NULL;
     char *psz_name = NULL;
 
@@ -237,7 +237,7 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
 
             case XML_READER_TEXT:
                 /* simple element content */
-                FREE_ATT();
+                free( psz_value );
                 psz_value = xml_ReaderValue( p_xml_reader );
                 if( !psz_value )
                 {
@@ -292,7 +292,9 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
     msg_Err( p_demux, "unexpected end of xml data" );
 
 end:
-    FREE_ATT_KEY();
+    free( psz_name );
+    free( psz_value );
+    free( psz_key );
     return b_ret;
 }
 
@@ -346,7 +348,7 @@ static bool parse_track_dict( demux_t *p_demux, input_item_t *p_input_item,
 {
     VLC_UNUSED(psz_element); VLC_UNUSED(p_handlers);
     input_item_t *p_new_input = NULL;
-    int i_ret = -1;
+    int i_ret;
     char *psz_uri = NULL;
     p_track = new_track();
 
@@ -407,7 +409,7 @@ static bool parse_track_dict( demux_t *p_demux, input_item_t *p_input_item,
 
 static track_elem_t *new_track()
 {
-    track_elem_t *p_track = NULL;
+    track_elem_t *p_track;
     p_track = malloc( sizeof( track_elem_t ) );
     if( p_track )
     {
