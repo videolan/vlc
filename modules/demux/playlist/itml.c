@@ -266,6 +266,7 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
             /* special case: key */
             if( !strcmp( p_handler->name, "key" ) )
             {
+                free( psz_key );
                 psz_key = strdup( psz_value );
             }
             /* call the simple handler */
