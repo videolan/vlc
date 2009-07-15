@@ -819,7 +819,6 @@ static int Demux_Seekable( demux_t *p_demux )
 
     unsigned int i_track_count = 0;
     unsigned int i_track;
-    bool b_stream;
     /* cannot be more than 100 stream (dcXX or wbXX) */
     avi_track_toread_t toread[100];
 
@@ -911,8 +910,6 @@ static int Demux_Seekable( demux_t *p_demux )
             toread[i_track].i_toread *= -1;
         }
     }
-
-    b_stream = false;
 
     for( ;; )
     {
@@ -1152,8 +1149,6 @@ static int Demux_Seekable( demux_t *p_demux )
         {
             toread[i_track].i_posf = -1;
         }
-
-        b_stream = true; /* at least one read succeed */
 
         if( tk->i_cat != VIDEO_ES )
             p_frame->i_dts = p_frame->i_pts;
