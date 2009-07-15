@@ -67,64 +67,56 @@ void Close_iTML( vlc_object_t *p_this )
  */
 int Demux( demux_t *p_demux )
 {
-    int i_ret = VLC_SUCCESS;
     xml_t *p_xml = NULL;
     xml_reader_t *p_xml_reader = NULL;
     char *psz_name = NULL;
+
     INIT_PLAYLIST_STUFF;
     p_demux->p_sys->i_ntracks = 0;
 
     /* create new xml parser from stream */
     p_xml = xml_Create( p_demux );
     if( !p_xml )
-        i_ret = VLC_ENOMOD;
-    else
-    {
-        p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
-        if( !p_xml_reader )
-            i_ret = VLC_EGENERIC;
-    }
+        goto end;
+
+    p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
+    if( !p_xml_reader )
+        goto end;
 
     /* locating the root node */
-    if( i_ret == VLC_SUCCESS )
+    do
     {
-        do
+        if( xml_ReaderRead( p_xml_reader ) != 1 )
         {
-            if( xml_ReaderRead( p_xml_reader ) != 1 )
-            {
-                msg_Err( p_demux, "can't read xml stream" );
-                i_ret = VLC_EGENERIC;
-            }
-        } while( i_ret == VLC_SUCCESS &&
-                 xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM );
-    }
-    /* checking root node name */
-    if( i_ret == VLC_SUCCESS )
-    {
-        psz_name = xml_ReaderName( p_xml_reader );
-        if( !psz_name || strcmp( psz_name, "plist" ) )
-        {
-            msg_Err( p_demux, "invalid root node name: %s", psz_name );
-            i_ret = VLC_EGENERIC;
+            msg_Err( p_demux, "can't read xml stream" );
+            goto end;
         }
-        FREE_NAME();
-    }
+    } while( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM );
 
-    if( i_ret == VLC_SUCCESS )
+    /* checking root node name */
+    psz_name = xml_ReaderName( p_xml_reader );
+    if( !psz_name || strcmp( psz_name, "plist" ) )
     {
-        xml_elem_hnd_t pl_elements[] =
-            { {"dict",    COMPLEX_CONTENT, {.cmplx = parse_plist_dict} } };
-        i_ret = parse_plist_node( p_demux, p_current_input,
-                                     NULL, p_xml_reader, "plist",
-                                     pl_elements );
-        HANDLE_PLAY_AND_RELEASE;
+        msg_Err( p_demux, "invalid root node name: %s", psz_name );
+        goto end;
     }
 
+    xml_elem_hnd_t pl_elements[] =
+        { {"dict",    COMPLEX_CONTENT, {.cmplx = parse_plist_dict} } };
+    parse_plist_node( p_demux, p_current_input, NULL, p_xml_reader, "plist",
+                      pl_elements );
+
+    HANDLE_PLAY_AND_RELEASE;
+
+end:
+    free( psz_name );
     if( p_xml_reader )
         xml_ReaderDelete( p_xml, p_xml_reader );
     if( p_xml )
         xml_Delete( p_xml );
-    return 0; /* Needed for correct operation of go back */
+
+    /* Needed for correct operation of go back */
+    return 0;
 }
 
 /** \brief dummy function for demux callback interface */
