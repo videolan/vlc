@@ -816,13 +816,9 @@ static void MainLoop( input_thread_t *p_input )
                 i_statistic_update = i_current + INT64_C(1000000);
             }
 
-            /* Check if i_wakeup is still valid */
+            /* Update the wakeup time */
             if( i_wakeup != 0 )
-            {
-                mtime_t i_new_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
-                if( !i_new_wakeup )
-                    i_wakeup = 0;
-            }
+                i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
         } while( i_current < i_wakeup );
     }
 
