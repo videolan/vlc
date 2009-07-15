@@ -46,13 +46,13 @@
     "value should be set in milliseconds." )
 
 #define SWFURL_TEXT N_("Default SWF Referrer URL")
-#define SWFURL_LONGTEXT N_("The SFW URL to use as referrer when connecting to"\
-                           "the server. This is the SWF file that contained"  \
+#define SWFURL_LONGTEXT N_("The SFW URL to use as referrer when connecting to "\
+                           "the server. This is the SWF file that contained "  \
                            "the stream.")
 
-#define PAGEURL_TEXT N_("Page Referrer URL")
-#define PAGEURL_LONGTEXT N_("Page URL to use as referrer when connecting to"  \
-                            "the server. This is the page housing the SWF"    \
+#define PAGEURL_TEXT N_("Default Page Referrer URL")
+#define PAGEURL_LONGTEXT N_("The Page URL to use as referrer when connecting to "  \
+                            "the server. This is the page housing the SWF "    \
                             "file.")
 
 static int  Open ( vlc_object_t * );
@@ -66,9 +66,9 @@ vlc_module_begin ()
 
     add_integer( "rtmp-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT,
                  CACHING_LONGTEXT, true )
-    add_string( "rtmp-swfurl", "file:///mac.flv", NULL, SWFURL_TEXT,
+    add_string( "rtmp-swfurl", "file:///player.swf", NULL, SWFURL_TEXT,
                 SWFURL_LONGTEXT, true )
-    add_string( "rtmp-pageurl", "file:///mac.html", NULL, PAGEURL_TEXT,
+    add_string( "rtmp-pageurl", "file:///player.htm", NULL, PAGEURL_TEXT,
                 PAGEURL_LONGTEXT, true )
 
     set_capability( "access", 0 )
