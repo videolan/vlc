@@ -402,47 +402,36 @@ void resolve_xml_special_chars( char *psz_value )
  */
 char *convert_xml_special_chars( const char *psz_content )
 {
-    char *psz_temp = malloc( 6 * strlen( psz_content ) + 1 );
-    const char *p_from = psz_content;
+    assert( psz_content );
+
+    const size_t len = strlen( psz_content );
+    char *const psz_temp = malloc( 6 * len + 1 );
     char *p_to   = psz_temp;
 
-    while ( *p_from )
+    if( psz_temp == NULL )
+        return NULL;
+    for( size_t i = 0; i < len; i++ )
     {
-        if ( *p_from == '<' )
-        {
-            strcpy( p_to, "&lt;" );
-            p_to += 4;
-        }
-        else if ( *p_from == '>' )
-        {
-            strcpy( p_to, "&gt;" );
-            p_to += 4;
-        }
-        else if ( *p_from == '&' )
-        {
-            strcpy( p_to, "&amp;" );
-            p_to += 5;
-        }
-        else if( *p_from == '\"' )
-        {
-            strcpy( p_to, "&quot;" );
-            p_to += 6;
-        }
-        else if( *p_from == '\'' )
-        {
-            strcpy( p_to, "&#039;" );
-            p_to += 6;
-        }
-        else
-        {
-            *p_to = *p_from;
-            p_to++;
-        }
-        p_from++;
-    }
-    *p_to = '\0';
+        const char *str;
+        char c = psz_content[i];
 
-    return psz_temp;
+        switch ( c )
+        {
+            case '\"': str = "quot"; break;
+            case '&':  str = "amp";  break;
+            case '\'': str = "#39";  break;
+            case '<':  str = "lt";   break;
+            case '>':  str = "gt";   break;
+            default:
+                *(p_to++) = c;
+                continue;
+        }
+        p_to += sprintf( p_to, "&%s;", str );
+    }
+    *(p_to++) = '\0';
+
+    p_to = realloc( psz_temp, p_to - psz_temp );
+    return p_to ? p_to : psz_temp; /* cannot fail */
 }
 
 /* Base64 encoding */
