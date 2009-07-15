@@ -194,98 +194,93 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
         i_node = xml_ReaderNodeType( p_xml_reader );
         switch( i_node )
         {
-            case XML_READER_NONE:
-                break;
+        case XML_READER_NONE:
+            break;
 
-            case XML_READER_STARTELEM:
-                /*  element start tag  */
-                psz_name = xml_ReaderName( p_xml_reader );
-                if( !psz_name || !*psz_name )
-                {
-                    msg_Err( p_demux, "invalid xml stream" );
-                    goto end;
-                }
-                /* choose handler */
-                for( p_handler = p_handlers;
+        case XML_READER_STARTELEM:
+            /*  element start tag  */
+            psz_name = xml_ReaderName( p_xml_reader );
+            if( !psz_name || !*psz_name )
+            {
+                msg_Err( p_demux, "invalid xml stream" );
+                goto end;
+            }
+            /* choose handler */
+            for( p_handler = p_handlers;
                      p_handler->name && strcmp( psz_name, p_handler->name );
                      p_handler++ );
-                if( !p_handler->name )
-                {
-                    msg_Err( p_demux, "unexpected element <%s>", psz_name );
-                    goto end;
-                }
-                FREE_NAME();
-                /* complex content is parsed in a separate function */
-                if( p_handler->type == COMPLEX_CONTENT )
-                {
-                    if( p_handler->pf_handler.cmplx( p_demux,
-                                                     p_input_item,
-                                                     NULL,
-                                                     p_xml_reader,
-                                                     p_handler->name,
-                                                     NULL ) )
-                    {
-                        p_handler = NULL;
-                        FREE_ATT_KEY();
-                    }
-                    else
-                    {
-                        goto end;
-                    }
-                }
-                break;
-
-            case XML_READER_TEXT:
-                /* simple element content */
-                free( psz_value );
-                psz_value = xml_ReaderValue( p_xml_reader );
-                if( !psz_value )
-                {
-                    msg_Err( p_demux, "invalid xml stream" );
-                    goto end;
-                }
-                break;
-
-            case XML_READER_ENDELEM:
-                /* element end tag */
-                psz_name = xml_ReaderName( p_xml_reader );
-                if( !psz_name )
-                {
-                    msg_Err( p_demux, "invalid xml stream" );
-                    goto end;
-                }
-                /* leave if the current parent node <track> is terminated */
-                if( !strcmp( psz_name, psz_element ) )
-                {
-                    b_ret = true;
-                    goto end;
-                }
-                /* there MUST have been a start tag for that element name */
-                if( !p_handler || !p_handler->name
-                    || strcmp( p_handler->name, psz_name ))
-                {
-                    msg_Err( p_demux, "there's no open element left for <%s>",
-                             psz_name );
-                    goto end;
-                }
-                /* special case: key */
-                if( !strcmp( p_handler->name, "key" ) )
-                {
-                    psz_key = strdup( psz_value );
-                }
-                /* call the simple handler */
-                else if( p_handler->pf_handler.smpl )
-                {
-                    p_handler->pf_handler.smpl( p_track, psz_key, psz_value );
-                }
-                FREE_ATT();
-                p_handler = NULL;
-                break;
-
-            default:
-                /* unknown/unexpected xml node */
-                msg_Err( p_demux, "unexpected xml node %i", i_node );
+            if( !p_handler->name )
+            {
+                msg_Err( p_demux, "unexpected element <%s>", psz_name );
                 goto end;
+            }
+            FREE_NAME();
+            /* complex content is parsed in a separate function */
+            if( p_handler->type == COMPLEX_CONTENT )
+            {
+                if( p_handler->pf_handler.cmplx( p_demux, p_input_item, NULL,
+                                                 p_xml_reader, p_handler->name,
+                                                 NULL ) )
+                {
+                    p_handler = NULL;
+                    FREE_ATT_KEY();
+                }
+                else
+                    goto end;
+            }
+            break;
+
+        case XML_READER_TEXT:
+            /* simple element content */
+            free( psz_value );
+            psz_value = xml_ReaderValue( p_xml_reader );
+            if( !psz_value )
+            {
+                msg_Err( p_demux, "invalid xml stream" );
+                goto end;
+            }
+            break;
+
+        case XML_READER_ENDELEM:
+            /* element end tag */
+            psz_name = xml_ReaderName( p_xml_reader );
+            if( !psz_name )
+            {
+                msg_Err( p_demux, "invalid xml stream" );
+                goto end;
+            }
+            /* leave if the current parent node <track> is terminated */
+            if( !strcmp( psz_name, psz_element ) )
+            {
+                b_ret = true;
+                goto end;
+            }
+            /* there MUST have been a start tag for that element name */
+            if( !p_handler || !p_handler->name
+                || strcmp( p_handler->name, psz_name ) )
+            {
+                msg_Err( p_demux, "there's no open element left for <%s>",
+                         psz_name );
+                goto end;
+            }
+            /* special case: key */
+            if( !strcmp( p_handler->name, "key" ) )
+            {
+                psz_key = strdup( psz_value );
+            }
+            /* call the simple handler */
+            else if( p_handler->pf_handler.smpl )
+            {
+                p_handler->pf_handler.smpl( p_track, psz_key, psz_value );
+            }
+            FREE_ATT();
+            p_handler = NULL;
+            break;
+
+        default:
+            /* unknown/unexpected xml node */
+            msg_Err( p_demux, "unexpected xml node %i", i_node );
+            goto end;
         }
         FREE_NAME();
     }
