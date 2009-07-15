@@ -31,12 +31,12 @@
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
+#include <vlc_xml.h>
+#include <vlc_strings.h>
+#include <vlc_url.h>
 
-#include "playlist.h"
-#include "vlc_xml.h"
-#include "vlc_strings.h"
-#include "vlc_url.h"
 #include "itml.h"
+#include "playlist.h"
 
 struct demux_sys_t
 {
@@ -135,8 +135,8 @@ static bool parse_plist_node( demux_t *p_demux, input_item_t *p_input_item,
                               xml_elem_hnd_t *p_handlers )
 {
     VLC_UNUSED(p_track); VLC_UNUSED(psz_element);
-    char *psz_name = NULL;
-    char *psz_value = NULL;
+    char *psz_name;
+    char *psz_value;
     bool b_version_found = false;
 
     /* read all playlist attributes */
@@ -187,6 +187,7 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
     char *psz_value = NULL;
     char *psz_key = NULL;
     xml_elem_hnd_t *p_handler = NULL;
+    bool b_ret = false;
 
     while( xml_ReaderRead( p_xml_reader ) == 1 )
     {
@@ -202,8 +203,7 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
                 if( !psz_name || !*psz_name )
                 {
                     msg_Err( p_demux, "invalid xml stream" );
-                    FREE_ATT_KEY();
-                    return false;
+                    goto end;
                 }
                 /* choose handler */
                 for( p_handler = p_handlers;
@@ -212,8 +212,7 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
                 if( !p_handler->name )
                 {
                     msg_Err( p_demux, "unexpected element <%s>", psz_name );
-                    FREE_ATT_KEY();
-                    return false;
+                    goto end;
                 }
                 FREE_NAME();
                 /* complex content is parsed in a separate function */
@@ -231,8 +230,7 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
                     }
                     else
                     {
-                        FREE_ATT_KEY();
-                        return false;
+                        goto end;
                     }
                 }
                 break;
@@ -244,8 +242,7 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
                 if( !psz_value )
                 {
                     msg_Err( p_demux, "invalid xml stream" );
-                    FREE_ATT_KEY();
-                    return false;
+                    goto end;
                 }
                 break;
 
@@ -255,14 +252,13 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
                 if( !psz_name )
                 {
                     msg_Err( p_demux, "invalid xml stream" );
-                    FREE_ATT_KEY();
-                    return false;
+                    goto end;
                 }
                 /* leave if the current parent node <track> is terminated */
                 if( !strcmp( psz_name, psz_element ) )
                 {
-                    FREE_ATT_KEY();
-                    return true;
+                    b_ret = true;
+                    goto end;
                 }
                 /* there MUST have been a start tag for that element name */
                 if( !p_handler || !p_handler->name
@@ -270,8 +266,7 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
                 {
                     msg_Err( p_demux, "there's no open element left for <%s>",
                              psz_name );
-                    FREE_ATT_KEY();
-                    return false;
+                    goto end;
                 }
                 /* special case: key */
                 if( !strcmp( p_handler->name, "key" ) )
@@ -290,14 +285,15 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
             default:
                 /* unknown/unexpected xml node */
                 msg_Err( p_demux, "unexpected xml node %i", i_node );
-                FREE_ATT_KEY();
-                return false;
+                goto end;
         }
         FREE_NAME();
     }
     msg_Err( p_demux, "unexpected end of xml data" );
+
+end:
     FREE_ATT_KEY();
-    return false;
+    return b_ret;
 }
 
 static bool parse_plist_dict( demux_t *p_demux, input_item_t *p_input_item,
