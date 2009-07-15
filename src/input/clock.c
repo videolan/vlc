@@ -163,6 +163,8 @@ struct input_clock_t
 static mtime_t ClockStreamToSystem( input_clock_t *, mtime_t i_stream );
 static mtime_t ClockSystemToStream( input_clock_t *, mtime_t i_system );
 
+static mtime_t ClockGetTsOffset( input_clock_t * );
+
 /*****************************************************************************
  * input_clock_New: create a new clock
  *****************************************************************************/
@@ -297,13 +299,12 @@ void input_clock_ChangeRate( input_clock_t *cl, int i_rate )
 {
     vlc_mutex_lock( &cl->lock );
 
-    /* Move the reference point */
     if( cl->b_has_reference )
     {
-        cl->last.i_system = ClockStreamToSystem( cl, cl->last.i_stream + AvgGet( &cl->drift ) );
-        cl->ref = cl->last;
+        /* Move the reference point (as if we were playing at the new rate
+         * from the start */
+        cl->ref.i_system = cl->last.i_system - (cl->last.i_system - cl->ref.i_system) * i_rate / cl->i_rate;
     }
-
     cl->i_rate = i_rate;
 
     vlc_mutex_unlock( &cl->lock );
@@ -358,8 +359,6 @@ int input_clock_ConvertTS( input_clock_t *cl,
                            int *pi_rate, mtime_t *pi_ts0, mtime_t *pi_ts1,
                            mtime_t i_ts_bound )
 {
-    mtime_t i_pts_delay;
-
     assert( pi_ts0 );
     vlc_mutex_lock( &cl->lock );
 
@@ -376,27 +375,29 @@ int input_clock_ConvertTS( input_clock_t *cl,
     }
 
     /* */
+    const mtime_t i_ts_delay = cl->i_pts_delay + ClockGetTsOffset( cl );
+
+    /* */
     if( *pi_ts0 > VLC_TS_INVALID )
     {
         *pi_ts0 = ClockStreamToSystem( cl, *pi_ts0 + AvgGet( &cl->drift ) );
         if( *pi_ts0 > cl->i_ts_max )
             cl->i_ts_max = *pi_ts0;
-        *pi_ts0 += cl->i_pts_delay;
+        *pi_ts0 += i_ts_delay;
     }
 
     /* XXX we do not ipdate i_ts_max on purpose */
     if( pi_ts1 && *pi_ts1 > VLC_TS_INVALID )
     {
         *pi_ts1 = ClockStreamToSystem( cl, *pi_ts1 + AvgGet( &cl->drift ) ) +
-                  cl->i_pts_delay;
+                  i_ts_delay;
     }
 
-    i_pts_delay = cl->i_pts_delay;
     vlc_mutex_unlock( &cl->lock );
 
     /* Check ts validity */
     if( i_ts_bound != INT64_MAX &&
-        *pi_ts0 > VLC_TS_INVALID && *pi_ts0 >= mdate() + i_pts_delay + i_ts_bound )
+        *pi_ts0 > VLC_TS_INVALID && *pi_ts0 >= mdate() + i_ts_delay + i_ts_bound )
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;
@@ -443,7 +444,7 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, mtime_t i_system )
     vlc_mutex_lock( &cl->lock );
 
     assert( cl->b_has_reference );
-    const mtime_t i_offset = i_system - cl->ref.i_system;
+    const mtime_t i_offset = i_system - cl->ref.i_system - ClockGetTsOffset( cl );
 
     cl->ref.i_system += i_offset;
     cl->last.i_system += i_offset;
@@ -525,6 +526,15 @@ static mtime_t ClockSystemToStream( input_clock_t *cl, mtime_t i_system )
     assert( cl->b_has_reference );
     return ( i_system - cl->ref.i_system ) * INPUT_RATE_DEFAULT / cl->i_rate +
             cl->ref.i_stream;
+}
+
+/**
+ * It returns timestamp display offset due to ref/last modfied on rate changes
+ * It ensures that currently converted dates are not changed.
+ */
+static mtime_t ClockGetTsOffset( input_clock_t *cl )
+{
+    return cl->i_pts_delay * ( cl->i_rate - INPUT_RATE_DEFAULT ) / INPUT_RATE_DEFAULT;
 }
 
 /*****************************************************************************
