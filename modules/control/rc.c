@@ -1655,7 +1655,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         }
         else
         {
-            psz_value = strdup( val.psz_string );
+            psz_value = val.psz_string;
         }
 
         if ( var_Change( p_vout, psz_variable,
