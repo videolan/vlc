@@ -129,7 +129,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /**
  * \brief parse the root node of the playlist
  */
-static bool parse_plist_node COMPLEX_INTERFACE
+static bool parse_plist_node( demux_t *p_demux, input_item_t *p_input_item,
+                              track_elem_t *p_track, xml_reader_t *p_xml_reader,
+                              const char *psz_element,
+                              xml_elem_hnd_t *p_handlers )
 {
     VLC_UNUSED(p_track); VLC_UNUSED(psz_element);
     char *psz_name = NULL;
@@ -175,7 +178,9 @@ static bool parse_plist_node COMPLEX_INTERFACE
  * \brief parse a <dict>
  * \param COMPLEX_INTERFACE
  */
-static bool parse_dict COMPLEX_INTERFACE
+static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
+                        track_elem_t *p_track, xml_reader_t *p_xml_reader,
+                        const char *psz_element, xml_elem_hnd_t *p_handlers )
 {
     int i_node;
     char *psz_name = NULL;
@@ -295,7 +300,10 @@ static bool parse_dict COMPLEX_INTERFACE
     return false;
 }
 
-static bool parse_plist_dict COMPLEX_INTERFACE
+static bool parse_plist_dict( demux_t *p_demux, input_item_t *p_input_item,
+                              track_elem_t *p_track, xml_reader_t *p_xml_reader,
+                              const char *psz_element,
+                              xml_elem_hnd_t *p_handlers )
 {
     VLC_UNUSED(p_track); VLC_UNUSED(psz_element); VLC_UNUSED(p_handlers);
     xml_elem_hnd_t pl_elements[] =
@@ -314,7 +322,10 @@ static bool parse_plist_dict COMPLEX_INTERFACE
                        "dict", pl_elements );
 }
 
-static bool parse_tracks_dict COMPLEX_INTERFACE
+static bool parse_tracks_dict( demux_t *p_demux, input_item_t *p_input_item,
+                               track_elem_t *p_track, xml_reader_t *p_xml_reader,
+                               const char *psz_element,
+                               xml_elem_hnd_t *p_handlers )
 {
     VLC_UNUSED(p_track); VLC_UNUSED(psz_element); VLC_UNUSED(p_handlers);
     xml_elem_hnd_t tracks_elements[] =
@@ -332,7 +343,10 @@ static bool parse_tracks_dict COMPLEX_INTERFACE
     return true;
 }
 
-static bool parse_track_dict COMPLEX_INTERFACE
+static bool parse_track_dict( demux_t *p_demux, input_item_t *p_input_item,
+                              track_elem_t *p_track, xml_reader_t *p_xml_reader,
+                              const char *psz_element,
+                              xml_elem_hnd_t *p_handlers )
 {
     VLC_UNUSED(psz_element); VLC_UNUSED(p_handlers);
     input_item_t *p_new_input = NULL;
@@ -381,7 +395,7 @@ static bool parse_track_dict COMPLEX_INTERFACE
             /* add meta info */
             add_meta( p_new_input, p_track );
             vlc_gc_decref( p_new_input );
-    
+
             p_demux->p_sys->i_ntracks++;
         }
         else
@@ -398,7 +412,7 @@ static bool parse_track_dict COMPLEX_INTERFACE
 static track_elem_t *new_track()
 {
     track_elem_t *p_track = NULL;
-    p_track = (track_elem_t *)malloc( sizeof( track_elem_t ) );
+    p_track = malloc( sizeof( track_elem_t ) );
     if( p_track )
     {
         p_track->name = NULL;
@@ -428,7 +442,8 @@ static void free_track( track_elem_t *p_track )
     free( p_track );
 }
 
-static bool save_data SIMPLE_INTERFACE
+static bool save_data( track_elem_t *p_track, const char *psz_name,
+                       char *psz_value)
 {
     /* exit if setting is impossible */
     if( !psz_name || !psz_value || !p_track )
@@ -458,8 +473,7 @@ static bool save_data SIMPLE_INTERFACE
 /**
  * \brief handles the supported <track> sub-elements
  */
-static bool add_meta( input_item_t *p_input_item,
-                            track_elem_t *p_track )
+static bool add_meta( input_item_t *p_input_item, track_elem_t *p_track )
 {
     /* exit if setting is impossible */
     if( !p_input_item || !p_track )
@@ -480,7 +494,9 @@ static bool add_meta( input_item_t *p_input_item,
 /**
  * \brief skips complex element content that we can't manage
  */
-static bool skip_element COMPLEX_INTERFACE
+static bool skip_element( demux_t *p_demux, input_item_t *p_input_item,
+                          track_elem_t *p_track, xml_reader_t *p_xml_reader,
+                          const char *psz_element, xml_elem_hnd_t *p_handlers )
 {
     VLC_UNUSED(p_demux); VLC_UNUSED(p_input_item);
     VLC_UNUSED(p_track); VLC_UNUSED(p_handlers);
