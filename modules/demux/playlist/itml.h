@@ -26,12 +26,11 @@
  */
 
 /* defines */
-#define FREE(v)        free(v);v=NULL;
-#define FREE_NAME()    free(psz_name);psz_name=NULL;
-#define FREE_VALUE()   free(psz_value);psz_value=NULL;
-#define FREE_KEY()     free(psz_key);psz_key=NULL;
-#define FREE_ATT()     FREE_NAME();FREE_VALUE()
-#define FREE_ATT_KEY() FREE_NAME();FREE_VALUE();FREE_KEY()
+#define FREE_NAME()     FREENULL( psz_name )
+#define FREE_VALUE()    FREENULL( psz_value )
+#define FREE_KEY()      FREENULL( psz_key )
+#define FREE_ATT()      do{ FREE_NAME();FREE_VALUE(); }while(0)
+#define FREE_ATT_KEY()  do{ FREE_NAME();FREE_VALUE();FREE_KEY();} while(0)
 
 #define UNKNOWN_CONTENT 0
 #define SIMPLE_CONTENT 1

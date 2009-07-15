@@ -423,12 +423,12 @@ static void free_track( track_elem_t *p_track )
     if ( !p_track )
         return;
 
-    FREE( p_track->name )
-    FREE( p_track->artist )
-    FREE( p_track->album )
-    FREE( p_track->genre )
-    FREE( p_track->trackNum )
-    FREE( p_track->location )
+    FREENULL( p_track->name );
+    FREENULL( p_track->artist );
+    FREENULL( p_track->album );
+    FREENULL( p_track->genre );
+    FREENULL( p_track->trackNum );
+    FREENULL( p_track->location );
     p_track->duration = 0;
     free( p_track );
 }
