@@ -84,7 +84,7 @@ QMenu *QVLCMenu::recentsMenu = NULL;
  * Add static entries to DP in menus
  ***************************************************************************/
 void addDPStaticEntry( QMenu *menu,
-                       const QString text,
+                       const QString& text,
                        const char *icon,
                        const char *member,
                        const char *shortcut = NULL )
@@ -113,7 +113,7 @@ void addDPStaticEntry( QMenu *menu,
  ***/
 QAction* addMIMStaticEntry( intf_thread_t *p_intf,
                             QMenu *menu,
-                            const QString text,
+                            const QString& text,
                             const char *icon,
                             const char *member,
                             bool bStatic = false )
@@ -1366,7 +1366,7 @@ int QVLCMenu::CreateChoicesMenu( QMenu *submenu, const char *psz_var,
 }
 
 void QVLCMenu::CreateAndConnect( QMenu *menu, const char *psz_var,
-        QString text, QString help,
+        const QString& text, const QString& help,
         int i_item_type, vlc_object_t *p_obj,
         vlc_value_t val, int i_val_type,
         bool checked )
