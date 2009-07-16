@@ -433,7 +433,7 @@ struct intf_sys_t
 	BOOL b_mediaKeySupport;
 }
 
-- (void)enableMediaKeySupport:(BOOL)b_value;
+- (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification;
 - (void)sendEvent: (NSEvent*)event;
 - (void)resetJump;
 

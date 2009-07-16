@@ -2863,11 +2863,18 @@ end:
 - (void)awakeFromNib
 {
 	b_mediaKeySupport = config_GetInt( VLCIntf, "macosx-mediakeys" );
+    [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(coreChangedMediaKeySupportSetting:) name: @"VLCMediaKeySupportSettingChanged" object: nil];
 }
 
-- (void)enableMediaKeySupport:(BOOL)b_value
+- (void)dealloc
 {
-	b_mediaKeySupport = b_value;
+    [[NSNotificationCenter defaultCenter] removeObserver: self];
+    [super dealloc];
+}
+
+- (void)coreChangedMediaKeySupportSetting: (NSNotification *)o_notification
+{
+	b_mediaKeySupport = config_GetInt( VLCIntf, "macosx-mediakeys" );
 }
 
 - (void)sendEvent: (NSEvent*)event
