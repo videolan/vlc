@@ -64,11 +64,10 @@ CAtmoConfig::CAtmoConfig()
 }
 
 CAtmoConfig::~CAtmoConfig() {
-   // and finally cleanup...
-   clearAllChannelMappings();
+    // and finally cleanup...
+    clearAllChannelMappings();
 #if !defined (WIN32)
-   if(m_devicename)
-      free(m_devicename);
+    free( m_devicename );
 #endif
 }
 
@@ -234,9 +233,8 @@ void CAtmoConfig::AddChannelAssignment(tChannelAssignment *ta) {
 }
 
 void CAtmoConfig::SetChannelAssignment(int index, tChannelAssignment *ta) {
-     if(m_ChannelAssignments[index]!=NULL)
-        delete m_ChannelAssignments[index];
-     m_ChannelAssignments[index] = ta;
+    delete m_ChannelAssignments[index];
+    m_ChannelAssignments[index] = ta;
 }
 
 CAtmoZoneDefinition *CAtmoConfig::getZoneDefinition(int zoneIndex) {

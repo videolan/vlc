@@ -48,8 +48,8 @@ static char *CDDAFormatMRL( const access_t *p_access, track_t i_track );
 #ifdef HAVE_LIBCDDB
 
 #define free_and_dup(var, val) \
-  if (var) free(var);          \
-  if (val) var=strdup(val);
+  free( var );          \
+  if (val) var = strdup( val );
 
 
 /* Saves CDDB information about CD-DA via libcddb. */

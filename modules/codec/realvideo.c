@@ -222,7 +222,7 @@ static int InitVideo(decoder_t *p_dec)
             free( p_sys );
             return VLC_EGENERIC;
     }
-    if (p_sys->plane) free(p_sys->plane);
+    free( p_sys->plane );
     p_sys->plane = malloc (p_dec->fmt_in.video.i_width*p_dec->fmt_in.video.i_height*3/2 + 1024 );
     if (NULL == p_sys->plane)
     {
@@ -419,11 +419,8 @@ static void Close( vlc_object_t *p_this )
 #endif
         p_sys->rv_handle=NULL;
 
-    if (p_sys->plane)
-    {
-        free(p_sys->plane);
-        p_sys->plane = NULL;
-    }
+    free( p_sys->plane );
+    p_sys->plane = NULL;
 
     msg_Dbg( p_dec, "FreeLibrary ok." );
 #ifdef LOADER

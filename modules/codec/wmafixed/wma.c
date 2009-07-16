@@ -261,8 +261,7 @@ static aout_buffer_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 
     /* worst case */
     size_t i_buffer = BLOCK_MAX_SIZE * MAX_CHANNELS * p_sys->wmadec.nb_frames;
-    if( p_sys->p_output )
-        free( p_sys->p_output );
+    free( p_sys->p_output );
     p_sys->p_output = malloc(i_buffer * sizeof(int32_t) );
     p_sys->p_samples = (int8_t*)p_sys->p_output;
 

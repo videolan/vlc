@@ -641,8 +641,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
 
                 if( !b_error )
                     var_Set( p_object, psz_variable, val );
-                if( psz_value != NULL )
-                    free( psz_value );
+                free( psz_value );
             }
             else
                 msg_Warn( p_intf, "vlc_var_set called without an object" );
@@ -811,8 +810,7 @@ void EvaluateRPN( intf_thread_t *p_intf, mvar_t  *vars,
             }
             i_result = config_SaveConfigFile( p_intf, psz_module );
 
-            if( psz_module != NULL )
-                free( psz_module );
+            free( psz_module );
             SSPushN( st, i_result );
         }
         else if( !strcmp( s, "vlc_config_reset" ) )

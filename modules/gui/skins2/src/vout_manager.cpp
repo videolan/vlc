@@ -50,11 +50,8 @@ VoutManager *VoutManager::instance( intf_thread_t *pIntf )
 
 void VoutManager::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_voutManager )
-    {
-        delete pIntf->p_sys->p_voutManager;
-        pIntf->p_sys->p_voutManager = NULL;
-    }
+    delete pIntf->p_sys->p_voutManager;
+    pIntf->p_sys->p_voutManager = NULL;
 }
 
 

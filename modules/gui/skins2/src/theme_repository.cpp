@@ -49,11 +49,8 @@ ThemeRepository *ThemeRepository::instance( intf_thread_t *pIntf )
 
 void ThemeRepository::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_repository )
-    {
-        delete pIntf->p_sys->p_repository;
-        pIntf->p_sys->p_repository = NULL;
-    }
+    delete pIntf->p_sys->p_repository;
+    pIntf->p_sys->p_repository = NULL;
 }
 
 

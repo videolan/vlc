@@ -147,11 +147,8 @@ Dialogs *Dialogs::instance( intf_thread_t *pIntf )
 
 void Dialogs::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_dialogs )
-    {
-        delete pIntf->p_sys->p_dialogs;
-        pIntf->p_sys->p_dialogs = NULL;
-    }
+    delete pIntf->p_sys->p_dialogs;
+    pIntf->p_sys->p_dialogs = NULL;
 }
 
 

@@ -100,11 +100,8 @@ OSLoop *X11Loop::instance( intf_thread_t *pIntf, X11Display &rDisplay )
 
 void X11Loop::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_osLoop )
-    {
-        delete pIntf->p_sys->p_osLoop;
-        pIntf->p_sys->p_osLoop = NULL;
-    }
+    delete pIntf->p_sys->p_osLoop;
+    pIntf->p_sys->p_osLoop = NULL;
 }
 
 

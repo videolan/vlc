@@ -41,9 +41,8 @@ CAtmoExternalCaptureInput::CAtmoExternalCaptureInput(CAtmoDynData *pAtmoDynData)
 
 CAtmoExternalCaptureInput::~CAtmoExternalCaptureInput(void)
 {
-   /* if there is still an unprocessed bufferpicture do kill it */
-   if(m_pCurrentFramePixels != NULL)
-      free(m_pCurrentFramePixels);
+    /* if there is still an unprocessed bufferpicture do kill it */
+    free( m_pCurrentFramePixels );
 
 #if defined(_ATMO_VLC_PLUGIN_)
     vlc_cond_destroy( &m_WakeupCond );

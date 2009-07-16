@@ -771,8 +771,7 @@ int checkXvMCCap( vout_thread_t *p_vout )
     }
     else
     {
-        if( p_vout->p_sys->xvmc_cap )
-            free( p_vout->p_sys->xvmc_cap );
+        free( p_vout->p_sys->xvmc_cap );
         p_vout->p_sys->xvmc_cap = NULL;
         msg_Err( p_vout, "use of direct XvMC context on a remote display failed"
                          " falling back to XV." );
@@ -1012,8 +1011,7 @@ void xxmc_dispose_context( vout_thread_t *p_vout )
         }
 
         msg_Dbg( p_vout, "freeing up XvMC surfaces and subpictures" );
-        if( p_vout->p_sys->xvmc_palette )
-            free( p_vout->p_sys->xvmc_palette );
+        free( p_vout->p_sys->xvmc_palette );
         dispose_xx44_palette( &p_vout->p_sys->palette );
         xxmc_xvmc_destroy_subpictures( p_vout );
         xxmc_xvmc_destroy_surfaces( p_vout );

@@ -197,11 +197,8 @@ static void Close ( vlc_object_t *p_this )
     module_unneed( p_vout, p_vout->p_sys->p_qte_main );
 #endif
 
-    if( p_vout->p_sys )
-    {
-        free( p_vout->p_sys );
-        p_vout->p_sys = NULL;
-    }
+    free( p_vout->p_sys );
+    p_vout->p_sys = NULL;
 }
 
 /*****************************************************************************

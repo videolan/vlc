@@ -74,11 +74,8 @@ VarManager *VarManager::instance( intf_thread_t *pIntf )
 
 void VarManager::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_varManager )
-    {
-        delete pIntf->p_sys->p_varManager;
-        pIntf->p_sys->p_varManager = NULL;
-    }
+    delete pIntf->p_sys->p_varManager;
+    pIntf->p_sys->p_varManager = NULL;
 }
 
 

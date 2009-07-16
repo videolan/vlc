@@ -52,11 +52,8 @@ Logger *Logger::instance( intf_thread_t *pIntf )
 
 void Logger::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_logger )
-    {
-        delete pIntf->p_sys->p_logger;
-        pIntf->p_sys->p_logger = NULL;
-    }
+    delete pIntf->p_sys->p_logger;
+    pIntf->p_sys->p_logger = NULL;
 }
 
 

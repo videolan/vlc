@@ -922,8 +922,7 @@ static int dirac_InspectDataUnit( decoder_t *p_dec, block_t **pp_block, block_t 
          *  - required for ogg muxing
          *  - useful for error checking
          *  - it isn't allowed to change until an eos */
-        if( p_es->p_extra )
-            free( p_es->p_extra );
+        free( p_es->p_extra );
         p_es->p_extra = calloc( 1, p_block->i_buffer + 13 );
         if( !p_es->p_extra )
         {

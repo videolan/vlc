@@ -306,8 +306,7 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
         {
             KaxTrackLanguage &lang = *(KaxTrackLanguage*)l;
 
-            if ( tk->fmt.psz_language != NULL )
-                free( tk->fmt.psz_language );
+            free( tk->fmt.psz_language );
             tk->fmt.psz_language = strdup( string( lang ).c_str() );
             msg_Dbg( &sys.demuxer,
                      "|   |   |   + Track Language=`%s'", tk->fmt.psz_language );

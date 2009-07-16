@@ -893,8 +893,7 @@ void QVLCMenu::MiscPopupMenu( intf_thread_t *p_intf )
 void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 {
     /* Delete old popup if there is one */
-    if( p_intf->p_sys->p_popup_menu )
-        delete p_intf->p_sys->p_popup_menu;
+    delete p_intf->p_sys->p_popup_menu;
 
     if( !show )
     {

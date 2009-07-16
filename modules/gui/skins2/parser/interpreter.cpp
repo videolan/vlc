@@ -141,11 +141,8 @@ Interpreter *Interpreter::instance( intf_thread_t *pIntf )
 
 void Interpreter::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_interpreter )
-    {
-        delete pIntf->p_sys->p_interpreter;
-        pIntf->p_sys->p_interpreter = NULL;
-    }
+    delete pIntf->p_sys->p_interpreter;
+    pIntf->p_sys->p_interpreter = NULL;
 }
 
 

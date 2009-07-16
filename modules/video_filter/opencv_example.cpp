@@ -133,9 +133,7 @@ static void CloseFilter( vlc_object_t *p_this )
     if( p_filter->p_sys->p_storage )
         cvReleaseMemStorage( &p_filter->p_sys->p_storage );
 
-    if (NULL != p_filter->p_sys->event_info.p_region)
-        free(p_filter->p_sys->event_info.p_region);
-
+    free( p_filter->p_sys->event_info.p_region );
     free( p_sys );
 
     var_Destroy( p_filter->p_libvlc, VIDEO_FILTER_EVENT_VARIABLE);
@@ -199,11 +197,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         if (faces && (faces->total > 0))
         {
             //msg_Dbg( p_filter, "Found %d face(s)", faces->total );
-            if (NULL != p_filter->p_sys->event_info.p_region)
-            {
-                free(p_filter->p_sys->event_info.p_region);
-                p_filter->p_sys->event_info.p_region = NULL;
-            }
+            free( p_filter->p_sys->event_info.p_region );
+            p_filter->p_sys->event_info.p_region = NULL;
             if( NULL == ( p_filter->p_sys->event_info.p_region =
                   (video_filter_region_info_t *)malloc(faces->total*sizeof(video_filter_region_info_t))))
             {

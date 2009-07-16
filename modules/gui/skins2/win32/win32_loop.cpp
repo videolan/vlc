@@ -107,11 +107,8 @@ OSLoop *Win32Loop::instance( intf_thread_t *pIntf )
 
 void Win32Loop::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_osLoop )
-    {
-        delete pIntf->p_sys->p_osLoop;
-        pIntf->p_sys->p_osLoop = NULL;
-    }
+    delete pIntf->p_sys->p_osLoop;
+    pIntf->p_sys->p_osLoop = NULL;
 }
 
 

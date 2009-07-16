@@ -72,11 +72,8 @@ OSLoop *MacOSXLoop::instance( intf_thread_t *pIntf )
 
 void MacOSXLoop::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_osLoop )
-    {
-        delete pIntf->p_sys->p_osLoop;
-        pIntf->p_sys->p_osLoop = NULL;
-    }
+    delete pIntf->p_sys->p_osLoop;
+    pIntf->p_sys->p_osLoop = NULL;
 }
 
 

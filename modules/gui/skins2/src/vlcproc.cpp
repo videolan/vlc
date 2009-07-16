@@ -65,11 +65,8 @@ VlcProc *VlcProc::instance( intf_thread_t *pIntf )
 
 void VlcProc::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_vlcProc )
-    {
-        delete pIntf->p_sys->p_vlcProc;
-        pIntf->p_sys->p_vlcProc = NULL;
-    }
+    delete pIntf->p_sys->p_vlcProc;
+    pIntf->p_sys->p_vlcProc = NULL;
 }
 
 

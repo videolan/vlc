@@ -67,11 +67,8 @@ AsyncQueue *AsyncQueue::instance( intf_thread_t *pIntf )
 
 void AsyncQueue::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_queue )
-    {
-        delete pIntf->p_sys->p_queue;
-        pIntf->p_sys->p_queue = NULL;
-    }
+    delete pIntf->p_sys->p_queue;
+    pIntf->p_sys->p_queue = NULL;
 }
 
 

@@ -64,10 +64,7 @@ OSFactory *OSFactory::instance( intf_thread_t *pIntf )
 
 void OSFactory::destroy( intf_thread_t *pIntf )
 {
-    if( pIntf->p_sys->p_osFactory )
-    {
-        delete pIntf->p_sys->p_osFactory;
-        pIntf->p_sys->p_osFactory = NULL;
-    }
+    delete pIntf->p_sys->p_osFactory;
+    pIntf->p_sys->p_osFactory = NULL;
 }
 
