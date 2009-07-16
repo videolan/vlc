@@ -53,10 +53,14 @@ void           input_clock_Delete( input_clock_t * );
 /**
  * This function will update a input_clock_t with a new clock reference point.
  * It will also tell if the clock point is late regarding our buffering.
+ *
+ * \param b_buffering_allowed tells if we are allowed to bufferize more data in
+ * advanced (if possible).
  */
 void    input_clock_Update( input_clock_t *, vlc_object_t *p_log,
                             bool *pb_late,
-                            bool b_can_pace_control, mtime_t i_clock, mtime_t i_system );
+                            bool b_can_pace_control, bool b_buffering_allowed,
+                            mtime_t i_clock, mtime_t i_system );
 /**
  * This function will reset the drift of a input_clock_t.
  *

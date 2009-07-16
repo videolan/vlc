@@ -86,6 +86,17 @@
  * my dice --Meuuh */
 #define CR_MEAN_PTS_GAP (300000)
 
+/* Rate (in 1/256) at which we will read faster to try to increase our
+ * internal buffer (if we control the pace of the source).
+ */
+#define CR_BUFFERING_RATE (48)
+
+/* Extra internal buffer value (in CLOCK_FREQ)
+ * It is 60s max, remember as it is limited by the size it takes by es_out.c
+ * it can be really large.
+ */
+#define CR_BUFFERING_TARGET (60000000)
+
 /*****************************************************************************
  * Structures
  *****************************************************************************/
@@ -142,6 +153,9 @@ struct input_clock_t
     /* Maximal timestamp returned by input_clock_ConvertTS (in system unit) */
     mtime_t i_ts_max;
 
+    /* Amount of extra buffering expressed in stream clock */
+    mtime_t i_buffering_duration;
+
     /* Clock drift */
     mtime_t i_next_drift_update;
     average_t drift;
@@ -182,6 +196,8 @@ input_clock_t *input_clock_New( int i_rate )
 
     cl->i_ts_max = VLC_TS_INVALID;
 
+    cl->i_buffering_duration = 0;
+
     cl->i_next_drift_update = VLC_TS_INVALID;
     AvgInit( &cl->drift, 10 );
 
@@ -215,7 +231,7 @@ void input_clock_Delete( input_clock_t *cl )
  *****************************************************************************/
 void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
                          bool *pb_late,
-                         bool b_can_pace_control,
+                         bool b_can_pace_control, bool b_buffering_allowed,
                          mtime_t i_ck_stream, mtime_t i_ck_system )
 {
     bool b_reset_reference = false;
@@ -243,6 +259,8 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         msg_Warn( p_log, "feeding synchro with a new reference point trying to recover from clock gap" );
         b_reset_reference= true;
     }
+
+    /* */
     if( b_reset_reference )
     {
         cl->i_next_drift_update = VLC_TS_INVALID;
@@ -254,6 +272,8 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
                                       __MAX( cl->i_ts_max + CR_MEAN_PTS_GAP, i_ck_system ) );
     }
 
+    /* Compute the drift between the stream clock and the system clock
+     * when we don't control the source pace */
     if( !b_can_pace_control && cl->i_next_drift_update < i_ck_system )
     {
         const mtime_t i_converted = ClockSystemToStream( cl, i_ck_system );
@@ -262,6 +282,26 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
 
         cl->i_next_drift_update = i_ck_system + CLOCK_FREQ/5; /* FIXME why that */
     }
+
+    /* Update the extra buffering value */
+    if( !b_can_pace_control || b_reset_reference )
+    {
+        cl->i_buffering_duration = 0;
+    }
+    else if( b_buffering_allowed )
+    {
+        /* Try to bufferize more than necessary by reading
+         * CR_BUFFERING_RATE/256 faster until we have CR_BUFFERING_TARGET.
+         */
+        const mtime_t i_duration = __MAX( i_ck_stream - cl->last.i_stream, 0 );
+
+        cl->i_buffering_duration += ( i_duration * CR_BUFFERING_RATE + 255 ) / 256;
+        if( cl->i_buffering_duration > CR_BUFFERING_TARGET )
+            cl->i_buffering_duration = CR_BUFFERING_TARGET;
+    }
+    //fprintf( stderr, "input_clock_Update: %d :: %lld\n", b_buffering_allowed, cl->i_buffering_duration/1000 );
+
+    /* */
     cl->last = clock_point_Create( i_ck_stream, i_ck_system );
 
     /* It does not take the decoder latency into account but it is not really
@@ -345,7 +385,7 @@ mtime_t input_clock_GetWakeup( input_clock_t *cl )
 
     /* Synchronized, we can wait */
     if( cl->b_has_reference )
-        i_wakeup = ClockStreamToSystem( cl, cl->last.i_stream + AvgGet( &cl->drift ) );
+        i_wakeup = ClockStreamToSystem( cl, cl->last.i_stream + AvgGet( &cl->drift ) - cl->i_buffering_duration );
 
     vlc_mutex_unlock( &cl->lock );
 
@@ -375,6 +415,7 @@ int input_clock_ConvertTS( input_clock_t *cl,
     }
 
     /* */
+    const mtime_t i_ts_buffering = cl->i_buffering_duration * cl->i_rate / INPUT_RATE_DEFAULT;
     const mtime_t i_ts_delay = cl->i_pts_delay + ClockGetTsOffset( cl );
 
     /* */
@@ -397,7 +438,7 @@ int input_clock_ConvertTS( input_clock_t *cl,
 
     /* Check ts validity */
     if( i_ts_bound != INT64_MAX &&
-        *pi_ts0 > VLC_TS_INVALID && *pi_ts0 >= mdate() + i_ts_delay + i_ts_bound )
+        *pi_ts0 > VLC_TS_INVALID && *pi_ts0 >= mdate() + i_ts_delay + i_ts_buffering + i_ts_bound )
         return VLC_EGENERIC;
 
     return VLC_SUCCESS;

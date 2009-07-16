@@ -187,6 +187,7 @@ static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, mtime_t i_da
 static void EsOutProgramChangePause( es_out_t *out, bool b_paused, mtime_t i_date );
 static void EsOutProgramsChangeRate( es_out_t *out );
 static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced );
+
 static char *LanguageGetName( const char *psz_code );
 static char *LanguageGetCode( const char *psz_lang );
 static char **LanguageSplit( const char *psz_langs );
@@ -705,6 +706,32 @@ static void EsOutDecodersChangePause( es_out_t *out, bool b_paused, mtime_t i_da
         }
     }
 }
+
+static bool EsOutIsExtraBufferingAllowed( es_out_t *out )
+{
+    es_out_sys_t *p_sys = out->p_sys;
+
+    size_t i_size = 0;
+    for( int i = 0; i < p_sys->i_es; i++ )
+    {
+        es_out_id_t *p_es = p_sys->es[i];
+
+        if( p_es->p_dec )
+            i_size += input_DecoderGetFifoSize( p_es->p_dec );
+        if( p_es->p_dec_record )
+            i_size += input_DecoderGetFifoSize( p_es->p_dec_record );
+    }
+    //fprintf( stderr, "----- EsOutIsExtraBufferingAllowed =% 5d kbytes -- ", i_size / 1024 );
+
+    /* TODO maybe we want to be able to tune it ? */
+#if defined(OPTIMIZE_MEMORY)
+    const size_t i_level_high = 500000;  /* 0.5 Mbytes */
+#else
+    const size_t i_level_high = 10000000; /* 10 Mbytes */
+#endif
+    return i_size < i_level_high;
+}
+
 static void EsOutProgramChangePause( es_out_t *out, bool b_paused, mtime_t i_date )
 {
     es_out_sys_t *p_sys = out->p_sys;
@@ -2236,7 +2263,9 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             bool b_late;
             input_clock_Update( p_pgrm->p_clock, VLC_OBJECT(p_sys->p_input),
                                 &b_late,
-                                p_sys->p_input->p->b_can_pace_control || p_sys->b_buffering, i_pcr, mdate() );
+                                p_sys->p_input->p->b_can_pace_control || p_sys->b_buffering,
+                                EsOutIsExtraBufferingAllowed( out ),
+                                i_pcr, mdate() );
 
             if( p_pgrm == p_sys->p_pgrm )
             {
