@@ -149,23 +149,21 @@ struct filter_sys_t
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-    filter_sys_t *p_sys = NULL;
+    filter_sys_t *p_sys;
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_vfilter_options,
                        p_filter->p_cfg );
 
-    p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
+    p_filter->p_sys = p_sys = calloc( 1, sizeof( filter_sys_t ) );
     if( p_filter->p_sys == NULL )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof(filter_sys_t) );
 
-    p_sys->p_scene = malloc( sizeof( scene_t ) );
+    p_sys->p_scene = calloc( 1, sizeof( scene_t ) );
     if( !p_sys->p_scene )
     {
         free( p_sys );
         return VLC_ENOMEM;
     }
-    memset( p_sys->p_scene, 0, sizeof(scene_t) );
 
     p_sys->p_image = image_HandlerCreate( p_this );
     if( !p_sys->p_image )
@@ -196,10 +194,9 @@ static int Create( vlc_object_t *p_this )
     p_sys->psz_path = var_GetNonEmptyString( p_this, CFG_PREFIX "path" );
     if( p_sys->psz_path == NULL )
     {
-        int i_ret;
-        i_ret = asprintf( &p_sys->psz_path, "%s", config_GetHomeDir());
-        if( i_ret == -1 )
-            p_sys->psz_path = NULL;
+        const char *psz_homedir = config_GetHomeDir();
+        if( psz_homedir )
+            p_sys->psz_path = strdup( psz_homedir );
     }
 
     p_filter->pf_video_filter = Filter;
@@ -240,7 +237,7 @@ static void SnapshotRatio( filter_t *p_filter, picture_t *p_pic )
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
 
-    if( !p_sys || !p_pic ) return;
+    if( !p_pic ) return;
 
     if( p_sys->i_frames % p_sys->i_ratio != 0 )
     {
@@ -249,32 +246,30 @@ static void SnapshotRatio( filter_t *p_filter, picture_t *p_pic )
     }
     p_sys->i_frames++;
 
-    if( p_sys->p_scene )
-    {
-        if( p_sys->p_scene->p_pic )
-            picture_Release( p_sys->p_scene->p_pic );
+    if( p_sys->p_scene->p_pic )
+        picture_Release( p_sys->p_scene->p_pic );
 
-        if( (p_sys->i_width <= 0) && (p_sys->i_height > 0) )
-        {
-            p_sys->i_width = (p_pic->format.i_width * p_sys->i_height) / p_pic->format.i_height;
-        }
-        else if( (p_sys->i_height <= 0) && (p_sys->i_width > 0) )
-        {
-            p_sys->i_height = (p_pic->format.i_height * p_sys->i_width) / p_pic->format.i_width;
-        }
-        else if( (p_sys->i_width <= 0) && (p_sys->i_height <= 0) )
-        {
-            p_sys->i_width = p_pic->format.i_width;
-            p_sys->i_height = p_pic->format.i_height;
-        }
-        p_sys->p_scene->p_pic = picture_New( p_pic->format.i_chroma,
-           p_pic->format.i_width, p_pic->format.i_height,
-           p_pic->format.i_sar_num );
-        if( p_sys->p_scene->p_pic )
-        {
-            picture_Copy( p_sys->p_scene->p_pic, p_pic );
-            SavePicture( p_filter, p_sys->p_scene->p_pic );
-        }
+    if( (p_sys->i_width <= 0) && (p_sys->i_height > 0) )
+    {
+        p_sys->i_width = (p_pic->format.i_width * p_sys->i_height) / p_pic->format.i_height;
+    }
+    else if( (p_sys->i_height <= 0) && (p_sys->i_width > 0) )
+    {
+        p_sys->i_height = (p_pic->format.i_height * p_sys->i_width) / p_pic->format.i_width;
+    }
+    else if( (p_sys->i_width <= 0) && (p_sys->i_height <= 0) )
+    {
+        p_sys->i_width = p_pic->format.i_width;
+        p_sys->i_height = p_pic->format.i_height;
+    }
+
+    p_sys->p_scene->p_pic = picture_New( p_pic->format.i_chroma,
+                p_pic->format.i_width, p_pic->format.i_height,
+                p_pic->format.i_sar_num );
+    if( p_sys->p_scene->p_pic )
+    {
+        picture_Copy( p_sys->p_scene->p_pic, p_pic );
+        SavePicture( p_filter, p_sys->p_scene->p_pic );
     }
 }
 
