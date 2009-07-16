@@ -799,7 +799,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             p_sys->b_continuous = true;
         }
         Disconnect( p_access );
-        if( p_sys->b_reconnect )
+        if( p_sys->b_reconnect && vlc_object_alive( p_access ) )
         {
             msg_Dbg( p_access, "got disconnected, trying to reconnect" );
             if( Connect( p_access, p_access->info.i_pos ) )
