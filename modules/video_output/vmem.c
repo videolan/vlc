@@ -164,15 +164,16 @@ static int Init( vout_thread_t *p_vout )
     p_vout->p_sys->pf_unlock = (void (*) (void *))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
-    psz_tmp = var_CreateGetString( p_vout, "vmem-data" );
-    p_vout->p_sys->p_data = (void *)(intptr_t)atoll( psz_tmp );
-    free( psz_tmp );
-
+    /* pf_lock and pf_unlock are mandatory */
     if( !p_vout->p_sys->pf_lock || !p_vout->p_sys->pf_unlock )
     {
         msg_Err( p_vout, "Invalid lock or unlock callbacks" );
         return VLC_EGENERIC;
     }
+
+    psz_tmp = var_CreateGetString( p_vout, "vmem-data" );
+    p_vout->p_sys->p_data = (void *)(intptr_t)atoll( psz_tmp );
+    free( psz_tmp );
 
     I_OUTPUTPICTURES = 0;
 
