@@ -57,16 +57,6 @@ vlc_module_begin ()
 vlc_module_end ()
 
 /*****************************************************************************
- * filter_sys_t: Invert video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the Invert specific properties of an output thread.
- *****************************************************************************/
-struct filter_sys_t
-{
-};
-
-/*****************************************************************************
  * Create: allocates Invert video thread output method
  *****************************************************************************
  * This function allocates and initializes a Invert vout method.
@@ -74,11 +64,6 @@ struct filter_sys_t
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-
-    /* Allocate structure */
-    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
-    if( p_filter->p_sys == NULL )
-        return VLC_ENOMEM;
 
     p_filter->pf_video_filter = Filter;
 
@@ -92,9 +77,7 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
-    filter_t *p_filter = (filter_t *)p_this;
-
-    free( p_filter->p_sys );
+    (void)p_this;
 }
 
 /*****************************************************************************

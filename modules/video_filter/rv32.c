@@ -32,15 +32,6 @@
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
 
-/*****************************************************************************
- * filter_sys_t : filter descriptor
- *****************************************************************************/
-struct filter_sys_t
-{
-    es_format_t fmt_in;
-    es_format_t fmt_out;
-};
-
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
@@ -64,7 +55,6 @@ vlc_module_end ()
 static int OpenFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t*)p_this;
-    filter_sys_t *p_sys;
 
     /* XXX Only support RV24 -> RV32 conversion */
     if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_RGB24 ||
@@ -78,11 +68,6 @@ static int OpenFilter( vlc_object_t *p_this )
      || p_filter->fmt_in.video.i_height != p_filter->fmt_out.video.i_height )
         return -1;
 
-    /* Allocate the memory needed to store the decoder's structure */
-    if( ( p_filter->p_sys = p_sys =
-          (filter_sys_t *)malloc(sizeof(filter_sys_t)) ) == NULL )
-        return VLC_ENOMEM;
-
     p_filter->pf_video_filter = Filter;
 
     return VLC_SUCCESS;
@@ -93,10 +78,7 @@ static int OpenFilter( vlc_object_t *p_this )
  *****************************************************************************/
 static void CloseFilter( vlc_object_t *p_this )
 {
-    filter_t *p_filter = (filter_t*)p_this;
-    filter_sys_t *p_sys = p_filter->p_sys;
-
-    free( p_sys );
+    (void)p_this;
 }
 
 /****************************************************************************
