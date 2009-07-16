@@ -376,26 +376,16 @@ static bool parse_track_dict( demux_t *p_demux, input_item_t *p_input_item,
 
     if( psz_uri )
     {
-        if( strlen( psz_uri ) > 17 &&
-            !strncmp( psz_uri, "file://localhost/", 17 ) )
-        {
-            /* remove 'localhost/' */
-            memmove( psz_uri + 7, psz_uri + 17, strlen( psz_uri ) - 9 );
-            msg_Info( p_demux, "Adding '%s'", psz_uri );
+        msg_Info( p_demux, "Adding '%s'", psz_uri );
 
-            p_new_input = input_item_New( p_demux, psz_uri, NULL );
-            input_item_AddSubItem( p_input_item, p_new_input );
+        p_new_input = input_item_New( p_demux, psz_uri, NULL );
+        input_item_AddSubItem( p_input_item, p_new_input );
 
-            /* add meta info */
-            add_meta( p_new_input, p_track );
-            vlc_gc_decref( p_new_input );
+        /* add meta info */
+        add_meta( p_new_input, p_track );
+        vlc_gc_decref( p_new_input );
 
-            p_demux->p_sys->i_ntracks++;
-        }
-        else
-        {
-            msg_Err( p_demux, "Don't know how to handle %s", psz_uri );
-        }
+        p_demux->p_sys->i_ntracks++;
         free( psz_uri );
     }
 
