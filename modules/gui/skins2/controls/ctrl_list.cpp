@@ -65,10 +65,7 @@ CtrlList::~CtrlList()
 {
     m_rList.getPositionVar().delObserver( this );
     m_rList.delObserver( this );
-    if( m_pImage )
-    {
-        delete m_pImage;
-    }
+    delete m_pImage;
 }
 
 
@@ -411,10 +408,7 @@ void CtrlList::autoScroll()
 
 void CtrlList::makeImage()
 {
-    if( m_pImage )
-    {
-        delete m_pImage;
-    }
+    delete m_pImage;
 
     // Get the size of the control
     const Position *pPos = getPosition();

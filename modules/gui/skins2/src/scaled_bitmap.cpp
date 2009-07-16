@@ -104,9 +104,6 @@ ScaledBitmap::ScaledBitmap( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
 
 ScaledBitmap::~ScaledBitmap()
 {
-    if( m_pData )
-    {
-        delete[] m_pData;
-    }
+    delete[] m_pData;
 }
 

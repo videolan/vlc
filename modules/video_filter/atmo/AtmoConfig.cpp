@@ -211,8 +211,7 @@ int CAtmoConfig::getNumChannelAssignments() {
 void CAtmoConfig::clearChannelMappings() {
     for(int i=1;i<10;i++) {
         tChannelAssignment *ca = m_ChannelAssignments[i];
-        if(ca!=NULL)
-           delete ca;
+        delete ca;
         m_ChannelAssignments[i] = NULL;
     }
 }
@@ -220,8 +219,7 @@ void CAtmoConfig::clearChannelMappings() {
 void CAtmoConfig::clearAllChannelMappings() {
     for(int i=0;i<10;i++) {
         tChannelAssignment *ca = m_ChannelAssignments[i];
-        if(ca!=NULL)
-           delete ca;
+        delete ca;
         m_ChannelAssignments[i] = NULL;
     }
 }

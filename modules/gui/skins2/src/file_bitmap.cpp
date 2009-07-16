@@ -85,7 +85,7 @@ FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
 
 FileBitmap::~FileBitmap()
 {
-    if( m_pData ) delete[] m_pData;
+    delete[] m_pData;
 }
 
 

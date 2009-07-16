@@ -130,10 +130,7 @@ UString::UString( intf_thread_t *pIntf, const char *pString ):
 
 UString::~UString()
 {
-    if( m_pString )
-    {
-        delete[] m_pString;
-    }
+    delete[] m_pString;
 }
 
 

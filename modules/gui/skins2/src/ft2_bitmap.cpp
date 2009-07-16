@@ -36,10 +36,7 @@ FT2Bitmap::FT2Bitmap( intf_thread_t *pIntf, int width, int height ):
 
 FT2Bitmap::~FT2Bitmap()
 {
-    if( m_pData )
-    {
-        delete[] m_pData;
-    }
+    delete[] m_pData;
 }
 
 
