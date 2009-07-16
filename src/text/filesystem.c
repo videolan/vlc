@@ -339,8 +339,7 @@ int utf8_loaddir( DIR *dir, char ***namelist,
 
         for( i = 0; i < num; i++ )
             free( tab[i] );
-        if( tab != NULL )
-            free( tab );
+        free( tab );
         }
     }
     return -1;

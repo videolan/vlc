@@ -466,8 +466,7 @@ static int filter_chain_DeleteFilterInternal( filter_chain_t *p_chain,
     vlc_object_release( p_filter );
 
     vlc_mouse_t *p_mouse = vlc_array_item_at_index( &p_chain->mouses, i_filter_idx );
-    if( p_mouse )
-        free( p_mouse );
+    free( p_mouse );
     vlc_array_remove( &p_chain->mouses, i_filter_idx );
 
     /* FIXME: check fmt_in/fmt_out consitency */
