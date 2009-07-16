@@ -2,16 +2,17 @@
 <archive type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="7.03">
 	<data>
 		<int key="IBDocument.SystemTarget">1050</int>
-		<string key="IBDocument.SystemVersion">9L16</string>
+		<string key="IBDocument.SystemVersion">9L25</string>
 		<string key="IBDocument.InterfaceBuilderVersion">677</string>
 		<string key="IBDocument.AppKitVersion">949.54</string>
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
 			<integer value="2199"/>
-			<integer value="29"/>
 			<integer value="3568"/>
 			<integer value="4375"/>
+			<integer value="283"/>
+			<integer value="29"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -1683,41 +1684,10 @@
 				<string key="NSWindowContentMaxSize">{3.40282e+38, 3.40282e+38}</string>
 				<string key="NSWindowContentMinSize">{599, 368}</string>
 				<object class="NSView" key="NSWindowView" id="980573178">
-					<nil key="NSNextResponder"/>
+					<reference key="NSNextResponder"/>
 					<int key="NSvFlags">256</int>
 					<object class="NSMutableArray" key="NSSubviews">
 						<bool key="EncodedWithXMLCoder">YES</bool>
-						<object class="NSButton" id="69119256">
-							<reference key="NSNextResponder" ref="980573178"/>
-							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{15, 12}, {185, 28}}</string>
-							<reference key="NSSuperview" ref="980573178"/>
-							<bool key="NSEnabled">YES</bool>
-							<object class="NSButtonCell" key="NSCell" id="563652351">
-								<int key="NSCellFlags">67239424</int>
-								<int key="NSCellFlags2">138018816</int>
-								<string key="NSContents">Open CrashLog...</string>
-								<object class="NSFont" key="NSSupport" id="26">
-									<string key="NSName">LucidaGrande</string>
-									<double key="NSSize">1.100000e+01</double>
-									<int key="NSfFlags">3100</int>
-								</object>
-								<reference key="NSControlView" ref="69119256"/>
-								<int key="NSButtonFlags">-2038284033</int>
-								<int key="NSButtonFlags2">1</int>
-								<object class="NSFont" key="NSAlternateImage" id="947581050">
-									<string key="NSName">Helvetica</string>
-									<double key="NSSize">1.100000e+01</double>
-									<int key="NSfFlags">16</int>
-								</object>
-								<string key="NSAlternateContents"/>
-								<object class="NSMutableString" key="NSKeyEquivalent">
-									<characters key="NS.bytes"/>
-								</object>
-								<int key="NSPeriodicDelay">200</int>
-								<int key="NSPeriodicInterval">25</int>
-							</object>
-						</object>
 						<object class="NSScrollView" id="302195131">
 							<reference key="NSNextResponder" ref="980573178"/>
 							<int key="NSvFlags">274</int>
@@ -1731,7 +1701,30 @@
 										<object class="NSTextView" id="324354779">
 											<reference key="NSNextResponder" ref="341241234"/>
 											<int key="NSvFlags">2322</int>
-											<string key="NSFrameSize">{557, 14}</string>
+											<object class="NSMutableSet" key="NSDragTypes">
+												<bool key="EncodedWithXMLCoder">YES</bool>
+												<object class="NSMutableArray" key="set.sortedObjects">
+													<bool key="EncodedWithXMLCoder">YES</bool>
+													<string>Apple HTML pasteboard type</string>
+													<string>Apple PDF pasteboard type</string>
+													<string>Apple PICT pasteboard type</string>
+													<string>Apple PNG pasteboard type</string>
+													<string>Apple URL pasteboard type</string>
+													<string>CorePasteboardFlavorType 0x6D6F6F76</string>
+													<string>CorePasteboardFlavorType 0x75726C20</string>
+													<string>NSColor pasteboard type</string>
+													<string>NSFilenamesPboardType</string>
+													<string>NSStringPboardType</string>
+													<string>NeXT Encapsulated PostScript v1.2 pasteboard type</string>
+													<string>NeXT RTFD pasteboard type</string>
+													<string>NeXT Rich Text Format v1.0 pasteboard type</string>
+													<string>NeXT TIFF v4.0 pasteboard type</string>
+													<string>NeXT font pasteboard type</string>
+													<string>NeXT ruler pasteboard type</string>
+													<string>WebURLsWithTitlesPboardType</string>
+												</object>
+											</object>
+											<string key="NSFrameSize">{597, 15}</string>
 											<reference key="NSSuperview" ref="341241234"/>
 											<object class="NSTextContainer" key="NSTextContainer" id="748594020">
 												<object class="NSLayoutManager" key="NSLayoutManager">
@@ -1749,7 +1742,7 @@
 													<nil key="NSDelegate"/>
 												</object>
 												<reference key="NSTextView" ref="324354779"/>
-												<double key="NSWidth">5.570000e+02</double>
+												<double key="NSWidth">5.970000e+02</double>
 												<int key="NSTCFlags">1</int>
 											</object>
 											<object class="NSTextViewSharedData" key="NSSharedData">
@@ -1816,7 +1809,7 @@
 											<nil key="NSDelegate"/>
 										</object>
 									</object>
-									<string key="NSFrame">{{1, 1}, {557, 302}}</string>
+									<string key="NSFrame">{{1, 1}, {597, 348}}</string>
 									<reference key="NSSuperview" ref="302195131"/>
 									<reference key="NSNextKeyView" ref="324354779"/>
 									<reference key="NSDocView" ref="324354779"/>
@@ -1849,7 +1842,7 @@
 									<double key="NSPercent">9.456522e-01</double>
 								</object>
 							</object>
-							<string key="NSFrame">{{20, 44}, {559, 304}}</string>
+							<string key="NSFrame">{{0, 18}, {599, 350}}</string>
 							<reference key="NSSuperview" ref="980573178"/>
 							<reference key="NSNextKeyView" ref="341241234"/>
 							<int key="NSsFlags">530</int>
@@ -1857,21 +1850,51 @@
 							<reference key="NSHScroller" ref="697955022"/>
 							<reference key="NSContentView" ref="341241234"/>
 						</object>
+						<object class="NSButton" id="69119256">
+							<reference key="NSNextResponder" ref="980573178"/>
+							<int key="NSvFlags">292</int>
+							<string key="NSFrame">{{0, -1}, {150, 20}}</string>
+							<reference key="NSSuperview" ref="980573178"/>
+							<bool key="NSEnabled">YES</bool>
+							<object class="NSButtonCell" key="NSCell" id="563652351">
+								<int key="NSCellFlags">-2080244224</int>
+								<int key="NSCellFlags2">134348800</int>
+								<string key="NSContents">Open CrashLog...</string>
+								<object class="NSFont" key="NSSupport" id="26">
+									<string key="NSName">LucidaGrande</string>
+									<double key="NSSize">1.100000e+01</double>
+									<int key="NSfFlags">3100</int>
+								</object>
+								<reference key="NSControlView" ref="69119256"/>
+								<int key="NSButtonFlags">-2035007233</int>
+								<int key="NSButtonFlags2">34</int>
+								<string key="NSAlternateContents"/>
+								<object class="NSMutableString" key="NSKeyEquivalent">
+									<characters key="NS.bytes"/>
+								</object>
+								<int key="NSPeriodicDelay">200</int>
+								<int key="NSPeriodicInterval">25</int>
+							</object>
+						</object>
 						<object class="NSButton" id="186669625">
 							<reference key="NSNextResponder" ref="980573178"/>
 							<int key="NSvFlags">292</int>
-							<string key="NSFrame">{{198, 12}, {185, 28}}</string>
+							<string key="NSFrame">{{149, -1}, {150, 20}}</string>
 							<reference key="NSSuperview" ref="980573178"/>
 							<bool key="NSEnabled">YES</bool>
 							<object class="NSButtonCell" key="NSCell" id="436035719">
 								<int key="NSCellFlags">67239424</int>
-								<int key="NSCellFlags2">138018816</int>
+								<int key="NSCellFlags2">134348800</int>
 								<string key="NSContents">Save this Log...</string>
 								<reference key="NSSupport" ref="26"/>
 								<reference key="NSControlView" ref="186669625"/>
 								<int key="NSButtonFlags">-2038284033</int>
-								<int key="NSButtonFlags2">1</int>
-								<reference key="NSAlternateImage" ref="947581050"/>
+								<int key="NSButtonFlags2">34</int>
+								<object class="NSFont" key="NSAlternateImage">
+									<string key="NSName">Helvetica</string>
+									<double key="NSSize">1.100000e+01</double>
+									<int key="NSfFlags">16</int>
+								</object>
 								<string key="NSAlternateContents"/>
 								<object class="NSMutableString" key="NSKeyEquivalent">
 									<characters key="NS.bytes"/>
@@ -1882,6 +1905,7 @@
 						</object>
 					</object>
 					<string key="NSFrameSize">{599, 368}</string>
+					<reference key="NSSuperview"/>
 				</object>
 				<string key="NSScreenRect">{{0, 0}, {1280, 778}}</string>
 				<string key="NSMinSize">{599, 384}</string>
@@ -10290,9 +10314,9 @@ LCAuLi4</string>
 						<reference key="object" ref="980573178"/>
 						<object class="NSMutableArray" key="children">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<reference ref="69119256"/>
 							<reference ref="302195131"/>
 							<reference ref="186669625"/>
+							<reference ref="69119256"/>
 						</object>
 						<reference key="parent" ref="823854124"/>
 					</object>
@@ -14049,8 +14073,8 @@ LCAuLi4</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
-					<string>{{105, 246}, {599, 368}}</string>
-					<string>{{105, 246}, {599, 368}}</string>
+					<string>{{343, 246}, {599, 368}}</string>
+					<string>{{343, 246}, {599, 368}}</string>
 					<reference ref="5"/>
 					<reference ref="5"/>
 					<string>{599, 368}</string>
