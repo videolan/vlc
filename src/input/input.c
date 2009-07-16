@@ -94,7 +94,7 @@ static void InputSourceMeta( input_thread_t *, input_source_t *, vlc_meta_t * );
 
 /* TODO */
 //static void InputGetAttachments( input_thread_t *, input_source_t * );
-static void SlaveDemux( input_thread_t *p_input );
+static void SlaveDemux( input_thread_t *p_input, bool *pb_demux_polled );
 static void SlaveSeek( input_thread_t *p_input );
 
 static void InputMetaUser( input_thread_t *p_input, vlc_meta_t *p_meta );
@@ -592,11 +592,12 @@ exit:
  * MainLoopDemux
  * It asks the demuxer to demux some data
  */
-static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t i_start_mdate )
+static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, bool *pb_demux_polled, mtime_t i_start_mdate )
 {
     int i_ret;
 
     *pb_changed = false;
+    *pb_demux_polled = p_input->p->input.p_demux->pf_demux != NULL;
 
     if( ( p_input->p->i_stop > 0 && p_input->p->i_time >= p_input->p->i_stop ) ||
         ( p_input->p->i_run > 0 && i_start_mdate+p_input->p->i_run < mdate() ) )
@@ -639,7 +640,10 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, mtime_t i_
 
     if( i_ret > 0 && p_input->p->i_slave > 0 )
     {
-        SlaveDemux( p_input );
+        bool b_demux_polled;
+        SlaveDemux( p_input, &b_demux_polled );
+
+        *pb_demux_polled |= b_demux_polled;
     }
 }
 
@@ -755,6 +759,7 @@ static void MainLoop( input_thread_t *p_input )
         mtime_t i_deadline;
         mtime_t i_wakeup;
         bool b_paused;
+        bool b_demux_polled;
 
         /* Demux data */
         b_force_update = false;
@@ -765,11 +770,12 @@ static void MainLoop( input_thread_t *p_input )
         b_paused = p_input->p->i_state == PAUSE_S &&
                    !es_out_GetBuffering( p_input->p->p_es_out );
 
+        b_demux_polled = true;
         if( !b_paused )
         {
             if( !p_input->p->input.b_eof )
             {
-                MainLoopDemux( p_input, &b_force_update, i_start_mdate );
+                MainLoopDemux( p_input, &b_force_update, &b_demux_polled, i_start_mdate );
 
                 i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
             }
@@ -788,7 +794,7 @@ static void MainLoop( input_thread_t *p_input )
         /* */
         do {
             i_deadline = i_wakeup;
-            if( b_paused )
+            if( b_paused || !b_demux_polled )
                 i_deadline = __MIN( i_intf_update, i_statistic_update );
 
             /* Handle control */
@@ -2452,6 +2458,8 @@ static int InputSourceInit( input_thread_t *p_input,
                             &in->b_can_pace_control ) )
             in->b_can_pace_control = false;
 
+        assert( in->p_demux->pf_demux != NULL || !in->b_can_pace_control );
+
         if( !in->b_can_pace_control )
         {
             if( demux_Control( in->p_demux, DEMUX_CAN_CONTROL_RATE,
@@ -2629,6 +2637,7 @@ static int InputSourceInit( input_thread_t *p_input,
             }
             goto error;
         }
+        assert( in->p_demux->pf_demux != NULL );
 
         /* Get title from demux */
         if( !p_input->b_preparsing && in->i_title <= 0 )
@@ -2779,11 +2788,12 @@ static void InputSourceMeta( input_thread_t *p_input,
 }
 
 
-static void SlaveDemux( input_thread_t *p_input )
+static void SlaveDemux( input_thread_t *p_input, bool *pb_demux_polled )
 {
     int64_t i_time;
     int i;
 
+    *pb_demux_polled = false;
     if( demux_Control( p_input->p->input.p_demux, DEMUX_GET_TIME, &i_time ) )
     {
         msg_Err( p_input, "demux doesn't like DEMUX_GET_TIME" );
@@ -2822,6 +2832,7 @@ static void SlaveDemux( input_thread_t *p_input )
         {
             i_ret = demux_Demux( in->p_demux );
         }
+        *pb_demux_polled |= in->p_demux->pf_demux != NULL;
 
         if( i_ret <= 0 )
         {

@@ -42,6 +42,9 @@ void demux_Delete( demux_t * );
 
 static inline int demux_Demux( demux_t *p_demux )
 {
+    if( !p_demux->pf_demux )
+        return 1;
+
     return p_demux->pf_demux( p_demux );
 }
 static inline int demux_vaControl( demux_t *p_demux, int i_query, va_list args )
