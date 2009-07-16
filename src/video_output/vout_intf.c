@@ -537,13 +537,7 @@ static char *VoutSnapshotGetDefaultDirectory( void )
 
     /* XXX: This saves in the data directory. Shouldn't we try saving
      *      to psz_homedir/Desktop or something nicer ? */
-    char *psz_datadir = config_GetUserDataDir();
-    if( psz_datadir )
-    {
-        if( asprintf( &psz_path, "%s", psz_datadir ) == -1 )
-            psz_path = NULL;
-        free( psz_datadir );
-    }
+    psz_path = config_GetUserDataDir();
 
 #endif
 
