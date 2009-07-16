@@ -99,4 +99,9 @@ void input_DecoderFrameNext( decoder_t *p_dec, mtime_t *pi_duration );
  */
 bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt, vlc_meta_t **pp_meta );
 
+/**
+ * This function returns the current size in bytes of the decoder fifo
+ */
+size_t input_DecoderGetFifoSize( decoder_t *p_dec );
+
 #endif
