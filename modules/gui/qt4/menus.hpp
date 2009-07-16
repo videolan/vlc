@@ -133,9 +133,9 @@ private:
     static QMenu * Populate( intf_thread_t *, QMenu *current,
                              vector<const char*>&, vector<vlc_object_t *>& );
 
-    static void CreateAndConnect( QMenu *, const char *, QString, QString,
-                                  int, vlc_object_t *, vlc_value_t, int,
-                                  bool c = false );
+    static void CreateAndConnect( QMenu *, const char *, const QString&,
+                                  const QString&, int, vlc_object_t *,
+                                  vlc_value_t, int, bool c = false );
     static void UpdateItem( intf_thread_t *, QMenu *, const char *,
                             vlc_object_t *, bool );
     static int CreateChoicesMenu( QMenu *,const char *, vlc_object_t *, bool );
