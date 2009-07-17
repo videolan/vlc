@@ -689,7 +689,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 #if defined(WIN32)
     dialog_progress_bar_t *p_dialog = dialog_ProgressCreate( p_dec,
         _("Building font cache"),
-        _( "Please wait while your font cache is rebuild.\n"
+        _( "Please wait while your font cache is rebuilt.\n"
         "This should take less than a minute." ), NULL );
     /* This makes Windows build of VLC hang */
     const UINT uPath = GetSystemWindowsDirectoryW( NULL, 0 );
