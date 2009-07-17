@@ -272,7 +272,7 @@ static int Demux( demux_t *p_demux )
         }
 
         /* Wait for data */
-        if( poll( &fd, 1, 500 ) ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
+        if( poll( &fd, 1, 10 ) ) /* Timeout after 0.01 seconds. Bigger delays are an issue when used with/as an input-slave since all the inputs run in the same thread. */
         {
             if( fd.revents & (POLLIN|POLLPRI) )
             {

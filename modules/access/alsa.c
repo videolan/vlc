@@ -312,7 +312,7 @@ static int Demux( demux_t *p_demux )
         }
 
         /* Wait for data */
-        int i_wait = snd_pcm_wait( p_sys->p_alsa_pcm, 500 );
+        int i_wait = snd_pcm_wait( p_sys->p_alsa_pcm, 10 ); /* See poll() comment in oss.c */
         switch( i_wait )
         {
             case 1:
