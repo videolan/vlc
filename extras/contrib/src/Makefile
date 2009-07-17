@@ -791,7 +791,11 @@ libtheora-$(THEORA_VERSION).tar.bz2:
 
 libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+ifndef HAVE_DARWIN_OS
 	patch -p0 < Patches/theora.patch
+else
+	patch -p0 < Patches/theora_mac.patch
+endif
 	patch -p0 < Patches/libtheora-includes.patch
 ifdef HAVE_WIN32
 	patch -p0 < Patches/theora-doc.patch
@@ -2515,8 +2519,8 @@ libass:
 	$(GIT) clone $(ASS_GIT)
 ifneq ($(HOST),$(BUILD))
 	patch -p0 < Patches/libass-cross.patch
-	(cd $@; autoreconf -ivf)
 endif
+	(cd $@; autoreconf -ivf)
 else
 # mplayer patches up to August 8, 2008 are included
 libass: libass-$(ASS_VERSION).tar.bz2
