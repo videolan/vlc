@@ -688,8 +688,8 @@ static int GAPILockSurface( vout_thread_t *p_vout, picture_t *p_pic )
             return VLC_EGENERIC;
         }
 
-#if 0
-        msg_Err( p_vout, "video (%d,%d,%d,%d) display (%d,%d,%d,%d) "
+#ifndef NDEBUG
+        msg_Dbg( p_vout, "video (%d,%d,%d,%d) display (%d,%d,%d,%d) "
                  "dest (%d,%d,%d,%d)",
                  video_rect.left, video_rect.right,
                  video_rect.top, video_rect.bottom,
@@ -701,7 +701,7 @@ static int GAPILockSurface( vout_thread_t *p_vout, picture_t *p_pic )
 
         if( !(p_dest = GXBeginDraw()) )
         {
-#if 0
+#ifndef NDEBUG
             msg_Err( p_vout, "GXBeginDraw error %d ", GetLastError() );
 #endif
             return VLC_EGENERIC;

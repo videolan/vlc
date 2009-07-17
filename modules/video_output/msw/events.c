@@ -691,7 +691,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
         return;
     }
 
-#if 0
+#ifndef NDEBUG
     msg_Dbg( p_vout, "DirectXUpdateRects image_dst_clipped coords:"
                      " %i,%i,%i,%i",
                      rect_dest_clipped.left, rect_dest_clipped.top,
@@ -752,7 +752,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
     }
 #endif
 
-#if 0
+#ifndef NDEBUG
     msg_Dbg( p_vout, "DirectXUpdateRects image_src_clipped"
                      " coords: %i,%i,%i,%i",
                      rect_src_clipped.left, rect_src_clipped.top,
