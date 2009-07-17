@@ -2808,6 +2808,13 @@ static void SlaveDemux( input_thread_t *p_input, bool *pb_demux_polled )
         if( in->b_eof )
             continue;
 
+        const bool b_demux_polled = in->p_demux->pf_demux != NULL;
+        if( !b_demux_polled )
+            continue;
+
+        *pb_demux_polled = true;
+
+        /* Call demux_Demux until we have read enough data */
         if( demux_Control( in->p_demux, DEMUX_SET_NEXT_DEMUX_TIME, i_time ) )
         {
             for( ;; )
@@ -2835,7 +2842,6 @@ static void SlaveDemux( input_thread_t *p_input, bool *pb_demux_polled )
         {
             i_ret = demux_Demux( in->p_demux );
         }
-        *pb_demux_polled |= in->p_demux->pf_demux != NULL;
 
         if( i_ret <= 0 )
         {
