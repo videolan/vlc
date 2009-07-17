@@ -501,10 +501,20 @@ void input_clock_SetJitter( input_clock_t *cl,
 
     /* Update late observations */
     const mtime_t i_delay_delta = i_pts_delay - cl->i_pts_delay;
+    mtime_t pi_late[INPUT_CLOCK_LATE_COUNT];
+    for( int i = 0; i < INPUT_CLOCK_LATE_COUNT; i++ )
+        pi_late[i] = __MAX( cl->late.pi_value[(cl->late.i_index + 1 + i)%INPUT_CLOCK_LATE_COUNT] - i_delay_delta, 0 );
+
+    for( int i = 0; i < INPUT_CLOCK_LATE_COUNT; i++ )
+        cl->late.pi_value[i] = 0;
+    cl->late.i_index = 0;
+
     for( int i = 0; i < INPUT_CLOCK_LATE_COUNT; i++ )
     {
-        if( cl->late.pi_value[i] > 0 )
-            cl->late.pi_value[i] = __MAX( cl->late.pi_value[i] - i_delay_delta, 0 );
+        if( pi_late[i] <= 0 )
+            continue;
+        cl->late.pi_value[cl->late.i_index] = pi_late[i];
+        cl->late.i_index = ( cl->late.i_index + 1 ) % INPUT_CLOCK_LATE_COUNT;
     }
 
     /* TODO always save the value, and when rebuffering use the new one if smaller
