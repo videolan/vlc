@@ -986,7 +986,6 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     p_dec->fmt_out.i_codec = p_dec->fmt_out.video.i_chroma;
 
     /* Get a new picture */
-    //p_sys->p_vout->render.b_allow_modify_pics = 0;
     p_pic = ffmpeg_NewPictBuf( p_dec, p_sys->p_context );
     if( !p_pic )
         return avcodec_default_get_buffer( p_context, p_ff_pic );
