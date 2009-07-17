@@ -552,7 +552,7 @@ void DialogsProvider::saveAPlaylist()
             msg_Warn( p_intf, "Impossible to recognise the file type. "
                     "Defaulting to XSPF" );
             psz_module = psz_xspf;
-            file.append( ".xpsf" );
+            file.append( ".xspf" );
         }
 
         playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
