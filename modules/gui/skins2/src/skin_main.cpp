@@ -65,7 +65,7 @@ extern "C" __declspec( dllexport )
 //---------------------------------------------------------------------------
 static int  Open  ( vlc_object_t * );
 static void Close ( vlc_object_t * );
-static void Run   ( intf_thread_t * );
+static void *Run  ( void * );
 
 static int DemuxOpen( vlc_object_t * );
 static int Demux( demux_t * );
@@ -99,8 +99,6 @@ static int Open( vlc_object_t *p_this )
     if( p_intf->p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_intf->pf_run = Run;
-
     // Suscribe to messages bank
 #if 0
     p_intf->p_sys->p_sub = msg_Subscribe( p_intf );
@@ -127,6 +125,27 @@ static int Open( vlc_object_t *p_this )
     // Create a variable to be notified of skins to be loaded
     var_Create( p_intf, "skin-to-load", VLC_VAR_STRING );
 
+    vlc_mutex_init( &p_intf->p_sys->init_lock );
+    vlc_cond_init( &p_intf->p_sys->init_wait );
+
+    vlc_mutex_lock( &p_intf->p_sys->init_lock );
+    p_intf->p_sys->b_ready = false;
+
+    if( vlc_clone( &p_intf->p_sys->thread, Run, p_intf,
+                               VLC_THREAD_PRIORITY_LOW ) )
+    {
+        vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+        vlc_cond_destroy( &p_intf->p_sys->init_wait );
+        vlc_mutex_destroy( &p_intf->p_sys->init_lock );
+        pl_Release( p_intf->p_sys->p_playlist );
+        free( p_intf->p_sys );
+        return VLC_EGENERIC;
+    }
+
+    while( !p_intf->p_sys->b_ready )
+        vlc_cond_wait( &p_intf->p_sys->init_wait, &p_intf->p_sys->init_lock );
+    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+
     vlc_mutex_lock( &skin_load.mutex );
     skin_load.intf = p_intf;
     vlc_mutex_unlock( &skin_load.mutex );
@@ -147,6 +166,11 @@ static void Close( vlc_object_t *p_this )
     skin_load.intf = NULL;
     vlc_mutex_unlock( &skin_load.mutex);
 
+    vlc_mutex_destroy( &p_intf->p_sys->init_lock );
+    vlc_cond_destroy( &p_intf->p_sys->init_wait );
+
+    vlc_join( p_intf->p_sys->thread, NULL );
+
     if( p_intf->p_sys->p_playlist )
         pl_Release( p_this );
 
@@ -163,14 +187,18 @@ static void Close( vlc_object_t *p_this )
 //---------------------------------------------------------------------------
 // Run: main loop
 //---------------------------------------------------------------------------
-static void Run( intf_thread_t *p_intf )
+static void *Run( void * p_obj )
 {
     int canc = vlc_savecancel();
+
+    intf_thread_t *p_intf = (intf_thread_t *)p_obj;
 
     bool b_error = false;
     char *skin_last = NULL;
     ThemeLoader *pLoader = NULL;
     OSLoop *loop = NULL;
+
+    vlc_mutex_lock( &p_intf->p_sys->init_lock );
 
     // Initialize singletons
     if( OSFactory::instance( p_intf ) == NULL )
@@ -270,6 +298,11 @@ static void Run( intf_thread_t *p_intf )
     // Get the instance of OSLoop
     loop = OSFactory::instance( p_intf )->getOSLoop();
 
+    // Signal the main thread this thread is now ready
+    p_intf->p_sys->b_ready = true;
+    vlc_cond_signal( &p_intf->p_sys->init_wait );
+    vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+
     // Enter the main event loop
     loop->run();
 
@@ -302,7 +335,13 @@ end:
     OSFactory::destroy( p_intf );
 
     if( b_error )
+    {
+        p_intf->p_sys->b_ready = true;
+        vlc_cond_signal( &p_intf->p_sys->init_wait );
+        vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+
         libvlc_Quit( p_intf->p_libvlc );
+    }
 
     vlc_restorecancel(canc);
 }
