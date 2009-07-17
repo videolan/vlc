@@ -2803,7 +2803,7 @@ static void SlaveDemux( input_thread_t *p_input, bool *pb_demux_polled )
     for( i = 0; i < p_input->p->i_slave; i++ )
     {
         input_source_t *in = p_input->p->slave[i];
-        int i_ret = 1;
+        int i_ret;
 
         if( in->b_eof )
             continue;
@@ -2822,7 +2822,10 @@ static void SlaveDemux( input_thread_t *p_input, bool *pb_demux_polled )
                 }
 
                 if( i_stime >= i_time )
+                {
+                    i_ret = 1;
                     break;
+                }
 
                 if( ( i_ret = demux_Demux( in->p_demux ) ) <= 0 )
                     break;
