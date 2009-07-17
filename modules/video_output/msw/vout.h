@@ -133,7 +133,7 @@ struct vout_sys_t
     bool   b_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
 
 
-#ifdef MODULE_NAME_IS_vout_directx
+#ifdef MODULE_NAME_IS_directx
     /* Overlay alignment restrictions */
     int          i_align_src_boundary;
     int          i_align_src_size;

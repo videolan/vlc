@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vout.c: Windows DirectX video output display method
+ * directx.c: Windows DirectDraw video output
  *****************************************************************************
  * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
@@ -34,6 +34,7 @@
  * display video in window mode.
  *
  *****************************************************************************/
+
 #include <errno.h>                                                 /* ENOMEM */
 
 #ifdef HAVE_CONFIG_H
@@ -42,12 +43,10 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_interface.h>
-#include <vlc_playlist.h>
 #include <vlc_vout.h>
+#include <vlc_playlist.h>   /* needed for wallpaper */
 
 #include <windows.h>
-#include <tchar.h>
 #include <ddraw.h>
 #include <commctrl.h>
 
