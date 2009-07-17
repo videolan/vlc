@@ -48,7 +48,7 @@
 #include <windowsx.h>
 #include <shellapi.h>
 
-#ifdef MODULE_NAME_IS_vout_directx
+#ifdef MODULE_NAME_IS_directx
 #include <ddraw.h>
 #endif
 #ifdef MODULE_NAME_IS_direct3d
@@ -333,7 +333,7 @@ void* EventThread( vlc_object_t *p_this )
 #ifdef MODULE_NAME_IS_direct3d
                 val.psz_string = strdup( VOUT_TITLE " (Direct3D output)" );
 #endif
-#ifdef MODULE_NAME_IS_vout_directx
+#ifdef MODULE_NAME_IS_directx
                 if( p_event->p_vout->p_sys->b_using_overlay ) val.psz_string =
                     strdup( VOUT_TITLE " (hardware YUV overlay DirectX output)" );
                 else if( p_event->p_vout->p_sys->b_hw_yuv ) val.psz_string =
@@ -665,7 +665,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
     rect_dest.top = point.y + i_y;
     rect_dest.bottom = rect_dest.top + i_height;
 
-#ifdef MODULE_NAME_IS_vout_directx
+#ifdef MODULE_NAME_IS_directx
     /* Apply overlay hardware constraints */
     if( p_vout->p_sys->b_using_overlay )
     {
@@ -698,7 +698,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
                      rect_dest_clipped.right, rect_dest_clipped.bottom );
 #endif
 
-#else /* MODULE_NAME_IS_vout_directx */
+#else /* MODULE_NAME_IS_directx */
 
     /* AFAIK, there are no clipping constraints in Direct3D, OpenGL and GDI */
     rect_dest_clipped = rect_dest;
@@ -735,7 +735,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
       (rect_dest.bottom - rect_dest_clipped.bottom) *
       p_vout->fmt_out.i_visible_height / (rect_dest.bottom - rect_dest.top);
 
-#ifdef MODULE_NAME_IS_vout_directx
+#ifdef MODULE_NAME_IS_directx
     /* Apply overlay hardware constraints */
     if( p_vout->p_sys->b_using_overlay )
     {
@@ -759,7 +759,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
                      rect_src_clipped.right, rect_src_clipped.bottom );
 #endif
 
-#ifdef MODULE_NAME_IS_vout_directx
+#ifdef MODULE_NAME_IS_directx
     /* The destination coordinates need to be relative to the current
      * directdraw primary surface (display) */
     rect_dest_clipped.left -= p_vout->p_sys->rect_display.left;
@@ -828,7 +828,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     {
         switch( message )
         {
-#ifdef MODULE_NAME_IS_vout_directx
+#ifdef MODULE_NAME_IS_directx
         case WM_ERASEBKGND:
         /* For overlay, we need to erase background */
             return !p_vout->p_sys->b_using_overlay ?

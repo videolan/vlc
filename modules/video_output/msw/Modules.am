@@ -1,4 +1,4 @@
-SOURCES_vout_directx = \
+SOURCES_directx = \
 	directx.c \
 	vout.h \
 	events.c \
