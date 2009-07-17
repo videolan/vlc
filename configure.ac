@@ -4380,9 +4380,9 @@ then
     if test -z "${with_directx}"
     then
       AC_CHECK_HEADERS(ddraw.h,
-      [ VLC_ADD_PLUGIN([vout_directx])
+      [ VLC_ADD_PLUGIN([directx])
         VLC_ADD_PLUGIN([aout_directx])
-        VLC_ADD_LIBS([vout_directx],[-lgdi32])
+        VLC_ADD_LIBS([directx],[-lgdi32])
       ])
       AC_CHECK_HEADERS(GL/gl.h,
       [ VLC_ADD_PLUGIN([glwin32])
@@ -4396,10 +4396,10 @@ then
       AC_MSG_CHECKING(for directX headers in ${with_directx})
       if test -f ${with_directx}/ddraw.h
       then
-        VLC_ADD_PLUGIN([vout_directx])
+        VLC_ADD_PLUGIN([directx])
 	VLC_ADD_PLUGIN([aout_directx])
-        VLC_ADD_CPPFLAGS([vout_directx aout_directx],[-I${with_directx}])
-        VLC_ADD_LIBS([vout_directx],[-lgdi32])
+        VLC_ADD_CPPFLAGS([directx aout_directx],[-I${with_directx}])
+        VLC_ADD_LIBS([directx],[-lgdi32])
         AC_MSG_RESULT(yes)
       else
         AC_MSG_RESULT(no)
