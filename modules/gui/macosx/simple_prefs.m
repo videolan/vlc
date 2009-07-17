@@ -264,8 +264,8 @@ create_toolbar_item( NSString * o_itemIdent, NSString * o_name, NSString * o_des
     [o_intf_fspanel_ckb setTitle: _NS("Show Fullscreen Controller")];
     [o_intf_lang_txt setStringValue: _NS("Language")];
     [o_intf_network_box setTitle: _NS("Privacy / Network Interaction")];
-	[o_intf_appleremote_ckb setTitle: _NS("Allow playback control with the Apple Remote")];
-	[o_intf_mediakeys_ckb setTitle: _NS("Allow playback control with the media keys")];
+	[o_intf_appleremote_ckb setTitle: _NS("Control playback with the Apple Remote")];
+	[o_intf_mediakeys_ckb setTitle: _NS("Control playback with media keys")];
     
     /* Subtitles and OSD */
     [o_osd_encoding_txt setStringValue: _NS("Default Encoding")];
