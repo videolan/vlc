@@ -68,7 +68,7 @@ vlc_module_begin ()
     set_callbacks( Activate, Destroy )
 
     set_category( CAT_VIDEO )
-    set_subcategory( SUBCAT_VIDEO_VFILTER2 )
+    set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_integer_with_range( CFG_PREFIX "width", 0, 0, INT_MAX, NULL,
                             WIDTH_TEXT, WIDTH_LONGTEXT, false )
