@@ -314,7 +314,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     p_intf = NULL;
 
     o_msg_lock = [[NSLock alloc] init];
-    o_msg_arr = [[NSMutableArray arrayWithCapacity: 200] retain];
+    o_msg_arr = [[NSMutableArray arrayWithCapacity: 600] retain];
     /* subscribe to LibVLC's debug messages as early as possible (for us) */
     [[NSNotificationCenter defaultCenter] addObserver: self selector: @selector(libvlcMessageReceived:) name: @"VLCCoreMessageReceived" object: nil];
     
