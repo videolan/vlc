@@ -2362,7 +2362,7 @@ static int InputSourceInit( input_thread_t *p_input,
           )
         {   /* host specified -> only localhost is supported */
             static const size_t i_localhost = sizeof("localhost")-1;
-            if( strncmp( psz_path, "localhost" DIR_SEP, i_localhost + 1) != 0 )
+            if( strncmp( psz_path, "localhost/", i_localhost + 1) != 0 )
             {
                 msg_Err( p_input, "cannot open remote file `%s://%s'",
                          psz_access, psz_path );
