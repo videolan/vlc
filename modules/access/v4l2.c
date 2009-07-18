@@ -428,8 +428,8 @@ static const struct
 
     /* Compressed data types */
     { V4L2_PIX_FMT_MJPEG,   VLC_CODEC_MJPG, 0, 0, 0 },
+    { V4L2_PIX_FMT_JPEG,    VLC_CODEC_JPEG, 0, 0, 0 },
 #if 0
-    { V4L2_PIX_FMT_JPEG,    VLC_FOURCC('J','P','E','G') },
     { V4L2_PIX_FMT_DV,      VLC_FOURCC('?','?','?','?') },
     { V4L2_PIX_FMT_MPEG,    VLC_FOURCC('?','?','?','?') },
 #endif
@@ -445,7 +445,7 @@ static const struct
 static const __u32 p_chroma_fallbacks[] =
 { V4L2_PIX_FMT_YUV420, V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV422P,
   V4L2_PIX_FMT_YUYV, V4L2_PIX_FMT_UYVY, V4L2_PIX_FMT_BGR24,
-  V4L2_PIX_FMT_BGR32, V4L2_PIX_FMT_MJPEG };
+  V4L2_PIX_FMT_BGR32, V4L2_PIX_FMT_MJPEG, V4L2_PIX_FMT_JPEG };
 
 static const struct
 {
@@ -1989,8 +1989,10 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     p_sys->i_width = fmt.fmt.pix.width;
     p_sys->i_height = fmt.fmt.pix.height;
 
-    /* Check interlacing */
     if( v4l2_ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 ) {;}
+    /* Print extra info */
+    msg_Dbg( p_demux, "Driver requires at most %d bytes to store a complete image", fmt.fmt.pix.sizeimage );
+    /* Check interlacing */
     switch( fmt.fmt.pix.field )
     {
         case V4L2_FIELD_NONE:
