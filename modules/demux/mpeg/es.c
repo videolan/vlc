@@ -368,6 +368,144 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 }
 
 /*****************************************************************************
+ * Wav header skipper
+ *****************************************************************************/
+#define WAV_PROBE_SIZE (512*1024)
+static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[] )
+{
+    const uint8_t *p_peek;
+    int         i_peek = 0;
+
+    /* */
+    *pi_skip = 0;
+
+    /* Check if we are dealing with a WAV file */
+    if( stream_Peek( p_demux->s, &p_peek, 12+8 ) != 12 + 8 )
+        return VLC_SUCCESS;
+
+    if( memcmp( p_peek, "RIFF", 4 ) || memcmp( &p_peek[8], "WAVE", 4 ) )
+        return VLC_SUCCESS;
+
+    /* Find the wave format header */
+    i_peek = 12 + 8;
+    while( memcmp( p_peek + i_peek - 8, "fmt ", 4 ) )
+    {
+        uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
+        if( i_len > WAV_PROBE_SIZE || i_peek + i_len > WAV_PROBE_SIZE )
+            return VLC_EGENERIC;
+
+        i_peek += i_len + 8;
+        if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
+            return VLC_EGENERIC;
+    }
+
+    /* Sanity check the wave format header */
+    uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
+    if( i_len > WAV_PROBE_SIZE )
+        return VLC_EGENERIC;
+
+    i_peek += i_len + 8;
+    if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
+        return VLC_EGENERIC;
+    const int i_format = GetWLE( p_peek + i_peek - i_len - 8 /* wFormatTag */ );
+    int i_format_idx;
+    for( i_format_idx = 0; pi_format[i_format_idx] != WAVE_FORMAT_UNKNOWN; i_format_idx++ )
+    {
+        if( i_format == pi_format[i_format_idx] )
+            break;
+    }
+    if( pi_format[i_format_idx] == WAVE_FORMAT_UNKNOWN )
+        return VLC_EGENERIC;
+
+    if( i_format == WAVE_FORMAT_PCM )
+    {
+        if( GetWLE( p_peek + i_peek - i_len - 6 /* nChannels */ ) != 2 )
+            return VLC_EGENERIC;
+        if( GetDWLE( p_peek + i_peek - i_len - 4 /* nSamplesPerSec */ ) !=
+            44100 )
+            return VLC_EGENERIC;
+    }
+
+    /* Skip the wave header */
+    while( memcmp( p_peek + i_peek - 8, "data", 4 ) )
+    {
+        uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
+        if( i_len > WAV_PROBE_SIZE || i_peek + i_len > WAV_PROBE_SIZE )
+            return VLC_EGENERIC;
+
+        i_peek += i_len + 8;
+        if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
+            return VLC_EGENERIC;
+    }
+    *pi_skip = i_peek;
+    return VLC_SUCCESS;
+}
+
+static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
+                         const char * ppsz_name[],
+                         int (*pf_check)( const uint8_t * ), int i_check_size,
+                         const int pi_wav_format[] )
+{
+    bool   b_forced_demux;
+
+    int64_t i_offset;
+    const uint8_t *p_peek;
+    int i_skip;
+
+    b_forced_demux = false;
+    for( int i = 0; ppsz_name[i] != NULL; i++ )
+    {
+        b_forced_demux |= demux_IsForced( p_demux, ppsz_name[i] );
+    }
+
+    i_offset = stream_Tell( p_demux->s );
+
+    if( WavSkipHeader( p_demux, &i_skip, pi_wav_format ) )
+    {
+        if( !b_forced_demux )
+            return VLC_EGENERIC;
+    }
+    const bool b_wav = i_skip > 0;
+
+    /* peek the begining
+     * It is common that wav files have some sort of garbage at the begining */
+    const int i_probe = i_skip + i_check_size + ( b_wav ? 16000 : 0);
+    const int i_peek = stream_Peek( p_demux->s, &p_peek, i_probe );
+    if( i_peek < i_skip + i_check_size )
+    {
+        msg_Err( p_demux, "cannot peek" );
+        return VLC_EGENERIC;
+    }
+    for( ;; )
+    {
+        if( i_skip + i_check_size > i_peek )
+        {
+            if( !b_forced_demux )
+                return VLC_EGENERIC;
+            break;
+        }
+        const int i_size = pf_check( &p_peek[i_skip] );
+        if( i_size >= 0 )
+        {
+            if( i_size == 0 || 1)
+                break;
+
+            /* If we have the frame size, check the next frame for
+             * extra robustness */
+            if( i_skip + i_check_size + i_size <= i_peek )
+            {
+                if( pf_check( &p_peek[i_skip+i_size] ) >= 0 )
+                    break;
+            }
+        }
+        i_skip++;
+    }
+
+    *pi_offset = i_offset + i_skip;
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
  * Mpeg I/II Audio
  *****************************************************************************/
 static int MpgaCheckSync( const uint8_t *p_peek )
@@ -577,143 +715,6 @@ static int AacInit( demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Wav header skipper
- *****************************************************************************/
-#define WAV_PROBE_SIZE (512*1024)
-static int WavSkipHeader( demux_t *p_demux, int *pi_skip, const int pi_format[] )
-{
-    const uint8_t *p_peek;
-    int         i_peek = 0;
-
-    /* */
-    *pi_skip = 0;
-
-    /* Check if we are dealing with a WAV file */
-    if( stream_Peek( p_demux->s, &p_peek, 12+8 ) != 12 + 8 )
-        return VLC_SUCCESS;
-
-    if( memcmp( p_peek, "RIFF", 4 ) || memcmp( &p_peek[8], "WAVE", 4 ) )
-        return VLC_SUCCESS;
-
-    /* Find the wave format header */
-    i_peek = 12 + 8;
-    while( memcmp( p_peek + i_peek - 8, "fmt ", 4 ) )
-    {
-        uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
-        if( i_len > WAV_PROBE_SIZE || i_peek + i_len > WAV_PROBE_SIZE )
-            return VLC_EGENERIC;
-
-        i_peek += i_len + 8;
-        if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
-            return VLC_EGENERIC;
-    }
-
-    /* Sanity check the wave format header */
-    uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
-    if( i_len > WAV_PROBE_SIZE )
-        return VLC_EGENERIC;
-
-    i_peek += i_len + 8;
-    if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
-        return VLC_EGENERIC;
-    const int i_format = GetWLE( p_peek + i_peek - i_len - 8 /* wFormatTag */ );
-    int i_format_idx;
-    for( i_format_idx = 0; pi_format[i_format_idx] != WAVE_FORMAT_UNKNOWN; i_format_idx++ )
-    {
-        if( i_format == pi_format[i_format_idx] )
-            break;
-    }
-    if( pi_format[i_format_idx] == WAVE_FORMAT_UNKNOWN )
-        return VLC_EGENERIC;
-
-    if( i_format == WAVE_FORMAT_PCM )
-    {
-        if( GetWLE( p_peek + i_peek - i_len - 6 /* nChannels */ ) != 2 )
-            return VLC_EGENERIC;
-        if( GetDWLE( p_peek + i_peek - i_len - 4 /* nSamplesPerSec */ ) !=
-            44100 )
-            return VLC_EGENERIC;
-    }
-
-    /* Skip the wave header */
-    while( memcmp( p_peek + i_peek - 8, "data", 4 ) )
-    {
-        uint32_t i_len = GetDWLE( p_peek + i_peek - 4 );
-        if( i_len > WAV_PROBE_SIZE || i_peek + i_len > WAV_PROBE_SIZE )
-            return VLC_EGENERIC;
-
-        i_peek += i_len + 8;
-        if( stream_Peek( p_demux->s, &p_peek, i_peek ) != i_peek )
-            return VLC_EGENERIC;
-    }
-    *pi_skip = i_peek;
-    return VLC_SUCCESS;
-}
-
-static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
-                         const char * ppsz_name[],
-                         int (*pf_check)( const uint8_t * ), int i_check_size,
-                         const int pi_wav_format[] )
-{
-    bool   b_forced_demux;
-
-    int64_t i_offset;
-    const uint8_t *p_peek;
-    int i_skip;
-
-    b_forced_demux = false;
-    for( int i = 0; ppsz_name[i] != NULL; i++ )
-    {
-        b_forced_demux |= demux_IsForced( p_demux, ppsz_name[i] );
-    }
-
-    i_offset = stream_Tell( p_demux->s );
-
-    if( WavSkipHeader( p_demux, &i_skip, pi_wav_format ) )
-    {
-        if( !b_forced_demux )
-            return VLC_EGENERIC;
-    }
-    const bool b_wav = i_skip > 0;
-
-    /* peek the begining
-     * It is common that wav files have some sort of garbage at the begining */
-    const int i_probe = i_skip + i_check_size + ( b_wav ? 16000 : 0);
-    const int i_peek = stream_Peek( p_demux->s, &p_peek, i_probe );
-    if( i_peek < i_skip + i_check_size )
-    {
-        msg_Err( p_demux, "cannot peek" );
-        return VLC_EGENERIC;
-    }
-    for( ;; )
-    {
-        if( i_skip + i_check_size > i_peek )
-        {
-            if( !b_forced_demux )
-                return VLC_EGENERIC;
-            break;
-        }
-        const int i_size = pf_check( &p_peek[i_skip] );
-        if( i_size >= 0 )
-        {
-            if( i_size == 0 || 1)
-                break;
-
-            /* If we have the frame size, check the next frame for
-             * extra robustness */
-            if( i_skip + i_check_size + i_size <= i_peek )
-            {
-                if( pf_check( &p_peek[i_skip+i_size] ) >= 0 )
-                    break;
-            }
-        }
-        i_skip++;
-    }
-
-    *pi_offset = i_offset + i_skip;
-    return VLC_SUCCESS;
-}
 
 /*****************************************************************************
  * A52
