@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>622</width>
-    <height>514</height>
+    <width>687</width>
+    <height>507</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -66,11 +66,14 @@
      <property name="title">
       <string>Network</string>
      </property>
-     <layout class="QGridLayout">
+     <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
        <widget class="QLabel" name="portLabel">
         <property name="text">
          <string>Server default port</string>
+        </property>
+        <property name="margin">
+         <number>0</number>
         </property>
         <property name="buddy">
          <cstring>UDPPort</cstring>
@@ -114,8 +117,8 @@
      <property name="title">
       <string>Caching</string>
      </property>
-     <layout class="QHBoxLayout">
-      <item>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
          <string>Default caching level</string>
@@ -125,7 +128,7 @@
         </property>
        </widget>
       </item>
-      <item>
+      <item row="0" column="1">
        <widget class="QComboBox" name="cachingCombo"/>
       </item>
      </layout>
