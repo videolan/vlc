@@ -361,10 +361,10 @@ static int DemuxControl( demux_t *, int, va_list );
 static int AccessControl( access_t *, int, va_list );
 
 static int Demux( demux_t * );
-static ssize_t AccessRead( access_t *, uint8_t *, size_t );
+static block_t *AccessRead( access_t * );
 
-static block_t* GrabVideo( demux_t *p_demux );
-static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame, size_t );
+static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys );
+static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size_t );
 
 static bool IsPixelFormatSupported( demux_t *p_demux,
                                           unsigned int i_pixelformat );
@@ -1054,7 +1054,7 @@ static int AccessOpen( vlc_object_t * p_this )
     if( *p_access->psz_access == '\0' ) return VLC_EGENERIC;
 
     access_InitFields( p_access );
-    ACCESS_SET_CALLBACKS( AccessRead, NULL, AccessControl, NULL );
+    ACCESS_SET_CALLBACKS( NULL, AccessRead, AccessControl, NULL );
     p_sys = calloc( 1, sizeof( demux_sys_t ));
     if( !p_sys ) return VLC_ENOMEM;
     p_access->p_sys = (access_sys_t*)p_sys;
@@ -1159,44 +1159,25 @@ static int AccessControl( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * AccessRead: access callback
  ******************************************************************************/
-static ssize_t AccessRead( access_t * p_access, uint8_t * p_buffer, size_t i_len )
+static block_t *AccessRead( access_t * p_access )
 {
-    demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
-    struct pollfd ufd;
-    int i_ret;
+    demux_sys_t *p_sys = (demux_sys_t *)p_access->p_sys;
 
-    ufd.fd = p_sys->i_fd;
-    ufd.events = POLLIN;
+    struct pollfd fd;
+    fd.fd = p_sys->i_fd;
+    fd.events = POLLIN|POLLPRI;
+    fd.revents = 0;
 
-    if( p_access->info.b_eof )
-        return 0;
-
-    do
+    /* Wait for data */
+    if( poll( &fd, 1, 500 ) ) /* Timeout after 0.5 seconds since I don't know if pf_demux can be blocking. */
     {
-        if( !vlc_object_alive (p_access) )
-            return 0;
-
-        ufd.revents = 0;
-    }
-    while( ( i_ret = poll( &ufd, 1, 500 ) ) == 0 );
-
-    if( i_ret < 0 )
-    {
-        msg_Err( p_access, "Polling error (%m)." );
-        return -1;
+        if( fd.revents & (POLLIN|POLLPRI) )
+        {
+            return GrabVideo( VLC_OBJECT(p_access), p_sys );
+        }
     }
 
-    i_ret = v4l2_read( p_sys->i_fd, p_buffer, i_len );
-    if( i_ret == 0 )
-    {
-        p_access->info.b_eof = true;
-    }
-    else if( i_ret > 0 )
-    {
-        p_access->info.i_pos += i_ret;
-    }
-
-    return i_ret;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -1216,7 +1197,7 @@ static int Demux( demux_t *p_demux )
     {
         if( fd.revents & (POLLIN|POLLPRI) )
         {
-            block_t *p_block = GrabVideo( p_demux );
+            block_t *p_block = GrabVideo( VLC_OBJECT(p_demux), p_sys );
             if( p_block )
             {
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
@@ -1231,10 +1212,8 @@ static int Demux( demux_t *p_demux )
 /*****************************************************************************
  * GrabVideo: Grab a video frame
  *****************************************************************************/
-static block_t* GrabVideo( demux_t *p_demux )
+static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-
     block_t *p_block = NULL;
     struct v4l2_buffer buf;
     ssize_t i_ret;
@@ -1371,7 +1350,7 @@ static block_t* GrabVideo( demux_t *p_demux )
  * ProcessVideoFrame: Helper function to take a buffer and copy it into
  * a new block
  *****************************************************************************/
-static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame, size_t i_size )
+static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size_t i_size )
 {
     block_t *p_block;
 
@@ -1393,9 +1372,9 @@ static block_t* ProcessVideoFrame( demux_t *p_demux, uint8_t *p_frame, size_t i_
 /*****************************************************************************
  * Helper function to initalise video IO using the Read method
  *****************************************************************************/
-static int InitRead( demux_t *p_demux, unsigned int i_buffer_size )
+static int InitRead( vlc_object_t *p_demux, demux_sys_t *p_sys, unsigned int i_buffer_size )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
+    (void)p_demux;
 
     p_sys->p_buffers = calloc( 1, sizeof( *p_sys->p_buffers ) );
     if( !p_sys->p_buffers )
@@ -1412,9 +1391,8 @@ static int InitRead( demux_t *p_demux, unsigned int i_buffer_size )
 /*****************************************************************************
  * Helper function to initalise video IO using the mmap method
  *****************************************************************************/
-static int InitMmap( demux_t *p_demux, int i_fd )
+static int InitMmap( vlc_object_t *p_demux, demux_sys_t *p_sys, int i_fd )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
     struct v4l2_requestbuffers req;
 
     memset( &req, 0, sizeof(req) );
@@ -1474,9 +1452,8 @@ open_failed:
 /*****************************************************************************
  * Helper function to initalise video IO using the userbuf method
  *****************************************************************************/
-static int InitUserP( demux_t *p_demux, int i_fd, unsigned int i_buffer_size )
+static int InitUserP( vlc_object_t *p_demux, demux_sys_t *p_sys, int i_fd, unsigned int i_buffer_size )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
     struct v4l2_requestbuffers req;
     unsigned int i_page_size;
 
@@ -1838,13 +1815,6 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
                   var_GetBool( p_obj, "v4l2-controls-reset" ), b_demux );
     SetAvailControlsByString( p_obj, p_sys, i_fd );
 
-    if( false == b_demux)
-    {
-        return i_fd;
-    }
-
-    demux_t *p_demux = (demux_t *) p_obj;
-
     /* Verify device support for the various IO methods */
     switch( p_sys->io )
     {
@@ -1900,7 +1870,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         /* Use current width and height settings */
         if( v4l2_ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
         {
-            msg_Err( p_demux, "Cannot get default width and height." );
+            msg_Err( p_obj, "Cannot get default width and height." );
             goto open_failed;
         }
 
@@ -1914,121 +1884,126 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     }
     else if( p_sys->i_width < 0 || p_sys->i_height < 0 )
     {
-        msg_Dbg( p_demux, "will try to find optimal width and height." );
+        msg_Dbg( p_obj, "will try to find optimal width and height." );
     }
     else
     {
         /* Use user specified width and height */
-        msg_Dbg( p_demux, "trying specified size %dx%d", p_sys->i_width, p_sys->i_height );
+        msg_Dbg( p_obj, "trying specified size %dx%d", p_sys->i_width, p_sys->i_height );
     }
 
     fmt.fmt.pix.width = p_sys->i_width;
     fmt.fmt.pix.height = p_sys->i_height;
     fmt.fmt.pix.field = V4L2_FIELD_NONE;
 
-    /* Test and set Chroma */
-    fmt.fmt.pix.pixelformat = 0;
-    if( p_sys->psz_requested_chroma && *p_sys->psz_requested_chroma )
+    if (b_demux)
     {
-        /* User specified chroma */
-        const vlc_fourcc_t i_requested_fourcc =
-            vlc_fourcc_GetCodecFromString( VIDEO_ES, p_sys->psz_requested_chroma );
+        demux_t *p_demux = (demux_t *) p_obj;
 
-        for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
+        /* Test and set Chroma */
+        fmt.fmt.pix.pixelformat = 0;
+        if( p_sys->psz_requested_chroma && *p_sys->psz_requested_chroma )
         {
-            if( v4l2chroma_to_fourcc[i].i_fourcc == i_requested_fourcc )
+            /* User specified chroma */
+            const vlc_fourcc_t i_requested_fourcc =
+                vlc_fourcc_GetCodecFromString( VIDEO_ES, p_sys->psz_requested_chroma );
+
+            for( int i = 0; v4l2chroma_to_fourcc[i].i_v4l2 != 0; i++ )
             {
-                fmt.fmt.pix.pixelformat = v4l2chroma_to_fourcc[i].i_v4l2;
-                break;
+                if( v4l2chroma_to_fourcc[i].i_fourcc == i_requested_fourcc )
+                {
+                    fmt.fmt.pix.pixelformat = v4l2chroma_to_fourcc[i].i_v4l2;
+                    break;
+                }
+            }
+            /* Try and set user chroma */
+            if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ( fmt.fmt.pix.pixelformat && v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) )
+            {
+                msg_Warn( p_demux, "Driver is unable to use specified chroma %s. Trying defaults.", p_sys->psz_requested_chroma );
+                fmt.fmt.pix.pixelformat = 0;
             }
         }
-        /* Try and set user chroma */
-        if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ( fmt.fmt.pix.pixelformat && v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) )
-        {
-            msg_Warn( p_demux, "Driver is unable to use specified chroma %s. Trying defaults.", p_sys->psz_requested_chroma );
-            fmt.fmt.pix.pixelformat = 0;
-        }
-    }
 
-    /* If no user specified chroma, find best */
-    /* This also decides if MPEG encoder card or not */
-    if( !fmt.fmt.pix.pixelformat )
-    {
-        unsigned int i;
-        for( i = 0; i < ARRAY_SIZE( p_chroma_fallbacks ); i++ )
+        /* If no user specified chroma, find best */
+        /* This also decides if MPEG encoder card or not */
+        if( !fmt.fmt.pix.pixelformat )
         {
-            fmt.fmt.pix.pixelformat = p_chroma_fallbacks[i];
-            if( IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat )
-             && v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) >= 0 )
-                break;
+            unsigned int i;
+            for( i = 0; i < ARRAY_SIZE( p_chroma_fallbacks ); i++ )
+            {
+                fmt.fmt.pix.pixelformat = p_chroma_fallbacks[i];
+                if( IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat )
+                 && v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) >= 0 )
+                    break;
+            }
+            if( i == ARRAY_SIZE( p_chroma_fallbacks ) )
+            {
+                msg_Warn( p_demux, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access)" );
+                goto open_failed;
+            }
         }
-        if( i == ARRAY_SIZE( p_chroma_fallbacks ) )
-        {
-            msg_Warn( p_demux, "Could not select any of the default chromas; attempting to open as MPEG encoder card (access)" );
-            goto open_failed;
-        }
-    }
 
-    if( p_sys->i_width < 0 || p_sys->i_height < 0 )
-    {
-        if( p_sys->f_fps <= 0 )
+        if( p_sys->i_width < 0 || p_sys->i_height < 0 )
         {
-            p_sys->f_fps = GetAbsoluteMaxFrameRate( p_demux, i_fd,
-                                                    fmt.fmt.pix.pixelformat );
-            msg_Dbg( p_demux, "Found maximum framerate of %f", p_sys->f_fps );
+            if( p_sys->f_fps <= 0 )
+            {
+                p_sys->f_fps = GetAbsoluteMaxFrameRate( p_demux, i_fd,
+                                                        fmt.fmt.pix.pixelformat );
+                msg_Dbg( p_demux, "Found maximum framerate of %f", p_sys->f_fps );
+            }
+            GetMaxDimensions( p_demux, i_fd,
+                              fmt.fmt.pix.pixelformat, p_sys->f_fps,
+                              &fmt.fmt.pix.width, &fmt.fmt.pix.height );
+            msg_Dbg( p_demux, "Found optimal dimensions for framerate %f of %dx%d",
+                     p_sys->f_fps, fmt.fmt.pix.width, fmt.fmt.pix.height );
+            if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) {;}
         }
-        GetMaxDimensions( p_demux, i_fd,
-                          fmt.fmt.pix.pixelformat, p_sys->f_fps,
-                          &fmt.fmt.pix.width, &fmt.fmt.pix.height );
-        msg_Dbg( p_demux, "Found optimal dimensions for framerate %f of %dx%d",
-                 p_sys->f_fps, fmt.fmt.pix.width, fmt.fmt.pix.height );
-        if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) {;}
-    }
 
-    /* Reassign width, height and chroma incase driver override */
-    p_sys->i_width = fmt.fmt.pix.width;
-    p_sys->i_height = fmt.fmt.pix.height;
+        /* Reassign width, height and chroma incase driver override */
+        p_sys->i_width = fmt.fmt.pix.width;
+        p_sys->i_height = fmt.fmt.pix.height;
+    }
 
     if( v4l2_ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 ) {;}
     /* Print extra info */
-    msg_Dbg( p_demux, "Driver requires at most %d bytes to store a complete image", fmt.fmt.pix.sizeimage );
+    msg_Dbg( p_obj, "Driver requires at most %d bytes to store a complete image", fmt.fmt.pix.sizeimage );
     /* Check interlacing */
     switch( fmt.fmt.pix.field )
     {
         case V4L2_FIELD_NONE:
-            msg_Dbg( p_demux, "Interlacing setting: progressive" );
+            msg_Dbg( p_obj, "Interlacing setting: progressive" );
             break;
         case V4L2_FIELD_TOP:
-            msg_Dbg( p_demux, "Interlacing setting: top field only" );
+            msg_Dbg( p_obj, "Interlacing setting: top field only" );
             break;
         case V4L2_FIELD_BOTTOM:
-            msg_Dbg( p_demux, "Interlacing setting: bottom field only" );
+            msg_Dbg( p_obj, "Interlacing setting: bottom field only" );
             break;
         case V4L2_FIELD_INTERLACED:
-            msg_Dbg( p_demux, "Interlacing setting: interleaved (bottom top if M/NTSC, top bottom otherwise)" );
+            msg_Dbg( p_obj, "Interlacing setting: interleaved (bottom top if M/NTSC, top bottom otherwise)" );
             break;
         case V4L2_FIELD_SEQ_TB:
-            msg_Dbg( p_demux, "Interlacing setting: sequential top bottom" );
+            msg_Dbg( p_obj, "Interlacing setting: sequential top bottom" );
             break;
         case V4L2_FIELD_SEQ_BT:
-            msg_Dbg( p_demux, "Interlacing setting: sequential bottom top" );
+            msg_Dbg( p_obj, "Interlacing setting: sequential bottom top" );
             break;
         case V4L2_FIELD_ALTERNATE:
-            msg_Dbg( p_demux, "Interlacing setting: alternate fields" );
+            msg_Dbg( p_obj, "Interlacing setting: alternate fields" );
             break;
         case V4L2_FIELD_INTERLACED_TB:
-            msg_Dbg( p_demux, "Interlacing setting: interleaved top bottom" );
+            msg_Dbg( p_obj, "Interlacing setting: interleaved top bottom" );
             break;
         case V4L2_FIELD_INTERLACED_BT:
-            msg_Dbg( p_demux, "Interlacing setting: interleaved bottom top" );
+            msg_Dbg( p_obj, "Interlacing setting: interleaved bottom top" );
             break;
         default:
-            msg_Warn( p_demux, "Interlacing setting: unknown type (%d)",
+            msg_Warn( p_obj, "Interlacing setting: unknown type (%d)",
                       fmt.fmt.pix.field );
             break;
     }
     if( fmt.fmt.pix.field != V4L2_FIELD_NONE )
-        msg_Warn( p_demux, "Interlaced inputs haven't been tested. Please report any issue." );
+        msg_Warn( p_obj, "Interlaced inputs haven't been tested. Please report any issue." );
 
     /* Look up final fourcc */
     p_sys->i_fourcc = 0;
@@ -2066,21 +2041,21 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         char psz_fourcc[5];
         memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
         vlc_fourcc_to_char( p_sys->i_fourcc, &psz_fourcc );
-        msg_Dbg( p_demux, "supported frame intervals for %4s, %dx%d:",
+        msg_Dbg( p_obj, "supported frame intervals for %4s, %dx%d:",
                  psz_fourcc, frmival.width, frmival.height );
         switch( frmival.type )
         {
             case V4L2_FRMIVAL_TYPE_DISCRETE:
                 do
                 {
-                    msg_Dbg( p_demux, "    supported frame interval: %d/%d",
+                    msg_Dbg( p_obj, "    supported frame interval: %d/%d",
                              frmival.discrete.numerator,
                              frmival.discrete.denominator );
                     frmival.index++;
                 } while( v4l2_ioctl( i_fd, VIDIOC_ENUM_FRAMEINTERVALS, &frmival ) >= 0 );
                 break;
             case V4L2_FRMIVAL_TYPE_STEPWISE:
-                msg_Dbg( p_demux, "    supported frame intervals: %d/%d to "
+                msg_Dbg( p_obj, "    supported frame intervals: %d/%d to "
                          "%d/%d using %d/%d increments",
                          frmival.stepwise.min.numerator,
                          frmival.stepwise.min.denominator,
@@ -2090,7 +2065,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
                          frmival.stepwise.step.denominator );
                 break;
             case V4L2_FRMIVAL_TYPE_CONTINUOUS:
-                msg_Dbg( p_demux, "    supported frame intervals: %d/%d to %d/%d",
+                msg_Dbg( p_obj, "    supported frame intervals: %d/%d to %d/%d",
                          frmival.stepwise.min.numerator,
                          frmival.stepwise.min.denominator,
                          frmival.stepwise.max.numerator,
@@ -2105,15 +2080,15 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
-        if( InitRead( p_demux, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
+        if( InitRead( p_obj, p_sys, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
         break;
 
     case IO_METHOD_MMAP:
-        if( InitMmap( p_demux, i_fd ) != VLC_SUCCESS ) goto open_failed;
+        if( InitMmap( p_obj, p_sys, i_fd ) != VLC_SUCCESS ) goto open_failed;
         break;
 
     case IO_METHOD_USERPTR:
-        if( InitUserP( p_demux, i_fd, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
+        if( InitUserP( p_obj, p_sys, i_fd, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
         break;
 
     }
@@ -2123,9 +2098,13 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     es_fmt.video.i_height = p_sys->i_height;
     es_fmt.video.i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;
 
-    msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
-        (char*)&es_fmt.i_codec, es_fmt.video.i_width, es_fmt.video.i_height );
-    p_sys->p_es = es_out_Add( p_demux->out, &es_fmt );
+    if( b_demux )
+    {
+        demux_t *p_demux = (demux_t *) p_obj;
+        msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
+            (char*)&es_fmt.i_codec, es_fmt.video.i_width, es_fmt.video.i_height );
+        p_sys->p_es = es_out_Add( p_demux->out, &es_fmt );
+    }
 
     /* Start Capture */
 
@@ -2147,7 +2126,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
             if( v4l2_ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
             {
-                msg_Err( p_demux, "VIDIOC_QBUF failed" );
+                msg_Err( p_obj, "VIDIOC_QBUF failed" );
                 goto open_failed;
             }
         }
@@ -2155,7 +2134,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         if( v4l2_ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
         {
-            msg_Err( p_demux, "VIDIOC_STREAMON failed" );
+            msg_Err( p_obj, "VIDIOC_STREAMON failed" );
             goto open_failed;
         }
 
@@ -2175,7 +2154,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
 
             if( v4l2_ioctl( i_fd, VIDIOC_QBUF, &buf ) < 0 )
             {
-                msg_Err( p_demux, "VIDIOC_QBUF failed" );
+                msg_Err( p_obj, "VIDIOC_QBUF failed" );
                 goto open_failed;
             }
         }
@@ -2183,7 +2162,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         buf_type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         if( v4l2_ioctl( i_fd, VIDIOC_STREAMON, &buf_type ) < 0 )
         {
-            msg_Err( p_demux, "VIDIOC_STREAMON failed" );
+            msg_Err( p_obj, "VIDIOC_STREAMON failed" );
             goto open_failed;
         }
 
@@ -2193,7 +2172,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     /* report fps */
     if( p_sys->f_fps >= 0.1 )
     {
-        msg_Dbg( p_demux, "User set fps=%f", p_sys->f_fps );
+        msg_Dbg( p_obj, "User set fps=%f", p_sys->f_fps );
     }
 
     return i_fd;
