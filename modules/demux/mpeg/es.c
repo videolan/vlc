@@ -545,21 +545,32 @@ static int MpgaGetFrameSamples( uint32_t h )
 
 static int MpgaProbe( demux_t *p_demux, int64_t *pi_offset )
 {
+    const int pi_wav[] = { WAVE_FORMAT_MPEG, WAVE_FORMAT_MPEGLAYER3, WAVE_FORMAT_UNKNOWN };
     bool   b_forced;
     bool   b_forced_demux;
     int64_t i_offset;
 
-    const uint8_t     *p_peek;
+    const uint8_t *p_peek;
+    int i_skip;
 
     b_forced = demux_IsPathExtension( p_demux, ".mp3" );
     b_forced_demux = demux_IsForced( p_demux, "mp3" ) ||
                      demux_IsForced( p_demux, "mpga" );
 
     i_offset = stream_Tell( p_demux->s );
-    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+
+    if( WavSkipHeader( p_demux, &i_skip, pi_wav ) )
+    {
+        if( !b_forced_demux )
+            return VLC_EGENERIC;
+
+        return VLC_EGENERIC;
+    }
+
+    if( stream_Peek( p_demux->s, &p_peek, i_skip + 4 ) < i_skip + 4 )
         return VLC_EGENERIC;
 
-    if( !MpgaCheckSync( p_peek ) )
+    if( !MpgaCheckSync( &p_peek[i_skip] ) )
     {
         bool b_ok = false;
         int i_peek;
@@ -567,22 +578,20 @@ static int MpgaProbe( demux_t *p_demux, int64_t *pi_offset )
         if( !b_forced_demux && !b_forced )
             return VLC_EGENERIC;
 
-        i_peek = stream_Peek( p_demux->s, &p_peek, 8096 );
-        while( i_peek > 4 )
+        i_peek = stream_Peek( p_demux->s, &p_peek, i_skip + 8096 );
+        while( i_skip + 4 < i_peek )
         {
-            if( MpgaCheckSync( p_peek ) )
+            if( MpgaCheckSync( &p_peek[i_skip] ) )
             {
                 b_ok = true;
                 break;
             }
-            p_peek += 1;
-            i_peek -= 1;
-            i_offset++;
+            i_skip++;
         }
         if( !b_ok && !b_forced_demux )
             return VLC_EGENERIC;
     }
-    *pi_offset = i_offset;
+    *pi_offset = i_offset + i_skip;
     return VLC_SUCCESS;
 }
 
