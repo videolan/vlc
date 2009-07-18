@@ -1957,6 +1957,9 @@ glib-$(GLIB_VERSION).tar.bz2:
 glib: glib-$(GLIB_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	(cd $@; patch -p0 < ../Patches/glib-remove-gtkdoc.patch)
+ifdef HAVE_DARWIN_10
+	(cd $@; patch -p0 < ../Patches/glib-Darwin64.patch)
+endif
 
 .glib: glib
 	(cd $<; sh autogen.sh --prefix=$(PREFIX) --host=$(HOST) && make && make install)
