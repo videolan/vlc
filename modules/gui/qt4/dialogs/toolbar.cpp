@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ToolbarEdit.cpp : ToolbarEdit and About dialogs
  ****************************************************************************
- * Copyright (C) 2008 the VideoLAN team
+ * Copyright (C) 2008-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb (at) videolan.org>

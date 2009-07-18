@@ -520,7 +520,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                     addWidget( preview, 1, 0, 1, 2 );
             CONNECT( ui.displayModeBox, currentIndexChanged( int ),
                      preview, setPreview( int ) );
-            
+
             CONFIG_GENERIC( "qt-display-mode", IntegerList, ui.displayLabel,
                             displayModeBox );
             CONFIG_GENERIC( "embedded-video", Bool, NULL, embedVideo );
@@ -538,12 +538,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "qt-updates-notif", Bool, NULL, updatesBox );
             CONFIG_GENERIC_NO_BOOL( "qt-updates-days", Integer, NULL,
                     updatesDays );
-            ui.updatenotifier_zone->setEnabled( ui.updatesBox->isChecked() );
+            ui.updatesDays->setEnabled( ui.updatesBox->isChecked() );
             CONNECT( ui.updatesBox, toggled( bool ),
-                     ui.updatenotifier_zone, setEnabled( bool ) );
+                     ui.updatesDays, setEnabled( bool ) );
 #else
             ui.updatesBox->hide();
-            ui.updatenotifier_zone->hide();
+            ui.updatesDays->hide();
 #endif
             /* ONE INSTANCE options */
 #if defined( WIN32 ) || defined( HAVE_DBUS ) || defined(__APPLE__)
