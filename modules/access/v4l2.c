@@ -2309,6 +2309,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     {
         struct v4l2_standard t_standards;
         t_standards.index = 0;
+        p_sys->i_standard = 0;
         while( v4l2_ioctl( i_fd, VIDIOC_ENUMSTD, &t_standards ) >=0 )
         {
             p_sys->i_standard++;
@@ -2372,6 +2373,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     {
         struct v4l2_tuner tuner;
         memset( &tuner, 0, sizeof(tuner) );
+        p_sys->i_tuner = 0;
         while( v4l2_ioctl( i_fd, VIDIOC_G_TUNER, &tuner ) >= 0 )
         {
             p_sys->i_tuner++;
