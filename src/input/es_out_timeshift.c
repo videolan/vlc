@@ -1315,10 +1315,10 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     case ES_OUT_RESET_PCR:           /* no arg */
         break;
 
-    case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=vlc_meta_t* */
+    case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=const vlc_meta_t* */
     {
         p_cmd->control.int_meta.i_int = (int)va_arg( args, int );
-        vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t * );
+        const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
 
         if( b_copy )
         {
@@ -1329,15 +1329,16 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         }
         else
         {
-            p_cmd->control.int_meta.p_meta = p_meta;
+            /* The cast is only needed to avoid warning */
+            p_cmd->control.int_meta.p_meta = (vlc_meta_t*)p_meta;
         }
         break;
     }
 
-    case ES_OUT_SET_GROUP_EPG:   /* arg1=int i_group arg2=vlc_epg_t* */
+    case ES_OUT_SET_GROUP_EPG:   /* arg1=int i_group arg2=const vlc_epg_t* */
     {
         p_cmd->control.int_epg.i_int = (int)va_arg( args, int );
-        vlc_epg_t *p_epg = (vlc_epg_t*)va_arg( args, vlc_epg_t * );
+        const vlc_epg_t *p_epg = va_arg( args, const vlc_epg_t * );
 
         if( b_copy )
         {
@@ -1358,7 +1359,8 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         }
         else
         {
-            p_cmd->control.int_epg.p_epg = p_epg;
+            /* The cast is only needed to avoid warning */
+            p_cmd->control.int_epg.p_epg = (vlc_epg_t*)p_epg;
         }
         break;
     }
@@ -1447,11 +1449,11 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
     case ES_OUT_RESET_PCR:           /* no arg */
         return es_out_Control( p_out, i_query );
 
-    case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=vlc_meta_t* */
+    case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=const vlc_meta_t* */
         return es_out_Control( p_out, i_query, p_cmd->control.int_meta.i_int,
                                                p_cmd->control.int_meta.p_meta );
 
-    case ES_OUT_SET_GROUP_EPG:   /* arg1=int i_group arg2=vlc_epg_t* */
+    case ES_OUT_SET_GROUP_EPG:   /* arg1=int i_group arg2=const vlc_epg_t* */
         return es_out_Control( p_out, i_query, p_cmd->control.int_epg.i_int,
                                                p_cmd->control.int_epg.p_epg );
 

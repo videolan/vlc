@@ -65,10 +65,10 @@ enum es_out_query_e
 
     /* Allow preroll of data (data with dts/pts < i_pts for all ES will be decoded but not displayed */
     ES_OUT_SET_NEXT_DISPLAY_TIME,       /* arg1=int64_t i_pts(microsecond) */
-    /* Set meta data for group (dynamic) */
-    ES_OUT_SET_GROUP_META,  /* arg1=int i_group arg2=vlc_meta_t */
-    /* Set epg for group (dynamic) */
-    ES_OUT_SET_GROUP_EPG,   /* arg1=int i_group arg2=vlc_epg_t */
+    /* Set meta data for group (dynamic) (The vlc_meta_t is not modified nor released) */
+    ES_OUT_SET_GROUP_META,  /* arg1=int i_group arg2=const vlc_meta_t */
+    /* Set epg for group (dynamic) (The vlc_epg_t is not modified nor released) */
+    ES_OUT_SET_GROUP_EPG,   /* arg1=int i_group arg2=const vlc_epg_t */
     /* */
     ES_OUT_DEL_GROUP,       /* arg1=int i_group */
 

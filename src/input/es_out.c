@@ -1153,7 +1153,7 @@ static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm )
     return psz;
 }
 
-static void EsOutProgramMeta( es_out_t *out, int i_group, vlc_meta_t *p_meta )
+static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_meta )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     es_out_pgrm_t     *p_pgrm;
@@ -1289,7 +1289,7 @@ static void vlc_epg_Merge( vlc_epg_t *p_dst, const vlc_epg_t *p_src )
     }
 }
 
-static void EsOutProgramEpg( es_out_t *out, int i_group, vlc_epg_t *p_epg )
+static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg )
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
@@ -2380,7 +2380,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         case ES_OUT_SET_GROUP_META:
         {
             int i_group = (int)va_arg( args, int );
-            vlc_meta_t *p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t * );
+            const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
 
             EsOutProgramMeta( out, i_group, p_meta );
             return VLC_SUCCESS;
@@ -2388,7 +2388,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         case ES_OUT_SET_GROUP_EPG:
         {
             int i_group = (int)va_arg( args, int );
-            vlc_epg_t *p_epg = (vlc_epg_t*)va_arg( args, vlc_epg_t * );
+            const vlc_epg_t *p_epg = va_arg( args, const vlc_epg_t * );
 
             EsOutProgramEpg( out, i_group, p_epg );
             return VLC_SUCCESS;
