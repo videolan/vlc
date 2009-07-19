@@ -319,7 +319,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
     /* Check sequence number */
     /* NOTE: the sequence number is per-source,
      * but is independent from the payload type. */
-    int delta_seq = seq - src->max_seq;
+    int16_t delta_seq = seq - src->max_seq;
     if ((delta_seq > 0) ? (delta_seq > p_sys->max_dropout)
                         : (-delta_seq > p_sys->max_misorder))
     {
