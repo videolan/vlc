@@ -171,7 +171,7 @@ void *rtp_thread (void *data)
 {
     demux_t *demux = data;
     demux_sys_t *p_sys = demux->p_sys;
-    bool autodetect = true, reorder = false;
+    bool autodetect = true;
 
     if (vlc_timer_create (&p_sys->timer, rtp_process, data))
         return NULL;
