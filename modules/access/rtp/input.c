@@ -53,22 +53,23 @@ static block_t *rtp_dgram_recv (vlc_object_t *obj, int fd)
     block_t *block = block_Alloc (0xffff);
     ssize_t len;
 
+    block_cleanup_push (block);
     do
     {
-        block_cleanup_push (block);
         len = net_Read (obj, fd, NULL,
                         block->p_buffer, block->i_buffer, false);
-        vlc_cleanup_pop ();
 
         if (((len <= 0) && fd_dead (fd)) || !vlc_object_alive (obj))
         {   /* POLLHUP -> permanent (DCCP) socket error */
             block_Release (block);
-            return NULL;
+            block = NULL;
+            break;
         }
     }
     while (len == -1);
+    vlc_cleanup_pop ();
 
-    return block_Realloc (block, 0, len);
+    return block ? block_Realloc (block, 0, len) : NULL;
 }
 
 
