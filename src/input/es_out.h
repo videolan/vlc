@@ -31,6 +31,14 @@
 
 #include <vlc_common.h>
 
+enum es_out_mode_e
+{
+    ES_OUT_MODE_NONE,   /* don't select anything */
+    ES_OUT_MODE_ALL,    /* eg for stream output */
+    ES_OUT_MODE_AUTO,   /* best audio/video or for input follow audio-track, sub-track */
+    ES_OUT_MODE_PARTIAL /* select programs given after --programs */
+};
+
 enum es_out_query_private_e
 {
 
