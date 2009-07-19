@@ -498,6 +498,10 @@ void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
                                              buttonType_e i_type,
                                              int i_option )
 {
+    doubleInt *value = new doubleInt;
+    value->i_type = i_type;
+    value->i_option = i_option;
+
     /* Special case for SPACERS, who aren't QWidgets */
     if( i_type == WIDGET_SPACER || i_type == WIDGET_SPACER_EXTEND )
     {
@@ -567,10 +571,6 @@ void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
     /* QList and QBoxLayout don't act the same with insert() */
     if( i_index < 0 ) i_index = controlLayout->count() - 1;
 
-    /* Insert in the value listing */
-    doubleInt *value = new doubleInt;
-    value->i_type = i_type;
-    value->i_option = i_option;
     widgetList.insert( i_index, value );
 }
 
@@ -739,12 +739,14 @@ bool DroppingController::eventFilter( QObject *obj, QEvent *event )
             QDrag *drag = new QDrag( widg );
             drag->setMimeData( mimeData );
 
+            /* Remove before the drag to not mess DropEvent,
+               that will createAndAddWidget */
+            widgetList.removeAt( i );
+
             /* Start the effective drag */
             drag->exec(Qt::CopyAction | Qt::MoveAction, Qt::MoveAction);
-
-            widgetList.removeAt( i );
-            controlLayout->removeWidget( widg );
             widg->hide();
+            controlLayout->removeWidget( widg );
             b_draging = false;
             }
             return true;
