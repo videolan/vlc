@@ -1,9 +1,8 @@
-<?xml version="1.0" encoding="UTF-8"?>
-<ui version="4.0">
+<ui version="4.0" >
  <author>Jean-Baptiste Kempf</author>
  <class>SPrefsInterface</class>
- <widget class="QWidget" name="SPrefsInterface">
-  <property name="geometry">
+ <widget class="QWidget" name="SPrefsInterface" >
+  <property name="geometry" >
    <rect>
     <x>0</x>
     <y>0</y>
@@ -11,32 +10,32 @@
     <height>657</height>
    </rect>
   </property>
-  <property name="sizePolicy">
-   <sizepolicy hsizetype="Preferred" vsizetype="Minimum">
+  <property name="sizePolicy" >
+   <sizepolicy vsizetype="Minimum" hsizetype="Preferred" >
     <horstretch>0</horstretch>
     <verstretch>0</verstretch>
    </sizepolicy>
   </property>
-  <property name="windowTitle">
+  <property name="windowTitle" >
    <string>Form</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout_3">
-   <item row="2" column="0" colspan="2">
-    <widget class="QGroupBox" name="OneInterfaceBox">
-     <property name="title">
+  <layout class="QGridLayout" name="gridLayout_3" >
+   <item row="2" column="0" colspan="2" >
+    <widget class="QGroupBox" name="OneInterfaceBox" >
+     <property name="title" >
       <string>Instances</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_2">
-      <item row="0" column="0">
-       <widget class="QCheckBox" name="OneInterfaceMode">
-        <property name="text">
+     <layout class="QGridLayout" name="gridLayout_2" >
+      <item row="0" column="0" >
+       <widget class="QCheckBox" name="OneInterfaceMode" >
+        <property name="text" >
          <string>Allow only one instance</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="1" colspan="2">
-       <widget class="QCheckBox" name="EnqueueOneInterfaceMode">
-        <property name="text">
+      <item row="0" column="1" colspan="2" >
+       <widget class="QCheckBox" name="EnqueueOneInterfaceMode" >
+        <property name="text" >
          <string>Enqueue files when in one instance mode</string>
         </property>
        </widget>
@@ -44,63 +43,63 @@
      </layout>
     </widget>
    </item>
-   <item row="4" column="0" colspan="2">
-    <widget class="QGroupBox" name="groupBox_2">
-     <property name="title">
+   <item row="4" column="0" colspan="2" >
+    <widget class="QGroupBox" name="groupBox_2" >
+     <property name="title" >
       <string>Privacy / Network Interaction</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout_5">
-      <item row="0" column="0">
-       <widget class="QLabel" name="artFetchLabel">
-        <property name="minimumSize">
+     <layout class="QGridLayout" name="gridLayout_5" >
+      <item row="0" column="0" >
+       <widget class="QLabel" name="artFetchLabel" >
+        <property name="minimumSize" >
          <size>
           <width>220</width>
           <height>0</height>
          </size>
         </property>
-        <property name="text">
+        <property name="text" >
          <string>Album art download policy:</string>
         </property>
        </widget>
       </item>
-      <item row="0" column="2" colspan="2">
-       <widget class="QComboBox" name="artFetcher"/>
+      <item row="0" column="2" colspan="2" >
+       <widget class="QComboBox" name="artFetcher" />
       </item>
-      <item row="1" column="0">
-       <widget class="QCheckBox" name="updatesBox">
-        <property name="text">
+      <item row="1" column="0" >
+       <widget class="QCheckBox" name="updatesBox" >
+        <property name="text" >
          <string>Activate update notifier</string>
         </property>
        </widget>
       </item>
-      <item row="1" column="2">
-       <widget class="QSpinBox" name="updatesDays">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+      <item row="1" column="2" >
+       <widget class="QSpinBox" name="updatesDays" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="alignment">
+        <property name="alignment" >
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
-        <property name="suffix">
+        <property name="suffix" >
          <string> days</string>
         </property>
-        <property name="prefix">
+        <property name="prefix" >
          <string>Every </string>
         </property>
        </widget>
       </item>
-      <item row="1" column="3">
-       <spacer name="horizontalSpacer_2">
-        <property name="orientation">
+      <item row="1" column="3" >
+       <spacer name="horizontalSpacer_2" >
+        <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeType">
+        <property name="sizeType" >
          <enum>QSizePolicy::Preferred</enum>
         </property>
-        <property name="sizeHint" stdset="0">
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>200</width>
           <height>27</height>
@@ -108,35 +107,35 @@
         </property>
        </spacer>
       </item>
-      <item row="2" column="0">
-       <widget class="QCheckBox" name="saveRecentlyPlayed">
-        <property name="text">
+      <item row="2" column="0" >
+       <widget class="QCheckBox" name="saveRecentlyPlayed" >
+        <property name="text" >
          <string>Save recently played items</string>
         </property>
        </widget>
       </item>
-      <item row="2" column="1">
-       <widget class="QLabel" name="filterLabel">
-        <property name="text">
+      <item row="2" column="1" >
+       <widget class="QLabel" name="filterLabel" >
+        <property name="text" >
          <string>Filter:</string>
         </property>
-        <property name="alignment">
+        <property name="alignment" >
          <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
         </property>
-        <property name="margin">
+        <property name="margin" >
          <number>5</number>
         </property>
        </widget>
       </item>
-      <item row="2" column="2" colspan="2">
-       <widget class="QLineEdit" name="recentlyPlayedFilters">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+      <item row="2" column="2" colspan="2" >
+       <widget class="QLineEdit" name="recentlyPlayedFilters" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="toolTip">
+        <property name="toolTip" >
          <string>Separate words by | (without space)</string>
         </property>
        </widget>
@@ -144,117 +143,117 @@
      </layout>
     </widget>
    </item>
-   <item row="1" column="0" colspan="2">
-    <widget class="QGroupBox" name="LooknfeelBox">
-     <property name="title">
+   <item row="1" column="0" colspan="2" >
+    <widget class="QGroupBox" name="LooknfeelBox" >
+     <property name="title" >
       <string>Look and feel</string>
      </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="2" colspan="4">
-       <widget class="QLabel" name="defaultLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="MinimumExpanding" vsizetype="Preferred">
+     <layout class="QGridLayout" name="gridLayout" >
+      <item row="0" column="2" colspan="4" >
+       <widget class="QLabel" name="defaultLabel" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="MinimumExpanding" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="frameShape">
+        <property name="frameShape" >
          <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="text">
+        <property name="text" >
          <string>This is VLC's default interface, with a native look and feel.</string>
         </property>
-        <property name="textFormat">
+        <property name="textFormat" >
          <enum>Qt::RichText</enum>
         </property>
-        <property name="wordWrap">
+        <property name="wordWrap" >
          <bool>true</bool>
         </property>
-        <property name="margin">
+        <property name="margin" >
          <number>10</number>
         </property>
        </widget>
       </item>
-      <item row="6" column="0" colspan="2">
-       <widget class="QRadioButton" name="skins">
-        <property name="text">
+      <item row="6" column="0" colspan="2" >
+       <widget class="QRadioButton" name="skins" >
+        <property name="text" >
          <string>Use custom skin</string>
         </property>
        </widget>
       </item>
-      <item row="6" column="2" colspan="4">
-       <widget class="QLabel" name="skinsLabel">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
+      <item row="6" column="2" colspan="4" >
+       <widget class="QLabel" name="skinsLabel" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Minimum" hsizetype="Minimum" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="frameShape">
+        <property name="frameShape" >
          <enum>QFrame::NoFrame</enum>
         </property>
-        <property name="text">
+        <property name="text" >
          <string/>
         </property>
-        <property name="textFormat">
+        <property name="textFormat" >
          <enum>Qt::RichText</enum>
         </property>
-        <property name="scaledContents">
+        <property name="scaledContents" >
          <bool>false</bool>
         </property>
-        <property name="alignment">
+        <property name="alignment" >
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
         </property>
-        <property name="wordWrap">
+        <property name="wordWrap" >
          <bool>true</bool>
         </property>
-        <property name="margin">
+        <property name="margin" >
          <number>5</number>
         </property>
-        <property name="openExternalLinks">
+        <property name="openExternalLinks" >
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="5" column="0" colspan="6">
-       <widget class="Line" name="line">
-        <property name="orientation">
+      <item row="5" column="0" colspan="6" >
+       <widget class="Line" name="line" >
+        <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
        </widget>
       </item>
-      <item row="7" column="2" colspan="4">
-       <widget class="QWidget" name="skins_zone" native="true">
-        <property name="enabled">
+      <item row="7" column="2" colspan="4" >
+       <widget class="QWidget" native="1" name="skins_zone" >
+        <property name="enabled" >
          <bool>true</bool>
         </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <layout class="QHBoxLayout" name="horizontalLayout_2">
-         <property name="margin">
+        <layout class="QHBoxLayout" name="horizontalLayout_2" >
+         <property name="margin" >
           <number>0</number>
          </property>
          <item>
-          <widget class="QLabel" name="skinFileLabel">
-           <property name="text">
+          <widget class="QLabel" name="skinFileLabel" >
+           <property name="text" >
             <string>Skin resource file:</string>
            </property>
-           <property name="alignment">
+           <property name="alignment" >
             <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
            </property>
-           <property name="buddy">
+           <property name="buddy" >
             <cstring>fileSkin</cstring>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="fileSkin">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+          <widget class="QLineEdit" name="fileSkin" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
@@ -262,14 +261,14 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="skinBrowse">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+          <widget class="QPushButton" name="skinBrowse" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="text">
+           <property name="text" >
             <string>Choose...</string>
            </property>
           </widget>
@@ -277,75 +276,75 @@
         </layout>
        </widget>
       </item>
-      <item row="0" column="0" colspan="2">
-       <widget class="QRadioButton" name="qt4">
-        <property name="text">
+      <item row="0" column="0" colspan="2" >
+       <widget class="QRadioButton" name="qt4" >
+        <property name="text" >
          <string>Use native style</string>
         </property>
-        <property name="checked">
+        <property name="checked" >
          <bool>true</bool>
         </property>
        </widget>
       </item>
-      <item row="1" column="2" colspan="4">
-       <widget class="QWidget" name="native_zone" native="true">
-        <layout class="QGridLayout" name="gridLayout_4">
-         <property name="margin">
+      <item row="1" column="2" colspan="4" >
+       <widget class="QWidget" native="1" name="native_zone" >
+        <layout class="QGridLayout" name="gridLayout_4" >
+         <property name="margin" >
           <number>0</number>
          </property>
-         <item row="0" column="1">
-          <widget class="QComboBox" name="displayModeBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="MinimumExpanding" vsizetype="Fixed">
+         <item row="0" column="1" >
+          <widget class="QComboBox" name="displayModeBox" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Fixed" hsizetype="MinimumExpanding" >
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
           </widget>
          </item>
-         <item row="7" column="1">
-          <widget class="QCheckBox" name="fsController">
-           <property name="text">
+         <item row="7" column="1" >
+          <widget class="QCheckBox" name="fsController" >
+           <property name="text" >
             <string>Show controls in full screen mode</string>
            </property>
           </widget>
          </item>
-         <item row="0" column="0">
-          <widget class="QLabel" name="displayLabel">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+         <item row="0" column="0" >
+          <widget class="QLabel" name="displayLabel" >
+           <property name="sizePolicy" >
+            <sizepolicy vsizetype="Preferred" hsizetype="Preferred" >
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
-           <property name="layoutDirection">
+           <property name="layoutDirection" >
             <enum>Qt::LeftToRight</enum>
            </property>
-           <property name="text">
+           <property name="text" >
             <string>Display mode:</string>
            </property>
-           <property name="alignment">
+           <property name="alignment" >
             <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
-          <widget class="QCheckBox" name="systrayBox">
-           <property name="text">
+         <item row="4" column="1" >
+          <widget class="QCheckBox" name="systrayBox" >
+           <property name="text" >
             <string>Show systray icon</string>
            </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QCheckBox" name="resizingBox">
-           <property name="text">
+         <item row="4" column="0" >
+          <widget class="QCheckBox" name="resizingBox" >
+           <property name="text" >
             <string>Resize interface to video size</string>
            </property>
           </widget>
          </item>
-         <item row="7" column="0">
-          <widget class="QCheckBox" name="embedVideo">
-           <property name="text">
+         <item row="7" column="0" >
+          <widget class="QCheckBox" name="embedVideo" >
+           <property name="text" >
             <string>Embed video in interface</string>
            </property>
           </widget>
@@ -353,68 +352,79 @@
         </layout>
        </widget>
       </item>
+      <item row="7" column="0" >
+       <widget class="QLabel" name="previewSkins" >
+        <property name="text" >
+         <string>&lt;!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0//EN" "http://www.w3.org/TR/REC-html40/strict.dtd">
+&lt;html>&lt;head>&lt;meta name="qrichtext" content="1" />&lt;style type="text/css">
+p, li { white-space: pre-wrap; }
+&lt;/style>&lt;/head>&lt;body style=" font-family:'DejaVu Sans'; font-size:9pt; font-weight:400; font-style:normal;">
+&lt;p style=" margin-top:0px; margin-bottom:0px; margin-left:0px; margin-right:0px; -qt-block-indent:0; text-indent:0px;">&lt;img src=":/prefsmenu/sample_skins" />&lt;/p>&lt;/body>&lt;/html></string>
+        </property>
+       </widget>
+      </item>
      </layout>
     </widget>
    </item>
-   <item row="0" column="0" colspan="2">
-    <widget class="QGroupBox" name="languageBox">
-     <property name="title">
+   <item row="0" column="0" colspan="2" >
+    <widget class="QGroupBox" name="languageBox" >
+     <property name="title" >
       <string>Language</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_3">
+     <layout class="QHBoxLayout" name="horizontalLayout_3" >
       <item>
-       <widget class="QLabel" name="languageLabel">
-        <property name="maximumSize">
+       <widget class="QLabel" name="languageLabel" >
+        <property name="maximumSize" >
          <size>
           <width>220</width>
           <height>16777215</height>
          </size>
         </property>
-        <property name="text">
+        <property name="text" >
          <string>Menus language:</string>
         </property>
-        <property name="alignment">
+        <property name="alignment" >
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
         </property>
        </widget>
       </item>
       <item>
-       <widget class="QComboBox" name="language"/>
+       <widget class="QComboBox" name="language" />
       </item>
      </layout>
     </widget>
    </item>
-   <item row="3" column="0" colspan="2">
-    <widget class="QGroupBox" name="assoBox">
-     <property name="title">
+   <item row="3" column="0" colspan="2" >
+    <widget class="QGroupBox" name="assoBox" >
+     <property name="title" >
       <string>File associations</string>
      </property>
-     <layout class="QHBoxLayout" name="horizontalLayout_4">
+     <layout class="QHBoxLayout" name="horizontalLayout_4" >
       <item>
-       <widget class="QPushButton" name="assoButton">
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+       <widget class="QPushButton" name="assoButton" >
+        <property name="sizePolicy" >
+         <sizepolicy vsizetype="Fixed" hsizetype="Maximum" >
           <horstretch>0</horstretch>
           <verstretch>0</verstretch>
          </sizepolicy>
         </property>
-        <property name="minimumSize">
+        <property name="minimumSize" >
          <size>
           <width>220</width>
           <height>0</height>
          </size>
         </property>
-        <property name="text">
+        <property name="text" >
          <string>Set up associations...</string>
         </property>
        </widget>
       </item>
       <item>
-       <spacer name="horizontalSpacer">
-        <property name="orientation">
+       <spacer name="horizontalSpacer" >
+        <property name="orientation" >
          <enum>Qt::Horizontal</enum>
         </property>
-        <property name="sizeHint" stdset="0">
+        <property name="sizeHint" stdset="0" >
          <size>
           <width>40</width>
           <height>20</height>
@@ -433,6 +443,8 @@
   <tabstop>artFetcher</tabstop>
   <tabstop>updatesBox</tabstop>
  </tabstops>
- <resources/>
+ <resources>
+  <include location="../vlc.qrc" />
+ </resources>
  <connections/>
 </ui>
