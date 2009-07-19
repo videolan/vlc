@@ -124,13 +124,15 @@ enum demux_query_e
     /* Attachments */
     DEMUX_GET_ATTACHMENTS,      /* arg1=input_attachment_t***, int* res=can fail */
 
-    /* RECORD you should accept it only if the stream can be recorded without
+    /* RECORD you are ensured that it is never called twice with the same state
+     * you should accept it only if the stream can be recorded without
      * any modification or header addition. */
     DEMUX_CAN_RECORD,           /* arg1=bool*   res=can fail(assume false) */
     DEMUX_SET_RECORD_STATE,     /* arg1=bool    res=can fail */
 
 
     /* II. Specific access_demux queries */
+    /* PAUSE you are ensured that it is never called twice with the same state */
     DEMUX_CAN_PAUSE = 0x1000,   /* arg1= bool*    can fail (assume false)*/
     DEMUX_SET_PAUSE_STATE,      /* arg1= bool     can fail */
 
