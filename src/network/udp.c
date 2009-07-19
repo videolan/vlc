@@ -164,6 +164,7 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
 
     val = -1;
 
+    int fd6 = -1;
     for (const struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
         int fd = net_Socket (obj, ptr->ai_family, ptr->ai_socktype,
@@ -174,18 +175,34 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
             continue;
         }
 
-        if (ptr->ai_next != NULL)
-        {
 #ifdef IPV6_V6ONLY
-            if ((ptr->ai_family != AF_INET6)
-             || setsockopt (fd, SOL_IPV6, IPV6_V6ONLY, &(int){ 0 },
-                            sizeof (int)))
-#endif
-            {
-                msg_Err (obj, "Multiple network protocols present");
-                msg_Err (obj, "Please select network protocol manually");
-            }
+        /* If IPv6 was forced, set IPv6-only mode.
+         * If IPv4 was forced, do nothing extraordinary.
+         * If nothing was forced, try dual-mode IPv6. */
+        if (ptr->ai_family == AF_INET6)
+        {
+            int on = (family == AF_INET6);
+            setsockopt (fd, SOL_IPV6, IPV6_V6ONLY, &on, sizeof (on));
         }
+        else if (ptr->ai_family == AF_INET && family == AF_UNSPEC)
+        {
+            for (const struct addrinfo *p = ptr; p != NULL; p = p->ai_next)
+                if (p->ai_family == AF_INET6)
+                {
+                    net_Close (fd);
+                    fd = -1;
+                    break;
+                }
+            if (fd == -1)
+                continue;
+        }
+#else
+        if (family == AF_UNSPEC && ptr->ai_next != NULL)
+        {
+            msg_Warn (obj, "ambiguous network protocol specification");
+            msg_Warn (obj, "please select IP version explicitly");
+        }
+#endif
 
         fd = net_SetupDgramSocket( obj, fd, ptr );
         if( fd == -1 )
