@@ -46,7 +46,6 @@ void rtp_queue (demux_t *, rtp_session_t *, block_t *);
 bool rtp_dequeue (demux_t *, const rtp_session_t *, mtime_t *);
 int rtp_add_type (demux_t *demux, rtp_session_t *ses, const rtp_pt_t *pt);
 
-int rtp_process (demux_t *demux);
 void *rtp_thread (void *data);
 
 /* Global data */
@@ -57,8 +56,8 @@ struct demux_sys_t
     int           fd;
     int           rtcp_fd;
     vlc_thread_t  thread;
+    vlc_timer_t   timer;
     vlc_mutex_t   lock;
-    vlc_cond_t    wait;
     bool thread_ready;
 
     unsigned      caching;
@@ -67,6 +66,8 @@ struct demux_sys_t
     uint16_t      max_misorder; /**< Max packet backward misordering */
     uint8_t       max_src; /**< Max simultaneous RTP sources */
     bool          framed_rtp; /**< Framed RTP packets over TCP */
+#if 0
     bool          dead; /**< End of stream */
+#endif
 };
 

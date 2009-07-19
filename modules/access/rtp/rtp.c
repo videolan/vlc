@@ -139,7 +139,6 @@ vlc_module_end ()
 /*
  * Local prototypes
  */
-static int Demux (demux_t *);
 static int Control (demux_t *, int i_query, va_list args);
 static int extract_port (char **phost);
 
@@ -236,7 +235,6 @@ static int Open (vlc_object_t *obj)
     }
 
     vlc_mutex_init (&p_sys->lock);
-    vlc_cond_init (&p_sys->wait);
     p_sys->srtp         = NULL;
     p_sys->fd           = fd;
     p_sys->rtcp_fd      = rtcp_fd;
@@ -246,9 +244,8 @@ static int Open (vlc_object_t *obj)
     p_sys->max_dropout  = var_CreateGetInteger (obj, "rtp-max-dropout");
     p_sys->max_misorder = var_CreateGetInteger (obj, "rtp-max-misorder");
     p_sys->framed_rtp   = (tp == IPPROTO_TCP);
-    p_sys->dead         = false;
 
-    demux->pf_demux   = Demux;
+    demux->pf_demux   = NULL;
     demux->pf_control = Control;
     demux->p_sys      = p_sys;
 
@@ -303,7 +300,6 @@ static void Close (vlc_object_t *obj)
         vlc_cancel (p_sys->thread);
         vlc_join (p_sys->thread, NULL);
     }
-    vlc_cond_destroy (&p_sys->wait);
     vlc_mutex_destroy (&p_sys->lock);
 
     if (p_sys->srtp)
@@ -676,11 +672,3 @@ int rtp_autodetect (demux_t *demux, rtp_session_t *session,
  * Dynamic payload type handlers
  * Hmm, none implemented yet.
  */
-
-/**
- * Processing callback
- */
-static int Demux (demux_t *demux)
-{
-    return rtp_process (demux) ? 0 : 1;
-}

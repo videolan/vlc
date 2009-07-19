@@ -453,6 +453,8 @@ bool rtp_dequeue (demux_t *demux, const rtp_session_t *session,
     mtime_t now = mdate ();
     bool pending = false;
 
+    *deadlinep = INT64_MAX;
+
     for (unsigned i = 0, max = session->srcc; i < max; i++)
     {
         rtp_source_t *src = session->srcv[i];
