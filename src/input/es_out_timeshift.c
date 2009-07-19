@@ -599,6 +599,7 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     case ES_OUT_SET_GROUP_EPG:
     case ES_OUT_SET_ES_SCRAMBLED_STATE:
     case ES_OUT_DEL_GROUP:
+    case ES_OUT_SET_META:
     case ES_OUT_SET_ES:
     case ES_OUT_RESTART_ES:
     case ES_OUT_SET_ES_DEFAULT:
@@ -1315,9 +1316,11 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     case ES_OUT_RESET_PCR:           /* no arg */
         break;
 
+    case ES_OUT_SET_META:        /* arg1=const vlc_meta_t* */
     case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=const vlc_meta_t* */
     {
-        p_cmd->control.int_meta.i_int = (int)va_arg( args, int );
+        if( i_query == ES_OUT_SET_GROUP_META )
+            p_cmd->control.int_meta.i_int = (int)va_arg( args, int );
         const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
 
         if( b_copy )
@@ -1461,6 +1464,9 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
         return es_out_Control( p_out, i_query, p_cmd->control.es_bool.p_es->p_es,
                                                p_cmd->control.es_bool.b_bool );
 
+    case ES_OUT_SET_META:  /* arg1=const vlc_meta_t* */
+        return es_out_Control( p_out, i_query, p_cmd->control.int_meta.p_meta );
+
     /* Modified control */
     case ES_OUT_SET_ES:      /* arg1= es_out_id_t*                   */
     case ES_OUT_RESTART_ES:  /* arg1= es_out_id_t*                   */
@@ -1490,7 +1496,8 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
 }
 static void CmdCleanControl( ts_cmd_t *p_cmd )
 {
-    if( p_cmd->control.i_query == ES_OUT_SET_GROUP_META &&
+    if( ( p_cmd->control.i_query == ES_OUT_SET_GROUP_META ||
+          p_cmd->control.i_query == ES_OUT_SET_META ) &&
         p_cmd->control.int_meta.p_meta )
     {
         vlc_meta_Delete( p_cmd->control.int_meta.p_meta );
