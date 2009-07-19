@@ -91,7 +91,7 @@ vlc_module_end ()
 /*
  * Local prototypes
  */
-static void *Thread (void *);
+static void Demux (void *);
 static int Control (demux_t *, int, va_list);
 
 struct demux_sys_t
@@ -107,9 +107,8 @@ struct demux_sys_t
     int16_t           x, y;
     uint16_t          w, h;
 
-    /* Thread does not use. This is for input thread only: */
-    vlc_thread_t      thread;
-    bool              running;
+    /* Timer does not use this, only input threa: */
+    vlc_timer_t       timer;
 };
 
 /**
@@ -123,7 +122,6 @@ static int Open (vlc_object_t *obj)
     if (p_sys == NULL)
         return VLC_ENOMEM;
     demux->p_sys = p_sys;
-    p_sys->running = false;
 
     /* Connect to X server */
     char *display = var_CreateGetNonEmptyString (obj, "x11-display");
@@ -245,9 +243,9 @@ static int Open (vlc_object_t *obj)
     p_sys->fmt.video.i_frame_rate_base = 1000;
     p_sys->es = NULL;
     p_sys->pts = VLC_TS_INVALID;
-    if (vlc_clone (&p_sys->thread, Thread, demux, VLC_THREAD_PRIORITY_INPUT))
+    if (vlc_timer_create (&p_sys->timer, Demux, demux))
         goto error;
-    p_sys->running = true;
+    vlc_timer_schedule (&p_sys->timer, false, 1, p_sys->interval);
 
     /* Initializes demux */
     demux->pf_demux   = NULL;
@@ -255,7 +253,8 @@ static int Open (vlc_object_t *obj)
     return VLC_SUCCESS;
 
 error:
-    Close (obj);
+    xcb_disconnect (p_sys->conn);
+    free (p_sys);
     return VLC_EGENERIC;
 }
 
@@ -268,11 +267,7 @@ static void Close (vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *p_sys = demux->p_sys;
 
-    if (p_sys->running)
-    {
-        vlc_cancel (p_sys->thread);
-        vlc_join (p_sys->thread, NULL);
-    }
+    vlc_timer_destroy (&p_sys->timer);
     xcb_disconnect (p_sys->conn);
     free (p_sys);
 }
@@ -322,22 +317,13 @@ static int Control (demux_t *demux, int query, va_list args)
         {
             bool pausing = va_arg (args, int);
 
-            if (pausing != p_sys->running)
-                return VLC_SUCCESS; /* No-op. FIXME: is it needed? */
             if (!pausing)
             {
                 p_sys->pts = VLC_TS_INVALID;
                 es_out_Control (demux->out, ES_OUT_RESET_PCR);
-                if (vlc_clone (&p_sys->thread, Thread, demux,
-                               VLC_THREAD_PRIORITY_INPUT))
-                    return VLC_EGENERIC;
             }
-            else
-            {
-                vlc_cancel (p_sys->thread);
-                vlc_join (p_sys->thread, NULL);
-            }
-            p_sys->running = !pausing;
+            vlc_timer_schedule (&p_sys->timer, false,
+                                pausing ? 0 : 1, p_sys->interval);
             return VLC_SUCCESS;
         }
 
@@ -358,18 +344,11 @@ static int Control (demux_t *demux, int query, va_list args)
 /**
  * Processing callback
  */
-static void Demux (demux_t *demux)
+static void Demux (void *data)
 {
+    demux_t *demux = data;
     demux_sys_t *p_sys = demux->p_sys;
     xcb_connection_t *conn = p_sys->conn;
-    mtime_t now = mdate ();
-
-    if (p_sys->pts != VLC_TS_INVALID)
-        mwait (p_sys->pts);
-    else
-        p_sys->pts = now;
-
-    int canc = vlc_savecancel ();
 
     /* Update capture region (if needed) */
     xcb_get_geometry_cookie_t gc = xcb_get_geometry (conn, p_sys->window);
@@ -384,7 +363,7 @@ static void Demux (demux_t *demux)
     if (geo == NULL)
     {
         msg_Err (demux, "bad X11 drawable 0x%08"PRIx32, p_sys->window);
-        goto out;
+        return;
     }
 
     uint16_t w = geo->width - x;
@@ -410,7 +389,7 @@ static void Demux (demux_t *demux)
         xcb_translate_coordinates_reply_t *coords =
              xcb_translate_coordinates_reply (conn, tc, NULL);
         if (coords == NULL)
-            goto out;
+            return;
         x = coords->dst_x;
         y = coords->dst_y;
         free (coords);
@@ -418,31 +397,26 @@ static void Demux (demux_t *demux)
 
     /* Capture screen */
     if (p_sys->es == NULL)
-        goto out;
+        return;
 
     xcb_get_image_reply_t *img;
     img = xcb_get_image_reply (conn,
         xcb_get_image (conn, XCB_IMAGE_FORMAT_Z_PIXMAP, p_sys->root,
                        x, y, w, h, ~0), NULL);
     if (img == NULL)
-        goto out;
+        return;
 
     /* Send block - zero copy */
     block_t *block = block_heap_Alloc (img, xcb_get_image_data (img),
                                        xcb_get_image_data_length (img));
     if (block == NULL)
-        goto out;
-    block->i_pts = block->i_dts = now;
+        return;
 
-    es_out_Control (demux->out, ES_OUT_SET_PCR, now);
+    if (p_sys->pts == VLC_TS_INVALID)
+        p_sys->pts = mdate ();
+    block->i_pts = block->i_dts = p_sys->pts;
+
+    es_out_Control (demux->out, ES_OUT_SET_PCR, p_sys->pts);
     es_out_Send (demux->out, p_sys->es, block);
     p_sys->pts += p_sys->interval;
-out:
-    vlc_restorecancel (canc);
-}
-
-static void *Thread (void *data)
-{
-    for (;;)
-         Demux (data);
 }
