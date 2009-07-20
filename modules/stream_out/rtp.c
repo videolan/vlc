@@ -247,7 +247,6 @@ struct sout_stream_sys_t
     vlc_mutex_t  lock_sdp;
 
     /* SDP to disk */
-    bool b_export_sdp_file;
     char *psz_sdp_file;
 
     /* SDP via SAP */
@@ -352,8 +351,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_port_video = var_GetInteger( p_stream, SOUT_CFG_PREFIX "port-video" );
     p_sys->rtcp_mux     = var_GetBool( p_stream, SOUT_CFG_PREFIX "rtcp-mux" );
 
-    p_sys->psz_sdp_file = NULL;
-
     if( p_sys->i_port_audio && p_sys->i_port_video == p_sys->i_port_audio )
     {
         msg_Err( p_stream, "audio and video RTP port must be distinct" );
@@ -446,8 +443,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->psz_sdp = NULL;
 
     p_sys->b_export_sap = false;
-    p_sys->b_export_sdp_file = false;
     p_sys->p_session = NULL;
+    p_sys->psz_sdp_file = NULL;
 
     p_sys->p_httpd_host = NULL;
     p_sys->p_httpd_file = NULL;
@@ -596,7 +593,7 @@ static void Close( vlc_object_t * p_this )
 
     free( p_sys->psz_sdp );
 
-    if( p_sys->b_export_sdp_file )
+    if( p_sys->psz_sdp_file != NULL )
     {
 #ifdef HAVE_UNISTD_H
         unlink( p_sys->psz_sdp_file );
@@ -658,12 +655,11 @@ static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
     }
     else if( url.psz_protocol && !strcasecmp( url.psz_protocol, "file" ) )
     {
-        if( p_sys->b_export_sdp_file )
+        if( p_sys->psz_sdp_file != NULL )
         {
             msg_Err( p_stream, "you can use sdp=file:// only once" );
             goto out;
         }
-        p_sys->b_export_sdp_file = true;
         psz_url = &psz_url[5];
         if( psz_url[0] == '/' && psz_url[1] == '/' )
             psz_url += 2;
@@ -1293,7 +1289,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     /* Update SDP (sap/file) */
     if( p_sys->b_export_sap ) SapSetup( p_stream );
-    if( p_sys->b_export_sdp_file ) FileSetup( p_stream );
+    if( p_sys->psz_sdp_file != NULL ) FileSetup( p_stream );
 
     return id;
 
@@ -1336,7 +1332,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     /* Update SDP (sap/file) */
     if( p_sys->b_export_sap && !p_sys->p_mux ) SapSetup( p_stream );
-    if( p_sys->b_export_sdp_file ) FileSetup( p_stream );
+    if( p_sys->psz_sdp_file != NULL ) FileSetup( p_stream );
 
     vlc_object_detach( id );
     vlc_object_release( id );
