@@ -178,19 +178,19 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      * them down.
      */
     /* Naming in the controller statusbar */
-    CONNECT( THEMIM->getIM(), nameChanged( QString ),
-             this, setName( QString ) );
+    CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
+             this, setName( const QString& ) );
     /* and in the systray */
     if( sysTray )
     {
-        CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
-                 updateSystrayTooltipName( QString ) );
+        CONNECT( THEMIM->getIM(), nameChanged( const QString& ), this,
+                 updateSystrayTooltipName( const QString& ) );
     }
     /* and in the title of the controller */
     if( config_GetInt( p_intf, "qt-name-in-title" ) )
     {
-        CONNECT( THEMIM->getIM(), nameChanged( QString ), this,
-             setVLCWindowsTitle( QString ) );
+        CONNECT( THEMIM->getIM(), nameChanged( const QString& ), this,
+             setVLCWindowsTitle( const QString& ) );
     }
 
     /**
@@ -910,7 +910,7 @@ void MainInterface::visual()
 /************************************************************************
  * Other stuff
  ************************************************************************/
-void MainInterface::setName( QString name )
+void MainInterface::setName( const QString& name )
 {
     input_name = name; /* store it for the QSystray use */
     /* Display it in the status bar, but also as a Tooltip in case it doesn't
@@ -923,7 +923,7 @@ void MainInterface::setName( QString name )
  * Give the decorations of the Main Window a correct Name.
  * If nothing is given, set it to VLC...
  **/
-void MainInterface::setVLCWindowsTitle( QString aTitle )
+void MainInterface::setVLCWindowsTitle( const QString& aTitle )
 {
     if( aTitle.isEmpty() )
     {
@@ -1048,7 +1048,7 @@ void MainInterface::handleSystrayClick(
  * Updates the name of the systray Icon tooltip.
  * Doesn't check if the systray exists, check before you call it.
  **/
-void MainInterface::updateSystrayTooltipName( QString name )
+void MainInterface::updateSystrayTooltipName( const QString& name )
 {
     if( name.isEmpty() )
     {

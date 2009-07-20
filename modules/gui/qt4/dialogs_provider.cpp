@@ -373,9 +373,9 @@ void DialogsProvider::MLAppendDialog( int tab )
 /**
  * Simple open
  ***/
-QStringList DialogsProvider::showSimpleOpen( QString help,
+QStringList DialogsProvider::showSimpleOpen( const QString& help,
                                              int filters,
-                                             QString path )
+                                             const QString& path )
 {
     QString fileTypes = "";
     if( filters & EXT_FILTER_MEDIA ) {
@@ -565,7 +565,7 @@ void DialogsProvider::saveAPlaylist()
  ****************************************************************************/
 
 void DialogsProvider::streamingDialog( QWidget *parent,
-                                       QString mrl,
+                                       const QString& mrl,
                                        bool b_transcode_only,
                                        QStringList options )
 {
@@ -686,7 +686,7 @@ void DialogsProvider::menuUpdateAction( QObject *data )
     func->doFunc( p_intf );
 }
 
-void DialogsProvider::SDMenuAction( QString data )
+void DialogsProvider::SDMenuAction( const QString& data )
 {
     char *psz_sd = strdup( qtu( data ) );
     if( !playlist_IsServicesDiscoveryLoaded( THEPL, psz_sd ) )

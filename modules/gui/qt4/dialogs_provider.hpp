@@ -112,11 +112,11 @@ public:
         return ( instance != NULL );
     }
 
-    QStringList showSimpleOpen( QString help = QString(),
+    QStringList showSimpleOpen( const QString& help = QString(),
                                 int filters = EXT_FILTER_MEDIA |
                                 EXT_FILTER_VIDEO | EXT_FILTER_AUDIO |
                                 EXT_FILTER_PLAYLIST,
-                                QString path = QString() );
+                                const QString& path = QString() );
     bool isDying() { return b_isDying; }
 protected:
     QSignalMapper *menusMapper;
@@ -179,7 +179,7 @@ public slots:
     void PLAppendDir();
     void MLAppendDir();
 
-    void streamingDialog( QWidget *parent, QString mrl, bool b_stream = true,
+    void streamingDialog( QWidget *parent, const QString& mrl, bool b_stream = true,
                           QStringList options = QStringList("") );
     void openAndStreamingDialogs();
     void openAndTranscodingDialogs();
@@ -193,7 +193,7 @@ public slots:
 private slots:
     void menuAction( QObject *);
     void menuUpdateAction( QObject * );
-    void SDMenuAction( QString );
+    void SDMenuAction( const QString& );
 signals:
     void  toolBarConfUpdated();
 };

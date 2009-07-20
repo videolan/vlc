@@ -178,7 +178,7 @@ signals:
     /// Send new position, new time and new length
     void positionUpdated( float , int, int );
     void rateChanged( int );
-    void nameChanged( QString );
+    void nameChanged( const QString& );
     /// Used to signal whether we should show navigation buttons
     void titleChanged( bool );
     void chapterChanged( bool );

@@ -167,13 +167,13 @@ private slots:
     void destroyPopupMenu();
     void recreateToolbars();
     void doComponentsUpdate();
-    void setName( QString );
-    void setVLCWindowsTitle( QString title = "" );
+    void setName( const QString& );
+    void setVLCWindowsTitle( const QString& title = "" );
 #if 0
     void visual();
 #endif
     void handleSystrayClick( QSystemTrayIcon::ActivationReason );
-    void updateSystrayTooltipName( QString );
+    void updateSystrayTooltipName( const QString& );
     void updateSystrayTooltipStatus( int );
 
     void showCryptedLabel( bool );
