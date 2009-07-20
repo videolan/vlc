@@ -82,17 +82,24 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-#define CACHING_TEXT N_("Caching value in ms")
+#define CACHING_TEXT N_("Caching value (ms)")
 #define CACHING_LONGTEXT N_( \
-    "Caching value for files. This " \
-    "value should be set in milliseconds." )
+    "Caching value for files, in milliseconds." )
+
+#define NETWORK_CACHING_TEXT N_("Extra network caching value (ms)")
+#define NETWORK_CACHING_LONGTEXT N_( \
+    "Supplementary caching value for remote files, in milliseconds." )
 
 vlc_module_begin ()
     set_description( N_("File input") )
     set_shortname( N_("File") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL, CACHING_TEXT, CACHING_LONGTEXT, true )
+    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL,
+                 CACHING_TEXT, CACHING_LONGTEXT, true )
+        change_safe()
+    add_integer( "network-caching", 3 * DEFAULT_PTS_DELAY / 1000, NULL,
+                 NETWORK_CACHING_TEXT, NETWORK_CACHING_LONGTEXT, true )
         change_safe()
     add_obsolete_string( "file-cat" )
     set_capability( "access", 50 )
@@ -120,6 +127,7 @@ struct access_sys_t
     int fd;
 
     /* */
+    unsigned caching;
     bool b_pace_control;
 };
 
@@ -162,9 +170,6 @@ static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
-
-    /* Update default_pts to a suitable value for file access */
-    var_Create( p_access, "file-caching", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
 
     STANDARD_READ_ACCESS_INIT;
     p_sys->i_nb_reads = 0;
@@ -211,13 +216,9 @@ static int Open( vlc_object_t *p_this )
 # warning File size not known!
 #endif
 
+    p_sys->caching = var_CreateGetInteger (p_access, "file-caching");
     if (IsRemote(fd))
-    {
-        int i_cache = var_GetInteger (p_access, "file-caching") + 700;
-        var_SetInteger (p_access, "file-caching", i_cache);
-        msg_Warn (p_access, "Opening remote file, increasing cache: %d",
-                  i_cache);
-    }
+        p_sys->caching += var_CreateGetInteger (p_access, "network-caching");
 
     p_sys->fd = fd;
     return VLC_SUCCESS;
@@ -347,7 +348,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         /* */
         case ACCESS_GET_PTS_DELAY:
             pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = var_GetInteger( p_access, "file-caching" ) * INT64_C(1000);
+            *pi_64 = p_sys->caching * INT64_C(1000);
             break;
 
         /* */
