@@ -55,15 +55,6 @@ static VLCUpdate *_o_sharedInstance = nil;
     } else {
         _o_sharedInstance = [super init];
         b_checked = false;
-
-        /* clean the interface */
-        [o_fld_releaseNote setString: @""];
-        [o_fld_currentVersion setString: @""];
-        /* translate strings to the user's language */
-        [o_update_window setTitle: _NS("Check for Updates")];
-        [o_btn_DownloadNow setTitle: _NS("Download now")];
-        [o_btn_okay setTitle: _NS("OK")];
-        [o_chk_updateOnStartup setTitle: _NS("Automatically check for updates")];
     }
 
     return _o_sharedInstance;
@@ -76,6 +67,15 @@ static VLCUpdate *_o_sharedInstance = nil;
 
 - (void)awakeFromNib
 {
+    /* clean the interface */
+    [o_fld_releaseNote setString: @""];
+    [o_fld_currentVersion setStringValue: @""];
+    /* translate strings to the user's language */
+    [o_update_window setTitle: _NS("Check for Updates")];
+    [o_btn_DownloadNow setTitle: _NS("Download now")];
+    [o_btn_okay setTitle: _NS("OK")];
+    [o_chk_updateOnStartup setTitle: _NS("Automatically check for updates")];
+
     /* we don't use - (BOOL)shouldCheckUpdateOnStartup because we don't want
      * the Alert panel to pop up at this time */
     [o_chk_updateOnStartup setState: [[NSUserDefaults standardUserDefaults] boolForKey: kPrefUpdateOnStartup]];
