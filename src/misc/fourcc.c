@@ -1092,7 +1092,7 @@ static const entry_t p_list_spu[] = {
     B(VLC_CODEC_TELETEXT, "Teletext"),
         A("telx"),
 
-    B(VLC_CODEC_TELETEXT, "Kate subtiles"),
+    B(VLC_CODEC_KATE, "Kate subtitles"),
         A("kate"),
 
     B(VLC_CODEC_CMML, "CMML annotations/metadata"),
