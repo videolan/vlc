@@ -307,7 +307,7 @@ static int parseURL( vlc_url_t *url, const char *path )
 
     if( url->psz_path && *url->psz_path == '/' )
         url->psz_path++;
-
+    decode_URI( url->psz_path );
     return VLC_SUCCESS;
 }
 
