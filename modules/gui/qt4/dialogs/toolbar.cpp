@@ -1,5 +1,5 @@
 /*****************************************************************************
- * ToolbarEdit.cpp : ToolbarEdit and About dialogs
+ * ToolbarEdit.cpp : ToolbarEdit dialog
  ****************************************************************************
  * Copyright (C) 2008-2009 the VideoLAN team
  * $Id$
