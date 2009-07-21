@@ -793,37 +793,43 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
         goto error;
     }
 
-    /* Send request */
-    i_err = SendRequest( p_this, psz_method, psz_content_type, psz_body,
-                         p_req_headers);
-    if ( i_err != VLC_SUCCESS )
-        goto error;
-
-    /* Read status line */
-    i_status = ReadStatusLine( p_this );
-    if ( i_status < 0 )
+    while ( 1 )
     {
-        i_err = i_status;
-        goto error;
-    }
-
-    vlc_dictionary_clear( p_resp_headers, FreeHeader, NULL );
-
-    /* Read headers */
-    headers_done = 0;
-    while ( !headers_done )
-    {
-        i_err = ReadHeader( p_this, p_resp_headers, &headers_done );
+        /* Send request */
+        i_err = SendRequest( p_this, psz_method, psz_content_type, psz_body,
+                             p_req_headers);
         if ( i_err != VLC_SUCCESS )
             goto error;
-    }
 
-    if ( i_status != 200 )
-    {
-        msg_Err( p_this, "Request failed (%s), status is %d",
-                 p_sys->psz_last_status_line, i_status );
-        i_err = VLC_EGENERIC;
-        goto error;
+        /* Read status line */
+        i_status = ReadStatusLine( p_this );
+        if ( i_status < 0 )
+        {
+            i_err = i_status;
+            goto error;
+        }
+
+        vlc_dictionary_clear( p_resp_headers, FreeHeader, NULL );
+
+        /* Read headers */
+        headers_done = 0;
+        while ( !headers_done )
+        {
+            i_err = ReadHeader( p_this, p_resp_headers, &headers_done );
+            if ( i_err != VLC_SUCCESS )
+                goto error;
+        }
+
+        if ( i_status == 200 )
+            /* Request successful */
+            break;
+        else
+        {
+            msg_Err( p_this, "Request failed (%s), status is %d",
+                     p_sys->psz_last_status_line, i_status );
+            i_err = VLC_EGENERIC;
+            goto error;
+        }
     }
 
 error:
