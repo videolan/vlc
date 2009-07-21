@@ -221,6 +221,7 @@ struct demux_sys_t
     char             event;
 
     bool             b_get_param;   /* Does the server support GET_PARAMETER */
+    bool             b_paused;      /* Are we paused? */
 };
 
 static int Demux  ( demux_t * );
@@ -299,6 +300,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->psz_path = strdup( p_demux->psz_path );
     p_sys->b_force_mcast = var_CreateGetBool( p_demux, "rtsp-mcast" );
     p_sys->b_get_param = false;
+    p_sys->b_paused = false;
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
     vlc_UrlParse( &p_sys->url, p_sys->psz_path, 0 );
@@ -1191,8 +1193,8 @@ static int Demux( demux_t *p_demux )
         return 0;
         */
     }
-    else if( !p_sys->b_multicast && p_sys->b_no_data &&
-             ( p_sys->i_no_data_ti > 34 ) )
+    else if( !p_sys->b_multicast && !p_sys->b_paused &&
+              p_sys->b_no_data && ( p_sys->i_no_data_ti > 34 ) )
     {
         bool b_rtsp_tcp = var_GetBool( p_demux, "rtsp-tcp" ) ||
                                 var_GetBool( p_demux, "rtsp-http" );
@@ -1210,7 +1212,8 @@ static int Demux( demux_t *p_demux )
         msg_Err( p_demux, "no data received in 10s, aborting" );
         return 0;
     }
-    else if( !p_sys->b_multicast && p_sys->i_no_data_ti > 34 )
+    else if( !p_sys->b_multicast && !p_sys->b_paused &&
+             ( p_sys->i_no_data_ti > 34 ) )
     {
         /* EOF ? */
         msg_Warn( p_demux, "no data received in 10s, eof ?" );
@@ -1398,13 +1401,13 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         {
             int i;
 
-            b_bool = (bool)va_arg( args, int );
+            p_sys->b_paused = (bool)va_arg( args, int );
             if( p_sys->rtsp == NULL )
                 return VLC_EGENERIC;
 
             /* FIXME */
-            if( ( b_bool && !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) ) ||
-                    ( !b_bool && !p_sys->rtsp->playMediaSession( *p_sys->ms,
+            if( ( p_sys->b_paused && !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) ) ||
+                    ( !p_sys->b_paused && !p_sys->rtsp->playMediaSession( *p_sys->ms,
                        -1 ) ) )
             {
                     msg_Err( p_demux, "PLAY or PAUSE failed %s", p_sys->env->getResultMsg() );
@@ -1419,9 +1422,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
              * waiting for a response from the server. So when we PAUSE
              * we set a flag that the TimeoutPrevention function will check
              * and if it's set, it will trigger the GET_PARAMETER message */
-            if( b_bool && p_sys->p_timeout != NULL )
+            if( p_sys->b_paused && p_sys->p_timeout != NULL )
                 p_sys->p_timeout->b_handle_keep_alive = true;
-            else if( !b_bool && p_sys->p_timeout != NULL )
+            else if( !p_sys->b_paused && p_sys->p_timeout != NULL )
                 p_sys->p_timeout->b_handle_keep_alive = false;
 
             for( i = 0; !b_bool && i < p_sys->i_track; i++ )
@@ -1432,6 +1435,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 p_sys->i_pcr = 0;
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             }
+
+            /* Reset data received counter */
+            p_sys->i_no_data_ti = 0;
 
             /* Retrieve the starttime if possible */
             p_sys->i_npt_start = p_sys->ms->playStartTime();
