@@ -442,7 +442,7 @@ vlc_module_begin ()
 #  endif
 #endif
 
-    add_integer( SOUT_CFG_PREFIX "bframes", 0, NULL, BFRAMES_TEXT,
+    add_integer( SOUT_CFG_PREFIX "bframes", 3, NULL, BFRAMES_TEXT,
                  BFRAMES_LONGTEXT, false )
         change_integer_range( 0, 16 )
 
@@ -467,7 +467,7 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "cabac", 1, NULL, CABAC_TEXT, CABAC_LONGTEXT,
               false )
 
-    add_integer( SOUT_CFG_PREFIX "ref", 1, NULL, REF_TEXT,
+    add_integer( SOUT_CFG_PREFIX "ref", 3, NULL, REF_TEXT,
                  REF_LONGTEXT, false )
         change_integer_range( 1, 16 )
         add_deprecated_alias( SOUT_CFG_PREFIX "frameref" ) /* Deprecated since 0.8.5 */
@@ -576,13 +576,13 @@ vlc_module_begin ()
         change_string_list( direct_pred_list, direct_pred_list_text, 0 );
 
 #if X264_BUILD >= 52 /* r573 */
-    add_integer( SOUT_CFG_PREFIX "direct-8x8", -1, NULL, DIRECT_PRED_SIZE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "direct-8x8", 1, NULL, DIRECT_PRED_SIZE_TEXT,
                  DIRECT_PRED_SIZE_LONGTEXT, false )
         change_integer_range( -1, 1 )
 #endif
 
 #if X264_BUILD >= 0x0012 /* r134 */
-    add_bool( SOUT_CFG_PREFIX "weightb", 0, NULL, WEIGHTB_TEXT,
+    add_bool( SOUT_CFG_PREFIX "weightb", 1, NULL, WEIGHTB_TEXT,
               WEIGHTB_LONGTEXT, false )
 #endif
 
@@ -619,7 +619,7 @@ vlc_module_begin ()
 #endif
 
 #if X264_BUILD >= 36 /* r318 */
-    add_bool( SOUT_CFG_PREFIX "mixed-refs", 0, NULL, MIXED_REFS_TEXT,
+    add_bool( SOUT_CFG_PREFIX "mixed-refs", 1, NULL, MIXED_REFS_TEXT,
               MIXED_REFS_LONGTEXT, false )
 #endif
 
@@ -643,7 +643,7 @@ vlc_module_begin ()
 #endif
 
 #if X264_BUILD >= 39 /* r360 */
-    add_integer( SOUT_CFG_PREFIX "trellis", 0, NULL, TRELLIS_TEXT,
+    add_integer( SOUT_CFG_PREFIX "trellis", 1, NULL, TRELLIS_TEXT,
                  TRELLIS_LONGTEXT, false )
         change_integer_range( 0, 2 )
 #endif
