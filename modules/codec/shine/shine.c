@@ -45,6 +45,8 @@
 #include <inttypes.h>
 #include <string.h>
 #include <limits.h>
+#include <assert.h>
+
 #include "../wmafixed/bswap.h"
 #include "enc_base.h"
 
