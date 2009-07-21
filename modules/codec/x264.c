@@ -872,7 +872,12 @@ static int  Open ( vlc_object_t *p_this )
 
     /* max bitrate = average bitrate -> CBR */
     var_Get( p_enc, SOUT_CFG_PREFIX "vbv-maxrate", &val );
-    p_sys->param.rc.i_vbv_max_bitrate = val.i_int;
+#if X264_BUILD >= 48
+    if( !val.i_int && p_sys->param.rc.i_rc_method == X264_RC_ABR )
+        p_sys->param.rc.i_vbv_max_bitrate = p_sys->param.rc.i_bitrate;
+    else
+#endif
+        p_sys->param.rc.i_vbv_max_bitrate = val.i_int;
 
 #else
     p_sys->param.rc.i_rc_buffer_size = p_sys->param.rc.i_bitrate;
