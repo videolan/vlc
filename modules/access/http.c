@@ -46,6 +46,7 @@
 #include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_md5.h>
+#include <vlc_http.h>
 
 #ifdef HAVE_ZLIB_H
 #   include <zlib.h>
@@ -137,21 +138,6 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 
-/* RFC 2617: Basic and Digest Access Authentication */
-typedef struct http_auth_t
-{
-    char *psz_realm;
-    char *psz_domain;
-    char *psz_nonce;
-    char *psz_opaque;
-    char *psz_stale;
-    char *psz_algorithm;
-    char *psz_qop;
-    int i_nonce;
-    char *psz_cnonce;
-    char *psz_HA1; /* stored H(A1) value if algorithm = "MD5-sess" */
-} http_auth_t;
-
 struct access_sys_t
 {
     int fd;
@@ -232,13 +218,10 @@ static char * cookie_get_name( const char * cookie );
 static void cookie_append( vlc_array_t * cookies, char * cookie );
 
 
-static void AuthParseHeader( access_t *p_access, const char *psz_header,
-                             http_auth_t *p_auth );
 static void AuthReply( access_t *p_acces, const char *psz_prefix,
                        vlc_url_t *p_url, http_auth_t *p_auth );
 static int AuthCheckReply( access_t *p_access, const char *psz_header,
                            vlc_url_t *p_url, http_auth_t *p_auth );
-static void AuthReset( http_auth_t *p_auth );
 
 /*****************************************************************************
  * Open:
@@ -314,6 +297,9 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     p_access->info.b_eof  = false;
 
     p_sys->cookies = saved_cookies;
+
+    http_auth_Init( &p_sys->auth );
+    http_auth_Init( &p_sys->proxy_auth );
 
     /* Parse URI - remove spaces */
     p = psz = strdup( p_access->psz_path );
@@ -518,10 +504,10 @@ connect:
         p_access->psz_path = strdup( p_sys->psz_location );
         /* Clean up current Open() run */
         vlc_UrlClean( &p_sys->url );
-        AuthReset( &p_sys->auth );
+        http_auth_Reset( &p_sys->auth );
         vlc_UrlClean( &p_sys->proxy );
         free( p_sys->psz_proxy_passbuf );
-        AuthReset( &p_sys->proxy_auth );
+        http_auth_Reset( &p_sys->proxy_auth );
         free( p_sys->psz_mime );
         free( p_sys->psz_pragma );
         free( p_sys->psz_location );
@@ -647,9 +633,9 @@ static void Close( vlc_object_t *p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     vlc_UrlClean( &p_sys->url );
-    AuthReset( &p_sys->auth );
+    http_auth_Reset( &p_sys->auth );
     vlc_UrlClean( &p_sys->proxy );
-    AuthReset( &p_sys->proxy_auth );
+    http_auth_Reset( &p_sys->proxy_auth );
 
     free( p_sys->psz_mime );
     free( p_sys->psz_pragma );
@@ -1511,12 +1497,14 @@ static int Request( access_t *p_access, int64_t i_tell )
         else if( !strcasecmp( psz, "www-authenticate" ) )
         {
             msg_Dbg( p_access, "Authentication header: %s", p );
-            AuthParseHeader( p_access, p, &p_sys->auth );
+            http_auth_ParseWwwAuthenticateHeader( VLC_OBJECT(p_access),
+                                                  &p_sys->auth, p );
         }
         else if( !strcasecmp( psz, "proxy-authenticate" ) )
         {
             msg_Dbg( p_access, "Proxy authentication header: %s", p );
-            AuthParseHeader( p_access, p, &p_sys->proxy_auth );
+            http_auth_ParseWwwAuthenticateHeader( VLC_OBJECT(p_access),
+                                                  &p_sys->proxy_auth, p );
         }
         else if( !strcasecmp( psz, "authentication-info" ) )
         {
@@ -1671,8 +1659,9 @@ static void cookie_append( vlc_array_t * cookies, char * cookie )
     vlc_array_append( cookies, cookie );
 }
 
+
 /*****************************************************************************
- * "RFC 2617: Basic and Digest Access Authentication" header parsing
+ * HTTP authentication
  *****************************************************************************/
 static char *AuthGetParam( const char *psz_header, const char *psz_param )
 {
@@ -1884,171 +1873,28 @@ static void AuthReply( access_t *p_access, const char *psz_prefix,
                        vlc_url_t *p_url, http_auth_t *p_auth )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    v_socket_t     *pvs = p_sys->p_vs;
+    char *psz_value;
 
-    const char *psz_username = p_url->psz_username ? p_url->psz_username : "";
-    const char *psz_password = p_url->psz_password ? p_url->psz_password : "";
+    psz_value =
+        http_auth_FormatAuthorizationHeader( VLC_OBJECT(p_access), p_auth,
+                                             "GET", p_url->psz_path,
+                                             p_url->psz_username,
+                                             p_url->psz_password );
+    if ( psz_value == NULL )
+        return;
 
-    if( p_auth->psz_nonce )
-    {
-        /* Digest Access Authentication */
-        char *psz_response;
-
-        if(    p_auth->psz_algorithm
-            && strcmp( p_auth->psz_algorithm, "MD5" )
-            && strcmp( p_auth->psz_algorithm, "MD5-sess" ) )
-        {
-            msg_Err( p_access, "Digest Access Authentication: "
-                     "Unknown algorithm '%s'", p_auth->psz_algorithm );
-            return;
-        }
-
-        if( p_auth->psz_qop || !p_auth->psz_cnonce )
-        {
-            /* FIXME: needs to be really random to prevent man in the middle
-             * attacks */
-            free( p_auth->psz_cnonce );
-            p_auth->psz_cnonce = strdup( "Some random string FIXME" );
-        }
-        p_auth->i_nonce ++;
-
-        psz_response = AuthDigest( p_access, p_url, p_auth, "GET" );
-        if( !psz_response ) return;
-
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
-                    "%sAuthorization: Digest "
-                    /* Mandatory parameters */
-                    "username=\"%s\", "
-                    "realm=\"%s\", "
-                    "nonce=\"%s\", "
-                    "uri=\"%s\", "
-                    "response=\"%s\", "
-                    /* Optional parameters */
-                    "%s%s%s" /* algorithm */
-                    "%s%s%s" /* cnonce */
-                    "%s%s%s" /* opaque */
-                    "%s%s%s" /* message qop */
-                    "%s%08x%s" /* nonce count */
-                    "\r\n",
-                    /* Mandatory parameters */
-                    psz_prefix,
-                    psz_username,
-                    p_auth->psz_realm,
-                    p_auth->psz_nonce,
-                    p_url->psz_path ? p_url->psz_path : "/",
-                    psz_response,
-                    /* Optional parameters */
-                    p_auth->psz_algorithm ? "algorithm=\"" : "",
-                    p_auth->psz_algorithm ? p_auth->psz_algorithm : "",
-                    p_auth->psz_algorithm ? "\", " : "",
-                    p_auth->psz_cnonce ? "cnonce=\"" : "",
-                    p_auth->psz_cnonce ? p_auth->psz_cnonce : "",
-                    p_auth->psz_cnonce ? "\", " : "",
-                    p_auth->psz_opaque ? "opaque=\"" : "",
-                    p_auth->psz_opaque ? p_auth->psz_opaque : "",
-                    p_auth->psz_opaque ? "\", " : "",
-                    p_auth->psz_qop ? "qop=\"" : "",
-                    p_auth->psz_qop ? p_auth->psz_qop : "",
-                    p_auth->psz_qop ? "\", " : "",
-                    p_auth->i_nonce ? "nc=\"" : "uglyhack=\"", /* Will be parsed as an unhandled extension */
-                    p_auth->i_nonce,
-                    p_auth->i_nonce ? "\"" : "\""
-                  );
-
-        free( psz_response );
-    }
-    else
-    {
-        /* Basic Access Authentication */
-        char buf[strlen( psz_username ) + strlen( psz_password ) + 2];
-        char *b64;
-
-        snprintf( buf, sizeof( buf ), "%s:%s", psz_username, psz_password );
-        b64 = vlc_b64_encode( buf );
-
-        if( b64 != NULL )
-        {
-             net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
-                         "%sAuthorization: Basic %s\r\n", psz_prefix, b64 );
-             free( b64 );
-        }
-    }
+    net_Printf( VLC_OBJECT(p_access), p_sys->fd, p_sys->p_vs,
+                "%sAuthorization: %s\r\n", psz_prefix, psz_value );
+    free( psz_value );
 }
 
 static int AuthCheckReply( access_t *p_access, const char *psz_header,
                            vlc_url_t *p_url, http_auth_t *p_auth )
 {
-    int i_ret = VLC_EGENERIC;
-    char *psz_nextnonce = AuthGetParam( psz_header, "nextnonce" );
-    char *psz_qop = AuthGetParamNoQuotes( psz_header, "qop" );
-    char *psz_rspauth = AuthGetParam( psz_header, "rspauth" );
-    char *psz_cnonce = AuthGetParam( psz_header, "cnonce" );
-    char *psz_nc = AuthGetParamNoQuotes( psz_header, "nc" );
-
-    if( psz_cnonce )
-    {
-        char *psz_digest;
-
-        if( strcmp( psz_cnonce, p_auth->psz_cnonce ) )
-        {
-            msg_Err( p_access, "HTTP Digest Access Authentication: server replied with a different client nonce value." );
-            goto error;
-        }
-
-        if( psz_nc )
-        {
-            int i_nonce;
-            i_nonce = strtol( psz_nc, NULL, 16 );
-            if( i_nonce != p_auth->i_nonce )
-            {
-                msg_Err( p_access, "HTTP Digest Access Authentication: server replied with a different nonce count value." );
-                goto error;
-            }
-        }
-
-        if( psz_qop && p_auth->psz_qop && strcmp( psz_qop, p_auth->psz_qop ) )
-            msg_Warn( p_access, "HTTP Digest Access Authentication: server replied using a different 'quality of protection' option" );
-
-        /* All the clear text values match, let's now check the response
-         * digest */
-        psz_digest = AuthDigest( p_access, p_url, p_auth, "" );
-        if( strcmp( psz_digest, psz_rspauth ) )
-        {
-            msg_Err( p_access, "HTTP Digest Access Authentication: server replied with an invalid response digest (expected value: %s).", psz_digest );
-            free( psz_digest );
-            goto error;
-        }
-        free( psz_digest );
-    }
-
-    if( psz_nextnonce )
-    {
-        free( p_auth->psz_nonce );
-        p_auth->psz_nonce = psz_nextnonce;
-        psz_nextnonce = NULL;
-    }
-
-    i_ret = VLC_SUCCESS;
-    error:
-        free( psz_nextnonce );
-        free( psz_qop );
-        free( psz_rspauth );
-        free( psz_cnonce );
-        free( psz_nc );
-
-    return i_ret;
-}
-
-static void AuthReset( http_auth_t *p_auth )
-{
-    FREENULL( p_auth->psz_realm );
-    FREENULL( p_auth->psz_domain );
-    FREENULL( p_auth->psz_nonce );
-    FREENULL( p_auth->psz_opaque );
-    FREENULL( p_auth->psz_stale );
-    FREENULL( p_auth->psz_algorithm );
-    FREENULL( p_auth->psz_qop );
-    p_auth->i_nonce = 0;
-    FREENULL( p_auth->psz_cnonce );
-    FREENULL( p_auth->psz_HA1 );
+    return
+        http_auth_ParseAuthenticationInfoHeader( VLC_OBJECT(p_access), p_auth,
+                                                 psz_header, "",
+                                                 p_url->psz_path,
+                                                 p_url->psz_username,
+                                                 p_url->psz_password );
 }
