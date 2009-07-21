@@ -490,12 +490,12 @@ vlc_module_begin ()
 
 /* Ratecontrol */
 
-    add_integer( SOUT_CFG_PREFIX "qp", 26, NULL, QP_TEXT, QP_LONGTEXT,
+    add_integer( SOUT_CFG_PREFIX "qp", -1, NULL, QP_TEXT, QP_LONGTEXT,
                  false )
-        change_integer_range( 0, 51 ) /* QP 0 -> lossless encoding */
+        change_integer_range( -1, 51 ) /* QP 0 -> lossless encoding */
 
 #if X264_BUILD >= 37 /* r334 */
-    add_integer( SOUT_CFG_PREFIX "crf", 0, NULL, CRF_TEXT,
+    add_integer( SOUT_CFG_PREFIX "crf", 23, NULL, CRF_TEXT,
                  CRF_LONGTEXT, false )
         change_integer_range( 0, 51 )
 #endif
@@ -812,8 +812,37 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->param.i_height = p_sys->param.i_height >> 4 << 4;
 #endif
 
-    /* average bitrate specified by transcode vb */
-    p_sys->param.rc.i_bitrate = p_enc->fmt_out.i_bitrate / 1000;
+
+    /* Check qcomp in here, to see if user want CBR (ABR) or do we use CRF/QP */
+    var_Get( p_enc, SOUT_CFG_PREFIX "qcomp", &val );
+    p_sys->param.rc.f_qcompress = val.f_float;
+    /* Enable ABR if qcomp near 0.0 */
+    if( val.f_float <= 0.1 )
+    {
+#if X264_BUILD < 48
+    /* cbr = 1 overrides qp or crf and sets an average bitrate
+       but maxrate = average bitrate is needed for "real" CBR */
+        p_sys->param.rc.b_cbr=1;
+#endif
+        p_sys->param.rc.i_rc_method = X264_RC_ABR;
+    }
+    else /* Set default to CRF */
+    {
+#if X264_BUILD >= 37
+        var_Get( p_enc, SOUT_CFG_PREFIX "crf", &val );
+        if( val.i_int > 0 && val.i_int <= 51 )
+        {
+#   if X264_BUILD >= 54
+            p_sys->param.rc.f_rf_constant = val.i_int;
+#   else
+            p_sys->param.rc.i_rf_constant = val.i_int;
+#   endif
+#   if X264_BUILD >= 48
+            p_sys->param.rc.i_rc_method = X264_RC_CRF;
+#   endif
+        }
+#endif
+    }
 
     var_Get( p_enc, SOUT_CFG_PREFIX "qpstep", &val );
     if( val.i_int >= 0 && val.i_int <= 51 ) p_sys->param.rc.i_qp_step = val.i_int;
@@ -836,6 +865,7 @@ static int  Open ( vlc_object_t *p_this )
         if( i_qmin > val.i_int ) i_qmin = val.i_int;
         if( i_qmax < val.i_int ) i_qmax = val.i_int;
 
+        /* User defined QP-value, so change ratecontrol method */
         p_sys->param.rc.i_rc_method = X264_RC_CQP;
 #if X264_BUILD >= 0x000a
         p_sys->param.rc.i_qp_constant = val.i_int;
@@ -846,13 +876,9 @@ static int  Open ( vlc_object_t *p_this )
 #endif
     }
 
-#if X264_BUILD < 48
-    /* cbr = 1 overrides qp or crf and sets an average bitrate
-       but maxrate = average bitrate is needed for "real" CBR */
-    if( p_sys->param.rc.i_bitrate > 0 ) p_sys->param.rc.b_cbr = 1;
-#else
-    if( p_sys->param.rc.i_bitrate > 0 ) p_sys->param.rc.i_rc_method = X264_RC_ABR;
-#endif
+    /* average bitrate specified by transcode vb, define if not QP-encode*/
+    if( p_sys->param.rc.i_rc_method != X264_RC_CQP ) 
+        p_sys->param.rc.i_bitrate = p_enc->fmt_out.i_bitrate / 1000;
 
 #if X264_BUILD >= 24
     var_Get( p_enc, SOUT_CFG_PREFIX "ratetol", &val );
@@ -875,7 +901,7 @@ static int  Open ( vlc_object_t *p_this )
 #if X264_BUILD >= 48
     if( !val.i_int && p_sys->param.rc.i_rc_method == X264_RC_ABR )
         p_sys->param.rc.i_vbv_max_bitrate = p_sys->param.rc.i_bitrate;
-    else
+    else if ( val.i_int )
 #endif
         p_sys->param.rc.i_vbv_max_bitrate = val.i_int;
 
@@ -921,8 +947,6 @@ static int  Open ( vlc_object_t *p_this )
     var_Get( p_enc, SOUT_CFG_PREFIX "pbratio", &val );
     p_sys->param.rc.f_pb_factor = val.f_float;
 
-    var_Get( p_enc, SOUT_CFG_PREFIX "qcomp", &val );
-    p_sys->param.rc.f_qcompress = val.f_float;
 
     var_Get( p_enc, SOUT_CFG_PREFIX "cplxblur", &val );
     p_sys->param.rc.f_complexity_blur = val.f_float;
@@ -1099,20 +1123,6 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->param.analyse.b_mixed_references = val.b_bool;
 #endif
 
-#if X264_BUILD >= 37
-    var_Get( p_enc, SOUT_CFG_PREFIX "crf", &val );
-    if( val.i_int > 0 && val.i_int <= 51 )
-    {
-#   if X264_BUILD >= 54
-        p_sys->param.rc.f_rf_constant = val.i_int;
-#   else
-        p_sys->param.rc.i_rf_constant = val.i_int;
-#   endif
-#   if X264_BUILD >= 48
-        p_sys->param.rc.i_rc_method = X264_RC_CRF;
-#   endif
-    }
-#endif
 
 #if X264_BUILD >= 39
     var_Get( p_enc, SOUT_CFG_PREFIX "trellis", &val );
