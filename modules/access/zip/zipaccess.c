@@ -105,6 +105,12 @@ int AccessOpen( vlc_object_t *p_this )
 
     char *psz_pathToZip = NULL, *psz_path = NULL, *psz_sep = NULL;
 
+    if( !strstr( p_access->psz_path, ZIP_SEP ) )
+    {
+        msg_Dbg( p_access, "path does not contain separator " ZIP_SEP );
+        return VLC_EGENERIC;
+    }
+
     p_access->p_sys = p_sys = (access_sys_t*)
             calloc( 1, sizeof( access_sys_t ) );
     if( !p_sys )
@@ -113,11 +119,6 @@ int AccessOpen( vlc_object_t *p_this )
     /* Split the MRL */
     psz_path = strdup( p_access->psz_path );
     psz_sep = strstr( psz_path, ZIP_SEP );
-    if( !psz_sep )
-    {
-        msg_Dbg( p_access, "path does not contain separator " ZIP_SEP );
-        return VLC_EGENERIC;
-    }
 
     *psz_sep = '\0';
     psz_pathToZip = unescapeXml( psz_path );
