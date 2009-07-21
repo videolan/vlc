@@ -181,12 +181,13 @@ buffered:
 
 static block_t *EncodeFrame( encoder_t *p_enc, aout_buffer_t *p_block )
 {
-    encoder_sys_t *p_sys = (encoder_sys_t *)p_enc->p_sys;
     block_t *p_pcm_block;
     block_t *p_chain = NULL;
     unsigned int i_samples = p_block->i_nb_bytes >> 2 /* s16l stereo */;
     mtime_t start_date = p_block->start_date;
     start_date -= (mtime_t)i_samples * (mtime_t)1000000 / (mtime_t)p_enc->fmt_out.audio.i_rate;
+
+    VLC_UNUSED(p_enc);
 
     do {
         p_pcm_block = GetPCM( p_enc, p_block );
