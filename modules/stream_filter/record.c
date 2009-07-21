@@ -56,8 +56,6 @@ vlc_module_end()
  *****************************************************************************/
 struct stream_sys_t
 {
-    bool b_active;
-
     FILE *f;        /* TODO it could be replaced by access_output_t one day */
     bool b_error;
 };
@@ -87,7 +85,7 @@ static int Open ( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->b_active = false;
+    p_sys->f = NULL;
 
     /* */
     s->pf_read = Read;
@@ -105,7 +103,7 @@ static void Close( vlc_object_t *p_this )
     stream_t *s = (stream_t*)p_this;
     stream_sys_t *p_sys = s->p_sys;
 
-    if( p_sys->b_active )
+    if( p_sys->f )
         Stop( s );
 
     free( p_sys );
@@ -120,14 +118,14 @@ static int Read( stream_t *s, void *p_read, unsigned int i_read )
     void *p_record = p_read;
 
     /* Allocate a temporary buffer for record when no p_read */
-    if( p_sys->b_active && !p_record )
+    if( p_sys->f && !p_record )
         p_record = malloc( i_read );
 
     /* */
     const int i_record = stream_Read( s->p_source, p_record, i_read );
 
     /* Dump read data */
-    if( p_sys->b_active )
+    if( p_sys->f )
     {
         if( p_record && i_record > 0 )
             Write( s, p_record, i_record );
@@ -153,7 +151,7 @@ static int Control( stream_t *s, int i_query, va_list args )
     if( b_active )
         psz_extension = (const char*)va_arg( args, const char* );
 
-    if( !s->p_sys->b_active == !b_active )
+    if( !s->p_sys->f == !b_active )
         return VLC_SUCCESS;
 
     if( b_active )
@@ -207,7 +205,6 @@ static int Start( stream_t *s, const char *psz_extension )
 
     /* */
     p_sys->f = f;
-    p_sys->b_active = true;
     p_sys->b_error = false;
     return VLC_SUCCESS;
 }
@@ -215,11 +212,11 @@ static int Stop( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    assert( p_sys->b_active );
+    assert( p_sys->f );
 
     msg_Dbg( s, "Recording completed" );
     fclose( p_sys->f );
-    p_sys->b_active = false;
+    p_sys->f = NULL;
     return VLC_SUCCESS;
 }
 
@@ -227,7 +224,7 @@ static void Write( stream_t *s, const uint8_t *p_buffer, size_t i_buffer )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    assert( p_sys->b_active );
+    assert( p_sys->f );
 
     if( i_buffer > 0 )
     {
