@@ -129,6 +129,7 @@ static int initOpenGL( projectm_thread_t *p_thread )
     p_thread->p_opengl->render.i_height = p_thread->i_height;
     p_thread->p_opengl->render.i_aspect = VOUT_ASPECT_FACTOR;
     p_thread->p_opengl->b_fullscreen = false;
+    p_thread->p_opengl->b_autoscale = true;
     p_thread->p_opengl->i_alignment = 0;
     p_thread->p_opengl->fmt_in.i_sar_num = 1;
     p_thread->p_opengl->fmt_in.i_sar_den = 1;
@@ -304,6 +305,8 @@ static void* Thread( vlc_object_t *p_this )
 
     while( vlc_object_alive( p_thread ) )
     {
+        /* Manage the events */
+        p_thread->p_opengl->pf_manage( p_thread->p_opengl );
         /* Render the image and swap the buffers */
         vlc_mutex_lock( &p_thread->lock );
         if( p_thread->i_nb_samples > 0 )
