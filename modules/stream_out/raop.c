@@ -115,6 +115,7 @@ struct sout_stream_sys_t
     char *psz_url;
     char *psz_client_instance;
     char *psz_session;
+    char *psz_last_status_line;
 
     int i_cseq;
     int i_server_port;
@@ -187,6 +188,7 @@ static void FreeSys( vlc_object_t *p_this, sout_stream_sys_t *p_sys )
     free( p_sys->psz_url );
     free( p_sys->psz_session );
     free( p_sys->psz_client_instance );
+    free( p_sys->psz_last_status_line );
     free( p_sys );
 }
 
@@ -573,27 +575,29 @@ static int ReadStatusLine( vlc_object_t *p_this )
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    char *psz_original = NULL;
     char *psz_line = NULL;
     char *psz_token;
     char *psz_next;
     int i_err = VLC_SUCCESS;
 
-    psz_line = net_Gets( p_this, p_sys->i_control_fd, NULL );
-    if ( !psz_line )
+    p_sys->psz_last_status_line = net_Gets( p_this, p_sys->i_control_fd,
+                                            NULL );
+    if ( !p_sys->psz_last_status_line )
     {
         i_err = VLC_EGENERIC;
         goto error;
     }
 
-    psz_original = strdup( psz_line );
+    /* Create working copy */
+    psz_line = strdup( p_sys->psz_last_status_line );
     psz_next = psz_line;
 
     /* Protocol field */
     psz_token = strsep( &psz_next, psz_delim_space );
     if ( !psz_token || strncmp( psz_token, "RTSP/1.", 7 ) != 0 )
     {
-        msg_Err( p_this, "Unknown protocol (%s)", psz_original );
+        msg_Err( p_this, "Unknown protocol (%s)",
+                 p_sys->psz_last_status_line );
         i_err = VLC_EGENERIC;
         goto error;
     }
@@ -602,13 +606,13 @@ static int ReadStatusLine( vlc_object_t *p_this )
     psz_token = strsep( &psz_next, psz_delim_space );
     if ( !psz_token || strcmp( psz_token, "200" ) != 0 )
     {
-        msg_Err( p_this, "Request failed (%s)", psz_original );
+        msg_Err( p_this, "Request failed (%s)",
+                 p_sys->psz_last_status_line );
         i_err = VLC_EGENERIC;
         goto error;
     }
 
 error:
-    free( psz_original );
     free( psz_line );
 
     return i_err;
@@ -813,6 +817,8 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
     }
 
 error:
+    FREENULL( p_sys->psz_last_status_line );
+
     return i_err;
 }
 
