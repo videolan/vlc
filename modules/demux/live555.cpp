@@ -1268,7 +1268,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     time = f * (double)p_sys->i_npt_length;   /* in second */
                 }
 
-                if( !p_sys->rtsp->playMediaSession( *p_sys->ms, time, -1, 1 ) )
+                if( !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) ||
+                    !p_sys->rtsp->playMediaSession( *p_sys->ms, time, -1, 1 ) )
                 {
                     msg_Err( p_demux, "PLAY failed %s",
                         p_sys->env->getResultMsg() );
