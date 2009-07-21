@@ -85,7 +85,7 @@ function parse()
         end
         if string.match( line, "<meta name=\"description\"" )
         then
-            description = vlc.strings.resolve_xml_special_chars( find( line, "name=\"description\" lang=\".-\" content=\"(.-)\"" ) )
+            description = vlc.strings.resolve_xml_special_chars( vlc.strings.resolve_xml_special_chars( find( line, "name=\"description\" lang=\".-\" content=\"(.-)\"" ) ) )
         end
         if path and name and description and arturl then break end
     end
