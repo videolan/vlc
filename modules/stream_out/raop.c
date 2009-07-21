@@ -578,13 +578,13 @@ static int ReadStatusLine( vlc_object_t *p_this )
     char *psz_line = NULL;
     char *psz_token;
     char *psz_next;
-    int i_err = VLC_SUCCESS;
+    int i_result;
 
     p_sys->psz_last_status_line = net_Gets( p_this, p_sys->i_control_fd,
                                             NULL );
     if ( !p_sys->psz_last_status_line )
     {
-        i_err = VLC_EGENERIC;
+        i_result = VLC_EGENERIC;
         goto error;
     }
 
@@ -598,24 +598,26 @@ static int ReadStatusLine( vlc_object_t *p_this )
     {
         msg_Err( p_this, "Unknown protocol (%s)",
                  p_sys->psz_last_status_line );
-        i_err = VLC_EGENERIC;
+        i_result = VLC_EGENERIC;
         goto error;
     }
 
     /* Status field */
     psz_token = strsep( &psz_next, psz_delim_space );
-    if ( !psz_token || strcmp( psz_token, "200" ) != 0 )
+    if ( !psz_token )
     {
         msg_Err( p_this, "Request failed (%s)",
                  p_sys->psz_last_status_line );
-        i_err = VLC_EGENERIC;
+        i_result = VLC_EGENERIC;
         goto error;
     }
+
+    i_result = atoi( psz_token );
 
 error:
     free( psz_line );
 
-    return i_err;
+    return i_result;
 }
 
 static int ReadHeader( vlc_object_t *p_this,
@@ -785,6 +787,7 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     int headers_done;
     int i_err = VLC_SUCCESS;
+    int i_status;
 
     if ( p_sys->i_control_fd < 0 )
     {
@@ -800,9 +803,20 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
         goto error;
 
     /* Read status line */
-    i_err = ReadStatusLine( p_this );
-    if ( i_err != VLC_SUCCESS )
+    i_status = ReadStatusLine( p_this );
+    if ( i_status < 0 )
+    {
+        i_err = i_status;
         goto error;
+    }
+
+    if ( i_status != 200 )
+    {
+        msg_Err( p_this, "Request failed (%s), status is %d",
+                 p_sys->psz_last_status_line, i_status );
+        i_err = VLC_EGENERIC;
+        goto error;
+    }
 
     if ( p_resp_headers )
         vlc_dictionary_clear( p_resp_headers, FreeHeader, NULL );
