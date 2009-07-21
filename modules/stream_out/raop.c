@@ -810,14 +810,6 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
         goto error;
     }
 
-    if ( i_status != 200 )
-    {
-        msg_Err( p_this, "Request failed (%s), status is %d",
-                 p_sys->psz_last_status_line, i_status );
-        i_err = VLC_EGENERIC;
-        goto error;
-    }
-
     if ( p_resp_headers )
         vlc_dictionary_clear( p_resp_headers, FreeHeader, NULL );
 
@@ -828,6 +820,14 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
         i_err = ReadHeader( p_this, p_resp_headers, &headers_done );
         if ( i_err != VLC_SUCCESS )
             goto error;
+    }
+
+    if ( i_status != 200 )
+    {
+        msg_Err( p_this, "Request failed (%s), status is %d",
+                 p_sys->psz_last_status_line, i_status );
+        i_err = VLC_EGENERIC;
+        goto error;
     }
 
 error:
