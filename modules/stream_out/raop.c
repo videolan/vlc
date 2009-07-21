@@ -644,7 +644,7 @@ static int ReadHeader( vlc_object_t *p_this,
     /* Empty line for response end */
     if ( psz_line[0] == '\0' )
         *done = 1;
-    else if ( p_resp_headers )
+    else
     {
         psz_original = strdup( psz_line );
         psz_next = psz_line;
@@ -755,12 +755,9 @@ static int SendRequest( vlc_object_t *p_this, const char *psz_method,
         }
     }
 
-    if ( p_req_headers )
-    {
-        i_err = WriteAuxHeaders( p_this, p_req_headers );
-        if ( i_err != VLC_SUCCESS )
-            goto error;
-    }
+    i_err = WriteAuxHeaders( p_this, p_req_headers );
+    if ( i_err != VLC_SUCCESS )
+        goto error;
 
     i_rc = net_Write( p_this, p_sys->i_control_fd, NULL,
                       psz_headers_end, sizeof( psz_headers_end ) - 1 );
@@ -810,8 +807,7 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
         goto error;
     }
 
-    if ( p_resp_headers )
-        vlc_dictionary_clear( p_resp_headers, FreeHeader, NULL );
+    vlc_dictionary_clear( p_resp_headers, FreeHeader, NULL );
 
     /* Read headers */
     headers_done = 0;
@@ -1044,34 +1040,46 @@ error:
 static int SendFlush( vlc_object_t *p_this )
 {
     VLC_UNUSED( p_this );
-
+    vlc_dictionary_t resp_headers;
     vlc_dictionary_t req_headers;
     int i_err = VLC_SUCCESS;
 
     vlc_dictionary_init( &req_headers, 0 );
+    vlc_dictionary_init( &resp_headers, 0 );
 
     vlc_dictionary_insert( &req_headers, "RTP-Info",
                            (void *)"seq=0;rtptime=0" );
 
-    i_err = ExecRequest( p_this, "FLUSH", NULL, NULL, &req_headers, NULL );
+    i_err = ExecRequest( p_this, "FLUSH", NULL, NULL,
+                         &req_headers, &resp_headers );
     if ( i_err != VLC_SUCCESS )
         goto error;
 
 error:
     vlc_dictionary_clear( &req_headers, NULL, NULL );
+    vlc_dictionary_clear( &resp_headers, FreeHeader, NULL );
 
     return i_err;
 }
 
 static int SendTeardown( vlc_object_t *p_this )
 {
+    vlc_dictionary_t resp_headers;
+    vlc_dictionary_t req_headers;
     int i_err = VLC_SUCCESS;
 
-    i_err = ExecRequest( p_this, "TEARDOWN", NULL, NULL, NULL, NULL );
+    vlc_dictionary_init( &req_headers, 0 );
+    vlc_dictionary_init( &resp_headers, 0 );
+
+    i_err = ExecRequest( p_this, "TEARDOWN", NULL, NULL,
+                         &req_headers, &resp_headers );
     if ( i_err != VLC_SUCCESS )
         goto error;
 
 error:
+    vlc_dictionary_clear( &req_headers, NULL, NULL );
+    vlc_dictionary_clear( &resp_headers, FreeHeader, NULL );
+
     return i_err;
 }
 
@@ -1080,12 +1088,14 @@ static int UpdateVolume( vlc_object_t *p_this )
     sout_stream_t *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     vlc_dictionary_t req_headers;
+    vlc_dictionary_t resp_headers;
     char *psz_parameters = NULL;
     double d_volume;
     int i_err = VLC_SUCCESS;
     int i_rc;
 
     vlc_dictionary_init( &req_headers, 0 );
+    vlc_dictionary_init( &resp_headers, 0 );
 
     /* Our volume is 0..255, RAOP is -144..0 (-144 off, -30..0 on) */
 
@@ -1110,12 +1120,13 @@ static int UpdateVolume( vlc_object_t *p_this )
 
     i_err = ExecRequest( p_this, "SET_PARAMETER",
                          "text/parameters", psz_parameters,
-                         &req_headers, NULL );
+                         &req_headers, &resp_headers );
     if ( i_err != VLC_SUCCESS )
         goto error;
 
 error:
     vlc_dictionary_clear( &req_headers, NULL, NULL );
+    vlc_dictionary_clear( &resp_headers, FreeHeader, NULL );
     free( psz_parameters );
 
     return i_err;
