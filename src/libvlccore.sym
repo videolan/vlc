@@ -147,6 +147,11 @@ GetFallbackEncoding
 GetLang_1
 GetLang_2B
 GetLang_2T
+http_auth_Init
+http_auth_Reset
+http_auth_ParseWwwAuthenticateHeader
+http_auth_ParseAuthenticationInfoHeader
+http_auth_FormatAuthorizationHeader
 httpd_ClientIP
 httpd_ClientModeBidir
 httpd_ClientModeStream

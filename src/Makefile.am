@@ -66,6 +66,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_filter.h \
 	../include/vlc_fourcc.h \
 	../include/vlc_gcrypt.h \
+	../include/vlc_http.h \
 	../include/vlc_httpd.h \
 	../include/vlc_image.h \
 	../include/vlc_input.h \
@@ -414,6 +415,7 @@ SOURCES_libvlc_common = \
 	extras/libc.c \
 	misc/filter.c \
 	misc/filter_chain.c \
+	misc/http_auth.c \
 	$(NULL)
 
 SOURCES_libvlc_httpd = \
