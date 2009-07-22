@@ -51,6 +51,12 @@ int main( int i_argc, const char *ppsz_argv[] )
 {
     int i_ret;
 
+#ifdef __APPLE__
+    /* The so-called POSIX-compliant MacOS X is not. 
+     * SIGPIPE fires even when it is blocked in all threads! */
+    signal (SIGPIPE, SIG_IGN);
+#endif
+
 #ifndef ALLOW_RUN_AS_ROOT
     if (geteuid () == 0)
     {
