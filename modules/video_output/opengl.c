@@ -388,6 +388,11 @@ static void End( vout_thread_t *p_vout )
     {
         p_sys->p_vout->pf_unlock( p_sys->p_vout );
     }
+
+    /* We must release the opengl provider here: opengl requiere init and end
+       to be done in the same thread */
+    module_unneed( p_sys->p_vout, p_sys->p_vout->p_module );
+    vlc_object_release( p_sys->p_vout );
 }
 
 /*****************************************************************************
@@ -399,9 +404,6 @@ static void DestroyVout( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t *p_sys = p_vout->p_sys;
-
-    module_unneed( p_sys->p_vout, p_sys->p_vout->p_module );
-    vlc_object_release( p_sys->p_vout );
 
     free( p_sys );
 }
