@@ -272,6 +272,13 @@ static void Close( vlc_object_t * );
     "-1 is automatic, based on number of threads." )
 #endif
 
+#if X264_BUILD >= 65
+#define PSY_RD_TEXT N_( "Strength of psychovisual optimization, default is \"1.0:0.0\"")
+#define PSY_RD_LONGTEXT N_( "First parameter controls if RD is on (subme>=6) or off"\
+        "second parameter controls if Trellis is used on psychovisual optimization," \
+        "default off")
+#endif
+
 #define SUBME_TEXT N_("Subpixel motion estimation and partition decision " \
     "quality")
 #if X264_BUILD >= 65 
@@ -480,6 +487,11 @@ vlc_module_begin ()
                  FILTER_LONGTEXT, false )
         add_deprecated_alias( SOUT_CFG_PREFIX "filter" ) /* Deprecated since 0.8.6 */
 
+#if X264_BUILD >= 65
+    add_string( SOUT_CFG_PREFIX "psy-rd", "1.0:0.0", NULL, PSY_RD_TEXT,
+                PSY_RD_LONGTEXT, false )
+
+#endif
     add_string( SOUT_CFG_PREFIX "level", "5.1", NULL, LEVEL_TEXT,
                LEVEL_LONGTEXT, false )
 
@@ -730,7 +742,7 @@ static const char *const ppsz_sout_options[] = {
     "qpmin", "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut",
     "sps-id", "ssim", "stats", "subme", "subpel", "tolerance", "trellis",
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "aq-mode",
-    "aq-strength",NULL
+    "aq-strength", "psy-rd", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -925,6 +937,18 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_deblocking_filter_beta = p ? atoi( p+1 ) : p_sys->param.i_deblocking_filter_alphac0;
         free( val.psz_string );
     }
+
+#if X264_BUILD >= 65
+    var_Get( p_enc, SOUT_CFG_PREFIX "psy-rd", &val );
+    if( val.psz_string )
+    {
+        char *p = strchr( val.psz_string, ':' );
+        p_sys->param.analyse.f_psy_rd = atof( val.psz_string );
+        p_sys->param.analyse.f_psy_trellis = p ? atof( p+1 ) : 0;
+        free( val.psz_string );
+    }
+
+#endif
 
     var_Get( p_enc, SOUT_CFG_PREFIX "level", &val );
     if( val.psz_string )
