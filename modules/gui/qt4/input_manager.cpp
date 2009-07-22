@@ -150,6 +150,9 @@ void InputManager::customEvent( QEvent *event )
     int i_type = event->type();
     IMEvent *ple = static_cast<IMEvent *>(event);
 
+    if( i_type == ItemChanged_Type )
+        UpdateMeta( ple->p_item->i_id );
+
     if( !hasInput() )
         return;
 
@@ -178,7 +181,6 @@ void InputManager::customEvent( QEvent *event )
             UpdateArt();
             /* Update duration of file */
         }
-        UpdateMeta( ple->p_item->i_id );
         break;
     case ItemStateChanged_Type:
         // TODO: Fusion with above state
