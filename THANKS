@@ -187,6 +187,7 @@ Laurent Mutricy <laurent.mutricy at ecl2005 dot ec-lyon dot fr> - HTTP interface
 Leo Spalteholz <leo dot spalteholz at gmail dot com> - Qt interface design
 Loox Thefuture <loox.thefuture at gmail dot com> - Media key in X11 vout
 Lorena Gomes - Catalan translation
+Luca Barbato <lu_zero -at- gentOo | org> - RTSP client fix
 Ludovic Fauvet <etix # l0cal dot com> - Qt4 patch
 Lukas Durfina <lukas.durfina at gmail.com> - Qt4: full screen controller. Teletext button fix. Various fixes.
 Luqman Hakim <ovdl qt rocketmail dot com> - Indonesian translation
