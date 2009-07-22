@@ -26,19 +26,15 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
 #include <vlc_keys.h>
-//#include <vlc_aout.h>
 
 #include <sys/types.h>
 #ifndef WIN32

@@ -25,13 +25,11 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <errno.h>                                                 /* ENOMEM */
-
-#include <ggi/ggi.h>
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#include <ggi/ggi.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
