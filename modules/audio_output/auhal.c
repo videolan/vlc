@@ -1051,7 +1051,7 @@ static void Probe( aout_instance_t * p_aout )
     return;
 
 error:
-    var_Destroy( p_aout, "audio-device" );
+    msg_Warn( p_aout, "audio device already initialized" );
     free( p_devices );
     return;
 }
