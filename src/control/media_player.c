@@ -595,13 +595,13 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
         var_Set( p_input_thread, "drawable-hwnd", val );
     }
 
-	var_Create( p_input_thread, "drawable-nsobject", VLC_VAR_ADDRESS );
+    var_Create( p_input_thread, "drawable-nsobject", VLC_VAR_ADDRESS );
     if( p_mi->drawable.nsobject != NULL )
     {
         vlc_value_t val = { .p_address = p_mi->drawable.nsobject };
         var_Set( p_input_thread, "drawable-nsobject", val );
     }
-	
+
     var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
     var_AddCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-event", input_event_changed, p_mi );

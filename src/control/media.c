@@ -352,11 +352,11 @@ libvlc_media_t * libvlc_media_new_as_node(
  **************************************************************************/
 void libvlc_media_add_option(
                                    libvlc_media_t * p_md,
-                                   const char * ppsz_option,
+                                   const char * psz_option,
                                    libvlc_exception_t *p_e )
 {
     VLC_UNUSED(p_e);
-    input_item_AddOption( p_md->p_input_item, ppsz_option,
+    input_item_AddOption( p_md->p_input_item, psz_option,
                           VLC_INPUT_OPTION_UNIQUE|VLC_INPUT_OPTION_TRUSTED );
 }
 
@@ -598,13 +598,5 @@ libvlc_media_get_user_data( libvlc_media_t * p_md,
                                        libvlc_exception_t * p_e )
 {
     VLC_UNUSED(p_e);
-
-    if( p_md )
-    {
-        return p_md->p_user_data;
-    }
-    else
-    {
-        return NULL;
-    }
+    return p_md ? p_md->p_user_data : NULL;
 }
