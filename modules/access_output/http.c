@@ -165,12 +165,11 @@ static int Open( vlc_object_t *p_this )
     char                *psz_bind_addr;
     int                 i_bind_port;
     char                *psz_file_name;
-    char                *psz_user = NULL;
-    char                *psz_pwd = NULL;
-    char                *psz_mime = NULL;
+    char                *psz_user;
+    char                *psz_pwd;
+    char                *psz_mime;
     char                *psz_cert = NULL, *psz_key = NULL, *psz_ca = NULL,
                         *psz_crl = NULL;
-    vlc_value_t         val;
 
     if( !( p_sys = p_access->p_sys =
                 malloc( sizeof( sout_access_out_sys_t ) ) ) )
@@ -251,30 +250,16 @@ static int Open( vlc_object_t *p_this )
     }
     free( psz_parser );
 
+    psz_user = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "user" );
+    psz_pwd = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "pwd" );
     if( p_access->psz_access && !strcmp( p_access->psz_access, "mmsh" ) )
     {
         psz_mime = strdup( "video/x-ms-asf-stream" );
     }
     else
     {
-        var_Get( p_access, SOUT_CFG_PREFIX "mime", &val );
-        if( *val.psz_string )
-            psz_mime = val.psz_string;
-        else
-            free( val.psz_string );
+        psz_mime = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "mime" );
     }
-
-    var_Get( p_access, SOUT_CFG_PREFIX "user", &val );
-    if( *val.psz_string )
-        psz_user = val.psz_string;
-    else
-        free( val.psz_string );
-
-    var_Get( p_access, SOUT_CFG_PREFIX "pwd", &val );
-    if( *val.psz_string )
-        psz_pwd = val.psz_string;
-    else
-        free( val.psz_string );
 
     p_sys->p_httpd_stream =
         httpd_StreamNew( p_sys->p_httpd_host, psz_file_name, psz_mime,
