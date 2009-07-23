@@ -59,6 +59,7 @@
 #if defined( WIN32 )
 #   include <io.h>
 #   include <ctype.h>
+#   include <shlwapi.h>
 #else
 #   include <unistd.h>
 #   include <poll.h>
@@ -171,6 +172,10 @@ static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
+#ifdef WIN32
+    wchar_t wpath[MAX_PATH+1];
+    bool is_remote = false;
+#endif
 
     STANDARD_READ_ACCESS_INIT;
     p_sys->i_nb_reads = 0;
@@ -187,6 +192,13 @@ static int Open( vlc_object_t *p_this )
     {
         msg_Dbg (p_access, "opening file `%s'", p_access->psz_path);
         fd = open_file (p_access, p_access->psz_path);
+#ifdef WIN32
+        if (MultiByteToWideChar (CP_UTF8, 0, p_access->psz_path, -1,
+                                 wpath, MAX_PATH)
+         && PathIsNetworkPathW (wpath))
+            is_remote = true;
+# define IsRemote( fd ) ((void)fd, is_remote)
+#endif
     }
     if (fd == -1)
         goto error;

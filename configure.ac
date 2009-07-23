@@ -354,6 +354,7 @@ case "${host_os}" in
         VLC_ADD_LIBS([activex mozilla],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx cddax sdl_image],[-lwinmm])
         VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap slp http stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp telnet rc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd],[-lws2_32])
+        VLC_ADD_LIBS([access_file], [-lshlwapi])
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
