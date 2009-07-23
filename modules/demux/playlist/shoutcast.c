@@ -34,7 +34,7 @@
 #include <vlc_demux.h>
 
 #include "playlist.h"
-#include "vlc_xml.h"
+#include <vlc_xml.h>
 
 struct demux_sys_t
 {

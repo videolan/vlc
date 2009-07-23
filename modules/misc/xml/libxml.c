@@ -28,9 +28,9 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-#include "vlc_block.h"
-#include "vlc_stream.h"
-#include "vlc_xml.h"
+#include <vlc_block.h>
+#include <vlc_stream.h>
+#include <vlc_xml.h>
 
 #include <libxml/xmlreader.h>
 #include <libxml/catalog.h>

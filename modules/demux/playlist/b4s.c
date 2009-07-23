@@ -32,9 +32,9 @@
 #include <vlc_common.h>
 #include <vlc_demux.h>
 #include <vlc_interface.h>
+#include <vlc_xml.h>
 
 #include "playlist.h"
-#include "vlc_xml.h"
 
 struct demux_sys_t
 {

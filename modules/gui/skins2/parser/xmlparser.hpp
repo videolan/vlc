@@ -25,9 +25,9 @@
 #define XMLPARSER_HPP
 
 #include "../src/skin_common.hpp"
-#include "vlc_block.h"
-#include "vlc_stream.h"
-#include "vlc_xml.h"
+#include <vlc_block.h>
+#include <vlc_stream.h>
+#include <vlc_xml.h>
 #include <map>
 
 // Current DTD version
