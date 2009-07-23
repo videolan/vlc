@@ -166,10 +166,10 @@ static void Close( vlc_object_t *p_this )
     skin_load.intf = NULL;
     vlc_mutex_unlock( &skin_load.mutex);
 
+    vlc_join( p_intf->p_sys->thread, NULL );
+
     vlc_mutex_destroy( &p_intf->p_sys->init_lock );
     vlc_cond_destroy( &p_intf->p_sys->init_wait );
-
-    vlc_join( p_intf->p_sys->thread, NULL );
 
     if( p_intf->p_sys->p_playlist )
         pl_Release( p_this );
