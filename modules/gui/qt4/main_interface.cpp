@@ -1134,7 +1134,7 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
 
         if( s.length() > 0 ) {
             playlist_Add( THEPL, qtu(s), NULL,
-                          PLAYLIST_APPEND | (first ? PLAYLIST_GO: 0),
+                          PLAYLIST_APPEND | PLAYLIST_PREPARSE | (first ? PLAYLIST_GO: 0),
                           PLAYLIST_END, true, false );
             first = false;
             RecentsMRL::getInstance( p_intf )->addRecent( s );
