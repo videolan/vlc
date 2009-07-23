@@ -157,6 +157,7 @@ static bool IsRemote (int fd)
 
 #endif
 #else /* !HAVE_FSTATFS */
+    (void)fd;
     return false;
 
 #endif
