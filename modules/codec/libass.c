@@ -342,7 +342,11 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
     if( b_fmt_changed )
     {
         ass_set_frame_size( p_ass->p_renderer, fmt.i_width, fmt.i_height );
-        ass_set_aspect_ratio( p_ass->p_renderer, 1.0 ); // TODO ?
+#if defined( LIBASS_VERSION ) && LIBASS_VERSION >= 0x00907000
+    ass_set_aspect_ratio( p_ass->p_renderer, 1.0, 1.0 ); // TODO ?
+#else
+    ass_set_aspect_ratio( p_ass->p_renderer, 1.0 ); // TODO ?
+#endif
 
         p_ass->fmt = fmt;
     }
@@ -744,13 +748,21 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 #ifdef WIN32
     dialog_ProgressSet( p_dialog, NULL, 0.2 );
 #endif
+#if defined( LIBASS_VERSION ) && LIBASS_VERSION >= 0x00907000
+    ass_set_fonts( p_renderer, psz_font, psz_family, true, NULL, 0 );  // setup default font/family
+#else
     ass_set_fonts( p_renderer, psz_font, psz_family );  // setup default font/family
+#endif
 #ifdef WIN32
     dialog_ProgressSet( p_dialog, NULL, 1.0 );
 #endif
 #else
     /* FIXME you HAVE to give him a font if no fontconfig */
+#if defined( LIBASS_VERSION ) && LIBASS_VERSION >= 0x00907000
+    ass_set_fonts( p_renderer, psz_font, psz_family, false, NULL, 0 );
+#else
     ass_set_fonts_nofc( p_renderer, psz_font, psz_family );
+#endif
 #endif
     memset( &p_ass->fmt, 0, sizeof(p_ass->fmt) );
 
