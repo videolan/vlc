@@ -87,6 +87,8 @@ static void AssHandleRelease( ass_handle_t * );
 /* */
 struct decoder_sys_t
 {
+    mtime_t      i_max_stop;
+
     /* decoder_sys_t is shared between decoder and spu units */
     vlc_mutex_t  lock;
     int          i_refcount;
@@ -146,6 +148,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* */
+    p_sys->i_max_stop = VLC_TS_INVALID;
     p_sys->p_ass = AssHandleHold( p_dec );
     if( !p_sys->p_ass )
     {
@@ -227,6 +230,7 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
+        p_sys->i_max_stop = VLC_TS_INVALID;
         block_Release( p_block );
         return NULL;
     }
@@ -268,15 +272,17 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu->p_sys->i_pts = p_block->i_pts;
 
     p_spu->i_start = p_block->i_pts;
-    p_spu->i_stop = p_block->i_pts + p_block->i_length;
+    p_spu->i_stop = __MAX( p_sys->i_max_stop, p_block->i_pts + p_block->i_length );
     p_spu->b_ephemer = true;
     p_spu->b_absolute = true;
+
+    p_sys->i_max_stop = p_spu->i_stop;
 
     vlc_mutex_lock( &libass_lock );
     if( p_sys->p_track )
     {
         ass_process_chunk( p_sys->p_track, p_spu->p_sys->p_subs_data, p_spu->p_sys->i_subs_len,
-                           p_spu->i_start / 1000, (p_spu->i_stop-p_spu->i_start) / 1000 );
+                           p_block->i_pts / 1000, p_block->i_length / 1000 );
     }
     vlc_mutex_unlock( &libass_lock );
 
@@ -357,7 +363,8 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
     ass_image_t *p_img = ass_render_frame( p_ass->p_renderer, p_sys->p_track,
                                            i_stream_date/1000, &i_changed );
 
-    if( !i_changed && !b_fmt_changed )
+    if( !i_changed && !b_fmt_changed &&
+        (p_img != NULL) == (p_subpic->p_region != NULL) )
     {
         vlc_mutex_unlock( &libass_lock );
         return;
