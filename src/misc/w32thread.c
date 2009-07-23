@@ -592,23 +592,14 @@ static void CALLBACK vlc_timer_do (void *val, BOOLEAN timeout)
     vlc_timer_t *id = val;
 
     assert (timeout);
-    if (TryEnterCriticalSection (&id->serializer))
-    {
-        id->overrun = InterlockedExchange (&id->counter, 0);
-        id->func (id->data);
-        LeaveCriticalSection (&id->serializer);
-    }
-    else /* Overrun */
-        InterlockedIncrement (&id->counter);
+    id->func (id->data);
 }
 
 int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 {
     id->func = func;
     id->data = data;
-    id->overrun = 0;
     id->handle = INVALID_HANDLE_VALUE;
-    InitializeCriticalSection (&id->serializer);
     return 0;
 }
 
@@ -616,7 +607,6 @@ void vlc_timer_destroy (vlc_timer_t *id)
 {
     if (id->handle != INVALID_HANDLE_VALUE)
         DeleteTimerQueueTimer (NULL, id->handle, NULL);
-    DeleteCriticalSection (&id->serializer);
 }
 
 void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
@@ -641,5 +631,6 @@ void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
 
 unsigned vlc_timer_getoverrun (const vlc_timer_t *id)
 {
-    return id->overrun;
+    (void)id;
+    return 0;
 }
