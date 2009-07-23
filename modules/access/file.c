@@ -164,6 +164,9 @@ static bool IsRemote (int fd)
 #endif
 }
 
+#ifndef HAVE_POSIX_FADVISE
+# define posix_fadvise(fd, off, len, adv) (0)
+#endif
 
 /*****************************************************************************
  * Open: open the file
@@ -234,6 +237,14 @@ static int Open( vlc_object_t *p_this )
         p_sys->caching += var_CreateGetInteger (p_access, "network-caching");
 
     p_sys->fd = fd;
+
+    if (p_access->pf_seek != NoSeek)
+    {
+        /* Demuxers will need the beginning of the file for probing. */
+        posix_fadvise (fd, 0, 4096, POSIX_FADV_WILLNEED);
+        /* In most cases, we only read the file once. */
+        posix_fadvise (fd, 0, 0, POSIX_FADV_NOREUSE);
+    }
     return VLC_SUCCESS;
 
 error:
@@ -297,10 +308,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
     p_sys->i_nb_reads++;
 
-#ifdef HAVE_SYS_STAT_H
     if ((p_access->info.i_size && !(p_sys->i_nb_reads % INPUT_FSTAT_NB_READS))
      || (p_access->info.i_pos > p_access->info.i_size))
     {
+#ifdef HAVE_SYS_STAT_H
         struct stat st;
 
         if ((fstat (fd, &st) == 0)
@@ -309,8 +320,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             p_access->info.i_size = st.st_size;
             p_access->info.i_update |= INPUT_UPDATE_SIZE;
         }
-    }
 #endif
+        /* Pre-fetch until the end (within memory limits) */
+        posix_fadvise (fd, p_access->info.i_pos, 0, POSIX_FADV_WILLNEED);
+    }
     return i_ret;
 }
 
