@@ -515,7 +515,7 @@ Interfaces:
      if libncursesw is available.
    * Some nice colors if the terminal supports it (most do)
  * Experimental Lua interface modules. See vlc -I lua and
-   share/lua/playlist/README.txt for more info.
+   share/lua/intf/README.txt for more info.
  * Unix
    * Option to allow only one running instance, using D-Bus interface.
    * D-Bus Interface implementing the MPRIS 
