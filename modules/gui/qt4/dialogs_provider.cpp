@@ -419,11 +419,9 @@ void DialogsProvider::addFromSimple( bool pl, bool go)
     foreach( const QString &file, files )
     {
         playlist_Add( THEPL, qtu( toNativeSeparators( file ) ), NULL,
-                      go ? ( PLAYLIST_APPEND | ( i ? 0 : PLAYLIST_GO ) |
-                                               ( i ? PLAYLIST_PREPARSE : 0 ) )
+                      go ? ( PLAYLIST_APPEND | ( i ? PLAYLIST_PREPARSE : PLAYLIST_GO ) )
                          : ( PLAYLIST_APPEND | PLAYLIST_PREPARSE ),
-                      PLAYLIST_END,
-                      pl ? true : false, false );
+                      PLAYLIST_END, pl, pl_Unlocked );
         RecentsMRL::getInstance( p_intf )->addRecent(
                 toNativeSeparators( file ) );
         i++;
