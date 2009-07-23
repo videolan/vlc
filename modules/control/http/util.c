@@ -29,7 +29,7 @@
 
 #include <vlc_common.h>
 #include "http.h"
-#include "vlc_strings.h"
+#include <vlc_strings.h>
 
 /****************************************************************************
  * File and directory functions

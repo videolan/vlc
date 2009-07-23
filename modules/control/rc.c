@@ -55,7 +55,7 @@
 #include <sys/types.h>
 
 #include <vlc_network.h>
-#include "vlc_url.h"
+#include <vlc_url.h>
 
 #include <vlc_charset.h>
 

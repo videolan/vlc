@@ -39,7 +39,7 @@
 #   define _off_t long
 #endif
 
-#include "vlc_keys.h"
+#include <vlc_keys.h>
 #include <vlc_messages.h>
 
 #include <stdio.h>

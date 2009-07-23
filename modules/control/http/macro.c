@@ -28,7 +28,7 @@
 
 #include "http.h"
 #include "macros.h"
-#include "vlc_url.h"
+#include <vlc_url.h>
 
 static int MacroParse( macro_t *m, char *psz_src )
 {

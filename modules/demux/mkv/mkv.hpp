@@ -51,7 +51,7 @@
 
 #include <vlc_codecs.h>               /* BITMAPINFOHEADER, WAVEFORMATEX */
 #include <vlc_iso_lang.h>
-#include "vlc_meta.h"
+#include <vlc_meta.h>
 #include <vlc_charset.h>
 #include <vlc_input.h>
 #include <vlc_demux.h>
@@ -102,7 +102,7 @@
 
 #include "ebml/StdIOCallback.h"
 
-#include "vlc_keys.h"
+#include <vlc_keys.h>
 
 extern "C" {
    #include "../mp4/libmp4.h"

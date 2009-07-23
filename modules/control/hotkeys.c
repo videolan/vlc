@@ -38,7 +38,7 @@
 #include <vlc_aout.h>
 #include <vlc_osd.h>
 #include <vlc_playlist.h>
-#include "vlc_keys.h"
+#include <vlc_keys.h>
 #include "math.h"
 
 #define CHANNELS_NUMBER 4

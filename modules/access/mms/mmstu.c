@@ -55,7 +55,7 @@
 #endif
 
 #include <vlc_network.h>
-#include "vlc_url.h"
+#include <vlc_url.h>
 #include "asf.h"
 #include "buffer.h"
 

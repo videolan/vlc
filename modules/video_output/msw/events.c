@@ -58,7 +58,7 @@
 #include <GL/gl.h>
 #endif
 
-#include "vlc_keys.h"
+#include <vlc_keys.h>
 #include "vout.h"
 
 #ifdef UNDER_CE

@@ -39,11 +39,11 @@
 #include <vlc_aout.h>
 #include <vlc_vout.h> /* for fullscreen */
 
-#include "vlc_httpd.h"
-#include "vlc_vlm.h"
-#include "vlc_network.h"
-#include "vlc_acl.h"
-#include "vlc_charset.h"
+#include <vlc_httpd.h>
+#include <vlc_vlm.h>
+#include <vlc_network.h>
+#include <vlc_acl.h>
+#include <vlc_charset.h>
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>

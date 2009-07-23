@@ -34,7 +34,7 @@
 #include "../events/evt_key.hpp"
 #include "../events/evt_mouse.hpp"
 #include "../events/evt_scroll.hpp"
-#include "vlc_keys.h"
+#include <vlc_keys.h>
 #ifdef sun
 #   include "solaris_specific.h" // for lrint
 #endif

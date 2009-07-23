@@ -55,7 +55,7 @@
 #include "../utils/var_bool.hpp"
 #include "../utils/var_text.hpp"
 
-#include "vlc_image.h"
+#include <vlc_image.h>
 
 
 Builder::Builder( intf_thread_t *pIntf, const BuilderData &rData,

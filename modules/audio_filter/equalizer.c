@@ -35,7 +35,7 @@
 #include <vlc_plugin.h>
 #include <vlc_charset.h>
 
-#include "vlc_aout.h"
+#include <vlc_aout.h>
 
 #include "equalizer_presets.h"
 /* TODO:

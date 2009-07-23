@@ -37,7 +37,7 @@
 #include <ctype.h>
 #include <vlc_charset.h>
 #include "playlist.h"
-#include "vlc_meta.h"
+#include <vlc_meta.h>
 
 struct demux_sys_t
 {

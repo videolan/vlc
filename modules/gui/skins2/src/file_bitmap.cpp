@@ -27,7 +27,7 @@
 #endif
 
 #include <vlc_common.h>
-#include "vlc_image.h"
+#include <vlc_image.h>
 #include "file_bitmap.hpp"
 
 FileBitmap::FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,

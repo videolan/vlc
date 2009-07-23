@@ -35,8 +35,8 @@
 #include <vlc_codec.h>
 #include <vlc_block.h>
 
-#include "vlc_bits.h"
-#include "vlc_block_helper.h"
+#include <vlc_bits.h>
+#include <vlc_block_helper.h>
 #include "packetizer_helper.h"
 
 /*****************************************************************************

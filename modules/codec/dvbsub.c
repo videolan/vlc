@@ -48,7 +48,7 @@
 #include <vlc_codec.h>
 #include <vlc_sout.h>
 
-#include "vlc_bits.h"
+#include <vlc_bits.h>
 
 /* #define DEBUG_DVBSUB 1 */
 

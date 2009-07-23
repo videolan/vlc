@@ -36,9 +36,9 @@
 #include <vlc_sout.h>
 #include <vlc_block.h>
 
-#include "vlc_httpd.h"
-#include "vlc_vod.h"
-#include "vlc_url.h"
+#include <vlc_httpd.h>
+#include <vlc_vod.h>
+#include <vlc_url.h>
 #include <vlc_network.h>
 #include <vlc_charset.h>
 #include <vlc_strings.h>

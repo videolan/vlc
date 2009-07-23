@@ -24,7 +24,7 @@
  */
 
 #include "real.h"
-#include "vlc_strings.h"
+#include <vlc_strings.h>
 #define BUFLEN 32000
 
 static inline char *nl(char *data) {

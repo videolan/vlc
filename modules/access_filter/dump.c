@@ -35,7 +35,7 @@
 #include <vlc_access.h>
 
 #include <vlc_charset.h>
-#include "vlc_keys.h"
+#include <vlc_keys.h>
 
 #define DEFAULT_MARGIN 32 // megabytes
 

@@ -31,11 +31,11 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
-#include "vlc_strings.h"
-#include "vlc_input.h"
+#include <vlc_strings.h>
+#include <vlc_input.h>
 
 #include <vlc_network.h>
-#include "vlc_url.h"
+#include <vlc_url.h>
 #include "asf.h"
 #include "buffer.h"
 
