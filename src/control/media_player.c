@@ -393,14 +393,8 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int,
                      "vout-snapshottaken", SnapshotTakenCallback, p_mi );
 
-    libvlc_exception_init( &p_e );
-    p_input_thread = libvlc_get_input_thread( p_mi, &p_e );
-
-    if( libvlc_exception_raised( &p_e ) )
-        /* no need to worry about no input thread */
-        libvlc_exception_clear( &p_e );
-    else
-        release_input_thread( p_mi, true );
+    /* Realease the input thread */
+    release_input_thread( p_mi, true );
 
     libvlc_event_manager_release( p_mi->p_event_manager );
     libvlc_media_release( p_mi->p_md );
