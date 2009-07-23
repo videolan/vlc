@@ -49,7 +49,7 @@
     #endif
 #endif
 
-#include "vlc_httpd.h"
+#include <vlc_httpd.h>
 
 #define DEFAULT_PORT        8080
 #define DEFAULT_SSL_PORT    8443
