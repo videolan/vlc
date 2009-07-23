@@ -62,8 +62,8 @@
 #endif
 
 #ifdef ENABLE_HTTPD
-#   include "vlc_httpd.h"
-#   include "vlc_acl.h"
+#   include <vlc_httpd.h>
+#   include <vlc_acl.h>
 #endif
 
 #include "dvb.h"

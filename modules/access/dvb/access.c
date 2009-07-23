@@ -70,7 +70,7 @@
 #endif
 
 #ifdef ENABLE_HTTPD
-#   include "vlc_httpd.h"
+#   include <vlc_httpd.h>
 #endif
 
 #include "dvb.h"
