@@ -735,7 +735,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     dialog_ProgressSet( p_dialog, NULL, 0.2 );
 #endif
 #if defined( LIBASS_VERSION ) && LIBASS_VERSION >= 0x00907000
-    ass_set_fonts( p_renderer, psz_font, psz_family, true, NULL, 0 );  // setup default font/family
+    ass_set_fonts( p_renderer, psz_font, psz_family, true, NULL, 1 );  // setup default font/family
 #else
     ass_set_fonts( p_renderer, psz_font, psz_family );  // setup default font/family
 #endif
@@ -745,7 +745,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 #else
     /* FIXME you HAVE to give him a font if no fontconfig */
 #if defined( LIBASS_VERSION ) && LIBASS_VERSION >= 0x00907000
-    ass_set_fonts( p_renderer, psz_font, psz_family, false, NULL, 0 );
+    ass_set_fonts( p_renderer, psz_font, psz_family, false, NULL, 1 );
 #else
     ass_set_fonts_nofc( p_renderer, psz_font, psz_family );
 #endif
