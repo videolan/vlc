@@ -440,14 +440,8 @@ int aout_FindAndRestart( vlc_object_t * p_this, const char *psz_name,
     (void)psz_name; (void)oldval; (void)newval; (void)p_data;
     if ( p_aout == NULL ) return VLC_SUCCESS;
 
-    if ( var_Type( p_aout, "audio-device" ) != 0 )
-    {
-        var_Destroy( p_aout, "audio-device" );
-    }
-    if ( var_Type( p_aout, "audio-channels" ) != 0 )
-    {
-        var_Destroy( p_aout, "audio-channels" );
-    }
+    var_Destroy( p_aout, "audio-device" );
+    var_Destroy( p_aout, "audio-channels" );
 
     aout_Restart( p_aout );
     vlc_object_release( p_aout );
@@ -469,10 +463,7 @@ int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
     {
         /* This is supposed to be a significant change and supposes
          * rebuilding the channel choices. */
-        if ( var_Type( p_aout, "audio-channels" ) >= 0 )
-        {
-            var_Destroy( p_aout, "audio-channels" );
-        }
+        var_Destroy( p_aout, "audio-channels" );
     }
     aout_Restart( p_aout );
     return 0;

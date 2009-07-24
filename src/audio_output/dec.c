@@ -231,14 +231,8 @@ int aout_DecDelete( aout_instance_t * p_aout, aout_input_t * p_input )
     {
         aout_OutputDelete( p_aout );
         aout_MixerDelete( p_aout );
-        if ( var_Type( p_aout, "audio-device" ) != 0 )
-        {
-            var_Destroy( p_aout, "audio-device" );
-        }
-        if ( var_Type( p_aout, "audio-channels" ) != 0 )
-        {
-            var_Destroy( p_aout, "audio-channels" );
-        }
+        var_Destroy( p_aout, "audio-device" );
+        var_Destroy( p_aout, "audio-channels" );
     }
 
     aout_unlock_mixer( p_aout );
