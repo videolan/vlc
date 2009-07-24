@@ -57,23 +57,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
 static int SnapshotTakenCallback( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
-static const libvlc_state_t vlc_to_libvlc_state_array[] =
-{
-    [INIT_S]        = libvlc_NothingSpecial,
-    [OPENING_S]     = libvlc_Opening,
-    [PLAYING_S]     = libvlc_Playing,
-    [PAUSE_S]       = libvlc_Paused,
-    [END_S]         = libvlc_Ended,
-    [ERROR_S]       = libvlc_Error,
-};
-
-static inline libvlc_state_t vlc_to_libvlc_state( int vlc_state )
-{
-    if( vlc_state < 0 || vlc_state > 6 )
-        return libvlc_Ended;
-
-    return vlc_to_libvlc_state_array[vlc_state];
-}
+static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi );
 
 /*
  * Release the associated input thread.
@@ -222,6 +206,14 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
             default:
                 return VLC_SUCCESS;
         }
+
+        libvlc_media_set_state( p_mi->p_md, libvlc_state, NULL );
+        libvlc_event_send( p_mi->p_event_manager, &event );
+    }
+    else if( newval.i_int == INPUT_EVENT_ABORT )
+    {
+        libvlc_state_t libvlc_state = libvlc_Stopped;
+        event.type = libvlc_MediaPlayerStopped;
 
         libvlc_media_set_state( p_mi->p_md, libvlc_state, NULL );
         libvlc_event_send( p_mi->p_event_manager, &event );
@@ -650,7 +642,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
     {
         /* Send a stop notification event only if we are in playing,
          * buffering or paused states */
-        libvlc_media_set_state( p_mi->p_md, libvlc_Ended, p_e );
+        libvlc_media_set_state( p_mi->p_md, libvlc_Stopped, p_e );
 
         /* Construct and send the event */
         libvlc_event_t event;
@@ -1125,9 +1117,7 @@ libvlc_state_t libvlc_media_player_get_state(
         return state;
     }
 
-    var_Get( p_input_thread, "state", &val );
-    state = vlc_to_libvlc_state(val.i_int);
-
+    state = libvlc_media_get_state( p_mi->p_md, NULL );
     if( state == libvlc_Playing )
     {
         float caching;
