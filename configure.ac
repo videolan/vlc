@@ -353,7 +353,7 @@ case "${host_os}" in
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([activex mozilla],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx cddax sdl_image],[-lwinmm])
-        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap slp http stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp telnet rc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd],[-lws2_32])
+        VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap slp http stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp telnet rc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi],[-lws2_32])
         VLC_ADD_LIBS([access_file], [-lshlwapi])
     fi
     if test "${SYS}" = "mingwce"; then
@@ -3738,26 +3738,26 @@ dnl uncompatible
 dnl
 AC_ARG_ENABLE(zvbi,
   AS_HELP_STRING([--enable-zvbi],[VBI (inc. Teletext) decoding support with
-		  libzvbi (default enabled)]))
+                  libzvbi (default enabled)]))
 AC_ARG_ENABLE(telx,
   AS_HELP_STRING([--enable-telx],[Teletext decoding module (conflicting with
-		  zvbi) (default enabled if zvbi is absent)]))
+                  zvbi) (default enabled if zvbi is absent)]))
 
 AS_IF( [test "${enable_zvbi}" != "no"],[
     PKG_CHECK_MODULES(ZVBI,
-    	zvbi-0.2 >= 0.2.25,
-    	[
-    	  VLC_ADD_LIBS([zvbi],[$ZVBI_LIBS])
-    	  VLC_ADD_CFLAGS([zvbi],[$ZVBI_CFLAGS])
+        zvbi-0.2 >= 0.2.25,
+        [
+          VLC_ADD_LIBS([zvbi],[$ZVBI_LIBS])
+          VLC_ADD_CFLAGS([zvbi],[$ZVBI_CFLAGS])
           VLC_ADD_PLUGIN([zvbi])
-	  AC_DEFINE(ZVBI_COMPILED, 1, [Define if the zvbi module is built])
-	  AS_IF( [test "${enable_telx}" = "yes"],[
-		  AC_MSG_WARN([The zvbi and telx modules are uncompatibles.
-			       Using zvbi.])
-		  ])
-	],[
-	  AC_MSG_WARN(ZVBI library not found. Enabling the telx module instead)
-	])
+          AC_DEFINE(ZVBI_COMPILED, 1, [Define if the zvbi module is built])
+          AS_IF( [test "${enable_telx}" = "yes"],[
+                  AC_MSG_WARN([The zvbi and telx modules are uncompatibles.
+                               Using zvbi.])
+                  ])
+        ],[
+          AC_MSG_WARN(ZVBI library not found. Enabling the telx module instead)
+        ])
     ])
 AS_IF( [test "${enable_telx}" != "no" ],[
   VLC_ADD_PLUGIN([telx])
