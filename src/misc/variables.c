@@ -230,7 +230,6 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     p_var->psz_text = NULL;
 
     p_var->i_type = i_type & ~VLC_VAR_DOINHERIT;
-    memset( &p_var->val, 0, sizeof(vlc_value_t) );
 
     p_var->i_usage = 1;
 
