@@ -388,6 +388,10 @@ static void test_creation_and_type( libvlc_int_t *p_libvlc )
     assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE ) == VLC_SUCCESS );
     assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMAX | VLC_VAR_HASSTEP | VLC_VAR_HASCHOICE) );
 
+    var_Destroy( p_libvlc, "bla" );
+    var_Destroy( p_libvlc, "bla" );
+    var_Destroy( p_libvlc, "bla" );
+    assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOVAR );
 }
 
 static void test_variables( libvlc_instance_t *p_vlc )
