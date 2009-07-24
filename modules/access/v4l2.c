@@ -3055,12 +3055,12 @@ static int Control( vlc_object_t *p_obj, demux_sys_t *p_sys, int i_fd,
             case VLC_VAR_BOOL:
                 val.b_bool = control.value;
                 var_Change( p_obj, psz_name, VLC_VAR_SETVALUE, &val, NULL );
-                var_SetVoid( p_obj, "controls-update" );
+                var_TriggerCallback( p_obj, "controls-update" );
                 break;
             case VLC_VAR_INTEGER:
                 val.i_int = control.value;
                 var_Change( p_obj, psz_name, VLC_VAR_SETVALUE, &val, NULL );
-                var_SetVoid( p_obj, "controls-update" );
+                var_TriggerCallback( p_obj, "controls-update" );
                 break;
         }
     }

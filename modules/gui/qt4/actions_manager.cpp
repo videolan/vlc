@@ -165,7 +165,7 @@ void ActionsManager::frame()
 {
     input_thread_t *p_input = THEMIM->getInput();
     if( p_input )
-        var_SetVoid( p_input, "frame-next" );
+        var_TriggerCallback( p_input, "frame-next" );
 }
 
 void ActionsManager::toggleMuteAudio()

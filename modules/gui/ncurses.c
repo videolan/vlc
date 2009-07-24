@@ -1167,22 +1167,22 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
         case '[':
             if( p_sys->p_input )
-                var_SetVoid( p_sys->p_input, "prev-title" );
+                var_TriggerCallback( p_sys->p_input, "prev-title" );
             break;
 
         case ']':
             if( p_sys->p_input )
-                var_SetVoid( p_sys->p_input, "next-title" );
+                var_TriggerCallback( p_sys->p_input, "next-title" );
             break;
 
         case '<':
             if( p_sys->p_input )
-                var_SetVoid( p_sys->p_input, "prev-chapter" );
+                var_TriggerCallback( p_sys->p_input, "prev-chapter" );
             break;
 
         case '>':
             if( p_sys->p_input )
-                var_SetVoid( p_sys->p_input, "next-chapter" );
+                var_TriggerCallback( p_sys->p_input, "next-chapter" );
             break;
 
         case 'p':

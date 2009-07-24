@@ -672,8 +672,8 @@ void InputManager::sectionPrev()
     if( hasInput() )
     {
         int i_type = var_Type( p_input, "next-chapter" );
-        var_SetVoid( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
-                            "prev-chapter":"prev-title" );
+        var_TriggerCallback( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
+                             "prev-chapter":"prev-title" );
     }
 }
 
@@ -682,8 +682,8 @@ void InputManager::sectionNext()
     if( hasInput() )
     {
         int i_type = var_Type( p_input, "next-chapter" );
-        var_SetVoid( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
-                            "next-chapter":"next-title" );
+        var_TriggerCallback( p_input, (i_type & VLC_VAR_TYPE) != 0 ?
+                             "next-chapter":"next-title" );
     }
 }
 
@@ -787,13 +787,13 @@ void InputManager::reverse()
 void InputManager::slower()
 {
     if( hasInput() )
-        var_SetVoid( p_input, "rate-slower" );
+        var_TriggerCallback( p_input, "rate-slower" );
 }
 
 void InputManager::faster()
 {
     if( hasInput() )
-        var_SetVoid( p_input, "rate-faster" );
+        var_TriggerCallback( p_input, "rate-faster" );
 }
 
 void InputManager::littlefaster()

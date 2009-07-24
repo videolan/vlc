@@ -358,7 +358,7 @@ void onRewind(GtkButton *button, gpointer user_data)
 
     if (p_intf->p_sys->p_input != NULL)
     {
-        var_SetVoid( p_intf->p_sys->p_input, "rate-slower" );
+        var_TriggerCallback( p_intf->p_sys->p_input, "rate-slower" );
     }
 }
 
@@ -413,7 +413,7 @@ void onForward(GtkButton *button, gpointer user_data)
 
     if (p_intf->p_sys->p_input != NULL)
     {
-        var_SetVoid( p_intf->p_sys->p_input, "rate-faster" );
+        var_TriggerCallback( p_intf->p_sys->p_input, "rate-faster" );
     }
 }
 

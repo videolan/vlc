@@ -1144,7 +1144,7 @@ static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
              p_vout->fmt_in.i_visible_width,
              p_vout->fmt_in.i_visible_height );
 
-    var_SetVoid( p_vout, "crop-update" );
+    var_TriggerCallback( p_vout, "crop-update" );
 
     return VLC_SUCCESS;
 }

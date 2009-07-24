@@ -803,7 +803,7 @@ void ExtV4l2::ValueChange( int value )
                 var_SetBool( p_obj, psz_var, value );
                 break;
             case VLC_VAR_VOID:
-                var_SetVoid( p_obj, psz_var );
+                var_TriggerCallback( p_obj, psz_var );
                 break;
         }
         free( psz_var );

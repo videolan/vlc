@@ -1086,12 +1086,12 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if ( !strcmp( psz_cmd, "faster" ) )
     {
-        var_SetVoid( p_input, "rate-faster" );
+        var_TriggerCallback( p_input, "rate-faster" );
         i_error = VLC_SUCCESS;
     }
     else if ( !strcmp( psz_cmd, "slower" ) )
     {
-        var_SetVoid( p_input, "rate-slower" );
+        var_TriggerCallback( p_input, "rate-slower" );
         i_error = VLC_SUCCESS;
     }
     else if ( !strcmp( psz_cmd, "normal" ) )
@@ -1120,9 +1120,9 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             }
         }
         else if( !strcmp( psz_cmd, "chapter_n" ) )
-            var_SetVoid( p_input, "next-chapter" );
+            var_TriggerCallback( p_input, "next-chapter" );
         else if( !strcmp( psz_cmd, "chapter_p" ) )
-            var_SetVoid( p_input, "prev-chapter" );
+            var_TriggerCallback( p_input, "prev-chapter" );
         i_error = VLC_SUCCESS;
     }
     else if( !strcmp( psz_cmd, "title" ) ||
@@ -1144,9 +1144,9 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
             }
         }
         else if( !strcmp( psz_cmd, "title_n" ) )
-            var_SetVoid( p_input, "next-title" );
+            var_TriggerCallback( p_input, "next-title" );
         else if( !strcmp( psz_cmd, "title_p" ) )
-            var_SetVoid( p_input, "prev-title" );
+            var_TriggerCallback( p_input, "prev-title" );
 
         i_error = VLC_SUCCESS;
     }

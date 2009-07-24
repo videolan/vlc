@@ -236,7 +236,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 p_input = playlist_CurrentInput( p_playlist );
                 if( p_input )
                 {
-                    var_SetVoid( p_input, "rate-slower" );
+                    var_TriggerCallback( p_input, "rate-slower" );
                     vlc_object_release( p_input );
                 }
                 break;
@@ -246,7 +246,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 p_input = playlist_CurrentInput( p_playlist );
                 if( p_input )
                 {
-                    var_SetVoid( p_input, "rate-faster" );
+                    var_TriggerCallback( p_input, "rate-faster" );
                     vlc_object_release( p_input );
                 }
                 break;

@@ -31,7 +31,7 @@ void CmdDvdNextTitle::execute()
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        var_SetVoid( p_input, "next-title" );
+        var_TriggerCallback( p_input, "next-title" );
         vlc_object_release( p_input );
     }
 }
@@ -44,7 +44,7 @@ void CmdDvdPreviousTitle::execute()
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        var_SetVoid( p_input, "prev-title" );
+        var_TriggerCallback( p_input, "prev-title" );
         vlc_object_release( p_input );
     }
 }
@@ -57,7 +57,7 @@ void CmdDvdNextChapter::execute()
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        var_SetVoid( p_input, "next-chapter" );
+        var_TriggerCallback( p_input, "next-chapter" );
         vlc_object_release( p_input );
     }
 }
@@ -70,7 +70,7 @@ void CmdDvdPreviousChapter::execute()
                                            FIND_ANYWHERE );
     if( p_input )
     {
-        var_SetVoid( p_input, "prev-chapter" );
+        var_TriggerCallback( p_input, "prev-chapter" );
         vlc_object_release( p_input );
     }
 }

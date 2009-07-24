@@ -565,14 +565,14 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         case PREV_TITLE:
             if( p_input )
             {
-                var_SetVoid( p_input, "prev-title" );
+                var_TriggerCallback( p_input, "prev-title" );
             }
             break;
 
         case NEXT_TITLE:
             if( p_input )
             {
-                var_SetVoid( p_input, "next-title" );
+                var_TriggerCallback( p_input, "next-title" );
             }
             break;
 
@@ -590,14 +590,14 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         case PREV_CHAPTER:
             if( p_input )
             {
-                var_SetVoid( p_input, "prev-chapter" );
+                var_TriggerCallback( p_input, "prev-chapter" );
             }
             break;
 
         case NEXT_CHAPTER:
             if( p_input )
             {
-                var_SetVoid( p_input, "next-chapter" );
+                var_TriggerCallback( p_input, "next-chapter" );
             }
             break;
 
@@ -636,7 +636,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 {
                     if( val.i_int > 1 )
                     {
-                        var_SetVoid( p_input, "prev-chapter" );
+                        var_TriggerCallback( p_input, "prev-chapter" );
                         break;
                     }
                 }
@@ -646,7 +646,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                 {
                     if( val.i_int > 1 )
                     {
-                        var_SetVoid( p_input, "prev-title" );
+                        var_TriggerCallback( p_input, "prev-title" );
                         break;
                     }
                 }
@@ -668,7 +668,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                     int i_chapter_count = var_CountChoices( p_input, "chapter" );
                     if( i_chapter_count > val.i_int )
                     {
-                        var_SetVoid( p_input, "next-chapter" );
+                        var_TriggerCallback( p_input, "next-chapter" );
                         break;
                     }
                 }
@@ -679,7 +679,7 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
                     int i_title_count = var_CountChoices( p_input, "title" );
                     if( i_title_count > val.i_int )
                     {
-                        var_SetVoid( p_input, "next-title" );
+                        var_TriggerCallback( p_input, "next-title" );
                         break;
                     }
                 }

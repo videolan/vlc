@@ -689,19 +689,19 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             }
             else if( i_action == ACTIONID_FRAME_NEXT )
             {
-                var_SetVoid( p_input, "frame-next" );
+                var_TriggerCallback( p_input, "frame-next" );
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  "%s", _("Next frame") );
             }
             else if( i_action == ACTIONID_FASTER )
             {
-                var_SetVoid( p_input, "rate-faster" );
+                var_TriggerCallback( p_input, "rate-faster" );
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  "%s", _("Faster") );
             }
             else if( i_action == ACTIONID_SLOWER )
             {
-                var_SetVoid( p_input, "rate-slower" );
+                var_TriggerCallback( p_input, "rate-slower" );
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  "%s", _("Slower") );
             }
@@ -754,13 +754,13 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             }
             /* Only makes sense with DVD */
             else if( i_action == ACTIONID_TITLE_PREV )
-                var_SetVoid( p_input, "prev-title" );
+                var_TriggerCallback( p_input, "prev-title" );
             else if( i_action == ACTIONID_TITLE_NEXT )
-                var_SetVoid( p_input, "next-title" );
+                var_TriggerCallback( p_input, "next-title" );
             else if( i_action == ACTIONID_CHAPTER_PREV )
-                var_SetVoid( p_input, "prev-chapter" );
+                var_TriggerCallback( p_input, "prev-chapter" );
             else if( i_action == ACTIONID_CHAPTER_NEXT )
-                var_SetVoid( p_input, "next-chapter" );
+                var_TriggerCallback( p_input, "next-chapter" );
             else if( i_action == ACTIONID_DISC_MENU )
                 var_SetInteger( p_input, "title  0", 2 );
 
