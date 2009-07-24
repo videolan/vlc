@@ -384,9 +384,6 @@ libvlc_media_player_new_from_media(
  **************************************************************************/
 static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 {
-    input_thread_t *p_input_thread;
-    libvlc_exception_t p_e;
-
     assert( p_mi );
 
     /* Detach Callback from the main libvlc object */
