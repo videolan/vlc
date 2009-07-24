@@ -723,7 +723,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     ass_set_use_margins( p_renderer, false);
     //if( false )
     //    ass_set_margins( p_renderer, int t, int b, int l, int r);
-    ass_set_hinting( p_renderer, ASS_HINTING_NATIVE ); // No idea
+    ass_set_hinting( p_renderer, ASS_HINTING_LIGHT );
     ass_set_font_scale( p_renderer, 1.0 );
     ass_set_line_spacing( p_renderer, 0.0 );
 
