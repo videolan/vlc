@@ -1,12 +1,12 @@
 Index: configure
 ===================================================================
---- configure	(revision 18349)
+--- configure	(revision 19505)
 +++ configure	(working copy)
-@@ -1758,7 +1758,6 @@
-         add_cflags -pipe
-         check_cflags -force_cpusubtype_ALL
-         check_cflags -Wno-sign-compare
+@@ -1826,7 +1826,6 @@
+         FFSERVERLDFLAGS=-Wl,-bind_at_load
+         objformat="macho"
+         enabled x86_64 && objformat="macho64"
 -        enabled shared || check_cflags -mdynamic-no-pic
-     fi
- fi
- 
+         ;;
+     mingw32*)
+         target_os=mingw32
