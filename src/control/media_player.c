@@ -584,17 +584,11 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
 
     var_Create( p_input_thread, "drawable-hwnd", VLC_VAR_ADDRESS );
     if( p_mi->drawable.hwnd != NULL )
-    {
-        vlc_value_t val = { .p_address = p_mi->drawable.hwnd };
-        var_Set( p_input_thread, "drawable-hwnd", val );
-    }
+        var_SetAddress( p_input_thread, "drawable-hwnd", p_mi->drawable.hwnd );
 
     var_Create( p_input_thread, "drawable-nsobject", VLC_VAR_ADDRESS );
     if( p_mi->drawable.nsobject != NULL )
-    {
-        vlc_value_t val = { .p_address = p_mi->drawable.nsobject };
-        var_Set( p_input_thread, "drawable-nsobject", val );
-    }
+        var_SetAddress( p_input_thread, "drawable-nsobject", p_mi->drawable.nsobject );
 
     var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
     var_AddCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
@@ -798,16 +792,16 @@ libvlc_time_t libvlc_media_player_get_length(
                              libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
+    libvlc_time_t i_time;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
     if( !p_input_thread )
         return -1;
 
-    var_Get( p_input_thread, "length", &val );
+    i_time = var_GetTime( p_input_thread, "length" );
     vlc_object_release( p_input_thread );
 
-    return (val.i_time+500LL)/1000LL;
+    return (i_time+500LL)/1000LL;
 }
 
 libvlc_time_t libvlc_media_player_get_time(
@@ -815,20 +809,20 @@ libvlc_time_t libvlc_media_player_get_time(
                                    libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
+    libvlc_time_t i_time;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( !p_input_thread )
         return -1;
 
-    var_Get( p_input_thread , "time", &val );
+    i_time = var_GetTime( p_input_thread , "time" );
     vlc_object_release( p_input_thread );
-    return (val.i_time+500LL)/1000LL;
+    return (i_time+500LL)/1000LL;
 }
 
 void libvlc_media_player_set_time(
                                  libvlc_media_player_t *p_mi,
-                                 libvlc_time_t time,
+                                 libvlc_time_t i_time,
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
@@ -837,7 +831,7 @@ void libvlc_media_player_set_time(
     if( !p_input_thread )
         return;
 
-    var_SetTime( p_input_thread, "time", time*1000LL );
+    var_SetTime( p_input_thread, "time", i_time*1000LL );
     vlc_object_release( p_input_thread );
 }
 
