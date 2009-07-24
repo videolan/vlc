@@ -67,7 +67,6 @@ vlc_module_end ()
  *****************************************************************************/
 static subpicture_t *DecodeBlock( decoder_t *, block_t ** );
 static void DestroySubpicture( subpicture_t * );
-static void PreRender( spu_t *, subpicture_t *, const video_format_t * );
 static void UpdateRegions( spu_t *,
                            subpicture_t *, const video_format_t *, mtime_t );
 
@@ -98,9 +97,6 @@ struct decoder_sys_t
 
     /* */
     ass_track_t  *p_track;
-
-    /* */
-    subpicture_t *p_spu_final;
 };
 static void DecSysRelease( decoder_sys_t *p_sys );
 static void DecSysHold( decoder_sys_t *p_sys );
@@ -286,7 +282,6 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
     vlc_mutex_unlock( &libass_lock );
 
-    p_spu->pf_pre_render = PreRender;
     p_spu->pf_update_regions = UpdateRegions;
     p_spu->pf_destroy = DestroySubpicture;
     p_spu->p_sys->p_dec_sys = p_sys;
@@ -309,16 +304,6 @@ static void DestroySubpicture( subpicture_t *p_subpic )
     free( p_subpic->p_sys );
 }
 
-static void PreRender( spu_t *p_spu, subpicture_t *p_subpic,
-                       const video_format_t *p_fmt )
-{
-    decoder_sys_t *p_dec_sys = p_subpic->p_sys->p_dec_sys;
-
-    p_dec_sys->p_spu_final = p_subpic;
-    VLC_UNUSED(p_fmt);
-    VLC_UNUSED(p_spu);
-}
-
 static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
                            const video_format_t *p_fmt, mtime_t i_ts )
 {
@@ -327,12 +312,6 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
 
     video_format_t fmt;
     bool b_fmt_changed;
-
-    if( p_subpic != p_sys->p_spu_final )
-    {
-        SubpictureReleaseRegions( p_spu, p_subpic );
-        return;
-    }
 
     vlc_mutex_lock( &libass_lock );
 
