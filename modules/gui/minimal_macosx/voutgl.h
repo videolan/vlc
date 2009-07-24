@@ -33,18 +33,18 @@ struct vout_sys_t
 {
     NSAutoreleasePool * o_pool;
     VLCOpenGLVoutView * o_glview;
-    bool          b_saved_frame;
+    bool                b_saved_frame;
     NSRect              s_frame;
-    bool          b_got_frame;
+    bool                b_got_frame;
 
     /* Mozilla plugin-related variables */
-    bool          b_embedded;
+    bool                b_embedded;
     AGLContext          agl_ctx;
     AGLDrawable         agl_drawable;
     int                 i_offx, i_offy;
     int                 i_width, i_height;
     WindowRef           theWindow;
     WindowGroupRef      winGroup;
-    bool          b_clipped_out;
+    bool                b_clipped_out;
     Rect                clipBounds, viewBounds;
 };
