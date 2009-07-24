@@ -121,14 +121,17 @@ noinst_HEADERS = \
 	mkdir -p -- ../include
 	echo "/* Automatically generated file - DO NOT EDIT */" > "$@.tmp"
 	echo "static const char psz_license[] =" >> "$@.tmp"
-	cat $(top_srcdir)/COPYING | sed s/'"'/'\\"'/g | $(AWK) '{ print "\""$$0"\\n\"" }' >> "$@.tmp"
+	sed 's/"/\\"/g;s/^.*$$/\"&\\n\"/' "$(top_srcdir)/COPYING" >> "$@.tmp"
 	echo ";" >> "$@.tmp"
 	echo "static const char psz_thanks[] =" >> "$@.tmp"
-	grep -v '$$Id:'  $(top_srcdir)/THANKS | sed s/'"'/'\\"'/g | $(AWK) '{ print "\""$$0"\\n\"" }'|sed s/"<.*.> "// >> "$@.tmp"
+	sed '/\$$Id:/d;s/"/\\"/g;s/<.*.> //;s/^.*$$/\"&\\n\"/' \
+		"$(top_srcdir)/THANKS" >> "$@.tmp"
 	echo ";" >> "$@.tmp"
 	echo "static const char psz_authors[] =" >> "$@.tmp"
-	grep N: $(top_srcdir)/AUTHORS | cut -d" " -f 2- | sed s/'"'/'\\"'/g | $(AWK) '{ print "\""$$0"\\n\"" }' >> "$@.tmp"
+	sed -n '/^N: /{;s///;s/"/\\"/g;s/^.*$$/\"&\\n\"/;p;}' \
+		"$(top_srcdir)/AUTHORS" >> "$@.tmp"
 	echo ";" >> "$@.tmp"
+
 	mv -f -- "$@.tmp" "$@"
 
 ###############################################################################
