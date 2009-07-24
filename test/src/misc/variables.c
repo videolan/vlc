@@ -234,7 +234,6 @@ static void test_limits( libvlc_int_t *p_libvlc )
 
     val.i_int = -1234;
     var_Change( p_libvlc, "bla", VLC_VAR_SETMIN, &val, NULL );
-
     val.i_int = 12345;
     var_Change( p_libvlc, "bla", VLC_VAR_SETMAX, &val, NULL );
 
@@ -322,6 +321,73 @@ static void test_change( libvlc_int_t *p_libvlc )
     assert( val.i_int = i_max );
     var_Change( p_libvlc, "bla", VLC_VAR_GETSTEP, &val, NULL );
     assert( val.i_int = i_step );
+
+    var_Destroy( p_libvlc, "bla" );
+}
+
+static void test_creation_and_type( libvlc_int_t *p_libvlc )
+{
+    int i_type;
+    vlc_value_t val;
+    val.i_int = 4212;
+
+    var_Create( p_libvlc, "bla", VLC_VAR_INTEGER );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER) );
+
+    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT ) == VLC_SUCCESS );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER) );
+
+    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND) );
+
+    var_Change( p_libvlc, "bla", VLC_VAR_SETMIN, &val, NULL );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMIN) );
+
+    var_Change( p_libvlc, "bla", VLC_VAR_SETMAX, &val, NULL );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMIN | VLC_VAR_HASMAX) );
+
+    var_Change( p_libvlc, "bla", VLC_VAR_SETSTEP, &val, NULL );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMIN | VLC_VAR_HASMAX | VLC_VAR_HASSTEP) );
+
+    var_Destroy( p_libvlc, "bla" );
+    var_Destroy( p_libvlc, "bla" );
+    var_Destroy( p_libvlc, "bla" );
+    assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOVAR );
+
+    var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER) );
+
+    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND) );
+
+    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASCHOICE ) == VLC_SUCCESS );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASCHOICE) );
+
+    var_Destroy( p_libvlc, "bla" );
+    var_Destroy( p_libvlc, "bla" );
+    var_Destroy( p_libvlc, "bla" );
+    assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOVAR );
+
+    var_Create( p_libvlc, "bla", VLC_VAR_INTEGER );
+    var_Change( p_libvlc, "bla", VLC_VAR_SETMIN, &val, NULL );
+    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMIN) );
+    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE ) == VLC_SUCCESS );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMIN | VLC_VAR_HASCHOICE) );
+
+    var_Destroy( p_libvlc, "bla" );
+    var_Destroy( p_libvlc, "bla" );
+    var_Destroy( p_libvlc, "bla" );
+    assert( var_Get( p_libvlc, "bla", &val ) == VLC_ENOVAR );
+
+    var_Create( p_libvlc, "bla", VLC_VAR_INTEGER );
+    var_Change( p_libvlc, "bla", VLC_VAR_SETMAX, &val, NULL );
+    var_Change( p_libvlc, "bla", VLC_VAR_SETSTEP, &val, NULL );
+    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND ) == VLC_SUCCESS );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMAX | VLC_VAR_HASSTEP) );
+    assert( var_Create( p_libvlc, "bla", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE ) == VLC_SUCCESS );
+    assert( var_Type( p_libvlc, "bla" ) == (VLC_VAR_INTEGER | VLC_VAR_ISCOMMAND | VLC_VAR_HASMAX | VLC_VAR_HASSTEP | VLC_VAR_HASCHOICE) );
+
 }
 
 static void test_variables( libvlc_instance_t *p_vlc )
@@ -358,6 +424,9 @@ static void test_variables( libvlc_instance_t *p_vlc )
 
     log( "Testing var_Change()\n" );
     test_change( p_libvlc );
+
+    log( "Testing type at creation\n" );
+    test_creation_and_type( p_libvlc );
 }
 
 
