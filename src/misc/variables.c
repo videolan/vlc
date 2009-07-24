@@ -193,15 +193,15 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     if( i_new >= 0 )
     {
         /* If the types differ, variable creation failed. */
-        if( (i_type & ~(VLC_VAR_DOINHERIT|VLC_VAR_ISCOMMAND)) != p_priv->p_vars[i_new].i_type )
+        if( (i_type & VLC_VAR_TYPE) != (p_priv->p_vars[i_new].i_type & VLC_VAR_TYPE) )
         {
             vlc_mutex_unlock( &p_priv->var_lock );
             return VLC_EBADVAR;
         }
 
         p_priv->p_vars[i_new].i_usage++;
-        if( i_type & VLC_VAR_ISCOMMAND )
-            p_priv->p_vars[i_new].i_type |= VLC_VAR_ISCOMMAND;
+        p_priv->p_vars[i_new].i_type |= ( i_type & VLC_VAR_ISCOMMAND );
+        p_priv->p_vars[i_new].i_type |= ( i_type & VLC_VAR_HASCHOICE );
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_SUCCESS;
     }
