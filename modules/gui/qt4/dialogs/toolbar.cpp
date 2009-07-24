@@ -647,16 +647,14 @@ inline int DroppingController::getParentPosInLayout( QPoint point )
     QPoint origin = mapToGlobal ( point );
 
     QWidget *tempWidg = QApplication::widgetAt( origin );
+    if( tempWidg == NULL )
+        return -1;
 
-    int i = -1;
-    if( tempWidg != NULL)
+    int i = controlLayout->indexOf( tempWidg );
+    if( i == -1 )
     {
-        i = controlLayout->indexOf( tempWidg );
-        if( i == -1 )
-        {
-            i = controlLayout->indexOf( tempWidg->parentWidget() );
-            tempWidg = tempWidg->parentWidget();
-        }
+        i = controlLayout->indexOf( tempWidg->parentWidget() );
+        tempWidg = tempWidg->parentWidget();
     }
 
     /* Return the nearest position */
