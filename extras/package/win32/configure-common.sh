@@ -28,5 +28,5 @@
       --enable-sse --enable-mmx \
       --disable-gnomevfs --disable-hal \
       --disable-cddax --disable-vcdx --disable-libcdio --disable-vcdinfo \
-      --disable-libcddb --disable-dvb --disable-zvbi --enable-telx \
+      --disable-libcddb --disable-dvb --enable-zvbi --disable-telx \
       --disable-pulse

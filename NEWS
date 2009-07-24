@@ -1,6 +1,12 @@
 Changes between 1.0.0 and 1.1.0-git:
 ------------------------------------
 
+Access:
+ * Port of the screen module from Xlib to XCB
+
+Demuxers:
+ * Support for ADPCM in .flv streams
+
 Mac OS X Interface:
  * Completely reworked user interface (based upon works from GSoC 2008)
 
@@ -10,6 +16,9 @@ Playlist:
 
 Audio filters:
  * Chorus/Flanger audio filter
+
+Encoders:
+ * x264, add psy-rd parameter and change default settings
 
 Visualisation:
  * Support of .milk visualisation files using projectM libraries
