@@ -344,6 +344,7 @@ end:
     }
 
     vlc_restorecancel(canc);
+    return NULL;
 }
 
 
