@@ -262,19 +262,6 @@ static inline int __var_SetString( vlc_object_t *p_obj, const char *psz_name, co
 }
 
 /**
- * Trigger the callbacks on a void variable
- *
- * \param p_obj The object that holds the variable
- * \param psz_name The name of the variable
- */
-static inline int __var_SetVoid( vlc_object_t *p_obj, const char *psz_name )
-{
-    vlc_value_t val;
-    val.b_bool = true;
-    return var_SetChecked( p_obj, psz_name, VLC_VAR_VOID, val );
-}
-
-/**
  * Set the value of a pointer variable
  *
  * \param p_obj The object that holds the variable
@@ -309,10 +296,6 @@ int __var_SetAddress( vlc_object_t *p_obj, const char *psz_name, void *ptr )
  * __var_SetString() with automatic casting
  */
 #define var_SetString(a,b,c)    __var_SetString( VLC_OBJECT(a),b,c)
-/**
- * __var_SetVoid() with automatic casting
- */
-#define var_SetVoid(a,b)        __var_SetVoid( VLC_OBJECT(a),b)
 /**
  * __var_SetAddress() with automatic casting
  */
