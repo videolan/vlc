@@ -265,35 +265,21 @@ void VLMDialog::addVLMItem()
 /* TODO : VOD are not exported to the file */
 bool VLMDialog::exportVLMConf()
 {
-    QFileDialog* qfd = new QFileDialog( this, qtr( "Save VLM configuration as..." ),
+    QString saveVLMConfFileName = QFileDialog::getSaveFileName( this,
+                                        qtr( "Save VLM configuration as..." ),
                                         qfu( config_GetHomeDir() ),
                                         qtr( "VLM conf (*.vlm);;All (*)" ) );
-    qfd->setFileMode( QFileDialog::AnyFile );
-    qfd->setAcceptMode( QFileDialog::AcceptSave );
-    qfd->setConfirmOverwrite( true );
 
-    bool exported = false;
-    if( qfd->exec() == QDialog::Accepted )
+    if( !saveVLMConfFileName.isEmpty() )
     {
-        QString saveVLMConfFileName = qfd->selectedFiles().first();
-        QString filter = qfd->selectedFilter();
-
-        // If *.vlm is selected, add .vlm at the end if needed
-        if( filter.contains( "VLM" ) && !saveVLMConfFileName.contains( ".vlm" ) )
-            saveVLMConfFileName.append( ".vlm" );
-
-        if( !saveVLMConfFileName.isEmpty() )
-        {
-            vlm_message_t *message;
-            QString command = "save \"" + saveVLMConfFileName + "\"";
-            vlm_ExecuteCommand( p_vlm , qtu( command ) , &message );
-            vlm_MessageDelete( message );
-            exported = true;
-        }
+        vlm_message_t *message;
+        QString command = "save \"" + saveVLMConfFileName + "\"";
+        vlm_ExecuteCommand( p_vlm , qtu( command ) , &message );
+        vlm_MessageDelete( message );
+        return true;
     }
 
-    delete qfd;
-    return exported;
+    return false;
 }
 
 void VLMDialog::mediasPopulator()
