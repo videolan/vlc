@@ -426,7 +426,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
                  "Module instance %s not found, looking in config values.",
                  qtu( module ) );
 #endif
-        i_type = config_GetType( p_intf, qtu( option ) ) & 0xf0;
+        i_type = config_GetType( p_intf, qtu( option ) ) & VLC_VAR_CLASS;
         switch( i_type )
         {
             case VLC_VAR_INTEGER:
@@ -443,7 +443,7 @@ void ExtVideo::setWidgetValue( QObject *widget )
     }
     else
     {
-        i_type = var_Type( p_obj, qtu( option ) ) & 0xf0;
+        i_type = var_Type( p_obj, qtu( option ) ) & VLC_VAR_CLASS;
         var_Get( p_obj, qtu( option ), &val );
         vlc_object_release( p_obj );
     }
@@ -540,7 +540,7 @@ void ExtVideo::updateFilterOptions()
     QLineEdit      *lineedit      = qobject_cast<QLineEdit*>     ( sender() );
     QComboBox      *combobox      = qobject_cast<QComboBox*>     ( sender() );
 
-    i_type &= 0xf0;
+    i_type &= VLC_VAR_CLASS;
     if( i_type == VLC_VAR_INTEGER || i_type == VLC_VAR_BOOL )
     {
         int i_int = 0;
