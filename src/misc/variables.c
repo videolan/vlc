@@ -162,6 +162,8 @@ static void     CheckValue  ( variable_t *, vlc_value_t * );
 
 static int      InheritValue( vlc_object_t *, const char *, vlc_value_t *,
                               int );
+static int      TriggerCallback( vlc_object_t *, variable_t *, const char *,
+                                 vlc_value_t, vlc_value_t );
 
 /**
  * Initialize a vlc variable
@@ -694,6 +696,7 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
                     int expected_type, vlc_value_t val )
 {
     int i_var;
+    int i_ret = VLC_SUCCESS;
     variable_t *p_var;
     vlc_value_t oldval;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
@@ -726,42 +729,14 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
     /* Deal with callbacks. Tell we're in a callback, release the lock,
      * call stored functions, retake the lock. */
     if( p_var->i_entries )
-    {
-        int i_var;
-        int i_entries = p_var->i_entries;
-        callback_entry_t *p_entries = p_var->p_entries;
-
-        p_var->b_incallback = true;
-        vlc_mutex_unlock( &p_priv->var_lock );
-
-        /* The real calls */
-        for( ; i_entries-- ; )
-        {
-            p_entries[i_entries].pf_callback( p_this, psz_name, oldval, val,
-                                              p_entries[i_entries].p_data );
-        }
-
-        vlc_mutex_lock( &p_priv->var_lock );
-
-        i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
-        if( i_var < 0 )
-        {
-            msg_Err( p_this, "variable %s has disappeared", psz_name );
-            vlc_mutex_unlock( &p_priv->var_lock );
-            return VLC_ENOVAR;
-        }
-
-        p_var = &p_priv->p_vars[i_var];
-        p_var->b_incallback = false;
-        vlc_cond_broadcast( &p_priv->var_wait );
-    }
+        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval, val );
 
     /* Free data if needed */
     p_var->ops->pf_free( &oldval );
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
-    return VLC_SUCCESS;
+    return i_ret;
 }
 
 
@@ -922,6 +897,7 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
 int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
 {
     int i_var;
+    int i_ret = VLC_SUCCESS;
     variable_t *p_var;
     vlc_value_t oldval;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
@@ -943,38 +919,10 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
     /* Deal with callbacks. Tell we're in a callback, release the lock,
      * call stored functions, retake the lock. */
     if( p_var->i_entries )
-    {
-        int i_var;
-        int i_entries = p_var->i_entries;
-        callback_entry_t *p_entries = p_var->p_entries;
-
-        p_var->b_incallback = true;
-        vlc_mutex_unlock( &p_priv->var_lock );
-
-        /* The real calls */
-        for( ; i_entries-- ; )
-        {
-            p_entries[i_entries].pf_callback( p_this, psz_name, oldval, oldval,
-                                              p_entries[i_entries].p_data );
-        }
-
-        vlc_mutex_lock( &p_priv->var_lock );
-
-        i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
-        if( i_var < 0 )
-        {
-            msg_Err( p_this, "variable %s has disappeared", psz_name );
-            vlc_mutex_unlock( &p_priv->var_lock );
-            return VLC_ENOVAR;
-        }
-
-        p_var = &p_priv->p_vars[i_var];
-        p_var->b_incallback = false;
-        vlc_cond_broadcast( &p_priv->var_wait );
-    }
+        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval, oldval );
 
     vlc_mutex_unlock( &p_priv->var_lock );
-    return VLC_SUCCESS;
+    return i_ret;
 }
 
 /** Parse a stringified option
@@ -1463,6 +1411,46 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
     /*msg_Dbg( p_this, "Inherited value for var %s from config", psz_name );*/
     return VLC_SUCCESS;
 }
+
+
+/**********************************************************************
+ * Trigger the callbacks
+ **********************************************************************/
+static int TriggerCallback( vlc_object_t *p_this, variable_t *p_var,
+                            const char *psz_name, vlc_value_t oldval,
+                            vlc_value_t newval )
+{
+    int i_var;
+    int i_entries = p_var->i_entries;
+    callback_entry_t *p_entries = p_var->p_entries;
+    vlc_object_internals_t *p_priv = vlc_internals( p_this );
+
+    p_var->b_incallback = true;
+    vlc_mutex_unlock( &p_priv->var_lock );
+
+    /* The real calls */
+    for( ; i_entries-- ; )
+    {
+        p_entries[i_entries].pf_callback( p_this, psz_name, oldval, newval,
+                                          p_entries[i_entries].p_data );
+    }
+
+    vlc_mutex_lock( &p_priv->var_lock );
+
+    i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
+    if( i_var < 0 )
+    {
+        msg_Err( p_this, "variable %s has disappeared", psz_name );
+        return VLC_ENOVAR;
+     }
+
+     p_var = &p_priv->p_vars[i_var];
+     p_var->b_incallback = false;
+     vlc_cond_broadcast( &p_priv->var_wait );
+
+     return VLC_SUCCESS;
+}
+
 
 /**********************************************************************
  * Execute a var command on an object identified by its name
