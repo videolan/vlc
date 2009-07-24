@@ -904,6 +904,7 @@ static void Close( vlc_object_t * p_this )
  *****************************************************************************/
 static void Play( aout_instance_t * p_aout )
 {
+    VLC_UNUSED(p_aout);
 }
 
 
@@ -1051,7 +1052,7 @@ static void Probe( aout_instance_t * p_aout )
     return;
 
 error:
-    msg_Warn( p_aout, "audio device already initialized" );
+    msg_Warn( p_aout, "audio device already in use" );
     free( p_devices );
     return;
 }
@@ -1265,7 +1266,7 @@ static int AudioStreamChangeFormat( aout_instance_t *p_aout, AudioStreamID i_str
 static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
                                       AudioUnitRenderActionFlags *ioActionFlags,
                                       const AudioTimeStamp *inTimeStamp,
-                                      unsigned int inBusNummer,
+                                      unsigned int inBusNumber,
                                       unsigned int inNumberFrames,
                                       AudioBufferList *ioData )
 {
@@ -1275,6 +1276,10 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
 
     aout_instance_t * p_aout = (aout_instance_t *)_p_aout;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
+
+    VLC_UNUSED(ioActionFlags);
+    VLC_UNUSED(inBusNumber);
+    VLC_UNUSED(inNumberFrames);
 
     host_time.mFlags = kAudioTimeStampHostTimeValid;
     AudioDeviceTranslateTime( p_sys->i_selected_dev, inTimeStamp, &host_time );
@@ -1367,6 +1372,10 @@ static OSStatus RenderCallbackSPDIF( AudioDeviceID inDevice,
     aout_instance_t * p_aout = (aout_instance_t *)threadGlobals;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
+    VLC_UNUSED(inDevice);
+    VLC_UNUSED(inInputData);
+    VLC_UNUSED(inInputTime);
+
     /* Check for the difference between the Device clock and mdate */
     p_sys->clock_diff = - (mtime_t)
         AudioConvertHostTimeToNanos( inNow->mHostTime ) / 1000;
@@ -1431,6 +1440,9 @@ static OSStatus StreamListener( AudioStreamID inStream,
 {
     OSStatus err = noErr;
     struct { vlc_mutex_t lock; vlc_cond_t cond; } * w = inClientData;
+
+    VLC_UNUSED(inStream);
+    VLC_UNUSED(inChannel);
  
     switch( inPropertyID )
     {
