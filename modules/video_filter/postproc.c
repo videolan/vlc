@@ -189,12 +189,8 @@ static int OpenPostproc( vlc_object_t *p_this )
     config_ChainParse( p_filter, FILTER_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    var_Create( p_filter, FILTER_PREFIX "q",
-                VLC_VAR_INTEGER | VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT |
-                VLC_VAR_ISCOMMAND );
-    /* For some obscure reason the VLC_VAR_ISCOMMAND isn't taken into account
-       in during var_Create */
-    var_Change( p_filter, FILTER_PREFIX "q", VLC_VAR_SETISCOMMAND, NULL, NULL );
+    var_Create( p_filter, FILTER_PREFIX "q", VLC_VAR_INTEGER |
+                VLC_VAR_HASCHOICE | VLC_VAR_DOINHERIT | VLC_VAR_ISCOMMAND );
 
     text.psz_string = _("Post processing");
     var_Change( p_filter, FILTER_PREFIX "q", VLC_VAR_SETTEXT, &text, NULL );
@@ -214,7 +210,6 @@ static int OpenPostproc( vlc_object_t *p_this )
         {
             msg_Err( p_filter, "Error while creating post processing mode." );
             free( val.psz_string );
-            var_Destroy( p_filter, FILTER_PREFIX "q" );
             pp_free_context( p_sys->pp_context );
             free( p_sys );
             return VLC_EGENERIC;
