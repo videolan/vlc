@@ -89,7 +89,9 @@ static int StoreString( demux_t *p_demux, char **ppsz_string,
         }
         *buf++ = '\0';
 
-        buf = *ppsz_string = realloc (*ppsz_string, buf - *ppsz_string);
+        buf = realloc (*ppsz_string, buf - *ppsz_string);
+        if( buf )
+            *ppsz_string = buf;
     }
     return VLC_SUCCESS;
 }
@@ -250,6 +252,7 @@ static int Demux( demux_t *p_demux )
 
             if( i_read < p_sys->i_data_len - i_pos ) break; /* Done */
 
+            /* XXX this looks fishy and inefficient */
             i_pos += i_read;
             p_sys->i_data_len += 1024;
             p_sys->psz_data = realloc( p_sys->psz_data, p_sys->i_data_len * sizeof( char * ) +1 );
