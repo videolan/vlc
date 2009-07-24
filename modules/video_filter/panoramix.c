@@ -344,6 +344,7 @@ static unsigned CountMonitors( vlc_object_t *obj )
     char *psz_display = var_CreateGetNonEmptyString( obj, "x11-display" );
     int snum;
     xcb_connection_t *conn = xcb_connect( psz_display, &snum );
+    free( psz_display );
     if( xcb_connection_has_error( conn ) )
         return 0;
 
