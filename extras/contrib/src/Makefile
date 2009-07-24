@@ -1759,7 +1759,7 @@ ifdef HAVE_DARWIN_OS
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -fnested-functions" && make && make install)
 else
 ifdef HAVE_WIN32
-	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) --std=gnu99" LIBS="-lpthreadGC2" && make && make install)
+	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) --std=gnu99"  && make && make install)
 else
 	(cd $<; ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" && make -C src && make -C src install)
 endif
@@ -2416,28 +2416,6 @@ ncurses: ncurses-$(NCURSES_VERSION).tar.gz
 CLEAN_FILE += .ncurses
 CLEAN_PKG += ncurses
 DISTCLEAN_PKG += ncurses-$(NCURSES_VERSION).tar.gz
-
-# ***************************************************************************
-# asa library (ASS/SSA support)
-# ***************************************************************************
-
-asa.git.tar.gz:
-	$(WGET) $(ASA_URL)
-
-asa: asa.git.tar.gz
-	$(EXTRACT_GZ)
-	patch -p0 < Patches/asa-git.diff
-
-.asa: asa .fontconfig .pcre .iconv
-	(cd $<; ./bootstrap; $(HOSTCC) CFLAGS="$(CFLAGS) -DPCRE_STATIC" ./configure $(HOSTCONF) --prefix=$(PREFIX))
-	(cd $</lib/import; make || (echo "Please copy a ./preparse file you built for your host into asa/lib/import"; echo "When you are finished, press enter." ; echo "If you are building natively, press enter." ; read i ; make) )
-	(cd $<; make && make install)
-	$(INSTALL_NAME)
-	touch $@
-
-CLEAN_FILE += .asa
-CLEAN_PKG += asa
-DISTCLEAN_PKG += asa.git.tar.gz
 
 # ***************************************************************************
 # FluidSynth library (Midi)
