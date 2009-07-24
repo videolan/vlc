@@ -82,6 +82,11 @@ static void Close( vlc_object_t * );
     "dialect of RTSP. With this parameter VLC will try this dialect, but "\
     "then it cannot connect to normal RTSP servers." )
 
+#define WMSERVER_TEXT N_("WMServer RTSP dialect")
+#define WMSERVER_LONGTEXT N_("WMServer uses an unstandard dialect " \
+    "of RTSP. Selecting this parameter will tell VLC to assume some " \
+    "options contrary to RFC 2326 guidelines.")
+
 #define USER_TEXT N_("RTSP user name")
 #define USER_LONGTEXT N_("Sets the username for the connection, " \
     "if no username or password are set in the url.")
@@ -131,6 +136,9 @@ vlc_module_begin ()
             change_safe()
         add_bool(   "rtsp-kasenna", false, NULL, KASENNA_TEXT,
                     KASENNA_LONGTEXT, true )
+        add_bool(   "rtsp-wmserver", false, NULL, WMSERVER_TEXT,
+                    WMSERVER_LONGTEXT, true)
+            change_safe()
         add_string( "rtsp-user", NULL, NULL, USER_TEXT,
                     USER_LONGTEXT, true )
         add_password( "rtsp-pwd", NULL, NULL, PASS_TEXT,
@@ -547,6 +555,9 @@ describe:
     if( psz_options )
         p_sys->b_get_param = (bool)strstr( psz_options, "GET_PARAMETER" );
     delete [] psz_options;
+
+    if( var_CreateGetBool( p_demux, "rtsp-wmserver" ) )
+       p_sys->b_get_param = true;
 
 #if LIVEMEDIA_LIBRARY_VERSION_INT >= 1223337600
     p_sdp = p_sys->rtsp->describeWithPassword( psz_url, psz_user, psz_pwd,
@@ -1324,7 +1335,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
             *pb = (p_sys->rtsp != NULL) &&
                     (p_sys->i_npt_length > 0) &&
-                    !var_GetBool( p_demux, "rtsp-kasenna" );
+                    ( !var_GetBool( p_demux, "rtsp-kasenna" ) ||
+                      !var_GetBool( p_demux, "rtsp-wmserver" ) );
             *pb2 = false;
             return VLC_SUCCESS;
 
@@ -1333,7 +1345,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             double f_scale, f_old_scale;
 
             if( !p_sys->rtsp || (p_sys->i_npt_length <= 0) ||
-                var_GetBool( p_demux, "rtsp-kasenna" ) )
+                var_GetBool( p_demux, "rtsp-kasenna" ) ||
+                var_GetBool( p_demux, "rtsp-wmserver" ) )
                 return VLC_EGENERIC;
 
             /* According to RFC 2326 p56 chapter 12.35 a RTSP server that
