@@ -78,7 +78,7 @@ vlc_module_end ()
 static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    vout_sys_t *p_sys = NULL;
+    vout_sys_t *p_sys;
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
     p_vout->pf_manage = Manage;
@@ -263,7 +263,6 @@ static void Destroy( vlc_object_t *p_this )
 
     CloseDisplay( p_vout );
     free( p_sys );
-    p_sys = NULL;
 }
 
 static int Manage( vout_thread_t *p_vout )

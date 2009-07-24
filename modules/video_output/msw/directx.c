@@ -438,7 +438,6 @@ static void CloseVideo( vlc_object_t *p_this )
     RestoreScreensaver( p_vout );
 
     free( p_vout->p_sys );
-    p_vout->p_sys = NULL;
 }
 
 /*****************************************************************************
