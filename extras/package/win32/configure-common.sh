@@ -26,6 +26,7 @@
       --enable-mozilla --with-mozilla-sdk-path=/usr/win32/gecko-sdk \
       --enable-activex \
       --enable-sse --enable-mmx \
+      --disable-fluidsynth \
       --disable-gnomevfs --disable-hal \
       --disable-cddax --disable-vcdx --disable-libcdio --disable-vcdinfo \
       --disable-libcddb --disable-dvb --enable-zvbi --disable-telx \
