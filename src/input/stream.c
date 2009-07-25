@@ -1040,91 +1040,24 @@ static int AStreamRefillBlock( stream_t *s )
  * Method 2:
  ****************************************************************************/
 static int AStreamRefillStream( stream_t *s );
+static int AStreamReadNoSeekStream( stream_t *s, void *p_read, unsigned int i_read );
 
 static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
 {
     stream_sys_t *p_sys = s->p_sys;
-    stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
 
-    uint8_t *p_data = (uint8_t *)p_read;
-    unsigned int i_data = 0;
-
-    if( tk->i_start >= tk->i_end )
-        return 0; /* EOF */
-
-    if( p_data == NULL )
+    if( !p_read )
     {
-        /* seek within this stream if possible, else use plain old read and discard */
-        stream_sys_t *p_sys = s->p_sys;
-        access_t     *p_access = p_sys->p_access;
+        const int64_t i_pos_wanted = p_sys->i_pos + i_read;
 
-        bool   b_aseek;
-        access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
-        if( b_aseek )
+        if( AStreamSeekStream( s, i_pos_wanted ) )
         {
-            const int64_t i_pos_wanted = p_sys->i_pos + i_read;
-
-            if( AStreamSeekStream( s, i_pos_wanted ) )
-            {
-                if( p_sys->i_pos != i_pos_wanted )
-                    return 0;
-            }
-            return i_read;
+            if( p_sys->i_pos != i_pos_wanted )
+                return 0;
         }
+        return i_read;
     }
-
-#ifdef STREAM_DEBUG
-    msg_Dbg( s, "AStreamReadStream: %d pos=%"PRId64" tk=%d start=%"PRId64
-             " offset=%d end=%"PRId64,
-             i_read, p_sys->i_pos, p_sys->stream.i_tk,
-             tk->i_start, p_sys->stream.i_offset, tk->i_end );
-#endif
-
-    while( i_data < i_read )
-    {
-        int i_off = (tk->i_start + p_sys->stream.i_offset) %
-                    STREAM_CACHE_TRACK_SIZE;
-        unsigned int i_current =
-            __MAX(0,__MIN( tk->i_end - tk->i_start - p_sys->stream.i_offset,
-                   STREAM_CACHE_TRACK_SIZE - i_off ));
-        int i_copy = __MIN( i_current, i_read - i_data );
-
-        if( i_copy <= 0 ) break; /* EOF */
-
-        /* Copy data */
-        /* msg_Dbg( s, "AStreamReadStream: copy %d", i_copy ); */
-        if( p_data )
-        {
-            memcpy( p_data, &tk->p_buffer[i_off], i_copy );
-            p_data += i_copy;
-        }
-        i_data += i_copy;
-        p_sys->stream.i_offset += i_copy;
-
-        /* Update pos now */
-        p_sys->i_pos += i_copy;
-
-        /* */
-        p_sys->stream.i_used += i_copy;
-
-        if( tk->i_end - tk->i_start - p_sys->stream.i_offset <= i_read -i_data )
-        {
-            const int i_read_requested = __MAX( __MIN( i_read - i_data,
-                                                       STREAM_READ_ATONCE * 10 ),
-                                                STREAM_READ_ATONCE / 2 );
-
-            if( p_sys->stream.i_used < i_read_requested )
-                p_sys->stream.i_used = i_read_requested;
-
-            if( AStreamRefillStream( s ) )
-            {
-                /* EOF */
-                if( tk->i_start >= tk->i_end ) break;
-            }
-        }
-    }
-
-    return i_data;
+    return AStreamReadNoSeekStream( s, p_read, i_read );
 }
 
 static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, unsigned int i_read )
@@ -1191,142 +1124,215 @@ static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, unsigned int
 static int AStreamSeekStream( stream_t *s, int64_t i_pos )
 {
     stream_sys_t *p_sys = s->p_sys;
-    access_t     *p_access = p_sys->p_access;
-    bool   b_aseek;
-    bool   b_afastseek;
-    int i_maxth;
-    int i_new;
-    int i;
+
+    stream_track_t *p_current = &p_sys->stream.tk[p_sys->stream.i_tk];
+    access_t *p_access = p_sys->p_access;
+
+    if( p_current->i_start >= p_current->i_end  && i_pos >= p_current->i_end )
+        return 0; /* EOF */
 
 #ifdef STREAM_DEBUG
     msg_Dbg( s, "AStreamSeekStream: to %"PRId64" pos=%"PRId64
              " tk=%d start=%"PRId64" offset=%d end=%"PRId64,
              i_pos, p_sys->i_pos, p_sys->stream.i_tk,
-             p_sys->stream.tk[p_sys->stream.i_tk].i_start,
+             p_current->i_start,
              p_sys->stream.i_offset,
-             p_sys->stream.tk[p_sys->stream.i_tk].i_end );
+             p_current->i_end );
 #endif
 
-
-    /* Seek in our current track ? */
-    if( i_pos >= p_sys->stream.tk[p_sys->stream.i_tk].i_start &&
-        i_pos < p_sys->stream.tk[p_sys->stream.i_tk].i_end )
-    {
-        stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
-#ifdef STREAM_DEBUG
-        msg_Dbg( s, "AStreamSeekStream: current track" );
-#endif
-        p_sys->i_pos = i_pos;
-        p_sys->stream.i_offset = i_pos - tk->i_start;
-
-        /* If there is not enough data left in the track, refill  */
-        /* \todo How to get a correct value for
-         *    - refilling threshold
-         *    - how much to refill
-         */
-        if( (tk->i_end - tk->i_start ) - p_sys->stream.i_offset <
-                                             p_sys->stream.i_read_size )
-        {
-            if( p_sys->stream.i_used < STREAM_READ_ATONCE / 2  )
-            {
-                p_sys->stream.i_used = STREAM_READ_ATONCE / 2 ;
-                AStreamRefillStream( s );
-            }
-        }
-        return VLC_SUCCESS;
-    }
-
+    bool   b_aseek;
     access_Control( p_access, ACCESS_CAN_SEEK, &b_aseek );
-    if( !b_aseek )
+    if( !b_aseek && i_pos < p_current->i_start )
     {
-        /* We can't do nothing */
-        msg_Dbg( s, "AStreamSeekStream: can't seek" );
+        msg_Warn( s, "AStreamSeekStream: can't seek" );
         return VLC_EGENERIC;
     }
+
+    bool   b_afastseek;
+    access_Control( p_access, ACCESS_CAN_SEEK, &b_afastseek );
+
+    /* FIXME compute seek cost (instead of static 'stupid' value) */
+    int64_t i_skip_threshold;
+    if( b_aseek )
+        i_skip_threshold = b_afastseek ? 128 : 3*p_sys->stream.i_read_size;
+    else
+        i_skip_threshold = INT64_MAX;
 
     /* Date the current track */
-    p_sys->stream.tk[p_sys->stream.i_tk].i_date = mdate();
+    p_current->i_date = mdate();
 
-    /* Try to reuse already read data */
-    for( i = 0; i < STREAM_CACHE_TRACK; i++ )
+    /* Search a new track slot */
+    stream_track_t *tk = NULL;
+    int i_tk_idx = -1;
+
+    /* Prefer the current track */
+    if( p_current->i_start <= i_pos && i_pos - p_current->i_end <= i_skip_threshold )
     {
-        stream_track_t *tk = &p_sys->stream.tk[i];
-
-        if( i_pos >= tk->i_start && i_pos <= tk->i_end )
+        tk = p_current;
+        i_tk_idx = p_sys->stream.i_tk;
+    }
+    if( !tk )
+    {
+        /* Try to maximize already read data */
+        for( int i = 0; i < STREAM_CACHE_TRACK; i++ )
         {
+            stream_track_t *t = &p_sys->stream.tk[i];
+
+            if( t->i_start > i_pos || i_pos > t->i_end )
+                continue;
+
+            if( !tk || tk->i_end < t->i_end )
+            {
+                tk = t;
+                i_tk_idx = i;
+            }
+        }
+    }
+    if( !tk )
+    {
+        /* Use the oldest unused */
+        for( int i = 0; i < STREAM_CACHE_TRACK; i++ )
+        {
+            stream_track_t *t = &p_sys->stream.tk[i];
+
+            if( !tk || tk->i_date > t->i_date )
+            {
+                tk = t;
+                i_tk_idx = i;
+            }
+        }
+    }
+    assert( i_tk_idx >= 0 && i_tk_idx < STREAM_CACHE_TRACK );
+
+    if( tk != p_current )
+        i_skip_threshold = 0;
+    if( tk->i_start <= i_pos && i_pos - tk->i_end <= i_skip_threshold )
+    {
 #ifdef STREAM_DEBUG
-            msg_Dbg( s, "AStreamSeekStream: reusing %d start=%"PRId64
-                     " end=%"PRId64, i, tk->i_start, tk->i_end );
+        msg_Err( s, "AStreamSeekStream: reusing %d start=%"PRId64
+                 " end=%"PRId64"(%s)",
+                 i_tk_idx, tk->i_start, tk->i_end,
+                 tk != p_current ? "seek" : i_pos > tk->i_end ? "skip" : "noseek" );
 #endif
+        if( tk != p_current )
+        {
+            assert( b_aseek );
 
-            /* Seek at the end of the buffer */
-            if( ASeek( s, tk->i_end ) ) return VLC_EGENERIC;
-
-            /* That's it */
-            p_sys->i_pos = i_pos;
-            p_sys->stream.i_tk = i;
-            p_sys->stream.i_offset = i_pos - tk->i_start;
-
-            if( p_sys->stream.i_used < STREAM_READ_ATONCE )
-                p_sys->stream.i_used = STREAM_READ_ATONCE;
-
-            if( AStreamRefillStream( s ) && i_pos == tk->i_end )
+            /* Seek at the end of the buffer
+             * TODO it is stupid to seek now, it would be better to delay it
+             */
+            if( ASeek( s, tk->i_end ) )
                 return VLC_EGENERIC;
-
-            return VLC_SUCCESS;
+        }
+        else
+        {
+            int64_t i_skip = i_pos - tk->i_end;
+            while( i_skip > 0 )
+            {
+                const int i_read_max = __MIN( 10 * STREAM_READ_ATONCE, i_skip );
+                if( AStreamReadNoSeekStream( s, NULL, i_read_max ) != i_read_max )
+                    return VLC_EGENERIC;
+                i_skip -= i_read_max;
+            }
         }
     }
-
-    access_Control( p_access, ACCESS_CAN_SEEK, &b_afastseek );
-    /* FIXME compute seek cost (instead of static 'stupid' value) */
-    i_maxth = __MIN( p_sys->stream.i_read_size, STREAM_READ_ATONCE / 2 );
-    if( !b_afastseek )
-        i_maxth *= 3;
-
-    /* FIXME TODO */
-#if 0
-    /* Search closest segment TODO */
-    for( i = 0; i < STREAM_CACHE_TRACK; i++ )
+    else
     {
-        stream_track_t *tk = &p_sys->stream.tk[i];
-
-        if( i_pos + i_maxth >= tk->i_start )
-        {
-            msg_Dbg( s, "good segment before current pos, TODO" );
-        }
-        if( i_pos - i_maxth <= tk->i_end )
-        {
-            msg_Dbg( s, "good segment after current pos, TODO" );
-        }
-    }
+#ifdef STREAM_DEBUG
+        msg_Err( s, "AStreamSeekStream: hard seek" );
 #endif
+        /* Nothing good, seek and choose oldest segment */
+        if( ASeek( s, i_pos ) )
+            return VLC_EGENERIC;
 
-    /* Nothing good, seek and choose oldest segment */
-    if( ASeek( s, i_pos ) ) return VLC_EGENERIC;
+        tk->i_start = i_pos;
+        tk->i_end   = i_pos;
+    }
+    p_sys->stream.i_offset = i_pos - tk->i_start;
+    p_sys->stream.i_tk = i_tk_idx;
     p_sys->i_pos = i_pos;
 
-    i_new = 0;
-    for( i = 1; i < STREAM_CACHE_TRACK; i++ )
+    /* If there is not enough data left in the track, refill  */
+    /* TODO How to get a correct value for
+     *    - refilling threshold
+     *    - how much to refill
+     */
+    if( (tk->i_end - tk->i_start) - p_sys->stream.i_offset < p_sys->stream.i_read_size )
     {
-        if( p_sys->stream.tk[i].i_date < p_sys->stream.tk[i_new].i_date )
-            i_new = i;
+        if( p_sys->stream.i_used < STREAM_READ_ATONCE / 2 )
+            p_sys->stream.i_used = STREAM_READ_ATONCE / 2;
+
+        if( AStreamRefillStream( s ) && i_pos == tk->i_end )
+            return VLC_EGENERIC;
     }
-
-    /* Reset the segment */
-    p_sys->stream.i_tk     = i_new;
-    p_sys->stream.i_offset =  0;
-    p_sys->stream.tk[i_new].i_start = i_pos;
-    p_sys->stream.tk[i_new].i_end   = i_pos;
-
-    /* Read data */
-    if( p_sys->stream.i_used < STREAM_READ_ATONCE / 2 )
-        p_sys->stream.i_used = STREAM_READ_ATONCE / 2;
-
-    if( AStreamRefillStream( s ) )
-        return VLC_EGENERIC;
-
     return VLC_SUCCESS;
 }
+
+static int AStreamReadNoSeekStream( stream_t *s, void *p_read, unsigned int i_read )
+{
+    stream_sys_t *p_sys = s->p_sys;
+    stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
+
+    uint8_t *p_data = (uint8_t *)p_read;
+    unsigned int i_data = 0;
+
+    if( tk->i_start >= tk->i_end )
+        return 0; /* EOF */
+
+#ifdef STREAM_DEBUG
+    msg_Dbg( s, "AStreamReadStream: %d pos=%"PRId64" tk=%d start=%"PRId64
+             " offset=%d end=%"PRId64,
+             i_read, p_sys->i_pos, p_sys->stream.i_tk,
+             tk->i_start, p_sys->stream.i_offset, tk->i_end );
+#endif
+
+    while( i_data < i_read )
+    {
+        int i_off = (tk->i_start + p_sys->stream.i_offset) %
+                    STREAM_CACHE_TRACK_SIZE;
+        unsigned int i_current =
+            __MAX(0,__MIN( tk->i_end - tk->i_start - p_sys->stream.i_offset,
+                   STREAM_CACHE_TRACK_SIZE - i_off ));
+        int i_copy = __MIN( i_current, i_read - i_data );
+
+        if( i_copy <= 0 ) break; /* EOF */
+
+        /* Copy data */
+        /* msg_Dbg( s, "AStreamReadStream: copy %d", i_copy ); */
+        if( p_data )
+        {
+            memcpy( p_data, &tk->p_buffer[i_off], i_copy );
+            p_data += i_copy;
+        }
+        i_data += i_copy;
+        p_sys->stream.i_offset += i_copy;
+
+        /* Update pos now */
+        p_sys->i_pos += i_copy;
+
+        /* */
+        p_sys->stream.i_used += i_copy;
+
+        if( tk->i_end - tk->i_start - p_sys->stream.i_offset <= i_read -i_data )
+        {
+            const int i_read_requested = __MAX( __MIN( i_read - i_data,
+                                                       STREAM_READ_ATONCE * 10 ),
+                                                STREAM_READ_ATONCE / 2 );
+
+            if( p_sys->stream.i_used < i_read_requested )
+                p_sys->stream.i_used = i_read_requested;
+
+            if( AStreamRefillStream( s ) )
+            {
+                /* EOF */
+                if( tk->i_start >= tk->i_end ) break;
+            }
+        }
+    }
+
+    return i_data;
+}
+
 
 static int AStreamRefillStream( stream_t *s )
 {
