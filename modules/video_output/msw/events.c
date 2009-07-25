@@ -383,11 +383,11 @@ void* EventThread( vlc_object_t *p_this )
 
     msg_Dbg( p_event, "DirectXEventThread terminating" );
 
-    /* clear the changes formerly signaled */
-    p_event->p_vout->p_sys->i_changes = 0;
-
     DirectXCloseWindow( p_event->p_vout );
     vlc_restorecancel (canc);
+    
+    /* clear the changes formerly signaled */
+    p_event->p_vout->p_sys->i_changes = EVENT_THREAD_ENDED;
     return NULL;
 }
 
@@ -416,14 +416,31 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     /* Get this module's instance */
     hInstance = GetModuleHandle(NULL);
 
-    /* If an external window was specified, we'll draw in it. */
-    p_vout->p_sys->parent_window =
-        vout_RequestHWND( p_vout, &p_vout->p_sys->i_window_x,
+    #ifdef MODULE_NAME_IS_direct3d
+    if( !p_vout->p_sys->b_desktop )
+    {
+    #endif
+        /* If an external window was specified, we'll draw in it. */
+        p_vout->p_sys->parent_window =
+            vout_RequestHWND( p_vout, &p_vout->p_sys->i_window_x,
                             &p_vout->p_sys->i_window_y,
                             &p_vout->p_sys->i_window_width,
                             &p_vout->p_sys->i_window_height );
-    if( p_vout->p_sys->parent_window )
-        p_vout->p_sys->hparent = p_vout->p_sys->parent_window->handle.hwnd;
+        if( p_vout->p_sys->parent_window )
+            p_vout->p_sys->hparent = p_vout->p_sys->parent_window->handle.hwnd;
+    #ifdef MODULE_NAME_IS_direct3d
+    }
+    else
+    {
+        /* Find Program Manager */
+        HWND hwnd = FindWindow( _T("Progman"), NULL );
+        if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SHELLDLL_DefView"), NULL );
+        if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SysListView32"), NULL );
+        if( !hwnd )
+            msg_Err( p_vout, "Couldn't find desktop icon window. Desktop mode can't be established." );
+        p_vout->p_sys->hparent = hwnd;
+    }
+    #endif
 
     /* We create the window ourself, there is no previous window proc. */
     p_vout->p_sys->pf_wndproc = NULL;
@@ -601,7 +618,10 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
     DestroyWindow( p_vout->p_sys->hwnd );
     if( p_vout->p_sys->hfswnd ) DestroyWindow( p_vout->p_sys->hfswnd );
 
-    vout_ReleaseWindow( p_vout->p_sys->parent_window );
+    #ifdef MODULE_NAME_IS_direct3d
+    if( !p_vout->p_sys->b_desktop )
+    #endif
+        vout_ReleaseWindow( p_vout->p_sys->parent_window );
     p_vout->p_sys->hwnd = NULL;
 
     /* We don't unregister the Window Class because it could lead to race
@@ -1322,5 +1342,6 @@ void StopEventThread( vout_thread_t *p_vout )
         vlc_object_release( p_vout->p_sys->p_event );
     }
 
-    vlc_mutex_destroy( &p_vout->p_sys->lock );
+    if( !p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG )
+        vlc_mutex_destroy( &p_vout->p_sys->lock );
 }

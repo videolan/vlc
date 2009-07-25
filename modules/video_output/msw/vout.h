@@ -168,6 +168,9 @@ struct vout_sys_t
 #endif
 
 #ifdef MODULE_NAME_IS_direct3d
+    /* show video on desktop window ? */
+    bool      b_desktop;
+
     // core objects
     HINSTANCE               hd3d9_dll;       /* handle of the opened d3d9 dll */
     LPDIRECT3D9             p_d3dobj;
@@ -270,6 +273,9 @@ void StopEventThread ( vout_thread_t *p_vout );
 #define IDM_TOGGLE_ON_TOP WM_USER + 1
 #define DX_POSITION_CHANGE 0x1000
 #define DX_WALLPAPER_CHANGE 0x2000
+#define DX_DESKTOP_CHANGE 0x4000
+#define EVENT_THREAD_ENDED 0x6000
+#define SWITCHING_MODE_FLAG 0x8000
 
 /*****************************************************************************
  * WinCE helpers

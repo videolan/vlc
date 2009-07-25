@@ -80,6 +80,10 @@ static int Direct3DVoutCreateScene      ( vout_thread_t * );
 static void Direct3DVoutReleaseScene    ( vout_thread_t * );
 static void Direct3DVoutRenderScene     ( vout_thread_t *, picture_t * );
 
+static int DesktopCallback( vlc_object_t *p_this, char const *psz_cmd,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data );
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -111,10 +115,18 @@ static int OpenVideoVista( vlc_object_t *obj )
     return IsVistaOrAbove() ? OpenVideo( obj ) : VLC_EGENERIC;
 }
 
+#define DESKTOP_TEXT N_("Enable desktop mode ")
+#define DESKTOP_LONGTEXT N_( \
+    "The desktop mode allows you to display the video on the desktop." )
+
 vlc_module_begin ()
     set_shortname( "Direct3D" )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
+
+    add_bool( "direct3d-desktop", 0, NULL, DESKTOP_TEXT, DESKTOP_LONGTEXT,
+              true )
+
     set_description( N_("DirectX 3D video output") )
     set_capability( "video output", 50 )
     add_shortcut( "direct3d" )
@@ -158,6 +170,7 @@ typedef struct
  *****************************************************************************/
 static int OpenVideo( vlc_object_t *p_this )
 {
+    vlc_value_t val;
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
     /* Allocate structure */
@@ -183,6 +196,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
     p_vout->p_sys->hparent = p_vout->p_sys->hfswnd = NULL;
     p_vout->p_sys->i_changes = 0;
+    p_vout->p_sys->b_desktop = false;
     vlc_mutex_init( &p_vout->p_sys->lock );
     SetRectEmpty( &p_vout->p_sys->rect_display );
     SetRectEmpty( &p_vout->p_sys->rect_parent );
@@ -207,6 +221,13 @@ static int OpenVideo( vlc_object_t *p_this )
         /* Variable to indicate if the window should be on top of others */
         /* Trigger a callback right now */
         var_TriggerCallback( p_vout, "video-on-top" );
+
+        /* Trigger a callback right now */
+        var_Create( p_vout, "direct3d-desktop", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+        val.psz_string = _("Desktop");
+        var_Change( p_vout, "direct3d-desktop", VLC_VAR_SETTEXT, &val, NULL );
+        var_AddCallback( p_vout, "direct3d-desktop", DesktopCallback, NULL );
+        var_TriggerCallback( p_vout, "direct3d-desktop" );
 
         DisableScreensaver ( p_vout );
 
@@ -332,6 +353,7 @@ static int Manage( vout_thread_t *p_vout )
                           rect_parent.right - rect_parent.left,
                           rect_parent.bottom - rect_parent.top,
                           SWP_NOZORDER );
+            UpdateRects( p_vout, true );
         }
     }
     else
@@ -362,6 +384,35 @@ static int Manage( vout_thread_t *p_vout )
         }
 #endif
         p_vout->p_sys->i_changes &= ~DX_POSITION_CHANGE;
+    }
+    
+    /*
+            * Desktop mode change
+            */
+    if( p_vout->p_sys->i_changes & DX_DESKTOP_CHANGE )
+    {
+        /* Close the direct3d instance attached to the current output window. */
+        End( p_vout );
+        StopEventThread( p_vout );
+        /* Set the switching mode flag */
+        p_vout->p_sys->i_changes |= SWITCHING_MODE_FLAG;
+        /* Reset the flag */
+        p_vout->p_sys->i_changes &= ~DX_DESKTOP_CHANGE;
+    }
+    
+    if( p_vout->p_sys->i_changes & EVENT_THREAD_ENDED
+        && p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG )
+    {
+        /* Open the direct3d output and attaches it to the new window */
+        p_vout->p_sys->b_desktop = !p_vout->p_sys->b_desktop;
+        p_vout->pf_display = FirstDisplay;
+
+        CreateEventThread( p_vout );
+        Init( p_vout );
+
+        /* Reset the flags */
+        p_vout->p_sys->i_changes &= ~EVENT_THREAD_ENDED;
+        p_vout->p_sys->i_changes &= ~SWITCHING_MODE_FLAG;
     }
 
     /* autoscale toggle */
@@ -493,6 +544,10 @@ static int Manage( vout_thread_t *p_vout )
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
     LPDIRECT3DDEVICE9       p_d3ddev = p_vout->p_sys->p_d3ddev;
+
+    if( p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG )
+        return;
+
     // Present the back buffer contents to the display
     // stretching and filtering happens here
     HRESULT hr = IDirect3DDevice9_Present(p_d3ddev,
@@ -1266,6 +1321,9 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     HRESULT hr;
     float f_width, f_height;
 
+    if( p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG )
+        return;
+    
     // check if device is still available
     hr = IDirect3DDevice9_TestCooperativeLevel(p_d3ddev);
     if( FAILED(hr) )
@@ -1423,3 +1481,36 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     }
 }
 
+
+/*****************************************************************************
+ * DesktopCallback: desktop mode variable callback
+ *****************************************************************************/
+static int DesktopCallback( vlc_object_t *p_this, char const *psz_cmd,
+                            vlc_value_t oldval, vlc_value_t newval,
+                            void *p_data )
+{
+    VLC_UNUSED( psz_cmd );
+    VLC_UNUSED( oldval );
+    VLC_UNUSED( p_data );
+
+    vout_thread_t *p_vout = (vout_thread_t *)p_this;
+
+    if( (newval.b_bool && !p_vout->p_sys->b_desktop) ||
+        (!newval.b_bool && p_vout->p_sys->b_desktop) )
+    {
+        playlist_t *p_playlist = pl_Hold( p_vout );
+
+        if( p_playlist )
+        {
+            /* Modify playlist as well because the vout might have to be
+             * restarted */
+            var_Create( p_playlist, "direct3d-desktop", VLC_VAR_BOOL );
+            var_Set( p_playlist, "direct3d-desktop", newval );
+            pl_Release( p_vout );
+        }
+
+        p_vout->p_sys->i_changes |= DX_DESKTOP_CHANGE;
+    }
+
+    return VLC_SUCCESS;
+}
