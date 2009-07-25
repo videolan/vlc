@@ -1,24 +1,11 @@
-Index: configure
-===================================================================
---- configure.orig	2009-03-23 18:20:30.339627360 +0000
-+++ configure	2009-03-23 18:25:12.457447960 +0000
-@@ -1438,7 +1438,7 @@
-     die "C compiler test failed."
+--- configure.orig	2009-07-26 00:06:36.000000000 +0200
++++ configure	2009-07-26 00:08:21.000000000 +0200
+@@ -1674,7 +1674,7 @@
  fi
  
+ add_cppflags -D_ISOC99_SOURCE -D_POSIX_C_SOURCE=200112
 -check_cflags -std=c99
 +#check_cflags -std=c99
- check_cc -D_FILE_OFFSET_BITS=64 <<EOF && add_cflags -D_FILE_OFFSET_BITS=64
+ check_cc -D_FILE_OFFSET_BITS=64 <<EOF && add_cppflags -D_FILE_OFFSET_BITS=64
  #include <stdlib.h>
  EOF
-@@ -1611,8 +1611,8 @@
-         objformat="win32"
-         enable dos_paths
-         if ! enabled x86_64; then
--            check_cpp_condition _mingw.h "(__MINGW32_MAJOR_VERSION > 3) || (__MINGW32_MAJOR_VERSION == 3 && __MINGW32_MINOR_VERSION >= 15)" ||
--                die "ERROR: MinGW runtime version must be >= 3.15."
-+            check_cpp_condition _mingw.h "(__MINGW32_MAJOR_VERSION > 3) || (__MINGW32_MAJOR_VERSION == 3 && __MINGW32_MINOR_VERSION >= 13)" ||
-+                die "ERROR: MinGW runtime version must be >= 3.13."
-             enabled_any avisynth vfwcap_demuxer &&
-                 { check_cpp_condition w32api.h "(__W32API_MAJOR_VERSION > 3) || (__W32API_MAJOR_VERSION == 3 && __W32API_MINOR_VERSION >= 13)" ||
-                   die "ERROR: avisynth and vfwcap_demuxer require w32api version 3.13 or later."; }
