@@ -1,0 +1,64 @@
+diff -ruN fontconfig.new/src/fcinit.c fontconfig/src/fcinit.c
+--- fontconfig.new/src/fcinit.c	2009-07-25 21:55:10.000000000 +0200
++++ fontconfig/src/fcinit.c	2009-07-25 21:58:05.000000000 +0200
+@@ -68,7 +68,8 @@
+     if (!config)
+ 	return FcFalse;
+     
+-    if (!FcConfigParseAndLoad (config, 0, FcTrue))
++//    if (!FcConfigParseAndLoad (config, 0, FcTrue))
++    if (1)
+     {
+ 	FcConfigDestroy (config);
+ 	return FcInitFallbackConfig ();
+diff -ruN fontconfig.new/src/fcxml.c fontconfig/src/fcxml.c
+--- fontconfig.new/src/fcxml.c	2009-07-25 21:55:10.000000000 +0200
++++ fontconfig/src/fcxml.c	2009-07-25 21:56:37.000000000 +0200
+@@ -23,6 +23,8 @@
+  */
+ 
+ #include "fcint.h"
++
++#if 0
+ #include <fcntl.h>
+ #include <stdarg.h>
+ #include <dirent.h>
+@@ -58,6 +60,8 @@
+ #undef STRICT
+ #endif
+ 
++#endif
++
+ static void
+ FcExprDestroy (FcExpr *e);
+ 
+@@ -71,6 +75,7 @@
+     free (test);
+ }
+ 
++#if 0
+ static FcExpr *
+ FcExprCreateInteger (FcConfig *config, int i)
+ {
+@@ -179,7 +184,7 @@
+     }
+     return e;
+ }
+-
++#endif
+ static void
+ FcExprDestroy (FcExpr *e)
+ {
+@@ -255,6 +260,7 @@
+     free (e);
+ }
+ 
++#if 0
+ typedef enum _FcElement {
+     FcElementNone,
+     FcElementFontconfig,
+@@ -2589,3 +2595,4 @@
+ #define __fcxml__
+ #include "fcaliastail.h"
+ #undef __fcxml__
++#endif
