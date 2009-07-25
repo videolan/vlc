@@ -806,7 +806,13 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_block->i_length = 0;
     }
     else if( p_stream->fmt.i_codec == VLC_CODEC_THEORA )
+    {
         p_block->i_dts = p_block->i_pts = i_pts;
+        if( (p_oggpacket->granulepos & ((1<<p_stream->i_granule_shift)-1)) == 0 )
+        {
+            p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+        }
+    }
     else if( p_stream->fmt.i_codec == VLC_CODEC_DIRAC )
     {
         ogg_int64_t dts = p_oggpacket->granulepos >> 31;

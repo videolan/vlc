@@ -818,6 +818,11 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     memcpy( p_block->p_buffer, oggpacket.packet, oggpacket.bytes );
     p_block->i_dts = p_block->i_pts = p_pict->date;
 
+    if( theora_packet_iskeyframe( &oggpacket ) )
+    {
+        p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+    }
+
     return p_block;
 }
 
