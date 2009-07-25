@@ -41,7 +41,6 @@
 # include <sched.h>
 #endif
 
-
 struct vlc_thread_boot
 {
     void * (*entry) (vlc_object_t *);
@@ -83,17 +82,6 @@ int vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line,
 
     /* Make sure we don't re-create a thread if the object has already one */
     assert( !p_priv->b_thread );
-
-#if defined( LIBVLC_USE_PTHREAD )
-#ifndef __APPLE__
-    if( config_GetInt( p_this, "rt-priority" ) > 0 )
-#endif
-    {
-        /* Hack to avoid error msg */
-        if( config_GetType( p_this, "rt-offset" ) )
-            i_priority += config_GetInt( p_this, "rt-offset" );
-    }
-#endif
 
     p_priv->b_thread = true;
     i_ret = vlc_clone( &p_priv->thread_id, thread_entry, boot, i_priority );

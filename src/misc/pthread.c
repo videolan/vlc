@@ -461,6 +461,31 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
     return pthread_getspecific (key);
 }
 
+static bool rt_priorities = false;
+static int rt_offset;
+
+void vlc_threads_setup (libvlc_int_t *p_libvlc)
+{
+    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+    static bool initialized = false;
+
+    vlc_mutex_lock (&lock);
+    /* Initializes real-time priorities before any thread is created,
+     * just once per process. */
+    if (!initialized)
+    {
+#ifndef __APPLE__
+        if (config_GetInt (p_libvlc, "rt-priority"))
+#endif
+        {
+            rt_offset = config_GetInt (p_libvlc, "rt-offset");
+            rt_priorities = true;
+        }
+        initialized = true;
+    }
+    vlc_mutex_unlock (&lock);
+}
+
 /**
  * Creates and starts new thread.
  *
@@ -504,8 +529,9 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
 #if defined (_POSIX_PRIORITY_SCHEDULING) && (_POSIX_PRIORITY_SCHEDULING >= 0) \
  && defined (_POSIX_THREAD_PRIORITY_SCHEDULING) \
  && (_POSIX_THREAD_PRIORITY_SCHEDULING >= 0)
+    if (rt_priorities)
     {
-        struct sched_param sp = { .sched_priority = priority, };
+        struct sched_param sp = { .sched_priority = priority + rt_offset, };
         int policy;
 
         if (sp.sched_priority <= 0)

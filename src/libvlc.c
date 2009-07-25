@@ -733,6 +733,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         var_SetInteger( p_libvlc, "verbose", -1 );
         priv->i_verbose = -1;
     }
+    vlc_threads_setup( p_libvlc );
 
     if( priv->b_color )
         priv->b_color = config_GetInt( p_libvlc, "color" ) > 0;

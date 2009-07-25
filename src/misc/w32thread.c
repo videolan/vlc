@@ -402,6 +402,11 @@ void *vlc_threadvar_get (vlc_threadvar_t key)
 
 
 /*** Threads ***/
+void vlc_threads_setup (libvlc_int_t *p_libvlc)
+{
+    (void) p_libvlc;
+}
+
 static unsigned __stdcall vlc_entry (void *data)
 {
     vlc_cancel_t cancel_data = VLC_CANCEL_INIT;
