@@ -698,7 +698,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->ti.noise_sensitivity = 1;
 
     theora_encode_init( &p_sys->td, &p_sys->ti );
-    theora_info_clear( &p_sys->ti );
     theora_comment_init( &p_sys->tc );
 
     /* Create and store headers */
