@@ -530,6 +530,11 @@ void PLModel::ProcessInputItemUpdate( input_thread_t *p_input )
 {
     if( !p_input ) return;
     ProcessInputItemUpdate( input_GetItem( p_input )->i_id );
+    if( p_input && !( p_input->b_dead || !vlc_object_alive( p_input ) ) )
+    {
+        PLItem *item = FindByInput( rootItem, input_GetItem( p_input )->i_id );
+        emit currentChanged( index( item, 0 ) );
+    }
 }
 void PLModel::ProcessInputItemUpdate( int i_input_id )
 {

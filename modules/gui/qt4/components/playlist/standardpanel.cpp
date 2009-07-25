@@ -72,7 +72,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     view->setDragEnabled( true );
     view->setAcceptDrops( true );
     view->setDropIndicatorShown( true );
-    view->setAutoScroll( true );
 
 
     getSettings()->beginGroup("Playlist");
@@ -97,10 +96,10 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
              model,activateItem( const QModelIndex& ) );
     CONNECT( view, rightClicked( QModelIndex , QPoint ),
              this, doPopup( QModelIndex, QPoint ) );
-    CONNECT( model, dataChanged( const QModelIndex&, const QModelIndex& ),
-             this, handleExpansion( const QModelIndex& ) );
     CONNECT( view->header(), customContextMenuRequested( const QPoint & ),
              this, popupSelectColumn( QPoint ) );
+    CONNECT( model, currentChanged( const QModelIndex& ),
+             this, handleExpansion( const QModelIndex& ) );
 
     currentRootId = -1;
     CONNECT( parent, rootChanged( int ), this, setCurrentRootId( int ) );
@@ -207,10 +206,9 @@ void StandardPLPanel::gotoPlayingItem()
     view->scrollTo( view->currentIndex() );
 }
 
-void StandardPLPanel::handleExpansion( const QModelIndex &index )
+void StandardPLPanel::handleExpansion( const QModelIndex& index )
 {
-    if( model->isCurrent( index ) )
-        view->scrollTo( index, QAbstractItemView::EnsureVisible );
+    view->scrollTo( index, QAbstractItemView::EnsureVisible );
 }
 
 void StandardPLPanel::setCurrentRootId( int _new )
