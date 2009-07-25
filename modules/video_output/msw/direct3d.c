@@ -385,7 +385,7 @@ static int Manage( vout_thread_t *p_vout )
 #endif
         p_vout->p_sys->i_changes &= ~DX_POSITION_CHANGE;
     }
-    
+
     /*
             * Desktop mode change
             */
@@ -399,7 +399,7 @@ static int Manage( vout_thread_t *p_vout )
         /* Reset the flag */
         p_vout->p_sys->i_changes &= ~DX_DESKTOP_CHANGE;
     }
-    
+
     if( p_vout->p_sys->i_changes & EVENT_THREAD_ENDED
         && p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG )
     {
@@ -1323,7 +1323,7 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG )
         return;
-    
+
     // check if device is still available
     hr = IDirect3DDevice9_TestCooperativeLevel(p_d3ddev);
     if( FAILED(hr) )

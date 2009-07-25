@@ -1756,7 +1756,7 @@ static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
         bAlignSizeSrc = (ddcaps.dwCaps & DDCAPS_ALIGNSIZESRC) ? 1 : 0;
         /* Determine overlay destination size alignment */
         bAlignSizeDest = (ddcaps.dwCaps & DDCAPS_ALIGNSIZEDEST) ? 1 : 0;
- 
+
         msg_Dbg( p_vout, "DirectDraw Capabilities: overlay=%i yuvoverlay=%i "
                          "can_deinterlace_overlay=%i colorkey=%i stretch=%i "
                          "bltfourcc=%i",

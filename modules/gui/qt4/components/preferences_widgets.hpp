@@ -207,7 +207,7 @@ public:
     virtual void show() { checkbox->show(); }
     virtual void hide() { checkbox->hide(); }
     virtual int getType() { return CONFIG_ITEM_BOOL; }
-private:    
+private:
     QAbstractButton *checkbox;
     void finish();
 };

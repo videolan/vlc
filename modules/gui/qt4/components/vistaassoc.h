@@ -59,7 +59,7 @@ typedef GUID IID;
 #define REFIID const IID* const
 
 extern "C" {
-    HRESULT WINAPI CoCreateInstance(const GUID *,LPUNKNOWN,DWORD,REFIID,PVOID*);         
+    HRESULT WINAPI CoCreateInstance(const GUID *,LPUNKNOWN,DWORD,REFIID,PVOID*);
     HRESULT WINAPI CoInitialize(PVOID);
     void WINAPI CoUninitialize(void);
 };

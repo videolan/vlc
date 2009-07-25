@@ -385,7 +385,7 @@ void* EventThread( vlc_object_t *p_this )
 
     DirectXCloseWindow( p_event->p_vout );
     vlc_restorecancel (canc);
-    
+
     /* clear the changes formerly signaled */
     p_event->p_vout->p_sys->i_changes = EVENT_THREAD_ENDED;
     return NULL;
