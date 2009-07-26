@@ -482,21 +482,21 @@ static void Probe( aout_instance_t * p_aout )
                              AOUT_CHAN_CENTER | AOUT_CHAN_REARLEFT |
                              AOUT_CHAN_MIDDLELEFT | AOUT_CHAN_MIDDLERIGHT |
                              AOUT_CHAN_REARRIGHT | AOUT_CHAN_LFE;
-       if( p_aout->output.output.i_physical_channels == i_physical_channels )
-       {
-           if( CreateDSBufferPCM( p_aout, &i_format, i_physical_channels, 8,
+    if( p_aout->output.output.i_physical_channels == i_physical_channels )
+    {
+        if( CreateDSBufferPCM( p_aout, &i_format, i_physical_channels, 8,
                                   p_aout->output.output.i_rate, true )
-               == VLC_SUCCESS )
-           {
-               val.i_int = AOUT_VAR_7_1;
-               text.psz_string = (char*) "7.1";
-               var_Change( p_aout, "audio-device",
-                           VLC_VAR_ADDCHOICE, &val, &text );
-               var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
-               is_default_output_set = true;
-               msg_Dbg( p_aout, "device supports 7.1 channels" );
-           }
-       }
+            == VLC_SUCCESS )
+        {
+            val.i_int = AOUT_VAR_7_1;
+            text.psz_string = (char*) "7.1";
+            var_Change( p_aout, "audio-device",
+                        VLC_VAR_ADDCHOICE, &val, &text );
+            var_Change( p_aout, "audio-device", VLC_VAR_SETDEFAULT, &val, NULL );
+            is_default_output_set = true;
+            msg_Dbg( p_aout, "device supports 7.1 channels" );
+        }
+    }
 
     /* Test for 3 Front 2 Rear support */
     i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
