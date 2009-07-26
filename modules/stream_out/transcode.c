@@ -1910,8 +1910,7 @@ static int transcode_video_process( sout_stream_t *p_stream,
         /* Check if we have a subpicture to overlay */
         if( p_sys->p_spu )
         {
-            p_subpic = spu_SortSubpictures( p_sys->p_spu, p_pic->date,
-                       false /* Fixme: check if stream is paused */, false );
+            p_subpic = spu_SortSubpictures( p_sys->p_spu, p_pic->date, false );
             /* TODO: get another pic */
         }
 
@@ -1941,8 +1940,9 @@ static int transcode_video_process( sout_stream_t *p_stream,
             fmt.i_sar_num = fmt.i_aspect * fmt.i_height / fmt.i_width;
             fmt.i_sar_den = VOUT_ASPECT_FACTOR;
 
+            /* FIXME the mdate() seems highly suspicious */
             spu_RenderSubpictures( p_sys->p_spu, p_pic, &fmt,
-                                   p_subpic, &id->p_decoder->fmt_out.video, false );
+                                   p_subpic, &id->p_decoder->fmt_out.video, mdate() );
         }
 
         /* Run user specified filter chain */
@@ -2334,7 +2334,7 @@ static int transcode_osd_process( sout_stream_t *p_stream,
     /* Check if we have a subpicture to send */
     if( p_sys->p_spu && in->i_dts > 0)
     {
-        p_subpic = spu_SortSubpictures( p_sys->p_spu, in->i_dts, false, false );
+        p_subpic = spu_SortSubpictures( p_sys->p_spu, in->i_dts, false );
     }
     else
     {

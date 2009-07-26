@@ -107,7 +107,8 @@ struct vout_thread_sys_t
 
 /* DO NOT use vout_RenderPicture unless you are in src/video_ouput */
 picture_t *vout_RenderPicture( vout_thread_t *, picture_t *,
-                               subpicture_t *, bool b_paused );
+                               subpicture_t *,
+                               mtime_t render_date );
 
 /* DO NOT use vout_UsePictureLocked unless you are in src/video_ouput
  *

@@ -149,7 +149,8 @@ static void SpuRenderRegion( spu_t *,
                              subpicture_t *, subpicture_region_t *,
                              const spu_scale_t scale_size,
                              const video_format_t *p_fmt,
-                             const spu_area_t *p_subtitle_area, int i_subtitle_area );
+                             const spu_area_t *p_subtitle_area, int i_subtitle_area,
+                             mtime_t render_date );
 
 static void UpdateSPU   ( spu_t *, vlc_object_t * );
 static int  CropCallback( vlc_object_t *, char const *,
@@ -350,13 +351,15 @@ void spu_DisplaySubpicture( spu_t *p_spu, subpicture_t *p_subpic )
 void spu_RenderSubpictures( spu_t *p_spu,
                             picture_t *p_pic_dst, const video_format_t *p_fmt_dst,
                             subpicture_t *p_subpic_list,
-                            const video_format_t *p_fmt_src, bool b_paused )
+                            const video_format_t *p_fmt_src,
+                            mtime_t render_date )
 {
     spu_private_t *p_sys = p_spu->p;
 
+    const mtime_t system_date = mdate();
+
     const int i_source_video_width  = p_fmt_src->i_width;
     const int i_source_video_height = p_fmt_src->i_height;
-    const mtime_t i_current_date = mdate();
 
     unsigned int i_subpicture;
     subpicture_t *pp_subpicture[VOUT_MAX_SUBPICTURES];
@@ -375,11 +378,11 @@ void spu_RenderSubpictures( spu_t *p_spu,
             p_subpic != NULL;
                 p_subpic = p_subpic->p_next )
     {
-        /* */
-        if( !b_paused && p_subpic->pf_pre_render )
+        /* TODO remove pre-render */
+        if( p_subpic->pf_pre_render )
             p_subpic->pf_pre_render( p_spu, p_subpic, p_fmt_dst );
 
-        if( !b_paused && p_subpic->pf_update_regions )
+        if( p_subpic->pf_update_regions )
         {
             video_format_t fmt_org = *p_fmt_dst;
             fmt_org.i_width =
@@ -387,7 +390,8 @@ void spu_RenderSubpictures( spu_t *p_spu,
             fmt_org.i_height =
             fmt_org.i_visible_height = i_source_video_height;
 
-            p_subpic->pf_update_regions( p_spu, p_subpic, &fmt_org, i_current_date );
+            p_subpic->pf_update_regions( p_spu, p_subpic, &fmt_org,
+                                         p_subpic->b_subtitle ? render_date : system_date );
         }
 
         /* */
@@ -505,7 +509,8 @@ void spu_RenderSubpictures( spu_t *p_spu,
             /* */
             SpuRenderRegion( p_spu, p_pic_dst, &area,
                              p_subpic, p_region, scale, p_fmt_dst,
-                             p_subtitle_area, i_subtitle_area );
+                             p_subtitle_area, i_subtitle_area,
+                             p_subpic->b_subtitle ? render_date : system_date );
 
             if( p_subpic->b_subtitle )
             {
@@ -540,12 +545,13 @@ void spu_RenderSubpictures( spu_t *p_spu,
  * to be removed if a newer one is available), which makes it a lot
  * more difficult to guess if a subpicture has to be rendered or not.
  *****************************************************************************/
-subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
-                                   bool b_paused, bool b_subtitle_only )
+subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
+                                   bool b_subtitle_only )
 {
     spu_private_t *p_sys = p_spu->p;
     int i_channel;
     subpicture_t *p_subpic = NULL;
+    const mtime_t system_date = mdate();
 
     /* Update sub-filter chain */
     vlc_mutex_lock( &p_sys->lock );
@@ -563,7 +569,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
     }
 
     /* Run subpicture filters */
-    filter_chain_SubFilter( p_sys->p_chain, display_date );
+    filter_chain_SubFilter( p_sys->p_chain, render_date );
 
     vlc_mutex_lock( &p_sys->lock );
 
@@ -575,8 +581,9 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
         bool         pb_available_late[VOUT_MAX_SUBPICTURES];
         int          i_available = 0;
 
-        mtime_t      start_date = display_date;
-        mtime_t      ephemer_date = 0;
+        mtime_t      start_date = render_date;
+        mtime_t      ephemer_subtitle_date = 0;
+        mtime_t      ephemer_system_date = 0;
         int i_index;
 
         /* Select available pictures */
@@ -599,25 +606,25 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
             {
                 continue;
             }
-            if( display_date &&
-                display_date < p_current->i_start )
+            if( render_date &&
+                render_date < p_current->i_start )
             {
                 /* Too early, come back next monday */
                 continue;
             }
 
-            if( p_current->i_start > ephemer_date )
-                ephemer_date = p_current->i_start;
+            mtime_t *pi_ephemer_date = p_current->b_subtitle ? &ephemer_subtitle_date : &ephemer_system_date;
+            if( p_current->i_start > *pi_ephemer_date )
+                *pi_ephemer_date = p_current->i_start;
 
-            b_stop_valid = ( !p_current->b_ephemer || p_current->i_stop > p_current->i_start ) &&
-                           ( !p_current->b_subtitle || !b_paused ); /* XXX Assume that subtitle are pausable */
+            b_stop_valid = !p_current->b_ephemer || p_current->i_stop > p_current->i_start;
 
-            b_late = b_stop_valid && p_current->i_stop <= display_date;
+            b_late = b_stop_valid && p_current->i_stop <= p_current->b_subtitle ? render_date : system_date;
 
             /* start_date will be used for correct automatic overlap support
              * in case picture that should not be displayed anymore (display_time)
              * overlap with a picture to be displayed (p_current->i_start)  */
-            if( !b_late && !p_current->b_ephemer )
+            if( p_current->b_subtitle && !b_late && !p_current->b_ephemer )
                 start_date = p_current->i_start;
 
             /* */
@@ -638,7 +645,10 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
             subpicture_t *p_current = p_available_subpic[i_index];
             bool b_late = pb_available_late[i_index];
 
-            if( ( b_late && p_current->i_stop <= __MAX( start_date, p_sys->i_last_sort_date ) ) ||
+            const mtime_t stop_date = p_current->b_subtitle ? __MAX( start_date, p_sys->i_last_sort_date ) : system_date;
+            const mtime_t ephemer_date = p_current->b_subtitle ? ephemer_subtitle_date : ephemer_system_date;
+
+            if( ( b_late && p_current->i_stop <= stop_date ) ||
                 ( p_current->b_ephemer && p_current->i_start < ephemer_date ) )
             {
                 /* Destroy late and obsolete ephemer subpictures */
@@ -651,7 +661,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t display_date,
         }
     }
 
-    p_sys->i_last_sort_date = display_date;
+    p_sys->i_last_sort_date = render_date;
     vlc_mutex_unlock( &p_sys->lock );
 
     return p_subpic;
@@ -1034,7 +1044,7 @@ static void SpuRenderCreateAndLoadScale( spu_t *p_spu )
 
 static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
                            subpicture_t *p_subpic, subpicture_region_t *p_region,
-                           int i_min_scale_ratio )
+                           int i_min_scale_ratio, mtime_t render_date )
 {
     filter_t *p_text = p_spu->p->p_text;
 
@@ -1063,7 +1073,7 @@ static void SpuRenderText( spu_t *p_spu, bool *pb_rerender_text,
      * the text over time.
      */
     var_SetTime( p_text, "spu-duration", p_subpic->i_stop - p_subpic->i_start );
-    var_SetTime( p_text, "spu-elapsed", mdate() - p_subpic->i_start );
+    var_SetTime( p_text, "spu-elapsed", render_date );
     var_SetBool( p_text, "text-rerender", false );
     var_SetInteger( p_text, "scale", i_min_scale_ratio );
 
@@ -1326,7 +1336,8 @@ static void SpuRenderRegion( spu_t *p_spu,
                              subpicture_t *p_subpic, subpicture_region_t *p_region,
                              const spu_scale_t scale_size,
                              const video_format_t *p_fmt,
-                             const spu_area_t *p_subtitle_area, int i_subtitle_area )
+                             const spu_area_t *p_subtitle_area, int i_subtitle_area,
+                             mtime_t render_date )
 {
     spu_private_t *p_sys = p_spu->p;
 
@@ -1346,7 +1357,8 @@ static void SpuRenderRegion( spu_t *p_spu,
     if( p_region->fmt.i_chroma == VLC_CODEC_TEXT )
     {
         const int i_min_scale_ratio = SCALE_UNIT; /* FIXME what is the right value? (scale_size is not) */
-        SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region, i_min_scale_ratio );
+        SpuRenderText( p_spu, &b_rerender_text, p_subpic, p_region,
+                       i_min_scale_ratio, render_date );
         b_restore_format = b_rerender_text;
 
         /* Check if the rendering has failed ... */

@@ -115,7 +115,7 @@ VLC_EXPORT( void, spu_DisplaySubpicture, ( spu_t *, subpicture_t * ) );
  *
  * The returned list can only be used by spu_RenderSubpictures.
  */
-VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t display_date, bool b_paused, bool b_subtitle_only ) );
+VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t render_date, bool b_subtitle_only ) );
 
 /**
  * This function renders a list of subpicture_t on the provided picture.
@@ -123,7 +123,7 @@ VLC_EXPORT( subpicture_t *, spu_SortSubpictures, ( spu_t *, mtime_t display_date
  * \param p_fmt_dst is the format of the destination picture.
  * \param p_fmt_src is the format of the original(source) video.
  */
-VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  picture_t *, const video_format_t *p_fmt_dst, subpicture_t *p_list, const video_format_t *p_fmt_src, bool b_paused ) );
+VLC_EXPORT( void, spu_RenderSubpictures, ( spu_t *,  picture_t *, const video_format_t *p_fmt_dst, subpicture_t *p_list, const video_format_t *p_fmt_src, mtime_t render_date ) );
 
 /** @}*/
 
