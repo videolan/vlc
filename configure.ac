@@ -3748,6 +3748,9 @@ AS_IF( [test "${enable_zvbi}" != "no"],[
         zvbi-0.2 >= 0.2.25,
         [
           VLC_ADD_LIBS([zvbi],[$ZVBI_LIBS])
+          if test "${SYS}" = "mingw32"; then
+          VLC_ADD_LIBS([zvbi],[ -lpthreadGC2])
+          fi
           VLC_ADD_CFLAGS([zvbi],[$ZVBI_CFLAGS])
           VLC_ADD_PLUGIN([zvbi])
           AC_DEFINE(ZVBI_COMPILED, 1, [Define if the zvbi module is built])
