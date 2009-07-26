@@ -584,9 +584,11 @@ void vlc_cancel (vlc_thread_t thread_id)
 }
 
 /**
- * Waits for a thread to complete (if needed), and destroys it.
+ * Waits for a thread to complete (if needed), then destroys it.
  * This is a cancellation point; in case of cancellation, the join does _not_
  * occur.
+ * @warning
+ * A thread cannot join itself (normally VLC will abort if this is attempted).
  *
  * @param handle thread handle
  * @param p_result [OUT] pointer to write the thread return value or NULL
