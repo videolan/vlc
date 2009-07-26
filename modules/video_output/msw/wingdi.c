@@ -40,58 +40,9 @@
 #include <tchar.h>
 #include <commctrl.h>
 
-/*#ifdef MODULE_NAME_IS_wingapi
-    typedef struct GXDisplayProperties {
-        DWORD cxWidth;
-        DWORD cyHeight;
-        long cbxPitch;
-        long cbyPitch;
-        long cBPP;
-        DWORD ffFormat;
-    } GXDisplayProperties;
-
-    typedef struct GXScreenRect {
-        DWORD dwTop;
-        DWORD dwLeft;
-        DWORD dwWidth;
-        DWORD dwHeight;
-    } GXScreenRect;
-
-#   define GX_FULLSCREEN    0x01
-#   define GX_NORMALKEYS    0x02
-#   define GX_LANDSCAPEKEYS 0x03
-
-#   ifndef kfLandscape
-#       define kfLandscape      0x8
-#       define kfPalette        0x10
-#       define kfDirect         0x20
-#       define kfDirect555      0x40
-#       define kfDirect565      0x80
-#       define kfDirect888      0x100
-#       define kfDirect444      0x200
-#       define kfDirectInverted 0x400
-#   endif
-#endif */ /* MODULE_NAME_IS_wingapi */
-
 #include "vout.h"
 
 #define MAX_DIRECTBUFFERS 10
-
-#ifdef UNDER_CE
-#ifndef WS_OVERLAPPEDWINDOW
-#   define WS_OVERLAPPEDWINDOW 0xcf0000
-#endif
-#ifndef WS_EX_NOPARENTNOTIFY
-#   define WS_EX_NOPARENTNOTIFY 4
-#endif
-#ifndef WS_EX_APPWINDOW
-#define WS_EX_APPWINDOW 0x40000
-#endif
-//#define SetWindowLongPtr SetWindowLong
-//#define GetWindowLongPtr GetWindowLong
-//#define GWLP_USERDATA GWL_USERDATA
-#define AdjustWindowRect(a,b,c)
-#endif //UNDER_CE
 
 #ifndef WS_NONAVDONEBUTTON
 #define WS_NONAVDONEBUTTON 0
