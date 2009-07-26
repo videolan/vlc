@@ -569,26 +569,41 @@ static void RegionDraw( subpicture_region_t *p_region, ass_image_t *p_img )
             p_img->dst_y < i_y || p_img->dst_y + p_img->h > i_y + i_height )
             continue;
 
-        const int r = (p_img->color >> 24)&0xff;
-        const int g = (p_img->color >> 16)&0xff;
-        const int b = (p_img->color >>  8)&0xff;
-        const int a = (p_img->color      )&0xff;
+        const unsigned r = (p_img->color >> 24)&0xff;
+        const unsigned g = (p_img->color >> 16)&0xff;
+        const unsigned b = (p_img->color >>  8)&0xff;
+        const unsigned a = (p_img->color      )&0xff;
         int x, y;
 
         for( y = 0; y < p_img->h; y++ )
         {
             for( x = 0; x < p_img->w; x++ )
             {
-                const int alpha = p_img->bitmap[y*p_img->stride+x];
-                const int an = (255 - a) * alpha / 255;
+                const unsigned alpha = p_img->bitmap[y*p_img->stride+x];
+                const unsigned an = (255 - a) * alpha / 255;
 
                 uint8_t *p_rgba = &p->p_pixels[(y+p_img->dst_y-i_y) * p->i_pitch + 4 * (x+p_img->dst_x-i_x)];
+                const unsigned ao = p_rgba[3];
 
                 /* Native endianness, but RGBA ordering */
-                p_rgba[0] = ( p_rgba[0] * (255-an) + r * an ) / 255;
-                p_rgba[1] = ( p_rgba[1] * (255-an) + g * an ) / 255;
-                p_rgba[2] = ( p_rgba[2] * (255-an) + b * an ) / 255;
-                p_rgba[3] = 255 - ( 255 - p_rgba[3] ) * ( 255 - an ) / 255;
+                if( ao == 0 )
+                {
+                    /* Optimized but the else{} will produce the same result */
+                    p_rgba[0] = r;
+                    p_rgba[1] = g;
+                    p_rgba[2] = b;
+                    p_rgba[3] = an;
+                }
+                else
+                {
+                    p_rgba[3] = 255 - ( 255 - p_rgba[3] ) * ( 255 - an ) / 255;
+                    if( p_rgba[3] != 0 )
+                    {
+                        p_rgba[0] = ( p_rgba[0] * ao * (255-an) / 255 + r * an ) / p_rgba[3];
+                        p_rgba[1] = ( p_rgba[1] * ao * (255-an) / 255 + g * an ) / p_rgba[3];
+                        p_rgba[2] = ( p_rgba[2] * ao * (255-an) / 255 + b * an ) / p_rgba[3];
+                    }
+                }
             }
         }
     }
