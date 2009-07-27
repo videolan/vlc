@@ -73,6 +73,7 @@
 #elif defined( UNDER_CE )
 /* FIXME the commandline on wince is a mess */
 # define dup(a) -1
+# define PathIsNetworkPathW(wpath) (! wcsncmp(wpath, L"\\\\", 2))
 #endif
 
 #include <vlc_charset.h>
