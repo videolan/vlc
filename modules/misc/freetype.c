@@ -301,7 +301,6 @@ static int Create( vlc_object_t *p_this )
     FcResult       fontresult;
 #endif
 
-    vlc_value_t    val;
 
     /* Allocate structure */
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
@@ -312,29 +311,18 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_font_size = 0;
     p_sys->i_display_height = 0;
 
-    var_Create( p_filter, "freetype-font",
-                VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "freetype-fontsize",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
     var_Create( p_filter, "freetype-rel-fontsize",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "freetype-opacity",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Create( p_filter, "freetype-effect",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_filter, "freetype-opacity", &val );
-    p_sys->i_font_opacity = __MAX( __MIN( val.i_int, 255 ), 0 );
-    var_Create( p_filter, "freetype-color",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_filter, "freetype-color", &val );
-    p_sys->i_font_color = __MAX( __MIN( val.i_int, 0xFFFFFF ), 0 );
-    p_sys->i_effect = var_GetInteger( p_filter, "freetype-effect" );
-    var_Get( p_filter, "freetype-fontsize", &val );
-    p_sys->i_default_font_size = val.i_int;
+
+    psz_fontfamily = var_CreateGetString( p_filter, "freetype-font" );
+    p_sys->i_default_font_size = var_CreateGetInteger( p_filter, "freetype-fontsize" );
+    p_sys->i_effect = var_CreateGetInteger( p_filter, "freetype-effect" );
+    p_sys->i_font_opacity = var_CreateGetInteger( p_filter,"freetype-opacity" );
+    p_sys->i_font_opacity = __MAX( __MIN( p_sys->i_font_opacity, 255 ), 0 );
+    p_sys->i_font_color = var_CreateGetInteger( p_filter, "freetype-color" );
+    p_sys->i_font_color = __MAX( __MIN( p_sys->i_font_color , 0xFFFFFF ), 0 );
 
     fontindex=0;
-    var_Get( p_filter, "freetype-font", &val );
-    psz_fontfamily = val.psz_string;
     if( !psz_fontfamily || !*psz_fontfamily )
     {
 #ifdef HAVE_FONTCONFIG
