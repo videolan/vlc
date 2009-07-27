@@ -56,11 +56,7 @@ void CmdPlaylistRandom::execute()
 {
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
     if( pPlaylist != NULL )
-    {
-        vlc_value_t val;
-        val.b_bool = m_value;
-        var_Set( pPlaylist , "random", val);
-    }
+        var_SetBool( pPlaylist , "random", m_value );
 }
 
 
@@ -68,11 +64,7 @@ void CmdPlaylistLoop::execute()
 {
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
     if( pPlaylist != NULL )
-    {
-        vlc_value_t val;
-        val.b_bool = m_value;
-        var_Set( pPlaylist , "loop", val);
-    }
+        var_SetBool( pPlaylist , "loop", m_value );
 }
 
 
@@ -80,11 +72,7 @@ void CmdPlaylistRepeat::execute()
 {
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
     if( pPlaylist != NULL )
-    {
-        vlc_value_t val;
-        val.b_bool = m_value;
-        var_Set( pPlaylist , "repeat", val);
-    }
+        var_SetBool( pPlaylist , "repeat", m_value );
 }
 
 
@@ -125,7 +113,5 @@ void CmdPlaylistFirst::execute()
 {
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
 
-    playlist_Lock( pPlaylist );
-    playlist_Control( pPlaylist, PLAYLIST_PLAY, pl_Locked );
-    playlist_Unlock( pPlaylist );
+    playlist_Control( pPlaylist, PLAYLIST_PLAY, pl_Unlocked );
 }
