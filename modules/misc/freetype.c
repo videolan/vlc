@@ -70,6 +70,8 @@
 
 #ifdef HAVE_FONTCONFIG
 #include <fontconfig/fontconfig.h>
+#undef DEFAULT_FONT
+#define DEFAULT_FONT FC_DEFAULT_FONT
 #endif
 
 #include <assert.h>
@@ -81,7 +83,13 @@ static int  Create ( vlc_object_t * );
 static void Destroy( vlc_object_t * );
 
 #define FONT_TEXT N_("Font")
-#define FONT_LONGTEXT N_("Filename for the font you want to use")
+
+#ifdef HAVE_FONTCONFIG
+#define FONT_LONGTEXT N_("Font family for the font you want to use")
+#else
+#define FONT_LONGTEXT N_("Fontfile for the font you want to use")
+#endif
+
 #define FONTSIZE_TEXT N_("Font size in pixels")
 #define FONTSIZE_LONGTEXT N_("This is the default size of the fonts " \
     "that will be rendered on the video. " \
@@ -284,8 +292,15 @@ static int Create( vlc_object_t *p_this )
 {
     filter_t      *p_filter = (filter_t *)p_this;
     filter_sys_t  *p_sys;
-    char          *psz_fontfile = NULL;
-    int            i_error;
+    char          *psz_fontfile=NULL;
+    char          *psz_fontfamily=NULL;
+    int            i_error,fontindex;
+
+#ifdef HAVE_FONTCONFIG
+    FcPattern     *fontpattern, *fontmatch;
+    FcResult       fontresult;
+#endif
+
     vlc_value_t    val;
 
     /* Allocate structure */
@@ -314,26 +329,62 @@ static int Create( vlc_object_t *p_this )
     var_Get( p_filter, "freetype-color", &val );
     p_sys->i_font_color = __MAX( __MIN( val.i_int, 0xFFFFFF ), 0 );
     p_sys->i_effect = var_GetInteger( p_filter, "freetype-effect" );
+    var_Get( p_filter, "freetype-fontsize", &val );
+    p_sys->i_default_font_size = val.i_int;
 
-    /* Look what method was requested */
+    fontindex=0;
     var_Get( p_filter, "freetype-font", &val );
-    psz_fontfile = val.psz_string;
-    if( !psz_fontfile || !*psz_fontfile )
+    psz_fontfamily = val.psz_string;
+    if( !psz_fontfamily || !*psz_fontfamily )
     {
-        free( psz_fontfile );
-        psz_fontfile = (char *)malloc( PATH_MAX + 1 );
-        if( !psz_fontfile )
-            goto error;
-#ifdef WIN32
-        GetWindowsDirectory( psz_fontfile, PATH_MAX + 1 );
-        strcat( psz_fontfile, "\\fonts\\arial.ttf" );
-#elif defined(__APPLE__)
-        strcpy( psz_fontfile, DEFAULT_FONT );
+#ifdef HAVE_FONTCONFIG
+        free( psz_fontfamily);
+        psz_fontfamily=strdup( DEFAULT_FONT );
 #else
-        msg_Err( p_filter, "user didn't specify a font" );
-        goto error;
+        free( psz_fontfamily );
+        psz_fontfamily = (char *)malloc( PATH_MAX + 1 );
+        if( !psz_fontfamily )
+            goto error;
+# ifdef WIN32
+        GetWindowsDirectory( psz_fontfamily , PATH_MAX + 1 );
+        strcat( psz_fontfamily, "\\fonts\\arial.ttf" );
+# else
+        strcpy( psz_fontfamily, DEFAULT_FONT );
+# endif
+        msg_Err( p_filter,"User didn't specify fontfile, using %s", psz_fontfamily);
 #endif
     }
+
+#ifdef HAVE_FONTCONFIG
+    /* Lets find some fontfile from freetype-font variable family */
+    char *psz_fontsize = malloc( 4 );
+    if( !psz_fontsize )
+        goto error;
+
+    snprintf( psz_fontsize, 4, "%d", p_sys->i_default_font_size );
+    fontpattern = FcPatternCreate();
+    FcPatternAddString( fontpattern, FC_FAMILY, psz_fontfamily);
+    FcPatternAddString( fontpattern, FC_SIZE, psz_fontsize );
+
+    if( FcConfigSubstitute( NULL, fontpattern, FcMatchPattern ) == FcFalse )
+    {
+        FcPatternDestroy( fontpattern );
+        free( psz_fontsize );
+        goto error;
+    }
+    FcDefaultSubstitute( fontpattern );
+
+    fontmatch = FcFontMatch( NULL, fontpattern, &fontresult );
+
+    FcPatternGetString( fontmatch, FC_FILE, 0, (FcChar8 **)&psz_fontfile);
+    FcPatternGetInteger( fontmatch, FC_INDEX, 0, &fontindex );
+    if( !psz_fontfile )
+        goto error;
+    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile);
+    free( psz_fontsize );
+#else
+    psz_fontfile = psz_fontfamily;
+#endif
 
     i_error = FT_Init_FreeType( &p_sys->p_library );
     if( i_error )
@@ -341,8 +392,10 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_filter, "couldn't initialize freetype" );
         goto error;
     }
+
     i_error = FT_New_Face( p_sys->p_library, psz_fontfile ? psz_fontfile : "",
-                           0, &p_sys->p_face );
+                           fontindex, &p_sys->p_face );
+
     if( i_error == FT_Err_Unknown_File_Format )
     {
         msg_Err( p_filter, "file %s have unknown format", psz_fontfile );
@@ -369,11 +422,8 @@ static int Create( vlc_object_t *p_this )
 
     p_sys->i_use_kerning = FT_HAS_KERNING( p_sys->p_face );
 
-    var_Get( p_filter, "freetype-fontsize", &val );
-    p_sys->i_default_font_size = val.i_int;
     if( SetFontSize( p_filter, 0 ) != VLC_SUCCESS ) goto error;
 
-    free( psz_fontfile );
 
     p_sys->pp_font_attachments = NULL;
     p_sys->i_font_attachments = 0;
@@ -381,10 +431,13 @@ static int Create( vlc_object_t *p_this )
     p_filter->pf_render_text = RenderText;
 #ifdef HAVE_FONTCONFIG
     p_filter->pf_render_html = RenderHtml;
+    FcPatternDestroy( fontmatch );
+    FcPatternDestroy( fontpattern );
 #else
     p_filter->pf_render_html = NULL;
 #endif
 
+    free( psz_fontfamily );
     LoadFontsFromAttachments( p_filter );
 
     return VLC_SUCCESS;
