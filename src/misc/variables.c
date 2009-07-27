@@ -1,7 +1,7 @@
 /*****************************************************************************
  * variables.c: routines for object variables handling
  *****************************************************************************
- * Copyright (C) 2002-2006 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -163,7 +163,7 @@ static void     CheckValue  ( variable_t *, vlc_value_t * );
 static int      InheritValue( vlc_object_t *, const char *, vlc_value_t *,
                               int );
 static int      TriggerCallback( vlc_object_t *, variable_t *, const char *,
-                                 vlc_value_t, vlc_value_t );
+                                 vlc_value_t );
 
 /**
  * Initialize a vlc variable
@@ -712,9 +712,9 @@ int __var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
     /*  Check boundaries */
     CheckValue( p_var, &p_var->val );
 
-    /* Del with callbacks.*/
+    /* Deal with callbacks.*/
     if( p_var->i_entries )
-        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval, p_var->val );
+        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval );
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
@@ -785,10 +785,9 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
     /* Set the variable */
     p_var->val = val;
 
-    /* Deal with callbacks. Tell we're in a callback, release the lock,
-     * call stored functions, retake the lock. */
+    /* Deal with callbacks */
     if( p_var->i_entries )
-        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval, val );
+        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval );
 
     /* Free data if needed */
     p_var->ops->pf_free( &oldval );
@@ -958,7 +957,6 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
     int i_var;
     int i_ret = VLC_SUCCESS;
     variable_t *p_var;
-    vlc_value_t oldval;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
     vlc_mutex_lock( &p_priv->var_lock );
@@ -972,13 +970,10 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
 
     p_var = &p_priv->p_vars[i_var];
 
-    /* Backup needed stuff */
-    oldval = p_var->val;
-
     /* Deal with callbacks. Tell we're in a callback, release the lock,
      * call stored functions, retake the lock. */
     if( p_var->i_entries )
-        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval, oldval );
+        i_ret = TriggerCallback( p_this, p_var, psz_name, p_var->val );
 
     vlc_mutex_unlock( &p_priv->var_lock );
     return i_ret;
@@ -1473,11 +1468,12 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
 
 
 /**********************************************************************
- * Trigger the callbacks
+ * Trigger the callbacks.
+ * Tell we're in a callback, release the lock, call stored functions,
+ * retake the lock.
  **********************************************************************/
 static int TriggerCallback( vlc_object_t *p_this, variable_t *p_var,
-                            const char *psz_name, vlc_value_t oldval,
-                            vlc_value_t newval )
+                            const char *psz_name, vlc_value_t oldval )
 {
     int i_var;
     int i_entries = p_var->i_entries;
@@ -1490,7 +1486,7 @@ static int TriggerCallback( vlc_object_t *p_this, variable_t *p_var,
     /* The real calls */
     for( ; i_entries-- ; )
     {
-        p_entries[i_entries].pf_callback( p_this, psz_name, oldval, newval,
+        p_entries[i_entries].pf_callback( p_this, psz_name, oldval, p_var->val,
                                           p_entries[i_entries].p_data );
     }
 
