@@ -21,10 +21,10 @@ i=0
 
 for modfile in `find . -name "Modules.am"`
 do
- for module in `grep "SOURCES_" $modfile|awk '{print $1}'|awk 'BEGIN {FS="SOURCES_"};{print $2}'`
+ for module in `awk '/^SOURCES_/{sub(/SOURCES_/,"",$1); print $1}' "$modfile"`
  do
   echo $module >> $TEMPFILE
-  if [ `grep " \* $module:" $LISTFILE |wc -l` = 0 ]
+  if ! grep -q " \* $module:" $LISTFILE
   then
    echo "$module exists in $modfile, but not listed"
    i=1
@@ -44,9 +44,9 @@ echo "--------------------------------------"
 echo "Checking that all listed modules exist"
 echo "--------------------------------------"
 
-for module in `grep " \* " $LISTFILE|awk '{print $2}'|sed s,':',,g `
+for module in `awk '/ \* /{gsub(/:/,"",$2); print $2}' $LISTFILE`
 do
- if [ `grep $module $TEMPFILE|wc -l` = 0 ]
+ if ! grep -q $module $TEMPFILE
  then
   i=1
   echo "$module is listed but does not exist"
