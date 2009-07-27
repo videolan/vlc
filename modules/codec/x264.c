@@ -1311,7 +1311,7 @@ static int  Open ( vlc_object_t *p_this )
     }
 
     /* We need to initialize pthreadw32 before we open the encoder,
-       but only oncce for the whole application. Since pthreadw32
+       but only once for the whole application. Since pthreadw32
        doesn't keep a refcount, do it ourselves. */
 #ifdef PTW32_STATIC_LIB
     vlc_value_t lock, count;
@@ -1326,7 +1326,7 @@ static int  Open ( vlc_object_t *p_this )
     if( count.i_int == 0 )
     {
         msg_Dbg( p_enc, "initializing pthread-win32" );
-        if( !pthread_win32_process_attach_np() || !pthread_win32_thread_attach_np() )   
+        if( !pthread_win32_process_attach_np() || !pthread_win32_thread_attach_np() )
         {
             msg_Warn( p_enc, "pthread Win32 Initialization failed" );
             vlc_mutex_unlock( lock.p_address );
@@ -1492,11 +1492,9 @@ static void Close( vlc_object_t *p_this )
 #ifdef PTW32_STATIC_LIB
     vlc_value_t lock, count;
 
-    var_Create( p_enc->p_libvlc, "pthread_win32_mutex", VLC_VAR_MUTEX );
     var_Get( p_enc->p_libvlc, "pthread_win32_mutex", &lock );
     vlc_mutex_lock( lock.p_address );
 
-    var_Create( p_enc->p_libvlc, "pthread_win32_count", VLC_VAR_INTEGER );
     var_Get( p_enc->p_libvlc, "pthread_win32_count", &count );
     count.i_int--;
     var_Set( p_enc->p_libvlc, "pthread_win32_count", count );
