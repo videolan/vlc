@@ -357,11 +357,9 @@ static int Create( vlc_object_t *p_this )
 
 #ifdef HAVE_FONTCONFIG
     /* Lets find some fontfile from freetype-font variable family */
-    char *psz_fontsize = malloc( 4 );
-    if( !psz_fontsize )
+    char *psz_fontsize;
+    if( asprintf( &psz_fontsize, "%d", p_sys->i_default_font_size ) == -1 )
         goto error;
-
-    snprintf( psz_fontsize, 4, "%d", p_sys->i_default_font_size );
     fontpattern = FcPatternCreate();
     FcPatternAddString( fontpattern, FC_FAMILY, psz_fontfamily);
     FcPatternAddString( fontpattern, FC_SIZE, psz_fontsize );
