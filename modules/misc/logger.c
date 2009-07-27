@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -120,23 +120,42 @@ static const char *const mode_list_text[] = { N_("Text"), "HTML"
 };
 
 #define LOGMODE_TEXT N_("Log format")
-#ifdef HAVE_SYSLOG_H
+#ifndef HAVE_SYSLOG_H
+#define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are " \
+  "\"text\" (default) and \"html\".")
+#else
+
 #define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are " \
   "\"text\" (default), \"html\", and \"syslog\" (special mode to send to " \
   "syslog instead of file.")
-#else
-#define LOGMODE_LONGTEXT N_("Specify the log format. Available choices are " \
-  "\"text\" (default) and \"html\".")
-#endif
-
-#ifdef HAVE_SYSLOG_H
-static const char *const facility_list[] = { "daemon", "user", "local0",
-    "local1", "local2", "local3", "local4", "local5", "local6", "local7" };
 
 #define SYSLOG_FACILITY_TEXT N_("Syslog facility")
 #define SYSLOG_FACILITY_LONGTEXT N_("Select the syslog facility where logs " \
-  "will be forwarded. Available choices are \"daemon\" (default), \"user\", " \
+  "will be forwarded. Available choices are \"user\" (default), \"daemon\", " \
   "and \"local0\" through \"local7\".")
+
+/* First in list is the default facility used. */
+#define DEFINE_SYSLOG_FACILITY \
+  DEF( "user",   LOG_USER ), \
+  DEF( "daemon", LOG_DAEMON ), \
+  DEF( "local0", LOG_LOCAL0 ), \
+  DEF( "local1", LOG_LOCAL1 ), \
+  DEF( "local2", LOG_LOCAL2 ), \
+  DEF( "local3", LOG_LOCAL3 ), \
+  DEF( "local4", LOG_LOCAL4 ), \
+  DEF( "local5", LOG_LOCAL5 ), \
+  DEF( "local6", LOG_LOCAL6 ), \
+  DEF( "local7", LOG_LOCAL7 )
+
+#define DEF( a, b ) a
+static const char *const fac_name[]   = { DEFINE_SYSLOG_FACILITY };
+#undef  DEF
+#define DEF( a, b ) b
+static const int         fac_number[] = { DEFINE_SYSLOG_FACILITY };
+#undef  DEF
+enum                   { fac_entries = sizeof(fac_name)/sizeof(fac_name[0]) };
+#undef  DEFINE_SYSLOG_FACILITY
+
 #endif
 
 vlc_module_begin ()
@@ -152,9 +171,9 @@ vlc_module_begin ()
                 false )
         change_string_list( mode_list, mode_list_text, 0 )
 #ifdef HAVE_SYSLOG_H
-    add_string( "syslog-facility", "daemon", NULL, SYSLOG_FACILITY_TEXT,
+    add_string( "syslog-facility", fac_name[0], NULL, SYSLOG_FACILITY_TEXT,
                 SYSLOG_FACILITY_LONGTEXT, true )
-        change_string_list( facility_list, facility_list, 0 )
+        change_string_list( fac_name, fac_name, 0 )
 #endif
 
     add_obsolete_string( "rrd-file" )
@@ -173,7 +192,7 @@ static int Open( vlc_object_t *p_this )
     char *psz_mode;
 
     CONSOLE_INTRO_MSG;
-    msg_Info( p_intf, "using logger..." );
+    msg_Info( p_intf, "using logger." );
 
     /* Allocate instance and initialize some members */
     p_sys = p_intf->p_sys = (intf_sys_t *)malloc( sizeof( intf_sys_t ) );
@@ -265,39 +284,34 @@ static int Open( vlc_object_t *p_this )
     {
         p_sys->msg.p_file = NULL;
 #ifdef HAVE_SYSLOG_H
-        int i_facility = LOG_DAEMON;
-        char *psz_facility = var_CreateGetString( p_intf, "syslog-facility" );
+        int i_facility;
+        const char *const psz_facility =
+                             var_CreateGetString( p_intf, "syslog-facility" );
         if( psz_facility )
         {
             bool b_valid = 0;
-            static const struct { const char psz_name[7]; int i_value; }
-            p_facility[10] = {
-                { "daemon", LOG_DAEMON }, { "user", LOG_USER },
-                { "local0", LOG_LOCAL0 }, { "local1", LOG_LOCAL1 },
-                { "local2", LOG_LOCAL2 }, { "local3", LOG_LOCAL3 },
-                { "local4", LOG_LOCAL4 }, { "local5", LOG_LOCAL5 },
-                { "local6", LOG_LOCAL6 }, { "local7", LOG_LOCAL7 }
-            };
-            for( size_t i = 0;
-                 i < sizeof( p_facility ) / sizeof( p_facility[0] );
-                 i++ )
+            for( size_t i = 0; i < fac_entries; ++i )
             {
-                if( !strcmp( psz_facility, p_facility[i].psz_name ) )
+                if( !strcmp( psz_facility, fac_name[i] ) )
                 {
-                    i_facility = p_facility[i].i_value;
+                    i_facility = fac_number[i];
                     b_valid = 1;
                     break;
                 }
             }
             if( !b_valid )
             {
-                msg_Warn( p_intf, "invalid syslog facility `%s', using `daemon'", psz_facility );
+                msg_Warn( p_intf, "invalid syslog facility `%s', using `%s'",
+                          psz_facility, fac_name[0] );
+                i_facility = fac_number[0];
             }
             free( psz_facility );
         }
         else
         {
-            msg_Warn( p_intf, "no syslog facility specified, using `daemon'" );
+            msg_Warn( p_intf, "no syslog facility specified, using `%s'",
+                      fac_name[0] );
+            i_facility = fac_number[0];
         }
 
         openlog( "vlc", LOG_PID|LOG_NDELAY, i_facility );
