@@ -45,8 +45,9 @@
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+
 /* Number of simultaneous subpictures */
-#define VOUT_MAX_SUBPICTURES (VOUT_MAX_PICTURES)
+#define VOUT_MAX_SUBPICTURES (__MAX(VOUT_MAX_PICTURES, SPU_MAX_PREPARE_TIME/5000))
 
 /* */
 typedef struct

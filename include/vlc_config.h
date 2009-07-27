@@ -132,6 +132,14 @@
 #define AOUT_MAX_RESAMPLING             10
 
 /*****************************************************************************
+ * SPU configuration
+ *****************************************************************************/
+
+/* Buffer must avoid arriving more than SPU_MAX_PREPARE_TIME in advanced to
+ * the SPU */
+#define SPU_MAX_PREPARE_TIME ((mtime_t)(0.5*CLOCK_FREQ))
+
+/*****************************************************************************
  * Video configuration
  *****************************************************************************/
 
