@@ -662,6 +662,66 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
     return VLC_SUCCESS;
 }
 
+
+/**
+ * Perform a Get and Set on a variable
+ *
+ * \param p_this: The object that hold the variable
+ * \param psz_name: the name of the variable
+ * \param i_action: the action to perform
+ * \param p_val: The action parameter
+ * \return vlc error codes
+ */
+int __var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
+                     vlc_value_t val )
+{
+    int i_var;
+    int i_ret = VLC_SUCCESS;
+    variable_t *p_var;
+    vlc_value_t oldval;
+    vlc_object_internals_t *p_priv = vlc_internals( p_this );
+
+    vlc_mutex_lock( &p_priv->var_lock );
+    i_var = GetUnused( p_this, psz_name );
+    if( i_var < 0 )
+    {
+        vlc_mutex_unlock( &p_priv->var_lock );
+        return i_var;
+    }
+
+    p_var = &p_priv->p_vars[i_var];
+
+    /* Duplicated data if needed */
+    //p_var->ops->pf_dup( &val );
+
+    /* Backup needed stuff */
+    oldval = p_var->val;
+
+    /* depending of the action requiered */
+    switch( i_action )
+    {
+    case VLC_VAR_TOGGLE_BOOL:
+        assert( ( p_var->i_type & VLC_VAR_BOOL ) == VLC_VAR_BOOL );
+        p_var->val.b_bool = !p_var->val.b_bool;
+        break;
+    default:
+        vlc_mutex_unlock( &p_priv->var_lock );
+        return VLC_EGENERIC;
+    }
+
+    /*  Check boundaries */
+    CheckValue( p_var, &p_var->val );
+
+    /* Del with callbacks.*/
+    if( p_var->i_entries )
+        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval, p_var->val );
+
+    vlc_mutex_unlock( &p_priv->var_lock );
+
+    return i_ret;
+}
+
+
 /**
  * Request a variable's type
  *

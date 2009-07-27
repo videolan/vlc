@@ -437,6 +437,7 @@ __var_DelCallback
 __var_Destroy
 var_FreeList
 __var_Get
+__var_GetAndSet
 var_GetChecked
 __var_Set
 var_SetChecked

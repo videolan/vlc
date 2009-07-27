@@ -115,6 +115,17 @@
 #define VLC_VAR_SETISCOMMAND        0x0040
 /**@}*/
 
+/** \defgroup var_GetAndSet Variable actions
+ * These are the different actions that can be used with __var_GetAndSet()
+ * @{
+ */
+/**
+ * Toggle the value of this boolean
+ * \param val Unused
+ */
+#define VLC_VAR_TOGGLE_BOOL         0x0010
+/**@}*/
+
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
@@ -128,6 +139,7 @@ VLC_EXPORT( int, __var_Set, ( vlc_object_t *, const char *, vlc_value_t ) );
 VLC_EXPORT( int, __var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 VLC_EXPORT( int, var_SetChecked, ( vlc_object_t *, const char *, int, vlc_value_t ) );
 VLC_EXPORT( int, var_GetChecked, ( vlc_object_t *, const char *, int, vlc_value_t * ) );
+VLC_EXPORT( int, __var_GetAndSet, ( vlc_object_t *, const char *, int, vlc_value_t ) );
 
 #define var_Command(a,b,c,d,e) __var_Command( VLC_OBJECT( a ), b, c, d, e )
 VLC_EXPORT( int, __var_Command, ( vlc_object_t *, const char *, const char *, const char *, char ** ) );
@@ -160,6 +172,10 @@ VLC_EXPORT( void, var_FreeList, ( vlc_value_t *, vlc_value_t * ) );
  * __var_Get() with automatic casting
  */
 #define var_Get(a,b,c) __var_Get( VLC_OBJECT(a), b, c )
+/**
+ * __var_GetAndSet() with automatic casting
+ */
+#define var_GetAndSet(a,b,c,d) __var_GetAndSet(VLC_OBJECT(a), b, c, d)
 
 /*****************************************************************************
  * Variable callbacks
@@ -654,6 +670,16 @@ static inline int __var_CountChoices( vlc_object_t *p_obj, const char *psz_name 
  */
 #define var_CountChoices(a,b) __var_CountChoices( VLC_OBJECT(a),b)
 
+
+static inline int __var_ToggleBool( vlc_object_t *p_obj, const char *psz_name )
+{
+    vlc_value_t val;
+    return __var_GetAndSet( p_obj, psz_name, VLC_VAR_TOGGLE_BOOL, val );
+}
+/**
+ * __var_ToggleBool() with automatic casting
+ */
+#define var_ToggleBool(a,b) __var_ToggleBool( VLC_OBJECT(a),b )
 /**
  * @}
  */
