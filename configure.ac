@@ -3749,7 +3749,7 @@ AS_IF( [test "${enable_zvbi}" != "no"],[
         [
           VLC_ADD_LIBS([zvbi],[$ZVBI_LIBS])
           if test "${SYS}" = "mingw32"; then
-          VLC_ADD_LIBS([zvbi],[ -lpthreadGC2])
+              VLC_ADD_LIBS([zvbi],[ -lpthreadGC2])
           fi
           VLC_ADD_CFLAGS([zvbi],[$ZVBI_CFLAGS])
           VLC_ADD_PLUGIN([zvbi])
@@ -3798,7 +3798,7 @@ AS_IF( [test "${enable_libass}" = "yes"], [
         AC_CHECK_HEADERS(fontconfig/fontconfig.h,
           [VLC_ADD_CPPFLAGS([libass],[-DHAVE_FONTCONFIG])
         if test "${SYS}" = "mingw32"; then
-           VLC_ADD_LIBS([libass],[-lfontconfig -lfreetype -liconv -lz -lxml2])
+           VLC_ADD_LIBS([libass],[-lfontconfig -lfreetype -liconv -lz])
         else
            VLC_ADD_LIBS([libass],[-lfontconfig])
         fi
@@ -3819,8 +3819,8 @@ AS_IF( [test "${enable_asademux}" = "yes"], [
       [
         VLC_ADD_LDFLAGS([asademux],[$PCRE_LIBS])
         VLC_ADD_CFLAGS([asademux],[$PCRE_CFLAGS])
-	if test "${SYS}" = "mingw32"; then
-	        VLC_ADD_CPPFLAGS([asademux],[-DPCRE_STATIC])
+        if test "${SYS}" = "mingw32"; then
+            VLC_ADD_CPPFLAGS([asademux],[-DPCRE_STATIC])
         fi
         VLC_ADD_PLUGIN([asademux])
       ],[
@@ -4239,7 +4239,7 @@ then
       VLC_ADD_CPPFLAGS([freetype skins2],[${FREETYPE_CFLAGS}])
       VLC_ADD_LIBS([freetype skins2],[${FREETYPE_LIBS}])
       if test "${SYS}" = "mingw32"; then
-        VLC_ADD_LIBS([freetype skins2],[-lxml2])
+        VLC_ADD_LIBS([skins2],[-lxml2])
         VLC_ADD_LIBS([freetype],[-liconv])
       fi
       if test "${enable_fontconfig}" != "no"
@@ -5271,7 +5271,7 @@ dnl
 if test "${SYS}" = "mingw32" -o "${SYS}" = "linux"; then
    AC_ARG_ENABLE(atmo,
 AS_HELP_STRING([--disable-atmo],[AtmoLight (homebrew philips ambilight)
-		(default enabled)]))
+                (default enabled)]))
    if test "${enable_atmo}" != "no"; then
       AC_LANG_PUSH(C++)
       VLC_ADD_PLUGIN([atmo])
