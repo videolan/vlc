@@ -506,9 +506,7 @@
             if( [o_title isEqualToString: _NS("Fullscreen")] ||
                 [sender isKindOfClass:[NSButton class]] )
             {
-                vlc_value_t val;
-                var_Get( p_playlist, "fullscreen", &val );
-                var_Set( p_playlist, "fullscreen", (vlc_value_t)!val.b_bool );
+                var_ToggleBool( p_playlist, "fullscreen" );
             }
 
             pl_Release( VLCIntf );

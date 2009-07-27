@@ -231,8 +231,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         {
             vlc_object_t *obj = p_vout ? VLC_OBJECT(p_vout)
                                        : VLC_OBJECT(p_playlist);
-            bool b = var_GetBool( obj, "fullscreen" );
-            var_SetBool( obj, "fullscreen", !b );
+            var_ToggleBool( obj, "fullscreen" );
             break;
         }
 
@@ -265,8 +264,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         {   /* FIXME: this is invalid if not using DirectX output!!! */
             vlc_object_t *obj = p_vout ? VLC_OBJECT(p_vout)
                                        : VLC_OBJECT(p_playlist);
-            bool b = var_GetBool( obj, "directx-wallpaper" );
-            var_SetBool( obj, "directx-wallpaper", !b );
+            var_ToggleBool( obj, "directx-wallpaper" );
         }
 #endif
 
@@ -287,8 +285,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
         case ACTIONID_RANDOM:
         {
-            bool b = var_GetBool( p_playlist, "random" );
-            var_SetBool( p_playlist, "random", !b );
+            var_ToggleBool( p_playlist, "random" );
         }
 
         case ACTIONID_PLAY_PAUSE:

@@ -117,7 +117,7 @@ void ActionsManager::fullscreen()
     vout_thread_t *p_vout = THEMIM->getVout();
     if( p_vout)
     {
-        var_SetBool( p_vout, "fullscreen", !var_GetBool( p_vout, "fullscreen" ) );
+        var_ToggleBool( p_vout, "fullscreen" );
         vlc_object_release( p_vout );
     }
 }
@@ -143,8 +143,7 @@ void ActionsManager::record()
     if( p_input )
     {
         /* This method won't work fine if the stream can't be cut anywhere */
-        const bool b_recording = var_GetBool( p_input, "record" );
-        var_SetBool( p_input, "record", !b_recording );
+        var_ToggleBool( p_input, "record" );
 #if 0
         else
         {

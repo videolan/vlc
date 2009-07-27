@@ -563,19 +563,13 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
             vlc_value_t val;
             /* Playlist Settings */
             case 'r':
-                var_Get( p_playlist, "random", &val );
-                val.b_bool = !val.b_bool;
-                var_Set( p_playlist, "random", val );
+                var_ToggleBool( p_playlist, "random" );
                 goto end;
             case 'l':
-                var_Get( p_playlist, "loop", &val );
-                val.b_bool = !val.b_bool;
-                var_Set( p_playlist, "loop", val );
+                var_ToggleBool( p_playlist, "loop" );
                 goto end;
             case 'R':
-                var_Get( p_playlist, "repeat", &val );
-                val.b_bool = !val.b_bool;
-                var_Set( p_playlist, "repeat", val );
+                var_ToggleBool( p_playlist, "repeat" );
                 goto end;
 
             /* Playlist sort */
@@ -1137,16 +1131,12 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                                           VLC_OBJECT_VOUT, FIND_CHILD );
                 if( p_vout )
                 {
-                    var_Get( p_vout, "fullscreen", &val );
-                    val.b_bool = !val.b_bool;
-                    var_Set( p_vout, "fullscreen", val );
+                    var_ToggleBool( p_vout, "fullscreen" );
                     vlc_object_release( p_vout );
                 }
                 else
                 {
-                    var_Get( p_playlist, "fullscreen", &val );
-                    val.b_bool = !val.b_bool;
-                    var_Set( p_playlist, "fullscreen", val );
+                    var_ToggleBool( p_playlist, "fullscreen" );
                 }
             }
             i_ret = 0;

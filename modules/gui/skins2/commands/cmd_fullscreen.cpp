@@ -37,7 +37,7 @@ void CmdFullscreen::execute()
     if( pVout )
     {
         // Switch to fullscreen
-        var_SetBool( pVout, "fullscreen", !var_GetBool( pVout, "fullscreen" ) );
+        var_ToggleBool( pVout, "fullscreen" );
         vlc_object_release( pVout );
     }
 }
