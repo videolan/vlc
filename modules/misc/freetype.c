@@ -361,7 +361,7 @@ static int Create( vlc_object_t *p_this )
     FcDefaultSubstitute( fontpattern );
 
     fontmatch = FcFontMatch( NULL, fontpattern, &fontresult );
-    if( fontmatch == FcResultNoMatch )
+    if( fontresult == FcResultNoMatch )
     {
         free( psz_fontsize );
         FcPatternDestroy( fontpattern );
