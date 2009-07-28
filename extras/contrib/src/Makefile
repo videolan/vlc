@@ -2495,26 +2495,11 @@ DISTCLEAN_PKG += schroedinger-$(SCHROED_VERSION).tar.gz
 libass-$(ASS_VERSION).tar.bz2:
 	$(WGET) $(ASS_URL)
 
-ifdef GIT
 libass:
 	$(GIT) clone $(ASS_GIT)
-ifneq ($(HOST),$(BUILD))
-	patch -p0 < Patches/libass-cross.patch
-endif
-	(cd $@; autoreconf -ivf)
-else
-# mplayer patches up to August 8, 2008 are included
-libass: libass-$(ASS_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-	(cd $@; patch -p1 < ../Patches/libass_mplayer_updates.patch)
-ifneq ($(HOST),$(BUILD))
-	patch -p0 < Patches/libass-cross.patch
-	(cd $@; autoreconf -ivf)
-endif
-endif
 
-.libass: libass .png
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
+.libass: libass
+	(cd $<; $(HOSTCC) ./configure --disable-png $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
 	touch $@
 
 CLEAN_FILE += .libass

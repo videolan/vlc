@@ -1,9 +1,0 @@
---- libass/Makefile.am.orig	2009-07-26 00:32:35.000000000 +0200
-+++ libass/Makefile.am	2009-07-26 00:34:32.000000000 +0200
-@@ -9,5 +9,5 @@
-     test = test
- endif
- 
--SUBDIRS = libass $(test)
-+SUBDIRS = libass
- 
