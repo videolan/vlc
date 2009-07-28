@@ -51,7 +51,7 @@ extern "C" {
  * On OSX 64-bits, this function will always fail.
  *
  * On other platforms, an existing X11 window ID is expected. See
- * libvlc_media_player_set_xid() for details.
+ * libvlc_media_player_set_xwindow() for details.
  *
  * \param p_mi the Media Player
  * \param drawable the libvlc_drawable_t where the media player
