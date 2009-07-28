@@ -324,8 +324,8 @@ VLC_PUBLIC_API float libvlc_media_player_get_position( libvlc_media_player_t *, 
  * Set movie position.
  *
  * \param p_mi the Media Player
+ * \param f_pos the position
  * \param p_e an initialized exception pointer
- * \return movie position
  */
 VLC_PUBLIC_API void libvlc_media_player_set_position( libvlc_media_player_t *, float, libvlc_exception_t *);
 
@@ -535,6 +535,7 @@ VLC_PUBLIC_API int libvlc_video_get_width( libvlc_media_player_t *, libvlc_excep
  * See also libvlc_video_set_scale().
  *
  * \param p_mediaplayer the media player
+ * \param p_e an initialized exception pointer
  * \return the currently configured zoom factor, or 0. if the video is set
  * to fit to the output window/drawable automatically.
  */
@@ -551,6 +552,7 @@ VLC_PUBLIC_API float libvlc_video_get_scale( libvlc_media_player_t *,
  *
  * \param p_mediaplayer the media player
  * \param i_factor the scaling factor, or zero
+ * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_video_set_scale( libvlc_media_player_t *, float,
                                             libvlc_exception_t *p_e );
@@ -985,7 +987,7 @@ VLC_PUBLIC_API void libvlc_audio_set_volume( libvlc_instance_t *, int, libvlc_ex
  */
 VLC_PUBLIC_API int libvlc_audio_get_track_count( libvlc_media_player_t *,  libvlc_exception_t * );
 
- /**
+/**
  * Get the description of available audio tracks.
  *
  * \param p_mi media player
