@@ -6,8 +6,6 @@ export LANG
 
 TEMPFILE=/tmp/vlclist.tmp.$$
 LISTFILE=LIST
-LISTFILE2=/tmp/vlclist2.tmp.$$
-LISTFILE3=/tmp/vlclist3.tmp.$$
 
 
 rm -f $TEMPFILE
@@ -44,7 +42,7 @@ echo "--------------------------------------"
 echo "Checking that all listed modules exist"
 echo "--------------------------------------"
 
-for module in `awk '/ \* /{gsub(/:/,"",$2); print $2}' $LISTFILE`
+for module in `awk -F'[ :]' '/ \* /{print $3}' $LISTFILE`
 do
  if ! grep -q $module $TEMPFILE
  then
@@ -63,27 +61,10 @@ echo "-------------------------------"
 echo "Checking for alphabetical order"
 echo "-------------------------------"
 
-rm -f $LISTFILE2
-touch $LISTFILE2
-rm -f $LISTFILE3
-touch $LISTFILE3
-
-grep " \* " $LISTFILE  >> $LISTFILE2
-
-sort -n $LISTFILE2 >> $LISTFILE3
-
-i=`diff $LISTFILE2 $LISTFILE3|wc -l`
-diff -u $LISTFILE2 $LISTFILE3
-
-if [ $i = 0 ]
-then 
-  echo "OK"
-fi
+grep " \* " $LISTFILE | LC_CTYPE=C sort -c && echo "OK"
 
 
 echo ""
 echo "`cat $TEMPFILE| wc -l` modules listed in Modules.am files"
 
 rm -f $TEMPFILE
-rm -f $LISTFILE2
-rm -f $LISTFILE3
