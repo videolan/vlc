@@ -182,9 +182,12 @@ static inline block_t *filter_NewAudioBuffer( filter_t *p_filter, int i_size )
 }
 
 /**
- * It creates a blend filter
+ * It creates a blend filter.
+ *
+ * Only the chroma properties of the dest format is used (chroma
+ * type, rgb masks and shifts)
  */
-VLC_EXPORT( filter_t *, filter_NewBlend, ( vlc_object_t *, vlc_fourcc_t i_chroma_dst ) );
+VLC_EXPORT( filter_t *, filter_NewBlend, ( vlc_object_t *, const video_format_t *p_dst_chroma ) );
 
 /**
  * It configures blend filter parameters that are allowed to changed

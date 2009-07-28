@@ -421,7 +421,7 @@ void spu_RenderSubpictures( spu_t *p_spu,
 
     /* Create the blending module */
     if( !p_sys->p_blend )
-        p_spu->p->p_blend = filter_NewBlend( VLC_OBJECT(p_spu), p_fmt_dst->i_chroma );
+        p_spu->p->p_blend = filter_NewBlend( VLC_OBJECT(p_spu), p_fmt_dst );
 
     /* Process all subpictures and regions (in the right order) */
     for( unsigned int i_index = 0; i_index < i_subpicture; i_index++ )
