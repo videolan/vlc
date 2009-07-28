@@ -147,8 +147,6 @@ struct subpicture_t
     int          i_alpha;                                  /**< transparency */
      /**@}*/
 
-    /** Pointer to function that renders this subtitle in a picture */
-    void ( *pf_render )  ( vout_thread_t *, picture_t *, const subpicture_t * );
     /** Pointer to function that cleans up the private data of this subtitle */
     void ( *pf_destroy ) ( subpicture_t * );
 

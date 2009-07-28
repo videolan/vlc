@@ -713,7 +713,6 @@ subpicture_t *subpicture_New( void )
     p_subpic->b_subtitle = false;
     p_subpic->i_alpha    = 0xFF;
     p_subpic->p_region   = NULL;
-    p_subpic->pf_render  = NULL;
     p_subpic->pf_destroy = NULL;
     p_subpic->p_sys      = NULL;
 
