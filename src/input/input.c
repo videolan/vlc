@@ -631,7 +631,15 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, bool *pb_d
 
     if( i_ret == 0 )    /* EOF */
     {
+        bool b_pause_after_each = var_CreateGetBool( p_input, "play-and-pause" );
         msg_Dbg( p_input, "EOF reached" );
+        if ( b_pause_after_each )
+        {
+            msg_Dbg( p_input, "pausing at EOF (pause after each)");
+            vlc_value_t pause_state;
+            pause_state.i_int = PAUSE_S;
+            Control( p_input, INPUT_CONTROL_SET_STATE, pause_state );
+        }
         p_input->p->input.b_eof = true;
     }
     else if( i_ret < 0 )

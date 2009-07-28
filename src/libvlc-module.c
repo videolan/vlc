@@ -1185,7 +1185,11 @@ static const char *const ppsz_albumart_descriptions[] =
 
 #define PAE_TEXT N_("Play and exit")
 #define PAE_LONGTEXT N_( \
-                "Exit if there are no more items in the playlist." )
+    "Exit if there are no more items in the playlist." )
+
+#define PAP_TEXT N_("Play and pause")
+#define PAP_LONGTEXT N_( \
+    "Pause each item in the playlist on the last frame." )
 
 #define ML_TEXT N_("Use media library")
 #define ML_LONGTEXT N_( \
@@ -2005,6 +2009,8 @@ vlc_module_begin ()
         change_safe()
     add_bool( "play-and-exit", 0, NULL, PAE_TEXT, PAE_LONGTEXT, false )
     add_bool( "play-and-stop", 0, NULL, PAS_TEXT, PAS_LONGTEXT, false )
+        change_safe()
+    add_bool( "play-and-pause", 0, NULL, PAP_TEXT, PAP_LONGTEXT, true )
         change_safe()
     add_bool( "media-library", 1, NULL, ML_TEXT, ML_LONGTEXT, false )
     add_bool( "playlist-tree", 0, NULL, PLTREE_TEXT, PLTREE_LONGTEXT, false )
