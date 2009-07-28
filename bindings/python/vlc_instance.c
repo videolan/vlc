@@ -138,54 +138,6 @@ vlcInstance_new_media_player( PyObject *self, PyObject *args )
 }
 
 static PyObject *
-vlcInstance_video_set_parent( PyObject *self, PyObject *args )
-{
-    libvlc_exception_t ex;
-    int i_drawable;
-
-    if( !PyArg_ParseTuple( args, "i", &i_drawable ) )
-        return NULL;
-
-    LIBVLC_TRY;
-    libvlc_video_set_parent( LIBVLC_INSTANCE(self), (libvlc_drawable_t) i_drawable, &ex );
-    LIBVLC_EXCEPT;
-
-    Py_INCREF( Py_None );
-    return Py_None;
-}
-
-static PyObject *
-vlcInstance_video_get_parent( PyObject *self, PyObject *args )
-{
-    libvlc_exception_t ex;
-    libvlc_drawable_t i_ret;
-
-    LIBVLC_TRY;
-    i_ret = libvlc_video_get_parent( LIBVLC_INSTANCE(self), &ex );
-    LIBVLC_EXCEPT;
-
-    return Py_BuildValue( "L", i_ret );
-}
-
-static PyObject *
-vlcInstance_video_set_size( PyObject *self, PyObject *args )
-{
-    libvlc_exception_t ex;
-    int i_width;
-    int i_height;
-
-    if( !PyArg_ParseTuple( args, "ii", &i_width, &i_height ) )
-        return NULL;
-
-    LIBVLC_TRY;
-    libvlc_video_set_size( LIBVLC_INSTANCE(self), i_width, i_height, &ex );
-    LIBVLC_EXCEPT;
-
-    Py_INCREF( Py_None );
-    return Py_None;
-}
-
-static PyObject *
 vlcInstance_audio_toggle_mute( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
@@ -564,12 +516,6 @@ static PyMethodDef vlcInstance_methods[] =
 {
     { "get_vlc_id", vlcInstance_get_vlc_id, METH_NOARGS,
       "get_vlc_id( ) -> int        Get the instance id."},
-    { "video_set_parent", vlcInstance_video_set_parent, METH_VARARGS,
-      "video_set_parent(xid=int)       Set the parent xid/HWND/CGrafPort"},
-    { "video_get_parent", vlcInstance_video_get_parent, METH_NOARGS,
-      "video_get_parent() -> int       Get the parent xid/HWND/CGrafPort"},
-    { "video_set_size", vlcInstance_video_set_size, METH_VARARGS,
-      "video_set_size(width=int, height=int)    Set the video width and height"},
     { "audio_toggle_mute", vlcInstance_audio_toggle_mute, METH_NOARGS,
       "audio_toggle_mute()         Toggle the mute state"},
     { "audio_get_mute", vlcInstance_audio_get_mute, METH_NOARGS,

@@ -344,39 +344,6 @@ vlcMediaPlayer_video_take_snapshot( PyObject *self, PyObject *args )
 }
 
 static PyObject *
-vlcMediaPlayer_video_resize( PyObject *self, PyObject *args )
-{
-    libvlc_exception_t ex;
-    int i_width;
-    int i_height;
-
-    if( !PyArg_ParseTuple( args, "ii", &i_width, &i_height ) )
-        return NULL;
-
-    LIBVLC_TRY;
-    libvlc_video_resize( LIBVLC_MEDIAPLAYER(self), i_width, i_height, &ex);
-    LIBVLC_EXCEPT;
-    Py_INCREF( Py_None );
-    return Py_None;
-}
-
-static PyObject *
-vlcMediaPlayer_video_reparent( PyObject *self, PyObject *args )
-{
-    libvlc_exception_t ex;
-    WINDOWHANDLE i_visual;
-    int i_ret;
-
-    if( !PyArg_ParseTuple( args, "i", &i_visual ) )
-        return NULL;
-
-    LIBVLC_TRY;
-    i_ret = libvlc_video_reparent( LIBVLC_MEDIAPLAYER(self), i_visual, &ex);
-    LIBVLC_EXCEPT;
-    return Py_BuildValue( "i", i_ret );
-}
-
-static PyObject *
 vlcMediaPlayer_is_seekable( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
@@ -435,20 +402,107 @@ vlcMediaPlayer_stop( PyObject *self, PyObject *args )
 }
 
 static PyObject *
-vlcMediaPlayer_set_drawable( PyObject *self, PyObject *args )
+vlcMediaPlayer_set_xwindow( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
-    int i_drawable;
+    uint32_t i_drawable;
 
     if( !PyArg_ParseTuple( args, "i", &i_drawable ) )
         return NULL;
 
     LIBVLC_TRY;
-    libvlc_media_player_set_drawable( LIBVLC_MEDIAPLAYER(self), (libvlc_drawable_t) i_drawable, &ex );
+    libvlc_media_player_set_xwindow( LIBVLC_MEDIAPLAYER(self), i_drawable, &ex );
     LIBVLC_EXCEPT;
 
     Py_INCREF( Py_None );
     return Py_None;
+}
+
+static PyObject *
+vlcMediaPlayer_get_xwindow( PyObject *self, PyObject *args )
+{
+    uint32_t i_ret;
+
+    i_ret = libvlc_media_player_get_xwindow( LIBVLC_MEDIAPLAYER(self));
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcMediaPlayer_set_hwnd( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    void* i_drawable;
+
+    if( !PyArg_ParseTuple( args, "l", &i_drawable ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_media_player_set_hwnd( LIBVLC_MEDIAPLAYER(self), (void*) i_drawable, &ex );
+    LIBVLC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcMediaPlayer_get_hwnd( PyObject *self, PyObject *args )
+{
+    void* i_ret;
+
+    i_ret = libvlc_media_player_get_hwnd( LIBVLC_MEDIAPLAYER(self));
+    return Py_BuildValue( "l", i_ret );
+}
+
+static PyObject *
+vlcMediaPlayer_set_agl( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    uint32_t i_drawable;
+
+    if( !PyArg_ParseTuple( args, "i", &i_drawable ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_media_player_set_agl( LIBVLC_MEDIAPLAYER(self), i_drawable, &ex );
+    LIBVLC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcMediaPlayer_get_agl( PyObject *self, PyObject *args )
+{
+    uint32_t i_ret;
+
+    i_ret = libvlc_media_player_get_agl( LIBVLC_MEDIAPLAYER(self));
+    return Py_BuildValue( "i", i_ret );
+}
+
+static PyObject *
+vlcMediaPlayer_set_nsobject( PyObject *self, PyObject *args )
+{
+    libvlc_exception_t ex;
+    void* i_drawable;
+
+    if( !PyArg_ParseTuple( args, "l", &i_drawable ) )
+        return NULL;
+
+    LIBVLC_TRY;
+    libvlc_media_player_set_nsobject( LIBVLC_MEDIAPLAYER(self), (void*) i_drawable, &ex );
+    LIBVLC_EXCEPT;
+
+    Py_INCREF( Py_None );
+    return Py_None;
+}
+
+static PyObject *
+vlcMediaPlayer_get_hwnd( PyObject *self, PyObject *args )
+{
+    void* i_ret;
+
+    i_ret = libvlc_media_player_get_nsobject( LIBVLC_MEDIAPLAYER(self));
+    return Py_BuildValue( "l", i_ret );
 }
 
 static PyObject *
@@ -575,10 +629,6 @@ static PyMethodDef vlcMediaPlayer_methods[] =
       "set_aspect_ratio(str)        Set new video aspect ratio" },
     { "video_take_snapshot", vlcMediaPlayer_video_take_snapshot, METH_VARARGS,
       "video_take_snapshot(filename=str)        Take a snapshot of the current video window" },
-    { "video_resize", vlcMediaPlayer_video_resize, METH_VARARGS,
-      "video_resize(width=int, height=int)      Resize the current video output window" },
-    { "video_reparent", vlcMediaPlayer_video_reparent, METH_VARARGS,
-      "video_reparent(visual=int)               change the parent for the current video output" },
 
     { "play", vlcMediaPlayer_play, METH_VARARGS,
       "play()    Play the media instance" },
