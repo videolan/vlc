@@ -28,6 +28,11 @@
 #include <vlc_aout.h>
 #include <vlc_codec.h>
 
+/* On Win32, we link statically */
+#ifdef WIN32
+# define FLUIDSYNTH_NOT_A_DLL
+#endif
+
 #include <fluidsynth.h>
 
 #define SOUNDFONT_TEXT N_("Sound fonts (required)")

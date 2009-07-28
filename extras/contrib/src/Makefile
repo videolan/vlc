@@ -2425,7 +2425,6 @@ DISTCLEAN_PKG += ncurses-$(NCURSES_VERSION).tar.gz
 fluidsynth-$(FLUID_VERSION).tar.gz:
 	$(WGET) $(FLUID_URL)
 
-
 fluidsynth: fluidsynth-$(FLUID_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
