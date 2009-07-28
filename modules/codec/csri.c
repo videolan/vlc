@@ -61,7 +61,6 @@ vlc_module_end ()
  *****************************************************************************/
 static subpicture_t *DecodeBlock( decoder_t *, block_t ** );
 static void DestroySubpicture( subpicture_t * );
-static void PreRender( spu_t *, subpicture_t *, const video_format_t * );
 static void UpdateRegions( spu_t *, subpicture_t *,
                            const video_format_t *,  mtime_t );
 
@@ -70,7 +69,6 @@ static void UpdateRegions( spu_t *, subpicture_t *,
  *****************************************************************************/
 struct decoder_sys_t
 {
-    subpicture_t *p_spu_final;
     video_format_t fmt_cached;
     csri_inst *p_instance;
 
@@ -79,6 +77,7 @@ struct decoder_sys_t
     void (*pf_push_packet)(csri_inst *inst, const void *packet,
                            size_t packetlen, double pts_start,
                            double pts_end);
+    mtime_t i_max_stop;
 };
 
 struct subpicture_sys_t
@@ -129,8 +128,11 @@ static int Create( vlc_object_t *p_this )
                                                    p_dec->fmt_in.p_extra,
                                                    p_dec->fmt_in.p_extra ? strnlen( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra ) : 0,
                                                    NULL);
+    p_sys->i_max_stop = VLC_TS_INVALID;
+
     p_dec->fmt_out.i_cat = SPU_ES;
     p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
+
 
     return VLC_SUCCESS;
 }
@@ -167,6 +169,12 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
 
     p_block = *pp_block;
+    if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
+    {
+        p_sys->i_max_stop = VLC_TS_INVALID;
+        block_Release( p_block );
+        return NULL;
+    }
     *pp_block = NULL;
 
     if( p_block->i_buffer == 0 || p_block->p_buffer[0] == '\0' )
@@ -206,17 +214,18 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_spu->p_sys->i_pts = p_block->i_pts;
 
     p_spu->i_start = p_block->i_pts;
-    p_spu->i_stop = p_block->i_pts + p_block->i_length;
-    p_spu->b_ephemer = false;
-    p_spu->b_absolute = false;
+    p_spu->i_stop = __MAX( p_sys->i_max_stop, p_block->i_pts + p_block->i_length );
+    p_spu->b_ephemer = true;
+    p_spu->b_absolute = true;
+
+    p_sys->i_max_stop = p_spu->i_stop;
 
     //msg_Dbg( p_dec, "BS %lf..%lf", p_spu->i_start * 0.000001, p_spu->i_stop * 0.000001);
     p_sys->pf_push_packet( p_sys->p_instance,
                            p_spu->p_sys->p_subs_data, p_spu->p_sys->i_subs_len,
-                           p_spu->i_start * 0.000001,
-                           p_spu->i_stop * 0.000001);
+                           p_block->i_pts * 0.000001,
+                           (p_block->i_pts + p_block->i_length) * 0.000001);
 
-    p_spu->pf_pre_render = PreRender;
     p_spu->pf_update_regions = UpdateRegions;
     p_spu->pf_destroy = DestroySubpicture;
 
@@ -232,15 +241,6 @@ static void DestroySubpicture( subpicture_t *p_subpic )
     free( p_subpic->p_sys );
 }
 
-static void PreRender( spu_t *p_spu, subpicture_t *p_subpic,
-                       const video_format_t *p_fmt )
-{
-    decoder_t *p_dec = p_subpic->p_sys->p_dec;
-    p_dec->p_sys->p_spu_final = p_subpic;
-    VLC_UNUSED(p_fmt);
-    VLC_UNUSED(p_spu);
-}
-
 static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
                            const video_format_t *p_fmt, mtime_t i_ts )
 {
@@ -253,10 +253,6 @@ static void UpdateRegions( spu_t *p_spu, subpicture_t *p_subpic,
     /* TODO maybe checking if we really need redrawing */
     subpicture_region_ChainDelete( p_subpic->p_region );
     p_subpic->p_region = NULL;
-
-    /* FIXME check why this is needed */
-    if( p_subpic != p_sys->p_spu_final )
-        return;
 
 #if 0
     msg_Warn( p_dec, "---- fmt: %dx%d %dx%d chroma=%4.4s",
