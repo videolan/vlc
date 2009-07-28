@@ -724,7 +724,8 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     ass_set_fonts_dir( p_library, psz_font_dir );
     free( psz_font_dir );
 #ifdef WIN32
-    dialog_ProgressSet( p_dialog, NULL, 0.1 );
+    if( p_dialog )
+        dialog_ProgressSet( p_dialog, NULL, 0.1 );
 #endif
 
     ass_set_extract_fonts( p_library, true );
@@ -747,7 +748,8 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
 
 #ifdef HAVE_FONTCONFIG
 #ifdef WIN32
-    dialog_ProgressSet( p_dialog, NULL, 0.2 );
+    if( p_dialog )
+        dialog_ProgressSet( p_dialog, NULL, 0.2 );
 #endif
 #if defined( LIBASS_VERSION ) && LIBASS_VERSION >= 0x00907000
     ass_set_fonts( p_renderer, psz_font, psz_family, true, NULL, 1 );  // setup default font/family
@@ -755,7 +757,8 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     ass_set_fonts( p_renderer, psz_font, psz_family );  // setup default font/family
 #endif
 #ifdef WIN32
-    dialog_ProgressSet( p_dialog, NULL, 1.0 );
+    if( p_dialog )
+        dialog_ProgressSet( p_dialog, NULL, 1.0 );
 #endif
 #else
     /* FIXME you HAVE to give him a font if no fontconfig */
@@ -774,7 +777,8 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     /* */
     vlc_mutex_unlock( &libass_lock );
 #ifdef WIN32
-    dialog_ProgressDestroy( p_dialog );
+    if( p_dialog )
+        dialog_ProgressDestroy( p_dialog );
 #endif
     return p_ass;
 
