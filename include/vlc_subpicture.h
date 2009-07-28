@@ -152,8 +152,7 @@ struct subpicture_t
     /** Pointer to function that cleans up the private data of this subtitle */
     void ( *pf_destroy ) ( subpicture_t * );
 
-    /** Pointer to functions for region management */
-    void (*pf_pre_render)    ( spu_t *, subpicture_t *, const video_format_t * );
+    /** Pointer to function that update the regions before rendering (optionnal) */
     void (*pf_update_regions)( spu_t *,
                                subpicture_t *, const video_format_t *, mtime_t );
 

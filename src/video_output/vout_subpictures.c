@@ -379,10 +379,6 @@ void spu_RenderSubpictures( spu_t *p_spu,
             p_subpic != NULL;
                 p_subpic = p_subpic->p_next )
     {
-        /* TODO remove pre-render */
-        if( p_subpic->pf_pre_render )
-            p_subpic->pf_pre_render( p_spu, p_subpic, p_fmt_dst );
-
         if( p_subpic->pf_update_regions )
         {
             video_format_t fmt_org = *p_fmt_dst;
