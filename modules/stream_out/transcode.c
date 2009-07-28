@@ -171,7 +171,7 @@ vlc_module_begin ()
                 VENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "vcodec", NULL, NULL, VCODEC_TEXT,
                 VCODEC_LONGTEXT, false )
-    add_integer( SOUT_CFG_PREFIX "vb", 800 * 1000, NULL, VB_TEXT,
+    add_integer( SOUT_CFG_PREFIX "vb", 0, NULL, VB_TEXT,
                  VB_LONGTEXT, false )
     add_float( SOUT_CFG_PREFIX "scale", 1, NULL, SCALE_TEXT,
                SCALE_LONGTEXT, false )
