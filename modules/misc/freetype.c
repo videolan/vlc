@@ -361,13 +361,24 @@ static int Create( vlc_object_t *p_this )
     FcDefaultSubstitute( fontpattern );
 
     fontmatch = FcFontMatch( NULL, fontpattern, &fontresult );
+    if( fontmatch == FcResultNoMath )
+    {
+        free( psz_fontsize );
+        FcPatternDestroy( fontpattern );
+        FcPatternDestroy( fontmatch );
+        goto error;
+    }
 
     FcPatternGetString( fontmatch, FC_FILE, 0, (FcChar8 **)&psz_fontfile);
     FcPatternGetInteger( fontmatch, FC_INDEX, 0, &fontindex );
-    if( !psz_fontfile )
-        goto error;
-    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile);
     free( psz_fontsize );
+    if( !psz_fontfile )
+    {
+        FcPatternDestroy( fontpattern );
+        FcPatternDestroy( fontmatch );
+        goto error;
+    }
+    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile);
 #else
     psz_fontfile = psz_fontfamily;
 #endif
