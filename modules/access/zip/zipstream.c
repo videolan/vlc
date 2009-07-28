@@ -205,8 +205,8 @@ int StreamOpen( vlc_object_t *p_this )
     if( !p_sys->zipFile )
     {
         msg_Warn( s, "unable to open file" );
-        free( p_sys );
         free( p_sys->fileFunctions );
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -214,8 +214,8 @@ int StreamOpen( vlc_object_t *p_this )
     char *psz_tmp;
     if( asprintf( &psz_tmp, "%s.xspf", s->psz_path ) == -1 )
     {
-        free( p_sys );
         free( p_sys->fileFunctions );
+        free( p_sys );
         return VLC_ENOMEM;
     }
     p_sys->psz_path = s->psz_path;
