@@ -825,12 +825,14 @@ static int  Open ( vlc_object_t *p_this )
 #endif
 
 
-    /* Check qcomp in here, to see if user want CBR (ABR) or do we use CRF/QP */
     var_Get( p_enc, SOUT_CFG_PREFIX "qcomp", &val );
     p_sys->param.rc.f_qcompress = val.f_float;
-    /* Enable ABR if qcomp near 0.0 */
-    if( val.f_float <= 0.1 )
+
+    /* transcode-default bitrate is 0,
+     * set more to ABR if user specifies bitrate */
+    if( p_enc->fmt_out.i_bitrate > 0 )
     {
+        p_sys->param.rc.i_bitrate = p_enc->fmt_out.i_bitrate / 1000;
 #if X264_BUILD < 48
     /* cbr = 1 overrides qp or crf and sets an average bitrate
        but maxrate = average bitrate is needed for "real" CBR */
@@ -888,9 +890,6 @@ static int  Open ( vlc_object_t *p_this )
 #endif
     }
 
-    /* average bitrate specified by transcode vb, define if not QP-encode*/
-    if( p_sys->param.rc.i_rc_method != X264_RC_CQP ) 
-        p_sys->param.rc.i_bitrate = p_enc->fmt_out.i_bitrate / 1000;
 
 #if X264_BUILD >= 24
     var_Get( p_enc, SOUT_CFG_PREFIX "ratetol", &val );
@@ -901,12 +900,6 @@ static int  Open ( vlc_object_t *p_this )
 
     var_Get( p_enc, SOUT_CFG_PREFIX "vbv-bufsize", &val );
     p_sys->param.rc.i_vbv_buffer_size = val.i_int;
-
-    /* x264 vbv-bufsize = 0 (default). if not provided set period
-       in seconds for local maximum bitrate (cache/bufsize) based
-       on average bitrate. */
-    if( !val.i_int )
-        p_sys->param.rc.i_vbv_buffer_size = p_sys->param.rc.i_bitrate * 2;
 
     /* max bitrate = average bitrate -> CBR */
     var_Get( p_enc, SOUT_CFG_PREFIX "vbv-maxrate", &val );
@@ -1267,6 +1260,25 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_fps_num = p_enc->fmt_in.video.i_frame_rate;
         p_sys->param.i_fps_den = p_enc->fmt_in.video.i_frame_rate_base;
     }
+
+    /* x264 vbv-bufsize = 0 (default). if not provided set period
+       in seconds for local maximum bitrate (cache/bufsize) based
+       on average bitrate when use has told bitrate.
+       vbv-buffer size is set to bitrate * secods between keyframes */
+    if( !p_sys->param.rc.i_vbv_buffer_size &&
+         p_sys->param.rc.i_rc_method == X264_RC_ABR &&
+         p_sys->param.i_fps_num )
+    {
+        p_sys->param.rc.i_vbv_buffer_size = p_sys->param.rc.i_bitrate *
+            p_sys->param.i_fps_den;
+#if X264_BUILD >= 0x000e
+        p_sys->param.rc.i_vbv_buffer_size *= p_sys->param.i_keyint_max;
+#else
+        p_sys->param.rc.i_vbv_buffer_size *= p_sys->param.i_idrframe;
+#endif
+        p_sys->param.rc.i_vbv_buffer_size /= p_sys->param.i_fps_num;
+    }
+
 
     unsigned i_cpu = vlc_CPU();
     if( !(i_cpu & CPU_CAPABILITY_MMX) )
