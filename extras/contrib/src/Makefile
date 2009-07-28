@@ -2562,7 +2562,7 @@ clean-src: clean
 	rm -rf $(DISTCLEAN_PKG)
 
 clean-svn:
-	rm -rf ffmpeg tremor x264 libdca pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz portaudio live555-$(LIVEDOTCOM_VERSION).tar.gz live
+	rm -rf ffmpeg tremor x264 libdca pa_snapshot_v$(PORTAUDIO_VERSION).tar.gz portaudio live555-$(LIVEDOTCOM_VERSION).tar.gz live libass
 
 distclean: clean-src
 
