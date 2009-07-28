@@ -310,7 +310,7 @@ static int Control( stream_t *s, int i_query, va_list args )
                 return VLC_EGENERIC;
             else
             {
-                p_sys->i_len = (size_t) i_position;
+                p_sys->i_pos = (size_t) i_position;
                 return VLC_SUCCESS;
             }
         }
