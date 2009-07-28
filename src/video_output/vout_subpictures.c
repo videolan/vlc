@@ -585,6 +585,8 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
         mtime_t      start_date = render_date;
         mtime_t      ephemer_subtitle_date = 0;
         mtime_t      ephemer_system_date = 0;
+        int64_t      i_ephemer_subtitle_order = INT64_MIN;
+        int64_t      i_ephemer_system_order = INT64_MIN;
         int i_index;
 
         /* Select available pictures */
@@ -614,9 +616,14 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
                 continue;
             }
 
-            mtime_t *pi_ephemer_date = p_current->b_subtitle ? &ephemer_subtitle_date : &ephemer_system_date;
-            if( p_current->i_start > *pi_ephemer_date )
+            mtime_t *pi_ephemer_date  = p_current->b_subtitle ? &ephemer_subtitle_date : &ephemer_system_date;
+            int64_t *pi_ephemer_order = p_current->b_subtitle ? &i_ephemer_subtitle_order : &i_ephemer_system_order;
+            if( p_current->i_start >= *pi_ephemer_date )
+            {
                 *pi_ephemer_date = p_current->i_start;
+                if( p_current->i_order > *pi_ephemer_order )
+                    *pi_ephemer_order = p_current->i_order;
+            }
 
             b_stop_valid = !p_current->b_ephemer || p_current->i_stop > p_current->i_start;
 
@@ -648,17 +655,23 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
 
             const mtime_t stop_date = p_current->b_subtitle ? __MAX( start_date, p_sys->i_last_sort_date ) : system_date;
             const mtime_t ephemer_date = p_current->b_subtitle ? ephemer_subtitle_date : ephemer_system_date;
+            const int64_t i_ephemer_order = p_current->b_subtitle ? i_ephemer_subtitle_order : i_ephemer_system_order;
 
-            if( ( b_late && p_current->i_stop <= stop_date ) ||
-                ( p_current->b_ephemer && p_current->i_start < ephemer_date ) )
+            /* Destroy late and obsolete ephemer subpictures */
+            bool b_rejet = b_late && p_current->i_stop <= stop_date;
+            if( p_current->b_ephemer )
             {
-                /* Destroy late and obsolete ephemer subpictures */
+                if( p_current->i_start < ephemer_date )
+                    b_rejet = true;
+                else if( p_current->i_start == ephemer_date &&
+                         p_current->i_order < i_ephemer_order )
+                    b_rejet = true;
+            }
+
+            if( b_rejet )
                 SpuHeapDeleteSubpicture( &p_sys->heap, p_current );
-            }
             else
-            {
                 SubpictureChain( &p_subpic, p_current );
-            }
         }
     }
 
