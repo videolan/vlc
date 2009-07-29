@@ -2497,6 +2497,7 @@ libass-$(ASS_VERSION).tar.bz2:
 
 libass:
 	$(GIT) clone $(ASS_GIT)
+	(cd $@; autoreconf -ivf)
 
 .libass: libass
 	(cd $<; $(HOSTCC) ./configure --disable-png $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
