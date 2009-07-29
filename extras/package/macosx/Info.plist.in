@@ -1019,6 +1019,8 @@
 			<string>Binary</string>
 		</dict>
 	</array>
+	<key>SUFeedURL</key>
+	<string>http://jones.videolan.org/~videolan/fpk/sparkle/vlc.xml</string>
 	<key>CFBundleExecutable</key>
 	<string>VLC</string>
 	<key>CFBundleGetInfoString</key>

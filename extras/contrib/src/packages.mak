@@ -229,3 +229,6 @@ ASS_URL=$(SF)/libass/libass-$(ASS_VERSION).tar.bz2
 ASS_GIT=git://greg.geekmind.org/libass.git
 GSM_VERSION=1.0.12
 GSM_URL=http://user.cs.tu-berlin.de/~jutta/gsm/gsm-$(GSM_VERSION).tar.gz
+SPARKLE_VERSION=1.5b6-vlc
+#SPARKLE_URL=http://sparkle.andymatuschak.org/files/Sparkle%20$(SPARKLE_VERSION).zip
+SPARKLE_URL=$(VIDEOLAN)/testing/contrib/Sparkle%20$(SPARKLE_VERSION).zip

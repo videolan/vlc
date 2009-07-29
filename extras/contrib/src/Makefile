@@ -2508,6 +2508,29 @@ CLEAN_PKG += libass
 DISTCLEAN_PKG += libass-$(ASS_VERSION).tar.bz2
 
 # ***************************************************************************
+# Sparkle
+# ***************************************************************************
+
+"Sparkle\ $(SPARKLE_VERSION).zip":
+	$(WGET) $(SPARKLE_URL)
+
+Sparkle: "Sparkle\ $(SPARKLE_VERSION).zip"
+	rm -rf $@ || true
+	unzip $<
+	touch $@
+
+.Sparkle: Sparkle
+	rm -rf ../Sparkle
+	mv Sparkle ..
+	mkdir Sparkle
+	(cd $<)
+	touch $@
+
+CLEAN_FILE += .Sparkle
+CLEAN_PKG += Sparkle
+DISTCLEAN_PKG += Sparkle%20$(SPARKLE_VERSION).zip
+
+# ***************************************************************************
 # UPNP library
 # ***************************************************************************
 

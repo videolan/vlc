@@ -65,7 +65,6 @@
 		CC402EFA0E00ABBB006A4BA4 /* play_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A703095AE51600018C74 /* play_embedded_blue.png */; };
 		CC402EFB0E00ABBB006A4BA4 /* skip_forward_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A704095AE51600018C74 /* skip_forward_embedded_blue.png */; };
 		CC402EFC0E00ABBB006A4BA4 /* skip_previous_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = C2F2A705095AE51600018C74 /* skip_previous_embedded_blue.png */; };
-		CC402EFD0E00ABBB006A4BA4 /* Update.nib in Resources */ = {isa = PBXBuildFile; fileRef = CC26BF2A09A7A05000E94D62 /* Update.nib */; };
 		CC402F000E00ABBB006A4BA4 /* add_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9AC0ABE07C800CA4CC5 /* add_embedded_blue.png */; };
 		CC402F010E00ABBB006A4BA4 /* add_embedded.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9AD0ABE07C800CA4CC5 /* add_embedded.png */; };
 		CC402F020E00ABBB006A4BA4 /* repeat_embedded_blue.png in Resources */ = {isa = PBXBuildFile; fileRef = CC4ED9AE0ABE07C800CA4CC5 /* repeat_embedded_blue.png */; };
@@ -134,6 +133,8 @@
 		CC402F420E00ABBB006A4BA4 /* ApplicationServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */; };
 		CC402F430E00ABBB006A4BA4 /* QTKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC1941240B9C1F8400635F6B /* QTKit.framework */; };
 		CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC962E2C0CC7992800A56695 /* WebKit.framework */; };
+		CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
+		CC426FD71020D47100A32659 /* Sparkle.framework in Copy Frameworks */ = {isa = PBXBuildFile; fileRef = CC426FD01020D44F00A32659 /* Sparkle.framework */; };
 		CC62B8D00FC5787D0077BB8C /* aiff.icns in Resources */ = {isa = PBXBuildFile; fileRef = CC62B8C50FC5787D0077BB8C /* aiff.icns */; };
 		CC62B8D10FC5787D0077BB8C /* audio.icns in Resources */ = {isa = PBXBuildFile; fileRef = CC62B8C60FC5787D0077BB8C /* audio.icns */; };
 		CC62B8D20FC5787D0077BB8C /* flv.icns in Resources */ = {isa = PBXBuildFile; fileRef = CC62B8C70FC5787D0077BB8C /* flv.icns */; };
@@ -174,6 +175,20 @@
 		CCD90F500E87C86D0034564A /* add_broadcast.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4D0E87C86D0034564A /* add_broadcast.png */; };
 		CCF11B540F8BFB520088542D /* ErrorPanel.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCF11B520F8BFB520088542D /* ErrorPanel.nib */; };
 /* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		CC426FD81020D48700A32659 /* Copy Frameworks */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = "";
+			dstSubfolderSpec = 10;
+			files = (
+				CC426FD71020D47100A32659 /* Sparkle.framework in Copy Frameworks */,
+			);
+			name = "Copy Frameworks";
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
 		089C1672FE841209C02AAC07 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = /System/Library/Frameworks/Foundation.framework; sourceTree = "<absolute>"; };
@@ -263,7 +278,6 @@
 		CC0FB34B0F8BED1100F057F7 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/CoreDialogs.nib; sourceTree = "<group>"; };
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		CC1C41D00D9BAD7F002728FA /* noart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = noart.png; path = Resources/noart.png; sourceTree = "<group>"; };
-		CC26BF2B09A7A05000E94D62 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/Update.nib; sourceTree = "<group>"; };
 		CC26BF3109A7A08C00E94D62 /* update.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = update.h; path = ../../../modules/gui/macosx/update.h; sourceTree = SOURCE_ROOT; };
 		CC26BF3209A7A08C00E94D62 /* update.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = update.m; path = ../../../modules/gui/macosx/update.m; sourceTree = SOURCE_ROOT; };
 		CC33C2200D2572DE008C4683 /* pause_embedded_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pause_embedded_graphite.png; path = Resources/pause_embedded_graphite.png; sourceTree = "<group>"; };
@@ -287,6 +301,7 @@
 		CC33C2500D2578F5008C4683 /* fullscreen_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fullscreen_graphite.png; path = Resources/fullscreen_graphite.png; sourceTree = "<group>"; };
 		CC3DC89B0A7CDB9600B53F32 /* ApplicationServices.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = ApplicationServices.framework; path = /System/Library/Frameworks/ApplicationServices.framework; sourceTree = "<absolute>"; };
 		CC402F4B0E00ABBB006A4BA4 /* VLC.bundle */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = VLC.bundle; sourceTree = BUILT_PRODUCTS_DIR; };
+		CC426FD01020D44F00A32659 /* Sparkle.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Sparkle.framework; path = ../../contrib/Sparkle/Sparkle.framework; sourceTree = SOURCE_ROOT; };
 		CC4A33210F8CB017000FC4A7 /* coredialogs.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = coredialogs.m; path = ../../../modules/gui/macosx/coredialogs.m; sourceTree = SOURCE_ROOT; };
 		CC4A33220F8CB017000FC4A7 /* coredialogs.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = coredialogs.h; path = ../../../modules/gui/macosx/coredialogs.h; sourceTree = SOURCE_ROOT; };
 		CC4ED9AC0ABE07C800CA4CC5 /* add_embedded_blue.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded_blue.png; path = Resources/add_embedded_blue.png; sourceTree = "<group>"; };
@@ -428,6 +443,7 @@
 				CC402F430E00ABBB006A4BA4 /* QTKit.framework in Frameworks */,
 				CC402F440E00ABBB006A4BA4 /* WebKit.framework in Frameworks */,
 				CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */,
+				CC426FD11020D44F00A32659 /* Sparkle.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -539,6 +555,7 @@
 		1058C7ACFEA557BF11CA2CBB /* Linked Frameworks */ = {
 			isa = PBXGroup;
 			children = (
+				CC426FD01020D44F00A32659 /* Sparkle.framework */,
 				CCBE999E0F922C51000705F8 /* CoreServices.framework */,
 				CC962E2C0CC7992800A56695 /* WebKit.framework */,
 				CC1941240B9C1F8400635F6B /* QTKit.framework */,
@@ -828,7 +845,6 @@
 				DCFCCDB7085CE18F001E36AF /* Wizard.nib */,
 				DC7F46EB08A183FC0027DB24 /* Extended.nib */,
 				DCE7BD0308A56C8B007B10AE /* Bookmarks.nib */,
-				CC26BF2A09A7A05000E94D62 /* Update.nib */,
 			);
 			name = nibs;
 			sourceTree = "<group>";
@@ -843,6 +859,7 @@
 				CC402EAF0E00ABBB006A4BA4 /* Resources */,
 				CC402F400E00ABBB006A4BA4 /* Frameworks */,
 				CC402F450E00ABBB006A4BA4 /* Rez */,
+				CC426FD81020D48700A32659 /* Copy Frameworks */,
 			);
 			buildRules = (
 			);
@@ -966,7 +983,6 @@
 				CC402EFA0E00ABBB006A4BA4 /* play_embedded_blue.png in Resources */,
 				CC402EFB0E00ABBB006A4BA4 /* skip_forward_embedded_blue.png in Resources */,
 				CC402EFC0E00ABBB006A4BA4 /* skip_previous_embedded_blue.png in Resources */,
-				CC402EFD0E00ABBB006A4BA4 /* Update.nib in Resources */,
 				CC402F000E00ABBB006A4BA4 /* add_embedded_blue.png in Resources */,
 				CC402F010E00ABBB006A4BA4 /* add_embedded.png in Resources */,
 				CC402F020E00ABBB006A4BA4 /* repeat_embedded_blue.png in Resources */,
@@ -1059,14 +1075,6 @@
 				CC0FB34B0F8BED1100F057F7 /* English */,
 			);
 			name = CoreDialogs.nib;
-			sourceTree = "<group>";
-		};
-		CC26BF2A09A7A05000E94D62 /* Update.nib */ = {
-			isa = PBXVariantGroup;
-			children = (
-				CC26BF2B09A7A05000E94D62 /* English */,
-			);
-			name = Update.nib;
 			sourceTree = "<group>";
 		};
 		CCB60A400E6E5E3F00407004 /* VLM.nib */ = {
@@ -1182,7 +1190,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = NO;
-				FRAMEWORK_SEARCH_PATHS = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../contrib/Sparkle\"";
 				GCC_DYNAMIC_NO_PIC = NO;
 				GCC_ENABLE_FIX_AND_CONTINUE = YES;
 				GCC_GENERATE_DEBUGGING_SYMBOLS = YES;
@@ -1212,7 +1224,11 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				COPY_PHASE_STRIP = YES;
-				FRAMEWORK_SEARCH_PATHS = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../contrib/Sparkle\"";
 				GCC_ENABLE_FIX_AND_CONTINUE = NO;
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
@@ -1238,7 +1254,11 @@
 		CC402F490E00ABBB006A4BA4 /* Default */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				FRAMEWORK_SEARCH_PATHS = "";
+				FRAMEWORK_SEARCH_PATHS = (
+					"$(inherited)",
+					"$(FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1)",
+				);
+				FRAMEWORK_SEARCH_PATHS_QUOTED_FOR_TARGET_1 = "\"$(SRCROOT)/../../contrib/Sparkle\"";
 				GCC_SYMBOLS_PRIVATE_EXTERN = NO;
 				HEADER_SEARCH_PATHS = "";
 				INFOPLIST_FILE = Info.plist;
