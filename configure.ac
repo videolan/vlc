@@ -2932,6 +2932,26 @@ then
 fi
 
 dnl
+dnl libva needs avcodec
+dnl
+AC_ARG_ENABLE(libva,
+  [  --enable-libva         libva VAAPI support (default disabled)])
+AS_IF([test "${enable_libva}" = "yes"], [
+  AS_IF([test "x${have_avcodec}" = "xyes"], [
+    PKG_CHECK_MODULES(LIBVA, [libva libva-x11],
+      [
+        VLC_ADD_LIBS([avcodec],[$LIBVA_LIBS])
+        VLC_ADD_CFLAGS([avcodec],[$LIBVA_CFLAGS])
+        AC_DEFINE(HAVE_AVCODEC_VAAPI, 1, [Define if avcodec has to be built with VAAPI support.])
+      ],[
+        AC_MSG_ERROR([Could not find libva.])
+    ])
+  ],[
+    AC_MSG_ERROR([libva VAAPI support depends on libavcodec.])
+  ])
+])
+
+dnl
 dnl stream_out switcher needs libavcodec
 dnl
 AC_ARG_ENABLE(switcher,
