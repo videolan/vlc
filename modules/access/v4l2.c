@@ -1950,7 +1950,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
                     if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) >= 0 )
                         break;
                     fmt.fmt.pix.field = V4L2_FIELD_ANY;
-                    if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
+                    if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) >= 0 )
                         break;
                     fmt.fmt.pix.field = V4L2_FIELD_NONE;
                 }
