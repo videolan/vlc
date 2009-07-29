@@ -42,6 +42,7 @@
 #include <vlc_charset.h>
 #include <vlc_gcrypt.h>
 #include <vlc_es.h>
+#include <vlc_http.h>
 
 #define RAOP_PORT 5000
 #define RAOP_USER_AGENT "VLC " VERSION
@@ -123,6 +124,8 @@ struct sout_stream_sys_t
     int i_server_port;
     int i_audio_latency;
     int i_jack_type;
+
+    http_auth_t auth;
 
     /* Send buffer */
     size_t i_sendbuf_len;
@@ -840,6 +843,30 @@ error:
     return i_err;
 }
 
+static int ParseAuthenticateHeader( vlc_object_t *p_this,
+                                    vlc_dictionary_t *p_resp_headers )
+{
+    sout_stream_t *p_stream = (sout_stream_t*)p_this;
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    char *psz_auth;
+    int i_err = VLC_SUCCESS;
+
+    psz_auth = vlc_dictionary_value_for_key( p_resp_headers,
+                                             "WWW-Authenticate" );
+    if ( psz_auth == NULL )
+    {
+        msg_Err( p_this, "HTTP 401 response missing "
+                         "WWW-Authenticate header" );
+        i_err = VLC_EGENERIC;
+        goto error;
+    }
+
+    http_auth_ParseWwwAuthenticateHeader( p_this, &p_sys->auth, psz_auth );
+
+error:
+    return i_err;
+}
+
 static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
                         const char *psz_content_type, const char *psz_body,
                         vlc_dictionary_t *p_req_headers,
@@ -847,9 +874,11 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
 {
     sout_stream_t *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    char *psz_authorization = NULL;
     int headers_done;
     int i_err = VLC_SUCCESS;
     int i_status;
+    int i_auth_state;
 
     if ( p_sys->i_control_fd < 0 )
     {
@@ -858,8 +887,29 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
         goto error;
     }
 
+    i_auth_state = 0;
     while ( 1 )
     {
+        /* Send header only when Digest authentication is used */
+        if ( p_sys->psz_password != NULL && p_sys->auth.psz_nonce != NULL )
+        {
+            FREENULL( psz_authorization );
+
+            psz_authorization =
+                http_auth_FormatAuthorizationHeader( p_this, &p_sys->auth,
+                                                     psz_method,
+                                                     p_sys->psz_url, "",
+                                                     p_sys->psz_password );
+            if ( psz_authorization == NULL )
+            {
+                i_err = VLC_EGENERIC;
+                goto error;
+            }
+
+            vlc_dictionary_insert( p_req_headers, "Authorization",
+                                   psz_authorization );
+        }
+
         /* Send request */
         i_err = SendRequest( p_this, psz_method, psz_content_type, psz_body,
                              p_req_headers);
@@ -888,6 +938,22 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
         if ( i_status == 200 )
             /* Request successful */
             break;
+        else if ( i_status == 401 )
+        {
+            /* Authorization required */
+            if ( i_auth_state == 1 || p_sys->psz_password == NULL )
+            {
+                msg_Err( p_this, "Access denied, password invalid" );
+                i_err = VLC_EGENERIC;
+                goto error;
+            }
+
+            i_err = ParseAuthenticateHeader( p_this, p_resp_headers );
+            if ( i_err != VLC_SUCCESS )
+                goto error;
+
+            i_auth_state = 1;
+        }
         else
         {
             msg_Err( p_this, "Request failed (%s), status is %d",
@@ -899,6 +965,7 @@ static int ExecRequest( vlc_object_t *p_this, const char *psz_method,
 
 error:
     FREENULL( p_sys->psz_last_status_line );
+    free( psz_authorization );
 
     return i_err;
 }
@@ -1356,6 +1423,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_stream_fd = -1;
     p_sys->i_volume = var_GetInteger( p_stream, SOUT_CFG_PREFIX "volume");
     p_sys->i_jack_type = JACK_TYPE_NONE;
+
+    http_auth_Init( &p_sys->auth );
 
     p_sys->psz_host = var_GetNonEmptyString( p_stream,
                                              SOUT_CFG_PREFIX "host" );
