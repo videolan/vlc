@@ -747,8 +747,12 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
                 op.packetno = p_stream->i_packet_no++;
                 ogg_stream_packetin( &p_stream->os, &op );
 
-                p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
-                block_ChainAppend( &p_hdr, p_og );
+                if( j == 0 )
+                    p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
+                else
+                    p_og = OggStreamPageOut( p_mux, &p_stream->os, 0 );
+                if( p_og )
+                    block_ChainAppend( &p_hdr, p_og );
             }
         }
         else if( p_stream->i_fourcc != VLC_CODEC_FLAC &&
