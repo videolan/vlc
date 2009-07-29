@@ -52,8 +52,6 @@ static char* ParseUriValue(char* psz_string);
 int Import_WPL( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    const uint8_t *p_peek;
-    CHECK_PEEK( p_peek, 8 );
 
     if(! ( demux_IsPathExtension( p_demux, ".wpl" ) || demux_IsForced( p_demux,  "wpl" )))
         return VLC_EGENERIC;

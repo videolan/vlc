@@ -53,8 +53,6 @@ static char* ParseTabValue(char* psz_string);
 int Import_ZPL( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    const uint8_t *p_peek;
-    CHECK_PEEK( p_peek, 8 );
 
     if(! ( demux_IsPathExtension( p_demux, ".zpl" ) || demux_IsForced( p_demux,  "zpl" )))
         return VLC_EGENERIC;
