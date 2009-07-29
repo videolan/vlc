@@ -1180,14 +1180,14 @@ static void* RunThread( void *p_this )
         mtime_t spu_render_time;
         if( p_vout->p->b_paused )
             spu_render_time = p_vout->p->i_pause_date;
+        else if( p_picture )
+            spu_render_time = p_picture->date > 1 ? p_picture->date : mdate();
         else
-            spu_render_time = p_picture ? p_picture->date : mdate();
+            spu_render_time = 0;
 
-        subpicture_t *p_subpic = NULL;
-        if( spu_render_time > 1 )
-            p_subpic = spu_SortSubpictures( p_vout->p_spu,
-                                            spu_render_time, b_snapshot );
-
+        subpicture_t *p_subpic = spu_SortSubpictures( p_vout->p_spu,
+                                                      spu_render_time,
+                                                      b_snapshot );
         /*
          * Perform rendering
          */

@@ -353,11 +353,11 @@ void spu_RenderSubpictures( spu_t *p_spu,
                             picture_t *p_pic_dst, const video_format_t *p_fmt_dst,
                             subpicture_t *p_subpic_list,
                             const video_format_t *p_fmt_src,
-                            mtime_t render_date )
+                            mtime_t render_subtitle_date )
 {
     spu_private_t *p_sys = p_spu->p;
 
-    const mtime_t system_date = mdate();
+    const mtime_t render_osd_date = mdate();
 
     const int i_source_video_width  = p_fmt_src->i_width;
     const int i_source_video_height = p_fmt_src->i_height;
@@ -388,7 +388,7 @@ void spu_RenderSubpictures( spu_t *p_spu,
             fmt_org.i_visible_height = i_source_video_height;
 
             p_subpic->pf_update_regions( p_spu, p_subpic, &fmt_org,
-                                         p_subpic->b_subtitle ? render_date : system_date );
+                                         p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
         }
 
         /* */
@@ -507,7 +507,7 @@ void spu_RenderSubpictures( spu_t *p_spu,
             SpuRenderRegion( p_spu, p_pic_dst, &area,
                              p_subpic, p_region, scale, p_fmt_dst,
                              p_subtitle_area, i_subtitle_area,
-                             p_subpic->b_subtitle ? render_date : system_date );
+                             p_subpic->b_subtitle ? render_subtitle_date : render_osd_date );
 
             if( p_subpic->b_subtitle )
             {
@@ -542,13 +542,13 @@ void spu_RenderSubpictures( spu_t *p_spu,
  * to be removed if a newer one is available), which makes it a lot
  * more difficult to guess if a subpicture has to be rendered or not.
  *****************************************************************************/
-subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
+subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_subtitle_date,
                                    bool b_subtitle_only )
 {
     spu_private_t *p_sys = p_spu->p;
     int i_channel;
     subpicture_t *p_subpic = NULL;
-    const mtime_t system_date = mdate();
+    const mtime_t render_osd_date = mdate();
 
     /* Update sub-filter chain */
     vlc_mutex_lock( &p_sys->lock );
@@ -566,7 +566,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
     }
 
     /* Run subpicture filters */
-    filter_chain_SubFilter( p_sys->p_chain, render_date );
+    filter_chain_SubFilter( p_sys->p_chain, render_osd_date );
 
     vlc_mutex_lock( &p_sys->lock );
 
@@ -578,9 +578,9 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
         bool         pb_available_late[VOUT_MAX_SUBPICTURES];
         int          i_available = 0;
 
-        mtime_t      start_date = render_date;
+        mtime_t      start_date = render_subtitle_date;
         mtime_t      ephemer_subtitle_date = 0;
-        mtime_t      ephemer_system_date = 0;
+        mtime_t      ephemer_osd_date = 0;
         int64_t      i_ephemer_subtitle_order = INT64_MIN;
         int64_t      i_ephemer_system_order = INT64_MIN;
         int i_index;
@@ -605,6 +605,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
             {
                 continue;
             }
+            const mtime_t render_date = p_current->b_subtitle ? render_subtitle_date : render_osd_date;
             if( render_date &&
                 render_date < p_current->i_start )
             {
@@ -612,7 +613,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
                 continue;
             }
 
-            mtime_t *pi_ephemer_date  = p_current->b_subtitle ? &ephemer_subtitle_date : &ephemer_system_date;
+            mtime_t *pi_ephemer_date  = p_current->b_subtitle ? &ephemer_subtitle_date : &ephemer_osd_date;
             int64_t *pi_ephemer_order = p_current->b_subtitle ? &i_ephemer_subtitle_order : &i_ephemer_system_order;
             if( p_current->i_start >= *pi_ephemer_date )
             {
@@ -623,7 +624,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
 
             b_stop_valid = !p_current->b_ephemer || p_current->i_stop > p_current->i_start;
 
-            b_late = b_stop_valid && p_current->i_stop <= p_current->b_subtitle ? render_date : system_date;
+            b_late = b_stop_valid && p_current->i_stop <= render_date;
 
             /* start_date will be used for correct automatic overlap support
              * in case picture that should not be displayed anymore (display_time)
@@ -649,8 +650,8 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
             subpicture_t *p_current = p_available_subpic[i_index];
             bool b_late = pb_available_late[i_index];
 
-            const mtime_t stop_date = p_current->b_subtitle ? __MAX( start_date, p_sys->i_last_sort_date ) : system_date;
-            const mtime_t ephemer_date = p_current->b_subtitle ? ephemer_subtitle_date : ephemer_system_date;
+            const mtime_t stop_date = p_current->b_subtitle ? __MAX( start_date, p_sys->i_last_sort_date ) : render_osd_date;
+            const mtime_t ephemer_date = p_current->b_subtitle ? ephemer_subtitle_date : ephemer_osd_date;
             const int64_t i_ephemer_order = p_current->b_subtitle ? i_ephemer_subtitle_order : i_ephemer_system_order;
 
             /* Destroy late and obsolete ephemer subpictures */
@@ -671,7 +672,7 @@ subpicture_t *spu_SortSubpictures( spu_t *p_spu, mtime_t render_date,
         }
     }
 
-    p_sys->i_last_sort_date = render_date;
+    p_sys->i_last_sort_date = render_subtitle_date;
     vlc_mutex_unlock( &p_sys->lock );
 
     return p_subpic;
