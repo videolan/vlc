@@ -44,7 +44,7 @@ src: using-src
 
 ifdef HAVE_DARWIN_OS
 
-CONTRIBREV=14
+CONTRIBREV=15
 contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
 	$(WGET) http://downloads.videolan.org/pub/videolan/testing/contrib/$@
 
@@ -82,7 +82,7 @@ package-macosx:
 	fi
 	mkdir tmp
 	tar cf - bin sbin include lib share/aclocal* share/autoconf* \
-		share/automake* share/gettext* share/libtool* gecko-sdk \
+		share/automake* share/gettext* share/libtool* gecko-sdk Sparkle \
 		| (cd tmp; tar xf -)
 	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@
 	(cd tmp; tar cf - .) | bzip2 -c > contrib-macosx.tar.bz2
