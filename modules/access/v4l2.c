@@ -1917,7 +1917,20 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
                 }
             }
             /* Try and set user chroma */
-            if( !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) || ( fmt.fmt.pix.pixelformat && v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) )
+            bool b_error = !IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat );
+            if( !b_error && fmt.fmt.pix.pixelformat )
+            {
+                if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
+                {
+                    fmt.fmt.pix.field = V4L2_FIELD_ANY;
+                    if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
+                    {
+                        fmt.fmt.pix.field = V4L2_FIELD_NONE;
+                        b_error = true;
+                    }
+                }
+            }
+            if( b_error )
             {
                 msg_Warn( p_demux, "Driver is unable to use specified chroma %s. Trying defaults.", p_sys->psz_requested_chroma );
                 fmt.fmt.pix.pixelformat = 0;
@@ -1932,9 +1945,15 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             for( i = 0; i < ARRAY_SIZE( p_chroma_fallbacks ); i++ )
             {
                 fmt.fmt.pix.pixelformat = p_chroma_fallbacks[i];
-                if( IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat )
-                 && v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) >= 0 )
-                    break;
+                if( IsPixelFormatSupported( p_demux, fmt.fmt.pix.pixelformat ) )
+                {
+                    if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) >= 0 )
+                        break;
+                    fmt.fmt.pix.field = V4L2_FIELD_ANY;
+                    if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
+                        break;
+                    fmt.fmt.pix.field = V4L2_FIELD_NONE;
+                }
             }
             if( i == ARRAY_SIZE( p_chroma_fallbacks ) )
             {
