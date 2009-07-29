@@ -619,87 +619,94 @@ static block_t *OggCreateHeader( sout_mux_t *p_mux )
 
     /* Write header for each stream. All b_o_s (beginning of stream) packets
      * must appear first in the ogg stream so we take care of them first. */
-    for( i = 0; i < p_mux->i_nb_inputs; i++ )
+    for( int pass = 0; pass < 2; pass++ )
     {
-        sout_input_t *p_input = p_mux->pp_inputs[i];
-        ogg_stream_t *p_stream = (ogg_stream_t*)p_input->p_sys;
-        p_stream->b_new = false;
-
-        msg_Dbg( p_mux, "creating header for %4.4s",
-                 (char *)&p_stream->i_fourcc );
-
-        ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
-        p_stream->i_packet_no = 0;
-
-        if( p_stream->i_fourcc == VLC_CODEC_VORBIS ||
-            p_stream->i_fourcc == VLC_CODEC_SPEEX ||
-            p_stream->i_fourcc == VLC_CODEC_THEORA )
+        for( i = 0; i < p_mux->i_nb_inputs; i++ )
         {
-            /* First packet in order: vorbis/speex/theora info */
-            p_extra = p_input->p_fmt->p_extra;
-            i_extra = p_input->p_fmt->i_extra;
+            sout_input_t *p_input = p_mux->pp_inputs[i];
+            ogg_stream_t *p_stream = (ogg_stream_t*)p_input->p_sys;
 
-            op.bytes = *(p_extra++) << 8;
-            op.bytes |= (*(p_extra++) & 0xFF);
-            op.packet = p_extra;
-            i_extra -= (op.bytes + 2);
-            if( i_extra < 0 )
+            bool video = ( p_stream->i_fourcc == VLC_CODEC_THEORA || p_stream->i_fourcc == VLC_CODEC_DIRAC );
+            if( ( ( pass == 0 && !video ) || ( pass == 1 && video ) ) )
+                continue;
+
+            msg_Dbg( p_mux, "creating header for %4.4s",
+                     (char *)&p_stream->i_fourcc );
+
+            ogg_stream_init( &p_stream->os, p_stream->i_serial_no );
+            p_stream->b_new = false;
+            p_stream->i_packet_no = 0;
+
+            if( p_stream->i_fourcc == VLC_CODEC_VORBIS ||
+                p_stream->i_fourcc == VLC_CODEC_SPEEX ||
+                p_stream->i_fourcc == VLC_CODEC_THEORA )
             {
-                msg_Err( p_mux, "header data corrupted");
-                op.bytes += i_extra;
+                /* First packet in order: vorbis/speex/theora info */
+                p_extra = p_input->p_fmt->p_extra;
+                i_extra = p_input->p_fmt->i_extra;
+
+                op.bytes = *(p_extra++) << 8;
+                op.bytes |= (*(p_extra++) & 0xFF);
+                op.packet = p_extra;
+                i_extra -= (op.bytes + 2);
+                if( i_extra < 0 )
+                {
+                    msg_Err( p_mux, "header data corrupted");
+                    op.bytes += i_extra;
+                }
+
+                op.b_o_s  = 1;
+                op.e_o_s  = 0;
+                op.granulepos = 0;
+                op.packetno = p_stream->i_packet_no++;
+                ogg_stream_packetin( &p_stream->os, &op );
+                p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
+
+                /* Get keyframe_granule_shift for theora granulepos calculation */
+                if( p_stream->i_fourcc == VLC_CODEC_THEORA )
+                {
+                    p_stream->i_keyframe_granule_shift =
+                        ( (op.packet[40] & 0x03) << 3 ) | ( (op.packet[41] & 0xe0) >> 5 );
+                }
+            }
+            else if( p_stream->i_fourcc == VLC_CODEC_DIRAC )
+            {
+                op.packet = p_input->p_fmt->p_extra;
+                op.bytes  = p_input->p_fmt->i_extra;
+                op.b_o_s  = 1;
+                op.e_o_s  = 0;
+                op.granulepos = ~0;
+                op.packetno = p_stream->i_packet_no++;
+                ogg_stream_packetin( &p_stream->os, &op );
+                p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
+            }
+            else if( p_stream->i_fourcc == VLC_CODEC_FLAC )
+            {
+                /* flac stream marker (yeah, only that in the 1st packet) */
+                op.packet = (unsigned char *)"fLaC";
+                op.bytes  = 4;
+                op.b_o_s  = 1;
+                op.e_o_s  = 0;
+                op.granulepos = 0;
+                op.packetno = p_stream->i_packet_no++;
+                ogg_stream_packetin( &p_stream->os, &op );
+                p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
+            }
+            else if( p_stream->p_oggds_header )
+            {
+                /* ds header */
+                op.packet = (uint8_t*)p_stream->p_oggds_header;
+                op.bytes  = p_stream->p_oggds_header->i_size + 1;
+                op.b_o_s  = 1;
+                op.e_o_s  = 0;
+                op.granulepos = 0;
+                op.packetno = p_stream->i_packet_no++;
+                ogg_stream_packetin( &p_stream->os, &op );
+                p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
             }
 
-            op.b_o_s  = 1;
-            op.e_o_s  = 0;
-            op.granulepos = 0;
-            op.packetno = p_stream->i_packet_no++;
-            ogg_stream_packetin( &p_stream->os, &op );
-            p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
-
-            /* Get keyframe_granule_shift for theora granulepos calculation */
-            if( p_stream->i_fourcc == VLC_CODEC_THEORA )
-            {
-                p_stream->i_keyframe_granule_shift =
-                    ( (op.packet[40] & 0x03) << 3 ) | ( (op.packet[41] & 0xe0) >> 5 );
-            }
+            block_ChainAppend( &p_hdr, p_og );
         }
-        else if( p_stream->i_fourcc == VLC_CODEC_DIRAC )
-        {
-            op.packet = p_input->p_fmt->p_extra;
-            op.bytes  = p_input->p_fmt->i_extra;
-            op.b_o_s  = 1;
-            op.e_o_s  = 0;
-            op.granulepos = ~0;
-            op.packetno = p_stream->i_packet_no++;
-            ogg_stream_packetin( &p_stream->os, &op );
-            p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
-        }
-        else if( p_stream->i_fourcc == VLC_CODEC_FLAC )
-        {
-            /* flac stream marker (yeah, only that in the 1st packet) */
-            op.packet = (unsigned char *)"fLaC";
-            op.bytes  = 4;
-            op.b_o_s  = 1;
-            op.e_o_s  = 0;
-            op.granulepos = 0;
-            op.packetno = p_stream->i_packet_no++;
-            ogg_stream_packetin( &p_stream->os, &op );
-            p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
-        }
-        else if( p_stream->p_oggds_header )
-        {
-            /* ds header */
-            op.packet = (uint8_t*)p_stream->p_oggds_header;
-            op.bytes  = p_stream->p_oggds_header->i_size + 1;
-            op.b_o_s  = 1;
-            op.e_o_s  = 0;
-            op.granulepos = 0;
-            op.packetno = p_stream->i_packet_no++;
-            ogg_stream_packetin( &p_stream->os, &op );
-            p_og = OggStreamFlush( p_mux, &p_stream->os, 0 );
-        }
-
-        block_ChainAppend( &p_hdr, p_og );
     }
 
     /* Take care of the non b_o_s headers */
