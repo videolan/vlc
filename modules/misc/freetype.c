@@ -348,14 +348,19 @@ static int Create( vlc_object_t *p_this )
     char *psz_fontsize;
     if( asprintf( &psz_fontsize, "%d", p_sys->i_default_font_size ) == -1 )
         goto error;
+
     fontpattern = FcPatternCreate();
+
+    if( !fontpattern )
+        goto error;
+
     FcPatternAddString( fontpattern, FC_FAMILY, psz_fontfamily);
     FcPatternAddString( fontpattern, FC_SIZE, psz_fontsize );
+    free( psz_fontsize );
 
     if( FcConfigSubstitute( NULL, fontpattern, FcMatchPattern ) == FcFalse )
     {
         FcPatternDestroy( fontpattern );
-        free( psz_fontsize );
         goto error;
     }
     FcDefaultSubstitute( fontpattern );
@@ -363,15 +368,12 @@ static int Create( vlc_object_t *p_this )
     fontmatch = FcFontMatch( NULL, fontpattern, &fontresult );
     if( fontresult == FcResultNoMatch )
     {
-        free( psz_fontsize );
         FcPatternDestroy( fontpattern );
-        FcPatternDestroy( fontmatch );
         goto error;
     }
 
     FcPatternGetString( fontmatch, FC_FILE, 0, (FcChar8 **)&psz_fontfile);
     FcPatternGetInteger( fontmatch, FC_INDEX, 0, &fontindex );
-    free( psz_fontsize );
     if( !psz_fontfile )
     {
         FcPatternDestroy( fontpattern );
