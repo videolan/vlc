@@ -5065,6 +5065,7 @@ then
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,AGL])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,IOKit])
   VLC_ADD_LDFLAGS([macosx],                           [-F\\\${top_srcdir}/extras/contrib/Sparkle -Wl,-framework,Sparkle])
+  VLC_ADD_OBJCFLAGS([macosx],                         [-F\\\${top_srcdir}/extras/contrib/Sparkle])
   dnl For bug report
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,AddressBook])
   VLC_ADD_LDFLAGS([macosx qtcapture],                 [-Wl,-framework,QTKit])
@@ -5072,19 +5073,13 @@ then
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
   VLC_ADD_LDFLAGS([opengllayer qtcapture],            [-Wl,-framework,QuartzCore])
   VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreVideo])
-  VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer growl], [-fobjc-exceptions] )
+  VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer growl opengllayer], [-fobjc-exceptions] )
 
   VLC_ADD_PLUGIN([access_eyetv])
   VLC_ADD_PLUGIN([qtcapture])
   VLC_ADD_PLUGIN([macosx])
   VLC_ADD_PLUGIN([minimal_macosx])
-
-  ORIGCFLAGS=$CFLAGS
-  CFLAGS="$CFLAGS -x objective-c"
-  AC_TRY_COMPILE([#import <QuartzCore/CALayer.h>],,
-  [VLC_ADD_PLUGIN([opengllayer])
-  VLC_ADD_OBJCFLAGS([opengllayer])],[])
-  CFLAGS=$ORIGCFLAGS
+  VLC_ADD_PLUGIN([opengllayer])
 fi
 
 dnl

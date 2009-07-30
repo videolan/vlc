@@ -1093,7 +1093,7 @@
 		</dict>
 	</array>
 	<key>CFBundleVersion</key>
-	<string>#REVISION#</string>
+	<string>@VERSION@</string>
 	<key>NSAppleScriptEnabled</key>
 	<string>YES</string>
 	<key>NSMainNibFile</key>
