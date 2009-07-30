@@ -1107,6 +1107,7 @@ static int FrontendSetQPSK( access_t *p_access )
 static int FrontendSetQAM( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
+    frontend_t *p_frontend = p_sys->p_frontend;
     struct dvb_frontend_parameters fep;
     vlc_value_t val;
     int i_ret;
@@ -1118,8 +1119,16 @@ static int FrontendSetQAM( access_t *p_access )
 
     fep.inversion = DecodeInversion( p_access );
 
+    /* Default symbol-rate is for dvb-s, and doesn't fit
+     * for dvb-c, so if it's over the limit of frontend, default to
+     * somewhat common value
+     */
     var_Get( p_access, "dvb-srate", &val );
-    fep.u.qam.symbol_rate = val.i_int;
+    if( val.i_int < p_frontend->info.symbol_rate_max &&
+        val.i_int > p_frontend->info.symbol_rate_min )
+        fep.u.qam.symbol_rate = val.i_int;
+    else
+        fep.u.qam.symbol_rate = 6875000;
 
     var_Get( p_access, "dvb-fec", &val );
     fep.u.qam.fec_inner = DecodeFEC( p_access, val.i_int );
