@@ -1,0 +1,52 @@
+* Python ctypes-based bindings
+
+The bindings use ctypes to directly call the libvlc dynamic lib, and
+the code is generated from the include files defining the public API.
+
+** Building
+
+To generate the vlc.py module and its documentation, use
+make
+
+Documentation building needs epydoc.
+
+** Layout
+
+The module offers two ways of accessing the API - a raw access to all
+exported methods, and more convenient wrapper classes :
+
+- Raw access: methods are available as attributes of the vlc
+  module. Use their docstring (introspective shells like ipython are
+  your friends) to explore them.
+
+- Wrapper classes: most major structures of the libvlc API (Instance,
+  Media, MediaPlayer, etc) are wrapped as classes, with shorter method
+  names.
+
+** Using the module
+
+On win32, the simplest way is to put the vlc.py file in the same
+directory as the libvlc.dll file (standard location:
+c:\Program Files\VideoLAN\VLC ).
+
+
+- Using raw access:
+
+>>> import vlc
+>>> vlc.libvlc_get_version()
+'1.0.0 Goldeneye'
+>>> e=vlc.VLCException()
+>>> i=vlc.libvlc_new(0, [], e)
+>>> i
+<vlc.Instance object at 0x8384a4c>
+>>> vlc.libvlc_audio_get_volume(i,e)
+50
+
+- Using wrapper classes:
+
+>>> i=vlc.Instance.new()
+>>> i.audio_get_volume()
+50
+>>> m=i.media_new('/tmp/foo.avi')
+>>> m.get_mrl()
+'/tmp/foo.avi'
