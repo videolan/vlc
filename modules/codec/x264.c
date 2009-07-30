@@ -1225,14 +1225,7 @@ static int  Open ( vlc_object_t *p_this )
     }
     else if( !strcmp( val.psz_string, "all" ) )
     {
-        p_sys->param.analyse.inter =
-            X264_ANALYSE_I4x4 |
-            X264_ANALYSE_PSUB16x16 |
-            X264_ANALYSE_BSUB16x16 |
-            X264_ANALYSE_PSUB8x8;
-#ifdef X264_ANALYSE_I8x8
-        p_sys->param.analyse.inter |= X264_ANALYSE_I8x8;
-#endif
+        p_sys->param.analyse.inter = ~0;
     }
     free( val.psz_string );
 
