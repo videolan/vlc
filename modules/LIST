@@ -86,6 +86,7 @@ $Id$
  * direct3d: video output module using the Direct3D API
  * directfb: Direct Framebuffer video output
  * directory : input module to read files in a directory
+ * directx: video output module using the DirectX API
  * dmo: a DirectMediaObject decoder that uses DirectMedia to decode video (WMV3)
  * dolby_surround_decoder: simple decoder for dolby surround encoded streams
  * dshow: DirectShow access plugin for encoding cards under Windows
@@ -358,7 +359,6 @@ $Id$
  * voc: VOC demuxer
  * vod_rtsp: RTSP VoD module
  * vorbis: a vorbis audio decoder/packetizer using the libvorbis library
- * vout_directx: video output module using the DirectX API
  * vout_sdl: video output module using the SDL library
  * wall: image wall filter
  * wav: Wav demuxer
