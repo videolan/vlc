@@ -29,6 +29,7 @@
 #endif
 
 #include <assert.h>
+#include <strings.h>
 
 #include <gcrypt.h>
 
@@ -97,6 +98,7 @@ struct sout_stream_sys_t
 {
     /* Input parameters */
     char *psz_host;
+    char *psz_password;
     int i_volume;
 
     /* Plugin status */
@@ -145,7 +147,13 @@ struct sout_stream_id_t
 #define VOLUME_LONGTEXT N_("Output volume for analog output: 0 for silence, " \
                            "1..255 from almost silent to very loud.")
 
-vlc_module_begin()
+#define PASSWORD_TEXT N_("Password")
+#define PASSWORD_LONGTEXT N_("Password for target device.")
+
+#define PASSWORD_FILE_TEXT N_("Password file")
+#define PASSWORD_FILE_LONGTEXT N_("Read password for target device from file.")
+
+vlc_module_begin();
     set_shortname( N_("RAOP") )
     set_description( N_("Remote Audio Output Protocol stream output") )
     set_capability( "sout stream", 0 )
@@ -154,6 +162,10 @@ vlc_module_begin()
     set_subcategory( SUBCAT_SOUT_STREAM )
     add_string( SOUT_CFG_PREFIX "host", "", NULL,
                 HOST_TEXT, HOST_LONGTEXT, false )
+    add_password( SOUT_CFG_PREFIX "password", NULL, NULL,
+                  PASSWORD_TEXT, PASSWORD_LONGTEXT, false )
+    add_file( SOUT_CFG_PREFIX "password-file", NULL, NULL,
+              PASSWORD_FILE_TEXT, PASSWORD_FILE_LONGTEXT, false )
     add_integer_with_range( SOUT_CFG_PREFIX "volume", 100, 0, 255, NULL,
                             VOLUME_TEXT, VOLUME_LONGTEXT, false )
     set_callbacks( Open, Close )
@@ -161,6 +173,8 @@ vlc_module_end()
 
 static const char *const ppsz_sout_options[] = {
     "host",
+    "password",
+    "password-file",
     "volume",
     NULL
 };
@@ -185,6 +199,7 @@ static void FreeSys( vlc_object_t *p_this, sout_stream_sys_t *p_sys )
 
     free( p_sys->p_sendbuf );
     free( p_sys->psz_host );
+    free( p_sys->psz_password );
     free( p_sys->psz_url );
     free( p_sys->psz_session );
     free( p_sys->psz_client_instance );
@@ -539,6 +554,56 @@ error:
     gcry_mpi_release( mpi_output );
 
     return i_err;
+}
+
+static char *ReadPasswordFile( vlc_object_t *p_this, const char *psz_path )
+{
+    FILE *p_file = NULL;
+    char *psz_password = NULL;
+    char *psz_newline;
+    char ps_buffer[256];
+
+    p_file = utf8_fopen( psz_path, "rt" );
+    if ( p_file == NULL )
+    {
+        msg_Err( p_this, "Unable to open password file '%s': %m", psz_path );
+        goto error;
+    }
+
+    /* Read one line only */
+    if ( fgets( ps_buffer, sizeof( ps_buffer ), p_file ) == NULL )
+    {
+        if ( ferror( p_file ) )
+        {
+            msg_Err( p_this, "Error reading '%s': %m", psz_path );
+            goto error;
+        }
+
+        /* Nothing was read, but there was no error either. Maybe the file is
+         * empty. Not all implementations of fgets(3) write \0 to the output
+         * buffer in this case.
+         */
+        ps_buffer[0] = '\0';
+
+    } else {
+        /* Replace first newline with '\0' */
+        psz_newline = index( ps_buffer, '\n' );
+        if ( psz_newline != NULL )
+            *psz_newline = '\0';
+    }
+
+    if ( strlen( ps_buffer ) == 0 ) {
+        msg_Err( p_this, "No password could be read from '%s'", psz_path );
+        goto error;
+    }
+
+    psz_password = strdup( ps_buffer );
+
+error:
+    if ( p_file != NULL )
+        fclose( p_file );
+
+    return psz_password;
 }
 
 /* Splits the value of a received header.
@@ -1263,6 +1328,7 @@ static int Open( vlc_object_t *p_this )
     sout_stream_t *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys;
     char psz_local[NI_MAXNUMERICHOST];
+    char *psz_pwfile = NULL;
     gcry_error_t i_gcrypt_err;
     int i_err = VLC_SUCCESS;
     uint32_t i_session_id;
@@ -1299,6 +1365,27 @@ static int Open( vlc_object_t *p_this )
         i_err = VLC_EGENERIC;
         goto error;
     }
+
+    p_sys->psz_password = var_GetNonEmptyString( p_stream,
+                                                 SOUT_CFG_PREFIX "password" );
+    if ( p_sys->psz_password == NULL )
+    {
+        /* Try password file instead */
+        psz_pwfile = var_GetNonEmptyString( p_stream,
+                                            SOUT_CFG_PREFIX "password-file" );
+        if ( psz_pwfile != NULL )
+        {
+            p_sys->psz_password = ReadPasswordFile( p_this, psz_pwfile );
+            if ( p_sys->psz_password == NULL )
+            {
+                i_err = VLC_EGENERIC;
+                goto error;
+            }
+        }
+    }
+
+    if ( p_sys->psz_password != NULL )
+        msg_Info( p_this, "Using password authentication" );
 
     var_AddCallback( p_stream, SOUT_CFG_PREFIX "volume",
                      VolumeCallback, NULL );
@@ -1400,6 +1487,8 @@ static int Open( vlc_object_t *p_this )
     }
 
 error:
+    free( psz_pwfile );
+
     if ( i_err != VLC_SUCCESS )
         FreeSys( p_this, p_sys );
 
