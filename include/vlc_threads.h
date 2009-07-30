@@ -162,9 +162,6 @@ struct vlc_timer_t
     HANDLE handle;
     void (*func) (void *);
     void *data;
-    unsigned overrun;
-    CRITICAL_SECTION serializer;
-    LONG volatile counter;
 };
 
 #endif
