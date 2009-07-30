@@ -438,7 +438,7 @@ error:
 #endif
     if( p_sys->p_face ) FT_Done_Face( p_sys->p_face );
     if( p_sys->p_library ) FT_Done_FreeType( p_sys->p_library );
-    free( psz_fontfile );
+    free( psz_fontfamily );
     free( p_sys );
     return VLC_EGENERIC;
 }
