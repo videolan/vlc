@@ -297,7 +297,7 @@ static int Create( vlc_object_t *p_this )
     int            i_error,fontindex;
 
 #ifdef HAVE_FONTCONFIG
-    FcPattern     *fontpattern, *fontmatch;
+    FcPattern     *fontpattern = NULL, *fontmatch = NULL;
     FcResult       fontresult = FcResultNoMatch;
 #endif
 
@@ -359,28 +359,18 @@ static int Create( vlc_object_t *p_this )
     free( psz_fontsize );
 
     if( FcConfigSubstitute( NULL, fontpattern, FcMatchPattern ) == FcFalse )
-    {
-        FcPatternDestroy( fontpattern );
         goto error;
-    }
     FcDefaultSubstitute( fontpattern );
 
     fontmatch = FcFontMatch( NULL, fontpattern, &fontresult );
     if( !fontmatch || fontresult == FcResultNoMatch )
-    {
-        FcPatternDestroy( fontpattern );
         goto error;
-    }
 
     FcPatternGetString( fontmatch, FC_FILE, 0, (FcChar8 **)&psz_fontfile);
     FcPatternGetInteger( fontmatch, FC_INDEX, 0, &fontindex );
     if( !psz_fontfile )
-    {
-        FcPatternDestroy( fontpattern );
-        FcPatternDestroy( fontmatch );
         goto error;
-    }
-    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile);
+    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile );
 #else
     psz_fontfile = psz_fontfamily;
 #endif
@@ -441,7 +431,11 @@ static int Create( vlc_object_t *p_this )
 
     return VLC_SUCCESS;
 
- error:
+error:
+#ifdef HAVE_FONTCONFIG
+    if( fontmatch ) FcPatternDestroy( fontmatch );
+    if( fontpattern ) FcPatternDestroy( fontpattern );
+#endif
     if( p_sys->p_face ) FT_Done_Face( p_sys->p_face );
     if( p_sys->p_library ) FT_Done_FreeType( p_sys->p_library );
     free( psz_fontfile );
