@@ -1,7 +1,7 @@
 /*****************************************************************************
  * podcast.c : podcast playlist imports
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
@@ -127,11 +127,13 @@ static int Demux( demux_t *p_demux )
     }
 
     while( xml_ReaderNodeType( p_xml_reader ) == XML_READER_NONE )
+    {
         if( xml_ReaderRead( p_xml_reader ) != 1 )
         {
             msg_Err( p_demux, "invalid file (no root node)" );
             return -1;
         }
+    }
 
     if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
         ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
@@ -142,7 +144,7 @@ static int Demux( demux_t *p_demux )
         free( psz_elname );
         return -1;
     }
-    free( psz_elname ); psz_elname = NULL;
+    FREENULL( psz_elname );
 
     while( (i_ret = xml_ReaderRead( p_xml_reader )) == 1 )
     {
@@ -183,29 +185,32 @@ static int Demux( demux_t *p_demux )
                         free( psz_elname );
                         return -1;
                     }
-                    if( !strcmp( psz_elname, "enclosure" ) &&
-                        !strcmp( psz_name, "url" ) )
+
+                    if( !strcmp( psz_elname, "enclosure" ) )
                     {
-                        free( psz_item_mrl );
-                        psz_item_mrl = strdup( psz_value );
-                    }
-                    else if( !strcmp( psz_elname, "enclosure" ) &&
-                        !strcmp( psz_name, "length" ) )
-                    {
-                        free( psz_item_size );
-                        psz_item_size = strdup( psz_value );
-                    }
-                    else if( !strcmp( psz_elname, "enclosure" ) &&
-                        !strcmp( psz_name, "type" ) )
-                    {
-                        free( psz_item_type );
-                        psz_item_type = strdup( psz_value );
+                        if( !strcmp( psz_name, "url" ) )
+                        {
+                            free( psz_item_mrl );
+                            psz_item_mrl = strdup( psz_value );
+                        }
+                        else if( !strcmp( psz_name, "length" ) )
+                        {
+                            free( psz_item_size );
+                            psz_item_size = strdup( psz_value );
+                        }
+                        else if( !strcmp( psz_name, "type" ) )
+                        {
+                            free( psz_item_type );
+                            psz_item_type = strdup( psz_value );
+                        }
+                        else
+                            msg_Dbg( p_demux,"unhandled attribure %s in element %s",
+                                     psz_name, psz_elname );
                     }
                     else
-                    {
                         msg_Dbg( p_demux,"unhandled attribure %s in element %s",
                                   psz_name, psz_elname );
-                    }
+
                     free( psz_name );
                     free( psz_value );
                 }
@@ -213,60 +218,64 @@ static int Demux( demux_t *p_demux )
             }
             case XML_READER_TEXT:
             {
-#define SET_DATA( field, name ) else if( b_item == true \
-                && !strcmp( psz_elname, name ) ) \
-                { \
-                    field = strdup( psz_text ); \
-                }
                 char *psz_text = xml_ReaderValue( p_xml_reader );
+
+#define SET_DATA( field, name )                 \
+    else if( !strcmp( psz_elname, name ) )      \
+    {                                           \
+        field = strdup( psz_text );             \
+    }
                 /* item specific meta data */
-                if( b_item == true && !strcmp( psz_elname, "title" ) )
+                if( b_item == true )
                 {
-                    psz_item_name = strdup( psz_text );
+                    if( !strcmp( psz_elname, "title" ) )
+                    {
+                        psz_item_name = strdup( psz_text );
+                    }
+                    else if( !strcmp( psz_elname, "itunes:author" ) ||
+                             !strcmp( psz_elname, "author" ) )
+                    { /* <author> isn't standard iTunes podcast stuff */
+                        psz_item_author = strdup( psz_text );
+                    }
+                    else if( !strcmp( psz_elname, "itunes:summary" ) ||
+                             !strcmp( psz_elname, "description" ) )
+                    { /* <description> isn't standard iTunes podcast stuff */
+                        psz_item_summary = strdup( psz_text );
+                    }
+                    SET_DATA( psz_item_date, "pubDate" )
+                    SET_DATA( psz_item_category, "itunes:category" )
+                    SET_DATA( psz_item_duration, "itunes:duration" )
+                    SET_DATA( psz_item_keywords, "itunes:keywords" )
+                    SET_DATA( psz_item_subtitle, "itunes:subtitle" )
                 }
-                else if( b_item == true
-                         && ( !strcmp( psz_elname, "itunes:author" )
-                            ||!strcmp( psz_elname, "author" ) ) )
-                { /* <author> isn't standard iTunes podcast stuff */
-                    psz_item_author = strdup( psz_text );
-                }
-                else if( b_item == true
-                         && ( !strcmp( psz_elname, "itunes:summary" )
-                            ||!strcmp( psz_elname, "description" ) ) )
-                { /* <description> isn't standard iTunes podcast stuff */
-                    psz_item_summary = strdup( psz_text );
-                }
-                SET_DATA( psz_item_date, "pubDate" )
-                SET_DATA( psz_item_category, "itunes:category" )
-                SET_DATA( psz_item_duration, "itunes:duration" )
-                SET_DATA( psz_item_keywords, "itunes:keywords" )
-                SET_DATA( psz_item_subtitle, "itunes:subtitle" )
 #undef SET_DATA
+
                 /* toplevel meta data */
-                else if( b_item == false && b_image == false
-                         && !strcmp( psz_elname, "title" ) )
+                else if( b_image == false )
                 {
-                    input_item_SetName( p_current_input, psz_text );
-                }
+                    if( !strcmp( psz_elname, "title" ) )
+                    {
+                        input_item_SetName( p_current_input, psz_text );
+                    }
 #define ADD_GINFO( info, name ) \
-    else if( !b_item && !b_image && !strcmp( psz_elname, name ) ) \
+    else if( !strcmp( psz_elname, name ) ) \
     { \
         input_item_AddInfo( p_current_input, _("Podcast Info"), \
                                 _( info ), "%s", psz_text ); \
     }
-                ADD_GINFO( "Podcast Link", "link" )
-                ADD_GINFO( "Podcast Copyright", "copyright" )
-                ADD_GINFO( "Podcast Category", "itunes:category" )
-                ADD_GINFO( "Podcast Keywords", "itunes:keywords" )
-                ADD_GINFO( "Podcast Subtitle", "itunes:subtitle" )
+                    ADD_GINFO( "Podcast Link", "link" )
+                    ADD_GINFO( "Podcast Copyright", "copyright" )
+                    ADD_GINFO( "Podcast Category", "itunes:category" )
+                    ADD_GINFO( "Podcast Keywords", "itunes:keywords" )
+                    ADD_GINFO( "Podcast Subtitle", "itunes:subtitle" )
 #undef ADD_GINFO
-                else if( b_item == false && b_image == false
-                         && ( !strcmp( psz_elname, "itunes:summary" )
-                            ||!strcmp( psz_elname, "description" ) ) )
-                { /* <description> isn't standard iTunes podcast stuff */
-                    input_item_AddInfo( p_current_input,
-                             _( "Podcast Info" ), _( "Podcast Summary" ),
-                             "%s", psz_text );
+                    else if( !strcmp( psz_elname, "itunes:summary" ) ||
+                             !strcmp( psz_elname, "description" ) )
+                    { /* <description> isn't standard iTunes podcast stuff */
+                        input_item_AddInfo( p_current_input,
+                            _( "Podcast Info" ), _( "Podcast Summary" ),
+                            "%s", psz_text );
+                    }
                 }
                 else
                 {
