@@ -1,5 +1,3 @@
-* Check cross-platform (win32, MacOSX) support
-
 * Investigate memory management
 
 * Find how to properly define enums
@@ -9,3 +7,6 @@
 * Implement event callbacks
 
 * Write a test suite
+
+* Support multiple VLC versions: define a front-end module which will
+   load the appropriate versionned module from a subdirectory.
