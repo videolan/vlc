@@ -46,6 +46,7 @@ struct demux_sys_t
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
+static mtime_t strTimeToMTime( const char *psz );
 
 /*****************************************************************************
  * Import_podcast: main import function
@@ -317,6 +318,11 @@ static int Demux( demux_t *p_demux )
                     ADD_INFO( "Podcast Summary", psz_item_summary );
                     ADD_INFO( "Podcast Type", psz_item_type );
 #undef ADD_INFO
+
+                    /* Set the duration if available */
+                    if( psz_item_duration )
+                        input_item_SetDuration( p_input, strTimeToMTime( psz_item_duration ) );
+
                     if( psz_item_size )
                     {
                         input_item_AddInfo( p_input,
@@ -367,4 +373,19 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 {
     VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
     return VLC_EGENERIC;
+}
+
+static mtime_t strTimeToMTime( const char *psz )
+{
+    int h, m, s;
+    switch( sscanf( psz, "%u:%u:%u", &h, &m, &s ) )
+    {
+    case 3:
+        return (mtime_t)( ( h*60 + m )*60 + s ) * 1000000;
+    case 2:
+        return (mtime_t)( h*60 + m ) * 1000000;
+        break;
+    default:
+        return -1;
+    }
 }
