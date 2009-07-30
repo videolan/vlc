@@ -434,9 +434,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 {
     vlc_value_t val;
     if( !p_real_vout ) return;
-    var_Get( p_real_vout, "fullscreen", &val );
-    val.b_bool = !val.b_bool;
-    var_Set( p_real_vout, "fullscreen", val );
+    var_ToggleBool( p_real_vout, "fullscreen" );
 }
 
 - (BOOL)isFullscreen
