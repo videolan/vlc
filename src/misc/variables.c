@@ -704,6 +704,10 @@ int __var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
         assert( ( p_var->i_type & VLC_VAR_BOOL ) == VLC_VAR_BOOL );
         p_var->val.b_bool = !p_var->val.b_bool;
         break;
+    case VLC_VAR_INTEGER_INCDEC:
+        assert( ( p_var->i_type & VLC_VAR_INTEGER ) == VLC_VAR_INTEGER );
+        p_var->val.i_int += val.i_int;
+        break;
     default:
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_EGENERIC;

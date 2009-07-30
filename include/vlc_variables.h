@@ -124,6 +124,11 @@
  * \param val Unused
  */
 #define VLC_VAR_TOGGLE_BOOL         0x0010
+/**
+ * Increment or decrement an integer of a given value
+ * \param val the value
+ */
+#define VLC_VAR_INTEGER_INCDEC      0x0020
 /**@}*/
 
 /*****************************************************************************
@@ -443,8 +448,9 @@ static inline char *__var_GetNonEmptyString( vlc_object_t *p_obj, const char *ps
  */
 static inline void __var_IncInteger( vlc_object_t *p_obj, const char *psz_name )
 {
-    int i_val = __var_GetInteger( p_obj, psz_name );
-    __var_SetInteger( p_obj, psz_name, ++i_val );
+    vlc_value_t val;
+    val.i_int = 1;
+    __var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_INCDEC, val );
 }
 #define var_IncInteger(a,b) __var_IncInteger( VLC_OBJECT(a), b )
 
@@ -455,8 +461,9 @@ static inline void __var_IncInteger( vlc_object_t *p_obj, const char *psz_name )
  */
 static inline void __var_DecInteger( vlc_object_t *p_obj, const char *psz_name )
 {
-    int i_val = __var_GetInteger( p_obj, psz_name );
-    __var_SetInteger( p_obj, psz_name, --i_val );
+    vlc_value_t val;
+    val.i_int = -1;
+    __var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_INCDEC, val );
 }
 #define var_DecInteger(a,b) __var_DecInteger( VLC_OBJECT(a), b )
 
