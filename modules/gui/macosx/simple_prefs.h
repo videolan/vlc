@@ -91,6 +91,7 @@
     IBOutlet id o_intf_fspanel_ckb;
 	IBOutlet id o_intf_appleremote_ckb;
 	IBOutlet id o_intf_mediakeys_ckb;
+    IBOutlet id o_intf_mediakeys_bg_ckb;
     IBOutlet id o_intf_lang_pop;
     IBOutlet id o_intf_lang_txt;
     IBOutlet id o_intf_network_box;
