@@ -298,7 +298,7 @@ static int Create( vlc_object_t *p_this )
 
 #ifdef HAVE_FONTCONFIG
     FcPattern     *fontpattern, *fontmatch;
-    FcResult       fontresult;
+    FcResult       fontresult = FcResultNoMatch;
 #endif
 
 
@@ -366,7 +366,7 @@ static int Create( vlc_object_t *p_this )
     FcDefaultSubstitute( fontpattern );
 
     fontmatch = FcFontMatch( NULL, fontpattern, &fontresult );
-    if( fontresult == FcResultNoMatch )
+    if( !fontmatch || fontresult == FcResultNoMatch )
     {
         FcPatternDestroy( fontpattern );
         goto error;
