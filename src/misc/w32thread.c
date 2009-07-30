@@ -611,7 +611,7 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 void vlc_timer_destroy (vlc_timer_t *id)
 {
     if (id->handle != INVALID_HANDLE_VALUE)
-        DeleteTimerQueueTimer (NULL, id->handle, NULL);
+        DeleteTimerQueueTimer (NULL, id->handle, INVALID_HANDLE_VALUE);
 }
 
 void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
