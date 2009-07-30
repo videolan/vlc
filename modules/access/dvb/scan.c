@@ -146,27 +146,40 @@ void scan_Clean( scan_t *p_scan )
 static int ScanDvbCNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
 {
     msg_Dbg( p_scan->p_obj, "Scan index %"PRId64, p_scan->i_index );
-    if( p_scan->i_index <= ( 10 ) )
+    /* values from dvb-scan utils frequency-files, sorted
+     * by how often they appear, hopefully speedups finding
+     * services */
+    static int frequencies[] = {
+     410, 426, 418, 394, 402, 362,
+     370, 354, 346, 442, 434, 386,
+     378, 450, 306, 162, 154, 474,
+     466, 458, 338, 754, 714, 586,
+     562, 546, 514, 490, 314, 170,
+     113, 770, 762, 746, 738, 730,
+     722, 706, 690, 682, 674, 666,
+     650, 642, 634, 554, 538, 530,
+     506, 498, 330, 322, 283, 850,
+     842, 834, 818, 810, 802, 794,
+     786, 778, 748, 732, 728, 724,
+     720, 698, 660, 658, 656, 610,
+     594, 578, 570, 522, 482, 377,
+     372, 347, 339, 323, 315, 299,
+     298, 291, 275, 267, 259, 255,
+     251, 243, 235, 232, 227, 219,
+     211, 203, 195, 187, 179, 171,
+     163, 155, 147, 146, 143, 139,
+     131, 123, 121
+    };
+
+    if( p_scan->i_index < (sizeof(frequencies)/sizeof(int)) )
     {
-        p_cfg->i_frequency = 100500000 + ( ( p_scan->i_index ) * 700000);
-    } 
-    else if ( p_scan->i_index <= (10 + 9  ) )
-    {
-        p_cfg->i_frequency = 97000000 + ( ( p_scan->i_index - 20 ) * 800000);
-    }
-    else if ( p_scan->i_index <= (38 + 17 ) )
-    {
-        p_cfg->i_frequency = 14250000 + ( ( p_scan->i_index - 33 ) * 700000);
-    }
-    else if ( p_scan->i_index <= (72 + (90-21) ) )
-    {
-        p_cfg->i_frequency = 13800000 + ( ( p_scan->i_index - (72 + 21 ) )  * 800000);
+        p_cfg->i_frequency = 1000000 * ( frequencies[ p_scan->i_index ] );
     }
     else
     {
         return VLC_EGENERIC;
     }
-    *pf_pos = (double)p_scan->i_index / ( (90-21+22-5+10+9));
+    *pf_pos = (double)p_scan->i_index / (sizeof(frequencies)/sizeof(int));
     return VLC_SUCCESS;
 
 }
