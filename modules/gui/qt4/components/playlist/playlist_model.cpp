@@ -135,10 +135,17 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
     QMimeData *mimeData = new QMimeData();
     QByteArray encodedData;
     QDataStream stream( &encodedData, QIODevice::WriteOnly );
+    QModelIndexList list;
 
     foreach( const QModelIndex &index, indexes ) {
         if( index.isValid() && index.column() == 0 )
-            stream << itemId( index );
+            list.append(index);
+    }
+
+    qSort(list);
+
+    foreach( const QModelIndex &index, list ) {
+        stream << itemId( index );
     }
     mimeData->setData( "vlc/playlist-item-id", encodedData );
     return mimeData;
@@ -146,65 +153,80 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
 
 /* Drop operation */
 bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
-                           int row, int column, const QModelIndex &target )
+                           int row, int column, const QModelIndex &parent )
 {
     if( data->hasFormat( "vlc/playlist-item-id" ) )
     {
         if( action == Qt::IgnoreAction )
             return true;
 
-        if( !target.isValid() )
-            /* We don't want to move on an invalid position */
-            return true;
+        PL_LOCK;
 
-        PLItem *targetItem = static_cast<PLItem*>( target.internalPointer() );
+        playlist_item_t *p_parent;
+
+        if( !parent.isValid())
+        {
+            if( row > -1)
+            {
+                // dropped into top node
+                p_parent = playlist_ItemGetById( p_playlist, rootItem->i_id );
+            }
+            else
+            {
+                // dropped outside any item
+                PL_UNLOCK;
+                return true;
+            }
+        }
+        else
+        {
+            // dropped into/onto an item (depends on (row = -1) or (row > -1))
+            p_parent = playlist_ItemGetById( p_playlist, itemId ( parent ) );
+        }
+        if( !p_parent || p_parent->i_children == -1 )
+        {
+            PL_UNLOCK;
+            return false;
+        }
 
         QByteArray encodedData = data->data( "vlc/playlist-item-id" );
         QDataStream stream( &encodedData, QIODevice::ReadOnly );
 
-        PLItem *newParentItem;
+        /* easiest way to never miss the right index to move to is to
+        track the previously moved item */
+        playlist_item_t *p_target = NULL;
+
         while( !stream.atEnd() )
         {
-            int i;
-            int srcId;
-            stream >> srcId;
+            int src_id;
+            stream >> src_id;
+            playlist_item_t *p_src = playlist_ItemGetById( p_playlist, src_id );
 
-            PL_LOCK;
-            playlist_item_t *p_target =
-                        playlist_ItemGetById( p_playlist, targetItem->i_id );
-            playlist_item_t *p_src = playlist_ItemGetById( p_playlist, srcId );
-
-            if( !p_target || !p_src )
+            if( !p_src )
             {
                 PL_UNLOCK;
                 return false;
             }
-            if( p_target->i_children == -1 ) /* A leaf */
+            if( !p_target )
             {
-                PLItem *parentItem = targetItem->parent();
-                assert( parentItem );
-                playlist_item_t *p_parent =
-                         playlist_ItemGetById( p_playlist, parentItem->i_id );
-                if( !p_parent )
+                if(row == -1)
                 {
-                    PL_UNLOCK;
-                    return false;
+                    playlist_TreeMove( p_playlist, p_src, p_parent, 0 );
                 }
-                for( i = 0 ; i< p_parent->i_children ; i++ )
-                    if( p_parent->pp_children[i] == p_target ) break;
-                // Move the item to the element after i
-                playlist_TreeMove( p_playlist, p_src, p_parent, i + 1 );
-                newParentItem = parentItem;
+                else {
+                    playlist_TreeMove( p_playlist, p_src, p_parent, row );
+                }
             }
             else
             {
-                /* \todo: if we drop on a top-level node, use copy instead ? */
-                playlist_TreeMove( p_playlist, p_src, p_target, 0 );
-                i = 0;
-                newParentItem = targetItem;
+                int i;
+                for( i = 0 ; i< p_parent->i_children ; i++ )
+                    if( p_parent->pp_children[i] == p_target ) break;
+                playlist_TreeMove( p_playlist, p_src, p_parent, i + 1 );
             }
-            PL_UNLOCK;
+            p_target = p_src;
         }
+        PL_UNLOCK;
         /*TODO: That's not a good idea to rebuild the playlist */
         rebuild();
     }
