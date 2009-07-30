@@ -223,30 +223,32 @@ static int Demux( demux_t *p_demux )
 #define SET_DATA( field, name )                 \
     else if( !strcmp( psz_elname, name ) )      \
     {                                           \
-        field = strdup( psz_text );             \
+        field = psz_text;                       \
     }
                 /* item specific meta data */
                 if( b_item == true )
                 {
                     if( !strcmp( psz_elname, "title" ) )
                     {
-                        psz_item_name = strdup( psz_text );
+                        psz_item_name = psz_text;
                     }
                     else if( !strcmp( psz_elname, "itunes:author" ) ||
                              !strcmp( psz_elname, "author" ) )
                     { /* <author> isn't standard iTunes podcast stuff */
-                        psz_item_author = strdup( psz_text );
+                        psz_item_author = psz_text;
                     }
                     else if( !strcmp( psz_elname, "itunes:summary" ) ||
                              !strcmp( psz_elname, "description" ) )
                     { /* <description> isn't standard iTunes podcast stuff */
-                        psz_item_summary = strdup( psz_text );
+                        psz_item_summary = psz_text;
                     }
                     SET_DATA( psz_item_date, "pubDate" )
                     SET_DATA( psz_item_category, "itunes:category" )
                     SET_DATA( psz_item_duration, "itunes:duration" )
                     SET_DATA( psz_item_keywords, "itunes:keywords" )
                     SET_DATA( psz_item_subtitle, "itunes:subtitle" )
+                    else
+                        free( psz_text );
                 }
 #undef SET_DATA
 
@@ -276,13 +278,14 @@ static int Demux( demux_t *p_demux )
                             _( "Podcast Info" ), _( "Podcast Summary" ),
                             "%s", psz_text );
                     }
+                    free( psz_text );
                 }
                 else
                 {
                     msg_Dbg( p_demux, "unhandled text in element '%s'",
                               psz_elname );
+                    free( psz_text );
                 }
-                free( psz_text );
                 break;
             }
             // End element
