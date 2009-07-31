@@ -241,14 +241,9 @@ vlc_module_begin ()
 
         set_callbacks( OpenDialogs, Close )
 
-#if defined (Q_WS_X11)
-# define WID_CAPABILITY "xwindow"
-#elif defined (WIN32)
-# define WID_CAPABILITY "hwnd"
-#endif
-#ifdef WID_CAPABILITY
+#if defined(Q_WS_X11) || defined(WIN32)
     add_submodule ()
-        set_capability( WID_CAPABILITY, 50 )
+        set_capability( "vout window", 50 )
         set_callbacks( WindowOpen, WindowClose )
 #endif
 
@@ -512,68 +507,83 @@ static void ShowDialog( intf_thread_t *p_intf, int i_dialog_event, int i_arg,
 
 /**
  * Video output window provider
+ *
+ * TODO move it out of here ?
  */
-#include <vlc_window.h>
+#include <vlc_vout_window.h>
 
-static int WindowControl (vout_window_t *, int, va_list);
+static int WindowControl( vout_window_t *, int i_query, va_list );
 
-static int WindowOpen (vlc_object_t *obj)
+static int WindowOpen( vlc_object_t *p_obj )
 {
-    vout_window_t *wnd = (vout_window_t *)obj;
-    intf_thread_t *intf = NULL;
-    vlc_value_t val;
+    vout_window_t *p_wnd = (vout_window_t*)p_obj;
 
-    if (config_GetInt (obj, "embedded-video") <= 0)
+    /* Check compatibility */
+#if defined (Q_WS_X11)
+    if( p_wnd->cfg->type != VOUT_WINDOW_TYPE_XWINDOW )
+#elif defined (WIN32)
+    if( p_wnd->cfg->type != VOUT_WINDOW_TYPE_HWND )
+#endif
         return VLC_EGENERIC;
 
-    QMutexLocker (&iface.lock);
-    if (var_Get (obj->p_libvlc, "qt4-iface", &val) == 0)
-        intf = (intf_thread_t *)val.p_address;
-    if (intf == NULL)
+    /* */
+    if( p_wnd->cfg->is_standalone )
+        return VLC_EGENERIC;
+
+    QMutexLocker( &iface.lock );
+
+    vlc_value_t val;
+
+    if( var_Get( p_obj->p_libvlc, "qt4-iface", &val ) )
+        val.p_address = NULL;
+
+    intf_thread_t *p_intf = (intf_thread_t *)val.p_address;
+
+    if( !p_intf )
     {   /* If another interface is used, this plugin cannot work */
-        msg_Dbg (obj, "Qt4 interface not found");
+        msg_Dbg( p_obj, "Qt4 interface not found" );
         return VLC_EGENERIC;
     }
 
-    MainInterface *p_mi = intf->p_sys->p_mi;
-    msg_Dbg (obj, "requesting video...");
+    MainInterface *p_mi = p_intf->p_sys->p_mi;
+    msg_Dbg( p_obj, "requesting video..." );
+
+    int i_x = p_wnd->cfg->x;
+    int i_y = p_wnd->cfg->y;
+    unsigned i_width = p_wnd->cfg->width;
+    unsigned i_height = p_wnd->cfg->height;
 
 #if defined (Q_WS_X11)
-    wnd->handle.xid = p_mi->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
-                                          &wnd->width, &wnd->height);
-    if (!wnd->handle.xid)
+    p_wnd->handle.xid = p_mi->requestVideo( &i_x, &i_y, &i_width, &i_height );
+    if( !p_wnd->handle.xid )
         return VLC_EGENERIC;
 
 #elif defined (WIN32)
-    wnd->handle.hwnd = p_mi->requestVideo (wnd->vout, &wnd->pos_x, &wnd->pos_y,
-                                           &wnd->width, &wnd->height);
-    if (!wnd->handle.hwnd)
+    p_wnd->handle.hwnd = p_mi->requestVideo( &i_x, &i_y, &i_width, &i_height );
+    if( !p_wnd->handle.hwnd )
         return VLC_EGENERIC;
-
-#else
-    return VLC_EGENERIC;
-
 #endif
 
-    wnd->control = WindowControl;
-    wnd->p_private = p_mi;
+    p_wnd->control = WindowControl;
+    p_wnd->sys = (vout_window_sys_t*)p_mi;
     return VLC_SUCCESS;
 }
 
-static int WindowControl (vout_window_t *wnd, int query, va_list args)
+static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
 {
-    MainInterface *p_mi = (MainInterface *)wnd->p_private;
-    QMutexLocker locker (&iface.lock);
+    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
+    QMutexLocker locker(&iface.lock);
 
-    return p_mi->controlVideo (query, args);
+    return p_mi->controlVideo( i_query, args );
 }
 
-static void WindowClose (vlc_object_t *obj)
+static void WindowClose( vlc_object_t *p_obj )
 {
-    vout_window_t *wnd = (vout_window_t *)obj;
-    MainInterface *p_mi = (MainInterface *)wnd->p_private;
-    QMutexLocker locker (&iface.lock);
+    vout_window_t *p_wnd = (vout_window_t*)p_obj;
+    MainInterface *p_mi = (MainInterface *)p_wnd->sys;
 
-    msg_Dbg (obj, "releasing video...");
-    p_mi->releaseVideo ();
+    QMutexLocker locker( &iface.lock );
+
+    msg_Dbg( p_obj, "releasing video..." );
+    p_mi->releaseVideo();
 }

@@ -61,6 +61,7 @@
 #include <assert.h>
 
 #include <vlc_keys.h> /* Wheel event */
+#include <vlc_vout_window.h>
 #include <vlc_vout.h>
 
 /* Callback prototypes */
@@ -706,13 +707,13 @@ private:
  * Thou shall not call/resize/hide widgets from on another thread.
  * This is wrong, and this is THE reason to emit signals on those Video Functions
  **/
-WId MainInterface::requestVideo( vout_thread_t *p_nvout, int *pi_x,
-                                 int *pi_y, unsigned int *pi_width,
+WId MainInterface::requestVideo( int *pi_x, int *pi_y,
+                                 unsigned int *pi_width,
                                  unsigned int *pi_height )
 {
     /* Request the videoWidget */
     if( !videoWidget ) return 0;
-    WId ret = videoWidget->request( p_nvout,pi_x, pi_y,
+    WId ret = videoWidget->request( pi_x, pi_y,
                                     pi_width, pi_height, b_keep_size );
     if( ret ) /* The videoWidget is available */
     {
@@ -763,29 +764,26 @@ void MainInterface::releaseVideoSlot( void )
 /* Call from WindowControl function */
 int MainInterface::controlVideo( int i_query, va_list args )
 {
-    int i_ret = VLC_SUCCESS;
     switch( i_query )
     {
-        case VOUT_SET_SIZE:
-        {
-            unsigned int i_width  = va_arg( args, unsigned int );
-            unsigned int i_height = va_arg( args, unsigned int );
-            emit askVideoToResize( i_width, i_height );
-            emit askUpdate();
-            break;
-        }
-        case VOUT_SET_STAY_ON_TOP:
-        {
-            int i_arg = va_arg( args, int );
-            QApplication::postEvent( this, new SetVideoOnTopQtEvent( i_arg ) );
-            break;
-        }
-        default:
-            i_ret = VLC_EGENERIC;
-            msg_Warn( p_intf, "unsupported control query" );
-            break;
+    case VOUT_WINDOW_SET_SIZE:
+    {
+        unsigned int i_width  = va_arg( args, unsigned int );
+        unsigned int i_height = va_arg( args, unsigned int );
+        emit askVideoToResize( i_width, i_height );
+        emit askUpdate();
+        return VLC_SUCCESS;
     }
-    return i_ret;
+    case VOUT_WINDOW_SET_ON_TOP:
+    {
+        int i_arg = va_arg( args, int );
+        QApplication::postEvent( this, new SetVideoOnTopQtEvent( i_arg ) );
+        return VLC_SUCCESS;
+    }
+    default:
+        msg_Warn( p_intf, "unsupported control query" );
+        return VLC_EGENERIC;
+    }
 }
 
 /*****************************************************************************

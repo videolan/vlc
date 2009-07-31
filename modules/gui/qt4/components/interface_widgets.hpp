@@ -59,7 +59,7 @@ public:
     VideoWidget( intf_thread_t * );
     virtual ~VideoWidget();
 
-    WId request( vout_thread_t *, int *, int *,
+    WId request( int *, int *,
                  unsigned int *, unsigned int *, bool );
     void  release( void );
     int   control( void *, int, va_list );
@@ -76,7 +76,7 @@ protected:
 
 private:
     intf_thread_t *p_intf;
-    vout_thread_t *p_vout;
+    bool b_used;
 
     QSize videoSize;
 

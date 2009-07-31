@@ -57,7 +57,7 @@
 VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
     /* Init */
-    p_vout = NULL;
+    b_used = false;
     videoSize.rwidth() = -1;
     videoSize.rheight() = -1;
 
@@ -89,13 +89,13 @@ void VideoWidget::paintEvent(QPaintEvent *ev)
 VideoWidget::~VideoWidget()
 {
     /* Ensure we are not leaking the video output. This would crash. */
-    assert( !p_vout );
+    assert( !b_used );
 }
 
 /**
  * Request the video to avoid the conflicts
  **/
-WId VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
+WId VideoWidget::request( int *pi_x, int *pi_y,
                           unsigned int *pi_width, unsigned int *pi_height,
                           bool b_keep_size )
 {
@@ -107,12 +107,12 @@ WId VideoWidget::request( vout_thread_t *p_nvout, int *pi_x, int *pi_y,
         *pi_height = size().height();
     }
 
-    if( p_vout )
+    if( b_used )
     {
         msg_Dbg( p_intf, "embedded video already in use" );
         return NULL;
     }
-    p_vout = p_nvout;
+    b_used = true;
 #ifndef NDEBUG
     msg_Dbg( p_intf, "embedded video ready (handle %p)", (void *)winId() );
 #endif
@@ -134,7 +134,7 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
 void VideoWidget::release( void )
 {
     msg_Dbg( p_intf, "Video is not needed anymore" );
-    p_vout = NULL;
+    b_used = false;
     videoSize.rwidth() = 0;
     videoSize.rheight() = 0;
     updateGeometry();

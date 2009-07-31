@@ -74,9 +74,8 @@ public:
     virtual ~MainInterface();
 
     /* Video requests from core */
-    WId requestVideo( vout_thread_t *p_nvout, int *pi_x,
-                      int *pi_y, unsigned int *pi_width,
-                      unsigned int *pi_height );
+    WId requestVideo( int *pi_x, int *pi_y,
+                      unsigned int *pi_width, unsigned int *pi_height );
     void releaseVideo( void  );
     int controlVideo( int i_query, va_list args );
 
