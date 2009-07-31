@@ -429,14 +429,18 @@ def parse_override(name):
         if m:
             # Dump old data
             if current is not None:
-                res[current]="\n".join(data)
+                res[current]="".join(data)
             current=m.group(1)
             data=[]
             continue
         data.append(l)
-    res[current]="\n".join(data)
+    res[current]="".join(data)
     f.close()
-    return res
+    
+    # Not robust wrt. internal methods, but this works for the moment.
+    overriden_methods=dict( (k, re.findall('^\s+def\s+(\w+)', v)) for (k, v) in res.iteritems() )
+
+    return res, overriden_methods
 
 def fix_python_comment(c):
     """Fix comment by removing first and last parameters (self and exception)
@@ -466,7 +470,7 @@ def generate_wrappers(methods):
                        ),
                      key=operator.itemgetter(0))
 
-    overrides=parse_override('override.py')
+    overrides, overriden_methods=parse_override('override.py')
 
     for classname, el in itertools.groupby(elements, key=operator.itemgetter(0)):
         print """
@@ -501,6 +505,10 @@ class %(name)s(object):
             # Strip prefix
             name=method.replace(prefix, '').replace('libvlc_', '')
             ret.add(method)
+            if name in overriden_methods.get(cl, []):
+                # Method already defined in override.py
+                continue
+
             if params:
                 params[0]=(params[0][0], 'self')
             if params and params[-1][0] in ('libvlc_exception_t*', 'mediacontrol_Exception*'):
