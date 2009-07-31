@@ -189,28 +189,32 @@ static int Demux( demux_t *p_demux )
                         if( !strcmp( psz_name, "url" ) )
                         {
                             free( psz_item_mrl );
-                            psz_item_mrl = strdup( psz_value );
+                            psz_item_mrl = psz_value;
                         }
                         else if( !strcmp( psz_name, "length" ) )
                         {
                             free( psz_item_size );
-                            psz_item_size = strdup( psz_value );
+                            psz_item_size = psz_value;
                         }
                         else if( !strcmp( psz_name, "type" ) )
                         {
                             free( psz_item_type );
-                            psz_item_type = strdup( psz_value );
+                            psz_item_type = psz_value;
                         }
                         else
+                        {
                             msg_Dbg( p_demux,"unhandled attribure %s in element %s",
                                      psz_name, psz_elname );
+                            free( psz_value );
+                        }
                     }
                     else
+                    {
                         msg_Dbg( p_demux,"unhandled attribure %s in element %s",
                                   psz_name, psz_elname );
-
+                        free( psz_value );
+                    }
                     free( psz_name );
-                    free( psz_value );
                 }
                 break;
             }
