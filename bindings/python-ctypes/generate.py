@@ -454,8 +454,8 @@ def parse_override(name):
 def fix_python_comment(c):
     """Fix comment by removing first and last parameters (self and exception)
     """
-    data=c.splitlines()
-    body=itertools.takewhile(lambda l: not '@param' in l, data)
+    data=c.replace('@{', '').replace('@see', 'See').splitlines()
+    body=itertools.takewhile(lambda l: not '@param' in l and not '@return' in l, data)
     param=[ python_param_re.sub('\\1:\\2', l) for l in  itertools.ifilter(lambda l: '@param' in l, data) ]
     ret=[ l.replace('@return', '@return:') for l in itertools.ifilter(lambda l: '@return' in l, data) ]
 
