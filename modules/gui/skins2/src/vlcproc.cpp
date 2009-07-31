@@ -30,7 +30,6 @@
 #include <vlc_aout.h>
 #include <vlc_vout.h>
 #include <vlc_playlist.h>
-#include <vlc_window.h>
 
 #include "vlcproc.hpp"
 #include "os_factory.hpp"

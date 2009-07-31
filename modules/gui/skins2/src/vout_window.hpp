@@ -25,6 +25,7 @@
 #define VOUT_WINDOW_HPP
 
 #include "generic_window.hpp"
+#include <vlc_vout_window.h>
 
 class OSGraphics;
 class CtrlVideo;
@@ -35,7 +36,7 @@ class VoutWindow: private GenericWindow
 {
     public:
 
-        VoutWindow( intf_thread_t *pIntf, vout_thread_t* pVout,
+        VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
                     int width, int height, GenericWindow* pParent = NULL );
         virtual ~VoutWindow();
 
@@ -79,7 +80,7 @@ class VoutWindow: private GenericWindow
         OSGraphics *m_pImage;
 
         /// vout thread
-        vout_thread_t* m_pVout;
+        vout_window_t* m_pWnd;
 
         /// original width and height
         int original_width;

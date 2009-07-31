@@ -31,17 +31,17 @@
 
 int VoutWindow::count = 0;
 
-VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_thread_t* pVout,
+VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
                         int width, int height, GenericWindow* pParent ) :
       GenericWindow( pIntf, 0, 0, false, false, pParent ),
-      m_pVout( pVout ), original_width( width ), original_height( height ),
+      m_pWnd( pWnd ), original_width( width ), original_height( height ),
       m_pParentWindow( pParent ), m_pImage( NULL )
 {
     // counter for debug
     count++;
 
-    if( m_pVout )
-        vlc_object_hold( m_pVout );
+    if( m_pWnd )
+        vlc_object_hold( m_pWnd );
 
     // needed on MS-Windows to prevent vlc hanging
     show();
@@ -51,8 +51,8 @@ VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_thread_t* pVout,
 VoutWindow::~VoutWindow()
 {
     delete m_pImage;
-    if( m_pVout )
-        vlc_object_release( m_pVout );
+    if( m_pWnd )
+        vlc_object_release( m_pWnd );
 
     count--;
     msg_Dbg( getIntf(), "VoutWindow count = %d", count );

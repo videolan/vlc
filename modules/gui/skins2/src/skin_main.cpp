@@ -32,7 +32,7 @@
 #include <vlc_demux.h>
 #include <vlc_playlist.h>
 #include <vlc_threads.h>
-#include <vlc_window.h>
+#include <vlc_vout_window.h>
 
 #include "dialogs.hpp"
 #include "os_factory.hpp"
@@ -364,7 +364,7 @@ static int WindowOpen( vlc_object_t *p_this )
 
     if( pWnd->handle.hwnd )
     {
-        pWnd->p_private = pIntf;
+        pWnd->sys = (vout_window_sys_t*)pIntf;
         pWnd->control = &VoutManager::controlWindow;
         return VLC_SUCCESS;
     }
@@ -377,7 +377,7 @@ static int WindowOpen( vlc_object_t *p_this )
 static void WindowClose( vlc_object_t *p_this )
 {
     vout_window_t *pWnd = (vout_window_t *)p_this;
-    intf_thread_t *pIntf = (intf_thread_t *)p_this->p_private;
+    intf_thread_t *pIntf = (intf_thread_t *)pWnd->sys;
 
     VoutManager::releaseWindow( pIntf, pWnd );
 }
@@ -569,11 +569,7 @@ vlc_module_begin ()
     add_shortcut( "skins" )
 
     add_submodule ()
-#ifndef WIN32
-        set_capability( "xwindow", 51 )
-#else
-        set_capability( "hwnd", 51 )
-#endif
+        set_capability( "vout window", 51 )
         set_callbacks( WindowOpen, WindowClose )
 
     add_submodule ()

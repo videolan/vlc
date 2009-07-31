@@ -27,7 +27,7 @@
 #include <vector>
 
 #include <vlc_vout.h>
-#include <vlc_window.h>
+#include <vlc_vout_window.h>
 #include "../utils/position.hpp"
 #include "../commands/cmd_generic.hpp"
 #include "../controls/ctrl_video.hpp"
@@ -37,17 +37,17 @@ class GenericWindow;
 
 #include <stdio.h>
 
-class SavedVout
+class SavedWnd
 {
 public:
-    SavedVout( vout_thread_t* pVout, VoutWindow* pVoutWindow = NULL,
+    SavedWnd( vout_window_t* pWnd, VoutWindow* pVoutWindow = NULL,
                CtrlVideo* pCtrlVideo = NULL, int height = 0, int width = 0 ) :
-       pVout( pVout ), pVoutWindow( pVoutWindow ), pCtrlVideo( pCtrlVideo ),
+       pWnd( pWnd ), pVoutWindow( pVoutWindow ), pCtrlVideo( pCtrlVideo ),
        height( height ), width( width ) {}
 
-    ~SavedVout() {}
+    ~SavedWnd() {}
 
-    vout_thread_t* pVout;
+    vout_window_t* pWnd;
     VoutWindow *pVoutWindow;
     CtrlVideo *pCtrlVideo;
     int height;
@@ -83,8 +83,8 @@ class VoutManager: public SkinObject
         /// Callback to request a vout window
         static void *getWindow( intf_thread_t *pIntf, vout_window_t *pWnd );
 
-        /// Accept Vout
-        void* acceptVout( vout_thread_t* pVout, int width, int height );
+        /// Accept Wnd
+        void* acceptWnd( vout_window_t* pWnd, int width, int height );
 
         // Window provider (release)
         static void releaseWindow( intf_thread_t *pIntf, vout_window_t *pWnd  );
@@ -104,9 +104,6 @@ class VoutManager: public SkinObject
         void discardVout( CtrlVideo* pCtrlVideo );
         void requestVout( CtrlVideo* pCtrlVideo );
 
-        // get a VoutWindow
-        void* getHandle( vout_thread_t* pVout, int width, int height );
-
         // get a useable video Control
         CtrlVideo* getBestCtrlVideo( );
 
@@ -114,7 +111,7 @@ class VoutManager: public SkinObject
         VoutMainWindow* getVoutMainWindow() { return m_pVoutMainWindow; }
 
         // test if vout are running
-        bool hasVout() { return ( m_SavedVoutVec.size() != 0 ) ; }
+        bool hasVout() { return ( m_SavedWndVec.size() != 0 ) ; }
 
         // (un)lock functions to protect vout sets
         void lockVout( ) { vlc_mutex_lock( &vout_lock ); }
@@ -129,7 +126,7 @@ class VoutManager: public SkinObject
 
         vector<CtrlVideo *> m_pCtrlVideoVec;
         vector<CtrlVideo *> m_pCtrlVideoVecBackup;
-        vector<SavedVout> m_SavedVoutVec;
+        vector<SavedWnd> m_SavedWndVec;
 
         VoutMainWindow* m_pVoutMainWindow;
 
