@@ -375,7 +375,7 @@ static void WaitPreparsed( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
         vlc_mutex_unlock( &p_fetcher->lock );
     }
 
-    var_DelCallback( p_input, "intf-event", InputEvent, p_fetcher );
+    var_DelCallback( p_input, "intf-event", InputEvent, &cond );
     vlc_cond_destroy( &cond );
 
 exit:
