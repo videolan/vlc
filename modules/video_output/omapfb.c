@@ -50,7 +50,7 @@
 #include <vlc_plugin.h>
 #include <vlc_keys.h>
 #include <vlc_vout.h>
-#include <vlc_window.h>
+#include <vlc_vout_window.h>
 #include <vlc_playlist.h>
 
 /*****************************************************************************
@@ -242,7 +242,7 @@ static void Destroy( vlc_object_t *p_this )
 
     if( p_vout->p_sys->b_embed )
     {
-        vout_ReleaseWindow( p_vout->p_sys->owner_window );
+        vout_window_Delete( p_vout->p_sys->owner_window );
         if( p_vout->b_fullscreen )
             XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
         XCloseDisplay( p_vout->p_sys->p_display );
@@ -665,12 +665,16 @@ static int InitWindow( vout_thread_t *p_vout )
         p_sys->p_display = XOpenDisplay( NULL );
 
         // Request window from interface
-        p_sys->owner_window =
-            vout_RequestXWindow( p_vout,
-                                &p_sys->embedded_window.i_x,
-                                &p_sys->embedded_window.i_y,
-                                &p_sys->embedded_window.i_width,
-                                &p_sys->embedded_window.i_height );
+        vout_window_cfg_t wnd_cfg;
+
+        memset( &wnd_cfg, 0, sizeof(wnd_cfg) );
+        wnd_cfg.type   = VOUT_WINDOW_TYPE_XWINDOW;
+        wnd_cfg.x      = p_sys->embedded_window.i_x;
+        wnd_cfg.y      = p_sys->embedded_window.i_y;
+        wnd_cfg.width  = p_sys->embedded_window.i_width;
+        wnd_cfg.height = p_sys->embedded_window.i_height;
+
+        p_sys->owner_window = vout_window_New( VLC_OBJECT(p_vout), NULL, &wnd_cfg );
         p_sys->main_window = p_sys->embedded_window;
 
         // We have to create a new window to get some events
