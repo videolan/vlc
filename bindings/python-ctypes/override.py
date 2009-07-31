@@ -140,3 +140,15 @@ class MediaListPlayer:
 class LogIterator:
     def __iter__(self):
         return self
+
+    def next(self):
+        if not self.has_next():
+            raise StopIteration
+        buffer=LogMessage()
+        e=VLCException()
+        ret=libvlc_log_iterator_next(self, buffer, e)
+        return ret
+
+class Log:
+    def __iter__(self):
+        return self.get_iterator()
