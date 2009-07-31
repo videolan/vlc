@@ -529,7 +529,7 @@ def generate_wrappers(methods):
                 args=", ".join( p[1] for p in params )
 
             print "    def %s(%s):" % (name, args)
-            print '        """%s\n"""' % fix_python_comment(comment)
+            print '        """%s\n        """' % fix_python_comment(comment)
             if params and params[-1][0] == 'libvlc_exception_t*':
                 # Exception handling
                 print "        e=VLCException()"
