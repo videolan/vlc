@@ -35,7 +35,7 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
-#include <vlc_window.h>
+#include <vlc_vout_window.h>
 #include <vlc_keys.h>
 
 #include <errno.h>                                                 /* ENOMEM */
@@ -337,7 +337,9 @@ int Activate ( vlc_object_t *p_this )
     CreateCursor( p_vout );
 
     /* Set main window's size */
-    p_vout->p_sys->original_window.i_width = p_vout->i_window_width;
+    p_vout->p_sys->original_window.i_x      = 0;
+    p_vout->p_sys->original_window.i_y      = 0;
+    p_vout->p_sys->original_window.i_width  = p_vout->i_window_width;
     p_vout->p_sys->original_window.i_height = p_vout->i_window_height;
     var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     /* Spawn base window - this window will include the video output window,
@@ -1608,8 +1610,15 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
     if( !p_vout->b_fullscreen )
     {
-        p_win->owner_window = vout_RequestXWindow( p_vout, &p_win->i_x,
-                              &p_win->i_y, &p_win->i_width, &p_win->i_height );
+        vout_window_cfg_t wnd_cfg;
+        memset( &wnd_cfg, 0, sizeof(wnd_cfg) );
+        wnd_cfg.type   = VOUT_WINDOW_TYPE_XWINDOW;
+        wnd_cfg.x      = p_win->i_x;
+        wnd_cfg.y      = p_win->i_y;
+        wnd_cfg.width  = p_win->i_width;
+        wnd_cfg.height = p_win->i_height;
+
+        p_win->owner_window = vout_window_New( VLC_OBJECT(p_vout), NULL, &wnd_cfg );
         if( !p_win->owner_window )
             return VLC_EGENERIC;
         xsize_hints.base_width  = xsize_hints.width = p_win->i_width;
@@ -1829,7 +1838,7 @@ static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
         }
     } while( !b_destroy_notify );
 
-    vout_ReleaseWindow( p_win->owner_window );
+    vout_window_Delete( p_win->owner_window );
 }
 
 /*****************************************************************************
@@ -3116,41 +3125,49 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
     switch( i_query )
     {
         case VOUT_SET_SIZE:
-            if( p_vout->p_sys->p_win->owner_window )
-                return vout_ControlWindow( p_vout->p_sys->p_win->owner_window,
-                                           i_query, args);
-
             i_width  = va_arg( args, unsigned int );
             i_height = va_arg( args, unsigned int );
             if( !i_width ) i_width = p_vout->i_window_width;
             if( !i_height ) i_height = p_vout->i_window_height;
 
+            if( p_vout->p_sys->p_win->owner_window )
+            {
+                return vout_window_SetSize( p_vout->p_sys->p_win->owner_window,
+                                            i_width, i_height);
+            }
+            else
+            {
 #ifdef MODULE_NAME_IS_xvmc
-            xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
+                xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
 #endif
-            /* Update dimensions */
-            XResizeWindow( p_vout->p_sys->p_display,
-                           p_vout->p_sys->p_win->base_window,
-                           i_width, i_height );
+                /* Update dimensions */
+                XResizeWindow( p_vout->p_sys->p_display,
+                               p_vout->p_sys->p_win->base_window,
+                               i_width, i_height );
 #ifdef MODULE_NAME_IS_xvmc
-            xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
+                xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
 #endif
-            return VLC_SUCCESS;
+                return VLC_SUCCESS;
+            }
 
         case VOUT_SET_STAY_ON_TOP:
-            if( p_vout->p_sys->p_win->owner_window )
-                return vout_ControlWindow( p_vout->p_sys->p_win->owner_window,
-                                           i_query, args);
-
             b_arg = (bool) va_arg( args, int );
+
+            if( p_vout->p_sys->p_win->owner_window )
+            {
+                return vout_window_SetOnTop( p_vout->p_sys->p_win->owner_window, b_arg );
+            }
+            else
+            {
 #ifdef MODULE_NAME_IS_xvmc
-            xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
+                xvmc_context_reader_lock( &p_vout->p_sys->xvmc_lock );
 #endif
-            WindowOnTop( p_vout, b_arg );
+                WindowOnTop( p_vout, b_arg );
 #ifdef MODULE_NAME_IS_xvmc
-            xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
+                xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
 #endif
-            return VLC_SUCCESS;
+                return VLC_SUCCESS;
+            }
 
        default:
             return VLC_EGENERIC;
