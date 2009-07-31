@@ -835,9 +835,11 @@ int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
         /* Really get the variable */
         *p_val = p_var->val;
 
+#ifndef NDEBUG
         /* Alert if the type is VLC_VAR_VOID */
         if( ( p_var->i_type & VLC_VAR_TYPE ) == VLC_VAR_VOID )
             msg_Warn( p_this, "Calling var_GetVoid on the void variable '%s' (0x%04x)", psz_name, p_var->i_type );
+#endif
 
         /* Duplicate value if needed */
         p_var->ops->pf_dup( p_val );
@@ -941,6 +943,13 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
         {
             break;
         }
+#ifndef NDEBUG
+        else if( p_var->p_entries[i_entry].pf_callback == pf_callback )
+        {
+            msg_Warn( p_this, "Calling var_DelCallback for '%s' with the same "
+                      "function but not the same data.", psz_name );
+        }
+#endif
     }
 
     if( i_entry < 0 )
