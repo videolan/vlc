@@ -520,6 +520,26 @@ class %(name)s(object):
             else:
                 print "        return %s(%s)" % (method, args)
             print
+
+            # Check for standard methods
+            if name == 'count':
+                # There is a count method. Generate a __len__ one.
+                print "    def __len__(self):"
+                print "        e=VLCException()"
+                print "        return %s(self, e)" % method
+                print
+            elif name.endswith('item_at_index'):
+                # Indexable (and thus iterable)"
+                print "    def __getitem__(self, i):"
+                print "        e=VLCException()"
+                print "        return %s(self, i, e)" % method
+                print
+                print "    def __iter__(self):"
+                print "        e=VLCException()"
+                print "        for i in xrange(len(self)):"
+                print "            yield self[i]"
+                print
+
     return ret
 
 if __name__ == '__main__':
