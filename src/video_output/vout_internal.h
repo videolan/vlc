@@ -31,6 +31,7 @@
 #define _VOUT_INTERNAL_H 1
 
 #include "vout_control.h"
+#include "snapshot.h"
 
 /* Number of pictures required to computes the FPS rate */
 #define VOUT_FPS_SAMPLES                20
@@ -88,14 +89,7 @@ struct vout_thread_sys_t
     char           *psz_vf2;
 
     /* Snapshot interface */
-    struct
-    {
-        bool        b_available;
-        int         i_request;
-        picture_t   *p_picture;
-        vlc_mutex_t lock;
-        vlc_cond_t  wait;
-    } snapshot;
+    vout_snapshot_t snapshot;
 
     /* Show media title on videoutput */
     bool            b_title_show;

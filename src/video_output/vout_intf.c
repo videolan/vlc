@@ -400,187 +400,6 @@ static int VoutSnapshotPip( vout_thread_t *p_vout, picture_t *p_pic )
     spu_DisplaySubpicture( p_vout->p_spu, p_subpic );
     return VLC_SUCCESS;
 }
-/**
- * This function will return the default directory used for snapshots
- */
-static char *VoutSnapshotGetDefaultDirectory( void )
-{
-    char *psz_path = NULL;
-#if defined(__APPLE__) || defined(SYS_BEOS)
-
-    if( asprintf( &psz_path, "%s/Desktop",
-                  config_GetHomeDir() ) == -1 )
-        psz_path = NULL;
-
-#elif defined(WIN32) && !defined(UNDER_CE)
-
-    /* Get the My Pictures folder path */
-    char *p_mypicturesdir = NULL;
-    typedef HRESULT (WINAPI *SHGETFOLDERPATH)( HWND, int, HANDLE, DWORD,
-                                               LPWSTR );
-    #ifndef CSIDL_FLAG_CREATE
-    #   define CSIDL_FLAG_CREATE 0x8000
-    #endif
-    #ifndef CSIDL_MYPICTURES
-    #   define CSIDL_MYPICTURES 0x27
-    #endif
-    #ifndef SHGFP_TYPE_CURRENT
-    #   define SHGFP_TYPE_CURRENT 0
-    #endif
-
-    HINSTANCE shfolder_dll;
-    SHGETFOLDERPATH SHGetFolderPath ;
-
-    /* load the shfolder dll to retrieve SHGetFolderPath */
-    if( ( shfolder_dll = LoadLibrary( _T("SHFolder.dll") ) ) != NULL )
-    {
-       wchar_t wdir[PATH_MAX];
-       SHGetFolderPath = (void *)GetProcAddress( shfolder_dll,
-                                                  _T("SHGetFolderPathW") );
-        if ((SHGetFolderPath != NULL )
-         && SUCCEEDED (SHGetFolderPath (NULL,
-                                       CSIDL_MYPICTURES | CSIDL_FLAG_CREATE,
-                                       NULL, SHGFP_TYPE_CURRENT,
-                                       wdir)))
-            p_mypicturesdir = FromWide (wdir);
-
-        FreeLibrary( shfolder_dll );
-    }
-
-    if( p_mypicturesdir == NULL )
-        psz_path = strdup( config_GetHomeDir() );
-    else
-        psz_path = p_mypicturesdir;
-
-#else
-
-    /* XXX: This saves in the data directory. Shouldn't we try saving
-     *      to psz_homedir/Desktop or something nicer ? */
-    psz_path = config_GetUserDataDir();
-
-#endif
-
-    return psz_path;
-}
-/**
- * This function will save a video snapshot to a file
- */
-static int VoutWriteSnapshot( vout_thread_t *p_vout, char **ppsz_filename,
-                              const block_t *p_image,
-                              const char *psz_path,
-                              const char *psz_format,
-                              const char *psz_prefix_fmt )
-{
-    /* */
-    char *psz_filename;
-    DIR *p_path = utf8_opendir( psz_path );
-    if( p_path != NULL )
-    {
-        /* The use specified a directory path */
-        closedir( p_path );
-
-        /* */
-        char *psz_prefix = NULL;
-        if( psz_prefix_fmt )
-            psz_prefix = str_format( p_vout, psz_prefix_fmt );
-        if( !psz_prefix )
-        {
-            psz_prefix = strdup( "vlcsnap-" );
-            if( !psz_prefix )
-                goto error;
-        }
-
-        if( var_GetBool( p_vout, "snapshot-sequential" ) )
-        {
-            int i_num = var_GetInteger( p_vout, "snapshot-num" );
-            for( ; ; i_num++ )
-            {
-                struct stat st;
-
-                if( asprintf( &psz_filename, "%s" DIR_SEP "%s%05d.%s",
-                              psz_path, psz_prefix, i_num++, psz_format ) < 0 )
-                {
-                    free( psz_prefix );
-                    goto error;
-                }
-                if( utf8_stat( psz_filename, &st ) )
-                    break;
-                free( psz_filename );
-            }
-
-            var_SetInteger( p_vout, "snapshot-num", i_num );
-        }
-        else
-        {
-            struct tm    curtime;
-            time_t       lcurtime = time( NULL ) ;
-
-            if( !localtime_r( &lcurtime, &curtime ) )
-            {
-                const unsigned int i_id = (p_image->i_pts / 100000) & 0xFFFFFF;
-
-                msg_Warn( p_vout, "failed to get current time. Falling back to legacy snapshot naming" );
-
-                if( asprintf( &psz_filename, "%s" DIR_SEP "%s%u.%s",
-                              psz_path, psz_prefix, i_id, psz_format ) < 0 )
-                    psz_filename = NULL;
-            }
-            else
-            {
-                /* suffix with the last decimal digit in 10s of seconds resolution
-                 * FIXME gni ? */
-                const int i_id = (p_image->i_pts / (100*1000)) & 0xFF;
-                char psz_curtime[128];
-
-                if( !strftime( psz_curtime, sizeof(psz_curtime), "%Y-%m-%d-%Hh%Mm%Ss", &curtime ) )
-                    strcpy( psz_curtime, "error" );
-
-                if( asprintf( &psz_filename, "%s" DIR_SEP "%s%s%1u.%s",
-                              psz_path, psz_prefix, psz_curtime, i_id, psz_format ) < 0 )
-                    psz_filename = NULL;
-            }
-        }
-        free( psz_prefix );
-    }
-    else
-    {
-        /* The user specified a full path name (including file name) */
-        psz_filename = str_format( p_vout, psz_path );
-        path_sanitize( psz_filename );
-    }
-
-    if( !psz_filename )
-        goto error;
-
-    /* Save the snapshot */
-    FILE *p_file = utf8_fopen( psz_filename, "wb" );
-    if( !p_file )
-    {
-        msg_Err( p_vout, "Failed to open '%s'", psz_filename );
-        free( psz_filename );
-        goto error;
-    }
-    if( fwrite( p_image->p_buffer, p_image->i_buffer, 1, p_file ) != 1 )
-    {
-        msg_Err( p_vout, "Failed to write to '%s'", psz_filename );
-        fclose( p_file );
-        free( psz_filename );
-        goto error;
-    }
-    fclose( p_file );
-
-    /* */
-    if( ppsz_filename )
-        *ppsz_filename = psz_filename;
-    else
-        free( psz_filename );
-
-    return VLC_SUCCESS;
-
-error:
-    msg_Err( p_vout, "could not save snapshot" );
-    return VLC_EGENERIC;
-}
 
 /**
  * This function will display the name and a PIP of the provided snapshot
@@ -603,26 +422,7 @@ int vout_GetSnapshot( vout_thread_t *p_vout,
                       video_format_t *p_fmt,
                       const char *psz_format, mtime_t i_timeout )
 {
-    vout_thread_sys_t *p_sys = p_vout->p;
-
-    vlc_mutex_lock( &p_sys->snapshot.lock );
-    p_sys->snapshot.i_request++;
-
-    const mtime_t i_deadline = mdate() + i_timeout;
-    while( p_sys->snapshot.b_available && !p_sys->snapshot.p_picture )
-    {
-        if( vlc_cond_timedwait( &p_sys->snapshot.wait, &p_sys->snapshot.lock,
-                                i_deadline ) )
-            break;
-    }
-
-    picture_t *p_picture = p_sys->snapshot.p_picture;
-    if( p_picture )
-        p_sys->snapshot.p_picture = p_picture->p_next;
-    else if( p_sys->snapshot.i_request > 0 )
-        p_sys->snapshot.i_request--;
-    vlc_mutex_unlock( &p_sys->snapshot.lock );
-
+    picture_t *p_picture = vout_snapshot_Get( &p_vout->p->snapshot, i_timeout );
     if( !p_picture )
     {
         msg_Err( p_vout, "Failed to grab a snapshot" );
@@ -678,7 +478,7 @@ static void VoutSaveSnapshot( vout_thread_t *p_vout )
 
     if( !psz_path )
     {
-        psz_path = VoutSnapshotGetDefaultDirectory();
+        psz_path = vout_snapshot_GetDirectory();
         if( !psz_path )
         {
             msg_Err( p_vout, "no path specified for snapshots" );
@@ -686,11 +486,21 @@ static void VoutSaveSnapshot( vout_thread_t *p_vout )
         }
     }
 
+    vout_snapshot_save_cfg_t cfg;
+    memset( &cfg, 0, sizeof(cfg) );
+    cfg.is_sequential = var_GetBool( p_vout, "snapshot-sequential" );
+    cfg.sequence = var_GetInteger( p_vout, "snapshot-num" );
+    cfg.path = psz_path;
+    cfg.format = psz_format;
+    cfg.prefix_fmt = psz_prefix;
+
     char *psz_filename;
-    if( VoutWriteSnapshot( p_vout, &psz_filename,
-                           p_image,
-                           psz_path, psz_format, psz_prefix ) )
+    int  i_sequence;
+    if (vout_snapshot_SaveImage( &psz_filename, &i_sequence,
+                                 p_image, VLC_OBJECT(p_vout), &cfg ) )
         goto exit;
+    if( cfg.is_sequential )
+        var_SetInteger( p_vout, "snapshot-num", i_sequence + 1 );
 
     VoutOsdSnapshot( p_vout, p_picture, psz_filename );
 
