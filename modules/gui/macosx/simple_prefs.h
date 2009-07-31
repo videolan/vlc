@@ -96,6 +96,8 @@
     IBOutlet id o_intf_lang_txt;
     IBOutlet id o_intf_network_box;
     IBOutlet id o_intf_view;
+    IBOutlet id o_intf_update_ckb;
+    IBOutlet id o_intf_last_update_lbl;
 
     IBOutlet id o_osd_encoding_pop;
     IBOutlet id o_osd_encoding_txt;

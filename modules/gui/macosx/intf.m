@@ -58,6 +58,7 @@
 
 #import <AddressBook/AddressBook.h>         /* for crashlog send mechanism */
 #import <IOKit/hidsystem/ev_keymap.h>         /* for the media key support */
+#import <Sparkle/Sparkle.h>                 /* we're the update delegate */
 
 /*****************************************************************************
  * Local prototypes.
@@ -903,6 +904,19 @@ static VLCMain *_o_sharedMainInstance = nil;
     if( jmpbuffer )
         longjmp( jmpbuffer, 1 );
     /* not reached */
+}
+
+#pragma mark -
+#pragma mark Sparkle delegate
+/* received directly before the update gets installed, so let's shut down a bit */
+- (void)updater:(SUUpdater *)updater willInstallUpdate:(SUAppcastItem *)update
+{
+    [o_remote stopListening: self];
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_STOP );
+
+    /* Close the window directly, because we do know that there
+     * won't be anymore video. It's currently waiting a bit. */
+    [[[o_controls voutView] window] orderOut:self];
 }
 
 #pragma mark -

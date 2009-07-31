@@ -168,6 +168,7 @@
 		CC62B95F0FC600E90077BB8C /* pause_big.png in Resources */ = {isa = PBXBuildFile; fileRef = CC62B9570FC600E90077BB8C /* pause_big.png */; };
 		CC62B9600FC600E90077BB8C /* play_big_down.png in Resources */ = {isa = PBXBuildFile; fileRef = CC62B9580FC600E90077BB8C /* play_big_down.png */; };
 		CC62B9610FC600E90077BB8C /* play_big.png in Resources */ = {isa = PBXBuildFile; fileRef = CC62B9590FC600E90077BB8C /* play_big.png */; };
+		CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */ = {isa = PBXBuildFile; fileRef = CC8062631021F8790021EB9A /* dsa_pub.pem */; };
 		CCB60A420E6E5E3F00407004 /* VLM.nib in Resources */ = {isa = PBXBuildFile; fileRef = CCB60A400E6E5E3F00407004 /* VLM.nib */; };
 		CCBE999F0F922C51000705F8 /* CoreServices.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = CCBE999E0F922C51000705F8 /* CoreServices.framework */; };
 		CCD90F4E0E87C86D0034564A /* add_schedule.png in Resources */ = {isa = PBXBuildFile; fileRef = CCD90F4B0E87C86D0034564A /* add_schedule.png */; };
@@ -370,6 +371,7 @@
 		CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = AppleRemote.m; path = ../../../modules/gui/macosx/AppleRemote.m; sourceTree = SOURCE_ROOT; };
 		CC6EDD4F0B9CA2140096068A /* eyetv.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = eyetv.h; path = ../../../modules/gui/macosx/eyetv.h; sourceTree = SOURCE_ROOT; };
 		CC6EDD500B9CA2140096068A /* eyetv.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = eyetv.m; path = ../../../modules/gui/macosx/eyetv.m; sourceTree = SOURCE_ROOT; };
+		CC8062631021F8790021EB9A /* dsa_pub.pem */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text; name = dsa_pub.pem; path = Resources/dsa_pub.pem; sourceTree = "<group>"; };
 		CC962E2C0CC7992800A56695 /* WebKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = WebKit.framework; path = /System/Library/Frameworks/WebKit.framework; sourceTree = "<absolute>"; };
 		CC965D5D0DA5880F0088F222 /* display_middle.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = display_middle.png; path = Resources/display_middle.png; sourceTree = "<group>"; };
 		CC965D5E0DA5880F0088F222 /* display_left.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = display_left.png; path = Resources/display_left.png; sourceTree = "<group>"; };
@@ -482,6 +484,7 @@
 				8ECA7E520563CD9500DFC000 /* Controller */,
 				F69B0CA602E24F6401A80112 /* InfoPlist.strings */,
 				8EBF3FA303F13FFB0059A3A7 /* vlc.scriptSuite */,
+				CC8062631021F8790021EB9A /* dsa_pub.pem */,
 				CC1C41D00D9BAD7F002728FA /* noart.png */,
 				CCD90F4A0E87C82D0034564A /* VLM */,
 				CC0B71E00D54F0DD00448E00 /* simple prefs (taken from qt4) */,
@@ -893,6 +896,7 @@
 			isa = PBXResourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				CC8062641021F8790021EB9A /* dsa_pub.pem in Resources */,
 				CC62B95A0FC600E90077BB8C /* backward_big_down.png in Resources */,
 				CC62B95B0FC600E90077BB8C /* backward_big.png in Resources */,
 				CC62B95C0FC600E90077BB8C /* forward_big_down.png in Resources */,
