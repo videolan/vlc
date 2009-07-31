@@ -412,6 +412,7 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
     ADD( "faster", VOID, Input )
     ADD( "slower", VOID, Input )
     ADD( "normal", VOID, Input )
+    ADD( "frame", VOID, Input )
 
     ADD( "atrack", STRING, Input )
     ADD( "vtrack", STRING, Input )
@@ -514,6 +515,7 @@ static void Run( intf_thread_t *p_intf )
                 var_AddCallback( p_input, "rate", RateChanged, p_intf );
                 var_AddCallback( p_input, "time-offset", TimeOffsetChanged,
                                  p_intf );
+                var_AddCallback( p_input, "frame-next", RateChanged, p_intf );
             }
         }
         else if( p_input->b_dead )
@@ -524,6 +526,7 @@ static void Run( intf_thread_t *p_intf )
             var_DelCallback( p_input, "rate", RateChanged, p_intf );
             var_DelCallback( p_input, "time-offset", TimeOffsetChanged,
                              p_intf );
+            var_DelCallback( p_input, "frame-next", RateChanged, p_intf );
             vlc_object_release( p_input );
             p_input = NULL;
 
@@ -818,6 +821,7 @@ static void Run( intf_thread_t *p_intf )
         var_DelCallback( p_input, "rate-slower", RateChanged, p_intf );
         var_DelCallback( p_input, "rate", RateChanged, p_intf );
         var_DelCallback( p_input, "time-offset", TimeOffsetChanged, p_intf );
+        var_DelCallback( p_input, "frame-next", RateChanged, p_intf );
         vlc_object_release( p_input );
     }
 
@@ -858,6 +862,7 @@ static void Help( intf_thread_t *p_intf, bool b_longhelp)
     msg_rc("%s", _("| faster . . . . . . . . . .  faster playing of stream"));
     msg_rc("%s", _("| slower . . . . . . . . . .  slower playing of stream"));
     msg_rc("%s", _("| normal . . . . . . . . . .  normal playing of stream"));
+    msg_rc("%s", _("| frame. . . . . . . . . .  play frame by frame"));
     msg_rc("%s", _("| f [on|off] . . . . . . . . . . . . toggle fullscreen"));
     msg_rc("%s", _("| info . . . . .  information about the current stream"));
     msg_rc("%s", _("| stats  . . . . . . . .  show statistical information"));
@@ -1030,7 +1035,7 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
 
     int state = var_GetInteger( p_input, "state" );
     if( ( state == PAUSE_S ) &&
-        ( strcmp( psz_cmd, "pause" ) != 0 ) )
+        ( strcmp( psz_cmd, "pause" ) != 0 ) && (strcmp( psz_cmd,"frame") != 0 ) )
     {
         msg_rc( "%s", _("Press menu select or pause to continue.") );
     }
@@ -1097,6 +1102,11 @@ static int Input( vlc_object_t *p_this, char const *psz_cmd,
     else if ( !strcmp( psz_cmd, "normal" ) )
     {
         var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT );
+        i_error = VLC_SUCCESS;
+    }
+    else if ( !strcmp( psz_cmd, "frame" ) )
+    {
+	var_TriggerCallback( p_input, "frame-next" );
         i_error = VLC_SUCCESS;
     }
     else if( !strcmp( psz_cmd, "chapter" ) ||
