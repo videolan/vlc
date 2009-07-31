@@ -36,7 +36,6 @@
 
 struct demux_sys_t
 {
-    char *psz_prefix;
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
 };
@@ -59,7 +58,6 @@ int Import_podcast( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "using podcast reader" );
-    p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
     p_demux->p_sys->p_xml = NULL;
     p_demux->p_sys->p_xml_reader = NULL;
 
@@ -74,7 +72,6 @@ void Close_podcast( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    free( p_sys->psz_prefix );
     if( p_sys->p_xml_reader ) xml_ReaderDelete( p_sys->p_xml, p_sys->p_xml_reader );
     if( p_sys->p_xml ) xml_Delete( p_sys->p_xml );
     free( p_sys );
@@ -171,7 +168,7 @@ static int Demux( demux_t *p_demux )
                 }
                 else if( !strcmp( psz_elname, "image" ) )
                 {
-                    b_item = true;
+                    b_image = true;
                 }
 
                 // Read the attributes
