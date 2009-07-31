@@ -87,13 +87,15 @@ paramlist_re=re.compile('\s*,\s*')
 comment_re=re.compile('\\param\s+(\S+)')
 python_param_re=re.compile('(@param\s+\S+)(.+)')
 forward_re=re.compile('.+\(\s*(.+?)\s*\)(\s*\S+)')
+enum_re=re.compile('typedef\s+(enum)\s*(\S+\s*)?\{\s*(.+)\s*\}\s*(\S+);')
 
 # Definition of parameter passing mode for types.  This should not be
 # hardcoded this way, but works alright ATM.
 parameter_passing=DefaultDict(default=1)
 parameter_passing['libvlc_exception_t*']=3
 
-# C-type to ctypes/python type conversion
+# C-type to ctypes/python type conversion.
+# Note that enum types conversions are generated (cf convert_enum_names)
 typ2class={
     'libvlc_exception_t*': 'ctypes.POINTER(VLCException)',
 
@@ -119,28 +121,20 @@ typ2class={
     'mediacontrol_PlaylistSeq*': 'MediaControlPlaylistSeq',
     'mediacontrol_Position*': 'MediaControlPosition',
     'mediacontrol_StreamInformation*': 'MediaControlStreamInformation',
-    'mediacontrol_PositionOrigin': 'ctypes.c_uint',
-    'mediacontrol_PositionKey': 'ctypes.c_uint',
     'WINDOWHANDLE': 'ctypes.c_ulong',
 
+    'void': 'None',
+    'void*': 'ctypes.c_void_p',
     'short': 'ctypes.c_short',
     'char*': 'ctypes.c_char_p',
     'char**': 'ListPOINTER(ctypes.c_char_p)',
     'uint32_t': 'ctypes.c_uint',
     'float': 'ctypes.c_float',
     'unsigned': 'ctypes.c_uint',
-    'void': 'None',
-    'void*': 'ctypes.c_void_p',
     'int': 'ctypes.c_int',
     '...': 'FIXMEva_list',
     'libvlc_callback_t': 'FIXMEcallback',
     'libvlc_time_t': 'ctypes.c_longlong',
-    'libvlc_video_marquee_int_option_t': 'ctypes.c_int',
-    'libvlc_video_marquee_string_option_t': 'ctypes.c_char_p',
-    # FIXME: enums -> to be processed
-    'libvlc_media_option_t': 'ctypes.c_uint',
-    'libvlc_meta_t': 'ctypes.c_uint',
-    'libvlc_state_t': 'State',
     }
 
 # Defined python classes, i.e. classes for which we want to generate
@@ -210,6 +204,101 @@ def generate_header(classes=None):
         else:
             print l,
     f.close()
+
+def convert_enum_names(enums):
+    res={}
+    for (typ, name, values) in enums:
+        if typ != 'enum':
+            raise Exception('This method only handles enums')
+        pyname=re.findall('(libvlc|mediacontrol)_(.+?)(_t)?$', name)[0][1]
+        if '_' in pyname:
+            pyname=pyname.title().replace('_', '')
+        else:
+            pyname=pyname.capitalize()
+        res[name]=pyname
+    return res
+
+def generate_enums(enums):
+    for (typ, name, values) in enums:
+        if typ != 'enum':
+            raise Exception('This method only handles enums')
+        pyname=typ2class[name]
+
+        print "class %s(ctypes.c_uint):" % pyname
+
+        conv={}
+        # Convert symbol names
+        for k, v in values:
+            n=k.split('_')[-1]
+            if len(n) == 1:
+                # Single character. Some symbols use 1_1, 5_1, etc.
+                n="_".join( k.split('_')[:-2] )
+            if re.match('^[0-9]', n):
+                # Cannot start an identifier with a number
+                n='_'+n
+            conv[k]=n
+
+        for k, v in values:
+            print "    %s=%s" % (conv[k], v)
+
+        print "    _names={"
+        for k, v in values:
+            print "        %s: '%s'," % (v, conv[k])
+        print "    }"
+
+        print """
+    def __repr__(self):
+        return ".".join((self.__class__.__module__, self.__class__.__name__, self._names[self.value]))
+"""
+
+def parse_typedef(name):
+    """Parse include file for typedef expressions.
+
+    This generates a tuple for each typedef:
+    (type, name, value_list)
+    with type == 'enum' (for the moment) and value_list being a list of (name, value)
+    Note that values are string, since this is intended for code generation.
+    """
+    f=open(name, 'r')
+    accumulator=''
+    for l in f:
+        # Note: lstrip() should not be necessary, but there is 1 badly
+        # formatted comment in vlc1.0.0 includes
+        if l.lstrip().startswith('/**'):
+            comment=''
+            continue
+        elif l.startswith(' * '):
+            comment = comment + l[3:]
+            continue
+
+        l=l.strip()
+
+        if accumulator:
+            accumulator=" ".join( (accumulator, l) )
+            if l.endswith(';'):
+                # End of definition
+                l=accumulator
+                accumulator=''
+        elif l.startswith('typedef enum') and not l.endswith(';'):
+            # Multiline definition. Accumulate until end of definition
+            accumulator=l
+            continue
+
+        m=enum_re.match(l)
+        if m:
+            values=[]
+            (typ, dummy, data, name)=m.groups()
+            for i, l in enumerate(paramlist_re.split(data)):
+                l=l.strip()
+                if l.startswith('/*'):
+                    continue
+                if '=' in l:
+                    # A value was specified. Use it.
+                    values.append(re.split('\s*=\s*', l))
+                else:
+                    if l:
+                        values.append( (l, str(i)) )
+            yield (typ, name, values)
 
 def parse_include(name):
     """Parse include file.
@@ -429,6 +518,12 @@ class %(name)s(object):
     return ret
 
 if __name__ == '__main__':
+    enums=[]
+    for name in sys.argv[1:]:
+        enums.extend(list(parse_typedef(name)))
+    # Generate python names for enums
+    typ2class.update(convert_enum_names(enums))
+
     methods=[]
     for name in sys.argv[1:]:
         methods.extend(list(parse_include(name)))
@@ -436,6 +531,7 @@ if __name__ == '__main__':
         sys.exit(0)
 
     generate_header()
+    generate_enums(enums)
     wrapped=generate_wrappers(methods)
     for l in methods:
         output_ctypes(*l)

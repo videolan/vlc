@@ -101,22 +101,6 @@ class MediaControlPositionOrigin(ctypes.c_uint):
     def __repr__(self):
         return self.enum[self.value]
 
-class State(ctypes.c_uint):
-    # FIXME: should be improved (State.NothingSpecial should hold the value)
-    # and maybe auto-generated from typedefs
-    enum=(
-        'NothingSpecial',
-        'Opening',
-        'Buffering',
-        'Playing',
-        'Paused',
-        'Stopped',
-        'Ended',
-        'Error',
-        )
-    def __repr__(self):
-        return self.enum[self.value]
-
 class MediaControlException(ctypes.Structure):
     _fields_= [
                 ('code', ctypes.c_int),

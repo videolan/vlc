@@ -1,9 +1,5 @@
 * Investigate memory management
 
-* Find how to properly define enums
-
-* Autogenerate enums from include files
-
 * Implement event callbacks
 
 * Write a test suite
