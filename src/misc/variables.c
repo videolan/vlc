@@ -197,6 +197,8 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
         /* If the types differ, variable creation failed. */
         if( (i_type & VLC_VAR_TYPE) != (p_priv->p_vars[i_new].i_type & VLC_VAR_TYPE) )
         {
+            msg_Err( p_this, "Variable '%s' (0x%04x) already exist but with a different type (0x%04x)",
+                     psz_name, p_priv->p_vars[i_new].i_type, i_type );
             vlc_mutex_unlock( &p_priv->var_lock );
             return VLC_EBADVAR;
         }
@@ -833,6 +835,10 @@ int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
         /* Really get the variable */
         *p_val = p_var->val;
 
+        /* Alert if the type is VLC_VAR_VOID */
+        if( ( p_var->i_type & VLC_VAR_TYPE ) == VLC_VAR_VOID )
+            msg_Warn( p_this, "Calling var_GetVoid on the void variable '%s' (0x%04x)", psz_name, p_var->i_type );
+
         /* Duplicate value if needed */
         p_var->ops->pf_dup( p_val );
     }
@@ -1062,7 +1068,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
     /* Create the variable in the input object.
      * Children of the input object will be able to retreive this value
      * thanks to the inheritance property of the object variables. */
-    var_Create( p_obj, psz_name, i_type );
+    __var_Create( p_obj, psz_name, i_type );
 
     switch( i_type )
     {
@@ -1302,7 +1308,7 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
     {
         int i;
 
-        /* FIXME: the list is sorted, dude. Use something cleverer. */
+        /* This list is not sorted so go throug it (this is a small list) */
         for( i = p_var->choices.i_count ; i-- ; )
         {
             if( p_var->ops->pf_cmp( *p_val, p_var->choices.p_values[i] ) == 0 )
