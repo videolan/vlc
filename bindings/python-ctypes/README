@@ -44,9 +44,17 @@ c:\Program Files\VideoLAN\VLC ).
 
 - Using wrapper classes:
 
->>> i=vlc.Instance.new()
+>>> import vlc
+>>> i=vlc.Instance('--no-audio', '--fullscreen')
 >>> i.audio_get_volume()
 50
 >>> m=i.media_new('/tmp/foo.avi')
 >>> m.get_mrl()
 '/tmp/foo.avi'
+>>> p=i.media_player_new(m)
+>>> p.play()
+
+or shorter:
+>>> import vlc
+>>> p=vlc.MediaPlayer('/tmp/foo.avi')
+>>> p.play()
