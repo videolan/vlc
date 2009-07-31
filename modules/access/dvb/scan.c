@@ -146,10 +146,9 @@ void scan_Clean( scan_t *p_scan )
 static int ScanDvbCNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
 {
     msg_Dbg( p_scan->p_obj, "Scan index %"PRId64, p_scan->i_index );
-    /* values from dvb-scan utils frequency-files, sorted
-     * by how often they appear, hopefully speedups finding
-     * services */
-    static int frequencies[] = {
+    /* Values taken from dvb-scan utils frequency-files, sorted by how
+     * often they appear. This hopefully speeds up finding services. */
+    static const unsigned short frequencies[] = {
      410, 426, 418, 394, 402, 362,
      370, 354, 346, 442, 434, 386,
      378, 450, 306, 162, 154, 474,
@@ -170,18 +169,15 @@ static int ScanDvbCNextFast( scan_t *p_scan, scan_configuration_t *p_cfg, double
      163, 155, 147, 146, 143, 139,
      131, 123, 121
     };
+    enum { num_frequencies = (sizeof(frequencies)/sizeof(*frequencies)) };
 
-    if( p_scan->i_index < (sizeof(frequencies)/sizeof(int)) )
+    if( p_scan->i_index < num_frequencies )
     {
         p_cfg->i_frequency = 1000000 * ( frequencies[ p_scan->i_index ] );
+        *pf_pos = (double)p_scan->i_index / num_frequencies;
+        return VLC_SUCCESS;
     }
-    else
-    {
-        return VLC_EGENERIC;
-    }
-    *pf_pos = (double)p_scan->i_index / (sizeof(frequencies)/sizeof(int));
-    return VLC_SUCCESS;
-
+    return VLC_EGENERIC;
 }
 
 static int ScanDvbTNextExhaustive( scan_t *p_scan, scan_configuration_t *p_cfg, double *pf_pos )
