@@ -470,12 +470,17 @@ def generate_wrappers(methods):
     for classname, el in itertools.groupby(elements, key=operator.itemgetter(0)):
         print """
 class %(name)s(object):
-    def __init__(self, pointer=None):
+    def __new__(cls, pointer=None):
         '''Internal method used for instanciating wrappers from ctypes.
         '''
         if pointer is None:
             raise Exception("Internal method. You should instanciate objects through other class methods (probably named 'new' or ending with 'new')")
-        self._as_parameter_=ctypes.c_void_p(pointer)
+        if pointer == 0:
+            return None
+        else:
+            o=object.__new__(cls)
+            o._as_parameter_=ctypes.c_void_p(pointer)
+            return o
 
     @staticmethod
     def from_param(arg):
