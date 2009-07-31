@@ -38,7 +38,11 @@ extern "C" {
  *****************************************************************************/
 /** \defgroup libvlc_media_list_view libvlc_media_list_view
  * \ingroup libvlc
- * LibVLC Media List View, represent a media_list using a different layout
+ * LibVLC Media List View: represents a media_list using a different layout.
+ * The layout can be a flat one without hierarchy, a hierarchical one.
+ *
+ * Other type of layout, such as orderer media_list layout could be implemented
+ * with this class.
  * @{ */
 
 /**
@@ -101,51 +105,6 @@ VLC_PUBLIC_API libvlc_media_list_view_t *
     libvlc_media_list_view_children_for_item(  libvlc_media_list_view_t * p_mlv,
                                            libvlc_media_t * p_md,
                                            libvlc_exception_t * p_e );
-
-/**
- * Get index position of media instance in media list view.
- * The function will return the first occurence.
- *
- * \param p_mlv a media list view instance
- * \param p_md media instance
- * \param p_e initialized exception object
- * \return index position in array of p_md
- */
-VLC_PUBLIC_API int
-    libvlc_media_list_view_index_of_item(  libvlc_media_list_view_t * p_mlv,
-                                           libvlc_media_t * p_md,
-                                           libvlc_exception_t * p_e );
-
-/**
- * Insert media instance in media list view at index position
- *
- * \param p_mlv a media list view instance
- * \param p_md media instance
- * \param index position in array where to insert
- * \param p_e initialized exception object
- */
-VLC_PUBLIC_API void
-    libvlc_media_list_view_insert_at_index(  libvlc_media_list_view_t * p_mlv,
-                                             libvlc_media_t * p_md,
-                                             int index,
-                                             libvlc_exception_t * p_e );
-
-/**
- * Remove media instance in media list view from index position
- *
- * \param p_mlv a media list view instance
- * \param index position in array of media instance to remove
- * \param p_e initialized exception object
- */
-VLC_PUBLIC_API void
-    libvlc_media_list_view_remove_at_index(  libvlc_media_list_view_t * p_mlv,
-                                             int index,
-                                             libvlc_exception_t * p_e );
-
-VLC_PUBLIC_API void
-    libvlc_media_list_view_add_item(  libvlc_media_list_view_t * p_mlv,
-                                      libvlc_media_t * p_md,
-                                      libvlc_exception_t * p_e );
 
 VLC_PUBLIC_API libvlc_media_list_t *
     libvlc_media_list_view_parent_media_list(  libvlc_media_list_view_t * p_mlv,
