@@ -103,6 +103,8 @@ class MediaPlayer:
             return o
 
     def get_instance(self):
+        """Return the associated vlc.Instance.
+        """
         return self._instance
 
 class MediaListPlayer:
@@ -131,6 +133,8 @@ class MediaListPlayer:
             return o
 
     def get_instance(self):
+        """Return the associated vlc.Instance.
+        """
         return self._instance
 
 class LogIterator:

@@ -207,7 +207,7 @@ def generate_header(classes=None):
 
 def convert_enum_names(enums):
     res={}
-    for (typ, name, values) in enums:
+    for (typ, name, values, comment) in enums:
         if typ != 'enum':
             raise Exception('This method only handles enums')
         pyname=re.findall('(libvlc|mediacontrol)_(.+?)(_t)?$', name)[0][1]
@@ -219,12 +219,13 @@ def convert_enum_names(enums):
     return res
 
 def generate_enums(enums):
-    for (typ, name, values) in enums:
+    for (typ, name, values, comment) in enums:
         if typ != 'enum':
             raise Exception('This method only handles enums')
         pyname=typ2class[name]
 
         print "class %s(ctypes.c_uint):" % pyname
+        print '    """%s\n    """' % comment
 
         conv={}
         # Convert symbol names
@@ -255,7 +256,7 @@ def parse_typedef(name):
     """Parse include file for typedef expressions.
 
     This generates a tuple for each typedef:
-    (type, name, value_list)
+    (type, name, value_list, comment)
     with type == 'enum' (for the moment) and value_list being a list of (name, value)
     Note that values are string, since this is intended for code generation.
     """
@@ -298,7 +299,9 @@ def parse_typedef(name):
                 else:
                     if l:
                         values.append( (l, str(i)) )
-            yield (typ, name, values)
+            comment=comment.replace('@{', '').replace('@see', 'See').replace('\ingroup', '')
+            yield (typ, name, values, comment)
+            comment=''
 
 def parse_include(name):
     """Parse include file.

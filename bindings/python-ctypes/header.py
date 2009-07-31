@@ -22,6 +22,17 @@
 # Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 #
 
+"""This module provides bindings for the
+U{libvlc<http://wiki.videolan.org/ExternalAPI>} and
+U{MediaControl<http://wiki.videolan.org/MediaControlAPI>} APIs.
+
+You can find documentation at U{http://www.advene.org/download/python-ctypes/}.
+
+Basically, the most important class is L{Instance}, which is used to
+create a libvlc Instance. From this instance, you can then create
+L{MediaPlayer} and L{MediaListPlayer} instances.
+"""
+
 import ctypes
 import sys
 
