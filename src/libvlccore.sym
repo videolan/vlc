@@ -560,7 +560,6 @@ __vlm_New
 __vout_AllocatePicture
 vout_ChromaCmp
 vout_Close
-vout_ControlWindow
 __vout_Create
 vout_CreatePicture
 vout_DestroyPicture
@@ -573,11 +572,12 @@ vout_OSDIcon
 __vout_OSDMessage
 vout_OSDSlider
 vout_PlacePicture
-vout_ReleaseWindow
 __vout_Request
-vout_RequestWindow
 vout_ShowTextAbsolute
 vout_ShowTextRelative
 vout_UnlinkPicture
+vout_window_New
+vout_window_Control
+vout_window_Delete
 __xml_Create
 xml_Delete
