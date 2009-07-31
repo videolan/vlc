@@ -346,6 +346,7 @@ SOURCES_libvlc_common = \
 	input/var.c \
 	video_output/snapshot.c \
 	video_output/snapshot.h \
+	video_output/statistic.h \
 	video_output/video_output.c \
 	video_output/vout_pictures.c \
 	video_output/vout_pictures.h \

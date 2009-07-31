@@ -384,8 +384,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->i_alignment  = 0;
     p_vout->p->render_time  = 10;
     p_vout->p->c_fps_samples = 0;
-    p_vout->p->i_picture_lost = 0;
-    p_vout->p->i_picture_displayed = 0;
+    vout_statistic_Init( &p_vout->p->statistic );
     p_vout->p->b_filter_change = 0;
     p_vout->p->b_paused = false;
     p_vout->p->i_pause_date = 0;
@@ -586,6 +585,9 @@ static void vout_Destructor( vlc_object_t * p_this )
     vlc_mutex_destroy( &p_vout->p->vfilter_lock );
 
     /* */
+    vout_statistic_Clean( &p_vout->p->statistic );
+
+    /* */
     vout_snapshot_Clean( &p_vout->p->snapshot );
 
     /* */
@@ -652,15 +654,8 @@ void vout_ChangePause( vout_thread_t *p_vout, bool b_paused, mtime_t i_date )
 
 void vout_GetResetStatistic( vout_thread_t *p_vout, int *pi_displayed, int *pi_lost )
 {
-    vlc_mutex_lock( &p_vout->change_lock );
-
-    *pi_displayed = p_vout->p->i_picture_displayed;
-    *pi_lost = p_vout->p->i_picture_lost;
-
-    p_vout->p->i_picture_displayed = 0;
-    p_vout->p->i_picture_lost = 0;
-
-    vlc_mutex_unlock( &p_vout->change_lock );
+    vout_statistic_GetReset( &p_vout->p->statistic,
+                             pi_displayed, pi_lost );
 }
 
 void vout_Flush( vout_thread_t *p_vout, mtime_t i_date )
@@ -1052,7 +1047,7 @@ static void* RunThread( void *p_this )
                 /* Picture is late: it will be destroyed and the thread
                  * will directly choose the next picture */
                 vout_UsePictureLocked( p_vout, p_pic );
-                p_vout->p->i_picture_lost++;
+                vout_statistic_Update( &p_vout->p->statistic, 0, 1 );
 
                 msg_Warn( p_vout, "late picture skipped (%"PRId64" > %d)",
                                   current_date - p_pic->date, - p_vout->p->render_time );
@@ -1167,7 +1162,7 @@ static void* RunThread( void *p_this )
         /*
          * Perform rendering
          */
-        p_vout->p->i_picture_displayed++;
+        vout_statistic_Update( &p_vout->p->statistic, 1, 0 );
         p_directbuffer = vout_RenderPicture( p_vout,
                                              p_filtered_picture, p_subpic,
                                              spu_render_time );

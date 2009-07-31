@@ -32,6 +32,7 @@
 
 #include "vout_control.h"
 #include "snapshot.h"
+#include "statistic.h"
 
 /* Number of pictures required to computes the FPS rate */
 #define VOUT_FPS_SAMPLES                20
@@ -72,8 +73,7 @@ struct vout_thread_sys_t
     mtime_t         p_fps_sample[VOUT_FPS_SAMPLES];     /**< FPS samples dates */
 
     /* Statistics */
-    int             i_picture_lost;
-    int             i_picture_displayed;
+    vout_statistic_t statistic;
 
     /* Pause */
     bool            b_paused;
