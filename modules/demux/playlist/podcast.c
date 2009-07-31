@@ -34,12 +34,6 @@
 #include "playlist.h"
 #include <vlc_xml.h>
 
-struct demux_sys_t
-{
-    xml_t *p_xml;
-    xml_reader_t *p_xml_reader;
-};
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -57,9 +51,9 @@ int Import_podcast( vlc_object_t *p_this )
     if( !demux_IsForced( p_demux, "podcast" ) )
         return VLC_EGENERIC;
 
-    STANDARD_DEMUX_INIT_MSG( "using podcast reader" );
-    p_demux->p_sys->p_xml = NULL;
-    p_demux->p_sys->p_xml_reader = NULL;
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    msg_Dbg( p_demux, "using podcast reader" );
 
     return VLC_SUCCESS;
 }
@@ -69,19 +63,12 @@ int Import_podcast( vlc_object_t *p_this )
  *****************************************************************************/
 void Close_podcast( vlc_object_t *p_this )
 {
-    demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    if( p_sys->p_xml_reader ) xml_ReaderDelete( p_sys->p_xml, p_sys->p_xml_reader );
-    if( p_sys->p_xml ) xml_Delete( p_sys->p_xml );
-    free( p_sys );
+    (void)p_this;
 }
 
 /* "specs" : http://phobos.apple.com/static/iTunesRSS.html */
 static int Demux( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-
     bool b_item = false;
     bool b_image = false;
     int i_ret;
@@ -105,18 +92,13 @@ static int Demux( demux_t *p_demux )
 
     INIT_PLAYLIST_STUFF;
 
-    p_xml = p_sys->p_xml = xml_Create( p_demux );
+    p_xml = xml_Create( p_demux );
     if( !p_xml )
         goto error;
-
-/*    psz_elname = stream_ReadLine( p_demux->s );
-    if( psz_elname ) free( psz_elname );
-    psz_elname = 0;*/
 
     p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
     if( !p_xml_reader )
         goto error;
-    p_sys->p_xml_reader = p_xml_reader;
 
     /* xml */
     /* check root node */
@@ -365,6 +347,8 @@ static int Demux( demux_t *p_demux )
     }
 
     free( psz_elname );
+    xml_ReaderDelete( p_xml, p_xml_reader );
+    xml_Delete( p_xml );
 
     HANDLE_PLAY_AND_RELEASE;
     return 0; /* Needed for correct operation of go back */
@@ -382,6 +366,10 @@ error:
     free( psz_item_subtitle );
     free( psz_item_summary );
     free( psz_elname );
+
+    if( p_xml_reader )
+        xml_ReaderDelete( p_xml, p_xml_reader );
+    xml_Delete( p_xml );
 
     HANDLE_PLAY_AND_RELEASE;
     return -1;
