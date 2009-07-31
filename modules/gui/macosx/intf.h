@@ -212,6 +212,7 @@ struct intf_sys_t
     IBOutlet NSMenuItem * o_mi_random;
     IBOutlet NSMenuItem * o_mi_repeat;
     IBOutlet NSMenuItem * o_mi_loop;
+    IBOutlet NSMenuItem * o_mi_quitAfterPB;
     IBOutlet NSMenuItem * o_mi_fwd;
     IBOutlet NSMenuItem * o_mi_bwd;
     IBOutlet NSMenuItem * o_mi_fwd1m;

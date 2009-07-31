@@ -73,6 +73,7 @@
 - (IBAction)repeat:(id)sender;
 - (IBAction)loop:(id)sender;
 - (IBAction)repeatButtonAction:(id)sender;
+- (IBAction)quitAfterPlayback:(id)sender;
 
 /* the three ugly helpers again */
 - (void)repeatOne;

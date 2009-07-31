@@ -661,6 +661,7 @@ static VLCMain *_o_sharedMainInstance = nil;
     [o_mi_random setTitle: _NS("Random")];
     [o_mi_repeat setTitle: _NS("Repeat One")];
     [o_mi_loop setTitle: _NS("Repeat All")];
+    [o_mi_quitAfterPB setTitle: _NS("Quit after Playback")];
     [o_mi_fwd setTitle: _NS("Step Forward")];
     [o_mi_bwd setTitle: _NS("Step Backward")];
 

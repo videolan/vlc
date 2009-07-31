@@ -8,11 +8,11 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="2457"/>
 			<integer value="4375"/>
-			<integer value="2199"/>
+			<integer value="235"/>
 			<integer value="3568"/>
 			<integer value="283"/>
+			<integer value="2199"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -842,6 +842,16 @@
 									<reference key="NSOnImage" ref="464614658"/>
 									<reference key="NSMixedImage" ref="724706907"/>
 								</object>
+								<object class="NSMenuItem" id="963561211">
+									<reference key="NSMenu" ref="816567345"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="464614658"/>
+									<reference key="NSMixedImage" ref="724706907"/>
+								</object>
 								<object class="NSMenuItem" id="1056015920">
 									<reference key="NSMenu" ref="816567345"/>
 									<string key="NSTitle">Repeat Item</string>
@@ -856,6 +866,24 @@
 									<string key="NSTitle">Repeat Playlist</string>
 									<string key="NSKeyEquiv">l</string>
 									<int key="NSKeyEquivModMask">1048576</int>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="464614658"/>
+									<reference key="NSMixedImage" ref="724706907"/>
+								</object>
+								<object class="NSMenuItem" id="634130855">
+									<reference key="NSMenu" ref="816567345"/>
+									<string key="NSTitle">Quit after Playback</string>
+									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="464614658"/>
+									<reference key="NSMixedImage" ref="724706907"/>
+								</object>
+								<object class="NSMenuItem" id="598785014">
+									<reference key="NSMenu" ref="816567345"/>
+									<bool key="NSIsDisabled">YES</bool>
+									<bool key="NSIsSeparator">YES</bool>
+									<string key="NSTitle"/>
+									<string key="NSKeyEquiv"/>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="464614658"/>
 									<reference key="NSMixedImage" ref="724706907"/>
@@ -9146,6 +9174,22 @@ LCAuLi4</string>
 					</object>
 					<int key="connectionID">4535</int>
 				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBActionConnection" key="connection">
+						<string key="label">quitAfterPlayback:</string>
+						<reference key="source" ref="318538144"/>
+						<reference key="destination" ref="634130855"/>
+					</object>
+					<int key="connectionID">4538</int>
+				</object>
+				<object class="IBConnectionRecord">
+					<object class="IBOutletConnection" key="connection">
+						<string key="label">o_mi_quitAfterPB</string>
+						<reference key="source" ref="382099807"/>
+						<reference key="destination" ref="634130855"/>
+					</object>
+					<int key="connectionID">4539</int>
+				</object>
 			</object>
 			<object class="IBMutableOrderedSet" key="objectRecords">
 				<object class="NSArray" key="orderedObjects">
@@ -9726,6 +9770,9 @@ LCAuLi4</string>
 							<reference ref="128133130"/>
 							<reference ref="521340648"/>
 							<reference ref="508315060"/>
+							<reference ref="598785014"/>
+							<reference ref="634130855"/>
+							<reference ref="963561211"/>
 						</object>
 						<reference key="parent" ref="443407942"/>
 					</object>
@@ -12689,6 +12736,21 @@ LCAuLi4</string>
 						<reference key="parent" ref="0"/>
 						<string key="objectName">Sparkle Updater</string>
 					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4536</int>
+						<reference key="object" ref="598785014"/>
+						<reference key="parent" ref="816567345"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4537</int>
+						<reference key="object" ref="634130855"/>
+						<reference key="parent" ref="816567345"/>
+					</object>
+					<object class="IBObjectRecord">
+						<int key="objectID">4540</int>
+						<reference key="object" ref="963561211"/>
+						<reference key="parent" ref="816567345"/>
+					</object>
 				</object>
 			</object>
 			<object class="NSMutableDictionary" key="flattenedProperties">
@@ -13197,6 +13259,7 @@ LCAuLi4</string>
 					<string>3292.ImportedFromIB2</string>
 					<string>333.IBPluginDependency</string>
 					<string>333.ImportedFromIB2</string>
+					<string>334.IBEditorWindowLastContentRect</string>
 					<string>334.IBPluginDependency</string>
 					<string>334.ImportedFromIB2</string>
 					<string>3385.IBPluginDependency</string>
@@ -13560,6 +13623,9 @@ LCAuLi4</string>
 					<string>446.IBPluginDependency</string>
 					<string>446.ImportedFromIB2</string>
 					<string>4533.IBPluginDependency</string>
+					<string>4536.IBPluginDependency</string>
+					<string>4537.IBPluginDependency</string>
+					<string>4540.IBPluginDependency</string>
 					<string>5.IBPluginDependency</string>
 					<string>5.ImportedFromIB2</string>
 					<string>56.IBPluginDependency</string>
@@ -13628,7 +13694,7 @@ LCAuLi4</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
-					<string>{{291, 259}, {200, 173}}</string>
+					<string>{{564, 509}, {200, 173}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -13944,7 +14010,7 @@ LCAuLi4</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
-					<string>{{214, 79}, {255, 353}}</string>
+					<string>{{358, 293}, {255, 393}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -14104,13 +14170,14 @@ LCAuLi4</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
-					<string>{{343, 682}, {468, 20}}</string>
+					<string>{{214, 686}, {468, 20}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
+					<string>{{493, 343}, {198, 343}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -14475,6 +14542,9 @@ LCAuLi4</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
+					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
@@ -14542,7 +14612,7 @@ LCAuLi4</string>
 				</object>
 			</object>
 			<nil key="sourceID"/>
-			<int key="maxID">4535</int>
+			<int key="maxID">4540</int>
 		</object>
 		<object class="IBClassDescriber" key="IBDocument.Classes">
 			<object class="NSMutableArray" key="referencedPartialClassDescriptions">
@@ -14760,6 +14830,7 @@ LCAuLi4</string>
 							<string>next:</string>
 							<string>play:</string>
 							<string>prev:</string>
+							<string>quitAfterPlayback:</string>
 							<string>random:</string>
 							<string>repeat:</string>
 							<string>repeatButtonAction:</string>
@@ -14777,6 +14848,7 @@ LCAuLi4</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
+							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -15253,6 +15325,7 @@ LCAuLi4</string>
 							<string>o_mi_previous</string>
 							<string>o_mi_program</string>
 							<string>o_mi_quit</string>
+							<string>o_mi_quitAfterPB</string>
 							<string>o_mi_random</string>
 							<string>o_mi_readme</string>
 							<string>o_mi_repeat</string>
@@ -15362,6 +15435,7 @@ LCAuLi4</string>
 							<string>id</string>
 							<string>NSProgressIndicator</string>
 							<string>NSTextView</string>
+							<string>NSMenuItem</string>
 							<string>NSMenuItem</string>
 							<string>NSMenuItem</string>
 							<string>NSMenuItem</string>

@@ -379,6 +379,16 @@
     pl_Release( p_intf );
 }
 
+- (IBAction)quitAfterPlayback:(id)sender
+{
+    vlc_value_t val;
+    playlist_t * p_playlist = pl_Hold( VLCIntf );
+    var_Get( p_playlist, "play-and-exit", &val );
+    val.b_bool = !val.b_bool;
+    var_Set( p_playlist, "play-and-exit", val );
+    pl_Release( VLCIntf );
+}
+
 - (IBAction)forward:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
@@ -1050,6 +1060,13 @@
     {
         int i_state;
         var_Get( p_playlist, "loop", &val );
+        i_state = val.b_bool ? NSOnState : NSOffState;
+        [o_mi setState: i_state];
+    }
+    else if( [[o_mi title] isEqualToString: _NS("Quit after Playback")] )
+    {
+        int i_state;
+        var_Get( p_playlist, "play-and-exit", &val );
         i_state = val.b_bool ? NSOnState : NSOffState;
         [o_mi setState: i_state];
     }
