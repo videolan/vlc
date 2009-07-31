@@ -384,6 +384,7 @@ def parse_include(name):
                    method,
                    params,
                    comment)
+            comment=''
 
 def output_ctypes(rtype, method, params, comment):
     """Output ctypes decorator for the given method.
