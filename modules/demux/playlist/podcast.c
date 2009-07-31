@@ -87,6 +87,7 @@ static int Demux( demux_t *p_demux )
     char *psz_item_keywords = NULL;
     char *psz_item_subtitle = NULL;
     char *psz_item_summary = NULL;
+    char *psz_art_url = NULL;
     int i_type;
     input_item_t *p_input;
 
@@ -266,9 +267,17 @@ static int Demux( demux_t *p_demux )
                 }
                 else
                 {
-                    msg_Dbg( p_demux, "unhandled text in element '%s'",
-                              psz_elname );
-                    free( psz_text );
+                    if( !strcmp( psz_elname, "url" ) )
+                    {
+                        free( psz_art_url );
+                        psz_art_url = psz_text;
+                    }
+                    else
+                    {
+                        msg_Dbg( p_demux, "unhandled text in element '%s'",
+                                 psz_elname );
+                        free( psz_text );
+                    }
                 }
                 break;
             }
@@ -305,6 +314,9 @@ static int Demux( demux_t *p_demux )
                     /* Set the duration if available */
                     if( psz_item_duration )
                         input_item_SetDuration( p_input, strTimeToMTime( psz_item_duration ) );
+                    /* Add the global art url to this item, if any */
+                    if( psz_art_url )
+                        input_item_SetArtURL( p_input, psz_art_url );
 
                     if( psz_item_size )
                     {
@@ -346,6 +358,7 @@ static int Demux( demux_t *p_demux )
         msg_Warn( p_demux, "error while parsing data" );
     }
 
+    free( psz_art_url );
     free( psz_elname );
     xml_ReaderDelete( p_xml, p_xml_reader );
     xml_Delete( p_xml );
@@ -365,6 +378,7 @@ error:
     free( psz_item_keywords );
     free( psz_item_subtitle );
     free( psz_item_summary );
+    free( psz_art_url );
     free( psz_elname );
 
     if( p_xml_reader )
