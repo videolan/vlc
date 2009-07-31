@@ -29,12 +29,10 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout.h>
-#include <vlc_window.h>
+#include <vlc_vout_window.h>
 
-static int  OpenXID (vlc_object_t *);
-static int  OpenHWND (vlc_object_t *);
-static void Close (vlc_object_t *);
+static int  Open (vlc_object_t *);
+static void Close(vlc_object_t *);
 
 #define XID_TEXT N_("ID of the video output X window")
 #define XID_LONGTEXT N_( \
@@ -46,20 +44,15 @@ static void Close (vlc_object_t *);
  */
 vlc_module_begin ()
     set_shortname (N_("Drawable"))
-    set_description (N_("Embedded X window video"))
+    set_description (N_("Embedded window video"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("xwindow", 70)
-    set_callbacks (OpenXID, Close)
+    set_capability ("vout window", 70)
+    set_callbacks (Open, Close)
     add_integer ("drawable-xid", 0, NULL, XID_TEXT, XID_LONGTEXT, true)
         change_unsaveable ()
-        /*change_integer_range (0, 0xffffffff)*/
-
-    add_submodule ()
-        set_description (N_("Embedded Windows video"))
-        set_capability ("hwnd", 70)
-        set_callbacks (OpenHWND, Close)
-
+    //add_integer ("drawable-hwnd", 0, NULL, HWN_TEXT, HWND_LONGTEXT, true) /* How to ? */
+    //    change_unsaveable ()
 vlc_module_end ()
 
 static int Control (vout_window_t *, int, va_list);
@@ -76,9 +69,26 @@ static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 /**
  * Find the drawable set by libvlc application.
  */
-static int Open (vlc_object_t *obj, const char *varname, bool ptr)
+static int Open (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
+    const char *varname;
+    bool ptr;
+
+    switch (wnd->cfg->type)
+    {
+    case VOUT_WINDOW_TYPE_XWINDOW:
+        varname = "drawable-xid";
+        ptr = false;
+        break;
+    case VOUT_WINDOW_TYPE_HWND:
+        varname = "drawable-hwnd";
+        ptr = true;
+        break;
+    default:
+        return VLC_EGENERIC;
+    }
+
     void **used, *val;
     size_t n = 0;
 
@@ -135,20 +145,9 @@ skip:
     /* FIXME: get window size (in platform-dependent ways) */
 
     wnd->control = Control;
-    wnd->p_sys = val;
+    wnd->sys = val;
     return VLC_SUCCESS;
 }
-
-static int  OpenXID (vlc_object_t *obj)
-{
-    return Open (obj, "drawable-xid", false);
-}
-
-static int  OpenHWND (vlc_object_t *obj)
-{
-    return Open (obj, "drawable-hwnd", true);
-}
-
 
 /**
  * Release the drawable.
@@ -156,7 +155,7 @@ static int  OpenHWND (vlc_object_t *obj)
 static void Close (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
-    void **used, *val = wnd->p_sys;
+    void **used, *val = wnd->sys;
     size_t n = 0;
 
     /* Remove this drawable from the list of busy ones */
@@ -188,12 +187,12 @@ static int Control (vout_window_t *wnd, int query, va_list ap)
 {
     switch (query)
     {
-        case VOUT_SET_SIZE: /* not allowed */
-        case VOUT_SET_STAY_ON_TOP: /* not allowed either, would be ugly */
+        case VOUT_WINDOW_SET_SIZE:   /* not allowed */
+        case VOUT_WINDOW_SET_ON_TOP: /* not allowed either, would be ugly */
+            return VLC_EGENERIC;
+        default:
+            msg_Warn (wnd, "unsupported control query %d", query);
             return VLC_EGENERIC;
     }
-
-    msg_Warn (wnd, "unsupported control query %d", query);
-    return VLC_EGENERIC;
 }
 
