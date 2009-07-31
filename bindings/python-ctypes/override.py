@@ -2,10 +2,10 @@ class Instance:
     """Create a new Instance instance.
 
     It may take as parameter either:
-     * a string
-     * a list of strings as first parameters
-     * the parameters given as the constructor parameters (must be strings)
-     * a MediaControl instance
+      - a string
+      - a list of strings as first parameters
+      - the parameters given as the constructor parameters (must be strings)
+      - a MediaControl instance
     """
     def __new__(cls, *p):
         if p and p[0] == 0:
@@ -51,10 +51,10 @@ class MediaControl:
     """Create a new MediaControl instance
 
     It may take as parameter either:
-     * a string
-     * a list of strings as first parameters
-     * the parameters given as the constructor parameters (must be strings)
-     * a vlc.Instance
+      - a string
+      - a list of strings as first parameters
+      - the parameters given as the constructor parameters (must be strings)
+      - a vlc.Instance
     """
     def __new__(cls, *p):
         if p and p[0] == 0:
@@ -81,8 +81,8 @@ class MediaPlayer:
     """Create a new MediaPlayer instance.
 
     It may take as parameter either:
-     * a string (media URI). In this case, a vlc.Instance will be created.
-     * a vlc.Instance
+      - a string (media URI). In this case, a vlc.Instance will be created.
+      - a vlc.Instance
     """
     def __new__(cls, *p):
         if p and p[0] == 0:
@@ -109,8 +109,8 @@ class MediaListPlayer:
     """Create a new MediaPlayer instance.
 
     It may take as parameter either:
-     * a vlc.Instance
-     * nothing
+      - a vlc.Instance
+      - nothing
     """
     def __new__(cls, *p):
         if p and p[0] == 0:
