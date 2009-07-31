@@ -30,7 +30,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
-#include <vlc_window.h>
+#include <vlc_vout_window.h>
 
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-banner.h>
@@ -53,7 +53,7 @@ static gboolean should_die         ( gpointer );
 static int      OpenWindow         ( vlc_object_t * );
 static void     CloseWindow        ( vlc_object_t * );
 static int      ControlWindow      ( vout_window_t *, int, va_list );
-static void*    request_video      ( intf_thread_t *, vout_thread_t * );
+static uint32_t request_video      ( intf_thread_t *, vout_thread_t * );
 static void     release_video      ( intf_thread_t * );
 static gboolean video_widget_ready ( gpointer data );
 
@@ -70,7 +70,7 @@ vlc_module_begin();
     add_shortcut( "maemo" );
 
     add_submodule();
-        set_capability( "xwindow", 50 );
+        set_capability( "vout window", 50 );
         set_callbacks( OpenWindow, CloseWindow );
 vlc_module_end();
 
@@ -265,60 +265,74 @@ static int OpenWindow (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
 
-    /* TODO: should probably be in the libvlc core instead: */
-    if (!config_GetInt (obj, "embedded-video"))
+    if (wnd->cfg->type != VOUT_WINDOW_TYPE_XWINDOW ||
+        wnd->cfg->is_standalone)
         return VLC_EGENERIC;
 
-    intf_thread_t *intf = (intf_thread_t *)
-    vlc_object_find_name (obj, "maemo", FIND_ANYWHERE);
+    intf_thread_t *intf = (intf_thread_t*)vlc_object_find_name (obj, "maemo", FIND_ANYWHERE);
     if (intf == NULL)
     {
         msg_Err( obj, "Maemo interface not found" );
         return VLC_EGENERIC; /* Maemo not in use */
     }
 
-    wnd->handle.xid = request_video( intf, wnd->vout );
+    /* FIXME it should NOT be needed */
+    vout_thread_t *vout = vlc_object_find (obj, VLC_OBJECT_VOUT, FIND_PARENT);
+
+    wnd->handle.xid = request_video( intf, vout );
+    if (!wnd->handle.xid)
+    {
+        vlc_object_release( vout );
+        return VLC_EGENERIC;
+    }
+    vlc_object_release( vout );
+
     msg_Dbg( intf, "Using handle %"PRIu32, wnd->handle.xid );
 
     wnd->control = ControlWindow;
-    wnd->p_private = intf;
-
-    // Signaling that the window is not at the requested sizeof
-    int i_width, i_height, i_x_top, i_y_top, i_x, i_y;
-    gdk_drawable_get_size( GDK_DRAWABLE( intf->p_sys->p_video_window->window ),
-                           &i_width, &i_height );
-    gdk_window_get_position( GTK_WIDGET(intf->p_sys->p_main_window)->window,
-                             &i_x_top, &i_y_top );
-    gdk_window_get_position( intf->p_sys->p_video_window->window, &i_x, &i_y );
-
-    wnd->width = i_width;
-    wnd->height = i_height;
-    wnd->pos_x = i_x_top + i_x;
-    wnd->pos_y = i_y_top + i_y;
+    wnd->sys = (vout_window_sys_t*)intf;
 
     return VLC_SUCCESS;
 }
 
 static int ControlWindow (vout_window_t *wnd, int query, va_list args)
 {
-    (void)wnd; (void)query; (void)args;
-    return VLC_EGENERIC;
+    intf_thread_t *intf = (intf_thread_t *)wnd->sys;
+
+    switch( query )
+    {
+    case VOUT_WINDOW_SET_SIZE:
+    {
+        int i_width  = (int)va_arg( args, int );
+        int i_height = (int)va_arg( args, int );
+
+        int i_current_w, i_current_h;
+        gdk_drawable_get_size( GDK_DRAWABLE( intf->p_sys->p_video_window->window ),
+                               &i_current_w, &i_current_h );
+        if( i_width != i_current_w || i_height != i_current_h )
+            return VLC_EGENERIC;
+        return VLC_SUCCESS;
+    }
+    default:
+        return VLC_EGENERIC;
+    }
 }
 
 static void CloseWindow (vlc_object_t *obj)
 {
-    intf_thread_t *intf = (intf_thread_t *)obj->p_private;
+    vout_window_t *wnd = (vout_window_t *)obj;
+    intf_thread_t *intf = (intf_thread_t *)wnd->sys;
 
     release_video( intf );
     vlc_object_release (intf);
 }
 
-static void *request_video( intf_thread_t *p_intf, vout_thread_t *p_nvout )
+static uint32_t request_video( intf_thread_t *p_intf, vout_thread_t *p_nvout )
 {
     if( p_intf->p_sys->p_vout )
     {
         msg_Dbg( p_intf, "Embedded video already in use" );
-        return NULL;
+        return 0;
     }
 
     vlc_mutex_lock( &p_intf->p_sys->p_video_mutex );
@@ -331,13 +345,15 @@ static void *request_video( intf_thread_t *p_intf, vout_thread_t *p_nvout )
 
     vlc_cleanup_run();
 
-    p_intf->p_sys->p_vout = p_nvout;
-    return ( void * )GDK_WINDOW_XID( p_intf->p_sys->p_video_window->window );
+    p_intf->p_sys->p_vout = vlc_object_hold( p_nvout );
+    return GDK_WINDOW_XID( p_intf->p_sys->p_video_window->window );
 }
 
 static void release_video( intf_thread_t *p_intf )
 {
     msg_Dbg( p_intf, "Releasing embedded video" );
+
+    vlc_object_release( p_intf->p_sys->p_vout );
     p_intf->p_sys->p_vout = NULL;
 }
 
