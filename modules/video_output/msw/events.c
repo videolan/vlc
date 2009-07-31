@@ -41,7 +41,7 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
-#include <vlc_window.h>
+#include <vlc_vout_window.h>
 
 #include <windows.h>
 #include <tchar.h>
@@ -420,12 +420,16 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     if( !p_vout->p_sys->b_desktop )
     {
     #endif
+        vout_window_cfg_t wnd_cfg;
+        memset( &wnd_cfg, 0, sizeof(wnd_cfg) );
+        wnd_cfg.type   = VOUT_WINDOW_TYPE_HWND;
+        wnd_cfg.x      = p_vout->p_sys->i_window_x;
+        wnd_cfg.y      = p_vout->p_sys->i_window_y;
+        wnd_cfg.width  = p_vout->p_sys->i_window_width;
+        wnd_cfg.height = p_vout->p_sys->i_window_height;
+
         /* If an external window was specified, we'll draw in it. */
-        p_vout->p_sys->parent_window =
-            vout_RequestHWND( p_vout, &p_vout->p_sys->i_window_x,
-                            &p_vout->p_sys->i_window_y,
-                            &p_vout->p_sys->i_window_width,
-                            &p_vout->p_sys->i_window_height );
+        p_vout->p_sys->parent_window = vout_window_New( VLC_OBJECT(p_vout), NULL, &wnd_cfg );
         if( p_vout->p_sys->parent_window )
             p_vout->p_sys->hparent = p_vout->p_sys->parent_window->handle.hwnd;
     #ifdef MODULE_NAME_IS_direct3d
@@ -621,7 +625,7 @@ static void DirectXCloseWindow( vout_thread_t *p_vout )
     #ifdef MODULE_NAME_IS_direct3d
     if( !p_vout->p_sys->b_desktop )
     #endif
-        vout_ReleaseWindow( p_vout->p_sys->parent_window );
+        vout_window_Delete( p_vout->p_sys->parent_window );
     p_vout->p_sys->hwnd = NULL;
 
     /* We don't unregister the Window Class because it could lead to race
@@ -1108,7 +1112,22 @@ static WINDOWPLACEMENT getWindowState(HWND hwnd)
 static int vaControlParentWindow( vout_thread_t *p_vout, int i_query,
                                    va_list args )
 {
-    return vout_ControlWindow( p_vout->p_sys->parent_window, i_query, args );
+    switch( i_query )
+    {
+    case VOUT_SET_SIZE:
+    {
+        const unsigned i_width  = va_arg(args, unsigned);
+        const unsigned i_height = va_arg(args, unsigned);
+        return vout_window_SetSize( p_vout->p_sys->parent_window, i_width, i_height );
+    }
+    case VOUT_SET_STAY_ON_TOP:
+    {
+        const bool is_on_top = va_arg(args, int);
+        return vout_window_SetOnTop( p_vout->p_sys->parent_window, is_on_top );
+    }
+    default:
+        return VLC_EGENERIC;
+    }
 }
 
 static int ControlParentWindow( vout_thread_t *p_vout, int i_query, ... )
