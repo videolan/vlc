@@ -36,7 +36,7 @@ typedef xcb_atom_t Atom;
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_window.h>
+#include <vlc_vout_window.h>
 
 #include "xcb_vlc.h"
 
@@ -56,7 +56,7 @@ vlc_module_begin ()
     set_description (N_("(Experimental) XCB video window"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("xwindow", 10)
+    set_capability ("vout window", 10)
     set_callbacks (Open, Close)
 
     add_string ("x11-display", NULL, NULL,
@@ -141,10 +141,13 @@ xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
 static int Open (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
-    vout_window_sys_t *p_sys = malloc (sizeof (*p_sys));
     xcb_generic_error_t *err;
     xcb_void_cookie_t ck;
 
+    if (wnd->cfg->type != VOUT_WINDOW_TYPE_XWINDOW)
+        return VLC_EGENERIC;
+
+    vout_window_sys_t *p_sys = malloc (sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
@@ -187,7 +190,7 @@ static int Open (vlc_object_t *obj)
 
     xcb_window_t window = xcb_generate_id (conn);
     ck = xcb_create_window_checked (conn, scr->root_depth, window, scr->root,
-                                    0, 0, wnd->width, wnd->height, 0,
+                                    0, 0, wnd->cfg->width, wnd->cfg->height, 0,
                                     XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                     scr->root_visual, mask, values);
     err = xcb_request_check (conn, ck);
@@ -198,8 +201,8 @@ static int Open (vlc_object_t *obj)
     }
 
     wnd->handle.xid = window;
-    wnd->p_sys = p_sys;
     wnd->control = Control;
+    wnd->sys = p_sys;
 
     p_sys->conn = conn;
     p_sys->keys = CreateKeyHandler (obj, conn);
@@ -273,7 +276,7 @@ error:
 static void Close (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
-    vout_window_sys_t *p_sys = wnd->p_sys;
+    vout_window_sys_t *p_sys = wnd->sys;
     xcb_connection_t *conn = p_sys->conn;
     xcb_window_t window = wnd->handle.xid;
 
@@ -293,7 +296,7 @@ static void Close (vlc_object_t *obj)
 static void *Thread (void *data)
 {
     vout_window_t *wnd = data;
-    vout_window_sys_t *p_sys = wnd->p_sys;
+    vout_window_sys_t *p_sys = wnd->sys;
     xcb_connection_t *conn = p_sys->conn;
 
     int fd = xcb_get_file_descriptor (conn);
@@ -330,12 +333,12 @@ static void *Thread (void *data)
 
 static int Control (vout_window_t *wnd, int cmd, va_list ap)
 {
-    vout_window_sys_t *p_sys = wnd->p_sys;
+    vout_window_sys_t *p_sys = wnd->sys;
     xcb_connection_t *conn = p_sys->conn;
 
     switch (cmd)
     {
-        case VOUT_SET_SIZE:
+        case VOUT_WINDOW_SET_SIZE:
         {
             unsigned width = va_arg (ap, unsigned);
             unsigned height = va_arg (ap, unsigned);
@@ -348,7 +351,7 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
             break;
         }
 
-        case VOUT_SET_STAY_ON_TOP:
+        case VOUT_WINDOW_SET_ON_TOP:
         {   /* From EWMH "_WM_STATE" */
             xcb_client_message_event_t ev = {
                 .response_type = XCB_CLIENT_MESSAGE,

@@ -33,7 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
-#include <vlc_window.h>
+#include <vlc_vout_window.h>
 
 #include "xcb_vlc.h"
 
@@ -296,7 +296,7 @@ static void Close (vlc_object_t *obj)
     vout_thread_t *vout = (vout_thread_t *)obj;
     vout_sys_t *p_sys = vout->p_sys;
 
-    vout_ReleaseWindow (p_sys->embed);
+    vout_window_Delete (p_sys->embed);
     /* colormap and window are garbage-collected by X */
     xcb_disconnect (p_sys->conn);
     free (p_sys);
@@ -447,5 +447,20 @@ HandleParentStructure (vout_thread_t *vout, xcb_connection_t *conn,
 
 static int Control (vout_thread_t *vout, int query, va_list ap)
 {
-    return vout_ControlWindow (vout->p_sys->embed, query, ap);
+    switch (query)
+    {
+    case VOUT_SET_SIZE:
+    {
+        const unsigned width  = va_arg (ap, unsigned);
+        const unsigned height = va_arg (ap, unsigned);
+        return vout_window_SetSize (vout->p_sys->embed, width, height);
+    }
+    case VOUT_SET_STAY_ON_TOP:
+    {
+        const bool is_on_top = va_arg (ap, int);
+        return vout_window_SetOnTop (vout->p_sys->embed, is_on_top);
+    }
+    default:
+        return VLC_EGENERIC;
+    }
 }

@@ -35,7 +35,7 @@
 
 #include <vlc_common.h>
 #include <vlc_vout.h>
-#include <vlc_window.h>
+#include <vlc_vout_window.h>
 
 #include "xcb_vlc.h"
 
@@ -69,8 +69,15 @@ vout_window_t *GetWindow (vout_thread_t *obj,
 {
     /* Get window */
     xcb_window_t root;
-    vout_window_t *wnd = vout_RequestXWindow (obj, &(int){ 0 }, &(int){ 0 },
-                                        &(unsigned){ 0 }, &(unsigned){ 0 });
+    vout_window_cfg_t wnd_cfg;
+
+    memset( &wnd_cfg, 0, sizeof(wnd_cfg) );
+    wnd_cfg.type = VOUT_WINDOW_TYPE_XWINDOW;
+    wnd_cfg.width  = obj->i_window_width;
+    wnd_cfg.height = obj->i_window_height;
+
+    vout_window_t *wnd = vout_window_New (VLC_OBJECT(obj), NULL, &wnd_cfg);
+
     if (wnd == NULL)
     {
         msg_Err (obj, "parent window not available");
@@ -137,7 +144,7 @@ vout_window_t *GetWindow (vout_thread_t *obj,
     return wnd;
 
 error:
-    vout_ReleaseWindow (wnd);
+    vout_window_Delete (wnd);
     return NULL;
 }
 
