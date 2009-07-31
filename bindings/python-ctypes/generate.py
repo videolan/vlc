@@ -418,8 +418,11 @@ def parse_override(name):
     """Parse override definitions file.
 
     It is possible to override methods definitions in classes.
+    
+    It returns a tuple
+    (code, overriden_methods, docstring)
     """
-    res={}
+    code={}
 
     data=[]
     current=None
@@ -429,18 +432,24 @@ def parse_override(name):
         if m:
             # Dump old data
             if current is not None:
-                res[current]="".join(data)
+                code[current]="".join(data)
             current=m.group(1)
             data=[]
             continue
         data.append(l)
-    res[current]="".join(data)
+    code[current]="".join(data)
     f.close()
-    
-    # Not robust wrt. internal methods, but this works for the moment.
-    overriden_methods=dict( (k, re.findall('^\s+def\s+(\w+)', v)) for (k, v) in res.iteritems() )
 
-    return res, overriden_methods
+    docstring={}
+    for k, v in code.iteritems():
+        if v.lstrip().startswith('"""'):
+            # Starting comment. Use it as docstring.
+            dummy, docstring[k], code[k]=v.split('"""', 2)
+
+    # Not robust wrt. internal methods, but this works for the moment.
+    overridden_methods=dict( (k, re.findall('^\s+def\s+(\w+)', v, re.MULTILINE)) for (k, v) in code.iteritems() )
+
+    return code, overridden_methods, docstring
 
 def fix_python_comment(c):
     """Fix comment by removing first and last parameters (self and exception)
@@ -470,11 +479,14 @@ def generate_wrappers(methods):
                        ),
                      key=operator.itemgetter(0))
 
-    overrides, overriden_methods=parse_override('override.py')
+    overrides, overriden_methods, docstring=parse_override('override.py')
 
     for classname, el in itertools.groupby(elements, key=operator.itemgetter(0)):
+        print """class %(name)s(object):""" % {'name': classname}
+        if classname in docstring:
+            print '    """%s\n    """' % docstring[classname]
+
         print """
-class %(name)s(object):
     def __new__(cls, pointer=None):
         '''Internal method used for instanciating wrappers from ctypes.
         '''
