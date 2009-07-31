@@ -207,7 +207,7 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_duplicate( libvlc_media_t * );
  * Read the meta of the media.
  *
  * \param p_meta_desc the media to read
- * \param e_meta_desc the meta to read
+ * \param e_meta the meta to read
  * \param p_e an initialized exception pointer
  * \return the media's meta
  */

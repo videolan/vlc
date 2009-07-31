@@ -227,6 +227,7 @@ VLC_PUBLIC_API void libvlc_media_player_set_agl ( libvlc_media_player_t *p_mi, u
 /**
  * Get the agl handler previously set with libvlc_media_player_set_agl().
  *
+ * \param p_mi the Media Player
  * \return the agl handler or 0 if none where set
  */
 VLC_PUBLIC_API uint32_t libvlc_media_player_get_agl ( libvlc_media_player_t *p_mi );
@@ -355,6 +356,14 @@ VLC_PUBLIC_API int libvlc_media_player_get_chapter( libvlc_media_player_t *, lib
  * \return number of chapters in movie
  */
 VLC_PUBLIC_API int libvlc_media_player_get_chapter_count( libvlc_media_player_t *, libvlc_exception_t *);
+
+/**
+ * Will the player play
+ *
+ * \param p_mi the Media Player
+ * \param p_e an initialized exception pointer
+ * \return boolean
+ */
 VLC_PUBLIC_API int libvlc_media_player_will_play        ( libvlc_media_player_t *, libvlc_exception_t *);
 
 /**

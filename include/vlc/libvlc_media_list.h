@@ -230,8 +230,8 @@ VLC_PUBLIC_API libvlc_media_list_view_t *
                                          libvlc_exception_t * );
 
 VLC_PUBLIC_API libvlc_media_list_view_t *
-    libvlc_media_list_hierarchical_node_view( libvlc_media_list_t *,
-                                              libvlc_exception_t * );
+    libvlc_media_list_hierarchical_node_view( libvlc_media_list_t * p_ml,
+                                              libvlc_exception_t * p_ex);
 
 /**
  * Get libvlc_event_manager from this media list instance.
