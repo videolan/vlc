@@ -160,6 +160,13 @@ static VLCOpen *_o_sharedMainInstance = nil;
     return _o_sharedMainInstance;
 }
 
+- (void)dealloc
+{
+    if( o_file_slave_path )
+        [o_file_slave_path release];
+    [super dealloc];
+}
+
 - (void)awakeFromNib
 {
     [o_panel setTitle: _NS("Open Source")];
@@ -175,6 +182,9 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     [o_file_btn_browse setTitle: _NS("Browse...")];
     [o_file_stream setTitle: _NS("Treat as a pipe rather than as a file")];
+    [o_file_slave_ckbox setTitle: _NS("Play another media synchronously")];
+    [o_file_slave_select_btn setTitle: _NS("Choose...")];
+    [o_file_slave_filename_txt setStringValue: @""];
 
     [o_disc_device_lbl setStringValue: _NS("Device name")];
     [o_disc_title_lbl setStringValue: _NS("Title")];
@@ -409,6 +419,8 @@ static VLCOpen *_o_sharedMainInstance = nil;
                       [[(VLCOutput *)o_sout_options mrl] objectAtIndex: i]]];
             }
         }
+        if( [o_file_slave_ckbox state] && o_file_slave_path )
+           [o_options addObject: [NSString stringWithFormat: @"input-slave=%@", o_file_slave_path]];
         if( [[[o_tabview selectedTabViewItem] label] isEqualToString: _NS("Capture")] )
         {
             if( [[[o_capture_mode_pop selectedItem] title] isEqualToString: _NS("Screen")] )
@@ -484,6 +496,34 @@ static VLCOpen *_o_sharedMainInstance = nil;
 
     [o_panel setFrame: o_win_rect display:YES animate: YES];
     [o_panel displayIfNeeded];
+}
+
+- (IBAction)inputSlaveAction:(id)sender
+{
+    if( sender == o_file_slave_ckbox )
+    {
+        [o_file_slave_select_btn setEnabled: [o_file_slave_ckbox state]];
+        [o_file_slave_filename_txt setStringValue: @""];
+    }
+    else
+    {
+        NSOpenPanel *o_open_panel;
+        o_open_panel = [NSOpenPanel openPanel];
+        [o_open_panel setCanChooseFiles: YES];
+        [o_open_panel setCanChooseDirectories: NO];
+        if( [o_open_panel runModalForDirectory: nil file: nil types: nil] == NSOKButton )
+        {
+            if( o_file_slave_path )
+                [o_file_slave_path release];
+            o_file_slave_path = [[o_open_panel filenames] objectAtIndex: 0];
+            [o_file_slave_path retain];
+            NSFileWrapper *o_file_wrapper;
+            o_file_wrapper = [[NSFileWrapper alloc] initWithPath: [[o_open_panel filenames] objectAtIndex: 0]];
+            [o_file_slave_filename_txt setStringValue: [NSString stringWithFormat: @"\"%@\"", [o_file_wrapper preferredFilename]]];
+        }
+        else
+            [o_file_slave_filename_txt setStringValue: @""];
+    }
 }
 
 - (void)openFileGeneric

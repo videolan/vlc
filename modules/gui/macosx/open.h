@@ -44,6 +44,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_btn_ok;
     IBOutlet id o_btn_cancel;
 
+    /* bottom-line items */
     IBOutlet id o_output_ckbox;
     IBOutlet id o_sout_options;
 
@@ -51,6 +52,9 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
     IBOutlet id o_file_path;
     IBOutlet id o_file_btn_browse;
     IBOutlet id o_file_stream;
+    IBOutlet id o_file_slave_ckbox;
+    IBOutlet id o_file_slave_select_btn;
+    IBOutlet id o_file_slave_filename_txt;
 
     /* open disc */
     IBOutlet id o_disc_type;
@@ -157,6 +161,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 
     BOOL b_autoplay;
     id o_currentCaptureView;
+    NSString *o_file_slave_path;
     intf_thread_t * p_intf;
 }
 
@@ -167,6 +172,7 @@ NSArray *GetEjectableMediaOfClass( const char *psz_class );
 - (void)tabView:(NSTabView *)o_tv didSelectTabViewItem:(NSTabViewItem *)o_tvi;
 - (void)textFieldWasClicked:(NSNotification *)o_notification;
 - (IBAction)expandMRLfieldAction:(id)sender;
+- (IBAction)inputSlaveAction:(id)sender;
 
 - (void)openFileGeneric;
 - (void)openFilePathChanged:(NSNotification *)o_notification;
