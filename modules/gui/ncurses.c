@@ -2137,9 +2137,11 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
             input_thread_t *p_input2 = playlist_CurrentInput( p_playlist );
 
             PL_LOCK;
+            assert( p_item );
+            playlist_item_t *p_current_playing_item = playlist_CurrentPlayingItem(p_playlist);
             if( ( p_node && p_item->p_input == p_node->p_input ) ||
-                        ( !p_node && p_input2 &&
-                          p_item->p_input == playlist_CurrentPlayingItem(p_playlist)->p_input ) )
+                        ( !p_node && p_input2 && p_current_playing_item &&
+                          p_item->p_input == p_current_playing_item->p_input ) )
                 c = '*';
             else if( p_item == p_node || ( p_item != p_node &&
                         PlaylistIsPlaying( p_playlist, p_item ) ) )
