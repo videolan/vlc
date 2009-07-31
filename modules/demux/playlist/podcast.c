@@ -106,14 +106,16 @@ static int Demux( demux_t *p_demux )
     INIT_PLAYLIST_STUFF;
 
     p_xml = p_sys->p_xml = xml_Create( p_demux );
-    if( !p_xml ) return -1;
+    if( !p_xml )
+        goto error;
 
 /*    psz_elname = stream_ReadLine( p_demux->s );
     if( psz_elname ) free( psz_elname );
     psz_elname = 0;*/
 
     p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
-    if( !p_xml_reader ) return -1;
+    if( !p_xml_reader )
+        goto error;
     p_sys->p_xml_reader = p_xml_reader;
 
     /* xml */
@@ -121,7 +123,7 @@ static int Demux( demux_t *p_demux )
     if( xml_ReaderRead( p_xml_reader ) != 1 )
     {
         msg_Err( p_demux, "invalid file (no root node)" );
-        return -1;
+        goto error;
     }
 
     while( xml_ReaderNodeType( p_xml_reader ) == XML_READER_NONE )
@@ -129,7 +131,7 @@ static int Demux( demux_t *p_demux )
         if( xml_ReaderRead( p_xml_reader ) != 1 )
         {
             msg_Err( p_demux, "invalid file (no root node)" );
-            return -1;
+            goto error;
         }
     }
 
@@ -139,8 +141,7 @@ static int Demux( demux_t *p_demux )
     {
         msg_Err( p_demux, "invalid root node %i, %s",
                  xml_ReaderNodeType( p_xml_reader ), psz_elname );
-        free( psz_elname );
-        return -1;
+        goto error;
     }
     FREENULL( psz_elname );
 
@@ -152,15 +153,15 @@ static int Demux( demux_t *p_demux )
         {
             // Error
             case -1:
-                return -1;
-                break;
+                goto error;
 
             case XML_READER_STARTELEM:
             {
                 // Read the element name
                 free( psz_elname );
                 psz_elname = xml_ReaderName( p_xml_reader );
-                if( !psz_elname ) return -1;
+                if( !psz_elname )
+                    goto error;
 
                 if( !strcmp( psz_elname, "item" ) )
                 {
@@ -180,8 +181,7 @@ static int Demux( demux_t *p_demux )
                     {
                         free( psz_name );
                         free( psz_value );
-                        free( psz_elname );
-                        return -1;
+                        goto error;
                     }
 
                     if( !strcmp( psz_elname, "enclosure" ) )
@@ -296,14 +296,14 @@ static int Demux( demux_t *p_demux )
                 // Read the element name
                 free( psz_elname );
                 psz_elname = xml_ReaderName( p_xml_reader );
-                if( !psz_elname ) return -1;
+                if( !psz_elname )
+                    goto error;
                 if( !strcmp( psz_elname, "item" ) )
                 {
                     if( psz_item_mrl == NULL )
                     {
                         msg_Err( p_demux, "invalid XML (no enclosure markup)" );
-                        free( psz_elname );
-                        return -1;
+                        goto error;
                     }
                     p_input = input_item_New( p_demux, psz_item_mrl, psz_item_name );
                     if( p_input == NULL ) break;
@@ -368,6 +368,23 @@ static int Demux( demux_t *p_demux )
 
     HANDLE_PLAY_AND_RELEASE;
     return 0; /* Needed for correct operation of go back */
+
+error:
+    free( psz_item_name );
+    free( psz_item_mrl );
+    free( psz_item_size );
+    free( psz_item_type );
+    free( psz_item_date );
+    free( psz_item_author );
+    free( psz_item_category );
+    free( psz_item_duration );
+    free( psz_item_keywords );
+    free( psz_item_subtitle );
+    free( psz_item_summary );
+    free( psz_elname );
+
+    HANDLE_PLAY_AND_RELEASE;
+    return -1;
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )
