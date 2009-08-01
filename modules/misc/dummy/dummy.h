@@ -26,8 +26,6 @@
  *****************************************************************************/
 int  OpenIntf     ( vlc_object_t * );
 
-int  OpenAccess   ( vlc_object_t * );
-
 int  OpenDemux    ( vlc_object_t * );
 void CloseDemux   ( vlc_object_t * );
 

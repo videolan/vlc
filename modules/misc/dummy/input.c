@@ -31,86 +31,11 @@
 
 #include <vlc_common.h>
 #include <vlc_interface.h>
-#include <vlc_access.h>
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 
 #include "dummy.h"
 
-/*****************************************************************************
- * Access functions.
- *****************************************************************************/
-static ssize_t AccessRead( access_t *p_access, uint8_t *p, size_t i_size )
-{
-    VLC_UNUSED(p_access);
-    memset( p, 0, i_size );
-    return i_size;
-}
-static int AccessControl( access_t *p_access, int i_query, va_list args )
-{
-    bool        *pb_bool;
-    int64_t     *pi_64;
-
-    switch( i_query )
-    {
-        /* */
-        case ACCESS_CAN_SEEK:
-        case ACCESS_CAN_FASTSEEK:
-        case ACCESS_CAN_PAUSE:
-        case ACCESS_CAN_CONTROL_PACE:
-            pb_bool = (bool*)va_arg( args, bool* );
-            *pb_bool = false;
-            break;
-
-        /* */
-        case ACCESS_GET_PTS_DELAY:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
-            *pi_64 = DEFAULT_PTS_DELAY * 1000;
-            break;
-
-        /* */
-        case ACCESS_SET_PAUSE_STATE:
-        case ACCESS_GET_TITLE_INFO:
-        case ACCESS_GET_META:
-        case ACCESS_SET_TITLE:
-        case ACCESS_SET_SEEKPOINT:
-            return VLC_EGENERIC;
-
-        default:
-            msg_Err( p_access, "unimplemented query in control" );
-            return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
-int OpenAccess( vlc_object_t *p_this )
-{
-    access_t *p_access = (access_t*)p_this;
-
-    /* Init p_access */
-    p_access->pf_read = AccessRead;
-    p_access->pf_block = NULL;
-    p_access->pf_seek = NULL;
-    p_access->pf_control = AccessControl;
-    p_access->info.i_update = 0;
-    p_access->info.i_size = 0;
-    p_access->info.i_pos = 0;
-    p_access->info.b_eof = false;
-    p_access->info.i_title = 0;
-    p_access->info.i_seekpoint = 0;
-    p_access->p_sys = NULL;
-
-    /* Force dummy demux plug-in */
-    free( p_access->psz_demux );
-    p_access->psz_demux = strdup( "vlc" );
-
-    return VLC_SUCCESS;
-}
-
-
-/*****************************************************************************
- * Demux
- *****************************************************************************/
 static int DemuxControl( demux_t *, int, va_list );
 
 static int DemuxNoOp( demux_t *demux )
@@ -191,7 +116,6 @@ void CloseDemux ( vlc_object_t *p_this )
 
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 {
-    return demux_vaControlHelper( p_demux->s,
-                                   0, 0, 0, 1,
-                                   i_query, args );
+    (void)p_demux; (void)i_query; (void)args;
+    return VLC_EGENERIC;
 }
