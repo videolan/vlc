@@ -194,7 +194,7 @@ libvlc_la_LIBADD = `$(VLC_CONFIG) -libs libvlc` \
 	libvlccore.la ../compat/libcompat.la
 libvlc_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 libvlc_la_LDFLAGS = $(AM_LDFLAGS) `$(VLC_CONFIG) --ldflags libvlc` \
-	-version-info 6:0:0 \
+	-version-info 5:0:0 \
 	-export-symbols $(srcdir)/libvlc.sym
 libvlc_la_DEPENDENCIES = libvlc.sym libvlccore.la
 if HAVE_WIN32
