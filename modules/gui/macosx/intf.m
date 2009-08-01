@@ -34,7 +34,6 @@
 #include <vlc_keys.h>
 #include <vlc_dialog.h>
 #include <unistd.h> /* execl() */
-#import <vlc_dialog.h>
 
 #import "intf.h"
 #import "fspanel.h"
