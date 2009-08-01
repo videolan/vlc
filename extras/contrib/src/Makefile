@@ -2561,6 +2561,9 @@ gsm: gsm-$(GSM_VERSION).tar.gz
 ifneq ($(HOST),$(BUILD))
 	(patch -p0 < Patches/gsm-cross.patch)
 endif
+ifdef HAVE_DARWIN_OS
+	(cd $@; sed -e 's%-O2%-O2\ $(EXTRA_CFLAGS)\ $(EXTRA_LDFLAGS)%' -e 's%# LDFLAGS 	=%LDFLAGS 	= $(EXTRA_LDFLAGS)%' -e 's%gcc%$(CC)%' -i.orig  Makefile)
+endif
 
 .gsm: gsm
 	(cd $<; $(HOSTCC) make && cp inc/gsm.h $(PREFIX)/include && cp lib/libgsm.a  $(PREFIX)/lib)
