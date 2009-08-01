@@ -668,7 +668,7 @@ static int InitWindow( vout_thread_t *p_vout )
         vout_window_cfg_t wnd_cfg;
 
         memset( &wnd_cfg, 0, sizeof(wnd_cfg) );
-        wnd_cfg.type   = VOUT_WINDOW_TYPE_XWINDOW;
+        wnd_cfg.type   = VOUT_WINDOW_TYPE_XID;
         wnd_cfg.x      = p_sys->embedded_window.i_x;
         wnd_cfg.y      = p_sys->embedded_window.i_y;
         wnd_cfg.width  = p_sys->embedded_window.i_width;

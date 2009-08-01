@@ -47,7 +47,7 @@ vlc_module_begin ()
     set_description (N_("Embedded window video"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout window", 70)
+    set_capability ("vout window xid", 70)
     set_callbacks (Open, Close)
     add_integer ("drawable-xid", 0, NULL, XID_TEXT, XID_LONGTEXT, true)
         change_unsaveable ()
@@ -77,7 +77,7 @@ static int Open (vlc_object_t *obj)
 
     switch (wnd->cfg->type)
     {
-    case VOUT_WINDOW_TYPE_XWINDOW:
+    case VOUT_WINDOW_TYPE_XID:
         varname = "drawable-xid";
         ptr = false;
         break;

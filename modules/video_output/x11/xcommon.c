@@ -1612,7 +1612,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
     {
         vout_window_cfg_t wnd_cfg;
         memset( &wnd_cfg, 0, sizeof(wnd_cfg) );
-        wnd_cfg.type   = VOUT_WINDOW_TYPE_XWINDOW;
+        wnd_cfg.type   = VOUT_WINDOW_TYPE_XID;
         wnd_cfg.x      = p_win->i_x;
         wnd_cfg.y      = p_win->i_y;
         wnd_cfg.width  = p_win->i_width;

@@ -56,7 +56,7 @@ vlc_module_begin ()
     set_description (N_("(Experimental) XCB video window"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout window", 10)
+    set_capability ("vout window xid", 10)
     set_callbacks (Open, Close)
 
     add_string ("x11-display", NULL, NULL,
@@ -143,9 +143,6 @@ static int Open (vlc_object_t *obj)
     vout_window_t *wnd = (vout_window_t *)obj;
     xcb_generic_error_t *err;
     xcb_void_cookie_t ck;
-
-    if (wnd->cfg->type != VOUT_WINDOW_TYPE_XWINDOW)
-        return VLC_EGENERIC;
 
     vout_window_sys_t *p_sys = malloc (sizeof (*p_sys));
     if (p_sys == NULL)

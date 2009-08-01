@@ -70,7 +70,7 @@ vlc_module_begin();
     add_shortcut( "maemo" );
 
     add_submodule();
-        set_capability( "vout window", 50 );
+        set_capability( "vout window xid", 50 );
         set_callbacks( OpenWindow, CloseWindow );
 vlc_module_end();
 
@@ -265,8 +265,7 @@ static int OpenWindow (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
 
-    if (wnd->cfg->type != VOUT_WINDOW_TYPE_XWINDOW ||
-        wnd->cfg->is_standalone)
+    if (wnd->cfg->is_standalone)
         return VLC_EGENERIC;
 
     intf_thread_t *intf = (intf_thread_t*)vlc_object_find_name (obj, "maemo", FIND_ANYWHERE);

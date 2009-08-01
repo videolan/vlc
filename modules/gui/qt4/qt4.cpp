@@ -243,7 +243,11 @@ vlc_module_begin ()
 
 #if defined(Q_WS_X11) || defined(WIN32)
     add_submodule ()
-        set_capability( "vout window", 50 )
+#if defined(Q_WS_X11)
+        set_capability( "vout window xid", 50 )
+#elif defined(WIN32)
+        set_capability( "vout window hwnd", 50 )
+#endif
         set_callbacks( WindowOpen, WindowClose )
 #endif
 
@@ -517,14 +521,6 @@ static int WindowControl( vout_window_t *, int i_query, va_list );
 static int WindowOpen( vlc_object_t *p_obj )
 {
     vout_window_t *p_wnd = (vout_window_t*)p_obj;
-
-    /* Check compatibility */
-#if defined (Q_WS_X11)
-    if( p_wnd->cfg->type != VOUT_WINDOW_TYPE_XWINDOW )
-#elif defined (WIN32)
-    if( p_wnd->cfg->type != VOUT_WINDOW_TYPE_HWND )
-#endif
-        return VLC_EGENERIC;
 
     /* */
     if( p_wnd->cfg->is_standalone )

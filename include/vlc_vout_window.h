@@ -41,7 +41,7 @@ typedef struct vout_window_sys_t vout_window_sys_t;
  * Window handle type
  */
 enum {
-    VOUT_WINDOW_TYPE_XWINDOW,
+    VOUT_WINDOW_TYPE_XID,
     VOUT_WINDOW_TYPE_HWND,
 };
 
