@@ -56,6 +56,7 @@ Bill <wenwuangel at hotmail .com> - memleak fixes
 Bill Eldridge <bill at rfa.org> - documentation
 Bill C. Riemers <briemers+git@redhat.com> - http access fixes
 Bob Maguire <maguirer at rjmaguire dot com> - addition of some controls to the OSX interface
+Branko Kokanovic - mirror video filter
 Brian C. Wiles - vlm schedule date fix
 Brian Johnson <brijohn@gmail.com> - interface fix
 Brian Raymond <braymond at echostorm dot net> - Quicktime 404 error on RTSP SETUP fix
