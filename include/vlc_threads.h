@@ -129,7 +129,6 @@ struct vlc_timer_t
 typedef struct
 {
     HANDLE handle;
-    void  *result;
 #if defined( UNDER_CE )
     HANDLE cancel_event;
 #endif

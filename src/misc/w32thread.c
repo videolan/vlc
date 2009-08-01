@@ -427,7 +427,7 @@ static unsigned __stdcall vlc_entry (void *p)
 #endif
 
     vlc_threadvar_set (cancel_key, &cancel_data);
-    data.handle->result = data.func (data.data);
+    data.func (data.data);
     return 0;
 }
 
@@ -505,8 +505,7 @@ void vlc_join (vlc_thread_t handle, void **result)
                                                         == WAIT_IO_COMPLETION);
 
     CloseHandle (handle->handle);
-    if (result)
-        *result = handle->result;
+    assert (result == NULL); /* <- FIXME if ever needed */
 #ifdef UNDER_CE
     CloseHandle (handle->cancel_event);
 #endif
