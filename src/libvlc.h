@@ -58,6 +58,9 @@ vlc_list_t *vlc_list_find( vlc_object_t *, int, int );
  * Threads subsystem
  */
 
+/* This cannot be used as is from plugins: */
+void vlc_detach (vlc_thread_t);
+
 /* Hopefully, no need to export this. There is a new thread API instead. */
 void vlc_thread_cancel (vlc_object_t *);
 int vlc_object_waitpipe (vlc_object_t *obj);

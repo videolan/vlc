@@ -589,15 +589,37 @@ void vlc_cancel (vlc_thread_t thread_id)
  * occur.
  * @warning
  * A thread cannot join itself (normally VLC will abort if this is attempted).
+ * Also, a detached thread <b>cannot</b> be joined.
  *
  * @param handle thread handle
  * @param p_result [OUT] pointer to write the thread return value or NULL
- * @return 0 on success, a standard error code otherwise.
  */
 void vlc_join (vlc_thread_t handle, void **result)
 {
     int val = pthread_join (handle, result);
     VLC_THREAD_ASSERT ("joining thread");
+}
+
+/**
+ * Detaches a thread. When the specified thread completes, it will be
+ * automatically destroyed (in particular, its stack will be reclaimed),
+ * instead of waiting for another thread to call vlc_join(). If the thread has
+ * already completed, it will be destroyed immediately.
+ *
+ * When a thread performs some work asynchronously and may complete much
+ * earlier than it can be joined, detaching the thread can save memory.
+ * However, care must be taken that any resources used by a detached thread
+ * remains valid until the thread completes. This will typically involve some
+ * kind of thread-safe signaling.
+ *
+ * A thread may detach itself.
+ *
+ * @param handle thread handle
+ */
+void vlc_detach (vlc_thread_t handle)
+{
+    int val = pthread_detach (handle);
+    VLC_THREAD_ASSERT ("detaching thread");
 }
 
 /**

@@ -497,6 +497,10 @@ void vlc_join (vlc_thread_t handle, void **result)
 #endif
 }
 
+void vlc_detach (vlc_thread_t handle)
+{
+    CloseHandle (handle);
+}
 
 /*** Thread cancellation ***/
 
