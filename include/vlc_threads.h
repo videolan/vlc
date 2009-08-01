@@ -126,13 +126,7 @@ struct vlc_timer_t
 };
 
 #elif defined( WIN32 )
-typedef struct
-{
-    HANDLE handle;
-#if defined( UNDER_CE )
-    HANDLE cancel_event;
-#endif
-} *vlc_thread_t;
+typedef HANDLE vlc_thread_t;
 
 typedef struct
 {

@@ -409,9 +409,8 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
 
 struct vlc_entry_data
 {
-    vlc_thread_t handle;
-    void *     (*func) (void *);
-    void *       data;
+    void * (*func) (void *);
+    void *  data;
 };
 
 static unsigned __stdcall vlc_entry (void *p)
@@ -439,18 +438,10 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
      * memory leaks and the signal functions not working (see Microsoft
      * Knowledge Base, article 104641) */
     HANDLE hThread;
-    vlc_thread_t th = malloc (sizeof (*th));
-
-    if (th == NULL)
-        return ENOMEM;
 
     struct vlc_entry_data *entry_data = malloc (sizeof (*entry_data));
     if (entry_data == NULL)
-    {
-        free (th);
         return ENOMEM;
-    }
-    entry_data->handle = th;
     entry_data->func = entry;
     entry_data->data = data;
 
@@ -458,7 +449,6 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
     th->cancel_event = CreateEvent (NULL, FALSE, FALSE, NULL);
     if (th->cancel_event == NULL)
     {
-        free(th);
         free (entry_data);
         return errno;
     }
@@ -474,11 +464,10 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         /* Thread closes the handle when exiting, duplicate it here
          * to be on the safe side when joining. */
         if (!DuplicateHandle (GetCurrentProcess (), hThread,
-                              GetCurrentProcess (), &th->handle, 0, FALSE,
+                              GetCurrentProcess (), p_handle, 0, FALSE,
                               DUPLICATE_SAME_ACCESS))
         {
             CloseHandle (hThread);
-            free (th);
             free (entry_data);
             return ENOMEM;
         }
@@ -489,11 +478,8 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         ResumeThread (hThread);
         if (priority)
             SetThreadPriority (hThread, priority);
-
-        *p_handle = th;
         return 0;
     }
-    free (th);
     return errno;
 }
 
@@ -501,15 +487,14 @@ void vlc_join (vlc_thread_t handle, void **result)
 {
     do
         vlc_testcancel ();
-    while (WaitForSingleObjectEx (handle->handle, INFINITE, TRUE)
+    while (WaitForSingleObjectEx (handle, INFINITE, TRUE)
                                                         == WAIT_IO_COMPLETION);
 
-    CloseHandle (handle->handle);
+    CloseHandle (handle);
     assert (result == NULL); /* <- FIXME if ever needed */
 #ifdef UNDER_CE
     CloseHandle (handle->cancel_event);
 #endif
-    free (handle);
 }
 
 
@@ -525,7 +510,7 @@ static void CALLBACK vlc_cancel_self (ULONG_PTR dummy)
 void vlc_cancel (vlc_thread_t thread_id)
 {
 #ifndef UNDER_CE
-    QueueUserAPC (vlc_cancel_self, thread_id->handle, 0);
+    QueueUserAPC (vlc_cancel_self, thread_id, 0);
 #else
     SetEvent (thread_id->cancel_event);
 #endif
