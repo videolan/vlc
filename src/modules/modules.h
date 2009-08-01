@@ -28,6 +28,7 @@
 #ifndef __LIBVLC_MODULES_H
 # define __LIBVLC_MODULES_H 1
 
+
 /* Number of tries before we unload an unused module */
 #define MODULE_HIDE_DELAY 50
 
@@ -75,7 +76,7 @@ struct module_cache_t
 #define MODULE_SHORTCUT_MAX 50
 
 /* The module handle type. */
-#if defined(HAVE_DL_DYLD) && !defined(__x86_64__)
+#if defined(HAVE_DL_DYLD)
 #   if defined (HAVE_MACH_O_DYLD_H)
 #       include <mach-o/dyld.h>
 #   endif

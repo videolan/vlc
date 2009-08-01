@@ -1395,10 +1395,7 @@ static void DeleteModule( module_bank_t *p_bank, module_t * p_module )
     {
         if( p_module->b_loaded && p_module->b_unloadable )
         {
-            #if defined( __APPLE__ ) && defined ( __x86_64__ )
-                if( strcmp( p_module->psz_object_name, "macosx" ) )
-            #endif
-                module_Unload( p_module->handle );
+            module_Unload( p_module->handle );
         }
         UndupModule( p_module );
         free( p_module->psz_filename );
