@@ -791,7 +791,7 @@ if test "${ac_cv_have_plugins}" = "no"; then
 fi
 
 # Only test for dlopen() if the others didn't work
-if test "${ac_cv_have_plugins}" = "no"; then
+if test "${ac_cv_have_plugins}" = "no" -o "${SYS}" = "darwin"; then
   AC_CHECK_HEADERS(dlfcn.h sys/dl.h)
   ac_cv_my_have_dlopen=no
   AC_CHECK_FUNC(dlopen,
