@@ -298,7 +298,9 @@ static int Create( vlc_object_t *p_this )
 
 #ifdef HAVE_FONTCONFIG
     FcPattern     *fontpattern = NULL, *fontmatch = NULL;
-    FcResult       fontresult = FcResultNoMatch;
+    /* Initialise result to Match, as fontconfig doesnt
+     * really set this other than some error-cases */
+    FcResult       fontresult = FcResultMatch;
 #endif
 
 
@@ -362,6 +364,9 @@ static int Create( vlc_object_t *p_this )
         goto error;
     FcDefaultSubstitute( fontpattern );
 
+    /* testing fontresult here doesn't do any good really, but maybe it will
+     * in future as fontconfig code doesn't set it in all cases and just
+     * returns NULL or doesn't set to to Match on all Match cases.*/
     fontmatch = FcFontMatch( NULL, fontpattern, &fontresult );
     if( !fontmatch || fontresult == FcResultNoMatch )
         goto error;
