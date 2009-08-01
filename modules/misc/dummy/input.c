@@ -33,6 +33,7 @@
 #include <vlc_interface.h>
 #include <vlc_access.h>
 #include <vlc_demux.h>
+#include <vlc_charset.h>
 
 #include "dummy.h"
 
@@ -118,6 +119,7 @@ struct demux_sys_t
     /* Used for the pause command */
     mtime_t expiration;
 };
+
 enum
 {
     COMMAND_NOP  = 0,
@@ -139,7 +141,6 @@ int OpenDemux ( vlc_object_t *p_this )
 
     int i_len = strlen( psz_name );
     demux_sys_t *p_sys;
-    int   i_arg;
 
     p_demux->pf_demux   = Demux;
     p_demux->pf_control = DemuxControl;
@@ -164,10 +165,10 @@ int OpenDemux ( vlc_object_t *p_this )
     /* Check for a "vlc://pause:***" command */
     if( i_len > 6 && !strncasecmp( psz_name, "pause:", 6 ) )
     {
-        i_arg = atoi( psz_name + 6 );
-        msg_Info( p_demux, "command `pause %i'", i_arg );
+        double f = us_atof( psz_name + 6 );
+        msg_Info( p_demux, "command `pause %f'", f );
         p_sys->i_command = COMMAND_PAUSE;
-        p_sys->expiration = mdate() + (mtime_t)i_arg * (mtime_t)1000000;
+        p_sys->expiration = mdate() + f * (mtime_t)1000000;
         return VLC_SUCCESS;
     }
  
