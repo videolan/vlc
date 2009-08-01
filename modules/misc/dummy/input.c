@@ -111,25 +111,25 @@ int OpenAccess( vlc_object_t *p_this )
 /*****************************************************************************
  * Demux
  *****************************************************************************/
-struct demux_sys_t
-{
-    /* The real command */
-    int i_command;
-
-    /* Used for the pause command */
-    mtime_t expiration;
-};
-
-enum
-{
-    COMMAND_NOP  = 0,
-    COMMAND_QUIT = 1,
-    COMMAND_PAUSE= 3,
-};
-
-static int Demux( demux_t * );
 static int DemuxControl( demux_t *, int, va_list );
 
+static int DemuxNoOp( demux_t *demux )
+{
+    (void) demux;
+    return 0;
+}
+
+static int DemuxPause( demux_t *demux )
+{
+    const mtime_t *p_end = (void *)demux->p_sys;
+    mtime_t now = mdate();
+
+    if( now >= *p_end )
+        return 0;
+
+    msleep( 10000 ); /* FIXME!!! */
+    return 1;
+}
 
 /*****************************************************************************
  * OpenDemux: initialize the target, ie. parse the command
@@ -139,42 +139,43 @@ int OpenDemux ( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t*)p_this;
     char * psz_name = p_demux->psz_path;
 
-    int i_len = strlen( psz_name );
-    demux_sys_t *p_sys;
-
-    p_demux->pf_demux   = Demux;
     p_demux->pf_control = DemuxControl;
-    p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
+    p_demux->p_sys = NULL;
 
     /* Check for a "vlc://nop" command */
-    if( i_len == 3 && !strncasecmp( psz_name, "nop", 3 ) )
+    if( !strcasecmp( psz_name, "nop" ) )
     {
         msg_Info( p_demux, "command `nop'" );
-        p_sys->i_command = COMMAND_NOP;
+        p_demux->pf_demux = DemuxNoOp;
         return VLC_SUCCESS;
     }
 
     /* Check for a "vlc://quit" command */
-    if( i_len == 4 && !strncasecmp( psz_name, "quit", 4 ) )
+    if( !strcasecmp( psz_name, "quit" ) )
     {
         msg_Info( p_demux, "command `quit'" );
-        p_sys->i_command = COMMAND_QUIT;
+        p_demux->pf_demux = DemuxNoOp;
+        libvlc_Quit( p_demux->p_libvlc );
         return VLC_SUCCESS;
     }
 
     /* Check for a "vlc://pause:***" command */
-    if( i_len > 6 && !strncasecmp( psz_name, "pause:", 6 ) )
+    if( !strncasecmp( psz_name, "pause:", 6 ) )
     {
         double f = us_atof( psz_name + 6 );
+        mtime_t end = mdate() + f * (mtime_t)1000000;
+
         msg_Info( p_demux, "command `pause %f'", f );
-        p_sys->i_command = COMMAND_PAUSE;
-        p_sys->expiration = mdate() + f * (mtime_t)1000000;
+        p_demux->pf_demux = DemuxPause;
+
+        p_demux->p_sys = malloc( sizeof( end ) );
+        if( p_demux->p_sys == NULL )
+            return VLC_ENOMEM;
+        memcpy( p_demux->p_sys, &end, sizeof( end ) );
         return VLC_SUCCESS;
     }
  
     msg_Err( p_demux, "unknown command `%s'", psz_name );
-
-    free( p_sys );
     return VLC_EGENERIC;
 }
 
@@ -186,37 +187,6 @@ void CloseDemux ( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t*)p_this;
 
     free( p_demux->p_sys );
-}
-
-/*****************************************************************************
- * Demux: do what the command says
- *****************************************************************************/
-static int Demux( demux_t *p_demux )
-{
-    demux_sys_t *p_sys = p_demux->p_sys;
-    bool b_eof = false;
-
-    switch( p_sys->i_command )
-    {
-        case COMMAND_QUIT:
-            b_eof = true;
-            libvlc_Quit( p_demux->p_libvlc );
-            break;
-
-        case COMMAND_PAUSE:
-            if( mdate() >= p_sys->expiration )
-                b_eof = true;
-            else
-                msleep( 10000 );
-            break;
- 
-        case COMMAND_NOP:
-        default:
-            b_eof = true;
-            break;
-    }
-
-    return b_eof ? 0 : 1;
 }
 
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
