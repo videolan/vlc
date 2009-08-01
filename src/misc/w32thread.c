@@ -407,16 +407,27 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
     (void) p_libvlc;
 }
 
-static unsigned __stdcall vlc_entry (void *data)
+struct vlc_entry_data
+{
+    vlc_thread_t handle;
+    void *     (*func) (void *);
+    void *       data;
+};
+
+static unsigned __stdcall vlc_entry (void *p)
 {
     vlc_cancel_t cancel_data = VLC_CANCEL_INIT;
-    vlc_thread_t self = data;
+    struct vlc_entry_data data;
+
+    memcpy (&data, p, sizeof (data));
+    free (p);
+
 #ifdef UNDER_CE
-    cancel_data.cancel_event = self->cancel_event;
+    cancel_data.cancel_event = data.handle->cancel_event;
 #endif
 
     vlc_threadvar_set (cancel_key, &cancel_data);
-    self->data = self->entry (self->data);
+    data.handle->result = data.func (data.data);
     return 0;
 }
 
@@ -433,19 +444,28 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
     if (th == NULL)
         return ENOMEM;
 
-    th->data = data;
-    th->entry = entry;
+    struct vlc_entry_data *entry_data = malloc (sizeof (*entry_data));
+    if (entry_data == NULL)
+    {
+        free (th);
+        return ENOMEM;
+    }
+    entry_data->handle = th;
+    entry_data->func = entry;
+    entry_data->data = data;
+
 #if defined( UNDER_CE )
     th->cancel_event = CreateEvent (NULL, FALSE, FALSE, NULL);
     if (th->cancel_event == NULL)
     {
         free(th);
+        free (entry_data);
         return errno;
     }
-    hThread = CreateThread (NULL, 128*1024, vlc_entry, th, CREATE_SUSPENDED, NULL);
+    hThread = CreateThread (NULL, 128*1024, vlc_entry, entry_data, CREATE_SUSPENDED, NULL);
 #else
     hThread = (HANDLE)(uintptr_t)
-        _beginthreadex (NULL, 0, vlc_entry, th, CREATE_SUSPENDED, NULL);
+        _beginthreadex (NULL, 0, vlc_entry, entry_data, CREATE_SUSPENDED, NULL);
 #endif
 
     if (hThread)
@@ -459,6 +479,7 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         {
             CloseHandle (hThread);
             free (th);
+            free (entry_data);
             return ENOMEM;
         }
 #else
@@ -485,7 +506,7 @@ void vlc_join (vlc_thread_t handle, void **result)
 
     CloseHandle (handle->handle);
     if (result)
-        *result = handle->data;
+        *result = handle->result;
 #ifdef UNDER_CE
     CloseHandle (handle->cancel_event);
 #endif
