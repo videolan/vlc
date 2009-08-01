@@ -96,9 +96,6 @@ static int Control (demux_t *, int, va_list);
 
 struct demux_sys_t
 {
-    /* WARNING: Control() is concurrent with Thread()/Demux().
-     * Currently, the thread owns everything in read/write, if it exists.
-     * We destroy it on pause, and re-create it on resume. */
     xcb_connection_t *conn;
     es_out_id_t      *es;
     es_format_t       fmt;
@@ -106,8 +103,9 @@ struct demux_sys_t
     xcb_window_t      root, window;
     int16_t           x, y;
     uint16_t          w, h;
-
-    /* Timer does not use this, only input threa: */
+    /* fmt, es and pts are protected by the lock. The rest is read-only. */
+    vlc_mutex_t       lock;
+    /* Timer does not use this, only input thread: */
     vlc_timer_t       timer;
 };
 
@@ -243,6 +241,7 @@ static int Open (vlc_object_t *obj)
     p_sys->fmt.video.i_frame_rate_base = 1000;
     p_sys->es = NULL;
     p_sys->pts = VLC_TS_INVALID;
+    vlc_mutex_init (&p_sys->lock);
     if (vlc_timer_create (&p_sys->timer, Demux, demux))
         goto error;
     vlc_timer_schedule (&p_sys->timer, false, 1, p_sys->interval);
@@ -268,6 +267,7 @@ static void Close (vlc_object_t *obj)
     demux_sys_t *p_sys = demux->p_sys;
 
     vlc_timer_destroy (&p_sys->timer);
+    vlc_mutex_destroy (&p_sys->lock);
     xcb_disconnect (p_sys->conn);
     free (p_sys);
 }
@@ -319,8 +319,10 @@ static int Control (demux_t *demux, int query, va_list args)
 
             if (!pausing)
             {
+                vlc_mutex_lock (&p_sys->lock);
                 p_sys->pts = VLC_TS_INVALID;
                 es_out_Control (demux->out, ES_OUT_RESET_PCR);
+                vlc_mutex_unlock (&p_sys->lock);
             }
             vlc_timer_schedule (&p_sys->timer, false,
                                 pausing ? 0 : 1, p_sys->interval);
@@ -368,21 +370,11 @@ static void Demux (void *data)
 
     uint16_t w = geo->width - x;
     uint16_t h = geo->height - y;
+    free (geo);
     if (p_sys->w > 0 && p_sys->w < w)
         w = p_sys->w;
     if (p_sys->h > 0 && p_sys->h < h)
         h = p_sys->h;
-
-    if (w != p_sys->fmt.video.i_visible_width
-     || h != p_sys->fmt.video.i_visible_height)
-    {
-        if (p_sys->es != NULL)
-            es_out_Del (demux->out, p_sys->es);
-        p_sys->fmt.video.i_visible_width = p_sys->fmt.video.i_width = w;
-        p_sys->fmt.video.i_visible_height = p_sys->fmt.video.i_height = h;
-        p_sys->es = es_out_Add (demux->out, &p_sys->fmt);
-    }
-    free (geo);
 
     if (p_sys->window != p_sys->root)
     {
@@ -394,10 +386,6 @@ static void Demux (void *data)
         y = coords->dst_y;
         free (coords);
     }
-
-    /* Capture screen */
-    if (p_sys->es == NULL)
-        return;
 
     xcb_get_image_reply_t *img;
     img = xcb_get_image_reply (conn,
@@ -412,11 +400,27 @@ static void Demux (void *data)
     if (block == NULL)
         return;
 
-    if (p_sys->pts == VLC_TS_INVALID)
-        p_sys->pts = mdate ();
-    block->i_pts = block->i_dts = p_sys->pts;
+    vlc_mutex_lock (&p_sys->lock);
+    if (w != p_sys->fmt.video.i_visible_width
+     || h != p_sys->fmt.video.i_visible_height)
+    {
+        if (p_sys->es != NULL)
+            es_out_Del (demux->out, p_sys->es);
+        p_sys->fmt.video.i_visible_width = p_sys->fmt.video.i_width = w;
+        p_sys->fmt.video.i_visible_height = p_sys->fmt.video.i_height = h;
+        p_sys->es = es_out_Add (demux->out, &p_sys->fmt);
+    }
 
-    es_out_Control (demux->out, ES_OUT_SET_PCR, p_sys->pts);
-    es_out_Send (demux->out, p_sys->es, block);
-    p_sys->pts += p_sys->interval;
+    /* Capture screen */
+    if (p_sys->es != NULL)
+    {
+        if (p_sys->pts == VLC_TS_INVALID)
+            p_sys->pts = mdate ();
+        block->i_pts = block->i_dts = p_sys->pts;
+
+        es_out_Control (demux->out, ES_OUT_SET_PCR, p_sys->pts);
+        es_out_Send (demux->out, p_sys->es, block);
+        p_sys->pts += p_sys->interval;
+    }
+    vlc_mutex_unlock (&p_sys->lock);
 }
