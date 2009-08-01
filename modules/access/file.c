@@ -322,8 +322,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             p_access->info.i_update |= INPUT_UPDATE_SIZE;
         }
 #endif
-        /* Pre-fetch until the end (within memory limits) */
-        posix_fadvise (fd, p_access->info.i_pos, 0, POSIX_FADV_WILLNEED);
     }
     return i_ret;
 }
