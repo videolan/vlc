@@ -145,6 +145,7 @@ FFMPEGCONF += --enable-memalign-hack
 endif
 
 ifdef HAVE_DARWIN_OS
+X264CONF=--host=$(HOST)
 X264CONF += --enable-pic
 FFMPEGCONF += --cc=$(CC)
 FFMPEGCONF += --arch=$(ARCH)
@@ -656,6 +657,9 @@ lua-$(LUA_VERSION).tar.gz:
 
 lua: lua-$(LUA_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_DARWIN_OS
+	(cd $@; sed -e 's%gcc%$(CC)%' -e 's%LDFLAGS=%LDFLAGS=$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' -i.orig  src/Makefile)
+endif
 
 .lua: lua
 ifdef HAVE_WIN32
