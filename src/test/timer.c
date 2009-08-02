@@ -61,6 +61,7 @@ int main (void)
     vlc_timer_schedule (&data.timer, false, 1, CLOCK_FREQ / 10);
     msleep (CLOCK_FREQ);
     vlc_mutex_lock (&data.lock);
+    data.count += vlc_timer_getoverrun (&data.timer);
     printf ("Count = %u\n", data.count);
     assert (data.count >= 10);
     data.count = 0;
@@ -73,6 +74,7 @@ int main (void)
     vlc_timer_schedule (&data.timer, true, now, CLOCK_FREQ / 10);
     msleep (CLOCK_FREQ);
     vlc_mutex_lock (&data.lock);
+    data.count += vlc_timer_getoverrun (&data.timer);
     printf ("Count = %u\n", data.count);
     assert (data.count >= 10);
     vlc_mutex_unlock (&data.lock);
