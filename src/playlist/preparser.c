@@ -42,9 +42,9 @@ struct playlist_preparser_t
     playlist_t          *p_playlist;
     playlist_fetcher_t  *p_fetcher;
 
-    vlc_thread_t    thread;
     vlc_mutex_t     lock;
-    bool            b_live, b_zombie;
+    vlc_cond_t      wait;
+    bool            b_live;
     input_item_t  **pp_waiting;
     int             i_waiting;
 
@@ -65,7 +65,8 @@ playlist_preparser_t *playlist_preparser_New( playlist_t *p_playlist, playlist_f
     p_preparser->p_playlist = p_playlist;
     p_preparser->p_fetcher = p_fetcher;
     vlc_mutex_init( &p_preparser->lock );
-    p_preparser->b_zombie = p_preparser->b_live = false;
+    vlc_cond_init( &p_preparser->wait );
+    p_preparser->b_live = false;
     p_preparser->i_art_policy = var_GetInteger( p_playlist, "album-art" );
     p_preparser->i_waiting = 0;
     p_preparser->pp_waiting = NULL;
@@ -78,43 +79,40 @@ void playlist_preparser_Push( playlist_preparser_t *p_preparser, input_item_t *p
     vlc_gc_incref( p_item );
 
     vlc_mutex_lock( &p_preparser->lock );
-    if( p_preparser->b_zombie )
-    {
-        vlc_join( p_preparser->thread, NULL );
-        p_preparser->b_zombie = false;
-    }
     INSERT_ELEM( p_preparser->pp_waiting, p_preparser->i_waiting,
                  p_preparser->i_waiting, p_item );
     if( !p_preparser->b_live )
     {
-        if( vlc_clone( &p_preparser->thread, Thread, p_preparser,
-                       VLC_THREAD_PRIORITY_LOW ) )
+        vlc_thread_t th;
+
+        if( vlc_clone( &th, Thread, p_preparser, VLC_THREAD_PRIORITY_LOW ) )
             msg_Warn( p_preparser->p_playlist,
                       "cannot spawn pre-parser thread" );
         else
+        {
+            vlc_detach( th );
             p_preparser->b_live = true;
+        }
     }
     vlc_mutex_unlock( &p_preparser->lock );
 }
 
 void playlist_preparser_Delete( playlist_preparser_t *p_preparser )
 {
-    bool b_join;
-
-    /* Destroy the item preparser */
     vlc_mutex_lock( &p_preparser->lock );
-    if( p_preparser->b_live )
-        vlc_cancel( p_preparser->thread );
-    b_join = p_preparser->b_live || p_preparser->b_zombie;
-    vlc_mutex_unlock( &p_preparser->lock );
-    if( b_join )
-        vlc_join( p_preparser->thread, NULL );
-
+    /* Remove pending item to speed up preparser thread exit */
     while( p_preparser->i_waiting > 0 )
-    {   /* Any left-over unparsed item? */
+    {
         vlc_gc_decref( p_preparser->pp_waiting[0] );
         REMOVE_ELEM( p_preparser->pp_waiting, p_preparser->i_waiting, 0 );
     }
+
+    while( p_preparser->b_live )
+        vlc_cond_wait( &p_preparser->wait, &p_preparser->lock );
+    vlc_mutex_unlock( &p_preparser->lock );
+
+    /* Destroy the item preparser */
+    vlc_cond_destroy( &p_preparser->wait );
     vlc_mutex_destroy( &p_preparser->lock );
     free( p_preparser );
 }
@@ -210,28 +208,15 @@ static void *Thread( void *data )
         {
             p_current = NULL;
             p_preparser->b_live = false;
-            p_preparser->b_zombie = true;
         }
         vlc_mutex_unlock( &p_preparser->lock );
 
         if( !p_current )
             break;
 
-        int canc = vlc_savecancel();
-
         Preparse( p_playlist, p_current );
 
         Art( p_preparser, p_current );
-
-        vlc_restorecancel( canc );
-
-        /* */
-        int i_activity = var_GetInteger( p_playlist, "activity" );
-        if( i_activity < 0 )
-            i_activity = 0;
-
-        /* Sleep at least 1ms and cancel thread if needed */
-        msleep( (i_activity+1) * 1000 );
     }
     return NULL;
 }
