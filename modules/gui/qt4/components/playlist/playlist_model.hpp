@@ -168,6 +168,7 @@ private:
 signals:
     void shouldRemove( int );
     void currentChanged( const QModelIndex& );
+    void columnsChanged( int );
 
 
 public slots:

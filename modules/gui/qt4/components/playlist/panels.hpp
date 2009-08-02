@@ -90,6 +90,7 @@ private slots:
     void setCurrentRootId( int );
     void popupAdd();
     void popupSelectColumn( QPoint );
+    void checkSortingIndicator( int );
 };
 
 #endif
