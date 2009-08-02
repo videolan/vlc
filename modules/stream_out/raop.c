@@ -29,7 +29,6 @@
 #endif
 
 #include <assert.h>
-#include <strings.h>
 
 #include <gcrypt.h>
 
@@ -590,7 +589,7 @@ static char *ReadPasswordFile( vlc_object_t *p_this, const char *psz_path )
 
     } else {
         /* Replace first newline with '\0' */
-        psz_newline = index( ps_buffer, '\n' );
+        psz_newline = strchr( ps_buffer, '\n' );
         if ( psz_newline != NULL )
             *psz_newline = '\0';
     }
