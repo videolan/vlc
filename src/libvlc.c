@@ -641,7 +641,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                     {
                         msg_Err( p_libvlc, "D-Bus problem" );
                         system_End( p_libvlc );
-                        exit( VLC_ETIMEOUT );
+                        exit( 1 );
                     }
 
                     /* append MRLs */
@@ -651,7 +651,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                     {
                         dbus_message_unref( p_dbus_msg );
                         system_End( p_libvlc );
-                        exit( VLC_ENOMEM );
+                        exit( 1 );
                     }
                     b_play = TRUE;
                     if( config_GetInt( p_libvlc, "playlist-enqueue" ) > 0 )
@@ -661,7 +661,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                     {
                         dbus_message_unref( p_dbus_msg );
                         system_End( p_libvlc );
-                        exit( VLC_ENOMEM );
+                        exit( 1 );
                     }
 
                     /* send message and get a handle for a reply */
@@ -671,7 +671,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                         msg_Err( p_libvlc, "D-Bus problem" );
                         dbus_message_unref( p_dbus_msg );
                         system_End( p_libvlc );
-                        exit( VLC_ETIMEOUT );
+                        exit( 1 );
                     }
 
                     if ( NULL == p_dbus_pending )
@@ -679,7 +679,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                         msg_Err( p_libvlc, "D-Bus problem" );
                         dbus_message_unref( p_dbus_msg );
                         system_End( p_libvlc );
-                        exit( VLC_ETIMEOUT );
+                        exit( 1 );
                     }
                     dbus_connection_flush( p_conn );
                     dbus_message_unref( p_dbus_msg );
@@ -690,7 +690,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
                 /* bye bye */
                 system_End( p_libvlc );
-                exit( VLC_SUCCESS );
+                exit( 0 );
             }
         }
         /* we unreference the connection when we've finished with it */
