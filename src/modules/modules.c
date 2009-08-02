@@ -580,16 +580,30 @@ found_shortcut:
 #endif
 
         p_this->b_force = p_list[i].b_force;
-        if( p_cand->pf_activate
-         && p_cand->pf_activate( p_this ) == VLC_SUCCESS )
+
+        int ret = VLC_SUCCESS;
+        if( p_cand->pf_activate )
+            ret = p_cand->pf_activate( p_this );
+        switch( ret )
         {
+        case VLC_SUCCESS:
+            /* good module! */
             p_module = p_cand;
-            /* Release the remaining modules */
-            while (++i < count)
-                module_release (p_list[i].p_module);
-        }
-        else
+            break;
+
+        case VLC_ETIMEOUT:
+            /* good module, but aborted */
             module_release( p_cand );
+            break;
+
+        default: /* bad module */
+            module_release( p_cand );
+            continue;
+        }
+
+        /* Release the remaining modules */
+        while (++i < count)
+            module_release (p_list[i].p_module);
     }
 
     free( p_list );
