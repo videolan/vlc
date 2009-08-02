@@ -756,14 +756,6 @@ if test "${ac_cv_have_plugins}" = "no"; then
   fi
 fi
 
-# Whatever style
-if test "${ac_cv_have_plugins}" = "no"; then
-  AC_CHECK_LIB(dld, dld_link,
-   [VLC_ADD_LIBS([libvlccore],[-ldld])
-    AC_DEFINE(HAVE_DL_DLD_LINK, 1, [Define if you have the GNU dld library])
-    ac_cv_have_plugins=yes])
-fi
-
 # Win32 style
 if test "${ac_cv_have_plugins}" = "no"; then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
