@@ -691,7 +691,7 @@ static int TreeMove( playlist_t *p_playlist, playlist_item_t *p_item,
      * down of the playlist. So when removing the element we have
      * to change the position as we loose one element
      */
-    if( j < i_newpos )
+    if( p_detach == p_node && j < i_newpos )
         i_newpos--;
 
     /* Attach to new parent */
