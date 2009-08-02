@@ -112,7 +112,7 @@ static int Activate( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ENOMEM;
     }
-    vlc_timer_schedule( &p_sys->timer, false, 30*CLOCK_FREQ, 30*CLOCK_FREQ );
+    vlc_timer_schedule( p_sys->timer, false, 30*CLOCK_FREQ, 30*CLOCK_FREQ );
 
 #ifdef HAVE_DBUS
     p_sys->p_connection = dbus_init( p_intf );
@@ -128,7 +128,7 @@ static void Deactivate( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    vlc_timer_destroy( &p_sys->timer );
+    vlc_timer_destroy( p_sys->timer );
 #ifdef HAVE_DBUS
     if( p_sys->p_connection )
         dbus_connection_unref( p_sys->p_connection );

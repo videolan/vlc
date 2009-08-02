@@ -775,13 +775,11 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
  * @warning This function <b>must</b> be called before the timer data can be
  * freed and before the timer callback function can be unloaded.
  *
- * @param timer to destroy
+ * @param timer timer to destroy
  */
-void vlc_timer_destroy (vlc_timer_t *id)
+void vlc_timer_destroy (vlc_timer_t timer)
 {
-    struct vlc_timer *timer = *id;
-
-    vlc_timer_schedule (id, false, 0, 0);
+    vlc_timer_schedule (timer, false, 0, 0);
     vlc_mutex_lock (&timer->lock);
     while (timer->users != 0)
         vlc_cond_wait (&timer->wait, &timer->lock);
@@ -801,7 +799,7 @@ void vlc_timer_destroy (vlc_timer_t *id)
  * the system is busy or suspended, or because a previous iteration of the
  * timer is still running. See also vlc_timer_getoverrun().
  *
- * @param id initialized timer pointer
+ * @param timer initialized timer
  * @param absolute the timer value origin is the same as mdate() if true,
  *                 the timer value is relative to now if false.
  * @param value zero to disarm the timer, otherwise the initial time to wait
@@ -809,11 +807,9 @@ void vlc_timer_destroy (vlc_timer_t *id)
  * @param interval zero to fire the timer just once, otherwise the timer
  *                 repetition interval.
  */
-void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
+void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
                          mtime_t value, mtime_t interval)
 {
-    struct vlc_timer *timer = *id;
-
     vlc_mutex_lock (&timer->lock);
     if (timer->value)
     {
@@ -833,14 +829,13 @@ void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
 
 /**
  * Fetch and reset the overrun counter for a timer.
- * @param id initialized timer pointer
+ * @param timer initialized timer
  * @return the timer overrun counter, i.e. the number of times that the timer
  * should have run but did not since the last actual run. If all is well, this
  * is zero.
  */
-unsigned vlc_timer_getoverrun (const vlc_timer_t *id)
+unsigned vlc_timer_getoverrun (vlc_timer_t timer)
 {
-    struct vlc_timer *timer = *id;
     unsigned ret;
 
     vlc_mutex_lock (&timer->lock);

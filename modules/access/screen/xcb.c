@@ -244,7 +244,7 @@ static int Open (vlc_object_t *obj)
     vlc_mutex_init (&p_sys->lock);
     if (vlc_timer_create (&p_sys->timer, Demux, demux))
         goto error;
-    vlc_timer_schedule (&p_sys->timer, false, 1, p_sys->interval);
+    vlc_timer_schedule (p_sys->timer, false, 1, p_sys->interval);
 
     /* Initializes demux */
     demux->pf_demux   = NULL;
@@ -266,7 +266,7 @@ static void Close (vlc_object_t *obj)
     demux_t *demux = (demux_t *)obj;
     demux_sys_t *p_sys = demux->p_sys;
 
-    vlc_timer_destroy (&p_sys->timer);
+    vlc_timer_destroy (p_sys->timer);
     vlc_mutex_destroy (&p_sys->lock);
     xcb_disconnect (p_sys->conn);
     free (p_sys);
@@ -324,7 +324,7 @@ static int Control (demux_t *demux, int query, va_list args)
                 es_out_Control (demux->out, ES_OUT_RESET_PCR);
                 vlc_mutex_unlock (&p_sys->lock);
             }
-            vlc_timer_schedule (&p_sys->timer, false,
+            vlc_timer_schedule (p_sys->timer, false,
                                 pausing ? 0 : 1, p_sys->interval);
             return VLC_SUCCESS;
         }

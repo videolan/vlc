@@ -629,20 +629,16 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
     return 0;
 }
 
-void vlc_timer_destroy (vlc_timer_t *id)
+void vlc_timer_destroy (vlc_timer_t timer)
 {
-    struct vlc_timer *timer = *id;
-
     if (timer->handle != INVALID_HANDLE_VALUE)
         DeleteTimerQueueTimer (NULL, timer->handle, INVALID_HANDLE_VALUE);
     free (timer);
 }
 
-void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
+void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
                          mtime_t value, mtime_t interval)
 {
-    struct vlc_timer *timer = *id;
-
     if (timer->handle != INVALID_HANDLE_VALUE)
     {
         DeleteTimerQueueTimer (NULL, timer->handle, NULL);
@@ -660,8 +656,8 @@ void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
         abort ();
 }
 
-unsigned vlc_timer_getoverrun (const vlc_timer_t *id)
+unsigned vlc_timer_getoverrun (vlc_timer_t timer)
 {
-    (void)id;
+    (void)timer;
     return 0;
 }

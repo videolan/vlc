@@ -163,7 +163,7 @@ static block_t *rtp_recv (demux_t *demux)
 
 static void timer_cleanup (void *timer)
 {
-    vlc_timer_destroy (timer);
+    vlc_timer_destroy ((vlc_timer_t)timer);
 }
 
 static void rtp_process (void *data);
@@ -176,7 +176,7 @@ void *rtp_thread (void *data)
 
     if (vlc_timer_create (&p_sys->timer, rtp_process, data))
         return NULL;
-    vlc_cleanup_push (timer_cleanup, &p_sys->timer);
+    vlc_cleanup_push (timer_cleanup, (void *)p_sys->timer);
 
     for (;;)
     {
@@ -217,6 +217,6 @@ static void rtp_process (void *data)
 
     vlc_mutex_lock (&p_sys->lock);
     if (rtp_dequeue (demux, p_sys->session, &deadline))
-        vlc_timer_schedule (&p_sys->timer, true, deadline, 0);
+        vlc_timer_schedule (p_sys->timer, true, deadline, 0);
     vlc_mutex_unlock (&p_sys->lock);
 }

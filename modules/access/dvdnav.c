@@ -385,7 +385,7 @@ static void Close( vlc_object_t *p_this )
 
     /* Stop still image handler */
     if( p_sys->still.b_created )
-        vlc_timer_destroy( &p_sys->still.timer );
+        vlc_timer_destroy( p_sys->still.timer );
     vlc_mutex_destroy( &p_sys->still.lock );
 
     var_Destroy( p_sys->p_input, "highlight-mutex" );
@@ -638,7 +638,7 @@ static int Demux( demux_t *p_demux )
             if( event->length != 0xff && p_sys->still.b_created )
             {
                 mtime_t delay = event->length * CLOCK_FREQ;
-                vlc_timer_schedule( &p_sys->still.timer, false, delay, 0 );
+                vlc_timer_schedule( p_sys->still.timer, false, delay, 0 );
             }
 
             b_still_init = true;
