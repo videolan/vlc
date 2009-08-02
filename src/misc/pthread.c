@@ -679,25 +679,70 @@ void vlc_control_cancel (int cmd, ...)
     assert (0);
 }
 
-#ifndef HAVE_POSIX_TIMER
-/* We have no fallback currently. We'll just crash on timer API usage. */
-static void timer_not_supported(void)
-{
-    fprintf(stderr, "*** Error: Timer API is not supported on this platform.\n");
-    abort();
-}
-#endif
 
-static void vlc_timer_do (union sigval val)
+struct vlc_timer
 {
-    vlc_timer_t *id = val.sival_ptr;
-    id->func (id->data);
+    vlc_thread_t thread;
+    vlc_mutex_t  lock;
+    vlc_cond_t   wait;
+    void       (*func) (void *);
+    void        *data;
+    mtime_t      value, interval;
+    unsigned     users;
+    unsigned     overruns;
+};
+
+static void *vlc_timer_do (void *data)
+{
+    struct vlc_timer *timer = data;
+
+    timer->func (timer->data);
+
+    vlc_mutex_lock (&timer->lock);
+    assert (timer->users > 0);
+    if (--timer->users == 0)
+        vlc_cond_signal (&timer->wait);
+    vlc_mutex_unlock (&timer->lock);
+    return NULL;
+}
+
+static void *vlc_timer_thread (void *data)
+{
+    struct vlc_timer *timer = data;
+    mtime_t value, interval;
+
+    vlc_mutex_lock (&timer->lock);
+    value = timer->value;
+    interval = timer->interval;
+    vlc_mutex_unlock (&timer->lock);
+
+    for (;;)
+    {
+         vlc_thread_t th;
+
+         mwait (value);
+
+         vlc_mutex_lock (&timer->lock);
+         if (vlc_clone (&th, vlc_timer_do, timer, VLC_THREAD_PRIORITY_INPUT))
+             timer->overruns++;
+         else
+         {
+             vlc_detach (th);
+             timer->users++;
+         }
+         vlc_mutex_unlock (&timer->lock);
+
+         if (interval == 0)
+             return NULL;
+
+         value += interval;
+    }
 }
 
 /**
  * Initializes an asynchronous timer.
- * @warning Asynchronous timers are processed from an unspecified thread, and
- * a timer is only serialized against itself.
+ * @warning Asynchronous timers are processed from an unspecified thread.
+ * Also, multiple occurences of an interval timer can run concurrently.
  *
  * @param id pointer to timer to be initialized
  * @param func function that the timer will call
@@ -706,29 +751,21 @@ static void vlc_timer_do (union sigval val)
  */
 int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 {
-#ifdef HAVE_POSIX_TIMER
-    struct sigevent ev;
+    struct vlc_timer *timer = malloc (sizeof (*timer));
 
-    memset (&ev, 0, sizeof (ev));
-    ev.sigev_notify = SIGEV_THREAD;
-    ev.sigev_value.sival_ptr = id;
-    ev.sigev_notify_function = vlc_timer_do;
-    ev.sigev_notify_attributes = NULL;
-    id->func = func;
-    id->data = data;
-
-#if (_POSIX_CLOCK_SELECTION >= 0)
-    if (timer_create (CLOCK_MONOTONIC, &ev, &id->handle))
-#else
-    if (timer_create (CLOCK_REALTIME, &ev, &id->handle))
-#endif
-        return errno;
-
+    if (timer == NULL)
+        return ENOMEM;
+    vlc_mutex_init (&timer->lock);
+    vlc_cond_init (&timer->wait);
+    assert (func);
+    timer->func = func;
+    timer->data = data;
+    timer->value = 0;
+    timer->interval = 0;
+    timer->users = 0;
+    timer->overruns = 0;
+    *id = timer;
     return 0;
-#else
-    timer_not_supported();
-    return 0;
-#endif
 }
 
 /**
@@ -742,12 +779,17 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
  */
 void vlc_timer_destroy (vlc_timer_t *id)
 {
-#ifdef HAVE_POSIX_TIMER
-    int val = timer_delete (id->handle);
-    VLC_THREAD_ASSERT ("deleting timer");
-#else
-    timer_not_supported();
-#endif
+    struct vlc_timer *timer = *id;
+
+    vlc_timer_schedule (id, false, 0, 0);
+    vlc_mutex_lock (&timer->lock);
+    while (timer->users != 0)
+        vlc_cond_wait (&timer->wait, &timer->lock);
+    vlc_mutex_unlock (&timer->lock);
+
+    vlc_cond_destroy (&timer->wait);
+    vlc_mutex_destroy (&timer->lock);
+    free (timer);
 }
 
 /**
@@ -770,29 +812,27 @@ void vlc_timer_destroy (vlc_timer_t *id)
 void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
                          mtime_t value, mtime_t interval)
 {
-#ifdef HAVE_POSIX_TIMER
-    lldiv_t vad = lldiv (value, CLOCK_FREQ);
-    lldiv_t itd = lldiv (interval, CLOCK_FREQ);
-    struct itimerspec it = {
-        .it_interval = {
-            .tv_sec = itd.quot,
-            .tv_nsec = (1000000000 / CLOCK_FREQ) * itd.rem,
-        },
-        .it_value = {
-            .tv_sec = vad.quot,
-            .tv_nsec = (1000000000 / CLOCK_FREQ) * vad.rem,
-        },
-    };
-    int flags = absolute ? TIMER_ABSTIME : 0;
+    struct vlc_timer *timer = *id;
 
-    int val = timer_settime (id->handle, flags, &it, NULL);
-    VLC_THREAD_ASSERT ("scheduling timer");
-#else
-    timer_not_supported();
-#endif
+    vlc_mutex_lock (&timer->lock);
+    if (timer->value)
+    {
+        vlc_cancel (timer->thread);
+        vlc_join (timer->thread, NULL);
+        timer->value = 0;
+    }
+    if ((value != 0)
+     && (vlc_clone (&timer->thread, vlc_timer_thread, timer,
+                    VLC_THREAD_PRIORITY_INPUT) == 0))
+    {
+        timer->value = (absolute ? 0 : mdate ()) + value;
+        timer->interval = interval;
+    }
+    vlc_mutex_unlock (&timer->lock);
 }
 
 /**
+ * Fetch and reset the overrun counter for a timer.
  * @param id initialized timer pointer
  * @return the timer overrun counter, i.e. the number of times that the timer
  * should have run but did not since the last actual run. If all is well, this
@@ -800,18 +840,12 @@ void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
  */
 unsigned vlc_timer_getoverrun (const vlc_timer_t *id)
 {
-#ifdef HAVE_POSIX_TIMER
-    int val = timer_getoverrun (id->handle);
-#ifndef NDEBUG
-    if (val == -1)
-    {
-        val = errno;
-        VLC_THREAD_ASSERT ("fetching timer overrun counter");
-    }
-#endif
-    return val;
-#else
-    timer_not_supported();
-    return 0;
-#endif
+    struct vlc_timer *timer = *id;
+    unsigned ret;
+
+    vlc_mutex_lock (&timer->lock);
+    ret = timer->overruns;
+    timer->overruns = 0;
+    vlc_mutex_unlock (&timer->lock);
+    return ret;
 }
