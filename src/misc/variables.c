@@ -33,7 +33,6 @@
 
 #include "libvlc.h"
 
-#include "vlc_interface.h"
 #include <assert.h>
 
 /*****************************************************************************
@@ -776,7 +775,7 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
     }
 
     p_var = &p_priv->p_vars[i_var];
-    assert( (p_var->i_type & VLC_VAR_CLASS) == 0 || expected_type == 0 ||
+    assert( expected_type == 0 ||
             (p_var->i_type & VLC_VAR_CLASS) == expected_type );
 
     /* Duplicate data if needed */
@@ -829,7 +828,7 @@ int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
     {
         variable_t *p_var = &p_priv->p_vars[i_var];
 
-        assert( (p_var->i_type & VLC_VAR_CLASS) == 0 || expected_type == 0 ||
+        assert( expected_type == 0 ||
                 (p_var->i_type & VLC_VAR_CLASS) == expected_type );
 
         /* Really get the variable */
@@ -1134,7 +1133,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
         goto cleanup;
     }
 
-    var_Set( p_obj, psz_name, val );
+    __var_Set( p_obj, psz_name, val );
 
     /* If that's a list, remove all elements allocated */
     if( i_type == VLC_VAR_LIST )
