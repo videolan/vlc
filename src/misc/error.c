@@ -45,8 +45,6 @@ char const * vlc_error ( int i_err )
 
         case VLC_ENOMEM:
             return "not enough memory";
-        case VLC_ETHREAD:
-            return "thread error";
         case VLC_ETIMEOUT:
             return "timeout";
 

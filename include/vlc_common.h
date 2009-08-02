@@ -434,7 +434,6 @@ struct vlc_list_t
  *****************************************************************************/
 #define VLC_SUCCESS         -0                                   /* No error */
 #define VLC_ENOMEM          -1                          /* Not enough memory */
-#define VLC_ETHREAD         -2                               /* Thread error */
 #define VLC_ETIMEOUT        -3                                    /* Timeout */
 
 #define VLC_ENOMOD         -10                           /* Module not found */

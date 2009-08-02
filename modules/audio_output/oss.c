@@ -522,7 +522,7 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_aout, "cannot create OSS thread (%m)" );
         close( p_sys->i_fd );
         free( p_sys );
-        return VLC_ETHREAD;
+        return VLC_ENOMEM;
     }
 
     return VLC_SUCCESS;

@@ -175,7 +175,7 @@ static int Open( vlc_object_t * p_this )
         delete pPlayer;
         free( p_sys->ppBuffers );
         free( p_sys );
-        return VLC_ETHREAD;
+        return VLC_ENOMEM;
     }
 
     return VLC_SUCCESS;

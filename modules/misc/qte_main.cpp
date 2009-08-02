@@ -109,7 +109,7 @@ static int Open( vlc_object_t *p_this )
         vlc_object_release( p_qte_main );
         i_refcount--;
         vlc_mutex_unlock( lock );
-        return VLC_ETHREAD;
+        return VLC_ENOMEM;
     }
 
     i_refcount++;
