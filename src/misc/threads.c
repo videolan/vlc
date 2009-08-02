@@ -148,7 +148,7 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 #elif defined( WIN32 ) || defined( UNDER_CE )
     VLC_UNUSED( psz_file); VLC_UNUSED( i_line );
 
-    if( !SetThreadPriority(p_priv->thread_id->handle, i_priority) )
+    if( !SetThreadPriority(p_priv->thread_id, i_priority) )
     {
         msg_Warn( p_this, "couldn't set a faster priority" );
         return 1;
@@ -176,7 +176,7 @@ void __vlc_thread_join( vlc_object_t *p_this )
 
 #ifndef UNDER_CE
     if( ! DuplicateHandle(GetCurrentProcess(),
-            p_priv->thread_id->handle,
+            p_priv->thread_id,
             GetCurrentProcess(),
             &hThread,
             0,
