@@ -1102,7 +1102,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
     i_dirlen = strlen( psz_dir );
 
     /* Parse the directory and try to load all files it contains. */
-    while( !p_this->p_libvlc->b_die && ( file = readdir( dir ) ) )
+    while( ( file = readdir( dir ) ) )
     {
         struct stat statbuf;
         unsigned int i_len;
