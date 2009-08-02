@@ -154,7 +154,7 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
 
 #elif defined(HAVE_DL_WINDOWS)
     wchar_t psz_wfile[MAX_PATH];
-    MultiByteToWideChar( CP_ACP, 0, psz_file, -1, psz_wfile, MAX_PATH );
+    MultiByteToWideChar( CP_UTF8, 0, psz_file, -1, psz_wfile, MAX_PATH );
 
 #ifndef UNDER_CE
     /* FIXME: this is not thread-safe -- Courmisch */

@@ -977,118 +977,9 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
 static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
                                const char *psz_dir, unsigned i_maxdepth )
 {
-/* FIXME: Needs to be ported to wide char on ALL Windows builds */
-#ifdef WIN32
-# undef opendir
-# undef closedir
-# undef readdir
-#endif
-#if defined( UNDER_CE ) || defined( _MSC_VER )
-#ifdef UNDER_CE
-    wchar_t psz_wpath[MAX_PATH + 256];
-    wchar_t psz_wdir[MAX_PATH];
-#endif
-    char psz_path[MAX_PATH + 256];
-    WIN32_FIND_DATA finddata;
-    HANDLE handle;
-    int rc;
-    char * psz_file;
-#endif
-
     if( i_maxdepth == 0 )
         return;
 
-#if defined( UNDER_CE ) || defined( _MSC_VER )
-#ifdef UNDER_CE
-    MultiByteToWideChar( CP_ACP, 0, psz_dir, -1, psz_wdir, MAX_PATH );
-
-    rc = GetFileAttributes( psz_wdir );
-    if( rc<0 || !(rc&FILE_ATTRIBUTE_DIRECTORY) ) return; /* Not a directory */
-
-    /* Parse all files in the directory */
-    swprintf( psz_wpath, L"%ls\\*", psz_wdir );
-#else
-    rc = GetFileAttributes( psz_dir );
-    if( rc<0 || !(rc&FILE_ATTRIBUTE_DIRECTORY) ) return; /* Not a directory */
-#endif
-
-    /* Parse all files in the directory */
-    sprintf( psz_path, "%s\\*", psz_dir );
-
-#ifdef UNDER_CE
-    handle = FindFirstFile( psz_wpath, &finddata );
-#else
-    handle = FindFirstFile( psz_path, &finddata );
-#endif
-    if( handle == INVALID_HANDLE_VALUE )
-    {
-        /* Empty directory */
-        return;
-    }
-
-    /* Parse the directory and try to load all files it contains. */
-    do
-    {
-#ifdef UNDER_CE
-        unsigned int i_len = wcslen( finddata.cFileName );
-        swprintf( psz_wpath, L"%ls\\%ls", psz_wdir, finddata.cFileName );
-        sprintf( psz_path, "%s\\%ls", psz_dir, finddata.cFileName );
-#else
-        unsigned int i_len = strlen( finddata.cFileName );
-        sprintf( psz_path, "%s\\%s", psz_dir, finddata.cFileName );
-#endif
-
-        /* Skip ".", ".." */
-        if( !*finddata.cFileName || !strcmp( finddata.cFileName, "." )
-         || !strcmp( finddata.cFileName, ".." ) )
-        {
-            if( !FindNextFile( handle, &finddata ) ) break;
-            continue;
-        }
-
-#ifdef UNDER_CE
-        if( GetFileAttributes( psz_wpath ) & FILE_ATTRIBUTE_DIRECTORY )
-#else
-        if( GetFileAttributes( psz_path ) & FILE_ATTRIBUTE_DIRECTORY )
-#endif
-        {
-            AllocatePluginDir( p_this, p_bank, psz_path, i_maxdepth - 1 );
-        }
-        else if( i_len > strlen( LIBEXT )
-                  /* We only load files ending with LIBEXT */
-                  && !strncasecmp( psz_path + strlen( psz_path)
-                                   - strlen( LIBEXT ),
-                                   LIBEXT, strlen( LIBEXT ) ) )
-        {
-            WIN32_FILE_ATTRIBUTE_DATA attrbuf;
-            int64_t i_time = 0, i_size = 0;
-
-#ifdef UNDER_CE
-            if( GetFileAttributesEx( psz_wpath, GetFileExInfoStandard,
-                                     &attrbuf ) )
-#else
-            if( GetFileAttributesEx( psz_path, GetFileExInfoStandard,
-                                     &attrbuf ) )
-#endif
-            {
-                i_time = attrbuf.ftLastWriteTime.dwHighDateTime;
-                i_time <<= 32;
-                i_time |= attrbuf.ftLastWriteTime.dwLowDateTime;
-                i_size = attrbuf.nFileSizeHigh;
-                i_size <<= 32;
-                i_size |= attrbuf.nFileSizeLow;
-            }
-            psz_file = psz_path;
-
-            AllocatePluginFile( p_this, p_bank, psz_file, i_time, i_size );
-        }
-    }
-    while( !p_this->p_libvlc->b_die && FindNextFile( handle, &finddata ) );
-
-    /* Close the directory */
-    FindClose( handle );
-
-#else
     DIR *dh = utf8_opendir (psz_dir);
     if (dh == NULL)
         return;
@@ -1128,8 +1019,6 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
         free (path);
     }
     closedir (dh);
-
-#endif
 }
 
 /*****************************************************************************
