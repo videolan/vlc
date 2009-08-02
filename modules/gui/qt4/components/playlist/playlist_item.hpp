@@ -40,7 +40,7 @@ class PLItem
 {
     friend class PLModel;
 public:
-    PLItem( int, int, PLItem *parent , PLModel * );
+    PLItem( int, int, bool, PLItem *parent , PLModel * );
     PLItem( playlist_item_t *, PLItem *parent, PLModel * );
     PLItem( playlist_item_t *, QSettings *, PLModel * );
     ~PLItem();
@@ -72,9 +72,10 @@ protected:
     int i_id;
     int i_input_id;
     int i_showflags;
+    bool b_is_node;
 
 private:
-    void init( int, int, PLItem *, PLModel *, QSettings * );
+    void init( int, int, bool, PLItem *, PLModel *, QSettings * );
     void updateColumnHeaders();
     PLItem *parentItem;
     PLModel *model;

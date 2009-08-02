@@ -117,7 +117,12 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
 {
     Qt::ItemFlags defaultFlags = QAbstractItemModel::flags( index );
     if( index.isValid() )
-        return Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled | defaultFlags;
+    {
+        PLItem *item = static_cast<PLItem*>( index.internalPointer() );
+        if ( item->b_is_node )
+            defaultFlags |= Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
+        else defaultFlags |= Qt::ItemIsDragEnabled;
+    }
     else if ( rootItem->i_id != p_playlist->p_root_onelevel->i_id
           && rootItem->i_id != p_playlist->p_root_category->i_id )
               defaultFlags |= Qt::ItemIsDropEnabled;
