@@ -992,12 +992,8 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
     WIN32_FIND_DATA finddata;
     HANDLE handle;
     int rc;
-#else
-    int    i_dirlen;
-    DIR *  dir;
-    struct dirent * file;
-#endif
     char * psz_file;
+#endif
 
     if( i_maxdepth == 0 )
         return;
@@ -1093,58 +1089,45 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
     FindClose( handle );
 
 #else
-    dir = opendir( psz_dir );
-    if( !dir )
-    {
+    DIR *dh = utf8_opendir (psz_dir);
+    if (dh == NULL)
         return;
-    }
-
-    i_dirlen = strlen( psz_dir );
 
     /* Parse the directory and try to load all files it contains. */
-    while( ( file = readdir( dir ) ) )
+    for (;;)
     {
-        struct stat statbuf;
-        unsigned int i_len;
-        int i_stat;
+        char *file = utf8_readdir (dh), *path;
+        struct stat st;
+
+        if (file == NULL)
+            break;
 
         /* Skip ".", ".." */
-        if( !*file->d_name || !strcmp( file->d_name, "." )
-         || !strcmp( file->d_name, ".." ) )
+        if (!strcmp (file, ".") || !strcmp (file, ".."))
         {
+            free (file);
             continue;
         }
 
-        i_len = strlen( file->d_name );
-        psz_file = malloc( i_dirlen + 1 + i_len + 1 );
-        sprintf( psz_file, "%s"DIR_SEP"%s", psz_dir, file->d_name );
+        const int pathlen = asprintf (&path, "%s"DIR_SEP"%s", psz_dir, file);
+        free (file);
+        if (pathlen == -1 || utf8_stat (path, &st))
+            continue;
 
-        i_stat = stat( psz_file, &statbuf );
-        if( !i_stat && statbuf.st_mode & S_IFDIR )
-        {
-            AllocatePluginDir( p_this, p_bank, psz_file, i_maxdepth - 1 );
-        }
-        else if( i_len > strlen( LIBEXT )
-                  /* We only load files ending with LIBEXT */
-                  && !strncasecmp( file->d_name + i_len - strlen( LIBEXT ),
-                                   LIBEXT, strlen( LIBEXT ) ) )
-        {
-            int64_t i_time = 0, i_size = 0;
+        if (S_ISDIR (st.st_mode))
+            /* Recurse into another directory */
+            AllocatePluginDir (p_this, p_bank, path, i_maxdepth - 1);
+        else
+        if (S_ISREG (st.st_mode)
+         && ((size_t)pathlen >= strlen (LIBEXT))
+         && !strncasecmp (path + pathlen - strlen (LIBEXT), LIBEXT,
+                          strlen (LIBEXT)))
+            /* ^^ We only load files ending with LIBEXT */
+            AllocatePluginFile (p_this, p_bank, path, st.st_mtime, st.st_size);
 
-            if( !i_stat )
-            {
-                i_time = statbuf.st_mtime;
-                i_size = statbuf.st_size;
-            }
-
-            AllocatePluginFile( p_this, p_bank, psz_file, i_time, i_size );
-        }
-
-        free( psz_file );
+        free (path);
     }
-
-    /* Close the directory */
-    closedir( dir );
+    closedir (dh);
 
 #endif
 }

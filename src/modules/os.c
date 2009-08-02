@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h> /* MODULE_SUFFIX */
+#include <vlc_charset.h>
 #include "libvlc.h"
 #include "modules.h"
 
@@ -184,12 +185,13 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
 # else
     const int flags = 0;
 # endif
+    char *path = ToLocale( psz_file );
 
-    handle = dlopen( psz_file, flags );
+    handle = dlopen( path, flags );
+    LocaleFree( path );
     if( handle == NULL )
     {
-        msg_Warn( p_this, "cannot load module `%s' (%s)",
-                          psz_file, dlerror() );
+        msg_Warn( p_this, "cannot load module `%s' (%s)", path, dlerror() );
         return -1;
     }
 
