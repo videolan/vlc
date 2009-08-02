@@ -601,35 +601,52 @@ void vlc_control_cancel (int cmd, ...)
 
 
 /*** Timers ***/
+struct vlc_timer
+{
+    HANDLE handle;
+    void (*func) (void *);
+    void *data;
+};
+
 static void CALLBACK vlc_timer_do (void *val, BOOLEAN timeout)
 {
-    vlc_timer_t *id = val;
+    struct vlc_timer *timer = val;
 
     assert (timeout);
-    id->func (id->data);
+    timer->func (timer->data);
 }
 
 int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 {
-    id->func = func;
-    id->data = data;
-    id->handle = INVALID_HANDLE_VALUE;
+    struct vlc_timer *timer = malloc (sizeof (*timer));
+
+    if (timer == NULL)
+        return ENOMEM;
+    timer->func = func;
+    timer->data = data;
+    timer->handle = INVALID_HANDLE_VALUE;
+    *id = timer;
     return 0;
 }
 
 void vlc_timer_destroy (vlc_timer_t *id)
 {
-    if (id->handle != INVALID_HANDLE_VALUE)
-        DeleteTimerQueueTimer (NULL, id->handle, INVALID_HANDLE_VALUE);
+    struct vlc_timer *timer = *id;
+
+    if (timer->handle != INVALID_HANDLE_VALUE)
+        DeleteTimerQueueTimer (NULL, timer->handle, INVALID_HANDLE_VALUE);
+    free (timer);
 }
 
 void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
                          mtime_t value, mtime_t interval)
 {
-    if (id->handle != INVALID_HANDLE_VALUE)
+    struct vlc_timer *timer = *id;
+
+    if (timer->handle != INVALID_HANDLE_VALUE)
     {
-        DeleteTimerQueueTimer (NULL, id->handle, NULL);
-        id->handle = INVALID_HANDLE_VALUE;
+        DeleteTimerQueueTimer (NULL, timer->handle, NULL);
+        timer->handle = INVALID_HANDLE_VALUE;
     }
     if (value == 0)
         return; /* Disarm */
@@ -638,8 +655,8 @@ void vlc_timer_schedule (vlc_timer_t *id, bool absolute,
         value -= mdate ();
     value = (value + 999) / 1000;
     interval = (interval + 999) / 1000;
-    if (!CreateTimerQueueTimer (&id->handle, NULL, vlc_timer_do, id, value,
-                                interval, WT_EXECUTEDEFAULT))
+    if (!CreateTimerQueueTimer (&timer->handle, NULL, vlc_timer_do, timer,
+                                value, interval, WT_EXECUTEDEFAULT))
         abort ();
 }
 

@@ -134,14 +134,7 @@ typedef struct
 } vlc_rwlock_t;
 
 typedef DWORD   vlc_threadvar_t;
-typedef struct vlc_timer_t vlc_timer_t;
-struct vlc_timer_t
-{
-    HANDLE handle;
-    void (*func) (void *);
-    void *data;
-};
-
+typedef struct vlc_timer *vlc_timer_t;
 #endif
 
 #if defined( WIN32 ) && !defined ETIMEDOUT
