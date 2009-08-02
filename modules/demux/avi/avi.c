@@ -765,7 +765,7 @@ error:
     }
     AVI_ChunkFreeRoot( p_demux->s, &p_sys->ck_root );
     free( p_sys );
-    return VLC_EGENERIC;
+    return vlc_object_alive( p_demux ) ? VLC_EGENERIC : VLC_ETIMEOUT;
 }
 
 /*****************************************************************************
