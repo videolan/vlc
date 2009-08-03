@@ -339,7 +339,7 @@ public:
     FontConfigControl( vlc_object_t *, module_config_t *, QLabel *,
                        QFontComboBox *);
     virtual ~FontConfigControl() {};
-    virtual QString getValue(){ return font->currentFont().toString(); }
+    virtual QString getValue(){ return font->currentFont().family(); }
 protected:
     QLabel *label;
     QFontComboBox *font;
