@@ -88,6 +88,7 @@ comment_re=re.compile('\\param\s+(\S+)')
 python_param_re=re.compile('(@param\s+\S+)(.+)')
 forward_re=re.compile('.+\(\s*(.+?)\s*\)(\s*\S+)')
 enum_re=re.compile('typedef\s+(enum)\s*(\S+\s*)?\{\s*(.+)\s*\}\s*(\S+);')
+special_enum_re=re.compile('^(enum)\s*(\S+\s*)?\{\s*(.+)\s*\};')
 
 # Definition of parameter passing mode for types.  This should not be
 # hardcoded this way, but works alright ATM.
@@ -273,17 +274,19 @@ def parse_typedef(name):
             continue
 
         l=l.strip()
+        if l.startswith('/*') or l.endswith('*/'):
+            continue
 
-        if accumulator:
+        if (l.startswith('typedef enum') or l.startswith('enum')) and not l.endswith(';'):
+            # Multiline definition. Accumulate until end of definition
+            accumulator=l
+            continue
+        elif accumulator:
             accumulator=" ".join( (accumulator, l) )
             if l.endswith(';'):
                 # End of definition
                 l=accumulator
                 accumulator=''
-        elif l.startswith('typedef enum') and not l.endswith(';'):
-            # Multiline definition. Accumulate until end of definition
-            accumulator=l
-            continue
 
         m=enum_re.match(l)
         if m:
@@ -302,6 +305,27 @@ def parse_typedef(name):
             comment=comment.replace('@{', '').replace('@see', 'See').replace('\ingroup', '')
             yield (typ, name, values, comment)
             comment=''
+            continue
+
+        # Special case, used only for libvlc_events.h
+        m=special_enum_re.match(l)
+        if m:
+            values=[]
+            (typ, name, data)=m.groups()
+            for i, l in enumerate(paramlist_re.split(data)):
+                l=l.strip()
+                if l.startswith('/*') or l.startswith('#'):
+                    continue
+                if '=' in l:
+                    # A value was specified. Use it.
+                    values.append(re.split('\s*=\s*', l))
+                else:
+                    if l:
+                        values.append( (l, str(i)) )
+            comment=comment.replace('@{', '').replace('@see', 'See').replace('\ingroup', '')
+            yield (typ, name, values, comment)
+            comment=''
+            continue
 
 def parse_include(name):
     """Parse include file.
