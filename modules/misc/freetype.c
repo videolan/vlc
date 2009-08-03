@@ -267,6 +267,7 @@ struct filter_sys_t
     int            i_default_font_size;
     int            i_display_height;
 #ifdef HAVE_FONTCONFIG
+    char*          psz_fontfamily;
     bool           b_fontconfig_ok;
     FcConfig      *p_fontconfig;
 #endif
@@ -278,7 +279,7 @@ struct filter_sys_t
 };
 
 #define UCHAR uint32_t
-#define TR_DEFAULT_FONT FC_DEFAULT_FONT
+#define TR_DEFAULT_FONT p_sys->psz_fontfamily
 #define TR_FONT_STYLE_PTR ft_style_t *
 
 #include "text_renderer.h"
@@ -308,6 +309,9 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys = p_sys = malloc( sizeof( filter_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
+ #ifdef HAVE_FONTCONFIG
+    p_sys->psz_fontfamily = NULL;
+#endif
     p_sys->p_face = 0;
     p_sys->p_library = 0;
     p_sys->i_font_size = 0;
@@ -376,7 +380,9 @@ static int Create( vlc_object_t *p_this )
     if( !psz_fontfile )
         goto error;
     msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile );
+    p_sys->psz_fontfamily = strdup( psz_fontfamily );
 #else
+    p_sys->psz_fontfamily = strdup( DEFAULT_FONT )
     psz_fontfile = psz_fontfamily;
 #endif
 
@@ -470,6 +476,7 @@ static void Destroy( vlc_object_t *p_this )
 
 #ifdef HAVE_FONTCONFIG
     FontBuilderDetach( p_filter, p_sys->p_fontbuilder );
+    free( p_sys->psz_fontfamily );
 #endif
 
     /* FcFini asserts calling the subfunction FcCacheFini()
