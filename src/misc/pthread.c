@@ -145,7 +145,7 @@ void vlc_mutex_init( vlc_mutex_t *p_mutex )
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_NORMAL );
 #else
     /* Create error-checking mutex to detect problems more easily. */
-# if defined (__GLIBC__) && (__GLIBC_MINOR__ < 6)
+# if defined (__GLIBC__) && (__GLIBC__ == 2) && (__GLIBC_MINOR__ < 6)
     pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
 # else
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
@@ -164,7 +164,7 @@ void vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
     pthread_mutexattr_t attr;
 
     pthread_mutexattr_init( &attr );
-#if defined (__GLIBC__) && (__GLIBC_MINOR__ < 6)
+#if defined (__GLIBC__) && (__GLIBC__ == 2) && (__GLIBC_MINOR__ < 6)
     pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_RECURSIVE_NP );
 #else
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
