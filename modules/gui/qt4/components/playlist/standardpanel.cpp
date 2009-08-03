@@ -211,7 +211,7 @@ void StandardPLPanel::gotoPlayingItem()
 
 void StandardPLPanel::handleExpansion( const QModelIndex& index )
 {
-    view->scrollTo( index, QAbstractItemView::EnsureVisible );
+    view->scrollTo( index );
 }
 
 void StandardPLPanel::setCurrentRootId( int _new )
