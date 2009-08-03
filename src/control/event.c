@@ -17,15 +17,16 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
+#define  LIBVLC_EVENT_TYPES_KEEP_DEFINE
 #include <vlc/libvlc.h>
 
 #include "libvlc_internal.h"
@@ -250,58 +251,19 @@ void libvlc_event_send( libvlc_event_manager_t * p_em,
  *
  * Get the char * name of an event type.
  **************************************************************************/
-static const char event_type_to_name[][35] =
+static const char event_type_to_name[][libvlc_num_event_types] =
 {
-#define EVENT(a) [a]=#a
-    EVENT(libvlc_MediaMetaChanged),
-    EVENT(libvlc_MediaSubItemAdded),
-    EVENT(libvlc_MediaDurationChanged),
-    EVENT(libvlc_MediaPreparsedChanged),
-    EVENT(libvlc_MediaFreed),
-    EVENT(libvlc_MediaStateChanged),
-
-    EVENT(libvlc_MediaPlayerNothingSpecial),
-    EVENT(libvlc_MediaPlayerOpening),
-    EVENT(libvlc_MediaPlayerBuffering),
-    EVENT(libvlc_MediaPlayerPlaying),
-    EVENT(libvlc_MediaPlayerPaused),
-    EVENT(libvlc_MediaPlayerStopped),
-    EVENT(libvlc_MediaPlayerForward),
-    EVENT(libvlc_MediaPlayerBackward),
-    EVENT(libvlc_MediaPlayerEndReached),
-    EVENT(libvlc_MediaPlayerTimeChanged),
-    EVENT(libvlc_MediaPlayerTitleChanged),
-    EVENT(libvlc_MediaPlayerPositionChanged),
-    EVENT(libvlc_MediaPlayerSeekableChanged),
-    EVENT(libvlc_MediaPlayerPausableChanged),
-
-    EVENT(libvlc_MediaListItemAdded),
-    EVENT(libvlc_MediaListWillAddItem),
-    EVENT(libvlc_MediaListItemDeleted),
-    EVENT(libvlc_MediaListWillDeleteItem),
-
-    EVENT(libvlc_MediaListViewItemAdded),
-    EVENT(libvlc_MediaListViewWillAddItem),
-    EVENT(libvlc_MediaListViewItemDeleted),
-    EVENT(libvlc_MediaListViewWillDeleteItem),
-
-    EVENT(libvlc_MediaListPlayerPlayed),
-    EVENT(libvlc_MediaListPlayerNextItemSet),
-    EVENT(libvlc_MediaListPlayerStopped),
-
-    EVENT(libvlc_MediaDiscovererStarted),
-    EVENT(libvlc_MediaDiscovererEnded),
-
-    EVENT(libvlc_MediaPlayerSnapshotTaken),
-#undef EVENT
+#define DEF(a) [libvlc_##a]=#a
+    DEFINE_LIBVLC_EVENT_TYPES
+#undef  DEF
 };
 
-static const char unkwown_event_name[] = "Unknown Event";
+static const char unknown_event_name[] = "Unknown Event";
 
 const char * libvlc_event_type_name( libvlc_event_type_t event_type )
 {
-    if( event_type >= sizeof(event_type_to_name)/sizeof(event_type_to_name[0]))
-        return unkwown_event_name;
+    if( event_type >= libvlc_num_event_types )
+        return unknown_event_name;
     return event_type_to_name[event_type];
 }
 

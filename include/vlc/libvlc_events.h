@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef LIBVLC_EVENTS_H
@@ -44,69 +44,80 @@ extern "C" {
  * @{
  */
 
+    /* Append new event types at the end. Do not remove, insert or
+     * re-order any entry. The cpp will prepend libvlc_ to the symbols. */
+#define DEFINE_LIBVLC_EVENT_TYPES \
+    DEF( MediaMetaChanged ), \
+    DEF( MediaSubItemAdded ), \
+    DEF( MediaDurationChanged ), \
+    DEF( MediaPreparsedChanged ), \
+    DEF( MediaFreed ), \
+    DEF( MediaStateChanged ), \
+    \
+    DEF( MediaPlayerNothingSpecial ), \
+    DEF( MediaPlayerOpening ), \
+    DEF( MediaPlayerBuffering ), \
+    DEF( MediaPlayerPlaying ), \
+    DEF( MediaPlayerPaused ), \
+    DEF( MediaPlayerStopped ), \
+    DEF( MediaPlayerForward ), \
+    DEF( MediaPlayerBackward ), \
+    DEF( MediaPlayerEndReached ), \
+    DEF( MediaPlayerEncounteredError ), \
+    DEF( MediaPlayerTimeChanged ), \
+    DEF( MediaPlayerPositionChanged ), \
+    DEF( MediaPlayerSeekableChanged ), \
+    DEF( MediaPlayerPausableChanged ), \
+    \
+    DEF( MediaListItemAdded ), \
+    DEF( MediaListWillAddItem ), \
+    DEF( MediaListItemDeleted ), \
+    DEF( MediaListWillDeleteItem ), \
+    \
+    DEF( MediaListViewItemAdded ), \
+    DEF( MediaListViewWillAddItem ), \
+    DEF( MediaListViewItemDeleted ), \
+    DEF( MediaListViewWillDeleteItem ), \
+    \
+    DEF( MediaListPlayerPlayed ), \
+    DEF( MediaListPlayerNextItemSet ), \
+    DEF( MediaListPlayerStopped ), \
+    \
+    DEF( MediaDiscovererStarted ), \
+    DEF( MediaDiscovererEnded ), \
+    \
+    DEF( MediaPlayerTitleChanged ), \
+    DEF( MediaPlayerSnapshotTaken ), \
+    DEF( MediaPlayerLengthChanged ), \
+    \
+    DEF( VlmMediaAdded ), \
+    DEF( VlmMediaRemoved ), \
+    DEF( VlmMediaChanged ), \
+    DEF( VlmMediaInstanceStarted ), \
+    DEF( VlmMediaInstanceStopped ), \
+    DEF( VlmMediaInstanceStatusInit ), \
+    DEF( VlmMediaInstanceStatusOpening ), \
+    DEF( VlmMediaInstanceStatusPlaying ), \
+    DEF( VlmMediaInstanceStatusPause ), \
+    DEF( VlmMediaInstanceStatusEnd ), \
+    DEF( VlmMediaInstanceStatusError ), \
+    /* New event types HERE */
+
 #ifdef __cplusplus
 enum libvlc_event_type_e {
 #else
 enum libvlc_event_type_t {
 #endif
-    /* Append new event types at the end.
-     * Do not remove, insert or re-order any entry. */
-    libvlc_MediaMetaChanged,
-    libvlc_MediaSubItemAdded,
-    libvlc_MediaDurationChanged,
-    libvlc_MediaPreparsedChanged,
-    libvlc_MediaFreed,
-    libvlc_MediaStateChanged,
-
-    libvlc_MediaPlayerNothingSpecial,
-    libvlc_MediaPlayerOpening,
-    libvlc_MediaPlayerBuffering,
-    libvlc_MediaPlayerPlaying,
-    libvlc_MediaPlayerPaused,
-    libvlc_MediaPlayerStopped,
-    libvlc_MediaPlayerForward,
-    libvlc_MediaPlayerBackward,
-    libvlc_MediaPlayerEndReached,
-    libvlc_MediaPlayerEncounteredError,
-    libvlc_MediaPlayerTimeChanged,
-    libvlc_MediaPlayerPositionChanged,
-    libvlc_MediaPlayerSeekableChanged,
-    libvlc_MediaPlayerPausableChanged,
-
-    libvlc_MediaListItemAdded,
-    libvlc_MediaListWillAddItem,
-    libvlc_MediaListItemDeleted,
-    libvlc_MediaListWillDeleteItem,
-
-    libvlc_MediaListViewItemAdded,
-    libvlc_MediaListViewWillAddItem,
-    libvlc_MediaListViewItemDeleted,
-    libvlc_MediaListViewWillDeleteItem,
-
-    libvlc_MediaListPlayerPlayed,
-    libvlc_MediaListPlayerNextItemSet,
-    libvlc_MediaListPlayerStopped,
-
-    libvlc_MediaDiscovererStarted,
-    libvlc_MediaDiscovererEnded,
-
-    libvlc_MediaPlayerTitleChanged,
-    libvlc_MediaPlayerSnapshotTaken,
-    libvlc_MediaPlayerLengthChanged,
-
-    libvlc_VlmMediaAdded,
-    libvlc_VlmMediaRemoved,
-    libvlc_VlmMediaChanged,
-    libvlc_VlmMediaInstanceStarted,
-    libvlc_VlmMediaInstanceStopped,
-    libvlc_VlmMediaInstanceStatusInit,
-    libvlc_VlmMediaInstanceStatusOpening,
-    libvlc_VlmMediaInstanceStatusPlaying,
-    libvlc_VlmMediaInstanceStatusPause,
-    libvlc_VlmMediaInstanceStatusEnd,
-    libvlc_VlmMediaInstanceStatusError,
-    /* New event types HERE */
+#define DEF(a) libvlc_##a
+    DEFINE_LIBVLC_EVENT_TYPES
+    libvlc_num_event_types
+#undef  DEF
 };
+
+/* Implementing libvlc_event_type_name() needs the definition too. */
+#ifndef LIBVLC_EVENT_TYPES_KEEP_DEFINE
+#undef  DEFINE_LIBVLC_EVENT_TYPES
+#endif
 
 /**
  * An Event
