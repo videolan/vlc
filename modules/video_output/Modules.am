@@ -19,6 +19,7 @@ SOURCES_opengllayer = opengllayer.m
 SOURCES_directfb = directfb.c
 SOURCES_vmem = vmem.c
 SOURCES_yuv = yuv.c
+SOURCES_vout_wrapper = wrapper.c
 
 libxcb_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
@@ -70,3 +71,5 @@ libdrawable_plugin_la_CFLAGS = $(AM_CFLAGS)
 libdrawable_plugin_la_LIBADD = $(AM_LIBADD)
 libdrawable_plugin_la_DEPENDENCIES =
 libvlc_LTLIBRARIES += libdrawable_plugin.la
+
+libvlc_LTLIBRARIES += libvout_wrapper_plugin.la
