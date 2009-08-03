@@ -141,7 +141,9 @@ void vlc_mutex_init( vlc_mutex_t *p_mutex )
 
     if( pthread_mutexattr_init( &attr ) )
         abort();
-#ifndef NDEBUG
+#ifdef NDEBUG
+    pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_NORMAL );
+#else
     /* Create error-checking mutex to detect problems more easily. */
 # if defined (__GLIBC__) && (__GLIBC_MINOR__ < 6)
     pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_ERRORCHECK_NP );
