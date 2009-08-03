@@ -147,6 +147,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
         }
         else if( !strcmp( argn[i], "text" ) )
         {
+            free( psz_text );
             psz_text = strdup( argv[i] );
         }
         else if( !strcmp( argn[i], "autoplay")
