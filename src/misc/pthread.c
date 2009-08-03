@@ -812,11 +812,16 @@ void vlc_timer_destroy (vlc_timer_t timer)
 void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
                          mtime_t value, mtime_t interval)
 {
+    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
+
+    vlc_mutex_lock (&lock);
     vlc_mutex_lock (&timer->lock);
     if (timer->value)
     {
+        vlc_mutex_unlock (&timer->lock);
         vlc_cancel (timer->thread);
         vlc_join (timer->thread, NULL);
+        vlc_mutex_lock (&timer->lock);
         timer->value = 0;
     }
     if ((value != 0)
@@ -827,6 +832,7 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
         timer->interval = interval;
     }
     vlc_mutex_unlock (&timer->lock);
+    vlc_mutex_unlock (&lock);
 }
 
 /**
