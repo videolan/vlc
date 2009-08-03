@@ -136,12 +136,10 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
         p_control = new DirectoryConfigControl( p_this, p_item, parent, l,
                                                 line );
         break;
-#if 0
     case CONFIG_ITEM_FONT:
         p_control = new FontConfigControl( p_this, p_item, parent, l,
-                                           line, false );
+                                           line);
         break;
-#endif
     case CONFIG_ITEM_KEY:
         p_control = new KeySelectorControl( p_this, p_item, parent, l, line );
         break;
@@ -370,20 +368,19 @@ void DirectoryConfigControl::updateField()
     text->setText( toNativeSepNoSlash( dir ) );
 }
 
-#if 0
 #include <QFontDialog>
 
 /********* String / Font **********/
 FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
                         module_config_t *_p_item, QWidget *_p_widget,
-                        QGridLayout *_p_layout, int& _int, bool _pwd ) :
-     FileConfigControl( _p_this, _p_item, _p_widget, _p_layout, _int, _pwd)
+                        QGridLayout *_p_layout, int& _int) :
+     FileConfigControl( _p_this, _p_item, _p_widget, _p_layout, _int)
 {}
 
 FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
                         module_config_t *_p_item, QLabel *_p_label,
-                        QLineEdit *_p_line, QPushButton *_p_button, bool _pwd ):
-     FileConfigControl( _p_this, _p_item, _p_label, _p_line, _p_button, _pwd)
+                        QLineEdit *_p_line, QPushButton *_p_button):
+     FileConfigControl( _p_this, _p_item, _p_label, _p_line, _p_button)
 {}
 
 void FontConfigControl::updateField()
@@ -393,7 +390,6 @@ void FontConfigControl::updateField()
     if( !ok ) return;
     text->setText( font.family() );
 }
-#endif
 
 /********* String / choice list **********/
 StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,

@@ -329,20 +329,18 @@ public slots:
     virtual void updateField();
 };
 
-#if 0
 class FontConfigControl : public FileConfigControl
 {
     Q_OBJECT;
 public:
     FontConfigControl( vlc_object_t *, module_config_t *, QWidget *,
-                       QGridLayout *, int&, bool pwd );
+                       QGridLayout *, int&);
     FontConfigControl( vlc_object_t *, module_config_t *, QLabel *,
-                       QLineEdit *, QPushButton *, bool pwd );
+                       QLineEdit *, QPushButton *);
     virtual ~FontConfigControl() {};
 public slots:
     virtual void updateField();
 };
-#endif
 
 class ModuleConfigControl : public VStringConfigControl
 {
