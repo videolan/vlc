@@ -542,6 +542,7 @@ static vlc_object_t *FontBuilderAttach( filter_t *p_filter )
     if( p_fontbuilder )
     {
         var_AddCallback( p_fontbuilder, "build-done", FontBuilderDone, p_filter );
+        msg_Warn( p_filter, "Building the Fontconfig cache" );
         FontBuilderGetFcConfig( p_filter, p_fontbuilder );
     }
     vlc_mutex_unlock( &fb_lock );
