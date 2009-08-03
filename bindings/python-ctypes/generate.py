@@ -295,7 +295,7 @@ def parse_typedef(name):
                     if l:
                         values.append( (l, str(i)) )
             comment=comment.replace('@{', '').replace('@see', 'See').replace('\ingroup', '')
-            yield (typ, name, values, comment)
+            yield (typ, name.strip(), values, comment)
             comment=''
             continue
 
@@ -315,7 +315,7 @@ def parse_typedef(name):
                     if l:
                         values.append( (l, str(i)) )
             comment=comment.replace('@{', '').replace('@see', 'See').replace('\ingroup', '')
-            yield (typ, name, values, comment)
+            yield (typ, name.strip(), values, comment)
             comment=''
             continue
 

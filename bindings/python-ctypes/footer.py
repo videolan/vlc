@@ -1,4 +1,4 @@
-# Footer code.
+### Start of footer.py ###
 
 class MediaEvent(ctypes.Structure):
     _fields_ = [
@@ -28,7 +28,7 @@ class EventUnion(ctypes.Union):
 
 class Event(ctypes.Structure):
     _fields_ = [
-        ('type', EventTypeT),
+        ('type', EventType),
         ('object', ctypes.c_void_p),
         ('u', EventUnion),
         ]
