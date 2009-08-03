@@ -45,7 +45,7 @@ static void Close(vlc_object_t *);
 #define DECLARE_OPEN(name) \
         static int Open##name(vlc_object_t *object) { return Open(object, #name); }
 
-DECLARE_OPEN(none);
+DECLARE_OPEN(aalib);
 
 #undef DECLARE_OPEN
 
@@ -60,7 +60,7 @@ vlc_module_begin()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
 
-    DECLARE_MODULE(none, 0)
+    DECLARE_MODULE(aalib, 10)
 
 vlc_module_end()
 
