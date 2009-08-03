@@ -45,7 +45,20 @@ def debug_callback(event, data):
 
 if __name__ == '__main__':
     import sys
-    import gobject
+    try:
+        from msvcrt import getch
+    except ImportError:
+        def getch():
+            import tty
+            import termios
+            fd=sys.stdin.fileno()
+            old_settings=termios.tcgetattr(fd)
+            try:
+                tty.setraw(fd)
+                ch=sys.stdin.read(1)
+            finally:
+                termios.tcsetattr(fd, termios.TCSADRAIN, old_settings)
+            return ch
 
     @callbackmethod
     def end_callback(event, data):
@@ -58,8 +71,48 @@ if __name__ == '__main__':
         p=i.media_player_new()
         p.set_media(m)
         p.play()
-        # Loop
-        e=p.event_manager()
-        e.event_attach(EventType.MediaPlayerPaused, end_callback, None)
-        gobject.MainLoop().run()
 
+        e=p.event_manager()
+        e.event_attach(EventType.MediaPlayerStopped, end_callback, None)
+
+        def print_info():
+            """Print information about the media."""
+            m=p.get_media()
+            print "Playing ", m.get_mrl()
+            print "Current time:", p.get_time(), "/", m.get_duration()
+            print "Position", p.get_position()
+        
+        def forward():
+            """Go forward 1s"""
+            p.set_time(p.get_time() + 1000)
+
+        def backward():
+            """Go backward 1s"""
+            p.set_time(p.get_time() - 1000)
+
+        def print_help():
+            """Print help
+            """
+            print "Commands:"
+            for k, m in keybindings.iteritems():
+                print "  %s: %s" % (k, (m.__doc__ or m.__name__).splitlines()[0])
+
+        def quit():
+            """Exit."""
+            sys.exit(0)
+
+        keybindings={
+            'f': p.toggle_fullscreen,
+            ' ': p.pause,
+            '+': forward,
+            '-': backward,
+            '?': print_help,
+            'i': print_info,
+            'q': quit,
+            }
+
+        while True:
+            k=getch()
+            method=keybindings.get(k, None)
+            if method is not None:
+                method()
