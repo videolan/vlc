@@ -223,9 +223,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     // Make sure that this instance has been associated with the drawing canvas.
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    libvlc_media_player_set_nsobject ((libvlc_media_player_t *)instance, 
-                                        aDrawable, 
-                                        &ex);
+    libvlc_media_player_set_nsobject(instance, aDrawable, &ex);
     catch_exception( &ex );
 }
 
@@ -233,10 +231,9 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    libvlc_drawable_t ret = libvlc_media_player_get_drawable ((libvlc_media_player_t *)instance, 
-                                        &ex);
+    id ret = libvlc_media_player_get_nsobject(instance);
     catch_exception( &ex );
-    return (id)ret;
+    return ret;
 }
 
 - (VLCAudio *)audio
