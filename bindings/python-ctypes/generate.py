@@ -234,7 +234,7 @@ def generate_enums(enums):
             n=k.split('_')[-1]
             if len(n) == 1:
                 # Single character. Some symbols use 1_1, 5_1, etc.
-                n="_".join( k.split('_')[:-2] )
+                n="_".join( k.split('_')[-2:] )
             if re.match('^[0-9]', n):
                 # Cannot start an identifier with a number
                 n='_'+n
