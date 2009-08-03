@@ -154,3 +154,5 @@ def check_vlc_exception(result, func, args):
     if c:
         raise Exception(args[-1].message)
     return result
+
+### End of header.py ###

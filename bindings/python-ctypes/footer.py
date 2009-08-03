@@ -40,14 +40,26 @@ callbackmethod=ctypes.CFUNCTYPE(None, Event, ctypes.c_void_p)
 @callbackmethod
 def debug_callback(event, data):
     print "Debug callback method"
-    print "Event:", event
+    print "Event:", event.type
     print "Data", data
 
 if __name__ == '__main__':
     import sys
+    import gobject
+
+    @callbackmethod
+    def end_callback(event, data):
+        print "End of stream"
+        sys.exit(0)
+
     if sys.argv[1:]:
-        i=vlc.Instance()
+        i=Instance()
         m=i.media_new(sys.argv[1])
-        p=MediaPlayer()
+        p=i.media_player_new()
         p.set_media(m)
         p.play()
+        # Loop
+        e=p.event_manager()
+        e.event_attach(EventType.MediaPlayerPaused, end_callback, None)
+        gobject.MainLoop().run()
+
