@@ -368,8 +368,6 @@ void DirectoryConfigControl::updateField()
     text->setText( toNativeSepNoSlash( dir ) );
 }
 
-#include <QFontComboBox>
-
 /********* String / Font **********/
 FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
                         module_config_t *_p_item, QWidget *_parent,
@@ -378,6 +376,7 @@ FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
 {
     label = new QLabel( qtr(p_item->psz_text) );
     font = new QFontComboBox( _parent );
+    font->setCurrentFont( QFont( qfu( p_item->value.psz) ) );
     if( !_p_layout )
     {
         QHBoxLayout *layout = new QHBoxLayout();
@@ -399,6 +398,7 @@ FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
 {
     label = _p_label;
     font = _p_font;
+    font->setCurrentFont( QFont( qfu( p_item->value.psz) ) );
 }
 
 /********* String / choice list **********/
