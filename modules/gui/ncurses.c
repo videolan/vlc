@@ -954,6 +954,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 {
                     playlist_item_t *p_parent = p_sys->p_node;
 
+                    PL_LOCK;
                     if( !p_parent )
                     p_parent = playlist_CurrentPlayingItem(p_playlist) ? playlist_CurrentPlayingItem(p_playlist)->p_parent : NULL;
                     if( !p_parent )
@@ -961,6 +962,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
                     while( p_parent->p_parent && p_parent->p_parent->p_parent )
                         p_parent = p_parent->p_parent;
+                    PL_UNLOCK;
 
                     playlist_Add( p_playlist, p_sys->psz_open_chain, NULL,
                                   PLAYLIST_APPEND|PLAYLIST_GO, PLAYLIST_END,
