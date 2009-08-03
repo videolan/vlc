@@ -388,7 +388,7 @@ FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
     else
     {
         _p_layout->addWidget( label, line, 0 );
-        _p_layout->addWidget( font, line, 1 );
+        _p_layout->addWidget( font, line, 1, 1, -1 );
     }
 }
 
