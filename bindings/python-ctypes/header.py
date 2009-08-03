@@ -86,6 +86,9 @@ class LogMessage(ctypes.Structure):
                 ('message', ctypes.c_char_p),
                 ]
 
+    def __str__(self):
+        print "vlc.LogMessage(%d:%s): %s" % (self.severity, self.type, self.message)
+
 class MediaControlPosition(ctypes.Structure):
     _fields_= [
                 ('origin', ctypes.c_ushort),
@@ -141,9 +144,6 @@ class RGBPicture(ctypes.Structure):
 
     def free(self):
         mediacontrol_RGBPicture__free(self)
-
-# Decorator for callback methods
-callbackmethod=ctypes.CFUNCTYPE(None, ctypes.c_void_p, ctypes.c_void_p)
 
 def check_vlc_exception(result, func, args):
     """Error checking method for functions using an exception in/out parameter.

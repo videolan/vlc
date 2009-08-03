@@ -101,7 +101,7 @@ class MediaPlayer:
             if p:
                 o.set_media(i.media_new(p[0]))
             return o
-
+    
     def get_instance(self):
         """Return the associated vlc.Instance.
         """

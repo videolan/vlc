@@ -59,13 +59,13 @@ blacklist=[
     "libvlc_exception_get_message",
     "libvlc_get_vlc_instance",
 
-    "libvlc_media_add_option_flag",
     "libvlc_media_list_view_index_of_item",
     "libvlc_media_list_view_insert_at_index",
     "libvlc_media_list_view_remove_at_index",
     "libvlc_media_list_view_add_item",
 
     # In svn but not in current 1.0.0
+    "libvlc_media_add_option_flag",
     'libvlc_video_set_deinterlace',
     'libvlc_video_get_marquee_option_as_int',
     'libvlc_video_get_marquee_option_as_string',
@@ -74,10 +74,6 @@ blacklist=[
     'libvlc_vlm_get_event_manager',
 
     'mediacontrol_PlaylistSeq__free',
-
-    # TODO
-    "libvlc_event_detach",
-    "libvlc_event_attach",
     ]
 
 # Precompiled regexps
@@ -106,7 +102,7 @@ typ2class={
     'libvlc_log_t*': 'Log',
     'libvlc_log_iterator_t*': 'LogIterator',
     'libvlc_log_message_t*': 'LogMessage',
-    'libvlc_event_type_t': 'EventType',
+    'libvlc_event_type_t': 'ctypes.c_uint',
     'libvlc_event_manager_t*': 'EventManager',
     'libvlc_media_discoverer_t*': 'MediaDiscoverer',
     'libvlc_media_library_t*': 'MediaLibrary',
@@ -134,7 +130,7 @@ typ2class={
     'unsigned': 'ctypes.c_uint',
     'int': 'ctypes.c_int',
     '...': 'FIXMEva_list',
-    'libvlc_callback_t': 'FIXMEcallback',
+    'libvlc_callback_t': 'ctypes.c_void_p',
     'libvlc_time_t': 'ctypes.c_longlong',
     }
 
@@ -147,7 +143,6 @@ defined_classes=(
     'Log',
     'LogIterator',
     #'LogMessage',
-    'EventType',
     'EventManager',
     'MediaDiscoverer',
     'MediaLibrary',
@@ -157,9 +152,6 @@ defined_classes=(
     'TrackDescription',
     'AudioOutput',
     'MediaControl',
-    #'RGBPicture',
-    #'MediaControlPosition',
-    #'MediaControlStreamInformation',
     )
 
 # Definition of prefixes that we can strip from method names when
@@ -195,10 +187,10 @@ def parse_param(s):
         # K&R definition: only type
         return s.replace(' ', ''), ''
 
-def generate_header(classes=None):
-    """Generate header code.
+def insert_code(filename):
+    """Generate header/footer code.
     """
-    f=open('header.py', 'r')
+    f=open(filename, 'r')
     for l in f:
         if 'build_date' in l:
             print 'build_date="%s"' % time.ctime()
@@ -603,11 +595,12 @@ if __name__ == '__main__':
     if debug:
         sys.exit(0)
 
-    generate_header()
+    insert_code('header.py')
     generate_enums(enums)
     wrapped=generate_wrappers(methods)
     for l in methods:
         output_ctypes(*l)
+    insert_code('footer.py')
 
     all=set( t[1] for t in methods )
     not_wrapped=all.difference(wrapped)

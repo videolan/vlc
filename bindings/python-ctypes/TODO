@@ -1,7 +1,5 @@
 * Investigate memory management
 
-* Implement event callbacks
-
 * Write a test suite
 
 * Support multiple VLC versions: define a front-end module which will
