@@ -285,8 +285,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->msg.p_file = NULL;
 #ifdef HAVE_SYSLOG_H
         int i_facility;
-        const char *const psz_facility =
-                             var_CreateGetString( p_intf, "syslog-facility" );
+        char *psz_facility = var_CreateGetString( p_intf, "syslog-facility" );
         if( psz_facility )
         {
             bool b_valid = 0;
