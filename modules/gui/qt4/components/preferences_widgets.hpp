@@ -45,6 +45,7 @@
 #include <QPushButton>
 #include <QVector>
 #include <QDialog>
+#include <QFontComboBox>
 
 class QTreeWidget;
 class QTreeWidgetItem;
@@ -329,17 +330,19 @@ public slots:
     virtual void updateField();
 };
 
-class FontConfigControl : public FileConfigControl
+class FontConfigControl : public VStringConfigControl
 {
     Q_OBJECT;
 public:
     FontConfigControl( vlc_object_t *, module_config_t *, QWidget *,
                        QGridLayout *, int&);
     FontConfigControl( vlc_object_t *, module_config_t *, QLabel *,
-                       QLineEdit *, QPushButton *);
+                       QFontComboBox *);
     virtual ~FontConfigControl() {};
-public slots:
-    virtual void updateField();
+    virtual QString getValue(){ return font->currentFont().toString(); }
+protected:
+    QLabel *label;
+    QFontComboBox *font;
 };
 
 class ModuleConfigControl : public VStringConfigControl

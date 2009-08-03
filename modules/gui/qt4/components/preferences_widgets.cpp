@@ -368,27 +368,37 @@ void DirectoryConfigControl::updateField()
     text->setText( toNativeSepNoSlash( dir ) );
 }
 
-#include <QFontDialog>
+#include <QFontComboBox>
 
 /********* String / Font **********/
 FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
-                        module_config_t *_p_item, QWidget *_p_widget,
-                        QGridLayout *_p_layout, int& _int) :
-     FileConfigControl( _p_this, _p_item, _p_widget, _p_layout, _int)
-{}
+                        module_config_t *_p_item, QWidget *_parent,
+                        QGridLayout *_p_layout, int& line) :
+     VStringConfigControl( _p_this, _p_item, _parent )
+{
+    label = new QLabel( qtr(p_item->psz_text) );
+    font = new QFontComboBox( _parent );
+    if( !_p_layout )
+    {
+        QHBoxLayout *layout = new QHBoxLayout();
+        layout->addWidget( label, 0 );
+        layout->addWidget( font, 1 );
+        widget->setLayout( layout );
+    }
+    else
+    {
+        _p_layout->addWidget( label, line, 0 );
+        _p_layout->addWidget( font, line, 1 );
+    }
+}
 
 FontConfigControl::FontConfigControl( vlc_object_t *_p_this,
                         module_config_t *_p_item, QLabel *_p_label,
-                        QLineEdit *_p_line, QPushButton *_p_button):
-     FileConfigControl( _p_this, _p_item, _p_label, _p_line, _p_button)
-{}
-
-void FontConfigControl::updateField()
+                        QFontComboBox *_p_font):
+     VStringConfigControl( _p_this, _p_item)
 {
-    bool ok;
-    QFont font = QFontDialog::getFont( &ok, QFont( text->text() ), NULL );
-    if( !ok ) return;
-    text->setText( font.family() );
+    label = _p_label;
+    font = _p_font;
 }
 
 /********* String / choice list **********/

@@ -576,8 +576,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             encoding );
             CONFIG_GENERIC( "sub-language", String, ui.subLangLabel,
                             preferredLanguage );
-            CONFIG_GENERIC_FILE( "freetype-font", Font, ui.fontLabel, ui.font,
-                            ui.fontBrowse );
+            CONFIG_GENERIC_NO_BOOL( "freetype-font", Font, ui.fontLabel, font );
             CONFIG_GENERIC( "freetype-color", IntegerList, ui.fontColorLabel,
                             fontColor );
             CONFIG_GENERIC( "freetype-rel-fontsize", IntegerList,
