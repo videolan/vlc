@@ -576,8 +576,8 @@ __vout_Request
 vout_ShowTextAbsolute
 vout_ShowTextRelative
 vout_UnlinkPicture
-vout_window_New
 vout_window_Control
 vout_window_Delete
+vout_window_New
 __xml_Create
 xml_Delete
