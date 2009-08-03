@@ -397,6 +397,8 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p->b_picture_empty = false;
     p_vout->p->i_picture_qtype = QTYPE_NONE;
 
+    vlc_mouse_Init( &p_vout->p->mouse );
+
     vout_snapshot_Init( &p_vout->p->snapshot );
 
     /* Initialize locks */

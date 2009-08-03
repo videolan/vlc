@@ -97,6 +97,9 @@ struct vout_thread_sys_t
     int             i_title_position;
 
     char            *psz_title;
+
+    /* */
+    vlc_mouse_t     mouse;
 };
 
 /* DO NOT use vout_RenderPicture unless you are in src/video_ouput */

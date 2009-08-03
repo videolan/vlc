@@ -95,6 +95,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_vlm.h \
 	../include/vlc_video_splitter.h \
 	../include/vlc_vout.h \
+	../include/vlc_vout_display.h \
 	../include/vlc_vout_window.h \
 	../include/vlc_xml.h \
 	$(NULL)
@@ -344,6 +345,8 @@ SOURCES_libvlc_common = \
 	input/stream_memory.c \
 	input/subtitles.c \
 	input/var.c \
+	video_output/display.c \
+	video_output/display.h \
 	video_output/snapshot.c \
 	video_output/snapshot.h \
 	video_output/statistic.h \
