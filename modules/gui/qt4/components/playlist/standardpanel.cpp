@@ -71,6 +71,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     view->setAcceptDrops( true );
     view->setDropIndicatorShown( true );
     view->header()->setSortIndicator( -1 , Qt::AscendingOrder );
+    view->setUniformRowHeights( true );
     view->setSortingEnabled( true );
 
 
