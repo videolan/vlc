@@ -2265,8 +2265,7 @@ static void* httpd_HostThread( void *data )
                                     {
                                         httpd_MsgAdd( answer,
                                                       "WWW-Authenticate",
-                                                      "Basic realm=\"%s\"",
-                                                      url->psz_user );
+                                                      "Basic realm=\"VLC stream\"" );
                                         /* We fail for all url */
                                         b_auth_failed = true;
                                         free( user );
