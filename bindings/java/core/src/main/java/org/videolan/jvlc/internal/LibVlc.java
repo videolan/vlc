@@ -25,9 +25,6 @@
 
 package org.videolan.jvlc.internal;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import com.sun.jna.Callback;
 import com.sun.jna.Library;
 import com.sun.jna.Native;
@@ -37,22 +34,14 @@ import com.sun.jna.Pointer;
 import com.sun.jna.PointerType;
 import com.sun.jna.Structure;
 import com.sun.jna.Union;
-import com.sun.jna.win32.W32APIFunctionMapper;
-import com.sun.jna.win32.W32APITypeMapper;
 
 
 public interface LibVlc extends Library
 {
-    Map options = new HashMap() {
-        {
-            put(Library.OPTION_DLOPEN_GLOBAL, Boolean.TRUE);
-        }
-    };
-    
-    LibVlc INSTANCE = (LibVlc) Native.loadLibrary(Platform.isWindows()? "libvlc" : "vlc", LibVlc.class, options);
+    LibVlc INSTANCE = (LibVlc) Native.loadLibrary(Platform.isWindows()? "libvlc" : "vlc", LibVlc.class);
 
     LibVlc SYNC_INSTANCE = (LibVlc) Native.synchronizedLibrary(INSTANCE);
-    
+
     public static class libvlc_exception_t extends Structure
     {
 
@@ -304,15 +293,15 @@ public interface LibVlc extends Library
     LibVlcInstance libvlc_new(int argc, String[] argv, libvlc_exception_t exception);
 
     void libvlc_release(LibVlcInstance libvlc_instance_t);
-  
+
     void libvlc_add_intf(LibVlcInstance libvlc_instance_t, String name, libvlc_exception_t exception);
-    
+
     void libvlc_wait(LibVlcInstance libvlc_instance_t);
-    
+
     String libvlc_get_version();
-    
+
     String libvlc_get_compiler();
-    
+
     String libvlc_get_changeset();
 
     // video
@@ -412,21 +401,21 @@ public interface LibVlc extends Library
     void libvlc_media_add_option(LibVlcMedia media, String option, libvlc_exception_t exception);
 
     LibVlcMedia libvlc_media_duplicate(LibVlcMedia media);
-    
+
     String libvlc_media_get_mrl(LibVlcMedia media);
 
     void libvlc_media_retain(LibVlcMedia media);
-    
+
     void libvlc_media_release(LibVlcMedia media);
-    
+
     int libvlc_media_get_state(LibVlcMedia media, libvlc_exception_t exception);
-    
+
     LibVlcMediaList libvlc_media_subitems(LibVlcMedia media, libvlc_exception_t exception);
 
     LibVlcEventManager libvlc_media_event_manager(LibVlcMedia media, libvlc_exception_t exception);
-    
+
     long libvlc_get_duration(LibVlcMedia media, libvlc_exception_t exception);
-    
+
     int libvlc_media_is_preparsed(LibVlcMedia media, libvlc_exception_t exception);
 
     // media player
@@ -455,7 +444,7 @@ public interface LibVlc extends Library
     void libvlc_media_player_set_position(LibVlcMediaPlayer instance, float position, libvlc_exception_t exception);
 
     int libvlc_media_player_is_playing(LibVlcMediaPlayer instance, libvlc_exception_t exception);
-    
+
     int libvlc_media_player_will_play(LibVlcMediaPlayer instance, libvlc_exception_t exception);
 
     void libvlc_media_player_set_rate(LibVlcMediaPlayer instance, float rate, libvlc_exception_t exception);
