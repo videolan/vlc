@@ -70,8 +70,15 @@ class ListPOINTER(object):
         if isinstance(param, (list,tuple)):
             return (self.etype * len(param))(*param)
 
+class LibVLCException(Exception):
+    """Python exception raised by libvlc methods.
+    """
+    pass
+
 # From libvlc_structures.h
 class VLCException(ctypes.Structure):
+    """libvlc exception.
+    """
     _fields_= [
                 ('raised', ctypes.c_int),
                 ('code', ctypes.c_int),
@@ -163,10 +170,10 @@ def check_vlc_exception(result, func, args):
     """Error checking method for functions using an exception in/out parameter.
     """
     ex=args[-1]
-    # Take into account both VLCException and MediacontrolException
+    # Take into account both VLCException and MediacontrolException:
     c=getattr(ex, 'raised', getattr(ex, 'code', 0))
     if c:
-        raise Exception(args[-1].message)
+        raise LibVLCException(args[-1].message)
     return result
 
 ### End of header.py ###
