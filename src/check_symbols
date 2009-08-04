@@ -2,7 +2,7 @@
 # Plugin API consistency check for VLC
 # Copyright © 2007 Rémi Denis-Courmont.
 
-if ! diff -u ${srcdir}/libvlccore.sym libvlc-sorted.sym; then
+if ! diff -u libvlc-headers.sym libvlc-sorted.sym; then
 	echo "Mismatching symbols found!"
 	exit 1
 fi
