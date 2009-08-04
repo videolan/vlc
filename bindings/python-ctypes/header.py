@@ -41,7 +41,21 @@ build_date="This will be replaced by the build date"
 if sys.platform == 'linux2':
     dll=ctypes.CDLL('libvlc.so')
 elif sys.platform == 'win32':
-    dll=ctypes.CDLL('libvlc.dll')
+    import ctypes.util
+    import os
+    plugin_path=None
+    path=ctypes.util.find_library('libvlc.dll')
+    if path is None:
+        # Try a standard location.
+        p='c:\\Program Files\\VideoLAN\\VLC\\libvlc.dll'
+        if os.path.exists(p):
+            plugin_path=os.path.dirname(p)
+            os.chdir(plugin_path)
+        # If chdir failed, this will not work and raise an exception
+        path='libvlc.dll'
+    else:
+        plugin_path=os.path.dirname(path)
+    dll=ctypes.CDLL(path)
 elif sys.platform == 'darwin':
     # FIXME: should find a means to configure path
     dll=ctypes.CDLL('/Applications/VLC.app/Contents/MacOS/lib/libvlc.2.dylib')

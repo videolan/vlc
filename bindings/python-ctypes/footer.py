@@ -66,7 +66,10 @@ if __name__ == '__main__':
         sys.exit(0)
 
     if sys.argv[1:]:
-        i=Instance()
+        if sys.platform == 'win32' and plugin_path is not None:
+            i=Instance('--plugin-path', plugin_path)
+        else:
+            i=Instance()
         m=i.media_new(sys.argv[1])
         p=i.media_player_new()
         p.set_media(m)
@@ -111,6 +114,7 @@ if __name__ == '__main__':
             'q': quit,
             }
 
+        print "Press q to quit, ? to get help."
         while True:
             k=getch()
             method=keybindings.get(k, None)
