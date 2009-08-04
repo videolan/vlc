@@ -478,7 +478,7 @@ static void Destroy( vlc_object_t *p_this )
 
 #ifdef HAVE_FONTCONFIG
     FontBuilderDetach( p_filter, p_sys->p_fontbuilder );
-    xml_Delete( p_sys->p_xml );
+    if( p_sys->p_xml ) xml_Delete( p_sys->p_xml );
     free( p_sys->psz_fontfamily );
 #endif
 
