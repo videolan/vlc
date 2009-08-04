@@ -437,7 +437,7 @@ def parse_override(name):
     """Parse override definitions file.
 
     It is possible to override methods definitions in classes.
-    
+
     It returns a tuple
     (code, overriden_methods, docstring)
     """
