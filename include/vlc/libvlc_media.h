@@ -263,7 +263,7 @@ VLC_PUBLIC_API libvlc_event_manager_t *
                                            libvlc_exception_t * p_e );
 
 /**
- * Get duration of media descriptor object item.
+ * Get duration (in ms) of media descriptor object item.
  *
  * \param p_md media descriptor object
  * \param p_e an initialized exception object

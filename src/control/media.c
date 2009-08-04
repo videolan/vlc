@@ -535,7 +535,7 @@ libvlc_media_event_manager( libvlc_media_t * p_md,
 }
 
 /**************************************************************************
- * Get duration of media object.
+ * Get duration of media object (in ms)
  **************************************************************************/
 int64_t
 libvlc_media_get_duration( libvlc_media_t * p_md,
@@ -549,7 +549,7 @@ libvlc_media_get_duration( libvlc_media_t * p_md,
         return -1;
     }
 
-    return input_item_GetDuration( p_md->p_input_item );
+    return input_item_GetDuration( p_md->p_input_item ) / 1000;
 }
 
 /**************************************************************************
