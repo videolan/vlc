@@ -190,6 +190,7 @@
 			<array>
 				<string>ram</string>
 				<string>rm</string>
+				<string>rmvb</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>rm.icns</string>
@@ -615,6 +616,7 @@
 			<key>CFBundleTypeExtensions</key>
 			<array>
 				<string>wmv</string>
+				<string>wm</string>
 			</array>
 			<key>CFBundleTypeIconFile</key>
 			<string>wmv.icns</string>
