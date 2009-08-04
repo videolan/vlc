@@ -402,10 +402,6 @@ subpicture_NewFromPicture
 subpicture_region_ChainDelete
 subpicture_region_Delete
 subpicture_region_New
-text_style_Copy
-text_style_Delete
-text_style_Duplicate
-text_style_New
 tls_ClientCreate
 tls_ClientDelete
 ToLocale
@@ -580,4 +576,8 @@ vout_window_New
 vout_window_Control
 vout_window_Delete
 __xml_Create
+text_style_Copy
+text_style_Delete
+text_style_Duplicate
+text_style_New
 xml_Delete
