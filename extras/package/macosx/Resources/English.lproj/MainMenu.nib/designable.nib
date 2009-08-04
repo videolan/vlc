@@ -8,11 +8,11 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="4375"/>
 			<integer value="235"/>
 			<integer value="3568"/>
-			<integer value="283"/>
 			<integer value="2199"/>
+			<integer value="4375"/>
+			<integer value="283"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -833,21 +833,21 @@
 									<reference key="NSOnImage" ref="464614658"/>
 									<reference key="NSMixedImage" ref="724706907"/>
 								</object>
-								<object class="NSMenuItem" id="229481215">
-									<reference key="NSMenu" ref="816567345"/>
-									<string key="NSTitle">Shuffle</string>
-									<string key="NSKeyEquiv">z</string>
-									<int key="NSKeyEquivModMask">1048576</int>
-									<int key="NSMnemonicLoc">2147483647</int>
-									<reference key="NSOnImage" ref="464614658"/>
-									<reference key="NSMixedImage" ref="724706907"/>
-								</object>
 								<object class="NSMenuItem" id="963561211">
 									<reference key="NSMenu" ref="816567345"/>
 									<bool key="NSIsDisabled">YES</bool>
 									<bool key="NSIsSeparator">YES</bool>
 									<string key="NSTitle"/>
 									<string key="NSKeyEquiv"/>
+									<int key="NSMnemonicLoc">2147483647</int>
+									<reference key="NSOnImage" ref="464614658"/>
+									<reference key="NSMixedImage" ref="724706907"/>
+								</object>
+								<object class="NSMenuItem" id="229481215">
+									<reference key="NSMenu" ref="816567345"/>
+									<string key="NSTitle">Shuffle</string>
+									<string key="NSKeyEquiv">z</string>
+									<int key="NSKeyEquivModMask">1048576</int>
 									<int key="NSMnemonicLoc">2147483647</int>
 									<reference key="NSOnImage" ref="464614658"/>
 									<reference key="NSMixedImage" ref="724706907"/>
@@ -14010,7 +14010,7 @@ LCAuLi4</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
-					<string>{{358, 293}, {255, 393}}</string>
+					<string>{{487, 293}, {255, 393}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -14170,7 +14170,7 @@ LCAuLi4</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
-					<string>{{214, 686}, {468, 20}}</string>
+					<string>{{343, 686}, {468, 20}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>

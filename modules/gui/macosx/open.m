@@ -501,10 +501,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
 - (IBAction)inputSlaveAction:(id)sender
 {
     if( sender == o_file_slave_ckbox )
-    {
         [o_file_slave_select_btn setEnabled: [o_file_slave_ckbox state]];
-        [o_file_slave_filename_txt setStringValue: @""];
-    }
     else
     {
         NSOpenPanel *o_open_panel;
@@ -517,12 +514,16 @@ static VLCOpen *_o_sharedMainInstance = nil;
                 [o_file_slave_path release];
             o_file_slave_path = [[o_open_panel filenames] objectAtIndex: 0];
             [o_file_slave_path retain];
-            NSFileWrapper *o_file_wrapper;
-            o_file_wrapper = [[NSFileWrapper alloc] initWithPath: [[o_open_panel filenames] objectAtIndex: 0]];
-            [o_file_slave_filename_txt setStringValue: [NSString stringWithFormat: @"\"%@\"", [o_file_wrapper preferredFilename]]];
         }
         else
             [o_file_slave_filename_txt setStringValue: @""];
+    }
+    if( o_file_slave_path )
+    {
+        NSFileWrapper *o_file_wrapper;
+        o_file_wrapper = [[NSFileWrapper alloc] initWithPath: o_file_slave_path];
+        [o_file_slave_filename_txt setStringValue: [NSString stringWithFormat: @"\"%@\"", [o_file_wrapper preferredFilename]]];
+        [o_file_wrapper release];
     }
 }
 
