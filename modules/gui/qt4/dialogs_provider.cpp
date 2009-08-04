@@ -525,37 +525,37 @@ void DialogsProvider::openAPlaylist()
 
 void DialogsProvider::saveAPlaylist()
 {
+    static const struct
+    {
+        char filter[24];
+        char module[12];
+    } types[] = {
+        { N_("XSPF playlist (*.xpsf)"), "export-xspf", },
+        { N_("M3U playlist (*.m3u)"), "export-m3u", },
+        { N_("HTML playlist (*.html)"), "export-html", },
+    };
+    QString filters, selected;
+
+    for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++ )
+    {
+        if( !filters.isEmpty() )
+            filters += ";;";
+        filters += qfu( vlc_gettext( types[i].filter ) );
+    }
+
     QString file = QFileDialog::getSaveFileName( NULL,
                                   qtr( "Save playlist as..." ),
-                                  p_intf->p_sys->filepath,
-                                  qtr( "XSPF playlist (*.xspf);; " ) +
-                                  qtr( "M3U playlist (*.m3u);; " ) +
-                                  qtr( "HTML playlist (*.html)" ) );
+                                  p_intf->p_sys->filepath, filters, &selected );
+    if( file.isEmpty() )
+        return;
 
-    if( !file.isEmpty() )
-    {
-        static const char psz_xspf[] = "export-xspf",
-                          psz_m3u[] = "export-m3u",
-                          psz_html[] = "export-html";
-        const char *psz_module;
-
-        if( file.contains( ".xsp" ) )
-            psz_module = psz_xspf;
-        else if( file.contains( ".m3u" ) )
-            psz_module = psz_m3u;
-        else if( file.contains(".html" ) )
-            psz_module = psz_html;
-        else
+    for( size_t i = 0; i < sizeof (types) / sizeof (types[0]); i++)
+        if( selected == qfu( vlc_gettext( types[i].filter ) ) )
         {
-            msg_Warn( p_intf, "Impossible to recognise the file type. "
-                    "Defaulting to XSPF" );
-            psz_module = psz_xspf;
-            file.append( ".xspf" );
+            playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
+                             THEPL->p_local_category, types[i].module );
+            break;
         }
-
-        playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
-                THEPL->p_local_category, psz_module);
-    }
 }
 
 /****************************************************************************
