@@ -54,10 +54,10 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
     p_scriptClass(NULL),
     p_browser(instance),
     psz_baseURL(NULL)
-#if XP_WIN
+#if defined(XP_WIN)
     ,pf_wndproc(NULL)
 #endif
-#if XP_UNIX
+#if defined(XP_UNIX)
     ,i_width((unsigned)-1)
     ,i_height((unsigned)-1)
     ,i_tb_width(0)
@@ -74,7 +74,7 @@ VlcPlugin::VlcPlugin( NPP instance, uint16 mode ) :
 #endif
 {
     memset(&npwindow, 0, sizeof(NPWindow));
-#if XP_UNIX
+#if defined(XP_UNIX)
     memset(&npvideo, 0, sizeof(Window));
     memset(&npcontrol, 0, sizeof(Window));
 #endif
@@ -586,7 +586,7 @@ relativeurl:
     return NULL;
 }
 
-#if XP_UNIX
+#if defined(XP_UNIX)
 int  VlcPlugin::setSize(unsigned width, unsigned height)
 {
     int diff = (width != i_width) || (height != i_height);

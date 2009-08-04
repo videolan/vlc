@@ -330,7 +330,7 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
 
     instance->pdata = NULL;
 
-#if XP_WIN
+#if defined(XP_WIN)
     HWND win = (HWND)p_plugin->getWindow().window;
     WNDPROC winproc = p_plugin->getWindowProc();
     if( winproc )
@@ -723,7 +723,7 @@ void NPP_Print( NPP instance, NPPrint* printInfo )
 /******************************************************************************
  * Windows-only methods
  *****************************************************************************/
-#if XP_WIN
+#if defined(XP_WIN)
 static LRESULT CALLBACK Manage( HWND p_hwnd, UINT i_msg, WPARAM wpar, LPARAM lpar )
 {
     VlcPlugin* p_plugin = reinterpret_cast<VlcPlugin*>(GetWindowLongPtr(p_hwnd, GWLP_USERDATA));

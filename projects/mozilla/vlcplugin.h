@@ -108,14 +108,14 @@ public:
     NPClass*            getScriptClass()
                             { return p_scriptClass; };
 
-#if XP_WIN
+#if defined(XP_WIN)
     WNDPROC             getWindowProc()
                             { return pf_wndproc; };
     void                setWindowProc(WNDPROC wndproc)
                             { pf_wndproc = wndproc; };
 #endif
 
-#if XP_UNIX
+#if defined(XP_UNIX)
     int                 setSize(unsigned width, unsigned height);
     Window              getVideoWindow()
                             { return npvideo; };
@@ -214,10 +214,10 @@ private:
 
     /* display settings */
     NPWindow  npwindow;
-#if XP_WIN
+#if defined(XP_WIN)
     WNDPROC   pf_wndproc;
 #endif
-#if XP_UNIX
+#if defined(XP_UNIX)
     unsigned int     i_width, i_height;
     unsigned int     i_tb_width, i_tb_height;
     Window           npvideo, npcontrol;
