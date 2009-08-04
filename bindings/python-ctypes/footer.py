@@ -81,13 +81,28 @@ if __name__ == '__main__':
         def print_info():
             """Print information about the media."""
             m=p.get_media()
-            print "Playing ", m.get_mrl()
-            print "Current time:", p.get_time(), "/", m.get_duration()
-            print "Position", p.get_position()
-        
+            print "State:", p.get_state()
+            print "Media:", m.get_mrl()
+            try:
+                print "Current time:", p.get_time(), "/", m.get_duration()
+                print "Position:", p.get_position()
+                print "FPS:", p.get_fps()
+                print "Rate:", p.get_rate()
+                print "Video size: (%d, %d)" % (p.video_get_width(), p.video_get_height())
+            except Exception:
+                pass
+
         def forward():
             """Go forward 1s"""
             p.set_time(p.get_time() + 1000)
+
+        def one_frame_forward():
+            """Go forward one frame"""
+            p.set_time(p.get_time() + long(1000 / (p.get_fps() or 25)))
+
+        def one_frame_backward():
+            """Go backward one frame"""
+            p.set_time(p.get_time() - long(1000 / (p.get_fps() or 25)))
 
         def backward():
             """Go backward 1s"""
@@ -99,6 +114,7 @@ if __name__ == '__main__':
             print "Commands:"
             for k, m in keybindings.iteritems():
                 print "  %s: %s" % (k, (m.__doc__ or m.__name__).splitlines()[0])
+            print " 1-9: go to the given fraction of the movie"
 
         def quit():
             """Exit."""
@@ -109,6 +125,8 @@ if __name__ == '__main__':
             ' ': p.pause,
             '+': forward,
             '-': backward,
+            '.': one_frame_forward,
+            ',': one_frame_backward,
             '?': print_help,
             'i': print_info,
             'q': quit,
@@ -117,6 +135,13 @@ if __name__ == '__main__':
         print "Press q to quit, ? to get help."
         while True:
             k=getch()
+            o=ord(k)
             method=keybindings.get(k, None)
             if method is not None:
                 method()
+            elif o >= 49 and o <= 57:
+                # Numeric value. Jump to a fraction of the movie.
+                v=0.1*(o-48)
+                p.set_position(v)
+
+
