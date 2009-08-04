@@ -76,7 +76,7 @@ if __name__ == '__main__':
         p.play()
 
         e=p.event_manager()
-        e.event_attach(EventType.MediaPlayerStopped, end_callback, None)
+        e.event_attach(EventType.MediaPlayerEndReached, end_callback, None)
 
         def print_info():
             """Print information about the media."""
