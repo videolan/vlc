@@ -44,15 +44,11 @@
 #include <tremor/ivorbiscodec.h>
 
 #else
-#include <vorbis/codec.h>
+#include <vorbis/vorbisenc.h>
 
-/* vorbis header */
-#ifdef HAVE_VORBIS_VORBISENC_H
-#   include <vorbis/vorbisenc.h>
-#   ifndef OV_ECTL_RATEMANAGE_AVG
-#       define OV_ECTL_RATEMANAGE_AVG 0x0
-#   endif
-#endif
+# ifndef OV_ECTL_RATEMANAGE_AVG
+#   define OV_ECTL_RATEMANAGE_AVG 0x0
+# endif
 
 #endif
 
@@ -198,9 +194,7 @@ vlc_module_begin ()
     add_submodule ()
     set_description( N_("Vorbis audio encoder") )
     set_capability( "encoder", 100 )
-#if defined(HAVE_VORBIS_VORBISENC_H)
     set_callbacks( OpenEncoder, CloseEncoder )
-#endif
 
     add_integer( ENC_CFG_PREFIX "quality", 0, NULL, ENC_QUALITY_TEXT,
                  ENC_QUALITY_LONGTEXT, false )
@@ -748,7 +742,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     free( p_sys );
 }
 
-#if defined(HAVE_VORBIS_VORBISENC_H) && !defined(MODULE_NAME_IS_tremor)
+#ifndef MODULE_NAME_IS_tremor
 
 /*****************************************************************************
  * encoder_sys_t : vorbis encoder descriptor

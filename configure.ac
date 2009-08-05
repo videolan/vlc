@@ -3447,43 +3447,7 @@ fi
 dnl
 dnl  Vorbis plugin
 dnl
-AC_ARG_ENABLE(vorbis,
-  [  --enable-vorbis         Vorbis decoder support (default enabled)])
-if test "${enable_vorbis}" != "no"
-then
-  AC_ARG_WITH(vorbis-tree,
-  [    --with-vorbis-tree=PATH vorbis tree for static linking])
-  if test -n "${with_vorbis_tree}"
-  then
-    AC_MSG_CHECKING(for libvorbis.a in ${with_vorbis_tree})
-    real_vorbis_tree="`cd ${with_vorbis_tree} 2>/dev/null && pwd`"
-    if test -z "${real_vorbis_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_vorbis_tree}])
-    fi
-    if test -f "${real_vorbis_tree}/lib/.libs/libvorbis.a"
-    then
-      dnl  Use a custom vorbis
-      AC_MSG_RESULT(${real_vorbis_tree}/lib/.libs/libvorbis.a)
-      VLC_ADD_PLUGIN([vorbis])
-      VLC_ADD_LIBS([vorbis],[${real_vorbis_tree}/lib/.libs/libvorbis.a ${real_vorbis_tree}/lib/.libs/libvorbisenc.a])
-      VLC_ADD_CFLAGS([vorbis],[-I${real_vorbis_tree}/include])
-    else
-      dnl  The given vorbis wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_vorbis_tree}/lib/.libs/libvorbis.a, make sure you compiled vorbis in ${with_vorbis_tree}])
-    fi
-  else
-    AC_CHECK_HEADERS(vorbis/codec.h, [
-      VLC_ADD_PLUGIN([vorbis])
-      VLC_ADD_LIBS([vorbis],[-lvorbis -logg -lm]) ],[])
-
-    AC_CHECK_HEADERS(vorbis/vorbisenc.h, [
-      VLC_ADD_LIBS([vorbis],[-lvorbisenc -lm]) ],[])
-  fi
-fi
+PKG_ENABLE_MODULES_VLC([VORBIS], [vorbis >= 1.1 vorbisenc >= 1.1], [Vorbis decoder and encoder], [auto])
 
 dnl
 dnl  Tremor plugin
