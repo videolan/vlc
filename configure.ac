@@ -719,7 +719,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LIBS([avcodec avformat swscale postproc ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer spatializer param_eq libvlccore vorbis freetype mod mpc dmo quicktime realaudio realvideo galaktos opengl],[-lm])
+  VLC_ADD_LIBS([avcodec avformat swscale postproc ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realaudio realvideo galaktos opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LIBS([headphone_channel_mixer normvol speex mono colorthres extract],[-lm])
@@ -2685,47 +2685,9 @@ AC_CHECK_FUNCS(inet_ntop,[
 dnl
 dnl  ogg demux plugin
 dnl
-AC_ARG_ENABLE(ogg,
-  [  --enable-ogg            Ogg demux support (default enabled)])
-if test "${enable_ogg}" != "no"
-then
-  AC_ARG_WITH(ogg-tree,
-  [    --with-ogg-tree=PATH  ogg tree for static linking])
-  if test -n "${with_ogg_tree}"
-  then
-    AC_MSG_CHECKING(for libogg.a in ${with_ogg_tree})
-    real_ogg_tree="`cd ${with_ogg_tree} 2>/dev/null && pwd`"
-    if test -z "${real_ogg_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_ogg_tree}])
-    fi
-    if test -f "${real_ogg_tree}/src/.libs/libogg.a"
-    then
-      dnl  Use a custom ogg
-      AC_MSG_RESULT(${real_ogg_tree}/src/.libs/libogg.a)
-      VLC_ADD_PLUGIN([ogg])
-      if test "${enable_sout}" != "no"; then
-        VLC_ADD_PLUGIN([mux_ogg])
-      fi
-      VLC_ADD_LIBS([ogg mux_ogg speex vorbis],[${real_ogg_tree}/src/.libs/libogg.a])
-      VLC_ADD_CFLAGS([ogg mux_ogg speex vorbis],[-I${real_ogg_tree}/include])
-    else
-      dnl  The given ogg wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_ogg_tree}/src/.libs/libogg.a, make sure you compiled ogg in ${with_ogg_tree}])
-    fi
-  else
-    AC_CHECK_HEADERS(ogg/ogg.h, [
-      AC_CHECK_LIB( ogg, oggpack_read, [
-        VLC_ADD_PLUGIN([ogg])
-        if test "${enable_sout}" != "no"; then
-          VLC_ADD_PLUGIN([mux_ogg])
-        fi
-        VLC_ADD_LIBS([ogg mux_ogg],[-logg])])
-     ],[])
-  fi
+PKG_ENABLE_MODULES_VLC([OGG], [ogg >= 1.0], [Ogg demux support], [auto])
+if test "${enable_sout}" != "no"; then
+    PKG_ENABLE_MODULES_VLC([MUX_OGG], [ogg >= 1.0], [Ogg demux support], [auto])
 fi
 
 dnl
@@ -3369,40 +3331,7 @@ AS_IF([test "${enable_dca}" != "no"], [
 dnl
 dnl  Flac plugin
 dnl
-AC_ARG_ENABLE(flac,
-  [  --enable-flac           libflac decoder/encoder support (default disabled)])
-if test "${enable_flac}" = "yes"
-then
-  AC_ARG_WITH(flac-tree,
-  [    --with-flac-tree=PATH flac tree for static linking])
-  if test -n "${with_flac_tree}"
-  then
-    AC_MSG_CHECKING(for libFLAC.a in ${with_flac_tree})
-    real_flac_tree="`cd ${with_flac_tree} 2>/dev/null && pwd`"
-    if test -z "${real_flac_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_flac_tree}])
-    fi
-    if test -f "${real_flac_tree}/src/libFLAC/.libs/libFLAC.a"
-    then
-      dnl  Use a custom flac
-      AC_MSG_RESULT(${real_flac_tree}/src/libFLAC/.libs/libFLAC.a)
-      VLC_ADD_LIBS([flac],[${real_flac_tree}/src/libFLAC/.libs/libFLAC.a])
-      VLC_ADD_CFLAGS([flac],[-I${real_flac_tree}/include])
-      AC_DEFINE(HAVE_FLAC_STREAM_DECODER_H, 1, [Define if you have FLAC])
-    else
-      dnl  The given flac wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_flac_tree}/src/libFLAC/.libs/libFLAC.a, make sure you compiled flac in ${with_flac_tree}])
-    fi
-  else
-    AC_CHECK_HEADERS(FLAC/stream_decoder.h, [
-      VLC_ADD_LIBS([flac],[-lFLAC -logg])
-     ],[])
-  fi
-fi
+PKG_ENABLE_MODULES_VLC([FLAC], [flac], [libflac decoder/encoder support], [auto])
 
 dnl
 dnl  Libmpeg2 plugin
@@ -3447,7 +3376,7 @@ fi
 dnl
 dnl  Vorbis plugin
 dnl
-PKG_ENABLE_MODULES_VLC([VORBIS], [vorbis >= 1.1 vorbisenc >= 1.1], [Vorbis decoder and encoder], [auto])
+PKG_ENABLE_MODULES_VLC([VORBIS], [ogg vorbis >= 1.1 vorbisenc >= 1.1], [Vorbis decoder and encoder], [auto])
 
 dnl
 dnl  Tremor plugin
@@ -3465,7 +3394,7 @@ fi
 dnl
 dnl  Speex plugin
 dnl
-PKG_ENABLE_MODULES_VLC([SPEEX], [speex >= 1.0.5], [Speex decoder support], [auto])
+PKG_ENABLE_MODULES_VLC([SPEEX], [ogg speex >= 1.0.5], [Speex decoder support], [auto])
 
 dnl
 dnl  tarkin decoder plugin
@@ -3498,7 +3427,7 @@ fi
 dnl
 dnl  theora decoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([THEORA], [theora >= 1.0], [experimental theora codec], [auto])
+PKG_ENABLE_MODULES_VLC([THEORA], [ogg theora >= 1.0], [experimental theora codec], [auto])
 
 dnl
 dnl  dirac encoder plugin
