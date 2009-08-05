@@ -3886,19 +3886,7 @@ fi
 dnl
 dnl  libxml2 module
 dnl
-AC_ARG_ENABLE(libxml2,
-  [  --enable-libxml2        libxml2 support (default enabled)])
-AS_IF([test "${enable_libxml2}" != "no"], [
-  PKG_CHECK_MODULES([XML2], [libxml-2.0 >= 2.5], [
-    VLC_ADD_CPPFLAGS([xml],[${XML2_CFLAGS}])
-    VLC_ADD_LIBS([xml],[${XML2_LIBS}])
-    VLC_ADD_PLUGIN([xml])
-  ], [
-    AS_IF([test "x${enable_xml2}" != "x"], [
-      AC_MSG_ERROR([Could not find libxml version 2.5 or higher])
-    ])
-  ])
-])
+PKG_ENABLE_MODULES_VLC([libxml2], [], [libxml-2.0 >= 2.5], [libxml2 support],[auto])
 
 dnl
 dnl  SVG module
@@ -4249,18 +4237,7 @@ PKG_ENABLE_MODULES_VLC([PULSE], [], [libpulse >= 0.9.11], [Pulseaudio support], 
 dnl
 dnl  Portaudio module
 dnl
-AC_ARG_ENABLE(portaudio,
-  [  --enable-portaudio      Portaudio library support (default disabled)],
-  [if test "${enable_portaudio}" = "yes"
-   then
-     VLC_ADD_PLUGIN([portaudio])
-     VLC_ADD_CXXFLAGS([portaudio],[])
-     if test "${SYS}" = "mingw32"; then
-        VLC_ADD_LIBS([portaudio],[-lportaudio -lwinmm -lole32])
-     else
-        VLC_ADD_LIBS([portaudio],[-lportaudio])
-     fi
-   fi])
+PKG_ENABLE_MODULES_VLC([PORTAUDIO], [], [portaudio-2.0], [Portaudio library support], [auto])
 
 dnl
 dnl  ALSA module
