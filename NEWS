@@ -27,6 +27,9 @@ Video Output:
 Visualisation:
  * Support of .milk visualisation files using projectM libraries
 
+Removed modules:
+ * csri
+
 Changes between 0.9.9a and 1.0.0:
 ---------------------------------
 

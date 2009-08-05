@@ -30,7 +30,6 @@ SOURCES_realaudio = realaudio.c
 SOURCES_realvideo = realvideo.c
 SOURCES_sdl_image = sdl_image.c
 SOURCES_zvbi = zvbi.c
-SOURCES_csri = csri.c
 SOURCES_cdg = cdg.c
 SOURCES_fluidsynth = fluidsynth.c
 SOURCES_cc = cc.c cc.h

@@ -74,7 +74,6 @@ $Id$
  * converter_float: Floating-point audio format conversions
  * crop: Crop video filter
  * croppadd: Crop/Padd image filter
- * csri: common subtitle interface decoder
  * cvdsub: CVD subtitles decoder
  * dbus: D-Bus control interface
  * dc1394: firewire input module
