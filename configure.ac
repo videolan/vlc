@@ -945,10 +945,10 @@ AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 
 
 dnl Check for hal
-PKG_ENABLE_MODULES_VLC([HAL], [hal >= 0.5.0], [Linux HAL services discovery], [auto])
+PKG_ENABLE_MODULES_VLC([HAL], [], [hal >= 0.5.0], [Linux HAL services discovery], [auto])
 
 dnl Check for mtp
-PKG_ENABLE_MODULES_VLC([MTP],[libmtp >= 0.3.0],[MTP devices support],[auto])
+PKG_ENABLE_MODULES_VLC([MTP], [], [libmtp >= 0.3.0],[MTP devices support],[auto])
 
 dnl Check for dbus
 AC_ARG_ENABLE(dbus,
@@ -1676,7 +1676,7 @@ AS_IF([test "${enable_sout}" != "no"], [
 AM_CONDITIONAL(ENABLE_SOUT, [test "${enable_sout}" != "no"])
 
 dnl Check for libshout
-PKG_ENABLE_MODULES_VLC([access_output_shout], [shout >= 2.1], [libshout output plugin], [auto])
+PKG_ENABLE_MODULES_VLC([shout], [access_output_shout], [shout >= 2.1], [libshout output plugin], [auto])
 
 dnl Lua modules
 AC_ARG_ENABLE(lua,
@@ -1731,7 +1731,7 @@ AM_CONDITIONAL(BUILD_HTTPD, [test "${enable_httpd}" != "no"])
 dnl
 dnl libproxy support
 dnl
-PKG_ENABLE_MODULES_VLC([LIBPROXY], [libproxy-1.0], [libproxy support], [auto])
+PKG_ENABLE_MODULES_VLC([LIBPROXY], [], [libproxy-1.0], [libproxy support], [auto])
 
 
 dnl
@@ -1767,7 +1767,7 @@ AS_IF([test "${enable_growl}" != "no"], [
 dnl
 dnl Libnotify notification plugin
 dnl
-PKG_ENABLE_MODULES_VLC([NOTIFY], [libnotify], [libnotify notification], [auto])
+PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify], [libnotify notification], [auto])
 
 dnl
 dnl Audioscrobbler plugin
@@ -1934,8 +1934,8 @@ dnl
 dnl - special access module for dc1394 input
 dnl - dv module: digital video module check for libraw1394
 dnl
-PKG_ENABLE_MODULES_VLC([dc1394], [libraw1394 >= 2.0.1 libdc1394 >= 1.0.0], [dc1394 access module], [auto])
-PKG_ENABLE_MODULES_VLC([access_dv], [libraw1394 >= 2.0.1 libavc1394 >= 0.5.3], [DV input module], [auto])
+PKG_ENABLE_MODULES_VLC([dc1394], [], [libraw1394 >= 2.0.1 libdc1394 >= 1.0.0], [dc1394 access module], [auto])
+PKG_ENABLE_MODULES_VLC([dv], [access_dv], [libraw1394 >= 2.0.1 libavc1394 >= 0.5.3], [DV input module], [auto])
 
 dnl
 dnl dvdread module: check for libdvdread
@@ -2324,7 +2324,7 @@ fi
 dnl
 dnl  gnomeVFS access module
 dnl
-PKG_ENABLE_MODULES_VLC([GNOMEVFS], [gnome-vfs-2.0], [GnomeVFS access module], [auto])
+PKG_ENABLE_MODULES_VLC([GNOMEVFS], [], [gnome-vfs-2.0], [GnomeVFS access module], [auto])
 
 
 dnl Need to test libcdio and libvcdinfo for a number of things. Do it now.
@@ -2561,9 +2561,9 @@ AC_CHECK_FUNCS(inet_ntop,[
 dnl
 dnl  ogg demux plugin
 dnl
-PKG_ENABLE_MODULES_VLC([OGG], [ogg >= 1.0], [Ogg demux support], [auto])
+PKG_ENABLE_MODULES_VLC([OGG], [], [ogg >= 1.0], [Ogg demux support], [auto])
 if test "${enable_sout}" != "no"; then
-    PKG_ENABLE_MODULES_VLC([MUX_OGG], [ogg >= 1.0], [Ogg demux support], [auto])
+    PKG_ENABLE_MODULES_VLC([MUX_OGG], [], [ogg >= 1.0], [Ogg demux support], [auto])
 fi
 
 dnl
@@ -3207,17 +3207,17 @@ AS_IF([test "${enable_dca}" != "no"], [
 dnl
 dnl  Flac plugin
 dnl
-PKG_ENABLE_MODULES_VLC([FLAC], [flac], [libflac decoder/encoder support], [auto])
+PKG_ENABLE_MODULES_VLC([FLAC], [], [flac], [libflac decoder/encoder support], [auto])
 
 dnl
 dnl  Libmpeg2 plugin
 dnl
-PKG_ENABLE_MODULES_VLC([LIBMPEG2], [libmpeg2 > 0.3.2], [libmpeg2 decoder support], [auto])
+PKG_ENABLE_MODULES_VLC([LIBMPEG2], [], [libmpeg2 > 0.3.2], [libmpeg2 decoder support], [auto])
 
 dnl
 dnl  Vorbis plugin
 dnl
-PKG_ENABLE_MODULES_VLC([VORBIS], [ogg vorbis >= 1.1 vorbisenc >= 1.1], [Vorbis decoder and encoder], [auto])
+PKG_ENABLE_MODULES_VLC([VORBIS], [], [ogg vorbis >= 1.1 vorbisenc >= 1.1], [Vorbis decoder and encoder], [auto])
 
 dnl
 dnl  Tremor plugin
@@ -3235,7 +3235,7 @@ fi
 dnl
 dnl  Speex plugin
 dnl
-PKG_ENABLE_MODULES_VLC([SPEEX], [ogg speex >= 1.0.5], [Speex decoder support], [auto])
+PKG_ENABLE_MODULES_VLC([SPEEX], [], [ogg speex >= 1.0.5], [Speex decoder support], [auto])
 
 dnl
 dnl  tarkin decoder plugin
@@ -3268,17 +3268,17 @@ fi
 dnl
 dnl  theora decoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([THEORA], [ogg theora >= 1.0], [experimental theora codec], [auto])
+PKG_ENABLE_MODULES_VLC([THEORA], [], [ogg theora >= 1.0], [experimental theora codec], [auto])
 
 dnl
 dnl  dirac encoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([DIRAC], [dirac >= 0.10.0], [dirac encoder], [auto], [], [ -lstdc++])
+PKG_ENABLE_MODULES_VLC([DIRAC], [], [dirac >= 0.10.0], [dirac encoder], [auto])
 
 dnl
 dnl  schroedinger decoder plugin (for dirac format video)
 dnl
-PKG_ENABLE_MODULES_VLC([SCHROEDINGER], [schroedinger-1.0 >= 1.0.6], [dirac decoder using schroedinger], [auto])
+PKG_ENABLE_MODULES_VLC([SCHROEDINGER], [], [schroedinger-1.0 >= 1.0.6], [dirac decoder using schroedinger], [auto])
 
 dnl
 dnl  PNG decoder module
@@ -3370,7 +3370,7 @@ fi
 dnl
 dnl libfluidsynth (MIDI synthetizer) plugin
 dnl
-PKG_ENABLE_MODULES_VLC([FLUIDSYNTH], [fluidsynth], [MIDI synthetiser with libfluidsynth], [auto])
+PKG_ENABLE_MODULES_VLC([FLUIDSYNTH], [], [fluidsynth], [MIDI synthetiser with libfluidsynth], [auto])
 
 dnl
 dnl Teletext Modules
@@ -3496,7 +3496,7 @@ AS_IF([test "${enable_kate}" != "no"], [
 dnl
 dnl  tiger decoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([TIGER], [tiger >= 0.3.1], [Tiger rendering library for Kate streams],[auto])
+PKG_ENABLE_MODULES_VLC([TIGER], [], [tiger >= 0.3.1], [Tiger rendering library for Kate streams],[auto])
 
 
 dnl
@@ -3903,7 +3903,7 @@ AS_IF([test "${enable_libxml2}" != "no"], [
 dnl
 dnl  SVG module
 dnl
-PKG_ENABLE_MODULES_VLC([SVG], [librsvg-2.0 >= 2.9.0], [SVG rendering library],[auto])
+PKG_ENABLE_MODULES_VLC([SVG], [], [librsvg-2.0 >= 2.9.0], [SVG rendering library],[auto])
 
 dnl
 dnl Snapshot vout module (with cache)
@@ -4244,7 +4244,7 @@ fi
 dnl
 dnl  Pulseaudio module
 dnl
-PKG_ENABLE_MODULES_VLC([PULSE], [libpulse >= 0.9.11], [Pulseaudio support], [auto])
+PKG_ENABLE_MODULES_VLC([PULSE], [], [libpulse >= 0.9.11], [Pulseaudio support], [auto])
 
 dnl
 dnl  Portaudio module
@@ -4841,7 +4841,7 @@ fi
 dnl
 dnl libprojectM visualization plugin
 dnl
-PKG_ENABLE_MODULES_VLC([projectm], [libprojectM], [projectM visualization plugin], [auto])
+PKG_ENABLE_MODULES_VLC([projectm], [], [libprojectM], [projectM visualization plugin], [auto])
 
 dnl
 dnl  AtmoLight (homebrew AmbiLight)
@@ -4860,7 +4860,7 @@ fi
 dnl
 dnl  Bonjour services discovery
 dnl
-PKG_ENABLE_MODULES_VLC([BONJOUR], [avahi-client >= 0.6], [Bonjour services discovery], [auto])
+PKG_ENABLE_MODULES_VLC([BONJOUR], [], [avahi-client >= 0.6], [Bonjour services discovery], [auto])
 
 dnl
 dnl  Lirc plugin

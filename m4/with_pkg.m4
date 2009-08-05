@@ -75,24 +75,31 @@ AM_CONDITIONAL([HAVE_][$1],
                [test "$AS_TR_SH([with_]m4_tolower([$1]))" = "yes"])
 ])
 
-dnl PKG_ENABLE_MODULES_VLC(VARIABLE-PREFIX, MODULES,
+dnl PKG_ENABLE_MODULES_VLC(VARIABLE-PREFIX,
+dnl                         VLC_MODULE_NAME  dnl (if empty, same as VARIABLE-PREFIX)
+dnl                         PKG MODULES,
 dnl                         [DESCRIPTION], [DEFAULT],
 dnl                         [EXTRA_CFLAGS], [EXTRA_LIBS])
 AC_DEFUN([PKG_ENABLE_MODULES_VLC],
 [
-PKG_WITH_MODULES([$1],[$2],
-    VLC_ADD_PLUGIN(m4_tolower([$1]))
-    VLC_ADD_CFLAGS(m4_tolower([$1]),[$$1_CFLAGS] [$5])
-    VLC_ADD_LIBS(m4_tolower([$1]),[$$1_LIBS] [$6]),
-    AS_IF([test x"$AS_TR_SH([enable_]m4_tolower([$1]))" = "xyes"],
-        [AC_MSG_ERROR(Library [$2] needed for [m4_tolower([$1]) was not found])],
-        [AC_MSG_WARN(Library [$2] needed for [m4_tolower([$1]) was not found])]
-         ),
-    [$3],[$4])
+m4_pushdef([module_name], m4_default(m4_tolower([$2]),m4_tolower([$1])))
+m4_pushdef([enable_arg], m4_tolower([$1]))
 
+PKG_WITH_MODULES([$1],[$3],
+    VLC_ADD_PLUGIN(module_name)
+    VLC_ADD_CFLAGS(module_name,[$$1_CFLAGS] [$6])
+    VLC_ADD_LIBS(module_name,[$$1_LIBS] [$7]),
+    AS_IF([test x"$AS_TR_SH([enable_]enable_arg)" = "xyes"],
+        [AC_MSG_ERROR(Library [$3] needed for [m4_tolower([$1])] was not found)],
+        [AC_MSG_WARN(Library [$3] needed for [m4_tolower([$1])] was not found)]
+         ),
+    [$4],[$5])
 
 AM_CONDITIONAL([HAVE_][$1],
-               [test "$AS_TR_SH([with_]m4_tolower([$1]))" = "yes"])
+               [test "$AS_TR_SH([with_]enable_arg)" = "yes"])
+
+m4_popdef([module_name])
+m4_popdef([enable_arg])
 
 ])
 
