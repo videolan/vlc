@@ -1931,66 +1931,11 @@ lternatively you can use --disable-live555 to disable the liveMedia plugin.])
 fi
 
 dnl
-dnl  special access module for dc1394 input
+dnl - special access module for dc1394 input
+dnl - dv module: digital video module check for libraw1394
 dnl
-AC_ARG_ENABLE(dc1394,
-  [  --enable-dc1394         dc1394 access module (default disabled)])
-if test "${enable_dc1394}" = "yes"
-then
-  dnl
-  dnl Check for libraw1394
-  dnl
-  PKG_CHECK_MODULES(LIBRAW1394, libraw1394 >= 2.0.1,
-    [
-      VLC_ADD_LIBS([dc1394],[`${PKG_CONFIG} --libs libraw1394`])
-      VLC_ADD_CPPFLAGS([dc1394],[`${PKG_CONFIG} --cflags libraw1394`])
-    ],
-    [AC_MSG_ERROR([Couldn't find libraw1394 >= 2.0.1, install libraw1394 development package])]
-  )
-
-  dnl
-  dnl Check for libdc1394
-  dnl
-  PKG_CHECK_MODULES(LIBDC1394, libdc1394-2 >= 2.0.2,
-    [
-      VLC_ADD_PLUGIN([dc1394])
-      VLC_ADD_LIBS([dc1394],[`${PKG_CONFIG} --libs libdc1394-2`])
-      VLC_ADD_CPPFLAGS([access_dv],[`${PKG_CONFIG} --cflags libdc1394-2`])
-    ],
-    [AC_MSG_ERROR([Couldn't find libdc1394 >= 2.0.2, install libdc1394 development package])]
-  )
-fi
-
-dnl
-dnl dv module: digital video module check for libraw1394
-dnl
-AC_ARG_ENABLE(dv,
-[  --enable-dv             dv input module (default disabled)])
-if test "${enable_dv}" = "yes"
-then
-  dnl
-  dnl Check for libraw1394
-  dnl
-  PKG_CHECK_MODULES(LIBRAW1394, libraw1394 >= 2.0.1,
-    [
-      VLC_ADD_LIBS([access_dv],[`${PKG_CONFIG} --libs libraw1394`])
-      VLC_ADD_CPPFLAGS([access_dv],[`${PKG_CONFIG} --cflags libraw1394`])
-    ],
-    [AC_MSG_ERROR([Couldn't find libraw1394 >= 2.0.1, install libraw1394 development package])]
-  )
-
-  dnl
-  dnl Check for libavc1394
-  dnl
-  PKG_CHECK_MODULES(LIBAVC1394, libavc1394 >= 0.5.3,
-    [
-      VLC_ADD_PLUGIN([access_dv])
-      VLC_ADD_LIBS([access_dv],[`${PKG_CONFIG} --libs libavc1394`])
-      VLC_ADD_CPPFLAGS([access_dv],[`${PKG_CONFIG} --cflags libavc1394`])
-    ],
-    [AC_MSG_ERROR([Couldn't find libavc1394 >= 0.5.1, install libavc1394 development package])]
-  )
-fi
+PKG_ENABLE_MODULES_VLC([dc1394], [libraw1394 >= 2.0.1 libdc1394 >= 1.0.0], [dc1394 access module], [auto])
+PKG_ENABLE_MODULES_VLC([access_dv], [libraw1394 >= 2.0.1 libavc1394 >= 0.5.3], [DV input module], [auto])
 
 dnl
 dnl dvdread module: check for libdvdread
