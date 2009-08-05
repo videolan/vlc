@@ -945,14 +945,10 @@ AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 
 
 dnl Check for hal
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 PKG_ENABLE_MODULES_VLC([HAL], [hal >= 0.5.0], [Linux HAL services discovery], [auto])
-fi
 
 dnl Check for mtp
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 PKG_ENABLE_MODULES_VLC([MTP],[libmtp >= 0.3.0],[MTP devices support],[auto])
-fi
 
 dnl Check for dbus
 AC_ARG_ENABLE(dbus,
@@ -1771,9 +1767,7 @@ AS_IF([test "${enable_growl}" != "no"], [
 dnl
 dnl Libnotify notification plugin
 dnl
-if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 PKG_ENABLE_MODULES_VLC([NOTIFY], [libnotify], [libnotify notification], [auto])
-fi
 
 dnl
 dnl Audioscrobbler plugin
