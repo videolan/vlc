@@ -483,6 +483,8 @@ vlc_fourcc_GetCodec
 vlc_fourcc_GetCodecAudio
 vlc_fourcc_GetCodecFromString
 vlc_fourcc_GetDescription
+vlc_fourcc_GetYUVFallback
+vlc_fourcc_AreUVPlanesSwapped
 vlc_gai_strerror
 vlc_gc_init
 vlc_getaddrinfo

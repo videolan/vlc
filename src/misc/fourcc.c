@@ -1283,3 +1283,156 @@ const char *vlc_fourcc_GetDescription( int i_cat, vlc_fourcc_t i_fourcc )
     return e.psz_description;
 }
 
+
+/* */
+#define VLC_CODEC_YUV_PLANAR_420 \
+    VLC_CODEC_I420, VLC_CODEC_YV12, VLC_CODEC_J420
+
+#define VLC_CODEC_YUV_PLANAR_422 \
+    VLC_CODEC_I422, VLC_CODEC_J422
+
+#define VLC_CODEC_YUV_PLANAR_440 \
+    VLC_CODEC_I440, VLC_CODEC_J440
+
+#define VLC_CODEC_YUV_PLANAR_444 \
+    VLC_CODEC_I444, VLC_CODEC_J444
+
+#define VLC_CODEC_YUV_PACKED \
+    VLC_CODEC_YUYV, VLC_CODEC_YVYU, \
+    VLC_CODEC_UYVY, VLC_CODEC_VYUY
+
+#define VLC_CODEC_FALLBACK_420 \
+    VLC_CODEC_YUV_PLANAR_422, VLC_CODEC_YUV_PACKED, \
+    VLC_CODEC_YUV_PLANAR_444, VLC_CODEC_YUV_PLANAR_440, \
+    VLC_CODEC_I411, VLC_CODEC_I410, VLC_CODEC_Y211
+
+static const vlc_fourcc_t p_I420_fallback[] = {
+    VLC_CODEC_I420, VLC_CODEC_YV12, VLC_CODEC_J420, VLC_CODEC_FALLBACK_420, 0
+};
+static const vlc_fourcc_t p_J420_fallback[] = {
+    VLC_CODEC_J420, VLC_CODEC_I420, VLC_CODEC_YV12, VLC_CODEC_FALLBACK_420, 0
+};
+static const vlc_fourcc_t p_YV12_fallback[] = {
+    VLC_CODEC_YV12, VLC_CODEC_I420, VLC_CODEC_J420, VLC_CODEC_FALLBACK_420, 0
+};
+
+#define VLC_CODEC_FALLBACK_422 \
+    VLC_CODEC_YUV_PACKED, VLC_CODEC_YUV_PLANAR_420, \
+    VLC_CODEC_YUV_PLANAR_444, VLC_CODEC_YUV_PLANAR_440, \
+    VLC_CODEC_I411, VLC_CODEC_I410, VLC_CODEC_Y211
+
+static const vlc_fourcc_t p_I422_fallback[] = {
+    VLC_CODEC_I422, VLC_CODEC_J422, VLC_CODEC_FALLBACK_422, 0
+};
+static const vlc_fourcc_t p_J422_fallback[] = {
+    VLC_CODEC_J422, VLC_CODEC_I422, VLC_CODEC_FALLBACK_422, 0
+};
+
+#define VLC_CODEC_FALLBACK_444 \
+    VLC_CODEC_YUV_PLANAR_422, VLC_CODEC_YUV_PACKED, \
+    VLC_CODEC_YUV_PLANAR_420, VLC_CODEC_YUV_PLANAR_440, \
+    VLC_CODEC_I411, VLC_CODEC_I410, VLC_CODEC_Y211
+
+static const vlc_fourcc_t p_I444_fallback[] = {
+    VLC_CODEC_I444, VLC_CODEC_J444, VLC_CODEC_FALLBACK_444, 0
+};
+static const vlc_fourcc_t p_J444_fallback[] = {
+    VLC_CODEC_J444, VLC_CODEC_I444, VLC_CODEC_FALLBACK_444, 0
+};
+
+static const vlc_fourcc_t p_I440_fallback[] = {
+    VLC_CODEC_I440,
+    VLC_CODEC_YUV_PLANAR_420,
+    VLC_CODEC_YUV_PLANAR_422,
+    VLC_CODEC_YUV_PLANAR_444,
+    VLC_CODEC_YUV_PACKED,
+    VLC_CODEC_I411, VLC_CODEC_I410, VLC_CODEC_Y211,
+};
+
+#define VLC_CODEC_FALLBACK_PACKED \
+    VLC_CODEC_YUV_PLANAR_422, VLC_CODEC_YUV_PLANAR_420, \
+    VLC_CODEC_YUV_PLANAR_444, VLC_CODEC_YUV_PLANAR_440, \
+    VLC_CODEC_I411, VLC_CODEC_I410, VLC_CODEC_Y211
+
+static const vlc_fourcc_t p_YUYV_fallback[] = {
+    VLC_CODEC_YUYV,
+    VLC_CODEC_YVYU,
+    VLC_CODEC_UYVY,
+    VLC_CODEC_VYUY,
+    VLC_CODEC_FALLBACK_PACKED, 0
+};
+static const vlc_fourcc_t p_YVYU_fallback[] = {
+    VLC_CODEC_YVYU,
+    VLC_CODEC_YUYV,
+    VLC_CODEC_UYVY,
+    VLC_CODEC_VYUY,
+    VLC_CODEC_FALLBACK_PACKED, 0
+};
+static const vlc_fourcc_t p_UYVY_fallback[] = {
+    VLC_CODEC_UYVY,
+    VLC_CODEC_VYUY,
+    VLC_CODEC_YUYV,
+    VLC_CODEC_YVYU,
+    VLC_CODEC_FALLBACK_PACKED, 0
+};
+static const vlc_fourcc_t p_VYUY_fallback[] = {
+    VLC_CODEC_VYUY,
+    VLC_CODEC_UYVY,
+    VLC_CODEC_YUYV,
+    VLC_CODEC_YVYU,
+    VLC_CODEC_FALLBACK_PACKED, 0
+};
+
+static const vlc_fourcc_t *pp_YUV_fallback[] = {
+    p_YV12_fallback,
+    p_I420_fallback,
+    p_J420_fallback,
+    p_I422_fallback,
+    p_J422_fallback,
+    p_I444_fallback,
+    p_J444_fallback,
+    p_I440_fallback,
+    p_YUYV_fallback,
+    p_YVYU_fallback,
+    p_UYVY_fallback,
+    p_VYUY_fallback,
+    NULL,
+};
+
+static const vlc_fourcc_t p_list_YUV[] = {
+    VLC_CODEC_YUV_PLANAR_420,
+    VLC_CODEC_YUV_PLANAR_422,
+    VLC_CODEC_YUV_PLANAR_440,
+    VLC_CODEC_YUV_PLANAR_444,
+    VLC_CODEC_YUV_PACKED,
+    VLC_CODEC_I411, VLC_CODEC_I410, VLC_CODEC_Y211,
+    0,
+};
+
+const vlc_fourcc_t *vlc_fourcc_GetYUVFallback( vlc_fourcc_t i_fourcc )
+{
+    for( unsigned i = 0; pp_YUV_fallback[i]; i++ )
+    {
+        if( pp_YUV_fallback[i][0] == i_fourcc )
+            return pp_YUV_fallback[i];
+    }
+    return p_list_YUV;
+}
+
+bool vlc_fourcc_AreUVPlanesSwapped( vlc_fourcc_t a, vlc_fourcc_t b )
+{
+    return (((a == VLC_CODEC_I420 || a == VLC_CODEC_J420) && b == VLC_CODEC_YV12) ||
+            ((b == VLC_CODEC_I420 || b == VLC_CODEC_J420) && a == VLC_CODEC_YV12));
+}
+
+#if 0
+static inline bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
+{
+    for( unsigned i = 0; p_list_YUV[i]; i++ )
+    {
+        if( p_list_YUV[i] == fcc )
+            return true;
+    }
+    return false;
+}
+#endif

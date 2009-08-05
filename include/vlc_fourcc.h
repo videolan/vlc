@@ -350,5 +350,20 @@ VLC_EXPORT( vlc_fourcc_t, vlc_fourcc_GetCodecAudio, ( vlc_fourcc_t i_fourcc, int
  */
 VLC_EXPORT( const char *, vlc_fourcc_GetDescription, ( int i_cat, vlc_fourcc_t i_fourcc ) );
 
+/**
+ * It returns a list (terminated with the value 0) of YUV fourccs in
+ * decreasing priority order for the given chroma.
+ *
+ * It will always return a non NULL pointer that must not freed.
+ */
+VLC_EXPORT( const vlc_fourcc_t *, vlc_fourcc_GetYUVFallback, ( vlc_fourcc_t ) );
+
+/**
+ * It returns true if the two fourccs are equivalent if their U&V planes are
+ * swapped.
+ */
+VLC_EXPORT( bool, vlc_fourcc_AreUVPlanesSwapped, (vlc_fourcc_t , vlc_fourcc_t ) );
+
+
 #endif /* _VLC_FOURCC_H */
 
