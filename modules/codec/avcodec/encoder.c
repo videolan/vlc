@@ -141,9 +141,7 @@ struct encoder_sys_t
     int        i_quality; /* for VBR */
     float      f_lumi_masking, f_dark_masking, f_p_masking, f_border_masking;
     int        i_luma_elim, i_chroma_elim;
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
     int        i_aac_profile; /* AAC profile to use.*/
-#endif
     /* Used to work around stupid timestamping behaviour in libavcodec */
     uint64_t i_framenum;
     mtime_t  pi_delay_pts[MAX_FRAME_DELAY];
@@ -156,9 +154,7 @@ static const char *const ppsz_enc_options[] = {
     "trellis", "qscale", "strict", "lumi-masking", "dark-masking",
     "p-masking", "border-masking", "luma-elim-threshold",
     "chroma-elim-threshold",
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
      "aac-profile",
-#endif
      NULL
 };
 
@@ -387,7 +383,6 @@ int OpenEncoder( vlc_object_t *p_this )
     var_Get( p_enc, ENC_CFG_PREFIX "chroma-elim-threshold", &val );
     p_sys->i_chroma_elim = val.i_int;
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
     var_Get( p_enc, ENC_CFG_PREFIX "aac-profile", &val );
     /* ffmpeg uses faac encoder atm, and it has issues with
      * other than low-complexity profile, so default to that */
@@ -411,7 +406,6 @@ int OpenEncoder( vlc_object_t *p_this )
         }
     }
     free( val.psz_string );
-#endif
 
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
@@ -592,11 +586,9 @@ int OpenEncoder( vlc_object_t *p_this )
             /* XXX: FAAC does resample only when setting the INPUT samplerate
              * to the desired value (-R option of the faac frontend)
             p_enc->fmt_in.audio.i_rate = p_context->sample_rate;*/
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
             /* vlc should default to low-complexity profile, faac encoder
              * has bug and aac audio has issues otherwise atm */
             p_context->profile = p_sys->i_aac_profile;
-#endif
         }
     }
 

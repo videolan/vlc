@@ -241,12 +241,10 @@ void EndAudioDec( decoder_t *p_dec );
   "the PSNR isn't much changed (default: 0.0). The H264 specification " \
   "recommends 7." )
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
 #define ENC_PROFILE_TEXT N_( "Specify AAC audio profile to use" )
 #define ENC_PROFILE_LONGTEXT N_( "Specify the AAC audio profile to use " \
    "for encoding the audio bitstream. It takes the following options: " \
    "main, low, ssr (not supported) and ltp (default: main)" )
-#endif
 
 #define FFMPEG_COMMON_MEMBERS   \
     int i_cat;                  \

@@ -192,11 +192,9 @@ vlc_module_begin ()
     add_integer( ENC_CFG_PREFIX "chroma-elim-threshold", 0, NULL,
                  ENC_CHROMA_ELIM_TEXT, ENC_CHROMA_ELIM_LONGTEXT, true )
 
-#if LIBAVCODEC_VERSION_INT >= ((51<<16)+(40<<8)+4)
     /* Audio AAC encoder profile */
     add_string( ENC_CFG_PREFIX "aac-profile", "low", NULL,
                 ENC_PROFILE_TEXT, ENC_PROFILE_LONGTEXT, true )
-#endif
 #endif /* ENABLE_SOUT */
 
     /* video filter submodule */
