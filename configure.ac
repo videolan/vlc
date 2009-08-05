@@ -3159,50 +3159,7 @@ dnl
 AS_IF([test "x${enable_dts}" != "x"], [
   AC_MSG_ERROR([--enable-dts is obsolete. Please use libdca and --enable-dca.])
 ])
-AS_IF([test "x${with_dts_tree}" != "x"], [
-  AC_MSG_ERROR([--with-dts-tree is obsolete. Please use libdca and --with-dca-tree.])
-])
-
-AC_ARG_ENABLE(dca,
-  AS_HELP_STRING([--enable-dca],[DTS Coherent Acoustics support with libdca
-		  (default enabled)]))
-AS_IF([test "${enable_dca}" != "no"], [
-  AC_ARG_WITH(dca-tree,
-    [    --with-dca-tree=PATH  libdca tree for static linking],,
-    [with_dca_tree="no"])
-  AS_IF([test "${with_dca_tree}" != "no"], [
-    real_dca_tree="`cd ${with_dca_tree} 2>/dev/null && pwd`"
-    AS_IF([test -z "${real_dca_tree}"], [
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_dca_tree} directory doesn't exist])
-    ])
-    dnl  Use a custom libdca
-    AC_MSG_CHECKING(for libdca in ${real_dca_tree})
-    AS_IF([test -f "${real_dca_tree}/libdca/.libs/libdca.a"], [
-      AC_MSG_RESULT(yes)
-      VLC_ADD_LIBS([dtstofloat32],[${real_dca_tree}/libdca/.libs/libdca.a])
-      AS_IF([test -f "${real_dca_tree}/include/dca.h"], [
-        VLC_ADD_CPPFLAGS([dtstofloat32],[-I${real_dca_tree}/include])
-      ], [
-        VLC_ADD_CPPFLAGS([dtstofloat32],[-I${real_dca_tree}/../include])
-      ])
-    ], [
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([the specified tree doesn't have libdca/.libs/libdca.a])
-    ])
-  ], [
-    PKG_CHECK_MODULES([DCA], [libdca >= 0.0.5], [
-      VLC_ADD_PLUGIN([dtstofloat32])
-      VLC_ADD_CPPFLAGS([dtstofloat32], [${DCA_CFLAGS}])
-      VLC_ADD_LIBS([dtstofloat32], [${DCA_LIBS}])
-    ], [
-      AS_IF([test "x${enable_dca}" != "x"], [
-        AC_MSG_ERROR([${DCA_PKG_ERRORS}])
-      ])
-    ])
-  ])
-])
+PKG_ENABLE_MODULES_VLC([DCA], [dtstofloat32], [libdca >= 0.0.5], [DTS Coherent Acoustics support with libdca], [auto])
 
 dnl
 dnl  Flac plugin
@@ -4314,17 +4271,9 @@ fi
 dnl
 dnl  JACK modules
 dnl
-AC_ARG_ENABLE(jack,
- [  --enable-jack           JACK audio I/O modules (default disabled)],,
- [enable_jack="no"])
+PKG_ENABLE_MODULES_VLC([JACK], [jack], [jack], [JACK audio I/O modules],[auto])
+PKG_ENABLE_MODULES_VLC([JACK], [access_jack], [jack], [JACK audio I/O modules],[auto])
 
-AS_IF([test "${enable_jack}" != "no"], [
-  AC_CHECK_HEADERS(jack/jack.h, [
-    VLC_ADD_PLUGIN([access_jack])
-    VLC_ADD_PLUGIN([jack])
-    VLC_ADD_LIBS([access_jack jack],[-ljack])
-  ],[AC_MSG_ERROR([cannot find JACK headers])])
-])
 
 dnl
 dnl  CyberLink for C++ UPnP stack

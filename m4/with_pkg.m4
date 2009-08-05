@@ -82,7 +82,7 @@ dnl                         [DESCRIPTION], [DEFAULT],
 dnl                         [EXTRA_CFLAGS], [EXTRA_LIBS])
 AC_DEFUN([PKG_ENABLE_MODULES_VLC],
 [
-m4_pushdef([module_name], m4_default(m4_tolower([$2]),m4_tolower([$1])))
+m4_pushdef([module_name], AS_TR_SH(m4_default(m4_tolower([$2]),m4_tolower([$1]))))
 m4_pushdef([enable_arg], m4_tolower([$1]))
 
 PKG_WITH_MODULES([$1],[$3],
