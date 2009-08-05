@@ -3636,19 +3636,7 @@ fi
 dnl
 dnl libfluidsynth (MIDI synthetizer) plugin
 dnl
-AC_ARG_ENABLE(fluidsynth,
-  [  --enable-fluidsynth     MIDI synthesisr with libfluidsynth (default enabled)])
-AS_IF([test "x${enable_fluidsynth}" != "xno"], [
-  PKG_CHECK_MODULES(FLUIDSYNTH, fluidsynth, [
-    VLC_ADD_PLUGIN(fluidsynth)
-    VLC_ADD_CFLAGS(fluidsynth, [${FLUIDSYNTH_CFLAGS}])
-    VLC_ADD_LIBS(fluidsynth, [${FLUIDSYNTH_LIBS}])
-  ], [
-    AS_IF([test "x${enable_fluidsynth}" != "x"], [
-      AC_MSG_ERROR([${FLUIDSYNTH_PKG_ERRORS}])
-    ])
-  ])
-])
+PKG_ENABLE_MODULES_VLC([FLUIDSYNTH], [fluidsynth], [MIDI synthetiser with libfluidsynth], [auto])
 
 dnl
 dnl Teletext Modules
@@ -3791,18 +3779,7 @@ AS_IF([test "${enable_kate}" != "no"], [
 dnl
 dnl  tiger decoder plugin
 dnl
-AC_ARG_ENABLE(tiger,
-[  --enable-tiger          Tiger rendering library for Kate streams (default enabled)])
-AS_IF([test "${enable_tiger}" != "no"], [
-  PKG_CHECK_MODULES(TIGER,[tiger >= 0.3.1], [
-      AC_DEFINE(HAVE_TIGER, 1, [Define if libtiger is available.])
-      VLC_ADD_CFLAGS([kate],[$TIGER_CFLAGS])
-      VLC_ADD_LIBS([kate],[$TIGER_LIBS]) ],[
-        AS_IF([test "x${enable_tiger}" != "x"], [
-          AC_MSG_ERROR([libtiger does not appear to be installed on your system.])
-        ])
-  ])
-])
+PKG_ENABLE_MODULES_VLC([TIGER], [tiger >= 0.3.1], [Tiger rendering library for Kate streams],[auto])
 
 
 dnl
@@ -4209,18 +4186,7 @@ AS_IF([test "${enable_libxml2}" != "no"], [
 dnl
 dnl  SVG module
 dnl
-AC_ARG_ENABLE(svg,
-  [  --enable-svg            SVG support (default disabled)])
-if test "${enable_svg}" = "yes"
-then
-  PKG_CHECK_MODULES(SVG,
-	librsvg-2.0 >= 2.9.0,
-	[
- 	  VLC_ADD_LIBS([svg],[$SVG_LIBS])
-      	  VLC_ADD_CFLAGS([svg],[$SVG_CFLAGS])
-          VLC_ADD_PLUGIN([svg]) ],
-        [AC_MSG_WARN(SVG library not found)])
-fi
+PKG_ENABLE_MODULES_VLC([SVG], [librsvg-2.0 >= 2.9.0], [SVG rendering library],[auto])
 
 dnl
 dnl Snapshot vout module (with cache)
