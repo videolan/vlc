@@ -82,7 +82,7 @@ AC_DEFUN([PKG_ENABLE_MODULES_VLC],
 [
 PKG_WITH_MODULES([$1],[$2],
     VLC_ADD_PLUGIN(m4_tolower([$1]))
-    VLC_ADD_CFLAGS(m4_tolower([$1]),[$$1_CFLAGS] [$5] )
+    VLC_ADD_CFLAGS(m4_tolower([$1]),[$$1_CFLAGS] [$5])
     VLC_ADD_LIBS(m4_tolower([$1]),[$$1_LIBS] [$6]),
     AS_IF([test x"$AS_TR_SH([enable_]m4_tolower([$1]))" = "xyes"],
         [AC_MSG_ERROR(Library [$2] needed for [m4_tolower([$1]) was not found])],

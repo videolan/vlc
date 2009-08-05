@@ -1702,16 +1702,7 @@ AS_IF([test "${enable_sout}" != "no"], [
 AM_CONDITIONAL(ENABLE_SOUT, [test "${enable_sout}" != "no"])
 
 dnl Check for libshout
-AC_ARG_ENABLE(shout,
-  [  --enable-shout          libshout output plugin (default disabled)])
-if test "${enable_shout}" = "yes"; then
-  PKG_CHECK_MODULES(SHOUT, shout >= 2.1,
-    [AC_DEFINE(HAVE_SHOUT, 1, [Define if you have the libshout library])
-     VLC_ADD_PLUGIN([access_output_shout])
-     VLC_ADD_LIBS([access_output_shout],[$SHOUT_LIBS])
-     VLC_ADD_CFLAGS([access_output_shout],[$SHOUT_CFLAGS])],
-    [AC_MSG_WARN(libshout library not found)])
-fi
+PKG_ENABLE_MODULES_VLC([access_output_shout], [shout >= 2.1], [libshout output plugin], [auto])
 
 dnl Lua modules
 AC_ARG_ENABLE(lua,
@@ -1766,19 +1757,8 @@ AM_CONDITIONAL(BUILD_HTTPD, [test "${enable_httpd}" != "no"])
 dnl
 dnl libproxy support
 dnl
-AC_ARG_ENABLE(libproxy,
-  [  --enable-libproxy       libproxy support (default auto)])
-AS_IF([test "${enable_libproxy}" != "no"], [
-  PKG_CHECK_MODULES(LIBPROXY, libproxy-1.0, [
-    AC_DEFINE(HAVE_LIBPROXY, 1, [Define if libproxy is available])
-    VLC_ADD_CFLAGS([access_http],[$LIBPROXY_CFLAGS])
-    VLC_ADD_LIBS([access_http],[$LIBPROXY_LIBS])
-  ], [
-    AS_IF([test "x${enable_libproxy}" != "x"], [
-      AC_MSG_ERROR([libproxy could not be found on your system])
-    ])
-  ])
-])
+PKG_ENABLE_MODULES_VLC([LIBPROXY], [libproxy-1.0], [libproxy support], [auto])
+
 
 dnl
 dnl VideoLAN manager
@@ -1851,7 +1831,6 @@ AC_ARG_ENABLE(taglib,
        VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS]) ],
       [AC_MSG_WARN(TagLib library not found)])
   ])
-
 
 dnl
 dnl  Input plugins
