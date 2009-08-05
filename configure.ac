@@ -945,35 +945,13 @@ AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 
 
 dnl Check for hal
-AC_ARG_ENABLE(hal,
-  [  --enable-hal            Linux HAL services discovery (default enabled)])
-
-if test "${enable_hal}" != "no" -a "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
-then
-  PKG_CHECK_MODULES(HAL, hal >= 0.5.0,
-    [
-      AC_DEFINE( HAVE_HAL, 1, [Define if you have the HAL library] )
-      VLC_ADD_PLUGIN([hal])
-      VLC_ADD_PLUGIN([probe_hal])
-      VLC_ADD_LIBS([libvlccore hal probe_hal],[$HAL_LIBS])
-      VLC_ADD_CFLAGS([libvlccore hal probe_hal],[$HAL_CFLAGS])],
-    [AC_MSG_WARN([libhal >= 0.5.0 was not found. Install libhal-dev ?])]
-  )
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
+PKG_ENABLE_MODULES_VLC([HAL], [hal >= 0.5.0], [Linux HAL services discovery], [auto])
 fi
 
 dnl Check for mtp
-AC_ARG_ENABLE(mtp,
-  [  --enable-mtp            MTP devices support (default enabled)])
-
-if test "${enable_mtp}" != "no" -a "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
-then
-  PKG_CHECK_MODULES(MTP, libmtp >= 0.3.0,
-    [ VLC_ADD_PLUGIN([mtp])
-      VLC_ADD_PLUGIN([access_mtp])
-      VLC_ADD_LIBS([mtp access_mtp],[$MTP_LIBS])
-      VLC_ADD_CFLAGS([mtp access_mtp],[$MTP_CFLAGS])],
-       [AC_MSG_WARN(MTP library not found)]
-  )
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
+PKG_ENABLE_MODULES_VLC([MTP],[libmtp >= 0.3.0],[MTP devices support],[auto])
 fi
 
 dnl Check for dbus
@@ -1793,20 +1771,9 @@ AS_IF([test "${enable_growl}" != "no"], [
 dnl
 dnl Libnotify notification plugin
 dnl
-
-AC_ARG_ENABLE(notify,
-  [  --enable-notify         libnotify notification plugin (default enabled)])
-AS_IF([test "${enable_notify}" != "no" -a "${SYS}" != "mingw32"], [
-    PKG_CHECK_MODULES(NOTIFY, libnotify,
-      [
-        VLC_ADD_PLUGIN([notify])
-        VLC_ADD_CFLAGS(notify, [$NOTIFY_CFLAGS])
-        VLC_ADD_LIBS(notify, [$NOTIFY_LIBS])
-      ],[
-    AS_IF([test "${enable_notify}" = "yes"],[
-        AC_MSG_WARN( libnotify not found) ])
-      ])
-  ])
+if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
+PKG_ENABLE_MODULES_VLC([NOTIFY], [libnotify], [libnotify notification], [auto])
+fi
 
 dnl
 dnl Audioscrobbler plugin
@@ -2418,17 +2385,8 @@ fi
 dnl
 dnl  gnomeVFS access module
 dnl
-AC_ARG_ENABLE(gnomevfs,
-  [  --enable-gnomevfs       GnomeVFS access module (default disabled)])
-if test "${enable_gnomevfs}" = "yes"
-then
-  PKG_CHECK_MODULES(GNOMEVFS, gnome-vfs-2.0,
-    VLC_ADD_LIBS([access_gnomevfs],[$GNOMEVFS_LIBS])
-    VLC_ADD_CPPFLAGS([access_gnomevfs],[$GNOMEVFS_CPPFLAGS])
-    VLC_ADD_CFLAGS([access_gnomevfs],[$GNOMEVFS_CFLAGS])
-    VLC_ADD_PLUGIN([access_gnomevfs]),
-    AC_MSG_WARN([GnomeVFS support disabled because GnomeVFS development headers not found]))
-fi
+PKG_ENABLE_MODULES_VLC([GNOMEVFS], [gnome-vfs-2.0], [GnomeVFS access module], [auto])
+
 
 dnl Need to test libcdio and libvcdinfo for a number of things. Do it now.
 AC_ARG_ENABLE(libcdio,
@@ -3315,42 +3273,7 @@ PKG_ENABLE_MODULES_VLC([FLAC], [flac], [libflac decoder/encoder support], [auto]
 dnl
 dnl  Libmpeg2 plugin
 dnl
-AC_ARG_ENABLE(libmpeg2,
-  [  --enable-libmpeg2       libmpeg2 decoder support (default enabled)])
-if test "${enable_libmpeg2}" != "no"
-then
-  AC_ARG_WITH(libmpeg2-tree,
-  [    --with-libmpeg2-tree=PATH libmpeg2 tree for static linking])
-  AS_IF([test -n "${with_libmpeg2_tree}"],[
-    AC_MSG_CHECKING(for libmpeg2.a in ${with_libmpeg2_tree})
-    real_libmpeg2_tree="`cd ${with_libmpeg2_tree} 2>/dev/null && pwd`"
-    if test -z "${real_libmpeg2_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_libmpeg2_tree}])
-    fi
-    if test -f "${real_libmpeg2_tree}/libmpeg2/.libs/libmpeg2.a"
-    then
-      dnl  Use a custom libmpeg2
-      AC_MSG_RESULT(${real_libmpeg2_tree}/libmpeg2/.libs/libmpeg2.a)
-      VLC_ADD_PLUGIN([libmpeg2])
-      VLC_ADD_LIBS([libmpeg2],[-L${real_libmpeg2_tree}/libmpeg2/.libs -lmpeg2])
-      VLC_ADD_CFLAGS([libmpeg2],[-I${real_libmpeg2_tree}/include])
-    else
-      dnl  The given libmpeg2 wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_libmpeg2_tree}/libmpeg2/.libs/libmpeg2.a, make sure you compiled libmpeg2 in ${with_libmpeg2_tree}])
-    fi
-  ],[
-   PKG_CHECK_MODULES(LIBMPEG2,[libmpeg2 > 0.3.2],[
-          VLC_ADD_PLUGIN([libmpeg2])
-          VLC_ADD_LIBS([libmpeg2], $LIBMPEG2_LIBS)
-          VLC_ADD_CFLAGS([libmpeg2], $LIBMPEG2_CFLAGS)
-       ],
-      AC_MSG_WARN([Could not find libmpeg2 on your system: you may get it from http://libmpeg2.sf.net/ . Alternatively you can use --disable-libmpeg2 to disable the libmpeg2 plugin.]))
-  ])
-fi
+PKG_ENABLE_MODULES_VLC([LIBMPEG2], [libmpeg2 > 0.3.2], [libmpeg2 decoder support], [auto])
 
 dnl
 dnl  Vorbis plugin
@@ -4979,19 +4902,7 @@ fi
 dnl
 dnl libprojectM visualization plugin
 dnl
-AC_ARG_ENABLE(projectm,
-  [  --enable-projectm          projectM visualization plugin (default disabled)])
-AS_IF([test "${enable_projectm}" = "yes"],
-  [
-    PKG_CHECK_MODULES(PROJECTM, libprojectM,
-    [
-      VLC_ADD_PLUGIN([projectm])
-      VLC_ADD_CXXFLAGS([projectm],[$PROJECTM_CFLAGS])
-      VLC_ADD_LIBS([projectm],[$PROJECTM_LIBS])
-      ],[
-      AC_MSG_WARN(libprojectM library not found)
-    ])
-  ])
+PKG_ENABLE_MODULES_VLC([projectm], [libprojectM], [projectM visualization plugin], [auto])
 
 dnl
 dnl  AtmoLight (homebrew AmbiLight)
@@ -5010,18 +4921,7 @@ fi
 dnl
 dnl  Bonjour services discovery
 dnl
-AC_ARG_ENABLE(bonjour,
-  [  --enable-bonjour        Bonjour services discovery (default enabled)])
-AS_IF([test "${enable_bonjour}" != "no"], [
-  PKG_CHECK_MODULES(BONJOUR, avahi-client >= 0.6, [
-    AC_DEFINE(HAVE_AVAHI_CLIENT, 1, [Define to 1 if you have libavahi-client])
-    VLC_ADD_LIBS([bonjour access_output_http],[$BONJOUR_LIBS])
-    VLC_ADD_CFLAGS([bonjour access_output_http],[$BONJOUR_CFLAGS])
-    VLC_ADD_PLUGIN([bonjour])
-  ], [
-    AC_MSG_WARN(avahi-client library not found)
-  ])
-])
+PKG_ENABLE_MODULES_VLC([BONJOUR], [avahi-client >= 0.6], [Bonjour services discovery], [auto])
 
 dnl
 dnl  Lirc plugin
