@@ -3501,47 +3501,7 @@ fi
 dnl
 dnl  Speex plugin
 dnl
-AC_ARG_ENABLE(speex,
-  [  --enable-speex          Speex decoder support (default enabled)])
-if test "${enable_speex}" != "no"
-then
-  AC_ARG_WITH(speex-tree,
-  [    --with-speex-tree=PATH speex tree for static linking])
-  if test -n "${with_speex_tree}"
-  then
-    AC_MSG_CHECKING(for libspeex.a in ${with_speex_tree})
-    real_speex_tree="`cd ${with_speex_tree} 2>/dev/null && pwd`"
-    if test -z "${real_speex_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_speex_tree}])
-    fi
-    if test -f "${real_speex_tree}/libspeex/.libs/libspeex.a"
-    then
-      dnl  Use a custom speex
-      AC_MSG_RESULT(${real_speex_tree}/libspeex/.libs/libspeex.a)
-      VLC_ADD_PLUGIN([speex])
-      VLC_ADD_LIBS([speex],[${real_speex_tree}/libspeex/.libs/libspeex.a])
-      VLC_ADD_CFLAGS([speex],[-I${real_speex_tree}/include])
-    else
-      dnl  The given speex wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_speex_tree}/libspeex/.libs/libspeex.a, make sure you compiled speex in ${with_speex_tree}])
-    fi
-  else
-    AC_CHECK_HEADERS(speex/speex.h, [
-      LDFLAGS="${LDFLAGS_save} ${LIBS_speex}"
-      AC_CHECK_LIB(speex, speex_decode_int, [
-        VLC_ADD_PLUGIN([speex])
-        VLC_ADD_LIBS([speex],[-lspeex]) ],
-        [ AC_MSG_RESULT([no])
-          AC_MSG_WARN([Your libspeex is too old, please get the development
-                       version.]) ],[])
-      LDFLAGS="${LDFLAGS_save}"
-      ],[])
-  fi
-fi
+PKG_ENABLE_MODULES_VLC([SPEEX], [speex >= 1.0.5], [Speex decoder support], [auto])
 
 dnl
 dnl  tarkin decoder plugin
@@ -3574,50 +3534,17 @@ fi
 dnl
 dnl  theora decoder plugin
 dnl
-AC_ARG_ENABLE(theora,
-[  --enable-theora         experimental theora codec (default disabled)])
-if test "${enable_theora}" = "yes"
-then
-  AC_CHECK_HEADERS(theora/theora.h, [
-    AC_CHECK_LIB(theora, theora_granule_time, [
-      VLC_ADD_PLUGIN([theora])
-      theora_libs="-ltheora -logg"
-      VLC_ADD_LIBS([theora],[${theora_libs}]) ],[
-      AC_MSG_ERROR([libtheora doesn't appear to be installed on your system.
-You also need to check that you have a libogg posterior to the 1.0 release.])],
-      [-logg])
-  ])
-fi
+PKG_ENABLE_MODULES_VLC([THEORA], [theora >= 1.0], [experimental theora codec], [auto])
 
 dnl
-dnl  dirac decoder plugin
+dnl  dirac encoder plugin
 dnl
-AC_ARG_ENABLE(dirac,
-[  --enable-dirac          experimental dirac codec (default disabled)])
-if test "${enable_dirac}" = "yes"; then
-  PKG_CHECK_MODULES(DIRAC,[dirac >= 0.10.0], [
-      VLC_ADD_PLUGIN([dirac])
-      VLC_ADD_CFLAGS([dirac],[$DIRAC_CFLAGS])
-      VLC_ADD_LIBS([dirac],[$DIRAC_LIBS -lstdc++]) ],[
-      AC_MSG_ERROR([libdirac >= 0.10.0 doesn't appear to be installed on your system.])
-  ])
-fi
+PKG_ENABLE_MODULES_VLC([DIRAC], [dirac >= 0.10.0], [dirac encoder], [auto], [], [ -lstdc++])
 
 dnl
 dnl  schroedinger decoder plugin (for dirac format video)
 dnl
-AC_ARG_ENABLE(schroedinger,
-[  --disable-schroedinger  high performance dirac codec (default enabled)])
-if test "${enable_schroedinger}" != "no"; then
-  PKG_CHECK_MODULES(SCHROEDINGER,[schroedinger-1.0 >= 1.0.6], [
-      VLC_ADD_PLUGIN([schroedinger])
-      VLC_ADD_CFLAGS([schroedinger],[$SCHROEDINGER_CFLAGS])
-      VLC_ADD_LIBS([schroedinger],[$SCHROEDINGER_LIBS]) ], [
-        AS_IF([test "x${enable_schroedinger}" != "x"], [
-          AC_MSG_ERROR([${SCHROEDINGER_PKG_ERRORS}])
-        ])
-])
-fi
+PKG_ENABLE_MODULES_VLC([SCHROEDINGER], [schroedinger-1.0 >= 1.0.6], [dirac decoder using schroedinger], [auto])
 
 dnl
 dnl  PNG decoder module
