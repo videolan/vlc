@@ -354,7 +354,7 @@ int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
 }
 
 static int
-config_Write (FILE *file, const char *type, const char *desc,
+config_Write (FILE *file, const char *desc, const char *type,
               bool comment, const char *name, const char *fmt, ...)
 {
     va_list ap;
