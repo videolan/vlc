@@ -306,7 +306,7 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
 # define BUFSIZE 1024
     int fds[2], i_status;
 
-    if (socketpair (AF_LOCAL, SOCK_STREAM, 0, fds))
+    if (socketpair (PF_LOCAL, SOCK_STREAM, 0, fds))
         return -1;
 
     pid_t pid = -1;
