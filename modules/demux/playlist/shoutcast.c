@@ -36,16 +36,6 @@
 #include "playlist.h"
 #include <vlc_xml.h>
 
-struct demux_sys_t
-{
-    input_item_t *p_current_input;
-
-    xml_t *p_xml;
-    xml_reader_t *p_xml_reader;
-
-    bool b_adult;
-};
-
 /* duplicate from modules/services_discovery/shout.c */
 #define SHOUTCAST_BASE_URL "http/shout-winamp://www.shoutcast.com/sbin/newxml.phtml"
 #define SHOUTCAST_TUNEIN_BASE_URL "http://www.shoutcast.com"
@@ -57,8 +47,10 @@ struct demux_sys_t
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
-static int DemuxGenre( demux_t *p_demux );
-static int DemuxStation( demux_t *p_demux );
+static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
+                       input_item_t *p_current_input );
+static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
+                         input_item_t *p_current_input, bool b_adult );
 
 /*****************************************************************************
  * Import_Shoutcast: main import function
@@ -70,12 +62,9 @@ int Import_Shoutcast( vlc_object_t *p_this )
     if( !demux_IsForced( p_demux, "shout-winamp" ) )
         return VLC_EGENERIC;
 
-    STANDARD_DEMUX_INIT_MSG( "using shoutcast playlist reader" );
-    p_demux->p_sys->p_xml = NULL;
-    p_demux->p_sys->p_xml_reader = NULL;
-
-    /* Do we want to list adult content ? */
-    p_demux->p_sys->b_adult = var_CreateGetBool( p_demux, "shoutcast-show-adult" );
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    msg_Dbg( p_demux, "using shoutcast playlist reader" );
 
     return VLC_SUCCESS;
 }
@@ -85,33 +74,23 @@ int Import_Shoutcast( vlc_object_t *p_this )
  *****************************************************************************/
 void Close_Shoutcast( vlc_object_t *p_this )
 {
-    demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    if( p_sys->p_xml_reader )
-        xml_ReaderDelete( p_sys->p_xml, p_sys->p_xml_reader );
-    if( p_sys->p_xml )
-        xml_Delete( p_sys->p_xml );
-    free( p_sys );
+    (void)p_this;
 }
 
 static int Demux( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
     xml_t *p_xml;
-    xml_reader_t *p_xml_reader;
+    xml_reader_t *p_xml_reader = NULL;
     char *psz_eltname = NULL;
     INIT_PLAYLIST_STUFF;
-    p_sys->p_current_input = p_current_input;
 
-    p_xml = p_sys->p_xml = xml_Create( p_demux );
+    p_xml = xml_Create( p_demux );
     if( !p_xml )
         goto error;
 
     p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
     if( !p_xml_reader )
         goto error;
-    p_sys->p_xml_reader = p_xml_reader;
 
     /* check root node */
     if( xml_ReaderRead( p_xml_reader ) != 1 )
@@ -133,21 +112,30 @@ static int Demux( demux_t *p_demux )
     if( !strcmp( psz_eltname, "genrelist" ) )
     {
         /* we're reading a genre list */
-        if( DemuxGenre( p_demux ) )
+        if( DemuxGenre( p_demux, p_xml_reader, p_current_input ) )
             goto error;
     }
     else
     {
         /* we're reading a station list */
-        if( DemuxStation( p_demux ) )
+        if( DemuxStation( p_demux, p_xml_reader, p_current_input,
+                var_CreateGetBool( p_demux, "shoutcast-show-adult" ) ) )
             goto error;
     }
 
+    if( p_xml_reader )
+        xml_ReaderDelete( p_xml, p_xml_reader );
+    if( p_xml )
+        xml_Delete( p_xml );
     free( psz_eltname );
     HANDLE_PLAY_AND_RELEASE;
     return 0; /* Needed for correct operation of go back */
 
 error:
+    if( p_xml_reader )
+        xml_ReaderDelete( p_xml, p_xml_reader );
+    if( p_xml )
+        xml_Delete( p_xml );
     free( psz_eltname );
     HANDLE_PLAY_AND_RELEASE;
     return -1;
@@ -163,17 +151,17 @@ error:
  *   ...
  * </genrelist>
  **/
-static int DemuxGenre( demux_t *p_demux )
+static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
+                       input_item_t *p_current_input )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
     char *psz_name = NULL; /* genre name */
 
-    while( xml_ReaderRead( p_sys->p_xml_reader ) == 1 )
+    while( xml_ReaderRead( p_xml_reader ) == 1 )
     {
         int i_type;
 
         // Get the node type
-        i_type = xml_ReaderNodeType( p_sys->p_xml_reader );
+        i_type = xml_ReaderNodeType( p_xml_reader );
         switch( i_type )
         {
             // Error
@@ -184,17 +172,17 @@ static int DemuxGenre( demux_t *p_demux )
             case XML_READER_STARTELEM:
             {
                 // Read the element name
-                char *psz_eltname = xml_ReaderName( p_sys->p_xml_reader );
+                char *psz_eltname = xml_ReaderName( p_xml_reader );
                 if( !psz_eltname ) return -1;
 
                 if( !strcmp( psz_eltname, "genre" ) )
                 {
                     // Read the attributes
-                    while( xml_ReaderNextAttr( p_sys->p_xml_reader ) == VLC_SUCCESS )
+                    while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
                     {
-                        char *psz_attrname = xml_ReaderName( p_sys->p_xml_reader );
+                        char *psz_attrname = xml_ReaderName( p_xml_reader );
                         char *psz_attrvalue =
-                            xml_ReaderValue( p_sys->p_xml_reader );
+                            xml_ReaderValue( p_xml_reader );
                         if( !psz_attrname || !psz_attrvalue )
                         {
                             FREENULL(psz_attrname);
@@ -226,7 +214,7 @@ static int DemuxGenre( demux_t *p_demux )
             case XML_READER_ENDELEM:
             {
                 // Read the element name
-                char *psz_eltname = xml_ReaderName( p_sys->p_xml_reader );
+                char *psz_eltname = xml_ReaderName( p_xml_reader );
                 if( !psz_eltname ) return -1;
                 if( !strcmp( psz_eltname, "genre" ) )
                 {
@@ -236,9 +224,9 @@ static int DemuxGenre( demux_t *p_demux )
                     {
                         input_item_t *p_input;
                         p_input = input_item_New( p_demux, psz_mrl, psz_name );
-                        input_item_CopyOptions( p_sys->p_current_input, p_input );
+                        input_item_CopyOptions( p_current_input, p_input );
                         free( psz_mrl );
-                        input_item_AddSubItem( p_sys->p_current_input, p_input );
+                        input_item_AddSubItem( p_current_input, p_input );
                         vlc_gc_decref( p_input );
                     }
                     FREENULL( psz_name );
@@ -276,10 +264,9 @@ static int DemuxGenre( demux_t *p_demux )
  *            lc="listener count"></station>
  * </stationlist>
  **/
-static int DemuxStation( demux_t *p_demux )
+static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
+                         input_item_t *p_current_input, bool b_adult )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-
     char *psz_base = NULL; /* */
 
     char *psz_name = NULL; /* genre name */
@@ -296,12 +283,12 @@ static int DemuxStation( demux_t *p_demux )
 
     char *psz_eltname = NULL; /* tag name */
 
-    while( xml_ReaderRead( p_sys->p_xml_reader ) == 1 )
+    while( xml_ReaderRead( p_xml_reader ) == 1 )
     {
         int i_type;
 
         // Get the node type
-        i_type = xml_ReaderNodeType( p_sys->p_xml_reader );
+        i_type = xml_ReaderNodeType( p_xml_reader );
         switch( i_type )
         {
             // Error
@@ -311,17 +298,17 @@ static int DemuxStation( demux_t *p_demux )
 
             case XML_READER_STARTELEM:
                 // Read the element name
-                psz_eltname = xml_ReaderName( p_sys->p_xml_reader );
+                psz_eltname = xml_ReaderName( p_xml_reader );
                 if( !psz_eltname ) return -1;
 
                 // Read the attributes
                 if( !strcmp( psz_eltname, "tunein" ) )
                 {
-                    while( xml_ReaderNextAttr( p_sys->p_xml_reader ) == VLC_SUCCESS )
+                    while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
                     {
-                        char *psz_attrname = xml_ReaderName( p_sys->p_xml_reader );
+                        char *psz_attrname = xml_ReaderName( p_xml_reader );
                         char *psz_attrvalue =
-                            xml_ReaderValue( p_sys->p_xml_reader );
+                            xml_ReaderValue( p_xml_reader );
                         if( !psz_attrname || !psz_attrvalue )
                         {
                             free( psz_eltname );
@@ -343,11 +330,11 @@ static int DemuxStation( demux_t *p_demux )
                 }
                 else if( !strcmp( psz_eltname, "station" ) )
                 {
-                    while( xml_ReaderNextAttr( p_sys->p_xml_reader ) == VLC_SUCCESS )
+                    while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
                     {
-                        char *psz_attrname = xml_ReaderName( p_sys->p_xml_reader );
+                        char *psz_attrname = xml_ReaderName( p_xml_reader );
                         char *psz_attrvalue =
-                            xml_ReaderValue( p_sys->p_xml_reader );
+                            xml_ReaderValue( p_xml_reader );
                         if( !psz_attrname || !psz_attrvalue )
                         {
                             free( psz_eltname );
@@ -384,11 +371,11 @@ static int DemuxStation( demux_t *p_demux )
             // End element
             case XML_READER_ENDELEM:
                 // Read the element name
-                psz_eltname = xml_ReaderName( p_sys->p_xml_reader );
+                psz_eltname = xml_ReaderName( p_xml_reader );
                 if( !psz_eltname ) return -1;
                 if( !strcmp( psz_eltname, "station" ) &&
                     ( psz_base || ( psz_rt && psz_load &&
-                    ( p_sys->b_adult || strcmp( psz_rt, "NC17" ) ) ) ) )
+                    ( b_adult || strcmp( psz_rt, "NC17" ) ) ) ) )
                 {
                     char *psz_mrl = NULL;
                     if( psz_rt || psz_load )
@@ -409,7 +396,7 @@ static int DemuxStation( demux_t *p_demux )
                     /* Create the item */
                     input_item_t *p_input;
                     p_input = input_item_New( p_demux, psz_mrl, psz_name );
-                    input_item_CopyOptions( p_sys->p_current_input, p_input );
+                    input_item_CopyOptions( p_current_input, p_input );
                     free( psz_mrl );
 
 #define SADD_INFO( type, field ) \
@@ -426,7 +413,7 @@ static int DemuxStation( demux_t *p_demux )
                         input_item_SetNowPlaying( p_input, psz_ct );
                     if( psz_rt )
                         input_item_SetRating( p_input, psz_rt );
-                    input_item_AddSubItem( p_sys->p_current_input, p_input );
+                    input_item_AddSubItem( p_current_input, p_input );
                     vlc_gc_decref( p_input );
                     FREENULL( psz_name );
                     FREENULL( psz_mt );
