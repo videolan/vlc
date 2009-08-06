@@ -23,6 +23,7 @@ vlc_SOURCES = winvlc.c
 endif
 
 vlc_wrapper_SOURCES = rootwrap.c
+vlc_wrapper_LDADD = $(SOCKET_LIBS)
 
 vlc_DEPENDENCIES = ../src/libvlc.sym
 vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`

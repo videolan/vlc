@@ -596,12 +596,14 @@ if test ${ac_cv_langinfo_codeset} = yes; then
     [Define if you have <langinfo.h> and nl_langinfo(CODESET).])
 fi
 
+SOCKET_LIBS=""
 AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,[
     VLC_ADD_LIBS([libvlccore cdda cddax],-lsocket)
-    LIBS_socket="-lsocket"
+    SOCKET_LIBS="-lsocket"
   ])
 ])
+AC_SUBST(SOCKET_LIBS)
 
 AC_CHECK_FUNCS(send,,[
   AC_CHECK_LIB(socket,send,[
@@ -652,7 +654,7 @@ dnl  -lnsl and -lsocket are needed on Solaris;
 dnl  we purposedly make the test fail on Windows
 LIBS_save="${LIBS}"
 AH_TEMPLATE(HAVE_GETADDRINFO, [Define to 1 if you have the `getaddrinfo' function.])
-AC_SEARCH_LIBS([getaddrinfo], [nsl], [AC_DEFINE(HAVE_GETADDRINFO)],, [${LIBS_socket}])
+AC_SEARCH_LIBS([getaddrinfo], [nsl], [AC_DEFINE(HAVE_GETADDRINFO)],, [${SOCKET_LIBS}])
 
 dnl NOTE: we assume getaddrinfo will be present if getnameinfo or gai_strerro
 dnl are
