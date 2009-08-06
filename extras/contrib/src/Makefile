@@ -1607,7 +1607,7 @@ qt4_mac: qt-mac-opensource-src-$(QT4_MAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .qt4_mac: qt4_mac
-	(cd qt4_mac; ./configure -prefix $(PREFIX) -release -fast -no-qt3support -nomake "examples demos" -sdk $(MACOSX_SDK) -no-framework && make && make install)
+	(cd qt4_mac; ./configure -prefix $(PREFIX) -release -fast -no-qt3support -nomake "examples demos" -sdk $(MACOSX_SDK) -no-framework -arch $(ARCH) && make && make install)
 	touch $@
 
 CLEAN_FILE += .qt4_mac
