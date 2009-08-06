@@ -50,6 +50,12 @@
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
 #endif
+#ifdef __sun__
+static inline int dirfd (DIR *dir)
+{
+    return dir->dd_fd;
+}
+#endif
 
 #include <vlc_charset.h>
 #include <vlc_url.h>
