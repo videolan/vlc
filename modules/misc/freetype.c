@@ -381,7 +381,10 @@ static int Create( vlc_object_t *p_this )
     fontpattern = FcPatternCreate();
 
     if( !fontpattern )
+    {
+        msg_Err( p_filter, "Creating fontpattern failed");
         goto error;
+    }
 
 #ifdef WIN32
     if( p_dialog )
@@ -392,7 +395,10 @@ static int Create( vlc_object_t *p_this )
     free( psz_fontsize );
 
     if( FcConfigSubstitute( NULL, fontpattern, FcMatchPattern ) == FcFalse )
+    {
+        msg_Err( p_filter, "FontSubstitute failed");
         goto error;
+    }
     FcDefaultSubstitute( fontpattern );
 
 #ifdef WIN32
@@ -404,12 +410,18 @@ static int Create( vlc_object_t *p_this )
      * returns NULL or doesn't set to to Match on all Match cases.*/
     fontmatch = FcFontMatch( NULL, fontpattern, &fontresult );
     if( !fontmatch || fontresult == FcResultNoMatch )
+    {
+        msg_Err( p_filter, "Fontmatching failed");
         goto error;
+    }
 
     FcPatternGetString( fontmatch, FC_FILE, 0, (FcChar8 **)&psz_fontfile);
     FcPatternGetInteger( fontmatch, FC_INDEX, 0, &fontindex );
     if( !psz_fontfile )
+    {
+        msg_Err( p_filter, "Failed to get fontfile");
         goto error;
+    }
 
     msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile );
     p_sys->psz_fontfamily = strdup( psz_fontfamily );
