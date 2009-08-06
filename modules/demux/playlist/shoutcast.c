@@ -75,9 +75,7 @@ int Import_Shoutcast( vlc_object_t *p_this )
     p_demux->p_sys->p_xml_reader = NULL;
 
     /* Do we want to list adult content ? */
-    var_Create( p_demux, "shoutcast-show-adult",
-                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    p_demux->p_sys->b_adult = var_GetBool( p_demux, "shoutcast-show-adult" );
+    p_demux->p_sys->b_adult = var_CreateGetBool( p_demux, "shoutcast-show-adult" );
 
     return VLC_SUCCESS;
 }
@@ -107,17 +105,19 @@ static int Demux( demux_t *p_demux )
     p_sys->p_current_input = p_current_input;
 
     p_xml = p_sys->p_xml = xml_Create( p_demux );
-    if( !p_xml ) return -1;
+    if( !p_xml )
+        goto error;
 
     p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
-    if( !p_xml_reader ) return -1;
+    if( !p_xml_reader )
+        goto error;
     p_sys->p_xml_reader = p_xml_reader;
 
     /* check root node */
     if( xml_ReaderRead( p_xml_reader ) != 1 )
     {
         msg_Err( p_demux, "invalid file (no root node)" );
-        return -1;
+        goto error;
     }
 
     if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
@@ -128,24 +128,30 @@ static int Demux( demux_t *p_demux )
         msg_Err( p_demux, "invalid root node %i, %s",
                  xml_ReaderNodeType( p_xml_reader ), psz_eltname );
         free( psz_eltname );
-        return -1;
+        goto error;
     }
 
     if( !strcmp( psz_eltname, "genrelist" ) )
     {
         /* we're reading a genre list */
         free( psz_eltname );
-        if( DemuxGenre( p_demux ) ) return -1;
+        if( DemuxGenre( p_demux ) )
+            goto error;
     }
     else
     {
         /* we're reading a station list */
         free( psz_eltname );
-        if( DemuxStation( p_demux ) ) return -1;
+        if( DemuxStation( p_demux ) )
+            goto error;
     }
 
     HANDLE_PLAY_AND_RELEASE;
     return 0; /* Needed for correct operation of go back */
+
+error:
+    HANDLE_PLAY_AND_RELEASE;
+    return -1;
 }
 
 #define GET_VALUE( a ) \
