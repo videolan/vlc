@@ -157,7 +157,7 @@ error:
 #define GET_VALUE( a ) \
                         if( !strcmp( psz_attrname, #a ) ) \
                         { \
-                            psz_ ## a = strdup( psz_attrvalue ); \
+                            psz_ ## a = psz_attrvalue; \
                         }
 /* <genrelist>
  *   <genre name="the name"></genre>
@@ -212,12 +212,12 @@ static int DemuxGenre( demux_t *p_demux )
                             msg_Warn( p_demux,
                                       "unexpected attribure %s in element %s",
                                       psz_attrname,psz_eltname );
+                            free( psz_attrvalue );
                         }
                         free( psz_attrname );
-                        free( psz_attrvalue );
                     }
                 }
-                free( psz_eltname ); psz_eltname = NULL;
+                FREENULL( psz_eltname );
                 break;
 
             case XML_READER_TEXT:
@@ -335,9 +335,9 @@ static int DemuxStation( demux_t *p_demux )
                             msg_Warn( p_demux,
                                       "unexpected attribure %s in element %s",
                                       psz_attrname, psz_eltname );
+                            free( psz_attrvalue );
                         }
                         free( psz_attrname );
-                        free( psz_attrvalue );
                     }
                 }
                 else if( !strcmp( psz_eltname, "station" ) )
@@ -369,9 +369,9 @@ static int DemuxStation( demux_t *p_demux )
                             msg_Warn( p_demux,
                                       "unexpected attribute %s in element %s",
                                       psz_attrname, psz_eltname );
+                            free( psz_attrvalue );
                         }
                         free( psz_attrname );
-                        free( psz_attrvalue );
                     }
                 }
                 free( psz_eltname );
