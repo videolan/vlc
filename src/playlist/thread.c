@@ -191,9 +191,9 @@ static void ResetCurrentlyPlaying( playlist_t *p_playlist,
               PLI_NAME( p_sys->status.p_node ) );
     ARRAY_RESET( p_playlist->current );
     p_playlist->i_current_index = -1;
-    for( ;; )
-    {   /** FIXME: this is *slow* */
-        playlist_item_t *p_next;
+    for( playlist_item_t *p_next = NULL; ; )
+    {
+        /** FIXME: this is *slow* */
         p_next = playlist_GetNextLeaf( p_playlist,
                                        p_sys->status.p_node,
                                        p_next, true, false );
