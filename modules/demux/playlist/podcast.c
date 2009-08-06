@@ -383,7 +383,8 @@ error:
 
     if( p_xml_reader )
         xml_ReaderDelete( p_xml, p_xml_reader );
-    xml_Delete( p_xml );
+    if( p_xml )
+        xml_Delete( p_xml );
 
     HANDLE_PLAY_AND_RELEASE;
     return -1;
