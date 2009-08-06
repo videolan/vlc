@@ -127,29 +127,28 @@ static int Demux( demux_t *p_demux )
     {
         msg_Err( p_demux, "invalid root node %i, %s",
                  xml_ReaderNodeType( p_xml_reader ), psz_eltname );
-        free( psz_eltname );
         goto error;
     }
 
     if( !strcmp( psz_eltname, "genrelist" ) )
     {
         /* we're reading a genre list */
-        free( psz_eltname );
         if( DemuxGenre( p_demux ) )
             goto error;
     }
     else
     {
         /* we're reading a station list */
-        free( psz_eltname );
         if( DemuxStation( p_demux ) )
             goto error;
     }
 
+    free( psz_eltname );
     HANDLE_PLAY_AND_RELEASE;
     return 0; /* Needed for correct operation of go back */
 
 error:
+    free( psz_eltname );
     HANDLE_PLAY_AND_RELEASE;
     return -1;
 }
@@ -168,8 +167,6 @@ static int DemuxGenre( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     char *psz_name = NULL; /* genre name */
-    char *psz_eltname = NULL; /* tag name */
-    input_item_t *p_input;
 
     while( xml_ReaderRead( p_sys->p_xml_reader ) == 1 )
     {
@@ -185,8 +182,9 @@ static int DemuxGenre( demux_t *p_demux )
                 break;
 
             case XML_READER_STARTELEM:
+            {
                 // Read the element name
-                psz_eltname = xml_ReaderName( p_sys->p_xml_reader );
+                char *psz_eltname = xml_ReaderName( p_sys->p_xml_reader );
                 if( !psz_eltname ) return -1;
 
                 if( !strcmp( psz_eltname, "genre" ) )
@@ -211,22 +209,24 @@ static int DemuxGenre( demux_t *p_demux )
                         {
                             msg_Warn( p_demux,
                                       "unexpected attribure %s in element %s",
-                                      psz_attrname,psz_eltname );
+                                      psz_attrname, psz_eltname );
                             free( psz_attrvalue );
                         }
                         free( psz_attrname );
                     }
                 }
-                FREENULL( psz_eltname );
+                free( psz_eltname );
                 break;
+            }
 
             case XML_READER_TEXT:
                 break;
 
             // End element
             case XML_READER_ENDELEM:
+            {
                 // Read the element name
-                psz_eltname = xml_ReaderName( p_sys->p_xml_reader );
+                char *psz_eltname = xml_ReaderName( p_sys->p_xml_reader );
                 if( !psz_eltname ) return -1;
                 if( !strcmp( psz_eltname, "genre" ) )
                 {
@@ -234,6 +234,7 @@ static int DemuxGenre( demux_t *p_demux )
                     if( asprintf( &psz_mrl, SHOUTCAST_BASE_URL "?genre=%s",
                              psz_name ) != -1 )
                     {
+                        input_item_t *p_input;
                         p_input = input_item_New( p_demux, psz_mrl, psz_name );
                         input_item_CopyOptions( p_sys->p_current_input, p_input );
                         free( psz_mrl );
@@ -242,8 +243,9 @@ static int DemuxGenre( demux_t *p_demux )
                     }
                     FREENULL( psz_name );
                 }
-                FREENULL( psz_eltname );
+                free( psz_eltname );
                 break;
+            }
         }
     }
     return 0;
@@ -277,7 +279,6 @@ static int DemuxGenre( demux_t *p_demux )
 static int DemuxStation( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    input_item_t *p_input;
 
     char *psz_base = NULL; /* */
 
@@ -404,6 +405,9 @@ static int DemuxStation( demux_t *p_demux )
                              psz_base, psz_id ) == -1 )
                             psz_mrl = NULL;
                     }
+
+                    /* Create the item */
+                    input_item_t *p_input;
                     p_input = input_item_New( p_demux, psz_mrl, psz_name );
                     input_item_CopyOptions( p_sys->p_current_input, p_input );
                     free( psz_mrl );
