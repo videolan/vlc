@@ -2324,7 +2324,7 @@ fi
 dnl
 dnl  gnomeVFS access module
 dnl
-PKG_ENABLE_MODULES_VLC([GNOMEVFS], [], [gnome-vfs-2.0], [GnomeVFS access module], [auto])
+PKG_ENABLE_MODULES_VLC([GNOMEVFS], [access_gnomevfs], [gnome-vfs-2.0], [GnomeVFS access module], [auto])
 
 
 dnl Need to test libcdio and libvcdinfo for a number of things. Do it now.
