@@ -573,8 +573,8 @@ AC_CHECK_FUNCS(fdatasync,,
   [AC_DEFINE(fdatasync, fsync, [Alias fdatasync() to fsync() if missing.])
 ])
 
-dnl Check for Linux system calls
-AC_CHECK_FUNCS([vmsplice])
+dnl Check for non-standard system calls
+AC_CHECK_FUNCS([vmsplice fstatfs])
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 

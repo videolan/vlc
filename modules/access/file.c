@@ -50,11 +50,9 @@
 #if defined (__linux__)
 #   include <sys/vfs.h>
 #   include <linux/magic.h>
-#   define HAVE_FSTATFS 1
 #elif defined (HAVE_SYS_MOUNT_H)
 #   include <sys/param.h>
 #   include <sys/mount.h>
-#   define HAVE_FSTATFS 1
 #endif
 
 #if defined( WIN32 )
