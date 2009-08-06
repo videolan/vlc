@@ -188,12 +188,13 @@ int module_Load( vlc_object_t *p_this, const char *psz_file,
     char *path = ToLocale( psz_file );
 
     handle = dlopen( path, flags );
-    LocaleFree( path );
     if( handle == NULL )
     {
         msg_Warn( p_this, "cannot load module `%s' (%s)", path, dlerror() );
+        LocaleFree( path );
         return -1;
     }
+    LocaleFree( path );
 
 #elif defined(HAVE_DL_SHL_LOAD)
     handle = shl_load( psz_file, BIND_IMMEDIATE | BIND_NONFATAL, NULL );
