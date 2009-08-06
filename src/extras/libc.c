@@ -57,6 +57,9 @@
 #   include <fcntl.h>
 #   include <sys/socket.h>
 #   include <sys/poll.h>
+#   ifndef PF_LOCAL
+#       define PF_LOCAL PF_UNIX
+#   endif
 #endif
 
 #if defined(WIN32) || defined(UNDER_CE)
