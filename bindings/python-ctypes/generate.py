@@ -206,7 +206,7 @@ def convert_enum_names(enums):
         pyname=re.findall('(libvlc|mediacontrol)_(.+?)(_t)?$', name)[0][1]
         if '_' in pyname:
             pyname=pyname.title().replace('_', '')
-        else:
+        elif not pyname[0].isupper():
             pyname=pyname.capitalize()
         res[name]=pyname
     return res
