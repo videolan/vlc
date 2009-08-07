@@ -106,34 +106,45 @@ static int send_fd (int p, int fd)
  */
 static void rootprocess (int fd)
 {
-    struct sockaddr_storage ss;
+    union
+    {
+        struct sockaddr         sa;
+        struct sockaddr_storage ss;
+        struct sockaddr_in      sin;
+#ifdef AF_INET6
+        struct sockaddr_in6     sin6;
+#endif
+    } addr;
 
-    while (recv (fd, &ss, sizeof (ss), 0) == sizeof (ss))
+    while (recv (fd, &addr.ss, sizeof (addr.ss), 0) == sizeof (addr.ss))
     {
         unsigned len;
         int sock;
+        int family;
 
-        switch (ss.ss_family)
+        switch (addr.sa.sa_family)
         {
             case AF_INET:
-                if (!is_allowed_port (((struct sockaddr_in *)&ss)->sin_port))
+                if (!is_allowed_port (addr.sin.sin_port))
                 {
                     if (send_err (fd, EACCES))
                         return;
                     continue;
                 }
                 len = sizeof (struct sockaddr_in);
+                family = PF_INET;
                 break;
 
 #ifdef AF_INET6
             case AF_INET6:
-                if (!is_allowed_port (((struct sockaddr_in6 *)&ss)->sin6_port))
+                if (!is_allowed_port (addr.sin6.sin6_port))
                 {
                     if (send_err (fd, EACCES))
                         return;
                     continue;
                 }
                 len = sizeof (struct sockaddr_in6);
+                family = PF_INET6;
                 break;
 #endif
 
@@ -143,17 +154,17 @@ static void rootprocess (int fd)
                 continue;
         }
 
-        sock = socket (ss.ss_family, SOCK_STREAM, IPPROTO_TCP);
+        sock = socket (family, SOCK_STREAM, IPPROTO_TCP);
         if (sock != -1)
         {
             const int val = 1;
 
             setsockopt (sock, SOL_SOCKET, SO_REUSEADDR, &val, sizeof (val));
 #ifdef AF_INET6
-            if (ss.ss_family == AF_INET6)
+            if (addr.sa.sa_family == AF_INET6)
                 setsockopt (sock, IPPROTO_IPV6, IPV6_V6ONLY, &val, sizeof (val));
 #endif
-            if (bind (sock, (struct sockaddr *)&ss, len) == 0)
+            if (bind (sock, &addr.sa, len) == 0)
             {
                 send_fd (fd, sock);
                 close (sock);
