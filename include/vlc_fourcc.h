@@ -240,6 +240,7 @@
 #define VLC_CODEC_QCELP     VLC_FOURCC('Q','c','l','p')
 #define VLC_CODEC_302M      VLC_FOURCC('3','0','2','m')
 #define VLC_CODEC_DVD_LPCM  VLC_FOURCC('l','p','c','m')
+#define VLC_CODEC_DVDA_LPCM VLC_FOURCC('a','p','c','m')
 #define VLC_CODEC_BD_LPCM   VLC_FOURCC('b','p','c','m')
 #define VLC_CODEC_SDDS      VLC_FOURCC('s','d','d','s')
 #define VLC_CODEC_MIDI      VLC_FOURCC('M','I','D','I')

@@ -989,6 +989,9 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_DVD_LPCM, "DVD LPCM Audio"),
         A("lpcm"),
 
+    B(VLC_CODEC_DVDA_LPCM, "DVD-Audio LPCM Audio"),
+        A("apcm"),
+
     B(VLC_CODEC_BD_LPCM, "BD LPCM Audio"),
         A("bpcm"),
 
