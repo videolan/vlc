@@ -229,7 +229,8 @@ static inline int ps_pkt_id( block_t *p_pkt )
 
         if( (i_sub_id & 0xfe) == 0xa0 &&
             p_pkt->i_buffer >= i_start + 7 &&
-            p_pkt->p_buffer[i_start + 6] != 0x80 )
+            ( p_pkt->p_buffer[i_start + 5] >=  0xc0 ||
+              p_pkt->p_buffer[i_start + 6] != 0x80 ) )
         {
             /* AOB LPCM/MLP extension
              * XXX for MLP I think that the !=0x80 test is not good and
@@ -485,7 +486,8 @@ static inline int ps_pkt_parse_pes( block_t *p_pes, int i_skip_extra )
 
     if( i_skip_extra >= 0 )
         i_skip += i_skip_extra;
-    else if( p_pes->i_buffer > i_skip + 3 && ps_pkt_id( p_pes ) == 0xa001 )
+    else if( p_pes->i_buffer > i_skip + 3 &&
+             ( ps_pkt_id( p_pes ) == 0xa001 || ps_pkt_id( p_pes ) == 0xbda1 ) )
         i_skip += 4 + p_pes->p_buffer[i_skip+3];
 
     if( p_pes->i_buffer <= i_skip )
