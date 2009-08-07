@@ -721,7 +721,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LIBS([avcodec avformat swscale postproc ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realaudio realvideo galaktos opengl],[-lm])
+  VLC_ADD_LIBS([avcodec avformat swscale postproc ffmpegaltivec stream_out_transrate i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realaudio realvideo opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LIBS([headphone_channel_mixer normvol speex mono colorthres extract],[-lm])
@@ -4695,23 +4695,6 @@ then
 fi
 
 dnl
-dnl OpenGL visualisation plugin
-dnl
-AC_ARG_ENABLE(galaktos,
-  [  --enable-galaktos       OpenGL visualisation plugin (default disabled)])
-if test "${enable_galaktos}" = "yes"
-then
-  AC_CHECK_HEADERS(GL/gl.h GL/glu.h, [
-    VLC_ADD_PLUGIN([galaktos])
-    if test "${SYS}" != "mingw32"; then
-      VLC_ADD_LIBS([galaktos],[${X_LIBS} -lGL -lGLU])
-    else
-      VLC_ADD_LIBS([galaktos],[-lopengl32])
-    fi
-  ])
-fi
-
-dnl
 dnl  goom visualization plugin
 dnl
 AC_ARG_ENABLE(goom,
@@ -5455,7 +5438,6 @@ AC_CONFIG_FILES([
   modules/video_output/x11/Makefile
   modules/visualization/Makefile
   modules/visualization/visual/Makefile
-  modules/visualization/galaktos/Makefile
 ])
 
 dnl Generate makefiles

@@ -116,7 +116,6 @@ $Id$
  * folder: folder meta data and art finder
  * freetype: Utility to put text on video using freetype2
  * ftp : FTP input module
- * galaktos: a visualization module that outputs OpenGL
  * gapi: PocketPC Video output
  * gaussianblur: gaussian blur video filter
  * gestures: mouse gestures control plugin
