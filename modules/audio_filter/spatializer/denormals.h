@@ -8,16 +8,11 @@
 #ifndef _denormals_
 #define _denormals_
 
-#include <stdint.h>
 
-#include <math.h>
-
-static inline float undenormalise( float f )
-{
-    if( fpclassify( f ) == FP_SUBNORMAL  )
-        return 0.0;
-    return f;
-}
+#ifdef __cplusplus
+extern "C"
+#endif
+float undenormalise( float );
 
 #endif//_denormals_
 
