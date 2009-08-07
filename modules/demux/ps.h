@@ -24,10 +24,25 @@
 #include <vlc_demux.h>
 #include <assert.h>
 
-/* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream */
-#define PS_TK_COUNT (768 - 0xc0)
+/* 256-0xC0 for normal stream, 256 for 0xbd stream, 256 for 0xfd stream, 8 for 0xa0 AOB stream */
+#define PS_TK_COUNT (256+256+256+8 - 0xc0)
+#if 0
 #define PS_ID_TO_TK( id ) ((id) <= 0xff ? (id) - 0xc0 : \
             ((id)&0xff) + (((id)&0xff00) == 0xbd00 ? 256-0xC0 : 512-0xc0) )
+#else
+static inline int ps_id_to_tk( unsigned i_id )
+{
+    if( i_id <= 0xff )
+        return i_id - 0xc0;
+    else if( (i_id & 0xff00) == 0xbd00 )
+        return 256-0xC0 + (i_id & 0xff);
+    else if( (i_id & 0xff00) == 0xfd00 )
+        return 512-0xc0 + (i_id & 0xff);
+    else
+        return 768-0xc0 + (i_id & 0x07);
+}
+#define PS_ID_TO_TK( id ) ps_id_to_tk( id )
+#endif
 
 typedef struct ps_psm_t ps_psm_t;
 static inline int ps_id_to_type( const ps_psm_t *, int );
@@ -125,6 +140,25 @@ static inline int ps_track_fill( ps_track_t *tk, ps_psm_t *p_psm, int i_id )
             return VLC_EGENERIC;
         }
     }
+    else if( (i_id&0xff00) == 0xa000 )
+    {
+        uint8_t i_sub_id = i_id & 0x07;
+        if( i_sub_id == 0 )
+        {
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_DVDA_LPCM );
+            tk->i_skip = 1;
+        }
+        else if( i_sub_id == 1 )
+        {
+            es_format_Init( &tk->fmt, AUDIO_ES, VLC_CODEC_MLP );
+            tk->i_skip = -1; /* It's a hack for variable skip value */
+        }
+        else
+        {
+            es_format_Init( &tk->fmt, UNKNOWN_ES, 0 );
+            return VLC_EGENERIC;
+        }
+    }
     else
     {
         int i_type = ps_id_to_type( p_psm , i_id );
@@ -190,8 +224,21 @@ static inline int ps_pkt_id( block_t *p_pkt )
         p_pkt->i_buffer >= 9 &&
         p_pkt->i_buffer >= 9 + (size_t)p_pkt->p_buffer[8] )
     {
+        const unsigned i_start = 9 + p_pkt->p_buffer[8];
+        const uint8_t i_sub_id = p_pkt->p_buffer[i_start];
+
+        if( (i_sub_id & 0xfe) == 0xa0 &&
+            p_pkt->i_buffer >= i_start + 7 &&
+            p_pkt->p_buffer[i_start + 6] != 0x80 )
+        {
+            /* AOB LPCM/MLP extension
+             * XXX for MLP I think that the !=0x80 test is not good and
+             * will fail for some valid files */
+            return 0xa000 | (i_sub_id & 0x01);
+        }
+
         /* VOB extension */
-        return 0xbd00 | p_pkt->p_buffer[9+p_pkt->p_buffer[8]];
+        return 0xbd00 | i_sub_id;
     }
     else if( p_pkt->p_buffer[3] == 0xfd &&
              p_pkt->i_buffer >= 9 &&
@@ -436,7 +483,10 @@ static inline int ps_pkt_parse_pes( block_t *p_pes, int i_skip_extra )
             }
     }
 
-    i_skip += i_skip_extra;
+    if( i_skip_extra >= 0 )
+        i_skip += i_skip_extra;
+    else if( p_pes->i_buffer > i_skip + 3 && ps_pkt_id( p_pes ) == 0xa001 )
+        i_skip += 4 + p_pes->p_buffer[i_skip+3];
 
     if( p_pes->i_buffer <= i_skip )
     {
