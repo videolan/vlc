@@ -4120,32 +4120,7 @@ fi
 dnl
 dnl  libcaca plugin
 dnl
-AC_ARG_ENABLE(caca,
-  [  --enable-caca           libcaca output (default disabled)])
-if test "${enable_caca}" = "yes"
-then
-  CACA_PATH="${PATH}"
-  AC_ARG_WITH(caca-config-path,
-    [    --with-caca-config-path=PATH caca-config path (default search in \$PATH)],
-    [ if test "${with_caca_config_path}" != "no"
-      then
-        CACA_PATH="${with_caca_config_path}:${PATH}"
-      fi ])
-  AC_PATH_PROG(CACA_CONFIG, caca-config, no, ${CACA_PATH})
-  if test "${CACA_CONFIG}" != "no"
-  then
-    VLC_ADD_PLUGIN([caca])
-    VLC_ADD_CFLAGS([caca],[`${CACA_CONFIG} --cflags`])
-    VLC_ADD_LIBS([caca],[`${CACA_CONFIG} --plugin-libs`])
-    AC_COMPILE_IFELSE( [AC_LANG_PROGRAM([[#include <caca.h>
-                                        caca_event_t ev;]],
-                                        [[ev.type = 0;]]
-                       )],
-                       [],
-      [AC_DEFINE(CACA_EVENT_OPAQUE, [1], ["Define if struct caca_event is opaque and must not be accessed directly"])]
-    )
-  fi
-fi
+PKG_ENABLE_MODULES_VLC([caca], [], [caca >= 0.99.beta1], [libcaca output],[auto])
 
 dnl
 dnl  win32 GDI plugin
