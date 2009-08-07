@@ -4324,25 +4324,7 @@ class testclass : public SearchResponseListener, public MediaPlayer
 dnl
 dnl UPnP Plugin (Intel SDK)
 dnl
-AC_ARG_ENABLE(upnp,
-  AS_HELP_STRING([--enable-upnp],[Intel UPnP SDK (default enabled)]))
-
-VLC_ADD_CXXFLAGS([upnp_intel], [ ])
-AS_IF([test "x${enable_upnp}" != "xno"], [
-  AC_CHECK_LIB([upnp], [UpnpInit], [has_upnp="yes"], [has_upnp="no"], [-lpthread])
-  AS_IF([test "x${enable_upnp}" != "x" && test "${has_upnp}" = "no"], [
-    AC_MSG_ERROR([cannot find Intel UPnP SDK (libupnp)])
-  ])
-  AS_IF([test "${has_upnp}" = "yes"], [
-    VLC_ADD_LIBS([upnp_intel], [-lupnp -lixml])
-  ])
-], [
-  has_upnp="no"
-])
-
-AS_IF([test "${has_upnp}" = "yes"], [
-  VLC_ADD_PLUGIN([upnp_intel])
-])
+PKG_ENABLE_MODULES_VLC([UPNP], [upnp_intel], [libupnp], [Intel UPnp SDK],[auto])
 
 
 dnl
@@ -4669,57 +4651,7 @@ fi
 dnl
 dnl  goom visualization plugin
 dnl
-AC_ARG_ENABLE(goom,
-[  --enable-goom           goom visualisation plugin (default disabled)])
-if test "${enable_goom}" = "yes"
-then
-  AC_ARG_WITH(goom-tree,
-    [    --with-goom-tree=PATH goom tree for static linking (required)])
-
-  dnl
-  dnl test for --with-goom-tree
-  dnl
-  if test "${with_goom_tree}" != "no" -a -n "${with_goom_tree}"; then
-    AC_MSG_CHECKING(for libgoom2.a in ${with_goom_tree})
-    real_goom_tree="`cd ${with_goom_tree} 2>/dev/null && pwd`"
-    if test -z "${real_goom_tree}"; then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_goom_tree}])
-    fi
-    if test -f "${real_goom_tree}/src/.libs/libgoom2.a"; then
-      AC_MSG_RESULT(${real_goom_tree}/src/.libs/libgoom2.a)
-      VLC_ADD_PLUGIN([goom])
-      VLC_ADD_LIBS([goom],[-L${real_goom_tree}/src/.libs -lgoom2])
-      VLC_ADD_CPPFLAGS([goom],[-I${real_goom_tree}/src -DUSE_GOOM_TREE])
-    else
-      dnl  The given libgoom2 wasn't built, try to look for the old goom
-      AC_MSG_RESULT(no)
-      AC_MSG_CHECKING(for libgoom.a in ${with_goom_tree})
-      if test -f "${real_goom_tree}/libgoom.a"; then
-        AC_MSG_RESULT(${real_goom_tree}/libgoom.a)
-        VLC_ADD_PLUGIN([goom])
-        VLC_ADD_LIBS([goom],[-L${real_goom_tree} -lgoom])
-        VLC_ADD_CPPFLAGS([goom],[-I${real_goom_tree} -DUSE_GOOM_TREE -DOLD_GOOM])
-      else
-        dnl  The given libgoom wasn't built
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([cannot find ${real_goom_tree}/src/.libs/libgoom2.a, make sure you compiled goom in ${with_goom_tree}])
-      fi
-    fi
-  else
-    AC_CHECK_HEADERS(goom/goom.h, [
-      LDFLAGS="${LDFLAGS_save} ${LIBS_goom}"
-      AC_CHECK_LIB(goom2, goom_init, [
-        VLC_ADD_PLUGIN([goom])
-        VLC_ADD_LIBS([goom],[-lgoom2])
-      ],[
-        AC_MSG_ERROR([Could not find goom on your system: you may get it from http://www.ios-software.com/.])
-      ])
-      LDFLAGS="${LDFLAGS_save}"
-    ])
-  fi
-fi
+PKG_ENABLE_MODULES_VLC([goom], [], [libgoom2], [goom visualization plugin], [auto])
 
 dnl
 dnl libprojectM visualization plugin
@@ -4748,17 +4680,7 @@ PKG_ENABLE_MODULES_VLC([BONJOUR], [], [avahi-client >= 0.6], [Bonjour services d
 dnl
 dnl  Lirc plugin
 dnl
-AC_ARG_ENABLE(lirc,
-  [  --enable-lirc           lirc support (default disabled)])
-if test "${enable_lirc}" = "yes"
-then
-  AC_CHECK_HEADER(lirc/lirc_client.h, AC_CHECK_LIB(lirc_client, lirc_init, have_lirc="true", have_lirc="false"),have_lirc="false")
-  if test "${have_lirc}" = "true"
-  then
-    VLC_ADD_PLUGIN([lirc])
-    VLC_ADD_LIBS([lirc],[-llirc_client])
-  fi
-fi
+PKG_ENABLE_MODULES_VLC([lirc], [], [liblircclient0], [lirc support], [auto])
 
 
 AC_ARG_WITH(,[Misc options:])
