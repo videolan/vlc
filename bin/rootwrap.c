@@ -21,6 +21,7 @@
 #if HAVE_CONFIG_H
 # include <config.h>
 #endif
+#define _XPG4_2 /* ancilliary data on Solaris */
 
 #include <stdlib.h> /* exit() */
 #include <stdio.h>
