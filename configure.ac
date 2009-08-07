@@ -368,9 +368,6 @@ case "${host_os}" in
     ;;
   solaris*)
     SYS=solaris
-    # _POSIX_PTHREAD_SEMANTICS is needed to get the POSIX ctime_r
-    # Perhaps it is useful other places as well?
-    CFLAGS_save="${CFLAGS_save} -D_POSIX_PTHREAD_SEMANTICS"; CFLAGS="${CFLAGS_save}"
     ;;
   hpux*)
     SYS=hpux
