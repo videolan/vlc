@@ -76,7 +76,7 @@ struct decoder_sys_t
 
     /* */
     unsigned i_header_size;
-    bool b_dvd;
+    int      i_type;
 };
 
 /*
@@ -91,6 +91,18 @@ struct decoder_sys_t
  * - number of channels - 1 (3 bits) 1 == 2 channels
  * - start code (8 bits) == 0x80
  *
+ * LPCM DVD-A header (http://dvd-audio.sourceforge.net/spec/aob.shtml)
+ * - continuity counter (8 bits, clipped to 0x00-0x1f)
+ * - header size (16 bits)
+ * - byte pointer to start of first audio frame.
+ * - unknown (8bits, 0x10 for stereo, 0x00 for surround)
+ * - sample size (4+4 bits)
+ * - samplerate (4+4 bits)
+ * - unknown (8 bits)
+ * - group assignment (8 bits)
+ * - unknown (8 bits)
+ * - padding(variable)
+ *
  * LPCM BD header :
  * - unkown (16 bits)
  * - number of channels (4 bits)
@@ -99,19 +111,44 @@ struct decoder_sys_t
  * - unknown (6 bits)
  */
 
-#define LPCM_DVD_HEADER_LEN (6)
+#define LPCM_VOB_HEADER_LEN (6)
+#define LPCM_AOB_HEADER_LEN (11)
 #define LPCM_BD_HEADER_LEN (4)
+
+enum
+{
+    LPCM_VOB,
+    LPCM_AOB,
+    LPCM_BD,
+};
+
+typedef struct
+{
+    unsigned i_channels;
+    bool     b_used;
+    unsigned pi_position[6];
+} aob_group_t;
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static void *DecodeFrame  ( decoder_t *, block_t ** );
-static int DvdHeader( unsigned *pi_rate,
+
+/* */
+static int VobHeader( unsigned *pi_rate,
                       unsigned *pi_channels, unsigned *pi_original_channels,
                       unsigned *pi_bits,
                       const uint8_t *p_header );
-static void DvdExtract( aout_buffer_t *, block_t *, unsigned i_bits );
-
+static void VobExtract( aout_buffer_t *, block_t *, unsigned i_bits );
+/* */
+static int AobHeader( unsigned *pi_rate,
+                      unsigned *pi_channels, unsigned *pi_layout,
+                      unsigned *pi_bits,
+                      unsigned *pi_padding,
+                      aob_group_t g[2],
+                      const uint8_t *p_header );
+static void AobExtract( aout_buffer_t *, block_t *, unsigned i_bits, aob_group_t p_group[2] );
+/* */
 static int BdHeader( unsigned *pi_rate,
                      unsigned *pi_channels, unsigned *pi_original_channels,
                      unsigned *pi_bits,
@@ -126,17 +163,25 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
-    bool b_dvd;
+    int i_type;
+    int i_header_size;
 
     switch( p_dec->fmt_in.i_codec )
     {
     /* DVD LPCM */
     case VLC_CODEC_DVD_LPCM:
-        b_dvd = true;
+        i_type = LPCM_VOB;
+        i_header_size = LPCM_VOB_HEADER_LEN;
+        break;
+    /* DVD-Audio LPCM */
+    case VLC_CODEC_DVDA_LPCM:
+        i_type = LPCM_AOB;
+        i_header_size = LPCM_AOB_HEADER_LEN;
         break;
     /* BD LPCM */
     case VLC_CODEC_BD_LPCM:
-        b_dvd = false;
+        i_type = LPCM_BD;
+        i_header_size = LPCM_BD_HEADER_LEN;
         break;
     default:
         return VLC_EGENERIC;
@@ -149,15 +194,28 @@ static int OpenCommon( vlc_object_t *p_this, bool b_packetizer )
     /* Misc init */
     p_sys->b_packetizer = b_packetizer;
     aout_DateSet( &p_sys->end_date, 0 );
-    p_sys->i_header_size = b_dvd ? LPCM_DVD_HEADER_LEN : LPCM_BD_HEADER_LEN;
-    p_sys->b_dvd = b_dvd;
+    p_sys->i_type = i_type;
+    p_sys->i_header_size = i_header_size;
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
 
     if( b_packetizer )
     {
-        p_dec->fmt_out.i_codec = b_dvd ? VLC_CODEC_DVD_LPCM : VLC_CODEC_BD_LPCM;
+        switch( i_type )
+        {
+        case LPCM_VOB:
+            p_dec->fmt_out.i_codec = VLC_CODEC_DVD_LPCM;
+            break;
+        case LPCM_AOB:
+            p_dec->fmt_out.i_codec = VLC_CODEC_DVDA_LPCM;
+            break;
+        default:
+            assert(0);
+        case LPCM_BD:
+            p_dec->fmt_out.i_codec = VLC_CODEC_BD_LPCM;
+            break;
+        }
     }
     else
     {
@@ -231,16 +289,32 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     }
 
     int i_ret;
-    if( p_sys->b_dvd )
-        i_ret = DvdHeader( &i_rate, &i_channels, &i_original_channels, &i_bits,
+    unsigned i_padding;
+    aob_group_t p_aob_group[2];
+    switch( p_sys->i_type )
+    {
+    case LPCM_VOB:
+        i_padding = 0;
+        i_ret = VobHeader( &i_rate, &i_channels, &i_original_channels, &i_bits,
                            p_block->p_buffer );
-    else
+        break;
+    case LPCM_AOB:
+        i_ret = AobHeader( &i_rate, &i_channels, &i_original_channels, &i_bits, &i_padding,
+                           p_aob_group,
+                           p_block->p_buffer );
+        break;
+    default:
+        assert(0);
+    case LPCM_BD:
+        i_padding = 0;
         i_ret = BdHeader( &i_rate, &i_channels, &i_original_channels, &i_bits,
                           p_block->p_buffer );
+        break;
+    }
 
-    if( i_ret )
+    if( i_ret || p_block->i_buffer <= p_sys->i_header_size + i_padding )
     {
-        msg_Warn( p_dec, "no frame sync" );
+        msg_Warn( p_dec, "no frame sync or too small frame" );
         block_Release( p_block );
         return NULL;
     }
@@ -256,7 +330,7 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     p_dec->fmt_out.audio.i_original_channels = i_original_channels;
     p_dec->fmt_out.audio.i_physical_channels = i_original_channels & AOUT_CHAN_PHYSMASK;
 
-    i_frame_length = (p_block->i_buffer - p_sys->i_header_size) / i_channels * 8 / i_bits;
+    i_frame_length = (p_block->i_buffer - p_sys->i_header_size - i_padding) / i_channels * 8 / i_bits;
 
     if( p_sys->b_packetizer )
     {
@@ -292,13 +366,23 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
         p_aout_buffer->end_date =
             aout_DateIncrement( &p_sys->end_date, i_frame_length );
 
-        p_block->p_buffer += p_sys->i_header_size;
-        p_block->i_buffer -= p_sys->i_header_size;
+        p_block->p_buffer += p_sys->i_header_size + i_padding;
+        p_block->i_buffer -= p_sys->i_header_size + i_padding;
 
-        if( p_sys->b_dvd )
-            DvdExtract( p_aout_buffer, p_block, i_bits );
-        else
+        switch( p_sys->i_type )
+        {
+        case LPCM_VOB:
+            VobExtract( p_aout_buffer, p_block, i_bits );
+            break;
+        case LPCM_AOB:
+            AobExtract( p_aout_buffer, p_block, i_bits, p_aob_group );
+            break;
+        default:
+            assert(0);
+        case LPCM_BD:
             BdExtract( p_aout_buffer, p_block );
+            break;
+        }
 
         block_Release( p_block );
         return p_aout_buffer;
@@ -317,7 +401,7 @@ static void CloseCommon( vlc_object_t *p_this )
 /*****************************************************************************
  *
  *****************************************************************************/
-static int DvdHeader( unsigned *pi_rate,
+static int VobHeader( unsigned *pi_rate,
                       unsigned *pi_channels, unsigned *pi_original_channels,
                       unsigned *pi_bits,
                       const uint8_t *p_header )
@@ -401,6 +485,146 @@ static int DvdHeader( unsigned *pi_rate,
         return -1;
     return 0;
 }
+
+static const unsigned p_aob_group1[21][6] = {
+    { AOUT_CHAN_CENTER, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, 0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,   0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,   0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,   0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,   0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, AOUT_CHAN_CENTER,   0 },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, 0  },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, 0  },
+    { AOUT_CHAN_LEFT,   AOUT_CHAN_RIGHT, AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, 0  },
+};
+static const unsigned p_aob_group2[21][6] = {
+    { 0 },
+    { 0 },
+    { AOUT_CHAN_REARCENTER, 0 },
+    { AOUT_CHAN_REARLEFT,   AOUT_CHAN_REARRIGHT,    0 },
+    { AOUT_CHAN_LFE,        0 },
+    { AOUT_CHAN_LFE,        AOUT_CHAN_REARCENTER,   0 },
+    { AOUT_CHAN_LFE,        AOUT_CHAN_REARLEFT,     AOUT_CHAN_REARRIGHT,    0 },
+    { AOUT_CHAN_CENTER,     0 },
+    { AOUT_CHAN_CENTER,     AOUT_CHAN_REARCENTER, 0 },
+    { AOUT_CHAN_CENTER,     AOUT_CHAN_REARLEFT,   AOUT_CHAN_REARRIGHT,    0 },
+    { AOUT_CHAN_CENTER,     AOUT_CHAN_LFE,        0 },
+    { AOUT_CHAN_CENTER,     AOUT_CHAN_LFE,        AOUT_CHAN_REARCENTER,   0 },
+    { AOUT_CHAN_CENTER,     AOUT_CHAN_LFE,        AOUT_CHAN_REARLEFT,     AOUT_CHAN_REARRIGHT,    0 },
+    { AOUT_CHAN_REARCENTER, 0 },
+    { AOUT_CHAN_REARLEFT,   AOUT_CHAN_REARRIGHT,    0 },
+    { AOUT_CHAN_LFE,        0 },
+    { AOUT_CHAN_LFE,        AOUT_CHAN_REARCENTER,   0 },
+    { AOUT_CHAN_LFE,        AOUT_CHAN_REARLEFT,     AOUT_CHAN_REARRIGHT,    0 },
+    { AOUT_CHAN_LFE,        0 },
+    { AOUT_CHAN_CENTER,     0 },
+    { AOUT_CHAN_CENTER,     AOUT_CHAN_LFE,          0 },
+};
+
+static int AobHeader( unsigned *pi_rate,
+                      unsigned *pi_channels, unsigned *pi_layout,
+                      unsigned *pi_bits,
+                      unsigned *pi_padding,
+                      aob_group_t g[2],
+                      const uint8_t *p_header )
+{
+    const unsigned i_header_size = GetWBE( &p_header[1] );
+    if( i_header_size + 3 < LPCM_AOB_HEADER_LEN )
+        return VLC_EGENERIC;
+
+    *pi_padding = 3+i_header_size - LPCM_AOB_HEADER_LEN;
+
+    const int i_index_size_g1 = (p_header[6] >> 4) & 0x0f;
+    const int i_index_size_g2 = (p_header[6]     ) & 0x0f;
+    const int i_index_rate_g1 = (p_header[7] >> 4) & 0x0f;
+    const int i_index_rate_g2 = (p_header[7]     ) & 0x0f;
+    const int i_assignment     = p_header[9];
+
+    /* Validate */
+    if( i_index_size_g1 > 0x02 ||
+        ( i_index_size_g2 != 0x0f && i_index_size_g2 > 0x02 ) )
+        return VLC_EGENERIC;
+    if( (i_index_rate_g1 & 0x07) > 0x02 ||
+        ( i_index_rate_g2 != 0x0f && (i_index_rate_g1 & 0x07) > 0x02 ) )
+        return VLC_EGENERIC;
+    if( i_assignment > 20 )
+        return VLC_EGENERIC;
+
+    /* */
+    *pi_bits = 16 + 4 * i_index_size_g1;
+    if( i_index_rate_g1 & 0x08 )
+        *pi_rate = 44100 << (i_index_rate_g1 & 0x07);
+    else
+        *pi_rate = 48000 << (i_index_rate_g1 & 0x07);
+
+
+    /* Group1 */
+    unsigned i_channels1 = 0;
+    unsigned i_layout1 = 0;
+    for( int i = 0; p_aob_group1[i_assignment][i] != 0; i++ )
+    {
+        i_channels1++;
+        i_layout1 |= p_aob_group1[i_assignment][i];
+    }
+    /* Group2 */
+    unsigned i_channels2 = 0;
+    unsigned i_layout2 = 0;
+    if( i_index_size_g2 != 0x0f && i_index_rate_g2 != 0x0f )
+    {
+        for( int i = 0; p_aob_group2[i_assignment][i] != 0; i++ )
+        {
+            i_channels2++;
+            i_layout2 |= p_aob_group2[i_assignment][i];
+        }
+        assert( (i_layout1 & i_layout2) == 0 );
+    }
+    /* It is enabled only when presents and compatible wih group1 */
+    const bool b_group2_used = i_index_size_g1 == i_index_size_g2 &&
+                               i_index_rate_g1 == i_index_rate_g2;
+
+    /* */
+    *pi_channels = i_channels1 + ( b_group2_used ? i_channels2 : 0 );
+    *pi_layout   = i_layout1   | ( b_group2_used ? i_layout2   : 0 );
+
+    /* */
+    for( int i = 0; i < 2; i++ )
+    {
+        const unsigned *p_aob = i == 0 ? p_aob_group1[i_assignment] :
+                                         p_aob_group2[i_assignment];
+        g[i].i_channels = i == 0 ? i_channels1 :
+                                   i_channels2;
+
+        g[i].b_used = i == 0 || b_group2_used;
+        if( !g[i].b_used )
+            continue;
+        for( int j = 0; j < g[i].i_channels; j++ )
+        {
+            g[i].pi_position[j] = 0;
+            for( int k = 0; pi_vlc_chan_order_wg4[k] != 0; k++ )
+            {
+                const unsigned i_channel = pi_vlc_chan_order_wg4[k];
+                if( i_channel == p_aob[j] )
+                    break;
+                if( (*pi_layout) & i_channel )
+                    g[i].pi_position[j]++;
+            }
+        }
+    }
+    return VLC_SUCCESS;
+}
+
 static int BdHeader( unsigned *pi_rate,
                      unsigned *pi_channels, unsigned *pi_original_channels,
                      unsigned *pi_bits,
@@ -492,7 +716,7 @@ static int BdHeader( unsigned *pi_rate,
     return 0;
 }
 
-static void DvdExtract( aout_buffer_t *p_aout_buffer, block_t *p_block,
+static void VobExtract( aout_buffer_t *p_aout_buffer, block_t *p_block,
                         unsigned i_bits )
 {
     uint8_t *p_out = p_aout_buffer->p_buffer;
@@ -556,9 +780,66 @@ static void DvdExtract( aout_buffer_t *p_aout_buffer, block_t *p_block,
         memcpy( p_out, p_block->p_buffer, p_block->i_buffer );
     }
 }
+static void AobExtract( aout_buffer_t *p_aout_buffer,
+                        block_t *p_block, unsigned i_bits, aob_group_t p_group[2] )
+{
+    const unsigned i_channels = p_group[0].i_channels +
+                                ( p_group[1].b_used ? p_group[1].i_channels : 0 );
+    uint8_t *p_out = p_aout_buffer->p_buffer;
+
+    while( p_block->i_buffer > 0 )
+    {
+        for( int i = 0; i < 2; i++ )
+        {
+            const aob_group_t *g = &p_group[1-i];
+            const int i_group_size = 2 * g->i_channels * i_bits / 8;
+
+            if( p_block->i_buffer < i_group_size )
+            {
+                p_block->i_buffer = 0;
+                break;
+            }
+            for( int n = 0; n < 2; n++ )
+            {
+                for( int j = 0; j < g->i_channels && g->b_used; j++ )
+                {
+                    const int i_src = n * g->i_channels + j;
+                    const int i_dst = n * i_channels + g->pi_position[j];
+
+                    if( i_bits == 24 )
+                    {
+                        p_out[3*i_dst+0] = p_block->p_buffer[2*i_src+0];
+                        p_out[3*i_dst+1] = p_block->p_buffer[2*i_src+1];
+                        p_out[3*i_dst+2] = p_block->p_buffer[4*g->i_channels+i_src];
+                    }
+                    else if( i_bits == 20 )
+                    {
+                        p_out[3*i_dst+0] = p_block->p_buffer[2*i_src+0];
+                        p_out[3*i_dst+1] = p_block->p_buffer[2*i_src+1];
+                        if( n == 0 )
+                            p_out[3*i_dst+2] = (p_block->p_buffer[4*g->i_channels+i_src]     ) & 0xf0;
+                        else
+                            p_out[3*i_dst+2] = (p_block->p_buffer[4*g->i_channels+i_src] << 4) & 0xf0;
+                    }
+                    else
+                    {
+                        assert( i_bits == 16 );
+                        p_out[2*i_dst+0] = p_block->p_buffer[2*i_src+0];
+                        p_out[2*i_dst+1] = p_block->p_buffer[2*i_src+1];
+                    }
+                }
+            }
+
+            p_block->i_buffer -= i_group_size;
+            p_block->p_buffer += i_group_size;
+        }
+        /* */
+        p_out += (i_bits == 16 ? 2 : 3) * i_channels * 2;
+
+    }
+}
 static void BdExtract( aout_buffer_t *p_aout_buffer, block_t *p_block )
 {
     memcpy( p_aout_buffer->p_buffer, p_block->p_buffer, p_block->i_buffer );
 }
-
 
