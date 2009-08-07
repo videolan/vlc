@@ -1,55 +1,66 @@
-Index: ffmpeg/libavcodec/ac3dec.c
-===================================================================
---- ffmpeg/libavcodec/ac3dec.c	(revision 19357)
-+++ ffmpeg/libavcodec/ac3dec.c	(working copy)
-@@ -819,15 +819,100 @@
+diff --git a/libavcodec/ac3dec.c b/libavcodec/ac3dec.c
+index baff415..49d6ea9 100644
+--- a/libavcodec/ac3dec.c
++++ b/libavcodec/ac3dec.c
+@@ -826,14 +826,105 @@ static int decode_audio_block(AC3DecodeContext *s, int blk)
  
      /* spectral extension strategy */
      if (s->eac3 && (!blk || get_bits1(gbc))) {
+-        if (get_bits1(gbc)) {
+-            av_log_missing_feature(s->avctx, "Spectral extension", 1);
+-            return -1;
 +        s->spx_in_use = get_bits1(gbc);
 +        if (s->spx_in_use) {
-+            int begf, endf;
-+            int spx_end_subband;
++            int copy_start, start_subband, end_subband, start_freq, end_freq;
 +
 +            /* determine which channels use spx */
 +            if (s->channel_mode == AC3_CHMODE_MONO) {
-+                s->channel_in_spx[1] = 1;
++                s->channel_uses_spx[1] = 1;
 +            } else {
 +                for (ch = 1; ch <= fbw_channels; ch++)
-+                    s->channel_in_spx[ch] = get_bits1(gbc);
++                    s->channel_uses_spx[ch] = get_bits1(gbc);
 +            }
 +
-+            s->spx_copy_start_freq = get_bits(gbc, 2) * 12 + 25;
-+            begf = get_bits(gbc, 3);
-+            endf = get_bits(gbc, 3);
-+            s->spx_start_subband = begf < 6 ? begf+2 : 2*begf-3;
-+            spx_end_subband      = endf < 4 ? endf+5 : 2*endf+3;
-+            if (s->spx_start_subband >= spx_end_subband) {
-+                av_log(s->avctx, AV_LOG_ERROR, "invalid spectral extension range (%d >= %d)\n",
-+                       s->spx_start_subband, spx_end_subband);
++            /* get the frequency bins of the spx copy region and the spx start
++               and end subbands */
++            copy_start    = get_bits(gbc, 2);
++            start_subband = get_bits(gbc, 3) + 2;
++            if (start_subband > 7)
++                start_subband += start_subband - 7;
++            end_subband   = get_bits(gbc, 3) + 5;
++            if (end_subband   > 7)
++                end_subband   += end_subband   - 7;
++            copy_start    = copy_start    * 12 + 25;
++            start_freq    = start_subband * 12 + 25;
++            end_freq      = end_subband   * 12 + 25;
++
++            /* check validity of spx ranges */
++            if (start_subband >= end_subband) {
++                av_log(s->avctx, AV_LOG_ERROR, "invalid spectral extension "
++                       "range (%d >= %d)\n", start_subband, end_subband);
 +                return -1;
 +            }
-+            s->spx_start_freq    = s->spx_start_subband * 12 + 25;
-+            s->spx_end_freq      = spx_end_subband      * 12 + 25;
-+            if (s->spx_copy_start_freq >= s->spx_start_freq) {
-+                av_log(s->avctx, AV_LOG_ERROR, "invalid spectral extension copy start bin (%d >= %d)\n",
-+                       s->spx_copy_start_freq, s->spx_start_freq);
++            if (copy_start >= start_freq) {
++                av_log(s->avctx, AV_LOG_ERROR, "invalid spectral extension "
++                       "copy start bin (%d >= %d)\n", copy_start, start_freq);
 +                return -1;
 +            }
++
++            s->spx_copy_start_freq = copy_start;
++            s->spx_start_subband   = start_subband;
++            s->spx_start_freq      = start_freq;
++            s->spx_end_freq        = end_freq;
++
 +            decode_band_structure(gbc, blk, s->eac3, 0,
-+                                  s->spx_start_subband, spx_end_subband,
++                                  start_subband, end_subband,
 +                                  ff_eac3_default_spx_band_struct,
 +                                  s->spx_band_struct, &s->num_spx_bands,
 +                                  s->spx_band_sizes);
 +        } else {
 +            for (ch = 1; ch <= fbw_channels; ch++) {
-+                s->channel_in_spx[ch] = 0;
++                s->channel_uses_spx[ch] = 0;
 +                s->first_spx_coords[ch] = 1;
 +            }
-+        }
-         if (get_bits1(gbc)) {
-             av_log_missing_feature(s->avctx, "Spectral extension", 1);
-             return -1;
          }
 -        /* TODO: parse spectral extension strategy info */
      }
@@ -58,11 +69,11 @@ Index: ffmpeg/libavcodec/ac3dec.c
 +    /* spectral extension coordinates */
 +    if (s->spx_in_use) {
 +        for (ch = 1; ch <= fbw_channels; ch++) {
-+            if (s->channel_in_spx[ch]) {
++            if (s->channel_uses_spx[ch]) {
 +                if (s->first_spx_coords[ch] || get_bits1(gbc)) {
 +                    float spx_blend;
 +                    int bin, master_spx_coord;
- 
++
 +                    s->first_spx_coords[ch] = 0;
 +                    spx_blend = get_bits(gbc, 5) * (1.0f/32);
 +                    master_spx_coord = get_bits(gbc, 2) * 3;
@@ -84,10 +95,8 @@ Index: ffmpeg/libavcodec/ac3dec.c
 +                        /* decode spx coordinates */
 +                        spx_coord_exp  = get_bits(gbc, 4);
 +                        spx_coord_mant = get_bits(gbc, 2);
-+                        if (spx_coord_exp == 15)
-+                            spx_coord_mant <<= 1;
-+                        else
-+                            spx_coord_mant += 4;
++                        if (spx_coord_exp == 15) spx_coord_mant <<= 1;
++                        else                     spx_coord_mant += 4;
 +                        spx_coord_mant <<= (25 - spx_coord_exp - master_spx_coord);
 +                        spx_coord = spx_coord_mant * (1.0f/(1<<23));
 +
@@ -101,11 +110,10 @@ Index: ffmpeg/libavcodec/ac3dec.c
 +            }
 +        }
 +    }
-+
+ 
      /* coupling strategy */
      if (s->eac3 ? s->cpl_strategy_exists[blk] : get_bits1(gbc)) {
-         memset(bit_alloc_stages, 3, AC3_MAX_CHANNELS);
-@@ -863,9 +948,9 @@
+@@ -870,9 +961,9 @@ static int decode_audio_block(AC3DecodeContext *s, int blk)
                  s->phase_flags_in_use = get_bits1(gbc);
  
              /* coupling frequency range */
@@ -117,7 +125,7 @@ Index: ffmpeg/libavcodec/ac3dec.c
              if (cpl_start_subband >= cpl_end_subband) {
                  av_log(s->avctx, AV_LOG_ERROR, "invalid coupling range (%d >= %d)\n",
                         cpl_start_subband, cpl_end_subband);
-@@ -938,8 +1023,11 @@
+@@ -945,8 +1036,11 @@ static int decode_audio_block(AC3DecodeContext *s, int blk)
      if (channel_mode == AC3_CHMODE_STEREO) {
          if ((s->eac3 && !blk) || get_bits1(gbc)) {
              s->num_rematrixing_bands = 4;
@@ -130,16 +138,16 @@ Index: ffmpeg/libavcodec/ac3dec.c
              for(bnd=0; bnd<s->num_rematrixing_bands; bnd++)
                  s->rematrixing_flags[bnd] = get_bits1(gbc);
          } else if (!blk) {
-@@ -964,6 +1052,8 @@
+@@ -971,6 +1065,8 @@ static int decode_audio_block(AC3DecodeContext *s, int blk)
              int prev = s->end_freq[ch];
              if (s->channel_in_cpl[ch])
                  s->end_freq[ch] = s->start_freq[CPL_CH];
-+            else if (s->channel_in_spx[ch])
++            else if (s->channel_uses_spx[ch])
 +                s->end_freq[ch] = s->spx_start_freq;
              else {
                  int bandwidth_code = get_bits(gbc, 6);
                  if (bandwidth_code > 60) {
-@@ -1160,8 +1254,6 @@
+@@ -1167,8 +1263,6 @@ static int decode_audio_block(AC3DecodeContext *s, int blk)
  
      /* TODO: generate enhanced coupling coordinates and uncouple */
  
@@ -148,7 +156,7 @@ Index: ffmpeg/libavcodec/ac3dec.c
      /* recover coefficients if rematrixing is in use */
      if(s->channel_mode == AC3_CHMODE_STEREO)
          do_rematrixing(s);
-@@ -1177,6 +1269,10 @@
+@@ -1184,6 +1278,10 @@ static int decode_audio_block(AC3DecodeContext *s, int blk)
          s->dsp.int32_to_float_fmul_scalar(s->transform_coeffs[ch], s->fixed_coeffs[ch], gain, 256);
      }
  
@@ -159,10 +167,10 @@ Index: ffmpeg/libavcodec/ac3dec.c
      /* downmix and MDCT. order depends on whether block switching is used for
         any channel in this block. this is because coefficients for the long
         and short transforms cannot be mixed. */
-Index: ffmpeg/libavcodec/ac3dec.h
-===================================================================
---- ffmpeg/libavcodec/ac3dec.h	(revision 19357)
-+++ ffmpeg/libavcodec/ac3dec.h	(working copy)
+diff --git a/libavcodec/ac3dec.h b/libavcodec/ac3dec.h
+index 38c2deb..fa6057d 100644
+--- a/libavcodec/ac3dec.h
++++ b/libavcodec/ac3dec.h
 @@ -42,6 +42,7 @@
  #define AC3_MAX_COEFS   256
  #define AC3_BLOCK_SIZE  256
@@ -171,19 +179,19 @@ Index: ffmpeg/libavcodec/ac3dec.h
  
  typedef struct {
      AVCodecContext *avctx;                  ///< parent context
-@@ -88,6 +89,23 @@
+@@ -88,6 +89,23 @@ typedef struct {
      int cpl_coords[AC3_MAX_CHANNELS][18];   ///< coupling coordinates                   (cplco)
  ///@}
  
 +///@defgroup spx spectral extension
 +///@{
 +    int spx_in_use;                             ///< spectral extension in use              (spxinu)
-+    uint8_t channel_in_spx[AC3_MAX_CHANNELS];   ///< channel in spectral extension          (chinspx)
++    uint8_t channel_uses_spx[AC3_MAX_CHANNELS]; ///< channel uses spectral extension        (chinspx)
 +    int8_t spx_atten_code[AC3_MAX_CHANNELS];    ///< spx attenuation code                   (spxattencod)
 +    int spx_start_subband;                      ///< spx beginning frequency band           (spxbegf)
 +    int spx_start_freq;                         ///< spx start frequency bin
 +    int spx_end_freq;                           ///< spx end frequency bin
-+    int spx_copy_start_freq;                    ///< spx starting frequency for copying     (copystartmant)
++    int spx_copy_start_freq;                    ///< spx starting frequency bin for copying (copystartmant)
 +    int num_spx_bands;                          ///< number of spx bands                    (nspxbnds)
 +    uint8_t spx_band_struct[SPX_MAX_BANDS];     ///< spectral extension band structure      (spxbndstrc)
 +    uint8_t spx_band_sizes[SPX_MAX_BANDS];      ///< number of bins in each band            (spxbndsztab)
@@ -195,7 +203,7 @@ Index: ffmpeg/libavcodec/ac3dec.h
  ///@defgroup aht adaptive hybrid transform
      int channel_uses_aht[AC3_MAX_CHANNELS];                         ///< channel AHT in use (chahtinu)
      int pre_mantissa[AC3_MAX_CHANNELS][AC3_MAX_COEFS][MAX_BLOCKS];  ///< pre-IDCT mantissas
-@@ -179,4 +197,11 @@
+@@ -179,4 +197,11 @@ int ff_eac3_parse_header(AC3DecodeContext *s);
   */
  void ff_eac3_decode_transform_coeffs_aht_ch(AC3DecodeContext *s, int ch);
  
@@ -207,10 +215,35 @@ Index: ffmpeg/libavcodec/ac3dec.h
 +void ff_eac3_apply_spectral_extension(AC3DecodeContext *s);
 +
  #endif /* AVCODEC_AC3DEC_H */
-Index: ffmpeg/libavcodec/eac3dec.c
-===================================================================
---- ffmpeg/libavcodec/eac3dec.c	(revision 19357)
-+++ ffmpeg/libavcodec/eac3dec.c	(working copy)
+diff --git a/libavcodec/ac3dec_data.c b/libavcodec/ac3dec_data.c
+index 907a3ae..abe359b 100644
+--- a/libavcodec/ac3dec_data.c
++++ b/libavcodec/ac3dec_data.c
+@@ -64,3 +64,9 @@ const uint8_t ff_eac3_hebap_tab[64] = {
+  */
+ const uint8_t ff_eac3_default_cpl_band_struct[18] =
+ { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1 };
++
++/**
++ * Table E2.15 Default Spectral Extension Banding Structure
++ */
++const uint8_t ff_eac3_default_spx_band_struct[17] =
++{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1 };
+diff --git a/libavcodec/ac3dec_data.h b/libavcodec/ac3dec_data.h
+index 8d9db05..9ed7c73 100644
+--- a/libavcodec/ac3dec_data.h
++++ b/libavcodec/ac3dec_data.h
+@@ -29,5 +29,6 @@ extern const uint8_t ff_ac3_rematrix_band_tab[5];
+ 
+ extern const uint8_t ff_eac3_hebap_tab[64];
+ extern const uint8_t ff_eac3_default_cpl_band_struct[18];
++extern const uint8_t ff_eac3_default_spx_band_struct[17];
+ 
+ #endif /* AVCODEC_AC3DEC_DATA_H */
+diff --git a/libavcodec/eac3dec.c b/libavcodec/eac3dec.c
+index 3784ccf..3a78540 100644
+--- a/libavcodec/eac3dec.c
++++ b/libavcodec/eac3dec.c
 @@ -23,10 +23,6 @@
  /*
   * There are several features of E-AC-3 that this decoder does not yet support.
@@ -222,7 +255,7 @@ Index: ffmpeg/libavcodec/eac3dec.c
   * Enhanced Coupling
   *     No known samples exist.  If any ever surface, this feature should not be
   *     too difficult to implement.
-@@ -66,6 +62,95 @@
+@@ -67,6 +63,95 @@ typedef enum {
  
  #define EAC3_SR_CODE_REDUCED  3
  
@@ -256,7 +289,7 @@ Index: ffmpeg/libavcodec/eac3dec.c
 +    copy_sizes[num_copy_sections++] = bin - s->spx_copy_start_freq;
 +
 +    for (ch = 1; ch <= s->fbw_channels; ch++) {
-+        if (!s->channel_in_spx[ch])
++        if (!s->channel_uses_spx[ch])
 +            continue;
 +
 +        /* Copy coeffs from normal bands to extension bands */
@@ -306,7 +339,7 @@ Index: ffmpeg/libavcodec/eac3dec.c
 +            float nscale = s->spx_noise_blend[ch][bnd] * rms_energy[bnd] * (1.0f/(1<<31));
 +            float sscale = s->spx_signal_blend[ch][bnd];
 +            for (i = 0; i < s->spx_band_sizes[bnd]; i++) {
-+                float noise  = nscale * (int)av_lfg_get(&s->dith_state);
++                float noise  = nscale * (int32_t)av_lfg_get(&s->dith_state);
 +                s->transform_coeffs[ch][bin]   *= sscale;
 +                s->transform_coeffs[ch][bin++] += noise;
 +            }
@@ -318,21 +351,26 @@ Index: ffmpeg/libavcodec/eac3dec.c
  /** lrint(M_SQRT2*cos(2*M_PI/12)*(1<<23)) */
  #define COEFF_0 10273905LL
  
-@@ -494,9 +579,10 @@
-     if (parse_spx_atten_data) {
-         av_log_missing_feature(s->avctx, "Spectral extension attenuation", 1);
-         for (ch = 1; ch <= s->fbw_channels; ch++) {
+@@ -492,13 +577,11 @@ int ff_eac3_parse_header(AC3DecodeContext *s)
+     }
+ 
+     /* spectral extension attenuation data */
+-    if (parse_spx_atten_data) {
+-        av_log_missing_feature(s->avctx, "Spectral extension attenuation", 1);
+-        for (ch = 1; ch <= s->fbw_channels; ch++) {
 -            if (get_bits1(gbc)) { // channel has spx attenuation
 -                skip_bits(gbc, 5); // skip spx attenuation code
 -            }
+-        }
++    for (ch = 1; ch <= s->fbw_channels; ch++) {
 +        if (parse_spx_atten_data && get_bits1(gbc))
 +            s->spx_atten_code[ch] = get_bits(gbc, 5);
 +        else
 +            s->spx_atten_code[ch] = -1;
-         }
      }
  
-@@ -513,6 +599,7 @@
+     /* block start information */
+@@ -514,6 +597,7 @@ int ff_eac3_parse_header(AC3DecodeContext *s)
  
      /* syntax state initialization */
      for (ch = 1; ch <= s->fbw_channels; ch++) {
@@ -340,18 +378,14 @@ Index: ffmpeg/libavcodec/eac3dec.c
          s->first_cpl_coords[ch] = 1;
      }
      s->first_cpl_leak = 1;
-Index: ffmpeg/libavcodec/ac3dec_data.c
-===================================================================
---- ffmpeg/libavcodec/ac3dec_data.c	(revision 19357)
-+++ ffmpeg/libavcodec/ac3dec_data.c	(working copy)
-@@ -1127,6 +1127,51 @@
- { 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 1, 0, 1, 1, 1, 1, 1 };
- 
- /**
-+ * Table E2.15 Default Spectral Extension Banding Structure
-+ */
-+const uint8_t ff_eac3_default_spx_band_struct[17] =
-+{ 0, 0, 0, 0, 0, 0, 0, 0, 1, 0, 1, 0, 1, 0, 1, 0, 1 };
+diff --git a/libavcodec/eac3dec_data.c b/libavcodec/eac3dec_data.c
+index 6c6a551..9e9f8a2 100644
+--- a/libavcodec/eac3dec_data.c
++++ b/libavcodec/eac3dec_data.c
+@@ -1093,3 +1093,42 @@ const uint8_t ff_eac3_frm_expstr[32][6] = {
+ {    EXP_D45,    EXP_D45,    EXP_D45,    EXP_D45,    EXP_D25,  EXP_REUSE},
+ {    EXP_D45,    EXP_D45,    EXP_D45,    EXP_D45,    EXP_D45,    EXP_D45},
+ };
 +
 +/**
 + * Table E.25: Spectral Extension Attenuation Table
@@ -391,21 +425,14 @@ Index: ffmpeg/libavcodec/ac3dec_data.c
 +    { 0.238710400977604098f, 0.056982655534888536f, 0.013602352551501938f },
 +    { 0.227930622139554201f, 0.051952368508924235f, 0.011841535675862483f }
 +};
-+
-+/**
-  * Table of bin locations for rematrixing bands
-  * reference: Section 7.5.2 Rematrixing : Frequency Band Definitions
-  */
-Index: ffmpeg/libavcodec/ac3dec_data.h
-===================================================================
---- ffmpeg/libavcodec/ac3dec_data.h	(revision 19357)
-+++ ffmpeg/libavcodec/ac3dec_data.h	(working copy)
-@@ -34,6 +34,8 @@
+diff --git a/libavcodec/eac3dec_data.h b/libavcodec/eac3dec_data.h
+index 76dd154..1331833 100644
+--- a/libavcodec/eac3dec_data.h
++++ b/libavcodec/eac3dec_data.h
+@@ -31,5 +31,6 @@ extern const int16_t ff_eac3_gaq_remap_2_4_b[9][2];
+ 
  extern const int16_t (* const ff_eac3_mantissa_vq[8])[6];
  extern const uint8_t ff_eac3_frm_expstr[32][6];
- extern const uint8_t ff_eac3_default_cpl_band_struct[18];
-+extern const uint8_t ff_eac3_default_spx_band_struct[17];
 +extern const float   ff_eac3_spx_atten_tab[32][3];
  
- extern const uint8_t ff_ac3_rematrix_band_tab[5];
- 
+ #endif /* AVCODEC_EAC3DEC_DATA_H */
