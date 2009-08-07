@@ -571,15 +571,9 @@ static int Open( vlc_object_t *p_this )
 
         /* Set rate. */
         i_old_rate = p_aout->output.output.i_rate;
-#ifdef HAVE_ALSA_NEW_API
         i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
                                                 &p_aout->output.output.i_rate,
                                                 NULL );
-#else
-        i_snd_rc = snd_pcm_hw_params_set_rate_near( p_sys->p_snd_pcm, p_hw,
-                                                p_aout->output.output.i_rate,
-                                                NULL );
-#endif
         if( i_snd_rc < 0 || p_aout->output.output.i_rate != i_old_rate )
         {
             msg_Warn( p_aout, "The rate %d Hz is not supported by your " \
@@ -588,13 +582,8 @@ static int Open( vlc_object_t *p_this )
         }
 
         /* Set period size. */
-#ifdef HAVE_ALSA_NEW_API
         if ( ( i_snd_rc = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm,
                                     p_hw, &i_period_size, NULL ) ) < 0 )
-#else
-        if ( ( i_snd_rc = snd_pcm_hw_params_set_period_size_near( p_sys->p_snd_pcm,
-                                    p_hw, i_period_size, NULL ) ) < 0 )
-#endif
         {
             msg_Err( p_aout, "unable to set period size (%s)",
                          snd_strerror( i_snd_rc ) );
@@ -603,13 +592,8 @@ static int Open( vlc_object_t *p_this )
         p_aout->output.i_nb_samples = i_period_size;
 
 /* Set buffer size. */
-#ifdef HAVE_ALSA_NEW_API
         if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
                                     p_hw, &i_buffer_size ) ) < 0 )
-#else
-        if ( ( i_snd_rc = snd_pcm_hw_params_set_buffer_size_near( p_sys->p_snd_pcm,
-                                    p_hw, i_buffer_size ) ) < 0 )
-#endif
         {
             msg_Err( p_aout, "unable to set buffer size (%s)",
                          snd_strerror( i_snd_rc ) );
@@ -637,13 +621,8 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-#ifdef HAVE_ALSA_NEW_API
     if( ( i_snd_rc = snd_pcm_hw_params_get_period_time( p_hw,
                                     &p_sys->i_period_time, NULL ) ) < 0 )
-#else
-    if( ( p_sys->i_period_time =
-                  (int)snd_pcm_hw_params_get_period_time( p_hw, NULL ) ) < 0 )
-#endif
     {
         msg_Err( p_aout, "unable to get period time (%s)",
                          snd_strerror( i_snd_rc ) );
@@ -774,7 +753,7 @@ static void* ALSAThread( vlc_object_t* p_this )
     vlc_mutex_unlock( &p_sys->lock );
 
     if( !vlc_object_alive (p_aout) )
-    	goto cleanup;
+        goto cleanup;
 
     mwait( p_sys->start_date - AOUT_PTS_TOLERANCE / 4 );
 
