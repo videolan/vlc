@@ -943,12 +943,6 @@ fi
 AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 
 
-dnl Check for hal
-PKG_ENABLE_MODULES_VLC([HAL], [], [hal >= 0.5.0], [Linux HAL services discovery], [auto])
-
-dnl Check for mtp
-PKG_ENABLE_MODULES_VLC([MTP], [], [libmtp >= 0.3.0],[MTP devices support],[auto])
-
 dnl Check for dbus
 AC_ARG_ENABLE(dbus,
   [  --enable-dbus           Linux D-BUS message bus system (default enabled)])
@@ -1673,9 +1667,6 @@ AS_IF([test "${enable_sout}" != "no"], [
   AC_DEFINE(ENABLE_SOUT, 1, [Define to 1 for stream output support.])
 ])
 AM_CONDITIONAL(ENABLE_SOUT, [test "${enable_sout}" != "no"])
-
-dnl Check for libshout
-PKG_ENABLE_MODULES_VLC([shout], [access_output_shout], [shout >= 2.1], [libshout output plugin], [auto])
 
 dnl Lua modules
 AC_ARG_ENABLE(lua,
@@ -2563,6 +2554,11 @@ dnl
 PKG_ENABLE_MODULES_VLC([OGG], [], [ogg >= 1.0], [Ogg demux support], [auto])
 if test "${enable_sout}" != "no"; then
     PKG_ENABLE_MODULES_VLC([MUX_OGG], [], [ogg >= 1.0], [Ogg demux support], [auto])
+fi
+
+if test "${enable_sout}" != "no"; then
+dnl Check for libshout
+PKG_ENABLE_MODULES_VLC([shout], [access_output_shout], [shout >= 2.1], [libshout output plugin], [auto])
 fi
 
 dnl
@@ -4652,8 +4648,15 @@ fi
 
 dnl
 dnl  Bonjour services discovery
-dnl
 PKG_ENABLE_MODULES_VLC([BONJOUR], [], [avahi-client >= 0.6], [Bonjour services discovery], [auto])
+
+dnl
+dnl  HAL services discovery
+PKG_ENABLE_MODULES_VLC([HAL], [], [hal >= 0.5.0], [Linux HAL services discovery], [auto])
+
+dnl
+dnl MTP devices services discovery
+PKG_ENABLE_MODULES_VLC([MTP], [], [libmtp >= 0.3.0],[MTP devices support],[auto])
 
 dnl
 dnl  Lirc plugin
