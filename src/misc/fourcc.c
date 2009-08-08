@@ -1428,8 +1428,7 @@ bool vlc_fourcc_AreUVPlanesSwapped( vlc_fourcc_t a, vlc_fourcc_t b )
             ((b == VLC_CODEC_I420 || b == VLC_CODEC_J420) && a == VLC_CODEC_YV12));
 }
 
-#if 0
-static inline bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
+bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
 {
     for( unsigned i = 0; p_list_YUV[i]; i++ )
     {
@@ -1438,4 +1437,4 @@ static inline bool vlc_fourcc_IsYUV(vlc_fourcc_t fcc)
     }
     return false;
 }
-#endif
+
