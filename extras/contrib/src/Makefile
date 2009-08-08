@@ -116,12 +116,12 @@ endif
 #
 ifdef HAVE_WIN32
 HOSTCONF+= --without-pic --disable-shared --enable-msw --disable-dependency-tracking
-FFMPEGCONF+= --target-os=mingw32 --enable-memalign-hack --cpu=i686 --arch=i686 --disable-debug
+FFMPEGCONF+= --target-os=mingw32 --enable-memalign-hack --cpu=i686 --arch=i686
 endif
 
 ifdef HAVE_WINCE
 HOSTCONF+= --without-pic --disable-shared
-FFMPEGCONF+= --enable-mingwce --cpu=armv4l --disable-debug --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols
+FFMPEGCONF+= --enable-mingwce --cpu=armv4l --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols
 endif
 
 ifdef HAVE_UCLIBC
@@ -130,14 +130,14 @@ FFMPEGCONF+= --arch=armeb --enable-armv5te --enable-iwmmxt
 else
 FFMPEGCONF+= --arch=armv4l
 endif
-FFMPEGCONF+= --enable-small --disable-debug --disable-mpegaudio-hp
+FFMPEGCONF+= --enable-small --disable-mpegaudio-hp
 FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
 else
 FFMPEGCONF+= --enable-libmp3lame --enable-libgsm
 endif
 
 ifdef HAVE_BEOS
-FFMPEGCONF+= --cpu=x86 --disable-debug --disable-audio-beos
+FFMPEGCONF+= --cpu=x86 --disable-audio-beos
 endif
 
 ifdef HAVE_DARWIN_OS_ON_INTEL
@@ -1109,6 +1109,7 @@ ffmpeg: ffmpeg-$(FFMPEG_VERSION).tar.gz
 endif
 
 FFMPEGCONF += \
+	--disable-debug \
 	--enable-gpl \
 	--enable-postproc \
 	--disable-ffserver \
