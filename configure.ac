@@ -2736,60 +2736,7 @@ fi
 dnl
 dnl  mad plugin
 dnl
-AC_ARG_ENABLE(mad,
-  [  --enable-mad            libmad module (default enabled)])
-if test "${enable_mad}" != "no"
-then
-  AC_ARG_WITH(mad,
-    [    --with-mad=PATH       path to libmad],[],[])
-  if test "${with_mad}" != "no" -a -n "${with_mad}"
-  then
-    VLC_ADD_CPPFLAGS([mpgatofixed32],[-I${with_mad}/include])
-    VLC_ADD_LIBS([mpgatofixed32],[-L${with_mad}/lib])
-  fi
-
-  AC_ARG_WITH(mad-tree,
-    [    --with-mad-tree=PATH   mad tree for static linking],[],[])
-  if test "${with_mad_tree}" != "no" -a -n "${with_mad_tree}"
-  then
-    real_mad_tree="`cd ${with_mad_tree} 2>/dev/null && pwd`"
-    if test -z "${real_mad_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([${with_mad_tree} directory doesn't exist])
-    fi
-    dnl  Use a custom libmad
-    AC_MSG_CHECKING(for mad.h in ${real_mad_tree})
-    if test -f ${real_mad_tree}/mad.h
-    then
-      AC_MSG_RESULT(yes)
-      VLC_ADD_CPPFLAGS([mpgatofixed32],[-I${real_mad_tree}])
-      VLC_ADD_LIBS([mpgatofixed32],[-L${real_mad_tree}/.libs])
-      LDFLAGS="${LDFLAGS_save} ${LIBS_mpgatofixed32}"
-      AC_CHECK_LIB(mad, mad_bit_init, [
-        VLC_ADD_PLUGIN([mpgatofixed32])
-        VLC_ADD_LIBS([mpgatofixed32],[-lmad])
-        ],[ AC_MSG_ERROR([the specified tree hasn't been compiled ])
-      ],[])
-      LDFLAGS="${LDFLAGS_save}"
-    else
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([the specified tree doesn't have mad.h])
-    fi
-  else
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_mpgatofixed32}"
-    LDFLAGS="${LDFLAGS_save} ${LIBS_mpgatofixed32}"
-    AC_CHECK_HEADERS(mad.h, ,
-      [ AC_MSG_ERROR([Could not find libmad on your system: you may get it from http://www.underbit.com/products/mad/. Alternatively you can use --disable-mad to disable the mad plugin.]) ])
-    AC_CHECK_LIB(mad, mad_bit_init, [
-      VLC_ADD_PLUGIN([mpgatofixed32])
-      VLC_ADD_LIBS([mpgatofixed32],[-lmad])],
-      [ AC_MSG_ERROR([Cannot find libmad library...]) ])
-    CPPFLAGS="${CPPFLAGS_save}"
-    LDFLAGS="${LDFLAGS_save}"
-  fi
-fi
+PKG_ENABLE_MODULES_VLC([mad], [mpgatofixed32], [mad], [MPEG Audio Decoder], [auto])
 
 dnl
 dnl   libid3tag support (FIXME!!! doesn't work with new input)
