@@ -1033,7 +1033,7 @@ else
 .ffmpeg: ffmpeg .lame .gsm
 endif
 endif
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS) -DRUNTIME_CPUDETECT" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS)" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
