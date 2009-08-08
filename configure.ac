@@ -2972,48 +2972,7 @@ fi
 dnl
 dnl twolame encoder plugin
 dnl
-AC_ARG_ENABLE(twolame,
-[  --enable-twolame        twolame codec (default disabled)])
-if test "${enable_twolame}" = "yes"
-then
-  AC_ARG_WITH(twolame-tree,
-  [    --with-twolame-tree=PATH twolame tree for static linking])
-  if test -n "${with_twolame_tree}"
-  then
-    AC_MSG_CHECKING(for libtwolame.a in ${with_twolame_tree})
-    real_twolame_tree="`cd ${with_twolame_tree} 2>/dev/null && pwd`"
-    if test -z "${real_twolame_tree}"
-    then
-      dnl  The given directory can't be found
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot cd to ${with_twolame_tree}])
-    fi
-    if test -f "${real_twolame_tree}/libtwolame/.libs/libtwolame.a"
-    then
-      dnl  Use a custom twolame
-      AC_MSG_RESULT(${real_twolame_tree}/libtwolame/.libs/libtwolame.a)
-      VLC_ADD_PLUGIN([twolame])
-      VLC_ADD_LIBS([twolame],[${real_twolame_tree}/libtwolame/.libs/libtwolame.a])
-      VLC_ADD_CPPFLAGS([twolame],[-I${real_twolame_tree}/libtwolame -DLIBTWOLAME_STATIC])
-    else
-      dnl  The given libtwolame wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_twolame_tree}/libtwolame/.libs/libtwolame.a, make sure you compiled libtwolame in ${with_twolame_tree}])
-    fi
-  else
-    CPPFLAGS="${CPPFLAGS_save} ${CPPFLAGS_twolame} -DLIBTWOLAME_STATIC"
-    LDFLAGS="${LDFLAGS_save} ${LIBS_twolame}"
-    AC_CHECK_HEADERS(twolame.h, ,
-      [ AC_MSG_ERROR([Cannot find development header for libtwolame...]) ])
-    AC_CHECK_LIB(twolame, twolame_init, [
-      VLC_ADD_PLUGIN([twolame])
-      VLC_ADD_CPPFLAGS([twolame],[-DLIBTWOLAME_STATIC])
-      VLC_ADD_LIBS([twolame],[-ltwolame]) ],
-        [ AC_MSG_ERROR([Cannot find libtwolame library...]) ])
-    LDFLAGS="${LDFLAGS_save}"
-    CPPFLAGS="${CPPFLAGS_save}"
-  fi
-fi
+PKG_ENABLE_MODULES_VLC([twolame], [], [twolame], [MPEG Audio Layer 2 encoder], [auto], [], [], [ -DLIBTWOLAME_STATIC])
 
 dnl
 dnl  QuickTime plugin
