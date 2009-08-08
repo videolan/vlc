@@ -26,12 +26,10 @@
 # define ORDER XCB_IMAGE_ORDER_LSB_FIRST
 #endif
 
-int CheckError (vout_thread_t *, const char *str, xcb_void_cookie_t);
-int ProcessEvent (vout_thread_t *, xcb_connection_t *, xcb_window_t,
-                  xcb_generic_event_t *);
-void HandleParentStructure (vout_thread_t *vout, xcb_connection_t *conn,
-                          xcb_window_t xid, xcb_configure_notify_event_t *ev);
+#include <vlc_picture.h>
+#include <vlc_vout_display.h>
 
+int ManageEvent (vout_display_t *vd, xcb_connection_t *conn, xcb_window_t window);
 
 /* keys.c */
 typedef struct key_handler_t key_handler_t;
@@ -40,15 +38,25 @@ void DestroyKeyHandler (key_handler_t *);
 int ProcessKeyEvent (key_handler_t *, xcb_generic_event_t *);
 
 /* common.c */
-struct vout_window_t;
-
 xcb_connection_t *Connect (vlc_object_t *obj);
-struct vout_window_t *GetWindow (vout_thread_t *obj,
+struct vout_window_t *GetWindow (vout_display_t *obj,
                                  xcb_connection_t *pconn,
                                  const xcb_screen_t **restrict pscreen,
                                  bool *restrict pshm);
 int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
                    unsigned *restrict width, unsigned *restrict height);
-int PictureAlloc (vout_thread_t *, picture_t *, size_t, xcb_connection_t *);
-void PictureFree (picture_t *pic, xcb_connection_t *conn);
-void CommonManage (vout_thread_t *);
+
+int CheckError (vout_display_t *, xcb_connection_t *conn,
+                const char *str, xcb_void_cookie_t);
+
+/* FIXME
+ * maybe it would be better to split this header in 2 */
+#include <xcb/shm.h>
+struct picture_sys_t
+{
+    xcb_shm_seg_t segment;
+};
+int PictureResourceAlloc (vout_display_t *vd, picture_resource_t *res, size_t size,
+                          xcb_connection_t *conn, bool attach);
+void PictureResourceFree (picture_resource_t *res, xcb_connection_t *conn);
+

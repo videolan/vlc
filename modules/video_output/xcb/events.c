@@ -30,7 +30,7 @@
 #include <xcb/xcb.h>
 
 #include <vlc_common.h>
-#include <vlc_vout.h>
+#include <vlc_vout_display.h>
 
 #include "xcb_vlc.h"
 
@@ -39,76 +39,67 @@
   * Otherwise, we'd var_OrInteger() and var_NandInteger() functions...
  */
 
-static void HandleButtonPress (vout_thread_t *vout,
+/* FIXME we assume direct mapping between XCB and VLC */
+static void HandleButtonPress (vout_display_t *vd,
                                xcb_button_press_event_t *ev)
 {
-    unsigned buttons = var_GetInteger (vout, "mouse-button-down");
-    buttons |= (1 << (ev->detail - 1));
-    var_SetInteger (vout, "mouse-button-down", buttons);
+    vout_display_SendEventMousePressed (vd, ev->detail - 1);
 }
 
-static void HandleButtonRelease (vout_thread_t *vout,
+static void HandleButtonRelease (vout_display_t *vd,
                                  xcb_button_release_event_t *ev)
 {
-    unsigned buttons = var_GetInteger (vout, "mouse-button-down");
-    buttons &= ~(1 << (ev->detail - 1));
-    var_SetInteger (vout, "mouse-button-down", buttons);
-
-    switch (ev->detail)
-    {
-        case 1: /* left mouse button */
-            var_SetBool (vout, "mouse-clicked", true);
-            var_SetBool (vout->p_libvlc, "intf-popupmenu", false);
-            break;
-        case 3:
-            var_SetBool (vout->p_libvlc, "intf-popupmenu", true);
-            break;
-    }
+    vout_display_SendEventMouseReleased (vd, ev->detail - 1);
 }
 
-static void HandleMotionNotify (vout_thread_t *vout,
+static void HandleMotionNotify (vout_display_t *vd,
                                 xcb_motion_notify_event_t *ev)
 {
-    unsigned x, y, width, height;
-    int v;
+    vout_display_place_t place;
 
-    vout_PlacePicture (vout, vout->output.i_width, vout->output.i_height,
-                       &x, &y, &width, &height);
-    v = vout->fmt_in.i_x_offset
-        + ((ev->event_x - x) * vout->fmt_in.i_visible_width / width);
-    if (v < 0)
-        v = 0; /* to the left of the picture */
-    else if ((unsigned)v > vout->fmt_in.i_width)
-        v = vout->fmt_in.i_width; /* to the right of the picture */
-    var_SetInteger (vout, "mouse-x", v);
+    /* TODO it could be saved */
+    vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
 
-    v = vout->fmt_in.i_y_offset
-        + ((ev->event_y - y) * vout->fmt_in.i_visible_height / height);
-    if (v < 0)
-        v = 0; /* above the picture */
-    else if ((unsigned)v > vout->fmt_in.i_height)
-        v = vout->fmt_in.i_height; /* below the picture */
-    var_SetInteger (vout, "mouse-y", v);
+    if (place.width <= 0 || place.height <= 0)
+        return;
+
+    const int x = vd->source.i_x_offset +
+        (int64_t)(ev->event_x -0*place.x) * vd->source.i_visible_width / place.width;
+    const int y = vd->source.i_y_offset +
+        (int64_t)(ev->event_y -0*place.y) * vd->source.i_visible_height/ place.height;
+
+    /* TODO show the cursor ? */
+    if (x >= vd->source.i_x_offset && x < vd->source.i_x_offset + vd->source.i_visible_width &&
+        y >= vd->source.i_y_offset && y < vd->source.i_y_offset + vd->source.i_visible_height)
+        vout_display_SendEventMouseMoved (vd, x, y);
+}
+
+static void
+HandleParentStructure (vout_display_t *vd, xcb_configure_notify_event_t *ev)
+{
+    if (ev->width  != vd->cfg->display.width ||
+        ev->height != vd->cfg->display.height)
+        vout_display_SendEventDisplaySize (vd, ev->width, ev->height);
 }
 
 /**
  * Process an X11 event.
  */
-int ProcessEvent (vout_thread_t *vout, xcb_connection_t *conn,
-                  xcb_window_t window, xcb_generic_event_t *ev)
+static int ProcessEvent (vout_display_t *vd,
+                         xcb_window_t window, xcb_generic_event_t *ev)
 {
     switch (ev->response_type & 0x7f)
     {
         case XCB_BUTTON_PRESS:
-            HandleButtonPress (vout, (xcb_button_press_event_t *)ev);
+            HandleButtonPress (vd, (xcb_button_press_event_t *)ev);
             break;
 
         case XCB_BUTTON_RELEASE:
-            HandleButtonRelease (vout, (xcb_button_release_event_t *)ev);
+            HandleButtonRelease (vd, (xcb_button_release_event_t *)ev);
             break;
 
         case XCB_MOTION_NOTIFY:
-            HandleMotionNotify (vout, (xcb_motion_notify_event_t *)ev);
+            HandleMotionNotify (vd, (xcb_motion_notify_event_t *)ev);
             break;
 
         case XCB_CONFIGURE_NOTIFY:
@@ -117,14 +108,41 @@ int ProcessEvent (vout_thread_t *vout, xcb_connection_t *conn,
                 (xcb_configure_notify_event_t *)ev;
 
             assert (cn->window != window);
-            HandleParentStructure (vout, conn, window, cn);
+            HandleParentStructure (vd, cn);
             break;
         }
 
+        /* FIXME I am not sure it is the right one */
+        case XCB_DESTROY_NOTIFY:
+            vout_display_SendEventClose (vd);
+            break;
+
         default:
-            msg_Dbg (vout, "unhandled event %"PRIu8, ev->response_type);
+            msg_Dbg (vd, "unhandled event %"PRIu8, ev->response_type);
     }
 
     free (ev);
     return VLC_SUCCESS;
 }
+
+/**
+ * Process incoming X events.
+ */
+int ManageEvent (vout_display_t *vd, xcb_connection_t *conn, xcb_window_t window)
+{
+    xcb_generic_event_t *ev;
+
+    while ((ev = xcb_poll_for_event (conn)) != NULL)
+        ProcessEvent (vd, window, ev);
+
+    if (xcb_connection_has_error (conn))
+    {
+        msg_Err (vd, "X server failure");
+        return VLC_EGENERIC;
+    }
+
+    return VLC_SUCCESS;
+}
+
+
+

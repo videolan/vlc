@@ -32,8 +32,8 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout.h>
-#include <vlc_vout_window.h>
+#include <vlc_vout_display.h>
+#include <vlc_picture_pool.h>
 
 #include "xcb_vlc.h"
 
@@ -57,7 +57,7 @@ vlc_module_begin ()
     set_description (N_("(Experimental) XCB video output"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("video output", 0)
+    set_capability ("vout display", 0)
     set_callbacks (Open, Close)
 
     add_string ("x11-display", NULL, NULL,
@@ -65,7 +65,13 @@ vlc_module_begin ()
     add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)
 vlc_module_end ()
 
-struct vout_sys_t
+/* It must be large enough to absorb the server display jitter but it is
+ * useless to used a too large value, direct rendering cannot be used with
+ * xcb x11
+ */
+#define MAX_PICTURES (3)
+
+struct vout_display_sys_t
 {
     xcb_connection_t *conn;
     vout_window_t *embed; /* VLC window (when windowed) */
@@ -77,40 +83,29 @@ struct vout_sys_t
     uint8_t pad; /* scanline pad */
     uint8_t depth; /* useful bits per pixel */
     uint8_t byte_order; /* server byte order */
+
+    picture_pool_t *pool; /* picture pool */
+    picture_resource_t resource[MAX_PICTURES];
 };
 
-static int Init (vout_thread_t *);
-static void Deinit (vout_thread_t *);
-static void Display (vout_thread_t *, picture_t *);
-static int Manage (vout_thread_t *);
-static int Control (vout_thread_t *, int, va_list);
+static picture_t *Get (vout_display_t *);
+static void Display (vout_display_t *, picture_t *);
+static int Control (vout_display_t *, int, va_list);
+static void Manage (vout_display_t *);
 
-int CheckError (vout_thread_t *vout, const char *str, xcb_void_cookie_t ck)
-{
-    xcb_generic_error_t *err;
-
-    err = xcb_request_check (vout->p_sys->conn, ck);
-    if (err)
-    {
-        msg_Err (vout, "%s: X11 error %d", str, err->error_code);
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
-#define p_vout vout
+static void ResetPictures (vout_display_t *);
 
 /**
  * Probe the X server.
  */
 static int Open (vlc_object_t *obj)
 {
-    vout_thread_t *vout = (vout_thread_t *)obj;
-    vout_sys_t *p_sys = malloc (sizeof (*p_sys));
+    vout_display_t *vd = (vout_display_t *)obj;
+    vout_display_sys_t *p_sys = malloc (sizeof (*p_sys));
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
-    vout->p_sys = p_sys;
+    vd->sys = p_sys;
 
     /* Connect to X */
     p_sys->conn = Connect (obj);
@@ -122,7 +117,7 @@ static int Open (vlc_object_t *obj)
 
     /* Get window */
     const xcb_screen_t *scr;
-    p_sys->embed = GetWindow (vout, p_sys->conn, &scr, &p_sys->shm);
+    p_sys->embed = GetWindow (vd, p_sys->conn, &scr, &p_sys->shm);
     if (p_sys->embed == NULL)
     {
         xcb_disconnect (p_sys->conn);
@@ -132,6 +127,9 @@ static int Open (vlc_object_t *obj)
 
     const xcb_setup_t *setup = xcb_get_setup (p_sys->conn);
     p_sys->byte_order = setup->image_byte_order;
+
+    /* */
+    video_format_t fmt_pic = vd->fmt;
 
     /* Determine our video format. Normally, this is done in pf_init(), but
      * this plugin always uses the same format for a given X11 screen. */
@@ -213,12 +211,12 @@ static int Open (vlc_object_t *obj)
         if (!vid)
             continue; /* The screen does not *really* support this depth */
 
-        vout->fmt_out.i_chroma = vout->output.i_chroma = chroma;
+        fmt_pic.i_chroma = chroma;
         if (!gray)
         {
-            vout->fmt_out.i_rmask = vout->output.i_rmask = vt->red_mask;
-            vout->fmt_out.i_gmask = vout->output.i_gmask = vt->green_mask;
-            vout->fmt_out.i_bmask = vout->output.i_bmask = vt->blue_mask;
+            fmt_pic.i_rmask = vt->red_mask;
+            fmt_pic.i_gmask = vt->green_mask;
+            fmt_pic.i_bmask = vt->blue_mask;
         }
         p_sys->bpp = fmt->bits_per_pixel;
         p_sys->pad = fmt->scanline_pad;
@@ -227,12 +225,12 @@ static int Open (vlc_object_t *obj)
 
     if (depth == 0)
     {
-        msg_Err (vout, "no supported pixmap formats or visual types");
+        msg_Err (vd, "no supported pixmap formats or visual types");
         goto error;
     }
 
-    msg_Dbg (vout, "using X11 visual ID 0x%"PRIx32, vid);
-    msg_Dbg (vout, " %"PRIu8" bits per pixels, %"PRIu8" bits line pad",
+    msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32, vid);
+    msg_Dbg (vd, " %"PRIu8" bits per pixels, %"PRIu8" bits line pad",
              p_sys->bpp, p_sys->pad);
 
     /* Create colormap (needed to select non-default visual) */
@@ -263,23 +261,41 @@ static int Open (vlc_object_t *obj)
                                        p_sys->embed->handle.xid, 0, 0, 1, 1, 0,
                                        XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                        vid, mask, values);
-        if (CheckError (vout, "cannot create X11 window", c))
+        if (CheckError (vd, p_sys->conn, "cannot create X11 window", c))
             goto error;
         p_sys->window = window;
-        msg_Dbg (vout, "using X11 window %08"PRIx32, p_sys->window);
+        msg_Dbg (vd, "using X11 window %08"PRIx32, p_sys->window);
         xcb_map_window (p_sys->conn, window);
     }
 
     /* Create graphic context (I wonder why the heck do we need this) */
     p_sys->gc = xcb_generate_id (p_sys->conn);
     xcb_create_gc (p_sys->conn, p_sys->gc, p_sys->window, 0, NULL);
-    msg_Dbg (vout, "using X11 graphic context %08"PRIx32, p_sys->gc);
+    msg_Dbg (vd, "using X11 graphic context %08"PRIx32, p_sys->gc);
 
-    vout->pf_init = Init;
-    vout->pf_end = Deinit;
-    vout->pf_display = Display;
-    vout->pf_manage = Manage;
-    vout->pf_control = Control;
+    /* */
+    p_sys->pool = NULL;
+
+    /* */
+    vout_display_info_t info = vd->info;
+    info.has_pictures_invalid = true;
+
+    /* Setup vout_display_t once everything is fine */
+    vd->fmt = fmt_pic;
+    vd->info = info;
+
+    vd->get = Get;
+    vd->prepare = NULL;
+    vd->display = Display;
+    vd->control = Control;
+    vd->manage = Manage;
+
+    /* */
+    unsigned width, height;
+    if (!GetWindowSize (p_sys->embed, p_sys->conn, &width, &height))
+        vout_display_SendEventDisplaySize (vd, width, height);
+    vout_display_SendEventFullscreen (vd, false);
+
     return VLC_SUCCESS;
 
 error:
@@ -293,174 +309,219 @@ error:
  */
 static void Close (vlc_object_t *obj)
 {
-    vout_thread_t *vout = (vout_thread_t *)obj;
-    vout_sys_t *p_sys = vout->p_sys;
+    vout_display_t *vd = (vout_display_t *)obj;
+    vout_display_sys_t *p_sys = vd->sys;
 
-    vout_window_Delete (p_sys->embed);
+    ResetPictures (vd);
+    vout_display_DeleteWindow (vd, p_sys->embed);
     /* colormap and window are garbage-collected by X */
     xcb_disconnect (p_sys->conn);
     free (p_sys);
 }
 
-
 /**
- * Allocate drawable window and picture buffers.
+ * Return a direct buffer
  */
-static int Init (vout_thread_t *vout)
+static picture_t *Get (vout_display_t *vd)
 {
-    vout_sys_t *p_sys = vout->p_sys;
-    unsigned x, y, width, height;
+    vout_display_sys_t *p_sys = vd->sys;
 
-    if (GetWindowSize (p_sys->embed, p_sys->conn, &width, &height))
-        return VLC_EGENERIC;
-    vout_PlacePicture (vout, width, height, &x, &y, &width, &height);
-
-    const uint32_t values[] = { x, y, width, height, };
-    xcb_configure_window (p_sys->conn, p_sys->window,
-                          XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y |
-                          XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
-                          values);
-
-    /* FIXME: I don't get the subtlety between output and fmt_out here */
-    vout->fmt_out.i_visible_width = width;
-    vout->fmt_out.i_visible_height = height;
-    vout->fmt_out.i_sar_num = vout->fmt_out.i_sar_den = 1;
-
-    vout->output.i_width = vout->fmt_out.i_width =
-        width * vout->fmt_in.i_width / vout->fmt_in.i_visible_width;
-    vout->output.i_height = vout->fmt_out.i_height =
-        height * vout->fmt_in.i_height / vout->fmt_in.i_visible_height;
-    vout->fmt_out.i_x_offset =
-        width * vout->fmt_in.i_x_offset / vout->fmt_in.i_visible_width;
-    p_vout->fmt_out.i_y_offset =
-        height * vout->fmt_in.i_y_offset / vout->fmt_in.i_visible_height;
-
-    assert (height > 0);
-    vout->output.i_aspect = vout->fmt_out.i_aspect =
-        width * VOUT_ASPECT_FACTOR / height;
-
-    /* Allocate picture buffers */
-    I_OUTPUTPICTURES = 0;
-    for (size_t index = 0; I_OUTPUTPICTURES < 2; index++)
+    if (!p_sys->pool)
     {
-        picture_t *pic = vout->p_picture + index;
+        vout_display_place_t place;
 
-        if (index > sizeof (vout->p_picture) / sizeof (pic))
-            break;
-        if (pic->i_status != FREE_PICTURE)
-            continue;
+        vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
 
-        picture_Setup (pic, vout->output.i_chroma,
-                       vout->output.i_width, vout->output.i_height,
-                       vout->output.i_aspect);
-        if (PictureAlloc (vout, pic, pic->p->i_pitch * pic->p->i_lines,
-                          p_sys->shm ? p_sys->conn : NULL))
-            break;
-        PP_OUTPUTPICTURE[I_OUTPUTPICTURES++] = pic;
+        /* */
+        const uint32_t values[] = { place.x, place.y, place.width, place.height };
+        xcb_configure_window (p_sys->conn, p_sys->window,
+                              XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y |
+                              XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
+                              values);
+
+        picture_t *pic = picture_NewFromFormat (&vd->fmt);
+        if (!pic)
+            return NULL;
+
+        assert (pic->i_planes == 1);
+        memset (p_sys->resource, 0, sizeof(p_sys->resource));
+
+        unsigned count;
+        picture_t *pic_array[MAX_PICTURES];
+        for (count = 0; count < MAX_PICTURES; count++)
+        {
+            picture_resource_t *res = &p_sys->resource[count];
+
+            res->p->i_lines = pic->p->i_lines;
+            res->p->i_pitch = pic->p->i_pitch;
+            if (PictureResourceAlloc (vd, res, res->p->i_pitch * res->p->i_lines,
+                                      p_sys->conn, p_sys->shm))
+                break;
+            pic_array[count] = picture_NewFromResource (&vd->fmt, res);
+            if (!pic_array[count])
+            {
+                PictureResourceFree (res, p_sys->conn);
+                memset (res, 0, sizeof(*res));
+                break;
+            }
+        }
+        picture_Release (pic);
+
+        if (count == 0)
+            return NULL;
+
+        p_sys->pool = picture_pool_New (count, pic_array);
+        if (!p_sys->pool)
+        {
+            /* TODO release picture resources */
+            return NULL;
+        }
+        /* FIXME should also do it in case of error ? */
+        xcb_flush (p_sys->conn);
     }
-    xcb_flush (p_sys->conn);
-    return VLC_SUCCESS;
-}
 
-/**
- * Free picture buffers.
- */
-static void Deinit (vout_thread_t *vout)
-{
-    for (int i = 0; i < I_OUTPUTPICTURES; i++)
-        PictureFree (PP_OUTPUTPICTURE[i], vout->p_sys->conn);
+    return picture_pool_Get (p_sys->pool);
 }
 
 /**
  * Sends an image to the X server.
  */
-static void Display (vout_thread_t *vout, picture_t *pic)
+static void Display (vout_display_t *vd, picture_t *pic)
 {
-    vout_sys_t *p_sys = vout->p_sys;
-    xcb_shm_seg_t segment = (uintptr_t)pic->p_sys;
+    vout_display_sys_t *p_sys = vd->sys;
+    xcb_shm_seg_t segment = pic->p_sys->segment;
 
     if (segment != 0)
         xcb_shm_put_image (p_sys->conn, p_sys->window, p_sys->gc,
           /* real width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
          /* real height */ pic->p->i_lines,
-                   /* x */ vout->fmt_out.i_x_offset,
-                   /* y */ vout->fmt_out.i_y_offset,
-               /* width */ vout->fmt_out.i_visible_width,
-              /* height */ vout->fmt_out.i_visible_height,
+                   /* x */ vd->fmt.i_x_offset,
+                   /* y */ vd->fmt.i_y_offset,
+               /* width */ vd->fmt.i_visible_width,
+              /* height */ vd->fmt.i_visible_height,
                            0, 0, p_sys->depth, XCB_IMAGE_FORMAT_Z_PIXMAP,
                            0, segment, 0);
     else
     {
-        const size_t offset = vout->fmt_out.i_y_offset * pic->p->i_pitch;
-        const unsigned lines = pic->p->i_lines - vout->fmt_out.i_y_offset;
+        const size_t offset = vd->fmt.i_y_offset * pic->p->i_pitch;
+        const unsigned lines = pic->p->i_lines - vd->fmt.i_y_offset;
 
         xcb_put_image (p_sys->conn, XCB_IMAGE_FORMAT_Z_PIXMAP,
                        p_sys->window, p_sys->gc,
                        pic->p->i_pitch / pic->p->i_pixel_pitch,
-                       lines, -vout->fmt_out.i_x_offset, 0, 0, p_sys->depth,
+                       lines, -vd->fmt.i_x_offset, 0, 0, p_sys->depth,
                        pic->p->i_pitch * lines, pic->p->p_pixels + offset);
     }
     xcb_flush (p_sys->conn);
+
+    /* FIXME might be WAY better to wait in some case (be carefull with
+     * VOUT_DISPLAY_RESET_PICTURES if done) + does not work with
+     * vout_display wrapper. */
+    picture_Release (pic);
 }
 
-/**
- * Process incoming X events.
- */
-static int Manage (vout_thread_t *vout)
+static int Control (vout_display_t *vd, int query, va_list ap)
 {
-    vout_sys_t *p_sys = vout->p_sys;
-    xcb_generic_event_t *ev;
+    vout_display_sys_t *p_sys = vd->sys;
 
-    while ((ev = xcb_poll_for_event (p_sys->conn)) != NULL)
-        ProcessEvent (vout, p_sys->conn, p_sys->window, ev);
-
-    if (xcb_connection_has_error (p_sys->conn))
-    {
-        msg_Err (vout, "X server failure");
-        return VLC_EGENERIC;
-    }
-
-    CommonManage (vout); /* FIXME: <-- move that to core */
-    return VLC_SUCCESS;
-}
-
-void
-HandleParentStructure (vout_thread_t *vout, xcb_connection_t *conn,
-                       xcb_window_t xid, xcb_configure_notify_event_t *ev)
-{
-    unsigned width, height, x, y;
-
-    vout_PlacePicture (vout, ev->width, ev->height, &x, &y, &width, &height);
-    if (width != vout->fmt_out.i_visible_width
-     || height != vout->fmt_out.i_visible_height)
-    {
-        vout->i_changes |= VOUT_SIZE_CHANGE;
-        return; /* vout will be reinitialized */
-    }
-
-    /* Move the picture within the window */
-    const uint32_t values[] = { x, y, };
-    xcb_configure_window (conn, xid,
-                          XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y,
-                          values);
-}
-
-static int Control (vout_thread_t *vout, int query, va_list ap)
-{
     switch (query)
     {
-    case VOUT_SET_SIZE:
+    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     {
-        const unsigned width  = va_arg (ap, unsigned);
-        const unsigned height = va_arg (ap, unsigned);
-        return vout_window_SetSize (vout->p_sys->embed, width, height);
+        const vout_display_cfg_t *p_cfg =
+            (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
+
+        if (vout_window_SetSize (p_sys->embed,
+                                  p_cfg->display.width,
+                                  p_cfg->display.height))
+            return VLC_EGENERIC;
+
+        vout_display_place_t place;
+        vout_display_PlacePicture (&place, &vd->source, p_cfg, false);
+
+        if (place.width  != vd->fmt.i_visible_width ||
+            place.height != vd->fmt.i_visible_height)
+        {
+            vout_display_SendEventPicturesInvalid (vd);
+            return VLC_SUCCESS;
+        }
+
+        /* Move the picture within the window */
+        const uint32_t values[] = { place.x, place.y };
+        xcb_configure_window (p_sys->conn, p_sys->window,
+                              XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y,
+                              values);
+        return VLC_SUCCESS;
     }
-    case VOUT_SET_STAY_ON_TOP:
+    case VOUT_DISPLAY_CHANGE_ON_TOP:
     {
-        const bool is_on_top = va_arg (ap, int);
-        return vout_window_SetOnTop (vout->p_sys->embed, is_on_top);
+        int b_on_top = (int)va_arg (ap, int);
+        return vout_window_SetOnTop (p_sys->embed, b_on_top);
     }
+
+    case VOUT_DISPLAY_CHANGE_ZOOM:
+    case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
+    case VOUT_DISPLAY_CHANGE_SOURCE_ASPECT:
+    case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
+        /* I am not sure it is always necessary, but it is way simpler ... */
+        vout_display_SendEventPicturesInvalid (vd);
+        return VLC_SUCCESS;
+
+    case VOUT_DISPLAY_RESET_PICTURES:
+    {
+        ResetPictures (vd);
+
+        vout_display_place_t place;
+        vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
+
+        vd->fmt.i_width  = vd->source.i_width  * place.width  / vd->source.i_visible_width;
+        vd->fmt.i_height = vd->source.i_height * place.height / vd->source.i_visible_height;
+
+        vd->fmt.i_visible_width  = place.width;
+        vd->fmt.i_visible_height = place.height;
+        vd->fmt.i_x_offset = vd->source.i_x_offset * place.width  / vd->source.i_visible_width;
+        vd->fmt.i_y_offset = vd->source.i_y_offset * place.height / vd->source.i_visible_height;
+        return VLC_SUCCESS;
+    }
+
+    /* TODO */
+#if 0
+    /* Hide the mouse. It will be send when
+     * vout_display_t::info.b_hide_mouse is false */
+    VOUT_DISPLAY_HIDE_MOUSE,
+
+    /* Ask the module to acknowledge/refuse the fullscreen state change after
+     * being requested (externaly or by VOUT_DISPLAY_EVENT_FULLSCREEN */
+    VOUT_DISPLAY_CHANGE_FULLSCREEN,     /* const vout_display_cfg_t *p_cfg */
+#endif
     default:
+        msg_Err (vd, "Unknown request in XCB vout display");
         return VLC_EGENERIC;
     }
+}
+
+static void Manage (vout_display_t *vd)
+{
+    vout_display_sys_t *p_sys = vd->sys;
+
+    ManageEvent (vd, p_sys->conn, p_sys->window);
+}
+
+static void ResetPictures (vout_display_t *vd)
+{
+    vout_display_sys_t *p_sys = vd->sys;
+
+    if (!p_sys->pool)
+        return;
+
+    for (unsigned i = 0; i < MAX_PICTURES; i++)
+    {
+        picture_resource_t *res = &p_sys->resource[i];
+
+        if (!res->p->p_pixels)
+            break;
+        PictureResourceFree (res, p_sys->conn);
+    }
+    picture_pool_Delete (p_sys->pool);
+    p_sys->pool = NULL;
 }
