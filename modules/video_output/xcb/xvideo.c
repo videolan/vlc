@@ -346,14 +346,20 @@ static int Open (vlc_object_t *obj)
 
         const xcb_xv_image_format_info_t *xfmt;
 
-        /* Video chroma in preference order */
-        const vlc_fourcc_t chromas[] = {
+        /* */
+        const vlc_fourcc_t chromas_default[] = {
             fmt.i_chroma,
             VLC_CODEC_YUYV,
             VLC_CODEC_RGB24,
             VLC_CODEC_RGB15,
+            0
         };
-        for (size_t i = 0; i < sizeof (chromas) / sizeof (chromas[0]); i++)
+        if (vlc_fourcc_IsYUV (fmt.i_chroma))
+            chromas = vlc_fourcc_GetYUVFallback (fmt.i_chroma);
+        else
+            chromas = chromas_default;
+
+        for (size_t i = 0; chromas[i]; i++)
         {
             vlc_fourcc_t chroma = chromas[i];
             xfmt = FindFormat (vd, chroma, &fmt, a->base_id, r, &p_sys->att);
