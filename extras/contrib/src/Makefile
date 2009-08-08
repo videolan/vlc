@@ -163,6 +163,9 @@ endif
 
 ifdef HAVE_LINUX
 ifdef HAVE_MAEMO
+ifneq ($(filter -m%=cortex-a8, $(EXTRA_CFLAGS)),)
+FFMPEGCONF += --disable-runtime-cpudetect --enable-neon --cpu=cortex-a8
+endif
 # Really, this could be done on all Linux platforms, not just Maemo.
 # Installing statically-linked VLC plugins is so much simpler.
 HOSTCONF += --with-pic --disable-shared
