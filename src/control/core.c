@@ -197,12 +197,6 @@ void libvlc_wait( libvlc_instance_t *p_i )
     libvlc_InternalWait( p_libvlc );
 }
 
-int libvlc_get_vlc_id( libvlc_instance_t *p_instance )
-{
-    assert( p_instance );
-    return 1;
-}
-
 const char * libvlc_get_version(void)
 {
     return VLC_Version();

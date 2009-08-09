@@ -140,16 +140,6 @@ VLC_PUBLIC_API libvlc_instance_t *
 libvlc_new( int , const char *const *, libvlc_exception_t *);
 
 /**
- * Return a libvlc instance identifier for legacy APIs. Use of this
- * function is discouraged, you should convert your program to use the
- * new API.
- *
- * \param p_instance the instance
- * \return the instance identifier
- */
-VLC_PUBLIC_API int libvlc_get_vlc_id( libvlc_instance_t *p_instance );
-
-/**
  * Decrement the reference count of a libvlc instance, and destroy it
  * if it reaches zero.
  *
@@ -215,15 +205,18 @@ VLC_PUBLIC_API const char * libvlc_get_changeset(void);
 struct vlc_object_t;
 
 /**
- * Return the libvlc internal object, the main object that all other depend on.
- * Any of of this function should be considered an ugly hack and avoided at all
- * cost. E.g. you need to expose some functionality that is not provided by the
- * libvlc API directly with libvlccore.
- * Remember to release the object with vlc_object_release( obj* )
+ * Get the internal main VLC object.
+ * Use of this function is usually a hack and should be avoided.
+ * @note
+ * You will need to link with libvlccore to make any use of the underlying VLC
+ * object. The libvlccore programming and binary interfaces are not stable.
+ * @warning
+ * Remember to release the object with vlc_object_release().
  *
  * \param p_instance the libvlc instance
+ * @return a VLC object of type "libvlc"
  */
-VLC_PUBLIC_API struct vlc_object_t *libvlc_get_vlc_instance(libvlc_instance_t *);
+VLC_PUBLIC_API struct vlc_object_t *libvlc_get_vlc_instance(libvlc_instance_t *p_instance);
 
 /**
  * Frees an heap allocation (char *) returned by a LibVLC API.

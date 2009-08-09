@@ -38,7 +38,6 @@ libvlc_get_fullscreen
 libvlc_get_input_thread
 libvlc_get_log_verbosity
 libvlc_get_version
-libvlc_get_vlc_id
 libvlc_get_vlc_instance
 libvlc_log_clear
 libvlc_log_close
