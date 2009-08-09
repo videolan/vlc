@@ -347,7 +347,7 @@ static int Open (vlc_object_t *obj)
         const xcb_xv_image_format_info_t *xfmt;
 
         /* */
-        const vlc_fourcc_t chromas_default[] = {
+        const vlc_fourcc_t *chromas, chromas_default[] = {
             fmt.i_chroma,
             VLC_CODEC_YUYV,
             VLC_CODEC_RGB24,
