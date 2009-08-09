@@ -738,6 +738,7 @@ void PLModel::doDelete( QModelIndexList selected )
                 recurseDelete( item->children, &selected );
             doDeleteItem( item, &selected );
         }
+        if( i > selected.size() ) i = selected.size();
     }
 }
 
