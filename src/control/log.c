@@ -112,51 +112,46 @@ libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance, libvlc_exception_t
 
 void libvlc_log_close( libvlc_log_t *p_log, libvlc_exception_t *p_e )
 {
-    if( p_log )
-    {
-        assert( p_log->p_messages );
-        msg_Unsubscribe(p_log->p_messages);
-        libvlc_release( p_log->p_instance );
-        libvlc_log_clear( p_log, p_e );
-        vlc_spin_destroy( &p_log->data.lock );
-        free(p_log);
-    }
-    else
-        RAISEVOID("Invalid log object!");
+    if( !p_log )
+        return;
+
+    assert( p_log->p_messages );
+    msg_Unsubscribe(p_log->p_messages);
+    libvlc_release( p_log->p_instance );
+    libvlc_log_clear( p_log, p_e );
+    vlc_spin_destroy( &p_log->data.lock );
+    free(p_log);
 }
 
 unsigned libvlc_log_count( const libvlc_log_t *p_log, libvlc_exception_t *p_e )
 {
-    if( p_log )
-    {
-        msg_cb_data_t *data = &((libvlc_log_t *)p_log)->data;
-        unsigned ret;
+    if( !p_log )
+        return 0;
 
-        /* We cannot lock due to constant pointer constraints. Break them.
-         * Even then, this si not really thread safe anyway. */
-        vlc_spin_lock (&data->lock);
-        ret = data->count;
-        vlc_spin_unlock (&data->lock);
-        return ret;
-    }
-    RAISEZERO("Invalid log object!");
+    msg_cb_data_t *data = &((libvlc_log_t *)p_log)->data;
+    unsigned ret;
+
+    /* We cannot lock due to constant pointer constraints. Break them.
+     * Even then, this si not really thread safe anyway. */
+    vlc_spin_lock (&data->lock);
+    ret = data->count;
+    vlc_spin_unlock (&data->lock);
+    return ret;
 }
 
 void libvlc_log_clear( libvlc_log_t *p_log, libvlc_exception_t *p_e )
 {
-    if( p_log )
-    {
-        vlc_spin_lock (&p_log->data.lock);
-        msg_item_t *tab[p_log->data.count];
-        memcpy (tab, p_log->data.items, sizeof (tab));
-        p_log->data.count = 0;
-        vlc_spin_unlock (&p_log->data.lock);
+    if( !p_log )
+        return;
 
-        for (unsigned i = 0; i < sizeof (tab) / sizeof (tab[0]); i++)
-            msg_Release (tab[i]);
-    }
-    else
-        RAISEVOID("Invalid log object!");
+    vlc_spin_lock (&p_log->data.lock);
+    msg_item_t *tab[p_log->data.count];
+    memcpy (tab, p_log->data.items, sizeof (tab));
+    p_log->data.count = 0;
+    vlc_spin_unlock (&p_log->data.lock);
+
+    for (unsigned i = 0; i < sizeof (tab) / sizeof (tab[0]); i++)
+         msg_Release (tab[i]);
 }
 
 libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *p_log, libvlc_exception_t *p_e )
@@ -183,21 +178,14 @@ libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *p_log, libvl
 
 void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter, libvlc_exception_t *p_e )
 {
-    if( p_iter )
-    {
-        free(p_iter);
-    }
-    else
-        RAISEVOID("Invalid log iterator!");
+    free( p_iter );
 }
 
 int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter, libvlc_exception_t *p_e )
 {
-    if( p_iter )
-    {
-        return p_iter->i_pos != p_iter->i_end;
-    }
-    RAISEZERO("Invalid log iterator!");
+    if( !p_iter )
+        return 0;
+    return p_iter->i_pos != p_iter->i_end;
 }
 
 libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
@@ -207,9 +195,8 @@ libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
     unsigned i_pos;
 
     if( !p_iter )
-        RAISENULL("Invalid log iterator!");
-    if( !buffer )
-        RAISENULL("Invalid message buffer!");
+        return NULL;
+    assert( buffer );
 
     i_pos = p_iter->i_pos;
     if( i_pos != p_iter->i_end )
