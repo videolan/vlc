@@ -4,14 +4,3 @@
 
 * Support multiple VLC versions: define a front-end module which will
    load the appropriate versionned module from a subdirectory.
-
-* Support options: --debug/-c, --output/-o, --check-symbols/-s, ...
-
-* Use setup.py
-
-* Refactor code: 
-   class Parser(list_of_includes) -> properties enums, methods..., 
-         dump()
-         check()...
-
-   class PythonGenerator(parser) -> p.save( filename )

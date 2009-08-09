@@ -33,6 +33,7 @@ import re
 import time
 import operator
 import itertools
+from optparse import OptionParser
 
 # DefaultDict from ASPN python cookbook
 import copy
@@ -91,520 +92,590 @@ special_enum_re=re.compile('^(enum)\s*(\S+\s*)?\{\s*(.+)\s*\};')
 parameter_passing=DefaultDict(default=1)
 parameter_passing['libvlc_exception_t*']=3
 
-# C-type to ctypes/python type conversion.
-# Note that enum types conversions are generated (cf convert_enum_names)
-typ2class={
-    'libvlc_exception_t*': 'ctypes.POINTER(VLCException)',
+class Parser(object):
+    def __init__(self, list_of_files):
+        self.methods=[]
+        self.enums=[]
 
-    'libvlc_media_player_t*': 'MediaPlayer',
-    'libvlc_instance_t*': 'Instance',
-    'libvlc_media_t*': 'Media',
-    'libvlc_log_t*': 'Log',
-    'libvlc_log_iterator_t*': 'LogIterator',
-    'libvlc_log_message_t*': 'LogMessage',
-    'libvlc_event_type_t': 'ctypes.c_uint',
-    'libvlc_event_manager_t*': 'EventManager',
-    'libvlc_media_discoverer_t*': 'MediaDiscoverer',
-    'libvlc_media_library_t*': 'MediaLibrary',
-    'libvlc_media_list_t*': 'MediaList',
-    'libvlc_media_list_player_t*': 'MediaListPlayer',
-    'libvlc_media_list_view_t*': 'MediaListView',
-    'libvlc_track_description_t*': 'TrackDescription',
-    'libvlc_audio_output_t*': 'AudioOutput',
+        for name in list_of_files:
+            self.enums.extend(self.parse_typedef(name))
+            self.methods.extend(self.parse_include(name))
 
-    'mediacontrol_Instance*': 'MediaControl',
-    'mediacontrol_Exception*': 'MediaControlException',
-    'mediacontrol_RGBPicture*': 'ctypes.POINTER(RGBPicture)',
-    'mediacontrol_PlaylistSeq*': 'MediaControlPlaylistSeq',
-    'mediacontrol_Position*': 'ctypes.POINTER(MediaControlPosition)',
-    'mediacontrol_StreamInformation*': 'ctypes.POINTER(MediaControlStreamInformation)',
-    'WINDOWHANDLE': 'ctypes.c_ulong',
+    def parse_param(self, s):
+        """Parse a C parameter expression.
 
-    'void': 'None',
-    'void*': 'ctypes.c_void_p',
-    'short': 'ctypes.c_short',
-    'char*': 'ctypes.c_char_p',
-    'char**': 'ListPOINTER(ctypes.c_char_p)',
-    'uint32_t': 'ctypes.c_uint',
-    'float': 'ctypes.c_float',
-    'unsigned': 'ctypes.c_uint',
-    'int': 'ctypes.c_int',
-    '...': 'FIXMEva_list',
-    'libvlc_callback_t': 'ctypes.c_void_p',
-    'libvlc_time_t': 'ctypes.c_longlong',
-    }
+        It is used to parse both the type/name for methods, and type/name
+        for their parameters.
 
-# Defined python classes, i.e. classes for which we want to generate
-# class wrappers around libvlc functions
-defined_classes=(
-    'MediaPlayer',
-    'Instance',
-    'Media',
-    'Log',
-    'LogIterator',
-    #'LogMessage',
-    'EventManager',
-    'MediaDiscoverer',
-    'MediaLibrary',
-    'MediaList',
-    'MediaListPlayer',
-    'MediaListView',
-    'TrackDescription',
-    'AudioOutput',
-    'MediaControl',
-    )
-
-# Definition of prefixes that we can strip from method names when
-# wrapping them into class methods
-prefixes=dict( (v, k[:-2]) for (k, v) in typ2class.iteritems() if  v in defined_classes )
-prefixes['MediaControl']='mediacontrol_'
-
-def parse_param(s):
-    """Parse a C parameter expression.
-
-    It is used to parse both the type/name for methods, and type/name
-    for their parameters.
-
-    It returns a tuple (type, name).
-    """
-    s=s.strip()
-    s=s.replace('const', '')
-    if 'VLC_FORWARD' in s:
-        m=forward_re.match(s)
-        s=m.group(1)+m.group(2)
-    m=param_re.search(s)
-    if m:
-        const, typ, name=m.groups()
-        while name.startswith('*'):
-            typ += '*'
-            name=name[1:]
-        if name == 'const*':
-            # K&R definition: const char * const*
-            name=''
-        typ=typ.replace(' ', '')
-        return typ, name
-    else:
-        # K&R definition: only type
-        return s.replace(' ', ''), ''
-
-def insert_code(filename):
-    """Generate header/footer code.
-    """
-    f=open(filename, 'r')
-    for l in f:
-        if 'build_date' in l:
-            print 'build_date="%s"' % time.ctime()
+        It returns a tuple (type, name).
+        """
+        s=s.strip()
+        s=s.replace('const', '')
+        if 'VLC_FORWARD' in s:
+            m=forward_re.match(s)
+            s=m.group(1)+m.group(2)
+        m=param_re.search(s)
+        if m:
+            const, typ, name=m.groups()
+            while name.startswith('*'):
+                typ += '*'
+                name=name[1:]
+            if name == 'const*':
+                # K&R definition: const char * const*
+                name=''
+            typ=typ.replace(' ', '')
+            return typ, name
         else:
-            print l,
-    f.close()
+            # K&R definition: only type
+            return s.replace(' ', ''), ''
 
-def convert_enum_names(enums):
-    res={}
-    for (typ, name, values, comment) in enums:
-        if typ != 'enum':
-            raise Exception('This method only handles enums')
-        pyname=re.findall('(libvlc|mediacontrol)_(.+?)(_t)?$', name)[0][1]
-        if '_' in pyname:
-            pyname=pyname.title().replace('_', '')
-        elif not pyname[0].isupper():
-            pyname=pyname.capitalize()
-        res[name]=pyname
-    return res
+    def parse_typedef(self, name):
+        """Parse include file for typedef expressions.
 
-def generate_enums(enums):
-    for (typ, name, values, comment) in enums:
-        if typ != 'enum':
-            raise Exception('This method only handles enums')
-        pyname=typ2class[name]
+        This generates a tuple for each typedef:
+        (type, name, value_list, comment)
+        with type == 'enum' (for the moment) and value_list being a list of (name, value)
+        Note that values are string, since this is intended for code generation.
+        """
+        f=open(name, 'r')
+        accumulator=''
+        for l in f:
+            # Note: lstrip() should not be necessary, but there is 1 badly
+            # formatted comment in vlc1.0.0 includes
+            if l.lstrip().startswith('/**'):
+                comment=''
+                continue
+            elif l.startswith(' * '):
+                comment = comment + l[3:]
+                continue
 
-        print "class %s(ctypes.c_uint):" % pyname
-        print '    """%s\n    """' % comment
+            l=l.strip()
+            if l.startswith('/*') or l.endswith('*/'):
+                continue
 
-        conv={}
-        # Convert symbol names
-        for k, v in values:
-            n=k.split('_')[-1]
-            if len(n) == 1:
-                # Single character. Some symbols use 1_1, 5_1, etc.
-                n="_".join( k.split('_')[-2:] )
-            if re.match('^[0-9]', n):
-                # Cannot start an identifier with a number
-                n='_'+n
-            conv[k]=n
+            if (l.startswith('typedef enum') or l.startswith('enum')) and not l.endswith(';'):
+                # Multiline definition. Accumulate until end of definition
+                accumulator=l
+                continue
+            elif accumulator:
+                accumulator=" ".join( (accumulator, l) )
+                if l.endswith(';'):
+                    # End of definition
+                    l=accumulator
+                    accumulator=''
 
-        for k, v in values:
-            print "    %s=%s" % (conv[k], v)
+            m=enum_re.match(l)
+            if m:
+                values=[]
+                (typ, dummy, data, name)=m.groups()
+                for i, l in enumerate(paramlist_re.split(data)):
+                    l=l.strip()
+                    if l.startswith('/*'):
+                        continue
+                    if '=' in l:
+                        # A value was specified. Use it.
+                        values.append(re.split('\s*=\s*', l))
+                    else:
+                        if l:
+                            values.append( (l, str(i)) )
+                comment=comment.replace('@{', '').replace('@see', 'See').replace('\ingroup', '')
+                yield (typ, name.strip(), values, comment)
+                comment=''
+                continue
 
-        print "    _names={"
-        for k, v in values:
-            print "        %s: '%s'," % (v, conv[k])
-        print "    }"
+            # Special case, used only for libvlc_events.h
+            m=special_enum_re.match(l)
+            if m:
+                values=[]
+                (typ, name, data)=m.groups()
+                for i, l in enumerate(paramlist_re.split(data)):
+                    l=l.strip()
+                    if l.startswith('/*') or l.startswith('#'):
+                        continue
+                    if '=' in l:
+                        # A value was specified. Use it.
+                        values.append(re.split('\s*=\s*', l))
+                    else:
+                        if l:
+                            values.append( (l, str(i)) )
+                comment=comment.replace('@{', '').replace('@see', 'See').replace('\ingroup', '')
+                yield (typ, name.strip(), values, comment)
+                comment=''
+                continue
 
-        print """
-    def __repr__(self):
-        return ".".join((self.__class__.__module__, self.__class__.__name__, self._names[self.value]))
-"""
+    def parse_include(self, name):
+        """Parse include file.
 
-def parse_typedef(name):
-    """Parse include file for typedef expressions.
+        This generates a tuple for each function:
+        (return_type, method_name, parameter_list, comment)
+        with parameter_list being a list of tuples (parameter_type, parameter_name).
+        """
+        f=open(name, 'r')
+        accumulator=''
+        comment=''
+        for l in f:
+            # Note: lstrip() should not be necessary, but there is 1 badly
+            # formatted comment in vlc1.0.0 includes
+            if l.lstrip().startswith('/**'):
+                comment=''
+                continue
+            elif l.startswith(' * '):
+                comment = comment + l[3:]
+                continue
 
-    This generates a tuple for each typedef:
-    (type, name, value_list, comment)
-    with type == 'enum' (for the moment) and value_list being a list of (name, value)
-    Note that values are string, since this is intended for code generation.
-    """
-    f=open(name, 'r')
-    accumulator=''
-    for l in f:
-        # Note: lstrip() should not be necessary, but there is 1 badly
-        # formatted comment in vlc1.0.0 includes
-        if l.lstrip().startswith('/**'):
-            comment=''
-            continue
-        elif l.startswith(' * '):
-            comment = comment + l[3:]
-            continue
+            l=l.strip()
 
-        l=l.strip()
-        if l.startswith('/*') or l.endswith('*/'):
-            continue
+            if accumulator:
+                accumulator=" ".join( (accumulator, l) )
+                if l.endswith(');'):
+                    # End of definition
+                    l=accumulator
+                    accumulator=''
+            elif l.startswith('VLC_PUBLIC_API') and not l.endswith(');'):
+                # Multiline definition. Accumulate until end of definition
+                accumulator=l
+                continue
 
-        if (l.startswith('typedef enum') or l.startswith('enum')) and not l.endswith(';'):
-            # Multiline definition. Accumulate until end of definition
-            accumulator=l
-            continue
-        elif accumulator:
-            accumulator=" ".join( (accumulator, l) )
-            if l.endswith(';'):
-                # End of definition
-                l=accumulator
-                accumulator=''
+            m=api_re.match(l)
+            if m:
+                (ret, param)=m.groups()
 
-        m=enum_re.match(l)
-        if m:
-            values=[]
-            (typ, dummy, data, name)=m.groups()
-            for i, l in enumerate(paramlist_re.split(data)):
-                l=l.strip()
-                if l.startswith('/*'):
-                    continue
-                if '=' in l:
-                    # A value was specified. Use it.
-                    values.append(re.split('\s*=\s*', l))
-                else:
-                    if l:
-                        values.append( (l, str(i)) )
-            comment=comment.replace('@{', '').replace('@see', 'See').replace('\ingroup', '')
-            yield (typ, name.strip(), values, comment)
-            comment=''
-            continue
+                rtype, method=self.parse_param(ret)
 
-        # Special case, used only for libvlc_events.h
-        m=special_enum_re.match(l)
-        if m:
-            values=[]
-            (typ, name, data)=m.groups()
-            for i, l in enumerate(paramlist_re.split(data)):
-                l=l.strip()
-                if l.startswith('/*') or l.startswith('#'):
-                    continue
-                if '=' in l:
-                    # A value was specified. Use it.
-                    values.append(re.split('\s*=\s*', l))
-                else:
-                    if l:
-                        values.append( (l, str(i)) )
-            comment=comment.replace('@{', '').replace('@see', 'See').replace('\ingroup', '')
-            yield (typ, name.strip(), values, comment)
-            comment=''
-            continue
-
-def parse_include(name):
-    """Parse include file.
-
-    This generates a tuple for each function:
-    (return_type, method_name, parameter_list, comment)
-    with parameter_list being a list of tuples (parameter_type, parameter_name).
-    """
-    f=open(name, 'r')
-    accumulator=''
-    comment=''
-    for l in f:
-        # Note: lstrip() should not be necessary, but there is 1 badly
-        # formatted comment in vlc1.0.0 includes
-        if l.lstrip().startswith('/**'):
-            comment=''
-            continue
-        elif l.startswith(' * '):
-            comment = comment + l[3:]
-            continue
-
-        l=l.strip()
-
-        if accumulator:
-            accumulator=" ".join( (accumulator, l) )
-            if l.endswith(');'):
-                # End of definition
-                l=accumulator
-                accumulator=''
-        elif l.startswith('VLC_PUBLIC_API') and not l.endswith(');'):
-            # Multiline definition. Accumulate until end of definition
-            accumulator=l
-            continue
-
-        m=api_re.match(l)
-        if m:
-            (ret, param)=m.groups()
-
-            rtype, method=parse_param(ret)
-
-            params=[]
-            for p in paramlist_re.split(param):
-                params.append( parse_param(p) )
-
-            if len(params) == 1 and params[0][0] == 'void':
-                # Empty parameter list
                 params=[]
+                for p in paramlist_re.split(param):
+                    params.append( self.parse_param(p) )
 
-            if list(p for p in params if not p[1]):
-                # Empty parameter names. Have to poke into comment.
-                names=comment_re.findall(comment)
-                if len(names) < len(params):
-                    # Bad description: all parameters are not specified.
-                    # Generate default parameter names
-                    badnames=[ "param%d" % i for i in xrange(len(params)) ]
-                    # Put in the existing ones
-                    for (i, p) in enumerate(names):
-                        badnames[i]=names[i]
-                    names=badnames
-                    print "### Error ###"
-                    print "### Cannot get parameter names from comment for %s: %s" % (method, comment.replace("\n", ' '))
-                    # Note: this was previously
-                    # raise Exception("Cannot get parameter names from comment for %s: %s" % (method, comment))
-                    # but it prevented code generation for a minor detail (some bad descriptions).
-                params=[ (p[0], names[i]) for (i, p) in enumerate(params) ]
+                if len(params) == 1 and params[0][0] == 'void':
+                    # Empty parameter list
+                    params=[]
 
-            for typ, name in params:
-                if not typ in typ2class:
-                    raise Exception("No conversion for %s (from %s:%s)" % (typ, method, name))
+                if list(p for p in params if not p[1]):
+                    # Empty parameter names. Have to poke into comment.
+                    names=comment_re.findall(comment)
+                    if len(names) < len(params):
+                        # Bad description: all parameters are not specified.
+                        # Generate default parameter names
+                        badnames=[ "param%d" % i for i in xrange(len(params)) ]
+                        # Put in the existing ones
+                        for (i, p) in enumerate(names):
+                            badnames[i]=names[i]
+                        names=badnames
+                        print "### Error ###"
+                        print "### Cannot get parameter names from comment for %s: %s" % (method, comment.replace("\n", ' '))
+                        # Note: this was previously
+                        # raise Exception("Cannot get parameter names from comment for %s: %s" % (method, comment))
+                        # but it prevented code generation for a minor detail (some bad descriptions).
+                    params=[ (p[0], names[i]) for (i, p) in enumerate(params) ]
 
-            # Transform Doxygen syntax into epydoc syntax
-            comment=comment.replace('\\param', '@param').replace('\\return', '@return')
+                # Transform Doxygen syntax into epydoc syntax
+                comment=comment.replace('\\param', '@param').replace('\\return', '@return')
 
-            if debug:
-                print '********************'
-                print l
-                print '-------->'
-                print "%s (%s)" % (method, rtype)
-                for typ, name in params:
-                    print "        %s (%s)" % (name, typ)
-                print '********************'
-            yield (rtype,
-                   method,
-                   params,
-                   comment)
-            comment=''
+                if debug:
+                    print '********************'
+                    print l
+                    print '-------->'
+                    print "%s (%s)" % (method, rtype)
+                    for typ, name in params:
+                        print "        %s (%s)" % (name, typ)
+                    print '********************'
+                yield (rtype,
+                       method,
+                       params,
+                       comment)
+                comment=''
 
-def output_ctypes(rtype, method, params, comment):
-    """Output ctypes decorator for the given method.
-    """
-    if method in blacklist:
-        # FIXME
-        return
+    def dump_methods(self):
+        print "** Defined functions **"
+        for (rtype, name, params, comment) in self.methods:
+            print "%(name)s (%(rtype)s):" % locals()
+            for t, n in params:
+                print "    %(n)s (%(t)s)" % locals()
 
-    if params:
-        print "prototype=ctypes.CFUNCTYPE(%s, %s)" % (typ2class.get(rtype, 'FIXME_%s' % rtype),
-                                                      ",".join( typ2class[p[0]] for p in params ))
-    else:
-        print "prototype=ctypes.CFUNCTYPE(%s)" % typ2class.get(rtype, 'FIXME_%s' % rtype)
+    def dump_enums(self):
+        print "** Defined enums **"
+        for (typ, name, values, comment) in self.enums:
+            print "%(name)s (%(typ)s):" % locals()
+            for k, v in values:
+                print "    %(k)s=%(v)s" % locals()
 
+class PythonGenerator(object):
+    # C-type to ctypes/python type conversion.
+    # Note that enum types conversions are generated (cf convert_enum_names)
+    type2class={
+        'libvlc_exception_t*': 'ctypes.POINTER(VLCException)',
 
-    if not params:
-        flags='paramflags= tuple()'
-    elif len(params) == 1:
-        flags="paramflags=( (%d, ), )" % parameter_passing[params[0][0]]
-    else:
-        flags="paramflags=%s" % ",".join( '(%d,)' % parameter_passing[p[0]] for p in params )
-    print flags
-    print '%s = prototype( ("%s", dll), paramflags )' % (method, method)
-    if '3' in flags:
-        # A VLCException is present. Process it.
-        print "%s.errcheck = check_vlc_exception" % method
-    print '%s.__doc__ = """%s"""' % (method, comment)
-    print
+        'libvlc_media_player_t*': 'MediaPlayer',
+        'libvlc_instance_t*': 'Instance',
+        'libvlc_media_t*': 'Media',
+        'libvlc_log_t*': 'Log',
+        'libvlc_log_iterator_t*': 'LogIterator',
+        'libvlc_log_message_t*': 'LogMessage',
+        'libvlc_event_type_t': 'ctypes.c_uint',
+        'libvlc_event_manager_t*': 'EventManager',
+        'libvlc_media_discoverer_t*': 'MediaDiscoverer',
+        'libvlc_media_library_t*': 'MediaLibrary',
+        'libvlc_media_list_t*': 'MediaList',
+        'libvlc_media_list_player_t*': 'MediaListPlayer',
+        'libvlc_media_list_view_t*': 'MediaListView',
+        'libvlc_track_description_t*': 'TrackDescription',
+        'libvlc_audio_output_t*': 'AudioOutput',
 
-def parse_override(name):
-    """Parse override definitions file.
+        'mediacontrol_Instance*': 'MediaControl',
+        'mediacontrol_Exception*': 'MediaControlException',
+        'mediacontrol_RGBPicture*': 'ctypes.POINTER(RGBPicture)',
+        'mediacontrol_PlaylistSeq*': 'MediaControlPlaylistSeq',
+        'mediacontrol_Position*': 'ctypes.POINTER(MediaControlPosition)',
+        'mediacontrol_StreamInformation*': 'ctypes.POINTER(MediaControlStreamInformation)',
+        'WINDOWHANDLE': 'ctypes.c_ulong',
 
-    It is possible to override methods definitions in classes.
+        'void': 'None',
+        'void*': 'ctypes.c_void_p',
+        'short': 'ctypes.c_short',
+        'char*': 'ctypes.c_char_p',
+        'char**': 'ListPOINTER(ctypes.c_char_p)',
+        'uint32_t': 'ctypes.c_uint',
+        'float': 'ctypes.c_float',
+        'unsigned': 'ctypes.c_uint',
+        'int': 'ctypes.c_int',
+        '...': 'FIXMEva_list',
+        'libvlc_callback_t': 'ctypes.c_void_p',
+        'libvlc_time_t': 'ctypes.c_longlong',
+        }
 
-    It returns a tuple
-    (code, overriden_methods, docstring)
-    """
-    code={}
+    # Defined python classes, i.e. classes for which we want to generate
+    # class wrappers around libvlc functions
+    defined_classes=(
+        'MediaPlayer',
+        'Instance',
+        'Media',
+        'Log',
+        'LogIterator',
+        'EventManager',
+        'MediaDiscoverer',
+        'MediaLibrary',
+        'MediaList',
+        'MediaListPlayer',
+        'MediaListView',
+        'TrackDescription',
+        'AudioOutput',
+        'MediaControl',
+        )
 
-    data=[]
-    current=None
-    f=open(name, 'r')
-    for l in f:
-        m=re.match('class (\S+):', l)
-        if m:
-            # Dump old data
-            if current is not None:
-                code[current]="".join(data)
-            current=m.group(1)
-            data=[]
-            continue
-        data.append(l)
-    code[current]="".join(data)
-    f.close()
+    def __init__(self, parser=None):
+        self.parser=parser
 
-    docstring={}
-    for k, v in code.iteritems():
-        if v.lstrip().startswith('"""'):
-            # Starting comment. Use it as docstring.
-            dummy, docstring[k], code[k]=v.split('"""', 2)
+        # Generate python names for enums
+        self.type2class.update(self.convert_enum_names(parser.enums))
+        self.check_types()
 
-    # Not robust wrt. internal methods, but this works for the moment.
-    overridden_methods=dict( (k, re.findall('^\s+def\s+(\w+)', v, re.MULTILINE)) for (k, v) in code.iteritems() )
+        # Definition of prefixes that we can strip from method names when
+        # wrapping them into class methods
+        self.prefixes=dict( (v, k[:-2])
+                            for (k, v) in self.type2class.iteritems()
+                            if  v in self.defined_classes )
+        self.prefixes['MediaControl']='mediacontrol_'
 
-    return code, overridden_methods, docstring
-
-def fix_python_comment(c):
-    """Fix comment by removing first and last parameters (self and exception)
-    """
-    data=c.replace('@{', '').replace('@see', 'See').splitlines()
-    body=itertools.takewhile(lambda l: not '@param' in l and not '@return' in l, data)
-    param=[ python_param_re.sub('\\1:\\2', l) for l in  itertools.ifilter(lambda l: '@param' in l, data) ]
-    ret=[ l.replace('@return', '@return:') for l in itertools.ifilter(lambda l: '@return' in l, data) ]
-
-    if len(param) >= 2:
-        param=param[1:-1]
-    elif len(param) == 1:
-        param=[]
-
-    return "\n".join(itertools.chain(body, param, ret))
-
-def generate_wrappers(methods):
-    """Generate class wrappers for all appropriate methods.
-
-    @return: the set of wrapped method names
-    """
-    ret=set()
-    # Sort methods against the element they apply to.
-    elements=sorted( ( (typ2class.get(params[0][0]), rt, met, params, c)
-                       for (rt, met, params, c) in methods
-                       if params and typ2class.get(params[0][0], '_') in defined_classes
-                       ),
-                     key=operator.itemgetter(0))
-
-    overrides, overriden_methods, docstring=parse_override('override.py')
-
-    for classname, el in itertools.groupby(elements, key=operator.itemgetter(0)):
-        print """class %(name)s(object):""" % {'name': classname}
-        if classname in docstring:
-            print '    """%s\n    """' % docstring[classname]
-
-        print """
-    def __new__(cls, pointer=None):
-        '''Internal method used for instanciating wrappers from ctypes.
-        '''
-        if pointer is None:
-            raise Exception("Internal method. You should instanciate objects through other class methods (probably named 'new' or ending with 'new')")
-        if pointer == 0:
-            return None
+    def save(self, filename=None):
+        if filename is None or filename == '-':
+            self.fd=sys.stdout
         else:
-            o=object.__new__(cls)
-            o._as_parameter_=ctypes.c_void_p(pointer)
-            return o
+            self.fd=open(filename, 'w')
 
-    @staticmethod
-    def from_param(arg):
-        '''(INTERNAL) ctypes parameter conversion method.
-        '''
-        return arg._as_parameter_
-""" % {'name': classname}
+        self.insert_code('header.py')
+        self.generate_enums(self.parser.enums)
+        wrapped_methods=self.generate_wrappers(self.parser.methods)
+        for l in self.parser.methods:
+            self.output_ctypes(*l)
+        self.insert_code('footer.py')
 
-        if classname in overrides:
-            print overrides[classname]
+        all_methods=set( t[1] for t in self.parser.methods )
+        not_wrapped=all_methods.difference(wrapped_methods)
+        self.output("# Not wrapped methods:")
+        for m in not_wrapped:
+            self.output("#   ", m)
+        
+        if self.fd != sys.stdout:
+            self.fd.close()
 
-        prefix=prefixes.get(classname, '')
+    def output(self, *p):
+        self.fd.write(" ".join(p))
+        self.fd.write("\n")
 
-        for cl, rtype, method, params, comment in el:
-            if method in blacklist:
-                continue
-            # Strip prefix
-            name=method.replace(prefix, '').replace('libvlc_', '')
-            ret.add(method)
-            if name in overriden_methods.get(cl, []):
-                # Method already defined in override.py
-                continue
+    def check_types(self):
+        """Make sure that all types are properly translated.
 
-            if params:
-                params[0]=(params[0][0], 'self')
-            if params and params[-1][0] in ('libvlc_exception_t*', 'mediacontrol_Exception*'):
-                args=", ".join( p[1] for p in params[:-1] )
+        This method must be called *after* convert_enum_names, since
+        the latter populates type2class with converted enum names.
+        """
+        for (rt, met, params, c) in self.parser.methods:
+            for typ, name in params:
+                if not typ in self.type2class:
+                    raise Exception("No conversion for %s (from %s:%s)" % (typ, met, name))
+
+    def insert_code(self, filename):
+        """Generate header/footer code.
+        """
+        f=open(filename, 'r')
+        for l in f:
+            if 'build_date' in l:
+                self.output('build_date="%s"' % time.ctime())
             else:
-                args=", ".join( p[1] for p in params )
+                self.output(l.rstrip())
+        f.close()
 
-            print "    def %s(%s):" % (name, args)
-            print '        """%s\n        """' % fix_python_comment(comment)
-            if params and params[-1][0] == 'libvlc_exception_t*':
-                # Exception handling
-                print "        e=VLCException()"
-                print "        return %s(%s, e)" % (method, args)
-            elif params and params[-1][0] == 'mediacontrol_Exception*':
-                # Exception handling
-                print "        e=MediaControlException()"
-                print "        return %s(%s, e)" % (method, args)
+    def convert_enum_names(self, enums):
+        res={}
+        for (typ, name, values, comment) in enums:
+            if typ != 'enum':
+                raise Exception('This method only handles enums')
+            pyname=re.findall('(libvlc|mediacontrol)_(.+?)(_t)?$', name)[0][1]
+            if '_' in pyname:
+                pyname=pyname.title().replace('_', '')
+            elif not pyname[0].isupper():
+                pyname=pyname.capitalize()
+            res[name]=pyname
+        return res
+
+    def generate_enums(self, enums):
+        for (typ, name, values, comment) in enums:
+            if typ != 'enum':
+                raise Exception('This method only handles enums')
+            pyname=self.type2class[name]
+
+            self.output("class %s(ctypes.c_uint):" % pyname)
+            self.output('    """%s\n    """' % comment)
+
+            conv={}
+            # Convert symbol names
+            for k, v in values:
+                n=k.split('_')[-1]
+                if len(n) == 1:
+                    # Single character. Some symbols use 1_1, 5_1, etc.
+                    n="_".join( k.split('_')[-2:] )
+                if re.match('^[0-9]', n):
+                    # Cannot start an identifier with a number
+                    n='_'+n
+                conv[k]=n
+
+            for k, v in values:
+                self.output("    %s=%s" % (conv[k], v))
+
+            self.output("    _names={")
+            for k, v in values:
+                self.output("        %s: '%s'," % (v, conv[k]))
+            self.output("    }")
+
+            self.output("""
+        def __repr__(self):
+            return ".".join((self.__class__.__module__, self.__class__.__name__, self._names[self.value]))
+    """)
+
+    def output_ctypes(self, rtype, method, params, comment):
+        """Output ctypes decorator for the given method.
+        """
+        if method in blacklist:
+            # FIXME
+            return
+
+        if params:
+            self.output("prototype=ctypes.CFUNCTYPE(%s, %s)" % (self.type2class.get(rtype, 'FIXME_%s' % rtype),
+                                                                ",".join( self.type2class[p[0]] for p in params )))
+        else:
+            self.output("prototype=ctypes.CFUNCTYPE(%s)" % self.type2class.get(rtype, 'FIXME_%s' % rtype))
+
+
+        if not params:
+            flags='paramflags= tuple()'
+        elif len(params) == 1:
+            flags="paramflags=( (%d, ), )" % parameter_passing[params[0][0]]
+        else:
+            flags="paramflags=%s" % ",".join( '(%d,)' % parameter_passing[p[0]] for p in params )
+        self.output(flags)
+        self.output('%s = prototype( ("%s", dll), paramflags )' % (method, method))
+        if '3' in flags:
+            # A VLCException is present. Process it.
+            self.output("%s.errcheck = check_vlc_exception" % method)
+        self.output('%s.__doc__ = """%s"""' % (method, comment))
+        self.output()
+
+    def parse_override(self, name):
+        """Parse override definitions file.
+
+        It is possible to override methods definitions in classes.
+
+        It returns a tuple
+        (code, overriden_methods, docstring)
+        """
+        code={}
+
+        data=[]
+        current=None
+        f=open(name, 'r')
+        for l in f:
+            m=re.match('class (\S+):', l)
+            if m:
+                # Dump old data
+                if current is not None:
+                    code[current]="".join(data)
+                current=m.group(1)
+                data=[]
+                continue
+            data.append(l)
+        code[current]="".join(data)
+        f.close()
+
+        docstring={}
+        for k, v in code.iteritems():
+            if v.lstrip().startswith('"""'):
+                # Starting comment. Use it as docstring.
+                dummy, docstring[k], code[k]=v.split('"""', 2)
+
+        # Not robust wrt. internal methods, but this works for the moment.
+        overridden_methods=dict( (k, re.findall('^\s+def\s+(\w+)', v, re.MULTILINE)) for (k, v) in code.iteritems() )
+
+        return code, overridden_methods, docstring
+
+    def fix_python_comment(self, c):
+        """Fix comment by removing first and last parameters (self and exception)
+        """
+        data=c.replace('@{', '').replace('@see', 'See').splitlines()
+        body=itertools.takewhile(lambda l: not '@param' in l and not '@return' in l, data)
+        param=[ python_param_re.sub('\\1:\\2', l) for l in  itertools.ifilter(lambda l: '@param' in l, data) ]
+        ret=[ l.replace('@return', '@return:') for l in itertools.ifilter(lambda l: '@return' in l, data) ]
+
+        if len(param) >= 2:
+            param=param[1:-1]
+        elif len(param) == 1:
+            param=[]
+
+        return "\n".join(itertools.chain(body, param, ret))
+
+    def generate_wrappers(self, methods):
+        """Generate class wrappers for all appropriate methods.
+
+        @return: the set of wrapped method names
+        """
+        ret=set()
+        # Sort methods against the element they apply to.
+        elements=sorted( ( (self.type2class.get(params[0][0]), rt, met, params, c)
+                           for (rt, met, params, c) in methods
+                           if params and self.type2class.get(params[0][0], '_') in self.defined_classes
+                           ),
+                         key=operator.itemgetter(0))
+
+        overrides, overriden_methods, docstring=self.parse_override('override.py')
+
+        for classname, el in itertools.groupby(elements, key=operator.itemgetter(0)):
+            self.output("""class %(name)s(object):""" % {'name': classname})
+            if classname in docstring:
+                self.output('    """%s\n    """' % docstring[classname])
+
+            self.output("""
+        def __new__(cls, pointer=None):
+            '''Internal method used for instanciating wrappers from ctypes.
+            '''
+            if pointer is None:
+                raise Exception("Internal method. Surely this class cannot be instanciated by itself.")
+            if pointer == 0:
+                return None
             else:
-                print "        return %s(%s)" % (method, args)
-            print
+                o=object.__new__(cls)
+                o._as_parameter_=ctypes.c_void_p(pointer)
+                return o
 
-            # Check for standard methods
-            if name == 'count':
-                # There is a count method. Generate a __len__ one.
-                print "    def __len__(self):"
-                print "        e=VLCException()"
-                print "        return %s(self, e)" % method
-                print
-            elif name.endswith('item_at_index'):
-                # Indexable (and thus iterable)"
-                print "    def __getitem__(self, i):"
-                print "        e=VLCException()"
-                print "        return %s(self, i, e)" % method
-                print
-                print "    def __iter__(self):"
-                print "        e=VLCException()"
-                print "        for i in xrange(len(self)):"
-                print "            yield self[i]"
-                print
+        @staticmethod
+        def from_param(arg):
+            '''(INTERNAL) ctypes parameter conversion method.
+            '''
+            return arg._as_parameter_
+    """ % {'name': classname})
 
-    return ret
+            if classname in overrides:
+                self.output(overrides[classname])
+
+            prefix=self.prefixes.get(classname, '')
+
+            for cl, rtype, method, params, comment in el:
+                if method in blacklist:
+                    continue
+                # Strip prefix
+                name=method.replace(prefix, '').replace('libvlc_', '')
+                ret.add(method)
+                if name in overriden_methods.get(cl, []):
+                    # Method already defined in override.py
+                    continue
+
+                if params:
+                    params[0]=(params[0][0], 'self')
+                if params and params[-1][0] in ('libvlc_exception_t*', 'mediacontrol_Exception*'):
+                    args=", ".join( p[1] for p in params[:-1] )
+                else:
+                    args=", ".join( p[1] for p in params )
+
+                self.output("    def %s(%s):" % (name, args))
+                self.output('        """%s\n        """' % self.fix_python_comment(comment))
+                if params and params[-1][0] == 'libvlc_exception_t*':
+                    # Exception handling
+                    self.output("        e=VLCException()")
+                    self.output("        return %s(%s, e)" % (method, args))
+                elif params and params[-1][0] == 'mediacontrol_Exception*':
+                    # Exception handling
+                    self.output("        e=MediaControlException()")
+                    self.output("        return %s(%s, e)" % (method, args))
+                else:
+                    self.output("        return %s(%s)" % (method, args))
+                self.output()
+
+                # Check for standard methods
+                if name == 'count':
+                    # There is a count method. Generate a __len__ one.
+                    self.output("""    def __len__(self):
+        e=VLCException()
+        return %s(self, e)
+""" % method)
+                elif name.endswith('item_at_index'):
+                    # Indexable (and thus iterable)"
+                    self.output("""    def __getitem__(self, i):
+        e=VLCException()
+        return %s(self, i, e)
+
+    def __iter__(self):
+        e=VLCException()
+        for i in xrange(len(self)):
+            yield self[i]
+""" % method)
+        return ret
+
+def process(output, list_of_includes):
+    p=Parser(list_of_includes)
+    g=PythonGenerator(p)
+    g.save(output)
 
 if __name__ == '__main__':
-    enums=[]
-    for name in sys.argv[1:]:
-        enums.extend(list(parse_typedef(name)))
-    # Generate python names for enums
-    typ2class.update(convert_enum_names(enums))
+    opt=OptionParser(usage="""Parse VLC include files and generate bindings code.
+%prog [options] include_file.h [...]""")
 
-    methods=[]
-    for name in sys.argv[1:]:
-        methods.extend(list(parse_include(name)))
-    if debug:
+    opt.add_option("-d", "--debug", dest="debug", action="store_true",
+                      default=False,
+                      help="Debug mode")
+
+    opt.add_option("-o", "--output", dest="output", action="store",
+                      type="str", default="-",
+                      help="Output filename")
+
+    (options, args) = opt.parse_args()
+
+    if not args:
+        opt.print_help()
+        sys.exit(1)
+
+    p=Parser(args)
+    if options.debug:
+        p.dump_methods()
+        p.dump_enums()
         sys.exit(0)
 
-    insert_code('header.py')
-    generate_enums(enums)
-    wrapped=generate_wrappers(methods)
-    for l in methods:
-        output_ctypes(*l)
-    insert_code('footer.py')
+    g=PythonGenerator(p)
 
-    all=set( t[1] for t in methods )
-    not_wrapped=all.difference(wrapped)
-    print "# Not wrapped methods:"
-    for m in not_wrapped:
-        print "#   ", m
-
+    g.save(options.output)
