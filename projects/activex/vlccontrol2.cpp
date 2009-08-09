@@ -624,7 +624,7 @@ VLCLog::~VLCLog()
 {
     delete _p_vlcmessages;
     if( _p_log )
-        libvlc_log_close(_p_log, NULL);
+        libvlc_log_close(_p_log);
 
     if( _p_typeinfo )
         _p_typeinfo->Release();
@@ -725,13 +725,7 @@ STDMETHODIMP VLCLog::get_verbosity(long* level)
         libvlc_instance_t* p_libvlc;
         HRESULT hr = _p_instance->getVLC(&p_libvlc);
         if( SUCCEEDED(hr) )
-        {
-            libvlc_exception_t ex;
-            libvlc_exception_init(&ex);
-
-            *level = libvlc_get_log_verbosity(p_libvlc, &ex);
-            hr = exception_bridge(&ex);
-        }
+            *level = libvlc_get_log_verbosity(p_libvlc);
         return hr;
     }
     else
@@ -759,12 +753,12 @@ STDMETHODIMP VLCLog::put_verbosity(long verbosity)
                 hr = exception_bridge(&ex);
             }
             if( SUCCEEDED(hr) )
-                libvlc_set_log_verbosity(p_libvlc, (unsigned)verbosity, &ex);
+                libvlc_set_log_verbosity(p_libvlc, (unsigned)verbosity);
         }
         else if( _p_log )
         {
             /* close log  when verbosity is set to -1 */
-            libvlc_log_close(_p_log, &ex);
+            libvlc_log_close(_p_log);
             _p_log = NULL;
         }
         hr = exception_bridge(&ex);
@@ -1200,38 +1194,20 @@ STDMETHODIMP VLCMessages::get__NewEnum(LPUNKNOWN* _NewEnum)
 
 STDMETHODIMP VLCMessages::clear()
 {
-    HRESULT hr = NOERROR;
     libvlc_log_t *p_log = _p_vlclog->_p_log;
     if( p_log )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_log_clear(p_log, &ex);
-        hr = exception_bridge(&ex);
-    }
-    return hr;
+        libvlc_log_clear(p_log);
+    return NOERROR;
 };
 
 STDMETHODIMP VLCMessages::get_count(long* count)
 {
-    HRESULT hr = S_OK;
-
     if( NULL == count )
         return E_POINTER;
 
     libvlc_log_t *p_log = _p_vlclog->_p_log;
-    if( p_log )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        *count = libvlc_log_count(p_log, &ex);
-        hr = exception_bridge(&ex);
-    }
-    else
-        *count = 0;
-    return hr;
+    *count = libvlc_log_count(p_log);
+    return S_OK;
 };
 
 STDMETHODIMP VLCMessages::iterator(IVLCMessageIterator** iter)
@@ -1263,7 +1239,7 @@ VLCMessageIterator::VLCMessageIterator(VLCPlugin *p_instance, VLCLog* p_vlclog )
 VLCMessageIterator::~VLCMessageIterator()
 {
     if( _p_iter )
-        libvlc_log_iterator_free(_p_iter, NULL);
+        libvlc_log_iterator_free(_p_iter);
 
     if( _p_typeinfo )
         _p_typeinfo->Release();
@@ -1342,25 +1318,19 @@ STDMETHODIMP VLCMessageIterator::Invoke(DISPID dispIdMember, REFIID riid,
 
 STDMETHODIMP VLCMessageIterator::get_hasNext(VARIANT_BOOL* hasNext)
 {
-    HRESULT hr = S_OK;
-
     if( NULL == hasNext )
         return E_POINTER;
 
     if( _p_iter &&  _p_vlclog->_p_log )
     {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        *hasNext = libvlc_log_iterator_has_next(_p_iter, &ex) ?
+        *hasNext = libvlc_log_iterator_has_next(_p_iter) ?
                    VARIANT_TRUE : VARIANT_FALSE;
-        hr = exception_bridge(&ex);
     }
     else
     {
         *hasNext = VARIANT_FALSE;
     }
-    return hr;
+    return S_OK;
 };
 
 STDMETHODIMP VLCMessageIterator::next(IVLCMessage** message)
@@ -1376,17 +1346,10 @@ STDMETHODIMP VLCMessageIterator::next(IVLCMessage** message)
 
         buffer.sizeof_msg = sizeof(buffer);
 
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_log_iterator_next(_p_iter, &buffer, &ex);
-        hr = exception_bridge(&ex);
-        if( SUCCEEDED(hr) )
-        {
-            *message = new VLCMessage(_p_instance, buffer);
-            if( !message )
-                hr = E_OUTOFMEMORY;
-        }
+        libvlc_log_iterator_next(_p_iter, &buffer);
+        *message = new VLCMessage(_p_instance, buffer);
+        if( !message )
+            hr = E_OUTOFMEMORY;
     }
     return hr;
 };
