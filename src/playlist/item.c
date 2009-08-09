@@ -718,47 +718,8 @@ int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
     int i_ret;
     PL_ASSERT_LOCKED;
 
-    /* Drop on a top level node. Move in the two trees */
-    if( p_node->p_parent == p_playlist->p_root_category ||
-        p_node->p_parent == p_playlist->p_root_onelevel )
-    {
-        /* Fixme: avoid useless lookups but we need some clean helpers */
-        {
-            /* Fixme: if we try to move a node on a top-level node, it will
-             * fail because the node doesn't exist in onelevel and we will
-             * do some shit in onelevel. We should recursively move all items
-             * within the node */
-            playlist_item_t *p_node_onelevel;
-            playlist_item_t *p_item_onelevel;
-            p_node_onelevel = playlist_ItemFindFromInputAndRoot( p_playlist,
-                                                p_node->p_input,
-                                                p_playlist->p_root_onelevel,
-                                                false );
-            p_item_onelevel = playlist_ItemFindFromInputAndRoot( p_playlist,
-                                                p_item->p_input,
-                                                p_playlist->p_root_onelevel,
-                                                false );
-            if( p_node_onelevel && p_item_onelevel )
-                TreeMove( p_playlist, p_item_onelevel, p_node_onelevel, i_newpos );
-        }
-        {
-            playlist_item_t *p_node_category;
-            playlist_item_t *p_item_category;
-            p_node_category = playlist_ItemFindFromInputAndRoot( p_playlist,
-                                                p_node->p_input,
-                                                p_playlist->p_root_category,
-                                                false );
-            p_item_category = playlist_ItemFindFromInputAndRoot( p_playlist,
-                                                p_item->p_input,
-                                                p_playlist->p_root_category,
-                                                false );
-            if( p_node_category && p_item_category )
-                TreeMove( p_playlist, p_item_category, p_node_category, 0 );
-        }
-        i_ret = VLC_SUCCESS;
-    }
-    else
-        i_ret = TreeMove( p_playlist, p_item, p_node, i_newpos );
+    if( p_node != p_item->p_parent ) return VLC_SUCCESS;
+    i_ret = TreeMove( p_playlist, p_item, p_node, i_newpos );
     pl_priv(p_playlist)->b_reset_currently_playing = true;
     vlc_cond_signal( &pl_priv(p_playlist)->signal );
     return i_ret;
