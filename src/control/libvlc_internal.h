@@ -110,8 +110,6 @@ void libvlc_event_attach_async( libvlc_event_manager_t * p_event_manager,
 
 #define RAISENULL( ... ) { libvlc_exception_raise( p_e, __VA_ARGS__ ); \
                            return NULL; }
-#define RAISEVOID( ... ) { libvlc_exception_raise( p_e, __VA_ARGS__ ); \
-                           return; }
 #define RAISEZERO( ... ) { libvlc_exception_raise( p_e, __VA_ARGS__ ); \
                            return 0; }
 
