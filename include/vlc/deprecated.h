@@ -82,7 +82,7 @@ VLC_DEPRECATED_API libvlc_drawable_t
  */
 
 /**
- * Start playing.
+ * Start playing (if there is any item in the playlist).
  *
  * Additionnal playlist item options can be specified for addition to the
  * item before it is played.
