@@ -42,7 +42,7 @@
 #define RETURN_ON_EXCEPTION(this,ex) \
     do { if( libvlc_exception_raised(&ex) ) \
     { \
-        NPN_SetException(this, libvlc_exception_get_message(&ex)); \
+        NPN_SetException(this, libvlc_errmsg()); \
         libvlc_exception_clear(&ex); \
         return INVOKERESULT_GENERIC_ERROR; \
     } } while(false)
@@ -448,7 +448,7 @@ LibvlcInputNPObject::getProperty(int index, NPVariant &result)
         {
             if( index != ID_input_state )
             {
-                NPN_SetException(this, libvlc_exception_get_message(&ex));
+                NPN_SetException(this, libvlc_errmsg());
                 libvlc_exception_clear(&ex);
                 return INVOKERESULT_GENERIC_ERROR;
             }

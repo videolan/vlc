@@ -105,8 +105,7 @@ private:
     {
         if( ! libvlc_exception_raised(ex) )
             return NOERROR;
-        _p_instance->setErrorInfo(IID_IVLCControl,
-                                  libvlc_exception_get_message(ex));
+        _p_instance->setErrorInfo(IID_IVLCControl, libvlc_errmsg());
         libvlc_exception_clear(ex);
         return E_FAIL;
     }

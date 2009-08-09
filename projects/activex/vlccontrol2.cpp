@@ -38,7 +38,7 @@ HRESULT _exception_bridge(VLCPlugin *p,REFIID riid, libvlc_exception_t *ex)
 {
     if( libvlc_exception_raised(ex) )
     {
-        p->setErrorInfo(riid,libvlc_exception_get_message(ex));
+        p->setErrorInfo(riid,libvlc_errmsg());
         libvlc_exception_clear(ex);
         return E_FAIL;
     }

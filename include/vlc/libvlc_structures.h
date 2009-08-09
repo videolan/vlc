@@ -51,7 +51,6 @@ typedef struct libvlc_instance_t libvlc_instance_t;
 typedef struct libvlc_exception_t
 {
     int b_raised;
-    char *psz_message;
 } libvlc_exception_t;
 
 /**@} */

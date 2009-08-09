@@ -39,32 +39,19 @@ static const char nomemstr[] = "Insufficient memory";
 void libvlc_exception_init( libvlc_exception_t *p_exception )
 {
     p_exception->b_raised = 0;
-    p_exception->psz_message = NULL;
 }
 
 void libvlc_exception_clear( libvlc_exception_t *p_exception )
 {
     if( NULL == p_exception )
         return;
-    if( p_exception->psz_message != nomemstr )
-        free( p_exception->psz_message );
-    p_exception->psz_message = NULL;
     p_exception->b_raised = 0;
+    libvlc_clearerr ();
 }
 
 int libvlc_exception_raised( const libvlc_exception_t *p_exception )
 {
     return (NULL != p_exception) && p_exception->b_raised;
-}
-
-const char *
-libvlc_exception_get_message( const libvlc_exception_t *p_exception )
-{
-    if( p_exception->b_raised == 1 && p_exception->psz_message )
-    {
-        return p_exception->psz_message;
-    }
-    return NULL;
 }
 
 static void libvlc_exception_not_handled( const char *psz )
@@ -78,31 +65,27 @@ void libvlc_exception_raise( libvlc_exception_t *p_exception,
                              const char *psz_format, ... )
 {
     va_list args;
-    char * psz;
+
+    /* Make sure that there is no unnoticed previous exception */
+    if( p_exception && p_exception->b_raised )
+    {
+        libvlc_exception_not_handled( libvlc_errmsg() );
+        libvlc_exception_clear( p_exception );
+    }
 
     /* Unformat-ize the message */
     va_start( args, psz_format );
-    if( vasprintf( &psz, psz_format, args ) == -1)
-        psz = (char *)nomemstr;
+    libvlc_vprinterr( psz_format, args );
     va_end( args );
 
     /* Does caller care about exceptions ? */
     if( p_exception == NULL ) {
         /* Print something, so that lazy third-parties can easily
          * notice that something may have gone unnoticedly wrong */
-        libvlc_exception_not_handled( psz );
-        if( psz != nomemstr )
-            free( psz );
+        libvlc_exception_not_handled( libvlc_errmsg() );
         return;
     }
 
-    /* Make sure that there is no unnoticed previous exception */
-    if( p_exception->b_raised )
-    {
-        libvlc_exception_not_handled( p_exception->psz_message );
-        libvlc_exception_clear( p_exception );
-    }
-    p_exception->psz_message = psz;
     p_exception->b_raised = 1;
 }
 

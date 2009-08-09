@@ -88,12 +88,9 @@ static inline void catch (void)
 {
     if (libvlc_exception_raised (&ex))
     {
-         fprintf (stderr, "Exception: %s\n",
-                  libvlc_exception_get_message (&ex));
+         fprintf (stderr, "Exception: %s\n", libvlc_errmsg ());
          abort ();
     }
-
-    assert (libvlc_exception_get_message (&ex) == NULL);
     libvlc_exception_clear (&ex);
 }
 

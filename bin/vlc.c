@@ -166,7 +166,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     }
     i_ret = libvlc_exception_raised (&ex);
     if( i_ret )
-        fprintf( stderr, "%s\n", libvlc_exception_get_message( &ex));
+        fprintf( stderr, "%s\n", libvlc_errmsg() );
 
     libvlc_exception_clear (&ex);
     libvlc_exception_clear (&dummy);

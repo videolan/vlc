@@ -106,16 +106,6 @@ libvlc_exception_raise( libvlc_exception_t *p_exception,
  */
 VLC_PUBLIC_API void libvlc_exception_clear( libvlc_exception_t * );
 
-/**
- * Get an exception's message.
- *
- * \param p_exception the exception to query
- * \return the exception message or NULL if not applicable (exception not
- *         raised, for example)
- */
-VLC_PUBLIC_API const char *
-libvlc_exception_get_message( const libvlc_exception_t *p_exception );
-
 /**@} */
 
 /*****************************************************************************

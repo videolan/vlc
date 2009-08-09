@@ -349,8 +349,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
     if( libvlc_exception_raised( &ex ) )
     {
         free( retval );
-        RAISE( mediacontrol_InternalException,
-               libvlc_exception_get_message( &ex ) );
+        RAISE( mediacontrol_InternalException, libvlc_errmsg( ) );
         libvlc_exception_clear( &ex );
         return NULL;
     }
@@ -371,8 +370,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
         if( libvlc_exception_raised( &ex ) )
         {
             free( retval );
-            RAISE( mediacontrol_InternalException,
-                   libvlc_exception_get_message( &ex ) );
+            RAISE( mediacontrol_InternalException, libvlc_errmsg() );
             libvlc_exception_clear( &ex );
             return NULL;
         }
