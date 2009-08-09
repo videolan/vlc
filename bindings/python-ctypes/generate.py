@@ -114,10 +114,10 @@ typ2class={
 
     'mediacontrol_Instance*': 'MediaControl',
     'mediacontrol_Exception*': 'MediaControlException',
-    'mediacontrol_RGBPicture*': 'RGBPicture',
+    'mediacontrol_RGBPicture*': 'ctypes.POINTER(RGBPicture)',
     'mediacontrol_PlaylistSeq*': 'MediaControlPlaylistSeq',
-    'mediacontrol_Position*': 'MediaControlPosition',
-    'mediacontrol_StreamInformation*': 'MediaControlStreamInformation',
+    'mediacontrol_Position*': 'ctypes.POINTER(MediaControlPosition)',
+    'mediacontrol_StreamInformation*': 'ctypes.POINTER(MediaControlStreamInformation)',
     'WINDOWHANDLE': 'ctypes.c_ulong',
 
     'void': 'None',

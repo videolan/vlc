@@ -77,6 +77,48 @@ class MediaControl:
             e=MediaControlException()
             return mediacontrol_new(len(p), p, e)
 
+    def get_media_position(self, origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime):
+        e=MediaControlException()
+        p=mediacontrol_get_media_position(self, origin, key, e)
+        if p:
+            return p.contents
+        else:
+            return None
+
+    def set_media_position(self, pos):
+        if not isinstance(pos, MediaControlPosition):
+            pos=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(pos))
+        e=MediaControlException()
+        mediacontrol_set_media_position(self, pos, e)
+
+    def start(self, pos=0):
+        if not isinstance(pos, MediaControlPosition):
+            pos=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(pos))
+        e=MediaControlException()
+        mediacontrol_start(self, pos, e)
+
+    def snapshot(self, pos=0):
+        if not isinstance(pos, MediaControlPosition):
+            pos=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(pos))
+        e=MediaControlException()
+        p=mediacontrol_snapshot(self, pos, e)
+        if p:
+            return p.contents
+        else:
+            return None
+
+    def display_text(self, message='', begin=0, end=1000):
+        if not isinstance(begin, MediaControlPosition):
+            begin=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(begin))
+        if not isinstance(end, MediaControlPosition):
+            begin=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(end))
+        e=MediaControlException()
+        mediacontrol_display_text(self, message, begin, end, e)
+
+    def get_stream_information(self, key=PositionKey.MediaTime):
+        e=MediaControlException()
+        return mediacontrol_get_stream_information(self, key, e).contents
+
 class MediaPlayer:
     """Create a new MediaPlayer instance.
 
@@ -101,7 +143,7 @@ class MediaPlayer:
             if p:
                 o.set_media(i.media_new(p[0]))
             return o
-    
+
     def get_instance(self):
         """Return the associated vlc.Instance.
         """

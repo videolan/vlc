@@ -97,6 +97,9 @@ class PlaylistItem(ctypes.Structure):
                 ('name', ctypes.c_char_p),
                 ]
 
+    def __str__(self):
+        return "PlaylistItem #%d %s (%uri)" % (self.id, self.name, self.uri)
+
 class LogMessage(ctypes.Structure):
     _fields_= [
                 ('size', ctypes.c_uint),
@@ -108,14 +111,21 @@ class LogMessage(ctypes.Structure):
                 ]
 
     def __str__(self):
-        print "vlc.LogMessage(%d:%s): %s" % (self.severity, self.type, self.message)
+        return "vlc.LogMessage(%d:%s): %s" % (self.severity, self.type, self.message)
 
 class MediaControlPosition(ctypes.Structure):
     _fields_= [
-                ('origin', ctypes.c_ushort),
-                ('key', ctypes.c_ushort),
+                ('origin', ctypes.c_int),
+                ('key', ctypes.c_int),
                 ('value', ctypes.c_longlong),
                 ]
+
+    def __str__(self):
+        return "MediaControlPosition %ld (%s, %s)" % (
+            self.value,
+            str(PositionOrigin(self.origin)),
+            str(PositionKey(self.key))
+            )
 
     @staticmethod
     def from_param(arg):
@@ -126,15 +136,6 @@ class MediaControlPosition(ctypes.Structure):
             return p
         else:
             return arg
-
-class MediaControlPositionOrigin(ctypes.c_uint):
-    enum=(
-        'AbsolutePosition',
-        'RelativePosition',
-        'ModuloPosition',
-        )
-    def __repr__(self):
-        return self.enum[self.value]
 
 class MediaControlException(ctypes.Structure):
     _fields_= [
@@ -149,19 +150,34 @@ class MediaControlException(ctypes.Structure):
 
 class MediaControlStreamInformation(ctypes.Structure):
     _fields_= [
-                ('code', ctypes.c_int),
-                ('message', ctypes.c_char_p),
+                ('status', ctypes.c_int),
+                ('url', ctypes.c_char_p),
+                ('position', ctypes.c_longlong),
+                ('length', ctypes.c_longlong),
                 ]
+
+    def __str__(self):
+        return "%s (%s) : %ld / %ld" % (self.url,
+                                        str(PlayerStatus(self.status)),
+                                        self.position,
+                                        self.length)
 
 class RGBPicture(ctypes.Structure):
     _fields_= [
                 ('width', ctypes.c_int),
                 ('height', ctypes.c_int),
                 ('type', ctypes.c_uint32),
-                ('date', ctypes.c_longlong),
+                ('date', ctypes.c_ulonglong),
                 ('size', ctypes.c_int),
-                ('data', ctypes.c_char_p),
+                ('data_pointer', ctypes.c_void_p),
                 ]
+
+    @property
+    def data(self):
+        return ctypes.string_at(self.data_pointer, self.size)
+
+    def __str__(self):
+        return "RGBPicture (%d, %d) - %ld ms - %d bytes" % (self.width, self.height, self.date, self.size)
 
     def free(self):
         mediacontrol_RGBPicture__free(self)
