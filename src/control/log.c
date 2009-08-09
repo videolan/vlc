@@ -73,17 +73,15 @@ struct libvlc_log_iterator_t
     unsigned i_end;
 };
 
-unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
+unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance )
 {
     assert( p_instance );
-    (void)p_e;
     return p_instance->verbosity;
 }
 
-void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level, libvlc_exception_t *p_e )
+void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level )
 {
     assert( p_instance );
-    (void)p_e;
     p_instance->verbosity = level;
 }
 
@@ -110,7 +108,7 @@ libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance, libvlc_exception_t
     return p_log;
 }
 
-void libvlc_log_close( libvlc_log_t *p_log, libvlc_exception_t *p_e )
+void libvlc_log_close( libvlc_log_t *p_log )
 {
     if( !p_log )
         return;
@@ -118,12 +116,12 @@ void libvlc_log_close( libvlc_log_t *p_log, libvlc_exception_t *p_e )
     assert( p_log->p_messages );
     msg_Unsubscribe(p_log->p_messages);
     libvlc_release( p_log->p_instance );
-    libvlc_log_clear( p_log, p_e );
+    libvlc_log_clear( p_log );
     vlc_spin_destroy( &p_log->data.lock );
     free(p_log);
 }
 
-unsigned libvlc_log_count( const libvlc_log_t *p_log, libvlc_exception_t *p_e )
+unsigned libvlc_log_count( const libvlc_log_t *p_log )
 {
     if( !p_log )
         return 0;
@@ -139,7 +137,7 @@ unsigned libvlc_log_count( const libvlc_log_t *p_log, libvlc_exception_t *p_e )
     return ret;
 }
 
-void libvlc_log_clear( libvlc_log_t *p_log, libvlc_exception_t *p_e )
+void libvlc_log_clear( libvlc_log_t *p_log )
 {
     if( !p_log )
         return;
@@ -154,7 +152,8 @@ void libvlc_log_clear( libvlc_log_t *p_log, libvlc_exception_t *p_e )
          msg_Release (tab[i]);
 }
 
-libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *p_log, libvlc_exception_t *p_e )
+libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *p_log,
+ libvlc_exception_t *p_e )
 {
     if( p_log )
     {
@@ -176,12 +175,12 @@ libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *p_log, libvl
     RAISENULL("Invalid log object!");
 }
 
-void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter, libvlc_exception_t *p_e )
+void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter )
 {
     free( p_iter );
 }
 
-int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter, libvlc_exception_t *p_e )
+int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter )
 {
     if( !p_iter )
         return 0;

@@ -309,21 +309,17 @@ VLC_PUBLIC_API const char * libvlc_event_type_name( libvlc_event_type_t event_ty
  * Return the VLC messaging verbosity level.
  *
  * \param p_instance libvlc instance
- * \param p_e an initialized exception pointer
  * \return verbosity level for messages
  */
-VLC_PUBLIC_API unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance,
-                                                  libvlc_exception_t *p_e );
+VLC_PUBLIC_API unsigned libvlc_get_log_verbosity( const libvlc_instance_t *p_instance );
 
 /**
  * Set the VLC messaging verbosity level.
  *
  * \param p_instance libvlc log instance
  * \param level log level
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level,
-                                              libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level );
 
 /**
  * Open a VLC message log instance.
@@ -337,19 +333,18 @@ VLC_PUBLIC_API libvlc_log_t *libvlc_log_open( libvlc_instance_t *, libvlc_except
 /**
  * Close a VLC message log instance.
  *
- * \param p_log libvlc log instance
- * \param p_e an initialized exception pointer
+ * \param p_log libvlc log instance or NULL
  */
-VLC_PUBLIC_API void libvlc_log_close( libvlc_log_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void libvlc_log_close( libvlc_log_t *p_log );
 
 /**
  * Returns the number of messages in a log instance.
  *
- * \param p_log libvlc log instance
+ * \param p_log libvlc log instance or NULL
  * \param p_e an initialized exception pointer
- * \return number of log messages
+ * \return number of log messages, 0 if p_log is NULL
  */
-VLC_PUBLIC_API unsigned libvlc_log_count( const libvlc_log_t *, libvlc_exception_t *);
+VLC_PUBLIC_API unsigned libvlc_log_count( const libvlc_log_t *p_log );
 
 /**
  * Clear a log instance.
@@ -357,10 +352,9 @@ VLC_PUBLIC_API unsigned libvlc_log_count( const libvlc_log_t *, libvlc_exception
  * All messages in the log are removed. The log should be cleared on a
  * regular basis to avoid clogging.
  *
- * \param p_log libvlc log instance
- * \param p_e an initialized exception pointer
+ * \param p_log libvlc log instance or NULL
  */
-VLC_PUBLIC_API void libvlc_log_clear( libvlc_log_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void libvlc_log_clear( libvlc_log_t *p_log );
 
 /**
  * Allocate and returns a new iterator to messages in log.
@@ -374,26 +368,24 @@ VLC_PUBLIC_API libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_
 /**
  * Release a previoulsy allocated iterator.
  *
- * \param p_iter libvlc log iterator
- * \param p_e an initialized exception pointer
+ * \param p_iter libvlc log iterator or NULL
  */
-VLC_PUBLIC_API void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter, libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter );
 
 /**
  * Return whether log iterator has more messages.
  *
- * \param p_iter libvlc log iterator
- * \param p_e an initialized exception pointer
+ * \param p_iter libvlc log iterator or NULL
  * \return true if iterator has more message objects, else false
  */
-VLC_PUBLIC_API int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter, libvlc_exception_t *p_e );
+VLC_PUBLIC_API int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter );
 
 /**
  * Return the next log message.
  *
  * The message contents must not be freed
  *
- * \param p_iter libvlc log iterator
+ * \param p_iter libvlc log iterator or NULL
  * \param p_buffer log buffer
  * \param p_e an initialized exception pointer
  * \return log message object
