@@ -349,9 +349,9 @@ static int Open (vlc_object_t *obj)
         /* */
         const vlc_fourcc_t *chromas, chromas_default[] = {
             fmt.i_chroma,
-            VLC_CODEC_YUYV,
             VLC_CODEC_RGB24,
             VLC_CODEC_RGB15,
+            VLC_CODEC_YUYV,
             0
         };
         if (vlc_fourcc_IsYUV (fmt.i_chroma))
