@@ -192,6 +192,7 @@ int libvlc_add_intf( libvlc_instance_t *p_i, const char *name,
         libvlc_exception_raise( p_e, "Interface initialization failed" );
         return -1;
     }
+    return 0;
 }
 
 void libvlc_wait( libvlc_instance_t *p_i )
