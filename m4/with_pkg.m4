@@ -87,7 +87,7 @@ m4_pushdef([enable_arg], m4_tolower([$1]))
 
 PKG_WITH_MODULES([$1],[$3],
     VLC_ADD_PLUGIN(module_name)
-    m4_ifnblank( [$8],  VLC_ADD_CPPFLAGS(module_name, [$8]))
+    m4_ifval( m4_normalize([$8]), VLC_ADD_CPPFLAGS(module_name, [$8]))
     VLC_ADD_CFLAGS(module_name,[$$1_CFLAGS] [$6])
     VLC_ADD_LIBS(module_name,[$$1_LIBS] [$7]),
     AS_IF([test x"$AS_TR_SH([enable_]enable_arg)" = "xyes"],
