@@ -115,18 +115,32 @@ Qt::DropActions PLModel::supportedDropActions() const
 
 Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
 {
-    Qt::ItemFlags defaultFlags = QAbstractItemModel::flags( index );
-    if( index.isValid() )
+    Qt::ItemFlags flags = QAbstractItemModel::flags( index );
+
+    PLItem *item = index.isValid() ?
+        static_cast<PLItem*>( index.internalPointer() ) :
+        rootItem;
+
+    int pl_input_id = p_playlist->p_local_category->p_input->i_id;
+    int ml_input_id = p_playlist->p_ml_category->p_input->i_id;
+
+    if( rootItem->i_id == p_playlist->p_root_onelevel->i_id
+          || rootItem->i_id == p_playlist->p_root_category->i_id )
     {
-        PLItem *item = static_cast<PLItem*>( index.internalPointer() );
-        if ( item->b_is_node )
-            defaultFlags |= Qt::ItemIsDragEnabled | Qt::ItemIsDropEnabled;
-        else defaultFlags |= Qt::ItemIsDragEnabled;
+        if( item->i_input_id == pl_input_id
+            || item->i_input_id == ml_input_id )
+                flags |= Qt::ItemIsDropEnabled;
     }
-    else if ( rootItem->i_id != p_playlist->p_root_onelevel->i_id
-          && rootItem->i_id != p_playlist->p_root_category->i_id )
-              defaultFlags |= Qt::ItemIsDropEnabled;
-    return defaultFlags;
+    else
+    {
+        if ( item->b_is_node &&
+            ( rootItem->i_input_id == pl_input_id ||
+            rootItem->i_input_id == ml_input_id ) )
+                flags |= Qt::ItemIsDropEnabled;
+        flags |= Qt::ItemIsDragEnabled;
+    }
+
+    return flags;
 }
 
 /* A list of model indexes are a playlist */
