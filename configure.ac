@@ -4567,7 +4567,17 @@ PKG_ENABLE_MODULES_VLC([MTP], [], [libmtp >= 0.3.0],[MTP devices support],[auto]
 dnl
 dnl  Lirc plugin
 dnl
-PKG_ENABLE_MODULES_VLC([lirc], [], [liblircclient0], [lirc support], [auto])
+AC_ARG_ENABLE(lirc,
+  [  --enable-lirc           lirc support (default disabled)])
+if test "${enable_lirc}" = "yes"
+then
+  AC_CHECK_HEADER(lirc/lirc_client.h, AC_CHECK_LIB(lirc_client, lirc_init, have_lirc="true", have_lirc="false"),have_lirc="false")
+  if test "${have_lirc}" = "true"
+  then
+    VLC_ADD_PLUGIN([lirc])
+    VLC_ADD_LIBS([lirc],[-llirc_client])
+  fi
+fi
 
 
 AC_ARG_WITH(,[Misc options:])
