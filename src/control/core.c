@@ -111,11 +111,22 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
 {
     libvlc_instance_t *p_new;
     int i_ret;
+
+    libvlc_init_threads ();
+
     libvlc_int_t *p_libvlc_int = libvlc_InternalCreate();
-    if( !p_libvlc_int ) RAISENULL( "VLC initialization failed" );
+    if( !p_libvlc_int )
+    {
+        libvlc_deinit_threads ();
+        RAISENULL( "VLC initialization failed" );
+    }
 
     p_new = malloc( sizeof( libvlc_instance_t ) );
-    if( !p_new ) RAISENULL( "Out of memory" );
+    if( !p_new )
+    {
+        libvlc_deinit_threads ();
+        RAISENULL( "Out of memory" );
+    }
 
     const char *my_argv[argc + 2];
 
@@ -132,6 +143,8 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     {
         libvlc_InternalDestroy( p_libvlc_int );
         free( p_new );
+        libvlc_deinit_threads ();
+
         if( i_ret == VLC_EEXITSUCCESS )
             return NULL;
         else
@@ -181,6 +194,7 @@ void libvlc_release( libvlc_instance_t *p_instance )
         libvlc_InternalCleanup( p_instance->p_libvlc_int );
         libvlc_InternalDestroy( p_instance->p_libvlc_int );
         free( p_instance );
+        libvlc_deinit_threads ();
     }
 }
 

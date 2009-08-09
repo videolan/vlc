@@ -58,6 +58,7 @@
 extern "C" {
 # endif
 
+#include <stdarg.h>
 #include <vlc/libvlc_structures.h>
 
 /*****************************************************************************
@@ -116,6 +117,49 @@ VLC_PUBLIC_API const char *
 libvlc_exception_get_message( const libvlc_exception_t *p_exception );
 
 /**@} */
+
+/*****************************************************************************
+ * Error handling
+ *****************************************************************************/
+/** \defgroup libvlc_error libvlc_error
+ * \ingroup libvlc_core
+ * LibVLC error handling
+ * @{
+ */
+
+/**
+ * A human-readable error message for the last LibVLC error in the calling
+ * thread. The resulting string is valid until another error occurs (at least
+ * until the next LibVLC call).
+ *
+ * @warning
+ * This will be NULL if there was no error.
+ */
+const char *libvlc_errmsg (void);
+
+/**
+ * Clears the LibVLC error status for the current thread. This is optional.
+ * By default, the error status is automatically overriden when a new error
+ * occurs, and destroyed when the thread exits.
+ */
+void libvlc_clearerr (void);
+
+/**
+ * Sets the LibVLC error status and message for the current thread.
+ * Any previous error is overriden.
+ * @return a nul terminated string in any case
+ */
+const char *libvlc_vprinterr (const char *fmt, va_list ap);
+
+/**
+ * Sets the LibVLC error status and message for the current thread.
+ * Any previous error is overriden.
+ * @return a nul terminated string in any case
+ */
+const char *libvlc_printerr (const char *fmt, ...);
+
+/**@} */
+
 
 /*****************************************************************************
  * Core handling

@@ -83,6 +83,10 @@ struct libvlc_instance_t
  * Other internal functions
  ***************************************************************************/
 
+/* Thread context */
+void libvlc_init_threads (void);
+void libvlc_deinit_threads (void);
+
 /* Events */
 libvlc_event_manager_t * libvlc_event_manager_new(
         void * p_obj, libvlc_instance_t * p_libvlc_inst,

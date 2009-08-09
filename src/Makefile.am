@@ -460,6 +460,7 @@ SOURCES_libvlc_control = \
 	control/media_list_view_internal.h \
 	control/media_player_internal.h \
 	control/core.c \
+	control/error.c \
 	control/log.c \
 	control/playlist.c \
 	control/vlm.c \
