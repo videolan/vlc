@@ -184,11 +184,14 @@ void libvlc_release( libvlc_instance_t *p_instance )
     }
 }
 
-void libvlc_add_intf( libvlc_instance_t *p_i, const char *name,
+int libvlc_add_intf( libvlc_instance_t *p_i, const char *name,
                       libvlc_exception_t *p_e )
 {
     if( libvlc_InternalAddIntf( p_i->p_libvlc_int, name ) )
-        RAISEVOID( "Interface initialization failed" );
+    {
+        libvlc_exception_raise( p_e, "Interface initialization failed" );
+        return -1;
+    }
 }
 
 void libvlc_wait( libvlc_instance_t *p_i )
