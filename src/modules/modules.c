@@ -499,17 +499,17 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
         /* If we required a shortcut, check this plugin provides it. */
         if( i_shortcuts > 0 )
         {
-            const char *psz_name = psz_shortcuts;
+            const char *name = psz_shortcuts;
 
             for( unsigned i_short = i_shortcuts; i_short > 0; i_short-- )
             {
                 for( unsigned i = 0; p_module->pp_shortcuts[i]; i++ )
                 {
                     char *c;
-                    if( ( c = strchr( psz_name, '@' ) )
-                        ? !strncasecmp( psz_name, p_module->pp_shortcuts[i],
-                                        c-psz_name )
-                        : !strcasecmp( psz_name, p_module->pp_shortcuts[i] ) )
+                    if( ( c = strchr( name, '@' ) )
+                        ? !strncasecmp( name, p_module->pp_shortcuts[i],
+                                        c-name )
+                        : !strcasecmp( name, p_module->pp_shortcuts[i] ) )
                     {
                         /* Found it */
                         if( c && c[1] )
@@ -520,7 +520,7 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
                 }
 
                 /* Go to the next shortcut... This is so lame! */
-                psz_name += strlen( psz_name ) + 1;
+                name += strlen( name ) + 1;
             }
 
             /* If we are in "strict" mode and we couldn't
