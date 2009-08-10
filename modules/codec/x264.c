@@ -173,10 +173,10 @@ static void Close( vlc_object_t * );
 
 #if X264_BUILD >= 59
 #define AQ_MODE_TEXT N_("How AQ distributes bits")
-#define AQ_MODE_LONGTEXT N_("Defines bitdistribution mode for AQ, default 2\n" \
+#define AQ_MODE_LONGTEXT N_("Defines bitdistribution mode for AQ, default 1\n" \
         " - 0: Disabled\n"\
-        " - 1: Avoid moving bits between frames\n"\
-        " - 2: Move bits between frames")
+        " - 1: Current x264 default mode\n"\
+        " - 2: uses log(var)^2 instead of log(var) and attempts to adapt strength per frame")
 
 #define AQ_STRENGTH_TEXT N_("Strength of AQ")
 #define AQ_STRENGTH_LONGTEXT N_("Strength to reduce blocking and blurring in flat\n"\
@@ -568,7 +568,7 @@ vlc_module_begin ()
     add_float( SOUT_CFG_PREFIX "qblur", 0.5, NULL, QBLUR_TEXT,
                QBLUR_LONGTEXT, false )
 #if X264_BUILD >= 59
-    add_integer( SOUT_CFG_PREFIX "aq-mode", 2, NULL, AQ_MODE_TEXT,
+    add_integer( SOUT_CFG_PREFIX "aq-mode", X264_AQ_VARIANCE, NULL, AQ_MODE_TEXT,
                  AQ_MODE_LONGTEXT, false )
          change_integer_range( 0, 2 )
     add_float( SOUT_CFG_PREFIX "aq-strength", 1.0, NULL, AQ_STRENGTH_TEXT,
