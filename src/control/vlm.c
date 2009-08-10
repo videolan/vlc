@@ -29,82 +29,6 @@
 
 #include "libvlc_internal.h"
 
-#if 0
-/* local function to be used in libvlc_vlm_show_media only */
-static char* recurse_answer( char* psz_prefix, vlm_message_t *p_answer ) {
-    char* psz_childprefix;
-    char* psz_response="";
-    char* response_tmp;
-    int i;
-    vlm_message_t *aw_child, **paw_child;
-
-    asprintf( &psz_childprefix, "%s%s.", psz_prefix, p_answer->psz_name );
-
-    if ( p_answer->i_child )
-    {
-        paw_child = p_answer->child;
-        aw_child = *( paw_child );
-        for( i = 0; i < p_answer->i_child; i++ )
-        {
-            asprintf( &response_tmp, "%s%s%s:%s\n",
-                      psz_response, psz_prefix, aw_child->psz_name,
-                      aw_child->psz_value );
-            free( psz_response );
-            psz_response = response_tmp;
-            if ( aw_child->i_child )
-            {
-                asprintf(&response_tmp, "%s%s", psz_response,
-                         recurse_answer(psz_childprefix, aw_child));
-                free( psz_response );
-                psz_response = response_tmp;
-            }
-            paw_child++;
-            aw_child = *( paw_child );
-        }
-    }
-    free( psz_childprefix );
-    return psz_response;
-}
-
-char* libvlc_vlm_show_media( libvlc_instance_t *p_instance, char *psz_name,
-                             libvlc_exception_t *p_exception )
-{
-    char *psz_message;
-    vlm_message_t *answer;
-    char *psz_response;
-
-    CHECK_VLM;
-    asprintf( &psz_message, "show %s", psz_name );
-    asprintf( &psz_response, "", psz_name );
-    vlm_ExecuteCommand( p_instance->libvlc_vlm.p_vlm, psz_message, &answer );
-    if( answer->psz_value )
-    {
-        libvlc_exception_raise( p_exception, "Unable to call show %s: %s",
-                                psz_name, answer->psz_value );
-    }
-    else
-    {
-        if ( answer->child )
-        {
-            psz_response = recurse_answer( "", answer );
-        }
-    }
-    free( psz_message );
-    return(psz_response );
-}
-#else
-
-char* libvlc_vlm_show_media( libvlc_instance_t *p_instance,
-                             const char *psz_name,
-                             libvlc_exception_t *p_exception )
-{
-    (void)p_instance;
-    /* FIXME is it needed ? */
-    libvlc_exception_raise( p_exception, "Unable to call show %s", psz_name );
-    return NULL;
-}
-
-#endif /* 0 */
 /* VLM events callback. Transmit to libvlc */
 static int VlmEvent( vlc_object_t *p_this, const char * name,
                      vlc_value_t old_val, vlc_value_t newval, void *param )
@@ -296,6 +220,181 @@ libvlc_vlm_get_media_instance( libvlc_instance_t *p_instance,
     TAB_CLEAN( i_minstance, pp_minstance );
     return p_minstance;
 }
+
+/* local function to be used in libvlc_vlm_show_media only */
+static char* recurse_answer( vlm_message_t *p_answer, const char* psz_delim,
+                             const int i_list ) {
+    char* psz_childdelim = NULL;
+    char* psz_nametag = NULL;
+    char* psz_response = strdup( "" );
+    int i_success = 0;
+    int i;
+    vlm_message_t *aw_child, **paw_child;
+
+    i_success = asprintf( &psz_childdelim, "%s\t", psz_delim);
+
+    /* starting with the children of root node */
+    if( i_success != -1 && p_answer->i_child )
+    {
+        paw_child = p_answer->child;
+        aw_child = *( paw_child );
+        /* Iterate over children */
+        for( i = 0; i < p_answer->i_child; i++ )
+        {
+            /* Spare comma if it is the last element */
+            char c_comma = ',';
+            if( i == (p_answer->i_child - 1) )
+                c_comma = ' ';
+
+            /* Append name of child node, if not in a list */
+            if( !i_list )
+            {
+                i_success = asprintf( &psz_response, "%s\"%s\": ",
+                              psz_response, aw_child->psz_name );
+                if( i_success == -1 ) break;
+            }
+
+            /* If child node has children, */
+            if( aw_child->i_child )
+            {
+                /* If the parent node is a list (hence the child node is
+                 * inside a list), create a property of its name as if it
+                 * had a name value node
+                 */
+                if( i_list )
+                {
+                    i_success = asprintf( &psz_nametag, "\"name\": \"%s\",%s",
+                                  aw_child->psz_name, psz_childdelim );
+                    if( i_success == -1 ) break;
+                }
+                else
+                {
+                    psz_nametag = strdup( "" );
+                }
+                /* If the child is a list itself, format it accordingly and
+                 * recurse through the child's children, telling them that
+                 * they are inside a list.
+                 */
+                if( strcmp( aw_child->psz_name, "media" ) == 0 ||
+                    strcmp( aw_child->psz_name, "inputs" ) == 0 ||
+                    strcmp( aw_child->psz_name, "options" ) == 0 )
+                {
+                    i_success = asprintf( &psz_response, "%s[%s%s%s]%c%s",
+                                          psz_response, psz_childdelim,
+                                          recurse_answer( aw_child,
+                                                          psz_childdelim, 1 ),
+                                          psz_delim, c_comma, psz_delim );
+                    if( i_success == -1 ) break;
+                }
+                /* Not a list, so format the child as a JSON object and
+                 * recurse through the child's children
+                 */
+                else
+                {
+                    i_success = asprintf( &psz_response, "%s{%s%s%s%s}%c%s",
+                                          psz_response, psz_childdelim, psz_nametag,
+                                          recurse_answer( aw_child,
+                                                          psz_childdelim, 0 ),
+                                          psz_delim, c_comma, psz_delim );
+                    if( i_success == -1 ) break;
+                }
+            }
+            /* Otherwise - when no children are present - the node is a
+             * value node. So print the value string
+             */
+            else
+            {
+                /* If value is equivalent to NULL, print it as null */
+                if( aw_child->psz_value == NULL
+                    || strcmp( aw_child->psz_value, "(null)" ) == 0 )
+                {
+                    i_success = asprintf( &psz_response, "%snull%c%s",
+                                          psz_response, c_comma, psz_delim );
+                    if( i_success == -1 )
+                        break;
+                }
+                /* Otherwise print the value in quotation marks */
+                else
+                {
+                    i_success = asprintf( &psz_response, "%s\"%s\"%c%s",
+                                          psz_response, aw_child->psz_value,
+                                          c_comma, psz_delim );
+                    if( i_success == -1 ) break;
+                }
+            }
+            /* getting next child */
+            paw_child++;
+            aw_child = *( paw_child );
+        }
+    }
+    free( psz_nametag );
+    free( psz_childdelim );
+    if( i_success == -1 )
+    {
+        free( psz_response );
+        psz_response = strdup( "" );
+    }
+    return psz_response;
+}
+
+const char* libvlc_vlm_show_media( libvlc_instance_t *p_instance,
+                                   const char *psz_name,
+                                   libvlc_exception_t *p_exception )
+{
+    char *psz_message = NULL;
+    vlm_message_t *answer = NULL;
+    char *psz_response = NULL;
+    const char *psz_fmt = NULL;
+    const char *psz_delimiter = NULL;
+    int i_list;
+    vlm_t *p_vlm = NULL;
+
+    VLM_RET(p_vlm, NULL);
+
+    if( psz_name == NULL )
+    {
+        libvlc_exception_raise( p_exception, "No media name supplied" );
+    }
+    else if( asprintf( &psz_message, "show %s", psz_name ) == -1 )
+    {
+        libvlc_exception_raise( p_exception, "Unable to call show %s",
+                                psz_name );
+    }
+    else
+    {
+        vlm_ExecuteCommand( p_vlm, psz_message, &answer );
+        if( answer->psz_value )
+        {
+            libvlc_exception_raise( p_exception, "Unable to call show %s: %s",
+                                    psz_name, answer->psz_value );
+        }
+        else if ( answer->child ) {
+            /* in case everything was requested  */
+            if ( strcmp( psz_name, "" ) == 0 )
+            {
+                psz_fmt = "{\n\t%s\n}\n";
+                psz_delimiter = "\n\t";
+                i_list = 0;
+            }
+            else
+            {
+                psz_fmt = "%s\n";
+                psz_delimiter = "\n";
+                i_list = 1;
+            }
+            if( asprintf( &psz_response, psz_fmt,
+                          recurse_answer( answer, psz_delimiter, i_list ) )
+                == -1 )
+            {
+                libvlc_exception_raise( p_exception, "Error in show %s",
+                                        psz_name );
+            }
+        }
+    }
+    free( psz_message );
+    return( psz_response );
+}
+
 
 void libvlc_vlm_add_broadcast( libvlc_instance_t *p_instance,
                                const char *psz_name,

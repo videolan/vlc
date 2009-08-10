@@ -232,14 +232,23 @@ VLC_PUBLIC_API void libvlc_vlm_seek_media( libvlc_instance_t *, const char *,
                                            float, libvlc_exception_t * );
 
 /**
- * Return information about the named broadcast.
- * \bug will always return NULL
+ * Return information about the named media as a JSON
+ * string representation.
+ *
+ * This function is mainly intended for debugging use,
+ * if you want programmatic access to the state of
+ * a vlm_media_instance_t, please use the corresponding
+ * libvlc_vlm_get_media_instance_xxx -functions.
+ * Currently there are no such functions available for
+ * vlm_media_t though.
+ *
  * \param p_instance the instance
- * \param psz_name the name of the broadcast
+ * \param psz_name the name of the media,
+ *      if the name is an empty string, all media is described
  * \param p_e an initialized exception pointer
  * \return string with information about named media
  */
-VLC_PUBLIC_API char* libvlc_vlm_show_media( libvlc_instance_t *, const char *,
+VLC_PUBLIC_API const char* libvlc_vlm_show_media( libvlc_instance_t *, const char *,
                                             libvlc_exception_t * );
 
 /**
