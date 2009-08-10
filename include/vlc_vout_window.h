@@ -64,9 +64,9 @@ typedef struct {
     int x;
     int y;
 
-    /* Windows size int */
-    int width;
-    int height;
+    /* Windows size hint */
+    unsigned width;
+    unsigned height;
 
 } vout_window_cfg_t;
 
@@ -96,13 +96,13 @@ struct vout_window_t {
 
     /* Control on the module (mandatory)
      *
-     * Do not use it directly but use vout_window_Control.
+     * Do not use it directly; use vout_window_Control instead.
      */
     int (*control)(vout_window_t *, int query, va_list);
 
     /* Private place holder for the vout_window_t module (optional)
      *
-     * A module is free to used it as it wishes.
+     * A module is free to use it as it wishes.
      */
     vout_window_sys_t *sys;
 };
@@ -110,23 +110,23 @@ struct vout_window_t {
 /** 
  * It creates a new window.
  * 
- * XXX If you are inside a "vout display", you must use
+ * @note If you are inside a "vout display", you must use
  * vout_display_New/DeleteWindow when possible to allow window recycling.
  */
 VLC_EXPORT( vout_window_t *, vout_window_New, (vlc_object_t *, const char *module, const vout_window_cfg_t *) );
 
 /**
- * It deletes a window created by vout_window_New.
+ * It deletes a window created by vout_window_New().
  *
- * XXX See vout_window_New about window recycling.
+ * @note See vout_window_New() about window recycling.
  */
 VLC_EXPORT( void, vout_window_Delete, (vout_window_t *) );
 
 /**
  * It allows configuring a window.
  *
- * XXX you must own the windows, and vout_window_t are not thread safe.
- * You must not use it directly but prefer the vout_window_* wrappers.
+ * @warning The caller must own the window, as vout_window_t is not thread safe.
+ * You should use it the vout_window_* wrappers instead of this function.
  */
 VLC_EXPORT( int, vout_window_Control, (vout_window_t *, int query, ...) );
 

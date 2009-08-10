@@ -47,7 +47,7 @@ typedef struct vout_display_owner_t vout_display_owner_t;
 typedef struct vout_display_owner_sys_t vout_display_owner_sys_t;
 
 /**
- * It specifies the possible alignment used in vout_display.
+ * Possible alignments for vout_display.
  */
 typedef enum
 {
@@ -119,7 +119,7 @@ typedef struct {
  * Control query for vout_display_t
  */
 enum {
-    /* Hide the mouse. It will be send when
+    /* Hide the mouse. It will be sent when
      * vout_display_t::info.b_hide_mouse is false */
     VOUT_DISPLAY_HIDE_MOUSE,
 
@@ -129,31 +129,31 @@ enum {
     VOUT_DISPLAY_RESET_PICTURES,
 
     /* Ask the module to acknowledge/refuse the fullscreen state change after
-     * being requested (externaly or by VOUT_DISPLAY_EVENT_FULLSCREEN */
+     * being requested (externally or by VOUT_DISPLAY_EVENT_FULLSCREEN */
     VOUT_DISPLAY_CHANGE_FULLSCREEN,     /* const vout_display_cfg_t *p_cfg */
 
-    /* Ask the module to acknowledge/refuse the on top state change after
-     * being requested externaly */
+    /* Ask the module to acknowledge/refuse the "always on top" state change
+     * after being requested externally */
     VOUT_DISPLAY_CHANGE_ON_TOP,         /* int b_on_top */
 
     /* Ask the module to acknowledge/refuse the display size change requested
-     * (externaly or by VOUT_DISPLAY_EVENT_DISPLAY_SIZE) */
+     * (externally or by VOUT_DISPLAY_EVENT_DISPLAY_SIZE) */
     VOUT_DISPLAY_CHANGE_DISPLAY_SIZE,   /* const vout_display_cfg_t *p_cfg */
 
     /* Ask the module to acknowledge/refuse fill display state change after
-     * being requested externaly */
+     * being requested externally */
     VOUT_DISPLAY_CHANGE_DISPLAY_FILLED, /* const vout_display_cfg_t *p_cfg */
 
     /* Ask the module to acknowledge/refuse zoom change after being requested
-     * externaly */
+     * externally */
     VOUT_DISPLAY_CHANGE_ZOOM, /* const vout_display_cfg_t *p_cfg */
 
     /* Ask the module to acknowledge/refuse source aspect ratio after being
-     * requested externaly */
+     * requested externally */
     VOUT_DISPLAY_CHANGE_SOURCE_ASPECT, /* const video_format_t *p_source */
 
     /* Ask the module to acknowledge/refuse source crop change after being
-     * requested externaly.
+     * requested externally.
      * The cropping requested is stored by video_format_t::i_x/y_offset and
      * video_format_t::i_visible_width/height */
     VOUT_DISPLAY_CHANGE_SOURCE_CROP,   /* const video_format_t *p_source */
@@ -162,8 +162,8 @@ enum {
 /**
  * Event from vout_display_t
  *
- * For event that modifiy the state, you may send them multiple of times,
- * only the transition will be kept and act upon.
+ * Events modifiying the state may be sent multiple times.
+ * Only the transition will be retained and acted upon.
  */
 enum {
     /* TODO:
@@ -201,13 +201,13 @@ struct vout_display_owner_t {
      */
     vout_display_owner_sys_t *sys;
 
-    /* Event comming from the module
+    /* Event coming from the module
      *
      * This function is set prior to the module instantiation and must not
      * be overwritten nor used directly (use the vout_display_SendEvent*
      * wrapper.
      *
-     * You can send it at any time ie from any vout_display_t functions
+     * You can send it at any time i.e. from any vout_display_t functions
      * (TODO add support from a private thread).
      */
     void            (*event)(vout_display_t *, int, va_list);
@@ -228,16 +228,16 @@ struct vout_display_t {
     module_t *module;
 
     /* Initial and current configuration.
-     * You cannot modify it directly, you must use the appropriate event.
+     * You cannot modify it directly, you must use the appropriate events.
      *
-     * It reflects the current in use value ie after the event has been accepted
+     * It reflects the current values, i.e. after the event has been accepted
      * and applied/configured if needed.
      */
     const vout_display_cfg_t *cfg;
 
     /* video source format.
      *
-     * You are guaranted that in the open function, no cropping is asked.
+     * Cropping is not requested while in the open function.
      * You cannot change it.
      */
     video_format_t source;
@@ -245,8 +245,8 @@ struct vout_display_t {
     /* picture_t format.
      *
      * You can only change it inside the module open function to
-     * match what you want and when a VOUT_DISPLAY_RESET_PICTURES
-     * is called on your module and was successfull.
+     * match what you want, and when a VOUT_DISPLAY_RESET_PICTURES control
+     * request is made and succeeds.
      *
      * By default, it is equal to ::source except for the aspect ratio
      * which is undefined(0) and is ignored.
@@ -255,7 +255,7 @@ struct vout_display_t {
 
     /* Informations
      *
-     * You can only set then in the open function.
+     * You can only set them in the open function.
      */
     vout_display_info_t info;
 
@@ -296,7 +296,7 @@ struct vout_display_t {
 
     /* Private place holder for the vout_display_t module (optional)
      *
-     * A module is free to used it as it wishes.
+     * A module is free to use it as it wishes.
      */
     vout_display_sys_t *sys;
 
@@ -358,7 +358,7 @@ static inline void vout_display_SendEventMouseDoubleClick(vout_display_t *vd)
 }
 
 /**
- * Ask for a new window with the given configuration as hint.
+ * Asks for a new window with the given configuration as hint.
  *
  * b_standalone/i_x/i_y may be overwritten by the core
  */
@@ -373,10 +373,10 @@ static inline void vout_display_DeleteWindow(vout_display_t *vd,
 }
 
 /**
- * It computes the default display size given the source and
+ * Computes the default display size given the source and
  * the display configuration.
  *
- * It supposes that the picture will already be cropped.
+ * This asssumes that the picture is already cropped.
  */
 VLC_EXPORT( void, vout_display_GetDefaultDisplaySize, (int *width, int *height, const video_format_t *source, const vout_display_cfg_t *) );
 
@@ -392,9 +392,9 @@ typedef struct {
 } vout_display_place_t;
 
 /**
- * It computes how to place a picture inside the display to respect
+ * Computes how to place a picture inside the display to respect
  * the given parameters.
- * It supposes that the cropping is done by an external mean.
+ * This assumes that cropping is done by an external mean.
  *
  * \param p_place Place inside the window (window pixel unit)
  * \param p_source Video source format
