@@ -467,8 +467,8 @@ class PythonGenerator(object):
             self.output("    }")
 
             self.output("""
-        def __repr__(self):
-            return ".".join((self.__class__.__module__, self.__class__.__name__, self._names[self.value]))
+    def __repr__(self):
+        return ".".join((self.__class__.__module__, self.__class__.__name__, self._names[self.value]))
     """)
 
     def output_ctypes(self, rtype, method, params, comment):
@@ -572,23 +572,23 @@ class PythonGenerator(object):
                 self.output('    """%s\n    """' % docstring[classname])
 
             self.output("""
-        def __new__(cls, pointer=None):
-            '''Internal method used for instanciating wrappers from ctypes.
-            '''
-            if pointer is None:
-                raise Exception("Internal method. Surely this class cannot be instanciated by itself.")
-            if pointer == 0:
-                return None
-            else:
-                o=object.__new__(cls)
-                o._as_parameter_=ctypes.c_void_p(pointer)
-                return o
+    def __new__(cls, pointer=None):
+        '''Internal method used for instanciating wrappers from ctypes.
+        '''
+        if pointer is None:
+            raise Exception("Internal method. Surely this class cannot be instanciated by itself.")
+        if pointer == 0:
+            return None
+        else:
+            o=object.__new__(cls)
+            o._as_parameter_=ctypes.c_void_p(pointer)
+            return o
 
-        @staticmethod
-        def from_param(arg):
-            '''(INTERNAL) ctypes parameter conversion method.
-            '''
-            return arg._as_parameter_
+    @staticmethod
+    def from_param(arg):
+        '''(INTERNAL) ctypes parameter conversion method.
+        '''
+        return arg._as_parameter_
     """ % {'name': classname})
 
             if classname in overrides:
