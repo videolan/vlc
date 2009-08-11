@@ -347,10 +347,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                 else
                     ui.lastfm->setChecked( false );
 
-                ui.lastfm_zone->setEnabled( ui.lastfm->isChecked() );
+                ui.lastfm_zone->setVisible( ui.lastfm->isChecked() );
 
                 CONNECT( ui.lastfm, toggled( bool ),
-                         ui.lastfm_zone, setEnabled( bool ) );
+                         ui.lastfm_zone, setVisible( bool ) );
                 CONNECT( ui.lastfm, stateChanged( int ),
                          this, lastfm_Changed( int ) );
             }
