@@ -50,7 +50,8 @@ enum {
  */
 enum {
     VOUT_WINDOW_SET_ON_TOP, /* int b_on_top */
-    VOUT_WINDOW_SET_SIZE,   /* int i_width, int i_height */
+    VOUT_WINDOW_SET_SIZE,   /* unsigned i_width, unsigned i_height */
+    VOUT_WINDOW_SET_FULLSCREEN, /* int b_fullscreen */
 };
 
 typedef struct {
@@ -141,9 +142,18 @@ static inline int vout_window_SetOnTop(vout_window_t *window, bool is_on_top)
 /**
  * Configure the windows display size.
  */
-static inline int vout_window_SetSize(vout_window_t *window, int width, int height)
+static inline int vout_window_SetSize(vout_window_t *window,
+                                      unsigned width, unsigned height)
 {
     return vout_window_Control(window, VOUT_WINDOW_SET_SIZE, width, height);
+}
+
+/**
+ * Configure the windows fullscreen mode.
+ */
+static inline int vout_window_SetFullScreen(vout_window_t *window, bool full)
+{
+    return vout_window_Control(window, VOUT_WINDOW_SET_FULLSCREEN, full);
 }
 
 #endif /* VLC_VOUT_WINDOW_H */
