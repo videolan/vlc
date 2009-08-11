@@ -115,6 +115,7 @@ Ethan C. Baldridge <BaldridgeE at cadmus.com> - directory browsing code
 Eurodata Computer Club <retron.info> - VLC icon design (v0.8.4)
 Farzaneh Sarafraz <farzaneh at farsiweb dot info> - Persian localisation
 Fouzia Bourai <fbourai at cerist dot dz> - Arabic localisation
+François Cartegnie <fcvlcdev at free.fr> - multiple Qt improvements and usability advise
 François Seingier <francois.seingier at club-internet.fr> - TTL setting in the wx stream output dialog
 Frank Chao <frank0624 at gmail.com> - Chinese Traditional translation
 Frans van Veen <f.m.j.c.vanveen at student.hhs.nl> - Mozilla plugin toolbar
