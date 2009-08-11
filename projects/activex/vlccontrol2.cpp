@@ -1346,7 +1346,10 @@ STDMETHODIMP VLCMessageIterator::next(IVLCMessage** message)
 
         buffer.sizeof_msg = sizeof(buffer);
 
-        libvlc_log_iterator_next(_p_iter, &buffer);
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_log_iterator_next(_p_iter, &buffer, &ex);
         *message = new VLCMessage(_p_instance, buffer);
         if( !message )
             hr = E_OUTOFMEMORY;
