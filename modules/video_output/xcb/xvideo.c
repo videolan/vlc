@@ -602,6 +602,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
     switch (query)
     {
+    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
+    {
+        const vout_display_cfg_t *c = va_arg (ap, const vout_display_cfg_t *);
+        return vout_window_SetFullScreen (p_sys->embed, c->is_fullscreen);
+    }
+
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
     case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
     case VOUT_DISPLAY_CHANGE_ZOOM:
@@ -658,10 +664,6 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     /* Hide the mouse. It will be send when
      * vout_display_t::info.b_hide_mouse is false */
     VOUT_DISPLAY_HIDE_MOUSE,
-
-    /* Ask the module to acknowledge/refuse the fullscreen state change after
-     * being requested (externaly or by VOUT_DISPLAY_EVENT_FULLSCREEN */
-    VOUT_DISPLAY_CHANGE_FULLSCREEN,     /* const vout_display_cfg_t *p_cfg */
 #endif
     case VOUT_DISPLAY_RESET_PICTURES:
         assert(0);
