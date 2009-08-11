@@ -255,7 +255,7 @@ int InitGLX13( vout_thread_t *p_vout )
      * configuration was chosen, instead of selecting the frame buffer from
      * the window. That requires reworking xcommon.c though.
      * -- Courmisch */
-    XGetWindowAttributes( p_sys->p_display, p_sys->p_win->video_window, &att );
+    XGetWindowAttributes( p_sys->p_display, p_sys->window.video_window, &att );
     for( int i = 0; i < i_nb && !fbconf; i++ )
     {
         XVisualInfo *p_vi;
@@ -277,7 +277,7 @@ int InitGLX13( vout_thread_t *p_vout )
 
     /* Create the GLX window */
     p_sys->gwnd = glXCreateWindow( p_sys->p_display, fbconf,
-                                   p_sys->p_win->video_window, NULL );
+                                   p_sys->window.video_window, NULL );
     if( p_sys->gwnd == None )
     {
         msg_Err( p_vout, "Cannot create GLX window" );
@@ -305,8 +305,8 @@ static void SwapBuffers( vout_thread_t *p_vout )
     vout_sys_t *p_sys = p_vout->p_sys;
     unsigned int i_width, i_height, i_x, i_y;
 
-    vout_PlacePicture( p_vout, p_vout->p_sys->p_win->i_width,
-                       p_vout->p_sys->p_win->i_height,
+    vout_PlacePicture( p_vout, p_vout->p_sys->window.i_width,
+                       p_vout->p_sys->window.i_height,
                        &i_x, &i_y, &i_width, &i_height );
 
     glViewport( 0, 0, (GLint)i_width, (GLint)i_height );
@@ -317,7 +317,7 @@ static void SwapBuffers( vout_thread_t *p_vout )
     }
     else
     {
-        glXSwapBuffers( p_sys->p_display, p_sys->p_win->video_window );
+        glXSwapBuffers( p_sys->p_display, p_sys->window.video_window );
     }
 }
 
@@ -333,7 +333,7 @@ void SwitchContext( vout_thread_t *p_vout )
     }
     else
     {
-        glXMakeCurrent( p_sys->p_display, p_sys->p_win->video_window,
+        glXMakeCurrent( p_sys->p_display, p_sys->window.video_window,
                         p_sys->gwctx );
     }
 }

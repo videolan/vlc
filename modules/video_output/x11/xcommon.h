@@ -214,12 +214,8 @@ struct vout_sys_t
     Visual *            p_visual;                          /* visual pointer */
     int                 i_screen;                           /* screen number */
 
-    /* Our current window */
-    x11_window_t *      p_win;
-
-    /* Our two windows */
-    x11_window_t        original_window;
-    x11_window_t        fullscreen_window;
+    /* Our window */
+    x11_window_t        window;
 
     /* key and mouse event handling */
     int                 i_vout_event;  /* 1(Fullsupport), 2(FullscreenOnly), 3(none) */
