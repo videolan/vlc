@@ -45,7 +45,7 @@ Backend::Backend(QObject *parent, const QVariantList &)
         : QObject(parent)
         , m_deviceManager(0)
         , m_effectManager(0)
-        , m_debugLevel(Warning)
+        , m_debugLevel(Debug)
 {
     bool wasInit = vlcInit();
 
