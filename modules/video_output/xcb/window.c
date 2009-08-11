@@ -75,7 +75,7 @@ struct vout_window_sys_t
     xcb_window_t root;
     xcb_atom_t wm_state;
     xcb_atom_t wm_state_above;
-    /*xcb_atom_t wmstate_fullscreen;*/
+    xcb_atom_t wm_state_fullscreen;
 };
 
 /** Set an X window property from a nul-terminated string */
@@ -245,13 +245,15 @@ static int Open (vlc_object_t *obj)
     set_string (conn, window, utf8, net_wm_icon_name, _("VLC"));
 
     /* Cache any EWMH atom we may need later */
-    xcb_intern_atom_cookie_t wm_state_ck, wm_state_above_ck;
+    xcb_intern_atom_cookie_t wm_state_ck, wm_state_above_ck, wm_state_fs_ck;
 
     wm_state_ck = intern_string (conn, "_NET_WM_STATE");
     wm_state_above_ck = intern_string (conn, "_NET_WM_STATE_ABOVE");
+    wm_state_fs_ck = intern_string (conn, "_NET_WM_STATE_FULLSCREEN");
 
     p_sys->wm_state = get_atom (conn, wm_state_ck);
     p_sys->wm_state_above = get_atom (conn, wm_state_above_ck);
+    p_sys->wm_state_fullscreen = get_atom (conn, wm_state_fs_ck);
 
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
@@ -373,23 +375,22 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
             xcb_configure_window (conn, wnd->handle.xid,
                                   XCB_CONFIG_WINDOW_WIDTH |
                                   XCB_CONFIG_WINDOW_HEIGHT, values);
-            xcb_flush (conn);
             break;
         }
 
         case VOUT_WINDOW_SET_ON_TOP:
-        {
-            bool on = va_arg (ap, int);
+            set_wm_state (wnd, va_arg (ap, int), p_sys->wm_state_above);
+            break;
 
-            set_wm_state (wnd, on, p_sys->wm_state_above);
-            xcb_flush (p_sys->conn);
-            return VLC_SUCCESS;
-        }
+        case VOUT_WINDOW_SET_FULLSCREEN:
+            set_wm_state (wnd, va_arg (ap, int), p_sys->wm_state_fullscreen);
+            break;
 
         default:
             msg_Err (wnd, "request %d not implemented", cmd);
             return VLC_EGENERIC;
     }
+    xcb_flush (p_sys->conn);
     return VLC_SUCCESS;
 }
 
