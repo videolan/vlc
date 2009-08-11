@@ -458,12 +458,6 @@ void Deactivate ( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    /* If the fullscreen window is still open, close it */
-    if( p_vout->b_fullscreen )
-    {
-        ToggleFullScreen( p_vout );
-    }
-
     /* Restore cursor if it was blanked */
     if( !p_vout->p_sys->b_mouse_pointer_visible )
     {
