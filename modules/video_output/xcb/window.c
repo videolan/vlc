@@ -332,7 +332,30 @@ static void *Thread (void *data)
     return NULL;
 }
 
-#include <vlc_vout.h>
+/** Changes the EWMH state of the window */
+static void set_wm_state (vout_window_t *wnd, bool on, xcb_atom_t state)
+{
+    vout_window_sys_t *sys = wnd->sys;
+    /* From EWMH "_WM_STATE" */
+    xcb_client_message_event_t ev = {
+         .response_type = XCB_CLIENT_MESSAGE,
+         .format = 32,
+         .window = wnd->handle.xid,
+         .type = sys->wm_state,
+    };
+
+    ev.data.data32[0] = on ? NET_WM_STATE_ADD : NET_WM_STATE_REMOVE;
+    ev.data.data32[1] = state;
+    ev.data.data32[2] = 0;
+    ev.data.data32[3] = 1;
+
+    /* From ICCCM "Changing Window State" */
+    xcb_send_event (sys->conn, 0, sys->root,
+                    XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
+                    XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
+                    (const char *)&ev);
+}
+
 
 static int Control (vout_window_t *wnd, int cmd, va_list ap)
 {
@@ -355,25 +378,10 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
         }
 
         case VOUT_WINDOW_SET_ON_TOP:
-        {   /* From EWMH "_WM_STATE" */
-            xcb_client_message_event_t ev = {
-                .response_type = XCB_CLIENT_MESSAGE,
-                .format = 32,
-                .window = wnd->handle.xid,
-                .type = p_sys->wm_state,
-            };
+        {
             bool on = va_arg (ap, int);
 
-            ev.data.data32[0] = on ? NET_WM_STATE_ADD : NET_WM_STATE_REMOVE;
-            ev.data.data32[1] = p_sys->wm_state_above;
-            ev.data.data32[2] = 0;
-            ev.data.data32[3] = 1;
-
-            /* From ICCCM "Changing Window State" */
-            xcb_send_event (p_sys->conn, 0, p_sys->root,
-                            XCB_EVENT_MASK_SUBSTRUCTURE_NOTIFY |
-                            XCB_EVENT_MASK_SUBSTRUCTURE_REDIRECT,
-                            (const char *)&ev);
+            set_wm_state (wnd, on, p_sys->wm_state_above);
             xcb_flush (p_sys->conn);
             return VLC_SUCCESS;
         }
