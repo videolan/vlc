@@ -40,6 +40,8 @@
 #include <QVBoxLayout>
 #include <QScrollArea>
 
+#include <QStyleFactory>
+#include <QSettings>
 #include <QtAlgorithms>
 
 #include <string>
@@ -482,7 +484,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
          * Interface Panel *
          *******************/
         START_SPREFS_CAT( Interface, qtr("Interface Settings") );
-            ui.defaultLabel->setFont( italicFont );
+//            ui.defaultLabel->setFont( italicFont );
             ui.skinsLabel->setText(
                     qtr( "This is VLC's skinnable interface. You can download other skins at" )
                     + QString( " <a href=\"http://www.videolan.org/vlc/skins.php\">VLC skins website</a>." ) );
@@ -495,6 +497,13 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.languageBox->hide();
             ui.assoBox->hide();
 #endif
+            ui.stylesCombo->addItems( QStyleFactory::keys() );
+            ui.stylesCombo->setCurrentIndex( ui.stylesCombo->findText(
+                        getSettings()->value( "MainWindow/QtStyle", "" ).toString() ) );
+            ui.stylesCombo->insertSeparator( 1 );
+
+            CONNECT( ui.stylesCombo, currentIndexChanged( QString ), this, changeStyle( QString ) );
+
 
             /* interface */
             char *psz_intf = config_GetPsz( p_intf, "intf" );
@@ -510,6 +519,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             optionWidgets.append( ui.skins );
             optionWidgets.append( ui.qt4 );
+            optionWidgets.append( ui.stylesCombo );
 
             ui.skins_zone->setEnabled( ui.skins->isChecked() );
             CONNECT( ui.skins, toggled( bool ), ui.skins_zone, setEnabled( bool ) );
@@ -750,6 +760,9 @@ void SPrefsPanel::apply()
             config_PutPsz( p_intf, "intf", "skins2" );
         if( qobject_cast<QRadioButton *>(optionWidgets[qtRB])->isChecked() )
             config_PutPsz( p_intf, "intf", "qt" );
+        getSettings()->setValue( "MainWindow/QtStyle",
+            qobject_cast<QComboBox *>(optionWidgets[styleCB])->currentText() );
+
         break;
     }
 
@@ -785,6 +798,19 @@ void SPrefsPanel::lastfm_Changed( int i_state )
         config_AddIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
     else if( i_state == Qt::Unchecked )
         config_RemoveIntf( VLC_OBJECT( p_intf ), "audioscrobbler" );
+}
+
+void SPrefsPanel::changeStyle( QString s_style )
+{
+    QApplication::setStyle( s_style );
+
+    /* force refresh on all widgets */
+    QWidgetList widgets = QApplication::allWidgets();
+    QWidgetList::iterator it = widgets.begin();
+    while( it != widgets.end() ) {
+        (*it)->update();
+        it++;
+    };
 }
 
 #ifdef WIN32

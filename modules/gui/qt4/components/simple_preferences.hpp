@@ -78,7 +78,7 @@ enum {
        spdifChB,
 };
 enum { inputLE, cachingCoB };
-enum { skinRB, qtRB };
+enum { skinRB, qtRB, styleCB };
 
 class ConfigControl;
 class QComboBox;
@@ -136,6 +136,7 @@ private slots:
     void assoDialog();
     void saveAsso();
 #endif
+    void changeStyle( QString );
 };
 
 #endif
