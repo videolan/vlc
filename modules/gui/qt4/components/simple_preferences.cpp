@@ -44,12 +44,10 @@
 #include <QSettings>
 #include <QtAlgorithms>
 
-#include <string>
-
 #define ICON_HEIGHT 64
 
 #ifdef WIN32
-#include "vistaassoc.h"
+# include "vistaassoc.h"
 #endif
 
 /*********************************************************************
@@ -497,14 +495,6 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.languageBox->hide();
             ui.assoBox->hide();
 #endif
-            ui.stylesCombo->addItems( QStyleFactory::keys() );
-            ui.stylesCombo->setCurrentIndex( ui.stylesCombo->findText(
-                        getSettings()->value( "MainWindow/QtStyle", "" ).toString() ) );
-            ui.stylesCombo->insertSeparator( 1 );
-
-            CONNECT( ui.stylesCombo, currentIndexChanged( QString ), this, changeStyle( QString ) );
-
-
             /* interface */
             char *psz_intf = config_GetPsz( p_intf, "intf" );
             if( psz_intf )
@@ -519,7 +509,17 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
             optionWidgets.append( ui.skins );
             optionWidgets.append( ui.qt4 );
+#if !defined(NDEBUG) || !defined( WIN32)
+            ui.stylesCombo->addItems( QStyleFactory::keys() );
+            ui.stylesCombo->setCurrentIndex( ui.stylesCombo->findText(
+                        getSettings()->value( "MainWindow/QtStyle", "" ).toString() ) );
+            ui.stylesCombo->insertSeparator( 1 );
+
+            CONNECT( ui.stylesCombo, currentIndexChanged( QString ), this, changeStyle( QString ) );
             optionWidgets.append( ui.stylesCombo );
+#else
+            ui.styleCombo->hide();
+#endif
 
             ui.skins_zone->setEnabled( ui.skins->isChecked() );
             CONNECT( ui.skins, toggled( bool ), ui.skins_zone, setEnabled( bool ) );
@@ -817,6 +817,7 @@ void SPrefsPanel::changeStyle( QString s_style )
 #include <QDialogButtonBox>
 #include <QHeaderView>
 #include "util/registry.hpp"
+#include <string>
 
 bool SPrefsPanel::addType( const char * psz_ext, QTreeWidgetItem* current,
                            QTreeWidgetItem* parent, QVLCRegistry *qvReg )
