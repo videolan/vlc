@@ -78,6 +78,7 @@ struct vout_window_sys_t
     /*xcb_atom_t wmstate_fullscreen;*/
 };
 
+/** Set an X window property from a nul-terminated string */
 static inline
 void set_string (xcb_connection_t *conn, xcb_window_t window,
                  xcb_atom_t type, xcb_atom_t atom, const char *str)
@@ -86,6 +87,7 @@ void set_string (xcb_connection_t *conn, xcb_window_t window,
                          /* format */ 8, strlen (str), str);
 }
 
+/** Set an X window string property */
 static inline
 void set_ascii_prop (xcb_connection_t *conn, xcb_window_t window,
                      xcb_atom_t atom, const char *value)
@@ -93,6 +95,7 @@ void set_ascii_prop (xcb_connection_t *conn, xcb_window_t window,
     set_string (conn, window, atom, XA_STRING, value);
 }
 
+/** Set the Window ICCCM client machine property */
 static inline
 void set_hostname_prop (xcb_connection_t *conn, xcb_window_t window)
 {
@@ -110,12 +113,14 @@ void set_hostname_prop (xcb_connection_t *conn, xcb_window_t window)
     free(hostname);
 }
 
+/** Request the X11 server to internalize a string into an atom */
 static inline
 xcb_intern_atom_cookie_t intern_string (xcb_connection_t *c, const char *s)
 {
     return xcb_intern_atom (c, 0, strlen (s), s);
 }
 
+/** Extract the X11 atom from an intern request cookie */
 static
 xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
 {
@@ -290,6 +295,7 @@ static void Close (vlc_object_t *obj)
 }
 
 
+/** Background thread for X11 events handling */
 static void *Thread (void *data)
 {
     vout_window_t *wnd = data;
