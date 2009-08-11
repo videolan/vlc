@@ -2079,20 +2079,20 @@ DISTCLEAN_PKG += firefox-source-$(MOZILLA_VERSION).tar.bz2
 # libjpeg
 # ***************************************************************************
 
-jpeg-$(JPEG_VERSION).tar.gz:
+jpegsrc.v$(JPEG_VERSION).tar.gz:
 	$(WGET) $(JPEG_URL)
 
-jpeg: jpeg-$(JPEG_VERSION).tar.gz
+jpeg-7: jpegsrc.v$(JPEG_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-.jpeg: jpeg
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(HOSTCC) && make && make install-lib)
+.jpeg: jpeg-7
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)" $(HOSTCC) && make && make install)
 	$(RANLIB) $(PREFIX)/lib/libjpeg.a
 	touch $@
 
 CLEAN_FILE += .jpeg
-CLEAN_PKG += jpeg
-DISTCLEAN_PKG += jpeg-$(JPEG_VERSION).tar.gz
+CLEAN_PKG += jpeg-7
+DISTCLEAN_PKG += jpegsrc.v$(JPEG_VERSION).tar.gz
 
 # ***************************************************************************
 # tiff
