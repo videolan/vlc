@@ -168,14 +168,14 @@ void VideoWidget::SetFullScreen( bool b_fs )
 
     if( b_fs )
     {   /* Go full-screen */
-        reparentable->setParent( NULL );
         reparentable->setWindowState( newstate );
+        reparentable->setParent( NULL );
         reparentable->show();
     }
     else
     {   /* Go windowed */
-        reparentable->setWindowState( newstate );
         layout->addWidget( reparentable );
+        reparentable->setWindowState( newstate );
     }
 }
 
