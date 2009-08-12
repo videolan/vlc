@@ -797,7 +797,6 @@ int MainInterface::controlVideo( int i_query, va_list args )
     case VOUT_WINDOW_SET_FULLSCREEN:
     {
         bool b_fs = va_arg( args, int );
-        msg_Err( p_intf, b_fs ? "fullscreen!" : "windowed!" );
         emit askVideoSetFullScreen( b_fs );
         return VLC_SUCCESS;
     }
