@@ -74,8 +74,8 @@ public:
     virtual ~MainInterface();
 
     /* Video requests from core */
-    WId requestVideo( int *pi_x, int *pi_y,
-                      unsigned int *pi_width, unsigned int *pi_height );
+    WId getVideo( int *pi_x, int *pi_y,
+                  unsigned int *pi_width, unsigned int *pi_height );
     void releaseVideo( void  );
     int controlVideo( int i_query, va_list args );
 
@@ -159,6 +159,8 @@ public slots:
     void popupMenu( const QPoint& );
 
     /* Manage the Video Functions from the vout threads */
+    void getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
+                       unsigned *pi_width, unsigned *pi_height );
     void releaseVideoSlot( void );
 
 private slots:
@@ -177,10 +179,10 @@ private slots:
 
     void showCryptedLabel( bool );
 signals:
+    void askGetVideo( WId *p_id, int *pi_x, int *pi_y,
+                      unsigned int *pi_width, unsigned int *pi_height );
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
-    void askVideoToShow( unsigned int, unsigned int );
-    void askBgWidgetToToggle();
     void askUpdate();
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );

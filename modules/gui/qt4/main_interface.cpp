@@ -216,18 +216,18 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     var_AddCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
 
 
-    /* VideoWidget connects to avoid different threads speaking to each other */
+    /* VideoWidget connects for asynchronous calls */
+    connect( this, SIGNAL(askGetVideo(WId*,int*,int*,unsigned*,unsigned *)),
+             this, SLOT(getVideoSlot(WId*,int*,int*,unsigned*,unsigned*)),
+             Qt::BlockingQueuedConnection );
     connect( this, SIGNAL(askReleaseVideo( void )),
-             this, SLOT(releaseVideoSlot( void )), Qt::BlockingQueuedConnection );
+             this, SLOT(releaseVideoSlot( void )),
+             Qt::BlockingQueuedConnection );
 
     if( videoWidget )
     {
         CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
                  videoWidget, SetSizing( unsigned int, unsigned int ) );
-
-        connect( this, SIGNAL(askVideoToShow( unsigned int, unsigned int)),
-             videoWidget, SLOT(SetSizing(unsigned int, unsigned int )),
-             Qt::BlockingQueuedConnection );
     }
 
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
@@ -373,7 +373,6 @@ void MainInterface::createMainWidget( QSettings *settings )
     bgWidget->resize(
             settings->value( "backgroundSize", QSize( 300, 200 ) ).toSize() );
     bgWidget->updateGeometry();
-    CONNECT( this, askBgWidgetToToggle(), bgWidget, toggle() );
 
     if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
         i_visualmode != QT_MINIMAL_MODE )
@@ -703,41 +702,54 @@ private:
 };
 
 /**
- * README
- * Thou shall not call/resize/hide widgets from on another thread.
- * This is wrong, and this is THE reason to emit signals on those Video Functions
- **/
-WId MainInterface::requestVideo( int *pi_x, int *pi_y,
-                                 unsigned int *pi_width,
-                                 unsigned int *pi_height )
+ * NOTE:
+ * You must note change the state of this object or other Qt4 UI objects,
+ * from the video output thread - only from the Qt4 UI main loop thread.
+ * All window provider queries must be handled through signals or events.
+ * That's why we have all those emit statements...
+ */
+WId MainInterface::getVideo( int *pi_x, int *pi_y,
+                             unsigned int *pi_width, unsigned int *pi_height )
+{
+    if( !videoWidget )
+        return 0;
+
+    /* This is a blocking call signal. Results are returned through pointers.
+     * Beware of deadlocks! */
+    WId id;
+    emit askGetVideo( &id, pi_x, pi_y, pi_width, pi_height );
+    return id;
+}
+
+void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
+                                  unsigned *pi_width, unsigned *pi_height )
 {
     /* Request the videoWidget */
-    if( !videoWidget ) return 0;
     WId ret = videoWidget->request( pi_x, pi_y,
                                     pi_width, pi_height, b_keep_size );
+    *p_id = ret;
     if( ret ) /* The videoWidget is available */
     {
         /* Did we have a bg ? Hide it! */
         if( VISIBLE( bgWidget) )
         {
             bgWasVisible = true;
-            emit askBgWidgetToToggle();
+            bgWidget->toggle();
         }
         else
             bgWasVisible = false;
 
         /* ask videoWidget to show */
-        emit askVideoToShow( *pi_width, *pi_height );
+        videoWidget->SetSizing( *pi_width, *pi_height );
 
         /* Consider the video active now */
         videoIsActive = true;
 
         emit askUpdate();
     }
-    return ret;
 }
 
-/* Call from the WindowClose function */
+/* Asynchronous call from the WindowClose function */
 void MainInterface::releaseVideo( void )
 {
     emit askReleaseVideo( );
@@ -761,7 +773,7 @@ void MainInterface::releaseVideoSlot( void )
     doComponentsUpdate();
 }
 
-/* Call from WindowControl function */
+/* Asynchronous call from WindowControl function */
 int MainInterface::controlVideo( int i_query, va_list args )
 {
     switch( i_query )
@@ -848,7 +860,7 @@ void MainInterface::toggleMinimalView( bool b_switch )
     { /* NORMAL MODE then */
         if( !videoWidget || videoWidget->isHidden() )
         {
-            emit askBgWidgetToToggle();
+            bgWidget->toggle();
         }
         else
         {
