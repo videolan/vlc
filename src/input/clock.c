@@ -95,7 +95,9 @@
  * It is 60s max, remember as it is limited by the size it takes by es_out.c
  * it can be really large.
  */
-#define CR_BUFFERING_TARGET (60000000)
+//#define CR_BUFFERING_TARGET (60000000)
+/* Due to some problems in es_out, we cannot use a large value yet */
+#define CR_BUFFERING_TARGET (100000)
 
 /*****************************************************************************
  * Structures
