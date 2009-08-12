@@ -228,6 +228,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     {
         CONNECT( this, askVideoToResize( unsigned int, unsigned int ),
                  videoWidget, SetSizing( unsigned int, unsigned int ) );
+        CONNECT( this, askVideoSetFullScreen( bool ),
+                 videoWidget, SetFullScreen( bool ) );
     }
 
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
@@ -790,6 +792,13 @@ int MainInterface::controlVideo( int i_query, va_list args )
     {
         int i_arg = va_arg( args, int );
         QApplication::postEvent( this, new SetVideoOnTopQtEvent( i_arg ) );
+        return VLC_SUCCESS;
+    }
+    case VOUT_WINDOW_SET_FULLSCREEN:
+    {
+        bool b_fs = va_arg( args, int );
+        msg_Err( p_intf, b_fs ? "fullscreen!" : "windowed!" );
+        emit askVideoSetFullScreen( b_fs );
         return VLC_SUCCESS;
     }
     default:

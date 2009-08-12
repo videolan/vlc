@@ -57,7 +57,7 @@
 VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
 {
     /* Init */
-    b_used = false;
+    reparentable = NULL;
     videoSize.rwidth() = -1;
     videoSize.rheight() = -1;
 
@@ -66,16 +66,14 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
     /* Set the policy to expand in both directions */
 //    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
-    /* Black background is more coherent for a Video Widget */
-    QPalette plt =  palette();
-    plt.setColor( QPalette::Window, Qt::black );
-    setPalette( plt );
-    setAutoFillBackground(true);
-
     /* Indicates that the widget wants to draw directly onto the screen.
        Widgets with this attribute set do not participate in composition
        management */
     setAttribute( Qt::WA_PaintOnScreen, true );
+
+    layout = new QHBoxLayout( this );
+    layout->setContentsMargins( 0, 0, 0, 0 );
+    setLayout( layout );
 }
 
 void VideoWidget::paintEvent(QPaintEvent *ev)
@@ -89,7 +87,7 @@ void VideoWidget::paintEvent(QPaintEvent *ev)
 VideoWidget::~VideoWidget()
 {
     /* Ensure we are not leaking the video output. This would crash. */
-    assert( !b_used );
+    assert( reparentable == NULL );
 }
 
 /**
@@ -101,22 +99,47 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
 {
     msg_Dbg( p_intf, "Video was requested %i, %i", *pi_x, *pi_y );
 
+    if( reparentable != NULL )
+    {
+        msg_Dbg( p_intf, "embedded video already in use" );
+        return NULL;
+    }
     if( b_keep_size )
     {
         *pi_width  = size().width();
         *pi_height = size().height();
     }
 
-    if( b_used )
-    {
-        msg_Dbg( p_intf, "embedded video already in use" );
-        return NULL;
-    }
-    b_used = true;
+    /* The Qt4 UI needs a fixed a widget ("this"), so that the parent layout is
+     * not messed up when we the video is reparented. Hence, we create an extra
+     * reparentable widget, that will be within the VideoWidget in windowed
+     * mode, and within the root window (NULL parent) in full-screen mode.
+     */
+    reparentable = new QWidget();
+    QLayout *innerLayout = new QHBoxLayout( reparentable );
+    innerLayout->setContentsMargins( 0, 0, 0, 0 );
+
+    /* The owner of the video window needs a stable handle (WinId). Reparenting
+     * in Qt4-X11 changes the WinId of the widget, so we need to create another
+     * dummy widget that stays within the reparentable widget. */
+    QWidget *stable = new QWidget();
+    QPalette plt = palette();
+    plt.setColor( QPalette::Window, Qt::black );
+    stable->setPalette( plt );
+    stable->setAutoFillBackground(true);
+    stable->setAttribute( Qt::WA_PaintOnScreen, true );
+
+    innerLayout->addWidget( stable );
+
+    reparentable->setLayout( innerLayout );
+    layout->addWidget( reparentable );
+    updateGeometry();
+
 #ifndef NDEBUG
-    msg_Dbg( p_intf, "embedded video ready (handle %p)", (void *)winId() );
+    msg_Dbg( p_intf, "embedded video ready (handle %p)",
+             (void *)stable->winId() );
 #endif
-    return winId();
+    return stable->winId();
 }
 
 /* Set the Widget to the correct Size */
@@ -131,10 +154,37 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
     updateGeometry(); // Needed for deinterlace
 }
 
+void VideoWidget::SetFullScreen( bool b_fs )
+{
+    const Qt::WindowStates curstate = reparentable->windowState();
+    Qt::WindowStates newstate = curstate;
+
+    if( b_fs )
+        newstate |= Qt::WindowFullScreen;
+    else
+        newstate &= ~Qt::WindowFullScreen;
+    if( newstate == curstate )
+        return; /* no changes needed */
+
+    if( b_fs )
+    {   /* Go full-screen */
+        reparentable->setParent( NULL );
+        reparentable->setWindowState( newstate );
+        reparentable->show();
+    }
+    else
+    {   /* Go windowed */
+        reparentable->setWindowState( newstate );
+        layout->addWidget( reparentable );
+    }
+}
+
 void VideoWidget::release( void )
 {
     msg_Dbg( p_intf, "Video is not needed anymore" );
-    b_used = false;
+    //layout->removeWidget( reparentable );
+    delete reparentable;
+    reparentable = NULL;
     videoSize.rwidth() = 0;
     videoSize.rheight() = 0;
     updateGeometry();

@@ -76,13 +76,14 @@ protected:
 
 private:
     intf_thread_t *p_intf;
-    bool b_used;
 
     QSize videoSize;
+    QWidget *reparentable;
+    QLayout *layout;
 
 public slots:
     void SetSizing( unsigned int, unsigned int );
-
+    void SetFullScreen( bool );
 };
 
 /******************** Background Widget ****************/

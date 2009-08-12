@@ -183,6 +183,7 @@ signals:
                       unsigned int *pi_width, unsigned int *pi_height );
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
+    void askVideoSetFullScreen( bool );
     void askUpdate();
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
