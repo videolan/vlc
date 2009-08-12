@@ -118,14 +118,10 @@ static int  Statistics   ( vlc_object_t *, char const *,
 static int updateStatistics( intf_thread_t *, input_item_t *);
 
 /* Status Callbacks */
-static int TimeOffsetChanged( vlc_object_t *, char const *,
-                              vlc_value_t, vlc_value_t , void * );
-static int VolumeChanged    ( vlc_object_t *, char const *,
-                              vlc_value_t, vlc_value_t, void * );
-static int StateChanged     ( vlc_object_t *, char const *,
-                              vlc_value_t, vlc_value_t, void * );
-static int RateChanged      ( vlc_object_t *, char const *,
-                              vlc_value_t, vlc_value_t, void * );
+static int VolumeChanged( vlc_object_t *, char const *,
+                          vlc_value_t, vlc_value_t, void * );
+static int InputEvent( vlc_object_t *, char const *,
+                       vlc_value_t, vlc_value_t, void * );
 
 struct intf_sys_t
 {
@@ -136,7 +132,8 @@ struct intf_sys_t
     /* status changes */
     vlc_mutex_t       status_lock;
     playlist_status_t i_last_state;
-    playlist_t *p_playlist;
+    playlist_t        *p_playlist;
+    bool              b_input_buffering;
 
 #ifdef WIN32
     HANDLE hConsoleIn;
@@ -329,6 +326,7 @@ static int Activate( vlc_object_t *p_this )
     p_intf->p_sys->psz_unix_path = psz_unix_path;
     vlc_mutex_init( &p_intf->p_sys->status_lock );
     p_intf->p_sys->i_last_state = PLAYLIST_STOPPED;
+    p_intf->p_sys->b_input_buffering = false;
 
     /* Non-buffered stdout */
     setvbuf( stdout, (char *)NULL, _IOLBF, 0 );
@@ -509,24 +507,12 @@ static void Run( intf_thread_t *p_intf )
                     msg_rc( STATUS_CHANGE "( audio volume: %d )",
                             config_GetInt( p_intf, "volume" ));
                 }
-                var_AddCallback( p_input, "state", StateChanged, p_intf );
-                var_AddCallback( p_input, "rate-faster", RateChanged, p_intf );
-                var_AddCallback( p_input, "rate-slower", RateChanged, p_intf );
-                var_AddCallback( p_input, "rate", RateChanged, p_intf );
-                var_AddCallback( p_input, "time-offset", TimeOffsetChanged,
-                                 p_intf );
-                var_AddCallback( p_input, "frame-next", RateChanged, p_intf );
+                var_AddCallback( p_input, "intf-event", InputEvent, p_intf );
             }
         }
         else if( p_input->b_dead )
         {
-            var_DelCallback( p_input, "state", StateChanged, p_intf );
-            var_DelCallback( p_input, "rate-faster", RateChanged, p_intf );
-            var_DelCallback( p_input, "rate-slower", RateChanged, p_intf );
-            var_DelCallback( p_input, "rate", RateChanged, p_intf );
-            var_DelCallback( p_input, "time-offset", TimeOffsetChanged,
-                             p_intf );
-            var_DelCallback( p_input, "frame-next", RateChanged, p_intf );
+            var_DelCallback( p_input, "intf-event", InputEvent, p_intf );
             vlc_object_release( p_input );
             p_input = NULL;
 
@@ -816,12 +802,7 @@ static void Run( intf_thread_t *p_intf )
 
     if( p_input )
     {
-        var_DelCallback( p_input, "state", StateChanged, p_intf );
-        var_DelCallback( p_input, "rate-faster", RateChanged, p_intf );
-        var_DelCallback( p_input, "rate-slower", RateChanged, p_intf );
-        var_DelCallback( p_input, "rate", RateChanged, p_intf );
-        var_DelCallback( p_input, "time-offset", TimeOffsetChanged, p_intf );
-        var_DelCallback( p_input, "frame-next", RateChanged, p_intf );
+        var_DelCallback( p_input, "intf-event", InputEvent, p_intf );
         vlc_object_release( p_input );
     }
 
@@ -931,26 +912,6 @@ static void Help( intf_thread_t *p_intf, bool b_longhelp)
 /********************************************************************
  * Status callback routines
  ********************************************************************/
-static int TimeOffsetChanged( vlc_object_t *p_this, char const *psz_cmd,
-    vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd);
-    VLC_UNUSED(oldval); VLC_UNUSED(newval);
-    intf_thread_t *p_intf = (intf_thread_t*)p_data;
-    input_thread_t *p_input =
-        playlist_CurrentInput( p_intf->p_sys->p_playlist );
-
-    if( p_input )
-    {
-        vlc_mutex_lock( &p_intf->p_sys->status_lock );
-        msg_rc( STATUS_CHANGE "( time-offset: %"PRId64"s )",
-                (var_GetTime( p_input, "time-offset" )/1000000) );
-        vlc_mutex_unlock( &p_intf->p_sys->status_lock );
-        vlc_object_release( p_input );
-    }
-    return VLC_SUCCESS;
-}
-
 static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
@@ -964,56 +925,88 @@ static int VolumeChanged( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int StateChanged( vlc_object_t *p_this, char const *psz_cmd,
-    vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static void StateChanged( intf_thread_t *p_intf, input_thread_t *p_input )
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
-    intf_thread_t *p_intf = (intf_thread_t*)p_data;
-    playlist_t    *p_playlist = p_intf->p_sys->p_playlist;
-    int i_status;
-    char cmd[6];
+    playlist_t *p_playlist = p_intf->p_sys->p_playlist;
 
     PL_LOCK;
-    i_status = playlist_Status( p_playlist );
+    const int i_status = playlist_Status( p_playlist );
     PL_UNLOCK;
 
+    /* */
+    char *psz_cmd;
     switch( i_status )
     {
     case PLAYLIST_STOPPED:
-        strcpy( cmd, "stop" );
+        psz_cmd = "stop";
         break;
     case PLAYLIST_RUNNING:
-        strcpy( cmd, "play" );
+        psz_cmd = "play";
         break;
     case PLAYLIST_PAUSED:
-        strcpy( cmd, "pause" );
+        psz_cmd = "pause";
         break;
     default:
-        cmd[0] = '\0';
-    } /* var_GetInteger( p_input, "state" )  */
-    vlc_mutex_lock( &p_intf->p_sys->status_lock );
-    msg_rc( STATUS_CHANGE "( %s state: %d ): %s", cmd, newval.i_int,
-            ppsz_input_state[ newval.i_int ] );
+        psz_cmd = "";
+        break;
+    }
 
+    /* */
+    const int i_state = var_GetInteger( p_input, "state" );
+
+    vlc_mutex_lock( &p_intf->p_sys->status_lock );
+    msg_rc( STATUS_CHANGE "( %s state: %d ): %s", psz_cmd,
+            i_state, ppsz_input_state[i_state] );
     vlc_mutex_unlock( &p_intf->p_sys->status_lock );
-    return VLC_SUCCESS;
+}
+static void RateChanged( intf_thread_t *p_intf,
+                         input_thread_t *p_input )
+{
+    vlc_mutex_lock( &p_intf->p_sys->status_lock );
+    msg_rc( STATUS_CHANGE "( new rate: %d )",
+            var_GetInteger( p_input, "rate" ) );
+    vlc_mutex_unlock( &p_intf->p_sys->status_lock );
+}
+static void PositionChanged( intf_thread_t *p_intf,
+                             input_thread_t *p_input )
+{
+    vlc_mutex_lock( &p_intf->p_sys->status_lock );
+    if( p_intf->p_sys->b_input_buffering )
+        msg_rc( STATUS_CHANGE "( time: %"PRId64"s )",
+                (var_GetTime( p_input, "time" )/1000000) );
+    p_intf->p_sys->b_input_buffering = false;
+    vlc_mutex_unlock( &p_intf->p_sys->status_lock );
+}
+static void CacheChanged( intf_thread_t *p_intf )
+{
+    vlc_mutex_lock( &p_intf->p_sys->status_lock );
+    p_intf->p_sys->b_input_buffering = true;
+    vlc_mutex_unlock( &p_intf->p_sys->status_lock );
 }
 
-static int RateChanged( vlc_object_t *p_this, char const *psz_cmd,
-    vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
+                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd);
-    VLC_UNUSED(oldval); VLC_UNUSED(newval);
-    intf_thread_t *p_intf = (intf_thread_t*)p_data;
-    input_thread_t *p_input = playlist_CurrentInput( p_intf->p_sys->p_playlist );
+    input_thread_t *p_input = (input_thread_t*)p_this;
+    intf_thread_t *p_intf = p_data;
 
-    if( p_input )
+    switch( newval.i_int )
     {
-        vlc_mutex_lock( &p_intf->p_sys->status_lock );
-        msg_rc( STATUS_CHANGE "( new rate: %d )",
-                var_GetInteger( p_input, "rate" ) );
-        vlc_mutex_unlock( &p_intf->p_sys->status_lock );
-        vlc_object_release( p_input );
+    case INPUT_EVENT_STATE:
+    case INPUT_EVENT_DEAD:
+        StateChanged( p_intf, p_input );
+        break;
+    case INPUT_EVENT_RATE:
+        RateChanged( p_intf, p_input );
+        break;
+    case INPUT_EVENT_POSITION:
+        PositionChanged( p_intf, p_input );
+        break;
+    case INPUT_EVENT_CACHE:
+        CacheChanged( p_intf );
+        break;
+    default:
+        break;
     }
     return VLC_SUCCESS;
 }
