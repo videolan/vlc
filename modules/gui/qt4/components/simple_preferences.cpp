@@ -518,7 +518,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONNECT( ui.stylesCombo, currentIndexChanged( QString ), this, changeStyle( QString ) );
             optionWidgets.append( ui.stylesCombo );
 #else
-            ui.styleCombo->hide();
+            ui.stylesCombo->hide();
 #endif
 
             ui.skins_zone->setEnabled( ui.skins->isChecked() );
