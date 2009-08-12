@@ -158,11 +158,18 @@ void VideoWidget::SetFullScreen( bool b_fs )
 {
     const Qt::WindowStates curstate = reparentable->windowState();
     Qt::WindowStates newstate = curstate;
+    Qt::WindowFlags  newflags = reparentable->windowFlags();
 
     if( b_fs )
+    {
         newstate |= Qt::WindowFullScreen;
+        newflags |= Qt::WindowStaysOnTopHint;
+    }
     else
+    {
         newstate &= ~Qt::WindowFullScreen;
+        newflags &= ~Qt::WindowStaysOnTopHint;
+    }
     if( newstate == curstate )
         return; /* no changes needed */
 
@@ -170,10 +177,12 @@ void VideoWidget::SetFullScreen( bool b_fs )
     {   /* Go full-screen */
         reparentable->setWindowState( newstate );
         reparentable->setParent( NULL );
+        reparentable->setWindowFlags( newflags );
         reparentable->show();
     }
     else
     {   /* Go windowed */
+        reparentable->setWindowFlags( newflags );
         layout->addWidget( reparentable );
         reparentable->setWindowState( newstate );
     }
