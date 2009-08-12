@@ -110,11 +110,6 @@ static void SwitchContext( vout_thread_t * );
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between VLC and the X server.")
 
-#define SCREEN_TEXT N_("Screen for fullscreen mode.")
-#define SCREEN_LONGTEXT N_( \
-    "Screen to use in fullscreen mode. For instance " \
-    "set it to 0 for first screen, 1 for the second.")
-
 vlc_module_begin ()
     set_shortname( "OpenGL(GLX)" )
     set_category( CAT_VIDEO )
@@ -128,9 +123,6 @@ vlc_module_begin ()
     add_bool( "glx-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, true )
 #ifdef HAVE_SYS_SHM_H
     add_bool( "glx-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true )
-#endif
-#ifdef HAVE_XINERAMA
-    add_integer ( "glx-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true )
 #endif
 vlc_module_end ()
 

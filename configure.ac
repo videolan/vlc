@@ -3515,68 +3515,6 @@ AS_IF([test "${enable_xvmc}" != "no"], [
   ])
 ])
 
-dnl
-dnl  Check for the Xinerama extension
-dnl
-AC_ARG_ENABLE(xinerama,
-  [  --enable-xinerama       Xinerama support (default enabled)],, [
-  enable_xinerama="$enable_xvideo"
-])
-AS_IF([test "$enable_xinerama" != "no"], [
-  ac_cv_have_xinerama="no"
-  CFLAGS="${CFLAGS_save} ${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext"
-  AC_CHECK_HEADERS(X11/extensions/Xinerama.h,[
-    AC_CHECK_LIB(Xinerama_pic, XineramaQueryExtension,[
-      VLC_ADD_LIBS([xvideo],[-lXinerama_pic])
-      VLC_ADD_LIBS([x11],[-lXinerama_pic])
-      VLC_ADD_LIBS([glx],[-lXinerama_pic])
-      VLC_ADD_LIBS([xvmc],[-lXinerama_pic])
-      ac_cv_have_xinerama="yes"
-    ],[
-      AC_CHECK_LIB(Xinerama, XineramaQueryExtension,[
-        VLC_ADD_LIBS([xvideo],[-lXinerama])
-        VLC_ADD_LIBS([x11],[-lXinerama])
-        VLC_ADD_LIBS([glx],[-lXinerama])
-        VLC_ADD_LIBS([xvmc],[-lXinerama])
-        ac_cv_have_xinerama="yes"
-      ])
-    ])
-  ])
-  if test "${ac_cv_have_xinerama}" = "yes"; then
-    AC_DEFINE(HAVE_XINERAMA, 1, [Define this if you have libXinerama installed])
-  fi
-
-dnl
-dnl  Check for XF86VidMode extension
-dnl
-  ac_cv_have_xf86vidmode="no"
-  AC_CHECK_HEADERS(X11/extensions/xf86vmode.h,[
-    AC_CHECK_LIB(Xxf86vm_pic, XF86VidModeGetViewPort,[
-      VLC_ADD_LIBS([xvideo],[-lXxf86vm_pic])
-      VLC_ADD_LIBS([x11],[-lXxf86vm_pic])
-      VLC_ADD_LIBS([glx],[-lXxf86vm_pic])
-      VLC_ADD_LIBS([xvmc],[-lXxf86vm_pic])
-      ac_cv_have_xf86vidmode="yes"
-    ],[
-      AC_CHECK_LIB(Xxf86vm, XF86VidModeGetViewPort,[
-        VLC_ADD_LIBS([xvideo],[-lXxf86vm])
-        VLC_ADD_LIBS([x11],[-lXxf86vm])
-        VLC_ADD_LIBS([glx],[-lXxf86vm])
-        VLC_ADD_LIBS([xvmc],[-lXxf86vm])
-        ac_cv_have_xf86vidmode="yes"
-      ])
-    ])
-  ],[true],
-[#ifdef HAVE_X11_XLIB_H
-# include <X11/Xlib.h>
-#endif]
-   )
-  AS_IF([test "${ac_cv_have_xf86vidmode}" = "yes"],
-    [AC_DEFINE(HAVE_XF86VIDMODE, 1, [Define this if you have libXxf86vm installed])
-  ])
-  CFLAGS="${CFLAGS_save}"
-])
-
 dnl End of Xlib tests
 CPPFLAGS="${CPPFLAGS_save}"
 

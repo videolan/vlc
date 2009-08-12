@@ -61,11 +61,6 @@ extern void Deactivate ( vlc_object_t * );
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between VLC and the X server.")
 
-#define SCREEN_TEXT N_("Screen for fullscreen mode.")
-#define SCREEN_LONGTEXT N_( \
-    "Screen to use in fullscreen mode. For instance " \
-    "set it to 0 for first screen, 1 for the second.")
-
 vlc_module_begin ()
     set_shortname( "X11" )
     set_category( CAT_VIDEO )
@@ -74,9 +69,6 @@ vlc_module_begin ()
     add_bool( "x11-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, true )
 #ifdef HAVE_SYS_SHM_H
     add_bool( "x11-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true )
-#endif
-#ifdef HAVE_XINERAMA
-    add_integer ( "x11-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true )
 #endif
     set_description( N_("X11 video output") )
     set_capability( "video output", 70 )

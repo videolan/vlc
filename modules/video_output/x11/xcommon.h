@@ -76,11 +76,6 @@ typedef struct x11_window_t
 
     Atom                wm_protocols;
     Atom                wm_delete_window;
-
-#ifdef HAVE_XINERAMA
-    int                 i_screen;
-#endif
-
 } x11_window_t;
 
 /*****************************************************************************

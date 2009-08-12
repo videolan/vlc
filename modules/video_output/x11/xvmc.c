@@ -122,11 +122,6 @@ extern void Deactivate ( vlc_object_t * );
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between VLC and the X server.")
 
-#define SCREEN_TEXT N_("Screen to be used for fullscreen mode.")
-#define SCREEN_LONGTEXT N_( \
-    "Choose the screen you want to use in fullscreen mode. For instance " \
-    "set it to 0 for first screen, 1 for the second.")
-
 #define MODE_TEXT N_("Deinterlace mode")
 #define MODE_LONGTEXT N_("You can choose the default deinterlace mode")
 
@@ -141,9 +136,6 @@ vlc_module_begin ()
     add_string( "xvmc-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
 #ifdef HAVE_SYS_SHM_H
     add_bool( "xvmc-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true )
-#endif
-#ifdef HAVE_XINERAMA
-    add_integer ( "xvmc-xineramascreen", -1, NULL, SCREEN_TEXT, SCREEN_LONGTEXT, true )
 #endif
     add_string( "xvmc-deinterlace-mode", "bob", NULL, MODE_TEXT, MODE_LONGTEXT, false )
     add_string( "xvmc-crop-style", "eq", NULL, CROP_TEXT, CROP_LONGTEXT, false )

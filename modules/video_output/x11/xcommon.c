@@ -81,14 +81,6 @@
 #   include <GL/glx.h>
 #endif
 
-#ifdef HAVE_XINERAMA
-#   include <X11/extensions/Xinerama.h>
-#endif
-
-#ifdef HAVE_X11_EXTENSIONS_XF86VMODE_H
-#   include <X11/extensions/xf86vmode.h>
-#endif
-
 #ifdef MODULE_NAME_IS_xvmc
 #   include <X11/extensions/vldXvMC.h>
 #   include "../../codec/xvmc/accel_xvmc.h"
