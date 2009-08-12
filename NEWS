@@ -31,6 +31,7 @@ Visualisation:
 Removed modules:
  * csri
  * galaktos
+ * showintf
 
 
 Changes between 1.0.0 and 1.0.1:

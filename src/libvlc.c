@@ -945,11 +945,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 #endif
 
-    if( config_GetInt( p_libvlc, "show-intf" ) > 0 )
-    {
-        intf_Create( p_libvlc, "showintf,none" );
-    }
-
     if( config_GetInt( p_libvlc, "network-synchronisation") > 0 )
     {
         intf_Create( p_libvlc, "netsync,none" );
@@ -986,10 +981,11 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Create volume callback system. */
     var_Create( p_libvlc, "volume-change", VLC_VAR_BOOL );
 
-    /* Create a variable for showing the interface (moved from playlist). */
+    /* Create a variable for showing the fullscreen interface from hotkeys */
     var_Create( p_libvlc, "intf-show", VLC_VAR_BOOL );
     var_SetBool( p_libvlc, "intf-show", true );
 
+    /* Create a variable for showing the right click menu */
     var_Create( p_libvlc, "intf-popupmenu", VLC_VAR_BOOL );
 
     /*

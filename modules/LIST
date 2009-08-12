@@ -284,7 +284,6 @@ $Id$
  * sharpen: Sharpen video filter
  * shine: MP3 encoder using Shine, a fixed point implementation
  * shout: Shoutcast services discovery
- * showintf: shows the main interface
  * signals: POSIX signals handling interface
  * simple_channel_mixer: channel mixer
  * skins2: Skinnable interface, new generation

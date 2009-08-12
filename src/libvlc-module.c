@@ -210,11 +210,6 @@ static const char *const ppsz_snap_formats[] =
     "show all available options, including those that most users should " \
     "never touch.")
 
-#define SHOWINTF_TEXT N_("Show interface with mouse")
-#define SHOWINTF_LONGTEXT N_( \
-    "When this is enabled, the interface is shown when you move the mouse to "\
-    "the edge of the screen in fullscreen mode." )
-
 #define INTERACTION_TEXT N_("Interface interaction")
 #define INTERACTION_LONGTEXT N_( \
     "When this is enabled, the interface will show a dialog box each time " \
@@ -2075,9 +2070,7 @@ vlc_module_begin ()
     add_bool( "interact", true, NULL, INTERACTION_TEXT,
               INTERACTION_LONGTEXT, false )
 
-    add_bool( "show-intf", false, NULL, SHOWINTF_TEXT, SHOWINTF_LONGTEXT,
-              false )
-        change_need_restart ()
+    add_obsolete_bool( "show-intf" );
 
     add_bool ( "stats", true, NULL, STATS_TEXT, STATS_LONGTEXT, true )
         change_need_restart ()
