@@ -210,6 +210,12 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
             return false;
         }
 
+        bool copy = false;
+        if( row == -1 &&
+            ( p_parent->p_input == p_playlist->p_local_category->p_input
+            || p_parent->p_input == p_playlist->p_ml_category->p_input ) )
+                copy = true;
+
         QByteArray encodedData = data->data( "vlc/playlist-item-id" );
         QDataStream stream( &encodedData, QIODevice::ReadOnly );
 
@@ -228,22 +234,27 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
                 PL_UNLOCK;
                 return false;
             }
+            if( copy )
+            {
+                input_item_t *input = p_src->p_input;
+                playlist_AddExt ( p_playlist,
+                    p_src->p_input->psz_uri, p_src->p_input->psz_name,
+                    PLAYLIST_APPEND | PLAYLIST_SPREPARSE, PLAYLIST_END,
+                    input->i_duration,
+                    input->i_options, input->ppsz_options, input->optflagc,
+                    p_parent == p_playlist->p_local_category, true );
+                continue;
+            }
             if( !p_target )
             {
-                if(row == -1)
-                {
-                    playlist_TreeMove( p_playlist, p_src, p_parent, 0 );
-                }
-                else {
-                    playlist_TreeMove( p_playlist, p_src, p_parent, row );
-                }
+                if ( row == -1 ) row = p_parent->i_children;
+                playlist_TreeMove( p_playlist, p_src, p_parent, row );
             }
             else
             {
-                int i;
-                for( i = 0 ; i< p_parent->i_children ; i++ )
-                    if( p_parent->pp_children[i] == p_target ) break;
-                playlist_TreeMove( p_playlist, p_src, p_parent, i + 1 );
+                for( row = 0 ; row < p_target->p_parent->i_children ; row++ )
+                    if( p_target->p_parent->pp_children[row] == p_target ) break;
+                playlist_TreeMove( p_playlist, p_src, p_parent, row + 1 );
             }
             p_target = p_src;
         }
