@@ -137,7 +137,6 @@ static int  xvmc_check_yv12( Display *display, XvPortID port );
 static void xvmc_update_XV_DOUBLE_BUFFER( vout_thread_t *p_vout );
 #endif
 
-static void TestNetWMSupport( vout_thread_t * );
 static int ConvertKey( int );
 
 static int X11ErrorHandler( Display *, XErrorEvent * );
@@ -360,8 +359,6 @@ int Activate ( vlc_object_t *p_this )
     /* Misc init */
     p_vout->p_sys->b_altfullscreen = 0;
     p_vout->p_sys->i_time_button_last_pressed = 0;
-
-    TestNetWMSupport( p_vout );
 
 #ifdef MODULE_NAME_IS_xvmc
     p_vout->p_sys->p_last_subtitle_save = NULL;
@@ -2735,81 +2732,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
        default:
             return VLC_EGENERIC;
     }
-}
-
-/*****************************************************************************
- * TestNetWMSupport: tests for Extended Window Manager Hints support
- *****************************************************************************/
-static void TestNetWMSupport( vout_thread_t *p_vout )
-{
-    int i_ret, i_format;
-    unsigned long i, i_items, i_bytesafter;
-    Atom net_wm_supported;
-    union { Atom *p_atom; unsigned char *p_char; } p_args;
-
-    p_args.p_atom = NULL;
-
-    p_vout->p_sys->b_net_wm_state_fullscreen =
-    p_vout->p_sys->b_net_wm_state_above =
-    p_vout->p_sys->b_net_wm_state_below =
-    p_vout->p_sys->b_net_wm_state_stays_on_top =
-        false;
-
-    net_wm_supported =
-        XInternAtom( p_vout->p_sys->p_display, "_NET_SUPPORTED", False );
-
-    i_ret = XGetWindowProperty( p_vout->p_sys->p_display,
-                                DefaultRootWindow( p_vout->p_sys->p_display ),
-                                net_wm_supported,
-                                0, 16384, False, AnyPropertyType,
-                                &net_wm_supported,
-                                &i_format, &i_items, &i_bytesafter,
-                                (unsigned char **)&p_args );
-
-    if( i_ret != Success || i_items == 0 ) return;
-
-    msg_Dbg( p_vout, "Window manager supports NetWM" );
-
-    p_vout->p_sys->net_wm_state =
-        XInternAtom( p_vout->p_sys->p_display, "_NET_WM_STATE", False );
-    p_vout->p_sys->net_wm_state_fullscreen =
-        XInternAtom( p_vout->p_sys->p_display, "_NET_WM_STATE_FULLSCREEN",
-                     False );
-    p_vout->p_sys->net_wm_state_above =
-        XInternAtom( p_vout->p_sys->p_display, "_NET_WM_STATE_ABOVE", False );
-    p_vout->p_sys->net_wm_state_below =
-        XInternAtom( p_vout->p_sys->p_display, "_NET_WM_STATE_BELOW", False );
-    p_vout->p_sys->net_wm_state_stays_on_top =
-        XInternAtom( p_vout->p_sys->p_display, "_NET_WM_STATE_STAYS_ON_TOP",
-                     False );
-
-    for( i = 0; i < i_items; i++ )
-    {
-        if( p_args.p_atom[i] == p_vout->p_sys->net_wm_state_fullscreen )
-        {
-            msg_Dbg( p_vout,
-                     "Window manager supports _NET_WM_STATE_FULLSCREEN" );
-            p_vout->p_sys->b_net_wm_state_fullscreen = true;
-        }
-        else if( p_args.p_atom[i] == p_vout->p_sys->net_wm_state_above )
-        {
-            msg_Dbg( p_vout, "Window manager supports _NET_WM_STATE_ABOVE" );
-            p_vout->p_sys->b_net_wm_state_above = true;
-        }
-        else if( p_args.p_atom[i] == p_vout->p_sys->net_wm_state_below )
-        {
-            msg_Dbg( p_vout, "Window manager supports _NET_WM_STATE_BELOW" );
-            p_vout->p_sys->b_net_wm_state_below = true;
-        }
-        else if( p_args.p_atom[i] == p_vout->p_sys->net_wm_state_stays_on_top )
-        {
-            msg_Dbg( p_vout,
-                     "Window manager supports _NET_WM_STATE_STAYS_ON_TOP" );
-            p_vout->p_sys->b_net_wm_state_stays_on_top = true;
-        }
-    }
-
-    XFree( p_args.p_atom );
 }
 
 /*****************************************************************************

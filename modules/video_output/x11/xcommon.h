@@ -250,17 +250,6 @@ struct vout_sys_t
     mtime_t             i_time_button_last_pressed;   /* to track dbl-clicks */
     Pixmap              cursor_pixmap;
 
-    /* Window manager properties */
-    Atom                net_wm_state;
-    Atom                net_wm_state_fullscreen;
-    bool          b_net_wm_state_fullscreen;
-    Atom                net_wm_state_above;
-    bool          b_net_wm_state_above;
-    Atom                net_wm_state_stays_on_top;
-    bool          b_net_wm_state_stays_on_top;
-    Atom                net_wm_state_below;
-    bool          b_net_wm_state_below;
-
 #ifdef MODULE_NAME_IS_glx
     /* GLX properties */
     int                 b_glx13;
