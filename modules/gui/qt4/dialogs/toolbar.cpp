@@ -480,7 +480,6 @@ void DroppingController::resetLine( const QString& line )
 {
     hide();
     QLayoutItem *child;
-    int i =0;
     while( (child = controlLayout->takeAt( 0 ) ) != 0 )
     {
         child->widget()->hide();
