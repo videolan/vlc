@@ -1251,6 +1251,7 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
     var_SetBool( p_vout, "fullscreen", p_vout->b_fullscreen );
 }
 
+#ifndef UNDER_CE
 void DisableScreensaver( vout_thread_t *p_vout )
 {
     /* disable screensaver by temporarily changing system settings */
@@ -1294,6 +1295,7 @@ void RestoreScreensaver( vout_thread_t *p_vout )
             p_vout->p_sys->i_spi_screensavetimeout, NULL, 0);
     }
 }
+#endif
 
 int CreateEventThread( vout_thread_t *p_vout )
 {
