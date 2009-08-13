@@ -3702,7 +3702,6 @@ then
       VLC_ADD_CPPFLAGS([freetype skins2],[${FREETYPE_CFLAGS}])
       VLC_ADD_LIBS([freetype skins2],[${FREETYPE_LIBS}])
       if test "${SYS}" = "mingw32"; then
-        VLC_ADD_LIBS([skins2],[-lxml2])
         VLC_ADD_LIBS([freetype],[-liconv -lz])
       fi
       if test "${enable_fontconfig}" != "no"
