@@ -9,6 +9,7 @@
  *          Gildas Bazin <gbazin@netcourrier.com>
  *          Clément Sténac
  *          Rémi Denis-Courmont
+ *          Pierre Ynard
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +36,9 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <limits.h>
+#ifdef UNDER_CE
+# include <mmsystem.h>
+#endif
 
 static vlc_threadvar_t cancel_key;
 
@@ -638,11 +642,17 @@ void vlc_control_cancel (int cmd, ...)
 /*** Timers ***/
 struct vlc_timer
 {
+#ifndef UNDER_CE
     HANDLE handle;
+#else
+    unsigned id;
+    unsigned interval;
+#endif
     void (*func) (void *);
     void *data;
 };
 
+#ifndef UNDER_CE
 static void CALLBACK vlc_timer_do (void *val, BOOLEAN timeout)
 {
     struct vlc_timer *timer = val;
@@ -650,6 +660,26 @@ static void CALLBACK vlc_timer_do (void *val, BOOLEAN timeout)
     assert (timeout);
     timer->func (timer->data);
 }
+#else
+static void CALLBACK vlc_timer_do (unsigned timer_id, unsigned msg,
+                                   DWORD_PTR user, DWORD_PTR unused1,
+                                   DWORD_PTR unused2)
+{
+    struct vlc_timer *timer = (struct vlc_timer *) user;
+    assert (timer_id == timer->id);
+    (void) msg;
+    (void) unused1;
+    (void) unused2;
+
+    timer->func (timer->data);
+
+    if (timer->interval)
+    {
+        mtime_t interval = timer->interval * 1000;
+        vlc_timer_schedule (timer, false, interval, interval);
+    }
+}
+#endif
 
 int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 {
@@ -659,26 +689,46 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
         return ENOMEM;
     timer->func = func;
     timer->data = data;
+#ifndef UNDER_CE
     timer->handle = INVALID_HANDLE_VALUE;
+#else
+    timer->id = 0;
+    timer->interval = 0;
+#endif
     *id = timer;
     return 0;
 }
 
 void vlc_timer_destroy (vlc_timer_t timer)
 {
+#ifndef UNDER_CE
     if (timer->handle != INVALID_HANDLE_VALUE)
         DeleteTimerQueueTimer (NULL, timer->handle, INVALID_HANDLE_VALUE);
+#else
+    if (timer->id)
+        timeKillEvent (timer->id);
+    /* FIXME: timers that have not yet completed will trigger use-after-free */
+#endif
     free (timer);
 }
 
 void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
                          mtime_t value, mtime_t interval)
 {
+#ifndef UNDER_CE
     if (timer->handle != INVALID_HANDLE_VALUE)
     {
         DeleteTimerQueueTimer (NULL, timer->handle, NULL);
         timer->handle = INVALID_HANDLE_VALUE;
     }
+#else
+    if (timer->id)
+    {
+        timeKillEvent (timer->id);
+        timer->id = 0;
+        timer->interval = 0;
+    }
+#endif
     if (value == 0)
         return; /* Disarm */
 
@@ -686,8 +736,29 @@ void vlc_timer_schedule (vlc_timer_t timer, bool absolute,
         value -= mdate ();
     value = (value + 999) / 1000;
     interval = (interval + 999) / 1000;
+
+#ifndef UNDER_CE
     if (!CreateTimerQueueTimer (&timer->handle, NULL, vlc_timer_do, timer,
                                 value, interval, WT_EXECUTEDEFAULT))
+#else
+    TIMECAPS caps;
+    timeGetDevCaps (&caps, sizeof(caps));
+
+    unsigned delay = value;
+    delay = __MAX(delay, caps.wPeriodMin);
+    delay = __MIN(delay, caps.wPeriodMax);
+
+    unsigned event = TIME_ONESHOT;
+
+    if (interval == delay)
+        event = TIME_PERIODIC;
+    else if (interval)
+        timer->interval = interval;
+
+    timer->id = timeSetEvent (delay, delay / 20, vlc_timer_do, (DWORD) timer,
+                              event);
+    if (!timer->id)
+#endif
         abort ();
 }
 
