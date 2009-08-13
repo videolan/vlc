@@ -231,4 +231,4 @@ GSM_VERSION=1.0.12
 GSM_URL=http://user.cs.tu-berlin.de/~jutta/gsm/gsm-$(GSM_VERSION).tar.gz
 SPARKLE_VERSION=1.5b6-vlc
 #SPARKLE_URL=http://sparkle.andymatuschak.org/files/Sparkle%20$(SPARKLE_VERSION).zip
-SPARKLE_URL=$(VIDEOLAN)/testing/contrib/Sparkle%20$(SPARKLE_VERSION).zip
+SPARKLE_URL=$(VIDEOLAN)/testing/contrib/Sparkle-$(SPARKLE_VERSION).zip
