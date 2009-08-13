@@ -75,11 +75,6 @@ VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
     /* Set the policy to expand in both directions */
 //    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
-    /* Indicates that the widget wants to draw directly onto the screen.
-       Widgets with this attribute set do not participate in composition
-       management */
-    setAttribute( Qt::WA_PaintOnScreen, true );
-
     layout = new QHBoxLayout( this );
     layout->setContentsMargins( 0, 0, 0, 0 );
     setLayout( layout );
@@ -136,6 +131,9 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
     plt.setColor( QPalette::Window, Qt::black );
     stable->setPalette( plt );
     stable->setAutoFillBackground(true);
+    /* Indicates that the widget wants to draw directly onto the screen.
+       Widgets with this attribute set do not participate in composition
+       management */
     stable->setAttribute( Qt::WA_PaintOnScreen, true );
 
     innerLayout->addWidget( stable );
