@@ -166,8 +166,8 @@ public:
         }
     }
 private:
-    int id;
     QMenu *menu;
+    int id;
 };
 
 #endif
