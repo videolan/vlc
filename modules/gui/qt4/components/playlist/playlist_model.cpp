@@ -322,7 +322,12 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
         int metadata = 1;
 
         if( item->model->i_depth == DEPTH_SEL )
-            return QVariant( QString( qfu( item->p_input->psz_name ) ) );
+        {
+            vlc_mutex_lock( &item->p_input->lock );
+            QString returninfo = QString( qfu( item->p_input->psz_name ) );
+            vlc_mutex_unlock( &item->p_input->lock );
+            return QVariant(returninfo);
+        }
 
         while( metadata < COLUMN_END )
         {
