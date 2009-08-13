@@ -482,6 +482,18 @@ VLC_PUBLIC_API int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi,
  */
 VLC_PUBLIC_API int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e );
 
+
+/**
+ * Display the next frame
+ *
+ * \param p_input the libvlc_media_player_t instance
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void    libvlc_media_player_next_frame( libvlc_media_player_t *p_input,
+                                                       libvlc_exception_t *p_e );
+
+
+
 /**
  * Release (free) libvlc_track_description_t
  *

@@ -1240,3 +1240,12 @@ int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi,
 
     return val.b_bool;
 }
+
+void    libvlc_media_player_next_frame( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    if( p_input_thread != NULL )
+        var_TriggerCallback( p_input_thread, "frame-next" );
+    else
+        libvlc_exception_raise( p_e, "Input thread is NULL" );
+}
