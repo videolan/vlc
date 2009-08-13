@@ -60,22 +60,20 @@ public:
 
     PLItem *parent() { return parentItem; };
 
-    QString columnString( int col ) { return item_col_strings.value( col ); };
-
     void update( playlist_item_t *, bool );
 
 protected:
     QList<PLItem*> children;
-    QList<QString> item_col_strings;
     bool b_current;
     int i_type;
     int i_id;
     int i_input_id;
     int i_showflags;
     bool b_is_node;
+    input_item_t *p_input;
 
 private:
-    void init( int, int, bool, PLItem *, PLModel *, QSettings * );
+    void init( playlist_item_t *, PLItem *, PLModel *, QSettings * );
     void updateColumnHeaders();
     PLItem *parentItem;
     PLModel *model;

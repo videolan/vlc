@@ -48,15 +48,17 @@
 */
 
 
-void PLItem::init( int _i_id, int _i_input_id, bool _is_node, PLItem *parent, PLModel *m, QSettings *settings )
+void PLItem::init( playlist_item_t *_playlist_item, PLItem *parent, PLModel *m, QSettings *settings )
 {
     parentItem = parent;          /* Can be NULL, but only for the rootItem */
-    i_id       = _i_id;           /* Playlist item specific id */
-    i_input_id = _i_input_id;     /* Identifier of the input */
+    i_id       = _playlist_item->i_id;           /* Playlist item specific id */
+    i_input_id = _playlist_item->p_input->i_id;     /* Identifier of the input */
     model      = m;               /* PLModel (QAbsmodel) */
     i_type     = -1;              /* Item type - Avoid segfault */
     b_current  = false;           /* Is the item the current Item or not */
-    b_is_node = _is_node;
+    b_is_node  = _playlist_item->i_children > 1;
+    p_input    = _playlist_item->p_input;
+    vlc_gc_incref( p_input );
 
     assert( model );              /* We need a model */
 
@@ -66,7 +68,6 @@ void PLItem::init( int _i_id, int _i_input_id, bool _is_node, PLItem *parent, PL
         if( model->i_depth == DEPTH_SEL )  /* Selector Panel */
         {
             i_showflags = 0;
-            item_col_strings.append( "" );
         }
         else
         {
@@ -83,7 +84,6 @@ void PLItem::init( int _i_id, int _i_input_id, bool _is_node, PLItem *parent, PL
     {
         i_showflags = parentItem->i_showflags;
         //Add empty string and update() handles data appending
-        item_col_strings.append( "" );
     }
 }
 
@@ -92,21 +92,14 @@ void PLItem::init( int _i_id, int _i_input_id, bool _is_node, PLItem *parent, PL
    Call the above function init
    So far the first constructor isn't used...
    */
-PLItem::PLItem( int _i_id, int _i_input_id, bool _is_node, PLItem *parent, PLModel *m )
+PLItem::PLItem( playlist_item_t *p_item, PLItem *parent, PLModel *m )
 {
-    init( _i_id, _i_input_id, _is_node, parent, m, NULL );
-}
-
-PLItem::PLItem( playlist_item_t * p_item, PLItem *parent, PLModel *m )
-{
-    init( p_item->i_id, p_item->p_input->i_id, p_item->i_children > -1,
-        parent, m, NULL );
+    init( p_item, parent, m, NULL );
 }
 
 PLItem::PLItem( playlist_item_t * p_item, QSettings *settings, PLModel *m )
 {
-    init( p_item->i_id, p_item->p_input->i_id, p_item->i_children > -1,
-        NULL, m, settings );
+    init( p_item, NULL, m, settings );
 }
 
 PLItem::~PLItem()
@@ -118,15 +111,7 @@ PLItem::~PLItem()
 /* Column manager */
 void PLItem::updateColumnHeaders()
 {
-    item_col_strings.clear();
-
     assert( i_showflags < COLUMN_END );
-
-    for( uint32_t i_index=1; i_index < COLUMN_END; i_index <<= 1 )
-    {
-        if( i_showflags & i_index )
-            item_col_strings.append( qfu( psz_column_title( i_index ) ) );
-    }
 }
 
 /* So far signal is always true.
@@ -179,31 +164,6 @@ void PLItem::update( playlist_item_t *p_item, bool iscurrent )
     b_current = iscurrent;
     b_is_node = p_item->i_children > -1;
 
-    item_col_strings.clear();
-
-    if( model->i_depth == 1 )  /* Selector Panel */
-    {
-        item_col_strings.append( qfu( p_item->p_input->psz_name ) );
-        return;
-    }
-
     i_showflags = parentItem ? parentItem->i_showflags : i_showflags;
-
-    /* Meta: ID */
-    if( i_showflags & COLUMN_NUMBER )
-    {
-        QModelIndex idx = model->index( this, 0 );
-        item_col_strings.append( QString::number( idx.row() + 1 ) );
-    }
-    /* Other meta informations */
-    for( uint32_t i_index=2; i_index < COLUMN_END; i_index <<= 1 )
-    {
-        if( i_showflags & i_index )
-        {
-            char *psz = psz_column_meta( p_item->p_input, i_index );
-            item_col_strings.append( qfu( psz ) );
-            free( psz );
-        }
-    }
 }
 

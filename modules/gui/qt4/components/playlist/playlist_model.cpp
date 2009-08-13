@@ -317,7 +317,34 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
     PLItem *item = static_cast<PLItem*>(index.internalPointer());
     if( role == Qt::DisplayRole )
     {
-        return QVariant( item->columnString( index.column() ) );
+        int running_index = -1;
+        int columncount = 0;
+        int metadata = 1;
+
+        if( item->model->i_depth == DEPTH_SEL )
+            return QVariant( QString( qfu( item->p_input->psz_name ) ) );
+
+        while( metadata < COLUMN_END )
+        {
+            if( item->i_showflags & metadata )
+                running_index++;
+            if( running_index == index.column() )
+                break;
+            metadata <<= 1;
+        }
+
+        if( running_index != index.column() ) return QVariant();
+
+        QString returninfo;
+        if( metadata == COLUMN_NUMBER )
+            returninfo = QString::number( index.row() + 1 );
+        else
+        {
+            char *psz = psz_column_meta( item->p_input, metadata );
+            returninfo = QString( qfu( psz ) );
+            free( psz );
+        }
+        return QVariant( returninfo );
     }
     else if( role == Qt::DecorationRole && index.column() == 0  )
     {
@@ -350,9 +377,25 @@ int PLModel::itemId( const QModelIndex &index ) const
 QVariant PLModel::headerData( int section, Qt::Orientation orientation,
                               int role ) const
 {
-    if (orientation == Qt::Horizontal && role == Qt::DisplayRole)
-            return QVariant( rootItem->columnString( section ) );
-    return QVariant();
+    int metadata=1;
+    int running_index=-1;
+    if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
+        return QVariant();
+
+    if( i_depth == DEPTH_SEL ) return QVariant( QString("") );
+
+    while( metadata < COLUMN_END )
+    {
+        if( metadata & rootItem->i_showflags )
+            running_index++;
+        if( running_index == section )
+            break;
+        metadata <<= 1;
+    }
+
+    if( running_index != section ) return QVariant();
+
+    return QVariant( qfu( psz_column_title( metadata ) ) );
 }
 
 QModelIndex PLModel::index( int row, int column, const QModelIndex &parent )
@@ -407,7 +450,17 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
 
 int PLModel::columnCount( const QModelIndex &i) const
 {
-    return rootItem->item_col_strings.count();
+    int columnCount=0;
+    int metadata=1;
+    if( i_depth == DEPTH_SEL ) return 1;
+
+    while( metadata < COLUMN_END )
+    {
+        if( metadata & rootItem->i_showflags )
+            columnCount++;
+        metadata <<= 1;
+    }
+    return columnCount;
 }
 
 int PLModel::childrenCount( const QModelIndex &parent ) const
@@ -874,7 +927,7 @@ void PLModel::viewchanged( int meta )
         }
 
         /* UNUSED        emit layoutAboutToBeChanged(); */
-        index = __MIN( index, rootItem->item_col_strings.count() );
+        index = __MIN( index, columnCount() );
         QModelIndex parent = createIndex( 0, 0, rootItem );
 
         if( rootItem->i_showflags & meta )
@@ -883,7 +936,6 @@ void PLModel::viewchanged( int meta )
             beginRemoveColumns( parent, index, index+1 );
             rootItem->i_showflags &= ~( meta );
             getSettings()->setValue( "qt-pl-showflags", rootItem->i_showflags );
-            rootItem->updateColumnHeaders();
             endRemoveColumns();
         }
         else
@@ -892,7 +944,6 @@ void PLModel::viewchanged( int meta )
             beginInsertColumns( parent, index, index+1 );
             rootItem->i_showflags |= meta;
             getSettings()->setValue( "qt-pl-showflags", rootItem->i_showflags );
-            rootItem->updateColumnHeaders();
             endInsertColumns();
         }
         emit columnsChanged( meta );
