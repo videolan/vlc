@@ -204,10 +204,10 @@ public slots:
     {
         requestUpdate();
     }
+    void showArtUpdate( const QString& );
 
 private slots:
     void askForUpdate();
-    void showArtUpdate( const QString& );
 
 signals:
     void updateRequested();

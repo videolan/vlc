@@ -32,6 +32,7 @@
 #include "components/interface_widgets.hpp"
 
 #include <assert.h>
+#include <vlc_url.h>
 
 #include <QTreeWidget>
 #include <QHeaderView>
@@ -225,6 +226,21 @@ void MetaPanel::update( input_item_t *p_item )
 
 #undef UPDATE_META_INT
 #undef UPDATE_META
+
+    // If a artURL is available as a local file, directly display it !
+
+    QString file;
+    char *psz_art = input_item_GetArtURL( p_item );
+    if( psz_art && !strncmp( psz_art, "file://", 7 ) &&
+                decode_URI( psz_art + 7 ) )
+#ifdef WIN32
+        file = qfu( psz_art + 8 ); // Remove extra / on Win32 URI.
+#else
+        file = qfu( psz_art + 7 );
+#endif
+    free( psz_art );
+
+    art_cover->showArtUpdate( file );
 
 }
 

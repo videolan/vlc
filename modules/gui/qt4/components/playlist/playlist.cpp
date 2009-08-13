@@ -60,6 +60,9 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) : p_intf ( _p_i )
     art = new ArtLabel( artContainer, p_intf );
     art->setToolTip( qtr( "Double click to get media information" ) );
 
+    CONNECT( THEMIM->getIM(), artChanged( QString ),
+             art, showArtUpdate( const QString& ) );
+
     artContLay->addWidget( art, 1 );
 
     leftW->addWidget( artContainer );

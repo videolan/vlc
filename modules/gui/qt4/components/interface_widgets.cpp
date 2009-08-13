@@ -245,6 +245,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
     label->setMaximumWidth( MAX_BG_SIZE );
     label->setMinimumHeight( MIN_BG_SIZE );
     label->setMinimumWidth( MIN_BG_SIZE );
+    label->setAlignment( Qt::AlignCenter );
     if( QDate::currentDate().dayOfYear() >= 354 )
         label->setPixmap( QPixmap( ":/logo/vlc128-christmas.png" ) );
     else
@@ -281,7 +282,15 @@ void BackgroundWidget::updateArt( const QString& url )
     }
     else
     {
-        label->setPixmap( QPixmap( url ) );
+        QPixmap pixmap( url );
+        if( pixmap.width() > label->maximumWidth() ||
+            pixmap.height() > label->maximumHeight() )
+        {
+            pixmap = pixmap.scaled( label->maximumWidth(),
+                          label->maximumHeight(), Qt::KeepAspectRatio );
+        }
+
+        label->setPixmap( pixmap );
     }
 }
 
@@ -479,14 +488,13 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
 {
     setContextMenuPolicy( Qt::ActionsContextMenu );
     CONNECT( this, updateRequested(), this, askForUpdate() );
-    CONNECT( THEMIM->getIM(), artChanged( QString ),
-             this, showArtUpdate( const QString& ) );
 
     setMinimumHeight( 128 );
     setMinimumWidth( 128 );
     setMaximumHeight( 128 );
     setMaximumWidth( 128 );
-    setScaledContents( true );
+    setScaledContents( false );
+    setAlignment( Qt::AlignCenter );
 
     QList< QAction* > artActions = actions();
     QAction *action = new QAction( qtr( "Download cover art" ), this );
@@ -508,12 +516,14 @@ void CoverArtLabel::showArtUpdate( const QString& url )
     QPixmap pix;
     if( !url.isEmpty()  && pix.load( url ) )
     {
-        setPixmap( pix );
+        pix = pix.scaled( maximumWidth(), maximumHeight(),
+                          Qt::KeepAspectRatioByExpanding );
     }
     else
     {
-        setPixmap( QPixmap( ":/noart.png" ) );
+        pix = QPixmap( ":/noart.png" );
     }
+    setPixmap( pix );
 }
 
 void CoverArtLabel::askForUpdate()
