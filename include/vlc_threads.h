@@ -112,7 +112,15 @@ typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
 
 #elif defined( WIN32 )
+#if !defined( UNDER_CE )
 typedef HANDLE vlc_thread_t;
+#else
+typedef struct
+{
+    HANDLE handle;
+    HANDLE cancel_event;
+} *vlc_thread_t;
+#endif
 
 typedef struct
 {

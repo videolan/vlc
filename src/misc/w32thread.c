@@ -411,6 +411,9 @@ struct vlc_entry_data
 {
     void * (*func) (void *);
     void *  data;
+#ifdef UNDER_CE
+    HANDLE  cancel_event;
+#endif
 };
 
 static unsigned __stdcall vlc_entry (void *p)
@@ -422,7 +425,7 @@ static unsigned __stdcall vlc_entry (void *p)
     free (p);
 
 #ifdef UNDER_CE
-    cancel_data.cancel_event = data.handle->cancel_event;
+    cancel_data.cancel_event = data.cancel_event;
 #endif
 
     vlc_threadvar_set (cancel_key, &cancel_data);
@@ -433,10 +436,7 @@ static unsigned __stdcall vlc_entry (void *p)
 int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
                int priority)
 {
-    /* When using the MSVCRT C library you have to use the _beginthreadex
-     * function instead of CreateThread, otherwise you'll end up with
-     * memory leaks and the signal functions not working (see Microsoft
-     * Knowledge Base, article 104641) */
+    int err = ENOMEM;
     HANDLE hThread;
 
     struct vlc_entry_data *entry_data = malloc (sizeof (*entry_data));
@@ -445,51 +445,73 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
     entry_data->func = entry;
     entry_data->data = data;
 
-#if defined( UNDER_CE )
+#ifndef UNDER_CE
+    /* When using the MSVCRT C library you have to use the _beginthreadex
+     * function instead of CreateThread, otherwise you'll end up with
+     * memory leaks and the signal functions not working (see Microsoft
+     * Knowledge Base, article 104641) */
+    hThread = (HANDLE)(uintptr_t)
+        _beginthreadex (NULL, 0, vlc_entry, entry_data, CREATE_SUSPENDED, NULL);
+    if (! hThread)
+    {
+        err = errno;
+        goto error;
+    }
+
+    /* Thread closes the handle when exiting, duplicate it here
+     * to be on the safe side when joining. */
+    if (!DuplicateHandle (GetCurrentProcess (), hThread,
+                          GetCurrentProcess (), p_handle, 0, FALSE,
+                          DUPLICATE_SAME_ACCESS))
+    {
+        CloseHandle (hThread);
+        goto error;
+    }
+
+#else
+    vlc_thread_t th = malloc (sizeof (*th));
+    if (th == NULL)
+        goto error;
     th->cancel_event = CreateEvent (NULL, FALSE, FALSE, NULL);
     if (th->cancel_event == NULL)
     {
-        free (entry_data);
-        return errno;
+        free (th);
+        goto error;
     }
-    hThread = CreateThread (NULL, 128*1024, vlc_entry, entry_data, CREATE_SUSPENDED, NULL);
-#else
-    hThread = (HANDLE)(uintptr_t)
-        _beginthreadex (NULL, 0, vlc_entry, entry_data, CREATE_SUSPENDED, NULL);
-#endif
+    entry_data->cancel_event = th->cancel_event;
 
-    if (hThread)
+    /* Not sure if CREATE_SUSPENDED + ResumeThread() is any useful on WinCE.
+     * Thread handles act up, too. */
+    th->handle = CreateThread (NULL, 128*1024, vlc_entry, entry_data,
+                               CREATE_SUSPENDED, NULL);
+    if (th->handle == NULL)
     {
-#ifndef UNDER_CE
-        /* Thread closes the handle when exiting, duplicate it here
-         * to be on the safe side when joining. */
-        if (!DuplicateHandle (GetCurrentProcess (), hThread,
-                              GetCurrentProcess (), p_handle, 0, FALSE,
-                              DUPLICATE_SAME_ACCESS))
-        {
-            CloseHandle (hThread);
-            free (entry_data);
-            return ENOMEM;
-        }
-#else
-        th->handle = hThread;
-#endif
-
-        ResumeThread (hThread);
-        if (priority)
-            SetThreadPriority (hThread, priority);
-        return 0;
+        CloseHandle (th->cancel_event);
+        free (th);
+        goto error;
     }
 
-#ifdef UNDER_CE
-    CloseHandle (th->cancel_event);
+    *p_handle = th;
+    hThread = th->handle;
+
 #endif
+
+    ResumeThread (hThread);
+    if (priority)
+        SetThreadPriority (hThread, priority);
+
+    return 0;
+
+error:
     free (entry_data);
-    return errno;
+    return err;
 }
 
 void vlc_join (vlc_thread_t handle, void **result)
 {
+#ifdef UNDER_CE
+# define handle handle->handle
+#endif
     do
         vlc_testcancel ();
     while (WaitForSingleObjectEx (handle, INFINITE, TRUE)
@@ -498,13 +520,21 @@ void vlc_join (vlc_thread_t handle, void **result)
     CloseHandle (handle);
     assert (result == NULL); /* <- FIXME if ever needed */
 #ifdef UNDER_CE
+# undef handle
     CloseHandle (handle->cancel_event);
+    free (handle);
 #endif
 }
 
 void vlc_detach (vlc_thread_t handle)
 {
+#ifndef UNDER_CE
     CloseHandle (handle);
+#else
+    /* FIXME: handle->cancel_event leak */
+    CloseHandle (handle->handle);
+    free (handle);
+#endif
 }
 
 /*** Thread cancellation ***/
