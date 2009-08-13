@@ -45,6 +45,15 @@
 #ifdef Q_WS_X11
 # include <X11/Xlib.h>
 # include <qx11info_x11.h>
+static void videoSync( void )
+{
+    /* Make sure the X server has processed all requests.
+     * This protects other threads using distinct connections from getting
+     * the video widget window in an inconsistent states. */
+    XSync( QX11Info::display(), False );
+}
+#else
+# define videoSync() (void)0
 #endif
 
 #include <math.h>
@@ -133,8 +142,8 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
 
     reparentable->setLayout( innerLayout );
     layout->addWidget( reparentable );
-    updateGeometry();
 
+    videoSync();
 #ifndef NDEBUG
     msg_Dbg( p_intf, "embedded video ready (handle %p)",
              (void *)stable->winId() );
@@ -152,6 +161,7 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
     videoSize.rheight() = h;
     if( !isVisible() ) show();
     updateGeometry(); // Needed for deinterlace
+    videoSync();
 }
 
 void VideoWidget::SetFullScreen( bool b_fs )
@@ -186,6 +196,7 @@ void VideoWidget::SetFullScreen( bool b_fs )
         layout->addWidget( reparentable );
         reparentable->setWindowState( newstate );
     }
+    videoSync();
 }
 
 void VideoWidget::release( void )
