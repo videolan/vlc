@@ -40,7 +40,6 @@ class PLItem
 {
     friend class PLModel;
 public:
-    PLItem( int, int, bool, PLItem *parent , PLModel * );
     PLItem( playlist_item_t *, PLItem *parent, PLModel * );
     PLItem( playlist_item_t *, QSettings *, PLModel * );
     ~PLItem();
@@ -74,7 +73,6 @@ protected:
 
 private:
     void init( playlist_item_t *, PLItem *, PLModel *, QSettings * );
-    void updateColumnHeaders();
     PLItem *parentItem;
     PLModel *model;
 };

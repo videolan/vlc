@@ -77,20 +77,17 @@ void PLItem::init( playlist_item_t *_playlist_item, PLItem *parent, PLModel *m, 
             else if ( i_showflags >= COLUMN_END )
                 i_showflags = COLUMN_END - 1; /* show everything */
 
-            updateColumnHeaders();
         }
     }
     else
     {
         i_showflags = parentItem->i_showflags;
-        //Add empty string and update() handles data appending
     }
 }
 
 /*
    Constructors
    Call the above function init
-   So far the first constructor isn't used...
    */
 PLItem::PLItem( playlist_item_t *p_item, PLItem *parent, PLModel *m )
 {
@@ -107,12 +104,6 @@ PLItem::~PLItem()
     vlc_gc_decref( p_input );
     qDeleteAll( children );
     children.clear();
-}
-
-/* Column manager */
-void PLItem::updateColumnHeaders()
-{
-    assert( i_showflags < COLUMN_END );
 }
 
 /* So far signal is always true.
@@ -149,13 +140,6 @@ int PLItem::row() const
 }
 
 /* update the PL Item, get the good names and so on */
-/* This function may not be the best way to do it
-   It destroys everything and gets everything again instead of just
-   building the necessary columns.
-   This does extra work if you re-display the same column. Slower...
-   On the other hand, this way saves memory.
-   There must be a more clever way.
-   */
 void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 {
     assert( p_item->p_input->i_id == i_input_id );
