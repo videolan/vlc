@@ -72,8 +72,6 @@ protected:
         return NULL;
     }
 
-    virtual void paintEvent(QPaintEvent *);
-
 private:
     intf_thread_t *p_intf;
 
