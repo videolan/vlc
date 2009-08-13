@@ -2510,6 +2510,9 @@ libass-$(ASS_VERSION).tar.bz2:
 
 libass:
 	$(GIT) clone $(ASS_GIT)
+ifdef HAVE_WIN32
+	(cd $@; patch -p1 < ../Patches/libass-win32.patch)
+endif
 	(cd $@; autoreconf -ivf)
 
 .libass: libass
