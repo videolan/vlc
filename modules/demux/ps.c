@@ -1,7 +1,7 @@
 /*****************************************************************************
  * ps.c: Program Stream demux module for VLC.
  *****************************************************************************
- * Copyright (C) 2004 the VideoLAN team
+ * Copyright (C) 2004-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
