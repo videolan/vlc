@@ -41,6 +41,7 @@
 #include <QDate>
 #include <QMenu>
 #include <QWidgetAction>
+#include <QDesktopWidget>
 
 #ifdef Q_WS_X11
 # include <X11/Xlib.h>
@@ -160,6 +161,7 @@ void VideoWidget::SetFullScreen( bool b_fs )
     Qt::WindowStates newstate = curstate;
     Qt::WindowFlags  newflags = reparentable->windowFlags();
 
+
     if( b_fs )
     {
         newstate |= Qt::WindowFullScreen;
@@ -175,9 +177,18 @@ void VideoWidget::SetFullScreen( bool b_fs )
 
     if( b_fs )
     {   /* Go full-screen */
-        reparentable->setWindowState( newstate );
+        int numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+        QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
+
         reparentable->setParent( NULL );
+        reparentable->setWindowState( newstate );
         reparentable->setWindowFlags( newflags );
+        /* To be sure window is on proper-screen in xinerama */
+        if( !screenres.contains( reparentable->pos() ) )
+        {
+            msg_Dbg( p_intf, "Moving video to correct screen");
+            reparentable->move( QPoint( screenres.x(), screenres.y() ) );
+        }
         reparentable->show();
     }
     else
