@@ -157,9 +157,8 @@ void DialogHandler::requestAnswer (vlc_object_t *, void *value)
         ? box->addButton ("&" + qfu(data->yes), QMessageBox::YesRole) : NULL;
     QAbstractButton *no = (data->no != NULL)
         ? box->addButton ("&" + qfu(data->no), QMessageBox::NoRole) : NULL;
-    QAbstractButton *cancel = (data->cancel != NULL)
-        ? box->addButton ("&" + qfu(data->cancel), QMessageBox::RejectRole)
-        : NULL;
+    if (data->cancel != NULL)
+        box->addButton ("&" + qfu(data->cancel), QMessageBox::RejectRole);
 
     box->exec ();
 
