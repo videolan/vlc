@@ -104,6 +104,7 @@ PLItem::PLItem( playlist_item_t * p_item, QSettings *settings, PLModel *m )
 
 PLItem::~PLItem()
 {
+    vlc_gc_decref( p_input );
     qDeleteAll( children );
     children.clear();
 }
