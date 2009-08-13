@@ -42,7 +42,7 @@ enum
 #define COLUMN_DEFAULT (COLUMN_TITLE|COLUMN_DURATION|COLUMN_ALBUM)
 
 /* Return the title of a column */
-static const char * psz_column_title( uint32_t i_column )
+static inline const char * psz_column_title( uint32_t i_column )
 {
     switch( i_column )
     {
@@ -61,7 +61,7 @@ static const char * psz_column_title( uint32_t i_column )
 
 /* Return the meta data associated with an item for a column
  * Returned value has to be freed */
-static char * psz_column_meta( input_item_t *p_item, uint32_t i_column )
+static inline char * psz_column_meta( input_item_t *p_item, uint32_t i_column )
 {
     int i_duration;
     char psz_duration[MSTRTIME_MAX_SIZE];
