@@ -326,7 +326,6 @@ typedef struct aout_output_t
     void                 (* pf_play)( aout_instance_t * );
     int                  (* pf_volume_get )( aout_instance_t *, audio_volume_t * );
     int                  (* pf_volume_set )( aout_instance_t *, audio_volume_t );
-    int                  (* pf_volume_infos )( aout_instance_t *, audio_volume_t * );
     int                     i_nb_samples;
 
     /* Current volume for the output - it's just a placeholder, the plug-in
@@ -445,8 +444,6 @@ VLC_EXPORT( void, aout_VolumeNoneInit, ( aout_instance_t * ) );
 VLC_EXPORT( int, __aout_VolumeGet, ( vlc_object_t *, audio_volume_t * ) );
 #define aout_VolumeSet(a, b) __aout_VolumeSet(VLC_OBJECT(a), b)
 VLC_EXPORT( int, __aout_VolumeSet, ( vlc_object_t *, audio_volume_t ) );
-#define aout_VolumeInfos(a, b) __aout_VolumeInfos(VLC_OBJECT(a), b)
-VLC_EXPORT( int, __aout_VolumeInfos, ( vlc_object_t *, audio_volume_t * ) );
 #define aout_VolumeUp(a, b, c) __aout_VolumeUp(VLC_OBJECT(a), b, c)
 VLC_EXPORT( int, __aout_VolumeUp, ( vlc_object_t *, int, audio_volume_t * ) );
 #define aout_VolumeDown(a, b, c) __aout_VolumeDown(VLC_OBJECT(a), b, c)

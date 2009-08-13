@@ -123,33 +123,6 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 }
 
 /*****************************************************************************
- * aout_VolumeInfos : get the boundary pi_soft
- *****************************************************************************/
-int __aout_VolumeInfos( vlc_object_t * p_object, audio_volume_t * pi_soft )
-{
-    aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
-                                                FIND_ANYWHERE );
-    int i_result;
-
-    if ( p_aout == NULL ) return 0;
-
-    aout_lock_mixer( p_aout );
-    if ( p_aout->mixer.b_error )
-    {
-        /* The output module is destroyed. */
-        i_result = -1;
-    }
-    else
-    {
-        i_result = p_aout->output.pf_volume_infos( p_aout, pi_soft );
-    }
-    aout_unlock_mixer( p_aout );
-
-    vlc_object_release( p_aout );
-    return i_result;
-}
-
-/*****************************************************************************
  * aout_VolumeUp : raise the output volume
  *****************************************************************************
  * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
@@ -228,7 +201,6 @@ void aout_VolumeSoftInit( aout_instance_t * p_aout )
 {
     int i_volume;
 
-    p_aout->output.pf_volume_infos = aout_VolumeSoftInfos;
     p_aout->output.pf_volume_get = aout_VolumeSoftGet;
     p_aout->output.pf_volume_set = aout_VolumeSoftSet;
 
@@ -243,14 +215,6 @@ void aout_VolumeSoftInit( aout_instance_t * p_aout )
     }
 
     aout_VolumeSoftSet( p_aout, (audio_volume_t)i_volume );
-}
-
-/* Placeholder for pf_volume_infos(). */
-int aout_VolumeSoftInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
-{
-    (void)p_aout;
-    *pi_soft = 0;
-    return 0;
 }
 
 /* Placeholder for pf_volume_get(). */
@@ -277,16 +241,8 @@ int aout_VolumeSoftSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 /* Meant to be called by the output plug-in's Open(). */
 void aout_VolumeNoneInit( aout_instance_t * p_aout )
 {
-    p_aout->output.pf_volume_infos = aout_VolumeNoneInfos;
     p_aout->output.pf_volume_get = aout_VolumeNoneGet;
     p_aout->output.pf_volume_set = aout_VolumeNoneSet;
-}
-
-/* Placeholder for pf_volume_infos(). */
-int aout_VolumeNoneInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
-{
-    (void)p_aout; (void)pi_soft;
-    return -1;
 }
 
 /* Placeholder for pf_volume_get(). */

@@ -132,7 +132,6 @@ static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
 static void CALLBACK WaveOutCallback ( HWAVEOUT, UINT, DWORD, DWORD, DWORD );
 static void* WaveOutThread( vlc_object_t * );
 
-static int VolumeInfos( aout_instance_t *, audio_volume_t * );
 static int VolumeGet( aout_instance_t *, audio_volume_t * );
 static int VolumeSet( aout_instance_t *, audio_volume_t );
 
@@ -392,7 +391,6 @@ static int Open( vlc_object_t *p_this )
             if( waveOutGetVolume( p_aout->output.p_sys->h_waveout, &i_dummy )
                 == MMSYSERR_NOERROR )
             {
-                p_aout->output.pf_volume_infos = VolumeInfos;
                 p_aout->output.pf_volume_get = VolumeGet;
                 p_aout->output.pf_volume_set = VolumeSet;
             }
@@ -1108,12 +1106,6 @@ static void* WaveOutThread( vlc_object_t *p_this )
 #undef waveout_warn
     vlc_restorecancel (canc);
     return NULL;
-}
-
-static int VolumeInfos( aout_instance_t * p_aout, audio_volume_t * pi_soft )
-{
-    *pi_soft = AOUT_VOLUME_MAX / 2;
-    return 0;
 }
 
 static int VolumeGet( aout_instance_t * p_aout, audio_volume_t * pi_volume )
