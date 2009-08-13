@@ -108,7 +108,7 @@ typedef struct
     block_t       *pp_blocks[MAX_BLOCKS];
     int           i_blocks;
 
-    audio_date_t  date;
+    date_t        date;
 
 } goom_thread_t;
 
@@ -184,8 +184,8 @@ static int Open( vlc_object_t *p_this )
     vlc_cond_init( &p_thread->wait );
 
     p_thread->i_blocks = 0;
-    aout_DateInit( &p_thread->date, p_filter->output.i_rate );
-    aout_DateSet( &p_thread->date, 0 );
+    date_Init( &p_thread->date, p_filter->output.i_rate, 1 );
+    date_Set( &p_thread->date, 0 );
     p_thread->i_channels = aout_FormatNbChannels( &p_filter->input );
 
     p_thread->psz_title = TitleGet( VLC_OBJECT( p_filter ) );
@@ -263,7 +263,7 @@ static inline int16_t FloatToInt16( float f )
  * Fill buffer
  *****************************************************************************/
 static int FillBuffer( int16_t *p_data, int *pi_data,
-                       audio_date_t *pi_date, audio_date_t *pi_date_end,
+                       date_t *pi_date, date_t *pi_date_end,
                        goom_thread_t *p_this )
 {
     int i_samples = 0;
@@ -279,13 +279,13 @@ static int FillBuffer( int16_t *p_data, int *pi_data,
 
         /* Date management */
         if( p_block->i_pts > 0 &&
-            p_block->i_pts != aout_DateGet( pi_date_end ) )
+            p_block->i_pts != date_Get( pi_date_end ) )
         {
-           aout_DateSet( pi_date_end, p_block->i_pts );
+           date_Set( pi_date_end, p_block->i_pts );
         }
         p_block->i_pts = 0;
 
-        aout_DateIncrement( pi_date_end, i_samples );
+        date_Increment( pi_date_end, i_samples );
 
         while( i_samples > 0 )
         {
@@ -323,7 +323,7 @@ static void* Thread( vlc_object_t *p_this )
 {
     goom_thread_t *p_thread = (goom_thread_t*)p_this;
     int width, height, speed;
-    audio_date_t i_pts;
+    date_t i_pts;
     int16_t p_data[2][512];
     int i_data = 0, i_count = 0;
     PluginInfo *p_plugin_info;
@@ -354,7 +354,7 @@ static void* Thread( vlc_object_t *p_this )
         if( speed && (++i_count % (speed+1)) ) continue;
 
         /* Frame dropping if necessary */
-        if( aout_DateGet( &i_pts ) + GOOM_DELAY <= mdate() ) continue;
+        if( date_Get( &i_pts ) + GOOM_DELAY <= mdate() ) continue;
 
         plane = goom_update( p_plugin_info, p_data, 0, 0.0,
                              p_thread->psz_title, NULL );
@@ -372,7 +372,7 @@ static void* Thread( vlc_object_t *p_this )
 
         memcpy( p_pic->p[0].p_pixels, plane, width * height * 4 );
 
-        p_pic->date = aout_DateGet( &i_pts ) + GOOM_DELAY;
+        p_pic->date = date_Get( &i_pts ) + GOOM_DELAY;
         vout_DisplayPicture( p_thread->p_vout, p_pic );
     }
 
