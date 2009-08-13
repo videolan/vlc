@@ -59,7 +59,7 @@ struct decoder_sys_t
     fluid_settings_t *settings;
     fluid_synth_t    *synth;
     int               soundfont;
-    audio_date_t      end_date;
+    date_t            end_date;
 };
 
 
@@ -110,8 +110,8 @@ static int Open (vlc_object_t *p_this)
         return VLC_EGENERIC;
     }
 
-    aout_DateInit (&p_sys->end_date, p_dec->fmt_out.audio.i_rate);
-    aout_DateSet (&p_sys->end_date, 0);
+    date_Init (&p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1);
+    date_Set (&p_sys->end_date, 0);
 
     return VLC_SUCCESS;
 }
@@ -142,10 +142,10 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
         return NULL;
     *pp_block = NULL;
 
-    if (p_block->i_pts && !aout_DateGet (&p_sys->end_date))
-        aout_DateSet (&p_sys->end_date, p_block->i_pts);
+    if (p_block->i_pts && !date_Get (&p_sys->end_date))
+        date_Set (&p_sys->end_date, p_block->i_pts);
     else
-    if (p_block->i_pts < aout_DateGet (&p_sys->end_date))
+    if (p_block->i_pts < date_Get (&p_sys->end_date))
     {
         msg_Warn (p_dec, "MIDI message in the past?");
         goto drop;
@@ -178,7 +178,7 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
     }
 
     unsigned samples =
-        (p_block->i_pts - aout_DateGet (&p_sys->end_date)) * 441 / 10000;
+        (p_block->i_pts - date_Get (&p_sys->end_date)) * 441 / 10000;
     if (samples == 0)
         return NULL;
 
@@ -186,8 +186,8 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
     if (p_out == NULL)
         goto drop;
 
-    p_out->start_date = aout_DateGet (&p_sys->end_date );
-    p_out->end_date   = aout_DateIncrement (&p_sys->end_date, samples);
+    p_out->start_date = date_Get (&p_sys->end_date );
+    p_out->end_date   = date_Increment (&p_sys->end_date, samples);
     fluid_synth_write_float (p_sys->synth, samples,
                              p_out->p_buffer, 0, 2,
                              p_out->p_buffer, 1, 2);

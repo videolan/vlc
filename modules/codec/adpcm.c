@@ -72,7 +72,7 @@ struct decoder_sys_t
     size_t              i_block;
     size_t              i_samplesperblock;
 
-    audio_date_t        end_date;
+    date_t              end_date;
 };
 
 static void DecodeAdpcmMs    ( decoder_t *, int16_t *, uint8_t * );
@@ -254,8 +254,8 @@ static int OpenDecoder( vlc_object_t *p_this )
         p_dec->fmt_out.audio.i_original_channels =
             pi_channels_maps[p_dec->fmt_in.audio.i_channels];
 
-    aout_DateInit( &p_sys->end_date, p_dec->fmt_out.audio.i_rate );
-    aout_DateSet( &p_sys->end_date, 0 );
+    date_Init( &p_sys->end_date, p_dec->fmt_out.audio.i_rate, 1 );
+    date_Set( &p_sys->end_date, 0 );
 
     p_dec->pf_decode_audio = DecodeBlock;
 
@@ -275,11 +275,11 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
 
     if( p_block->i_pts != 0 &&
-        p_block->i_pts != aout_DateGet( &p_sys->end_date ) )
+        p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
-        aout_DateSet( &p_sys->end_date, p_block->i_pts );
+        date_Set( &p_sys->end_date, p_block->i_pts );
     }
-    else if( !aout_DateGet( &p_sys->end_date ) )
+    else if( !date_Get( &p_sys->end_date ) )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
@@ -300,9 +300,9 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             return NULL;
         }
 
-        p_out->start_date = aout_DateGet( &p_sys->end_date );
+        p_out->start_date = date_Get( &p_sys->end_date );
         p_out->end_date =
-            aout_DateIncrement( &p_sys->end_date, p_sys->i_samplesperblock );
+            date_Increment( &p_sys->end_date, p_sys->i_samplesperblock );
 
         switch( p_sys->codec )
         {

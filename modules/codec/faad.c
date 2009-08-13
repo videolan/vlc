@@ -62,7 +62,7 @@ struct decoder_sys_t
     faacDecHandle *hfaad;
 
     /* samples */
-    audio_date_t date;
+    date_t date;
 
     /* temporary buffer */
     uint8_t *p_buffer;
@@ -134,7 +134,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Misc init */
-    aout_DateSet( &p_sys->date, 0 );
+    date_Set( &p_sys->date, 0 );
     p_dec->fmt_out.i_cat = AUDIO_ES;
 
     if (vlc_CPU() & CPU_CAPABILITY_FPU)
@@ -165,7 +165,7 @@ static int Open( vlc_object_t *p_this )
         p_dec->fmt_out.audio.i_physical_channels
             = p_dec->fmt_out.audio.i_original_channels
             = pi_channels_guessed[i_channels];
-        aout_DateInit( &p_sys->date, i_rate );
+        date_Init( &p_sys->date, i_rate, 1 );
     }
     else
     {
@@ -261,7 +261,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 = p_dec->fmt_out.audio.i_original_channels
                 = pi_channels_guessed[i_channels];
 
-            aout_DateInit( &p_sys->date, i_rate );
+            date_Init( &p_sys->date, i_rate, 1 );
         }
     }
 
@@ -284,14 +284,14 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         p_dec->fmt_out.audio.i_physical_channels
             = p_dec->fmt_out.audio.i_original_channels
             = pi_channels_guessed[i_channels];
-        aout_DateInit( &p_sys->date, i_rate );
+        date_Init( &p_sys->date, i_rate, 1 );
     }
 
-    if( p_block->i_pts != 0 && p_block->i_pts != aout_DateGet( &p_sys->date ) )
+    if( p_block->i_pts != 0 && p_block->i_pts != date_Get( &p_sys->date ) )
     {
-        aout_DateSet( &p_sys->date, p_block->i_pts );
+        date_Set( &p_sys->date, p_block->i_pts );
     }
-    else if( !aout_DateGet( &p_sys->date ) )
+    else if( !date_Get( &p_sys->date ) )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
@@ -353,8 +353,8 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* We decoded a valid frame */
         if( p_dec->fmt_out.audio.i_rate != frame.samplerate )
         {
-            aout_DateInit( &p_sys->date, frame.samplerate );
-            aout_DateSet( &p_sys->date, p_block->i_pts );
+            date_Init( &p_sys->date, frame.samplerate, 1 );
+            date_Set( &p_sys->date, p_block->i_pts );
         }
         p_block->i_pts = 0;  /* PTS is valid only once */
 
@@ -415,8 +415,8 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             return NULL;
         }
 
-        p_out->start_date = aout_DateGet( &p_sys->date );
-        p_out->end_date = aout_DateIncrement( &p_sys->date, frame.samples / frame.channels );
+        p_out->start_date = date_Get( &p_sys->date );
+        p_out->end_date = date_Increment( &p_sys->date, frame.samples / frame.channels );
 
         DoReordering( (uint32_t *)p_out->p_buffer, samples,
                       frame.samples / frame.channels, frame.channels,

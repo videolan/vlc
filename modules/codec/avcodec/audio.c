@@ -60,7 +60,7 @@ struct decoder_sys_t
      * Output properties
      */
     audio_sample_format_t aout_format;
-    audio_date_t          end_date;
+    date_t                end_date;
 
     /*
      *
@@ -207,9 +207,9 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->i_previous_channels = 0;
     p_sys->i_previous_layout = 0;
 
-    aout_DateSet( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, 0 );
     if( p_dec->fmt_in.audio.i_rate )
-        aout_DateInit( &p_sys->end_date, p_dec->fmt_in.audio.i_rate );
+        date_Init( &p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1 );
 
     /* */
     p_dec->fmt_out.i_cat = AUDIO_ES;
@@ -234,8 +234,8 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
     if( ( p_buffer = decoder_NewAudioBuffer( p_dec, i_samples ) ) == NULL )
         return NULL;
 
-    p_buffer->start_date = aout_DateGet( &p_sys->end_date );
-    p_buffer->end_date = aout_DateIncrement( &p_sys->end_date, i_samples );
+    p_buffer->start_date = date_Get( &p_sys->end_date );
+    p_buffer->end_date = date_Increment( &p_sys->end_date, i_samples );
 
     if( p_sys->b_extract )
         aout_ChannelExtract( p_buffer->p_buffer, p_dec->fmt_out.audio.i_channels,
@@ -269,7 +269,7 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         block_Release( p_block );
         avcodec_flush_buffers( p_sys->p_context );
         p_sys->i_samples = 0;
-        aout_DateSet( &p_sys->end_date, 0 );
+        date_Set( &p_sys->end_date, 0 );
 
         if( p_sys->i_codec_id == CODEC_ID_MP2 || p_sys->i_codec_id == CODEC_ID_MP3 )
             p_sys->i_reject_count = 3;
@@ -284,7 +284,7 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         return p_buffer;
     }
 
-    if( !aout_DateGet( &p_sys->end_date ) && !p_block->i_pts )
+    if( !date_Get( &p_sys->end_date ) && !p_block->i_pts )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
@@ -348,17 +348,17 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
 
     if( p_dec->fmt_out.audio.i_rate != (unsigned int)p_sys->p_context->sample_rate )
     {
-        aout_DateInit( &p_sys->end_date, p_sys->p_context->sample_rate );
-        aout_DateSet( &p_sys->end_date, p_block->i_pts );
+        date_Init( &p_sys->end_date, p_sys->p_context->sample_rate, 1 );
+        date_Set( &p_sys->end_date, p_block->i_pts );
     }
 
     /* **** Set audio output parameters **** */
     SetupOutputFormat( p_dec, true );
 
     if( p_block->i_pts != 0 &&
-        p_block->i_pts != aout_DateGet( &p_sys->end_date ) )
+        p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
-        aout_DateSet( &p_sys->end_date, p_block->i_pts );
+        date_Set( &p_sys->end_date, p_block->i_pts );
     }
     p_block->i_pts = 0;
 

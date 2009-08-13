@@ -43,7 +43,7 @@
  *****************************************************************************/
 struct decoder_sys_t
 {
-    audio_date_t end_date; /* To set the PTS */
+    date_t end_date; /* To set the PTS */
     WMADecodeContext wmadec; /* name is self explanative */
 
     int32_t *p_output; /* buffer where the frames are rendered */
@@ -101,8 +101,8 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
     if( !( p_buffer = p_dec->pf_aout_buffer_new( p_dec, i_samples ) ) )
         return NULL;
 
-    p_buffer->start_date = aout_DateGet( &p_sys->end_date );
-    p_buffer->end_date = aout_DateIncrement( &p_sys->end_date, i_samples );
+    p_buffer->start_date = date_Get( &p_sys->end_date );
+    p_buffer->end_date = date_Increment( &p_sys->end_date, i_samples );
 
     memcpy( p_buffer->p_buffer, p_sys->p_samples, p_buffer->i_nb_bytes );
     p_sys->p_samples += p_buffer->i_nb_bytes;
@@ -133,7 +133,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     memset( p_sys, 0, sizeof( decoder_sys_t ) );
 
     /* Date */
-    aout_DateInit( &p_sys->end_date, p_dec->fmt_in.audio.i_rate );
+    date_Init( &p_sys->end_date, p_dec->fmt_in.audio.i_rate, 1 );
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
@@ -206,7 +206,7 @@ static aout_buffer_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_flags&(BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        aout_DateSet( &p_sys->end_date, 0 );
+        date_Set( &p_sys->end_date, 0 );
         block_Release( p_block );
         *pp_block = NULL;
         return NULL;
@@ -229,13 +229,13 @@ static aout_buffer_t *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
 
     /* Date management */
     if( p_block->i_pts > 0 &&
-        p_block->i_pts != aout_DateGet( &p_sys->end_date ) )
+        p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
-        aout_DateSet( &p_sys->end_date, p_block->i_pts );
+        date_Set( &p_sys->end_date, p_block->i_pts );
         /* don't reuse the same pts */
         p_block->i_pts = 0;
     }
-    else if( !aout_DateGet( &p_sys->end_date ) )
+    else if( !date_Get( &p_sys->end_date ) )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );

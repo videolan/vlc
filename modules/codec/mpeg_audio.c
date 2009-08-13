@@ -56,8 +56,8 @@ struct decoder_sys_t
     /*
      * Common properties
      */
-    audio_date_t          end_date;
-    unsigned int          i_current_layer;
+    date_t          end_date;
+    unsigned int    i_current_layer;
 
     mtime_t i_pts;
 
@@ -147,7 +147,7 @@ static int Open( vlc_object_t *p_this )
     /* Misc init */
     p_sys->b_packetizer = false;
     p_sys->i_state = STATE_NOSYNC;
-    aout_DateSet( &p_sys->end_date, 0 );
+    date_Set( &p_sys->end_date, 0 );
     p_sys->bytestream = block_BytestreamInit();
     p_sys->b_discontinuity = false;
 
@@ -210,13 +210,13 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             p_sys->i_state = STATE_NOSYNC;
             block_BytestreamEmpty( &p_sys->bytestream );
         }
-        aout_DateSet( &p_sys->end_date, 0 );
+        date_Set( &p_sys->end_date, 0 );
         block_Release( *pp_block );
         p_sys->b_discontinuity = true;
         return NULL;
     }
 
-    if( !aout_DateGet( &p_sys->end_date ) && !(*pp_block)->i_pts )
+    if( !date_Get( &p_sys->end_date ) && !(*pp_block)->i_pts )
     {
         /* We've just started the stream, wait for the first PTS. */
         msg_Dbg( p_dec, "waiting for PTS" );
@@ -255,9 +255,9 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* New frame, set the Presentation Time Stamp */
             p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
             if( p_sys->i_pts != 0 &&
-                p_sys->i_pts != aout_DateGet( &p_sys->end_date ) )
+                p_sys->i_pts != date_Get( &p_sys->end_date ) )
             {
-                aout_DateSet( &p_sys->end_date, p_sys->i_pts );
+                date_Set( &p_sys->end_date, p_sys->i_pts );
             }
             p_sys->i_state = STATE_HEADER;
 
@@ -495,8 +495,8 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
         msg_Dbg( p_dec, "MPGA channels:%d samplerate:%d bitrate:%d",
                   p_sys->i_channels, p_sys->i_rate, p_sys->i_bit_rate );
 
-        aout_DateInit( &p_sys->end_date, p_sys->i_rate );
-        aout_DateSet( &p_sys->end_date, p_sys->i_pts );
+        date_Init( &p_sys->end_date, p_sys->i_rate, 1 );
+        date_Set( &p_sys->end_date, p_sys->i_pts );
     }
 
     p_dec->fmt_out.audio.i_rate     = p_sys->i_rate;
@@ -538,9 +538,9 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
     p_buf = decoder_NewAudioBuffer( p_dec, p_sys->i_frame_length );
     if( p_buf == NULL ) return NULL;
 
-    p_buf->start_date = aout_DateGet( &p_sys->end_date );
+    p_buf->start_date = date_Get( &p_sys->end_date );
     p_buf->end_date =
-        aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length );
+        date_Increment( &p_sys->end_date, p_sys->i_frame_length );
     p_buf->b_discontinuity = p_sys->b_discontinuity;
     p_sys->b_discontinuity = false;
 
@@ -561,10 +561,10 @@ static block_t *GetSoutBuffer( decoder_t *p_dec )
     p_block = block_New( p_dec, p_sys->i_frame_size );
     if( p_block == NULL ) return NULL;
 
-    p_block->i_pts = p_block->i_dts = aout_DateGet( &p_sys->end_date );
+    p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );
 
     p_block->i_length =
-        aout_DateIncrement( &p_sys->end_date, p_sys->i_frame_length ) - p_block->i_pts;
+        date_Increment( &p_sys->end_date, p_sys->i_frame_length ) - p_block->i_pts;
 
     return p_block;
 }

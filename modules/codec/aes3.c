@@ -64,7 +64,7 @@ struct decoder_sys_t
     /*
      * Output properties
      */
-    audio_date_t end_date;
+    date_t end_date;
 };
 
 #define AES3_HEADER_LEN 4
@@ -134,8 +134,8 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if( p_aout_buffer == NULL )
         goto exit;
 
-    p_aout_buffer->start_date = aout_DateGet( &p_sys->end_date );
-    p_aout_buffer->end_date = aout_DateIncrement( &p_sys->end_date, i_frame_length );
+    p_aout_buffer->start_date = date_Get( &p_sys->end_date );
+    p_aout_buffer->end_date = date_Increment( &p_sys->end_date, i_frame_length );
 
     p_block->i_buffer -= AES3_HEADER_LEN;
     p_block->p_buffer += AES3_HEADER_LEN;
@@ -219,8 +219,8 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     if( !p_block )
         return NULL;
 
-    p_block->i_pts = p_block->i_dts = aout_DateGet( &p_sys->end_date );
-    p_block->i_length = aout_DateIncrement( &p_sys->end_date, i_frame_length ) - p_block->i_pts;
+    p_block->i_pts = p_block->i_dts = date_Get( &p_sys->end_date );
+    p_block->i_length = date_Increment( &p_sys->end_date, i_frame_length ) - p_block->i_pts;
 
     /* Just pass on the incoming frame */
     return p_block;
@@ -243,8 +243,8 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
         return VLC_EGENERIC;
 
     /* Misc init */
-    aout_DateInit( &p_sys->end_date, 48000 );
-    aout_DateSet( &p_sys->end_date, 0 );
+    date_Init( &p_sys->end_date, 48000, 1 );
+    date_Set( &p_sys->end_date, 0 );
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = AUDIO_ES;
@@ -297,12 +297,12 @@ static block_t *Parse( decoder_t *p_dec, int *pi_frame_length, int *pi_bits,
 
     /* Date management */
     if( p_block->i_pts > 0 &&
-        p_block->i_pts != aout_DateGet( &p_sys->end_date ) )
+        p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
-        aout_DateSet( &p_sys->end_date, p_block->i_pts );
+        date_Set( &p_sys->end_date, p_block->i_pts );
     }
 
-    if( !aout_DateGet( &p_sys->end_date ) )
+    if( !date_Get( &p_sys->end_date ) )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );

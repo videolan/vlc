@@ -187,7 +187,7 @@ struct decoder_sys_t
     /* Output properties */
     uint8_t *           plane;
     mtime_t             pts;
-    audio_date_t        date;
+    date_t              date;
 
     int                 i_late; /* video */
 
@@ -492,7 +492,7 @@ static int OpenAudio( decoder_t *p_dec )
     p_dec->fmt_out.audio.i_original_channels =
         pi_channels_maps[p_sys->OutputFormatInfo.numChannels];
 
-    aout_DateInit( &p_sys->date, p_dec->fmt_out.audio.i_rate );
+    date_Init( &p_sys->date, p_dec->fmt_out.audio.i_rate, 1 );
 
     p_sys->i_buffer      = 0;
     p_sys->i_buffer_size = 100*1000;
@@ -615,11 +615,11 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
             }
 
             if( p_sys->pts != 0 &&
-                p_sys->pts != aout_DateGet( &p_sys->date ) )
+                p_sys->pts != date_Get( &p_sys->date ) )
             {
-                aout_DateSet( &p_sys->date, p_sys->pts );
+                date_Set( &p_sys->date, p_sys->pts );
             }
-            else if( !aout_DateGet( &p_sys->date ) )
+            else if( !date_Get( &p_sys->date ) )
             {
                 return NULL;
             }
@@ -642,8 +642,8 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 
         if( p_out )
         {
-            p_out->start_date = aout_DateGet( &p_sys->date );
-            p_out->end_date = aout_DateIncrement( &p_sys->date, i_frames );
+            p_out->start_date = date_Get( &p_sys->date );
+            p_out->end_date = date_Increment( &p_sys->date, i_frames );
 
             memcpy( p_out->p_buffer,
                     &p_sys->out_buffer[2 * p_sys->i_out * p_dec->fmt_out.audio.i_channels],
