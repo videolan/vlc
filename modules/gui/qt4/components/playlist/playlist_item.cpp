@@ -56,7 +56,7 @@ void PLItem::init( playlist_item_t *_playlist_item, PLItem *parent, PLModel *m, 
     model      = m;               /* PLModel (QAbsmodel) */
     i_type     = -1;              /* Item type - Avoid segfault */
     b_current  = false;           /* Is the item the current Item or not */
-    b_is_node  = _playlist_item->i_children > 1;
+    b_is_node  = _playlist_item->i_children > -1;
     p_input    = _playlist_item->p_input;
     vlc_gc_incref( p_input );
 
