@@ -205,6 +205,7 @@ FunctionEnd
   !insertmacro ${_action} ".a52"
   !insertmacro ${_action} ".aac"
   !insertmacro ${_action} ".ac3"
+  !insertmacro ${_action} ".aob"
   !insertmacro ${_action} ".dts"
   !insertmacro ${_action} ".flac"
   !insertmacro ${_action} ".m4a"
