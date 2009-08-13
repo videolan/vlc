@@ -480,6 +480,11 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
             SetThreadPriority (hThread, priority);
         return 0;
     }
+
+#ifdef UNDER_CE
+    CloseHandle (th->cancel_event);
+#endif
+    free (entry_data);
     return errno;
 }
 
