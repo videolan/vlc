@@ -3700,10 +3700,10 @@ then
       VLC_ADD_PLUGIN([freetype])
       have_freetype=yes
       VLC_ADD_CPPFLAGS([freetype skins2],[${FREETYPE_CFLAGS}])
-      VLC_ADD_LIBS([freetype skins2],[${FREETYPE_LIBS}])
       if test "${SYS}" = "mingw32"; then
         VLC_ADD_LIBS([freetype],[-liconv -lz])
       fi
+      VLC_ADD_LIBS([freetype skins2],[${FREETYPE_LIBS}])
       if test "${enable_fontconfig}" != "no"
       then
         AC_CHECK_HEADERS(fontconfig/fontconfig.h,
@@ -3712,6 +3712,16 @@ then
         AC_CHECK_HEADERS(Carbon/Carbon.h,
           [VLC_ADD_LDFLAGS([freetype],[-Wl,-framework,Carbon])])
       fi
+
+     dnl fribidi support
+      if test "${enable_fribidi}" != "no"
+      then
+        PKG_CHECK_MODULES(FRIBIDI, fribidi, [
+          VLC_ADD_CPPFLAGS([freetype skins2], [${FRIBIDI_CFLAGS} -DHAVE_FRIBIDI])
+          VLC_ADD_LIBS([freetype skins2], [${FRIBIDI_LIBS}])
+        ])
+      fi
+
   ],[
   have_freetype=no
   AS_IF([ test "${enable_freetype}" =  "yes"],[
@@ -3721,14 +3731,6 @@ from http://www.freetype.org/, or configure with --disable-freetype. Have a nice
     ])
   ])
 
-  dnl fribidi support
-  if test "${enable_fribidi}" != "no"
-  then
-    PKG_CHECK_MODULES(FRIBIDI, fribidi, [
-      VLC_ADD_CPPFLAGS([freetype skins2], [${FRIBIDI_CFLAGS} -DHAVE_FRIBIDI])
-      VLC_ADD_LIBS([freetype skins2], [${FRIBIDI_LIBS}])
-    ])
-    fi
 fi
 
 dnl
