@@ -98,12 +98,12 @@ typedef enum buttonType_e
 } buttonType_e;
 
 
-static const char* nameL[BUTTON_MAX] = { N_("Play"), N_("Stop"), N_("Open"),
+static const char* const nameL[BUTTON_MAX] = { N_("Play"), N_("Stop"), N_("Open"),
     N_("Previous"), N_("Next"), N_("Slower"), N_("Faster"), N_("Fullscreen"),
    N_("De-Fullscreen"), N_("Extended panel"), N_("Playlist"), N_("Snapshot"),
    N_("Record"), N_("A->B Loop"), N_("Frame By Frame"), N_("Trickplay Reverse"),
    N_("Step backward" ), N_("Step forward"), N_("Quit") };
-static const char* tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
+static const char* const tooltipL[BUTTON_MAX] = { I_PLAY_TOOLTIP,
     N_("Stop playback"), N_("Open a medium"),
     N_("Previous media in the playlist"),
     N_("Next media in the playlist"), N_("Slower"), N_("Faster"),
