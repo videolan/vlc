@@ -1,12 +1,13 @@
 Index: configure
 ===================================================================
---- configure	(revision 19505)
-+++ configure	(working copy)
-@@ -1826,7 +1826,6 @@
+--- configure	(révision 19634)
++++ configure	(copie de travail)
+@@ -1873,8 +1873,6 @@
          FFSERVERLDFLAGS=-Wl,-bind_at_load
          objformat="macho"
          enabled x86_64 && objformat="macho64"
--        enabled shared || check_cflags -mdynamic-no-pic
+-        enabled shared ||
+-            { check_cflags -mdynamic-no-pic && add_asflags -mdynamic-no-pic; }
          ;;
      mingw32*)
-         target_os=mingw32
+         if test $target_os = "mingw32ce"; then
