@@ -151,7 +151,7 @@ void InputManager::customEvent( QEvent *event )
     IMEvent *ple = static_cast<IMEvent *>(event);
 
     if( i_type == ItemChanged_Type )
-        UpdateMeta( ple->p_item->i_id );
+        UpdateMeta( ple->p_item );
 
     if( !hasInput() )
         return;
@@ -616,9 +616,9 @@ inline void InputManager::UpdateStats()
     emit statisticsUpdated( input_GetItem( p_input ) );
 }
 
-inline void InputManager::UpdateMeta( int id )
+inline void InputManager::UpdateMeta( input_item_t *p_item )
 {
-    emit metaChanged( id );
+    emit metaChanged( p_item );
 }
 
 inline void InputManager::UpdateMeta()

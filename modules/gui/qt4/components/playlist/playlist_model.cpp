@@ -94,8 +94,8 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 #undef ADD_ICON
 
     rebuild( p_root );
-    CONNECT( THEMIM->getIM(), metaChanged( int ),
-            this, ProcessInputItemUpdate( int ) );
+    CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
+            this, ProcessInputItemUpdate( input_item_t *) );
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
             this, ProcessInputItemUpdate( input_thread_t* ) );
 }
@@ -572,17 +572,17 @@ void PLModel::customEvent( QEvent *event )
 void PLModel::ProcessInputItemUpdate( input_thread_t *p_input )
 {
     if( !p_input ) return;
-    ProcessInputItemUpdate( input_GetItem( p_input )->i_id );
+    ProcessInputItemUpdate( input_GetItem( p_input ) );
     if( p_input && !( p_input->b_dead || !vlc_object_alive( p_input ) ) )
     {
         PLItem *item = FindByInput( rootItem, input_GetItem( p_input )->i_id );
         emit currentChanged( index( item, 0 ) );
     }
 }
-void PLModel::ProcessInputItemUpdate( int i_input_id )
+void PLModel::ProcessInputItemUpdate( input_item_t *p_item )
 {
-    if( i_input_id <= 0 ) return;
-    PLItem *item = FindByInput( rootItem, i_input_id );
+    if( !p_item ||  p_item->i_id <= 0 ) return;
+    PLItem *item = FindByInput( rootItem, p_item->i_id );
     if( item )
     {
         QPL_LOCK;
