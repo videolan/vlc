@@ -83,7 +83,7 @@ struct filter_sys_t
 
     unsigned int i_remainder;                /* remainder of previous sample */
 
-    audio_date_t end_date;
+    date_t end_date;
 
     bool b_first;
     bool b_filter2;
@@ -219,10 +219,10 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             p_out_buf->i_nb_samples = p_in_buf->i_nb_samples +
                 p_sys->i_old_wing;
 
-            p_out_buf->start_date = aout_DateGet( &p_sys->end_date );
+            p_out_buf->start_date = date_Get( &p_sys->end_date );
             p_out_buf->end_date =
-                aout_DateIncrement( &p_sys->end_date,
-                                    p_out_buf->i_nb_samples );
+                date_Increment( &p_sys->end_date,
+                                p_out_buf->i_nb_samples );
 
             p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
                 p_filter->input.i_bytes_per_frame;
@@ -238,8 +238,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
          * everything. */
         p_filter->b_continuity = true;
         p_sys->i_remainder = 0;
-        aout_DateInit( &p_sys->end_date, i_out_rate );
-        aout_DateSet( &p_sys->end_date, p_in_buf->start_date );
+        date_Init( &p_sys->end_date, i_out_rate, 1 );
+        date_Set( &p_sys->end_date, p_in_buf->start_date );
         p_sys->i_old_rate   = p_filter->input.i_rate;
         p_sys->d_old_factor = 1;
         p_sys->i_old_wing   = 0;
@@ -454,9 +454,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     /* Finalize aout buffer */
     p_out_buf->i_nb_samples = i_out;
-    p_out_buf->start_date = aout_DateGet( &p_sys->end_date );
-    p_out_buf->end_date = aout_DateIncrement( &p_sys->end_date,
-                                              p_out_buf->i_nb_samples );
+    p_out_buf->start_date = date_Get( &p_sys->end_date );
+    p_out_buf->end_date = date_Increment( &p_sys->end_date,
+                                          p_out_buf->i_nb_samples );
 
     p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
         i_nb_channels * sizeof(int32_t);

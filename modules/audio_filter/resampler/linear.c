@@ -57,7 +57,7 @@ struct filter_sys_t
 
     unsigned int i_remainder;                /* remainder of previous sample */
 
-    audio_date_t end_date;
+    date_t       end_date;
 };
 
 /*****************************************************************************
@@ -107,7 +107,7 @@ static int Create( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ENOMEM;
     }
-    aout_DateInit( &p_sys->end_date, p_filter->output.i_rate );
+    date_Init( &p_sys->end_date, p_filter->output.i_rate, 1 );
 
     p_filter->pf_do_work = DoWork;
 
@@ -170,7 +170,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     {
         p_filter->b_continuity = true;
         p_sys->i_remainder = 0;
-        aout_DateInit( &p_sys->end_date, p_filter->output.i_rate );
+        date_Init( &p_sys->end_date, p_filter->output.i_rate, 1 );
     }
     else
     {
@@ -226,12 +226,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->start_date = p_in_buf->start_date;
 
     if( p_in_buf->start_date !=
-        aout_DateGet( &p_sys->end_date ) )
+        date_Get( &p_sys->end_date ) )
     {
-        aout_DateSet( &p_sys->end_date, p_in_buf->start_date );
+        date_Set( &p_sys->end_date, p_in_buf->start_date );
     }
 
-    p_out_buf->end_date = aout_DateIncrement( &p_sys->end_date,
+    p_out_buf->end_date = date_Increment( &p_sys->end_date,
                                               p_out_buf->i_nb_samples );
 
     p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
@@ -265,7 +265,7 @@ static int OpenFilter( vlc_object_t *p_this )
         free( p_sys );
         return VLC_ENOMEM;
     }
-    aout_DateInit( &p_sys->end_date, p_filter->fmt_in.audio.i_rate );
+    date_Init( &p_sys->end_date, p_filter->fmt_in.audio.i_rate, 1 );
 
     p_filter->pf_audio_filter = Resample;
 
