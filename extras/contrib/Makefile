@@ -26,7 +26,7 @@
 
 include ./config.mak
 
-BUILDDIRS = bin doc etc include info lib man sbin share tmp gecko-sdk
+BUILDDIRS = bin doc etc include info lib man sbin share tmp gecko-sdk Sparkle
 
 ifdef HAVE_DARWIN_OS
 TARGETALL=using-bin
