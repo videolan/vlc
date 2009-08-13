@@ -163,16 +163,6 @@ struct aout_buffer_t
 /* Max input rate factor (1/4 -> 4) */
 #define AOUT_MAX_INPUT_RATE (4)
 
-/** date incrementation helper structure without long-term
- * rounding errors
- */
-struct audio_date_t
-{
-    mtime_t  date;
-    uint32_t i_divider;
-    uint32_t i_remainder;
-};
-
 /** allocation of memory in the audio output */
 typedef struct aout_alloc_t
 {
@@ -208,7 +198,7 @@ struct aout_fifo_t
 {
     aout_buffer_t *         p_first;
     aout_buffer_t **        pp_last;
-    audio_date_t            end_date;
+    date_t                  end_date;
 };
 
 /* */
@@ -381,13 +371,6 @@ static const uint32_t pi_vlc_chan_order_wg4[] =
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-
-/* From common.c : */
-VLC_EXPORT( void, aout_DateInit, ( audio_date_t *, uint32_t ) );
-VLC_EXPORT( void, aout_DateSet, ( audio_date_t *, mtime_t ) );
-VLC_EXPORT( void, aout_DateMove, ( audio_date_t *, mtime_t ) );
-VLC_EXPORT( mtime_t, aout_DateGet, ( const audio_date_t * ) LIBVLC_USED);
-VLC_EXPORT( mtime_t, aout_DateIncrement, ( audio_date_t *, uint32_t ) );
 
 VLC_EXPORT( aout_buffer_t *, aout_OutputNextBuffer, ( aout_instance_t *, mtime_t, bool ) LIBVLC_USED );
 

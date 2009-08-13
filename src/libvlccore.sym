@@ -11,11 +11,6 @@ aout_ChannelReorder
 aout_ChannelsRestart
 aout_CheckChannelExtraction
 aout_CheckChannelReorder
-aout_DateGet
-aout_DateIncrement
-aout_DateInit
-aout_DateMove
-aout_DateSet
 aout_EnableFilter
 aout_FifoFirstDate
 aout_FifoPop

@@ -75,7 +75,7 @@ static int MixBuffer( aout_instance_t * p_aout )
     int             i, i_first_input = 0;
     aout_buffer_t * p_output_buffer;
     mtime_t start_date, end_date;
-    audio_date_t exact_start_date;
+    date_t  exact_start_date;
 
     if ( p_aout->mixer.b_error )
     {
@@ -102,9 +102,8 @@ static int MixBuffer( aout_instance_t * p_aout )
     aout_lock_input_fifos( p_aout );
 
     /* Retrieve the date of the next buffer. */
-    memcpy( &exact_start_date, &p_aout->output.fifo.end_date,
-            sizeof(audio_date_t) );
-    start_date = aout_DateGet( &exact_start_date );
+    exact_start_date = p_aout->output.fifo.end_date;
+    start_date = date_Get( &exact_start_date );
 
     if ( start_date != 0 && start_date < mdate() )
     {
@@ -114,7 +113,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         msg_Warn( p_aout, "output PTS is out of range (%"PRId64"), clearing out",
                   mdate() - start_date );
         aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
-        aout_DateSet( &exact_start_date, 0 );
+        date_Set( &exact_start_date, 0 );
         start_date = 0;
     }
 
@@ -152,7 +151,7 @@ static int MixBuffer( aout_instance_t * p_aout )
 
             if ( !start_date || start_date < p_buffer->start_date )
             {
-                aout_DateSet( &exact_start_date, p_buffer->start_date );
+                date_Set( &exact_start_date, p_buffer->start_date );
                 start_date = p_buffer->start_date;
             }
         }
@@ -164,8 +163,8 @@ static int MixBuffer( aout_instance_t * p_aout )
             return -1;
         }
     }
-    aout_DateIncrement( &exact_start_date, p_aout->output.i_nb_samples );
-    end_date = aout_DateGet( &exact_start_date );
+    date_Increment( &exact_start_date, p_aout->output.i_nb_samples );
+    end_date = date_Get( &exact_start_date );
 
     /* Check that start_date and end_date are available for all input
      * streams. */
@@ -280,7 +279,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                     /* Is it really the best way to do it ? */
                     aout_lock_output_fifo( p_aout );
                     aout_FifoSet( p_aout, &p_aout->output.fifo, 0 );
-                    aout_DateSet( &exact_start_date, 0 );
+                    date_Set( &exact_start_date, 0 );
                     aout_unlock_output_fifo( p_aout );
                     break;
                 }

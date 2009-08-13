@@ -350,7 +350,7 @@ void aout_FifoInit( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
 
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
-    aout_DateInit( &p_fifo->end_date, i_rate );
+    date_Init( &p_fifo->end_date, i_rate, 1 );
 }
 
 /*****************************************************************************
@@ -366,15 +366,15 @@ void aout_FifoPush( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
     p_fifo->pp_last = &p_buffer->p_next;
     *p_fifo->pp_last = NULL;
     /* Enforce the continuity of the stream. */
-    if ( aout_DateGet( &p_fifo->end_date ) )
+    if ( date_Get( &p_fifo->end_date ) )
     {
-        p_buffer->start_date = aout_DateGet( &p_fifo->end_date );
-        p_buffer->end_date = aout_DateIncrement( &p_fifo->end_date,
-                                                 p_buffer->i_nb_samples );
+        p_buffer->start_date = date_Get( &p_fifo->end_date );
+        p_buffer->end_date = date_Increment( &p_fifo->end_date,
+                                             p_buffer->i_nb_samples );
     }
     else
     {
-        aout_DateSet( &p_fifo->end_date, p_buffer->end_date );
+        date_Set( &p_fifo->end_date, p_buffer->end_date );
     }
 }
 
@@ -389,7 +389,7 @@ void aout_FifoSet( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
     (void)p_aout;
     AOUT_ASSERT_FIFO_LOCKED;
 
-    aout_DateSet( &p_fifo->end_date, date );
+    date_Set( &p_fifo->end_date, date );
     p_buffer = p_fifo->p_first;
     while ( p_buffer != NULL )
     {
@@ -411,7 +411,7 @@ void aout_FifoMoveDates( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
     (void)p_aout;
     AOUT_ASSERT_FIFO_LOCKED;
 
-    aout_DateMove( &p_fifo->end_date, difference );
+    date_Move( &p_fifo->end_date, difference );
     p_buffer = p_fifo->p_first;
     while ( p_buffer != NULL )
     {
@@ -428,7 +428,7 @@ mtime_t aout_FifoNextStart( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
     (void)p_aout;
     AOUT_ASSERT_FIFO_LOCKED;
-    return aout_DateGet( &p_fifo->end_date );
+    return date_Get( &p_fifo->end_date );
 }
 
 /*****************************************************************************
@@ -481,65 +481,6 @@ void aout_FifoDestroy( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 
     p_fifo->p_first = NULL;
     p_fifo->pp_last = &p_fifo->p_first;
-}
-
-
-/*
- * Date management (internal and external)
- */
-
-/*****************************************************************************
- * aout_DateInit : set the divider of an audio_date_t
- *****************************************************************************/
-void aout_DateInit( audio_date_t * p_date, uint32_t i_divider )
-{
-    p_date->date = 0;
-    p_date->i_divider = i_divider;
-    p_date->i_remainder = 0;
-}
-
-/*****************************************************************************
- * aout_DateSet : set the date of an audio_date_t
- *****************************************************************************/
-void aout_DateSet( audio_date_t * p_date, mtime_t new_date )
-{
-    p_date->date = new_date;
-    p_date->i_remainder = 0;
-}
-
-/*****************************************************************************
- * aout_DateMove : move forwards or backwards the date of an audio_date_t
- *****************************************************************************/
-void aout_DateMove( audio_date_t * p_date, mtime_t difference )
-{
-    p_date->date += difference;
-}
-
-/*****************************************************************************
- * aout_DateGet : get the date of an audio_date_t
- *****************************************************************************/
-mtime_t aout_DateGet( const audio_date_t * p_date )
-{
-    return p_date->date;
-}
-
-/*****************************************************************************
- * aout_DateIncrement : increment the date and return the result, taking
- * into account rounding errors
- *****************************************************************************/
-mtime_t aout_DateIncrement( audio_date_t * p_date, uint32_t i_nb_samples )
-{
-    mtime_t i_dividend = INT64_C(1000000) * i_nb_samples;
-    assert( p_date->i_divider > 0 ); /* uninitialized audio_data_t ? */
-    p_date->date += i_dividend / p_date->i_divider;
-    p_date->i_remainder += (int)(i_dividend % p_date->i_divider);
-    if ( p_date->i_remainder >= p_date->i_divider )
-    {
-        /* This is Bresenham algorithm. */
-        p_date->date++;
-        p_date->i_remainder -= p_date->i_divider;
-    }
-    return p_date->date;
 }
 
 /*****************************************************************************
