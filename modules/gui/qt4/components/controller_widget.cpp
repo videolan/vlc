@@ -42,8 +42,8 @@
 
 SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
                           bool b_shiny, bool b_special )
-                         : QWidget( _parent ), b_my_volume( false ),
-                           p_intf( _p_intf)
+                         : QWidget( _parent ), p_intf( _p_intf),
+                           b_my_volume( false )
 {
     /* We need a layout for this widget */
     QHBoxLayout *layout = new QHBoxLayout( this );
