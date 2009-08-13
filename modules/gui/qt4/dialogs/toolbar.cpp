@@ -544,7 +544,7 @@ void DroppingController::createAndAddWidget( QBoxLayout *controlLayout,
             foreach( child, children )
             {
                 QWidget *childWidg;
-                if( childWidg = qobject_cast<QWidget *>( child ) )
+                if( ( childWidg = qobject_cast<QWidget *>( child ) ) )
                 {
                     child->installEventFilter( this );
                     childWidg->setEnabled( true );
