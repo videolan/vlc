@@ -54,7 +54,7 @@ index baff415..49d6ea9 100644
 +            decode_band_structure(gbc, blk, s->eac3, 0,
 +                                  start_subband, end_subband,
 +                                  ff_eac3_default_spx_band_struct,
-+                                  s->spx_band_struct, &s->num_spx_bands,
++                                  &s->num_spx_bands,
 +                                  s->spx_band_sizes);
 +        } else {
 +            for (ch = 1; ch <= fbw_channels; ch++) {
