@@ -54,6 +54,7 @@ void PLItem::init( playlist_item_t *_playlist_item, PLItem *parent, PLModel *m, 
     i_id       = _playlist_item->i_id;           /* Playlist item specific id */
     model      = m;               /* PLModel (QAbsmodel) */
     i_type     = -1;              /* Item type - Avoid segfault */
+    b_current  = false;           /* Is the item the current Item or not */
     b_is_node  = _playlist_item->i_children > -1;
     p_input    = _playlist_item->p_input;
     vlc_gc_incref( p_input );
@@ -138,12 +139,13 @@ int PLItem::row() const
 }
 
 /* update the PL Item, get the good names and so on */
-void PLItem::update( playlist_item_t *p_item )
+void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 {
     assert( p_item->p_input == p_input);
 
     /* Useful for the model */
     i_type = p_item->p_input->i_type;
+    b_current = iscurrent;
     b_is_node = p_item->i_children > -1;
 
     i_showflags = parentItem ? parentItem->i_showflags : i_showflags;
