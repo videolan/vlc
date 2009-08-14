@@ -14,7 +14,7 @@
          *)
                  DEBUG="-g -Wall -Wno-parentheses -DDEBUG -D__NO_MATH_INLINES"
 -                CFLAGS="-Wall -Wno-parentheses -O3 -fforce-addr -fomit-frame-pointer -finline-functions -funroll-loops"
-+                EXTRAS_CFLAGS="-Wall -Wno-parentheses -O3 -fforce-addr -fomit-frame-pointer -finline-functions -funroll-loops -read_only_relocs suppress"
++                EXTRAS_CFLAGS="-Wall -Wno-parentheses -O3 -fforce-addr -fomit-frame-pointer -finline-functions -funroll-loops -read_only_relocs suppress -fno-pic"
                  PROFILE="-Wall -Wno-parentheses -pg -g -O3 -fno-inline-functions -DDEBUG";;
          esac
  fi
