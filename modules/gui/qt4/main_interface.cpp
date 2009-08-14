@@ -335,6 +335,7 @@ MainInterface::~MainInterface()
  *****************************/
 void MainInterface::recreateToolbars()
 {
+    msg_Dbg( p_intf, "Recreating the toolbars" );
     settings->beginGroup( "MainWindow" );
     delete controls;
     delete inputC;
@@ -345,9 +346,9 @@ void MainInterface::recreateToolbars()
              this, doComponentsUpdate() );
     inputC = new InputControlsWidget( p_intf, this );
 
-    mainLayout->insertWidget( 2, inputC, 0, Qt::AlignBottom );
-    mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
-                              controls, 0, Qt::AlignBottom );
+    mainLayout->addWidget( inputC, 2, 0, 1, -1, Qt::AlignBottom );
+    mainLayout->addWidget( controls, settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
+                              0, 1, -1, Qt::AlignBottom );
     settings->endGroup();
 }
 
@@ -356,7 +357,7 @@ void MainInterface::createMainWidget( QSettings *settings )
     /* Create the main Widget and the mainLayout */
     QWidget *main = new QWidget;
     setCentralWidget( main );
-    mainLayout = new QVBoxLayout( main );
+    mainLayout = new QGridLayout( main );
 
     /* Margins, spacing */
     main->setContentsMargins( 0, 0, 0, 0 );
@@ -399,11 +400,15 @@ void MainInterface::createMainWidget( QSettings *settings )
 
 
     /* Add the controls Widget to the main Widget */
-    mainLayout->insertWidget( 0, bgWidget );
-    if( videoWidget ) mainLayout->insertWidget( 0, videoWidget, 10 );
-    mainLayout->insertWidget( 2, inputC, 0, Qt::AlignBottom );
-    mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
-                              controls, 0, Qt::AlignBottom );
+    if( videoWidget ){
+        mainLayout->addWidget( videoWidget, 0, 0, 1, -1 );
+        mainLayout->setRowStretch( 0, 10 );
+    }
+    mainLayout->addWidget( bgWidget, 1, 0, 1, -1 );
+    //mainLayout->setRowStretch( 1, 10 );
+    mainLayout->addWidget( inputC, 2, 0, 1, -1, Qt::AlignBottom );
+    mainLayout->addWidget( controls, settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
+                           0, 1, -1, Qt::AlignBottom );
 
     /* Finish the sizing */
     main->updateGeometry();
@@ -839,7 +844,7 @@ void MainInterface::togglePlaylist()
         }
         else
         {
-            mainLayout->insertWidget( 4, playlistWidget );
+         //   mainLayout->insertWidget( 4, playlistWidget );
         }
         playlistVisible = true;
 

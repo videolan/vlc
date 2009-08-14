@@ -104,7 +104,7 @@ private:
     QSystemTrayIcon     *sysTray;
     QMenu               *systrayMenu;
     QString              input_name;
-    QVBoxLayout         *mainLayout;
+    QGridLayout         *mainLayout;
     ControlsWidget      *controls;
     InputControlsWidget *inputC;
     FullscreenControllerWidget *fullscreenControls;
