@@ -405,7 +405,7 @@ protected:
     LRESULT ProcessCustomDraw( LPARAM lParam );
     void HandlePopupMenu( HWND hwnd, POINT point);
 
-    void DeleteItem( int item );
+    void DeleteItem( input_item_t * item );
 
     void OnOpen();
     void OnSave();
