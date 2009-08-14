@@ -98,7 +98,7 @@ public:
     QModelIndex index( int r, int c, const QModelIndex &parent ) const;
     QModelIndex index( PLItem *, int c ) const;
     int itemId( const QModelIndex &index ) const;
-    bool isCurrent( const QModelIndex &index );
+    bool isCurrent( const QModelIndex &index ) const;
     QModelIndex parent( const QModelIndex &index ) const;
     int childrenCount( const QModelIndex &parent = QModelIndex() ) const;
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
@@ -155,6 +155,7 @@ private:
     /* Popup */
     int i_popup_item, i_popup_parent;
     QModelIndexList current_selection;
+    QModelIndex currentIndex;
     QSignalMapper *ContextUpdateMapper;
 
     /* Lookups */
