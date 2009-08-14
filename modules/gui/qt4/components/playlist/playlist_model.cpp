@@ -121,21 +121,21 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
         static_cast<PLItem*>( index.internalPointer() ) :
         rootItem;
 
-    int pl_input_id = p_playlist->p_local_category->p_input->i_id;
-    int ml_input_id = p_playlist->p_ml_category->p_input->i_id;
+    input_item_t *pl_input = p_playlist->p_local_category->p_input;
+    input_item_t *ml_input = p_playlist->p_ml_category->p_input;
 
     if( rootItem->i_id == p_playlist->p_root_onelevel->i_id
           || rootItem->i_id == p_playlist->p_root_category->i_id )
     {
-        if( item->i_input_id == pl_input_id
-            || item->i_input_id == ml_input_id )
+        if( item->p_input == pl_input
+            || item->p_input == ml_input)
                 flags |= Qt::ItemIsDropEnabled;
     }
     else
     {
         if ( item->b_is_node &&
-            ( rootItem->i_input_id == pl_input_id ||
-            rootItem->i_input_id == ml_input_id ) )
+            ( rootItem->p_input == pl_input ||
+            rootItem->p_input == ml_input ) )
                 flags |= Qt::ItemIsDropEnabled;
         flags |= Qt::ItemIsDragEnabled;
     }
@@ -561,7 +561,8 @@ PLItem *PLModel::FindById( PLItem *root, int i_id )
 
 PLItem *PLModel::FindByInput( PLItem *root, int i_id )
 {
-    return FindInner( root, i_id, true );
+    PLItem *result = FindInner( root, i_id, true );
+    return result;
 }
 
 #define CACHE( i, p ) { i_cached_id = i; p_cached_item = p; }
@@ -580,7 +581,7 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
         CACHE( i_id, root );
         return root;
     }
-    else if( b_input && root->i_input_id == i_id )
+    else if( b_input && root->p_input->i_id == i_id )
     {
         ICACHE( i_id, root );
         return root;
@@ -594,7 +595,7 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
             CACHE( i_id, (*it) );
             return p_cached_item;
         }
-        else if( b_input && (*it)->i_input_id == i_id )
+        else if( b_input && (*it)->p_input->i_id == i_id )
         {
             ICACHE( i_id, (*it) );
             return p_cached_item_bi;

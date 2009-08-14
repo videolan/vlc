@@ -52,7 +52,6 @@ void PLItem::init( playlist_item_t *_playlist_item, PLItem *parent, PLModel *m, 
 {
     parentItem = parent;          /* Can be NULL, but only for the rootItem */
     i_id       = _playlist_item->i_id;           /* Playlist item specific id */
-    i_input_id = _playlist_item->p_input->i_id;     /* Identifier of the input */
     model      = m;               /* PLModel (QAbsmodel) */
     i_type     = -1;              /* Item type - Avoid segfault */
     b_current  = false;           /* Is the item the current Item or not */
@@ -142,7 +141,7 @@ int PLItem::row() const
 /* update the PL Item, get the good names and so on */
 void PLItem::update( playlist_item_t *p_item, bool iscurrent )
 {
-    assert( p_item->p_input->i_id == i_input_id );
+    assert( p_item->p_input == p_input);
 
     /* Useful for the model */
     i_type = p_item->p_input->i_type;

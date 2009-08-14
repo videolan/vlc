@@ -66,7 +66,6 @@ protected:
     bool b_current;
     int i_type;
     int i_id;
-    int i_input_id;
     int i_showflags;
     bool b_is_node;
     input_item_t *p_input;
