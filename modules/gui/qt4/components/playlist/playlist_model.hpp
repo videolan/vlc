@@ -98,7 +98,7 @@ public:
     QModelIndex index( int r, int c, const QModelIndex &parent ) const;
     QModelIndex index( PLItem *, int c ) const;
     int itemId( const QModelIndex &index ) const;
-    bool isCurrent( const QModelIndex &index );
+    bool isCurrent( const QModelIndex &index ) const;
     QModelIndex parent( const QModelIndex &index ) const;
     int childrenCount( const QModelIndex &parent = QModelIndex() ) const;
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
@@ -132,6 +132,7 @@ private:
     void customEvent( QEvent * );
 
     PLItem *rootItem;
+    PLItem *currentItem;
 
     playlist_t *p_playlist;
     intf_thread_t *p_intf;

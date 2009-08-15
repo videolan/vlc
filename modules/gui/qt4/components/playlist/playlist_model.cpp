@@ -77,6 +77,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     i_cached_id       = -1;
     i_cached_input_id = -1;
     i_popup_item      = i_popup_parent = -1;
+    currentItem       = NULL;
 
     rootItem          = NULL; /* PLItem rootItem, will be set in rebuild( ) */
 
@@ -98,6 +99,18 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
             this, ProcessInputItemUpdate( input_item_t *) );
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
             this, ProcessInputItemUpdate( input_thread_t* ) );
+    PL_LOCK;
+    playlist_item_t *p_item;
+    /* Check if there's allready some item playing when playlist
+     * model is created, if so, tell model that it's currentone
+     */
+    if( (p_item = playlist_CurrentPlayingItem(p_playlist)) )
+    {
+        currentItem = FindByInput( rootItem,
+                                           p_item->p_input->i_id );
+        emit currentChanged( index( currentItem, 0 ) );
+    }
+    PL_UNLOCK;
 }
 
 PLModel::~PLModel()
@@ -370,7 +383,7 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
     }
     else if( role == Qt::FontRole )
     {
-        if( item->b_current == true )
+        if( isCurrent( index ) )
         {
             QFont f; f.setBold( true ); return QVariant( f );
         }
@@ -378,10 +391,11 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
     return QVariant();
 }
 
-bool PLModel::isCurrent( const QModelIndex &index )
+bool PLModel::isCurrent( const QModelIndex &index ) const
 {
     assert( index.isValid() );
-    return static_cast<PLItem*>(index.internalPointer())->b_current;
+    if( !currentItem ) return false;
+    return static_cast<PLItem*>(index.internalPointer())->p_input == currentItem->p_input;
 }
 
 int PLModel::itemId( const QModelIndex &index ) const
@@ -646,6 +660,7 @@ void PLModel::ProcessInputItemUpdate( input_thread_t *p_input )
     if( p_input && !( p_input->b_dead || !vlc_object_alive( p_input ) ) )
     {
         PLItem *item = FindByInput( rootItem, input_GetItem( p_input )->i_id );
+        currentItem = item;
         emit currentChanged( index( item, 0 ) );
     }
 }
@@ -730,7 +745,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
     UpdateNodeChildren( rootItem );
     if( (p_item = playlist_CurrentPlayingItem(p_playlist)) )
     {
-        PLItem *currentItem = FindByInput( rootItem,
+        currentItem = FindByInput( rootItem,
                                            p_item->p_input->i_id );
         if( currentItem )
         {
@@ -782,9 +797,9 @@ void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item,
     if( !force && i_depth == DEPTH_SEL && p_item->p_parent &&
                                  p_item->p_parent->i_id != rootItem->i_id )
         return;
-    item->update( p_item, p_item == playlist_CurrentPlayingItem( p_playlist ) );
+    item->update( p_item );
     if( signal )
-        emit dataChanged( index( item, 0 ) , index( item, 1 ) );
+        emit dataChanged( index( item, 0 ) , index( item, columnCount( QModelIndex() ) ) );
 }
 
 /************************* Actions ******************************/
