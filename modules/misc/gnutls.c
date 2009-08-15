@@ -587,7 +587,7 @@ gnutls_Addx509File( vlc_object_t *p_this,
 {
     struct stat st;
 
-    int fd = utf8_open (psz_path, O_RDONLY, 0);
+    int fd = utf8_open (psz_path, O_RDONLY);
     if (fd == -1)
         goto error;
 

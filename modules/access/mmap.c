@@ -94,7 +94,7 @@ static int Open (vlc_object_t *p_this)
     else
     {
         msg_Dbg (p_access, "opening file %s", path);
-        fd = utf8_open (path, O_RDONLY | O_NOCTTY, 0666);
+        fd = utf8_open (path, O_RDONLY | O_NOCTTY);
     }
 
     if (fd == -1)
