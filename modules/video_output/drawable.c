@@ -34,11 +34,6 @@
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 
-#define XID_TEXT N_("ID of the video output X window")
-#define XID_LONGTEXT N_( \
-    "VLC can embed its video output in an existing X11 window. " \
-    "This is the X identifier of that window (0 means none).")
-
 /*
  * Module descriptor
  */
@@ -49,8 +44,6 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout window xid", 70)
     set_callbacks (Open, Close)
-    add_integer ("drawable-xid", 0, NULL, XID_TEXT, XID_LONGTEXT, true)
-        change_unsaveable ()
     //add_integer ("drawable-hwnd", 0, NULL, HWN_TEXT, HWND_LONGTEXT, true) /* How to ? */
     //    change_unsaveable ()
 vlc_module_end ()
@@ -72,36 +65,15 @@ static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 static int Open (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
-    const char *varname;
-    bool ptr;
-
-    switch (wnd->cfg->type)
-    {
-    case VOUT_WINDOW_TYPE_XID:
-        varname = "drawable-xid";
-        ptr = false;
-        break;
-    case VOUT_WINDOW_TYPE_HWND:
-        varname = "drawable-hwnd";
-        ptr = true;
-        break;
-    default:
-        return VLC_EGENERIC;
-    }
-
     void **used, *val;
     size_t n = 0;
 
-    if (var_Create (obj->p_libvlc, "drawables-in-use", VLC_VAR_ADDRESS)
-     || var_Create (obj, varname, VLC_VAR_DOINHERIT
-                                  | (ptr ? VLC_VAR_ADDRESS : VLC_VAR_INTEGER)))
+    if (var_Create (obj->p_libvlc, "hwnd-in-use", VLC_VAR_ADDRESS)
+     || var_Create (obj, "drawable-hwnd", VLC_VAR_DOINHERIT | VLC_VAR_ADDRESS))
         return VLC_ENOMEM;
 
-    if (ptr)
-        val = var_GetAddress (obj, varname);
-    else
-        val = (void *)(uintptr_t)var_GetInteger (obj, varname);
-    var_Destroy (obj, varname);
+    val = var_GetAddress (obj, "drawable-hwnd");
+    var_Destroy (obj, "drawable-hwn");
 
     /* Keep a list of busy drawables, so we don't overlap videos if there are
      * more than one video track in the stream. */
@@ -123,12 +95,12 @@ static int Open (vlc_object_t *obj)
     {
         used[n] = val;
         used[n + 1] = NULL;
-        var_SetAddress (obj->p_libvlc, "drawables-in-use", used);
+        var_SetAddress (obj->p_libvlc, "hwnd-in-use", used);
     }
     else
     {
 skip:
-        msg_Warn (wnd, "drawable %p is busy", val);
+        msg_Warn (wnd, "HWND %p is busy", val);
         val = NULL;
     }
     vlc_mutex_unlock (&serializer);
@@ -136,14 +108,7 @@ skip:
     if (val == NULL)
         return VLC_EGENERIC;
 
-    if (ptr)
-        wnd->handle.hwnd = val;
-    else
-        wnd->handle.xid = (uintptr_t)val;
-
-    /* FIXME: check that X server matches --x11-display (if specified) */
-    /* FIXME: get window size (in platform-dependent ways) */
-
+    wnd->handle.hwnd = val;
     wnd->control = Control;
     wnd->sys = val;
     return VLC_SUCCESS;
@@ -160,7 +125,7 @@ static void Close (vlc_object_t *obj)
 
     /* Remove this drawable from the list of busy ones */
     vlc_mutex_lock (&serializer);
-    used = var_GetAddress (VLC_OBJECT (obj->p_libvlc), "drawables-in-use");
+    used = var_GetAddress (VLC_OBJECT (obj->p_libvlc), "hwnd-in-use");
     assert (used);
     while (used[n] != val)
     {
@@ -172,14 +137,13 @@ static void Close (vlc_object_t *obj)
     while (used[++n] != NULL);
 
     if (n == 0)
-      /* should not be needed (var_Destroy...) but better safe than sorry: */
-         var_SetAddress (obj->p_libvlc, "drawables-in-use", NULL);
+         var_SetAddress (obj->p_libvlc, "hwnd-in-use", NULL);
     vlc_mutex_unlock (&serializer);
 
     if (n == 0)
         free (used);
     /* Variables are reference-counted... */
-    var_Destroy (obj->p_libvlc, "drawables-in-use");
+    var_Destroy (obj->p_libvlc, "hwnd-in-use");
 }
 
 
