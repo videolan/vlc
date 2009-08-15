@@ -165,6 +165,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     uint8_t *p_src = NULL;
     uint8_t *p_out = NULL;
     int i_src_pitch;
+    int i_out_pitch;
     int pix;
     const int v1 = -1;
     const int v2 = 3; /* 2^3 = 8 */
@@ -182,6 +183,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     p_src = p_pic->p[Y_PLANE].p_pixels;
     p_out = p_outpic->p[Y_PLANE].p_pixels;
     i_src_pitch = p_pic->p[Y_PLANE].i_visible_pitch;
+    i_out_pitch = p_outpic->p[Y_PLANE].i_visible_pitch;
 
     /* perform convolution only on Y plane. Avoid border line. */
     vlc_mutex_lock( &p_filter->p_sys->lock );
@@ -190,14 +192,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         if( (i == 0) || (i == p_pic->p[Y_PLANE].i_visible_lines - 1) )
         {
             for( j = 0; j < p_pic->p[Y_PLANE].i_visible_pitch; j++ )
-                p_out[i * i_src_pitch + j] = clip( p_src[i * i_src_pitch + j] );
+                p_out[i * i_out_pitch + j] = clip( p_src[i * i_src_pitch + j] );
             continue ;
         }
         for( j = 0; j < p_pic->p[Y_PLANE].i_visible_pitch; j++ )
         {
             if( (j == 0) || (j == p_pic->p[Y_PLANE].i_visible_pitch - 1) )
             {
-                p_out[i * i_src_pitch + j] = p_src[i * i_src_pitch + j];
+                p_out[i * i_out_pitch + j] = p_src[i * i_src_pitch + j];
                 continue ;
             }
 
@@ -212,18 +214,14 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                   (p_src[(i + 1) * i_src_pitch + j + 1] * v1);
 
            pix = pix >= 0 ? clip(pix) : -clip(pix * -1);
-           p_out[i * i_src_pitch + j] = clip( p_src[i * i_src_pitch + j] +
+           p_out[i * i_out_pitch + j] = clip( p_src[i * i_src_pitch + j] +
                p_filter->p_sys->tab_precalc[pix + 256] );
         }
     }
     vlc_mutex_unlock( &p_filter->p_sys->lock );
 
-    vlc_memcpy( p_outpic->p[U_PLANE].p_pixels, p_pic->p[U_PLANE].p_pixels,
-                p_outpic->p[U_PLANE].i_lines * p_outpic->p[U_PLANE].i_pitch );
-
-    vlc_memcpy( p_outpic->p[V_PLANE].p_pixels, p_pic->p[V_PLANE].p_pixels,
-                p_outpic->p[V_PLANE].i_lines * p_outpic->p[V_PLANE].i_pitch );
-
+    plane_CopyPixels( &p_outpic->p[U_PLANE], &p_pic->p[U_PLANE] );
+    plane_CopyPixels( &p_outpic->p[V_PLANE], &p_pic->p[V_PLANE] );
 
     return CopyInfoAndRelease( p_outpic, p_pic );
 }
