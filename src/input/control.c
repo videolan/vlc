@@ -427,7 +427,7 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         case INPUT_GET_VOUTS:
         {
             vout_thread_t ***ppp_vout = (vout_thread_t***)va_arg( args, vout_thread_t*** );
-            int           *pi_vout = (int*)va_arg( args, int* );
+            size_t        *pi_vout = va_arg( args, size_t * );
 
             input_resource_HoldVouts( p_input->p->p_resource, ppp_vout, pi_vout );
             if( *pi_vout <= 0 )

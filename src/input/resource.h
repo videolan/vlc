@@ -81,7 +81,7 @@ vout_thread_t *input_resource_HoldVout( input_resource_t * );
  *
  * You must call vlc_object_release on all values returned (if non NULL).
  */
-void input_resource_HoldVouts( input_resource_t *, vout_thread_t ***, int * );
+void input_resource_HoldVouts( input_resource_t *, vout_thread_t ***, size_t * );
 
 #endif
 

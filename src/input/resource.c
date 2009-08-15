@@ -288,7 +288,9 @@ static vout_thread_t *HoldVout( input_resource_t *p_resource )
 
     return p_vout;
 }
-static void HoldVouts( input_resource_t *p_resource, vout_thread_t ***ppp_vout, int *pi_vout )
+
+static void HoldVouts( input_resource_t *p_resource, vout_thread_t ***ppp_vout,
+                       size_t *pi_vout )
 {
     vout_thread_t **pp_vout;
 
@@ -300,7 +302,7 @@ static void HoldVouts( input_resource_t *p_resource, vout_thread_t ***ppp_vout, 
     if( p_resource->i_vout <= 0 )
         goto exit;
 
-    pp_vout = calloc( p_resource->i_vout, sizeof(*pp_vout) );
+    pp_vout = malloc( p_resource->i_vout * sizeof(*pp_vout) );
     if( !pp_vout )
         goto exit;
 
@@ -460,10 +462,13 @@ vout_thread_t *input_resource_HoldVout( input_resource_t *p_resource )
 {
     return HoldVout( p_resource );
 }
-void input_resource_HoldVouts( input_resource_t *p_resource, vout_thread_t ***ppp_vout, int *pi_vout )
+
+void input_resource_HoldVouts( input_resource_t *p_resource, vout_thread_t ***ppp_vout,
+                               size_t *pi_vout )
 {
     HoldVouts( p_resource, ppp_vout, pi_vout );
 }
+
 void input_resource_TerminateVout( input_resource_t *p_resource )
 {
     input_resource_RequestVout( p_resource, NULL, NULL, false );

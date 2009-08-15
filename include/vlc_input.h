@@ -568,12 +568,12 @@ static inline int input_AddSubtitle( input_thread_t *p_input, const char *psz_ur
 static inline vout_thread_t *input_GetVout( input_thread_t *p_input )
 {
      vout_thread_t **pp_vout, *p_vout;
-     unsigned i_vout;
+     size_t i_vout;
 
      if( input_Control( p_input, INPUT_GET_VOUTS, &pp_vout, &i_vout ) )
          return NULL;
 
-     for( unsigned i = 1; i < i_vout; i++ )
+     for( size_t i = 1; i < i_vout; i++ )
          vlc_object_release( (vlc_object_t *)(pp_vout[i]) );
 
      p_vout = (i_vout >= 1) ? pp_vout[0] : NULL;
