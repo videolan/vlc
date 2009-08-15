@@ -59,8 +59,8 @@ static void EmClose (vlc_object_t *);
  * Module descriptor
  */
 vlc_module_begin ()
-    set_shortname (N_("XCB window"))
-    set_description (N_("(Experimental) XCB video window"))
+    set_shortname (N_("X window"))
+    set_description (N_("X11 video window (XCB)"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout window xid", 10)
