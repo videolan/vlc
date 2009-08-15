@@ -209,7 +209,14 @@ int ProcessKeyEvent (key_handler_t *ctx, xcb_generic_event_t *ev)
         case XCB_KEY_RELEASE:
             break;
 
-        /*TODO: key mappings update*/
+        case XCB_MAPPING_NOTIFY:
+        {
+            xcb_mapping_notify_event_t *e = (xcb_mapping_notify_event_t *)ev;
+            msg_Dbg (ctx->obj, "refreshing keyboard mapping");
+            xcb_refresh_keyboard_mapping (ctx->syms, e);
+            break;
+        }
+
         default:
             return -1;
     }
