@@ -41,7 +41,7 @@ VLC_EXPORT( char *, ToLocale, ( const char * ) LIBVLC_USED );
 VLC_EXPORT( char *, ToLocaleDup, ( const char * ) LIBVLC_USED );
 
 /* TODO: move all of this to "vlc_fs.h" or something like that */
-VLC_EXPORT( int, utf8_open, ( const char *filename, int flags, mode_t mode ) LIBVLC_USED );
+VLC_EXPORT( int, utf8_open, ( const char *filename, int flags, ... ) LIBVLC_USED );
 VLC_EXPORT( FILE *, utf8_fopen, ( const char *filename, const char *mode ) LIBVLC_USED );
 VLC_EXPORT( DIR *, utf8_opendir, ( const char *dirname ) LIBVLC_USED );
 VLC_EXPORT( char *, utf8_readdir, ( DIR *dir ) LIBVLC_USED );
