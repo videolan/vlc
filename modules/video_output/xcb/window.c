@@ -282,7 +282,6 @@ static void Close (vlc_object_t *obj)
     vout_window_t *wnd = (vout_window_t *)obj;
     vout_window_sys_t *p_sys = wnd->sys;
     xcb_connection_t *conn = p_sys->conn;
-    xcb_window_t window = wnd->handle.xid;
 
     if (p_sys->keys)
     {
