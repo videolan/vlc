@@ -140,6 +140,20 @@ xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
 #define NET_WM_STATE_ADD    1
 #define NET_WM_STATE_TOGGLE 2
 
+static void CacheAtoms (vout_window_sys_t *p_sys)
+{
+    xcb_connection_t *conn = p_sys->conn;
+    xcb_intern_atom_cookie_t wm_state_ck, wm_state_above_ck, wm_state_fs_ck;
+
+    wm_state_ck = intern_string (conn, "_NET_WM_STATE");
+    wm_state_above_ck = intern_string (conn, "_NET_WM_STATE_ABOVE");
+    wm_state_fs_ck = intern_string (conn, "_NET_WM_STATE_FULLSCREEN");
+
+    p_sys->wm_state = get_atom (conn, wm_state_ck);
+    p_sys->wm_state_above = get_atom (conn, wm_state_above_ck);
+    p_sys->wm_state_fullscreen = get_atom (conn, wm_state_fs_ck);
+}
+
 /**
  * Create an X11 window.
  */
@@ -244,16 +258,11 @@ static int Open (vlc_object_t *obj)
     xcb_atom_t net_wm_icon_name = get_atom (conn, net_wm_icon_name_ck);
     set_string (conn, window, utf8, net_wm_icon_name, _("VLC"));
 
+    /* Make the window visible */
+    xcb_map_window (conn, window);
+
     /* Cache any EWMH atom we may need later */
-    xcb_intern_atom_cookie_t wm_state_ck, wm_state_above_ck, wm_state_fs_ck;
-
-    wm_state_ck = intern_string (conn, "_NET_WM_STATE");
-    wm_state_above_ck = intern_string (conn, "_NET_WM_STATE_ABOVE");
-    wm_state_fs_ck = intern_string (conn, "_NET_WM_STATE_FULLSCREEN");
-
-    p_sys->wm_state = get_atom (conn, wm_state_ck);
-    p_sys->wm_state_above = get_atom (conn, wm_state_above_ck);
-    p_sys->wm_state_fullscreen = get_atom (conn, wm_state_fs_ck);
+    CacheAtoms (p_sys);
 
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
@@ -261,9 +270,7 @@ static int Open (vlc_object_t *obj)
      && vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
         DestroyKeyHandler (p_sys->keys);
 
-    /* Make sure the window is ready */
-    xcb_map_window (conn, window);
-    xcb_flush (conn);
+    xcb_flush (conn); /* Make sure map_window is sent (should be useless) */
 
     return VLC_SUCCESS;
 
