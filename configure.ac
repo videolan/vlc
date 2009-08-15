@@ -527,6 +527,7 @@ fi
 
 dnl
 dnl Buggy glibc prevention. Purposedly not cached.
+dnl See sourceware.org bugs 5058 and 5443.
 dnl Ubuntu alone has 20 bug numbers for this...
 dnl
 AC_MSG_CHECKING(for buggy GNU/libc versions)
