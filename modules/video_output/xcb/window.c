@@ -290,8 +290,6 @@ static void Close (vlc_object_t *obj)
         vlc_join (p_sys->thread, NULL);
         DestroyKeyHandler (p_sys->keys);
     }
-    xcb_unmap_window (conn, window);
-    xcb_destroy_window (conn, window);
     xcb_disconnect (conn);
     free (p_sys);
 }
