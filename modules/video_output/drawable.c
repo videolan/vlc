@@ -42,7 +42,7 @@ vlc_module_begin ()
     set_description (N_("Embedded window video"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout window xid", 70)
+    set_capability ("vout window hwnd", 70)
     set_callbacks (Open, Close)
     //add_integer ("drawable-hwnd", 0, NULL, HWN_TEXT, HWND_LONGTEXT, true) /* How to ? */
     //    change_unsaveable ()
