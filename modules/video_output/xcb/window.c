@@ -45,8 +45,15 @@ typedef xcb_atom_t Atom;
     "X11 hardware display to use. By default VLC will " \
     "use the value of the DISPLAY environment variable.")
 
+#define XID_TEXT N_("ID of the video output X window")
+#define XID_LONGTEXT N_( \
+    "VLC can embed its video output in an existing X11 window. " \
+    "This is the X identifier of that window (0 means none).")
+
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
+static int  EmOpen (vlc_object_t *);
+static void EmClose (vlc_object_t *);
 
 /*
  * Module descriptor
@@ -61,6 +68,18 @@ vlc_module_begin ()
 
     add_string ("x11-display", NULL, NULL,
                 DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
+
+    add_submodule ()
+    set_shortname (N_("Drawable"))
+    set_description (N_("Embedded window video"))
+    set_category (CAT_VIDEO)
+    set_subcategory (SUBCAT_VIDEO_VOUT)
+    set_capability ("vout window xid", 70)
+    set_callbacks (EmOpen, EmClose)
+
+    add_integer ("drawable-xid", 0, NULL, XID_TEXT, XID_LONGTEXT, true)
+        change_unsaveable ()
+
 vlc_module_end ()
 
 static int Control (vout_window_t *, int, va_list ap);
@@ -398,3 +417,154 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
     return VLC_SUCCESS;
 }
 
+/*** Embedded drawable support ***/
+
+static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
+
+/** Acquire a drawable */
+static int AcquireDrawable (vlc_object_t *obj, xcb_window_t window)
+{
+    vlc_value_t val;
+    xcb_window_t *used;
+    size_t n;
+
+    if (var_Create (obj->p_libvlc, "xid-in-use", VLC_VAR_ADDRESS))
+        return VLC_ENOMEM;
+
+    /* Keep a list of busy drawables, so we don't overlap videos if there are
+     * more than one video track in the stream. */
+    vlc_mutex_lock (&serializer);
+    var_Get (VLC_OBJECT (obj->p_libvlc), "xid-in-use", &val);
+    used = val.p_address;
+    if (used != NULL)
+    {
+        while (used[n])
+        {
+            if (used[n] == window)
+                goto skip;
+            n++;
+        }
+    }
+
+    used = realloc (used, sizeof (*used) * (n + 2));
+    if (used != NULL)
+    {
+        used[n] = window;
+        used[n + 1] = 0;
+        val.p_address = used;
+        var_Set (obj->p_libvlc, "xid-in-use", val);
+    }
+    else
+    {
+skip:
+        msg_Warn (obj, "X11 drawable 0x%08"PRIx8" is busy", window);
+        window = 0;
+    }
+    vlc_mutex_unlock (&serializer);
+
+    return (window == 0) ? VLC_EGENERIC : VLC_SUCCESS;
+}
+
+/** Remove this drawable from the list of busy ones */
+static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
+{
+    vlc_value_t val;
+    xcb_window_t *used;
+    size_t n = 0;
+
+    vlc_mutex_lock (&serializer);
+    var_Get (VLC_OBJECT (obj->p_libvlc), "xid-in-use", &val);
+    used = val.p_address;
+    assert (used);
+    while (used[n] != window)
+    {
+        assert (used[n]);
+        n++;
+    }
+    do
+        used[n] = used[n + 1];
+    while (used[++n]);
+
+    if (n == 0)
+         var_SetAddress (obj->p_libvlc, "xid-in-use", NULL);
+    vlc_mutex_unlock (&serializer);
+
+    if (n == 0)
+        free (used);
+    /* Variables are reference-counted... */
+    var_Destroy (obj->p_libvlc, "xid-in-use");
+}
+
+/**
+ * Wrap an existing X11 window to embed the video.
+ */
+static int EmOpen (vlc_object_t *obj)
+{
+    vout_window_t *wnd = (vout_window_t *)obj;
+
+    xcb_window_t window = var_CreateGetInteger (obj, "drawable-xid");
+    if (window == 0)
+        return VLC_EGENERIC;
+    var_Destroy (obj, "drawable-xid");
+
+    if (AcquireDrawable (obj, window))
+        return VLC_EGENERIC;
+
+    vout_window_sys_t *p_sys = malloc (sizeof (*p_sys));
+    xcb_connection_t *conn = xcb_connect (NULL, NULL);
+    if (p_sys == NULL || xcb_connection_has_error (conn))
+        goto error;
+
+    wnd->handle.xid = window;
+    wnd->control = Control;
+    wnd->sys = p_sys;
+
+    p_sys->conn = conn;
+
+    xcb_get_geometry_reply_t *geo =
+        xcb_get_geometry_reply (conn, xcb_get_geometry (conn, window), NULL);
+    if (geo == NULL)
+    {
+        msg_Err (obj, "bad X11 window 0x%08"PRIx8, window);
+        goto error;
+    }
+    p_sys->root = geo->root;
+    free (geo);
+
+    if (var_CreateGetInteger (obj, "vout-event") != 3) /* FIXME: <- cleanup */
+    {
+        p_sys->keys = CreateKeyHandler (obj, conn);
+        if (p_sys->keys != NULL)
+        {
+            const uint32_t mask = XCB_CW_EVENT_MASK;
+            const uint32_t values[1] = {
+                XCB_EVENT_MASK_KEY_PRESS,
+            };
+            xcb_change_window_attributes (conn, window, mask, values);
+        }
+    }
+
+    CacheAtoms (p_sys);
+    if ((p_sys->keys != NULL)
+     && vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
+        DestroyKeyHandler (p_sys->keys);
+
+    xcb_flush (conn);
+
+    return VLC_SUCCESS;
+
+error:
+    xcb_disconnect (conn);
+    free (p_sys);
+    ReleaseDrawable (obj, window);
+    return VLC_EGENERIC;
+}
+
+static void EmClose (vlc_object_t *obj)
+{
+    vout_window_t *wnd = (vout_window_t *)obj;
+    xcb_window_t window = wnd->handle.xid;
+
+    Close (obj);
+    ReleaseDrawable (obj, window);
+}
