@@ -117,6 +117,9 @@ static int ProcessEvent (vout_display_t *vd,
             vout_display_SendEventClose (vd);
             break;
 
+        case XCB_MAPPING_NOTIFY:
+            break;
+
         default:
             msg_Dbg (vd, "unhandled event %"PRIu8, ev->response_type);
     }
