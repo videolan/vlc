@@ -106,6 +106,7 @@ static int Open (vlc_object_t *obj)
         return VLC_ENOMEM;
 
     vd->sys = p_sys;
+    p_sys->pool = NULL;
 
     /* Connect to X */
     p_sys->conn = Connect (obj);
@@ -272,9 +273,6 @@ static int Open (vlc_object_t *obj)
     p_sys->gc = xcb_generate_id (p_sys->conn);
     xcb_create_gc (p_sys->conn, p_sys->gc, p_sys->window, 0, NULL);
     msg_Dbg (vd, "using X11 graphic context %08"PRIx32, p_sys->gc);
-
-    /* */
-    p_sys->pool = NULL;
 
     /* */
     vout_display_info_t info = vd->info;
