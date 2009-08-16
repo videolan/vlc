@@ -38,17 +38,11 @@
 #include <vlc_vout_window.h>
 #include <vlc_keys.h>
 
-#include <errno.h>                                                 /* ENOMEM */
-
 #ifdef HAVE_MACHINE_PARAM_H
     /* BSD */
 #   include <machine/param.h>
 #   include <sys/types.h>                                  /* typedef ushort */
 #   include <sys/ipc.h>
-#endif
-
-#ifndef WIN32
-#   include <netinet/in.h>                            /* BSD: struct in_addr */
 #endif
 
 #ifdef HAVE_XSP
