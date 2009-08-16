@@ -150,6 +150,17 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
     reparentable->setLayout( innerLayout );
     layout->addWidget( reparentable );
 
+#ifdef Q_WS_X11
+    /* HACK: Only one X11 client can subscribe to mouse click events.
+     * VLC currently handles those in the video display.
+     * Force Qt4 to unsubscribe from them. */
+    Display *dpy = QX11Info::display();
+    Window w = stable->winId();
+    XWindowAttributes attr;
+
+    XGetWindowAttributes( dpy, w, &attr );
+    XSelectInput( dpy, w, attr.your_event_mask & ~ButtonPressMask );
+#endif
     videoSync();
 #ifndef NDEBUG
     msg_Dbg( p_intf, "embedded video ready (handle %p)",
