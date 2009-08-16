@@ -4,7 +4,7 @@
  * Copyright (C) 2005, 2007 the VideoLAN team
  * $Id$
  *
- * Authors: Felix Kühne <fkuehne@users.sf.net>
+ * Authors: Felix Kühne <fkuehne at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by

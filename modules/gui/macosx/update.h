@@ -4,7 +4,7 @@
  * Copyright © 2005-2008 the VideoLAN team
  * $Id$
  *
- * Authors: Felix Kühne <fkuehne@users.sf.net>
+ * Authors: Felix Kühne <fkuehne at videolan dot org>
  *          Rafaël Carré <funman@videolanorg>
  *
  * This program is free software; you can redistribute it and/or modify
