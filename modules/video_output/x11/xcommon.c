@@ -88,9 +88,11 @@
 int  Activate   ( vlc_object_t * );
 void Deactivate ( vlc_object_t * );
 
+#ifndef MODULE_NAME_IS_glx
 static int  InitVideo      ( vout_thread_t * );
 static void EndVideo       ( vout_thread_t * );
 static void DisplayVideo   ( vout_thread_t *, picture_t * );
+#endif
 static int  ManageVideo    ( vout_thread_t * );
 static int  Control        ( vout_thread_t *, int, va_list );
 
@@ -99,8 +101,10 @@ static int  InitDisplay    ( vout_thread_t * );
 static int  CreateWindow   ( vout_thread_t *, x11_window_t * );
 static void DestroyWindow  ( vout_thread_t *, x11_window_t * );
 
+#ifndef MODULE_NAME_IS_glx
 static int  NewPicture     ( vout_thread_t *, picture_t * );
 static void FreePicture    ( vout_thread_t *, picture_t * );
+#endif
 
 #ifdef HAVE_SYS_SHM_H
 static int i_shm_major = 0;
@@ -164,15 +168,17 @@ int Activate ( vlc_object_t *p_this )
     bool   b_chroma = 0;
 #endif
 
+#ifndef MODULE_NAME_IS_glx
     p_vout->pf_init = InitVideo;
     p_vout->pf_end = EndVideo;
-    p_vout->pf_manage = ManageVideo;
+    p_vout->pf_display = DisplayVideo;
+#endif
 #ifdef MODULE_NAME_IS_xvmc
     p_vout->pf_render = RenderVideo;
 #else
     p_vout->pf_render = NULL;
 #endif
-    p_vout->pf_display = DisplayVideo;
+    p_vout->pf_manage = ManageVideo;
     p_vout->pf_control = Control;
 
     /* Allocate structure */
@@ -756,7 +762,7 @@ static void DisablePixelDoubling( vout_thread_t *p_vout )
 #endif
 
 
-
+#if !defined(MODULE_NAME_IS_glx)
 /*****************************************************************************
  * InitVideo: initialize X11 video thread output method
  *****************************************************************************
@@ -1089,6 +1095,7 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     /* Make sure the command is sent now - do NOT use XFlush !*/
     XSync( p_vout->p_sys->p_display, False );
 }
+#endif
 
 /*****************************************************************************
  * ManageVideo: handle X11 events
@@ -1483,6 +1490,7 @@ static int ManageVideo( vout_thread_t *p_vout )
     return 0;
 }
 
+#if !defined( MODULE_NAME_IS_glx )
 /*****************************************************************************
  * EndVideo: terminate X11 video thread output method
  *****************************************************************************
@@ -1500,6 +1508,7 @@ static void EndVideo( vout_thread_t *p_vout )
         FreePicture( p_vout, PP_OUTPUTPICTURE[ i_index ] );
     }
 }
+#endif
 
 /* following functions are local */
 
@@ -1720,10 +1729,9 @@ static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
  *****************************************************************************
  * Returns 0 on success, -1 otherwise
  *****************************************************************************/
+#if !defined(MODULE_NAME_IS_glx)
 static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#ifndef MODULE_NAME_IS_glx
-
 #if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
     int i_plane;
 #endif
@@ -1863,12 +1871,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             p_pic->i_planes = 0;
             return -1;
     }
-#else
-
-    VLC_UNUSED(p_vout); VLC_UNUSED(p_pic);
-
-#endif /* !MODULE_NAME_IS_glx */
-
     return 0;
 }
 
@@ -1914,6 +1916,7 @@ static void FreePicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     free( p_pic->p_sys );
 }
+#endif /* !MODULE_NAME_IS_glx */
 
 /*****************************************************************************
  * ToggleFullScreen: Enable or disable full screen mode
