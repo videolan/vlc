@@ -82,6 +82,7 @@ static int Demux( demux_t *p_demux )
     xml_t *p_xml;
     xml_reader_t *p_xml_reader = NULL;
     char *psz_eltname = NULL;
+    int i_ret = -1;
     INIT_PLAYLIST_STUFF;
 
     p_xml = xml_Create( p_demux );
@@ -123,13 +124,7 @@ static int Demux( demux_t *p_demux )
             goto error;
     }
 
-    if( p_xml_reader )
-        xml_ReaderDelete( p_xml, p_xml_reader );
-    if( p_xml )
-        xml_Delete( p_xml );
-    free( psz_eltname );
-    HANDLE_PLAY_AND_RELEASE;
-    return 0; /* Needed for correct operation of go back */
+    i_ret = 0; /* Needed for correct operation of go back */
 
 error:
     if( p_xml_reader )
@@ -138,7 +133,7 @@ error:
         xml_Delete( p_xml );
     free( psz_eltname );
     HANDLE_PLAY_AND_RELEASE;
-    return -1;
+    return i_ret;
 }
 
 #define GET_VALUE( a ) \
@@ -155,25 +150,23 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                        input_item_t *p_current_input )
 {
     char *psz_name = NULL; /* genre name */
+    int i_ret = -1;
 
     while( xml_ReaderRead( p_xml_reader ) == 1 )
     {
-        int i_type;
-
         // Get the node type
-        i_type = xml_ReaderNodeType( p_xml_reader );
-        switch( i_type )
+        switch( xml_ReaderNodeType( p_xml_reader ) )
         {
             // Error
             case -1:
-                return -1;
-                break;
+                goto error;
 
             case XML_READER_STARTELEM:
             {
                 // Read the element name
                 char *psz_eltname = xml_ReaderName( p_xml_reader );
-                if( !psz_eltname ) return -1;
+                if( !psz_eltname )
+                    goto error;
 
                 if( !strcmp( psz_eltname, "genre" ) )
                 {
@@ -185,11 +178,10 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                             xml_ReaderValue( p_xml_reader );
                         if( !psz_attrname || !psz_attrvalue )
                         {
-                            FREENULL(psz_attrname);
-                            FREENULL(psz_attrvalue);
-                            free(psz_eltname);
-                            /*FIXME: isn't return a bit too much. what about break*/
-                            return -1;
+                            free( psz_attrname );
+                            free( psz_attrvalue );
+                            free( psz_eltname );
+                            break;
                         }
 
                         GET_VALUE( name )
@@ -215,7 +207,9 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
             {
                 // Read the element name
                 char *psz_eltname = xml_ReaderName( p_xml_reader );
-                if( !psz_eltname ) return -1;
+                if( !psz_eltname )
+                    goto error;
+
                 if( !strcmp( psz_eltname, "genre" ) )
                 {
                     char* psz_mrl;
@@ -236,7 +230,11 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
             }
         }
     }
-    return 0;
+    i_ret = 0;
+
+error:
+    free( psz_name );
+    return i_ret;
 }
 
 /* radio stations:
