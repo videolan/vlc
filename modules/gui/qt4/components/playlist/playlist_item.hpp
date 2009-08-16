@@ -40,8 +40,8 @@ class PLItem
 {
     friend class PLModel;
 public:
-    PLItem( playlist_item_t *, PLItem *parent, PLModel * );
-    PLItem( playlist_item_t *, QSettings *, PLModel * );
+    PLItem( playlist_item_t *, PLItem *parent );
+    PLItem( playlist_item_t * );
     ~PLItem();
 
     int row() const;
@@ -49,10 +49,10 @@ public:
     void insertChild( PLItem *, int p, bool signal = true );
     void appendChild( PLItem *item, bool signal = true )
     {
-        insertChild( item, children.count(), signal );
+        children.insert( children.count(), item );
     };
 
-    void remove( PLItem *removed );
+    void remove( PLItem *removed, int i_depth );
 
     PLItem *child( int row ) { return children.value( row ); };
     int childCount() const { return children.count(); };
@@ -67,9 +67,8 @@ protected:
     input_item_t *p_input;
 
 private:
-    void init( playlist_item_t *, PLItem *, PLModel *, QSettings * );
+    void init( playlist_item_t *, PLItem * );
     PLItem *parentItem;
-    PLModel *model;
 };
 
 #endif

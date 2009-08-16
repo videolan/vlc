@@ -29,10 +29,8 @@
 #include <assert.h>
 
 #include "qt4.hpp"
-#include "components/playlist/playlist_model.hpp"
+#include "playlist_item.hpp"
 #include <vlc_intf_strings.h>
-
-#include <QSettings>
 
 #include "sorting.h"
 
@@ -48,29 +46,27 @@
 */
 
 
-void PLItem::init( playlist_item_t *_playlist_item, PLItem *parent, PLModel *m, QSettings *settings )
+void PLItem::init( playlist_item_t *_playlist_item, PLItem *parent )
 {
     parentItem = parent;          /* Can be NULL, but only for the rootItem */
     i_id       = _playlist_item->i_id;           /* Playlist item specific id */
-    model      = m;               /* PLModel (QAbsmodel) */
     p_input    = _playlist_item->p_input;
     vlc_gc_incref( p_input );
 
-    assert( model );              /* We need a model */
 }
 
 /*
    Constructors
    Call the above function init
    */
-PLItem::PLItem( playlist_item_t *p_item, PLItem *parent, PLModel *m )
+PLItem::PLItem( playlist_item_t *p_item, PLItem *parent )
 {
-    init( p_item, parent, m, NULL );
+    init( p_item, parent );
 }
 
-PLItem::PLItem( playlist_item_t * p_item, QSettings *settings, PLModel *m )
+PLItem::PLItem( playlist_item_t * p_item )
 {
-    init( p_item, NULL, m, settings );
+    init( p_item, NULL );
 }
 
 PLItem::~PLItem()
@@ -85,22 +81,15 @@ PLItem::~PLItem()
  */
 void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
 {
-    if( signal )
-        model->beginInsertRows( model->index( this , 0 ), i_pos, i_pos );
     children.insert( i_pos, item );
-    if( signal )
-        model->endInsertRows();
 }
 
-void PLItem::remove( PLItem *removed )
+void PLItem::remove( PLItem *removed, int i_depth )
 {
-    if( model->i_depth == DEPTH_SEL || parentItem )
+    if( i_depth == DEPTH_SEL || parentItem )
     {
         int i_index = parentItem->children.indexOf( removed );
-        model->beginRemoveRows( model->index( parentItem, 0 ),
-                                i_index, i_index );
         parentItem->children.removeAt( i_index );
-        model->endRemoveRows();
     }
 }
 
