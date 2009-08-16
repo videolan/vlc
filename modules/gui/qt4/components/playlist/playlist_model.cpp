@@ -81,6 +81,17 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 
     rootItem          = NULL; /* PLItem rootItem, will be set in rebuild( ) */
 
+    if( i_depth == DEPTH_SEL )
+        i_showflags = 0;
+    else
+    {
+        i_showflags = getSettings()->value( "qt-pl-showflags", COLUMN_DEFAULT ).toInt();
+        if( i_showflags < 1)
+            i_showflags = COLUMN_DEFAULT; /* reasonable default to show something */
+        else if ( i_showflags >= COLUMN_END )
+            i_showflags = COLUMN_END - 1; /* show everything */
+    }
+
     /* Icons initialization */
 #define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( QPixmap( x ) )
     ADD_ICON( UNKNOWN , type_unknown_xpm );
@@ -116,7 +127,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 PLModel::~PLModel()
 {
     if(i_depth == -1)
-        getSettings()->setValue( "qt-pl-showflags", rootItem->i_showflags );
+        getSettings()->setValue( "qt-pl-showflags", i_showflags );
     delCallbacks();
     delete rootItem;
 }
@@ -356,7 +367,7 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
 
         while( metadata < COLUMN_END )
         {
-            if( item->i_showflags & metadata )
+            if( i_showflags & metadata )
                 running_index++;
             if( running_index == index.column() )
                 break;
@@ -417,7 +428,7 @@ QVariant PLModel::headerData( int section, Qt::Orientation orientation,
 
     while( metadata < COLUMN_END )
     {
-        if( metadata & rootItem->i_showflags )
+        if( metadata & i_showflags )
             running_index++;
         if( running_index == section )
             break;
@@ -487,7 +498,7 @@ int PLModel::columnCount( const QModelIndex &i) const
 
     while( metadata < COLUMN_END )
     {
-        if( metadata & rootItem->i_showflags )
+        if( metadata & i_showflags )
             columnCount++;
         metadata <<= 1;
     }
@@ -971,20 +982,20 @@ void PLModel::viewchanged( int meta )
         index = __MIN( index, columnCount() );
         QModelIndex parent = createIndex( 0, 0, rootItem );
 
-        if( rootItem->i_showflags & meta )
+        if( i_showflags & meta )
             /* Removing columns */
         {
             beginRemoveColumns( parent, index, index+1 );
-            rootItem->i_showflags &= ~( meta );
-            getSettings()->setValue( "qt-pl-showflags", rootItem->i_showflags );
+            i_showflags &= ~( meta );
+            getSettings()->setValue( "qt-pl-showflags", i_showflags );
             endRemoveColumns();
         }
         else
         {
             /* Adding columns */
             beginInsertColumns( parent, index, index+1 );
-            rootItem->i_showflags |= meta;
-            getSettings()->setValue( "qt-pl-showflags", rootItem->i_showflags );
+            i_showflags |= meta;
+            getSettings()->setValue( "qt-pl-showflags", i_showflags );
             endInsertColumns();
         }
         emit columnsChanged( meta );

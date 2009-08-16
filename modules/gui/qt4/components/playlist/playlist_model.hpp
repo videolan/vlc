@@ -124,7 +124,7 @@ public:
                       int row, int column, const QModelIndex &target );
     QStringList mimeTypes() const;
 
-    int shownFlags() { return rootItem->i_showflags;  }
+    int shownFlags() { return i_showflags;  }
 
 private:
     void addCallbacks();
@@ -137,6 +137,7 @@ private:
     playlist_t *p_playlist;
     intf_thread_t *p_intf;
     int i_depth;
+    int i_showflags;
 
     static QIcon icons[ITEM_TYPE_NUMBER];
 

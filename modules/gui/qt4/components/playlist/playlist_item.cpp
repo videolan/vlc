@@ -58,28 +58,6 @@ void PLItem::init( playlist_item_t *_playlist_item, PLItem *parent, PLModel *m, 
     vlc_gc_incref( p_input );
 
     assert( model );              /* We need a model */
-
-    /* No parent, should be the 2 main ones */
-    if( parentItem == NULL )
-    {
-        if( model->i_depth == DEPTH_SEL )  /* Selector Panel */
-        {
-            i_showflags = 0;
-        }
-        else
-        {
-            i_showflags = settings->value( "qt-pl-showflags", COLUMN_DEFAULT ).toInt();
-            if( i_showflags < 1)
-                i_showflags = COLUMN_DEFAULT; /* reasonable default to show something; */
-            else if ( i_showflags >= COLUMN_END )
-                i_showflags = COLUMN_END - 1; /* show everything */
-
-        }
-    }
-    else
-    {
-        i_showflags = parentItem->i_showflags;
-    }
 }
 
 /*
@@ -144,6 +122,5 @@ void PLItem::update( playlist_item_t *p_item )
     /* Useful for the model */
     i_type = p_item->p_input->i_type;
 
-    i_showflags = parentItem ? parentItem->i_showflags : i_showflags;
 }
 

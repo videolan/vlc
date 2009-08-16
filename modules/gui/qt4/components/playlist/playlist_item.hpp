@@ -65,7 +65,6 @@ protected:
     QList<PLItem*> children;
     int i_type;
     int i_id;
-    int i_showflags;
     input_item_t *p_input;
 
 private:
