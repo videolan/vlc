@@ -99,15 +99,6 @@ extern void Deactivate ( vlc_object_t * );
     "If you graphics card provides several adaptors, this option allows you " \
     "to choose which one will be used (you shouldn't have to change this).")
 
-#define ALT_FS_TEXT N_("Alternate fullscreen method")
-#define ALT_FS_LONGTEXT N_( \
-    "There are two ways to make a fullscreen window, unfortunately each one " \
-    "has its drawbacks.\n" \
-    "1) Let the window manager handle your fullscreen window (default), but " \
-    "things like taskbars will likely show on top of the video.\n" \
-    "2) Completely bypass the window manager, but then nothing will be able " \
-    "to show on top of the video.")
-
 #define DISPLAY_TEXT N_("X11 display name")
 #define DISPLAY_LONGTEXT N_( \
     "Specify the X11 hardware display you want to use. By default VLC will " \
@@ -132,7 +123,6 @@ vlc_module_begin ()
     set_shortname( "XVMC" )
     add_string( "xvmc-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
     add_integer( "xvmc-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true )
-    add_bool( "xvmc-altfullscreen", 0, NULL, ALT_FS_TEXT, ALT_FS_LONGTEXT, true )
     add_string( "xvmc-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
 #ifdef HAVE_SYS_SHM_H
     add_bool( "xvmc-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true )

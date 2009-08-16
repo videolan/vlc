@@ -68,6 +68,11 @@ vlc_module_begin ()
 
     add_string ("x11-display", NULL, NULL,
                 DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
+    /* Obsolete since 1.1.0: */
+    add_obsolete_bool ("x11-altfullscreen")
+    add_obsolete_bool ("xvideo-altfullscreen")
+    add_obsolete_bool ("xvmc-altfullscreen")
+    add_obsolete_bool ("glx-altfullscreen")
 
     add_submodule ()
     set_shortname (N_("Drawable"))
