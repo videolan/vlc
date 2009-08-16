@@ -716,19 +716,21 @@ static bool parse_extension_node COMPLEX_INTERFACE
         if( !strcmp( psz_name, "title" ) )
         {
             resolve_xml_special_chars( psz_value );
-            psz_title = strdup( psz_value );
+            psz_title = psz_value;
         }
         /* extension attribute: application */
         else if( !strcmp( psz_name, "application" ) )
         {
-            psz_application = strdup( psz_value );
+            psz_application = psz_value;
         }
         /* unknown attribute */
         else
+        {
             msg_Warn( p_demux, "invalid <%s> attribute:\"%s\"", psz_element,
                       psz_name );
-
-        FREE_ATT();
+            FREE_VALUE();
+        }
+        FREE_NAME();
     }
 
     /* attribute title is mandatory except for <extension> */

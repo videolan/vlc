@@ -200,15 +200,15 @@ static int Demux( demux_t *p_demux )
                     if( !strcmp( psz_elname, "entry" ) &&
                         !strcmp( psz_name, "Playstring" ) )
                     {
-                        psz_mrl = strdup( psz_value );
+                        psz_mrl = psz_value;
                     }
                     else
                     {
                         msg_Warn( p_demux, "unexpected attribure %s in element %s",
                                   psz_name, psz_elname );
+                        free( psz_value );
                     }
                     free( psz_name );
-                    free( psz_value );
                 }
                 break;
             }
@@ -222,34 +222,34 @@ static int Demux( demux_t *p_demux )
                 }
                 if( !strcmp( psz_elname, "Name" ) )
                 {
-                    psz_name = strdup( psz_text );
+                    psz_name = psz_text;
                 }
                 else if( !strcmp( psz_elname, "Genre" ) )
                 {
-                    psz_genre = strdup( psz_text );
+                    psz_genre = psz_text;
                 }
                 else if( !strcmp( psz_elname, "Nowplaying" ) )
                 {
-                    psz_now = strdup( psz_text );
+                    psz_now = psz_text;
                 }
                 else if( !strcmp( psz_elname, "Listeners" ) )
                 {
-                    psz_listeners = strdup( psz_text );
+                    psz_listeners = psz_text;
                 }
                 else if( !strcmp( psz_elname, "Bitrate" ) )
                 {
-                    psz_bitrate = strdup( psz_text );
+                    psz_bitrate = psz_text;
                 }
                 else if( !strcmp( psz_elname, "" ) )
                 {
-                    ;
+                    free( psz_text );
                 }
                 else
                 {
                     msg_Warn( p_demux, "unexpected text in element '%s'",
                               psz_elname );
+                    free( psz_text );
                 }
-                free( psz_text );
                 break;
             }
             // End element
@@ -281,7 +281,7 @@ static int Demux( demux_t *p_demux )
                     FREENULL( psz_now );
                 }
                 free( psz_elname );
-                psz_elname = strdup("");
+                psz_elname = strdup( "" );
 
                 break;
             }
