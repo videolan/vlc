@@ -528,11 +528,11 @@ QStringList PLModel::selectedURIs()
     QStringList lst;
     for( int i = 0; i < current_selection.size(); i++ )
     {
-        PL_LOCK;
         PLItem *item = static_cast<PLItem*>
                     (current_selection[i].internalPointer());
         if( item )
         {
+            PL_LOCK;
             playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
             if( p_item )
             {
@@ -543,8 +543,8 @@ QStringList PLModel::selectedURIs()
                     free( psz );
                 }
             }
+            PL_UNLOCK;
         }
-        PL_UNLOCK;
     }
     return lst;
 }
@@ -686,11 +686,7 @@ void PLModel::ProcessInputItemUpdate( input_item_t *p_item )
     if( !p_item ||  p_item->i_id <= 0 ) return;
     PLItem *item = FindByInput( rootItem, p_item->i_id );
     if( item )
-    {
-        QPL_LOCK;
-        UpdateTreeItem( item, true );
-        QPL_UNLOCK;
-    }
+        UpdateTreeItem( item, true, true);
 }
 
 void PLModel::ProcessItemRemoval( int i_id )
@@ -708,9 +704,9 @@ void PLModel::ProcessItemAppend( const playlist_add_t *p_add )
     PLItem *newItem = NULL;
 
     PLItem *nodeItem = FindById( rootItem, p_add->i_node );
-    PL_LOCK;
-    if( !nodeItem ) goto end;
+    if( !nodeItem ) return;
 
+    PL_LOCK;
     p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
     if( i_depth == DEPTH_SEL && p_item->p_parent &&
@@ -718,12 +714,15 @@ void PLModel::ProcessItemAppend( const playlist_add_t *p_add )
         goto end;
 
     newItem = new PLItem( p_item, nodeItem );
+    PL_UNLOCK;
+
     emit layoutAboutToBeChanged();
     emit beginInsertRows( index( newItem, 0 ), nodeItem->childCount(), nodeItem->childCount()+1 );
     nodeItem->appendChild( newItem );
     emit endInsertRows();
     emit layoutChanged();
     UpdateTreeItem( newItem, true );
+    return;
 end:
     PL_UNLOCK;
     return;
@@ -745,7 +744,6 @@ void PLModel::rebuild( playlist_item_t *p_root )
 
     emit layoutAboutToBeChanged();
 
-    PL_LOCK;
     /* Clear the tree */
     if( rootItem )
     {
@@ -758,6 +756,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
             emit endRemoveRows();
         }
     }
+    PL_LOCK;
     if( p_root )
     {
         delete rootItem;
@@ -811,14 +810,13 @@ void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
     }
 }
 
-/* This function must be entered WITH the playlist lock */
+/* Function doesn't need playlist-lock, as we don't touch playlist_item_t stuff here*/
 void PLModel::UpdateTreeItem( PLItem *item, bool signal, bool force )
 {
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
-    if ( !p_item )
+    if ( !item || !item->p_input )
         return;
-    if( !force && i_depth == DEPTH_SEL && p_item->p_parent &&
-                                 p_item->p_parent->i_id != rootItem->i_id )
+    if( !force && i_depth == DEPTH_SEL && item->parentItem &&
+                                 item->parentItem->p_input != rootItem->p_input )
         return;
     if( signal )
         emit dataChanged( index( item, 0 ) , index( item, columnCount( QModelIndex() ) ) );
@@ -876,12 +874,12 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
         playlist_DeleteFromInput( p_playlist, p_item->p_input, pl_Locked );
     else
         playlist_NodeDelete( p_playlist, p_item, true, false );
+    PL_UNLOCK;
     /* And finally, remove it from the tree */
     emit beginRemoveRows( index( item->parentItem, 0), item->parentItem->children.indexOf( item ),
             item->parentItem->children.indexOf( item )+1 );
     item->remove( item, i_depth );
     emit endRemoveRows();
-    PL_UNLOCK;
 }
 
 /******* Volume III: Sorting and searching ********/
@@ -1039,7 +1037,8 @@ void PLModel::popupInfo()
         mid->setParent( PlaylistDialog::getInstance( p_intf ),
                         Qt::Dialog );
         mid->show();
-    }
+    } else
+        PL_UNLOCK;
 }
 
 void PLModel::popupStream()
