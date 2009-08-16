@@ -201,7 +201,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
     [o_net_udpm_addr_lbl setStringValue: _NS("IP Address")];
     [o_net_udpm_port_lbl setStringValue: _NS("Port")];
     [o_net_http_url_lbl setStringValue: _NS("URL")];
-    [o_net_help_lbl setStringValue: _NS("To Open a usual network stream (HTTP, RTSP, MMS, FTP, etc.), just enter the URL in the field above. If you want to open a RTP or UDP stream, press the button below.")];
+    [o_net_help_lbl setStringValue: _NS("To Open a usual network stream (HTTP, RTSP, RTMP, MMS, FTP, etc.), just enter the URL in the field above. If you want to open a RTP or UDP stream, press the button below.")];
     [o_net_help_udp_lbl setStringValue: _NS("If you want to open a multicast stream, enter the respective IP address given by the stream provider. In unicast mode, VLC will use your machine's IP automatically.\n\nTo open a stream using a different protocol, just press Cancel to close this sheet.")];
     [o_net_udp_cancel_btn setTitle: _NS("Cancel")];
     [o_net_udp_ok_btn setTitle: _NS("Open")];
@@ -883,7 +883,7 @@ static VLCOpen *_o_sharedMainInstance = nil;
         NSString *o_url = [o_net_http_url stringValue];
 
         if ( ![o_url hasPrefix:@"http:"] && ![o_url hasPrefix:@"ftp:"]
-              && ![o_url hasPrefix:@"mms"] && ![o_url hasPrefix:@"rtsp"] )
+              && ![o_url hasPrefix:@"mms"] && ![o_url hasPrefix:@"rtsp"] && ![o_url hasPrefix:@"rtmp"] )
             o_mrl_string = [NSString stringWithFormat: @"http://%@", o_url];
         else
             o_mrl_string = o_url;
