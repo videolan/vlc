@@ -76,7 +76,7 @@ vlc_module_begin()
     DECLARE_MODULE(xcb, 75)
 
     add_submodule()
-    DECLARE_MODULE(xcb_xv, 0)
+    DECLARE_MODULE(xcb_xv, 155)
 
 vlc_module_end()
 

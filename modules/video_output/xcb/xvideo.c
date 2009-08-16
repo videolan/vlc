@@ -55,16 +55,19 @@ static void Close (vlc_object_t *);
  */
 vlc_module_begin ()
     set_shortname (N_("XVideo"))
-    set_description (N_("(Experimental) XVideo output"))
+    set_description (N_("XVideo output (XCB)"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout display", 0)
+    set_capability ("vout display", 155)
     set_callbacks (Open, Close)
 
     add_string ("x11-display", NULL, NULL,
                 DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
+        add_deprecated_alias ("xvideo-display")
     add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)
+        add_deprecated_alias ("xvideo-shm")
     add_shortcut ("xcb-xv")
+    add_shortcut ("xv")
 vlc_module_end ()
 
 #define MAX_PICTURES (VOUT_MAX_PICTURES)
