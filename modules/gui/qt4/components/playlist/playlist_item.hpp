@@ -28,13 +28,8 @@
 # include "config.h"
 #endif
 
-#include "components/playlist/playlist_model.hpp"
-
-#include <QString>
 #include <QList>
 
-class QSettings;
-class PLModel;
 
 class PLItem
 {

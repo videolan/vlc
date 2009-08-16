@@ -86,7 +86,7 @@ void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
 
 void PLItem::remove( PLItem *removed, int i_depth )
 {
-    if( i_depth == DEPTH_SEL || parentItem )
+    if( i_depth == 1 /* DEPTH_SEL */ || parentItem )
     {
         int i_index = parentItem->children.indexOf( removed );
         parentItem->children.removeAt( i_index );
