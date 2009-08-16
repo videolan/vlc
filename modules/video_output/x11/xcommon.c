@@ -57,8 +57,6 @@
 #include <X11/Xproto.h>
 #include <X11/Xmd.h>
 #include <X11/Xutil.h>
-#include <X11/keysym.h>
-#include <X11/XF86keysym.h>
 #ifdef HAVE_SYS_SHM_H
 #   include <X11/extensions/XShm.h>
 #endif
