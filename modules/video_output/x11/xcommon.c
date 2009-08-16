@@ -349,7 +349,6 @@ int Activate ( vlc_object_t *p_this )
     DisableXScreenSaver( p_vout );
 
     /* Misc init */
-    p_vout->p_sys->b_altfullscreen = 0;
     p_vout->p_sys->i_time_button_last_pressed = 0;
 
 #ifdef MODULE_NAME_IS_xvmc

@@ -216,7 +216,6 @@ struct vout_sys_t
     int                 i_vout_event;  /* 1(Fullsupport), 2(FullscreenOnly), 3(none) */
 
     /* X11 generic properties */
-    bool          b_altfullscreen;          /* which fullscreen method */
 #ifdef HAVE_SYS_SHM_H
     int                 i_shm_opcode;      /* shared memory extension opcode */
 #endif
