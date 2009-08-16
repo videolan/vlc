@@ -48,12 +48,13 @@ class QPalette;
 class QPixmap;
 class QHBoxLayout;
 class QMenu;
+class ReparentableWidget;
 
 /******************** Video Widget ****************/
 class VideoWidget : public QFrame
 {
     Q_OBJECT
-friend class MainInterface;
+friend class ReparentableWidget;
 
 public:
     VideoWidget( intf_thread_t * );
@@ -78,6 +79,9 @@ private:
     QSize videoSize;
     QWidget *reparentable;
     QLayout *layout;
+
+signals:
+    void keyPressed( QKeyEvent * );
 
 public slots:
     void SetSizing( unsigned int, unsigned int );

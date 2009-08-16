@@ -59,6 +59,22 @@ static void videoSync( void )
 
 #include <math.h>
 
+class ReparentableWidget : public QWidget
+{
+private:
+    VideoWidget *owner;
+public:
+    ReparentableWidget( VideoWidget *owner ) : owner( owner )
+    {
+    }
+
+protected:
+    void keyPressEvent( QKeyEvent *e )
+    {
+        emit owner->keyPressed( e );
+    }
+};
+
 /**********************************************************************
  * Video Widget. A simple frame on which video is drawn
  * This class handles resize issues
@@ -112,7 +128,7 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
      * reparentable widget, that will be within the VideoWidget in windowed
      * mode, and within the root window (NULL parent) in full-screen mode.
      */
-    reparentable = new QWidget();
+    reparentable = new ReparentableWidget( this );
     QLayout *innerLayout = new QHBoxLayout( reparentable );
     innerLayout->setContentsMargins( 0, 0, 0, 0 );
 

@@ -230,6 +230,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
                  videoWidget, SetSizing( unsigned int, unsigned int ) );
         CONNECT( this, askVideoSetFullScreen( bool ),
                  videoWidget, SetFullScreen( bool ) );
+        CONNECT( videoWidget, keyPressed( QKeyEvent * ),
+                 this, handleKeyPress( QKeyEvent * ) );
     }
 
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
@@ -1201,6 +1203,11 @@ void MainInterface::customEvent( QEvent *event )
 }
 
 void MainInterface::keyPressEvent( QKeyEvent *e )
+{
+    handleKeyPress( e );
+}
+
+void MainInterface::handleKeyPress( QKeyEvent *e )
 {
     if( ( e->modifiers() &  Qt::ControlModifier ) && ( e->key() == Qt::Key_H )
           && !menuBar()->isVisible() )

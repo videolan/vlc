@@ -178,6 +178,9 @@ private slots:
     void updateSystrayTooltipStatus( int );
 
     void showCryptedLabel( bool );
+
+    void handleKeyPress( QKeyEvent * );
+
 signals:
     void askGetVideo( WId *p_id, int *pi_x, int *pi_y,
                       unsigned int *pi_width, unsigned int *pi_height );
