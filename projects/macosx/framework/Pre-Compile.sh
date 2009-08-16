@@ -35,7 +35,7 @@ if test "${ACTION}" = "build"; then
     target_modules="${target}/${modules}"    # Should we consider using a different well-known folder like shared resources?
     target_share="${target}/${share}"    # Should we consider using a different well-known folder like shared resources?
     target_include="${target}/${include}"    # Should we consider using a different well-known folder like shared resources?
-    linked_libs=" "
+    linked_libs=""
     
     ##########################
     # @function install_library(src_lib, dest_dir, type, lib_install_prefix, destination_name)
@@ -81,11 +81,11 @@ if test "${ACTION}" = "build"; then
                 local name=`basename ${linked_lib}`
                 case "${linked_lib}" in
                     */vlc_build_dir/* | */vlc_install_dir/* | *vlc* | */extras/contrib/lib/*)
-#                        if test -e ${linked_lib}; then
+                        if test -e ${linked_lib}; then
                             install_name_tool -change "$linked_lib" "${lib_install_prefix}/${name}" "${lib_dest}"
                             linked_libs="${linked_libs} ${ref_lib}"
                             install_library ${linked_lib} ${target_lib} "library"
-#                        fi
+                        fi
                         ;;
                 esac
             done
