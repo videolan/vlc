@@ -723,7 +723,7 @@ void PLModel::ProcessItemAppend( const playlist_add_t *p_add )
     nodeItem->appendChild( newItem );
     emit endInsertRows();
     emit layoutChanged();
-    UpdateTreeItem( p_item, newItem, true );
+    UpdateTreeItem( newItem, true );
 end:
     PL_UNLOCK;
     return;
@@ -772,8 +772,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
                                            p_item->p_input->i_id );
         if( currentItem )
         {
-            UpdateTreeItem( p_item, currentItem,
-                            true, false );
+            UpdateTreeItem( currentItem, true, false );
         }
     }
     else
@@ -816,19 +815,11 @@ void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
 void PLModel::UpdateTreeItem( PLItem *item, bool signal, bool force )
 {
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
-    UpdateTreeItem( p_item, item, signal, force );
-}
-
-/* This function must be entered WITH the playlist lock */
-void PLModel::UpdateTreeItem( playlist_item_t *p_item, PLItem *item,
-                              bool signal, bool force )
-{
     if ( !p_item )
         return;
     if( !force && i_depth == DEPTH_SEL && p_item->p_parent &&
                                  p_item->p_parent->i_id != rootItem->i_id )
         return;
-    item->update( p_item );
     if( signal )
         emit dataChanged( index( item, 0 ) , index( item, columnCount( QModelIndex() ) ) );
 }

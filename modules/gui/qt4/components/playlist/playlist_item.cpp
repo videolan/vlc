@@ -102,10 +102,3 @@ int PLItem::row() const
     return 0;
 }
 
-/* update the PL Item, get the good names and so on */
-void PLItem::update( playlist_item_t *p_item )
-{
-    assert( p_item->p_input == p_input);
-
-}
-

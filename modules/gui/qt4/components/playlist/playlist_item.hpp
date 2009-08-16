@@ -59,8 +59,6 @@ public:
 
     PLItem *parent() { return parentItem; };
 
-    void update( playlist_item_t * );
-
 protected:
     QList<PLItem*> children;
     int i_id;

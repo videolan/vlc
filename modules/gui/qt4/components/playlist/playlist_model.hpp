@@ -146,7 +146,6 @@ private:
     void ProcessItemAppend( const playlist_add_t *p_add );
 
     void UpdateTreeItem( PLItem *, bool, bool force = false );
-    void UpdateTreeItem( playlist_item_t *, PLItem *, bool, bool forc = false );
     void UpdateNodeChildren( PLItem * );
     void UpdateNodeChildren( playlist_item_t *, PLItem * );
 
