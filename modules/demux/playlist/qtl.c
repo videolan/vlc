@@ -188,25 +188,11 @@ static int Demux( demux_t *p_demux )
 
         if( !strcmp( psz_attrname, "autoplay" ) )
         {
-            if( !strcmp( psz_attrvalue, "true" ) )
-            {
-                b_autoplay = true;
-            }
-            else
-            {
-                b_autoplay = false;
-            }
+            b_autoplay = !strcmp( psz_attrvalue, "true" );
         }
         else if( !strcmp( psz_attrname, "controler" ) )
         {
-            if( !strcmp( psz_attrvalue, "false" ) )
-            {
-                b_controler = false;
-            }
-            else
-            {
-                b_controler = true;
-            }
+            b_controler = !strcmp( psz_attrvalue, "false" );
         }
         else if( !strcmp( psz_attrname, "fullscreen" ) )
         {
@@ -238,14 +224,7 @@ static int Demux( demux_t *p_demux )
         }
         else if( !strcmp( psz_attrname, "kioskmode" ) )
         {
-            if( !strcmp( psz_attrvalue, "true" ) )
-            {
-                b_kioskmode = true;
-            }
-            else
-            {
-                b_kioskmode = false;
-            }
+            b_kioskmode = !strcmp( psz_attrvalue, "true" );
         }
         else if( !strcmp( psz_attrname, "loop" ) )
         {
@@ -273,14 +252,7 @@ static int Demux( demux_t *p_demux )
         }
         else if( !strcmp( psz_attrname, "playeveryframe" ) )
         {
-            if( !strcmp( psz_attrvalue, "true" ) )
-            {
-                b_playeveryframe = true;
-            }
-            else
-            {
-                b_playeveryframe = false;
-            }
+            b_playeveryframe = !strcmp( psz_attrvalue, "true" );
         }
         else if( !strcmp( psz_attrname, "qtnext" ) )
         {
@@ -289,14 +261,7 @@ static int Demux( demux_t *p_demux )
         }
         else if( !strcmp( psz_attrname, "quitwhendone" ) )
         {
-            if( !strcmp( psz_attrvalue, "true" ) )
-            {
-                b_quitwhendone = true;
-            }
-            else
-            {
-                b_quitwhendone = false;
-            }
+            b_quitwhendone = !strcmp( psz_attrvalue, "true" );
         }
         else if( !strcmp( psz_attrname, "src" ) )
         {
@@ -322,22 +287,22 @@ static int Demux( demux_t *p_demux )
     }
 
     msg_Dbg( p_demux, "autoplay: %s (unused by VLC)",
-             b_autoplay==true ? "true": "false" );
+             b_autoplay ? "true": "false" );
     msg_Dbg( p_demux, "controler: %s (unused by VLC)",
-             b_controler==true?"true": "false" );
+             b_controler ? "true": "false" );
     msg_Dbg( p_demux, "fullscreen: %s (unused by VLC)",
              ppsz_fullscreen[fullscreen] );
     msg_Dbg( p_demux, "href: %s", psz_href );
     msg_Dbg( p_demux, "kioskmode: %s (unused by VLC)",
-             b_kioskmode==true?"true":"false" );
+             b_kioskmode ? "true":"false" );
     msg_Dbg( p_demux, "loop: %s (unused by VLC)", ppsz_loop[loop] );
     msg_Dbg( p_demux, "movieid: %d (unused by VLC)", i_movieid );
     msg_Dbg( p_demux, "moviename: %s", psz_moviename );
     msg_Dbg( p_demux, "playeverframe: %s (unused by VLC)",
-             b_playeveryframe==true?"true":"false" );
+             b_playeveryframe ? "true":"false" );
     msg_Dbg( p_demux, "qtnext: %s", psz_qtnext );
     msg_Dbg( p_demux, "quitwhendone: %s (unused by VLC)",
-             b_quitwhendone==true?"true":"false" );
+             b_quitwhendone ? "true":"false" );
     msg_Dbg( p_demux, "src: %s", psz_src );
     msg_Dbg( p_demux, "mimetype: %s", psz_mimetype );
     msg_Dbg( p_demux, "volume: %d (unused by VLC)", i_volume );
