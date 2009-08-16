@@ -53,11 +53,11 @@ static void Close (vlc_object_t *);
  * Module descriptor
  */
 vlc_module_begin ()
-    set_shortname (N_("XCB"))
-    set_description (N_("(Experimental) XCB video output"))
+    set_shortname (N_("X11"))
+    set_description (N_("X11 video output (XCB)"))
     set_category (CAT_VIDEO)
     set_subcategory (SUBCAT_VIDEO_VOUT)
-    set_capability ("vout display", 0)
+    set_capability ("vout display", 75)
     set_callbacks (Open, Close)
 
     add_string ("x11-display", NULL, NULL,
