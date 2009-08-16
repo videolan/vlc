@@ -387,8 +387,8 @@ VLC_EXPORT( void, vout_display_GetDefaultDisplaySize, (int *width, int *height, 
 typedef struct {
     int x;
     int y;
-    int width;
-    int height;
+    unsigned width;
+    unsigned height;
 } vout_display_place_t;
 
 /**
