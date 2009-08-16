@@ -282,7 +282,7 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
 void PLModel::removeItem( int i_id )
 {
     PLItem *item = FindById( rootItem, i_id );
-    if( currentItem && currentItem->p_input == item->p_input ) currentItem = NULL;
+    if( currentItem && item && currentItem->p_input == item->p_input ) currentItem = NULL;
     if( item ) item->remove( item );
 }
 
