@@ -1,9 +1,3 @@
-SOURCES_x11 = \
-	x11.c \
-	xcommon.c \
-	xcommon.h \
-	$(NULL)
-
 SOURCES_xvideo = \
 	xvideo.c \
 	xcommon.c \

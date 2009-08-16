@@ -368,7 +368,7 @@ case "${host_os}" in
     ;;
   *nto*)
     SYS=nto
-    VLC_ADD_LIBS([x11 xvideo],[-lsocket])
+    VLC_ADD_LIBS([xvideo],[-lsocket])
     ;;
   solaris*)
     SYS=solaris
@@ -3438,13 +3438,7 @@ AC_ARG_ENABLE(x11,
 CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
 
 AS_IF([test "${enable_x11}" != "no"], [
-  AC_CHECK_HEADERS(X11/Xlib.h, [
-    VLC_ADD_PLUGIN([x11])
-    VLC_ADD_LIBS([x11],[${X_LIBS} ${X_PRE_LIBS} -lX11])
-    VLC_ADD_CPPFLAGS([x11],[${X_CFLAGS}])
-
-    AC_CHECK_LIB(Xext, XShmAttach, [VLC_ADD_LIBS([x11],[-lXext])])
-  ])
+  AC_CHECK_HEADERS(X11/Xlib.h)
 
 dnl Check for DPMS
   AC_CHECK_HEADERS(X11/extensions/dpms.h, [
@@ -4936,13 +4930,13 @@ AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 dnl Tests for Osso and Xsp
 AC_CHECK_LIB(osso, osso_display_blanking_pause, [
   PKG_CHECK_MODULES(GLIB2, glib-2.0, [
-    VLC_ADD_CPPFLAGS([x11 xvideo xvmc glx omapfb],[-DHAVE_OSSO ${DBUS_CFLAGS} ${GLIB2_CFLAGS}])
-    VLC_ADD_LIBS([x11 xvideo xvmc glx omapfb],[-losso])
+    VLC_ADD_CPPFLAGS([xvideo xvmc glx omapfb],[-DHAVE_OSSO ${DBUS_CFLAGS} ${GLIB2_CFLAGS}])
+    VLC_ADD_LIBS([xvideo xvmc glx omapfb],[-losso])
  ])
 ])
 AC_CHECK_LIB(Xsp, XSPSetPixelDoubling,[
-  VLC_ADD_CPPFLAGS([x11 xvideo xvmc glx],[-DHAVE_XSP])
-  VLC_ADD_LIBS([x11 xvideo xvmc glx],[-lXsp])
+  VLC_ADD_CPPFLAGS([xvideo xvmc glx],[-DHAVE_XSP])
+  VLC_ADD_LIBS([xvideo xvmc glx],[-lXsp])
 ])
 
 dnl

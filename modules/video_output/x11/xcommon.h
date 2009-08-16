@@ -206,7 +206,6 @@ struct vout_sys_t
     /* Internal settings and properties */
     Display *           p_display;                        /* display pointer */
 
-    Visual *            p_visual;                          /* visual pointer */
     int                 i_screen;                           /* screen number */
 
     /* Our window */
@@ -224,12 +223,6 @@ struct vout_sys_t
     int                 i_xvport;
     bool          b_paint_colourkey;
     int                 i_colourkey;
-#else
-    Colormap            colormap;               /* colormap used (8bpp only) */
-
-    unsigned int        i_screen_depth;
-    unsigned int        i_bytes_per_pixel;
-    unsigned int        i_bytes_per_line;
 #endif
 
     /* Screen saver properties */

@@ -122,11 +122,6 @@ static int  XVideoGetPort    ( vout_thread_t *, vlc_fourcc_t, picture_heap_t * )
 static void XVideoReleasePort( vout_thread_t *, int );
 #endif
 
-#ifdef MODULE_NAME_IS_x11
-static void SetPalette     ( vout_thread_t *,
-                             uint16_t *, uint16_t *, uint16_t * );
-#endif
-
 #ifdef MODULE_NAME_IS_xvmc
 static void RenderVideo    ( vout_thread_t *, picture_t * );
 static int  xvmc_check_yv12( Display *display, XvPortID port );
@@ -446,13 +441,7 @@ void Deactivate ( vlc_object_t *p_this )
         ToggleCursor( p_vout );
     }
 
-#ifdef MODULE_NAME_IS_x11
-    /* Destroy colormap */
-    if( XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
-    {
-        XFreeColormap( p_vout->p_sys->p_display, p_vout->p_sys->colormap );
-    }
-#elif defined(MODULE_NAME_IS_xvideo)
+#if defined(MODULE_NAME_IS_xvideo)
     XVideoReleasePort( p_vout, p_vout->p_sys->i_xvport );
 #elif defined(MODULE_NAME_IS_xvmc)
     if( p_vout->p_sys->xvmc_cap )
@@ -812,65 +801,6 @@ static int InitVideo( vout_thread_t *p_vout )
             break;
     }
 #endif
-
-#elif defined(MODULE_NAME_IS_x11)
-    /* Initialize the output structure: RGB with square pixels, whatever
-     * the input format is, since it's the only format we know */
-    switch( p_vout->p_sys->i_screen_depth )
-    {
-        case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = VLC_CODEC_RGB8; break;
-        case 15:
-            p_vout->output.i_chroma = VLC_CODEC_RGB15; break;
-        case 16:
-            p_vout->output.i_chroma = VLC_CODEC_RGB16; break;
-        case 24:
-        case 32:
-            p_vout->output.i_chroma = VLC_CODEC_RGB32; break;
-        default:
-            msg_Err( p_vout, "unknown screen depth %i",
-                     p_vout->p_sys->i_screen_depth );
-            return VLC_SUCCESS;
-    }
-
-#ifdef HAVE_XSP
-    vout_PlacePicture( p_vout, p_vout->p_sys->window.i_width  / p_vout->p_sys->i_hw_scale,
-                       p_vout->p_sys->window.i_height  / p_vout->p_sys->i_hw_scale,
-                       &i_index, &i_index,
-                       &p_vout->fmt_out.i_visible_width,
-                       &p_vout->fmt_out.i_visible_height );
-#else
-    vout_PlacePicture( p_vout, p_vout->p_sys->window.i_width,
-                       p_vout->p_sys->window.i_height,
-                       &i_index, &i_index,
-                       &p_vout->fmt_out.i_visible_width,
-                       &p_vout->fmt_out.i_visible_height );
-#endif
-
-    p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
-
-    p_vout->output.i_width = p_vout->fmt_out.i_width =
-        p_vout->fmt_out.i_visible_width * p_vout->fmt_in.i_width /
-        p_vout->fmt_in.i_visible_width;
-    p_vout->output.i_height = p_vout->fmt_out.i_height =
-        p_vout->fmt_out.i_visible_height * p_vout->fmt_in.i_height /
-        p_vout->fmt_in.i_visible_height;
-    p_vout->fmt_out.i_x_offset =
-        p_vout->fmt_out.i_visible_width * p_vout->fmt_in.i_x_offset /
-        p_vout->fmt_in.i_visible_width;
-    p_vout->fmt_out.i_y_offset =
-        p_vout->fmt_out.i_visible_height * p_vout->fmt_in.i_y_offset /
-        p_vout->fmt_in.i_visible_height;
-
-    p_vout->fmt_out.i_sar_num = p_vout->fmt_out.i_sar_den = 1;
-    p_vout->output.i_aspect = p_vout->fmt_out.i_aspect =
-        p_vout->fmt_out.i_width * VOUT_ASPECT_FACTOR /p_vout->fmt_out.i_height;
-
-    msg_Dbg( p_vout, "x11 image size %ix%i (%i,%i,%ix%i)",
-             p_vout->fmt_out.i_width, p_vout->fmt_out.i_height,
-             p_vout->fmt_out.i_x_offset, p_vout->fmt_out.i_y_offset,
-             p_vout->fmt_out.i_visible_width,
-             p_vout->fmt_out.i_visible_height );
 #endif
 
     /* Try to initialize up to MAX_DIRECTBUFFERS direct buffers */
@@ -1043,7 +973,6 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
     if( p_vout->p_sys->i_shm_opcode )
     {
         /* Display rendered image using shared memory extension */
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
         XvShmPutImage( p_vout->p_sys->p_display, p_vout->p_sys->i_xvport,
                        p_vout->p_sys->window.video_window,
                        p_vout->p_sys->window.gc, p_pic->p_sys->p_image,
@@ -1053,23 +982,11 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                        p_vout->fmt_out.i_visible_height,
                        0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height,
                        False /* Don't put True here or you'll waste your CPU */ );
-#else
-        XShmPutImage( p_vout->p_sys->p_display,
-                      p_vout->p_sys->window.video_window,
-                      p_vout->p_sys->window.gc, p_pic->p_sys->p_image,
-                      p_vout->fmt_out.i_x_offset,
-                      p_vout->fmt_out.i_y_offset,
-                      0 /*dest_x*/, 0 /*dest_y*/,
-                      p_vout->fmt_out.i_visible_width,
-                      p_vout->fmt_out.i_visible_height,
-                      False /* Don't put True here ! */ );
-#endif
     }
     else
 #endif /* HAVE_SYS_SHM_H */
     {
         /* Use standard XPutImage -- this is gonna be slow ! */
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
         XvPutImage( p_vout->p_sys->p_display, p_vout->p_sys->i_xvport,
                     p_vout->p_sys->window.video_window,
                     p_vout->p_sys->window.gc, p_pic->p_sys->p_image,
@@ -1078,16 +995,6 @@ static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
                     p_vout->fmt_out.i_visible_width,
                     p_vout->fmt_out.i_visible_height,
                     0 /*dest_x*/, 0 /*dest_y*/, i_width, i_height );
-#else
-        XPutImage( p_vout->p_sys->p_display,
-                   p_vout->p_sys->window.video_window,
-                   p_vout->p_sys->window.gc, p_pic->p_sys->p_image,
-                   p_vout->fmt_out.i_x_offset,
-                   p_vout->fmt_out.i_y_offset,
-                   0 /*dest_x*/, 0 /*dest_y*/,
-                   p_vout->fmt_out.i_visible_width,
-                   p_vout->fmt_out.i_visible_height );
-#endif
     }
 
     /* Make sure the command is sent now - do NOT use XFlush !*/
@@ -1431,12 +1338,7 @@ static int ManageVideo( vout_thread_t *p_vout )
     {
         unsigned int i_width, i_height, i_x, i_y;
 
-#ifdef MODULE_NAME_IS_x11
-        /* We need to signal the vout thread about the size change because it
-         * is doing the rescaling */
-#else
         p_vout->i_changes &= ~VOUT_SIZE_CHANGE;
-#endif
 
         vout_PlacePicture( p_vout, p_vout->p_sys->window.i_width,
                            p_vout->p_sys->window.i_height,
@@ -1635,23 +1537,6 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                       ButtonPressMask | ButtonReleaseMask |
                       PointerMotionMask );
 
-#ifdef MODULE_NAME_IS_x11
-    if( XDefaultDepth(p_vout->p_sys->p_display, p_vout->p_sys->i_screen) == 8 )
-    {
-        /* Allocate a new palette */
-        p_vout->p_sys->colormap =
-            XCreateColormap( p_vout->p_sys->p_display,
-                             DefaultRootWindow( p_vout->p_sys->p_display ),
-                             DefaultVisual( p_vout->p_sys->p_display,
-                                            p_vout->p_sys->i_screen ),
-                             AllocAll );
-
-        xwindow_attributes.colormap = p_vout->p_sys->colormap;
-        XChangeWindowAttributes( p_vout->p_sys->p_display, p_win->base_window,
-                                 CWColormap, &xwindow_attributes );
-    }
-#endif
-
     /* Create video output sub-window. */
     p_win->video_window =  XCreateSimpleWindow(
                                       p_vout->p_sys->p_display,
@@ -1730,9 +1615,7 @@ static void DestroyWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 #if !defined(MODULE_NAME_IS_glx)
 static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 {
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
     int i_plane;
-#endif
 
     /* We know the chroma, allocate a buffer which will be used
      * directly by the decoder */
@@ -1764,13 +1647,8 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         /* Create image using XShm extension */
         p_pic->p_sys->p_image =
             CreateShmImage( p_vout, p_vout->p_sys->p_display,
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
                             p_vout->p_sys->i_xvport,
                             VLC2X11_FOURCC(p_vout->output.i_chroma),
-#else
-                            p_vout->p_sys->p_visual,
-                            p_vout->p_sys->i_screen_depth,
-#endif
                             &p_pic->p_sys->shminfo,
                             p_vout->output.i_width, p_vout->output.i_height );
     }
@@ -1781,15 +1659,9 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
         /* Create image without XShm extension */
         p_pic->p_sys->p_image =
             CreateImage( p_vout, p_vout->p_sys->p_display,
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
                          p_vout->p_sys->i_xvport,
                          VLC2X11_FOURCC(p_vout->output.i_chroma),
                          p_pic->format.i_bits_per_pixel,
-#else
-                         p_vout->p_sys->p_visual,
-                         p_vout->p_sys->i_screen_depth,
-                         p_vout->p_sys->i_bytes_per_pixel,
-#endif
                          p_vout->output.i_width, p_vout->output.i_height );
 
 #ifdef HAVE_SYS_SHM_H
@@ -1809,7 +1681,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
 
     switch( p_vout->output.i_chroma )
     {
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
         case VLC_CODEC_I420:
         case VLC_CODEC_YV12:
         case VLC_CODEC_Y211:
@@ -1839,26 +1710,6 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
             }
 
             break;
-
-#else
-        case VLC_CODEC_RGB8:
-        case VLC_CODEC_RGB16:
-        case VLC_CODEC_RGB15:
-        case VLC_CODEC_RGB24:
-        case VLC_CODEC_RGB32:
-
-            p_pic->p->i_lines = p_pic->p_sys->p_image->height;
-            p_pic->p->i_visible_lines = p_pic->p_sys->p_image->height;
-            p_pic->p->p_pixels = (uint8_t*)p_pic->p_sys->p_image->data
-                                  + p_pic->p_sys->p_image->xoffset;
-            p_pic->p->i_pitch = p_pic->p_sys->p_image->bytes_per_line;
-
-            /* p_pic->p->i_pixel_pitch = 4 for RV24 but this should be set
-             * properly by picture_Setup() */
-            p_pic->p->i_visible_pitch = p_pic->p->i_pixel_pitch
-                                         * p_pic->p_sys->p_image->width;
-            break;
-#endif
 
         default:
             /* Unknown chroma, tell the guy to get lost */
@@ -2280,13 +2131,6 @@ static void XVideoReleasePort( vout_thread_t *p_vout, int i_port )
  *****************************************************************************/
 static int InitDisplay( vout_thread_t *p_vout )
 {
-#ifdef MODULE_NAME_IS_x11
-    XPixmapFormatValues *       p_formats;                 /* pixmap formats */
-    XVisualInfo *               p_xvisual;            /* visuals information */
-    XVisualInfo                 xvisual_template;         /* visual template */
-    int                         i_count, i;                    /* array size */
-#endif
-
 #ifdef HAVE_SYS_SHM_H
     p_vout->p_sys->i_shm_opcode = 0;
 
@@ -2327,96 +2171,6 @@ static int InitDisplay( vout_thread_t *p_vout )
 #endif
 #endif
 
-#ifdef MODULE_NAME_IS_x11
-    /* Initialize structure */
-    p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
-
-    /* Get screen depth */
-    p_vout->p_sys->i_screen_depth = XDefaultDepth( p_vout->p_sys->p_display,
-                                                   p_vout->p_sys->i_screen );
-    switch( p_vout->p_sys->i_screen_depth )
-    {
-    case 8:
-        /*
-         * Screen depth is 8bpp. Use PseudoColor visual with private colormap.
-         */
-        xvisual_template.screen =   p_vout->p_sys->i_screen;
-        xvisual_template.class =    DirectColor;
-        p_xvisual = XGetVisualInfo( p_vout->p_sys->p_display,
-                                    VisualScreenMask | VisualClassMask,
-                                    &xvisual_template, &i_count );
-        if( p_xvisual == NULL )
-        {
-            msg_Err( p_vout, "no PseudoColor visual available" );
-            return VLC_EGENERIC;
-        }
-        p_vout->p_sys->i_bytes_per_pixel = 1;
-        p_vout->output.pf_setpalette = SetPalette;
-        break;
-    case 15:
-    case 16:
-    case 24:
-    default:
-        /*
-         * Screen depth is higher than 8bpp. TrueColor visual is used.
-         */
-        xvisual_template.screen =   p_vout->p_sys->i_screen;
-        xvisual_template.class =    TrueColor;
-/* In some cases, we get a truecolor class adaptor that has a different
-   color depth. So try to get a real true color one first */
-        xvisual_template.depth =    p_vout->p_sys->i_screen_depth;
-
-        p_xvisual = XGetVisualInfo( p_vout->p_sys->p_display,
-                                    VisualScreenMask | VisualClassMask |
-                                    VisualDepthMask,
-                                    &xvisual_template, &i_count );
-        if( p_xvisual == NULL )
-        {
-            msg_Warn( p_vout, "No screen matching the required color depth" );
-            p_xvisual = XGetVisualInfo( p_vout->p_sys->p_display,
-                                    VisualScreenMask | VisualClassMask,
-                                    &xvisual_template, &i_count );
-            if( p_xvisual == NULL )
-            {
-
-                msg_Err( p_vout, "no TrueColor visual available" );
-                return VLC_EGENERIC;
-            }
-        }
-
-        p_vout->output.i_rmask = p_xvisual->red_mask;
-        p_vout->output.i_gmask = p_xvisual->green_mask;
-        p_vout->output.i_bmask = p_xvisual->blue_mask;
-
-        /* There is no difference yet between 3 and 4 Bpp. The only way
-         * to find the actual number of bytes per pixel is to list supported
-         * pixmap formats. */
-        p_formats = XListPixmapFormats( p_vout->p_sys->p_display, &i_count );
-        p_vout->p_sys->i_bytes_per_pixel = 0;
-
-        for( i = 0; i < i_count; i++ )
-        {
-            /* Under XFree4.0, the list contains pixmap formats available
-             * through all video depths ; so we have to check against current
-             * depth. */
-            if( p_formats[i].depth == (int)p_vout->p_sys->i_screen_depth )
-            {
-                if( p_formats[i].bits_per_pixel / 8
-                        > (int)p_vout->p_sys->i_bytes_per_pixel )
-                {
-                    p_vout->p_sys->i_bytes_per_pixel =
-                        p_formats[i].bits_per_pixel / 8;
-                }
-            }
-        }
-        if( p_formats ) XFree( p_formats );
-
-        break;
-    }
-    p_vout->p_sys->p_visual = p_xvisual->visual;
-    XFree( p_xvisual );
-#endif
-
     return VLC_SUCCESS;
 }
 
@@ -2445,9 +2199,6 @@ IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
 #elif defined(MODULE_NAME_IS_xvmc)
     p_image = XvShmCreateImage( p_display, i_xvport, i_chroma, 0,
                                 i_width, i_height, p_shm );
-#else
-    p_image = XShmCreateImage( p_display, p_visual, i_depth, ZPixmap, 0,
-                               p_shm, i_width, i_height );
 #endif
     if( p_image == NULL )
     {
@@ -2531,45 +2282,18 @@ static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
 {
     uint8_t *    p_data;                          /* image data storage zone */
     IMAGE_TYPE *p_image;
-#ifdef MODULE_NAME_IS_x11
-    int         i_quantum;                     /* XImage quantum (see below) */
-    int         i_bytes_per_line;
-#endif
 
     /* Allocate memory for image */
 #ifdef MODULE_NAME_IS_xvideo
     p_data = malloc( i_width * i_height * i_bits_per_pixel / 8 );
-#elif defined(MODULE_NAME_IS_x11)
-    i_bytes_per_line = i_width * i_bytes_per_pixel;
-    p_data = malloc( i_bytes_per_line * i_height );
 #endif
     if( !p_data )
         return NULL;
-
-#ifdef MODULE_NAME_IS_x11
-    /* Optimize the quantum of a scanline regarding its size - the quantum is
-       a diviser of the number of bits between the start of two scanlines. */
-    if( i_bytes_per_line & 0xf )
-    {
-        i_quantum = 0x8;
-    }
-    else if( i_bytes_per_line & 0x10 )
-    {
-        i_quantum = 0x10;
-    }
-    else
-    {
-        i_quantum = 0x20;
-    }
-#endif
 
     /* Create XImage. p_data will be automatically freed */
 #ifdef MODULE_NAME_IS_xvideo
     p_image = XvCreateImage( p_display, i_xvport, i_chroma,
                              (char *)p_data, i_width, i_height );
-#elif defined(MODULE_NAME_IS_x11)
-    p_image = XCreateImage( p_display, p_visual, i_depth, ZPixmap, 0,
-                            (char *)p_data, i_width, i_height, i_quantum, 0 );
 #endif
     if( p_image == NULL )
     {
@@ -2623,38 +2347,6 @@ static int X11ErrorHandler( Display * display, XErrorEvent * event )
     return 0;
 #endif
 }
-
-#ifdef MODULE_NAME_IS_x11
-/*****************************************************************************
- * SetPalette: sets an 8 bpp palette
- *****************************************************************************
- * This function sets the palette given as an argument. It does not return
- * anything, but could later send information on which colors it was unable
- * to set.
- *****************************************************************************/
-static void SetPalette( vout_thread_t *p_vout,
-                        uint16_t *red, uint16_t *green, uint16_t *blue )
-{
-    int i;
-    XColor p_colors[255];
-
-    /* allocate palette */
-    for( i = 0; i < 255; i++ )
-    {
-        /* kludge: colors are indexed reversely because color 255 seems
-         * to be reserved for black even if we try to set it to white */
-        p_colors[ i ].pixel = 255 - i;
-        p_colors[ i ].pad   = 0;
-        p_colors[ i ].flags = DoRed | DoGreen | DoBlue;
-        p_colors[ i ].red   = red[ 255 - i ];
-        p_colors[ i ].blue  = blue[ 255 - i ];
-        p_colors[ i ].green = green[ 255 - i ];
-    }
-
-    XStoreColors( p_vout->p_sys->p_display,
-                  p_vout->p_sys->colormap, p_colors, 255 );
-}
-#endif
 
 /*****************************************************************************
  * Control: control facility for the vout
