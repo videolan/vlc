@@ -146,7 +146,7 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
     }
     else
     {
-        if ( item->b_is_node &&
+        if ( (item->childCount() > 0) &&
             ( rootItem->p_input == pl_input ||
             rootItem->p_input == ml_input ) )
                 flags |= Qt::ItemIsDropEnabled;
