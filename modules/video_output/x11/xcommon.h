@@ -27,7 +27,7 @@
 /*****************************************************************************
  * Defines
  *****************************************************************************/
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
+#if defined(MODULE_NAME_IS_xvmc)
 #   define IMAGE_TYPE     XvImage
 #   define EXTRA_ARGS     int i_xvport, int i_chroma, int i_bits_per_pixel
 #   define EXTRA_ARGS_SHM int i_xvport, int i_chroma, XShmSegmentInfo *p_shm
@@ -219,7 +219,7 @@ struct vout_sys_t
     int                 i_shm_opcode;      /* shared memory extension opcode */
 #endif
 
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
+#if defined(MODULE_NAME_IS_xvmc)
     int                 i_xvport;
     bool          b_paint_colourkey;
     int                 i_colourkey;
@@ -359,9 +359,7 @@ typedef struct mwmhints_t
 /*****************************************************************************
  * Chroma defines
  *****************************************************************************/
-#ifdef MODULE_NAME_IS_xvideo
-#   define MAX_DIRECTBUFFERS (VOUT_MAX_PICTURES)
-#elif defined(MODULE_NAME_IS_xvmc)
+#if defined(MODULE_NAME_IS_xvmc)
 #   define MAX_DIRECTBUFFERS (VOUT_MAX_PICTURES+2)
 #else
 #   define MAX_DIRECTBUFFERS 2

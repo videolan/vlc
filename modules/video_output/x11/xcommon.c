@@ -64,16 +64,13 @@
 #   include <X11/extensions/dpms.h>
 #endif
 
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
-#   include <X11/extensions/Xv.h>
-#   include <X11/extensions/Xvlib.h>
-#endif
-
 #ifdef MODULE_NAME_IS_glx
 #   include <GL/glx.h>
 #endif
 
 #ifdef MODULE_NAME_IS_xvmc
+#   include <X11/extensions/Xv.h>
+#   include <X11/extensions/Xvlib.h>
 #   include <X11/extensions/vldXvMC.h>
 #   include "../../codec/xvmc/accel_xvmc.h"
 #endif
@@ -117,12 +114,9 @@ static void CreateCursor   ( vout_thread_t * );
 static void DestroyCursor  ( vout_thread_t * );
 static void ToggleCursor   ( vout_thread_t * );
 
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
+#if defined(MODULE_NAME_IS_xvmc)
 static int  XVideoGetPort    ( vout_thread_t *, vlc_fourcc_t, picture_heap_t * );
 static void XVideoReleasePort( vout_thread_t *, int );
-#endif
-
-#ifdef MODULE_NAME_IS_xvmc
 static void RenderVideo    ( vout_thread_t *, picture_t * );
 static int  xvmc_check_yv12( Display *display, XvPortID port );
 static void xvmc_update_XV_DOUBLE_BUFFER( vout_thread_t *p_vout );
@@ -154,8 +148,6 @@ int Activate ( vlc_object_t *p_this )
     char *        psz_display;
 #if defined(MODULE_NAME_IS_xvmc)
     char *psz_value;
-#endif
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
     char *       psz_chroma;
     vlc_fourcc_t i_chroma = 0;
     bool   b_chroma = 0;
@@ -204,7 +196,7 @@ int Activate ( vlc_object_t *p_this )
     /* Get a screen ID matching the XOpenDisplay return value */
     p_vout->p_sys->i_screen = DefaultScreen( p_vout->p_sys->p_display );
 
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
+#if defined(MODULE_NAME_IS_xvmc)
     psz_chroma = config_GetPsz( p_vout, "xvideo-chroma" );
     if( psz_chroma )
     {
@@ -441,9 +433,7 @@ void Deactivate ( vlc_object_t *p_this )
         ToggleCursor( p_vout );
     }
 
-#if defined(MODULE_NAME_IS_xvideo)
-    XVideoReleasePort( p_vout, p_vout->p_sys->i_xvport );
-#elif defined(MODULE_NAME_IS_xvmc)
+#if defined(MODULE_NAME_IS_xvmc)
     if( p_vout->p_sys->xvmc_cap )
     {
         xvmc_context_writer_lock( &p_vout->p_sys->xvmc_lock );
@@ -763,7 +753,7 @@ static int InitVideo( vout_thread_t *p_vout )
 
     I_OUTPUTPICTURES = 0;
 
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
+#if defined(MODULE_NAME_IS_xvmc)
     /* Initialize the output structure; we already found an XVideo port,
      * and the corresponding chroma we will be using. Since we can
      * arbitrary scale, stick to the coordinates and aspect. */
@@ -1217,43 +1207,7 @@ static int ManageVideo( vout_thread_t *p_vout )
     /* Handle events for video output sub-window */
     while( XCheckWindowEvent( p_vout->p_sys->p_display,
                               p_vout->p_sys->window.video_window,
-                              ExposureMask, &xevent ) == True )
-    {
-        /* Window exposed (only handled if stream playback is paused) */
-        if( xevent.type == Expose )
-        {
-            if( ((XExposeEvent *)&xevent)->count == 0 )
-            {
-                /* (if this is the last a collection of expose events...) */
-
-#if defined(MODULE_NAME_IS_xvideo)
-                x11_window_t *p_win = &p_vout->p_sys->window;
-
-                /* Paint the colour key if needed */
-                if( p_vout->p_sys->b_paint_colourkey &&
-                    xevent.xexpose.window == p_win->video_window )
-                {
-                    XSetForeground( p_vout->p_sys->p_display,
-                                    p_win->gc, p_vout->p_sys->i_colourkey );
-                    XFillRectangle( p_vout->p_sys->p_display,
-                                    p_win->video_window, p_win->gc, 0, 0,
-                                    p_win->i_width, p_win->i_height );
-                }
-#endif
-
-#if 0
-                if( p_vout->p_libvlc->p_input_bank->pp_input[0] != NULL )
-                {
-                    if( PAUSE_S == p_vout->p_libvlc->p_input_bank->pp_input[0]
-                                                   ->stream.control.i_status )
-                    {
-                        /* XVideoDisplay( p_vout )*/;
-                    }
-                }
-#endif
-            }
-        }
-    }
+                              ExposureMask, &xevent ) == True );
 
     /* ClientMessage event - only WM_PROTOCOLS with WM_DELETE_WINDOW data
      * are handled - according to the man pages, the format is always 32
@@ -1919,7 +1873,7 @@ static void ToggleCursor( vout_thread_t *p_vout )
     }
 }
 
-#if defined(MODULE_NAME_IS_xvideo) || defined(MODULE_NAME_IS_xvmc)
+#if defined(MODULE_NAME_IS_xvmc)
 /*****************************************************************************
  * XVideoGetPort: get YUV12 port
  *****************************************************************************/
@@ -1971,11 +1925,7 @@ static int XVideoGetPort( vout_thread_t *p_vout,
     }
 
     i_selected_port = -1;
-#ifdef MODULE_NAME_IS_xvmc
     i_requested_adaptor = config_GetInt( p_vout, "xvmc-adaptor" );
-#else
-    i_requested_adaptor = config_GetInt( p_vout, "xvideo-adaptor" );
-#endif
     for( i_adaptor = 0; i_adaptor < i_num_adaptors; ++i_adaptor )
     {
         XvImageFormatValues *p_formats;
@@ -2162,15 +2112,6 @@ static int InitDisplay( vout_thread_t *p_vout )
         msg_Dbg( p_vout, "XShm video extension disabled" );
 #endif
 
-#ifdef MODULE_NAME_IS_xvideo
-    /* XXX The brightness and contrast values should be read from environment
-     * XXX variables... */
-#if 0
-    XVideoSetAttribute( p_vout, "XV_BRIGHTNESS", 0.5 );
-    XVideoSetAttribute( p_vout, "XV_CONTRAST",   0.5 );
-#endif
-#endif
-
     return VLC_SUCCESS;
 }
 
@@ -2193,10 +2134,7 @@ IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
     Status result;
 
     /* Create XImage / XvImage */
-#ifdef MODULE_NAME_IS_xvideo
-    p_image = XvShmCreateImage( p_display, i_xvport, i_chroma, 0,
-                                i_width, i_height, p_shm );
-#elif defined(MODULE_NAME_IS_xvmc)
+#if defined(MODULE_NAME_IS_xvmc)
     p_image = XvShmCreateImage( p_display, i_xvport, i_chroma, 0,
                                 i_width, i_height, p_shm );
 #endif
@@ -2270,40 +2208,6 @@ IMAGE_TYPE * CreateShmImage( vout_thread_t *p_vout,
     return p_image;
 }
 #endif
-
-/*****************************************************************************
- * CreateImage: create an XImage or XvImage
- *****************************************************************************
- * Create a simple image used as a buffer.
- *****************************************************************************/
-static IMAGE_TYPE * CreateImage( vout_thread_t *p_vout,
-                                 Display *p_display, EXTRA_ARGS,
-                                 int i_width, int i_height )
-{
-    uint8_t *    p_data;                          /* image data storage zone */
-    IMAGE_TYPE *p_image;
-
-    /* Allocate memory for image */
-#ifdef MODULE_NAME_IS_xvideo
-    p_data = malloc( i_width * i_height * i_bits_per_pixel / 8 );
-#endif
-    if( !p_data )
-        return NULL;
-
-    /* Create XImage. p_data will be automatically freed */
-#ifdef MODULE_NAME_IS_xvideo
-    p_image = XvCreateImage( p_display, i_xvport, i_chroma,
-                             (char *)p_data, i_width, i_height );
-#endif
-    if( p_image == NULL )
-    {
-        msg_Err( p_vout, "XCreateImage() failed" );
-        free( p_data );
-        return NULL;
-    }
-
-    return p_image;
-}
 
 #endif
 /*****************************************************************************

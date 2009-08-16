@@ -368,7 +368,6 @@ case "${host_os}" in
     ;;
   *nto*)
     SYS=nto
-    VLC_ADD_LIBS([xvideo],[-lsocket])
     ;;
   solaris*)
     SYS=solaris
@@ -3456,26 +3455,6 @@ dnl Check for DPMS
 ])
 
 dnl
-dnl  XVideo module
-dnl  (enabled by default except on win32)
-dnl
-AC_ARG_ENABLE(xvideo,
-  [  --enable-xvideo         XVideo support (default enabled)],, [
-    enable_xvideo="$enable_x11"
-])
-AS_IF([test "${enable_xvideo}" != "no"], [
-  AC_CHECK_HEADERS(X11/extensions/Xv.h, [
-    CFLAGS="${CFLAGS_save} ${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext"
-    AC_CHECK_LIB(Xv,XvPutImage,[
-        VLC_ADD_PLUGIN([xvideo])
-        VLC_ADD_CPPFLAGS([xvideo],[${X_CFLAGS}])
-        VLC_ADD_LIBS([xvideo],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXv])
-    ])
-    CFLAGS="${CFLAGS_save}"
-  ])
-])
-
-dnl
 dnl  GLX module
 dnl  (enabled by default except on win32)
 dnl
@@ -3528,6 +3507,10 @@ AC_ARG_ENABLE(xcb,
   ], [
     enable_xcb="no"
   ])
+])
+AC_ARG_ENABLE(xvideo,
+  [  --enable-xvideo         XVideo support (default enabled)],, [
+    enable_xvideo="$enable_xcb"
 ])
 
 AS_IF([test "${enable_xcb}" != "no"], [
@@ -4930,13 +4913,13 @@ AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 dnl Tests for Osso and Xsp
 AC_CHECK_LIB(osso, osso_display_blanking_pause, [
   PKG_CHECK_MODULES(GLIB2, glib-2.0, [
-    VLC_ADD_CPPFLAGS([xvideo xvmc glx omapfb],[-DHAVE_OSSO ${DBUS_CFLAGS} ${GLIB2_CFLAGS}])
-    VLC_ADD_LIBS([xvideo xvmc glx omapfb],[-losso])
+    VLC_ADD_CPPFLAGS([xvmc glx omapfb],[-DHAVE_OSSO ${DBUS_CFLAGS} ${GLIB2_CFLAGS}])
+    VLC_ADD_LIBS([xvmc glx omapfb],[-losso])
  ])
 ])
 AC_CHECK_LIB(Xsp, XSPSetPixelDoubling,[
-  VLC_ADD_CPPFLAGS([xvideo xvmc glx],[-DHAVE_XSP])
-  VLC_ADD_LIBS([xvideo xvmc glx],[-lXsp])
+  VLC_ADD_CPPFLAGS([xvmc glx],[-DHAVE_XSP])
+  VLC_ADD_LIBS([xvmc glx],[-lXsp])
 ])
 
 dnl
