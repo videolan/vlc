@@ -64,20 +64,7 @@ uint32_t CPUCapabilities( void )
 {
     volatile uint32_t i_capabilities = CPU_CAPABILITY_NONE;
 
-#if defined(__APPLE__) && (defined(__ppc__) || defined(__ppc64__))
-    int selectors[2] = { CTL_HW, HW_VECTORUNIT };
-    int i_has_altivec = 0;
-    size_t i_length = sizeof( i_has_altivec );
-    int i_error = sysctl( selectors, 2, &i_has_altivec, &i_length, NULL, 0);
-
-    i_capabilities |= CPU_CAPABILITY_FPU;
-
-    if( i_error == 0 && i_has_altivec != 0 )
-        i_capabilities |= CPU_CAPABILITY_ALTIVEC;
-
-    return i_capabilities;
-
-#elif defined( __i386__ ) || defined( __x86_64__ )
+#if defined( __i386__ ) || defined( __x86_64__ )
     volatile unsigned int  i_eax, i_ebx, i_ecx, i_edx;
     volatile bool    b_amd;
 
@@ -131,12 +118,7 @@ uint32_t CPUCapabilities( void )
                  : "cc" );
 
     if( i_eax == i_ebx )
-    {
-#       if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-        signal( SIGILL, pf_sigill );
-#       endif
-        return i_capabilities;
-    }
+        goto out;
 #   else
     /* x86_64 supports cpuid instruction, so we dont need to check it */
 #   endif
@@ -147,12 +129,7 @@ uint32_t CPUCapabilities( void )
     cpuid( 0x00000000 );
 
     if( !i_eax )
-    {
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-        signal( SIGILL, pf_sigill );
-#   endif
-        return i_capabilities;
-    }
+        goto out;
 
     /* FIXME: this isn't correct, since some 486s have cpuid */
     i_capabilities |= CPU_CAPABILITY_586;
@@ -165,12 +142,7 @@ uint32_t CPUCapabilities( void )
     cpuid( 0x00000001 );
 
     if( ! (i_edx & 0x00800000) )
-    {
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-        signal( SIGILL, pf_sigill );
-#   endif
-        return i_capabilities;
-    }
+        goto out;
 
     i_capabilities |= CPU_CAPABILITY_MMX;
 
@@ -220,12 +192,7 @@ uint32_t CPUCapabilities( void )
     cpuid( 0x80000000 );
 
     if( i_eax < 0x80000001 )
-    {
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-        signal( SIGILL, pf_sigill );
-#   endif
-        return i_capabilities;
-    }
+        goto out;
 
     /* list these additional capabilities */
     cpuid( 0x80000001 );
@@ -254,17 +221,26 @@ uint32_t CPUCapabilities( void )
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
     }
 
+out:
 #   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
     signal( SIGILL, pf_sigill );
 #   endif
-    return i_capabilities;
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
 
-#   ifdef CAN_COMPILE_ALTIVEC
-    void (*pf_sigill) (int) = signal( SIGILL, SigHandler );
-
     i_capabilities |= CPU_CAPABILITY_FPU;
+
+#   if defined(__APPLE__)
+    int selectors[2] = { CTL_HW, HW_VECTORUNIT };
+    int i_has_altivec = 0;
+    size_t i_length = sizeof( i_has_altivec );
+    int i_error = sysctl( selectors, 2, &i_has_altivec, &i_length, NULL, 0);
+
+    if( i_error == 0 && i_has_altivec != 0 )
+        i_capabilities |= CPU_CAPABILITY_ALTIVEC;
+
+#   elif defined( CAN_COMPILE_ALTIVEC )
+    void (*pf_sigill) (int) = signal( SIGILL, SigHandler );
 
     i_illegal = 0;
 
@@ -277,31 +253,21 @@ uint32_t CPUCapabilities( void )
     }
 
     if( i_illegal == 0 )
-    {
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
-    }
 
     signal( SIGILL, pf_sigill );
 #   else
     (void)SigHandler; /* Don't complain about dead code here */
 #   endif
 
-    return i_capabilities;
-
 #elif defined( __sparc__ )
-
     i_capabilities |= CPU_CAPABILITY_FPU;
-    return i_capabilities;
 
 #elif defined( _MSC_VER ) && !defined( UNDER_CE )
     i_capabilities |= CPU_CAPABILITY_FPU;
-    return i_capabilities;
-
-#else
-    /* default behaviour */
-    return i_capabilities;
 
 #endif
+    return i_capabilities;
 }
 
 /*****************************************************************************
