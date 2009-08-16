@@ -53,7 +53,6 @@ void PLItem::init( playlist_item_t *_playlist_item, PLItem *parent, PLModel *m, 
     parentItem = parent;          /* Can be NULL, but only for the rootItem */
     i_id       = _playlist_item->i_id;           /* Playlist item specific id */
     model      = m;               /* PLModel (QAbsmodel) */
-    i_type     = -1;              /* Item type - Avoid segfault */
     p_input    = _playlist_item->p_input;
     vlc_gc_incref( p_input );
 
@@ -118,9 +117,6 @@ int PLItem::row() const
 void PLItem::update( playlist_item_t *p_item )
 {
     assert( p_item->p_input == p_input);
-
-    /* Useful for the model */
-    i_type = p_item->p_input->i_type;
 
 }
 

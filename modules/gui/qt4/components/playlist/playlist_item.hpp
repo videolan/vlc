@@ -63,7 +63,6 @@ public:
 
 protected:
     QList<PLItem*> children;
-    int i_type;
     int i_id;
     input_item_t *p_input;
 
