@@ -131,8 +131,6 @@ static int  xvmc_check_yv12( Display *display, XvPortID port );
 static void xvmc_update_XV_DOUBLE_BUFFER( vout_thread_t *p_vout );
 #endif
 
-static int ConvertKey( int );
-
 static int X11ErrorHandler( Display *, XErrorEvent * );
 
 #ifdef HAVE_XSP
@@ -1130,7 +1128,7 @@ static int ManageVideo( vout_thread_t *p_vout )
 
     while( XCheckWindowEvent( p_vout->p_sys->p_display,
                               p_vout->p_sys->window.base_window,
-                              StructureNotifyMask | KeyPressMask |
+                              StructureNotifyMask |
                               ButtonPressMask | ButtonReleaseMask |
                               PointerMotionMask | Button1MotionMask , &xevent )
            == True )
@@ -1147,49 +1145,6 @@ static int ManageVideo( vout_thread_t *p_vout )
                 p_vout->i_changes |= VOUT_SIZE_CHANGE;
                 p_vout->p_sys->window.i_width = xevent.xconfigure.width;
                 p_vout->p_sys->window.i_height = xevent.xconfigure.height;
-            }
-        }
-        /* Keyboard event */
-        else if( xevent.type == KeyPress )
-        {
-            unsigned int state = xevent.xkey.state;
-            KeySym x_key_symbol;
-            char i_key;                                   /* ISO Latin-1 key */
-
-            /* We may have keys like F1 trough F12, ESC ... */
-            x_key_symbol = XKeycodeToKeysym( p_vout->p_sys->p_display,
-                                             xevent.xkey.keycode, 0 );
-            val.i_int = ConvertKey( (int)x_key_symbol );
-
-            xevent.xkey.state &= ~ShiftMask;
-            xevent.xkey.state &= ~ControlMask;
-            xevent.xkey.state &= ~Mod1Mask;
-
-            if( !val.i_int &&
-                XLookupString( &xevent.xkey, &i_key, 1, NULL, NULL ) )
-            {
-                /* "Normal Keys"
-                 * The reason why I use this instead of XK_0 is that
-                 * with XLookupString, we don't have to care about
-                 * keymaps. */
-                val.i_int = i_key;
-            }
-
-            if( val.i_int )
-            {
-                if( state & ShiftMask )
-                {
-                    val.i_int |= KEY_MODIFIER_SHIFT;
-                }
-                if( state & ControlMask )
-                {
-                    val.i_int |= KEY_MODIFIER_CTRL;
-                }
-                if( state & Mod1Mask )
-                {
-                    val.i_int |= KEY_MODIFIER_ALT;
-                }
-                var_Set( p_vout->p_libvlc, "key-pressed", val );
             }
         }
         /* Mouse click */
@@ -1670,7 +1625,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
                         );
     if ( b_vout_event )
         XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
-                      StructureNotifyMask | KeyPressMask |
+                      StructureNotifyMask |
                       ButtonPressMask | ButtonReleaseMask |
                       PointerMotionMask );
 
@@ -2726,63 +2681,4 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
        default:
             return VLC_EGENERIC;
     }
-}
-
-/*****************************************************************************
- * Key events handling
- *****************************************************************************/
-static const struct
-{
-    int i_x11key;
-    int i_vlckey;
-
-} x11keys_to_vlckeys[] =
-{
-    { XK_F1, KEY_F1 }, { XK_F2, KEY_F2 }, { XK_F3, KEY_F3 }, { XK_F4, KEY_F4 },
-    { XK_F5, KEY_F5 }, { XK_F6, KEY_F6 }, { XK_F7, KEY_F7 }, { XK_F8, KEY_F8 },
-    { XK_F9, KEY_F9 }, { XK_F10, KEY_F10 }, { XK_F11, KEY_F11 },
-    { XK_F12, KEY_F12 },
-
-    { XK_Return, KEY_ENTER },
-    { XK_KP_Enter, KEY_ENTER },
-    { XK_space, KEY_SPACE },
-    { XK_Escape, KEY_ESC },
-
-    { XK_Menu, KEY_MENU },
-    { XK_Left, KEY_LEFT },
-    { XK_Right, KEY_RIGHT },
-    { XK_Up, KEY_UP },
-    { XK_Down, KEY_DOWN },
-
-    { XK_Home, KEY_HOME },
-    { XK_End, KEY_END },
-    { XK_Page_Up, KEY_PAGEUP },
-    { XK_Page_Down, KEY_PAGEDOWN },
-
-    { XK_Insert, KEY_INSERT },
-    { XK_Delete, KEY_DELETE },
-    { XF86XK_AudioNext, KEY_MEDIA_NEXT_TRACK},
-    { XF86XK_AudioPrev, KEY_MEDIA_PREV_TRACK},
-    { XF86XK_AudioMute, KEY_VOLUME_MUTE },
-    { XF86XK_AudioLowerVolume, KEY_VOLUME_DOWN },
-    { XF86XK_AudioRaiseVolume, KEY_VOLUME_UP },
-    { XF86XK_AudioPlay, KEY_MEDIA_PLAY_PAUSE },
-    { XF86XK_AudioPause, KEY_MEDIA_PLAY_PAUSE },
-
-    { 0, 0 }
-};
-
-static int ConvertKey( int i_key )
-{
-    int i;
-
-    for( i = 0; x11keys_to_vlckeys[i].i_x11key != 0; i++ )
-    {
-        if( x11keys_to_vlckeys[i].i_x11key == i_key )
-        {
-            return x11keys_to_vlckeys[i].i_vlckey;
-        }
-    }
-
-    return 0;
 }
