@@ -758,6 +758,10 @@ void PLModel::rebuild( playlist_item_t *p_root )
                             true, false );
         }
     }
+    else
+    {
+        currentItem = NULL;
+    }
     PL_UNLOCK;
 
     /* And signal the view */
