@@ -132,8 +132,7 @@ static int Open (vlc_object_t *obj)
     /* */
     video_format_t fmt_pic = vd->fmt;
 
-    /* Determine our video format. Normally, this is done in pf_init(), but
-     * this plugin always uses the same format for a given X11 screen. */
+    /* Determine our video format. */
     xcb_visualid_t vid = 0;
     uint8_t depth = 0;
     bool gray = true;
@@ -246,6 +245,12 @@ static int Open (vlc_object_t *obj)
         cmap = scr->default_colormap;
 
     /* Create window */
+    unsigned width, height;
+    if (GetWindowSize (p_sys->embed, p_sys->conn, &width, &height))
+        goto error;
+
+    p_sys->window = xcb_generate_id (p_sys->conn);
+    p_sys->gc = xcb_generate_id (p_sys->conn);
     {
         const uint32_t mask = XCB_CW_EVENT_MASK | XCB_CW_COLORMAP;
         const uint32_t values[] = {
@@ -256,22 +261,20 @@ static int Open (vlc_object_t *obj)
             cmap,
         };
         xcb_void_cookie_t c;
-        xcb_window_t window = xcb_generate_id (p_sys->conn);
 
-        c = xcb_create_window_checked (p_sys->conn, depth, window,
-                                       p_sys->embed->handle.xid, 0, 0, 1, 1, 0,
+        c = xcb_create_window_checked (p_sys->conn, depth, p_sys->window,
+                                       p_sys->embed->handle.xid, 0, 0,
+                                       width, height, 0,
                                        XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                        vid, mask, values);
+        xcb_map_window (p_sys->conn, p_sys->window);
+        /* Create graphic context (I wonder why the heck do we need this) */
+        xcb_create_gc (p_sys->conn, p_sys->gc, p_sys->window, 0, NULL);
+
         if (CheckError (vd, p_sys->conn, "cannot create X11 window", c))
             goto error;
-        p_sys->window = window;
-        msg_Dbg (vd, "using X11 window %08"PRIx32, p_sys->window);
-        xcb_map_window (p_sys->conn, window);
     }
-
-    /* Create graphic context (I wonder why the heck do we need this) */
-    p_sys->gc = xcb_generate_id (p_sys->conn);
-    xcb_create_gc (p_sys->conn, p_sys->gc, p_sys->window, 0, NULL);
+    msg_Dbg (vd, "using X11 window %08"PRIx32, p_sys->window);
     msg_Dbg (vd, "using X11 graphic context %08"PRIx32, p_sys->gc);
 
     /* */
@@ -289,9 +292,7 @@ static int Open (vlc_object_t *obj)
     vd->manage = Manage;
 
     /* */
-    unsigned width, height;
-    if (!GetWindowSize (p_sys->embed, p_sys->conn, &width, &height))
-        vout_display_SendEventDisplaySize (vd, width, height);
+    vout_display_SendEventDisplaySize (vd, width, height);
     vout_display_SendEventFullscreen (vd, false);
 
     return VLC_SUCCESS;
@@ -312,7 +313,7 @@ static void Close (vlc_object_t *obj)
 
     ResetPictures (vd);
     vout_display_DeleteWindow (vd, p_sys->embed);
-    /* colormap and window are garbage-collected by X */
+    /* colormap, window and context are garbage-collected by X */
     xcb_disconnect (p_sys->conn);
     free (p_sys);
 }
