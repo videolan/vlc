@@ -416,6 +416,8 @@ void MainInterface::createMainWidget( QSettings *settings )
     if( config_GetInt( p_intf, "qt-fs-controller" ) )
     {
         fullscreenControls = new FullscreenControllerWidget( p_intf, this );
+        CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
+                 this, handleKeyPress( QKeyEvent * ) );
     }
 }
 

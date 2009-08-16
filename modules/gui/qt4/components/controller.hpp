@@ -229,6 +229,9 @@ public:
     void fullscreenChanged( vout_thread_t *, bool b_fs, int i_timeout );
     void mouseChanged( vout_thread_t *, int i_mousex, int i_mousey );
 
+signals:
+    void keyPressed( QKeyEvent * );
+
 public slots:
     void setVoutList( vout_thread_t **, int );
 

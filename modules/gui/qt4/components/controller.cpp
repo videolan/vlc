@@ -935,19 +935,10 @@ void FullscreenControllerWidget::leaveEvent( QEvent *event )
 
 /**
  * When you get pressed key, send it to video output
- * FIXME: clearing focus by clearFocus() to not getting
- * key press events didnt work
  */
 void FullscreenControllerWidget::keyPressEvent( QKeyEvent *event )
 {
-    int i_vlck = qtEventToVLCKey( event );
-    if( i_vlck > 0 )
-    {
-        var_SetInteger( p_intf->p_libvlc, "key-pressed", i_vlck );
-        event->accept();
-    }
-    else
-        event->ignore();
+    emit keyPressed( event );
 }
 
 /* */
