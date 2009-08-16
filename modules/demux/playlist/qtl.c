@@ -58,14 +58,6 @@ volume - 0 (mute) - 100 (max)
 #include "playlist.h"
 #include <vlc_xml.h>
 
-struct demux_sys_t
-{
-    input_item_t *p_current_input;
-
-    xml_t *p_xml;
-    xml_reader_t *p_xml_reader;
-};
-
 typedef enum { FULLSCREEN_NORMAL,
                FULLSCREEN_DOUBLE,
                FULLSCREEN_HALF,
@@ -88,9 +80,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
  *****************************************************************************/
 int Import_QTL( vlc_object_t *p_this )
 {
-    DEMUX_BY_EXTENSION_MSG( ".qtl", "using QuickTime Media Link reader" );
-    p_demux->p_sys->p_xml = NULL;
-    p_demux->p_sys->p_xml_reader = NULL;
+    demux_t *p_demux = (demux_t *)p_this;
+
+    if( !demux_IsPathExtension( p_demux, ".qtl" ) )
+        return VLC_EGENERIC;
+
+    p_demux->pf_demux = Demux;
+    p_demux->pf_control = Control;
+    msg_Dbg( p_demux, "using QuickTime Media Link reader" );
+
     return VLC_SUCCESS;
 }
 
@@ -99,23 +97,16 @@ int Import_QTL( vlc_object_t *p_this )
  *****************************************************************************/
 void Close_QTL( vlc_object_t *p_this )
 {
-    demux_t *p_demux = (demux_t *)p_this;
-    demux_sys_t *p_sys = p_demux->p_sys;
-
-    if( p_sys->p_xml_reader )
-        xml_ReaderDelete( p_sys->p_xml, p_sys->p_xml_reader );
-    if( p_sys->p_xml )
-        xml_Delete( p_sys->p_xml );
-    free( p_sys );
+    (void)p_this;
 }
 
 static int Demux( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
     xml_t *p_xml;
-    xml_reader_t *p_xml_reader;
+    xml_reader_t *p_xml_reader = NULL;
     char *psz_eltname = NULL;
     input_item_t *p_input;
+    int i_ret = -1;
 
     /* List of all possible attributes. The only required one is "src" */
     bool b_autoplay = false;
@@ -135,20 +126,19 @@ static int Demux( demux_t *p_demux )
 
     INIT_PLAYLIST_STUFF;
 
-    p_sys->p_current_input = p_current_input;
-
-    p_xml = p_sys->p_xml = xml_Create( p_demux );
-    if( !p_xml ) return -1;
+    p_xml = xml_Create( p_demux );
+    if( !p_xml )
+        goto error;
 
     p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
-    if( !p_xml_reader ) return -1;
-    p_sys->p_xml_reader = p_xml_reader;
+    if( !p_xml_reader )
+        goto error;
 
     /* check root node */
     if( xml_ReaderRead( p_xml_reader ) != 1 )
     {
         msg_Err( p_demux, "invalid file (no root node)" );
-        return -1;
+        goto error;
     }
 
     if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
@@ -169,21 +159,21 @@ static int Demux( demux_t *p_demux )
             msg_Err( p_demux, "invalid root node %i, %s",
                      xml_ReaderNodeType( p_xml_reader ), psz_eltname );
             free( psz_eltname );
-            return -1;
+            goto error;
         }
     }
     free( psz_eltname );
 
-    while( xml_ReaderNextAttr( p_sys->p_xml_reader ) == VLC_SUCCESS )
+    while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
     {
-        char *psz_attrname = xml_ReaderName( p_sys->p_xml_reader );
-        char *psz_attrvalue = xml_ReaderValue( p_sys->p_xml_reader );
+        char *psz_attrname = xml_ReaderName( p_xml_reader );
+        char *psz_attrvalue = xml_ReaderValue( p_xml_reader );
 
         if( !psz_attrname || !psz_attrvalue )
         {
             free( psz_attrname );
             free( psz_attrvalue );
-            return -1;
+            goto error;
         }
 
         if( !strcmp( psz_attrname, "autoplay" ) )
@@ -329,6 +319,14 @@ static int Demux( demux_t *p_demux )
         }
     }
 
+    i_ret = 0; /* Needed for correct operation of go back */
+
+error:
+    if( p_xml_reader )
+        xml_ReaderDelete( p_xml, p_xml_reader );
+    if( p_xml )
+        xml_Delete( p_xml );
+
     HANDLE_PLAY_AND_RELEASE;
 
     free( psz_href );
@@ -336,8 +334,7 @@ static int Demux( demux_t *p_demux )
     free( psz_qtnext );
     free( psz_src );
     free( psz_mimetype );
-
-    return 0; /* Needed for correct operation of go back */
+    return i_ret;
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )
