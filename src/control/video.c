@@ -97,13 +97,11 @@ void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi,
 {
     /* We only work on the first vout */
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
-    bool ret;
 
     /* GetVout will raise the exception for us */
     if( !p_vout ) return;
 
-    ret = var_GetBool( p_vout, "fullscreen" );
-    var_SetBool( p_vout, "fullscreen", !ret );
+    var_ToggleBool( p_vout, "fullscreen" );
 
     vlc_object_release( p_vout );
 }
