@@ -844,16 +844,16 @@ float libvlc_media_player_get_position(
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
+    float f_position;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( !p_input_thread )
         return -1.0;
 
-    var_Get( p_input_thread, "position", &val );
+    f_position = var_GetFloat( p_input_thread, "position" );
     vlc_object_release( p_input_thread );
 
-    return val.f_float;
+    return f_position;
 }
 
 void libvlc_media_player_set_chapter(
@@ -876,16 +876,16 @@ int libvlc_media_player_get_chapter(
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
+    int i_chapter;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( !p_input_thread )
         return -1;
 
-    var_Get( p_input_thread, "chapter", &val );
+    i_chapter = var_GetInteger( p_input_thread, "chapter" );
     vlc_object_release( p_input_thread );
 
-    return val.i_int;
+    return i_chapter;
 }
 
 int libvlc_media_player_get_chapter_count(
@@ -956,16 +956,16 @@ int libvlc_media_player_get_title(
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
+    int i_title;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( !p_input_thread )
         return -1;
 
-    var_Get( p_input_thread, "title", &val );
+    i_title = var_GetInteger( p_input_thread, "title" );
     vlc_object_release( p_input_thread );
 
-    return val.i_int;
+    return i_title;
 }
 
 int libvlc_media_player_get_title_count(
@@ -1081,16 +1081,16 @@ float libvlc_media_player_get_rate(
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
+    int i_rate;
     bool b_can_rewind;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( !p_input_thread )
         return 0.0;  /* rate < 0 indicates rewind */
 
-    var_Get( p_input_thread, "rate", &val );
+    i_rate = var_GetInteger( p_input_thread, "rate" );
     b_can_rewind = var_GetBool( p_input_thread, "can-rewind" );
-    if( (val.i_int < 0) && !b_can_rewind )
+    if( i_rate < 0 && !b_can_rewind )
     {
         vlc_object_release( p_input_thread );
         libvlc_exception_raise( p_e, "invalid rate" );
@@ -1098,7 +1098,7 @@ float libvlc_media_player_get_rate(
     }
     vlc_object_release( p_input_thread );
 
-    return (float)1000.0f/val.i_int;
+    return (float)1000.0f/i_rate;
 }
 
 libvlc_state_t libvlc_media_player_get_state(
@@ -1107,7 +1107,6 @@ libvlc_state_t libvlc_media_player_get_state(
 {
     input_thread_t *p_input_thread;
     libvlc_state_t state = libvlc_Ended;
-    vlc_value_t val;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( !p_input_thread )
@@ -1134,7 +1133,7 @@ int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi,
                                        libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
+    bool b_seekable;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if ( !p_input_thread )
@@ -1144,10 +1143,10 @@ int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi,
             libvlc_exception_clear( p_e );
         return false;
     }
-    var_Get( p_input_thread, "can-seek", &val );
+    b_seekable = var_GetBool( p_input_thread, "can-seek" );
     vlc_object_release( p_input_thread );
 
-    return val.b_bool;
+    return b_seekable;
 }
 
 /* internal function, used by audio, video */
@@ -1226,7 +1225,7 @@ int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_value_t val;
+    bool b_can_pause;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if ( !p_input_thread )
@@ -1236,10 +1235,10 @@ int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi,
             libvlc_exception_clear( p_e );
         return false;
     }
-    var_Get( p_input_thread, "can-pause", &val );
+    b_can_pause = var_GetBool( p_input_thread, "can-pause" );
     vlc_object_release( p_input_thread );
 
-    return val.b_bool;
+    return b_can_pause;
 }
 
 void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e )
