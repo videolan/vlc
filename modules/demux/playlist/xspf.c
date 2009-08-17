@@ -731,6 +731,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
             FREE_VALUE();
         }
         FREE_NAME();
+        psz_value = NULL;
     }
 
     /* attribute title is mandatory except for <extension> */
