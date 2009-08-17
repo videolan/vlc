@@ -73,12 +73,12 @@ static void push(libvlc_event_manager_t * p_em, libvlc_event_listener_t * listen
     static const long MaxQueuedItem = 300000;
     long count = 0;
 #endif
-    
+
     struct queue_elmt * elmt = malloc(sizeof(struct queue_elmt));
     elmt->listener = *listener;
     elmt->event = *event;
     elmt->next = NULL;
-    
+
     /* Append to the end of the queue */
     struct queue_elmt * iter = queue(p_em)->elements;
     if(!iter)
@@ -118,7 +118,7 @@ static bool pop(libvlc_event_manager_t * p_em, libvlc_event_listener_t * listene
 
     *listener = queue(p_em)->elements->listener;
     *event = queue(p_em)->elements->event;
-    
+
     struct queue_elmt * elmt = queue(p_em)->elements;
     queue(p_em)->elements = elmt->next;
     free(elmt);
@@ -155,7 +155,7 @@ static void pop_listener(libvlc_event_manager_t * p_em, libvlc_event_listener_t 
  **************************************************************************/
 void
 libvlc_event_async_fini(libvlc_event_manager_t * p_em)
-{    
+{
     if(!is_queue_initialized(p_em)) return;
 
     if(current_thread_is_asynch_thread(p_em))
@@ -163,7 +163,7 @@ libvlc_event_async_fini(libvlc_event_manager_t * p_em)
         fprintf(stderr, "*** Error: releasing the last reference of the observed object from its callback thread is not (yet!) supported\n");
         abort();
     }
-    
+
     vlc_thread_t thread = queue(p_em)->thread;
     if(thread)
     {
@@ -182,7 +182,7 @@ libvlc_event_async_fini(libvlc_event_manager_t * p_em)
         iter = iter->next;
         free(elemt_to_delete);
     }
-    
+
     free(queue(p_em));
 }
 
@@ -202,7 +202,7 @@ libvlc_event_async_init(libvlc_event_manager_t * p_em)
     vlc_mutex_init(&queue(p_em)->lock);
     vlc_cond_init(&queue(p_em)->signal);
     vlc_cond_init(&queue(p_em)->signal_idle);
-    
+
     error = vlc_clone (&queue(p_em)->thread, event_async_loop, p_em, VLC_THREAD_PRIORITY_LOW);
     if(error)
     {
@@ -225,7 +225,7 @@ libvlc_event_async_ensure_listener_removal(libvlc_event_manager_t * p_em, libvlc
 
     queue_lock(p_em);
     pop_listener(p_em, listener);
-    
+
     // Wait for the asynch_loop to have processed all events.
     if(!current_thread_is_asynch_thread(p_em))
     {
@@ -286,7 +286,7 @@ static void * event_async_loop(void * arg)
             vlc_cond_broadcast(&queue(p_em)->signal_idle); // We'll be idle
             vlc_cond_wait(&queue(p_em)->signal, &queue(p_em)->lock);
             vlc_cleanup_pop();
-            
+
             queue(p_em)->is_idle = false;
         }
     }

@@ -407,7 +407,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
         }
 
         retval->url = libvlc_media_get_mrl( p_media, &ex );
-	
+
         retval->position = libvlc_media_player_get_time( self->p_media_player, &ex );
         if( libvlc_exception_raised( &ex ) )
         {

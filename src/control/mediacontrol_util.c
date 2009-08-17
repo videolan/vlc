@@ -143,9 +143,9 @@ private_mediacontrol_position2microsecond( libvlc_media_player_t * p_media_playe
         /* Ignore exception, we will assume a 0 time value */
 
         l_pos = private_mediacontrol_unit_convert( p_media_player,
-						   pos->key,
-						   mediacontrol_MediaTime,
-						   pos->value );
+                                                   pos->key,
+                                                   mediacontrol_MediaTime,
+                                                   pos->value );
         return 1000 * ( l_time + l_pos );
         break;
     }
@@ -165,9 +165,9 @@ private_mediacontrol_position2microsecond( libvlc_media_player_t * p_media_playe
         /* Ignore exception, we will assume a 0 time value */
 
         l_pos = private_mediacontrol_unit_convert( p_media_player,
-						   pos->key,
-						   mediacontrol_MediaTime,
-						   pos->value );
+                                                   pos->key,
+                                                   mediacontrol_MediaTime,
+                                                   pos->value );
 
         return 1000 * ( ( l_time + l_pos ) % l_length );
         break;
@@ -245,7 +245,7 @@ mediacontrol_exception_free( mediacontrol_Exception *exception )
  */
 mediacontrol_RGBPicture*
 private_mediacontrol_createRGBPicture( int i_width, int i_height, long i_chroma, int64_t l_date,
-				       char* p_data, int i_datasize )
+                                       char* p_data, int i_datasize )
 {
     mediacontrol_RGBPicture *retval;
 
