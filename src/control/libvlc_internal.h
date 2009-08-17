@@ -53,12 +53,6 @@ typedef void (*libvlc_vlm_release_func_t)( libvlc_instance_t * ) ;
  * Opaque structures for libvlc API
  ***************************************************************************/
 
-typedef enum libvlc_lock_state_t
-{
-    libvlc_Locked,
-    libvlc_UnLocked
-} libvlc_lock_state_t;
-
 typedef struct libvlc_vlm_t
 {
     vlm_t                  *p_vlm;
