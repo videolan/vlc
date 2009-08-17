@@ -594,7 +594,7 @@ VLC_PUBLIC_API char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *, lib
  * \param psz_aspect new video aspect-ratio
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *, char *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *, const char *, libvlc_exception_t * );
 
 /**
  * Get current video subtitle.
@@ -641,7 +641,7 @@ VLC_PUBLIC_API void libvlc_video_set_spu( libvlc_media_player_t *, int , libvlc_
  * \param p_e an initialized exception pointer
  * \return the success status (boolean)
  */
-VLC_PUBLIC_API int libvlc_video_set_subtitle_file( libvlc_media_player_t *, char *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_set_subtitle_file( libvlc_media_player_t *, const char *, libvlc_exception_t * );
 
 /**
  * Get the description of available titles.
@@ -680,7 +680,7 @@ VLC_PUBLIC_API char *libvlc_video_get_crop_geometry( libvlc_media_player_t *, li
  * \param psz_geometry new crop filter geometry
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_video_set_crop_geometry( libvlc_media_player_t *, char *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_set_crop_geometry( libvlc_media_player_t *, const char *, libvlc_exception_t * );
 
 /**
  * Toggle teletext transparent status on video output.

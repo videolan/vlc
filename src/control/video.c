@@ -222,10 +222,10 @@ void libvlc_video_set_scale( libvlc_media_player_t *p_mp, float f_scale,
 char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
 {
-    char *psz_aspect = 0;
+    char *psz_aspect = NULL;
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
 
-    if( !p_vout ) return 0;
+    if( !p_vout ) return NULL;
 
     psz_aspect = var_GetNonEmptyString( p_vout, "aspect-ratio" );
     vlc_object_release( p_vout );
@@ -233,7 +233,7 @@ char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *p_mi,
 }
 
 void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi,
-                                    char *psz_aspect, libvlc_exception_t *p_e )
+                                    const char *psz_aspect, libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
     int i_ret = -1;
@@ -341,7 +341,7 @@ end:
 }
 
 int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi,
-                                    char *psz_subtitle,
+                                    const char *psz_subtitle,
                                     libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
@@ -387,7 +387,7 @@ char *libvlc_video_get_crop_geometry( libvlc_media_player_t *p_mi,
 }
 
 void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi,
-                                    char *psz_geometry, libvlc_exception_t *p_e )
+                                     const char *psz_geometry, libvlc_exception_t *p_e )
 {
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
     int i_ret = -1;
