@@ -138,7 +138,6 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     p_new->libvlc_vlm.p_vlm = NULL;
     p_new->libvlc_vlm.p_event_manager = NULL;
     p_new->libvlc_vlm.pf_release = NULL;
-    p_new->b_playlist_locked = 0;
     p_new->ref_count = 1;
     p_new->verbosity = 1;
     p_new->p_callback_list = NULL;

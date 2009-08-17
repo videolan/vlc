@@ -70,7 +70,6 @@ struct libvlc_instance_t
 {
     libvlc_int_t *p_libvlc_int;
     libvlc_vlm_t  libvlc_vlm;
-    int           b_playlist_locked;
     unsigned      ref_count;
     int           verbosity;
     vlc_mutex_t   instance_lock;
