@@ -85,6 +85,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 
     if( vout_GetSnapshot( p_vout, &p_image, NULL, &fmt, "png", 500*1000 ) )
     {
+        vlc_object_release( p_vout );
         RAISE_NULL( mediacontrol_InternalException, "Snapshot exception" );
         return NULL;
     }
@@ -109,6 +110,8 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
 
     if( !p_pic )
         RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
+
+    vlc_object_release( p_vout );
     return p_pic;
 }
 
@@ -150,6 +153,9 @@ mediacontrol_display_text( mediacontrol_Instance *self,
         RAISE_VOID( mediacontrol_InternalException, "No input" );
     }
     p_vout = input_GetVout( p_input );
+    /*FIXME: take care of the next fixme that can use p_input */
+    vlc_object_release( p_input );
+
     if( ! p_vout )
     {
         RAISE_VOID( mediacontrol_InternalException, "No video output" );
