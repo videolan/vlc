@@ -1092,6 +1092,7 @@ float libvlc_media_player_get_rate(
     b_can_rewind = var_GetBool( p_input_thread, "can-rewind" );
     if( (val.i_int < 0) && !b_can_rewind )
     {
+        vlc_object_release( p_input_thread );
         libvlc_exception_raise( p_e, "invalid rate" );
         return 0.0;
     }
@@ -1241,11 +1242,14 @@ int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi,
     return val.b_bool;
 }
 
-void    libvlc_media_player_next_frame( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e )
+void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( p_input_thread != NULL )
+    {
         var_TriggerCallback( p_input_thread, "frame-next" );
+        vlc_object_release( p_input_thread );
+    }
     else
         libvlc_exception_raise( p_e, "Input thread is NULL" );
 }
