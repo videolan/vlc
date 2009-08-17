@@ -530,7 +530,7 @@ void DialogsProvider::saveAPlaylist()
         char filter[24];
         char module[12];
     } types[] = {
-        { N_("XSPF playlist (*.xpsf)"), "export-xspf", },
+        { N_("XSPF playlist (*.xspf)"), "export-xspf", },
         { N_("M3U playlist (*.m3u)"), "export-m3u", },
         { N_("HTML playlist (*.html)"), "export-html", },
     };
