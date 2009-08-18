@@ -416,10 +416,16 @@ noinst_DATA = VLC.app
 endif
 endif
 
+xcodebuild_FLAGS = $(xcodebuildsilentflags_$(V))
+xcodebuildsilentflags_ = $(xcodebuildsilentflags__$(AM_DEFAULT_VERBOSITY))
+xcodebuildsilentflags_0 = 2>&1 >/dev/null
+# '__' prefix trick for old automake version.
+xcodebuildsilentflags__0 = $(xcodebuildsilentflags_0)
+
 # VLC-release.app for packaging and giving it to your friends
 # use package-macosx to get a nice dmg
 VLC-release.app: vlc
-	( cd src && make install )
+	( cd src && $(MAKE) $(AM_MAKEFLAGS) install )
 	rm -Rf "$(top_builddir)/tmp"
 	mkdir -p "$(top_builddir)/tmp/extras/package/macosx"
 	rm -Rf $(top_builddir)/VLC-release.app
@@ -487,10 +493,10 @@ VLC-release.app: vlc
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
-	cd $(top_builddir)/tmp/extras/package/macosx && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
-	    cd ../../../../ && \
-	    cp -R $(top_builddir)/tmp/extras/package/macosx/build/Default/VLC.bundle \
-	          $(top_builddir)/VLC-release.app; \
+	$(AM_V_GEN)cd $(top_builddir)/tmp/extras/package/macosx && \
+        xcodebuild -target vlc $(xcodebuild_FLAGS) && \
+	cd ../../../../ && \
+	cp -R $(top_builddir)/tmp/extras/package/macosx/build/Default/VLC.bundle $(top_builddir)/VLC-release.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS
 	PRODUCT="VLC-release.app" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
@@ -642,10 +648,10 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	  cp "$(srcdir)/modules/gui/macosx/$$i" \
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
-	cd $(top_builddir)/tmp/extras/package/macosx && xcodebuild -target vlc | grep -v '^\([ \t]\|$$\)' && \
-	    cd ../../../../ && \
-	    cp -R $(top_builddir)/tmp/extras/package/macosx/build/Default/VLC.bundle \
-	          $(top_builddir)/VLC.app
+	$(AM_V_GEN)cd $(top_builddir)/tmp/extras/package/macosx && \
+	xcodebuild -target vlc $(xcodebuild_FLAGS) && \
+	cd ../../../../ && \
+	cp -R $(top_builddir)/tmp/extras/package/macosx/build/Default/VLC.bundle $(top_builddir)/VLC.app
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
 	touch $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	chmod +x $(top_builddir)/VLC.app/Contents/MacOS/VLC
