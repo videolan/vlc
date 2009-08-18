@@ -892,6 +892,11 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
 /******* Volume III: Sorting and searching ********/
 void PLModel::sort( int column, Qt::SortOrder order )
 {
+    sort( rootItem->i_id, column, order );
+}
+
+void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
+{
     int i_index = -1;
     int i_flag = 0;
 
@@ -912,7 +917,7 @@ next:
     PL_LOCK;
     {
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
-                                                        rootItem->i_id );
+                                                        i_root_id );
         if( p_root && i_flag )
         {
             playlist_RecursiveNodeSort( p_playlist, p_root,
@@ -946,6 +951,7 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
     int i_id;
     if( index.isValid() ) i_id = itemId( index );
     else i_id = rootItem->i_id;
+    i_popup_column = index.column();
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
     if( p_item )
@@ -979,8 +985,11 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
             menu->addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
             if( node )
             {
+                QMenu *sort_menu = new QMenu( qtr(I_POP_SORT) );
+                sort_menu->addAction( qtr( "Ascending" ), this, SLOT( popupSortAsc() ) );
+                sort_menu->addAction( qtr( "Descending" ), this, SLOT( popupSortDesc() ) );
                 menu->addSeparator();
-                menu->addAction( qtr(I_POP_SORT), this, SLOT( popupSort() ) );
+                menu->addMenu( sort_menu );
             }
         }
         if( node && tree )
@@ -1136,6 +1145,16 @@ void PLModel::popupAddNode()
         playlist_NodeCreate( p_playlist, qtu( name ), p_item, 0, NULL );
     }
     PL_UNLOCK;
+}
+
+void PLModel::popupSortAsc()
+{
+    sort( i_popup_item, i_popup_column, Qt::AscendingOrder );
+}
+
+void PLModel::popupSortDesc()
+{
+    sort( i_popup_item, i_popup_column, Qt::DescendingOrder );
 }
 /**********************************************************************
  * Playlist callbacks

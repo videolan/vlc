@@ -116,6 +116,7 @@ public:
     void doDelete( QModelIndexList selected );
     void search( const QString& search_text );
     void sort( int column, Qt::SortOrder order );
+    void sort( int i_root_id, int column, Qt::SortOrder order );
     void removeItem( int );
 
     /* DnD handling */
@@ -155,7 +156,7 @@ private:
     void doDeleteItem( PLItem *item, QModelIndexList *fullList );
 
     /* Popup */
-    int i_popup_item, i_popup_parent;
+    int i_popup_item, i_popup_parent, i_popup_column;
     QModelIndexList current_selection;
     QSignalMapper *ContextUpdateMapper;
 
@@ -188,6 +189,8 @@ private slots:
     void popupSave();
     void popupExplore();
     void popupAddNode();
+    void popupSortAsc();
+    void popupSortDesc();
     void viewchanged( int );
     void ProcessInputItemUpdate( input_item_t *);
     void ProcessInputItemUpdate( input_thread_t* p_input );
