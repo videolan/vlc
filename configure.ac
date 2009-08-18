@@ -5245,7 +5245,7 @@ echo '#! /bin/sh' >compile
 echo rm -f .error\$\$ >>compile
 echo ERROR=0 >>compile
 echo export PATH=$PATH LANG=C >>compile
-echo "(make \$@ 2>&1 || touch .error\$\$)| \\" >>compile
+echo "(make V=1 \$@ 2>&1 || touch .error\$\$)| \\" >>compile
 echo '`sed -ne "s/^top_srcdir *= *//p" < Makefile`/extras/buildsystem/make.pl' >>compile
 echo test -f .error\$\$ \&\& ERROR=1 >>compile
 echo rm -f .error\$\$ >>compile
