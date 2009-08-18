@@ -300,6 +300,7 @@ VLC_EXPORT( int, playlist_AskForArtEnqueue, (playlist_t *, input_item_t *, bool 
 
 /* Playlist sorting */
 VLC_EXPORT( int,  playlist_TreeMove, ( playlist_t *, playlist_item_t *, playlist_item_t *, int ) );
+VLC_EXPORT( int,  playlist_TreeMoveMany, ( playlist_t *, int, playlist_item_t **, playlist_item_t *, int ) );
 VLC_EXPORT( int,  playlist_RecursiveNodeSort, ( playlist_t *, playlist_item_t *,int, int ) );
 
 VLC_EXPORT( playlist_item_t *,  playlist_CurrentPlayingItem, ( playlist_t * ) );

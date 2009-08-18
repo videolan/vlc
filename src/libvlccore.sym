@@ -334,6 +334,7 @@ playlist_ServicesDiscoveryAdd
 playlist_ServicesDiscoveryRemove
 playlist_Status
 playlist_TreeMove
+playlist_TreeMoveMany
 playlist_Unlock
 __pl_Hold
 __pl_Release

@@ -217,22 +217,16 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
         if( !parent.isValid())
         {
             if( row > -1)
-            {
-                // dropped into top node
                 p_parent = playlist_ItemGetById( p_playlist, rootItem->i_id );
-            }
             else
             {
-                // dropped outside any item
                 PL_UNLOCK;
                 return true;
             }
         }
         else
-        {
-            // dropped into/onto an item (depends on (row = -1) or (row > -1))
             p_parent = playlist_ItemGetById( p_playlist, itemId ( parent ) );
-        }
+
         if( !p_parent || p_parent->i_children == -1 )
         {
             PL_UNLOCK;
@@ -248,45 +242,52 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
         QByteArray encodedData = data->data( "vlc/playlist-item-id" );
         QDataStream stream( &encodedData, QIODevice::ReadOnly );
 
-        /* easiest way to never miss the right index to move to is to
-        track the previously moved item */
-        playlist_item_t *p_target = NULL;
-
-        while( !stream.atEnd() )
+        if( copy )
         {
-            int src_id;
-            stream >> src_id;
-            playlist_item_t *p_src = playlist_ItemGetById( p_playlist, src_id );
-
-            if( !p_src )
+            while( !stream.atEnd() )
             {
-                PL_UNLOCK;
-                return false;
-            }
-            if( copy )
-            {
-                input_item_t *input = p_src->p_input;
+                int i_id;
+                stream >> i_id;
+                playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
+                if( !p_item )
+                {
+                    PL_UNLOCK;
+                    return false;
+                }
+                input_item_t *p_input = p_item->p_input;
                 playlist_AddExt ( p_playlist,
-                    p_src->p_input->psz_uri, p_src->p_input->psz_name,
+                    p_input->psz_uri, p_input->psz_name,
                     PLAYLIST_APPEND | PLAYLIST_SPREPARSE, PLAYLIST_END,
-                    input->i_duration,
-                    input->i_options, input->ppsz_options, input->optflagc,
+                    p_input->i_duration,
+                    p_input->i_options, p_input->ppsz_options, p_input->optflagc,
                     p_parent == p_playlist->p_local_category, true );
-                continue;
             }
-            if( !p_target )
-            {
-                if ( row == -1 ) row = p_parent->i_children;
-                playlist_TreeMove( p_playlist, p_src, p_parent, row );
-            }
-            else
-            {
-                for( row = 0 ; row < p_target->p_parent->i_children ; row++ )
-                    if( p_target->p_parent->pp_children[row] == p_target ) break;
-                playlist_TreeMove( p_playlist, p_src, p_parent, row + 1 );
-            }
-            p_target = p_src;
         }
+        else
+        {
+            QList<int> ids;
+            while( !stream.atEnd() )
+            {
+                int id;
+                stream >> id;
+                ids.append(id);
+            }
+            int count = ids.size();
+            playlist_item_t *items[count];
+            for( int i = 0; i < count; i++ )
+            {
+                playlist_item_t *item = playlist_ItemGetById( p_playlist, ids[i] );
+                if( !item )
+                {
+                    PL_UNLOCK;
+                    return false;
+                }
+                items[i] = item;
+            }
+            playlist_TreeMoveMany( p_playlist, count, items, p_parent,
+                (row == -1 ? p_parent->i_children : row) );
+        }
+
         PL_UNLOCK;
         /*TODO: That's not a good idea to rebuild the playlist */
         rebuild();

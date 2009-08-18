@@ -672,33 +672,11 @@ playlist_item_t *playlist_ItemFindFromInputAndRoot( playlist_t *p_playlist,
 }
 
 
-static int TreeMove( playlist_t *p_playlist, playlist_item_t *p_item,
-                     playlist_item_t *p_node, int i_newpos )
+static int ItemIndex ( playlist_item_t *p_item )
 {
-    int j;
-    playlist_item_t *p_detach = p_item->p_parent;
-    (void)p_playlist;
-
-    if( p_node->i_children == -1 ) return VLC_EGENERIC;
-
-    for( j = 0; j < p_detach->i_children; j++ )
-    {
-         if( p_detach->pp_children[j] == p_item ) break;
-    }
-    REMOVE_ELEM( p_detach->pp_children, p_detach->i_children, j );
-
-    /* If j < i_newpos, we are moving the element from the top to the
-     * down of the playlist. So when removing the element we have
-     * to change the position as we loose one element
-     */
-    if( p_detach == p_node && j < i_newpos )
-        i_newpos--;
-
-    /* Attach to new parent */
-    INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
-    p_item->p_parent = p_node;
-
-    return VLC_SUCCESS;
+    for( int i = 0; i < p_item->p_parent->i_children; i++ )
+        if( p_item->p_parent->pp_children[i] == p_item ) return i;
+    return -1;
 }
 
 /**
@@ -715,14 +693,65 @@ static int TreeMove( playlist_t *p_playlist, playlist_item_t *p_item,
 int playlist_TreeMove( playlist_t * p_playlist, playlist_item_t *p_item,
                        playlist_item_t *p_node, int i_newpos )
 {
-    int i_ret;
     PL_ASSERT_LOCKED;
 
-    if( p_node != p_item->p_parent ) return VLC_SUCCESS;
-    i_ret = TreeMove( p_playlist, p_item, p_node, i_newpos );
-    pl_priv(p_playlist)->b_reset_currently_playing = true;
-    vlc_cond_signal( &pl_priv(p_playlist)->signal );
-    return i_ret;
+    if( p_node->i_children == -1 ) return VLC_EGENERIC;
+
+    playlist_item_t *p_detach = p_item->p_parent;
+    int i_index = ItemIndex( p_item );
+
+    REMOVE_ELEM( p_detach->pp_children, p_detach->i_children, i_index );
+
+    if( p_detach == p_node && i_index < i_newpos )
+        i_newpos--;
+
+    INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
+    p_item->p_parent = p_node;
+
+    pl_priv( p_playlist )->b_reset_currently_playing = true;
+    vlc_cond_signal( &pl_priv( p_playlist )->signal );
+    return VLC_SUCCESS;
+}
+
+/**
+ * Moves an array of items
+ *
+ * This function must be entered with the playlist lock
+ *
+ * \param p_playlist the playlist
+ * \param i_items the number of indexes to move
+ * \param pp_items the array of indexes to move
+ * \param p_node the target node
+ * \param i_newpos the target position under this node
+ * \return VLC_SUCCESS or an error
+ */
+int playlist_TreeMoveMany( playlist_t *p_playlist,
+                            int i_items, playlist_item_t **pp_items,
+                            playlist_item_t *p_node, int i_newpos )
+{
+    PL_ASSERT_LOCKED;
+
+    if ( p_node->i_children == -1 ) return VLC_EGENERIC;
+
+    int i;
+    for( i = 0; i < i_items; i++ )
+    {
+        playlist_item_t *p_item = pp_items[i];
+        int i_index = ItemIndex( p_item );
+        playlist_item_t *p_parent = p_item->p_parent;
+        REMOVE_ELEM( p_parent->pp_children, p_parent->i_children, i_index );
+        if ( p_parent == p_node && i_index < i_newpos ) i_newpos--;
+    }
+    for( i = i_items - 1; i >= 0; i-- )
+    {
+        playlist_item_t *p_item = pp_items[i];
+        INSERT_ELEM( p_node->pp_children, p_node->i_children, i_newpos, p_item );
+        p_item->p_parent = p_node;
+    }
+
+    pl_priv( p_playlist )->b_reset_currently_playing = true;
+    vlc_cond_signal( &pl_priv( p_playlist )->signal );
+    return VLC_SUCCESS;
 }
 
 /**
