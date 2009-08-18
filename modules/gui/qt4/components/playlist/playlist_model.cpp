@@ -977,14 +977,14 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
             menu->addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
             menu->addSeparator();
             menu->addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
+            if( node )
+            {
+                menu->addSeparator();
+                menu->addAction( qtr(I_POP_SORT), this, SLOT( popupSort() ) );
+            }
         }
-        if( node )
-        {
-            if( index.isValid() ) menu->addSeparator();
-            menu->addAction( qtr(I_POP_SORT), this, SLOT( popupSort() ) );
-            if( tree )
+        if( node && tree )
                 menu->addAction( qtr(I_POP_ADD), this, SLOT( popupAddNode() ) );
-        }
         if( index.isValid() )
         {
             menu->addSeparator();
