@@ -156,16 +156,18 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
             || item->p_input == ml_input)
                 flags |= Qt::ItemIsDropEnabled;
     }
-    else
+    else if( rootItem->p_input == pl_input ||
+            rootItem->p_input == ml_input )
     {
         PL_LOCK;
         playlist_item_t *plItem =
             playlist_ItemGetById( p_playlist, item->i_id );
-        if ( plItem && ( plItem->i_children > -1 ) &&
-            ( rootItem->p_input == pl_input ||
-            rootItem->p_input == ml_input ) )
-                flags |= Qt::ItemIsDropEnabled;
+
+        if ( plItem && ( plItem->i_children > -1 ) )
+            flags |= Qt::ItemIsDropEnabled;
+
         PL_UNLOCK;
+
         flags |= Qt::ItemIsDragEnabled;
     }
 
