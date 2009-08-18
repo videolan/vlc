@@ -941,9 +941,11 @@ void PLModel::search( const QString& search_text )
 /*********** Popup *********/
 void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
 {
-    assert( index.isValid() );
     PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, itemId( index ) );
+    int i_id;
+    if( index.isValid() ) i_id = itemId( index );
+    else i_id = rootItem->i_id;
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
     if( p_item )
     {
         i_popup_item = p_item->i_id;
@@ -964,22 +966,28 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
 
         current_selection = list;
         QMenu *menu = new QMenu;
-        menu->addAction( qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
-        menu->addAction( qtr(I_POP_DEL), this, SLOT( popupDel() ) );
-        menu->addSeparator();
-        menu->addAction( qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
-        menu->addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
-        menu->addSeparator();
-        menu->addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
+        if( index.isValid() )
+        {
+            menu->addAction( qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
+            menu->addAction( qtr(I_POP_DEL), this, SLOT( popupDel() ) );
+            menu->addSeparator();
+            menu->addAction( qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
+            menu->addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
+            menu->addSeparator();
+            menu->addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
+        }
         if( node )
         {
-            menu->addSeparator();
+            if( index.isValid() ) menu->addSeparator();
             menu->addAction( qtr(I_POP_SORT), this, SLOT( popupSort() ) );
-            if( tree );
+            if( tree )
                 menu->addAction( qtr(I_POP_ADD), this, SLOT( popupAddNode() ) );
         }
-        menu->addSeparator();
-        menu->addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
+        if( index.isValid() )
+        {
+            menu->addSeparator();
+            menu->addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
+        }
         menu->popup( point );
     }
     else

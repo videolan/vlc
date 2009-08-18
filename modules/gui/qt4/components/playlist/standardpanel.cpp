@@ -336,7 +336,6 @@ void StandardPLPanel::search( const QString& searchText )
 
 void StandardPLPanel::doPopup( QModelIndex index, QPoint point )
 {
-    if( !index.isValid() ) return;
     QItemSelectionModel *selection = view->selectionModel();
     QModelIndexList list = selection->selectedIndexes();
     model->popup( index, point, list );
