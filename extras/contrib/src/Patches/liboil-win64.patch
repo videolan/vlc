@@ -1,0 +1,109 @@
+diff -ruN liboil.old/liboil/amd64/wavelet.c liboil/liboil/amd64/wavelet.c
+--- liboil.old/liboil/amd64/wavelet.c	2009-08-18 11:36:57.000000000 +0200
++++ liboil/liboil/amd64/wavelet.c	2009-08-18 11:38:00.000000000 +0200
+@@ -2,7 +2,7 @@
+ #include <liboil/liboilfunction.h>
+ #include <liboil/liboilclasses.h>
+ #include <stddef.h>
+-
++#include <stdint.h>
+ 
+ void
+ deinterleave2_asm (int16_t *d1, int16_t *d2, int16_t *s_2xn, int n)
+@@ -1409,7 +1409,7 @@
+       "  jnz 1b\n"
+       "  emms\n"
+       : "+r" (i1), "+r" (s1), "+r" (s2), "+r" (n)
+-      : "r" ((long)is1), "r" ((long)ss1), "r" ((long)ss2)
++      : "r" ((intptr_t)is1), "r" ((intptr_t)ss1), "r" ((intptr_t)ss2)
+       );
+ }
+ OIL_DEFINE_IMPL_FULL (multiply_and_acc_12xn_s16_u8_mmx,
+@@ -1596,7 +1596,7 @@
+         [s2_nx4_off] "+r" (s2_nx4_off),
+         [n] "+m" (n),
+         [s1] "+r" (s1)
+-      : [sstr] "r" ((long)(sstr2))
++      : [sstr] "r" ((intptr_t)(sstr2))
+       );
+ }
+ OIL_DEFINE_IMPL_FULL (mas4_across_add_s16_mmx, mas4_across_add_s16,
+@@ -1753,8 +1753,8 @@
+         [s3_8] "+r" (s3_8),
+         [d] "+r" (d),
+         [n] "+m" (n),
+-        [s1] "+r" ((long)(s1))
+-      : [sstr] "r" ((long)(sstr2))
++        [s1] "+r" ((intptr_t)(s1))
++      : [sstr] "r" ((intptr_t)(sstr2))
+       );
+ }
+ OIL_DEFINE_IMPL_FULL (mas8_across_add_s16_mmx, mas8_across_add_s16,
+diff -ruN liboil.old/liboil/i386_amd64/mas.c liboil/liboil/i386_amd64/mas.c
+--- liboil.old/liboil/i386_amd64/mas.c	2009-08-18 11:36:57.000000000 +0200
++++ liboil/liboil/i386_amd64/mas.c	2009-08-18 11:38:39.000000000 +0200
+@@ -1,7 +1,7 @@
+ 
+ #include <liboil/liboilfunction.h>
+ #include <liboil/liboilclasses.h>
+-
++#include <stdint.h>
+ 
+ void
+ mas10_u8_mmx (uint8_t *d, const uint8_t *s1_np9, const int16_t *s2_10,
+@@ -1104,7 +1104,7 @@
+       "  packuswb %%mm2, %%mm2\n"
+       "  movd %%mm2, 0(%[d])\n"
+       : [p] "+r" (p)
+-      : [d] "r" (d), [ss1] "r" ((long)ss1));
++      : [d] "r" (d), [ss1] "r" ((intptr_t)ss1));
+     d+=4;
+     s1_nx8+=4;
+     n--;
+diff -ruN liboil.old/liboil/i386_amd64/multiply_and_acc.c liboil/liboil/i386_amd64/multiply_and_acc.c
+--- liboil.old/liboil/i386_amd64/multiply_and_acc.c	2009-08-18 11:36:57.000000000 +0200
++++ liboil/liboil/i386_amd64/multiply_and_acc.c	2009-08-18 11:38:27.000000000 +0200
+@@ -1,6 +1,7 @@
+ 
+ #include <liboil/liboilfunction.h>
+ #include <liboil/liboilclasses.h>
++#include <stdint.h>
+ 
+ void
+ multiply_and_acc_6xn_s16_u8_mmx (int16_t *i1, int is1, int16_t *s1,
+@@ -32,7 +33,7 @@
+ #ifdef __i386__
+       : "m" (is1), "m" (ss1), "m" (ss2)
+ #else
+-      : "r" ((long)is1), "r" ((long)ss1), "r" ((long)ss2)
++      : "r" ((intptr_t)is1), "r" ((intptr_t)ss1), "r" ((intptr_t)ss2)
+ #endif
+       );
+ }
+@@ -68,7 +69,7 @@
+ #ifdef __i386__
+       : "m" (is1), "m" (ss1), "m" (ss2)
+ #else
+-      : "r" ((long)is1), "r" ((long)ss1), "r" ((long)ss2)
++      : "r" ((intptr_t)is1), "r" ((intptr_t)ss1), "r" ((intptr_t)ss2)
+ #endif
+       );
+ }
+@@ -114,7 +115,7 @@
+ #ifdef __i386__
+       : "m" (is1), "m" (ss1), "m" (ss2)
+ #else
+-      : "r" ((long)is1), "r" ((long)ss1), "r" ((long)ss2)
++      : "r" ((intptr_t)is1), "r" ((intptr_t)ss1), "r" ((intptr_t)ss2)
+ #endif
+       );
+ }
+@@ -170,7 +171,7 @@
+ #ifdef __i386__
+       : "m" (is1), "m" (ss1), "m" (ss2)
+ #else
+-      : "r" ((long)is1), "r" ((long)ss1), "r" ((long)ss2)
++      : "r" ((intptr_t)is1), "r" ((intptr_t)ss1), "r" ((intptr_t)ss2)
+ #endif
+       );
+ }
