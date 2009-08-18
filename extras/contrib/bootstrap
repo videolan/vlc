@@ -229,10 +229,17 @@ case $HOST in
         echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
         cat src/Distributions/wince.mak >> distro.mak
     ;;
+    x86_64-*-mingw*)
+        echo "HAVE_WIN64 = 1" >> config.mak
+        echo "HAVE_WIN32 = 1" >> config.mak
+        echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
+           EXTRA_CFLAGS="-O3"
+        cat src/Distributions/win32.mak >> distro.mak
+    ;;
     *mingw32*)
         echo "HAVE_WIN32 = 1" >> config.mak
         echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
-	    EXTRA_CFLAGS="-O3"
+        EXTRA_CFLAGS="-O3"
         cat src/Distributions/win32.mak >> distro.mak
     ;;
     i686-pc-cygwin)

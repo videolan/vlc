@@ -815,6 +815,9 @@ endif
 ifdef HAVE_DARWIN_10
 THEORACONF += --disable-asm
 endif
+ifdef HAVE_WIN64
+THEORACONF += --disable-asm
+endif
 
 .theora: libtheora .ogg
 ifdef HAVE_BEOS
