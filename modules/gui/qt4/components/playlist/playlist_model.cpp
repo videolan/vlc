@@ -1123,7 +1123,7 @@ void PLModel::popupAddNode()
 {
     bool ok;
     QString name = QInputDialog::getText( PlaylistDialog::getInstance( p_intf ),
-        QString( "Add node" ), QString( "Enter name for new node" ),
+        qtr( I_POP_ADD ), qtr( "Enter name for new node:" ),
         QLineEdit::Normal, QString(), &ok);
     if( !ok || name.isEmpty() ) return;
     PL_LOCK;
