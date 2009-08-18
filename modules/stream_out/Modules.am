@@ -1,4 +1,3 @@
-SUBDIRS = transrate
 SOURCES_stream_out_dummy = dummy.c
 SOURCES_stream_out_description = description.c
 SOURCES_stream_out_standard = standard.c
