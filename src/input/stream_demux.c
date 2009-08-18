@@ -284,6 +284,9 @@ static void* DStreamThread( vlc_object_t* p_this )
         return NULL;
     }
 
+    /* stream_Demux cannot apply DVB filters.
+     * Get all programs and let the E/S output sort them out. */
+    demux_Control( p_demux, DEMUX_SET_GROUP, -1, NULL );
     p_sys->p_demux = p_demux;
 
     /* Main loop */
