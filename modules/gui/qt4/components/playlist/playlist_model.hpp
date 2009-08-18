@@ -186,6 +186,7 @@ private slots:
     void popupStream();
     void popupSave();
     void popupExplore();
+    void popupAddNode();
     void viewchanged( int );
     void ProcessInputItemUpdate( input_item_t *);
     void ProcessInputItemUpdate( input_thread_t* p_input );

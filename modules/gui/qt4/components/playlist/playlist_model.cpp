@@ -948,7 +948,20 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
     {
         i_popup_item = p_item->i_id;
         i_popup_parent = p_item->p_parent ? p_item->p_parent->i_id : -1;
+        bool node = p_item->i_children > -1;
+        bool tree = false;
+        if( node )
+        {
+            /* check whether we are in tree view */
+            playlist_item_t *p_up = p_item;
+            while( p_up )
+            {
+                if ( p_up == p_playlist->p_root_category ) tree = true;
+                p_up = p_up->p_parent;
+            }
+        }
         PL_UNLOCK;
+
         current_selection = list;
         QMenu *menu = new QMenu;
         menu->addAction( qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
@@ -958,11 +971,12 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
         menu->addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
         menu->addSeparator();
         menu->addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
-        if( p_item->i_children > -1 )
+        if( node )
         {
             menu->addSeparator();
             menu->addAction( qtr(I_POP_SORT), this, SLOT( popupSort() ) );
-            menu->addAction( qtr(I_POP_ADD), this, SLOT( popupAdd() ) );
+            if( tree );
+                menu->addAction( qtr(I_POP_ADD), this, SLOT( popupAddNode() ) );
         }
         menu->addSeparator();
         menu->addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
@@ -1096,6 +1110,23 @@ void PLModel::popupExplore()
         PL_UNLOCK;
 }
 
+#include <QInputDialog>
+void PLModel::popupAddNode()
+{
+    bool ok;
+    QString name = QInputDialog::getText( PlaylistDialog::getInstance( p_intf ),
+        QString( "Add node" ), QString( "Enter name for new node" ),
+        QLineEdit::Normal, QString(), &ok);
+    if( !ok || name.isEmpty() ) return;
+    PL_LOCK;
+    playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
+                                                    i_popup_item );
+    if( p_item )
+    {
+        playlist_NodeCreate( p_playlist, qtu( name ), p_item, 0, NULL );
+    }
+    PL_UNLOCK;
+}
 /**********************************************************************
  * Playlist callbacks
  **********************************************************************/
