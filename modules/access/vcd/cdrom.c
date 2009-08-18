@@ -183,8 +183,6 @@ void ioctl_Close( vlc_object_t * p_this, vcddev_t *p_vcddev )
 #ifdef WIN32
     if( p_vcddev->h_device_handle )
         CloseHandle( p_vcddev->h_device_handle );
-    if( p_vcddev->hASPI )
-        FreeLibrary( (HMODULE)p_vcddev->hASPI );
 #else
     if( p_vcddev->i_device_handle != -1 )
         close( p_vcddev->i_device_handle );
@@ -287,151 +285,33 @@ int ioctl_GetTracksMap( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         darwin_freeTOC( pTOC );
 
 #elif defined( WIN32 )
-        if( p_vcddev->hASPI )
+        DWORD dwBytesReturned;
+        CDROM_TOC cdrom_toc;
+
+        if( DeviceIoControl( p_vcddev->h_device_handle, IOCTL_CDROM_READ_TOC,
+                             NULL, 0, &cdrom_toc, sizeof(CDROM_TOC),
+                             &dwBytesReturned, NULL ) == 0 )
         {
-            HANDLE hEvent;
-            struct SRB_ExecSCSICmd ssc;
-            uint8_t p_tocheader[ 4 ];
-
-            /* Create the transfer completion event */
-            hEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
-            if( hEvent == NULL )
-            {
-                return -1;
-            }
-
-            memset( &ssc, 0, sizeof( ssc ) );
-
-            ssc.SRB_Cmd         = SC_EXEC_SCSI_CMD;
-            ssc.SRB_Flags       = SRB_DIR_IN | SRB_EVENT_NOTIFY;
-            ssc.SRB_HaId        = LOBYTE( p_vcddev->i_sid );
-            ssc.SRB_Target      = HIBYTE( p_vcddev->i_sid );
-            ssc.SRB_SenseLen    = SENSE_LEN;
-
-            ssc.SRB_PostProc = (LPVOID) hEvent;
-            ssc.SRB_CDBLen      = 10;
-
-            /* Operation code */
-            ssc.CDBByte[ 0 ] = READ_TOC;
-
-            /* Format */
-            ssc.CDBByte[ 2 ] = READ_TOC_FORMAT_TOC;
-
-            /* Starting track */
-            ssc.CDBByte[ 6 ] = 0;
-
-            /* Allocation length and buffer */
-            ssc.SRB_BufLen = sizeof( p_tocheader );
-            ssc.SRB_BufPointer  = p_tocheader;
-            ssc.CDBByte[ 7 ] = ( ssc.SRB_BufLen >>  8 ) & 0xff;
-            ssc.CDBByte[ 8 ] = ( ssc.SRB_BufLen       ) & 0xff;
-
-            /* Initiate transfer */
-            ResetEvent( hEvent );
-            p_vcddev->lpSendCommand( (void*) &ssc );
-
-            /* If the command has still not been processed, wait until it's
-             * finished */
-            if( ssc.SRB_Status == SS_PENDING )
-                WaitForSingleObject( hEvent, INFINITE );
-
-            /* check that the transfer went as planned */
-            if( ssc.SRB_Status != SS_COMP )
-            {
-                CloseHandle( hEvent );
-                return 0;
-            }
-
-            i_tracks = p_tocheader[3] - p_tocheader[2] + 1;
-
-            if( pp_sectors )
-            {
-                int i, i_toclength;
-                uint8_t *p_fulltoc;
-
-                i_toclength = 4 /* header */ + p_tocheader[0] +
-                              ((unsigned int)p_tocheader[1] << 8);
-
-                p_fulltoc = malloc( i_toclength );
-                *pp_sectors = calloc( i_tracks + 1, sizeof(**pp_sectors) );
-
-                if( *pp_sectors == NULL || p_fulltoc == NULL )
-                {
-                    free( *pp_sectors );
-                    free( p_fulltoc );
-                    CloseHandle( hEvent );
-                    return 0;
-                }
-
-                /* Allocation length and buffer */
-                ssc.SRB_BufLen = i_toclength;
-                ssc.SRB_BufPointer  = p_fulltoc;
-                ssc.CDBByte[ 7 ] = ( ssc.SRB_BufLen >>  8 ) & 0xff;
-                ssc.CDBByte[ 8 ] = ( ssc.SRB_BufLen       ) & 0xff;
-
-                /* Initiate transfer */
-                ResetEvent( hEvent );
-                p_vcddev->lpSendCommand( (void*) &ssc );
-
-                /* If the command has still not been processed, wait until it's
-                 * finished */
-                if( ssc.SRB_Status == SS_PENDING )
-                    WaitForSingleObject( hEvent, INFINITE );
-
-                /* check that the transfer went as planned */
-                if( ssc.SRB_Status != SS_COMP )
-                    i_tracks = 0;
-
-                for( i = 0 ; i <= i_tracks ; i++ )
-                {
-                    int i_index = 8 + 8 * i;
-                    (*pp_sectors)[ i ] = ((int)p_fulltoc[ i_index ] << 24) +
-                                         ((int)p_fulltoc[ i_index+1 ] << 16) +
-                                         ((int)p_fulltoc[ i_index+2 ] << 8) +
-                                         (int)p_fulltoc[ i_index+3 ];
-
-                    msg_Dbg( p_this, "p_sectors: %i, %i", i, (*pp_sectors)[i]);
-                }
-
-                free( p_fulltoc );
-            }
-
-            CloseHandle( hEvent );
-
+            msg_Err( p_this, "could not read TOCHDR" );
+            return 0;
         }
-        else
+
+        i_tracks = cdrom_toc.LastTrack - cdrom_toc.FirstTrack + 1;
+
+        if( pp_sectors )
         {
-            DWORD dwBytesReturned;
-            CDROM_TOC cdrom_toc;
-
-            if( DeviceIoControl( p_vcddev->h_device_handle,
-                                 IOCTL_CDROM_READ_TOC,
-                                 NULL, 0, &cdrom_toc, sizeof(CDROM_TOC),
-                                 &dwBytesReturned, NULL ) == 0 )
-            {
-                msg_Err( p_this, "could not read TOCHDR" );
+            *pp_sectors = calloc( i_tracks + 1, sizeof(**pp_sectors) );
+            if( *pp_sectors == NULL )
                 return 0;
-            }
 
-            i_tracks = cdrom_toc.LastTrack - cdrom_toc.FirstTrack + 1;
-
-            if( pp_sectors )
+            for( int i = 0 ; i <= i_tracks ; i++ )
             {
-                int i;
-
-                *pp_sectors = calloc( i_tracks + 1, sizeof(**pp_sectors) );
-                if( *pp_sectors == NULL )
-                    return 0;
-
-                for( i = 0 ; i <= i_tracks ; i++ )
-                {
-                    (*pp_sectors)[ i ] = MSF_TO_LBA2(
+                (*pp_sectors)[ i ] = MSF_TO_LBA2(
                                            cdrom_toc.TrackData[i].Address[1],
                                            cdrom_toc.TrackData[i].Address[2],
                                            cdrom_toc.TrackData[i].Address[3] );
-                    msg_Dbg( p_this, "p_sectors: %i, %i", i, (*pp_sectors)[i]);
-                }
-            }
+                msg_Dbg( p_this, "p_sectors: %i, %i", i, (*pp_sectors)[i]);
+             }
         }
 
 #elif defined( HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H ) \
@@ -600,107 +480,34 @@ int ioctl_ReadSectors( vlc_object_t *p_this, const vcddev_t *p_vcddev,
         }
 
 #elif defined( WIN32 )
-        if( p_vcddev->hASPI )
+        DWORD dwBytesReturned;
+        RAW_READ_INFO cdrom_raw;
+
+        /* Initialize CDROM_RAW_READ structure */
+        cdrom_raw.DiskOffset.QuadPart = CD_SECTOR_SIZE * i_sector;
+        cdrom_raw.SectorCount = i_nb;
+        cdrom_raw.TrackMode =  i_type == VCD_TYPE ? XAForm2 : CDDA;
+
+        if( DeviceIoControl( p_vcddev->h_device_handle, IOCTL_CDROM_RAW_READ,
+                             &cdrom_raw, sizeof(RAW_READ_INFO), p_block,
+                             VCD_SECTOR_SIZE * i_nb, &dwBytesReturned,
+                             NULL ) == 0 )
         {
-            HANDLE hEvent;
-            struct SRB_ExecSCSICmd ssc;
-
-            /* Create the transfer completion event */
-            hEvent = CreateEvent( NULL, TRUE, FALSE, NULL );
-            if( hEvent == NULL )
+            if( i_type == VCD_TYPE )
             {
-                if( i_type == VCD_TYPE ) free( p_block );
-                return -1;
-            }
-
-            memset( &ssc, 0, sizeof( ssc ) );
-
-            ssc.SRB_Cmd         = SC_EXEC_SCSI_CMD;
-            ssc.SRB_Flags       = SRB_DIR_IN | SRB_EVENT_NOTIFY;
-            ssc.SRB_HaId        = LOBYTE( p_vcddev->i_sid );
-            ssc.SRB_Target      = HIBYTE( p_vcddev->i_sid );
-            ssc.SRB_SenseLen    = SENSE_LEN;
-
-            ssc.SRB_PostProc = (LPVOID) hEvent;
-            ssc.SRB_CDBLen      = 12;
-
-            /* Operation code */
-            ssc.CDBByte[ 0 ] = READ_CD;
-
-            /* Sector type */
-            ssc.CDBByte[ 1 ] = i_type == VCD_TYPE ? SECTOR_TYPE_MODE2_FORM2 :
-                                                    SECTOR_TYPE_CDDA;
-
-            /* Start of LBA */
-            ssc.CDBByte[ 2 ] = ( i_sector >> 24 ) & 0xff;
-            ssc.CDBByte[ 3 ] = ( i_sector >> 16 ) & 0xff;
-            ssc.CDBByte[ 4 ] = ( i_sector >>  8 ) & 0xff;
-            ssc.CDBByte[ 5 ] = ( i_sector       ) & 0xff;
-
-            /* Transfer length */
-            ssc.CDBByte[ 6 ] = ( i_nb >> 16 ) & 0xff;
-            ssc.CDBByte[ 7 ] = ( i_nb >> 8  ) & 0xff;
-            ssc.CDBByte[ 8 ] = ( i_nb       ) & 0xff;
-
-            /* Data selection */
-            ssc.CDBByte[ 9 ] = i_type == VCD_TYPE ? READ_CD_RAW_MODE2 :
-                                                    READ_CD_USERDATA;
-
-            /* Result buffer */
-            ssc.SRB_BufPointer  = p_block;
-            ssc.SRB_BufLen = VCD_SECTOR_SIZE * i_nb;
-
-            /* Initiate transfer */
-            ResetEvent( hEvent );
-            p_vcddev->lpSendCommand( (void*) &ssc );
-
-            /* If the command has still not been processed, wait until it's
-             * finished */
-            if( ssc.SRB_Status == SS_PENDING )
-            {
-                WaitForSingleObject( hEvent, INFINITE );
-            }
-            CloseHandle( hEvent );
-
-            /* check that the transfer went as planned */
-            if( ssc.SRB_Status != SS_COMP )
-            {
-                if( i_type == VCD_TYPE ) free( p_block );
-                return -1;
-            }
-        }
-        else
-        {
-            DWORD dwBytesReturned;
-            RAW_READ_INFO cdrom_raw;
-
-            /* Initialize CDROM_RAW_READ structure */
-            cdrom_raw.DiskOffset.QuadPart = CD_SECTOR_SIZE * i_sector;
-            cdrom_raw.SectorCount = i_nb;
-            cdrom_raw.TrackMode =  i_type == VCD_TYPE ? XAForm2 : CDDA;
-
-            if( DeviceIoControl( p_vcddev->h_device_handle,
-                                 IOCTL_CDROM_RAW_READ, &cdrom_raw,
-                                 sizeof(RAW_READ_INFO), p_block,
-                                 VCD_SECTOR_SIZE * i_nb, &dwBytesReturned,
-                                 NULL ) == 0 )
-            {
-                if( i_type == VCD_TYPE )
+                /* Retry in YellowMode2 */
+                cdrom_raw.TrackMode = YellowMode2;
+                if( DeviceIoControl( p_vcddev->h_device_handle,
+                                     IOCTL_CDROM_RAW_READ, &cdrom_raw,
+                                     sizeof(RAW_READ_INFO), p_block,
+                                     VCD_SECTOR_SIZE * i_nb, &dwBytesReturned,
+                                     NULL ) == 0 )
                 {
-                    /* Retry in YellowMode2 */
-                    cdrom_raw.TrackMode = YellowMode2;
-                    if( DeviceIoControl( p_vcddev->h_device_handle,
-                                 IOCTL_CDROM_RAW_READ, &cdrom_raw,
-                                 sizeof(RAW_READ_INFO), p_block,
-                                 VCD_SECTOR_SIZE * i_nb, &dwBytesReturned,
-                                 NULL ) == 0 )
-                    {
-                        free( p_block );
-                        return -1;
-                    }
+                    free( p_block );
+                    return -1;
                 }
-                else return -1;
             }
+            else return -1;
         }
 
 #elif defined( HAVE_SCSIREQ_IN_SYS_SCSIIO_H )
@@ -1113,138 +920,26 @@ static int darwin_getNumberOfTracks( CDTOC *pTOC, int i_descriptors )
 /*****************************************************************************
  * win32_vcd_open: open vcd drive
  *****************************************************************************
- * Load and use aspi if it is available, otherwise use IOCTLs on WinNT/2K/XP.
+ * Use IOCTLs on WinNT/2K/XP.
  *****************************************************************************/
 static int win32_vcd_open( vlc_object_t * p_this, const char *psz_dev,
                            vcddev_t *p_vcddev )
 {
     /* Initializations */
     p_vcddev->h_device_handle = NULL;
-    p_vcddev->i_sid = 0;
-    p_vcddev->hASPI = 0;
-    p_vcddev->lpSendCommand = 0;
 
-    if( WIN_NT )
-    {
-        char psz_win32_drive[7];
+    char psz_win32_drive[7];
 
-        msg_Dbg( p_this, "using winNT/2K/XP ioctl layer" );
+    msg_Dbg( p_this, "using winNT/2K/XP ioctl layer" );
 
-        sprintf( psz_win32_drive, "\\\\.\\%c:", psz_dev[0] );
+    sprintf( psz_win32_drive, "\\\\.\\%c:", psz_dev[0] );
 
-        p_vcddev->h_device_handle = CreateFile( psz_win32_drive, GENERIC_READ,
+    p_vcddev->h_device_handle = CreateFile( psz_win32_drive, GENERIC_READ,
                                             FILE_SHARE_READ | FILE_SHARE_WRITE,
                                             NULL, OPEN_EXISTING,
                                             FILE_FLAG_NO_BUFFERING |
                                             FILE_FLAG_RANDOM_ACCESS, NULL );
-        return (p_vcddev->h_device_handle == NULL) ? -1 : 0;
-    }
-    else
-    {
-        HMODULE hASPI = NULL;
-        long (*lpGetSupport)( void ) = NULL;
-        long (*lpSendCommand)( void* ) = NULL;
-        DWORD dwSupportInfo;
-        int i, j, i_hostadapters;
-        char c_drive = psz_dev[0];
-
-        hASPI = LoadLibrary( "wnaspi32.dll" );
-        if( hASPI != NULL )
-        {
-            lpGetSupport = (void *)GetProcAddress( hASPI, "GetASPI32SupportInfo" );
-            lpSendCommand = (void *)GetProcAddress( hASPI, "SendASPI32Command" );
-        }
-
-        if( hASPI == NULL || lpGetSupport == NULL || lpSendCommand == NULL )
-        {
-            msg_Dbg( p_this,
-                     "unable to load aspi or get aspi function pointers" );
-            if( hASPI ) FreeLibrary( hASPI );
-            return -1;
-        }
-
-        /* ASPI support seems to be there */
-
-        dwSupportInfo = lpGetSupport();
-
-        if( HIBYTE( LOWORD ( dwSupportInfo ) ) == SS_NO_ADAPTERS )
-        {
-            msg_Dbg( p_this, "no host adapters found (aspi)" );
-            FreeLibrary( hASPI );
-            return -1;
-        }
-
-        if( HIBYTE( LOWORD ( dwSupportInfo ) ) != SS_COMP )
-        {
-            msg_Dbg( p_this, "unable to initalize aspi layer" );
-            FreeLibrary( hASPI );
-            return -1;
-        }
-
-        i_hostadapters = LOBYTE( LOWORD( dwSupportInfo ) );
-        if( i_hostadapters == 0 )
-        {
-            FreeLibrary( hASPI );
-            return -1;
-        }
-
-        c_drive = c_drive > 'Z' ? c_drive - 'a' : c_drive - 'A';
-
-        for( i = 0; i < i_hostadapters; i++ )
-        {
-          for( j = 0; j < 15; j++ )
-          {
-              struct SRB_GetDiskInfo srbDiskInfo;
-
-              srbDiskInfo.SRB_Cmd         = SC_GET_DISK_INFO;
-              srbDiskInfo.SRB_HaId        = i;
-              srbDiskInfo.SRB_Flags       = 0;
-              srbDiskInfo.SRB_Hdr_Rsvd    = 0;
-              srbDiskInfo.SRB_Target      = j;
-              srbDiskInfo.SRB_Lun         = 0;
-
-              lpSendCommand( (void*) &srbDiskInfo );
-
-              if( (srbDiskInfo.SRB_Status == SS_COMP) &&
-                  (srbDiskInfo.SRB_Int13HDriveInfo == c_drive) )
-              {
-                  /* Make sure this is a cdrom device */
-                  struct SRB_GDEVBlock   srbGDEVBlock;
-
-                  memset( &srbGDEVBlock, 0, sizeof(struct SRB_GDEVBlock) );
-                  srbGDEVBlock.SRB_Cmd    = SC_GET_DEV_TYPE;
-                  srbGDEVBlock.SRB_HaId   = i;
-                  srbGDEVBlock.SRB_Target = j;
-
-                  lpSendCommand( (void*) &srbGDEVBlock );
-
-                  if( ( srbGDEVBlock.SRB_Status == SS_COMP ) &&
-                      ( srbGDEVBlock.SRB_DeviceType == DTYPE_CDROM ) )
-                  {
-                      p_vcddev->i_sid = MAKEWORD( i, j );
-                      p_vcddev->hASPI = (long)hASPI;
-                      p_vcddev->lpSendCommand = lpSendCommand;
-                      msg_Dbg( p_this, "using aspi layer" );
-
-                      return 0;
-                  }
-                  else
-                  {
-                      FreeLibrary( hASPI );
-                      msg_Dbg( p_this, "%c: is not a cdrom drive",
-                               psz_dev[0] );
-                      return -1;
-                  }
-              }
-          }
-        }
-
-        FreeLibrary( hASPI );
-        msg_Dbg( p_this, "unable to get haid and target (aspi)" );
-
-    }
-
-    return -1;
+    return (p_vcddev->h_device_handle == NULL) ? -1 : 0;
 }
 
 #endif /* WIN32 */
@@ -1408,12 +1103,6 @@ static int CdTextRead( vlc_object_t *p_object, const vcddev_t *p_vcddev,
 static int CdTextRead( vlc_object_t *p_object, const vcddev_t *p_vcddev,
                        uint8_t **pp_buffer, int *pi_buffer )
 {
-    if( p_vcddev->hASPI )
-    {
-        msg_Err( p_object, "mode ASPI unsupported for CD-TEXT" );
-        return -1;
-    }
-
     CDROM_READ_TOC_EX TOCEx;
     memset(&TOCEx, 0, sizeof(TOCEx));
     TOCEx.Format = CDROM_READ_TOC_EX_FORMAT_CDTEXT;
