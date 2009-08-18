@@ -968,6 +968,9 @@ libebml: libebml-$(LIBEBML_VERSION).tar.bz2
 ifdef HAVE_WIN32
 	(cd $@; patch -p0 < ../Patches/libebml-svn-win32.patch)
 endif
+ifdef HAVE_WIN64
+       patch -p0 < Patches/libebml-win64.patch
+endif
 
 .ebml: libebml
 ifdef HAVE_WIN32
