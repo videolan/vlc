@@ -91,12 +91,12 @@ static int convert_path (const char *restrict path, wchar_t *restrict wpath)
  */
 int utf8_open (const char *filename, int flags, ...)
 {
-    mode_t mode = 0;
+    unsigned int mode = 0;
     va_list ap;
 
     va_start (ap, flags);
     if (flags & O_CREAT)
-        mode = va_arg (ap, mode_t);
+        mode = va_arg (ap, unsigned int);
     va_end (ap);
 
 #ifdef UNDER_CE
