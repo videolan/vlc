@@ -35,6 +35,7 @@ namespace VLC {
 AudioOutput::AudioOutput(Backend *p_back, QObject * p_parent)
         : SinkNode(p_parent),
         f_volume(1.0),
+        i_device(0),
         p_backend(p_back)
 {
     p_media_object = 0;
