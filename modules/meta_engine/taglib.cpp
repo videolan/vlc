@@ -329,16 +329,11 @@ static int ReadMeta( vlc_object_t* p_this)
 
 
 #if defined(WIN32) || defined (UNDER_CE)
-    if(GetVersion() < 0x80000000)
-    {
-        wchar_t wpath[MAX_PATH + 1];
-        if( !MultiByteToWideChar( CP_UTF8, 0, p_demux->psz_path, -1, wpath, MAX_PATH) )
-            return VLC_EGENERIC;
-        wpath[MAX_PATH] = L'\0';
-        f = FileRef( wpath );
-    }
-    else
+    wchar_t wpath[MAX_PATH + 1];
+    if( !MultiByteToWideChar( CP_UTF8, 0, p_demux->psz_path, -1, wpath, MAX_PATH) )
         return VLC_EGENERIC;
+    wpath[MAX_PATH] = L'\0';
+    f = FileRef( wpath );
 #else
     const char* local_name = ToLocale( p_demux->psz_path );
     if( !local_name )
@@ -538,19 +533,11 @@ static int WriteMeta( vlc_object_t *p_this )
     }
 
 #if defined(WIN32) || defined (UNDER_CE)
-    if(GetVersion() < 0x80000000)
-    {
-        wchar_t wpath[MAX_PATH + 1];
-        if( !MultiByteToWideChar( CP_UTF8, 0, export_file , -1, wpath, MAX_PATH) )
-            return VLC_EGENERIC;
-        wpath[MAX_PATH] = L'\0';
-        f = FileRef( wpath );
-    }
-    else
-    {
-        free( export_file );
+    wchar_t wpath[MAX_PATH + 1];
+    if( !MultiByteToWideChar( CP_UTF8, 0, export_file , -1, wpath, MAX_PATH) )
         return VLC_EGENERIC;
-    }
+    wpath[MAX_PATH] = L'\0';
+    f = FileRef( wpath );
 #else
     const char* local_name = ToLocale( export_file );
     if( !local_name )
