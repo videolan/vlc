@@ -2464,6 +2464,7 @@ liboil: liboil-$(OIL_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -d liboil -p1 < Patches/liboil-noshared.patch
 	patch -d liboil -p1 < Patches/liboil-Xcompile.patch
+	patch -d liboil -p1 < Patches/liboil-win64.patch
 
 
 .liboil: liboil
