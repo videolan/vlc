@@ -25,6 +25,10 @@ AC_CANONICAL_HOST
 AM_INIT_AUTOMAKE(tar-ustar)
 AM_CONFIG_HEADER(config.h)
 
+# Disable with "./configure --disable-silent-rules" or "make V=1"
+m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+
+
 dnl Too many people are not aware of maintainer mode:
 dnl If you want to use it, you definitely know what you are doing, so
 dnl you can specify "--disable-maintainer-mode". But if you want the default
