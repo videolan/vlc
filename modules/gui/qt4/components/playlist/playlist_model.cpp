@@ -943,10 +943,10 @@ void PLModel::search( const QString& search_text )
 /*********** Popup *********/
 void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
 {
-    PL_LOCK;
     int i_id;
     if( index.isValid() ) i_id = itemId( index );
     else i_id = rootItem->i_id;
+    PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
     if( p_item )
     {
