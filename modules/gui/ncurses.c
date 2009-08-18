@@ -747,8 +747,15 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
                 if( p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file || i_key == ' ' )
                 {
                     char* psz_uri;
-                    if( asprintf( &psz_uri, "directory://%s/%s", p_sys->psz_current_dir, p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path ) == -1 )
+                    if( asprintf( &psz_uri, "%s://%s/%s",
+                        p_sys->pp_dir_entries[p_sys->i_box_bidx]->b_file ?
+                            "file" : "directory",
+                        p_sys->psz_current_dir,
+                        p_sys->pp_dir_entries[p_sys->i_box_bidx]->psz_path
+                        ) == -1 )
+                    {
                         psz_uri = NULL;
+                    }
 
                     playlist_item_t *p_parent = p_sys->p_node;
                     if( !p_parent )
