@@ -1004,6 +1004,8 @@ void PLModel::viewchanged( int meta )
         index = __MIN( index, columnCount() );
         QModelIndex parent = createIndex( 0, 0, rootItem );
 
+        emit layoutAboutToBeChanged();
+
         if( i_showflags & meta )
             /* Removing columns */
         {
@@ -1020,8 +1022,10 @@ void PLModel::viewchanged( int meta )
             getSettings()->setValue( "qt-pl-showflags", i_showflags );
             emit endInsertColumns();
         }
+
         emit columnsChanged( meta );
-        rebuild();
+        emit layoutChanged();
+
     }
 }
 
