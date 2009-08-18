@@ -206,7 +206,7 @@ void StandardPLPanel::toggleRandom()
 
 void StandardPLPanel::gotoPlayingItem()
 {
-    view->scrollTo( view->currentIndex() );
+    view->scrollTo( model->currentIndex() );
 }
 
 void StandardPLPanel::handleExpansion( const QModelIndex& index )

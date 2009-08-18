@@ -97,6 +97,7 @@ public:
                          int role = Qt::DisplayRole ) const;
     QModelIndex index( int r, int c, const QModelIndex &parent ) const;
     QModelIndex index( PLItem *, int c ) const;
+    QModelIndex currentIndex( ) { return index( currentItem, 0 ); };
     int itemId( const QModelIndex &index ) const;
     bool isCurrent( const QModelIndex &index ) const;
     QModelIndex parent( const QModelIndex &index ) const;
