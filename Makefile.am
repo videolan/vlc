@@ -2,6 +2,11 @@
 # Automake targets and declarations
 ###############################################################################
 
+# Pass --quiet to make when we are not verbose.
+AM_MAKEFLAGS = $(makesilentflags_$(V))
+makesilentflags_ = $(makesilentflags_$(AM_DEFAULT_VERBOSITY))
+makesilentflags_0 = --quiet
+
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
