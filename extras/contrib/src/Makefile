@@ -2463,6 +2463,8 @@ liboil-$(OIL_VERSION).tar.gz:
 liboil: liboil-$(OIL_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -d liboil -p1 < Patches/liboil-noshared.patch
+	patch -d liboil -p1 < Patches/liboil-Xcompile.patch
+
 
 .liboil: liboil
 ifdef HAVE_DARWIN_OS
