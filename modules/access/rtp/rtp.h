@@ -62,6 +62,7 @@ void *rtp_stream_thread (void *data);
 struct demux_sys_t
 {
     rtp_session_t *session;
+    stream_t *chained_demux;
 #ifdef HAVE_SRTP
     struct srtp_session_t *srtp;
 #endif

@@ -254,6 +254,7 @@ static int Open (vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
+    p_sys->chained_demux = NULL;
 #ifdef HAVE_SRTP
     p_sys->srtp         = NULL;
 #endif
@@ -443,14 +444,23 @@ void codec_decode (demux_t *demux, void *data, block_t *block)
 
 static void *stream_init (demux_t *demux, const char *name)
 {
-    return stream_DemuxNew (demux, name, demux->out);
+    demux_sys_t *p_sys = demux->p_sys;
+
+    if (p_sys->chained_demux != NULL)
+        return NULL;
+    p_sys->chained_demux = stream_DemuxNew (demux, name, demux->out);
+    return p_sys->chained_demux;
 }
 
 static void stream_destroy (demux_t *demux, void *data)
 {
+    demux_sys_t *p_sys = demux->p_sys;
+
     if (data)
+    {
         stream_Delete ((stream_t *)data);
-    (void)demux;
+        p_sys->chained_demux = NULL;
+    }
 }
 
 /* Send a packet to a chained demuxer */
