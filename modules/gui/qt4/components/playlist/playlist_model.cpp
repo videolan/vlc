@@ -168,8 +168,8 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
 
         PL_UNLOCK;
 
-        flags |= Qt::ItemIsDragEnabled;
     }
+    flags |= Qt::ItemIsDragEnabled;
 
     return flags;
 }
