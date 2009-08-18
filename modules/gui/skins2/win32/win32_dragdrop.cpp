@@ -146,43 +146,22 @@ STDMETHODIMP Win32DragDrop::Drop( LPDATAOBJECT pDataObj, DWORD grfKeyState,
 
 void Win32DragDrop::HandleDrop( HDROP HDrop )
 {
-    if( GetVersion() < 0x80000000 )
+    // Get the number of dropped files
+    int nbFiles = DragQueryFileW( HDrop, 0xFFFFFFFF, NULL, 0 );
+
+    // For each dropped file
+    for( int i = 0; i < nbFiles; i++ )
     {
-        // Use Unicode for Windows NT and above
+        // Get the name of the file
+        int nameLength = DragQueryFileW( HDrop, i, NULL, 0 ) + 1;
+        wchar_t *psz_fileName = new WCHAR[nameLength];
+        DragQueryFileW( HDrop, i, psz_fileName, nameLength );
 
-        // Get the number of dropped files
-        int nbFiles = DragQueryFileW( HDrop, 0xFFFFFFFF, NULL, 0 );
+        // Add the file
+        CmdAddItem cmd(getIntf(),sFromWide(psz_fileName),m_playOnDrop);
+        cmd.execute();
 
-        // For each dropped file
-        for( int i = 0; i < nbFiles; i++ )
-        {
-            // Get the name of the file
-            int nameLength = DragQueryFileW( HDrop, i, NULL, 0 ) + 1;
-            wchar_t *psz_fileName = new WCHAR[nameLength];
-            DragQueryFileW( HDrop, i, psz_fileName, nameLength );
-
-            // Add the file
-            CmdAddItem cmd(getIntf(),sFromWide(psz_fileName),m_playOnDrop);
-            cmd.execute();
-
-            delete[] psz_fileName;
-        }
-    }
-    else
-    {
-        int nbFiles = DragQueryFile( HDrop, 0xFFFFFFFF, NULL, 0 );
-
-        for( int i = 0; i < nbFiles; i++ )
-        {
-            int nameLength = DragQueryFile( HDrop, i, NULL, 0 ) + 1;
-            char *psz_fileName = new char[nameLength];
-            DragQueryFile( HDrop, i, psz_fileName, nameLength );
-
-            CmdAddItem cmd(getIntf(),sFromLocale(psz_fileName),m_playOnDrop);
-            cmd.execute();
-
-            delete[] psz_fileName;
-        }
+        delete[] psz_fileName;
     }
 
     DragFinish( HDrop );
