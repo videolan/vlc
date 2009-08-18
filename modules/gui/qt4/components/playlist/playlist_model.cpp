@@ -985,11 +985,12 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
             menu->addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
             if( node )
             {
-                QMenu *sort_menu = new QMenu( qtr(I_POP_SORT) );
-                sort_menu->addAction( qtr( "Ascending" ), this, SLOT( popupSortAsc() ) );
-                sort_menu->addAction( qtr( "Descending" ), this, SLOT( popupSortDesc() ) );
                 menu->addSeparator();
-                menu->addMenu( sort_menu );
+                QMenu *sort_menu = menu->addMenu( qtr(I_POP_SORT) );
+                sort_menu->addAction( qtr( "Ascending" ),
+                    this, SLOT( popupSortAsc() ) );
+                sort_menu->addAction( qtr( "Descending" ),
+                    this, SLOT( popupSortDesc() ) );
             }
         }
         if( node && tree )
