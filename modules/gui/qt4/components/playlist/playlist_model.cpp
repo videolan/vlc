@@ -111,18 +111,6 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
             this, ProcessInputItemUpdate( input_item_t *) );
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
             this, ProcessInputItemUpdate( input_thread_t* ) );
-    PL_LOCK;
-    playlist_item_t *p_item;
-    /* Check if there's allready some item playing when playlist
-     * model is created, if so, tell model that it's currentone
-     */
-    if( (p_item = playlist_CurrentPlayingItem(p_playlist)) )
-    {
-        currentItem = FindByInput( rootItem,
-                                           p_item->p_input->i_id );
-        emit currentChanged( index( currentItem, 0 ) );
-    }
-    PL_UNLOCK;
 }
 
 PLModel::~PLModel()
@@ -773,21 +761,13 @@ void PLModel::rebuild( playlist_item_t *p_root )
     /* Recreate from root */
     UpdateNodeChildren( rootItem );
     if( (p_item = playlist_CurrentPlayingItem(p_playlist)) )
-    {
-        currentItem = FindByInput( rootItem,
-                                           p_item->p_input->i_id );
-        if( currentItem )
-        {
-            UpdateTreeItem( currentItem, true, false );
-        }
-    }
+        currentItem = FindByInput( rootItem, p_item->p_input->i_id );
     else
-    {
         currentItem = NULL;
-    }
     PL_UNLOCK;
 
     /* And signal the view */
+    emit currentChanged( index( currentItem, 0 ) );
     emit layoutChanged();
     addCallbacks();
 }
