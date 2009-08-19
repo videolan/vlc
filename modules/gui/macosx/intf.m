@@ -49,7 +49,6 @@
 #import "bookmarks.h"
 #import "coredialogs.h"
 #import "embeddedwindow.h"
-#import "update.h"
 #import "AppleRemote.h"
 #import "eyetv.h"
 #import "simple_prefs.h"
@@ -328,9 +327,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     o_embedded_list = [[VLCEmbeddedList alloc] init];
     o_coredialogs = [[VLCCoreDialogProvider alloc] init];
     o_info = [[VLCInfo alloc] init];
-#ifdef UPDATE_CHECK
-    o_update = [[VLCUpdate alloc] init];
-#endif
 
     i_lastShownVolume = -1;
 
@@ -580,15 +576,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     [self _removeOldPreferences];
 
-#ifdef UPDATE_CHECK
-    /* Check for update silently on startup */
-    if( !nib_update_loaded )
-        nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner: NSApp];
-
-    if([o_update shouldCheckForUpdate])
-        [NSThread detachNewThreadSelector:@selector(checkForUpdate) toTarget:o_update withObject:nil];
-#endif
-
     /* Handle sleep notification */
     [[[NSWorkspace sharedWorkspace] notificationCenter] addObserver:self selector:@selector(computerWillSleep:)
            name:NSWorkspaceWillSleepNotification object:nil];
@@ -828,10 +815,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* remove global observer watching for vout device changes correctly */
     [[NSNotificationCenter defaultCenter] removeObserver: self];
-
-#ifdef UPDATE_CHECK
-    [o_update end];
-#endif
 
     /* release some other objects here, because it isn't sure whether dealloc
      * will be called later on */
@@ -2245,21 +2228,6 @@ end:
     }
 
     [o_sprefs showSimplePrefs];
-}
-
-#pragma mark -
-#pragma mark Update
-
-- (IBAction)checkForUpdate:(id)sender
-{
-#ifdef UPDATE_CHECK
-    if( !nib_update_loaded )
-        nib_update_loaded = [NSBundle loadNibNamed:@"Update" owner: NSApp];
-    [o_update showUpdateWindow];
-#else
-    msg_Err( VLCIntf, "Update checker wasn't enabled in this build" );
-    dialog_FatalWait( VLCIntf, _("Update check failed"), _("Checking for updates was not enabled in this build.") );
-#endif
 }
 
 #pragma mark -

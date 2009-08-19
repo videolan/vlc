@@ -103,10 +103,7 @@ struct intf_sys_t
     id o_vlm;                   /* VLCVLMController */
     id o_embedded_list;         /* VLCEmbeddedList*/
     id o_coredialogs;           /* VLCCoreDialogProvider */
-    VLCInformation * o_info;                  /* VLCInformation */
-#ifdef UPDATE_CHECK
-    id o_update;                /* VLCUpdate      */
-#endif
+    VLCInformation * o_info;    /* VLCInformation */
     id o_eyetv;                 /* VLCEyeTVController */
     BOOL nib_main_loaded;       /* main nibfile */
     BOOL nib_open_loaded;       /* open nibfile */
@@ -115,7 +112,6 @@ struct intf_sys_t
     BOOL nib_extended_loaded;   /* extended nibfile */
     BOOL nib_bookmarks_loaded;  /* bookmarks nibfile */
     BOOL nib_prefs_loaded;      /* preferences nibfile */
-    BOOL nib_update_loaded;     /* update nibfile */
     BOOL nib_info_loaded;       /* information panel nibfile */
     BOOL nib_vlm_loaded;        /* VLM Panel nibfile */
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
@@ -398,7 +394,6 @@ struct intf_sys_t
 - (IBAction)viewAbout:(id)sender;
 - (IBAction)showLicense:(id)sender;
 - (IBAction)viewPreferences:(id)sender;
-- (IBAction)checkForUpdate:(id)sender;
 - (IBAction)viewHelp:(id)sender;
 - (IBAction)openReadMe:(id)sender;
 - (IBAction)openDocumentation:(id)sender;

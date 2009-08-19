@@ -29,7 +29,7 @@
 #import "misc.h"
 #import "intf.h"
 #import "AppleRemote.h"
-#import <Sparkle/Sparkle.h>                                 //for o_intf_last_update_lbl
+#import <Sparkle/Sparkle.h>                        //for o_intf_last_update_lbl
 
 static NSString* VLCSPrefsToolbarIdentifier = @"Our Simple Preferences Toolbar Identifier";
 static NSString* VLCIntfSettingToolbarIdentifier = @"Intf Settings Item Identifier";

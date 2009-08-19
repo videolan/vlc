@@ -8,11 +8,11 @@
 		<string key="IBDocument.HIToolboxVersion">353.00</string>
 		<object class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<bool key="EncodedWithXMLCoder">YES</bool>
-			<integer value="235"/>
-			<integer value="3568"/>
 			<integer value="2199"/>
-			<integer value="4375"/>
+			<integer value="57"/>
 			<integer value="283"/>
+			<integer value="3568"/>
+			<integer value="4419"/>
 		</object>
 		<object class="NSArray" key="IBDocument.PluginDependencies">
 			<bool key="EncodedWithXMLCoder">YES</bool>
@@ -14157,8 +14157,8 @@ LCAuLi4</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
-					<string>{{343, 246}, {599, 368}}</string>
-					<string>{{343, 246}, {599, 368}}</string>
+					<string>{{351, 374}, {599, 368}}</string>
+					<string>{{351, 374}, {599, 368}}</string>
 					<reference ref="5"/>
 					<reference ref="5"/>
 					<string>{599, 368}</string>
@@ -14552,7 +14552,7 @@ LCAuLi4</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
-					<string>{{355, 449}, {270, 233}}</string>
+					<string>{{355, 453}, {270, 233}}</string>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 					<reference ref="5"/>
 					<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
@@ -15159,7 +15159,6 @@ LCAuLi4</string>
 						<bool key="EncodedWithXMLCoder">YES</bool>
 						<object class="NSMutableArray" key="dict.sortedKeys">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>checkForUpdate:</string>
 							<string>clearRecentItems:</string>
 							<string>crashReporterAction:</string>
 							<string>intfOpenCapture:</string>
@@ -15192,7 +15191,6 @@ LCAuLi4</string>
 						</object>
 						<object class="NSMutableArray" key="dict.values">
 							<bool key="EncodedWithXMLCoder">YES</bool>
-							<string>id</string>
 							<string>id</string>
 							<string>id</string>
 							<string>id</string>
@@ -15384,7 +15382,6 @@ LCAuLi4</string>
 							<string>o_sprefs</string>
 							<string>o_timefield</string>
 							<string>o_timeslider</string>
-							<string>o_update</string>
 							<string>o_vlm</string>
 							<string>o_vmi_fullscreen</string>
 							<string>o_vmi_mute</string>
@@ -15559,7 +15556,6 @@ LCAuLi4</string>
 							<string>id</string>
 							<string>NSTextField</string>
 							<string>NSSlider</string>
-							<string>id</string>
 							<string>id</string>
 							<string>NSMenuItem</string>
 							<string>NSMenuItem</string>
