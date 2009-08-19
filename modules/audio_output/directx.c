@@ -1,7 +1,7 @@
 /*****************************************************************************
  * directx.c: Windows DirectX audio output method
  *****************************************************************************
- * Copyright (C) 2001 the VideoLAN team
+ * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -210,7 +210,7 @@ static void Play       ( aout_instance_t * );
 static void Probe             ( aout_instance_t * );
 static int  InitDirectSound   ( aout_instance_t * );
 static int  CreateDSBuffer    ( aout_instance_t *, int, int, int, int, int, bool );
-static int  CreateDSBufferPCM ( aout_instance_t *, int*, int, int, int, bool );
+static int  CreateDSBufferPCM ( aout_instance_t *, vlc_fourcc_t*, int, int, int, bool );
 static void DestroyDSBuffer   ( aout_instance_t * );
 static void* DirectSoundThread( vlc_object_t * );
 static int  FillBuffer        ( aout_instance_t *, int, aout_buffer_t * );
@@ -448,7 +448,7 @@ static int OpenAudio( vlc_object_t *p_this )
 static void Probe( aout_instance_t * p_aout )
 {
     vlc_value_t val, text;
-    int i_format;
+    vlc_fourcc_t i_format;
     unsigned int i_physical_channels;
     DWORD ui_speaker_config;
     bool is_default_output_set = false;
@@ -984,7 +984,7 @@ static int CreateDSBuffer( aout_instance_t *p_aout, int i_format,
  * We first try to create a WAVE_FORMAT_IEEE_FLOAT buffer if supported by
  * the hardware, otherwise we create a WAVE_FORMAT_PCM buffer.
  ****************************************************************************/
-static int CreateDSBufferPCM( aout_instance_t *p_aout, int *i_format,
+static int CreateDSBufferPCM( aout_instance_t *p_aout, vlc_fourcc_t *i_format,
                               int i_channels, int i_nb_channels, int i_rate,
                               bool b_probe )
 {
