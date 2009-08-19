@@ -290,19 +290,18 @@ LRESULT CALLBACK WMHOTKEYPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
     {
         case WM_HOTKEY:
             {
-                int i;
                 char psz_atomName[40];
 
                 intf_thread_t *p_intf =
                     (intf_thread_t*)GetWindowLongPtr( hwnd, GWLP_USERDATA );
                 struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
 
-                i = GlobalGetAtomNameA(
-                        wParam, psz_atomName, sizeof( psz_atomName ) );
-                if( !i ) return 0;
+                if( !GlobalGetAtomNameA(
+                        wParam, psz_atomName, sizeof( psz_atomName ) ) )
+                    return 0;
 
                 /* search for key associated with VLC */
-                for( i = 0; p_hotkeys[i].psz_action != NULL; i++ )
+                for( int i = 0; p_hotkeys[i].psz_action != NULL; i++ )
                 {
                     if( strcmp( p_hotkeys[i].psz_action, psz_atomName ) )
                         continue;
