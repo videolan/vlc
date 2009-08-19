@@ -162,9 +162,9 @@ static void *Thread( void *p_data )
     vlc_cond_signal( &p_sys->wait );
     vlc_mutex_unlock( &p_sys->lock );
 
-    SetWindowLongPtr( p_sys->hotkeyWindow, GWL_WNDPROC,
+    SetWindowLongPtr( p_sys->hotkeyWindow, GWLP_WNDPROC,
             (LONG_PTR)WMHOTKEYPROC );
-    SetWindowLongPtr( p_sys->hotkeyWindow, GWL_USERDATA,
+    SetWindowLongPtr( p_sys->hotkeyWindow, GWLP_USERDATA,
             (LONG_PTR)p_intf );
 
     /* Registering of Hotkeys */
@@ -294,7 +294,7 @@ LRESULT CALLBACK WMHOTKEYPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                 char psz_atomName[40];
 
                 intf_thread_t *p_intf =
-                    (intf_thread_t*)GetWindowLongPtr( hwnd, GWL_USERDATA );
+                    (intf_thread_t*)GetWindowLongPtr( hwnd, GWLP_USERDATA );
                 struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
 
                 i = GlobalGetAtomNameA(
