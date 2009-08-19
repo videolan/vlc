@@ -120,7 +120,7 @@ typedef struct
 
     int             i_rate;
     int             i_scale;
-    int             i_samplesize;
+    unsigned int    i_samplesize;
 
     es_out_id_t     *p_es;
 
