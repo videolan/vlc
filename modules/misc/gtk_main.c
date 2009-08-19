@@ -169,7 +169,7 @@ static void* GtkMain( vlc_object_t *p_this )
 #endif
 
 #if defined(MODULE_NAME_IS_gnome_main)
-    gnome_init( p_this->p_libvlc->psz_object_name, VERSION, i_args, p_args );
+    gnome_init( PACKAGE, VERSION, i_args, p_args );
 #elif defined(MODULE_NAME_IS_gnome2_main)
     gnome_program_init( PACKAGE, VERSION, LIBGNOMEUI_MODULE,
                         i_args, p_args,
