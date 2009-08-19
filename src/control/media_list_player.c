@@ -76,6 +76,7 @@ static inline void vlc_assert_locked(vlc_mutex_t *mutex)
  */
 
 static void next(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e);
+static void stop(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e);
 
 /*
  * Private functions
@@ -210,15 +211,19 @@ mlist_item_deleted(const libvlc_event_t * p_event, void * p_user_data)
 {
     libvlc_media_list_player_t * p_mlp = p_user_data;
     libvlc_media_list_t * p_emitting_mlist = p_event->p_obj;
-    libvlc_media_t * p_current_md;
-    p_current_md = libvlc_media_list_item_at_path(p_mlp->p_mlist, p_mlp->current_playing_item_path);
+    libvlc_media_t * p_current_md = NULL;
+
+    lock(p_mlp);
+    if (p_mlp->current_playing_item_path)
+        p_current_md = libvlc_media_list_item_at_path(p_mlp->p_mlist, p_mlp->current_playing_item_path);
 
     if (p_event->u.media_list_item_deleted.item == p_current_md &&
         p_emitting_mlist == p_mlp->p_mlist)
     {
         /* We are playing this item, let's stop */
-        libvlc_media_list_player_stop(p_mlp, NULL);
+        stop(p_mlp, NULL);
     }
+    unlock(p_mlp);
 }
 
 
@@ -295,6 +300,9 @@ set_current_playing_item(libvlc_media_list_player_t * p_mlp, libvlc_media_list_p
         free(p_mlp->current_playing_item_path);
         p_mlp->current_playing_item_path = path;
     }
+
+    if (!path)
+        return;
 
     libvlc_media_t * p_md;
     p_md = libvlc_media_list_item_at_path(p_mlp->p_mlist, path);
@@ -508,11 +516,13 @@ void libvlc_media_list_player_play_item(libvlc_media_list_player_t * p_mlp, libv
 }
 
 /**************************************************************************
- *       Stop (Public)
+ *       Stop (Private)
+ *
+ * Lock must be held.
  **************************************************************************/
-void libvlc_media_list_player_stop(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
+static void stop(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
 {
-    lock(p_mlp);
+    assert_locked(p_mlp);
 
     if (p_mlp->p_mi && p_mlp->current_playing_item_path)
     {
@@ -524,11 +534,22 @@ void libvlc_media_list_player_stop(libvlc_media_list_player_t * p_mlp, libvlc_ex
 
     free(p_mlp->current_playing_item_path);
     p_mlp->current_playing_item_path = NULL;
+}
+
+/**************************************************************************
+ *       Stop (Public)
+ **************************************************************************/
+void libvlc_media_list_player_stop(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
+{
+    lock(p_mlp);
+    stop(p_mlp, p_e);
     unlock(p_mlp);
 }
 
 /**************************************************************************
  *       Next (Private)
+ *
+ * Lock must be held.
  **************************************************************************/
 static void next(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
 {
@@ -554,7 +575,7 @@ static void next(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
     if (!path)
     {
         libvlc_media_list_unlock(p_mlp->p_mlist);
-        libvlc_media_list_player_stop(p_mlp, p_e);
+        stop(p_mlp, p_e);
         return;
     }
 
