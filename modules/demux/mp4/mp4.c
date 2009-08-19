@@ -666,7 +666,7 @@ static int Demux( demux_t *p_demux )
                         uint32_t p_key[4];
                         drms_get_p_key( tk->p_drms, p_key );
 
-                        for( int i_pos = tk->p_skcr->data.p_skcr->i_init; i_pos < p_block->i_buffer; )
+                        for( size_t i_pos = tk->p_skcr->data.p_skcr->i_init; i_pos < p_block->i_buffer; )
                         {
                             int n = __MIN( tk->p_skcr->data.p_skcr->i_encr, p_block->i_buffer - i_pos );
                             drms_decrypt( tk->p_drms, (uint32_t*)&p_block->p_buffer[i_pos], n, p_key );
