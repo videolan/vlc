@@ -663,7 +663,7 @@ endif
 
 .lua: lua
 ifdef HAVE_WIN32
-	( cd $< && sed -i.orig 's/lua luac/lua.exe/' Makefile && cd src && sed -i.orig 's/CC=/#CC=/' Makefile && sed -i 's/strip/\$(STRIP)/' Makefile && cd ../..)
+	( cd $< && sed -i.orig 's/lua luac/lua.exe/' Makefile && cd src && sed -i.orig 's/CC=/#CC=/' Makefile && sed -i 's/strip/$(STRIP)/' Makefile && cd ../..)
 	(cd $<&& $(HOSTCC) make $(LUA_MAKEPLATEFORM)&& cd src&& $(HOSTCC) make liblua.a&& cd ..&&$(HOSTCC) make install INSTALL_TOP=$(PREFIX)&& $(RANLIB) $(PREFIX)/lib/liblua.a)
 	(cd $<&& sed -i.orig 's@prefix= /usr/local@prefix= $(PREFIX)@' etc/lua.pc&& mkdir -p $(PREFIX)/lib/pkgconfig&& cp etc/lua.pc $(PREFIX)/lib/pkgconfig)
 else
