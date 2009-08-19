@@ -36,7 +36,9 @@
 #include <windows.h>
 
 #if !defined(UNDER_CE)
-#   define  _WIN32_IE 0x500
+# ifndef _WIN32_IE
+#   define  _WIN32_IE 0x501
+# endif
 #   include <shlobj.h>
 #   include <tlhelp32.h>
 #   include <wininet.h>
