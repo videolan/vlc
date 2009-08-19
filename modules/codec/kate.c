@@ -344,7 +344,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
-    int            i_ret;
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_KATE )
     {
@@ -403,7 +402,7 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if( p_sys->b_use_tiger )
     {
-        i_ret = tiger_renderer_create( &p_sys->p_tr );
+        int i_ret = tiger_renderer_create( &p_sys->p_tr );
         if( i_ret < 0 )
         {
             msg_Warn ( p_dec, "Failed to create Tiger renderer, falling back to basic rendering" );
