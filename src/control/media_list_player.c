@@ -278,7 +278,7 @@ uninstall_media_player_observer(libvlc_media_list_player_t * p_mlp)
 
     // Now, lock back the callback lock. No more callback will be present from this point.
     vlc_mutex_lock(&p_mlp->mp_callback_lock);
-    p_mlp->are_mp_callback_cancelled = true;
+    p_mlp->are_mp_callback_cancelled = false;
 
     // What is here is safe, because we garantee that we won't be able to anything concurently,
     // - except (cancelled) callbacks - thanks to the object_lock.
@@ -315,6 +315,9 @@ set_current_playing_item(libvlc_media_list_player_t * p_mlp, libvlc_media_list_p
     /* Create a new media_player if there is none */
     if (!p_mlp->p_mi)
         p_mlp->p_mi = libvlc_media_player_new_from_media(p_md, NULL);
+
+    libvlc_media_player_set_media(p_mlp->p_mi, p_md, NULL);
+
     install_media_player_observer(p_mlp);
     libvlc_media_release(p_md); /* for libvlc_media_list_item_at_index */
 }
@@ -387,6 +390,15 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
     free(p_mlp->current_playing_item_path);
     libvlc_release(p_mlp->p_libvlc_instance);
     free(p_mlp);
+}
+
+/**************************************************************************
+ *        event_manager (Public)
+ **************************************************************************/
+libvlc_event_manager_t *
+libvlc_media_list_player_event_manager(libvlc_media_list_player_t * p_mlp)
+{
+    return p_mlp->p_event_manager;
 }
 
 /**************************************************************************
@@ -586,7 +598,10 @@ static void next(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
     /* Send the next item event */
     libvlc_event_t event;
     event.type = libvlc_MediaListPlayerNextItemSet;
+    libvlc_media_t * p_md = libvlc_media_list_item_at_path(p_mlp->p_mlist, path);
+    event.u.media_list_player_next_item_set.item = p_md;
     libvlc_event_send(p_mlp->p_event_manager, &event);
+    libvlc_media_release(p_md);
 }
 
 /**************************************************************************

@@ -27,7 +27,7 @@
 #include <vlc_common.h>
 #include <vlc_mtime.h>
 
-static void media_list_add_file_path(libvlc_instance_t *vlc, libvlc_media_list_t *ml, const char * file_path)
+static void* media_list_add_file_path(libvlc_instance_t *vlc, libvlc_media_list_t *ml, const char * file_path)
 {
     libvlc_media_t *md = libvlc_media_new (vlc, file_path, &ex);
     catch ();
@@ -36,6 +36,81 @@ static void media_list_add_file_path(libvlc_instance_t *vlc, libvlc_media_list_t
     catch ();
 
     libvlc_media_release (md);
+    return md;
+}
+
+static bool done_playing = false;
+static const unsigned items_count = 4;
+static void * items[4];
+static unsigned current_index = 0;
+
+static void next_item_callback(const libvlc_event_t * p_event, void * user_data)
+{
+    (void)user_data;
+    libvlc_media_t *md = p_event->u.media_list_player_next_item_set.item;
+    current_index++;
+    assert(current_index < items_count);    
+    assert(items[current_index] == md);
+    log ("Item %d was correctly queued\n", current_index);
+    if (current_index == (items_count - 1))
+        done_playing = true;
+}
+
+static void test_media_list_player_items_queue(const char** argv, int argc)
+{
+    libvlc_instance_t *vlc;
+    libvlc_media_t *md;
+    libvlc_media_list_t *ml;
+    libvlc_media_list_player_t *mlp;
+    
+    const char * file = test_default_sample;
+    
+    log ("Testing media player item queue-ing\n");
+    
+    libvlc_exception_init (&ex);
+    vlc = libvlc_new (argc, argv, &ex);
+    catch ();
+    
+    md = libvlc_media_new (vlc, file, &ex);
+    catch ();
+    
+    ml = libvlc_media_list_new (vlc, &ex);
+    catch ();
+    
+    mlp = libvlc_media_list_player_new (vlc, &ex);
+    catch ();
+    
+    libvlc_media_list_add_media (ml, md, &ex);
+    catch ();
+    
+    items[0] = md;
+
+    // Add three more media
+    items[1] = media_list_add_file_path (vlc, ml, file);
+    items[2] = media_list_add_file_path (vlc, ml, file);
+    items[3] = media_list_add_file_path (vlc, ml, file);
+    
+    libvlc_media_list_player_set_media_list (mlp, ml, &ex);
+
+    libvlc_event_manager_t * em = libvlc_media_list_player_event_manager(mlp);
+    libvlc_event_attach(em, libvlc_MediaListPlayerNextItemSet, next_item_callback, NULL, &ex);
+    catch ();
+
+    libvlc_media_list_player_play_item (mlp, md, &ex);
+    catch ();
+
+    // Wait dummily for next_item_callback() to flag 'done_playing':
+    while (!done_playing)
+        msleep(100000);
+
+    libvlc_media_list_player_stop (mlp, &ex);
+    catch ();
+
+    libvlc_media_list_player_release (mlp);
+    catch ();
+    
+    libvlc_release (vlc);
+    catch ();
 }
 
 static void test_media_list_player_next(const char** argv, int argc)
@@ -206,6 +281,6 @@ int main (void)
     test_media_list_player_pause_stop (test_defaults_args, test_defaults_nargs);
     test_media_list_player_play_item_at_index (test_defaults_args, test_defaults_nargs);
     test_media_list_player_next (test_defaults_args, test_defaults_nargs);
-
+    test_media_list_player_items_queue (test_defaults_args, test_defaults_nargs);
     return 0;
 }

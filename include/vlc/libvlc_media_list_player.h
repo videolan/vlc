@@ -65,6 +65,14 @@ VLC_PUBLIC_API void
     libvlc_media_list_player_release( libvlc_media_list_player_t * p_mlp );
 
 /**
+ * Return the event manager of this media_list_player.
+ *
+ * \param p_mlp media list player instance
+ */
+VLC_PUBLIC_API libvlc_event_manager_t *
+    libvlc_media_list_player_event_manager(libvlc_media_list_player_t * p_mlp);
+
+/**
  * Replace media player in media_list_player with this instance.
  *
  * \param p_mlp media list player instance

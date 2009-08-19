@@ -213,6 +213,12 @@ struct libvlc_event_t
             int index;
         } media_list_view_will_delete_item;
 
+        /* media list player */
+        struct
+        {
+            libvlc_media_t * item;
+        } media_list_player_next_item_set;
+        
         /* snapshot taken */
         struct
         {
