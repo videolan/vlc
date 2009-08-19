@@ -47,7 +47,7 @@
 #define ICON_HEIGHT 64
 
 #ifdef WIN32
-# include "vistaassoc.h"
+# include <vlc_windows_interfaces.h>
 #endif
 
 /*********************************************************************

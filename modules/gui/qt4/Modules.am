@@ -280,7 +280,6 @@ noinst_HEADERS = \
 	components/sout/profile_selector.hpp \
 	components/sout/sout_widgets.hpp \
 	components/sout/profiles.hpp \
-	components/vistaassoc.h \
 	util/input_slider.hpp \
 	util/customwidgets.hpp \
 	util/qvlcframe.hpp \
