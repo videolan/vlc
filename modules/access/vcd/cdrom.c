@@ -1103,6 +1103,8 @@ static int CdTextRead( vlc_object_t *p_object, const vcddev_t *p_vcddev,
 static int CdTextRead( vlc_object_t *p_object, const vcddev_t *p_vcddev,
                        uint8_t **pp_buffer, int *pi_buffer )
 {
+    VLC_UNUSED( p_object );
+
     CDROM_READ_TOC_EX TOCEx;
     memset(&TOCEx, 0, sizeof(TOCEx));
     TOCEx.Format = CDROM_READ_TOC_EX_FORMAT_CDTEXT;
