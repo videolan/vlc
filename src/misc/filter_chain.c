@@ -201,37 +201,6 @@ int filter_chain_DeleteFilter( filter_chain_t *p_chain, filter_t *p_filter )
     return UpdateBufferFunctions( p_chain );
 }
 
-/**
- * Reading from the filter chain
- */
-filter_t *filter_chain_GetFilter( filter_chain_t *p_chain, int i_position,
-                                  const char *psz_name )
-{
-    if( psz_name )
-    {
-        if( i_position < 0 )
-            return NULL;
-
-        for( int i = 0; i < vlc_array_count( &p_chain->filters ); i++ )
-        {
-            filter_t *p_filter = vlc_array_item_at_index( &p_chain->filters, i );
-            if( !strcmp( p_filter->psz_object_name, psz_name ) )
-            {
-                if( i_position <= 0 )
-                    return p_filter;
-                i_position--;
-            }
-       }
-        return NULL;
-    }
-    else
-    {
-        if( i_position < 0 || i_position >= vlc_array_count( &p_chain->filters ) )
-            return NULL;
-        return vlc_array_item_at_index( &p_chain->filters, i_position );
-    }
-}
-
 int filter_chain_GetLength( filter_chain_t *p_chain )
 {
     return vlc_array_count( &p_chain->filters );

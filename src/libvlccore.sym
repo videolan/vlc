@@ -124,7 +124,6 @@ filter_chain_AppendFromString
 filter_chain_AudioFilter
 filter_chain_Delete
 filter_chain_DeleteFilter
-filter_chain_GetFilter
 filter_chain_GetFmtOut
 filter_chain_GetLength
 filter_chain_MouseFilter

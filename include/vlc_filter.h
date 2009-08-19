@@ -300,16 +300,6 @@ VLC_EXPORT( int, filter_chain_AppendFromString, ( filter_chain_t *, const char *
 VLC_EXPORT( int, filter_chain_DeleteFilter, ( filter_chain_t *, filter_t * ) );
 
 /**
- * Get filter by name of position in the filter chain.
- *
- * \param p_chain pointer to filter chain
- * \param i_position position of filter in filter chain
- * \param psz_name name of filter to get
- * \return filter object based on position or name provided
- */
-VLC_EXPORT( filter_t *, filter_chain_GetFilter, ( filter_chain_t *, int, const char * ) );
-
-/**
  * Get the number of filters in the filter chain.
  *
  * \param p_chain pointer to filter chain
