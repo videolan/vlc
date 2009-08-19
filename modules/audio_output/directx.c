@@ -748,6 +748,8 @@ static void CloseAudio( vlc_object_t *p_this )
 static int CALLBACK CallBackDirectSoundEnum( LPGUID p_guid, LPCSTR psz_desc,
                                              LPCSTR psz_mod, LPVOID _p_aout )
 {
+    VLC_UNUSED( psz_mod );
+
     aout_instance_t *p_aout = (aout_instance_t *)_p_aout;
 
     msg_Dbg( p_aout, "found device: %s", psz_desc );
@@ -1041,7 +1043,7 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
     notification_thread_t *p_notif = p_aout->output.p_sys->p_notif;
     aout_sys_t *p_sys = p_aout->output.p_sys;
     void *p_write_position, *p_wrap_around;
-    long l_bytes1, l_bytes2;
+    unsigned long l_bytes1, l_bytes2;
     HRESULT dsresult;
 
     /* Before copying anything, we have to lock the buffer */
