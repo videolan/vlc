@@ -1229,6 +1229,7 @@ if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGIN([podcast])
   VLC_ADD_PLUGIN([shout])
   VLC_ADD_PLUGIN([sap])
+  VLC_ADD_PLUGIN([mediadirs])
   VLC_ADD_PLUGIN([fake])
   VLC_ADD_PLUGIN([folder])
   VLC_ADD_PLUGIN([rss])
