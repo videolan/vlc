@@ -84,11 +84,13 @@ static inline bool have_exception (void)
         return false;
 }
 
-static inline void catch (void)
+#define catch() catch_with_info(__FILE__, __FUNCTION__, __LINE__)
+
+static inline void catch_with_info (const char * file, const char * func, unsigned line)
 {
     if (libvlc_exception_raised (&ex))
     {
-         fprintf (stderr, "Exception: %s\n", libvlc_errmsg ());
+         fprintf (stderr, "%s:%s():%d Exception: %s\n", file, func, line, libvlc_errmsg ());
          abort ();
     }
     libvlc_exception_clear (&ex);
