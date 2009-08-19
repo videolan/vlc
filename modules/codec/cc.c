@@ -618,7 +618,7 @@ static void Eia608ParseChannel( eia608_t *h, const uint8_t d[2] )
 
     /* */
     const int d1 = d[0] & 0x7f;
-    const int d2 = d[1] & 0x7f;
+    // const int d2 = d[1] & 0x7f;
     if( d1 == 0x14 )
         h->i_channel = 1;
     else if( d1 == 0x1c )
@@ -1143,5 +1143,6 @@ static char *Eia608Text( eia608_t *h, bool b_html )
 
 static void Eia608Exit( eia608_t *h )
 {
+    VLC_UNUSED( h );
 }
 

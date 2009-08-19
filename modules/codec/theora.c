@@ -82,7 +82,7 @@ static void *ProcessPacket ( decoder_t *, ogg_packet *, block_t ** );
 static picture_t *DecodePacket( decoder_t *, ogg_packet * );
 
 static void ParseTheoraComments( decoder_t * );
-static void theora_CopyPicture( decoder_t *, picture_t *, yuv_buffer * );
+static void theora_CopyPicture( picture_t *, yuv_buffer * );
 
 static int  OpenEncoder( vlc_object_t *p_this );
 static void CloseEncoder( vlc_object_t *p_this );
@@ -498,7 +498,7 @@ static picture_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
     p_pic = decoder_NewPicture( p_dec );
     if( !p_pic ) return NULL;
 
-    theora_CopyPicture( p_dec, p_pic, &yuv );
+    theora_CopyPicture( p_pic, &yuv );
 
     p_pic->date = p_sys->i_pts;
 
@@ -553,7 +553,7 @@ static void CloseDecoder( vlc_object_t *p_this )
  * theora_CopyPicture: copy a picture from theora internal buffers to a
  *                     picture_t structure.
  *****************************************************************************/
-static void theora_CopyPicture( decoder_t *p_dec, picture_t *p_pic,
+static void theora_CopyPicture( picture_t *p_pic,
                                 yuv_buffer *yuv )
 {
     int i_plane, i_line, i_dst_stride, i_src_stride;

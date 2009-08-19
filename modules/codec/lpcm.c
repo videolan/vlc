@@ -289,12 +289,11 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
     }
 
     int i_ret;
-    unsigned i_padding;
+    unsigned i_padding = 0;
     aob_group_t p_aob_group[2];
     switch( p_sys->i_type )
     {
     case LPCM_VOB:
-        i_padding = 0;
         i_ret = VobHeader( &i_rate, &i_channels, &i_original_channels, &i_bits,
                            p_block->p_buffer );
         break;
@@ -303,13 +302,12 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
                            p_aob_group,
                            p_block->p_buffer );
         break;
-    default:
-        assert(0);
     case LPCM_BD:
-        i_padding = 0;
         i_ret = BdHeader( &i_rate, &i_channels, &i_original_channels, &i_bits,
                           p_block->p_buffer );
         break;
+    default:
+        assert(0);
     }
 
     if( i_ret || p_block->i_buffer <= p_sys->i_header_size + i_padding )
@@ -792,7 +790,7 @@ static void AobExtract( aout_buffer_t *p_aout_buffer,
         for( int i = 0; i < 2; i++ )
         {
             const aob_group_t *g = &p_group[1-i];
-            const int i_group_size = 2 * g->i_channels * i_bits / 8;
+            const unsigned int i_group_size = 2 * g->i_channels * i_bits / 8;
 
             if( p_block->i_buffer < i_group_size )
             {
