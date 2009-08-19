@@ -158,6 +158,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
     char *psz_value = NULL;
     bool b_version_found = false;
     int i_node;
+    bool b_ret = false;
     xml_elem_hnd_t *p_handler = NULL;
 
     xml_elem_hnd_t pl_elements[] =
@@ -186,9 +187,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
         if( !psz_name || !psz_value )
         {
             msg_Err( p_demux, "invalid xml stream @ <playlist>" );
-            free( psz_name );
-            free( psz_value );
-            return false;
+            goto end;
         }
         /* attribute: version */
         if( !strcmp( psz_name, "version" ) )
@@ -208,13 +207,16 @@ static bool parse_playlist_node COMPLEX_INTERFACE
         else
             msg_Warn( p_demux, "invalid <playlist> attribute:\"%s\"", psz_name);
 
-        FREE_ATT();
+        free( psz_name );
+        free( psz_value );
     }
     /* attribute version is mandatory !!! */
     if( !b_version_found )
         msg_Warn( p_demux, "<playlist> requires \"version\" attribute" );
 
     /* parse the child elements - we only take care of <trackList> */
+    psz_name = NULL;
+    psz_value = NULL;
     while( xml_ReaderRead( p_xml_reader ) == 1 )
     {
         i_node = xml_ReaderNodeType( p_xml_reader );
@@ -228,8 +230,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
                 if( !psz_name || !*psz_name )
                 {
                     msg_Err( p_demux, "invalid xml stream" );
-                    FREE_ATT();
-                    return false;
+                    goto end;
                 }
                 /* choose handler */
                 for( p_handler = pl_elements;
@@ -238,24 +239,22 @@ static bool parse_playlist_node COMPLEX_INTERFACE
                 if( !p_handler->name )
                 {
                     msg_Err( p_demux, "unexpected element <%s>", psz_name );
-                    FREE_ATT();
-                    return false;
+                    goto end;
                 }
                 FREE_NAME();
                 /* complex content is parsed in a separate function */
                 if( p_handler->type == COMPLEX_CONTENT )
                 {
+                    FREE_VALUE();
                     if( p_handler->pf_handler.cmplx( p_demux,
                                                      p_input_item,
                                                      p_xml_reader,
                                                      p_handler->name ) )
                     {
                         p_handler = NULL;
-                        FREE_ATT();
                     }
                     else
                     {
-                        FREE_ATT();
                         return false;
                     }
                 }
@@ -263,13 +262,12 @@ static bool parse_playlist_node COMPLEX_INTERFACE
 
             case XML_READER_TEXT:
                 /* simple element content */
-                FREE_ATT();
+                free( psz_value );
                 psz_value = xml_ReaderValue( p_xml_reader );
                 if( !psz_value )
                 {
                     msg_Err( p_demux, "invalid xml stream" );
-                    FREE_ATT();
-                    return false;
+                    goto end;
                 }
                 break;
 
@@ -279,14 +277,13 @@ static bool parse_playlist_node COMPLEX_INTERFACE
                 if( !psz_name )
                 {
                     msg_Err( p_demux, "invalid xml stream" );
-                    FREE_ATT();
-                    return false;
+                    goto end;
                 }
                 /* leave if the current parent node <playlist> is terminated */
                 if( !strcmp( psz_name, psz_element ) )
                 {
-                    FREE_ATT();
-                    return true;
+                    b_ret = true;
+                    goto end;
                 }
                 /* there MUST have been a start tag for that element name */
                 if( !p_handler || !p_handler->name
@@ -294,8 +291,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "there's no open element left for <%s>",
                              psz_name );
-                    FREE_ATT();
-                    return false;
+                    goto end;
                 }
 
                 if( p_handler->pf_handler.smpl )
@@ -310,12 +306,14 @@ static bool parse_playlist_node COMPLEX_INTERFACE
             default:
                 /* unknown/unexpected xml node */
                 msg_Err( p_demux, "unexpected xml node %i", i_node );
-                FREE_ATT();
-                return false;
+                goto end;
         }
-        FREE_NAME();
     }
-    return false;
+
+end:
+    free( psz_name );
+    free( psz_value );
+    return b_ret;
 }
 
 /**
