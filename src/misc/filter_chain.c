@@ -412,16 +412,15 @@ static int filter_chain_DeleteFilterInternal( filter_chain_t *p_chain,
         /* Oops, filter wasn't found
          * FIXME shoulnd't it be an assert instead ? */
         msg_Err( p_chain->p_this,
-                 "Couldn't find filter '%s' (%p) when trying to remove it from chain",
-                 p_filter->psz_object_name, p_filter );
+                 "Couldn't find filter %p when trying to remove it from chain",
+                 p_filter );
         return VLC_EGENERIC;
     }
 
     /* Remove it from the chain */
     vlc_array_remove( &p_chain->filters, i_filter_idx );
 
-    msg_Dbg( p_chain->p_this, "Filter '%s' (%p) removed from chain",
-             p_filter->psz_object_name, p_filter );
+    msg_Dbg( p_chain->p_this, "Filter %p removed from chain", p_filter );
 
     /* Destroy the filter object */
     if( IsInternalVideoAllocator( p_filter ) )
