@@ -160,6 +160,8 @@ module_t *module_find_by_shortcut (const char *psz_shortcut);
 typedef struct vlc_object_internals_t
 {
     int             i_object_type; /* Object type, deprecated */
+    char           *psz_object_name; /* module name */
+    /* ^^ can only used from the thread that called module_(un)need() */
 
     /* Object variables */
     variable_t *    p_vars;

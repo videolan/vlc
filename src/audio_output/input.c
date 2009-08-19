@@ -451,7 +451,10 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     for( int i = 0; i < p_input->i_nb_filters; i++ )
     {
         aout_filter_t *p_filter = p_input->pp_filters[i];
-        if( strcmp( "scaletempo", p_filter->psz_object_name ) == 0 )
+        /* FIXME: suspicious access to psz_object_name */
+#warning Is this right?
+        if( strcmp( "scaletempo",
+                    vlc_internals(p_filter)->psz_object_name ) == 0 )
         {
           p_input->p_playback_rate_filter = p_filter;
           break;

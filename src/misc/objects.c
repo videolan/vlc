@@ -122,7 +122,7 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     p_priv->i_object_type = i_type;
     p_new->psz_object_type = psz_type;
-    p_new->psz_object_name = NULL;
+    p_priv->psz_object_name = NULL;
 
     p_new->b_die = false;
     p_new->b_error = false;
@@ -283,7 +283,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     free( p_this->psz_header );
 
-    FREENULL( p_this->psz_object_name );
+    free( p_priv->psz_object_name );
 
     vlc_spin_destroy( &p_priv->ref_spin );
     if( p_priv->pipes[1] != -1 && p_priv->pipes[1] != p_priv->pipes[0] )
@@ -482,8 +482,8 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
     msg_Warn( p_this, "%s(%s) is not safe!", __func__, psz_name );
     /* If have the requested name ourselves, don't look further */
     if( !(i_mode & FIND_STRICT)
-        && p_this->psz_object_name
-        && !strcmp( p_this->psz_object_name, psz_name ) )
+        && vlc_internals(p_this)->psz_object_name
+        && !strcmp( vlc_internals(p_this)->psz_object_name, psz_name ) )
     {
         vlc_object_hold( p_this );
         return p_this;
@@ -583,7 +583,7 @@ void __vlc_object_release( vlc_object_t *p_this )
                 fprintf( stderr,
                          "ERROR: leaking object (%p, type:%s, name:%s)\n",
                          leaked, leaked->psz_object_type,
-                         leaked->psz_object_name );
+                         vlc_internals(leaked)->psz_object_name );
                 /* Dump object to ease debugging */
                 vlc_object_dump( leaked );
                 fflush(stderr);
@@ -1016,8 +1016,8 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
         p_tmp = p_this->p_parent;
         if( p_tmp )
         {
-            if( p_tmp->psz_object_name
-                && !strcmp( p_tmp->psz_object_name, psz_name ) )
+            if( vlc_internals(p_tmp)->psz_object_name
+             && !strcmp( vlc_internals(p_tmp)->psz_object_name, psz_name ) )
             {
                 vlc_object_hold( p_tmp );
                 return p_tmp;
@@ -1033,8 +1033,8 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
         for( i = vlc_internals( p_this )->i_children; i--; )
         {
             p_tmp = vlc_internals( p_this )->pp_children[i];
-            if( p_tmp->psz_object_name
-                && !strcmp( p_tmp->psz_object_name, psz_name ) )
+            if( vlc_internals(p_tmp)->psz_object_name
+             && !strcmp( vlc_internals(p_tmp)->psz_object_name, psz_name ) )
             {
                 vlc_object_hold( p_tmp );
                 return p_tmp;
@@ -1066,9 +1066,10 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
 
     int canc = vlc_savecancel ();
     memset( &psz_name, 0, sizeof(psz_name) );
-    if( p_this->psz_object_name )
+    if( vlc_internals(p_this)->psz_object_name )
     {
-        snprintf( psz_name, 49, " \"%s\"", p_this->psz_object_name );
+        snprintf( psz_name, 49, " \"%s\"",
+                  vlc_internals(p_this)->psz_object_name );
         if( psz_name[48] )
             psz_name[48] = '\"';
     }
