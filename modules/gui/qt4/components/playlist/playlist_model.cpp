@@ -289,8 +289,7 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
 void PLModel::removeItem( int i_id )
 {
     PLItem *item = FindById( rootItem, i_id );
-    if( currentItem && item && currentItem->p_input == item->p_input ) currentItem = NULL;
-    if( item ) item->remove( item, i_depth );
+    RemoveItem( item );
 }
 
 /* callbacks and slots */
@@ -756,6 +755,20 @@ void PLModel::rebuild( playlist_item_t *p_root )
     addCallbacks();
 }
 
+void PLModel::RemoveItem( PLItem *item )
+{
+    if( !item ) return;
+    if( currentItem && currentItem->p_input == item->p_input )
+    {
+        currentItem = NULL;
+        emit currentChanged( QModelIndex() );
+    }
+    PLItem *parent = item->parentItem;
+    assert( parent );
+    int i_index = parent->children.indexOf( item );
+    parent->children.removeAt( i_index );
+    delete item;
+}
 void PLModel::RemoveChildren( PLItem *root )
 {
   if( root->children.size() )
@@ -853,7 +866,7 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
     /* And finally, remove it from the tree */
     int itemIndex = item->parentItem->children.indexOf( item );
     beginRemoveRows( index( item->parentItem, 0), itemIndex, itemIndex );
-    item->remove( item, i_depth );
+    RemoveItem( item );
     endRemoveRows();
 }
 

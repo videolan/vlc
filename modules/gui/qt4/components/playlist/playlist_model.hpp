@@ -152,6 +152,7 @@ private:
     void doDeleteItem( PLItem *item, QModelIndexList *fullList );
     void UpdateTreeItem( PLItem *, bool, bool force = false );
     /* The following actions will not signal the view! */
+    void RemoveItem ( PLItem * );
     void RemoveChildren( PLItem * );
     void UpdateChildren( PLItem * );
     void UpdateChildren( playlist_item_t *, PLItem * );
