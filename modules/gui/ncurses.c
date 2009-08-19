@@ -1453,11 +1453,11 @@ static void MainBoxWrite( intf_thread_t *p_intf, int l, int x, const char *p_fmt
 
 static void DumpObject( intf_thread_t *p_intf, int *l, vlc_object_t *p_obj, int i_level )
 {
-    if( p_obj->psz_object_name )
+    /*if( p_obj->psz_object_name )
         MainBoxWrite( p_intf, (*l)++, 1 + 2 * i_level, "%s \"%s\" (%p)",
                 p_obj->psz_object_type, p_obj->psz_object_name,
                 p_obj );
-    else
+    else*/
         MainBoxWrite( p_intf, (*l)++, 1 + 2 * i_level, "%s (%o)",
                 p_obj->psz_object_type, p_obj );
 
