@@ -277,11 +277,11 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
     else
         item = new QTreeWidgetItem( modulesTree );
 
-    if( p_obj->psz_object_name )
+    /*if( p_obj->psz_object_name )
         item->setText( 0, qfu( p_obj->psz_object_type ) + " \"" +
                        qfu( p_obj->psz_object_name ) + "\" (" +
                        QString::number((uintptr_t)p_obj) + ")" );
-    else
+    else*/
         item->setText( 0, qfu( p_obj->psz_object_type ) + " (" +
                        QString::number((uintptr_t)p_obj) + ")" );
 
