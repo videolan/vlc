@@ -128,6 +128,10 @@ static void Close( vlc_object_t * );
     "a level compatible with the rest of the encoding options. Range 1 to 5.1 " \
     "(10 to 51 is also allowed).")
 
+#define PROFILE_TEXT N_("H.264 profile")
+#define PROFILE_LONGTEXT N_("Specify H.264 profile which limits are enforced over" \
+        "other settings" )
+
 /* In order to play an interlaced output stream encoded by x264, a decoder needs
    mbaff support. r570 is using the 'mb' part and not 'aff' yet; so it's really
    'pure-interlaced' mode */
@@ -403,6 +407,9 @@ static const char *const enc_me_list_text[] =
   { N_("dia"), N_("hex"), N_("umh"), N_("esa"), N_("tesa") };
 #endif
 
+static const char *const profile_list[] =
+  { "baseline", "main", "high" };
+
 static const char *const enc_analyse_list[] =
   { "none", "fast", "normal", "slow", "all" };
 static const char *const enc_analyse_list_text[] =
@@ -494,6 +501,10 @@ vlc_module_begin ()
 #endif
     add_string( SOUT_CFG_PREFIX "level", "5.1", NULL, LEVEL_TEXT,
                LEVEL_LONGTEXT, false )
+
+    add_string( SOUT_CFG_PREFIX "profile", "high", NULL, PROFILE_TEXT,
+               PROFILE_LONGTEXT, false )
+        change_string_list( profile_list, profile_list, 0 );
 
 #if X264_BUILD >= 51 /* r570 */
     add_bool( SOUT_CFG_PREFIX "interlaced", 0, NULL, INTERLACED_TEXT, INTERLACED_LONGTEXT,
@@ -742,7 +753,7 @@ static const char *const ppsz_sout_options[] = {
     "qpmin", "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut",
     "sps-id", "ssim", "stats", "subme", "subpel", "tolerance", "trellis",
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "aq-mode",
-    "aq-strength", "psy-rd", NULL
+    "aq-strength", "psy-rd", "profile", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -1271,6 +1282,27 @@ static int  Open ( vlc_object_t *p_this )
 #endif
         p_sys->param.rc.i_vbv_buffer_size /= p_sys->param.i_fps_num;
     }
+
+    /* Check if user has given some profile (baseline,main,high) to limit
+     * settings, and apply those*/
+    var_Get( p_enc, SOUT_CFG_PREFIX "profile", &val );
+    if( val.psz_string )
+    {
+        if( !strcasecmp( val.psz_string, "baseline" ) )
+        {
+            msg_Dbg( p_enc, "Limiting to baseline profile");
+            p_sys->param.analyse.b_transform_8x8 = 0;
+            p_sys->param.b_cabac = 0;
+            p_sys->param.i_bframe = 0;
+        }
+        else if (!strcasecmp( val.psz_string, "main" ) )
+        {
+            msg_Dbg( p_enc, "Limiting to main-profile");
+            p_sys->param.analyse.b_transform_8x8 = 0;
+        }
+        /* high profile don't restrict stuff*/
+    }
+    free( val.psz_string );
 
 
     unsigned i_cpu = vlc_CPU();
