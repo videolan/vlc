@@ -445,14 +445,6 @@ static bool parse_track_node COMPLEX_INTERFACE
                 /* complex content is parsed in a separate function */
                 if( p_handler->type == COMPLEX_CONTENT )
                 {
-                    if( !p_new_input )
-                    {
-                        msg_Err( p_demux,
-                                 "at <%s> level no new item has been allocated",
-                                 p_handler->name );
-                        FREE_ATT();
-                        return false;
-                    }
                     if( p_handler->pf_handler.cmplx( p_demux,
                                                      p_new_input,
                                                      p_xml_reader,
@@ -570,13 +562,6 @@ static bool parse_track_node COMPLEX_INTERFACE
                 else
                 {
                     /* there MUST be an item */
-                    if( !p_new_input )
-                    {
-                        msg_Err( p_demux, "item not yet created at <%s>",
-                                 psz_name );
-                        FREE_ATT();
-                        return false;
-                    }
                     if( p_handler->pf_handler.smpl )
                     {
                         p_handler->pf_handler.smpl( p_new_input,
