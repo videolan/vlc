@@ -1334,7 +1334,7 @@ else
 	patch -p0 < Patches/goom2k4-0-mmx.patch
 endif
 	patch -p0 < Patches/goom2k4-0-memleaks.patch
-	patch -p0 < Patches/goom.patch
+	patch -p0 < Patches/goom2k4-autotools.patch
 	(cd $@; rm -f configure; ACLOCAL="aclocal -I m4/" autoreconf -ivf)
 
 .goom2k4: goom
