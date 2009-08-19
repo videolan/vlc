@@ -15,6 +15,7 @@ Mac OS X Interface:
 Playlist:
  * WPL playlist support
  * ZPL playlist support
+ * Lua scripts for Mpora and Vimeo playback
 
 Audio filters:
  * Chorus/Flanger audio filter
