@@ -118,6 +118,9 @@ ifdef HAVE_WIN32
 HOSTCONF+= --without-pic --disable-shared --enable-msw --disable-dependency-tracking
 FFMPEGCONF+= --target-os=mingw32 --enable-memalign-hack --cpu=i686 --arch=i686
 endif
+ifdef HAVE_WIN64
+FFMPEGCONF+= --cpu=x86_64
+endif
 
 ifdef HAVE_WINCE
 HOSTCONF+= --without-pic --disable-shared
