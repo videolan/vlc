@@ -548,7 +548,6 @@ static inline int RemoveLastUTF8Entity( char *psz, int len )
 static int HandleKey( intf_thread_t *p_intf, int i_key )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    vlc_value_t val;
     int i_ret = 1;
 
     playlist_t *p_playlist = pl_Hold( p_intf );
@@ -560,7 +559,6 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
 
         switch( i_key )
         {
-            vlc_value_t val;
             /* Playlist Settings */
             case 'r':
                 var_ToggleBool( p_playlist, "random" );
