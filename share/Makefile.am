@@ -220,6 +220,8 @@ DIST_lua= \
 	lua/playlist/megavideo.lua \
 	lua/playlist/metacafe.lua \
 	lua/playlist/googlevideo.lua \
+	lua/playlist/mpora.lua \
+	lua/playlist/vimeo.lua \
 	lua/intf/README.txt \
 	lua/intf/http.lua \
 	lua/intf/rc.lua \
