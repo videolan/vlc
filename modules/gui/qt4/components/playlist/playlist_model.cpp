@@ -925,63 +925,56 @@ void PLModel::search( const QString& search_text )
 /*********** Popup *********/
 void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
 {
-    int i_id;
-    if( index.isValid() ) i_id = itemId( index );
-    else i_id = rootItem->i_id;
-    i_popup_column = index.column();
+    int i_id = index.isValid() ? itemId( index ) : rootItem->i_id;
+
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
-    if( p_item )
+    if( !p_item )
     {
-        i_popup_item = p_item->i_id;
-        i_popup_parent = p_item->p_parent ? p_item->p_parent->i_id : -1;
-        bool node = p_item->i_children > -1;
-        bool tree = false;
-        if( node )
-        {
-            /* check whether we are in tree view */
-            playlist_item_t *p_up = p_item;
-            while( p_up )
-            {
-                if ( p_up == p_playlist->p_root_category ) tree = true;
-                p_up = p_up->p_parent;
-            }
-        }
-        PL_UNLOCK;
-
-        current_selection = list;
-        QMenu *menu = new QMenu;
-        if( index.isValid() )
-        {
-            menu->addAction( qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
-            menu->addAction( qtr(I_POP_DEL), this, SLOT( popupDel() ) );
-            menu->addSeparator();
-            menu->addAction( qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
-            menu->addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
-            menu->addSeparator();
-            menu->addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
-            if( node )
-            {
-                menu->addSeparator();
-                QMenu *sort_menu = menu->addMenu( qtr( "Sort by ") +
-                    qfu( psz_column_title( metaColumn( index.column() ) ) ) );
-                sort_menu->addAction( qtr( "Ascending" ),
-                    this, SLOT( popupSortAsc() ) );
-                sort_menu->addAction( qtr( "Descending" ),
-                    this, SLOT( popupSortDesc() ) );
-            }
-        }
-        if( node && tree )
-                menu->addAction( qtr(I_POP_ADD), this, SLOT( popupAddNode() ) );
-        if( index.isValid() )
-        {
-            menu->addSeparator();
-            menu->addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
-        }
-        menu->popup( point );
+        PL_UNLOCK; return;
     }
-    else
-        PL_UNLOCK;
+    i_popup_item = index.isValid() ? p_item->i_id : -1;
+    i_popup_parent = index.isValid() ?
+        ( p_item->p_parent ? p_item->p_parent->i_id : -1 ) :
+        ( p_item->i_id );
+    i_popup_column = index.column();
+    /* check whether we are in tree view */
+    bool tree = false;
+    playlist_item_t *p_up = p_item;
+    while( p_up )
+    {
+        if ( p_up == p_playlist->p_root_category ) tree = true;
+        p_up = p_up->p_parent;
+    }
+    PL_UNLOCK;
+
+    current_selection = list;
+    QMenu *menu = new QMenu;
+    if( i_popup_item > -1 )
+    {
+        menu->addAction( qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
+        menu->addAction( qtr(I_POP_DEL), this, SLOT( popupDel() ) );
+        menu->addSeparator();
+        menu->addAction( qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
+        menu->addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
+        menu->addSeparator();
+        menu->addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
+        menu->addSeparator();
+        QMenu *sort_menu = menu->addMenu( qtr( "Sort by ") +
+            qfu( psz_column_title( metaColumn( index.column() ) ) ) );
+        sort_menu->addAction( qtr( "Ascending" ),
+            this, SLOT( popupSortAsc() ) );
+        sort_menu->addAction( qtr( "Descending" ),
+            this, SLOT( popupSortDesc() ) );
+    }
+    if( tree )
+        menu->addAction( qtr(I_POP_ADD), this, SLOT( popupAddNode() ) );
+    if( i_popup_item > -1 )
+    {
+        menu->addSeparator();
+        menu->addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
+    }
+    menu->popup( point );
 }
 
 
@@ -1122,7 +1115,7 @@ void PLModel::popupAddNode()
     if( !ok || name.isEmpty() ) return;
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist,
-                                                    i_popup_item );
+                                                    i_popup_parent );
     if( p_item )
     {
         playlist_NodeCreate( p_playlist, qtu( name ), p_item, 0, NULL );
@@ -1132,12 +1125,12 @@ void PLModel::popupAddNode()
 
 void PLModel::popupSortAsc()
 {
-    sort( i_popup_item, i_popup_column, Qt::AscendingOrder );
+    sort( i_popup_parent, i_popup_column, Qt::AscendingOrder );
 }
 
 void PLModel::popupSortDesc()
 {
-    sort( i_popup_item, i_popup_column, Qt::DescendingOrder );
+    sort( i_popup_parent, i_popup_column, Qt::DescendingOrder );
 }
 /**********************************************************************
  * Playlist callbacks
