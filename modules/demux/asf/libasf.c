@@ -434,7 +434,7 @@ static int ASF_ReadObject_metadata( stream_t *s, asf_object_t *p_obj )
         /* Read data */
         if( p_record->i_type == ASF_METADATA_TYPE_STRING )
         {
-            p_record->p_data = ASF_READS( i_data );
+            p_record->p_data = (uint8_t *)ASF_READS( i_data );
             p_record->i_data = i_data/2; /* FIXME Is that needed ? */
         }
         else if( p_record->i_type == ASF_METADATA_TYPE_BYTE )
