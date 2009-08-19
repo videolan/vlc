@@ -477,6 +477,9 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
 {
     vlc_object_t *p_found;
 
+    /* Reading psz_object_name from a separate inhibits thread-safety.
+     * Use a libvlc address variable instead for that sort of things! */
+    msg_Warn( p_this, "%s(%s) is not safe!", __func__, psz_name );
     /* If have the requested name ourselves, don't look further */
     if( !(i_mode & FIND_STRICT)
         && p_this->psz_object_name
