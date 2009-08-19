@@ -569,19 +569,8 @@ DISTCLEAN_PKG += a52dec-$(A52DEC_VERSION).tar.gz
 # mpeg2dec
 # ***************************************************************************
 
-#mpeg2dec:
-#	@echo "*** Please press return here : ***"
-#	cvs -d $(MPEG2DEC_CVSROOT) login
-#	cvs -d $(MPEG2DEC_CVSROOT) co mpeg2dec
-#	(cd $@; ./bootstrap)
-
 libmpeg2-$(LIBMPEG2_VERSION).tar.gz:
 	$(WGET) $(LIBMPEG2_URL)
-
-# It is easier to use bootstrapped versions...
-#mpeg2dec-$(MPEG2DEC_VERSION).tar.gz:
-#	$(WGET) $(MPEG2DEC_SNAPSHOT)
-#	mv mpeg2dec-$(MPEG2DEC_DATE).tar.gz $@
 
 libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 	$(EXTRACT_GZ)
@@ -592,7 +581,6 @@ libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 
 CLEAN_FILE += .mpeg2
 CLEAN_PKG += libmpeg2
-#DISTCLEAN_PKG += mpeg2dec-$(MPEG2DEC_VERSION)-cvs.tar.gz
 DISTCLEAN_PKG += libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 
 # ***************************************************************************
@@ -729,12 +717,6 @@ DISTCLEAN_PKG += libogg-$(OGG_VERSION).tar.gz
 # ***************************************************************************
 # vorbis
 # ***************************************************************************
-
-#vorbis:
-#	@echo "*** Please type \"anoncvs\" here : ***"
-#	cvs -d $(OGG_CVSROOT) login
-#	cvs -d $(OGG_CVSROOT) co vorbis
-#	(cd $@; ./autogen.sh)
 
 libvorbis-$(VORBIS_VERSION).tar.gz:
 	$(WGET) $(VORBIS_URL)
@@ -1771,23 +1753,11 @@ DISTCLEAN_PKG += zvbi-$(ZVBI_VERSION).tar.bz2
 # libraw1394
 # ***************************************************************************
 
-#ifdef SVN
-#libraw1394:
-#	$(SVN) co -r 325 $(LIBDC1394_SVN)/libraw1394/trunk/libraw1394  libraw1394
-#        (cd $<; libtoolize --copy --force; \
-#                autopoint -f; \
-#                aclocal -I extras/contrib/share/aclocal; \
-#                autoconf; \
-#                autoheader; \
-#                automake --add-missing --copy -Wall)
-#
-#else
 libraw1394-$(LIBRAW1394_VERSION).tar.gz:
 	$(WGET) $(LIBRAW1394_URL)
 
 libraw1394: libraw1394-$(LIBRAW1394_VERSION).tar.gz
 	$(EXTRACT_GZ)
-#endif
 
 .raw1394: libraw1394
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make DESTDIR=$(PREFIX) install)
@@ -1802,23 +1772,11 @@ DISTCLEAN_PKG += libraw1394-$(LIBRAW1394_VERSION).tar.gz
 # libdc1394
 # ***************************************************************************
 
-#ifdef SVN
-#libdc1394:
-#	$(SVN) co -r 325 $(LIBDC1394_SVN)/libdc1394/trunk/libdc1394  libdc1394
-#        (cd $<; libtoolize --copy --force; \
-#                autopoint -f; \
-#                aclocal -I extras/contrib/share/aclocal; \
-#                autoconf; \
-#                autoheader; \
-#                automake --add-missing --copy -Wall)
-#
-#else
 libdc1394-$(LIBDC1394_VERSION).tar.gz:
 	$(WGET) $(LIBDC1394_URL)
 
 libdc1394: libdc1394-$(LIBDC1394_VERSION).tar.gz
 	$(EXTRACT_GZ)
-#endif
 
 .dc1394: libdc1394
 	(cd $<; ./configure --prefix=$(PREFIX) && \
@@ -2359,7 +2317,7 @@ taglib-$(TAGLIB_VERSION).tar.gz:
 taglib: taglib-$(TAGLIB_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
-	patch -p0 < Patches/taglib.patch
+	patch -p0 < Patches/taglib-static.patch
 endif
 ifdef HAVE_CYGWIN
 	patch -p0 < Patches/taglib-cygwin.patch
