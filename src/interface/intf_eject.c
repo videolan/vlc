@@ -167,7 +167,7 @@ int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
     i_flags = MCI_OPEN_TYPE | MCI_OPEN_TYPE_ID |
               MCI_OPEN_ELEMENT | MCI_OPEN_SHAREABLE;
 
-    if( !mciSendCommand( 0, MCI_OPEN, i_flags, (unsigned long)&op ) )
+    if( !mciSendCommand( 0, MCI_OPEN, i_flags, (uintptr_t)&op ) )
     {
         st.dwItem = MCI_STATUS_READY;
         /* Eject disc */
