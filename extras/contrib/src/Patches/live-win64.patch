@@ -14,19 +14,19 @@ diff -ruN live/BasicUsageEnvironment/BasicHashTable.cpp live.new/BasicUsageEnvir
  
  unsigned BasicHashTable::hashIndexFromKey(char const* key) const {
 -  unsigned result = 0;
-+  intptr_t result = 0;
++  uintptr_t result = 0;
  
    if (fKeyType == STRING_HASH_KEYS) {
      while (1) {
        char c = *key++;
        if (c == 0) break;
 -      result += (result<<3) + (unsigned)c;
-+      result += (result<<3) + (intptr_t)c;
++      result += (result<<3) + (uintptr_t)c;
      }
      result &= fMask;
    } else if (fKeyType == ONE_WORD_HASH_KEYS) {
 -    result = randomIndex((unsigned long)key);
-+    result = randomIndex((intptr_t)key);
++    result = randomIndex((uintptr_t)key);
    } else {
      unsigned* k = (unsigned*)key;
      unsigned long sum = 0;
@@ -66,7 +66,7 @@ diff -ruN live/groupsock/Groupsock.cpp live.new/groupsock/Groupsock.cpp
        TunnelEncapsulationTrailer* trailer;
  
 -      Boolean misaligned = ((unsigned long)trailerInPacket & 3) != 0;
-+      Boolean misaligned = ((intptr_t)trailerInPacket & 3) != 0;
++      Boolean misaligned = ((uintptr_t)trailerInPacket & 3) != 0;
        unsigned trailerOffset;
        u_int8_t tunnelCmd;
        if (isSSM()) {
@@ -130,17 +130,17 @@ diff -ruN live/liveMedia/RTCP.cpp live.new/liveMedia/RTCP.cpp
      HashTable::Iterator* iter
        = HashTable::Iterator::create(*fTable);
 -    unsigned long timeCount;
-+    intptr_t timeCount;
++    uintptr_t timeCount;
      char const* key;
 -    while ((timeCount = (unsigned long)(iter->next(key))) != 0) {
-+    while ((timeCount = (intptr_t)(iter->next(key))) != 0) {
++    while ((timeCount = (uintptr_t)(iter->next(key))) != 0) {
  #ifdef DEBUG
        fprintf(stderr, "reap: checking SSRC 0x%lx: %ld (threshold %d)\n", (unsigned long)key, timeCount, threshold);
  #endif
 -      if (timeCount < (unsigned long)threshold) { // this SSRC is old
 -        unsigned long ssrc = (unsigned long)key;
-+      if (timeCount < (intptr_t)threshold) { // this SSRC is old
-+        intptr_t ssrc = (intptr_t)key;
++      if (timeCount < (uintptr_t)threshold) { // this SSRC is old
++        intptr_t ssrc = (uintptr_t)key;
          oldSSRC = (unsigned)ssrc;
          foundOldMember = True;
        }
