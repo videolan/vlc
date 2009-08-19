@@ -144,3 +144,41 @@ diff -ruN live/liveMedia/RTCP.cpp live.new/liveMedia/RTCP.cpp
          oldSSRC = (unsigned)ssrc;
          foundOldMember = True;
        }
+--- live/BasicUsageEnvironment/include/BasicHashTable.hh	2009-07-28 03:05:14.000000000 +0200
++++ live.new/BasicUsageEnvironment/include/BasicHashTable.hh	2009-08-19 19:00:05.000000000 +0200
+@@ -24,6 +24,8 @@
+ #include "HashTable.hh"
+ #endif
+ 
++#include <stdint.h>
++
+ // A simple hash table implementation, inspired by the hash table
+ // implementation used in Tcl 7.6: <http://www.tcl.tk/>
+ 
+@@ -87,7 +89,7 @@
+   unsigned hashIndexFromKey(char const* key) const;
+     // used to implement many of the routines above
+ 
+-  unsigned randomIndex(unsigned long i) const {
++  unsigned randomIndex(uintptr_t i) const {
+     return (((i*1103515245) >> fDownShift) & fMask);
+   }
+ 
+diff -ruN live/groupsock/include/NetCommon.h live.new/groupsock/include/NetCommon.h
+--- live/groupsock/include/NetCommon.h	2009-07-28 03:05:14.000000000 +0200
++++ live.new/groupsock/include/NetCommon.h	2009-08-19 19:00:59.000000000 +0200
+@@ -37,8 +37,12 @@
+ #define closeSocket closesocket
+ #define EWOULDBLOCK WSAEWOULDBLOCK
+ #define EINPROGRESS WSAEWOULDBLOCK
+-#define EAGAIN WSAEWOULDBLOCK
+-#define EINTR WSAEINTR
++#ifndef EAGAIN
++ #define EAGAIN WSAEWOULDBLOCK
++#endif
++#ifndef EINTR
++ #define EINTR WSAEINTR
++#endif
+ 
+ #if defined(_WIN32_WCE)
+ #define NO_STRSTREAM 1
