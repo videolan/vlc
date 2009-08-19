@@ -1061,10 +1061,7 @@ static int DirectXConvertKey( int i_key )
  *****************************************************************************/
 static int Control( vout_thread_t *p_vout, int i_query, va_list args )
 {
-    unsigned int *pi_width, *pi_height;
-	bool b_bool;
     RECT rect_window;
-    POINT point;
 
     switch( i_query )
     {
