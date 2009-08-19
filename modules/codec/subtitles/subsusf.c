@@ -40,8 +40,8 @@ static int           ParseImageAttachments( decoder_t *p_dec );
 
 static subpicture_t        *ParseText     ( decoder_t *, block_t * );
 static void                 ParseUSFHeader( decoder_t * );
-static subpicture_region_t *ParseUSFString( decoder_t *, char *, subpicture_t * );
-static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, subpicture_t *p_spu, const char *psz_filename, int i_transparent_color );
+static subpicture_region_t *ParseUSFString( decoder_t *, char * );
+static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec, const char *psz_filename, int i_transparent_color );
 
 /*****************************************************************************
  * Module descriptor.
@@ -220,7 +220,7 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
     }
 
     /* Decode USF strings */
-    p_spu->p_region = ParseUSFString( p_dec, psz_subtitle, p_spu );
+    p_spu->p_region = ParseUSFString( p_dec, psz_subtitle );
 
     p_spu->i_start = p_block->i_pts;
     p_spu->i_stop = p_block->i_pts + p_block->i_length;
@@ -372,7 +372,6 @@ static void SetupPositions( subpicture_region_t *p_region, char *psz_subtitle )
 }
 
 static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
-                                              subpicture_t *p_spu,
                                               char *psz_subtitle,
                                               int i_len,
                                               int i_sys_align )
@@ -830,11 +829,9 @@ static void ParseUSFHeaderTags( decoder_t *p_dec, xml_reader_t *p_xml_reader )
 
 
 static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
-                                            char *psz_subtitle,
-                                            subpicture_t *p_spu_in )
+                                            char *psz_subtitle )
 {
     decoder_sys_t        *p_sys = p_dec->p_sys;
-    subpicture_t         *p_spu = p_spu_in;
     subpicture_region_t  *p_region_first = NULL;
     subpicture_region_t  *p_region_upto  = p_region_first;
 
@@ -856,7 +853,6 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                     psz_end += strcspn( psz_end, ">" ) + 1;
 
                     p_text_region = CreateTextRegion( p_dec,
-                                                      p_spu,
                                                       psz_subtitle,
                                                       psz_end - psz_subtitle,
                                                       p_sys->i_align );
@@ -895,7 +891,6 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                     psz_end += strcspn( psz_end, ">" ) + 1;
 
                     p_text_region = CreateTextRegion( p_dec,
-                                                      p_spu,
                                                       psz_subtitle,
                                                       psz_end - psz_subtitle,
                                                       p_sys->i_align );
@@ -949,7 +944,7 @@ static subpicture_region_t *ParseUSFString( decoder_t *p_dec,
                     char *psz_filename = strndup( &psz_content[1], psz_end - &psz_content[1] );
                     if( psz_filename )
                     {
-                        p_image_region = LoadEmbeddedImage( p_dec, p_spu,
+                        p_image_region = LoadEmbeddedImage( p_dec,
                                             psz_filename, i_transparent );
                         free( psz_filename );
                     }
@@ -1138,17 +1133,15 @@ static char *CreatePlainText( char *psz_subtitle )
  * download and resize image located at psz_url
  ***************************************************************************/
 static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
-                                               subpicture_t *p_spu,
                                                const char *psz_filename,
                                                int i_transparent_color )
 {
     decoder_sys_t         *p_sys = p_dec->p_sys;
     subpicture_region_t   *p_region;
     video_format_t         fmt_out;
-    int                    k;
     picture_t             *p_pic = NULL;
 
-    for( k = 0; k < p_sys->i_images; k++ )
+    for( int k = 0; k < p_sys->i_images; k++ )
     {
         if( p_sys->pp_images &&
             !strcmp( p_sys->pp_images[k]->psz_filename, psz_filename ) )
