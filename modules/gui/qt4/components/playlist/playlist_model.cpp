@@ -349,10 +349,6 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
     PLItem *item = static_cast<PLItem*>(index.internalPointer());
     if( role == Qt::DisplayRole )
     {
-        int running_index = -1;
-        int columncount = 0;
-        int metadata = 1;
-
         if( i_depth == DEPTH_SEL )
         {
             vlc_mutex_lock( &item->p_input->lock );
@@ -361,16 +357,8 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
             return QVariant(returninfo);
         }
 
-        while( metadata < COLUMN_END )
-        {
-            if( i_showflags & metadata )
-                running_index++;
-            if( running_index == index.column() )
-                break;
-            metadata <<= 1;
-        }
-
-        if( running_index != index.column() ) return QVariant();
+        int metadata = metaColumn( index.column() );
+        if( metadata == COLUMN_END ) return QVariant();
 
         QString returninfo;
         if( metadata == COLUMN_NUMBER )
@@ -378,7 +366,7 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
         else
         {
             char *psz = psz_column_meta( item->p_input, metadata );
-            returninfo = QString( qfu( psz ) );
+            returninfo = qfu( psz );
             free( psz );
         }
         return QVariant( returninfo );
@@ -415,25 +403,16 @@ int PLModel::itemId( const QModelIndex &index ) const
 QVariant PLModel::headerData( int section, Qt::Orientation orientation,
                               int role ) const
 {
-    int metadata=1;
-    int running_index=-1;
     if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
         return QVariant();
 
     if( i_depth == DEPTH_SEL ) return QVariant( QString("") );
 
-    while( metadata < COLUMN_END )
-    {
-        if( metadata & i_showflags )
-            running_index++;
-        if( running_index == section )
-            break;
-        metadata <<= 1;
-    }
+    int meta_col = metaColumn( section );
 
-    if( running_index != section ) return QVariant();
+    if( meta_col == COLUMN_END ) return QVariant();
 
-    return QVariant( qfu( psz_column_title( metadata ) ) );
+    return QVariant( qfu( psz_column_title( meta_col ) ) );
 }
 
 QModelIndex PLModel::index( int row, int column, const QModelIndex &parent )
@@ -641,6 +620,24 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
 #undef CACHE
 #undef ICACHE
 
+/* computes column id of meta data from visible column index */
+int PLModel::metaColumn( int column ) const
+{
+    int metadata = 1;
+    int running_index = -1;
+
+    while( metadata < COLUMN_END )
+    {
+        if( metadata & i_showflags )
+            running_index++;
+        if( running_index == column )
+            break;
+        metadata <<= 1;
+    }
+
+    if( running_index != column ) return COLUMN_END;
+    return metadata;
+}
 
 /************************* Updates handling *****************************/
 void PLModel::customEvent( QEvent *event )
@@ -966,7 +963,8 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
             if( node )
             {
                 menu->addSeparator();
-                QMenu *sort_menu = menu->addMenu( qtr(I_POP_SORT) );
+                QMenu *sort_menu = menu->addMenu( qtr( "Sort by ") +
+                    qfu( psz_column_title( metaColumn( index.column() ) ) ) );
                 sort_menu->addAction( qtr( "Ascending" ),
                     this, SLOT( popupSortAsc() ) );
                 sort_menu->addAction( qtr( "Descending" ),

@@ -164,6 +164,7 @@ private:
     PLItem *FindById( PLItem *, int );
     PLItem *FindByInput( PLItem *, int );
     PLItem *FindInner( PLItem *, int , bool );
+    int metaColumn ( int column ) const;
     PLItem *p_cached_item;
     PLItem *p_cached_item_bi;
     int i_cached_id;
