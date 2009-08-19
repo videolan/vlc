@@ -114,13 +114,12 @@ EXTRA_DIST += \
 	extras/package/macosx/Resources/English.lproj/Bookmarks.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/Extended.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/Extended.nib/keyedobjects.nib \
-	extras/package/macosx/Resources/English.lproj/Update.nib/designable.nib \
-	extras/package/macosx/Resources/English.lproj/Update.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/CoreDialogs.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/designable.nib \
 	extras/package/macosx/Resources/English.lproj/ErrorPanel.nib/keyedobjects.nib \
 	extras/package/macosx/Resources/English.lproj/InfoPlist.strings.in \
+	extras/package/macosx/Resources/dsa_pub.pem \
 	extras/package/macosx/Resources/aiff.icns \
 	extras/package/macosx/Resources/audio.icns \
 	extras/package/macosx/Resources/avi.icns \
@@ -481,8 +480,6 @@ VLC-release.app: vlc
 	    extended.m \
 	    bookmarks.h \
 	    bookmarks.m \
-	    update.h \
-	    update.m \
 	    coredialogs.h \
 	    coredialogs.m \
 	    embeddedwindow.h \
@@ -636,8 +633,6 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	    extended.m \
 	    bookmarks.h \
 	    bookmarks.m \
-	    update.h \
-	    update.m \
 	    coredialogs.h \
 	    coredialogs.m \
 	    embeddedwindow.h \
