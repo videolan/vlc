@@ -323,35 +323,34 @@ static bool parse_playlist_node COMPLEX_INTERFACE
 static bool parse_tracklist_node COMPLEX_INTERFACE
 {
     VLC_UNUSED(psz_element);
-    char *psz_name = NULL;
-    int i_node;
+    char *psz_name;
     int i_ntracks = 0;
 
     /* now parse the <track>s */
     while( xml_ReaderRead( p_xml_reader ) == 1 )
     {
-        i_node = xml_ReaderNodeType( p_xml_reader );
+        int i_node = xml_ReaderNodeType( p_xml_reader );
         if( i_node == XML_READER_STARTELEM )
         {
-            psz_name = xml_ReaderName( p_xml_reader );
-            if( !psz_name )
+            char *psz_eltname = xml_ReaderName( p_xml_reader );
+            if( !psz_eltname )
             {
                 msg_Err( p_demux, "unexpected end of xml data" );
-                FREE_NAME();
+                free( psz_eltname );
                 return false;
             }
-            if( strcmp( psz_name, "track") )
+            if( strcmp( psz_eltname, "track") )
             {
                 msg_Err( p_demux, "unexpected child of <trackList>: <%s>",
-                         psz_name );
-                FREE_NAME();
+                         psz_eltname );
+                free( psz_eltname );
                 return false;
             }
-            FREE_NAME();
+            free( psz_eltname );
 
             /* parse the track data in a separate function */
-            if( parse_track_node( p_demux, p_input_item,
-                                   p_xml_reader,"track" ) == true )
+            if( parse_track_node( p_demux, p_input_item, p_xml_reader,
+                                  "track" ) )
                 i_ntracks++;
         }
         else if( i_node == XML_READER_ENDELEM )
@@ -362,20 +361,18 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
     if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_ENDELEM )
     {
         msg_Err( p_demux, "there's a missing </trackList>" );
-        FREE_NAME();
         return false;
     }
     psz_name = xml_ReaderName( p_xml_reader );
     if( !psz_name || strcmp( psz_name, "trackList" ) )
     {
         msg_Err( p_demux, "expected: </trackList>, found: </%s>", psz_name );
-        FREE_NAME();
+        free( psz_name );
         return false;
     }
-    FREE_NAME();
+    free( psz_name );
 
     msg_Dbg( p_demux, "parsed %i tracks successfully", i_ntracks );
-
     return true;
 }
 
