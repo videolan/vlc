@@ -29,6 +29,9 @@
 
 #include "util/qvlcframe.hpp"
 #include "components/preferences_widgets.hpp" /* First Start */
+#ifdef WIN32
+ #include <vlc_windows_interfaces.h>
+#endif
 
 #include <QSystemTrayIcon>
 
@@ -147,6 +150,11 @@ private:
     QLabel              *nameLabel;
     QLabel              *cryptedLabel;
 
+#ifdef WIN32
+    HIMAGELIST himl;
+    LPTASKBARLIST3 p_taskbl;
+#endif
+
 public slots:
     void undockPlaylist();
     void dockPlaylist( pl_dock_e i_pos = PL_BOTTOM );
@@ -157,6 +165,7 @@ public slots:
     void toggleFullScreen();
     void toggleFSC();
     void popupMenu( const QPoint& );
+    void changeThumbbarButtons( int );
 
     /* Manage the Video Functions from the vout threads */
     void getVideoSlot( WId *p_id, int *pi_x, int *pi_y,

@@ -359,7 +359,11 @@ static void *Thread( void *obj )
         argv[argc] = NULL;
     }
 #endif
+#ifdef WIN32
+    QVLCApp app( p_intf, argc, argv );
+#else
     QVLCApp app( argc, argv );
+#endif
     p_intf->p_sys->p_app = &app;
 
 
