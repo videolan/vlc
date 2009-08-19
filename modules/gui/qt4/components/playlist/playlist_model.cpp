@@ -130,9 +130,7 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
 {
     Qt::ItemFlags flags = QAbstractItemModel::flags( index );
 
-    PLItem *item = index.isValid() ?
-        static_cast<PLItem*>( index.internalPointer() ) :
-        rootItem;
+    PLItem *item = index.isValid() ? getItem( index ) : rootItem;
 
     input_item_t *pl_input = p_playlist->p_local_category->p_input;
     input_item_t *ml_input = p_playlist->p_ml_category->p_input;
@@ -325,7 +323,7 @@ void PLModel::delCallbacks()
 void PLModel::activateItem( const QModelIndex &index )
 {
     assert( index.isValid() );
-    PLItem *item = static_cast<PLItem*>(index.internalPointer());
+    PLItem *item = getItem( index );
     assert( item );
     PL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
@@ -352,7 +350,7 @@ void PLModel::activateItem( playlist_item_t *p_item )
 QVariant PLModel::data( const QModelIndex &index, int role ) const
 {
     if( !index.isValid() ) return QVariant();
-    PLItem *item = static_cast<PLItem*>(index.internalPointer());
+    PLItem *item = getItem( index );
     if( role == Qt::DisplayRole )
     {
         if( i_depth == DEPTH_SEL )
@@ -395,15 +393,13 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
 
 bool PLModel::isCurrent( const QModelIndex &index ) const
 {
-    assert( index.isValid() );
     if( !currentItem ) return false;
-    return static_cast<PLItem*>(index.internalPointer())->p_input == currentItem->p_input;
+    return getItem( index )->p_input == currentItem->p_input;
 }
 
 int PLModel::itemId( const QModelIndex &index ) const
 {
-    assert( index.isValid() );
-    return static_cast<PLItem*>(index.internalPointer())->i_id;
+    return getItem( index )->i_id;
 }
 
 QVariant PLModel::headerData( int section, Qt::Orientation orientation,
@@ -424,11 +420,7 @@ QVariant PLModel::headerData( int section, Qt::Orientation orientation,
 QModelIndex PLModel::index( int row, int column, const QModelIndex &parent )
                   const
 {
-    PLItem *parentItem;
-    if( !parent.isValid() )
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<PLItem*>(parent.internalPointer());
+    PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;
 
     PLItem *childItem = parentItem->child( row );
     if( childItem )
@@ -452,7 +444,7 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
 {
     if( !index.isValid() ) return QModelIndex();
 
-    PLItem *childItem = static_cast<PLItem*>(index.internalPointer());
+    PLItem *childItem = getItem( index );
     if( !childItem )
     {
         msg_Err( p_playlist, "NULL CHILD" );
@@ -493,13 +485,7 @@ int PLModel::childrenCount( const QModelIndex &parent ) const
 
 int PLModel::rowCount( const QModelIndex &parent ) const
 {
-    PLItem *parentItem;
-
-    if( !parent.isValid() )
-        parentItem = rootItem;
-    else
-        parentItem = static_cast<PLItem*>(parent.internalPointer());
-
+    PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;
     return parentItem->childCount();
 }
 
@@ -508,8 +494,7 @@ QStringList PLModel::selectedURIs()
     QStringList lst;
     for( int i = 0; i < current_selection.size(); i++ )
     {
-        PLItem *item = static_cast<PLItem*>
-                    (current_selection[i].internalPointer());
+        PLItem *item = getItem( current_selection[i] );
         if( item )
         {
             PL_LOCK;
@@ -625,6 +610,12 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
 }
 #undef CACHE
 #undef ICACHE
+
+PLItem *PLModel::getItem( const QModelIndex& index ) const
+{
+    assert( index.isValid() );
+    return static_cast<PLItem*>( index.internalPointer() );
+}
 
 /* computes column id of meta data from visible column index */
 int PLModel::metaColumn( int column ) const
@@ -831,7 +822,7 @@ void PLModel::doDelete( QModelIndexList selected )
     {
         QModelIndex index = selected[i];
         if( index.column() != 0 ) continue;
-        PLItem *item = static_cast<PLItem*>(index.internalPointer());
+        PLItem *item = getItem( index );
         if( item )
         {
             if( item->children.size() )

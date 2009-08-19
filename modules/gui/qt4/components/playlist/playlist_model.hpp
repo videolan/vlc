@@ -166,6 +166,7 @@ private:
     PLItem *FindById( PLItem *, int );
     PLItem *FindByInput( PLItem *, int );
     PLItem *FindInner( PLItem *, int , bool );
+    PLItem *getItem( const QModelIndex& index ) const;
     int metaColumn ( int column ) const;
     PLItem *p_cached_item;
     PLItem *p_cached_item_bi;
