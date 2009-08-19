@@ -1327,9 +1327,6 @@ goom$(GOOM2k4_VERSION).tar.gz:
 
 goom: goom$(GOOM2k4_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_DARWIN_OS
-	patch -p0 < Patches/goom.patch
-endif
 ifdef HAVE_WIN32
 	(cd $@; dos2unix configure.in)
 	patch -p0 < Patches/goom2k4-0-win32.patch
@@ -1337,13 +1334,11 @@ else
 	patch -p0 < Patches/goom2k4-0-mmx.patch
 endif
 	patch -p0 < Patches/goom2k4-0-memleaks.patch
+	patch -p0 < Patches/goom.patch
+	(cd $@; rm -f configure; ACLOCAL="aclocal -I m4/" autoreconf -ivf)
 
 .goom2k4: goom
-ifdef HAVE_DARWIN_OS
-	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --disable-shared --enable-static && make && make install)
-else
-	(cd $< && rm -f configure; ACLOCAL="aclocal -I m4/" autoreconf -ivf && $(HOSTCC) sh ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
-endif
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --disable-glibtest --disable-gtktest && make && make install)
 	touch $@
 
 CLEAN_FILE += .goom2k4
