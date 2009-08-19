@@ -772,6 +772,8 @@ static void ESNew( demux_t *p_demux, int i_id, int i_lang )
 static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
                            int i_angle )
 {
+    VLC_UNUSED( i_angle );
+
     demux_sys_t *p_sys = p_demux->p_sys;
     int pgc_id = 0, pgn = 0;
     int i;
@@ -1323,19 +1325,19 @@ static void DvdReadFindCell( demux_t *p_demux )
  *****************************************************************************/
 static void DemuxTitles( demux_t *p_demux, int *pi_angle )
 {
+    VLC_UNUSED( pi_angle );
+
     demux_sys_t *p_sys = p_demux->p_sys;
     input_title_t *t;
     seekpoint_t *s;
-    int32_t i_titles;
-    int i;
 
     /* Find out number of titles/chapters */
 #define tt_srpt p_sys->p_vmg_file->tt_srpt
 
-    i_titles = tt_srpt->nr_of_srpts;
+    int32_t i_titles = tt_srpt->nr_of_srpts;
     msg_Dbg( p_demux, "number of titles: %d", i_titles );
 
-    for( i = 0; i < i_titles; i++ )
+    for( int i = 0; i < i_titles; i++ )
     {
         int32_t i_chapters = 0;
         int j;

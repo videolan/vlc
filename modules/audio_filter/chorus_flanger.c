@@ -233,8 +233,10 @@ static inline void sanitize( float * f_value )
 static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
                     aout_buffer_t *p_in_buf, aout_buffer_t *p_out_buf )
 {
+    VLC_UNUSED( p_aout );
+
     struct aout_filter_sys_t *p_sys = p_filter->p_sys;
-    int i, i_chan;
+    int i_chan;
     int i_samples = p_in_buf->i_nb_samples; /* Gives the number of samples */
     int i_maxOffset = (int)floor( p_sys->f_sweepDepth * p_sys->i_sampleRate /
             1000 ); /*maximum number of samples to offset in buffer */
@@ -247,7 +249,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
 
     /* Process each sample */
-    for( i = 0; i < i_samples ; i++ )
+    for( int i = 0; i < i_samples ; i++ )
     {
         /* Use a sine function as a oscillator wave. TODO */
         /* f_offset = sinf( ( p_sys->i_cumulative ) * p_sys->f_sinMultiplier ) *
