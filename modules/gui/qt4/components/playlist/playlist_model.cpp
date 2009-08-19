@@ -255,27 +255,34 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
         }
         else
         {
-            QList<int> ids;
+            QList<playlist_item_t*> items;
             while( !stream.atEnd() )
             {
                 int id;
                 stream >> id;
-                ids.append(id);
-            }
-            int count = ids.size();
-            playlist_item_t *items[count];
-            for( int i = 0; i < count; i++ )
-            {
-                playlist_item_t *item = playlist_ItemGetById( p_playlist, ids[i] );
-                if( !item )
+                playlist_item_t *item = playlist_ItemGetById( p_playlist, id );
+                if( !item ) continue;
+                /* better not try to move a node into itself: */
+                if( item->i_children > 0 )
                 {
-                    PL_UNLOCK;
-                    return false;
+                    playlist_item_t *climber = p_parent;
+                    while( climber )
+                    {
+                        if( climber == item ) break;
+                        climber = climber->p_parent;
+                    }
+                    if( climber ) continue;
                 }
-                items[i] = item;
+                items.append( item );
             }
-            playlist_TreeMoveMany( p_playlist, count, items, p_parent,
-                (row == -1 ? p_parent->i_children : row) );
+            int count = items.size();
+            if( count )
+            {
+                playlist_item_t *pp_items[count];
+                for( int i = 0; i < count; i++ ) pp_items[i] = items[i];
+                playlist_TreeMoveMany( p_playlist, count, pp_items, p_parent,
+                    (row == -1 ? p_parent->i_children : row) );
+            }
         }
 
         PL_UNLOCK;
