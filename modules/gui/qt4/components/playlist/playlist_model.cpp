@@ -708,11 +708,9 @@ void PLModel::ProcessItemAppend( const playlist_add_t *p_add )
     newItem = new PLItem( p_item, nodeItem );
     PL_UNLOCK;
 
-    emit layoutAboutToBeChanged();
-    emit beginInsertRows( index( newItem, 0 ), nodeItem->childCount(), nodeItem->childCount()+1 );
+    beginInsertRows( index( nodeItem, 0 ), nodeItem->childCount(), nodeItem->childCount() );
     nodeItem->appendChild( newItem );
-    emit endInsertRows();
-    emit layoutChanged();
+    endInsertRows();
     UpdateTreeItem( newItem, true );
     return;
 end:
@@ -734,20 +732,8 @@ void PLModel::rebuild( playlist_item_t *p_root )
     /* Invalidate cache */
     i_cached_id = i_cached_input_id = -1;
 
-    emit layoutAboutToBeChanged();
+    if( rootItem ) RemoveChildren( rootItem );
 
-    /* Clear the tree */
-    if( rootItem )
-    {
-        if( rootItem->children.size() )
-        {
-            emit beginRemoveRows( index( rootItem, 0 ), 0,
-                    rootItem->children.size() -1 );
-            qDeleteAll( rootItem->children );
-            rootItem->children.clear();
-            emit endRemoveRows();
-        }
-    }
     PL_LOCK;
     if( p_root )
     {
@@ -756,7 +742,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
     }
     assert( rootItem );
     /* Recreate from root */
-    UpdateNodeChildren( rootItem );
+    UpdateChildren( rootItem );
     if( (p_item = playlist_CurrentPlayingItem(p_playlist)) )
         currentItem = FindByInput( rootItem, p_item->p_input->i_id );
     else
@@ -764,33 +750,38 @@ void PLModel::rebuild( playlist_item_t *p_root )
     PL_UNLOCK;
 
     /* And signal the view */
+    reset();
     emit currentChanged( index( currentItem, 0 ) );
-    emit layoutChanged();
+
     addCallbacks();
 }
 
-/* This function must be entered WITH the playlist lock */
-void PLModel::UpdateNodeChildren( PLItem *root )
+void PLModel::RemoveChildren( PLItem *root )
 {
-    emit layoutAboutToBeChanged();
-    playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id );
-    UpdateNodeChildren( p_node, root );
-    emit layoutChanged();
+  if( root->children.size() )
+  {
+      qDeleteAll( root->children );
+      root->children.clear();
+  }
 }
 
 /* This function must be entered WITH the playlist lock */
-void PLModel::UpdateNodeChildren( playlist_item_t *p_node, PLItem *root )
+void PLModel::UpdateChildren( PLItem *root )
+{
+    playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id );
+    UpdateChildren( p_node, root );
+}
+
+/* This function must be entered WITH the playlist lock */
+void PLModel::UpdateChildren( playlist_item_t *p_node, PLItem *root )
 {
     for( int i = 0; i < p_node->i_children ; i++ )
     {
         if( p_node->pp_children[i]->i_flags & PLAYLIST_DBL_FLAG ) continue;
         PLItem *newItem =  new PLItem( p_node->pp_children[i], root );
-        emit beginInsertRows( index( newItem, 0 ), root->childCount(), root->childCount()+1 );
         root->appendChild( newItem );
-        emit endInsertRows();
-        UpdateTreeItem( newItem, true, true );
         if( i_depth == DEPTH_PL && p_node->pp_children[i]->i_children != -1 )
-            UpdateNodeChildren( p_node->pp_children[i], newItem );
+            UpdateChildren( p_node->pp_children[i], newItem );
     }
 }
 
@@ -860,10 +851,10 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
         playlist_NodeDelete( p_playlist, p_item, true, false );
     PL_UNLOCK;
     /* And finally, remove it from the tree */
-    emit beginRemoveRows( index( item->parentItem, 0), item->parentItem->children.indexOf( item ),
-            item->parentItem->children.indexOf( item )+1 );
+    int itemIndex = item->parentItem->children.indexOf( item );
+    beginRemoveRows( index( item->parentItem, 0), itemIndex, itemIndex );
     item->remove( item, i_depth );
-    emit endRemoveRows();
+    endRemoveRows();
 }
 
 /******* Volume III: Sorting and searching ********/
@@ -885,12 +876,21 @@ void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
         if( column == i_index )
         {
             i_flag = i_column;
-            goto next;
+            break;
         }
     }
 
+    PLItem *item = FindById( rootItem, i_root_id );
+    if( !item ) return;
+    QModelIndex qIndex = index( item, 0 );
+    int count = item->children.size();
+    if( count )
+    {
+        beginRemoveRows( qIndex, 0, count - 1 );
+        RemoveChildren( item );
+        endRemoveRows( );
+    }
 
-next:
     PL_LOCK;
     {
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
@@ -903,8 +903,13 @@ next:
                                             ORDER_NORMAL : ORDER_REVERSE );
         }
     }
+    if( count )
+    {
+        beginInsertRows( qIndex, 0, count - 1 );
+        UpdateChildren( item );
+        endInsertRows( );
+    }
     PL_UNLOCK;
-    rebuild();
 }
 
 void PLModel::search( const QString& search_text )
@@ -991,32 +996,27 @@ void PLModel::viewchanged( int meta )
             _meta >>= 1;
         }
 
-        /* UNUSED        emit layoutAboutToBeChanged(); */
         index = __MIN( index, columnCount() );
         QModelIndex parent = createIndex( 0, 0, rootItem );
-
-        emit layoutAboutToBeChanged();
 
         if( i_showflags & meta )
             /* Removing columns */
         {
-            emit beginRemoveColumns( parent, index, index+1 );
+            beginRemoveColumns( parent, index, index+1 );
             i_showflags &= ~( meta );
             getSettings()->setValue( "qt-pl-showflags", i_showflags );
-            emit endRemoveColumns();
+            endRemoveColumns();
         }
         else
         {
             /* Adding columns */
-            emit beginInsertColumns( parent, index, index+1 );
+            beginInsertColumns( parent, index, index+1 );
             i_showflags |= meta;
             getSettings()->setValue( "qt-pl-showflags", i_showflags );
-            emit endInsertColumns();
+            endInsertColumns();
         }
 
         emit columnsChanged( meta );
-        emit layoutChanged();
-
     }
 }
 

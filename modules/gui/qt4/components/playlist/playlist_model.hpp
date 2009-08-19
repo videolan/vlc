@@ -147,13 +147,14 @@ private:
     void ProcessItemRemoval( int i_id );
     void ProcessItemAppend( const playlist_add_t *p_add );
 
-    void UpdateTreeItem( PLItem *, bool, bool force = false );
-    void UpdateNodeChildren( PLItem * );
-    void UpdateNodeChildren( playlist_item_t *, PLItem * );
-
     /* Actions */
     void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList );
     void doDeleteItem( PLItem *item, QModelIndexList *fullList );
+    void UpdateTreeItem( PLItem *, bool, bool force = false );
+    /* The following actions will not signal the view! */
+    void RemoveChildren( PLItem * );
+    void UpdateChildren( PLItem * );
+    void UpdateChildren( playlist_item_t *, PLItem * );
 
     /* Popup */
     int i_popup_item, i_popup_parent, i_popup_column;
