@@ -48,7 +48,6 @@ using namespace std;
 
 #include <dshow.h>
 #include <comcat.h>
-#include <ks.h>
 #include "bdadefs.h"
 #include "bda.h"
 
