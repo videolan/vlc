@@ -611,7 +611,7 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
 #undef CACHE
 #undef ICACHE
 
-PLItem *PLModel::getItem( const QModelIndex& index ) const
+PLItem *PLModel::getItem( QModelIndex index )
 {
     assert( index.isValid() );
     return static_cast<PLItem*>( index.internalPointer() );
