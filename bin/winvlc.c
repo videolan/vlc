@@ -42,8 +42,10 @@
 #   include <shlobj.h>
 #   include <tlhelp32.h>
 #   include <wininet.h>
+# ifndef _WIN64
 static void check_crashdump();
 LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo);
+# endif
 #endif
 
 #ifndef UNDER_CE
@@ -141,11 +143,13 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     argv[argc] = NULL;
     LocalFree (wargv);
 
+# ifndef _WIN64
     if(crash_handling)
     {
         check_crashdump();
         SetUnhandledExceptionFilter(vlc_exception_filter);
     }
+# endif /* WIN64 */
 
 #else
     char **argv, psz_cmdline[wcslen(lpCmdLine) * 4];
@@ -183,7 +187,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     return ret;
 }
 
-#if !defined( UNDER_CE )
+#if !defined( UNDER_CE ) && !defined( _WIN64 )
 
 static void get_crashdump_path(wchar_t * wdir)
 {
