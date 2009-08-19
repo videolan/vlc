@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2008 the VideoLAN team
+ Copyright © 2009 the VideoLAN team
 
  Authors: Konstantin Pavlov (thresh@videolan.org)
 
