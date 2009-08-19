@@ -186,7 +186,8 @@ static bool parse_playlist_node COMPLEX_INTERFACE
         if( !psz_name || !psz_value )
         {
             msg_Err( p_demux, "invalid xml stream @ <playlist>" );
-            FREE_ATT();
+            free( psz_name );
+            free( psz_value );
             return false;
         }
         /* attribute: version */
@@ -612,7 +613,6 @@ static bool set_item_info SIMPLE_INTERFACE
     if( !psz_name || !psz_value || !p_input )
         return false;
 
-
     /* re-convert xml special characters inside psz_value */
     resolve_xml_special_chars( psz_value );
 
@@ -882,19 +882,18 @@ static bool parse_extitem_node COMPLEX_INTERFACE
 {
     VLC_UNUSED(psz_element);
     input_item_t *p_new_input = NULL;
-    char *psz_name = NULL;
-    char *psz_value = NULL;
     int i_tid = -1;
 
     /* read all extension item attributes */
     while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
     {
-        psz_name = xml_ReaderName( p_xml_reader );
-        psz_value = xml_ReaderValue( p_xml_reader );
+        char *psz_name = xml_ReaderName( p_xml_reader );
+        char *psz_value = xml_ReaderValue( p_xml_reader );
         if( !psz_name || !psz_value )
         {
             msg_Err( p_demux, "invalid xml stream @ <vlc:item>" );
-            FREE_ATT();
+            free( psz_name );
+            free( psz_value );
             return false;
         }
         /* attribute: href */
@@ -906,7 +905,8 @@ static bool parse_extitem_node COMPLEX_INTERFACE
         else
             msg_Warn( p_demux, "invalid <vlc:item> attribute:\"%s\"", psz_name);
 
-        FREE_ATT();
+        free( psz_name );
+        free( psz_value );
     }
 
     /* attribute href is mandatory */
@@ -943,13 +943,12 @@ static bool parse_extitem_node COMPLEX_INTERFACE
 static bool skip_element COMPLEX_INTERFACE
 {
     VLC_UNUSED(p_demux); VLC_UNUSED(p_input_item);
-    char *psz_endname;
 
     while( xml_ReaderRead( p_xml_reader ) == 1 )
     {
         if( xml_ReaderNodeType( p_xml_reader ) == XML_READER_ENDELEM )
         {
-            psz_endname = xml_ReaderName( p_xml_reader );
+            char *psz_endname = xml_ReaderName( p_xml_reader );
             if( !psz_endname )
                 return false;
             if( !strcmp( psz_element, psz_endname ) )
