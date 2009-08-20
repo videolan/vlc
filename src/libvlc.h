@@ -27,8 +27,6 @@
 
 typedef struct variable_t variable_t;
 
-extern const char vlc_usage[];
-
 /* Actions (hot keys) */
 typedef struct action
 {
