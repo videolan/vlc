@@ -28,6 +28,10 @@ int
 CDDADebugCB   ( vlc_object_t *p_this, const char *psz_name,
                     vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
+    VLC_UNUSED(p_this);
+    VLC_UNUSED(psz_name);
+    VLC_UNUSED(oldval);
+    VLC_UNUSED(p_data);
     cdda_data_t *p_cdda;
 
     if (NULL == p_cdda_input) return VLC_EGENERIC;
@@ -49,6 +53,11 @@ int
 CDDBEnabledCB   ( vlc_object_t *p_this, const char *psz_name,
                       vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
+    VLC_UNUSED(p_this);
+    VLC_UNUSED(psz_name);
+    VLC_UNUSED(oldval);
+    VLC_UNUSED(p_data);
+
     cdda_data_t *p_cdda;
 
     if (NULL == p_cdda_input) return VLC_EGENERIC;
@@ -71,6 +80,11 @@ int
 CDTextEnabledCB   ( vlc_object_t *p_this, const char *psz_name,
                         vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
+    VLC_UNUSED(p_this);
+    VLC_UNUSED(psz_name);
+    VLC_UNUSED(oldval);
+    VLC_UNUSED(p_data);
+    
     cdda_data_t *p_cdda;
 
     if (NULL == p_cdda_input) return VLC_EGENERIC;
@@ -90,6 +104,11 @@ int
 CDDANavModeCB( vlc_object_t *p_this, const char *psz_name,
                         vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
+    VLC_UNUSED(p_this);
+    VLC_UNUSED(psz_name);
+    VLC_UNUSED(oldval);
+    VLC_UNUSED(p_data);
+    
     cdda_data_t *p_cdda;
 
     if (NULL == p_cdda_input) return VLC_EGENERIC;
@@ -110,6 +129,11 @@ int
 CDTextPreferCB   ( vlc_object_t *p_this, const char *psz_name,
                        vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
+    VLC_UNUSED(p_this);
+    VLC_UNUSED(psz_name);
+    VLC_UNUSED(oldval);
+    VLC_UNUSED(p_data);
+    
     cdda_data_t *p_cdda;
 
     if (NULL == p_cdda_input) return VLC_EGENERIC;
@@ -132,6 +156,11 @@ int
 CDDABlocksPerReadCB ( vlc_object_t *p_this, const char *psz_name,
                           vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
+    VLC_UNUSED(p_this);
+    VLC_UNUSED(psz_name);
+    VLC_UNUSED(oldval);
+    VLC_UNUSED(p_data);
+    
     cdda_data_t *p_cdda;
 
     if (NULL == p_cdda_input) return VLC_EGENERIC;

@@ -532,6 +532,7 @@ char *
 CDDAFormatStr( const access_t *p_access, cdda_data_t *p_cdda,
                const char format_str[], const char *psz_mrl, track_t i_track)
 {
+    VLC_UNUSED(p_access);
 #define TEMP_STR_SIZE 256
 #define TEMP_STR_LEN (TEMP_STR_SIZE-1)
     static char temp_str[TEMP_STR_SIZE];
