@@ -164,7 +164,6 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
 
     val = -1;
 
-    int fd6 = -1;
     for (const struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
         int fd = net_Socket (obj, ptr->ai_family, ptr->ai_socktype,
