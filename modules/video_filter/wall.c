@@ -397,7 +397,6 @@ static int Filter( video_splitter_t *p_splitter, picture_t *pp_dst[], picture_t 
             if( !p_output->b_active )
                 continue;
 
-            video_splitter_output_t *p_cfg = &p_splitter->p_output[p_output->i_output];
             picture_t *p_dst = pp_dst[p_output->i_output];
 
             /* */
@@ -422,6 +421,7 @@ static int Mouse( video_splitter_t *p_splitter, vlc_mouse_t *p_mouse,
                   int i_index,
                   const vlc_mouse_t *p_old, const vlc_mouse_t *p_new )
 {
+    VLC_UNUSED(p_old);
     video_splitter_sys_t *p_sys = p_splitter->p_sys;
 
     for( int y = 0; y < p_sys->i_row; y++ )
