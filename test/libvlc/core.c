@@ -26,7 +26,6 @@
 static void test_core (const char ** argv, int argc)
 {
     libvlc_instance_t *vlc;
-    int id;
 
     log ("Testing core\n");
 
