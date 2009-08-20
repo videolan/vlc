@@ -1009,8 +1009,9 @@ RDC_PROG_CC_FLAGS_IFELSE([-pipe])
 AC_ARG_ENABLE(warnings-as-error,
       AS_HELP_STRING([--enable-warnings-as-error],[Treat acceptable warnings as error (default in debug)]),, [enable_warnings_as_error="$enable_debug"])
 AS_IF([test "${enable_warnings_as_error}" = "yes"], [
-    RDC_PROG_CC_WERRORFLAGS([unused-function unused-label unused-value unused-parameter unused-variable unused])
-])
+    RDC_PROG_CC_WERRORFLAGS([unused-function unused-label unused-value unused-parameter unused-variable unused \
+     missing-braces nonnull parentheses uninitialized address enum-compare undef comment switch ignored])
+    ])
 
 dnl Check for various optimization flags
 AC_CACHE_CHECK([if \$CC accepts -Os],
