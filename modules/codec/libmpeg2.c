@@ -103,7 +103,9 @@ static int  OpenDecoder( vlc_object_t * );
 static void CloseDecoder( vlc_object_t * );
 
 static picture_t *DecodeBlock( decoder_t *, block_t ** );
+#if MPEG2_RELEASE >= MPEG2_VERSION (0, 5, 0)
 static block_t   *GetCc( decoder_t *p_dec, bool pb_present[4] );
+#endif
 
 static picture_t *GetNewPicture( decoder_t * );
 static void PutPicture( decoder_t *, picture_t * );
@@ -671,6 +673,7 @@ static picture_t *GetNewPicture( decoder_t *p_dec )
     return p_pic;
 }
 
+#if MPEG2_RELEASE >= MPEG2_VERSION (0, 5, 0)
 /*****************************************************************************
  * GetCc: Retrieves the Closed Captions for the CC decoder.
  *****************************************************************************/
@@ -697,6 +700,7 @@ static block_t *GetCc( decoder_t *p_dec, bool pb_present[4] )
     cc_Flush( &p_sys->cc );
     return p_cc;
 }
+#endif
 
 /*****************************************************************************
  * GetAR: Get aspect ratio
