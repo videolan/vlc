@@ -1765,6 +1765,7 @@ static int Mux( sout_mux_t *p_mux )
 #define STD_PES_PAYLOAD 170
 static block_t *FixPES( sout_mux_t *p_mux, block_fifo_t *p_fifo )
 {
+    VLC_UNUSED(p_mux);
     block_t *p_data;
     size_t i_size;
 
@@ -2003,6 +2004,7 @@ static void TSDate( sout_mux_t *p_mux, sout_buffer_chain_t *p_chain_ts,
 static block_t *TSNew( sout_mux_t *p_mux, ts_stream_t *p_stream,
                        bool b_pcr )
 {
+    VLC_UNUSED(p_mux);
     block_t *p_pes = p_stream->chain_pes.p_first;
     block_t *p_ts;
 
@@ -2222,6 +2224,7 @@ static void PEStoTS( sout_instance_t *p_sout,
                      sout_buffer_chain_t *c, block_t *p_pes,
                      ts_stream_t *p_stream )
 {
+    VLC_UNUSED(p_sout);
     uint8_t *p_data;
     int     i_size;
     int     b_new_pes;
@@ -2313,6 +2316,7 @@ static void PEStoTS( sout_instance_t *p_sout,
 static block_t *WritePSISection( sout_instance_t *p_sout,
                                        dvbpsi_psi_section_t* p_section )
 {
+    VLC_UNUSED(p_sout);
     block_t   *p_psi, *p_first = NULL;
 
     while( p_section )
