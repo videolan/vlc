@@ -494,12 +494,10 @@ static void* update_DownloadReal( vlc_object_t *p_this );
  * Download the file given in the update_t
  *
  * \param p_update structure
- * \param destination to store the download file
- *        This can be an existing dir, a (non)existing target fullpath filename or
- *        NULL for the current working dir.
+ * \param dir to store the download file
  * \return nothing
  */
-void update_Download( update_t *p_update, const char *destination )
+void update_Download( update_t *p_update, const char *psz_destdir )
 {
     assert( p_update );
 
@@ -519,7 +517,7 @@ void update_Download( update_t *p_update, const char *destination )
 
     p_udt->p_update = p_update;
     p_update->p_download = p_udt;
-    p_udt->psz_destination = destination ? strdup( destination ) : NULL;
+    p_udt->psz_destdir = psz_destdir ? strdup( psz_destdir ) : NULL;
 
     vlc_thread_create( p_udt, "download update", update_DownloadReal,
                        VLC_THREAD_PRIORITY_LOW );
@@ -546,7 +544,7 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     int canc;
 
     update_t *p_update = p_udt->p_update;
-    char *psz_destination = p_udt->psz_destination;
+    char *psz_destdir = p_udt->psz_destdir;
 
     msg_Dbg( p_udt, "Opening Stream '%s'", p_update->release.psz_url );
     canc = vlc_savecancel ();
@@ -572,13 +570,13 @@ static void* update_DownloadReal( vlc_object_t *p_this )
     }
     psz_tmpdestfile++;
 
-    if( utf8_stat( psz_destination, &p_stat) == 0 && (p_stat.st_mode & S_IFDIR) )
+    if( utf8_stat( psz_destdir, &p_stat) == 0 && (p_stat.st_mode & S_IFDIR) )
     {
-        if( asprintf( &psz_destfile, "%s%c%s", psz_destination, DIR_SEP_CHAR, psz_tmpdestfile ) == -1 )
+        if( asprintf( &psz_destfile, "%s%c%s", psz_destdir, DIR_SEP_CHAR, psz_tmpdestfile ) == -1 )
             goto end;
     }
-    else if( psz_destination )
-        psz_destfile = strdup( psz_destination );
+    else if( psz_destdir )
+        psz_destfile = strdup( psz_destdir );
     else
         psz_destfile = strdup( psz_tmpdestfile );
 
@@ -741,7 +739,7 @@ end:
         stream_Delete( p_stream );
     if( p_file )
         fclose( p_file );
-    free( psz_destination );
+    free( psz_destdir );
     free( psz_destfile );
     free( p_buffer );
     free( psz_size );
