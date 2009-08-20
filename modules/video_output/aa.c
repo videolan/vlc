@@ -194,6 +194,8 @@ static void Prepare(vout_display_t *vd, picture_t *picture)
                            red[ i ], green[ i ], blue[ i ]);
         }
     }
+#else
+    VLC_UNUSED(picture);
 #endif
 
     aa_fastrender(sys->aa_context, 0, 0,
@@ -216,6 +218,7 @@ static void Display(vout_display_t *vd, picture_t *picture)
  */
 static int Control(vout_display_t *vd, int query, va_list args)
 {
+    VLC_UNUSED(args);
     vout_display_sys_t *sys = vd->sys;
 
     switch (query) {
