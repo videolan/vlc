@@ -409,6 +409,7 @@ void __config_PutFloat( vlc_object_t *p_this,
  *****************************************************************************/
 module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
 {
+    VLC_UNUSED(p_this);
     module_t *p_parser;
 
     if( !psz_name ) return NULL;
@@ -533,6 +534,7 @@ void config_UnsetCallbacks( module_config_t *p_new, size_t n )
  *****************************************************************************/
 void __config_ResetAll( vlc_object_t *p_this )
 {
+    VLC_UNUSED(p_this);
     module_t *p_module;
     module_t **list = module_list_get (NULL);
 
