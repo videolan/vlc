@@ -126,6 +126,8 @@ static int paCallback( const void *inputBuffer, void *outputBuffer,
                        const PaStreamCallbackTimeInfo *paDate,
                        PaStreamCallbackFlags statusFlags, void *p_cookie )
 {
+    VLC_UNUSED( inputBuffer ); VLC_UNUSED( statusFlags );
+
     struct aout_sys_t *p_sys = (struct aout_sys_t*) p_cookie;
     aout_instance_t   *p_aout = p_sys->p_aout;
     aout_buffer_t     *p_buffer;
@@ -169,7 +171,6 @@ static int Open( vlc_object_t * p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     struct aout_sys_t * p_sys;
-    int i_err;
 
     msg_Dbg( p_aout, "entering Open()");
 
@@ -188,6 +189,8 @@ static int Open( vlc_object_t * p_this )
 #ifdef PORTAUDIO_IS_SERIOUSLY_BROKEN
     if( !b_init )
     {
+        int i_err;
+
         /* Test device */
         if( PAOpenDevice( p_aout ) != VLC_SUCCESS )
         {
