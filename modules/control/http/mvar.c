@@ -335,6 +335,7 @@ mvar_t *mvar_InfoSetNew( char *name, input_thread_t *p_input )
 mvar_t *mvar_ObjectSetNew( intf_thread_t *p_intf, char *psz_name,
                                const char *psz_capability )
 {
+    VLC_UNUSED(p_intf);
     mvar_t *s = mvar_New( psz_name, "set" );
     size_t i;
 
