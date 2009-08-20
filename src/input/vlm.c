@@ -73,6 +73,8 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval,
                        void *p_data )
 {
+    VLC_UNUSED(psz_cmd);
+    VLC_UNUSED(oldval);
     input_thread_t *p_input = (input_thread_t *)p_this;
     vlm_t *p_vlm = libvlc_priv( p_input->p_libvlc )->p_vlm;
     vlm_media_sys_t *p_media = p_data;
