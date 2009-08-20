@@ -908,7 +908,7 @@ VCDOpen ( vlc_object_t *p_this )
         goto err_exit;
     }
 
-    p_vcdplayer->b_svd= (bool) vcdinfo_get_tracksSVD(p_vcdplayer->vcd);;
+    p_vcdplayer->b_svd = vcdinfo_get_tracksSVD(p_vcdplayer->vcd);
 
     /* Get track information. */
     p_vcdplayer->i_tracks = vcdinfo_get_num_tracks(p_vcdplayer->vcd);
