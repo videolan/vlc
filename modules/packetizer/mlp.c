@@ -56,15 +56,15 @@ vlc_module_end ()
 typedef struct
 {
     int i_type;
-    int i_rate;
-    int i_channels;
+    unsigned i_rate;
+    unsigned i_channels;
     int i_channels_conf;
-    int i_samples;
+    unsigned i_samples;
 
     bool b_vbr;
-    int  i_bitrate;
+    unsigned  i_bitrate;
 
-    int  i_substreams;
+    unsigned  i_substreams;
 
 } mlp_header_t;
 
@@ -392,7 +392,10 @@ static int MlpParse( mlp_header_t *p_mlp, const uint8_t p_hdr[MLP_HEADER_SYNC] )
         bs_skip( &s, 4 + 4 );
 
         i_rate_idx1 = bs_read( &s, 4 );
-        const int i_rate_idx2 = bs_read( &s, 4 );
+
+        // Just skip the 4 following, since we don't use it
+        // const int i_rate_idx2 = bs_read( &s, 4 );
+        bs_skip( &s, 4 );
 
         bs_skip( &s, 11 );
 
@@ -465,7 +468,7 @@ static int SyncInfo( const uint8_t *p_hdr, bool *pb_mlp, mlp_header_t *p_mlp )
         int i_tmp = 0 ^ p_hdr[0] ^ p_hdr[1] ^ p_hdr[2] ^ p_hdr[3];
         const uint8_t *p = &p_hdr[4 + ( b_has_sync ? 28 : 0 )];
 
-        for( int i = 0; i < p_mlp->i_substreams; i++ )
+        for( unsigned i = 0; i < p_mlp->i_substreams; i++ )
         {
             i_tmp ^= *p++;
             i_tmp ^= *p++;
