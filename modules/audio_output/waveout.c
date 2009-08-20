@@ -1,10 +1,11 @@
 /*****************************************************************************
  * waveout.c : Windows waveOut plugin for vlc
  *****************************************************************************
- * Copyright (C) 2001 the VideoLAN team
+ * Copyright (C) 2001-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
+ *          André Weber
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -125,7 +126,7 @@ static void Probe        ( aout_instance_t * );
 static int OpenWaveOut   ( aout_instance_t *, uint32_t,
                            int, int, int, int, bool );
 static int OpenWaveOutPCM( aout_instance_t *, uint32_t,
-                           int*, int, int, int, bool );
+                           vlc_fourcc_t*, int, int, int, bool );
 static int PlayWaveOut   ( aout_instance_t *, HWAVEOUT, WAVEHDR *,
                            aout_buffer_t *, bool );
 
@@ -453,7 +454,7 @@ static int Open( vlc_object_t *p_this )
 static void Probe( aout_instance_t * p_aout )
 {
     vlc_value_t val, text;
-    int i_format;
+    vlc_fourcc_t i_format;
     unsigned int i_physical_channels;
 
     var_Create( p_aout, "audio-device", VLC_VAR_INTEGER | VLC_VAR_HASCHOICE );
@@ -801,7 +802,8 @@ static int OpenWaveOut( aout_instance_t *p_aout, uint32_t i_device_id, int i_for
 /*****************************************************************************
  * OpenWaveOutPCM: open a PCM waveout sound device
  ****************************************************************************/
-static int OpenWaveOutPCM( aout_instance_t *p_aout, uint32_t i_device_id, int *i_format,
+static int OpenWaveOutPCM( aout_instance_t *p_aout, uint32_t i_device_id,
+                           vlc_fourcc_t *i_format,
                            int i_channels, int i_nb_channels, int i_rate,
                            bool b_probe )
 {
