@@ -73,7 +73,7 @@ typedef struct commandparams_t
 
 typedef struct commanddesc_t
 {
-    const char *psz_command;
+    char *psz_command;
     bool b_atomic;
     int ( *pf_parser ) ( char *psz_command, char *psz_end,
                          commandparams_t *p_params );
