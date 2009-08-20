@@ -318,7 +318,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         pf = (double*) va_arg( args, double* );
         if( p_sys->i_length > 0 )
         {
-            *pf = (double)date_Get( &p_sys->pts ) / (double)p_sys->i_length;
+            double current = date_Get( &p_sys->pts );
+            double length = p_sys->i_length;
+            *pf = current / length;
             return VLC_SUCCESS;
         }
         return VLC_EGENERIC;
