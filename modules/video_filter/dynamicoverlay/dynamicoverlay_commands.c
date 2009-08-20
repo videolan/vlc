@@ -792,7 +792,7 @@ static int exec_StartAtomic( filter_t *p_filter,
 /*****************************************************************************
  * Command functions
  *****************************************************************************/
-static const commanddesc_t p_commands[] =
+static const commanddesc_static_t p_commands[] =
 {
     {   .psz_command = "DataSharedMem",
         .b_atomic = true,
