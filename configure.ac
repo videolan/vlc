@@ -250,8 +250,6 @@ case "${host_os}" in
         echo "  Assuming --enable-vcdx"
         enable_caca="yes"
         echo "  Assuming --enable-caca"
-        enable_goom="yes"
-        echo "  Assuming --enable-goom"
         enable_ncurses="yes"
         echo "  Assuming --enable-ncurses"
         enable_twolame="yes"
