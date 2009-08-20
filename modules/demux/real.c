@@ -135,7 +135,7 @@ struct demux_sys_t
     int          i_track;
     real_track_t **track;
 
-    int     i_buffer;
+    size_t     i_buffer;
     uint8_t buffer[65536];
 
     int64_t     i_pcr;
@@ -299,20 +299,17 @@ static int Demux( demux_t *p_demux )
     if( stream_Read( p_demux->s, header, 12 ) < 12 )
         return 0;
     //const int i_version = GetWBE( &header[0] );
-    const int     i_size = GetWBE( &header[2] ) - 12;
+    const size_t  i_size = GetWBE( &header[2] ) - 12;
     const int     i_id   = GetWBE( &header[4] );
     const int64_t i_pts  = 1 + 1000 * GetDWBE( &header[6] );
     const int     i_flags= header[11]; /* flags 0x02 -> keyframe */
 
     p_sys->i_data_packets++;
-
-    if( i_size <= 0 )
+    if( i_size > sizeof(p_sys->buffer) )
     {
         msg_Err( p_demux, "Got a NUKK size to read. (Invalid format?)" );
         return 1;
     }
-
-    assert( i_size <= sizeof(p_sys->buffer) );
 
     p_sys->i_buffer = stream_Read( p_demux->s, p_sys->buffer, i_size );
     if( p_sys->i_buffer < i_size )
@@ -729,13 +726,13 @@ static void DemuxAudioMethod2( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
     if( p_sys->i_buffer < 2 )
         return;
 
-    int i_sub = (p_sys->buffer[1] >> 4)&0x0f;
+    unsigned i_sub = (p_sys->buffer[1] >> 4)&0x0f;
     if( p_sys->i_buffer < 2+2*i_sub )
         return;
 
     uint8_t *p_sub = &p_sys->buffer[2+2*i_sub];
 
-    for( int i = 0; i < i_sub; i++ )
+    for( unsigned i = 0; i < i_sub; i++ )
     {
         const int i_sub_size = GetWBE( &p_sys->buffer[2+i*2] );
         block_t *p_block = block_New( p_demux, i_sub_size );
@@ -1060,7 +1057,8 @@ static int HeaderMDPR( demux_t *p_demux )
     if( i_size > 0 )
     {
         CodecParse( p_demux, i_size, i_num );
-        if( stream_Read( p_demux->s, NULL, i_size ) < i_size )
+        unsigned size = stream_Read( p_demux->s, NULL, i_size );
+        if( size < i_size )
             return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
