@@ -957,7 +957,6 @@ static void StartTitle( input_thread_t * p_input )
         p_input->p->i_run = 0;
     }
 
-    const mtime_t i_length = var_GetTime( p_input, "length" );
     if( p_input->p->i_start > 0 )
     {
         vlc_value_t s;
