@@ -438,16 +438,6 @@ static void DestroyFilter( vlc_object_t *p_this )
 }
 
 /*****************************************************************************
- * MosaicReleasePicture : Hack to avoid picture duplication
- *****************************************************************************/
-static void MosaicReleasePicture( picture_t *p_picture )
-{
-    picture_t *p_original_pic = (picture_t *)p_picture->p_sys;
-
-    picture_Release( p_original_pic );
-}
-
-/*****************************************************************************
  * Filter
  *****************************************************************************/
 static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
