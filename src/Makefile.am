@@ -417,6 +417,7 @@ SOURCES_libvlc_common = \
 	misc/error.c \
 	misc/update.h \
 	misc/update.c \
+	misc/update_crypto.c \
 	misc/xml.c \
 	misc/devices.c \
 	extras/libc.c \

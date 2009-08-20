@@ -63,7 +63,6 @@ VLC_EXPORT( void, update_Check, ( update_t *, void (*callback)( void*, bool ), v
 VLC_EXPORT( bool, update_NeedUpgrade, ( update_t * ) );
 VLC_EXPORT( void, update_Download, ( update_t *, const char* ) );
 VLC_EXPORT( update_release_t*, update_GetRelease, ( update_t * ) );
-VLC_EXPORT( void, update_WaitDownload, ( update_t * ) );
 
 /**
  * @}

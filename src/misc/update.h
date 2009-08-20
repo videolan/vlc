@@ -37,6 +37,8 @@
  * XXX
  */
 
+#include <vlc_update.h>
+
 enum    /* Public key algorithms */
 {
     /* we will only use DSA public keys */
@@ -162,6 +164,7 @@ typedef struct
     void (*pf_callback)( void *, bool );
     void *p_data;
 } update_check_thread_t;
+
 /**
  * The update object. Stores (and caches) all information relative to updates
  */
@@ -174,4 +177,59 @@ struct update_t
     update_download_thread_t *p_download;
     update_check_thread_t *p_check;
 };
+
+/*
+ * download a public key (the last one) from videolan server, and parse it
+ */
+public_key_t *
+download_key(
+        vlc_object_t *p_this, const uint8_t *p_longid,
+        const uint8_t *p_signature_issuer );
+
+/*
+ * fill a public_key_t with public key data, including:
+ *   * public key packet
+ *   * signature packet issued by key which long id is p_sig_issuer
+ *   * user id packet
+ */
+int
+parse_public_key(
+        const uint8_t *p_key_data, size_t i_key_len, public_key_t *p_key,
+        const uint8_t *p_sig_issuer );
+
+/*
+ * Verify an OpenPGP signature made on some SHA-1 hash, with some DSA public key
+ */
+int
+verify_signature(
+        uint8_t *p_r, uint8_t *p_s, public_key_packet_t *p_key,
+        uint8_t *p_hash );
+
+/*
+ * Download the signature associated to a document or a binary file.
+ * We're given the file's url, we just append ".asc" to it and download
+ */
+int
+download_signature(
+        vlc_object_t *p_this, signature_packet_t *p_sig, const char *psz_url );
+
+/*
+ * return a sha1 hash of a text
+ */
+uint8_t *
+hash_sha1_from_text(
+        const char *psz_text, signature_packet_t *p_sig );
+
+/*
+ * return a sha1 hash of a file
+ */
+uint8_t *
+hash_sha1_from_file(
+        const char *psz_file, signature_packet_t *p_sig );
+
+/*
+ * return a sha1 hash of a public key
+ */
+uint8_t *
+hash_sha1_from_public_key( public_key_t *p_pkey );
 
