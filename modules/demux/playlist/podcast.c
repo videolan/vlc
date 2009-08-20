@@ -74,7 +74,7 @@ static int Demux( demux_t *p_demux )
     int i_ret;
 
     xml_t *p_xml;
-    xml_reader_t *p_xml_reader;
+    xml_reader_t *p_xml_reader = NULL;
     char *psz_elname = NULL;
     char *psz_item_mrl = NULL;
     char *psz_item_size = NULL;
