@@ -185,7 +185,6 @@ sdpplin_t *sdpplin_parse(char *data)
   char*             buf;
   char*             decoded;
   int               handled;
-  int               len;
 
   desc = calloc( 1, sizeof(sdpplin_t) );
   if( !desc )
