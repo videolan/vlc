@@ -1109,7 +1109,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     /* Check for audio header (old format) */
                     else if( GetDWLE((oggpacket.packet+96)) == 0x05589F81 )
                     {
-                        unsigned int i_extra_size;
+                        int i_extra_size;
                         unsigned int i_format_tag;
 
                         p_stream->fmt.i_cat = AUDIO_ES;
@@ -1220,7 +1220,7 @@ static int Ogg_FindLogicalStreams( demux_t *p_demux )
                     else if( !strncmp( st->streamtype, "audio", 5 ) )
                     {
                         char p_buffer[5];
-                        unsigned int i_extra_size;
+                        int i_extra_size;
                         int i_format_tag;
 
                         st->sh.audio.channels = GetWLE( &oggpacket.packet[1+44] );
