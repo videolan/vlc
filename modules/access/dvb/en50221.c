@@ -415,6 +415,7 @@ static int SPDUSend( access_t * p_access, int i_session_id,
 static void SessionOpen( access_t * p_access, uint8_t i_slot,
                          uint8_t *p_spdu, int i_size )
 {
+    VLC_UNUSED(i_size);
     access_sys_t *p_sys = p_access->p_sys;
     int i_session_id;
     int i_resource_id = ResourceIdToInt( &p_spdu[2] );
@@ -549,6 +550,8 @@ static void SessionCreate( access_t * p_access, int i_slot, int i_resource_id )
 static void SessionCreateResponse( access_t * p_access, uint8_t i_slot,
                                    uint8_t *p_spdu, int i_size )
 {
+    VLC_UNUSED(i_slot);
+    VLC_UNUSED(i_size);
     access_sys_t *p_sys = p_access->p_sys;
     int i_status = p_spdu[2];
     int i_resource_id = ResourceIdToInt( &p_spdu[3] );
@@ -908,6 +911,7 @@ static void ApplicationInformationEnterMenu( access_t * p_access,
 static void ApplicationInformationHandle( access_t * p_access, int i_session_id,
                                           uint8_t *p_apdu, int i_size )
 {
+    VLC_UNUSED(i_session_id);
     int i_tag = APDUGetTag( p_apdu, i_size );
 
     switch ( i_tag )
@@ -1643,6 +1647,7 @@ static char *MMIGetText( access_t *p_access, uint8_t **pp_apdu, int *pi_size )
 static void MMIHandleEnq( access_t *p_access, int i_session_id,
                           uint8_t *p_apdu, int i_size )
 {
+    VLC_UNUSED(i_size);
     access_sys_t *p_sys = p_access->p_sys;
     mmi_t *p_mmi = (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
     int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
@@ -1670,6 +1675,7 @@ static void MMIHandleEnq( access_t *p_access, int i_session_id,
 static void MMIHandleMenu( access_t *p_access, int i_session_id, int i_tag,
                            uint8_t *p_apdu, int i_size )
 {
+    VLC_UNUSED(i_size);
     access_sys_t *p_sys = p_access->p_sys;
     mmi_t *p_mmi = (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
     int i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
