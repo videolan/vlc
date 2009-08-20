@@ -1618,8 +1618,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
 {
     block_t *p_pes = pid->es->p_pes;
     uint8_t header[34];
-    int     i_pes_size = 0;
-    int     i_skip = 0;
+    unsigned i_pes_size = 0;
+    unsigned i_skip = 0;
     mtime_t i_dts = -1;
     mtime_t i_pts = -1;
     mtime_t i_length = 0;
@@ -3198,12 +3198,12 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
     es_format_t *p_fmt = &pid->es->fmt;
 
     ts_teletext_page_t p_page[2 * 64 + 20];
-    int i_page = 0;
+    unsigned i_page = 0;
 
     /* Gather pages informations */
 #if defined _DVBPSI_DR_56_H_ && \
     defined DVBPSI_VERSION && DVBPSI_VERSION_INT > ((0<<16)+(1<<8)+5)
-    for( int i_tag_idx = 0; i_tag_idx < 2; i_tag_idx++ )
+    for( unsigned i_tag_idx = 0; i_tag_idx < 2; i_tag_idx++ )
     {
         dvbpsi_descriptor_t *p_dr = PMTEsFindDescriptor( p_es, i_tag_idx == 0 ? 0x46 : 0x56 );
         if( !p_dr )
@@ -3295,7 +3295,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
     }
     else
     {
-        for( int i = 0; i < i_page; i++ )
+        for( unsigned i = 0; i < i_page; i++ )
         {
             ts_es_t *p_es;
 
