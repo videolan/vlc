@@ -40,6 +40,7 @@ void libvlc_playlist_play( libvlc_instance_t *p_instance, int i_id,
 {
     playlist_t *pl = libvlc_priv (p_instance->p_libvlc_int)->p_playlist;
     VLC_UNUSED(i_id); VLC_UNUSED(i_options); VLC_UNUSED(ppsz_options);
+    VLC_UNUSED(p_e);
 
     assert( pl );
     if( pl->items.i_size == 0 )

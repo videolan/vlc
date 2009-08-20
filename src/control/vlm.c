@@ -37,13 +37,12 @@
 static int VlmEvent( vlc_object_t *p_this, const char * name,
                      vlc_value_t old_val, vlc_value_t newval, void *param )
 {
+    VLC_UNUSED(p_this);
+    VLC_UNUSED(name);
+    VLC_UNUSED(old_val);    
     vlm_event_t *event = (vlm_event_t*)newval.p_address;
     libvlc_event_manager_t *p_event_manager = (libvlc_event_manager_t *) param;
     libvlc_event_t libvlc_event;
-
-    VLC_UNUSED( p_this );
-    VLC_UNUSED( name );
-    VLC_UNUSED( old_val );
 
     libvlc_event.u.vlm_media_event.psz_instance_name = NULL;
     libvlc_event.u.vlm_media_event.psz_media_name = event->psz_name;
@@ -183,6 +182,7 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance,
 void libvlc_vlm_release( libvlc_instance_t *p_instance,
                          libvlc_exception_t *p_exception)
 {
+    VLC_UNUSED(p_exception);
     libvlc_vlm_release_internal( p_instance );
 }
 
