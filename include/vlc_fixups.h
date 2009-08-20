@@ -163,7 +163,7 @@ static inline void freelocale(locale_t loc)
 {
     (void)loc;
 }
-static inline locale_t newlocale(int mask, const char * locale, locale_t base);
+static inline locale_t newlocale(int mask, const char * locale, locale_t base)
 {
     (void)mask; (void)locale; (void)base;
     return NULL;
