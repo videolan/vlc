@@ -2500,6 +2500,27 @@ CLEAN_FILE += .gsm
 CLEAN_PKG += gsm
 DISTCLEAN_PKG += gsm-$(GSM_VERSION).tar.gz
 
+# *********
+# projectM
+# *********
+ifdef SVN
+libprojectM:
+	$(SVN) co $(LIBPROJECTM_SVN) libprojectM
+else
+libprojectM-$(LIBPROJECTM_VERSION).tar.bz2:
+	$(WGET) $(LIBPROJECTM_URL)
+
+libprojectM: libprojectM-$(LIBPROJECTM_VERSION).tar.bz2
+	$(EXTRACT_BZ2)
+endif
+
+.libprojectM: libprojectM
+	(cd $</src; $(HOSTCC) CPPFLAGS="$(CPPFLAGS) cmake . -DUSE_FBO:STRING=FALSE -DUSE_FBO:BOOL=OFF -DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF -DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF -DINCLUDE-PROJECTM-QT:BOOL=OFF && make install)
+	touch $@
+
+CLEAN_FILE += .libprojectM
+CLEAN_PKG += libprojectM
+DISTCLEAN_PKG += libprojectM-$(LIBPROJECTM_VERSION).tar.bz2
 
 # ***************************************************************************
 # X11 C Bindings
