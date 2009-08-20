@@ -65,6 +65,7 @@
  *****************************************************************************/
 static int Activate ( vlc_object_t *p_this )
 {
+    VLC_UNUSED(p_this);
 #ifndef MODULE_NAME_IS_memcpy
     vlc_fastmem_register( fast_memcpy, NULL );
 #endif
