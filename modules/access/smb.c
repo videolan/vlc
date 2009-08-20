@@ -109,6 +109,14 @@ static void Win32AddConnection( access_t *, char *, char *, char *, char * );
 static void smb_auth( const char *srv, const char *shr, char *wg, int wglen,
                       char *un, int unlen, char *pw, int pwlen )
 {
+    VLC_UNUSED(srv);
+    VLC_UNUSED(shr);
+    VLC_UNUSED(wg);
+    VLC_UNUSED(wglen);
+    VLC_UNUSED(un);
+    VLC_UNUSED(unlen);
+    VLC_UNUSED(pw);
+    VLC_UNUSED(pwlen);
     //wglen = unlen = pwlen = 0;
 }
 #endif
