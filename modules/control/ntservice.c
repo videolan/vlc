@@ -125,10 +125,9 @@ void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     intf_sys_t sys;
-    intf_thread_t *p_extraintf;
     SERVICE_TABLE_ENTRY dispatchTable[] =
     {
-        { VLCSERVICENAME, &ServiceDispatch },
+        { (LPTSTR)VLCSERVICENAME, &ServiceDispatch },
         { NULL, NULL }
     };
 

@@ -81,6 +81,8 @@ static void Close( vlc_object_t *p_this )
 
 static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
 {
+    VLC_UNUSED( p_enc );
+
     subpicture_region_t *p_region;
     block_t *p_block;
     size_t len;
