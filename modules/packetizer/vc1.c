@@ -203,7 +203,7 @@ static block_t *Packetize( decoder_t *p_dec, block_t **pp_block )
     if( p_sys->b_check_startcode && pp_block && *pp_block )
     {
         /* Fix syntax for (some?) VC1 from asf */
-        const int i_startcode = sizeof(p_vc1_startcode);
+        const unsigned i_startcode = sizeof(p_vc1_startcode);
 
         block_t *p_block = *pp_block;
         if( p_block->i_buffer > 0 &&
