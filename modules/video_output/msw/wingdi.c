@@ -535,6 +535,8 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 #ifndef MODULE_NAME_IS_wingapi
 static void DisplayGDI( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    VLC_UNUSED( p_pic );
+
     vout_sys_t *p_sys = p_vout->p_sys;
     RECT rect_dst = rect_dest_clipped;
     HDC hdc = GetDC( p_sys->hvideownd );
@@ -714,6 +716,7 @@ static void FirstDisplayGAPI( vout_thread_t *p_vout, picture_t *p_pic )
 static void SetPalette( vout_thread_t *p_vout,
                         uint16_t *red, uint16_t *green, uint16_t *blue )
 {
+    VLC_UNUSED( red ); VLC_UNUSED( green );VLC_UNUSED( blue );
     msg_Err( p_vout, "FIXME: SetPalette unimplemented" );
 }
 
