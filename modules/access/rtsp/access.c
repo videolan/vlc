@@ -235,7 +235,7 @@ static int Open( vlc_object_t *p_this )
 
 
             msg_Err( p_access, "rtsp session can not be established" );
-            dialog_Fatal( p_access, _("Session failed"),
+            dialog_Fatal( p_access, _("Session failed"), "%s",
                     _("The requested RTSP session could not be established.") );
             goto error;
         }
