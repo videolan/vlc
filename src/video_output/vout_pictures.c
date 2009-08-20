@@ -554,6 +554,7 @@ int __vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
                             vlc_fourcc_t i_chroma,
                             int i_width, int i_height, int i_aspect )
 {
+    VLC_UNUSED(p_this);
     int i_bytes, i_index, i_width_aligned, i_height_aligned;
 
     /* Make sure the real dimensions are a multiple of 16 */
