@@ -850,7 +850,7 @@ static CDTOC *darwin_getTOC( vlc_object_t * p_this, const vcddev_t *p_vcddev )
         IOObjectRelease( iterator );
     }
 
-    if( service == NULL )
+    if( !service )
     {
         msg_Err( p_this, "search for kIOCDMediaClass came up empty" );
         return( NULL );
@@ -1097,6 +1097,9 @@ static int CdTextRead( vlc_object_t *p_object, const vcddev_t *p_vcddev,
                        uint8_t **pp_buffer, int *pi_buffer )
 {
     VLC_UNUSED( p_object );
+    VLC_UNUSED( p_vcddev );
+    VLC_UNUSED( pp_buffer );
+    VLC_UNUSED( pi_buffer );
     return -1;
 }
 #elif defined( WIN32 )
