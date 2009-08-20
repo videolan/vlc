@@ -243,7 +243,7 @@ static int Open( vlc_object_t * p_this )
     if( p_sys->i_hog_pid != -1 && p_sys->i_hog_pid != getpid() )
     {
         msg_Err( p_aout, "Selected audio device is exclusively in use by another program." );
-        dialog_Fatal( p_aout, _("Audio output failed"),
+        dialog_Fatal( p_aout, _("Audio output failed"), "%s",
                         _("The selected audio output device is exclusively in "
                           "use by another program.") );
         goto error;
@@ -428,7 +428,7 @@ static int OpenAnalog( aout_instance_t *p_aout )
             {
                 p_aout->output.output.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
                 msg_Err( p_aout, "You should configure your speaker layout with Audio Midi Setup Utility in /Applications/Utilities. Now using Stereo mode." );
-                dialog_Fatal( p_aout, _("Audio device is not configured"),
+                dialog_Fatal( p_aout, _("Audio device is not configured"), "%s",
                                 _("You should configure your speaker layout with "
                                   "the \"Audio Midi Setup\" utility in /Applications/"
                                   "Utilities. Stereo mode is being used now.") );
