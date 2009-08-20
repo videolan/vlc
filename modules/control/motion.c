@@ -145,7 +145,7 @@ int Open ( vlc_object_t *p_this )
         }
     }
 #ifdef __APPLE__
-    else if( p_intf->p_sys->unimotion_hw = detect_sms() )
+    else if((p_intf->p_sys->unimotion_hw = detect_sms()))
         p_intf->p_sys->sensor = UNIMOTION_SENSOR;
 #endif
     else
