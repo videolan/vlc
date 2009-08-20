@@ -1175,7 +1175,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         i64 = stream_Size( p_demux->s );
         if( i64 > 0 )
         {
-            *pf = (double)stream_Tell( p_demux->s ) / (double)i64;
+            double current = stream_Tell( p_demux->s );
+            *pf = current / (double)i64;
         }
         else
         {
@@ -1630,8 +1631,8 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
     pid->es->pp_last = &pid->es->p_pes;
 
     /* FIXME find real max size */
-    const int i_max = block_ChainExtract( p_pes, header, 34 );
-
+    /* const int i_max = */ block_ChainExtract( p_pes, header, 34 );
+    
     if( header[0] != 0 || header[1] != 0 || header[2] != 1 )
     {
         if( !p_demux->p_sys->b_silent )
@@ -1748,16 +1749,12 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
         {
             /* display length */
             if( p_pes->i_buffer + 2 <= i_skip )
-            {
                 i_length = GetWBE( &p_pes->p_buffer[i_skip] );
-            }
 
             i_skip += 2;
         }
         if( p_pes->i_buffer + 2 <= i_skip )
-        {
             i_pes_size = GetWBE( &p_pes->p_buffer[i_skip] );
-        }
         /* */
         i_skip += 2;
     }
@@ -3220,7 +3217,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
         {
             const dvbpsi_teletextpage_t *p_src = &p_sub->p_pages[i];
 
-            if( p_src->i_teletext_type < 0 || p_src->i_teletext_type >= 0x06 )
+            if( p_src->i_teletext_type >= 0x06 )
                 continue;
 
             assert( i_page < sizeof(p_page)/sizeof(*p_page) );
@@ -3622,6 +3619,7 @@ static void PMTSetupEs0xA0( demux_t *p_demux, ts_pid_t *pid,
 static void PMTSetupEsHDMV( demux_t *p_demux, ts_pid_t *pid,
                            const dvbpsi_pmt_es_t *p_es )
 {
+    VLC_UNUSED(p_demux);
     es_format_t *p_fmt = &pid->es->fmt;
 
     /* Blu-Ray mapping */
