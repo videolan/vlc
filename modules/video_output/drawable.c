@@ -149,6 +149,8 @@ static void Close (vlc_object_t *obj)
 
 static int Control (vout_window_t *wnd, int query, va_list ap)
 {
+    VLC_UNUSED( ap );
+
     switch (query)
     {
         case VOUT_WINDOW_SET_SIZE:   /* not allowed */
