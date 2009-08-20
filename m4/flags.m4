@@ -31,6 +31,12 @@ AC_DEFUN([RDC_PROG_CC_FLAGS_IFELSE],
   ])
 ])
 
+AC_DEFUN([RDC_PROG_CC_WERRORFLAGS],
+[ for a in $1; do
+    RDC_PROG_CC_FLAGS_IFELSE([-Werror=$a])
+  done
+])
+
 AC_DEFUN([RDC_PROG_CC_WFLAGS],
 [ for a in $1; do
     RDC_PROG_CC_FLAGS_IFELSE([-W$a])

@@ -1008,6 +1008,13 @@ CFLAGS="${CFLAGS_save}"
 RDC_PROG_CC_WFLAGS([all extra sign-compare undef pointer-arith bad-function-cast cast-align write-strings missing-prototypes volatile-register-var error-implicit-function-declaration])
 RDC_PROG_CC_FLAGS_IFELSE([-pipe])
 
+AC_ARG_ENABLE(warnings-as-error,
+      AS_HELP_STRING([--enable-warnings-as-error],[Treat acceptable warnings as error (default disabled, enabled in debug)]))
+if test "x${warnings_as_error}" = "xyes" -o "x${enable_debug}" != "xno"
+then
+    RDC_PROG_CC_WERRORFLAGS([unused-function unused-label unused-value unused-parameter unused-variable unused])
+fi
+
 dnl Check for various optimization flags
 AC_CACHE_CHECK([if \$CC accepts -Os],
     [ac_cv_c_os],
@@ -1132,7 +1139,7 @@ dnl Check for __attribute__((packed))
 AC_CACHE_CHECK([for __attribute__((packed))],
   [ac_cv_c_attribute_packed],
   [ac_cv_c_attribute_packed=no
-   AC_TRY_COMPILE(, [struct __attribute__((__packed__)) foo { int a; } b;],
+   AC_TRY_COMPILE(, [struct __attribute__((__packed__)) foo { int a; } b; (void)b;],
                     [ac_cv_c_attribute_packed=yes])])
 if test "${ac_cv_c_attribute_packed}" != "no"; then
   AC_DEFINE(HAVE_ATTRIBUTE_PACKED, 1, Support for __attribute__((packed)) for structs)
