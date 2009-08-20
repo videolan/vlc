@@ -363,6 +363,7 @@ static void Close( vlc_object_t *p_this )
  */
 static void Overflow (msg_cb_data_t *p_sys, msg_item_t *p_item, unsigned overruns)
 {
+    VLC_UNUSED(overruns);
     int verbosity = var_CreateGetInteger( p_sys->p_intf, "verbose" );
     int priority = 0;
 
