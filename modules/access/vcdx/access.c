@@ -220,7 +220,7 @@ VCDReadBlock( access_t * p_access )
             if ( p_vcdplayer->i_lsn >= i_lsn && i_lsn != VCDINFO_NULL_LSN )
             {
                 dbg_print( (INPUT_DBG_LSN|INPUT_DBG_PBC),
-                           "entry change to %d, current LSN %u >= end %u",
+                           "entry change to %zu, current LSN %u >= end %u",
                            i_entry, p_vcdplayer->i_lsn, i_lsn);
 
                 p_vcdplayer->play_item.num = i_entry;
