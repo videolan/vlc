@@ -30,11 +30,11 @@
  * Preamble
  *****************************************************************************/
 
-#ifdef UPDATE_CHECK
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+
+#ifdef UPDATE_CHECK
 
 #include <gcrypt.h>
 #include <assert.h>
