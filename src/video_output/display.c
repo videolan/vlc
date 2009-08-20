@@ -165,7 +165,7 @@ static void vout_display_Manage(vout_display_t *vd)
 }
 
 /* */
-void vout_display_GetDefaultDisplaySize(int *width, int *height,
+void vout_display_GetDefaultDisplaySize(unsigned *width, unsigned *height,
                                         const video_format_t *source,
                                         const vout_display_cfg_t *cfg)
 {
@@ -204,10 +204,10 @@ void vout_display_PlacePicture(vout_display_place_t *place,
         return;
 
     /* */
-    int width;
-    int height;
-    int display_width;
-    int display_height;
+    unsigned width;
+    unsigned height;
+    unsigned display_width;
+    unsigned display_height;
 
     if (cfg->is_display_filled) {
         width  = source->i_visible_width;

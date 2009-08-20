@@ -72,13 +72,13 @@ typedef struct {
         const char *title;
 
         /* Display size */
-        int  width;
-        int  height;
+        unsigned  width;
+        unsigned  height;
 
         /* Display SAR */
         struct {
-            int num;
-            int den;
+            unsigned num;
+            unsigned den;
         } sar;
     } display;
 
@@ -378,7 +378,7 @@ static inline void vout_display_DeleteWindow(vout_display_t *vd,
  *
  * This asssumes that the picture is already cropped.
  */
-VLC_EXPORT( void, vout_display_GetDefaultDisplaySize, (int *width, int *height, const video_format_t *source, const vout_display_cfg_t *) );
+VLC_EXPORT( void, vout_display_GetDefaultDisplaySize, (unsigned *width, unsigned *height, const video_format_t *source, const vout_display_cfg_t *) );
 
 
 /**
