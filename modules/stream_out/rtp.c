@@ -854,7 +854,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
      * mux (TS/PS), then p_fmt is NULL. */
     sout_stream_sys_t *p_sys = p_stream->p_sys;
     sout_stream_id_t  *id;
-    int               cscov = -1;
     char              *psz_sdp;
 
     if (0xffffffff == p_sys->payload_bitmap)
@@ -1258,6 +1257,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         p_sys->payload_bitmap |= 1 << (id->i_payload_type - 96);
 
 #if 0 /* No payload formats sets this at the moment */
+    int cscov = -1;
     if( cscov != -1 )
         cscov += 8 /* UDP */ + 12 /* RTP */;
     if( id->sinkc > 0 )
