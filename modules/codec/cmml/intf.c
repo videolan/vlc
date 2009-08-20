@@ -137,7 +137,12 @@ decoder_sys_t *OpenIntf ( vlc_object_t *p_this )
     var_AddCallback( p_intf->p_libvlc, "browse-follow-anchor",
                      FollowAnchorCallback, p_intf );
 
-    vlc_thread_create( p_intf, "cmml", RunIntf, VLC_THREAD_PRIORITY_LOW );
+    int ret = vlc_thread_create( p_intf, "cmml", RunIntf, VLC_THREAD_PRIORITY_LOW );
+    if (ret)
+    {
+        CloseIntf( p_intf);
+        return NULL;
+    }
     return p_intf;
 }
 
