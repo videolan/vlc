@@ -49,7 +49,9 @@
 #include FT_GLYPH_H
 #define FT_FLOOR(X)     ((X & -64) >> 6)
 #define FT_CEIL(X)      (((X + 63) & -64) >> 6)
-#define FT_MulFix(v, s) (((v)*(s))>>16)
+#ifndef FT_MulFix
+ #define FT_MulFix(v, s) (((v)*(s))>>16)
+#endif
 
 #ifdef __APPLE__
 #define DEFAULT_FONT "/System/Library/Fonts/LucidaGrande.dfont"

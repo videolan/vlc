@@ -465,6 +465,8 @@ static void Run( intf_thread_t *p_intf )
 static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
+    VLC_UNUSED( oldval );
+
     intf_thread_t   *p_intf = ( intf_thread_t* ) p_data;
     intf_sys_t      *p_sys  = p_intf->p_sys;
     input_thread_t  *p_input = ( input_thread_t* )p_this;

@@ -102,7 +102,7 @@ typedef struct
     vlc_cond_t    wait;
 
     /* Audio properties */
-    int i_channels;
+    unsigned i_channels;
 
     /* Audio samples queue */
     block_t       *pp_blocks[MAX_BLOCKS];
@@ -274,8 +274,8 @@ static int FillBuffer( int16_t *p_data, int *pi_data,
         if( !p_this->i_blocks ) return VLC_EGENERIC;
 
         p_block = p_this->pp_blocks[0];
-        i_samples = __MIN( 512 - *pi_data, p_block->i_buffer /
-                           sizeof(float) / p_this->i_channels );
+        i_samples = __MIN( (unsigned)(512 - *pi_data),
+                p_block->i_buffer / sizeof(float) / p_this->i_channels );
 
         /* Date management */
         if( p_block->i_pts > 0 &&
