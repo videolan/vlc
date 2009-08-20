@@ -98,9 +98,9 @@ static void Display   ( vout_thread_t *, picture_t * );
 static void FirstDisplay( vout_thread_t *, picture_t * );
 static void SetPalette( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 
-static int  NewPictureVec  ( vout_thread_t *, picture_t *, int );
+static int  NewPictureVec  ( vout_thread_t *, picture_t * );
 static void FreePictureVec ( vout_thread_t *, picture_t *, int );
-static int  UpdatePictureStruct( vout_thread_t *, picture_t *, int );
+static int  UpdatePictureStruct( vout_thread_t *, picture_t * );
 
 static int  DirectXInitDDraw      ( vout_thread_t *p_vout );
 static void DirectXCloseDDraw     ( vout_thread_t *p_vout );
@@ -368,7 +368,7 @@ static int Init( vout_thread_t *p_vout )
             break;
     }
 
-    NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
+    NewPictureVec( p_vout, p_vout->p_picture );
 
     i_chroma_backup = p_vout->output.i_chroma;
 
@@ -378,13 +378,13 @@ static int Init( vout_thread_t *p_vout )
         if( p_vout->output.i_chroma != VLC_CODEC_I420 )
         {
             p_vout->output.i_chroma = VLC_CODEC_YV12;
-            NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
+            NewPictureVec( p_vout, p_vout->p_picture );
         }
         if( !I_OUTPUTPICTURES )
         {
             /* hmmm, it still didn't work! Let's try another one */
             p_vout->output.i_chroma = VLC_CODEC_YUYV;
-            NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
+            NewPictureVec( p_vout, p_vout->p_picture );
         }
     }
 
@@ -394,7 +394,7 @@ static int Init( vout_thread_t *p_vout )
         p_vout->output.i_chroma = i_chroma_backup;
         p_vout->p_sys->b_using_overlay = 0;
         msg_Warn( p_vout, "Could not initialize directx overlay" ) ;
-        NewPictureVec( p_vout, p_vout->p_picture, MAX_DIRECTBUFFERS );
+        NewPictureVec( p_vout, p_vout->p_picture );
     }
 
     /* Change the window title bar text */
@@ -1303,12 +1303,12 @@ static void DirectXCloseSurface( vout_thread_t *p_vout,
 }
 
 /*****************************************************************************
- * NewPictureVec: allocate a vector of identical pictures
+ * NewPictureVec: allocate a picture
+ * FIXME? make it work for i_num_pic pictures...
  *****************************************************************************
  * Returns 0 on success, -1 otherwise
  *****************************************************************************/
-static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic,
-                          int i_num_pics )
+static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic )
 {
     int i;
     int i_ret = VLC_SUCCESS;
@@ -1579,8 +1579,7 @@ static void FreePictureVec( vout_thread_t *p_vout, picture_t *p_pic,
  *****************************************************************************
  * This will setup stuff for use by the video_output thread
  *****************************************************************************/
-static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic,
-                                int i_chroma )
+static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic )
 {
     switch( p_vout->output.i_chroma )
     {
@@ -1843,7 +1842,7 @@ static int DirectXLockSurface( vout_thread_t *p_vout, picture_t *p_pic )
 
     /* Now we have a pointer to the surface memory, we can update our picture
      * structure. */
-    if( UpdatePictureStruct( p_vout, p_pic, p_vout->output.i_chroma )
+    if( UpdatePictureStruct( p_vout, p_pic )
         != VLC_SUCCESS )
     {
         DirectXUnlockSurface( p_vout, p_pic );
@@ -1858,6 +1857,8 @@ static int DirectXLockSurface( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static int DirectXUnlockSurface( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    VLC_UNUSED( p_vout );
+
     /* Unlock the Surface */
     if( IDirectDrawSurface2_Unlock( p_pic->p_sys->p_surface, NULL ) == DD_OK )
         return VLC_SUCCESS;
@@ -1972,6 +1973,8 @@ BOOL WINAPI DirectXEnumCallback2( GUID* p_guid, LPTSTR psz_desc,
                                   LPTSTR psz_drivername, VOID* p_context,
                                   HMONITOR hmon )
 {
+    VLC_UNUSED( p_guid ); VLC_UNUSED( psz_desc ); VLC_UNUSED( hmon );
+
     module_config_t *p_item = (module_config_t *)p_context;
 
     p_item->ppsz_list =
@@ -1993,6 +1996,8 @@ BOOL WINAPI DirectXEnumCallback2( GUID* p_guid, LPTSTR psz_desc,
 static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
                                vlc_value_t newval, vlc_value_t oldval, void *d)
 {
+    VLC_UNUSED( newval ); VLC_UNUSED( oldval ); VLC_UNUSED( d );
+
     HRESULT (WINAPI *OurDirectDrawEnumerateEx)( LPDDENUMCALLBACKEXA, LPVOID,
                                                 DWORD );
     HINSTANCE hddraw_dll;
@@ -2048,6 +2053,7 @@ static int WallpaperCallback( vlc_object_t *p_this, char const *psz_cmd,
                               vlc_value_t oldval, vlc_value_t newval,
                               void *p_data )
 {
+    VLC_UNUSED( psz_cmd ); VLC_UNUSED( oldval ); VLC_UNUSED( p_data );
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     if( (newval.b_bool && !p_vout->p_sys->b_wallpaper) ||
@@ -2076,5 +2082,6 @@ static int WallpaperCallback( vlc_object_t *p_this, char const *psz_cmd,
 static void SetPalette( vout_thread_t *p_vout,
                         uint16_t *red, uint16_t *green, uint16_t *blue )
 {
+    VLC_UNUSED( red ); VLC_UNUSED( green );VLC_UNUSED( blue );
     msg_Err( p_vout, "FIXME: SetPalette unimplemented" );
 }
