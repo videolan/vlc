@@ -597,7 +597,7 @@ static int AobHeader( unsigned *pi_rate,
     *pi_layout   = i_layout1   | ( b_group2_used ? i_layout2   : 0 );
 
     /* */
-    for( int i = 0; i < 2; i++ )
+    for( unsigned i = 0; i < 2; i++ )
     {
         const unsigned *p_aob = i == 0 ? p_aob_group1[i_assignment] :
                                          p_aob_group2[i_assignment];
@@ -607,7 +607,7 @@ static int AobHeader( unsigned *pi_rate,
         g[i].b_used = i == 0 || b_group2_used;
         if( !g[i].b_used )
             continue;
-        for( int j = 0; j < g[i].i_channels; j++ )
+        for( unsigned j = 0; j < g[i].i_channels; j++ )
         {
             g[i].pi_position[j] = 0;
             for( int k = 0; pi_vlc_chan_order_wg4[k] != 0; k++ )
@@ -797,9 +797,9 @@ static void AobExtract( aout_buffer_t *p_aout_buffer,
                 p_block->i_buffer = 0;
                 break;
             }
-            for( int n = 0; n < 2; n++ )
+            for( unsigned n = 0; n < 2; n++ )
             {
-                for( int j = 0; j < g->i_channels && g->b_used; j++ )
+                for( unsigned j = 0; j < g->i_channels && g->b_used; j++ )
                 {
                     const int i_src = n * g->i_channels + j;
                     const int i_dst = n * i_channels + g->pi_position[j];
