@@ -689,6 +689,9 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 #endif
     ret = getaddrinfo (node, psz_service, &hints, res);
 
+#if defined(AI_IDN) || defined(WIN32)
+out:
+#endif
     LocaleFree (node);
     return ret;
 }
