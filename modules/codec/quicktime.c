@@ -850,6 +850,8 @@ exit_error:
 #endif
     vlc_mutex_unlock( &qt_mutex );
 
+#else
+    VLC_UNUSED( p_dec );
 #endif /* !WIN32 */
 
     return VLC_EGENERIC;
