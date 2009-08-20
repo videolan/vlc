@@ -1036,6 +1036,7 @@ vout_display_t *vout_NewDisplay(vout_thread_t *vout,
 
 static void SplitterClose(vout_display_t *vd)
 {
+    VLC_UNUSED(vd);
     assert(0);
 }
 
@@ -1316,6 +1317,7 @@ void vout_SendDisplayEventMouse(vout_thread_t *vout, const vlc_mouse_t *m)
 }
 vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout, vout_display_t *vd, const vout_window_cfg_t *cfg)
 {
+    VLC_UNUSED(vd);
     vout_window_cfg_t cfg_override = *cfg;
 
     if( !config_GetInt( vout, "embedded-video" ) )
@@ -1325,6 +1327,8 @@ vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout, vout_display_t *vd, c
 }
 void vout_DeleteDisplayWindow(vout_thread_t *vout, vout_display_t *vd, vout_window_t *window)
 {
+    VLC_UNUSED(vout);
+    VLC_UNUSED(vd);
     vout_window_Delete(window);
 }
 
