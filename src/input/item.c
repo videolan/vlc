@@ -748,6 +748,8 @@ void input_item_SetEpg( input_item_t *p_item,
         event.type = vlc_InputItemInfoChanged;
         vlc_event_send( &p_item->event_manager, &event );
     }
+#else
+    VLC_UNUSED( p_epg );
 #endif
 }
 
