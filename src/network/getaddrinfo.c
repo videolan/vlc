@@ -689,7 +689,6 @@ int vlc_getaddrinfo( vlc_object_t *p_this, const char *node,
 #endif
     ret = getaddrinfo (node, psz_service, &hints, res);
 
-out:
     LocaleFree (node);
     return ret;
 }
