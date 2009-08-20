@@ -849,7 +849,7 @@ flac-$(FLAC_VERSION).tar.gz:
 flac: flac-$(FLAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
-	patch -p0 < Patches/flac-win32.patch
+	( cd $@; patch -p1 < ../Patches/flac-win32.patch )
 endif
 
 FLAC_DISABLE_FLAGS = --disable-oggtest --disable-xmms-plugin --disable-cpplibs
