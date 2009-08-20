@@ -27,9 +27,13 @@ Encoders:
 Video Output:
  * Added desktop mode to the Direct3D output module. It differs from DirectX
    desktop mode, because it hides the desktop icons, but reacts to mouse clicks.
+ * New x11 and xv modules based on XCB
 
 Visualisation:
  * Support of .milk visualisation files using projectM libraries
+
+Windows port:
+ * Integration in Windows 7 taskbar
 
 Removed modules:
  * csri
