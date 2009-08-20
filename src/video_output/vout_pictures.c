@@ -1042,7 +1042,7 @@ int picture_Export( vlc_object_t *p_obj,
                     video_format_t *p_fmt,
                     picture_t *p_picture,
                     vlc_fourcc_t i_format,
-                    int i_override_width, int i_override_height )
+                    unsigned i_override_width, unsigned i_override_height )
 {
     /* */
     video_format_t fmt_in = p_picture->format;
@@ -1074,10 +1074,8 @@ int picture_Export( vlc_object_t *p_obj,
     }
 
     /* */
-    fmt_out.i_width  = ( i_override_width < 0 ) ?
-                       i_original_width : i_override_width;
-    fmt_out.i_height = ( i_override_height < 0 ) ?
-                       i_original_height : i_override_height;
+    fmt_out.i_width  = i_override_width > 0 ? i_override_width : i_original_width;
+    fmt_out.i_height = i_override_height > 0 ? i_override_height : i_original_height;
 
     /* scale if only one direction is provided */
     if( fmt_out.i_height == 0 && fmt_out.i_width > 0 )

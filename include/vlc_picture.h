@@ -281,7 +281,7 @@ static inline void picture_Copy( picture_t *p_dst, const picture_t *p_src )
  * picture to be encoded. If at most one of them is > 0 then the picture aspect
  * ratio will be kept.
  */
-VLC_EXPORT( int, picture_Export, ( vlc_object_t *p_obj, block_t **pp_image, video_format_t *p_fmt, picture_t *p_picture, vlc_fourcc_t i_format, int i_override_width, int i_override_height ) );
+VLC_EXPORT( int, picture_Export, ( vlc_object_t *p_obj, block_t **pp_image, video_format_t *p_fmt, picture_t *p_picture, vlc_fourcc_t i_format, unsigned i_override_width, unsigned i_override_height ) );
 
 /**
  * This function will setup all fields of a picture_t without allocating any
