@@ -333,7 +333,6 @@ static void test_change( libvlc_int_t *p_libvlc )
 
 static void test_creation_and_type( libvlc_int_t *p_libvlc )
 {
-    int i_type;
     vlc_value_t val;
     val.i_int = 4212;
 
