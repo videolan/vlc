@@ -48,6 +48,7 @@ static void * fast_memcpy ( void * to, const void * from, size_t len );
  *****************************************************************************/
 static int Activate ( vlc_object_t *p_this )
 {
+    VLC_UNUSED(p_this);
     vlc_fastmem_register( fast_memcpy, NULL );
     return VLC_SUCCESS;
 }
