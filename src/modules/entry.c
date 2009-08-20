@@ -42,6 +42,8 @@ static const char *mdgettext (const char *domain, const char *msg)
 #ifdef ENABLE_NLS
     if (*msg) /* Do not translate ""! */
         return dgettext (domain, msg);
+#else
+    VLC_UNUSED(domain);
 #endif
     return msg;
 }
