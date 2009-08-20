@@ -132,18 +132,21 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
 
     PLItem *item = index.isValid() ? getItem( index ) : rootItem;
 
-    input_item_t *pl_input = p_playlist->p_local_category->p_input;
-    input_item_t *ml_input = p_playlist->p_ml_category->p_input;
+    input_item_t *pl_input =
+        p_playlist->p_local_category ?
+        p_playlist->p_local_category->p_input : NULL;
+    input_item_t *ml_input =
+        p_playlist->p_ml_category ?
+        p_playlist->p_ml_category->p_input : NULL;
 
-    if( rootItem->i_id == p_playlist->p_root_onelevel->i_id
-          || rootItem->i_id == p_playlist->p_root_category->i_id )
+    if( i_depth == DEPTH_SEL )
     {
-        if( item->p_input == pl_input
-            || item->p_input == ml_input)
+        if( ( pl_input && item->p_input == pl_input ) ||
+            ( ml_input && item->p_input == ml_input ) )
                 flags |= Qt::ItemIsDropEnabled;
     }
-    else if( rootItem->p_input == pl_input ||
-            rootItem->p_input == ml_input )
+    else if( ( pl_input && rootItem->p_input == pl_input ) ||
+              ( ml_input && rootItem->p_input == ml_input ) )
     {
         PL_LOCK;
         playlist_item_t *plItem =
