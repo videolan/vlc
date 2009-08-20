@@ -111,6 +111,7 @@ VIDEO_FILTER_WRAPPER( I420_YMGA )
 static void I420_YMGA( filter_t *p_filter, picture_t *p_source,
                                            picture_t *p_dest )
 {
+    VLC_UNUSED(p_filter);
     uint8_t *p_uv = p_dest->U_PIXELS;
     uint8_t *p_u = p_source->U_PIXELS;
     uint8_t *p_v = p_source->V_PIXELS;
