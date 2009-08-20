@@ -46,6 +46,9 @@ public:
     {
         children.insert( children.count(), item );
     };
+    void removeChild( PLItem * );
+    void removeChildren();
+    void takeChildAt( int );
 
     PLItem *child( int row ) { return children.value( row ); };
     int childCount() const { return children.count(); };

@@ -163,11 +163,10 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
     return flags;
 }
 
-/* A list of model indexes are a playlist */
 QStringList PLModel::mimeTypes() const
 {
     QStringList types;
-    types << "vlc/playlist-item-id";
+    types << "vlc/qt-playlist-item";
     return types;
 }
 
@@ -186,9 +185,10 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
     qSort(list);
 
     foreach( const QModelIndex &index, list ) {
-        stream << itemId( index );
+        PLItem *item = getItem( index );
+        stream.writeRawData( (char*) &item, sizeof( PLItem* ) );
     }
-    mimeData->setData( "vlc/playlist-item-id", encodedData );
+    mimeData->setData( "vlc/qt-playlist-item", encodedData );
     return mimeData;
 }
 
@@ -196,28 +196,16 @@ QMimeData *PLModel::mimeData( const QModelIndexList &indexes ) const
 bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
                            int row, int column, const QModelIndex &parent )
 {
-    if( data->hasFormat( "vlc/playlist-item-id" ) )
+    if( data->hasFormat( "vlc/qt-playlist-item" ) )
     {
         if( action == Qt::IgnoreAction )
             return true;
 
+        PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;
+
         PL_LOCK;
-
-        playlist_item_t *p_parent;
-
-        if( !parent.isValid())
-        {
-            if( row > -1)
-                p_parent = playlist_ItemGetById( p_playlist, rootItem->i_id );
-            else
-            {
-                PL_UNLOCK;
-                return true;
-            }
-        }
-        else
-            p_parent = playlist_ItemGetById( p_playlist, itemId ( parent ) );
-
+        playlist_item_t *p_parent =
+            playlist_ItemGetById( p_playlist, parentItem->i_id );
         if( !p_parent || p_parent->i_children == -1 )
         {
             PL_UNLOCK;
@@ -225,72 +213,104 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
         }
 
         bool copy = false;
-        if( row == -1 &&
-            ( p_parent->p_input == p_playlist->p_local_category->p_input
-            || p_parent->p_input == p_playlist->p_ml_category->p_input ) )
-                copy = true;
-
-        QByteArray encodedData = data->data( "vlc/playlist-item-id" );
-        QDataStream stream( &encodedData, QIODevice::ReadOnly );
-
-        if( copy )
-        {
-            while( !stream.atEnd() )
-            {
-                int i_id;
-                stream >> i_id;
-                playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
-                if( !p_item )
-                {
-                    PL_UNLOCK;
-                    return false;
-                }
-                input_item_t *p_input = p_item->p_input;
-                playlist_AddExt ( p_playlist,
-                    p_input->psz_uri, p_input->psz_name,
-                    PLAYLIST_APPEND | PLAYLIST_SPREPARSE, PLAYLIST_END,
-                    p_input->i_duration,
-                    p_input->i_options, p_input->ppsz_options, p_input->optflagc,
-                    p_parent == p_playlist->p_local_category, true );
-            }
-        }
-        else
-        {
-            QList<playlist_item_t*> items;
-            while( !stream.atEnd() )
-            {
-                int id;
-                stream >> id;
-                playlist_item_t *item = playlist_ItemGetById( p_playlist, id );
-                if( !item ) continue;
-                /* better not try to move a node into itself: */
-                if( item->i_children > 0 )
-                {
-                    playlist_item_t *climber = p_parent;
-                    while( climber )
-                    {
-                        if( climber == item ) break;
-                        climber = climber->p_parent;
-                    }
-                    if( climber ) continue;
-                }
-                items.append( item );
-            }
-            int count = items.size();
-            if( count )
-            {
-                playlist_item_t *pp_items[count];
-                for( int i = 0; i < count; i++ ) pp_items[i] = items[i];
-                playlist_TreeMoveMany( p_playlist, count, pp_items, p_parent,
-                    (row == -1 ? p_parent->i_children : row) );
-            }
-        }
-
+        playlist_item_t *p_pl = p_playlist->p_local_category;
+        playlist_item_t *p_ml = p_playlist->p_ml_category;
+        if
+        (
+            row == -1 && (
+            ( p_pl && p_parent->p_input == p_pl->p_input ) ||
+            ( p_ml && p_parent->p_input == p_ml->p_input ) )
+        )
+            copy = true;
         PL_UNLOCK;
-        /*TODO: That's not a good idea to rebuild the playlist */
-        rebuild();
+
+        QByteArray encodedData = data->data( "vlc/qt-playlist-item" );
+        if( copy )
+            dropAppendCopy( encodedData, parentItem );
+        else
+            dropMove( encodedData, parentItem, row );
     }
     return true;
+}
+
+void PLModel::dropAppendCopy( QByteArray& data, PLItem *target )
+{
+    QDataStream stream( &data, QIODevice::ReadOnly );
+
+    PL_LOCK;
+    playlist_item_t *p_parent =
+            playlist_ItemGetById( p_playlist, target->i_id );
+    while( !stream.atEnd() )
+    {
+        PLItem *item;
+        stream.readRawData( (char*)&item, sizeof(PLItem*) );
+        playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
+        if( !p_item ) continue;
+        input_item_t *p_input = p_item->p_input;
+        playlist_AddExt ( p_playlist,
+            p_input->psz_uri, p_input->psz_name,
+            PLAYLIST_APPEND | PLAYLIST_SPREPARSE, PLAYLIST_END,
+            p_input->i_duration,
+            p_input->i_options, p_input->ppsz_options, p_input->optflagc,
+            p_parent == p_playlist->p_local_category, true );
+    }
+    PL_UNLOCK;
+}
+
+void PLModel::dropMove( QByteArray& data, PLItem *target, int row )
+{
+    QDataStream stream( &data, QIODevice::ReadOnly );
+    QList<PLItem*> model_items;
+    QList<int> ids;
+    int new_pos = row == -1 ? target->children.size() : row;
+    int model_pos = new_pos;
+    while( !stream.atEnd() )
+    {
+        PLItem *item;
+        stream.readRawData( (char*)&item, sizeof(PLItem*) );
+
+        /* better not try to move a node into itself: */
+        PLItem *climber = target;
+        while( climber )
+        {
+            if( climber == item ) break;
+            climber = climber->parentItem;
+        }
+        if( climber ) continue;
+
+        if( item->parentItem == target &&
+            target->children.indexOf( item ) < model_pos )
+                model_pos--;
+
+        ids.append( item->i_id );
+        model_items.append( item );
+
+        TakeItem( item );
+    }
+    int count = ids.size();
+    if( count )
+    {
+        playlist_item_t *pp_items[count];
+
+        PL_LOCK;
+        for( int i = 0; i < count; i++ )
+        {
+            playlist_item_t *p_item = playlist_ItemGetById( p_playlist, ids[i] );
+            if( !p_item )
+            {
+                PL_UNLOCK;
+                return;
+            }
+            pp_items[i] = p_item;
+        }
+        playlist_item_t *p_parent =
+            playlist_ItemGetById( p_playlist, target->i_id );
+        playlist_TreeMoveMany( p_playlist, count, pp_items, p_parent,
+            new_pos );
+        PL_UNLOCK;
+
+        InsertChildren( target, model_items, model_pos );
+    }
 }
 
 /* remove item with its id */
@@ -732,7 +752,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
     /* Invalidate cache */
     i_cached_id = i_cached_input_id = -1;
 
-    if( rootItem ) RemoveChildren( rootItem );
+    if( rootItem ) rootItem->removeChildren();
 
     PL_LOCK;
     if( p_root )
@@ -756,27 +776,43 @@ void PLModel::rebuild( playlist_item_t *p_root )
     addCallbacks();
 }
 
+void PLModel::TakeItem( PLItem *item )
+{
+    assert( item );
+    PLItem *parent = item->parentItem;
+    assert( parent );
+    int i_index = parent->children.indexOf( item );
+
+    beginRemoveRows( index( parent, 0 ), i_index, i_index );
+    parent->takeChildAt( i_index );
+    endRemoveRows();
+}
+
+void PLModel::InsertChildren( PLItem *node, QList<PLItem*>& items, int i_pos )
+{
+    assert( node );
+    int count = items.size();
+    if( !count ) return;
+    beginInsertRows( index( node, 0 ), i_pos, i_pos + count - 1 );
+    for( int i = 0; i < count; i++ )
+    {
+        node->children.insert( i_pos + i, items[i] );
+        items[i]->parentItem = node;
+    }
+    endInsertRows();
+}
+
 void PLModel::RemoveItem( PLItem *item )
 {
     if( !item ) return;
-    if( currentItem && currentItem->p_input == item->p_input )
+    if( currentItem == item )
     {
         currentItem = NULL;
         emit currentChanged( QModelIndex() );
     }
     PLItem *parent = item->parentItem;
     assert( parent );
-    int i_index = parent->children.indexOf( item );
-    parent->children.removeAt( i_index );
-    delete item;
-}
-void PLModel::RemoveChildren( PLItem *root )
-{
-  if( root->children.size() )
-  {
-      qDeleteAll( root->children );
-      root->children.clear();
-  }
+    parent->removeChild( item );
 }
 
 /* This function must be entered WITH the playlist lock */
@@ -789,11 +825,17 @@ void PLModel::UpdateChildren( PLItem *root )
 /* This function must be entered WITH the playlist lock */
 void PLModel::UpdateChildren( playlist_item_t *p_node, PLItem *root )
 {
+    playlist_item_t *p_item = playlist_CurrentPlayingItem(p_playlist);
     for( int i = 0; i < p_node->i_children ; i++ )
     {
         if( p_node->pp_children[i]->i_flags & PLAYLIST_DBL_FLAG ) continue;
         PLItem *newItem =  new PLItem( p_node->pp_children[i], root );
         root->appendChild( newItem );
+        if( p_item && newItem->p_input == p_item->p_input )
+        {
+            currentItem = newItem;
+            emit currentChanged( index( currentItem, 0 ) );
+        }
         if( i_depth == DEPTH_PL && p_node->pp_children[i]->i_children != -1 )
             UpdateChildren( p_node->pp_children[i], newItem );
     }
@@ -901,7 +943,7 @@ void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
     if( count )
     {
         beginRemoveRows( qIndex, 0, count - 1 );
-        RemoveChildren( item );
+        item->removeChildren();
         endRemoveRows( );
     }
 

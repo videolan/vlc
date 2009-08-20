@@ -84,6 +84,25 @@ void PLItem::insertChild( PLItem *item, int i_pos, bool signal )
     children.insert( i_pos, item );
 }
 
+void PLItem::removeChild( PLItem *item )
+{
+    children.removeOne( item );
+    delete item;
+}
+
+void PLItem::removeChildren()
+{
+    qDeleteAll( children );
+    children.clear();
+}
+
+void PLItem::takeChildAt( int index )
+{
+    PLItem *child = children[index];
+    child->parentItem = NULL;
+    children.removeAt( index );
+}
+
 /* This function is used to get one's parent's row number in the model */
 int PLItem::row() const
 {
