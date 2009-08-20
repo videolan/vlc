@@ -408,7 +408,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         i_nb_items++;
                     }
 
-                    for( i = 0; i < p_sys->p_playlist->items.i_size; i++ )
+                    size_t size = p_sys->p_playlist->items.i_size;
+                    for( i = 0; i < size; i++ )
                     {
                         size_t j;
 
