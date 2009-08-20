@@ -60,10 +60,6 @@ void I420_RGB8         ( filter_t *, picture_t *, picture_t * );
 void I420_RGB16_dither ( filter_t *, picture_t *, picture_t * );
 void I420_RGB16        ( filter_t *, picture_t *, picture_t * );
 void I420_RGB32        ( filter_t *, picture_t *, picture_t * );
-static picture_t *I420_RGB8_Filter         ( filter_t *, picture_t * );
-static picture_t *I420_RGB16_dither_Filter ( filter_t *, picture_t * );
-static picture_t *I420_RGB16_Filter        ( filter_t *, picture_t * );
-static picture_t *I420_RGB32_Filter        ( filter_t *, picture_t * );
 #else // if defined(MODULE_NAME_IS_i420_rgb_mmx)
 void I420_R5G5B5       ( filter_t *, picture_t *, picture_t * );
 void I420_R5G6B5       ( filter_t *, picture_t *, picture_t * );
@@ -71,12 +67,6 @@ void I420_A8R8G8B8     ( filter_t *, picture_t *, picture_t * );
 void I420_R8G8B8A8     ( filter_t *, picture_t *, picture_t * );
 void I420_B8G8R8A8     ( filter_t *, picture_t *, picture_t * );
 void I420_A8B8G8R8     ( filter_t *, picture_t *, picture_t * );
-static picture_t *I420_R5G5B5_Filter       ( filter_t *, picture_t * );
-static picture_t *I420_R5G6B5_Filter       ( filter_t *, picture_t * );
-static picture_t *I420_A8R8G8B8_Filter     ( filter_t *, picture_t * );
-static picture_t *I420_R8G8B8A8_Filter     ( filter_t *, picture_t * );
-static picture_t *I420_B8G8R8A8_Filter     ( filter_t *, picture_t * );
-static picture_t *I420_A8B8G8R8_Filter     ( filter_t *, picture_t * );
 #endif
 
 /*****************************************************************************

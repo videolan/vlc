@@ -39,6 +39,17 @@
 #include "i420_rgb.h"
 #if defined (MODULE_NAME_IS_i420_rgb)
 #   include "i420_rgb_c.h"
+    static picture_t *I420_RGB8_Filter         ( filter_t *, picture_t * );
+//    static picture_t *I420_RGB16_dither_Filter ( filter_t *, picture_t * );
+    static picture_t *I420_RGB16_Filter        ( filter_t *, picture_t * );
+    static picture_t *I420_RGB32_Filter        ( filter_t *, picture_t * );
+#else
+    static picture_t *I420_R5G5B5_Filter       ( filter_t *, picture_t * );
+    static picture_t *I420_R5G6B5_Filter       ( filter_t *, picture_t * );
+    static picture_t *I420_A8R8G8B8_Filter     ( filter_t *, picture_t * );
+    static picture_t *I420_R8G8B8A8_Filter     ( filter_t *, picture_t * );
+    static picture_t *I420_B8G8R8A8_Filter     ( filter_t *, picture_t * );
+    static picture_t *I420_A8B8G8R8_Filter     ( filter_t *, picture_t * );
 #endif
 
 /*****************************************************************************
@@ -296,6 +307,7 @@ static void Deactivate( vlc_object_t *p_this )
 #if defined (MODULE_NAME_IS_i420_rgb)
 VIDEO_FILTER_WRAPPER( I420_RGB8 )
 VIDEO_FILTER_WRAPPER( I420_RGB16 )
+//VIDEO_FILTER_WRAPPER( I420_RGB16_dither )
 VIDEO_FILTER_WRAPPER( I420_RGB32 )
 #else
 VIDEO_FILTER_WRAPPER( I420_R5G5B5 )
