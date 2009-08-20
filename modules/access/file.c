@@ -165,7 +165,7 @@ static bool IsRemote (int fd)
 }
 
 #ifndef HAVE_POSIX_FADVISE
-# define posix_fadvise(fd, off, len, adv) (0)
+# define posix_fadvise(fd, off, len, adv)
 #endif
 
 /*****************************************************************************
