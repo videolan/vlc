@@ -154,9 +154,20 @@ static inline char *getenv (const char *name)
 
 #ifndef HAVE_USELOCALE
 typedef void *locale_t;
-# define newlocale( a, b, c ) ((locale_t)0)
-# define uselocale( a ) ((locale_t)0)
-# define freelocale( a ) (void)0
+static inline locale_t uselocale(locale_t loc)
+{
+    VLC_UNUSED(loc);
+    return NULL;
+}
+static inline void freelocale(locale_t loc)
+{
+    VLC_UNUSED(loc);
+}
+static inline locale_t newlocale(int mask, const char * locale, locale_t base);
+{
+    VLC_UNUSED(mask); VLC_UNUSED(locale); VLC_UNUSED(base);
+    return NULL;
+}
 #endif
 
 #ifdef WIN32
