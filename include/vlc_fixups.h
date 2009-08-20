@@ -156,16 +156,16 @@ static inline char *getenv (const char *name)
 typedef void *locale_t;
 static inline locale_t uselocale(locale_t loc)
 {
-    VLC_UNUSED(loc);
+    (void)loc;
     return NULL;
 }
 static inline void freelocale(locale_t loc)
 {
-    VLC_UNUSED(loc);
+    (void)loc;
 }
 static inline locale_t newlocale(int mask, const char * locale, locale_t base);
 {
-    VLC_UNUSED(mask); VLC_UNUSED(locale); VLC_UNUSED(base);
+    (void)mask; (void)locale; (void)base;
     return NULL;
 }
 #endif
