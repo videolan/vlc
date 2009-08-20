@@ -47,6 +47,7 @@
  *****************************************************************************/
 void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 {
+    VLC_UNUSED( p_this ); VLC_UNUSED( pi_argc ); VLC_UNUSED( ppsz_argv );
     WSADATA Data;
 
     /* Get our full path */
