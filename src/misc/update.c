@@ -143,12 +143,12 @@ void update_Delete( update_t *p_update )
 
     if( p_update->p_check )
     {
-        assert( !p_update->p_download );
         vlc_object_kill( p_update->p_check );
         vlc_thread_join( p_update->p_check );
         vlc_object_release( p_update->p_check );
     }
-    else if( p_update->p_download )
+
+    if( p_update->p_download )
     {
         vlc_object_kill( p_update->p_download );
         vlc_thread_join( p_update->p_download );
@@ -731,8 +731,6 @@ end:
     free( psz_destfile );
     free( p_buffer );
     free( psz_size );
-
-    p_udt->p_update->p_download = NULL;
 
     vlc_restorecancel( canc );
     return NULL;
