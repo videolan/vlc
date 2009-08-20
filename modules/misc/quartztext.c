@@ -911,9 +911,9 @@ static CGContextRef CreateOffScreenContext( int i_width, int i_height,
 
 static offscreen_bitmap_t *Compose( int i_text_align,
                                     CFMutableAttributedStringRef p_attrString,
-                                    int i_width,
-                                    int i_height,
-                                    int *pi_textblock_height )
+                                    unsigned i_width,
+                                    unsigned i_height,
+                                    unsigned *pi_textblock_height )
 {
     offscreen_bitmap_t  *p_offScreen  = NULL;
     CGColorSpaceRef      p_colorSpace = NULL;
@@ -1006,11 +1006,11 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
                        CFMutableAttributedStringRef p_attrString )
 {
     offscreen_bitmap_t *p_offScreen = NULL;
-    int      i_textblock_height = 0;
+    unsigned      i_textblock_height = 0;
 
-    int i_width = p_filter->fmt_out.video.i_visible_width;
-    int i_height = p_filter->fmt_out.video.i_visible_height;
-    int i_text_align = p_region->i_align & 0x3;
+    unsigned i_width = p_filter->fmt_out.video.i_visible_width;
+    unsigned i_height = p_filter->fmt_out.video.i_visible_height;
+    unsigned i_text_align = p_region->i_align & 0x3;
 
     if( !p_attrString )
     {
@@ -1029,7 +1029,8 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
 
     uint8_t *p_dst_y,*p_dst_u,*p_dst_v,*p_dst_a;
     video_format_t fmt;
-    int x, y, i_offset, i_pitch;
+    int i_offset;
+    unsigned x, y, i_pitch;
     uint8_t i_y, i_u, i_v; // YUV values, derived from incoming RGB
 
     // Create a new subpicture region
@@ -1051,10 +1052,10 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     p_dst_a = p_region->p_picture->A_PIXELS;
     i_pitch = p_region->p_picture->A_PITCH;
 
-    i_offset = (i_height+VERTICAL_MARGIN < fmt.i_height) ? VERTICAL_MARGIN *i_pitch : 0 ;
-    for( y=0; y<fmt.i_height; y++)
+    i_offset = (i_height + VERTICAL_MARGIN < fmt.i_height) ? VERTICAL_MARGIN *i_pitch : 0 ;
+    for( y = 0; y < fmt.i_height; y++)
     {
-        for( x=0; x<fmt.i_width; x++)
+        for( x = 0; x < fmt.i_width; x++)
         {
             int i_alpha = p_offScreen->p_data[ y * p_offScreen->i_bytesPerRow + x * p_offScreen->i_bytesPerPixel     ];
             int i_red   = p_offScreen->p_data[ y * p_offScreen->i_bytesPerRow + x * p_offScreen->i_bytesPerPixel + 1 ];
