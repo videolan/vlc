@@ -185,6 +185,7 @@ $Id$
  * memcpymmxext: MMX EXT accelerated version of memcpy
  * mga: video output module for Matrox cards using the Linux mga kernel driver
  * minimal_macosx: a minimal Mac OS X GUI, using the FrameWork
+ * mirror: mirror video filter
  * mjpeg: a demuxer for multipart and concatenated JPEG data
  * mkv: Matroska demuxer
  * mod: MOD demuxer
@@ -310,7 +311,6 @@ $Id$
  * stream_out_standard: standard stream output module
  * stream_out_switcher: stream output module to display backgrounds
  * stream_out_transcode: audio & video transcoder using ffmpeg
- * stream_out_transrate: audio & video transrater using ffmpeg
  * subsdec: a codec to output textual subtitles
  * subsusf: a demuxer for USF subtitles
  * subtitle: a demuxer for subtitle files
@@ -366,14 +366,11 @@ $Id$
  * wingapi: Win CE video output
  * wingdi: WIN 32 / WIN CE GDI video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
- * x11: video output module using the X11 API
  * x264: H264 video decoder using X264
  * xa: XA demuxer
  * xml: LibXML xml parser
  * xosd: X On Screen Display interface
  * xtag: XTAG xml parser
- * xvid: Decoder for the Xvid codec, using libxvidcore
- * xvideo: video output module using the XVideo API
  * xvmc: XVMC video output and decoder
  * yuv: yuv video output
  * yuvp: YUVP to YUVA/RGBA chroma converter

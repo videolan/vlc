@@ -35,6 +35,8 @@ Removed modules:
  * csri
  * galaktos
  * showintf
+ * transrate
+ * x11, xvideo, xvid
 
 
 Changes between 1.0.0 and 1.0.1:
