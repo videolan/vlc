@@ -30,6 +30,8 @@
  * Preamble
  *****************************************************************************/
 
+#ifdef UPDATE_CHECK
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -1028,3 +1030,5 @@ int download_signature( vlc_object_t *p_this, signature_packet_t *p_sig,
 
     return VLC_SUCCESS;
 }
+
+#endif /* UPDATE_CHECK */
