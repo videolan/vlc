@@ -1414,6 +1414,7 @@ static void transcode_video_filter_buffer_del( filter_t *p_filter, picture_t *p_
 static int transcode_video_filter_allocation_init( filter_t *p_filter,
                                                    void *p_data )
 {
+    VLC_UNUSED(p_data);
     p_filter->pf_vout_buffer_new = transcode_video_filter_buffer_new;
     p_filter->pf_vout_buffer_del = transcode_video_filter_buffer_del;
     return VLC_SUCCESS;
@@ -1421,6 +1422,7 @@ static int transcode_video_filter_allocation_init( filter_t *p_filter,
 
 static void transcode_video_filter_allocation_clear( filter_t *p_filter )
 {
+    VLC_UNUSED(p_filter);
 }
 
 static int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
