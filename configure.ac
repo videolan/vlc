@@ -1010,7 +1010,8 @@ AC_ARG_ENABLE(warnings-as-error,
       AS_HELP_STRING([--enable-warnings-as-error],[Treat acceptable warnings as error (default disabled, enabled in debug)]))
 if test "x${warnings_as_error}" = "xyes" -o "x${enable_debug}" != "xno"
 then
-    RDC_PROG_CC_WERRORFLAGS([unused-function unused-label unused-value unused-parameter unused-variable unused])
+    RDC_PROG_CC_WERRORFLAGS([unused-function unused-label unused-value unused-parameter unused-variable unused \
+    missing-parameter-type missing-declarations undef address enum-compare implicit-int implicit-function-declaration comment format main missing-braces nonnull parentheses pointer-sign reorder return-type sequence-point switch trigraphs uninitialized])
 fi
 
 dnl Check for various optimization flags
