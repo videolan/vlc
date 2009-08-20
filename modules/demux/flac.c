@@ -382,7 +382,10 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         double *pf = (double*)va_arg( args, double * );
         const int64_t i_length = ControlGetLength(p_demux);
         if( i_length > 0 )
-            *pf = (double)ControlGetTime(p_demux) / (double)i_length;
+        {
+            double current = ControlGetTime(p_demux);
+            *pf = current / (double)i_length;
+        }
         else
             *pf= 0.0;
         return VLC_SUCCESS;
