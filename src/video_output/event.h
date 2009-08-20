@@ -120,6 +120,9 @@ static inline void vout_SendEventDisplayFilled(vout_thread_t *vout, bool is_disp
 
 static inline void vout_SendEventZoom(vout_thread_t *vout, int num, int den)
 {
+    VLC_UNUSED(vout);
+    VLC_UNUSED(num);
+    VLC_UNUSED(den);
     /* FIXME deadlock problems with current vout */
 #if 0
     const float zoom = (float)num / (float)den;
@@ -132,6 +135,8 @@ static inline void vout_SendEventZoom(vout_thread_t *vout, int num, int den)
 
 static inline void vout_SendEventOnTop(vout_thread_t *vout, bool is_on_top)
 {
+    VLC_UNUSED(vout);
+    VLC_UNUSED(is_on_top);
     /* FIXME deadlock problems with current vout */
 #if 0
 
@@ -147,6 +152,9 @@ static inline void vout_SendEventOnTop(vout_thread_t *vout, bool is_on_top)
 static inline void vout_SendEventSourceAspect(vout_thread_t *vout,
                                               unsigned num, unsigned den)
 {
+    VLC_UNUSED(vout);
+    VLC_UNUSED(num);
+    VLC_UNUSED(den);
     /* FIXME the value stored in "aspect-ratio" are not reduced
      * creating a lot of problems here */
 #if 0
@@ -172,6 +180,9 @@ static inline void vout_SendEventSourceCrop(vout_thread_t *vout,
                                             unsigned left, unsigned top,
                                             unsigned right, unsigned bottom)
 {
+    VLC_UNUSED(num);
+    VLC_UNUSED(den);
+
     vlc_value_t val;
 
     /* I cannot use var_Set here, infinite loop otherwise */
