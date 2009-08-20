@@ -239,6 +239,7 @@ static bool has_inode_loop (const directory_t *dir)
             return true;
 #else
 # define fstat( fd, st ) (0)
+    VLC_UNUSED( dir );
 #endif
     return false;
 }
