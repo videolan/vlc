@@ -741,11 +741,11 @@ end:
         stream_Delete( p_stream );
     if( p_file )
         fclose( p_file );
+    free( psz_destination );
     free( psz_destfile );
     free( p_buffer );
     free( psz_size );
 
-    free( p_udt->psz_destination );
     p_udt->p_update->p_download = NULL;
 
     vlc_restorecancel( canc );
