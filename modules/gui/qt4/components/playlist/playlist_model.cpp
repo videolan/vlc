@@ -108,9 +108,9 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 
     rebuild( p_root );
     CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
-            this, ProcessInputItemUpdate( input_item_t *) );
+            this, processInputItemUpdate( input_item_t *) );
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
-            this, ProcessInputItemUpdate( input_thread_t* ) );
+            this, processInputItemUpdate( input_thread_t* ) );
 }
 
 PLModel::~PLModel()
@@ -285,7 +285,7 @@ void PLModel::dropMove( QByteArray& data, PLItem *target, int row )
         ids.append( item->i_id );
         model_items.append( item );
 
-        TakeItem( item );
+        takeItem( item );
     }
     int count = ids.size();
     if( count )
@@ -309,15 +309,15 @@ void PLModel::dropMove( QByteArray& data, PLItem *target, int row )
             new_pos );
         PL_UNLOCK;
 
-        InsertChildren( target, model_items, model_pos );
+        insertChildren( target, model_items, model_pos );
     }
 }
 
 /* remove item with its id */
 void PLModel::removeItem( int i_id )
 {
-    PLItem *item = FindById( rootItem, i_id );
-    RemoveItem( item );
+    PLItem *item = findById( rootItem, i_id );
+    removeItem( item );
 }
 
 /* callbacks and slots */
@@ -501,11 +501,6 @@ int PLModel::columnCount( const QModelIndex &i) const
     return columnCount;
 }
 
-int PLModel::childrenCount( const QModelIndex &parent ) const
-{
-    return rowCount( parent );
-}
-
 int PLModel::rowCount( const QModelIndex &parent ) const
 {
     PLItem *parentItem = parent.isValid() ? getItem( parent ) : rootItem;
@@ -569,21 +564,21 @@ void PLModel::setRandom( bool on )
 
 /************************* Lookups *****************************/
 
-PLItem *PLModel::FindById( PLItem *root, int i_id )
+PLItem *PLModel::findById( PLItem *root, int i_id )
 {
-    return FindInner( root, i_id, false );
+    return findInner( root, i_id, false );
 }
 
-PLItem *PLModel::FindByInput( PLItem *root, int i_id )
+PLItem *PLModel::findByInput( PLItem *root, int i_id )
 {
-    PLItem *result = FindInner( root, i_id, true );
+    PLItem *result = findInner( root, i_id, true );
     return result;
 }
 
 #define CACHE( i, p ) { i_cached_id = i; p_cached_item = p; }
 #define ICACHE( i, p ) { i_cached_input_id = i; p_cached_item_bi = p; }
 
-PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
+PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_input )
 {
     if( ( !b_input && i_cached_id == i_id) ||
         ( b_input && i_cached_input_id ==i_id ) )
@@ -617,7 +612,7 @@ PLItem * PLModel::FindInner( PLItem *root, int i_id, bool b_input )
         }
         if( (*it)->children.size() )
         {
-            PLItem *childFound = FindInner( (*it), i_id, b_input );
+            PLItem *childFound = findInner( (*it), i_id, b_input );
             if( childFound )
             {
                 if( b_input )
@@ -670,21 +665,21 @@ void PLModel::customEvent( QEvent *event )
     PLEvent *ple = static_cast<PLEvent *>(event);
 
     if( type == ItemAppend_Type )
-        ProcessItemAppend( &ple->add );
+        processItemAppend( &ple->add );
     else if( type == ItemDelete_Type )
-        ProcessItemRemoval( ple->i_id );
+        processItemRemoval( ple->i_id );
     else
         rebuild();
 }
 
 /**** Events processing ****/
-void PLModel::ProcessInputItemUpdate( input_thread_t *p_input )
+void PLModel::processInputItemUpdate( input_thread_t *p_input )
 {
     if( !p_input ) return;
-    ProcessInputItemUpdate( input_GetItem( p_input ) );
+    processInputItemUpdate( input_GetItem( p_input ) );
     if( p_input && !( p_input->b_dead || !vlc_object_alive( p_input ) ) )
     {
-        PLItem *item = FindByInput( rootItem, input_GetItem( p_input )->i_id );
+        PLItem *item = findByInput( rootItem, input_GetItem( p_input )->i_id );
         currentItem = item;
         emit currentChanged( index( item, 0 ) );
     }
@@ -693,15 +688,15 @@ void PLModel::ProcessInputItemUpdate( input_thread_t *p_input )
         currentItem = NULL;
     }
 }
-void PLModel::ProcessInputItemUpdate( input_item_t *p_item )
+void PLModel::processInputItemUpdate( input_item_t *p_item )
 {
     if( !p_item ||  p_item->i_id <= 0 ) return;
-    PLItem *item = FindByInput( rootItem, p_item->i_id );
+    PLItem *item = findByInput( rootItem, p_item->i_id );
     if( item )
-        UpdateTreeItem( item, true, true);
+        updateTreeItem( item, true, true);
 }
 
-void PLModel::ProcessItemRemoval( int i_id )
+void PLModel::processItemRemoval( int i_id )
 {
     if( i_id <= 0 ) return;
     if( i_id == i_cached_id ) i_cached_id = -1;
@@ -710,12 +705,12 @@ void PLModel::ProcessItemRemoval( int i_id )
     removeItem( i_id );
 }
 
-void PLModel::ProcessItemAppend( const playlist_add_t *p_add )
+void PLModel::processItemAppend( const playlist_add_t *p_add )
 {
     playlist_item_t *p_item = NULL;
     PLItem *newItem = NULL;
 
-    PLItem *nodeItem = FindById( rootItem, p_add->i_node );
+    PLItem *nodeItem = findById( rootItem, p_add->i_node );
     if( !nodeItem ) return;
 
     PL_LOCK;
@@ -731,7 +726,7 @@ void PLModel::ProcessItemAppend( const playlist_add_t *p_add )
     beginInsertRows( index( nodeItem, 0 ), nodeItem->childCount(), nodeItem->childCount() );
     nodeItem->appendChild( newItem );
     endInsertRows();
-    UpdateTreeItem( newItem, true );
+    updateTreeItem( newItem, true );
     return;
 end:
     PL_UNLOCK;
@@ -762,9 +757,9 @@ void PLModel::rebuild( playlist_item_t *p_root )
     }
     assert( rootItem );
     /* Recreate from root */
-    UpdateChildren( rootItem );
+    updateChildren( rootItem );
     if( (p_item = playlist_CurrentPlayingItem(p_playlist)) )
-        currentItem = FindByInput( rootItem, p_item->p_input->i_id );
+        currentItem = findByInput( rootItem, p_item->p_input->i_id );
     else
         currentItem = NULL;
     PL_UNLOCK;
@@ -776,7 +771,7 @@ void PLModel::rebuild( playlist_item_t *p_root )
     addCallbacks();
 }
 
-void PLModel::TakeItem( PLItem *item )
+void PLModel::takeItem( PLItem *item )
 {
     assert( item );
     PLItem *parent = item->parentItem;
@@ -788,7 +783,7 @@ void PLModel::TakeItem( PLItem *item )
     endRemoveRows();
 }
 
-void PLModel::InsertChildren( PLItem *node, QList<PLItem*>& items, int i_pos )
+void PLModel::insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos )
 {
     assert( node );
     int count = items.size();
@@ -802,7 +797,7 @@ void PLModel::InsertChildren( PLItem *node, QList<PLItem*>& items, int i_pos )
     endInsertRows();
 }
 
-void PLModel::RemoveItem( PLItem *item )
+void PLModel::removeItem( PLItem *item )
 {
     if( !item ) return;
     if( currentItem == item )
@@ -816,14 +811,14 @@ void PLModel::RemoveItem( PLItem *item )
 }
 
 /* This function must be entered WITH the playlist lock */
-void PLModel::UpdateChildren( PLItem *root )
+void PLModel::updateChildren( PLItem *root )
 {
     playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id );
-    UpdateChildren( p_node, root );
+    updateChildren( p_node, root );
 }
 
 /* This function must be entered WITH the playlist lock */
-void PLModel::UpdateChildren( playlist_item_t *p_node, PLItem *root )
+void PLModel::updateChildren( playlist_item_t *p_node, PLItem *root )
 {
     playlist_item_t *p_item = playlist_CurrentPlayingItem(p_playlist);
     for( int i = 0; i < p_node->i_children ; i++ )
@@ -837,12 +832,12 @@ void PLModel::UpdateChildren( playlist_item_t *p_node, PLItem *root )
             emit currentChanged( index( currentItem, 0 ) );
         }
         if( i_depth == DEPTH_PL && p_node->pp_children[i]->i_children != -1 )
-            UpdateChildren( p_node->pp_children[i], newItem );
+            updateChildren( p_node->pp_children[i], newItem );
     }
 }
 
 /* Function doesn't need playlist-lock, as we don't touch playlist_item_t stuff here*/
-void PLModel::UpdateTreeItem( PLItem *item, bool signal, bool force )
+void PLModel::updateTreeItem( PLItem *item, bool signal, bool force )
 {
     if ( !item || !item->p_input )
         return;
@@ -909,7 +904,7 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
     /* And finally, remove it from the tree */
     int itemIndex = item->parentItem->children.indexOf( item );
     beginRemoveRows( index( item->parentItem, 0), itemIndex, itemIndex );
-    RemoveItem( item );
+    removeItem( item );
     endRemoveRows();
 }
 
@@ -936,7 +931,7 @@ void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
         }
     }
 
-    PLItem *item = FindById( rootItem, i_root_id );
+    PLItem *item = findById( rootItem, i_root_id );
     if( !item ) return;
     QModelIndex qIndex = index( item, 0 );
     int count = item->children.size();
@@ -962,7 +957,7 @@ void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
     if( count )
     {
         beginInsertRows( qIndex, 0, count - 1 );
-        UpdateChildren( item );
+        updateChildren( item );
         endInsertRows( );
     }
     PL_UNLOCK;

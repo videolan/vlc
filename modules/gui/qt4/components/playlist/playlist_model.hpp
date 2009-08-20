@@ -90,49 +90,48 @@ public:
              playlist_item_t *, int, QObject *parent = 0 );
     ~PLModel();
 
-    /* All types of lookups / QModel stuff */
+    /*** QModel subclassing ***/
+
+    /* Data structure */
     QVariant data( const QModelIndex &index, int role ) const;
-    Qt::ItemFlags flags( const QModelIndex &index ) const;
     QVariant headerData( int section, Qt::Orientation orientation,
                          int role = Qt::DisplayRole ) const;
-    QModelIndex index( int r, int c, const QModelIndex &parent ) const;
-    QModelIndex index( PLItem *, int c ) const;
-    QModelIndex currentIndex( ) { return index( currentItem, 0 ); };
-    int itemId( const QModelIndex &index ) const;
-    bool isCurrent( const QModelIndex &index ) const;
-    QModelIndex parent( const QModelIndex &index ) const;
-    int childrenCount( const QModelIndex &parent = QModelIndex() ) const;
     int rowCount( const QModelIndex &parent = QModelIndex() ) const;
     int columnCount( const QModelIndex &parent = QModelIndex() ) const;
+    Qt::ItemFlags flags( const QModelIndex &index ) const;
+    QModelIndex index( int r, int c, const QModelIndex &parent ) const;
+    QModelIndex parent( const QModelIndex &index ) const;
 
-    /* Get current selection */
-    QStringList selectedURIs();
-
-    void rebuild(); void rebuild( playlist_item_t * );
-    bool hasRandom(); bool hasLoop(); bool hasRepeat();
-
-    /* Actions made by the views */
-    void popup( QModelIndex & index, QPoint &point, QModelIndexList list );
-    void doDelete( QModelIndexList selected );
-    void search( const QString& search_text );
-    void sort( int column, Qt::SortOrder order );
-    void sort( int i_root_id, int column, Qt::SortOrder order );
-    void removeItem( int );
-
-    /* DnD handling */
+    /* Drag and Drop */
     Qt::DropActions supportedDropActions() const;
     QMimeData* mimeData( const QModelIndexList &indexes ) const;
     bool dropMimeData( const QMimeData *data, Qt::DropAction action,
                       int row, int column, const QModelIndex &target );
     QStringList mimeTypes() const;
 
+    /**** Custom ****/
+
+    /* Lookups */
+    QStringList selectedURIs();
+    bool hasRandom(); bool hasLoop(); bool hasRepeat();
     int shownFlags() { return i_showflags;  }
+    QModelIndex index( PLItem *, int c ) const;
+    QModelIndex currentIndex( ) { return index( currentItem, 0 ); };
+    bool isCurrent( const QModelIndex &index ) const;
+    int itemId( const QModelIndex &index ) const;
+
+    /* Actions */
+    void popup( QModelIndex & index, QPoint &point, QModelIndexList list );
+    void doDelete( QModelIndexList selected );
+    void search( const QString& search_text );
+    void sort( int column, Qt::SortOrder order );
+    void sort( int i_root_id, int column, Qt::SortOrder order );
+    void removeItem( int );
+    void rebuild(); void rebuild( playlist_item_t * );
 
 private:
-    void addCallbacks();
-    void delCallbacks();
-    void customEvent( QEvent * );
 
+    /* General */
     PLItem *rootItem;
     PLItem *currentItem;
 
@@ -143,22 +142,25 @@ private:
 
     static QIcon icons[ITEM_TYPE_NUMBER];
 
-    /* Update processing */
-    void ProcessItemRemoval( int i_id );
-    void ProcessItemAppend( const playlist_add_t *p_add );
+    /* Callbacks related */
+    void addCallbacks();
+    void delCallbacks();
+    void customEvent( QEvent * );
+    void processItemRemoval( int i_id );
+    void processItemAppend( const playlist_add_t *p_add );
 
     /* Actions */
     void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList );
     void doDeleteItem( PLItem *item, QModelIndexList *fullList );
-    void UpdateTreeItem( PLItem *, bool, bool force = false );
+    void updateTreeItem( PLItem *, bool, bool force = false );
+    void takeItem( PLItem * ); //will not delete item
+    void insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos );
     void dropAppendCopy( QByteArray& data, PLItem *target );
     void dropMove( QByteArray& data, PLItem *target, int new_pos );
-    void TakeItem( PLItem * );
-    void InsertChildren( PLItem *node, QList<PLItem*>& items, int i_pos );
     /* The following actions will not signal the view! */
-    void RemoveItem ( PLItem * );
-    void UpdateChildren( PLItem * );
-    void UpdateChildren( playlist_item_t *, PLItem * );
+    void removeItem ( PLItem * );
+    void updateChildren( PLItem * );
+    void updateChildren( playlist_item_t *, PLItem * );
 
     /* Popup */
     int i_popup_item, i_popup_parent, i_popup_column;
@@ -166,15 +168,16 @@ private:
     QSignalMapper *ContextUpdateMapper;
 
     /* Lookups */
-    PLItem *FindById( PLItem *, int );
-    PLItem *FindByInput( PLItem *, int );
-    PLItem *FindInner( PLItem *, int , bool );
+    PLItem *findById( PLItem *, int );
+    PLItem *findByInput( PLItem *, int );
+    PLItem *findInner( PLItem *, int , bool );
     static inline PLItem *getItem( QModelIndex index );
     int metaColumn ( int column ) const;
     PLItem *p_cached_item;
     PLItem *p_cached_item_bi;
     int i_cached_id;
     int i_cached_input_id;
+
 signals:
     void shouldRemove( int );
     void currentChanged( const QModelIndex& );
@@ -199,8 +202,8 @@ private slots:
     void popupSortAsc();
     void popupSortDesc();
     void viewchanged( int );
-    void ProcessInputItemUpdate( input_item_t *);
-    void ProcessInputItemUpdate( input_thread_t* p_input );
+    void processInputItemUpdate( input_item_t *);
+    void processInputItemUpdate( input_thread_t* p_input );
 };
 
 #endif
