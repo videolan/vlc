@@ -76,6 +76,8 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
 {
+    VLC_UNUSED( p_buffer );
+
     int i = 0;
     aout_input_t * p_input = p_aout->pp_inputs[i];
     while ( p_input->b_error || p_input->b_paused )

@@ -1148,7 +1148,7 @@ static int VolumeSet( aout_instance_t * p_aout, audio_volume_t i_volume )
 static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
                                  vlc_value_t newval, vlc_value_t oldval, void *data )
 {
-    int i;
+    VLC_UNUSED( newval ); VLC_UNUSED( oldval ); VLC_UNUSED( data );
 
     module_config_t *p_item = config_FindConfig( p_this, psz_name );
     if( !p_item ) return VLC_SUCCESS;
@@ -1156,6 +1156,8 @@ static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
     /* Clear-up the current list */
     if( p_item->i_list )
     {
+        int i;
+
         /* Keep the first entry */
         for( i = 1; i < p_item->i_list; i++ )
         {
