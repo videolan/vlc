@@ -128,6 +128,7 @@ static int rtsp_put( rtsp_client_t *rtsp, const char *psz_string )
 
 static int rtsp_get_status_code( rtsp_client_t *rtsp, const char *psz_string )
 {
+    VLC_UNUSED(rtsp);
     char psz_buffer[4];
     int i_code = 0;
 

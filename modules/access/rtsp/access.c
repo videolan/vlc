@@ -136,6 +136,7 @@ static int RtspReadLine( void *p_userdata, uint8_t *p_buffer, int i_buffer )
 
 static int RtspWrite( void *p_userdata, uint8_t *p_buffer, int i_buffer )
 {
+    VLC_UNUSED(i_buffer);
     access_t *p_access = (access_t *)p_userdata;
     access_sys_t *p_sys = p_access->p_sys;
 
@@ -308,6 +309,8 @@ static block_t *BlockRead( access_t *p_access )
  *****************************************************************************/
 static int Seek( access_t *p_access, int64_t i_pos )
 {
+    VLC_UNUSED(p_access);
+    VLC_UNUSED(i_pos);
     return VLC_SUCCESS;
 }
 
