@@ -24,7 +24,7 @@
 #ifndef _OSD_MENU_PARSER_H_
 #define _OSD_MENU_PARSER_H_
 
-static const char *ppsz_button_states[] = { "unselect", "select", "pressed" };
+extern const char * const ppsz_button_states[3];
 
 /* OSD Menu structure support routines for internal use by
  * OSD Menu configuration file parsers only.
