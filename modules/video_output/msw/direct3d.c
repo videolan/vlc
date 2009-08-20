@@ -543,6 +543,8 @@ static int Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Display( vout_thread_t *p_vout, picture_t *p_pic )
 {
+    VLC_UNUSED( p_pic );
+
     LPDIRECT3DDEVICE9       p_d3ddev = p_vout->p_sys->p_d3ddev;
 
     if( p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG )
