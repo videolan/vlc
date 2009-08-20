@@ -222,9 +222,10 @@ static int Open( vlc_object_t * p_this )
                 static const uint32_t pi_pair[] = { AOUT_CHAN_REARLEFT|AOUT_CHAN_REARRIGHT,
                                                     AOUT_CHAN_MIDDLELEFT|AOUT_CHAN_MIDDLERIGHT,
                                                     AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT };
+                /* FIXME: Unused yet
                 static const uint32_t pi_center[] = { AOUT_CHAN_REARCENTER,
                                                       0,
-                                                      AOUT_CHAN_CENTER };
+                                                      AOUT_CHAN_CENTER }; */
 
                 /* Try to complete with pair */
                 for( unsigned i = 0; i < sizeof(pi_pair)/sizeof(*pi_pair); i++ )
