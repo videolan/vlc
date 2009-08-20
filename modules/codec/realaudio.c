@@ -73,7 +73,9 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static int  OpenDll( decoder_t * );
+#ifndef WIN32
 static int  OpenNativeDll( decoder_t *, char *, char * );
+#endif
 static int  OpenWin32Dll( decoder_t *, char *, char * );
 static void CloseDll( decoder_t * );
 
@@ -390,6 +392,7 @@ static int OpenDll( decoder_t *p_dec )
     return VLC_EGENERIC;
 }
 
+#ifndef WIN32
 static int OpenNativeDll( decoder_t *p_dec, char *psz_path, char *psz_dll )
 {
 #if defined(HAVE_DL_DLOPEN)
@@ -490,10 +493,15 @@ static int OpenNativeDll( decoder_t *p_dec, char *psz_path, char *psz_dll )
     if( context ) p_sys->raFreeDecoder( context );
     if( context ) p_sys->raCloseCodec( context );
     dlclose( handle );
+#else
+    VLC_UNUSED( p_dec );
+    VLC_UNUSED( psz_path);
+    VLC_UNUSED( psz_dll );
 #endif
 
     return VLC_EGENERIC;
 }
+#endif /* Win32 */
 
 static int OpenWin32Dll( decoder_t *p_dec, char *psz_path, char *psz_dll )
 {
