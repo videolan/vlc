@@ -187,9 +187,9 @@ static block_t *CaptureBlockNew( demux_t *p_demux )
         p_data->bmi.bmiHeader.biClrImportant = 0;
 
         i_val = var_CreateGetInteger( p_demux, "screen-fragment-size" );
-        p_data->i_fragment_size = i_val > 0 ? i_val : p_sys->fmt.video.i_height;
-        p_data->i_fragment_size = i_val > p_sys->fmt.video.i_height ?
-                                            p_sys->fmt.video.i_height :
+        p_data->i_fragment_size = i_val > 0 ? i_val : (int)p_sys->fmt.video.i_height;
+        p_data->i_fragment_size = i_val > (int)p_sys->fmt.video.i_height ?
+                                            (int)p_sys->fmt.video.i_height :
                                             p_data->i_fragment_size;
         p_sys->f_fps *= (p_sys->fmt.video.i_height/p_data->i_fragment_size);
         p_sys->i_incr = 1000000 / p_sys->f_fps;
