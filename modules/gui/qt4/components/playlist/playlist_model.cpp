@@ -46,10 +46,6 @@
 
 QIcon PLModel::icons[ITEM_TYPE_NUMBER];
 
-static int PlaylistChanged( vlc_object_t *, const char *,
-                            vlc_value_t, vlc_value_t, void * );
-static int PlaylistNext( vlc_object_t *, const char *,
-                         vlc_value_t, vlc_value_t, void * );
 static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
                          vlc_value_t oval, vlc_value_t nval, void *param );
 static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
@@ -323,11 +319,6 @@ void PLModel::removeItem( int i_id )
 /* callbacks and slots */
 void PLModel::addCallbacks()
 {
-    /* Some global changes happened -> Rebuild all */
-    var_AddCallback( p_playlist, "intf-change", PlaylistChanged, this );
-    /* We went to the next item
-    var_AddCallback( p_playlist, "item-current", PlaylistNext, this );
-    */
     /* One item has been updated */
     var_AddCallback( p_playlist, "playlist-item-append", ItemAppended, this );
     var_AddCallback( p_playlist, "playlist-item-deleted", ItemDeleted, this );
@@ -335,10 +326,6 @@ void PLModel::addCallbacks()
 
 void PLModel::delCallbacks()
 {
-    /*
-    var_DelCallback( p_playlist, "item-current", PlaylistNext, this );
-    */
-    var_DelCallback( p_playlist, "intf-change", PlaylistChanged, this );
     var_DelCallback( p_playlist, "playlist-item-append", ItemAppended, this );
     var_DelCallback( p_playlist, "playlist-item-deleted", ItemDeleted, this );
 }
@@ -659,7 +646,7 @@ void PLModel::customEvent( QEvent *event )
 {
     int type = event->type();
     if( type != ItemAppend_Type &&
-        type != ItemDelete_Type && type != PLUpdate_Type )
+        type != ItemDelete_Type )
         return;
 
     PLEvent *ple = static_cast<PLEvent *>(event);
@@ -668,8 +655,6 @@ void PLModel::customEvent( QEvent *event )
         processItemAppend( &ple->add );
     else if( type == ItemDelete_Type )
         processItemRemoval( ple->i_id );
-    else
-        rebuild();
 }
 
 /**** Events processing ****/
@@ -1186,25 +1171,6 @@ void PLModel::popupSortDesc()
 /**********************************************************************
  * Playlist callbacks
  **********************************************************************/
-static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
-                            vlc_value_t oval, vlc_value_t nval, void *param )
-{
-    PLModel *p_model = (PLModel *) param;
-    PLEvent *event = new PLEvent( PLUpdate_Type, 0 );
-    QApplication::postEvent( p_model, event );
-    return VLC_SUCCESS;
-}
-
-static int PlaylistNext( vlc_object_t *p_this, const char *psz_variable,
-                         vlc_value_t oval, vlc_value_t nval, void *param )
-{
-    PLModel *p_model = (PLModel *) param;
-    PLEvent *event = new PLEvent( ItemUpdate_Type, oval.i_int );
-    QApplication::postEvent( p_model, event );
-    event = new PLEvent( ItemUpdate_Type, nval.i_int );
-    QApplication::postEvent( p_model, event );
-    return VLC_SUCCESS;
-}
 
 static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t oval, vlc_value_t nval, void *param )

@@ -54,7 +54,6 @@ enum {
     ItemUpdate_Type = QEvent::User + PLEventType + 2,
     ItemDelete_Type = QEvent::User + PLEventType + 3,
     ItemAppend_Type = QEvent::User + PLEventType + 4,
-    PLUpdate_Type   = QEvent::User + PLEventType + 5,
 };
 
 class PLEvent : public QEvent
