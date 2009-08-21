@@ -41,6 +41,8 @@
 #ifdef __APPLE__
 # include <OpenGL/gl.h>
 # include <OpenGL/glext.h>
+#else
+# include <GL/gl.h>
 #endif
 
 #ifndef YCBCR_MESA
@@ -67,7 +69,6 @@
 # define VLCGL_TYPE   GL_UNSIGNED_SHORT_8_8_APPLE
 #else
 
-# include <GL/gl.h>
 # define VLCGL_TARGET GL_TEXTURE_2D
 
 /* RV32 */
