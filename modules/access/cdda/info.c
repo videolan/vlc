@@ -860,7 +860,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
     }
     else
     {
-        input_thread_t *p_input = (input_thread_t*)vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
+        input_thread_t *p_input = access_GetParentInput( p_access );
         if( !p_input )
             return VLC_EGENERIC;
 

@@ -248,8 +248,7 @@ static int Demux( demux_t *p_demux )
     lua_State *L = p_demux->p_sys->L;
     char *psz_filename = p_demux->p_sys->psz_filename;
 
-    input_thread_t *p_input_thread = (input_thread_t *)
-        vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+    input_thread_t *p_input_thread = demux_GetParentInput( p_demux );
     input_item_t *p_current_input = input_GetItem( p_input_thread );
     playlist_t *p_playlist = pl_Hold( p_demux );
 

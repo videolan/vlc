@@ -651,8 +651,7 @@ static int Demux( demux_t *p_demux )
     input_thread_t *p_input;
     input_item_t *p_parent_input;
 
-    p_input = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT,
-                                                 FIND_PARENT );
+    p_input = demux_GetParentInput( p_demux );
     assert( p_input );
     if( !p_input )
     {

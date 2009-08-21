@@ -369,7 +369,7 @@ static int Open( vlc_object_t * p_this )
 
         msg_Dbg( p_demux, "detected playlist mov file (%d ref)", i_count );
 
-        input_thread_t *p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+        input_thread_t *p_input = demux_GetParentInput( p_demux );
         input_item_t *p_current = input_GetItem( p_input );
 
         for( i = 0; i < i_count; i++ )

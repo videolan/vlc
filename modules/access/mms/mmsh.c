@@ -167,7 +167,7 @@ int MMSHOpen( access_t *p_access )
     {
         msg_Dbg( p_access, "redirection to %s", psz_location );
 
-        input_thread_t * p_input = vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
+        input_thread_t * p_input = access_GetParentInput( p_access );
         input_item_t * p_new_loc;
 
         if( !p_input )

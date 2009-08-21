@@ -339,7 +339,7 @@ static int Open( vlc_object_t *p_this )
 
     /* FIXME hack hack hack hack FIXME */
     /* Get p_input and create variable */
-    p_sys->p_input = vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );
+    p_sys->p_input = demux_GetParentInput( p_demux );
     var_Create( p_sys->p_input, "x-start", VLC_VAR_INTEGER );
     var_Create( p_sys->p_input, "y-start", VLC_VAR_INTEGER );
     var_Create( p_sys->p_input, "x-end", VLC_VAR_INTEGER );

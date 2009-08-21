@@ -167,7 +167,7 @@ vlc_module_end ()
 
 input_item_t * GetCurrentItem(demux_t *p_demux)
 {
-    input_thread_t *p_input_thread = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );;
+    input_thread_t *p_input_thread = demux_GetParentInput( p_demux );
     input_item_t *p_current_input = input_GetItem( p_input_thread );
     vlc_gc_incref(p_current_input);
     vlc_object_release(p_input_thread);

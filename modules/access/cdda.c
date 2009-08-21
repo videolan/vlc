@@ -177,7 +177,7 @@ static int Open( vlc_object_t *p_this )
    if( p_sys->i_track < 0 )
    {
         /* We only do separate items if the whole disc is requested */
-        input_thread_t *p_input = (input_thread_t*)vlc_object_find( p_access, VLC_OBJECT_INPUT, FIND_PARENT );
+        input_thread_t *p_input = access_GetParentInput( p_access );
 
         i_ret = -1;
         if( p_input )

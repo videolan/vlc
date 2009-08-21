@@ -894,9 +894,7 @@ VCDOpen ( vlc_object_t *p_this )
                                                     "-track-length" );
     p_vcdplayer->in_still          = false;
     p_vcdplayer->play_item.type    = VCDINFO_ITEM_TYPE_NOTFOUND;
-    p_vcdplayer->p_input           = vlc_object_find( p_access,
-                                                      VLC_OBJECT_INPUT,
-                                                      FIND_PARENT );
+    p_vcdplayer->p_input           = access_GetParentInput( p_access );
 //    p_vcdplayer->p_meta            = vlc_meta_New();
     p_vcdplayer->p_segments        = NULL;
     p_vcdplayer->p_entries         = NULL;
