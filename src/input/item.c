@@ -715,7 +715,6 @@ void input_item_SetEpg( input_item_t *p_item,
 {
     input_item_DelInfo( p_item, psz_epg, NULL );
 
-#ifdef HAVE_LOCALTIME_R
     vlc_mutex_lock( &p_item->lock );
     for( int i = 0; i < p_epg->i_event; i++ )
     {
@@ -748,9 +747,6 @@ void input_item_SetEpg( input_item_t *p_item,
         event.type = vlc_InputItemInfoChanged;
         vlc_event_send( &p_item->event_manager, &event );
     }
-#else
-    VLC_UNUSED( p_epg );
-#endif
 }
 
 
