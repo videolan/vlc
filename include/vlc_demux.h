@@ -71,6 +71,9 @@ struct demux_t
         int          i_seekpoint;   /* idem, start from 0 */
     } info;
     demux_sys_t *p_sys;
+
+    /* Weak link to parent input */
+    input_thread_t *p_input;
 };
 
 
@@ -189,6 +192,12 @@ VLC_EXPORT( decoder_t *,demux_PacketizerNew, ( demux_t *p_demux, es_format_t *p_
  * This function will destroy a packetizer create by demux_PacketizerNew.
  */
 VLC_EXPORT( void, demux_PacketizerDestroy, ( decoder_t *p_packetizer ) );
+
+/**
+ * This function will return the parent input of this demux.
+ * It is retained. Can return NULL.
+ */
+VLC_EXPORT( input_thread_t *, demux_GetParentInput, ( demux_t *p_demux ) );
 
 /* */
 #define DEMUX_INIT_COMMON() do {            \

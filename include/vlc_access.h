@@ -115,6 +115,9 @@ struct access_t
         int          i_seekpoint;/* idem, start from 0 */
     } info;
     access_sys_t *p_sys;
+
+    /* Weak link to parent input */
+    input_thread_t *p_input;
 };
 
 static inline int access_vaControl( access_t *p_access, int i_query, va_list args )
@@ -143,6 +146,12 @@ static inline void access_InitFields( access_t *p_a )
     p_a->info.i_title = 0;
     p_a->info.i_seekpoint = 0;
 }
+
+/**
+ * This function will return the parent input of this access.
+ * It is retained. It can return NULL.
+ */
+VLC_EXPORT( input_thread_t *, access_GetParentInput, ( access_t *p_access ) );
 
 #define ACCESS_SET_CALLBACKS( read, block, control, seek )              \
     p_access->pf_read = read;                                           \

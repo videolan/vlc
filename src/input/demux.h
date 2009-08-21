@@ -35,8 +35,8 @@
 #include "stream.h"
 
 /* stream_t *s could be null and then it mean a access+demux in one */
-#define demux_New( a, b, c, d, e, f,g ) __demux_New(VLC_OBJECT(a),b,c,d,e,f,g)
-demux_t *__demux_New( vlc_object_t *p_obj, const char *psz_access, const char *psz_demux, const char *psz_path, stream_t *s, es_out_t *out, bool );
+#define demux_New( a, b, c, d, e, f, g, h ) __demux_New(VLC_OBJECT(a),b,c,d,e,f,g,h)
+demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input, const char *psz_access, const char *psz_demux, const char *psz_path, stream_t *s, es_out_t *out, bool );
 
 void demux_Delete( demux_t * );
 

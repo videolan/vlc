@@ -229,6 +229,7 @@ stream_t *stream_CommonNew( vlc_object_t *p_obj )
 
     return s;
 }
+
 void stream_CommonDelete( stream_t *s )
 {
     if( s->p_text )
@@ -258,8 +259,15 @@ stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
     strcpy( psz_dup, psz_url );
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_dup );
 
+    /* Get a weak link to the parent input */
+    /* FIXME: This should probably be removed in favor of a NULL input. */
+    input_thread_t *p_input = (input_thread_t *)vlc_object_find( p_parent, VLC_OBJECT_INPUT, FIND_PARENT );
+    
     /* Now try a real access */
-    p_access = access_New( p_parent, psz_access, psz_demux, psz_path );
+    p_access = access_New( p_parent, p_input, psz_access, psz_demux, psz_path );
+
+    if(p_input)
+        vlc_object_release((vlc_object_t*)p_input);
 
     if( p_access == NULL )
     {
@@ -285,6 +293,7 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
     if( !s )
         return NULL;
 
+    s->p_input = p_access->p_input;
     s->psz_path = strdup( p_access->psz_path );
     s->p_sys = p_sys = malloc( sizeof( *p_sys ) );
     if( !s->psz_path || !s->p_sys )
@@ -348,7 +357,7 @@ stream_t *stream_AccessNew( access_t *p_access, char **ppsz_list )
             if( !psz_name )
                 break;
 
-            access_t *p_tmp = access_New( p_access,
+            access_t *p_tmp = access_New( p_access, p_access->p_input,
                                           p_access->psz_access, "", psz_name );
             if( !p_tmp )
                 continue;
@@ -1533,8 +1542,7 @@ char *stream_ReadLine( stream_t *s )
                 }
 
                 /* FIXME that's UGLY */
-                input_thread_t *p_input;
-                p_input = (input_thread_t *)vlc_object_find( s, VLC_OBJECT_INPUT, FIND_PARENT );
+                input_thread_t *p_input = s->p_input;
                 if( p_input != NULL)
                 {
                     var_Create( p_input, "subsdec-encoding", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
@@ -1716,7 +1724,7 @@ static int AReadStream( stream_t *s, void *p_read, unsigned int i_read )
 
         msg_Dbg( s, "opening input `%s'", psz_name );
 
-        p_list_access = access_New( s, p_access->psz_access, "", psz_name );
+        p_list_access = access_New( s, s->p_input, p_access->psz_access, "", psz_name );
 
         if( !p_list_access ) return 0;
 
@@ -1788,7 +1796,7 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
 
         msg_Dbg( s, "opening input `%s'", psz_name );
 
-        p_list_access = access_New( s, p_access->psz_access, "", psz_name );
+        p_list_access = access_New( s, s->p_input, p_access->psz_access, "", psz_name );
 
         if( !p_list_access ) return 0;
 
@@ -1843,7 +1851,7 @@ static int ASeek( stream_t *s, int64_t i_pos )
         if( i != p_sys->i_list_index && i != 0 )
         {
             p_list_access =
-                access_New( s, p_access->psz_access, "", psz_name );
+                access_New( s, s->p_input, p_access->psz_access, "", psz_name );
         }
         else if( i != p_sys->i_list_index )
         {

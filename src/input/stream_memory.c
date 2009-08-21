@@ -78,6 +78,12 @@ stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
 
     vlc_object_attach( s, p_this );
 
+    /* Get a weak link to the parent input */
+    /* FIXME: The usage of vlc_object_find has to be removed. */
+    s->p_input = (input_thread_t *)vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_PARENT );
+    if(s->p_input)
+        vlc_object_release((vlc_object_t*)s->p_input);
+
     return s;
 }
 

@@ -2416,7 +2416,7 @@ static int InputSourceInit( input_thread_t *p_input,
         }
 
         /* Try access_demux first */
-        in->p_demux = demux_New( p_input, psz_access, psz_demux, psz_path,
+        in->p_demux = demux_New( p_input, p_input, psz_access, psz_demux, psz_path,
                                   NULL, p_input->p->p_es_out, false );
     }
     else
@@ -2481,7 +2481,7 @@ static int InputSourceInit( input_thread_t *p_input,
     else
     {
         /* Now try a real access */
-        in->p_access = access_New( p_input, psz_access, psz_demux, psz_path );
+        in->p_access = access_New( p_input, p_input, psz_access, psz_demux, psz_path );
         if( in->p_access == NULL )
         {
             if( vlc_object_alive( p_input ) )
@@ -2609,7 +2609,7 @@ static int InputSourceInit( input_thread_t *p_input,
             {
                 psz_real_path = psz_path;
             }
-            in->p_demux = demux_New( p_input, psz_access, psz_demux,
+            in->p_demux = demux_New( p_input, p_input, psz_access, psz_demux,
                                       psz_real_path,
                                       in->p_stream, p_input->p->p_es_out,
                                       p_input->b_preparsing );

@@ -54,9 +54,9 @@ static void DStreamDelete ( stream_t * );
 static void* DStreamThread ( vlc_object_t * );
 
 
-stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
-                             es_out_t *out )
+stream_t *stream_DemuxNew( demux_t *p_demux, const char *psz_demux, es_out_t *out )
 {
+    vlc_object_t *p_obj = VLC_OBJECT(p_demux);
     /* We create a stream reader, and launch a thread */
     stream_t     *s;
     stream_sys_t *p_sys;
@@ -64,6 +64,7 @@ stream_t *__stream_DemuxNew( vlc_object_t *p_obj, const char *psz_demux,
     s = stream_CommonNew( p_obj );
     if( s == NULL )
         return NULL;
+    s->p_input = p_demux->p_input;
     s->psz_path  = strdup(""); /* N/A */
     s->pf_read   = DStreamRead;
     s->pf_peek   = DStreamPeek;
@@ -278,7 +279,7 @@ static void* DStreamThread( vlc_object_t* p_this )
     int canc = vlc_savecancel();
 
     /* Create the demuxer */
-    if( !(p_demux = demux_New( s, "", p_sys->psz_name, "", s, p_sys->out,
+    if( !(p_demux = demux_New( s, s->p_input, "", p_sys->psz_name, "", s, p_sys->out,
                                false )) )
     {
         return NULL;

@@ -42,6 +42,8 @@ stream_t *stream_FilterNew( stream_t *p_source,
     if( s == NULL )
         return NULL;
 
+    s->p_input = p_source->p_input;
+
     /* */
     s->psz_path = strdup( p_source->psz_path );
     if( !s->psz_path )

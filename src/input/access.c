@@ -31,8 +31,9 @@
 /*****************************************************************************
  * access_New:
  *****************************************************************************/
-access_t *__access_New( vlc_object_t *p_obj, const char *psz_access,
-                        const char *psz_demux, const char *psz_path )
+access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
+                        const char *psz_access, const char *psz_demux,
+                        const char *psz_path )
 {
     access_t *p_access = vlc_custom_create( p_obj, sizeof (*p_access),
                                             VLC_OBJECT_GENERIC, "access" );
@@ -43,6 +44,8 @@ access_t *__access_New( vlc_object_t *p_obj, const char *psz_access,
     /* */
     msg_Dbg( p_obj, "creating access '%s' path='%s'",
              psz_access, psz_path );
+
+    p_access->p_input = p_parent_input;
 
     p_access->psz_path   = strdup( psz_path );
     p_access->psz_access = strdup( psz_access );
@@ -87,5 +90,14 @@ void access_Delete( access_t *p_access )
     free( p_access->psz_demux );
 
     vlc_object_release( p_access );
+}
+
+
+/*****************************************************************************
+ * access_GetParentInput:
+ *****************************************************************************/
+input_thread_t * access_GetParentInput( access_t *p_access )
+{
+    return p_access->p_input ? vlc_object_hold((vlc_object_t *)p_access->p_input) : NULL;
 }
 

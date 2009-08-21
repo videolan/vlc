@@ -75,6 +75,9 @@ struct stream_t
 
     /* Text reader state */
     stream_text_t *p_text;
+
+    /* Weak link to parent input */
+    input_thread_t *p_input;
 };
 
 /**
@@ -157,8 +160,8 @@ static inline char *stream_ContentType( stream_t *s )
  * Create a special stream and a demuxer, this allows chaining demuxers
  * You must delete it using stream_Delete.
  */
-#define stream_DemuxNew( a, b, c ) __stream_DemuxNew( VLC_OBJECT(a), b, c)
-VLC_EXPORT( stream_t *,__stream_DemuxNew, ( vlc_object_t *p_obj, const char *psz_demux, es_out_t *out ) );
+VLC_EXPORT( stream_t *, stream_DemuxNew, ( demux_t *p_demux, const char *psz_demux, es_out_t *out ) );
+    
 /**
  * Send data to a stream_t handle created by stream_DemuxNew.
  */

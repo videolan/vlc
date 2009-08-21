@@ -37,7 +37,7 @@ static bool SkipAPETag( demux_t *p_demux );
  * demux_New:
  *  if s is NULL then load a access_demux
  *****************************************************************************/
-demux_t *__demux_New( vlc_object_t *p_obj,
+demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
                        const char *psz_access, const char *psz_demux,
                        const char *psz_path,
                        stream_t *s, es_out_t *out, bool b_quick )
@@ -48,6 +48,8 @@ demux_t *__demux_New( vlc_object_t *p_obj,
     const char *psz_module;
 
     if( p_demux == NULL ) return NULL;
+
+    p_demux->p_input = p_parent_input;
 
     /* Parse URL */
     p_demux->psz_access = strdup( psz_access );
@@ -202,6 +204,15 @@ void demux_Delete( demux_t *p_demux )
 
     vlc_object_release( p_demux );
 }
+
+/*****************************************************************************
+ * demux_GetParentInput:
+ *****************************************************************************/
+input_thread_t * demux_GetParentInput( demux_t *p_demux )
+{
+    return p_demux->p_input ? vlc_object_hold((vlc_object_t*)p_demux->p_input) : NULL;
+}
+
 
 /*****************************************************************************
  * demux_vaControlHelper:
