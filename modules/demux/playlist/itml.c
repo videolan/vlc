@@ -71,7 +71,7 @@ int Demux( demux_t *p_demux )
     xml_reader_t *p_xml_reader = NULL;
     char *psz_name = NULL;
 
-    INIT_PLAYLIST_STUFF;
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
     p_demux->p_sys->i_ntracks = 0;
 
     /* create new xml parser from stream */
@@ -106,7 +106,7 @@ int Demux( demux_t *p_demux )
     parse_plist_node( p_demux, p_current_input, NULL, p_xml_reader, "plist",
                       pl_elements );
 
-    HANDLE_PLAY_AND_RELEASE;
+    vlc_gc_decref(p_current_input);
 
 end:
     free( psz_name );

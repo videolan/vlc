@@ -83,7 +83,7 @@ static int Demux( demux_t *p_demux )
     xml_reader_t *p_xml_reader = NULL;
     char *psz_eltname = NULL;
     int i_ret = -1;
-    INIT_PLAYLIST_STUFF;
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     p_xml = xml_Create( p_demux );
     if( !p_xml )
@@ -132,7 +132,7 @@ error:
     if( p_xml )
         xml_Delete( p_xml );
     free( psz_eltname );
-    HANDLE_PLAY_AND_RELEASE;
+    vlc_gc_decref(p_current_input);
     return i_ret;
 }
 

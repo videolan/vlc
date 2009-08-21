@@ -129,7 +129,7 @@ static int Demux( demux_t *p_demux )
     char *psz_description = NULL;
     input_item_t *p_input;
 
-    INIT_PLAYLIST_STUFF;
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     p_sys->p_current_input = p_current_input;
 
@@ -212,7 +212,7 @@ static int Demux( demux_t *p_demux )
         vlc_gc_decref( p_input );
     }
 
-    HANDLE_PLAY_AND_RELEASE;
+    vlc_gc_decref(p_current_input);
 
     free( psz_version );
     free( psz_url );

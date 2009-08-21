@@ -93,7 +93,7 @@ static int Demux( demux_t *p_demux )
     char       *psz_parse;
     input_item_t *p_input;
 
-    INIT_PLAYLIST_STUFF;
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     psz_line = stream_ReadLine( p_demux->s );
     while( psz_line )
@@ -124,7 +124,7 @@ static int Demux( demux_t *p_demux )
         psz_line = stream_ReadLine( p_demux->s );
 
     }
-    HANDLE_PLAY_AND_RELEASE;
+    vlc_gc_decref(p_current_input);
     var_Destroy( p_demux, "wpl-extvlcopt" );
     return 0; /* Needed for correct operation of go back */
 }

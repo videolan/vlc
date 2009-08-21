@@ -97,7 +97,7 @@ static int Demux( demux_t *p_demux )
          *psz_description = NULL, *psz_url = NULL,        *psz_copyright = NULL,
          *psz_mrl = NULL;
 
-    INIT_PLAYLIST_STUFF;
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     psz_line = stream_ReadLine( p_demux->s );
     char *psz_parse = psz_line;
@@ -212,7 +212,7 @@ static int Demux( demux_t *p_demux )
         psz_line = stream_ReadLine( p_demux->s );
     }
 
-    HANDLE_PLAY_AND_RELEASE;
+    vlc_gc_decref(p_current_input);
     var_Destroy( p_demux, "zpl-extvlcopt" );
     return 0; /* Needed for correct operation of go back */
 }

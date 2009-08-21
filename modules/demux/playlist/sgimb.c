@@ -324,7 +324,7 @@ static int Demux ( demux_t *p_demux )
     input_item_t    *p_child = NULL;
     char            *psz_line;
 
-    INIT_PLAYLIST_STUFF;
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
@@ -404,7 +404,7 @@ static int Demux ( demux_t *p_demux )
 
     input_item_AddSubItem( p_current_input, p_child );
     vlc_gc_decref( p_child );
-    HANDLE_PLAY_AND_RELEASE
+    vlc_gc_decref(p_current_input);
     return 0; /* Needed for correct operation of go back */
 }
 

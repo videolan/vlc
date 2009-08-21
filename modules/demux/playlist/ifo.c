@@ -88,7 +88,7 @@ static int Demux( demux_t *p_demux )
     size_t len = 0;
     input_item_t *p_input;
 
-    INIT_PLAYLIST_STUFF;
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     len = strlen( "dvd://" ) + strlen( p_demux->psz_path )
           - strlen( "VIDEO_TS.IFO" );
@@ -99,7 +99,7 @@ static int Demux( demux_t *p_demux )
     input_item_AddSubItem( p_current_input, p_input );
     vlc_gc_decref( p_input );
 
-    HANDLE_PLAY_AND_RELEASE;
+    vlc_gc_decref(p_current_input);
 
     return 0; /* Needed for correct operation of go back */
 }

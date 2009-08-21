@@ -83,7 +83,7 @@ int Demux( demux_t *p_demux )
     xml_t *p_xml = NULL;
     xml_reader_t *p_xml_reader = NULL;
     char *psz_name = NULL;
-    INIT_PLAYLIST_STUFF;
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
     p_demux->p_sys->pp_tracklist = NULL;
     p_demux->p_sys->i_tracklist_entries = 0;
     p_demux->p_sys->i_track_id = -1;
@@ -130,7 +130,7 @@ int Demux( demux_t *p_demux )
     }
 
 end:
-    HANDLE_PLAY_AND_RELEASE;
+    vlc_gc_decref(p_current_input);
     if( p_xml_reader )
         xml_ReaderDelete( p_xml, p_xml_reader );
     if( p_xml )

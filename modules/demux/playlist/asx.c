@@ -234,7 +234,7 @@ static int Demux( demux_t *p_demux )
     char        *psz_parse = NULL;
     char        *psz_backup = NULL;
     bool  b_entry = false;
-    INIT_PLAYLIST_STUFF;
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     /* init txt */
     if( p_sys->i_data_len < 0 )
@@ -710,7 +710,7 @@ static int Demux( demux_t *p_demux )
             STARTMARK
 #endif
     }
-    HANDLE_PLAY_AND_RELEASE;
+    vlc_gc_decref(p_current_input);
     return 0; /* Needed for correct operation of go back */
 }
 

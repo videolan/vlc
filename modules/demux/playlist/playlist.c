@@ -165,6 +165,14 @@ vlc_module_begin ()
         set_callbacks( Import_ZPL, Close_ZPL )
 vlc_module_end ()
 
+input_item_t * GetCurrentItem(demux_t *p_demux)
+{
+    input_thread_t *p_input_thread = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT );;
+    input_item_t *p_current_input = input_GetItem( p_input_thread );
+    vlc_gc_incref(p_current_input);
+    vlc_object_release(p_input_thread);
+    return p_current_input;
+}
 
 /**
  * Find directory part of the path to the playlist file, in case of

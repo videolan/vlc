@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include <vlc_input.h>
+#include <vlc_playlist.h>
 
 char *ProcessMRL( char *, char * );
 char *FindPrefix( demux_t * );
@@ -82,13 +83,7 @@ void Close_WPL ( vlc_object_t * );
 int Import_ZPL ( vlc_object_t * );
 void Close_ZPL ( vlc_object_t * );
 
-#define INIT_PLAYLIST_STUFF \
-    input_thread_t *p_input_thread = (input_thread_t *)vlc_object_find( p_demux, VLC_OBJECT_INPUT, FIND_PARENT ); \
-    input_item_t *p_current_input = input_GetItem( p_input_thread );
-
-#define HANDLE_PLAY_AND_RELEASE \
-    vlc_object_release( p_input_thread );
-
+extern input_item_t * GetCurrentItem(demux_t *p_demux);
 
 #define STANDARD_DEMUX_INIT_MSG( msg ) do { \
     DEMUX_INIT_COMMON();                    \

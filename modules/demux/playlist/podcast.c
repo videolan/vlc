@@ -91,7 +91,7 @@ static int Demux( demux_t *p_demux )
     int i_type;
     input_item_t *p_input;
 
-    INIT_PLAYLIST_STUFF;
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     p_xml = xml_Create( p_demux );
     if( !p_xml )
@@ -363,7 +363,7 @@ static int Demux( demux_t *p_demux )
     xml_ReaderDelete( p_xml, p_xml_reader );
     xml_Delete( p_xml );
 
-    HANDLE_PLAY_AND_RELEASE;
+    vlc_gc_decref(p_current_input);
     return 0; /* Needed for correct operation of go back */
 
 error:
@@ -386,7 +386,7 @@ error:
     if( p_xml )
         xml_Delete( p_xml );
 
-    HANDLE_PLAY_AND_RELEASE;
+    vlc_gc_decref(p_current_input);
     return -1;
 }
 

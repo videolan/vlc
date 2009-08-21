@@ -91,7 +91,7 @@ static int Demux( demux_t *p_demux )
     char *psz_mrl = NULL, *psz_name = NULL, *psz_genre = NULL;
     char *psz_now = NULL, *psz_listeners = NULL, *psz_bitrate = NULL;
 
-    INIT_PLAYLIST_STUFF;
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
 
     p_xml = p_sys->p_xml = xml_Create( p_demux );
     if( !p_xml ) return -1;
@@ -295,7 +295,7 @@ static int Demux( demux_t *p_demux )
 
    free( psz_elname );
 
-    HANDLE_PLAY_AND_RELEASE;
+    vlc_gc_decref(p_current_input);
     return 0; /* Needed for correct operation of go back */
 }
 
