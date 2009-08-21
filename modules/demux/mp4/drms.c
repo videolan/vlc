@@ -2004,7 +2004,7 @@ static int GetiPodID( int64_t *p_ipod_id )
             if( IOServiceGetMatchingServices( port, match_dic,
                                               &iterator ) == KERN_SUCCESS )
             {
-                while( ( device = IOIteratorNext( iterator ) ) != NULL )
+                while( ( device = IOIteratorNext( iterator ) ) != 0 )
                 {
                     value = IORegistryEntryCreateCFProperty( device,
                         CFSTR("GUID"), kCFAllocatorDefault, kNilOptions );
