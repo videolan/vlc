@@ -359,8 +359,6 @@ static const char *
      char *const *argv;
      const char *optstring;
 {
-    (void)argc;
-    (void)argv;
     /* Start processing options with ARGV-element 1 (since ARGV-element 0
        is the program name); the sequence of previously skipped
        non-option ARGV-elements is empty.  */
