@@ -45,6 +45,7 @@
 // Fix ourselves ColorSync headers that gets included in ApplicationServices.
 #define DisposeCMProfileIterateUPP(a) DisposeCMProfileIterateUPP(CMProfileIterateUPP userUPP __attribute__((unused)))
 #define DisposeCMMIterateUPP(a) DisposeCMMIterateUPP(CMProfileIterateUPP userUPP __attribute__((unused)))
+#define __MACHINEEXCEPTIONS__
 #include <Carbon/Carbon.h>
 
 #define DEFAULT_FONT           "Arial Black"
