@@ -275,8 +275,9 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
             }
         }
         /* Calculate position in delay */
+        int offset = floor( p_sys->f_offset );
         pf_ptr = p_sys->pf_write + i_maxOffset * p_sys->i_channels +
-            (int)( floor( p_sys->f_offset ) ) * p_sys->i_channels;
+            offset * p_sys->i_channels;
 
         /* Handle Overflow */
         if( pf_ptr < p_sys->pf_delayLineStart )
