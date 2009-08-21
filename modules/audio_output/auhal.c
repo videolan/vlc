@@ -35,6 +35,10 @@
 #include <vlc_dialog.h>
 #include <vlc_aout.h>
 
+// By pass part of header which compile with some warnings,
+// and that we don't require.
+#define __MACHINEEXCEPTIONS__
+
 #include <CoreAudio/CoreAudio.h>
 #include <AudioUnit/AudioUnitProperties.h>
 #include <AudioUnit/AudioUnitParameters.h>
