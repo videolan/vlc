@@ -238,8 +238,8 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     struct aout_filter_sys_t *p_sys = p_filter->p_sys;
     int i_chan;
     int i_samples = p_in_buf->i_nb_samples; /* Gives the number of samples */
-    int i_maxOffset = (int)floor( p_sys->f_sweepDepth * p_sys->i_sampleRate /
-            1000 ); /*maximum number of samples to offset in buffer */
+    /* maximum number of samples to offset in buffer */
+    int i_maxOffset = floor( p_sys->f_sweepDepth * p_sys->i_sampleRate / 1000 );
     float *p_out = (float*)p_out_buf->p_buffer;
     float *p_in =  (float*)p_in_buf->p_buffer;
 
