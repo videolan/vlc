@@ -32,8 +32,12 @@
 
 #include <vlc_common.h>
 
+#include <sys/types.h>
 #include <signal.h>                            /* SIGHUP, SIGINT, SIGKILL */
-#include <setjmp.h>                                    /* longjmp, setjmp */
+#ifndef WIN32
+#include <unistd.h>
+#include <sys/wait.h>
+#endif
 
 #include "libvlc.h"
 
@@ -41,24 +45,33 @@
 #include <sys/sysctl.h>
 #endif
 
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static void SigHandler   ( int );
-
-/*****************************************************************************
- * Global variables - they're needed for signal handling
- *****************************************************************************/
-static jmp_buf env;
-static int     i_illegal;
-
-#if defined( __i386__ ) || defined( __x86_64__ )
-static void warn_cap( const char *psz_capability )
+#if defined( __i386__ ) || defined( __x86_64__ ) \
+ || defined( __ppc__ ) || defined( __ppc64__ )
+static bool check_OS_capability( const char *psz_capability, pid_t pid )
 {
+#ifndef WIN32
+    int status;
+
+    if( pid == -1 )
+        return false; /* fail safe :-/ */
+
+    while( waitpid( pid, &status, 0 ) == -1 );
+
+    if( WIFEXITED( status ) && WEXITSTATUS( status ) == 0 )
+        return true;
+
     fprintf( stderr, "warning: your CPU has %s instructions, but not your "
                      "operating system.\n", psz_capability );
     fprintf( stderr, "         some optimizations will be disabled unless "
                      "you upgrade your OS\n" );
+    return false;
+#else
+# warning FIXME!
+# define fork() (errno = ENOSYS, -1)
+    (void)pid;
+    (void)psz_capability;
+    return true;
+#endif
 }
 #endif
 
@@ -69,11 +82,11 @@ static void warn_cap( const char *psz_capability )
  *****************************************************************************/
 uint32_t CPUCapabilities( void )
 {
-    volatile uint32_t i_capabilities = CPU_CAPABILITY_NONE;
+    uint32_t i_capabilities = CPU_CAPABILITY_NONE;
 
 #if defined( __i386__ ) || defined( __x86_64__ )
-    volatile unsigned int  i_eax, i_ebx, i_ecx, i_edx;
-    volatile bool    b_amd;
+     unsigned int i_eax, i_ebx, i_ecx, i_edx;
+     bool b_amd;
 
     /* Needed for x86 CPU capabilities detection */
 #   if defined( __x86_64__ )
@@ -98,10 +111,6 @@ uint32_t CPUCapabilities( void )
                            "=d" ( i_edx )      \
                          : "a"  ( reg )        \
                          : "cc" );
-#   endif
-
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-    void (*pf_sigill) (int) = signal( SIGILL, SigHandler );
 #   endif
 
     i_capabilities |= CPU_CAPABILITY_FPU;
@@ -159,37 +168,31 @@ uint32_t CPUCapabilities( void )
 
 #   ifdef CAN_COMPILE_SSE
         /* We test if OS supports the SSE instructions */
-        i_illegal = 0;
-
-        if( setjmp( env ) == 0 )
+        pid_t pid = fork();
+        if( pid == 0 )
         {
             /* Test a SSE instruction */
             __asm__ __volatile__ ( "xorps %%xmm0,%%xmm0\n" : : );
+            exit(0);
         }
-
-        if( i_illegal == 0 )
+        if( check_OS_capability( "SSE", pid ) )
             i_capabilities |= CPU_CAPABILITY_SSE;
-        else
-            warn_cap( "SSE" );
 #   endif
     }
 
     if( i_edx & 0x04000000 )
     {
 #   if defined(CAN_COMPILE_SSE)
-        /* We test if OS supports the SSE instructions */
-        i_illegal = 0;
-
-        if( setjmp( env ) == 0 )
+        /* We test if OS supports the SSE2 instructions */
+        pid_t pid = fork();
+        if( pid == 0 )
         {
             /* Test a SSE2 instruction */
             __asm__ __volatile__ ( "movupd %%xmm0, %%xmm0\n" : : );
+            exit(0);
         }
-
-        if( i_illegal == 0 )
+        if( check_OS_capability( "SSE2", pid ) )
             i_capabilities |= CPU_CAPABILITY_SSE2;
-        else
-            warn_cap( "SSE2" );
 #   endif
     }
 
@@ -205,18 +208,15 @@ uint32_t CPUCapabilities( void )
 #   ifdef CAN_COMPILE_3DNOW
     if( i_edx & 0x80000000 )
     {
-        i_illegal = 0;
-
-        if( setjmp( env ) == 0 )
+        pid_t pid = fork();
+        if( pid == 0 )
         {
             /* Test a 3D Now! instruction */
             __asm__ __volatile__ ( "pfadd %%mm0,%%mm0\n" "femms\n" : : );
+            exit(0);
         }
-
-        if( i_illegal == 0 )
+        if( check_OS_capability( "3D Now!", pid ) )
             i_capabilities |= CPU_CAPABILITY_3DNOW;
-        else
-            warn_cap( "3D Now!" );
     }
 #   endif
 
@@ -224,11 +224,7 @@ uint32_t CPUCapabilities( void )
     {
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
     }
-
 out:
-#   if defined( CAN_COMPILE_SSE ) || defined ( CAN_COMPILE_3DNOW )
-    signal( SIGILL, pf_sigill );
-#   endif
 
 #elif defined( __arm__ )
 #   if defined( __ARM_EABI__ ) && !defined( __SOFTFP__ )
@@ -249,24 +245,19 @@ out:
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
 
 #   elif defined( CAN_COMPILE_ALTIVEC )
-    void (*pf_sigill) (int) = signal( SIGILL, SigHandler );
-
-    i_illegal = 0;
-
-    if( setjmp( env ) == 0 )
+    pid_t pid = fork();
+    if( pid == 0 )
     {
         asm volatile ("mtspr 256, %0\n\t"
                       "vand %%v0, %%v0, %%v0"
                       :
                       : "r" (-1));
+        exit(0);
     }
 
-    if( i_illegal == 0 )
+    if( check_OS_capability( "Altivec", pid ) )
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
 
-    signal( SIGILL, pf_sigill );
-#   else
-    (void)SigHandler; /* Don't complain about dead code here */
 #   endif
 
 #elif defined( __sparc__ )
@@ -278,26 +269,6 @@ out:
 #endif
     return i_capabilities;
 }
-
-/*****************************************************************************
- * SigHandler: system signal handler
- *****************************************************************************
- * This function is called when an illegal instruction signal is received by
- * the program. We use this function to test OS and CPU capabilities
- *****************************************************************************/
-static void SigHandler( int i_signal )
-{
-    /* Acknowledge the signal received */
-    i_illegal = 1;
-
-#ifdef HAVE_SIGRELSE
-    sigrelse( i_signal );
-#else
-    VLC_UNUSED( i_signal );
-#endif
-    longjmp( env, 1 );
-}
-
 
 uint32_t cpu_flags = 0;
 
