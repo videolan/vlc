@@ -243,7 +243,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     {
 
         p_sys->p_blend = filter_NewBlend( VLC_OBJECT(p_filter),
-                                          &p_filter->fmt_in );
+                                          &p_filter->fmt_in.video );
         if( !p_sys->p_blend )
         {
             free( p_sys );
