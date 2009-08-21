@@ -1004,7 +1004,7 @@ fi
 CFLAGS="${CFLAGS_save}"
 
 RDC_PROG_CC_WFLAGS([all extra sign-compare undef pointer-arith bad-function-cast cast-align write-strings missing-prototypes volatile-register-var error-implicit-function-declaration])
-RDC_PROG_CC_FLAGS_IFELSE([-pipe])
+RDC_PROG_CC_FLAGS([-pipe])
 
 AC_ARG_ENABLE(warnings-as-error,
       AS_HELP_STRING([--enable-warnings-as-error],[Treat acceptable warnings as error (default in debug)]),, [enable_warnings_as_error="$enable_debug"])
@@ -1013,6 +1013,7 @@ AS_IF([test "${enable_warnings_as_error}" = "yes"], [
      missing-braces nonnull parentheses uninitialized address enum-compare undef comment switch \
      bad-function-cast ignored])
 ])
+AC_SUBST(CFLAGS_WERROR)
 
 dnl Check for various optimization flags
 AC_CACHE_CHECK([if \$CC accepts -Os],

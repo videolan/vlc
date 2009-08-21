@@ -22,24 +22,24 @@ AC_DEFUN([RDC_PROG_CC_FLAGS_IFELSE],
   ])
 
   ac_res=`eval echo '${'$as_ac_var'}'`
-  AS_IF([test "${ac_res}" != "no"], [
-    CFLAGS="${CFLAGS_save} $1"
-    $2
-  ], [
-    CFLAGS="${CFLAGS_save}"
-    $3
-  ])
+  CFLAGS="${CFLAGS_save}"
+  AS_IF([test "${ac_res}" != "no"], [$2], [$3])
+])
+
+AC_DEFUN([RDC_PROG_CC_FLAGS],
+[AC_LANG_ASSERT(C)
+  RDC_PROG_CC_FLAGS_IFELSE([$1], [CFLAGS="${CFLAGS} $1"])
 ])
 
 AC_DEFUN([RDC_PROG_CC_WERRORFLAGS],
 [ for a in $1; do
-    RDC_PROG_CC_FLAGS_IFELSE([-Werror=$a])
+    RDC_PROG_CC_FLAGS_IFELSE([-Werror=$a], [CFLAGS_WERROR="${CFLAGS_WERROR} -Werror=${a}"])
   done
 ])
 
 AC_DEFUN([RDC_PROG_CC_WFLAGS],
 [ for a in $1; do
-    RDC_PROG_CC_FLAGS_IFELSE([-W$a])
+    RDC_PROG_CC_FLAGS([-W$a])
   done
 ])
 

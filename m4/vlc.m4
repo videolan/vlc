@@ -58,6 +58,12 @@ AC_DEFUN([VLC_ADD_LIBS], [
   done
 ])
 
+AC_DEFUN([VLC_SET_CFLAGS_WERROR], [
+  for element in [$1]; do
+    eval "CFLAGS_WERROR_${element}="'"'"$2"''"'
+  done
+])
+
 dnl ===========================================================================
 dnl  Macros to save and restore default flags
 
@@ -131,6 +137,9 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
     fi
     if test "`eval echo @'$'LIBS_${x}@`" != "@@"; then
       echo "      libs=\"\${libs} `eval echo '$'LIBS_${x}`\""
+    fi
+    if test "`eval echo @'$'LIBS_${x}@`" != "@@"; then
+      echo "      CFLAGS_WERROR=\"`eval echo '$'CFLAGS_WERROR_${x}`\""
     fi
     echo "    ;;"
   ] done >> vlc-config.in
