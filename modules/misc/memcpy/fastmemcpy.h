@@ -153,7 +153,7 @@ __asm__ __volatile__(\
 #define MIN_LEN 0x40  /* 64-byte blocks */
 #endif
 
-void * fast_memcpy(void * to, const void * from, size_t len)
+static void * fast_memcpy(void * to, const void * from, size_t len)
 {
     void *retval;
     size_t i;
