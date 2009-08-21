@@ -33,7 +33,6 @@
 #include <vlc_common.h>
 
 #include <sys/types.h>
-#include <signal.h>                            /* SIGHUP, SIGINT, SIGKILL */
 #ifndef WIN32
 #include <unistd.h>
 #include <sys/wait.h>
