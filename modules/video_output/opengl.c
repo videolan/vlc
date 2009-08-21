@@ -39,56 +39,50 @@
 #include <vlc_vout.h>
 
 #ifdef __APPLE__
-#include <OpenGL/gl.h>
-#include <OpenGL/glext.h>
-
-/* On OS X, use GL_TEXTURE_RECTANGLE_EXT instead of GL_TEXTURE_2D.
-   This allows sizes which are not powers of 2 */
-#define VLCGL_TARGET GL_TEXTURE_RECTANGLE_EXT
-
-/* OS X OpenGL supports YUV. Hehe. */
-#define VLCGL_FORMAT GL_YCBCR_422_APPLE
-#define VLCGL_TYPE   GL_UNSIGNED_SHORT_8_8_APPLE
-#else
-
-#include <GL/gl.h>
-#define VLCGL_TARGET GL_TEXTURE_2D
-
-/* RV16 */
-#ifndef GL_UNSIGNED_SHORT_5_6_5
-#define GL_UNSIGNED_SHORT_5_6_5 0x8363
+# include <OpenGL/gl.h>
+# include <OpenGL/glext.h>
 #endif
-//#define VLCGL_RGB_FORMAT GL_RGB
-//#define VLCGL_RGB_TYPE GL_UNSIGNED_SHORT_5_6_5
 
-/* RV24 */
-//#define VLCGL_RGB_FORMAT GL_RGB
-//#define VLCGL_RGB_TYPE GL_UNSIGNED_BYTE
-
-/* RV32 */
-#define VLCGL_RGB_FORMAT GL_RGBA
-#define VLCGL_RGB_TYPE GL_UNSIGNED_BYTE
-
-/* YUY2 */
 #ifndef YCBCR_MESA
-#define YCBCR_MESA 0x8757
+# define YCBCR_MESA 0x8757
 #endif
 #ifndef UNSIGNED_SHORT_8_8_MESA
-#define UNSIGNED_SHORT_8_8_MESA 0x85BA
+# define UNSIGNED_SHORT_8_8_MESA 0x85BA
 #endif
-#define VLCGL_YUV_FORMAT YCBCR_MESA
-#define VLCGL_YUV_TYPE UNSIGNED_SHORT_8_8_MESA
+/* RV16 */
+#ifndef GL_UNSIGNED_SHORT_5_6_5
+# define GL_UNSIGNED_SHORT_5_6_5 0x8363
+#endif
+#ifndef GL_CLAMP_TO_EDGE
+# define GL_CLAMP_TO_EDGE 0x812F
+#endif
+
+#ifdef __APPLE__
+/* On OS X, use GL_TEXTURE_RECTANGLE_EXT instead of GL_TEXTURE_2D.
+   This allows sizes which are not powers of 2 */
+# define VLCGL_TARGET GL_TEXTURE_RECTANGLE_EXT
+
+/* OS X OpenGL supports YUV. Hehe. */
+# define VLCGL_FORMAT GL_YCBCR_422_APPLE
+# define VLCGL_TYPE   GL_UNSIGNED_SHORT_8_8_APPLE
+#else
+
+# include <GL/gl.h>
+# define VLCGL_TARGET GL_TEXTURE_2D
+
+/* RV32 */
+# define VLCGL_RGB_FORMAT GL_RGBA
+# define VLCGL_RGB_TYPE GL_UNSIGNED_BYTE
+
+/* YUY2 */
+# define VLCGL_YUV_FORMAT YCBCR_MESA
+# define VLCGL_YUV_TYPE UNSIGNED_SHORT_8_8_MESA
 
 /* Use RGB on Win32/GLX */
-#define VLCGL_FORMAT VLCGL_RGB_FORMAT
-#define VLCGL_TYPE   VLCGL_RGB_TYPE
-//#define VLCGL_FORMAT VLCGL_YUV_FORMAT
-//#define VLCGL_TYPE   VLCGL_YUV_TYPE
+# define VLCGL_FORMAT VLCGL_RGB_FORMAT
+# define VLCGL_TYPE   VLCGL_RGB_TYPE
 #endif
 
-#ifndef GL_CLAMP_TO_EDGE
-#   define GL_CLAMP_TO_EDGE 0x812F
-#endif
 
 /*****************************************************************************
  * Vout interface
