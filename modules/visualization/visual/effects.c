@@ -487,8 +487,11 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
             p_buffs = p_s16_buff;
     }
     fft_perform( p_buffer1, p_output, p_state);
-    for(i= 0; i< FFT_BUFFER_SIZE ; i++ )
-        p_dest[i] = ( (int) sqrt( p_output [ i ] ) ) >> 8;
+    for(i = 0; i < FFT_BUFFER_SIZE; i++)
+    {
+        int sqrti = sqrt(p_output[i]);
+        p_dest[i] = sqrti >> 8;
+    }
 
     i_nb_bands *= i_sections;
 
@@ -504,9 +507,10 @@ int spectrometer_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
         y >>=7;/* remove some noise */
         if( y != 0)
         {
-            height[i] = (int)log(y)* y_scale;
-               if(height[i] > 150)
-                  height[i] = 150;
+            int logy = log(y);
+            height[i] = logy * y_scale;
+            if(height[i] > 150)
+                height[i] = 150;
         }
         else
         {
