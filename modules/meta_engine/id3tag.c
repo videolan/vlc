@@ -136,7 +136,8 @@ static void ParseID3Tag( demux_t *p_demux, const uint8_t *p_data, int i_size )
             while( i_data >= 4 )
             {
                 const unsigned int i_peak_size = p_data[3];
-                const float f_gain = (float)GetWBE( &p_data[1] ) / 512.0;
+                float f_temp = GetWBE( &p_data[1] );
+                const float f_gain = f_temp / 512.0;
                 char psz_value[32];
 
                 if( i_data < i_peak_size + 4 )
