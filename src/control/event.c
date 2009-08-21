@@ -88,7 +88,7 @@ libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst,
 /**************************************************************************
  *       libvlc_event_manager_release (internal) :
  *
- * Init an object's event manager.
+ * Release an object's event manager.
  **************************************************************************/
 void libvlc_event_manager_release( libvlc_event_manager_t * p_em )
 {
