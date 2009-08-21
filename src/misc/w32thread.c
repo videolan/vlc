@@ -373,6 +373,7 @@ void vlc_rwlock_unlock (vlc_rwlock_t *lock)
 int vlc_threadvar_create (vlc_threadvar_t *p_tls, void (*destr) (void *))
 {
 #warning FIXME: use destr() callback and stop leaking!
+
     *p_tls = TlsAlloc();
     return (*p_tls == TLS_OUT_OF_INDEXES) ? EAGAIN : 0;
 }
