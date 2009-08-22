@@ -367,8 +367,12 @@ void TopWindow::innerShow()
         updateShape();
         m_pActiveLayout->onShow();
     }
+
     // Show the window
     GenericWindow::innerShow();
+
+    // place the top window on the screen (after show!)
+    move( getLeft(), getTop() );
 }
 
 

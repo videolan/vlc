@@ -41,36 +41,34 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     OSWindow( pIntf ), m_rDisplay( rDisplay ), m_pParent( pParentWindow ),
     m_dragDrop( dragDrop )
 {
+    XSetWindowAttributes attr;
+    unsigned long valuemask;
+
     if (pParentWindow)
     {
         m_wnd_parent = pParentWindow->m_wnd;
+
+        int i_screen = DefaultScreen( XDISPLAY );
+
+        attr.event_mask = ExposureMask | StructureNotifyMask;
+        attr.backing_store = Always;
+        attr.background_pixel = BlackPixel( XDISPLAY, i_screen );
+        valuemask = CWBackingStore | CWBackPixel | CWEventMask;
     }
     else
     {
         m_wnd_parent = DefaultRootWindow( XDISPLAY );
+
+        attr.event_mask = ExposureMask | StructureNotifyMask;
+        valuemask = CWEventMask;
     }
-    XSetWindowAttributes attr;
-    attr.event_mask = ExposureMask | StructureNotifyMask;
 
     // Create the window
     m_wnd = XCreateWindow( XDISPLAY, m_wnd_parent, -10, 0, 1, 1, 0, 0,
-                           InputOutput, CopyFromParent, CWEventMask, &attr );
+                           InputOutput, CopyFromParent, valuemask, &attr );
 
-    // Make sure window is created before returning
-    XMapWindow( XDISPLAY, m_wnd );
-    bool b_map_notify = false;
-    do
-    {
-        XEvent xevent;
-        XWindowEvent( XDISPLAY, m_wnd, SubstructureNotifyMask |
-                      StructureNotifyMask, &xevent);
-        if( (xevent.type == MapNotify)
-             && (xevent.xmap.window == m_wnd ) )
-        {
-            b_map_notify = true;
-        }
-    } while( ! b_map_notify );
-    XUnmapWindow( XDISPLAY, m_wnd );
+    // wait for X server to process the previous commands
+    XSync( XDISPLAY, false );
 
     // Set the colormap for 8bpp mode
     if( XPIXELSIZE == 1 )
@@ -156,11 +154,10 @@ void X11Window::reparent( void* OSHandle, int x, int y, int w, int h )
 }
 
 
-void X11Window::show( int left, int top ) const
+void X11Window::show() const
 {
     // Map the window
     XMapRaised( XDISPLAY, m_wnd );
-    XMoveWindow( XDISPLAY, m_wnd, left, top );
 }
 
 

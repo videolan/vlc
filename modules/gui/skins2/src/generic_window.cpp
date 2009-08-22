@@ -148,7 +148,7 @@ void GenericWindow::innerShow()
 {
     if( m_pOsWindow )
     {
-        m_pOsWindow->show( m_left, m_top );
+        m_pOsWindow->show();
     }
 }
 

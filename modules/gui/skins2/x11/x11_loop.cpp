@@ -160,7 +160,9 @@ void X11Loop::handleX11Event()
             Theme *pTheme = getIntf()->p_sys->p_theme;
             if( pTheme )
             {
-                pTheme->getWindowManager().synchVisibility();
+                // Commented out as it really doesn't seem useful
+                // but rather brings visible problems
+                // pTheme->getWindowManager().synchVisibility();
             }
         }
         return;

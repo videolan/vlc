@@ -24,11 +24,10 @@
 
 #include "cmd_resize.hpp"
 #include "../src/generic_layout.hpp"
-#include "../src/window_manager.hpp"
 #include "../src/vlcproc.hpp"
-#include "../src/vout_window.hpp"
+#include "../src/window_manager.hpp"
+#include "../src/vout_manager.hpp"
 #include "../controls/ctrl_video.hpp"
-#include <vlc_vout.h>
 
 
 CmdResize::CmdResize( intf_thread_t *pIntf, const WindowManager &rWindowManager,
@@ -46,29 +45,6 @@ void CmdResize::execute()
 }
 
 
-CmdResizeVout::CmdResizeVout( intf_thread_t *pIntf, VoutWindow *pVoutWindow,
-                              int width, int height ):
-    CmdGeneric( pIntf ), m_pVoutWindow( pVoutWindow ), m_width( width ),
-    m_height( height )
-{
-}
-
-
-void CmdResizeVout::execute()
-{
-    if( m_pVoutWindow )
-    {
-        m_pVoutWindow->setOriginalWidth( m_width );
-        m_pVoutWindow->setOriginalHeight( m_height );
-
-        CtrlVideo* pCtrlVideo = m_pVoutWindow->getCtrlVideo();
-        if( pCtrlVideo )
-        {
-            pCtrlVideo->resizeControl( m_width, m_height );
-        }
-    }
-}
-
 
 CmdResizeInnerVout::CmdResizeInnerVout( intf_thread_t *pIntf,
                     CtrlVideo* pCtrlVideo )
@@ -81,4 +57,34 @@ void CmdResizeInnerVout::execute()
 {
     m_pCtrlVideo->resizeInnerVout();
 }
+
+
+CmdResizeVout::CmdResizeVout( intf_thread_t *pIntf, vout_window_t* pWnd,
+                              int width, int height )
+  : CmdGeneric( pIntf ), m_pWnd( pWnd ), m_width( width ), m_height( height )
+{
+}
+
+
+void CmdResizeVout::execute()
+{
+    VoutManager* p_VoutManager = getIntf()->p_sys->p_voutManager;
+
+    p_VoutManager->setSizeWnd( m_pWnd, m_width, m_height );
+}
+
+CmdSetFullscreen::CmdSetFullscreen( intf_thread_t *pIntf,
+                                    vout_window_t * pWnd, bool fullscreen )
+    : CmdGeneric( pIntf ), m_pWnd( pWnd ), m_bFullscreen( fullscreen )
+{
+}
+
+
+void CmdSetFullscreen::execute()
+{
+    VoutManager* p_VoutManager = getIntf()->p_sys->p_voutManager;
+
+    p_VoutManager->setFullscreenWnd( m_pWnd, m_bFullscreen );
+}
+
 

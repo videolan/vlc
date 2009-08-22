@@ -89,9 +89,8 @@ void CtrlVideo::onPositionChange()
 
 void CtrlVideo::draw( OSGraphics &rImage, int xDest, int yDest )
 {
-    GenericWindow *pParent = getWindow();
     const Position *pPos = getPosition();
-    if( pParent && pPos )
+    if( pPos && !m_pVoutWindow )
     {
         // Draw a black rectangle under the video to avoid transparency
         rImage.fillRect( pPos->getLeft(), pPos->getTop(), pPos->getWidth(),
@@ -118,28 +117,28 @@ void CtrlVideo::setLayout( GenericLayout *pLayout,
 
 void CtrlVideo::resizeControl( int width, int height )
 {
-    int newWidth = width + m_xShift;
-    int newHeight = height + m_yShift;
-
-    // Create a resize command
-    // FIXME: this way of getting the window manager kind of sucks
     WindowManager &rWindowManager =
         getIntf()->p_sys->p_theme->getWindowManager();
-    rWindowManager.startResize( m_rLayout, WindowManager::kResizeSE );
-    CmdGeneric *pCmd = new CmdResize( getIntf(), rWindowManager,
-                                      m_rLayout, newWidth, newHeight );
-    // Push the command in the asynchronous command queue
-    AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
-    pQueue->push( CmdGenericPtr( pCmd ), false );
 
-    // FIXME: this should be a command too
-    rWindowManager.stopResize();
+    const Position *pPos = getPosition();
 
-    pCmd = new CmdResizeInnerVout( getIntf(), this );
-    pQueue->push( CmdGenericPtr( pCmd ), false );
+    if( width != pPos->getWidth() || height != pPos->getHeight() )
+    {
+        // new layout dimensions
+        int newWidth = width + m_xShift;
+        int newHeight = height + m_yShift;
 
-    TopWindow* pWin = getWindow();
-    rWindowManager.show( *pWin );
+        // Resize the layout
+        rWindowManager.startResize( m_rLayout, WindowManager::kResizeSE );
+        rWindowManager.resize( m_rLayout, newWidth, newHeight );
+        rWindowManager.stopResize();
+
+        if( m_pVoutWindow )
+        {
+            m_pVoutWindow->resize( pPos->getWidth(), pPos->getHeight() );
+            m_pVoutWindow->move( pPos->getLeft(), pPos->getTop() );
+        }
+    }
 }
 
 
@@ -225,9 +224,6 @@ void CtrlVideo::resizeInnerVout( )
 
         m_pVoutWindow->resize( pPos->getWidth(), pPos->getHeight() );
         m_pVoutWindow->move( pPos->getLeft(), pPos->getTop() );
-
-        rWindowManager.show( *pWin );
-        m_pVoutWindow->show();
     }
 }
 

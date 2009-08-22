@@ -26,12 +26,11 @@
 #define CMD_RESIZE_HPP
 
 #include "cmd_generic.hpp"
-#include <vlc_vout.h>
+#include <vlc_vout_window.h>
 
 class WindowManager;
 class GenericLayout;
 class CtrlVideo;
-class VoutWindow;
 
 
 /// Command to resize a layout
@@ -56,27 +55,6 @@ class CmdResize: public CmdGeneric
 };
 
 
-/// Command to resize the vout window
-class CmdResizeVout: public CmdGeneric
-{
-    public:
-        /// Resize the given layout
-        CmdResizeVout( intf_thread_t *pIntf, VoutWindow *pVoutWindow,
-                       int width, int height );
-        virtual ~CmdResizeVout() {}
-
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "resize vout"; }
-
-    private:
-        VoutWindow *m_pVoutWindow;
-        int m_width, m_height;
-};
-
-
 /// Command to resize the inner vout window
 class CmdResizeInnerVout: public CmdGeneric
 {
@@ -93,6 +71,48 @@ class CmdResizeInnerVout: public CmdGeneric
 
     private:
         CtrlVideo* m_pCtrlVideo;
+};
+
+
+/// Command to resize the vout window
+class CmdResizeVout: public CmdGeneric
+{
+    public:
+        /// Resize the given layout
+        CmdResizeVout( intf_thread_t *pIntf, vout_window_t* pWnd,
+                       int width, int height );
+        virtual ~CmdResizeVout() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "resize vout"; }
+
+    private:
+        vout_window_t* m_pWnd;
+        int m_width, m_height;
+};
+
+
+/// Command to toggle Fullscreen
+class CmdSetFullscreen: public CmdGeneric
+{
+    public:
+        /// Resize the given layout
+        CmdSetFullscreen( intf_thread_t *pIntf, vout_window_t* pWnd,
+                          bool fullscreen );
+        virtual ~CmdSetFullscreen() {}
+
+        /// This method does the real job of the command
+        virtual void execute();
+
+        /// Return the type of the command
+        virtual string getType() const { return "toogle fullscreen"; }
+
+    private:
+        vout_window_t* m_pWnd;
+        bool m_bFullscreen;
 };
 
 #endif

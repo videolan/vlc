@@ -44,7 +44,7 @@ class X11Window: public OSWindow
         virtual ~X11Window();
 
         // Show the window
-        virtual void show( int left, int top ) const;
+        virtual void show() const;
 
         // Hide the window
         virtual void hide() const;

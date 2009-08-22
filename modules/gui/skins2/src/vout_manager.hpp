@@ -80,11 +80,20 @@ class VoutManager: public SkinObject
         /// Delete the instance of VoutManager
         static void destroy( intf_thread_t *pIntf );
 
+        /// Accept Wnd
+        void* acceptWnd( vout_window_t* pWnd );
+
+        /// Release Wnd
+        void releaseWnd( vout_window_t* pWnd );
+
+        /// set size Wnd
+        void setSizeWnd( vout_window_t* pWnd, int width, int height );
+
+        /// set fullscreen Wnd
+        void setFullscreenWnd( vout_window_t* pWnd, bool b_fullscreen );
+
         /// Callback to request a vout window
         static void *getWindow( intf_thread_t *pIntf, vout_window_t *pWnd );
-
-        /// Accept Wnd
-        void* acceptWnd( vout_window_t* pWnd, int width, int height );
 
         // Window provider (release)
         static void releaseWindow( intf_thread_t *pIntf, vout_window_t *pWnd  );
@@ -113,10 +122,6 @@ class VoutManager: public SkinObject
         // test if vout are running
         bool hasVout() { return ( m_SavedWndVec.size() != 0 ) ; }
 
-        // (un)lock functions to protect vout sets
-        void lockVout( ) { vlc_mutex_lock( &vout_lock ); }
-        void unlockVout( ) { vlc_mutex_unlock( &vout_lock ); }
-
     protected:
         // Protected because it is a singleton
         VoutManager( intf_thread_t *pIntf );
@@ -129,8 +134,6 @@ class VoutManager: public SkinObject
         vector<SavedWnd> m_SavedWndVec;
 
         VoutMainWindow* m_pVoutMainWindow;
-
-        vlc_mutex_t vout_lock;
 };
 
 

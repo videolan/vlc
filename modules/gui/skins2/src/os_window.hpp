@@ -38,7 +38,7 @@ class OSWindow: public SkinObject
         virtual ~OSWindow() {}
 
         // Show the window
-        virtual void show( int left, int top ) const = 0;
+        virtual void show() const = 0;
 
         // Hide the window
         virtual void hide() const = 0;

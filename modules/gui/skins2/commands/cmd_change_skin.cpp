@@ -44,7 +44,6 @@ void CmdChangeSkin::execute()
         pOldTheme->getWindowManager().hideAll();
     }
 
-    VoutManager::instance( getIntf() )->lockVout();
     VoutManager::instance( getIntf() )->saveVoutConfig();
 
     ThemeLoader loader( getIntf() );
@@ -57,7 +56,6 @@ void CmdChangeSkin::execute()
 
         // restore vout config
         VoutManager::instance( getIntf() )->restoreVoutConfig( true );
-        VoutManager::instance( getIntf() )->unlockVout();
     }
     else if( pOldTheme )
     {
@@ -65,12 +63,10 @@ void CmdChangeSkin::execute()
                   " restoring the previous one" );
         getIntf()->p_sys->p_theme = pOldTheme;
         VoutManager::instance( getIntf() )->restoreVoutConfig( false );
-        VoutManager::instance( getIntf() )->unlockVout();
         pOldTheme->getWindowManager().restoreVisibility();
     }
     else
     {
-        VoutManager::instance( getIntf() )->unlockVout();
         msg_Err( getIntf(), "cannot load the theme, aborting" );
         // Quit
         CmdQuit cmd( getIntf() );

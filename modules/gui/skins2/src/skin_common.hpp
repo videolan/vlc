@@ -146,6 +146,12 @@ struct intf_sys_t
     vlc_mutex_t  init_lock;
     vlc_cond_t   init_wait;
     bool         b_ready;
+
+    /// handle (vout windows)
+    void*        handle;
+    vlc_mutex_t  vout_lock;
+    vlc_cond_t   vout_wait;
+    bool         b_vout_ready;
 };
 
 

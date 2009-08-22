@@ -150,6 +150,9 @@ static int Open( vlc_object_t *p_this )
     skin_load.intf = p_intf;
     vlc_mutex_unlock( &skin_load.mutex );
 
+    vlc_mutex_init( &p_intf->p_sys->vout_lock );
+    vlc_cond_init( &p_intf->p_sys->vout_wait );
+
     return VLC_SUCCESS;
 }
 
@@ -178,6 +181,9 @@ static void Close( vlc_object_t *p_this )
 #if 0
     msg_Unsubscribe( p_intf, p_intf->p_sys->p_sub );
 #endif
+
+    vlc_cond_destroy( &p_intf->p_sys->vout_wait );
+    vlc_mutex_destroy( &p_intf->p_sys->vout_lock );
 
     // Destroy structure
     free( p_intf->p_sys );
@@ -309,9 +315,6 @@ static void *Run( void * p_obj )
     // Destroy OSLoop
     OSFactory::instance( p_intf )->destroyOSLoop();
 
-    // save config file
-    config_SaveConfigFile( p_intf, NULL );
-
     // save and delete the theme
     if( p_intf->p_sys->p_theme )
     {
@@ -322,6 +325,9 @@ static void *Run( void * p_obj )
 
         msg_Dbg( p_intf, "current theme deleted" );
     }
+
+    // save config file
+    config_SaveConfigFile( p_intf, NULL );
 
 end:
     // Destroy "singleton" objects
@@ -347,6 +353,7 @@ end:
     return NULL;
 }
 
+static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 
 // Callbacks for vout requests
 static int WindowOpen( vlc_object_t *p_this )
@@ -360,16 +367,20 @@ static int WindowOpen( vlc_object_t *p_this )
 
     vlc_object_release( pIntf );
 
+    vlc_mutex_lock( &serializer );
+
     pWnd->handle.hwnd = VoutManager::getWindow( pIntf, pWnd );
 
     if( pWnd->handle.hwnd )
     {
         pWnd->sys = (vout_window_sys_t*)pIntf;
         pWnd->control = &VoutManager::controlWindow;
+        vlc_mutex_unlock( &serializer );
         return VLC_SUCCESS;
     }
     else
     {
+        vlc_mutex_unlock( &serializer );
         return VLC_EGENERIC;
     }
 }

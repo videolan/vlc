@@ -118,7 +118,7 @@ void Win32Window::reparent( void* OSHandle, int x, int y, int w, int h )
 }
 
 
-void Win32Window::show( int left, int top ) const
+void Win32Window::show() const
 {
     ShowWindow( m_hWnd, SW_SHOW );
 }

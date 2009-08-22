@@ -48,21 +48,23 @@ class VoutWindow: private GenericWindow
         using GenericWindow::show;
         using GenericWindow::hide;
         using GenericWindow::move;
+        using GenericWindow::resize;
         using GenericWindow::getOSHandle;
         //@}
-
-        /// Resize the window
-        virtual void resize( int width, int height );
 
         /// get the parent  window
         virtual GenericWindow* getWindow( ) { return m_pParentWindow; }
 
-        /// Refresh an area of the window
-        virtual void refresh( int left, int top, int width, int height );
+        /// hotkeys processing
+        virtual void processEvent( EvtKey &rEvtKey );
 
         /// set and get Video Control for VoutWindow
         virtual void setCtrlVideo( CtrlVideo* pCtrlVideo );
         virtual CtrlVideo* getCtrlVideo( ) { return m_pCtrlVideo; }
+
+        /// toggle fullscreen mode
+        virtual void setFullscreen( bool b_fullscreen );
+        virtual bool isFullscreen() { return m_bFullscreen; }
 
         /// get original size of vout
         virtual int getOriginalWidth( ) { return original_width; }
@@ -76,15 +78,15 @@ class VoutWindow: private GenericWindow
 
     private:
 
-        /// Image when there is no video
-        OSGraphics *m_pImage;
-
         /// vout thread
         vout_window_t* m_pWnd;
 
         /// original width and height
         int original_width;
         int original_height;
+
+        /// fulscreen mode indicator
+        bool m_bFullscreen;
 
         /// VideoControl attached to it
         CtrlVideo* m_pCtrlVideo;

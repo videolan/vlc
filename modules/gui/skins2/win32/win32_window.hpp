@@ -41,7 +41,7 @@ class Win32Window: public OSWindow
         virtual ~Win32Window();
 
         // Show the window
-        virtual void show( int left, int top ) const;
+        virtual void show() const;
 
         // Hide the window
         virtual void hide() const;
