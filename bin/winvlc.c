@@ -43,7 +43,7 @@
 #   include <tlhelp32.h>
 #   include <wininet.h>
 # ifndef _WIN64
-static void check_crashdump();
+static void check_crashdump(void);
 LONG WINAPI vlc_exception_filter(struct _EXCEPTION_POINTERS *lpExceptionInfo);
 # endif
 #endif
