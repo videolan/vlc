@@ -51,11 +51,11 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
     case VOUT_WINDOW_TYPE_HWND:
         type = "vout window hwnd";
         break;
-    default:
-        assert(0);
     case VOUT_WINDOW_TYPE_XID:
         type = "vout window xid";
         break;
+    default:
+        assert(0);
     }
 
     window->module = module_need(window, type,
