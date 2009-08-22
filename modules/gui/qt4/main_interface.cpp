@@ -360,8 +360,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
             if(S_OK != p_taskbl->vt->ThumbBarAddButtons(p_taskbl, GetForegroundWindow(), 3, thbButtons))
                 msg_Err( p_intf, "ThumbBarAddButtons failed with error %08x", GetLastError() );
 
+            CONNECT( THEMIM->getIM(), statusChanged( int ), this, changeThumbbarButtons( int ) );
         }
-        CONNECT( THEMIM->getIM(), statusChanged( int ), this, changeThumbbarButtons( int ) );
     }
     else
     {
