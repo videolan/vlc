@@ -339,7 +339,9 @@ void OpenDialog::finish( bool b_enqueue = false )
         bool b_start = !i && !b_enqueue;
 
         input_item_t *p_input;
-        p_input = input_item_New( p_intf, qtu( itemsMRL[i] ), NULL );
+        char* psz_uri = make_URI( qtu( itemsMRL[i] ) );
+        p_input = input_item_New( p_intf, psz_uri, NULL );
+        free( psz_uri );
 
         /* Insert options only for the first element.
            We don't know how to edit that anyway. */
