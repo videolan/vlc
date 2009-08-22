@@ -80,7 +80,9 @@ static int           OpenAudio( decoder_t * );
 static int           OpenVideo( decoder_t * );
 
 static aout_buffer_t *DecodeAudio( decoder_t *, block_t ** );
+#ifndef WIN32
 static picture_t     *DecodeVideo( decoder_t *, block_t ** );
+#endif
 
 #define FCC( a, b , c, d ) \
     ((uint32_t)( ((a)<<24)|((b)<<16)|((c)<<8)|(d)))
@@ -214,7 +216,9 @@ static const int pi_channels_maps[6] =
 };
 
 static int QTAudioInit( decoder_t * );
+#ifndef WIN32
 static int QTVideoInit( decoder_t * );
+#endif
 
 /*****************************************************************************
  * Open: probe the decoder and return score
@@ -229,7 +233,7 @@ static int Open( vlc_object_t *p_this )
 #ifdef __APPLE__
     OSErr err;
     SInt32 qtVersion, macosversion;
-    
+
     err = Gestalt(gestaltQuickTimeVersion, &qtVersion);
     err = Gestalt(gestaltSystemVersion, &macosversion);
 #ifndef NDEBUG
@@ -840,7 +844,7 @@ static int OpenVideo( decoder_t *p_dec )
     p_dec->fmt_out.video.i_width = p_dec->fmt_in.video.i_width;
     p_dec->fmt_out.video.i_height= p_dec->fmt_in.video.i_height;
     p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * p_dec->fmt_in.video.i_width / p_dec->fmt_in.video.i_height;
- 
+
     vlc_mutex_unlock( &qt_mutex );
     return VLC_SUCCESS;
 
