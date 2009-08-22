@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include "cmd_audio.hpp"
+#include "../src/vlcproc.hpp"
 #include <vlc_aout.h>
 #include <string>
 
@@ -51,5 +52,12 @@ void CmdSetEqualizer::execute()
     {
         config_PutPsz( getIntf(), "audio-filter", filters.c_str() );
     }
+}
+
+void CmdVolumeChanged::execute()
+{
+    VlcProc* p_VlcProc = getIntf()->p_sys->p_vlcProc;
+
+    p_VlcProc->refreshVolume();
 }
 

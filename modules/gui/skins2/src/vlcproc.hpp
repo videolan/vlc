@@ -85,6 +85,9 @@ class VlcProc: public SkinObject
         /// Indicate whether the embedded video output is currently used
         bool isVoutUsed() const { return m_pVout != NULL; }
 
+        /// Refresh Volume
+        void refreshVolume();
+
     protected:
         // Protected because it is a singleton
         VlcProc( intf_thread_t *pIntf );
@@ -153,6 +156,11 @@ class VlcProc: public SkinObject
 
         /// Update the stream name variable
         void updateStreamName();
+
+        /// Callback for volume variable
+        static int onVolumeChanged( vlc_object_t *pObj, const char *pVariable,
+                                    vlc_value_t oldVal, vlc_value_t newVal,
+                                    void *pParam );
 
         /// Callback for intf-change variable
         static int onIntfChange( vlc_object_t *pObj, const char *pVariable,

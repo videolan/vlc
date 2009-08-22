@@ -47,6 +47,7 @@
 #include "../commands/cmd_vars.hpp"
 #include "../commands/cmd_dialogs.hpp"
 #include "../commands/cmd_update_item.hpp"
+#include "../commands/cmd_audio.hpp"
 #include "../utils/var_bool.hpp"
 #include <sstream>
 
@@ -137,6 +138,9 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     // so they must put commands in the queue and NOT do anything else
     // (X11 calls are not reentrant)
 
+    // Called when volume sound changes
+    var_AddCallback( pIntf->p_libvlc, "volume-change",
+                     onVolumeChanged, this );
     // Called when the playlist changes
     var_AddCallback( pIntf->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
@@ -180,6 +184,8 @@ VlcProc::~VlcProc()
 
     interaction_Unregister( getIntf() );
 
+    var_DelCallback( getIntf()->p_libvlc, "volume-change",
+                     onVolumeChanged, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-item-append",
@@ -252,6 +258,14 @@ void VlcProc::refreshAudio()
         pFilters = config_GetPsz( getIntf(), "audio-filter" );
     }
 
+    // Refresh the equalizer variable
+    VarBoolImpl *pVarEqualizer = (VarBoolImpl*)m_cVarEqualizer.get();
+    pVarEqualizer->set( pFilters && strstr( pFilters, "equalizer" ) );
+    free( pFilters );
+}
+
+void VlcProc::refreshVolume()
+{
     // Refresh sound volume
     audio_volume_t volume;
     aout_VolumeGet( getIntf()->p_sys->p_playlist, &volume );
@@ -261,11 +275,6 @@ void VlcProc::refreshAudio()
     // Set the mute variable
     VarBoolImpl *pVarMute = (VarBoolImpl*)m_cVarMute.get();
     pVarMute->set( volume == 0 );
-
-    // Refresh the equalizer variable
-    VarBoolImpl *pVarEqualizer = (VarBoolImpl*)m_cVarEqualizer.get();
-    pVarEqualizer->set( pFilters && strstr( pFilters, "equalizer" ) );
-    free( pFilters );
 }
 
 void VlcProc::refreshPlaylist()
@@ -371,6 +380,23 @@ void VlcProc::refreshInput()
         pVarPaused->set( false );
     }
 }
+
+int VlcProc::onVolumeChanged( vlc_object_t *pObj, const char *pVariable,
+                           vlc_value_t oldVal, vlc_value_t newVal,
+                           void *pParam )
+{
+    VlcProc *pThis = (VlcProc*)pParam;
+
+    // Create a playtree notify command (for new style playtree)
+    CmdVolumeChanged *pCmd = new CmdVolumeChanged( pThis->getIntf() );
+
+    // Push the command in the asynchronous command queue
+    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
+    pQueue->push( CmdGenericPtr( pCmd ) );
+
+    return VLC_SUCCESS;
+}
+
 
 int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldVal, vlc_value_t newVal,
