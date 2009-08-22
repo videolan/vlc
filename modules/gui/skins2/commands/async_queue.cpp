@@ -74,19 +74,21 @@ void AsyncQueue::destroy( intf_thread_t *pIntf )
 
 void AsyncQueue::push( const CmdGenericPtr &rcCommand, bool removePrev )
 {
+    vlc_mutex_lock( &m_lock );
+
     if( removePrev )
     {
         // Remove the commands of the same type
         remove( rcCommand.get()->getType(), rcCommand );
     }
     m_cmdList.push_back( rcCommand );
+
+    vlc_mutex_unlock( &m_lock );
 }
 
 
 void AsyncQueue::remove( const string &rType, const CmdGenericPtr &rcCommand )
 {
-    vlc_mutex_lock( &m_lock );
-
     list<CmdGenericPtr>::iterator it;
     for( it = m_cmdList.begin(); it != m_cmdList.end(); it++ )
     {
@@ -104,8 +106,6 @@ void AsyncQueue::remove( const string &rType, const CmdGenericPtr &rcCommand )
             }
         }
     }
-
-    vlc_mutex_unlock( &m_lock );
 }
 
 
