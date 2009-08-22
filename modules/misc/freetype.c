@@ -436,8 +436,12 @@ static int Create( vlc_object_t *p_this )
 # endif
 
 #else
-    p_sys->psz_fontfamily = strdup( DEFAULT_FONT )
+
+#ifdef HAVE_FONTCONFIG
+    p_sys->psz_fontfamily = strdup( DEFAULT_FONT );
     psz_fontfile = psz_fontfamily;
+#endif
+
 #endif
 
     i_error = FT_Init_FreeType( &p_sys->p_library );

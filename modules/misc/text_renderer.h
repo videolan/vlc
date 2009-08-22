@@ -542,6 +542,7 @@ static int ProcessNodes( filter_t *p_filter,
         if( p_font_style->i_style_flags & STYLE_UNDERLINE )
             b_uline = true;
     }
+#ifdef HAVE_FONTCONFIG
     else
     {
         rv = PushFont( &p_fonts,
@@ -551,6 +552,8 @@ static int ProcessNodes( filter_t *p_filter,
                           (((255-p_sys->i_font_opacity) & 0xff) << 24),
                        0x00ffffff );
     }
+#endif
+
     if( rv != VLC_SUCCESS )
         return rv;
 
