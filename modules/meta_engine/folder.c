@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_playlist.h>
+#include <vlc_art_finder.h>
 #include <vlc_charset.h>
 #include <vlc_url.h>
 
@@ -74,7 +75,8 @@ vlc_module_end ()
  *****************************************************************************/
 static int FindMeta( vlc_object_t *p_this )
 {
-    input_item_t *p_item = (input_item_t *)p_this->p_private;
+    art_finder_t *p_finder = (art_finder_t *)p_this;
+    input_item_t *p_item = p_finder->p_item;
     bool b_have_art = false;
 
     int i;

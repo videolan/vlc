@@ -29,6 +29,7 @@
 #include <vlc_playlist.h>
 #include <vlc_stream.h>
 #include <limits.h>
+#include <vlc_art_finder.h>
 
 #include "art.h"
 #include "fetcher.h"
@@ -138,12 +139,10 @@ void playlist_fetcher_Delete( playlist_fetcher_t *p_fetcher )
 static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
 {
     int i_ret;
-    module_t *p_module;
-    char *psz_title, *psz_artist, *psz_album;
 
-    psz_artist = input_item_GetArtist( p_item );
-    psz_album = input_item_GetAlbum( p_item );
-    psz_title = input_item_GetTitle( p_item );
+    char *psz_artist = input_item_GetArtist( p_item );
+    char *psz_album = input_item_GetAlbum( p_item );
+    char *psz_title = input_item_GetTitle( p_item );
     if( !psz_title )
         psz_title = input_item_GetName( p_item );
 
@@ -219,19 +218,26 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     }
 
     /* Fetch the art url */
-    p_fetcher->p_private = p_item;
+    i_ret = VLC_EGENERIC;
 
-    p_module = module_need( p_fetcher, "art finder", NULL, false );
+    vlc_object_t *p_parent = VLC_OBJECT(p_fetcher->p_playlist);
+    art_finder_t *p_finder =
+        vlc_custom_create( p_parent, sizeof( *p_finder ), VLC_OBJECT_GENERIC,
+                           "art finder" );
+    if( p_finder != NULL)
+    {
+        module_t *p_module;
 
-    if( p_module )
-    {
-        module_unneed( p_fetcher, p_module );
-        i_ret = 1;
-    }
-    else
-    {
-        msg_Dbg( p_fetcher, "unable to find art" );
-        i_ret = VLC_EGENERIC;
+        vlc_object_attach( p_finder, p_parent );
+        p_finder->p_item = p_item;
+
+        p_module = module_need( p_parent, "art finder", NULL, false );
+        if( p_module )
+        {
+            module_unneed( p_finder, p_module );
+            i_ret = 1;
+        }
+        vlc_object_release( p_finder );
     }
 
     /* Record this album */

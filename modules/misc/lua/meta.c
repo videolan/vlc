@@ -37,6 +37,7 @@
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
+#include <vlc_art_finder.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
 #include <vlc_stream.h>
@@ -191,11 +192,12 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
  *****************************************************************************/
 int FindArt( vlc_object_t *p_this )
 {
+    art_finder_t *p_finder = (art_finder_t *)p_this;
+    input_item_t *p_item = p_finder->p_item;
     playlist_t *p_playlist = pl_Hold( p_this );
     if( !p_playlist )
         return VLC_EGENERIC;
 
-    input_item_t *p_item = (input_item_t *)p_this->p_private;
     lua_State *L = vlclua_meta_init( p_this, p_item );
     int i_ret = vlclua_scripts_batch_execute( p_this, "meta", &fetch_art, L, p_item );
     lua_close( L );
