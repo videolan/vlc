@@ -227,7 +227,7 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
         vlc_object_attach( p_finder, p_parent );
         p_finder->p_item = p_item;
 
-        p_module = module_need( p_parent, "art finder", NULL, false );
+        p_module = module_need( p_finder, "art finder", NULL, false );
         if( p_module )
         {
             module_unneed( p_finder, p_module );
