@@ -732,8 +732,8 @@ AC_CHECK_LIB(m,exp,[
 AC_CHECK_LIB(m,round,[
   VLC_ADD_LIBS([dbus],[-lm])
 ])
-AC_CHECK_LIB(mx,sqrtf,[
-  VLC_ADD_LIBS([x264],[-lmx])
+AC_CHECK_LIB(m,sqrtf,[
+  VLC_ADD_LIBS([x264],[-lm])
 ])
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
