@@ -347,7 +347,7 @@ static filter_t *filter_chain_AppendFilterInternal( filter_chain_t *p_chain,
     vlc_array_append( &p_chain->mouses, p_mouse );
 
     msg_Dbg( p_chain->p_this, "Filter '%s' (%p) appended to chain",
-             psz_name ? psz_name : vlc_internals(p_filter)->psz_object_name,
+             psz_name ? psz_name : module_get_name(p_filter->p_module, false),
              p_filter );
 
     return p_filter;
