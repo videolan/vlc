@@ -75,9 +75,6 @@ VLC_EXPORT( void, __vlc_object_detach, ( vlc_object_t * ) );
 __attribute__((deprecated))
 #endif
 VLC_EXPORT( void *, __vlc_object_find, ( vlc_object_t *, int, int ) );
-#if defined (__GNUC__) && !defined __cplusplus
-__attribute__((deprecated))
-#endif
 VLC_EXPORT( vlc_object_t *, vlc_object_find_name, ( vlc_object_t *, const char *, int ) );
 VLC_EXPORT( void *, __vlc_object_hold, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_release, ( vlc_object_t * ) );

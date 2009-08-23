@@ -607,14 +607,6 @@ found_shortcut:
     {
         msg_Dbg( p_this, "using %s module \"%s\"",
                  psz_capability, p_module->psz_object_name );
-        if( !vlc_internals(p_this)->psz_object_name )
-        {
-            /* This assumes that p_this is the object which will be using the
-             * module. That's not always the case ... but it is in most cases.
-             */
-            vlc_internals(p_this)->psz_object_name =
-                strdup( psz_alias ? psz_alias : p_module->psz_object_name );
-        }
     }
     else if( count == 0 )
     {
