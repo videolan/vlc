@@ -62,11 +62,10 @@ vlc_module_end ()
 /*****************************************************************************
  * ParseID3Tag : parse an id3tag into the info structures
  *****************************************************************************/
-static void ParseID3Tag( demux_t *p_demux, const uint8_t *p_data, int i_size )
+static void ParseID3Tag( demux_meta_t *p_demux_meta, const uint8_t *p_data, int i_size )
 {
     struct id3_tag   *p_id3_tag;
     struct id3_frame *p_frame;
-    demux_meta_t     *p_demux_meta = (demux_meta_t*)p_demux->p_private;
     vlc_meta_t       *p_meta;
     int i;
 
@@ -225,7 +224,7 @@ static void ParseID3Tag( demux_t *p_demux, const uint8_t *p_data, int i_size )
             }
             else if( ID_IS ( "APIC" ) )
             {
-                msg_Dbg( p_demux, "** Has APIC **" );
+                msg_Dbg( p_demux_meta, "** Has APIC **" );
             }
             else if( p_frame->description )
             {
@@ -265,9 +264,8 @@ static size_t GetAPEvXSize( const uint8_t *p_data, int i_data )
     /* it is the footer */
     return i_body + ( (flags&(1<<31)) ? APE_TAG_HEADERSIZE : 0 );
 }
-static void ParseAPEvXTag( demux_t *p_demux, const uint8_t *p_data, int i_data )
+static void ParseAPEvXTag( demux_meta_t *p_demux_meta, const uint8_t *p_data, int i_data )
 {
-    demux_meta_t     *p_demux_meta = (demux_meta_t*)p_demux->p_private;
     vlc_meta_t       *p_meta;
     bool b_start;
     bool b_end;
@@ -371,8 +369,9 @@ static void ParseAPEvXTag( demux_t *p_demux, const uint8_t *p_data, int i_data )
  * CheckFooter: check for ID3/APE at the end of the file
  * CheckHeader: check for ID3/APE at the begining of the file
  *****************************************************************************/
-static void CheckFooter( demux_t *p_demux )
+static void CheckFooter( demux_meta_t *p_demux_meta )
 {
+    demux_t      *p_demux = (demux_t *)p_demux_meta->p_demux;
     const int64_t i_pos = stream_Size( p_demux->s );
     const size_t i_peek = 128+APE_TAG_HEADERSIZE;
     const uint8_t *p_peek;
@@ -397,7 +396,7 @@ static void CheckFooter( demux_t *p_demux )
     if( i_id3v1_size == 128 )
     {
         msg_Dbg( p_demux, "found ID3v1 tag" );
-        ParseID3Tag( p_demux, p_peek_id3, i_id3v1_size );
+        ParseID3Tag( p_demux_meta, p_peek_id3, i_id3v1_size );
     }
 
     /* Compute ID3v2 position */
@@ -433,7 +432,7 @@ static void CheckFooter( demux_t *p_demux )
             stream_Peek( p_demux->s, &p_peek, i_id3v2_size ) == i_id3v2_size )
         {
             msg_Dbg( p_demux, "found ID3v2 tag at end of file" );
-            ParseID3Tag( p_demux, p_peek, i_id3v2_size );
+            ParseID3Tag( p_demux_meta, p_peek, i_id3v2_size );
         }
     }
 
@@ -444,14 +443,16 @@ static void CheckFooter( demux_t *p_demux )
             stream_Peek( p_demux->s, &p_peek, i_apevx_size ) == i_apevx_size )
         {
             msg_Dbg( p_demux, "found APEvx tag at end of file" );
-            ParseAPEvXTag( p_demux, p_peek, i_apevx_size );
+            ParseAPEvXTag( p_demux_meta, p_peek, i_apevx_size );
         }
     }
 }
-static void CheckHeader( demux_t *p_demux )
+static void CheckHeader( demux_meta_t *p_demux_meta )
 {
     const uint8_t *p_peek;
     int i_size;
+
+    demux_t      *p_demux = (demux_t *)p_demux_meta->p_demux;
 
     if( stream_Seek( p_demux->s, 0 ) )
         return;
@@ -464,7 +465,7 @@ static void CheckHeader( demux_t *p_demux )
         stream_Peek( p_demux->s, &p_peek, i_size ) == i_size )
     {
         msg_Dbg( p_demux, "found ID3v2 tag" );
-        ParseID3Tag( p_demux, p_peek, i_size );
+        ParseID3Tag( p_demux_meta, p_peek, i_size );
         return;
     }
 
@@ -476,7 +477,7 @@ static void CheckHeader( demux_t *p_demux )
         stream_Peek( p_demux->s, &p_peek, i_size ) == i_size )
     {
         msg_Dbg( p_demux, "found APEv1/2 tag" );
-        ParseAPEvXTag( p_demux, p_peek, i_size );
+        ParseAPEvXTag( p_demux_meta, p_peek, i_size );
     }
 }
 
@@ -501,10 +502,10 @@ static int ParseTags( vlc_object_t *p_this )
     p_demux_meta->p_meta = NULL;
 
     /* */
-    CheckFooter( p_demux );
+    CheckFooter( p_demux_meta );
 
     /* */
-    CheckHeader( p_demux );
+    CheckHeader( p_demux_meta );
 
     /* Restore position
      *  Demuxer will not see tags at the start as src/input/demux.c skips it
