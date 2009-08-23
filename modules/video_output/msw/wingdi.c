@@ -358,7 +358,7 @@ static int Manage( vout_thread_t *p_vout )
 
         if( !EqualRect( &rect_parent, &p_vout->p_sys->rect_parent ) )
         {
-            int i_x, i_y, i_width, i_height;
+            unsigned int i_x, i_y, i_width, i_height;
             p_vout->p_sys->rect_parent = rect_parent;
 
             /* This one is to force the update even if only

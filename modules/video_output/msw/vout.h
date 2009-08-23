@@ -149,8 +149,8 @@ struct vout_sys_t
     /* DDraw capabilities */
     int          b_caps_overlay_clipping;
 
-    int          i_rgb_colorkey;      /* colorkey in RGB used by the overlay */
-    int          i_colorkey;                 /* colorkey used by the overlay */
+    unsigned int    i_rgb_colorkey;      /* colorkey in RGB used by the overlay */
+    unsigned int    i_colorkey;                 /* colorkey used by the overlay */
 
     COLORREF        color_bkg;
     COLORREF        color_bkgtxt;

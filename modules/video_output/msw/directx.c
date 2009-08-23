@@ -1186,7 +1186,7 @@ int DirectDrawUpdateOverlay( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->b_wallpaper )
     {
-        int i_x, i_y, i_width, i_height;
+        unsigned i_x, i_y, i_width, i_height;
 
         rect_src.left = p_vout->fmt_out.i_x_offset;
         rect_src.top = p_vout->fmt_out.i_y_offset;
