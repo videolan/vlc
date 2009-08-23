@@ -829,7 +829,8 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     }
     else
     {
-        p_vout = (vout_thread_t *)GetWindowLongPtr( hwnd, GWLP_USERDATA );
+        LONG_PTR p_user_data = GetWindowLongPtr( hwnd, GWLP_USERDATA );
+        p_vout = (vout_thread_t *)p_user_data;
         if( !p_vout )
         {
             /* Hmmm mozilla does manage somehow to save the pointer to our
