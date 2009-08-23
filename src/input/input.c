@@ -1538,24 +1538,22 @@ static void ControlPause( input_thread_t *p_input, mtime_t i_control_date )
         if( i_ret )
         {
             msg_Warn( p_input, "cannot set pause state" );
-            i_state = p_input->p->i_state;
+            return;
         }
     }
 
     /* */
-    if( !i_ret )
+    i_ret = es_out_SetPauseState( p_input->p->p_es_out,
+                                  p_input->p->b_can_pause, true,
+                                  i_control_date );
+    if( i_ret )
     {
-        i_ret = es_out_SetPauseState( p_input->p->p_es_out, p_input->p->b_can_pause, true, i_control_date );
-        if( i_ret )
-        {
-            msg_Warn( p_input, "cannot set pause state at es_out level" );
-            i_state = p_input->p->i_state;
-        }
+        msg_Warn( p_input, "cannot set pause state at es_out level" );
+        return;
     }
 
     /* Switch to new state */
     input_ChangeState( p_input, i_state );
-
 }
 
 static void ControlUnpause( input_thread_t *p_input, mtime_t i_control_date )
