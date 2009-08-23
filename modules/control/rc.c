@@ -934,7 +934,7 @@ static void StateChanged( intf_thread_t *p_intf, input_thread_t *p_input )
     PL_UNLOCK;
 
     /* */
-    char *psz_cmd;
+    const char *psz_cmd;
     switch( i_status )
     {
     case PLAYLIST_STOPPED:
