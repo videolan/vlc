@@ -175,12 +175,12 @@ static const struct
                     aout_buffer_t *, picture_t *);
 } pf_effect_run[]=
 {
-    { "scope",      scope_Run },
-    { "vuMeter",    vuMeter_Run },
-    { "spectrum",   spectrum_Run },
-    { "spectrometer",   spectrometer_Run },
-    { "dummy",      dummy_Run},
-    { NULL,         dummy_Run}
+    { "scope",        scope_Run },
+    { "vuMeter",      vuMeter_Run },
+    { "spectrum",     spectrum_Run },
+    { "spectrometer", spectrometer_Run },
+    { "dummy",        dummy_Run},
+    { NULL,           dummy_Run}
 };
 
 /*****************************************************************************
