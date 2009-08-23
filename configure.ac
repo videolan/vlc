@@ -561,7 +561,7 @@ dnl Check for system libs needed
 need_libc=false
 
 dnl Check for usual libc functions
-AC_CHECK_FUNCS([gettimeofday isatty sigrelse getpwuid_r memalign posix_memalign if_nametoindex getenv putenv setenv ctime_r lrintf daemon fork lstat posix_fadvise posix_madvise uselocale])
+AC_CHECK_FUNCS([gettimeofday isatty sigrelse getpwuid_r memalign posix_memalign if_nametoindex getenv putenv setenv ctime_r daemon fork lstat posix_fadvise posix_madvise uselocale])
 AC_FUNC_ALLOCA
 AC_CHECK_FUNCS(fcntl)
 AC_REPLACE_FUNCS([asprintf atof atoll getcwd gmtime_r lldiv localtime_r rewind strcasecmp strcasestr strdup strlcpy strncasecmp strndup strnlen strsep strtof strtoll vasprintf swab])
@@ -731,6 +731,10 @@ AC_CHECK_LIB(m,exp,[
 ])
 AC_CHECK_LIB(m,round,[
   VLC_ADD_LIBS([dbus],[-lm])
+])
+AC_CHECK_LIB(m,lrintf, [
+  AC_DEFINE(HAVE_LRINTF, 1, [Define to 1 if you have the lrintf function])
+  VLC_ADD_LIBS([skins2],[-lm])
 ])
 AC_CHECK_LIB(m,sqrtf,[
   VLC_ADD_LIBS([x264],[-lm])
