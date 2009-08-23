@@ -247,9 +247,9 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     p_input->b_recycle_vout = psz_visual && *psz_visual;
 
     /* parse user filter lists */
+    char *const ppsz_array[] = { psz_scaletempo, psz_filters, psz_visual };
     for( i_visual = 0; i_visual < 3 && !AOUT_FMT_NON_LINEAR(&chain_output_format); i_visual++ )
     {
-        char *ppsz_array[] = { psz_scaletempo, psz_filters, psz_visual };
         char *psz_next = NULL;
         char *psz_parser = ppsz_array[i_visual];
 
