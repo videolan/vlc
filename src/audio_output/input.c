@@ -300,26 +300,22 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
             p_filter->p_owner->p_aout  = p_aout;
             p_filter->p_owner->p_input = p_input;
 
+            /* request format */
+            memcpy( &p_filter->input, &chain_output_format,
+                    sizeof(audio_sample_format_t) );
+            memcpy( &p_filter->output, &chain_output_format,
+                    sizeof(audio_sample_format_t) );
+
+
             /* try to find the requested filter */
             if( i_visual == 2 ) /* this can only be a visualization module */
             {
-                /* request format */
-                memcpy( &p_filter->input, &chain_output_format,
-                        sizeof(audio_sample_format_t) );
-                memcpy( &p_filter->output, &chain_output_format,
-                        sizeof(audio_sample_format_t) );
 
                 p_filter->p_module = module_need( p_filter, "visualization",
                                                   psz_parser, true );
             }
             else /* this can be a audio filter module as well as a visualization module */
             {
-                /* request format */
-                memcpy( &p_filter->input, &chain_input_format,
-                        sizeof(audio_sample_format_t) );
-                memcpy( &p_filter->output, &chain_output_format,
-                        sizeof(audio_sample_format_t) );
-
                 p_filter->p_module = module_need( p_filter, "audio filter",
                                               psz_parser, true );
 
