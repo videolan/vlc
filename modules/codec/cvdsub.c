@@ -573,9 +573,9 @@ static void RenderImage( decoder_t *p_dec, block_t *p_data,
     int i_field;            /* The subtitles are interlaced */
     int i_row, i_column;    /* scanline row/column number */
     uint8_t i_color, i_count;
-    bsw_t bsw;
+    bs_t bs;
 
-    bsw_init_writable( &bsw, p_data->p_buffer + p_sys->i_image_offset,
+    bs_init( &bs, p_data->p_buffer + p_sys->i_image_offset,
              p_data->i_buffer - p_sys->i_image_offset );
 
     for( i_field = 0; i_field < 2; i_field++ )
@@ -584,12 +584,12 @@ static void RenderImage( decoder_t *p_dec, block_t *p_data,
         {
             for( i_column = 0; i_column < p_sys->i_width; i_column++ )
             {
-                uint8_t i_val = bsw_read( &bsw, 4 );
+                uint8_t i_val = bs_read( &bs, 4 );
 
                 if( i_val == 0 )
                 {
                     /* Fill the rest of the line with next color */
-                    i_color = bsw_read( &bsw, 4 );
+                    i_color = bs_read( &bs, 4 );
 
                     memset( &p_dest[i_row * p_region->p_picture->Y_PITCH +
                                     i_column], i_color,
@@ -612,7 +612,7 @@ static void RenderImage( decoder_t *p_dec, block_t *p_data,
                 }
             }
 
-            bsw_align( &bsw );
+            bs_align( &bs );
         }
     }
 }

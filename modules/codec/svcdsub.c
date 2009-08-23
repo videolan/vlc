@@ -546,9 +546,9 @@ static void SVCDSubRenderImage( decoder_t *p_dec, block_t *p_data,
     int i_field;            /* The subtitles are interlaced */
     int i_row, i_column;    /* scanline row/column number */
     uint8_t i_color, i_count;
-    bsw_t bs;
+    bs_t bs;
 
-    bsw_init_writable( &bs, p_data->p_buffer + p_sys->i_image_offset,
+    bs_init( &bs, p_data->p_buffer + p_sys->i_image_offset,
              p_data->i_buffer - p_sys->i_image_offset );
 
     for( i_field = 0; i_field < 2; i_field++ )
@@ -557,8 +557,8 @@ static void SVCDSubRenderImage( decoder_t *p_dec, block_t *p_data,
         {
             for( i_column = 0; i_column < p_sys->i_width; i_column++ )
             {
-                i_color = bsw_read( &bs, 2 );
-                if( i_color == 0 && (i_count = bsw_read( &bs, 2 )) )
+                i_color = bs_read( &bs, 2 );
+                if( i_color == 0 && (i_count = bs_read( &bs, 2 )) )
                 {
                     i_count = __MIN( i_count, p_sys->i_width - i_column );
                     memset( &p_dest[i_row * p_region->p_picture->Y_PITCH +
@@ -570,11 +570,11 @@ static void SVCDSubRenderImage( decoder_t *p_dec, block_t *p_data,
                 p_dest[i_row * p_region->p_picture->Y_PITCH + i_column] = i_color;
             }
 
-            bsw_align( &bs );
+            bs_align( &bs );
         }
 
         /* odd field */
-        bsw_init_writable( &bs, p_data->p_buffer + p_sys->i_image_offset +
+        bs_init( &bs, p_data->p_buffer + p_sys->i_image_offset +
                  p_sys->second_field_offset,
                  p_data->i_buffer - p_sys->i_image_offset -
                  p_sys->second_field_offset );

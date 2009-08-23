@@ -31,24 +31,14 @@
 
 typedef struct bs_s
 {
-    const uint8_t *p_start;
-    const uint8_t *p;
-    const uint8_t *p_end;
-
-    unsigned     i_left;    /* i_count number of available bits */
-} bs_t;
-
-typedef struct bs_writable_s
-{
     uint8_t *p_start;
     uint8_t *p;
     uint8_t *p_end;
-    
-    unsigned     i_left;    /* i_count number of available bits */
-} bsw_t;
 
+    int     i_left;    /* i_count number of available bits */
+} bs_t;
 
-static inline void bs_init( bs_t *s, const void *p_data, unsigned i_data )
+static inline void bs_init( bs_t *s, void *p_data, int i_data )
 {
     s->p_start = p_data;
     s->p       = p_data;
@@ -151,67 +141,25 @@ static inline void bs_skip( bs_t *s, int i_count )
     }
 }
 
-/*
- * Writable bits stream
- */
-static inline void bsw_init_writable( bsw_t *s, void *p_data, unsigned i_data )
-{
-    s->p_start = p_data;
-    s->p       = p_data;
-    s->p_end   = s->p + i_data;
-    s->i_left  = 8;
-}
-
-static inline bs_t * bs_from_writable( bsw_t *s )
-{
-    return (bs_t *)s;
-}
-
-static inline void bsw_skip( bsw_t *s, int count )
-{
-    return bs_skip(bs_from_writable(s), count);
-}
-
-static inline uint32_t bsw_show( bsw_t *s, int count )
-{
-    return bs_show(bs_from_writable(s), count);
-}
-
-static inline uint32_t bsw_read1( bsw_t *s )
-{
-    return bs_read1(bs_from_writable(s));
-}
-
-static inline uint32_t bsw_read( bsw_t *s, int count )
-{
-    return bs_read(bs_from_writable(s), count);
-}
-
-static inline int bsw_pos( bsw_t *s )
-{
-    return bs_pos(bs_from_writable(s));
-}
-
-static inline int bsw_eof( bsw_t *s )
-{
-    return bs_eof(bs_from_writable(s));
-}
-
-
-static inline void bsw_write( bsw_t *s, int i_count, uint32_t i_bits )
+static inline void bs_write( bs_t *s, int i_count, uint32_t i_bits )
 {
     while( i_count > 0 )
     {
         if( s->p >= s->p_end )
+        {
             break;
+        }
 
         i_count--;
 
         if( ( i_bits >> i_count )&0x01 )
+        {
             *s->p |= 1 << ( s->i_left - 1 );
+        }
         else
+        {
             *s->p &= ~( 1 << ( s->i_left - 1 ) );
-
+        }
         s->i_left--;
         if( s->i_left == 0 )
         {
@@ -221,7 +169,7 @@ static inline void bsw_write( bsw_t *s, int i_count, uint32_t i_bits )
     }
 }
 
-static inline void bsw_align( bsw_t *s )
+static inline void bs_align( bs_t *s )
 {
     if( s->i_left != 8 )
     {
@@ -230,16 +178,20 @@ static inline void bsw_align( bsw_t *s )
     }
 }
 
-static inline void bsw_align_0( bsw_t *s )
+static inline void bs_align_0( bs_t *s )
 {
     if( s->i_left != 8 )
-        bsw_write( s, s->i_left, 0 );
+    {
+        bs_write( s, s->i_left, 0 );
+    }
 }
 
-static inline void bsw_align_1( bsw_t *s )
+static inline void bs_align_1( bs_t *s )
 {
     while( s->i_left != 8 )
-        bsw_write( s, 1, 1 );
+    {
+        bs_write( s, 1, 1 );
+    }
 }
 
 #endif

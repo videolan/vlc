@@ -430,88 +430,88 @@ static int LOASSyncInfo( uint8_t p_header[LOAS_HEADER_SIZE], unsigned int *pi_he
     return ( ( p_header[1] & 0x1f ) << 8 ) + p_header[2];
 }
 
-static int Mpeg4GAProgramConfigElement( bsw_t *s )
+static int Mpeg4GAProgramConfigElement( bs_t *s )
 {
     /* TODO compute channels count ? */
-    int i_tag = bsw_read( s, 4 );
+    int i_tag = bs_read( s, 4 );
     if( i_tag != 0x05 )
         return -1;
-    bsw_skip( s, 2 + 4 ); // object type + sampling index
-    int i_num_front = bsw_read( s, 4 );
-    int i_num_side = bsw_read( s, 4 );
-    int i_num_back = bsw_read( s, 4 );
-    int i_num_lfe = bsw_read( s, 2 );
-    int i_num_assoc_data = bsw_read( s, 3 );
-    int i_num_valid_cc = bsw_read( s, 4 );
+    bs_skip( s, 2 + 4 ); // object type + sampling index
+    int i_num_front = bs_read( s, 4 );
+    int i_num_side = bs_read( s, 4 );
+    int i_num_back = bs_read( s, 4 );
+    int i_num_lfe = bs_read( s, 2 );
+    int i_num_assoc_data = bs_read( s, 3 );
+    int i_num_valid_cc = bs_read( s, 4 );
 
-    if( bsw_read1(s) )
-        bsw_skip( s, 4 ); // mono downmix
-    if( bsw_read1(s) )
-        bsw_skip( s, 4 ); // stereo downmix
-    if( bsw_read1(s) )
-        bsw_skip( s, 2+1 ); // matrix downmix + pseudo_surround
+    if( bs_read1(s) )
+        bs_skip( s, 4 ); // mono downmix
+    if( bs_read1(s) )
+        bs_skip( s, 4 ); // stereo downmix
+    if( bs_read1(s) )
+        bs_skip( s, 2+1 ); // matrix downmix + pseudo_surround
 
-    bsw_skip( s, i_num_front * (1+4) );
-    bsw_skip( s, i_num_side * (1+4) );
-    bsw_skip( s, i_num_back * (1+4) );
-    bsw_skip( s, i_num_lfe * (4) );
-    bsw_skip( s, i_num_assoc_data * (4) );
-    bsw_skip( s, i_num_valid_cc * (5) );
-    bsw_align( s );
-    int i_comment = bsw_read( s, 8 );
-    bsw_skip( s, i_comment * 8 );
+    bs_skip( s, i_num_front * (1+4) );
+    bs_skip( s, i_num_side * (1+4) );
+    bs_skip( s, i_num_back * (1+4) );
+    bs_skip( s, i_num_lfe * (4) );
+    bs_skip( s, i_num_assoc_data * (4) );
+    bs_skip( s, i_num_valid_cc * (5) );
+    bs_align( s );
+    int i_comment = bs_read( s, 8 );
+    bs_skip( s, i_comment * 8 );
     return 0;
 }
 
-static int Mpeg4GASpecificConfig( mpeg4_cfg_t *p_cfg, bsw_t *s )
+static int Mpeg4GASpecificConfig( mpeg4_cfg_t *p_cfg, bs_t *s )
 {
-    p_cfg->i_frame_length = bsw_read1(s) ? 960 : 1024;
+    p_cfg->i_frame_length = bs_read1(s) ? 960 : 1024;
 
-    if( bsw_read1( s ) )     // depend on core coder
-        bsw_skip( s, 14 );   // core coder delay
+    if( bs_read1( s ) )     // depend on core coder
+        bs_skip( s, 14 );   // core coder delay
 
-    int i_extension_flag = bsw_read1( s );
+    int i_extension_flag = bs_read1( s );
     if( p_cfg->i_channel == 0 )
     {
         Mpeg4GAProgramConfigElement( s );
     }
     if( p_cfg->i_object_type == 6 || p_cfg->i_object_type == 20 )
-        bsw_skip( s, 3 );    // layer
+        bs_skip( s, 3 );    // layer
 
     if( i_extension_flag )
     {
         if( p_cfg->i_object_type == 22 )
         {
-            bsw_skip( s, 5 + 11 );   // numOfSubFrame + layer length
+            bs_skip( s, 5 + 11 );   // numOfSubFrame + layer length
         }
         if( p_cfg->i_object_type == 17 || p_cfg->i_object_type == 19 ||
             p_cfg->i_object_type == 20 || p_cfg->i_object_type == 23 )
         {
-            bsw_skip( s, 1+1+1 );    // ER data : section scale spectral */
+            bs_skip( s, 1+1+1 );    // ER data : section scale spectral */
         }
-        if( bsw_read1( s ) )     // extension 3
+        if( bs_read1( s ) )     // extension 3
             fprintf( stderr, "Mpeg4GASpecificConfig: error 1\n" );
     }
     return 0;
 }
 
-static int Mpeg4ReadAudioObjectType( bsw_t *s )
+static int Mpeg4ReadAudioObjectType( bs_t *s )
 {
-    int i_type = bsw_read( s, 5 );
+    int i_type = bs_read( s, 5 );
     if( i_type == 31 )
-        i_type = 32 + bsw_read( s, 6 );
+        i_type = 32 + bs_read( s, 6 );
     return i_type;
 }
 
-static int Mpeg4ReadAudioSamplerate( bsw_t *s )
+static int Mpeg4ReadAudioSamplerate( bs_t *s )
 {
-    int i_index = bsw_read( s, 4 );
+    int i_index = bs_read( s, 4 );
     if( i_index != 0x0f )
         return pi_sample_rates[i_index];
-    return bsw_read( s, 24 );
+    return bs_read( s, 24 );
 }
 
-static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_t *p_extra, bsw_t *s, int i_max_size )
+static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_t *p_extra, bs_t *s, int i_max_size )
 {
 #if 0
     static const char *ppsz_otype[] = {
@@ -533,8 +533,8 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
         "DST",
     };
 #endif
-    const int i_pos_start = bsw_pos( s );
-    bsw_t s_sav = *s;
+    const int i_pos_start = bs_pos( s );
+    bs_t s_sav = *s;
     int i_bits;
     int i;
 
@@ -544,7 +544,7 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
     p_cfg->i_object_type = Mpeg4ReadAudioObjectType( s );
     p_cfg->i_samplerate = Mpeg4ReadAudioSamplerate( s );
 
-    p_cfg->i_channel = bsw_read( s, 4 );
+    p_cfg->i_channel = bs_read( s, 4 );
     if( p_cfg->i_channel == 7 )
         p_cfg->i_channel = 8; // 7.1
     else if( p_cfg->i_channel >= 8 )
@@ -614,14 +614,14 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
     case 17: case 19: case 20: case 21: case 22: case 23:
     case 24: case 25: case 26: case 27:
     {
-        int epConfig = bsw_read( s, 2 );
+        int epConfig = bs_read( s, 2 );
         if( epConfig == 2 || epConfig == 3 )
         {
             //ErrorProtectionSpecificConfig();
         }
         if( epConfig == 3 )
         {
-            int directMapping = bsw_read1( s );
+            int directMapping = bs_read1( s );
             if( directMapping )
             {
                 // tbd ...
@@ -633,19 +633,19 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
         break;
     }
 
-    if( p_cfg->extension.i_object_type != 5 && i_max_size > 0 && i_max_size - (bsw_pos(s) - i_pos_start) >= 16 &&
-        bsw_read( s, 11 ) == 0x2b7 )
+    if( p_cfg->extension.i_object_type != 5 && i_max_size > 0 && i_max_size - (bs_pos(s) - i_pos_start) >= 16 &&
+        bs_read( s, 11 ) == 0x2b7 )
     {
         p_cfg->extension.i_object_type = Mpeg4ReadAudioObjectType( s );
         if( p_cfg->extension.i_object_type == 5 )
         {
-            p_cfg->i_sbr  = bsw_read1( s );
+            p_cfg->i_sbr  = bs_read1( s );
             if( p_cfg->i_sbr == 1 )
             {
                 p_cfg->extension.i_samplerate = Mpeg4ReadAudioSamplerate( s );
-                if( i_max_size > 0 && i_max_size - (bsw_pos(s) - i_pos_start) >= 12 && bsw_read( s, 11 ) == 0x548 )
+                if( i_max_size > 0 && i_max_size - (bs_pos(s) - i_pos_start) >= 12 && bs_read( s, 11 ) == 0x548 )
                 {
-                   p_cfg->i_ps = bsw_read1( s );
+                   p_cfg->i_ps = bs_read1( s );
                 }
             }
         }
@@ -654,38 +654,38 @@ static int Mpeg4ReadAudioSpecificInfo( mpeg4_cfg_t *p_cfg, int *pi_extra, uint8_
     //fprintf( stderr, "Mpeg4ReadAudioSpecificInfo: t=%s(%d)f=%d c=%d sbr=%d\n",
     //         ppsz_otype[p_cfg->i_object_type], p_cfg->i_object_type, p_cfg->i_samplerate, p_cfg->i_channel, p_cfg->i_sbr );
 
-    i_bits = bsw_pos(s) - i_pos_start;
+    i_bits = bs_pos(s) - i_pos_start;
 
     *pi_extra = __MIN( ( i_bits + 7 ) / 8, LATM_MAX_EXTRA_SIZE );
     for( i = 0; i < *pi_extra; i++ )
     {
         const int i_read = __MIN( 8, i_bits - 8*i );
-        p_extra[i] = bsw_read( &s_sav, i_read ) << (8-i_read);
+        p_extra[i] = bs_read( &s_sav, i_read ) << (8-i_read);
     }
     return i_bits;
 }
 
-static int LatmGetValue( bsw_t *s )
+static int LatmGetValue( bs_t *s )
 {
-    int i_bytes = bsw_read( s, 2 );
+    int i_bytes = bs_read( s, 2 );
     int v = 0;
     int i;
     for( i = 0; i < i_bytes; i++ )
-        v = (v << 8) + bsw_read( s, 8 );
+        v = (v << 8) + bs_read( s, 8 );
 
     return v;
 }
 
-static int LatmReadStreamMuxConfiguration( latm_mux_t *m, bsw_t *s )
+static int LatmReadStreamMuxConfiguration( latm_mux_t *m, bs_t *s )
 {
     int i_mux_version;
     int i_mux_versionA;
     int i_program;
 
-    i_mux_version = bsw_read( s, 1 );
+    i_mux_version = bs_read( s, 1 );
     i_mux_versionA = 0;
     if( i_mux_version )
-        i_mux_versionA = bsw_read( s, 1 );
+        i_mux_versionA = bs_read( s, 1 );
 
     if( i_mux_versionA != 0 ) /* support only A=0 */
         return -1;
@@ -700,15 +700,15 @@ static int LatmReadStreamMuxConfiguration( latm_mux_t *m, bsw_t *s )
         }
     }
 
-    m->b_same_time_framing = bsw_read1( s );
-    m->i_sub_frames = 1 + bsw_read( s, 6 );
-    m->i_programs = 1 + bsw_read( s, 4 );
+    m->b_same_time_framing = bs_read1( s );
+    m->i_sub_frames = 1 + bs_read( s, 6 );
+    m->i_programs = 1 + bs_read( s, 4 );
 
     for( i_program = 0; i_program < m->i_programs; i_program++ )
     {
         int i_layer;
 
-        m->pi_layers[i_program] = 1+bsw_read( s, 3 );
+        m->pi_layers[i_program] = 1+bs_read( s, 3 );
 
         for( i_layer = 0; i_layer < m->pi_layers[i_program]; i_layer++ )
         {
@@ -721,7 +721,7 @@ static int LatmReadStreamMuxConfiguration( latm_mux_t *m, bsw_t *s )
 
             b_previous_cfg = false;
             if( i_program != 0 || i_layer != 0 )
-                b_previous_cfg = bsw_read1( s );
+                b_previous_cfg = bs_read1( s );
 
             if( b_previous_cfg )
             {
@@ -735,33 +735,33 @@ static int LatmReadStreamMuxConfiguration( latm_mux_t *m, bsw_t *s )
                     i_cfg_size = LatmGetValue(s);
                 i_cfg_size -= Mpeg4ReadAudioSpecificInfo( &st->cfg, &st->i_extra, st->extra, s, i_cfg_size );
                 if( i_cfg_size > 0 )
-                    bsw_skip( s, i_cfg_size );
+                    bs_skip( s, i_cfg_size );
             }
 
-            st->i_frame_length_type = bsw_read( s, 3 );
+            st->i_frame_length_type = bs_read( s, 3 );
             switch( st->i_frame_length_type )
             {
             case 0:
             {
-                bsw_skip( s, 8 ); /* latmBufferFullnes */
+                bs_skip( s, 8 ); /* latmBufferFullnes */
                 if( !m->b_same_time_framing )
                 {
                     if( st->cfg.i_object_type == 6 || st->cfg.i_object_type == 20 ||
                         st->cfg.i_object_type == 8 || st->cfg.i_object_type == 24 )
                     {
-                        bsw_skip( s, 6 ); /* eFrameOffset */
+                        bs_skip( s, 6 ); /* eFrameOffset */
                     }
                 }
                 break;
             }
             case 1:
-                st->i_frame_length = bsw_read( s, 9 );
+                st->i_frame_length = bs_read( s, 9 );
                 break;
             case 3: case 4: case 5:
-                st->i_frame_length_index = bsw_read( s, 6 ); // celp
+                st->i_frame_length_index = bs_read( s, 6 ); // celp
                 break;
             case 6: case 7:
-                st->i_frame_length_index = bsw_read( s, 1 ); // hvxc
+                st->i_frame_length_index = bs_read( s, 1 ); // hvxc
             default:
                 break;
             }
@@ -771,7 +771,7 @@ static int LatmReadStreamMuxConfiguration( latm_mux_t *m, bsw_t *s )
     }
 
     /* other data */
-    if( bsw_read1( s ) )
+    if( bs_read1( s ) )
     {
         if( i_mux_version == 1 )
         {
@@ -781,16 +781,16 @@ static int LatmReadStreamMuxConfiguration( latm_mux_t *m, bsw_t *s )
         {
             int b_continue;
             do {
-                b_continue = bsw_read1(s);
-                m->i_other_data = (m->i_other_data << 8) + bsw_read( s, 8 );
+                b_continue = bs_read1(s);
+                m->i_other_data = (m->i_other_data << 8) + bs_read( s, 8 );
             } while( b_continue );
         }
     }
 
     /* crc */
     m->i_crc = -1;
-    if( bsw_read1( s ) )
-        m->i_crc = bsw_read( s, 8 );
+    if( bs_read1( s ) )
+        m->i_crc = bs_read( s, 8 );
 
     return 0;
 }
@@ -798,14 +798,14 @@ static int LatmReadStreamMuxConfiguration( latm_mux_t *m, bsw_t *s )
 static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    bsw_t s;
+    bs_t s;
     int i_sub;
     int i_accumulated = 0;
 
-    bsw_init_writable( &s, p_buffer, i_buffer );
+    bs_init( &s, p_buffer, i_buffer );
 
     /* Read the stream mux configuration if present */
-    if( !bsw_read1( &s ) )
+    if( !bs_read1( &s ) )
     {
         if( !LatmReadStreamMuxConfiguration( &p_sys->latm, &s ) &&
             p_sys->latm.i_streams > 0 )
@@ -858,7 +858,7 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
                         int i_payload = 0;
                         for( ;; )
                         {
-                            int i_tmp = bsw_read( &s, 8 );
+                            int i_tmp = bs_read( &s, 8 );
                             i_payload += i_tmp;
                             if( i_tmp != 255 )
                                 break;
@@ -873,7 +873,7 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
                              ( st->i_frame_length_type == 5 ) ||
                              ( st->i_frame_length_type == 7 ) )
                     {
-                        bsw_skip( &s, 2 ); // muxSlotLengthCoded
+                        bs_skip( &s, 2 ); // muxSlotLengthCoded
                         pi_payload[i_program][i_layer] = 0; /* TODO */
                     }
                     else
@@ -898,13 +898,13 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
 
                     /* FIXME that's slow (and a bit ugly to write in place) */
                     for( i = 0; i < pi_payload[i_program][i_layer]; i++ )
-                        p_buffer[i_accumulated++] = bsw_read( &s, 8 );
+                        p_buffer[i_accumulated++] = bs_read( &s, 8 );
                 }
             }
         }
         else
         {
-            const int i_chunks = bsw_read( &s, 4 );
+            const int i_chunks = bs_read( &s, 4 );
             int pi_program[16];
             int pi_layer[16];
             int i_chunk;
@@ -913,7 +913,7 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
 
             for( i_chunk = 0; i_chunk < i_chunks; i_chunk++ )
             {
-                const int streamIndex = bsw_read( &s, 4 );
+                const int streamIndex = bs_read( &s, 4 );
                 latm_stream_t *st = &p_sys->latm.stream[streamIndex];
                 const int i_program = st->i_program;
                 const int i_layer = st->i_layer;
@@ -926,13 +926,13 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
                     int i_payload = 0;
                     for( ;; )
                     {
-                        int i_tmp = bsw_read( &s, 8 );
+                        int i_tmp = bs_read( &s, 8 );
                         i_payload += i_tmp;
                         if( i_tmp != 255 )
                             break;
                     }
                     pi_payload[i_program][i_layer] = i_payload;
-                    bsw_skip( &s, 1 ); // auEndFlag
+                    bs_skip( &s, 1 ); // auEndFlag
                 }
                 else if( st->i_frame_length_type == 1 )
                 {
@@ -942,7 +942,7 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
                          ( st->i_frame_length_type == 5 ) ||
                          ( st->i_frame_length_type == 7 ) )
                 {
-                    bsw_read( &s, 2 ); // muxSlotLengthCoded
+                    bs_read( &s, 2 ); // muxSlotLengthCoded
                 }
                 else
                 {
@@ -962,7 +962,7 @@ static int LOASParse( decoder_t *p_dec, uint8_t *p_buffer, int i_buffer )
     {
         /* Other data XXX we just ignore them */
     }
-    bsw_align( &s );
+    bs_align( &s );
 
     return i_accumulated;
 }
