@@ -1,0 +1,20 @@
+diff -ruN libiconv/lib/iconv.c libiconv.new/lib/iconv.c
+--- libiconv/lib/iconv.c	2003-05-22 21:17:40.000000000 +0200
++++ libiconv.new/lib/iconv.c	2009-08-23 12:07:44.000000000 +0200
+@@ -21,6 +21,7 @@
+ #include <iconv.h>
+ 
+ #include <stdlib.h>
++#include <stdint.h>
+ #include <string.h>
+ #include "config.h"
+ #include "localcharset.h"
+@@ -156,7 +157,7 @@
+ };
+ #define stringpool2 ((const char *) &stringpool2_contents)
+ static const struct alias sysdep_aliases[] = {
+-#define S(tag,name,encoding_index) { (int)(long)&((struct stringpool2_t *)0)->stringpool_##tag, encoding_index },
++#define S(tag,name,encoding_index) { (int)(intptr_t)&((struct stringpool2_t *)0)->stringpool_##tag, encoding_index },
+ #include "aliases2.h"
+ #undef S
+ };
