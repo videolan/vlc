@@ -92,10 +92,7 @@ static void ParseID3Tag( demux_t *p_demux, const uint8_t *p_data, int i_size )
             id3_byte_t const * p_ufid;
             id3_length_t i_ufidlen;
 
-            p_ufid = (id3_byte_t const *)
-                        id3_field_getbinarydata(
-                                &p_frame->fields[1],
-                                &i_ufidlen );
+            p_ufid = id3_field_getbinarydata( &p_frame->fields[1], &i_ufidlen );
             char *psz_ufid = strndup( p_ufid, i_ufidlen );
 
             vlc_meta_SetTrackID( p_meta, psz_ufid );
@@ -162,7 +159,7 @@ static void ParseID3Tag( demux_t *p_demux, const uint8_t *p_data, int i_size )
     /* T--- Text informations */
     for( i = 0; (p_frame = id3_tag_findframe( p_id3_tag, "T", i )) != NULL; i++ )
     {
-        int i_strings;
+        unsigned i_strings;
  
         /* Special case TXXX is not the same beast */
         if( ID_IS( "TXXX" ) )
