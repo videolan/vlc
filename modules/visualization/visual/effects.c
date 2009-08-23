@@ -799,15 +799,14 @@ int scope_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
               aout_buffer_t * p_buffer , picture_t * p_picture)
 {
     VLC_UNUSED(p_aout);
+
     int i_index;
     float *p_sample ;
     uint8_t *ppp_area[2][3];
 
-
     for( i_index = 0 ; i_index < 2 ; i_index++ )
     {
-        int j;
-        for( j = 0 ; j < 3 ; j++ )
+        for( int j = 0 ; j < 3 ; j++ )
         {
             ppp_area[i_index][j] =
                 p_picture->p[j].p_pixels + i_index * p_picture->p[j].i_lines
@@ -816,7 +815,7 @@ int scope_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
     }
 
     for( i_index = 0, p_sample = (float *)p_buffer->p_buffer;
-            i_index < __MIN( p_effect->i_width, p_buffer->i_nb_samples );
+            i_index < __MIN( p_effect->i_width, (int)p_buffer->i_nb_samples );
             i_index++ )
     {
         uint8_t i_value;
@@ -857,12 +856,12 @@ int vuMeter_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
               aout_buffer_t * p_buffer , picture_t * p_picture)
 {
         VLC_UNUSED(p_aout);
-        int i, j;
+        int j;
         float i_value_l = 0;
         float i_value_r = 0;
 
         /* Compute the peack values */
-        for ( i = 0 ; i < p_buffer->i_nb_samples; i++ )
+        for ( unsigned i = 0 ; i < p_buffer->i_nb_samples; i++ )
         {
                 const float *p_sample = (float *)p_buffer->p_buffer;
                 float ch;
@@ -925,7 +924,7 @@ int vuMeter_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                 teta_grad = GRAD_ANGLE_MIN;
                 for ( teta = -M_PI_4; teta <= M_PI_4; teta = teta + 0.003 )
                 {
-                        for ( i = 140; i <= 150; i++ )
+                        for ( unsigned i = 140; i <= 150; i++ )
                         {
                                 y = i * cos(teta) + 20;
                                 x = i * sin(teta) + 150 + 240 * j;
@@ -949,7 +948,7 @@ int vuMeter_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
 
                 /* Draw the two hands */
                 teta = (float)i_value[j] / 200 - M_PI_4;
-                for ( i = 0; i <= 150; i++ )
+                for ( int i = 0; i <= 150; i++ )
                 {
                         y = i * cos(teta) + 20;
                         x = i * sin(teta) + 150 + 240 * j;
@@ -967,7 +966,7 @@ int vuMeter_Run(visual_effect_t * p_effect, aout_instance_t *p_aout,
                 /* Draw the hand bases */
                 for ( teta = -M_PI_2; teta <= M_PI_2 + 0.01; teta = teta + 0.003 )
                 {
-                        for ( i = 0; i < 10; i++ )
+                        for ( int i = 0; i < 10; i++ )
                         {
                                 y = i * cos(teta) + 20;
                                 x = i * sin(teta) + 150 + 240 * j;
