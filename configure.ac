@@ -1451,7 +1451,7 @@ AS_IF([test "${enable_sse}" != "no"], [
 AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly],
     [ac_cv_3dnow_inline],
     [CFLAGS="${CFLAGS_save}"
-     AC_TRY_COMPILE(,[void *p = NULL; asm volatile("pfadd %%mm1,%%mm2"::"r"(p));],
+     AC_TRY_COMPILE(,[void *p;asm volatile("pfadd %%mm1,%%mm2"::"r"(p));],
                     ac_cv_3dnow_inline=yes, ac_cv_3dnow_inline=no)])
 AS_IF([test "${ac_cv_3dnow_inline}" != "no"], [
   AC_DEFINE(CAN_COMPILE_3DNOW, 1,
