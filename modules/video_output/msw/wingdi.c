@@ -141,8 +141,7 @@ static int OpenVideo ( vlc_object_t *p_this )
     p_vout->p_sys->render_height = p_vout->render.i_height;
 #endif
 
-    p_vout->p_sys->p_event = (vlc_object_t *)
-        vlc_object_create( p_vout, sizeof( vlc_object_t ) );
+    p_vout->p_sys->p_event = vlc_object_create( p_vout, sizeof( event_thread_t ) );
     if( !p_vout->p_sys->p_event )
     {
         free( p_vout->p_sys );
