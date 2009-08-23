@@ -184,7 +184,6 @@ typedef struct access_sys_t access_sys_t;
 typedef struct stream_t     stream_t;
 typedef struct stream_sys_t stream_sys_t;
 typedef struct demux_t  demux_t;
-typedef struct demux_meta_t demux_meta_t;
 typedef struct demux_sys_t demux_sys_t;
 typedef struct es_out_t     es_out_t;
 typedef struct es_out_id_t  es_out_id_t;

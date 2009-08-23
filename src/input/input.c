@@ -2749,11 +2749,14 @@ static void InputSourceMeta( input_thread_t *p_input,
     if( !b_bool )
         return;
 
-    demux_meta_t *p_demux_meta = p_demux->p_private = calloc( 1, sizeof(*p_demux_meta) );
+    demux_meta_t *p_demux_meta =
+        vlc_custom_create( p_demux, sizeof( *p_demux_meta ),
+                           VLC_OBJECT_GENERIC, "demux meta" );
     if( !p_demux_meta )
         return;
+    p_demux_meta->p_demux = p_demux;
 
-    module_t *p_id3 = module_need( p_demux, "meta reader", NULL, false );
+    module_t *p_id3 = module_need( p_demux_meta, "meta reader", NULL, false );
     if( p_id3 )
     {
         if( p_demux_meta->p_meta )
@@ -2771,7 +2774,7 @@ static void InputSourceMeta( input_thread_t *p_input,
         }
         module_unneed( p_demux, p_id3 );
     }
-    free( p_demux_meta );
+    vlc_object_release( p_demux_meta );
 }
 
 

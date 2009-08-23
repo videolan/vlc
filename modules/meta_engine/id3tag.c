@@ -485,12 +485,12 @@ static void CheckHeader( demux_t *p_demux )
  ****************************************************************************/
 static int ParseTags( vlc_object_t *p_this )
 {
-    demux_t      *p_demux = (demux_t *)p_this;
-    demux_meta_t *p_demux_meta = (demux_meta_t*)p_demux->p_private;
+    demux_meta_t *p_demux_meta = (demux_meta_t *)p_this;
+    demux_t      *p_demux = (demux_t *)p_demux_meta->p_demux;
     bool    b_seekable;
     int64_t       i_init;
 
-    msg_Dbg( p_demux, "checking for ID3v1/2 and APEv1/2 tags" );
+    msg_Dbg( p_demux_meta, "checking for ID3v1/2 and APEv1/2 tags" );
     stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
     if( !b_seekable )
         return VLC_EGENERIC;

@@ -78,13 +78,15 @@ struct demux_t
 
 
 /* demux_meta_t is returned by "meta reader" module to the demuxer */
-struct demux_meta_t
+typedef struct demux_meta_t
 {
+    VLC_COMMON_MEMBERS
+    demux_t *p_demux; /** FIXME: use stream_t instead? */
     vlc_meta_t *p_meta;                 /**< meta data */
 
     int i_attachments;                  /**< number of attachments */
     input_attachment_t **attachments;    /**< array of attachments */
-};
+} demux_meta_t;
 
 enum demux_query_e
 {
