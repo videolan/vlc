@@ -60,6 +60,7 @@ access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     access_InitFields( p_access );
 
     /* Before module_need (for var_Create...) */
+    vlc_object_set_name( p_access, psz_access );
     vlc_object_attach( p_access, p_obj );
 
     p_access->p_module = module_need( p_access, "access", psz_access, true );

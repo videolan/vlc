@@ -154,6 +154,7 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
     }
 
     /* Before module_need (for var_Create...) */
+    vlc_object_set_name( p_demux, psz_module );
     vlc_object_attach( p_demux, p_obj );
 
     if( s )
