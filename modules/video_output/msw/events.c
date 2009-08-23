@@ -1127,6 +1127,7 @@ static int vaControlParentWindow( vout_thread_t *p_vout, int i_query,
     }
 }
 
+#if 0
 static int ControlParentWindow( vout_thread_t *p_vout, int i_query, ... )
 {
     va_list args;
@@ -1137,6 +1138,7 @@ static int ControlParentWindow( vout_thread_t *p_vout, int i_query, ... )
     va_end( args );
     return ret;
 }
+#endif
 
 void Win32ToggleFullscreen( vout_thread_t *p_vout )
 {
