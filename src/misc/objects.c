@@ -54,6 +54,7 @@
 # include <errno.h> /* ENOSYS */
 #endif
 
+#include <limits.h>
 #include <assert.h>
 
 #if defined (HAVE_SYS_EVENTFD_H)
@@ -122,7 +123,7 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
 
     p_priv->i_object_type = i_type;
     p_new->psz_object_type = psz_type;
-    p_priv->psz_object_name = NULL;
+    p_priv->psz_name = NULL;
 
     p_new->b_die = false;
     p_new->b_error = false;
@@ -241,6 +242,20 @@ void __vlc_object_set_destructor( vlc_object_t *p_this,
     vlc_spin_unlock( &p_priv->ref_spin );
 }
 
+#undef vlc_object_set_name
+int vlc_object_set_name(vlc_object_t *obj, const char *name)
+{
+    vlc_object_internals_t *priv = vlc_internals(obj);
+
+    /* Object must be named before it is attached (or never) */
+    assert(obj->p_parent == NULL);
+    assert(priv->i_children == 0);
+
+    free(priv->psz_name);
+    priv->psz_name = name ? strdup(name) : NULL;
+    return (priv->psz_name || !name) ? VLC_SUCCESS : VLC_ENOMEM;
+}
+
 /**
  ****************************************************************************
  * Destroy a vlc object (Internal)
@@ -281,7 +296,7 @@ static void vlc_object_destroy( vlc_object_t *p_this )
 
     free( p_this->psz_header );
 
-    free( p_priv->psz_object_name );
+    free( p_priv->psz_name );
 
     vlc_spin_destroy( &p_priv->ref_spin );
     if( p_priv->pipes[1] != -1 && p_priv->pipes[1] != p_priv->pipes[0] )
@@ -453,6 +468,14 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     return p_found;
 }
 
+
+static int objnamecmp(const vlc_object_t *obj, const char *name)
+{
+    if (!vlc_object_get_name(obj))
+        return INT_MIN;
+    return strcmp( vlc_object_get_name(obj), name );
+}
+
 #undef vlc_object_find_name
 /**
  * Finds a named object and increment its reference count.
@@ -479,9 +502,7 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
      * Use a libvlc address variable instead for that sort of things! */
     msg_Warn( p_this, "%s(%s) is not safe!", __func__, psz_name );
     /* If have the requested name ourselves, don't look further */
-    if( !(i_mode & FIND_STRICT)
-        && vlc_internals(p_this)->psz_object_name
-        && !strcmp( vlc_internals(p_this)->psz_object_name, psz_name ) )
+    if( !(i_mode & FIND_STRICT) && !objnamecmp(p_this, psz_name) )
     {
         vlc_object_hold( p_this );
         return p_this;
@@ -581,7 +602,7 @@ void __vlc_object_release( vlc_object_t *p_this )
                 fprintf( stderr,
                          "ERROR: leaking object (%p, type:%s, name:%s)\n",
                          leaked, leaked->psz_object_type,
-                         vlc_internals(leaked)->psz_object_name );
+                         vlc_object_get_name(leaked) );
                 /* Dump object to ease debugging */
                 vlc_object_dump( leaked );
                 fflush(stderr);
@@ -1014,8 +1035,7 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
         p_tmp = p_this->p_parent;
         if( p_tmp )
         {
-            if( vlc_internals(p_tmp)->psz_object_name
-             && !strcmp( vlc_internals(p_tmp)->psz_object_name, psz_name ) )
+            if( !objnamecmp(p_tmp, psz_name) )
             {
                 vlc_object_hold( p_tmp );
                 return p_tmp;
@@ -1031,8 +1051,7 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
         for( i = vlc_internals( p_this )->i_children; i--; )
         {
             p_tmp = vlc_internals( p_this )->pp_children[i];
-            if( vlc_internals(p_tmp)->psz_object_name
-             && !strcmp( vlc_internals(p_tmp)->psz_object_name, psz_name ) )
+            if( !objnamecmp(p_tmp, psz_name ) )
             {
                 vlc_object_hold( p_tmp );
                 return p_tmp;
@@ -1064,10 +1083,10 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
 
     int canc = vlc_savecancel ();
     memset( &psz_name, 0, sizeof(psz_name) );
-    if( vlc_internals(p_this)->psz_object_name )
+    if( vlc_object_get_name(p_this) )
     {
         snprintf( psz_name, 49, " \"%s\"",
-                  vlc_internals(p_this)->psz_object_name );
+                  vlc_object_get_name(p_this) );
         if( psz_name[48] )
             psz_name[48] = '\"';
     }

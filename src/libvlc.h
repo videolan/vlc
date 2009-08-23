@@ -140,6 +140,12 @@ __vlc_custom_create (vlc_object_t *p_this, size_t i_size, int i_type,
 #define vlc_custom_create(o, s, t, n) \
         __vlc_custom_create(VLC_OBJECT(o), s, t, n)
 
+/**
+ * Assign a name to an object for vlc_object_find_name().
+ */
+extern int vlc_object_set_name(vlc_object_t *, const char *);
+#define vlc_object_set_name(o, n) vlc_object_set_name(VLC_OBJECT(o), n)
+
 /*
  * To be cleaned-up module stuff:
  */
@@ -158,8 +164,7 @@ module_t *module_find_by_shortcut (const char *psz_shortcut);
 typedef struct vlc_object_internals_t
 {
     int             i_object_type; /* Object type, deprecated */
-    char           *psz_object_name; /* module name */
-    /* ^^ can only used from the thread that called module_(un)need() */
+    char           *psz_name; /* given name */
 
     /* Object variables */
     variable_t *    p_vars;
@@ -192,6 +197,11 @@ typedef struct vlc_object_internals_t
 #define ZOOM_DOUBLE_KEY_TEXT N_("2:1 Double")
 
 #define vlc_internals( obj ) (((vlc_object_internals_t*)(VLC_OBJECT(obj)))-1)
+
+static inline const char *vlc_object_get_name(const vlc_object_t *o)
+{
+    return vlc_internals(o)->psz_name;
+}
 
 typedef struct sap_handler_t sap_handler_t;
 
