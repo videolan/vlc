@@ -160,8 +160,6 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_priv->pp_children = NULL;
     p_priv->i_children = 0;
 
-    p_new->p_private = NULL;
-
     /* Initialize mutexes and condvars */
     vlc_mutex_init( &p_priv->var_lock );
     vlc_cond_init( &p_priv->var_wait );

@@ -515,9 +515,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
                                                                             \
     vlc_object_t *  p_parent;                            /**< our parent */ \
                                                                             \
-    /* Private data */                                                      \
-    void *          p_private;                                              \
-                                                                            \
 /**@}*/                                                                     \
 
 /* VLC_OBJECT: attempt at doing a clever cast */
