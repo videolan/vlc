@@ -248,6 +248,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
 
     /* parse user filter lists */
     char *const ppsz_array[] = { psz_scaletempo, psz_filters, psz_visual };
+    p_input->p_playback_rate_filter = NULL;
+
     for( i_visual = 0; i_visual < 3 && !AOUT_FMT_NON_LINEAR(&chain_output_format); i_visual++ )
     {
         char *psz_next = NULL;
@@ -388,6 +390,9 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
             memcpy( &chain_input_format, &p_filter->output,
                     sizeof( audio_sample_format_t ) );
 
+            if( i_visual == 0 ) /* scaletempo */
+                p_input->p_playback_rate_filter = p_filter;
+
             /* next filter if any */
             psz_parser = psz_next;
         }
@@ -443,19 +448,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     }
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
 
-    p_input->p_playback_rate_filter = NULL;
-    for( int i = 0; i < p_input->i_nb_filters; i++ )
-    {
-        aout_filter_t *p_filter = p_input->pp_filters[i];
-        /* FIXME: suspicious access to psz_object_name */
-#warning Is this right?
-        if( strcmp( "scaletempo",
-                    vlc_internals(p_filter)->psz_object_name ) == 0 )
-        {
-          p_input->p_playback_rate_filter = p_filter;
-          break;
-        }
-    }
     if( ! p_input->p_playback_rate_filter && p_input->i_nb_resamplers > 0 )
     {
         p_input->p_playback_rate_filter = p_input->pp_resamplers[0];
