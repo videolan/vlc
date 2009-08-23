@@ -171,7 +171,8 @@ private:
     PLItem *findByInput( PLItem *, int );
     PLItem *findInner( PLItem *, int , bool );
     static inline PLItem *getItem( QModelIndex index );
-    int metaColumn ( int column ) const;
+    int columnFromMeta( int meta_column, int shown_flags ) const;
+    int columnToMeta( int column, int shown_flags ) const;
     PLItem *p_cached_item;
     PLItem *p_cached_item_bi;
     int i_cached_id;
