@@ -252,7 +252,7 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_chroma = VLC_CODEC_YUYV;
     i_pixel_pitch = 2;
 
-#elif (VLCGL_FORMAT == GL_YCBCR_422_APPLE)
+#elif defined( GL_YCBCR_422_APPLE ) && (VLCGL_FORMAT == GL_YCBCR_422_APPLE)
     p_vout->output.i_chroma = VLC_CODEC_UYVY;
     i_pixel_pitch = 2;
 
