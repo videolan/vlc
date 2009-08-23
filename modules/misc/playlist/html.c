@@ -38,13 +38,11 @@ int Export_HTML( vlc_object_t *p_this );
 
 
 /**
- * Recursiveyy follow the playlist
- * @param p_playlist: the playlist
+ * Recursively follow the playlist
  * @param p_export: the export structure
  * @param p_root: the current node
  */
-static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
-                        playlist_item_t *p_root )
+static void DoChildren( playlist_export_t *p_export, playlist_item_t *p_root )
 {
     /* Go through the playlist and add items */
     for( int i = 0; i < p_root->i_children ; i++)
@@ -57,7 +55,7 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
 
         if( p_current->i_children >= 0 )
         {
-            DoChildren( p_playlist, p_export, p_current );
+            DoChildren( p_export, p_current );
             continue;
         }
 
@@ -99,10 +97,9 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
  */
 int Export_HTML( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist = (playlist_t*)p_this;
-    playlist_export_t *p_export = (playlist_export_t *)p_playlist->p_private;
+    playlist_export_t *p_export = (playlist_export_t *)p_this;
 
-    msg_Dbg( p_playlist, "saving using HTML format" );
+    msg_Dbg( p_export, "saving using HTML format" );
 
     /* Write header */
     fprintf( p_export->p_file, "<?xml version=\"1.0\" encoding=\"utf-8\" ?>\n"
@@ -134,7 +131,7 @@ int Export_HTML( vlc_object_t *p_this )
 "  <ol>\n" );
 
     // Call the playlist constructor
-    DoChildren( p_playlist, p_export, p_export->p_root );
+    DoChildren( p_export, p_export->p_root );
 
     // Print the footer
     fprintf( p_export->p_file, "  </ol>\n"

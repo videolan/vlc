@@ -44,8 +44,7 @@ int Export_M3U ( vlc_object_t * );
 /*****************************************************************************
  * Export_M3U: main export function
  *****************************************************************************/
-static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
-                        playlist_item_t *p_root )
+static void DoChildren( playlist_export_t *p_export, playlist_item_t *p_root )
 {
     int i, j;
 
@@ -60,7 +59,7 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
 
         if( p_current->i_children >= 0 )
         {
-            DoChildren( p_playlist, p_export, p_current );
+            DoChildren( p_export, p_current );
             continue;
         }
 
@@ -110,14 +109,13 @@ static void DoChildren( playlist_t *p_playlist, playlist_export_t *p_export,
 
 int Export_M3U( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist = (playlist_t*)p_this;
-    playlist_export_t *p_export = (playlist_export_t *)p_playlist->p_private;
+    playlist_export_t *p_export = (playlist_export_t *)p_this;
 
-    msg_Dbg(p_playlist, "saving using M3U format");
+    msg_Dbg( p_export, "saving using M3U format");
 
     /* Write header */
     fprintf( p_export->p_file, "#EXTM3U\n" );
 
-    DoChildren( p_playlist, p_export, p_export->p_root );
+    DoChildren( p_export, p_export->p_root );
     return VLC_SUCCESS;
 }

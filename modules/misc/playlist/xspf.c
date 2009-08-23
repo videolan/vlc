@@ -50,9 +50,7 @@ static void xspf_extension_item( playlist_item_t *, FILE *, int * );
  */
 int xspf_export_playlist( vlc_object_t *p_this )
 {
-    const playlist_t *p_playlist = (playlist_t *)p_this;
-    const playlist_export_t *p_export =
-        (playlist_export_t *)p_playlist->p_private;
+    const playlist_export_t *p_export = (playlist_export_t *)p_this;
     int               i, i_count;
     char             *psz_temp;
     playlist_item_t  *p_node = p_export->p_root;

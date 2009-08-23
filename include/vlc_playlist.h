@@ -133,12 +133,13 @@ TYPEDEF_ARRAY(playlist_item_t*, playlist_item_array_t);
  */
 
 /** Helper structure to export to file part of the playlist */
-struct playlist_export_t
+typedef struct playlist_export_t
 {
-    char *psz_filename;
+    VLC_COMMON_MEMBERS
+    const char *psz_filename;
     FILE *p_file;
     playlist_item_t *p_root;
-};
+} playlist_export_t;
 
 /** playlist item / node */
 struct playlist_item_t
