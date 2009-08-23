@@ -1698,8 +1698,9 @@ static bool Control( input_thread_t *p_input,
         }
 
         case INPUT_CONTROL_SET_STATE:
-            if( ( val.i_int == PLAYING_S && p_input->p->i_state == PAUSE_S ) ||
-                ( val.i_int == PAUSE_S && p_input->p->i_state == PAUSE_S ) )
+            if( val.i_int != PLAYING_S && val.i_int != PAUSE_S )
+                msg_Err( p_input, "invalid state in INPUT_CONTROL_SET_STATE" );
+            else if( p_input->p->i_state == PAUSE_S )
             {
                 ControlUnpause( p_input, i_control_date );
 
@@ -1718,10 +1719,6 @@ static bool Control( input_thread_t *p_input,
 
                 /* Correct "state" value */
                 input_ChangeState( p_input, p_input->p->i_state );
-            }
-            else if( val.i_int != PLAYING_S && val.i_int != PAUSE_S )
-            {
-                msg_Err( p_input, "invalid state in INPUT_CONTROL_SET_STATE" );
             }
             break;
 
