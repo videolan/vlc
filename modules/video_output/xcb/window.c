@@ -431,7 +431,7 @@ static int AcquireDrawable (vlc_object_t *obj, xcb_window_t window)
 {
     vlc_value_t val;
     xcb_window_t *used;
-    size_t n;
+    size_t n = 0;
 
     if (var_Create (obj->p_libvlc, "xid-in-use", VLC_VAR_ADDRESS))
         return VLC_ENOMEM;
