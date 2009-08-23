@@ -647,7 +647,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
 #define rect_dest p_vout->p_sys->rect_dest
 #define rect_dest_clipped p_vout->p_sys->rect_dest_clipped
 
-    int i_width, i_height, i_x, i_y;
+    unsigned int i_width, i_height, i_x, i_y;
 
     RECT  rect;
     POINT point;
@@ -717,7 +717,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
 
 #ifndef NDEBUG
     msg_Dbg( p_vout, "DirectXUpdateRects image_dst_clipped coords:"
-                     " %i,%i,%i,%i",
+                     " %li,%li,%li,%li",
                      rect_dest_clipped.left, rect_dest_clipped.top,
                      rect_dest_clipped.right, rect_dest_clipped.bottom );
 #endif
@@ -778,7 +778,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
 
 #ifndef NDEBUG
     msg_Dbg( p_vout, "DirectXUpdateRects image_src_clipped"
-                     " coords: %i,%i,%i,%i",
+                     " coords: %li,%li,%li,%li",
                      rect_src_clipped.left, rect_src_clipped.top,
                      rect_src_clipped.right, rect_src_clipped.bottom );
 #endif
