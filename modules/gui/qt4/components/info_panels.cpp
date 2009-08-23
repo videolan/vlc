@@ -249,29 +249,7 @@ void MetaPanel::update( input_item_t *p_item )
  **/
 void MetaPanel::saveMeta()
 {
-    playlist_t *p_playlist;
-
-    meta_export_t p_export;
-    p_export.p_item = p_input;
-
     if( p_input == NULL )
-        return;
-
-    /* we can write meta data only in a file */
-    vlc_mutex_lock( &p_input->lock );
-    int i_type = p_input->i_type;
-    vlc_mutex_unlock( &p_input->lock );
-    if( i_type == ITEM_TYPE_FILE )
-    {
-        char *psz_uri_orig = input_item_GetURI( p_input );
-        char *psz_uri = psz_uri_orig;
-        if( !strncmp( psz_uri, "file://", 7 ) )
-            psz_uri += 7; /* strlen("file://") = 7 */
-
-        p_export.psz_file = strndup( psz_uri, PATH_MAX );
-        free( psz_uri_orig );
-    }
-    else
         return;
 
     /* now we read the modified meta data */
@@ -286,14 +264,8 @@ void MetaPanel::saveMeta()
     input_item_SetPublisher( p_input, qtu( publisher_text->text() ) );
     input_item_SetDescription( p_input, qtu( description_text->text() ) );
 
-    p_playlist = pl_Hold( p_intf );
-    PL_LOCK;
-    p_playlist->p_private = &p_export;
-
-    module_t *p_mod = module_need( p_playlist, "meta writer", NULL, false );
-    if( p_mod )
-        module_unneed( p_playlist, p_mod );
-    PL_UNLOCK;
+    playlist_t *p_playlist = pl_Hold( p_intf );
+    input_item_WriteMeta( VLC_OBJECT(p_playlist), p_input );
     pl_Release( p_intf );
 
     /* Reset the status of the mode. No need to emit any signal because parent

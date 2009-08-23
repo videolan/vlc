@@ -28,6 +28,8 @@
 
 #include <vlc_common.h>
 #include <vlc_playlist.h>
+#include <vlc_url.h>
+
 #include "input_internal.h"
 #include "../playlist/art.h"
 
@@ -129,3 +131,44 @@ exit:
     free( psz_arturl );
 }
 
+int input_item_WriteMeta( vlc_object_t *obj, input_item_t *p_item )
+{
+    meta_export_t *p_export =
+        vlc_custom_create( obj, sizeof( *p_export ), VLC_OBJECT_GENERIC,
+                           "meta writer" );
+    if( p_export == NULL )
+        return VLC_ENOMEM;
+    vlc_object_attach( p_export, obj );
+    p_export->p_item = p_item;
+
+    int type;
+    vlc_mutex_lock( &p_item->lock );
+    type = p_item->i_type;
+    vlc_mutex_unlock( &p_item->lock );
+    if( type != ITEM_TYPE_FILE )
+    {
+        char *psz_uri = input_item_GetURI( p_item );
+
+#warning FIXME: function for URI->path conversion!
+        decode_URI( psz_uri );
+        if( !strncmp( psz_uri, "file://", 7 ) )
+        {
+            p_export->psz_file = strdup( psz_uri + 7 );
+            free( psz_uri );
+        }
+        else
+#warning This should not happen!
+            p_export->psz_file = psz_uri;
+    }
+    else
+    {
+        vlc_object_release( p_export );
+        return VLC_EGENERIC;
+    }
+
+    module_t *p_mod = module_need( p_export, "meta writer", NULL, false );
+    if( p_mod )
+        module_unneed( p_export, p_mod );
+    vlc_object_release( p_export );
+    return VLC_SUCCESS;
+}

@@ -342,9 +342,8 @@ typedef struct osd_menu_state_t osd_menu_state_t;
 typedef struct vlm_t         vlm_t;
 typedef struct vlm_message_t vlm_message_t;
 
-/* divers */
+/* misc */
 typedef struct vlc_meta_t    vlc_meta_t;
-typedef struct meta_export_t meta_export_t;
 
 /* Stats */
 typedef struct counter_t     counter_t;

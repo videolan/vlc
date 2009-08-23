@@ -195,10 +195,13 @@ enum {
     ALBUM_ART_ALL
 };
 
-struct meta_export_t
+typedef struct meta_export_t
 {
+    VLC_COMMON_MEMBERS
     input_item_t *p_item;
     const char *psz_file;
-};
+} meta_export_t;
+
+VLC_EXPORT( int, input_item_WriteMeta, (vlc_object_t *, input_item_t *) );
 
 #endif

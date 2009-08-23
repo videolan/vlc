@@ -514,8 +514,7 @@ static void WriteMetaToXiph( Ogg::XiphComment* tag, input_item_t* p_item )
 
 static int WriteMeta( vlc_object_t *p_this )
 {
-    playlist_t *p_playlist = (playlist_t *)p_this;
-    meta_export_t *p_export = (meta_export_t *)p_playlist->p_private;
+    meta_export_t *p_export = (meta_export_t *)p_this;
     input_item_t *p_item = p_export->p_item;
     FileRef f;
 

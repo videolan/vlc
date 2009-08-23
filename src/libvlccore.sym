@@ -205,6 +205,7 @@ input_item_SetDuration
 input_item_SetMeta
 input_item_SetName
 input_item_SetURI
+input_item_WriteMeta
 input_MetaTypeToLocalizedString
 __input_Read
 input_SplitMRL
