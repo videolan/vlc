@@ -201,7 +201,7 @@ private slots:
     void popupAddNode();
     void popupSortAsc();
     void popupSortDesc();
-    void viewchanged( int );
+    void toggleColumnShown( int meta_column );
     void processInputItemUpdate( input_item_t *);
     void processInputItemUpdate( input_thread_t* p_input );
 };

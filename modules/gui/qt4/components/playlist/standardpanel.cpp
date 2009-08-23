@@ -323,7 +323,7 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
         CONNECT( option, triggered(), ContextUpdateMapper, map() );
     }
 
-    CONNECT( ContextUpdateMapper, mapped( int ),  model, viewchanged( int ) );
+    CONNECT( ContextUpdateMapper, mapped( int ),  model, toggleColumnShown( int ) );
 
     selectColMenu.exec( QCursor::pos() );
 }

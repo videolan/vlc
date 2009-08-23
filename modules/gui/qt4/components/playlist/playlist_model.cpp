@@ -649,7 +649,7 @@ meta_col must be contained in shown_flags!
 */
 int PLModel::columnFromMeta( int meta_col, int shown_flags ) const
 {
-    assert( meta & shown_flags );
+    assert( meta_col & shown_flags );
 
     int meta = 1;
     int index = -1;
@@ -1044,15 +1044,14 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
     menu->popup( point );
 }
 
-void PLModel::viewchanged( int meta )
+void PLModel::toggleColumnShown( int meta )
 {
     assert( meta );
-    int _meta = meta;
     if( rootItem )
     {
         if( i_showflags & meta )
-            /* Removing columns */
         {
+            /* Removing columns */
             int index = columnFromMeta( meta, i_showflags );
 
             beginRemoveColumns( QModelIndex(), index, index );
@@ -1062,10 +1061,10 @@ void PLModel::viewchanged( int meta )
         }
         else
         {
+            /* Adding columns */
             int sf = i_showflags;
             sf |= meta;
             int index = columnFromMeta( meta, sf );
-            /* Adding columns */
             beginInsertColumns( QModelIndex(), index, index );
             i_showflags = sf;
             getSettings()->setValue( "qt-pl-showflags", i_showflags );
