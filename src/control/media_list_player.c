@@ -505,14 +505,13 @@ void libvlc_media_list_player_play_item_at_index(libvlc_media_list_player_t * p_
 
     lock(p_mlp);
     set_current_playing_item(p_mlp, libvlc_media_list_path_with_root_index(i_index));
+    libvlc_media_player_play(p_mlp->p_mi, p_e);
     unlock(p_mlp);
 
     /* Send the next item event */
     libvlc_event_t event;
     event.type = libvlc_MediaListPlayerNextItemSet;
     libvlc_event_send(p_mlp->p_event_manager, &event);
-
-    libvlc_media_player_play(p_mlp->p_mi, p_e);
 }
 
 /**************************************************************************
@@ -520,18 +519,18 @@ void libvlc_media_list_player_play_item_at_index(libvlc_media_list_player_t * p_
  **************************************************************************/
 void libvlc_media_list_player_play_item(libvlc_media_list_player_t * p_mlp, libvlc_media_t * p_md, libvlc_exception_t * p_e)
 {
+    lock(p_mlp);
     libvlc_media_list_path_t path = libvlc_media_list_path_of_item(p_mlp->p_mlist, p_md);
     if (!path)
     {
         libvlc_exception_raise(p_e, "No such item in media list");
+        unlock(p_mlp);
         return;
     }
     
-    lock(p_mlp);
-    set_current_playing_item(p_mlp, path);
-    unlock(p_mlp);
-    
+    set_current_playing_item(p_mlp, path);    
     libvlc_media_player_play(p_mlp->p_mi, p_e);
+    unlock(p_mlp);
 }
 
 /**************************************************************************
