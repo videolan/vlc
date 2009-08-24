@@ -41,7 +41,7 @@ Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
 }
 
 
-void Volume::set( float percentage )
+void Volume::set( float percentage, bool updateVLC )
 {
     // Avoid looping forever...
     if( (int)(get() * AOUT_VOLUME_MAX) !=
@@ -49,8 +49,9 @@ void Volume::set( float percentage )
     {
         VarPercent::set( percentage );
 
-        aout_VolumeSet( getIntf()->p_sys->p_playlist,
-                        (int)(get() * AOUT_VOLUME_MAX / 2.0) );
+        if( updateVLC )
+            aout_VolumeSet( getIntf()->p_sys->p_playlist,
+                            (int)(get() * AOUT_VOLUME_MAX / 2.0) );
     }
 }
 

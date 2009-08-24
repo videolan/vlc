@@ -37,7 +37,9 @@ class Volume: public VarPercent
         Volume( intf_thread_t *pIntf );
         virtual ~Volume() {}
 
-        virtual void set( float percentage );
+        virtual void set( float percentage, bool updateVLC );
+
+        virtual void set( float percentage ) { set( percentage, true ); }
 
         virtual string getAsStringPercent() const;
 };

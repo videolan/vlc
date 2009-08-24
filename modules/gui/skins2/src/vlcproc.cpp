@@ -256,7 +256,7 @@ void VlcProc::refreshAudio()
     audio_volume_t volume;
     aout_VolumeGet( getIntf()->p_sys->p_playlist, &volume );
     Volume *pVolume = (Volume*)m_cVarVolume.get();
-    pVolume->set( (double)volume * 2.0 / AOUT_VOLUME_MAX );
+    pVolume->set( (double)volume * 2.0 / AOUT_VOLUME_MAX , false );
 
     // Set the mute variable
     VarBoolImpl *pVarMute = (VarBoolImpl*)m_cVarMute.get();
