@@ -1175,8 +1175,8 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         i64 = stream_Size( p_demux->s );
         if( i64 > 0 )
         {
-            double current = stream_Tell( p_demux->s );
-            *pf = current / (double)i64;
+            double f_current = stream_Tell( p_demux->s );
+            *pf = f_current / (double)i64;
         }
         else
         {
