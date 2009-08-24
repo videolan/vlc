@@ -502,7 +502,10 @@ libvlc_media_list_player_get_state(libvlc_media_list_player_t * p_mlp, libvlc_ex
 void libvlc_media_list_player_play_item_at_index(libvlc_media_list_player_t * p_mlp, int i_index, libvlc_exception_t * p_e)
 {
     VLC_UNUSED(p_e);
+
+    lock(p_mlp);
     set_current_playing_item(p_mlp, libvlc_media_list_path_with_root_index(i_index));
+    unlock(p_mlp);
 
     /* Send the next item event */
     libvlc_event_t event;
@@ -523,7 +526,11 @@ void libvlc_media_list_player_play_item(libvlc_media_list_player_t * p_mlp, libv
         libvlc_exception_raise(p_e, "No such item in media list");
         return;
     }
+    
+    lock(p_mlp);
     set_current_playing_item(p_mlp, path);
+    unlock(p_mlp);
+    
     libvlc_media_player_play(p_mlp->p_mi, p_e);
 }
 
