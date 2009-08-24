@@ -27,33 +27,59 @@
 #include <vlc_common.h>
 #include <vlc_mtime.h>
 
-static void* media_list_add_file_path(libvlc_instance_t *vlc, libvlc_media_list_t *ml, const char * file_path)
+#include "libvlc_additions.h"
+
+struct check_items_order_data {
+    bool done_playing;
+    unsigned count;
+    unsigned index;
+    void * items[16];
+};
+
+static inline void check_data_init(struct check_items_order_data *check)
 {
-    libvlc_media_t *md = libvlc_media_new (vlc, file_path, &ex);
-    catch ();
-
-    libvlc_media_list_add_media (ml, md, &ex);
-    catch ();
-
-    libvlc_media_release (md);
-    return md;
+    check->index = 0;
+    check->count = 0;
+    check->done_playing = false;
 }
 
-static bool done_playing = false;
-static const unsigned items_count = 4;
-static void * items[4];
-static unsigned current_index = 0;
-
-static void next_item_callback(const libvlc_event_t * p_event, void * user_data)
+static inline void queue_expected_item(struct check_items_order_data *check, void *item)
 {
-    (void)user_data;
+    assert(check->count < 16);
+    check->items[check->count] = item;
+    check->count++;
+}
+
+static inline void wait_queued_items(struct check_items_order_data *check)
+{
+    // Wait dummily for check_items_order_callback() to flag 'done_playing':
+    while (!check->done_playing)
+        msleep(100000);
+}
+
+static void check_items_order_callback(const libvlc_event_t * p_event, void * user_data)
+{
+    struct check_items_order_data *checks = user_data;
     libvlc_media_t *md = p_event->u.media_list_player_next_item_set.item;
-    current_index++;
-    assert(current_index < items_count);    
-    assert(items[current_index] == md);
-    log ("Item %d was correctly queued\n", current_index);
-    if (current_index == (items_count - 1))
-        done_playing = true;
+    assert(checks->index < checks->count);
+    if (checks->items[checks->index] != md)
+    {
+        char *title = libvlc_media_get_meta(md, libvlc_meta_Title, NULL);
+        log ("Got items %s\n", title);
+        free(title);
+    }
+    assert(checks->items[checks->index] == md);
+    
+    char *title = libvlc_media_get_meta(md, libvlc_meta_Title, NULL);
+    log ("Item %d '%s' was correctly queued\n", checks->index, title);
+    free(title);
+    
+    if (checks->index == (checks->count - 1))
+    {
+        log ("Done playing with success\n");
+        checks->done_playing = true;
+    }
+    checks->index++;
 }
 
 static void test_media_list_player_items_queue(const char** argv, int argc)
@@ -82,26 +108,42 @@ static void test_media_list_player_items_queue(const char** argv, int argc)
     
     libvlc_media_list_add_media (ml, md, &ex);
     catch ();
-    
-    items[0] = md;
+
+    static struct check_items_order_data check;
+    check_data_init(&check);
+    queue_expected_item(&check, md);
 
     // Add three more media
-    items[1] = media_list_add_file_path (vlc, ml, file);
-    items[2] = media_list_add_file_path (vlc, ml, file);
-    items[3] = media_list_add_file_path (vlc, ml, file);
+    queue_expected_item(&check, media_list_add_file_path (vlc, ml, file));
+    queue_expected_item(&check, media_list_add_file_path (vlc, ml, file));
+    queue_expected_item(&check, media_list_add_file_path (vlc, ml, file));
+
+    // Add a node
+    libvlc_media_t *node = libvlc_media_new_as_node(vlc, "node", &ex);
+    catch ();
+    libvlc_media_list_add_media(ml, node, &ex);
+    catch ();
+    queue_expected_item(&check, node);
+
+    // Add items to that node
+    libvlc_media_list_t *subitems = libvlc_media_subitems(node, &ex);
+    catch ();
+    queue_expected_item(&check, media_list_add_file_path(vlc, subitems, file));
+    queue_expected_item(&check, media_list_add_file_path(vlc, subitems, file));
+    queue_expected_item(&check, media_list_add_file_path(vlc, subitems, file));
+    libvlc_media_list_release(subitems);
     
     libvlc_media_list_player_set_media_list (mlp, ml, &ex);
 
     libvlc_event_manager_t * em = libvlc_media_list_player_event_manager(mlp);
-    libvlc_event_attach(em, libvlc_MediaListPlayerNextItemSet, next_item_callback, NULL, &ex);
+    libvlc_event_attach(em, libvlc_MediaListPlayerNextItemSet, check_items_order_callback, &check, &ex);
     catch ();
 
-    libvlc_media_list_player_play_item (mlp, md, &ex);
+    libvlc_media_list_player_play(mlp, &ex);
     catch ();
 
-    // Wait dummily for next_item_callback() to flag 'done_playing':
-    while (!done_playing)
-        msleep(100000);
+    // Wait until all item are read
+    wait_queued_items(&check);
 
     libvlc_media_list_player_stop (mlp, &ex);
     catch ();

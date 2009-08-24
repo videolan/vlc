@@ -4,6 +4,11 @@
 
 AUTOMAKE_OPTIONS = subdir-objects
 
+extra_check_verbose = $(extra_check_verbose_$(V))
+extra_check_verbose_ = $(extra_check_flags__$(AM_DEFAULT_VERBOSITY))
+extra_check_verbose_0 = @echo TEST $@
+extra_check_verbose__0 = $(extra_check_verbose_0)
+
 ###############################################################################
 # Unit/regression test
 ###############################################################################
@@ -26,7 +31,7 @@ EXTRA_PROGRAMS = \
 #check_DATA = samples/test.sample samples/meta.sample
 EXTRA_DIST = samples/empty.voc
 
-check_HEADERS = libvlc/test.h
+check_HEADERS = libvlc/test.h libvlc/libvlc_additions.h
 
 TESTS = $(check_PROGRAMS)
 
