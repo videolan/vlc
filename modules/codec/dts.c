@@ -581,7 +581,7 @@ static int SyncInfo( const uint8_t *p_buf,
                      unsigned int *pi_frame_length )
 {
     unsigned int i_audio_mode;
-    unsigned int i_frame_size = 0;
+    unsigned int i_frame_size;
 
     /* 14 bits, little endian version of the bitstream */
     if( p_buf[0] == 0xff && p_buf[1] == 0x1f &&
