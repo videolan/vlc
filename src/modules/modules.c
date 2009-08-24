@@ -560,11 +560,14 @@ found_shortcut:
         {
             module_t *p_new_module =
                 AllocatePlugin( p_this, p_real->psz_filename );
-            if( p_new_module )
-            {
-                CacheMerge( p_this, p_real, p_new_module );
-                DeleteModule( p_module_bank, p_new_module );
+            if( p_new_module == NULL )
+            {   /* Corrupted module */
+                msg_Err( p_this, "possibly corrupt module cache" );
+                module_release( p_cand );
+                continue;
             }
+            CacheMerge( p_this, p_real, p_new_module );
+            DeleteModule( p_module_bank, p_new_module );
         }
 #endif
 
