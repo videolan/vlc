@@ -31,24 +31,3 @@ static void* media_list_add_file_path(libvlc_instance_t *vlc, libvlc_media_list_
     return md;
 }
 
-static libvlc_media_list_player_t *media_list_player_with_root_media(libvlc_instance_t *vlc, libvlc_media_t *m)
-{
-    libvlc_media_list_t *ml;
-    libvlc_media_list_player_t *mlp;
-    
-    libvlc_exception_init (&ex);
-    
-    ml = libvlc_media_list_new (vlc, &ex);
-    catch ();
-    
-    mlp = libvlc_media_list_player_new (vlc, &ex);
-    
-    libvlc_media_list_add_media(ml, m, &ex);
-    catch ();
-    
-    libvlc_media_list_player_set_media_list(mlp, ml, &ex);
-    catch ();
-    
-    return mlp;
-}
-
