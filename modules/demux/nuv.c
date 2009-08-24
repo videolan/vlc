@@ -461,9 +461,14 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 i64 = stream_Size( p_demux->s );
                 if( i64 > 0 )
-                    *pf = (double)stream_Tell( p_demux->s ) / (double)i64;
+                {
+                    const double f_current = stream_Tell( p_demux->s );
+                    *pf = f_current / (double)i64;
+                }
                 else
+                {
                     *pf = 0.0;
+                }
             }
             return VLC_SUCCESS;
 
