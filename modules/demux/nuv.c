@@ -461,10 +461,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             {
                 i64 = stream_Size( p_demux->s );
                 if( i64 > 0 )
-                {
-                    double current = stream_Tell( p_demux->s );
-                    *pf = current / (double)i64;
-                }
+                    *pf = (double)stream_Tell( p_demux->s ) / (double)i64;
                 else
                     *pf = 0.0;
             }
@@ -726,8 +723,8 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
 {
     frame_header_t fh;
     int64_t i_original_pos;
-    uint8_t* p_seek_table = NULL;
-    uint8_t* p_kfa_table = NULL;
+    uint8_t* p_seek_table;
+    uint8_t* p_kfa_table;
     int32_t i_seek_elements = 0, i_kfa_elements = 0, j;
     int64_t i_time, i_offset;
     int keyframe, last_keyframe = 0, frame = 0, kfa_entry_id = 0;
@@ -807,17 +804,12 @@ static int SeekTableLoad( demux_t *p_demux, demux_sys_t *p_sys )
         }
     }
 
+
     if( i_kfa_elements > 0 )
         msg_Warn( p_demux, "untested keyframe adjust support, upload samples" );
 
-    for(j = 0; j < i_seek_elements; j++)
+    for(j=0; j < i_seek_elements; j++)
     {
-        if( !p_seek_table || !p_kfa_table)
-        {
-            free(p_seek_table);
-            free(p_kfa_table);
-            return VLC_EGENERIC;
-        }
 #if 0
         uint8_t* p = p_seek_table + j * 12;
         msg_Dbg( p_demux, "%x %x %x %x %x %x %x %x %x %x %x %x",
