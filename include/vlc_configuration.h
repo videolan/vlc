@@ -222,6 +222,10 @@ typedef enum vlc_userdir
     VLC_HOME_DIR, /* User's home */
     VLC_CONFIG_DIR, /* VLC-specific configuration directory */
     VLC_DATA_DIR, /* VLC-specific data directory */
+    VLC_DOWNLOAD_DIR, /* VLC-specific download directory */
+    VLC_PICTURE_DIR, /* VLC-specific snapshot directory */
+    VLC_MUSIC_DIR, /* VLC-specific music directory */
+    VLC_VIDEO_DIR, /* VLC-specific video directory */
 } vlc_userdir_t;
 
 VLC_EXPORT(char *, config_GetUserDir, ( vlc_userdir_t ) LIBVLC_USED);
