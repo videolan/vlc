@@ -64,7 +64,7 @@ struct input_item_t
     uint8_t    *optflagv;            /**< Some flags of input options */
     unsigned   optflagc;
 
-    mtime_t    i_duration;           /**< Duration in milliseconds*/
+    mtime_t    i_duration;           /**< Duration in microseconds */
 
     uint8_t    i_type;               /**< Type (file, disc, ... see input_item_type_e) */
     bool b_prefers_tree;             /**< Do we prefer being displayed as tree*/
