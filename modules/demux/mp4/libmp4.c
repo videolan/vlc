@@ -1243,12 +1243,12 @@ static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( p_box->i_type == FOURCC_drms )
     {
-        p_box->data.p_sample_soun->p_drms =
-            drms_alloc( config_GetHomeDir() );
-
-        if( p_box->data.p_sample_soun->p_drms == NULL )
+        char *home = config_GetUserDir( VLC_HOME_DIR );
+        if( home != NULL )
         {
-            msg_Err( p_stream, "drms_alloc() failed" );
+            p_box->data.p_sample_soun->p_drms = drms_alloc( home );
+            if( p_box->data.p_sample_soun->p_drms == NULL )
+                msg_Err( p_stream, "drms_alloc() failed" );
         }
     }
 
@@ -1344,12 +1344,12 @@ int MP4_ReadBox_sample_vide( stream_t *p_stream, MP4_Box_t *p_box )
 
     if( p_box->i_type == FOURCC_drmi )
     {
-        p_box->data.p_sample_vide->p_drms =
-            drms_alloc( config_GetHomeDir() );
-
-        if( p_box->data.p_sample_vide->p_drms == NULL )
+        char *home = config_GetUserDir( VLC_HOME_DIR );
+        if( home != NULL )
         {
-            msg_Err( p_stream, "drms_alloc() failed" );
+            p_box->data.p_sample_vide->p_drms = drms_alloc( home );
+            if( p_box->data.p_sample_vide->p_drms == NULL )
+                msg_Err( p_stream, "drms_alloc() failed" );
         }
     }
 

@@ -120,5 +120,14 @@ struct intf_sys_t
 
 #define getSettings() p_intf->p_sys->mainSettings
 
+static inline QString QVLCUserDir( vlc_userdir_t type )
+{
+    char *dir = config_GetUserDir( type );
+    if( !dir )
+        abort();
+    QString res = qfu( dir );
+    free( dir );
+    return res;
+}
 
 #endif

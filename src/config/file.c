@@ -88,9 +88,12 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
     {
         /* This is the fallback for pre XDG Base Directory
          * Specification configs */
+        char *home = config_GetUserDir(VLC_HOME_DIR);
         char *psz_old;
-        if( asprintf( &psz_old, "%s" DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE,
-                      config_GetHomeDir() ) != -1 )
+
+        if( home != NULL
+         && asprintf( &psz_old, "%s" DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE,
+                      home ) != -1 )
         {
             p_stream = utf8_fopen( psz_old, "rt" );
             if( p_stream )
@@ -101,7 +104,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
                           "VLC will now use %s.", psz_old, psz_filename );
                 char *psz_readme;
                 if( asprintf(&psz_readme,"%s"DIR_SEP CONFIG_DIR DIR_SEP"README",
-                              config_GetHomeDir() ) != -1 )
+                             home ) != -1 )
                 {
                     FILE *p_readme = utf8_fopen( psz_readme, "wt" );
                     if( p_readme )
@@ -120,6 +123,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
             }
             free( psz_old );
         }
+        free( home );
     }
 #endif
     free( psz_filename );

@@ -131,67 +131,7 @@ void vout_snapshot_Set(vout_snapshot_t *snap,
 /* */
 char *vout_snapshot_GetDirectory(void)
 {
-    char *psz_path = NULL;
-#if defined(__APPLE__) || defined(SYS_BEOS)
-
-    if (asprintf(&psz_path, "%s/Desktop",
-                  config_GetHomeDir()) == -1)
-        psz_path = NULL;
-
-#elif defined(WIN32) && !defined(UNDER_CE)
-
-    /* Get the My Pictures folder path */
-    char *p_mypicturesdir = NULL;
-    typedef HRESULT (WINAPI *SHGETFOLDERPATH)(HWND, int, HANDLE, DWORD,
-                                               LPWSTR);
-    #ifndef CSIDL_FLAG_CREATE
-    #   define CSIDL_FLAG_CREATE 0x8000
-    #endif
-    #ifndef CSIDL_MYPICTURES
-    #   define CSIDL_MYPICTURES 0x27
-    #endif
-    #ifndef SHGFP_TYPE_CURRENT
-    #   define SHGFP_TYPE_CURRENT 0
-    #endif
-
-    HINSTANCE shfolder_dll;
-    SHGETFOLDERPATH SHGetFolderPath ;
-
-    /* load the shfolder dll to retrieve SHGetFolderPath */
-    if ((shfolder_dll = LoadLibrary(_T("SHFolder.dll"))) != NULL)
-    {
-       wchar_t wdir[PATH_MAX];
-       SHGetFolderPath = (void *)GetProcAddress(shfolder_dll,
-                                                  _T("SHGetFolderPathW"));
-        if ((SHGetFolderPath != NULL)
-         && SUCCEEDED (SHGetFolderPath (NULL,
-                                       CSIDL_MYPICTURES | CSIDL_FLAG_CREATE,
-                                       NULL, SHGFP_TYPE_CURRENT,
-                                       wdir)))
-            p_mypicturesdir = FromWide (wdir);
-
-        FreeLibrary(shfolder_dll);
-    }
-
-    if (p_mypicturesdir == NULL)
-        psz_path = strdup(config_GetHomeDir());
-    else
-        psz_path = p_mypicturesdir;
-
-#else
-
-    /* XXX: This saves in the data directory. Shouldn't we try saving
-     *      to psz_homedir/Desktop or something nicer ? */
-    char *psz_datadir = config_GetUserDataDir();
-    if (psz_datadir)
-    {
-        if (asprintf(&psz_path, "%s", psz_datadir) == -1)
-            psz_path = NULL;
-        free(psz_datadir);
-    }
-
-#endif
-    return psz_path;
+    return config_GetUserDir(VLC_HOME_DIR);
 }
 /* */
 int vout_snapshot_SaveImage(char **name, int *sequential,

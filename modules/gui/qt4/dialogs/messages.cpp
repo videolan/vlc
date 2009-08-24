@@ -245,7 +245,7 @@ bool MessagesDialog::save()
 {
     QString saveLogFileName = QFileDialog::getSaveFileName(
             this, qtr( "Save log file as..." ),
-            qfu( config_GetHomeDir() ),
+            QVLCUserDir( VLC_HOME_DIR ),
             qtr( "Texts / Logs (*.log *.txt);; All (*.*) ") );
 
     if( !saveLogFileName.isNull() )

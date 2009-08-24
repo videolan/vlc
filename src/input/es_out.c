@@ -464,12 +464,9 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
 
     if( b_record )
     {
-        char *psz_path = var_CreateGetString( p_input, "input-record-path" );
-        if( !psz_path || *psz_path == '\0' )
-        {
-            free( psz_path );
-            psz_path = strdup( config_GetHomeDir() );
-        }
+        char *psz_path = var_CreateGetNonEmptyString( p_input, "input-record-path" );
+        if( !psz_path )
+            psz_path = config_GetUserDir(VLC_HOME_DIR);
 
         char *psz_sout = NULL;  // TODO conf
 

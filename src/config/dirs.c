@@ -78,6 +78,7 @@ const char *config_GetDataDir( void )
 #endif
 }
 
+#if defined (WIN32) || defined(__APPLE__) || defined (SYS_BEOS)
 static const char *GetDir( bool b_appdata, bool b_common_appdata )
 {
     /* FIXME: a full memory page here - quite a waste... */
@@ -146,6 +147,7 @@ static const char *GetDir( bool b_appdata, bool b_common_appdata )
 #endif
     return homedir;
 }
+#endif
 
 /**
  * Determines the system configuration directory.
@@ -171,12 +173,53 @@ const char *config_GetConfDir( void )
 #endif
 }
 
-/**
- * Get the user's home directory
- */
-const char *config_GetHomeDir( void )
+static char *config_GetHomeDir (void)
 {
-    return GetDir (false, false);
+#ifndef WIN32
+    /* 1/ Try $HOME  */
+    const char *home = getenv ("HOME");
+#if defined(HAVE_GETPWUID_R)
+    /* 2/ Try /etc/passwd */
+    char buf[sysconf (_SC_GETPW_R_SIZE_MAX)];
+    if (home == NULL)
+    {
+        struct passwd pw, *res;
+
+        if (!getpwuid_r (getuid (), &pw, buf, sizeof (buf), &res) && res)
+            home = pw.pw_dir;
+    }
+#endif
+    /* 3/ Desperately try $TMP */
+    if (home == NULL)
+        home = getenv( "TMP" );
+    /* 4/ Beyond hope, hard-code /tmp */
+    if (home == NULL)
+        home = "/tmp";
+
+    return FromLocaleDup (home);
+
+#else /* WIN32 */
+    wchar_t wdir[MAX_PATH];
+
+# if defined (UNDER_CE)
+    /*There are some errors in cegcc headers*/
+#undef SHGetSpecialFolderPath
+    BOOL WINAPI SHGetSpecialFolderPath(HWND,LPWSTR,int,BOOL);
+    if (SHGetSpecialFolderPath (NULL, wdir, CSIDL_APPDATA, 1))
+# else
+    if (SHGetFolderPathW (NULL, CSIDL_PERSONAL | CSIDL_FLAG_CREATE,
+                          NULL, SHGFP_TYPE_CURRENT, wdir ) == S_OK)
+# endif
+        return FromWide (wdir);
+    return NULL;
+#endif
+}
+
+char *config_GetUserDir (vlc_userdir_t type)
+{
+    char *home = config_GetHomeDir ();
+    (void)type;
+    return home;
 }
 
 static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
@@ -194,8 +237,7 @@ static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
     /* XDG Base Directory Specification - Version 0.6 */
     snprintf (var, sizeof (var), "XDG_%s_HOME", xdg_name);
 
-    const char *psz_home = getenv (var);
-    psz_home = psz_home ? FromLocale (psz_home) : NULL;
+    char *psz_home = FromLocale (getenv (var));
     if( psz_home )
     {
         if( asprintf( &psz_dir, "%s/vlc", psz_home ) == -1 )
@@ -204,10 +246,11 @@ static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
         return psz_dir;
     }
 
-    /* Try HOME, then fallback to non-XDG dirs */
-    psz_home = config_GetHomeDir();
-    if( asprintf( &psz_dir, "%s/%s/vlc", psz_home, xdg_default ) == -1 )
+    psz_home = config_GetUserDir (VLC_HOME_DIR);
+    if( psz_home == NULL
+     || asprintf( &psz_dir, "%s/%s/vlc", psz_home, xdg_default ) == -1 )
         psz_dir = NULL;
+    free (psz_home);
 #endif
     return psz_dir;
 }

@@ -271,12 +271,15 @@ static void Trigger (access_t *access)
         // and there is an off-by-one in the following sprintf().
         return;
 
-    const char *home = config_GetHomeDir();
+    char *dir = config_GetUserDir( VLC_HOME_DIR );
+     if( dir == NULL )
+         return;
 
     /* Hmm what about the extension?? */
-    char filename[strlen (home) + sizeof ("/vlcdump-YYYYYYYYY-MM-DD-HH-MM-SS.ts")];
-    sprintf (filename, "%s/vlcdump-%04u-%02u-%02u-%02u-%02u-%02u.ts", home,
+    char filename[strlen (dir) + sizeof ("/vlcdump-YYYYYYYYY-MM-DD-HH-MM-SS.ts")];
+    sprintf (filename, "%s/vlcdump-%04u-%02u-%02u-%02u-%02u-%02u.ts", dir,
              t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);
+    free( dir );
 
     msg_Info (access, "dumping media to \"%s\"...", filename);
 

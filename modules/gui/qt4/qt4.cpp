@@ -453,7 +453,7 @@ static void *Thread( void *obj )
 
     /* Retrieve last known path used in file browsing */
     p_intf->p_sys->filepath =
-         getSettings()->value( "filedialog-path", config_GetHomeDir() ).toString();
+         getSettings()->value( "filedialog-path", QVLCUserDir( VLC_HOME_DIR ) ).toString();
 
     /* Loads and tries to apply the preferred QStyle */
     QString s_style = getSettings()->value( "MainWindow/QtStyle", "" ).toString();

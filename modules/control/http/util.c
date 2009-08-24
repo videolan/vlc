@@ -951,9 +951,10 @@ char *RealPath( const char *psz_src )
 
     if( psz_dir[0] == '~' )
     {
-        char *dir;
-        asprintf( &dir, "%s%s", config_GetHomeDir(), psz_dir + 1 );
+        char *home = config_GetUserDir( VLC_HOME_DIR ), *dir;
+        asprintf( &dir, "%s%s", home, psz_dir + 1 );
         free( psz_dir );
+        free( home );
         psz_dir = dir;
     }
 

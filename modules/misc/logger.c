@@ -234,10 +234,13 @@ static int Open( vlc_object_t *p_this )
         if( !psz_file )
         {
 #ifdef __APPLE__
-            if( asprintf( &psz_file, "%s/"LOG_DIR"/%s", config_GetHomeDir(),
+            char *home = config_GetUserDir(VLC_HOME_DIR);
+            if( home == NULL
+             || asprintf( &psz_file, "%s/"LOG_DIR"/%s", home,
                 (p_sys->msg.i_mode == MODE_HTML) ? LOG_FILE_HTML
                                              : LOG_FILE_TEXT ) == -1 )
                 psz_file = NULL;
+            free(home);
 #else
             switch( p_sys->msg.i_mode )
             {

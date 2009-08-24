@@ -310,7 +310,7 @@ static int Open( vlc_object_t *p_this )
         p_sys->psz_current_dir = psz_tmp;
     else
     {
-        p_sys->psz_current_dir = strdup( config_GetHomeDir() );
+        p_sys->psz_current_dir = config_GetUserDir( VLC_HOME_DIR );
         free( psz_tmp );
     }
 

@@ -54,7 +54,7 @@ config_GetCacheDir
 config_GetConfDir
 config_GetDataDir
 __config_GetFloat
-config_GetHomeDir
+config_GetUserDir
 __config_GetInt
 __config_GetPsz
 __config_GetType
