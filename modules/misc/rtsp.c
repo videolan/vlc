@@ -1178,9 +1178,8 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     f_pos /= ((double)(p_media->i_length))/1000 /1000 / 100;
                     CommandPush( p_vod, RTSP_CMD_TYPE_SEEK, p_media,
                                  psz_session, f_pos, NULL );
-                    break;
                 }
-                if( psz_scale )
+                else if( psz_scale )
                 {
                     double f_scale = 0.0;
                     char *end;
