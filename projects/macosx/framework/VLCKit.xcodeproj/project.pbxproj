@@ -482,7 +482,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n\trm -Rf $SYMROOT/vlc_build_dir\n     exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir && $top_srcdir/configure --disable-nls --enable-debug --with-macosx-sdk=$SDKROOT -C\n";
+			shellScript = "if test $ACTION = \"clean\"\nthen\n\trm -Rf $SYMROOT/vlc_build_dir\n     exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir && $top_srcdir/configure --disable-nls --enable-debug --with-macosx-sdk=$SDKROOT\n";
 			showEnvVarsInLog = 0;
 		};
 		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
