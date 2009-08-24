@@ -249,14 +249,6 @@ static char *config_GetAppDir (const char *xdg_name, const char *xdg_default)
 }
 
 /**
- * Get the user's VLC configuration directory
- */
-char *config_GetUserConfDir( void )
-{
-    return config_GetAppDir ("CONFIG", ".config");
-}
-
-/**
  * Get the user's VLC data directory
  * (used for stuff like the skins, custom lua modules, ...)
  */
@@ -286,7 +278,12 @@ char *config_GetCacheDir( void )
 
 char *config_GetUserDir (vlc_userdir_t type)
 {
-    char *home = config_GetHomeDir ();
-    (void)type;
-    return home;
+    switch (type)
+    {
+        case VLC_HOME_DIR:
+            return config_GetHomeDir ();
+        case VLC_CONFIG_DIR:
+            return config_GetAppDir ("CONFIG", ".config");
+    }
+    assert (0);
 }

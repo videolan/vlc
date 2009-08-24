@@ -59,7 +59,7 @@ static char *config_GetConfigFile( vlc_object_t *obj )
     char *psz_file = config_GetPsz( obj, "config" );
     if( psz_file == NULL )
     {
-        char *psz_dir = config_GetUserConfDir();
+        char *psz_dir = config_GetUserDir( VLC_CONFIG_DIR );
 
         if( asprintf( &psz_file, "%s" DIR_SEP CONFIG_FILE, psz_dir ) == -1 )
             psz_file = NULL;
@@ -385,8 +385,8 @@ config_Write (FILE *file, const char *desc, const char *type,
 
 static int config_PrepareDir (vlc_object_t *obj)
 {
-    char *psz_configdir = config_GetUserConfDir ();
-    if (psz_configdir == NULL) /* XXX: This should never happen */
+    char *psz_configdir = config_GetUserDir (VLC_CONFIG_DIR);
+    if (psz_configdir == NULL)
         return -1;
 
     int ret = config_CreateDir (obj, psz_configdir);

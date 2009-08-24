@@ -134,7 +134,7 @@ static int vlclua_homedir( lua_State *L )
 
 static int vlclua_configdir( lua_State *L )
 {
-    char *dir = config_GetUserConfDir();
+    char *dir = config_GetUserDir( VLC_CONFIG_DIR );
     lua_pushstring( L, dir );
     free( dir );
     return 1;

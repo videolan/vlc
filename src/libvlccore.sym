@@ -58,7 +58,6 @@ config_GetUserDir
 __config_GetInt
 __config_GetPsz
 __config_GetType
-config_GetUserConfDir
 config_GetUserDataDir
 __config_PutFloat
 __config_PutInt
