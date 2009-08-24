@@ -2371,9 +2371,9 @@ static void AVI_IndexCreate( demux_t *p_demux )
             if( dialog_ProgressCancelled( p_dialog ) )
                 break;
 
-            double current = stream_Tell( p_demux->s );
-            double size = stream_Size( p_demux->s );
-            double f_pos = current / size;
+            double f_current = stream_Tell( p_demux->s );
+            double f_size    = stream_Size( p_demux->s );
+            double f_pos     = f_current / f_size;
             dialog_ProgressSet( p_dialog, NULL, f_pos );
 
             i_dialog_update = mdate();
