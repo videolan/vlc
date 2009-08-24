@@ -600,7 +600,10 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     return ret;
 }
 
-
+- (void *)libVLCMediaPlayer
+{
+    return instance;
+}
 @end
 
 @implementation VLCMediaPlayer (Private)

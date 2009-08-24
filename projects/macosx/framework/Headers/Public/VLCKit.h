@@ -23,13 +23,14 @@
  *****************************************************************************/
 
 /**
- * TODO: Framework Documetnation
+ * TODO: Framework Documentation
  */
 
 #import <VLCKit/VLCLibrary.h>
 #import <VLCKit/VLCMedia.h>
 #import <VLCKit/VLCMediaLibrary.h>
 #import <VLCKit/VLCMediaList.h>
+#import <VLCKit/VLCMediaListPlayer.h>
 #import <VLCKit/VLCMediaListAspect.h>
 #import <VLCKit/VLCMediaDiscoverer.h>
 #import <VLCKit/VLCMediaPlayer.h>

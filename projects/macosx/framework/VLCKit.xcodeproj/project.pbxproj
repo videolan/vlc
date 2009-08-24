@@ -48,6 +48,8 @@
 /* End PBXAggregateTarget section */
 
 /* Begin PBXBuildFile section */
+		63014A7A1042ACE100534090 /* VLCMediaListPlayer.m in Sources */ = {isa = PBXBuildFile; fileRef = 63014A781042ACE100534090 /* VLCMediaListPlayer.m */; };
+		63014B7E1042E64A00534090 /* VLCMediaListPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 63014B7D1042E64A00534090 /* VLCMediaListPlayer.h */; };
 		6303C43A0CF45CAE0000ECC8 /* VLCMediaListAspect.m in Sources */ = {isa = PBXBuildFile; fileRef = 6303C4390CF45CAE0000ECC8 /* VLCMediaListAspect.m */; };
 		6303C43C0CF45CC30000ECC8 /* VLCMediaListAspect.h in Headers */ = {isa = PBXBuildFile; fileRef = 6303C43B0CF45CC30000ECC8 /* VLCMediaListAspect.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		632A0E850D3835C400AFC99B /* VLCStreamSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 632A0E830D3835C400AFC99B /* VLCStreamSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -120,6 +122,8 @@
 		0867D6A5FE840307C02AAC07 /* AppKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = AppKit.framework; path = /System/Library/Frameworks/AppKit.framework; sourceTree = "<absolute>"; };
 		1058C7B1FEA5585E11CA2CBB /* Cocoa.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Cocoa.framework; path = /System/Library/Frameworks/Cocoa.framework; sourceTree = "<absolute>"; };
 		32DBCF5E0370ADEE00C91783 /* VLC_Prefix.pch */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = VLC_Prefix.pch; sourceTree = "<group>"; };
+		63014A781042ACE100534090 /* VLCMediaListPlayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCMediaListPlayer.m; sourceTree = "<group>"; };
+		63014B7D1042E64A00534090 /* VLCMediaListPlayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMediaListPlayer.h; path = Public/VLCMediaListPlayer.h; sourceTree = "<group>"; };
 		63030CC70CCA652C0088ECD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = Info.plist; path = Resources/Info.plist; sourceTree = "<group>"; };
 		6303C4390CF45CAE0000ECC8 /* VLCMediaListAspect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCMediaListAspect.m; sourceTree = "<group>"; };
 		6303C43B0CF45CC30000ECC8 /* VLCMediaListAspect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMediaListAspect.h; path = Public/VLCMediaListAspect.h; sourceTree = "<group>"; };
@@ -220,6 +224,7 @@
 				EF78BD3E0CAEEFF600354E6E /* VLCMedia.m */,
 				637D5ADB0CF6F2720073EA45 /* VLCMediaDiscoverer.m */,
 				EF78BD410CAEEFF600354E6E /* VLCMediaList.m */,
+				63014A781042ACE100534090 /* VLCMediaListPlayer.m */,
 				6303C4390CF45CAE0000ECC8 /* VLCMediaListAspect.m */,
 				EF8BB8CF0CAFA8D80038A613 /* VLCMediaPlayer.m */,
 				EF78BD400CAEEFF600354E6E /* VLCMediaLibrary.m */,
@@ -304,6 +309,7 @@
 				637D5ABC0CF6F2650073EA45 /* VLCMediaDiscoverer.h */,
 				EF78BD160CAEEEE700354E6E /* VLCMediaList.h */,
 				6303C43B0CF45CC30000ECC8 /* VLCMediaListAspect.h */,
+				63014B7D1042E64A00534090 /* VLCMediaListPlayer.h */,
 				EF8BB8CE0CAFA8D80038A613 /* VLCMediaPlayer.h */,
 				EF78BD150CAEEEE700354E6E /* VLCMediaLibrary.h */,
 				6341FCAE0D2C0929002A97B7 /* VLCVideoLayer.h */,
@@ -348,6 +354,7 @@
 				A7A0CEA40D2EF13000F2C039 /* VLCVideoCommon.h in Headers */,
 				632A0E850D3835C400AFC99B /* VLCStreamSession.h in Headers */,
 				632A0EC30D38392E00AFC99B /* VLCStreamOutput.h in Headers */,
+				63014B7E1042E64A00534090 /* VLCMediaListPlayer.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -521,6 +528,7 @@
 				A7A0CEA50D2EF13000F2C039 /* VLCVideoCommon.m in Sources */,
 				632A0E860D3835C400AFC99B /* VLCStreamSession.m in Sources */,
 				632A0EC40D38392E00AFC99B /* VLCStreamOutput.m in Sources */,
+				63014A7A1042ACE100534090 /* VLCMediaListPlayer.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};

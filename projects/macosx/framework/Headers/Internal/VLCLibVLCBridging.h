@@ -25,6 +25,7 @@
 #import "VLCLibrary.h"
 #import "VLCMediaListAspect.h"
 #import "VLCStreamOutput.h"
+#import "VLCMediaPlayer.h"
 
 /* Utility functions */
 /**
@@ -92,6 +93,15 @@ extern void __catch_exception( void * e, const char * function, const char * fil
 
 /**
  * Bridges functionality between VLCMedia and VLCMediaPlayer
+ */
+@interface VLCMediaPlayer (LibVLCBridging)
+
+/* Properties */
+@property (readonly) void * libVLCMediaPlayer;    //< LibVLC media list pointer.
+@end
+
+/**
+ * Bridges functionality between VLCMediaPlayer and LibVLC core
  */
 @interface VLCMedia (VLCMediaPlayerBridging)
 /**
