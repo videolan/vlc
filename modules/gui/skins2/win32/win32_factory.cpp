@@ -225,7 +225,7 @@ bool Win32Factory::init()
     }
 
     // Initialize the resource path
-    char *datadir = config_GetUserDataDir();
+    char *datadir = config_GetUserDir( VLC_DATA_DIR );
     m_resourcePath.push_back( (string)datadir + "\\skins" );
     free( datadir );
     m_resourcePath.push_back( (string)config_GetDataDir() +

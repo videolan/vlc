@@ -675,7 +675,7 @@ static int OpenClient (vlc_object_t *obj)
         goto error;
     }
 
-    char *userdir = config_GetUserDataDir ();
+    char *userdir = config_GetDataDir ( VLC_DATA_DIR );
     if (userdir != NULL)
     {
         char path[strlen (userdir) + sizeof ("/ssl/private")];

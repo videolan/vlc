@@ -108,7 +108,7 @@ void
 libvlc_media_library_load( libvlc_media_library_t * p_mlib,
                            libvlc_exception_t * p_e )
 {
-    char *psz_datadir = config_GetUserDataDir();
+    char *psz_datadir = config_GetUserDir( VLC_DATA_DIR );
     char * psz_uri;
 
     if( !psz_datadir ) /* XXX: i doubt that this can ever happen */

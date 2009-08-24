@@ -108,7 +108,7 @@ static int file_compare( const char **a, const char **b )
 int vlclua_dir_list( const char *luadirname, char **ppsz_dir_list )
 {
     int i = 0;
-    char *datadir = config_GetUserDataDir();
+    char *datadir = config_GetUserDir( VLC_DATA_DIR );
     if( datadir == NULL )
         return VLC_ENOMEM;
 

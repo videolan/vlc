@@ -120,7 +120,9 @@ static int vlclua_datadir( lua_State *L )
 
 static int vlclua_userdatadir( lua_State *L )
 {
-    lua_pushstring( L, config_GetUserDataDir() );
+    char *dir = config_GetUserDir( VLC_DATA_DIR );
+    lua_pushstring( L, dir );
+    free( dir );
     return 1;
 }
 

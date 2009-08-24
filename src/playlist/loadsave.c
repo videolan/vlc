@@ -125,7 +125,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     if( !config_GetInt( p_playlist, "media-library") )
         return VLC_SUCCESS;
 
-    psz_datadir = config_GetUserDataDir();
+    psz_datadir = config_GetUserDir( VLC_DATA_DIR );
 
     if( !psz_datadir ) /* XXX: This should never happen */
     {
@@ -208,7 +208,7 @@ int playlist_MLDump( playlist_t *p_playlist )
     if( !config_GetInt( p_playlist, "media-library") )
         return VLC_SUCCESS;
 
-    psz_datadir = config_GetUserDataDir();
+    psz_datadir = config_GetUserDir( VLC_DATA_DIR );
 
     if( !psz_datadir ) /* XXX: This should never happen */
     {

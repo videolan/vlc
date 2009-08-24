@@ -216,13 +216,12 @@ VLC_EXPORT( void,   __config_ResetAll, ( vlc_object_t * ) );
 VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) LIBVLC_USED );
 VLC_EXPORT(const char *, config_GetDataDir, ( void ) LIBVLC_USED);
 VLC_EXPORT(const char *, config_GetConfDir, ( void ) LIBVLC_USED);
-VLC_EXPORT(char *, config_GetUserDataDir, ( void ) LIBVLC_USED);
 
-typedef enum vlc_userdir {
-    /* User's home */
-    VLC_HOME_DIR,
-    /* VLC configuration directory */
-    VLC_CONFIG_DIR,
+typedef enum vlc_userdir
+{
+    VLC_HOME_DIR, /* User's home */
+    VLC_CONFIG_DIR, /* VLC-specific configuration directory */
+    VLC_DATA_DIR, /* VLC-specific data directory */
 } vlc_userdir_t;
 
 VLC_EXPORT(char *, config_GetUserDir, ( vlc_userdir_t ) LIBVLC_USED);
