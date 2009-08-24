@@ -215,14 +215,7 @@ static char *config_GetHomeDir (void)
 #endif
 }
 
-char *config_GetUserDir (vlc_userdir_t type)
-{
-    char *home = config_GetHomeDir ();
-    (void)type;
-    return home;
-}
-
-static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
+static char *config_GetAppDir (const char *xdg_name, const char *xdg_default)
 {
     char *psz_dir;
 #if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
@@ -246,7 +239,7 @@ static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
         return psz_dir;
     }
 
-    psz_home = config_GetUserDir (VLC_HOME_DIR);
+    psz_home = config_GetHomeDir ();
     if( psz_home == NULL
      || asprintf( &psz_dir, "%s/%s/vlc", psz_home, xdg_default ) == -1 )
         psz_dir = NULL;
@@ -260,7 +253,7 @@ static char *config_GetFooDir (const char *xdg_name, const char *xdg_default)
  */
 char *config_GetUserConfDir( void )
 {
-    return config_GetFooDir ("CONFIG", ".config");
+    return config_GetAppDir ("CONFIG", ".config");
 }
 
 /**
@@ -269,7 +262,7 @@ char *config_GetUserConfDir( void )
  */
 char *config_GetUserDataDir( void )
 {
-    return config_GetFooDir ("DATA", ".local/share");
+    return config_GetAppDir ("DATA", ".local/share");
 }
 
 /**
@@ -287,6 +280,13 @@ char *config_GetCacheDir( void )
 
     return psz_dir;
 #else
-    return config_GetFooDir ("CACHE", ".cache");
+    return config_GetAppDir ("CACHE", ".cache");
 #endif
+}
+
+char *config_GetUserDir (vlc_userdir_t type)
+{
+    char *home = config_GetHomeDir ();
+    (void)type;
+    return home;
 }
