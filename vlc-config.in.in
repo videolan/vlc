@@ -27,6 +27,8 @@ cflags_optim_speed="@CFLAGS_OPTIM_SPEED@"
 cflags_optim_nodebug="@CFLAGS_OPTIM_NODEBUG@"
 cflags_nooptim="@CFLAGS_NOOPTIM@"
 
+cflags_werror="@CFLAGS_WERROR@"
+
 #
 #  Do not touch below this place unless you really know what you are doing
 #
@@ -94,7 +96,7 @@ cppflags="${cppflags} -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURC
 #
 if [ "${debug}" = yes ]; then
   cppflags="${cppflags} -DDEBUG"
-  cflags="${cflags} -g"
+  cflags="${cflags} -g ${cflags_werror}"
   cxxflags="${cxxflags} -g"
   objcflags="${objcflags} -g"
   ldflags="${ldflags} -g"
