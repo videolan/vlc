@@ -209,7 +209,7 @@ static void * EventDispatcherMainLoop(void * user_data)
 - (void)callOnMainThreadDelegateOfObject:(id)aTarget withDelegateMethod:(SEL)aSelector withNotificationName: (NSString *)aNotificationName
 {
     /* Don't send on main thread before this gets sorted out */
-//    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     
     message_t message = 
     { 
@@ -219,19 +219,19 @@ static void * EventDispatcherMainLoop(void * user_data)
         VLCNotification 
     };
 
-//    if( [NSThread isMainThread] )
-//    {
+    if( [NSThread isMainThread] )
+    {
         [self callDelegateOfObjectAndSendNotificationWithArgs:[[NSData dataWithBytes:&message length:sizeof(message_t)] retain] /* released in the call */];
-//    } 
-//    else 
-//    {
-//        pthread_mutex_lock( [self queueLock] );
-//        [[self messageQueue] insertObject:[NSData dataWithBytes:&message length:sizeof(message_t)] atIndex:0];
-//        pthread_cond_signal( [self signalData] );
-//        pthread_mutex_unlock( [self queueLock] );
-//    }
+    } 
+    else 
+    {
+        pthread_mutex_lock( [self queueLock] );
+        [[self messageQueue] insertObject:[NSData dataWithBytes:&message length:sizeof(message_t)] atIndex:0];
+        pthread_cond_signal( [self signalData] );
+        pthread_mutex_unlock( [self queueLock] );
+    }
     
-//    [pool release];
+    [pool release];
 }
 
 - (void)callOnMainThreadObject:(id)aTarget withMethod:(SEL)aSelector withArgumentAsObject: (id)arg
@@ -278,7 +278,7 @@ static void * EventDispatcherMainLoop(void * user_data)
 
 - (void)callDelegateOfObject:(id) aTarget withDelegateMethod:(SEL)aSelector withNotificationName: (NSString *)aNotificationName
 {
-    //    [[NSNotificationCenter defaultCenter] postNotification: [NSNotification notificationWithName:aNotificationName object:aTarget]];
+    [[NSNotificationCenter defaultCenter] postNotification: [NSNotification notificationWithName:aNotificationName object:aTarget]];
     
     if (![aTarget delegate] || ![[aTarget delegate] respondsToSelector:aSelector])
         return;
