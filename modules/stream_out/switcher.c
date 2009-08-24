@@ -951,6 +951,7 @@ static block_t *AudioGetBuffer( sout_stream_t *p_stream, sout_stream_id_t *id,
     int i_out;
     block_t *p_out;
 
+    (void)p_stream;
     i_out = avcodec_encode_audio( id->ff_enc_c, id->p_buffer_out,
                                   2 * AVCODEC_MAX_AUDIO_FRAME_SIZE,
                                   id->p_samples );
