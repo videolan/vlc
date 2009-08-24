@@ -278,8 +278,12 @@ static inline void picture_Copy( picture_t *p_dst, const picture_t *p_src )
  * picture before encoding.
  *
  * i_override_width/height allow to override the width and/or the height of the
- * picture to be encoded. If at most one of them is > 0 then the picture aspect
- * ratio will be kept.
+ * picture to be encoded:
+ *  - if strictly lower than 0, the original dimension will be used.
+ *  - if equal to 0, it will be deduced from the other dimension which must be
+ *  different to 0.
+ *  - if strictly higher than 0, it will override the dimension.
+ * If at most one of them is > 0 then the picture aspect ratio will be kept.
  */
 VLC_EXPORT( int, picture_Export, ( vlc_object_t *p_obj, block_t **pp_image, video_format_t *p_fmt, picture_t *p_picture, vlc_fourcc_t i_format, int i_override_width, int i_override_height ) );
 
