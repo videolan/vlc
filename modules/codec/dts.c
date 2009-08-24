@@ -29,6 +29,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -622,9 +623,11 @@ static int SyncInfo( const uint8_t *p_buf,
                                      pi_bit_rate, pi_frame_length );
     }
     /* DTS-HD */
-    else if( p_buf[0] == 0x64 && p_buf[1] ==  0x58 &&
-             p_buf[2] == 0x20 && p_buf[3] ==  0x25 )
+    else
     {
+        assert( p_buf[0] == 0x64 && p_buf[1] ==  0x58 &&
+                p_buf[2] == 0x20 && p_buf[3] ==  0x25 );
+
         int i_dts_hd_size;
         bs_t s;
         bs_init( &s, &p_buf[4], DTS_HEADER_SIZE - 4 );
