@@ -79,7 +79,7 @@ const char *config_GetDataDir( void )
 }
 
 #if defined (WIN32) || defined(__APPLE__) || defined (SYS_BEOS)
-static const char *GetDir( bool b_appdata, bool b_common_appdata )
+static const char *GetDir( bool b_common )
 {
     /* FIXME: a full memory page here - quite a waste... */
     static char homedir[PATH_MAX] = "";
@@ -94,24 +94,20 @@ static const char *GetDir( bool b_appdata, bool b_common_appdata )
     if( SHGetSpecialFolderPath( NULL, wdir, CSIDL_APPDATA, 1 ) )
 # else
     /* Get the "Application Data" folder for the current user */
-    if( S_OK == SHGetFolderPathW( NULL,
-              ( b_appdata ? CSIDL_APPDATA :
-               ( b_common_appdata ? CSIDL_COMMON_APPDATA: CSIDL_PERSONAL ) )
-              | CSIDL_FLAG_CREATE,
-                                  NULL, SHGFP_TYPE_CURRENT, wdir ) )
+    if( S_OK == SHGetFolderPathW( NULL, (b_common ? CSIDL_COMMON_APPDATA
+                                                  : CSIDL_APPDATA)
+              | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, wdir ) )
 # endif
     {
         static char appdir[PATH_MAX] = "";
         static char comappdir[PATH_MAX] = "";
         WideCharToMultiByte (CP_UTF8, 0, wdir, -1,
-                             b_appdata ? appdir :
-                             (b_common_appdata ? comappdir :homedir),
-                              PATH_MAX, NULL, NULL);
-        return b_appdata ? appdir : (b_common_appdata ? comappdir :homedir);
+                             b_common ? comappdir : appdir,
+                             PATH_MAX, NULL, NULL);
+        return b_common ? comappdir : appdir;
     }
 #else
-    (void)b_appdata;
-    (void)b_common_appdata;
+    (void)b_common;
 #endif
 
 #ifdef LIBVLC_USE_PTHREAD
@@ -157,7 +153,7 @@ static const char *GetDir( bool b_appdata, bool b_common_appdata )
 const char *config_GetConfDir( void )
 {
 #if defined (WIN32)
-    return GetDir( false, true );
+    return GetDir( true );
 #elif defined(__APPLE__) || defined (SYS_BEOS)
     static char path[PATH_MAX] = "";
 
@@ -219,7 +215,7 @@ static char *config_GetAppDir (const char *xdg_name, const char *xdg_default)
 {
     char *psz_dir;
 #if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
-    const char *psz_parent = GetDir (true, false);
+    const char *psz_parent = GetDir (false);
 
     if( asprintf( &psz_dir, "%s" DIR_SEP CONFIG_DIR, psz_parent ) == -1 )
         psz_dir = NULL;
@@ -256,7 +252,7 @@ char *config_GetCacheDir( void )
 {
 #if defined(__APPLE__)
     char *psz_dir;
-    const char *psz_parent = GetDir (true, false);
+    const char *psz_parent = GetDir (false);
 
     if( asprintf( &psz_dir, "%s" DIR_SEP CACHES_DIR, psz_parent ) == -1 )
         psz_dir = NULL;
