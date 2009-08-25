@@ -219,6 +219,7 @@ static void init_xx44_palette( xx44_palette_t *p, unsigned num_entries )
 static void dispose_xx44_palette(xx44_palette_t *p)
 {
     /* Nothing to do */
+    VLC_UNUSED(p);
 }
 
 static void colorToPalette( const uint32_t *icolor, unsigned char *palette_p,
@@ -236,7 +237,7 @@ static void colorToPalette( const uint32_t *icolor, unsigned char *palette_p,
             case 'Y':
             default:  *palette_p = color->y; break;
         }
-        *palette_p++;
+        palette_p++;
     }
 }
 
@@ -309,6 +310,14 @@ void blend_xx44( uint8_t *dst_img, subpicture_t *sub_img,
                  int dst_width, int dst_height, int dst_pitch,
                  xx44_palette_t *palette, int ia44 )
 {
+    VLC_UNUSED(dst_img);
+    VLC_UNUSED(sub_img);
+    VLC_UNUSED(dst_width);
+    VLC_UNUSED(dst_height);
+    VLC_UNUSED(dst_pitch);
+    VLC_UNUSED(palette);
+    VLC_UNUSED(ia44);
+#if 0
     int src_width;
     int src_height;
     int mask;
@@ -322,7 +331,6 @@ void blend_xx44( uint8_t *dst_img, subpicture_t *sub_img,
     int clip_right;
     int i_len, i_color;
     uint16_t *p_source = NULL;
-#if 0
     if (!sub_img)
         return;
 
@@ -1245,6 +1253,8 @@ static int xxmc_xvmc_update_context( vout_thread_t *p_vout,
 void xxmc_do_update_frame( picture_t *picture, uint32_t width, uint32_t height,
         double ratio, int format, int flags)
 {
+    VLC_UNUSED(ratio);
+    VLC_UNUSED(flags);
     vout_thread_t *p_vout = picture->p_sys->p_vout;
     int indextime = 0;
     int status = 0;
