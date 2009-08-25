@@ -462,6 +462,8 @@ static block_t *GrabJack( demux_t *p_demux )
 
     if( i_read < 100 ) /* avoid small read */
     {   /* vlc has too much free time on its hands? */
+#undef msleep
+#warning Hmm.... looks wrong
         msleep(1000);
         return NULL;
     }
