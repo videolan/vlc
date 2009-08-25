@@ -152,7 +152,7 @@ X264CONF=--host=$(HOST)
 X264CONF += --enable-pic
 FFMPEGCONF += --cc=$(CC)
 FFMPEGCONF += --arch=$(ARCH)
-ifdef HAVE_DARWIN_10
+ifdef HAVE_DARWIN_64
 FFMPEGCONF += --cpu=core2
 X264CONF+=--host=x86_64-apple-darwin10
 endif
@@ -801,7 +801,7 @@ ifdef HAVE_WIN32
 THEORACONF += --disable-docs
 endif
 
-ifdef HAVE_DARWIN_10
+ifdef HAVE_DARWIN_64
 THEORACONF += --disable-asm
 endif
 ifdef HAVE_WIN64
@@ -1915,7 +1915,7 @@ glib-$(GLIB_VERSION).tar.bz2:
 glib: glib-$(GLIB_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
 	(cd $@; patch -p0 < ../Patches/glib-remove-gtkdoc.patch)
-ifdef HAVE_DARWIN_10
+ifdef HAVE_DARWIN_64
 	(cd $@; patch -p0 < ../Patches/glib-Darwin64.patch)
 endif
 
