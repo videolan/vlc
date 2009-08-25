@@ -5210,7 +5210,6 @@ AC_CONFIG_FILES([
   modules/stream_out/Makefile
   modules/video_chroma/Makefile
   modules/video_filter/Makefile
-  modules/video_filter/atmo/Makefile
   modules/video_filter/dynamicoverlay/Makefile
   modules/video_output/Makefile
   modules/video_output/msw/Makefile

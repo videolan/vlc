@@ -106,6 +106,7 @@ void CAtmoExternalCaptureInput::DeliverNewSourceDataPaket(BITMAPINFOHEADER *bmpI
         memcpy(m_pCurrentFramePixels,pixelData,PixelDataSize);
     }
 #if defined(_ATMO_VLC_PLUGIN_)
+#error This makes no sense!
    vlc_mutex_lock( &m_WakeupLock );
    vlc_cond_signal( &m_WakeupCond );
    vlc_mutex_unlock( &m_WakeupLock );
@@ -173,8 +174,10 @@ DWORD CAtmoExternalCaptureInput::Execute(void) {
 void CAtmoExternalCaptureInput::WaitForNextFrame(DWORD timeout)
 {
     this->m_FrameArrived = ATMO_FALSE;
+#error m_FrameArrived is not protected (no, volatile does not work)
     for(DWORD i=0;(i<timeout) && !m_FrameArrived;i++)
 #if defined (_ATMO_VLC_PLUGIN_)
+#error A condition variable or a semaphore is needed.
         msleep(1000);
 #else
         Sleep(1);

@@ -1,4 +1,4 @@
-SUBDIRS = atmo dynamicoverlay
+SUBDIRS = dynamicoverlay
 SOURCES_mosaic = mosaic.c mosaic.h
 SOURCES_transform = transform.c
 SOURCES_invert = invert.c
