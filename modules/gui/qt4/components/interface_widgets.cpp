@@ -175,6 +175,8 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
    Parent has to care about resizing itself */
 void VideoWidget::SetSizing( unsigned int w, unsigned int h )
 {
+    if (reparentable->windowState() & Qt::WindowFullScreen )
+        return;
     msg_Dbg( p_intf, "Video is resizing to: %i %i", w, h );
     videoSize.rwidth() = w;
     videoSize.rheight() = h;
@@ -215,8 +217,8 @@ void VideoWidget::SetFullScreen( bool b_fs )
 
         QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
 
-        reparentable->setWindowState( newstate );
         reparentable->setParent( NULL );
+        reparentable->setWindowState( newstate );
         reparentable->setWindowFlags( newflags );
         /* To be sure window is on proper-screen in xinerama */
         if( !screenres.contains( reparentable->pos() ) )
@@ -229,8 +231,8 @@ void VideoWidget::SetFullScreen( bool b_fs )
     else
     {   /* Go windowed */
         reparentable->setWindowFlags( newflags );
-        layout->addWidget( reparentable );
         reparentable->setWindowState( newstate );
+        layout->addWidget( reparentable );
     }
     videoSync();
 }
@@ -246,6 +248,7 @@ void VideoWidget::release( void )
     updateGeometry();
     hide();
 }
+
 
 QSize VideoWidget::sizeHint() const
 {
