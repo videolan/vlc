@@ -38,7 +38,7 @@
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 
-static void DoWork    ( aout_instance_t *, aout_buffer_t * );
+static void DoWork    ( aout_mixer_t *, aout_buffer_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -56,17 +56,17 @@ vlc_module_end ()
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    aout_mixer_t *p_mixer = (aout_mixer_t *)p_this;
 
-    if ( !AOUT_FMT_NON_LINEAR(&p_aout->mixer.mixer) )
+    if ( !AOUT_FMT_NON_LINEAR(&p_mixer->fmt) )
     {
         return -1;
     }
 
-    p_aout->mixer.pf_do_work = DoWork;
+    p_mixer->mix = DoWork;
     /* This is a bit kludgy - do not ask for a new buffer, since the one
      * provided by the first input will be good enough. */
-    p_aout->mixer.output_alloc.i_alloc_type = AOUT_ALLOC_NONE;
+    p_mixer->allocation.i_alloc_type = AOUT_ALLOC_NONE;
 
     return 0;
 }
@@ -74,25 +74,25 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * DoWork: mix a new output buffer - this does nothing, indeed
  *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
+static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t * p_buffer )
 {
     VLC_UNUSED( p_buffer );
 
-    int i = 0;
-    aout_input_t * p_input = p_aout->pp_inputs[i];
-    while ( p_input->b_error || p_input->b_paused )
-        p_input = p_aout->pp_inputs[++i];
+    unsigned i = 0;
+    aout_mixer_input_t * p_input = p_mixer->input[i];
+    while ( p_input->is_invalid )
+        p_input = p_mixer->input[++i];
 
-    aout_buffer_t * p_old_buffer = aout_FifoPop( p_aout, &p_input->fifo );
+    aout_buffer_t * p_old_buffer = aout_FifoPop( NULL, &p_input->fifo );
     aout_BufferFree( p_old_buffer );
 
     /* Empty other FIFOs to avoid a memory leak. */
-    for ( i++; i < p_aout->i_nb_inputs; i++ )
+    for ( i++; i < p_mixer->input_count; i++ )
     {
-        p_input = p_aout->pp_inputs[i];
-        if ( p_input->b_error || p_input->b_paused )
+        p_input = p_mixer->input[i];
+        if ( p_input->is_invalid )
             continue;
-        while ((p_old_buffer = aout_FifoPop( p_aout, &p_input->fifo )))
+        while ((p_old_buffer = aout_FifoPop( NULL, &p_input->fifo )))
             aout_BufferFree( p_old_buffer );
     }
 }

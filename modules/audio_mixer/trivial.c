@@ -39,7 +39,7 @@
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 
-static void DoWork    ( aout_instance_t *, aout_buffer_t * );
+static void DoWork    ( aout_mixer_t *, aout_buffer_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -57,15 +57,15 @@ vlc_module_end ()
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    aout_instance_t * p_aout = (aout_instance_t *)p_this;
+    aout_mixer_t *p_mixer = (aout_mixer_t *)p_this;
 
-    if ( p_aout->mixer.mixer.i_format != VLC_CODEC_FL32
-          && p_aout->mixer.mixer.i_format != VLC_CODEC_FI32 )
+    if ( p_mixer->fmt.i_format != VLC_CODEC_FL32
+          && p_mixer->fmt.i_format != VLC_CODEC_FI32 )
     {
         return -1;
     }
 
-    p_aout->mixer.pf_do_work = DoWork;
+    p_mixer->mix = DoWork;
 
     return 0;
 }
@@ -73,23 +73,23 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * DoWork: mix a new output buffer
  *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
+static void DoWork( aout_mixer_t *p_mixer, aout_buffer_t * p_buffer )
 {
-    int i = 0;
-    aout_input_t * p_input = p_aout->pp_inputs[i];
-    int i_nb_channels = aout_FormatNbChannels( &p_aout->mixer.mixer );
+    unsigned i = 0;
+    aout_mixer_input_t * p_input = p_mixer->input[i];
+    int i_nb_channels = aout_FormatNbChannels( &p_mixer->fmt );
     int i_nb_bytes = p_buffer->i_nb_samples * sizeof(int32_t)
                       * i_nb_channels;
     uint8_t * p_in;
     uint8_t * p_out;
 
-    while ( p_input->b_error || p_input->b_paused )
+    while ( p_input->is_invalid )
     {
-        p_input = p_aout->pp_inputs[++i];
+        p_input = p_mixer->input[++i];
         /* This can't crash because if no input has b_error == 0, the
          * audio mixer cannot run and we can't be here. */
     }
-    p_in = p_input->p_first_byte_to_mix;
+    p_in = p_input->begin;
     p_out = p_buffer->p_buffer;
 
     for ( ; ; )
@@ -109,11 +109,11 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
             p_out += i_available_bytes;
 
             /* Next buffer */
-            p_old_buffer = aout_FifoPop( p_aout, &p_input->fifo );
+            p_old_buffer = aout_FifoPop( NULL, &p_input->fifo );
             aout_BufferFree( p_old_buffer );
             if ( p_input->fifo.p_first == NULL )
             {
-                msg_Err( p_aout, "internal amix error" );
+                msg_Err( p_mixer, "internal amix error" );
                 return;
             }
             p_in = p_input->fifo.p_first->p_buffer;
@@ -121,19 +121,19 @@ static void DoWork( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
         else
         {
             vlc_memcpy( p_out, p_in, i_nb_bytes );
-            p_input->p_first_byte_to_mix = p_in + i_nb_bytes;
+            p_input->begin = p_in + i_nb_bytes;
             break;
         }
     }
 
     /* Empty other FIFOs to avoid a memory leak. */
-    for ( i++; i < p_aout->i_nb_inputs; i++ )
+    for ( i++; i < p_mixer->input_count; i++ )
     {
         aout_fifo_t * p_fifo;
         aout_buffer_t * p_deleted;
 
-        p_input = p_aout->pp_inputs[i];
-        if ( p_input->b_error || p_input->b_paused )
+        p_input = p_mixer->input[i];
+        if ( p_input->is_invalid )
             continue;
         p_fifo = &p_input->fifo;
         p_deleted = p_fifo->p_first;
