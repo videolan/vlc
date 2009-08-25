@@ -880,7 +880,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
 
     /* Get the IDirectDraw2 interface */
     dxresult = IDirectDraw_QueryInterface( p_ddobject, &IID_IDirectDraw2,
-                                        (LPVOID *)&p_vout->p_sys->p_ddobject );
+                                        &p_vout->p_sys->p_ddobject );
     /* Release the unused interface */
     IDirectDraw_Release( p_ddobject );
     if( dxresult != DD_OK )
@@ -969,7 +969,7 @@ static int DirectXCreateDisplay( vout_thread_t *p_vout )
 
     dxresult = IDirectDrawSurface_QueryInterface( p_display,
                                          &IID_IDirectDrawSurface2,
-                                         (LPVOID *)&p_vout->p_sys->p_display );
+                                         &p_vout->p_sys->p_display );
     /* Release the old interface */
     IDirectDrawSurface_Release( p_display );
     if ( dxresult != DD_OK )

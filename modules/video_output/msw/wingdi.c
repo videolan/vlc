@@ -802,7 +802,7 @@ static void InitBuffers( vout_thread_t *p_vout )
 
     p_vout->p_sys->off_bitmap =
         CreateDIBSection( window_dc, (BITMAPINFO *)p_header, DIB_RGB_COLORS,
-                          (void**)&p_vout->p_sys->p_pic_buffer, NULL, 0 );
+                          &p_vout->p_sys->p_pic_buffer, NULL, 0 );
 
     p_vout->p_sys->off_dc = CreateCompatibleDC( window_dc );
 

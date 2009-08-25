@@ -1375,7 +1375,7 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Update the vertex buffer */
-    hr = IDirect3DVertexBuffer9_Lock(p_d3dvtc, 0, 0, (VOID **)(&p_vertices), D3DLOCK_DISCARD);
+    hr = IDirect3DVertexBuffer9_Lock(p_d3dvtc, 0, 0, (&p_vertices), D3DLOCK_DISCARD);
     if( FAILED(hr) )
     {
         msg_Dbg( p_vout, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
