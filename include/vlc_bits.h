@@ -35,23 +35,23 @@ typedef struct bs_s
     uint8_t *p;
     uint8_t *p_end;
 
-    int     i_left;    /* i_count number of available bits */
+    ssize_t  i_left;    /* i_count number of available bits */
 } bs_t;
 
-static inline void bs_init( bs_t *s, void *p_data, int i_data )
+static inline void bs_init( bs_t *s, const void *p_data, size_t i_data )
 {
-    s->p_start = p_data;
-    s->p       = p_data;
-    s->p_end   = s->p + i_data;
+    s->p_start = (void *)p_data;
+    s->p       = s->p_start;
+    s->p_end   = s->p_start + i_data;
     s->i_left  = 8;
 }
 
-static inline int bs_pos( bs_t *s )
+static inline int bs_pos( const bs_t *s )
 {
     return( 8 * ( s->p - s->p_start ) + 8 - s->i_left );
 }
 
-static inline int bs_eof( bs_t *s )
+static inline int bs_eof( const bs_t *s )
 {
     return( s->p >= s->p_end ? 1: 0 );
 }
@@ -128,7 +128,7 @@ static inline uint32_t bs_show( bs_t *s, int i_count )
     return bs_read( &s_tmp, i_count );
 }
 
-static inline void bs_skip( bs_t *s, int i_count )
+static inline void bs_skip( bs_t *s, ssize_t i_count )
 {
     s->i_left -= i_count;
 
