@@ -652,7 +652,7 @@ static void* OSSThread( vlc_object_t *p_this )
             while( vlc_object_alive (p_aout) && ! ( p_buffer =
                 aout_OutputNextBuffer( p_aout, next_date, true ) ) )
             {
-                msleep( 1000 );
+                msleep( VLC_HARD_MIN_SLEEP );
                 next_date = mdate();
             }
         }
