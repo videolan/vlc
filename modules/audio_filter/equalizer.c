@@ -616,5 +616,6 @@ static int TwoPassCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     /* FIXME lock (same for all other callbacks) */
     p_sys->b_2eqz = newval.b_bool;
+    return VLC_SUCCESS;
 }
 
