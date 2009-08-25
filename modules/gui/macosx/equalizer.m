@@ -355,14 +355,6 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
         p_object = (vlc_object_t *)pl_Hold( p_intf );
 
     var_SetBool( p_object, "equalizer-2pass", b_2p );
-    if( ( [o_ckb_enable state] ) && ( p_aout != NULL ) )
-    {
-        int i;
-        for( i = 0; i < p_aout->i_nb_inputs; i++ )
-        {
-            p_aout->pp_inputs[i]->b_restart = true;
-        }
-    }
 
     if( (BOOL)config_GetInt( p_intf, "macosx-eq-keep" ) == YES )
     {
