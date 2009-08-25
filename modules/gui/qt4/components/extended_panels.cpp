@@ -952,18 +952,12 @@ void Equalizer::set2Pass()
     aout_instance_t *p_aout= THEMIM->getAout();
     bool b_2p = ui.eq2PassCheck->isChecked();
 
-    if( p_aout == NULL )
-        config_PutInt( p_intf, "equalizer-2pass", b_2p );
-    else
+    if( p_aout )
     {
         var_SetBool( p_aout, "equalizer-2pass", b_2p );
-        config_PutInt( p_intf, "equalizer-2pass", b_2p );
-        for( int i = 0; i < p_aout->i_nb_inputs; i++ )
-        {
-            p_aout->pp_inputs[i]->b_restart = true;
-        }
         vlc_object_release( p_aout );
     }
+    config_PutInt( p_intf, "equalizer-2pass", b_2p );
 }
 
 /* Function called when the preamp slider is moved */
