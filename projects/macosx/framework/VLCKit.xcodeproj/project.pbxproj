@@ -461,7 +461,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ncd ../../../extras/contrib && ./bootstrap";
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    cd ../../../extras/contrib && make clean\n    exit 0\nfi\nif test $ARCHS = \"x86_64\"\nthen\n    cd ../../../extras/contrib && ./bootstrap x86_64-apple-darwin10\nelse\n    cd ../../../extras/contrib && ./bootstrap\nfi";
 			showEnvVarsInLog = 0;
 		};
 		633BD6EB0D2ADF280012A314 /* ShellScript */ = {
@@ -475,7 +475,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\ncd ../../../extras/contrib && make";
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\nif test $ARCHS = \"x86_64\"\nthen\n    cd ../../../extras/contrib && make && ./bootstrap\nelse\n    cd ../../../extras/contrib && make\nfi";
 			showEnvVarsInLog = 0;
 		};
 		63FFDBCD0D2AE2AE0092FC96 /* ShellScript */ = {
@@ -561,7 +561,7 @@
 		1DEB91AE08733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				COPY_PHASE_STRIP = NO;
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
@@ -606,7 +606,7 @@
 		1DEB91AF08733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				DYLIB_COMPATIBILITY_VERSION = 1;
 				DYLIB_CURRENT_VERSION = 1;
 				FRAMEWORK_VERSION = A;
