@@ -781,7 +781,7 @@ loader:
     }
 
     i_err = GetClass( codecs_table[i_codec].p_guid, &IID_IClassFactory,
-                      (void**)&cFactory );
+                      &cFactory );
     if( i_err || cFactory == NULL )
     {
         msg_Dbg( p_this, "no such class object" );
@@ -790,7 +790,7 @@ loader:
     }
 
     i_err = cFactory->vt->CreateInstance( cFactory, 0, &IID_IUnknown,
-                                          (void**)&cObject );
+                                          &cObject );
     cFactory->vt->Release( (IUnknown*)cFactory );
     if( i_err || !cObject )
     {
@@ -799,7 +799,7 @@ loader:
         return VLC_EGENERIC;
     }
     i_err = cObject->vt->QueryInterface( cObject, &IID_IMediaObject,
-                                        (void**)pp_dmo );
+                                        pp_dmo );
     cObject->vt->Release( (IUnknown*)cObject );
     if( i_err || !*pp_dmo )
     {
@@ -1200,7 +1200,7 @@ static int EncoderSetVideoType( encoder_t *p_enc, IMediaObject *p_dmo )
 
         i_err = p_dmo->vt->QueryInterface( (IUnknown *)p_dmo,
                                            &IID_IWMCodecPrivateData,
-                                           (void **)&p_privdata );
+                                           &p_privdata );
         if( i_err ) break;
 
         i_err = p_privdata->vt->SetPartialOutputType( p_privdata, &dmo_type );
