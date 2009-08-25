@@ -74,9 +74,6 @@ case $HOST in
     *powerpc*|*ppc*)
          ARCH="ppc"
      ;;
-    *darwin10*)
-         ARCH="x86_64"
-     ;;
     *86_64*)
           ARCH="x86_64"
      ;;
@@ -113,24 +110,19 @@ case $HOST in
         echo "Compiling VLC requires 10.5.x or later" >&2
         exit 1
     ;;
-    powerpc-apple-darwin8)
-        echo "Your version of Mac OS X is too old!" >&2
-        echo "Compiling and running VLC requires 10.5.x or later" >&2
-        exit 1
-    ;;
-    i686-apple-darwin8)
+    *-apple-darwin8)
         echo "Your version of Mac OS X is too old!" >&2
         echo "Compiling and running VLC requires 10.5.x or later" >&2
         exit 1
     ;;
     powerpc-apple-darwin9)
-# Mac OS X 10.5 with Xcode 3, specific rules apply
         SDK_TARGET=10.5
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
         echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.5.sdk" >> config.mak
         echo "HAVE_DARWIN_9 = 1" >> config.mak
         HAVE_DARWIN_9=1
+        HAVE_DARWIN_32=1
         CFLAGS_TUNING=" -arch ppc -mtune=G4"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -arch ppc -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET} -Wl,-syslibroot,\${MACOSX_SDK}"
@@ -146,7 +138,7 @@ case $HOST in
             exit 1
         fi
     ;;
-    i686-apple-darwin9)
+    i686-apple-darwin*)
         SDK_TARGET=10.5
         MIN_LD_VERSION_WITH_TEXT_RELOCATION=81
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
@@ -159,7 +151,8 @@ case $HOST in
         fi
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
         echo "MACOSX_SDK = /Developer/SDKs/MacOSX10.5.sdk" >> config.mak
-        CFLAGS_TUNING=" -march=prescott -mtune=generic -arch i386"
+        HAVE_DARWIN_32=1
+        CFLAGS_TUNING=" -march=prescott -mtune=generic -arch i386 -m32"
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -arch i386 -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         CC="/Developer/usr/bin/gcc-4.2"
@@ -173,25 +166,25 @@ case $HOST in
             exit 1
         fi
     ;;
-    *-apple-darwin10)
+    x86_64-apple-darwin*)
         SDK_TARGET=10.5
         echo "SDK_TARGET = ${SDK_TARGET}" >> config.mak
         echo "HAVE_DARWIN_OS_ON_INTEL = 1" >> config.mak
         echo "HAVE_DARWIN_9 = 1" >> config.mak
-        echo "HAVE_DARWIN_10 = 1" >> config.mak
-        HAVE_DARWIN_10=1
         echo "ENVP = MACOSX_DEPLOYMENT_TARGET=${SDK_TARGET}" >> config.mak
         echo "MACOSX_SDK = /Developer/SDKs/MacOSX${SDK_TARGET}.sdk" >> config.mak
-        if test $ARCH = "x86_64"; then
-            CFLAGS_TUNING=" -march=core2 -mtune=core2"
-        else
-            CFLAGS_TUNING=" -march=prescott -mtune=core2"
-        fi
+        HAVE_DARWIN_64=1
+        CFLAGS_TUNING=" -march=core2 -mtune=core2 -m64 -arch x86_64"
+        echo "HAVE_DARWIN_64 = 1" >> config.mak
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
-        CC="gcc"
-        CXX="g++"
+        CC="/Developer/usr/bin/gcc-4.2"
+        CXX="/Developer/usr/bin/g++-4.2"
+        LD="ld"
+        RANLIB="ranlib"
+        AR="ar"
+        STRIP="strip"
         cat src/Distributions/darwin.mak >> distro.mak
         if test -e /Developer/SDKs; then
             echo "SDKs found. Everything is fine." >&2
@@ -364,13 +357,24 @@ if test $HAVE_DARWIN_9; then
     echo "*****************************************************************"
 fi
 
-if test $HAVE_DARWIN_10; then
+if test $HAVE_DARWIN_32; then
     set +x
     echo
     echo "*****************************************************************"
-    echo "* You are running Darwin 10.                                    *"
-    echo "* For testing purposes, VLC will be compiled in 64bit mode      *"
-    echo "* using the 10.5 SDK for backward-compatibility.                *"
+    echo "* VLC will be compiled in 32bit mode.                           *" 
+    echo "*                                                               *"
+    echo "* Re-run with the x86_64-apple-darwin* argument to turn on      *" 
+    echo "* 64bit compilation for Intel-based Macs, whereas * is either   *"
+    echo "* 9 or 10 depending on your Darwin version.                     *"
+    echo "* There is NO PPC64 support right now.                          *"
+    echo "*****************************************************************"
+fi
+
+if test $HAVE_DARWIN_64; then
+    set +x
+    echo
+    echo "*****************************************************************"
+    echo "* VLC will be compiled in 64bit mode using the 10.5 SDK.        *" 
     echo "*****************************************************************"
     set -x
 fi
