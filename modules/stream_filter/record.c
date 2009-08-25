@@ -177,7 +177,7 @@ static int Start( stream_t *s, const char *psz_extension )
     /* Retreive path */
     char *psz_path = var_CreateGetNonEmptyString( s, "input-record-path" );
     if( !psz_path )
-        psz_path = config_GetUserDir( VLC_HOME_DIR );
+        psz_path = config_GetUserDir( VLC_DOWNLOAD_DIR );
 
     if( !psz_path )
         return VLC_ENOMEM;

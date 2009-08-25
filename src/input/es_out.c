@@ -466,7 +466,8 @@ static int EsOutSetRecord(  es_out_t *out, bool b_record )
     {
         char *psz_path = var_CreateGetNonEmptyString( p_input, "input-record-path" );
         if( !psz_path )
-            psz_path = config_GetUserDir(VLC_HOME_DIR);
+            /* TODO: autoselect video or music dir ? */
+            psz_path = config_GetUserDir(VLC_DOWNLOAD_DIR);
 
         char *psz_sout = NULL;  // TODO conf
 

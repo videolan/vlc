@@ -271,7 +271,7 @@ static void Trigger (access_t *access)
         // and there is an off-by-one in the following sprintf().
         return;
 
-    char *dir = config_GetUserDir( VLC_HOME_DIR );
+    char *dir = config_GetUserDir( VLC_DOWNLOAD_DIR );
      if( dir == NULL )
          return;
 
