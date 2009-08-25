@@ -464,24 +464,11 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
         return;
     }
 
-    // Return if there is no media available or if the stream is not paused or 
-    // playing something else
-    if (!media || (![self isPlaying] && [self state] != VLCMediaPlayerStatePaused))
-        return;
-
-    // Should never get here.
-    if (!instance)
-        return;
-
-
     // Pause the stream
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     libvlc_media_player_pause( (libvlc_media_player_t *)instance, &ex );
     catch_exception( &ex );
-    
-    // TODO: Should we record the time in case the media instance is destroyed
-    // then rebuilt?
 }
 
 - (void)stop
@@ -495,11 +482,6 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
         [self performSelectorInBackground:@selector(stop) withObject:nil];
         return;
     }
-
-    // Return if there is no media available or if the system is not in play status 
-    // or pause status.
-    if (!media)
-        return;
     
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
