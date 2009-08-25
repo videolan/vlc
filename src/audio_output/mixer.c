@@ -27,9 +27,11 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <stddef.h>
 #include <vlc_common.h>
+#include <libvlc.h>
 
 #ifdef HAVE_ALLOCA_H
 #   include <alloca.h>
@@ -43,14 +45,38 @@
  *****************************************************************************/
 int aout_MixerNew( aout_instance_t * p_aout )
 {
-    p_aout->mixer.p_module = module_need( p_aout, "audio mixer", NULL, false );
-    if ( p_aout->mixer.p_module == NULL )
+    assert( !p_aout->p_mixer );
+    vlc_assert_locked( &p_aout->input_fifos_lock );
+
+    aout_mixer_t *p_mixer = vlc_object_create( p_aout, sizeof(*p_mixer) );
+    if( !p_mixer )
+        return VLC_EGENERIC;
+
+    p_mixer->fmt = p_aout->mixer_format;
+    p_mixer->allocation = p_aout->mixer_allocation;
+    p_mixer->multiplier = p_aout->mixer_multiplier;
+    p_mixer->input_count = p_aout->i_nb_inputs;
+    p_mixer->input = calloc( p_mixer->input_count, sizeof(*p_mixer->input) );
+    for( int i = 0; i < p_aout->i_nb_inputs; i++ )
+        p_mixer->input[i] = &p_aout->pp_inputs[i]->mixer;
+    p_mixer->mix = NULL;
+    p_mixer->sys = NULL;
+
+    vlc_object_attach( p_mixer, p_aout );
+
+    p_mixer->module = module_need( p_mixer, "audio mixer", NULL, false );
+    if( !p_mixer->module )
     {
         msg_Err( p_aout, "no suitable audio mixer" );
-        return -1;
+        vlc_object_detach( p_mixer );
+        free( p_mixer->input );
+        vlc_object_release( p_mixer );
+        return VLC_EGENERIC;
     }
-    p_aout->mixer.b_error = 0;
-    return 0;
+
+    /* */
+    p_aout->p_mixer = p_mixer;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -60,9 +86,17 @@ int aout_MixerNew( aout_instance_t * p_aout )
  *****************************************************************************/
 void aout_MixerDelete( aout_instance_t * p_aout )
 {
-    if ( p_aout->mixer.b_error ) return;
-    module_unneed( p_aout, p_aout->mixer.p_module );
-    p_aout->mixer.b_error = 1;
+    if( !p_aout->p_mixer )
+        return;
+
+    vlc_object_detach( p_aout->p_mixer );
+
+    module_unneed( p_aout->p_mixer, p_aout->p_mixer->module );
+
+    vlc_object_release( p_aout->p_mixer );
+
+    /* */
+    p_aout->p_mixer = NULL;
 }
 
 /*****************************************************************************
@@ -77,14 +111,14 @@ static int MixBuffer( aout_instance_t * p_aout )
     mtime_t start_date, end_date;
     date_t  exact_start_date;
 
-    if ( p_aout->mixer.b_error )
+    if( !p_aout->p_mixer )
     {
         /* Free all incoming buffers. */
         aout_lock_input_fifos( p_aout );
         for ( i = 0; i < p_aout->i_nb_inputs; i++ )
         {
             aout_input_t * p_input = p_aout->pp_inputs[i];
-            aout_buffer_t * p_buffer = p_input->fifo.p_first;
+            aout_buffer_t * p_buffer = p_input->mixer.fifo.p_first;
             if ( p_input->b_error ) continue;
             while ( p_buffer != NULL )
             {
@@ -127,7 +161,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         for ( i = 0; i < p_aout->i_nb_inputs; i++ )
         {
             aout_input_t * p_input = p_aout->pp_inputs[i];
-            aout_fifo_t * p_fifo = &p_input->fifo;
+            aout_fifo_t * p_fifo = &p_input->mixer.fifo;
             aout_buffer_t * p_buffer;
 
             if ( p_input->b_error || p_input->b_paused )
@@ -141,7 +175,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                 p_buffer = aout_FifoPop( p_aout, p_fifo );
                 aout_BufferFree( p_buffer );
                 p_buffer = p_fifo->p_first;
-                p_input->p_first_byte_to_mix = NULL;
+                p_input->mixer.begin = NULL;
             }
 
             if ( p_buffer == NULL )
@@ -171,12 +205,13 @@ static int MixBuffer( aout_instance_t * p_aout )
     for ( i = 0; i < p_aout->i_nb_inputs; i++ )
     {
         aout_input_t * p_input = p_aout->pp_inputs[i];
-        aout_fifo_t * p_fifo = &p_input->fifo;
+        aout_fifo_t * p_fifo = &p_input->mixer.fifo;
         aout_buffer_t * p_buffer;
         mtime_t prev_date;
         bool b_drop_buffers;
 
-        if ( p_input->b_error || p_input->b_paused )
+        p_input->mixer.is_invalid = p_input->b_error || p_input->b_paused;
+        if ( p_input->mixer.is_invalid )
         {
             if ( i_first_input == i ) i_first_input++;
             continue;
@@ -198,7 +233,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                       start_date - p_buffer->end_date );
             aout_BufferFree( p_buffer );
             p_fifo->p_first = p_buffer = p_next;
-            p_input->p_first_byte_to_mix = NULL;
+            p_input->mixer.begin = NULL;
         }
         if ( p_buffer == NULL )
         {
@@ -246,34 +281,34 @@ static int MixBuffer( aout_instance_t * p_aout )
         if ( p_buffer == NULL ) break;
 
         p_buffer = p_fifo->p_first;
-        if ( !AOUT_FMT_NON_LINEAR( &p_aout->mixer.mixer ) )
+        if ( !AOUT_FMT_NON_LINEAR( &p_aout->p_mixer->fmt ) )
         {
             /* Additionally check that p_first_byte_to_mix is well
              * located. */
             mtime_t i_nb_bytes = (start_date - p_buffer->start_date)
-                            * p_aout->mixer.mixer.i_bytes_per_frame
-                            * p_aout->mixer.mixer.i_rate
-                            / p_aout->mixer.mixer.i_frame_length
+                            * p_aout->p_mixer->fmt.i_bytes_per_frame
+                            * p_aout->p_mixer->fmt.i_rate
+                            / p_aout->p_mixer->fmt.i_frame_length
                             / 1000000;
             ptrdiff_t mixer_nb_bytes;
 
-            if ( p_input->p_first_byte_to_mix == NULL )
+            if ( p_input->mixer.begin == NULL )
             {
-                p_input->p_first_byte_to_mix = p_buffer->p_buffer;
+                p_input->mixer.begin = p_buffer->p_buffer;
             }
-            mixer_nb_bytes = p_input->p_first_byte_to_mix - p_buffer->p_buffer;
+            mixer_nb_bytes = p_input->mixer.begin - p_buffer->p_buffer;
 
-            if ( !((i_nb_bytes + p_aout->mixer.mixer.i_bytes_per_frame
+            if ( !((i_nb_bytes + p_aout->p_mixer->fmt.i_bytes_per_frame
                      > mixer_nb_bytes) &&
-                   (i_nb_bytes < p_aout->mixer.mixer.i_bytes_per_frame
+                   (i_nb_bytes < p_aout->p_mixer->fmt.i_bytes_per_frame
                      + mixer_nb_bytes)) )
             {
                 msg_Warn( p_aout, "mixer start isn't output start (%"PRId64")",
                           i_nb_bytes - mixer_nb_bytes );
 
                 /* Round to the nearest multiple */
-                i_nb_bytes /= p_aout->mixer.mixer.i_bytes_per_frame;
-                i_nb_bytes *= p_aout->mixer.mixer.i_bytes_per_frame;
+                i_nb_bytes /= p_aout->p_mixer->fmt.i_bytes_per_frame;
+                i_nb_bytes *= p_aout->p_mixer->fmt.i_bytes_per_frame;
                 if( i_nb_bytes < 0 )
                 {
                     /* Is it really the best way to do it ? */
@@ -284,7 +319,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                     break;
                 }
 
-                p_input->p_first_byte_to_mix = p_buffer->p_buffer + i_nb_bytes;
+                p_input->mixer.begin = p_buffer->p_buffer + i_nb_bytes;
             }
         }
     }
@@ -297,12 +332,12 @@ static int MixBuffer( aout_instance_t * p_aout )
     }
 
     /* Run the mixer. */
-    aout_BufferAlloc( &p_aout->mixer.output_alloc,
+    aout_BufferAlloc( &p_aout->p_mixer->allocation,
                       ((uint64_t)p_aout->output.i_nb_samples * 1000000)
                         / p_aout->output.output.i_rate,
                       /* This is a bit kludgy, but is actually only used
                        * for the S/PDIF dummy mixer : */
-                      p_aout->pp_inputs[i_first_input]->fifo.p_first,
+                      p_aout->pp_inputs[i_first_input]->mixer.fifo.p_first,
                       p_output_buffer );
     if ( p_output_buffer == NULL )
     {
@@ -310,17 +345,17 @@ static int MixBuffer( aout_instance_t * p_aout )
         return -1;
     }
     /* This is again a bit kludgy - for the S/PDIF mixer. */
-    if ( p_aout->mixer.output_alloc.i_alloc_type != AOUT_ALLOC_NONE )
+    if ( p_aout->p_mixer->allocation.i_alloc_type != AOUT_ALLOC_NONE )
     {
         p_output_buffer->i_nb_samples = p_aout->output.i_nb_samples;
         p_output_buffer->i_nb_bytes = p_aout->output.i_nb_samples
-                              * p_aout->mixer.mixer.i_bytes_per_frame
-                              / p_aout->mixer.mixer.i_frame_length;
+                              * p_aout->p_mixer->fmt.i_bytes_per_frame
+                              / p_aout->p_mixer->fmt.i_frame_length;
     }
     p_output_buffer->start_date = start_date;
     p_output_buffer->end_date = end_date;
 
-    p_aout->mixer.pf_do_work( p_aout, p_output_buffer );
+    p_aout->p_mixer->mix( p_aout->p_mixer, p_output_buffer );
 
     aout_unlock_input_fifos( p_aout );
 
@@ -347,20 +382,20 @@ void aout_MixerRun( aout_instance_t * p_aout )
  *****************************************************************************/
 int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier )
 {
-    float f_old = p_aout->mixer.f_multiplier;
-    bool b_new_mixer = 0;
+    float f_old = p_aout->mixer_multiplier;
+    bool b_new_mixer = false;
 
-    if ( !p_aout->mixer.b_error )
+    if ( p_aout->p_mixer )
     {
         aout_MixerDelete( p_aout );
-        b_new_mixer = 1;
+        b_new_mixer = true;
     }
 
-    p_aout->mixer.f_multiplier = f_multiplier;
+    p_aout->mixer_multiplier = f_multiplier;
 
     if ( b_new_mixer && aout_MixerNew( p_aout ) )
     {
-        p_aout->mixer.f_multiplier = f_old;
+        p_aout->mixer_multiplier = f_old;
         aout_MixerNew( p_aout );
         return -1;
     }
@@ -376,7 +411,7 @@ int aout_MixerMultiplierSet( aout_instance_t * p_aout, float f_multiplier )
  *****************************************************************************/
 int aout_MixerMultiplierGet( aout_instance_t * p_aout, float * pf_multiplier )
 {
-    *pf_multiplier = p_aout->mixer.f_multiplier;
+    *pf_multiplier = p_aout->mixer_multiplier;
     return 0;
 }
 

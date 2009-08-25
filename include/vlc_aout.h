@@ -174,25 +174,6 @@ typedef struct aout_alloc_t
 #define AOUT_ALLOC_STACK    1
 #define AOUT_ALLOC_HEAP     2
 
-/** audio output mixer */
-typedef struct aout_mixer_t
-{
-    audio_sample_format_t   mixer;
-    aout_alloc_t            output_alloc;
-
-    module_t *              p_module;
-    struct aout_mixer_sys_t * p_sys;
-    void                 (* pf_do_work)( struct aout_instance_t *,
-                                         struct aout_buffer_t * );
-
-    /** If b_error == 1, there is no mixer. */
-    bool              b_error;
-    /** Multiplier used to raise or lower the volume of the sound in
-     * software. Beware, this creates sound distortion and should be avoided
-     * as much as possible. This isn't available for non-float32 mixer. */
-    float                   f_multiplier;
-} aout_mixer_t;
-
 /** audio output buffer FIFO */
 struct aout_fifo_t
 {
@@ -200,6 +181,9 @@ struct aout_fifo_t
     aout_buffer_t **        pp_last;
     date_t                  end_date;
 };
+
+/* FIXME to remove once aout.h is cleaned a bit more */
+#include <vlc_aout_mixer.h>
 
 /* */
 typedef struct
@@ -266,12 +250,8 @@ struct aout_input_t
     mtime_t                 i_resamp_start_date;
     int                     i_resamp_start_drift;
 
-    aout_fifo_t             fifo;
-
     /* Mixer information */
-    uint8_t *               p_first_byte_to_mix;
     audio_replay_gain_t     replay_gain;
-    float                   f_multiplier;
 
     /* If b_restart == 1, the input pipeline will be re-created. */
     bool              b_restart;
@@ -295,6 +275,9 @@ struct aout_input_t
     /* */
     bool                b_recycle_vout;
     aout_request_vout_t request_vout;
+
+    /* */
+    aout_mixer_input_t mixer;
  };
 
 /** an output stream for the audio output */
@@ -351,7 +334,10 @@ struct aout_instance_t
     int                     i_nb_inputs;
 
     /* Mixer */
-    aout_mixer_t            mixer;
+    audio_sample_format_t   mixer_format;
+    aout_alloc_t            mixer_allocation;
+    float                   mixer_multiplier;
+    aout_mixer_t            *p_mixer;
 
     /* Output plug-in */
     aout_output_t           output;

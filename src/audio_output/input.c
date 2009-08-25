@@ -83,8 +83,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     p_input->i_nb_resamplers = p_input->i_nb_filters = 0;
 
     /* Prepare FIFO. */
-    aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer.mixer.i_rate );
-    p_input->p_first_byte_to_mix = NULL;
+    aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->p_mixer->fmt.i_rate );
+    p_input->mixer.begin = NULL;
 
     /* */
     if( p_request_vout )
@@ -98,10 +98,8 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     }
 
     /* Prepare format structure */
-    memcpy( &chain_input_format, &p_input->input,
-            sizeof(audio_sample_format_t) );
-    memcpy( &chain_output_format, &p_aout->mixer.mixer,
-            sizeof(audio_sample_format_t) );
+    chain_input_format  = p_input->input;
+    chain_output_format = p_aout->p_mixer->fmt;
     chain_output_format.i_rate = p_input->input.i_rate;
     aout_FormatPrepare( &chain_output_format );
 
@@ -419,12 +417,12 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     p_input->input_alloc.i_bytes_per_sec = -1;
 
     /* Create resamplers. */
-    if ( !AOUT_FMT_NON_LINEAR( &p_aout->mixer.mixer ) )
+    if ( !AOUT_FMT_NON_LINEAR( &p_aout->p_mixer->fmt ) )
     {
         chain_output_format.i_rate = (__MAX(p_input->input.i_rate,
-                                            p_aout->mixer.mixer.i_rate)
+                                            p_aout->p_mixer->fmt.i_rate)
                                  * (100 + AOUT_MAX_RESAMPLING)) / 100;
-        if ( chain_output_format.i_rate == p_aout->mixer.mixer.i_rate )
+        if ( chain_output_format.i_rate == p_aout->p_mixer->fmt.i_rate )
         {
             /* Just in case... */
             chain_output_format.i_rate++;
@@ -432,7 +430,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
         if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_resamplers,
                                          &p_input->i_nb_resamplers,
                                          &chain_output_format,
-                                         &p_aout->mixer.mixer ) < 0 )
+                                         &p_aout->p_mixer->fmt ) < 0 )
         {
             inputFailure( p_aout, p_input, "couldn't set a resampler pipeline");
             return -1;
@@ -500,7 +498,7 @@ int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
     aout_FiltersDestroyPipeline( p_aout, p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
     p_input->i_nb_resamplers = 0;
-    aout_FifoDestroy( p_aout, &p_input->fifo );
+    aout_FifoDestroy( p_aout, &p_input->mixer.fifo );
 
     return 0;
 }
@@ -530,18 +528,18 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
         /* A little trick to avoid loosing our input fifo and properties */
 
-        p_first_byte_to_mix = p_input->p_first_byte_to_mix;
-        fifo = p_input->fifo;
+        p_first_byte_to_mix = p_input->mixer.begin;
+        fifo = p_input->mixer.fifo;
         b_paused = p_input->b_paused;
         i_pause_date = p_input->i_pause_date;
 
-        aout_FifoInit( p_aout, &p_input->fifo, p_aout->mixer.mixer.i_rate );
+        aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->p_mixer->fmt.i_rate );
 
         aout_InputDelete( p_aout, p_input );
 
         aout_InputNew( p_aout, p_input, &p_input->request_vout );
-        p_input->p_first_byte_to_mix = p_first_byte_to_mix;
-        p_input->fifo = fifo;
+        p_input->mixer.begin = p_first_byte_to_mix;
+        p_input->mixer.fifo = fifo;
         p_input->b_paused = b_paused;
         p_input->i_pause_date = i_pause_date;
 
@@ -591,7 +589,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
      * this. We'll deal with that when pushing the buffer, and compensate
      * with the next incoming buffer. */
     aout_lock_input_fifos( p_aout );
-    start_date = aout_FifoNextStart( p_aout, &p_input->fifo );
+    start_date = aout_FifoNextStart( p_aout, &p_input->mixer.fifo );
     aout_unlock_input_fifos( p_aout );
 
     if ( start_date != 0 && start_date < mdate() )
@@ -602,8 +600,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "computed PTS is out of range (%"PRId64"), "
                   "clearing out", mdate() - start_date );
         aout_lock_input_fifos( p_aout );
-        aout_FifoSet( p_aout, &p_input->fifo, 0 );
-        p_input->p_first_byte_to_mix = NULL;
+        aout_FifoSet( p_aout, &p_input->mixer.fifo, 0 );
+        p_input->mixer.begin = NULL;
         aout_unlock_input_fifos( p_aout );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
@@ -632,8 +630,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         msg_Warn( p_aout, "audio drift is too big (%"PRId64"), clearing out",
                   start_date - p_buffer->start_date );
         aout_lock_input_fifos( p_aout );
-        aout_FifoSet( p_aout, &p_input->fifo, 0 );
-        p_input->p_first_byte_to_mix = NULL;
+        aout_FifoSet( p_aout, &p_input->mixer.fifo, 0 );
+        p_input->mixer.begin = NULL;
         aout_unlock_input_fifos( p_aout );
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
@@ -760,7 +758,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     p_buffer->start_date = start_date;
 
     aout_lock_input_fifos( p_aout );
-    aout_FifoPush( p_aout, &p_input->fifo, p_buffer );
+    aout_FifoPush( p_aout, &p_input->mixer.fifo, p_buffer );
     aout_unlock_input_fifos( p_aout );
     return 0;
 }
@@ -780,7 +778,7 @@ static void inputFailure( aout_instance_t * p_aout, aout_input_t * p_input,
                                  p_input->i_nb_filters );
     aout_FiltersDestroyPipeline( p_aout, p_input->pp_resamplers,
                                  p_input->i_nb_resamplers );
-    aout_FifoDestroy( p_aout, &p_input->fifo );
+    aout_FifoDestroy( p_aout, &p_input->mixer.fifo );
     var_Destroy( p_aout, "visual" );
     var_Destroy( p_aout, "equalizer" );
     var_Destroy( p_aout, "audio-filter" );
@@ -934,7 +932,8 @@ static int ReplayGainCallback( vlc_object_t *p_this, char const *psz_cmd,
         ReplayGainSelect( p_aout, p_aout->pp_inputs[i] );
 
     /* Restart the mixer (a trivial mixer may be in use) */
-    aout_MixerMultiplierSet( p_aout, p_aout->mixer.f_multiplier );
+    if( p_aout->p_mixer )
+        aout_MixerMultiplierSet( p_aout, p_aout->mixer_multiplier );
     aout_unlock_mixer( p_aout );
 
     return VLC_SUCCESS;
@@ -948,7 +947,7 @@ static void ReplayGainSelect( aout_instance_t *p_aout, aout_input_t *p_input )
     int i_use;
     float f_gain;
 
-    p_input->f_multiplier = 1.0;
+    p_input->mixer.multiplier = 1.0;
 
     if( !psz_replay_gain )
         return;
@@ -979,14 +978,14 @@ static void ReplayGainSelect( aout_instance_t *p_aout, aout_input_t *p_input )
         f_gain = var_GetFloat( p_aout, "audio-replay-gain-default" );
     else
         f_gain = 0.0;
-    p_input->f_multiplier = pow( 10.0, f_gain / 20.0 );
+    p_input->mixer.multiplier = pow( 10.0, f_gain / 20.0 );
 
     /* */
     if( p_input->replay_gain.pb_peak[i_use] &&
         var_GetBool( p_aout, "audio-replay-gain-peak-protection" ) &&
-        p_input->replay_gain.pf_peak[i_use] * p_input->f_multiplier > 1.0 )
+        p_input->replay_gain.pf_peak[i_use] * p_input->mixer.multiplier > 1.0 )
     {
-        p_input->f_multiplier = 1.0f / p_input->replay_gain.pf_peak[i_use];
+        p_input->mixer.multiplier = 1.0f / p_input->replay_gain.pf_peak[i_use];
     }
 
     free( psz_replay_gain );

@@ -79,7 +79,7 @@ int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
     }
 
     aout_lock_mixer( p_aout );
-    if ( !p_aout->mixer.b_error )
+    if ( p_aout->p_mixer )
     {
         i_result = p_aout->output.pf_volume_get( p_aout, pi_volume );
     }
@@ -110,11 +110,12 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
         return VLC_SUCCESS;
 
     int i_result = VLC_SUCCESS;
+
     aout_lock_mixer( p_aout );
-
-    if ( !p_aout->mixer.b_error )
+    aout_lock_input_fifos( p_aout );
+    if ( p_aout->p_mixer )
         i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
-
+    aout_unlock_input_fifos( p_aout );
     aout_unlock_mixer( p_aout );
 
     var_SetBool( p_aout, "intf-change", true );

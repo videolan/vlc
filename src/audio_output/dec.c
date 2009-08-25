@@ -112,7 +112,7 @@ static aout_input_t * DecNew( aout_instance_t * p_aout,
     p_aout->pp_inputs[p_aout->i_nb_inputs] = p_input;
     p_aout->i_nb_inputs++;
 
-    if ( p_aout->mixer.b_error )
+    if ( !p_aout->p_mixer )
     {
         int i;
 
@@ -379,7 +379,7 @@ void aout_DecChangePause( aout_instance_t *p_aout, aout_input_t *p_input, bool b
     if( i_duration != 0 )
     {
         aout_lock_mixer( p_aout );
-        for( aout_buffer_t *p = p_input->fifo.p_first; p != NULL; p = p->p_next )
+        for( aout_buffer_t *p = p_input->mixer.fifo.p_first; p != NULL; p = p->p_next )
         {
             p->start_date += i_duration;
             p->end_date += i_duration;
@@ -392,8 +392,8 @@ void aout_DecFlush( aout_instance_t *p_aout, aout_input_t *p_input )
 {
     aout_lock_input_fifos( p_aout );
 
-    aout_FifoSet( p_aout, &p_input->fifo, 0 );
-    p_input->p_first_byte_to_mix = NULL;
+    aout_FifoSet( p_aout, &p_input->mixer.fifo, 0 );
+    p_input->mixer.begin = NULL;
 
     aout_unlock_input_fifos( p_aout );
 }

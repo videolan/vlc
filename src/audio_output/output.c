@@ -170,28 +170,27 @@ int aout_OutputNew( aout_instance_t * p_aout,
     aout_FormatPrint( p_aout, "output", &p_aout->output.output );
 
     /* Calculate the resulting mixer output format. */
-    memcpy( &p_aout->mixer.mixer, &p_aout->output.output,
-            sizeof(audio_sample_format_t) );
+    p_aout->mixer_format = p_aout->output.output;
     if ( !AOUT_FMT_NON_LINEAR(&p_aout->output.output) )
     {
         /* Non-S/PDIF mixer only deals with float32 or fixed32. */
-        p_aout->mixer.mixer.i_format
+        p_aout->mixer_format.i_format
                      = (vlc_CPU() & CPU_CAPABILITY_FPU) ?
                         VLC_CODEC_FL32 : VLC_CODEC_FI32;
-        aout_FormatPrepare( &p_aout->mixer.mixer );
+        aout_FormatPrepare( &p_aout->mixer_format );
     }
     else
     {
-        p_aout->mixer.mixer.i_format = p_format->i_format;
+        p_aout->mixer_format.i_format = p_format->i_format;
     }
 
-    aout_FormatPrint( p_aout, "mixer", &p_aout->mixer.mixer );
+    aout_FormatPrint( p_aout, "mixer", &p_aout->mixer_format );
 
     /* Create filters. */
     p_aout->output.i_nb_filters = 0;
     if ( aout_FiltersCreatePipeline( p_aout, p_aout->output.pp_filters,
                                      &p_aout->output.i_nb_filters,
-                                     &p_aout->mixer.mixer,
+                                     &p_aout->mixer_format,
                                      &p_aout->output.output ) < 0 )
     {
         msg_Err( p_aout, "couldn't create audio output pipeline" );
@@ -200,15 +199,15 @@ int aout_OutputNew( aout_instance_t * p_aout,
     }
 
     /* Prepare hints for the buffer allocator. */
-    p_aout->mixer.output_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
-    p_aout->mixer.output_alloc.i_bytes_per_sec
-                        = p_aout->mixer.mixer.i_bytes_per_frame
-                           * p_aout->mixer.mixer.i_rate
-                           / p_aout->mixer.mixer.i_frame_length;
+    p_aout->mixer_allocation.i_alloc_type = AOUT_ALLOC_HEAP;
+    p_aout->mixer_allocation.i_bytes_per_sec
+                        = p_aout->mixer_format.i_bytes_per_frame
+                           * p_aout->mixer_format.i_rate
+                           / p_aout->mixer_format.i_frame_length;
 
     aout_FiltersHintBuffers( p_aout, p_aout->output.pp_filters,
                              p_aout->output.i_nb_filters,
-                             &p_aout->mixer.output_alloc );
+                             &p_aout->mixer_allocation );
 
     p_aout->output.b_error = 0;
     return 0;
@@ -350,7 +349,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
         aout_lock_input_fifos( p_aout );
         for ( i = 0; i < p_aout->i_nb_inputs; i++ )
         {
-            aout_fifo_t * p_fifo = &p_aout->pp_inputs[i]->fifo;
+            aout_fifo_t * p_fifo = &p_aout->pp_inputs[i]->mixer.fifo;
 
             aout_FifoMoveDates( p_aout, p_fifo, difference );
         }
