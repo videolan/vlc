@@ -260,6 +260,7 @@ void xx44_to_xvmc_palette( const xx44_palette_t *p,unsigned char *xvmc_palette,
     }
 }
 
+#if 0
 static int xx44_paletteIndex( xx44_palette_t *p, int color, uint32_t clut )
 {
     unsigned int i;
@@ -288,7 +289,9 @@ static int xx44_paletteIndex( xx44_palette_t *p, int color, uint32_t clut )
     p->lookup_cache[color] = p->max_used++;
     return p->lookup_cache[color];
 }
+#endif
 
+#if 0
 static void memblend_xx44( uint8_t *mem, uint8_t val,
                            size_t size, uint8_t mask )
 {
@@ -305,6 +308,7 @@ static void memblend_xx44( uint8_t *mem, uint8_t val,
         mem++;
     }
 }
+#endif
 
 void blend_xx44( uint8_t *dst_img, subpicture_t *sub_img,
                  int dst_width, int dst_height, int dst_pitch,
@@ -476,6 +480,7 @@ int xxmc_xvmc_surface_valid( vout_thread_t *p_vout, XvMCSurface *surf )
     return ret;
 }
 
+#if 0
 static void xxmc_xvmc_dump_subpictures( vout_thread_t *p_vout )
 {
     int i;
@@ -488,6 +493,7 @@ static void xxmc_xvmc_dump_subpictures( vout_thread_t *p_vout )
                          handler->subValid[i]);
     }
 }
+#endif
 
 XvMCSubpicture *xxmc_xvmc_alloc_subpicture( vout_thread_t *p_vout,
                     XvMCContext *context, unsigned short width,

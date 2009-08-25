@@ -116,8 +116,8 @@ static void ToggleCursor   ( vout_thread_t * );
 #if defined(MODULE_NAME_IS_xvmc)
 static int  XVideoGetPort    ( vout_thread_t *, vlc_fourcc_t, picture_heap_t * );
 static void RenderVideo    ( vout_thread_t *, picture_t * );
-static int  xvmc_check_yv12( Display *display, XvPortID port );
-static void xvmc_update_XV_DOUBLE_BUFFER( vout_thread_t *p_vout );
+//static int  xvmc_check_yv12( Display *display, XvPortID port );
+//static void xvmc_update_XV_DOUBLE_BUFFER( vout_thread_t *p_vout );
 #endif
 
 static int X11ErrorHandler( Display *, XErrorEvent * );
@@ -480,6 +480,7 @@ void Deactivate ( vlc_object_t *p_this )
 #define XINE_IMGFMT_YV12 (('2'<<24)|('1'<<16)|('V'<<8)|'Y')
 
 /* called xlocked */
+#if 0
 static int xvmc_check_yv12( Display *display, XvPortID port )
 {
     XvImageFormatValues *formatValues;
@@ -501,12 +502,16 @@ static int xvmc_check_yv12( Display *display, XvPortID port )
     XFree (formatValues);
     return 1;
 }
+#endif
 
+#if 0
 static void xvmc_sync_surface( vout_thread_t *p_vout, XvMCSurface * srf )
 {
     XvMCSyncSurface( p_vout->p_sys->p_display, srf );
 }
+#endif
 
+#if 0
 static void xvmc_update_XV_DOUBLE_BUFFER( vout_thread_t *p_vout )
 {
     Atom         atom;
@@ -525,6 +530,7 @@ static void xvmc_update_XV_DOUBLE_BUFFER( vout_thread_t *p_vout )
     //xprintf(this->xine, XINE_VERBOSITY_DEBUG,
     //    "video_out_xxmc: double buffering mode = %d\n", xv_double_buffer);
 }
+#endif
 
 static void RenderVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
