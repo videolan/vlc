@@ -1,3 +1,4 @@
+
 /*****************************************************************************
  * dictionary.c: Tests for vlc_dictionary_t
  *****************************************************************************
@@ -36,7 +37,7 @@ static void test_dictionary_validity (vlc_dictionary_t * p_dict, const char ** o
 {
     /* Test values and keys now */
     char ** keys = vlc_dictionary_all_keys( p_dict );
-    int i, j;
+    long i, j;
 
     assert( keys );
 
@@ -57,7 +58,7 @@ static void test_dictionary_validity (vlc_dictionary_t * p_dict, const char ** o
     free( keys );
 
     for( i = 0; i < size; i++ )
-        assert( vlc_dictionary_value_for_key( p_dict, our_keys[i] ) == (void*)i );
+        assert( vlc_dictionary_value_for_key( p_dict, our_keys[i] ) == (void *)i );
 }
 
 int main (void)
@@ -67,7 +68,7 @@ int main (void)
     };
     const int size = sizeof(our_keys)/sizeof(our_keys[0]);
     char ** keys;
-    int i = 0;
+    long i = 0;
 
     vlc_dictionary_t dict;
     vlc_dictionary_init( &dict, 0 );
@@ -81,7 +82,7 @@ int main (void)
 
     /* Insert some values */
     for( i = 0; i < size; i++ )
-        vlc_dictionary_insert( &dict, our_keys[i], (void*)i );
+        vlc_dictionary_insert( &dict, our_keys[i], (void *)i );
 
     test_dictionary_validity( &dict, our_keys, size );
 
