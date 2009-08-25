@@ -488,8 +488,8 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n\trm -Rf $SYMROOT/vlc_build_dir\n     exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir && $top_srcdir/configure --disable-nls --enable-debug --with-macosx-sdk=$SDKROOT\n";
+			shellPath = /bin/tcsh;
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    rm -Rf $SYMROOT/vlc_build_dir\n    exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nif test $ARCHS = \"x86_64\"\nthen\n    setenv CFLAGS -m64\n    setenv CXXFLAGS -m64\n    setenv CPPFLAGS -m64\n    setenv OBJCFLAGS -m64\nfi\nif test $ARCHS = \"i386\"\nthen\n    setenv CFLAGS -m32\n    setenv CXXFLAGS -m32\n    setenv CPPFLAGS -m32\n    setenv OBJCFLAGS -m32\nfi\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir && $top_srcdir/configure --disable-nls --enable-debug --with-macosx-sdk=$SDKROOT\n";
 			showEnvVarsInLog = 0;
 		};
 		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
@@ -650,7 +650,7 @@
 		1DEB91B208733DA50010E9CD /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				GCC_ENABLE_OBJC_GC = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
@@ -662,7 +662,7 @@
 		1DEB91B308733DA50010E9CD /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(NATIVE_ARCH)";
+				ARCHS = "$(NATIVE_ARCH_ACTUAL)";
 				GCC_ENABLE_OBJC_GC = YES;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
