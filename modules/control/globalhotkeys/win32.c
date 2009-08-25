@@ -292,8 +292,8 @@ LRESULT CALLBACK WMHOTKEYPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
             {
                 char psz_atomName[40];
 
-                intf_thread_t *p_intf =
-                    (intf_thread_t*)GetWindowLongPtr( hwnd, GWLP_USERDATA );
+                LONG_PTR ret = GetWindowLongPtr( hwnd, GWLP_USERDATA );
+                intf_thread_t *p_intf = (intf_thread_t*)ret;
                 struct hotkey *p_hotkeys = p_intf->p_libvlc->p_hotkeys;
 
                 if( !GlobalGetAtomNameA(
