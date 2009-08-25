@@ -267,6 +267,7 @@ static void Destroy( vlc_object_t *p_this )
 
 static int Manage( vout_thread_t *p_vout )
 {
+    VLC_UNUSED(p_vout);
     return VLC_SUCCESS;
 }
 
