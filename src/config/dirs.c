@@ -244,6 +244,111 @@ static char *config_GetAppDir (const char *xdg_name, const char *xdg_default)
     return psz_dir;
 }
 
+static char *config_GetTypeDir (const char *xdg_name)
+{
+#if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
+    (void)xdg_name;
+    return config_GetAppDir (NULL, NULL);
+#else
+    const size_t namelen = strlen (xdg_name);
+    const char *home = getenv ("HOME");
+    const size_t homelen = strlen (home);
+    const char *dir = getenv ("XDG_CONFIG_HOME");
+    const char *file = "user-dirs.dirs";
+
+    if (home == NULL)
+        return NULL;
+    if (dir == NULL)
+    {
+        dir = home;
+        file = ".config/user-dirs.dirs";
+    }
+
+    char *path;
+    if (asprintf (&path, "%s/%s", dir, file) == -1)
+        return NULL;
+
+    FILE *stream = fopen (path, "rt");
+    free (path);
+    if (stream == NULL)
+        return NULL;
+
+    char *linebuf = NULL;
+    size_t linelen = 0;
+
+    while (getline (&linebuf, &linelen, stream) != -1)
+    {
+        char *ptr = linebuf;
+        ptr += strspn (ptr, " \t"); /* Skip whites */
+        if (strncmp (ptr, "XDG_", 4))
+            continue;
+        ptr += 4; /* Skip XDG_ */
+        if (strncmp (ptr, xdg_name, namelen))
+            continue;
+        ptr += namelen; /* Skip XDG type name */
+        if (strncmp (ptr, "_DIR", 4))
+            continue;
+        ptr += 4; /* Skip _DIR */
+        ptr += strspn (ptr, " \t"); /* Skip whites */
+        if (*ptr != '=')
+            continue;
+        ptr++; /* Skip equality sign */
+        ptr += strspn (ptr, " \t"); /* Skip whites */
+        if (*ptr != '"')
+            continue;
+        ptr++; /* Skip quote */
+        linelen -= ptr - linebuf;
+
+        char *out;
+        if (strncmp (ptr, "$HOME", 5))
+        {
+            path = malloc (linelen);
+            if (path == NULL)
+                continue;
+            out = path;
+        }
+        else
+        {   /* Prefix with $HOME */
+            ptr += 5;
+            path = malloc (homelen + linelen - 5);
+            if (path == NULL)
+                continue;
+            memcpy (path, home, homelen);
+            out = path + homelen;
+        }
+
+        while (*ptr != '"')
+        {
+            if (*ptr == '\\')
+                ptr++;
+            if (*ptr == '\0')
+                goto skip;
+            *(out++) = *(ptr++);
+        }
+        *out = '\0';
+        goto done;
+    skip:
+        free (path);
+    }
+
+    /* Default! */
+    if (strcmp (xdg_name, "DESKTOP") == 0)
+    {
+        if (asprintf (&path, "%s/Desktop", home) == -1)
+            path = NULL;
+    }
+    else
+        path = strdup (home);
+
+done:
+    free (linebuf);
+    char *ret = FromLocaleDup (path);
+    free (path);
+    return ret;
+#endif
+}
+
+
 /**
  * Get the user's VLC cache directory
  * (used for stuff like the modules cache, the album art cache, ...)
@@ -273,6 +378,22 @@ char *config_GetUserDir (vlc_userdir_t type)
             return config_GetAppDir ("CONFIG", ".config");
         case VLC_DATA_DIR:
             return config_GetAppDir ("DATA", ".local/share");
+        case VLC_DESKTOP_DIR:
+            return config_GetTypeDir ("DESKTOP");
+        case VLC_DOWNLOAD_DIR:
+            return config_GetTypeDir ("DOWNLOAD");
+        case VLC_TEMPLATES_DIR:
+            return config_GetTypeDir ("TEMPLATES");
+        case VLC_PUBLICSHARE_DIR:
+            return config_GetTypeDir ("PUBLICSHARE");
+        case VLC_DOCUMENTS_DIR:
+            return config_GetTypeDir ("DOCUMENTS");
+        case VLC_MUSIC_DIR:
+            return config_GetTypeDir ("MUSIC");
+        case VLC_PICTURES_DIR:
+            return config_GetTypeDir ("PICTURES");
+        case VLC_VIDEOS_DIR:
+            return config_GetTypeDir ("VIDEOS");
     }
     assert (0);
 }
