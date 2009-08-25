@@ -2105,11 +2105,11 @@ then
         VLC_ADD_LIBS([opencv_example],[-L${with_opencv_tree}/lib -lcv -lcxcore -lcvaux -lhighgui])
         VLC_ADD_CXXFLAGS([opencv_example],[-I${with_opencv_tree}/cv/include -I${with_opencv_tree}/cxcore/include -I${with_opencv_tree}/cvaux/include -I${with_opencv_tree}/otherlibs/highgui])
         AC_LANG_POP(C++)
-	  else
+      else
         dnl  No opencv could be found, sorry
         AC_MSG_RESULT(no)
         AC_MSG_ERROR([cannot find opencv in ${with_opencv_tree}])
-	  fi
+      fi
     else
       PKG_CHECK_MODULES(OPENCV, opencv,
         [
@@ -3733,7 +3733,7 @@ fi
 dnl
 dnl  libxml2 module
 dnl
-PKG_ENABLE_MODULES_VLC([libxml2], [], [libxml-2.0 >= 2.5], [libxml2 support],[auto])
+PKG_ENABLE_MODULES_VLC([libxml2], [xml], [libxml-2.0 >= 2.5], [libxml2 support],[auto])
 
 dnl
 dnl  SVG module
