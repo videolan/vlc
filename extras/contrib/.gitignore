@@ -16,6 +16,7 @@ etc
 gecko-sdk
 doc
 info
+Sparkle
 *.bak
 # Ignore fetched contrib
 src/*
