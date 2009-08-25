@@ -135,6 +135,8 @@ static int PreampCallback( vlc_object_t *, char const *,
                                            vlc_value_t, vlc_value_t, void * );
 static int BandsCallback ( vlc_object_t *, char const *,
                                            vlc_value_t, vlc_value_t, void * );
+static int TwoPassCallback( vlc_object_t *, char const *,
+                                           vlc_value_t, vlc_value_t, void * );
 
 
 
@@ -405,6 +407,7 @@ static int EqzInit( aout_filter_t *p_filter, int i_rate )
     var_AddCallback( p_aout, "equalizer-preset", PresetCallback, p_sys );
     var_AddCallback( p_aout, "equalizer-bands", BandsCallback, p_sys );
     var_AddCallback( p_aout, "equalizer-preamp", PreampCallback, p_sys );
+    var_AddCallback( p_aout, "equalizer-2pass", TwoPassCallback, p_sys );
 
     msg_Dbg( p_filter, "equalizer loaded for %d Hz with %d bands %d pass",
                         i_rate, p_sys->i_band, p_sys->b_2eqz ? 2 : 1 );
@@ -488,6 +491,8 @@ static void EqzClean( aout_filter_t *p_filter )
                         "equalizer-preset", PresetCallback, p_sys );
     var_DelCallback( (aout_instance_t *)p_filter->p_parent,
                         "equalizer-preamp", PreampCallback, p_sys );
+    var_DelCallback( (aout_instance_t *)p_filter->p_parent,
+                        "equalizer-2pass", TwoPassCallback, p_sys );
 
     free( p_sys->f_alpha );
     free( p_sys->f_beta );
@@ -602,5 +607,14 @@ static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
         p = &psz_next[1];
     }
     return VLC_SUCCESS;
+}
+static int TwoPassCallback( vlc_object_t *p_this, char const *psz_cmd,
+                            vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
+
+    /* FIXME lock (same for all other callbacks) */
+    p_sys->b_2eqz = newval.b_bool;
 }
 
