@@ -139,15 +139,6 @@ DWORD CAtmoExternalCaptureInput::Execute(void)
           i++;
           if(i == 100) {
              i = 0;
-#if !defined(WIN32)
-/* kludge for pthreads? using the same condition variable too often results in hanging the pthread
-   call inside vlc_cond_timedwait...
-*/
-#ifdef _ATMO_KLUDGE_
-             vlc_cond_destroy( &m_WakeupCond );
-             vlc_cond_init( &m_WakeupCond );
-#endif
-#endif
           }
     }
     vlc_mutex_unlock( &m_WakeupLock );
