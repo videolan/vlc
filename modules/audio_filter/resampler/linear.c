@@ -145,7 +145,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i_chan, i_in, i_out = 0;
 
     /* Check if we really need to run the resampler */
-    if( p_aout->mixer.mixer.i_rate == p_filter->input.i_rate )
+    if( p_aout->mixer_format.i_rate == p_filter->input.i_rate )
     {
         if( p_filter->b_continuity &&
             p_in_buf->i_size >=

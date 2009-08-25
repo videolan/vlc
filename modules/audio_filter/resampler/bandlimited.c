@@ -196,7 +196,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     if( p_sys->b_filter2 )
         i_out_rate = p_filter->output.i_rate;
     else
-        i_out_rate = p_aout->mixer.mixer.i_rate;
+        i_out_rate = p_aout->mixer_format.i_rate;
 
     /* Check if we really need to run the resampler */
     if( i_out_rate == p_filter->input.i_rate )
