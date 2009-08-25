@@ -82,7 +82,13 @@ static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abor
 
     /* We owned this one */
     input_Stop( p_input_thread, b_input_abort );
+
     vlc_thread_join( p_input_thread );
+
+    assert( p_mi->p_input_resource == NULL );
+    assert( p_input_thread->b_dead );
+    /* Store the input resource for future use. */
+    p_mi->p_input_resource = input_DetachResource( p_input_thread );
 
     var_Destroy( p_input_thread, "drawable-hwnd" );
     var_Destroy( p_input_thread, "drawable-xid" );
@@ -288,6 +294,7 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
     p_mi->drawable.nsobject = NULL;
     p_mi->p_libvlc_instance = p_libvlc_instance;
     p_mi->p_input_thread = NULL;
+    p_mi->p_input_resource = NULL;
     p_mi->i_refcount = 1;
     vlc_mutex_init( &p_mi->object_lock );
     p_mi->p_event_manager = libvlc_event_manager_new( p_mi,
@@ -382,8 +389,14 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int,
                      "vout-snapshottaken", SnapshotTakenCallback, p_mi );
 
-    /* Realease the input thread */
+    /* Release the input thread */
     release_input_thread( p_mi, true );
+
+    if( p_mi->p_input_resource )
+    {
+        input_resource_Delete( p_mi->p_input_resource );
+        p_mi->p_input_resource = NULL;    
+    }
 
     libvlc_event_manager_release( p_mi->p_event_manager );
     libvlc_media_release( p_mi->p_md );
@@ -553,7 +566,7 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
     }
 
     p_mi->p_input_thread = input_Create( p_mi->p_libvlc_instance->p_libvlc_int,
-                                         p_mi->p_md->p_input_item, NULL, NULL );
+                                         p_mi->p_md->p_input_item, NULL, p_mi->p_input_resource );
 
     if( !p_mi->p_input_thread )
     {
@@ -561,6 +574,7 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
         return;
     }
 
+    p_mi->p_input_resource = NULL;
     p_input_thread = p_mi->p_input_thread;
 
     var_Create( p_input_thread, "drawable-agl", VLC_VAR_INTEGER );

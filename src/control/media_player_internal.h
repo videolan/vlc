@@ -32,12 +32,14 @@
 #include <vlc/vlc.h>
 #include <vlc/libvlc_structures.h>
 #include <vlc/libvlc_media.h>
+#include <vlc_input.h>
 
 struct libvlc_media_player_t
 {
     int                i_refcount;
     vlc_mutex_t        object_lock;
     input_thread_t *   p_input_thread;
+	input_resource_t * p_input_resource;
     struct libvlc_instance_t * p_libvlc_instance; /* Parent instance */
     libvlc_media_t * p_md; /* current media descriptor */
     libvlc_event_manager_t * p_event_manager;

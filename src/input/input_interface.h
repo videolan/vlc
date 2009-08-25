@@ -47,11 +47,6 @@ int input_Preparse( vlc_object_t *, input_item_t * );
 input_stats_t *stats_NewInputStats( input_thread_t *p_input );
 
 /**
- * This function releases an input_resource_t and all associated resources.
- */
-void input_resource_Delete( input_resource_t * );
-
-/**
  * This function deletes the current sout in the resources.
  */
 void input_resource_TerminateSout( input_resource_t *p_resource );
@@ -69,15 +64,6 @@ void input_resource_TerminateVout( input_resource_t *p_resource );
 bool input_resource_HasVout( input_resource_t *p_resource );
 
 /* input.c */
-
-/**
- * This function detaches resources from a dead input.
- *
- * It MUST be called on a dead input (p_input->b_dead true) otherwise
- * it will assert.
- * It does not support concurrent calls.
- */
-input_resource_t *input_DetachResource( input_thread_t * );
 
 /* */
 typedef enum
