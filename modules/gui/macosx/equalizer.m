@@ -99,14 +99,7 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
          }
     }
 
-    var_SetString( p_object, "audio-filter", psz_string );
-    if( p_aout )
-    {
-        for( i = 0; i < p_aout->i_nb_inputs; i++ )
-        {
-            p_aout->pp_inputs[i]->b_restart = true;
-        }
-    }
+    aout_EnableFilter( p_object, psz_string, false);
     
     if( (BOOL)config_GetInt( p_object, "macosx-eq-keep" ) == YES )
     {
