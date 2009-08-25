@@ -267,7 +267,7 @@ bool VLMDialog::exportVLMConf()
 {
     QString saveVLMConfFileName = QFileDialog::getSaveFileName( this,
                                         qtr( "Save VLM configuration as..." ),
-                                        QVLCUserDir( VLC_HOME_DIR ),
+                                        QVLCUserDir( VLC_DOCUMENTS_DIR ),
                                         qtr( "VLM conf (*.vlm);;All (*)" ) );
 
     if( !saveVLMConfFileName.isEmpty() )
@@ -339,7 +339,7 @@ bool VLMDialog::importVLMConf()
     QString openVLMConfFileName = toNativeSeparators(
             QFileDialog::getOpenFileName(
             this, qtr( "Open VLM configuration..." ),
-            QVLCUserDir( VLC_HOME_DIR ),
+            QVLCUserDir( VLC_DOCUMENTS_DIR ),
             qtr( "VLM conf (*.vlm);;All (*)" ) ) );
 
     if( !openVLMConfFileName.isEmpty() )
