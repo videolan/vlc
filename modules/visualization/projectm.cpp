@@ -318,7 +318,7 @@ static void* Thread( vlc_object_t *p_this )
         vlc_mutex_unlock( &p_thread->lock );
 
         /* TODO: use a fps limiter */
-        msleep( 1000 );
+        msleep( 10000 );
     }
 
 

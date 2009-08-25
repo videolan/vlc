@@ -176,7 +176,7 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
 
     /* Wait a tad so the meta has been fetched
      * FIXME that's awfully wrong */
-    msleep( 1000*4 );
+    msleep( 10000 );
 
     /* Playing something ... */
     input_item_t *p_input_item = input_GetItem( p_input );

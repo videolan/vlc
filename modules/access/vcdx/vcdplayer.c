@@ -550,7 +550,7 @@ vcdplayer_pbc_nav ( access_t * p_access, uint8_t *wait_time )
           return READ_BLOCK;
         } else if (p_vcdplayer->i_still) {
           /* Hack: Just go back and do still again */
-          msleep(1000);
+          msleep(10000);
           return READ_STILL_FRAME;
         }
       }
