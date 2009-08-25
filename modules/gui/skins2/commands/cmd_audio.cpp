@@ -30,37 +30,7 @@
 
 void CmdSetEqualizer::execute()
 {
-    aout_instance_t *pAout = NULL;
-
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-    input_thread_t *pInput = playlist_CurrentInput( pPlaylist );
-    if( pInput )
-        pAout = input_GetAout( pInput );
-
-    // XXX
-    string filters;
-    if( m_enable)
-    {
-        filters = "equalizer";
-    }
-
-    if( pAout )
-    {
-        var_SetString( pAout, "audio-filter", (char*)filters.c_str() );
-        for( int i = 0; i < pAout->i_nb_inputs; i++ )
-        {
-            pAout->pp_inputs[i]->b_restart = true;
-        }
-    }
-    else
-    {
-        config_PutPsz( getIntf(), "audio-filter", filters.c_str() );
-    }
-
-    if( pAout )
-        vlc_object_release( pAout );
-    if( pInput )
-        vlc_object_release( pInput );
+    aout_EnableFilter( getIntf(), "equalizer", m_enable );
 }
 
 void CmdVolumeChanged::execute()
