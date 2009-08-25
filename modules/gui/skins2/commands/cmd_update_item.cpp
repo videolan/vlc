@@ -39,38 +39,38 @@ void CmdUpdateItem::execute()
     if( pPlaylist == NULL )
         return;
 
-	input_thread_t *p_input = playlist_CurrentInput( pPlaylist );
+    input_thread_t *p_input = playlist_CurrentInput( pPlaylist );
     if( !p_input )
         return;
 
-	// Get playlist item information
-	input_item_t *pItem = input_GetItem( p_input );
+    // Get playlist item information
+    input_item_t *pItem = input_GetItem( p_input );
 
     char *pszName = input_item_GetName( pItem );
     char *pszUri = input_item_GetURI( pItem );
 
-	string name = pszName;
-	// XXX: This should be done in VLC core, not here...
-	// Remove path information if any
-	OSFactory *pFactory = OSFactory::instance( getIntf() );
-	string::size_type pos = name.rfind( pFactory->getDirSeparator() );
-	if( pos != string::npos )
-	{
-		name = name.substr( pos + 1, name.size() - pos + 1 );
-	}
-	UString srcName( getIntf(), name.c_str() );
-	UString srcURI( getIntf(), pszUri );
+    string name = pszName;
+    // XXX: This should be done in VLC core, not here...
+    // Remove path information if any
+    OSFactory *pFactory = OSFactory::instance( getIntf() );
+    string::size_type pos = name.rfind( pFactory->getDirSeparator() );
+    if( pos != string::npos )
+    {
+        name = name.substr( pos + 1, name.size() - pos + 1 );
+    }
+    UString srcName( getIntf(), name.c_str() );
+    UString srcURI( getIntf(), pszUri );
 
     free( pszName );
     free( pszUri );
 
-   // Create commands to update the stream variables
-	CmdSetText *pCmd1 = new CmdSetText( getIntf(), m_rStreamName, srcName );
-	CmdSetText *pCmd2 = new CmdSetText( getIntf(), m_rStreamURI, srcURI );
-	// Push the commands in the asynchronous command queue
-	AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
-	pQueue->push( CmdGenericPtr( pCmd1 ), false );
-	pQueue->push( CmdGenericPtr( pCmd2 ), false );
-	vlc_object_release( p_input );
+    // Create commands to update the stream variables
+    CmdSetText *pCmd1 = new CmdSetText( getIntf(), m_rStreamName, srcName );
+    CmdSetText *pCmd2 = new CmdSetText( getIntf(), m_rStreamURI, srcURI );
+    // Push the commands in the asynchronous command queue
+    AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
+    pQueue->push( CmdGenericPtr( pCmd1 ), false );
+    pQueue->push( CmdGenericPtr( pCmd2 ), false );
+    vlc_object_release( p_input );
 }
 
