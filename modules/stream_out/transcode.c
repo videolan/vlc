@@ -2093,7 +2093,11 @@ static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
         {
             /* Encoder still has stuff to encode, wait to clear-up the list */
             while( p_ssys->i_first_pic == i_first_pic )
-                msleep( 5000 );
+            {
+#warning THERE IS A DEFINITELY BUG! LOCKING IS INSUFFICIENT!
+                msleep( 10000 );
+                barrier ();
+            }
         }
     }
 
