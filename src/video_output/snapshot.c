@@ -131,7 +131,7 @@ void vout_snapshot_Set(vout_snapshot_t *snap,
 /* */
 char *vout_snapshot_GetDirectory(void)
 {
-    return config_GetUserDir(VLC_HOME_DIR);
+    return config_GetUserDir(VLC_PICTURES_DIR);
 }
 /* */
 int vout_snapshot_SaveImage(char **name, int *sequential,

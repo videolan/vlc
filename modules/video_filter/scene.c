@@ -193,7 +193,7 @@ static int Create( vlc_object_t *p_this )
     p_sys->psz_prefix = var_CreateGetString( p_this, CFG_PREFIX "prefix" );
     p_sys->psz_path = var_GetNonEmptyString( p_this, CFG_PREFIX "path" );
     if( p_sys->psz_path == NULL )
-        p_sys->psz_path = config_GetUserDir( VLC_HOME_DIR );
+        p_sys->psz_path = config_GetUserDir( VLC_PICTURES_DIR );
 
     p_filter->pf_video_filter = Filter;
 
