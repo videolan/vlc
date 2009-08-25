@@ -32,7 +32,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
 #include <vlc_vout_window.h>
@@ -116,7 +115,6 @@ static void ToggleCursor   ( vout_thread_t * );
 
 #if defined(MODULE_NAME_IS_xvmc)
 static int  XVideoGetPort    ( vout_thread_t *, vlc_fourcc_t, picture_heap_t * );
-static void XVideoReleasePort( vout_thread_t *, int );
 static void RenderVideo    ( vout_thread_t *, picture_t * );
 static int  xvmc_check_yv12( Display *display, XvPortID port );
 static void xvmc_update_XV_DOUBLE_BUFFER( vout_thread_t *p_vout );
@@ -2062,14 +2060,6 @@ static int XVideoGetPort( vout_thread_t *p_vout,
     }
 
     return i_selected_port;
-}
-
-/*****************************************************************************
- * XVideoReleasePort: release YUV12 port
- *****************************************************************************/
-static void XVideoReleasePort( vout_thread_t *p_vout, int i_port )
-{
-    XvUngrabPort( p_vout->p_sys->p_display, i_port, CurrentTime );
 }
 #endif
 
