@@ -87,6 +87,59 @@ struct aout_filter_owner_sys_t
     aout_input_t    *p_input;
 };
 
+/** an input stream for the audio output */
+struct aout_input_t
+{
+    /* When this lock is taken, the pipeline cannot be changed by a
+     * third-party. */
+    vlc_mutex_t             lock;
+
+    audio_sample_format_t   input;
+    aout_alloc_t            input_alloc;
+
+    /* pre-filters */
+    aout_filter_t *         pp_filters[AOUT_MAX_FILTERS];
+    int                     i_nb_filters;
+
+    aout_filter_t *         p_playback_rate_filter;
+
+    /* resamplers */
+    aout_filter_t *         pp_resamplers[AOUT_MAX_FILTERS];
+    int                     i_nb_resamplers;
+    int                     i_resampling_type;
+    mtime_t                 i_resamp_start_date;
+    int                     i_resamp_start_drift;
+
+    /* Mixer information */
+    audio_replay_gain_t     replay_gain;
+
+    /* If b_restart == 1, the input pipeline will be re-created. */
+    bool              b_restart;
+
+    /* If b_error == 1, there is no input pipeline. */
+    bool              b_error;
+
+    /* Did we just change the output format? (expect buffer inconsistencies) */
+    bool              b_changed;
+
+    /* last rate from input */
+    int               i_last_input_rate;
+
+    /* */
+    int               i_buffer_lost;
+
+    /* */
+    bool              b_paused;
+    mtime_t           i_pause_date;
+
+    /* */
+    bool                b_recycle_vout;
+    aout_request_vout_t request_vout;
+
+    /* */
+    aout_mixer_input_t mixer;
+ };
+
 /****************************************************************************
  * Prototypes
  *****************************************************************************/
