@@ -161,6 +161,10 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define QT_FULLSCREEN_TEXT N_( "Show a controller in fullscreen mode" )
 #define QT_NATIVEOPEN_TEXT N_( "Embed the file browser in open dialog" )
 
+#define FULLSCREEN_NUMBER_TEXT N_( "Define which screen fullscreen goes" )
+#define FULLSCREEN_NUMBER_LONGTEXT N_( "Screennumber of fullscreen, instead of" \
+                                       "same screen where interface is" )
+
 /* Various modes definition */
 static const int i_mode_list[] =
     { QT_NORMAL_MODE, QT_ALWAYS_VIDEO_MODE, QT_MINIMAL_MODE };
@@ -232,6 +236,9 @@ vlc_module_begin ()
     add_bool( "qt-privacy-ask", true, NULL, PRIVACY_TEXT, PRIVACY_TEXT,
               false )
         change_internal ()
+
+    add_integer( "qt-fullscreen-screennumber", -1, NULL, FULLSCREEN_NUMBER_TEXT,
+               FULLSCREEN_NUMBER_LONGTEXT, false );
 
     add_obsolete_bool( "qt-blingbling" ) /* Suppressed since 1.0.0 */
 

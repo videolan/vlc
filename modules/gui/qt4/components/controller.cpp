@@ -711,7 +711,9 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
 
     /* First Move */
     QPoint pos1 = getSettings()->value( "FullScreen/pos" ).toPoint();
-    int number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+    int number =  config_GetInt( p_intf, "qt-fullscreen-screennumber" );
+    if( number == -1 || number > QApplication::desktop()->numScreens() )
+        number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
     if( QApplication::desktop()->screenGeometry( number ).contains( pos1, true ) )
     {
         move( pos1 );

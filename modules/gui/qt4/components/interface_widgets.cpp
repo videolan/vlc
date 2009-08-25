@@ -205,7 +205,14 @@ void VideoWidget::SetFullScreen( bool b_fs )
 
     if( b_fs )
     {   /* Go full-screen */
-        int numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+        int numscreen =  config_GetInt( p_intf, "qt-fullscreen-screennumber" );
+        /* if user hasn't defined screennumber, or screennumber that is bigger
+         * than current number of screens, take screennumber where current interface
+         * is
+         */
+        if( numscreen == -1 || numscreen > QApplication::desktop()->numScreens() )
+            numscreen = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
+
         QRect screenres = QApplication::desktop()->screenGeometry( numscreen );
 
         reparentable->setWindowState( newstate );
