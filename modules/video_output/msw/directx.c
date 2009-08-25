@@ -722,9 +722,9 @@ static void FirstDisplay( vout_thread_t *p_vout, picture_t *p_pic )
 
     if( p_vout->p_sys->b_using_overlay )
     {
+        HBRUSH brush = CreateSolidBrush( p_vout->p_sys->i_rgb_colorkey );
         /* set the colorkey as the backgound brush for the video window */
-        SetClassLongPtr( p_vout->p_sys->hvideownd, GCLP_HBRBACKGROUND,
-                      (LONG_PTR)CreateSolidBrush( p_vout->p_sys->i_rgb_colorkey ) );
+        SetClassLongPtr( p_vout->p_sys->hvideownd, GCLP_HBRBACKGROUND, (LONG_PTR)brush );
     }
     /*
     ** Video window is initially hidden, show it now since we got a
