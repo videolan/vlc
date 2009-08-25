@@ -1396,7 +1396,6 @@ static int Mux( sout_mux_t *p_mux )
             block_FifoEmpty( p_mux->pp_inputs[i]->p_fifo );
         }
         msg_Dbg( p_mux, "waiting for PCR streams" );
-        msleep( 1000 );
         return VLC_SUCCESS;
     }
     p_pcr_stream = (ts_stream_t*)p_sys->p_pcr_input->p_sys;
