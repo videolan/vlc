@@ -1016,7 +1016,8 @@ AC_ARG_ENABLE(warnings-as-error,
 AS_IF([test "${enable_warnings_as_error}" = "yes"], [
     RDC_PROG_CC_WERRORFLAGS([unused-function unused-label unused-value unused-parameter unused-variable unused \
      missing-braces nonnull parentheses uninitialized address enum-compare undef comment switch \
-     bad-function-cast ignored])
+     bad-function-cast implicit sequence-point return-type strict-aliasing array-bounds missing-parameter-type \
+     overflow int-to-pointer-cast pointer-to-int-cast div-by-zero overflow ignored])
 ])
 AC_SUBST(CFLAGS_WERROR)
 
