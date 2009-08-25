@@ -280,8 +280,8 @@ static void Run( intf_thread_t *p_intf )
                 if (net_errno != EINTR)
                 {
                     msg_Err (p_intf, "network poll error");
-                    msleep (1000);
-                    continue;
+                    pause (); /* We are screwed! */
+                    break;
                 }
             case 0:
                 continue;
