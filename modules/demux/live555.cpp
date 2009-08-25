@@ -1284,10 +1284,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     time = f * (double)p_sys->i_npt_length;   /* in second */
                 }
 
-                if( !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) ||
-                    !p_sys->rtsp->playMediaSession( *p_sys->ms, time, -1, 1 ) )
+                if( !p_sys->b_paused && !p_sys->rtsp->pauseMediaSession( *p_sys->ms ))
                 {
-                    msg_Err( p_demux, "PLAY failed %s",
+                    msg_Err( p_demux, "PAUSE before seek failed failed %s",
+                        p_sys->env->getResultMsg() );
+                    return VLC_EGENERIC;
+                }
+                if( !p_sys->rtsp->playMediaSession( *p_sys->ms, time, -1, 1 ) )
+                {
+                    msg_Err( p_demux, "seek PLAY failed %s",
                         p_sys->env->getResultMsg() );
                     return VLC_EGENERIC;
                 }
@@ -1402,19 +1407,20 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         case DEMUX_SET_PAUSE_STATE:
         {
             int i;
-
-            p_sys->b_paused = (bool)va_arg( args, int );
+            bool b_pause = (bool)va_arg( args, int );
             if( p_sys->rtsp == NULL )
                 return VLC_EGENERIC;
 
-            /* FIXME */
-            if( ( p_sys->b_paused && !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) ) ||
-                    ( !p_sys->b_paused && !p_sys->rtsp->playMediaSession( *p_sys->ms,
+            if( b_pause == p_sys->b_paused )
+                return VLC_SUCCESS;
+            if( ( b_pause && !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) ) ||
+                    ( !b_pause && !p_sys->rtsp->playMediaSession( *p_sys->ms,
                        -1 ) ) )
             {
                     msg_Err( p_demux, "PLAY or PAUSE failed %s", p_sys->env->getResultMsg() );
                     return VLC_EGENERIC;
             }
+            p_sys->b_paused = b_pause;
 
             /* When we Pause, we'll need the TimeoutPrevention thread to
              * handle sending the "Keep Alive" message to the server.
