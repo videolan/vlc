@@ -23,12 +23,13 @@
 
 #include "cmd_dvd.hpp"
 #include <vlc_input.h>
+#include <vlc_playlist.h>
 
 void CmdDvdNextTitle::execute()
 {
-    input_thread_t *p_input =
-        (input_thread_t *)vlc_object_find( getIntf(), VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    input_thread_t *p_input = playlist_CurrentInput( pPlaylist );
+
     if( p_input )
     {
         var_TriggerCallback( p_input, "next-title" );
@@ -39,9 +40,9 @@ void CmdDvdNextTitle::execute()
 
 void CmdDvdPreviousTitle::execute()
 {
-    input_thread_t *p_input =
-        (input_thread_t *)vlc_object_find( getIntf(), VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    input_thread_t *p_input = playlist_CurrentInput( pPlaylist );
+
     if( p_input )
     {
         var_TriggerCallback( p_input, "prev-title" );
@@ -52,9 +53,9 @@ void CmdDvdPreviousTitle::execute()
 
 void CmdDvdNextChapter::execute()
 {
-    input_thread_t *p_input =
-        (input_thread_t *)vlc_object_find( getIntf(), VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    input_thread_t *p_input = playlist_CurrentInput( pPlaylist );
+
     if( p_input )
     {
         var_TriggerCallback( p_input, "next-chapter" );
@@ -65,9 +66,9 @@ void CmdDvdNextChapter::execute()
 
 void CmdDvdPreviousChapter::execute()
 {
-    input_thread_t *p_input =
-        (input_thread_t *)vlc_object_find( getIntf(), VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    input_thread_t *p_input = playlist_CurrentInput( pPlaylist );
+
     if( p_input )
     {
         var_TriggerCallback( p_input, "prev-chapter" );
@@ -78,9 +79,9 @@ void CmdDvdPreviousChapter::execute()
 
 void CmdDvdRootMenu::execute()
 {
-    input_thread_t *p_input =
-        (input_thread_t *)vlc_object_find( getIntf(), VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    input_thread_t *p_input = playlist_CurrentInput( pPlaylist );
+
     if( p_input )
     {
         vlc_value_t val;

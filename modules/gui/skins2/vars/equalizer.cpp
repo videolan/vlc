@@ -26,6 +26,8 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_playlist.h>
+#include <vlc_input.h>
 #include <vlc_aout.h>
 #include "equalizer.hpp"
 #include "../utils/var_percent.hpp"
@@ -81,6 +83,13 @@ VariablePtr EqualizerBands::getBand( int band )
 
 void EqualizerBands::onUpdate( Subject<VarPercent> &rBand, void *arg )
 {
+    aout_instance_t *pAout = NULL;
+
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    input_thread_t *pInput = playlist_CurrentInput( pPlaylist );
+    if( pInput )
+        pAout = input_GetAout( pInput );
+
     // Make sure we are not called from set()
     if (!m_isUpdating)
     {
@@ -98,18 +107,20 @@ void EqualizerBands::onUpdate( Subject<VarPercent> &rBand, void *arg )
             ss << " " << val;
         }
 
-
         string bands = ss.str();
-        aout_instance_t *pAout = (aout_instance_t *)vlc_object_find( getIntf(),
-                VLC_OBJECT_AOUT, FIND_ANYWHERE );
+
         config_PutPsz( getIntf(), "equalizer-bands", bands.c_str() );
         if( pAout )
         {
             // Update the audio output
             var_SetString( pAout, "equalizer-bands", (char*)bands.c_str() );
-            vlc_object_release( pAout );
         }
     }
+
+    if( pAout )
+        vlc_object_release( pAout );
+    if( pInput )
+        vlc_object_release( pInput );
 }
 
 
@@ -122,6 +133,13 @@ EqualizerPreamp::EqualizerPreamp( intf_thread_t *pIntf ): VarPercent( pIntf )
 
 void EqualizerPreamp::set( float percentage, bool updateVLC )
 {
+    aout_instance_t *pAout = NULL;
+
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    input_thread_t *pInput = playlist_CurrentInput( pPlaylist );
+    if( pInput )
+        pAout = input_GetAout( pInput );
+
     VarPercent::set( percentage );
 
     // Avoid infinite loop
@@ -129,14 +147,16 @@ void EqualizerPreamp::set( float percentage, bool updateVLC )
     {
         float val = 40 * percentage - 20;
 
-        aout_instance_t *pAout = (aout_instance_t *)vlc_object_find( getIntf(),
-                                VLC_OBJECT_AOUT, FIND_ANYWHERE );
         config_PutFloat( getIntf(), "equalizer-preamp", val );
         if( pAout )
         {
             // Update the audio output
             var_SetFloat( pAout, "equalizer-preamp", val );
-            vlc_object_release( pAout );
         }
     }
+
+    if( pAout )
+        vlc_object_release( pAout );
+    if( pInput )
+        vlc_object_release( pInput );
 }

@@ -79,9 +79,9 @@ void CmdStop::execute()
 
 void CmdSlower::execute()
 {
-    input_thread_t *pInput =
-        (input_thread_t *)vlc_object_find( getIntf(), VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    input_thread_t *pInput = playlist_CurrentInput( pPlaylist );
+
     if( pInput )
     {
         vlc_value_t val;
@@ -95,9 +95,9 @@ void CmdSlower::execute()
 
 void CmdFaster::execute()
 {
-    input_thread_t *pInput =
-        (input_thread_t *)vlc_object_find( getIntf(), VLC_OBJECT_INPUT,
-                                           FIND_ANYWHERE );
+    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
+    input_thread_t *pInput = playlist_CurrentInput( pPlaylist );
+
     if( pInput )
     {
         vlc_value_t val;
