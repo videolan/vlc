@@ -125,6 +125,9 @@ static int Open( vlc_object_t *p_this )
     // Create a variable to be notified of skins to be loaded
     var_Create( p_intf, "skin-to-load", VLC_VAR_STRING );
 
+    vlc_mutex_init( &p_intf->p_sys->vout_lock );
+    vlc_cond_init( &p_intf->p_sys->vout_wait );
+
     vlc_mutex_init( &p_intf->p_sys->init_lock );
     vlc_cond_init( &p_intf->p_sys->init_wait );
 
@@ -135,8 +138,11 @@ static int Open( vlc_object_t *p_this )
                                VLC_THREAD_PRIORITY_LOW ) )
     {
         vlc_mutex_unlock( &p_intf->p_sys->init_lock );
+
         vlc_cond_destroy( &p_intf->p_sys->init_wait );
         vlc_mutex_destroy( &p_intf->p_sys->init_lock );
+        vlc_cond_destroy( &p_intf->p_sys->vout_wait );
+        vlc_mutex_destroy( &p_intf->p_sys->vout_lock );
         pl_Release( p_intf->p_sys->p_playlist );
         free( p_intf->p_sys );
         return VLC_EGENERIC;
@@ -149,9 +155,6 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_lock( &skin_load.mutex );
     skin_load.intf = p_intf;
     vlc_mutex_unlock( &skin_load.mutex );
-
-    vlc_mutex_init( &p_intf->p_sys->vout_lock );
-    vlc_cond_init( &p_intf->p_sys->vout_wait );
 
     return VLC_SUCCESS;
 }
@@ -358,14 +361,17 @@ static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 // Callbacks for vout requests
 static int WindowOpen( vlc_object_t *p_this )
 {
+    int i_ret;
     vout_window_t *pWnd = (vout_window_t *)p_this;
-    intf_thread_t *pIntf = (intf_thread_t *)
-        vlc_object_find_name( p_this, "skins2", FIND_ANYWHERE );
+
+    vlc_mutex_lock( &skin_load.mutex );
+    intf_thread_t *pIntf = skin_load.intf;
+    if( pIntf )
+        vlc_object_hold( pIntf );
+    vlc_mutex_unlock( &skin_load.mutex );
 
     if( pIntf == NULL )
         return VLC_EGENERIC;
-
-    vlc_object_release( pIntf );
 
     vlc_mutex_lock( &serializer );
 
@@ -373,13 +379,15 @@ static int WindowOpen( vlc_object_t *p_this )
 
     if( pWnd->handle.hwnd )
     {
-        pWnd->sys = (vout_window_sys_t*)pIntf;
         pWnd->control = &VoutManager::controlWindow;
+        pWnd->sys = (vout_window_sys_t*)pIntf;
+
         vlc_mutex_unlock( &serializer );
         return VLC_SUCCESS;
     }
     else
     {
+        vlc_object_release( pIntf );
         vlc_mutex_unlock( &serializer );
         return VLC_EGENERIC;
     }
@@ -391,6 +399,8 @@ static void WindowClose( vlc_object_t *p_this )
     intf_thread_t *pIntf = (intf_thread_t *)pWnd->sys;
 
     VoutManager::releaseWindow( pIntf, pWnd );
+
+    vlc_object_release( pIntf );
 }
 
 //---------------------------------------------------------------------------

@@ -972,11 +972,10 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
         /* In skins interface, append some items */
         if( !mi )
         {
-
-            vlc_object_t *p_object = ( vlc_object_t* )
-                vlc_object_find_name( p_intf, "skins2", FIND_PARENT );
-            if( p_object )
+            if( p_intf->p_sys->b_isDialogProvider )
             {
+                vlc_object_t* p_object = p_intf->p_parent;
+
                 objects.clear(); varnames.clear();
                 objects.push_back( p_object );
                 varnames.push_back( "intf-skins" );
@@ -986,8 +985,6 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 objects.push_back( p_object );
                 varnames.push_back( "intf-skins-interactive" );
                 Populate( p_intf, submenu, varnames, objects );
-
-                vlc_object_release( p_object );
             }
             else
                 msg_Warn( p_intf, "could not find parent interface" );
