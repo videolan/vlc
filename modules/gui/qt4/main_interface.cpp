@@ -362,6 +362,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         }
         CONNECT( THEMIM->getIM(), statusChanged( int ), this, changeThumbbarButtons( int ) );
     }
+    else
+    {
+        himl = NULL;
+        p_taskbl = NULL;
+    }
 #endif
 
 }
@@ -383,7 +388,8 @@ MainInterface::~MainInterface()
     }
 
 #ifdef WIN32
-    ImageList_Destroy( himl );
+    if( himl )
+        ImageList_Destroy( himl );
     if(p_taskbl)
         p_taskbl->vt->Release(p_taskbl);
     CoUninitialize();
