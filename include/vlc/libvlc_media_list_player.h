@@ -45,6 +45,16 @@ extern "C" {
 
 typedef struct libvlc_media_list_player_t libvlc_media_list_player_t;
 
+/*
+ *  Defines playback modes for playlist.
+ */
+typedef enum libvlc_playback_mode_t
+{
+    libvlc_playback_mode_default,
+    libvlc_playback_mode_loop,
+    libvlc_playback_mode_repeat
+} libvlc_playback_mode_t;
+
 /**
  * Create new media_list_player.
  *
@@ -172,7 +182,30 @@ VLC_PUBLIC_API void
     libvlc_media_list_player_next( libvlc_media_list_player_t * p_mlp,
                                    libvlc_exception_t * p_e );
 
-/* NOTE: shouldn't there also be a libvlc_media_list_player_prev() */
+/**
+ * Play previous item from media list
+ *
+ * \param p_mlp media list player instance
+ * \param p_e initialized exception instance
+ */
+VLC_PUBLIC_API void
+    libvlc_media_list_player_previous( libvlc_media_list_player_t * p_mlp,
+                                       libvlc_exception_t * p_e );
+
+
+
+/**
+ * Sets the playback mode for the playlist
+ *
+ * \param p_mlp media list player instance
+ * \param e_mode playback mode specification
+ * \param p_e initialized exception instance
+ */
+VLC_PUBLIC_API void
+    libvlc_media_list_player_set_playback_mode( 
+                                        libvlc_media_list_player_t * p_mlp,
+                                        libvlc_playback_mode_t e_mode,
+                                        libvlc_exception_t * p_e );
 
 /** @} media_list_player */
 
