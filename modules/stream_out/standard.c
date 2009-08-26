@@ -102,6 +102,9 @@ vlc_module_begin ()
     set_capability( "sout stream", 50 )
     add_shortcut( "standard" )
     add_shortcut( "std" )
+    add_shortcut( "file" )
+    add_shortcut( "http" )
+    add_shortcut( "udp" )
     set_category( CAT_SOUT )
     set_subcategory( SUBCAT_SOUT_STREAM )
 
@@ -167,7 +170,7 @@ static int Open( vlc_object_t *p_this )
     sout_stream_sys_t   *p_sys;
 
     char *psz_mux;
-    char *psz_access;
+    char *psz_access=NULL;
     char *psz_url=NULL;
     char *psz_bind;
     char *psz_path;
@@ -182,9 +185,29 @@ static int Open( vlc_object_t *p_this )
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
 
+    if( !strcmp( p_stream->psz_name, "http" ) )
+    {
+        psz_access = strdup("http");
+    }
+    else if (!strcmp (p_stream->psz_name, "udp"))
+    {
+        psz_access = strdup("udp");
+    }
+    else if (!strcmp (p_stream->psz_name, "file"))
+    {
+        psz_access = strdup("file");
+    }
+
     var_Get( p_stream, SOUT_CFG_PREFIX "access", &val );
-    psz_access = *val.psz_string ? val.psz_string : NULL;
-    if( !*val.psz_string ) free( val.psz_string );
+    if( *val.psz_string )
+    {
+        free( psz_access );
+        psz_access = val.psz_string;
+    }
+    else
+    {
+        free( val.psz_string );
+    }
 
     var_Get( p_stream, SOUT_CFG_PREFIX "mux", &val );
     psz_mux = *val.psz_string ? val.psz_string : NULL;
