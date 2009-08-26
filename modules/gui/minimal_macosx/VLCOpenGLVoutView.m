@@ -80,6 +80,9 @@ void cocoaglvoutviewEnd( vout_thread_t * p_vout )
 {
     id <VLCOpenGLVoutEmbedding> o_cocoaglview_container;
 
+    if (!p_vout->p_sys->o_glview)
+        return;
+
     msg_Dbg( p_vout, "Mac OS X Vout is closing" );
     var_Destroy( p_vout, "drawable-nsobject" );
 
@@ -89,15 +92,15 @@ void cocoaglvoutviewEnd( vout_thread_t * p_vout )
     [p_vout->p_sys->o_glview detachFromVout];
     msg_Dbg( p_vout, "Mac OS X Vout is closing" );
 
-    /* Let the view go, _without_blocking_ */
-    [p_vout->p_sys->o_glview performSelectorOnMainThread:@selector(removeFromSuperview) withObject:NULL waitUntilDone:NO];
-
     if( [(id)o_cocoaglview_container respondsToSelector:@selector(removeVoutSubview:)] )
-        [o_cocoaglview_container removeVoutSubview: p_vout->p_sys->o_glview];
+        [o_cocoaglview_container performSelectorOnMainThread:@selector(removeVoutSubview:) withObject:p_vout->p_sys->o_glview waitUntilDone:NO];
 
-    [p_vout->p_sys->o_glview release];
+    /* Let the view go and release it, _without_blocking_ */
+    [p_vout->p_sys->o_glview performSelectorOnMainThread:@selector(removeFromSuperviewAndRelease) withObject:nil waitUntilDone:NO];
+    p_vout->p_sys->o_glview = nil;
 
     [p_vout->p_sys->o_pool release];
+    p_vout->p_sys->o_pool = nil;
  
 }
 
@@ -219,11 +222,11 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
     [super dealloc];
 }
 
-- (void)removeFromSuperview
+- (void)removeFromSuperviewAndRelease
 {
-    [super removeFromSuperview];
+    [self removeFromSuperview];
+    [self release];
 }
-
 
 - (id) initWithVout: (vout_thread_t *) vout container: (id <VLCOpenGLVoutEmbedding>) aContainer
 {

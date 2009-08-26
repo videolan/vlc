@@ -98,6 +98,7 @@ int OpenVideoGL  ( vlc_object_t * p_this )
 void CloseVideoGL ( vlc_object_t * p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *) p_this;
+    cocoaglvoutviewEnd( p_vout );
     /* Clean up */
     free( p_vout->p_sys );
 }
