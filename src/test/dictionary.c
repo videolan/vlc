@@ -37,7 +37,7 @@ static void test_dictionary_validity (vlc_dictionary_t * p_dict, const char ** o
 {
     /* Test values and keys now */
     char ** keys = vlc_dictionary_all_keys( p_dict );
-    long i, j;
+    intptr_t i, j;
 
     assert( keys );
 
@@ -68,7 +68,7 @@ int main (void)
     };
     const int size = sizeof(our_keys)/sizeof(our_keys[0]);
     char ** keys;
-    long i = 0;
+    intptr_t i = 0;
 
     vlc_dictionary_t dict;
     vlc_dictionary_init( &dict, 0 );
