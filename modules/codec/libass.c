@@ -724,7 +724,7 @@ static ass_handle_t *AssHandleHold( decoder_t *p_dec )
     }
 #endif
     if( !psz_font_dir )
-        psz_font_dir = config_GetCacheDir();
+        psz_font_dir = config_GetUserDir( VLC_CACHE_DIR );
 
     if( !psz_font_dir )
         goto error;

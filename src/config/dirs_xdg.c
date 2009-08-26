@@ -199,15 +199,6 @@ done:
 }
 
 
-/**
- * Get the user's VLC cache directory
- * (used for stuff like the modules cache, the album art cache, ...)
- */
-char *config_GetCacheDir( void )
-{
-    return config_GetAppDir ("CACHE", ".cache");
-}
-
 char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
@@ -218,6 +209,9 @@ char *config_GetUserDir (vlc_userdir_t type)
             return config_GetAppDir ("CONFIG", ".config");
         case VLC_DATA_DIR:
             return config_GetAppDir ("DATA", ".local/share");
+        case VLC_CACHE_DIR:
+            return config_GetAppDir ("CACHE", ".cache");
+
         case VLC_DESKTOP_DIR:
             return config_GetTypeDir ("DESKTOP");
         case VLC_DOWNLOAD_DIR:

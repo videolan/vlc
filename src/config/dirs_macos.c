@@ -133,21 +133,6 @@ static char *config_GetAppDir (void)
     return psz_dir;
 }
 
-/**
- * Get the user's VLC cache directory
- * (used for stuff like the modules cache, the album art cache, ...)
- */
-char *config_GetCacheDir( void )
-{
-    char *psz_dir;
-    const char *psz_parent = GetDir (false);
-
-    if( asprintf( &psz_dir, "%s/Library/Preferences/VLC", psz_parent ) == -1 )
-        psz_dir = NULL;
-
-    return psz_dir;
-}
-
 char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
@@ -155,9 +140,10 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_HOME_DIR:
             return config_GetHomeDir ();
         case VLC_CONFIG_DIR:
-            return config_GetAppDir ();
         case VLC_DATA_DIR:
+        case VLC_CACHE_DIR:
             return config_GetAppDir ();
+
         case VLC_DESKTOP_DIR:
         case VLC_DOWNLOAD_DIR:
         case VLC_TEMPLATES_DIR:

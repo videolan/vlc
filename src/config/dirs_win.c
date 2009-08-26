@@ -109,11 +109,6 @@ static char *config_GetAppDir (void)
     return psz_dir;
 }
 
-char *config_GetCacheDir( void )
-{
-    return config_GetAppDir ();
-}
-
 char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
@@ -121,9 +116,10 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_HOME_DIR:
             return config_GetShellDir (CSIDL_PERSONAL);
         case VLC_CONFIG_DIR:
-            return config_GetAppDir ();
         case VLC_DATA_DIR:
+        case VLC_CACHE_DIR:
             return config_GetAppDir ();
+
         case VLC_DESKTOP_DIR:
         case VLC_DOWNLOAD_DIR:
         case VLC_TEMPLATES_DIR:
