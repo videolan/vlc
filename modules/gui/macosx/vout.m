@@ -290,7 +290,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     if( !p_vout ) return;
 
-    p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
+    p_input = getInput();
 
     if( !p_input ) return;
 

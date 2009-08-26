@@ -49,9 +49,8 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
 {
     char *psz_parser, *psz_string;
     int i;
-    vlc_object_t *p_object = vlc_object_find( p_intf,
-                                VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    aout_instance_t *p_aout = (aout_instance_t *)p_object;
+    aout_instance_t *p_aout = getAout();
+    vlc_object_t *p_object = VLC_OBJECT(p_aout);
     if( !p_object )
     {
         p_object = (vlc_object_t *)pl_Hold( p_intf );
@@ -115,8 +114,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
                                  char *psz_name )
 {
     char *psz_parser, *psz_string;
-    vlc_object_t *p_object = vlc_object_find( p_intf,
-                                VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    vlc_object_t *p_object = VLC_OBJECT(getAout());
     if( p_object == NULL )
         p_object = (vlc_object_t *)pl_Hold( p_intf );
 
@@ -171,8 +169,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     bool b_2p;
     int i;
     bool b_enabled = GetFiltersStatus( p_intf, (char *)"equalizer" );
-    vlc_object_t *p_object = vlc_object_find( p_intf,
-                                              VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    vlc_object_t *p_object = VLC_OBJECT(getAout());
 
     if( p_object == NULL )
         p_object = (vlc_object_t *)pl_Hold( p_intf );
@@ -227,8 +224,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 - (IBAction)bandSliderUpdated:(id)sender
 {
     intf_thread_t *p_intf = VLCIntf;
-    vlc_object_t *p_object = vlc_object_find( p_intf,
-                                              VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    vlc_object_t *p_object = VLC_OBJECT(getAout());
 
     if( p_object == NULL )
         p_object = (vlc_object_t *)pl_Hold( p_intf );
@@ -264,8 +260,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 {
     intf_thread_t *p_intf = VLCIntf;
     int i;
-    vlc_object_t *p_object= vlc_object_find( p_intf,
-                                             VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    vlc_object_t *p_object= VLC_OBJECT(getAout());
     if( p_object == NULL )
         p_object = (vlc_object_t *)pl_Hold( p_intf );
 
@@ -309,8 +304,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     intf_thread_t *p_intf = VLCIntf;
     float f_preamp = [sender floatValue] ;
 
-    vlc_object_t *p_object = vlc_object_find( p_intf,
-                                              VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    vlc_object_t *p_object = VLC_OBJECT(getAout());
     if( p_object == NULL )
         p_object = (vlc_object_t *)pl_Hold( p_intf );
 
@@ -348,9 +342,8 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 {
     intf_thread_t *p_intf = VLCIntf;
     bool b_2p = [sender state] ? true : false;
-    vlc_object_t *p_object= vlc_object_find( p_intf,
-                                             VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    aout_instance_t *p_aout = (aout_instance_t *)p_object;
+    aout_instance_t *p_aout = getAout();
+    vlc_object_t *p_object= VLC_OBJECT(p_aout);
     if( p_object == NULL )
         p_object = (vlc_object_t *)pl_Hold( p_intf );
 
@@ -376,8 +369,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
 - (void)awakeFromNib
 {
     int i;
-    vlc_object_t *p_object= vlc_object_find( VLCIntf,
-                                             VLC_OBJECT_AOUT, FIND_ANYWHERE );
+    vlc_object_t *p_object= VLC_OBJECT(getAout());
     if( p_object == NULL )
         p_object = (vlc_object_t *)pl_Hold( VLCIntf );
 

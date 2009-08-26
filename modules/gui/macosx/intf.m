@@ -279,6 +279,34 @@ bool checkProgressPanel (void *priv)
 }
 
 #pragma mark -
+#pragma mark Helpers
+
+input_thread_t *getInput(void)
+{
+    intf_thread_t *p_intf = VLCIntf;
+    playlist_t *p_playlist = pl_Hold(p_intf);
+    input_thread_t *p_input = pl_CurrentInput(p_playlist);
+    pl_Release(p_playlist);
+    return p_input;
+}
+
+vout_thread_t *getVout(void)
+{
+    input_thread_t *p_input = getInput();
+    vout_thread_t *p_vout = input_GetVout(p_input);
+    vlc_object_release(p_input);
+    return p_vout;
+}
+
+aout_instance_t *getAout(void)
+{
+    input_thread_t *p_input = getInput();
+    aout_instance_t *p_aout = input_GetAout(p_input);
+    vlc_object_release(p_input);
+    return p_aout;
+}
+
+#pragma mark -
 #pragma mark Private
 
 @interface VLCMain ()
@@ -1935,11 +1963,9 @@ end:
 
 - (void)refreshVoutDeviceMenu:(NSNotification *)o_notification
 {
-    int x,y = 0;
-    vout_thread_t * p_vout = vlc_object_find( p_intf, VLC_OBJECT_VOUT,
-                                              FIND_ANYWHERE );
- 
-    if(! p_vout )
+    int x, y = 0;
+    vout_thread_t * p_vout = getVout();
+    if( !p_vout )
         return;
  
     /* clean the menu before adding new entries */

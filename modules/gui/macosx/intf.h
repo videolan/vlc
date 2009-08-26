@@ -54,6 +54,12 @@ unsigned int CocoaKeyToVLC( unichar i_key );
             @"/System/Library/CoreServices/SystemVersion.plist"] \
             objectForKey: @"ProductVersion"] floatValue]
 
+
+// You need to release those objects after use
+input_thread_t *getInput(void);
+vout_thread_t *getVout(void);
+aout_instance_t *getAout(void);
+
 /*****************************************************************************
  * intf_sys_t: description and status of the interface
  *****************************************************************************/
