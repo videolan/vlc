@@ -92,7 +92,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
         char *psz_old;
 
         if( home != NULL
-         && asprintf( &psz_old, "%s" DIR_SEP CONFIG_DIR DIR_SEP CONFIG_FILE,
+         && asprintf( &psz_old, "%s/.vlc/" CONFIG_FILE,
                       home ) != -1 )
         {
             p_stream = utf8_fopen( psz_old, "rt" );
@@ -103,7 +103,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
                 msg_Info( p_obj->p_libvlc, "Found old config file at %s. "
                           "VLC will now use %s.", psz_old, psz_filename );
                 char *psz_readme;
-                if( asprintf(&psz_readme,"%s"DIR_SEP CONFIG_DIR DIR_SEP"README",
+                if( asprintf(&psz_readme,"%s/.vlc/README",
                              home ) != -1 )
                 {
                     FILE *p_readme = utf8_fopen( psz_readme, "wt" );

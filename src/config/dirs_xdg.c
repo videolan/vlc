@@ -1,8 +1,8 @@
 /*****************************************************************************
- * dirs.c: directories configuration
+ * dirs_xdg.c: XDG directories configuration
  *****************************************************************************
  * Copyright (C) 2001-2007 the VideoLAN team
- * Copyright © 2007-2008 Rémi Denis-Courmont
+ * Copyright © 2007-2009 Rémi Denis-Courmont
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
  *
@@ -27,123 +27,23 @@
 
 #include <vlc_common.h>
 
-#if defined( WIN32 )
-# ifndef _WIN32_IE
-#  define _WIN32_IE 0x0501
-# endif
-# include <w32api.h>
-#ifndef UNDER_CE
-# include <direct.h>
-#endif
-# include <shlobj.h>
-#else
-# include <unistd.h>
-# include <pwd.h>
-#endif
-
 #include "../libvlc.h"
-#include "configuration.h"
 #include <vlc_charset.h>
-#include <vlc_configuration.h>
 
-#include <errno.h>                                                  /* errno */
+#include <unistd.h>
+#include <pwd.h>
 #include <assert.h>
 #include <limits.h>
 
-#if defined( WIN32 )
-# define DIR_SHARE ""
-#else
-# define DIR_SHARE "share"
-#endif
-
-
 /**
- * config_GetDataDir: find directory where shared data is installed
+ * Determines the shared data directory
  *
  * @return a string (always succeeds).
  */
 const char *config_GetDataDir( void )
 {
-#if defined (WIN32) || defined(__APPLE__) || defined (SYS_BEOS)
-    static char path[PATH_MAX] = "";
-
-    if( *path == '\0' )
-    {
-        snprintf( path, sizeof( path ), "%s" DIR_SEP DIR_SHARE, psz_vlcpath );
-        path[sizeof( path ) - 1] = '\0';
-    }
-    return path;
-#else
     return DATA_PATH;
-#endif
 }
-
-#if defined (WIN32) || defined(__APPLE__) || defined (SYS_BEOS)
-static const char *GetDir( bool b_common )
-{
-    /* FIXME: a full memory page here - quite a waste... */
-    static char homedir[PATH_MAX] = "";
-
-#if defined (WIN32)
-    wchar_t wdir[MAX_PATH];
-
-# if defined (UNDER_CE)
-    /*There are some errors in cegcc headers*/
-#undef SHGetSpecialFolderPath
-    BOOL WINAPI SHGetSpecialFolderPath(HWND,LPWSTR,int,BOOL);
-    if( SHGetSpecialFolderPath( NULL, wdir, CSIDL_APPDATA, 1 ) )
-# else
-    /* Get the "Application Data" folder for the current user */
-    if( S_OK == SHGetFolderPathW( NULL, (b_common ? CSIDL_COMMON_APPDATA
-                                                  : CSIDL_APPDATA)
-              | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, wdir ) )
-# endif
-    {
-        static char appdir[PATH_MAX] = "";
-        static char comappdir[PATH_MAX] = "";
-        WideCharToMultiByte (CP_UTF8, 0, wdir, -1,
-                             b_common ? comappdir : appdir,
-                             PATH_MAX, NULL, NULL);
-        return b_common ? comappdir : appdir;
-    }
-#else
-    (void)b_common;
-#endif
-
-#ifdef LIBVLC_USE_PTHREAD
-    static pthread_mutex_t lock = PTHREAD_MUTEX_INITIALIZER;
-    pthread_mutex_lock (&lock);
-#endif
-
-    if (!*homedir)
-    {
-        const char *psz_localhome = getenv( "HOME" );
-#if defined(HAVE_GETPWUID_R)
-        char buf[sysconf (_SC_GETPW_R_SIZE_MAX)];
-        if (psz_localhome == NULL)
-        {
-            struct passwd pw, *res;
-
-            if (!getpwuid_r (getuid (), &pw, buf, sizeof (buf), &res) && res)
-                psz_localhome = pw.pw_dir;
-        }
-#endif
-        if (psz_localhome == NULL)
-            psz_localhome = getenv( "TMP" );
-        if (psz_localhome == NULL)
-            psz_localhome = "/tmp";
-
-        const char *uhomedir = FromLocale (psz_localhome);
-        strncpy (homedir, uhomedir, sizeof (homedir) - 1);
-        homedir[sizeof (homedir) - 1] = '\0';
-        LocaleFree (uhomedir);
-    }
-#ifdef LIBVLC_USE_PTHREAD
-    pthread_mutex_unlock (&lock);
-#endif
-    return homedir;
-}
-#endif
 
 /**
  * Determines the system configuration directory.
@@ -152,26 +52,11 @@ static const char *GetDir( bool b_common )
  */
 const char *config_GetConfDir( void )
 {
-#if defined (WIN32)
-    return GetDir( true );
-#elif defined(__APPLE__) || defined (SYS_BEOS)
-    static char path[PATH_MAX] = "";
-
-    if( *path == '\0' )
-    {
-        snprintf( path, sizeof( path ), "%s"DIR_SEP DIR_SHARE, /* FIXME: Duh? */
-                  psz_vlcpath );
-        path[sizeof( path ) - 1] = '\0';
-    }
-    return path;
-#else
     return SYSCONFDIR;
-#endif
 }
 
 static char *config_GetHomeDir (void)
 {
-#ifndef WIN32
     /* 1/ Try $HOME  */
     const char *home = getenv ("HOME");
 #if defined(HAVE_GETPWUID_R)
@@ -185,44 +70,15 @@ static char *config_GetHomeDir (void)
             home = pw.pw_dir;
     }
 #endif
-    /* 3/ Desperately try $TMP */
-    if (home == NULL)
-        home = getenv( "TMP" );
-    /* 4/ Beyond hope, hard-code /tmp */
-    if (home == NULL)
-        home = "/tmp";
 
     return FromLocaleDup (home);
-
-#else /* WIN32 */
-    wchar_t wdir[MAX_PATH];
-
-# if defined (UNDER_CE)
-    /*There are some errors in cegcc headers*/
-#undef SHGetSpecialFolderPath
-    BOOL WINAPI SHGetSpecialFolderPath(HWND,LPWSTR,int,BOOL);
-    if (SHGetSpecialFolderPath (NULL, wdir, CSIDL_APPDATA, 1))
-# else
-    if (SHGetFolderPathW (NULL, CSIDL_PERSONAL | CSIDL_FLAG_CREATE,
-                          NULL, SHGFP_TYPE_CURRENT, wdir ) == S_OK)
-# endif
-        return FromWide (wdir);
-    return NULL;
-#endif
 }
 
 static char *config_GetAppDir (const char *xdg_name, const char *xdg_default)
 {
     char *psz_dir;
-#if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
-    const char *psz_parent = GetDir (false);
-
-    if( asprintf( &psz_dir, "%s" DIR_SEP CONFIG_DIR, psz_parent ) == -1 )
-        psz_dir = NULL;
-
-    (void)xdg_name; (void)xdg_default;
-#else
     char var[sizeof ("XDG__HOME") + strlen (xdg_name)];
+
     /* XDG Base Directory Specification - Version 0.6 */
     snprintf (var, sizeof (var), "XDG_%s_HOME", xdg_name);
 
@@ -240,16 +96,11 @@ static char *config_GetAppDir (const char *xdg_name, const char *xdg_default)
      || asprintf( &psz_dir, "%s/%s/vlc", psz_home, xdg_default ) == -1 )
         psz_dir = NULL;
     free (psz_home);
-#endif
     return psz_dir;
 }
 
 static char *config_GetTypeDir (const char *xdg_name)
 {
-#if defined(WIN32) || defined(__APPLE__) || defined(SYS_BEOS)
-    (void)xdg_name;
-    return config_GetAppDir (NULL, NULL);
-#else
     const size_t namelen = strlen (xdg_name);
     const char *home = getenv ("HOME");
     const size_t homelen = strlen (home);
@@ -345,7 +196,6 @@ done:
     char *ret = FromLocaleDup (path);
     free (path);
     return ret;
-#endif
 }
 
 
@@ -355,17 +205,7 @@ done:
  */
 char *config_GetCacheDir( void )
 {
-#if defined(__APPLE__)
-    char *psz_dir;
-    const char *psz_parent = GetDir (false);
-
-    if( asprintf( &psz_dir, "%s" DIR_SEP CACHES_DIR, psz_parent ) == -1 )
-        psz_dir = NULL;
-
-    return psz_dir;
-#else
     return config_GetAppDir ("CACHE", ".cache");
-#endif
 }
 
 char *config_GetUserDir (vlc_userdir_t type)

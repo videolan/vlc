@@ -259,22 +259,26 @@ SOURCES_libvlc_beos = \
 	$(NULL)
 
 SOURCES_libvlc_darwin = \
+	config/dirs_macos.c \
 	misc/pthread.c \
 	misc/darwin_specific.c \
 	$(NULL)
 
 SOURCES_libvlc_linux = \
+	config/dirs_xdg.c \
 	misc/pthread.c \
 	misc/linux_specific.c \
 	$(NULL)
 
 SOURCES_libvlc_win32 = \
+	config/dirs_win.c \
 	misc/w32thread.c \
 	misc/win32_specific.c \
 	network/winsock.c \
 	$(NULL)
 
 SOURCES_libvlc_other = \
+	config/dirs_xdg.c \
 	misc/pthread.c \
 	misc/not_specific.c
 
@@ -404,7 +408,6 @@ SOURCES_libvlc_common = \
 	misc/action.c \
 	config/configuration.h \
 	config/core.c \
-	config/dirs.c \
 	config/chain.c \
 	config/file.c \
 	config/intf.c \
