@@ -7,6 +7,18 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
+		630F6D6E1045DE4000B03EE4 /* core-framework */ = {
+			isa = PBXAggregateTarget;
+			buildConfigurationList = 630F6D801045DE6300B03EE4 /* Build configuration list for PBXAggregateTarget "core-framework" */;
+			buildPhases = (
+			);
+			dependencies = (
+				630F6D721045DE4500B03EE4 /* PBXTargetDependency */,
+				630F6D741045DE4900B03EE4 /* PBXTargetDependency */,
+			);
+			name = "core-framework";
+			productName = "core-framework";
+		};
 		633BD6D20D2ADE040012A314 /* vlc-contrib-core-framework */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 633BD6D60D2ADE230012A314 /* Build configuration list for PBXAggregateTarget "vlc-contrib-core-framework" */;
@@ -87,6 +99,20 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
+		630F6D711045DE4500B03EE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 633BD6DB0D2ADE4E0012A314 /* vlc-core */;
+			remoteInfo = "vlc-core";
+		};
+		630F6D731045DE4900B03EE4 /* PBXContainerItemProxy */ = {
+			isa = PBXContainerItemProxy;
+			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
+			proxyType = 1;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* VLCKit */;
+			remoteInfo = VLCKit;
+		};
 		633BD6ED0D2AE03E0012A314 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
@@ -417,6 +443,7 @@
 				633BD6E40D2ADF030012A314 /* vlc-contrib */,
 				633BD6DB0D2ADE4E0012A314 /* vlc-core */,
 				63FFDBCE0D2AE2AE0092FC96 /* vlc-configure */,
+				630F6D6E1045DE4000B03EE4 /* core-framework */,
 			);
 		};
 /* End PBXProject section */
@@ -535,6 +562,16 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
+		630F6D721045DE4500B03EE4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 633BD6DB0D2ADE4E0012A314 /* vlc-core */;
+			targetProxy = 630F6D711045DE4500B03EE4 /* PBXContainerItemProxy */;
+		};
+		630F6D741045DE4900B03EE4 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = 8DC2EF4F0486A6940098B216 /* VLCKit */;
+			targetProxy = 630F6D731045DE4900B03EE4 /* PBXContainerItemProxy */;
+		};
 		633BD6EE0D2AE03E0012A314 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 633BD6E40D2ADF030012A314 /* vlc-contrib */;
@@ -651,6 +688,7 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
 				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				GCC_ENABLE_OBJC_GC = YES;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
@@ -664,10 +702,32 @@
 				ARCHS = "$(ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1)";
 				ARCHS_STANDARD_32_BIT_PRE_XCODE_3_1 = "ppc i386";
 				GCC_ENABLE_OBJC_GC = YES;
+				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
 				PREBINDING = NO;
 				SDKROOT = "";
+			};
+			name = Release;
+		};
+		630F6D6F1045DE4000B03EE4 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = NO;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				PRODUCT_NAME = "core-framework";
+			};
+			name = Debug;
+		};
+		630F6D701045DE4000B03EE4 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COPY_PHASE_STRIP = YES;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				GCC_ENABLE_FIX_AND_CONTINUE = NO;
+				PRODUCT_NAME = "core-framework";
+				ZERO_LINK = NO;
 			};
 			name = Release;
 		};
@@ -779,6 +839,15 @@
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Debug;
+		};
+		630F6D801045DE6300B03EE4 /* Build configuration list for PBXAggregateTarget "core-framework" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				630F6D6F1045DE4000B03EE4 /* Debug */,
+				630F6D701045DE4000B03EE4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
