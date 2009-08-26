@@ -284,8 +284,9 @@ bool checkProgressPanel (void *priv)
 input_thread_t *getInput(void)
 {
     intf_thread_t *p_intf = VLCIntf;
-    playlist_t *p_playlist = pl_Hold(p_intf);
-    input_thread_t *p_input = pl_CurrentInput(p_playlist);
+    if (!p_intf)
+        return NULL;
+    input_thread_t *p_input = pl_CurrentInput(p_intf);
     pl_Release(p_playlist);
     return p_input;
 }
@@ -293,6 +294,8 @@ input_thread_t *getInput(void)
 vout_thread_t *getVout(void)
 {
     input_thread_t *p_input = getInput();
+    if (!p_input)
+        return NULL;
     vout_thread_t *p_vout = input_GetVout(p_input);
     vlc_object_release(p_input);
     return p_vout;
@@ -301,6 +304,8 @@ vout_thread_t *getVout(void)
 aout_instance_t *getAout(void)
 {
     input_thread_t *p_input = getInput();
+    if (!p_input)
+        return NULL;
     aout_instance_t *p_aout = input_GetAout(p_input);
     vlc_object_release(p_input);
     return p_aout;
