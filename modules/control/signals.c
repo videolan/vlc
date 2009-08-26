@@ -118,5 +118,4 @@ static void *SigThread (void *data)
     pthread_sigmask (SIG_UNBLOCK, &set, NULL);
     for (;;)
         pause ();
-    return NULL;
 }
