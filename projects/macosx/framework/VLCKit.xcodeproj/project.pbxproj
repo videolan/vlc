@@ -103,14 +103,14 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 633BD6DB0D2ADE4E0012A314 /* vlc-core */;
+			remoteGlobalIDString = 633BD6DB0D2ADE4E0012A314;
 			remoteInfo = "vlc-core";
 		};
 		630F6D731045DE4900B03EE4 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216 /* VLCKit */;
+			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
 			remoteInfo = VLCKit;
 		};
 		633BD6ED0D2AE03E0012A314 /* PBXContainerItemProxy */ = {
@@ -502,7 +502,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n    exit 0\nfi\nif test $ARCHS = \"x86_64\"\nthen\n    cd ../../../extras/contrib && make && ./bootstrap\nelse\n    cd ../../../extras/contrib && make\nfi";
+			shellScript = "if test \"$ACTION\" = \"clean\"; then\n    exit 0\nfi\nif test \"$ARCHS\" = \"x86_64\"; then\n    cd ../../../extras/contrib && make && ./bootstrap\nelse\n    cd ../../../extras/contrib && make\nfi";
 			showEnvVarsInLog = 0;
 		};
 		63FFDBCD0D2AE2AE0092FC96 /* ShellScript */ = {
@@ -515,8 +515,8 @@
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/tcsh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n    rm -Rf $SYMROOT/vlc_build_dir\n    exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nif test $ARCHS = \"x86_64\"\nthen\n    setenv CFLAGS -m64\n    setenv CXXFLAGS -m64\n    setenv CPPFLAGS -m64\n    setenv OBJCFLAGS -m64\nfi\nif test $ARCHS = \"i386\"\nthen\n    setenv CFLAGS -m32\n    setenv CXXFLAGS -m32\n    setenv CPPFLAGS -m32\n    setenv OBJCFLAGS -m32\nfi\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir && $top_srcdir/configure --disable-nls --enable-debug --with-macosx-sdk=$SDKROOT\n";
+			shellPath = /bin/sh;
+			shellScript = "if test \"$ACTION\" = \"clean\"; then\n    rm -Rf $SYMROOT/vlc_build_dir\n    exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nif test \"$ARCHS\" = \"x86_64\"; then\n    setenv CFLAGS -m64\n    setenv CXXFLAGS -m64\n    setenv CPPFLAGS -m64\n    setenv OBJCFLAGS -m64\nfi\nif test \"$ARCHS\" = \"i386\"; then\n    setenv CFLAGS -m32\n    setenv CXXFLAGS -m32\n    setenv CPPFLAGS -m32\n    setenv OBJCFLAGS -m32\nfi\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir && $top_srcdir/configure --disable-nls --enable-debug --with-macosx-sdk=$SDKROOT\n";
 			showEnvVarsInLog = 0;
 		};
 		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
