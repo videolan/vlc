@@ -5,7 +5,8 @@
 # Pass --quiet to make when we are not verbose.
 AM_MAKEFLAGS = $(makesilentflags_$(V))
 makesilentflags_ = $(makesilentflags__$(AM_DEFAULT_VERBOSITY))
-makesilentflags__0 = --quiet
+makesilentflags_0 = --quiet
+makesilentflags__0 = $(makesilentflags_0)
 
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
