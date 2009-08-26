@@ -203,6 +203,9 @@ static void AccessClose( vlc_object_t * );
     "please use 'v4l2:/""/ :input-slave=alsa:/""/' or " \
     "'v4l2:/""/ :input-slave=oss:/""/' instead." )
 
+#define ASPECT_TEXT N_("Picture aspect-ratio n:m")
+#define ASPECT_LONGTEXT N_("Define input picture aspect-ratio to use. Default is 4:3" )
+
 typedef enum {
     IO_METHOD_READ,
     IO_METHOD_MMAP,
@@ -257,6 +260,8 @@ vlc_module_begin ()
                 WIDTH_LONGTEXT, true )
     add_integer( CFG_PREFIX "height", -1, NULL, HEIGHT_TEXT,
                 HEIGHT_LONGTEXT, true )
+    add_string( CFG_PREFIX "aspect-ratio", "4:3", NULL, ASPECT_TEXT,
+              ASPECT_LONGTEXT, true )
     add_float( CFG_PREFIX "fps", 0, NULL, FPS_TEXT, FPS_LONGTEXT, true )
     add_integer( CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
                 CACHING_TEXT, CACHING_LONGTEXT, true )
@@ -523,6 +528,7 @@ struct demux_sys_t
 
     int i_width;
     int i_height;
+    unsigned int i_aspect;
     float f_fps;            /* <= 0.0 mean to grab at full rate */
     mtime_t i_video_pts;    /* only used when f_fps > 0 */
     int i_fourcc;
@@ -685,6 +691,19 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
 
     p_sys->psz_set_ctrls = var_CreateGetString( p_obj, "v4l2-set-ctrls" );
 
+    char *psz_aspect = var_CreateGetString( p_obj, "v4l2-aspect-ratio" );
+    if( psz_aspect && *psz_aspect && strchr( psz_aspect, ":" ) )
+    {
+        char psz_delim = strchr( psz_aspect, ":" );
+        p_sys->i_aspect = atoi( psz_aspect ) * VOUT_ASPECT_FACTOR / atoi( psz_delim + 1 );
+    }
+    else
+    {
+        p_sys->i_aspect = 4 * VOUT_ASPECT_FACTOR / 3 ;
+
+    }
+    free( psz_aspect );
+
     p_sys->psz_device = NULL;
     p_sys->i_fd = -1;
 
@@ -809,6 +828,17 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
                 p_sys->i_height =
                     strtol( psz_parser + strlen( "height=" ),
                             &psz_parser, 0 );
+            }
+            else if( !strncmp( psz_parser, "aspect-ratio=",
+                               strlen( "aspect-ratio=" ) ) )
+            {
+                unsigned int num,den;
+                num = strtol( psz_parser + strlen( "aspect-ratio=" ),
+                              &psz_parser, 0 );
+                den = strtol( psz_parser + strlen( ":" ),
+                              &psz_parser, 0 );
+                if( num && den )
+                    p_sys->i_aspect = num * VOUT_ASPECT_FACTOR / den;
             }
             else if( !strncmp( psz_parser, "controls-reset",
                                strlen( "controls-reset" ) ) )
@@ -2115,7 +2145,9 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     /* Add */
     es_fmt.video.i_width  = p_sys->i_width;
     es_fmt.video.i_height = p_sys->i_height;
-    es_fmt.video.i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;
+
+    /* Get aspect-ratio */
+    es_fmt.video.i_aspect = p_sys->i_aspect;
 
     if( b_demux )
     {
