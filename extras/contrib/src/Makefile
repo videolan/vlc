@@ -2344,7 +2344,6 @@ liboil: liboil-$(OIL_VERSION).tar.gz
 .liboil: liboil
 ifdef HAVE_DARWIN_OS
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)")
-endif
 else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O2")
 endif
