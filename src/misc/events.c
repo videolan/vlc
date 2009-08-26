@@ -161,7 +161,7 @@ void vlc_event_manager_fini( vlc_event_manager_t * p_em )
 }
 
 /**
- * Destroy the event manager
+ * Register the event manager
  */
 int vlc_event_manager_register_event_type(
         vlc_event_manager_t * p_em,
