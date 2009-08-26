@@ -53,9 +53,14 @@ const char *config_GetDataDir( void )
     return path;
 }
 
-static const char *GetDir( bool b_common )
+const char *config_GetConfDir (void)
 {
+    static char appdir[PATH_MAX] = "";
     wchar_t wdir[MAX_PATH];
+
+#warning FIXME: thread-safety!
+    if (*appdir)
+        return appdir;
 
 #if defined (UNDER_CE)
     /*There are some errors in cegcc headers*/
@@ -64,27 +69,18 @@ static const char *GetDir( bool b_common )
     if( SHGetSpecialFolderPath( NULL, wdir, CSIDL_APPDATA, 1 ) )
 #else
     /* Get the "Application Data" folder for the current user */
-    if( S_OK == SHGetFolderPathW( NULL, (b_common ? CSIDL_COMMON_APPDATA
-                                                  : CSIDL_APPDATA)
+    if( S_OK == SHGetFolderPathW( NULL, CSIDL_COMMON_APPDATA
               | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, wdir ) )
 #endif
     {
-        static char appdir[PATH_MAX] = "";
-        static char comappdir[PATH_MAX] = "";
         WideCharToMultiByte (CP_UTF8, 0, wdir, -1,
-                             b_common ? comappdir : appdir,
-                             PATH_MAX, NULL, NULL);
-        return b_common ? comappdir : appdir;
+                             appdir, PATH_MAX, NULL, NULL);
+        return appdir;
     }
     return NULL;
 }
 
-const char *config_GetConfDir( void )
-{
-    return GetDir( true );
-}
-
-static char *config_GetHomeDir (void)
+static char *config_GetShellDir (int csidl)
 {
     wchar_t wdir[MAX_PATH];
 
@@ -94,7 +90,7 @@ static char *config_GetHomeDir (void)
     BOOL WINAPI SHGetSpecialFolderPath(HWND,LPWSTR,int,BOOL);
     if (SHGetSpecialFolderPath (NULL, wdir, CSIDL_APPDATA, 1))
 #else
-    if (SHGetFolderPathW (NULL, CSIDL_PERSONAL | CSIDL_FLAG_CREATE,
+    if (SHGetFolderPathW (NULL, csidl | CSIDL_FLAG_CREATE,
                           NULL, SHGFP_TYPE_CURRENT, wdir ) == S_OK)
 #endif
         return FromWide (wdir);
@@ -104,10 +100,12 @@ static char *config_GetHomeDir (void)
 static char *config_GetAppDir (void)
 {
     char *psz_dir;
-    const char *psz_parent = GetDir (false);
+    char *psz_parent = config_GetShellDir (CSIDL_APPDATA);
 
-    if( asprintf( &psz_dir, "%s\\vlc", psz_parent ) == -1 )
+    if (psz_parent == NULL
+     ||  asprintf (&psz_dir, "%s\\vlc", psz_parent) == -1)
         psz_dir = NULL;
+    free (psz_parent);
     return psz_dir;
 }
 
@@ -121,7 +119,7 @@ char *config_GetUserDir (vlc_userdir_t type)
     switch (type)
     {
         case VLC_HOME_DIR:
-            return config_GetHomeDir ();
+            return config_GetShellDir (CSIDL_PERSONAL);
         case VLC_CONFIG_DIR:
             return config_GetAppDir ();
         case VLC_DATA_DIR:
@@ -132,8 +130,12 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_PUBLICSHARE_DIR:
         case VLC_DOCUMENTS_DIR:
         case VLC_MUSIC_DIR:
+#warning FIXME: unimplemented
+            return config_GetUserDir (VLC_HOME_DIR);
         case VLC_PICTURES_DIR:
+            return config_GetShellDir (CSIDL_MYPICTURES);
         case VLC_VIDEOS_DIR:
+#warning FIXME: unimplemented
             return config_GetUserDir (VLC_HOME_DIR);
     }
     assert (0);
