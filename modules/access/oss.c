@@ -221,7 +221,6 @@ static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
         /* Special for access_demux */
         case DEMUX_CAN_PAUSE:
         case DEMUX_CAN_SEEK:
-        case DEMUX_SET_PAUSE_STATE:
         case DEMUX_CAN_CONTROL_PACE:
             pb = (bool*)va_arg( args, bool * );
             *pb = false;
