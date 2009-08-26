@@ -286,9 +286,7 @@ input_thread_t *getInput(void)
     intf_thread_t *p_intf = VLCIntf;
     if (!p_intf)
         return NULL;
-    input_thread_t *p_input = pl_CurrentInput(p_intf);
-    pl_Release(p_playlist);
-    return p_input;
+    return pl_CurrentInput(p_intf);
 }
 
 vout_thread_t *getVout(void)
