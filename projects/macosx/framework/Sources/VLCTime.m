@@ -83,13 +83,13 @@
         long long positiveDuration = llabs(duration);
         if( positiveDuration > 3600 )
             return [NSString stringWithFormat:@"%s%01d:%02d:%02d",
-                        duration < 0 ? "-" : ""
+                        duration < 0 ? "-" : "",
                 (long) (positiveDuration / 3600),
                 (long)((positiveDuration / 60) % 60),
                 (long) (positiveDuration % 60)];
         else
             return [NSString stringWithFormat:@"%s%02d:%02d",
-                            duration < 0 ? "-" : ""
+                            duration < 0 ? "-" : "",
                     (long)((positiveDuration / 60) % 60),
                     (long) (positiveDuration % 60)];
     }
