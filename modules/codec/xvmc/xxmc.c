@@ -220,6 +220,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+#if 0
 static void WriteDecodeFile(int value)
 {
     FILE *f_wd_ok;
@@ -232,6 +233,7 @@ static void WriteDecodeFile(int value)
         fclose(f_wd_ok);
     }
 }
+#endif
 
 /*****************************************************************************
  * RunDecoder: the libmpeg2 decoder
@@ -639,6 +641,7 @@ static void CloseDecoder( vlc_object_t *p_this )
     free( p_sys );
 }
 
+#if 0
 static double get_aspect_ratio( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
@@ -676,6 +679,8 @@ static double get_aspect_ratio( decoder_t *p_dec )
     }
     return ratio;
 }
+#endif
+
 /*****************************************************************************
  * GetNewPicture: Get a new picture from the vout and set the buf struct
  *****************************************************************************/
