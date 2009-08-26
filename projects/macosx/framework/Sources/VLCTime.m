@@ -80,15 +80,18 @@
     if (value)
     {
         long long duration = [value longLongValue] / 1000000;
-        if( duration > 3600 )
-            return [NSString stringWithFormat:@"%01d:%02d:%02d",
-                (long) (duration / 3600),
-                (long)((duration / 60) % 60),
-                (long) (duration % 60)];
+        long long positiveDuration = llabs(duration);
+        if( positiveDuration > 3600 )
+            return [NSString stringWithFormat:@"%s%01d:%02d:%02d",
+                        duration < 0 ? "-" : ""
+                (long) (positiveDuration / 3600),
+                (long)((positiveDuration / 60) % 60),
+                (long) (positiveDuration % 60)];
         else
-            return [NSString stringWithFormat:@"%02d:%02d",
-                    (long)((duration / 60) % 60),
-                    (long) (duration % 60)];
+            return [NSString stringWithFormat:@"%s%02d:%02d",
+                            duration < 0 ? "-" : ""
+                    (long)((positiveDuration / 60) % 60),
+                    (long) (positiveDuration % 60)];
     }
     else
     {
