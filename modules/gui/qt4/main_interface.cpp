@@ -1256,9 +1256,11 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
         QString s = toNativeSeparators( url.toLocalFile() );
 
         if( s.length() > 0 ) {
-            playlist_Add( THEPL, qtu(s), NULL,
+            char* psz_uri = make_URI( qtu(s) );
+            playlist_Add( THEPL, psz_uri, NULL,
                           PLAYLIST_APPEND | (first ? PLAYLIST_GO: PLAYLIST_PREPARSE),
                           PLAYLIST_END, true, pl_Unlocked );
+            free( psz_uri );
             first = false;
             RecentsMRL::getInstance( p_intf )->addRecent( s );
         }
