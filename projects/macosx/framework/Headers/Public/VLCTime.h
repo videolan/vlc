@@ -27,7 +27,7 @@
 /**
  * Provides an object to define VLCMedia's time.
  */
-@interface VLCTime : NSObject
+@interface VLCTime : NSObject <NSCopying>
 {
     NSNumber * value;       //< Holds, in seconds, the VLCTime value
 }

@@ -58,6 +58,11 @@
     [super dealloc];
 }
 
+- (id)copyWithZone:(NSZone *)zone
+{
+    return [[VLCTime alloc] initWithNumber:value];
+}
+
 /* NSObject Overrides */
 - (NSString *)description
 {
