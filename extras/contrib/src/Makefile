@@ -788,7 +788,11 @@ libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 ifndef HAVE_DARWIN_OS
 	patch -p0 < Patches/theora.patch
 else
-	patch -p0 < Patches/theora_mac.patch
+ifdef HAVE_DARWIN_OS_ON_INTEL
+	patch -p0 < Patches/theora_mac_intel32.patch
+else
+	patch -p0 < Patches/theora_mac_ppc.patch
+endif
 endif
 	patch -p0 < Patches/libtheora-includes.patch
 ifdef HAVE_WIN32
