@@ -139,10 +139,6 @@ else
 FFMPEGCONF+= --enable-libmp3lame --enable-libgsm
 endif
 
-ifdef HAVE_BEOS
-FFMPEGCONF+= --cpu=x86 --disable-audio-beos
-endif
-
 ifdef HAVE_DARWIN_OS_ON_INTEL
 FFMPEGCONF += --enable-memalign-hack
 endif
@@ -216,39 +212,6 @@ endef
 #	$(MAKE) -C $< install
 #	$(INSTALL_NAME)
 #	touch $@
-
-ifeq ($(HOST),i586-pc-beos)
-# We test if the file actually exists, as sometimes (but not always)
-# libtool won't accept to build the shared library
-define INSTALL_NAME
-	if test -f $(PREFIX)/lib/lib$(patsubst .%,%,$@).so ; then \
-		mkdir -p $(PREFIX)/vlc-lib ; \
-		cp $(PREFIX)/lib/lib$(patsubst .%,%,$@).so \
-		  $(PREFIX)/vlc-lib/ ; \
-	fi
-endef
-endif
-
-# ***************************************************************************
-# perl
-# ***************************************************************************
-
-ifeq ($(BUILD),i586-pc-beos)
-perl-$(PERL_VERSION).tar.gz:
-	$(WGET) $(PERL_URL)
-
-perl: perl-$(PERL_VERSION).tar.gz
-	$(EXTRACT_GZ)
-	sed -i.orig 's%prefix="/boot/home/config"%prefix="$(PREFIX)"%'  perl/hints/beos.sh
-
-.perl: perl
-	(cd $<; ./Configure -d -e && make && make install && ln -sf perl5/$(PERL_VERSION)/BePC-beos/CORE/libperl.so $(PREFIX)/lib/libperl.so)
-	touch $@
-
-CLEAN_FILE += .perl
-CLEAN_PKG += perl
-DISTCLEAN_PKG += perl-$(PERL_VERSION).tar.gz
-endif
 
 # ***************************************************************************
 # autoconf
@@ -332,23 +295,6 @@ CLEAN_FILE += .libtool
 
 endif
 
-ifeq ($(BUILD),i586-pc-beos)
-libtool-$(LIBTOOL_VERSION).tar.gz:
-	$(WGET) $(LIBTOOL_URL)
-
-libtool: libtool-$(LIBTOOL_VERSION).tar.gz
-	$(EXTRACT_GZ)
-
-.libtool: libtool
-	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
-	touch $@
-
-CLEAN_PKG += libtool
-DISTCLEAN_PKG += libtool-$(LIBTOOL_VERSION).tar.gz
-CLEAN_FILE += .libtool
-
-endif
-
 # ***************************************************************************
 # automake
 # ***************************************************************************
@@ -409,11 +355,6 @@ ifdef HAVE_WIN32
 	( cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-relocatable --with-iconv-prefix=$(PREFIX) --disable-java --disable-native-java)
 else
 	( cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-java --disable-native-java --without-emacs)
-endif
-ifeq ($(BUILD),i586-pc-beos)
-# The ugliest kludge ever - so libtool correctly links shared libraries
-# on BeOS. Sorry, I just can't figure out how libtool works
-	( cd $< && for f in `find . -name libtool`; do  sed -e 's/ -shared / -nostart /' -e 's/^predep_objects.*/predep_objects=""/' -i  $$f; chmod +x $$f; done )
 endif
 ifneq ($(HOST),$(BUILD))
   ifndef HAVE_CYGWIN
@@ -813,11 +754,7 @@ THEORACONF += --disable-asm
 endif
 
 .theora: libtheora .ogg
-ifdef HAVE_BEOS
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF) --disable-asm && make && make install)
-else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF)&& make && make install)
-endif
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -893,9 +830,6 @@ speex-$(SPEEX_VERSION).tar.gz:
 speex: speex-$(SPEEX_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/speex.patch
-ifdef HAVE_BEOS
-	patch -p0 < Patches/speex-BeOS.patch
-endif
 
 .speex: speex
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --enable-ogg=no && make && make install)
@@ -1045,14 +979,8 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 ifdef SVN
 ffmpeg:
 	$(SVN) co $(FFMPEG_SVN) ffmpeg
-ifeq ($(HOST),i586-pc-beos)
-	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-beos.patch)
-endif
 ifdef HAVE_WINCE
 	patch -p1 < Patches/ffmpeg-svn-wince.patch
-endif
-ifdef HAVE_BEOS
-	(cd $@; patch -p0 < ../Patches/ffmpeg-alignment.patch)
 endif
 ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $@; patch -p0 < ../Patches/ffmpeg-macosx-intel-mmx.patch)
@@ -1667,9 +1595,6 @@ twolame-$(TWOLAME_VERSION).tar.gz:
 
 twolame: twolame-$(TWOLAME_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_BEOS
-	patch -p0 < Patches/twolame-BeOS.patch
-endif
 ifdef HAVE_WIN32
 	(cd twolame/win32; $(WGET) "http://twolame.svn.sourceforge.net/viewvc/*checkout*/twolame/trunk/win32/winutil.h")
 endif
