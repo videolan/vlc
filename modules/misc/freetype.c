@@ -417,7 +417,7 @@ static int Create( vlc_object_t *p_this )
         goto error;
     }
 
-    FcPatternGetString( fontmatch, FC_FILE, 0, (FcChar8 **)&psz_fontfile);
+    FcPatternGetString( fontmatch, FC_FILE, 0, &psz_fontfile);
     FcPatternGetInteger( fontmatch, FC_INDEX, 0, &fontindex );
     if( !psz_fontfile )
     {
