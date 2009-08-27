@@ -360,6 +360,13 @@ static const struct
     { VLC_CODEC_ALAW, CODEC_ID_PCM_ALAW, AUDIO_ES },
     { VLC_CODEC_MULAW, CODEC_ID_PCM_MULAW, AUDIO_ES },
     { VLC_CODEC_S24DAUD, CODEC_ID_PCM_S24DAUD, AUDIO_ES },
+#if ( !defined( WORDS_BIGENDIAN ) )
+    { VLC_CODEC_FL32, CODEC_ID_PCM_F32LE, AUDIO_ES },
+    { VLC_CODEC_FL64, CODEC_ID_PCM_F64LE, AUDIO_ES },
+#else
+    { VLC_CODEC_FL32, CODEC_ID_PCM_F32BE, AUDIO_ES },
+    { VLC_CODEC_FL64, CODEC_ID_PCM_F64BE, AUDIO_ES },
+#endif
 
     /* Subtitle streams */
     /* Before this version, subs were too experimental */
