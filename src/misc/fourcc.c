@@ -1119,6 +1119,9 @@ static const entry_t p_list_spu[] = {
     B(VLC_CODEC_CVD, "CVD subtitles"),
         A("cvd "),
 
+    B(VLC_CODEC_BD_PG, "BD subtitles"),
+        A("bdpg"),
+
     B(0, "")
 };
 

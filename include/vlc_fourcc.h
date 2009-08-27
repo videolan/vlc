@@ -280,6 +280,8 @@
 #define VLC_CODEC_USF       VLC_FOURCC('u','s','f',' ')
 #define VLC_CODEC_OGT       VLC_FOURCC('o','g','t',' ')
 #define VLC_CODEC_CVD       VLC_FOURCC('c','v','d',' ')
+/* Blu-ray Presentation Graphics */
+#define VLC_CODEC_BD_PG     VLC_FOURCC('b','d','p','g')
 
 
 /* Special endian dependant values
