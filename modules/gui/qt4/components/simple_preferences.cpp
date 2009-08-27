@@ -519,6 +519,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             optionWidgets.append( ui.stylesCombo );
 #else
             ui.stylesCombo->hide();
+            optionWidgets.append( NULL );
 #endif
 
             ui.skins_zone->setEnabled( ui.skins->isChecked() );
@@ -760,8 +761,9 @@ void SPrefsPanel::apply()
             config_PutPsz( p_intf, "intf", "skins2" );
         if( qobject_cast<QRadioButton *>(optionWidgets[qtRB])->isChecked() )
             config_PutPsz( p_intf, "intf", "qt" );
-        getSettings()->setValue( "MainWindow/QtStyle",
-            qobject_cast<QComboBox *>(optionWidgets[styleCB])->currentText() );
+        if( qobject_cast<QComboBox *>(optionWidgets[styleCB]) )
+            getSettings()->setValue( "MainWindow/QtStyle",
+                qobject_cast<QComboBox *>(optionWidgets[styleCB])->currentText() );
 
         break;
     }
