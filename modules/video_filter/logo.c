@@ -121,7 +121,6 @@ vlc_module_end ()
  */
 typedef struct
 {
-    char *psz_file;    /* candidate for deletion -- not needed */
     int i_delay;       /* -1 means use default delay */
     int i_alpha;       /* -1 means use default alpha */
     picture_t *p_pic;
@@ -596,7 +595,7 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
 /**
  * It loads the logo image into memory.
  */
-static picture_t *LoadImage( vlc_object_t *p_this, char *psz_filename )
+static picture_t *LoadImage( vlc_object_t *p_this, const char *psz_filename )
 {
     if( !psz_filename )
         return NULL;
@@ -679,23 +678,17 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
                 *p_c = '\0';
         }
 
-        p_logo[i].psz_file = strdup( psz_list );
-        p_logo[i].p_pic = LoadImage( p_this, p_logo[i].psz_file );
-
+        msg_Dbg( p_this, "logo file name %s, delay %d, alpha %d",
+                 psz_list, p_logo[i].i_delay, p_logo[i].i_alpha );
+        p_logo[i].p_pic = LoadImage( p_this, psz_list );
         if( !p_logo[i].p_pic )
         {
             msg_Warn( p_this, "error while loading logo %s, will be skipped",
-                      p_logo[i].psz_file );
+                      psz_list );
         }
 
         if( p_c )
             psz_list = &p_c[1];
-    }
-
-    for( i = 0; i < p_logo_list->i_count; i++ )
-    {
-       msg_Dbg( p_this, "logo file name %s, delay %d, alpha %d",
-                p_logo[i].psz_file, p_logo[i].i_delay, p_logo[i].i_alpha );
     }
 
     /* initialize so that on the first update it will wrap back to 0 */
@@ -713,12 +706,8 @@ static void LogoListUnload( logo_list_t *p_list )
     {
         logo_t *p_logo = &p_list->p_logo[i];
 
-        free( p_logo->psz_file );
         if( p_logo->p_pic )
-        {
             picture_Release( p_logo->p_pic );
-            p_logo->p_pic = NULL;
-        }
     }
     free( p_list->p_logo );
 }
