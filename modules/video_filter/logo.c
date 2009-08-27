@@ -721,8 +721,8 @@ static void LogoListUnload( logo_list_t *p_list )
             picture_Release( p_logo->p_pic );
             p_logo->p_pic = NULL;
         }
-        free( p_logo );
     }
+    free( p_list->p_logo );
 }
 
 /**
