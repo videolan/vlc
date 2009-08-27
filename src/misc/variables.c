@@ -194,7 +194,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     if( i_new >= 0 )
     {
         /* If the types differ, variable creation failed. */
-        if( (i_type & VLC_VAR_TYPE) != (p_priv->p_vars[i_new].i_type & VLC_VAR_TYPE) )
+        if( (i_type & VLC_VAR_CLASS) != (p_priv->p_vars[i_new].i_type & VLC_VAR_CLASS) )
         {
             msg_Err( p_this, "Variable '%s' (0x%04x) already exist but with a different type (0x%04x)",
                      psz_name, p_priv->p_vars[i_new].i_type, i_type );
@@ -371,10 +371,7 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
     }
 
     /* Free callbacks if needed */
-    if( p_var->p_entries )
-    {
-        free( p_var->p_entries );
-    }
+    free( p_var->p_entries );
 
     free( p_var->psz_name );
     free( p_var->psz_text );
