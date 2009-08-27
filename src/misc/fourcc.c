@@ -1094,6 +1094,7 @@ static const entry_t p_list_spu[] = {
     B(VLC_CODEC_XSUB, "DivX XSUB subtitles"),
         A("XSUB"),
         A("xsub"),
+        A("DXSB"),
 
     B(VLC_CODEC_SSA, "SubStation Alpha subtitles"),
         A("ssa "),
