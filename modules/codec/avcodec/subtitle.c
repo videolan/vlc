@@ -100,6 +100,7 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
  */
 subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
 {
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 25, 0 )
     decoder_sys_t *sys = dec->p_sys;
 
     if (!block_ptr || !*block_ptr)
@@ -163,6 +164,9 @@ subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
     if (!spu)
         block_Release(block);
     return spu;
+#else
+    return NULL;
+#endif
 }
 
 /**
