@@ -877,7 +877,7 @@ AC_CHECK_TYPE(ssize_t,, [
 
 dnl Check for poll
 AC_SEARCH_LIBS(poll, [poll], [AC_DEFINE(HAVE_POLL, 1, [Define to 1 if the OS is usabl... err, has poll().])], [
-if test ${SYS} != "mingw32"
+if test ${SYS} != "mingw32" -a test ${SYS} != "mingwce"
 then
     AC_MSG_WARN([Your platform does not support poll(). VLC has it's own poll() implementation, but it is only intended to be used on Windows. VLC might crash or be insecure when you see this message. Either switch to an OS with a proper poll() implementation, or implement one for your OS in VLC])
 fi
