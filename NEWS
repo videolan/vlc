@@ -8,6 +8,7 @@ Demuxers:
  * Support for ADPCM in .flv streams
  * EXPERIMENTAL support for .aob files from DVD-Audio (MLP and LPCM)
    (Full disc support is NOT present yet)
+ * Support for TwinVQ (.vqf) files
 
 Mac OS X Interface:
  * Completely reworked user interface (based upon works from GSoC 2008)
