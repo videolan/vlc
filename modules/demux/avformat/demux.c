@@ -234,6 +234,7 @@ int OpenDemux( vlc_object_t *p_this )
         {
         case CODEC_TYPE_AUDIO:
             es_format_Init( &fmt, AUDIO_ES, fcc );
+            fmt.i_bitrate = cc->bit_rate;
             fmt.audio.i_channels = cc->channels;
             fmt.audio.i_rate = cc->sample_rate;
 #if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
