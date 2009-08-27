@@ -583,7 +583,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
                               vd->source.i_visible_height,
                    /* Dst: */ 0, 0, p_sys->width, p_sys->height,
                 /* Memory: */ pic->p->i_pitch / pic->p->i_pixel_pitch,
-                              pic->p->i_lines, false);
+                              pic->p->i_visible_lines, false);
     else
         xcb_xv_put_image (p_sys->conn, p_sys->port, p_sys->window,
                           p_sys->gc, p_sys->id,
