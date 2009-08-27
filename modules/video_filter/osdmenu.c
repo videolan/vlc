@@ -253,7 +253,7 @@ static int CreateFilter ( vlc_object_t *p_this )
     /* Attach subpicture filter callback */
     p_filter->pf_sub_filter = Filter;
 
-    p_sys->p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT, FIND_ANYWHERE );
+    p_sys->p_vout = vlc_object_find( p_this, VLC_OBJECT_VOUT, FIND_PARENT );
     if( p_sys->p_vout )
     {
         var_AddCallback( p_sys->p_vout, "mouse-x",
