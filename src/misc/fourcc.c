@@ -909,6 +909,8 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_ADPCM_SWF, "Flash ADPCM Audio"),
         A("SWFa"),
 
+    B(VLC_CODEC_ADPCM_IMA_WAV, "IMA WAV ADPCM Audio"),
+        A("ms\x00\x11"),
 
     /* AMR */
     B(VLC_CODEC_AMR_NB, "AMR narrow band"),

@@ -174,7 +174,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         case VLC_FOURCC('i','m','a', '4'): /* IMA ADPCM */
             p_sys->codec = ADPCM_IMA_QT;
             break;
-        case VLC_FOURCC('m','s',0x00,0x11): /* IMA ADPCM */
+        case VLC_CODEC_ADPCM_IMA_WAV: /* IMA ADPCM */
             p_sys->codec = ADPCM_IMA_WAV;
             break;
         case VLC_CODEC_ADPCM_MS: /* MS ADPCM */

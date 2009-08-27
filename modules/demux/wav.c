@@ -323,7 +323,7 @@ static int Open( vlc_object_t * p_this )
                                 &p_sys->fmt ) )
             goto error;
         break;
-    case VLC_FOURCC( 'm', 's', 0x00, 0x11 ):
+    case VLC_CODEC_ADPCM_IMA_WAV:
         if( FrameInfo_IMA_ADPCM( &p_sys->i_frame_size, &p_sys->i_frame_samples,
                                  &p_sys->fmt ) )
             goto error;
