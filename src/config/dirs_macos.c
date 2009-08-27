@@ -43,7 +43,7 @@ const char *config_GetDataDir( void )
 #warning FIXME: thread-safety!
     if( *path == '\0' )
     {
-        snprintf( path, sizeof( path ), "%s" DIR_SEP DIR_SHARE, psz_vlcpath );
+        snprintf( path, sizeof( path ), "%s" DIR_SEP "share", psz_vlcpath );
         path[sizeof( path ) - 1] = '\0';
     }
     return path;
@@ -91,7 +91,7 @@ const char *config_GetConfDir( void )
 #warning FIXME: system config is not the same as shared app data...
     if( *path == '\0' )
     {
-        snprintf( path, sizeof( path ), "%s"DIR_SEP DIR_SHARE, /* FIXME: Duh? */
+        snprintf( path, sizeof( path ), "%s" DIR_SEP "share", /* FIXME: Duh? */
                   psz_vlcpath );
         path[sizeof( path ) - 1] = '\0';
     }
@@ -126,7 +126,7 @@ static char *config_GetHomeDir (void)
 static char *config_GetAppDir (void)
 {
     char *psz_dir;
-    const char *psz_parent = GetDir (false);
+    const char *psz_parent = GetDir ();
 
     if( asprintf( &psz_dir, "%s/Library/Preferences/VLC", psz_parent ) == -1 )
         psz_dir = NULL;
