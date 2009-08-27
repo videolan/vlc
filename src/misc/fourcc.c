@@ -905,7 +905,7 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_ADPCM_G726, "G.726 ADPCM Audio"),
         A("g726"),
 
-    /* G.726 ADPCM */
+    /* Flash ADPCM */
     B(VLC_CODEC_ADPCM_SWF, "Flash ADPCM Audio"),
         A("SWFa"),
 
