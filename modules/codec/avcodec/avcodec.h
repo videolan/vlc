@@ -33,6 +33,7 @@ int GetVlcChroma( video_format_t *fmt, const int i_ffmpeg_chroma );
 
 picture_t * DecodeVideo    ( decoder_t *, block_t ** );
 aout_buffer_t * DecodeAudio( decoder_t *, block_t ** );
+subpicture_t *DecodeSubtitle( decoder_t *p_dec, block_t ** );
 
 /* Video encoder module */
 int  OpenEncoder ( vlc_object_t * );
@@ -57,6 +58,12 @@ void EndVideoDec( decoder_t *p_dec );
 int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
                   AVCodec *p_codec, int i_codec_id, const char *psz_namecodec );
 void EndAudioDec( decoder_t *p_dec );
+
+/* Subtitle Decoder */
+int InitSubtitleDec( decoder_t *p_dec, AVCodecContext *p_context,
+                     AVCodec *p_codec, int i_codec_id, const char *psz_namecodec );
+void EndSubtitleDec( decoder_t *p_dec );
+
 
 /*****************************************************************************
  * Module descriptor help strings

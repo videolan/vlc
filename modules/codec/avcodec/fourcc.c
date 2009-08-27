@@ -371,13 +371,17 @@ static const struct
 #endif
 
     /* Subtitle streams */
-    /* Before this version, subs were too experimental */
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 33, 0 )
+    { VLC_CODEC_BD_PG, CODEC_ID_HDMV_PGS_SUBTITLE, SPU_ES },
+#endif
+#if 0
     { VLC_CODEC_SPU, CODEC_ID_DVD_SUBTITLE, SPU_ES },
     { VLC_CODEC_DVBS, CODEC_ID_DVB_SUBTITLE, SPU_ES },
     { VLC_CODEC_SUBT, CODEC_ID_TEXT, SPU_ES },
     { VLC_CODEC_XSUB, CODEC_ID_XSUB, SPU_ES },
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 50, 0 )
     { VLC_CODEC_SSA, CODEC_ID_SSA, SPU_ES },
+#endif
 #endif
 
     { 0, 0, UNKNOWN_ES }

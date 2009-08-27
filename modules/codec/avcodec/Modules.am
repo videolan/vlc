@@ -2,6 +2,7 @@ SOURCES_avcodec = \
 	avcodec.c \
 	avcodec.h \
 	video.c \
+	subtitle.c \
 	audio.c \
 	deinterlace.c \
 	avutil.h \

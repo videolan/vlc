@@ -280,6 +280,11 @@ static int OpenDecoder( vlc_object_t *p_this )
         i_result =  InitAudioDec ( p_dec, p_context, p_codec,
                                        i_codec_id, psz_namecodec );
         break;
+    case SPU_ES:
+        p_dec->pf_decode_sub = DecodeSubtitle;
+        i_result =  InitSubtitleDec( p_dec, p_context, p_codec,
+                                     i_codec_id, psz_namecodec );
+        break;
     default:
         i_result = VLC_EGENERIC;
     }
@@ -304,6 +309,9 @@ static void CloseDecoder( vlc_object_t *p_this )
         break;
     case VIDEO_ES:
          EndVideoDec ( p_dec );
+        break;
+    case SPU_ES:
+         EndSubtitleDec( p_dec );
         break;
     }
 
