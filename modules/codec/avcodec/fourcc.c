@@ -339,7 +339,6 @@ static const struct
     { VLC_CODEC_SPEEX, CODEC_ID_SPEEX, AUDIO_ES },
 #endif
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 34, 0 )
-#warning HERE
     { VLC_CODEC_TWINVQ, CODEC_ID_TWINVQ, AUDIO_ES },
 #endif
 
