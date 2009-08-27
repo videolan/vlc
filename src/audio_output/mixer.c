@@ -93,6 +93,7 @@ void aout_MixerDelete( aout_instance_t * p_aout )
 
     module_unneed( p_aout->p_mixer, p_aout->p_mixer->module );
 
+    free( p_aout->p_mixer->input );
     vlc_object_release( p_aout->p_mixer );
 
     /* */
