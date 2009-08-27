@@ -522,13 +522,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         goto error;
     }
 
-    if (asprintf (&temporary, "%s.%u", permanent,
-#ifdef UNDER_CE
-                  GetCurrentProcessId ()
-#else
-                  getpid ()
-#endif
-                 ) == -1)
+    if (asprintf (&temporary, "%s.%u", permanent, getpid ()) == -1)
     {
         temporary = NULL;
         module_list_free (list);

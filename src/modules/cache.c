@@ -508,12 +508,7 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
 
     char psz_tmpname[sizeof (psz_filename) + 12];
     snprintf (psz_tmpname, sizeof (psz_tmpname), "%s.%"PRIu32, psz_filename,
-#ifdef UNDER_CE
-              (uint32_t)GetCurrentProcessId ()
-#else
-              (uint32_t)getpid ()
-#endif
-             );
+              (uint32_t)getpid ());
     file = utf8_fopen( psz_tmpname, "wb" );
     if (file == NULL)
         goto error;

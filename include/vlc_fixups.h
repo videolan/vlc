@@ -53,6 +53,10 @@ typedef struct
 # include <stdarg.h> /* va_list */
 #endif
 
+#ifndef HAVE_GETPID
+# include <sys/types.h> /* pid_t */
+#endif
+
 #ifdef __cplusplus
 extern "C" {
 #endif
@@ -131,6 +135,10 @@ void rewind (FILE *);
 
 #ifndef HAVE_GETCWD
 char *getcwd (char *buf, size_t size);
+#endif
+
+#ifndef HAVE_GETPID
+pid_t getpid (void);
 #endif
 
 #ifdef __cplusplus
