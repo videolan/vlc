@@ -622,7 +622,7 @@ libmad-$(LIBMAD_VERSION).tar.gz:
 libmad: libmad-$(LIBMAD_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_DARWIN_OS
-	( cd $@; sed -e 's%-march=i486%$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' -i.orig  configure )
+	( cd $@; sed -e 's%-march=i486%$(EXTRA_CFLAGS) $(EXTRA_LDFLAGS)%' -e 's%-dynamiclib%-dynamiclib -arch $(ARCH)%' -i.orig  configure )
 endif
 
 .mad: libmad
