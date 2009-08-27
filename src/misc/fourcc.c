@@ -893,6 +893,10 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_ADPCM_IMA_WS, "Westwood IMA ADPCM audio"),
         A("AIWS"),
 
+    /* MS ADPCM */
+    B(VLC_CODEC_ADPCM_MS, "MS ADPCM audio"),
+        A("ms\x00\x02"),
+
     /* Sierra VMD */
     B(VLC_CODEC_VMDAUDIO, "Sierra VMD Audio"),
         A("vmda"),

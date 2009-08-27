@@ -221,6 +221,7 @@
 #define VLC_CODEC_VMDAUDIO  VLC_FOURCC('v','m','d','a')
 #define VLC_CODEC_ADPCM_G726 VLC_FOURCC('g','7','2','6')
 #define VLC_CODEC_ADPCM_SWF VLC_FOURCC('S','W','F','a')
+#define VLC_CODEC_ADPCM_MS  VLC_FOURCC('m','s',0x00,0x02)
 #define VLC_CODEC_AMR_NB    VLC_FOURCC('s','a','m','r')
 #define VLC_CODEC_AMR_WB    VLC_FOURCC('s','a','w','b')
 #define VLC_CODEC_ALAC      VLC_FOURCC('a','l','a','c')
