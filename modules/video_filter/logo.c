@@ -629,13 +629,14 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
                           const char *psz_filename )
 {
     char *psz_list; /* the list: <logo>[,[<delay>[,[<alpha>]]]][;...] */
+    char *psz_original;
     unsigned int i;
     logo_t *p_logo;         /* the parsing's result */
 
     p_logo_list->i_counter = 0;
     p_logo_list->i_next_pic = 0;
 
-    psz_list = strdup( psz_filename );
+    psz_original = psz_list = strdup( psz_filename );
     if( !psz_list )
         abort();
 
@@ -699,6 +700,8 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
 
     /* initialize so that on the first update it will wrap back to 0 */
     p_logo_list->i_counter = p_logo_list->i_count - 1;
+
+    free( psz_original );
 }
 
 /**
