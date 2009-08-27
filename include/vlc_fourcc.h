@@ -264,6 +264,7 @@
 #define VLC_CODEC_FI32      VLC_FOURCC('f','i','3','2')
 #define VLC_CODEC_FL32      VLC_FOURCC('f','l','3','2')
 #define VLC_CODEC_FL64      VLC_FOURCC('f','l','6','4')
+#define VLC_CODEC_TWINVQ    VLC_FOURCC('T','W','I','N')
 
 /* Subtitle */
 #define VLC_CODEC_SPU       VLC_FOURCC('s','p','u',' ')

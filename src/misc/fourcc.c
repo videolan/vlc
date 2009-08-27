@@ -1068,6 +1068,9 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_FL32, "64 bits float"),
         A("fl64"),
 
+    B(VLC_CODEC_TWINVQ, "TwinVQ"),
+        A("TWIN"),
+
     B(0, "")
 };
 static const entry_t p_list_spu[] = {
