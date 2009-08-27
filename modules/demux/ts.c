@@ -3649,6 +3649,9 @@ static void PMTSetupEsHDMV( demux_t *p_demux, ts_pid_t *pid,
         p_fmt->i_codec = VLC_CODEC_EAC3;
         break;
     case 0x90: /* Presentation graphics */
+        p_fmt->i_cat = SPU_ES;
+        p_fmt->i_codec = VLC_CODEC_BD_PG;
+        break;
     case 0x91: /* Interactive graphics */
     case 0x92: /* Subtitle */
     default:
