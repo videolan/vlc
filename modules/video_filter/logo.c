@@ -144,8 +144,6 @@ typedef struct
     int i_delay;            /* default delay (0 - 60000 ms) */
     int i_alpha;            /* default alpha */
 
-    char *psz_filename;     /* --logo-file string ( is it really useful
-                             * to store it ? ) */
 } logo_list_t;
 
 /**
@@ -195,7 +193,7 @@ static int Mouse( filter_t *, vlc_mouse_t *, const vlc_mouse_t *, const vlc_mous
 static int LogoCallback( vlc_object_t *, char const *,
                          vlc_value_t, vlc_value_t, void * );
 
-static void LogoListLoad( vlc_object_t *, logo_list_t * );
+static void LogoListLoad( vlc_object_t *, logo_list_t *, const char * );
 static void LogoListUnload( logo_list_t * );
 static logo_t *LogoListNext( logo_list_t *p_list, mtime_t i_date );
 static logo_t *LogoListCurrent( logo_list_t *p_list );
@@ -223,6 +221,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
+    char *psz_filename;
 
     /* */
     if( !b_sub && !es_format_IsSimilar( &p_filter->fmt_in, &p_filter->fmt_out ) )
@@ -258,16 +257,15 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     /* */
     logo_list_t *p_list = &p_sys->list;
 
-    p_list->psz_filename =
-        var_CreateGetStringCommand( p_filter, "logo-file" );
-    if( !p_list->psz_filename )
+    psz_filename = var_CreateGetStringCommand( p_filter, "logo-file" );
+    if( !psz_filename )
     {
         if( p_sys->p_blend )
             filter_DeleteBlend( p_sys->p_blend );
         free( p_sys );
         return VLC_ENOMEM;
     }
-    if( *p_list->psz_filename == '\0' )
+    if( *psz_filename == '\0' )
         msg_Warn( p_this, "no logo file specified" );
 
     p_list->i_alpha = var_CreateGetIntegerCommand( p_filter,
@@ -287,7 +285,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
         p_sys->i_pos = 0;
 
     vlc_mutex_init( &p_sys->lock );
-    LogoListLoad( p_this, p_list );
+    LogoListLoad( p_this, p_list, psz_filename );
     p_sys->b_spu_update = true;
     p_sys->b_mouse_grab = false;
 
@@ -306,6 +304,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
         p_filter->pf_mouse = Mouse;
     }
 
+    free( psz_filename );
     return VLC_SUCCESS;
 }
 
@@ -566,10 +565,7 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
     if( !strcmp( psz_var, "logo-file" ) )
     {
         LogoListUnload( p_list );
-        p_list->psz_filename = strdup( newval.psz_string );
-        if( !p_list->psz_filename )
-            abort();
-        LogoListLoad( p_this, p_list );
+        LogoListLoad( p_this, p_list, newval.psz_string );
     }
     else if ( !strcmp( psz_var, "logo-x" ) )
     {
@@ -629,7 +625,8 @@ static picture_t *LoadImage( vlc_object_t *p_this, char *psz_filename )
  * without a stated time or transparency will use the logo-delay and
  * logo-transparency values.
  */
-static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list )
+static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
+                          const char *psz_filename )
 {
     char *psz_list; /* the list: <logo>[,[<delay>[,[<alpha>]]]][;...] */
     unsigned int i;
@@ -638,7 +635,7 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list )
     p_logo_list->i_counter = 0;
     p_logo_list->i_next_pic = 0;
 
-    psz_list = strdup( p_logo_list->psz_filename );
+    psz_list = strdup( psz_filename );
     if( !psz_list )
         abort();
 
@@ -709,8 +706,6 @@ static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list )
  */
 static void LogoListUnload( logo_list_t *p_list )
 {
-    free( p_list->psz_filename );
-
     for( unsigned i = 0; i < p_list->i_count; i++ )
     {
         logo_t *p_logo = &p_list->p_logo[i];
