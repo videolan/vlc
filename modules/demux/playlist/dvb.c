@@ -1,7 +1,7 @@
 /*****************************************************************************
  * dvb.c : DVB channel list import (szap/tzap/czap compatible channel lists)
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-20009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -30,7 +30,6 @@
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
-#include <vlc_interface.h>
 #include <vlc_charset.h>
 
 #include "playlist.h"
@@ -211,8 +210,8 @@ static int ParseLine( char *psz_line, char **ppsz_name,
     while( psz_parse )
     {
         const char *psz_option = NULL;
-        char *psz_end = strchr( psz_parse, ':' );
-        if( psz_end ) { *psz_end = 0; psz_end++; }
+        char *psz_option_end = strchr( psz_parse, ':' );
+        if( psz_option_end ) { *psz_option_end = 0; psz_option_end++; }
 
         if( i_count == 0 )
         {
@@ -278,7 +277,7 @@ static int ParseLine( char *psz_line, char **ppsz_name,
                              psz_dup );
         }
 
-        psz_parse = psz_end;
+        psz_parse = psz_option_end;
         i_count++;
     }
 
