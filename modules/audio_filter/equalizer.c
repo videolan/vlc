@@ -118,6 +118,7 @@ struct aout_filter_sys_t
     float x2[32][2];
     float y2[32][128][2];
 
+    vlc_mutex_t lock;
 };
 
 static void DoWork( aout_instance_t *, aout_filter_t *,
@@ -178,8 +179,10 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
+    vlc_mutex_init( &p_sys->lock );
     if( EqzInit( p_filter, p_filter->input.i_rate ) != VLC_SUCCESS )
     {
+        vlc_mutex_destroy( &p_sys->lock );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -196,6 +199,7 @@ static void Close( vlc_object_t *p_this )
     aout_filter_sys_t *p_sys = p_filter->p_sys;
 
     EqzClean( p_filter );
+    vlc_mutex_destroy( &p_sys->lock );
     free( p_sys );
 }
 
@@ -422,6 +426,7 @@ static void EqzFilter( aout_filter_t *p_filter, float *out, float *in,
     aout_filter_sys_t *p_sys = p_filter->p_sys;
     int i, ch, j;
 
+    vlc_mutex_lock( &p_sys->lock );
     for( i = 0; i < i_samples; i++ )
     {
         for( ch = 0; ch < i_channels; ch++ )
@@ -475,6 +480,7 @@ static void EqzFilter( aout_filter_t *p_filter, float *out, float *in,
         in  += i_channels;
         out += i_channels;
     }
+    vlc_mutex_unlock( &p_sys->lock );
 }
 
 static void EqzClean( aout_filter_t *p_filter )
@@ -505,8 +511,12 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     const char *psz_preset = newval.psz_string;
 
+    vlc_mutex_lock( &p_sys->lock );
     if( !*psz_preset || p_sys->i_band != 10 )
+    {
+        vlc_mutex_unlock( &p_sys->lock );
         return VLC_SUCCESS;
+    }
 
     for( unsigned i = 0; eqz_preset_10b[i] != NULL; i++ )
     {
@@ -527,6 +537,7 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
                               d.quot, d.rem ) == -1 )
                 {
                     free( psz_newbands );
+                    vlc_mutex_unlock( &p_sys->lock );
                     return VLC_ENOMEM;
                 }
                 free( psz_newbands );
@@ -534,6 +545,7 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
             }
             if( p_sys->b_first == false )
             {
+                vlc_mutex_unlock( &p_sys->lock );
                 var_SetString( p_aout, "equalizer-bands", psz_newbands );
                 var_SetFloat( p_aout, "equalizer-preamp",
                               eqz_preset_10b[i]->f_preamp );
@@ -543,6 +555,7 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
             {
                 p_sys->psz_newbands = psz_newbands;
                 p_sys->f_newpreamp = eqz_preset_10b[i]->f_preamp;
+                vlc_mutex_unlock( &p_sys->lock );
             }
             return VLC_SUCCESS;
         }
@@ -564,7 +577,10 @@ static int PreampCallback( vlc_object_t *p_this, char const *psz_cmd,
         newval.f_float = -20.0;
     else if( newval.f_float > 20.0 )
         newval.f_float = 20.0;
+
+    vlc_mutex_lock( &p_sys->lock );
     p_sys->f_gamp = pow( 10, newval.f_float /20.0);
+    vlc_mutex_unlock( &p_sys->lock );
 
     return VLC_SUCCESS;
 }
@@ -579,6 +595,7 @@ static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
     char *psz_next;
 
     /* Same thing for bands */
+    vlc_mutex_lock( &p_sys->lock );
     for( int i = 0; i < p_sys->i_band; i++ )
     {
         float f;
@@ -598,6 +615,7 @@ static int BandsCallback( vlc_object_t *p_this, char const *psz_cmd,
             break; /* end of line */
         p = &psz_next[1];
     }
+    vlc_mutex_unlock( &p_sys->lock );
     return VLC_SUCCESS;
 }
 static int TwoPassCallback( vlc_object_t *p_this, char const *psz_cmd,
@@ -606,8 +624,9 @@ static int TwoPassCallback( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     aout_filter_sys_t *p_sys = (aout_filter_sys_t *)p_data;
 
-    /* FIXME lock (same for all other callbacks) */
+    vlc_mutex_lock( &p_sys->lock );
     p_sys->b_2eqz = newval.b_bool;
+    vlc_mutex_unlock( &p_sys->lock );
     return VLC_SUCCESS;
 }
 
