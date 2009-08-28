@@ -150,7 +150,7 @@ VLC_PUBLIC_API int libvlc_audio_output_set( libvlc_instance_t *p_instance,
 int libvlc_audio_output_device_count( libvlc_instance_t *p_instance,
                                       const char *psz_audio_output )
 {
-    char *psz_config_name = NULL;
+    char *psz_config_name;
     if( !psz_audio_output )
         return 0;
     if( asprintf( &psz_config_name, "%s-audio-device", psz_audio_output ) == -1 )
@@ -171,10 +171,8 @@ int libvlc_audio_output_device_count( libvlc_instance_t *p_instance,
 
         return p_module_config->i_list;
     }
-    else
-        free( psz_config_name );
 
-
+    free( psz_config_name );
     return 0;
 }
 
@@ -185,7 +183,7 @@ char * libvlc_audio_output_device_longname( libvlc_instance_t *p_instance,
                                             const char *psz_audio_output,
                                             int i_device )
 {
-    char *psz_config_name = NULL;
+    char *psz_config_name;
     if( !psz_audio_output )
         return NULL;
     if( asprintf( &psz_config_name, "%s-audio-device", psz_audio_output ) == -1 )
@@ -216,9 +214,8 @@ char * libvlc_audio_output_device_longname( libvlc_instance_t *p_instance,
                 return strdup( p_module_config->ppsz_list[i_device] );
         }
     }
-    else
-        free( psz_config_name );
 
+    free( psz_config_name );
     return NULL;
 }
 
@@ -229,7 +226,7 @@ char * libvlc_audio_output_device_id( libvlc_instance_t *p_instance,
                                       const char *psz_audio_output,
                                       int i_device )
 {
-    char *psz_config_name = NULL;
+    char *psz_config_name;
     if( !psz_audio_output )
         return NULL;
     if( asprintf( &psz_config_name, "%s-audio-device", psz_audio_output ) == -1)
@@ -256,9 +253,8 @@ char * libvlc_audio_output_device_id( libvlc_instance_t *p_instance,
             return strdup( p_module_config->ppsz_list[i_device] );
 
     }
-    else
-        free( psz_config_name );
 
+    free( psz_config_name );
     return NULL;
 }
 
@@ -287,11 +283,9 @@ int libvlc_audio_output_get_device_type( libvlc_instance_t *p_instance,
     aout_instance_t *p_aout = GetAOut( p_instance, p_e );
     if( p_aout )
     {
-        vlc_value_t val;
-
-        var_Get( p_aout, "audio-device", &val );
+        int i_device_type = var_GetInteger( p_aout, "audio-device" );
         vlc_object_release( p_aout );
-        return val.i_int;
+        return i_device_type;
     }
     libvlc_exception_raise( p_e, "Unable to get audio output" );
     return libvlc_AudioOutputDevice_Error;
@@ -500,11 +494,9 @@ void libvlc_audio_set_channel( libvlc_instance_t *p_instance,
     if( p_aout )
     {
         vlc_value_t val;
-        int i_ret = -1;
 
         val.i_int = channel;
-        i_ret = var_Set( p_aout, "audio-channels", val );
-        if( i_ret < 0 )
+        if( var_Set( p_aout, "audio-channels", val ) < 0 )
             libvlc_exception_raise( p_e, "Failed setting audio channel" );
 
         vlc_object_release( p_aout );
