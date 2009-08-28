@@ -48,6 +48,8 @@
 
 #include "avcodec.h"
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 25, 0 )
+
 struct decoder_sys_t {
     FFMPEG_COMMON_MEMBERS
 };
@@ -100,7 +102,6 @@ int InitSubtitleDec(decoder_t *dec, AVCodecContext *context,
  */
 subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
 {
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 25, 0 )
     decoder_sys_t *sys = dec->p_sys;
 
     if (!block_ptr || !*block_ptr)
@@ -164,11 +165,6 @@ subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
     if (!spu)
         block_Release(block);
     return spu;
-#else
-    VLC_UNUSED(dec);
-    VLC_UNUSED(block_ptr);
-    return NULL;
-#endif
 }
 
 /**
@@ -278,3 +274,4 @@ static subpicture_t *ConvertSubtitle(decoder_t *dec, AVSubtitle *ffsub, mtime_t 
     return spu;
 }
 
+#endif
