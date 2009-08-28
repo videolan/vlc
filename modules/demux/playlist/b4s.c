@@ -196,7 +196,12 @@ static int Demux( demux_t *p_demux )
                 {
                     char *psz_name = xml_ReaderName( p_xml_reader );
                     char *psz_value = xml_ReaderValue( p_xml_reader );
-                    if( !psz_name || !psz_value ) return -1;
+                    if( !psz_name || !psz_value )
+                    {
+                        free( psz_name );
+                        free( psz_value );
+                        return -1;
+                    }
                     if( !strcmp( psz_elname, "entry" ) &&
                         !strcmp( psz_name, "Playstring" ) )
                     {
