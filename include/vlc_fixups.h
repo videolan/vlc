@@ -38,6 +38,11 @@ typedef struct
 } lldiv_t;
 #endif
 
+#if !defined(HAVE_GETENV) || \
+    !defined(HAVE_USELOCALE)
+# include <stdlib.h> /* NULL */
+#endif
+
 #ifndef HAVE_REWIND
 # include <stdio.h> /* FILE */
 #endif
