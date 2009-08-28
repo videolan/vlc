@@ -86,18 +86,34 @@ class MediaControl:
             return None
 
     def set_media_position(self, pos):
+        """Set the media position.
+
+        @param pos: a MediaControlPosition or an integer (in ms)
+        """
         if not isinstance(pos, MediaControlPosition):
             pos=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(pos))
         e=MediaControlException()
         mediacontrol_set_media_position(self, pos, e)
 
     def start(self, pos=0):
+        """Start the player at the given position.
+
+        @param pos: a MediaControlPosition or an integer (in ms)
+        """
         if not isinstance(pos, MediaControlPosition):
             pos=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(pos))
         e=MediaControlException()
         mediacontrol_start(self, pos, e)
 
     def snapshot(self, pos=0):
+        """Take a snapshot.
+
+        Note: the position parameter is not properly implemented. For
+        the moment, the only valid position is the 0-relative position
+        (i.e. the current position).
+
+        @param pos: a MediaControlPosition or an integer (in ms)
+        """
         if not isinstance(pos, MediaControlPosition):
             pos=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(pos))
         e=MediaControlException()
@@ -108,6 +124,12 @@ class MediaControl:
             return None
 
     def display_text(self, message='', begin=0, end=1000):
+        """Display a caption between begin and end positions.
+
+        @param message: the caption to display
+        @param begin: the begin position
+        @param end: the end position
+        """
         if not isinstance(begin, MediaControlPosition):
             begin=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(begin))
         if not isinstance(end, MediaControlPosition):
@@ -116,6 +138,8 @@ class MediaControl:
         mediacontrol_display_text(self, message, begin, end, e)
 
     def get_stream_information(self, key=PositionKey.MediaTime):
+        """Return information about the stream.
+        """
         e=MediaControlException()
         return mediacontrol_get_stream_information(self, key, e).contents
 
