@@ -1702,8 +1702,10 @@ then
             AC_CHECK_LIB( lua , luaL_newstate,
               [LUA_LIBS="-llua"],
               [ have_lua=no
-                AC_MSG_WARN([lua >= 5.1 not found!])
-              ])
+                AS_IF([test "x${enable_lua}" = "xyes"],
+                  [AC_MSG_ERROR([lua >= 5.1 not found!])],
+                  [AC_MSG_WARN([lua >= 5.1 not found!])])
+              ], [-lm])
           )
         )
       ])
