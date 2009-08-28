@@ -39,8 +39,6 @@
 struct demux_sys_t
 {
     char *psz_prefix;
-    xml_t *p_xml;
-    xml_reader_t *p_xml_reader;
 };
 
 /*****************************************************************************
@@ -59,8 +57,6 @@ int Import_B4S( vlc_object_t *p_this )
     DEMUX_BY_EXTENSION_OR_FORCED_MSG( ".b4s", "b4s-open",
                                       "using B4S playlist reader" );
     p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
-    p_demux->p_sys->p_xml = NULL;
-    p_demux->p_sys->p_xml_reader = NULL;
     return VLC_SUCCESS;
 }
 
@@ -73,43 +69,40 @@ void Close_B4S( vlc_object_t *p_this )
     demux_sys_t *p_sys = p_demux->p_sys;
 
     free( p_sys->psz_prefix );
-    if( p_sys->p_xml_reader ) xml_ReaderDelete( p_sys->p_xml, p_sys->p_xml_reader );
-    if( p_sys->p_xml ) xml_Delete( p_sys->p_xml );
     free( p_sys );
 }
 
 static int Demux( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = p_demux->p_sys;
-    int i_ret;
+    int i_ret = -1;
 
     xml_t *p_xml;
-    xml_reader_t *p_xml_reader;
+    xml_reader_t *p_xml_reader = NULL;
     char *psz_elname = NULL;
-    int i_type;
     input_item_t *p_input;
-    char *psz_mrl = NULL, *psz_name = NULL, *psz_genre = NULL;
+    char *psz_mrl = NULL, *psz_title = NULL, *psz_genre = NULL;
     char *psz_now = NULL, *psz_listeners = NULL, *psz_bitrate = NULL;
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    p_xml = p_sys->p_xml = xml_Create( p_demux );
-    if( !p_xml ) return -1;
+    p_xml = xml_Create( p_demux );
+    if( !p_xml )
+        goto end;
 
     psz_elname = stream_ReadLine( p_demux->s );
     free( psz_elname );
     psz_elname = NULL;
 
     p_xml_reader = xml_ReaderCreate( p_xml, p_demux->s );
-    if( !p_xml_reader ) return -1;
-    p_sys->p_xml_reader = p_xml_reader;
+    if( !p_xml_reader )
+        goto end;
 
     /* xml */
     /* check root node */
     if( xml_ReaderRead( p_xml_reader ) != 1 )
     {
         msg_Err( p_demux, "invalid file (no root node)" );
-        return -1;
+        goto end;
     }
 
     if( xml_ReaderNodeType( p_xml_reader ) != XML_READER_STARTELEM ||
@@ -118,10 +111,9 @@ static int Demux( demux_t *p_demux )
     {
         msg_Err( p_demux, "invalid root node %i, %s",
                  xml_ReaderNodeType( p_xml_reader ), psz_elname );
-        free( psz_elname );
-        return -1;
+        goto end;
     }
-    free( psz_elname );
+    FREENULL( psz_elname );
 
     /* root node should not have any attributes, and should only
      * contain the "playlist node */
@@ -132,17 +124,16 @@ static int Demux( demux_t *p_demux )
     if( i_ret != 1 )
     {
         msg_Err( p_demux, "invalid file (no child node)" );
-        return -1;
+        goto end;
     }
 
     if( ( psz_elname = xml_ReaderName( p_xml_reader ) ) == NULL ||
         strcmp( psz_elname, "playlist" ) )
     {
         msg_Err( p_demux, "invalid child node %s", psz_elname );
-        free( psz_elname );
-        return -1;
+        goto end;
     }
-    free( psz_elname ); psz_elname = NULL;
+    FREENULL( psz_elname );
 
     // Read the attributes
     while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
@@ -153,7 +144,7 @@ static int Demux( demux_t *p_demux )
         {
             free( psz_name );
             free( psz_value );
-            return -1;
+            goto end;
         }
         if( !strcmp( psz_name, "num_entries" ) )
         {
@@ -175,21 +166,19 @@ static int Demux( demux_t *p_demux )
     while( (i_ret = xml_ReaderRead( p_xml_reader )) == 1 )
     {
         // Get the node type
-        i_type = xml_ReaderNodeType( p_xml_reader );
-        switch( i_type )
+        switch( xml_ReaderNodeType( p_xml_reader ) )
         {
             // Error
             case -1:
-                return -1;
-                break;
+                goto end;
 
             case XML_READER_STARTELEM:
             {
                 // Read the element name
                 free( psz_elname );
                 psz_elname = xml_ReaderName( p_xml_reader );
-                if( !psz_elname ) return -1;
-
+                if( !psz_elname )
+                    goto end;
 
                 // Read the attributes
                 while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
@@ -200,7 +189,7 @@ static int Demux( demux_t *p_demux )
                     {
                         free( psz_name );
                         free( psz_value );
-                        return -1;
+                        goto end;
                     }
                     if( !strcmp( psz_elname, "entry" ) &&
                         !strcmp( psz_name, "Playstring" ) )
@@ -227,7 +216,7 @@ static int Demux( demux_t *p_demux )
                 }
                 if( !strcmp( psz_elname, "Name" ) )
                 {
-                    psz_name = psz_text;
+                    psz_title = psz_text;
                 }
                 else if( !strcmp( psz_elname, "Genre" ) )
                 {
@@ -263,10 +252,11 @@ static int Demux( demux_t *p_demux )
                 // Read the element name
                 free( psz_elname );
                 psz_elname = xml_ReaderName( p_xml_reader );
-                if( !psz_elname ) return -1;
+                if( !psz_elname )
+                    goto end;
                 if( !strcmp( psz_elname, "entry" ) )
                 {
-                    p_input = input_item_New( p_demux, psz_mrl, psz_name );
+                    p_input = input_item_New( p_demux, psz_mrl, psz_title );
                     if( psz_now )
                         input_item_SetNowPlaying( p_input, psz_now );
                     if( psz_genre )
@@ -278,7 +268,7 @@ static int Demux( demux_t *p_demux )
 
                     input_item_AddSubItem( p_current_input, p_input );
                     vlc_gc_decref( p_input );
-                    FREENULL( psz_name );
+                    FREENULL( psz_title );
                     FREENULL( psz_mrl );
                     FREENULL( psz_genre );
                     FREENULL( psz_bitrate );
@@ -296,12 +286,18 @@ static int Demux( demux_t *p_demux )
     if( i_ret != 0 )
     {
         msg_Warn( p_demux, "error while parsing data" );
+        i_ret = 0; /* Needed for correct operation of go back */
     }
 
-   free( psz_elname );
+end:
+    free( psz_elname );
 
-    vlc_gc_decref(p_current_input);
-    return 0; /* Needed for correct operation of go back */
+    vlc_gc_decref( p_current_input );
+    if( p_xml_reader )
+        xml_ReaderDelete( p_xml, p_xml_reader );
+    if( p_xml )
+        xml_Delete( p_xml );
+    return i_ret;
 }
 
 static int Control( demux_t *p_demux, int i_query, va_list args )
