@@ -62,7 +62,7 @@ static aout_instance_t *GetAOut( libvlc_instance_t *p_instance,
 /*****************************************
  * Get the list of available audio outputs
  *****************************************/
-VLC_PUBLIC_API libvlc_audio_output_t *
+libvlc_audio_output_t *
         libvlc_audio_output_list_get( libvlc_instance_t *p_instance,
                                       libvlc_exception_t *p_e )
 {
@@ -113,7 +113,7 @@ VLC_PUBLIC_API libvlc_audio_output_t *
 /********************************************
  * Free the list of available audio outputs
  ***********************************************/
-VLC_PUBLIC_API void libvlc_audio_output_list_release( libvlc_audio_output_t *p_list )
+void libvlc_audio_output_list_release( libvlc_audio_output_t *p_list )
 {
     libvlc_audio_output_t *p_actual, *p_before;
     p_actual = p_list;
@@ -132,7 +132,7 @@ VLC_PUBLIC_API void libvlc_audio_output_list_release( libvlc_audio_output_t *p_l
 /***********************
  * Set the audio output.
  ***********************/
-VLC_PUBLIC_API int libvlc_audio_output_set( libvlc_instance_t *p_instance,
+int libvlc_audio_output_set( libvlc_instance_t *p_instance,
                                             const char *psz_name )
 {
     if( module_exists( psz_name ) )
@@ -261,7 +261,7 @@ char * libvlc_audio_output_device_id( libvlc_instance_t *p_instance,
 /*****************************
  * Set device for using
  *****************************/
-VLC_PUBLIC_API void libvlc_audio_output_device_set( libvlc_instance_t *p_instance,
+void libvlc_audio_output_device_set( libvlc_instance_t *p_instance,
                                                     const char *psz_audio_output,
                                                     const char *psz_device_id )
 {
