@@ -317,6 +317,10 @@ static int Open (vlc_object_t *obj)
         return VLC_EGENERIC;
     }
 
+    /* */
+    p_sys->att = NULL;
+    p_sys->pool = NULL;
+
     /* Cache adaptors infos */
     p_sys->adaptors = GetAdaptors (p_sys->embed, p_sys->conn);
     if (p_sys->adaptors == NULL)
@@ -326,7 +330,6 @@ static int Open (vlc_object_t *obj)
     video_format_t fmt = vd->fmt;
     // TODO !
 #if 1
-    p_sys->att = NULL;
     bool found_adaptor = false;
 
     /* FIXME: check max image size */
