@@ -1,7 +1,7 @@
 /*****************************************************************************
  * b4s.c : B4S playlist format import
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Sigmund Augdal Helberg <dnumgis@videolan.org>
@@ -31,7 +31,6 @@
 
 #include <vlc_common.h>
 #include <vlc_demux.h>
-#include <vlc_interface.h>
 #include <vlc_xml.h>
 
 #include "playlist.h"
@@ -46,7 +45,6 @@ struct demux_sys_t
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
-//static char *GetNextToken(char *psz_cur_string);
 static int IsWhitespace( char *psz_string );
 
 /*****************************************************************************
@@ -305,29 +303,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
     return VLC_EGENERIC;
 }
-
-#if 0
-/**
- * Get a in-string pointer to the start of the next token from a
- * string terminating the pointer returned by a previous call.
- *
- * \param psz_cur_string The string to search for the token from
- * \return a pointer to withing psz_cur_string, or NULL if no token
- * was found
- * \note The returned pointer may contain more than one
- * token, Run GetNextToken once more to terminate the token properly
- */
-static char *GetNextToken(char *psz_cur_string) {
-    while (*psz_cur_string && !isspace(*psz_cur_string))
-        psz_cur_string++;
-    if (!*psz_cur_string)
-        return NULL;
-    *psz_cur_string++ = '\0';
-    while (*psz_cur_string && isspace(*psz_cur_string))
-        psz_cur_string++;
-    return psz_cur_string;
-}
-#endif
 
 static int IsWhitespace( char *psz_string )
 {
