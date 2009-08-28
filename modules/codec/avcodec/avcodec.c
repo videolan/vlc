@@ -44,15 +44,14 @@
 #   include <avcodec.h>
 #endif
 
+#include "avcodec.h"
+#include "avutil.h"
+
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 51, 48, 0 )
 #   error You must update libavcodec to a version >= 51.48.0
 #elif LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 25, 0 )
 #   warning You should update libavcodec to get subtitle support
 #endif
-
-
-#include "avcodec.h"
-#include "avutil.h"
 
 /*****************************************************************************
  * decoder_sys_t: decoder descriptor
@@ -315,9 +314,11 @@ static void CloseDecoder( vlc_object_t *p_this )
     case VIDEO_ES:
          EndVideoDec ( p_dec );
         break;
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 25, 0 )
     case SPU_ES:
          EndSubtitleDec( p_dec );
         break;
+#endif
     }
 
     if( p_sys->p_context )
