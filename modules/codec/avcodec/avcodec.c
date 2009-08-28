@@ -44,9 +44,12 @@
 #   include <avcodec.h>
 #endif
 
-#if LIBAVCODEC_BUILD < 5000
-#   error You must have a libavcodec >= 5000 (get svn)
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 51, 48, 0 )
+#   error You must update libavcodec to a version >= 51.48.0
+#elif LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 25, 0 )
+#   warning You should update libavcodec to get subtitle support
 #endif
+
 
 #include "avcodec.h"
 #include "avutil.h"
