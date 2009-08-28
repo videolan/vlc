@@ -320,7 +320,7 @@ void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
         goto end;
     }
 
-    if( (i_spu < 0) && (i_spu > val_list.p_list->i_count) )
+    if( (i_spu < 0) || (i_spu > val_list.p_list->i_count) )
     {
         libvlc_exception_raise( p_e, "Subtitle value out of range" );
         goto end;
@@ -699,7 +699,7 @@ int libvlc_video_get_marquee_option_as_int( libvlc_media_player_t *p_mi,
         vlc_object_release(marquee);
         return isEnabled;
     }
-    
+
     /* Generic case */
     if(!identifier)
     {
@@ -724,7 +724,7 @@ char * libvlc_video_get_marquee_option_as_string( libvlc_media_player_t *p_mi,
         libvlc_exception_raise( p_e, "This option is not available" );
         return 0;
     }
-    
+
     vlc_object_t * marquee = get_marquee_object(p_mi);
     if(!marquee)
     {

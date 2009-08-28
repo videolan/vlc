@@ -454,7 +454,7 @@ void libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track,
         return;
 
     var_Change( p_input_thread, "audio-es", VLC_VAR_GETCHOICES, &val_list, NULL );
-    if( (i_track < 0) && (i_track > val_list.p_list->i_count) )
+    if( (i_track < 0) || (i_track > val_list.p_list->i_count) )
     {
         libvlc_exception_raise( p_e, "Audio track out of range" );
         goto end;
@@ -509,5 +509,4 @@ void libvlc_audio_set_channel( libvlc_instance_t *p_instance,
 
         vlc_object_release( p_aout );
     }
-
 }
