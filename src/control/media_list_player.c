@@ -334,7 +334,7 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance, libvlc_exception_t 
 {
     (void)p_e;
     libvlc_media_list_player_t * p_mlp;
-    p_mlp = calloc(sizeof(libvlc_media_list_player_t), 1);
+    p_mlp = calloc( 1, sizeof(libvlc_media_list_player_t) );
     if (!p_mlp)
         return NULL;
 
