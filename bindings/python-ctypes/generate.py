@@ -65,14 +65,16 @@ blacklist=[
     "libvlc_media_list_view_remove_at_index",
     "libvlc_media_list_view_add_item",
 
-    # In svn but not in current 1.0.0
-    "libvlc_media_add_option_flag",
-    'libvlc_video_set_deinterlace',
-    'libvlc_video_get_marquee_option_as_int',
-    'libvlc_video_get_marquee_option_as_string',
-    'libvlc_video_set_marquee_option_as_int',
-    'libvlc_video_set_marquee_option_as_string',
-    'libvlc_vlm_get_event_manager',
+    # In svn but not in current 1.0.0.
+    #"libvlc_media_add_option_flag",
+    #'libvlc_video_set_deinterlace',
+    #'libvlc_video_get_marquee_option_as_int',
+    #'libvlc_video_get_marquee_option_as_string',
+    #'libvlc_video_set_marquee_option_as_int',
+    #'libvlc_video_set_marquee_option_as_string',
+    #'libvlc_vlm_get_event_manager',
+    #"libvlc_media_list_player_event_manager",
+    #'libvlc_media_player_next_frame',
 
     'mediacontrol_PlaylistSeq__free',
     ]
@@ -478,25 +480,26 @@ class PythonGenerator(object):
             # FIXME
             return
 
+        self.output("""if hasattr(dll, '%s'):""" % method)
         if params:
-            self.output("prototype=ctypes.CFUNCTYPE(%s, %s)" % (self.type2class.get(rtype, 'FIXME_%s' % rtype),
+            self.output("    prototype=ctypes.CFUNCTYPE(%s, %s)" % (self.type2class.get(rtype, 'FIXME_%s' % rtype),
                                                                 ",".join( self.type2class[p[0]] for p in params )))
         else:
-            self.output("prototype=ctypes.CFUNCTYPE(%s)" % self.type2class.get(rtype, 'FIXME_%s' % rtype))
+            self.output("    prototype=ctypes.CFUNCTYPE(%s)" % self.type2class.get(rtype, 'FIXME_%s' % rtype))
 
 
         if not params:
-            flags='paramflags= tuple()'
+            flags='    paramflags= tuple()'
         elif len(params) == 1:
-            flags="paramflags=( (%d, ), )" % parameter_passing[params[0][0]]
+            flags="    paramflags=( (%d, ), )" % parameter_passing[params[0][0]]
         else:
-            flags="paramflags=%s" % ",".join( '(%d,)' % parameter_passing[p[0]] for p in params )
+            flags="    paramflags=%s" % ",".join( '(%d,)' % parameter_passing[p[0]] for p in params )
         self.output(flags)
-        self.output('%s = prototype( ("%s", dll), paramflags )' % (method, method))
+        self.output('    %s = prototype( ("%s", dll), paramflags )' % (method, method))
         if '3' in flags:
             # A VLCException is present. Process it.
-            self.output("%s.errcheck = check_vlc_exception" % method)
-        self.output('%s.__doc__ = """%s"""' % (method, comment))
+            self.output("    %s.errcheck = check_vlc_exception" % method)
+        self.output('    %s.__doc__ = """%s"""' % (method, comment))
         self.output()
 
     def parse_override(self, name):
@@ -613,18 +616,19 @@ class PythonGenerator(object):
                 else:
                     args=", ".join( p[1] for p in params )
 
-                self.output("    def %s(%s):" % (name, args))
-                self.output('        """%s\n        """' % self.fix_python_comment(comment))
+                self.output("    if hasattr(dll, '%s'):" % method)
+                self.output("        def %s(%s):" % (name, args))
+                self.output('            """%s\n        """' % self.fix_python_comment(comment))
                 if params and params[-1][0] == 'libvlc_exception_t*':
                     # Exception handling
-                    self.output("        e=VLCException()")
-                    self.output("        return %s(%s, e)" % (method, args))
+                    self.output("            e=VLCException()")
+                    self.output("            return %s(%s, e)" % (method, args))
                 elif params and params[-1][0] == 'mediacontrol_Exception*':
                     # Exception handling
-                    self.output("        e=MediaControlException()")
-                    self.output("        return %s(%s, e)" % (method, args))
+                    self.output("            e=MediaControlException()")
+                    self.output("            return %s(%s, e)" % (method, args))
                 else:
-                    self.output("        return %s(%s)" % (method, args))
+                    self.output("            return %s(%s)" % (method, args))
                 self.output()
 
                 # Check for standard methods
