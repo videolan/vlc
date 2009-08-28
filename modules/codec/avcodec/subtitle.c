@@ -165,6 +165,8 @@ subpicture_t *DecodeSubtitle(decoder_t *dec, block_t **block_ptr)
         block_Release(block);
     return spu;
 #else
+    VLC_UNUSED(dec);
+    VLC_UNUSED(block_ptr);
     return NULL;
 #endif
 }
