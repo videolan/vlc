@@ -184,6 +184,7 @@ Kevin H. Patterson <kevpatt at khptech dot com> - Theora framesize calculation
 Koehler, Vitally <vkoehler AT telekom de> -  solves the problem of audio packet losses by the playback of MPEG2 transport stream.
 Konstanty Bialkowski <konstanty -|- ieee [] org> - improvements on mod files support
 kty0ne - WinAmp 5 skin for VLC
+Kypchak Kypchak <kypchak 47 gmail d0t com> - Kazakh localization
 Lahiru Lakmal Priyadarshana <llahiru at gmail # com> - Qt4 patch
 Laurent Jonqueres <laurent_jonqueres at yahoo.fr> - Occitan localization
 Laurent Mutricy <laurent.mutricy at ecl2005 dot ec-lyon dot fr> - HTTP interface fixes
@@ -231,6 +232,7 @@ Morten Brix Pedersen <morten at wtf.dk> - Danish translation
 Myckel Habets <myckel at sdf.lonestar.org> - Dutch translation
 Namhyung Kim <namhyung at gmail d0t com> - Korean translation
 Nilmoni Deb <ndeb at ece.cmu.edu> - autoconf and Makefile fixes
+Oleksandr Natalenko <pfactum at gmail dot com> - Ukranian translation
 Olivier Aubert <oaubert at bat710.univ-lyon1.fr> - clone list patch
 Olivier Houchard <doginou @t dong d0t ci0 d0t org> - UDP & HTTP access output fix, ffmpeg mux fix
 Olivier Pomel <pomel at via.ecp.fr> - original VLC code
