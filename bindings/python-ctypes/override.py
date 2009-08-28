@@ -72,7 +72,7 @@ class MediaControl:
 
         if p and isinstance(p[0], Instance):
             e=MediaControlException()
-            return mediacontrol_new_from_instance(p[0])
+            return mediacontrol_new_from_instance(p[0], e)
         else:
             e=MediaControlException()
             return mediacontrol_new(len(p), p, e)
