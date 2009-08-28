@@ -40,7 +40,7 @@ typedef struct
 
 #if !defined(HAVE_GETENV) || \
     !defined(HAVE_USELOCALE)
-# include <stdlib.h> /* NULL */
+# include <stddef.h> /* NULL */
 #endif
 
 #ifndef HAVE_REWIND
