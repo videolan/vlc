@@ -57,6 +57,11 @@
 #ifdef HAVE_LIBPROXY
 #    include <proxy.h>
 #endif
+
+#ifdef WIN32
+#   include <Windows.h>
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -99,6 +104,11 @@ static void Close( vlc_object_t * );
 #define MAX_REDIRECT_TEXT N_("Max number of redirection")
 #define MAX_REDIRECT_LONGTEXT N_("Limit the number of redirection to follow.")
 
+#define USE_IE_PROXY_TEXT N_("Use Internet Explorer entered HTTP proxy server")
+#define USE_IE_PROXY_LONGTEXT N_("Use Internet Explorer entered HTTP proxy " \
+    "server for all URL. Don't take into account bypasses settings and auto " \
+    "configuration scripts.")
+
 vlc_module_begin ()
     set_description( N_("HTTP input") )
     set_capability( "access", 0 )
@@ -125,6 +135,10 @@ vlc_module_begin ()
               FORWARD_COOKIES_LONGTEXT, true )
     add_integer( "http-max-redirect", 5, NULL, MAX_REDIRECT_TEXT,
                  MAX_REDIRECT_LONGTEXT, true )
+#ifdef WIN32
+    add_bool( "http-use-IE-proxy", false, NULL, USE_IE_PROXY_TEXT,
+              USE_IE_PROXY_LONGTEXT, true )
+#endif
     add_obsolete_string("http-user")
     add_obsolete_string("http-pwd")
     add_shortcut( "http" )
@@ -371,6 +385,67 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
             msg_Err(p_access, "Allocating memory for libproxy failed");
         }
     }
+#elif defined( WIN32 )
+    else
+    {
+        if( var_CreateGetBool( p_access, "http-use-IE-proxy" ) )
+        {
+            /* Try to get the proxy server address from Windows internet settings using registry. */
+            HKEY h_key;
+            /* Open the key */
+            if( RegOpenKeyEx( HKEY_CURRENT_USER, "Software\\Microsoft" \
+                              "\\Windows\\CurrentVersion\\Internet Settings",
+                              0, KEY_READ, &h_key ) == ERROR_SUCCESS )
+            {
+                DWORD i_dataReadSize = 4; /* sizeof( DWORD ); */
+                DWORD proxyEnable = 0;
+                /* Get the proxy enable value */
+                if( RegQueryValueEx( h_key, "ProxyEnable", NULL, NULL,
+                                     (char *)&proxyEnable, &i_dataReadSize )
+                                     == ERROR_SUCCESS )
+                {
+                    if( proxyEnable )
+                    {
+                        /* Proxy is enable */
+                        char psz_key[256];
+                        i_dataReadSize = 256;
+                        if( RegQueryValueEx( h_key, "ProxyServer",
+                                             NULL, NULL, psz_key,
+                                             &i_dataReadSize )
+                                             == ERROR_SUCCESS )
+                        {
+                            /* Get the proxy URL :
+                            Proxy server value in the registry can be something like "address:port"
+                            or "ftp=adress1:port1;http=adress2:port2 ..." depending of the
+                            confirguration. */
+                            char *psz_proxy;
+                            psz_proxy = strstr( psz_key, "http=" );
+                            if( psz_proxy != NULL )
+                            {
+                                psz_proxy += strlen( "http=" );
+                                char *psz_endUrl = strchr( psz_proxy, ';' );
+                                if( psz_endUrl != NULL )
+                                    *psz_endUrl = '\0';
+                            }
+                            else
+                                psz_proxy = psz_key;
+                            /* Set proxy enable for this connection. */
+                            p_sys->b_proxy = true;
+                            vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
+                        }
+                        msg_Warn( p_access, "Couldn't read in registry " \
+                                  "the proxy server address." );
+                    }
+                }
+                else
+                    msg_Warn( p_access, "Couldn't read in registry if the " \
+                              "proxy is enable or not." );
+            }
+            else
+                msg_Warn( p_access, "Couldn't open internet settings key " \
+                          "in registry." );
+        }
+    }
 #elif HAVE_GETENV
     else
     {
@@ -382,6 +457,7 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
         }
     }
 #endif
+
     if( psz ) /* No, this is NOT a use-after-free error */
     {
         psz = var_CreateGetNonEmptyString( p_access, "http-proxy-pwd" );
