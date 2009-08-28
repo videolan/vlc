@@ -91,19 +91,42 @@ class LibVLCException(Exception):
     pass
 
 # From libvlc_structures.h
-class VLCException(ctypes.Structure):
-    """libvlc exception.
-    """
-    _fields_= [
-                ('raised', ctypes.c_int),
-                ('code', ctypes.c_int),
-                ('message', ctypes.c_char_p),
-                ]
-    def init(self):
-        libvlc_exception_init(self)
 
-    def clear(self):
-        libvlc_exception_clear(self)
+# This is version-dependent, depending on the presence of libvlc_exception_get_message.
+
+if hasattr(dll, 'libvlc_exception_get_message'):
+    # New-style message passing
+    class VLCException(ctypes.Structure):
+        """libvlc exception.
+        """
+        _fields_= [
+                    ('raised', ctypes.c_int),
+                    ]
+
+        @property
+        def message(self):
+            return dll.libvlc_exception_get_message()
+
+        def init(self):
+            libvlc_exception_init(self)
+
+        def clear(self):
+            libvlc_exception_clear(self)
+else:
+    # Old-style exceptions
+    class VLCException(ctypes.Structure):
+        """libvlc exception.
+        """
+        _fields_= [
+                    ('raised', ctypes.c_int),
+                    ('code', ctypes.c_int),
+                    ('message', ctypes.c_char_p),
+                    ]
+        def init(self):
+            libvlc_exception_init(self)
+
+        def clear(self):
+            libvlc_exception_clear(self)
 
 class PlaylistItem(ctypes.Structure):
     _fields_= [
