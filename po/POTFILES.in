@@ -65,7 +65,7 @@ include/vlc/vlc.h
 include/vlc_vlm.h
 include/vlc_vod.h
 include/vlc_vout.h
-include/vlc_window.h
+include/vlc_vout_window.h
 include/vlc_xml.h
 src/audio_output/aout_internal.h
 src/audio_output/common.c
@@ -79,7 +79,9 @@ src/config/chain.c
 src/config/cmdline.c
 src/config/configuration.h
 src/config/core.c
-src/config/dirs.c
+src/config/dirs_macos.c
+src/config/dirs_win.c
+src/config/dirs_xdg.c
 src/config/file.c
 src/config/intf.c
 src/control/audio.c
@@ -393,7 +395,6 @@ modules/codec/cmml/xtag.c
 modules/codec/cmml/xtag.h
 modules/codec/cmml/xurl.c
 modules/codec/cmml/xurl.h
-modules/codec/csri.c
 modules/codec/cvdsub.c
 modules/codec/dirac.c
 modules/codec/dmo/buffer.c
@@ -459,7 +460,6 @@ modules/control/motion.c
 modules/control/netsync.c
 modules/control/ntservice.c
 modules/control/rc.c
-modules/control/showintf.c
 modules/control/signals.c
 modules/control/telnet.c
 modules/control/unimotion.c
@@ -622,8 +622,6 @@ modules/gui/macosx/prefs_widgets.h
 modules/gui/macosx/prefs_widgets.m
 modules/gui/macosx/simple_prefs.h
 modules/gui/macosx/simple_prefs.m
-modules/gui/macosx/update.h
-modules/gui/macosx/update.m
 modules/gui/macosx/vlm.h
 modules/gui/macosx/vlm.m
 modules/gui/macosx/vout.h
@@ -1141,12 +1139,6 @@ modules/stream_out/rtsp.c
 modules/stream_out/standard.c
 modules/stream_out/switcher.c
 modules/stream_out/transcode.c
-modules/stream_out/transrate/block.c
-modules/stream_out/transrate/frame.c
-modules/stream_out/transrate/getvlc.h
-modules/stream_out/transrate/putvlc.h
-modules/stream_out/transrate/transrate.c
-modules/stream_out/transrate/transrate.h
 modules/video_chroma/grey_yuv.c
 modules/video_chroma/i420_rgb.c
 modules/video_chroma/i420_rgb.h
@@ -1269,10 +1261,8 @@ modules/video_output/snapshot.c
 modules/video_output/svgalib.c
 modules/video_output/vmem.c
 modules/video_output/x11/glx.c
-modules/video_output/x11/x11.c
 modules/video_output/x11/xcommon.c
 modules/video_output/x11/xcommon.h
-modules/video_output/x11/xvideo.c
 modules/video_output/x11/xvmc.c
 modules/video_output/xcb/window.c
 modules/video_output/xcb/x11.c
