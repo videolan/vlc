@@ -170,6 +170,10 @@ endif
 X264CONF += --enable-pic
 endif
 
+ifdef HAVE_ISA_THUMB
+NOTHUMB ?= -mno-thumb
+endif
+
 DATE=`date +%Y-%m-%d`
 
 # ***************************************************************************
@@ -631,7 +635,7 @@ ifdef HAVE_DARWIN_OS
 endif
 
 .mad: libmad
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3" && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="-O3 $(NOTHUMB)" && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
@@ -984,6 +988,9 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 ifdef SVN
 ffmpeg:
 	$(SVN) co $(FFMPEG_SVN) ffmpeg
+ifdef HAVE_ISA_THUMB
+	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
+endif
 ifdef HAVE_WINCE
 	patch -p1 < Patches/ffmpeg-svn-wince.patch
 endif
@@ -1039,6 +1046,9 @@ ifdef HAVE_UCLIBC
 else
 .ffmpeg: ffmpeg .lame .gsm
 endif
+endif
+ifdef HAVE_ISA_THUMB
+	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
 	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS)" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
 	touch $@
