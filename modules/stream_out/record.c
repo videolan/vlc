@@ -306,21 +306,31 @@ static int OutputNew( sout_stream_t *p_stream,
                       const char *psz_muxer, const char *psz_prefix, const char *psz_extension  )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
+    char *psz_file;
     char *psz_output;
     int i_count;
 
-    if( asprintf( &psz_output, "std{access=file,mux='%s',dst='%s%s%s'}",
-                  psz_muxer, psz_prefix, psz_extension ? "." : "", psz_extension ? psz_extension : "" ) < 0 )
-        return -1;
+    if( asprintf( &psz_file, "%s%s%s",
+                  psz_prefix, psz_extension ? "." : "", psz_extension ? psz_extension : "" ) < 0 )
+    {
+        psz_file = NULL;
+        goto error;
+    }
+
+    if( asprintf( &psz_output, "std{access=file,mux='%s',dst='%s'}",
+                  psz_muxer, psz_file ) < 0 )
+    {
+        psz_output = NULL;
+        goto error;
+    }
 
     /* Create the output */
     msg_Dbg( p_stream, "Using record output `%s'", psz_output );
+
     p_sys->p_out = sout_StreamNew( p_stream->p_sout, psz_output );
 
-    free( psz_output );
-
     if( !p_sys->p_out )
-        return -1;
+        goto error;
 
     /* Add es */
     i_count = 0;
@@ -333,7 +343,20 @@ static int OutputNew( sout_stream_t *p_stream,
             i_count++;
     }
 
+    if( psz_file && psz_extension )
+        var_SetString( p_stream->p_libvlc, "record-file", psz_file );
+
+    free( psz_file );
+    free( psz_output );
+
     return i_count;
+
+error:
+
+    free( psz_file );
+    free( psz_output );
+    return -1;
+
 }
 
 static void OutputStart( sout_stream_t *p_stream )
