@@ -162,6 +162,11 @@ FFMPEGCONF+= --enable-libamr-nb --enable-libamr-wb --enable-nonfree
 endif
 
 ifdef HAVE_LINUX
+ifdef HAVE_MAEMO
+# Really, this could be done on all Linux platforms, not just Maemo.
+# Installing statically-linked VLC plugins is so much simpler.
+HOSTCONF += --with-pic --disable-shared
+endif
 X264CONF += --enable-pic
 endif
 
