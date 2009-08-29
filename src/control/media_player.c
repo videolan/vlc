@@ -348,9 +348,7 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
         vout_thread that generates the event and media_player that re-emits it
         with its own event manager
     */
-    var_Create( p_libvlc_instance->p_libvlc_int, "vout-snapshottaken",
-                VLC_VAR_STRING | VLC_VAR_ISCOMMAND );
-    var_AddCallback( p_libvlc_instance->p_libvlc_int, "vout-snapshottaken",
+    var_AddCallback( p_libvlc_instance->p_libvlc_int, "snapshot-file",
                      SnapshotTakenCallback, p_mi );
 
     return p_mi;
@@ -387,7 +385,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 
     /* Detach Callback from the main libvlc object */
     var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int,
-                     "vout-snapshottaken", SnapshotTakenCallback, p_mi );
+                     "snapshot-file", SnapshotTakenCallback, p_mi );
 
     /* Release the input thread */
     release_input_thread( p_mi, true );

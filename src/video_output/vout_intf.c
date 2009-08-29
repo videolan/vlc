@@ -504,10 +504,9 @@ static void VoutSaveSnapshot( vout_thread_t *p_vout )
 
     VoutOsdSnapshot( p_vout, p_picture, psz_filename );
 
-    /* Generate a media player event  - Right now just trigger a global libvlc var
-        CHECK: Could not find a more local object. The goal is to communicate
-        vout_thread with libvlc_media_player or its input_thread */
-    var_SetString( p_vout->p_libvlc, "vout-snapshottaken", psz_filename );
+    /* signal creation of a new snapshot file */
+    var_SetString( p_vout->p_libvlc, "snapshot-file", psz_filename );
+
     free( psz_filename );
 
 exit:

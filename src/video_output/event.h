@@ -220,10 +220,8 @@ static inline void vout_SendEventSourceCrop(vout_thread_t *vout,
 #if 0
 static inline void vout_SendEventSnapshot(vout_thread_t *vout, const char *filename)
 {
-    /* Generate a media player event  - Right now just trigger a global libvlc var
-        CHECK: Could not find a more local object. The goal is to communicate
-        vout_thread with libvlc_media_player or its input_thread */
-    var_SetString(vout->p_libvlc, "vout-snapshottaken", filename);
+    /* signal creation of a new snapshot file */
+    var_SetString(vout->p_libvlc, "snapshot-file", filename);
 }
 
 #warning "FIXME clean up postproc event"
