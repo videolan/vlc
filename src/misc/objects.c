@@ -59,7 +59,6 @@
 
 #if defined (HAVE_SYS_EVENTFD_H)
 # include <sys/eventfd.h>
-# define HAVE_EVENTFD 1
 #endif
 
 
