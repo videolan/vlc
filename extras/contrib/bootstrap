@@ -259,6 +259,7 @@ case $HOST in
                 cat src/Distributions/fedora.mak >> distro.mak
             elif test -f /etc/maemo_version; then
                 cat src/Distributions/maemo.mak >> distro.mak
+                echo 'HAVE_MAEMO = 1' >> config.mak
             else
                 # Default Unix-like systems
                 cat src/Distributions/unix.mak >> distro.mak
