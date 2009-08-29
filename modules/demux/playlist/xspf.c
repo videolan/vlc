@@ -63,15 +63,15 @@ int Import_xspf( vlc_object_t *p_this )
 void Close_xspf( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    int i;
-    for(i = 0; i < p_demux->p_sys->i_tracklist_entries; i++)
+    demux_sys_t *p_sys = p_demux->p_sys;
+    for( int i = 0; i < p_sys->i_tracklist_entries; i++ )
     {
-        if(p_demux->p_sys->pp_tracklist[i])
-            vlc_gc_decref( p_demux->p_sys->pp_tracklist[i] );
+        if( p_sys->pp_tracklist[i] )
+            vlc_gc_decref( p_sys->pp_tracklist[i] );
     }
-    free( p_demux->p_sys->pp_tracklist );
-    free( p_demux->p_sys->psz_base );
-    free( p_demux->p_sys );
+    free( p_sys->pp_tracklist );
+    free( p_sys->psz_base );
+    free( p_sys );
 }
 
 /**
@@ -113,6 +113,7 @@ int Demux( demux_t *p_demux )
     if( !psz_name || strcmp( psz_name, "playlist" ) )
     {
         msg_Err( p_demux, "invalid root node name: %s", psz_name );
+        free( psz_name );
         goto end;
     }
     free( psz_name );
