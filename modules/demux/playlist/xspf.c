@@ -382,10 +382,10 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
  */
 static bool parse_track_node COMPLEX_INTERFACE
 {
-    int i_node;
     char *psz_name = NULL;
     char *psz_value = NULL;
     xml_elem_hnd_t *p_handler = NULL;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
     xml_elem_hnd_t track_elements[] =
         { {"location",     SIMPLE_CONTENT,  {NULL} },
@@ -413,11 +413,11 @@ static bool parse_track_node COMPLEX_INTERFACE
     }
 
     /* reset i_track_id */
-    p_demux->p_sys->i_track_id = -1;
+    p_sys->i_track_id = -1;
 
     while( xml_ReaderRead( p_xml_reader ) == 1 )
     {
-        i_node = xml_ReaderNodeType( p_xml_reader );
+        int i_node = xml_ReaderNodeType( p_xml_reader );
         switch( i_node )
         {
             case XML_READER_NONE:
@@ -497,29 +497,26 @@ static bool parse_track_node COMPLEX_INTERFACE
                     }
                     free( psz_uri );
 
-                    if( p_demux->p_sys->i_track_id < 0 )
+                    if( p_sys->i_track_id < 0 )
                     {
                         input_item_AddSubItem( p_input_item, p_new_input );
                         vlc_gc_decref( p_new_input );
                         return true;
                     }
 
-                    if( p_demux->p_sys->i_track_id >=
-                           p_demux->p_sys->i_tracklist_entries )
+                    if( p_sys->i_track_id >= p_sys->i_tracklist_entries )
                     {
                         input_item_t **pp;
-                        pp = realloc( p_demux->p_sys->pp_tracklist,
-                            (p_demux->p_sys->i_track_id + 1) * sizeof(*pp) );
+                        pp = realloc( p_sys->pp_tracklist,
+                            (p_sys->i_track_id + 1) * sizeof(*pp) );
                         if( !pp )
                             return false;
-                        p_demux->p_sys->pp_tracklist = pp;
-                        while( p_demux->p_sys->i_track_id >=
-                               p_demux->p_sys->i_tracklist_entries )
-                            pp[p_demux->p_sys->i_tracklist_entries++] = NULL;
+                        p_sys->pp_tracklist = pp;
+                        while( p_sys->i_track_id >= p_sys->i_tracklist_entries )
+                            pp[p_sys->i_tracklist_entries++] = NULL;
                     }
 
-                    p_demux->p_sys->pp_tracklist[
-                            p_demux->p_sys->i_track_id ] = p_new_input;
+                    p_sys->pp_tracklist[ p_sys->i_track_id ] = p_new_input;
                     return true;
                 }
                 /* there MUST have been a start tag for that element name */
@@ -542,11 +539,11 @@ static bool parse_track_node COMPLEX_INTERFACE
                      * Last, psz_base should default to the XSPF resource
                      * location if missing (not the current working directory).
                      * -- Courmisch */
-                    if( p_demux->p_sys->psz_base && !strstr( psz_value, "://" ) )
+                    if( p_sys->psz_base && !strstr( psz_value, "://" ) )
                     {
                         char* psz_tmp;
-                        if( asprintf( &psz_tmp, "%s%s",
-                                p_demux->p_sys->psz_base, psz_value ) == -1 )
+                        if( asprintf( &psz_tmp, "%s%s", p_sys->psz_base,
+                                      psz_value ) == -1 )
                         {
                             FREE_ATT();
                             return NULL;
