@@ -102,11 +102,14 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     ADD_ICON( NODE, ":/type/node" );
 #undef ADD_ICON
 
+    ContextUpdateMapper = new QSignalMapper(this);
+
     rebuild( p_root );
     CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
             this, processInputItemUpdate( input_item_t *) );
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
             this, processInputItemUpdate( input_thread_t* ) );
+    CONNECT( ContextUpdateMapper, mapped( int ),  this, toggleColumnShown( int ) );
 }
 
 PLModel::~PLModel()
@@ -1041,7 +1044,25 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
         menu->addSeparator();
         menu->addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
     }
+    if( tree || i_popup_item > -1 )
+        menu->addSeparator();
+    QMenu *col_selector = menu->addMenu( qtr( "Visible columns" ) );
+    makeColumnSelectMenu( col_selector );
     menu->popup( point );
+}
+
+void PLModel::makeColumnSelectMenu( QMenu *menu )
+{
+    int i_column = 1;
+    for( i_column = 1; i_column != COLUMN_END; i_column<<=1 )
+    {
+        QAction* option = menu->addAction(
+            qfu( psz_column_title( i_column ) ) );
+        option->setCheckable( true );
+        option->setChecked( shownFlags() & i_column );
+        ContextUpdateMapper->setMapping( option, i_column );
+        CONNECT( option, triggered(), ContextUpdateMapper, map() );
+    }
 }
 
 void PLModel::toggleColumnShown( int meta )

@@ -128,6 +128,8 @@ public:
     void removeItem( int );
     void rebuild(); void rebuild( playlist_item_t * );
 
+    /* Helpers */
+    void makeColumnSelectMenu( QMenu *menu );
 private:
 
     /* General */

@@ -308,22 +308,9 @@ void StandardPLPanel::checkSortingIndicator( int meta )
 
 void StandardPLPanel::popupSelectColumn( QPoint pos )
 {
-    ContextUpdateMapper = new QSignalMapper(this);
-
     QMenu selectColMenu;
 
-    int i_column = 1;
-    for( i_column = 1; i_column != COLUMN_END; i_column<<=1 )
-    {
-        QAction* option = selectColMenu.addAction(
-            qfu( psz_column_title( i_column ) ) );
-        option->setCheckable( true );
-        option->setChecked( model->shownFlags() & i_column );
-        ContextUpdateMapper->setMapping( option, i_column );
-        CONNECT( option, triggered(), ContextUpdateMapper, map() );
-    }
-
-    CONNECT( ContextUpdateMapper, mapped( int ),  model, toggleColumnShown( int ) );
+    model->makeColumnSelectMenu( &selectColMenu );
 
     selectColMenu.exec( QCursor::pos() );
 }
