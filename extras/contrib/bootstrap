@@ -243,6 +243,8 @@ case $HOST in
             EXTRA_CLFAGS="$EXTRA_CFLAGS -mfpu=neon"
             EXTRA_CFLAGS="$EXTRA_CFLAGS -mthumb -mthumb-interwork"
             echo 'HAVE_ISA_THUMB = 1' >> config.mak
+        else
+            EXTRA_CFLAGS="-msoft-float"
         fi
     ;;
     *86_64*linux*)
