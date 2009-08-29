@@ -438,8 +438,10 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
     /* Load configuration */
     cfg->is_fullscreen = var_CreateGetBool(vout, "fullscreen");
     cfg->display.title = title;
-    cfg->display.width   = var_CreateGetInteger(vout, "width");
-    cfg->display.height  = var_CreateGetInteger(vout, "height");
+    const int display_width = var_CreateGetInteger(vout, "width");
+    const int display_height = var_CreateGetInteger(vout, "height");
+    cfg->display.width   = display_width > 0  ? display_width  : 0;
+    cfg->display.height  = display_height > 0 ? display_height : 0;
     cfg->is_display_filled  = var_CreateGetBool(vout, "autoscale");
     cfg->display.sar.num = 1; /* TODO monitor AR */
     cfg->display.sar.den = 1;
