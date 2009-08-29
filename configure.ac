@@ -794,7 +794,7 @@ if test "${ac_cv_have_plugins}" = "no" -o "${SYS}" = "darwin"; then
     ac_cv_my_have_dlopen=yes,
     AC_CHECK_LIB(dl, dlopen,
       ac_cv_my_have_dlopen=yes
-      VLC_ADD_LIBS([libvlccore realaudio realvideo],[-ldl]),
+      VLC_ADD_LIBS([libvlccore realaudio realvideo lua],[-ldl]),
       AC_CHECK_LIB(svld, dlopen,
         ac_cv_my_have_dlopen=yes
         VLC_ADD_LIBS([libvlccore],[-lsvld]))))
