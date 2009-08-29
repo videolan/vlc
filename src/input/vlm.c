@@ -571,17 +571,19 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             {
                 input_item_t item;
                 es_format_t es, *p_es = &es;
-                char fourcc[5];
+                union { char text[5]; uint32_t value; } fourcc;
 
-                sprintf( fourcc, "%4.4s", p_cfg->vod.psz_mux );
-                fourcc[0] = tolower(fourcc[0]); fourcc[1] = tolower(fourcc[1]);
-                fourcc[2] = tolower(fourcc[2]); fourcc[3] = tolower(fourcc[3]);
+                sprintf( fourcc.text, "%4.4s", p_cfg->vod.psz_mux );
+                fourcc.text[0] = tolower(fourcc.text[0]);
+                fourcc.text[1] = tolower(fourcc.text[1]);
+                fourcc.text[2] = tolower(fourcc.text[2]);
+                fourcc.text[3] = tolower(fourcc.text[3]);
 
                 /* XXX: Don't do it that way, but properly use a new input item ref. */
                 item = *p_media->vod.p_item;
                 item.i_es = 1;
                 item.es = &p_es;
-                es_format_Init( &es, VIDEO_ES, *((int *)fourcc) );
+                es_format_Init( &es, VIDEO_ES, fourcc.value );
 
                 p_media->vod.p_media =
                     p_vlm->p_vod->pf_media_new( p_vlm->p_vod, p_cfg->psz_name, &item );
