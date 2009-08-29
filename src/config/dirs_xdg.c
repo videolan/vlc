@@ -204,7 +204,7 @@ char *config_GetUserDir (vlc_userdir_t type)
     switch (type)
     {
         case VLC_HOME_DIR:
-            return config_GetHomeDir ();
+            break;
         case VLC_CONFIG_DIR:
             return config_GetAppDir ("CONFIG", ".config");
         case VLC_DATA_DIR:
@@ -229,5 +229,5 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_VIDEOS_DIR:
             return config_GetTypeDir ("VIDEOS");
     }
-    assert (0);
+    return config_GetHomeDir ();
 }
