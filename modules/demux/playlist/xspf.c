@@ -386,6 +386,7 @@ static bool parse_track_node COMPLEX_INTERFACE
     char *psz_value = NULL;
     xml_elem_hnd_t *p_handler = NULL;
     demux_sys_t *p_sys = p_demux->p_sys;
+    bool b_ret = false;
 
     xml_elem_hnd_t track_elements[] =
         { {"location",     SIMPLE_CONTENT,  {NULL} },
@@ -429,8 +430,7 @@ static bool parse_track_node COMPLEX_INTERFACE
                 if( !psz_name || !*psz_name )
                 {
                     msg_Err( p_demux, "invalid xml stream" );
-                    FREE_ATT();
-                    return false;
+                    goto end;
                 }
                 /* choose handler */
                 for( p_handler = track_elements;
@@ -439,24 +439,22 @@ static bool parse_track_node COMPLEX_INTERFACE
                 if( !p_handler->name )
                 {
                     msg_Err( p_demux, "unexpected element <%s>", psz_name );
-                    FREE_ATT();
-                    return false;
+                    goto end;
                 }
                 FREE_NAME();
                 /* complex content is parsed in a separate function */
                 if( p_handler->type == COMPLEX_CONTENT )
                 {
+                    FREE_VALUE();
                     if( p_handler->pf_handler.cmplx( p_demux,
                                                      p_new_input,
                                                      p_xml_reader,
                                                      p_handler->name ) )
                     {
                         p_handler = NULL;
-                        FREE_ATT();
                     }
                     else
                     {
-                        FREE_ATT();
                         return false;
                     }
                 }
@@ -464,13 +462,12 @@ static bool parse_track_node COMPLEX_INTERFACE
 
             case XML_READER_TEXT:
                 /* simple element content */
-                FREE_ATT();
+                free( psz_value );
                 psz_value = xml_ReaderValue( p_xml_reader );
                 if( !psz_value )
                 {
                     msg_Err( p_demux, "invalid xml stream" );
-                    FREE_ATT();
-                    return false;
+                    goto end;
                 }
                 break;
 
@@ -480,14 +477,14 @@ static bool parse_track_node COMPLEX_INTERFACE
                 if( !psz_name )
                 {
                     msg_Err( p_demux, "invalid xml stream" );
-                    FREE_ATT();
-                    return false;
+                    goto end;
                 }
 
                 /* leave if the current parent node <track> is terminated */
                 if( !strcmp( psz_name, psz_element ) )
                 {
-                    FREE_ATT();
+                    free( psz_name );
+                    free( psz_value );
 
                     /* Make sure we have a URI */
                     char *psz_uri = input_item_GetURI( p_new_input );
@@ -525,8 +522,7 @@ static bool parse_track_node COMPLEX_INTERFACE
                 {
                     msg_Err( p_demux, "there's no open element left for <%s>",
                              psz_name );
-                    FREE_ATT();
-                    return false;
+                    goto end;
                 }
 
                 /* special case: location */
@@ -545,8 +541,7 @@ static bool parse_track_node COMPLEX_INTERFACE
                         if( asprintf( &psz_tmp, "%s%s", p_sys->psz_base,
                                       psz_value ) == -1 )
                         {
-                            FREE_ATT();
-                            return NULL;
+                            goto end;
                         }
                         input_item_SetURI( p_new_input, psz_tmp );
                         free( psz_tmp );
@@ -554,8 +549,6 @@ static bool parse_track_node COMPLEX_INTERFACE
                     else
                         input_item_SetURI( p_new_input, psz_value );
                     input_item_CopyOptions( p_input_item, p_new_input );
-                    FREE_ATT();
-                    p_handler = NULL;
                 }
                 else
                 {
@@ -575,14 +568,15 @@ static bool parse_track_node COMPLEX_INTERFACE
             default:
                 /* unknown/unexpected xml node */
                 msg_Err( p_demux, "unexpected xml node %i", i_node );
-                FREE_ATT();
-                return false;
+                goto end;
         }
-        FREE_NAME();
     }
     msg_Err( p_demux, "unexpected end of xml data" );
-    FREE_ATT();
-    return false;
+
+end:
+    free( psz_name );
+    free( psz_value );
+    return b_ret;
 }
 
 /**
