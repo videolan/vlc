@@ -34,6 +34,4 @@ void CloseEncoder ( vlc_object_t * );
 int  OpenDemux    ( vlc_object_t * );
 void CloseDemux   ( vlc_object_t * );
 
-int  OpenVideo    ( vlc_object_t * );
-
 #define kBufferSize 0x500

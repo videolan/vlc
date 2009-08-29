@@ -4,7 +4,6 @@ SOURCES_stats = \
 	decoder.c \
 	demux.c \
 	encoder.c \
-	vout.c \
 	$(NULL)
 
 libvlc_LTLIBRARIES += libstats_plugin.la

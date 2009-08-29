@@ -38,13 +38,14 @@
  *****************************************************************************/
 static picture_t *Get(vout_display_t *);
 static void       Display(vout_display_t *, picture_t *);
+static void       DisplayStat(vout_display_t *, picture_t *);
 static int        Control(vout_display_t *, int, va_list);
-static void       Manage(vout_display_t *);
+static void       Manage (vout_display_t *);
 
 /*****************************************************************************
  * OpenVideo: activates dummy vout display method
  *****************************************************************************/
-int OpenVideo(vlc_object_t *object)
+static int OpenVideoCommon(vlc_object_t *object, bool display_stat)
 {
     vout_display_t *vd = (vout_display_t *)object;
 
@@ -61,11 +62,19 @@ int OpenVideo(vlc_object_t *object)
     }
     vd->get = Get;
     vd->prepare = NULL;
-    vd->display = Display;
+    vd->display = display_stat ? DisplayStat : Display;
     vd->control = Control;
     vd->manage = Manage;
 
     return VLC_SUCCESS;
+}
+int OpenVideo(vlc_object_t *object)
+{
+    return OpenVideoCommon(object, false);
+}
+int OpenVideoStat(vlc_object_t *object)
+{
+    return OpenVideoCommon(object, true);
 }
 
 static picture_t *Get(vout_display_t *vd)
@@ -73,11 +82,25 @@ static picture_t *Get(vout_display_t *vd)
     VLC_UNUSED(vd);
     return picture_NewFromFormat(&vd->fmt);
 }
+
 static void Display(vout_display_t *vd, picture_t *picture)
 {
     VLC_UNUSED(vd);
     picture_Release(picture);
 }
+
+static void DisplayStat(vout_display_t *vd, picture_t *picture)
+{
+    VLC_UNUSED(vd);
+    if (vd->fmt.i_width*vd->fmt.i_height >= sizeof(mtime_t)) {
+        mtime_t date;
+        memcpy(&date, picture->p->p_pixels, sizeof(date));
+        msg_Dbg(vd, "VOUT got %"PRIu64" ms offset",
+                (mdate() - date) / 1000 );
+    }
+    picture_Release(picture);
+}
+
 static int Control(vout_display_t *vd, int query, va_list args)
 {
     VLC_UNUSED(vd);
@@ -85,6 +108,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
     VLC_UNUSED(args);
     return VLC_SUCCESS;
 }
+
 static void Manage(vout_display_t *vd)
 {
     VLC_UNUSED(vd);
