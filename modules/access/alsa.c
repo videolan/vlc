@@ -499,11 +499,7 @@ static int OpenAudioDevAlsa( demux_t *p_demux )
     }
 
     /* Set sample rate */
-#ifdef HAVE_ALSA_NEW_API
     i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, &p_sys->i_sample_rate, NULL );
-#else
-    i_err = snd_pcm_hw_params_set_rate_near( p_sys->p_alsa_pcm, p_hw_params, p_sys->i_sample_rate, NULL );
-#endif
     if( i_err < 0 )
     {
         msg_Err( p_demux, "ALSA: cannot set sample rate (%s)",
@@ -541,11 +537,7 @@ static int OpenAudioDevAlsa( demux_t *p_demux )
 
     /* Set period time */
     unsigned int period_time = buffer_time / 4;
-#ifdef HAVE_ALSA_NEW_API
     i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, &period_time, 0 );
-#else
-    i_err = snd_pcm_hw_params_set_period_time_near( p_sys->p_alsa_pcm, p_hw_params, period_time, 0 );
-#endif
     if( i_err < 0 )
     {
         msg_Err( p_demux, "ALSA: cannot set period time (%s)",
@@ -554,11 +546,7 @@ static int OpenAudioDevAlsa( demux_t *p_demux )
     }
 
     /* Set buffer time */
-#ifdef HAVE_ALSA_NEW_API
     i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, &buffer_time, 0 );
-#else
-    i_err = snd_pcm_hw_params_set_buffer_time_near( p_sys->p_alsa_pcm, p_hw_params, buffer_time, 0 );
-#endif
     if( i_err < 0 )
     {
         msg_Err( p_demux, "ALSA: cannot set buffer time (%s)",
