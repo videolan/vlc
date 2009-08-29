@@ -1,5 +1,5 @@
 /*****************************************************************************
- * input_interface.h: Input functions usable ouside input code.
+ * input_interface.h: Input functions usable outside input code.
  *****************************************************************************
  * Copyright (C) 1998-2008 the VideoLAN team
  * $Id$

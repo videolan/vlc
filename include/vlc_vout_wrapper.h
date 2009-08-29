@@ -26,7 +26,7 @@
 
 #include <vlc_vout_display.h>
 
-/* XXX DO NOT use it ouside the vout module wrapper XXX */
+/* XXX DO NOT use it outside the vout module wrapper XXX */
 
 /**
  * It retreive a picture from the display
