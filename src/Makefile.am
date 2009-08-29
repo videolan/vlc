@@ -48,6 +48,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_aout.h \
 	../include/vlc_aout_mixer.h \
 	../include/vlc_arrays.h \
+	../include/vlc_art_finder.h \
 	../include/vlc_avcodec.h \
 	../include/vlc_bits.h \
 	../include/vlc_block.h \
@@ -77,6 +78,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_messages.h \
 	../include/vlc_meta.h \
 	../include/vlc_modules.h \
+	../include/vlc_mouse.h \
 	../include/vlc_mtime.h \
 	../include/vlc_objects.h \
 	../include/vlc_picture.h \
@@ -117,6 +119,7 @@ noinst_HEADERS = \
 	../include/vlc_tls.h \
 	../include/vlc_update.h \
 	../include/vlc_vod.h \
+	../include/vlc_vout_wrapper.h \
 	$(NULL)
 
 ../include/vlc_about.h: Makefile.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_srcdir)/AUTHORS
@@ -352,6 +355,7 @@ SOURCES_libvlc_common = \
 	input/var.c \
 	video_output/display.c \
 	video_output/display.h \
+	video_output/event.h \
 	video_output/snapshot.c \
 	video_output/snapshot.h \
 	video_output/statistic.h \

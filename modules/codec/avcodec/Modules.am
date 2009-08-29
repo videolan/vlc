@@ -9,6 +9,7 @@ SOURCES_avcodec = \
 	fourcc.c \
 	chroma.c \
 	vaapi.c \
+	vaapi.h \
 	$(NULL)
 
 if ENABLE_SOUT

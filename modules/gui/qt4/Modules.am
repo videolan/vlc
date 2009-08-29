@@ -103,6 +103,7 @@ DEPS_res = \
 	pixmaps/playlist/add.png \
 	pixmaps/playlist/jumpto.png \
 	pixmaps/playlist/playlist.png \
+	pixmaps/playlist/remove.png \
 	pixmaps/playlist/repeat_all.png \
 	pixmaps/playlist/repeat_off.png \
 	pixmaps/playlist/repeat_one.png \
@@ -124,6 +125,10 @@ DEPS_res = \
 	pixmaps/previous.png \
 	pixmaps/previous_16px.png \
 	pixmaps/profile_new.png \
+	pixmaps/sample_classic.png \
+	pixmaps/sample_complete.png \
+	pixmaps/sample_minimal.png \
+	pixmaps/sample_skins.png \
 	pixmaps/slower.png \
 	pixmaps/space.png \
 	pixmaps/stop.png \
