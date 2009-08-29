@@ -306,8 +306,8 @@ static int OutputNew( sout_stream_t *p_stream,
                       const char *psz_muxer, const char *psz_prefix, const char *psz_extension  )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    char *psz_file;
-    char *psz_output;
+    char *psz_file = NULL;
+    char *psz_output = NULL;
     int i_count;
 
     if( asprintf( &psz_file, "%s%s%s",
