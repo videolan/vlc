@@ -692,9 +692,9 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->psz_set_ctrls = var_CreateGetString( p_obj, "v4l2-set-ctrls" );
 
     char *psz_aspect = var_CreateGetString( p_obj, "v4l2-aspect-ratio" );
-    if( psz_aspect && *psz_aspect && strchr( psz_aspect, ":" ) )
+    if( psz_aspect && *psz_aspect && strchr( psz_aspect, ':' ) )
     {
-        char psz_delim = strchr( psz_aspect, ":" );
+        char *psz_delim = strchr( psz_aspect, ':' );
         p_sys->i_aspect = atoi( psz_aspect ) * VOUT_ASPECT_FACTOR / atoi( psz_delim + 1 );
     }
     else
