@@ -252,37 +252,38 @@ case $HOST in
         echo "LIBRARY_PATH = /usr/lib64" >> config.mak
         echo "PKG_CONFIG_PATH = /usr/lib64/pkgconfig" >> config.mak
         echo "PKG_CONFIG_LIBDIR = /usr/lib64/pkgconfig" >> config.mak
-        cat src/Distributions/unix.mak >> distro.mak
-    ;;
-    *)
-        if test "$HOST" = "$BUILD"; then
-            if test -d "/usr/lib/pkgconfig"; then
-                if test -z "$PKG_CONFIG_PATH"; then
-                    echo "PKG_CONFIG_PATH = /usr/lib/pkgconfig" >> config.mak
-                fi
-                if test -z "$PKG_CONFIG_LIBDIR"; then
-                    echo "PKG_CONFIG_LIBDIR = /usr/lib/pkgconfig" >> config.mak
-                fi
-            fi
-            # Try to match distribution
-            if test -f /etc/fedora-release; then
-                cat src/Distributions/fedora.mak >> distro.mak
-            elif test -f /etc/maemo_version; then
-                cat src/Distributions/maemo.mak >> distro.mak
-                echo 'HAVE_MAEMO = 1' >> config.mak
-            else
-                # Default Unix-like systems
-                cat src/Distributions/unix.mak >> distro.mak
-            fi
-        else # unknown distro
-            if test ! -z "${DISTRO}";  then
-                cat src/Distributions/${DISTRO}.mak >> distro.mak
-            else
-                cat src/Distributions/unix.mak >> distro.mak
-            fi
-        fi
     ;;
 esac
+
+if ! test -f distro.mak; then
+    if test ! -z "${DISTRO}";  then
+        cat src/Distributions/${DISTRO}.mak >> distro.mak
+    elif test "$HOST" = "$BUILD"; then
+        if test -d "/usr/lib/pkgconfig"; then
+            if test -z "$PKG_CONFIG_PATH"; then
+                echo "PKG_CONFIG_PATH = /usr/lib/pkgconfig" >> config.mak
+            fi
+            if test -z "$PKG_CONFIG_LIBDIR"; then
+                echo "PKG_CONFIG_LIBDIR = /usr/lib/pkgconfig" >> config.mak
+            fi
+        fi
+        # Try to match distribution
+        if test -f /etc/fedora-release; then
+            cat src/Distributions/fedora.mak >> distro.mak
+        elif test -f /etc/maemo_version; then
+            cat src/Distributions/maemo.mak >> distro.mak
+            echo 'HAVE_MAEMO = 1' >> config.mak
+        elif test -f /etc/debian_version; then
+            # NOTE: check for Debian *after* its derivatives
+            cat src/Distribution/debian.mak >> distro.mak
+        fi
+    fi
+fi
+
+if ! test -f distro.mak; then
+    # Default Unix-like systems
+    cat src/Distributions/unix.mak >> distro.mak
+fi
 
 echo "BUILD = $BUILD" >> config.mak
 echo "HOST = $HOST" >> config.mak
