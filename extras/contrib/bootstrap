@@ -235,6 +235,15 @@ case $HOST in
             cat src/Distributions/unix.mak >> distro.mak
         fi
     ;;
+    arm-none-linux-gnueabi)
+        if test -f /etc/maemo_version; then
+            cat src/Distributions/maemo.mak >> distro.mak
+            echo 'HAVE_MAEMO = 1' >> config.mak
+            EXTRA_CFLAGS=" -mcpu=cortex-a8 -mtune=cortex-a8 -march=armv7-a"
+            EXTRA_CLFAGS="$EXTRA_CFLAGS -mfpu=vfp"
+            EXTRA_CFLAGS="$EXTRA_CFLAGS -mthumb -mthumb-interwork"
+        fi
+    ;;
     *86_64*linux*)
         EXTRA_CFLAGS=" -fPIC"
         EXTRA_CPPFLAGS=" -fPIC"
