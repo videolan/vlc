@@ -3546,7 +3546,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
   dnl libxcb
   PKG_CHECK_MODULES(XCB, [xcb])
   PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
-  VLC_ADD_PLUGIN([xcb])
+  VLC_ADD_PLUGIN([xcb_x11])
   VLC_ADD_PLUGIN([xcb_screen])
 
   AS_IF([test "${enable_xvideo}" != "no"], [

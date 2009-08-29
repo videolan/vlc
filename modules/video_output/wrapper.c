@@ -48,7 +48,7 @@ static void Close(vlc_object_t *);
 DECLARE_OPEN(aalib);
 DECLARE_OPEN(caca);
 DECLARE_OPEN(sdl);
-DECLARE_OPEN(xcb);
+DECLARE_OPEN(xcb_x11);
 DECLARE_OPEN(xcb_xv);
 
 #undef DECLARE_OPEN
@@ -73,7 +73,7 @@ vlc_module_begin()
     DECLARE_MODULE(sdl, 60)
 
     add_submodule()
-    DECLARE_MODULE(xcb, 75)
+    DECLARE_MODULE(xcb_x11, 75)
 
     add_submodule()
     DECLARE_MODULE(xcb_xv, 155)

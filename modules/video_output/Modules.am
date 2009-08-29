@@ -21,18 +21,18 @@ SOURCES_vmem = vmem.c
 SOURCES_yuv = yuv.c
 SOURCES_vout_wrapper = wrapper.c
 
-libxcb_plugin_la_SOURCES = \
+libxcb_x11_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
 	xcb/x11.c \
 	xcb/common.c \
 	xcb/events.c
-libxcb_plugin_la_CFLAGS = $(AM_CFLAGS) \
+libxcb_x11_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) \
 	$(XPROTO_CFLAGS)
-libxcb_plugin_la_LIBADD = $(AM_LIBADD) \
+libxcb_x11_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS) $(XCB_SHM_LIBS) \
 	$(XPROTO_LIBS)
-libxcb_plugin_la_DEPENDENCIES =
+libxcb_x11_plugin_la_DEPENDENCIES =
 
 libxcb_xv_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \
@@ -57,11 +57,11 @@ libxcb_window_plugin_la_LIBADD = $(AM_LIBADD) \
 libxcb_window_plugin_la_DEPENDENCIES =
 
 EXTRA_LTLIBRARIES += \
-	libxcb_plugin.la \
+	libxcb_x11_plugin.la \
 	libxcb_xv_plugin.la \
 	libxcb_window_plugin.la
 libvlc_LTLIBRARIES += \
-	$(LTLIBxcb) \
+	$(LTLIBxcb_x11) \
 	$(LTLIBxcb_xv) \
 	$(LTLIBxcb_window)
 
