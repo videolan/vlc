@@ -27,7 +27,6 @@ Encoders:
     #transcode{vcodec=h264,venc=x264{profile=baseline,level=1.2},vb=384,width=320,height=176}
  * x264, defaults to crf=23 as x264.exe-does, if bitrate is given, uses ABR and if qp-value is set
    uses CQP
- * MPEG2 transrate stream output removed
 
 Video Output:
  * Added desktop mode to the Direct3D output module. It differs from DirectX
