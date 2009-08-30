@@ -75,6 +75,7 @@ static void test_block (void)
     assert (!memcmp (block->p_buffer + 200, text, sizeof (text)));
 
     block = block_Realloc (block, -200, sizeof (text) + 200);
+    block_Release (block);
 
     //block = block_Alloc (SIZE_MAX);
     //assert (block == NULL);
