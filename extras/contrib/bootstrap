@@ -182,7 +182,7 @@ case $HOST in
         RANLIB="ranlib"
         AR="ar"
         STRIP="strip"
-        cat src/Distributions/darwin.mak >> distro.mak
+        cat src/Distributions/darwin64.mak >> distro.mak
         if test -e /Developer/SDKs; then
             echo "SDKs found. Everything is fine." >&2
         else
