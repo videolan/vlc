@@ -68,11 +68,18 @@
     if (_rootMedia == media)
         return;
     [_rootMedia release];
-    _rootMedia = [media retain];
+    _rootMedia = nil;
+
     VLCMediaList *mediaList = [[VLCMediaList alloc] init];
     if (media)
         [mediaList addMedia:media];
+
+    // This will clean rootMedia
     [self setMediaList:mediaList];
+
+    // Thus set rootMedia here.
+    _rootMedia = [media retain];
+
     [mediaList release];
 }
 
