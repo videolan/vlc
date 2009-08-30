@@ -75,7 +75,7 @@ private:
     QTreeView *view;
     QPushButton *repeatButton, *randomButton, *addButton, *gotoPlayingButton;
     int currentRootId;
-    QSignalMapper *ContextUpdateMapper;
+    QSignalMapper *selectColumnsSigMapper;
 public slots:
     void removeItem( int );
     virtual void setRoot( int );
@@ -90,7 +90,7 @@ private slots:
     void setCurrentRootId( int );
     void popupAdd();
     void popupSelectColumn( QPoint );
-    void checkSortingIndicator( int );
+    void toggleColumnShown( int );
 };
 
 #endif

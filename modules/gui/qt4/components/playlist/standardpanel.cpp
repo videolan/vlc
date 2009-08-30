@@ -83,9 +83,13 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     }
     else
     {
-        /* Configure the size of the header */
-        view->header()->resizeSection( 0, 200 );
-        view->header()->resizeSection( 1, 80 );
+        int m, c;
+        for( m = 1, c = 0; m != COLUMN_END; m <<= 1, c++ )
+        {
+            view->setColumnHidden( c, !( m & COLUMN_DEFAULT ) );
+            if( m == COLUMN_TITLE ) view->header()->resizeSection( c, 200 );
+            else if( m == COLUMN_DURATION ) view->header()->resizeSection( c, 80 );
+        }
     }
     view->header()->setSortIndicatorShown( true );
     view->header()->setClickable( true );
@@ -101,8 +105,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
              this, popupSelectColumn( QPoint ) );
     CONNECT( model, currentChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
-    CONNECT( model, columnsChanged( int ),
-            this, checkSortingIndicator( int ) );
 
     currentRootId = -1;
     CONNECT( parent, rootChanged( int ), this, setCurrentRootId( int ) );
@@ -172,6 +174,9 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->addLayout( buttons );
 //    layout->addWidget( bar );
     setLayout( layout );
+
+    selectColumnsSigMapper = new QSignalMapper( this );
+    CONNECT( selectColumnsSigMapper, mapped( int ), this, toggleColumnShown( int ) );
 }
 
 /* Function to toggle between the Repeat states */
@@ -260,59 +265,38 @@ void StandardPLPanel::popupAdd()
                         + QPoint( 0, addButton->height() ) );
 }
 
-/* Set sortingindicator to -1 if it's on column thats removed,
- * else check that it's still showing on correct column
- */
-void StandardPLPanel::checkSortingIndicator( int meta )
-{
-    int index=0;
-
-    if( view->header()->isSortIndicatorShown() == false )
-        return;
-
-    int sortIndex = view->header()->sortIndicatorSection();
-    if( sortIndex < 0 || sortIndex > view->header()->count() || meta == 0 )
-        return;
-
-    int _meta = meta;
-
-    while( _meta )
-    {
-        if( _meta & model->shownFlags() )
-            index++;
-        _meta >>= 1;
-    }
-
-    /* Adding column */
-    if( model->shownFlags() & meta )
-    {
-        /* If column is added before sortIndex, move it one to right*/
-        if( sortIndex >= index )
-        {
-            sortIndex += 1;
-        }
-    } else {
-        /* Column removed */
-        if( sortIndex == index )
-        {
-            sortIndex = -1;
-        } else if( sortIndex > index )
-        {
-            /* Move indicator left one step*/
-            sortIndex -= 1;
-        }
-    }
-    view->header()->setSortIndicator( sortIndex  ,
-                view->header()->sortIndicatorOrder() );
-}
-
 void StandardPLPanel::popupSelectColumn( QPoint pos )
 {
-    QMenu selectColMenu;
+    QMenu menu;
 
-    model->makeColumnSelectMenu( &selectColMenu );
+    int i, j;
+    for( i = 1, j = 0; i < COLUMN_END; i <<= 1, j++ )
+    {
+        QAction* option = menu.addAction(
+            qfu( psz_column_title( i ) ) );
+        option->setCheckable( true );
+        option->setChecked( !view->isColumnHidden( j ) );
+        selectColumnsSigMapper->setMapping( option, j );
+        CONNECT( option, triggered(), selectColumnsSigMapper, map() );
+    }
+    menu.exec( QCursor::pos() );
+}
 
-    selectColMenu.exec( QCursor::pos() );
+void StandardPLPanel::toggleColumnShown( int i )
+{
+    if( view->isColumnHidden( i ) )
+    {
+        view->setColumnHidden( i, false );
+    }
+    else
+    {
+        int visible = 0;
+        int m, c;
+        for( m = 1, c = 0; m != COLUMN_END && visible < 2; m <<= 1, c++ )
+            if( !view->isColumnHidden( c ) ) visible++;
+        if( visible < 2 ) return;
+        view->setColumnHidden( i, true );
+    }
 }
 
 /* Search in the playlist */

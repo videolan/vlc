@@ -78,17 +78,6 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 
     rootItem          = NULL; /* PLItem rootItem, will be set in rebuild( ) */
 
-    if( i_depth == DEPTH_SEL )
-        i_showflags = 0;
-    else
-    {
-        i_showflags = getSettings()->value( "qt-pl-showflags", COLUMN_DEFAULT ).toInt();
-        if( i_showflags < 1)
-            i_showflags = COLUMN_DEFAULT; /* reasonable default to show something */
-        else if ( i_showflags >= COLUMN_END )
-            i_showflags = COLUMN_END - 1; /* show everything */
-    }
-
     /* Icons initialization */
 #define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( QPixmap( x ) )
     ADD_ICON( UNKNOWN , type_unknown_xpm );
@@ -102,20 +91,15 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     ADD_ICON( NODE, ":/type/node" );
 #undef ADD_ICON
 
-    ContextUpdateMapper = new QSignalMapper(this);
-
     rebuild( p_root );
     CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
             this, processInputItemUpdate( input_item_t *) );
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
             this, processInputItemUpdate( input_thread_t* ) );
-    CONNECT( ContextUpdateMapper, mapped( int ),  this, toggleColumnShown( int ) );
 }
 
 PLModel::~PLModel()
 {
-    if(i_depth == -1)
-        getSettings()->setValue( "qt-pl-showflags", i_showflags );
     delCallbacks();
     delete rootItem;
 }
@@ -374,7 +358,7 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
             return QVariant(returninfo);
         }
 
-        int metadata = columnToMeta( index.column(), i_showflags );
+        int metadata = columnToMeta( index.column() );
         if( metadata == COLUMN_END ) return QVariant();
 
         QString returninfo;
@@ -423,7 +407,7 @@ QVariant PLModel::headerData( int section, Qt::Orientation orientation,
 
     if( i_depth == DEPTH_SEL ) return QVariant( QString("") );
 
-    int meta_col = columnToMeta( section, i_showflags );
+    int meta_col = columnToMeta( section );
 
     if( meta_col == COLUMN_END ) return QVariant();
 
@@ -478,17 +462,7 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
 
 int PLModel::columnCount( const QModelIndex &i) const
 {
-    int columnCount=0;
-    int metadata=1;
-    if( i_depth == DEPTH_SEL ) return 1;
-
-    while( metadata < COLUMN_END )
-    {
-        if( metadata & i_showflags )
-            columnCount++;
-        metadata <<= 1;
-    }
-    return columnCount;
+    return i_depth == DEPTH_SEL ? 1 : columnFromMeta( COLUMN_END );
 }
 
 int PLModel::rowCount( const QModelIndex &parent ) const
@@ -625,48 +599,32 @@ PLItem *PLModel::getItem( QModelIndex index )
     return static_cast<PLItem*>( index.internalPointer() );
 }
 
-/*
-Computes meta data column id from shown column index and shown columns flags.
-Returns COLUMN_END in case of failure.
-*/
-int PLModel::columnToMeta( int column, int shown_flags ) const
+int PLModel::columnToMeta( int _column ) const
 {
     int meta = 1;
-    int index = -1;
+    int column = 0;
 
-    while( meta < COLUMN_END )
+    while( column != _column && meta != COLUMN_END )
     {
-        if( meta & shown_flags )
-            index++;
-        if( index == column )
-            break;
         meta <<= 1;
+        column++;
     }
 
     return meta;
 }
 
-/*
-Computes shown column index from meta data column id and shown columns flags.
-meta_col must be contained in shown_flags!
-*/
-int PLModel::columnFromMeta( int meta_col, int shown_flags ) const
+int PLModel::columnFromMeta( int meta_col ) const
 {
-    assert( meta_col & shown_flags );
-
     int meta = 1;
-    int index = -1;
+    int column = 0;
 
-    while( meta < COLUMN_END )
+    while( meta != meta_col && meta != COLUMN_END )
     {
-        if( meta & shown_flags )
-            index++;
-        if( meta == meta_col )
-            break;
         meta <<= 1;
+        column++;
     }
 
-    return index;
+    return column;
 }
 
 /************************* Updates handling *****************************/
@@ -930,20 +888,8 @@ void PLModel::sort( int column, Qt::SortOrder order )
 
 void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
 {
-    int i_index = -1;
-    int i_flag = 0;
-
-    int i_column = 1;
-    for( i_column = 1; i_column != COLUMN_END; i_column<<=1 )
-    {
-        if( ( shownFlags() & i_column ) )
-            i_index++;
-        if( column == i_index )
-        {
-            i_flag = i_column;
-            break;
-        }
-    }
+    int meta = columnToMeta( column );
+    if( meta == COLUMN_END ) return;
 
     PLItem *item = findById( rootItem, i_root_id );
     if( !item ) return;
@@ -960,10 +906,10 @@ void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
     {
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
                                                         i_root_id );
-        if( p_root && i_flag )
+        if( p_root )
         {
             playlist_RecursiveNodeSort( p_playlist, p_root,
-                                        i_column_sorting( i_flag ),
+                                        i_column_sorting( meta ),
                                         order == Qt::AscendingOrder ?
                                             ORDER_NORMAL : ORDER_REVERSE );
         }
@@ -1031,7 +977,7 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
         menu->addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
         menu->addSeparator();
         QMenu *sort_menu = menu->addMenu( qtr( "Sort by ") +
-            qfu( psz_column_title( columnToMeta( index.column(), i_showflags ) ) ) );
+            qfu( psz_column_title( columnToMeta( index.column() ) ) ) );
         sort_menu->addAction( qtr( "Ascending" ),
             this, SLOT( popupSortAsc() ) );
         sort_menu->addAction( qtr( "Descending" ),
@@ -1044,56 +990,7 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
         menu->addSeparator();
         menu->addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
     }
-    if( tree || i_popup_item > -1 )
-        menu->addSeparator();
-    QMenu *col_selector = menu->addMenu( qtr( "Visible columns" ) );
-    makeColumnSelectMenu( col_selector );
     menu->popup( point );
-}
-
-void PLModel::makeColumnSelectMenu( QMenu *menu )
-{
-    int i_column = 1;
-    for( i_column = 1; i_column != COLUMN_END; i_column<<=1 )
-    {
-        QAction* option = menu->addAction(
-            qfu( psz_column_title( i_column ) ) );
-        option->setCheckable( true );
-        option->setChecked( shownFlags() & i_column );
-        ContextUpdateMapper->setMapping( option, i_column );
-        CONNECT( option, triggered(), ContextUpdateMapper, map() );
-    }
-}
-
-void PLModel::toggleColumnShown( int meta )
-{
-    assert( meta );
-    if( rootItem )
-    {
-        if( i_showflags & meta )
-        {
-            /* Removing columns */
-            int index = columnFromMeta( meta, i_showflags );
-
-            beginRemoveColumns( QModelIndex(), index, index );
-            i_showflags &= ~( meta );
-            getSettings()->setValue( "qt-pl-showflags", i_showflags );
-            endRemoveColumns();
-        }
-        else
-        {
-            /* Adding columns */
-            int sf = i_showflags;
-            sf |= meta;
-            int index = columnFromMeta( meta, sf );
-            beginInsertColumns( QModelIndex(), index, index );
-            i_showflags = sf;
-            getSettings()->setValue( "qt-pl-showflags", i_showflags );
-            endInsertColumns();
-        }
-
-        emit columnsChanged( meta );
-    }
 }
 
 void PLModel::popupDel()

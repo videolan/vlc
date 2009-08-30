@@ -113,7 +113,6 @@ public:
     /* Lookups */
     QStringList selectedURIs();
     bool hasRandom(); bool hasLoop(); bool hasRepeat();
-    int shownFlags() { return i_showflags;  }
     QModelIndex index( PLItem *, int c ) const;
     QModelIndex currentIndex( ) { return index( currentItem, 0 ); };
     bool isCurrent( const QModelIndex &index ) const;
@@ -128,8 +127,6 @@ public:
     void removeItem( int );
     void rebuild(); void rebuild( playlist_item_t * );
 
-    /* Helpers */
-    void makeColumnSelectMenu( QMenu *menu );
 private:
 
     /* General */
@@ -139,7 +136,6 @@ private:
     playlist_t *p_playlist;
     intf_thread_t *p_intf;
     int i_depth;
-    int i_showflags;
 
     static QIcon icons[ITEM_TYPE_NUMBER];
 
@@ -166,15 +162,14 @@ private:
     /* Popup */
     int i_popup_item, i_popup_parent, i_popup_column;
     QModelIndexList current_selection;
-    QSignalMapper *ContextUpdateMapper;
 
     /* Lookups */
     PLItem *findById( PLItem *, int );
     PLItem *findByInput( PLItem *, int );
     PLItem *findInner( PLItem *, int , bool );
     static inline PLItem *getItem( QModelIndex index );
-    int columnFromMeta( int meta_column, int shown_flags ) const;
-    int columnToMeta( int column, int shown_flags ) const;
+    int columnFromMeta( int meta_column ) const;
+    int columnToMeta( int column ) const;
     PLItem *p_cached_item;
     PLItem *p_cached_item_bi;
     int i_cached_id;
@@ -183,8 +178,6 @@ private:
 signals:
     void shouldRemove( int );
     void currentChanged( const QModelIndex& );
-    void columnsChanged( int );
-
 
 public slots:
     void activateItem( const QModelIndex &index );
@@ -203,7 +196,6 @@ private slots:
     void popupAddNode();
     void popupSortAsc();
     void popupSortDesc();
-    void toggleColumnShown( int meta_column );
     void processInputItemUpdate( input_item_t *);
     void processInputItemUpdate( input_thread_t* p_input );
 };
