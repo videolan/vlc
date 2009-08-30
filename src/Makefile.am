@@ -513,8 +513,11 @@ stamp-revision:
 	rm -f -- revision.tmp
 	(git --git-dir="$(top_srcdir)/.git/" describe --tags --long \
 		--always || echo exported) > revision.tmp
-	diff revision.tmp revision.txt >/dev/null 2>&1 || \
-	mv -f -- revision.tmp revision.txt
+	if diff revision.tmp revision.txt >/dev/null; then \
+		rm -f -- revision.tmp; \
+	else \
+		mv -f -- revision.tmp revision.txt; \
+	fi 2>&1
 
 ###############################################################################
 # Unit/regression test
