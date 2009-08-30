@@ -62,10 +62,6 @@
     "Run framebuffer on current TTY device (default enabled). " \
     "(disable tty handling with caution)" )
 
-#define CHROMA_TEXT N_("Chroma used.")
-#define CHROMA_LONGTEXT N_( \
-    "Force use of a specific chroma for output. Default is I420." )
-
 #define ASPECT_RATIO_TEXT N_("Video aspect ratio")
 #define ASPECT_RATIO_LONGTEXT N_( \
     "Aspect ratio of the video image (4:3, 16:9). Default is square pixels." )
@@ -91,8 +87,7 @@ vlc_module_begin ()
     add_file( FB_DEV_VAR, "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
               false )
     add_bool( "fb-tty", 1, NULL, TTY_TEXT, TTY_LONGTEXT, true )
-    add_string( "fb-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
-                true )
+    add_obsolete_string( "fb-chroma" );
     add_string( "fb-aspect-ratio", NULL, NULL, ASPECT_RATIO_TEXT,
                 ASPECT_RATIO_LONGTEXT, true )
     add_integer( "fb-mode", 4, NULL, FB_MODE_TEXT, FB_MODE_LONGTEXT,
@@ -161,7 +156,6 @@ struct vout_sys_t
     int      i_aspect;
     int      i_bytes_per_pixel;
     bool     b_auto;       /* Automatically adjust video size to fb size */
-    vlc_fourcc_t i_chroma;
 
     /* Video memory */
     uint8_t    *p_video;                                      /* base adress */
@@ -210,25 +204,6 @@ static int Open( vlc_object_t *p_this )
     }
 #endif
 #endif
-
-    char *psz_chroma = var_CreateGetNonEmptyString( p_vout, "fb-chroma" );
-    if( psz_chroma )
-    {
-        const vlc_fourcc_t i_chroma =
-            vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_chroma );
-
-        if( i_chroma )
-        {
-            p_sys->i_chroma = i_chroma;
-            msg_Dbg( p_vout, "forcing chroma '%s'", psz_chroma );
-        }
-        else
-        {
-            msg_Warn( p_vout, "invalid chroma (%s), using defaults.",
-                      psz_chroma );
-        }
-        free( psz_chroma );
-    }
 
     p_sys->i_aspect = -1;
     char *psz_aspect = var_CreateGetNonEmptyString( p_vout, "fb-aspect-ratio" );
@@ -492,41 +467,35 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     p_vout->fmt_out = p_vout->fmt_in;
-    if( p_sys->i_chroma == 0 )
-    {
-        /* Initialize the output structure: RGB with square pixels, whatever
-         * the input format is, since it's the only format we know */
-        switch( p_sys->var_info.bits_per_pixel )
-        {
-        case 8: /* FIXME: set the palette */
-            p_vout->output.i_chroma = VLC_CODEC_RGB8; break;
-        case 15:
-            p_vout->output.i_chroma = VLC_CODEC_RGB15; break;
-        case 16:
-            p_vout->output.i_chroma = VLC_CODEC_RGB16; break;
-        case 24:
-            p_vout->output.i_chroma = VLC_CODEC_RGB24; break;
-        case 32:
-            p_vout->output.i_chroma = VLC_CODEC_RGB32; break;
-        default:
-            msg_Err( p_vout, "unknown screen depth %i",
-                     p_vout->p_sys->var_info.bits_per_pixel );
-            return VLC_EGENERIC;
-        }
 
-        if( p_sys->var_info.bits_per_pixel != 8 )
-        {
-            p_vout->output.i_rmask = ( (1 << p_sys->var_info.red.length) - 1 )
-                                 << p_sys->var_info.red.offset;
-            p_vout->output.i_gmask = ( (1 << p_sys->var_info.green.length) - 1 )
-                                 << p_sys->var_info.green.offset;
-            p_vout->output.i_bmask = ( (1 << p_sys->var_info.blue.length) - 1 )
-                                 << p_sys->var_info.blue.offset;
-        }
-    }
-    else
+    /* Initialize the output structure: RGB with square pixels, whatever
+     * the input format is, since it's the only format we know */
+    switch( p_sys->var_info.bits_per_pixel )
     {
-        p_vout->output.i_chroma = p_sys->i_chroma;
+    case 8: /* FIXME: set the palette */
+        p_vout->output.i_chroma = VLC_CODEC_RGB8; break;
+    case 15:
+        p_vout->output.i_chroma = VLC_CODEC_RGB15; break;
+    case 16:
+        p_vout->output.i_chroma = VLC_CODEC_RGB16; break;
+    case 24:
+        p_vout->output.i_chroma = VLC_CODEC_RGB24; break;
+    case 32:
+        p_vout->output.i_chroma = VLC_CODEC_RGB32; break;
+    default:
+        msg_Err( p_vout, "unknown screen depth %i",
+                 p_vout->p_sys->var_info.bits_per_pixel );
+        return VLC_EGENERIC;
+    }
+
+    if( p_sys->var_info.bits_per_pixel != 8 )
+    {
+        p_vout->output.i_rmask = ( (1 << p_sys->var_info.red.length) - 1 )
+                             << p_sys->var_info.red.offset;
+        p_vout->output.i_gmask = ( (1 << p_sys->var_info.green.length) - 1 )
+                             << p_sys->var_info.green.offset;
+        p_vout->output.i_bmask = ( (1 << p_sys->var_info.blue.length) - 1 )
+                             << p_sys->var_info.blue.offset;
     }
     p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
 
