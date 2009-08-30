@@ -199,7 +199,7 @@ static void *Run( void *data )
             input_item_AddOption( p_root, "ignore-filetypes=ini,db,lnk,txt",
                                   VLC_INPUT_OPTION_TRUSTED );
 
-        input_item_AddOption( p_root, "recursive=expand",
+        input_item_AddOption( p_root, "recursive=collapse",
                               VLC_INPUT_OPTION_TRUSTED );
 
 
