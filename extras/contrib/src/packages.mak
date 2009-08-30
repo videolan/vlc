@@ -47,6 +47,7 @@ PKGCFG_URL=$(VIDEOLAN)/testing/contrib/pkg-config-$(PKGCFG_VERSION).tar.gz
 #PKGCFG_URL=http://pkgconfig.freedesktop.org/releases/pkg-config-$(PKGCFG_VERSION).tar.gz
 LIBICONV_VERSION=1.9.2
 LIBICONV_URL=$(GNU)/libiconv/libiconv-$(LIBICONV_VERSION).tar.gz
+LIBICONVMAC_URL=$(VIDEOLAN)/testing/contrib/libiconv-snowleopard.tar.bz2
 GETTEXT_VERSION=0.17
 GETTEXT_URL=$(GNU)/gettext/gettext-$(GETTEXT_VERSION).tar.gz
 FONTCONFIG_VERSION=2.7.0
