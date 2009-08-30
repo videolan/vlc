@@ -46,20 +46,6 @@ vlc_module_begin ()
     set_callbacks( OpenFilter, CloseFilter )
 vlc_module_end ()
 
-#define FCC_YUVA VLC_CODEC_YUVA
-#define FCC_YUVP VLC_CODEC_YUVP
-#define FCC_RGBA VLC_CODEC_RGBA
-
-#define FCC_I420 VLC_CODEC_I420
-#define FCC_YV12 VLC_CODEC_YV12
-#define FCC_YUY2 VLC_CODEC_YUYV
-#define FCC_UYVY VLC_CODEC_UYVY
-#define FCC_YVYU VLC_CODEC_YVYU
-#define FCC_RV15 VLC_CODEC_RGB15
-#define FCC_RV16 VLC_CODEC_RGB16
-#define FCC_RV24 VLC_CODEC_RGB24
-#define FCC_RV32 VLC_CODEC_RGB32
-
 /****************************************************************************
  * Local prototypes
  ****************************************************************************/
@@ -118,14 +104,14 @@ static int OpenFilter( vlc_object_t *p_this )
      * We could try to use a chroma filter if we can't. */
     int in_chroma = p_filter->fmt_in.video.i_chroma;
     int out_chroma = p_filter->fmt_out.video.i_chroma;
-    if( ( in_chroma  != FCC_YUVA && in_chroma  != FCC_I420 &&
-          in_chroma  != FCC_YV12 && in_chroma  != FCC_YUVP &&
-          in_chroma  != FCC_RGBA ) ||
-        ( out_chroma != FCC_I420 && out_chroma != FCC_YUY2 &&
-          out_chroma != FCC_YV12 && out_chroma != FCC_UYVY &&
-          out_chroma != FCC_YVYU && out_chroma != FCC_RV15 &&
-          out_chroma != FCC_YVYU && out_chroma != FCC_RV16 &&
-          out_chroma != FCC_RV24 && out_chroma != FCC_RV32 ) )
+    if( ( in_chroma  != VLC_CODEC_YUVA && in_chroma  != VLC_CODEC_I420 &&
+          in_chroma  != VLC_CODEC_YV12 && in_chroma  != VLC_CODEC_YUVP &&
+          in_chroma  != VLC_CODEC_RGBA ) ||
+        ( out_chroma != VLC_CODEC_I420 && out_chroma != VLC_CODEC_YUYV &&
+          out_chroma != VLC_CODEC_YV12 && out_chroma != VLC_CODEC_UYVY &&
+          out_chroma != VLC_CODEC_YVYU && out_chroma != VLC_CODEC_RGB15 &&
+          out_chroma != VLC_CODEC_YVYU && out_chroma != VLC_CODEC_RGB16 &&
+          out_chroma != VLC_CODEC_RGB24 && out_chroma != VLC_CODEC_RGB32 ) )
     {
         return VLC_EGENERIC;
     }
@@ -157,16 +143,16 @@ typedef void (*BlendFunction)( filter_t *,
                        picture_t *, const picture_t *,
                        int , int , int , int , int );
 
-#define FCC_PLANAR_420 { FCC_I420, FCC_YV12, 0 }
-#define FCC_PACKED_422 { FCC_YUY2, FCC_UYVY, FCC_YVYU, 0 }
-#define FCC_RGB_16 { FCC_RV15, FCC_RV16, 0 }
-#define FCC_RGB_24 { FCC_RV24, FCC_RV32, 0 }
+#define VLC_CODEC_PLANAR_420 { VLC_CODEC_I420, VLC_CODEC_YV12, 0 }
+#define VLC_CODEC_PACKED_422 { VLC_CODEC_YUYV, VLC_CODEC_UYVY, VLC_CODEC_YVYU, 0 }
+#define VLC_CODEC_RGB_16 { VLC_CODEC_RGB15, VLC_CODEC_RGB16, 0 }
+#define VLC_CODEC_RGB_24 { VLC_CODEC_RGB24, VLC_CODEC_RGB32, 0 }
 
 #define BLEND_CFG( fccSrc, fctPlanar, fctPacked, fctRgb16, fctRgb24  ) \
-    { .src = fccSrc, .p_dst = FCC_PLANAR_420, .pf_blend = fctPlanar }, \
-    { .src = fccSrc, .p_dst = FCC_PACKED_422, .pf_blend = fctPacked }, \
-    { .src = fccSrc, .p_dst = FCC_RGB_16,     .pf_blend = fctRgb16  }, \
-    { .src = fccSrc, .p_dst = FCC_RGB_24,     .pf_blend = fctRgb24  }
+    { .src = fccSrc, .p_dst = VLC_CODEC_PLANAR_420, .pf_blend = fctPlanar }, \
+    { .src = fccSrc, .p_dst = VLC_CODEC_PACKED_422, .pf_blend = fctPacked }, \
+    { .src = fccSrc, .p_dst = VLC_CODEC_RGB_16,     .pf_blend = fctRgb16  }, \
+    { .src = fccSrc, .p_dst = VLC_CODEC_RGB_24,     .pf_blend = fctRgb24  }
 
 static const struct
 {
@@ -175,15 +161,15 @@ static const struct
     BlendFunction pf_blend;
 } p_blend_cfg[] = {
 
-    BLEND_CFG( FCC_YUVA, BlendYUVAI420, BlendYUVAYUVPacked, BlendYUVARV16, BlendYUVARV24 ),
+    BLEND_CFG( VLC_CODEC_YUVA, BlendYUVAI420, BlendYUVAYUVPacked, BlendYUVARV16, BlendYUVARV24 ),
 
-    BLEND_CFG( FCC_YUVP, BlendPalI420, BlendPalYUVPacked, BlendPalRV, BlendPalRV ),
+    BLEND_CFG( VLC_CODEC_YUVP, BlendPalI420, BlendPalYUVPacked, BlendPalRV, BlendPalRV ),
 
-    BLEND_CFG( FCC_RGBA, BlendRGBAI420, BlendRGBAYUVPacked, BlendRGBAR16, BlendRGBAR24 ),
+    BLEND_CFG( VLC_CODEC_RGBA, BlendRGBAI420, BlendRGBAYUVPacked, BlendRGBAR16, BlendRGBAR24 ),
 
-    BLEND_CFG( FCC_I420, BlendI420I420, BlendI420YUVPacked, BlendI420R16, BlendI420R24 ),
+    BLEND_CFG( VLC_CODEC_I420, BlendI420I420, BlendI420YUVPacked, BlendI420R16, BlendI420R24 ),
 
-    BLEND_CFG( FCC_YV12, BlendI420I420, BlendI420YUVPacked, BlendI420R16, BlendI420R24 ),
+    BLEND_CFG( VLC_CODEC_YV12, BlendI420I420, BlendI420YUVPacked, BlendI420R16, BlendI420R24 ),
 
     { 0, {0,}, NULL }
 };
@@ -326,9 +312,9 @@ static void vlc_yuv_packed_index( int *pi_y, int *pi_u, int *pi_v, vlc_fourcc_t 
         vlc_fourcc_t chroma;
         int y, u ,v;
     } p_index[] = {
-        { FCC_YUY2, 0, 1, 3 },
-        { FCC_UYVY, 1, 0, 2 },
-        { FCC_YVYU, 0, 3, 1 },
+        { VLC_CODEC_YUYV, 0, 1, 3 },
+        { VLC_CODEC_UYVY, 1, 0, 2 },
+        { VLC_CODEC_YVYU, 0, 3, 1 },
         { 0, 0, 0, 0 }
     };
     int i;
@@ -373,12 +359,12 @@ static void vlc_blend_rgb16( uint16_t *p_dst,
 static void vlc_rgb_index( int *pi_rindex, int *pi_gindex, int *pi_bindex,
                            const video_format_t *p_fmt )
 {
-    if( p_fmt->i_chroma != FCC_RV24 && p_fmt->i_chroma != FCC_RV32 )
+    if( p_fmt->i_chroma != VLC_CODEC_RGB24 && p_fmt->i_chroma != VLC_CODEC_RGB32 )
         return;
 
     /* XXX it will works only if mask are 8 bits aligned */
 #ifdef WORDS_BIGENDIAN
-    const int i_mask_bits = p_fmt->i_chroma == FCC_RV24 ? 24 : 32;
+    const int i_mask_bits = p_fmt->i_chroma == VLC_CODEC_RGB24 ? 24 : 32;
     *pi_rindex = ( i_mask_bits - p_fmt->i_lrshift ) / 8;
     *pi_gindex = ( i_mask_bits - p_fmt->i_lgshift ) / 8;
     *pi_bindex = ( i_mask_bits - p_fmt->i_lbshift ) / 8;
@@ -1183,7 +1169,7 @@ static void BlendPalRV( filter_t *p_filter,
                 continue;
 
             /* Blending */
-            if( p_filter->fmt_out.video.i_chroma == FCC_RV15 || p_filter->fmt_out.video.i_chroma == FCC_RV16 )
+            if( p_filter->fmt_out.video.i_chroma == VLC_CODEC_RGB15 || p_filter->fmt_out.video.i_chroma == VLC_CODEC_RGB16 )
                 vlc_blend_rgb16( (uint16_t*)&p_dst[i_x * i_pix_pitch],
                                   rgbpal[p_src[i_x]][0], rgbpal[p_src[i_x]][1], rgbpal[p_src[i_x]][2],
                                   i_trans,
