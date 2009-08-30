@@ -50,6 +50,20 @@ SOURCES_swscale_maemo = swscale_maemo.c \
 	libswscale_nokia770/arm_colorconv.h
 SOURCES_scene = scene.c
 SOURCES_yuvp = yuvp.c
+SOURCES_atmo = atmo/atmo.cpp \
+	atmo/AtmoDefs.h \
+	atmo/AtmoCalculations.cpp atmo/AtmoCalculations.h \
+	atmo/AtmoConfig.cpp atmo/AtmoConfig.h \
+	atmo/AtmoConnection.cpp atmo/AtmoConnection.h \
+	atmo/AtmoDynData.cpp atmo/AtmoDynData.h \
+	atmo/AtmoExternalCaptureInput.cpp atmo/AtmoExternalCaptureInput.h \
+	atmo/AtmoInput.cpp atmo/AtmoInput.h \
+	atmo/AtmoLiveView.cpp atmo/AtmoLiveView.h \
+	atmo/AtmoOutputFilter.cpp atmo/AtmoOutputFilter.h \
+	atmo/AtmoSerialConnection.cpp atmo/AtmoSerialConnection.h \
+	atmo/AtmoThread.cpp atmo/AtmoThread.h \
+	atmo/AtmoTools.cpp atmo/AtmoTools.h \
+	atmo/AtmoZoneDefinition.cpp atmo/AtmoZoneDefinition.h
 SOURCES_video_filter_wrapper = wrapper.c
 noinst_HEADERS = filter_common.h filter_picture.h
 
