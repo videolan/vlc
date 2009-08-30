@@ -49,29 +49,6 @@
 #include <vlc_interface.h>
 
 /*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
-
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );
-static int  Manage    ( vout_thread_t * );
-static void Display   ( vout_thread_t *, picture_t * );
-static int  Control   ( vout_thread_t *, int, va_list );
-
-static int  NewPicture     ( vout_thread_t *, picture_t * );
-static void FreePicture    ( vout_thread_t *, picture_t * );
-
-static int  OpenDisplay    ( vout_thread_t * );
-static void CloseDisplay   ( vout_thread_t * );
-static void SwitchDisplay  ( int i_signal );
-static void TextMode       ( int i_tty );
-static void GfxMode        ( int i_tty );
-
-#define MAX_DIRECTBUFFERS 1
-
-/*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 #define FB_DEV_VAR "fbdev"
@@ -104,6 +81,9 @@ static void GfxMode        ( int i_tty );
     "in hardware then you must disable this option. It then does double buffering " \
     "in software." )
 
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
+
 vlc_module_begin ()
     set_shortname( "Framebuffer" )
     set_category( CAT_VIDEO )
@@ -121,8 +101,32 @@ vlc_module_begin ()
               true )
     set_description( N_("GNU/Linux framebuffer video output") )
     set_capability( "video output", 30 )
-    set_callbacks( Create, Destroy )
+    set_callbacks( Open, Close )
 vlc_module_end ()
+
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
+static int  Init      ( vout_thread_t * );
+static void End       ( vout_thread_t * );
+static int  Manage    ( vout_thread_t * );
+static void Display   ( vout_thread_t *, picture_t * );
+static int  Control   ( vout_thread_t *, int, va_list );
+
+static int  NewPicture     ( vout_thread_t *, picture_t * );
+static void FreePicture    ( vout_thread_t *, picture_t * );
+
+static int  OpenDisplay    ( vout_thread_t * );
+static void CloseDisplay   ( vout_thread_t * );
+static void SwitchDisplay  ( int i_signal );
+static void TextMode       ( int i_tty );
+static void GfxMode        ( int i_tty );
+
+static int  TtyInit( vout_thread_t * );
+static void TtyExit( vout_thread_t * );
+
+#define MAX_DIRECTBUFFERS 1
 
 /*****************************************************************************
  * vout_sys_t: video output framebuffer method descriptor
@@ -169,35 +173,20 @@ struct picture_sys_t
     uint8_t *    p_data;                                      /* base adress */
 };
 
-/*****************************************************************************
- * Create: allocates FB video thread output method
- *****************************************************************************
+/**
  * This function allocates and initializes a FB vout method.
- *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+ */
+static int Open( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t    *p_sys;
-    char          *psz_chroma;
-    char          *psz_aspect;
-    int           i_mode;
-    struct sigaction    sig_tty;                 /* sigaction for tty change */
-    struct vt_mode      vt_mode;                          /* vt current mode */
-    struct termios      new_termios;
 
     /* Allocate instance and initialize some members */
-    p_vout->p_sys = p_sys = calloc( 1, sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
+    p_vout->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
+    if( !p_sys )
         return VLC_ENOMEM;
 
     p_sys->p_video = MAP_FAILED;
-
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = Manage;
-    p_vout->pf_render = NULL;
-    p_vout->pf_display = Display;
-    p_vout->pf_control = Control;
 
     /* Does the framebuffer uses hw acceleration? */
     p_sys->b_hw_accel = var_CreateGetBool( p_vout, "fb-hw-accel" );
@@ -222,7 +211,7 @@ static int Create( vlc_object_t *p_this )
 #endif
 #endif
 
-    psz_chroma = var_CreateGetNonEmptyString( p_vout, "fb-chroma" );
+    char *psz_chroma = var_CreateGetNonEmptyString( p_vout, "fb-chroma" );
     if( psz_chroma )
     {
         const vlc_fourcc_t i_chroma =
@@ -242,7 +231,7 @@ static int Create( vlc_object_t *p_this )
     }
 
     p_sys->i_aspect = -1;
-    psz_aspect = var_CreateGetNonEmptyString( p_vout, "fb-aspect-ratio" );
+    char *psz_aspect = var_CreateGetNonEmptyString( p_vout, "fb-aspect-ratio" );
     if( psz_aspect )
     {
         char *psz_parser = strchr( psz_aspect, ':' );
@@ -260,143 +249,162 @@ static int Create( vlc_object_t *p_this )
     }
 
     p_sys->b_auto = false;
-    i_mode = var_CreateGetInteger( p_vout, "fb-mode" );
+    const int i_mode = var_CreateGetInteger( p_vout, "fb-mode" );
     switch( i_mode )
     {
-        case 0: /* QCIF */
-            p_sys->i_width  = 176;
-            p_sys->i_height = 144;
-            break;
-        case 1: /* CIF */
-            p_sys->i_width  = 352;
-            p_sys->i_height = 288;
-            break;
-        case 2: /* NTSC */
-            p_sys->i_width  = 640;
-            p_sys->i_height = 480;
-            break;
-        case 3: /* PAL */
-            p_sys->i_width  = 704;
-            p_sys->i_height = 576;
-            break;
-        case 4:
-        default:
-            p_sys->b_auto = true;
-     }
+    case 0: /* QCIF */
+        p_sys->i_width  = 176;
+        p_sys->i_height = 144;
+        break;
+    case 1: /* CIF */
+        p_sys->i_width  = 352;
+        p_sys->i_height = 288;
+        break;
+    case 2: /* NTSC */
+        p_sys->i_width  = 640;
+        p_sys->i_height = 480;
+        break;
+    case 3: /* PAL */
+        p_sys->i_width  = 704;
+        p_sys->i_height = 576;
+        break;
+    case 4:
+    default:
+        p_sys->b_auto = true;
+        break;
+    }
 
     /* tty handling */
-    if( p_sys->b_tty )
+    if( p_sys->b_tty && TtyInit( p_vout ) )
     {
-        GfxMode( p_sys->i_tty );
-
-        /* Set keyboard settings */
-        if( tcgetattr(0, &p_vout->p_sys->old_termios) == -1 )
-        {
-            msg_Err( p_vout, "tcgetattr failed" );
-        }
-
-        if( tcgetattr(0, &new_termios) == -1 )
-        {
-            msg_Err( p_vout, "tcgetattr failed" );
-        }
-
-        /* new_termios.c_lflag &= ~ (ICANON | ISIG);
-        new_termios.c_lflag |= (ECHO | ECHOCTL); */
-        new_termios.c_lflag &= ~ (ICANON);
-        new_termios.c_lflag &= ~(ECHO | ECHOCTL);
-        new_termios.c_iflag = 0;
-        new_termios.c_cc[VMIN] = 1;
-        new_termios.c_cc[VTIME] = 0;
-
-        if( tcsetattr(0, TCSAFLUSH, &new_termios) == -1 )
-        {
-            msg_Err( p_vout, "tcsetattr failed" );
-        }
-
-        ioctl( p_sys->i_tty, VT_RELDISP, VT_ACKACQ );
-
-        /* Set-up tty signal handler to be aware of tty changes */
-        memset( &sig_tty, 0, sizeof( sig_tty ) );
-        sig_tty.sa_handler = SwitchDisplay;
-        sigemptyset( &sig_tty.sa_mask );
-        if( sigaction( SIGUSR1, &sig_tty, &p_vout->p_sys->sig_usr1 ) ||
-            sigaction( SIGUSR2, &sig_tty, &p_vout->p_sys->sig_usr2 ) )
-        {
-            msg_Err( p_vout, "cannot set signal handler (%m)" );
-            tcsetattr(0, 0, &p_vout->p_sys->old_termios);
-            TextMode( p_sys->i_tty );
-            free( p_vout->p_sys );
-            return VLC_EGENERIC;
-        }
-
-        /* Set-up tty according to new signal handler */
-        if( -1 == ioctl( p_sys->i_tty, VT_GETMODE, &p_vout->p_sys->vt_mode ) )
-        {
-            msg_Err( p_vout, "cannot get terminal mode (%m)" );
-            sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
-            sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
-            tcsetattr(0, 0, &p_vout->p_sys->old_termios);
-            TextMode( p_sys->i_tty );
-            free( p_vout->p_sys );
-            return VLC_EGENERIC;
-        }
-        memcpy( &vt_mode, &p_vout->p_sys->vt_mode, sizeof( vt_mode ) );
-        vt_mode.mode   = VT_PROCESS;
-        vt_mode.waitv  = 0;
-        vt_mode.relsig = SIGUSR1;
-        vt_mode.acqsig = SIGUSR2;
-
-        if( -1 == ioctl( p_sys->i_tty, VT_SETMODE, &vt_mode ) )
-        {
-            msg_Err( p_vout, "cannot set terminal mode (%m)" );
-            sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
-            sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
-            tcsetattr(0, 0, &p_vout->p_sys->old_termios);
-            TextMode( p_sys->i_tty );
-            free( p_vout->p_sys );
-            return VLC_EGENERIC;
-        }
+        free( p_sys );
+        return VLC_EGENERIC;
     }
 
     if( OpenDisplay( p_vout ) )
     {
-        Destroy( VLC_OBJECT(p_vout) );
+        Close( VLC_OBJECT(p_vout) );
         return VLC_EGENERIC;
     }
 
+    /* */
+    p_vout->pf_init = Init;
+    p_vout->pf_end = End;
+    p_vout->pf_manage = Manage;
+    p_vout->pf_render = NULL;
+    p_vout->pf_display = Display;
+    p_vout->pf_control = Control;
     return VLC_SUCCESS;
 }
 
 
-/*****************************************************************************
- * Destroy: destroy FB video thread output method
- *****************************************************************************
- * Terminate an output method created by Create
- *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+/**
+ * Terminate an output method created by Open
+ */
+static void Close( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     CloseDisplay( p_vout );
 
     if( p_vout->p_sys->b_tty )
-    {
-        /* Reset the terminal */
-        ioctl( p_vout->p_sys->i_tty, VT_SETMODE, &p_vout->p_sys->vt_mode );
-
-        /* Remove signal handlers */
-        sigaction( SIGUSR1, &p_vout->p_sys->sig_usr1, NULL );
-        sigaction( SIGUSR2, &p_vout->p_sys->sig_usr2, NULL );
-
-        /* Reset the keyboard state */
-        tcsetattr( 0, 0, &p_vout->p_sys->old_termios );
-
-        /* Return to text mode */
-        TextMode( p_vout->p_sys->i_tty );
-    }
+        TtyExit( p_vout );
 
     /* Destroy structure */
     free( p_vout->p_sys );
+}
+
+static int TtyInit( vout_thread_t *p_vout )
+{
+    vout_sys_t *p_sys = p_vout->p_sys;
+
+    struct termios new_termios;
+
+    GfxMode( p_sys->i_tty );
+
+    /* Set keyboard settings */
+    if( tcgetattr(0, &p_sys->old_termios) == -1 )
+    {
+        msg_Err( p_vout, "tcgetattr failed" );
+    }
+
+    if( tcgetattr(0, &new_termios) == -1 )
+    {
+        msg_Err( p_vout, "tcgetattr failed" );
+    }
+
+    /* new_termios.c_lflag &= ~ (ICANON | ISIG);
+    new_termios.c_lflag |= (ECHO | ECHOCTL); */
+    new_termios.c_lflag &= ~ (ICANON);
+    new_termios.c_lflag &= ~(ECHO | ECHOCTL);
+    new_termios.c_iflag = 0;
+    new_termios.c_cc[VMIN] = 1;
+    new_termios.c_cc[VTIME] = 0;
+
+    if( tcsetattr(0, TCSAFLUSH, &new_termios) == -1 )
+    {
+        msg_Err( p_vout, "tcsetattr failed" );
+    }
+
+    ioctl( p_sys->i_tty, VT_RELDISP, VT_ACKACQ );
+
+    /* Set-up tty signal handler to be aware of tty changes */
+    struct sigaction sig_tty;
+    memset( &sig_tty, 0, sizeof( sig_tty ) );
+    sig_tty.sa_handler = SwitchDisplay;
+    sigemptyset( &sig_tty.sa_mask );
+    if( sigaction( SIGUSR1, &sig_tty, &p_sys->sig_usr1 ) ||
+        sigaction( SIGUSR2, &sig_tty, &p_sys->sig_usr2 ) )
+    {
+        msg_Err( p_vout, "cannot set signal handler (%m)" );
+        tcsetattr(0, 0, &p_sys->old_termios);
+        TextMode( p_sys->i_tty );
+        return VLC_EGENERIC;
+    }
+
+    /* Set-up tty according to new signal handler */
+    if( -1 == ioctl( p_sys->i_tty, VT_GETMODE, &p_sys->vt_mode ) )
+    {
+        msg_Err( p_vout, "cannot get terminal mode (%m)" );
+        sigaction( SIGUSR1, &p_sys->sig_usr1, NULL );
+        sigaction( SIGUSR2, &p_sys->sig_usr2, NULL );
+        tcsetattr(0, 0, &p_sys->old_termios);
+        TextMode( p_sys->i_tty );
+        return VLC_EGENERIC;
+    }
+    struct vt_mode vt_mode = p_sys->vt_mode;
+    vt_mode.mode   = VT_PROCESS;
+    vt_mode.waitv  = 0;
+    vt_mode.relsig = SIGUSR1;
+    vt_mode.acqsig = SIGUSR2;
+
+    if( -1 == ioctl( p_sys->i_tty, VT_SETMODE, &vt_mode ) )
+    {
+        msg_Err( p_vout, "cannot set terminal mode (%m)" );
+        sigaction( SIGUSR1, &p_sys->sig_usr1, NULL );
+        sigaction( SIGUSR2, &p_sys->sig_usr2, NULL );
+        tcsetattr(0, 0, &p_sys->old_termios);
+        TextMode( p_sys->i_tty );
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+static void TtyExit( vout_thread_t *p_vout )
+{
+    vout_sys_t *p_sys = p_vout->p_sys;
+
+    /* Reset the terminal */
+    ioctl( p_sys->i_tty, VT_SETMODE, &p_sys->vt_mode );
+
+    /* Remove signal handlers */
+    sigaction( SIGUSR1, &p_sys->sig_usr1, NULL );
+    sigaction( SIGUSR2, &p_sys->sig_usr2, NULL );
+
+    /* Reset the keyboard state */
+    tcsetattr( 0, 0, &p_sys->old_termios );
+
+    /* Return to text mode */
+    TextMode( p_sys->i_tty );
 }
 
 /*****************************************************************************
