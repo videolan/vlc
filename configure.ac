@@ -4546,7 +4546,7 @@ dnl  AtmoLight (homebrew AmbiLight)
 dnl
 AC_ARG_ENABLE(atmo,
 AS_HELP_STRING([--disable-atmo],[AtmoLight (homebrew Philips ambilight)
-                (default enabled)]),, [enable_atmo="yes"])
+                (broken, default disabled)]),, [enable_atmo="no"])
 AS_IF([test "${enable_atmo}" != no], [
   AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "linux"], [
     AC_LANG_PUSH(C++)
