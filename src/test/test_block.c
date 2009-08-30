@@ -58,6 +58,27 @@ static void test_block_File (void)
     remove ("testfile.txt");
 }
 
+static void test_block (void)
+{
+    block_t *block = block_Alloc (sizeof (text));
+    assert (block != NULL);
+
+    strcpy (block->p_buffer, text);
+    block = block_Realloc (block, -10, sizeof (text));
+    assert (block != NULL);
+    assert (!strcmp (block->p_buffer, text + 10));
+    assert (block->i_buffer == sizeof (text));
+
+    block = block_Realloc (block, 10, sizeof (text));
+    assert (block != NULL);
+    assert (!strcmp (block->p_buffer + 10, text + 10));
+    assert (block->i_buffer == sizeof (text));
+    block_Release (block);
+
+    block = block_Alloc (SIZE_MAX);
+    assert (block == NULL);
+}
+
 int main (void)
 {
     test_block_File ();
