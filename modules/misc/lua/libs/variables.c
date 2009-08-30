@@ -238,7 +238,7 @@ static int vlclua_libvlc_command( lua_State *L )
     val_arg.psz_string = strdup( luaL_optstring( L, 2, "" ) );
     lua_pop( L, 2 );
     int i_type = var_Type( p_this->p_libvlc, psz_cmd );
-    if( ! i_type & VLC_VAR_ISCOMMAND )
+    if( ! (i_type & VLC_VAR_ISCOMMAND) )
     {
         free( val_arg.psz_string );
         return luaL_error( L, "libvlc's \"%s\" is not a command",
