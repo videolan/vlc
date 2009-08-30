@@ -417,7 +417,10 @@ void DiscOpenPanel::updateMRL()
         else
             mrl = "dvdsimple://";
         mrl += ui.deviceCombo->currentText();
-        emit methodChanged( "dvdnav-caching" );
+        if( !ui.dvdsimple->isChecked() )
+            emit methodChanged( "dvdnav-caching" );
+        else
+            emit methodChanged( "dvdread-caching" );
 
         if ( ui.titleSpin->value() > 0 ) {
             mrl += QString("@%1").arg( ui.titleSpin->value() );
@@ -1139,6 +1142,7 @@ void CaptureOpenPanel::updateMRL()
             mrl += " :dvb-bandwidth=" +
                 QString::number( bdaBandBox->itemData(
                     bdaBandBox->currentIndex() ).toInt() );
+        emit methodChanged( "dvb-caching" );
         break;
     case DSHOW_DEVICE:
         fileList << "dshow://";
@@ -1148,6 +1152,7 @@ void CaptureOpenPanel::updateMRL()
             colon_escape( QString("%1").arg( adevDshowW->getValue() ) );
         if( dshowVSizeLine->isModified() )
             mrl += " :dshow-size=" + dshowVSizeLine->text();
+        emit methodChanged( "dshow-caching" );
         break;
 #else
     case V4L_DEVICE:
@@ -1208,6 +1213,7 @@ void CaptureOpenPanel::updateMRL()
     case SCREEN_DEVICE:
         fileList << "screen://";
         mrl = " :screen-fps=" + QString::number( screenFPS->value() );
+        emit methodChanged( "screen-caching" );
         updateButtons();
         break;
     }
