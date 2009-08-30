@@ -100,6 +100,8 @@ OPEN( ShoutTV )
 OPEN( Freebox )
 OPEN( FrenchTV )
 
+#undef OPEN
+
 vlc_module_begin ()
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_SD )
