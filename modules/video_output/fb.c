@@ -62,10 +62,6 @@
     "Run framebuffer on current TTY device (default enabled). " \
     "(disable tty handling with caution)" )
 
-#define ASPECT_RATIO_TEXT N_("Video aspect ratio")
-#define ASPECT_RATIO_LONGTEXT N_( \
-    "Aspect ratio of the video image (4:3, 16:9). Default is square pixels." )
-
 #define FB_MODE_TEXT N_("Framebuffer resolution to use.")
 #define FB_MODE_LONGTEXT N_( \
     "Select the resolution for the framebuffer. Currently it supports " \
@@ -88,8 +84,7 @@ vlc_module_begin ()
               false )
     add_bool( "fb-tty", 1, NULL, TTY_TEXT, TTY_LONGTEXT, true )
     add_obsolete_string( "fb-chroma" );
-    add_string( "fb-aspect-ratio", NULL, NULL, ASPECT_RATIO_TEXT,
-                ASPECT_RATIO_LONGTEXT, true )
+    add_obsolete_string( "fb-aspect-ratio" );
     add_integer( "fb-mode", 4, NULL, FB_MODE_TEXT, FB_MODE_LONGTEXT,
                  true )
     add_bool( "fb-hw-accel", true, NULL, HW_ACCEL_TEXT, HW_ACCEL_LONGTEXT,
@@ -153,7 +148,6 @@ struct vout_sys_t
     /* Video information */
     uint32_t i_width;
     uint32_t i_height;
-    int      i_aspect;
     int      i_bytes_per_pixel;
     bool     b_auto;       /* Automatically adjust video size to fb size */
 
@@ -204,24 +198,6 @@ static int Open( vlc_object_t *p_this )
     }
 #endif
 #endif
-
-    p_sys->i_aspect = -1;
-    char *psz_aspect = var_CreateGetNonEmptyString( p_vout, "fb-aspect-ratio" );
-    if( psz_aspect )
-    {
-        char *psz_parser = strchr( psz_aspect, ':' );
-
-        if( psz_parser )
-        {
-            *psz_parser++ = '\0';
-            p_sys->i_aspect = ( atoi( psz_aspect )
-                              * VOUT_ASPECT_FACTOR ) / atoi( psz_parser );
-        }
-        msg_Dbg( p_vout, "using aspect ratio %d:%d",
-                  atoi( psz_aspect ), atoi( psz_parser ) );
-
-        free( psz_aspect );
-    }
 
     p_sys->b_auto = false;
     const int i_mode = var_CreateGetInteger( p_vout, "fb-mode" );
@@ -507,12 +483,8 @@ static int Init( vout_thread_t *p_vout )
     p_vout->fmt_out.i_visible_height = p_sys->i_height;
 
     /* Assume we have square pixels */
-    if( p_sys->i_aspect < 0 )
-    {
-        p_vout->output.i_aspect = ( p_sys->i_width
-                                  * VOUT_ASPECT_FACTOR ) / p_sys->i_height;
-    }
-    else p_vout->output.i_aspect = p_sys->i_aspect;
+    p_vout->output.i_aspect = ( p_sys->i_width
+                              * VOUT_ASPECT_FACTOR ) / p_sys->i_height;
 
     p_vout->fmt_out.i_sar_num = p_vout->fmt_out.i_sar_den = 1;
     p_vout->fmt_out.i_aspect  = p_vout->render.i_aspect = p_vout->output.i_aspect;
