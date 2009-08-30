@@ -50,7 +50,6 @@ nodist_SOURCES_qt4 = \
 		components/controller.moc.cpp \
 		components/controller_widget.moc.cpp \
 		components/playlist/playlist_model.moc.cpp \
-		components/playlist/playlist_item.moc.cpp \
 		components/playlist/playlist.moc.cpp \
 		components/playlist/panels.moc.cpp \
 		components/playlist/selector.moc.cpp \
