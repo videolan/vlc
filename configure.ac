@@ -4623,7 +4623,7 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     VLC_ADD_LIBS([gnutls], [$GNUTLS_LIBS])
   ], [
     AS_IF([test "${enable_gnutls}" = "yes"], [
-      AC_MSG_ERROR([gnutls not present or too old (version 1.2.9 required)])
+      AC_MSG_ERROR([gnutls not present or too old (version 1.7.4 required)])
     ])
   ])
 ])
