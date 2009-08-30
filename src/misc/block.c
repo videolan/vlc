@@ -193,7 +193,7 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
      * minimize the payload size for memory copy. */
     assert( i_prebody >= 0 );
     if( (size_t)(p_block->p_buffer - p_start) < (size_t)i_prebody
-     || (size_t)(p_end - p_block->p_buffer) < p_block->i_buffer + i_body )
+     || (size_t)(p_end - p_block->p_buffer) < i_body )
     {
         /* FIXME: this is really dumb, we should use realloc() */
         block_t *p_rea = block_Alloc( requested );
