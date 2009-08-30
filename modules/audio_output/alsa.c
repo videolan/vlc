@@ -690,11 +690,11 @@ static void Play( aout_instance_t *p_aout )
         p_aout->output.p_sys->b_playing = true;
 
         /* get the playing date of the first aout buffer */
+        vlc_mutex_lock( &p_aout->output.p_sys->lock );
         p_aout->output.p_sys->start_date =
             aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
 
         /* wake up the audio output thread */
-        vlc_mutex_lock( &p_aout->output.p_sys->lock );
         vlc_cond_signal( &p_aout->output.p_sys->wait );
         vlc_mutex_unlock( &p_aout->output.p_sys->lock );
     }
