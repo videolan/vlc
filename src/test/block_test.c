@@ -75,6 +75,9 @@ static void test_block (void)
     assert (!memcmp (block->p_buffer + 200, text, sizeof (text)));
 
     block = block_Realloc (block, -200, sizeof (text) + 200);
+    assert (block != NULL);
+    assert (block->i_buffer == sizeof (text));
+    assert (!memcmp (block->p_buffer, text, sizeof (text)));
     block_Release (block);
 
     //block = block_Alloc (SIZE_MAX);
@@ -83,7 +86,6 @@ static void test_block (void)
 
 int main (void)
 {
-    test_block ();
     test_block_File ();
     test_block ();
     return 0;
