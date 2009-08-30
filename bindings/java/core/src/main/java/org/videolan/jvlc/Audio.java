@@ -60,7 +60,7 @@ public class Audio
      */
     public final int DOLBY_CHANNEL = 5;
 
-    
+
     public Audio(JVLC jvlc)
     {
         this.jvlc = jvlc;
@@ -70,6 +70,12 @@ public class Audio
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         return jvlc.getLibvlc().libvlc_audio_get_track(mediaInstance.getInstance(), exception);
+    }
+
+    public int getTrackCount(MediaPlayer mediaInstance)
+    {
+        libvlc_exception_t exception = new libvlc_exception_t();
+        return jvlc.getLibvlc().libvlc_audio_get_track_count(mediaInstance.getInstance(), exception);
     }
 
     public void setTrack(MediaPlayer mediaInstance, int track)
