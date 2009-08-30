@@ -328,8 +328,6 @@ static int Open (vlc_object_t *obj)
 
     /* */
     video_format_t fmt = vd->fmt;
-    // TODO !
-#if 1
     bool found_adaptor = false;
 
     /* FIXME: check max image size */
@@ -379,8 +377,28 @@ static int Open (vlc_object_t *obj)
         continue;
 
     found_format:
-        /* TODO: grab port */
-        p_sys->port = a->base_id;
+        /* Grab a port */
+        /* XXX: assume all of an adapter's ports have the same formats */
+        for (unsigned i = 0; i < a->num_ports; i++)
+        {
+             xcb_xv_port_t port = a->base_id + i;
+             xcb_xv_grab_port_reply_t *gr =
+                 xcb_xv_grab_port_reply (p_sys->conn,
+                     xcb_xv_grab_port (p_sys->conn, port,
+                                       XCB_TIME_CURRENT_TIME), NULL);
+             uint8_t result = gr ? gr->result : 0xff;
+
+             free (gr);
+             if (result == 0)
+             {
+                 p_sys->port = port;
+                 goto grabbed_port;
+             }
+             msg_Dbg (vd, "cannot grab port %"PRIu32, port);
+        }
+        continue;
+
+    grabbed_port:
         msg_Dbg (vd, "using port %"PRIu32, p_sys->port);
 
         p_sys->id = xfmt->id;
@@ -404,7 +422,6 @@ static int Open (vlc_object_t *obj)
         msg_Err (vd, "no available XVideo adaptor");
         goto error;
     }
-#endif
 
     /* Create window */
     {
