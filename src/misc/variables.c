@@ -919,6 +919,9 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
 {
     int i_entry, i_var;
     variable_t *p_var;
+#ifndef NDEBUG
+    bool b_found_similar = false;
+#endif
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
     vlc_mutex_lock( &p_priv->var_lock );
@@ -941,15 +944,20 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
         }
 #ifndef NDEBUG
         else if( p_var->p_entries[i_entry].pf_callback == pf_callback )
-        {
-            msg_Warn( p_this, "Calling var_DelCallback for '%s' with the same "
-                      "function but not the same data.", psz_name );
-        }
+            b_found_similar = true;
 #endif
     }
 
     if( i_entry < 0 )
     {
+#ifndef NDEBUG
+        if( b_found_similar )
+            msg_Warn( p_this, "Calling var_DelCallback for '%s' with the same "
+                              "function but not the same data.", psz_name );
+        else
+            msg_Warn( p_this, "var_DelCallback can't find the callback for "
+                              "'%s'", psz_name );
+#endif
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_EGENERIC;
     }
