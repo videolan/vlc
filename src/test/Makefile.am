@@ -17,7 +17,7 @@ AM_CFLAGS = `$(VLC_CONFIG) --cflags libvlc`
 AM_LDFLAGS = -no-install
 LDADD = ../libvlccore.la
 
-test_block_SOURCES = test_block.c ../misc/block.c
+test_block_SOURCES = block_test.c ../misc/block.c
 test_dictionary_SOURCES = dictionary.c
 test_i18n_atof_SOURCES = i18n_atof.c
 test_keys_SOURCES = keys.c
