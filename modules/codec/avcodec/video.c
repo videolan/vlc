@@ -81,9 +81,6 @@ struct decoder_sys_t
     /* Hack to force display of still pictures */
     bool b_first_frame;
 
-    int i_buffer_orig, i_buffer;
-    char *p_buffer_orig, *p_buffer;
-
     /* */
     AVPaletteControl palette;
 
@@ -344,15 +341,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->b_first_frame = true;
     p_sys->b_flush = false;
     p_sys->i_late_frames = 0;
-    p_sys->i_buffer = 0;
-    p_sys->i_buffer_orig = 1;
-    p_sys->p_buffer_orig = p_sys->p_buffer = malloc( p_sys->i_buffer_orig );
-    if( !p_sys->p_buffer_orig )
-    {
-        av_free( p_sys->p_ff_pic );
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
@@ -401,7 +389,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     {
         msg_Err( p_dec, "cannot open codec (%s)", p_sys->psz_namecodec );
         av_free( p_sys->p_ff_pic );
-        free( p_sys->p_buffer_orig );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -441,7 +428,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
 
     if( p_block->i_flags & (BLOCK_FLAG_DISCONTINUITY|BLOCK_FLAG_CORRUPTED) )
     {
-        p_sys->i_buffer = 0;
         p_sys->i_pts = 0; /* To make sure we recover properly */
 
         p_sys->input_pts = p_sys->input_dts = 0;
@@ -503,7 +489,6 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
              * but break picture until a new I, and for mpeg4 ...*/
             p_sys->i_late_frames--; /* needed else it will never be decrease */
             block_Release( p_block );
-            p_sys->i_buffer = 0;
             return NULL;
         }
     }
@@ -544,37 +529,23 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     {
         p_sys->b_flush = ( p_block->i_flags & BLOCK_FLAG_END_OF_SEQUENCE ) != 0;
 
-        p_sys->i_buffer = p_block->i_buffer;
-        if( p_sys->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE >
-            p_sys->i_buffer_orig )
-        {
-            free( p_sys->p_buffer_orig );
-            p_sys->i_buffer_orig =
-                p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE;
-            p_sys->p_buffer_orig = malloc( p_sys->i_buffer_orig );
-        }
-        p_sys->p_buffer = p_sys->p_buffer_orig;
-        p_sys->i_buffer = p_block->i_buffer;
-        if( !p_sys->p_buffer )
-        {
-            block_Release( p_block );
+        p_block = block_Realloc( p_block, 0,
+                            p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
+        if( !p_block )
             return NULL;
-        }
-        vlc_memcpy( p_sys->p_buffer, p_block->p_buffer, p_block->i_buffer );
-        memset( p_sys->p_buffer + p_block->i_buffer, 0,
+        *pp_block = p_block;
+        memset( p_block->p_buffer + p_block->i_buffer, 0,
                 FF_INPUT_BUFFER_PADDING_SIZE );
-
-        p_block->i_buffer = 0;
     }
 
-    while( p_sys->i_buffer > 0 || p_sys->b_flush )
+    while( p_block->i_buffer > 0 || p_sys->b_flush )
     {
         int i_used, b_gotpicture;
         picture_t *p_pic;
 
         i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
                                        &b_gotpicture,
-                                       p_sys->i_buffer <= 0 && p_sys->b_flush ? NULL : (uint8_t*)p_sys->p_buffer, p_sys->i_buffer );
+                                       p_block->i_buffer <= 0 && p_sys->b_flush ? NULL : p_block->p_buffer, p_block->i_buffer );
 
         if( b_null_size && p_sys->p_context->width > 0 &&
             p_sys->p_context->height > 0 &&
@@ -585,32 +556,32 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
             if( p_sys->b_hurry_up )
                 p_sys->p_context->skip_frame = p_sys->i_skip_frame;
             i_used = avcodec_decode_video( p_sys->p_context, p_sys->p_ff_pic,
-                                           &b_gotpicture,
-                                           (uint8_t*)p_sys->p_buffer, p_sys->i_buffer );
+                                           &b_gotpicture, p_block->p_buffer,
+                                           p_block->i_buffer );
         }
 
         if( p_sys->b_flush )
             p_sys->b_first_frame = true;
 
-        if( p_sys->i_buffer <= 0 )
+        if( p_block->i_buffer <= 0 )
             p_sys->b_flush = false;
 
         if( i_used < 0 )
         {
             if( b_drawpicture )
-                msg_Warn( p_dec, "cannot decode one frame (%d bytes)",
-                          p_sys->i_buffer );
+                msg_Warn( p_dec, "cannot decode one frame (%zu bytes)",
+                          p_block->i_buffer );
             block_Release( p_block );
             return NULL;
         }
-        else if( i_used > p_sys->i_buffer )
+        else if( i_used > p_block->i_buffer )
         {
-            i_used = p_sys->i_buffer;
+            i_used = p_block->i_buffer;
         }
 
         /* Consumed bytes */
-        p_sys->i_buffer -= i_used;
-        p_sys->p_buffer += i_used;
+        p_block->i_buffer -= i_used;
+        p_block->p_buffer += i_used;
 
         /* Nothing to display */
         if( !b_gotpicture )
@@ -755,7 +726,6 @@ void EndVideoDec( decoder_t *p_dec )
     avcodec_flush_buffers( p_sys->p_context );
 
     if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
-    free( p_sys->p_buffer_orig );
 
     if( p_sys->p_va )
         VaDelete( p_sys->p_va );
