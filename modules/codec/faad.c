@@ -222,9 +222,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             /* FIXME: multiple blocks per frame */
             if( p_block->i_buffer > i_header_size )
             {
-                vlc_memcpy( p_block->p_buffer,
-                            p_block->p_buffer + i_header_size,
-                            p_block->i_buffer - i_header_size );
+                p_block->p_buffer += i_header_size;
                 p_block->i_buffer -= i_header_size;
             }
         }
