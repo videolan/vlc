@@ -76,6 +76,16 @@ static void BlockRelease( block_t *p_block )
     free( p_block );
 }
 
+static void BlockMetaCopy( block_t *restrict out, const block_t *in )
+{
+    out->i_dts     = in->i_dts;
+    out->i_pts     = in->i_pts;
+    out->i_flags   = in->i_flags;
+    out->i_length  = in->i_length;
+    out->i_rate    = in->i_rate;
+    out->i_samples = in->i_samples;
+}
+
 /* Memory alignment */
 #define BLOCK_ALIGN        16
 /* Initial size of reserved header and footer */
@@ -156,8 +166,11 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
             return p_block;
         }
         /* Not enough room: allocate a new buffer */
+        block_t *p_rea = block_Alloc( requested );
+        if( p_rea )
+            BlockMetaCopy( p_rea, p_block );
         block_Release( p_block );
-        return block_Alloc( requested );
+        return p_rea;
     }
 
     /* First, shrink payload */
@@ -186,12 +199,7 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
         block_t *p_rea = block_Alloc( requested );
         if( p_rea )
         {
-            p_rea->i_dts     = p_block->i_dts;
-            p_rea->i_pts     = p_block->i_pts;
-            p_rea->i_flags   = p_block->i_flags;
-            p_rea->i_length  = p_block->i_length;
-            p_rea->i_rate    = p_block->i_rate;
-            p_rea->i_samples = p_block->i_samples;
+            BlockMetaCopy( p_rea, p_block );
             p_rea->p_buffer += i_prebody;
             p_rea->i_buffer -= i_prebody;
             memcpy( p_rea->p_buffer, p_block->p_buffer, p_block->i_buffer );
