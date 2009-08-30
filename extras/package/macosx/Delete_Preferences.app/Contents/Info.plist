@@ -13,21 +13,30 @@
 	<key>CFBundleInfoDictionaryVersion</key>
 	<string>6.0</string>
 	<key>CFBundleName</key>
-	<string>Untitled</string>
+	<string>Delete_Preferences</string>
 	<key>CFBundlePackageType</key>
 	<string>APPL</string>
 	<key>CFBundleSignature</key>
 	<string>aplt</string>
+	<key>LSMinimumSystemVersionByArchitecture</key>
+	<dict>
+		<key>x86_64</key>
+		<string>10.6</string>
+	</dict>
 	<key>LSRequiresCarbon</key>
 	<true/>
 	<key>WindowState</key>
 	<dict>
+		<key>dividerCollapsed</key>
+		<false/>
+		<key>eventLogLevel</key>
+		<integer>-1</integer>
 		<key>name</key>
 		<string>ScriptWindowState</string>
 		<key>positionOfDivider</key>
-		<real>494</real>
+		<real>477</real>
 		<key>savedFrame</key>
-		<string>10 341 868 680 0 0 1680 1028 </string>
+		<string>5 119 868 659 0 0 1280 778 </string>
 		<key>selectedTabView</key>
 		<string>description</string>
 	</dict>
