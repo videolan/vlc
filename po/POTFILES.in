@@ -1078,7 +1078,6 @@ modules/misc/stats/demux.c
 modules/misc/stats/encoder.c
 modules/misc/stats/stats.c
 modules/misc/stats/stats.h
-modules/misc/stats/vout.c
 modules/misc/svg.c
 modules/misc/testsuite/test1.c
 modules/misc/testsuite/test2.cpp
