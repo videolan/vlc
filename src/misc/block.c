@@ -2,7 +2,7 @@
  * block.c: Data blocks management functions
  *****************************************************************************
  * Copyright (C) 2003-2004 the VideoLAN team
- * $Id$
+ * Copyright (C) 2007-2009 Rémi Denis-Courmont
  *
  * Authors: Laurent Aimar <fenrir@videolan.org>
  *
@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <sys/stat.h>
+#include <assert.h>
 #include "vlc_block.h"
 
 /**
@@ -111,9 +112,10 @@ block_t *block_Alloc( size_t i_size )
 block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
 {
     block_sys_t *p_sys = (block_sys_t *)p_block;
-    ssize_t i_buffer_size = i_prebody + i_body;
+    size_t requested = i_prebody + i_body;
 
-    if( i_buffer_size <= 0 )
+    /* Corner case: empty block requested */
+    if( i_prebody <= 0 && i_body <= (size_t)(-i_prebody) )
     {
         block_Release( p_block );
         return NULL;
@@ -132,30 +134,56 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
         p_sys = (block_sys_t *)p_block;
     }
 
-    /* Adjust reserved header if there is enough room */
-    if( p_block->p_buffer - i_prebody > p_sys->p_allocated_buffer &&
-        p_block->p_buffer - i_prebody < p_sys->p_allocated_buffer +
-        p_sys->i_allocated_buffer )
+    uint8_t *p_start = p_sys->p_allocated_buffer;
+    uint8_t *p_end = p_sys->p_allocated_buffer + p_sys->i_allocated_buffer;
+
+    assert( p_block->p_buffer + p_block->i_buffer <= p_end );
+    assert( p_block->p_buffer >= p_start );
+
+    /* Corner case: the current payload is discarded completely */
+    if( i_prebody <= 0 && p_block->i_buffer <= (size_t)-i_prebody )
+         p_block->i_buffer = 0; /* discard current payload */
+    if( p_block->i_buffer == 0 )
     {
+        size_t available = p_end - p_start;
+
+        if( requested <= available )
+        {   /* Enough room: recycle buffer */
+            size_t extra = available - requested;
+
+            p_block->p_buffer = p_start + (extra / 2);
+            p_block->i_buffer = requested;
+            return p_block;
+        }
+        /* Not enough room: allocate a new buffer */
+        block_Release( p_block );
+        return block_Alloc( requested );
+    }
+
+    /* First, shrink payload */
+
+    /* Pull payload start */
+    if( i_prebody < 0 )
+    {
+        assert( p_block->i_buffer >= (size_t)-i_prebody );
         p_block->p_buffer -= i_prebody;
         p_block->i_buffer += i_prebody;
+        i_body += i_prebody;
         i_prebody = 0;
     }
 
-    /* Adjust payload size if there is enough room */
-    if( p_block->p_buffer + i_body < p_sys->p_allocated_buffer +
-        p_sys->i_allocated_buffer )
-    {
-        p_block->i_buffer = i_buffer_size;
-        i_body = 0;
-    }
+    /* Trim payload end */
+    if( p_block->i_buffer > i_body )
+        p_block->i_buffer = i_body;
 
-    /* Not enough room, reallocate the buffer */
-    if( i_body > 0 || i_prebody > 0 )
+    /* Second, reallocate the buffer if we lack space. This is done now to
+     * minimize the payload size for memory copy. */
+    assert( i_prebody >= 0 );
+    if( (size_t)(p_block->p_buffer - p_start) < (size_t)i_prebody
+     || (size_t)(p_end - p_block->p_buffer) < p_block->i_buffer + i_body )
     {
         /* FIXME: this is really dumb, we should use realloc() */
-        block_t *p_rea = block_New( NULL, i_buffer_size );
-
+        block_t *p_rea = block_Alloc( requested );
         if( p_rea )
         {
             p_rea->i_dts     = p_block->i_dts;
@@ -164,18 +192,31 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
             p_rea->i_length  = p_block->i_length;
             p_rea->i_rate    = p_block->i_rate;
             p_rea->i_samples = p_block->i_samples;
-
-            memcpy( p_rea->p_buffer + i_prebody, p_block->p_buffer,
-                    __MIN( p_block->i_buffer, p_rea->i_buffer - i_prebody ) );
+            p_rea->p_buffer += i_prebody;
+            p_rea->i_buffer -= i_prebody;
+            memcpy( p_rea->p_buffer, p_block->p_buffer, p_block->i_buffer );
         }
-
         block_Release( p_block );
+        p_block = p_rea;
+    }
+    /* NOTE: p_start and p_end are corrupted from this point */
 
-        return p_rea;
+    /* Third, expand payload */
+
+    /* Push payload start */
+    if( i_prebody > 0 )
+    {
+        p_block->p_buffer -= i_prebody;
+        p_block->i_buffer += i_prebody;
+        i_body += i_prebody;
+        i_prebody = 0;
     }
 
+    /* Expand payload to requested size */
+    p_block->i_buffer = i_body;
+
     /* We have a very large reserved footer now? Release some of it.
-     * XXX it may not keep the algniment of p_buffer */
+     * XXX it might not preserve the alignment of p_buffer */
     if( (p_sys->p_allocated_buffer + p_sys->i_allocated_buffer) -
         (p_block->p_buffer + p_block->i_buffer) > BLOCK_WASTE_SIZE )
     {
