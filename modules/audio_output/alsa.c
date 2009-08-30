@@ -62,7 +62,7 @@ struct aout_sys_t
     snd_output_t      * p_snd_stderr;
 #endif
 
-    int b_playing;                                         /* playing status */
+    bool b_playing;  /* playing status */
     mtime_t start_date;
 
     vlc_mutex_t lock;
@@ -687,7 +687,7 @@ static void Play( aout_instance_t *p_aout )
 {
     if( !p_aout->output.p_sys->b_playing )
     {
-        p_aout->output.p_sys->b_playing = 1;
+        p_aout->output.p_sys->b_playing = true;
 
         /* get the playing date of the first aout buffer */
         p_aout->output.p_sys->start_date =
