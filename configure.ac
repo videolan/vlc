@@ -4544,16 +4544,16 @@ PKG_ENABLE_MODULES_VLC([projectm], [], [libprojectM], [projectM visualization pl
 dnl
 dnl  AtmoLight (homebrew AmbiLight)
 dnl
-if test "${SYS}" = "mingw32" -o "${SYS}" = "linux"; then
-   AC_ARG_ENABLE(atmo,
-AS_HELP_STRING([--disable-atmo],[AtmoLight (homebrew philips ambilight)
-                (default enabled)]))
-   if test "${enable_atmo}" != "no"; then
-      AC_LANG_PUSH(C++)
-      VLC_ADD_PLUGIN([atmo])
-      AC_LANG_POP(C++)
-   fi
-fi
+AC_ARG_ENABLE(atmo,
+AS_HELP_STRING([--disable-atmo],[AtmoLight (homebrew Philips ambilight)
+                (default enabled)]),, [enable_atmo="yes"])
+AS_IF([test "${enable_atmo}" != no], [
+  AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "linux"], [
+    AC_LANG_PUSH(C++)
+    VLC_ADD_PLUGIN([atmo])
+    AC_LANG_POP(C++)
+  ])
+])
 
 dnl
 dnl  Bonjour services discovery
