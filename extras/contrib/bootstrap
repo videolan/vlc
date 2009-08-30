@@ -33,7 +33,7 @@ fi
 LANG=C
 export LANG
 set -e
-set -x
+set +x
 
 BUILD=`gcc -dumpmachine`
 if test "$#" -ge "1"; then
