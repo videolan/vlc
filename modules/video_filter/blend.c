@@ -107,11 +107,14 @@ static int OpenFilter( vlc_object_t *p_this )
     if( ( in_chroma  != VLC_CODEC_YUVA && in_chroma  != VLC_CODEC_I420 &&
           in_chroma  != VLC_CODEC_YV12 && in_chroma  != VLC_CODEC_YUVP &&
           in_chroma  != VLC_CODEC_RGBA ) ||
-        ( out_chroma != VLC_CODEC_I420 && out_chroma != VLC_CODEC_YUYV &&
-          out_chroma != VLC_CODEC_YV12 && out_chroma != VLC_CODEC_UYVY &&
-          out_chroma != VLC_CODEC_YVYU && out_chroma != VLC_CODEC_RGB15 &&
-          out_chroma != VLC_CODEC_YVYU && out_chroma != VLC_CODEC_RGB16 &&
-          out_chroma != VLC_CODEC_RGB24 && out_chroma != VLC_CODEC_RGB32 ) )
+        ( out_chroma != VLC_CODEC_I420 && out_chroma != VLC_CODEC_J420 &&
+          out_chroma != VLC_CODEC_YV12 &&
+          out_chroma != VLC_CODEC_YUYV && out_chroma != VLC_CODEC_YVYU &&
+          out_chroma != VLC_CODEC_UYVY && out_chroma != VLC_CODEC_VYUY &&
+          out_chroma != VLC_CODEC_RGB15 &&
+          out_chroma != VLC_CODEC_RGB16 &&
+          out_chroma != VLC_CODEC_RGB24 &&
+          out_chroma != VLC_CODEC_RGB32 ) )
     {
         return VLC_EGENERIC;
     }
@@ -143,8 +146,8 @@ typedef void (*BlendFunction)( filter_t *,
                        picture_t *, const picture_t *,
                        int , int , int , int , int );
 
-#define VLC_CODEC_PLANAR_420 { VLC_CODEC_I420, VLC_CODEC_YV12, 0 }
-#define VLC_CODEC_PACKED_422 { VLC_CODEC_YUYV, VLC_CODEC_UYVY, VLC_CODEC_YVYU, 0 }
+#define VLC_CODEC_PLANAR_420 { VLC_CODEC_I420, VLC_CODEC_J420, VLC_CODEC_YV12, 0 }
+#define VLC_CODEC_PACKED_422 { VLC_CODEC_YUYV, VLC_CODEC_UYVY, VLC_CODEC_YVYU, VLC_CODEC_VYUY, 0 }
 #define VLC_CODEC_RGB_16 { VLC_CODEC_RGB15, VLC_CODEC_RGB16, 0 }
 #define VLC_CODEC_RGB_24 { VLC_CODEC_RGB24, VLC_CODEC_RGB32, 0 }
 
@@ -315,6 +318,7 @@ static void vlc_yuv_packed_index( int *pi_y, int *pi_u, int *pi_v, vlc_fourcc_t 
         { VLC_CODEC_YUYV, 0, 1, 3 },
         { VLC_CODEC_UYVY, 1, 0, 2 },
         { VLC_CODEC_YVYU, 0, 3, 1 },
+        { VLC_CODEC_VYUY, 1, 2, 0 },
         { 0, 0, 0, 0 }
     };
     int i;
