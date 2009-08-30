@@ -385,7 +385,7 @@ static int Open (vlc_object_t *obj)
              xcb_xv_grab_port_reply_t *gr =
                  xcb_xv_grab_port_reply (p_sys->conn,
                      xcb_xv_grab_port (p_sys->conn, port,
-                                       XCB_TIME_CURRENT_TIME), NULL);
+                                       XCB_CURRENT_TIME), NULL);
              uint8_t result = gr ? gr->result : 0xff;
 
              free (gr);
