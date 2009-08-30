@@ -51,6 +51,7 @@ DECLARE_OPEN(sdl);
 DECLARE_OPEN(xcb_x11);
 DECLARE_OPEN(xcb_xv);
 DECLARE_OPEN(dummy);
+DECLARE_OPEN(fb);
 
 #undef DECLARE_OPEN
 
@@ -81,6 +82,9 @@ vlc_module_begin()
 
     add_submodule()
     DECLARE_MODULE(dummy, 1)
+
+    add_submodule()
+    DECLARE_MODULE(fb, 30)
 
 vlc_module_end()
 
