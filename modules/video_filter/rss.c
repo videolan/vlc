@@ -77,12 +77,12 @@ static const char *const ppsz_color_descriptions[] = {
  * filter_sys_t: rss filter descriptor
  *****************************************************************************/
 
-struct rss_item_t
+typedef struct rss_item_t
 {
     char *psz_title;
     char *psz_description;
     char *psz_link;
-};
+} rss_item_t;
 
 typedef struct rss_feed_t
 {
@@ -94,7 +94,7 @@ typedef struct rss_feed_t
     picture_t *p_pic;
 
     int i_items;
-    struct rss_item_t *p_items;
+    rss_item_t *p_items;
 } rss_feed_t;
 
 struct filter_sys_t
@@ -114,7 +114,7 @@ struct filter_sys_t
     mtime_t last_date;
 
     int i_feeds;
-    struct rss_feed_t *p_feeds;
+    rss_feed_t *p_feeds;
 
     int i_ttl;
     time_t t_last_update;
@@ -348,8 +348,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     subpicture_region_t *p_region;
 
     int i_feed, i_item;
-
-    struct rss_feed_t *p_feed;
+    rss_feed_t *p_feed;
 
     memset( &fmt, 0, sizeof(video_format_t) );
 
@@ -698,7 +697,7 @@ static int FetchRSS( filter_t *p_filter)
 
     for( i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
     {
-        struct rss_feed_t *p_feed = p_sys->p_feeds+i_feed;
+        rss_feed_t *p_feed = p_sys->p_feeds+i_feed;
 
         FREENULL( p_feed->psz_title );
         FREENULL( p_feed->psz_description );
@@ -711,7 +710,7 @@ static int FetchRSS( filter_t *p_filter)
         }
         for( int i = 0; i < p_feed->i_items; i++ )
         {
-            struct rss_item_t *p_item = p_feed->p_items + i;
+            rss_item_t *p_item = p_feed->p_items + i;
             free( p_item->psz_title );
             free( p_item->psz_link );
             free( p_item->psz_description );
@@ -764,7 +763,7 @@ static int FetchRSS( filter_t *p_filter)
                     {
                         b_is_item = true;
                         p_feed->i_items++;
-                        p_feed->p_items = (struct rss_item_t *)realloc( p_feed->p_items, p_feed->i_items * sizeof( struct rss_item_t ) );
+                        p_feed->p_items = realloc( p_feed->p_items, p_feed->i_items * sizeof( rss_item_t ) );
                         p_feed->p_items[p_feed->i_items-1].psz_title = NULL;
                         p_feed->p_items[p_feed->i_items-1].psz_description
                                                                      = NULL;
@@ -881,8 +880,7 @@ static int FetchRSS( filter_t *p_filter)
 #                   endif
                     if( b_is_item == true )
                     {
-                        struct rss_item_t *p_item;
-                        p_item = p_feed->p_items+i_item;
+                        rss_item_t *p_item = p_feed->p_items+i_item;
                         if( !strcmp( psz_eltname, "title" ) /* rss/atom */
                             && !p_item->psz_title )
                         {
@@ -974,18 +972,12 @@ static void FreeRSS( filter_t *p_filter)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    struct rss_item_t *p_item;
-    struct rss_feed_t *p_feed;
-
-    int i_feed;
-    int i_item;
-
-    for( i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
+    for( int i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
     {
-        p_feed = p_sys->p_feeds+i_feed;
-        for( i_item = 0; i_item < p_feed->i_items; i_item++ )
+        rss_feed_t *p_feed = p_sys->p_feeds+i_feed;
+        for( int i_item = 0; i_item < p_feed->i_items; i_item++ )
         {
-            p_item = p_feed->p_items+i_item;
+            rss_item_t *p_item = p_feed->p_items+i_item;
             free( p_item->psz_title );
             free( p_item->psz_link );
             free( p_item->psz_description );
