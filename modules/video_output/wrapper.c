@@ -127,7 +127,7 @@ static int Open(vlc_object_t *object, const char *module)
     vout_thread_t *vout = (vout_thread_t *)object;
     vout_sys_t *sys;
 
-    msg_Err(vout, "Opening vout display wrapper");
+    msg_Warn(vout, "Opening vout display wrapper");
 
     /* */
     sys = malloc(sizeof(*sys));
