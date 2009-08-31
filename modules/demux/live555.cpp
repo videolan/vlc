@@ -224,6 +224,8 @@ struct demux_sys_t
 
     bool             b_get_param;   /* Does the server support GET_PARAMETER */
     bool             b_paused;      /* Are we paused? */
+
+    float            f_seek_request;/* In case we receive a seek request while paused*/
 };
 
 static int Demux  ( demux_t * );
@@ -303,6 +305,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->b_force_mcast = var_CreateGetBool( p_demux, "rtsp-mcast" );
     p_sys->b_get_param = false;
     p_sys->b_paused = false;
+    p_sys->f_seek_request = -1;
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
     vlc_UrlParse( &p_sys->url, p_sys->psz_path, 0 );
@@ -1284,9 +1287,15 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                     time = f * (double)p_sys->i_npt_length;   /* in second */
                 }
 
-                if( !p_sys->b_paused && !p_sys->rtsp->pauseMediaSession( *p_sys->ms ))
+                if( p_sys->b_paused )
                 {
-                    msg_Err( p_demux, "PAUSE before seek failed failed %s",
+                    p_sys->f_seek_request = time;
+                    return VLC_SUCCESS;
+                }
+
+                if( !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) )
+                {
+                    msg_Err( p_demux, "PAUSE before seek failed %s",
                         p_sys->env->getResultMsg() );
                     return VLC_EGENERIC;
                 }
@@ -1414,11 +1423,12 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
             if( ( b_pause && !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) ) ||
                     ( !b_pause && !p_sys->rtsp->playMediaSession( *p_sys->ms,
-                       -1 ) ) )
+                       p_sys->f_seek_request ) ) )
             {
                     msg_Err( p_demux, "PLAY or PAUSE failed %s", p_sys->env->getResultMsg() );
                     return VLC_EGENERIC;
             }
+            p_sys->f_seek_request = -1;
             p_sys->b_paused = b_pause;
 
             /* When we Pause, we'll need the TimeoutPrevention thread to
