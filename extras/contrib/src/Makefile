@@ -765,7 +765,6 @@ endif
 ifdef HAVE_WIN32
 	patch -p0 < Patches/theora-doc.patch
 endif
-	(cd $@; ./autogen.sh)
 
 THEORACONF = --disable-sdltest --disable-oggtest --disable-vorbistest --disable-examples
 ifdef HAVE_WIN32
@@ -780,7 +779,7 @@ THEORACONF += --disable-asm
 endif
 
 .theora: libtheora .ogg
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF) && make && make install)
+	(cd $<; $(HOSTCC) ./autogen.sh $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF) && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
