@@ -88,6 +88,14 @@
     return _rootMedia;
 }
 
+- (void)playMedia:(VLCMedia *)media
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+    libvlc_media_list_player_play_item(instance, [media libVLCMediaDescriptor], &ex);
+    catch_exception(&ex);    
+}
+
 - (void)play
 {
     libvlc_exception_t ex;

@@ -32,4 +32,10 @@
  */
 - (void)play;
 - (void)stop;
+
+/**
+ * media must be in the current media list.
+ */
+- (void)playMedia:(VLCMedia *)media;
+
 @end
