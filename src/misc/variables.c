@@ -978,11 +978,9 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
     {
 #ifndef NDEBUG
         if( b_found_similar )
-            msg_Warn( p_this, "Calling var_DelCallback for '%s' with the same "
-                              "function but not the same data.", psz_name );
-        else
-            msg_Warn( p_this, "var_DelCallback can't find the callback for "
-                              "'%s'", psz_name );
+            fprintf( stderr, "Calling var_DelCallback for '%s' with the same "
+                             "function but not the same data.", psz_name );
+        assert( 0 );
 #endif
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_EGENERIC;
