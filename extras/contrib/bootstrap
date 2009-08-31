@@ -242,8 +242,6 @@ case $HOST in
             echo 'HAVE_MAEMO = 1' >> config.mak
             EXTRA_CFLAGS=" -mcpu=cortex-a8 -mtune=cortex-a8 -march=armv7-a"
             EXTRA_CLFAGS="$EXTRA_CFLAGS -mfpu=neon"
-            EXTRA_CFLAGS="$EXTRA_CFLAGS -mthumb -mthumb-interwork"
-            echo 'HAVE_ISA_THUMB = 1' >> config.mak
         else
             EXTRA_CFLAGS="-msoft-float"
         fi
