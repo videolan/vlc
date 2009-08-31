@@ -353,11 +353,11 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
     picture_Release(picture);
 }
-static int Control(vout_display_t *vd, int i_query, va_list args)
+static int Control(vout_display_t *vd, int query, va_list args)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    switch (i_query) {
+    switch (query) {
     case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE: {
         const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
         if (cfg->display.width  != sys->width ||
