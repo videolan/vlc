@@ -716,7 +716,7 @@ ifdef SVN
 tremor:
 	$(SVN) co http://svn.xiph.org/trunk/Tremor tremor
 	(cd $@ && patch -p0 < ../Patches/tremor.patch)
-	(cd $@; rm -f ogg.h && echo "#include <ogg/ogg.h>" > ogg.h && rm -f os_types.h && echo "#include <ogg/os_types.h>" > os_types.h && ./autogen.sh)
+	(cd $@; rm -f ogg.h && echo "#include <ogg/ogg.h>" > ogg.h && rm -f os_types.h && echo "#include <ogg/os_types.h>" > os_types.h)
 else
 tremor-$(TREMOR_VERSION).tar.bz2:
 	echo "tremor snapshot does not exist, you MUST use subversion !"
@@ -728,7 +728,7 @@ tremor: tremor-$(TREMOR_VERSION).tar.bz2
 endif
 
 .tremor: tremor .ogg
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install)
+	(cd $<; $(HOSTCC) ./autogen.sh $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
