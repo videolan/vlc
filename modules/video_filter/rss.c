@@ -100,7 +100,6 @@ typedef struct rss_feed_t
 struct filter_sys_t
 {
     vlc_mutex_t lock;
-    vlc_mutex_t *p_lock;
 
     int i_xoff, i_yoff;  /* offsets for the display string in the video window */
     int i_pos; /* permit relative positioning (top, bottom, left, right, center) */
@@ -669,25 +668,236 @@ static int ParseUrls( filter_t *p_filter, char *psz_urls )
 }
 
 
+
+/****************************************************************************
+ * Parse the rss feed
+ ***************************************************************************/
+static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
+                      rss_feed_t *p_feed )
+{
+    VLC_UNUSED(p_filter);
+    char *psz_eltname = NULL;
+
+    bool b_is_item = false;
+    bool b_is_image = false;
+
+    int i_item = 0;
+
+    while( xml_ReaderRead( p_xml_reader ) == 1 )
+    {
+        switch( xml_ReaderNodeType( p_xml_reader ) )
+        {
+        // Error
+        case -1:
+            goto end;
+
+        case XML_READER_STARTELEM:
+            free( psz_eltname );
+            psz_eltname = xml_ReaderName( p_xml_reader );
+            if( !psz_eltname )
+                goto end;
+
+#ifdef RSS_DEBUG
+            msg_Dbg( p_filter, "element name: %s", psz_eltname );
+#endif
+            /* rss or atom */
+            if( !strcmp( psz_eltname, "item" ) || !strcmp( psz_eltname, "entry" ) )
+            {
+                b_is_item = true;
+                p_feed->i_items++;
+                p_feed->p_items = realloc( p_feed->p_items,
+                                           p_feed->i_items * sizeof( rss_item_t ) );
+                p_feed->p_items[p_feed->i_items-1].psz_title = NULL;
+                p_feed->p_items[p_feed->i_items-1].psz_description = NULL;
+                p_feed->p_items[p_feed->i_items-1].psz_link = NULL;
+            }
+            /* rss */
+            else if( !strcmp( psz_eltname, "image" ) )
+            {
+                b_is_image = true;
+            }
+            /* atom */
+            else if( !strcmp( psz_eltname, "link" ) )
+            {
+                char *psz_href = NULL;
+                char *psz_rel = NULL;
+                while( xml_ReaderNextAttr( p_xml_reader ) == VLC_SUCCESS )
+                {
+                    char *psz_name = xml_ReaderName( p_xml_reader );
+                    char *psz_value = xml_ReaderValue( p_xml_reader );
+                    if( !strcmp( psz_name, "rel" ) )
+                    {
+                        free( psz_rel );
+                        psz_rel = psz_value;
+                    }
+                    else if( !strcmp( psz_name, "href" ) )
+                    {
+                        free( psz_href );
+                        psz_href = psz_value;
+                    }
+                    else
+                    {
+                        free( psz_value );
+                    }
+                    free( psz_name );
+                }
+
+                /* "rel" and "href" must be defined */
+                if( psz_rel && psz_href )
+                {
+                    if( !strcmp( psz_rel, "alternate" ) && !b_is_item &&
+                        !b_is_image && !p_feed->psz_link )
+                    {
+                        p_feed->psz_link = psz_href;
+                    }
+                    /* this isn't in the rfc but i found some ... */
+                    else if( ( !strcmp( psz_rel, "logo" ) ||
+                               !strcmp( psz_rel, "icon" ) )
+                             && !b_is_item && !b_is_image
+                             && !p_feed->psz_image )
+                    {
+                        p_feed->psz_image = psz_href;
+                    }
+                    else
+                    {
+                        free( psz_href );
+                    }
+                }
+                else
+                {
+                    free( psz_href );
+                }
+                free( psz_rel );
+            }
+            break;
+
+        case XML_READER_ENDELEM:
+            free( psz_eltname );
+            psz_eltname = xml_ReaderName( p_xml_reader );
+            if( !psz_eltname )
+                goto end;
+
+#ifdef RSS_DEBUG
+            msg_Dbg( p_filter, "element end : %s", psz_eltname );
+#endif
+            /* rss or atom */
+            if( !strcmp( psz_eltname, "item" ) || !strcmp( psz_eltname, "entry" ) )
+            {
+                b_is_item = false;
+                i_item++;
+            }
+            /* rss */
+            else if( !strcmp( psz_eltname, "image" ) )
+            {
+                b_is_image = false;
+            }
+            FREENULL( psz_eltname );
+            break;
+
+        case XML_READER_TEXT:
+        {
+            if( !psz_eltname )
+                break;
+            char *psz_eltvalue = xml_ReaderValue( p_xml_reader );
+            if( !psz_eltvalue )
+                goto end;
+
+            char *psz_clean = removeWhiteChars( psz_eltvalue );
+            free( psz_eltvalue );
+            psz_eltvalue = psz_clean;
+
+#ifdef RSS_DEBUG
+            msg_Dbg( p_filter, "  text : <%s>", psz_eltvalue );
+#endif
+            /* Is it an item ? */
+            if( b_is_item )
+            {
+                rss_item_t *p_item = p_feed->p_items+i_item;
+                /* rss/atom */
+                if( !strcmp( psz_eltname, "title" ) && !p_item->psz_title )
+                {
+                    p_item->psz_title = psz_eltvalue;
+                }
+                else if( !strcmp( psz_eltname, "link" ) /* rss */
+                         && !p_item->psz_link )
+                {
+                    p_item->psz_link = psz_eltvalue;
+                }
+                /* rss/atom */
+                else if( ( !strcmp( psz_eltname, "description" ) ||
+                           !strcmp( psz_eltname, "summary" ) )
+                          && !p_item->psz_description )
+                {
+                    p_item->psz_description = psz_eltvalue;
+                }
+                else
+                {
+                    free( psz_eltvalue );
+                }
+            }
+            /* Is it an image ? */
+            else if( b_is_image )
+            {
+                if( !strcmp( psz_eltname, "url" ) && !p_feed->psz_image )
+                    p_feed->psz_image = psz_eltvalue;
+                else
+                    free( psz_eltvalue );
+            }
+            else
+            {
+                /* rss/atom */
+                if( !strcmp( psz_eltname, "title" ) && !p_feed->psz_title )
+                {
+                    p_feed->psz_title = psz_eltvalue;
+                }
+                /* rss */
+                else if( !strcmp( psz_eltname, "link" ) && !p_feed->psz_link )
+                {
+                    p_feed->psz_link = psz_eltvalue;
+                }
+                /* rss ad atom */
+                else if( ( !strcmp( psz_eltname, "description" ) ||
+                           !strcmp( psz_eltname, "subtitle" ) )
+                         && !p_feed->psz_description )
+                {
+                    p_feed->psz_description = psz_eltvalue;
+                }
+                /* rss */
+                else if( ( !strcmp( psz_eltname, "logo" ) ||
+                           !strcmp( psz_eltname, "icon" ) )
+                         && !p_feed->psz_image )
+                {
+                    p_feed->psz_image = psz_eltvalue;
+                }
+                else
+                {
+                    free( psz_eltvalue );
+                }
+            }
+            break;
+        }
+        }
+    }
+
+    free( psz_eltname );
+    return true;
+
+end:
+    free( psz_eltname );
+    return false;
+}
+
+
 /****************************************************************************
  * FetchRSS (or Atom) feeds
  ***************************************************************************/
-static int FetchRSS( filter_t *p_filter)
+static int FetchRSS( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
     stream_t *p_stream;
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
-    int i_ret = 1;
-
-    char *psz_eltname = NULL;
-    char *psz_eltvalue = NULL;
-
-    int i_feed;
-    int i_item;
-    bool b_is_item;
-    bool b_is_image;
 
     p_xml = xml_Create( p_filter );
     if( !p_xml )
@@ -696,10 +906,12 @@ static int FetchRSS( filter_t *p_filter)
         return 1;
     }
 
-    for( i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
+    /* Fetch all feeds and parse them */
+    for( int i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
     {
         rss_feed_t *p_feed = p_sys->p_feeds+i_feed;
 
+        /* Free the ressources */
         FREENULL( p_feed->psz_title );
         FREENULL( p_feed->psz_description );
         FREENULL( p_feed->psz_link );
@@ -719,6 +931,7 @@ static int FetchRSS( filter_t *p_filter)
         p_feed->i_items = 0;
         FREENULL( p_feed->p_items );
 
+        /* Fetch the feed */
         msg_Dbg( p_filter, "opening %s RSS/Atom feed ...", p_feed->psz_url );
 
         p_stream = stream_UrlNew( p_filter, p_feed->psz_url );
@@ -736,232 +949,26 @@ static int FetchRSS( filter_t *p_filter)
             goto error;
         }
 
-        i_item = 0;
-        b_is_item = false;
-        b_is_image = false;
+        /* Parse the feed */
+        if( !ParseFeed( p_filter, p_xml_reader, p_feed ) )
+            goto error;
 
-        while( xml_ReaderRead( p_xml_reader ) == 1 )
-        {
-            switch( xml_ReaderNodeType( p_xml_reader ) )
-            {
-                // Error
-                case -1:
-                    goto error;
-
-                case XML_READER_STARTELEM:
-                    free( psz_eltname );
-                    psz_eltname = xml_ReaderName( p_xml_reader );
-                    if( !psz_eltname )
-                        goto error;
-
-#                   ifdef RSS_DEBUG
-                    msg_Dbg( p_filter, "element name: %s", psz_eltname );
-#                   endif
-                    if( !strcmp( psz_eltname, "item" ) /* rss */
-                     || !strcmp( psz_eltname, "entry" ) ) /* atom */
-                    {
-                        b_is_item = true;
-                        p_feed->i_items++;
-                        p_feed->p_items = realloc( p_feed->p_items, p_feed->i_items * sizeof( rss_item_t ) );
-                        p_feed->p_items[p_feed->i_items-1].psz_title = NULL;
-                        p_feed->p_items[p_feed->i_items-1].psz_description
-                                                                     = NULL;
-                        p_feed->p_items[p_feed->i_items-1].psz_link = NULL;
-                    }
-                    else if( !strcmp( psz_eltname, "image" ) ) /* rss */
-                    {
-                        b_is_image = true;
-                    }
-                    else if( !strcmp( psz_eltname, "link" ) ) /* atom */
-                    {
-                        char *psz_href = NULL;
-                        char *psz_rel = NULL;
-                        while( xml_ReaderNextAttr( p_xml_reader )
-                               == VLC_SUCCESS )
-                        {
-                            char *psz_name = xml_ReaderName( p_xml_reader );
-                            char *psz_value = xml_ReaderValue( p_xml_reader );
-                            if( !strcmp( psz_name, "rel" ) )
-                            {
-                                if( psz_rel )
-                                {
-                                    msg_Dbg( p_filter, "\"rel\" attribute of link atom duplicated (last value: %s)", psz_value );
-                                    free( psz_rel );
-                                }
-                                psz_rel = psz_value;
-                            }
-                            else if( !strcmp( psz_name, "href" ) )
-                            {
-                                if( psz_href )
-                                {
-                                    msg_Dbg( p_filter, "\"href\" attribute of link atom duplicated (last value: %s)", psz_href );
-                                    free( psz_href );
-                                }
-                                psz_href = psz_value;
-                            }
-                            else
-                            {
-                                free( psz_value );
-                            }
-                            free( psz_name );
-                        }
-                        if( psz_rel && psz_href )
-                        {
-                            if( !strcmp( psz_rel, "alternate" )
-                                && b_is_item == false
-                                && b_is_image == false
-                                && !p_feed->psz_link )
-                            {
-                                p_feed->psz_link = psz_href;
-                            }
-                            /* this isn't in the rfc but i found some ... */
-                            else if( ( !strcmp( psz_rel, "logo" )
-                                    || !strcmp( psz_rel, "icon" ) )
-                                    && b_is_item == false
-                                    && b_is_image == false
-                                    && !p_feed->psz_image )
-                            {
-                                p_feed->psz_image = psz_href;
-                            }
-                            else
-                            {
-                                free( psz_href );
-                            }
-                        }
-                        else
-                        {
-                            free( psz_href );
-                        }
-                        free( psz_rel );
-                    }
-                    break;
-
-                case XML_READER_ENDELEM:
-                    free( psz_eltname );
-                    psz_eltname = xml_ReaderName( p_xml_reader );
-                    if( !psz_eltname )
-                        goto error;
-
-#                   ifdef RSS_DEBUG
-                    msg_Dbg( p_filter, "element end : %s", psz_eltname );
-#                   endif
-                    if( !strcmp( psz_eltname, "item" ) /* rss */
-                     || !strcmp( psz_eltname, "entry" ) ) /* atom */
-                    {
-                        b_is_item = false;
-                        i_item++;
-                    }
-                    else if( !strcmp( psz_eltname, "image" ) ) /* rss */
-                    {
-                        b_is_image = false;
-                    }
-                    FREENULL( psz_eltname );
-                    break;
-
-                case XML_READER_TEXT:
-                    if( !psz_eltname ) break;
-                    psz_eltvalue = xml_ReaderValue( p_xml_reader );
-                    if( !psz_eltvalue )
-                    {
-                        goto error;
-                    }
-                    else
-                    {
-                        char *psz_clean = removeWhiteChars( psz_eltvalue );
-                        free( psz_eltvalue );
-                        psz_eltvalue = psz_clean;
-                    }
-#                   ifdef RSS_DEBUG
-                    msg_Dbg( p_filter, "  text : <%s>", psz_eltvalue );
-#                   endif
-                    if( b_is_item == true )
-                    {
-                        rss_item_t *p_item = p_feed->p_items+i_item;
-                        if( !strcmp( psz_eltname, "title" ) /* rss/atom */
-                            && !p_item->psz_title )
-                        {
-                            p_item->psz_title = psz_eltvalue;
-                        }
-                        else if( !strcmp( psz_eltname, "link" ) /* rss */
-                                 && !p_item->psz_link )
-                        {
-                            p_item->psz_link = psz_eltvalue;
-                        }
-                        else if((!strcmp( psz_eltname, "description" ) /* rss */
-                              || !strcmp( psz_eltname, "summary" ) ) /* atom */
-                              && !p_item->psz_description )
-                        {
-                            p_item->psz_description = psz_eltvalue;
-                        }
-                        else
-                        {
-                            FREENULL( psz_eltvalue );
-                        }
-                    }
-                    else if( b_is_image == true )
-                    {
-                        if( !strcmp( psz_eltname, "url" ) /* rss */
-                            && !p_feed->psz_image )
-                        {
-                            p_feed->psz_image = psz_eltvalue;
-                        }
-                        else
-                        {
-                            FREENULL( psz_eltvalue );
-                        }
-                    }
-                    else
-                    {
-                        if( !strcmp( psz_eltname, "title" ) /* rss/atom */
-                            && !p_feed->psz_title )
-                        {
-                            p_feed->psz_title = psz_eltvalue;
-                        }
-                        else if( !strcmp( psz_eltname, "link" ) /* rss */
-                                 && !p_feed->psz_link )
-                        {
-                            p_feed->psz_link = psz_eltvalue;
-                        }
-                        else if((!strcmp( psz_eltname, "description" ) /* rss */
-                              || !strcmp( psz_eltname, "subtitle" ) ) /* atom */
-                              && !p_feed->psz_description )
-                        {
-                            p_feed->psz_description = psz_eltvalue;
-                        }
-                        else if( ( !strcmp( psz_eltname, "logo" ) /* atom */
-                              || !strcmp( psz_eltname, "icon" ) ) /* atom */
-                              && !p_feed->psz_image )
-                        {
-                            p_feed->psz_image = psz_eltvalue;
-                        }
-                        else
-                        {
-                            FREENULL( psz_eltvalue );
-                        }
-                    }
-                    break;
-            }
-        }
-
+        /* If we have a image: load it if requiere */
         if( p_sys->b_images == true
             && p_feed->psz_image && !p_feed->p_pic )
         {
             p_feed->p_pic = LoadImage( p_filter, p_feed->psz_image );
         }
 
+        msg_Dbg( p_filter, "done with %s RSS/Atom feed", p_feed->psz_url );
         xml_ReaderDelete( p_xml, p_xml_reader );
         stream_Delete( p_stream );
-        msg_Dbg( p_filter, "done with %s RSS/Atom feed", p_feed->psz_url );
     }
 
-    free( psz_eltname );
-    free( psz_eltvalue );
     xml_Delete( p_xml );
     return 0;
 
 error:
-    free( psz_eltname );
-    free( psz_eltvalue );
 
     if( p_xml_reader )
         xml_ReaderDelete( p_xml, p_xml_reader );
@@ -970,7 +977,7 @@ error:
     if( p_xml )
         xml_Delete( p_xml );
 
-    return i_ret;
+    return 1;
 }
 
 /****************************************************************************
