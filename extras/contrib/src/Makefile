@@ -765,7 +765,7 @@ endif
 ifdef HAVE_WIN32
 	patch -p0 < Patches/theora-doc.patch
 endif
-	(cd $@; autoconf)
+	(cd $@; ./autogen.sh)
 
 THEORACONF = --disable-sdltest --disable-oggtest --disable-vorbistest --disable-examples
 ifdef HAVE_WIN32
