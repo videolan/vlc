@@ -41,9 +41,18 @@ Index: synthesis.c
    if(oggpack_read(&opb,1)!=0){
 Index: info.c
 ===================================================================
---- info.c	(révision 12136)
-+++ info.c	(copie de travail)
+--- info.c  (révision 16541)
++++ info.c  (copie de travail)
 @@ -299,7 +299,7 @@
+   char buffer[6];
+ 
+   if(op){
+-    oggpack_readinit(&opb,op->packet);
++    oggpack_readinit(&opb,op->packet,op->bytes);
+ 
+     if(!op->b_o_s)
+       return(0); /* Not the initial packet */
+@@ -327,7 +327,7 @@
    oggpack_buffer opb;
    
    if(op){
