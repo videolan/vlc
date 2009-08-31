@@ -534,7 +534,7 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         if( !p_block )
             return NULL;
         *pp_block = p_block;
-        memset( p_block->p_buffer + p_block->i_buffer - FF_INPUT_BUFFER_PADDING_SIZE, 0,
+        memset( p_block->p_buffer + p_block->i_buffer, 0,
                 FF_INPUT_BUFFER_PADDING_SIZE );
     }
 
