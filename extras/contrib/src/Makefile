@@ -2348,7 +2348,7 @@ fluidsynth: fluidsynth-$(FLUID_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_WIN32
 	patch -p0 < Patches/fluid-win32.patch
-	cd $@; ./autogen.sh
+	cd $@; ./autogen.sh || true
 endif
 
 .fluid: fluidsynth
