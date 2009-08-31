@@ -45,6 +45,7 @@ Removed modules:
  * showintf
  * transrate
  * x11, xvideo, xvid
+ * gtk_main, gtk_main2, gnome_main, gnome_main2 and pda interface
 
 
 Changes between 1.0.0 and 1.0.1:

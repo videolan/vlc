@@ -124,8 +124,6 @@ $Id$
  * glwin32: a opengl provider using DirectX OpenGL
  * glx: a opengl provider using X11 OpenGL
  * gme: game music files demuxer
- * gnome2_main: Gtk+ wrapper for gtk_main
- * gnome_main: Gtk+ wrapper for gtk_main
  * gnutls: GNU TLS encryption/decryption module
  * goom: visualisation plugin based on goom
  * gradient: Gradient and edge detection video effects filter
@@ -133,8 +131,6 @@ $Id$
  * grey_yuv: grayscale to others conversion module
  * growl: announce currently playing stream to growl
  * growl_udp: growl UDP notification plugin
- * gtk2_main: Gtk+ wrapper for gtk_main
- * gtk_main: Gtk+ wrapper for gtk_main
  * h264: H264 decoder
  * hal: Linux HAL services discovery module
  * hd1000a: audio output module for the Roku HD1000 Set-Top-Box
@@ -240,7 +236,6 @@ $Id$
  * packetizer_vc1: VC-1 video packetizer
  * panoramix: image wall panoramic video with edge blending filter
  * param_eq: parametric equalizer
- * pda: interface for iPaq using the Gtk2+ widget set
  * playlist: playlist import module
  * png: PNG images decoder
  * podcast: podcast feed parser

@@ -479,7 +479,7 @@ if test "${SYS}" = "mingw32"
 then
     AC_CHECK_LIB(mingwex,opendir,
         AC_CHECK_LIB(mingw32,opendir,,
-            [VLC_ADD_LIBS([libvlccore gtk],[-lmingwex])])
+            [VLC_ADD_LIBS([libvlccore],[-lmingwex])])
     )
 fi
 
@@ -986,12 +986,6 @@ then
 fi
 ;;
 esac
-
-dnl Build the gtk_main plugins?
-NEED_GTK_MAIN=no
-NEED_GNOME_MAIN=no
-NEED_GTK2_MAIN=no
-NEED_GNOME2_MAIN=no
 
 dnl build the qte plugin ?
 NEED_QTE_MAIN=no
@@ -4270,28 +4264,6 @@ AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes" ||
 	  test "${SYS}" != "mingwce" && test "${enable_skins2}" != "no")])
 
 dnl
-dnl  PDA Gtk+2 module
-dnl
-AC_ARG_ENABLE(pda,
-  [  --enable-pda            PDA interface needs Gtk2 support (default disabled)])
-if test "${enable_pda}" = "yes"
-then
-  PKG_CHECK_MODULES(GTK2, [gtk+-2.0 >= 2.0.0, gthread-2.0])
-  VLC_ADD_CFLAGS([gtk2],[${GTK2_CFLAGS}])
-  VLC_ADD_LIBS([gtk2],[${GTK2_LIBS}])
-  VLC_ADD_CFLAGS([pda],[${GTK2_CFLAGS} ${CFLAGS_pda}])
-  VLC_ADD_LIBS([pda],[${LDFLAGS_pda}])
-  VLC_ADD_LIBS([pda],[${GTK2_LIBS}])
-  VLC_ADD_PLUGIN([pda])
-  if test "${SYS}" != "mingw32"; then
-    NEED_GTK2_MAIN=yes
-    VLC_ADD_CFLAGS([gtk2_main],[$GTK2_CFLAGS])
-    VLC_ADD_LIBS([gtk2_main],[$GTK2_LIBS])
-  fi
-fi
-AM_CONDITIONAL(BUILD_PDA, [test "${enable_pda}" = "yes"])
-
-dnl
 dnl Maemo
 dnl
 AC_ARG_ENABLE(maemo,
@@ -4973,39 +4945,6 @@ then
 fi
 
 dnl
-dnl  gtk_main plugin
-dnl
-if test "${NEED_GTK_MAIN}" != "no"
-then
-    VLC_ADD_PLUGIN([gtk_main])
-    VLC_ADD_CFLAGS([gtk_main],[${CFLAGS_gtk}])
-    VLC_ADD_LDFLAGS([gtk_main],[${LDFLAGS_gtk}])
-fi
-
-if test "${NEED_GNOME_MAIN}" != "no"
-then
-    VLC_ADD_PLUGIN([gnome_main])
-    VLC_ADD_CFLAGS([gnome_main],[${CFLAGS_gtk} ${CFLAGS_gnome}])
-    VLC_ADD_LDFLAGS([gnome_main],[${LDFLAGS_gtk} ${LDFLAGS_gnome}])
-fi
-
-if test "${NEED_GTK2_MAIN}" != "no"
-then
-    VLC_ADD_PLUGIN([gtk2_main])
-    VLC_ADD_CFLAGS([gtk2],[-DNEED_GTK2_MAIN])
-    VLC_ADD_CFLAGS([pda],[-DNEED_GTK2_MAIN])
-    VLC_ADD_CFLAGS([gtk2_main],[${CFLAGS_gtk2} ${CFLAGS_pda}])
-    VLC_ADD_LDFLAGS([gtk2_main],[${LDFLAGS_gtk2} ${LDFLAGS_pda}])
-fi
-
-if test "${NEED_GNOME2_MAIN}" != "no"
-then
-    VLC_ADD_PLUGIN([gnome2_main])
-    VLC_ADD_CFLAGS([gnome2_main],[${CFLAGS_gtk2} ${CFLAGS_gnome2}])
-    VLC_ADD_LDFLAGS([gnome2_main],[${LDFLAGS_gtk2} ${LDFLAGS_gnome2}])
-fi
-
-dnl
 dnl  qte_main plugin
 dnl
 if test "${NEED_QTE_MAIN}" != "no"
@@ -5194,7 +5133,6 @@ AC_CONFIG_FILES([
   modules/demux/playlist/Makefile
   modules/gui/Makefile
   modules/gui/beos/Makefile
-  modules/gui/pda/Makefile
   modules/gui/macosx/Makefile
   modules/gui/maemo/Makefile
   modules/gui/minimal_macosx/Makefile

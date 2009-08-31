@@ -17,7 +17,6 @@ nobase_dist_vlcdata_SCRIPTS = \
 EXTRA_DIST = \
 	$(skins2_default_vlt_FILES) \
 	$(DIST_rsrc) \
-	$(DIST_pda) \
 	$(DIST_skins2) \
 	$(DIST_http) \
 	$(DIST_http_lua) \
@@ -30,9 +29,6 @@ nobase_vlcdata_DATA =
 if BUILD_SKINS
 nobase_vlcdata_DATA += skins2/default.vlt
 nobase_vlcdata_DATA += $(DIST_skins2)
-endif
-if BUILD_PDA
-nobase_vlcdata_DATA += $(DIST_pda)
 endif
 if BUILD_HTTPD
 nobase_vlcdata_DATA += $(DIST_http)
@@ -62,16 +58,6 @@ DIST_rsrc = \
 	vlc_beos.rsrc \
 	vlc_win32_rc.rc.in \
 	libvlc_win32_rc.rc.in
-
-DIST_pda = \
-	pda-forwardb16x16.xpm \
-	pda-openb16x16.xpm \
-	pda-pauseb16x16.xpm \
-	pda-playb16x16.xpm \
-	pda-playlistb16x16.xpm \
-	pda-preferencesb16x16.xpm \
-	pda-rewindb16x16.xpm \
-	pda-stopb16x16.xpm
 
 DIST_icons = vlc.ico
 

@@ -8,10 +8,6 @@ if BUILD_LUA
 SUBDIRS += lua
 endif
 
-SOURCES_gtk_main = gtk_main.c
-SOURCES_gnome_main = gtk_main.c
-SOURCES_gtk2_main = gtk_main.c
-SOURCES_gnome2_main = gtk_main.c
 SOURCES_screensaver = screensaver.c
 SOURCES_qte_main = qte_main.cpp
 SOURCES_freetype = freetype.c text_renderer.h

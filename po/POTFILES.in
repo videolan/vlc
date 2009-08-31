@@ -642,14 +642,6 @@ modules/gui/minimal_macosx/voutagl.m
 modules/gui/minimal_macosx/voutgl.h
 modules/gui/minimal_macosx/voutgl.m
 modules/gui/ncurses.c
-modules/gui/pda/pda.c
-modules/gui/pda/pda.h
-modules/gui/pda/pda_callbacks.c
-modules/gui/pda/pda_callbacks.h
-modules/gui/pda/pda_interface.c
-modules/gui/pda/pda_interface.h
-modules/gui/pda/pda_support.c
-modules/gui/pda/pda_support.h
 modules/gui/qnx/aout.c
 modules/gui/qnx/qnx.c
 modules/gui/qnx/vout.c
@@ -1017,7 +1009,6 @@ modules/misc/dummy/renderer.c
 modules/misc/dummy/vout.c
 modules/misc/freetype.c
 modules/misc/gnutls.c
-modules/misc/gtk_main.c
 modules/misc/inhibit.c
 modules/misc/logger.c
 modules/misc/lua/demux.c

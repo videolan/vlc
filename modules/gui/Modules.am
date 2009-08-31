@@ -10,9 +10,6 @@ endif
 if BUILD_MAEMO
 SUBDIRS += maemo
 endif
-if BUILD_PDA
-SUBDIRS += pda
-endif
 SUBDIRS += qnx
 if ENABLE_QT4
 SUBDIRS += qt4
