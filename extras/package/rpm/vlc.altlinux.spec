@@ -397,14 +397,6 @@ Requires: fonts-ttf-dejavu
 This package contains freetype subtitles and OSD text output plugin 
 to VLC Media Player.
 
-%package plugin-galaktos
-Summary: Galaktos visualization plugin for VLC Media Player
-Group: Video
-Requires: lib%name = %version-%release
-
-%description plugin-galaktos
-This package contains Galaktos visualization plugin for VLC Media Player.
-
 %if_enabled ggi
 %package plugin-ggi
 Summary: GGI video output plugin for VLC Media Player
@@ -811,7 +803,7 @@ This package contains fortunes from VLC Media Player.
 %package maxi
 Summary: Maxi package for VLC Media Player
 Group: Video
-Requires: vlc vlc-interface-ncurses vlc-interface-skins2 vlc-interface-wxwidgets vlc-interface-lirc vlc-interface-telnet vlc-interface-http vlc-plugin-a52 vlc-plugin-aa vlc-plugin-alsa vlc-plugin-arts vlc-plugin-audiocd vlc-plugin-caca vlc-plugin-cmml vlc-plugin-dvb vlc-plugin-dvdnav vlc-plugin-dvdread vlc-plugin-esd vlc-plugin-faad vlc-plugin-ffmpeg vlc-plugin-framebuffer vlc-plugin-flac vlc-plugin-freetype vlc-plugin-galaktos vlc-plugin-glx vlc-plugin-gnutls vlc-plugin-goom vlc-plugin-h264 vlc-plugin-hal vlc-plugin-jack vlc-plugin-image vlc-plugin-mad vlc-plugin-mga vlc-plugin-modplug vlc-plugin-mpeg2 vlc-plugin-musepack vlc-plugin-ogg vlc-plugin-opengl vlc-plugin-osd vlc-plugin-oss vlc-plugin-png vlc-plugin-podcast vlc-plugin-realrtsp vlc-plugin-screen vlc-plugin-sdl vlc-plugin-sdlimage vlc-plugin-shout vlc-plugin-snapshot vlc-plugin-speex vlc-plugin-theora vlc-plugin-v4l vlc-plugin-videocd vlc-plugin-x11 vlc-plugin-xml vlc-plugin-xvideo libvlc mozilla-plugin-vlc vim-plugin-vlc-syntax vlc-plugin-bonjour vlc-plugin-matroska vlc-plugin-ts vlc-plugin-notify vlc-plugin-live555 vlc-plugin-twolame vlc-plugin-dv
+Requires: vlc vlc-interface-ncurses vlc-interface-skins2 vlc-interface-wxwidgets vlc-interface-lirc vlc-interface-telnet vlc-interface-http vlc-plugin-a52 vlc-plugin-aa vlc-plugin-alsa vlc-plugin-arts vlc-plugin-audiocd vlc-plugin-caca vlc-plugin-cmml vlc-plugin-dvb vlc-plugin-dvdnav vlc-plugin-dvdread vlc-plugin-esd vlc-plugin-faad vlc-plugin-ffmpeg vlc-plugin-framebuffer vlc-plugin-flac vlc-plugin-freetype vlc-plugin-glx vlc-plugin-gnutls vlc-plugin-goom vlc-plugin-h264 vlc-plugin-hal vlc-plugin-jack vlc-plugin-image vlc-plugin-mad vlc-plugin-mga vlc-plugin-modplug vlc-plugin-mpeg2 vlc-plugin-musepack vlc-plugin-ogg vlc-plugin-opengl vlc-plugin-osd vlc-plugin-oss vlc-plugin-png vlc-plugin-podcast vlc-plugin-realrtsp vlc-plugin-screen vlc-plugin-sdl vlc-plugin-sdlimage vlc-plugin-shout vlc-plugin-snapshot vlc-plugin-speex vlc-plugin-theora vlc-plugin-v4l vlc-plugin-videocd vlc-plugin-x11 vlc-plugin-xml vlc-plugin-xvideo libvlc mozilla-plugin-vlc vim-plugin-vlc-syntax vlc-plugin-bonjour vlc-plugin-matroska vlc-plugin-ts vlc-plugin-notify vlc-plugin-live555 vlc-plugin-twolame vlc-plugin-dv
 %{?_enable_dca:Requires: vlc-plugin-dca}
 %{?_enable_svg:Requires: vlc-plugin-svg}
 %{?_enable_ggi:Requires: vlc-plugin-ggi}
@@ -889,7 +881,6 @@ export JAVA_HOME=%_libdir/j2se1.5-sun
 	--enable-flac \
 	--enable-freetype \
 	--enable-fribidi \
-	--enable-galaktos \
 	%{subst_enable ggi} \
 	--enable-glx \
 	%{subst_enable gnomevfs} \
@@ -1456,9 +1447,6 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %files plugin-gnomevfs
 %_vlc_pluginsdir/access/libaccess_gnomevfs_plugin.so*
 %endif
-
-%files plugin-galaktos
-%_vlc_pluginsdir/visualization/libgalaktos_plugin.so*
 
 %files plugin-freetype
 %_vlc_pluginsdir/misc/libfreetype_plugin.so*

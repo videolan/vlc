@@ -148,7 +148,6 @@ export XPIDL_INCL=$(xulrunner-config --idlflags)
    --enable-release \
    --enable-sout \
    --with-ffmpeg-faac \
-   --disable-galaktos \
    --enable-httpd \
    --disable-jack \
    --enable-mozilla \
