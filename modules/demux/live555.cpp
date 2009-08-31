@@ -1232,7 +1232,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     demux_sys_t *p_sys = p_demux->p_sys;
     int64_t *pi64, i64;
     double  *pf, f;
-    bool *pb, *pb2, b_bool;
+    bool *pb, *pb2;
     int *pi_int;
 
     switch( i_query )
@@ -1406,7 +1406,6 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_SET_PAUSE_STATE:
         {
-            int i;
             bool b_pause = (bool)va_arg( args, int );
             if( p_sys->rtsp == NULL )
                 return VLC_EGENERIC;
@@ -1435,13 +1434,16 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             else if( !p_sys->b_paused && p_sys->p_timeout != NULL )
                 p_sys->p_timeout->b_handle_keep_alive = false;
 
-            for( i = 0; !b_bool && i < p_sys->i_track; i++ )
+            if( !p_sys->b_paused )
             {
-                live_track_t *tk = p_sys->track[i];
-                tk->b_rtcp_sync = false;
-                tk->i_pts = 0;
-                p_sys->i_pcr = 0;
-                es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+                for( int i = 0; i < p_sys->i_track; i++ )
+                {
+                    live_track_t *tk = p_sys->track[i];
+                    tk->b_rtcp_sync = false;
+                    tk->i_pts = 0;
+                    p_sys->i_pcr = 0;
+                    es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
+                }
             }
 
             /* Reset data received counter */
