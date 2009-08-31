@@ -676,9 +676,10 @@ static int FetchRSS( filter_t *p_filter)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    stream_t *p_stream = NULL;
-    xml_t *p_xml = NULL;
-    xml_reader_t *p_xml_reader = NULL;
+    stream_t *p_stream;
+    xml_t *p_xml;
+    xml_reader_t *p_xml_reader;
+    int i_ret = 1;
 
     char *psz_eltname = NULL;
     char *psz_eltvalue = NULL;
@@ -724,16 +725,15 @@ static int FetchRSS( filter_t *p_filter)
         if( !p_stream )
         {
             msg_Err( p_filter, "Failed to open %s for reading", p_feed->psz_url );
-            xml_Delete( p_xml );
-            return 1;
+            p_xml_reader = NULL;
+            goto error;
         }
 
         p_xml_reader = xml_ReaderCreate( p_xml, p_stream );
         if( !p_xml_reader )
         {
             msg_Err( p_filter, "Failed to open %s for parsing", p_feed->psz_url );
-            xml_Delete( p_xml );
-            return 1;
+            goto error;
         }
 
         i_item = 0;
@@ -746,15 +746,14 @@ static int FetchRSS( filter_t *p_filter)
             {
                 // Error
                 case -1:
-                    return 1;
+                    goto error;
 
                 case XML_READER_STARTELEM:
                     free( psz_eltname );
                     psz_eltname = xml_ReaderName( p_xml_reader );
                     if( !psz_eltname )
-                    {
-                        return 1;
-                    }
+                        goto error;
+
 #                   ifdef RSS_DEBUG
                     msg_Dbg( p_filter, "element name: %s", psz_eltname );
 #                   endif
@@ -839,12 +838,10 @@ static int FetchRSS( filter_t *p_filter)
 
                 case XML_READER_ENDELEM:
                     free( psz_eltname );
-                    psz_eltname = NULL;
                     psz_eltname = xml_ReaderName( p_xml_reader );
                     if( !psz_eltname )
-                    {
-                        return 1;
-                    }
+                        goto error;
+
 #                   ifdef RSS_DEBUG
                     msg_Dbg( p_filter, "element end : %s", psz_eltname );
 #                   endif
@@ -858,8 +855,7 @@ static int FetchRSS( filter_t *p_filter)
                     {
                         b_is_image = false;
                     }
-                    free( psz_eltname );
-                    psz_eltname = NULL;
+                    FREENULL( psz_eltname );
                     break;
 
                 case XML_READER_TEXT:
@@ -867,13 +863,13 @@ static int FetchRSS( filter_t *p_filter)
                     psz_eltvalue = xml_ReaderValue( p_xml_reader );
                     if( !psz_eltvalue )
                     {
-                        return 1;
+                        goto error;
                     }
                     else
                     {
-                        char *psz_clean;
-                        psz_clean = removeWhiteChars( psz_eltvalue );
-                        free( psz_eltvalue ); psz_eltvalue = psz_clean;
+                        char *psz_clean = removeWhiteChars( psz_eltvalue );
+                        free( psz_eltvalue );
+                        psz_eltvalue = psz_clean;
                     }
 #                   ifdef RSS_DEBUG
                     msg_Dbg( p_filter, "  text : <%s>", psz_eltvalue );
@@ -899,8 +895,7 @@ static int FetchRSS( filter_t *p_filter)
                         }
                         else
                         {
-                            free( psz_eltvalue );
-                            psz_eltvalue = NULL;
+                            FREENULL( psz_eltvalue );
                         }
                     }
                     else if( b_is_image == true )
@@ -912,8 +907,7 @@ static int FetchRSS( filter_t *p_filter)
                         }
                         else
                         {
-                            free( psz_eltvalue );
-                            psz_eltvalue = NULL;
+                            FREENULL( psz_eltvalue );
                         }
                     }
                     else
@@ -942,8 +936,7 @@ static int FetchRSS( filter_t *p_filter)
                         }
                         else
                         {
-                            free( psz_eltvalue );
-                            psz_eltvalue = NULL;
+                            FREENULL( psz_eltvalue );
                         }
                     }
                     break;
@@ -956,13 +949,28 @@ static int FetchRSS( filter_t *p_filter)
             p_feed->p_pic = LoadImage( p_filter, p_feed->psz_image );
         }
 
-        if( p_xml_reader && p_xml ) xml_ReaderDelete( p_xml, p_xml_reader );
-        if( p_stream ) stream_Delete( p_stream );
+        xml_ReaderDelete( p_xml, p_xml_reader );
+        stream_Delete( p_stream );
         msg_Dbg( p_filter, "done with %s RSS/Atom feed", p_feed->psz_url );
     }
-    if( p_xml ) xml_Delete( p_xml );
 
+    free( psz_eltname );
+    free( psz_eltvalue );
+    xml_Delete( p_xml );
     return 0;
+
+error:
+    free( psz_eltname );
+    free( psz_eltvalue );
+
+    if( p_xml_reader )
+        xml_ReaderDelete( p_xml, p_xml_reader );
+    if( p_stream )
+        stream_Delete( p_stream );
+    if( p_xml )
+        xml_Delete( p_xml );
+
+    return i_ret;
 }
 
 /****************************************************************************
