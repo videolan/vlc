@@ -10,9 +10,6 @@ Demuxers:
    (Full disc support is NOT present yet)
  * Support for TwinVQ (.vqf) files
 
-Mac OS X Interface:
- * Completely reworked user interface (based upon works from GSoC 2008)
-
 Playlist:
  * WPL playlist support
  * ZPL playlist support
@@ -35,6 +32,12 @@ Video Output:
 
 Visualisation:
  * Support of .milk visualisation files using projectM libraries
+
+Service discovery:
+ * Service discovery for Picture/Music/Video user directories
+
+Mac OS X Interface:
+ * Completely reworked user interface (based upon works from GSoC 2008)
 
 Windows port:
  * Integration in Windows 7 taskbar
