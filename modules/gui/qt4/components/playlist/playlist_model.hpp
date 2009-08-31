@@ -125,7 +125,7 @@ public:
     void sort( int column, Qt::SortOrder order );
     void sort( int i_root_id, int column, Qt::SortOrder order );
     void removeItem( int );
-    void rebuild(); void rebuild( playlist_item_t * );
+    void rebuild(); void rebuild( playlist_item_t *, bool b_first = false );
 
 private:
 

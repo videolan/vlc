@@ -91,7 +91,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     ADD_ICON( NODE, ":/type/node" );
 #undef ADD_ICON
 
-    rebuild( p_root );
+    rebuild( p_root, true );
     CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
             this, processInputItemUpdate( input_item_t *) );
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
@@ -707,14 +707,18 @@ end:
 
 void PLModel::rebuild()
 {
-    rebuild( NULL );
+    rebuild( NULL, false );
 }
 
-void PLModel::rebuild( playlist_item_t *p_root )
+void PLModel::rebuild( playlist_item_t *p_root, bool b_first )
 {
     playlist_item_t* p_item;
-    /* Remove callbacks before locking to avoid deadlocks */
-    delCallbacks();
+    /* Remove callbacks before locking to avoid deadlocks
+       The first time the callbacks are not present so
+       don't try to delete them */
+    if( !b_first )
+        delCallbacks();
+
     /* Invalidate cache */
     i_cached_id = i_cached_input_id = -1;
 
