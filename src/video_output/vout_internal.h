@@ -40,6 +40,10 @@
 /* */
 struct vout_thread_sys_t
 {
+    /* module */
+    const char *psz_module_type;
+    char       *psz_module_name;
+
     /* Thread & synchronization */
     vlc_thread_t    thread;
     vlc_cond_t      change_wait;

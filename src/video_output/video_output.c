@@ -494,31 +494,21 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     /* */
     DeinterlaceEnable( p_vout );
 
-    vlc_object_set_destructor( p_vout, vout_Destructor );
+    if( p_vout->p->psz_filter_chain && *p_vout->p->psz_filter_chain )
+        p_vout->p->psz_module_type = "video filter";
+    else
+        p_vout->p->psz_module_type = "video output";
+    p_vout->p->psz_module_name = psz_name;
+    p_vout->p_module = NULL;
 
     /* */
-    p_vout->p_module = module_need( p_vout,
-        ( p_vout->p->psz_filter_chain && *p_vout->p->psz_filter_chain ) ?
-        "video filter" : "video output", psz_name, p_vout->p->psz_filter_chain && *p_vout->p->psz_filter_chain );
-    free( psz_name );
-
-    if( p_vout->p_module == NULL )
-    {
-        msg_Err( p_vout, "no suitable vout module" );
-        spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
-        spu_Destroy( p_vout->p_spu );
-        p_vout->p_spu = NULL;
-        vlc_object_release( p_vout );
-        return NULL;
-    }
+    vlc_object_set_destructor( p_vout, vout_Destructor );
 
     /* */
     vlc_cond_init( &p_vout->p->change_wait );
     if( vlc_clone( &p_vout->p->thread, RunThread, p_vout,
                    VLC_THREAD_PRIORITY_OUTPUT ) )
     {
-        module_unneed( p_vout, p_vout->p_module );
-        p_vout->p_module = NULL;
         spu_Attach( p_vout->p_spu, VLC_OBJECT(p_vout), false );
         spu_Destroy( p_vout->p_spu );
         p_vout->p_spu = NULL;
@@ -565,8 +555,6 @@ void vout_Close( vout_thread_t *p_vout )
     vout_snapshot_End( &p_vout->p->snapshot );
 
     vlc_join( p_vout->p->thread, NULL );
-    module_unneed( p_vout, p_vout->p_module );
-    p_vout->p_module = NULL;
 }
 
 /* */
@@ -576,6 +564,8 @@ static void vout_Destructor( vlc_object_t * p_this )
 
     /* Make sure the vout was stopped first */
     assert( !p_vout->p_module );
+
+    free( p_vout->p->psz_module_name );
 
     /* */
     if( p_vout->p_spu )
@@ -985,26 +975,30 @@ static void* RunThread( void *p_this )
     int             i_idle_loops = 0;  /* loops without displaying a picture */
     int             i_picture_qtype_last = QTYPE_NONE;
 
-    bool            b_drop_late;
+
+    vlc_mutex_lock( &p_vout->change_lock );
 
     /*
      * Initialize thread
      */
-    vlc_mutex_lock( &p_vout->change_lock );
-    p_vout->b_error = InitThread( p_vout );
-
-    b_drop_late = var_CreateGetBool( p_vout, "drop-late-frames" );
+    p_vout->p_module = module_need( p_vout,
+                                    p_vout->p->psz_module_type,
+                                    p_vout->p->psz_module_name,
+                                    !strcmp(p_vout->p->psz_module_type, "video filter") );
+    if( p_vout->p_module )
+        p_vout->b_error = InitThread( p_vout );
+    else
+        p_vout->b_error = true;
 
     /* signal the creation of the vout */
     p_vout->p->b_ready = true;
     vlc_cond_signal( &p_vout->p->change_wait );
 
     if( p_vout->b_error )
-    {
-        EndThread( p_vout );
-        vlc_mutex_unlock( &p_vout->change_lock );
-        return NULL;
-    }
+        goto exit_thread;
+
+    /* */
+    const bool b_drop_late = var_CreateGetBool( p_vout, "drop-late-frames" );
 
     /*
      * Main loop - it is not executed if an error occurred during
@@ -1311,7 +1305,7 @@ static void* RunThread( void *p_this )
             if( p_vout->pf_init( p_vout ) )
             {
                 msg_Err( p_vout, "cannot resize display" );
-                /* FIXME: pf_end will be called again in EndThread() */
+                /* FIXME: pf_end will be called again in CleanThread()? */
                 p_vout->b_error = 1;
             }
 
@@ -1396,10 +1390,17 @@ static void* RunThread( void *p_this )
     if( p_vout->b_error )
         ErrorThread( p_vout );
 
-    /* End of thread */
+    /* Clean thread */
     CleanThread( p_vout );
+
+exit_thread:
+    /* End of thread */
     EndThread( p_vout );
     vlc_mutex_unlock( &p_vout->change_lock );
+
+    if( p_vout->p_module )
+        module_unneed( p_vout, p_vout->p_module );
+    p_vout->p_module = NULL;
 
     return NULL;
 }
