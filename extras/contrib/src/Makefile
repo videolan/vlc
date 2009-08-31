@@ -728,7 +728,7 @@ tremor: tremor-$(TREMOR_VERSION).tar.bz2
 endif
 
 .tremor: tremor .ogg
-	(cd $<; $(HOSTCC) ./autogen.sh $(HOSTCONF) --prefix=$(PREFIX) --disable-shared && make && make install)
+	(cd $<; $(HOSTCC) ./autogen.sh $(HOSTCONF) --prefix=$(PREFIX) --disable-shared CFLAGS="$(NOTHUMB)" && make && make install)
 	$(INSTALL_NAME)
 	touch $@
 
