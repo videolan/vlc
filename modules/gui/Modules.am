@@ -1,4 +1,4 @@
-DIST_SUBDIRS = beos macosx maemo minimal_macosx pda qnx qt4 skins2 wince
+DIST_SUBDIRS = beos macosx maemo minimal_macosx qnx qt4 skins2 wince
 SUBDIRS =
 
 if HAVE_BEOS
