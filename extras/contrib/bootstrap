@@ -127,7 +127,7 @@ case $HOST in
         CXX="/Developer/usr/bin/g++-4.2"
         LD="ld -arch ppc -syslibroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         echo "PATH = /bin:/usr/bin:/usr/local/bin:" >> config.mak
-        cat src/Distributions/darwin.mak >> distro.mak
+        DISTRO=darwin
         if test -e /Developer/SDKs; then
             echo "SDKs found. Everything is fine." >&2
         else
@@ -155,7 +155,7 @@ case $HOST in
         CC="/Developer/usr/bin/gcc-4.2"
         CXX="/Developer/usr/bin/g++-4.2"
         echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
-        cat src/Distributions/darwin.mak >> distro.mak
+        DISTRO=darwin
         if test -e /Developer/SDKs; then
             echo "SDKs found. Everything is fine." >&2
         else
@@ -182,7 +182,7 @@ case $HOST in
         RANLIB="ranlib"
         AR="ar"
         STRIP="strip"
-        cat src/Distributions/darwin64.mak >> distro.mak
+        DISTRO=darwin
         if test -e /Developer/SDKs; then
             echo "SDKs found. Everything is fine." >&2
         else
@@ -193,20 +193,20 @@ case $HOST in
     *mingw32ce)
         echo "HAVE_WINCE = 1" >> config.mak
         echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
-        cat src/Distributions/wince.mak >> distro.mak
+        DISTRO=wince
     ;;
     x86_64-*-mingw*)
         echo "HAVE_WIN64 = 1" >> config.mak
         echo "HAVE_WIN32 = 1" >> config.mak
         echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
            EXTRA_CFLAGS="-O3"
-        cat src/Distributions/win64.mak >> distro.mak
+        DISTRO=win64
     ;;
     *mingw32*)
         echo "HAVE_WIN32 = 1" >> config.mak
         echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
         EXTRA_CFLAGS="-O3"
-        cat src/Distributions/win32.mak >> distro.mak
+        DISTRO=win32
     ;;
     i686-pc-cygwin)
         echo "HAVE_WIN32 = 1" >> config.mak
@@ -218,26 +218,21 @@ case $HOST in
         EXTRA_CPPFLAGS=" -mno-cygwin -isystem /usr/include/mingw"
         EXTRA_LDFLAGS=" -mno-cygwin"
         echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
-        cat src/Distributions/win32.mak >> distro.mak
+        DISTRO=win32
     ;;
     arm-wince-pe)
         echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
         EXTRA_CPPFLAGS=" -D_WIN32_WCE"
-        cat src/Distributions/wince.mak >> distro.mak
+        DISTRO=wince
     ;;
     armeb-linux-uclibc)
         echo "HAVE_UCLIBC = 1" >> config.mak
         echo "HAVE_BIGENDIAN = 1" >> config.mak
         EXTRA_CFLAGS="-Os -march=armv5 -msoft-float"
-        if test ! -z "${DISTRO}";  then
-            cat src/Distributions/${DISTRO}.mak >> distro.mak
-        else
-            cat src/Distributions/unix.mak >> distro.mak
-        fi
     ;;
     arm-none-linux-gnueabi)
         if test -f /etc/maemo_version; then
-            cat src/Distributions/maemo.mak >> distro.mak
+            DISTRO=maemo
             echo 'HAVE_MAEMO = 1' >> config.mak
             EXTRA_CFLAGS=" -mcpu=cortex-a8 -mtune=cortex-a8 -march=armv7-a"
             EXTRA_CLFAGS="$EXTRA_CFLAGS -mfpu=neon"
@@ -257,35 +252,31 @@ case $HOST in
     ;;
 esac
 
-if ! test -f distro.mak; then
-    if test ! -z "${DISTRO}";  then
-        cat src/Distributions/${DISTRO}.mak >> distro.mak
-    elif test "$HOST" = "$BUILD"; then
-        if test -d "/usr/lib/pkgconfig"; then
-            if test -z "$PKG_CONFIG_PATH"; then
-                echo "PKG_CONFIG_PATH = /usr/lib/pkgconfig" >> config.mak
-            fi
-            if test -z "$PKG_CONFIG_LIBDIR"; then
-                echo "PKG_CONFIG_LIBDIR = /usr/lib/pkgconfig" >> config.mak
-            fi
+if test -z "${DISTRO}" -a "$HOST" = "$BUILD"; then
+    if test -d "/usr/lib/pkgconfig"; then
+        if test -z "$PKG_CONFIG_PATH"; then
+            echo "PKG_CONFIG_PATH = /usr/lib/pkgconfig" >> config.mak
         fi
-        # Try to match distribution
-        if test -f /etc/fedora-release; then
-            cat src/Distributions/fedora.mak >> distro.mak
-        elif test -f /etc/maemo_version; then
-            cat src/Distributions/maemo.mak >> distro.mak
-            echo 'HAVE_MAEMO = 1' >> config.mak
-        elif test -f /etc/debian_version; then
-            # NOTE: check for Debian *after* its derivatives
-            cat src/Distribution/debian.mak >> distro.mak
+        if test -z "$PKG_CONFIG_LIBDIR"; then
+            echo "PKG_CONFIG_LIBDIR = /usr/lib/pkgconfig" >> config.mak
         fi
+    fi
+    # Try to match distribution
+    if test -f /etc/fedora-release; then
+        DISTRO=fedora
+    elif test -f /etc/maemo_version; then
+        DISTRO=maemo
+        echo 'HAVE_MAEMO = 1' >> config.mak
+    elif test -f /etc/debian_version; then
+        # NOTE: check for Debian *after* its derivatives
+        DISTRO=debian
     fi
 fi
 
-if ! test -f distro.mak; then
-    # Default Unix-like systems
-    cat src/Distributions/unix.mak >> distro.mak
-fi
+# Default Unix-like systems
+test -z "${DISTRO}" && DISTRO=unix
+
+cat src/Distributions/"${DISTRO}".mak >> distro.mak
 
 echo "BUILD = $BUILD" >> config.mak
 echo "HOST = $HOST" >> config.mak
