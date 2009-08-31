@@ -138,7 +138,7 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
     if test "`eval echo @'$'LIBS_${x}@`" != "@@"; then
       echo "      libs=\"\${libs} `eval echo '$'LIBS_${x}`\""
     fi
-    if test "`eval echo @'$'LIBS_${x}@`" != "@@"; then
+    if test "`eval echo @'$'CFLAGS_WERROR_${x}@`" != "@@"; then
       echo "      CFLAGS_WERROR=\"`eval echo '$'CFLAGS_WERROR_${x}`\""
     fi
     echo "    ;;"
