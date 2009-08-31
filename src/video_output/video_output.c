@@ -484,12 +484,23 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     free( psz_parser );
     free( psz_tmp );
     p_vout->p_cfg = p_cfg;
+
+    /* Create a few object variables for interface interaction */
+    var_Create( p_vout, "vout-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    text.psz_string = _("Filters");
+    var_Change( p_vout, "vout-filter", VLC_VAR_SETTEXT, &text, NULL );
+    var_AddCallback( p_vout, "vout-filter", FilterCallback, NULL );
+
+    /* */
+    DeinterlaceEnable( p_vout );
+
+    vlc_object_set_destructor( p_vout, vout_Destructor );
+
+    /* */
     p_vout->p_module = module_need( p_vout,
         ( p_vout->p->psz_filter_chain && *p_vout->p->psz_filter_chain ) ?
         "video filter" : "video output", psz_name, p_vout->p->psz_filter_chain && *p_vout->p->psz_filter_chain );
     free( psz_name );
-
-    vlc_object_set_destructor( p_vout, vout_Destructor );
 
     if( p_vout->p_module == NULL )
     {
@@ -500,15 +511,6 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
         vlc_object_release( p_vout );
         return NULL;
     }
-
-    /* Create a few object variables for interface interaction */
-    var_Create( p_vout, "vout-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    text.psz_string = _("Filters");
-    var_Change( p_vout, "vout-filter", VLC_VAR_SETTEXT, &text, NULL );
-    var_AddCallback( p_vout, "vout-filter", FilterCallback, NULL );
-
-    /* */
-    DeinterlaceEnable( p_vout );
 
     /* */
     vlc_cond_init( &p_vout->p->change_wait );
