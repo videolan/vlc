@@ -52,6 +52,7 @@ Modules:
         builtin                   flags for built-in modules
         pic                       flags for PIC code
         MODULE                    any available module (dummy, gtk, avi, etc.)
+        libs                      flags for external libs
 BLAH
         exit $1
 }
@@ -96,7 +97,7 @@ cppflags="${cppflags} -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURC
 #
 if [ "${debug}" = yes ]; then
   cppflags="${cppflags} -DDEBUG"
-  cflags="${cflags} -g ${cflags_werror}"
+  cflags="${cflags} -g"
   cxxflags="${cxxflags} -g"
   objcflags="${objcflags} -g"
   ldflags="${ldflags} -g"
@@ -226,6 +227,10 @@ while test $# -gt 0; do
       echo_builtin=yes
       cppflags="${cppflags} -D__LIBVLC__ -D__BUILTIN__"
       ;;
+    libs)
+      # Avoid to use werror on what is not vlc's code.
+      cflags_werror=""
+      ;;
     pic)
       ;;
     mozilla)
@@ -247,6 +252,12 @@ done
 if test -n "${module}"; then
   cppflags="${cppflags} -DMODULE_NAME=${module} -DMODULE_NAME_IS_${module} -DMODULE_STRING=\"${module}\""
 fi
+
+#
+# Set the Werror flags.
+#
+
+cflags="${cflags} ${cflags_werror}"
 
 #
 #  Output what we were asked
