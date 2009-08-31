@@ -877,7 +877,7 @@ faad2-$(FAAD2_VERSION).tar.gz:
 
 faad2: faad2-$(FAAD2_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	(cd $@; sh ./bootstrap)
+	(cd $@; echo|$(HOSTCC) -iquote . -E - || sed -i 's/-iquote /-I/' libfaad/Makefile.am; sh ./bootstrap)
 
 .faad: faad2
 	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --disable-shared --prefix=$(PREFIX) CFLAGS="-O3" && sed -i.orig "s/shrext_cmds/shrext/g" libtool && make -C libfaad && make -C libfaad install)
