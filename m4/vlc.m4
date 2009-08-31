@@ -61,6 +61,7 @@ AC_DEFUN([VLC_ADD_LIBS], [
 AC_DEFUN([VLC_SET_CFLAGS_WERROR], [
   for element in [$1]; do
     eval "CFLAGS_WERROR_${element}="'"'"$2"'"'
+    am_modules_with_werror="${am_modules_with_werror} ${element}"
   done
 ])
 
@@ -92,7 +93,7 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
 
   AC_MSG_RESULT(configure: creating ./vlc-config.in)
 
-  am_all_modules="`for x in ${am_modules_with_cppflags} ${am_modules_with_cflags} ${am_modules_with_cxxflags} ${am_modules_with_objcflags} ${am_modules_with_ldflags} ${am_modules_with_libs}; do echo $x; done | sort | uniq`"
+  am_all_modules="`for x in ${am_modules_with_cppflags} ${am_modules_with_cflags} ${am_modules_with_cxxflags} ${am_modules_with_objcflags} ${am_modules_with_ldflags} ${am_modules_with_libs} ${am_modules_with_werror}; do echo $x; done | sort | uniq`"
 
   rm -f vlc-config.in
   sed -ne '/#@1@#/q;p' < "${srcdir}/vlc-config.in.in" \
