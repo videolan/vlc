@@ -99,11 +99,7 @@ int csa_SetCW( vlc_object_t *p_caller, csa_t *c, char *psz_ck, bool set_odd )
     }
     else
     {
-#ifndef UNDER_CE
         uint64_t i_ck = strtoull( psz_ck, NULL, 16 );
-#else
-        uint64_t i_ck = strtoll( psz_ck, NULL, 16 );
-#endif
         uint8_t  ck[8];
         int      i;
 
