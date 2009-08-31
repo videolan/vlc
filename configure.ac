@@ -863,7 +863,7 @@ AC_CHECK_HEADERS([net/if.h], [], [],
   ])
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_CHECK_HEADERS(machine/param.h sys/shm.h)
-AC_CHECK_HEADERS([linux/version.h linux/dccp.h scsi/scsi.h])
+AC_CHECK_HEADERS([linux/version.h linux/dccp.h scsi/scsi.h linux/magic.h])
 AC_CHECK_HEADERS(syslog.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 

@@ -49,7 +49,9 @@
 #endif
 #if defined (__linux__)
 #   include <sys/vfs.h>
+#ifdef HAVE_LINUX_MAGIC_H
 #   include <linux/magic.h>
+#endif
 #elif defined (HAVE_SYS_MOUNT_H)
 #   include <sys/param.h>
 #   include <sys/mount.h>
@@ -143,7 +145,8 @@ static bool IsRemote (int fd)
 #if defined(MNT_LOCAL)
     return !(stf.f_flags & MNT_LOCAL);
 
-#elif defined (__linux__)
+#else
+#   ifdef HAVE_LINUX_MAGIC_H
     switch (stf.f_type)
     {
         case AFS_SUPER_MAGIC:
@@ -155,7 +158,7 @@ static bool IsRemote (int fd)
             return true;
     }
     return false;
-
+#   endif
 #endif
 #else /* !HAVE_FSTATFS */
     (void)fd;
