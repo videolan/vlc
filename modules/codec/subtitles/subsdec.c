@@ -68,7 +68,7 @@ static const char *const ppsz_encodings[] = {
     "ISO-8859-6",
     "Windows-1256",
     "ISO-8859-7",
-    "Windows-1256",
+    "Windows-1253",
     "ISO-8859-8",
     "Windows-1255",
     "ISO-8859-9",
@@ -121,7 +121,7 @@ static const char *const ppsz_encoding_names[] = {
     N_("Arabic (Windows-1256)"),
     /* 7 */
     N_("Greek (ISO 8859-7)"),
-    N_("Greek (Windows-1256)"),
+    N_("Greek (Windows-1253)"),
     /* 8 */
     N_("Hebrew (ISO 8859-8)"),
     N_("Hebrew (Windows-1255)"),
