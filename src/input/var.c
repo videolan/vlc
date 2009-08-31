@@ -241,7 +241,8 @@ void input_ControlVarInit ( input_thread_t *p_input )
  *****************************************************************************/
 void input_ControlVarStop( input_thread_t *p_input )
 {
-    InputDelCallbacks( p_input, p_input_callbacks );
+    if( !p_input->b_preparsing )
+        InputDelCallbacks( p_input, p_input_callbacks );
 
     if( p_input->p->i_title > 0 )
     {
