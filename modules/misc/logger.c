@@ -72,7 +72,7 @@
     "  </body>\n" \
     "</html>\n"
 
-#if HAVE_SYSLOG_H
+#ifdef HAVE_SYSLOG_H
 #include <syslog.h>
 #endif
 
