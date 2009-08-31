@@ -60,7 +60,7 @@ AC_DEFUN([VLC_ADD_LIBS], [
 
 AC_DEFUN([VLC_SET_CFLAGS_WERROR], [
   for element in [$1]; do
-    eval "CFLAGS_WERROR_${element}="'"'"$2"''"'
+    eval "CFLAGS_WERROR_${element}="'"'"$2"'"'
   done
 ])
 
