@@ -37,10 +37,6 @@
 
 #include <assert.h>
 
-#ifdef UNDER_CE
-#   define _IONBF 0x0004
-#endif
-
 #define MODE_TEXT 0
 #define MODE_HTML 1
 #define MODE_SYSLOG 2
