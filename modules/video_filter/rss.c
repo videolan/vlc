@@ -59,6 +59,7 @@ static subpicture_t *Filter( filter_t *, mtime_t );
 
 static int FetchRSS( filter_t * );
 static void FreeRSS( filter_t * );
+static int ParseUrls( filter_t *, char * );
 
 static const int pi_color_values[] = {
                0xf0000000, 0x00000000, 0x00808080, 0x00C0C0C0,
@@ -83,8 +84,9 @@ struct rss_item_t
     char *psz_link;
 };
 
-struct rss_feed_t
+typedef struct rss_feed_t
 {
+    char *psz_url;
     char *psz_title;
     char *psz_description;
     char *psz_link;
@@ -93,7 +95,7 @@ struct rss_feed_t
 
     int i_items;
     struct rss_item_t *p_items;
-};
+} rss_feed_t;
 
 struct filter_sys_t
 {
@@ -111,7 +113,6 @@ struct filter_sys_t
 
     mtime_t last_date;
 
-    char *psz_urls;
     int i_feeds;
     struct rss_feed_t *p_feeds;
 
@@ -237,6 +238,7 @@ static int CreateFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     int i_feed;
     int i_ret = VLC_ENOMEM;
+    char *psz_urls;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -246,7 +248,7 @@ static int CreateFilter( vlc_object_t *p_this )
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    p_sys->psz_urls = var_CreateGetString( p_filter, CFG_PREFIX "urls" );
+    psz_urls = var_CreateGetString( p_filter, CFG_PREFIX "urls" );
     p_sys->i_title = var_CreateGetInteger( p_filter, CFG_PREFIX "title" );
     p_sys->i_cur_feed = 0;
     p_sys->i_cur_item = p_sys->i_title == scroll_title ? -1 : 0;
@@ -278,6 +280,10 @@ static int CreateFilter( vlc_object_t *p_this )
     {
         msg_Warn( p_filter, "rss-size wasn't specified. Feed images will thus be displayed without being resized" );
     }
+
+    /* Parse the urls */
+    ParseUrls( p_filter, psz_urls );
+    free( psz_urls );
 
     if( FetchRSS( p_filter ) )
     {
@@ -312,7 +318,6 @@ static int CreateFilter( vlc_object_t *p_this )
 
 error:
     free( p_sys->psz_marquee );
-    free( p_sys->psz_urls );
     free( p_sys );
     return i_ret;
 }
@@ -326,7 +331,6 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     text_style_Delete( p_sys->p_style );
     free( p_sys->psz_marquee );
-    free( p_sys->psz_urls );
     FreeRSS( p_filter );
     free( p_sys );
 }
@@ -611,6 +615,61 @@ static char *removeWhiteChars( const char *psz_src )
     return psz_clean2;
 }
 
+
+/****************************************************************************
+ * Parse url list, psz_urls must be non empty
+ ***************************************************************************/
+static int ParseUrls( filter_t *p_filter, char *psz_urls )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    char *psz_urls2 = psz_urls;
+
+    p_sys->i_feeds = 1;
+
+    /* Count the number of feeds */
+    while( *psz_urls )
+    {
+        if( *psz_urls == '|' )
+            p_sys->i_feeds++;
+        psz_urls++;
+    }
+
+    /* Allocate the structure */
+    p_sys->p_feeds = malloc( p_sys->i_feeds * sizeof( rss_feed_t ) );
+    if( !p_sys->p_feeds )
+        return VLC_ENOMEM;
+
+    /* Loop on all urls and fill in the struct */
+    psz_urls = psz_urls2;
+    for( int i = 0; i < p_sys->i_feeds; i++ )
+    {
+        rss_feed_t* p_feed = p_sys->p_feeds + i;
+        char *psz_end;
+
+        if( i < p_sys->i_feeds - 1 )
+        {
+            psz_end = strchr( psz_urls, '|' );
+            *psz_end = '\0';
+        }
+        else
+            psz_end = psz_urls;
+
+        p_feed->i_items = 0;
+        p_feed->p_items = NULL;
+        p_feed->psz_title = NULL;
+        p_feed->psz_link = NULL;
+        p_feed->psz_description = NULL;
+        p_feed->psz_image = NULL;
+        p_feed->p_pic = NULL;
+        p_feed->psz_url = strdup( psz_urls );
+
+        psz_urls = psz_end + 1;
+    }
+
+    return VLC_SUCCESS;
+}
+
+
 /****************************************************************************
  * FetchRSS (or Atom) feeds
  ***************************************************************************/
@@ -624,24 +683,11 @@ static int FetchRSS( filter_t *p_filter)
 
     char *psz_eltname = NULL;
     char *psz_eltvalue = NULL;
-    char *psz_feed = NULL;
-    char *psz_buffer = NULL;
-    char *psz_buffer_2 = NULL;
 
     int i_feed;
     int i_item;
     bool b_is_item;
     bool b_is_image;
-    int i_int;
-
-    FreeRSS( p_filter );
-    p_sys->i_feeds = 1;
-    i_int = 0;
-    while( p_sys->psz_urls[i_int] != 0 )
-        if( p_sys->psz_urls[i_int++] == '|' )
-            p_sys->i_feeds++;
-    p_sys->p_feeds = (struct rss_feed_t *)malloc( p_sys->i_feeds
-                                * sizeof( struct rss_feed_t ) );
 
     p_xml = xml_Create( p_filter );
     if( !p_xml )
@@ -650,32 +696,35 @@ static int FetchRSS( filter_t *p_filter)
         return 1;
     }
 
-    psz_buffer = strdup( p_sys->psz_urls );
-    psz_buffer_2 = psz_buffer; /* keep track so we can free it */
     for( i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
     {
         struct rss_feed_t *p_feed = p_sys->p_feeds+i_feed;
 
-        if( psz_buffer == NULL ) break;
-        if( psz_buffer[0] == 0 ) psz_buffer++;
-        psz_feed = psz_buffer;
-        psz_buffer = strchr( psz_buffer, '|' );
-        if( psz_buffer != NULL ) psz_buffer[0] = 0;
-
-        p_feed->psz_title = NULL;
-        p_feed->psz_description = NULL;
-        p_feed->psz_link = NULL;
-        p_feed->psz_image = NULL;
-        p_feed->p_pic = NULL;
+        FREENULL( p_feed->psz_title );
+        FREENULL( p_feed->psz_description );
+        FREENULL( p_feed->psz_link );
+        FREENULL( p_feed->psz_image );
+        if( p_feed->p_pic )
+        {
+            picture_Release( p_feed->p_pic );
+            p_feed->p_pic = NULL;
+        }
+        for( int i = 0; i < p_feed->i_items; i++ )
+        {
+            struct rss_item_t *p_item = p_feed->p_items + i;
+            free( p_item->psz_title );
+            free( p_item->psz_link );
+            free( p_item->psz_description );
+        }
         p_feed->i_items = 0;
-        p_feed->p_items = NULL;
+        FREENULL( p_feed->p_items );
 
-        msg_Dbg( p_filter, "opening %s RSS/Atom feed ...", psz_feed );
+        msg_Dbg( p_filter, "opening %s RSS/Atom feed ...", p_feed->psz_url );
 
-        p_stream = stream_UrlNew( p_filter, psz_feed );
+        p_stream = stream_UrlNew( p_filter, p_feed->psz_url );
         if( !p_stream )
         {
-            msg_Err( p_filter, "Failed to open %s for reading", psz_feed );
+            msg_Err( p_filter, "Failed to open %s for reading", p_feed->psz_url );
             xml_Delete( p_xml );
             return 1;
         }
@@ -683,7 +732,7 @@ static int FetchRSS( filter_t *p_filter)
         p_xml_reader = xml_ReaderCreate( p_xml, p_stream );
         if( !p_xml_reader )
         {
-            msg_Err( p_filter, "Failed to open %s for parsing", psz_feed );
+            msg_Err( p_filter, "Failed to open %s for parsing", p_feed->psz_url );
             xml_Delete( p_xml );
             return 1;
         }
@@ -911,9 +960,8 @@ static int FetchRSS( filter_t *p_filter)
 
         if( p_xml_reader && p_xml ) xml_ReaderDelete( p_xml, p_xml_reader );
         if( p_stream ) stream_Delete( p_stream );
-        msg_Dbg( p_filter, "done with %s RSS/Atom feed", psz_feed );
+        msg_Dbg( p_filter, "done with %s RSS/Atom feed", p_feed->psz_url );
     }
-    free( psz_buffer_2 );
     if( p_xml ) xml_Delete( p_xml );
 
     return 0;
@@ -949,6 +997,7 @@ static void FreeRSS( filter_t *p_filter)
         free( p_feed->psz_image );
         if( p_feed->p_pic != NULL )
             picture_Release( p_feed->p_pic );
+        free( p_feed->psz_url );
     }
     free( p_sys->p_feeds );
     p_sys->i_feeds = 0;
