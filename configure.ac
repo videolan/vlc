@@ -343,7 +343,7 @@ case "${host_os}" in
             [#ifdef WIN32
              yes
              #endif],
-            SYS=mingw32, SYS=cygwin)
+            SYS=mingw32, AC_MSG_ERROR([VLC requires -mno-cygwin]))
         ;;
     esac
 
@@ -762,7 +762,7 @@ fi
 
 # Win32 style
 if test "${ac_cv_have_plugins}" = "no"; then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
+  if test "${SYS}" = "mingw32" ; then
     AC_CHECK_LIB(kernel32, main,
      [VLC_ADD_LIBS([libvlccore],[-lkernel32])
       AC_DEFINE(HAVE_DL_WINDOWS, 1, [Define if you have Windows' LoadLibrary])
@@ -2058,7 +2058,7 @@ AC_ARG_ENABLE(dshow,
   [  --enable-dshow          Win32 DirectShow support (default enabled on Win32)])
 if test "${enable_dshow}" != "no"
 then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
+  if test "${SYS}" = "mingw32"
   then
     AC_LANG_PUSH(C++)
       AC_CHECK_HEADERS(dshow.h,
@@ -2077,7 +2077,7 @@ AC_ARG_ENABLE(bda,
 		  enabled on Win32)]))
 if test "${enable_bda}" != "no"
 then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
+  if test "${SYS}" = "mingw32"
   then
       AC_CHECK_HEADERS(dshow.h,
       [ VLC_ADD_PLUGIN([bda])
@@ -2096,7 +2096,7 @@ if test "${enable_opencv}" = "yes" -a "${CXX}" != "";
 then
   AC_ARG_WITH(opencv-tree,
   [    --with-opencv-tree=PATH opencv tree for linking])
-    if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
+    if test "${SYS}" = "mingw32"
     then
       test -z "${with_opencv_tree}" && AC_MSG_ERROR([You have to specify --with-opencv-tree])
       AC_MSG_CHECKING(for opencv in ${with_opencv_tree})
@@ -3774,7 +3774,7 @@ dnl
 dnl  Windows DirectX module
 dnl
 
-if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "cygwin"
+if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"
 then
   VLC_ADD_PLUGIN([panoramix])
 fi
@@ -3783,7 +3783,7 @@ AC_ARG_ENABLE(directx,
   [  --enable-directx        Win32 DirectX support (default enabled on Win32)])
 if test "${enable_directx}" != "no"
 then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "cygwin"
+  if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"
   then
     AC_ARG_WITH(directx,
     [    --with-directx=PATH   Win32 DirectX headers])
@@ -3984,7 +3984,7 @@ dnl
 AC_ARG_ENABLE(wingdi,
   [  --enable-wingdi         Win32 GDI module (default enabled on Win32)])
 if test "${enable_wingdi}" != "no"; then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
+  if test "${SYS}" = "mingw32"; then
     VLC_ADD_PLUGIN([wingdi])
     VLC_ADD_LIBS([wingdi],[-lgdi32])
   fi
@@ -4041,7 +4041,7 @@ dnl
 AC_ARG_ENABLE(waveout,
   [  --enable-waveout        Win32 waveOut module (default enabled on Win32)])
 if test "${enable_waveout}" != "no"; then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"; then
+  if test "${SYS}" = "mingw32"; then
     VLC_ADD_PLUGIN([waveout])
     VLC_ADD_LIBS([waveout],[-lwinmm])
   fi
@@ -4198,7 +4198,7 @@ if test "${enable_skins2}" = "yes" ||
     fi
   fi
 
-  if test "${skins2_missing_lib}" = "no" && (test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"); then
+  if test "${skins2_missing_lib}" = "no" && (test "${SYS}" = "mingw32"); then
     VLC_ADD_PLUGIN([skins2])
     ALIASES="${ALIASES} svlc"
     VLC_ADD_CPPFLAGS([skins2],[-U_OFF_T_ -U_off_t -Imodules/gui/skins2 -DWIN32_SKINS])
@@ -4259,7 +4259,7 @@ AS_IF([test "${enable_qt4}" != "no"], [
     VLC_ADD_PLUGIN([qt4])
     AC_DEFINE([HAVE_QT4], 1, [Define to 1 if you have QT4 library.])
     ALIASES="${ALIASES} qvlc"
-    AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "cygwin" -a "${SYS}" != "darwin"], [
+    AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "darwin"], [
         VLC_ADD_LIBS([qt4],[$QT4_LIBS -lX11])
     ], [
         VLC_ADD_LIBS([qt4],[$QT4_LIBS -lole32])
@@ -4662,7 +4662,7 @@ AC_ARG_WITH(wine-sdk-path,
   [    --with-wine-sdk-path=PATH path to wine sdk])
 if test "${enable_activex}" != "no"
 then
-  if test "${SYS}" = "mingw32" -o "${SYS}" = "cygwin"
+  if test "${SYS}" = "mingw32"
   then
     AC_CHECK_PROGS(MIDL, [midl], no)
     if test "${with_wine_sdk_path}" != ""
