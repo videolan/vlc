@@ -62,7 +62,7 @@ protected:
     virtual void closeEvent( QCloseEvent * );
 
 signals:
-    void rootChanged( int );
+    void rootChanged( playlist_item_t *);
 };
 
 class ArtLabel : public CoverArtLabel

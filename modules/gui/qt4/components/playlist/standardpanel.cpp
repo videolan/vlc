@@ -107,7 +107,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
              this, handleExpansion( const QModelIndex& ) );
 
     currentRootId = -1;
-    CONNECT( parent, rootChanged( int ), this, setCurrentRootId( int ) );
+    CONNECT( parent, rootChanged( playlist_item_t * ),
+             this, setCurrentRootId( playlist_item_t * ) );
 
     /* Buttons configuration */
     QHBoxLayout *buttons = new QHBoxLayout;
@@ -219,19 +220,16 @@ void StandardPLPanel::handleExpansion( const QModelIndex& index )
     view->scrollTo( index );
 }
 
-void StandardPLPanel::setCurrentRootId( int _new )
+void StandardPLPanel::setCurrentRootId( playlist_item_t *p_item )
 {
-    currentRootId = _new;
-    if( currentRootId == THEPL->p_local_category->i_id ||
-        currentRootId == THEPL->p_local_onelevel->i_id  )
+    if( p_item == THEPL->p_local_category ||
+        p_item == THEPL->p_local_onelevel )
     {
         addButton->setEnabled( true );
         addButton->setToolTip( qtr(I_PL_ADDPL) );
     }
-    else if( ( THEPL->p_ml_category &&
-                        currentRootId == THEPL->p_ml_category->i_id ) ||
-             ( THEPL->p_ml_onelevel &&
-                        currentRootId == THEPL->p_ml_onelevel->i_id ) )
+    else if( ( THEPL->p_ml_category && p_item == THEPL->p_ml_category) ||
+             ( THEPL->p_ml_onelevel && p_item == THEPL->p_ml_onelevel ) )
     {
         addButton->setEnabled( true );
         addButton->setToolTip( qtr(I_PL_ADDML) );
@@ -309,6 +307,14 @@ void StandardPLPanel::setRoot( int i_root_id )
     QPL_LOCK;
     playlist_item_t *p_item = playlist_ItemGetById( THEPL, i_root_id );
     assert( p_item );
+    p_item = playlist_GetPreferredNode( THEPL, p_item );
+    setRoot( p_item );
+    QPL_UNLOCK;
+}
+
+void StandardPLPanel::setRoot( playlist_item_t *p_item )
+{
+    QPL_LOCK;
     p_item = playlist_GetPreferredNode( THEPL, p_item );
     assert( p_item );
     QPL_UNLOCK;

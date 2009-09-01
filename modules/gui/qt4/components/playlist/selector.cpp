@@ -25,30 +25,36 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include "components/playlist/selector.hpp"
 #include "qt4.hpp"
 
 #include <QVBoxLayout>
 #include <QHeaderView>
-#include <QTreeView>
+#include <QTreeWidget>
+
+#include <vlc_playlist.h>
 
 PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p ), p_intf(_p_intf)
 {
-    model = new PLModel( THEPL, p_intf, THEPL->p_root_category, 1, this );
-    view = new QTreeView( 0 );
+//    model = new PLModel( THEPL, p_intf, THEPL->p_root_category, 1, this );
+    view = new QTreeWidget;
     view->setIconSize( QSize( 24,24 ) );
-    view->setAlternatingRowColors( true );
+//    view->setAlternatingRowColors( true );
     view->setIndentation( 0 );
     view->header()->hide();
-    view->setModel( model );
+//    view->setModel( model );
 
     view->setAcceptDrops(true);
     view->setDropIndicatorShown(true);
 
-    CONNECT( view, activated( const QModelIndex& ),
-             this, setSource( const QModelIndex& ) );
-    CONNECT( view, clicked( const QModelIndex& ),
-             this, setSource( const QModelIndex& ) );
+
+    createItems();
+    CONNECT( view, itemActivated( QTreeWidgetItem *, int ),
+             this, setSource( QTreeWidgetItem *) );
+    CONNECT( view, itemClicked( QTreeWidgetItem *, int ),
+             this, setSource( QTreeWidgetItem *) );
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing( 0 ); layout->setMargin( 0 );
@@ -56,15 +62,38 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p ), p_i
     setLayout( layout );
 
     /* select the first item */
-    view->setCurrentIndex( model->index( 0, 0, QModelIndex() ) );
+//  view->setCurrentIndex( model->index( 0, 0, QModelIndex() ) );
 }
 
-void PLSelector::setSource( const QModelIndex &index )
+void PLSelector::setSource( QTreeWidgetItem *item )
 {
-    if( model )
-        emit activated( model->itemId( index ) );
+    if( item )
+    {
+        playlist_item_t *pl_item =
+                item->data( 0, Qt::UserRole ).value<playlist_item_t *>();
+        emit activated( pl_item );
+    }
 }
 
+void PLSelector::createItems()
+{
+    assert( view );
+    QTreeWidgetItem *pl = new QTreeWidgetItem( view );
+    pl->setText( 0, qtr( "Playlist" ) );
+    pl->setData( 0, Qt::UserRole, QVariant::fromValue( THEPL->p_local_category ) );
+/*    QTreeWidgetItem *empty = new QTreeWidgetItem( view );
+    empty->setFlags(Qt::NoItemFlags);
+*/
+    QTreeWidgetItem *lib = new QTreeWidgetItem( view );
+    lib->setText( 0, qtr( "Library" ) );
+    lib->setData( 0, Qt::UserRole, QVariant::fromValue( THEPL->p_ml_category ) );
+/*
+    QTreeWidgetItem *empty2 = new QTreeWidgetItem( view );
+    empty2->setFlags(Qt::NoItemFlags);*/
+
+
+
+}
 PLSelector::~PLSelector()
 {
 }

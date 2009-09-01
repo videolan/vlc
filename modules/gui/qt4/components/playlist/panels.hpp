@@ -35,6 +35,8 @@
 #include <QWidget>
 #include <QString>
 
+#include <vlc_playlist.h>
+
 class QSignalMapper;
 class QTreeView;
 class PLModel;
@@ -56,6 +58,7 @@ protected:
     QFrame *parent;
 public slots:
     virtual void setRoot( int ) = 0;
+    virtual void setRoot( playlist_item_t * ) = 0;
 };
 
 
@@ -79,6 +82,7 @@ private:
 public slots:
     void removeItem( int );
     virtual void setRoot( int );
+    virtual void setRoot( playlist_item_t * );
 private slots:
     void deleteSelection();
     void handleExpansion( const QModelIndex& );
@@ -87,7 +91,7 @@ private slots:
     void gotoPlayingItem();
     void doPopup( QModelIndex index, QPoint point );
     void search( const QString& searchText );
-    void setCurrentRootId( int );
+    void setCurrentRootId( playlist_item_t * );
     void popupAdd();
     void popupSelectColumn( QPoint );
     void toggleColumnShown( int );

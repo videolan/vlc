@@ -31,10 +31,12 @@
 #include "components/playlist/playlist_model.hpp"
 
 #include <QWidget>
+#include <QTreeWidgetItem>
 
-class QTreeView;
+class QTreeWidget;
 class PlaylistWidget;
 
+Q_DECLARE_METATYPE( playlist_item_t *);
 class PLSelector: public QWidget
 {
     Q_OBJECT;
@@ -46,11 +48,13 @@ protected:
     friend class PlaylistWidget;
 private:
     intf_thread_t *p_intf;
-    QTreeView *view;
+    QTreeWidget *view;
+    void createItems();
 private slots:
-    void setSource( const QModelIndex& );
+    void setSource( QTreeWidgetItem *item );
 signals:
     void activated( int );
+    void activated( playlist_item_t * );
     void shouldRemove( int );
 };
 
