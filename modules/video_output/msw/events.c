@@ -343,7 +343,6 @@ void* EventThread( vlc_object_t *p_this )
 #endif
             }
 
-#ifdef UNICODE
             {
                 wchar_t *psz_title = malloc( strlen(val.psz_string) * 2 + 2 );
                 if( psz_title )
@@ -353,7 +352,6 @@ void* EventThread( vlc_object_t *p_this )
                     free( val.psz_string ); val.psz_string = (char *)psz_title;
                 }
             }
-#endif
 
             SetWindowText( p_event->p_vout->p_sys->hwnd,
                            (LPCTSTR)val.psz_string );

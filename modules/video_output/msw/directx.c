@@ -240,11 +240,7 @@ static int OpenVideo( vlc_object_t *p_this )
         p_vout->p_sys->MonitorFromWindow = (HMONITOR (WINAPI *)( HWND, DWORD ))
             GetProcAddress( huser32, _T("MonitorFromWindow") );
         p_vout->p_sys->GetMonitorInfo =
-#ifndef UNICODE
-            GetProcAddress( huser32, "GetMonitorInfoA" );
-#else
             GetProcAddress( huser32, _T("GetMonitorInfoW") );
-#endif
     }
 
     var_Create( p_vout, "overlay", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
@@ -842,11 +838,7 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
 
     OurDirectDrawEnumerateEx =
       (void *)GetProcAddress( p_vout->p_sys->hddraw_dll,
-#ifndef UNICODE
-                              "DirectDrawEnumerateExA" );
-#else
                               _T("DirectDrawEnumerateExW") );
-#endif
 
     if( OurDirectDrawEnumerateEx && p_vout->p_sys->MonitorFromWindow )
     {
@@ -2027,11 +2019,7 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     if( hddraw_dll == NULL ) return VLC_SUCCESS;
 
     OurDirectDrawEnumerateEx =
-#ifndef UNICODE
-      (void *)GetProcAddress( hddraw_dll, "DirectDrawEnumerateExA" );
-#else
       (void *)GetProcAddress( hddraw_dll, _T("DirectDrawEnumerateExW") );
-#endif
 
     if( OurDirectDrawEnumerateEx )
     {
