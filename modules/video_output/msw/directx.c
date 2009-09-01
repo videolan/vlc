@@ -171,11 +171,11 @@ vlc_module_begin ()
     set_shortname( "DirectX" )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
-    add_bool( "directx-hw-yuv", 1, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
+    add_bool( "directx-hw-yuv", true, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
               true )
-    add_bool( "directx-use-sysmem", 0, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT,
+    add_bool( "directx-use-sysmem", false, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT,
               true )
-    add_bool( "directx-3buffering", 1, NULL, TRIPLEBUF_TEXT,
+    add_bool( "directx-3buffering", true, NULL, TRIPLEBUF_TEXT,
               TRIPLEBUF_LONGTEXT, true )
 
     add_string( "directx-device", "", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
@@ -183,10 +183,10 @@ vlc_module_begin ()
         change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
 
-    add_bool( "directx-wallpaper", 0, NULL, WALLPAPER_TEXT, WALLPAPER_LONGTEXT,
+    add_bool( "directx-wallpaper", false, NULL, WALLPAPER_TEXT, WALLPAPER_LONGTEXT,
               true )
 
-    set_description( N_("DirectX video output") )
+    set_description( N_("DirectX (DirectDraw) video output") )
     set_capability( "video output", 100 )
     add_shortcut( "directx" )
     set_callbacks( OpenVideo, CloseVideo )
