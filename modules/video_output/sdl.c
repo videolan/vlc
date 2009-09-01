@@ -650,8 +650,8 @@ static void Manage(vout_display_t *vd)
             const int y = (int64_t)(event.motion.y - sys->place.y) * vd->source.i_height / sys->place.height;
 
             SDL_ShowCursor(1);
-            if (x >= 0 && x < vd->source.i_width &&
-                y >= 0 && y < vd->source.i_height)
+        if (x >= 0 && (unsigned)x < vd->source.i_width &&
+                y >= 0 && (unsigned)y < vd->source.i_height)
                 vout_display_SendEventMouseMoved(vd, x, y);
             break;
         }
