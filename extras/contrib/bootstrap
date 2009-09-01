@@ -241,7 +241,8 @@ case $HOST in
             DISTRO=maemo
             echo 'HAVE_MAEMO = 1' >> config.mak
             EXTRA_CFLAGS=" -mcpu=cortex-a8 -mtune=cortex-a8 -march=armv7-a"
-            EXTRA_CFLAGS="$EXTRA_CFLAGS -mfpu=neon"
+            EXTRA_CFLAGS="$EXTRA_CFLAGS -mfpu=neon -mfloat-abi=softfp"
+            EXTRA_CFLAGS="$EXTRA_CFLAGS -O3 -fno-tree-vectorize"
         else
             EXTRA_CFLAGS="-msoft-float"
         fi
