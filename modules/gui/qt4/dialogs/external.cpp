@@ -106,6 +106,7 @@ void DialogHandler::requestLogin (vlc_object_t *, void *value)
     QLayout *layout = new QVBoxLayout (dialog);
 
     dialog->setWindowTitle (qfu(data->title));
+    dialog->setWindowRole ("vlc-login");
     layout->setMargin (2);
 
     /* User name and password fields */
@@ -185,6 +186,7 @@ QVLCProgressDialog::QVLCProgressDialog (DialogHandler *parent,
 {
     if (data->title != NULL)
         setWindowTitle (qfu(data->title));
+    setWindowRole ("vlc-progress");
     setMinimumDuration (0);
 
     connect (this, SIGNAL(progressed(int)), SLOT(setValue(int)));

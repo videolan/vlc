@@ -1381,6 +1381,7 @@ KeyInputDialog::KeyInputDialog( QTreeWidget *_table,
     table = _table;
     setWindowTitle( b_global ? qtr( "Global" ): ""
                     + qtr( "Hotkey for " ) + keyToChange );
+    setWindowRole( "vlc-key-input" );
 
     vLayout = new QVBoxLayout( this );
     selected = new QLabel( qtr( "Press the new keys for " ) + keyToChange );

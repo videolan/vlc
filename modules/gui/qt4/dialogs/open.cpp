@@ -78,6 +78,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     /* Basic Creation of the Window */
     ui.setupUi( this );
     setWindowTitle( qtr( "Open Media" ) );
+    setWindowRole( "vlc-open-media" );
     setWindowModality( Qt::WindowModal );
 
     /* Tab definition and creation */

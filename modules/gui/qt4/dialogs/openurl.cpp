@@ -60,6 +60,7 @@ OpenUrlDialog::OpenUrlDialog( QWidget *parent,
         QVLCDialog( parent, _p_intf ), bClipboard( _bClipboard )
 {
     setWindowTitle( qtr( "Open URL" ) );
+    setWindowRole( "vlc-open-url" );
 
     /* Buttons */
     QPushButton *but;

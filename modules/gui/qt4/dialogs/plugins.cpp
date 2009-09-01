@@ -43,6 +43,7 @@ PluginDialog *PluginDialog::instance = NULL;
 PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Plugins and extensions" ) );
+    setWindowRole( "vlc-plugins" );
     QGridLayout *layout = new QGridLayout( this );
 
     /* Main Tree for modules */

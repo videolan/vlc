@@ -1304,6 +1304,7 @@ void CaptureOpenPanel::advancedDialog()
     /* New Adv Prop dialog */
     adv = new QDialog( this );
     adv->setWindowTitle( qtr( "Advanced Options" ) );
+    adv->setWindowRole( "vlc-advanced-options" );
 
     /* A main Layout with a Frame */
     QVBoxLayout *mainLayout = new QVBoxLayout( adv );

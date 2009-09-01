@@ -267,6 +267,8 @@ static int Open (vlc_object_t *obj)
         = intern_string (conn, "_NET_WM_NAME");
     xcb_intern_atom_cookie_t net_wm_icon_name_ck
         = intern_string (conn, "_NET_WM_ICON_NAME");
+    xcb_intern_atom_cookie_t wm_window_role_ck
+        = intern_string (conn, "WM_WINDOW_ROLE");
 
     xcb_atom_t utf8 = get_atom (conn, utf8_string_ck);
 
@@ -282,6 +284,9 @@ static int Open (vlc_object_t *obj)
 
     xcb_atom_t net_wm_icon_name = get_atom (conn, net_wm_icon_name_ck);
     set_string (conn, window, utf8, net_wm_icon_name, _("VLC"));
+
+    xcb_atom_t wm_window_role = get_atom (conn, wm_window_role_ck);
+    set_ascii_prop (conn, window, wm_window_role, "vlc-video");
 
     /* Make the window visible */
     xcb_map_window (conn, window);

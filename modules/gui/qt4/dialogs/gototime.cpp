@@ -41,6 +41,7 @@ GotoTimeDialog::GotoTimeDialog( QWidget *parent, intf_thread_t *_p_intf)
 {
     setWindowFlags( Qt::Tool );
     setWindowTitle( qtr( "Go to Time" ) );
+    setWindowRole( "vlc-goto-time" );
 
     QGridLayout *mainLayout = new QGridLayout( this );
     mainLayout->setSizeConstraint( QLayout::SetFixedSize );

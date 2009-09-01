@@ -53,6 +53,7 @@ HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
 {
     setWindowTitle( qtr( "Help" ) );
+    setWindowRole( "vlc-help" );
     setMinimumSize( 350, 300 );
 
     QGridLayout *layout = new QGridLayout( this );
@@ -85,6 +86,7 @@ AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
             : QVLCDialog( parent, _p_intf )
 {
     setWindowTitle( qtr( "About" ) );
+    setWindowRole( "vlc-about" );
     resize( 600, 500 );
     setMinimumSize( 600, 500 );
 
@@ -201,6 +203,7 @@ UpdateDialog *UpdateDialog::instance = NULL;
 UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "VLC media player updates" ) );
+    setWindowRole( "vlc-update" );
 
     QGridLayout *layout = new QGridLayout( this );
 

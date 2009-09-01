@@ -105,6 +105,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Main settings */
     setFocusPolicy( Qt::StrongFocus );
     setAcceptDrops( true );
+    setWindowRole( "vlc-main" );
     setWindowIcon( QApplication::windowIcon() );
     setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
 
@@ -605,6 +606,7 @@ int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
     QDialog *privacy = new QDialog( this );
 
     privacy->setWindowTitle( qtr( "Privacy and Network Policies" ) );
+    privacy->setWindowRole( "vlc-privacy" );
 
     QGridLayout *gLayout = new QGridLayout( privacy );
 

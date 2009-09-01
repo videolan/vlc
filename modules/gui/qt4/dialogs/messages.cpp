@@ -73,6 +73,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
                : QVLCFrame( _p_intf )
 {
     setWindowTitle( qtr( "Messages" ) );
+    setWindowRole( "vlc-messages" );
 
     /* General widgets */
     QGridLayout *mainLayout = new QGridLayout( this );

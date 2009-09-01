@@ -115,6 +115,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) : p_intf ( _p_i )
 
     setAcceptDrops( true );
     setWindowTitle( qtr( "Playlist" ) );
+    setWindowRole( "vlc-playlist" );
     setWindowIcon( QApplication::windowIcon() );
 }
 

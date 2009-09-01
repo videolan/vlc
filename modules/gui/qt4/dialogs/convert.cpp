@@ -42,6 +42,7 @@ ConvertDialog::ConvertDialog( QWidget *parent, intf_thread_t *_p_intf,
               : QVLCDialog( parent, _p_intf )
 {
     setWindowTitle( qtr( "Convert" ) );
+    setWindowRole( "vlc-convert" );
 
     QGridLayout *mainLayout = new QGridLayout( this );
     SoutInputBox *inputBox = new SoutInputBox( this );
