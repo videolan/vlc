@@ -162,6 +162,9 @@ case $HOST in
             echo "ERROR:\nYour Developer Tools' SDKs were not found.\nYou need to add extra symbolic links to /Developer to achieve correctly\nbuilt contribs.\nHave a look at the OSX-Compile-HOWTO for details." >&2
             exit 1
         fi
+        if test $HOST="i686-apple-darwin10"; then
+            echo "HAVE_DARWIN_10 = 1" >> config.mak
+        fi
     ;;
     x86_64-apple-darwin*)
         SDK_TARGET=10.5
@@ -188,6 +191,9 @@ case $HOST in
         else
             echo "ERROR:\nYour Developer Tools' SDKs were not found.\nYou need to add extra symbolic links to /Developer to achieve correctly\nbuilt contribs.\nHave a look at the OSX-Compile-HOWTO for details." >&2
             exit 1
+        fi
+        if test $HOST="x86_64-apple-darwin10"; then
+            echo "HAVE_DARWIN_10 = 1" >> config.mak
         fi
     ;;
     *mingw32ce)
