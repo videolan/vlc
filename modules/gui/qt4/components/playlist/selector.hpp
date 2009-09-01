@@ -53,9 +53,7 @@ private:
 private slots:
     void setSource( QTreeWidgetItem *item );
 signals:
-    void activated( int );
     void activated( playlist_item_t * );
-    void shouldRemove( int );
 };
 
 #endif

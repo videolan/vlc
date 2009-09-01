@@ -57,7 +57,6 @@ protected:
     intf_thread_t *p_intf;
     QFrame *parent;
 public slots:
-    virtual void setRoot( int ) = 0;
     virtual void setRoot( playlist_item_t * ) = 0;
 };
 
@@ -81,7 +80,6 @@ private:
     QSignalMapper *selectColumnsSigMapper;
 public slots:
     void removeItem( int );
-    virtual void setRoot( int );
     virtual void setRoot( playlist_item_t * );
 private slots:
     void deleteSelection();

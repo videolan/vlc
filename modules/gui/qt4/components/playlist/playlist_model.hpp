@@ -177,7 +177,6 @@ private:
     int i_cached_input_id;
 
 signals:
-    void shouldRemove( int );
     void currentChanged( const QModelIndex& );
 
 public slots:

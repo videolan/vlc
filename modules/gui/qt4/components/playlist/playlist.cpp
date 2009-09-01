@@ -86,11 +86,6 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) : p_intf ( _p_i )
     connect( selector, SIGNAL( activated( playlist_item_t * ) ),
              this, SIGNAL( rootChanged( playlist_item_t * ) ) );
 
-    /* Forward removal requests from the selector to the main panel */
-/*    CONNECT( qobject_cast<PLSelector *>( selector )->model,
-             shouldRemove( int ),
-             qobject_cast<StandardPLPanel *>( rightPanel ), removeItem( int ) ); */
-
     emit rootChanged( p_root );
 
     /* Add the two sides of the QSplitter */
