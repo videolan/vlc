@@ -39,7 +39,7 @@ all: $(TARGETALL)
 using-src:
 	$(MAKE) -C src
 ifdef HAVE_DARWIN_10
-	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%' -i.orig *.la && rm -f *.la.orig)
+	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%g' -i.orig *.la && rm -f *.la.orig)
 endif
 
 # shortcut
@@ -65,7 +65,7 @@ using-bin: contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
     # libiconv.la is no longer present on Snow Leopard, so fix possible references to it, which would
     # result in linking issues
 ifdef HAVE_DARWIN_10
-	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%' -i.orig *.la && rm -f *.la.orig)
+	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%g' -i.orig *.la && rm -f *.la.orig)
 endif
 endif
 
