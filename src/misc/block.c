@@ -64,6 +64,7 @@ void block_Init( block_t *restrict b, void *buf, size_t size )
     b->i_dts = VLC_TS_INVALID;
     b->i_length = 0;
     b->i_rate = 0;
+    b->i_samples = 0;
     b->p_buffer = buf;
     b->i_buffer = size;
 #ifndef NDEBUG
