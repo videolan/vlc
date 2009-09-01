@@ -24,6 +24,7 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -32,7 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 
-#include SDL_IMAGE_INCLUDE_FILE
+#include <SDL/SDL_image.h>
 
 /*****************************************************************************
  * decoder_sys_t : sdl decoder descriptor

@@ -3612,81 +3612,41 @@ then
       then
         SDL_PATH="${with_sdl_config_path}:${PATH}"
       fi ])
-  AC_PATH_PROG(SDL12_CONFIG, sdl12-config, no, ${SDL_PATH})
-  SDL_CONFIG="${SDL12_CONFIG}"
-  SDL_HEADER="SDL12/SDL.h"
-  SDL_IMAGE="SDL12/SDL_image.h"
-  if test "${SDL_CONFIG}" = "no"
-  then
-    AC_PATH_PROG(SDL11_CONFIG, sdl11-config, no, ${SDL_PATH})
-    SDL_CONFIG=${SDL11_CONFIG}
-    SDL_HEADER="SDL11/SDL.h"
-    SDL_IMAGE="SDL11/SDL_image.h"
-  fi
-  if test "${SDL_CONFIG}" = "no"
-  then
-    AC_PATH_PROG(SDL_CONFIG, sdl-config, no, ${SDL_PATH})
-    SDL_HEADER="SDL/SDL.h"
-    SDL_IMAGE="SDL/SDL_image.h"
-  fi
-  # check for cross-compiling
-  SDL_PREFIX=
-  AC_ARG_WITH(sdl-prefix,
-    [    --with-sdl-prefix=PATH path to libsdl (needed for cross-compiling),
-                               e.g use as:
-                               --with-sdl-prefix=/usr/local/arm/2.95.3/arm-linux/usr)],[],[])
-  if test "${with_sdl_prefix}" != "no" -a -n "${with_sdl_prefix}"
-  then
-    SDL_PREFIX="--prefix=${with_sdl_prefix}"
-  fi
-  if test "${SDL_CONFIG}" != "no"
-  then
-    # SDL on Darwin is heavily patched and can only run SDL_image
-    if test "${SYS}" != "darwin"; then
-      VLC_ADD_PLUGIN([vout_sdl])
-      VLC_ADD_PLUGIN([aout_sdl])
-    fi
-    VLC_ADD_CFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} ${SDL_PREFIX} --cflags | sed 's,SDL,,'`])
-    VLC_ADD_LIBS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} ${SDL_PREFIX} --libs | sed 's,-rdynamic,,'`])
-    CPPFLAGS="${CPPFLAGS_save} ${CFLAGS_vout_sdl}"
-    AC_CHECK_HEADERS(${SDL_HEADER}, AC_DEFINE_UNQUOTED(SDL_INCLUDE_FILE,
-      <${SDL_HEADER}>, Indicate whether we should use SDL/SDL.h or SDL11/SDL.h),
-      [ AC_CHECK_HEADERS(SDL.h, AC_DEFINE(SDL_INCLUDE_FILE, <SDL.h>,
-          As a last resort we also test for SDL.h presence),
-      [ AC_MSG_ERROR([The development package for SDL is not installed.
-Please install it and try again. Alternatively you can also configure with
---disable-sdl.])
-      ])])
-    AS_IF([ test "${enable_sdl_image}" != "no"],[
-      AC_CHECK_HEADERS(${SDL_IMAGE}, [AC_DEFINE_UNQUOTED(SDL_IMAGE_INCLUDE_FILE,
-        <${SDL_IMAGE}>, Indicate the path of SDL_image.h)
-        VLC_ADD_PLUGIN([sdl_image])
-        AC_CHECK_LIB(png, png_set_rows,
-          [VLC_ADD_LIBS([sdl_image],[-lpng -lz])],[],[-lz])
-        AC_CHECK_LIB(jpeg, jpeg_start_decompress,
-          [VLC_ADD_LIBS([sdl_image],[-ljpeg])])
-        AC_CHECK_LIB(tiff, TIFFClientOpen,
-          [VLC_ADD_LIBS([sdl_image],[-ltiff])])
-        VLC_ADD_LIBS([sdl_image], [-lSDL_image])],
-        [ AC_CHECK_HEADERS(SDL_image.h, AC_DEFINE(SDL_IMAGE_INCLUDE_FILE, <SDL_image.h>,
-            As a last resort we also test for SDL_image.h presence),
-        [ AC_MSG_WARN([The development package for SDL_image is not installed.
-  You should install it alongside your SDL package.])
-        ])])
-    ])
-    CPPFLAGS="${CPPFLAGS_save}"
-    if expr 1.1.5 \> `${SDL_CONFIG} --version` >/dev/null
-    then
-      AC_MSG_ERROR([The development package for SDL is not installed.
-Please install it and try again. Alternatively you can also configure with
---disable-sdl.])
-    fi
+  AC_PATH_PROG(SDL_CONFIG, sdl-config, no, ${SDL_PATH})
+  SDL_HEADER="SDL/SDL.h"
+  SDL_IMAGE="SDL/SDL_image.h"
 
-  elif test "${enable_sdl}" =  "yes"
-  then
-    AC_MSG_ERROR([I couldn't find the SDL package. You can download libSDL
+  if test "${SDL_CONFIG}" != "no";  then
+     PKG_CHECK_MODULES(SDL, [sdl >= 1.2.10], [
+        # SDL on Darwin is heavily patched and can only run SDL_image
+        if test "${SYS}" != "darwin"; then
+          VLC_ADD_PLUGIN([vout_sdl])
+          VLC_ADD_PLUGIN([aout_sdl])
+        fi
+        VLC_ADD_CFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} --cflags | sed 's,SDL,,'`])
+        VLC_ADD_LIBS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`])
+
+        # SDL_image
+        AS_IF([ test "${enable_sdl_image}" != "no"],[
+          AC_CHECK_HEADERS("SDL/SDL_image.h", [
+            VLC_ADD_PLUGIN([sdl_image])
+            AC_CHECK_LIB(png, png_set_rows, [VLC_ADD_LIBS([sdl_image],[-lpng -lz])],[],[-lz])
+            AC_CHECK_LIB(jpeg, jpeg_start_decompress, [VLC_ADD_LIBS([sdl_image],[-ljpeg])])
+            AC_CHECK_LIB(tiff, TIFFClientOpen, [VLC_ADD_LIBS([sdl_image],[-ltiff])])
+            VLC_ADD_LIBS([sdl_image], [-lSDL_image])],
+            [ AC_MSG_WARN([The development package for SDL_image is not installed.
+      You should install it alongside your SDL package.])
+            ])
+        ])
+     ],[
+       AC_MSG_ERROR([The development package for SDL is too old. You need 1.2.10.
+                    Alternatively you can also configure with --disable-sdl.])
+     ])
+  else if test "${enable_sdl}" =  "yes"; then
+    AC_MSG_ERROR([I could not find the SDL package. You can download libSDL
 from http://www.libsdl.org/, or configure with --disable-sdl. Have a nice day.
     ])
+      fi
   fi
 fi
 
