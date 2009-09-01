@@ -88,6 +88,7 @@ python_param_re=re.compile('(@param\s+\S+)(.+)')
 forward_re=re.compile('.+\(\s*(.+?)\s*\)(\s*\S+)')
 enum_re=re.compile('typedef\s+(enum)\s*(\S+\s*)?\{\s*(.+)\s*\}\s*(\S+);')
 special_enum_re=re.compile('^(enum)\s*(\S+\s*)?\{\s*(.+)\s*\};')
+event_def_re=re.compile('^DEF\(\s*(\w+)\s*\)')
 
 # Definition of parameter passing mode for types.  This should not be
 # hardcoded this way, but works alright ATM.
@@ -139,6 +140,8 @@ class Parser(object):
         with type == 'enum' (for the moment) and value_list being a list of (name, value)
         Note that values are string, since this is intended for code generation.
         """
+        event_names=[]
+
         f=open(name, 'r')
         accumulator=''
         for l in f:
@@ -186,20 +189,34 @@ class Parser(object):
                 continue
 
             # Special case, used only for libvlc_events.h
+            # (version after 96a96f60bb0d1f2506e68b356897ceca6f6b586d)
+            m=event_def_re.match(l)
+            if m:
+                # Event definition.
+                event_names.append('libvlc_'+m.group(1))
+                continue
+
+            # Special case, used only for libvlc_events.h
             m=special_enum_re.match(l)
             if m:
-                values=[]
                 (typ, name, data)=m.groups()
-                for i, l in enumerate(paramlist_re.split(data)):
-                    l=l.strip()
-                    if l.startswith('/*') or l.startswith('#'):
-                        continue
-                    if '=' in l:
-                        # A value was specified. Use it.
-                        values.append(re.split('\s*=\s*', l))
-                    else:
-                        if l:
-                            values.append( (l, str(i)) )
+                if event_names:
+                    # event_names were defined through DEF macro
+                    # (see 96a96f60bb0d1f2506e68b356897ceca6f6b586d)
+                    values=list( (n, str(i)) for i, n in enumerate(event_names))
+                else:
+                    # Before 96a96f60bb0d1f2506e68b356897ceca6f6b586d
+                    values=[]
+                    for i, l in enumerate(paramlist_re.split(data)):
+                        l=l.strip()
+                        if l.startswith('/*') or l.startswith('#'):
+                            continue
+                        if '=' in l:
+                            # A value was specified. Use it.
+                            values.append(re.split('\s*=\s*', l))
+                        else:
+                            if l:
+                                values.append( (l, str(i)) )
                 comment=comment.replace('@{', '').replace('@see', 'See').replace('\ingroup', '')
                 yield (typ, name.strip(), values, comment)
                 comment=''
@@ -396,7 +413,7 @@ class PythonGenerator(object):
         self.output("# Not wrapped methods:")
         for m in not_wrapped:
             self.output("#   ", m)
-        
+
         if self.fd != sys.stdout:
             self.fd.close()
 
