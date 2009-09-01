@@ -62,6 +62,9 @@
 #elif defined( WIN32 )
 #define DEFAULT_FONT "" /* Default font found at run-time */
 #define FC_DEFAULT_FONT "Arial"
+#elif defined( HAVE_MAEMO )
+#define DEFAULT_FONT "/usr/share/fonts/nokia/nosnb.ttf"
+#define FC_DEFAULT_FONT "Nokia Sans Bold"
 #else
 #define DEFAULT_FONT "/usr/share/fonts/truetype/freefont/FreeSerifBold.ttf"
 #define FC_DEFAULT_FONT "Serif Bold"
