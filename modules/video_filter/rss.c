@@ -281,7 +281,11 @@ static int CreateFilter( vlc_object_t *p_this )
     }
 
     /* Parse the urls */
-    ParseUrls( p_filter, psz_urls );
+    if( ParseUrls( p_filter, psz_urls ) )
+    {
+        free( psz_urls );
+        goto error;
+    }
     free( psz_urls );
 
     if( FetchRSS( p_filter ) )
@@ -328,6 +332,7 @@ static void DestroyFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    vlc_mutex_destroy( &p_sys->lock );
     text_style_Delete( p_sys->p_style );
     free( p_sys->psz_marquee );
     FreeRSS( p_filter );
