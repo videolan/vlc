@@ -124,6 +124,14 @@ static int FindDevicesCallback( vlc_object_t *, char const *,
 static int WallpaperCallback( vlc_object_t *, char const *,
                               vlc_value_t, vlc_value_t, void * );
 
+BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
+                                 LPTSTR psz_drivername, VOID* p_context,
+                                 HMONITOR hmon );
+                                 
+BOOL WINAPI DirectXEnumCallback2( GUID* p_guid, LPTSTR psz_desc,
+                                  LPTSTR psz_drivername, VOID* p_context,
+                                  HMONITOR hmon );
+                                  
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
