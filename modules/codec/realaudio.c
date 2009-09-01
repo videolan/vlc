@@ -76,7 +76,9 @@ static int  OpenDll( decoder_t * );
 #ifndef WIN32
 static int  OpenNativeDll( decoder_t *, char *, char * );
 #endif
+#if defined(LOADER) || defined(WIN32)
 static int  OpenWin32Dll( decoder_t *, char *, char * );
+#endif
 static void CloseDll( decoder_t * );
 
 static aout_buffer_t *Decode( decoder_t *, block_t ** );
@@ -154,8 +156,10 @@ typedef struct __attribute__((__packed__)) {
     void* extradata;
 } wra_init_t;
 
+#if 0 /* I have no idea what this is doing here */
 void *__builtin_new(unsigned long size) {return malloc(size);}
 void __builtin_delete(void *p) {free(p);}
+#endif
 
 static const int pi_channels_maps[7] =
 {
@@ -270,7 +274,7 @@ static int OpenDll( decoder_t *p_dec )
     int i, i_result;
 
     /** Find the good path for the dlls.**/
-    char *ppsz_path[] =
+    const char *ppsz_path[] =
     {
       ".",
 #ifndef WIN32
@@ -349,7 +353,7 @@ static int OpenDll( decoder_t *p_dec )
         if( asprintf( &psz_dll, "%s/%4.4s.so.6.0", ppsz_path[i],
                   (char *)&p_dec->fmt_in.i_codec ) != -1 )
         {
-            i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
+            i_result = OpenNativeDll( p_dec, (char *)ppsz_path[i], psz_dll );
             free( psz_dll );
             if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
         }
@@ -358,7 +362,7 @@ static int OpenDll( decoder_t *p_dec )
         if( asprintf( &psz_dll, "%s/%4.4s.so", ppsz_path[i],
                   (char *)&p_dec->fmt_in.i_codec ) != -1 )
         {
-            i_result = OpenNativeDll( p_dec, ppsz_path[i], psz_dll );
+            i_result = OpenNativeDll( p_dec, (char *)ppsz_path[i], psz_dll );
             free( psz_dll );
             if( i_result == VLC_SUCCESS ) return VLC_SUCCESS;
         }
@@ -503,9 +507,9 @@ static int OpenNativeDll( decoder_t *p_dec, char *psz_path, char *psz_dll )
 }
 #endif /* Win32 */
 
+#if defined(LOADER) || defined(WIN32)
 static int OpenWin32Dll( decoder_t *p_dec, char *psz_path, char *psz_dll )
 {
-#if defined(LOADER) || defined(WIN32)
     decoder_sys_t *p_sys = p_dec->p_sys;
     void *handle = 0, *context = 0;
     unsigned int i_result;
@@ -610,10 +614,10 @@ static int OpenWin32Dll( decoder_t *p_dec, char *psz_path, char *psz_dll )
     if( context ) p_sys->wraFreeDecoder( context );
     if( context ) p_sys->wraCloseCodec( context );
     FreeLibrary( handle );
-#endif
 
     return VLC_EGENERIC;
 }
+#endif
 
 /*****************************************************************************
  * CloseDll:
