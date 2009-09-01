@@ -46,9 +46,8 @@
 #include <vlc_vout.h>
 #include <vlc_playlist.h>   /* needed for wallpaper */
 
-#include <windows.h>
 #include <ddraw.h>
-#include <commctrl.h>
+#include <commctrl.h>       /* ListView_(Get|Set)* */
 
 #ifndef UNDER_CE
 #   include <multimon.h>
