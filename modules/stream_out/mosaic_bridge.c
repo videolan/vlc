@@ -157,7 +157,7 @@ vlc_module_begin ()
                  HEIGHT_LONGTEXT, true )
     add_string( CFG_PREFIX "sar", "1:1", NULL, RATIO_TEXT,
                 RATIO_LONGTEXT, false )
-    add_string( CFG_PREFIX "chroma", 0, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
+    add_string( CFG_PREFIX "chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT,
                 false )
 
     add_module_list( CFG_PREFIX "vfilter", "video filter2",

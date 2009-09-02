@@ -199,9 +199,9 @@ vlc_module_begin ()
 #if defined (HAVE_ISATTY)
     add_bool( "rc-fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, true )
 #endif
-    add_string( "rc-unix", 0, NULL, UNIX_TEXT, UNIX_LONGTEXT, true )
+    add_string( "rc-unix", NULL, NULL, UNIX_TEXT, UNIX_LONGTEXT, true )
 #endif
-    add_string( "rc-host", 0, NULL, HOST_TEXT, HOST_LONGTEXT, true )
+    add_string( "rc-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true )
 
     set_capability( "interface", 20 )
 
