@@ -1,10 +1,11 @@
 /*****************************************************************************
  * selector.cpp : Playlist source selector
  ****************************************************************************
- * Copyright (C) 2000-2005 the VideoLAN team
+ * Copyright (C) 2006-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          Jean-Baptiste Kempf
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -35,6 +36,7 @@
 #include <QTreeWidget>
 
 #include <vlc_playlist.h>
+#include <vlc_services_discovery.h>
 
 PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p ), p_intf(_p_intf)
 {
@@ -42,8 +44,9 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p ), p_i
     view = new QTreeWidget;
     view->setIconSize( QSize( 24,24 ) );
 //    view->setAlternatingRowColors( true );
-    view->setIndentation( 0 );
+    view->setIndentation( 10 );
     view->header()->hide();
+    view->setRootIsDecorated( false );
 //    view->setModel( model );
 
     view->setAcceptDrops(true);
@@ -67,12 +70,30 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf ) : QWidget( p ), p_i
 
 void PLSelector::setSource( QTreeWidgetItem *item )
 {
-    if( item )
+    if( !item )
+        return;
+
+    int i_type = item->data( 0, Qt::UserRole ).toInt();
+
+    if( i_type == SD_TYPE )
+    {
+        QString qs = item->data( 0, Qt::UserRole + 1 ).toString();
+        if( !playlist_IsServicesDiscoveryLoaded( THEPL, qtu( qs ) ) )
+        {
+            playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
+            //FIXME we should return the playlist_item_t;
+            emit NULL;
+        }
+    }
+    else if( i_type == PL_TYPE || i_type == ML_TYPE )
     {
         playlist_item_t *pl_item =
-                item->data( 0, Qt::UserRole ).value<playlist_item_t *>();
-        emit activated( pl_item );
+                item->data( 0, Qt::UserRole + 1 ).value<playlist_item_t *>();
+        if( pl_item )
+            emit activated( pl_item );
     }
+    else
+        assert( 0 );
 }
 
 void PLSelector::createItems()
@@ -80,18 +101,37 @@ void PLSelector::createItems()
     assert( view );
     QTreeWidgetItem *pl = new QTreeWidgetItem( view );
     pl->setText( 0, qtr( "Playlist" ) );
-    pl->setData( 0, Qt::UserRole, QVariant::fromValue( THEPL->p_local_category ) );
+    pl->setData( 0, Qt::UserRole, PL_TYPE );
+    pl->setData( 0, Qt::UserRole + 1, QVariant::fromValue( THEPL->p_local_category ) );
 /*    QTreeWidgetItem *empty = new QTreeWidgetItem( view );
     empty->setFlags(Qt::NoItemFlags);
 */
     QTreeWidgetItem *lib = new QTreeWidgetItem( view );
     lib->setText( 0, qtr( "Library" ) );
-    lib->setData( 0, Qt::UserRole, QVariant::fromValue( THEPL->p_ml_category ) );
+    lib->setData( 0, Qt::UserRole, ML_TYPE );
+    lib->setData( 0, Qt::UserRole + 1, QVariant::fromValue( THEPL->p_ml_category ) );
 /*
     QTreeWidgetItem *empty2 = new QTreeWidgetItem( view );
     empty2->setFlags(Qt::NoItemFlags);*/
 
+    QTreeWidgetItem *sds = new QTreeWidgetItem( view );
+    sds->setExpanded( true );
+    sds->setText( 0, qtr( "Libraries" ) );
 
+    char **ppsz_longnames;
+    char **ppsz_names = vlc_sd_GetNames( &ppsz_longnames );
+    if( !ppsz_names )
+        return;
+
+    char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
+    QTreeWidgetItem *sd_item;
+    for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
+    {
+        sd_item = new QTreeWidgetItem( QStringList( *ppsz_longname ) );
+        sd_item->setData( 0, Qt::UserRole, SD_TYPE );
+        sd_item->setData( 0, Qt::UserRole + 1, qfu( *ppsz_name ) );
+        sds->addChild( sd_item );
+    }
 
 }
 PLSelector::~PLSelector()

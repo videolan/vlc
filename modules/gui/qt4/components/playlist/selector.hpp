@@ -36,6 +36,12 @@
 class QTreeWidget;
 class PlaylistWidget;
 
+enum {
+    PL_TYPE,
+    ML_TYPE,
+    SD_TYPE,
+};
+
 Q_DECLARE_METATYPE( playlist_item_t *);
 class PLSelector: public QWidget
 {
