@@ -899,6 +899,7 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
     stream_t *p_stream;
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
+    int i_feed;
 
     /* These data are not modified after the creation of the module so we don't
        need to hold the lock */
@@ -919,7 +920,7 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
     }
 
     /* Fetch all feeds and parse them */
-    for( int i_feed = 0; i_feed < i_feeds; i_feed++ )
+    for( i_feed = 0; i_feed < i_feeds; i_feed++ )
     {
         rss_feed_t *p_feed = p_feeds + i_feed;
         rss_feed_t *p_old_feed = p_sys->p_feeds + i_feed;
@@ -972,8 +973,7 @@ static rss_feed_t* FetchRSS( filter_t *p_filter )
     return p_feeds;
 
 error:
-
-    /*TODO: still a memleak */
+    FreeRSS( p_feeds, i_feed + 1 );
     if( p_xml_reader )
         xml_ReaderDelete( p_xml, p_xml_reader );
     if( p_stream )
@@ -1016,15 +1016,24 @@ static void Fetch( void *p_data )
     filter_t *p_filter = p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    msg_Dbg( p_filter, "Updating the rss feeds" );
     rss_feed_t *p_feeds = FetchRSS( p_filter );
+    if( !p_feeds )
+    {
+        msg_Err( p_filter, "Unable to fetch the feeds" );
+        return;
+    }
+
     rss_feed_t *p_old_feeds = p_sys->p_feeds;
 
-    if( !p_feeds )
-        return;
-
     vlc_mutex_lock( &p_sys->lock );
+    /* Update the feeds */
     p_sys->p_feeds = p_feeds;
     p_sys->b_fetched = true;
+    /* Set all current info to the original values */
+    p_sys->i_cur_feed = 0;
+    p_sys->i_cur_item = p_sys->i_title == scroll_title ? -1 : 0;
+    p_sys->i_cur_char = 0;
     vlc_mutex_unlock( &p_sys->lock );
 
     if( p_old_feeds )
