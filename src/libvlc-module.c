@@ -1,7 +1,7 @@
 /*****************************************************************************
- * libvlc.h: Options for the main (libvlc itself) module
+ * libvlc-module.c: Options for the main (libvlc itself) module
  *****************************************************************************
- * Copyright (C) 1998-2006 the VideoLAN team
+ * Copyright (C) 1998-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Vincent Seguin <seguin@via.ecp.fr>
