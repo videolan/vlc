@@ -31,303 +31,258 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout.h>
+#include <vlc_vout_display.h>
+#include <vlc_picture_pool.h>
 #include <vlc_charset.h>
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
-
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t *p_vout );
-static void Display   ( vout_thread_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-
 #define YUV_FILE_TEXT N_("device, fifo or filename")
-#define YUV_FILE_LONGTEXT N_("device, fifo or filename to write yuv frames too." )
+#define YUV_FILE_LONGTEXT N_("device, fifo or filename to write yuv frames too.")
 
 #define CHROMA_TEXT N_("Chroma used.")
-#define CHROMA_LONGTEXT N_( \
-    "Force use of a specific chroma for output. Default is I420." )
+#define CHROMA_LONGTEXT N_(\
+    "Force use of a specific chroma for output. Default is I420.")
 
-#define YUV4MPEG2_TEXT N_( "YUV4MPEG2 header (default disabled)" )
-#define YUV4MPEG2_LONGTEXT N_( "The YUV4MPEG2 header is compatible " \
+#define YUV4MPEG2_TEXT N_("YUV4MPEG2 header (default disabled)")
+#define YUV4MPEG2_LONGTEXT N_("The YUV4MPEG2 header is compatible " \
     "with mplayer yuv video ouput and requires YV12/I420 fourcc. By default "\
-    "vlc writes the fourcc of the picture frame into the output destination." )
+    "vlc writes the fourcc of the picture frame into the output destination.")
 
 #define CFG_PREFIX "yuv-"
 
-vlc_module_begin ()
-    set_shortname( N_( "YUV output" ) )
-    set_description( N_( "YUV video output" ) )
-    set_category( CAT_VIDEO )
-    set_subcategory( SUBCAT_VIDEO_VOUT )
-    set_capability( "video output", 0 )
+static int  Open (vlc_object_t *);
+static void Close(vlc_object_t *);
 
-    add_string( CFG_PREFIX "file", "stream.yuv", NULL,
-                YUV_FILE_TEXT, YUV_FILE_LONGTEXT, false )
-    add_string( CFG_PREFIX "chroma", NULL, NULL,
-                CHROMA_TEXT, CHROMA_LONGTEXT, true )
-    add_bool  ( CFG_PREFIX "yuv4mpeg2", false, NULL,
-                YUV4MPEG2_TEXT, YUV4MPEG2_LONGTEXT, true )
+vlc_module_begin()
+    set_shortname(N_("YUV output"))
+    set_description(N_("YUV video output"))
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    set_capability("vout display", 0)
 
-    set_callbacks( Create, Destroy )
-vlc_module_end ()
+    add_string(CFG_PREFIX "file", "stream.yuv", NULL,
+                YUV_FILE_TEXT, YUV_FILE_LONGTEXT, false)
+    add_string(CFG_PREFIX "chroma", NULL, NULL,
+                CHROMA_TEXT, CHROMA_LONGTEXT, true)
+    add_bool  (CFG_PREFIX "yuv4mpeg2", false, NULL,
+                YUV4MPEG2_TEXT, YUV4MPEG2_LONGTEXT, true)
 
+    set_callbacks(Open, Close)
+vlc_module_end()
+
+/*****************************************************************************
+ * Local prototypes
+ *****************************************************************************/
 static const char *const ppsz_vout_options[] = {
     "file", "chroma", "yuv4mpeg2", NULL
 };
 
-static void WriteYUV( vout_thread_t *p_vout, video_format_t fmt,
-                      picture_t *p_pic );
+/* */
+static picture_t *Get    (vout_display_t *);
+static void       Display(vout_display_t *, picture_t *);
+static int        Control(vout_display_t *, int, va_list);
+static void       Manage (vout_display_t *);
 
 /*****************************************************************************
- * vout_sys_t: video output descriptor
+ * vout_display_sys_t: video output descriptor
  *****************************************************************************/
-struct vout_sys_t
-{
-    char *psz_file;
-    FILE *p_fd;
-    bool  b_header;
-    bool  b_yuv4mpeg2;
-    vlc_fourcc_t i_chroma;
+struct vout_display_sys_t {
+    FILE *f;
+    bool  is_first;
+    bool  is_yuv4mpeg2;
+    bool  use_dr;
+
+    picture_pool_t *pool;
 };
 
-/*****************************************************************************
- * Create: allocates video thread
- *****************************************************************************
- * This function allocates and initializes a vout method.
- *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+/* */
+static int Open(vlc_object_t *object)
 {
-    vout_thread_t *p_vout = ( vout_thread_t * )p_this;
-    vout_sys_t *p_sys;
-    char *psz_fcc;
-
-    config_ChainParse( p_vout, CFG_PREFIX, ppsz_vout_options,
-                       p_vout->p_cfg );
+    vout_display_t *vd = (vout_display_t *)object;
+    vout_display_sys_t *sys;
 
     /* Allocate instance and initialize some members */
-    p_vout->p_sys = p_sys = malloc( sizeof( vout_sys_t ) );
-    if( !p_vout->p_sys )
+    vd->sys = sys = malloc(sizeof(*sys));
+    if (!sys)
         return VLC_ENOMEM;
 
-    p_sys->b_header = false;
-    p_sys->p_fd = NULL;
+    sys->is_first = false;
+    sys->is_yuv4mpeg2 = var_CreateGetBool(vd, CFG_PREFIX "yuv4mpeg2");
+    sys->pool = NULL;
 
-    p_sys->b_yuv4mpeg2 = var_CreateGetBool( p_this, CFG_PREFIX "yuv4mpeg2" );
-    p_sys->i_chroma = VLC_CODEC_I420;
+    /* */
+    char *psz_fcc = var_CreateGetNonEmptyString(vd, CFG_PREFIX "chroma");
+    const vlc_fourcc_t requested_chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES,
+                                                                        psz_fcc);
+    free(psz_fcc);
 
-    p_sys->psz_file =
-            var_CreateGetString( p_this, CFG_PREFIX "file" );
-    p_sys->p_fd = utf8_fopen( p_sys->psz_file, "wb" );
-    if( !p_sys->p_fd )
-    {
-        free( p_sys->psz_file );
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-
-    psz_fcc = var_CreateGetNonEmptyString( p_this, CFG_PREFIX "chroma" );
-    const vlc_fourcc_t i_requested_chroma =
-        vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_fcc );
-    if( i_requested_chroma )
-        p_sys->i_chroma = i_requested_chroma;
-    free( psz_fcc );
-
-    if( p_sys->b_yuv4mpeg2 )
-    {
-        switch( p_sys->i_chroma )
-        {
-            case VLC_CODEC_YV12:
-            case VLC_CODEC_I420:
-            case VLC_CODEC_J420:
-                break;
-            default:
-                msg_Err( p_this,
-                    "YUV4MPEG2 mode needs chroma YV12 not %4s as requested",
-                    (char *)&(p_sys->i_chroma) );
-                fclose( p_vout->p_sys->p_fd );
-                free( p_vout->p_sys->psz_file );
-                free( p_vout->p_sys );
-                return VLC_EGENERIC;
-        }
-    }
-
-    msg_Dbg( p_this, "using chroma %4s", (char *)&(p_sys->i_chroma) );
-
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = NULL;
-    p_vout->pf_render = NULL;
-    p_vout->pf_display = Display;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Init: initialize video thread
- *****************************************************************************/
-static int Init( vout_thread_t *p_vout )
-{
-    vout_sys_t *p_sys = (vout_sys_t *) p_vout->p_sys;
-    int i_index;
-    picture_t *p_pic;
-
-    /* Initialize the output structure */
-    if( p_vout->render.i_chroma != p_sys->i_chroma )
-        p_vout->output.i_chroma = p_vout->fmt_out.i_chroma = p_sys->i_chroma;
-    else
-       p_vout->output.i_chroma = p_vout->render.i_chroma;
-
-    p_vout->output.pf_setpalette = NULL;
-    p_vout->output.i_width = p_vout->render.i_width;
-    p_vout->output.i_height = p_vout->render.i_height;
-    p_vout->output.i_aspect = p_vout->output.i_width
-                               * VOUT_ASPECT_FACTOR / p_vout->output.i_height;
-
-    p_vout->output.i_rmask = 0xff0000;
-    p_vout->output.i_gmask = 0x00ff00;
-    p_vout->output.i_bmask = 0x0000ff;
-
-    /* Try to initialize 1 direct buffer */
-    p_pic = NULL;
-
-    /* Find an empty picture slot */
-    for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
-    {
-        if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
-        {
-            p_pic = p_vout->p_picture + i_index;
+    const vlc_fourcc_t chroma = requested_chroma ? requested_chroma :
+                                                   VLC_CODEC_I420;
+    if (sys->is_yuv4mpeg2) {
+        switch (chroma) {
+        case VLC_CODEC_YV12:
+        case VLC_CODEC_I420:
+        case VLC_CODEC_J420:
             break;
+        default:
+            msg_Err(vd, "YUV4MPEG2 mode needs chroma YV12 not %4.4s as requested",
+                    (char *)&chroma);
+            free(sys);
+            return VLC_EGENERIC;
         }
     }
+    sys->use_dr = chroma == vd->fmt.i_chroma;
+    msg_Dbg(vd, "Using chroma %4.4s", (char *)&chroma);
 
-    /* Allocate the picture */
-    if( p_pic == NULL )
-        return VLC_EGENERIC;
-
-    vout_AllocatePicture( VLC_OBJECT(p_vout), p_pic, p_vout->output.i_chroma,
-                          p_vout->output.i_width, p_vout->output.i_height,
-                          p_vout->output.i_aspect );
-
-    if( p_pic->i_planes == 0 )
-    {
+    /* */
+    char *name = var_CreateGetNonEmptyString(vd, CFG_PREFIX "file");
+    if (!name) {
+        msg_Err(vd, "Empty file name");
+        free(sys);
         return VLC_EGENERIC;
     }
+    sys->f = utf8_fopen(name, "wb");
 
-    p_pic->i_status = DESTROYED_PICTURE;
-    p_pic->i_type   = DIRECT_PICTURE;
+    if (!sys->f) {
+        msg_Err(vd, "Failed to open %s", name);
+        free(name);
+        free(sys);
+        return VLC_EGENERIC;
+    }
+    msg_Dbg(vd, "Writing data to %s", name);
+    free(name);
 
-    PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
-    I_OUTPUTPICTURES++;
+    /* */
+    video_format_t fmt = vd->fmt;
+    fmt.i_chroma = chroma;
+    video_format_FixRgb(&fmt);
+
+    /* */
+    vout_display_info_t info = vd->info;
+    info.has_hide_mouse = true;
+
+    /* */
+    vd->fmt     = fmt;
+    vd->info    = info;
+    vd->get     = Get;
+    vd->prepare = NULL;
+    vd->display = Display;
+    vd->control = Control;
+    vd->manage  = Manage;
+
+    vout_display_SendEventFullscreen(vd, false);
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * Destroy: destroy video thread
- *****************************************************************************
- * Terminate an output method created by Create
- *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
+/* */
+static void Close(vlc_object_t *object)
 {
-    int i_index;
-    vout_thread_t *p_vout = ( vout_thread_t * )p_this;
+    vout_display_t *vd = (vout_display_t *)object;
+    vout_display_sys_t *sys = vd->sys;
 
-    for( i_index = I_OUTPUTPICTURES-1; i_index >= 0; i_index-- )
-    {
-        free( PP_OUTPUTPICTURE[ i_index ]->p_data );
+    if (sys->pool)
+        picture_pool_Delete(sys->pool);
+    fclose(sys->f);
+    free(sys);
+}
+
+/*****************************************************************************
+ *
+ *****************************************************************************/
+static picture_t *Get(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    if (!sys->pool) {
+        sys->pool = picture_pool_NewFromFormat(&vd->fmt, sys->use_dr ? VOUT_MAX_PICTURES : 1);
+        if (!sys->pool)
+            return NULL;
+    }
+    return picture_pool_Get(sys->pool);
+}
+
+static void Display(vout_display_t *vd, picture_t *picture)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    /* */
+    video_format_t fmt = vd->fmt;
+    fmt.i_sar_num = vd->source.i_sar_num;
+    fmt.i_sar_den = vd->source.i_sar_den;
+
+    /* */
+    char type;
+    if (picture->b_progressive)
+        type = 'p';
+    else if (picture->b_top_field_first)
+        type = 't';
+    else
+        type = 'b';
+
+    if (type != 'p') {
+        msg_Warn(vd, "Received a non progressive frame, "
+                     "it will be written as progressive.");
+        type = 'p';
     }
 
-    /* Destroy structure */
-    fclose( p_vout->p_sys->p_fd );
-
-    free( p_vout->p_sys->psz_file );
-    free( p_vout->p_sys );
-}
-
-/*****************************************************************************
- * Display: displays previously rendered output
- *****************************************************************************
- * This function copies the rendered picture into our circular buffer.
- *****************************************************************************/
-static void Display( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    video_format_t fmt_in;
-
-    memset( &fmt_in, 0, sizeof( fmt_in ) );
-    video_format_Copy( &fmt_in, &p_pic->format );
-    /* assume square pixels if i_sar_num = 0 */
-    if( p_pic->format.i_sar_num == 0 )
-        fmt_in.i_sar_num = fmt_in.i_sar_den = 1;
-
-    WriteYUV( p_vout, fmt_in, p_pic );
-    video_format_Clean( &fmt_in );
-    return;
-}
-
-static void End( vout_thread_t *p_vout )
-{
-    VLC_UNUSED(p_vout);
-}
-
-static void WriteYUV( vout_thread_t *p_vout, video_format_t fmt,
-                      picture_t *p_pic )
-{
-    vout_sys_t *p_sys = p_vout->p_sys;
-
-    if( !p_pic || !p_sys ) return;
-
-#if 0
-    msg_Dbg( p_vout, "writing %d bytes of fourcc %4s",
-             i_bytes, (char *)&fmt.i_chroma );
-#endif
-    if( !p_sys->b_header )
-    {
-        const char *p_hdr = "";
-        if( p_sys->b_yuv4mpeg2 )
-        {
+    /* */
+    if (!sys->is_first) {
+        const char *header;
+        char buffer[5];
+        if (sys->is_yuv4mpeg2) {
             /* MPlayer compatible header, unfortunately it doesn't tell you
              * the exact fourcc used. */
-            p_hdr = "YUV4MPEG2";
+            header = "YUV4MPEG2";
+        } else {
+            snprintf(buffer, sizeof(buffer), "%4.4s", 
+                     (const char*)&fmt.i_chroma);
+            header = buffer;
         }
-        else
-        {
-            p_hdr = (const char*)&fmt.i_chroma;
-        }
-        fprintf( p_sys->p_fd, "%4s W%d H%d F%d:%d I%c A%d:%d\n",
-                 p_hdr,
-                 fmt.i_width, fmt.i_height,
-                 fmt.i_frame_rate, fmt.i_frame_rate_base,
-                 (p_pic->b_progressive ? 'p' :
-                         (p_pic->b_top_field_first ? 't' : 'b')),
-                 fmt.i_sar_num, fmt.i_sar_den );
-        fflush( p_sys->p_fd );
-        p_sys->b_header = true;
+
+        fprintf(sys->f, "%s W%d H%d F%d:%d I%c A%d:%d\n",
+                header,
+                fmt.i_visible_width, fmt.i_visible_height,
+                fmt.i_frame_rate, fmt.i_frame_rate_base,
+                type,
+                fmt.i_sar_num, fmt.i_sar_den);
+        sys->is_first = true;
     }
 
-    fprintf( p_sys->p_fd, "FRAME\n" );
-    if( p_pic->b_progressive )
-    {
-        size_t i_bytes = (fmt.i_width * fmt.i_height * fmt.i_bits_per_pixel) >> 3;
-        size_t i_written = 0;
-
-        i_written = fwrite( p_pic->p_data, 1, i_bytes, p_sys->p_fd );
-        if( i_written != i_bytes )
-        {
-            msg_Warn( p_vout, "only %zd of %zd bytes written",
-                      i_written, i_bytes );
+    /* */
+    fprintf(sys->f, "FRAME\n");
+    for (int i = 0; i < picture->i_planes; i++) {
+        const plane_t *plane = &picture->p[i];
+        for( int y = 0; y < plane->i_visible_lines; y++) {
+            const size_t written = fwrite(&plane->p_pixels[y*plane->i_pitch],
+                                          1, plane->i_visible_pitch, sys->f);
+            if (written != (size_t)plane->i_visible_pitch)
+                msg_Warn(vd, "only %zd of %d bytes written",
+                         written, plane->i_visible_pitch);
         }
     }
-    else
-    {
-        msg_Warn( p_vout, "only progressive frames are supported, "
-                          "use a deinterlace filter" );
-    }
-    fflush( p_sys->p_fd );
+    fflush(sys->f);
+
+    /* */
+    picture_Release(picture);
 }
+
+static int Control(vout_display_t *vd, int query, va_list args)
+{
+    VLC_UNUSED(vd);
+    switch (query) {
+    case VOUT_DISPLAY_CHANGE_FULLSCREEN: {
+        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
+        if (cfg->is_fullscreen)
+            return VLC_EGENERIC;
+        return VLC_SUCCESS;
+    }
+    default:
+        return VLC_EGENERIC;
+    }
+}
+static void Manage (vout_display_t *vd)
+{
+    VLC_UNUSED(vd);
+}
+
