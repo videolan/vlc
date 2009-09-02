@@ -57,8 +57,8 @@ static int  CreateFilter ( vlc_object_t * );
 static void DestroyFilter( vlc_object_t * );
 static subpicture_t *Filter( filter_t *, mtime_t );
 
-static int FetchRSS( filter_t * );
-static void FreeRSS( filter_t * );
+static struct rss_feed_t *FetchRSS( filter_t * );
+static void FreeRSS( struct rss_feed_t *, int );
 static int ParseUrls( filter_t *, char * );
 
 static void Fetch( void * );
@@ -325,7 +325,7 @@ static void DestroyFilter( vlc_object_t *p_this )
 
     text_style_Delete( p_sys->p_style );
     free( p_sys->psz_marquee );
-    FreeRSS( p_filter );
+    FreeRSS( p_sys->p_feeds, p_sys->i_feeds );
     free( p_sys );
 }
 
@@ -879,7 +879,7 @@ end:
 /****************************************************************************
  * FetchRSS (or Atom) feeds
  ***************************************************************************/
-static int FetchRSS( filter_t *p_filter )
+static rss_feed_t* FetchRSS( filter_t *p_filter )
 {
     filter_sys_t *p_sys = p_filter->p_sys;
 
@@ -887,37 +887,40 @@ static int FetchRSS( filter_t *p_filter )
     xml_t *p_xml;
     xml_reader_t *p_xml_reader;
 
+    /* These data are not modified after the creation of the module so we don't
+       need to hold the lock */
+    int i_feeds = p_sys->i_feeds;
+    bool b_images = p_sys->b_images;
+
+    /* Allocate a new structure */
+    rss_feed_t *p_feeds = malloc( i_feeds * sizeof( rss_feed_t ) );
+    if( !p_feeds )
+        return NULL;
+
     p_xml = xml_Create( p_filter );
     if( !p_xml )
     {
         msg_Err( p_filter, "Failed to open XML parser" );
-        return 1;
+        free( p_feeds );
+        return NULL;
     }
 
     /* Fetch all feeds and parse them */
-    for( int i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
+    for( int i_feed = 0; i_feed < i_feeds; i_feed++ )
     {
-        rss_feed_t *p_feed = p_sys->p_feeds+i_feed;
+        rss_feed_t *p_feed = p_feeds + i_feed;
+        rss_feed_t *p_old_feed = p_sys->p_feeds + i_feed;
 
-        /* Free the ressources */
-        FREENULL( p_feed->psz_title );
-        FREENULL( p_feed->psz_description );
-        FREENULL( p_feed->psz_link );
-        FREENULL( p_feed->psz_image );
-        if( p_feed->p_pic )
-        {
-            picture_Release( p_feed->p_pic );
-            p_feed->p_pic = NULL;
-        }
-        for( int i = 0; i < p_feed->i_items; i++ )
-        {
-            rss_item_t *p_item = p_feed->p_items + i;
-            free( p_item->psz_title );
-            free( p_item->psz_link );
-            free( p_item->psz_description );
-        }
+        /* Initialize the structure */
+        p_feed->psz_title = NULL;
+        p_feed->psz_description = NULL;
+        p_feed->psz_link = NULL;
+        p_feed->psz_image = NULL;
+        p_feed->p_pic = NULL;
         p_feed->i_items = 0;
-        FREENULL( p_feed->p_items );
+        p_feed->p_items = NULL;
+
+        p_feed->psz_url = strdup( p_old_feed->psz_url );
 
         /* Fetch the feed */
         msg_Dbg( p_filter, "opening %s RSS/Atom feed ...", p_feed->psz_url );
@@ -942,8 +945,7 @@ static int FetchRSS( filter_t *p_filter )
             goto error;
 
         /* If we have a image: load it if requiere */
-        if( p_sys->b_images == true
-            && p_feed->psz_image && !p_feed->p_pic )
+        if( b_images && p_feed->psz_image && !p_feed->p_pic )
         {
             p_feed->p_pic = LoadImage( p_filter, p_feed->psz_image );
         }
@@ -954,10 +956,11 @@ static int FetchRSS( filter_t *p_filter )
     }
 
     xml_Delete( p_xml );
-    return 0;
+    return p_feeds;
 
 error:
 
+    /*TODO: still a memleak */
     if( p_xml_reader )
         xml_ReaderDelete( p_xml, p_xml_reader );
     if( p_stream )
@@ -965,19 +968,17 @@ error:
     if( p_xml )
         xml_Delete( p_xml );
 
-    return 1;
+    return NULL;
 }
 
 /****************************************************************************
  * FreeRSS
  ***************************************************************************/
-static void FreeRSS( filter_t *p_filter)
+static void FreeRSS( rss_feed_t *p_feeds, int i_feeds )
 {
-    filter_sys_t *p_sys = p_filter->p_sys;
-
-    for( int i_feed = 0; i_feed < p_sys->i_feeds; i_feed++ )
+    for( int i_feed = 0; i_feed < i_feeds; i_feed++ )
     {
-        rss_feed_t *p_feed = p_sys->p_feeds+i_feed;
+        rss_feed_t *p_feed = p_feeds+i_feed;
         for( int i_item = 0; i_item < p_feed->i_items; i_item++ )
         {
             rss_item_t *p_item = p_feed->p_items+i_item;
@@ -994,8 +995,7 @@ static void FreeRSS( filter_t *p_filter)
             picture_Release( p_feed->p_pic );
         free( p_feed->psz_url );
     }
-    free( p_sys->p_feeds );
-    p_sys->i_feeds = 0;
+    free( p_feeds );
 }
 
 static void Fetch( void *p_data )
@@ -1003,8 +1003,17 @@ static void Fetch( void *p_data )
     filter_t *p_filter = p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
 
+    rss_feed_t *p_feeds = FetchRSS( p_filter );
+    rss_feed_t *p_old_feeds = p_sys->p_feeds;
+
+    if( !p_feeds )
+        return;
+
     vlc_mutex_lock( &p_sys->lock );
-    FetchRSS( p_filter );
+    p_sys->p_feeds = p_feeds;
     p_sys->b_fetched = true;
     vlc_mutex_unlock( &p_sys->lock );
+
+    if( p_old_feeds )
+        FreeRSS( p_old_feeds, p_sys->i_feeds );
 }
