@@ -59,7 +59,6 @@ endif
 
 ifneq ($(CC),)
 HOSTCC+= CC="$(CC)"
-FFMPEGCONF += --cc=$(CC)
 endif
 ifneq ($(CXX),)
 HOSTCC+= CXX="$(CXX)"
@@ -117,9 +116,11 @@ endif
 ifdef HAVE_WIN32
 HOSTCONF+= --without-pic --disable-shared --enable-msw --disable-dependency-tracking
 FFMPEGCONF+= --target-os=mingw32 --enable-memalign-hack --cpu=i686 --arch=i686
-endif
 ifdef HAVE_WIN64
-FFMPEGCONF+= --cpu=x86_64
+FFMPEGCONF+= --cpu=i686 --arch=x86_64
+else
+FFMPEGCONF+= --cpu=i686 --arch=x86_32
+endif
 endif
 
 ifdef HAVE_WINCE
