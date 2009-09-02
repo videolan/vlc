@@ -38,8 +38,6 @@
  * Local prototypes
  ****************************************************************************/
 static int  OpenFilter ( vlc_object_t * );
-static void CloseFilter( vlc_object_t * );
-
 static picture_t *Filter( filter_t *, picture_t * );
 
 /*****************************************************************************
@@ -48,7 +46,7 @@ static picture_t *Filter( filter_t *, picture_t * );
 vlc_module_begin ()
     set_description( N_("Video scaling filter") )
     set_capability( "video filter2", 10 )
-    set_callbacks( OpenFilter, CloseFilter )
+    set_callbacks( OpenFilter, NULL )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -76,14 +74,6 @@ static int OpenFilter( vlc_object_t *p_this )
              p_filter->fmt_out.video.i_height );
 
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * CloseFilter: clean up the filter
- *****************************************************************************/
-static void CloseFilter( vlc_object_t *p_this )
-{
-    (void)p_this;
 }
 
 /****************************************************************************
