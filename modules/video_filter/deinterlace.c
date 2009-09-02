@@ -94,7 +94,7 @@ static void EndMMX       ( void );
 static void End3DNow     ( void );
 #endif
 
-static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method );
+static void SetFilterMethod( vout_thread_t *p_vout, const char *psz_method );
 static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout );
 
 static int OpenFilter( vlc_object_t *p_this );
@@ -192,7 +192,7 @@ static int Create( vlc_object_t *p_this )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vout_sys_t *p_sys;
-    vlc_value_t val;
+    char *psz_mode;
 
     /* Allocate structure */
     p_sys = p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
@@ -251,22 +251,19 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Look what method was requested */
-    var_Create( p_vout, "deinterlace-mode", VLC_VAR_STRING );
-    var_Change( p_vout, "deinterlace-mode", VLC_VAR_INHERITVALUE, &val, NULL );
+    psz_mode = var_CreateGetString( p_vout, "deinterlace-mode" );
 
-    if( val.psz_string == NULL )
+    if( !psz_mode )
     {
         msg_Err( p_vout, "configuration variable deinterlace-mode empty" );
         msg_Err( p_vout, "no deinterlace mode provided, using \"discard\"" );
 
-        val.psz_string = strdup( "discard" );
+        psz_mode = strdup( "discard" );
     }
 
-    msg_Dbg( p_vout, "using %s deinterlace mode", val.psz_string );
+    SetFilterMethod( p_vout, psz_mode );
 
-    SetFilterMethod( p_vout, val.psz_string );
-
-    free( val.psz_string );
+    free( psz_mode );
 
     return VLC_SUCCESS;
 }
@@ -274,7 +271,7 @@ static int Create( vlc_object_t *p_this )
 /*****************************************************************************
  * SetFilterMethod: setup the deinterlace method to use.
  *****************************************************************************/
-static void SetFilterMethod( vout_thread_t *p_vout, char *psz_method )
+static void SetFilterMethod( vout_thread_t *p_vout, const char *psz_method )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
     if( !strcmp( psz_method, "mean" ) )
