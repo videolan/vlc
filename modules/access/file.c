@@ -134,6 +134,7 @@ struct access_sys_t
     bool b_pace_control;
 };
 
+#ifndef WIN32
 static bool IsRemote (int fd)
 {
 #ifdef HAVE_FSTATFS
@@ -166,6 +167,7 @@ static bool IsRemote (int fd)
 
 #endif
 }
+#endif
 
 #ifndef HAVE_POSIX_FADVISE
 # define posix_fadvise(fd, off, len, adv)
