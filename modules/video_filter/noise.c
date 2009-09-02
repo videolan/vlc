@@ -39,8 +39,6 @@
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
-
 static picture_t *Filter( filter_t *, picture_t * );
 
 #define FILTER_PREFIX "noise-"
@@ -56,19 +54,8 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     add_shortcut( "noise" )
-    set_callbacks( Create, Destroy )
+    set_callbacks( Create, NULL )
 vlc_module_end ()
-
-/*****************************************************************************
- * filter_sys_t: Distort video output method descriptor
- *****************************************************************************
- * This structure is part of the video output thread descriptor.
- * It describes the Distort specific properties of an output thread.
- *****************************************************************************/
-struct filter_sys_t
-{
-    mtime_t last_date;
-};
 
 /*****************************************************************************
  * Create: allocates Distort video thread output method
@@ -78,28 +65,9 @@ struct filter_sys_t
 static int Create( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
-
-    /* Allocate structure */
-    p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
-    if( p_filter->p_sys == NULL )
-        return VLC_ENOMEM;
-
     p_filter->pf_video_filter = Filter;
 
-    p_filter->p_sys->last_date = 0;
-
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Destroy: destroy Distort video thread output method
- *****************************************************************************
- * Terminate an output method created by DistortCreateOutputMethod
- *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
-{
-    filter_t *p_filter = (filter_t *)p_this;
-    free( p_filter->p_sys );
 }
 
 /*****************************************************************************
@@ -112,9 +80,7 @@ static void Destroy( vlc_object_t *p_this )
 static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
-    filter_sys_t *p_sys = p_filter->p_sys;
     int i_index;
-    mtime_t new_date = mdate();
 
     if( !p_pic ) return NULL;
 
@@ -125,8 +91,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         picture_Release( p_pic );
         return NULL;
     }
-
-    p_sys->last_date = new_date;
 
     for( i_index = 0 ; i_index < p_pic->i_planes ; i_index++ )
     {
