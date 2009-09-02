@@ -185,7 +185,7 @@ case $HOST in
         RANLIB="ranlib"
         AR="ar"
         STRIP="strip"
-        DISTRO=darwin
+        DISTRO=darwin64
         if test -e /Developer/SDKs; then
             echo "SDKs found. Everything is fine." >&2
         else
