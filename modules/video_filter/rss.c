@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
+ *          Rémi Duraffort <ivoire -at- videolan -dot- org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -41,7 +42,6 @@
 #include <vlc_block.h>
 #include <vlc_osd.h>
 
-#include <vlc_block.h>
 #include <vlc_stream.h>
 #include <vlc_xml.h>
 #include <vlc_charset.h>
@@ -119,7 +119,6 @@ struct filter_sys_t
     int i_feeds;
     rss_feed_t *p_feeds;
 
-    int i_ttl;
     bool b_images;
     int i_title;
 
@@ -217,7 +216,7 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "length", 60, NULL, LENGTH_TEXT, LENGTH_LONGTEXT,
                  false )
     add_integer( CFG_PREFIX "ttl", 1800, NULL, TTL_TEXT, TTL_LONGTEXT, false )
-    add_bool( CFG_PREFIX "images", 1, NULL, IMAGE_TEXT, IMAGE_LONGTEXT, false )
+    add_bool( CFG_PREFIX "images", true, NULL, IMAGE_TEXT, IMAGE_LONGTEXT, false )
     add_integer( CFG_PREFIX "title", default_title, NULL, TITLE_TEXT, TITLE_LONGTEXT, false )
         change_integer_list( pi_title_modes, ppsz_title_modes, NULL )
 
@@ -240,6 +239,7 @@ static int CreateFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     int i_ret = VLC_ENOMEM;
     char *psz_urls;
+    int i_ttl;
 
     /* Allocate structure */
     p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
@@ -249,7 +249,7 @@ static int CreateFilter( vlc_object_t *p_this )
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
 
-    psz_urls = var_CreateGetString( p_filter, CFG_PREFIX "urls" );
+    /* Fill the p_sys structure with the configuration */
     p_sys->i_title = var_CreateGetInteger( p_filter, CFG_PREFIX "title" );
     p_sys->i_cur_feed = 0;
     p_sys->i_cur_item = p_sys->i_title == scroll_title ? -1 : 0;
@@ -258,8 +258,10 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->p_feeds = NULL;
     p_sys->i_speed = var_CreateGetInteger( p_filter, CFG_PREFIX "speed" );
     p_sys->i_length = var_CreateGetInteger( p_filter, CFG_PREFIX "length" );
-    p_sys->i_ttl = __MAX( 0, var_CreateGetInteger( p_filter, CFG_PREFIX "ttl" ) );
     p_sys->b_images = var_CreateGetBool( p_filter, CFG_PREFIX "images" );
+
+    i_ttl = __MAX( 0, var_CreateGetInteger( p_filter, CFG_PREFIX "ttl" ) );
+    psz_urls = var_CreateGetString( p_filter, CFG_PREFIX "urls" );
 
     p_sys->psz_marquee = malloc( p_sys->i_length + 1 );
     if( p_sys->psz_marquee == NULL )
@@ -277,7 +279,7 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->p_style->i_font_color = var_CreateGetInteger( p_filter, CFG_PREFIX "color" );
     p_sys->p_style->i_font_size = var_CreateGetInteger( p_filter, CFG_PREFIX "size" );
 
-    if( p_sys->b_images == true && p_sys->p_style->i_font_size == -1 )
+    if( p_sys->b_images && p_sys->p_style->i_font_size == -1 )
     {
         msg_Warn( p_filter, "rss-size wasn't specified. Feed images will thus be displayed without being resized" );
     }
@@ -303,7 +305,7 @@ static int CreateFilter( vlc_object_t *p_this )
         goto error;
     }
     vlc_timer_schedule( p_sys->timer, false, 1,
-                        (mtime_t)(p_sys->i_ttl)*1000000 );
+                        (mtime_t)(i_ttl)*1000000 );
 
     return VLC_SUCCESS;
 
