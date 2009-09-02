@@ -237,6 +237,7 @@ static int Open (vlc_object_t *obj)
     if (err)
     {
         msg_Err (wnd, "creating window: X11 error %d", err->error_code);
+        free (err);
         goto error;
     }
 
