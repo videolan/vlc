@@ -1,6 +1,6 @@
-diff -ruN -- libiconv/lib/aliases.h libiconv.new2/lib/aliases.h
+diff -ruN libiconv/lib/aliases.h libiconv.new/lib/aliases.h
 --- libiconv/lib/aliases.h	2009-06-30 22:51:58.000000000 +0200
-+++ libiconv.new2/lib/aliases.h	2009-09-02 22:12:35.000000000 +0200
++++ libiconv.new/lib/aliases.h	2009-09-02 23:20:33.000000000 +0200
 @@ -808,852 +808,852 @@
    {
      {-1}, {-1}, {-1}, {-1}, {-1}, {-1}, {-1},
@@ -1229,23 +1229,23 @@ diff -ruN -- libiconv/lib/aliases.h libiconv.new2/lib/aliases.h
    };
  
  #ifdef __GNUC__
-diff -ruN -- libiconv/lib/iconv.c libiconv.new2/lib/iconv.c
---- libiconv/lib/iconv.c	2009-09-02 22:16:23.000000000 +0200
-+++ libiconv.new2/lib/iconv.c	2009-06-21 13:17:33.000000000 +0200
-@@ -21,7 +21,6 @@
+diff -ruN libiconv/lib/iconv.c libiconv.new/lib/iconv.c
+--- libiconv/lib/iconv.c	2009-06-21 13:17:33.000000000 +0200
++++ libiconv.new/lib/iconv.c	2009-09-02 23:24:06.000000000 +0200
+@@ -21,6 +21,7 @@
  #include <iconv.h>
  
  #include <stdlib.h>
--#include <stdint.h>
++#include <stdint.h>
  #include <string.h>
  #include "config.h"
  #include "localcharset.h"
-@@ -169,7 +168,7 @@
+@@ -168,7 +169,7 @@
  };
  #define stringpool2 ((const char *) &stringpool2_contents)
  static const struct alias sysdep_aliases[] = {
--#define S(tag,name,encoding_index) { (int)(intptr_t)&((struct stringpool2_t *)0)->stringpool_##tag, encoding_index },
-+#define S(tag,name,encoding_index) { (int)(long)&((struct stringpool2_t *)0)->stringpool_##tag, encoding_index },
+-#define S(tag,name,encoding_index) { (int)(long)&((struct stringpool2_t *)0)->stringpool_##tag, encoding_index },
++#define S(tag,name,encoding_index) { (int)(intptr_t)&((struct stringpool2_t *)0)->stringpool_##tag, encoding_index },
  #include "aliases2.h"
  #undef S
  };
