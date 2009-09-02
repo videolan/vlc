@@ -53,6 +53,7 @@ DECLARE_OPEN(xcb_xv);
 DECLARE_OPEN(dummy);
 DECLARE_OPEN(fb);
 DECLARE_OPEN(directfb);
+DECLARE_OPEN(yuv);
 
 #undef DECLARE_OPEN
 
@@ -89,6 +90,9 @@ vlc_module_begin()
 
     add_submodule()
     DECLARE_MODULE(directfb, 60)
+
+    add_submodule()
+    DECLARE_MODULE(yuv, 0)
 
 vlc_module_end()
 
