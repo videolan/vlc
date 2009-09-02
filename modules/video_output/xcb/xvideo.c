@@ -593,10 +593,11 @@ static void Display (vout_display_t *vd, picture_t *pic)
 {
     vout_display_sys_t *p_sys = vd->sys;
     xcb_shm_seg_t segment = pic->p_sys->segment;
+    xcb_void_cookie_t ck;
 
     if (segment)
-        xcb_xv_shm_put_image (p_sys->conn, p_sys->port, p_sys->window,
-                              p_sys->gc, segment, p_sys->id, 0,
+        ck = xcb_xv_shm_put_image_checked (p_sys->conn, p_sys->port,
+                              p_sys->window, p_sys->gc, segment, p_sys->id, 0,
                    /* Src: */ vd->source.i_x_offset,
                               vd->source.i_y_offset,
                               vd->source.i_visible_width,
@@ -605,7 +606,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
                 /* Memory: */ pic->p->i_pitch / pic->p->i_pixel_pitch,
                               pic->p->i_visible_lines, false);
     else
-        xcb_xv_put_image (p_sys->conn, p_sys->port, p_sys->window,
+        ck = xcb_xv_put_image_checked (p_sys->conn, p_sys->port, p_sys->window,
                           p_sys->gc, p_sys->id,
                           vd->source.i_x_offset,
                           vd->source.i_y_offset,
@@ -615,7 +616,14 @@ static void Display (vout_display_t *vd, picture_t *pic)
                           vd->source.i_width, vd->source.i_height,
                           p_sys->data_size, pic->p->p_pixels);
 
-    xcb_flush (p_sys->conn);
+    /* Wait for reply. See x11.c for rationale. */
+    xcb_generic_error_t *e = xcb_request_check (p_sys->conn, ck);
+    if (e != NULL)
+    {
+        msg_Dbg (vd, "%s: X11 error %d", "cannot put image", e->error_code);
+        free (e);
+    }
+
     picture_Release (pic);
 }
 
