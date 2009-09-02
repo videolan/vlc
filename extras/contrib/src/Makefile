@@ -401,13 +401,9 @@ libiconv-$(LIBICONV_VERSION).tar.gz:
 
 libiconv: libiconv-$(LIBICONV_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_DARWIN_OS
-	patch -p0 < Patches/libiconv.patch
-endif
 ifdef HAVE_WIN64
 	patch -p0 < Patches/libiconv-win64.patch
 endif
-	patch -p0 < Patches/libiconv-autoconf-uclibc.patch
 
 libiconv-snowleopard.tar.bz2:
 	$(WGET) $(LIBICONVMAC_URL)
