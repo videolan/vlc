@@ -32,6 +32,9 @@
 # include "config.h"
 #endif
 
+/* prevent system sleep */
+#import <CoreServices/CoreServices.h>
+
 #include <vlc/vlc.h>
 
 /* Notification Messages */
@@ -651,8 +654,16 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     [self didChangeValueForKey:@"time"];
 }
 
+- (void)delaySleep
+{
+    UpdateSystemActivity(UsrActivity);
+}
+
 - (void)mediaPlayerPositionChanged:(NSNumber *)newPosition
 {
+    // This seems to be the most relevant place to delay sleeping and screen saver.
+    [self delaySleep];
+
     [self willChangeValueForKey:@"position"];
     position = [newPosition floatValue];
     [self didChangeValueForKey:@"position"];
@@ -664,4 +675,5 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     cachedState = [newState intValue];
     [self didChangeValueForKey:@"state"];
 }
+
 @end
