@@ -1361,6 +1361,6 @@ void StopEventThread( vout_thread_t *p_vout )
         vlc_object_release( p_vout->p_sys->p_event );
     }
 
-    if( !p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG )
+    if( !( p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG ) )
         vlc_mutex_destroy( &p_vout->p_sys->lock );
 }
