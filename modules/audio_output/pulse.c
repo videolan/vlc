@@ -165,7 +165,7 @@ static int Open ( vlc_object_t *p_this )
     }
 
     /* Add a quick command line info message */
-    msg_Info(p_aout, "No. of Audio Channels: %d", ss.channels);
+    msg_Dbg(p_aout, "%d audio channels", ss.channels);
 
     ss.rate = p_aout->output.output.i_rate;
     ss.format = PA_SAMPLE_FLOAT32NE;
