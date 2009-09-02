@@ -125,7 +125,7 @@ vlc_module_begin ()
     add_integer( "xvmc-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true )
     add_string( "xvmc-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
 #ifdef HAVE_SYS_SHM_H
-    add_bool( "xvmc-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true )
+    add_bool( "xvmc-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true )
 #endif
     add_string( "xvmc-deinterlace-mode", "bob", NULL, MODE_TEXT, MODE_LONGTEXT, false )
     add_string( "xvmc-crop-style", "eq", NULL, CROP_TEXT, CROP_LONGTEXT, false )

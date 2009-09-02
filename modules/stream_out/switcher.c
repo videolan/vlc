@@ -131,7 +131,7 @@ vlc_module_begin ()
                  GOP_TEXT, GOP_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "qscale", 5, NULL,
                  QSCALE_TEXT, QSCALE_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "mute-audio", 1, NULL,
+    add_bool( SOUT_CFG_PREFIX "mute-audio", true, NULL,
               AUDIO_TEXT, AUDIO_LONGTEXT, true )
 vlc_module_end ()
 

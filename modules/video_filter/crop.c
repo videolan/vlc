@@ -109,7 +109,7 @@ vlc_module_begin ()
 
     add_string( "crop-geometry", NULL, NULL, GEOMETRY_TEXT,
                                              GEOMETRY_LONGTEXT, false )
-    add_bool( "autocrop", 0, NULL, AUTOCROP_TEXT,
+    add_bool( "autocrop", false, NULL, AUTOCROP_TEXT,
                                    AUTOCROP_LONGTEXT, false )
 
 #ifdef BEST_AUTOCROP

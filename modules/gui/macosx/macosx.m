@@ -106,19 +106,19 @@ vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     linked_with_a_crap_library_which_uses_atexit( )
-    add_bool( "macosx-autoplay", 1, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
+    add_bool( "macosx-autoplay", true, NULL, AUTOPLAY_OSX_TEST, AUTOPLAY_OSX_LONGTEXT,
               false )
-    add_bool( "macosx-recentitems", 1, NULL, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT,
+    add_bool( "macosx-recentitems", true, NULL, RECENT_ITEMS_TEXT, RECENT_ITEMS_LONGTEXT,
               false )
-    add_bool( "macosx-eq-keep", 1, NULL, EQ_KEEP_TEXT, EQ_KEEP_LONGTEXT,
+    add_bool( "macosx-eq-keep", true, NULL, EQ_KEEP_TEXT, EQ_KEEP_LONGTEXT,
               false )
-    add_bool( "macosx-fspanel", 1, NULL, FSPANEL_TEXT, FSPANEL_LONGTEXT,
+    add_bool( "macosx-fspanel", true, NULL, FSPANEL_TEXT, FSPANEL_LONGTEXT,
               false )
-    add_bool( "macosx-appleremote", 1, NULL, USE_APPLE_REMOTE_TEXT, USE_APPLE_REMOTE_LONGTEXT,
+    add_bool( "macosx-appleremote", true, NULL, USE_APPLE_REMOTE_TEXT, USE_APPLE_REMOTE_LONGTEXT,
              false )
-    add_bool( "macosx-mediakeys", 1, NULL, USE_MEDIAKEYS_TEXT, USE_MEDIAKEYS_LONGTEXT,
+    add_bool( "macosx-mediakeys", true, NULL, USE_MEDIAKEYS_TEXT, USE_MEDIAKEYS_LONGTEXT,
              false )
-    add_bool( "macosx-mediakeys-background", 1, NULL, USE_MEDIAKEYS_BACKGROUND_TEXT, USE_MEDIAKEYS_BACKGROUND_LONGTEXT,
+    add_bool( "macosx-mediakeys-background", true, NULL, USE_MEDIAKEYS_BACKGROUND_TEXT, USE_MEDIAKEYS_BACKGROUND_LONGTEXT,
              false )
 
     add_submodule ()
@@ -130,13 +130,13 @@ vlc_module_begin ()
 
         add_integer( "macosx-vdev", 0, NULL, VDEV_TEXT, VDEV_LONGTEXT,
                      false )
-        add_bool( "macosx-stretch", 0, NULL, STRETCH_TEXT, STRETCH_LONGTEXT,
+        add_bool( "macosx-stretch", false, NULL, STRETCH_TEXT, STRETCH_LONGTEXT,
                   false )
         add_float_with_range( "macosx-opaqueness", 1, 0, 1, NULL,
                               OPAQUENESS_TEXT, OPAQUENESS_LONGTEXT, true );
-        add_bool( "macosx-black", 1, NULL, BLACK_TEXT, BLACK_LONGTEXT,
+        add_bool( "macosx-black", true, NULL, BLACK_TEXT, BLACK_LONGTEXT,
                   false )
-        add_bool( "macosx-background", 0, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
+        add_bool( "macosx-background", false, NULL, BACKGROUND_TEXT, BACKGROUND_LONGTEXT,
                   false )
 vlc_module_end ()
 

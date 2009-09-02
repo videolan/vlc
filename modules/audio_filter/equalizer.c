@@ -82,7 +82,7 @@ vlc_module_begin ()
         change_string_list( preset_list, preset_list_text, 0 )
     add_string( "equalizer-bands", NULL, NULL, BANDS_TEXT,
                 BANDS_LONGTEXT, true )
-    add_bool( "equalizer-2pass", 0, NULL, TWOPASS_TEXT,
+    add_bool( "equalizer-2pass", false, NULL, TWOPASS_TEXT,
               TWOPASS_LONGTEXT, true )
     add_float( "equalizer-preamp", 12.0, NULL, PREAMP_TEXT,
                PREAMP_LONGTEXT, true )

@@ -133,11 +133,11 @@ vlc_module_begin ()
     add_integer_with_range( RMTOSD_CFG "update", RMTOSD_UPDATE_DEFAULT,
         RMTOSD_UPDATE_MIN, RMTOSD_UPDATE_MAX, NULL, RMTOSD_UPDATE_TEXT,
         RMTOSD_UPDATE_LONGTEXT, true )
-    add_bool( RMTOSD_CFG "vnc-polling", 0, NULL,
+    add_bool( RMTOSD_CFG "vnc-polling", false, NULL,
               RMTOSD_POLL_TEXT , RMTOSD_POLL_LONGTEXT, false )
-    add_bool( RMTOSD_CFG "mouse-events", 0, NULL,
+    add_bool( RMTOSD_CFG "mouse-events", false, NULL,
               RMTOSD_MOUSE_TEXT , RMTOSD_MOUSE_LONGTEXT, false )
-    add_bool( RMTOSD_CFG "key-events", 0, NULL,
+    add_bool( RMTOSD_CFG "key-events", false, NULL,
               RMTOSD_KEYS_TEXT , RMTOSD_KEYS_LONGTEXT, false )
     add_integer_with_range( RMTOSD_CFG "alpha", 255, 0, 255, NULL,
         RMTOSD_ALPHA_TEXT, RMTOSD_ALPHA_LONGTEXT, true )

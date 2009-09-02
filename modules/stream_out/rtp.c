@@ -206,7 +206,7 @@ vlc_module_begin ()
     add_string( SOUT_CFG_PREFIX "salt", "", NULL,
                 SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "mp4a-latm", 0, NULL, RFC3016_TEXT,
+    add_bool( SOUT_CFG_PREFIX "mp4a-latm", false, NULL, RFC3016_TEXT,
                  RFC3016_LONGTEXT, false )
 
     set_callbacks( Open, Close )

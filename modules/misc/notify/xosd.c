@@ -87,7 +87,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INTERFACE_CONTROL )
     set_description( N_("XOSD interface") )
     set_shortname( "XOSD" )
-    add_bool( "xosd-position", 1, NULL, POSITION_TEXT, POSITION_LONGTEXT, true )
+    add_bool( "xosd-position", true, NULL, POSITION_TEXT, POSITION_LONGTEXT, true )
     add_integer( "xosd-text-offset", 30, NULL, TXT_OFS_TEXT, TXT_OFS_LONGTEXT, true )
     add_integer( "xosd-shadow-offset", 2, NULL,
                  SHD_OFS_TEXT, SHD_OFS_LONGTEXT, true )

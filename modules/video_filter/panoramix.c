@@ -92,7 +92,7 @@ vlc_module_begin()
 
 #define ATTENUATION_TEXT N_("Attenuation")
 #define ATTENUATION_LONGTEXT N_("Check this option if you want attenuate blended zone by this plug-in (if option is unchecked, attenuate is made by opengl)")
-    add_bool( CFG_PREFIX "attenuate", 1, NULL, ATTENUATION_TEXT, ATTENUATION_LONGTEXT, false )
+    add_bool( CFG_PREFIX "attenuate", true, NULL, ATTENUATION_TEXT, ATTENUATION_LONGTEXT, false )
 
 #define BEGIN_TEXT N_("Attenuation, begin (in %)")
 #define BEGIN_LONGTEXT N_("Select in percent the Lagrange coeff of the beginning blended zone")

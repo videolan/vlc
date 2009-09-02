@@ -179,7 +179,7 @@ vlc_module_begin ()
                FPS_LONGTEXT, false )
     add_bool( SOUT_CFG_PREFIX "hurry-up", true, NULL, HURRYUP_TEXT,
                HURRYUP_LONGTEXT, false )
-    add_bool( SOUT_CFG_PREFIX "deinterlace", 0, NULL, DEINTERLACE_TEXT,
+    add_bool( SOUT_CFG_PREFIX "deinterlace", false, NULL, DEINTERLACE_TEXT,
               DEINTERLACE_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "deinterlace-module", "deinterlace", NULL,
                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,
@@ -208,7 +208,7 @@ vlc_module_begin ()
                  ACHANS_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "samplerate", 0, NULL, ARATE_TEXT,
                  ARATE_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "audio-sync", 0, NULL, ASYNC_TEXT,
+    add_bool( SOUT_CFG_PREFIX "audio-sync", false, NULL, ASYNC_TEXT,
               ASYNC_LONGTEXT, false )
     add_module_list( SOUT_CFG_PREFIX "afilter",  "audio filter2",
                      NULL, NULL,
@@ -219,20 +219,20 @@ vlc_module_begin ()
                 SENC_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "scodec", NULL, NULL, SCODEC_TEXT,
                 SCODEC_LONGTEXT, false )
-    add_bool( SOUT_CFG_PREFIX "soverlay", 0, NULL, SCODEC_TEXT,
+    add_bool( SOUT_CFG_PREFIX "soverlay", false, NULL, SCODEC_TEXT,
                SCODEC_LONGTEXT, false )
     add_module_list( SOUT_CFG_PREFIX "sfilter", "video filter",
                      NULL, NULL,
                      SFILTER_TEXT, SFILTER_LONGTEXT, false )
 
     set_section( N_("On Screen Display"), NULL )
-    add_bool( SOUT_CFG_PREFIX "osd", 0, NULL, OSD_TEXT,
+    add_bool( SOUT_CFG_PREFIX "osd", false, NULL, OSD_TEXT,
               OSD_LONGTEXT, false )
 
     set_section( N_("Miscellaneous"), NULL )
     add_integer( SOUT_CFG_PREFIX "threads", 0, NULL, THREADS_TEXT,
                  THREADS_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "high-priority", 0, NULL, HP_TEXT, HP_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "high-priority", false, NULL, HP_TEXT, HP_LONGTEXT,
               true )
 
 vlc_module_end ()

@@ -210,7 +210,7 @@ vlc_module_begin ()
 #endif
     add_string( SOUT_CFG_PREFIX "program-pmt", NULL, NULL, PMTPROG_TEXT,
                 PMTPROG_LONGTEXT, true )
-    add_bool( SOUT_CFG_PREFIX "es-id-pid", 0, NULL, PID_TEXT, PID_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "es-id-pid", false, NULL, PID_TEXT, PID_LONGTEXT,
               true )
     add_string( SOUT_CFG_PREFIX "muxpmt", NULL, NULL, MUXPMT_TEXT, MUXPMT_LONGTEXT, true )
 #ifdef HAVE_DVBPSI_SDT

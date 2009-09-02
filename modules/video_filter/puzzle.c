@@ -62,7 +62,7 @@ vlc_module_begin()
                             ROWS_TEXT, ROWS_LONGTEXT, false )
     add_integer_with_range( CFG_PREFIX "cols", 4, 1, 128, NULL,
                             COLS_TEXT, COLS_LONGTEXT, false )
-    add_bool( CFG_PREFIX "black-slot", 0, NULL,
+    add_bool( CFG_PREFIX "black-slot", false, NULL,
               BLACKSLOT_TEXT, BLACKSLOT_LONGTEXT, false )
 
     set_callbacks( Open, Close )

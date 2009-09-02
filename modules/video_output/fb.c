@@ -82,7 +82,7 @@ vlc_module_begin ()
     set_subcategory(SUBCAT_VIDEO_VOUT)
     add_file(FB_DEV_VAR, "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
               false)
-    add_bool("fb-tty", 1, NULL, TTY_TEXT, TTY_LONGTEXT, true)
+    add_bool("fb-tty", true, NULL, TTY_TEXT, TTY_LONGTEXT, true)
     add_obsolete_string("fb-chroma")
     add_obsolete_string("fb-aspect-ratio")
     add_integer("fb-mode", 4, NULL, FB_MODE_TEXT, FB_MODE_LONGTEXT,

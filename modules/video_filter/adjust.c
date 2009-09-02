@@ -95,7 +95,7 @@ vlc_module_begin ()
     add_float_with_range( "gamma", 1.0, 0.01, 10.0, NULL,
                           GAMMA_TEXT, GAMMA_LONGTEXT, false )
 
-    add_bool( "brightness-threshold", 0, NULL,
+    add_bool( "brightness-threshold", false, NULL,
               THRES_TEXT, THRES_LONGTEXT, false )
 
     add_shortcut( "adjust" )

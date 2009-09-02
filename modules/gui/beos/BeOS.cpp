@@ -52,7 +52,7 @@ void CloseVideo   ( vlc_object_t * );
 vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
-    add_bool( "beos-dvdmenus", 0, NULL, _("Use DVD Menus"), "", true )
+    add_bool( "beos-dvdmenus", false, NULL, _("Use DVD Menus"), "", true )
     set_shortname( "BeOS" )
     set_description( N_("BeOS standard API interface") )
     set_capability( "interface", 100 )

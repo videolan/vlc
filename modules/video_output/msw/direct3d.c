@@ -124,7 +124,7 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
 
-    add_bool( "direct3d-desktop", 0, NULL, DESKTOP_TEXT, DESKTOP_LONGTEXT,
+    add_bool( "direct3d-desktop", false, NULL, DESKTOP_TEXT, DESKTOP_LONGTEXT,
               true )
 
     set_description( N_("DirectX 3D video output") )

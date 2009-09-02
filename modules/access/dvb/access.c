@@ -207,15 +207,15 @@ vlc_module_begin ()
                  false )
     add_integer( "dvb-inversion", 2, NULL, INVERSION_TEXT, INVERSION_LONGTEXT,
                  true )
-    add_bool( "dvb-probe", 1, NULL, PROBE_TEXT, PROBE_LONGTEXT, true )
-    add_bool( "dvb-budget-mode", 0, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
+    add_bool( "dvb-probe", true, NULL, PROBE_TEXT, PROBE_LONGTEXT, true )
+    add_bool( "dvb-budget-mode", false, NULL, BUDGET_TEXT, BUDGET_LONGTEXT,
               true )
     /* DVB-S (satellite) */
     add_integer( "dvb-satno", 0, NULL, SATNO_TEXT, SATNO_LONGTEXT,
                  true )
     add_integer( "dvb-voltage", 13, NULL, VOLTAGE_TEXT, VOLTAGE_LONGTEXT,
                  true )
-    add_bool( "dvb-high-voltage", 0, NULL, HIGH_VOLTAGE_TEXT,
+    add_bool( "dvb-high-voltage", false, NULL, HIGH_VOLTAGE_TEXT,
               HIGH_VOLTAGE_LONGTEXT, true )
     add_integer( "dvb-tone", -1, NULL, TONE_TEXT, TONE_LONGTEXT,
                  true )

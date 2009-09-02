@@ -54,13 +54,13 @@ vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
 
-    add_bool( "playlist-autostart", 1, NULL,
+    add_bool( "playlist-autostart", true, NULL,
               AUTOSTART_TEXT, AUTOSTART_LONGTEXT, false )
 
     add_integer( "parent-item", 0, NULL, NULL, NULL, true )
         change_internal ()
 
-    add_bool( "playlist-skip-ads", 1, NULL,
+    add_bool( "playlist-skip-ads", true, NULL,
               SKIP_ADS_TEXT, SKIP_ADS_LONGTEXT, false )
 
     set_shortname( N_("Playlist") )

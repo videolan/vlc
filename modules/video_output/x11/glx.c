@@ -112,7 +112,7 @@ vlc_module_begin ()
     add_string( "glx-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
     add_integer( "glx-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true )
 #ifdef HAVE_SYS_SHM_H
-    add_bool( "glx-shm", 1, NULL, SHM_TEXT, SHM_LONGTEXT, true )
+    add_bool( "glx-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true )
 #endif
 vlc_module_end ()
 

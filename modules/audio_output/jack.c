@@ -85,7 +85,7 @@ vlc_module_begin ()
     set_capability( "audio output", 100 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
-    add_bool( AUTO_CONNECT_OPTION, 0, NULL, AUTO_CONNECT_TEXT,
+    add_bool( AUTO_CONNECT_OPTION, false, NULL, AUTO_CONNECT_TEXT,
               AUTO_CONNECT_LONGTEXT, true )
     add_string( CONNECT_REGEX_OPTION, NULL, NULL, CONNECT_REGEX_TEXT,
                 CONNECT_REGEX_LONGTEXT, true )

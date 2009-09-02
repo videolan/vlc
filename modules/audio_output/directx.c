@@ -243,7 +243,7 @@ vlc_module_begin ()
     add_shortcut( "directx" )
     add_integer( "directx-audio-device", 0, NULL, DEVICE_TEXT,
                  DEVICE_LONGTEXT, true )
-    add_bool( "directx-audio-float32", 0, 0, FLOAT_TEXT,
+    add_bool( "directx-audio-float32", false, NULL, FLOAT_TEXT,
               FLOAT_LONGTEXT, true )
     add_string( "directx-audio-speaker", "Windows default", NULL,
                  SPEAKER_TEXT, SPEAKER_LONGTEXT, true )

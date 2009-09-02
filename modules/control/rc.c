@@ -191,13 +191,13 @@ vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     set_description( N_("Remote control interface") )
-    add_bool( "rc-show-pos", 0, NULL, POS_TEXT, POS_LONGTEXT, true )
+    add_bool( "rc-show-pos", false, NULL, POS_TEXT, POS_LONGTEXT, true )
 
 #ifdef WIN32
-    add_bool( "rc-quiet", 0, NULL, QUIET_TEXT, QUIET_LONGTEXT, false )
+    add_bool( "rc-quiet", false, NULL, QUIET_TEXT, QUIET_LONGTEXT, false )
 #else
 #if defined (HAVE_ISATTY)
-    add_bool( "rc-fake-tty", 0, NULL, TTY_TEXT, TTY_LONGTEXT, true )
+    add_bool( "rc-fake-tty", false, NULL, TTY_TEXT, TTY_LONGTEXT, true )
 #endif
     add_string( "rc-unix", NULL, NULL, UNIX_TEXT, UNIX_LONGTEXT, true )
 #endif

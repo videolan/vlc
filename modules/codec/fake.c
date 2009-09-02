@@ -100,11 +100,11 @@ vlc_module_begin ()
                  WIDTH_LONGTEXT, true )
     add_integer( "fake-height", 0, NULL, HEIGHT_TEXT,
                  HEIGHT_LONGTEXT, true )
-    add_bool( "fake-keep-ar", 0, NULL, KEEP_AR_TEXT, KEEP_AR_LONGTEXT,
+    add_bool( "fake-keep-ar", false, NULL, KEEP_AR_TEXT, KEEP_AR_LONGTEXT,
               true )
     add_string( "fake-aspect-ratio", "", NULL,
                 ASPECT_RATIO_TEXT, ASPECT_RATIO_LONGTEXT, true )
-    add_bool( "fake-deinterlace", 0, NULL, DEINTERLACE_TEXT,
+    add_bool( "fake-deinterlace", false, NULL, DEINTERLACE_TEXT,
               DEINTERLACE_LONGTEXT, false )
     add_string( "fake-deinterlace-module", "deinterlace", NULL,
                 DEINTERLACE_MODULE_TEXT, DEINTERLACE_MODULE_LONGTEXT,

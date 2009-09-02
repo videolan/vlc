@@ -112,7 +112,7 @@ vlc_module_begin ()
         add_shortcut( "livedotcom" )
         set_capability( "access_demux", 0 )
         set_callbacks( Open, Close )
-        add_bool( "rtsp-tcp", 0, NULL,
+        add_bool( "rtsp-tcp", false, NULL,
                   N_("Use RTP over RTSP (TCP)"),
                   N_("Use RTP over RTSP (TCP)"), true )
             change_safe()
@@ -123,7 +123,7 @@ vlc_module_begin ()
                   N_("Force multicast RTP via RTSP"),
                   N_("Force multicast RTP via RTSP"), true )
             change_safe()
-        add_bool( "rtsp-http", 0, NULL,
+        add_bool( "rtsp-http", false, NULL,
                   N_("Tunnel RTSP and RTP over HTTP"),
                   N_("Tunnel RTSP and RTP over HTTP"), true )
             change_safe()

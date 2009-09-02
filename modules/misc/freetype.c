@@ -167,7 +167,7 @@ vlc_module_begin ()
                  EFFECT_LONGTEXT, false )
         change_integer_list( pi_effects, ppsz_effects_text, NULL )
 
-    add_bool( "freetype-yuvp", 0, NULL, YUVP_TEXT,
+    add_bool( "freetype-yuvp", false, NULL, YUVP_TEXT,
               YUVP_LONGTEXT, true )
     set_capability( "text renderer", 100 )
     add_shortcut( "text" )

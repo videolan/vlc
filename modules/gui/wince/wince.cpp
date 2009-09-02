@@ -71,7 +71,7 @@ vlc_module_begin ()
 
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
-    add_bool( "wince-embed", 1, NULL,
+    add_bool( "wince-embed", true, NULL,
               EMBED_TEXT, EMBED_LONGTEXT, false )
 
     add_submodule ()
