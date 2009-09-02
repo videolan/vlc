@@ -50,6 +50,7 @@ int CheckError (vout_display_t *vd, xcb_connection_t *conn,
     if (err)
     {
         msg_Err (vd, "%s: X11 error %d", str, err->error_code);
+        free (err);
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
