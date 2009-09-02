@@ -1051,7 +1051,7 @@ FFMPEGCONF += \
 	--disable-protocols \
 	--disable-network
 ifdef HAVE_WIN32
-FFMPEGCONF += --disable-bzlib --disable-decoder=dca
+FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=ac3
 endif
 
 ifdef HAVE_WINCE
