@@ -193,7 +193,7 @@ vlc_module_begin ()
     set_callbacks( CreateFilter, DestroyFilter )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
-    add_string( CFG_PREFIX "urls", "rss", NULL, MSG_TEXT, MSG_LONGTEXT, false )
+    add_string( CFG_PREFIX "urls", NULL, NULL, MSG_TEXT, MSG_LONGTEXT, false )
 
     set_section( N_("Position"), NULL )
     add_integer( CFG_PREFIX "x", 0, NULL, POSX_TEXT, POSX_LONGTEXT, true )
@@ -237,7 +237,6 @@ static int CreateFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
-    int i_ret = VLC_ENOMEM;
     char *psz_urls;
     int i_ttl;
 
@@ -248,6 +247,15 @@ static int CreateFilter( vlc_object_t *p_this )
 
     config_ChainParse( p_filter, CFG_PREFIX, ppsz_filter_options,
                        p_filter->p_cfg );
+
+    /* Get the urls to parse: must be non empty */
+    psz_urls = var_CreateGetNonEmptyString( p_filter, CFG_PREFIX "urls" );
+    if( !psz_urls )
+    {
+        msg_Err( p_filter, "The list of urls must not be empty" );
+        free( p_sys );
+        return VLC_EGENERIC;
+    }
 
     /* Fill the p_sys structure with the configuration */
     p_sys->i_title = var_CreateGetInteger( p_filter, CFG_PREFIX "title" );
@@ -261,11 +269,14 @@ static int CreateFilter( vlc_object_t *p_this )
     p_sys->b_images = var_CreateGetBool( p_filter, CFG_PREFIX "images" );
 
     i_ttl = __MAX( 0, var_CreateGetInteger( p_filter, CFG_PREFIX "ttl" ) );
-    psz_urls = var_CreateGetString( p_filter, CFG_PREFIX "urls" );
 
     p_sys->psz_marquee = malloc( p_sys->i_length + 1 );
     if( p_sys->psz_marquee == NULL )
-        goto error;
+    {
+        free( psz_urls );
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
     p_sys->psz_marquee[p_sys->i_length] = '\0';
 
     p_sys->p_style = text_style_New();
@@ -286,11 +297,7 @@ static int CreateFilter( vlc_object_t *p_this )
 
     /* Parse the urls */
     if( ParseUrls( p_filter, psz_urls ) )
-    {
-        free( psz_urls );
         goto error;
-    }
-    free( psz_urls );
 
     /* Misc init */
     vlc_mutex_init( &p_sys->lock );
@@ -307,12 +314,16 @@ static int CreateFilter( vlc_object_t *p_this )
     vlc_timer_schedule( p_sys->timer, false, 1,
                         (mtime_t)(i_ttl)*1000000 );
 
+    free( psz_urls );
     return VLC_SUCCESS;
 
 error:
+    if( p_sys->p_style )
+        text_style_Delete( p_sys->p_style );
     free( p_sys->psz_marquee );
+    free( psz_urls );
     free( p_sys );
-    return i_ret;
+    return VLC_ENOMEM;
 }
 /*****************************************************************************
  * DestroyFilter: destroy RSS video filter
