@@ -171,6 +171,7 @@ endif
 # Installing statically-linked VLC plugins is so much simpler.
 HOSTCONF += --with-pic --disable-shared
 endif
+FFMPEGCONF += --enable-pic
 X264CONF += --enable-pic
 endif
 
