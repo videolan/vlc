@@ -34,6 +34,10 @@
 
 /* prevent system sleep */
 #import <CoreServices/CoreServices.h>
+/* FIXME: Ugly hack! */
+#ifdef __x86_64__
+#import <CoreServices/../Frameworks/OSServices.framework/Headers/Power.h>
+#endif
 
 #include <vlc/vlc.h>
 
