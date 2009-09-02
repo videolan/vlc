@@ -168,8 +168,16 @@ static int Open ( vlc_object_t *p_this )
     msg_Dbg(p_aout, "%d audio channels", ss.channels);
 
     ss.rate = p_aout->output.output.i_rate;
-    ss.format = PA_SAMPLE_FLOAT32NE;
-    p_aout->output.output.i_format = VLC_CODEC_FL32;
+    if (vlc_CPU() & CPU_CAPABILITY_FPU)
+    {
+        ss.format = PA_SAMPLE_FLOAT32NE;
+        p_aout->output.output.i_format = VLC_CODEC_FL32;
+    }
+    else
+    {
+        ss.format = PA_SAMPLE_S16NE;
+        p_aout->output.output.i_format = VLC_CODEC_S16N;
+    }
 
     if (!pa_sample_spec_valid(&ss)) {
         msg_Err(p_aout,"Invalid sample spec");
