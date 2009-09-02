@@ -1249,3 +1249,32 @@ diff -ruN libiconv/lib/iconv.c libiconv.new/lib/iconv.c
  #include "aliases2.h"
  #undef S
  };
+--- libiconv/srclib/malloca.c	2009-06-21 13:31:08.000000000 +0200
++++ libiconv.new/srclib/malloca.c	2009-09-03 00:02:20.000000000 +0200
+@@ -75,7 +75,7 @@
+ 
+       if (p != NULL)
+ 	{
+-	  size_t slot;
++	  uintptr_t slot;
+ 
+ 	  p += HEADER_SIZE;
+ 
+@@ -83,7 +83,7 @@
+ 	  ((int *) p)[-1] = MAGIC_NUMBER;
+ 
+ 	  /* Enter p into the hash table.  */
+-	  slot = (unsigned long) p % HASH_TABLE_SIZE;
++	  slot = (uintptr_t) p % HASH_TABLE_SIZE;
+ 	  ((struct header *) (p - HEADER_SIZE))->next = mmalloca_results[slot];
+ 	  mmalloca_results[slot] = p;
+ 
+@@ -116,7 +116,7 @@
+ 	{
+ 	  /* Looks like a mmalloca() result.  To see whether it really is one,
+ 	     perform a lookup in the hash table.  */
+-	  size_t slot = (unsigned long) p % HASH_TABLE_SIZE;
++	  uintptr_t slot = (uintptr_t) p % HASH_TABLE_SIZE;
+ 	  void **chain = &mmalloca_results[slot];
+ 	  for (; *chain != NULL;)
+ 	    {
