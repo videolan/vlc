@@ -411,6 +411,8 @@ InfoPanel::InfoPanel( QWidget *parent,
      InfoTree = new QTreeWidget(this);
      InfoTree->setColumnCount( 1 );
      InfoTree->header()->hide();
+     InfoTree->header()->setStretchLastSection(false);
+     InfoTree->header()->setResizeMode(QHeaderView::ResizeToContents);
      layout->addWidget(InfoTree, 1, 0 );
 }
 
