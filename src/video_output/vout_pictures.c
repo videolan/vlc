@@ -1331,6 +1331,7 @@ void picture_pool_Delete( picture_pool_t *p_pool )
 
         free( p_release_sys );
     }
+    free( p_pool->pp_picture );
     free( p_pool );
 }
 
