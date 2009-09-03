@@ -28,6 +28,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 
 #ifdef HAVE_ALLOCA_H
