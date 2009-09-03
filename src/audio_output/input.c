@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 
 #include <stdio.h>
@@ -39,9 +41,6 @@
 #include <vlc_input.h>
 #include <vlc_vout.h>                  /* for vout_Request */
 
-#ifdef HAVE_ALLOCA_H
-#   include <alloca.h>
-#endif
 #include <vlc_aout.h>
 #include <libvlc.h>
 
@@ -83,6 +82,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     p_input->i_nb_resamplers = p_input->i_nb_filters = 0;
 
     /* Prepare FIFO. */
+    assert( p_aout->p_mixer );
     aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->p_mixer->fmt.i_rate );
     p_input->mixer.begin = NULL;
 
