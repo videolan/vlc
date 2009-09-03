@@ -70,6 +70,10 @@ def get_ldflags():
                                 'r').readline().rstrip().split())
 	if os.sys.platform == 'darwin':
 	    ldflags.append('-lstdc++')
+        if not '-lvlc' in ldflags:
+            # Some broken vlc-config can exist (esp. on win32). Try to
+            # workaround the problem.
+            ldflags.append('-lvlc')
         return ldflags
 
 #source_files = [ 'vlc_module.c', 'vlc_mediacontrol.c',
