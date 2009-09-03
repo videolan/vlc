@@ -203,7 +203,7 @@ vlc_module_begin ()
                  ENC_MAXBR_LONGTEXT, false )
     add_integer( ENC_CFG_PREFIX "min-bitrate", 0, NULL, ENC_MINBR_TEXT,
                  ENC_MINBR_LONGTEXT, false )
-    add_bool( ENC_CFG_PREFIX "cbr", 0, NULL, ENC_CBR_TEXT,
+    add_bool( ENC_CFG_PREFIX "cbr", false, NULL, ENC_CBR_TEXT,
                  ENC_CBR_LONGTEXT, false )
 #endif
 

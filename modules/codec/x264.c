@@ -449,7 +449,7 @@ vlc_module_begin ()
 
 #if X264_BUILD >= 55 /* r607 */
 #  if X264_BUILD < 67 /* r1117 */
-    add_bool( SOUT_CFG_PREFIX "pre-scenecut", 0, NULL, PRESCENE_TEXT,
+    add_bool( SOUT_CFG_PREFIX "pre-scenecut", false, NULL, PRESCENE_TEXT,
               PRESCENE_LONGTEXT, false )
 #  else
     add_obsolete_bool( SOUT_CFG_PREFIX "pre-scenecut" )
@@ -465,7 +465,7 @@ vlc_module_begin ()
                  B_ADAPT_LONGTEXT, false )
         change_integer_range( 0, 2 )
 #elif  X264_BUILD >= 0x0013 /* r137 */
-    add_bool( SOUT_CFG_PREFIX "b-adapt", 1, NULL, B_ADAPT_TEXT,
+    add_bool( SOUT_CFG_PREFIX "b-adapt", true, NULL, B_ADAPT_TEXT,
               B_ADAPT_LONGTEXT, false )
 #endif
 
@@ -475,10 +475,10 @@ vlc_module_begin ()
         change_integer_range( -100, 100 )
 #endif
 
-    add_bool( SOUT_CFG_PREFIX "bpyramid", 0, NULL, BPYRAMID_TEXT,
+    add_bool( SOUT_CFG_PREFIX "bpyramid", false, NULL, BPYRAMID_TEXT,
               BPYRAMID_LONGTEXT, false )
 
-    add_bool( SOUT_CFG_PREFIX "cabac", 1, NULL, CABAC_TEXT, CABAC_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "cabac", true, NULL, CABAC_TEXT, CABAC_LONGTEXT,
               false )
 
     add_integer( SOUT_CFG_PREFIX "ref", 3, NULL, REF_TEXT,
@@ -486,7 +486,7 @@ vlc_module_begin ()
         change_integer_range( 1, 16 )
         add_deprecated_alias( SOUT_CFG_PREFIX "frameref" ) /* Deprecated since 0.8.5 */
 
-    add_bool( SOUT_CFG_PREFIX "nf", 0, NULL, NF_TEXT,
+    add_bool( SOUT_CFG_PREFIX "nf", false, NULL, NF_TEXT,
               NF_LONGTEXT, false )
         add_deprecated_alias( SOUT_CFG_PREFIX "loopfilter" ) /* Deprecated since 0.8.5 */
 
@@ -507,7 +507,7 @@ vlc_module_begin ()
         change_string_list( profile_list, profile_list, 0 );
 
 #if X264_BUILD >= 51 /* r570 */
-    add_bool( SOUT_CFG_PREFIX "interlaced", 0, NULL, INTERLACED_TEXT, INTERLACED_LONGTEXT,
+    add_bool( SOUT_CFG_PREFIX "interlaced", false, NULL, INTERLACED_TEXT, INTERLACED_LONGTEXT,
               false )
 #endif
 
@@ -605,7 +605,7 @@ vlc_module_begin ()
 #endif
 
 #if X264_BUILD >= 0x0012 /* r134 */
-    add_bool( SOUT_CFG_PREFIX "weightb", 1, NULL, WEIGHTB_TEXT,
+    add_bool( SOUT_CFG_PREFIX "weightb", true, NULL, WEIGHTB_TEXT,
               WEIGHTB_LONGTEXT, false )
 #endif
 
@@ -634,7 +634,7 @@ vlc_module_begin ()
 
 #if X264_BUILD >= 41
 # if X264_BUILD < 65 /* r368 */
-    add_bool( SOUT_CFG_PREFIX "b-rdo", 0, NULL, B_RDO_TEXT,
+    add_bool( SOUT_CFG_PREFIX "b-rdo", false, NULL, B_RDO_TEXT,
               B_RDO_LONGTEXT, false )
 # else
     add_obsolete_bool( SOUT_CFG_PREFIX "b-rdo" )
@@ -642,18 +642,18 @@ vlc_module_begin ()
 #endif
 
 #if X264_BUILD >= 36 /* r318 */
-    add_bool( SOUT_CFG_PREFIX "mixed-refs", 1, NULL, MIXED_REFS_TEXT,
+    add_bool( SOUT_CFG_PREFIX "mixed-refs", true, NULL, MIXED_REFS_TEXT,
               MIXED_REFS_LONGTEXT, false )
 #endif
 
 #if X264_BUILD >= 23 /* r171 */
-    add_bool( SOUT_CFG_PREFIX "chroma-me", 1, NULL, CHROMA_ME_TEXT,
+    add_bool( SOUT_CFG_PREFIX "chroma-me", true, NULL, CHROMA_ME_TEXT,
               CHROMA_ME_LONGTEXT, false )
 #endif
 
 #if X264_BUILD >= 43
 # if X264_BUILD < 65 /* r390 */
-    add_bool( SOUT_CFG_PREFIX "bime", 0, NULL, BIME_TEXT,
+    add_bool( SOUT_CFG_PREFIX "bime", false, NULL, BIME_TEXT,
               BIME_LONGTEXT, false )
 # else
     add_obsolete_bool( SOUT_CFG_PREFIX "bime" )
@@ -661,7 +661,7 @@ vlc_module_begin ()
 #endif
 
 #if X264_BUILD >= 30 /* r251 */
-    add_bool( SOUT_CFG_PREFIX "8x8dct", 0, NULL, TRANSFORM_8X8DCT_TEXT,
+    add_bool( SOUT_CFG_PREFIX "8x8dct", false, NULL, TRANSFORM_8X8DCT_TEXT,
               TRANSFORM_8X8DCT_LONGTEXT, false )
 #endif
 
@@ -672,12 +672,12 @@ vlc_module_begin ()
 #endif
 
 #if X264_BUILD >= 42 /* r384 */
-    add_bool( SOUT_CFG_PREFIX "fast-pskip", 1, NULL, FAST_PSKIP_TEXT,
+    add_bool( SOUT_CFG_PREFIX "fast-pskip", true, NULL, FAST_PSKIP_TEXT,
               FAST_PSKIP_LONGTEXT, false )
 #endif
 
 #if X264_BUILD >= 46 /* r503 */
-    add_bool( SOUT_CFG_PREFIX "dct-decimate", 1, NULL, DCT_DECIMATE_TEXT,
+    add_bool( SOUT_CFG_PREFIX "dct-decimate", true, NULL, DCT_DECIMATE_TEXT,
               DCT_DECIMATE_LONGTEXT, false )
 #endif
 
@@ -700,24 +700,24 @@ vlc_module_begin ()
 /* Input/Output */
 
 #if X264_BUILD >= 55 /* r607 */
-    add_bool( SOUT_CFG_PREFIX "non-deterministic", 0, NULL, NON_DETERMINISTIC_TEXT,
+    add_bool( SOUT_CFG_PREFIX "non-deterministic", false, NULL, NON_DETERMINISTIC_TEXT,
               NON_DETERMINISTIC_LONGTEXT, false )
 #endif
 
-    add_bool( SOUT_CFG_PREFIX "asm", 1, NULL, ASM_TEXT,
+    add_bool( SOUT_CFG_PREFIX "asm", true, NULL, ASM_TEXT,
               ASM_LONGTEXT, false )
 
     /* x264 psnr = 1 (default). disable PSNR computation for speed. */
-    add_bool( SOUT_CFG_PREFIX "psnr", 0, NULL, PSNR_TEXT,
+    add_bool( SOUT_CFG_PREFIX "psnr", false, NULL, PSNR_TEXT,
               PSNR_LONGTEXT, false )
 
 #if X264_BUILD >= 50 /* r554 */
     /* x264 ssim = 1 (default). disable SSIM computation for speed. */
-    add_bool( SOUT_CFG_PREFIX "ssim", 0, NULL, SSIM_TEXT,
+    add_bool( SOUT_CFG_PREFIX "ssim", false, NULL, SSIM_TEXT,
               SSIM_LONGTEXT, false )
 #endif
 
-    add_bool( SOUT_CFG_PREFIX "quiet", 0, NULL, QUIET_TEXT,
+    add_bool( SOUT_CFG_PREFIX "quiet", false, NULL, QUIET_TEXT,
               QUIET_LONGTEXT, false )
 
 #if X264_BUILD >= 47 /* r518 */
@@ -725,11 +725,11 @@ vlc_module_begin ()
                  SPS_ID_LONGTEXT, false )
 #endif
 
-    add_bool( SOUT_CFG_PREFIX "aud", 0, NULL, AUD_TEXT,
+    add_bool( SOUT_CFG_PREFIX "aud", false, NULL, AUD_TEXT,
               AUD_LONGTEXT, false )
 
 #if X264_BUILD >= 0x000e /* r81 */
-    add_bool( SOUT_CFG_PREFIX "verbose", 0, NULL, VERBOSE_TEXT,
+    add_bool( SOUT_CFG_PREFIX "verbose", false, NULL, VERBOSE_TEXT,
               VERBOSE_LONGTEXT, false )
 #endif
 
