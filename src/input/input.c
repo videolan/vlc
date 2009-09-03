@@ -1669,9 +1669,8 @@ static bool Control( input_thread_t *p_input,
                 int64_t i_length;
 
                 /* Emulate it with a SET_POS */
-                demux_Control( p_input->p->input.p_demux,
-                                DEMUX_GET_LENGTH, &i_length );
-                if( i_length > 0 )
+                if( !demux_Control( p_input->p->input.p_demux,
+                                    DEMUX_GET_LENGTH, &i_length ) && i_length > 0 )
                 {
                     double f_pos = (double)i_time / (double)i_length;
                     i_ret = demux_Control( p_input->p->input.p_demux,
@@ -2429,8 +2428,9 @@ static int InputSourceInit( input_thread_t *p_input,
     if( in->p_demux )
     {
         /* Get infos from access_demux */
-        demux_Control( in->p_demux,
-                        DEMUX_GET_PTS_DELAY, &in->i_pts_delay );
+        int i_ret = demux_Control( in->p_demux,
+                                   DEMUX_GET_PTS_DELAY, &in->i_pts_delay );
+        assert( !i_ret );
         in->i_pts_delay = __MAX( 0, __MIN( in->i_pts_delay, INPUT_PTS_DELAY_MAX ) );
 
 
