@@ -375,7 +375,6 @@ VLC_PUBLIC_API void libvlc_log_close( libvlc_log_t *p_log );
  * Returns the number of messages in a log instance.
  *
  * \param p_log libvlc log instance or NULL
- * \param p_e an initialized exception pointer
  * \return number of log messages, 0 if p_log is NULL
  */
 VLC_PUBLIC_API unsigned libvlc_log_count( const libvlc_log_t *p_log );
