@@ -143,7 +143,7 @@ staticforward PyTypeObject vlcMedia_Type;
 
 #define LIBVLC_EXCEPT if( libvlc_exception_raised( &ex ) ) { \
     PyObject *py_exc = vlc_Exception; \
-    PyErr_SetString( py_exc, libvlc_exception_get_message( &ex ) ); \
+    PyErr_SetString( py_exc, libvlc_errmsg() );	\
     return NULL; \
   }
 
