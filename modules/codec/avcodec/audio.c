@@ -108,7 +108,7 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     p_sys->p_context->block_align = p_dec->fmt_in.audio.i_blockalign;
     p_sys->p_context->bit_rate = p_dec->fmt_in.i_bitrate;
-#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 0, 0 )
     p_sys->p_context->bits_per_sample = p_dec->fmt_in.audio.i_bitspersample;
 #else
     p_sys->p_context->bits_per_coded_sample = p_dec->fmt_in.audio.i_bitspersample;
@@ -315,7 +315,7 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
     memset( &p_block->p_buffer[p_block->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE );
 
-#if LIBAVCODEC_VERSION_INT >= ((52<<16)+(0<<8)+0)
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 0, 0 )
     i_used = avcodec_decode_audio2( p_sys->p_context,
                                    (int16_t*)p_sys->p_output, &i_output,
                                    p_block->p_buffer, p_block->i_buffer );

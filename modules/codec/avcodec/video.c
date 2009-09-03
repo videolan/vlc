@@ -210,7 +210,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     /*  ***** Get configuration of ffmpeg plugin ***** */
     p_sys->p_context->workaround_bugs =
         config_GetInt( p_dec, "ffmpeg-workaround-bugs" );
-#if LIBAVCODEC_VERSION_INT < ((52<<16)+(0<<8)+0)
+#if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 0, 0 )
     p_sys->p_context->error_resilience =
         config_GetInt( p_dec, "ffmpeg-error-resilience" );
 #else
