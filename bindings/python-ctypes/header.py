@@ -33,6 +33,7 @@ create a libvlc Instance. From this instance, you can then create
 L{MediaPlayer} and L{MediaListPlayer} instances.
 """
 
+import logging
 import ctypes
 import sys
 
@@ -224,10 +225,13 @@ def check_vlc_exception(result, func, args):
     """Error checking method for functions using an exception in/out parameter.
     """
     ex=args[-1]
+    if not isinstance(ex, (VLCException, MediaControlException)):
+        logging.warn("python-vlc: error when processing function %s. Please report this as a bug to vlc-devel@videolan.org" % str(func))
+        return result
     # Take into account both VLCException and MediacontrolException:
     c=getattr(ex, 'raised', getattr(ex, 'code', 0))
     if c:
-        raise LibVLCException(args[-1].message)
+        raise LibVLCException(ex.message)
     return result
 
 ### End of header.py ###
