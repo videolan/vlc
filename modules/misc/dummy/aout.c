@@ -1,5 +1,5 @@
 /*****************************************************************************
- * aout_dummy.c : dummy audio output plugin
+ * aout.c : dummy audio output plugin
  *****************************************************************************
  * Copyright (C) 2002 the VideoLAN team
  * $Id$
