@@ -125,14 +125,14 @@ VLC_PUBLIC_API void libvlc_exception_clear( libvlc_exception_t * );
  * @warning
  * This will be NULL if there was no error.
  */
-const char *libvlc_errmsg (void);
+VLC_PUBLIC_API const char *libvlc_errmsg (void);
 
 /**
  * Clears the LibVLC error status for the current thread. This is optional.
  * By default, the error status is automatically overriden when a new error
  * occurs, and destroyed when the thread exits.
  */
-void libvlc_clearerr (void);
+VLC_PUBLIC_API void libvlc_clearerr (void);
 
 /**
  * Sets the LibVLC error status and message for the current thread.
