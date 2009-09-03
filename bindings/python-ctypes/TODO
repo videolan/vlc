@@ -1,6 +1,4 @@
 * Investigate memory management
 
-* Write a test suite
-
 * Support multiple VLC versions: define a front-end module which will
    load the appropriate versionned module from a subdirectory.

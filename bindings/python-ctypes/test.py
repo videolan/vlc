@@ -37,37 +37,37 @@ class TestVLCAPI(unittest.TestCase):
     # failure, check that the reason is not a change in the .h
     # definitions.
     def test_enum_event_type(self):
-        self.assertEqual(vlc.EventType.MediaStateChanged, 5)
+        self.assertEqual(vlc.EventType.MediaStateChanged.value, 5)
 
     def test_enum_meta(self):
-        self.assertEqual(vlc.Meta.Description, 6)
+        self.assertEqual(vlc.Meta.Description.value, 6)
 
     def test_enum_state(self):
-        self.assertEqual(vlc.State.Playing, 3)
+        self.assertEqual(vlc.State.Playing.value, 3)
 
     def test_enum_media_option(self):
-        self.assertEqual(vlc.MediaOption.unique, 256)
+        self.assertEqual(vlc.MediaOption.unique.value, 256)
 
     def test_enum_playback_mode(self):
-        self.assertEqual(vlc.PlaybackMode.repeat, 2)
+        self.assertEqual(vlc.PlaybackMode.repeat.value, 2)
 
     def test_enum_marquee_int_option(self):
-        self.assertEqual(vlc.VideoMarqueeIntOption.Size, 5)
+        self.assertEqual(vlc.VideoMarqueeIntOption.Size.value, 5)
 
     def test_enum_output_device_type(self):
-        self.assertEqual(vlc.AudioOutputDeviceTypes._2F2R, 4)
+        self.assertEqual(vlc.AudioOutputDeviceTypes._2F2R.value, 4)
 
     def test_enum_output_channel(self):
-        self.assertEqual(vlc.AudioOutputChannel.Dolbys, 5)
+        self.assertEqual(vlc.AudioOutputChannel.Dolbys.value, 5)
 
     def test_enum_position_origin(self):
-        self.assertEqual(vlc.PositionOrigin.ModuloPosition, 2)
+        self.assertEqual(vlc.PositionOrigin.ModuloPosition.value, 2)
 
     def test_enum_position_key(self):
-        self.assertEqual(vlc.PositionKey.MediaTime, 2)
+        self.assertEqual(vlc.PositionKey.MediaTime.value, 2)
 
     def test_enum_player_status(self):
-        self.assertEqual(vlc.PlayerStatus.StopStatus, 5)
+        self.assertEqual(vlc.PlayerStatus.StopStatus.value, 5)
 
     # Basic MediaControl tests
     def test_mediacontrol_creation(self):
@@ -100,6 +100,12 @@ class TestVLCAPI(unittest.TestCase):
         i=vlc.Instance()
         p=i.media_player_new(mrl)
         self.assertEqual(p.get_media().get_mrl(), mrl)
+
+    def test_libvlc_player_state(self):
+        mrl='/tmp/foo.avi'
+        i=vlc.Instance()
+        p=i.media_player_new(mrl)
+        self.assertEqual(p.get_state(), vlc.State.Ended)
 
 if __name__ == '__main__':
     unittest.main()

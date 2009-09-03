@@ -478,7 +478,7 @@ class PythonGenerator(object):
                 conv[k]=n
 
             for k, v in values:
-                self.output("    %s=%s" % (conv[k], v))
+                self.output("    %s=ctypes.c_uint(%s)" % (conv[k], v))
 
             self.output("    _names={")
             for k, v in values:
@@ -488,6 +488,13 @@ class PythonGenerator(object):
             self.output("""
     def __repr__(self):
         return ".".join((self.__class__.__module__, self.__class__.__name__, self._names[self.value]))
+
+    def __eq__(self, other):
+        return (isinstance(other, ctypes.c_uint) and self.value == other.value)
+
+    def __ne__(self, other):
+        return not self.__eq__(other)
+
     """)
 
     def output_ctypes(self, rtype, method, params, comment):
