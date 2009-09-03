@@ -497,7 +497,7 @@ vlcMediaPlayer_set_nsobject( PyObject *self, PyObject *args )
 }
 
 static PyObject *
-vlcMediaPlayer_get_hwnd( PyObject *self, PyObject *args )
+vlcMediaPlayer_get_nsobject( PyObject *self, PyObject *args )
 {
     void* i_ret;
 
@@ -636,8 +636,24 @@ static PyMethodDef vlcMediaPlayer_methods[] =
       "pause()   Pause the media instance" },
     { "stop", vlcMediaPlayer_stop, METH_VARARGS,
       "stop()    Stop the media instance" },
-    { "set_drawable", vlcMediaPlayer_set_drawable, METH_VARARGS,
-      "set_drawable()    Set the drawable id" },
+
+    { "set_xwindow", vlcMediaPlayer_set_xwindow, METH_VARARGS,
+      "set_xwindow()    Set the X-Window id" },
+    { "set_nsobject", vlcMediaPlayer_set_nsobject, METH_VARARGS,
+      "set_nsobject()    Set the NSObject" },
+    { "set_agl", vlcMediaPlayer_set_agl, METH_VARARGS,
+      "set_agl()    Set the AGL" },
+    { "set_hwnd", vlcMediaPlayer_set_hwnd, METH_VARARGS,
+      "set_hwndl()    Set the HWND" },
+
+    { "get_xwindow", vlcMediaPlayer_get_xwindow, METH_VARARGS,
+      "get_xwindow()    Set the X-Window id" },
+    { "get_nsobject", vlcMediaPlayer_get_nsobject, METH_VARARGS,
+      "get_nsobject()    Set the NSObject" },
+    { "get_agl", vlcMediaPlayer_get_agl, METH_VARARGS,
+      "get_agl()    Set the AGL" },
+    { "get_hwnd", vlcMediaPlayer_get_hwnd, METH_VARARGS,
+      "get_hwndl()    Set the HWND" },
 
     { "get_chapter", vlcMediaPlayer_get_chapter, METH_VARARGS,
       "get_chapter() -> int    Get current chapter" },
