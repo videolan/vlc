@@ -412,7 +412,7 @@ libiconv-snowleopard: libiconv-snowleopard.tar.bz2
 	$(EXTRACT_BZ2)
 
 ifdef HAVE_DARWIN_OS
-ifdef HAVE_DARWIN_64
+ifdef HAVE_DARWIN_10
 .iconv: libiconv-snowleopard
 	(cd libiconv-snowleopard && cp libiconv.* ../../lib/)
 	touch $@
