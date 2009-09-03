@@ -86,6 +86,10 @@ static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t * p_buffer )
         p_input = p_mixer->input[++i];
 
     aout_buffer_t * p_old_buffer = aout_FifoPop( NULL, &p_input->fifo );
+    /* We don't free the old buffer because,
+     * The aout core use a hack to avoid useless memcpy: the buffer in which
+     * to mix is the same as the one in the first active input fifo.
+     * So the ownership of that buffer belongs to our caller */
     assert( p_old_buffer == p_buffer );
 
     /* Empty other FIFOs to avoid a memory leak. */
