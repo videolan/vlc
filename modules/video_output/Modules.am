@@ -50,10 +50,10 @@ libxcb_xv_plugin_la_DEPENDENCIES =
 libxcb_window_plugin_la_SOURCES = xcb/window.c xcb/keys.c
 libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XCB_CFLAGS) \
-	$(XCB_AUX_CFLAGS) $(XCB_KEYSYMS_CFLAGS)
+	$(XCB_KEYSYMS_CFLAGS)
 libxcb_window_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XCB_LIBS) \
-	$(XCB_AUX_LIBS) $(XCB_KEYSYMS_LIBS)
+	$(XCB_KEYSYMS_LIBS)
 libxcb_window_plugin_la_DEPENDENCIES =
 
 EXTRA_LTLIBRARIES += \
