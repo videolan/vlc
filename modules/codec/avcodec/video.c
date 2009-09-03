@@ -190,7 +190,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
                       AVCodec *p_codec, int i_codec_id, const char *psz_namecodec )
 {
     decoder_sys_t *p_sys;
-    vlc_value_t val;
+    int i_val;
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys = calloc( 1, sizeof(decoder_sys_t) ) ) == NULL )
@@ -218,37 +218,28 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
         config_GetInt( p_dec, "ffmpeg-error-resilience" );
 #endif
 
-    var_Create( p_dec, "grayscale", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "grayscale", &val );
-    if( val.b_bool ) p_sys->p_context->flags |= CODEC_FLAG_GRAY;
+    if( var_CreateGetBool( p_dec, "grayscale" ) )
+        p_sys->p_context->flags |= CODEC_FLAG_GRAY;
 
-    var_Create( p_dec, "ffmpeg-vismv", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "ffmpeg-vismv", &val );
-    if( val.i_int ) p_sys->p_context->debug_mv = val.i_int;
+    i_val = var_CreateGetInteger( p_dec, "ffmpeg-vismv" );
+    if( i_val ) p_sys->p_context->debug_mv = i_val;
 
-    var_Create( p_dec, "ffmpeg-lowres", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "ffmpeg-lowres", &val );
-    if( val.i_int > 0 && val.i_int <= 2 ) p_sys->p_context->lowres = val.i_int;
+    i_val = var_CreateGetInteger( p_dec, "ffmpeg-lowres" );
+    if( i_val > 0 && i_val <= 2 ) p_sys->p_context->lowres = i_val;
 
-    var_Create( p_dec, "ffmpeg-skiploopfilter",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "ffmpeg-skiploopfilter", &val );
-    if( val.i_int > 0 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONREF;
-    if( val.i_int > 1 ) p_sys->p_context->skip_loop_filter = AVDISCARD_BIDIR;
-    if( val.i_int > 2 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONKEY;
-    if( val.i_int > 3 ) p_sys->p_context->skip_loop_filter = AVDISCARD_ALL;
+    i_val = var_CreateGetInteger( p_dec, "ffmpeg-skiploopfilter" );
+    if( i_val >= 4 ) p_sys->p_context->skip_loop_filter = AVDISCARD_ALL;
+    else if( i_val == 3 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONKEY;
+    else if( i_val == 2 ) p_sys->p_context->skip_loop_filter = AVDISCARD_BIDIR;
+    else if( i_val == 1 ) p_sys->p_context->skip_loop_filter = AVDISCARD_NONREF;
 
-    bool b_fast = var_CreateGetBool( p_dec, "ffmpeg-fast" );
-    if( b_fast ) p_sys->p_context->flags2 |= CODEC_FLAG2_FAST;
+    if( var_CreateGetBool( p_dec, "ffmpeg-fast" ) )
+        p_sys->p_context->flags2 |= CODEC_FLAG2_FAST;
 
     /* ***** ffmpeg frame skipping ***** */
-    var_Create( p_dec, "ffmpeg-hurry-up", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "ffmpeg-hurry-up", &val );
-    p_sys->b_hurry_up = val.b_bool;
+    p_sys->b_hurry_up = var_CreateGetBool( p_dec, "ffmpeg-hurry-up" );
 
-    var_Create( p_dec, "ffmpeg-skip-frame", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "ffmpeg-skip-frame", &val );
-    switch( val.i_int )
+    switch( var_CreateGetInteger( p_dec, "ffmpeg-skip-frame" ) )
     {
         case -1:
             p_sys->p_context->skip_frame = AVDISCARD_NONE;
@@ -271,9 +262,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     }
     p_sys->i_skip_frame = p_sys->p_context->skip_frame;
 
-    var_Create( p_dec, "ffmpeg-skip-idct",  VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "ffmpeg-skip-idct", &val );
-    switch( val.i_int )
+    switch( var_CreateGetInteger( p_dec, "ffmpeg-skip-idct" ) )
     {
         case -1:
             p_sys->p_context->skip_idct = AVDISCARD_NONE;
@@ -298,9 +287,8 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /* ***** ffmpeg direct rendering ***** */
     p_sys->b_direct_rendering = false;
-    var_Create( p_dec, "ffmpeg-dr", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "ffmpeg-dr", &val );
-    if( val.b_bool && (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
+    if( var_CreateGetBool( p_dec, "ffmpeg-dr" ) &&
+       (p_sys->p_codec->capabilities & CODEC_CAP_DR1) &&
         /* Apparently direct rendering doesn't work with YUV422P */
         p_sys->p_context->pix_fmt != PIX_FMT_YUV422P &&
         /* H264 uses too many reference frames */
