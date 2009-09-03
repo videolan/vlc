@@ -29,6 +29,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
@@ -84,7 +86,7 @@ static void DoWork( aout_mixer_t * p_mixer, aout_buffer_t * p_buffer )
         p_input = p_mixer->input[++i];
 
     aout_buffer_t * p_old_buffer = aout_FifoPop( NULL, &p_input->fifo );
-    aout_BufferFree( p_old_buffer );
+    assert( p_old_buffer == p_buffer );
 
     /* Empty other FIFOs to avoid a memory leak. */
     for ( i++; i < p_mixer->input_count; i++ )
