@@ -694,6 +694,10 @@ if __name__ == '__main__':
                       default=False,
                       help="Debug mode")
 
+    opt.add_option("-c", "--check", dest="check", action="store_true",
+                      default=False,
+                      help="Check mode")
+
     opt.add_option("-o", "--output", dest="output", action="store",
                       type="str", default="-",
                       help="Output filename")
@@ -705,9 +709,21 @@ if __name__ == '__main__':
         sys.exit(1)
 
     p=Parser(args)
+    if options.check:
+        # Various consistency checks.
+        for (rt, name, params, comment) in p.methods:
+            if not comment.strip():
+                print "No comment for %s" % name
+                continue
+            names=comment_re.findall(comment)
+            if len(names) != len(params):
+                print "Docstring comment parameters mismatch for %s" % name
+
     if options.debug:
         p.dump_methods()
         p.dump_enums()
+
+    if options.check or options.debug:
         sys.exit(0)
 
     g=PythonGenerator(p)

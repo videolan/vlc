@@ -211,6 +211,7 @@ VLC_PUBLIC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_
 /**
  * Get the agl handler previously set with libvlc_media_player_set_agl().
  *
+ * \param p_mi the Media Player
  * \return the agl handler or 0 if none where set
  */
 VLC_PUBLIC_API void * libvlc_media_player_get_nsobject ( libvlc_media_player_t *p_mi );
@@ -257,6 +258,7 @@ VLC_PUBLIC_API void libvlc_media_player_set_xwindow ( libvlc_media_player_t *p_m
  * even if VLC is not currently using it (for instance if it is playing an
  * audio-only input).
  *
+ * \param p_mi the Media Player
  * \return an X window ID, or 0 if none where set.
  */
 VLC_PUBLIC_API uint32_t libvlc_media_player_get_xwindow ( libvlc_media_player_t *p_mi );
@@ -277,6 +279,7 @@ VLC_PUBLIC_API void libvlc_media_player_set_hwnd ( libvlc_media_player_t *p_mi, 
  * libvlc_media_player_set_hwnd(). The handle will be returned even if LibVLC
  * is not currently outputting any video to it.
  *
+ * \param p_mi the Media Player
  * \return a window handle or NULL if there are none.
  */
 VLC_PUBLIC_API void *libvlc_media_player_get_hwnd ( libvlc_media_player_t *p_mi );

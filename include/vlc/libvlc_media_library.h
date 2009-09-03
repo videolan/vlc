@@ -42,6 +42,13 @@
 
 typedef struct libvlc_media_library_t libvlc_media_library_t;
 
+/**
+ * Create an new Media Library object
+ *
+ * \param p_libvlc_instance the libvlc instance
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API libvlc_media_player_t * libvlc_media_player_new( libvlc_instance_t *, libvlc_exception_t * );
 VLC_PUBLIC_API libvlc_media_library_t *
     libvlc_media_library_new( libvlc_instance_t * p_inst,
                               libvlc_exception_t * p_e );

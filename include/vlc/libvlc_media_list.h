@@ -222,7 +222,7 @@ VLC_PUBLIC_API libvlc_media_list_view_t *
  * Get a hierarchical media list view of media list items
  *
  * \param p_ml a media list instance
- * \param p_ex an excpetion instance
+ * \param p_ex an exception instance
  * \return hierarchical media list view instance
  */
 VLC_PUBLIC_API libvlc_media_list_view_t *
