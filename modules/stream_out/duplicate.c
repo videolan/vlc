@@ -310,7 +310,7 @@ static bool NumInRange( char *psz_range, int i_num )
         i_start = strtol( psz_range, &end, 0 );
         if( end == psz_range ) i_start = i_num;
 
-        i_stop  = strtol( psz,       &end, 0 );
+        i_stop  = strtol( psz+1,       &end, 0 );
         if( end == psz_range ) i_stop = i_num;
     }
     else
