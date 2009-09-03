@@ -406,7 +406,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     }
 
     /* Prepare hints for the buffer allocator. */
-    p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
+    p_input->input_alloc.b_alloc = true;
     p_input->input_alloc.i_bytes_per_sec = -1;
 
     /* Create resamplers. */
@@ -432,7 +432,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
         aout_FiltersHintBuffers( p_aout, p_input->pp_resamplers,
                                  p_input->i_nb_resamplers,
                                  &p_input->input_alloc );
-        p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
+        p_input->input_alloc.b_alloc = true;
 
         /* Setup the initial rate of the resampler */
         p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
@@ -447,7 +447,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     aout_FiltersHintBuffers( p_aout, p_input->pp_filters,
                              p_input->i_nb_filters,
                              &p_input->input_alloc );
-    p_input->input_alloc.i_alloc_type = AOUT_ALLOC_HEAP;
+    p_input->input_alloc.b_alloc = true;
 
     /* i_bytes_per_sec is still == -1 if no filters */
     p_input->input_alloc.i_bytes_per_sec = __MAX(

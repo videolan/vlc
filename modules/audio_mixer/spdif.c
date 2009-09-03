@@ -66,7 +66,7 @@ static int Create( vlc_object_t *p_this )
     p_mixer->mix = DoWork;
     /* This is a bit kludgy - do not ask for a new buffer, since the one
      * provided by the first input will be good enough. */
-    p_mixer->allocation.i_alloc_type = AOUT_ALLOC_NONE;
+    p_mixer->allocation.b_alloc = false;
 
     return 0;
 }

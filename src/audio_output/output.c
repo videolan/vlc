@@ -199,7 +199,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
     }
 
     /* Prepare hints for the buffer allocator. */
-    p_aout->mixer_allocation.i_alloc_type = AOUT_ALLOC_HEAP;
+    p_aout->mixer_allocation.b_alloc = true;
     p_aout->mixer_allocation.i_bytes_per_sec
                         = p_aout->mixer_format.i_bytes_per_frame
                            * p_aout->mixer_format.i_rate

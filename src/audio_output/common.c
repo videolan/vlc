@@ -696,3 +696,43 @@ bool aout_CheckChannelExtraction( int *pi_selection,
     }
     return i_out == i_channels;
 }
+
+/*****************************************************************************
+ * aout_BufferAlloc:
+ *****************************************************************************/
+
+void aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
+        aout_buffer_t *old_buffer, aout_buffer_t **new_buffer)
+{
+    if ( !allocation->b_alloc )
+    {
+        *new_buffer = old_buffer;
+        return;
+    }
+
+    aout_buffer_t *buffer;
+    int i_alloc_size;
+
+    i_alloc_size = (int)( (uint64_t)allocation->i_bytes_per_sec
+                                        * (microseconds) / 1000000 + 1 );
+
+    buffer = malloc( i_alloc_size + sizeof(aout_buffer_t) );
+    if ( !buffer )
+    {
+        *new_buffer = NULL;
+        return;
+    }
+
+    buffer->b_alloc = true;
+    buffer->i_size = i_alloc_size;
+    buffer->p_buffer = (uint8_t *)buffer + sizeof(aout_buffer_t);
+    buffer->b_discontinuity = false;
+
+    if ( old_buffer )
+    {
+        buffer->start_date = old_buffer->start_date;
+        buffer->end_date = old_buffer->end_date;
+    }
+
+    *new_buffer = buffer;
+}

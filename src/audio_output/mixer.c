@@ -339,14 +339,14 @@ static int MixBuffer( aout_instance_t * p_aout )
                       /* This is a bit kludgy, but is actually only used
                        * for the S/PDIF dummy mixer : */
                       p_aout->pp_inputs[i_first_input]->mixer.fifo.p_first,
-                      p_output_buffer );
+                      &p_output_buffer );
     if ( p_output_buffer == NULL )
     {
         aout_unlock_input_fifos( p_aout );
         return -1;
     }
     /* This is again a bit kludgy - for the S/PDIF mixer. */
-    if ( p_aout->p_mixer->allocation.i_alloc_type != AOUT_ALLOC_NONE )
+    if ( p_aout->p_mixer->allocation.b_alloc )
     {
         p_output_buffer->i_nb_samples = p_aout->output.i_nb_samples;
         p_output_buffer->i_nb_bytes = p_aout->output.i_nb_samples

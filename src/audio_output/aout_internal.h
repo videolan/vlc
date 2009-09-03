@@ -28,58 +28,8 @@
 #ifndef __LIBVLC_AOUT_INTERNAL_H
 # define __LIBVLC_AOUT_INTERNAL_H 1
 
-#include <assert.h>
-
-#if defined( __APPLE__ ) || defined( SYS_BSD )
-#undef HAVE_ALLOCA
-#endif
-
-#ifdef HAVE_ALLOCA
-#   define ALLOCA_TEST( p_alloc, p_new_buffer )                             \
-        if ( (p_alloc)->i_alloc_type == AOUT_ALLOC_STACK )                  \
-        {                                                                   \
-            (p_new_buffer) = alloca( i_alloc_size + sizeof(aout_buffer_t) );\
-            i_alloc_type = AOUT_ALLOC_STACK;                                \
-        }                                                                   \
-        else
-#else
-#   define ALLOCA_TEST( p_alloc, p_new_buffer )
-#endif
-
-#define aout_BufferAlloc( p_alloc, i_nb_usec, p_previous_buffer,            \
-                          p_new_buffer )                                    \
-    if ( (p_alloc)->i_alloc_type == AOUT_ALLOC_NONE )                       \
-    {                                                                       \
-        (p_new_buffer) = p_previous_buffer;                                 \
-    }                                                                       \
-    else                                                                    \
-    {                                                                       \
-        int i_alloc_size, i_alloc_type;                                     \
-        i_alloc_size = (int)( (uint64_t)(p_alloc)->i_bytes_per_sec          \
-                                            * (i_nb_usec) / 1000000 + 1 );  \
-        ALLOCA_TEST( p_alloc, p_new_buffer )                                \
-        {                                                                   \
-            (p_new_buffer) = malloc( i_alloc_size + sizeof(aout_buffer_t) );\
-            i_alloc_type = AOUT_ALLOC_HEAP;                                 \
-        }                                                                   \
-        if ( p_new_buffer != NULL )                                         \
-        {                                                                   \
-            (p_new_buffer)->i_alloc_type = i_alloc_type;                    \
-            (p_new_buffer)->i_size = i_alloc_size;                          \
-            (p_new_buffer)->p_buffer = (uint8_t *)(p_new_buffer)            \
-                                         + sizeof(aout_buffer_t);           \
-            (p_new_buffer)->b_discontinuity = false;                        \
-            if ( (p_previous_buffer) != NULL )                              \
-            {                                                               \
-                (p_new_buffer)->start_date =                                \
-                           ((aout_buffer_t *)p_previous_buffer)->start_date;\
-                (p_new_buffer)->end_date =                                  \
-                           ((aout_buffer_t *)p_previous_buffer)->end_date;  \
-            }                                                               \
-        }                                                                   \
-        /* we'll keep that for a while --Meuuh */                           \
-        /* else printf("%s:%d\n", __FILE__, __LINE__); */                   \
-    }
+void aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
+        aout_buffer_t *old_buffer, aout_buffer_t **new_buffer);
 
 struct aout_filter_owner_sys_t
 {

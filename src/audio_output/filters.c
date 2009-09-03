@@ -317,14 +317,14 @@ void aout_FiltersHintBuffers( aout_instance_t * p_aout,
             p_first_alloc->i_bytes_per_sec = __MAX(
                                          p_first_alloc->i_bytes_per_sec,
                                          i_input_size );
-            p_filter->output_alloc.i_alloc_type = AOUT_ALLOC_NONE;
+            p_filter->output_alloc.b_alloc = false;
         }
         else
         {
             /* We're gonna need a buffer allocation. */
             memcpy( &p_filter->output_alloc, p_first_alloc,
                     sizeof(aout_alloc_t) );
-            p_first_alloc->i_alloc_type = AOUT_ALLOC_STACK;
+            p_first_alloc->b_alloc = true;
             p_first_alloc->i_bytes_per_sec = i_input_size;
         }
     }
@@ -350,7 +350,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
         aout_BufferAlloc( &p_filter->output_alloc,
                           ((mtime_t)(*pp_input_buffer)->i_nb_samples + 2)
                           * 1000000 / p_filter->input.i_rate,
-                          *pp_input_buffer, p_output_buffer );
+                          *pp_input_buffer, &p_output_buffer );
         if( p_output_buffer == NULL )
             return;
 
@@ -373,8 +373,6 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
             *pp_input_buffer = p_output_buffer;
         }
     }
-
-    assert( (*pp_input_buffer) == NULL || (*pp_input_buffer)->i_alloc_type != AOUT_ALLOC_STACK );
 }
 
 /*****************************************************************************

@@ -129,7 +129,7 @@ typedef int32_t vlc_fixed_t;
 struct aout_buffer_t
 {
     uint8_t *               p_buffer;
-    int                     i_alloc_type;
+    bool                    b_alloc;
     /* i_size is the real size of the buffer (used for debug ONLY), i_nb_bytes
      * is the number of significative bytes in it. */
     size_t                  i_size, i_nb_bytes;
@@ -147,12 +147,11 @@ struct aout_buffer_t
     void (*pf_release)( aout_buffer_t * );
 };
 
-#define aout_BufferFree( p_buffer ) do {                                    \
-    if( p_buffer != NULL && (p_buffer)->i_alloc_type == AOUT_ALLOC_HEAP )   \
-    {                                                                       \
-        free( p_buffer );                                                   \
-    }                                                                       \
-    p_buffer = NULL; } while(0)
+static inline void aout_BufferFree( aout_buffer_t *buffer )
+{
+    if( buffer && buffer->b_alloc )
+        free( buffer );
+}
 
 /* Size of a frame for S/PDIF output. */
 #define AOUT_SPDIF_SIZE 6144
@@ -166,13 +165,9 @@ struct aout_buffer_t
 /** allocation of memory in the audio output */
 typedef struct aout_alloc_t
 {
-    int                     i_alloc_type;
+    bool                    b_alloc;
     int                     i_bytes_per_sec;
 } aout_alloc_t;
-
-#define AOUT_ALLOC_NONE     0
-#define AOUT_ALLOC_STACK    1
-#define AOUT_ALLOC_HEAP     2
 
 /** audio output buffer FIFO */
 struct aout_fifo_t
