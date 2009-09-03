@@ -93,9 +93,9 @@ class LibVLCException(Exception):
 
 # From libvlc_structures.h
 
-# This is version-dependent, depending on the presence of libvlc_exception_get_message.
+# This is version-dependent, depending on the presence of libvlc_errmsg
 
-if hasattr(dll, 'libvlc_exception_get_message'):
+if hasattr(dll, 'libvlc_errmsg'):
     # New-style message passing
     class VLCException(ctypes.Structure):
         """libvlc exception.
@@ -106,7 +106,7 @@ if hasattr(dll, 'libvlc_exception_get_message'):
 
         @property
         def message(self):
-            return dll.libvlc_exception_get_message()
+            return dll.libvlc_errmsg()
 
         def init(self):
             libvlc_exception_init(self)
