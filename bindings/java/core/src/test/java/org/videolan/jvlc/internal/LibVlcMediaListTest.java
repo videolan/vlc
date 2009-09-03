@@ -1,5 +1,5 @@
 /*****************************************************************************
- * MediaListTest.java: VLC Java Bindings
+ * LibVlcMediaListTest.java: VLC Java Bindings
  *****************************************************************************
  * Copyright (C) 1998-2008 the VideoLAN team
  *
@@ -33,7 +33,7 @@ import org.videolan.jvlc.internal.LibVlc.LibVlcMediaList;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
-public class LibVLCMediaListTest extends AbstractVLCInternalTest
+public class LibVlcMediaListTest extends AbstractVLCInternalTest
 {
 
     @Test

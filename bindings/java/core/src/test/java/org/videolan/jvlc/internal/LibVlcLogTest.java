@@ -1,5 +1,5 @@
 /*****************************************************************************
- * LibvlcLogTest.java: VLC Java Bindings
+ * LibVlcLogTest.java: VLC Java Bindings
  *****************************************************************************
  * Copyright (C) 1998-2008 the VideoLAN team
  *
@@ -32,7 +32,7 @@ import org.videolan.jvlc.internal.LibVlc.LibVlcLogIterator;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
 
-public class LibvlcLogTest extends AbstractVLCInternalTest
+public class LibVlcLogTest extends AbstractVLCInternalTest
 {
 
     @Test
