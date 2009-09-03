@@ -82,8 +82,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     p_input->i_nb_resamplers = p_input->i_nb_filters = 0;
 
     /* Prepare FIFO. */
-    assert( p_aout->p_mixer );
-    aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->p_mixer->fmt.i_rate );
+    aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->mixer_format.i_rate );
     p_input->mixer.begin = NULL;
 
     /* */
@@ -99,7 +98,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
 
     /* Prepare format structure */
     chain_input_format  = p_input->input;
-    chain_output_format = p_aout->p_mixer->fmt;
+    chain_output_format = p_aout->mixer_format;
     chain_output_format.i_rate = p_input->input.i_rate;
     aout_FormatPrepare( &chain_output_format );
 
@@ -410,12 +409,12 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
     p_input->input_alloc.i_bytes_per_sec = -1;
 
     /* Create resamplers. */
-    if ( !AOUT_FMT_NON_LINEAR( &p_aout->p_mixer->fmt ) )
+    if ( !AOUT_FMT_NON_LINEAR( &p_aout->mixer_format ) )
     {
         chain_output_format.i_rate = (__MAX(p_input->input.i_rate,
-                                            p_aout->p_mixer->fmt.i_rate)
+                                            p_aout->mixer_format.i_rate)
                                  * (100 + AOUT_MAX_RESAMPLING)) / 100;
-        if ( chain_output_format.i_rate == p_aout->p_mixer->fmt.i_rate )
+        if ( chain_output_format.i_rate == p_aout->mixer_format.i_rate )
         {
             /* Just in case... */
             chain_output_format.i_rate++;
@@ -423,7 +422,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
         if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_resamplers,
                                          &p_input->i_nb_resamplers,
                                          &chain_output_format,
-                                         &p_aout->p_mixer->fmt ) < 0 )
+                                         &p_aout->mixer_format ) < 0 )
         {
             inputFailure( p_aout, p_input, "couldn't set a resampler pipeline");
             return -1;
@@ -526,7 +525,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         b_paused = p_input->b_paused;
         i_pause_date = p_input->i_pause_date;
 
-        aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->p_mixer->fmt.i_rate );
+        aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->mixer_format.i_rate );
 
         aout_InputDelete( p_aout, p_input );
 
