@@ -134,9 +134,12 @@ int GetFfmpegChroma( int *i_ffmpeg_chroma, const video_format_t fmt )
     {
         if( chroma_table[i].i_chroma == fmt.i_chroma )
         {
-            if( chroma_table[i].i_rmask == fmt.i_rmask &&
-                chroma_table[i].i_gmask == fmt.i_gmask &&
-                chroma_table[i].i_bmask == fmt.i_bmask )
+            if( ( chroma_table[i].i_rmask == 0 &&
+                  chroma_table[i].i_gmask == 0 &&
+                  chroma_table[i].i_bmask == 0 ) ||
+                ( chroma_table[i].i_rmask == fmt.i_rmask &&
+                  chroma_table[i].i_gmask == fmt.i_gmask &&
+                  chroma_table[i].i_bmask == fmt.i_bmask ) )
             {
                 *i_ffmpeg_chroma = chroma_table[i].i_chroma_id;
                 return VLC_SUCCESS;
