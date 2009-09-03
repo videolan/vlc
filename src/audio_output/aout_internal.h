@@ -28,8 +28,8 @@
 #ifndef __LIBVLC_AOUT_INTERNAL_H
 # define __LIBVLC_AOUT_INTERNAL_H 1
 
-void aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
-        aout_buffer_t *old_buffer, aout_buffer_t **new_buffer);
+aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
+        aout_buffer_t *old_buffer);
 
 struct aout_filter_owner_sys_t
 {

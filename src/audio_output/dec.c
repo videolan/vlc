@@ -267,7 +267,7 @@ aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
     duration = (1000000 * (mtime_t)i_nb_samples) / p_input->input.i_rate;
 
     /* This necessarily allocates in the heap. */
-    aout_BufferAlloc( &p_input->input_alloc, duration, NULL, &p_buffer );
+    p_buffer = aout_BufferAlloc( &p_input->input_alloc, duration, NULL );
     if( p_buffer != NULL )
         p_buffer->i_nb_bytes = i_nb_samples * p_input->input.i_bytes_per_frame
                                   / p_input->input.i_frame_length;
@@ -326,7 +326,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         mtime_t duration = (1000000 * (mtime_t)p_buffer->i_nb_samples)
                             / p_input->input.i_rate;
 
-        aout_BufferAlloc( &p_input->input_alloc, duration, NULL, &p_new_buffer );
+        p_new_buffer = aout_BufferAlloc( &p_input->input_alloc, duration, NULL);
         vlc_memcpy( p_new_buffer->p_buffer, p_buffer->p_buffer,
                     p_buffer->i_nb_bytes );
         p_new_buffer->i_nb_samples = p_buffer->i_nb_samples;

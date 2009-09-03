@@ -701,13 +701,12 @@ bool aout_CheckChannelExtraction( int *pi_selection,
  * aout_BufferAlloc:
  *****************************************************************************/
 
-void aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
-        aout_buffer_t *old_buffer, aout_buffer_t **new_buffer)
+aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
+        aout_buffer_t *old_buffer)
 {
     if ( !allocation->b_alloc )
     {
-        *new_buffer = old_buffer;
-        return;
+        return old_buffer;
     }
 
     aout_buffer_t *buffer;
@@ -718,10 +717,7 @@ void aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
 
     buffer = malloc( i_alloc_size + sizeof(aout_buffer_t) );
     if ( !buffer )
-    {
-        *new_buffer = NULL;
-        return;
-    }
+        return NULL;
 
     buffer->b_alloc = true;
     buffer->i_size = i_alloc_size;
@@ -734,5 +730,5 @@ void aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
         buffer->end_date = old_buffer->end_date;
     }
 
-    *new_buffer = buffer;
+    return buffer;
 }

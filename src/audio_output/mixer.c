@@ -333,13 +333,12 @@ static int MixBuffer( aout_instance_t * p_aout )
     }
 
     /* Run the mixer. */
-    aout_BufferAlloc( &p_aout->p_mixer->allocation,
-                      ((uint64_t)p_aout->output.i_nb_samples * 1000000)
-                        / p_aout->output.output.i_rate,
-                      /* This is a bit kludgy, but is actually only used
-                       * for the S/PDIF dummy mixer : */
-                      p_aout->pp_inputs[i_first_input]->mixer.fifo.p_first,
-                      &p_output_buffer );
+    p_output_buffer = aout_BufferAlloc( &p_aout->p_mixer->allocation,
+                          ((uint64_t)p_aout->output.i_nb_samples * 1000000)
+                            / p_aout->output.output.i_rate,
+                          /* This is a bit kludgy, but is actually only used
+                           * for the S/PDIF dummy mixer : */
+                          p_aout->pp_inputs[i_first_input]->mixer.fifo.p_first);
     if ( p_output_buffer == NULL )
     {
         aout_unlock_input_fifos( p_aout );

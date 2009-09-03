@@ -347,10 +347,10 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
         /* Resamplers can produce slightly more samples than (i_in_nb *
          * p_filter->output.i_rate / p_filter->input.i_rate) so we need
          * slightly bigger buffers. */
-        aout_BufferAlloc( &p_filter->output_alloc,
-                          ((mtime_t)(*pp_input_buffer)->i_nb_samples + 2)
-                          * 1000000 / p_filter->input.i_rate,
-                          *pp_input_buffer, &p_output_buffer );
+        p_output_buffer = aout_BufferAlloc( &p_filter->output_alloc,
+                              ((mtime_t)(*pp_input_buffer)->i_nb_samples + 2)
+                              * 1000000 / p_filter->input.i_rate,
+                              *pp_input_buffer );
         if( p_output_buffer == NULL )
             return;
 
