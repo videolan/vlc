@@ -79,8 +79,8 @@ vlc_module_begin ()
         change_safe()
     add_string( "ftp-user", "anonymous", NULL, USER_TEXT, USER_LONGTEXT,
                 false )
-    add_password( "ftp-pwd", "anonymous@example.com", NULL, PASS_TEXT,
-                  PASS_LONGTEXT, false )
+    add_string( "ftp-pwd", "anonymous@example.com", NULL, PASS_TEXT,
+                PASS_LONGTEXT, false )
     add_string( "ftp-account", "anonymous", NULL, ACCOUNT_TEXT,
                 ACCOUNT_LONGTEXT, false )
     add_shortcut( "ftp" )
