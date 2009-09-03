@@ -4362,7 +4362,7 @@ then
   VLC_ADD_OBJCFLAGS([macosx],                         [-F\\\${top_srcdir}/extras/contrib/Sparkle])
   dnl For bug report
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,AddressBook])
-  VLC_ADD_LDFLAGS([macosx qtcapture],                 [-Wl,-framework,QTKit])
+  VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,QTKit])
   VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreAudio])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
   VLC_ADD_LDFLAGS([opengllayer qtcapture],            [-Wl,-framework,QuartzCore])
