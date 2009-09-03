@@ -210,11 +210,14 @@ class LogIterator:
     def next(self):
         if not self.has_next():
             raise StopIteration
-        buffer=LogMessage()
+        buf=LogMessage()
         e=VLCException()
-        ret=libvlc_log_iterator_next(self, buffer, e)
-        return ret
+        ret=libvlc_log_iterator_next(self, buf, e)
+        return ret.contents
 
 class Log:
     def __iter__(self):
         return self.get_iterator()
+
+    def dump(self):
+        return [ str(m) for m in self ]

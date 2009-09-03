@@ -329,7 +329,7 @@ class PythonGenerator(object):
         'libvlc_media_t*': 'Media',
         'libvlc_log_t*': 'Log',
         'libvlc_log_iterator_t*': 'LogIterator',
-        'libvlc_log_message_t*': 'LogMessage',
+        'libvlc_log_message_t*': 'ctypes.POINTER(LogMessage)',
         'libvlc_event_type_t': 'ctypes.c_uint',
         'libvlc_event_manager_t*': 'EventManager',
         'libvlc_media_discoverer_t*': 'MediaDiscoverer',
@@ -658,9 +658,15 @@ class PythonGenerator(object):
                 # Check for standard methods
                 if name == 'count':
                     # There is a count method. Generate a __len__ one.
-                    self.output("""    def __len__(self):
+                    if params and params[-1][0] == 'libvlc_exception_t*':
+                        self.output("""    def __len__(self):
         e=VLCException()
         return %s(self, e)
+""" % method)
+                    else:
+                        # No exception
+                        self.output("""    def __len__(self):
+        return %s(self)
 """ % method)
                 elif name.endswith('item_at_index'):
                     # Indexable (and thus iterable)"

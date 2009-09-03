@@ -149,6 +149,9 @@ class LogMessage(ctypes.Structure):
                 ('message', ctypes.c_char_p),
                 ]
 
+    def __init__(self):
+        self.size=ctypes.sizeof(self)
+
     def __str__(self):
         return "vlc.LogMessage(%d:%s): %s" % (self.severity, self.type, self.message)
 
