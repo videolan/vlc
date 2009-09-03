@@ -2871,8 +2871,8 @@ AC_ARG_ENABLE(switcher,
 AS_IF([test "${enable_switcher}" = "yes"], [
   AS_IF([test "x${have_avcodec}" = "xyes"], [
     VLC_ADD_PLUGIN([stream_out_switcher])
-    VLC_ADD_LIBS([stream_out_switcher],[$AVCODEC_LIBS])
-    VLC_ADD_CFLAGS([stream_out_switcher],[$AVCODEC_CFLAGS])
+    VLC_ADD_LIBS([stream_out_switcher],[$AVCODEC_LIBS $AVUTIL_LIBS])
+    VLC_ADD_CFLAGS([stream_out_switcher],[$AVCODEC_CFLAGS $AVUTIL_CFLAGS])
   ],[AC_MSG_ERROR([Stream_out switcher depends on avcodec])
   ])
 ])
@@ -2894,8 +2894,8 @@ then
       AC_CHECK_HEADERS(libavformat/avformat.h ffmpeg/avformat.h)
       AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
       VLC_ADD_PLUGIN([avformat])
-      VLC_ADD_LIBS([avformat],[$AVFORMAT_LIBS])
-      VLC_ADD_CFLAGS([avformat],[$AVFORMAT_CFLAGS])
+      VLC_ADD_LIBS([avformat],[$AVFORMAT_LIBS $AVUTIL_LIBS])
+      VLC_ADD_CFLAGS([avformat],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
       AC_MSG_ERROR([Could not find libavformat or libavutil. Use --disable-avformat to ignore this error.])
@@ -2941,8 +2941,8 @@ then
       CFLAGS="${CFLAGS} ${POSTPROC_CFLAGS}"
       AC_CHECK_HEADERS(libpostproc/postproc.h postproc/postprocess.h)
       VLC_ADD_PLUGIN([postproc])
-      VLC_ADD_LIBS([postproc],[$POSTPROC_LIBS])
-      VLC_ADD_CFLAGS([postproc],[$POSTPROC_CFLAGS])
+      VLC_ADD_LIBS([postproc],[$POSTPROC_LIBS $AVUTIL_LIBS])
+      VLC_ADD_CFLAGS([postproc],[$POSTPROC_CFLAGS $AVUTIL_CFLAGS])
       VLC_RESTORE_FLAGS
     ],[
       AC_MSG_ERROR([Could not find libpostproc. Use --disable-postproc to ignore this error.])
