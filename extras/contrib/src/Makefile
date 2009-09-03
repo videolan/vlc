@@ -2498,6 +2498,61 @@ CLEAN_PKG += gsm
 DISTCLEAN_PKG += gsm-$(GSM_VERSION).tar.gz
 
 
+# ***************************************************************************
+# X11 C Bindings
+# ***************************************************************************
+
+libxcb-$(XCB_VERSION).tar.bz2:
+	$(WGET) $(XCB_URL)/$@
+
+libxcb: libxcb-$(XCB_VERSION).tar.bz2
+	-rm -rf $@
+	bzcat $< | tar xf -
+	mv libxcb-$(XCB_VERSION) $@
+	touch $@
+
+.xcb: libxcb
+	cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) \
+		--disable-composite \
+		--disable-damage \
+		--disable-dpms \
+		--disable-glx \
+		--enable-randr \
+		--disable-record \
+		--enable-render \
+		--disable-resource \
+		--disable-screensaver \
+		--disable-shape \
+		--enable-shm \
+		--disable-sync \
+		--disable-xevie \
+		--disable-xfixes \
+		--disable-xfree86-dri \
+		--disable-xinerama \
+		--disable-xinput \
+		--disable-xprint \
+		--disable-selinux \
+		--disable-xtest \
+		--enable-xv \
+		--disable-xvmc \
+		--disable-build-docs
+	cd $< && make install
+	touch $@
+
+xcb-util-$(XCB_UTIL_VERSION).tar.bz2:
+	$(WGET) $(XCB_UTIL_URL)/$@
+
+xcb-util: xcb-util-$(XCB_UTIL_VERSION).tar.bz2
+	-rm -rf $@
+	bzcat $< | tar xf -
+	mv xcb-util-$(XCB_UTIL_VERSION) $@
+	touch $@
+
+.xcb-util: xcb-util .xcb
+	cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)
+	cd $< && make install
+	touch $@
+
 
 # ***************************************************************************
 # Some cleaning

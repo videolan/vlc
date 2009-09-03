@@ -231,3 +231,7 @@ GSM_URL=http://user.cs.tu-berlin.de/~jutta/gsm/gsm-$(GSM_VERSION).tar.gz
 SPARKLE_VERSION=1.5b6-vlc
 #SPARKLE_URL=http://sparkle.andymatuschak.org/files/Sparkle%20$(SPARKLE_VERSION).zip
 SPARKLE_URL=$(VIDEOLAN)/testing/contrib/Sparkle-$(SPARKLE_VERSION).zip
+XCB_VERSION=1.2
+XCB_URL=http://xcb.freedesktop.org/dist/
+XCB_UTIL_VERSION=0.2
+XCB_UTIL_URL=$(XCB_URL)
