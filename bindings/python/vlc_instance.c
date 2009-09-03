@@ -115,12 +115,6 @@ vlcInstance_dealloc( PyObject *self )
 }
 
 static PyObject *
-vlcInstance_get_vlc_id( PyObject *self, PyObject *args )
-{
-    return Py_BuildValue( "i", libvlc_get_vlc_id( LIBVLC_INSTANCE(self) ) );
-}
-
-static PyObject *
 vlcInstance_new_media_player( PyObject *self, PyObject *args )
 {
     libvlc_exception_t ex;
