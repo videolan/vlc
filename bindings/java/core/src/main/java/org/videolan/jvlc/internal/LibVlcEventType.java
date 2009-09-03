@@ -68,5 +68,18 @@ public enum LibVlcEventType {
     libvlc_MediaDiscovererEnded, // 32
 
     libvlc_MediaPlayerTitleChanged, // 33
-    libvlc_MediaPlayerSnapshotTaken; // 34
+    libvlc_MediaPlayerSnapshotTaken, // 34
+    libvlc_MediaPlayerLengthChanged, // 35
+
+    libvlc_VlmMediaAdded, // 36
+    libvlc_VlmMediaRemoved, // 37
+    libvlc_VlmMediaChanged, // 38
+    libvlc_VlmMediaInstanceStarted, // 39
+    libvlc_VlmMediaInstanceStopped, // 40
+    libvlc_VlmMediaInstanceStatusInit, // 41
+    libvlc_VlmMediaInstanceStatusOpening, // 42
+    libvlc_VlmMediaInstanceStatusPlaying, // 43
+    libvlc_VlmMediaInstanceStatusPause, // 44
+    libvlc_VlmMediaInstanceStatusEnd, // 45
+    libvlc_VlmMediaInstanceStatusError; // 46
 }
