@@ -715,7 +715,7 @@ AM_CONDITIONAL(BUILD_GETOPT, ${need_getopt})
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
 AC_TYPE_SIGNAL
 AC_CHECK_LIB(m,cos,[
-  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua],[-lm])
+  VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
   VLC_ADD_LIBS([avcodec avformat swscale postproc ffmpegaltivec i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realaudio realvideo opengl],[-lm])
