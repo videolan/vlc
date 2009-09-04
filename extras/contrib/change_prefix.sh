@@ -49,7 +49,7 @@ for file in $files; do
  if test ".`file $file | grep Mach-O`" != "." ; then
     echo "Changing prefixes of '$file'"
     islib=n
-    if test ".`file $file | grep 'Mach-O dynamically'`" != "." ; then
+    if test ".`file $file | grep 'dynamically linked shared library'`" != "." ; then
       islib=y
     fi
     libs=`otool -L $file 2>/dev/null | grep $prefix | cut -d\  -f 1`
