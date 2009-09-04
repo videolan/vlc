@@ -24,15 +24,15 @@
 /* You can use these numbers with | and & to determine what you want to show */
 enum
 {
-    COLUMN_NUMBER       = 0x0001,
-    COLUMN_TITLE        = 0x0002,
-    COLUMN_DURATION     = 0x0004,
-    COLUMN_ARTIST       = 0x0008,
-    COLUMN_GENRE        = 0x0010,
-    COLUMN_ALBUM        = 0x0020,
-    COLUMN_TRACK_NUMBER = 0x0040,
-    COLUMN_DESCRIPTION  = 0x0080,
-    COLUMN_URI          = 0x0100,
+    COLUMN_TITLE          = 0x0001,
+    COLUMN_DURATION       = 0x0002,
+    COLUMN_ARTIST         = 0x0004,
+    COLUMN_GENRE          = 0x0008,
+    COLUMN_ALBUM          = 0x0010,
+    COLUMN_TRACK_NUMBER   = 0x0020,
+    COLUMN_DESCRIPTION    = 0x0040,
+    COLUMN_URI            = 0x0080,
+    COLUMN_NUMBER         = 0x0100,
 
     /* Add new entries here and update the COLUMN_END value*/
 
