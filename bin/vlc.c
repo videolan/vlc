@@ -79,9 +79,6 @@ int main( int i_argc, const char *ppsz_argv[] )
 #   ifndef NDEBUG
     /* Activate malloc checking routines to detect heap corruptions. */
     putenv( (char*)"MALLOC_CHECK_=2" );
-#       ifdef __APPLE__
-    putenv( (char*)"MallocErrorAbort=crash_my_baby_crash" );
-#       endif
 
     /* Disable the ugly Gnome crash dialog so that we properly segfault */
     putenv( (char *)"GNOME_DISABLE_CRASH_DIALOG=1" );
