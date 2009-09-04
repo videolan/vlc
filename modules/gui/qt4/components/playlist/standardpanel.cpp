@@ -269,8 +269,10 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
 {
     QMenu menu;
 
+    /* We do not offer the option to hide index 0 column, or
+    * QTreeView will behave weird */
     int i, j;
-    for( i = 1, j = 0; i < COLUMN_END; i <<= 1, j++ )
+    for( i = 1 << 1, j = 1; i < COLUMN_END; i <<= 1, j++ )
     {
         QAction* option = menu.addAction(
             qfu( psz_column_title( i ) ) );
@@ -284,19 +286,7 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
 
 void StandardPLPanel::toggleColumnShown( int i )
 {
-    if( view->isColumnHidden( i ) )
-    {
-        view->setColumnHidden( i, false );
-    }
-    else
-    {
-        int visible = 0;
-        int m, c;
-        for( m = 1, c = 0; m != COLUMN_END && visible < 2; m <<= 1, c++ )
-            if( !view->isColumnHidden( c ) ) visible++;
-        if( visible < 2 ) return;
-        view->setColumnHidden( i, true );
-    }
+    view->setColumnHidden( i, !view->isColumnHidden( i ) );
 }
 
 /* Search in the playlist */
