@@ -402,7 +402,6 @@ class PythonGenerator(object):
             self.fd=open(filename, 'w')
 
         self.insert_code('header.py')
-        self.generate_enums(self.parser.enums)
         wrapped_methods=self.generate_wrappers(self.parser.methods)
         for l in self.parser.methods:
             self.output_ctypes(*l)
@@ -437,10 +436,13 @@ class PythonGenerator(object):
         """
         f=open(filename, 'r')
         for l in f:
-            if 'build_date' in l:
+            if l.startswith('build_date'):
                 self.output('build_date="%s"' % time.ctime())
+            elif l.startswith('# GENERATED_ENUMS'):
+                self.generate_enums(self.parser.enums)
             else:
                 self.output(l.rstrip())
+
         f.close()
 
     def convert_enum_names(self, enums):
@@ -462,7 +464,7 @@ class PythonGenerator(object):
                 raise Exception('This method only handles enums')
             pyname=self.type2class[name]
 
-            self.output("class %s(ctypes.c_uint):" % pyname)
+            self.output("class %s(ctypes.c_ulong):" % pyname)
             self.output('    """%s\n    """' % comment)
 
             conv={}
@@ -477,9 +479,6 @@ class PythonGenerator(object):
                     n='_'+n
                 conv[k]=n
 
-            for k, v in values:
-                self.output("    %s=ctypes.c_uint(%s)" % (conv[k], v))
-
             self.output("    _names={")
             for k, v in values:
                 self.output("        %s: '%s'," % (v, conv[k]))
@@ -490,12 +489,19 @@ class PythonGenerator(object):
         return ".".join((self.__class__.__module__, self.__class__.__name__, self._names[self.value]))
 
     def __eq__(self, other):
-        return (isinstance(other, ctypes.c_uint) and self.value == other.value)
+        return ( (isinstance(other, ctypes.c_ulong) and self.value == other.value)
+                 or (isinstance(other, (int, long)) and self.value == other ) )
 
     def __ne__(self, other):
         return not self.__eq__(other)
-
     """)
+            for k, v in values:
+                self.output("%(class)s.%(attribute)s=%(class)s(%(value)s)" % {
+                        'class': pyname,
+                        'attribute': conv[k],
+                        'value': v
+                        })
+            self.output("")
 
     def output_ctypes(self, rtype, method, params, comment):
         """Output ctypes decorator for the given method.

@@ -91,7 +91,7 @@ class MediaControl:
         @param pos: a MediaControlPosition or an integer (in ms)
         """
         if not isinstance(pos, MediaControlPosition):
-            pos=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(pos))
+            pos=MediaControlPosition(long(pos))
         e=MediaControlException()
         mediacontrol_set_media_position(self, pos, e)
 
@@ -101,7 +101,7 @@ class MediaControl:
         @param pos: a MediaControlPosition or an integer (in ms)
         """
         if not isinstance(pos, MediaControlPosition):
-            pos=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(pos))
+            pos=MediaControlPosition(long(pos))
         e=MediaControlException()
         mediacontrol_start(self, pos, e)
 
@@ -115,11 +115,16 @@ class MediaControl:
         @param pos: a MediaControlPosition or an integer (in ms)
         """
         if not isinstance(pos, MediaControlPosition):
-            pos=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(pos))
+            pos=MediaControlPosition(long(pos))
         e=MediaControlException()
         p=mediacontrol_snapshot(self, pos, e)
         if p:
-            return p.contents
+            snap=p.contents
+            # FIXME: there is a bug in the current mediacontrol_snapshot
+            # implementation, which sets an incorrect date.
+            # Workaround here:
+            snap.date=self.get_media_position().value
+            return snap
         else:
             return None
 
@@ -131,9 +136,9 @@ class MediaControl:
         @param end: the end position
         """
         if not isinstance(begin, MediaControlPosition):
-            begin=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(begin))
+            begin=self.value2position(pos)
         if not isinstance(end, MediaControlPosition):
-            begin=MediaControlPosition(origin=PositionOrigin.AbsolutePosition, key=PositionKey.MediaTime, value=long(end))
+            end=self.value2position(end)
         e=MediaControlException()
         mediacontrol_display_text(self, message, begin, end, e)
 

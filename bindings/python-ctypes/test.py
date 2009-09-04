@@ -84,6 +84,29 @@ class TestVLCAPI(unittest.TestCase):
         mc.set_mrl(mrl)
         self.assertEqual(mc.get_mrl(), mrl)
 
+    def test_mediacontrol_position(self):
+        p=vlc.MediaControlPosition(value=2,
+                                   origin=vlc.PositionOrigin.RelativePosition,
+                                   key=vlc.PositionKey.MediaTime)
+        self.assertEqual(p.value, 2)
+
+    def test_mediacontrol_position_shortcut(self):
+        p=vlc.MediaControlPosition(2)
+        self.assertEqual(p.value, 2)
+        self.assertEqual(p.key, vlc.PositionKey.MediaTime)
+        self.assertEqual(p.origin, vlc.PositionOrigin.AbsolutePosition)
+
+    def test_mediacontrol_get_media_position(self):
+        mc=vlc.MediaControl()
+        p=mc.get_media_position()
+        self.assertEqual(p.value, -1)
+
+    def test_mediacontrol_get_stream_information(self):
+        mc=vlc.MediaControl()
+        s=mc.get_stream_information()
+        self.assertEqual(s.position, 0)
+        self.assertEqual(s.length, 0)
+
     # Basic libvlc tests
     def test_instance_creation(self):
         i=vlc.Instance()
