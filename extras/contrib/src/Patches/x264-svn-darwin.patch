@@ -12,16 +12,3 @@ Index: configure
  
  if [ "$debug" != "yes" -a "$gprof" != "yes" ]; then
 
-Index: common/common.h
-===================================================================
---- common/common.h	(revision 701)
-+++ common/common.h	(working copy)
-@@ -67,7 +67,7 @@
- #include <stdlib.h>
- #include <string.h>
- #include <assert.h>
--#include "x264.h"
-+#include "../x264.h"
- #include "bs.h"
- #include "set.h"
- #include "predict.h"
