@@ -82,7 +82,7 @@ vlc_module_begin ()
 
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
-    set_capability( "video output", 1 )
+    set_capability( "video output", 0 )
 
     add_integer( "vout-snapshot-width", 320, NULL, WIDTH_TEXT, WIDTH_LONGTEXT, false )
     add_integer( "vout-snapshot-height", 200, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT, false )
