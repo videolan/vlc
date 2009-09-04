@@ -45,7 +45,7 @@ extern "C" {
 
 typedef struct libvlc_media_list_player_t libvlc_media_list_player_t;
 
-/*
+/**
  *  Defines playback modes for playlist.
  */
 typedef enum libvlc_playback_mode_t
