@@ -198,11 +198,6 @@ typedef struct vlc_object_internals_t
 
 #define vlc_internals( obj ) (((vlc_object_internals_t*)(VLC_OBJECT(obj)))-1)
 
-static inline const char *vlc_object_get_name(const vlc_object_t *o)
-{
-    return vlc_internals(o)->psz_name;
-}
-
 typedef struct sap_handler_t sap_handler_t;
 
 /**

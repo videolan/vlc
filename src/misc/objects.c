@@ -255,6 +255,14 @@ int vlc_object_set_name(vlc_object_t *obj, const char *name)
     return (priv->psz_name || !name) ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
+#undef vlc_object_get_name
+const char *vlc_object_get_name(const vlc_object_t *obj)
+{
+    vlc_object_internals_t *priv = vlc_internals(obj);
+
+    return priv->psz_name;
+}
+
 /**
  ****************************************************************************
  * Destroy a vlc object (Internal)

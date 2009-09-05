@@ -83,6 +83,8 @@ VLC_EXPORT( void *, __vlc_object_hold, ( vlc_object_t * ) );
 VLC_EXPORT( void, __vlc_object_release, ( vlc_object_t * ) );
 VLC_EXPORT( vlc_list_t *, __vlc_list_children, ( vlc_object_t * ) );
 VLC_EXPORT( void, vlc_list_release, ( vlc_list_t * ) );
+VLC_EXPORT( const char *, vlc_object_get_name, ( const vlc_object_t * ) ) LIBVLC_USED;
+#define vlc_object_get_name(o) vlc_object_get_name(VLC_OBJECT(o))
 
 /*}@*/
 
