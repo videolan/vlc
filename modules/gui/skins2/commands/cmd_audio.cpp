@@ -33,10 +33,4 @@ void CmdSetEqualizer::execute()
     aout_EnableFilter( getIntf(), "equalizer", m_enable );
 }
 
-void CmdVolumeChanged::execute()
-{
-    VlcProc* p_VlcProc = getIntf()->p_sys->p_vlcProc;
-
-    p_VlcProc->refreshVolume();
-}
 

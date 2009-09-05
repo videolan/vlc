@@ -46,21 +46,4 @@ class CmdSetEqualizer: public CmdGeneric
 };
 
 
-/// Command to enable/disable the equalizer
-class CmdVolumeChanged: public CmdGeneric
-{
-    public:
-        CmdVolumeChanged( intf_thread_t *pIntf ) : CmdGeneric( pIntf ) {}
-        virtual ~CmdVolumeChanged() {}
-
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "set volume"; }
-
-    private:
-};
-
-
 #endif

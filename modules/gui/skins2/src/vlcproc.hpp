@@ -27,6 +27,8 @@
 
 #include <set>
 
+#include <vlc_common.h>
+#include <vlc_input.h>
 #include <vlc_vout.h>
 #include "../vars/equalizer.hpp"
 #include "../vars/playtree.hpp"
@@ -85,8 +87,17 @@ class VlcProc: public SkinObject
         /// Indicate whether the embedded video output is currently used
         bool isVoutUsed() const { return m_pVout != NULL; }
 
-        /// Refresh Volume
-        void refreshVolume();
+        void on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+        void on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+        void on_bit_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+        void on_sample_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+
+        void on_random_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+        void on_loop_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+        void on_repeat_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+
+        void on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+        void on_audio_filter_changed( vlc_object_t* p_obj, vlc_value_t newVal );
 
     protected:
         // Protected because it is a singleton
@@ -147,20 +158,8 @@ class VlcProc: public SkinObject
         /// Define the command that calls manage()
         DEFINE_CALLBACK( VlcProc, Manage );
 
-        /// Refresh audio variables
-        void refreshAudio();
-        /// Refresh playlist variables
-        void refreshPlaylist();
-        /// Refresh input variables
-        void refreshInput();
-
         /// Update the stream name variable
         void updateStreamName();
-
-        /// Callback for volume variable
-        static int onVolumeChanged( vlc_object_t *pObj, const char *pVariable,
-                                    vlc_value_t oldVal, vlc_value_t newVal,
-                                    void *pParam );
 
         /// Callback for intf-change variable
         static int onIntfChange( vlc_object_t *pObj, const char *pVariable,
@@ -212,6 +211,12 @@ class VlcProc: public SkinObject
         static int onEqPreampChange( vlc_object_t *pObj, const char *pVariable,
                                      vlc_value_t oldVal, vlc_value_t newVal,
                                      void *pParam );
+
+        /// Generic Callback
+        static int onGenericCallback( vlc_object_t *pObj, const char *pVariable,
+                                      vlc_value_t oldVal, vlc_value_t newVal,
+                                      void *pParam );
+
 };
 
 
