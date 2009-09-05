@@ -299,26 +299,27 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 /*****************************************************************************
  * Divers
  *****************************************************************************/
-static bool NumInRange( char *psz_range, int i_num )
+static bool NumInRange( const char *psz_range, int i_num )
 {
-    char *psz = strchr( psz_range, '-' );
+    const char *psz = strchr( psz_range, '-' );
     char *end;
     int  i_start, i_stop;
 
+    i_start = strtol( psz_range, &end, 0 );
+    if( end == psz_range )
+        i_start = i_num;
+
     if( psz )
     {
-        i_start = strtol( psz_range, &end, 0 );
-        if( end == psz_range ) i_start = i_num;
-
-        i_stop  = strtol( psz+1,       &end, 0 );
-        if( end == psz_range ) i_stop = i_num;
+        psz++;
+        i_stop = strtol( psz, &end, 0 );
+        if( end == psz )
+            i_stop = i_num
     }
     else
-    {
-        i_start = i_stop = strtol( psz_range, NULL, 0 );
-    }
+        i_stop = i_start;
 
-    return i_start <= i_num && i_num <= i_stop ? true : false;
+    return i_start <= i_num && i_num <= i_stop;
 }
 
 static bool ESSelected( es_format_t *fmt, char *psz_select )
