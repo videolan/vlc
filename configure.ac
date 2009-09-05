@@ -1456,6 +1456,24 @@ AS_IF([test "${ac_cv_3dnow_inline}" != "no"], [
   VLC_ADD_PLUGIN([memcpy3dn])
 ])
 
+
+AC_ARG_ENABLE(neon,
+[ --disable-neon           disable NEON optimizations (default auto)],, [
+  AS_IF([test "${host_cpu}" = "arm"], [enable_neon="yes"] ,[enable_neon="no"])
+])
+AS_IF([test "${enable_neon}" != "no"], [
+  AC_CACHE_CHECK([if $CC groks NEON inline assembly], [ac_cv_neon_inline], [
+    AC_COMPILE_IFELSE([
+      AC_LANG_PROGRAM(,[[asm volatile("vqmovun.s64 d0, q1":::"d0");]])
+    ], [
+      ac_cv_neon_inline="yes"
+    ], [
+      ac_cv_neon_inline="no"
+    ])
+  ])
+])
+AM_CONDITIONAL(HAVE_NEON, [test "${ac_cv_neon_inline}" = "yes"])
+
 AC_ARG_ENABLE(altivec,
 [  --disable-altivec       disable AltiVec optimizations (default auto)],, [
   AS_IF([test "${host_cpu}" = "powerpc"],
