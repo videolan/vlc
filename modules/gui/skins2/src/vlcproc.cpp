@@ -105,6 +105,9 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     REGISTER_VAR( m_cVarSeekable, VarBoolImpl, "vlc.isSeekable" )
     REGISTER_VAR( m_cVarDvdActive, VarBoolImpl, "dvd.isActive" )
 
+    REGISTER_VAR( m_cVarRecordable, VarBoolImpl, "vlc.canRecord" )
+    REGISTER_VAR( m_cVarRecording, VarBoolImpl, "vlc.isRecording" )
+
     /* Vout variables */
     REGISTER_VAR( m_cVarFullscreen, VarBoolImpl, "vlc.isFullscreen" )
     REGISTER_VAR( m_cVarHasVout, VarBoolImpl, "vlc.hasVout" )
@@ -205,6 +208,7 @@ VlcProc::~VlcProc()
         var_DelCallback( pInput, "intf-event", onGenericCallback, this );
         var_DelCallback( pInput, "bit-rate", onGenericCallback, this );
         var_DelCallback( pInput, "sample-rate", onGenericCallback, this );
+        var_DelCallback( pInput, "can-Record", onGenericCallback, this );
 
         vlc_object_release( pInput );
         getIntf()->p_sys->p_input = NULL;
@@ -480,6 +484,7 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     ADD_CALLBACK_ENTRY( "intf-event", intf_event_changed )
     ADD_CALLBACK_ENTRY( "bit-rate", bit_rate_changed )
     ADD_CALLBACK_ENTRY( "sample-rate", sample_rate_changed )
+    ADD_CALLBACK_ENTRY( "can-record", can_record_changed )
 
     ADD_CALLBACK_ENTRY( "random", random_changed )
     ADD_CALLBACK_ENTRY( "loop", loop_changed )
@@ -505,6 +510,7 @@ void VlcProc::on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal )
         var_DelCallback( pInput, "intf-event", onGenericCallback, this );
         var_DelCallback( pInput, "bit-rate", onGenericCallback, this );
         var_DelCallback( pInput, "sample-rate", onGenericCallback, this );
+        var_DelCallback( pInput, "can-record", onGenericCallback, this );
         vlc_object_release( pInput );
         pInput = getIntf()->p_sys->p_input = NULL;
     }
@@ -517,6 +523,7 @@ void VlcProc::on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal )
     var_AddCallback( pInput, "intf-event", onGenericCallback, this );
     var_AddCallback( pInput, "bit-rate", onGenericCallback, this );
     var_AddCallback( pInput, "sample-rate", onGenericCallback, this );
+    var_AddCallback( pInput, "can-record", onGenericCallback, this );
     getIntf()->p_sys->p_input = pInput;
 }
 
@@ -638,6 +645,14 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
                 break;
             }
 
+            case INPUT_EVENT_RECORD:
+            {
+                VarBoolImpl *pVarRecording =
+                               (VarBoolImpl*)m_cVarRecording.get();
+                pVarRecording->set( var_GetBool( pInput, "record" ) );
+                break;
+            }
+
             INPUT_EVENT_DEAD:
             INPUT_EVENT_ABORT:
             {
@@ -646,6 +661,8 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
                 var_DelCallback( pInput, "bit-rate",
                                           onGenericCallback, this );
                 var_DelCallback( pInput, "sample-rate",
+                                          onGenericCallback, this );
+                var_DelCallback( pInput, "can-record" ,
                                           onGenericCallback, this );
                 vlc_object_release( pInput );
                 getIntf()->p_sys->p_input = NULL;
@@ -688,6 +705,14 @@ void VlcProc::on_sample_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
     int sampleRate = var_GetInteger( pInput, "sample-rate" ) / 1000;
     pSampleRate->set( UString::fromInt( getIntf(), sampleRate ) );
+}
+
+void VlcProc::on_can_record_changed( vlc_object_t* p_obj, vlc_value_t newVal )
+{
+    input_thread_t* pInput = (input_thread_t*) p_obj;
+
+    VarBoolImpl *pVarRecordable = (VarBoolImpl*)m_cVarRecordable.get();
+    pVarRecordable->set( var_GetBool(  pInput, "can-record" ) );
 }
 
 void VlcProc::on_random_changed( vlc_object_t* p_obj, vlc_value_t newVal )

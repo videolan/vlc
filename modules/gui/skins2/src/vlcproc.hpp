@@ -91,6 +91,7 @@ class VlcProc: public SkinObject
         void on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal );
         void on_bit_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal );
         void on_sample_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal );
+        void on_can_record_changed( vlc_object_t* p_obj, vlc_value_t newVal );
 
         void on_random_changed( vlc_object_t* p_obj, vlc_value_t newVal );
         void on_loop_changed( vlc_object_t* p_obj, vlc_value_t newVal );
@@ -128,6 +129,8 @@ class VlcProc: public SkinObject
         VariablePtr m_cVarStopped;
         VariablePtr m_cVarPaused;
         VariablePtr m_cVarSeekable;
+        VariablePtr m_cVarRecordable;
+        VariablePtr m_cVarRecording;
         /// Variables related to the vout
         VariablePtr m_cVarFullscreen;
         VarBox m_varVoutSize;

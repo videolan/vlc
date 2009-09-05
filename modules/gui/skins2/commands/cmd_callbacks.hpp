@@ -69,6 +69,7 @@ ADD_COMMAND( item_current_changed )
 ADD_COMMAND( intf_event_changed )
 ADD_COMMAND( bit_rate_changed )
 ADD_COMMAND( sample_rate_changed )
+ADD_COMMAND( can_record_changed )
 
 ADD_COMMAND( random_changed )
 ADD_COMMAND( loop_changed )

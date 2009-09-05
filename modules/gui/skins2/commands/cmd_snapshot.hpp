@@ -29,5 +29,7 @@
 
 /// Command to snapshot VLC
 DEFINE_COMMAND(Snapshot, "snapshot" )
+DEFINE_COMMAND(ToggleRecord, "togglerecord" )
+DEFINE_COMMAND(NextFrame, "nextframe" )
 
 #endif

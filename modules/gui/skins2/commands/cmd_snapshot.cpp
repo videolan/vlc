@@ -39,3 +39,24 @@ void CmdSnapshot::execute()
     }
 }
 
+
+void CmdToggleRecord::execute()
+{
+    input_thread_t* pInput = getIntf()->p_sys->p_input;
+    if( !pInput )
+        return;
+
+    var_ToggleBool( pInput, "record" );
+}
+
+
+void CmdNextFrame::execute()
+{
+    input_thread_t* pInput = getIntf()->p_sys->p_input;
+    if( !pInput )
+        return;
+
+    var_TriggerCallback( pInput, "frame-next" );
+}
+
+
