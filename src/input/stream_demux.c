@@ -162,6 +162,7 @@ static int DStreamRead( stream_t *s, void *p_read, unsigned int i_read )
             i_copy = __MIN( i_read, p_block->i_buffer );
             if( p_out && i_copy ) memcpy( p_out, p_block->p_buffer, i_copy );
             i_read -= i_copy;
+            p_out += i_copy;
             i_out += i_copy;
             p_block->i_buffer -= i_copy;
             p_block->p_buffer += i_copy;
