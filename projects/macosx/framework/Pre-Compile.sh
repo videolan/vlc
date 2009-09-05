@@ -157,14 +157,10 @@ if test "${ACTION}" = "build"; then
 
     ##########################
     # Build the share folder
-    if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
-        echo "Building share folder..."
-        pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -resolve-src-symlinks"
-        mkdir -p ${target_share}
-        $pbxcp ${VLC_SRC_DIR}/share/lua ${target_share}
-    else
-        echo "Share folder not needed for this product"
-    fi 
+    echo "Building share folder..."
+    pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -resolve-src-symlinks"
+    mkdir -p ${target_share}
+    $pbxcp ${VLC_SRC_DIR}/share/lua ${target_share}
     
 
     ##########################
