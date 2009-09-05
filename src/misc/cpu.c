@@ -227,7 +227,7 @@ out:
 
 #elif defined( __arm__ )
 #   if defined( __ARM_EABI__ ) && !defined( __SOFTFP__ )
-    i_capabilities |= CPU_CAPABILITY_FPU;
+//    i_capabilities |= CPU_CAPABILITY_FPU;
 #   endif
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
