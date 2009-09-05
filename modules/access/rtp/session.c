@@ -348,7 +348,7 @@ rtp_queue (demux_t *demux, rtp_session_t *session, block_t *block)
     block_t **pp = &src->blocks;
     for (block_t *prev = *pp; prev != NULL; prev = *pp)
     {
-        int delta_seq = seq - rtp_seq (prev);
+        int16_t delta_seq = seq - rtp_seq (prev);
         if (delta_seq < 0)
             break;
         if (delta_seq == 0)
