@@ -653,8 +653,8 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
                 break;
             }
 
-            INPUT_EVENT_DEAD:
-            INPUT_EVENT_ABORT:
+            case INPUT_EVENT_DEAD:
+            case INPUT_EVENT_ABORT:
             {
                 var_DelCallback( pInput, "intf-event",
                                           onGenericCallback, this );
@@ -675,7 +675,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
     }
     else
     {
-        // pVarSeekable->set( false );
+        pVarSeekable->set( false );
         pVarDvdActive->set( false );
         pTime->set( 0, false );
         pVarFullscreen->set( false );
