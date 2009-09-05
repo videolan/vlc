@@ -79,30 +79,30 @@ static void Do_F32_S32 (aout_instance_t *aout, aout_filter_t *filter,
     if (nb_samples & 2)
         asm volatile (
             "vld1.f32 {d0}, [%[inp]]!\n"
-            "vcvt.s32.f32 d1, d0, #28\n"
-            "vst1.s32 {d1}, [%[outp]]!\n"
+            "vcvt.s32.f32 d0, d0, #28\n"
+            "vst1.s32 {d0}, [%[outp]]!\n"
             : [outp] "+r" (outp), [inp] "+r" (inp)
             :
-            : "q0", "memory");
+            : "d0", "memory");
 
     if (nb_samples & 4)
         asm volatile (
             "vld2.f32 {q0}, [%[inp]]!\n"
-            "vcvt.s32.f32 q1, q0, #28\n"
-            "vst2.s32 {q1}, [%[outp]]!\n"
+            "vcvt.s32.f32 q0, q0, #28\n"
+            "vst2.s32 {q0}, [%[outp]]!\n"
             : [outp] "+r" (outp), [inp] "+r" (inp)
             :
-            : "q0", "q1", "memory");
+            : "q0", "memory");
 
     while (inp != endp)
         asm volatile (
             "vld4.f32 {q0-q1}, [%[inp]]!\n"
-            "vcvt.s32.f32 q2, q0, #28\n"
-            "vcvt.s32.f32 q3, q1, #28\n"
-            "vst4.s32 {q2-q3}, [%[outp]]!\n"
+            "vcvt.s32.f32 q0, q0, #28\n"
+            "vcvt.s32.f32 q1, q1, #28\n"
+            "vst4.s32 {q0-q1}, [%[outp]]!\n"
             : [outp] "+r" (outp), [inp] "+r" (inp)
             :
-            : "q0", "q1", "q2", "q3", "memory");
+            : "q0", "q1", "memory");
 
     outbuf->i_nb_samples = inbuf->i_nb_samples;
     outbuf->i_nb_bytes = inbuf->i_nb_bytes;
