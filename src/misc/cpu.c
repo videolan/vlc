@@ -229,6 +229,9 @@ out:
 #   if defined( __ARM_EABI__ ) && !defined( __SOFTFP__ )
 //    i_capabilities |= CPU_CAPABILITY_FPU;
 #   endif
+#   if defined( __ARM_NEON__ )
+    i_capabilities |= CPU_CAPABILITY_NEON;
+#   endif
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
 

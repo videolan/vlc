@@ -798,6 +798,7 @@ VLC_EXPORT(int, vlc_wclosedir, ( void *_p_dir ));
 #define CPU_CAPABILITY_SSE     (1<<6)
 #define CPU_CAPABILITY_SSE2    (1<<7)
 #define CPU_CAPABILITY_ALTIVEC (1<<16)
+#define CPU_CAPABILITY_NEON    (1<<24)
 #define CPU_CAPABILITY_FPU     (1<<31)
 VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
 
