@@ -6,7 +6,7 @@ all: \
 	.twolame .x264 \
 	.ebml .matroska .ffmpeg .mod \
 	.live .dvbpsi .zvbi \
-	.lua
+	.lua .xcb .xcb-util
 #.gpg-error .gcrypt .gnutls -> OpenSSL
 #.dvdcss .dvdnav -> no DVD
 #.dirac -> broken
