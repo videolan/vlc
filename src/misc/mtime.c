@@ -324,7 +324,8 @@ mtime_t mdate( void )
         i_previous_time = res;
         LeaveCriticalSection( &date_lock );
     }
-#elif USE_APPLE_MACH /* The version that should be used, if it was cancelable */
+#elif defined(USE_APPLE_MACH)
+    /* The version that should be used, if it was cancelable */
     pthread_once(&mtime_timebase_info_once, mtime_init_timebase);
     uint64_t mach_time = date * 1000 * mtime_timebase_info.denom / mtime_timebase_info.numer;
     mach_wait_until(mach_time);
@@ -425,7 +426,8 @@ void msleep( mtime_t delay )
 
     while( nanosleep( &ts_delay, &ts_delay ) && ( errno == EINTR ) );
 
-#elif USE_APPLE_MACH /* The version that should be used, if it was cancelable */
+#elif defined (USE_APPLE_MACH)
+    /* The version that should be used, if it was cancelable */
     pthread_once(&mtime_timebase_info_once, mtime_init_timebase);
     uint64_t mach_time = delay * 1000 * mtime_timebase_info.denom / mtime_timebase_info.numer;
     mach_wait_until(mach_time + mach_absolute_time());
