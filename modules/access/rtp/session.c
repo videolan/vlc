@@ -383,11 +383,12 @@ rtp_decode (demux_t *demux, const rtp_session_t *session, rtp_source_t *src)
     if (delta_seq != 0)
     {
         if (delta_seq >= 0x8000)
-        {   /* Unrecoverable if later packets have already been dequeued */
-            msg_Warn (demux, "ignoring late packet (sequence: %"PRIu16")",
+        {   /* Trash too late packets (and PIM Assert duplicates) */
+            msg_Dbg (demux, "ignoring late packet (sequence: %"PRIu16")",
                       rtp_seq (block));
             goto drop;
         }
+        msg_Warn (demux, "%"PRIu16" packet(s) lost", delta_seq);
         block->i_flags |= BLOCK_FLAG_DISCONTINUITY;
     }
     src->last_seq = rtp_seq (block);
