@@ -314,7 +314,7 @@ static bool NumInRange( const char *psz_range, int i_num )
         psz++;
         i_stop = strtol( psz, &end, 0 );
         if( end == psz )
-            i_stop = i_num
+            i_stop = i_num;
     }
     else
         i_stop = i_start;
