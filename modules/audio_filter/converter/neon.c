@@ -173,15 +173,28 @@ static void Do_S32_S16 (aout_instance_t *aout, aout_filter_t *filter,
             :
             : "q0", "memory");
 
-    while (inp != endp)
+    if (nb_samples & 8)
         asm volatile (
             "vld1.s32 {q0-q1}, [%[inp]]!\n"
-            "vrshrn.s32 d0, q0, #13\n"
-            "vrshrn.s32 d1, q1, #13\n"
+            "vrshrn.i32 d0, q0, #13\n"
+            "vrshrn.i32 d1, q1, #13\n"
             "vst1.s16 {q0}, [%[outp]]!\n"
             : [outp] "+r" (outp), [inp] "+r" (inp)
             :
             : "q0", "q1", "memory");
+
+    while (inp != endp)
+        asm volatile (
+            "vld1.s32 {q0-q1}, [%[inp]]!\n"
+            "vld1.s32 {q2-q3}, [%[inp]]!\n"
+            "vrshrn.s32 d0, q0, #13\n"
+            "vrshrn.s32 d1, q1, #13\n"
+            "vrshrn.s32 d2, q2, #13\n"
+            "vrshrn.s32 d3, q3, #13\n"
+            "vst1.s16 {q0-q1}, [%[outp]]!\n"
+            : [outp] "+r" (outp), [inp] "+r" (inp)
+            :
+            : "q0", "q1", "q2", "q3", "memory");
 
     outbuf->i_nb_samples = inbuf->i_nb_samples;
     outbuf->i_nb_bytes = inbuf->i_nb_bytes / 2;
