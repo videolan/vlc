@@ -344,4 +344,3 @@ StandardPLPanel::~StandardPLPanel()
     getSettings()->endGroup();
 }
 
-

@@ -77,25 +77,30 @@ void PLSelector::setSource( QTreeWidgetItem *item )
 
     int i_type = item->data( 0, Qt::UserRole ).toInt();
 
+    assert( ( i_type == PL_TYPE || i_type == ML_TYPE || i_type == SD_TYPE ) );
     if( i_type == SD_TYPE )
     {
-        QString qs = item->data( 0, Qt::UserRole + 1 ).toString();
+        QString qs = item->data( 0, Qt::UserRole + 2 ).toString();
         if( !playlist_IsServicesDiscoveryLoaded( THEPL, qtu( qs ) ) )
         {
             playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
 #warning FIXME
-            emit activated( THEPL->p_root_category->pp_children[THEPL->p_root_category->i_children-1] );
+            playlist_item_t *pl_item =
+                    THEPL->p_root_category->pp_children[THEPL->p_root_category->i_children-1];
+            item->setData( 0, Qt::UserRole + 1, QVariant::fromValue( pl_item ) );
+
+            emit activated( pl_item );
+            return;
         }
     }
-    else if( i_type == PL_TYPE || i_type == ML_TYPE )
-    {
-        playlist_item_t *pl_item =
-                item->data( 0, Qt::UserRole + 1 ).value<playlist_item_t *>();
-        if( pl_item )
+
+    if( i_type == SD_TYPE )
+        msg_Dbg( p_intf, "SD already loaded, reloading" );
+
+    playlist_item_t *pl_item =
+            item->data( 0, Qt::UserRole + 1 ).value<playlist_item_t *>();
+    if( pl_item )
             emit activated( pl_item );
-    }
-    else
-        assert( 0 );
 }
 
 void PLSelector::createItems()
@@ -132,7 +137,7 @@ void PLSelector::createItems()
     {
         sd_item = new QTreeWidgetItem( QStringList( *ppsz_longname ) );
         sd_item->setData( 0, Qt::UserRole, SD_TYPE );
-        sd_item->setData( 0, Qt::UserRole + 1, qfu( *ppsz_name ) );
+        sd_item->setData( 0, Qt::UserRole + 2, qfu( *ppsz_name ) );
         sds->addChild( sd_item );
     }
 }
