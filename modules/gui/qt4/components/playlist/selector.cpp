@@ -75,19 +75,19 @@ void PLSelector::setSource( QTreeWidgetItem *item )
     if( !item )
         return;
 
-    int i_type = item->data( 0, Qt::UserRole ).toInt();
+    int i_type = item->data( 0, TYPE_ROLE ).toInt();
 
     assert( ( i_type == PL_TYPE || i_type == ML_TYPE || i_type == SD_TYPE ) );
     if( i_type == SD_TYPE )
     {
-        QString qs = item->data( 0, Qt::UserRole + 2 ).toString();
+        QString qs = item->data( 0, NAME_ROLE ).toString();
         if( !playlist_IsServicesDiscoveryLoaded( THEPL, qtu( qs ) ) )
         {
             playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
 #warning FIXME
             playlist_item_t *pl_item =
                     THEPL->p_root_category->pp_children[THEPL->p_root_category->i_children-1];
-            item->setData( 0, Qt::UserRole + 1, QVariant::fromValue( pl_item ) );
+            item->setData( 0, PPL_ITEM_ROLE, QVariant::fromValue( pl_item ) );
 
             emit activated( pl_item );
             return;
@@ -98,7 +98,7 @@ void PLSelector::setSource( QTreeWidgetItem *item )
         msg_Dbg( p_intf, "SD already loaded, reloading" );
 
     playlist_item_t *pl_item =
-            item->data( 0, Qt::UserRole + 1 ).value<playlist_item_t *>();
+            item->data( 0, PPL_ITEM_ROLE ).value<playlist_item_t *>();
     if( pl_item )
             emit activated( pl_item );
 }
@@ -108,16 +108,16 @@ void PLSelector::createItems()
     assert( view );
     QTreeWidgetItem *pl = new QTreeWidgetItem( view );
     pl->setText( 0, qtr( "Playlist" ) );
-    pl->setData( 0, Qt::UserRole, PL_TYPE );
-    pl->setData( 0, Qt::UserRole + 1, QVariant::fromValue( THEPL->p_local_category ) );
+    pl->setData( 0, TYPE_ROLE, PL_TYPE );
+    pl->setData( 0, PPL_ITEM_ROLE, QVariant::fromValue( THEPL->p_local_category ) );
 
 /*  QTreeWidgetItem *empty = new QTreeWidgetItem( view );
     empty->setFlags(Qt::NoItemFlags); */
 
     QTreeWidgetItem *lib = new QTreeWidgetItem( view );
     lib->setText( 0, qtr( "Library" ) );
-    lib->setData( 0, Qt::UserRole, ML_TYPE );
-    lib->setData( 0, Qt::UserRole + 1, QVariant::fromValue( THEPL->p_ml_category ) );
+    lib->setData( 0, TYPE_ROLE, ML_TYPE );
+    lib->setData( 0, PPL_ITEM_ROLE, QVariant::fromValue( THEPL->p_ml_category ) );
 
 /*  QTreeWidgetItem *empty2 = new QTreeWidgetItem( view );
     empty2->setFlags(Qt::NoItemFlags);*/
@@ -136,8 +136,8 @@ void PLSelector::createItems()
     for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
     {
         sd_item = new QTreeWidgetItem( QStringList( *ppsz_longname ) );
-        sd_item->setData( 0, Qt::UserRole, SD_TYPE );
-        sd_item->setData( 0, Qt::UserRole + 2, qfu( *ppsz_name ) );
+        sd_item->setData( 0, TYPE_ROLE, SD_TYPE );
+        sd_item->setData( 0, NAME_ROLE, qfu( *ppsz_name ) );
         sds->addChild( sd_item );
     }
 }
