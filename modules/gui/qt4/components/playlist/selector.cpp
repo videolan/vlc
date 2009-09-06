@@ -83,8 +83,8 @@ void PLSelector::setSource( QTreeWidgetItem *item )
         if( !playlist_IsServicesDiscoveryLoaded( THEPL, qtu( qs ) ) )
         {
             playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
-            //FIXME we should return the playlist_item_t;
-            emit NULL;
+#warning FIXME
+            emit activated( THEPL->p_root_category->pp_children[THEPL->p_root_category->i_children-1] );
         }
     }
     else if( i_type == PL_TYPE || i_type == ML_TYPE )
