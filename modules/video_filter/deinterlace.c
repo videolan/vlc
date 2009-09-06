@@ -1059,7 +1059,7 @@ static void MergeAltivec( void *_p_dest, const void *_p_s1,
     uint8_t *p_end  = p_dest + i_bytes - 15;
 
     /* Use C until the first 16-bytes aligned destination pixel */
-    while( (int)p_dest & 0xF )
+    while( (uintptr_t)p_dest & 0xF )
     {
         *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }
