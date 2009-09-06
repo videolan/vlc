@@ -288,88 +288,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     resize( sizeHint() );
 
 #ifdef WIN32
-    /*Here is the code for the taskbar thumb buttons
-    FIXME:We need pretty buttons in 16x16 px that are handled correctly by masks in Qt
-    FIXME:the play button's picture doesn't changed to pause when clicked
-    */
-    OSVERSIONINFO winVer;
-    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if( GetVersionEx(&winVer) && winVer.dwMajorVersion > 5 && winVer.dwMajorVersion > 0 )
-    {
-        if(himl = ImageList_Create( 15, //cx
-                                    18, //cy
-                                    ILC_COLOR,//flags
-                                    4,//initial nb of images
-                                    0//nb of images that can be added
-                                    ))
-        {
-            QPixmap img   = QPixmap(":/toolbar/previous_b");
-            QPixmap img2  = QPixmap(":/toolbar/pause_b");
-            QPixmap img3  = QPixmap(":/toolbar/play_b");
-            QPixmap img4  = QPixmap(":/toolbar/next_b");
-            QBitmap mask  = img.createMaskFromColor(Qt::transparent);
-            QBitmap mask2 = img2.createMaskFromColor(Qt::transparent);
-            QBitmap mask3 = img3.createMaskFromColor(Qt::transparent);
-            QBitmap mask4 = img4.createMaskFromColor(Qt::transparent);
-
-            if(-1 == ImageList_Add(himl, img.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask.toWinHBITMAP()))
-                msg_Err( p_intf, "ImageList_Add failed" );
-            if(-1 == ImageList_Add(himl, img2.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask2.toWinHBITMAP()))
-                msg_Err( p_intf, "ImageList_Add failed" );
-            if(-1 == ImageList_Add(himl, img3.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask3.toWinHBITMAP()))
-                msg_Err( p_intf, "ImageList_Add failed" );
-            if(-1 == ImageList_Add(himl, img4.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask4.toWinHBITMAP()))
-                msg_Err( p_intf, "ImageList_Add failed" );
-        }
-
-        CoInitialize( 0 );
-
-        if( S_OK == CoCreateInstance( &clsid_ITaskbarList,
-                    NULL, CLSCTX_INPROC_SERVER,
-                    &IID_ITaskbarList3,
-                    (void **)&p_taskbl) )
-        {
-            p_taskbl->vt->HrInit(p_taskbl);
-
-            int msg_value = RegisterWindowMessage("TaskbarButtonCreated");
-            //msg_Info( p_intf, "msg value: %04x", msg_value );
-
-            // Define an array of two buttons. These buttons provide images through an 
-            // image list and also provide tooltips.
-            DWORD dwMask = THB_BITMAP | THB_FLAGS;
-
-            THUMBBUTTON thbButtons[2];
-            thbButtons[0].dwMask = dwMask;
-            thbButtons[0].iId = 0;
-            thbButtons[0].iBitmap = 0;
-            thbButtons[0].dwFlags = THBF_HIDDEN;
-
-            thbButtons[1].dwMask = dwMask;
-            thbButtons[1].iId = 1;
-            thbButtons[1].iBitmap = 2;
-            thbButtons[1].dwFlags = THBF_HIDDEN;
-
-            thbButtons[2].dwMask = dwMask;
-            thbButtons[2].iId = 2;
-            thbButtons[2].iBitmap = 3;
-            thbButtons[2].dwFlags = THBF_HIDDEN;
-
-            HRESULT hr = p_taskbl->vt->ThumbBarSetImageList(p_taskbl, GetForegroundWindow(), himl );
-            if(S_OK != hr)
-                msg_Err( p_intf, "ThumbBarSetImageList failed with error %08x", hr );
-            if(S_OK != p_taskbl->vt->ThumbBarAddButtons(p_taskbl, GetForegroundWindow(), 3, thbButtons))
-                msg_Err( p_intf, "ThumbBarAddButtons failed with error %08x", GetLastError() );
-
-            CONNECT( THEMIM->getIM(), statusChanged( int ), this, changeThumbbarButtons( int ) );
-        }
-    }
-    else
-    {
-        himl = NULL;
-        p_taskbl = NULL;
-    }
+    createTaskBarButtons();
 #endif
-
 }
 
 MainInterface::~MainInterface()
@@ -556,6 +476,93 @@ inline void MainInterface::createStatusBar()
     CONNECT( THEMIM->getIM(), encryptionChanged( bool ),
              this, showCryptedLabel( bool ) );
 }
+
+#ifdef WIN32
+void MainInterface::createTaskBarButtons()
+{
+    /*Here is the code for the taskbar thumb buttons
+    FIXME:We need pretty buttons in 16x16 px that are handled correctly by masks in Qt
+    FIXME:the play button's picture doesn't changed to pause when clicked
+    */
+    OSVERSIONINFO winVer;
+    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    if( GetVersionEx(&winVer) && winVer.dwMajorVersion > 5 && winVer.dwMajorVersion > 0 )
+    {
+        if(himl = ImageList_Create( 15, //cx
+                                    18, //cy
+                                    ILC_COLOR,//flags
+                                    4,//initial nb of images
+                                    0//nb of images that can be added
+                                    ))
+        {
+            QPixmap img   = QPixmap(":/toolbar/previous_b");
+            QPixmap img2  = QPixmap(":/toolbar/pause_b");
+            QPixmap img3  = QPixmap(":/toolbar/play_b");
+            QPixmap img4  = QPixmap(":/toolbar/next_b");
+            QBitmap mask  = img.createMaskFromColor(Qt::transparent);
+            QBitmap mask2 = img2.createMaskFromColor(Qt::transparent);
+            QBitmap mask3 = img3.createMaskFromColor(Qt::transparent);
+            QBitmap mask4 = img4.createMaskFromColor(Qt::transparent);
+
+            if(-1 == ImageList_Add(himl, img.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask.toWinHBITMAP()))
+                msg_Err( p_intf, "ImageList_Add failed" );
+            if(-1 == ImageList_Add(himl, img2.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask2.toWinHBITMAP()))
+                msg_Err( p_intf, "ImageList_Add failed" );
+            if(-1 == ImageList_Add(himl, img3.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask3.toWinHBITMAP()))
+                msg_Err( p_intf, "ImageList_Add failed" );
+            if(-1 == ImageList_Add(himl, img4.toWinHBITMAP(QPixmap::PremultipliedAlpha),mask4.toWinHBITMAP()))
+                msg_Err( p_intf, "ImageList_Add failed" );
+        }
+
+        CoInitialize( 0 );
+
+        if( S_OK == CoCreateInstance( &clsid_ITaskbarList,
+                    NULL, CLSCTX_INPROC_SERVER,
+                    &IID_ITaskbarList3,
+                    (void **)&p_taskbl) )
+        {
+            p_taskbl->vt->HrInit(p_taskbl);
+
+            int msg_value = RegisterWindowMessage("TaskbarButtonCreated");
+            //msg_Info( p_intf, "msg value: %04x", msg_value );
+
+            // Define an array of two buttons. These buttons provide images through an
+            // image list and also provide tooltips.
+            DWORD dwMask = THB_BITMAP | THB_FLAGS;
+
+            THUMBBUTTON thbButtons[2];
+            thbButtons[0].dwMask = dwMask;
+            thbButtons[0].iId = 0;
+            thbButtons[0].iBitmap = 0;
+            thbButtons[0].dwFlags = THBF_HIDDEN;
+
+            thbButtons[1].dwMask = dwMask;
+            thbButtons[1].iId = 1;
+            thbButtons[1].iBitmap = 2;
+            thbButtons[1].dwFlags = THBF_HIDDEN;
+
+            thbButtons[2].dwMask = dwMask;
+            thbButtons[2].iId = 2;
+            thbButtons[2].iBitmap = 3;
+            thbButtons[2].dwFlags = THBF_HIDDEN;
+
+            HRESULT hr = p_taskbl->vt->ThumbBarSetImageList(p_taskbl, GetForegroundWindow(), himl );
+            if(S_OK != hr)
+                msg_Err( p_intf, "ThumbBarSetImageList failed with error %08x", hr );
+            if(S_OK != p_taskbl->vt->ThumbBarAddButtons(p_taskbl, GetForegroundWindow(), 3, thbButtons))
+                msg_Err( p_intf, "ThumbBarAddButtons failed with error %08x", GetLastError() );
+
+            CONNECT( THEMIM->getIM(), statusChanged( int ), this, changeThumbbarButtons( int ) );
+        }
+    }
+    else
+    {
+        himl = NULL;
+        p_taskbl = NULL;
+    }
+}
+#endif
+
 
 inline void MainInterface::initSystray()
 {

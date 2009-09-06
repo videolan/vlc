@@ -153,6 +153,7 @@ private:
 #ifdef WIN32
     HIMAGELIST himl;
     LPTASKBARLIST3 p_taskbl;
+    void createTaskBarButtons();
 #endif
 
 public slots:
