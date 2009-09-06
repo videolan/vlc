@@ -109,6 +109,7 @@ static char *config_GetAppDir (void)
     return psz_dir;
 }
 
+#warning FIXME Use known folders on Vista and above
 char *config_GetUserDir (vlc_userdir_t type)
 {
     switch (type)
@@ -125,14 +126,13 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_TEMPLATES_DIR:
         case VLC_PUBLICSHARE_DIR:
         case VLC_DOCUMENTS_DIR:
+            return config_GetUserDir(VLC_HOME_DIR);
         case VLC_MUSIC_DIR:
-#warning FIXME: unimplemented
-            return config_GetUserDir (VLC_HOME_DIR);
+            return config_GetShellDir (CSIDL_MYMUSIC);
         case VLC_PICTURES_DIR:
             return config_GetShellDir (CSIDL_MYPICTURES);
         case VLC_VIDEOS_DIR:
-#warning FIXME: unimplemented
-            return config_GetUserDir (VLC_HOME_DIR);
+            return config_GetShellDir (CSIDL_MYVIDEO);
     }
     assert (0);
 }
