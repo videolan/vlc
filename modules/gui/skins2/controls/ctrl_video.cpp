@@ -90,7 +90,7 @@ void CtrlVideo::onPositionChange()
 void CtrlVideo::draw( OSGraphics &rImage, int xDest, int yDest )
 {
     const Position *pPos = getPosition();
-    if( pPos && !m_pVoutWindow )
+    if( pPos )
     {
         // Draw a black rectangle under the video to avoid transparency
         rImage.fillRect( pPos->getLeft(), pPos->getTop(), pPos->getWidth(),
