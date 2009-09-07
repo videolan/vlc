@@ -60,8 +60,10 @@ public:
 protected:
     friend class PlaylistWidget;
 private:
-    intf_thread_t *p_intf;
+    QStringList mimeTypes () const;
+    bool dropMimeData ( QTreeWidgetItem * parent, int index, const QMimeData * data, Qt::DropAction action );
     void createItems();
+    intf_thread_t *p_intf;
 private slots:
     void setSource( QTreeWidgetItem *item );
 signals:

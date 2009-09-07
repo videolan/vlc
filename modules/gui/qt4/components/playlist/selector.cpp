@@ -29,11 +29,12 @@
 #include <assert.h>
 
 #include "components/playlist/selector.hpp"
+#include "playlist_item.hpp"
 #include "qt4.hpp"
 
 #include <QVBoxLayout>
 #include <QHeaderView>
-#include <QTreeWidget>
+#include <QMimeData>
 
 #include <vlc_playlist.h>
 #include <vlc_services_discovery.h>
@@ -48,8 +49,9 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
     setRootIsDecorated( false );
 //    model = new PLModel( THEPL, p_intf, THEPL->p_root_category, 1, this );
 //    view->setModel( model );
-//    view->setAcceptDrops(true);
-//    view->setDropIndicatorShown(true);
+    viewport()->setAcceptDrops(true);
+    setDropIndicatorShown(true);
+    invisibleRootItem()->setFlags( invisibleRootItem()->flags() & ~Qt::ItemIsDropEnabled );
 
     createItems();
     CONNECT( this, itemActivated( QTreeWidgetItem *, int ),
@@ -102,7 +104,6 @@ void PLSelector::createItems()
     pl->setText( 0, qtr( "Playlist" ) );
     pl->setData( 0, TYPE_ROLE, PL_TYPE );
     pl->setData( 0, PPL_ITEM_ROLE, QVariant::fromValue( THEPL->p_local_category ) );
-
 /*  QTreeWidgetItem *empty = new QTreeWidgetItem( view );
     empty->setFlags(Qt::NoItemFlags); */
 
@@ -117,6 +118,7 @@ void PLSelector::createItems()
     QTreeWidgetItem *sds = new QTreeWidgetItem( this );
     sds->setExpanded( true );
     sds->setText( 0, qtr( "Libraries" ) );
+    sds->setFlags( sds->flags() & ~Qt::ItemIsDropEnabled );
 
     char **ppsz_longnames;
     char **ppsz_names = vlc_sd_GetNames( &ppsz_longnames );
@@ -130,8 +132,50 @@ void PLSelector::createItems()
         sd_item = new QTreeWidgetItem( QStringList( *ppsz_longname ) );
         sd_item->setData( 0, TYPE_ROLE, SD_TYPE );
         sd_item->setData( 0, NAME_ROLE, qfu( *ppsz_name ) );
+        sd_item->setFlags( sd_item->flags() & ~Qt::ItemIsDropEnabled );
         sds->addChild( sd_item );
     }
+}
+
+#include <iostream>
+QStringList PLSelector::mimeTypes() const
+{
+    QStringList types;
+    types << "vlc/qt-playlist-item";
+    return types;
+}
+
+bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int index,
+  const QMimeData * data, Qt::DropAction action )
+{
+    if( !parent ) return false;
+
+    QVariant type = parent->data( 0, TYPE_ROLE );
+    if( type == QVariant() ) return false;
+    int i_type = type.toInt();
+    if( i_type != PL_TYPE && i_type != ML_TYPE ) return false;
+    bool to_pl = i_type == PL_TYPE;
+
+    if( data->hasFormat( "vlc/qt-playlist-item" ) )
+    {
+        QByteArray encodedData = data->data( "vlc/qt-playlist-item" );
+        QDataStream stream( &encodedData, QIODevice::ReadOnly );
+        playlist_Lock( THEPL );
+        while( !stream.atEnd() )
+        {
+            PLItem *item;
+            stream.readRawData( (char*)&item, sizeof(PLItem*) );
+            input_item_t *pl_input =item->inputItem();
+            playlist_AddExt ( THEPL,
+                pl_input->psz_uri, pl_input->psz_name,
+                PLAYLIST_APPEND | PLAYLIST_SPREPARSE, PLAYLIST_END,
+                pl_input->i_duration,
+                pl_input->i_options, pl_input->ppsz_options, pl_input->optflagc,
+                to_pl, true );
+        }
+        playlist_Unlock( THEPL );
+    }
+    return true;
 }
 
 PLSelector::~PLSelector()

@@ -54,6 +54,7 @@ public:
     int childCount() const { return children.count(); };
 
     PLItem *parent() { return parentItem; };
+    input_item_t *inputItem() { return p_input; }
 
 protected:
     QList<PLItem*> children;
