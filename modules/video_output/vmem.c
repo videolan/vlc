@@ -29,284 +29,277 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout.h>
-
-/*****************************************************************************
- * Local prototypes
- *****************************************************************************/
-static int  Create    ( vlc_object_t * );
-static void Destroy   ( vlc_object_t * );
-
-static int  Init          ( vout_thread_t * );
-static void End           ( vout_thread_t * );
-static int  LockPicture   ( vout_thread_t *, picture_t * );
-static int  UnlockPicture ( vout_thread_t *, picture_t * );
+#include <vlc_vout_display.h>
+#include <vlc_picture_pool.h>
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define T_WIDTH N_( "Width" )
-#define LT_WIDTH N_( "Video memory buffer width." )
+#define T_WIDTH N_("Width")
+#define LT_WIDTH N_("Video memory buffer width.")
 
-#define T_HEIGHT N_( "Height" )
-#define LT_HEIGHT N_( "Video memory buffer height." )
+#define T_HEIGHT N_("Height")
+#define LT_HEIGHT N_("Video memory buffer height.")
 
-#define T_PITCH N_( "Pitch" )
-#define LT_PITCH N_( "Video memory buffer pitch in bytes." )
+#define T_PITCH N_("Pitch")
+#define LT_PITCH N_("Video memory buffer pitch in bytes.")
 
-#define T_CHROMA N_( "Chroma" )
-#define LT_CHROMA N_( "Output chroma for the memory image as a 4-character " \
-                      "string, eg. \"RV32\"." )
+#define T_CHROMA N_("Chroma")
+#define LT_CHROMA N_("Output chroma for the memory image as a 4-character " \
+                      "string, eg. \"RV32\".")
 
-#define T_LOCK N_( "Lock function" )
-#define LT_LOCK N_( "Address of the locking callback function. This " \
+#define T_LOCK N_("Lock function")
+#define LT_LOCK N_("Address of the locking callback function. This " \
                     "function must fill in valid plane memory address " \
-                    "information for use by the video renderer." )
+                    "information for use by the video renderer.")
 
-#define T_UNLOCK N_( "Unlock function" )
-#define LT_UNLOCK N_( "Address of the unlocking callback function" )
+#define T_UNLOCK N_("Unlock function")
+#define LT_UNLOCK N_("Address of the unlocking callback function")
 
-#define T_DATA N_( "Callback data" )
-#define LT_DATA N_( "Data for the locking and unlocking functions" )
+#define T_DATA N_("Callback data")
+#define LT_DATA N_("Data for the locking and unlocking functions")
 
-vlc_module_begin ()
-    set_description( N_( "Video memory output" ) )
-    set_shortname( N_("Video memory") )
+static int  Open (vlc_object_t *);
+static void Close(vlc_object_t *);
 
-    set_category( CAT_VIDEO )
-    set_subcategory( SUBCAT_VIDEO_VOUT )
-    set_capability( "video output", 0 )
+vlc_module_begin()
+    set_description(N_("Video memory output"))
+    set_shortname(N_("Video memory"))
 
-    add_integer( "vmem-width", 320, NULL, T_WIDTH, LT_WIDTH, false )
-    add_integer( "vmem-height", 200, NULL, T_HEIGHT, LT_HEIGHT, false )
-    add_integer( "vmem-pitch", 640, NULL, T_PITCH, LT_PITCH, false )
-    add_string( "vmem-chroma", "RV16", NULL, T_CHROMA, LT_CHROMA, true )
-    add_string( "vmem-lock", "0", NULL, T_LOCK, LT_LOCK, true )
-    add_string( "vmem-unlock", "0", NULL, T_UNLOCK, LT_UNLOCK, true )
-    add_string( "vmem-data", "0", NULL, T_DATA, LT_DATA, true )
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    set_capability("vout display", 0)
 
-    set_callbacks( Create, Destroy )
-vlc_module_end ()
+    add_integer("vmem-width", 320, NULL, T_WIDTH, LT_WIDTH, false)
+    add_integer("vmem-height", 200, NULL, T_HEIGHT, LT_HEIGHT, false)
+    add_integer("vmem-pitch", 640, NULL, T_PITCH, LT_PITCH, false)
+    add_string("vmem-chroma", "RV16", NULL, T_CHROMA, LT_CHROMA, true)
+    add_string("vmem-lock", "0", NULL, T_LOCK, LT_LOCK, true)
+    add_string("vmem-unlock", "0", NULL, T_UNLOCK, LT_UNLOCK, true)
+    add_string("vmem-data", "0", NULL, T_DATA, LT_DATA, true)
+
+    set_callbacks(Open, Close)
+vlc_module_end()
 
 /*****************************************************************************
- * vout_sys_t: video output descriptor
+ * Local prototypes
  *****************************************************************************/
-struct vout_sys_t
-{
-    int i_width, i_height, i_pitch;
-
-    void (*pf_lock) (void *, void **);
-    void (*pf_unlock) (void *);
-    void *p_data;
+struct picture_sys_t {
+    void (*lock)(void *sys, void **plane);
+    void (*unlock)(void *sys);
+    void *sys;
 };
 
+struct vout_display_sys_t {
+    picture_pool_t *pool;
+};
+
+static picture_t *Get    (vout_display_t *);
+static void       Display(vout_display_t *, picture_t *);
+static int        Control(vout_display_t *, int, va_list);
+static void       Manage (vout_display_t *);
+
+static int        Lock(picture_t *);
+static void       Unlock(picture_t *);
+
 /*****************************************************************************
- * Create: allocates video thread
+ * Open: allocates video thread
  *****************************************************************************
  * This function allocates and initializes a vout method.
  *****************************************************************************/
-static int Create( vlc_object_t *p_this )
+static int Open(vlc_object_t *object)
 {
-    vout_thread_t *p_vout = ( vout_thread_t * )p_this;
+    vout_display_t *vd = (vout_display_t *)object;
 
-    /* Allocate instance and initialize some members */
-    p_vout->p_sys = malloc( sizeof( vout_sys_t ) );
-    if( ! p_vout->p_sys )
-        return VLC_ENOMEM;
-
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = NULL;
-    p_vout->pf_render = NULL;
-    p_vout->pf_display = NULL;
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Init: initialize video thread
- *****************************************************************************/
-static int Init( vout_thread_t *p_vout )
-{
-    int i_index;
-    picture_t *p_pic;
-    char *psz_chroma, *psz_tmp;
-    int i_width, i_height, i_pitch;
-    vlc_fourcc_t i_chroma;
-
-    i_width = var_CreateGetInteger( p_vout, "vmem-width" );
-    i_height = var_CreateGetInteger( p_vout, "vmem-height" );
-    i_pitch = var_CreateGetInteger( p_vout, "vmem-pitch" );
-
-    psz_chroma = var_CreateGetString( p_vout, "vmem-chroma" );
-    if( !psz_chroma )
-    {
-        msg_Err( p_vout, "Cannot find chroma information." );
+    /* */
+    char *chroma_format = var_CreateGetString(vd, "vmem-chroma");
+    const vlc_fourcc_t chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, chroma_format);
+    free(chroma_format);
+    if (!chroma) {
+        msg_Err(vd, "vmem-chroma should be 4 characters long");
         return VLC_EGENERIC;
     }
 
-    i_chroma = vlc_fourcc_GetCodecFromString( VIDEO_ES, psz_chroma );
-    free( psz_chroma );
+    /* */
+    picture_sys_t cfg;
 
-    if( !i_chroma )
-    {
-        msg_Err( p_vout, "vmem-chroma should be 4 characters long" );
+    char *tmp;
+    tmp = var_CreateGetString(vd, "vmem-lock");
+    cfg.lock = (void (*)(void *, void **))(intptr_t)atoll(tmp);
+    free(tmp);
+
+    tmp = var_CreateGetString(vd, "vmem-unlock");
+    cfg.unlock = (void (*)(void *))(intptr_t)atoll(tmp);
+    free(tmp);
+
+    tmp = var_CreateGetString(vd, "vmem-data");
+    cfg.sys = (void *)(intptr_t)atoll(tmp);
+    free(tmp);
+
+    /* lock and unlock are mandatory */
+    if (!cfg.lock || !cfg.unlock) {
+        msg_Err(vd, "Invalid lock or unlock callbacks");
         return VLC_EGENERIC;
     }
 
-    psz_tmp = var_CreateGetString( p_vout, "vmem-lock" );
-    p_vout->p_sys->pf_lock = (void (*) (void *, void **))(intptr_t)atoll( psz_tmp );
-    free( psz_tmp );
+    /* */
+    video_format_t fmt = vd->fmt;
 
-    psz_tmp = var_CreateGetString( p_vout, "vmem-unlock" );
-    p_vout->p_sys->pf_unlock = (void (*) (void *))(intptr_t)atoll( psz_tmp );
-    free( psz_tmp );
-
-    /* pf_lock and pf_unlock are mandatory */
-    if( !p_vout->p_sys->pf_lock || !p_vout->p_sys->pf_unlock )
-    {
-        msg_Err( p_vout, "Invalid lock or unlock callbacks" );
-        return VLC_EGENERIC;
-    }
-
-    psz_tmp = var_CreateGetString( p_vout, "vmem-data" );
-    p_vout->p_sys->p_data = (void *)(intptr_t)atoll( psz_tmp );
-    free( psz_tmp );
-
-    I_OUTPUTPICTURES = 0;
-
-    /* Initialize the output structure */
-    p_vout->output.i_chroma = i_chroma;
-    p_vout->output.pf_setpalette = NULL;
-    p_vout->output.i_width = i_width;
-    p_vout->output.i_height = i_height;
-    p_vout->output.i_aspect = p_vout->output.i_width
-                               * VOUT_ASPECT_FACTOR / p_vout->output.i_height;
+    fmt.i_chroma = chroma;
+    fmt.i_width  = var_CreateGetInteger(vd, "vmem-width");
+    fmt.i_height = var_CreateGetInteger(vd, "vmem-height");
 
     /* Define the bitmasks */
-    switch( i_chroma )
+    switch (chroma)
     {
-      case VLC_CODEC_RGB15:
-        p_vout->output.i_rmask = 0x001f;
-        p_vout->output.i_gmask = 0x03e0;
-        p_vout->output.i_bmask = 0x7c00;
+    case VLC_CODEC_RGB15:
+        fmt.i_rmask = 0x001f;
+        fmt.i_gmask = 0x03e0;
+        fmt.i_bmask = 0x7c00;
         break;
-
-      case VLC_CODEC_RGB16:
-        p_vout->output.i_rmask = 0x001f;
-        p_vout->output.i_gmask = 0x07e0;
-        p_vout->output.i_bmask = 0xf800;
+    case VLC_CODEC_RGB16:
+        fmt.i_rmask = 0x001f;
+        fmt.i_gmask = 0x07e0;
+        fmt.i_bmask = 0xf800;
         break;
-
-      case VLC_CODEC_RGB24:
-        p_vout->output.i_rmask = 0xff0000;
-        p_vout->output.i_gmask = 0x00ff00;
-        p_vout->output.i_bmask = 0x0000ff;
+    case VLC_CODEC_RGB24:
+        fmt.i_rmask = 0xff0000;
+        fmt.i_gmask = 0x00ff00;
+        fmt.i_bmask = 0x0000ff;
         break;
-
-      case VLC_CODEC_RGB32:
-        p_vout->output.i_rmask = 0xff0000;
-        p_vout->output.i_gmask = 0x00ff00;
-        p_vout->output.i_bmask = 0x0000ff;
+    case VLC_CODEC_RGB32:
+        fmt.i_rmask = 0xff0000;
+        fmt.i_gmask = 0x00ff00;
+        fmt.i_bmask = 0x0000ff;
+        break;
+    default:
+        fmt.i_rmask = 0;
+        fmt.i_gmask = 0;
+        fmt.i_bmask = 0;
         break;
     }
 
-    /* Try to initialize 1 direct buffer */
-    p_pic = NULL;
+    /* */
+    vout_display_sys_t *sys;
+    vd->sys = sys = calloc(1, sizeof(*sys));
+    if (!sys)
+        return VLC_EGENERIC;
 
-    /* Find an empty picture slot */
-    for( i_index = 0 ; i_index < VOUT_MAX_PICTURES ; i_index++ )
-    {
-        if( p_vout->p_picture[ i_index ].i_status == FREE_PICTURE )
-        {
-            p_pic = p_vout->p_picture + i_index;
-            break;
-        }
+    /* */
+    const int pitch = var_CreateGetInteger(vd, "vmem-pitch");
+    picture_resource_t rsc;
+    rsc.p_sys = malloc(sizeof(*rsc.p_sys));
+    *rsc.p_sys = cfg;
+    for (int i = 0; i < PICTURE_PLANE_MAX; i++) {
+        /* vmem-lock is responsible for the allocation */
+        rsc.p[i].p_pixels = NULL;
+        rsc.p[i].i_lines  = fmt.i_height;
+        rsc.p[i].i_pitch  = pitch;
+    }
+    picture_t *picture = picture_NewFromResource(&fmt, &rsc);
+    if (!picture) {
+        free(rsc.p_sys);
+        free(sys);
+        return VLC_EGENERIC;
     }
 
-    /* Allocate the picture */
-    if( p_pic == NULL )
-    {
+    /* */
+    picture_pool_configuration_t pool;
+    memset(&pool, 0, sizeof(pool));
+    pool.picture_count = 1;
+    pool.picture       = &picture;
+    pool.lock          = Lock;
+    pool.unlock        = Unlock;
+    sys->pool = picture_pool_NewExtended(&pool);
+    if (!sys->pool) {
+        picture_Release(picture);
+        free(sys);
         return VLC_SUCCESS;
     }
 
-    if( picture_Setup( p_pic, p_vout->output.i_chroma,
-                       p_vout->output.i_width, p_vout->output.i_height,
-                       p_vout->output.i_aspect ) )
-    {
-        free( p_pic );
+    /* */
+    vout_display_info_t info = vd->info;
+    info.has_hide_mouse = true;
+
+    /* */
+    vd->fmt     = fmt;
+    vd->info    = info;
+    vd->get     = Get;
+    vd->prepare = NULL;
+    vd->display = Display;
+    vd->control = Control;
+    vd->manage  = Manage;
+
+    /* */
+    vout_display_SendEventFullscreen(vd, false);
+    vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height);
+    return VLC_SUCCESS;
+}
+
+static void Close(vlc_object_t *object)
+{
+    vout_display_t *vd = (vout_display_t *)object;
+    vout_display_sys_t *sys = vd->sys;
+
+    picture_pool_Delete(sys->pool);
+    free(sys);
+}
+
+/* */
+static picture_t *Get(vout_display_t *vd)
+{
+    return picture_pool_Get(vd->sys->pool);
+}
+
+static void Display(vout_display_t *vd, picture_t *picture)
+{
+    VLC_UNUSED(vd);
+    assert(!picture_IsReferenced(picture));
+    picture_Release(picture);
+}
+static int Control(vout_display_t *vd, int query, va_list args)
+{
+    switch (query) {
+    case VOUT_DISPLAY_CHANGE_FULLSCREEN:
+    case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE: {
+        const vout_display_cfg_t *cfg = va_arg(args, const vout_display_cfg_t *);
+        if (cfg->display.width  != vd->fmt.i_width ||
+            cfg->display.height != vd->fmt.i_height)
+            return VLC_EGENERIC;
+        if (cfg->is_fullscreen)
+            return VLC_EGENERIC;
+        return VLC_SUCCESS;
+    }
+    default:
         return VLC_EGENERIC;
     }
+}
+static void Manage(vout_display_t *vd)
+{
+    VLC_UNUSED(vd);
+}
 
-    p_pic->p->i_pitch = i_pitch;
+/* */
+static int Lock(picture_t *picture)
+{
+    picture_sys_t *sys = picture->p_sys;
 
-    p_pic->pf_lock = LockPicture;
-    p_pic->pf_unlock = UnlockPicture;
+    void *planes[PICTURE_PLANE_MAX];
+    sys->lock(sys->sys, planes);
 
-    p_pic->i_status = DESTROYED_PICTURE;
-    p_pic->i_type   = DIRECT_PICTURE;
-
-    PP_OUTPUTPICTURE[ I_OUTPUTPICTURES ] = p_pic;
-
-    I_OUTPUTPICTURES++;
+    for (int i = 0; i < picture->i_planes; i++)
+        picture->p[i].p_pixels = planes[i];
 
     return VLC_SUCCESS;
 }
-
-/*****************************************************************************
- * End: terminate video thread output method
- *****************************************************************************/
-static void End( vout_thread_t *p_vout )
+static void Unlock(picture_t *picture)
 {
-    (void)p_vout;
-}
+    picture_sys_t *sys = picture->p_sys;
 
-/*****************************************************************************
- * Destroy: destroy video thread
- *****************************************************************************
- * Terminate an output method created by Create
- *****************************************************************************/
-static void Destroy( vlc_object_t *p_this )
-{
-    vout_thread_t *p_vout = ( vout_thread_t * )p_this;
-
-    /* Destroy structure */
-    free( p_vout->p_sys );
-}
-
-/*****************************************************************************
- * LockPicture: lock a picture
- *****************************************************************************
- * This function locks the picture and prepares it for direct pixel access.
- *****************************************************************************/
-static int LockPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    int i_index;
-    void *planes[p_pic->i_planes];
-
-    p_vout->p_sys->pf_lock( p_vout->p_sys->p_data, planes );
-
-    for( i_index = 0; i_index < p_pic->i_planes; i_index++ )
-    {
-        p_pic->p[i_index].p_pixels = planes[i_index];
-    }
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * UnlockPicture: unlock a picture
- *****************************************************************************
- * This function unlocks a previously locked picture.
- *****************************************************************************/
-static int UnlockPicture( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    p_vout->p_sys->pf_unlock( p_vout->p_sys->p_data );
-
-    (void)p_pic;
-
-    return VLC_SUCCESS;
+    sys->unlock(sys->sys);
 }
 
