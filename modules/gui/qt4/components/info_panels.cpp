@@ -480,8 +480,8 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
 
      QList<QTreeWidgetItem *> items;
 
-     QLabel *topLabel = new QLabel( qtr( "Statistics about the currently "
-                 "playing media or stream." ) );
+     QLabel *topLabel = new QLabel( qtr( "Current"
+                 " media / stream " "statistics") );
      topLabel->setWordWrap( true );
      layout->addWidget( topLabel, 0, 0 );
 
@@ -506,39 +506,39 @@ InputStatsPanel::InputStatsPanel( QWidget *parent,
     /* Create the main categories */
     CREATE_CATEGORY( audio, qtr("Audio") );
     CREATE_CATEGORY( video, qtr("Video") );
-    CREATE_CATEGORY( input, qtr("Input") );
-    CREATE_CATEGORY( streaming, qtr("Streaming") );
+    CREATE_CATEGORY( input, qtr("Input/Read") );
+    CREATE_CATEGORY( streaming, qtr("Output/Written/Sent") );
 
-    CREATE_AND_ADD_TO_CAT( read_media_stat, qtr("Read at media"),
+    CREATE_AND_ADD_TO_CAT( read_media_stat, qtr("Media data size"),
                            "0", input , "kB" );
     CREATE_AND_ADD_TO_CAT( input_bitrate_stat, qtr("Input bitrate"),
                            "0", input, "kb/s" );
-    CREATE_AND_ADD_TO_CAT( demuxed_stat, qtr("Demuxed"), "0", input, "kB") ;
-    CREATE_AND_ADD_TO_CAT( stream_bitrate_stat, qtr("Stream bitrate"),
+    CREATE_AND_ADD_TO_CAT( demuxed_stat, qtr("Demuxed data size"), "0", input, "kB") ;
+    CREATE_AND_ADD_TO_CAT( stream_bitrate_stat, qtr("Content bitrate"),
                            "0", input, "kb/s" );
-    CREATE_AND_ADD_TO_CAT( corrupted_stat, qtr("Corrupted"),
+    CREATE_AND_ADD_TO_CAT( corrupted_stat, qtr("Discarded (corrupted)"),
                            "0", input, "" );
-    CREATE_AND_ADD_TO_CAT( discontinuity_stat, qtr("Discontinuities"),
+    CREATE_AND_ADD_TO_CAT( discontinuity_stat, qtr("Dropped (discontinued)"),
                            "0", input, "" );
 
-    CREATE_AND_ADD_TO_CAT( vdecoded_stat, qtr("Decoded blocks"),
-                           "0", video, "" );
-    CREATE_AND_ADD_TO_CAT( vdisplayed_stat, qtr("Displayed frames"),
-                           "0", video, "" );
-    CREATE_AND_ADD_TO_CAT( vlost_frames_stat, qtr("Lost frames"),
-                           "0", video, "" );
+    CREATE_AND_ADD_TO_CAT( vdecoded_stat, qtr("Decoded"),
+                           "0", video, qtr("blocks") );
+    CREATE_AND_ADD_TO_CAT( vdisplayed_stat, qtr("Displayed"),
+                           "0", video, qtr("frames") );
+    CREATE_AND_ADD_TO_CAT( vlost_frames_stat, qtr("Lost"),
+                           "0", video, qtr("frames") );
 
-    CREATE_AND_ADD_TO_CAT( send_stat, qtr("Sent packets"), "0", streaming, "" );
-    CREATE_AND_ADD_TO_CAT( send_bytes_stat, qtr("Sent bytes"),
+    CREATE_AND_ADD_TO_CAT( send_stat, qtr("Sent"), "0", streaming, qtr("packets") );
+    CREATE_AND_ADD_TO_CAT( send_bytes_stat, qtr("Sent"),
                            "0", streaming, "kB" );
-    CREATE_AND_ADD_TO_CAT( send_bitrate_stat, qtr("Sent bitrate"),
+    CREATE_AND_ADD_TO_CAT( send_bitrate_stat, qtr("Upstream rate"),
                            "0", streaming, "kb/s" );
 
-    CREATE_AND_ADD_TO_CAT( adecoded_stat, qtr("Decoded blocks"),
-                           "0", audio, "" );
-    CREATE_AND_ADD_TO_CAT( aplayed_stat, qtr("Played buffers"),
-                           "0", audio, "" );
-    CREATE_AND_ADD_TO_CAT( alost_stat, qtr("Lost buffers"), "0", audio, "" );
+    CREATE_AND_ADD_TO_CAT( adecoded_stat, qtr("Decoded"),
+                           "0", audio, qtr("blocks") );
+    CREATE_AND_ADD_TO_CAT( aplayed_stat, qtr("Played"),
+                           "0", audio, qtr("buffers") );
+    CREATE_AND_ADD_TO_CAT( alost_stat, qtr("Lost"), "0", audio, qtr("buffers") );
 
 #undef CREATE_AND_ADD_TO_CAT
 #undef CREATE_CATEGORY
