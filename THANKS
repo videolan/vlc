@@ -199,6 +199,7 @@ Mahrazi Mohd Kamal <mahrazi at gmail.com> - Malay Translation
 Malte Tancred <malte at frontbase dot com> - VLCKit patch for URLs
 Marc Nolette <nolette at videotron.ca> - PVR support in DirectShow input
 Marco Munderloh <Marco.Munderloh at web.de> - HTTP fix for Win32 to URL filenames
+Marian Ďurkovič - various RTP and TS fixes
 Marián Hikaník <podnety _at_ mojepreklady _dot_ net> - Slovak localisation
 Mark Gritter <mgritter at kealia.com> - fix for netlist packet leak in demuxPSI
 Marko Uskokovic <uskokovic at etf dot bg.ac.yu> - Serbian localisation
