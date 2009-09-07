@@ -39,32 +39,25 @@
 #include <vlc_services_discovery.h>
 
 PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
-           : QWidget( p ), p_intf(_p_intf)
+           : QTreeWidget( p ), p_intf(_p_intf)
 {
-    view = new QTreeWidget;
-
-    view->setIconSize( QSize( 24,24 ) );
+    setIconSize( QSize( 24,24 ) );
 //    view->setAlternatingRowColors( true );
-    view->setIndentation( 10 );
-    view->header()->hide();
-    view->setRootIsDecorated( false );
+    setIndentation( 10 );
+    header()->hide();
+    setRootIsDecorated( false );
 //    model = new PLModel( THEPL, p_intf, THEPL->p_root_category, 1, this );
 //    view->setModel( model );
 //    view->setAcceptDrops(true);
 //    view->setDropIndicatorShown(true);
 
     createItems();
-    CONNECT( view, itemActivated( QTreeWidgetItem *, int ),
+    CONNECT( this, itemActivated( QTreeWidgetItem *, int ),
              this, setSource( QTreeWidgetItem *) );
     /* I believe this is unnecessary, seeing
        QStyle::SH_ItemView_ActivateItemOnSingleClick
         CONNECT( view, itemClicked( QTreeWidgetItem *, int ),
              this, setSource( QTreeWidgetItem *) ); */
-
-    QVBoxLayout *layout = new QVBoxLayout;
-    layout->setSpacing( 0 ); layout->setMargin( 0 );
-    layout->addWidget( view );
-    setLayout( layout );
 
     /* select the first item */
 //  view->setCurrentIndex( model->index( 0, 0, QModelIndex() ) );
@@ -105,8 +98,7 @@ void PLSelector::setSource( QTreeWidgetItem *item )
 
 void PLSelector::createItems()
 {
-    assert( view );
-    QTreeWidgetItem *pl = new QTreeWidgetItem( view );
+    QTreeWidgetItem *pl = new QTreeWidgetItem( this );
     pl->setText( 0, qtr( "Playlist" ) );
     pl->setData( 0, TYPE_ROLE, PL_TYPE );
     pl->setData( 0, PPL_ITEM_ROLE, QVariant::fromValue( THEPL->p_local_category ) );
@@ -114,7 +106,7 @@ void PLSelector::createItems()
 /*  QTreeWidgetItem *empty = new QTreeWidgetItem( view );
     empty->setFlags(Qt::NoItemFlags); */
 
-    QTreeWidgetItem *lib = new QTreeWidgetItem( view );
+    QTreeWidgetItem *lib = new QTreeWidgetItem( this );
     lib->setText( 0, qtr( "Library" ) );
     lib->setData( 0, TYPE_ROLE, ML_TYPE );
     lib->setData( 0, PPL_ITEM_ROLE, QVariant::fromValue( THEPL->p_ml_category ) );
@@ -122,7 +114,7 @@ void PLSelector::createItems()
 /*  QTreeWidgetItem *empty2 = new QTreeWidgetItem( view );
     empty2->setFlags(Qt::NoItemFlags);*/
 
-    QTreeWidgetItem *sds = new QTreeWidgetItem( view );
+    QTreeWidgetItem *sds = new QTreeWidgetItem( this );
     sds->setExpanded( true );
     sds->setText( 0, qtr( "Libraries" ) );
 

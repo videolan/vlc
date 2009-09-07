@@ -29,14 +29,13 @@
 # include "config.h"
 #endif
 
-#include <QWidget>
+#include <QTreeWidget>
 #include <QTreeWidgetItem>
 
 #include <vlc_playlist.h>
 
 #include "qt4.hpp"
 
-class QTreeWidget;
 class PlaylistWidget;
 
 enum {
@@ -52,7 +51,7 @@ enum {
 };
 
 Q_DECLARE_METATYPE( playlist_item_t *);
-class PLSelector: public QWidget
+class PLSelector: public QTreeWidget
 {
     Q_OBJECT;
 public:
@@ -62,7 +61,6 @@ protected:
     friend class PlaylistWidget;
 private:
     intf_thread_t *p_intf;
-    QTreeWidget *view;
     void createItems();
 private slots:
     void setSource( QTreeWidgetItem *item );
