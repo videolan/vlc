@@ -883,11 +883,11 @@ faad2-$(FAAD2_VERSION).tar.gz:
 
 faad2: faad2-$(FAAD2_VERSION).tar.gz
 	$(EXTRACT_GZ)
-	(cd $@; echo|$(HOSTCC) -iquote . -E - || sed -i 's/-iquote /-I/' libfaad/Makefile.am; sh ./bootstrap)
+	(cd $@; echo|$(CC) -iquote . -E - || sed -i 's/-iquote /-I/' libfaad/Makefile.am; sh ./bootstrap)
 	patch -p0 < Patches/faad-arm-fixed.patch
 
 .faad: faad2
-	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --disable-shared --prefix=$(PREFIX) CFLAGS="-O3" && sed -i.orig "s/shrext_cmds/shrext/g" libtool && make -C libfaad && make -C libfaad install)
+	(cd $< && $(HOSTCC) ./configure $(HOSTCONF) --disable-shared --prefix=$(PREFIX) CFLAGS="-O3 $(NOTHUMB)" && sed -i.orig "s/shrext_cmds/shrext/g" libtool && make -C libfaad && make -C libfaad install)
 	touch $@
 
 CLEAN_FILE += .faad
