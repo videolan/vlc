@@ -300,8 +300,9 @@ inline void VLCProfileEditor::registerCodecs()
 #undef ADD_SCALING
 
 #define ADD_SAMPLERATE( sample ) ui.aSampleBox->addItem( sample );
-    ADD_SAMPLERATE( "11250" )
-    ADD_SAMPLERATE( "22500" )
+    ADD_SAMPLERATE( "8000" )
+    ADD_SAMPLERATE( "11025" )
+    ADD_SAMPLERATE( "22050" )
     ADD_SAMPLERATE( "44100" )
     ADD_SAMPLERATE( "48000" )
 #undef ADD_SAMPLERATE
