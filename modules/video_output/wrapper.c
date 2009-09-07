@@ -55,6 +55,7 @@ DECLARE_OPEN(fb);
 DECLARE_OPEN(directfb);
 DECLARE_OPEN(yuv);
 DECLARE_OPEN(snapshot);
+DECLARE_OPEN(vmem);
 
 #undef DECLARE_OPEN
 
@@ -97,6 +98,9 @@ vlc_module_begin()
 
     add_submodule()
     DECLARE_MODULE(snapshot, 0)
+
+    add_submodule()
+    DECLARE_MODULE(vmem, 0)
 
 vlc_module_end()
 
