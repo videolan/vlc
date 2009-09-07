@@ -58,7 +58,9 @@ struct picture_pool_t {
     picture_t **picture;
 };
 
-static void PicturePoolPictureRelease(picture_t *);
+static void Release(picture_t *);
+static int  Lock(picture_t *);
+static void Unlock(picture_t *);
 
 picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
 {
@@ -92,7 +94,7 @@ picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg
 
         /* */
         picture->i_refcount    = 0;
-        picture->pf_release    = PicturePoolPictureRelease;
+        picture->pf_release    = Release;
         picture->p_release_sys = release_sys;
 
         /* */
@@ -165,8 +167,7 @@ picture_t *picture_pool_Get(picture_pool_t *pool)
         if (picture->i_refcount > 0)
             continue;
 
-        picture_release_sys_t *release_sys = picture->p_release_sys;
-        if (release_sys->lock && release_sys->lock(picture))
+        if (Lock(picture))
             continue;
 
         /* */
@@ -185,7 +186,8 @@ void picture_pool_NonEmpty(picture_pool_t *pool, bool reset)
         picture_t *picture = pool->picture[i];
 
         if (reset) {
-            /* TODO pf_unlock */
+            if (picture->i_refcount > 0)
+                Unlock(picture);
             picture->i_refcount = 0;
         } else if (picture->i_refcount == 0) {
             return;
@@ -194,18 +196,30 @@ void picture_pool_NonEmpty(picture_pool_t *pool, bool reset)
         }
     }
     if (!reset && old) {
-        /* TODO pf_unlock */
+        if (old->i_refcount > 0)
+            Unlock(old);
         old->i_refcount = 0;
     }
 }
 
-static void PicturePoolPictureRelease(picture_t *picture)
+static void Release(picture_t *picture)
 {
     assert(picture->i_refcount > 0);
 
     if (--picture->i_refcount > 0)
         return;
+    Unlock(picture);
+}
 
+static int Lock(picture_t *picture)
+{
+    picture_release_sys_t *release_sys = picture->p_release_sys;
+    if (release_sys->lock)
+        return release_sys->lock(picture);
+    return VLC_SUCCESS;
+}
+static void Unlock(picture_t *picture)
+{
     picture_release_sys_t *release_sys = picture->p_release_sys;
     if (release_sys->unlock)
         release_sys->unlock(picture);
