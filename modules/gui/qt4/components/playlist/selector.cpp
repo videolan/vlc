@@ -54,15 +54,12 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
 //    view->setDropIndicatorShown(true);
 
     createItems();
-    /* CONNECT( view, itemActivated( QTreeWidgetItem *, int ),
-             this, setSource( QTreeWidgetItem *) ); */
+    CONNECT( view, itemActivated( QTreeWidgetItem *, int ),
+             this, setSource( QTreeWidgetItem *) );
     /* I believe this is unnecessary, seeing
-       QStyle::SH_ItemView_ActivateItemOnSingleClick */
-    /* <jleben> No, you can only make custom styles by creating whole new
-       or subclassing an existing QStyle.
-       Connecting itemClicked signal is easier, of course */
-    CONNECT( view, itemClicked( QTreeWidgetItem *, int ),
-          this, setSource( QTreeWidgetItem *) );
+       QStyle::SH_ItemView_ActivateItemOnSingleClick
+        CONNECT( view, itemClicked( QTreeWidgetItem *, int ),
+             this, setSource( QTreeWidgetItem *) ); */
 
     QVBoxLayout *layout = new QVBoxLayout;
     layout->setSpacing( 0 ); layout->setMargin( 0 );
@@ -78,10 +75,7 @@ void PLSelector::setSource( QTreeWidgetItem *item )
     if( !item )
         return;
 
-    QVariant type = item->data( 0, TYPE_ROLE );
-    if( type == QVariant() ) return;
-
-    int i_type = type.toInt();
+    int i_type = item->data( 0, TYPE_ROLE ).toInt();
 
     assert( ( i_type == PL_TYPE || i_type == ML_TYPE || i_type == SD_TYPE ) );
     if( i_type == SD_TYPE )
