@@ -1334,6 +1334,9 @@ void RestoreScreensaver( vout_thread_t *p_vout )
 
 int CreateEventThread( vout_thread_t *p_vout )
 {
+    if( !( p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG ) )
+        vlc_mutex_init( &p_vout->p_sys->lock );
+
     /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
      * Windows can stay blocked inside this call for a long time, and when
