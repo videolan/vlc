@@ -115,9 +115,6 @@ static void test_events (const char ** argv, int argc)
     libvlc_event_send (em, &event);
     assert( !callback_was_called );
 
-    libvlc_event_detach (em, mi_events[mi_events_len-1], test_events_callback_and_detach, &callback_was_called, &ex);
-    catch ();
-
     log ("+ Testing regular detach()\n");
 
     for (i = 0; i < mi_events_len - 1; i++) {
