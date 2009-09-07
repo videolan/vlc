@@ -37,182 +37,177 @@
 /*****************************************************************************
  *
  *****************************************************************************/
-struct picture_release_sys_t
-{
+struct picture_release_sys_t {
     /* Saved release */
-    void (*pf_release)( picture_t * );
-    picture_release_sys_t *p_release_sys;
+    void (*release)(picture_t *);
+    picture_release_sys_t *release_sys;
 
     /* */
-    int  (*pf_lock)( picture_t * );
-    void (*pf_unlock)( picture_t * );
+    int  (*lock)(picture_t *);
+    void (*unlock)(picture_t *);
 
     /* */
-    int64_t i_tick;
+    int64_t tick;
 };
 
-struct picture_pool_t
-{
-    int64_t i_tick;
-
-    int i_picture;
-    picture_t **pp_picture;
+struct picture_pool_t {
+    /* */
+    int64_t   tick;
+    /* */
+    int       picture_count;
+    picture_t **picture;
 };
 
-static void PicturePoolPictureRelease( picture_t * );
+static void PicturePoolPictureRelease(picture_t *);
 
-picture_pool_t *picture_pool_NewExtended( const picture_pool_configuration_t *cfg )
+picture_pool_t *picture_pool_NewExtended(const picture_pool_configuration_t *cfg)
 {
-    picture_pool_t *p_pool = calloc( 1, sizeof(*p_pool) );
-    if( !p_pool )
+    picture_pool_t *pool = calloc(1, sizeof(*pool));
+    if (!pool)
         return NULL;
 
-    p_pool->i_tick = 1;
-    p_pool->i_picture = cfg->picture_count;
-    p_pool->pp_picture = calloc( p_pool->i_picture, sizeof(*p_pool->pp_picture) );
-    if( !p_pool->pp_picture )
-    {
-        free( p_pool );
+    pool->tick = 1;
+    pool->picture_count = cfg->picture_count;
+    pool->picture = calloc(pool->picture_count, sizeof(*pool->picture));
+    if (!pool->picture) {
+        free(pool);
         return NULL;
     }
 
-    for( int i = 0; i < cfg->picture_count; i++ )
-    {
-        picture_t *p_picture = cfg->picture[i];
+    for (int i = 0; i < cfg->picture_count; i++) {
+        picture_t *picture = cfg->picture[i];
 
         /* The pool must be the only owner of the picture */
-        assert( p_picture->i_refcount == 1 );
+        assert(picture->i_refcount == 1);
 
         /* Install the new release callback */
-        picture_release_sys_t *p_release_sys = malloc( sizeof(*p_release_sys) );
-        if( !p_release_sys )
+        picture_release_sys_t *release_sys = malloc(sizeof(*release_sys));
+        if (!release_sys)
             abort();
-        p_release_sys->pf_release    = p_picture->pf_release;
-        p_release_sys->p_release_sys = p_picture->p_release_sys;
-        p_release_sys->pf_lock       = cfg->lock;
-        p_release_sys->pf_unlock     = cfg->unlock;
-        p_release_sys->i_tick        = 0;
-
-        p_picture->i_refcount = 0;
-        p_picture->pf_release = PicturePoolPictureRelease;
-        p_picture->p_release_sys = p_release_sys;
+        release_sys->release     = picture->pf_release;
+        release_sys->release_sys = picture->p_release_sys;
+        release_sys->lock        = cfg->lock;
+        release_sys->unlock      = cfg->unlock;
+        release_sys->tick        = 0;
 
         /* */
-        p_pool->pp_picture[i] = p_picture;
+        picture->i_refcount    = 0;
+        picture->pf_release    = PicturePoolPictureRelease;
+        picture->p_release_sys = release_sys;
+
+        /* */
+        pool->picture[i] = picture;
     }
-    return p_pool;
+    return pool;
 
 }
 
-picture_pool_t *picture_pool_New( int i_picture, picture_t *pp_picture[] )
+picture_pool_t *picture_pool_New(int picture_count, picture_t *picture[])
 {
     picture_pool_configuration_t cfg;
 
-    memset( &cfg, 0, sizeof(cfg) );
-    cfg.picture_count = i_picture;
-    cfg.picture       = pp_picture;
+    memset(&cfg, 0, sizeof(cfg));
+    cfg.picture_count = picture_count;
+    cfg.picture       = picture;
 
-    return picture_pool_NewExtended( &cfg );
+    return picture_pool_NewExtended(&cfg);
 }
 
-picture_pool_t *picture_pool_NewFromFormat( const video_format_t *p_fmt, int i_picture )
+picture_pool_t *picture_pool_NewFromFormat(const video_format_t *fmt, int picture_count)
 {
-    picture_t *pp_picture[i_picture];
+    picture_t *picture[picture_count];
 
-    for( int i = 0; i < i_picture; i++ )
-    {
-        pp_picture[i] = picture_New( p_fmt->i_chroma,
-                                     p_fmt->i_width, p_fmt->i_height,
-                                     p_fmt->i_aspect );
-        if( !pp_picture[i] )
+    for (int i = 0; i < picture_count; i++) {
+        picture[i] = picture_NewFromFormat(fmt);
+        if (!picture[i])
             goto error;
     }
-    picture_pool_t *p_pool = picture_pool_New( i_picture, pp_picture );
-    if( !p_pool )
+    picture_pool_t *pool = picture_pool_New(picture_count, picture);
+    if (!pool)
         goto error;
 
-    return p_pool;
+    return pool;
 
 error:
-    for( int i = 0; i < i_picture; i++ )
-    {
-        if( !pp_picture[i] )
+    for (int i = 0; i < picture_count; i++) {
+        if (!picture[i])
             break;
-        picture_Release( pp_picture[i] );
+        picture_Release(picture[i]);
     }
     return NULL;
 }
 
-void picture_pool_Delete( picture_pool_t *p_pool )
+void picture_pool_Delete(picture_pool_t *pool)
 {
-    for( int i = 0; i < p_pool->i_picture; i++ )
-    {
-        picture_t *p_picture = p_pool->pp_picture[i];
-        picture_release_sys_t *p_release_sys = p_picture->p_release_sys;
+    for (int i = 0; i < pool->picture_count; i++) {
+        picture_t *picture = pool->picture[i];
+        picture_release_sys_t *release_sys = picture->p_release_sys;
 
-        assert( p_picture->i_refcount == 0 );
+        assert(picture->i_refcount == 0);
 
         /* Restore old release callback */
-        p_picture->i_refcount = 1;
-        p_picture->pf_release = p_release_sys->pf_release;
-        p_picture->p_release_sys = p_release_sys->p_release_sys;
+        picture->i_refcount    = 1;
+        picture->pf_release    = release_sys->release;
+        picture->p_release_sys = release_sys->release_sys;
 
-        picture_Release( p_picture );
+        picture_Release(picture);
 
-        free( p_release_sys );
+        free(release_sys);
     }
-    free( p_pool->pp_picture );
-    free( p_pool );
+    free(pool->picture);
+    free(pool);
 }
 
-picture_t *picture_pool_Get( picture_pool_t *p_pool )
+picture_t *picture_pool_Get(picture_pool_t *pool)
 {
-    for( int i = 0; i < p_pool->i_picture; i++ )
-    {
-        picture_t *p_picture = p_pool->pp_picture[i];
-        if( p_picture->i_refcount > 0 )
+    for (int i = 0; i < pool->picture_count; i++) {
+        picture_t *picture = pool->picture[i];
+        if (picture->i_refcount > 0)
             continue;
 
-        picture_release_sys_t *p_release_sys = p_picture->p_release_sys;
-        if( p_release_sys->pf_lock && p_release_sys->pf_lock(p_picture) )
+        picture_release_sys_t *release_sys = picture->p_release_sys;
+        if (release_sys->lock && release_sys->lock(picture))
             continue;
 
         /* */
-        p_picture->p_release_sys->i_tick = p_pool->i_tick++;
-        picture_Hold( p_picture );
-        return p_picture;
+        picture->p_release_sys->tick = pool->tick++;
+        picture_Hold(picture);
+        return picture;
     }
     return NULL;
 }
 
-void picture_pool_NonEmpty( picture_pool_t *p_pool, bool b_reset )
+void picture_pool_NonEmpty(picture_pool_t *pool, bool reset)
 {
-    picture_t *p_old = NULL;
+    picture_t *old = NULL;
 
-    for( int i = 0; i < p_pool->i_picture; i++ )
-    {
-        picture_t *p_picture = p_pool->pp_picture[i];
+    for (int i = 0; i < pool->picture_count; i++) {
+        picture_t *picture = pool->picture[i];
 
-        if( b_reset )
-            p_picture->i_refcount = 0;
-        else if( p_picture->i_refcount == 0 )
+        if (reset) {
+            /* TODO pf_unlock */
+            picture->i_refcount = 0;
+        } else if (picture->i_refcount == 0) {
             return;
-        else if( !p_old || p_picture->p_release_sys->i_tick < p_old->p_release_sys->i_tick )
-            p_old = p_picture;
+        } else if (!old || picture->p_release_sys->tick < old->p_release_sys->tick) {
+            old = picture;
+        }
     }
-    if( !b_reset && p_old )
-        p_old->i_refcount = 0;
+    if (!reset && old) {
+        /* TODO pf_unlock */
+        old->i_refcount = 0;
+    }
 }
 
-static void PicturePoolPictureRelease( picture_t *p_picture )
+static void PicturePoolPictureRelease(picture_t *picture)
 {
-    assert( p_picture->i_refcount > 0 );
+    assert(picture->i_refcount > 0);
 
-    if( --p_picture->i_refcount > 0 )
+    if (--picture->i_refcount > 0)
         return;
 
-    picture_release_sys_t *p_release_sys = p_picture->p_release_sys;
-    if( p_release_sys->pf_unlock )
-        p_release_sys->pf_unlock( p_picture );
+    picture_release_sys_t *release_sys = picture->p_release_sys;
+    if (release_sys->unlock)
+        release_sys->unlock(picture);
 }
 

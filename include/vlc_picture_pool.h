@@ -69,14 +69,14 @@ VLC_EXPORT( picture_pool_t *, picture_pool_NewExtended, ( const picture_pool_con
  *
  * It is provided as convenience.
  */
-VLC_EXPORT( picture_pool_t *, picture_pool_New, ( int i_picture, picture_t *pp_picture[] ) );
+VLC_EXPORT( picture_pool_t *, picture_pool_New, ( int picture_count, picture_t *picture[] ) );
 
 /**
  * It creates a picture_pool_t creating images using the given format.
  *
  * Provided for convenience.
  */
-VLC_EXPORT( picture_pool_t *, picture_pool_NewFromFormat, ( const video_format_t *, int i_picture ) );
+VLC_EXPORT( picture_pool_t *, picture_pool_NewFromFormat, ( const video_format_t *, int picture_count ) );
 
 /**
  * It destroys a pool created by picture_pool_New.
@@ -104,7 +104,7 @@ VLC_EXPORT( picture_t *, picture_pool_Get, ( picture_pool_t * ) );
  * XXX it should be used with great care, the only reason you may need
  * it is to workaround a bug.
  */
-VLC_EXPORT( void, picture_pool_NonEmpty, ( picture_pool_t *, bool b_reset ) );
+VLC_EXPORT( void, picture_pool_NonEmpty, ( picture_pool_t *, bool reset ) );
 
 #endif /* VLC_PICTURE_POOL_H */
 
