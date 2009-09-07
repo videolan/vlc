@@ -92,7 +92,8 @@ public:
     {
         if( !libvlc_media_player )
         {
-             libvlc_exception_raise(ex,"no mediaplayer");
+             libvlc_exception_raise(ex);
+             libvlc_printerr("no mediaplayer");
         }
         return libvlc_media_player;
     }
