@@ -1345,29 +1345,29 @@ int CreateEventThread( vout_thread_t *p_vout )
      * window (because PeekMessage has to be called from the same thread which
      * created the window). */
     msg_Dbg( p_vout, "creating Vout EventThread" );
-    p_vout->p_sys->p_event =
+    event_thread_t *p_event = p_vout->p_sys->p_event =
         vlc_object_create( p_vout, sizeof(event_thread_t) );
-    p_vout->p_sys->p_event->p_vout = p_vout;
-    p_vout->p_sys->p_event->window_ready = CreateEvent( NULL, TRUE, FALSE, NULL );
-    if( vlc_thread_create( p_vout->p_sys->p_event, "Vout Events Thread",
+    p_event->p_vout = p_vout;
+    p_event->window_ready = CreateEvent( NULL, TRUE, FALSE, NULL );
+    if( vlc_thread_create( p_event, "Vout Events Thread",
                            EventThread, 0 ) )
     {
         msg_Err( p_vout, "cannot create Vout EventThread" );
-        CloseHandle( p_vout->p_sys->p_event->window_ready );
-        vlc_object_release( p_vout->p_sys->p_event );
-        p_vout->p_sys->p_event = NULL;
+        CloseHandle( p_event->window_ready );
+        vlc_object_release( p_event );
+        p_event = NULL;
         return 0;
     }
-    WaitForSingleObject( p_vout->p_sys->p_event->window_ready, INFINITE );
-    CloseHandle( p_vout->p_sys->p_event->window_ready );
+    WaitForSingleObject( p_event->window_ready, INFINITE );
+    CloseHandle( p_event->window_ready );
 
-    if( p_vout->p_sys->p_event->b_error )
+    if( p_event->b_error )
     {
         msg_Err( p_vout, "Vout EventThread failed" );
         return 0;
     }
 
-    vlc_object_attach( p_vout->p_sys->p_event, p_vout );
+    vlc_object_attach( p_event, p_vout );
 
     msg_Dbg( p_vout, "Vout EventThread running" );
     return 1;
@@ -1385,10 +1385,11 @@ void StopEventThread( vout_thread_t *p_vout )
 
     if( p_vout->p_sys->p_event )
     {
-        vlc_object_detach( p_vout->p_sys->p_event );
+        event_thread_t *p_event = p_vout->p_sys->p_event;
+        vlc_object_detach( p_event );
 
         /* Kill Vout EventThread */
-        vlc_object_kill( p_vout->p_sys->p_event );
+        vlc_object_kill( p_event );
 
         /* we need to be sure Vout EventThread won't stay stuck in
          * GetMessage, so we send a fake message */
@@ -1397,10 +1398,11 @@ void StopEventThread( vout_thread_t *p_vout )
             PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
         }
 
-        vlc_thread_join( p_vout->p_sys->p_event );
-        vlc_object_release( p_vout->p_sys->p_event );
+        vlc_thread_join( p_event );
+        vlc_object_release( p_event );
     }
 
     if( !( p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG ) )
         vlc_mutex_destroy( &p_vout->p_sys->lock );
 }
+
