@@ -1344,12 +1344,6 @@ static int transcode_audio_process( sout_stream_t *p_stream,
     return VLC_SUCCESS;
 }
 
-static void audio_release_buffer( aout_buffer_t *p_buffer )
-{
-    if( p_buffer && p_buffer->p_sys ) block_Release( p_buffer->p_sys );
-    free( p_buffer );
-}
-
 static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
 {
     aout_buffer_t *p_buffer;
@@ -1375,7 +1369,6 @@ static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
     p_buffer = malloc( sizeof(aout_buffer_t) );
     if( !p_buffer ) return NULL;
     p_buffer->b_discontinuity = false;
-    p_buffer->pf_release = audio_release_buffer;
     p_buffer->p_sys = p_block = block_New( p_dec, i_size );
 
     p_buffer->p_buffer = p_block->p_buffer;
