@@ -88,15 +88,12 @@ VLC_PUBLIC_API int
 libvlc_exception_raised( const libvlc_exception_t *p_exception );
 
 /**
- * Raise an exception using a user-provided message.
+ * Raise an exception.
  *
  * \param p_exception the exception to raise
- * \param psz_format the exception message format string
- * \param ... the format string arguments
  */
 VLC_PUBLIC_API void
-libvlc_exception_raise( libvlc_exception_t *p_exception,
-                        const char *psz_format, ... );
+libvlc_exception_raise( libvlc_exception_t *p_exception );
 
 /**
  * Clear an exception object so it can be reused.

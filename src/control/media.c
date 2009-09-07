@@ -245,14 +245,16 @@ libvlc_media_t * libvlc_media_new_from_input_item(
 
     if (!p_input_item)
     {
-        libvlc_exception_raise( p_e, "No input item given" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "No input item given" );
         return NULL;
     }
 
     p_md = malloc( sizeof(libvlc_media_t) );
     if( !p_md )
     {
-        libvlc_exception_raise( p_e, "Not enough memory" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Not enough memory" );
         return NULL;
     }
 
@@ -302,7 +304,8 @@ libvlc_media_t * libvlc_media_new(
 
     if (!p_input_item)
     {
-        libvlc_exception_raise( p_e, "Can't create md's input_item" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Not enough memory" );
         return NULL;
     }
 
@@ -330,7 +333,8 @@ libvlc_media_t * libvlc_media_new_as_node(
 
     if (!p_input_item)
     {
-        libvlc_exception_raise( p_e, "Can't create md's input_item" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Not enough memory" );
         return NULL;
     }
 
@@ -545,7 +549,8 @@ libvlc_media_get_duration( libvlc_media_t * p_md,
 
     if( !p_md || !p_md->p_input_item)
     {
-        libvlc_exception_raise( p_e, "No input item" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "No input item" );
         return -1;
     }
 
@@ -563,7 +568,8 @@ libvlc_media_is_preparsed( libvlc_media_t * p_md,
 
     if( !p_md || !p_md->p_input_item)
     {
-        libvlc_exception_raise( p_e, "No input item" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "No input item" );
         return false;
     }
 

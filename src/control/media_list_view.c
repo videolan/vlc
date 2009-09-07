@@ -475,7 +475,8 @@ libvlc_media_list_view_children_for_item( libvlc_media_list_view_t * p_mlv,
     { \
         if( p_mlv->pf_##name ) \
             return p_mlv->pf_##name ARGS(__VA_ARGS__) ; \
-        libvlc_exception_raise( p_e, "No '" #name "' method in this media_list_view" ); \
+        libvlc_exception_raise( p_e ); \
+        libvlc_printerr( "No '" #name "' method in this media_list_view" ); \
         return default_ret_value;\
     }
 
@@ -490,7 +491,8 @@ libvlc_media_list_view_children_for_item( libvlc_media_list_view_t * p_mlv,
             p_mlv->pf_##name ARGS(__VA_ARGS__) ; \
             return; \
         } \
-        libvlc_exception_raise( p_e, "No '" #name "' method in this media_list_view" ); \
+        libvlc_exception_raise( p_e ); \
+        libvlc_printerr( "No '" #name "' method in this media_list_view" ); \
     }
 
 

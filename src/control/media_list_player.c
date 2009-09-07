@@ -566,14 +566,9 @@ void libvlc_media_list_player_set_media_player(libvlc_media_list_player_t * p_ml
  **************************************************************************/
 void libvlc_media_list_player_set_media_list(libvlc_media_list_player_t * p_mlp, libvlc_media_list_t * p_mlist, libvlc_exception_t * p_e)
 {
-    lock(p_mlp);
+    assert (p_mlist);
 
-    if (!p_mlist)
-    {
-        libvlc_exception_raise(p_e, "No media list provided");
-        unlock(p_mlp);
-        return;
-    }
+    lock(p_mlp);
     if (p_mlp->p_mlist)
     {
         uninstall_playlist_observer(p_mlp);
@@ -668,7 +663,8 @@ void libvlc_media_list_player_play_item(libvlc_media_list_player_t * p_mlp, libv
     libvlc_media_list_path_t path = libvlc_media_list_path_of_item(p_mlp->p_mlist, p_md);
     if (!path)
     {
-        libvlc_exception_raise(p_e, "No such item in media list");
+        libvlc_exception_raise(p_e);
+        libvlc_printerr("Item not found in media list");
         unlock(p_mlp);
         return;
     }
@@ -726,7 +722,8 @@ static void set_relative_playlist_position_and_play(
 
     if (!p_mlp->p_mlist)
     {
-        libvlc_exception_raise(p_e, "No media list");
+        libvlc_exception_raise(p_e);
+        libvlc_printerr("No media list");
         return;
     }
 

@@ -134,7 +134,8 @@ int mlist_is_writable( libvlc_media_list_t *p_mlist, libvlc_exception_t *p_e )
     if( !p_mlist||p_mlist->b_read_only )
     {
         /* We are read-only from user side */
-        libvlc_exception_raise( p_e, "Cannot write to read-only media list." );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Attempt to write a read-only media list" );
         return 0;
     }
     return 1;
@@ -259,7 +260,8 @@ libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
 
     if( !p_input_item )
     {
-        libvlc_exception_raise( p_e, "Can't create an input item" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Not enough memory" );
         return;
     }
 
@@ -417,7 +419,8 @@ void _libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
 
     if( index < 0 || index >= vlc_array_count( &p_mlist->items ))
     {
-        libvlc_exception_raise( p_e, "Index out of bounds");
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Index out of bounds" );
         return;
     }
 
@@ -444,7 +447,8 @@ libvlc_media_list_item_at_index( libvlc_media_list_t * p_mlist,
 
     if( index < 0 || index >= vlc_array_count( &p_mlist->items ))
     {
-        libvlc_exception_raise( p_e, "Index out of bounds");
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Index out of bounds" );
         return NULL;
     }
 

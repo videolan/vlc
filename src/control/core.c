@@ -65,23 +65,8 @@ static void libvlc_exception_not_handled( const char *psz )
     abort();
 }
 
-void libvlc_exception_raise( libvlc_exception_t *p_exception,
-                             const char *psz_format, ... )
+void libvlc_exception_raise( libvlc_exception_t *p_exception )
 {
-    va_list args;
-
-    /* Make sure that there is no unnoticed previous exception */
-    if( p_exception && p_exception->b_raised )
-    {
-        libvlc_exception_not_handled( libvlc_errmsg() );
-        libvlc_exception_clear( p_exception );
-    }
-
-    /* Unformat-ize the message */
-    va_start( args, psz_format );
-    libvlc_vprinterr( psz_format, args );
-    va_end( args );
-
     /* Does caller care about exceptions ? */
     if( p_exception == NULL ) {
         /* Print something, so that lazy third-parties can easily
@@ -187,7 +172,8 @@ int libvlc_add_intf( libvlc_instance_t *p_i, const char *name,
 {
     if( libvlc_InternalAddIntf( p_i->p_libvlc_int, name ) )
     {
-        libvlc_exception_raise( p_e, "Interface initialization failed" );
+        libvlc_printerr("Interface initialization failed");
+        libvlc_exception_raise( p_e );
         return -1;
     }
     return 0;

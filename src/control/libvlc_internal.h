@@ -104,9 +104,11 @@ void libvlc_event_attach_async( libvlc_event_manager_t * p_event_manager,
 
 /* Exception shorcuts */
 
-#define RAISENULL( ... ) { libvlc_exception_raise( p_e, __VA_ARGS__ ); \
+#define RAISENULL( ... ) { libvlc_printerr(__VA_ARGS__); \
+                           libvlc_exception_raise( p_e ); \
                            return NULL; }
-#define RAISEZERO( ... ) { libvlc_exception_raise( p_e, __VA_ARGS__ ); \
+#define RAISEZERO( ... ) { libvlc_printerr(__VA_ARGS__); \
+                           libvlc_exception_raise( p_e ); \
                            return 0; }
 
 #endif

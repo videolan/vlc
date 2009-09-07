@@ -30,6 +30,7 @@
 #include <vlc_es.h>
 #include <vlc_input.h>
 #include <vlc_vlm.h>
+#include <assert.h>
 
 #include "libvlc_internal.h"
 
@@ -166,8 +167,8 @@ static int libvlc_vlm_init( libvlc_instance_t *p_instance,
         p_instance->libvlc_vlm.p_vlm = vlm_New( p_instance->p_libvlc_int );
         if( !p_instance->libvlc_vlm.p_vlm )
         {
-            libvlc_exception_raise( p_exception,
-                                    "Unable to create VLM." );
+            libvlc_exception_raise( p_exception );
+            libvlc_printerr( "VLM not supported or out of memory" );
             return VLC_EGENERIC;
         }
         var_AddCallback( (vlc_object_t *)p_instance->libvlc_vlm.p_vlm,
@@ -209,8 +210,8 @@ libvlc_vlm_get_media_instance( libvlc_instance_t *p_instance,
         vlm_Control( p_vlm, VLM_GET_MEDIA_INSTANCES, id, &pp_minstance,
                      &i_minstance ) )
     {
-        libvlc_exception_raise( p_exception, "Unable to get %s instances",
-                                psz_name );
+        libvlc_exception_raise( p_exception );
+        libvlc_printerr( "%s: media instances not found", psz_name );
         return NULL;
     }
     p_minstance = NULL;
@@ -355,44 +356,41 @@ const char* libvlc_vlm_show_media( libvlc_instance_t *p_instance,
 
     VLM_RET(p_vlm, NULL);
 
-    if( psz_name == NULL )
+    assert( psz_name );
+
+    if( asprintf( &psz_message, "show %s", psz_name ) == -1 )
     {
-        libvlc_exception_raise( p_exception, "No media name supplied" );
+        libvlc_exception_raise( p_exception );
+        libvlc_printerr( "Not enough memory" );
+        return NULL;
     }
-    else if( asprintf( &psz_message, "show %s", psz_name ) == -1 )
+
+    vlm_ExecuteCommand( p_vlm, psz_message, &answer );
+    if( answer->psz_value )
     {
-        libvlc_exception_raise( p_exception, "Unable to call show %s",
-                                psz_name );
+        libvlc_exception_raise( p_exception );
+        libvlc_printerr( "Unable to call show %s: %s",
+                         psz_name, answer->psz_value );
     }
-    else
-    {
-        vlm_ExecuteCommand( p_vlm, psz_message, &answer );
-        if( answer->psz_value )
+    else if ( answer->child )
+    {   /* in case everything was requested  */
+        if ( strcmp( psz_name, "" ) == 0 )
         {
-            libvlc_exception_raise( p_exception, "Unable to call show %s: %s",
-                                    psz_name, answer->psz_value );
+            psz_fmt = "{\n\t%s\n}\n";
+            psz_delimiter = "\n\t";
+            i_list = 0;
         }
-        else if ( answer->child ) {
-            /* in case everything was requested  */
-            if ( strcmp( psz_name, "" ) == 0 )
-            {
-                psz_fmt = "{\n\t%s\n}\n";
-                psz_delimiter = "\n\t";
-                i_list = 0;
-            }
-            else
-            {
-                psz_fmt = "%s\n";
-                psz_delimiter = "\n";
-                i_list = 1;
-            }
-            if( asprintf( &psz_response, psz_fmt,
-                          recurse_answer( answer, psz_delimiter, i_list ) )
-                == -1 )
-            {
-                libvlc_exception_raise( p_exception, "Error in show %s",
-                                        psz_name );
-            }
+        else
+        {
+            psz_fmt = "%s\n";
+            psz_delimiter = "\n";
+            i_list = 1;
+        }
+        if( asprintf( &psz_response, psz_fmt,
+                      recurse_answer( answer, psz_delimiter, i_list ) ) == -1 )
+        {
+            libvlc_exception_raise( p_exception );
+            libvlc_printerr( "Out of memory" );
         }
     }
     free( psz_message );
@@ -429,8 +427,10 @@ void libvlc_vlm_add_broadcast( libvlc_instance_t *p_instance,
     n = vlm_Control( p_vlm, VLM_ADD_MEDIA, &m, NULL );
     vlm_media_Clean( &m );
     if( n )
-        libvlc_exception_raise( p_exception, "Media %s creation failed",
-                                psz_name );
+    {
+        libvlc_exception_raise( p_exception );
+        libvlc_printerr( "Media %s creation failed", psz_name );
+    }
 }
 
 void libvlc_vlm_add_vod( libvlc_instance_t *p_instance, const char *psz_name,
@@ -457,8 +457,10 @@ void libvlc_vlm_add_vod( libvlc_instance_t *p_instance, const char *psz_name,
     n = vlm_Control( p_vlm, VLM_ADD_MEDIA, &m, NULL );
     vlm_media_Clean( &m );
     if( n )
-        libvlc_exception_raise( p_exception, "Media %s creation failed",
-                                psz_name );
+    {
+        libvlc_exception_raise( p_exception );
+        libvlc_printerr( "Media %s creation failed", psz_name );
+    }
 }
 
 void libvlc_vlm_del_media( libvlc_instance_t *p_instance, const char *psz_name,
@@ -472,7 +474,8 @@ void libvlc_vlm_del_media( libvlc_instance_t *p_instance, const char *psz_name,
     if( vlm_Control( p_vlm, VLM_GET_MEDIA_ID, psz_name, &id ) ||
         vlm_Control( p_vlm, VLM_DEL_MEDIA, id ) )
     {
-        libvlc_exception_raise( p_exception, "Unable to delete %s", psz_name );
+        libvlc_exception_raise( p_exception );
+        libvlc_printerr( "Unable to delete %s", psz_name );
     }
 }
 
@@ -483,7 +486,8 @@ void libvlc_vlm_del_media( libvlc_instance_t *p_instance, const char *psz_name,
     VLM(p_vlm);             \
     if( vlm_Control( p_vlm, VLM_GET_MEDIA_ID, psz_name, &id ) ||    \
         vlm_Control( p_vlm, VLM_GET_MEDIA, id, &p_media ) ) {       \
-        libvlc_exception_raise( p_exception, psz_error, psz_name ); \
+        libvlc_exception_raise( p_exception );                      \
+        libvlc_printerr( psz_error, psz_name );                     \
         return;             \
     }                       \
     if( !p_media ) goto error;                                      \
@@ -497,7 +501,8 @@ void libvlc_vlm_del_media( libvlc_instance_t *p_instance, const char *psz_name,
     vlm_media_Delete( p_media );                                    \
     return;                 \
   error:                    \
-    libvlc_exception_raise( p_exception, psz_error, psz_name );\
+    libvlc_exception_raise( p_exception );                          \
+    libvlc_printerr( psz_error, psz_name );                         \
   } while(0)
 
 void libvlc_vlm_set_enabled( libvlc_instance_t *p_instance,
@@ -598,7 +603,8 @@ void libvlc_vlm_play_media( libvlc_instance_t *p_instance,
     if( vlm_Control( p_vlm, VLM_GET_MEDIA_ID, psz_name, &id ) ||
         vlm_Control( p_vlm, VLM_START_MEDIA_BROADCAST_INSTANCE, id, NULL, 0 ) )
     {
-        libvlc_exception_raise( p_exception, "Unable to play %s", psz_name );
+        libvlc_exception_raise( p_exception );
+        libvlc_printerr( "Unable to play %s", psz_name );
     }
 }
 
@@ -614,7 +620,8 @@ void libvlc_vlm_stop_media( libvlc_instance_t *p_instance,
     if( vlm_Control( p_vlm, VLM_GET_MEDIA_ID, psz_name, &id ) ||
         vlm_Control( p_vlm, VLM_STOP_MEDIA_INSTANCE, id, NULL ) )
     {
-        libvlc_exception_raise( p_exception, "Unable to stop %s", psz_name );
+        libvlc_exception_raise( p_exception );
+        libvlc_printerr( "Unable to stop %s", psz_name );
     }
 }
 
@@ -630,7 +637,8 @@ void libvlc_vlm_pause_media( libvlc_instance_t *p_instance,
     if( vlm_Control( p_vlm, VLM_GET_MEDIA_ID, psz_name, &id ) ||
         vlm_Control( p_vlm, VLM_PAUSE_MEDIA_INSTANCE, id, NULL ) )
     {
-        libvlc_exception_raise( p_exception, "Unable to pause %s", psz_name );
+        libvlc_exception_raise( p_exception );
+        libvlc_printerr( "Unable to pause %s", psz_name );
     }
 }
 
@@ -646,8 +654,10 @@ void libvlc_vlm_seek_media( libvlc_instance_t *p_instance,
     if( vlm_Control( p_vlm, VLM_GET_MEDIA_ID, psz_name, &id ) ||
         vlm_Control( p_vlm, VLM_SET_MEDIA_INSTANCE_POSITION, id, NULL,
                      f_percentage ) )
-        libvlc_exception_raise( p_exception, "Unable to seek %s to %f",
-                                psz_name, f_percentage );
+    {
+        libvlc_exception_raise( p_exception );
+        libvlc_printerr( "Unable to seek %s to %f%%", psz_name, f_percentage );
+    }
 }
 
 float libvlc_vlm_get_media_instance_position( libvlc_instance_t *p_instance,

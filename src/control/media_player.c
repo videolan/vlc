@@ -275,16 +275,13 @@ libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
 {
     libvlc_media_player_t * p_mi;
 
-    if( !p_libvlc_instance )
-    {
-        libvlc_exception_raise( p_e, "invalid libvlc instance" );
-        return NULL;
-    }
+    assert( p_libvlc_instance );
 
     p_mi = malloc( sizeof(libvlc_media_player_t) );
     if( !p_mi )
     {
-        libvlc_exception_raise( p_e, "not enough memory" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Not enough memory" );
         return NULL;
     }
     p_mi->p_md = NULL;
@@ -558,8 +555,9 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
 
     if( !p_mi->p_md )
     {
-        libvlc_exception_raise( p_e, "no associated media descriptor" );
         vlc_mutex_unlock( &p_mi->object_lock );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "No associated media descriptor" );
         return;
     }
 
@@ -1038,7 +1036,8 @@ void libvlc_media_player_set_rate(
     if( (rate < 0.0) && !b_can_rewind )
     {
         vlc_object_release( p_input_thread );
-        libvlc_exception_raise( p_e, "Rate value is invalid" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Invalid playback rate" );
         return;
     }
 
@@ -1063,7 +1062,6 @@ float libvlc_media_player_get_rate(
     if( i_rate < 0 && !b_can_rewind )
     {
         vlc_object_release( p_input_thread );
-        libvlc_exception_raise( p_e, "invalid rate" );
         return 0.0;
     }
     vlc_object_release( p_input_thread );
@@ -1143,7 +1141,8 @@ libvlc_track_description_t *
         malloc( sizeof( libvlc_track_description_t ) );
     if ( !p_track_description )
     {
-        libvlc_exception_raise( p_e, "not enough memory" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Not enough memory" );
         goto end;
     }
     p_actual = p_track_description;
@@ -1157,7 +1156,8 @@ libvlc_track_description_t *
             if ( !p_actual )
             {
                 libvlc_track_description_release( p_track_description );
-                libvlc_exception_raise( p_e, "not enough memory" );
+                libvlc_exception_raise( p_e );
+                libvlc_printerr( "Not enough memory" );
                 goto end;
             }
         }
@@ -1220,5 +1220,8 @@ void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi, libvlc_excepti
         vlc_object_release( p_input_thread );
     }
     else
-        libvlc_exception_raise( p_e, "Input thread is NULL" );
+    {
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "No active input" );
+    }
 }

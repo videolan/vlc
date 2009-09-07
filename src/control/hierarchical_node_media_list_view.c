@@ -105,7 +105,8 @@ hierarch_node_media_list_view_item_at_index( libvlc_media_list_view_t * p_mlv,
         libvlc_media_release( p_md );
     }
 
-    libvlc_exception_raise( p_e, "Index out of bound in Media List View" );
+    libvlc_exception_raise( p_e );
+    libvlc_printerr( "Index out of bound in Media List View" );
     return NULL;
 }
 

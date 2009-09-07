@@ -39,6 +39,7 @@
 
 #include "media_player_internal.h"
 #include <vlc_osd.h>
+#include <assert.h>
 
 /*
  * Remember to release the returned vout_thread_t.
@@ -54,7 +55,8 @@ static vout_thread_t *GetVout( libvlc_media_player_t *p_mi,
         p_vout = input_GetVout( p_input );
         if( !p_vout )
         {
-            libvlc_exception_raise( p_exception, "No active video output" );
+            libvlc_exception_raise( p_exception );
+            libvlc_printerr( "No active video output" );
         }
         vlc_object_release( p_input );
     }
@@ -116,16 +118,13 @@ libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, const char *psz_filepat
 {
     vout_thread_t *p_vout;
 
-    /* The filepath must be not NULL */
-    if( !psz_filepath )
-    {
-        libvlc_exception_raise( p_e, "filepath is null" );
-        return;
-    }
+    assert( psz_filepath );
+
     /* We must have an input */
     if( !p_mi->p_input_thread )
     {
-        libvlc_exception_raise( p_e, "Input does not exist" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Input does not exist" );
         return;
     }
 
@@ -243,11 +242,12 @@ void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi,
     if( !p_vout ) return;
 
     i_ret = var_SetString( p_vout, "aspect-ratio", psz_aspect );
-    if( i_ret )
-        libvlc_exception_raise( p_e,
-                        "Unexpected error while setting aspect-ratio value" );
-
     vlc_object_release( p_vout );
+    if( i_ret )
+    {
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Bad or unsupported aspect ratio" );
+    }
 }
 
 int libvlc_video_get_spu( libvlc_media_player_t *p_mi,
@@ -265,8 +265,9 @@ int libvlc_video_get_spu( libvlc_media_player_t *p_mi,
     i_ret = var_Get( p_input_thread, "spu-es", &val );
     if( i_ret < 0 )
     {
-        libvlc_exception_raise( p_e, "Getting subtitle information failed" );
         vlc_object_release( p_input_thread );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Subtitle informations not found" );
         return i_ret;
     }
 
@@ -318,15 +319,11 @@ void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
 
     var_Change( p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &val_list, NULL );
 
-    if( val_list.p_list->i_count == 0 )
+    if( ( val_list.p_list->i_count == 0 )
+     || (i_spu < 0) || (i_spu > val_list.p_list->i_count) )
     {
-        libvlc_exception_raise( p_e, "Subtitle value out of range" );
-        goto end;
-    }
-
-    if( (i_spu < 0) || (i_spu > val_list.p_list->i_count) )
-    {
-        libvlc_exception_raise( p_e, "Subtitle value out of range" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Subtitle number out of range" );
         goto end;
     }
 
@@ -334,7 +331,8 @@ void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
     i_ret = var_Set( p_input_thread, "spu-es", newval );
     if( i_ret < 0 )
     {
-        libvlc_exception_raise( p_e, "Setting subtitle value failed" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Subtitle selection error" );
     }
 
 end:
@@ -397,16 +395,19 @@ void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi,
     if( !p_vout ) return;
 
     i_ret = var_SetString( p_vout, "crop", psz_geometry );
-    if( i_ret )
-        libvlc_exception_raise( p_e,
-                        "Unexpected error while setting crop geometry" );
-
     vlc_object_release( p_vout );
+
+    if( i_ret )
+    {
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Bad or unsupported cropping geometry" );
+    }
 }
 
 int libvlc_video_get_teletext( libvlc_media_player_t *p_mi,
                                libvlc_exception_t *p_e )
 {
+#if 0
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
     vlc_object_t *p_vbi;
     int i_ret = -1;
@@ -423,11 +424,15 @@ int libvlc_video_get_teletext( libvlc_media_player_t *p_mi,
 
     vlc_object_release( p_vout );
     return i_ret;
+#else
+    return -1;
+#endif
 }
 
 void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
                                 libvlc_exception_t *p_e )
 {
+#if 0
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
     vlc_object_t *p_vbi;
     int i_ret = -1;
@@ -445,13 +450,13 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
                             "Unexpected error while setting teletext page" );
     }
     vlc_object_release( p_vout );
+#endif
 }
 
 void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
                              libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    vlc_object_t *p_vbi;
     int i_ret;
 
     p_input_thread = libvlc_get_input_thread(p_mi, p_e);
@@ -463,7 +468,8 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
         return;
     }
     const bool b_selected = var_GetInteger( p_input_thread, "teletext-es" ) >= 0;
-
+#if 0
+    vlc_object_t *p_vbi;
     p_vbi = (vlc_object_t *)vlc_object_find_name( p_input_thread, "zvbi",
                                                   FIND_CHILD );
     if( p_vbi )
@@ -488,7 +494,9 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
         }
         vlc_object_release( p_vbi );
     }
-    else if( b_selected )
+    else
+#endif
+    if( b_selected )
     {
         var_SetInteger( p_input_thread, "spu-es", -1 );
     }
@@ -544,7 +552,8 @@ int libvlc_video_get_track( libvlc_media_player_t *p_mi,
     i_ret = var_Get( p_input_thread, "video-es", &val );
     if( i_ret < 0 )
     {
-        libvlc_exception_raise( p_e, "Getting Video track information failed" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Video track information not found" );
         vlc_object_release( p_input_thread );
         return i_ret;
     }
@@ -577,17 +586,16 @@ void libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track,
     var_Change( p_input_thread, "video-es", VLC_VAR_GETCHOICES, &val_list, NULL );
     for( i = 0; i < val_list.p_list->i_count; i++ )
     {
-        vlc_value_t val = val_list.p_list->p_values[i];
-        if( i_track == val.i_int )
+        if( i_track == val_list.p_list->p_values[i].i_int )
         {
-            i_ret = var_Set( p_input_thread, "video-es", val );
+            i_ret = var_SetInteger( p_input_thread, "video-es", i_track );
             if( i_ret < 0 )
-                libvlc_exception_raise( p_e, "Setting video track failed" );
+                break;
             goto end;
         }
     }
-    libvlc_exception_raise( p_e, "Video track out of range" );
-
+    libvlc_exception_raise( p_e );
+    libvlc_printerr( "Video track number out of range" );
 end:
     var_FreeList( &val_list, NULL );
     vlc_object_release( p_input_thread );
@@ -603,10 +611,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
     vout_thread_t *p_vout = GetVout( p_mi, p_e );
 
     if( !p_vout )
-    {
-        libvlc_exception_raise( p_e, "Unable to get video output" );
         return;
-    }
 
     if( b_enable )
     {
@@ -620,7 +625,8 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
         }
         else
         {
-            libvlc_exception_raise( p_e, "Unsuported or bad deinterlace filter name" );
+            libvlc_exception_raise( p_e );
+            libvlc_printerr( "Bad or unsuported deinterlacing mode" );
         }
     }
     else
@@ -691,7 +697,8 @@ int libvlc_video_get_marquee_option_as_int( libvlc_media_player_t *p_mi,
     const char * identifier = get_marquee_int_option_identifier(option);
     if(!identifier)
     {
-        libvlc_exception_raise( p_e, "This option is not available" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Unknown marquee option" );
         return 0;
     }
     vlc_object_t * marquee = get_marquee_object(p_mi);
@@ -707,9 +714,11 @@ int libvlc_video_get_marquee_option_as_int( libvlc_media_player_t *p_mi,
     /* Generic case */
     if(!identifier)
     {
-        libvlc_exception_raise( p_e, "Marquee is not enabled" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Marquee not enabled" );
         return 0;
     }
+#warning This and the next function may crash due to type checking!
     int ret = var_GetInteger(marquee, identifier);
     vlc_object_release(marquee);
     return ret;
@@ -725,15 +734,17 @@ char * libvlc_video_get_marquee_option_as_string( libvlc_media_player_t *p_mi,
     const char * identifier = get_marquee_string_option_identifier(option);
     if(!identifier)
     {
-        libvlc_exception_raise( p_e, "This option is not available" );
-        return 0;
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Unknown marquee option" );
+        return NULL;
     }
 
     vlc_object_t * marquee = get_marquee_object(p_mi);
     if(!marquee)
     {
-        libvlc_exception_raise( p_e, "Marquee is not enabled" );
-        return 0;
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Marquee not enabled" );
+        return NULL;
     }
     char *ret = var_GetString(marquee, identifier);
     vlc_object_release(marquee);
@@ -750,7 +761,8 @@ void libvlc_video_set_marquee_option_as_int( libvlc_media_player_t *p_mi,
     const char * identifier = get_marquee_int_option_identifier(option);
     if(!identifier)
     {
-        libvlc_exception_raise( p_e, "This option is not available" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Unknown marquee option" );
         return;
     }
 
@@ -766,17 +778,14 @@ void libvlc_video_set_marquee_option_as_int( libvlc_media_player_t *p_mi,
             vout_EnableFilter(vout, identifier, value, false);
             vlc_object_release(vout);
         }
-        else
-        {
-            libvlc_exception_raise( p_e, "No Vout" );
-        }
         return;
     }
 
     vlc_object_t * marquee = get_marquee_object(p_mi);
     if(!marquee)
     {
-        libvlc_exception_raise( p_e, "Marquee is not enabled" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Marquee not enabled" );
         return;
     }
     var_SetInteger(marquee, identifier, value);
@@ -794,13 +803,15 @@ void libvlc_video_set_marquee_option_as_string( libvlc_media_player_t *p_mi,
     const char * identifier = get_marquee_string_option_identifier(option);
     if(!identifier)
     {
-        libvlc_exception_raise( p_e, "This option is not available" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Unknown marquee option" );
         return;
     }
     vlc_object_t * marquee = get_marquee_object(p_mi);
     if(!marquee)
     {
-        libvlc_exception_raise( p_e, "Marquee is not enabled" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Marquee not enabled" );
         return;
     }
     var_SetString(marquee, identifier, value);

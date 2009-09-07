@@ -111,20 +111,19 @@ libvlc_media_library_load( libvlc_media_library_t * p_mlib,
     char *psz_datadir = config_GetUserDir( VLC_DATA_DIR );
     char * psz_uri;
 
-    if( !psz_datadir ) /* XXX: i doubt that this can ever happen */
+    if( psz_datadir == NULL
+     || asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP "ml.xsp",
+                  psz_datadir ) == -1 )
+        psz_uri = NULL;
+    free( psz_datadir );
+
+    if( psz_uri == NULL );
     {
-        libvlc_exception_raise( p_e, "Can't get data directory" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Not enough memory" );
         return;
     }
 
-    if( asprintf( &psz_uri, "file/xspf-open://%s" DIR_SEP "ml.xsp",
-                  psz_datadir ) == -1 )
-    {
-        free( psz_datadir );
-        libvlc_exception_raise( p_e, "Can't get create the path" );
-        return;
-    }
-    free( psz_datadir );
     if( p_mlib->p_mlist )
         libvlc_media_list_release( p_mlib->p_mlist );
 
@@ -145,7 +144,8 @@ libvlc_media_library_save( libvlc_media_library_t * p_mlib,
                            libvlc_exception_t * p_e )
 {
     (void)p_mlib;
-    libvlc_exception_raise( p_e, "Not supported" );
+    libvlc_exception_raise( p_e );
+    libvlc_printerr( "Function not implemented" );
 }
 
 /**************************************************************************

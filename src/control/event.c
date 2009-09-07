@@ -31,6 +31,7 @@
 
 #include "libvlc_internal.h"
 #include "event_internal.h"
+#include <assert.h>
 
 typedef struct libvlc_event_listeners_group_t
 {
@@ -74,7 +75,8 @@ libvlc_event_manager_new( void * p_obj, libvlc_instance_t * p_libvlc_inst,
     p_em = malloc(sizeof( libvlc_event_manager_t ));
     if( !p_em )
     {
-        libvlc_exception_raise( p_e, "No Memory left" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Not enough memory" );
         return NULL;
     }
 
@@ -134,7 +136,8 @@ void libvlc_event_manager_register_event_type(
     listeners_group = malloc(sizeof(libvlc_event_listeners_group_t));
     if( !listeners_group )
     {
-        libvlc_exception_raise( p_e, "No Memory left" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Not enough memory" );
         return;
     }
 
@@ -287,7 +290,8 @@ void event_attach( libvlc_event_manager_t * p_event_manager,
     listener = malloc(sizeof(libvlc_event_listener_t));
     if( !listener )
     {
-        libvlc_exception_raise( p_e, "No Memory left" );
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Not enough memory" );
         return;
     }
     
@@ -310,9 +314,9 @@ void event_attach( libvlc_event_manager_t * p_event_manager,
     vlc_mutex_unlock( &p_event_manager->object_lock );
     
     free(listener);
-    libvlc_exception_raise( p_e,
-                           "This object event manager doesn't know about '%s' events",
-                           libvlc_event_type_name(event_type));
+    fprintf( stderr, "This object event manager doesn't know about '%s' events",
+             libvlc_event_type_name(event_type) );
+    assert(0);
 }
 
 /**************************************************************************
@@ -399,10 +403,5 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
 
     libvlc_event_async_ensure_listener_removal(p_event_manager, &listener_to_remove);
 
-    if(!found)
-    {
-        libvlc_exception_raise( p_e,
-                               "This object event manager doesn't know about '%s,%p,%p' event observer",
-                               libvlc_event_type_name(event_type), pf_callback, p_user_data );        
-    }
+    assert(found);
 }
