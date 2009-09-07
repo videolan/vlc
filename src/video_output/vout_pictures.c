@@ -1239,6 +1239,10 @@ struct picture_release_sys_t
     picture_release_sys_t *p_release_sys;
 
     /* */
+    int  (*pf_lock)( picture_t * );
+    void (*pf_unlock)( picture_t * );
+
+    /* */
     int64_t i_tick;
 };
 
@@ -1252,28 +1256,37 @@ struct picture_pool_t
 
 static void PicturePoolPictureRelease( picture_t * );
 
-picture_pool_t *picture_pool_New( int i_picture, picture_t *pp_picture[] )
+picture_pool_t *picture_pool_NewExtended( const picture_pool_configuration_t *cfg )
 {
     picture_pool_t *p_pool = calloc( 1, sizeof(*p_pool) );
     if( !p_pool )
         return NULL;
 
     p_pool->i_tick = 1;
-    p_pool->i_picture = i_picture;
+    p_pool->i_picture = cfg->picture_count;
     p_pool->pp_picture = calloc( p_pool->i_picture, sizeof(*p_pool->pp_picture) );
-
-    for( int i = 0; i < i_picture; i++ )
+    if( !p_pool->pp_picture )
     {
-        picture_t *p_picture = pp_picture[i];
+        free( p_pool );
+        return NULL;
+    }
+
+    for( int i = 0; i < cfg->picture_count; i++ )
+    {
+        picture_t *p_picture = cfg->picture[i];
 
         /* The pool must be the only owner of the picture */
         assert( p_picture->i_refcount == 1 );
 
         /* Install the new release callback */
         picture_release_sys_t *p_release_sys = malloc( sizeof(*p_release_sys) );
-        p_release_sys->pf_release = p_picture->pf_release;
+        if( !p_release_sys )
+            abort();
+        p_release_sys->pf_release    = p_picture->pf_release;
         p_release_sys->p_release_sys = p_picture->p_release_sys;
-        p_release_sys->i_tick = 0;
+        p_release_sys->pf_lock       = cfg->lock;
+        p_release_sys->pf_unlock     = cfg->unlock;
+        p_release_sys->i_tick        = 0;
 
         p_picture->i_refcount = 0;
         p_picture->pf_release = PicturePoolPictureRelease;
@@ -1283,6 +1296,18 @@ picture_pool_t *picture_pool_New( int i_picture, picture_t *pp_picture[] )
         p_pool->pp_picture[i] = p_picture;
     }
     return p_pool;
+
+}
+
+picture_pool_t *picture_pool_New( int i_picture, picture_t *pp_picture[] )
+{
+    picture_pool_configuration_t cfg;
+
+    memset( &cfg, 0, sizeof(cfg) );
+    cfg.picture_count = i_picture;
+    cfg.picture       = pp_picture;
+
+    return picture_pool_NewExtended( &cfg );
 }
 
 picture_pool_t *picture_pool_NewFromFormat( const video_format_t *p_fmt, int i_picture )
@@ -1340,13 +1365,17 @@ picture_t *picture_pool_Get( picture_pool_t *p_pool )
     for( int i = 0; i < p_pool->i_picture; i++ )
     {
         picture_t *p_picture = p_pool->pp_picture[i];
+        if( p_picture->i_refcount > 0 )
+            continue;
 
-        if( p_picture->i_refcount <= 0 )
-        {
-            p_picture->p_release_sys->i_tick = p_pool->i_tick++;
-            picture_Hold( p_picture );
-            return p_picture;
-        }
+        picture_release_sys_t *p_release_sys = p_picture->p_release_sys;
+        if( p_release_sys->pf_lock && p_release_sys->pf_lock(p_picture) )
+            continue;
+
+        /* */
+        p_picture->p_release_sys->i_tick = p_pool->i_tick++;
+        picture_Hold( p_picture );
+        return p_picture;
     }
     return NULL;
 }
@@ -1377,6 +1406,8 @@ static void PicturePoolPictureRelease( picture_t *p_picture )
     if( --p_picture->i_refcount > 0 )
         return;
 
-    /* Nothing to do for the moment */
+    picture_release_sys_t *p_release_sys = p_picture->p_release_sys;
+    if( p_release_sys->pf_unlock )
+        p_release_sys->pf_unlock( p_picture );
 }
 

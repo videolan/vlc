@@ -40,12 +40,34 @@
 typedef struct picture_pool_t picture_pool_t;
 
 /**
- * It creates a picture_pool_t wrapping the given arrays of picture.
+ * Picture pool configuration
+ */
+typedef struct {
+    int       picture_count;
+    picture_t **picture;
+
+    int       (*lock)(picture_t *);
+    void      (*unlock)(picture_t *);
+} picture_pool_configuration_t;
+
+/**
+ * It creates a picture_pool_t wrapping the given configuration.
  *
  * It is usefull to avoid useless picture creations/destructions.
  * The given picture must not have a reference count greater than 1.
  * The pool takes ownership of the picture and MUST not be used directly.
  * When deleted, the pool will release the pictures using picture_Release.
+ * If defined, picture_pool_configuration_t::lock will be called before
+ * a picture is used, and picture_pool_configuration_t::unlock will be called
+ * as soon as a picture is unused. They are allowed to modify picture_t::p and
+ * access picture_t::p_sys.
+ */
+VLC_EXPORT( picture_pool_t *, picture_pool_NewExtended, ( const picture_pool_configuration_t * ) );
+
+/**
+ * It creates a picture_pool_t wrapping the given arrays of picture.
+ *
+ * It is provided as convenience.
  */
 VLC_EXPORT( picture_pool_t *, picture_pool_New, ( int i_picture, picture_t *pp_picture[] ) );
 
