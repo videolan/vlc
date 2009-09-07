@@ -170,7 +170,15 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     filter->setBuddy( search );
     CONNECT( search, textChanged( const QString& ), this, search( const QString& ) );
 
+    /* Title label */
+    title = new QLabel;
+    QFont titleFont;
+    titleFont.setPointSize( titleFont.pointSize() + 6 );
+    titleFont.setFamily( "Verdana" );
+    title->setFont( titleFont );
+
     /* Finish the layout */
+    layout->addWidget( title );
     layout->addWidget( view );
     layout->addLayout( buttons );
 //    layout->addWidget( bar );
@@ -236,6 +244,13 @@ void StandardPLPanel::setCurrentRootId( playlist_item_t *p_item )
     }
     else
         addButton->setEnabled( false );
+
+    /* <jleben> do we need to lock here? */
+    playlist_Lock( THEPL );
+    char *psz_title = input_item_GetName( p_item->p_input );
+    title->setText( psz_title );
+    free( psz_title );
+    playlist_Unlock( THEPL );
 }
 
 /* PopupAdd Menu for the Add Menu */

@@ -74,6 +74,7 @@ protected:
     PLModel *model;
     friend class PlaylistWidget;
 private:
+    QLabel *title;
     QTreeView *view;
     QPushButton *repeatButton, *randomButton, *addButton, *gotoPlayingButton;
     int currentRootId;
