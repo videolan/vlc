@@ -61,6 +61,10 @@
 #include <vlc_keys.h>
 #include "vout.h"
 
+#ifndef UNDER_CE
+#include <vlc_windows_interfaces.h>
+#endif
+
 #ifdef UNDER_CE
 #include <aygshell.h>
     //WINSHELLAPI BOOL WINAPI SHFullScreen(HWND hwndRequester, DWORD dwState);
@@ -793,6 +797,39 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
         DirectDrawUpdateOverlay( p_vout );
 #endif
 
+#ifndef UNDER_CE
+    /* Windows 7 taskbar thumbnail code */
+    LPTASKBARLIST3 p_taskbl;
+    OSVERSIONINFO winVer;
+    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    if( GetVersionEx(&winVer) && winVer.dwMajorVersion > 5 && winVer.dwMajorVersion > 0 )
+    {
+        CoInitialize( 0 );
+
+        if( S_OK == CoCreateInstance( &clsid_ITaskbarList,
+                    NULL, CLSCTX_INPROC_SERVER,
+                    &IID_ITaskbarList3,
+                    (void **)&p_taskbl) )
+        {
+            RECT rect_video, rect_parent, rect_relative;
+            HWND hroot = GetAncestor(p_vout->p_sys->hwnd,GA_ROOT);
+
+            p_taskbl->vt->HrInit(p_taskbl);
+            GetWindowRect(p_vout->p_sys->hvideownd, &rect_video);
+            GetWindowRect(hroot, &rect_parent);
+            rect_relative.left = rect_video.left - rect_parent.left - 8;
+            rect_relative.right = rect_video.right - rect_video.left + rect_relative.left;
+            rect_relative.top = rect_video.top - rect_parent.top - 10;
+            rect_relative.bottom = rect_video.bottom - rect_video.top + rect_relative.top - 25;
+
+            if (S_OK != p_taskbl->vt->SetThumbnailClip(p_taskbl, hroot, &rect_relative))
+                msg_Err( p_vout, "SetThumbNailClip failed");
+
+            p_taskbl->vt->Release(p_taskbl);
+        }
+        CoUninitialize();
+    }
+#endif
     /* Signal the change in size/position */
     p_vout->p_sys->i_changes |= DX_POSITION_CHANGE;
 

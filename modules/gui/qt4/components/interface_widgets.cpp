@@ -241,6 +241,34 @@ void VideoWidget::release( void )
 {
     msg_Dbg( p_intf, "Video is not needed anymore" );
     //layout->removeWidget( reparentable );
+
+#ifdef WIN32
+    /* Come back to default thumbnail for Windows 7 taskbar */
+    LPTASKBARLIST3 p_taskbl;
+    OSVERSIONINFO winVer;
+    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
+    if( GetVersionEx(&winVer) && winVer.dwMajorVersion > 5 && winVer.dwMajorVersion > 0 )
+    {
+        CoInitialize( 0 );
+
+        if( S_OK == CoCreateInstance( &clsid_ITaskbarList,
+                    NULL, CLSCTX_INPROC_SERVER,
+                    &IID_ITaskbarList3,
+                    (void **)&p_taskbl) )
+        {
+            p_taskbl->vt->HrInit(p_taskbl);
+
+            HWND hroot = GetAncestor(reparentable->winId(),GA_ROOT);
+
+            if (S_OK != p_taskbl->vt->SetThumbnailClip(p_taskbl, hroot, NULL))
+                msg_Err(p_intf, "SetThumbNailClip failed");
+            msg_Err(p_intf, "Releasing taskbar | root handle = %08x", hroot);
+            p_taskbl->vt->Release(p_taskbl);
+        }
+        CoUninitialize();
+    }
+#endif
+
     delete reparentable;
     reparentable = NULL;
     videoSize.rwidth() = 0;
