@@ -35,8 +35,10 @@ const GUID IID_IApplicationAssociationRegistrationUI = {0x1f76a169,0xf994,0x40ac
 
 const GUID clsid_ITaskbarList ={ 0x56FDF344,0xFD6D,0x11d0,{0x95,0x8A,0x00,0x60,0x97,0xC9,0xA0,0x90}};
 const GUID IID_ITaskbarList3 = { 0xea1afb91,0x9e28,0x4b86,{0x90,0xe9,0x9e,0x9f,0x8a,0x5e,0xef,0xaf}};
+#ifndef __IUnknown_INTERFACE_DEFINED__
 #undef IUnknown
 typedef struct _IUnknown IUnknown;
+#endif
 typedef struct _IApplicationAssociationRegistrationUI IApplicationAssociationRegistrationUI;
 typedef struct _ITaskbarList3 ITaskbarList3;
 
@@ -49,8 +51,9 @@ typedef struct IUnknown_vt
 
 } IUnknown_vt;
 struct _IUnknown { IUnknown_vt* vt; };
+#ifndef __IUnknown_INTERFACE_DEFINED__
 typedef IUnknown *LPUNKNOWN;
-
+#endif
 typedef struct IApplicationAssociationRegistrationUI_vt
 {
     /* IUnknown methods */
@@ -166,11 +169,14 @@ struct _ITaskbarList3 { ITaskbarList3Vtbl* vt; };
 typedef ITaskbarList3 *LPTASKBARLIST3, *PTASKBARLIST3;
 
 
-
+#ifdef __cplusplus
 extern "C" {
+#endif
     HRESULT WINAPI CoCreateInstance(const GUID *,LPUNKNOWN,DWORD,REFIID,PVOID*);
     HRESULT WINAPI CoInitialize(PVOID);
     void WINAPI CoUninitialize(void);
+#ifdef __cplusplus
 };
+#endif
 
 #endif //VISTAASSOC_H
