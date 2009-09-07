@@ -73,16 +73,16 @@ VLC_EXPORT( void, picture_fifo_Push, ( picture_fifo_t *, picture_t * ) );
 
 /**
  * It release all picture inside the fifo that have a lower or equal date
- * if b_below or higher or equal to not b_below than the given one.
+ * if flush_before or higher or equal to if not flush_before than the given one.
  *
  * All pictures inside the fifo will be released by picture_Release.
  */
-VLC_EXPORT( void, picture_fifo_Flush, ( picture_fifo_t *, mtime_t i_date, bool b_below ) );
+VLC_EXPORT( void, picture_fifo_Flush, ( picture_fifo_t *, mtime_t date, bool flush_before ) );
 
 /**
  * It applies a delta on all the picture timestamp.
  */
-VLC_EXPORT( void, picture_fifo_OffsetDate, ( picture_fifo_t *, mtime_t i_delta ) );
+VLC_EXPORT( void, picture_fifo_OffsetDate, ( picture_fifo_t *, mtime_t delta ) );
 
 
 #endif /* VLC_PICTURE_FIFO_H */
