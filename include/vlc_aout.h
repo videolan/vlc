@@ -138,6 +138,7 @@ struct aout_buffer_t
     mtime_t                 start_date, end_date;
 
     struct aout_buffer_t *  p_next;
+    void                 *p_sys;
 };
 
 static inline void aout_BufferFree( aout_buffer_t *buffer )
