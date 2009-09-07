@@ -41,36 +41,6 @@ typedef int libvlc_drawable_t;
 extern "C" {
 # endif
 
-/**
- * Set the drawable where the media player should render its video output.
- *
- * On Windows 32-bits, a window handle (HWND) is expected.
- * On Windows 64-bits, this function will always fail.
- *
- * On OSX 32-bits, a CGrafPort is expected.
- * On OSX 64-bits, this function will always fail.
- *
- * On other platforms, an existing X11 window ID is expected. See
- * libvlc_media_player_set_xwindow() for details.
- *
- * \param p_mi the Media Player
- * \param drawable the libvlc_drawable_t where the media player
- *        should render its video
- * \param p_e an initialized exception pointer
- */
-VLC_DEPRECATED_API void libvlc_media_player_set_drawable ( libvlc_media_player_t *, libvlc_drawable_t, libvlc_exception_t * );
-
-/**
- * Get the drawable where the media player should render its video output
- *
- * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
- * \return the libvlc_drawable_t where the media player
- *         should render its video
- */
-VLC_DEPRECATED_API libvlc_drawable_t
-                    libvlc_media_player_get_drawable ( libvlc_media_player_t *, libvlc_exception_t * );
-
 /*****************************************************************************
  * Playlist (Deprecated)
  *****************************************************************************/

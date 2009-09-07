@@ -241,8 +241,11 @@ int mediacontrol_set_visual( mediacontrol_Instance *self,
 
     mediacontrol_exception_init( exception );
     libvlc_exception_init( &ex );
-
-    libvlc_media_player_set_drawable( self->p_media_player, (libvlc_drawable_t)visual_id, &ex );
+#ifdef WIN32
+    libvlc_media_player_set_hwnd( self->p_media_player, visual_id, &ex );
+#else
+    libvlc_media_player_set_xwindow( self->p_media_player, visual_id, &ex );
+#endif
     HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
     return true;
 }

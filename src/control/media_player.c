@@ -744,48 +744,6 @@ void *libvlc_media_player_get_hwnd( libvlc_media_player_t *p_mi )
 }
 
 /**************************************************************************
- * Set Drawable
- **************************************************************************/
-void libvlc_media_player_set_drawable( libvlc_media_player_t *p_mi,
-                                       libvlc_drawable_t drawable,
-                                       libvlc_exception_t *p_e )
-{
-#ifdef WIN32
-    if (sizeof (HWND) <= sizeof (libvlc_drawable_t))
-        p_mi->drawable.hwnd = (HWND)drawable;
-    else
-        libvlc_exception_raise(p_e, "Operation not supported");
-#elif defined(__APPLE__)
-    p_mi->drawable.agl = drawable;
-    (void) p_e;
-#else
-    p_mi->drawable.xid = drawable;
-    (void) p_e;
-#endif
-}
-
-/**************************************************************************
- * Get Drawable
- **************************************************************************/
-libvlc_drawable_t
-libvlc_media_player_get_drawable ( libvlc_media_player_t *p_mi,
-                                   libvlc_exception_t *p_e )
-{
-    VLC_UNUSED(p_e);
-
-#ifdef WIN32
-    if (sizeof (HWND) <= sizeof (libvlc_drawable_t))
-        return (libvlc_drawable_t)p_mi->drawable.hwnd;
-    else
-        return 0;
-#elif defined(__APPLE__)
-    return p_mi->drawable.agl;
-#else
-    return p_mi->drawable.xid;
-#endif
-}
-
-/**************************************************************************
  * Getters for stream information
  **************************************************************************/
 libvlc_time_t libvlc_media_player_get_length(
