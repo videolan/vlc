@@ -129,22 +129,15 @@ typedef int32_t vlc_fixed_t;
 struct aout_buffer_t
 {
     uint8_t *               p_buffer;
-    bool                    b_alloc;
     /* i_size is the real size of the buffer (used for debug ONLY), i_nb_bytes
      * is the number of significative bytes in it. */
     size_t                  i_size, i_nb_bytes;
     unsigned int            i_nb_samples;
-    mtime_t                 start_date, end_date;
+    bool                    b_alloc;
     bool                    b_discontinuity; /* Set on discontinuity (for non pcm stream) */
+    mtime_t                 start_date, end_date;
 
     struct aout_buffer_t *  p_next;
-
-    /** Private data (aout_buffer_t will disappear soon so no need for an
-     * aout_buffer_sys_t type) */
-    void * p_sys;
-
-    /** This way the release can be overloaded */
-    void (*pf_release)( aout_buffer_t * );
 };
 
 static inline void aout_BufferFree( aout_buffer_t *buffer )
