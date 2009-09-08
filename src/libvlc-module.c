@@ -1073,7 +1073,7 @@ static const char *const ppsz_clock_descriptions[] =
 #define PLUGINS_CACHE_LONGTEXT N_( \
     "Use a plugins cache which will greatly improve the startup time of VLC.")
 
-#define STATS_TEXT N_("Collect local statistics")
+#define STATS_TEXT N_("Locally collect statistics")
 #define STATS_LONGTEXT N_( \
      "Collect miscellaneous local statistics about the playing media.")
 
