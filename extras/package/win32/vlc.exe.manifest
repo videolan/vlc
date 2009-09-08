@@ -7,6 +7,13 @@
 		type="win32"
 	/>
 	<description>see http://www.videolan.org/</description>
+     <trustInfo xmlns="urn:schemas-microsoft-com:asm.v3">
+        <security>
+            <requestedPrivileges>
+                <requestedExecutionLevel level="asInvoker" />
+            </requestedPrivileges>
+        </security>
+    </trustInfo>
 	<dependency>
 		<dependentAssembly>
 			<assemblyIdentity
