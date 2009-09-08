@@ -333,7 +333,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
             continue;
 
         ptr = strchr( psz_ip, '\n' );
-        if( ptr == NULL )
+        if( ptr == NULL && !feof(file) )
         {
             msg_Warn( p_acl->p_owner, "skipping overly long line in %s",
                       psz_path);
@@ -354,15 +354,14 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
             continue; /* skip unusable line */
         }
 
-        /* skips comment-only line */
-        if( *psz_ip == '#' )
-            continue;
-
-        /* looks for first space, CR, LF, etc. or end-of-line comment */
-        /* (there is at least a linefeed) */
-        for( ptr = psz_ip; ( *ptr != '#' ) && !isspace( *ptr ); ptr++ );
+        /* look for first space, CR, LF, etc. or comment character */
+        for( ptr = psz_ip; ( *ptr!='#' ) && !isspace( *ptr ) && *ptr; ++ptr );
 
         *ptr = '\0';
+
+        /* skip lines without usable information */
+        if( ptr == psz_ip )
+            continue;
 
         msg_Dbg( p_acl->p_owner, "restricted to %s", psz_ip );
 
