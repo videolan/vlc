@@ -566,6 +566,7 @@ void libvlc_media_list_player_set_media_player(libvlc_media_list_player_t * p_ml
  **************************************************************************/
 void libvlc_media_list_player_set_media_list(libvlc_media_list_player_t * p_mlp, libvlc_media_list_t * p_mlist, libvlc_exception_t * p_e)
 {
+    VLC_UNUSED( p_e );
     assert (p_mlist);
 
     lock(p_mlp);

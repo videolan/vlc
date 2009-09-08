@@ -358,6 +358,7 @@ void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
                                      void *p_user_data,
                                      libvlc_exception_t *p_e )
 {
+    VLC_UNUSED( p_e );
     libvlc_event_listeners_group_t * listeners_group;
     libvlc_event_listener_t * listener;
     int i, j;

@@ -425,6 +425,8 @@ int libvlc_video_get_teletext( libvlc_media_player_t *p_mi,
     vlc_object_release( p_vout );
     return i_ret;
 #else
+    VLC_UNUSED( p_mi );
+    VLC_UNUSED( p_e );
     return -1;
 #endif
 }
@@ -450,6 +452,10 @@ void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
                             "Unexpected error while setting teletext page" );
     }
     vlc_object_release( p_vout );
+#else
+    VLC_UNUSED( p_mi );
+    VLC_UNUSED( p_e );
+    VLC_UNUSED( i_page );
 #endif
 }
 
@@ -457,7 +463,6 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
                              libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    int i_ret;
 
     p_input_thread = libvlc_get_input_thread(p_mi, p_e);
     if( !p_input_thread ) return;
@@ -469,6 +474,7 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
     }
     const bool b_selected = var_GetInteger( p_input_thread, "teletext-es" ) >= 0;
 #if 0
+    int i_ret;
     vlc_object_t *p_vbi;
     p_vbi = (vlc_object_t *)vlc_object_find_name( p_input_thread, "zvbi",
                                                   FIND_CHILD );
