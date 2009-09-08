@@ -39,42 +39,52 @@ import sys
 
 build_date="This will be replaced by the build date"
 
+# Used for win32 and MacOS X
+detected_plugin_path=None
+
 if sys.platform == 'linux2':
     dll=ctypes.CDLL('libvlc.so')
 elif sys.platform == 'win32':
     import ctypes.util
     import os
-    plugin_path=None
+    detected_plugin_path=None
     path=ctypes.util.find_library('libvlc.dll')
     if path is None:
         # Try to use registry settings
         import _winreg
-        plugin_path_found = None
+        detected_plugin_path_found = None
         subkey, name = 'Software\\VideoLAN\\VLC','InstallDir'
         for hkey in _winreg.HKEY_LOCAL_MACHINE, _winreg.HKEY_CURRENT_USER:
             try:
                 reg = _winreg.OpenKey(hkey, subkey)
-                plugin_path_found, type_id = _winreg.QueryValueEx(reg, name)
+                detected_plugin_path_found, type_id = _winreg.QueryValueEx(reg, name)
                 _winreg.CloseKey(reg)
                 break
             except _winreg.error:
                 pass
-        if plugin_path_found:
-            plugin_path = plugin_path_found
+        if detected_plugin_path_found:
+            detected_plugin_path = detected_plugin_path_found
         else:
             # Try a standard location.
             p='c:\\Program Files\\VideoLAN\\VLC\\libvlc.dll'
             if os.path.exists(p):
-                plugin_path=os.path.dirname(p)
-        os.chdir(plugin_path)
+                detected_plugin_path=os.path.dirname(p)
+        os.chdir(detected_plugin_path)
         # If chdir failed, this will not work and raise an exception
         path='libvlc.dll'
     else:
-        plugin_path=os.path.dirname(path)
+        detected_plugin_path=os.path.dirname(path)
     dll=ctypes.CDLL(path)
 elif sys.platform == 'darwin':
     # FIXME: should find a means to configure path
-    dll=ctypes.CDLL('/Applications/VLC.app/Contents/MacOS/lib/libvlc.2.dylib')
+    d='/Applications/VLC.app'
+    import os
+    if os.path.exists(d):
+        dll=ctypes.CDLL(d+'/Contents/MacOS/lib/libvlc.2.dylib')
+        detected_plugin_path=d+'/Contents/MacOS/modules'
+    else:
+        # Hope some default path is set...
+        dll=ctypes.CDLL('libvlc.2.dylib')
 
 #
 # Generated enum types.

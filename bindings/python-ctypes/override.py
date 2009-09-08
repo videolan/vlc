@@ -24,6 +24,10 @@ class Instance:
         if p and isinstance(p[0], MediaControl):
             return p[0].get_instance()
         else:
+            if not p and detected_plugin_path is not None:
+                # No parameters passed. Under win32 and MacOS, specify
+                # the detected_plugin_path if present.
+                p=[ 'vlc', '--plugin-path='+ detected_plugin_path ]
             e=VLCException()
             return libvlc_new(len(p), p, e)
 
@@ -74,6 +78,10 @@ class MediaControl:
             e=MediaControlException()
             return mediacontrol_new_from_instance(p[0], e)
         else:
+            if not p and detected_plugin_path is not None:
+                # No parameters passed. Under win32 and MacOS, specify
+                # the detected_plugin_path if present.
+                p=[ 'vlc', '--plugin-path='+ detected_plugin_path ]
             e=MediaControlException()
             return mediacontrol_new(len(p), p, e)
 
