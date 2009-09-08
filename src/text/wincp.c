@@ -91,7 +91,7 @@ static const char *FindFallbackEncoding (const char *locale)
         return "CP1251"; // KOI8, ISO-8859-5 and CP1251 are incompatible(?)
 
     /* Arabic (ISO-8859-6) */
-    static const char arabic[] = "ar" "ckb" "fa";
+    static const char arabic[] = "ar" "fa";
     if (!locale_match (arabic, locale))
         // FIXME: someone check if we should return CP1256 or ISO-8859-6
         return "CP1256"; // CP1256 is(?) more common, but incompatible(?)
