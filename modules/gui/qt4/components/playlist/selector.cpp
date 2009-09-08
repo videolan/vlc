@@ -70,7 +70,10 @@ void PLSelector::setSource( QTreeWidgetItem *item )
     if( !item )
         return;
 
-    int i_type = item->data( 0, TYPE_ROLE ).toInt();
+    bool b_ok;
+    int i_type = item->data( 0, TYPE_ROLE ).toInt( &b_ok );
+    if( !b_ok )
+        return;
 
     assert( ( i_type == PL_TYPE || i_type == ML_TYPE || i_type == SD_TYPE ) );
     if( i_type == SD_TYPE )
