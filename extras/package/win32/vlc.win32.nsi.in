@@ -147,10 +147,10 @@ NoBackup:
   WriteRegStr HKCR "VLC$R0\DefaultIcon" "" '"$INSTDIR\vlc.exe",0'
 
 ;;; Vista Only part
-  ; Vista detection
+  ; Vista and above detection
   ReadRegStr $R1 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
-  StrCpy $R2 $R1 3
-  StrCmp $R2 '6.0' ForVista ToEnd
+  StrCpy $R2 $R1 1
+  StrCmp $R2 '6' ForVista ToEnd
 ForVista:
   WriteRegStr HKLM "Software\Clients\Media\VLC\Capabilities\FileAssociations" "$R0" "VLC$R0"
 
@@ -446,11 +446,11 @@ Section $Name_Section01 SEC01
     '"$INSTDIR\vlc.exe" --started-from-file "%1"'
   !insertmacro MacroAllExtensions WriteRegStrSupportedTypes
 
-; Vista Registration
-  ; Vista detection
+; Windows default programs Registration
+  ; Vista and above detection
   ReadRegStr $R0 HKLM "SOFTWARE\Microsoft\Windows NT\CurrentVersion" CurrentVersion
-  StrCpy $R1 $R0 3
-  StrCmp $R1 '6.0' lbl_vista lbl_done
+  StrCpy $R1 $R0 1
+  StrCmp $R1 '6' lbl_vista lbl_done
 
   lbl_vista:
   WriteRegStr HKLM "Software\RegisteredApplications" "VLC" "Software\Clients\Media\VLC\Capabilities"
