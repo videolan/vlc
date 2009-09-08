@@ -137,7 +137,6 @@ void PLSelector::createItems()
     }
 }
 
-#include <iostream>
 QStringList PLSelector::mimeTypes() const
 {
     QStringList types;
