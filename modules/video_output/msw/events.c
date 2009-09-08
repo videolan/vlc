@@ -802,7 +802,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
     LPTASKBARLIST3 p_taskbl;
     OSVERSIONINFO winVer;
     winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if( GetVersionEx(&winVer) && winVer.dwMajorVersion > 5 && winVer.dwMajorVersion > 0 )
+    if( GetVersionEx(&winVer) && winVer.dwMajorVersion > 5 )
     {
         CoInitialize( 0 );
 

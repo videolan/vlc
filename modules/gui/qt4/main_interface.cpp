@@ -486,7 +486,7 @@ void MainInterface::createTaskBarButtons()
     */
     OSVERSIONINFO winVer;
     winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if( GetVersionEx(&winVer) && winVer.dwMajorVersion > 5 && winVer.dwMajorVersion > 0 )
+    if( GetVersionEx(&winVer) && winVer.dwMajorVersion > 5 )
     {
         if(himl = ImageList_Create( 15, //cx
                                     18, //cy
