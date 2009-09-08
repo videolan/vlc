@@ -175,7 +175,6 @@ static int Demux( demux_t *p_demux )
 
     int i_data;
 
-    /* I'm pretty sure that stream_Peek,stream_Read( , NULL ) would be faster*/
     i_data = stream_Read( p_demux->s, p_sys->buffer, DUMP_BLOCKSIZE );
     if ( i_data <= 0 )
         return i_data;
