@@ -72,6 +72,56 @@
 
 static int vaControlParentWindow( vout_thread_t *, int, va_list );
 
+/* */
+int CommonInit( vout_thread_t *p_vout )
+{
+    vout_sys_t *p_sys = p_vout->p_sys;
+
+    p_sys->hwnd      = NULL;
+    p_sys->hvideownd = NULL;
+    p_sys->hparent   = NULL;
+    p_sys->hfswnd    = NULL;
+    p_sys->i_changes = 0;
+    SetRectEmpty( &p_sys->rect_display );
+    SetRectEmpty( &p_sys->rect_parent );
+
+    p_sys->b_cursor_hidden = 0;
+    p_sys->i_lastmoved = mdate();
+    p_sys->i_mouse_hide_timeout =
+        var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
+
+    var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+
+    /* Set main window's size */
+    p_sys->i_window_width  = p_vout->i_window_width;
+    p_sys->i_window_height = p_vout->i_window_height;
+
+    if( !CreateEventThread( p_vout ) )
+        return VLC_EGENERIC;
+
+    /* Variable to indicate if the window should be on top of others */
+    /* Trigger a callback right now */
+    var_TriggerCallback( p_vout, "video-on-top" );
+
+    /* Why not with glwin32 */
+#if !defined(UNDER_CE) && !defined(MODULE_NAME_IS_glwin32)
+    var_Create( p_vout, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    DisableScreensaver ( p_vout );
+#endif
+
+    return VLC_SUCCESS;
+}
+
+/* */
+void CommonClean( vout_thread_t *p_vout )
+{
+    StopEventThread( p_vout );
+
+#if !defined(UNDER_CE) && !defined(MODULE_NAME_IS_glwin32)
+    RestoreScreensaver( p_vout );
+#endif
+}
+
 /*****************************************************************************
  * UpdateRects: update clipping rectangles
  *****************************************************************************

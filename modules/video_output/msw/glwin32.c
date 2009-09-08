@@ -104,36 +104,14 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->pf_swap = FirstSwap;
     p_vout->pf_control = Control;
 
-    p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
-    p_vout->p_sys->hparent = p_vout->p_sys->hfswnd = NULL;
-    p_vout->p_sys->i_changes = 0;
-    SetRectEmpty( &p_vout->p_sys->rect_display );
-    SetRectEmpty( &p_vout->p_sys->rect_parent );
+    if( CommonInit( p_vout ) )
+        goto error;
 
-    var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    return VLC_SUCCESS;
 
-    p_vout->p_sys->b_cursor_hidden = 0;
-    p_vout->p_sys->i_lastmoved = mdate();
-    p_vout->p_sys->i_mouse_hide_timeout =
-        var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
-
-    /* Set main window's size */
-    p_vout->p_sys->i_window_width = p_vout->i_window_width;
-    p_vout->p_sys->i_window_height = p_vout->i_window_height;
-
-    if ( CreateEventThread( p_vout ) )
-    {
-        /* Variable to indicate if the window should be on top of others */
-        /* Trigger a callback right now */
-        var_TriggerCallback( p_vout, "video-on-top" );
-
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        CloseVideo( VLC_OBJECT(p_vout) );
-        return VLC_EGENERIC;
-    }
+error:
+    CloseVideo( VLC_OBJECT(p_vout) );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -191,10 +169,9 @@ static void CloseVideo( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    StopEventThread( p_vout );
+    CommonClean( p_vout );
 
     free( p_vout->p_sys );
-    p_vout->p_sys = NULL;
 }
 
 /*****************************************************************************

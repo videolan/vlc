@@ -194,50 +194,25 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->pf_display = FirstDisplay;
     p_vout->pf_control = Control;
 
-    p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
-    p_vout->p_sys->hparent = p_vout->p_sys->hfswnd = NULL;
-    p_vout->p_sys->i_changes = 0;
-    p_vout->p_sys->b_desktop = false;
-    SetRectEmpty( &p_vout->p_sys->rect_display );
-    SetRectEmpty( &p_vout->p_sys->rect_parent );
+    if( CommonInit( p_vout ) )
+        goto error;
 
+    p_vout->p_sys->b_desktop = false;
     var_Create( p_vout, "directx-hw-yuv", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
-    p_vout->p_sys->b_cursor_hidden = 0;
-    p_vout->p_sys->i_lastmoved = mdate();
-    p_vout->p_sys->i_mouse_hide_timeout =
-        var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
+    /* Trigger a callback right now */
+    var_Create( p_vout, "direct3d-desktop", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    val.psz_string = _("Desktop");
+    var_Change( p_vout, "direct3d-desktop", VLC_VAR_SETTEXT, &val, NULL );
+    var_AddCallback( p_vout, "direct3d-desktop", DesktopCallback, NULL );
+    var_TriggerCallback( p_vout, "direct3d-desktop" );
 
-    var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
+    return VLC_SUCCESS;
 
-    /* Set main window's size */
-    p_vout->p_sys->i_window_width = p_vout->i_window_width;
-    p_vout->p_sys->i_window_height = p_vout->i_window_height;
-
-    if ( CreateEventThread( p_vout ) )
-    {
-        /* Variable to indicate if the window should be on top of others */
-        /* Trigger a callback right now */
-        var_TriggerCallback( p_vout, "video-on-top" );
-
-        /* Trigger a callback right now */
-        var_Create( p_vout, "direct3d-desktop", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-        val.psz_string = _("Desktop");
-        var_Change( p_vout, "direct3d-desktop", VLC_VAR_SETTEXT, &val, NULL );
-        var_AddCallback( p_vout, "direct3d-desktop", DesktopCallback, NULL );
-        var_TriggerCallback( p_vout, "direct3d-desktop" );
-
-        DisableScreensaver ( p_vout );
-
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        CloseVideo( VLC_OBJECT(p_vout) );
-        return VLC_EGENERIC;
-    }
+error:
+    CloseVideo( VLC_OBJECT(p_vout) );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -251,12 +226,9 @@ static void CloseVideo( vlc_object_t *p_this )
 
     Direct3DVoutRelease( p_vout );
 
-    StopEventThread( p_vout );
-
-    RestoreScreensaver( p_vout );
+    CommonClean( p_vout );
 
     free( p_vout->p_sys );
-    p_vout->p_sys = NULL;
 }
 
 /*****************************************************************************

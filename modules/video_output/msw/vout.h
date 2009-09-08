@@ -262,6 +262,9 @@ void StopEventThread ( vout_thread_t *p_vout );
 /*****************************************************************************
  * Prototypes from common.c
  *****************************************************************************/
+int CommonInit( vout_thread_t * );
+void CommonClean( vout_thread_t * );
+
 int Control( vout_thread_t *p_vout, int i_query, va_list args );
 
 void UpdateRects ( vout_thread_t *p_vout, bool b_force );

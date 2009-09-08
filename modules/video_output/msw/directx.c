@@ -227,16 +227,15 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->pf_display = FirstDisplay;
     p_vout->pf_control = Control;
 
+    if( CommonInit( p_vout ) )
+        goto error;
+
+    /* */
     p_vout->p_sys->p_ddobject = NULL;
     p_vout->p_sys->p_display = NULL;
     p_vout->p_sys->p_current_surface = NULL;
     p_vout->p_sys->p_clipper = NULL;
-    p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
-    p_vout->p_sys->hparent = p_vout->p_sys->hfswnd = NULL;
-    p_vout->p_sys->i_changes = 0;
     p_vout->p_sys->b_wallpaper = 0;
-    SetRectEmpty( &p_vout->p_sys->rect_display );
-    SetRectEmpty( &p_vout->p_sys->rect_parent );
 
     /* Multimonitor stuff */
     p_vout->p_sys->hmonitor = NULL;
@@ -256,20 +255,6 @@ static int OpenVideo( vlc_object_t *p_this )
     var_Create( p_vout, "directx-hw-yuv", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "directx-3buffering", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
     var_Create( p_vout, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "disable-screensaver", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-
-    p_vout->p_sys->b_cursor_hidden = 0;
-    p_vout->p_sys->i_lastmoved = mdate();
-    p_vout->p_sys->i_mouse_hide_timeout =
-        var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
-
-    /* Set main window's size */
-    p_vout->p_sys->i_window_width = p_vout->i_window_width;
-    p_vout->p_sys->i_window_height = p_vout->i_window_height;
-
-    if ( !CreateEventThread( p_vout ) )
-        goto error;
 
     /* Initialise DirectDraw */
     if( DirectXInitDDraw( p_vout ) )
@@ -287,17 +272,11 @@ static int OpenVideo( vlc_object_t *p_this )
 
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
-    var_TriggerCallback( p_vout, "video-on-top" );
-
-    /* Variable to indicate if the window should be on top of others */
-    /* Trigger a callback right now */
     var_Create( p_vout, "directx-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
     val.psz_string = _("Wallpaper");
     var_Change( p_vout, "directx-wallpaper", VLC_VAR_SETTEXT, &val, NULL );
     var_AddCallback( p_vout, "directx-wallpaper", WallpaperCallback, NULL );
     var_TriggerCallback( p_vout, "directx-wallpaper" );
-
-    DisableScreensaver ( p_vout );
 
     return VLC_SUCCESS;
 
@@ -438,13 +417,11 @@ static void CloseVideo( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    StopEventThread( p_vout );
-
     /* Make sure the wallpaper is restored */
     var_DelCallback( p_vout, "directx-wallpaper", WallpaperCallback, NULL );
     SwitchWallpaperMode( p_vout, false );
 
-    RestoreScreensaver( p_vout );
+    CommonClean( p_vout );
 
     free( p_vout->p_sys );
 }
