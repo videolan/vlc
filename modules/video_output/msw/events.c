@@ -809,7 +809,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
         if( S_OK == CoCreateInstance( &clsid_ITaskbarList,
                     NULL, CLSCTX_INPROC_SERVER,
                     &IID_ITaskbarList3,
-                    (void **)&p_taskbl) )
+                    &p_taskbl) )
         {
             RECT rect_video, rect_parent, rect_relative;
             HWND hroot = GetAncestor(p_vout->p_sys->hwnd,GA_ROOT);
