@@ -3805,15 +3805,12 @@ if test "${enable_directx}" != "no"
 then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"
   then
-    AC_ARG_WITH(directx,
-    [    --with-directx=PATH   Win32 DirectX headers])
-    if test -z "${with_directx}"
-    then
       AC_CHECK_HEADERS(ddraw.h,
       [ VLC_ADD_PLUGIN([directx])
         VLC_ADD_PLUGIN([aout_directx])
         VLC_ADD_LIBS([directx],[-lgdi32])
-      ])
+      ],[AC_MSG_ERROR([Cannot find DirectX headers!])]
+      )
       AC_CHECK_HEADERS(GL/gl.h,
       [ VLC_ADD_PLUGIN([glwin32])
         VLC_ADD_LIBS([glwin32],[-lopengl32 -lgdi32])
@@ -3823,22 +3820,27 @@ then
         VLC_ADD_LIBS([direct3d],[-lgdi32])
       ])
       VLC_ADD_LIBS([direct3d directx glwin32],[-lole32])
-    else
-      AC_MSG_CHECKING(for directX headers in ${with_directx})
-      if test -f ${with_directx}/ddraw.h
-      then
-        VLC_ADD_PLUGIN([directx])
-	VLC_ADD_PLUGIN([aout_directx])
-        VLC_ADD_CPPFLAGS([directx aout_directx],[-I${with_directx}])
-        VLC_ADD_LIBS([directx],[-lgdi32])
-        AC_MSG_RESULT(yes)
-      else
-        AC_MSG_RESULT(no)
-        AC_MSG_ERROR([Cannot find ${with_directx}/ddraw.h!])
-      fi
-    fi
   fi
 fi
+
+dnl
+dnl  win32 GDI plugin
+dnl
+AC_ARG_ENABLE(wingdi,
+  [  --enable-wingdi         Win32 GDI module (default enabled on Win32)])
+if test "${enable_wingdi}" != "no"; then
+  if test "${SYS}" = "mingw32"; then
+    VLC_ADD_PLUGIN([wingdi])
+    VLC_ADD_LIBS([wingdi],[-lgdi32 -lole32])
+  fi
+  if test "${SYS}" = "mingwce"; then
+    VLC_ADD_PLUGIN([wingdi])
+    VLC_ADD_PLUGIN([wingapi])
+    VLC_ADD_LIBS([wingdi],[-laygshell])
+    VLC_ADD_LIBS([wingapi],[-laygshell])
+  fi
+fi
+
 
 dnl
 dnl  Linux framebuffer module
@@ -3998,24 +4000,6 @@ dnl
 dnl  libcaca plugin
 dnl
 PKG_ENABLE_MODULES_VLC([caca], [], [caca >= 0.99.beta1], [libcaca output],[auto])
-
-dnl
-dnl  win32 GDI plugin
-dnl
-AC_ARG_ENABLE(wingdi,
-  [  --enable-wingdi         Win32 GDI module (default enabled on Win32)])
-if test "${enable_wingdi}" != "no"; then
-  if test "${SYS}" = "mingw32"; then
-    VLC_ADD_PLUGIN([wingdi])
-    VLC_ADD_LIBS([wingdi],[-lgdi32 -lole32])
-  fi
-  if test "${SYS}" = "mingwce"; then
-    VLC_ADD_PLUGIN([wingdi])
-    VLC_ADD_PLUGIN([wingapi])
-    VLC_ADD_LIBS([wingdi],[-laygshell])
-    VLC_ADD_LIBS([wingapi],[-laygshell])
-  fi
-fi
 
 dnl
 dnl  Audio plugins
