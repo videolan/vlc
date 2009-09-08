@@ -128,7 +128,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->i_height = var_CreateGetInteger( p_this, "invmem-height" );
     if( p_sys->i_width == 0 || p_sys->i_height == 0 )
     {
-        msg_Err( p_dec, "--vmem-width and --vmem-height must be > 0" );
+        msg_Err( p_dec, "--invmem-width and --invmem-height must be > 0" );
         free( p_sys );
         return VLC_EGENERIC;
     }
