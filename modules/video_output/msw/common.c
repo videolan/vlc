@@ -84,6 +84,7 @@ int CommonInit( vout_thread_t *p_vout )
     p_sys->i_changes = 0;
     SetRectEmpty( &p_sys->rect_display );
     SetRectEmpty( &p_sys->rect_parent );
+    vlc_mutex_init( &p_sys->lock );
 
     p_sys->b_cursor_hidden = 0;
     p_sys->i_lastmoved = mdate();
@@ -116,6 +117,7 @@ int CommonInit( vout_thread_t *p_vout )
 void CommonClean( vout_thread_t *p_vout )
 {
     StopEventThread( p_vout );
+    vlc_mutex_destroy( &p_vout->p_sys->lock );
 
 #if !defined(UNDER_CE) && !defined(MODULE_NAME_IS_glwin32)
     RestoreScreensaver( p_vout );

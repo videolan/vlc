@@ -880,9 +880,6 @@ static int DirectXConvertKey( int i_key )
 
 int CreateEventThread( vout_thread_t *p_vout )
 {
-    if( !( p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG ) )
-        vlc_mutex_init( &p_vout->p_sys->lock );
-
     /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
      * Windows can stay blocked inside this call for a long time, and when
@@ -947,8 +944,5 @@ void StopEventThread( vout_thread_t *p_vout )
         vlc_thread_join( p_event );
         vlc_object_release( p_event );
     }
-
-    if( !( p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG ) )
-        vlc_mutex_destroy( &p_vout->p_sys->lock );
 }
 
