@@ -3822,6 +3822,7 @@ then
       [ VLC_ADD_PLUGIN([direct3d])
         VLC_ADD_LIBS([direct3d],[-lgdi32])
       ])
+      VLC_ADD_LIBS([direct3d directx glwin32],[-lole32])
     else
       AC_MSG_CHECKING(for directX headers in ${with_directx})
       if test -f ${with_directx}/ddraw.h
@@ -4006,7 +4007,7 @@ AC_ARG_ENABLE(wingdi,
 if test "${enable_wingdi}" != "no"; then
   if test "${SYS}" = "mingw32"; then
     VLC_ADD_PLUGIN([wingdi])
-    VLC_ADD_LIBS([wingdi],[-lgdi32])
+    VLC_ADD_LIBS([wingdi],[-lgdi32 -lole32])
   fi
   if test "${SYS}" = "mingwce"; then
     VLC_ADD_PLUGIN([wingdi])
