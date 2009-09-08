@@ -64,12 +64,9 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
                   playlist_item_t * p_root,
                   /*playlist_GetPreferredNode( THEPL, THEPL->p_local_category );
                     and THEPL->p_root_category for SelectPL */
-                  int _i_depth,             /* -1 for StandPL, 1 for SelectPL */
                   QObject *parent )         /* Basic Qt parent */
                   : QAbstractItemModel( parent )
 {
-    i_depth = _i_depth;
-    assert( i_depth == DEPTH_SEL || i_depth == DEPTH_PL );
     p_intf            = _p_intf;
     p_playlist        = _p_playlist;
     i_cached_id       = -1;
@@ -123,13 +120,7 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
         p_playlist->p_ml_category ?
         p_playlist->p_ml_category->p_input : NULL;
 
-    if( i_depth == DEPTH_SEL )
-    {
-        if( ( pl_input && item->p_input == pl_input ) ||
-            ( ml_input && item->p_input == ml_input ) )
-                flags |= Qt::ItemIsDropEnabled;
-    }
-    else if( ( pl_input && rootItem->p_input == pl_input ) ||
+    if( ( pl_input && rootItem->p_input == pl_input ) ||
               ( ml_input && rootItem->p_input == ml_input ) )
     {
         PL_LOCK;
@@ -351,14 +342,6 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
     PLItem *item = getItem( index );
     if( role == Qt::DisplayRole )
     {
-        if( i_depth == DEPTH_SEL )
-        {
-            vlc_mutex_lock( &item->p_input->lock );
-            QString returninfo = QString( qfu( item->p_input->psz_name ) );
-            vlc_mutex_unlock( &item->p_input->lock );
-            return QVariant(returninfo);
-        }
-
         int metadata = columnToMeta( index.column() );
         if( metadata == COLUMN_END ) return QVariant();
 
@@ -405,8 +388,6 @@ QVariant PLModel::headerData( int section, Qt::Orientation orientation,
 {
     if (orientation != Qt::Horizontal || role != Qt::DisplayRole)
         return QVariant();
-
-    if( i_depth == DEPTH_SEL ) return QVariant( QString("") );
 
     int meta_col = columnToMeta( section );
 
@@ -463,7 +444,7 @@ QModelIndex PLModel::parent( const QModelIndex &index ) const
 
 int PLModel::columnCount( const QModelIndex &i) const
 {
-    return i_depth == DEPTH_SEL ? 1 : columnFromMeta( COLUMN_END );
+    return columnFromMeta( COLUMN_END );
 }
 
 int PLModel::rowCount( const QModelIndex &parent ) const
@@ -665,7 +646,7 @@ void PLModel::processInputItemUpdate( input_item_t *p_item )
     if( !p_item ||  p_item->i_id <= 0 ) return;
     PLItem *item = findByInput( rootItem, p_item->i_id );
     if( item )
-        updateTreeItem( item, true, true);
+        updateTreeItem( item );
 }
 
 void PLModel::processItemRemoval( int i_id )
@@ -688,9 +669,6 @@ void PLModel::processItemAppend( const playlist_add_t *p_add )
     PL_LOCK;
     p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
-    if( i_depth == DEPTH_SEL && p_item->p_parent &&
-                        p_item->p_parent->i_id != rootItem->i_id )
-        goto end;
 
     newItem = new PLItem( p_item, nodeItem );
     PL_UNLOCK;
@@ -698,7 +676,7 @@ void PLModel::processItemAppend( const playlist_add_t *p_add )
     beginInsertRows( index( nodeItem, 0 ), nodeItem->childCount(), nodeItem->childCount() );
     nodeItem->appendChild( newItem );
     endInsertRows();
-    updateTreeItem( newItem, true );
+    updateTreeItem( newItem );
     return;
 end:
     PL_UNLOCK;
@@ -808,21 +786,16 @@ void PLModel::updateChildren( playlist_item_t *p_node, PLItem *root )
             currentItem = newItem;
             emit currentChanged( index( currentItem, 0 ) );
         }
-        if( i_depth == DEPTH_PL && p_node->pp_children[i]->i_children != -1 )
+        if( p_node->pp_children[i]->i_children != -1 )
             updateChildren( p_node->pp_children[i], newItem );
     }
 }
 
 /* Function doesn't need playlist-lock, as we don't touch playlist_item_t stuff here*/
-void PLModel::updateTreeItem( PLItem *item, bool signal, bool force )
+void PLModel::updateTreeItem( PLItem *item )
 {
-    if ( !item || !item->p_input )
-        return;
-    if( !force && i_depth == DEPTH_SEL && item->parentItem &&
-                                 item->parentItem->p_input != rootItem->p_input )
-        return;
-    if( signal )
-        emit dataChanged( index( item, 0 ) , index( item, columnCount( QModelIndex() ) ) );
+    if( !item ) return;
+    emit dataChanged( index( item, 0 ) , index( item, columnCount( QModelIndex() ) ) );
 }
 
 /************************* Actions ******************************/

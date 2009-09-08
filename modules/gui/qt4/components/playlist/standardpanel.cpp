@@ -54,7 +54,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   playlist_item_t *p_root ):
                                   PLPanel( _parent, _p_intf )
 {
-    model = new PLModel( p_playlist, p_intf, p_root, -1, this );
+    model = new PLModel( p_playlist, p_intf, p_root, this );
 
     QVBoxLayout *layout = new QVBoxLayout();
     layout->setSpacing( 0 ); layout->setMargin( 0 );

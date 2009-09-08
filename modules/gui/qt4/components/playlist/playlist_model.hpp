@@ -87,7 +87,7 @@ friend class PLItem;
 
 public:
     PLModel( playlist_t *, intf_thread_t *,
-             playlist_item_t *, int, QObject *parent = 0 );
+             playlist_item_t *, QObject *parent = 0 );
     ~PLModel();
 
     /*** QModel subclassing ***/
@@ -150,7 +150,7 @@ private:
     /* Actions */
     void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList );
     void doDeleteItem( PLItem *item, QModelIndexList *fullList );
-    void updateTreeItem( PLItem *, bool, bool force = false );
+    void updateTreeItem( PLItem * );
     void takeItem( PLItem * ); //will not delete item
     void insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos );
     void dropAppendCopy( QByteArray& data, PLItem *target );
