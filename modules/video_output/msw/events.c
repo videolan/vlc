@@ -910,8 +910,6 @@ int CreateEventThread( vout_thread_t *p_vout )
         return 0;
     }
 
-    vlc_object_attach( p_event, p_vout );
-
     msg_Dbg( p_vout, "Vout EventThread running" );
     return 1;
 }
@@ -929,7 +927,6 @@ void StopEventThread( vout_thread_t *p_vout )
     if( p_vout->p_sys->p_event )
     {
         event_thread_t *p_event = p_vout->p_sys->p_event;
-        vlc_object_detach( p_event );
 
         /* Kill Vout EventThread */
         vlc_object_kill( p_event );
