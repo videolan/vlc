@@ -77,6 +77,8 @@ struct demux_sys_t
     char        *psz_file;
     FILE        *p_file;
     uint64_t    i_write;
+
+    uint8_t     buffer[DUMP_BLOCKSIZE];
 };
 
 /*
@@ -171,14 +173,14 @@ static int Demux( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    const uint8_t *p_peek;
     int i_data;
 
-    i_data = stream_Peek( p_demux->s, &p_peek, DUMP_BLOCKSIZE );
+    /* I'm pretty sure that stream_Peek,stream_Read( , NULL ) would be faster*/
+    i_data = stream_Read( p_demux->s, p_sys->buffer, DUMP_BLOCKSIZE );
     if ( i_data <= 0 )
         return i_data;
 
-    i_data = fwrite( p_peek, 1, i_data, p_sys->p_file );
+    i_data = fwrite( p_sys->buffer, 1, i_data, p_sys->p_file );
 
     if( i_data == 0 )
     {
@@ -189,7 +191,6 @@ static int Demux( demux_t *p_demux )
     msg_Dbg( p_demux, "dumped %d bytes", i_data );
 #endif
 
-    stream_Read( p_demux->s, NULL, i_data );
     p_sys->i_write += i_data;
 
     return 1;
