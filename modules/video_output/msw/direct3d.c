@@ -359,22 +359,14 @@ static int Manage( vout_thread_t *p_vout )
     }
 
     /*
-            * Desktop mode change
-            */
+     * Desktop mode change
+     */
     if( p_vout->p_sys->i_changes & DX_DESKTOP_CHANGE )
     {
         /* Close the direct3d instance attached to the current output window. */
         End( p_vout );
         StopEventThread( p_vout );
-        /* Set the switching mode flag */
-        p_vout->p_sys->i_changes |= SWITCHING_MODE_FLAG;
-        /* Reset the flag */
-        p_vout->p_sys->i_changes &= ~DX_DESKTOP_CHANGE;
-    }
 
-    if( p_vout->p_sys->i_changes & EVENT_THREAD_ENDED
-        && p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG )
-    {
         /* Open the direct3d output and attaches it to the new window */
         p_vout->p_sys->b_desktop = !p_vout->p_sys->b_desktop;
         p_vout->pf_display = FirstDisplay;
@@ -383,9 +375,8 @@ static int Manage( vout_thread_t *p_vout )
         CreateEventThread( p_vout );
         Init( p_vout );
 
-        /* Reset the flags */
-        p_vout->p_sys->i_changes &= ~EVENT_THREAD_ENDED;
-        p_vout->p_sys->i_changes &= ~SWITCHING_MODE_FLAG;
+        /* Reset the flag */
+        p_vout->p_sys->i_changes &= ~DX_DESKTOP_CHANGE;
     }
 
     /* autoscale toggle */
@@ -513,9 +504,6 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     VLC_UNUSED( p_pic );
 
     LPDIRECT3DDEVICE9       p_d3ddev = p_vout->p_sys->p_d3ddev;
-
-    if( p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG )
-        return;
 
     // Present the back buffer contents to the display
     // stretching and filtering happens here
@@ -1289,9 +1277,6 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     CUSTOMVERTEX            *p_vertices;
     HRESULT hr;
     float f_width, f_height;
-
-    if( p_vout->p_sys->i_changes & SWITCHING_MODE_FLAG )
-        return;
 
     // check if device is still available
     hr = IDirect3DDevice9_TestCooperativeLevel(p_d3ddev);

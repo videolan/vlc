@@ -289,8 +289,6 @@ void RestoreScreensaver ( vout_thread_t *p_vout );
 #define DX_POSITION_CHANGE 0x1000
 #define DX_WALLPAPER_CHANGE 0x2000
 #define DX_DESKTOP_CHANGE 0x4000
-#define EVENT_THREAD_ENDED 0x6000
-#define SWITCHING_MODE_FLAG 0x8000
 
 /*****************************************************************************
  * WinCE helpers

@@ -396,10 +396,7 @@ static void *EventThread( void *p_this )
     msg_Dbg( p_vout, "DirectXEventThread terminating" );
 
     DirectXCloseWindow( p_event->p_vout );
-    vlc_restorecancel (canc);
-
-    /* clear the changes formerly signaled */
-    p_event->p_vout->p_sys->i_changes = EVENT_THREAD_ENDED;
+    vlc_restorecancel(canc);
     return NULL;
 }
 
@@ -971,6 +968,9 @@ static void EventThreadStop( event_thread_t *p_event )
 
     vlc_join( p_event->thread, NULL );
     p_event->b_ready = false;
+
+    /* clear the changes formerly signaled */
+    p_event->p_vout->p_sys->i_changes = 0;
 }
 
 /* */
