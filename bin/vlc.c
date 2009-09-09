@@ -49,8 +49,6 @@ extern char *FromLocale (const char *);
  *****************************************************************************/
 int main( int i_argc, const char *ppsz_argv[] )
 {
-    int i_ret;
-
 #ifdef __APPLE__
     /* The so-called POSIX-compliant MacOS X is not. 
      * SIGPIPE fires even when it is blocked in all threads! */
@@ -159,17 +157,14 @@ int main( int i_argc, const char *ppsz_argv[] )
         libvlc_add_intf (vlc, NULL, &ex);
         libvlc_playlist_play (vlc, -1, 0, NULL, &dummy);
         libvlc_wait (vlc);
+
+        if (libvlc_exception_raised (&ex))
+            fprintf( stderr, "%s\n", libvlc_errmsg() );
         libvlc_release (vlc);
     }
-    i_ret = libvlc_exception_raised (&ex);
-    if( i_ret )
-        fprintf( stderr, "%s\n", libvlc_errmsg() );
-
-    libvlc_exception_clear (&ex);
-    libvlc_exception_clear (&dummy);
 
     for (int i = 0; i < argc; i++)
         LocaleFree (argv[i]);
 
-    return i_ret;
+    return vlc == NULL || libvlc_exception_raised (&ex);
 }
