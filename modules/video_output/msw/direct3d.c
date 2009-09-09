@@ -302,36 +302,7 @@ static void End( vout_thread_t *p_vout )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
-    /* If we do not control our window, we check for geometry changes
-     * ourselves because the parent might not send us its events. */
-    vlc_mutex_lock( &p_vout->p_sys->lock );
-    if( p_vout->p_sys->hparent && !p_vout->b_fullscreen )
-    {
-        RECT rect_parent;
-        POINT point;
-
-        vlc_mutex_unlock( &p_vout->p_sys->lock );
-
-        GetClientRect( p_vout->p_sys->hparent, &rect_parent );
-        point.x = point.y = 0;
-        ClientToScreen( p_vout->p_sys->hparent, &point );
-        OffsetRect( &rect_parent, point.x, point.y );
-
-        if( !EqualRect( &rect_parent, &p_vout->p_sys->rect_parent ) )
-        {
-            p_vout->p_sys->rect_parent = rect_parent;
-
-            SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
-                          rect_parent.right - rect_parent.left,
-                          rect_parent.bottom - rect_parent.top,
-                          SWP_NOZORDER );
-            UpdateRects( p_vout, true );
-        }
-    }
-    else
-    {
-        vlc_mutex_unlock( &p_vout->p_sys->lock );
-    }
+    CommonManage( p_vout );
 
     /*
      * Position Change
@@ -380,99 +351,6 @@ static int Manage( vout_thread_t *p_vout )
 
         /* Reset the flag */
         p_vout->p_sys->i_changes &= ~DX_DESKTOP_CHANGE;
-    }
-
-    /* autoscale toggle */
-    if( p_vout->i_changes & VOUT_SCALE_CHANGE )
-    {
-        p_vout->i_changes &= ~VOUT_SCALE_CHANGE;
-
-        p_vout->b_autoscale = var_GetBool( p_vout, "autoscale" );
-        p_vout->i_zoom = (int) ZOOM_FP_FACTOR;
-
-        UpdateRects( p_vout, true );
-    }
-
-    /* scaling factor */
-    if( p_vout->i_changes & VOUT_ZOOM_CHANGE )
-    {
-        p_vout->i_changes &= ~VOUT_ZOOM_CHANGE;
-
-        p_vout->b_autoscale = false;
-        p_vout->i_zoom =
-            (int)( ZOOM_FP_FACTOR * var_GetFloat( p_vout, "scale" ) );
-        UpdateRects( p_vout, true );
-    }
-
-    /* Check for cropping / aspect changes */
-    if( p_vout->i_changes & VOUT_CROP_CHANGE ||
-        p_vout->i_changes & VOUT_ASPECT_CHANGE )
-    {
-        p_vout->i_changes &= ~VOUT_CROP_CHANGE;
-        p_vout->i_changes &= ~VOUT_ASPECT_CHANGE;
-
-        p_vout->fmt_out.i_x_offset = p_vout->fmt_in.i_x_offset;
-        p_vout->fmt_out.i_y_offset = p_vout->fmt_in.i_y_offset;
-        p_vout->fmt_out.i_visible_width = p_vout->fmt_in.i_visible_width;
-        p_vout->fmt_out.i_visible_height = p_vout->fmt_in.i_visible_height;
-        p_vout->fmt_out.i_aspect = p_vout->fmt_in.i_aspect;
-        p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
-        p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
-        p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;
-        UpdateRects( p_vout, true );
-    }
-
-    /* We used to call the Win32 PeekMessage function here to read the window
-     * messages. But since window can stay blocked into this function for a
-     * long time (for example when you move your window on the screen), I
-     * decided to isolate PeekMessage in another thread. */
-
-    /*
-     * Fullscreen change
-     */
-    if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE
-        || p_vout->p_sys->i_changes & VOUT_FULLSCREEN_CHANGE )
-    {
-        Win32ToggleFullscreen( p_vout );
-
-        p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
-        p_vout->p_sys->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
-    }
-
-    /*
-     * Pointer change
-     */
-    EventThreadMouseAutoHide( p_vout->p_sys->p_event );
-
-    /*
-     * "Always on top" status change
-     */
-    if( p_vout->p_sys->b_on_top_change )
-    {
-        HMENU hMenu = GetSystemMenu( p_vout->p_sys->hwnd, FALSE );
-        bool b = var_GetBool( p_vout, "video-on-top" );
-
-        /* Set the window on top if necessary */
-        if( b && !( GetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE )
-                           & WS_EX_TOPMOST ) )
-        {
-            CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
-                           MF_BYCOMMAND | MFS_CHECKED );
-            SetWindowPos( p_vout->p_sys->hwnd, HWND_TOPMOST, 0, 0, 0, 0,
-                          SWP_NOSIZE | SWP_NOMOVE );
-        }
-        else
-        /* The window shouldn't be on top */
-        if( !b && ( GetWindowLong( p_vout->p_sys->hwnd, GWL_EXSTYLE )
-                           & WS_EX_TOPMOST ) )
-        {
-            CheckMenuItem( hMenu, IDM_TOGGLE_ON_TOP,
-                           MF_BYCOMMAND | MFS_UNCHECKED );
-            SetWindowPos( p_vout->p_sys->hwnd, HWND_NOTOPMOST, 0, 0, 0, 0,
-                          SWP_NOSIZE | SWP_NOMOVE );
-        }
-
-        p_vout->p_sys->b_on_top_change = false;
     }
 
     return VLC_SUCCESS;

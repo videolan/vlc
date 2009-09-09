@@ -271,8 +271,9 @@ void            EventThreadMouseAutoHide( event_thread_t * );
 /*****************************************************************************
  * Prototypes from common.c
  *****************************************************************************/
-int CommonInit( vout_thread_t * );
+int  CommonInit( vout_thread_t * );
 void CommonClean( vout_thread_t * );
+void CommonManage( vout_thread_t * );
 
 int Control( vout_thread_t *p_vout, int i_query, va_list args );
 
