@@ -40,8 +40,13 @@
 
 #define DISPLAY_TEXT N_("X11 display")
 #define DISPLAY_LONGTEXT N_( \
-    "X11 hardware display to use. By default VLC will " \
+    "X11 hardware display to use. By default, VLC will " \
     "use the value of the DISPLAY environment variable.")
+
+#define ADAPTOR_TEXT N_("XVideo adaptor number")
+#define ADAPTOR_LONGTEXT N_( \
+    "XVideo hardware adaptor to use. By default, VLC will " \
+    "use the first functional adaptor.")
 
 #define SHM_TEXT N_("Use shared memory")
 #define SHM_LONGTEXT N_( \
@@ -64,10 +69,13 @@ vlc_module_begin ()
     add_string ("x11-display", NULL, NULL,
                 DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
         add_deprecated_alias ("xvideo-display")
+    add_integer ("xvideo-adaptor", -1, NULL,
+                 ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true)
     add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)
         add_deprecated_alias ("xvideo-shm")
     add_shortcut ("xcb-xv")
     add_shortcut ("xv")
+    add_shortcut ("xvideo")
 vlc_module_end ()
 
 #define MAX_PICTURES (VOUT_MAX_PICTURES)
@@ -326,6 +334,8 @@ static int Open (vlc_object_t *obj)
     if (p_sys->adaptors == NULL)
         goto error;
 
+    int forced_adaptor = var_CreateGetInteger (obj, "xvideo-adaptor");
+
     /* */
     video_format_t fmt = vd->fmt;
     bool found_adaptor = false;
@@ -337,6 +347,12 @@ static int Open (vlc_object_t *obj)
          xcb_xv_adaptor_info_next (&it))
     {
         const xcb_xv_adaptor_info_t *a = it.data;
+
+        if (forced_adaptor != -1 && forced_adaptor != 0)
+        {
+            forced_adaptor--;
+            continue;
+        }
 
         /* FIXME: Open() should fail if none of the ports are usable to VLC */
         if (!(a->type & XCB_XV_TYPE_IMAGE_MASK))
