@@ -261,8 +261,10 @@ int DirectDrawUpdateOverlay( vout_thread_t *p_vout );
 /*****************************************************************************
  * Prototypes from events.c
  *****************************************************************************/
-int CreateEventThread( vout_thread_t *p_vout );
-void StopEventThread ( vout_thread_t *p_vout );
+event_thread_t *EventThreadCreate( vout_thread_t * );
+void            EventThreadDestroy( event_thread_t * );
+int             EventThreadStart( event_thread_t * );
+void            EventThreadStop( event_thread_t * );
 
 /*****************************************************************************
  * Prototypes from common.c
@@ -274,6 +276,7 @@ int Control( vout_thread_t *p_vout, int i_query, va_list args );
 
 void UpdateRects ( vout_thread_t *p_vout, bool b_force );
 void Win32ToggleFullscreen ( vout_thread_t *p_vout );
+void ExitFullscreen( vout_thread_t *p_vout );
 #ifndef UNDER_CE
 void DisableScreensaver ( vout_thread_t *p_vout );
 void RestoreScreensaver ( vout_thread_t *p_vout );

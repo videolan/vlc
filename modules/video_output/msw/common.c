@@ -97,7 +97,10 @@ int CommonInit( vout_thread_t *p_vout )
     p_sys->i_window_width  = p_vout->i_window_width;
     p_sys->i_window_height = p_vout->i_window_height;
 
-    if( !CreateEventThread( p_vout ) )
+    p_sys->p_event = EventThreadCreate( p_vout );
+    if( !p_sys->p_event )
+        return VLC_EGENERIC;
+    if( EventThreadStart( p_sys->p_event ) )
         return VLC_EGENERIC;
 
     /* Variable to indicate if the window should be on top of others */
@@ -116,8 +119,16 @@ int CommonInit( vout_thread_t *p_vout )
 /* */
 void CommonClean( vout_thread_t *p_vout )
 {
-    StopEventThread( p_vout );
-    vlc_mutex_destroy( &p_vout->p_sys->lock );
+    vout_sys_t *p_sys = p_vout->p_sys;
+
+    ExitFullscreen( p_vout );
+    if( p_sys->p_event )
+    {
+        EventThreadStop( p_sys->p_event );
+        EventThreadDestroy( p_sys->p_event );
+    }
+
+    vlc_mutex_destroy( &p_sys->lock );
 
 #if !defined(UNDER_CE) && !defined(MODULE_NAME_IS_glwin32)
     RestoreScreensaver( p_vout );
@@ -411,6 +422,17 @@ static int ControlParentWindow( vout_thread_t *p_vout, int i_query, ... )
     return ret;
 }
 #endif
+
+void ExitFullscreen( vout_thread_t *p_vout )
+{
+    if( p_vout->b_fullscreen )
+    {
+        msg_Dbg( p_vout, "Quitting fullscreen" );
+        Win32ToggleFullscreen( p_vout );
+        /* Force fullscreen in the core for the next video */
+        var_SetBool( p_vout, "fullscreen", true );
+    }
+}
 
 void Win32ToggleFullscreen( vout_thread_t *p_vout )
 {

@@ -895,7 +895,7 @@ static int DirectXConvertKey( int i_key )
     return 0;
 }
 
-static event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
+event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
 {
      /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
@@ -916,14 +916,14 @@ static event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
     return p_event;
 }
 
-static void EventThreadDestroy( event_thread_t *p_event )
+void EventThreadDestroy( event_thread_t *p_event )
 {
     vlc_cond_destroy( &p_event->wait );
     vlc_mutex_destroy( &p_event->lock );
     free( p_event );
 }
 
-static int EventThreadStart( event_thread_t *p_event )
+int EventThreadStart( event_thread_t *p_event )
 {
     p_event->b_ready = false;
     p_event->b_done  = false;
@@ -952,7 +952,7 @@ static int EventThreadStart( event_thread_t *p_event )
     return VLC_SUCCESS;
 }
 
-static void EventThreadStop( event_thread_t *p_event )
+void EventThreadStop( event_thread_t *p_event )
 {
     if( !p_event->b_ready )
         return;
@@ -971,37 +971,5 @@ static void EventThreadStop( event_thread_t *p_event )
 
     /* clear the changes formerly signaled */
     p_event->p_vout->p_sys->i_changes = 0;
-}
-
-/* */
-int CreateEventThread( vout_thread_t *p_vout )
-{
-    event_thread_t *p_event =
-        p_vout->p_sys->p_event = EventThreadCreate( p_vout );
-    if( !p_event )
-        return 0;
-
-    if( EventThreadStart( p_event ) )
-        return 0;
-    return 1;
-}
-
-void StopEventThread( vout_thread_t *p_vout )
-{
-    if( p_vout->b_fullscreen )
-    {
-        msg_Dbg( p_vout, "Quitting fullscreen" );
-        Win32ToggleFullscreen( p_vout );
-        /* Force fullscreen in the core for the next video */
-        var_SetBool( p_vout, "fullscreen", true );
-    }
-
-    event_thread_t *p_event = p_vout->p_sys->p_event;
-    if( p_event )
-    {
-        EventThreadStop( p_event );
-        EventThreadDestroy( p_event );
-        p_vout->p_sys->p_event = NULL;
-    }
 }
 

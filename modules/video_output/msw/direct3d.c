@@ -365,14 +365,17 @@ static int Manage( vout_thread_t *p_vout )
     {
         /* Close the direct3d instance attached to the current output window. */
         End( p_vout );
-        StopEventThread( p_vout );
+
+        ExitFullscreen( p_vout );
+
+        EventThreadStop( p_vout->p_sys->p_event );
 
         /* Open the direct3d output and attaches it to the new window */
         p_vout->p_sys->b_desktop = !p_vout->p_sys->b_desktop;
         p_vout->pf_display = FirstDisplay;
-        vlc_mutex_init( &p_vout->p_sys->lock );
 
-        CreateEventThread( p_vout );
+        EventThreadStart( p_vout->p_sys->p_event );
+
         Init( p_vout );
 
         /* Reset the flag */
