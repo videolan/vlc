@@ -301,26 +301,27 @@ static int Open (vlc_object_t *obj)
     vd->sys = p_sys;
 
     /* Connect to X */
-    p_sys->conn = Connect (obj);
-    if (p_sys->conn == NULL)
+    xcb_connection_t *conn = Connect (obj);
+    if (conn == NULL)
     {
         free (p_sys);
         return VLC_EGENERIC;
     }
+    p_sys->conn = conn;
 
-    if (!CheckXVideo (vd, p_sys->conn))
+    if (!CheckXVideo (vd, conn))
     {
         msg_Warn (vd, "Please enable XVideo 2.2 for faster video display");
-        xcb_disconnect (p_sys->conn);
+        xcb_disconnect (conn);
         free (p_sys);
         return VLC_EGENERIC;
     }
 
     const xcb_screen_t *screen;
-    p_sys->embed = GetWindow (vd, p_sys->conn, &screen, &p_sys->shm);
+    p_sys->embed = GetWindow (vd, conn, &screen, &p_sys->shm);
     if (p_sys->embed == NULL)
     {
-        xcb_disconnect (p_sys->conn);
+        xcb_disconnect (conn);
         free (p_sys);
         return VLC_EGENERIC;
     }
@@ -358,9 +359,9 @@ static int Open (vlc_object_t *obj)
         if (!(a->type & XCB_XV_TYPE_IMAGE_MASK))
             continue;
 
-        xcb_xv_list_image_formats_reply_t *r;
-        r = xcb_xv_list_image_formats_reply (p_sys->conn,
-            xcb_xv_list_image_formats (p_sys->conn, a->base_id), NULL);
+        xcb_xv_list_image_formats_reply_t *r =
+            xcb_xv_list_image_formats_reply (conn,
+                xcb_xv_list_image_formats (conn, a->base_id), NULL);
         if (r == NULL)
             continue;
 
@@ -399,9 +400,8 @@ static int Open (vlc_object_t *obj)
         {
              xcb_xv_port_t port = a->base_id + i;
              xcb_xv_grab_port_reply_t *gr =
-                 xcb_xv_grab_port_reply (p_sys->conn,
-                     xcb_xv_grab_port (p_sys->conn, port,
-                                       XCB_CURRENT_TIME), NULL);
+                 xcb_xv_grab_port_reply (conn,
+                     xcb_xv_grab_port (conn, port, XCB_CURRENT_TIME), NULL);
              uint8_t result = gr ? gr->result : 0xff;
 
              free (gr);
@@ -446,18 +446,18 @@ static int Open (vlc_object_t *obj)
             XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE |
             XCB_EVENT_MASK_POINTER_MOTION;
         xcb_void_cookie_t c;
-        xcb_window_t window = xcb_generate_id (p_sys->conn);
+        xcb_window_t window = xcb_generate_id (conn);
 
-        c = xcb_create_window_checked (p_sys->conn, screen->root_depth, window,
+        c = xcb_create_window_checked (conn, screen->root_depth, window,
                                        p_sys->embed->handle.xid, 0, 0, 1, 1, 0,
                                        XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                        screen->root_visual,
                                        XCB_CW_EVENT_MASK, &mask);
-        if (CheckError (vd, p_sys->conn, "cannot create X11 window", c))
+        if (CheckError (vd, conn, "cannot create X11 window", c))
             goto error;
         p_sys->window = window;
-        msg_Dbg (vd, "using X11 window %08"PRIx32, p_sys->window);
-        xcb_map_window (p_sys->conn, window);
+        msg_Dbg (vd, "using X11 window %08"PRIx32, window);
+        xcb_map_window (conn, window);
 
         vout_display_place_t place;
 
@@ -467,15 +467,15 @@ static int Open (vlc_object_t *obj)
 
         /* */
         const uint32_t values[] = { place.x, place.y, place.width, place.height };
-        xcb_configure_window (p_sys->conn, p_sys->window,
+        xcb_configure_window (conn, window,
                               XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y |
                               XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
                               values);
     }
 
     /* Create graphic context */
-    p_sys->gc = xcb_generate_id (p_sys->conn);
-    xcb_create_gc (p_sys->conn, p_sys->gc, p_sys->window, 0, NULL);
+    p_sys->gc = xcb_generate_id (conn);
+    xcb_create_gc (conn, p_sys->gc, p_sys->window, 0, NULL);
     msg_Dbg (vd, "using X11 graphic context %08"PRIx32, p_sys->gc);
 
     /* */
@@ -497,7 +497,7 @@ static int Open (vlc_object_t *obj)
 
     /* */
     unsigned width, height;
-    if (!GetWindowSize (p_sys->embed, p_sys->conn, &width, &height))
+    if (!GetWindowSize (p_sys->embed, conn, &width, &height))
         vout_display_SendEventDisplaySize (vd, width, height);
     vout_display_SendEventFullscreen (vd, false);
 
