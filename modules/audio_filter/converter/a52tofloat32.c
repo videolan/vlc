@@ -274,8 +274,8 @@ static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
 /*****************************************************************************
  * Interleave: helper function to interleave channels
  *****************************************************************************/
-static void Interleave( float * p_out, const float * p_in, int i_nb_channels,
-                        int *pi_chan_table )
+static void Interleave( sample_t * p_out, const sample_t * p_in,
+                        int i_nb_channels, int *pi_chan_table )
 {
     /* We do not only have to interleave, but also reorder the channels */
 
@@ -292,7 +292,7 @@ static void Interleave( float * p_out, const float * p_in, int i_nb_channels,
 /*****************************************************************************
  * Duplicate: helper function to duplicate a unique channel
  *****************************************************************************/
-static void Duplicate( float * p_out, const float * p_in )
+static void Duplicate( sample_t * p_out, const sample_t * p_in )
 {
     int i;
 
@@ -307,7 +307,7 @@ static void Duplicate( float * p_out, const float * p_in )
 /*****************************************************************************
  * Exchange: helper function to exchange left & right channels
  *****************************************************************************/
-static void Exchange( float * p_out, const float * p_in )
+static void Exchange( sample_t * p_out, const sample_t * p_in )
 {
     int i;
     const float * p_first = p_in + 256;
@@ -374,19 +374,19 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
               && (p_filter->output.i_physical_channels
                    & (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
         {
-            Duplicate( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
+            Duplicate( (sample_t *)(p_out_buf->p_buffer + i * i_bytes_per_block),
                        p_samples );
         }
         else if ( p_filter->output.i_original_channels
                     & AOUT_CHAN_REVERSESTEREO )
         {
-            Exchange( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
+            Exchange( (sample_t *)(p_out_buf->p_buffer + i * i_bytes_per_block),
                       p_samples );
         }
         else
         {
             /* Interleave the *$£%ù samples. */
-            Interleave( (float *)(p_out_buf->p_buffer + i * i_bytes_per_block),
+            Interleave( (sample_t *)(p_out_buf->p_buffer + i * i_bytes_per_block),
                         p_samples, p_sys->i_nb_channels, p_sys->pi_chan_table);
         }
     }
