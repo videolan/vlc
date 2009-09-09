@@ -80,6 +80,9 @@ case $HOST in
     *86*)
           ARCH="i386"
      ;;
+    arm*eabi)
+          ARCH="armel"
+     ;;
 esac
 echo "ARCH = $ARCH" >> config.mak
 
