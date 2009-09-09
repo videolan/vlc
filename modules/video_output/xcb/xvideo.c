@@ -560,6 +560,13 @@ static picture_t *Get (vout_display_t *vd)
             /* We assume that offsets[0] is zero */
             for (int i = 1; i < pic->i_planes; i++)
                 res->p[i].p_pixels = res->p[0].p_pixels + offsets[i];
+            if (vd->fmt.i_chroma == VLC_CODEC_YV12)
+            {   /* YVU: swap U and V planes */
+                uint8_t *buf = res->p[2].p_pixels;
+                res->p[2].p_pixels = res->p[1].p_pixels;
+                res->p[1].p_pixels = buf;
+            }
+
             pic_array[count] = picture_NewFromResource (&vd->fmt, res);
             if (!pic_array[count])
             {
