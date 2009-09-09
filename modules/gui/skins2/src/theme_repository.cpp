@@ -91,7 +91,11 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
 
 ThemeRepository::~ThemeRepository()
 {
+    var_DelCallback( getIntf(), "intf-skins", changeSkin, this );
+    var_DelCallback( getIntf(), "intf-skins-interactive", changeSkin, this );
+
     var_Destroy( getIntf(), "intf-skins" );
+    var_Destroy( getIntf(), "intf-skins-interactive" );
 }
 
 
