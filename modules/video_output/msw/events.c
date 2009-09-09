@@ -200,26 +200,26 @@ static void *EventThread( void *p_this )
                 (abs(mouse_pos.y - old_mouse_pos.y)) > 2 ) )
             {
                 GetCursorPos( &old_mouse_pos );
-                p_event->p_vout->p_sys->i_lastmoved = mdate();
+                p_event->i_lastmoved = mdate();
 
-                if( p_event->p_vout->p_sys->b_cursor_hidden )
+                if( p_event->b_cursor_hidden )
                 {
-                    p_event->p_vout->p_sys->b_cursor_hidden = 0;
+                    p_event->b_cursor_hidden = 0;
                     ShowCursor( TRUE );
                 }
             }
             break;
 
         case WM_VLC_HIDE_MOUSE:
-            if( p_event->p_vout->p_sys->b_cursor_hidden ) break;
-            p_event->p_vout->p_sys->b_cursor_hidden = true;
+            if( p_event->b_cursor_hidden ) break;
+            p_event->b_cursor_hidden = true;
             GetCursorPos( &old_mouse_pos );
             ShowCursor( FALSE );
             break;
 
         case WM_VLC_SHOW_MOUSE:
-            if( !p_event->p_vout->p_sys->b_cursor_hidden ) break;
-            p_event->p_vout->p_sys->b_cursor_hidden = false;
+            if( !p_event->b_cursor_hidden ) break;
+            p_event->b_cursor_hidden = false;
             GetCursorPos( &old_mouse_pos );
             ShowCursor( TRUE );
             break;
@@ -895,6 +895,30 @@ static int DirectXConvertKey( int i_key )
     return 0;
 }
 
+void EventThreadMouseAutoHide( event_thread_t *p_event )
+{
+    vout_thread_t *p_vout = p_event->p_vout;
+
+    if( p_vout->b_fullscreen &&
+        !p_event->b_cursor_hidden &&
+        (mdate() - p_event->i_lastmoved) > p_event->i_mouse_hide_timeout )
+    {
+        /* Hide the cursor only if it is inside our window */
+        POINT point;
+        GetCursorPos( &point );
+
+        HWND hwnd = WindowFromPoint(point);
+        if( hwnd == p_vout->p_sys->hwnd || hwnd == p_vout->p_sys->hvideownd )
+        {
+            PostMessage( p_vout->p_sys->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
+        }
+        else
+        {
+            p_event->i_lastmoved = mdate();
+        }
+    }
+}
+
 event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
 {
      /* Create the Vout EventThread, this thread is created by us to isolate
@@ -912,6 +936,11 @@ event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
     p_event->p_vout = p_vout;
     vlc_mutex_init( &p_event->lock );
     vlc_cond_init( &p_event->wait );
+
+    p_event->b_cursor_hidden      = false;
+    p_event->i_lastmoved          = mdate();
+    p_event->i_mouse_hide_timeout =
+        var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
    
     return p_event;
 }

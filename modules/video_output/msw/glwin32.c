@@ -283,25 +283,7 @@ static int Manage( vout_thread_t *p_vout )
     /*
      * Pointer change
      */
-    if( p_vout->b_fullscreen && !p_vout->p_sys->b_cursor_hidden &&
-        (mdate() - p_vout->p_sys->i_lastmoved) >
-            p_vout->p_sys->i_mouse_hide_timeout )
-    {
-        POINT point;
-        HWND hwnd;
-
-        /* Hide the cursor only if it is inside our window */
-        GetCursorPos( &point );
-        hwnd = WindowFromPoint(point);
-        if( hwnd == p_vout->p_sys->hwnd || hwnd == p_vout->p_sys->hvideownd )
-        {
-            PostMessage( p_vout->p_sys->hwnd, WM_VLC_HIDE_MOUSE, 0, 0 );
-        }
-        else
-        {
-            p_vout->p_sys->i_lastmoved = mdate();
-        }
-    }
+    EventThreadMouseAutoHide( p_vout->p_sys->p_event );
 
     /*
      * "Always on top" status change

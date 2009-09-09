@@ -37,6 +37,11 @@ typedef struct
     bool         b_done;
     bool         b_error;
 
+    /* Mouse */
+    volatile bool    b_cursor_hidden;
+    volatile mtime_t i_lastmoved;
+    mtime_t          i_mouse_hide_timeout;
+
 } event_thread_t;
 
 #ifdef MODULE_NAME_IS_wingapi
@@ -111,11 +116,6 @@ struct vout_sys_t
     int          i_window_style;
 
     volatile uint16_t i_changes;        /* changes made to the video display */
-
-    /* Mouse */
-    volatile bool b_cursor_hidden;
-    volatile mtime_t    i_lastmoved;
-    mtime_t             i_mouse_hide_timeout;
 
     /* Misc */
     bool      b_on_top_change;
@@ -265,6 +265,8 @@ event_thread_t *EventThreadCreate( vout_thread_t * );
 void            EventThreadDestroy( event_thread_t * );
 int             EventThreadStart( event_thread_t * );
 void            EventThreadStop( event_thread_t * );
+
+void            EventThreadMouseAutoHide( event_thread_t * );
 
 /*****************************************************************************
  * Prototypes from common.c

@@ -86,11 +86,6 @@ int CommonInit( vout_thread_t *p_vout )
     SetRectEmpty( &p_sys->rect_parent );
     vlc_mutex_init( &p_sys->lock );
 
-    p_sys->b_cursor_hidden = 0;
-    p_sys->i_lastmoved = mdate();
-    p_sys->i_mouse_hide_timeout =
-        var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
-
     var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     /* Set main window's size */
