@@ -83,7 +83,6 @@ vlc_module_end ()
 struct vout_display_sys_t
 {
     xcb_connection_t *conn;
-    xcb_xv_query_adaptors_reply_t *adaptors;
     vout_window_t *embed;/* VLC window */
 
     xcb_window_t window; /* drawable X window */
@@ -277,18 +276,6 @@ FindFormat (vout_display_t *vd,
 
 
 /**
- * Get a list of XVideo adaptors for a given window.
- */
-static xcb_xv_query_adaptors_reply_t *GetAdaptors (vout_window_t *wnd,
-                                                   xcb_connection_t *conn)
-{
-    xcb_xv_query_adaptors_cookie_t ck;
-
-    ck = xcb_xv_query_adaptors (conn, wnd->handle.xid);
-    return xcb_xv_query_adaptors_reply (conn, ck, NULL);
-}
-
-/**
  * Probe the X server.
  */
 static int Open (vlc_object_t *obj)
@@ -331,8 +318,10 @@ static int Open (vlc_object_t *obj)
     p_sys->pool = NULL;
 
     /* Cache adaptors infos */
-    p_sys->adaptors = GetAdaptors (p_sys->embed, p_sys->conn);
-    if (p_sys->adaptors == NULL)
+    xcb_xv_query_adaptors_reply_t *adaptors =
+        xcb_xv_query_adaptors_reply (conn,
+            xcb_xv_query_adaptors (conn, p_sys->embed->handle.xid), NULL);
+    if (adaptors == NULL)
         goto error;
 
     int forced_adaptor = var_CreateGetInteger (obj, "xvideo-adaptor");
@@ -343,7 +332,7 @@ static int Open (vlc_object_t *obj)
 
     /* FIXME: check max image size */
     xcb_xv_adaptor_info_iterator_t it;
-    for (it = xcb_xv_query_adaptors_info_iterator (p_sys->adaptors);
+    for (it = xcb_xv_query_adaptors_info_iterator (adaptors);
          it.rem > 0;
          xcb_xv_adaptor_info_next (&it))
     {
@@ -433,6 +422,7 @@ static int Open (vlc_object_t *obj)
         found_adaptor = true;
         break;
     }
+    free (adaptors);
     if (!found_adaptor)
     {
         msg_Err (vd, "no available XVideo adaptor");
@@ -531,7 +521,6 @@ static void Close (vlc_object_t *obj)
     }
 
     free (p_sys->att);
-    free (p_sys->adaptors);
     vout_display_DeleteWindow (vd, p_sys->embed);
     xcb_disconnect (p_sys->conn);
     free (p_sys);
