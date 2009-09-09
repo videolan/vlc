@@ -344,7 +344,6 @@ static int Open (vlc_object_t *obj)
             continue;
         }
 
-        /* FIXME: Open() should fail if none of the ports are usable to VLC */
         if (!(a->type & XCB_XV_TYPE_IMAGE_MASK))
             continue;
 
@@ -414,10 +413,6 @@ static int Open (vlc_object_t *obj)
             fmt.i_gmask = xfmt->green_mask;
             fmt.i_bmask = xfmt->blue_mask;
         }
-        else
-        if (xfmt->num_planes == 3
-         && !strcmp ((const char *)xfmt->vcomp_order, "YVU"))
-            fmt.i_chroma = VLC_CODEC_YV12;
         free (r);
         found_adaptor = true;
         break;
