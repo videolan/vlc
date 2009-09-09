@@ -3358,8 +3358,8 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
     for( int i = 0; p_sub && i < p_sub->i_subtitles_number; i++ )
     {
         const int i_type = p_sub->p_subtitle[i].i_subtitling_type;
-        if( ( i_type >= 0x10 && i_type <= 0x13 ) ||
-            ( i_type >= 0x20 && i_type <= 0x23 ) )
+        if( ( i_type >= 0x10 && i_type <= 0x14 ) ||
+            ( i_type >= 0x20 && i_type <= 0x24 ) )
             i_page++;
     }
 #endif
@@ -3425,12 +3425,14 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
             case 0x11: /* 4:3 */
             case 0x12: /* 16:9 */
             case 0x13: /* 2.21:1 */
+            case 0x14: /* HD monitor */
                 p_es->fmt.psz_description = strdup( _("DVB subtitles") );
                 break;
             case 0x20: /* Hearing impaired unspec. */
             case 0x21: /* h.i. 4:3 */
             case 0x22: /* h.i. 16:9 */
             case 0x23: /* h.i. 2.21:1 */
+            case 0x24: /* h.i. HD monitor */
                 p_es->fmt.psz_description = strdup( _("DVB subtitles: hearing impaired") );
                 break;
             default:
