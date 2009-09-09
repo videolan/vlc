@@ -85,7 +85,7 @@ static void DirectXPopupMenu( event_thread_t *p_event, bool b_open )
 {
     vlc_value_t val;
     val.b_bool = b_open;
-    var_Set( p_event->p_libvlc, "intf-popupmenu", val );
+    var_Set( p_event->p_vout->p_libvlc, "intf-popupmenu", val );
 }
 
 static int DirectXConvertKey( int i_key );
@@ -98,9 +98,10 @@ static int DirectXConvertKey( int i_key );
  * The main goal of this thread is to isolate the Win32 PeekMessage function
  * because this one can block for a long time.
  *****************************************************************************/
-static void* EventThread( vlc_object_t *p_this )
+static void *EventThread( void *p_this )
 {
     event_thread_t *p_event = (event_thread_t *)p_this;
+    vout_thread_t *p_vout = p_event->p_vout;
     MSG msg;
     POINT old_mouse_pos = {0,0}, mouse_pos;
     vlc_value_t val;
@@ -108,17 +109,24 @@ static void* EventThread( vlc_object_t *p_this )
     HMODULE hkernel32;
     int canc = vlc_savecancel ();
 
+    vlc_mutex_lock( &p_event->lock );
     /* Create a window for the video */
     /* Creating a window under Windows also initializes the thread's event
      * message queue */
     if( DirectXCreateWindow( p_event->p_vout ) )
+        p_event->b_error = true;
+
+    p_event->b_ready = true;
+    vlc_cond_signal( &p_event->wait );
+
+    const bool b_error = p_event->b_error;
+    vlc_mutex_unlock( &p_event->lock );
+
+    if( b_error )
     {
-        vlc_restorecancel (canc);
+        vlc_restorecancel( canc );
         return NULL;
     }
-
-    /* Signal the creation of the window */
-    SetEvent( p_event->window_ready );
 
 #ifndef UNDER_CE
     /* Set power management stuff */
@@ -133,18 +141,30 @@ static void* EventThread( vlc_object_t *p_this )
             /* Prevent monitor from powering off */
             OurSetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_CONTINUOUS );
         else
-            msg_Dbg( p_event, "no support for SetThreadExecutionState()" );
+            msg_Dbg( p_vout, "no support for SetThreadExecutionState()" );
     }
 #endif
 
     /* Main loop */
     /* GetMessage will sleep if there's no message in the queue */
-    while( vlc_object_alive (p_event) && GetMessage( &msg, 0, 0, 0 ) )
+    for( ;; )
     {
+        if( !GetMessage( &msg, 0, 0, 0 ) )
+        {
+            vlc_mutex_lock( &p_event->lock );
+            p_event->b_done = true;
+            vlc_mutex_unlock( &p_event->lock );
+            break;
+        }
+
         /* Check if we are asked to exit */
-        if( !vlc_object_alive (p_event) )
+        vlc_mutex_lock( &p_event->lock );
+        const bool b_done = p_event->b_done;
+        vlc_mutex_unlock( &p_event->lock );
+        if( b_done )
             break;
 
+        /* */
         switch( msg.message )
         {
 
@@ -277,7 +297,7 @@ static void* EventThread( vlc_object_t *p_this )
                     val.i_int |= KEY_MODIFIER_ALT;
                 }
 
-                var_Set( p_event->p_libvlc, "key-pressed", val );
+                var_Set( p_vout->p_libvlc, "key-pressed", val );
             }
             break;
 
@@ -305,12 +325,12 @@ static void* EventThread( vlc_object_t *p_this )
                     val.i_int |= KEY_MODIFIER_ALT;
                 }
 
-                var_Set( p_event->p_libvlc, "key-pressed", val );
+                var_Set( p_vout->p_libvlc, "key-pressed", val );
             }
             break;
 
         case WM_VLC_CHANGE_TEXT:
-            var_Get( p_event->p_vout, "video-title", &val );
+            var_Get( p_vout, "video-title", &val );
             if( !val.psz_string || !*val.psz_string ) /* Default video title */
             {
                 free( val.psz_string );
@@ -369,11 +389,11 @@ static void* EventThread( vlc_object_t *p_this )
     /* Check for WM_QUIT if we created the window */
     if( !p_event->p_vout->p_sys->hparent && msg.message == WM_QUIT )
     {
-        msg_Warn( p_event, "WM_QUIT... should not happen!!" );
+        msg_Warn( p_vout, "WM_QUIT... should not happen!!" );
         p_event->p_vout->p_sys->hwnd = NULL; /* Window already destroyed */
     }
 
-    msg_Dbg( p_event, "DirectXEventThread terminating" );
+    msg_Dbg( p_vout, "DirectXEventThread terminating" );
 
     DirectXCloseWindow( p_event->p_vout );
     vlc_restorecancel (canc);
@@ -878,9 +898,9 @@ static int DirectXConvertKey( int i_key )
     return 0;
 }
 
-int CreateEventThread( vout_thread_t *p_vout )
+static event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
 {
-    /* Create the Vout EventThread, this thread is created by us to isolate
+     /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
      * Windows can stay blocked inside this call for a long time, and when
      * this happens it thus blocks vlc's video_output thread.
@@ -888,29 +908,81 @@ int CreateEventThread( vout_thread_t *p_vout )
      * window (because PeekMessage has to be called from the same thread which
      * created the window). */
     msg_Dbg( p_vout, "creating Vout EventThread" );
-    event_thread_t *p_event = p_vout->p_sys->p_event =
-        vlc_object_create( p_vout, sizeof(event_thread_t) );
+    event_thread_t *p_event = malloc( sizeof(*p_event) );
+    if( !p_event )
+        return NULL;
+
     p_event->p_vout = p_vout;
-    p_event->window_ready = CreateEvent( NULL, TRUE, FALSE, NULL );
-    if( vlc_thread_create( p_event, "Vout Events Thread",
-                           EventThread, 0 ) )
-    {
-        msg_Err( p_vout, "cannot create Vout EventThread" );
-        CloseHandle( p_event->window_ready );
-        vlc_object_release( p_event );
-        p_vout->p_sys->p_event = NULL;
-        return 0;
-    }
-    WaitForSingleObject( p_event->window_ready, INFINITE );
-    CloseHandle( p_event->window_ready );
+    vlc_mutex_init( &p_event->lock );
+    vlc_cond_init( &p_event->wait );
+   
+    return p_event;
+}
 
-    if( p_event->b_error )
+static void EventThreadDestroy( event_thread_t *p_event )
+{
+    vlc_cond_destroy( &p_event->wait );
+    vlc_mutex_destroy( &p_event->lock );
+    free( p_event );
+}
+
+static int EventThreadStart( event_thread_t *p_event )
+{
+    p_event->b_ready = false;
+    p_event->b_done  = false;
+    p_event->b_error = false;
+
+    if( vlc_clone( &p_event->thread, EventThread, p_event,
+                   VLC_THREAD_PRIORITY_LOW ) )
     {
-        msg_Err( p_vout, "Vout EventThread failed" );
-        return 0;
+        msg_Err( p_event->p_vout, "cannot create Vout EventThread" );
+        return VLC_EGENERIC;
     }
 
-    msg_Dbg( p_vout, "Vout EventThread running" );
+    vlc_mutex_lock( &p_event->lock );
+    while( !p_event->b_ready )
+        vlc_cond_wait( &p_event->wait, &p_event->lock );
+    const bool b_error = p_event->b_error;
+    vlc_mutex_unlock( &p_event->lock );
+
+    if( b_error )
+    {
+        vlc_join( p_event->thread, NULL );
+        p_event->b_ready = false;
+        return VLC_EGENERIC;
+    }
+    msg_Dbg( p_event->p_vout, "Vout EventThread running" );
+    return VLC_SUCCESS;
+}
+
+static void EventThreadStop( event_thread_t *p_event )
+{
+    if( !p_event->b_ready )
+        return;
+
+    vlc_mutex_lock( &p_event->lock );
+    p_event->b_done = true;
+    vlc_mutex_unlock( &p_event->lock );
+
+    /* we need to be sure Vout EventThread won't stay stuck in
+     * GetMessage, so we send a fake message */
+    if( p_event->p_vout->p_sys->hwnd )
+        PostMessage( p_event->p_vout->p_sys->hwnd, WM_NULL, 0, 0);
+
+    vlc_join( p_event->thread, NULL );
+    p_event->b_ready = false;
+}
+
+/* */
+int CreateEventThread( vout_thread_t *p_vout )
+{
+    event_thread_t *p_event =
+        p_vout->p_sys->p_event = EventThreadCreate( p_vout );
+    if( !p_event )
+        return 0;
+
+    if( EventThreadStart( p_event ) )
+        return 0;
     return 1;
 }
 
@@ -924,22 +996,12 @@ void StopEventThread( vout_thread_t *p_vout )
         var_SetBool( p_vout, "fullscreen", true );
     }
 
-    if( p_vout->p_sys->p_event )
+    event_thread_t *p_event = p_vout->p_sys->p_event;
+    if( p_event )
     {
-        event_thread_t *p_event = p_vout->p_sys->p_event;
-
-        /* Kill Vout EventThread */
-        vlc_object_kill( p_event );
-
-        /* we need to be sure Vout EventThread won't stay stuck in
-         * GetMessage, so we send a fake message */
-        if( p_vout->p_sys->hwnd )
-        {
-            PostMessage( p_vout->p_sys->hwnd, WM_NULL, 0, 0);
-        }
-
-        vlc_thread_join( p_event );
-        vlc_object_release( p_event );
+        EventThreadStop( p_event );
+        EventThreadDestroy( p_event );
+        p_vout->p_sys->p_event = NULL;
     }
 }
 

@@ -25,12 +25,17 @@
 /*****************************************************************************
  * event_thread_t: event thread
  *****************************************************************************/
-typedef struct event_thread_t
+typedef struct
 {
-    VLC_COMMON_MEMBERS
+    vout_thread_t *p_vout;
 
-    vout_thread_t * p_vout;
-    HANDLE window_ready;
+    /* */
+    vlc_thread_t thread;
+    vlc_mutex_t  lock;
+    vlc_cond_t   wait;
+    bool         b_ready;
+    bool         b_done;
+    bool         b_error;
 
 } event_thread_t;
 
