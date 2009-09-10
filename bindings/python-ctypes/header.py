@@ -103,7 +103,7 @@ class ListPOINTER(object):
         self.etype = etype
 
     def from_param(self, param):
-        if isinstance(param, (list,tuple)):
+        if isinstance(param, (list, tuple)):
             return (self.etype * len(param))(*param)
 
 class LibVLCException(Exception):
@@ -170,6 +170,7 @@ class LogMessage(ctypes.Structure):
                 ]
 
     def __init__(self):
+        super(LogMessage, self).__init__()
         self.size=ctypes.sizeof(self)
 
     def __str__(self):
@@ -187,6 +188,7 @@ class MediaControlPosition(ctypes.Structure):
         # class with an int as parameter will create the appropriate
         # default position (absolute position, media time, with the
         # int as value).
+        super(MediaControlPosition, self).__init__()
         self.value=value
         if origin is None:
             origin=PositionOrigin.AbsolutePosition
@@ -205,8 +207,7 @@ class MediaControlPosition(ctypes.Structure):
     @staticmethod
     def from_param(arg):
         if isinstance(arg, (int, long)):
-            p=MediaControlPosition(arg)
-            return p
+            return MediaControlPosition(arg)
         else:
             return arg
 

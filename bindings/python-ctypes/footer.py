@@ -44,7 +44,6 @@ def debug_callback(event, data):
     print "Data", data
 
 if __name__ == '__main__':
-    import sys
     try:
         from msvcrt import getch
     except ImportError:
@@ -66,47 +65,44 @@ if __name__ == '__main__':
         sys.exit(0)
 
     if sys.argv[1:]:
-        if sys.platform == 'win32' and plugin_path is not None:
-            i=Instance('--plugin-path', plugin_path)
-        else:
-            i=Instance()
-        m=i.media_new(sys.argv[1])
-        p=i.media_player_new()
-        p.set_media(m)
-        p.play()
+        instance=Instance()
+        media=instance.media_new(sys.argv[1])
+        player=instance.media_player_new()
+        player.set_media(media)
+        player.play()
 
-        e=p.event_manager()
-        e.event_attach(EventType.MediaPlayerEndReached, end_callback, None)
+        event_manager=player.event_manager()
+        event_manager.event_attach(EventType.MediaPlayerEndReached, end_callback, None)
 
         def print_info():
             """Print information about the media."""
-            m=p.get_media()
-            print "State:", p.get_state()
-            print "Media:", m.get_mrl()
+            media=player.get_media()
+            print "State:", player.get_state()
+            print "Media:", media.get_mrl()
             try:
-                print "Current time:", p.get_time(), "/", m.get_duration()
-                print "Position:", p.get_position()
-                print "FPS:", p.get_fps()
-                print "Rate:", p.get_rate()
-                print "Video size: (%d, %d)" % (p.video_get_width(), p.video_get_height())
+                print "Current time:", player.get_time(), "/", media.get_duration()
+                print "Position:", player.get_position()
+                print "FPS:", player.get_fps()
+                print "Rate:", player.get_rate()
+                print "Video size: (%d, %d)" % (player.video_get_width(), player.video_get_height())
             except Exception:
                 pass
 
         def forward():
             """Go forward 1s"""
-            p.set_time(p.get_time() + 1000)
+            player.set_time(player.get_time() + 1000)
 
         def one_frame_forward():
             """Go forward one frame"""
-            p.set_time(p.get_time() + long(1000 / (p.get_fps() or 25)))
+            player.set_time(player.get_time() + long(1000 / (player.get_fps() or 25)))
 
         def one_frame_backward():
             """Go backward one frame"""
-            p.set_time(p.get_time() - long(1000 / (p.get_fps() or 25)))
+            player.set_time(player.get_time() - long(1000 / (player.get_fps() or 25)))
 
         def backward():
             """Go backward 1s"""
-            p.set_time(p.get_time() - 1000)
+            player.set_time(player.get_time() - 1000)
 
         def print_help():
             """Print help
@@ -116,20 +112,20 @@ if __name__ == '__main__':
                 print "  %s: %s" % (k, (m.__doc__ or m.__name__).splitlines()[0])
             print " 1-9: go to the given fraction of the movie"
 
-        def quit():
+        def quit_app():
             """Exit."""
             sys.exit(0)
 
         keybindings={
-            'f': p.toggle_fullscreen,
-            ' ': p.pause,
+            'f': player.toggle_fullscreen,
+            ' ': player.pause,
             '+': forward,
             '-': backward,
             '.': one_frame_forward,
             ',': one_frame_backward,
             '?': print_help,
             'i': print_info,
-            'q': quit,
+            'q': quit_app,
             }
 
         print "Press q to quit, ? to get help."
@@ -142,6 +138,6 @@ if __name__ == '__main__':
             elif o >= 49 and o <= 57:
                 # Numeric value. Jump to a fraction of the movie.
                 v=0.1*(o-48)
-                p.set_position(v)
+                player.set_position(v)
 
 

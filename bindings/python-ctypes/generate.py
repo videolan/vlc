@@ -604,7 +604,8 @@ class PythonGenerator(object):
             if classname in docstring:
                 self.output('    """%s\n    """' % docstring[classname])
 
-            self.output("""
+            if not 'def __new__' in overrides.get(classname, ''):
+                self.output("""
     def __new__(cls, pointer=None):
         '''Internal method used for instanciating wrappers from ctypes.
         '''
@@ -616,13 +617,15 @@ class PythonGenerator(object):
             o=object.__new__(cls)
             o._as_parameter_=ctypes.c_void_p(pointer)
             return o
+""")
 
+            self.output("""
     @staticmethod
     def from_param(arg):
         '''(INTERNAL) ctypes parameter conversion method.
         '''
         return arg._as_parameter_
-    """ % {'name': classname})
+""")
 
             if classname in overrides:
                 self.output(overrides[classname])

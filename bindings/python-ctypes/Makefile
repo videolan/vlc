@@ -11,5 +11,9 @@ doc: $(MODULE_NAME)
 test: $(MODULE_NAME)
 	python test.py
 
+check: $(MODULE_NAME)
+	-pyflakes $<
+	-pylint $<
+
 clean:
 	-$(RM) $(MODULE_NAME)

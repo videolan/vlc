@@ -144,7 +144,7 @@ class MediaControl:
         @param end: the end position
         """
         if not isinstance(begin, MediaControlPosition):
-            begin=self.value2position(pos)
+            begin=self.value2position(begin)
         if not isinstance(end, MediaControlPosition):
             end=self.value2position(end)
         e=MediaControlException()
