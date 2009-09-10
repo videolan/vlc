@@ -227,6 +227,9 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     fmt.i_x_offset = fmt.i_y_offset = 0;
 
     /* Build palette */
+    fmt.p_palette = calloc( 1, sizeof(*fmt.p_palette) );
+    if( !fmt.p_palette )
+        return VLC_EGENERIC;
     fmt.p_palette->i_entries = 16;
     for( i = 0; i < fmt.p_palette->i_entries; i++ )
     {
@@ -238,7 +241,10 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
 
     p_region->p_picture = picture_New( fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect );
     if( !p_region->p_picture )
+    {
+        free( fmt.p_palette );
         return VLC_EGENERIC;
+    }
     p_region->fmt = fmt;
 
     p_dst = p_region->p_picture->Y_PIXELS;
