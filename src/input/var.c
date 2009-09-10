@@ -223,6 +223,9 @@ void input_ControlVarInit ( input_thread_t *p_input )
     val.i_time = 0;
     var_Change( p_input, "length", VLC_VAR_SETVALUE, &val, NULL );
 
+    var_Create( p_input, "bit-rate", VLC_VAR_INTEGER );
+    var_Create( p_input, "sample-rate", VLC_VAR_INTEGER );
+
     if( !p_input->b_preparsing )
     {
         /* Special "intf-event" variable. */

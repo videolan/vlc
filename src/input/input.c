@@ -1144,9 +1144,6 @@ static int Init( input_thread_t * p_input )
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, false );
     es_out_Control( p_input->p->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
 
-    var_Create( p_input, "bit-rate", VLC_VAR_INTEGER );
-    var_Create( p_input, "sample-rate", VLC_VAR_INTEGER );
-
     /* */
     input_ChangeState( p_input, OPENING_S );
     input_SendEventCache( p_input, 0.0 );
