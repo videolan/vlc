@@ -374,6 +374,8 @@ struct demux_sys_t
     bool        b_start_record;
 };
 
+static int i_broken_epg;
+
 static int Demux    ( demux_t *p_demux );
 static int DemuxFile( demux_t *p_demux );
 static int Control( demux_t *p_demux, int i_query, va_list args );
@@ -2584,9 +2586,17 @@ static char *EITConvertToUTF8( const unsigned char *psz_instring,
     if( i_length < 1 ) return NULL;
     if( psz_instring[0] >= 0x20 )
     {
-        psz_encoding = "ISO_8859-1";
-        /* According to the specification, this should be ISO6937,
-         * but it seems Latin-1 is used instead. */
+        /* According to ETSI EN 300 468 Annex A, this should be ISO6937,
+         * but some broadcasters use different charset... */
+        if ( i_broken_epg == 1 )
+        {
+           psz_encoding = "ISO_8859-1";
+        }
+        else
+        {
+           psz_encoding = "ISO_6937";
+        }
+
         offset = 0;
     }
     else switch( psz_instring[0] )
@@ -2720,6 +2730,8 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
              p_sdt->i_ts_id, p_sdt->i_version, p_sdt->b_current_next,
              p_sdt->i_network_id );
 
+    i_broken_epg = 0;
+
     for( p_srv = p_sdt->p_first_service; p_srv; p_srv = p_srv->p_next )
     {
         vlc_meta_t          *p_meta;
@@ -2764,6 +2776,17 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                 dvbpsi_service_dr_t *pD = dvbpsi_DecodeServiceDr( p_dr );
                 char *str1 = NULL;
                 char *str2 = NULL;
+
+                /* Workarounds for broadcasters with broken EPG */
+
+                if ( p_sdt->i_network_id == 133 )
+                   i_broken_epg = 1;  /* SKY DE & BetaDigital use ISO8859-1 */
+
+                if ( !strncmp(pD->i_service_provider_name, "CSAT",
+                              pD->i_service_provider_name_length) )
+                   i_broken_epg = 1;  /* CanalSat FR uses ISO8859-1 */
+
+                /* FIXME: Digital+ ES also uses ISO8859-1 */
 
                 str1 = EITConvertToUTF8(pD->i_service_provider_name,
                                         pD->i_service_provider_name_length);
