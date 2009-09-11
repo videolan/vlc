@@ -2506,6 +2506,7 @@ DISTCLEAN_PKG += gsm-$(GSM_VERSION).tar.gz
 ifdef SVN
 libprojectM:
 	$(SVN) co $(LIBPROJECTM_SVN) libprojectM
+	patch -d libprojectM -p0 < Patches/libprojectM-fpic.patch
 else
 libprojectM-$(LIBPROJECTM_VERSION).tar.bz2:
 	$(WGET) $(LIBPROJECTM_URL)
