@@ -75,7 +75,8 @@ static int InputEventPreparse( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
     vlc_sem_t *p_sem_preparse = p_data;
 
-    if( newval.i_int == INPUT_EVENT_DEAD )
+    if( newval.i_int == INPUT_EVENT_DEAD ||
+        newval.i_int == INPUT_EVENT_ITEM_META )
         vlc_sem_post( p_sem_preparse );
 
     return VLC_SUCCESS;
@@ -574,7 +575,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 vlc_sem_init( &sem_preparse, 0 );
                 var_AddCallback( p_input, "intf-event", InputEventPreparse, &sem_preparse );
 
-                if( !p_input->b_dead )
+                while( !p_input->b_dead && ( !p_cfg->vod.psz_mux || !input_item_IsPreparsed( p_media->vod.p_item ) ) )
                     vlc_sem_wait( &sem_preparse );
 
                 var_DelCallback( p_input, "intf-event", InputEventPreparse, &sem_preparse );
