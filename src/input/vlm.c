@@ -69,6 +69,18 @@ static void vlm_Destructor( vlm_t *p_vlm );
 static void* Manage( void * );
 static int vlm_MediaVodControl( void *, vod_media_t *, const char *, int, va_list );
 
+static int InputEventPreparse( vlc_object_t *p_this, char const *psz_cmd,
+                               vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    VLC_UNUSED(p_this); VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
+    vlc_sem_t *p_sem_preparse = p_data;
+
+    if( newval.i_int == INPUT_EVENT_DEAD )
+        vlc_sem_post( p_sem_preparse );
+
+    return VLC_SUCCESS;
+}
+
 static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval,
                        void *p_data )
@@ -558,8 +570,15 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
 
             if( (p_input = input_CreateAndStart( p_vlm->p_libvlc, p_media->vod.p_item, psz_header ) ) )
             {
-                while( !p_input->b_eof && !p_input->b_error )
-                    msleep( 100000 );
+                vlc_sem_t sem_preparse;
+                vlc_sem_init( &sem_preparse, 0 );
+                var_AddCallback( p_input, "intf-event", InputEventPreparse, &sem_preparse );
+
+                if( !p_input->b_dead )
+                    vlc_sem_wait( &sem_preparse );
+
+                var_DelCallback( p_input, "intf-event", InputEventPreparse, &sem_preparse );
+                vlc_sem_destroy( &sem_preparse );
 
                 input_Stop( p_input, false );
                 vlc_thread_join( p_input );
