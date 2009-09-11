@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CMD_DIALOGS_HPP
@@ -31,156 +31,63 @@
 
 #include <vlc_interface.h>
 
-template<int TYPE = 0> class CmdDialogs;
+#define DEFINE_DIALOGS \
+    DEF( ChangeSkin,         showChangeSkin() ) \
+    DEF( FileSimple,         showFileSimple( true ) ) \
+    DEF( File,               showFile( true ) ) \
+    DEF( Disc,               showDisc( true ) ) \
+    DEF( Net,                showNet( true ) ) \
+    DEF( Messages,           showMessages() ) \
+    DEF( Prefs,              showPrefs() ) \
+    DEF( FileInfo,           showFileInfo() ) \
+    \
+    DEF( Add,                showFile( false ) ) \
+    DEF( PlaylistLoad,       showPlaylistLoad() ) \
+    DEF( PlaylistSave,       showPlaylistSave() ) \
+    DEF( Directory,          showDirectory( true ) ) \
+    DEF( StreamingWizard,    showStreamingWizard() ) \
+    DEF( Playlist,           showPlaylist() ) \
+    \
+    DEF( ShowPopupMenu,      showPopupMenu(true,INTF_DIALOG_POPUPMENU) ) \
+    DEF( HidePopupMenu,      showPopupMenu(false,INTF_DIALOG_POPUPMENU) ) \
+    DEF( ShowAudioPopupMenu, showPopupMenu(true,INTF_DIALOG_AUDIOPOPUPMENU) ) \
+    DEF( HideAudioPopupMenu, showPopupMenu(false,INTF_DIALOG_AUDIOPOPUPMENU) ) \
+    DEF( ShowVideoPopupMenu, showPopupMenu(true,INTF_DIALOG_VIDEOPOPUPMENU) ) \
+    DEF( HideVideoPopupMenu, showPopupMenu(false,INTF_DIALOG_VIDEOPOPUPMENU) ) \
+    DEF( ShowMiscPopupMenu,  showPopupMenu(true,INTF_DIALOG_MISCPOPUPMENU) ) \
+    DEF( HideMiscPopupMenu,  showPopupMenu(false,INTF_DIALOG_MISCPOPUPMENU) )
 
-// XXX use an enum instead
-typedef CmdDialogs<1> CmdDlgChangeSkin;
-typedef CmdDialogs<2> CmdDlgFileSimple;
-typedef CmdDialogs<3> CmdDlgFile;
-typedef CmdDialogs<4> CmdDlgDisc;
-typedef CmdDialogs<5> CmdDlgNet;
-typedef CmdDialogs<6> CmdDlgMessages;
-typedef CmdDialogs<7> CmdDlgPrefs;
-typedef CmdDialogs<8> CmdDlgFileInfo;
-
-typedef CmdDialogs<11> CmdDlgAdd;
-typedef CmdDialogs<12> CmdDlgPlaylistLoad;
-typedef CmdDialogs<13> CmdDlgPlaylistSave;
-typedef CmdDialogs<14> CmdDlgDirectory;
-typedef CmdDialogs<15> CmdDlgStreamingWizard;
-typedef CmdDialogs<16> CmdDlgPlaytreeLoad;
-typedef CmdDialogs<17> CmdDlgPlaytreeSave;
-typedef CmdDialogs<18> CmdDlgPlaylist;
-
-typedef CmdDialogs<30> CmdDlgShowPopupMenu;
-typedef CmdDialogs<31> CmdDlgHidePopupMenu;
-typedef CmdDialogs<32> CmdDlgShowAudioPopupMenu;
-typedef CmdDialogs<33> CmdDlgHideAudioPopupMenu;
-typedef CmdDialogs<34> CmdDlgShowVideoPopupMenu;
-typedef CmdDialogs<35> CmdDlgHideVideoPopupMenu;
-typedef CmdDialogs<36> CmdDlgShowMiscPopupMenu;
-typedef CmdDialogs<37> CmdDlgHideMiscPopupMenu;
-
-
-/// Generic "Open dialog" command
-template<int TYPE>
-class CmdDialogs: public CmdGeneric
-{
-    public:
-        CmdDialogs( intf_thread_t *pIntf ): CmdGeneric( pIntf ) {}
-        virtual ~CmdDialogs() {}
-
-        /// This method does the real job of the command
-        virtual void execute()
-        {
-            /// Get the dialogs provider
-            Dialogs *pDialogs = Dialogs::instance( getIntf() );
-            if( pDialogs == NULL )
-            {
-                return;
-            }
-
-            switch( TYPE )
-            {
-                case 1:
-                    pDialogs->showChangeSkin();
-                    break;
-                case 2:
-                    pDialogs->showFileSimple( true );
-                    break;
-                case 3:
-                    pDialogs->showFile( true );
-                    break;
-                case 4:
-                    pDialogs->showDisc( true );
-                    break;
-                case 5:
-                    pDialogs->showNet( true );
-                    break;
-                case 6:
-                    pDialogs->showMessages();
-                    break;
-                case 7:
-                    pDialogs->showPrefs();
-                    break;
-                case 8:
-                    pDialogs->showFileInfo();
-                    break;
-               case 11:
-                    pDialogs->showFile( false );
-                    break;
-                case 12:
-                    pDialogs->showPlaylistLoad();
-                    break;
-                case 13:
-                    pDialogs->showPlaylistSave();
-                    break;
-                case 14:
-                    pDialogs->showDirectory( true );
-                    break;
-                case 15:
-                    pDialogs->showStreamingWizard();
-                    break;
-                case 18:
-                    pDialogs->showPlaylist();
-                    break;
-                case 30:
-                    pDialogs->showPopupMenu( true, INTF_DIALOG_POPUPMENU );
-                    break;
-                case 31:
-                    pDialogs->showPopupMenu( false, INTF_DIALOG_POPUPMENU );
-                    break;
-                case 32:
-                    pDialogs->showPopupMenu( true, INTF_DIALOG_AUDIOPOPUPMENU );
-                    break;
-                case 33:
-                    pDialogs->showPopupMenu( false,INTF_DIALOG_AUDIOPOPUPMENU );
-                    break;
-                case 34:
-                    pDialogs->showPopupMenu( true, INTF_DIALOG_VIDEOPOPUPMENU );
-                    break;
-                case 35:
-                    pDialogs->showPopupMenu( false,INTF_DIALOG_VIDEOPOPUPMENU );
-                    break;
-                 case 36:
-                    pDialogs->showPopupMenu( true, INTF_DIALOG_MISCPOPUPMENU );
-                    break;
-                case 37:
-                    pDialogs->showPopupMenu( false,INTF_DIALOG_MISCPOPUPMENU );
-                    break;
-                default:
-                    msg_Warn( getIntf(), "unknown dialog type" );
-                    break;
-            }
-        }
-
-        /// Return the type of the command
-        virtual string getType() const { return "dialog"; }
+#define DEF( a, c ) \
+class CmdDlg##a: public CmdGeneric                              \
+{   public:                                                     \
+    CmdDlg##a( intf_thread_t *pIntf ): CmdGeneric( pIntf ) { }  \
+    virtual ~CmdDlg##a() { }                                    \
+    virtual void execute()                                      \
+    {                                                           \
+        Dialogs *dlg = Dialogs::instance( getIntf() );          \
+        if( dlg ) dlg->c;                                       \
+    }                                                           \
+    virtual string getType() const { return #a" dialog"; }      \
 };
+
+DEFINE_DIALOGS
 
 class CmdInteraction: public CmdGeneric
 {
-    public:
-        CmdInteraction( intf_thread_t *pIntf, interaction_dialog_t *
-                        p_dialog ): CmdGeneric( pIntf ), m_pDialog( p_dialog )
-        {}
-        virtual ~CmdInteraction() {}
+public:
+    CmdInteraction( intf_thread_t *pIntf, interaction_dialog_t * p_dialog )
+                  : CmdGeneric( pIntf ), m_pDialog( p_dialog ) { }
+    virtual ~CmdInteraction() { }
 
-        /// This method does the real job of the command
-        virtual void execute()
-        {
-            /// Get the dialogs provider
-            Dialogs *pDialogs = Dialogs::instance( getIntf() );
-            if( pDialogs == NULL )
-            {
-                return;
-            }
+    virtual void execute()
+    {
+        Dialogs *pDialogs = Dialogs::instance( getIntf() );
+        if( pDialogs != NULL )
             pDialogs->showInteraction( m_pDialog );
-        }
-
-        virtual string getType() const { return "interaction"; }
-    private:
-        interaction_dialog_t *m_pDialog;
+    }
+    virtual string getType() const { return "interaction"; }
+private:
+    interaction_dialog_t *m_pDialog;
 };
 
 #endif
