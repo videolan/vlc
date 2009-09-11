@@ -2782,8 +2782,8 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
                 if ( p_sdt->i_network_id == 133 )
                    i_broken_epg = 1;  /* SKY DE & BetaDigital use ISO8859-1 */
 
-                if ( !strncmp(pD->i_service_provider_name, "CSAT",
-                              pD->i_service_provider_name_length) )
+                if ( (pD->i_service_provider_name_length == 4) &&
+                     !strncmp(pD->i_service_provider_name, "CSAT", 4) )
                    i_broken_epg = 1;  /* CanalSat FR uses ISO8859-1 */
 
                 /* FIXME: Digital+ ES also uses ISO8859-1 */
