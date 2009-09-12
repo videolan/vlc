@@ -93,6 +93,9 @@ static void EndMMX       ( void );
 #if defined(CAN_COMPILE_3DNOW)
 static void End3DNow     ( void );
 #endif
+#if defined __ARM_NEON__
+static void MergeNEON (void *, const void *, const void *, size_t);
+#endif
 
 static void SetFilterMethod( vout_thread_t *p_vout, const char *psz_method );
 static vout_thread_t *SpawnRealVout( vout_thread_t *p_vout );
@@ -242,6 +245,14 @@ static int Create( vlc_object_t *p_this )
     {
         p_sys->pf_merge = Merge3DNow;
         p_sys->pf_end_merge = End3DNow;
+    }
+    else
+#endif
+#if defined __ARM_NEON__
+    if( vlc_CPU() & CPU_CAPABILITY_NEON )
+    {
+        p_sys->pf_merge = MergeNEON;
+        p_sys->pf_end_merge = NULL;
     }
     else
 #endif
@@ -1116,6 +1127,64 @@ static void MergeAltivec( void *_p_dest, const void *_p_s1,
     {
         *p_dest++ = ( (uint16_t)(*p_s1++) + (uint16_t)(*p_s2++) ) >> 1;
     }
+}
+#endif
+
+#ifdef __ARM_NEON__
+static void MergeNEON (void *restrict out, const void *in1,
+                       const void *in2, size_t n)
+{
+    uint8_t *outp = out;
+    const uint8_t *in1p = in1;
+    const uint8_t *in2p = in2;
+    size_t mis = ((uintptr_t)outp) & 15;
+
+    if (mis)
+    {
+        MergeGeneric (outp, in1p, in2p, mis);
+        outp += mis;
+        in1p += mis;
+        in2p += mis;
+        n -= mis;
+    }
+
+    uint8_t *end = outp + (n & ~15);
+
+    if ((((uintptr_t)in1p)|((uintptr_t)in2p)) & 15)
+        while (outp < end)
+            asm volatile (
+                "vld1.u8  {q0-q1}, [%[in1]]!\n"
+                "vld1.u8  {q2-q3}, [%[in2]]!\n"
+                "vhadd.u8 q4, q0, q2\n"
+                "vld1.u8  {q6-q7}, [%[in1]]!\n"
+                "vhadd.u8 q5, q1, q3\n"
+                "vld1.u8  {q8-q9}, [%[in2]]!\n"
+                "vhadd.u8 q10, q6, q8\n"
+                "vhadd.u8 q11, q7, q9\n"
+                "vst1.u8  {q4-q5}, [%[out],:128]!\n"
+                "vst1.u8  {q10-q11}, [%[out],:128]!\n"
+                : [out] "+r" (outp), [in1] "+r" (in1p), [in2] "+r" (in2p)
+                :
+                : "q0", "q1", "q2", "memory");
+    else
+         while (outp < end)
+            asm volatile (
+                "vld1.u8  {q0-q1}, [%[in1],:128]!\n"
+                "vld1.u8  {q2-q3}, [%[in2],:128]!\n"
+                "vhadd.u8 q4, q0, q2\n"
+                "vld1.u8  {q6-q7}, [%[in1],:128]!\n"
+                "vhadd.u8 q5, q1, q3\n"
+                "vld1.u8  {q8-q9}, [%[in2],:128]!\n"
+                "vhadd.u8 q10, q6, q8\n"
+                "vhadd.u8 q11, q7, q9\n"
+                "vst1.u8  {q4-q5}, [%[out],:128]!\n"
+                "vst1.u8  {q10-q11}, [%[out],:128]!\n"
+                : [out] "+r" (outp), [in1] "+r" (in1p), [in2] "+r" (in2p)
+                :
+                : "q0", "q1", "q2", "memory");
+    n &= 15;
+    if (n)
+        MergeGeneric (outp, in1p, in2p, n);
 }
 #endif
 
