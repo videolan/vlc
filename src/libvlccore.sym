@@ -463,6 +463,10 @@ vlc_cond_init
 vlc_cond_signal
 vlc_cond_timedwait
 vlc_cond_wait
+vlc_sem_init
+vlc_sem_destroy
+vlc_sem_post
+vlc_sem_wait
 vlc_control_cancel
 vlc_CPU
 vlc_error

@@ -48,8 +48,7 @@
 #   include <stdlib.h> /* lldiv_t definition (only in C99) */
 #   include <unistd.h> /* _POSIX_SPIN_LOCKS */
 #   include <pthread.h>
-    /* Needed for pthread_cond_timedwait */
-#   include <errno.h>
+#   include <semaphore.h>
 #   include <time.h>
 
 #endif
@@ -107,6 +106,7 @@ typedef pthread_t       vlc_thread_t;
 typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
 typedef pthread_cond_t  vlc_cond_t;
+typedef sem_t           vlc_sem_t;
 typedef pthread_rwlock_t vlc_rwlock_t;
 typedef pthread_key_t   vlc_threadvar_t;
 typedef struct vlc_timer *vlc_timer_t;
@@ -130,6 +130,7 @@ typedef struct
 #define VLC_STATIC_MUTEX { 0, }
 
 typedef HANDLE  vlc_cond_t;
+typedef HANDLE  vlc_sem_t;
 
 typedef struct
 {
@@ -163,7 +164,12 @@ VLC_EXPORT( void, vlc_cond_destroy,  ( vlc_cond_t * ) );
 VLC_EXPORT( void, vlc_cond_signal, (vlc_cond_t *) );
 VLC_EXPORT( void, vlc_cond_broadcast, (vlc_cond_t *) );
 VLC_EXPORT( void, vlc_cond_wait, (vlc_cond_t *, vlc_mutex_t *) );
-VLC_EXPORT( int, vlc_cond_timedwait, (vlc_cond_t *, vlc_mutex_t *, mtime_t) );
+VLC_EXPORT( int,  vlc_cond_timedwait, (vlc_cond_t *, vlc_mutex_t *, mtime_t) );
+VLC_EXPORT( void, vlc_sem_init, (vlc_sem_t *, unsigned) );
+VLC_EXPORT( void, vlc_sem_destroy, (vlc_sem_t *) );
+VLC_EXPORT( int,  vlc_sem_post, (vlc_sem_t *) );
+VLC_EXPORT( void, vlc_sem_wait, (vlc_sem_t *) );
+
 VLC_EXPORT( void, vlc_rwlock_init, (vlc_rwlock_t *) );
 VLC_EXPORT( void, vlc_rwlock_destroy, (vlc_rwlock_t *) );
 VLC_EXPORT( void, vlc_rwlock_rdlock, (vlc_rwlock_t *) );

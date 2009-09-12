@@ -296,6 +296,37 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     return (result == WAIT_OBJECT_0) ? 0 : ETIMEDOUT;
 }
 
+/*** Semaphore ***/
+void vlc_sem_init (vlc_sem_t *sem, unsigned value)
+{
+    *sem = CreateSemaphore (NULL, value, 0x7fffffff, NULL);
+    if (*sem == NULL)
+        abort ();
+}
+
+void vlc_sem_destroy (vlc_sem_t *sem)
+{
+    CloseHandle (*sem);
+}
+
+int vlc_sem_post (vlc_sem_t *sem)
+{
+    ReleaseSemaphore (*sem, 1, NULL);
+    return 0; /* FIXME */
+}
+
+void vlc_sem_wait (vlc_sem_t *sem)
+{
+    DWORD result;
+
+    do
+    {
+        vlc_testcancel ();
+        result = WaitForSingleObjectEx (*sem, INFINITE, TRUE);
+    }
+    while (result == WAIT_IO_COMPLETION);
+}
+
 /*** Read/write locks */
 /* SRW (Slim Read Write) locks are available in Vista+ only */
 void vlc_rwlock_init (vlc_rwlock_t *lock)

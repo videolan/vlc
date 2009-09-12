@@ -379,6 +379,48 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
 }
 
 /**
+ * Initializes a semaphore.
+ */
+void vlc_sem_init (vlc_sem_t *sem, unsigned value)
+{
+    if (sem_init (sem, 0, value))
+        abort ();
+}
+
+/**
+ * Destroys a semaphore.
+ */
+void vlc_sem_destroy (vlc_sem_t *sem)
+{
+    int val = sem_destroy (sem);
+    VLC_THREAD_ASSERT ("destroying semaphore");
+}
+
+/**
+ * Increments the value of a semaphore.
+ */
+int vlc_sem_post (vlc_sem_t *sem)
+{
+    int val = sem_post (sem);
+    if (val != EOVERFLOW)
+        VLC_THREAD_ASSERT ("unlocking semaphore");
+    return val;
+}
+
+/**
+ * Atomically wait for the semaphore to become non-zero (if needed),
+ * then decrements it.
+ */
+void vlc_sem_wait (vlc_sem_t *sem)
+{
+    int val;
+    do
+        val = sem_wait (sem);
+    while (val == EINTR);
+    VLC_THREAD_ASSERT ("locking semaphore");
+}
+
+/**
  * Initializes a read/write lock.
  */
 void vlc_rwlock_init (vlc_rwlock_t *lock)
