@@ -60,9 +60,6 @@ protected:
     virtual void dropEvent( QDropEvent *);
     virtual void dragEnterEvent( QDragEnterEvent * );
     virtual void closeEvent( QCloseEvent * );
-
-signals:
-    void rootChanged( playlist_item_t *);
 };
 
 class ArtLabel : public CoverArtLabel

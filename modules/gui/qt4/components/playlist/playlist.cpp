@@ -80,13 +80,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) : p_intf ( _p_i )
     CONNECT( selector, activated( playlist_item_t * ),
              rightPanel, setRoot( playlist_item_t * ) );
 
-    /* Connect the activated() to the rootChanged() signal
-       This will be used by StandardPLPanel to setCurrentRootId, that will
-       change the label of the addButton  */
-    connect( selector, SIGNAL( activated( playlist_item_t * ) ),
-             this, SIGNAL( rootChanged( playlist_item_t * ) ) );
-
-    emit rootChanged( p_root );
+    rightPanel->setRoot( p_root );
 
     /* Add the two sides of the QSplitter */
     addWidget( leftW );

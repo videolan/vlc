@@ -90,7 +90,6 @@ private slots:
     void gotoPlayingItem();
     void doPopup( QModelIndex index, QPoint point );
     void search( const QString& searchText );
-    void setCurrentRootId( playlist_item_t * );
     void popupAdd();
     void popupSelectColumn( QPoint );
     void toggleColumnShown( int );

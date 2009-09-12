@@ -107,8 +107,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
              this, handleExpansion( const QModelIndex& ) );
 
     currentRootId = -1;
-    CONNECT( parent, rootChanged( playlist_item_t * ),
-             this, setCurrentRootId( playlist_item_t * ) );
 
     /* Buttons configuration */
     QHBoxLayout *buttons = new QHBoxLayout;
@@ -228,31 +226,6 @@ void StandardPLPanel::handleExpansion( const QModelIndex& index )
     view->scrollTo( index );
 }
 
-void StandardPLPanel::setCurrentRootId( playlist_item_t *p_item )
-{
-    if( p_item == THEPL->p_local_category ||
-        p_item == THEPL->p_local_onelevel )
-    {
-        addButton->setEnabled( true );
-        addButton->setToolTip( qtr(I_PL_ADDPL) );
-    }
-    else if( ( THEPL->p_ml_category && p_item == THEPL->p_ml_category) ||
-             ( THEPL->p_ml_onelevel && p_item == THEPL->p_ml_onelevel ) )
-    {
-        addButton->setEnabled( true );
-        addButton->setToolTip( qtr(I_PL_ADDML) );
-    }
-    else
-        addButton->setEnabled( false );
-
-    /* <jleben> do we need to lock here? */
-    playlist_Lock( THEPL );
-    char *psz_title = input_item_GetName( p_item->p_input );
-    title->setText( psz_title );
-    free( psz_title );
-    playlist_Unlock( THEPL );
-}
-
 /* PopupAdd Menu for the Add Menu */
 void StandardPLPanel::popupAdd()
 {
@@ -320,11 +293,38 @@ void StandardPLPanel::doPopup( QModelIndex index, QPoint point )
 void StandardPLPanel::setRoot( playlist_item_t *p_item )
 {
     QPL_LOCK;
-    p_item = playlist_GetPreferredNode( THEPL, p_item );
     assert( p_item );
+
+    p_item = playlist_GetPreferredNode( THEPL, p_item );
+
+    /* needed for popupAdd() */
+    currentRootId = p_item->i_id;
+
+    /* cosmetics, ..still need playlist locking.. */
+    char *psz_title = input_item_GetName( p_item->p_input );
+    title->setText( psz_title );
+    free( psz_title );
+
     QPL_UNLOCK;
 
+    /* do THE job */
     model->rebuild( p_item );
+
+    /* enable/disable adding */
+    if( p_item == THEPL->p_local_category ||
+        p_item == THEPL->p_local_onelevel )
+    {
+        addButton->setEnabled( true );
+        addButton->setToolTip( qtr(I_PL_ADDPL) );
+    }
+    else if( ( THEPL->p_ml_category && p_item == THEPL->p_ml_category) ||
+              ( THEPL->p_ml_onelevel && p_item == THEPL->p_ml_onelevel ) )
+    {
+        addButton->setEnabled( true );
+        addButton->setToolTip( qtr(I_PL_ADDML) );
+    }
+    else
+        addButton->setEnabled( false );
 }
 
 void StandardPLPanel::removeItem( int i_id )
