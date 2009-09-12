@@ -478,7 +478,7 @@ static void *Thread( void *obj )
 
     if (p_mi != NULL)
     {
-        QMutexLocker locker (&iface.lock);
+        /* FIXME: are we sure that video window is already destroyed? */
 
         msg_Dbg (p_intf, "destroying the main Qt4 interface");
         p_intf->p_sys->p_mi = NULL;
@@ -543,8 +543,6 @@ static int WindowOpen( vlc_object_t *p_obj )
     if( p_wnd->cfg->is_standalone )
         return VLC_EGENERIC;
 
-    QMutexLocker( &iface.lock );
-
     vlc_value_t val;
 
     if( var_Get( p_obj->p_libvlc, "qt4-iface", &val ) )
@@ -585,8 +583,6 @@ static int WindowOpen( vlc_object_t *p_obj )
 static int WindowControl( vout_window_t *p_wnd, int i_query, va_list args )
 {
     MainInterface *p_mi = (MainInterface *)p_wnd->sys;
-    QMutexLocker locker(&iface.lock);
-
     return p_mi->controlVideo( i_query, args );
 }
 
@@ -594,8 +590,6 @@ static void WindowClose( vlc_object_t *p_obj )
 {
     vout_window_t *p_wnd = (vout_window_t*)p_obj;
     MainInterface *p_mi = (MainInterface *)p_wnd->sys;
-
-    QMutexLocker locker( &iface.lock );
 
     msg_Dbg( p_obj, "releasing video..." );
     p_mi->releaseVideo();
