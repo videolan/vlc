@@ -406,6 +406,7 @@ static int Manage( vout_thread_t *p_vout )
         /* Open the direct3d output and attaches it to the new window */
         p_vout->p_sys->b_desktop = !p_vout->p_sys->b_desktop;
         p_vout->pf_display = FirstDisplay;
+        vlc_mutex_init( &p_vout->p_sys->lock );
 
         CreateEventThread( p_vout );
         Init( p_vout );
