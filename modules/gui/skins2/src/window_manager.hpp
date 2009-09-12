@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef WINDOW_MANAGER_HPP
@@ -44,187 +44,182 @@ class Popup;
 /// Window manager for skin windows
 class WindowManager: public SkinObject
 {
-    public:
-        /// Direction of the resizing
-        enum Direction_t
-        {
-            kResizeE,   // East
-            kResizeSE,  // South-East
-            kResizeS,   // South
-            kNone       // Reserved for internal use
-        };
+public:
+    /// Direction of the resizing
+    enum Direction_t
+    {
+        kResizeE,   // East
+        kResizeSE,  // South-East
+        kResizeS,   // South
+        kNone       // Reserved for internal use
+    };
+    WindowManager( intf_thread_t *pIntf );
+    virtual ~WindowManager();
 
-        /// Constructor
-        WindowManager( intf_thread_t *pIntf);
+    /**
+     * Add a window to the list of known windows. Necessary if you want
+     * your window to be movable...
+     */
+    void registerWindow( TopWindow &rWindow );
 
-        /// Destructor
-        virtual ~WindowManager();
+    /// Remove a previously registered window
+    void unregisterWindow( TopWindow &rWindow );
 
-        /**
-         * Add a window to the list of known windows. Necessary if you want
-         * your window to be movable...
-         */
-        void registerWindow( TopWindow &rWindow );
+    /// Tell the window manager that a move is initiated for rWindow
+    void startMove( TopWindow &rWindow );
 
-        /// Remove a previously registered window
-        void unregisterWindow( TopWindow &rWindow );
+    /// Tell the window manager that the current move ended
+    void stopMove();
 
-        /// Tell the window manager that a move is initiated for rWindow
-        void startMove( TopWindow &rWindow );
+    /**
+     * Move the rWindow window to (left, top), and move all its
+     * anchored windows.
+     * If a new anchoring is detected, the windows will move accordingly.
+     */
+    void move( TopWindow &rWindow, int left, int top ) const;
 
-        /// Tell the window manager that the current move ended
-        void stopMove();
+    /// Tell the window manager that a resize is initiated for rLayout
+    void startResize( GenericLayout &rLayout, Direction_t direction );
 
-        /**
-         * Move the rWindow window to (left, top), and move all its
-         * anchored windows.
-         * If a new anchoring is detected, the windows will move accordingly.
-         */
-        void move( TopWindow &rWindow, int left, int top ) const;
+    /// Tell the window manager that the current resizing ended
+    void stopResize();
 
-        /// Tell the window manager that a resize is initiated for rLayout
-        void startResize( GenericLayout &rLayout, Direction_t direction );
+    /**
+     * Resize the rLayout layout to (width, height), and move all its
+     * anchored windows, if some anchors are moved during the resizing.
+     * If a new anchoring is detected, the windows will move (or resize)
+     * accordingly.
+     */
+    void resize( GenericLayout &rLayout, int width, int height ) const;
 
-        /// Tell the window manager that the current resizing ended
-        void stopResize();
+    /// Maximize the given window
+    void maximize( TopWindow &rWindow );
 
-        /**
-         * Resize the rLayout layout to (width, height), and move all its
-         * anchored windows, if some anchors are moved during the resizing.
-         * If a new anchoring is detected, the windows will move (or resize)
-         * accordingly.
-         */
-        void resize( GenericLayout &rLayout, int width, int height ) const;
+    /// Unmaximize the given window
+    void unmaximize( TopWindow &rWindow );
 
-        /// Maximize the given window
-        void maximize( TopWindow &rWindow );
+    /// Raise all the registered windows
+    void raiseAll() const;
 
-        /// Unmaximize the given window
-        void unmaximize( TopWindow &rWindow );
+    /// Show all the registered windows
+    void showAll( bool firstTime = false ) const;
 
-        /// Raise all the registered windows
-        void raiseAll() const;
+    /// Hide all the registered windows
+    void hideAll() const;
 
-        /// Show all the registered windows
-        void showAll( bool firstTime = false ) const;
+    /// Synchronize the windows with their visibility variable
+    void synchVisibility() const;
 
-        /// Hide all the registered windows
-        void hideAll() const;
+    /// Save the current visibility of the windows
+    void saveVisibility();
 
-        /// Synchronize the windows with their visibility variable
-        void synchVisibility() const;
+    /// Restore the saved visibility of the windows
+    void restoreVisibility() const;
 
-        /// Save the current visibility of the windows
-        void saveVisibility();
+    /// Raise the given window
+    void raise( TopWindow &rWindow ) const { rWindow.raise(); }
 
-        /// Restore the saved visibility of the windows
-        void restoreVisibility() const;
+    /// Show the given window
+    void show( TopWindow &rWindow ) const { rWindow.show(); }
 
-        /// Raise the given window
-        void raise( TopWindow &rWindow ) const { rWindow.raise(); }
+    /// Hide the given window
+    void hide( TopWindow &rWindow ) const { rWindow.hide(); }
 
-        /// Show the given window
-        void show( TopWindow &rWindow ) const { rWindow.show(); }
+    /// Toggle all the windows on top
+    void toggleOnTop();
 
-        /// Hide the given window
-        void hide( TopWindow &rWindow ) const { rWindow.hide(); }
+    /// Set the magnetism of screen edges
+    void setMagnetValue( int magnet ) { m_magnet = magnet; }
 
-        /// Toggle all the windows on top
-        void toggleOnTop();
+    /// Set the alpha value of the static windows
+    void setAlphaValue( int alpha ) { m_alpha = alpha; }
 
-        /// Set the magnetism of screen edges
-        void setMagnetValue( int magnet ) { m_magnet = magnet; }
+    /// Set the alpha value of the moving windows
+    void setMoveAlphaValue( int moveAlpha ) { m_moveAlpha = moveAlpha; }
 
-        /// Set the alpha value of the static windows
-        void setAlphaValue( int alpha ) { m_alpha = alpha; }
+    /// Create the tooltip window
+    void createTooltip( const GenericFont &rTipFont );
 
-        /// Set the alpha value of the moving windows
-        void setMoveAlphaValue( int moveAlpha ) { m_moveAlpha = moveAlpha; }
+    /// Show the tooltip window
+    void showTooltip();
 
-        /// Create the tooltip window
-        void createTooltip( const GenericFont &rTipFont );
+    /// Hide the tooltip window
+    void hideTooltip();
 
-        /// Show the tooltip window
-        void showTooltip();
+    /// Add a layout of the given window. This new layout will be the
+    /// active one.
+    void addLayout( TopWindow &rWindow, GenericLayout &rLayout );
 
-        /// Hide the tooltip window
-        void hideTooltip();
+    /// Change the active layout of the given window
+    void setActiveLayout( TopWindow &rWindow, GenericLayout &rLayout );
 
-        /// Add a layout of the given window. This new layout will be the
-        /// active one.
-        void addLayout( TopWindow &rWindow, GenericLayout &rLayout );
+    /// Mark the given popup as active
+    void setActivePopup( Popup &rPopup ) { m_pPopup = &rPopup; }
 
-        /// Change the active layout of the given window
-        void setActiveLayout( TopWindow &rWindow, GenericLayout &rLayout );
+    /// Return the active popup, or NULL if none is active
+    Popup * getActivePopup() const { return m_pPopup; }
 
-        /// Mark the given popup as active
-        void setActivePopup( Popup &rPopup ) { m_pPopup = &rPopup; }
+private:
+    /// Some useful typedefs for lazy people like me
+    typedef set<TopWindow*> WinSet_t;
+    typedef list<Anchor*> AncList_t;
 
-        /// Return the active popup, or NULL if none is active
-        Popup * getActivePopup() const { return m_pPopup; }
+    /// Dependencies map
+    /**
+     * This map represents the graph of anchored windows: it associates
+     * to a given window all the windows that are directly anchored by it.
+     * This is not transitive, i.e. if a is in m_dep[b] and if b is in
+     * m_dep[c], it doesn't mean that a is in m_dep[c] (in fact, it
+     * would be extremely rare...)
+     */
+    map<TopWindow*, WinSet_t> m_dependencies;
+    /// Store all the windows
+    WinSet_t m_allWindows;
+    /**
+     * Store the windows that were visible when saveVisibility() was
+     * last called.
+     */
+    WinSet_t m_savedWindows;
+    /// Store the moving windows
+    /**
+     * This set is updated at every start of move.
+     */
+    WinSet_t m_movingWindows;
+    /**
+     * Store the moving windows in the context of resizing
+     * These sets are updated at every start of move
+     */
+    //@{
+    WinSet_t m_resizeMovingE;
+    WinSet_t m_resizeMovingS;
+    WinSet_t m_resizeMovingSE;
+    //@}
+    /// Indicate whether the windows are currently on top
+    VariablePtr m_cVarOnTop;
+    /// Magnetism of the screen edges (= scope of action)
+    int m_magnet;
+    /// Alpha value of the static windows
+    int m_alpha;
+    /// Alpha value of the moving windows
+    int m_moveAlpha;
+    /// Direction of the current resizing
+    Direction_t m_direction;
+    /// Rect of the last maximized window
+    SkinsRect m_maximizeRect;
+    /// Tooltip
+    Tooltip *m_pTooltip;
+    /// Active popup, if any
+    Popup *m_pPopup;
 
-    private:
-        /// Some useful typedefs for lazy people like me
-        typedef set<TopWindow*> WinSet_t;
-        typedef list<Anchor*> AncList_t;
+    /// Recursively build a set of windows anchored to the one given.
+    void buildDependSet( WinSet_t &rWinSet, TopWindow *pWindow );
 
-        /// Dependencies map
-        /**
-         * This map represents the graph of anchored windows: it associates
-         * to a given window all the windows that are directly anchored by it.
-         * This is not transitive, i.e. if a is in m_dep[b] and if b is in
-         * m_dep[c], it doesn't mean that a is in m_dep[c] (in fact, it
-         * would be extremely rare...)
-         */
-        map<TopWindow*, WinSet_t> m_dependencies;
-        /// Store all the windows
-        WinSet_t m_allWindows;
-        /**
-         * Store the windows that were visible when saveVisibility() was
-         * last called.
-         */
-        WinSet_t m_savedWindows;
-        /// Store the moving windows
-        /**
-         * This set is updated at every start of move.
-         */
-        WinSet_t m_movingWindows;
-        /**
-         * Store the moving windows in the context of resizing
-         * These sets are updated at every start of move
-         */
-        //@{
-        WinSet_t m_resizeMovingE;
-        WinSet_t m_resizeMovingS;
-        WinSet_t m_resizeMovingSE;
-        //@}
-        /// Indicate whether the windows are currently on top
-        VariablePtr m_cVarOnTop;
-        /// Magnetism of the screen edges (= scope of action)
-        int m_magnet;
-        /// Alpha value of the static windows
-        int m_alpha;
-        /// Alpha value of the moving windows
-        int m_moveAlpha;
-        /// Direction of the current resizing
-        Direction_t m_direction;
-        /// Rect of the last maximized window
-        SkinsRect m_maximizeRect;
-        /// Tooltip
-        Tooltip *m_pTooltip;
-        /// Active popup, if any
-        Popup *m_pPopup;
-
-        /// Recursively build a set of windows anchored to the one given.
-        void buildDependSet( WinSet_t &rWinSet, TopWindow *pWindow );
-
-        /// Check anchoring
-        /**
-         * This function updates xOffset and yOffset, to take care of a new
-         * anchoring (if any)
-         */
-        void checkAnchors( TopWindow *pWindow,
-                           int &xOffset, int &yOffset ) const;
+    /// Check anchoring
+    /**
+     * This function updates xOffset and yOffset, to take care of a new
+     * anchoring (if any)
+     */
+    void checkAnchors( TopWindow *pWindow, int &xOffset, int &yOffset ) const;
 };
 
 

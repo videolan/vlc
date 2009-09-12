@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef X11_WINDOW_HPP
@@ -36,57 +36,57 @@ class X11DragDrop;
 /// X11 implementation of OSWindow
 class X11Window: public OSWindow
 {
-    public:
-        X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
-                   X11Display &rDisplay, bool dragDrop, bool playOnDrop,
-                   X11Window *pParentWindow );
+public:
+    X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
+               X11Display &rDisplay, bool dragDrop, bool playOnDrop,
+               X11Window *pParentWindow );
 
-        virtual ~X11Window();
+    virtual ~X11Window();
 
-        // Show the window
-        virtual void show() const;
+    // Show the window
+    virtual void show() const;
 
-        // Hide the window
-        virtual void hide() const;
+    // Hide the window
+    virtual void hide() const;
 
-        /// Move the window
-        virtual void moveResize( int left, int top,
-                                 int width, int height ) const;
+    /// Move the window
+    virtual void moveResize( int left, int top,
+                             int width, int height ) const;
 
-        /// Bring the window on top
-        virtual void raise() const;
+    /// Bring the window on top
+    virtual void raise() const;
 
-        /// Set the opacity of the window (0 = transparent, 255 = opaque)
-        virtual void setOpacity( uint8_t value ) const;
+    /// Set the opacity of the window (0 = transparent, 255 = opaque)
+    virtual void setOpacity( uint8_t value ) const;
 
-        /// Toggle the window on top
-        virtual void toggleOnTop( bool onTop ) const;
+    /// Toggle the window on top
+    virtual void toggleOnTop( bool onTop ) const;
 
-        /// Get the window ID
-        Window getDrawable() const { return m_wnd; }
+    /// Get the window ID
+    Window getDrawable() const { return m_wnd; }
 
-        /// Getter for the handler
-        void* getOSHandle() const { return (void*) m_wnd; }
+    /// Getter for the handler
+    void* getOSHandle() const { return (void*) m_wnd; }
 
-        /// Getter for the handler
-        void* getParentOSHandle() const { return (void*) m_wnd_parent; }
+    /// Getter for the handler
+    void* getParentOSHandle() const { return (void*) m_wnd_parent; }
 
-        /// reparent the window
-        void reparent( void* OSHandle, int x, int y, int w, int h );
+    /// reparent the window
+    void reparent( void* OSHandle, int x, int y, int w, int h );
 
-    private:
-        /// X11 display
-        X11Display &m_rDisplay;
-        /// Window ID
-        Window m_wnd;
-        /// Window ID
-        Window m_wnd_parent;
-        /// Parent window
-        X11Window *m_pParent;
-        /// Indicates whether the window handles drag&drop events
-        bool m_dragDrop;
-        /// Drop target
-        X11DragDrop *m_pDropTarget;
+private:
+    /// X11 display
+    X11Display &m_rDisplay;
+    /// Window ID
+    Window m_wnd;
+    /// Window ID
+    Window m_wnd_parent;
+    /// Parent window
+    X11Window *m_pParent;
+    /// Indicates whether the window handles drag&drop events
+    bool m_dragDrop;
+    /// Drop target
+    X11DragDrop *m_pDropTarget;
 };
 
 

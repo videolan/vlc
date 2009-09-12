@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -47,72 +47,72 @@ class GenericRect;
 /// Class for skin construction
 class Builder: public SkinObject
 {
-    public:
-        Builder( intf_thread_t *pIntf, const BuilderData &rData,
-                 const string &rPath );
-        virtual ~Builder();
+public:
+    Builder( intf_thread_t *pIntf, const BuilderData &rData,
+             const string &rPath );
+    virtual ~Builder();
 
-        /// Create a Theme object, ready to use.
-        /// Return NULL in case of problem
-        Theme *build();
+    /// Create a Theme object, ready to use.
+    /// Return NULL in case of problem
+    Theme *build();
 
-        /// Parse an action tag and returns a command
-        CmdGeneric *parseAction( const string &rAction );
+    /// Parse an action tag and returns a command
+    CmdGeneric *parseAction( const string &rAction );
 
-    private:
-        /// Data from the XML
-        const BuilderData &m_rData;
-        /// Path of the theme
-        const string m_path;
+private:
+    /// Data from the XML
+    const BuilderData &m_rData;
+    /// Path of the theme
+    const string m_path;
 
-        /// Theme under construction
-        Theme *m_pTheme;
+    /// Theme under construction
+    Theme *m_pTheme;
 
-        void addTheme( const BuilderData::Theme &rData );
-        void addIniFile( const BuilderData::IniFile &rData );
-        void addBitmap( const BuilderData::Bitmap &rData );
-        void addSubBitmap( const BuilderData::SubBitmap &rData );
-        void addBitmapFont( const BuilderData::BitmapFont &rData );
-        void addFont( const BuilderData::Font &rData );
-        void addPopupMenu( const BuilderData::PopupMenu &rData );
-        void addMenuItem( const BuilderData::MenuItem &rData );
-        void addMenuSeparator( const BuilderData::MenuSeparator &rData );
-        void addWindow( const BuilderData::Window &rData );
-        void addLayout( const BuilderData::Layout &rData );
-        void addAnchor( const BuilderData::Anchor &rData );
-        void addButton( const BuilderData::Button &rData );
-        void addCheckbox( const BuilderData::Checkbox &rData );
-        void addImage( const BuilderData::Image &rData );
-        void addPanel( const BuilderData::Panel &rData );
-        void addText( const BuilderData::Text &rData );
-        void addRadialSlider( const BuilderData::RadialSlider &rData );
-        void addSlider( const BuilderData::Slider &rData );
-        void addList( const BuilderData::List &rData );
-        void addTree( const BuilderData::Tree &rData );
-        void addVideo( const BuilderData::Video &rData );
+    void addTheme( const BuilderData::Theme &rData );
+    void addIniFile( const BuilderData::IniFile &rData );
+    void addBitmap( const BuilderData::Bitmap &rData );
+    void addSubBitmap( const BuilderData::SubBitmap &rData );
+    void addBitmapFont( const BuilderData::BitmapFont &rData );
+    void addFont( const BuilderData::Font &rData );
+    void addPopupMenu( const BuilderData::PopupMenu &rData );
+    void addMenuItem( const BuilderData::MenuItem &rData );
+    void addMenuSeparator( const BuilderData::MenuSeparator &rData );
+    void addWindow( const BuilderData::Window &rData );
+    void addLayout( const BuilderData::Layout &rData );
+    void addAnchor( const BuilderData::Anchor &rData );
+    void addButton( const BuilderData::Button &rData );
+    void addCheckbox( const BuilderData::Checkbox &rData );
+    void addImage( const BuilderData::Image &rData );
+    void addPanel( const BuilderData::Panel &rData );
+    void addText( const BuilderData::Text &rData );
+    void addRadialSlider( const BuilderData::RadialSlider &rData );
+    void addSlider( const BuilderData::Slider &rData );
+    void addList( const BuilderData::List &rData );
+    void addTree( const BuilderData::Tree &rData );
+    void addVideo( const BuilderData::Video &rData );
 
-        /// Compute the position of a control
-        const Position makePosition( const string &rLeftTop,
-                                     const string &rRightBottom,
-                                     int xPos, int yPos, int width, int height,
-                                     const GenericRect &rRect,
-                                     bool xKeepRatio = false,
-                                     bool yKeepRatio = false ) const;
+    /// Compute the position of a control
+    const Position makePosition( const string &rLeftTop,
+                                 const string &rRightBottom,
+                                 int xPos, int yPos, int width, int height,
+                                 const GenericRect &rRect,
+                                 bool xKeepRatio = false,
+                                 bool yKeepRatio = false ) const;
 
-        // Build the full path of a file
-        string getFilePath( const string &fileName ) const;
+    // Build the full path of a file
+    string getFilePath( const string &fileName ) const;
 
-        /// Get a font from its id
-        GenericFont *getFont( const string &fontId );
+    /// Get a font from its id
+    GenericFont *getFont( const string &fontId );
 
-        /// Function to parse "points" tags
-        Bezier *getPoints( const char *pTag ) const;
+    /// Function to parse "points" tags
+    Bezier *getPoints( const char *pTag ) const;
 
-        /// Compute a color value
-        uint32_t getColor( const string &rVal ) const;
+    /// Compute a color value
+    uint32_t getColor( const string &rVal ) const;
 
-        /// Image handler (used to load image files)
-        image_handler_t *m_pImageHandler;
+    /// Image handler (used to load image files)
+    image_handler_t *m_pImageHandler;
 };
 
 #endif

@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef VOUTMANAGER_HPP
@@ -41,11 +41,10 @@ class SavedWnd
 {
 public:
     SavedWnd( vout_window_t* pWnd, VoutWindow* pVoutWindow = NULL,
-               CtrlVideo* pCtrlVideo = NULL, int height = 0, int width = 0 ) :
-       pWnd( pWnd ), pVoutWindow( pVoutWindow ), pCtrlVideo( pCtrlVideo ),
-       height( height ), width( width ) {}
-
-    ~SavedWnd() {}
+               CtrlVideo* pCtrlVideo = NULL, int height = 0, int width = 0 )
+            : pWnd( pWnd ), pVoutWindow( pVoutWindow ),
+              pCtrlVideo( pCtrlVideo ), height( height ), width( width ) { }
+    ~SavedWnd() { }
 
     vout_window_t* pWnd;
     VoutWindow *pVoutWindow;
@@ -56,84 +55,83 @@ public:
 
 class VoutMainWindow: public GenericWindow
 {
-    public:
+public:
 
-        VoutMainWindow( intf_thread_t *pIntf, int left = 0, int top = 0 ) :
-                GenericWindow( pIntf, left, top, false, false, NULL )
-        {
-            resize( 10, 10 );
-            move( -50, -50 );
-        }
-        virtual ~VoutMainWindow() {}
-
+    VoutMainWindow( intf_thread_t *pIntf, int left = 0, int top = 0 ) :
+            GenericWindow( pIntf, left, top, false, false, NULL )
+    {
+        resize( 10, 10 );
+        move( -50, -50 );
+    }
+    virtual ~VoutMainWindow() { }
 };
 
 
 /// Singleton object handling VLC internal state and playlist
 class VoutManager: public SkinObject
 {
-    public:
-        /// Get the instance of VoutManager
-        /// Returns NULL if the initialization of the object failed
-        static VoutManager *instance( intf_thread_t *pIntf );
+public:
+    /// Get the instance of VoutManager
+    /// Returns NULL if the initialization of the object failed
+    static VoutManager *instance( intf_thread_t *pIntf );
 
-        /// Delete the instance of VoutManager
-        static void destroy( intf_thread_t *pIntf );
+    /// Delete the instance of VoutManager
+    static void destroy( intf_thread_t *pIntf );
 
-        /// Accept Wnd
-        void* acceptWnd( vout_window_t* pWnd );
+    /// Accept Wnd
+    void* acceptWnd( vout_window_t* pWnd );
 
-        /// Release Wnd
-        void releaseWnd( vout_window_t* pWnd );
+    /// Release Wnd
+    void releaseWnd( vout_window_t* pWnd );
 
-        /// set size Wnd
-        void setSizeWnd( vout_window_t* pWnd, int width, int height );
+    /// set size Wnd
+    void setSizeWnd( vout_window_t* pWnd, int width, int height );
 
-        /// set fullscreen Wnd
-        void setFullscreenWnd( vout_window_t* pWnd, bool b_fullscreen );
+    /// set fullscreen Wnd
+    void setFullscreenWnd( vout_window_t* pWnd, bool b_fullscreen );
 
-        /// Callback to request a vout window
-        static void *getWindow( intf_thread_t *pIntf, vout_window_t *pWnd );
+    /// Callback to request a vout window
+    static void *getWindow( intf_thread_t *pIntf, vout_window_t *pWnd );
 
-        // Window provider (release)
-        static void releaseWindow( intf_thread_t *pIntf, vout_window_t *pWnd  );
+    // Window provider (release)
+    static void releaseWindow( intf_thread_t *pIntf, vout_window_t *pWnd  );
 
-        /// Callback to change a vout window
-        static int controlWindow( struct vout_window_t *pWnd,
-                                  int query, va_list args );
+    /// Callback to change a vout window
+    static int controlWindow( struct vout_window_t *pWnd,
+                              int query, va_list args );
 
-        // Register Video Controls (when building theme)
-        void registerCtrlVideo( CtrlVideo* p_CtrlVideo );
+    // Register Video Controls (when building theme)
+    void registerCtrlVideo( CtrlVideo* p_CtrlVideo );
 
-        // save and restore vouts (when changing theme)
-        void saveVoutConfig( );
-        void restoreVoutConfig( bool b_success );
+    // save and restore vouts (when changing theme)
+    void saveVoutConfig( );
+    void restoreVoutConfig( bool b_success );
 
-        // save and restore vouts (when swapping Layout)
-        void discardVout( CtrlVideo* pCtrlVideo );
-        void requestVout( CtrlVideo* pCtrlVideo );
+    // save and restore vouts (when swapping Layout)
+    void discardVout( CtrlVideo* pCtrlVideo );
+    void requestVout( CtrlVideo* pCtrlVideo );
 
-        // get a useable video Control
-        CtrlVideo* getBestCtrlVideo( );
+    // get a useable video Control
+    CtrlVideo* getBestCtrlVideo( );
 
-        // get the VoutMainWindow
-        VoutMainWindow* getVoutMainWindow() { return m_pVoutMainWindow; }
+    // get the VoutMainWindow
+    VoutMainWindow* getVoutMainWindow() { return m_pVoutMainWindow; }
 
-        // test if vout are running
-        bool hasVout() { return ( m_SavedWndVec.size() != 0 ) ; }
+    // test if vout are running
+    bool hasVout() { return ( m_SavedWndVec.size() != 0 ) ; }
 
-    protected:
-        // Protected because it is a singleton
-        VoutManager( intf_thread_t *pIntf );
-        virtual ~VoutManager();
+protected:
+    // Protected because it is a singleton
+    VoutManager( intf_thread_t *pIntf );
+    virtual ~VoutManager();
 
-    private:
+private:
 
-        vector<CtrlVideo *> m_pCtrlVideoVec;
-        vector<CtrlVideo *> m_pCtrlVideoVecBackup;
-        vector<SavedWnd> m_SavedWndVec;
+    vector<CtrlVideo *> m_pCtrlVideoVec;
+    vector<CtrlVideo *> m_pCtrlVideoVecBackup;
+    vector<SavedWnd> m_SavedWndVec;
 
-        VoutMainWindow* m_pVoutMainWindow;
+    VoutMainWindow* m_pVoutMainWindow;
 };
 
 

@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CTRL_RADIALSLIDER_HPP
@@ -38,60 +38,60 @@ class VarPercent;
 /// Radial slider
 class CtrlRadialSlider: public CtrlGeneric, public Observer<VarPercent>
 {
-    public:
-        /// Create a radial slider with the given image, which must be
-        /// composed of numImg subimages of the same size
-        CtrlRadialSlider( intf_thread_t *pIntf, const GenericBitmap &rBmpSeq,
-                          int numImg, VarPercent &rVariable, float minAngle,
-                          float maxAngle, const UString &rHelp,
-                          VarBool *pVisible );
+public:
+    /// Create a radial slider with the given image, which must be
+    /// composed of numImg subimages of the same size
+    CtrlRadialSlider( intf_thread_t *pIntf, const GenericBitmap &rBmpSeq,
+                      int numImg, VarPercent &rVariable, float minAngle,
+                      float maxAngle, const UString &rHelp,
+                      VarBool *pVisible );
 
-        virtual ~CtrlRadialSlider();
+    virtual ~CtrlRadialSlider();
 
-        /// Handle an event
-        virtual void handleEvent( EvtGeneric &rEvent );
+    /// Handle an event
+    virtual void handleEvent( EvtGeneric &rEvent );
 
-        /// Check whether coordinates are inside the control
-        virtual bool mouseOver( int x, int y ) const;
+    /// Check whether coordinates are inside the control
+    virtual bool mouseOver( int x, int y ) const;
 
-        /// Draw the control on the given graphics
-        virtual void draw( OSGraphics &rImage, int xDest, int yDest );
+    /// Draw the control on the given graphics
+    virtual void draw( OSGraphics &rImage, int xDest, int yDest );
 
-        /// Get the type of control (custom RTTI)
-        virtual string getType() const { return "radial_slider"; }
+    /// Get the type of control (custom RTTI)
+    virtual string getType() const { return "radial_slider"; }
 
-    private:
-        /// Finite state machine of the control
-        FSM m_fsm;
-        /// Number of sub-images in the slider image
-        int m_numImg;
-        /// Variable associated to the slider
-        VarPercent &m_rVariable;
-        /// Min and max angles of the button
-        float m_minAngle, m_maxAngle;
-        /// Position of the cursor
-        int m_position;
-        /// Size of an image
-        int m_width, m_height;
-        /// The last received event
-        EvtGeneric *m_pEvt;
-        /// Sequence of images
-        OSGraphics *m_pImgSeq;
-        /// Last saved position
-        int m_lastPos;
+private:
+    /// Finite state machine of the control
+    FSM m_fsm;
+    /// Number of sub-images in the slider image
+    int m_numImg;
+    /// Variable associated to the slider
+    VarPercent &m_rVariable;
+    /// Min and max angles of the button
+    float m_minAngle, m_maxAngle;
+    /// Position of the cursor
+    int m_position;
+    /// Size of an image
+    int m_width, m_height;
+    /// The last received event
+    EvtGeneric *m_pEvt;
+    /// Sequence of images
+    OSGraphics *m_pImgSeq;
+    /// Last saved position
+    int m_lastPos;
 
-        /// Callback objects
-        DEFINE_CALLBACK( CtrlRadialSlider, UpDown )
-        DEFINE_CALLBACK( CtrlRadialSlider, DownUp )
-        DEFINE_CALLBACK( CtrlRadialSlider, Move )
+    /// Callback objects
+    DEFINE_CALLBACK( CtrlRadialSlider, UpDown )
+    DEFINE_CALLBACK( CtrlRadialSlider, DownUp )
+    DEFINE_CALLBACK( CtrlRadialSlider, Move )
 
-        /// Method called when the observed variable is modified
-        virtual void onUpdate( Subject<VarPercent> &rVariable, void* );
+    /// Method called when the observed variable is modified
+    virtual void onUpdate( Subject<VarPercent> &rVariable, void* );
 
-        /// Change the position of the cursor, with the given position of
-        /// the mouse (relative to the layout). Is blocking is true, the
-        /// the cursor cannot do more than a half turn
-        void setCursor( int posX, int posY, bool blocking );
+    /// Change the position of the cursor, with the given position of
+    /// the mouse (relative to the layout). Is blocking is true, the
+    /// the cursor cannot do more than a half turn
+    void setCursor( int posX, int posY, bool blocking );
 };
 
 

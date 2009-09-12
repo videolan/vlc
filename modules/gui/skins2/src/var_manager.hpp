@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef VAR_MANAGER_HPP
@@ -32,54 +32,54 @@
 
 class VarManager: public SkinObject
 {
-    public:
-        /// Get the instance of VarManager
-        static VarManager *instance( intf_thread_t *pIntf );
+public:
+    /// Get the instance of VarManager
+    static VarManager *instance( intf_thread_t *pIntf );
 
-        /// Delete the instance of VarManager
-        static void destroy( intf_thread_t *pIntf );
+    /// Delete the instance of VarManager
+    static void destroy( intf_thread_t *pIntf );
 
-        /// Register a named variable in the manager
-        void registerVar( const VariablePtr &rcVar, const string &rName );
+    /// Register a named variable in the manager
+    void registerVar( const VariablePtr &rcVar, const string &rName );
 
-        /// Register an anonymous variable in the manager
-        void registerVar( const VariablePtr &rcVar );
+    /// Register an anonymous variable in the manager
+    void registerVar( const VariablePtr &rcVar );
 
-        /// Get a variable by its name (NULL if not found)
-        Variable *getVar( const string &rName );
+    /// Get a variable by its name (NULL if not found)
+    Variable *getVar( const string &rName );
 
-        /// Get a variable by its name and check the type (NULL if not found)
-        Variable *getVar( const string &rName, const string &rType );
+    /// Get a variable by its name and check the type (NULL if not found)
+    Variable *getVar( const string &rName, const string &rType );
 
-        /// Get the tooltip text variable
-        VarText &getTooltipText() { return *m_pTooltipText; }
+    /// Get the tooltip text variable
+    VarText &getTooltipText() { return *m_pTooltipText; }
 
-        /// Get the help text variable
-        VarText &getHelpText() { return *m_pHelpText; }
+    /// Get the help text variable
+    VarText &getHelpText() { return *m_pHelpText; }
 
-        /// Register a constant value
-        void registerConst( const string &rName, const string &rValue);
+    /// Register a constant value
+    void registerConst( const string &rName, const string &rValue);
 
-        /// Get a constant value by its name
-        string getConst( const string &rName );
+    /// Get a constant value by its name
+    string getConst( const string &rName );
 
-    private:
-        /// Tooltip text
-        VarText *m_pTooltipText;
-        /// Help text
-        VarText *m_pHelpText;
-        /// Map of named registered variables
-        map<string, VariablePtr> m_varMap;
-        /// List of named registed variables
-        list<string> m_varList;
-        /// List of anonymous registed variables
-        list<VariablePtr> m_anonVarList;
-        /// Map of constant values
-        map<string, string> m_constMap;
+private:
+    /// Tooltip text
+    VarText *m_pTooltipText;
+    /// Help text
+    VarText *m_pHelpText;
+    /// Map of named registered variables
+    map<string, VariablePtr> m_varMap;
+    /// List of named registed variables
+    list<string> m_varList;
+    /// List of anonymous registed variables
+    list<VariablePtr> m_anonVarList;
+    /// Map of constant values
+    map<string, string> m_constMap;
 
-        /// Private because it is a singleton
-        VarManager( intf_thread_t *pIntf );
-        virtual ~VarManager();
+    /// Private because it is a singleton
+    VarManager( intf_thread_t *pIntf );
+    virtual ~VarManager();
 };
 
 

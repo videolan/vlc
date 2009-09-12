@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef POPUP_HPP
@@ -39,33 +39,33 @@ class EvtMenu;
 /// Class handling a popup menu
 class Popup: public SkinObject
 {
-    public:
-        Popup( intf_thread_t *pIntf, WindowManager &rWindowManager );
-        virtual ~Popup() {}
+public:
+    Popup( intf_thread_t *pIntf, WindowManager &rWindowManager );
+    virtual ~Popup() { }
 
-        void show( int xPos, int yPos );
-        void hide();
+    void show( int xPos, int yPos );
+    void hide();
 
-        // XXX: it would be nice to use a UString here, if X11 supports it for
-        // its menu items (Windows doesn't, unfortunately)
-        /// Insert a new menu item to the popup menu, at the position pos
-        void addItem( const string &rLabel, CmdGeneric &rCmd, int pos );
+    // XXX: it would be nice to use a UString here, if X11 supports it for
+    // its menu items (Windows doesn't, unfortunately)
+    /// Insert a new menu item to the popup menu, at the position pos
+    void addItem( const string &rLabel, CmdGeneric &rCmd, int pos );
 
-        /// Create a dummy menu item to separate sections
-        void addSeparator( int pos );
+    /// Create a dummy menu item to separate sections
+    void addSeparator( int pos );
 
-        /// Execute the action corresponding to the chosen menu item
-        void handleEvent( const EvtMenu &rEvent );
+    /// Execute the action corresponding to the chosen menu item
+    void handleEvent( const EvtMenu &rEvent );
 
-    private:
-        /// OS specific implementation
-        OSPopup *m_pOsPopup;
+private:
+    /// OS specific implementation
+    OSPopup *m_pOsPopup;
 
-        /// Window manager
-        WindowManager &m_rWindowManager;
+    /// Window manager
+    WindowManager &m_rWindowManager;
 
-        /// Actions for the menu items, indexed by the position in the menu
-        map<int, CmdGeneric *> m_actions;
+    /// Actions for the menu items, indexed by the position in the menu
+    map<int, CmdGeneric *> m_actions;
 };
 
 typedef CountedPtr<Popup> PopupPtr;

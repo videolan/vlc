@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef SCALED_BITMAP_HPP
@@ -31,28 +31,28 @@
 /// Class for scaling bitmaps
 class ScaledBitmap: public GenericBitmap
 {
-    public:
-        /// Create a scaled bitmap from the given bitmap and size
-        ScaledBitmap( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
-                      int width, int height );
+public:
+    /// Create a scaled bitmap from the given bitmap and size
+    ScaledBitmap( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
+                  int width, int height );
 
-        virtual ~ScaledBitmap();
+    virtual ~ScaledBitmap();
 
-        /// Get the width of the bitmap
-        virtual int getWidth() const { return m_width; }
+    /// Get the width of the bitmap
+    virtual int getWidth() const { return m_width; }
 
-        /// Get the heighth of the bitmap
-        virtual int getHeight() const { return m_height; }
+    /// Get the heighth of the bitmap
+    virtual int getHeight() const { return m_height; }
 
-        /// Get a linear buffer containing the image data.
-        /// Each pixel is stored in 4 bytes in the order B,G,R,A
-        virtual uint8_t *getData() const { return m_pData; }
+    /// Get a linear buffer containing the image data.
+    /// Each pixel is stored in 4 bytes in the order B,G,R,A
+    virtual uint8_t *getData() const { return m_pData; }
 
-    private:
-        /// Bitmap size
-        int m_width, m_height;
-        /// Image data buffer
-        uint8_t *m_pData;
+private:
+    /// Bitmap size
+    int m_width, m_height;
+    /// Image data buffer
+    uint8_t *m_pData;
 };
 
 

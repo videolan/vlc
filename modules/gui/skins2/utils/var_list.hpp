@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef VAR_LIST_HPP
@@ -36,73 +36,73 @@
 /// List variable
 class VarList: public Variable, public Subject<VarList>
 {
-    public:
-        VarList( intf_thread_t *pIntf );
-        virtual ~VarList();
+public:
+    VarList( intf_thread_t *pIntf );
+    virtual ~VarList();
 
-        /// Get the variable type
-        virtual const string &getType() const { return m_type; }
+    /// Get the variable type
+    virtual const string &getType() const { return m_type; }
 
-        /// Add a pointer on a string in the list
-        virtual void add( const UStringPtr &rcString );
+    /// Add a pointer on a string in the list
+    virtual void add( const UStringPtr &rcString );
 
-        /// Remove the selected elements from the list
-        virtual void delSelected();
+    /// Remove the selected elements from the list
+    virtual void delSelected();
 
-        /// Remove all the elements from the list
-        virtual void clear();
+    /// Remove all the elements from the list
+    virtual void clear();
 
-        /// Get the number of items in the list
-        int size() const { return m_list.size(); }
+    /// Get the number of items in the list
+    int size() const { return m_list.size(); }
 
-        /// Type of an element in the list
-        struct Elem_t
-        {
-            UStringPtr m_cString;
-            bool m_selected;
-            bool m_playing;
+    /// Type of an element in the list
+    struct Elem_t
+    {
+        UStringPtr m_cString;
+        bool m_selected;
+        bool m_playing;
 
-            Elem_t( const UStringPtr &rcString, bool selected = false, bool
-                    playing = false ):
-                m_cString( rcString ), m_selected( selected ),
-                m_playing( playing) {}
-        };
+        Elem_t( const UStringPtr &rcString,
+                bool selected = false, bool playing = false )
+              : m_cString( rcString ),
+                m_selected( selected ), m_playing( playing ) { }
+    };
 
-        /// Iterators
-        typedef list<Elem_t>::iterator Iterator;
-        typedef list<Elem_t>::const_iterator ConstIterator;
+    /// Iterators
+    typedef list<Elem_t>::iterator Iterator;
+    typedef list<Elem_t>::const_iterator ConstIterator;
 
-        /// Beginning of the list
-        Iterator begin() { return m_list.begin(); }
-        ConstIterator begin() const { return m_list.begin(); }
+    /// Beginning of the list
+    Iterator begin() { return m_list.begin(); }
+    ConstIterator begin() const { return m_list.begin(); }
 
-        /// End of the list
-        Iterator end() { return m_list.end(); }
-        ConstIterator end() const { return m_list.end(); }
+    /// End of the list
+    Iterator end() { return m_list.end(); }
+    ConstIterator end() const { return m_list.end(); }
 
-        /// Return an iterator on the n'th element of the list
-        Iterator operator[]( int n );
-        ConstIterator operator[]( int n ) const;
+    /// Return an iterator on the n'th element of the list
+    Iterator operator[]( int n );
+    ConstIterator operator[]( int n ) const;
 
-        /// Execute the action associated to this item
-        virtual void action( Elem_t *pItem ) {}
+    /// Execute the action associated to this item
+    virtual void action( Elem_t *pItem ) { }
 
-        /// Get a reference on the position variable
-        VarPercent &getPositionVar() const
-            { return *((VarPercent*)m_cPosition.get()); }
+    /// Get a reference on the position variable
+    VarPercent &getPositionVar() const
+        { return *((VarPercent*)m_cPosition.get()); }
 
-        /// Get a counted pointer on the position variable
-        const VariablePtr &getPositionVarPtr() const { return m_cPosition; }
+    /// Get a counted pointer on the position variable
+    const VariablePtr &getPositionVarPtr() const { return m_cPosition; }
 
-    protected:
-        /// List of elements
-        list<Elem_t> m_list;
+protected:
+    /// List of elements
+    list<Elem_t> m_list;
 
-    private:
-        /// Variable type
-        static const string m_type;
-        /// Position variable
-        VariablePtr m_cPosition;
+private:
+    /// Variable type
+    static const string m_type;
+    /// Position variable
+    VariablePtr m_cPosition;
 };
 
 

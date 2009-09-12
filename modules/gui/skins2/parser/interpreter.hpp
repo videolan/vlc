@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef INTERPRETER_HPP
@@ -38,41 +38,41 @@ class VarPercent;
 /// Command interpreter for scripts in the XML
 class Interpreter: public SkinObject
 {
-    public:
-        /// Get the instance of Interpreter
-        static Interpreter *instance( intf_thread_t *pIntf );
+public:
+    /// Get the instance of Interpreter
+    static Interpreter *instance( intf_thread_t *pIntf );
 
-        /// Delete the instance of Interpreter
-        static void destroy( intf_thread_t *pIntf );
+    /// Delete the instance of Interpreter
+    static void destroy( intf_thread_t *pIntf );
 
-        /// Parse an action tag and returns a pointer on a command
-        /// (the intepreter takes care of deleting it, don't do it
-        ///  yourself !)
-        CmdGeneric *parseAction( const string &rAction, Theme *pTheme );
+    /// Parse an action tag and returns a pointer on a command
+    /// (the intepreter takes care of deleting it, don't do it
+    ///  yourself !)
+    CmdGeneric *parseAction( const string &rAction, Theme *pTheme );
 
-        /// Returns the boolean variable corresponding to the given name
-        VarBool *getVarBool( const string &rName, Theme *pTheme );
+    /// Returns the boolean variable corresponding to the given name
+    VarBool *getVarBool( const string &rName, Theme *pTheme );
 
 
-        /// Returns the percent variable corresponding to the given name
-        VarPercent *getVarPercent( const string &rName, Theme *pTheme );
+    /// Returns the percent variable corresponding to the given name
+    VarPercent *getVarPercent( const string &rName, Theme *pTheme );
 
-        /// Returns the list variable corresponding to the given name
-        VarList *getVarList( const string &rName, Theme *pTheme );
+    /// Returns the list variable corresponding to the given name
+    VarList *getVarList( const string &rName, Theme *pTheme );
 
-        /// Returns the tree variable corresponding to the given name
-        VarTree *getVarTree( const string &rName, Theme *pTheme );
+    /// Returns the tree variable corresponding to the given name
+    VarTree *getVarTree( const string &rName, Theme *pTheme );
 
-        /// Get a constant value
-        string getConstant( const string &rValue );
+    /// Get a constant value
+    string getConstant( const string &rValue );
 
-    private:
-        /// Map of global commands
-        map<string, CmdGenericPtr> m_commandMap;
+private:
+    /// Map of global commands
+    map<string, CmdGenericPtr> m_commandMap;
 
-        // Private because it is a singleton
-        Interpreter( intf_thread_t *pIntf );
-        virtual ~Interpreter() {}
+    // Private because it is a singleton
+    Interpreter( intf_thread_t *pIntf );
+    virtual ~Interpreter() { }
 };
 
 #endif

@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CTRL_VIDEO_HPP
@@ -33,79 +33,79 @@
 /// Control video
 class CtrlVideo: public CtrlGeneric, public Observer<VarBox>
 {
-    public:
-        CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
-                   bool autoResize, const UString &rHelp, VarBool *pVisible );
-        virtual ~CtrlVideo();
+public:
+    CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
+               bool autoResize, const UString &rHelp, VarBool *pVisible );
+    virtual ~CtrlVideo();
 
-        /// Handle an event on the control
-        virtual void handleEvent( EvtGeneric &rEvent );
+    /// Handle an event on the control
+    virtual void handleEvent( EvtGeneric &rEvent );
 
-        /// Check whether coordinates are inside the control
-        virtual bool mouseOver( int x, int y ) const;
+    /// Check whether coordinates are inside the control
+    virtual bool mouseOver( int x, int y ) const;
 
-        /// Callback for layout resize
-        virtual void onResize();
+    /// Callback for layout resize
+    virtual void onResize();
 
-        /// Called when the Position is set
-        virtual void onPositionChange();
+    /// Called when the Position is set
+    virtual void onPositionChange();
 
-        /// Draw the control on the given graphics
-        virtual void draw( OSGraphics &rImage, int xDest, int yDest );
+    /// Draw the control on the given graphics
+    virtual void draw( OSGraphics &rImage, int xDest, int yDest );
 
-        /// Get the type of control (custom RTTI)
-        virtual string getType() const { return "video"; }
+    /// Get the type of control (custom RTTI)
+    virtual string getType() const { return "video"; }
 
-        /// Method called when the vout size is updated
-        virtual void onUpdate( Subject<VarBox> &rVoutSize, void* );
+    /// Method called when the vout size is updated
+    virtual void onUpdate( Subject<VarBox> &rVoutSize, void* );
 
-        /// Method called when visibility or ActiveLayout is updated
-        virtual void onUpdate( Subject<VarBool> &rVariable , void* );
+    /// Method called when visibility or ActiveLayout is updated
+    virtual void onUpdate( Subject<VarBool> &rVariable , void* );
 
-        // Attach a voutWindow to a Video Control
-        void attachVoutWindow( VoutWindow* pVoutWindow,
-                               int width = -1, int height = -1 );
+    // Attach a voutWindow to a Video Control
+    void attachVoutWindow( VoutWindow* pVoutWindow,
+                           int width = -1, int height = -1 );
 
-        // Detach a voutWindow from a Video Control
-        void detachVoutWindow( );
+    // Detach a voutWindow from a Video Control
+    void detachVoutWindow( );
 
-        // Update the inner part of the Video Control
-        void resizeInnerVout( );
+    // Update the inner part of the Video Control
+    void resizeInnerVout( );
 
-        // Get TopWindow associated with the video control
-        virtual TopWindow* getWindow() { return CtrlGeneric::getWindow(); }
+    // Get TopWindow associated with the video control
+    virtual TopWindow* getWindow() { return CtrlGeneric::getWindow(); }
 
-        // Get the VoutWindow associated with the video control
-        virtual VoutWindow* getVoutWindow() { return m_pVoutWindow; }
+    // Get the VoutWindow associated with the video control
+    virtual VoutWindow* getVoutWindow() { return m_pVoutWindow; }
 
-        /// Set the position and the associated layout of the control
-        virtual void setLayout( GenericLayout *pLayout,
-                                const Position &rPosition );
+    /// Set the position and the associated layout of the control
+    virtual void setLayout( GenericLayout *pLayout,
+                            const Position &rPosition );
 
-        // resize the video Control
-        virtual void resizeControl( int width, int height );
+    // resize the video Control
+    virtual void resizeControl( int width, int height );
 
-        // Is this control useable (visibility requirements)
-        virtual bool isUseable() { return m_bIsUseable; }
+    // Is this control useable (visibility requirements)
+    virtual bool isUseable() { return m_bIsUseable; }
 
-        // Is this control used
-        virtual bool isUsed() { return m_pVoutWindow ? true : false; }
+    // Is this control used
+    virtual bool isUsed() { return m_pVoutWindow ? true : false; }
 
-    private:
-        /// Associated layout
-        GenericLayout &m_rLayout;
+private:
+    /// Associated layout
+    GenericLayout &m_rLayout;
 
-        /// Autoresize parameter
-        bool m_bAutoResize;
+    /// Autoresize parameter
+    bool m_bAutoResize;
 
-        /// Difference between layout size and video size
-        int m_xShift, m_yShift;
+    /// Difference between layout size and video size
+    int m_xShift, m_yShift;
 
-        /// Is the video Control useable
-        bool m_bIsUseable;
+    /// Is the video Control useable
+    bool m_bIsUseable;
 
-        /// Vout window
-        VoutWindow *m_pVoutWindow;
+    /// Vout window
+    VoutWindow *m_pVoutWindow;
 };
 
 #endif

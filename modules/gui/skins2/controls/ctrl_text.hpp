@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CTRL_TEXT_HPP
@@ -40,100 +40,100 @@ class VarText;
 /// Class for control text
 class CtrlText: public CtrlGeneric, public Observer<VarText>
 {
-    public:
-        enum Align_t
-        {
-            kLeft,
-            kCenter,
-            kRight
-        };
+public:
+    enum Align_t
+    {
+        kLeft,
+        kCenter,
+        kRight
+    };
 
-        enum Scrolling_t
-        {
-            // The text starts scrolling automatically if it is larger than the
-            // width of the control. The user can still stop it or make it
-            // scroll manually with the mouse.
-            kAutomatic,
-            // Only manual scrolling is allowed (with the mouse)
-            kManual,
-            // No scrolling of the text is allowed
-            kNone
-        };
+    enum Scrolling_t
+    {
+        // The text starts scrolling automatically if it is larger than the
+        // width of the control. The user can still stop it or make it
+        // scroll manually with the mouse.
+        kAutomatic,
+        // Only manual scrolling is allowed (with the mouse)
+        kManual,
+        // No scrolling of the text is allowed
+        kNone
+    };
 
-        /// Create a text control with the optional given color
-        CtrlText( intf_thread_t *pIntf, VarText &rVariable,
-                  const GenericFont &rFont, const UString &rHelp,
-                  uint32_t color, VarBool *pVisible, Scrolling_t scrollMode,
-                  Align_t alignment);
-        virtual ~CtrlText();
+    /// Create a text control with the optional given color
+    CtrlText( intf_thread_t *pIntf, VarText &rVariable,
+              const GenericFont &rFont, const UString &rHelp,
+              uint32_t color, VarBool *pVisible, Scrolling_t scrollMode,
+              Align_t alignment);
+    virtual ~CtrlText();
 
-        /// Handle an event
-        virtual void handleEvent( EvtGeneric &rEvent );
+    /// Handle an event
+    virtual void handleEvent( EvtGeneric &rEvent );
 
-        /// Check whether coordinates are inside the control
-        virtual bool mouseOver( int x, int y ) const;
+    /// Check whether coordinates are inside the control
+    virtual bool mouseOver( int x, int y ) const;
 
-        /// Draw the control on the given graphics
-        virtual void draw( OSGraphics &rImage, int xDest, int yDest );
+    /// Draw the control on the given graphics
+    virtual void draw( OSGraphics &rImage, int xDest, int yDest );
 
-        /// Set the text of the control, with an optional color
-        /// This takes effect immediatly
-        void setText( const UString &rText, uint32_t color = 0xFFFFFFFF );
+    /// Set the text of the control, with an optional color
+    /// This takes effect immediatly
+    void setText( const UString &rText, uint32_t color = 0xFFFFFFFF );
 
-        /// Get the type of control (custom RTTI)
-        virtual string getType() const { return "text"; }
+    /// Get the type of control (custom RTTI)
+    virtual string getType() const { return "text"; }
 
-    private:
-        /// Finite state machine of the control
-        FSM m_fsm;
-        /// Variable associated to the control
-        VarText &m_rVariable;
-        /// Callback objects
-        DEFINE_CALLBACK( CtrlText, ToManual )
-        DEFINE_CALLBACK( CtrlText, ManualMoving )
-        DEFINE_CALLBACK( CtrlText, ManualStill )
-        DEFINE_CALLBACK( CtrlText, Move )
-        /// The last received event
-        EvtGeneric *m_pEvt;
-        /// Font used to render the text
-        const GenericFont &m_rFont;
-        /// Color of the text
-        uint32_t m_color;
-        /// Scrolling mode
-        Scrolling_t m_scrollMode;
-        /// Type of alignment
-        Align_t m_alignment;
-        /// Image of the text
-        GenericBitmap *m_pImg;
-        /// Image of the text, repeated twice and with some blank between;
-        /// useful to display a 'circular' moving text...
-        GenericBitmap *m_pImgDouble;
-        /// Current image (should always be equal to m_pImg or m_pImgDouble)
-        GenericBitmap *m_pCurrImg;
-        /// Position of the left side of the moving text (always <= 0)
-        int m_xPos;
-        /// Offset between the mouse pointer and the left side of the
-        /// moving text
-        int m_xOffset;
-         /// Timer to move the text
-        OSTimer *m_pTimer;
+private:
+    /// Finite state machine of the control
+    FSM m_fsm;
+    /// Variable associated to the control
+    VarText &m_rVariable;
+    /// Callback objects
+    DEFINE_CALLBACK( CtrlText, ToManual )
+    DEFINE_CALLBACK( CtrlText, ManualMoving )
+    DEFINE_CALLBACK( CtrlText, ManualStill )
+    DEFINE_CALLBACK( CtrlText, Move )
+    /// The last received event
+    EvtGeneric *m_pEvt;
+    /// Font used to render the text
+    const GenericFont &m_rFont;
+    /// Color of the text
+    uint32_t m_color;
+    /// Scrolling mode
+    Scrolling_t m_scrollMode;
+    /// Type of alignment
+    Align_t m_alignment;
+    /// Image of the text
+    GenericBitmap *m_pImg;
+    /// Image of the text, repeated twice and with some blank between;
+    /// useful to display a 'circular' moving text...
+    GenericBitmap *m_pImgDouble;
+    /// Current image (should always be equal to m_pImg or m_pImgDouble)
+    GenericBitmap *m_pCurrImg;
+    /// Position of the left side of the moving text (always <= 0)
+    int m_xPos;
+    /// Offset between the mouse pointer and the left side of the
+    /// moving text
+    int m_xOffset;
+     /// Timer to move the text
+    OSTimer *m_pTimer;
 
-        /// Callback for the timer
-        DEFINE_CALLBACK( CtrlText, UpdateText );
+    /// Callback for the timer
+    DEFINE_CALLBACK( CtrlText, UpdateText );
 
-        /// Method called when the observed variable is modified
-        virtual void onUpdate( Subject<VarText> &rVariable, void* );
+    /// Method called when the observed variable is modified
+    virtual void onUpdate( Subject<VarText> &rVariable, void* );
 
-        /// Display the text on the control
-        void displayText( const UString &rText );
+    /// Display the text on the control
+    void displayText( const UString &rText );
 
-        /// Helper function to set the position in the correct interval
-        void adjust( int &position );
+    /// Helper function to set the position in the correct interval
+    void adjust( int &position );
 
-        /// Update the behaviour of the text whenever the control size changes
-        virtual void onPositionChange();
-        /// Update the behaviour of the text whenever the control size changes
-        virtual void onResize();
+    /// Update the behaviour of the text whenever the control size changes
+    virtual void onPositionChange();
+    /// Update the behaviour of the text whenever the control size changes
+    virtual void onResize();
 };
 
 

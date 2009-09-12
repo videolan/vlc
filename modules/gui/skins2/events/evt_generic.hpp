@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef EVT_GENERIC_HPP
@@ -32,14 +32,14 @@
 /// Base class for OS events
 class EvtGeneric: public SkinObject
 {
-    public:
-        virtual ~EvtGeneric() {}
+public:
+    virtual ~EvtGeneric() { }
 
-        /// Return the type of the event
-        virtual const string getAsString() const = 0;
+    /// Return the type of the event
+    virtual const string getAsString() const = 0;
 
-    protected:
-        EvtGeneric( intf_thread_t *pIntf ): SkinObject( pIntf ) {}
+protected:
+    EvtGeneric( intf_thread_t *pIntf ): SkinObject( pIntf ) { }
 };
 
 

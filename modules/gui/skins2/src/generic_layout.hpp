@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef GENERIC_LAYOUT_HPP
@@ -43,7 +43,7 @@ class VarBoolImpl;
 struct LayeredControl
 {
     LayeredControl( CtrlGeneric *pControl, int layer ):
-        m_pControl( pControl ), m_layer( layer ) {}
+        m_pControl( pControl ), m_layer( layer ) { }
 
     /// Pointer on the control
     CtrlGeneric *m_pControl;
@@ -55,123 +55,122 @@ struct LayeredControl
 /// Base class for layouts
 class GenericLayout: public SkinObject
 {
-    public:
-        GenericLayout( intf_thread_t *pIntf, int width, int height,
-                       int minWidth, int maxWidth, int minHeight,
-                       int maxHeight );
+public:
+    GenericLayout( intf_thread_t *pIntf, int width, int height,
+                   int minWidth, int maxWidth, int minHeight, int maxHeight );
 
-        virtual ~GenericLayout();
+    virtual ~GenericLayout();
 
-        /// Attach the layout to a window
-        virtual void setWindow( TopWindow *pWindow );
+    /// Attach the layout to a window
+    virtual void setWindow( TopWindow *pWindow );
 
-        /// Get the associated window, if any
-        virtual TopWindow *getWindow() const { return m_pWindow; }
+    /// Get the associated window, if any
+    virtual TopWindow *getWindow() const { return m_pWindow; }
 
-        /// Called by a control which wants to capture the mouse
-        virtual void onControlCapture( const CtrlGeneric &rCtrl );
+    /// Called by a control which wants to capture the mouse
+    virtual void onControlCapture( const CtrlGeneric &rCtrl );
 
-        /// Called by a control which wants to release the mouse
-        virtual void onControlRelease( const CtrlGeneric &rCtrl );
+    /// Called by a control which wants to release the mouse
+    virtual void onControlRelease( const CtrlGeneric &rCtrl );
 
-        /// Refresh the window
-        virtual void refreshAll();
+    /// Refresh the window
+    virtual void refreshAll();
 
-        /// Refresh a rectangular portion of the window
-        virtual void refreshRect( int x, int y, int width, int height );
+    /// Refresh a rectangular portion of the window
+    virtual void refreshRect( int x, int y, int width, int height );
 
-        /// Get the image of the layout
-        virtual OSGraphics *getImage() const { return m_pImage; }
+    /// Get the image of the layout
+    virtual OSGraphics *getImage() const { return m_pImage; }
 
-        /// Get the position of the layout (relative to the screen)
-        /**
-         * Note: These values are different from the m_rect.getLeft() and
-         * m_rect.getTop(), which always return 0.
-         * The latter methods are there as a "root rect" for the panels and
-         * controls, since each control knows its parent rect, but returns
-         * coordinates relative to the root rect.
-         */
-        virtual int getLeft() const { return m_pWindow->getLeft(); }
-        virtual int getTop() const { return m_pWindow->getTop(); }
+    /// Get the position of the layout (relative to the screen)
+    /**
+     * Note: These values are different from the m_rect.getLeft() and
+     * m_rect.getTop(), which always return 0.
+     * The latter methods are there as a "root rect" for the panels and
+     * controls, since each control knows its parent rect, but returns
+     * coordinates relative to the root rect.
+     */
+    virtual int getLeft() const { return m_pWindow->getLeft(); }
+    virtual int getTop() const { return m_pWindow->getTop(); }
 
-        /// Get the size of the layout
-        virtual int getWidth() const { return m_rect.getWidth(); }
-        virtual int getHeight() const { return m_rect.getHeight(); }
-        virtual const GenericRect &getRect() const { return m_rect; }
+    /// Get the size of the layout
+    virtual int getWidth() const { return m_rect.getWidth(); }
+    virtual int getHeight() const { return m_rect.getHeight(); }
+    virtual const GenericRect &getRect() const { return m_rect; }
 
-        /// Get the minimum and maximum size of the layout
-        virtual int getMinWidth() const { return m_minWidth; }
-        virtual int getMaxWidth() const { return m_maxWidth; }
-        virtual int getMinHeight() const { return m_minHeight; }
-        virtual int getMaxHeight() const { return m_maxHeight; }
+    /// Get the minimum and maximum size of the layout
+    virtual int getMinWidth() const { return m_minWidth; }
+    virtual int getMaxWidth() const { return m_maxWidth; }
+    virtual int getMinHeight() const { return m_minHeight; }
+    virtual int getMaxHeight() const { return m_maxHeight; }
 
-        /// specific refresh window (if video controls)
-        virtual void computeRefresh( int x, int y, int width, int height );
+    /// specific refresh window (if video controls)
+    virtual void computeRefresh( int x, int y, int width, int height );
 
-        /// Resize the layout
-        virtual void resize( int width, int height );
+    /// Resize the layout
+    virtual void resize( int width, int height );
 
-        /**
-         * Add a control in the layout at the given position, and
-         * the optional given layer
-         */
-        virtual void addControl( CtrlGeneric *pControl,
-                                 const Position &rPosition,
-                                 int layer );
+    /**
+     * Add a control in the layout at the given position, and
+     * the optional given layer
+     */
+    virtual void addControl( CtrlGeneric *pControl,
+                             const Position &rPosition,
+                             int layer );
 
-        /// Get the list of the controls in this layout, by layer order
-        virtual const list<LayeredControl> &getControlList() const;
+    /// Get the list of the controls in this layout, by layer order
+    virtual const list<LayeredControl> &getControlList() const;
 
-        /// Called by a control when its image has changed
-        /**
-         * The arguments indicate the size of the rectangle to refresh,
-         * and the offset (from the control position) of this rectangle.
-         * Use a negative width or height to refresh the layout completely
-         */
-        virtual void onControlUpdate( const CtrlGeneric &rCtrl,
-                                      int width, int height,
-                                      int xOffSet, int yOffSet );
+    /// Called by a control when its image has changed
+    /**
+     * The arguments indicate the size of the rectangle to refresh,
+     * and the offset (from the control position) of this rectangle.
+     * Use a negative width or height to refresh the layout completely
+     */
+    virtual void onControlUpdate( const CtrlGeneric &rCtrl,
+                                  int width, int height,
+                                  int xOffSet, int yOffSet );
 
-        /// Get the list of the anchors of this layout
-        virtual const list<Anchor*>& getAnchorList() const;
+    /// Get the list of the anchors of this layout
+    virtual const list<Anchor*>& getAnchorList() const;
 
-        /// Add an anchor to this layout
-        virtual void addAnchor( Anchor *pAnchor );
+    /// Add an anchor to this layout
+    virtual void addAnchor( Anchor *pAnchor );
 
-        /// Called when the layout is shown
-        virtual void onShow();
+    /// Called when the layout is shown
+    virtual void onShow();
 
-        /// Called when the layout is hidden
-        virtual void onHide();
+    /// Called when the layout is hidden
+    virtual void onHide();
 
-        /// Give access to the "active layout" variable
-        // FIXME: we give read/write access
-        VarBoolImpl &getActiveVar() { return *m_pVarActive; }
+    /// Give access to the "active layout" variable
+    // FIXME: we give read/write access
+    VarBoolImpl &getActiveVar() { return *m_pVarActive; }
 
-    private:
-        /// Parent window of the layout
-        TopWindow *m_pWindow;
-        /// Layout size
-        SkinsRect m_rect;
-        int m_minWidth, m_maxWidth;
-        int m_minHeight, m_maxHeight;
-        /// Image of the layout
-        OSGraphics *m_pImage;
-        /// List of the controls in the layout
-        list<LayeredControl> m_controlList;
-        /// Video control(s)
-        set<CtrlVideo *> m_pVideoCtrlSet;
-        /// List of the anchors in the layout
-        list<Anchor*> m_anchorList;
-        /// Flag to know if the layout is visible
-        bool m_visible;
-        /// Variable for the "active state" of the layout
-        /**
-         * Note: the layout is not an observer on this variable, because it
-         * cannot be changed externally (i.e. without an explicit change of
-         * layout). This way, we avoid using a setActiveLayoutInner method.
-         */
-        mutable VarBoolImpl *m_pVarActive;
+private:
+    /// Parent window of the layout
+    TopWindow *m_pWindow;
+    /// Layout size
+    SkinsRect m_rect;
+    int m_minWidth, m_maxWidth;
+    int m_minHeight, m_maxHeight;
+    /// Image of the layout
+    OSGraphics *m_pImage;
+    /// List of the controls in the layout
+    list<LayeredControl> m_controlList;
+    /// Video control(s)
+    set<CtrlVideo *> m_pVideoCtrlSet;
+    /// List of the anchors in the layout
+    list<Anchor*> m_anchorList;
+    /// Flag to know if the layout is visible
+    bool m_visible;
+    /// Variable for the "active state" of the layout
+    /**
+     * Note: the layout is not an observer on this variable, because it
+     * cannot be changed externally (i.e. without an explicit change of
+     * layout). This way, we avoid using a setActiveLayoutInner method.
+     */
+    mutable VarBoolImpl *m_pVarActive;
 };
 
 

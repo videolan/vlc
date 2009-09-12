@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef EVT_MOUSE_HPP
@@ -31,44 +31,43 @@
 /// Class for mouse button events
 class EvtMouse: public EvtInput
 {
-    public:
-        enum ButtonType_t
-        {
-            kLeft,
-            kMiddle,
-            kRight
-        };
+public:
+    enum ButtonType_t
+    {
+        kLeft,
+        kMiddle,
+        kRight
+    };
 
-        enum ActionType_t
-        {
-            kDown,
-            kUp,
-            kDblClick
-        };
+    enum ActionType_t
+    {
+        kDown,
+        kUp,
+        kDblClick
+    };
 
-        EvtMouse( intf_thread_t *pIntf, int xPos, int yPos, ButtonType_t button,
-                  ActionType_t action, int mod = kModNone ):
-            EvtInput( pIntf, mod ), m_xPos( xPos ), m_yPos( yPos ),
-            m_button( button ), m_action( action ) {}
-        virtual ~EvtMouse() {}
+    EvtMouse( intf_thread_t *pIntf, int xPos, int yPos, ButtonType_t button,
+              ActionType_t action, int mod = kModNone )
+            : EvtInput( pIntf, mod ), m_xPos( xPos ), m_yPos( yPos ),
+              m_button( button ), m_action( action ) { }
+    virtual ~EvtMouse() { }
+    virtual const string getAsString() const;
 
-        // Return the event coordinates
-        int getXPos() const { return m_xPos; }
-        int getYPos() const { return m_yPos; }
+    // Return the event coordinates
+    int getXPos() const { return m_xPos; }
+    int getYPos() const { return m_yPos; }
 
-        // Return the button and the action
-        ButtonType_t getButton() const { return m_button; }
-        ActionType_t getAction() const { return m_action; }
+    // Return the button and the action
+    ButtonType_t getButton() const { return m_button; }
+    ActionType_t getAction() const { return m_action; }
 
-        virtual const string getAsString() const;
-
-    private:
-        /// Coordinates of the mouse relative to the window
-        int m_xPos, m_yPos;
-        /// Mouse button involved in the event
-        ButtonType_t m_button;
-        /// Type of action
-        ActionType_t m_action;
+private:
+    /// Coordinates of the mouse relative to the window
+    int m_xPos, m_yPos;
+    /// Mouse button involved in the event
+    ButtonType_t m_button;
+    /// Type of action
+    ActionType_t m_action;
 };
 
 

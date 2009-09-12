@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef INI_FILE_HPP
@@ -32,17 +32,17 @@
 /// INI file parser
 class IniFile: public SkinObject
 {
-    public:
-        IniFile( intf_thread_t *pIntf, const string &rName,
-                 const string &rPath );
-        virtual ~IniFile() {}
+public:
+    IniFile( intf_thread_t *pIntf, const string &rName,
+             const string &rPath );
+    virtual ~IniFile() { }
 
-        /// Parse the INI file and fill the VarManager
-        void parseFile();
+    /// Parse the INI file and fill the VarManager
+    void parseFile();
 
-    private:
-        string m_name;
-        string m_path;
+private:
+    string m_name;
+    string m_path;
 };
 
 

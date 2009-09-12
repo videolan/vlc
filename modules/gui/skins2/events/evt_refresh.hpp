@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef EVT_REFRESH_HPP
@@ -31,27 +31,25 @@
 /// Refresh window event
 class EvtRefresh: public EvtGeneric
 {
-    public:
-        /// Constructor with the coordinates of the area to refresh
-        EvtRefresh( intf_thread_t *pIntf, int xStart, int yStart, int width,
-                    int height ):
-            EvtGeneric( pIntf ), m_xStart( xStart ), m_yStart( yStart ),
-            m_width( width ), m_height( height ) {}
+public:
+    /// Constructor with the coordinates of the area to refresh
+    EvtRefresh( intf_thread_t *pIntf, int xStart, int yStart,
+                                      int width, int height )
+              : EvtGeneric( pIntf ), m_xStart( xStart ), m_yStart( yStart ),
+                                     m_width( width ), m_height( height ) { }
 
-        virtual ~EvtRefresh() {}
+    virtual ~EvtRefresh() { }
+    virtual const string getAsString() const { return "refresh"; }
 
-        /// Return the type of event
-        virtual const string getAsString() const { return "refresh"; }
+    /// Getters
+    int getXStart() const { return m_xStart; }
+    int getYStart() const { return m_yStart; }
+    int getWidth()  const { return m_width; }
+    int getHeight() const { return m_height; }
 
-        /// Getters
-        int getXStart() const { return m_xStart; }
-        int getYStart() const { return m_yStart; }
-        int getWidth()  const { return m_width; }
-        int getHeight() const { return m_height; }
-
-    private:
-        /// Coordinates and size of the area to refresh
-        int m_xStart, m_yStart, m_width, m_height;
+private:
+    /// Coordinates and size of the area to refresh
+    int m_xStart, m_yStart, m_width, m_height;
 };
 
 

@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef EVT_SCROLL_HPP
@@ -31,33 +31,32 @@
 /// Class for mouse scroll events
 class EvtScroll: public EvtInput
 {
-    public:
-        enum Direction_t
-        {
-            kUp,
-            kDown
-        };
+public:
+    enum Direction_t
+    {
+        kUp,
+        kDown
+    };
 
-        EvtScroll( intf_thread_t *pIntf, int xPos, int yPos,
-                   Direction_t direction, int mod = kModNone ):
-            EvtInput( pIntf, mod ), m_xPos( xPos ), m_yPos( yPos ),
-            m_direction( direction ) {}
-        virtual ~EvtScroll() {}
+    EvtScroll( intf_thread_t *pIntf, int xPos, int yPos,
+               Direction_t direction, int mod = kModNone )
+             : EvtInput( pIntf, mod ), m_xPos( xPos ), m_yPos( yPos ),
+               m_direction( direction ) { }
+    virtual ~EvtScroll() { }
+    virtual const string getAsString() const;
 
-        // Return the event coordinates
-        int getXPos() const { return m_xPos; }
-        int getYPos() const { return m_yPos; }
+    // Return the event coordinates
+    int getXPos() const { return m_xPos; }
+    int getYPos() const { return m_yPos; }
 
-        // Return the direction
-        Direction_t getDirection() const { return m_direction; }
+    // Return the direction
+    Direction_t getDirection() const { return m_direction; }
 
-        virtual const string getAsString() const;
-
-    private:
-        /// Coordinates of the mouse relative to the window
-        int m_xPos, m_yPos;
-        /// Scroll direction
-        Direction_t m_direction;
+private:
+    /// Coordinates of the mouse relative to the window
+    int m_xPos, m_yPos;
+    /// Scroll direction
+    Direction_t m_direction;
 };
 
 

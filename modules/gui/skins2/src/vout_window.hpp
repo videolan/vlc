@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef VOUT_WINDOW_HPP
@@ -34,65 +34,65 @@ class CtrlVideo;
 /// Class to handle a video output window
 class VoutWindow: private GenericWindow
 {
-    public:
+public:
 
-        VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
-                    int width, int height, GenericWindow* pParent = NULL );
-        virtual ~VoutWindow();
+    VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
+                int width, int height, GenericWindow* pParent = NULL );
+    virtual ~VoutWindow();
 
-        // counter used for debugging purpose
-        static int count;
+    // counter used for debugging purpose
+    static int count;
 
-        /// Make some functions public
-        //@{
-        using GenericWindow::show;
-        using GenericWindow::hide;
-        using GenericWindow::move;
-        using GenericWindow::resize;
-        using GenericWindow::getOSHandle;
-        //@}
+    /// Make some functions public
+    //@{
+    using GenericWindow::show;
+    using GenericWindow::hide;
+    using GenericWindow::move;
+    using GenericWindow::resize;
+    using GenericWindow::getOSHandle;
+    //@}
 
-        /// get the parent  window
-        virtual GenericWindow* getWindow( ) { return m_pParentWindow; }
+    /// get the parent  window
+    virtual GenericWindow* getWindow( ) { return m_pParentWindow; }
 
-        /// hotkeys processing
-        virtual void processEvent( EvtKey &rEvtKey );
+    /// hotkeys processing
+    virtual void processEvent( EvtKey &rEvtKey );
 
-        /// set and get Video Control for VoutWindow
-        virtual void setCtrlVideo( CtrlVideo* pCtrlVideo );
-        virtual CtrlVideo* getCtrlVideo( ) { return m_pCtrlVideo; }
+    /// set and get Video Control for VoutWindow
+    virtual void setCtrlVideo( CtrlVideo* pCtrlVideo );
+    virtual CtrlVideo* getCtrlVideo( ) { return m_pCtrlVideo; }
 
-        /// toggle fullscreen mode
-        virtual void setFullscreen( bool b_fullscreen );
-        virtual bool isFullscreen() { return m_bFullscreen; }
+    /// toggle fullscreen mode
+    virtual void setFullscreen( bool b_fullscreen );
+    virtual bool isFullscreen() { return m_bFullscreen; }
 
-        /// get original size of vout
-        virtual int getOriginalWidth( ) { return original_width; }
-        virtual int getOriginalHeight( ) { return original_height; }
+    /// get original size of vout
+    virtual int getOriginalWidth( ) { return original_width; }
+    virtual int getOriginalHeight( ) { return original_height; }
 
-        /// set original size of vout
-        virtual void setOriginalWidth( int width ) { original_width = width; }
-        virtual void setOriginalHeight( int height ) { original_height = height; }
+    /// set original size of vout
+    virtual void setOriginalWidth( int width ) { original_width = width; }
+    virtual void setOriginalHeight( int height ) { original_height = height; }
 
-        virtual string getType() const { return "Vout"; }
+    virtual string getType() const { return "Vout"; }
 
-    private:
+private:
 
-        /// vout thread
-        vout_window_t* m_pWnd;
+    /// vout thread
+    vout_window_t* m_pWnd;
 
-        /// original width and height
-        int original_width;
-        int original_height;
+    /// original width and height
+    int original_width;
+    int original_height;
 
-        /// fulscreen mode indicator
-        bool m_bFullscreen;
+    /// fulscreen mode indicator
+    bool m_bFullscreen;
 
-        /// VideoControl attached to it
-        CtrlVideo* m_pCtrlVideo;
+    /// VideoControl attached to it
+    CtrlVideo* m_pCtrlVideo;
 
-        /// Parent Window
-        GenericWindow* m_pParentWindow;
+    /// Parent Window
+    GenericWindow* m_pParentWindow;
 };
 
 typedef CountedPtr<VoutWindow> VoutWindowPtr;

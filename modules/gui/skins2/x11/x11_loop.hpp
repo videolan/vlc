@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef X11_LOOP_HPP
@@ -36,39 +36,39 @@ class GenericWindow;
 /// Main event loop for X11 (singleton)
 class X11Loop: public OSLoop
 {
-    public:
-        /// Get the instance of X11Loop
-        static OSLoop *instance( intf_thread_t *pIntf, X11Display &rDisplay );
+public:
+    /// Get the instance of X11Loop
+    static OSLoop *instance( intf_thread_t *pIntf, X11Display &rDisplay );
 
-        /// Destroy the instance of X11Loop
-        static void destroy( intf_thread_t *pIntf );
+    /// Destroy the instance of X11Loop
+    static void destroy( intf_thread_t *pIntf );
 
-        /// Enter the event loop
-        virtual void run();
+    /// Enter the event loop
+    virtual void run();
 
-        /// Exit the main loop
-        virtual void exit();
+    /// Exit the main loop
+    virtual void exit();
 
-    private:
-        /// X11 Display
-        X11Display &m_rDisplay;
-        /// Flag set on exit
-        bool m_exit;
-        /// Date and position of the last left-click
-        mtime_t m_lastClickTime;
-        int m_lastClickPosX, m_lastClickPosY;
-        /// Maximum interval between clicks for a double-click (in microsec)
-        static int m_dblClickDelay;
-        /// Map associating special (i.e. non ascii) virtual key codes with
-        /// internal vlc key codes
-        map<KeySym, int> keysymToVlcKey;
+private:
+    /// X11 Display
+    X11Display &m_rDisplay;
+    /// Flag set on exit
+    bool m_exit;
+    /// Date and position of the last left-click
+    mtime_t m_lastClickTime;
+    int m_lastClickPosX, m_lastClickPosY;
+    /// Maximum interval between clicks for a double-click (in microsec)
+    static int m_dblClickDelay;
+    /// Map associating special (i.e. non ascii) virtual key codes with
+    /// internal vlc key codes
+    map<KeySym, int> keysymToVlcKey;
 
-        // Private because it's a singleton
-        X11Loop( intf_thread_t *pIntf, X11Display &rDisplay );
-        virtual ~X11Loop();
+    // Private because it's a singleton
+    X11Loop( intf_thread_t *pIntf, X11Display &rDisplay );
+    virtual ~X11Loop();
 
-        /// Handle the next X11 event
-        void handleX11Event();
+    /// Handle the next X11 event
+    void handleX11Event();
 };
 
 #endif

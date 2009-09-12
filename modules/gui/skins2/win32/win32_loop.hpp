@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef WIN32_LOOP_HPP
@@ -35,30 +35,30 @@ class GenericWindow;
 /// Main event loop for Win32
 class Win32Loop: public OSLoop
 {
-    public:
-        /// Get the instance of Win32Loop
-        static OSLoop *instance( intf_thread_t *pIntf );
+public:
+    /// Get the instance of Win32Loop
+    static OSLoop *instance( intf_thread_t *pIntf );
 
-        /// Destroy the instance of Win32Loop
-        static void destroy( intf_thread_t *pIntf );
+    /// Destroy the instance of Win32Loop
+    static void destroy( intf_thread_t *pIntf );
 
-        /// Enter the event loop
-        virtual void run();
+    /// Enter the event loop
+    virtual void run();
 
-        /// Exit the main loop
-        virtual void exit();
+    /// Exit the main loop
+    virtual void exit();
 
-    private:
-        // Private because it is a singleton
-        Win32Loop( intf_thread_t *pIntf );
-        virtual ~Win32Loop();
+private:
+    // Private because it is a singleton
+    Win32Loop( intf_thread_t *pIntf );
+    virtual ~Win32Loop();
 
-        /// Map associating special (i.e. non ascii) virtual key codes with
-        /// internal vlc key codes
-        map<int, int> virtKeyToVlcKey;
+    /// Map associating special (i.e. non ascii) virtual key codes with
+    /// internal vlc key codes
+    map<int, int> virtKeyToVlcKey;
 
-        /// Helper function to find the modifier in a Windows message
-        int getMod( WPARAM wParam ) const;
+    /// Helper function to find the modifier in a Windows message
+    int getMod( WPARAM wParam ) const;
 };
 
 #endif

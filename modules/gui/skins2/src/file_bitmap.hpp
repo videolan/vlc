@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef FILE_BITMAP_HPP
@@ -32,30 +32,30 @@
 /// Class for file bitmaps
 class FileBitmap: public GenericBitmap
 {
-    public:
-        /// Load a bitmap from a file. aColor is the transparency
-        /// color, in the format 0xRRGGBB
-        FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
-                    string fileName, uint32_t aColor, int nbFrames = 1,
-                    int fps = 0 );
+public:
+    /// Load a bitmap from a file. aColor is the transparency
+    /// color, in the format 0xRRGGBB
+    FileBitmap( intf_thread_t *pIntf, image_handler_t *pImageHandler,
+                string fileName, uint32_t aColor, int nbFrames = 1,
+                int fps = 0 );
 
-        virtual ~FileBitmap();
+    virtual ~FileBitmap();
 
-        /// Get the width of the bitmap
-        virtual int getWidth() const { return m_width; }
+    /// Get the width of the bitmap
+    virtual int getWidth() const { return m_width; }
 
-        /// Get the heighth of the bitmap
-        virtual int getHeight() const { return m_height; }
+    /// Get the heighth of the bitmap
+    virtual int getHeight() const { return m_height; }
 
-        /// Get a linear buffer containing the image data.
-        /// Each pixel is stored in 4 bytes in the order B,G,R,A
-        virtual uint8_t *getData() const;
+    /// Get a linear buffer containing the image data.
+    /// Each pixel is stored in 4 bytes in the order B,G,R,A
+    virtual uint8_t *getData() const;
 
-    private:
-        /// Size of the bitmap.
-        int m_width, m_height;
-        /// Buffer containing the image data.
-        uint8_t *m_pData;
+private:
+    /// Size of the bitmap.
+    int m_width, m_height;
+    /// Buffer containing the image data.
+    uint8_t *m_pData;
 };
 
 

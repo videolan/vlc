@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef ASYNC_QUEUE_HPP
@@ -36,38 +36,38 @@ class OSTimer;
 /// Asynchronous queue for commands
 class AsyncQueue: public SkinObject
 {
-    public:
-        /// Get the instance of AsyncQueue
-        /// Returns NULL if initialization failed.
-        static AsyncQueue *instance( intf_thread_t *pIntf );
+public:
+    /// Get the instance of AsyncQueue
+    /// Returns NULL if initialization failed.
+    static AsyncQueue *instance( intf_thread_t *pIntf );
 
-        /// Destroy the instance of AsyncQueue
-        static void destroy( intf_thread_t *pIntf );
+    /// Destroy the instance of AsyncQueue
+    static void destroy( intf_thread_t *pIntf );
 
-        /// Add a command in the queue, after having removed the commands
-        /// of the same type already in the queue if needed
-        void push( const CmdGenericPtr &rcCommand, bool removePrev = true );
+    /// Add a command in the queue, after having removed the commands
+    /// of the same type already in the queue if needed
+    void push( const CmdGenericPtr &rcCommand, bool removePrev = true );
 
-        /// Remove the commands of the given type
-        void remove( const string &rType , const CmdGenericPtr &rcCommand );
+    /// Remove the commands of the given type
+    void remove( const string &rType , const CmdGenericPtr &rcCommand );
 
-        /// Flush the queue and execute the commands
-        void flush();
+    /// Flush the queue and execute the commands
+    void flush();
 
-    private:
-        /// Command queue
-        list<CmdGenericPtr> m_cmdList;
-        /// Timer
-        OSTimer *m_pTimer;
-        /// Mutex
-        vlc_mutex_t m_lock;
+private:
+    /// Command queue
+    list<CmdGenericPtr> m_cmdList;
+    /// Timer
+    OSTimer *m_pTimer;
+    /// Mutex
+    vlc_mutex_t m_lock;
 
-        // Private because it is a singleton
-        AsyncQueue( intf_thread_t *pIntf );
-        virtual ~AsyncQueue();
+    // Private because it is a singleton
+    AsyncQueue( intf_thread_t *pIntf );
+    virtual ~AsyncQueue();
 
-        // Callback to flush the queue
-        DEFINE_CALLBACK( AsyncQueue, Flush );
+    // Callback to flush the queue
+    DEFINE_CALLBACK( AsyncQueue, Flush );
 };
 
 

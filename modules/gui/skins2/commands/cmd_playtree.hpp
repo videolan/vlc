@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CMD_PLAYTREE_HPP
@@ -33,20 +33,16 @@
 /// Command to delete the selected items from a tree
 class CmdPlaytreeDel: public CmdGeneric
 {
-    public:
-        CmdPlaytreeDel( intf_thread_t *pIntf, VarTree &rTree ):
-            CmdGeneric( pIntf ), m_rTree( rTree ) {}
-        virtual ~CmdPlaytreeDel() {}
+public:
+    CmdPlaytreeDel( intf_thread_t *pIntf, VarTree &rTree )
+                  : CmdGeneric( pIntf ), m_rTree( rTree ) { }
+    virtual ~CmdPlaytreeDel() { }
+    virtual void execute();
+    virtual string getType() const { return "playtree del"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "playtree del"; }
-
-    private:
-        /// Tree
-        VarTree &m_rTree;
+private:
+    /// Tree
+    VarTree &m_rTree;
 };
 
 /// Command to sort the playtree

@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
@@ -158,16 +158,16 @@ struct intf_sys_t
 /// Base class for all skin classes
 class SkinObject
 {
-    public:
-        SkinObject( intf_thread_t *pIntf ): m_pIntf( pIntf ) {}
-        virtual ~SkinObject() {}
+public:
+    SkinObject( intf_thread_t *pIntf ): m_pIntf( pIntf ) { }
+    virtual ~SkinObject() { }
 
-        /// Getter (public because it is used in C callbacks in the win32
-        /// interface)
-        intf_thread_t *getIntf() const { return m_pIntf; }
+    /// Getter (public because it is used in C callbacks in the win32
+    /// interface)
+    intf_thread_t *getIntf() const { return m_pIntf; }
 
-    private:
-        intf_thread_t *m_pIntf;
+private:
+    intf_thread_t *m_pIntf;
 };
 
 

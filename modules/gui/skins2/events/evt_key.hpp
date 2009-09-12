@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef EVT_KEY_HPP
@@ -31,29 +31,26 @@
 /// Class for keyboard events
 class EvtKey: public EvtInput
 {
-    public:
-        enum ActionType_t
-        {
-            kDown,
-            kUp
-        };
+public:
+    enum ActionType_t
+    {
+        kDown,
+        kUp
+    };
 
-        EvtKey( intf_thread_t *pIntf, int key, ActionType_t action,
-                int mod = kModNone ):
-            EvtInput( pIntf, mod ), m_key( key ), m_action( action ) {}
-        virtual ~EvtKey() {}
+    EvtKey( intf_thread_t *I, int key, ActionType_t actn, int mod = kModNone )
+          : EvtInput( I, mod ), m_key( key ), m_action( actn ) { }
+    virtual ~EvtKey() { }
+    virtual const string getAsString() const;
 
-        /// Return the type of event
-        virtual const string getAsString() const;
+    int getKey() const { return m_key; }
 
-        int getKey() const { return m_key; }
-
-    private:
-        /// The concerned key, stored according to the '#define's in vlc_keys.h
-        /// but without the modifiers (which are stored in EvtInput)
-        int m_key;
-        /// Type of action
-        ActionType_t m_action;
+private:
+    /// The concerned key, stored according to the '#define's in vlc_keys.h
+    /// but without the modifiers (which are stored in EvtInput)
+    int m_key;
+    /// Type of action
+    ActionType_t m_action;
 };
 
 

@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CMD_MUXER_HPP
@@ -31,20 +31,16 @@
 /// This command only contains other commands (composite pattern)
 class CmdMuxer: public CmdGeneric
 {
-    public:
-        CmdMuxer( intf_thread_t *pIntf, const list<CmdGeneric*> &rList ):
-            CmdGeneric( pIntf ), m_list( rList ) {}
-        virtual ~CmdMuxer() {}
+public:
+    CmdMuxer( intf_thread_t *pIntf, const list<CmdGeneric*> &rList ):
+        CmdGeneric( pIntf ), m_list( rList ) { }
+    virtual ~CmdMuxer() { }
+    virtual void execute();
+    virtual string getType() const { return "muxer"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "muxer"; }
-
-    private:
-        /// List of commands we will execute sequentially
-        list<CmdGeneric*> m_list;
+private:
+    /// List of commands we will execute sequentially
+    list<CmdGeneric*> m_list;
 };
 
 #endif

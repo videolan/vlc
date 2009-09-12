@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef TOOLTIP_HPP
@@ -37,44 +37,44 @@ class UString;
 
 class Tooltip: public SkinObject, public Observer<VarText>
 {
-    public:
-        /// Create a tooltip with the given font and delay (in milliseconds)
-        Tooltip( intf_thread_t *pIntf, const GenericFont &rFont, int delay );
+public:
+    /// Create a tooltip with the given font and delay (in milliseconds)
+    Tooltip( intf_thread_t *pIntf, const GenericFont &rFont, int delay );
 
-        virtual ~Tooltip();
+    virtual ~Tooltip();
 
-        /// Draw the tooltip and show it after the delay
-        void show();
+    /// Draw the tooltip and show it after the delay
+    void show();
 
-        /// Hide the tooltip and cancel the timer if a tooltip is waiting for
-        /// display
-        void hide();
+    /// Hide the tooltip and cancel the timer if a tooltip is waiting for
+    /// display
+    void hide();
 
-    private:
-        /// Font
-        const GenericFont &m_rFont;
-        /// Delay before popping the tooltip
-        int m_delay;
-        /// Timer to wait before showing the tooltip
-        OSTimer *m_pTimer;
-        /// OS specific tooltip window
-        OSTooltip *m_pOsTooltip;
-        /// Image of the tooltip
-        OSGraphics *m_pImage;
-        /// Position of the tooltip
-        int m_xPos, m_yPos;
+private:
+    /// Font
+    const GenericFont &m_rFont;
+    /// Delay before popping the tooltip
+    int m_delay;
+    /// Timer to wait before showing the tooltip
+    OSTimer *m_pTimer;
+    /// OS specific tooltip window
+    OSTooltip *m_pOsTooltip;
+    /// Image of the tooltip
+    OSGraphics *m_pImage;
+    /// Position of the tooltip
+    int m_xPos, m_yPos;
 
-        /// Method called when the observed variable is modified
-        virtual void onUpdate( Subject<VarText> &rVariable, void * );
+    /// Method called when the observed variable is modified
+    virtual void onUpdate( Subject<VarText> &rVariable, void * );
 
-        /// Display text of the tooltip
-        void displayText( const UString &rText );
+    /// Display text of the tooltip
+    void displayText( const UString &rText );
 
-        /// Build m_pImage with the given text
-        void makeImage( const UString &rText );
+    /// Build m_pImage with the given text
+    void makeImage( const UString &rText );
 
-        /// Callback to show the tooltip window
-        DEFINE_CALLBACK( Tooltip, Show );
+    /// Callback to show the tooltip window
+    DEFINE_CALLBACK( Tooltip, Show );
 };
 
 

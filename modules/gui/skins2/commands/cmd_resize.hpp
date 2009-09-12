@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CMD_RESIZE_HPP
@@ -36,83 +36,67 @@ class CtrlVideo;
 /// Command to resize a layout
 class CmdResize: public CmdGeneric
 {
-    public:
-        /// Resize the given layout
-        CmdResize( intf_thread_t *pIntf, const WindowManager &rWindowManager,
-                   GenericLayout &rLayout, int width, int height );
-        virtual ~CmdResize() {}
+public:
+    /// Resize the given layout
+    CmdResize( intf_thread_t *pIntf, const WindowManager &rWindowManager,
+               GenericLayout &rLayout, int width, int height );
+    virtual ~CmdResize() { }
+    virtual void execute();
+    virtual string getType() const { return "resize"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "resize"; }
-
-    private:
-        const WindowManager &m_rWindowManager;
-        GenericLayout &m_rLayout;
-        int m_width, m_height;
+private:
+    const WindowManager &m_rWindowManager;
+    GenericLayout &m_rLayout;
+    int m_width, m_height;
 };
 
 
 /// Command to resize the inner vout window
 class CmdResizeInnerVout: public CmdGeneric
 {
-    public:
-        /// Resize the given layout
-        CmdResizeInnerVout( intf_thread_t *pIntf, CtrlVideo* pCtrlVideo );
-        virtual ~CmdResizeInnerVout() {}
+public:
+    /// Resize the given layout
+    CmdResizeInnerVout( intf_thread_t *pIntf, CtrlVideo* pCtrlVideo );
+    virtual ~CmdResizeInnerVout() { }
+    virtual void execute();
+    virtual string getType() const { return "resize inner vout"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "resize inner vout"; }
-
-    private:
-        CtrlVideo* m_pCtrlVideo;
+private:
+    CtrlVideo* m_pCtrlVideo;
 };
 
 
 /// Command to resize the vout window
 class CmdResizeVout: public CmdGeneric
 {
-    public:
-        /// Resize the given layout
-        CmdResizeVout( intf_thread_t *pIntf, vout_window_t* pWnd,
-                       int width, int height );
-        virtual ~CmdResizeVout() {}
+public:
+    /// Resize the given layout
+    CmdResizeVout( intf_thread_t *pIntf, vout_window_t* pWnd,
+                   int width, int height );
+    virtual ~CmdResizeVout() { }
+    virtual void execute();
+    virtual string getType() const { return "resize vout"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "resize vout"; }
-
-    private:
-        vout_window_t* m_pWnd;
-        int m_width, m_height;
+private:
+    vout_window_t* m_pWnd;
+    int m_width, m_height;
 };
 
 
 /// Command to toggle Fullscreen
 class CmdSetFullscreen: public CmdGeneric
 {
-    public:
-        /// Resize the given layout
-        CmdSetFullscreen( intf_thread_t *pIntf, vout_window_t* pWnd,
-                          bool fullscreen );
-        virtual ~CmdSetFullscreen() {}
+public:
+    /// Resize the given layout
+    CmdSetFullscreen( intf_thread_t *pIntf, vout_window_t* pWnd,
+                      bool fullscreen );
+    virtual ~CmdSetFullscreen() { }
+    virtual void execute();
+    virtual string getType() const { return "toogle fullscreen"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "toogle fullscreen"; }
-
-    private:
-        vout_window_t* m_pWnd;
-        bool m_bFullscreen;
+private:
+    vout_window_t* m_pWnd;
+    bool m_bFullscreen;
 };
 
 #endif

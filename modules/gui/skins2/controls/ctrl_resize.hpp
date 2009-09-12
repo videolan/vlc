@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CTRL_RESIZE_HPP
@@ -36,63 +36,63 @@ class WindowManager;
 /// Control decorator for resizing windows
 class CtrlResize: public CtrlFlat
 {
-    public:
-        CtrlResize( intf_thread_t *pIntf, WindowManager &rWindowManager,
-                    CtrlFlat &rCtrl, GenericLayout &rLayout,
-                    const UString &rHelp, VarBool *pVisible,
-                    WindowManager::Direction_t direction );
-        virtual ~CtrlResize() {}
+public:
+    CtrlResize( intf_thread_t *pIntf, WindowManager &rWindowManager,
+                CtrlFlat &rCtrl, GenericLayout &rLayout,
+                const UString &rHelp, VarBool *pVisible,
+                WindowManager::Direction_t direction );
+    virtual ~CtrlResize() { }
 
-        /// Handle an event
-        virtual void handleEvent( EvtGeneric &rEvent );
+    /// Handle an event
+    virtual void handleEvent( EvtGeneric &rEvent );
 
-        /// Check whether coordinates are inside the decorated control
-        virtual bool mouseOver( int x, int y ) const;
+    /// Check whether coordinates are inside the decorated control
+    virtual bool mouseOver( int x, int y ) const;
 
-        /// Draw the control on the given graphics
-        virtual void draw( OSGraphics &rImage, int xDest, int yDest );
+    /// Draw the control on the given graphics
+    virtual void draw( OSGraphics &rImage, int xDest, int yDest );
 
-        /// Set the position and the associated layout of the decorated control
-        virtual void setLayout( GenericLayout *pLayout,
-                                const Position &rPosition );
+    /// Set the position and the associated layout of the decorated control
+    virtual void setLayout( GenericLayout *pLayout,
+                            const Position &rPosition );
 
-        /// Get the position of the decorated control in the layout, if any
-        virtual const Position *getPosition() const;
+    /// Get the position of the decorated control in the layout, if any
+    virtual const Position *getPosition() const;
 
-        /// Method called when the control is resized
-        virtual void onResize();
+    /// Method called when the control is resized
+    virtual void onResize();
 
-        /// Get the type of control (custom RTTI)
-        virtual string getType() const { return m_rCtrl.getType(); }
+    /// Get the type of control (custom RTTI)
+    virtual string getType() const { return m_rCtrl.getType(); }
 
-    private:
-        FSM m_fsm;
-        /// Window manager
-        WindowManager &m_rWindowManager;
-        /// Decorated CtrlFlat
-        CtrlFlat &m_rCtrl;
-        /// The layout resized by this control
-        GenericLayout &m_rLayout;
-        /// The last received event
-        EvtGeneric *m_pEvt;
-        /// Position of the click that started the resizing
-        int m_xPos, m_yPos;
-        /// Direction of the resizing
-        WindowManager::Direction_t m_direction;
+private:
+    FSM m_fsm;
+    /// Window manager
+    WindowManager &m_rWindowManager;
+    /// Decorated CtrlFlat
+    CtrlFlat &m_rCtrl;
+    /// The layout resized by this control
+    GenericLayout &m_rLayout;
+    /// The last received event
+    EvtGeneric *m_pEvt;
+    /// Position of the click that started the resizing
+    int m_xPos, m_yPos;
+    /// Direction of the resizing
+    WindowManager::Direction_t m_direction;
 
-        /// Change the cursor, based on the given direction
-        void changeCursor( WindowManager::Direction_t direction ) const;
+    /// Change the cursor, based on the given direction
+    void changeCursor( WindowManager::Direction_t direction ) const;
 
-        /// Callback objects
-        DEFINE_CALLBACK( CtrlResize, OutStill )
-        DEFINE_CALLBACK( CtrlResize, StillOut )
-        DEFINE_CALLBACK( CtrlResize, StillStill )
-        DEFINE_CALLBACK( CtrlResize, StillResize )
-        DEFINE_CALLBACK( CtrlResize, ResizeStill )
-        DEFINE_CALLBACK( CtrlResize, ResizeResize )
+    /// Callback objects
+    DEFINE_CALLBACK( CtrlResize, OutStill )
+    DEFINE_CALLBACK( CtrlResize, StillOut )
+    DEFINE_CALLBACK( CtrlResize, StillStill )
+    DEFINE_CALLBACK( CtrlResize, StillResize )
+    DEFINE_CALLBACK( CtrlResize, ResizeStill )
+    DEFINE_CALLBACK( CtrlResize, ResizeResize )
 
-        // Size of the layout, before resizing
-        int m_width, m_height;
+    // Size of the layout, before resizing
+    int m_width, m_height;
 };
 
 #endif

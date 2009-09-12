@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef BITMAP_FONT_HPP
@@ -33,39 +33,39 @@ class GenericBitmap;
 /// Class to handle bitmap fonts
 class BitmapFont: public GenericFont
 {
-    public:
-        BitmapFont( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
-                    const string &rType );
-        virtual ~BitmapFont() {}
+public:
+    BitmapFont( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
+                const string &rType );
+    virtual ~BitmapFont() { }
 
-        virtual bool init() { return true; }
+    virtual bool init() { return true; }
 
-        /// Render a string on a bitmap.
-        /// If maxWidth != -1, the text is truncated with '...'
-        virtual GenericBitmap *drawString( const UString &rString,
-            uint32_t color, int maxWidth = -1 ) const;
+    /// Render a string on a bitmap.
+    /// If maxWidth != -1, the text is truncated with '...'
+    virtual GenericBitmap *drawString( const UString &rString,
+        uint32_t color, int maxWidth = -1 ) const;
 
-        /// Get the font size
-        virtual int getSize() const { return m_height; }
+    /// Get the font size
+    virtual int getSize() const { return m_height; }
 
-    private:
-        /// Description of a glyph
-        struct Glyph_t
-        {
-            Glyph_t(): m_xPos( -1 ), m_yPos( 0 ) {}
-            int m_xPos, m_yPos;
-        };
+private:
+    /// Description of a glyph
+    struct Glyph_t
+    {
+        Glyph_t(): m_xPos( -1 ), m_yPos( 0 ) { }
+        int m_xPos, m_yPos;
+    };
 
-        /// Bitmap
-        const GenericBitmap &m_rBitmap;
-        /// Glyph size
-        int m_width, m_height;
-        /// Horizontal advance between two characters
-        int m_advance;
-        /// Horizontal advance for non-displayable characters
-        int m_skip;
-        /// Character table
-        Glyph_t m_table[256];
+    /// Bitmap
+    const GenericBitmap &m_rBitmap;
+    /// Glyph size
+    int m_width, m_height;
+    /// Horizontal advance between two characters
+    int m_advance;
+    /// Horizontal advance for non-displayable characters
+    int m_skip;
+    /// Character table
+    Glyph_t m_table[256];
 };
 
 #endif

@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef EVT_FOCUS_HPP
@@ -31,20 +31,19 @@
 /// Focus change event
 class EvtFocus: public EvtGeneric
 {
-    public:
-        EvtFocus( intf_thread_t *pIntf, bool focus ): EvtGeneric( pIntf ),
-            m_focus( focus ) {}
-        virtual ~EvtFocus() {}
+public:
+    EvtFocus( intf_thread_t *pIntf, bool focus )
+            : EvtGeneric( pIntf ), m_focus( focus ) { }
+    virtual ~EvtFocus() { }
 
-        /// Return the type of event
-        virtual const string getAsString() const
-        {
-            return ( m_focus ? "focus:in" : "focus:out" );
-        }
+    virtual const string getAsString() const
+    {
+        return ( m_focus ? "focus:in" : "focus:out" );
+    }
 
-    private:
-        /// true for a focus in, and false for a focus out
-        bool m_focus;
+private:
+    /// true for a focus in, and false for a focus out
+    bool m_focus;
 };
 
 

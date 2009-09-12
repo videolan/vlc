@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CMD_VARS_HPP
@@ -40,130 +40,101 @@ DEFINE_COMMAND( PlaytreeChanged, "playtree changed" )
 /// Command to notify the playtree of an item update
 class CmdPlaytreeUpdate: public CmdGeneric
 {
-    public:
-        CmdPlaytreeUpdate( intf_thread_t *pIntf, int id ):
-            CmdGeneric( pIntf ), m_id( id ) {}
-        virtual ~CmdPlaytreeUpdate() {}
+public:
+    CmdPlaytreeUpdate( intf_thread_t *pIntf, int id ):
+        CmdGeneric( pIntf ), m_id( id ) { }
+    virtual ~CmdPlaytreeUpdate() { }
+    virtual void execute();
+    virtual string getType() const { return "playtree update"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
+    /// Only accept removal of command if they concern the same item
+    virtual bool checkRemove( CmdGeneric * ) const;
 
-        /// Return the type of the command
-        virtual string getType() const { return "playtree update"; }
-
-        /// Only accept removal of command if they concern the same item
-        virtual bool checkRemove( CmdGeneric * ) const;
-
-    private:
-        /// Playlist item ID
-        int m_id;
+private:
+    /// Playlist item ID
+    int m_id;
 };
 
 /// Command to notify the playtree of an item append
 class CmdPlaytreeAppend: public CmdGeneric
 {
-    public:
-        CmdPlaytreeAppend( intf_thread_t *pIntf, playlist_add_t *p_add ) :
-            CmdGeneric( pIntf ), m_pAdd( p_add ) {}
-        virtual ~CmdPlaytreeAppend() {}
+public:
+    CmdPlaytreeAppend( intf_thread_t *pIntf, playlist_add_t *p_add ):
+        CmdGeneric( pIntf ), m_pAdd( p_add ) { }
+    virtual ~CmdPlaytreeAppend() { }
+    virtual void execute();
+    virtual string getType() const { return "playtree append"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "playtree append"; }
-
-    private:
-        playlist_add_t * m_pAdd;
+private:
+    playlist_add_t * m_pAdd;
 };
 
 /// Command to notify the playtree of an item deletion
 class CmdPlaytreeDelete: public CmdGeneric
 {
-    public:
-        CmdPlaytreeDelete( intf_thread_t *pIntf, int i_id ) :
-            CmdGeneric( pIntf ), m_id( i_id ) {}
-        virtual ~CmdPlaytreeDelete() {}
+public:
+    CmdPlaytreeDelete( intf_thread_t *pIntf, int i_id ):
+        CmdGeneric( pIntf ), m_id( i_id ) { }
+    virtual ~CmdPlaytreeDelete() { }
+    virtual void execute();
+    virtual string getType() const { return "playtree append"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "playtree append"; }
-
-    private:
-        int m_id;
+private:
+    int m_id;
 };
-
-
 
 
 /// Command to set a text variable
 class CmdSetText: public CmdGeneric
 {
-    public:
-        CmdSetText( intf_thread_t *pIntf, VarText &rText,
-                    const UString &rValue ):
-            CmdGeneric( pIntf ), m_rText( rText ), m_value( rValue ) {}
-        virtual ~CmdSetText() {}
+public:
+    CmdSetText( intf_thread_t *pIntf, VarText &rText, const UString &rValue ):
+        CmdGeneric( pIntf ), m_rText( rText ), m_value( rValue ) { }
+    virtual ~CmdSetText() { }
+    virtual void execute();
+    virtual string getType() const { return "set text"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "set text"; }
-
-    private:
-        /// Text variable to set
-        VarText &m_rText;
-        /// Value to set
-        const UString m_value;
+private:
+    /// Text variable to set
+    VarText &m_rText;
+    /// Value to set
+    const UString m_value;
 };
 
 
 /// Command to set the equalizer preamp
 class CmdSetEqPreamp: public CmdGeneric
 {
-    public:
-        CmdSetEqPreamp( intf_thread_t *pIntf, EqualizerPreamp &rPreamp,
-                       float value ):
-            CmdGeneric( pIntf ), m_rPreamp( rPreamp ), m_value( value ) {}
-        virtual ~CmdSetEqPreamp() {}
+public:
+    CmdSetEqPreamp( intf_thread_t *I, EqualizerPreamp &P, float v )
+                  : CmdGeneric( I ), m_rPreamp( P ), m_value( v ) { }
+    virtual ~CmdSetEqPreamp() { }
+    virtual void execute();
+    virtual string getType() const { return "set equalizer preamp"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "set equalizer preamp"; }
-
-    private:
-        /// Preamp variable to set
-        EqualizerPreamp &m_rPreamp;
-        /// Value to set
-        float m_value;
+private:
+    /// Preamp variable to set
+    EqualizerPreamp &m_rPreamp;
+    /// Value to set
+    float m_value;
 };
 
 
 /// Command to set the equalizerbands
 class CmdSetEqBands: public CmdGeneric
 {
-    public:
-        CmdSetEqBands( intf_thread_t *pIntf, EqualizerBands &rEqBands,
-                       const string &rValue ):
-            CmdGeneric( pIntf ), m_rEqBands( rEqBands ), m_value( rValue ) {}
-        virtual ~CmdSetEqBands() {}
+public:
+    CmdSetEqBands( intf_thread_t *I, EqualizerBands &B, const string &V )
+                 : CmdGeneric( I ), m_rEqBands( B ), m_value( V ) { }
+    virtual ~CmdSetEqBands() { }
+    virtual void execute();
+    virtual string getType() const { return "set equalizer bands"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "set equalizer bands"; }
-
-    private:
-        /// Equalizer variable to set
-        EqualizerBands &m_rEqBands;
-        /// Value to set
-        const string m_value;
+private:
+    /// Equalizer variable to set
+    EqualizerBands &m_rEqBands;
+    /// Value to set
+    const string m_value;
 };
 
 

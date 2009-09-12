@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef MACOSX_TOOLTIP_HPP
@@ -32,18 +32,16 @@ class MacOSXDisplay;
 /// MacOSX implementation of OSTooltip
 class MacOSXTooltip: public OSTooltip
 {
-    public:
-        MacOSXTooltip( intf_thread_t *pIntf );
+public:
+    MacOSXTooltip( intf_thread_t *pIntf );
 
-        virtual ~MacOSXTooltip();
+    virtual ~MacOSXTooltip();
 
-        /// Show the tooltip
-        virtual void show( int left, int top, OSGraphics &rText );
+    /// Show the tooltip
+    virtual void show( int left, int top, OSGraphics &rText );
 
-        /// Hide the tooltip
-        virtual void hide();
-
-    private:
+    /// Hide the tooltip
+    virtual void hide();
 };
 
 

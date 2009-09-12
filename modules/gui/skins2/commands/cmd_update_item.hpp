@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CMD_UPDATE_ITEM_HPP
@@ -31,19 +31,15 @@
 /// Udate item command
 class CmdUpdateItem: public CmdGeneric
 {
-    public:
-        CmdUpdateItem( intf_thread_t *pIntf, VarText &rStreamName, VarText &rStreamURI ) :
-            CmdGeneric( pIntf ), m_rStreamName(rStreamName), m_rStreamURI(rStreamURI) {}
-        virtual ~CmdUpdateItem() {}
+public:
+    CmdUpdateItem( intf_thread_t *I,VarText &N,VarText &U )
+                 : CmdGeneric(I), m_rStreamName(N), m_rStreamURI(U) { }
+    virtual ~CmdUpdateItem() { }
+    virtual void execute();
+    virtual string getType() const { return "update item"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "update item"; }
-
-    private:
-        VarText &m_rStreamName;
-        VarText &m_rStreamURI;
+private:
+    VarText &m_rStreamName;
+    VarText &m_rStreamURI;
 };
 #endif

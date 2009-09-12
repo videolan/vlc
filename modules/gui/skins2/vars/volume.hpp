@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef VOLUME_HPP
@@ -33,15 +33,15 @@
 /// Variable for VLC volume
 class Volume: public VarPercent
 {
-    public:
-        Volume( intf_thread_t *pIntf );
-        virtual ~Volume() {}
+public:
+    Volume( intf_thread_t *pIntf );
+    virtual ~Volume() { }
 
-        virtual void set( float percentage, bool updateVLC );
+    virtual void set( float percentage, bool updateVLC );
 
-        virtual void set( float percentage ) { set( percentage, true ); }
+    virtual void set( float percentage ) { set( percentage, true ); }
 
-        virtual string getAsStringPercent() const;
+    virtual string getAsStringPercent() const;
 };
 
 

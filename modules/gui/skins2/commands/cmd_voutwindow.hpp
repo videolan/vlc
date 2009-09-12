@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CMD_VOUTWINDOW_HPP
@@ -31,38 +31,30 @@
 /// Command to create a vout window
 class CmdNewVoutWindow: public CmdGeneric
 {
-    public:
-        /// Create a vout window
-        CmdNewVoutWindow( intf_thread_t *pIntf, vout_window_t *pWnd );
-        virtual ~CmdNewVoutWindow() {}
+public:
+    /// Create a vout window
+    CmdNewVoutWindow( intf_thread_t *pIntf, vout_window_t *pWnd );
+    virtual ~CmdNewVoutWindow() { }
+    virtual void execute();
+    virtual string getType() const { return "new vout window"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "new vout window"; }
-
-    private:
-        vout_window_t* m_pWnd;
+private:
+    vout_window_t* m_pWnd;
 };
 
 
 /// Command to release a vout window
 class CmdReleaseVoutWindow: public CmdGeneric
 {
-    public:
-        /// Release a vout window
-        CmdReleaseVoutWindow( intf_thread_t *pIntf, vout_window_t *pWnd );
-        virtual ~CmdReleaseVoutWindow() {}
+public:
+    /// Release a vout window
+    CmdReleaseVoutWindow( intf_thread_t *pIntf, vout_window_t *pWnd );
+    virtual ~CmdReleaseVoutWindow() { }
+    virtual void execute();
+    virtual string getType() const { return "new vout window"; }
 
-        /// This method does the real job of the command
-        virtual void execute();
-
-        /// Return the type of the command
-        virtual string getType() const { return "new vout window"; }
-
-    private:
-        vout_window_t* m_pWnd;
+private:
+    vout_window_t* m_pWnd;
 };
 
 #endif

@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef EVT_LEAVE_HPP
@@ -31,12 +31,10 @@
 /// Mouse leave event
 class EvtLeave: public EvtInput
 {
-    public:
-        EvtLeave( intf_thread_t *pIntf ): EvtInput( pIntf ) {}
-        virtual ~EvtLeave() {}
-
-        /// Return the type of event
-        virtual const string getAsString() const { return "leave"; }
+public:
+    EvtLeave( intf_thread_t *pIntf ): EvtInput( pIntf ) { }
+    virtual ~EvtLeave() { }
+    virtual const string getAsString() const { return "leave"; }
 };
 
 

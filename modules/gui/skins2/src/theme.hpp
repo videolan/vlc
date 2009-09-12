@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef THEME_HPP
@@ -45,50 +45,50 @@ class Interpreter;
 /// Class storing the data of the current theme
 class Theme: public SkinObject
 {
-    private:
-        friend class Builder;
-        friend class Interpreter;
-    public:
-        Theme( intf_thread_t *pIntf ): SkinObject( pIntf ),
-            m_windowManager( getIntf() ) {}
-        virtual ~Theme();
+private:
+    friend class Builder;
+    friend class Interpreter;
+public:
+    Theme( intf_thread_t *pIntf ): SkinObject( pIntf ),
+        m_windowManager( getIntf() ) { }
+    virtual ~Theme();
 
-        void loadConfig();
-        void saveConfig();
+    void loadConfig();
+    void saveConfig();
 
-        GenericBitmap *getBitmapById( const string &id ) const;
-        GenericFont *getFontById( const string &id ) const;
-        Popup *getPopupById( const string &id ) const;
-        TopWindow *getWindowById( const string &id ) const;
-        GenericLayout *getLayoutById( const string &id ) const;
-        CtrlGeneric *getControlById( const string &id ) const;
-        Position *getPositionById( const string &id ) const;
+    GenericBitmap *getBitmapById( const string &id ) const;
+    GenericFont *getFontById( const string &id ) const;
+    Popup *getPopupById( const string &id ) const;
+    TopWindow *getWindowById( const string &id ) const;
+    GenericLayout *getLayoutById( const string &id ) const;
+    CtrlGeneric *getControlById( const string &id ) const;
+    Position *getPositionById( const string &id ) const;
 
-        WindowManager &getWindowManager() { return m_windowManager; }
+    WindowManager &getWindowManager() { return m_windowManager; }
 
-    private:
-        /// Store the bitmaps by ID
-        map<string, GenericBitmapPtr> m_bitmaps;
-        /// Store the fonts by ID
-        map<string, GenericFontPtr> m_fonts;
-        /// Store the popups by ID
-        map<string, PopupPtr> m_popups;
-        /// Store the windows by ID
-        map<string, TopWindowPtr> m_windows;
-        /// Store the layouts by ID
-        map<string, GenericLayoutPtr> m_layouts;
-        /// Store the controls by ID
-        map<string, CtrlGenericPtr> m_controls;
-        /// Store the panel positions by ID
-        map<string, PositionPtr> m_positions;
-        /// Store the commands
-        list<CmdGenericPtr> m_commands;
-        /// Store the Bezier curves
-        list<BezierPtr> m_curves;
-        /// Store the variables
-        list<VariablePtr> m_vars;
+private:
+    /// Store the bitmaps by ID
+    map<string, GenericBitmapPtr> m_bitmaps;
+    /// Store the fonts by ID
+    map<string, GenericFontPtr> m_fonts;
+    /// Store the popups by ID
+    map<string, PopupPtr> m_popups;
+    /// Store the windows by ID
+    map<string, TopWindowPtr> m_windows;
+    /// Store the layouts by ID
+    map<string, GenericLayoutPtr> m_layouts;
+    /// Store the controls by ID
+    map<string, CtrlGenericPtr> m_controls;
+    /// Store the panel positions by ID
+    map<string, PositionPtr> m_positions;
+    /// Store the commands
+    list<CmdGenericPtr> m_commands;
+    /// Store the Bezier curves
+    list<BezierPtr> m_curves;
+    /// Store the variables
+    list<VariablePtr> m_vars;
 
-        WindowManager m_windowManager;
+    WindowManager m_windowManager;
 };
 
 

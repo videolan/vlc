@@ -250,11 +250,9 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
 class rect
 {
 public:
-  rect( int v_x = 0, int v_y = 0,
-          int v_width = 0, int v_height = 0 )
-     : x( v_x), y( v_y ), width( v_width), height( v_height)
-    {}
-    ~rect(){}
+    rect( int v_x = 0, int v_y = 0, int v_width = 0, int v_height = 0 )
+        : x( v_x ), y( v_y ), width( v_width ), height( v_height ) { }
+    ~rect() { }
     int x;
     int y;
     int width;

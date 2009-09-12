@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef WIN32_TOOLTIP_HPP
@@ -32,21 +32,20 @@
 /// Win32 implementation of OSTooltip
 class Win32Tooltip: public OSTooltip
 {
-    public:
-        Win32Tooltip( intf_thread_t *pIntf, HINSTANCE hInst,
-                            HWND hParentWindow );
+public:
+    Win32Tooltip( intf_thread_t *pIntf, HINSTANCE hInst, HWND hParentWindow );
 
-        virtual ~Win32Tooltip();
+    virtual ~Win32Tooltip();
 
-        /// Show the tooltip
-        virtual void show( int left, int top, OSGraphics &rText );
+    /// Show the tooltip
+    virtual void show( int left, int top, OSGraphics &rText );
 
-        /// Hide the tooltip
-        virtual void hide();
+    /// Hide the tooltip
+    virtual void hide();
 
-    private:
-        /// Window ID
-        HWND m_hWnd;
+private:
+    /// Window ID
+    HWND m_hWnd;
 };
 
 

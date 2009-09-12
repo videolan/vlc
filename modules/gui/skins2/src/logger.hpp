@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef LOGGER_HPP
@@ -37,24 +37,24 @@
 // Logger class
 class Logger: public SkinObject
 {
-    public:
-        /// Get the instance of Logger
-        /// Returns NULL if initialization failed
-        static Logger *instance( intf_thread_t *pIntf );
+public:
+    /// Get the instance of Logger
+    /// Returns NULL if initialization failed
+    static Logger *instance( intf_thread_t *pIntf );
 
-        /// Delete the instance of Logger
-        static void destroy( intf_thread_t *pIntf );
+    /// Delete the instance of Logger
+    static void destroy( intf_thread_t *pIntf );
 
-        /// Print an error message
-        void error( const string &rMsg );
+    /// Print an error message
+    void error( const string &rMsg );
 
-        /// Print a warning
-        void warn( const string &rMsg );
+    /// Print a warning
+    void warn( const string &rMsg );
 
-    private:
-        // Private because it's a singleton
-        Logger( intf_thread_t *pIntf );
-        ~Logger();
+private:
+    // Private because it's a singleton
+    Logger( intf_thread_t *pIntf );
+    ~Logger();
 };
 
 

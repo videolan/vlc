@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CTRL_FLAT_HPP
@@ -31,12 +31,11 @@
 /// Base class for "mover controls" and images
 class CtrlFlat: public CtrlGeneric
 {
-    protected:
-        CtrlFlat( intf_thread_t *pIntf, const UString &rHelp,
-                  VarBool *pVisible ):
-            CtrlGeneric( pIntf, rHelp, pVisible ) {}
+protected:
+    CtrlFlat( intf_thread_t *pIntf, const UString &rHelp, VarBool *pVisible )
+            : CtrlGeneric( pIntf, rHelp, pVisible ) { }
 
-        virtual ~CtrlFlat() {}
+    virtual ~CtrlFlat() { }
 };
 
 #endif

@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef CTRL_BUTTON_HPP
@@ -36,59 +36,58 @@ class CmdGeneric;
 /// Base class for button controls
 class CtrlButton: public CtrlGeneric, public Observer<AnimBitmap>
 {
-    public:
-        /// Create a button with 3 images
-        CtrlButton( intf_thread_t *pIntf, const GenericBitmap &rBmpUp,
-                    const GenericBitmap &rBmpOver,
-                    const GenericBitmap &rBmpDown,
-                    CmdGeneric &rCommand, const UString &rTooltip,
-                    const UString &rHelp, VarBool *pVisible );
+public:
+    /// Create a button with 3 images
+    CtrlButton( intf_thread_t *pIntf, const GenericBitmap &rBmpUp,
+                const GenericBitmap &rBmpOver, const GenericBitmap &rBmpDown,
+                CmdGeneric &rCommand, const UString &rTooltip,
+                const UString &rHelp, VarBool *pVisible );
 
-        virtual ~CtrlButton();
+    virtual ~CtrlButton();
 
-        /// Handle an event
-        virtual void handleEvent( EvtGeneric &rEvent );
+    /// Handle an event
+    virtual void handleEvent( EvtGeneric &rEvent );
 
-        /// Check whether coordinates are inside the control
-        virtual bool mouseOver( int x, int y ) const;
+    /// Check whether coordinates are inside the control
+    virtual bool mouseOver( int x, int y ) const;
 
-        /// Draw the control on the given graphics
-        virtual void draw( OSGraphics &rImage, int xDest, int yDest );
+    /// Draw the control on the given graphics
+    virtual void draw( OSGraphics &rImage, int xDest, int yDest );
 
-        /// Get the text of the tooltip
-        virtual UString getTooltipText() const { return m_tooltip; }
+    /// Get the text of the tooltip
+    virtual UString getTooltipText() const { return m_tooltip; }
 
-        /// Get the type of control (custom RTTI)
-        virtual string getType() const { return "button"; }
+    /// Get the type of control (custom RTTI)
+    virtual string getType() const { return "button"; }
 
-    private:
-        /// Finite state machine of the control
-        FSM m_fsm;
-        /// Command triggered by the button
-        CmdGeneric &m_rCommand;
-        /// Tooltip text
-        const UString m_tooltip;
-        /// Images of the button in the different states
-        AnimBitmap m_imgUp, m_imgOver, m_imgDown;
-        /// Current image
-        AnimBitmap *m_pImg;
+private:
+    /// Finite state machine of the control
+    FSM m_fsm;
+    /// Command triggered by the button
+    CmdGeneric &m_rCommand;
+    /// Tooltip text
+    const UString m_tooltip;
+    /// Images of the button in the different states
+    AnimBitmap m_imgUp, m_imgOver, m_imgDown;
+    /// Current image
+    AnimBitmap *m_pImg;
 
-        /// Callback objects
-        DEFINE_CALLBACK( CtrlButton, UpOverDownOver )
-        DEFINE_CALLBACK( CtrlButton, DownOverUpOver )
-        DEFINE_CALLBACK( CtrlButton, DownOverDown )
-        DEFINE_CALLBACK( CtrlButton, DownDownOver )
-        DEFINE_CALLBACK( CtrlButton, UpOverUp )
-        DEFINE_CALLBACK( CtrlButton, UpUpOver )
-        DEFINE_CALLBACK( CtrlButton, DownUp )
-        DEFINE_CALLBACK( CtrlButton, UpHidden )
-        DEFINE_CALLBACK( CtrlButton, HiddenUp )
+    /// Callback objects
+    DEFINE_CALLBACK( CtrlButton, UpOverDownOver )
+    DEFINE_CALLBACK( CtrlButton, DownOverUpOver )
+    DEFINE_CALLBACK( CtrlButton, DownOverDown )
+    DEFINE_CALLBACK( CtrlButton, DownDownOver )
+    DEFINE_CALLBACK( CtrlButton, UpOverUp )
+    DEFINE_CALLBACK( CtrlButton, UpUpOver )
+    DEFINE_CALLBACK( CtrlButton, DownUp )
+    DEFINE_CALLBACK( CtrlButton, UpHidden )
+    DEFINE_CALLBACK( CtrlButton, HiddenUp )
 
-        /// Change the current image
-        void setImage( AnimBitmap *pImg );
+    /// Change the current image
+    void setImage( AnimBitmap *pImg );
 
-        /// Method called when an animated bitmap changes
-        virtual void onUpdate( Subject<AnimBitmap> &rBitmap, void* );
+    /// Method called when an animated bitmap changes
+    virtual void onUpdate( Subject<AnimBitmap> &rBitmap, void* );
 };
 
 
