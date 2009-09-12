@@ -56,7 +56,8 @@ public:
 
 private:
     /// Command queue
-    list<CmdGenericPtr> m_cmdList;
+    typedef std::list<CmdGenericPtr> cmdList_t;
+    cmdList_t m_cmdList;
     /// Timer
     OSTimer *m_pTimer;
     /// Mutex

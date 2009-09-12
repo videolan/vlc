@@ -89,22 +89,22 @@ void AsyncQueue::push( const CmdGenericPtr &rcCommand, bool removePrev )
 
 void AsyncQueue::remove( const string &rType, const CmdGenericPtr &rcCommand )
 {
-    list<CmdGenericPtr>::iterator it;
-    for( it = m_cmdList.begin(); it != m_cmdList.end(); it++ )
+    cmdList_t::iterator it;
+    for( it = m_cmdList.begin(); it != m_cmdList.end(); /* nothing */ )
     {
-        // Remove the command if it is of the given type
-        if( (*it).get()->getType() == rType )
+        // Remove the command if it is of the given type and the command
+        // doesn't disagree. Note trickery to avoid skipping entries
+        // while maintaining iterator validity.
+
+        if( (*it).get()->getType() == rType &&
+            rcCommand.get()->checkRemove( (*it).get() ) )
         {
-            // Maybe the command wants to check if it must really be
-            // removed
-            if( rcCommand.get()->checkRemove( (*it).get() ) == true )
-            {
-                list<CmdGenericPtr>::iterator itNew = it;
-                itNew++;
-                m_cmdList.erase( it );
-                it = itNew;
-            }
+            cmdList_t::iterator itNew = it;
+            ++itNew;
+            m_cmdList.erase( it );
+            it = itNew;
         }
+        else ++it;
     }
 }
 

@@ -40,7 +40,8 @@ public:
 
 private:
     /// List of commands we will execute sequentially
-    list<CmdGeneric*> m_list;
+    typedef std::list<CmdGeneric*> cmdList_t;
+    cmdList_t m_list;
 };
 
 #endif
