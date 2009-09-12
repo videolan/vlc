@@ -44,6 +44,7 @@
 #include <vlc_input.h>
 
 #include <ctype.h>
+#include <errno.h>
 #include <fcntl.h>
 #include <sys/ioctl.h>
 #include <sys/mman.h>

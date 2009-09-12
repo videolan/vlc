@@ -26,6 +26,7 @@
 #endif
 #include <stdarg.h>
 #include <assert.h>
+#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_demux.h>

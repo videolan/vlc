@@ -28,6 +28,7 @@
 #include <vlc_interface.h>
 #include <vlc_keys.h>
 #include <ctype.h>
+#include <errno.h>
 
 #include <xcb/xcb.h>
 #include <xcb/xcb_keysyms.h>

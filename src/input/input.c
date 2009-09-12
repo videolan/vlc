@@ -34,6 +34,7 @@
 #include <ctype.h>
 #include <limits.h>
 #include <assert.h>
+#include <errno.h>
 
 #include "input_internal.h"
 #include "event.h"

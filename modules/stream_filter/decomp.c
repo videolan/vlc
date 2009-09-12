@@ -28,6 +28,7 @@
 #include <vlc_network.h>
 #include <assert.h>
 #include <unistd.h>
+#include <errno.h>
 #ifndef _POSIX_SPAWN
 # define _POSIX_SPAWN (-1)
 #endif

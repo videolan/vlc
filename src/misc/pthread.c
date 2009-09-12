@@ -35,6 +35,7 @@
 #include <assert.h>
 #include <unistd.h> /* fsync() */
 #include <signal.h>
+#include <errno.h>
 
 #include <sched.h>
 #ifdef __linux__

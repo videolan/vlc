@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <sys/stat.h>
 #include <assert.h>
+#include <errno.h>
 #include "vlc_block.h"
 
 /**

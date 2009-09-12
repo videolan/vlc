@@ -37,6 +37,7 @@
 
 #include <ctype.h>
 #include <fcntl.h>
+#include <errno.h>
 
 #include "dynamicoverlay.h"
 

@@ -23,6 +23,8 @@
  * This file implements gcrypt support functions in vlc
  */
 
+#include <errno.h>
+
 #ifdef LIBVLC_USE_PTHREAD
 /**
  * If possible, use gcrypt-provided thread implementation. This is so that
