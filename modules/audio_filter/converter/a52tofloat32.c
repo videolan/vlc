@@ -310,8 +310,8 @@ static void Duplicate( sample_t * p_out, const sample_t * p_in )
 static void Exchange( sample_t * p_out, const sample_t * p_in )
 {
     int i;
-    const float * p_first = p_in + 256;
-    const float * p_second = p_in;
+    const sample_t * p_first = p_in + 256;
+    const sample_t * p_second = p_in;
 
     for ( i = 0; i < 256; i++ )
     {
@@ -334,7 +334,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #endif
     int             i_flags = p_sys->i_flags;
     int             i_bytes_per_block = 256 * p_sys->i_nb_channels
-                      * sizeof(float);
+                      * sizeof(sample_t);
     int             i;
 
     /* Do the actual decoding now. */
