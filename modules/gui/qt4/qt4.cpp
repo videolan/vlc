@@ -263,11 +263,7 @@ vlc_module_end ()
 /*****************************************/
 
 /* Ugly, but the Qt4 interface assumes single instance anyway */
-static struct
-{
-    QMutex lock;
-    QWaitCondition ready;
-} iface;
+static vlc_sem_t ready;
 
 /*****************************************************************************
  * Module callbacks
@@ -298,6 +294,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_playlist = pl_Hold( p_intf );
 
     /* */
+    vlc_sem_init (&ready, 0);
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
         pl_Release (p_sys->p_playlist);
@@ -306,13 +303,12 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* */
-    QMutexLocker locker (&iface.lock);
-    vlc_value_t val;
+    vlc_sem_wait (&ready);
+    vlc_sem_destroy (&ready);
 
-    while( p_sys->p_mi == NULL && !p_sys->b_isDialogProvider )
-        iface.ready.wait( &iface.lock );
     if( !p_sys->b_isDialogProvider )
     {
+        vlc_value_t val;
         var_Create (p_this->p_libvlc, "qt4-iface", VLC_VAR_ADDRESS);
         val.p_address = p_this;
         var_Set (p_this->p_libvlc, "qt4-iface", val);
@@ -419,11 +415,9 @@ static void *Thread( void *obj )
         p_mi = NULL;
 
     /* */
-    iface.lock.lock();
     p_intf->p_sys->p_mi = p_mi;
     p_intf->p_sys->b_isDialogProvider = p_mi == NULL;
-    iface.ready.wakeAll();
-    iface.lock.unlock();
+    vlc_sem_post (&ready);
 
     /* Explain to the core how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;
