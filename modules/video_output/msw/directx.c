@@ -366,7 +366,13 @@ static int Init( vout_thread_t *p_vout )
         case VLC_CODEC_YVYU:
             p_vout->output.i_chroma = VLC_CODEC_YVYU;
             break;
+        case VLC_CODEC_I420:
+            p_vout->output.i_chroma = VLC_CODEC_I420;
+            break;
         default:
+            msg_Dbg( p_vout, "use default chroma YV12 for render " \
+                             "chroma (%4.4s)",
+                             (char *)&p_vout->render.i_chroma);
             p_vout->output.i_chroma = VLC_CODEC_YV12;
             break;
     }
@@ -1618,6 +1624,7 @@ static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic )
 
             /* U and V inverted compared to I420
              * Fixme: this should be handled by the vout core */
+            /* could this be right? */
             p_vout->output.i_chroma = VLC_CODEC_I420;
 
             p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
