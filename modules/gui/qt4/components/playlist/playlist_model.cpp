@@ -526,6 +526,7 @@ PLItem *PLModel::findByInput( PLItem *root, int i_id )
 
 PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_input )
 {
+    if( !root ) return NULL;
     if( ( !b_input && i_cached_id == i_id) ||
         ( b_input && i_cached_input_id ==i_id ) )
     {
@@ -755,14 +756,21 @@ void PLModel::insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos )
 void PLModel::removeItem( PLItem *item )
 {
     if( !item ) return;
+
     if( currentItem == item )
     {
         currentItem = NULL;
         emit currentChanged( QModelIndex() );
     }
-    PLItem *parent = item->parentItem;
-    assert( parent );
-    parent->removeChild( item );
+
+    if( item->parentItem ) item->parentItem->removeChild( item );
+    else delete item;
+
+    if(item == rootItem)
+    {
+        rootItem = NULL;
+        reset();
+    }
 }
 
 /* This function must be entered WITH the playlist lock */
