@@ -559,7 +559,8 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
             {
                 if( p_plugin->b_autoplay )
                 {
-                    p_plugin->playlist_play(NULL);
+                    p_plugin->playlist_play(&ex);
+                    libvlc_exception_clear(&ex);
                 }
             }
             p_plugin->b_stream = true;
