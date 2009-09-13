@@ -12,6 +12,7 @@ SOURCES_stream_out_mosaic_bridge = mosaic_bridge.c
 SOURCES_stream_out_autodel = autodel.c
 SOURCES_stream_out_record = record.c
 SOURCES_stream_out_raop = raop.c
+SOURCES_stream_out_smem = smem.c
 
 libvlc_LTLIBRARIES += \
 	libstream_out_dummy_plugin.la \
@@ -26,6 +27,7 @@ libvlc_LTLIBRARIES += \
 	libstream_out_mosaic_bridge_plugin.la \
 	libstream_out_autodel_plugin.la \
 	libstream_out_record_plugin.la \
+	libstream_out_smem_plugin.la \
 	$(NULL)
 
 if HAVE_LIBGCRYPT
