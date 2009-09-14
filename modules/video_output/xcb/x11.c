@@ -195,23 +195,22 @@ static int Open (vlc_object_t *obj)
         {
             if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
             {
-                vid = vt->visual_id;
                 gray = false;
-                break;
+                goto found_vt;
             }
             if (fmt->depth == 8 && vt->_class == XCB_VISUAL_CLASS_STATIC_GRAY)
             {
                 if (!gray)
                     continue; /* Prefer color over gray scale */
-                vid = vt->visual_id;
                 chroma = VLC_CODEC_GREY;
+                goto found_vt;
             }
         }
+        continue; /* The screen does not *really* support this depth */
 
-        if (!vid)
-            continue; /* The screen does not *really* support this depth */
-
+    found_vt:
         fmt_pic.i_chroma = chroma;
+        vid = vt->visual_id;
         if (!gray)
         {
             fmt_pic.i_rmask = vt->red_mask;
@@ -229,7 +228,8 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
-    msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32, vid);
+    msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32" (depth: %"PRIu8")", vid,
+             p_sys->depth);
     msg_Dbg (vd, " %"PRIu8" bits per pixels, %"PRIu8" bits line pad",
              p_sys->bpp, p_sys->pad);
 
