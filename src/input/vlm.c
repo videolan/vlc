@@ -569,14 +569,18 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             if( asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name ) == -1 )
                 psz_header = NULL;
 
-            if( (p_input = input_CreateAndStart( p_vlm->p_libvlc, p_media->vod.p_item, psz_header ) ) )
+            p_input = input_Create( p_vlm->p_libvlc, p_media->vod.p_item, psz_header, NULL );
+            if( p_input )
             {
                 vlc_sem_t sem_preparse;
                 vlc_sem_init( &sem_preparse, 0 );
                 var_AddCallback( p_input, "intf-event", InputEventPreparse, &sem_preparse );
 
-                while( !p_input->b_dead && ( !p_cfg->vod.psz_mux || !input_item_IsPreparsed( p_media->vod.p_item ) ) )
-                    vlc_sem_wait( &sem_preparse );
+                if( !input_Start( p_input ) )
+                {
+                    while( !p_input->b_dead && ( !p_cfg->vod.psz_mux || !input_item_IsPreparsed( p_media->vod.p_item ) ) )
+                        vlc_sem_wait( &sem_preparse );
+                }
 
                 var_DelCallback( p_input, "intf-event", InputEventPreparse, &sem_preparse );
                 vlc_sem_destroy( &sem_preparse );
