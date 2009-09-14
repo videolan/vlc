@@ -156,16 +156,13 @@ input_thread_t *__input_CreateAndStart( vlc_object_t *p_parent,
 }
 
 /**
- * Initialize an input thread and run it. This thread will clean after itself,
- * you can forget about it. It can work either in blocking or non-blocking mode
+ * Initialize an input thread and run it until it stops by itself.
  *
  * \param p_parent a vlc_object
  * \param p_item an input item
- * \param b_block should we block until read is finished ?
  * \return an error code, VLC_SUCCESS on success
  */
-int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
-                   bool b_block )
+int __input_Read( vlc_object_t *p_parent, input_item_t *p_item )
 {
     input_thread_t *p_input;
 
@@ -173,22 +170,7 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item,
     if( !p_input )
         return VLC_EGENERIC;
 
-    if( b_block )
-    {
-        RunAndDestroy( VLC_OBJECT(p_input) );
-        return VLC_SUCCESS;
-    }
-    else
-    {
-        if( vlc_thread_create( p_input, "input", RunAndDestroy,
-                               VLC_THREAD_PRIORITY_INPUT ) )
-        {
-            input_ChangeState( p_input, ERROR_S );
-            msg_Err( p_input, "cannot create input thread" );
-            vlc_object_release( p_input );
-            return VLC_EGENERIC;
-        }
-    }
+    RunAndDestroy( VLC_OBJECT(p_input) );
     return VLC_SUCCESS;
 }
 

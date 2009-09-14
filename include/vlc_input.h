@@ -524,8 +524,8 @@ VLC_EXPORT( int,  input_Start, ( input_thread_t * ) );
 
 VLC_EXPORT( void, input_Stop, ( input_thread_t *, bool b_abort ) );
 
-#define input_Read(a,b,c) __input_Read(VLC_OBJECT(a),b, c)
-VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t *, bool ) );
+#define input_Read(a,b) __input_Read(VLC_OBJECT(a),b)
+VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t * ) );
 
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );
 

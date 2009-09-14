@@ -98,7 +98,7 @@ int playlist_Import( playlist_t *p_playlist, const char *psz_file )
 
     playlist_AddInput( p_playlist, p_input, PLAYLIST_APPEND, PLAYLIST_END,
                        true, false );
-    return input_Read( p_playlist, p_input, true );
+    return input_Read( p_playlist, p_input );
 }
 
 /*****************************************************************************
@@ -187,7 +187,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     PL_UNLOCK;
 
     stats_TimerStart( p_playlist, "ML Load", STATS_TIMER_ML_LOAD );
-    input_Read( p_playlist, p_input, true );
+    input_Read( p_playlist, p_input );
     stats_TimerStop( p_playlist,STATS_TIMER_ML_LOAD );
 
     PL_LOCK;

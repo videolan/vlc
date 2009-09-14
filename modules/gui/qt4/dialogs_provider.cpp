@@ -492,7 +492,7 @@ static void openDirectory( intf_thread_t *p_intf, bool pl, bool go )
                        PLAYLIST_END, pl, pl_Unlocked );
         RecentsMRL::getInstance( p_intf )->addRecent( mrl );
         if( !go )
-            input_Read( THEPL, p_input, true );
+            input_Read( THEPL, p_input );
         vlc_gc_decref( p_input );
     }
 }

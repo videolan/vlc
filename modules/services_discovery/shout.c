@@ -214,7 +214,7 @@ static void AddSubitemsOfShoutItemURL( services_discovery_t *p_sd,
     /* Read every subitems, and add them in ItemAdded */
     vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                       ItemAdded, &category );
-    input_Read( p_sd, p_input, true );
+    input_Read( p_sd, p_input );
     vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemAdded,
                       ItemAdded, &category );
 
