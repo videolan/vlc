@@ -788,7 +788,7 @@ static void MainLoop( input_thread_t *p_input )
 
                 i_wakeup = es_out_GetWakeup( p_input->p->p_es_out );
             }
-            else if( !p_input->b_eof && !es_out_GetEmpty( p_input->p->p_es_out ) )
+            else if( !es_out_GetEmpty( p_input->p->p_es_out ) )
             {
                 msg_Dbg( p_input, "waiting decoder fifos to empty" );
                 i_wakeup = mdate() + INPUT_IDLE_SLEEP;
