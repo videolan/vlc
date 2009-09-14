@@ -2000,12 +2000,22 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
                                                         fmt.fmt.pix.pixelformat );
                 msg_Dbg( p_demux, "Found maximum framerate of %f", p_sys->f_fps );
             }
+            uint32_t i_width, i_height;
             GetMaxDimensions( p_demux, i_fd,
                               fmt.fmt.pix.pixelformat, p_sys->f_fps,
-                              &fmt.fmt.pix.width, &fmt.fmt.pix.height );
-            msg_Dbg( p_demux, "Found optimal dimensions for framerate %f of %dx%d",
-                     p_sys->f_fps, fmt.fmt.pix.width, fmt.fmt.pix.height );
-            if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) {;}
+                              &i_width, &i_height );
+            if( i_width || i_height )
+            {
+                msg_Dbg( p_demux, "Found optimal dimensions for framerate %f of %dx%d",
+                         p_sys->f_fps, i_width, i_height );
+                fmt.fmt.pix.width = i_width;
+                fmt.fmt.pix.height = i_height;
+                if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) {;}
+            }
+            else
+            {
+                msg_Warn( p_obj, "Could not find optimal width and height." );
+            }
         }
 
         /* Reassign width, height and chroma incase driver override */
