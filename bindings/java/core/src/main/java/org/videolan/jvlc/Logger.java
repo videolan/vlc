@@ -46,9 +46,9 @@ public class Logger
         this.libvlc = jvlc.getLibvlc();
         libvlc_exception_t exception = new libvlc_exception_t();
         this.logInstance = jvlc.getLibvlc().libvlc_log_open(jvlc.getInstance(), exception);
-        if (exception.raised == 1)
+        if (exception.b_raised == 1)
         {
-            throw new RuntimeException("Native exception thrown: " + exception.message);
+            throw new RuntimeException("Native exception thrown");
         }
     }
     

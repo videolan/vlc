@@ -42,7 +42,7 @@ public class LibVlcMediaTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         Assert.assertNotNull(md);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
     }
     
     @Test
@@ -70,7 +70,7 @@ public class LibVlcMediaTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         LibVlcEventManager evManager = libvlc.libvlc_media_event_manager(md, exception);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         Assert.assertNotNull(evManager);
     }
 
@@ -80,7 +80,7 @@ public class LibVlcMediaTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         int state = libvlc.libvlc_media_get_state(md, exception);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         Assert.assertEquals(LibVlcState.libvlc_NothingSpecial.ordinal(), state);
     }
 
@@ -90,7 +90,7 @@ public class LibVlcMediaTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         int state = libvlc.libvlc_media_is_preparsed(md, exception);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         Assert.assertEquals(0, state);
     }
 

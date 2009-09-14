@@ -47,7 +47,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
         Assert.assertNotNull(mediaListPlayer);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
@@ -58,7 +58,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
         LibVlcMediaList mediaList = libvlc.libvlc_media_list_new(libvlcInstance, exception);
         libvlc.libvlc_media_list_player_set_media_list(mediaListPlayer, mediaList, exception);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         libvlc.libvlc_media_list_release(mediaList);
         libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
@@ -72,7 +72,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         LibVlcMedia mediaDescriptor = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         libvlc.libvlc_media_list_add_media(mediaList, mediaDescriptor, exception);
         libvlc.libvlc_media_list_player_set_media_list(mediaListPlayer, mediaList, exception);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         libvlc.libvlc_media_list_release(mediaList);
         libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
@@ -84,7 +84,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
         int result = libvlc.libvlc_media_list_player_is_playing(mediaListPlayer, exception);
         Assert.assertEquals(0, result);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
@@ -94,7 +94,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
         libvlc.libvlc_media_list_player_play(mediaListPlayer, exception);
-        Assert.assertEquals(1, exception.raised);
+        Assert.assertEquals(1, exception.b_raised);
         libvlc.libvlc_media_list_player_release(mediaListPlayer);
     }
 
@@ -109,7 +109,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         libvlc.libvlc_media_list_add_media(mediaList, mediaDescriptor, exception);
         libvlc.libvlc_media_list_player_set_media_list(mediaListPlayer, mediaList, exception);
         libvlc.libvlc_media_list_player_play(mediaListPlayer, exception);
-        Assert.assertEquals("Exception message: " + exception.message + ".\n", 0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         libvlc.libvlc_media_release(mediaDescriptor);
         libvlc.libvlc_media_list_release(mediaList);
     }
@@ -127,7 +127,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         while (true)
         {
             int playing = libvlc.libvlc_media_list_player_is_playing(mediaListPlayer, exception);
-            if (exception.raised == 1)
+            if (exception.b_raised == 1)
             {
                 throw new RuntimeException("Native exception thrown");
             }
@@ -158,11 +158,11 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         libvlc.libvlc_media_list_add_media(mediaList, mediaDescriptor, exception);
         libvlc.libvlc_media_list_player_set_media_list(mediaListPlayer, mediaList, exception);
         libvlc.libvlc_media_list_player_play_item(mediaListPlayer, mediaDescriptor, exception);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         while (true)
         {
             int playing = libvlc.libvlc_media_list_player_is_playing(mediaListPlayer, exception);
-            if (exception.raised == 1)
+            if (exception.b_raised == 1)
             {
                 throw new RuntimeException("Native exception thrown");
             }
@@ -201,7 +201,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         while (true)
         {
             int playing = libvlc.libvlc_media_list_player_is_playing(mediaListPlayer, exception);
-            if (exception.raised == 1)
+            if (exception.b_raised == 1)
             {
                 throw new RuntimeException("Native exception thrown");
             }
@@ -214,7 +214,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         libvlc.libvlc_media_list_player_pause(mediaListPlayer, exception);
 
         int state = libvlc.libvlc_media_list_player_get_state(mediaListPlayer, exception);
-        Assert.assertEquals(exception.message, 0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         Thread.sleep(200L);
         Assert.assertEquals(
             "Expected state: " + LibVlcState.libvlc_Paused + ".\n",
@@ -233,7 +233,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         LibVlcMediaPlayer mi = libvlc.libvlc_media_player_new_from_media(md, exception);
         libvlc.libvlc_media_list_player_set_media_player(mediaListPlayer, mi, exception);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
     }
 
     @Test
@@ -242,7 +242,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMediaListPlayer mediaListPlayer = libvlc.libvlc_media_list_player_new(libvlcInstance, exception);
         libvlc.libvlc_media_list_player_next(mediaListPlayer, exception);
-        Assert.assertEquals(1, exception.raised);
+        Assert.assertEquals(1, exception.b_raised);
     }
 
     /**
@@ -261,7 +261,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         libvlc.libvlc_media_list_player_play_item_at_index(mediaListPlayer, 0, exception);
         Thread.sleep(150);
         libvlc.libvlc_media_list_player_next(mediaListPlayer, exception);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         libvlc.libvlc_media_list_release(mediaList);
     }
 
@@ -279,7 +279,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         while (true)
         {
             int playing = libvlc.libvlc_media_list_player_get_state(mediaListPlayer, exception);
-            Assert.assertEquals(0, exception.raised);
+            Assert.assertEquals(0, exception.b_raised);
             if (playing == LibVlcState.libvlc_Playing.ordinal())
             {
                 break;
@@ -291,7 +291,7 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         while (true)
         {
             int playing = libvlc.libvlc_media_list_player_is_playing(mediaListPlayer, exception);
-            Assert.assertEquals(0, exception.raised);
+            Assert.assertEquals(0, exception.b_raised);
             if (playing == 0)
             {
                 break;

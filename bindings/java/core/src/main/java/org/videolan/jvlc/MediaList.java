@@ -125,7 +125,7 @@ public class MediaList
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         jvlc.getLibvlc().libvlc_media_list_remove_index(instance, index, exception);
-        if (exception.raised == 0)
+        if (exception.b_raised == 0)
         {
             items.remove(index);
             return true;

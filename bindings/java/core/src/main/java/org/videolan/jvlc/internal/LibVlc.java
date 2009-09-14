@@ -44,12 +44,7 @@ public interface LibVlc extends Library
 
     public static class libvlc_exception_t extends Structure
     {
-
-        public int raised;
-
-        public int code;
-
-        public String message;
+        public int b_raised;
     }
 
     public static class libvlc_log_message_t extends Structure

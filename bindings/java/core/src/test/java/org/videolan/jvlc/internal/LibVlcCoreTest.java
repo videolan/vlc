@@ -42,7 +42,7 @@ public class LibVlcCoreTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcInstance libvlcInstance = instance.libvlc_new(0, new String[] {"-I","dummy","--aout=dummy","--vout=dummy"}, exception);
         Assert.assertNotNull(libvlcInstance);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
     }
     
     @Test
@@ -59,7 +59,7 @@ public class LibVlcCoreTest
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcInstance libvlcInstance = instance.libvlc_new(0, new String[] {}, exception);
         instance.libvlc_add_intf(libvlcInstance, "dummy", exception);
-        Assert.assertEquals(0, exception.raised);
+        Assert.assertEquals(0, exception.b_raised);
         instance.libvlc_release(libvlcInstance);
     }
     
