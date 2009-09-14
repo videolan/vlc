@@ -232,6 +232,12 @@ int OpenEncoder( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    if( p_enc->fmt_out.i_cat == SPU_ES )
+    {
+        /* We don't support subtitle encoding */
+        return VLC_EGENERIC;
+    }
+
     /* Initialization must be done before avcodec_find_encoder() */
     InitLibavcodec( p_this );
 
