@@ -107,10 +107,10 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     const bool b_input_5_0 = !b_input_7_0 &&
                              ( (i_input_physical & AOUT_CHANS_5_0) == AOUT_CHANS_5_0 ||
                                (i_input_physical & AOUT_CHANS_5_0_MIDDLE) == AOUT_CHANS_5_0_MIDDLE );
-    const bool b_input_3_0 = !b_input_7_0 && !b_input_5_0 &&
+    const bool b_input_4_center_rear =  !b_input_7_0 && !b_input_5_0 &&
+                             (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_4_CENTER_REAR;
+    const bool b_input_3_0 = !b_input_7_0 && !b_input_5_0 && !b_input_4_center_rear &&
                              (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_3_0;
-
-    const bool b_input_4_center_rear = (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_4_CENTER_REAR;
 
     int i_input_nb = aout_FormatNbChannels( &p_filter->input );
     int i_output_nb = aout_FormatNbChannels( &p_filter->output );
