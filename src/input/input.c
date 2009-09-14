@@ -631,15 +631,7 @@ static void MainLoopDemux( input_thread_t *p_input, bool *pb_changed, bool *pb_d
 
     if( i_ret == 0 )    /* EOF */
     {
-        bool b_pause_after_each = var_CreateGetBool( p_input, "play-and-pause" );
         msg_Dbg( p_input, "EOF reached" );
-        if ( b_pause_after_each )
-        {
-            msg_Dbg( p_input, "pausing at EOF (pause after each)");
-            vlc_value_t pause_state;
-            pause_state.i_int = PAUSE_S;
-            Control( p_input, INPUT_CONTROL_SET_STATE, pause_state );
-        }
         p_input->p->input.b_eof = true;
     }
     else if( i_ret < 0 )
@@ -755,6 +747,7 @@ static void MainLoop( input_thread_t *p_input )
     mtime_t i_start_mdate = mdate();
     mtime_t i_intf_update = 0;
     mtime_t i_statistic_update = 0;
+    bool b_pause_after_eof = var_CreateGetBool( p_input, "play-and-pause" );
 
     /* Start the timer */
     stats_TimerStop( p_input, STATS_TIMER_INPUT_LAUNCHING );
@@ -793,10 +786,20 @@ static void MainLoop( input_thread_t *p_input )
                 msg_Dbg( p_input, "waiting decoder fifos to empty" );
                 i_wakeup = mdate() + INPUT_IDLE_SLEEP;
             }
+            else if( b_pause_after_eof )
+            {
+                msg_Dbg( p_input, "pausing at EOF (pause after each)");
+                val.i_int = PAUSE_S;
+                Control( p_input, INPUT_CONTROL_SET_STATE, val );
+
+                b_pause_after_eof = false;
+                b_paused = true;
+            }
             else
             {
                 if( MainLoopTryRepeat( p_input, &i_start_mdate ) )
                     break;
+                b_pause_after_eof = var_GetBool( p_input, "play-and-pause" );
             }
         }
 
