@@ -56,6 +56,7 @@
 #ifdef __APPLE__
 #import <Carbon/Carbon.h>
 #define DEFAULT_FONT "/System/Library/Fonts/LucidaGrande.dfont"
+#define DEFAULT_FONT_SNOWLEOPARD "/System/Library/Fonts/LucidaGrande.ttc"
 #define FC_DEFAULT_FONT "Lucida Grande"
 #elif defined( SYS_BEOS )
 #define DEFAULT_FONT "/boot/beos/etc/fonts/ttfonts/Swiss721.ttf"
@@ -325,8 +326,17 @@ static int Create( vlc_object_t *p_this )
     if( !psz_fontfamily || !*psz_fontfamily )
     {
 #ifdef HAVE_FONTCONFIG
+#ifdef __APPLE__
+        SInt32 MacVersion;
+        free( psz_fontfamily);
+        if (Gestalt(gestaltSystemVersion, &MacVersion) == noErr && MacVersion >= 0x1060)
+            psz_fontfamily=strdup( DEFAULT_FONT_SNOWLEOPARD );
+        else
+            psz_fontfamily=strdup( DEFAULT_FONT );
+#else
         free( psz_fontfamily);
         psz_fontfamily=strdup( DEFAULT_FONT );
+#endif
 #else
         free( psz_fontfamily );
         psz_fontfamily = (char *)malloc( PATH_MAX + 1 );
@@ -337,17 +347,10 @@ static int Create( vlc_object_t *p_this )
         strcat( psz_fontfamily, "\\fonts\\arial.ttf" );
 # elif __APPLE__
         SInt32 MacVersion;
-        if (Gestalt(gestaltSystemVersion, &MacVersion) == noErr)
-        {
-            if (MacVersion >= 0x1060)
-            {
-                strcpy( psz_fontfile, "/System/Library/Fonts/LucidaGrande.ttc" );
-            }
-            else
-            {
-                strcpy( psz_fontfile, DEFAULT_FONT );
-            }
-        }
+        if (Gestalt(gestaltSystemVersion, &MacVersion) == noErr && MacVersion >= 0x1060)
+            strcpy( psz_fontfile, DEFAULT_FONT_SNOWLEOPARD );
+        else
+            strcpy( psz_fontfile, DEFAULT_FONT );
 # else
         strcpy( psz_fontfamily, DEFAULT_FONT );
 # endif
