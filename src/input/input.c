@@ -64,7 +64,6 @@
 static void Destructor( input_thread_t * p_input );
 
 static  void *Run            ( vlc_object_t *p_this );
-static  void *RunAndDestroy  ( vlc_object_t *p_this );
 
 static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
                                   const char *, bool, input_resource_t * );
@@ -164,13 +163,17 @@ input_thread_t *__input_CreateAndStart( vlc_object_t *p_parent,
  */
 int __input_Read( vlc_object_t *p_parent, input_item_t *p_item )
 {
-    input_thread_t *p_input;
-
-    p_input = Create( p_parent, p_item, NULL, false, NULL );
+    input_thread_t *p_input = Create( p_parent, p_item, NULL, false, NULL );
     if( !p_input )
         return VLC_EGENERIC;
 
-    RunAndDestroy( VLC_OBJECT(p_input) );
+    if( !Init( p_input ) )
+    {
+        MainLoop( p_input );
+        End( p_input );
+    }
+
+    vlc_object_release( p_input );
     return VLC_SUCCESS;
 }
 
@@ -538,31 +541,6 @@ exit:
         input_SendEventAbort( p_input );
     input_SendEventDead( p_input );
 
-    vlc_restorecancel( canc );
-    return NULL;
-}
-
-/*****************************************************************************
- * RunAndDestroy: main thread loop
- * This is the "just forget me" thread that spawns the input processing chain,
- * reads the stream, cleans up and releases memory
- *****************************************************************************/
-static void *RunAndDestroy( vlc_object_t *p_this )
-{
-    input_thread_t *p_input = (input_thread_t *)p_this;
-    const int canc = vlc_savecancel();
-
-    if( Init( p_input ) )
-        goto exit;
-
-    MainLoop( p_input );
-
-    /* Clean up */
-    End( p_input );
-
-exit:
-    /* Release memory */
-    vlc_object_release( p_input );
     vlc_restorecancel( canc );
     return NULL;
 }
