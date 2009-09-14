@@ -621,11 +621,8 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
                 p_var->psz_text = NULL;
             break;
         case VLC_VAR_GETTEXT:
-            p_val->psz_string = NULL;
-            if( p_var->psz_text )
-            {
-                p_val->psz_string = strdup( p_var->psz_text );
-            }
+            p_val->psz_string = p_var->psz_text ? strdup( p_var->psz_text )
+                                                : NULL;
             break;
         case VLC_VAR_INHERITVALUE:
             {
@@ -915,6 +912,10 @@ int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
     i_var = GetUnused( p_this, psz_name );
     if( i_var < 0 )
     {
+#ifndef NDEBUG
+        msg_Warn( p_this, "Failed to add a callback to the non-existing "
+                          "variable '%s'", psz_name );
+#endif
         vlc_mutex_unlock( &p_priv->var_lock );
         return i_var;
     }
