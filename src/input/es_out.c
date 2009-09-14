@@ -331,6 +331,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
 static void EsOutDelete( es_out_t *out )
 {
     es_out_sys_t *p_sys = out->p_sys;
+    input_thread_t *p_input = p_sys->p_input;
     int i;
 
     if( p_sys->p_sout_record )
@@ -366,6 +367,18 @@ static void EsOutDelete( es_out_t *out )
     {
         es_out_pgrm_t *p_pgrm = p_sys->pgrm[i];
         input_clock_Delete( p_pgrm->p_clock );
+
+        /* Remove SDT and EPG entries */
+        char *psz_cat = EsOutProgramGetMetaName( p_pgrm );
+        input_Control( p_input, INPUT_DEL_INFO, psz_cat, NULL );
+        char *psz_epg;
+        if( asprintf( &psz_epg, "EPG %s", psz_cat ) >= 0 )
+        {
+            input_Control( p_input, INPUT_DEL_INFO, psz_epg, NULL );
+            free( psz_epg );
+        }
+        free( psz_cat );
+
         free( p_pgrm->psz_now_playing );
         free( p_pgrm->psz_publisher );
         free( p_pgrm->psz_name );
