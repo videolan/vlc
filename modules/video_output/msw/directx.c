@@ -225,6 +225,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->pf_manage = Manage;
     p_vout->pf_render = NULL;
     p_vout->pf_display = FirstDisplay;
+    p_vout->pf_control = Control;
 
     p_vout->p_sys->p_ddobject = NULL;
     p_vout->p_sys->p_display = NULL;

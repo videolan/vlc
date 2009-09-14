@@ -256,15 +256,20 @@ int DirectDrawUpdateOverlay( vout_thread_t *p_vout );
 /*****************************************************************************
  * Prototypes from events.c
  *****************************************************************************/
-void* EventThread ( vlc_object_t *p_this );
+int CreateEventThread( vout_thread_t *p_vout );
+void StopEventThread ( vout_thread_t *p_vout );
+
+/*****************************************************************************
+ * Prototypes from common.c
+ *****************************************************************************/
+int Control( vout_thread_t *p_vout, int i_query, va_list args );
+
 void UpdateRects ( vout_thread_t *p_vout, bool b_force );
 void Win32ToggleFullscreen ( vout_thread_t *p_vout );
 #ifndef UNDER_CE
 void DisableScreensaver ( vout_thread_t *p_vout );
 void RestoreScreensaver ( vout_thread_t *p_vout );
 #endif
-int CreateEventThread( vout_thread_t *p_vout );
-void StopEventThread ( vout_thread_t *p_vout );
 
 /*****************************************************************************
  * Constants

@@ -102,6 +102,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->pf_end = End;
     p_vout->pf_manage = Manage;
     p_vout->pf_swap = FirstSwap;
+    p_vout->pf_control = Control;
 
     p_vout->p_sys->hwnd = p_vout->p_sys->hvideownd = NULL;
     p_vout->p_sys->hparent = p_vout->p_sys->hfswnd = NULL;

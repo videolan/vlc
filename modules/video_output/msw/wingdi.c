@@ -152,6 +152,7 @@ static int OpenVideo ( vlc_object_t *p_this )
     p_vout->pf_end = End;
     p_vout->pf_manage = Manage;
     p_vout->pf_render = Render;
+    p_vout->pf_control = Control;
 #ifdef MODULE_NAME_IS_wingapi
     p_vout->pf_display = FirstDisplayGAPI;
 
