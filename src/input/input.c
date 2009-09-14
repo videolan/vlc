@@ -777,7 +777,7 @@ static void MainLoop( input_thread_t *p_input )
          * is paused -> this may cause problem with some of them
          * The same problem can be seen when seeking while paused */
         b_paused = p_input->p->i_state == PAUSE_S &&
-                   !es_out_GetBuffering( p_input->p->p_es_out );
+                   ( !es_out_GetBuffering( p_input->p->p_es_out ) || p_input->p->input.b_eof );
 
         b_demux_polled = true;
         if( !b_paused )
