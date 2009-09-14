@@ -2976,13 +2976,14 @@ static void EITCallBack( demux_t *p_demux,
                         if( psz_dsc && psz_itm )
                         {
                             msg_Dbg( p_demux, "       - desc='%s' item='%s'", psz_dsc, psz_itm );
-
+#if 0
                             psz_extra = realloc( psz_extra, strlen(psz_extra) + strlen(psz_dsc) + strlen(psz_itm) + 3 + 1 );
                             strcat( psz_extra, "(" );
                             strcat( psz_extra, psz_dsc );
                             strcat( psz_extra, " " );
                             strcat( psz_extra, psz_itm );
                             strcat( psz_extra, ")" );
+#endif
                         }
                         free( psz_dsc );
                         free( psz_itm );
