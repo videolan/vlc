@@ -729,10 +729,11 @@ void input_item_SetEpg( input_item_t *p_item,
                   1900 + tm_start.tm_year, 1 + tm_start.tm_mon, tm_start.tm_mday,
                   tm_start.tm_hour, tm_start.tm_min, tm_start.tm_sec );
         if( p_evt->psz_short_description || p_evt->psz_description )
-            InputItemAddInfo( p_item, psz_epg, psz_start, "%s (%2.2d:%2.2d) - %s",
+            InputItemAddInfo( p_item, psz_epg, psz_start, "%s (%2.2d:%2.2d) - %s %s",
                               p_evt->psz_name,
                               p_evt->i_duration/60/60, (p_evt->i_duration/60)%60,
-                              p_evt->psz_short_description ? p_evt->psz_short_description : p_evt->psz_description );
+                              p_evt->psz_short_description ? p_evt->psz_short_description : "" ,
+                              p_evt->psz_description ? p_evt->psz_description : "" );
         else
             InputItemAddInfo( p_item, psz_epg, psz_start, "%s (%2.2d:%2.2d)",
                               p_evt->psz_name,
