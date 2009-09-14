@@ -140,7 +140,7 @@ void SoundWidget::updateVolume( int i_sliderVolume )
     if( i_sliderVolume == 0 )
     {
         volMuteLabel->setPixmap( QPixmap(":/toolbar/volume-muted" ) );
-        volMuteLabel->setToolTip( qtr( "Unmute" ) );
+        volMuteLabel->setToolTip(qfu(vlc_pgettext("Tooltip|Unmute", "Unmute")));
         return;
     }
 
@@ -149,7 +149,7 @@ void SoundWidget::updateVolume( int i_sliderVolume )
     else if( i_sliderVolume > (VOLUME_MAX * 2 / 3 ) )
         volMuteLabel->setPixmap( QPixmap( ":/toolbar/volume-high" ) );
     else volMuteLabel->setPixmap( QPixmap( ":/toolbar/volume-medium" ) );
-    volMuteLabel->setToolTip( qtr( "Mute" ) );
+    volMuteLabel->setToolTip( qfu(vlc_pgettext("Tooltip|Mute", "Mute")) );
 }
 
 void SoundWidget::updateVolume()
