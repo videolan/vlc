@@ -69,7 +69,7 @@ static input_thread_t * Create  ( vlc_object_t *, input_item_t *,
                                   const char *, bool, input_resource_t * );
 static  int             Init    ( input_thread_t *p_input );
 static void             End     ( input_thread_t *p_input );
-static void             MainLoop( input_thread_t *p_input );
+static void             MainLoop( input_thread_t *p_input, bool b_interactive );
 
 static void ObjectKillChildrens( input_thread_t *, vlc_object_t * );
 
@@ -169,7 +169,7 @@ int __input_Read( vlc_object_t *p_parent, input_item_t *p_item )
 
     if( !Init( p_input ) )
     {
-        MainLoop( p_input );
+        MainLoop( p_input, false );
         End( p_input );
     }
 
@@ -526,7 +526,7 @@ static void *Run( vlc_object_t *p_this )
     if( Init( p_input ) )
         goto exit;
 
-    MainLoop( p_input );
+    MainLoop( p_input, true ); /* FIXME it can be wrong (like with VLM) */
 
     /* Clean up */
     End( p_input );
@@ -702,12 +702,13 @@ static void MainLoopStatistic( input_thread_t *p_input )
  * MainLoop
  * The main input loop.
  */
-static void MainLoop( input_thread_t *p_input )
+static void MainLoop( input_thread_t *p_input, bool b_interactive )
 {
     mtime_t i_start_mdate = mdate();
     mtime_t i_intf_update = 0;
     mtime_t i_statistic_update = 0;
-    bool b_pause_after_eof = var_CreateGetBool( p_input, "play-and-pause" );
+    bool b_pause_after_eof = b_interactive &&
+                             var_CreateGetBool( p_input, "play-and-pause" );
 
     /* Start the timer */
     stats_TimerStop( p_input, STATS_TIMER_INPUT_LAUNCHING );
