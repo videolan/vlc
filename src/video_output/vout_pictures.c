@@ -825,7 +825,7 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma, int i_width, int
         p_picture->p->i_visible_lines = i_height;
         p_picture->p->i_pitch = i_width_aligned;
         p_picture->p->i_visible_pitch = i_width;
-        p_picture->p->i_pixel_pitch = 8;
+        p_picture->p->i_pixel_pitch = 1;
         p_picture->i_planes = 1;
         break;
 
@@ -846,7 +846,7 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma, int i_width, int
         p_picture->p->i_visible_lines = i_height;
         p_picture->p->i_pitch = i_width_aligned * 2;
         p_picture->p->i_visible_pitch = i_width * 2;
-        p_picture->p->i_pixel_pitch = 4;
+        p_picture->p->i_pixel_pitch = 2;
         p_picture->i_planes = 1;
         break;
 
