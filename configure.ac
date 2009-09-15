@@ -4811,6 +4811,42 @@ then
   AC_DEFINE([UPDATE_CHECK], 1, [Define if you want to use the VLC update mechanism])
 fi
 
+dnl
+dnl SQLite
+dnl
+AC_ARG_ENABLE(sqlite,
+  [  --enable-sqlite   SQLite (default disabled)],,
+  [enable_sqlite = "no"])
+AC_ARG_WITH(sqlite,
+  [    --with-sqlite=PATH sqlite path linking])
+if test "${SYS}" != "darwin"; then
+  PKG_ENABLE_MODULES_VLC([SQLITE], [], [sqlite3], [sqlite3], [auto])
+else
+  if test "${enable_sqlite}" != "no"
+  then
+    AC_CHECK_HEADERS(sqlite3.h, [
+        VLC_ADD_PLUGIN([sqlite])
+        if test "${with_sqlite}" != "no" -a -n "${with_sqlite}"; then
+          AC_MSG_CHECKING(existence of sqlite directory in ${with_sqlite})
+          real_sqlite="`cd ${with_sqlite} 2>/dev/null && pwd`"
+          if test -z "${real_sqlite}"
+          then
+            dnl  The given directory can't be found
+            AC_MSG_RESULT(no)
+            AC_MSG_ERROR([cannot cd to ${with_sqlite}])
+          fi
+          VLC_ADD_CFLAGS([sqlite],[-I${with_sqlite}/include])
+          VLC_ADD_LIBS([sqlite], [-L${with_sqlite}/lib -lsqlite3])
+          AC_MSG_RESULT(yes)
+        else
+          VLC_ADD_LIBS([sqlite], [-lsqlite3])
+        fi
+        AC_DEFINE([SQLITE_MODULE], 1, [Define if you want to use SQLite module]) ],
+        AC_MSG_ERROR([sqlite3 is required for sqlite module]) )
+  fi
+fi
+AM_CONDITIONAL([HAVE_SQLITE], [test "${enable_sqlite}" != "no"])
+
 
 dnl
 dnl  Endianness check

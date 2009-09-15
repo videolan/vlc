@@ -289,6 +289,7 @@ $Id$
  * spdif_mixer: dummy audio mixer for the S/PDIF output
  * speex: a speex audio decoder/packetizer using the libspeex library
  * spudec: RLE DVD subtitles decoder
+ * sqlite: manage an SQLite database
  * stats: Stats encoder function
  * stream_filter_rar: Stream filter to read inside Rar files
  * stream_filter_record: record any stream instantly
