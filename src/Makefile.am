@@ -89,6 +89,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_plugin.h \
 	../include/vlc_rand.h \
 	../include/vlc_services_discovery.h \
+	../include/vlc_sql.h \
 	../include/vlc_sout.h \
 	../include/vlc_stream.h \
 	../include/vlc_strings.h \
@@ -436,6 +437,7 @@ SOURCES_libvlc_common = \
 	misc/filter.c \
 	misc/filter_chain.c \
 	misc/http_auth.c \
+	misc/sql.c \
 	$(NULL)
 
 SOURCES_libvlc_httpd = \
