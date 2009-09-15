@@ -134,7 +134,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     const char *progid = NULL;
 
     /* parse plugin arguments */
-    for( int i = 0; i < argc ; i++ )
+    for( int i = 0; i < argc , ppsz_argc < 32; i++ )
     {
        /* fprintf(stderr, "argn=%s, argv=%s\n", argn[i], argv[i]); */
 
