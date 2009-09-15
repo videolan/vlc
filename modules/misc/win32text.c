@@ -370,6 +370,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     if( !bitmap )
     {
         msg_Err( p_filter, "could not create bitmap" );
+        free( psz_string );
         return VLC_EGENERIC;
     }
 
@@ -388,6 +389,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     SelectObject( p_sys->hcdc, bitmap_bak );
     DeleteObject( bitmap );
+    free( psz_string );
     return VLC_SUCCESS;
 }
 
