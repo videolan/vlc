@@ -417,6 +417,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "prefer-system-codecs", Bool, NULL, systemCodecBox );
 #else
             ui.systemCodecBox->hide();
+            ui.systemCodecLabel->hide();
 #endif
             optionWidgets.append( ui.DVDDevice );
             optionWidgets.append( ui.cachingCombo );

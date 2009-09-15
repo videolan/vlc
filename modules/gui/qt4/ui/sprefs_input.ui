@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>687</width>
-    <height>507</height>
+    <height>489</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -18,13 +18,19 @@
    <item>
     <widget class="QGroupBox" name="groupBox">
      <property name="title">
-      <string>Disc Devices</string>
+      <string>Optical drive</string>
      </property>
      <layout class="QGridLayout">
       <item row="0" column="0">
        <widget class="QLabel" name="label">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
-         <string>Default disc device</string>
+         <string>Default optical device</string>
         </property>
         <property name="buddy">
          <cstring>DVDDevice</cstring>
@@ -32,31 +38,67 @@
        </widget>
       </item>
       <item row="0" column="1">
-       <widget class="QLineEdit" name="DVDDevice"/>
+       <layout class="QHBoxLayout" name="horizontalLayout_5">
+        <item>
+         <widget class="QLineEdit" name="DVDDevice"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="DVDBrowse">
+          <property name="text">
+           <string>Browse...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
-      <item row="0" column="2">
-       <widget class="QPushButton" name="DVDBrowse">
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_4">
+     <property name="title">
+      <string>Files</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout_3">
+      <item row="0" column="0">
+       <widget class="QLabel" name="aviLabel">
         <property name="text">
-         <string>Browse...</string>
+         <string>Damaged or incomplete AVI file</string>
+        </property>
+        <property name="buddy">
+         <cstring>AviRepair</cstring>
         </property>
        </widget>
       </item>
       <item row="1" column="0">
        <widget class="QLabel" name="recordLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
          <string>Record directory or filename</string>
         </property>
        </widget>
       </item>
       <item row="1" column="1">
-       <widget class="QLineEdit" name="recordPath"/>
+       <layout class="QHBoxLayout" name="horizontalLayout_4">
+        <item>
+         <widget class="QLineEdit" name="recordPath"/>
+        </item>
+        <item>
+         <widget class="QPushButton" name="recordBrowse">
+          <property name="text">
+           <string>Browse...</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
       </item>
-      <item row="1" column="2">
-       <widget class="QPushButton" name="recordBrowse">
-        <property name="text">
-         <string>Browse...</string>
-        </property>
-       </widget>
+      <item row="0" column="1">
+       <widget class="QComboBox" name="AviRepair"/>
       </item>
      </layout>
     </widget>
@@ -69,8 +111,14 @@
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
        <widget class="QLabel" name="portLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
-         <string>Server default port</string>
+         <string>Default port (server mode)</string>
         </property>
         <property name="margin">
          <number>0</number>
@@ -80,26 +128,10 @@
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="UDPPort">
-        <property name="alignment">
-         <set>Qt::AlignRight</set>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>65535</number>
-        </property>
-        <property name="value">
-         <number>1234</number>
-        </property>
-       </widget>
-      </item>
       <item row="1" column="0">
        <widget class="QLabel" name="httpProxyLabel">
         <property name="text">
-         <string>HTTP proxy</string>
+         <string>HTTP proxy URL</string>
         </property>
         <property name="buddy">
          <cstring>proxy</cstring>
@@ -109,27 +141,82 @@
       <item row="1" column="1">
        <widget class="QLineEdit" name="proxy"/>
       </item>
-     </layout>
-    </widget>
-   </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_5">
-     <property name="title">
-      <string>Caching</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout_3">
-      <item row="0" column="0">
+      <item row="3" column="0">
        <widget class="QLabel" name="label_2">
         <property name="text">
-         <string>Default caching level</string>
+         <string>Default caching policy</string>
         </property>
         <property name="buddy">
          <cstring>cachingCombo</cstring>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
+      <item row="3" column="1">
        <widget class="QComboBox" name="cachingCombo"/>
+      </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout">
+        <item>
+         <widget class="QRadioButton" name="HTTP">
+          <property name="text">
+           <string>HTTP (default)</string>
+          </property>
+          <property name="checkable">
+           <bool>true</bool>
+          </property>
+          <property name="checked">
+           <bool>true</bool>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <widget class="QRadioButton" name="RTSP_TCPBox">
+          <property name="text">
+           <string>RTP over RTSP (TCP)</string>
+          </property>
+         </widget>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="label_3">
+        <property name="text">
+         <string>Stream transport</string>
+        </property>
+       </widget>
+      </item>
+      <item row="0" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_3">
+        <item>
+         <widget class="QSpinBox" name="UDPPort">
+          <property name="alignment">
+           <set>Qt::AlignRight</set>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>65535</number>
+          </property>
+          <property name="value">
+           <number>1234</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer_2">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
       </item>
      </layout>
     </widget>
@@ -137,74 +224,84 @@
    <item>
     <widget class="QGroupBox" name="groupBox_3">
      <property name="title">
-      <string>Codecs / Muxers</string>
+      <string>Codecs</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="0" column="0">
+      <item row="2" column="0">
        <widget class="QLabel" name="ppLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
-         <string>Post-Processing quality</string>
+         <string>Video quality post-processing level</string>
         </property>
         <property name="buddy">
          <cstring>PostProcLevel</cstring>
         </property>
        </widget>
       </item>
-      <item row="0" column="1">
-       <widget class="QSpinBox" name="PostProcLevel">
-        <property name="alignment">
-         <set>Qt::AlignRight</set>
-        </property>
-        <property name="minimum">
-         <number>1</number>
-        </property>
-        <property name="maximum">
-         <number>65535</number>
-        </property>
-        <property name="value">
-         <number>6</number>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="aviLabel">
-        <property name="text">
-         <string>Repair AVI files</string>
-        </property>
-        <property name="buddy">
-         <cstring>AviRepair</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="1" column="1">
-       <widget class="QComboBox" name="AviRepair"/>
-      </item>
-      <item row="2" column="0" colspan="2">
-       <widget class="QCheckBox" name="systemCodecBox">
-        <property name="text">
-         <string>Use system codecs if available (better quality)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0" colspan="2">
-       <widget class="QCheckBox" name="RTSP_TCPBox">
-        <property name="text">
-         <string>Use RTP over RTSP (TCP)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0">
+      <item row="7" column="0">
        <widget class="QLabel" name="filterLabel">
         <property name="text">
-         <string>Skip the loop filter for H.264 decoding</string>
+         <string>H.264 in-loop deblocking filter</string>
         </property>
         <property name="buddy">
          <cstring>loopFilterBox</cstring>
         </property>
        </widget>
       </item>
-      <item row="4" column="1">
+      <item row="7" column="1">
        <widget class="QComboBox" name="loopFilterBox"/>
+      </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QSpinBox" name="PostProcLevel">
+          <property name="alignment">
+           <set>Qt::AlignRight</set>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>26</number>
+          </property>
+          <property name="value">
+           <number>6</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="1" column="0">
+       <widget class="QLabel" name="systemCodecLabel">
+        <property name="text">
+         <string>System codecs (better quality)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="1" column="1">
+       <widget class="QCheckBox" name="systemCodecBox">
+        <property name="text">
+         <string>Use host codecs if available</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
