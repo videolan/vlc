@@ -68,7 +68,7 @@ public interface LibVlc extends Library
 
         public int type;
 
-        public Pointer obj;
+        public Pointer p_obj;
 
         public event_type_specific event_type_specific;
 
@@ -76,7 +76,7 @@ public interface LibVlc extends Library
 
     public class media_meta_changed extends Structure
     {
-
+        // Enum !
         public Pointer meta_type;
     }
 
@@ -124,6 +124,21 @@ public interface LibVlc extends Library
 
         // @todo: check this one
         public long new_time;
+    }
+
+    public class media_player_title_changed extends Structure
+    {
+        public int new_title;
+    }
+
+    public class media_player_seekable_changed extends Structure
+    {
+        public NativeLong new_seekable;
+    }
+
+    public class media_player_pausable_changed extends Structure
+    {
+        public NativeLong new_pausable;
     }
 
     /* media list */
@@ -192,17 +207,26 @@ public interface LibVlc extends Library
         public int index;
     }
 
-    /* media discoverer */
-    public class media_media_discoverer_started extends Structure
+    public class media_list_player_next_item_set extends Structure
     {
-
-        public Pointer unused;
+        public LibVlcMedia item;
     }
 
-    public class media_media_discoverer_ended extends Structure
+    public class media_player_snapshot_taken extends Structure
     {
+        public String psz_filename;
+    }
 
-        public Pointer unused;
+    public class media_player_length_changed extends Structure
+    {
+        // @todo: check the type
+        public long new_length;
+    }
+
+    public class vlm_media_event extends Structure
+    {
+        public String psz_media_name;
+        public String psz_instance_name;
     }
 
     public class event_type_specific extends Union
@@ -224,6 +248,12 @@ public interface LibVlc extends Library
 
         public media_player_time_changed media_player_time_changed;
 
+        public media_player_title_changed media_player_title_changed;
+
+        public media_player_seekable_changed media_player_seekable_changed;
+
+        public media_player_pausable_changed media_player_pausable_changed;
+
         public media_list_item_added media_list_item_added;
 
         public media_list_will_add_item media_list_will_add_item;
@@ -239,6 +269,14 @@ public interface LibVlc extends Library
         public media_list_view_item_deleted media_list_view_item_deleted;
 
         public media_list_view_will_delete_item media_list_view_will_delete_item;
+
+        public media_list_player_next_item_set media_list_player_next_item_set;
+
+        public media_player_snapshot_taken media_player_snapshot_taken;
+
+        public media_player_length_changed media_player_length_changed;
+
+        public vlm_media_event vlm_media_event;
     }
 
     public class LibVlcInstance extends PointerType
