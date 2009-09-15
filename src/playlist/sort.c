@@ -141,16 +141,12 @@ void playlist_ItemArraySort( unsigned i_items, playlist_item_t **pp_items,
     else /* Randomise */
     {
         unsigned i_position;
+        unsigned i_new;
         playlist_item_t *p_temp;
 
-        for( i_position = 0; i_position < i_items ; i_position++ )
+        for( i_position = i_items - 1; i_position > 0; i_position-- )
         {
-            int i_new;
-
-            if( i_items > 1 )
-                i_new = rand() % (i_items - 1);
-            else
-                i_new = 0;
+            i_new = rand() % i_position;
             p_temp = pp_items[i_position];
             pp_items[i_position] = pp_items[i_new];
             pp_items[i_new] = p_temp;
