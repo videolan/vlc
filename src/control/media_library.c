@@ -117,7 +117,7 @@ libvlc_media_library_load( libvlc_media_library_t * p_mlib,
         psz_uri = NULL;
     free( psz_datadir );
 
-    if( psz_uri == NULL );
+    if( psz_uri == NULL )
     {
         libvlc_exception_raise( p_e );
         libvlc_printerr( "Not enough memory" );
