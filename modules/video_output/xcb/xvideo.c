@@ -252,15 +252,16 @@ FindFormat (vout_display_t *vd,
         if (chroma != ParseFormat (vd, f))
             continue;
 
+        /* VLC pads scanline to 16 pixels internally */
+        unsigned width = (fmt->i_width + 15) & ~15;
         xcb_xv_query_image_attributes_reply_t *i;
         i = xcb_xv_query_image_attributes_reply (conn,
             xcb_xv_query_image_attributes (conn, port, f->id,
-                fmt->i_width, fmt->i_height), NULL);
+                width, fmt->i_height), NULL);
         if (i == NULL)
             continue;
 
-        if (i->width != fmt->i_width
-         || i->height != fmt->i_height)
+        if (i->width != width || i->height != fmt->i_height)
         {
             msg_Warn (vd, "incompatible size %ux%u -> %"PRIu32"x%"PRIu32,
                       fmt->i_width, fmt->i_height,
@@ -622,7 +623,8 @@ static void Display (vout_display_t *vd, picture_t *pic)
                           vd->source.i_visible_width,
                           vd->source.i_visible_height,
                           0, 0, p_sys->width, p_sys->height,
-                          vd->source.i_width, vd->source.i_height,
+                          pic->p->i_pitch / pic->p->i_pixel_pitch,
+                          pic->p->i_visible_lines,
                           p_sys->data_size, pic->p->p_pixels);
 
     /* Wait for reply. See x11.c for rationale. */
