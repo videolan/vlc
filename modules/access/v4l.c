@@ -38,6 +38,7 @@
 #include <vlc_demux.h>
 #include <vlc_access.h>
 #include <vlc_picture.h>
+#include <vlc_charset.h>
 
 #include <sys/ioctl.h>
 #include <sys/mman.h>
@@ -631,8 +632,8 @@ static void ParseMRL( demux_t *p_demux )
             }
             else if( !strncmp( psz_parser, "fps=", strlen( "fps=" ) ) )
             {
-                p_sys->f_fps = strtof( psz_parser + strlen( "fps=" ),
-                                       &psz_parser );
+                p_sys->f_fps = us_strtof( psz_parser + strlen( "fps=" ),
+                                          &psz_parser );
             }
             else if( !strncmp( psz_parser, "adev=", strlen( "adev=" ) )
              || !strncmp( psz_parser, "samplerate=", strlen( "samplerate=" ) )

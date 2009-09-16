@@ -29,6 +29,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_charset.h>
 #include "variables.h"
 
 #include "libvlc.h"
@@ -1122,7 +1123,7 @@ void var_OptionParse( vlc_object_t *p_obj, const char *psz_option,
         break;
 
     case VLC_VAR_FLOAT:
-        val.f_float = atof( psz_value );
+        val.f_float = us_atof( psz_value );
         break;
 
     case VLC_VAR_STRING:
@@ -1596,7 +1597,7 @@ int __var_Command( vlc_object_t *p_this, const char *psz_name,
             i_ret = var_SetInteger( p_obj, psz_cmd, atoi( psz_arg ) );
             break;
         case VLC_VAR_FLOAT:
-            i_ret = var_SetFloat( p_obj, psz_cmd, atof( psz_arg ) );
+            i_ret = var_SetFloat( p_obj, psz_cmd, us_atof( psz_arg ) );
             break;
         case VLC_VAR_STRING:
             i_ret = var_SetString( p_obj, psz_cmd, psz_arg );

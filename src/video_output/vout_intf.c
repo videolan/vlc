@@ -269,7 +269,7 @@ void vout_IntfInit( vout_thread_t *p_vout )
         }
         else
         {
-            i_aspect = atof( val.psz_string );
+            i_aspect = us_atof( val.psz_string );
             vlc_ureduce( &i_aspect_num, &i_aspect_den,
                          i_aspect *VOUT_ASPECT_FACTOR, VOUT_ASPECT_FACTOR, 0 );
         }

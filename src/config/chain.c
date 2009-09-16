@@ -33,6 +33,7 @@
 
 #include <vlc_common.h>
 #include "libvlc.h"
+#include <vlc_charset.h>
 
 #include "vlc_interface.h"
 
@@ -382,7 +383,7 @@ void __config_ChainParse( vlc_object_t *p_this, const char *psz_prefix,
                                     NULL, 0 );
                 break;
             case VLC_VAR_FLOAT:
-                val.f_float = atof( cfg->psz_value ? cfg->psz_value : "0" );
+                val.f_float = us_atof( cfg->psz_value ? cfg->psz_value : "0" );
                 break;
             case VLC_VAR_STRING:
             case VLC_VAR_MODULE:
