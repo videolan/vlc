@@ -543,6 +543,8 @@ libmpeg2-$(LIBMPEG2_VERSION).tar.gz:
 
 libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	cd libmpeg2 && patch -p0 < ../Patches/libmpeg2-mc-neon.patch
+	cd libmpeg2 && ./bootstrap
 
 .mpeg2: libmpeg2
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-x --disable-sdl && cd libmpeg2 && make && make install && cd ../include && make && make install)
