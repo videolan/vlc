@@ -173,11 +173,11 @@ struct libvlc_event_t
         } media_player_title_changed;
         struct
         {
-            uint64_t new_seekable; /* FIXME: that's a boolean! */
+            int new_seekable;
         } media_player_seekable_changed;
         struct
         {
-            uint64_t new_pausable; /* FIXME: that's a BOOL!!! */
+            int new_pausable;
         } media_player_pausable_changed;
 
         /* media list */
@@ -229,7 +229,7 @@ struct libvlc_event_t
         {
             libvlc_media_t * item;
         } media_list_player_next_item_set;
-        
+
         /* snapshot taken */
         struct
         {
