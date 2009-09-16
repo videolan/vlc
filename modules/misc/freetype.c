@@ -323,11 +323,10 @@ static int Create( vlc_object_t *p_this )
     fontindex=0;
     if( !psz_fontfamily || !*psz_fontfamily )
     {
+        free( psz_fontfamily );
 #ifdef HAVE_FONTCONFIG
-        free( psz_fontfamily);
         psz_fontfamily=strdup( DEFAULT_FONT );
 #else
-        free( psz_fontfamily );
         psz_fontfamily = (char *)malloc( PATH_MAX + 1 );
         if( !psz_fontfamily )
             goto error;
