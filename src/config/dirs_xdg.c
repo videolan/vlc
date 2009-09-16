@@ -121,78 +121,84 @@ static char *config_GetTypeDir (const char *xdg_name)
 
     FILE *stream = fopen (path, "rt");
     free (path);
-    if (stream == NULL)
-        return NULL;
-
-    char *linebuf = NULL;
-    size_t linelen = 0;
-
-    while (getline (&linebuf, &linelen, stream) != -1)
+    path = NULL;
+    if (stream != NULL)
     {
-        char *ptr = linebuf;
-        ptr += strspn (ptr, " \t"); /* Skip whites */
-        if (strncmp (ptr, "XDG_", 4))
-            continue;
-        ptr += 4; /* Skip XDG_ */
-        if (strncmp (ptr, xdg_name, namelen))
-            continue;
-        ptr += namelen; /* Skip XDG type name */
-        if (strncmp (ptr, "_DIR", 4))
-            continue;
-        ptr += 4; /* Skip _DIR */
-        ptr += strspn (ptr, " \t"); /* Skip whites */
-        if (*ptr != '=')
-            continue;
-        ptr++; /* Skip equality sign */
-        ptr += strspn (ptr, " \t"); /* Skip whites */
-        if (*ptr != '"')
-            continue;
-        ptr++; /* Skip quote */
-        linelen -= ptr - linebuf;
+        char *linebuf = NULL;
+        size_t linelen = 0;
 
-        char *out;
-        if (strncmp (ptr, "$HOME", 5))
+        while (getline (&linebuf, &linelen, stream) != -1)
         {
-            path = malloc (linelen);
-            if (path == NULL)
+            char *ptr = linebuf;
+            ptr += strspn (ptr, " \t"); /* Skip whites */
+            if (strncmp (ptr, "XDG_", 4))
                 continue;
-            out = path;
-        }
-        else
-        {   /* Prefix with $HOME */
-            ptr += 5;
-            path = malloc (homelen + linelen - 5);
-            if (path == NULL)
+            ptr += 4; /* Skip XDG_ */
+            if (strncmp (ptr, xdg_name, namelen))
                 continue;
-            memcpy (path, home, homelen);
-            out = path + homelen;
-        }
+            ptr += namelen; /* Skip XDG type name */
+            if (strncmp (ptr, "_DIR", 4))
+                continue;
+            ptr += 4; /* Skip _DIR */
+            ptr += strspn (ptr, " \t"); /* Skip whites */
+            if (*ptr != '=')
+                continue;
+            ptr++; /* Skip equality sign */
+            ptr += strspn (ptr, " \t"); /* Skip whites */
+            if (*ptr != '"')
+                continue;
+            ptr++; /* Skip quote */
+            linelen -= ptr - linebuf;
 
-        while (*ptr != '"')
-        {
-            if (*ptr == '\\')
-                ptr++;
-            if (*ptr == '\0')
-                goto skip;
-            *(out++) = *(ptr++);
+            char *out;
+            if (strncmp (ptr, "$HOME", 5))
+            {
+                path = malloc (linelen);
+                if (path == NULL)
+                    continue;
+                out = path;
+            }
+            else
+            {   /* Prefix with $HOME */
+                ptr += 5;
+                path = malloc (homelen + linelen - 5);
+                if (path == NULL)
+                    continue;
+                memcpy (path, home, homelen);
+                out = path + homelen;
+            }
+
+            while (*ptr != '"')
+            {
+                if (*ptr == '\\')
+                    ptr++;
+                if (*ptr == '\0')
+                {
+                    free (path);
+                    path = NULL;
+                    continue;
+                }
+                *(out++) = *(ptr++);
+            }
+            *out = '\0';
+            break;
         }
-        *out = '\0';
-        goto done;
-    skip:
-        free (path);
+        free (linebuf);
+        fclose (stream);
     }
 
     /* Default! */
-    if (strcmp (xdg_name, "DESKTOP") == 0)
+    if (path == NULL)
     {
-        if (asprintf (&path, "%s/Desktop", home) == -1)
-            path = NULL;
+        if (strcmp (xdg_name, "DESKTOP") == 0)
+        {
+            if (asprintf (&path, "%s/Desktop", home) == -1)
+                path = NULL;
+        }
+        else
+            path = strdup (home);
     }
-    else
-        path = strdup (home);
 
-done:
-    free (linebuf);
     char *ret = FromLocaleDup (path);
     free (path);
     return ret;
