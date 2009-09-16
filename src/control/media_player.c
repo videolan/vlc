@@ -54,10 +54,37 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
                      vlc_value_t oldval, vlc_value_t newval,
                      void * p_userdata );
 
-static int SnapshotTakenCallback( vlc_object_t *p_this, char const *psz_cmd,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data );
+static int
+snapshot_was_taken( vlc_object_t *p_this, char const *psz_cmd,
+                    vlc_value_t oldval, vlc_value_t newval, void *p_data );
 
 static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi );
+
+/*
+ * Shortcuts
+ */
+
+#define register_event(a, b) __register_event(a, libvlc_MediaPlayer ## b)
+static inline void __register_event(libvlc_media_player_t *mp, libvlc_event_type_t type)
+{
+    libvlc_event_manager_register_event_type(mp->p_event_manager, type, NULL);
+}
+
+static inline void lock(libvlc_media_player_t *mp)
+{
+    vlc_mutex_lock(&mp->object_lock);
+}
+
+static inline void unlock(libvlc_media_player_t *mp)
+{
+    vlc_mutex_unlock(&mp->object_lock);
+}
+
+static inline void clear_if_needed(libvlc_exception_t *e)
+{
+    if (libvlc_exception_raised(e))
+        libvlc_exception_clear(e);
+}
 
 /*
  * Release the associated input thread.
@@ -112,18 +139,18 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_player_t *p_mi,
 
     if( !p_mi ) RAISENULL( "Media Instance is NULL" );
 
-    vlc_mutex_lock( &p_mi->object_lock );
+    lock(p_mi);
 
     if( !p_mi->p_input_thread )
     {
-        vlc_mutex_unlock( &p_mi->object_lock );
+        unlock(p_mi);
         RAISENULL( "Input is NULL" );
     }
 
     p_input_thread = p_mi->p_input_thread;
     vlc_object_hold( p_input_thread );
 
-    vlc_mutex_unlock( &p_mi->object_lock );
+    unlock(p_mi);
 
     return p_input_thread;
 }
@@ -253,7 +280,28 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
 
 }
 
+/**************************************************************************
+ * Snapshot Taken Event.
+ *
+ * FIXME: This snapshot API interface makes no sense in media_player.
+ *************************************************************************/
+static int snapshot_was_taken(vlc_object_t *p_this, char const *psz_cmd,
+                              vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_this);
+
+    libvlc_media_player_t *mp = p_data;
+    libvlc_event_t event;
+    event.type = libvlc_MediaPlayerSnapshotTaken;
+    event.u.media_player_snapshot_taken.psz_filename = newval.psz_string;
+    libvlc_event_send(mp->p_event_manager, &event);
+
+    return VLC_SUCCESS;
+}
+
+
 static void libvlc_media_player_destroy( libvlc_media_player_t * );
+
 
 /**************************************************************************
  * Create a Media Instance object.
@@ -270,85 +318,67 @@ static void libvlc_media_player_destroy( libvlc_media_player_t * );
  * - When attempting to destroy the object the lock is also held.
  **************************************************************************/
 libvlc_media_player_t *
-libvlc_media_player_new( libvlc_instance_t * p_libvlc_instance,
-                           libvlc_exception_t * p_e )
+libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
 {
-    libvlc_media_player_t * p_mi;
+    libvlc_media_player_t * mp;
 
-    assert( p_libvlc_instance );
+    assert(instance);
 
-    p_mi = malloc( sizeof(libvlc_media_player_t) );
-    if( !p_mi )
+    mp = malloc(sizeof(libvlc_media_player_t));
+    if (!mp)
     {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Not enough memory" );
+        libvlc_exception_raise(e);
+        libvlc_printerr("Not enough memory");
         return NULL;
     }
-    p_mi->p_md = NULL;
-    p_mi->drawable.agl = 0;
-    p_mi->drawable.xid = 0;
-    p_mi->drawable.hwnd = NULL;
-    p_mi->drawable.nsobject = NULL;
-    p_mi->p_libvlc_instance = p_libvlc_instance;
-    p_mi->p_input_thread = NULL;
-    p_mi->p_input_resource = NULL;
-    p_mi->i_refcount = 1;
-    vlc_mutex_init( &p_mi->object_lock );
-    p_mi->p_event_manager = libvlc_event_manager_new( p_mi,
-            p_libvlc_instance, p_e );
-    if( libvlc_exception_raised( p_e ) )
+    mp->p_md = NULL;
+    mp->drawable.agl = 0;
+    mp->drawable.xid = 0;
+    mp->drawable.hwnd = NULL;
+    mp->drawable.nsobject = NULL;
+    mp->p_libvlc_instance = instance;
+    mp->p_input_thread = NULL;
+    mp->p_input_resource = NULL;
+    mp->i_refcount = 1;
+    vlc_mutex_init(&mp->object_lock);
+    mp->p_event_manager = libvlc_event_manager_new(mp, instance, e);
+    if (libvlc_exception_raised(e))
     {
-        vlc_mutex_destroy( &p_mi->object_lock );
-        free( p_mi );
+        vlc_mutex_destroy(&mp->object_lock);
+        free(mp);
         return NULL;
     }
 
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerNothingSpecial, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerOpening, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerBuffering, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerPlaying, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerPaused, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerStopped, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerForward, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerBackward, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerEndReached, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerEncounteredError, p_e );
+    register_event(mp, NothingSpecial);
+    register_event(mp, Opening);
+    register_event(mp, Buffering);
+    register_event(mp, Playing);
+    register_event(mp, Paused);
+    register_event(mp, Stopped);
+    register_event(mp, Forward);
+    register_event(mp, Backward);
+    register_event(mp, EndReached);
+    register_event(mp, EncounteredError);
 
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerPositionChanged, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerTimeChanged, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerLengthChanged, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerTitleChanged, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerSeekableChanged, p_e );
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-            libvlc_MediaPlayerPausableChanged, p_e );
+    register_event(mp, PositionChanged);
+    register_event(mp, TimeChanged);
+    register_event(mp, LengthChanged);
+    register_event(mp, TitleChanged);
+    register_event(mp, PausableChanged);
 
     /* Snapshot initialization */
-    libvlc_event_manager_register_event_type( p_mi->p_event_manager,
-           libvlc_MediaPlayerSnapshotTaken, p_e );
+    register_event(mp, SnapshotTaken);
 
     /* Attach a var callback to the global object to provide the glue between
-        vout_thread that generates the event and media_player that re-emits it
-        with its own event manager
-    */
-    var_AddCallback( p_libvlc_instance->p_libvlc_int, "snapshot-file",
-                     SnapshotTakenCallback, p_mi );
+     * vout_thread that generates the event and media_player that re-emits it
+     * with its own event manager
+     *
+     * FIXME: It's unclear why we want to put this in public API, and why we
+     * want to expose it in such a limiting and ugly way.
+     */
+    var_AddCallback(instance->p_libvlc_int, "snapshot-file", snapshot_was_taken, mp);
 
-    return p_mi;
+    return mp;
 }
 
 /**************************************************************************
@@ -382,7 +412,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
 
     /* Detach Callback from the main libvlc object */
     var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int,
-                     "snapshot-file", SnapshotTakenCallback, p_mi );
+                     "snapshot-file", snapshot_was_taken, p_mi );
 
     /* Release the input thread */
     release_input_thread( p_mi, true );
@@ -409,9 +439,9 @@ void libvlc_media_player_release( libvlc_media_player_t *p_mi )
     bool destroy;
 
     assert( p_mi );
-    vlc_mutex_lock( &p_mi->object_lock );
+    lock(p_mi);
     destroy = !--p_mi->i_refcount;
-    vlc_mutex_unlock( &p_mi->object_lock );
+    unlock(p_mi);
 
     if( destroy )
         libvlc_media_player_destroy( p_mi );
@@ -426,9 +456,9 @@ void libvlc_media_player_retain( libvlc_media_player_t *p_mi )
 {
     assert( p_mi );
 
-    vlc_mutex_lock( &p_mi->object_lock );
+    lock(p_mi);
     p_mi->i_refcount++;
-    vlc_mutex_unlock( &p_mi->object_lock );
+    unlock(p_mi);
 }
 
 /**************************************************************************
@@ -446,7 +476,7 @@ void libvlc_media_player_set_media(
     if( !p_mi )
         return;
 
-    vlc_mutex_lock( &p_mi->object_lock );
+    lock(p_mi);
 
     /* FIXME I am not sure if it is a user request or on die(eof/error)
      * request here */
@@ -463,7 +493,7 @@ void libvlc_media_player_set_media(
     if( !p_md )
     {
         p_mi->p_md = NULL;
-        vlc_mutex_unlock( &p_mi->object_lock );
+        unlock(p_mi);
         return; /* It is ok to pass a NULL md */
     }
 
@@ -474,7 +504,7 @@ void libvlc_media_player_set_media(
      * libvlc_instance, because we don't really care */
     p_mi->p_libvlc_instance = p_md->p_libvlc_instance;
 
-    vlc_mutex_unlock( &p_mi->object_lock );
+    unlock(p_mi);
 }
 
 /**************************************************************************
@@ -488,11 +518,11 @@ libvlc_media_player_get_media(
     libvlc_media_t *p_m;
     VLC_UNUSED(p_e);
 
-    vlc_mutex_lock( &p_mi->object_lock );
+    lock(p_mi);
     p_m = p_mi->p_md;
     if( p_m )
         libvlc_media_retain( p_mi->p_md );
-    vlc_mutex_unlock( &p_mi->object_lock );
+    unlock(p_mi);
     return p_mi->p_md;
 }
 
@@ -507,29 +537,6 @@ libvlc_media_player_event_manager(
     VLC_UNUSED(p_e);
 
     return p_mi->p_event_manager;
-}
-
-/**************************************************************************
- * Trigger a snapshot Taken Event.
- *************************************************************************/
-static int SnapshotTakenCallback( vlc_object_t *p_this, char const *psz_cmd,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval);
-    VLC_UNUSED(p_this) ;
-
-    libvlc_media_player_t* p_mi = (libvlc_media_player_t*) p_data ;
-    libvlc_event_t event ;
-    event.type = libvlc_MediaPlayerSnapshotTaken ;
-    event.u.media_player_snapshot_taken.psz_filename = newval.psz_string ;
-    /* Snapshot psz data is a vlc_variable owned by libvlc object .
-         Its memmory management is taken care by the obj*/
-    msg_Dbg( p_this, "about to emit libvlc_snapshot_taken.make psz_str=0x%p"
-             " (%s)", event.u.media_player_snapshot_taken.psz_filename,
-             event.u.media_player_snapshot_taken.psz_filename );
-    libvlc_event_send( p_mi->p_event_manager, &event );
-
-    return VLC_SUCCESS;
 }
 
 /**************************************************************************
@@ -551,11 +558,11 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
     /* Ignore previous exception */
     libvlc_exception_clear( p_e );
 
-    vlc_mutex_lock( &p_mi->object_lock );
+    lock(p_mi);
 
     if( !p_mi->p_md )
     {
-        vlc_mutex_unlock( &p_mi->object_lock );
+        unlock(p_mi);
         libvlc_exception_raise( p_e );
         libvlc_printerr( "No associated media descriptor" );
         return;
@@ -566,7 +573,7 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
 
     if( !p_mi->p_input_thread )
     {
-        vlc_mutex_unlock( &p_mi->object_lock );
+        unlock(p_mi);
         return;
     }
 
@@ -599,7 +606,7 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
         p_mi->p_input_thread = NULL;
     }
 
-    vlc_mutex_unlock( &p_mi->object_lock );
+    unlock(p_mi);
 }
 
 /**************************************************************************
@@ -660,9 +667,9 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
 
-    vlc_mutex_lock( &p_mi->object_lock );
+    lock(p_mi);
     release_input_thread( p_mi, true ); /* This will stop the input thread */
-    vlc_mutex_unlock( &p_mi->object_lock );
+    unlock(p_mi);
 }
 
 /**************************************************************************
@@ -1080,8 +1087,7 @@ libvlc_state_t libvlc_media_player_get_state(
     if( !p_input_thread )
     {
         /* We do return the right value, no need to throw an exception */
-        if( libvlc_exception_raised( p_e ) )
-            libvlc_exception_clear( p_e );
+        clear_if_needed(p_e);
         return state;
     }
 
@@ -1107,8 +1113,7 @@ int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi,
     if ( !p_input_thread )
     {
         /* We do return the right value, no need to throw an exception */
-        if( libvlc_exception_raised( p_e ) )
-            libvlc_exception_clear( p_e );
+        clear_if_needed(p_e);
         return false;
     }
     b_seekable = var_GetBool( p_input_thread, "can-seek" );
@@ -1201,8 +1206,7 @@ int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi,
     if ( !p_input_thread )
     {
         /* We do return the right value, no need to throw an exception */
-        if( libvlc_exception_raised( p_e ) )
-            libvlc_exception_clear( p_e );
+        clear_if_needed(p_e);
         return false;
     }
     b_can_pause = var_GetBool( p_input_thread, "can-pause" );
