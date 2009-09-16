@@ -326,7 +326,6 @@ static int Create( vlc_object_t *p_this )
 #ifdef HAVE_FONTCONFIG
         free( psz_fontfamily);
         psz_fontfamily=strdup( DEFAULT_FONT );
-#endif
 #else
         free( psz_fontfamily );
         psz_fontfamily = (char *)malloc( PATH_MAX + 1 );
