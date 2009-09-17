@@ -364,7 +364,6 @@ case "${host_os}" in
         then
           AC_CHECK_TOOL(PEFLAGS, peflags, :)
         fi
-        AM_CONDITIONAL(USE_PEFLAGS, [test "${enable_peflags}" = "yes"])
     fi
     if test "${SYS}" = "mingwce"; then
         # add ws2 for closesocket, select, recv
@@ -412,6 +411,7 @@ AM_CONDITIONAL(HAVE_DARWIN, test "${SYS}" = "darwin")
 AM_CONDITIONAL(HAVE_LINUX, [test "${SYS}" = "linux"])
 AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WINCE, test "${SYS}" = "mingwce")
+AM_CONDITIONAL(USE_PEFLAGS, [test "${enable_peflags}" = "yes"])
 
 dnl
 dnl Sadly autoconf doesn't think about testing foo.exe when ask to test
