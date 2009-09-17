@@ -344,8 +344,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     SetTextColor( p_sys->hcdc, RGB( (i_font_color >> 16) & 0xff,
                   (i_font_color >> 8) & 0xff, i_font_color & 0xff) );
 
-    GetTextExtentExPoint( p_sys->hcdc, psz_string, _tcslen(psz_string),
-                          0, 0, 0, &size );
+    GetTextExtentPoint( p_sys->hcdc, psz_string, _tcslen(psz_string), &size );
     i_width = rect.right = size.cx; i_height = rect.bottom = size.cy;
 
     p_bmi = malloc(sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD)*16);
