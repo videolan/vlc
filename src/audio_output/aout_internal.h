@@ -219,39 +219,39 @@ static inline bool AoutChangeFilterString( vlc_object_t *p_obj, aout_instance_t 
                                            const char* psz_variable,
                                            const char *psz_name, bool b_add )
 {
-    vlc_value_t val;
+    char *psz_val;
     char *psz_parser;
 
     if( *psz_name == '\0' )
         return false;
 
     if( p_aout )
-        var_Get( p_aout, psz_variable, &val );
+        psz_val = var_GetString( p_aout, psz_variable );
     else
-        val.psz_string = config_GetPsz( p_obj, "audio-filter" );
+        psz_val = config_GetPsz( p_obj, "audio-filter" );
 
-    if( !val.psz_string )
-        val.psz_string = strdup("");
+    if( !psz_val )
+        psz_val = strdup( "" );
 
-    psz_parser = strstr( val.psz_string, psz_name );
+    psz_parser = strstr( psz_val, psz_name );
 
     if( ( b_add && psz_parser ) || ( !b_add && !psz_parser ) )
     {
         /* Nothing to do */
-        free( val.psz_string );
+        free( psz_val );
         return false;
     }
 
     if( b_add )
     {
-        char *psz_old = val.psz_string;
+        char *psz_old = psz_val;
         if( *psz_old )
         {
-            if( asprintf( &val.psz_string, "%s:%s", psz_old, psz_name ) == -1 )
-                val.psz_string = NULL;
+            if( asprintf( &psz_val, "%s:%s", psz_old, psz_name ) == -1 )
+                psz_val = NULL;
         }
         else
-            val.psz_string = strdup( psz_name );
+            psz_val = strdup( psz_name );
         free( psz_old );
     }
     else
@@ -267,10 +267,10 @@ static inline bool AoutChangeFilterString( vlc_object_t *p_obj, aout_instance_t 
     }
 
     if( p_aout )
-        var_Set( p_aout, psz_variable, val );
+        var_SetString( p_aout, psz_variable, psz_val );
     else
-        config_PutPsz( p_obj, psz_variable, val.psz_string );
-    free( val.psz_string );
+        config_PutPsz( p_obj, psz_variable, psz_val );
+    free( psz_val );
     return true;
 }
 

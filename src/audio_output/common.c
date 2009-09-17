@@ -77,7 +77,6 @@ static void aout_Destructor( vlc_object_t * p_this );
 aout_instance_t * __aout_New( vlc_object_t * p_parent )
 {
     aout_instance_t * p_aout;
-    vlc_value_t val;
 
     /* Allocate descriptor. */
     p_aout = vlc_object_create( p_parent, VLC_OBJECT_AOUT );
@@ -97,8 +96,7 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     p_aout->output.b_starving = 1;
 
     var_Create( p_aout, "intf-change", VLC_VAR_BOOL );
-    val.b_bool = true;
-    var_Set( p_aout, "intf-change", val );
+    var_SetBool( p_aout, "intf-change", true );
 
     vlc_object_set_destructor( p_aout, aout_Destructor );
 
