@@ -1379,6 +1379,13 @@ static int  Open ( vlc_object_t *p_this )
 
 #endif
 
+#if X264_BUILD >= 69
+    /* Set lookahead value to lower than default,
+     * as rtp-output without mux doesn't handle
+     * difference that well yet*/
+    p_sys->param.rc.i_lookahead=5;
+#endif
+
     /* Open the encoder */
     p_sys->h = x264_encoder_open( &p_sys->param );
 
