@@ -108,8 +108,6 @@ struct decoder_sys_t
     int i_pitch;
 
     vlc_fourcc_t i_chroma;
-
-    picture_t *p_pic;
 };
 
 
@@ -219,8 +217,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     p_sys->i_pitch = pitch;
 
-    p_sys->p_pic = NULL;
-
     /* Set callbacks */
     p_dec->pf_decode_video = DecodeBlock;
 
@@ -240,28 +236,27 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
     block_t *p_block;
+    picture_t*  p_pic;
 
     if( !pp_block || !*pp_block ) return NULL;
 
     p_block = *pp_block;
 
     // create new picture
-    if( p_sys->p_pic != NULL )
-        picture_Release( p_sys->p_pic );
-    p_sys->p_pic = decoder_NewPicture( p_dec );
-    if ( !p_sys->p_pic ) return NULL;
-    p_sys->p_pic->b_force = true;
-    p_sys->p_pic->p->i_pitch = p_dec->p_sys->i_pitch;
-    p_sys->p_pic->date = p_block->i_pts > 0 ? p_block->i_pts : p_block->i_dts;
+    p_pic = decoder_NewPicture( p_dec );
+    if ( !p_pic ) return NULL;
+    p_pic->b_force = true;
+    p_pic->p->i_pitch = p_dec->p_sys->i_pitch;
+    p_pic->date = p_block->i_pts > 0 ? p_block->i_pts : p_block->i_dts;
 
     // lock input and copy to picture
-    p_sys->p_pic->p->p_pixels = p_sys->pf_lock( p_dec->p_sys->p_data );
+    p_pic->p->p_pixels = p_sys->pf_lock( p_dec->p_sys->p_data );
 
     // unlock input
     p_sys->pf_unlock( p_dec->p_sys->p_data );
 
     block_Release( *pp_block ); *pp_block = NULL;
-    return p_sys->p_pic;
+    return p_pic;
 }
 
 /*****************************************************************************
@@ -271,9 +266,6 @@ static void CloseDecoder( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t *)p_this;
     decoder_sys_t *p_sys = p_dec->p_sys;
-
-    if( p_sys->p_pic != NULL )
-        picture_Release( p_sys->p_pic );
 
     free( p_sys );
 }
