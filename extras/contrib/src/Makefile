@@ -735,7 +735,7 @@ endif
 
 ifdef SVN
 tremor-source: tremor
-	tar cfvz tremor-$(DATE).tar.gz tremor
+	tar cv --exclude=.svn tremor | bzip2 > tremor-$(DATE).tar.bz2
 
 SOURCE += tremor-source
 endif
@@ -1082,7 +1082,7 @@ endif
 
 ifdef SVN
 ffmpeg-source: ffmpeg
-	tar cfvz ffmpeg-$(DATE).tar.gz ffmpeg
+	tar cv --exclude=.svn ffmpeg | bzip2 > ffmpeg-$(DATE).tar.bz2
 
 SOURCE += ffmpeg-source
 endif
@@ -1114,7 +1114,7 @@ endif
 
 ifdef SVN
 libdvdcss-source: libdvdcss
-	tar cfvz libdvdcss-$(DATE).tar.gz libdvdcss
+	tar cv --exclude=.svn libdvdcss | bzip2 > libdvdcss-$(DATE).tar.bz2
 
 SOURCE += libdvdcss-source
 endif
