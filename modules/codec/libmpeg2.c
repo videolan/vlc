@@ -212,7 +212,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
 
 #elif defined(__arm__)
-    i_accel | MPEG2_ACCEL_ARM;
+    i_accel |= MPEG2_ACCEL_ARM;
 
 #else
     /* If we do not know this CPU, trust libmpeg2's feature detection */
