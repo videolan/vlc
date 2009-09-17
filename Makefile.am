@@ -766,6 +766,13 @@ package-win32-base-debug: package-win-common
 # Contrib *.dll's
 	cp $(srcdir)/extras/contrib/lib/*.dll "vlc-$(VERSION)/" || true
 
+#Enable DEP and ASLR for all the binaries
+if USE_PEFLAGS
+	find $(win32_destdir) -type f -name '*.dll' -print -o -name '*.exe' -print | while read i; do \
+	$(PEFLAGS) --dynamicbase=true --nxcompat=true "$$i" ; \
+	done
+endif
+
 # Copy the lua scripts (HTTP)
 if BUILD_LUA
 	mkdir -p "$(win32_lua_destdir)/http/images"
