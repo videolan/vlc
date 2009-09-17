@@ -1386,9 +1386,10 @@ endif
 endif
 	touch $@
 
-ifdef SVN
+ifdef GIT
 x264-source: x264
-	tar cfvz x264-$(DATE).tar.gz x264
+	cd x264 && \
+	git archive --format=tar HEAD | bzip2 > ../x264-$(DATE).tar.bz2
 
 SOURCE += x264-source
 endif
