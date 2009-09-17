@@ -1,10 +1,11 @@
 /*****************************************************************************
  * win32text.c : Text drawing routines using the TextOut win32 API
  *****************************************************************************
- * Copyright (C) 2002 - 2005 the VideoLAN team
+ * Copyright (C) 2002 - 2009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
+ *          Pierre Ynard
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -302,8 +303,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     int i, i_width, i_height;
     HBITMAP bitmap, bitmap_bak;
     BITMAPINFO *p_bmi;
-    RECT rect = {0};
-    SIZE size;
+    RECT rect = { 0, 0, 0, 0 };
 
     /* Sanity check */
     if( !p_region_in || !p_region_out ) return VLC_EGENERIC;
@@ -344,8 +344,9 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     SetTextColor( p_sys->hcdc, RGB( (i_font_color >> 16) & 0xff,
                   (i_font_color >> 8) & 0xff, i_font_color & 0xff) );
 
-    GetTextExtentPoint( p_sys->hcdc, psz_string, _tcslen(psz_string), &size );
-    i_width = rect.right = size.cx; i_height = rect.bottom = size.cy;
+    DrawText( p_sys->hcdc, psz_string, -1, &rect,
+              DT_CALCRECT | DT_CENTER | DT_NOPREFIX );
+    i_width = rect.right; i_height = rect.bottom;
 
     p_bmi = malloc(sizeof(BITMAPINFOHEADER) + sizeof(RGBQUAD)*16);
     memset( p_bmi, 0, sizeof(BITMAPINFOHEADER) );
@@ -376,8 +377,8 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     bitmap_bak = SelectObject( p_sys->hcdc, bitmap );
     FillRect( p_sys->hcdc, &rect, (HBRUSH)GetStockObject(BLACK_BRUSH) );
 
-    //TextOut( p_sys->hcdc, 0, 0, psz_string, strlen(psz_string) );
-    if( !DrawText( p_sys->hcdc, psz_string, -1, &rect, 0 ) )
+    if( !DrawText( p_sys->hcdc, psz_string, -1, &rect,
+                   DT_CENTER | DT_NOPREFIX ) )
     {
         msg_Err( p_filter, "could not draw text" );
     }
