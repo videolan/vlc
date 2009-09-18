@@ -347,6 +347,7 @@ static int SendVideo( sout_stream_t *p_stream, sout_stream_id_t *id,
     p_sys->pf_video_postrender_callback( p_sys->p_video_data, p_pixels,
                                          id->format->video.i_width, id->format->video.i_height,
                                          id->format->video.i_bits_per_pixel, i_size, p_buffer->i_pts );
+    block_ChainRelease( p_buffer );
     return VLC_SUCCESS;
 }
 
