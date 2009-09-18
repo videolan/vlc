@@ -280,7 +280,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 picture_t *p_picture = DpbNewPicture( p_dec );
                 if( !p_picture )
                 {
-                    /* Is it ok ? or do we need a reset ? */
+                    Reset( p_dec );
                     block_Release( p_block );
                     return NULL;
                 }
