@@ -858,6 +858,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Load background interfaces
      */
+    /* Create volume callback system. (this variable must be created before
+       all interfaces as they can use it) */
+    var_Create( p_libvlc, "volume-change", VLC_VAR_BOOL );
+
     psz_modules = config_GetPsz( p_libvlc, "extraintf" );
     psz_control = config_GetPsz( p_libvlc, "control" );
 
@@ -981,8 +985,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     var_Create( p_libvlc, "drawable-clip-bottom", VLC_VAR_INTEGER );
     var_Create( p_libvlc, "drawable-clip-right", VLC_VAR_INTEGER );
 
-    /* Create volume callback system. */
-    var_Create( p_libvlc, "volume-change", VLC_VAR_BOOL );
 
     /* Create a variable for showing the fullscreen interface from hotkeys */
     var_Create( p_libvlc, "intf-show", VLC_VAR_BOOL );
