@@ -307,6 +307,9 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 
     /* Sanity check */
     if( !p_region_in || !p_region_out ) return VLC_EGENERIC;
+    if( !p_region_in->psz_text || !*p_region_in->psz_text )
+        return VLC_EGENERIC;
+
     psz_string = malloc( (strlen( p_region_in->psz_text )+1) * sizeof(TCHAR) );
     if( !psz_string )
         return VLC_ENOMEM;
