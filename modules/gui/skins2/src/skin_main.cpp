@@ -106,6 +106,11 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->p_sys->p_input = NULL;
     p_intf->p_sys->p_playlist = pl_Hold( p_intf );
+    if( !p_intf->p_sys->p_playlist )
+    {
+        free( p_intf->p_sys );
+        return VLC_EGENERIC;
+    }
 
     // Initialize "singleton" objects
     p_intf->p_sys->p_logger = NULL;
