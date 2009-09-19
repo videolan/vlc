@@ -44,8 +44,8 @@
 #include <sys/sysctl.h>
 #endif
 
-#if defined( __i386__ ) || defined( __x86_64__ ) \
- || defined( __ppc__ ) || defined( __ppc64__ )
+#if defined( __i386__ ) || defined( __x86_64__ ) || defined( __powerpc__ ) \
+ || defined( __ppc__ ) || defined( __ppc64__ ) || defined( __powerpc64__ )
 static bool check_OS_capability( const char *psz_capability, pid_t pid )
 {
 #ifndef WIN32
@@ -233,7 +233,8 @@ out:
     i_capabilities |= CPU_CAPABILITY_NEON;
 #   endif
 
-#elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
+#elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __powerpc64__ ) \
+    || defined( __ppc64__ )
 
     i_capabilities |= CPU_CAPABILITY_FPU;
 
