@@ -645,6 +645,7 @@ Function .onInit
 
   !include "languages\english.nsh"
   StrCmp $LANGUAGE ${LANG_FRENCH} French 0
+  StrCmp $LANGUAGE ${LANG_GERMAN} German 0
   StrCmp $LANGUAGE ${LANG_ITALIAN} Italian 0
   StrCmp $LANGUAGE ${LANG_HUNGARIAN} Hungarian 0
   StrCmp $LANGUAGE ${LANG_ROMANIAN} Romanian 0
@@ -658,6 +659,9 @@ Function .onInit
   StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
+  Goto EndLanguageCmp
+  German:
+  !include "languages\german.nsh"
   Goto EndLanguageCmp
   Italian:
   !include "languages\italian.nsh"
@@ -899,6 +903,7 @@ Function un.onInit
 
   !include "languages\english.nsh"
   StrCmp $LANGUAGE ${LANG_FRENCH} French 0
+  StrCmp $LANGUAGE ${LANG_GERMAN} German 0
   StrCmp $LANGUAGE ${LANG_ITALIAN} Italian 0
   StrCmp $LANGUAGE ${LANG_HUNGARIAN} Hungarian 0
   StrCmp $LANGUAGE ${LANG_ROMANIAN} Romanian 0
@@ -912,6 +917,9 @@ Function un.onInit
   StrCmp $LANGUAGE ${LANG_PORTUGUESEBR} Brazilian EndLanguageCmp
   French:
   !include "languages\french.nsh"
+  Goto EndLanguageCmp
+  German:
+  !include "languages\german.nsh"
   Goto EndLanguageCmp
   Italian:
   !include "languages\italian.nsh"
