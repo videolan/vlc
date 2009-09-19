@@ -30,9 +30,9 @@ static int Open (vlc_object_t *);
 
 vlc_module_begin ()
     set_description (N_("ARM NEON audio format conversions") )
-    add_submodule ()
-        set_capability ("audio filter", 20)
-        set_callbacks (Open, NULL)
+    set_capability ("audio filter", 20)
+    set_callbacks (Open, NULL)
+    add_requirement (NEON)
 vlc_module_end ()
 
 static void Do_F32_S32 (aout_instance_t *, aout_filter_t *,
@@ -44,8 +44,6 @@ static int Open (vlc_object_t *obj)
 {
     aout_filter_t *filter = (aout_filter_t *)obj;
 
-    if (!(vlc_CPU () & CPU_CAPABILITY_NEON))
-        return VLC_EGENERIC;
     if (!AOUT_FMTS_SIMILAR (&filter->input, &filter->output))
         return VLC_EGENERIC;
 
