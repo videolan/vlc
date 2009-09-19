@@ -158,6 +158,12 @@ class VlcProc: public SkinObject
          */
         void manage();
 
+        // reset variables when input is over
+        void reset_input();
+
+        // init variables (libvlc and playlist levels)
+        void init_variables();
+
         /// Define the command that calls manage()
         DEFINE_CALLBACK( VlcProc, Manage );
 
@@ -171,6 +177,11 @@ class VlcProc: public SkinObject
 
         /// Callback for intf-show variable
         static int onIntfShow( vlc_object_t *pObj, const char *pVariable,
+                               vlc_value_t oldVal, vlc_value_t newVal,
+                               void *pParam );
+
+        /// Callback for input-current variable
+        static int onInputNew( vlc_object_t *pObj, const char *pVariable,
                                vlc_value_t oldVal, vlc_value_t newVal,
                                void *pParam );
 
@@ -188,12 +199,6 @@ class VlcProc: public SkinObject
         static int onItemDelete( vlc_object_t *pObj, const char *pVariable,
                                  vlc_value_t oldVal, vlc_value_t newVal,
                                  void *pParam );
-
-
-        /// Callback for playlist-current variable
-        static int onPlaylistChange( vlc_object_t *pObj, const char *pVariable,
-                                     vlc_value_t oldVal, vlc_value_t newVal,
-                                     void *pParam );
 
         /// Callback for skins2-to-load variable
         static int onSkinToLoad( vlc_object_t *pObj, const char *pVariable,
