@@ -87,6 +87,9 @@ class VlcProc: public SkinObject
         /// Indicate whether the embedded video output is currently used
         bool isVoutUsed() const { return m_pVout != NULL; }
 
+        /// update equalizer
+        void update_equalizer( );
+
         void on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal );
         void on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal );
         void on_bit_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal );
@@ -148,6 +151,7 @@ class VlcProc: public SkinObject
         vout_thread_t *m_pVout;
         /// Audio output
         aout_instance_t *m_pAout;
+        bool m_bEqualizer_started;
 
         /**
          * Poll VLC internals to update the status (volume, current time in

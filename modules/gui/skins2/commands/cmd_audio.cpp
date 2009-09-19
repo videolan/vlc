@@ -31,6 +31,7 @@
 void CmdSetEqualizer::execute()
 {
     aout_EnableFilter( getIntf(), "equalizer", m_enable );
+    VlcProc::instance( getIntf() )->update_equalizer();
 }
 
 

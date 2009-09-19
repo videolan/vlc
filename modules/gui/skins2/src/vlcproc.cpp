@@ -74,7 +74,8 @@ void VlcProc::destroy( intf_thread_t *pIntf )
 
 VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     m_varVoutSize( pIntf ), m_varEqBands( pIntf ),
-    m_pVout( NULL ), m_pAout( NULL ), m_cmdManage( this )
+    m_pVout( NULL ), m_pAout( NULL ), m_bEqualizer_started( false ),
+    m_cmdManage( this )
 {
     // Create a timer to poll the status of the vlc
     OSFactory *pOsFactory = OSFactory::instance( pIntf );
@@ -575,52 +576,49 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
         case INPUT_EVENT_AOUT:
         {
-            char *pFilters;
             aout_instance_t* pAout = input_GetAout( pInput );
-            if( pAout )
+
+            // end of input or aout reuse (nothing to do)
+            if( !pAout || pAout == m_pAout )
             {
-                if( m_pAout )
+                if( pAout )
+                    vlc_object_release( pAout );
+                break;
+            }
+
+            // remove previous Aout if any
+            if( m_pAout )
+            {
+                var_DelCallback( m_pAout, "audio-filter",
+                                 onGenericCallback, this );
+                if( m_bEqualizer_started )
                 {
-                    var_DelCallback( m_pAout, "audio-filter",
-                                     onGenericCallback, this );
                     var_DelCallback( m_pAout, "equalizer-bands",
                                      onEqBandsChange, this );
                     var_DelCallback( m_pAout, "equalizer-preamp",
                                      onEqPreampChange, this );
-                    vlc_object_release( m_pAout );
-                    m_pAout = NULL;
                 }
+                vlc_object_release( m_pAout );
+                m_pAout = NULL;
+                m_bEqualizer_started = false;
+            }
 
-                var_AddCallback( pAout, "audio-filter",
-                                 onGenericCallback, this );
+            // New Aout (addCallbacks)
+            var_AddCallback( pAout, "audio-filter", onGenericCallback, this );
+
+            char *pFilters = var_GetNonEmptyString( pAout, "audio-filter" );
+            bool b_equalizer = pFilters && strstr( pFilters, "equalizer" );
+            free( pFilters );
+            pVarEqualizer->set( b_equalizer );
+            if( b_equalizer )
+            {
                 var_AddCallback( pAout, "equalizer-bands",
                               onEqBandsChange, this );
                 var_AddCallback( pAout, "equalizer-preamp",
                               onEqPreampChange, this );
-                m_pAout = pAout;
-
-                pFilters = var_GetNonEmptyString( pAout, "audio-filter" );
+                m_bEqualizer_started = true;
             }
-            else
-            {
-                if( m_pAout )
-                {
-                    var_DelCallback( m_pAout, "audio-filter",
-                                     onGenericCallback, this );
-                    var_DelCallback( m_pAout, "equalizer-bands",
-                                     onEqBandsChange, this );
-                    var_DelCallback( m_pAout, "equalizer-preamp",
-                                     onEqPreampChange, this );
-                    vlc_object_release( m_pAout );
-                    m_pAout = NULL;
-                }
-                // Get the audio filters
-                pFilters = config_GetPsz( getIntf(), "audio-filter" );
-            }
-            // Refresh the equalizer variable
-            bool b_equalizer = pFilters && strstr( pFilters, "equalizer" );
-            pVarEqualizer->set( b_equalizer );
-            free( pFilters );
+            m_pAout = pAout;
             break;
         }
 
@@ -720,15 +718,19 @@ void VlcProc::on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 void VlcProc::on_audio_filter_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
     aout_instance_t* pAout = (aout_instance_t*) p_obj;
-
-    char *pFilters = var_GetNonEmptyString( pAout, "audio-filter" );
-
     VarBoolImpl *pVarEqualizer = (VarBoolImpl*)m_cVarEqualizer.get();
+
+    char *pFilters = newVal.psz_string;
 
     // Refresh the equalizer variable
     bool b_equalizer = pFilters && strstr( pFilters, "equalizer" );
     pVarEqualizer->set( b_equalizer );
-    free( pFilters );
+    if( b_equalizer && !m_bEqualizer_started )
+    {
+        var_AddCallback( pAout, "equalizer-bands", onEqBandsChange, this );
+        var_AddCallback( pAout, "equalizer-preamp", onEqPreampChange, this );
+        m_bEqualizer_started = true;
+    }
 }
 
 void VlcProc::reset_input()
@@ -801,5 +803,23 @@ void VlcProc::init_variables()
     // Set the mute variable
     VarBoolImpl *pVarMute = (VarBoolImpl*)m_cVarMute.get();
     pVarMute->set( volume == 0 );
+
+    // Set the equalizer variable
+    update_equalizer();
+}
+
+void VlcProc::update_equalizer()
+{
+    VarBoolImpl *pVarEqualizer = (VarBoolImpl*)m_cVarEqualizer.get();
+
+    char *pFilters;
+    if( m_pAout )
+        pFilters = var_GetNonEmptyString( m_pAout, "audio-filter" );
+    else
+        pFilters = config_GetPsz( getIntf(), "audio-filter" );
+
+    bool b_equalizer = pFilters && strstr( pFilters, "equalizer" );
+    free( pFilters );
+    pVarEqualizer->set( b_equalizer );
 }
 
