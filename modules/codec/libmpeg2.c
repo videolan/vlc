@@ -275,6 +275,7 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             mpeg2_custom_fbuf( p_sys->p_mpeg2dec, 1 );
 
             /* Set the first 2 reference frames */
+            p_sys->i_aspect = 0;
             GetAR( p_dec );
             for( int i = 0; i < 2; i++ )
             {
