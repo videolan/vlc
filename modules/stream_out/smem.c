@@ -139,10 +139,10 @@ struct sout_stream_id_t
 struct sout_stream_sys_t
 {
     vlc_mutex_t *p_lock;
-    void ( *pf_video_prerender_callback ) ( void* p_video_data , uint8_t** pp_pixel_buffer , int size );
-    void ( *pf_audio_prerender_callback ) ( void* p_audio_data , uint8_t** pp_pcm_buffer , unsigned int );
+    void ( *pf_video_prerender_callback ) ( void* p_video_data, uint8_t** pp_pixel_buffer , int size );
+    void ( *pf_audio_prerender_callback ) ( void* p_audio_data, uint8_t** pp_pcm_buffer , unsigned int size );
     void ( *pf_video_postrender_callback ) ( void* p_video_data, uint8_t* p_pixel_buffer, int width, int height, int pixel_pitch, int size, int pts );
-    void ( *pf_audio_postrender_callback ) ( void*, unsigned int, unsigned int, unsigned int, unsigned int );
+    void ( *pf_audio_postrender_callback ) ( void* p_audio_data, uint8_t* p_pcm_buffer, unsigned int channels, unsigned int rate, unsigned int nb_samples, unsigned int bits_per_sample, unsigned int size, int pts );
     void *p_audio_data;
     void *p_video_data;
     bool time_sync;
@@ -177,7 +177,7 @@ static int Open( vlc_object_t *p_this )
     free( psz_tmp );
 
     psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_AUDIO "postrender-callback" );
-    p_sys->pf_audio_postrender_callback = (void (*) (void*, unsigned int, unsigned int, unsigned int, unsigned int))(intptr_t)atoll( psz_tmp );
+    p_sys->pf_audio_postrender_callback = (void (*) (void*, uint8_t*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, int))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
     psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_VIDEO "data" );
@@ -265,9 +265,48 @@ static sout_stream_id_t *AddVideo( sout_stream_t *p_stream, es_format_t *p_fmt )
 
 static sout_stream_id_t *AddAudio( sout_stream_t *p_stream, es_format_t *p_fmt )
 {
-    VLC_UNUSED( p_stream );
-    VLC_UNUSED( p_fmt );
-    return NULL;
+    sout_stream_id_t* id;
+    int i_bits_per_sample;
+
+    switch( p_fmt->i_codec )
+    {
+    case VLC_CODEC_U8:
+    case VLC_CODEC_S8:
+        i_bits_per_sample = 8;
+        break;
+    case VLC_CODEC_U16L:
+    case VLC_CODEC_S16L:
+    case VLC_CODEC_U16B:
+    case VLC_CODEC_S16B:
+        i_bits_per_sample =  16;
+        break;
+    case VLC_CODEC_U24L:
+    case VLC_CODEC_S24L:
+    case VLC_CODEC_U24B:
+    case VLC_CODEC_S24B:
+        i_bits_per_sample = 24;
+        break;
+    case VLC_CODEC_S32L:
+    case VLC_CODEC_S32B:
+    case VLC_CODEC_FL32:
+    case VLC_CODEC_FI32:
+        i_bits_per_sample = 32;
+        break;
+    case VLC_CODEC_FL64:
+        i_bits_per_sample = 64;
+        break;
+    default:
+        msg_Err( p_stream, "Smem does only support raw audio format" );
+        return NULL;
+    }
+
+    id = calloc( 1, sizeof( sout_stream_id_t ) );
+    if( !id )
+        return NULL;
+
+    id->format = p_fmt;
+    id->format->audio.i_bitspersample = i_bits_per_sample;
+    return id;
 }
 
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
@@ -314,8 +353,21 @@ static int SendVideo( sout_stream_t *p_stream, sout_stream_id_t *id,
 static int SendAudio( sout_stream_t *p_stream, sout_stream_id_t *id,
                       block_t *p_buffer )
 {
-    VLC_UNUSED( p_stream );
-    VLC_UNUSED( id );
-    VLC_UNUSED( p_buffer );
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    int i_size;
+    uint8_t* p_pcm_buffer;
+    int i_samples = 0;
+
+    i_size = p_buffer->i_buffer;
+    i_samples = i_size / ( ( id->format->audio.i_bitspersample / 8 ) * id->format->audio.i_channels );
+    /* Calling the prerender callback to get user buffer */
+    p_sys->pf_audio_prerender_callback( p_sys->p_audio_data, &p_pcm_buffer, i_size );
+    /* Copying data into user buffer */
+    vlc_memcpy( p_pcm_buffer, p_buffer->p_buffer, i_size );
+    /* Calling the postrender callback to tell the user his buffer is ready */
+    p_sys->pf_audio_postrender_callback( p_sys->p_audio_data, p_pcm_buffer,
+                                         id->format->audio.i_channels, id->format->audio.i_rate, p_buffer->i_samples,
+                                         id->format->audio.i_bitspersample, i_size, p_buffer->i_pts );
+    block_ChainRelease( p_buffer );
     return VLC_SUCCESS;
 }
