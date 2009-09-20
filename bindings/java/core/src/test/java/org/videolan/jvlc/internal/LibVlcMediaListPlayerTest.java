@@ -213,6 +213,8 @@ public class LibVlcMediaListPlayerTest extends AbstractVLCInternalTest
         }
         libvlc.libvlc_media_list_player_pause(mediaListPlayer, exception);
 
+        Thread.sleep(500);
+        
         int state = libvlc.libvlc_media_list_player_get_state(mediaListPlayer, exception);
         Assert.assertEquals(0, exception.b_raised);
         Thread.sleep(200L);
