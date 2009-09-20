@@ -41,11 +41,16 @@ i420_yuyv_neon:
 	add		Y2,	Y1,	PITCH
 1:
 	mov		END_O1,	O2
+	pld		[Y2]
 2:
+	pld		[U, #64]
 	vld1.u8		{d2},		[U,:64]!
+	pld		[V, #64]
 	vld1.u8		{d3},		[V,:64]!
+	pld		[Y1, #64]
 	vzip.u8		d2,	d3
 	vld1.u8		{q0},		[Y1,:128]!
+	pld		[Y2, #64]
 	vmov		q3,	q1
 	vzip.u8		q0,	q1
 	vld1.u8		{q2},		[Y2,:128]!
