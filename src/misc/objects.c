@@ -241,26 +241,35 @@ void __vlc_object_set_destructor( vlc_object_t *p_this,
     vlc_spin_unlock( &p_priv->ref_spin );
 }
 
+static vlc_mutex_t name_lock = VLC_STATIC_MUTEX;
+
 #undef vlc_object_set_name
 int vlc_object_set_name(vlc_object_t *obj, const char *name)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
+    char *newname = name ? strdup (name) : NULL;
+    char *oldname;
 
-    /* Object must be named before it is attached (or never) */
-    assert(obj->p_parent == NULL);
-    assert(priv->i_children == 0);
+    vlc_mutex_lock (&name_lock);
+    oldname = priv->psz_name;
+    priv->psz_name = newname;
+    vlc_mutex_unlock (&name_lock);
 
-    free(priv->psz_name);
-    priv->psz_name = name ? strdup(name) : NULL;
+    free (oldname);
     return (priv->psz_name || !name) ? VLC_SUCCESS : VLC_ENOMEM;
 }
 
 #undef vlc_object_get_name
-const char *vlc_object_get_name(const vlc_object_t *obj)
+char *vlc_object_get_name(const vlc_object_t *obj)
 {
     vlc_object_internals_t *priv = vlc_internals(obj);
+    char *name;
 
-    return priv->psz_name;
+    vlc_mutex_lock (&name_lock);
+    name = priv->psz_name ? strdup (priv->psz_name) : NULL;
+    vlc_mutex_unlock (&name_lock);
+
+    return name;
 }
 
 /**
@@ -478,9 +487,13 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
 
 static int objnamecmp(const vlc_object_t *obj, const char *name)
 {
-    if (!vlc_object_get_name(obj))
+    char *objname = vlc_object_get_name(obj);
+    if (objname == NULL)
         return INT_MIN;
-    return strcmp( vlc_object_get_name(obj), name );
+
+    int ret = strcmp (objname, name);
+    free (objname);
+    return ret;
 }
 
 #undef vlc_object_find_name
@@ -607,9 +620,8 @@ void __vlc_object_release( vlc_object_t *p_this )
             {
                 /* We are leaking this object */
                 fprintf( stderr,
-                         "ERROR: leaking object (%p, type:%s, name:%s)\n",
-                         leaked, leaked->psz_object_type,
-                         vlc_object_get_name(leaked) );
+                         "ERROR: leaking object (%p, type:%s)\n",
+                         leaked, leaked->psz_object_type );
                 /* Dump object to ease debugging */
                 vlc_object_dump( leaked );
                 fflush(stderr);
@@ -1090,10 +1102,11 @@ static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
 
     int canc = vlc_savecancel ();
     memset( &psz_name, 0, sizeof(psz_name) );
-    if( vlc_object_get_name(p_this) )
+    char *name = vlc_object_get_name(p_this);
+    if( name )
     {
-        snprintf( psz_name, 49, " \"%s\"",
-                  vlc_object_get_name(p_this) );
+        snprintf( psz_name, 49, " \"%s\"", name );
+        free( name );
         if( psz_name[48] )
             psz_name[48] = '\"';
     }

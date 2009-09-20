@@ -278,11 +278,14 @@ void MessagesDialog::buildTree( QTreeWidgetItem *parentItem,
     else
         item = new QTreeWidgetItem( modulesTree );
 
-    const char *name = vlc_object_get_name( p_obj );
+    char *name = vlc_object_get_name( p_obj );
     if( name != NULL )
+    {
         item->setText( 0, qfu( p_obj->psz_object_type ) + " \"" +
                        qfu( name ) + "\" (" +
                        QString::number((uintptr_t)p_obj) + ")" );
+        free( name );
+    }
     else
         item->setText( 0, qfu( p_obj->psz_object_type ) + " (" +
                        QString::number((uintptr_t)p_obj) + ")" );
