@@ -605,6 +605,8 @@ found_shortcut:
     {
         msg_Dbg( p_this, "using %s module \"%s\"",
                  psz_capability, p_module->psz_object_name );
+        vlc_object_set_name( p_this, psz_alias ? psz_alias
+                                               : p_module->psz_object_name );
     }
     else if( count == 0 )
     {

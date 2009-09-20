@@ -782,6 +782,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * Choose the best memcpy module
      */
     priv->p_memcpy_module = module_need( p_libvlc, "memcpy", "$memcpy", false );
+    /* Avoid being called "memcpy":*/
+    vlc_object_set_name( p_libvlc, "main" );
 
     priv->b_stats = config_GetInt( p_libvlc, "stats" ) > 0;
     priv->i_timers = 0;
