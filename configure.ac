@@ -2861,6 +2861,12 @@ AS_IF([test "${enable_id3tag}" = "yes"], [
     ])
 ])
 
+AC_ARG_ENABLE(merge-ffmpeg,
+[  --enable-merged-ffmpeg  merge FFMPEG-based plugins (default disabled)],, [
+  enable_merge_ffmpeg="no"
+])
+AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
+
 dnl
 dnl  avcodec decoder/encoder plugin
 dnl
@@ -2921,9 +2927,14 @@ then
       CFLAGS="${CFLAGS} ${AVFORMAT_CFLAGS}"
       AC_CHECK_HEADERS(libavformat/avformat.h ffmpeg/avformat.h)
       AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
-      VLC_ADD_PLUGIN([avformat])
-      VLC_ADD_LIBS([avformat],[$AVFORMAT_LIBS $AVUTIL_LIBS])
-      VLC_ADD_CFLAGS([avformat],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
+      AS_IF([test "$enable_merge_ffmpeg" = "no"], [
+        VLC_ADD_PLUGIN([avformat])
+        VLC_ADD_LIBS([avformat],[$AVFORMAT_LIBS $AVUTIL_LIBS])
+        VLC_ADD_CFLAGS([avformat],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
+      ], [
+        VLC_ADD_LIBS([avcodec],[$AVFORMAT_LIBS $AVUTIL_LIBS])
+        VLC_ADD_CFLAGS([avcodec],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
+      ])
       VLC_RESTORE_FLAGS
     ],[
       AC_MSG_ERROR([Could not find libavformat or libavutil. Use --disable-avformat to ignore this error.])

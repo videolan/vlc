@@ -22,9 +22,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
+#ifndef MERGE_FFMPEG
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -34,10 +32,8 @@
 
 #include "avformat.h"
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
 vlc_module_begin ()
+#endif /* MERGE_FFMPEG */
     add_shortcut( "ffmpeg" )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
@@ -56,4 +52,6 @@ vlc_module_begin ()
                 MUX_LONGTEXT, true )
     set_callbacks( OpenMux, CloseMux )
 #endif
+#ifndef MERGE_FFMPEG
 vlc_module_end ()
+#endif

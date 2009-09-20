@@ -78,6 +78,10 @@ static const char *const enc_hq_list_text[] = {
     N_("rd"), N_("bits"), N_("simple") };
 #endif
 
+#ifdef MERGE_FFMPEG
+# include "../../demux/avformat/avformat.h"
+#endif
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -206,6 +210,10 @@ vlc_module_begin ()
     set_description( N_("FFmpeg deinterlace video filter") )
     add_shortcut( "ffmpeg-deinterlace" )
 
+#ifdef MERGE_FFMPEG
+    add_submodule ()
+#   include "../../demux/avformat/avformat.c"
+#endif
 vlc_module_end ()
 
 /*****************************************************************************
