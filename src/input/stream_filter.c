@@ -54,7 +54,6 @@ stream_t *stream_FilterNew( stream_t *p_source,
     s->p_source = p_source;
 
     /* */
-    vlc_object_set_name( s, psz_stream_filter );
     vlc_object_attach( s, p_source );
 
     s->p_module = module_need( s, "stream_filter", psz_stream_filter, true );

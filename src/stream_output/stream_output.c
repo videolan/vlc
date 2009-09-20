@@ -313,7 +313,6 @@ sout_access_out_t *sout_AccessOutNew( vlc_object_t *p_sout,
     p_access->i_writes = 0;
     p_access->i_sent_bytes = 0;
 
-    vlc_object_set_name( p_access, p_access->psz_access );
     vlc_object_attach( p_access, p_sout );
 
     p_access->p_module   =
@@ -436,7 +435,6 @@ sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
     p_mux->b_waiting_stream = true;
     p_mux->i_add_stream_start = -1;
 
-    vlc_object_set_name( p_mux, p_mux->psz_mux );
     vlc_object_attach( p_mux, p_sout );
 
     p_mux->p_module =
@@ -790,7 +788,6 @@ sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_chain )
 
     msg_Dbg( p_sout, "stream=`%s'", p_stream->psz_name );
 
-    vlc_object_set_name( p_stream, p_stream->psz_name );
     vlc_object_attach( p_stream, p_sout );
 
     p_stream->p_module =

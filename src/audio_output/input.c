@@ -283,7 +283,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
                 continue;
             }
 
-            vlc_object_set_name( p_filter, psz_parser );
             vlc_object_attach( p_filter , p_aout );
 
             p_filter->request_vout.pf_request_vout = RequestVoutFromFilter;

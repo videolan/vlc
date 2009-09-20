@@ -300,7 +300,6 @@ static filter_t *filter_chain_AppendFilterInternal( filter_chain_t *p_chain,
                                             VLC_OBJECT_GENERIC, "filter" );
     if( !p_filter )
         return NULL;
-    vlc_object_set_name( p_filter, psz_name );
     vlc_object_attach( p_filter, p_chain->p_this );
 
     if( !p_fmt_in )
