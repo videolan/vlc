@@ -124,9 +124,7 @@ static long FAR PASCAL DirectXEventProc( HWND, UINT, WPARAM, LPARAM );
 
 static void DirectXPopupMenu( event_thread_t *p_event, bool b_open )
 {
-    vlc_value_t val;
-    val.b_bool = b_open;
-    var_Set( p_event->p_vout->p_libvlc, "intf-popupmenu", val );
+    var_SetBool( p_event->p_vout->p_libvlc, "intf-popupmenu", b_open );
 }
 
 static int DirectXConvertKey( int i_key );
