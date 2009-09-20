@@ -138,8 +138,6 @@ uint32_t CPUCapabilities( void )
         goto out;
 # endif
 
-    i_capabilities |= CPU_CAPABILITY_486;
-
     /* the CPU supports the CPUID instruction - get its level */
     cpuid( 0x00000000 );
 
@@ -149,9 +147,6 @@ uint32_t CPUCapabilities( void )
     if( !i_eax )
         goto out;
 #endif
-
-    /* FIXME: this isn't correct, since some 486s have cpuid */
-    i_capabilities |= CPU_CAPABILITY_586;
 
     /* borrowed from mpeg2dec */
     b_amd = ( i_ebx == 0x68747541 ) && ( i_ecx == 0x444d4163 )

@@ -789,8 +789,6 @@ VLC_EXPORT(int, vlc_wclosedir, ( void *_p_dir ));
  * CPU capabilities
  *****************************************************************************/
 #define CPU_CAPABILITY_NONE    0
-#define CPU_CAPABILITY_486     (1<<0)
-#define CPU_CAPABILITY_586     (1<<1)
 #define CPU_CAPABILITY_MMX     (1<<3)
 #define CPU_CAPABILITY_3DNOW   (1<<4)
 #define CPU_CAPABILITY_MMXEXT  (1<<5)
