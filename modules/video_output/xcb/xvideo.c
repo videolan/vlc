@@ -533,8 +533,8 @@ static picture_t *Get (vout_display_t *vd)
 
     if (!p_sys->pool)
     {
-        picture_t *pic = picture_New (vd->fmt.i_chroma,
-                                      p_sys->att->width, p_sys->att->height, 0);
+        picture_t *pic = picture_New (vd->fmt.i_chroma, p_sys->att->width,
+                                      p_sys->att->height, 0);
         if (!pic)
             return NULL;
 
