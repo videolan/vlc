@@ -1,6 +1,6 @@
 StrCpy $Name_Section01 "Media Player (erforderlich)"
 StrCpy $Name_Section02a "Verknüpfung im Startmenü"
-StrCpy $Name_Section02b "Verknüpfung auf den Desktop"
+StrCpy $Name_Section02b "Verknüpfung auf Desktop"
 StrCpy $Name_Section03 "Mozilla-Plugin"
 StrCpy $Name_Section04 "ActiveX-Plugin"
 StrCpy $Name_Section05 "Wiedergabe von Datenträgern"
@@ -14,9 +14,9 @@ StrCpy $Name_Section08 "Löschen von Einstellungen und Cache"
 StrCpy $Desc_Section01 \
     "Der Media Player selbst"
 StrCpy $Desc_Section02a \
-    "Erstellt eine Verknüpfung in Ihrem Startmenü für einfachen Zugang"
+    "Erstellt eine Verknüpfung in Ihrem Startmenü für einen einfachen Zugang"
 StrCpy $Desc_Section02b \
-    "Erstellt eine Verknüpfung auf Ihrem Desktop für einfachen Zugang"
+    "Erstellt eine Verknüpfung auf Ihrem Desktop für einen einfachen Zugang"
 StrCpy $Desc_Section03 \
     "Das VLC Mozilla und Mozilla Firefox-Plugin"
 StrCpy $Desc_Section04 \
@@ -24,21 +24,21 @@ StrCpy $Desc_Section04 \
 StrCpy $Desc_Section05 \
     "DVD und CD-Wiedergabe Registrierung"
 StrCpy $Desc_Section06 \
-    "Legt VLC media player als Standard-Anwendung für die angegebenen Dateitypen fest"
+    "Legt den VLC media player als Standard-Anwendung für die angegebenen Dateitypen fest"
 StrCpy $Desc_Section07 \
-    "Fügt Kontextmenü-Elemente ein ('Wiedergabe mit VLC' und 'Zu VLC's Wiedergabeliste hinzufügen')"
+    "Fügt Kontextmenü-Elemente ein ('Wiedergabe mit VLC' und 'Zur VLC's Wiedergabeliste hinzufügen')"
 StrCpy $Desc_Section08 \
-    "Löscht die Einstellungen und Cache-Dateien vom VLC media player, die aus früheren Installationen vorhanden sein können."
+    "Löscht übergebliebene Einstellungen und Cache-Dateien des VLC media players aus früheren Installationen."
 
 StrCpy $Message_AlreadyInstalled  \
-"VLC media player ist bereits installiert. $\nMöchten Sie die vorherige Version entfernen \
+"VLC media player ist bereits installiert. $\nMöchten Sie die vorherige Version entfernen, \
 bevor Sie $(^Name) installieren?"
 
 StrCpy $Name_Section91 "Deinstallieren"
 StrCpy $Name_Section92 "Löschen von Einstellungen und Cache"
 
 StrCpy $Desc_Section91 \
-"Deinstalliere VLC media player und alle seine Komponenten"
+"Deinstalliere den VLC media player und alle seine Komponenten"
 StrCpy $Desc_Section92 \
 "Lösche Einstellungen und Cache-Dateien vom VLC media player"
 
