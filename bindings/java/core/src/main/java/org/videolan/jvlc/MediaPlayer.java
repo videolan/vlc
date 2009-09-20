@@ -25,6 +25,7 @@
 
 package org.videolan.jvlc;
 
+import java.awt.Canvas;
 import java.util.ArrayList;
 import java.util.EnumSet;
 import java.util.List;
@@ -36,6 +37,9 @@ import org.videolan.jvlc.internal.LibVlcEventType;
 import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;
 import org.videolan.jvlc.internal.LibVlc.LibVlcMediaPlayer;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
+
+import com.sun.jna.Native;
+import com.sun.jna.Platform;
 
 
 public class MediaPlayer
@@ -152,11 +156,11 @@ public class MediaPlayer
         libvlc_exception_t exception = new libvlc_exception_t();
         return libvlc.libvlc_media_player_get_fps(instance, exception);
     }
-    
+
     public boolean isPlaying()
     {
         libvlc_exception_t exception = new libvlc_exception_t();
-        return libvlc.libvlc_media_player_is_playing(instance, exception) == 1? true : false;
+        return libvlc.libvlc_media_player_is_playing(instance, exception) == 1 ? true : false;
     }
 
     public void addListener(final MediaPlayerListener listener)
@@ -170,6 +174,20 @@ public class MediaPlayer
             libvlc.libvlc_event_attach(eventManager, event.ordinal(), callback, null, exception);
         }
         callbacks.add(callback);
+    }
+
+    public void setParent(Canvas canvas)
+    {
+        long drawable = Native.getComponentID(canvas);
+        libvlc_exception_t exception = new libvlc_exception_t();
+        if (Platform.isWindows())
+        {
+            libvlc.libvlc_media_player_set_hwnd(instance, drawable, exception);
+        }
+        else
+        {
+            libvlc.libvlc_media_player_set_xwindow(instance, drawable, exception);
+        }
     }
 
     /**
@@ -191,7 +209,7 @@ public class MediaPlayer
         released = true;
 
         libvlc_exception_t exception = new libvlc_exception_t();
-        for (MediaPlayerCallback callback : callbacks)  
+        for (MediaPlayerCallback callback : callbacks)
         {
             for (LibVlcEventType event : EnumSet.range(
                 LibVlcEventType.libvlc_MediaPlayerPlaying,
@@ -201,9 +219,9 @@ public class MediaPlayer
             }
         }
         libvlc.libvlc_media_player_release(instance);
-        
+
     }
-    
+
     /**
      * Returns the instance.
      * @return the instance

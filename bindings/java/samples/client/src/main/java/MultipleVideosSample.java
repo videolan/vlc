@@ -83,6 +83,7 @@ public class MultipleVideosSample
         for (int i = 0; i < videosNumber; i++)
         {
             jvlcArray[i].play(filename);
+            jvlcArray[i].setVideoOutput(videoCanvasesArray[i]);
             Thread.sleep(500);
         }
     }

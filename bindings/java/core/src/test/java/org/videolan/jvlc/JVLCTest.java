@@ -39,7 +39,7 @@ public class JVLCTest extends AbstractJVLCTest
     public void jvlcNew()
     {
         JVLC jvlc = new JVLC();
-        Assert.assertNotNull(jvlc.getMediaList());
+        Assert.assertNotNull(jvlc.getAudio());
     }
     
     @Test

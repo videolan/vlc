@@ -38,6 +38,7 @@ import org.videolan.jvlc.internal.LibVlc.LibVlcMediaPlayer;
 import org.videolan.jvlc.internal.LibVlc.libvlc_event_t;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
+import com.sun.jna.Platform;
 import com.sun.jna.Pointer;
 
 
@@ -119,7 +120,14 @@ public class LibVlcImpl
         
         int drawable = (int) com.sun.jna.Native.getComponentID(canvas);
 
-        libVlc.libvlc_video_set_parent(libvlc_instance_t, drawable, exception);
+        if (Platform.isWindows())
+        {
+            libVlc.libvlc_media_player_set_hwnd(mediaPlayer, drawable, exception);
+        }
+        else
+        {
+            libVlc.libvlc_media_player_set_xwindow(mediaPlayer, drawable, exception);
+        }
         libVlc.libvlc_media_player_play(mediaPlayer, exception);
     }
 }

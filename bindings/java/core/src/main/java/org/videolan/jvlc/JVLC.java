@@ -35,8 +35,6 @@ import org.videolan.jvlc.internal.LibVlc;
 import org.videolan.jvlc.internal.LibVlc.LibVlcInstance;
 import org.videolan.jvlc.internal.LibVlc.libvlc_exception_t;
 
-import com.sun.jna.Native;
-
 public class JVLC
 {
 
@@ -44,34 +42,22 @@ public class JVLC
 
     private final LibVlc libvlc = LibVlc.SYNC_INSTANCE;
 
-    private MediaList mediaList;
-    
     private VLM vlm;
     
     private Audio audio;
     
     private volatile boolean released;
 
-    private MediaListPlayer mediaListPlayer;
+    private Canvas canvas;
     
     public JVLC()
     {
-        String[] args = new String[] {};
-        instance = createInstance(args);
-        init();
+        this(new String[] {});
     }
 
     public JVLC(String[] args)
     {
         instance = createInstance(args);
-        init();
-    }
-    
-    private void init()
-    {
-        mediaList = new MediaList(this);
-        mediaListPlayer = new MediaListPlayer(this);
-        mediaListPlayer.setMediaList(mediaList);
         audio = new Audio(this);
     }
     
@@ -93,6 +79,10 @@ public class JVLC
     {
         MediaDescriptor mediaDescriptor = new MediaDescriptor(this, media);
         MediaPlayer mediaPlayer = new MediaPlayer(mediaDescriptor);
+        if (canvas != null)
+        {
+            mediaPlayer.setParent(canvas);
+        }
         mediaPlayer.play();
         mediaDescriptor.release();
         return mediaPlayer;
@@ -100,23 +90,12 @@ public class JVLC
 
     public void setVideoOutput(Canvas canvas)
     {
-        long drawable = Native.getComponentID(canvas);
-        libvlc_exception_t exception = new libvlc_exception_t();
-        libvlc.libvlc_video_set_parent(instance, drawable, exception );
+        this.canvas = canvas;
     }
 
     public Logger getLogger()
     {
         return new Logger(this);
-    }
-    
-    /**
-     * Returns the mediaList.
-     * @return the mediaList
-     */
-    public MediaList getMediaList()
-    {
-        return mediaList;
     }
 
     public VLM getVLM()
@@ -176,8 +155,6 @@ public class JVLC
             vlm.release();
             vlm = null;
         }
-        mediaList.release();
-        mediaListPlayer.release();
         
         libvlc.libvlc_release(instance);
     }
@@ -191,16 +168,6 @@ public class JVLC
     {
         release();
         super.finalize();
-    }
-
-    
-    /**
-     * Returns the mediaListPlayer.
-     * @return the mediaListPlayer
-     */
-    public MediaListPlayer getMediaListPlayer()
-    {
-        return mediaListPlayer;
     }
 
     /**

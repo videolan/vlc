@@ -338,8 +338,14 @@ public interface LibVlc extends Library
     String libvlc_get_changeset();
 
     // video
-
-    void libvlc_video_set_parent(LibVlcInstance libvlc_instance, long drawable, libvlc_exception_t exception);
+    
+    void libvlc_media_player_set_hwnd(LibVlcMediaPlayer mediaplayer_instance, long drawable, libvlc_exception_t exception);
+    
+    long libvlc_media_player_get_hwnd(LibVlcMediaPlayer mediaplayer_instance);
+    
+    void libvlc_media_player_set_xwindow(LibVlcMediaPlayer mediaplayer_instance, long drawable, libvlc_exception_t exception);
+    
+    long libvlc_media_player_get_xwindow(LibVlcMediaPlayer mediaplayer_instance);
 
     void libvlc_toggle_fullscreen(LibVlcMediaPlayer libvlc_instance);
 
