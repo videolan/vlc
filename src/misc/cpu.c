@@ -114,7 +114,9 @@ uint32_t CPUCapabilities( void )
 
     i_capabilities |= CPU_CAPABILITY_FPU;
 
-#   if defined( __i386__ )
+# if defined (__i386__) && !defined (__i486__) && !defined (__i586__) \
+  && !defined (__i686__) && !defined (__pentium4__) \
+  && !defined (__k6__) && !defined (__athlon__) && !defined (__k8__)
     /* check if cpuid instruction is supported */
     asm volatile ( "push %%ebx\n\t"
                    "pushf\n\t"
@@ -134,17 +136,19 @@ uint32_t CPUCapabilities( void )
 
     if( i_eax == i_ebx )
         goto out;
-#   else
-    /* x86_64 supports cpuid instruction, so we dont need to check it */
-#   endif
+# endif
 
     i_capabilities |= CPU_CAPABILITY_486;
 
     /* the CPU supports the CPUID instruction - get its level */
     cpuid( 0x00000000 );
 
+# if defined (__i386__) && !defined (__i586__) \
+  && !defined (__i686__) && !defined (__pentium4__) \
+  && !defined (__k6__) && !defined (__athlon__) && !defined (__k8__)
     if( !i_eax )
         goto out;
+#endif
 
     /* FIXME: this isn't correct, since some 486s have cpuid */
     i_capabilities |= CPU_CAPABILITY_586;
@@ -155,12 +159,15 @@ uint32_t CPUCapabilities( void )
 
     /* test for the MMX flag */
     cpuid( 0x00000001 );
-
+# if !defined (__MMX__)
     if( ! (i_edx & 0x00800000) )
         goto out;
-
+# endif
     i_capabilities |= CPU_CAPABILITY_MMX;
 
+# if defined (__SSE__)
+    i_capabilities |= CPU_CAPABILITY_MMXEXT | CPU_CAPABILITY_SSE;
+# else
     if( i_edx & 0x02000000 )
     {
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
@@ -178,10 +185,13 @@ uint32_t CPUCapabilities( void )
             i_capabilities |= CPU_CAPABILITY_SSE;
 #   endif
     }
+# endif
 
+# if defined (__SSE2__)
+    i_capabilities |= CPU_CAPABILITY_SSE2;
+# elif defined (CAN_COMPILE_SSE)
     if( i_edx & 0x04000000 )
     {
-#   if defined(CAN_COMPILE_SSE)
         /* We test if OS supports the SSE2 instructions */
         pid_t pid = fork();
         if( pid == 0 )
@@ -192,8 +202,8 @@ uint32_t CPUCapabilities( void )
         }
         if( check_OS_capability( "SSE2", pid ) )
             i_capabilities |= CPU_CAPABILITY_SSE2;
-#   endif
     }
+# endif
 
     /* test for additional capabilities */
     cpuid( 0x80000000 );
@@ -204,7 +214,9 @@ uint32_t CPUCapabilities( void )
     /* list these additional capabilities */
     cpuid( 0x80000001 );
 
-#   ifdef CAN_COMPILE_3DNOW
+# if defined (__3dNOW__)
+    i_capabilities |= CPU_CAPABILITY_3DNOW;
+# elif defined (CAN_COMPILE_3DNOW)
     if( i_edx & 0x80000000 )
     {
         pid_t pid = fork();
@@ -217,7 +229,7 @@ uint32_t CPUCapabilities( void )
         if( check_OS_capability( "3D Now!", pid ) )
             i_capabilities |= CPU_CAPABILITY_3DNOW;
     }
-#   endif
+# endif
 
     if( b_amd && ( i_edx & 0x00400000 ) )
     {
