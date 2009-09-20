@@ -29,26 +29,25 @@
 #define	Y2	r5
 #define	U	r6
 #define	V	r7
-#define	END_O1	r8
+#define	END_O1	r12
 
 	.align
 	.global i420_uyvy_neon
 	.type	i420_uyvy_neon, %function
 i420_uyvy_neon:
-	push		{r4-r8}
-	add		r8,	pc,	#(indexes+64-.-8)
+	adr		r12,	indexes+64
 	b		i420_pack_neon
 
 	.global i420_yuyv_neon
 	.type	i420_yuyv_neon, %function
 i420_yuyv_neon:
-	push		{r4-r8}
-	add		r8,	pc,	#(indexes-.-8)
+	adr		r12,	indexes
 	.hidden	i420_pack_neon
 i420_pack_neon:
-	vld1.u8		{d24-d27},	[r8]!
-	ldmia		r1,	{r4, r6, r7}
-	vld1.u8		{d28-d31},	[r8]
+	push		{r4-r7, lr}
+	vld1.u8		{d24-d27},	[r12]!
+	ldmia		r1,	{Y1, U, V}
+	vld1.u8		{d28-d31},	[r12]
 	add		O2,	O1,	PITCH, lsl #1
 	add		Y2,	Y1,	PITCH
 1:
@@ -81,8 +80,7 @@ i420_pack_neon:
 	cmp		HEIGHT,	#0
 	bne		1b
 
-	pop		{r4-r8}
-	bx		lr
+	pop		{r4-r7, pc}
 
 	.hidden indexes
 indexes:
