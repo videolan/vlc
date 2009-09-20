@@ -1,4 +1,4 @@
-SOURCES_avcodec = \
+libavcodec_plugin_la_SOURCES = \
 	avcodec.c \
 	avcodec.h \
 	video.c \
@@ -11,14 +11,13 @@ SOURCES_avcodec = \
 	vaapi.c \
 	vaapi.h \
 	$(NULL)
-
 if ENABLE_SOUT
-SOURCES_avcodec += encoder.c
+libavcodec_plugin_la_SOURCES += \
+	encoder.c
 endif
-
-EXTRA_libavcodec_plugin_la_SOURCES = \
-	encoder.c \
-	$(NULL)
+libavcodec_plugin_la_CFLAGS = $(AM_CFLAGS)
+libavcodec_plugin_la_LIBADD = $(AM_LIBADD)
+libavcodec_plugin_la_DEPENDENCIES =
 
 libvlc_LTLIBRARIES += \
 	$(LTLIBavcodec)
