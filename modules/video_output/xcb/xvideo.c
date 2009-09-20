@@ -614,7 +614,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
                               vd->source.i_visible_height,
                    /* Dst: */ 0, 0, p_sys->width, p_sys->height,
                 /* Memory: */ pic->p->i_pitch / pic->p->i_pixel_pitch,
-                              pic->p->i_visible_lines, false);
+                              pic->p->i_lines, false);
     else
         ck = xcb_xv_put_image_checked (p_sys->conn, p_sys->port, p_sys->window,
                           p_sys->gc, p_sys->id,
@@ -624,7 +624,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
                           vd->source.i_visible_height,
                           0, 0, p_sys->width, p_sys->height,
                           pic->p->i_pitch / pic->p->i_pixel_pitch,
-                          pic->p->i_visible_lines,
+                          pic->p->i_lines,
                           p_sys->data_size, pic->p->p_pixels);
 
     /* Wait for reply. See x11.c for rationale. */
