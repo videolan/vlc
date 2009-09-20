@@ -1,4 +1,4 @@
- @****************************************************************************
+ @*****************************************************************************
  @ i420_yuyv_neon.S : ARM NEONv1 I420 to YUYV chroma conversion
  @*****************************************************************************
  @ Copyright (C) 2009 Rémi Denis-Courmont
@@ -14,8 +14,8 @@
  @ GNU General Public License for more details.
  @
  @ You should have received a copy of the GNU General Public License
- @ along with this program; if not, write to the Free Software
- @ Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ @ along with this program; if not, write to the Free Software Foundation,
+ @ Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  @****************************************************************************/
 
 	.fpu neon
@@ -32,41 +32,26 @@
 #define	END_O1	r12
 
 	.align
-	.global i420_uyvy_neon
-	.type	i420_uyvy_neon, %function
-i420_uyvy_neon:
-	adr		r12,	indexes+64
-	b		i420_pack_neon
-
 	.global i420_yuyv_neon
 	.type	i420_yuyv_neon, %function
 i420_yuyv_neon:
-	adr		r12,	indexes
-	.hidden	i420_pack_neon
-i420_pack_neon:
 	push		{r4-r7, lr}
-	vld1.u8		{d24-d27},	[r12]!
 	ldmia		r1,	{Y1, U, V}
-	vld1.u8		{d28-d31},	[r12]
 	add		O2,	O1,	PITCH, lsl #1
 	add		Y2,	Y1,	PITCH
 1:
 	mov		END_O1,	O2
 2:
-	vld1.u8		{d0-d1},	[Y1,:128]!
 	vld1.u8		{d2},		[U,:64]!
 	vld1.u8		{d3},		[V,:64]!
-	vld1.u8		{d4-d5},	[Y2,:128]!
-	vtbl.u8		d16,	{d0-d3},	d24
-	vtbl.u8		d17,	{d0-d3},	d25
-	vtbl.u8		d18,	{d0-d3},	d26
-	vtbl.u8		d19,	{d0-d3},	d27
-	vtbl.u8		d20,	{d2-d5},	d28
-	vtbl.u8		d21,	{d2-d5},	d29
-	vtbl.u8		d22,	{d2-d5},	d30
-	vtbl.u8		d23,	{d2-d5},	d31
-	vst1.u8		{d16-d19},	[O1,:128]!
-	vst1.u8		{d20-d23},	[O2,:128]!
+	vzip.u8		d2,	d3
+	vld1.u8		{q0},		[Y1,:128]!
+	vmov		q3,	q1
+	vzip.u8		q0,	q1
+	vld1.u8		{q2},		[Y2,:128]!
+	vzip.u8		q2,	q3
+	vst1.u8		{q0-q1},	[O1,:128]!
+	vst1.u8		{q2-q3},	[O2,:128]!
 
 	cmp		O1,	END_O1
 	bne		2b
@@ -82,25 +67,37 @@ i420_pack_neon:
 
 	pop		{r4-r7, pc}
 
-	.hidden indexes
-indexes:
-	@ YUYV1
-	.byte	0x00, 0x10, 0x01, 0x18, 0x02, 0x11, 0x03, 0x19
-	.byte	0x04, 0x12, 0x05, 0x1A, 0x06, 0x13, 0x07, 0x1B
-	.byte	0x08, 0x14, 0x09, 0x1C, 0x0A, 0x15, 0x0B, 0x1D
-	.byte	0x0C, 0x16, 0x0D, 0x1E, 0x0E, 0x17, 0x0F, 0x1F
-	@ YUYV2
-	.byte	0x10, 0x00, 0x11, 0x08, 0x12, 0x01, 0x13, 0x09
-	.byte	0x14, 0x02, 0x15, 0x0A, 0x16, 0x03, 0x17, 0x0B
-	.byte	0x18, 0x04, 0x19, 0x0C, 0x1A, 0x05, 0x1B, 0x0D
-	.byte	0x1C, 0x06, 0x1D, 0x0E, 0x1E, 0x07, 0x1F, 0x0F
-	@ UYVY1
-	.byte	0x10, 0x00, 0x18, 0x01, 0x11, 0x02, 0x19, 0x03
-	.byte	0x12, 0x04, 0x1A, 0x05, 0x13, 0x06, 0x1B, 0x07
-	.byte	0x14, 0x08, 0x1C, 0x09, 0x15, 0x0A, 0x1D, 0x0B
-	.byte	0x16, 0x0C, 0x1E, 0x0D, 0x17, 0x0E, 0x1F, 0x0F
-	@ UYVY2
-	.byte	0x00, 0x10, 0x08, 0x11, 0x01, 0x12, 0x09, 0x13
-	.byte	0x02, 0x14, 0x0A, 0x15, 0x03, 0x16, 0x0B, 0x17
-	.byte	0x04, 0x18, 0x0C, 0x19, 0x05, 0x1A, 0x0D, 0x1B
-	.byte	0x06, 0x1C, 0x0E, 0x1D, 0x07, 0x1E, 0x0F, 0x1F
+	.global i420_uyvy_neon
+	.type	i420_uyvy_neon, %function
+i420_uyvy_neon:
+	push		{r4-r7, lr}
+	ldmia		r1,	{Y1, U, V}
+	add		O2,	O1,	PITCH, lsl #1
+	add		Y2,	Y1,	PITCH
+1:
+	mov		END_O1,	O2
+2:
+	vld1.u8		{d0},		[U,:64]!
+	vld1.u8		{d1},		[V,:64]!
+	vzip.u8		d0,	d1
+	vld1.u8		{q1},		[Y1,:128]!
+	vmov		q2,	q0
+	vzip.u8		q0,	q1
+	vld1.u8		{q3},		[Y2,:128]!
+	vzip.u8		q2,	q3
+	vst1.u8		{q0-q1},	[O1,:128]!
+	vst1.u8		{q2-q3},	[O2,:128]!
+
+	cmp		O1,	END_O1
+	bne		2b
+
+	sub		HEIGHT,	#2
+	mov		O1,	O2
+	add		O2,	PITCH,	lsl #1
+	mov		Y1,	Y2
+	add		Y2,	PITCH
+
+	cmp		HEIGHT,	#0
+	bne		1b
+
+	pop		{r4-r7, pc}
