@@ -31,14 +31,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_codec.h>
-
-/* ffmpeg header */
-#ifdef HAVE_LIBAVFORMAT_AVFORMAT_H
-#   include <libavformat/avformat.h>
-#elif defined(HAVE_FFMPEG_AVFORMAT_H)
-#   include <ffmpeg/avformat.h>
-#endif
 
 #include "avformat.h"
 
