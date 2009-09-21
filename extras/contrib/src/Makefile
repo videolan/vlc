@@ -1028,7 +1028,7 @@ ifdef HAVE_DARWIN_OS
 ifdef HAVE_DARWIN_OS_ON_INTEL
 	(cd $@; patch -p0 < ../Patches/ffmpeg-macosx-intel-mmx.patch)
 else
-	(cd $@; patch -p0 < ../Patches/ffmpeg-darwin-ppc-mdynamic.patch) 
+	(cd $@; patch -p0 < ../Patches/ffmpeg-darwin-ppc-mdynamic.patch)
 endif
 endif
 ifdef HAVE_UCLIBC
@@ -1065,7 +1065,7 @@ FFMPEGCONF += \
 	--disable-protocols \
 	--disable-network
 ifdef HAVE_WIN32
-FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=ac3
+FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=ac3 --enable-libmp3lame
 endif
 
 ifdef HAVE_WINCE
