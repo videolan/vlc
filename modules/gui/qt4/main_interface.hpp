@@ -193,7 +193,7 @@ private slots:
 
 signals:
     void askGetVideo( WId *p_id, int *pi_x, int *pi_y,
-                      unsigned int *pi_width, unsigned int *pi_height );
+                      unsigned *pi_width, unsigned *pi_height );
     void askReleaseVideo( );
     void askVideoToResize( unsigned int, unsigned int );
     void askVideoSetFullScreen( bool );
