@@ -74,7 +74,7 @@ void EndSubtitleDec( decoder_t *p_dec );
 
 #define ERROR_TEXT N_("Error resilience")
 #define ERROR_LONGTEXT N_( \
-    "Ffmpeg can do error resilience.\n" \
+    "FFmpeg can do error resilience.\n" \
     "However, with a buggy encoder (such as the ISO MPEG-4 encoder from M$) " \
     "this can produce a lot of errors.\n" \
     "Valid values range from 0 to 4 (0 disables all errors resilience).")
@@ -113,7 +113,7 @@ void EndSubtitleDec( decoder_t *p_dec );
     "(-1=None, 0=Default, 1=B-frames, 2=P-frames, 3=B+P frames, 4=all frames)." )
 
 #define DEBUG_TEXT N_( "Debug mask" )
-#define DEBUG_LONGTEXT N_( "Set ffmpeg debug mask" )
+#define DEBUG_LONGTEXT N_( "Set FFmpeg debug mask" )
 
 /* TODO: Use a predefined list, with 0,1,2,4,7 */
 #define VISMV_TEXT N_( "Visualize motion vectors" )
