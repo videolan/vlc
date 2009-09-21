@@ -1455,7 +1455,7 @@ AS_IF([test "${enable_sse}" != "no"], [
   ])
 ])
 
-AC_ARG_ENABLE(ssse3,
+AC_ARG_ENABLE(sse3,
 [  --disable-sse3          disable SSE3/SSSE3 optimizations (default auto)]
 ,, [
   case "${host_cpu}" in
@@ -1468,7 +1468,7 @@ AC_ARG_ENABLE(ssse3,
   esac
 ])
 AS_IF([test "${enable_sse3}" != "no"], [
-
+  # SSE3
   AC_CACHE_CHECK([if $CC groks SSE3 inline assembly],
     [ac_cv_sse3_inline],
     [CFLAGS="${CFLAGS_save} -O -msse3"
@@ -1478,10 +1478,8 @@ AS_IF([test "${enable_sse3}" != "no"], [
   ])
   AS_IF([test "${ac_cv_sse3_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE3, 1,
-              [Define to 1 if SSE3 inline assembly is available.])
-    ]
-    )
-
+              [Define to 1 if SSE3 inline assembly is available.]) ])
+  # SSSE3
   AC_CACHE_CHECK([if $CC groks SSSE3 inline assembly],
     [ac_cv_ssse3_inline],
     [CFLAGS="${CFLAGS_save} -O -mssse3"
@@ -1492,9 +1490,33 @@ AS_IF([test "${enable_sse3}" != "no"], [
 
   AS_IF([test "${ac_cv_ssse3_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSSE3, 1,
-              [Define to 1 if SSSE3 inline assembly is available.])
-    ]
-    )
+              [Define to 1 if SSSE3 inline assembly is available.]) ])
+])
+
+AC_ARG_ENABLE(sse4,
+[  --disable-sse4          disable SSE4 optimizations (default auto)]
+,, [
+  case "${host_cpu}" in
+    i686|x86_64)
+      enable_sse4=yes
+      ;;
+    *)
+      enable_sse4=no
+      ;;
+  esac
+])
+AS_IF([test "${enable_sse4}" != "no"], [
+  # SSE3
+  AC_CACHE_CHECK([if $CC groks SSE4 inline assembly],
+    [ac_cv_sse4_inline],
+    [CFLAGS="${CFLAGS_save} -O -msse4"
+     AC_TRY_COMPILE(,[void *p;asm volatile("pmaxsb %%xmm1,%%xmm0"::"r"(p));],
+                    ac_cv_sse4_inline=yes, ac_cv_sse4_inline=no)
+     ARCH="${ARCH} sse4"
+  ])
+  AS_IF([test "${ac_cv_sse4_inline}" != "no"], [
+    AC_DEFINE(CAN_COMPILE_SSE4, 1,
+              [Define to 1 if SSE4 inline assembly is available.]) ])
 ])
 
 AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly],
