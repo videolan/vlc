@@ -412,7 +412,16 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC_NO_BOOL( "ffmpeg-pp-q", Integer, ui.ppLabel,
                                     PostProcLevel );
             CONFIG_GENERIC( "avi-index", IntegerList, ui.aviLabel, AviRepair );
-            CONFIG_GENERIC( "rtsp-tcp", Bool, NULL, RTSP_TCPBox );
+
+            /* live555 module prefs */
+            CONFIG_GENERIC( "rtsp-tcp", Bool, NULL,
+                                live555TransportRTSP_TCPRadio );
+            if ( !module_exists( "live555" ) )
+            {
+                ui.live555TransportRTSP_TCPRadio->hide();
+                ui.live555TransportHTTPRadio->hide();
+                ui.live555TransportLabel->hide();
+            }
 #ifdef WIN32
             CONFIG_GENERIC( "prefer-system-codecs", Bool, NULL, systemCodecBox );
 #else

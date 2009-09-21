@@ -157,7 +157,7 @@
       <item row="2" column="1">
        <layout class="QHBoxLayout" name="horizontalLayout">
         <item>
-         <widget class="QRadioButton" name="HTTP">
+         <widget class="QRadioButton" name="live555TransportHTTPRadio">
           <property name="text">
            <string>HTTP (default)</string>
           </property>
@@ -170,7 +170,7 @@
          </widget>
         </item>
         <item>
-         <widget class="QRadioButton" name="RTSP_TCPBox">
+         <widget class="QRadioButton" name="live555TransportRTSP_TCPRadio">
           <property name="text">
            <string>RTP over RTSP (TCP)</string>
           </property>
@@ -179,9 +179,9 @@
        </layout>
       </item>
       <item row="2" column="0">
-       <widget class="QLabel" name="label_3">
+       <widget class="QLabel" name="live555TransportLabel">
         <property name="text">
-         <string>Stream transport</string>
+         <string>Live555 stream transport</string>
         </property>
        </widget>
       </item>
@@ -316,7 +316,7 @@
   <tabstop>cachingCombo</tabstop>
   <tabstop>PostProcLevel</tabstop>
   <tabstop>AviRepair</tabstop>
-  <tabstop>RTSP_TCPBox</tabstop>
+  <tabstop>live555TransportRTSP_TCPRadio</tabstop>
   <tabstop>systemCodecBox</tabstop>
  </tabstops>
  <resources/>
