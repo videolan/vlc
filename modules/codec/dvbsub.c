@@ -234,7 +234,8 @@ struct decoder_sys_t
     dvbsub_page_t   *p_page;
     dvbsub_region_t *p_regions;
     dvbsub_clut_t   *p_cluts;
-    dvbsub_display_t *p_display;
+    /* this is very small, so keep forever */
+    dvbsub_display_t display;
     dvbsub_clut_t    default_clut;
 };
 
@@ -279,6 +280,7 @@ static void decode_clut( decoder_t *, bs_t * );
 static void free_all( decoder_t * );
 
 static void default_clut_init( decoder_t * );
+static void default_dds_init( decoder_t * );
 
 static subpicture_t *render( decoder_t * );
 
@@ -313,7 +315,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_regions      = NULL;
     p_sys->p_cluts        = NULL;
     p_sys->p_page         = NULL;
-    p_sys->p_display      = NULL;
+
+    /* configure for SD res in case DDS is not present */
+    default_dds_init( p_dec );
 
     var_Create( p_this, DVBSUB_CFG_PREFIX "position",
                 VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
@@ -375,6 +379,11 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if( ( pp_block == NULL ) || ( *pp_block == NULL ) ) return NULL;
     p_block = *pp_block;
     *pp_block = NULL;
+
+    /* configure for SD res in case DDS is not present */
+    /* a change of PTS is a good indication we must get a new DDS */
+    if (p_sys->i_pts != p_block->i_pts)
+        default_dds_init( p_dec );
 
     p_sys->i_pts = p_block->i_pts;
     if( p_sys->i_pts <= 0 )
@@ -952,15 +961,13 @@ static void decode_display_definition( decoder_t *p_dec, bs_t *s )
     decoder_sys_t *p_sys = p_dec->p_sys;
     uint16_t      i_segment_length;
     uint16_t      i_processed_length = 40;
-    dvbsub_display_t *p_display;
-    dvbsub_display_t *p_old = p_sys->p_display;
     int           i_version;
 
     i_segment_length = bs_read( s, 16 );
     i_version        = bs_read( s, 4 );
 
     /* Check version number */
-    if( p_old && ( p_old->i_version == i_version ) )
+    if( p_sys->display.i_version == i_version )
     {
         /* The definition did not change */
         bs_skip( s, 8*i_segment_length - 4 );
@@ -970,32 +977,26 @@ static void decode_display_definition( decoder_t *p_dec, bs_t *s )
 #ifdef DEBUG_DVBSUB
     msg_Dbg( p_dec, "new display definition: %i", i_version );
 #endif
-    p_display = malloc( sizeof(dvbsub_display_t) );
-    if( p_display )
+
+    /* We don't have this version of the display definition: Parse it */
+    p_sys->display.i_version = i_version;
+    p_sys->display.b_windowed = bs_read( s, 1 );
+    bs_skip( s, 3 ); /* Reserved bits */
+    p_sys->display.i_width = bs_read( s, 16 )+1;
+    p_sys->display.i_height = bs_read( s, 16 )+1;
+
+    if( p_sys->display.b_windowed )
     {
-        /* We don't have this version of the display definition: Parse it */
-        p_display->i_version = i_version;
-        p_display->b_windowed = bs_read( s, 1 );
-        bs_skip( s, 3 ); /* Reserved bits */
-        p_display->i_width = bs_read( s, 16 )+1;
-        p_display->i_height = bs_read( s, 16 )+1;
-
-        if( p_display->b_windowed )
-        {
 #ifdef DEBUG_DVBSUB
-            msg_Dbg( p_dec, "display definition with offsets (windowed)" );
+        msg_Dbg( p_dec, "display definition with offsets (windowed)" );
 #endif
-            /* Coordinates are measured from the top left corner */
-            p_display->i_x     = bs_read( s, 16 );
-            p_display->i_max_x = bs_read( s, 16 );
-            p_display->i_y     = bs_read( s, 16 );
-            p_display->i_max_y = bs_read( s, 16 );
-            i_processed_length += 64;
-        }
+        /* Coordinates are measured from the top left corner */
+        p_sys->display.i_x     = bs_read( s, 16 );
+        p_sys->display.i_max_x = bs_read( s, 16 );
+        p_sys->display.i_y     = bs_read( s, 16 );
+        p_sys->display.i_max_y = bs_read( s, 16 );
+        i_processed_length += 64;
     }
-
-    p_sys->p_display = p_display;
-    free( p_old );
 
     if( i_processed_length != i_segment_length*8 )
     {
@@ -1005,10 +1006,10 @@ static void decode_display_definition( decoder_t *p_dec, bs_t *s )
 
 #ifdef DEBUG_DVBSUB
     msg_Dbg( p_dec, "version: %d, width: %d, height: %d",
-             p_display->i_version, p_display->i_width, p_display->i_height );
-    if( p_display->b_windowed )
+             p_sys->display.i_version, p_sys->display.i_width, p_sys->display.i_height );
+    if( p_sys->display.b_windowed )
         msg_Dbg( p_dec, "xmin: %d, xmax: %d, ymin: %d, ymax: %d",
-                 p_display->i_x, p_display->i_max_x, p_display->i_y, p_display->i_max_y );
+                 p_sys->display.i_x, p_sys->display.i_max_x, p_sys->display.i_y, p_sys->display.i_max_y );
 #endif
 }
 
@@ -1409,7 +1410,7 @@ static void free_all( decoder_t *p_dec )
     dvbsub_region_t *p_reg, *p_reg_next;
     dvbsub_clut_t *p_clut, *p_clut_next;
 
-    free( p_sys->p_display );
+    /*free( p_sys->p_display ); No longer malloced */
 
     for( p_clut = p_sys->p_cluts; p_clut != NULL; p_clut = p_clut_next )
     {
@@ -1468,19 +1469,16 @@ static subpicture_t *render( decoder_t *p_dec )
     p_spu->i_original_picture_width = 720;
     p_spu->i_original_picture_height = 576;
 
-    if( p_sys->p_display )
-    {
-        p_spu->i_original_picture_width = p_sys->p_display->i_width;
-        p_spu->i_original_picture_height = p_sys->p_display->i_height;
+    p_spu->i_original_picture_width = p_sys->display.i_width;
+    p_spu->i_original_picture_height = p_sys->display.i_height;
 
-        if( p_sys->p_display->b_windowed )
-        {
-            /* TODO: check that this actually works */
-            p_spu->i_original_picture_width = p_sys->p_display->i_max_x - p_sys->p_display->i_x;
-            p_spu->i_original_picture_height = p_sys->p_display->i_max_y - p_sys->p_display->i_y;
-            i_base_x += p_sys->p_display->i_x;
-            i_base_y += p_sys->p_display->i_y;
-        }
+    if( p_sys->display.b_windowed )
+    {
+        /* TODO: check that this actually works */
+        p_spu->i_original_picture_width = p_sys->display.i_max_x - p_sys->display.i_x;
+        p_spu->i_original_picture_height = p_sys->display.i_max_y - p_sys->display.i_y;
+        i_base_x += p_sys->display.i_x;
+        i_base_y += p_sys->display.i_y;
     }
 
     pp_spu_region = &p_spu->p_region;
@@ -2608,3 +2606,18 @@ static void encode_pixel_line_8bp( bs_t *s, subpicture_region_t *p_region,
     /* Stuffing */
     bs_align_0( s );
 }
+
+
+static void default_dds_init( decoder_t * p_dec )
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+
+    /* see notes on DDS at the top of the file */
+
+    /* configure for SD res in case DDS is not present */
+    p_sys->display.i_version = 0xff; /* an invalid version so it's always different */
+    p_sys->display.i_width = 720;
+    p_sys->display.i_height = 576;
+    p_sys->display.b_windowed = false;
+}
+
