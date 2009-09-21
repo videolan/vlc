@@ -1455,6 +1455,48 @@ AS_IF([test "${enable_sse}" != "no"], [
   ])
 ])
 
+AC_ARG_ENABLE(ssse3,
+[  --disable-sse3          disable SSE3/SSSE3 optimizations (default auto)]
+,, [
+  case "${host_cpu}" in
+    i686|x86_64)
+      enable_sse3=yes
+      ;;
+    *)
+      enable_sse3=no
+      ;;
+  esac
+])
+AS_IF([test "${enable_sse3}" != "no"], [
+
+  AC_CACHE_CHECK([if $CC groks SSE3 inline assembly],
+    [ac_cv_sse3_inline],
+    [CFLAGS="${CFLAGS_save} -O -msse3"
+     AC_TRY_COMPILE(,[void *p;asm volatile("movsldup %%xmm1,%%xmm0"::"r"(p));],
+                    ac_cv_sse3_inline=yes, ac_cv_sse3_inline=no)
+     ARCH="${ARCH} sse3"
+  ])
+  AS_IF([test "${ac_cv_sse3_inline}" != "no"], [
+    AC_DEFINE(CAN_COMPILE_SSE3, 1,
+              [Define to 1 if SSE3 inline assembly is available.])
+    ]
+    )
+
+  AC_CACHE_CHECK([if $CC groks SSSE3 inline assembly],
+    [ac_cv_ssse3_inline],
+    [CFLAGS="${CFLAGS_save} -O -mssse3"
+     AC_TRY_COMPILE(,[void *p;asm volatile("pabsw %%xmm0,%%xmm0"::"r"(p));],
+                    ac_cv_ssse3_inline=yes, ac_cv_ssse3_inline=no)
+     ARCH="${ARCH} ssse3"
+  ])
+
+  AS_IF([test "${ac_cv_ssse3_inline}" != "no"], [
+    AC_DEFINE(CAN_COMPILE_SSSE3, 1,
+              [Define to 1 if SSSE3 inline assembly is available.])
+    ]
+    )
+])
+
 AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly],
     [ac_cv_3dnow_inline],
     [CFLAGS="${CFLAGS_save}"
