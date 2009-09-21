@@ -1054,6 +1054,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
                     p_stream->i_stream_type = 0x81;
                     p_stream->i_stream_id = 0xbd;
                     break;
+                case VLC_CODEC_EAC3:
+                    p_stream->i_stream_type = 0x06;
+                    p_stream->i_stream_id = 0xbd;
+                    break;
                 case VLC_CODEC_DVD_LPCM:
                     p_stream->i_stream_type = 0x83;
                     p_stream->i_stream_id = 0xbd;
@@ -2696,6 +2700,11 @@ static void GetPMT( sout_mux_t *p_mux, sout_buffer_chain_t *c )
             /* DTS format identifier, frame size 1024 - FIXME */
             uint8_t data[4] = { 0x44, 0x54, 0x53, 0x32 };
             dvbpsi_PMTESAddDescriptor( p_es, 0x05, 4, data );
+        }
+        else if( p_stream->i_codec == VLC_CODEC_EAC3 )
+        {
+            uint8_t data[1] = { 0x00 };
+            dvbpsi_PMTESAddDescriptor( p_es, 0x7a, 1, data );
         }
         else if( p_stream->i_codec == VLC_CODEC_TELETEXT )
         {
