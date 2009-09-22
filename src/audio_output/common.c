@@ -717,7 +717,6 @@ aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
     if ( !buffer )
         return NULL;
 
-    buffer->b_alloc = true;
     buffer->i_size = i_alloc_size;
     buffer->p_buffer = (uint8_t *)buffer + sizeof(aout_buffer_t);
     buffer->b_discontinuity = false;

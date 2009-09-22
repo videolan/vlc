@@ -133,7 +133,6 @@ struct aout_buffer_t
      * is the number of significative bytes in it. */
     size_t                  i_size, i_nb_bytes;
     unsigned int            i_nb_samples;
-    bool                    b_alloc;
     bool                    b_discontinuity; /* Set on discontinuity (for non pcm stream) */
     mtime_t                 start_date, end_date;
 
@@ -143,8 +142,7 @@ struct aout_buffer_t
 
 static inline void aout_BufferFree( aout_buffer_t *buffer )
 {
-    if( buffer && buffer->b_alloc )
-        free( buffer );
+    free( buffer );
 }
 
 /* Size of a frame for S/PDIF output. */
