@@ -134,8 +134,7 @@ static int SendAudio( sout_stream_t *p_stream, sout_stream_id_t *id,
 struct sout_stream_id_t
 {
     es_format_t* format;
-    void *p_audio_data;
-    void *p_video_data;
+    void *p_data;
 };
 
 struct sout_stream_sys_t
@@ -252,7 +251,7 @@ static sout_stream_id_t *AddVideo( sout_stream_t *p_stream, es_format_t *p_fmt )
         return NULL;
 
     psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_VIDEO "data" );
-    id->p_video_data = (void *)( intptr_t )atoll( psz_tmp );
+    id->p_data = (void *)( intptr_t )atoll( psz_tmp );
     free( psz_tmp );
 
     id->format = p_fmt;
@@ -303,7 +302,7 @@ static sout_stream_id_t *AddAudio( sout_stream_t *p_stream, es_format_t *p_fmt )
         return NULL;
 
     psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_AUDIO "data" );
-    id->p_audio_data = (void *)( intptr_t )atoll( psz_tmp );
+    id->p_data = (void *)( intptr_t )atoll( psz_tmp );
     free( psz_tmp );
 
     id->format = p_fmt;
@@ -341,12 +340,12 @@ static int SendVideo( sout_stream_t *p_stream, sout_stream_id_t *id,
     i_line_size = i_pixel_pitch * id->format->video.i_width;
     i_size = i_line * i_line_size;
     /* Calling the prerender callback to get user buffer */
-    p_sys->pf_video_prerender_callback( id->p_video_data, &p_pixels , i_size );
+    p_sys->pf_video_prerender_callback( id->p_data, &p_pixels , i_size );
     /* Copying data into user buffer */
     for ( int line = 0; line < i_line; line++, p_pixels += i_line_size )
         vlc_memcpy( p_pixels, p_buffer->p_buffer + i_line_size * line , i_line_size );
     /* Calling the postrender callback to tell the user his buffer is ready */
-    p_sys->pf_video_postrender_callback( id->p_video_data, p_pixels,
+    p_sys->pf_video_postrender_callback( id->p_data, p_pixels,
                                          id->format->video.i_width, id->format->video.i_height,
                                          id->format->video.i_bits_per_pixel, i_size, p_buffer->i_pts );
     block_ChainRelease( p_buffer );
@@ -364,11 +363,11 @@ static int SendAudio( sout_stream_t *p_stream, sout_stream_id_t *id,
     i_size = p_buffer->i_buffer;
     i_samples = i_size / ( ( id->format->audio.i_bitspersample / 8 ) * id->format->audio.i_channels );
     /* Calling the prerender callback to get user buffer */
-    p_sys->pf_audio_prerender_callback( id->p_audio_data, &p_pcm_buffer, i_size );
+    p_sys->pf_audio_prerender_callback( id->p_data, &p_pcm_buffer, i_size );
     /* Copying data into user buffer */
     vlc_memcpy( p_pcm_buffer, p_buffer->p_buffer, i_size );
     /* Calling the postrender callback to tell the user his buffer is ready */
-    p_sys->pf_audio_postrender_callback( id->p_audio_data, p_pcm_buffer,
+    p_sys->pf_audio_postrender_callback( id->p_data, p_pcm_buffer,
                                          id->format->audio.i_channels, id->format->audio.i_rate, p_buffer->i_samples,
                                          id->format->audio.i_bitspersample, i_size, p_buffer->i_pts );
     block_ChainRelease( p_buffer );
