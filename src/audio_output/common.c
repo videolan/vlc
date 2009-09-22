@@ -721,12 +721,5 @@ aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
     buffer->i_size = i_alloc_size;
     buffer->p_buffer = (uint8_t *)buffer + sizeof(aout_buffer_t);
     buffer->b_discontinuity = false;
-
-    if ( old_buffer )
-    {
-        buffer->start_date = old_buffer->start_date;
-        buffer->end_date = old_buffer->end_date;
-    }
-
     return buffer;
 }
