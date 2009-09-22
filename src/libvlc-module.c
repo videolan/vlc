@@ -1009,6 +1009,12 @@ static const char *const ppsz_clock_descriptions[] =
     "If your processor supports the SSE2 instructions set, VLC can take " \
     "advantage of them.")
 
+#define SSE3_TEXT N_("Enable CPU SSE3 support")
+#define SSE3_LONGTEXT N_( \
+    "If your processor supports the SSE3 instructions set, VLC can take " \
+    "advantage of them.")
+
+
 #define ALTIVEC_TEXT N_("Enable CPU AltiVec support")
 #define ALTIVEC_LONGTEXT N_( \
     "If your processor supports the AltiVec instructions set, VLC can take " \
@@ -1926,6 +1932,8 @@ vlc_module_begin ()
     add_bool( "sse", 1, NULL, SSE_TEXT, SSE_LONGTEXT, true )
         change_need_restart ()
     add_bool( "sse2", 1, NULL, SSE2_TEXT, SSE2_LONGTEXT, true )
+        change_need_restart ()
+    add_bool( "sse3", 1, NULL, SSE3_TEXT, SSE3_LONGTEXT, true )
         change_need_restart ()
 #endif
 #if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )

@@ -201,6 +201,24 @@ uint32_t CPUCapabilities( void )
     }
 # endif
 
+# if defined (__SSE3__)
+    i_capabilities |= CPU_CAPABILITY_SSE3;
+# elif defined (CAN_COMPILE_SSE3)
+    if( i_ecx & 0x00000001 )
+    {
+        /* We test if OS supports the SSE3 instructions */
+        pid_t pid = fork();
+        if( pid == 0 )
+        {
+            /* Test a SSE3 instruction */
+            __asm__ __volatile__ ( "movsldup %%xmm1, %%xmm0\n" : : );
+            exit(0);
+        }
+        if( check_OS_capability( "SSE3", pid ) )
+            i_capabilities |= CPU_CAPABILITY_SSE3;
+    }
+# endif
+
     /* test for additional capabilities */
     cpuid( 0x80000000 );
 

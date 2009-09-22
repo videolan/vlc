@@ -761,12 +761,15 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         cpu_flags &= ~CPU_CAPABILITY_SSE;
     if( !config_GetInt( p_libvlc, "sse2" ) )
         cpu_flags &= ~CPU_CAPABILITY_SSE2;
+    if( !config_GetInt( p_libvlc, "sse3" ) )
+        cpu_flags &= ~CPU_CAPABILITY_SSE3;
 
     PRINT_CAPABILITY( CPU_CAPABILITY_MMX, "MMX" );
     PRINT_CAPABILITY( CPU_CAPABILITY_3DNOW, "3DNow!" );
     PRINT_CAPABILITY( CPU_CAPABILITY_MMXEXT, "MMXEXT" );
     PRINT_CAPABILITY( CPU_CAPABILITY_SSE, "SSE" );
     PRINT_CAPABILITY( CPU_CAPABILITY_SSE2, "SSE2" );
+    PRINT_CAPABILITY( CPU_CAPABILITY_SSE3, "SSE3" );
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
     if( !config_GetInt( p_libvlc, "altivec" ) )
