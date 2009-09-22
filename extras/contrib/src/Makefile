@@ -115,11 +115,11 @@ endif
 #
 ifdef HAVE_WIN32
 HOSTCONF+= --without-pic --disable-shared --enable-msw --disable-dependency-tracking
-FFMPEGCONF+= --target-os=mingw32 --enable-memalign-hack --cpu=i686 --arch=i686
+FFMPEGCONF+= --target-os=mingw32 --enable-memalign-hack
 ifdef HAVE_WIN64
 FFMPEGCONF+= --cpu=athlon64 --arch=x86_64
 else
-FFMPEGCONF+= --cpu=i686 --arch=x86_32
+FFMPEGCONF+= --cpu=i686
 endif
 endif
 
@@ -1077,7 +1077,7 @@ else
 .ffmpeg: ffmpeg .lame .gsm
 endif
 endif
-	(cd $<; $(HOSTCC) ./configure $(FFMPEGCONF) --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS)" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
+	(cd $<; $(HOSTCC) ./configure --prefix=$(PREFIX) --extra-cflags="$(CFLAGS) $(FFMPEG_CFLAGS)" --extra-ldflags="$(LDFLAGS)" $(FFMPEGCONF) --disable-shared --enable-static && make && make install-libs install-headers)
 	touch $@
 
 ifdef SVN
