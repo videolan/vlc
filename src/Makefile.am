@@ -413,6 +413,7 @@ SOURCES_libvlc_common = \
 	misc/stats.c \
 	misc/cpu.c \
 	misc/action.c \
+	misc/epg.c \
 	config/configuration.h \
 	config/core.c \
 	config/chain.c \

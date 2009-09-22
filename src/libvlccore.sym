@@ -549,6 +549,13 @@ vlc_timer_schedule
 vlc_ureduce
 VLC_Version
 vlc_wclosedir
+vlc_epg_Init
+vlc_epg_Clean
+vlc_epg_New
+vlc_epg_Delete
+vlc_epg_AddEvent
+vlc_epg_SetCurrent
+vlc_epg_Merge
 vlm_Control
 vlm_Delete
 vlm_ExecuteCommand

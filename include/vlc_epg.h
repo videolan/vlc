@@ -49,73 +49,48 @@ typedef struct
     vlc_epg_event_t **pp_event;
 } vlc_epg_t;
 
-static inline void vlc_epg_Init( vlc_epg_t *p_epg, const char *psz_name )
-{
-    p_epg->psz_name = psz_name ? strdup( psz_name ) : NULL;
-    p_epg->p_current = NULL;
-    TAB_INIT( p_epg->i_event, p_epg->pp_event );
-}
+/**
+ * It initializes a vlc_epg_t.
+ *
+ * You must call vlc_epg_Clean to release the associated resource.
+ */
+VLC_EXPORT(void, vlc_epg_Init, (vlc_epg_t *p_epg, const char *psz_name));
 
-static inline void vlc_epg_Clean( vlc_epg_t *p_epg )
-{
-    int i;
-    for( i = 0; i < p_epg->i_event; i++ )
-    {
-        vlc_epg_event_t *p_evt = p_epg->pp_event[i];
-        free( p_evt->psz_name );
-        free( p_evt->psz_short_description );
-        free( p_evt->psz_description );
-        free( p_evt );
-    }
-    TAB_CLEAN( p_epg->i_event, p_epg->pp_event );
-    free( p_epg->psz_name );
-}
+/**
+ * It releases all resources associated to a vlc_epg_t
+ */
+VLC_EXPORT(void, vlc_epg_Clean, (vlc_epg_t *p_epg));
 
-static inline void vlc_epg_AddEvent( vlc_epg_t *p_epg, int64_t i_start, int i_duration,
-                                const char *psz_name, const char *psz_short_description, const char *psz_description )
-{
-    vlc_epg_event_t *p_evt = (vlc_epg_event_t*)malloc( sizeof(vlc_epg_event_t) );
-    if( !p_evt )
-        return;
-    p_evt->i_start = i_start;
-    p_evt->i_duration = i_duration;
-    p_evt->psz_name = psz_name ? strdup( psz_name ) : NULL;
-    p_evt->psz_short_description = psz_short_description ? strdup( psz_short_description ) : NULL;
-    p_evt->psz_description = psz_description ? strdup( psz_description ) : NULL;
-    TAB_APPEND_CPP( vlc_epg_event_t, p_epg->i_event, p_epg->pp_event, p_evt );
-}
+/**
+ * It creates and appends a new vlc_epg_event_t to a vlc_epg_t.
+ *
+ * \see vlc_epg_t for the definitions of the parameters.
+ */
+VLC_EXPORT(void, vlc_epg_AddEvent, (vlc_epg_t *p_epg, int64_t i_start, int i_duration, const char *psz_name, const char *psz_short_description, const char *psz_description));
 
-LIBVLC_USED
-static inline vlc_epg_t *vlc_epg_New( const char *psz_name )
-{
-    vlc_epg_t *p_epg = (vlc_epg_t*)malloc( sizeof(vlc_epg_t) );
-    if( p_epg )
-        vlc_epg_Init( p_epg, psz_name );
-    return p_epg;
-}
+/**
+ * It creates a new vlc_epg_t*
+ *
+ * You must call vlc_epg_Delete to release the associated resource.
+ */
+VLC_EXPORT(vlc_epg_t *, vlc_epg_New, (const char *psz_name));
 
-static inline void vlc_epg_Delete( vlc_epg_t *p_epg )
-{
-    vlc_epg_Clean( p_epg );
-    free( p_epg );
-}
+/**
+ * It releases a vlc_epg_t*.
+ */
+VLC_EXPORT(void, vlc_epg_Delete, (vlc_epg_t *p_epg));
 
-static inline void vlc_epg_SetCurrent( vlc_epg_t *p_epg, int64_t i_start )
-{
-    int i;
-    p_epg->p_current = NULL;
-    if( i_start < 0 )
-        return;
+/**
+ * It set the current event of a vlc_epg_t given a start time
+ */
+VLC_EXPORT(void, vlc_epg_SetCurrent, (vlc_epg_t *p_epg, int64_t i_start));
 
-    for( i = 0; i < p_epg->i_event; i++ )
-    {
-        if( p_epg->pp_event[i]->i_start == i_start )
-        {
-            p_epg->p_current = p_epg->pp_event[i];
-            break;
-        }
-    }
-}
+/**
+ * It merges all the event of \p p_src and \p p_dst into \p p_dst.
+ *
+ * \p p_src is not modified.
+ */
+VLC_EXPORT(void, vlc_epg_Merge, (vlc_epg_t *p_dst, const vlc_epg_t *p_src));
 
 #endif
 
