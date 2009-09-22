@@ -80,6 +80,7 @@
 
 #include "vlc_charset.h"
 #include "vlc_arrays.h"
+#include <vlc_cpu.h>
 
 #include "modules/modules.h"
 

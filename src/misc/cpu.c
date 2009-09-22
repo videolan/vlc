@@ -31,6 +31,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_cpu.h>
 
 #include <sys/types.h>
 #ifndef WIN32
@@ -81,7 +82,7 @@ static bool check_OS_capability( const char *psz_capability, pid_t pid )
  *****************************************************************************/
 uint32_t CPUCapabilities( void )
 {
-    uint32_t i_capabilities = CPU_CAPABILITY_NONE;
+    uint32_t i_capabilities = 0;
 
 #if defined( __i386__ ) || defined( __x86_64__ )
      unsigned int i_eax, i_ebx, i_ecx, i_edx;

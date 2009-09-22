@@ -33,6 +33,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_codec_synchro.h>
+#include <vlc_cpu.h>
 
 #include <unistd.h>
 #ifdef __GLIBC__

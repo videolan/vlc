@@ -25,6 +25,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_cpu.h>
 
 static int Open (vlc_object_t *);
 

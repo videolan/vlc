@@ -27,6 +27,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_codec.h>
+#include <vlc_cpu.h>
 
 /* On Win32, we link statically */
 #ifdef WIN32

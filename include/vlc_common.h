@@ -785,27 +785,7 @@ VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char *const
 /* dir wrappers (defined in src/extras/libc.c) */
 VLC_EXPORT(int, vlc_wclosedir, ( void *_p_dir ));
 
-/*****************************************************************************
- * CPU capabilities
- *****************************************************************************/
-#define CPU_CAPABILITY_NONE    0
-#define CPU_CAPABILITY_MMX     (1<<3)
-#define CPU_CAPABILITY_3DNOW   (1<<4)
-#define CPU_CAPABILITY_MMXEXT  (1<<5)
-#define CPU_CAPABILITY_SSE     (1<<6)
-#define CPU_CAPABILITY_SSE2    (1<<7)
-#define CPU_CAPABILITY_SSE3    (1<<8)
-#define CPU_CAPABILITY_SSSE3   (1<<9)
-#define CPU_CAPABILITY_SSE4    (1<<10)
-#define CPU_CAPABILITY_ALTIVEC (1<<16)
-#define CPU_CAPABILITY_NEON    (1<<24)
-#define CPU_CAPABILITY_FPU     (1<<31)
-VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
-
-typedef void *(*vlc_memcpy_t) (void *tgt, const void *src, size_t n);
-typedef void *(*vlc_memset_t) (void *tgt, int c, size_t n);
-
-VLC_EXPORT( void, vlc_fastmem_register, (vlc_memcpy_t cpy, vlc_memset_t set) );
+/* Fast large memory copy and memory set */
 VLC_EXPORT( void *, vlc_memcpy, ( void *, const void *, size_t ) );
 VLC_EXPORT( void *, vlc_memset, ( void *, int, size_t ) );
 

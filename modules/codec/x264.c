@@ -33,6 +33,7 @@
 #include <vlc_sout.h>
 #include <vlc_codec.h>
 #include <vlc_charset.h>
+#include <vlc_cpu.h>
 
 #ifdef PTW32_STATIC_LIB
 #include <pthread.h>

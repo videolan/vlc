@@ -33,6 +33,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_cpu.h>
 
 #ifdef HAVE_ALTIVEC_H
 #   include <altivec.h>

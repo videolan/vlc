@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_cpu.h>
 
 #ifdef HAVE_LIBSWSCALE_SWSCALE_H
 #   include <libswscale/swscale.h>

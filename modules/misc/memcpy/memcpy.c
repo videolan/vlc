@@ -31,6 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_cpu.h>
 
 #undef HAVE_MMX
 #undef HAVE_MMX2

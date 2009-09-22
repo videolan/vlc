@@ -34,6 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_block_helper.h>
+#include <vlc_cpu.h>
 #include "../codec/cc.h"
 
 #include <mpeg2.h>

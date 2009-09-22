@@ -38,6 +38,7 @@
 #include <vlc_dialog.h>
 
 #include <vlc_aout.h>
+#include <vlc_cpu.h>
 
 /* ALSA part
    Note: we use the new API which is available since 0.9.0beta10a. */
