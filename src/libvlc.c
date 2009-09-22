@@ -298,7 +298,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                          const char *ppsz_argv[] )
 {
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
-    char         p_capabilities[200];
     char *       p_tmp = NULL;
     char *       psz_modules = NULL;
     char *       psz_parser = NULL;
@@ -740,6 +739,16 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( !config_GetInt( p_libvlc, "fpu" ) )
         cpu_flags &= ~CPU_CAPABILITY_FPU;
 
+    char p_capabilities[200];
+#define PRINT_CAPABILITY( capability, string )                              \
+    if( vlc_CPU() & capability )                                            \
+    {                                                                       \
+        strncat( p_capabilities, string " ",                                \
+                 sizeof(p_capabilities) - strlen(p_capabilities) );         \
+        p_capabilities[sizeof(p_capabilities) - 1] = '\0';                  \
+    }
+    p_capabilities[0] = '\0';
+
 #if defined( __i386__ ) || defined( __x86_64__ )
     if( !config_GetInt( p_libvlc, "mmx" ) )
         cpu_flags &= ~CPU_CAPABILITY_MMX;
@@ -751,27 +760,24 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         cpu_flags &= ~CPU_CAPABILITY_SSE;
     if( !config_GetInt( p_libvlc, "sse2" ) )
         cpu_flags &= ~CPU_CAPABILITY_SSE2;
-#endif
-#if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-    if( !config_GetInt( p_libvlc, "altivec" ) )
-        cpu_flags &= ~CPU_CAPABILITY_ALTIVEC;
-#endif
 
-#define PRINT_CAPABILITY( capability, string )                              \
-    if( vlc_CPU() & capability )                                            \
-    {                                                                       \
-        strncat( p_capabilities, string " ",                                \
-                 sizeof(p_capabilities) - strlen(p_capabilities) );         \
-        p_capabilities[sizeof(p_capabilities) - 1] = '\0';                  \
-    }
-
-    p_capabilities[0] = '\0';
     PRINT_CAPABILITY( CPU_CAPABILITY_MMX, "MMX" );
     PRINT_CAPABILITY( CPU_CAPABILITY_3DNOW, "3DNow!" );
     PRINT_CAPABILITY( CPU_CAPABILITY_MMXEXT, "MMXEXT" );
     PRINT_CAPABILITY( CPU_CAPABILITY_SSE, "SSE" );
     PRINT_CAPABILITY( CPU_CAPABILITY_SSE2, "SSE2" );
+
+#elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
+    if( !config_GetInt( p_libvlc, "altivec" ) )
+        cpu_flags &= ~CPU_CAPABILITY_ALTIVEC;
+
     PRINT_CAPABILITY( CPU_CAPABILITY_ALTIVEC, "AltiVec" );
+
+#elif defined( __arm__ )
+    PRINT_CAPABILITY( CPU_CAPABILITY_NEON, "NEONv1" );
+
+#endif
+
     PRINT_CAPABILITY( CPU_CAPABILITY_FPU, "FPU" );
     msg_Dbg( p_libvlc, "CPU has capabilities %s", p_capabilities );
 
