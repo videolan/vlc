@@ -1295,25 +1295,25 @@ static int transcode_audio_process( sout_stream_t *p_stream,
         if( p_sys->b_master_sync )
         {
             mtime_t i_dts = date_Get( &id->interpolated_pts ) + 1;
-            if ( p_audio_buf->start_date - i_dts > MASTER_SYNC_MAX_DRIFT
-                  || p_audio_buf->start_date - i_dts < -MASTER_SYNC_MAX_DRIFT )
+            if ( p_audio_buf->i_pts - i_dts > MASTER_SYNC_MAX_DRIFT
+                  || p_audio_buf->i_pts - i_dts < -MASTER_SYNC_MAX_DRIFT )
             {
                 msg_Dbg( p_stream, "drift is too high, resetting master sync" );
-                date_Set( &id->interpolated_pts, p_audio_buf->start_date );
-                i_dts = p_audio_buf->start_date + 1;
+                date_Set( &id->interpolated_pts, p_audio_buf->i_pts );
+                i_dts = p_audio_buf->i_pts + 1;
             }
-            p_sys->i_master_drift = p_audio_buf->start_date - i_dts;
+            p_sys->i_master_drift = p_audio_buf->i_pts - i_dts;
             date_Increment( &id->interpolated_pts, p_audio_buf->i_nb_samples );
-            p_audio_buf->start_date -= p_sys->i_master_drift;
+            p_audio_buf->i_pts -= p_sys->i_master_drift;
             p_audio_buf->end_date -= p_sys->i_master_drift;
         }
 
         p_audio_block = p_audio_buf->p_sys;
         p_audio_block->i_buffer = p_audio_buf->i_nb_bytes;
         p_audio_block->i_dts = p_audio_block->i_pts =
-            p_audio_buf->start_date;
+            p_audio_buf->i_pts;
         p_audio_block->i_length = p_audio_buf->end_date -
-            p_audio_buf->start_date;
+            p_audio_buf->i_pts;
         p_audio_block->i_samples = p_audio_buf->i_nb_samples;
 
         /* Run filter chain */
@@ -1329,7 +1329,7 @@ static int transcode_audio_process( sout_stream_t *p_stream,
         p_audio_buf->p_buffer = p_audio_block->p_buffer;
         p_audio_buf->i_nb_bytes = p_audio_block->i_buffer;
         p_audio_buf->i_nb_samples = p_audio_block->i_samples;
-        p_audio_buf->start_date = p_audio_block->i_dts;
+        p_audio_buf->i_pts = p_audio_block->i_dts;
         p_audio_buf->end_date = p_audio_block->i_dts + p_audio_block->i_length;
 
         audio_timer_start( id->p_encoder );

@@ -146,7 +146,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     {
         if( p_filter->p_sys->i_frames == 1 )
             /* We'll need the starting date */
-            p_filter->p_sys->start_date = p_in_buf->start_date;
+            p_filter->p_sys->start_date = p_in_buf->i_pts;
 
         /* Not enough data */
         p_out_buf->i_nb_samples = 0;
@@ -213,7 +213,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
     }
 
-    p_out_buf->start_date = p_filter->p_sys->start_date;
+    p_out_buf->i_pts = p_filter->p_sys->start_date;
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples * 3;
     p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples * 4;
 }

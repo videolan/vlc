@@ -663,7 +663,7 @@ static void* OSSThread( vlc_object_t *p_this )
             i_size = p_buffer->i_nb_bytes;
             /* This is theoretical ... we'll see next iteration whether
              * we're drifting */
-            next_date += p_buffer->end_date - p_buffer->start_date;
+            next_date += p_buffer->end_date - p_buffer->i_pts;
         }
         else
         {

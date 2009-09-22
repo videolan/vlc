@@ -369,7 +369,7 @@ void aout_FifoPush( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
     /* Enforce the continuity of the stream. */
     if ( date_Get( &p_fifo->end_date ) )
     {
-        p_buffer->start_date = date_Get( &p_fifo->end_date );
+        p_buffer->i_pts = date_Get( &p_fifo->end_date );
         p_buffer->end_date = date_Increment( &p_fifo->end_date,
                                              p_buffer->i_nb_samples );
     }
@@ -416,7 +416,7 @@ void aout_FifoMoveDates( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
     p_buffer = p_fifo->p_first;
     while ( p_buffer != NULL )
     {
-        p_buffer->start_date += difference;
+        p_buffer->i_pts += difference;
         p_buffer->end_date += difference;
         p_buffer = p_buffer->p_next;
     }
@@ -440,7 +440,7 @@ mtime_t aout_FifoFirstDate( aout_instance_t * p_aout, aout_fifo_t * p_fifo )
 {
     (void)p_aout;
     AOUT_ASSERT_FIFO_LOCKED;
-    return p_fifo->p_first ?  p_fifo->p_first->start_date : 0;
+    return p_fifo->p_first ?  p_fifo->p_first->i_pts : 0;
 }
 
 /*****************************************************************************

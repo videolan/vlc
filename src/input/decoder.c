@@ -1115,7 +1115,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
     aout_input_t    *p_aout_input = p_owner->p_aout_input;
 
     /* */
-    if( p_audio->start_date <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify audio_output/*
+    if( p_audio->i_pts <= VLC_TS_INVALID ) // FIXME --VLC_TS_INVALID verify audio_output/*
     {
         msg_Warn( p_dec, "non-dated audio buffer received" );
         *pi_lost_sum += 1;
@@ -1135,7 +1135,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
 
         p_owner->buffer.i_count++;
         if( p_owner->buffer.i_count > DECODER_MAX_BUFFERING_COUNT ||
-            p_audio->start_date - p_owner->buffer.p_audio->start_date > DECODER_MAX_BUFFERING_AUDIO_DURATION )
+            p_audio->i_pts - p_owner->buffer.p_audio->i_pts > DECODER_MAX_BUFFERING_AUDIO_DURATION )
         {
             p_owner->buffer.b_full = true;
             vlc_cond_signal( &p_owner->wait_acknowledge );
@@ -1168,22 +1168,22 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         }
 
         /* */
-        const bool b_dated = p_audio->start_date > VLC_TS_INVALID;
+        const bool b_dated = p_audio->i_pts > VLC_TS_INVALID;
         int i_rate = INPUT_RATE_DEFAULT;
 
-        DecoderFixTs( p_dec, &p_audio->start_date, &p_audio->end_date, NULL,
+        DecoderFixTs( p_dec, &p_audio->i_pts, &p_audio->end_date, NULL,
                       &i_rate, AOUT_MAX_ADVANCE_TIME, false );
 
         vlc_mutex_unlock( &p_owner->lock );
 
         if( !p_aout || !p_aout_input ||
-            p_audio->start_date <= VLC_TS_INVALID ||
+            p_audio->i_pts <= VLC_TS_INVALID ||
             i_rate < INPUT_RATE_DEFAULT/AOUT_MAX_INPUT_RATE ||
             i_rate > INPUT_RATE_DEFAULT*AOUT_MAX_INPUT_RATE )
             b_reject = true;
 
         DecoderWaitDate( p_dec, &b_reject,
-                         p_audio->start_date - AOUT_MAX_PREPARE_TIME );
+                         p_audio->i_pts - AOUT_MAX_PREPARE_TIME );
 
         if( !b_reject )
         {
@@ -1239,7 +1239,7 @@ static void DecoderDecodeAudio( decoder_t *p_dec, block_t *p_block )
         i_decoded++;
 
         if( p_owner->i_preroll_end > VLC_TS_INVALID &&
-            p_aout_buf->start_date < p_owner->i_preroll_end )
+            p_aout_buf->i_pts < p_owner->i_preroll_end )
         {
             aout_DecDeleteBuffer( p_aout, p_aout_input, p_aout_buf );
             continue;

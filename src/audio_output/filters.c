@@ -353,7 +353,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
                               *pp_input_buffer );
         if( p_output_buffer == NULL )
             return;
-        p_output_buffer->start_date = (*pp_input_buffer)->start_date;
+        p_output_buffer->i_pts = (*pp_input_buffer)->i_pts;
         p_output_buffer->end_date = (*pp_input_buffer)->end_date;
 
         /* Please note that p_output_buffer->i_nb_samples & i_nb_bytes

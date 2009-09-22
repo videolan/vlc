@@ -981,7 +981,7 @@ static void *DecBlock( decoder_t *p_dec, block_t **pp_block )
             memcpy( p_aout_buffer->p_buffer,
                     block_out.p_buffer, block_out.i_buffer );
             /* Date management */
-            p_aout_buffer->start_date = date_Get( &p_sys->end_date );
+            p_aout_buffer->i_pts = date_Get( &p_sys->end_date );
             p_aout_buffer->end_date =
                 date_Increment( &p_sys->end_date, i_samples );
         }
@@ -1538,7 +1538,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
         memcpy( p_block_in->p_buffer, p_aout_buffer->p_buffer,
                 p_block_in->i_buffer );
 
-        i_pts = p_aout_buffer->start_date;
+        i_pts = p_aout_buffer->i_pts;
     }
 
     /* Feed input to the DMO */

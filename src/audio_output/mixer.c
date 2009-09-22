@@ -169,10 +169,10 @@ static int MixBuffer( aout_instance_t * p_aout )
                 continue;
 
             p_buffer = p_fifo->p_first;
-            while ( p_buffer != NULL && p_buffer->start_date < mdate() )
+            while ( p_buffer != NULL && p_buffer->i_pts < mdate() )
             {
                 msg_Warn( p_aout, "input PTS is out of range (%"PRId64"), "
-                          "trashing", mdate() - p_buffer->start_date );
+                          "trashing", mdate() - p_buffer->i_pts );
                 p_buffer = aout_FifoPop( p_aout, p_fifo );
                 aout_BufferFree( p_buffer );
                 p_buffer = p_fifo->p_first;
@@ -184,10 +184,10 @@ static int MixBuffer( aout_instance_t * p_aout )
                 break;
             }
 
-            if ( !start_date || start_date < p_buffer->start_date )
+            if ( !start_date || start_date < p_buffer->i_pts )
             {
-                date_Set( &exact_start_date, p_buffer->start_date );
-                start_date = p_buffer->start_date;
+                date_Set( &exact_start_date, p_buffer->i_pts );
+                start_date = p_buffer->i_pts;
             }
         }
 
@@ -255,11 +255,11 @@ static int MixBuffer( aout_instance_t * p_aout )
             b_drop_buffers = 0;
             for ( ; p_buffer != NULL; p_buffer = p_buffer->p_next )
             {
-                if ( prev_date != p_buffer->start_date )
+                if ( prev_date != p_buffer->i_pts )
                 {
                     msg_Warn( p_aout,
                               "buffer hole, dropping packets (%"PRId64")",
-                              p_buffer->start_date - prev_date );
+                              p_buffer->i_pts - prev_date );
                     b_drop_buffers = 1;
                     break;
                 }
@@ -286,7 +286,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         {
             /* Additionally check that p_first_byte_to_mix is well
              * located. */
-            mtime_t i_nb_bytes = (start_date - p_buffer->start_date)
+            mtime_t i_nb_bytes = (start_date - p_buffer->i_pts)
                             * p_aout->p_mixer->fmt.i_bytes_per_frame
                             * p_aout->p_mixer->fmt.i_rate
                             / p_aout->p_mixer->fmt.i_frame_length
@@ -352,7 +352,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                               * p_aout->p_mixer->fmt.i_bytes_per_frame
                               / p_aout->p_mixer->fmt.i_frame_length;
     }
-    p_output_buffer->start_date = start_date;
+    p_output_buffer->i_pts = start_date;
     p_output_buffer->end_date = end_date;
 
     p_aout->p_mixer->mix( p_aout->p_mixer, p_output_buffer );

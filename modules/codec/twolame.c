@@ -271,7 +271,7 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     int i_nb_samples = p_aout_buf->i_nb_samples;
     block_t *p_chain = NULL;
 
-    p_sys->i_pts = p_aout_buf->start_date -
+    p_sys->i_pts = p_aout_buf->i_pts -
                 (mtime_t)1000000 * (mtime_t)p_sys->i_nb_samples /
                 (mtime_t)p_enc->fmt_out.audio.i_rate;
 

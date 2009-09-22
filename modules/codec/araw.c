@@ -370,7 +370,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    p_out->start_date = date_Get( &p_sys->end_date );
+    p_out->i_pts = date_Get( &p_sys->end_date );
     p_out->end_date   = date_Increment( &p_sys->end_date, i_samples );
 
     if( p_sys->p_logtos16 )
@@ -1419,7 +1419,7 @@ static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 
     if( p_block )
     {
-        p_block->i_dts = p_block->i_pts = p_aout_buf->start_date;
+        p_block->i_dts = p_block->i_pts = p_aout_buf->i_pts;
         p_block->i_length = (int64_t)p_aout_buf->i_nb_samples *
             (int64_t)1000000 / p_enc->fmt_in.audio.i_rate;
     }

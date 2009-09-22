@@ -662,7 +662,7 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
     }
 
     /* Date management (already done by packetizer) */
-    p_sys->p_aout_buffer->start_date = p_sys->p_block->i_pts;
+    p_sys->p_aout_buffer->i_pts = p_sys->p_block->i_pts;
     p_sys->p_aout_buffer->end_date =
         p_sys->p_block->i_pts + p_sys->p_block->i_length;
 
@@ -1359,7 +1359,7 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     block_t *p_chain;
     unsigned int i;
 
-    p_sys->i_pts = p_aout_buf->start_date -
+    p_sys->i_pts = p_aout_buf->i_pts -
                 (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
                 (mtime_t)p_enc->fmt_in.audio.i_rate;
 

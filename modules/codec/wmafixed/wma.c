@@ -101,7 +101,7 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
     if( !( p_buffer = p_dec->pf_aout_buffer_new( p_dec, i_samples ) ) )
         return NULL;
 
-    p_buffer->start_date = date_Get( &p_sys->end_date );
+    p_buffer->i_pts = date_Get( &p_sys->end_date );
     p_buffer->end_date = date_Increment( &p_sys->end_date, i_samples );
 
     memcpy( p_buffer->p_buffer, p_sys->p_samples, p_buffer->i_nb_bytes );

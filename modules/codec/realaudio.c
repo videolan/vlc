@@ -723,7 +723,7 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
         memcpy( p_aout_buffer->p_buffer, p_sys->p_out, p_sys->i_out );
 
         /* Date management */
-        p_aout_buffer->start_date = date_Get( &p_sys->end_date );
+        p_aout_buffer->i_pts = date_Get( &p_sys->end_date );
         p_aout_buffer->end_date =
             date_Increment( &p_sys->end_date, i_samples );
     }

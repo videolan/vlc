@@ -238,7 +238,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         return;
     }
     memcpy( p_block->p_buffer, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
-    p_block->i_pts = p_in_buf->start_date;
+    p_block->i_pts = p_in_buf->i_pts;
 
     p_sys->p_thread->pp_blocks[p_sys->p_thread->i_blocks++] = p_block;
 

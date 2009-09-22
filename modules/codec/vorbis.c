@@ -559,7 +559,7 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
         vorbis_synthesis_read( &p_sys->vd, i_samples );
 
         /* Date management */
-        p_aout_buffer->start_date = date_Get( &p_sys->end_date );
+        p_aout_buffer->i_pts = date_Get( &p_sys->end_date );
         p_aout_buffer->end_date = date_Increment( &p_sys->end_date, i_samples );
         return p_aout_buffer;
     }
@@ -915,7 +915,7 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     int i;
     unsigned int j;
 
-    p_sys->i_pts = p_aout_buf->start_date -
+    p_sys->i_pts = p_aout_buf->i_pts -
                 (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
                 (mtime_t)p_enc->fmt_in.audio.i_rate;
 

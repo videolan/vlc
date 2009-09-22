@@ -239,7 +239,7 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
     if( ( p_buffer = decoder_NewAudioBuffer( p_dec, i_samples ) ) == NULL )
         return NULL;
 
-    p_buffer->start_date = date_Get( &p_sys->end_date );
+    p_buffer->i_pts = date_Get( &p_sys->end_date );
     p_buffer->end_date = date_Increment( &p_sys->end_date, i_samples );
 
     if( p_sys->b_extract )

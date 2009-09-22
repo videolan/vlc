@@ -300,7 +300,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             return NULL;
         }
 
-        p_out->start_date = date_Get( &p_sys->end_date );
+        p_out->i_pts = date_Get( &p_sys->end_date );
         p_out->end_date =
             date_Increment( &p_sys->end_date, p_sys->i_samplesperblock );
 

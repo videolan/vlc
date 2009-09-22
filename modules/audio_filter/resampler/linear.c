@@ -223,12 +223,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = i_out;
-    p_out_buf->start_date = p_in_buf->start_date;
+    p_out_buf->i_pts = p_in_buf->i_pts;
 
-    if( p_in_buf->start_date !=
+    if( p_in_buf->i_pts !=
         date_Get( &p_sys->end_date ) )
     {
-        date_Set( &p_sys->end_date, p_in_buf->start_date );
+        date_Set( &p_sys->end_date, p_in_buf->i_pts );
     }
 
     p_out_buf->end_date = date_Increment( &p_sys->end_date,

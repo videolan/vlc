@@ -134,7 +134,7 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if( p_aout_buffer == NULL )
         goto exit;
 
-    p_aout_buffer->start_date = date_Get( &p_sys->end_date );
+    p_aout_buffer->i_pts = date_Get( &p_sys->end_date );
     p_aout_buffer->end_date = date_Increment( &p_sys->end_date, i_frame_length );
 
     p_block->i_buffer -= AES3_HEADER_LEN;

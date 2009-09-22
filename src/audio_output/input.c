@@ -552,7 +552,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* Actually run the resampler now. */
     if ( p_input->i_nb_resamplers > 0 )
     {
-        const mtime_t i_date = p_buffer->start_date;
+        const mtime_t i_date = p_buffer->i_pts;
         aout_FiltersPlay( p_aout, p_input->pp_resamplers,
                           p_input->i_nb_resamplers,
                           &p_buffer );
@@ -600,12 +600,12 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         start_date = 0;
     }
 
-    if ( p_buffer->start_date < mdate() + AOUT_MIN_PREPARE_TIME )
+    if ( p_buffer->i_pts < mdate() + AOUT_MIN_PREPARE_TIME )
     {
         /* The decoder gives us f*cked up PTS. It's its business, but we
          * can't present it anyway, so drop the buffer. */
         msg_Warn( p_aout, "PTS is out of range (%"PRId64"), dropping buffer",
-                  mdate() - p_buffer->start_date );
+                  mdate() - p_buffer->i_pts );
 
         inputDrop( p_input, p_buffer );
         inputResamplingStop( p_input );
@@ -616,10 +616,10 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
      * the audio. */
     mtime_t i_pts_tolerance = 3 * AOUT_PTS_TOLERANCE * i_input_rate / INPUT_RATE_DEFAULT;
     if ( start_date != 0 &&
-         ( start_date < p_buffer->start_date - i_pts_tolerance ) )
+         ( start_date < p_buffer->i_pts - i_pts_tolerance ) )
     {
         msg_Warn( p_aout, "audio drift is too big (%"PRId64"), clearing out",
-                  start_date - p_buffer->start_date );
+                  start_date - p_buffer->i_pts );
         aout_lock_input_fifos( p_aout );
         aout_FifoSet( p_aout, &p_input->mixer.fifo, 0 );
         p_input->mixer.begin = NULL;
@@ -630,15 +630,15 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         start_date = 0;
     }
     else if ( start_date != 0 &&
-              ( start_date > p_buffer->start_date + i_pts_tolerance) )
+              ( start_date > p_buffer->i_pts + i_pts_tolerance) )
     {
         msg_Warn( p_aout, "audio drift is too big (%"PRId64"), dropping buffer",
-                  start_date - p_buffer->start_date );
+                  start_date - p_buffer->i_pts );
         inputDrop( p_input, p_buffer );
         return 0;
     }
 
-    if ( start_date == 0 ) start_date = p_buffer->start_date;
+    if ( start_date == 0 ) start_date = p_buffer->i_pts;
 
 #ifndef AOUT_PROCESS_BEFORE_CHEKS
     /* Run pre-filters. */
@@ -649,8 +649,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* Run the resampler if needed.
      * We first need to calculate the output rate of this resampler. */
     if ( ( p_input->i_resampling_type == AOUT_RESAMPLING_NONE ) &&
-         ( start_date < p_buffer->start_date - AOUT_PTS_TOLERANCE
-           || start_date > p_buffer->start_date + AOUT_PTS_TOLERANCE ) &&
+         ( start_date < p_buffer->i_pts - AOUT_PTS_TOLERANCE
+           || start_date > p_buffer->i_pts + AOUT_PTS_TOLERANCE ) &&
          p_input->i_nb_resamplers > 0 )
     {
         /* Can happen in several circumstances :
@@ -660,7 +660,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
          *    synchronization
          * Solution : resample the buffer to avoid a scratch.
          */
-        mtime_t drift = p_buffer->start_date - start_date;
+        mtime_t drift = p_buffer->i_pts - start_date;
 
         p_input->i_resamp_start_date = mdate();
         p_input->i_resamp_start_drift = (int)drift;
@@ -703,9 +703,9 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             msg_Warn( p_aout, "resampling stopped after %"PRIi64" usec "
                       "(drift: %"PRIi64")",
                       mdate() - p_input->i_resamp_start_date,
-                      p_buffer->start_date - start_date);
+                      p_buffer->i_pts - start_date);
         }
-        else if( abs( (int)(p_buffer->start_date - start_date) ) <
+        else if( abs( (int)(p_buffer->i_pts - start_date) ) <
                  abs( p_input->i_resamp_start_drift ) / 2 )
         {
             /* if we reduced the drift from half, then it is time to switch
@@ -717,7 +717,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
             p_input->i_resamp_start_drift = 0;
         }
         else if( p_input->i_resamp_start_drift &&
-                 ( abs( (int)(p_buffer->start_date - start_date) ) >
+                 ( abs( (int)(p_buffer->i_pts - start_date) ) >
                    abs( p_input->i_resamp_start_drift ) * 3 / 2 ) )
         {
             /* If the drift is increasing and not decreasing, than something
@@ -745,8 +745,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
     /* Adding the start date will be managed by aout_FifoPush(). */
     p_buffer->end_date = start_date +
-        (p_buffer->end_date - p_buffer->start_date);
-    p_buffer->start_date = start_date;
+        (p_buffer->end_date - p_buffer->i_pts);
+    p_buffer->i_pts = start_date;
 
     aout_lock_input_fifos( p_aout );
     aout_FifoPush( p_aout, &p_input->mixer.fifo, p_buffer );
