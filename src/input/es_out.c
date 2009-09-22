@@ -71,8 +71,6 @@ typedef struct
     char    *psz_name;
     char    *psz_now_playing;
     char    *psz_publisher;
-
-    vlc_epg_t *p_epg;
 } es_out_pgrm_t;
 
 struct es_out_id_t
@@ -382,8 +380,6 @@ static void EsOutDelete( es_out_t *out )
         free( p_pgrm->psz_now_playing );
         free( p_pgrm->psz_publisher );
         free( p_pgrm->psz_name );
-        if( p_pgrm->p_epg )
-            vlc_epg_Delete( p_pgrm->p_epg );
 
         free( p_pgrm );
     }
@@ -1065,7 +1061,6 @@ static es_out_pgrm_t *EsOutProgramAdd( es_out_t *out, int i_group )
     p_pgrm->psz_name = NULL;
     p_pgrm->psz_now_playing = NULL;
     p_pgrm->psz_publisher = NULL;
-    p_pgrm->p_epg = NULL;
     p_pgrm->p_clock = input_clock_New( p_sys->i_rate );
     if( !p_pgrm->p_clock )
     {
@@ -1128,8 +1123,6 @@ static int EsOutProgramDel( es_out_t *out, int i_group )
     free( p_pgrm->psz_name );
     free( p_pgrm->psz_now_playing );
     free( p_pgrm->psz_publisher );
-    if( p_pgrm->p_epg )
-        vlc_epg_Delete( p_pgrm->p_epg );
     free( p_pgrm );
 
     /* Update "program" variable */
@@ -1264,6 +1257,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
 {
     es_out_sys_t      *p_sys = out->p_sys;
     input_thread_t    *p_input = p_sys->p_input;
+    input_item_t      *p_item = p_input->p->p_item;
     es_out_pgrm_t     *p_pgrm;
     char *psz_cat;
 
@@ -1272,28 +1266,35 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     if( !p_pgrm )
         return;
 
-    /* Merge EPG */
-    if( !p_pgrm->p_epg )
-        p_pgrm->p_epg = vlc_epg_New( p_pgrm->psz_name );
-    vlc_epg_Merge( p_pgrm->p_epg, p_epg );
-
     /* Update info */
-    msg_Dbg( p_input, "EsOutProgramEpg: number=%d name=%s", i_group, p_pgrm->p_epg->psz_name );
-
     psz_cat = EsOutProgramGetMetaName( p_pgrm );
+    msg_Dbg( p_input, "EsOutProgramEpg: number=%d name=%s", i_group, psz_cat );
 
-    char *psz_epg;
-    if( asprintf( &psz_epg, "EPG %s", psz_cat ) >= 0 )
-    {
-        input_item_SetEpg( p_input->p->p_item, psz_epg, p_pgrm->p_epg );
-        free( psz_epg );
-    }
+    /* Merge EPG */
+    vlc_epg_t epg;
+
+    epg = *p_epg;
+    epg.psz_name = psz_cat;
+
+    input_item_SetEpg( p_item, &epg );
 
     /* Update now playing */
     free( p_pgrm->psz_now_playing );
     p_pgrm->psz_now_playing = NULL;
-    if( p_pgrm->p_epg->p_current && p_pgrm->p_epg->p_current->psz_name && *p_pgrm->p_epg->p_current->psz_name )
-        p_pgrm->psz_now_playing = strdup( p_pgrm->p_epg->p_current->psz_name );
+
+    vlc_mutex_lock( &p_item->lock );
+    for( int i = 0; i < p_item->i_epg; i++ )
+    {
+        const vlc_epg_t *p_tmp = p_item->pp_epg[i];
+
+        if( p_tmp->psz_name && !strcmp(p_tmp->psz_name, psz_cat) )
+        {
+            if( p_tmp->p_current && p_tmp->p_current->psz_name && *p_tmp->p_current->psz_name )
+                p_pgrm->psz_now_playing = strdup( p_tmp->p_current->psz_name );
+            break;
+        }
+    }
+    vlc_mutex_unlock( &p_item->lock );
 
     if( p_pgrm == p_sys->p_pgrm )
     {

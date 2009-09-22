@@ -31,6 +31,7 @@
  */
 
 #include <vlc_meta.h>
+#include <vlc_epg.h>
 
 #include <string.h>
 
@@ -81,6 +82,9 @@ struct input_item_t
     bool          b_error_when_reading;       /**< Error When Reading */
 
     vlc_meta_t *p_meta;
+
+    int         i_epg;               /**< Number of EPG entries */
+    vlc_epg_t   **pp_epg;            /**< EPG entries */
 
     vlc_event_manager_t event_manager;
 
