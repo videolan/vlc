@@ -402,6 +402,16 @@ public interface LibVlc extends Library
 
     void libvlc_audio_set_channel(LibVlcInstance instance, int channel, libvlc_exception_t exception);
 
+    int libvlc_audio_output_device_count(LibVlcInstance instance, libvlc_exception_t exception);
+    
+    String libvlc_audio_output_device_id(LibVlcInstance instance, String audio_output, int i_device);
+    
+    String libvlc_audio_output_device_longname(LibVlcInstance instance, String audio_output, int i_device);
+    
+    String libvlc_audio_output_device_set(LibVlcInstance instance, String audio_output, String device_name, String deviceId);
+    
+    int libvlc_audio_output_get_device_type(LibVlcInstance instance, libvlc_exception_t exception);
+        
     // playlist
 
     void libvlc_playlist_loop(LibVlcInstance instance, int loop, libvlc_exception_t exception);
