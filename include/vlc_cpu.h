@@ -35,13 +35,27 @@
 #  define CPU_CAPABILITY_SSE3    (1<<8)
 #  define CPU_CAPABILITY_SSSE3   (1<<9)
 #  define CPU_CAPABILITY_SSE4    (1<<10)
+# else
+#  define CPU_CAPABILITY_MMX     (0)
+#  define CPU_CAPABILITY_3DNOW   (0)
+#  define CPU_CAPABILITY_MMXEXT  (0)
+#  define CPU_CAPABILITY_SSE     (0)
+#  define CPU_CAPABILITY_SSE2    (0)
+#  define CPU_CAPABILITY_SSE3    (0)
+#  define CPU_CAPABILITY_SSSE3   (0)
+#  define CPU_CAPABILITY_SSE4    (0)
+# endif
 
-# elif defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
+# if defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
 #  define CPU_CAPABILITY_ALTIVEC (1<<16)
+# else
+#  define CPU_CAPABILITY_ALTIVEC (0)
+# endif
 
-# elif defined (__arm__)
+# if defined (__arm__)
 #  define CPU_CAPABILITY_NEON    (1<<24)
-
+# else
+#  define CPU_CAPABILITY_NEON    (0)
 # endif
 
 /** Are floating point oeprations fast?
