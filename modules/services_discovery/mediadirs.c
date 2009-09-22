@@ -107,7 +107,7 @@ struct services_discovery_sys_t
     enum type_e i_type;
 
     char* psz_dir[2];
-    char* psz_var;
+    const char* psz_var;
 };
 
 /*****************************************************************************
@@ -129,21 +129,21 @@ static int Open( vlc_object_t *p_this, enum type_e i_type )
         p_sys->psz_dir[0] = config_GetUserDir( VLC_VIDEOS_DIR );
         p_sys->psz_dir[1] = var_CreateGetString( p_sd, "input-record-path" );
 
-        p_sys->psz_var = strdup( "record-file" );
+        p_sys->psz_var = "record-file";
     }
     else if( p_sys->i_type == Audio )
     {
         p_sys->psz_dir[0] = config_GetUserDir( VLC_MUSIC_DIR );
         p_sys->psz_dir[1] = var_CreateGetString( p_sd, "input-record-path" );
 
-        p_sys->psz_var = strdup( "record-file" );
+        p_sys->psz_var = "record-file";
     }
     else if( p_sys->i_type == Picture )
     {
         p_sys->psz_dir[0] = config_GetUserDir( VLC_PICTURES_DIR );
         p_sys->psz_dir[1] = var_CreateGetString( p_sd, "snapshot-path" );
 
-        p_sys->psz_var = strdup( "snapshot-file" );
+        p_sys->psz_var = "snapshot-file";
     }
     else
     {
@@ -156,7 +156,6 @@ static int Open( vlc_object_t *p_this, enum type_e i_type )
     if( vlc_clone( &p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW ) )
     {
         var_DelCallback( p_sd->p_libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
-        free( p_sys->psz_var );
         free( p_sys->psz_dir[1] );
         free( p_sys->psz_dir[0] );
         free( p_sys );
@@ -233,7 +232,6 @@ static void Close( vlc_object_t *p_this )
 
     var_DelCallback( p_sd->p_libvlc, p_sys->psz_var, onNewFileAdded, p_sd );
 
-    free( p_sys->psz_var );
     free( p_sys->psz_dir[1] );
     free( p_sys->psz_dir[0] );
     free( p_sys );
