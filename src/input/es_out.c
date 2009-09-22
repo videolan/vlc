@@ -371,6 +371,9 @@ static void EsOutDelete( es_out_t *out )
         free( p_pgrm );
     }
     TAB_CLEAN( p_sys->i_pgrm, p_sys->pgrm );
+
+    input_item_SetEpgOffline( p_sys->p_input->p->p_item );
+
     vlc_mutex_destroy( &p_sys->lock );
 
     free( p_sys );

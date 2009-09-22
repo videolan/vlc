@@ -38,6 +38,7 @@ void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed );
 void input_item_SetArtNotFound( input_item_t *p_i, bool b_not_found );
 void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched );
 void input_item_SetEpg( input_item_t *p_item, const vlc_epg_t *p_epg );
+void input_item_SetEpgOffline( input_item_t * );
 
 int input_Preparse( vlc_object_t *, input_item_t * );
 

@@ -790,6 +790,39 @@ signal:
     }
 }
 
+void input_item_SetEpgOffline( input_item_t *p_item )
+{
+    vlc_mutex_lock( &p_item->lock );
+    for( int i = 0; i < p_item->i_epg; i++ )
+        vlc_epg_SetCurrent( p_item->pp_epg[i], -1 );
+    vlc_mutex_unlock( &p_item->lock );
+
+#ifdef EPG_DEBUG
+    vlc_mutex_lock( &p_item->lock );
+    const int i_epg_info = p_item->i_epg;
+    char *ppsz_epg_info[i_epg_info];
+    for( int i = 0; i < p_item->i_epg; i++ )
+    {
+        const vlc_epg_t *p_epg = p_item->pp_epg[i];
+        if( asprintf( &ppsz_epg_info[i], "EPG %s", p_epg->psz_name ? p_epg->psz_name : "unknown" ) < 0 )
+            ppsz_epg_info[i] = NULL;
+    }
+    vlc_mutex_unlock( &p_item->lock );
+
+    for( int i = 0; i < i_epg_info; i++ )
+    {
+        if( !ppsz_epg_info[i] )
+            continue;
+        input_item_DelInfo( p_item, ppsz_epg_info[i], NULL );
+        free( ppsz_epg_info[i] );
+    }
+#endif
+
+    vlc_event_t event = { .type = vlc_InputItemInfoChanged, };
+    vlc_event_send( &p_item->event_manager, &event );
+}
+
+
 input_item_t *__input_item_NewExt( vlc_object_t *p_obj, const char *psz_uri,
                                   const char *psz_name,
                                   int i_options,
