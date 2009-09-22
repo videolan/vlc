@@ -1394,7 +1394,7 @@ dnl  Check for fully workin SSE2 intrinsics
 dnl  We need support for -mmmx, we need <emmintrin.h>, and we also need a
 dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
 AC_ARG_ENABLE(sse,
-[  --disable-sse           disable SSE (1 and 2) optimizations (default auto)]
+[  --disable-sse           disable SSE (1, 2, 3 and 4) optimizations (default auto)]
 ,, [
   case "${host_cpu}" in
     i686|x86_64)
@@ -1453,21 +1453,7 @@ AS_IF([test "${enable_sse}" != "no"], [
     VLC_ADD_PLUGIN([i420_yuy2_sse2])
     VLC_ADD_PLUGIN([i422_yuy2_sse2])
   ])
-])
 
-AC_ARG_ENABLE(sse3,
-[  --disable-sse3          disable SSE3/SSSE3 optimizations (default auto)]
-,, [
-  case "${host_cpu}" in
-    i686|x86_64)
-      enable_sse3=yes
-      ;;
-    *)
-      enable_sse3=no
-      ;;
-  esac
-])
-AS_IF([test "${enable_sse3}" != "no"], [
   # SSE3
   AC_CACHE_CHECK([if $CC groks SSE3 inline assembly],
     [ac_cv_sse3_inline],
@@ -1491,22 +1477,8 @@ AS_IF([test "${enable_sse3}" != "no"], [
   AS_IF([test "${ac_cv_ssse3_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSSE3, 1,
               [Define to 1 if SSSE3 inline assembly is available.]) ])
-])
 
-AC_ARG_ENABLE(sse4,
-[  --disable-sse4          disable SSE4 optimizations (default auto)]
-,, [
-  case "${host_cpu}" in
-    i686|x86_64)
-      enable_sse4=yes
-      ;;
-    *)
-      enable_sse4=no
-      ;;
-  esac
-])
-AS_IF([test "${enable_sse4}" != "no"], [
-  # SSE3
+  # SSE4
   AC_CACHE_CHECK([if $CC groks SSE4 inline assembly],
     [ac_cv_sse4_inline],
     [CFLAGS="${CFLAGS_save} -O -msse4"
