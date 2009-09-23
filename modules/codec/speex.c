@@ -683,7 +683,7 @@ static aout_buffer_t *DecodeRtpSpeexPacket( decoder_t *p_dec, block_t **pp_block
     */
     p_aout_buffer = decoder_NewAudioBuffer( p_dec, 
         p_sys->p_header->frame_size );
-    if ( !p_aout_buffer || p_aout_buffer->i_nb_bytes == 0 )
+    if ( !p_aout_buffer || p_aout_buffer->i_buffer == 0 )
     {
         msg_Err(p_dec, "Oops: No new buffer was returned!");
 	return NULL;

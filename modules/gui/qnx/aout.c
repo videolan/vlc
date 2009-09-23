@@ -294,7 +294,7 @@ static void* QNXaoutThread( vlc_object_t *p_this )
         if ( p_buffer != NULL )
         {
             p_bytes = p_buffer->p_buffer;
-            i_size = p_buffer->i_nb_bytes;
+            i_size = p_buffer->i_buffer;
         }
         else
         {

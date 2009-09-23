@@ -1071,7 +1071,7 @@ static void* WaveOutThread( vlc_object_t *p_this )
                 if( p_buffer && p_sys->b_chan_reorder )
                 {
                     aout_ChannelReorder( p_buffer->p_buffer,
-                        p_buffer->i_nb_bytes,
+                        p_buffer->i_buffer,
                         p_sys->waveformat.Format.nChannels,
                         p_sys->pi_chan_table,
                         p_sys->waveformat.Format.wBitsPerSample );

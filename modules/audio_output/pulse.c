@@ -467,9 +467,9 @@ static void stream_request_cb(pa_stream *s, size_t length, void *userdata) {
 
         if ( p_buffer != NULL )
         {
-            PULSE_DEBUG( "Pulse stream request write buffer %d", p_buffer->i_nb_bytes);
-            pa_stream_write(p_sys->stream, p_buffer->p_buffer, p_buffer->i_nb_bytes, NULL, 0, PA_SEEK_RELATIVE);
-            length -= p_buffer->i_nb_bytes;
+            PULSE_DEBUG( "Pulse stream request write buffer %d", p_buffer->i_buffer);
+            pa_stream_write(p_sys->stream, p_buffer->p_buffer, p_buffer->i_buffer, NULL, 0, PA_SEEK_RELATIVE);
+            length -= p_buffer->i_buffer;
             aout_BufferFree( p_buffer );
         }
         else

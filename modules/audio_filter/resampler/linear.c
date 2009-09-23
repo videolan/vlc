@@ -149,11 +149,11 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     {
         if( p_filter->b_continuity &&
             p_in_buf->i_size >=
-              p_in_buf->i_nb_bytes + sizeof(float) * i_nb_channels )
+              p_in_buf->i_buffer + sizeof(float) * i_nb_channels )
         {
             /* output the whole thing with the last sample from last time */
             memmove( ((float *)(p_in_buf->p_buffer)) + i_nb_channels,
-                     p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
+                     p_in_buf->p_buffer, p_in_buf->i_buffer );
             memcpy( p_in_buf->p_buffer, p_prev_sample,
                     i_nb_channels * sizeof(float) );
         }
@@ -161,9 +161,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         return;
     }
 
-    float p_in_orig[p_in_buf->i_nb_bytes / 4], *p_in = p_in_orig;
+    float p_in_orig[p_in_buf->i_buffer / 4], *p_in = p_in_orig;
 
-    vlc_memcpy( p_in, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
+    vlc_memcpy( p_in, p_in_buf->p_buffer, p_in_buf->i_buffer );
 
     /* Take care of the previous input sample (if any) */
     if( !p_filter->b_continuity )
@@ -234,7 +234,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->i_length = date_Increment( &p_sys->end_date,
                                   p_out_buf->i_nb_samples ) - p_out_buf->i_pts;
 
-    p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
+    p_out_buf->i_buffer = p_out_buf->i_nb_samples *
         i_nb_channels * sizeof(int32_t);
 }
 
@@ -336,17 +336,17 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
     aout_filter.b_continuity = false;
 
     in_buf.p_buffer = p_block->p_buffer;
-    in_buf.i_nb_bytes = p_block->i_buffer;
+    in_buf.i_buffer = p_block->i_buffer;
     in_buf.i_nb_samples = p_block->i_nb_samples;
     out_buf.p_buffer = p_out->p_buffer;
-    out_buf.i_nb_bytes = p_out->i_buffer;
+    out_buf.i_buffer = p_out->i_buffer;
     out_buf.i_nb_samples = p_out->i_nb_samples;
 
     DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
 
     block_Release( p_block );
  
-    p_out->i_buffer = out_buf.i_nb_bytes;
+    p_out->i_buffer = out_buf.i_buffer;
     p_out->i_nb_samples = out_buf.i_nb_samples;
 
     return p_out;

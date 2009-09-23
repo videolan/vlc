@@ -189,7 +189,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 {
     VLC_UNUSED(p_aout);
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
+    p_out_buf->i_buffer = p_in_buf->i_buffer;
 
     ProcessEQ( (float*)p_in_buf->p_buffer, (float*)p_out_buf->p_buffer,
                p_filter->p_sys->p_state,

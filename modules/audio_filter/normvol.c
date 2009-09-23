@@ -179,7 +179,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
+    p_out_buf->i_buffer = p_in_buf->i_buffer;
 
     /* Calculate the average power level on this buffer */
     for( i = 0 ; i < i_samples; i++ )

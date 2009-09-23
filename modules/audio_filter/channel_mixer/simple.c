@@ -119,7 +119,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;
+    p_out_buf->i_buffer = p_in_buf->i_buffer * i_output_nb / i_input_nb;
 
     if( p_filter->output.i_physical_channels == AOUT_CHANS_2_0 )
     {
@@ -312,17 +312,17 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
     aout_filter.output.i_format = p_filter->fmt_out.i_codec;
 
     in_buf.p_buffer = p_block->p_buffer;
-    in_buf.i_nb_bytes = p_block->i_buffer;
+    in_buf.i_buffer = p_block->i_buffer;
     in_buf.i_nb_samples = p_block->i_nb_samples;
     out_buf.p_buffer = p_out->p_buffer;
-    out_buf.i_nb_bytes = p_out->i_buffer;
+    out_buf.i_buffer = p_out->i_buffer;
     out_buf.i_nb_samples = p_out->i_nb_samples;
 
     DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
 
     block_Release( p_block );
 
-    p_out->i_buffer = out_buf.i_nb_bytes;
+    p_out->i_buffer = out_buf.i_buffer;
     p_out->i_nb_samples = out_buf.i_nb_samples;
 
     return p_out;

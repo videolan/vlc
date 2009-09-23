@@ -1365,14 +1365,14 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     p_sys->i_samples_delay += p_aout_buf->i_nb_samples;
 
     /* Convert samples to FLAC__int32 */
-    if( p_sys->i_buffer < p_aout_buf->i_nb_bytes * 2 )
+    if( p_sys->i_buffer < p_aout_buf->i_buffer * 2 )
     {
         p_sys->p_buffer =
-            realloc( p_sys->p_buffer, p_aout_buf->i_nb_bytes * 2 );
-        p_sys->i_buffer = p_aout_buf->i_nb_bytes * 2;
+            realloc( p_sys->p_buffer, p_aout_buf->i_buffer * 2 );
+        p_sys->i_buffer = p_aout_buf->i_buffer * 2;
     }
 
-    for( i = 0 ; i < p_aout_buf->i_nb_bytes / 2 ; i++ )
+    for( i = 0 ; i < p_aout_buf->i_buffer / 2 ; i++ )
     {
         p_sys->p_buffer[i]= ((int16_t *)p_aout_buf->p_buffer)[i];
     }

@@ -105,8 +105,8 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
     p_buffer->i_length = date_Increment( &p_sys->end_date, i_samples )
                          - p_buffer->i_pts;
 
-    memcpy( p_buffer->p_buffer, p_sys->p_samples, p_buffer->i_nb_bytes );
-    p_sys->p_samples += p_buffer->i_nb_bytes;
+    memcpy( p_buffer->p_buffer, p_sys->p_samples, p_buffer->i_buffer );
+    p_sys->p_samples += p_buffer->i_buffer;
     p_sys->i_samples -= i_samples;
 
     return p_buffer;

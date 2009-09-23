@@ -379,7 +379,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         int16_t *s = (int16_t*)p_out->p_buffer;
         unsigned int i;
 
-        for( i = 0; i < p_out->i_nb_bytes / 2; i++ )
+        for( i = 0; i < p_out->i_buffer / 2; i++ )
         {
             *s++ = p_sys->p_logtos16[*p_block->p_buffer++];
             p_block->i_buffer--;
@@ -387,9 +387,9 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
     else
     {
-        memcpy( p_out->p_buffer, p_block->p_buffer, p_out->i_nb_bytes );
-        p_block->p_buffer += p_out->i_nb_bytes;
-        p_block->i_buffer -= p_out->i_nb_bytes;
+        memcpy( p_out->p_buffer, p_block->p_buffer, p_out->i_buffer );
+        p_block->p_buffer += p_out->i_buffer;
+        p_block->i_buffer -= p_out->i_buffer;
     }
 
     return p_out;
@@ -1376,11 +1376,11 @@ static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     encoder_sys_t *p_sys = p_enc->p_sys;
     block_t *p_block = NULL;
 
-    if( !p_aout_buf || !p_aout_buf->i_nb_bytes ) return NULL;
+    if( !p_aout_buf || !p_aout_buf->i_buffer ) return NULL;
 
     if( p_sys->i_s16tolog )
     {
-        if( ( p_block = block_New( p_enc, p_aout_buf->i_nb_bytes / 2 ) ) )
+        if( ( p_block = block_New( p_enc, p_aout_buf->i_buffer / 2 ) ) )
         {
             int8_t *s = (int8_t*)p_block->p_buffer; // sink
             int16_t *aout = (int16_t*)p_aout_buf->p_buffer; // source
@@ -1388,7 +1388,7 @@ static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
 
             if( p_sys->i_s16tolog == ALAW )
             {
-                for( i = 0; i < p_aout_buf->i_nb_bytes / 2; i++ )
+                for( i = 0; i < p_aout_buf->i_buffer / 2; i++ )
                 {
                     if( *aout >= 0)
                         *s++ = alaw_encode[*aout / 16];
@@ -1400,7 +1400,7 @@ static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
             }
             else /* ULAW */
             {
-                for( i = 0; i < p_aout_buf->i_nb_bytes / 2; i++ )
+                for( i = 0; i < p_aout_buf->i_buffer / 2; i++ )
                 {
                     if( *aout >= 0)
                         *s++ = ulaw_encode[*aout / 4];
@@ -1412,10 +1412,10 @@ static block_t *EncoderEncode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
             }
         }
     }
-    else if( ( p_block = block_New( p_enc, p_aout_buf->i_nb_bytes ) ) )
+    else if( ( p_block = block_New( p_enc, p_aout_buf->i_buffer ) ) )
     {
         memcpy( p_block->p_buffer, p_aout_buf->p_buffer,
-                p_aout_buf->i_nb_bytes );
+                p_aout_buf->i_buffer );
     }
 
     if( p_block )

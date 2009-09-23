@@ -221,7 +221,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     block_t *p_block;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
+    p_out_buf->i_buffer = p_in_buf->i_buffer;
 
     /* Queue sample */
     vlc_mutex_lock( &p_sys->p_thread->lock );
@@ -231,13 +231,13 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         return;
     }
 
-    p_block = block_New( p_sys->p_thread, p_in_buf->i_nb_bytes );
+    p_block = block_New( p_sys->p_thread, p_in_buf->i_buffer );
     if( !p_block )
     {
         vlc_mutex_unlock( &p_sys->p_thread->lock );
         return;
     }
-    memcpy( p_block->p_buffer, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
+    memcpy( p_block->p_buffer, p_in_buf->p_buffer, p_in_buf->i_buffer );
     p_block->i_pts = p_in_buf->i_pts;
 
     p_sys->p_thread->pp_blocks[p_sys->p_thread->i_blocks++] = p_block;

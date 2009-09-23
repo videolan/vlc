@@ -482,8 +482,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     aout_filter_sys_t *p = p_filter->p_sys;
 
     if( p_filter->input.i_rate == p->sample_rate ) {
-      memcpy( p_out_buf->p_buffer, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
-      p_out_buf->i_nb_bytes   = p_in_buf->i_nb_bytes;
+      memcpy( p_out_buf->p_buffer, p_in_buf->p_buffer, p_in_buf->i_buffer );
+      p_out_buf->i_buffer   = p_in_buf->i_buffer;
       p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
       return;
     }
@@ -500,7 +500,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                (int)( p->bytes_stride / p->bytes_per_frame ) );
     }
 
-    size_t i_outsize = calculate_output_buffer_size ( p_filter, p_in_buf->i_nb_bytes );
+    size_t i_outsize = calculate_output_buffer_size ( p_filter, p_in_buf->i_buffer );
     if( i_outsize > p_out_buf->i_size ) {
         void *temp = realloc( p->p_buffers[ p->i_buf ], i_outsize );
         if( temp == NULL )
@@ -513,9 +513,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     size_t bytes_out = transform_buffer( p_filter,
-        p_in_buf->p_buffer, p_in_buf->i_nb_bytes,
+        p_in_buf->p_buffer, p_in_buf->i_buffer,
         p_out_buf->p_buffer );
 
-    p_out_buf->i_nb_bytes   = bytes_out;
+    p_out_buf->i_buffer   = bytes_out;
     p_out_buf->i_nb_samples = bytes_out / p->bytes_per_frame;
 }

@@ -119,7 +119,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int32_t * p_src = (int32_t *)p_in_buf->p_buffer;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;
+    p_out_buf->i_buffer = p_in_buf->i_buffer * i_output_nb / i_input_nb;
 
     if ( (p_filter->output.i_original_channels & AOUT_CHAN_PHYSMASK)
                 != (p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK)

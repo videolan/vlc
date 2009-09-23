@@ -250,7 +250,7 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
                       p_aout->output.i_nb_filters,
                       &p_buffer );
 
-    if( p_buffer->i_nb_bytes == 0 )
+    if( p_buffer->i_buffer == 0 )
     {
         aout_BufferFree( p_buffer );
         return;

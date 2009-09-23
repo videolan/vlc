@@ -466,9 +466,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     /* out buffer characterisitcs */
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;
+    p_out_buf->i_buffer = p_in_buf->i_buffer * i_output_nb / i_input_nb;
     p_out = p_out_buf->p_buffer;
-    i_out_size = p_out_buf->i_nb_bytes;
+    i_out_size = p_out_buf->i_buffer;
 
     /* Slide the overflow buffer */
     p_overflow = p_sys->p_overflow_buffer;
@@ -675,15 +675,15 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     aout_filter.b_in_place = 0;
 
     in_buf.p_buffer = p_block->p_buffer;
-    in_buf.i_nb_bytes = p_block->i_buffer;
+    in_buf.i_buffer = p_block->i_buffer;
     in_buf.i_nb_samples = p_block->i_nb_samples;
     out_buf.p_buffer = p_out->p_buffer;
-    out_buf.i_nb_bytes = p_out->i_buffer;
+    out_buf.i_buffer = p_out->i_buffer;
     out_buf.i_nb_samples = p_out->i_nb_samples;
 
     DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
 
-    p_out->i_buffer = out_buf.i_nb_bytes;
+    p_out->i_buffer = out_buf.i_buffer;
     p_out->i_nb_samples = out_buf.i_nb_samples;
 
     block_Release( p_block );

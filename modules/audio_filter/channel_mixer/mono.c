@@ -490,13 +490,13 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     aout_filter.output.i_format = p_filter->fmt_out.i_codec;
 
     in_buf.p_buffer = p_block->p_buffer;
-    in_buf.i_nb_bytes = p_block->i_buffer;
+    in_buf.i_buffer = p_block->i_buffer;
     in_buf.i_nb_samples = p_block->i_nb_samples;
 
 #if 0
     unsigned int i_in_size = in_buf.i_nb_samples  * (p_filter->p_sys->i_bitspersample/8) *
                              aout_FormatNbChannels( &(p_filter->fmt_in.audio) );
-    if( (in_buf.i_nb_bytes != i_in_size) && ((i_in_size % 32) != 0) ) /* is it word aligned?? */
+    if( (in_buf.i_buffer != i_in_size) && ((i_in_size % 32) != 0) ) /* is it word aligned?? */
     {
         msg_Err( p_filter, "input buffer is not word aligned" );
         /* Fix output buffer to be word aligned */
@@ -504,7 +504,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
 #endif
 
     out_buf.p_buffer = p_out->p_buffer;
-    out_buf.i_nb_bytes = p_out->i_buffer;
+    out_buf.i_buffer = p_out->i_buffer;
     out_buf.i_nb_samples = p_out->i_nb_samples;
 
     memset( p_out->p_buffer, 0, i_out_size );
@@ -518,7 +518,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
         i_samples = stereo_to_mono( &aout_filter, &out_buf, &in_buf );
     }
 
-    p_out->i_buffer = out_buf.i_nb_bytes;
+    p_out->i_buffer = out_buf.i_buffer;
     p_out->i_nb_samples = out_buf.i_nb_samples;
 
     block_Release( p_block );
@@ -555,9 +555,9 @@ static void stereo2mono_downmix( aout_filter_t * p_filter,
 
     /* out buffer characterisitcs */
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * i_output_nb / i_input_nb;
+    p_out_buf->i_buffer = p_in_buf->i_buffer * i_output_nb / i_input_nb;
     p_out = p_out_buf->p_buffer;
-    i_out_size = p_out_buf->i_nb_bytes;
+    i_out_size = p_out_buf->i_buffer;
 
     /* Slide the overflow buffer */
     p_overflow = p_sys->p_overflow_buffer;

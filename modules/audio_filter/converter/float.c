@@ -174,7 +174,7 @@ static void Do_F32ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
+    p_out_buf->i_buffer = p_in_buf->i_buffer;
 }
 
 static void Do_FL32ToF32( aout_instance_t * p_aout, aout_filter_t * p_filter,
@@ -192,7 +192,7 @@ static void Do_FL32ToF32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
+    p_out_buf->i_buffer = p_in_buf->i_buffer;
 }
 
 /*****************************************************************************
@@ -247,7 +247,7 @@ static void Do_FL32ToS16( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes / 2;
+    p_out_buf->i_buffer = p_in_buf->i_buffer / 2;
 }
 
 /*****************************************************************************
@@ -292,7 +292,7 @@ static void Do_FL32ToS8( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes / 4;
+    p_out_buf->i_buffer = p_in_buf->i_buffer / 4;
 }
 
 /*****************************************************************************
@@ -337,7 +337,7 @@ static void Do_FL32ToU16( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes / 2;
+    p_out_buf->i_buffer = p_in_buf->i_buffer / 2;
 }
 
 /*****************************************************************************
@@ -382,7 +382,7 @@ static void Do_FL32ToU8( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes / 4;
+    p_out_buf->i_buffer = p_in_buf->i_buffer / 4;
 }
 
 /*****************************************************************************
@@ -445,7 +445,7 @@ static void Do_S16ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 2;
+    p_out_buf->i_buffer = p_in_buf->i_buffer * 4 / 2;
 }
 
 static void Do_S24ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
@@ -471,7 +471,7 @@ static void Do_S24ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 3;
+    p_out_buf->i_buffer = p_in_buf->i_buffer * 4 / 3;
 }
 
 static void Do_S32ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
@@ -490,7 +490,7 @@ static void Do_S32ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 4;
+    p_out_buf->i_buffer = p_in_buf->i_buffer * 4 / 4;
 }
 
 /*****************************************************************************
@@ -561,7 +561,7 @@ static void Do_S16ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
         *p_out-- = (float)*p_in-- / 32768.0;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 2;
+    p_out_buf->i_buffer = p_in_buf->i_buffer * 4 / 2;
 }
 
 static void Do_S24ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
@@ -593,7 +593,7 @@ static void Do_S24ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 3;
+    p_out_buf->i_buffer = p_in_buf->i_buffer * 4 / 3;
 }
 
 static void Do_S32ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
@@ -612,7 +612,7 @@ static void Do_S32ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * 4 / 4;
+    p_out_buf->i_buffer = p_in_buf->i_buffer * 4 / 4;
 }
 
 
@@ -657,7 +657,7 @@ static void Do_S8ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * sizeof(float);
+    p_out_buf->i_buffer = p_in_buf->i_buffer * sizeof(float);
 }
 
 /*****************************************************************************
@@ -701,5 +701,5 @@ static void Do_U8ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * sizeof(float);
+    p_out_buf->i_buffer = p_in_buf->i_buffer * sizeof(float);
 }

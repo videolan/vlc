@@ -1085,7 +1085,7 @@ static int FillBuffer( aout_instance_t *p_aout, int i_frame,
         if( p_sys->b_chan_reorder )
         {
             /* Do the channel reordering here */
-            aout_ChannelReorder( p_buffer->p_buffer, p_buffer->i_nb_bytes,
+            aout_ChannelReorder( p_buffer->p_buffer, p_buffer->i_buffer,
                                  p_sys->i_channels, p_sys->pi_chan_table,
                                  p_sys->i_bits_per_sample );
         }

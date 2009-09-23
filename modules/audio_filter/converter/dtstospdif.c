@@ -117,28 +117,28 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 {
     uint32_t i_ac5_spdif_type = 0;
     uint16_t i_fz = p_in_buf->i_nb_samples * 4;
-    uint16_t i_frame, i_length = p_in_buf->i_nb_bytes;
+    uint16_t i_frame, i_length = p_in_buf->i_buffer;
     static const uint8_t p_sync_le[6] = { 0x72, 0xF8, 0x1F, 0x4E, 0x00, 0x00 };
     static const uint8_t p_sync_be[6] = { 0xF8, 0x72, 0x4E, 0x1F, 0x00, 0x00 };
 
-    if( p_in_buf->i_nb_bytes != p_filter->p_sys->i_frame_size )
+    if( p_in_buf->i_buffer != p_filter->p_sys->i_frame_size )
     {
         /* Frame size changed, reset everything */
         msg_Warn( p_aout, "Frame size changed from %u to %u, "
                           "resetting everything.",
                   p_filter->p_sys->i_frame_size,
-                  (unsigned)p_in_buf->i_nb_bytes );
+                  (unsigned)p_in_buf->i_buffer );
 
-        p_filter->p_sys->i_frame_size = p_in_buf->i_nb_bytes;
+        p_filter->p_sys->i_frame_size = p_in_buf->i_buffer;
         p_filter->p_sys->p_buf = realloc( p_filter->p_sys->p_buf,
-                                          p_in_buf->i_nb_bytes * 3 );
+                                          p_in_buf->i_buffer * 3 );
         p_filter->p_sys->i_frames = 0;
     }
 
     /* Backup frame */
-    vlc_memcpy( p_filter->p_sys->p_buf + p_in_buf->i_nb_bytes *
+    vlc_memcpy( p_filter->p_sys->p_buf + p_in_buf->i_buffer *
                   p_filter->p_sys->i_frames,
-                p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
+                p_in_buf->p_buffer, p_in_buf->i_buffer );
 
     p_filter->p_sys->i_frames++;
 
@@ -150,7 +150,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
         /* Not enough data */
         p_out_buf->i_nb_samples = 0;
-        p_out_buf->i_nb_bytes = 0;
+        p_out_buf->i_buffer = 0;
         return;
     }
 
@@ -215,5 +215,5 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     p_out_buf->i_pts = p_filter->p_sys->start_date;
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples * 3;
-    p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples * 4;
+    p_out_buf->i_buffer = p_out_buf->i_nb_samples * 4;
 }

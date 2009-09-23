@@ -246,7 +246,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     float *pf_ptr, f_diff = 0, f_frac = 0, f_temp = 0 ;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
+    p_out_buf->i_buffer = p_in_buf->i_buffer;
 
     /* Process each sample */
     for( int i = 0; i < i_samples ; i++ )

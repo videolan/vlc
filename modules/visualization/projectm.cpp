@@ -259,7 +259,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     projectm_thread_t *p_thread = p_filter->p_sys->p_thread;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes;
+    p_out_buf->i_buffer = p_in_buf->i_buffer;
 
     vlc_mutex_lock( &p_thread->lock );
     if( p_thread->i_buffer_size > 0 )

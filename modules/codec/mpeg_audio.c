@@ -546,7 +546,7 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
     p_sys->b_discontinuity = false;
 
     /* Hack for libmad filter */
-    p_buf->i_nb_bytes = p_sys->i_frame_size + MAD_BUFFER_GUARD;
+    p_buf->i_buffer = p_sys->i_frame_size + MAD_BUFFER_GUARD;
 
     return p_buf;
 }

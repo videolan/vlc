@@ -150,11 +150,11 @@ static void Play( void * _p_aout, void * _p_buffer, size_t i_size,
     if( p_aout_buffer != NULL )
     {
         vlc_memcpy( p_buffer, p_aout_buffer->p_buffer,
-                    MIN( i_size, p_aout_buffer->i_nb_bytes ) );
-        if( p_aout_buffer->i_nb_bytes < i_size )
+                    MIN( i_size, p_aout_buffer->i_buffer ) );
+        if( p_aout_buffer->i_buffer < i_size )
         {
-            vlc_memset(  p_buffer + p_aout_buffer->i_nb_bytes,
-                         0, i_size - p_aout_buffer->i_nb_bytes );
+            vlc_memset(  p_buffer + p_aout_buffer->i_buffer,
+                         0, i_size - p_aout_buffer->i_buffer );
         }
         aout_BufferFree( p_aout_buffer );
     }

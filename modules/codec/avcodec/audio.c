@@ -251,7 +251,7 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
                              p_sys->p_samples, p_sys->p_context->channels, i_samples,
                              p_sys->pi_extraction, p_dec->fmt_out.audio.i_bitspersample );
     else
-        memcpy( p_buffer->p_buffer, p_sys->p_samples, p_buffer->i_nb_bytes );
+        memcpy( p_buffer->p_buffer, p_sys->p_samples, p_buffer->i_buffer );
 
     p_sys->p_samples += i_samples * p_sys->p_context->channels * ( p_dec->fmt_out.audio.i_bitspersample / 8 );
     p_sys->i_samples -= i_samples;

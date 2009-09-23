@@ -1308,7 +1308,7 @@ static int transcode_audio_process( sout_stream_t *p_stream,
         }
 
         p_audio_block = p_audio_buf->p_sys;
-        p_audio_block->i_buffer = p_audio_buf->i_nb_bytes;
+        p_audio_block->i_buffer = p_audio_buf->i_buffer;
         p_audio_block->i_dts = p_audio_block->i_pts =
             p_audio_buf->i_pts;
         p_audio_block->i_length = p_audio_buf->i_length;
@@ -1325,7 +1325,7 @@ static int transcode_audio_process( sout_stream_t *p_stream,
         assert( p_audio_block );
 
         p_audio_buf->p_buffer = p_audio_block->p_buffer;
-        p_audio_buf->i_nb_bytes = p_audio_block->i_buffer;
+        p_audio_buf->i_buffer = p_audio_block->i_buffer;
         p_audio_buf->i_nb_samples = p_audio_block->i_nb_samples;
         p_audio_buf->i_pts = p_audio_block->i_dts;
         p_audio_buf->i_length = p_audio_block->i_length;
@@ -1370,7 +1370,7 @@ static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
     p_buffer->p_sys = p_block = block_New( p_dec, i_size );
 
     p_buffer->p_buffer = p_block->p_buffer;
-    p_buffer->i_size = p_buffer->i_nb_bytes = p_block->i_buffer;
+    p_buffer->i_size = p_buffer->i_buffer = p_block->i_buffer;
     p_buffer->i_nb_samples = i_samples;
     p_block->i_nb_samples = i_samples;
 

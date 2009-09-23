@@ -78,7 +78,7 @@ static void DoWork( aout_mixer_t *p_mixer, aout_buffer_t * p_buffer )
     unsigned i = 0;
     aout_mixer_input_t * p_input = p_mixer->input[i];
     int i_nb_channels = aout_FormatNbChannels( &p_mixer->fmt );
-    int i_nb_bytes = p_buffer->i_nb_samples * sizeof(int32_t)
+    int i_buffer = p_buffer->i_nb_samples * sizeof(int32_t)
                       * i_nb_channels;
     uint8_t * p_in;
     uint8_t * p_out;
@@ -100,12 +100,12 @@ static void DoWork( aout_mixer_t *p_mixer, aout_buffer_t * p_buffer )
                                            * sizeof(int32_t)
                                            * i_nb_channels;
 
-        if ( i_available_bytes < i_nb_bytes )
+        if ( i_available_bytes < i_buffer )
         {
             aout_buffer_t * p_old_buffer;
 
             vlc_memcpy( p_out, p_in, i_available_bytes );
-            i_nb_bytes -= i_available_bytes;
+            i_buffer -= i_available_bytes;
             p_out += i_available_bytes;
 
             /* Next buffer */
@@ -120,8 +120,8 @@ static void DoWork( aout_mixer_t *p_mixer, aout_buffer_t * p_buffer )
         }
         else
         {
-            vlc_memcpy( p_out, p_in, i_nb_bytes );
-            p_input->begin = p_in + i_nb_bytes;
+            vlc_memcpy( p_out, p_in, i_buffer );
+            p_input->begin = p_in + i_buffer;
             break;
         }
     }

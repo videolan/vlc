@@ -1535,7 +1535,7 @@ static block_t *EncodeBlock( encoder_t *p_enc, void *p_data )
     else
     {
         aout_buffer_t *p_aout_buffer = (aout_buffer_t *)p_data;
-        p_block_in = block_New( p_enc, p_aout_buffer->i_nb_bytes );
+        p_block_in = block_New( p_enc, p_aout_buffer->i_buffer );
         memcpy( p_block_in->p_buffer, p_aout_buffer->p_buffer,
                 p_block_in->i_buffer );
 

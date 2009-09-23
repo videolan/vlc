@@ -343,7 +343,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     int i;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes *
+    p_out_buf->i_buffer = p_in_buf->i_buffer *
                             aout_FormatNbChannels( &p_filter->output ) /
                             aout_FormatNbChannels( &p_filter->input );
 

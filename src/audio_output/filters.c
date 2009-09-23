@@ -356,7 +356,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
         p_output_buffer->i_pts = (*pp_input_buffer)->i_pts;
         p_output_buffer->i_length = (*pp_input_buffer)->i_length;
 
-        /* Please note that p_output_buffer->i_nb_samples & i_nb_bytes
+        /* Please note that p_output_buffer->i_nb_samples & i_buffer
          * shall be set by the filter plug-in. */
         if( (*pp_input_buffer)->i_nb_samples > 0 )
         {
@@ -365,7 +365,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
         }
         else
         {
-            p_output_buffer->i_nb_bytes = 0;
+            p_output_buffer->i_buffer = 0;
             p_output_buffer->i_nb_samples = 0;
         }
 

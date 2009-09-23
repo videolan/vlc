@@ -131,7 +131,7 @@ struct aout_buffer_t
     uint8_t *               p_buffer;
     /* i_size is the real size of the buffer (used for debug ONLY), i_nb_bytes
      * is the number of significative bytes in it. */
-    size_t                  i_size, i_nb_bytes;
+    size_t                  i_size, i_buffer;
     unsigned int            i_nb_samples;
     uint32_t                i_flags;
     mtime_t                 i_pts, i_length;

@@ -133,7 +133,7 @@ static void Do_F32_S32 (aout_instance_t *aout, aout_filter_t *filter,
             : "q0", "q1", "memory");
 
     outbuf->i_nb_samples = inbuf->i_nb_samples;
-    outbuf->i_nb_bytes = inbuf->i_nb_bytes;
+    outbuf->i_buffer = inbuf->i_buffer;
     (void) aout;
 }
 
@@ -196,6 +196,6 @@ static void Do_S32_S16 (aout_instance_t *aout, aout_filter_t *filter,
             : "q0", "q1", "q2", "q3", "memory");
 
     outbuf->i_nb_samples = inbuf->i_nb_samples;
-    outbuf->i_nb_bytes = inbuf->i_nb_bytes / 2;
+    outbuf->i_buffer = inbuf->i_buffer / 2;
     (void) aout;
 }

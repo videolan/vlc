@@ -176,9 +176,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     size_t i;
 
     p_out_buf->i_nb_samples = i_nb_samples;
-    p_out_buf->i_nb_bytes = sizeof(float) * i_nb_samples
+    p_out_buf->i_buffer = sizeof(float) * i_nb_samples
                             * aout_FormatNbChannels( &p_filter->output );
-    memset( p_out, 0, p_out_buf->i_nb_bytes );
+    memset( p_out, 0, p_out_buf->i_buffer );
 
 
     if( p_sys->i_rear_left >= 0 )

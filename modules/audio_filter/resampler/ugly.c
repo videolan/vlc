@@ -101,10 +101,10 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         return;
     }
 
-    int32_t p_in_orig[p_in_buf->i_nb_bytes / sizeof(int32_t)],
+    int32_t p_in_orig[p_in_buf->i_buffer / sizeof(int32_t)],
            *p_in = p_in_orig;
 
-    vlc_memcpy( p_in, p_in_buf->p_buffer, p_in_buf->i_nb_bytes );
+    vlc_memcpy( p_in, p_in_buf->p_buffer, p_in_buf->i_buffer );
 
     for( i_out = i_out_nb ; i_out-- ; )
     {
@@ -124,7 +124,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = i_out_nb;
-    p_out_buf->i_nb_bytes = i_out_nb * i_sample_bytes;
+    p_out_buf->i_buffer = i_out_nb * i_sample_bytes;
     p_out_buf->i_pts = p_in_buf->i_pts;
     p_out_buf->i_length = p_out_buf->i_nb_samples *
         1000000 / p_filter->output.i_rate;

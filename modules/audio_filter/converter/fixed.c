@@ -146,7 +146,7 @@ static void Do_F32ToS16( aout_instance_t * p_aout, aout_filter_t * p_filter,
         *p_out++ = s24_to_s16_pcm(*p_in++);
     }
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes / 2;
+    p_out_buf->i_buffer = p_in_buf->i_buffer / 2;
 }
 
 
@@ -191,7 +191,7 @@ static void Do_S16ToF32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes
+    p_out_buf->i_buffer = p_in_buf->i_buffer
             * sizeof(vlc_fixed_t) / sizeof(int16_t);
 }
 
@@ -237,5 +237,5 @@ static void Do_U8ToF32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_bytes * sizeof(vlc_fixed_t);
+    p_out_buf->i_buffer = p_in_buf->i_buffer * sizeof(vlc_fixed_t);
 }

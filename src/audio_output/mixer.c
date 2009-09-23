@@ -287,7 +287,7 @@ static int MixBuffer( aout_instance_t * p_aout )
         {
             /* Additionally check that p_first_byte_to_mix is well
              * located. */
-            mtime_t i_nb_bytes = (start_date - p_buffer->i_pts)
+            mtime_t i_buffer = (start_date - p_buffer->i_pts)
                             * p_aout->p_mixer->fmt.i_bytes_per_frame
                             * p_aout->p_mixer->fmt.i_rate
                             / p_aout->p_mixer->fmt.i_frame_length
@@ -300,18 +300,18 @@ static int MixBuffer( aout_instance_t * p_aout )
             }
             mixer_nb_bytes = p_input->mixer.begin - p_buffer->p_buffer;
 
-            if ( !((i_nb_bytes + p_aout->p_mixer->fmt.i_bytes_per_frame
+            if ( !((i_buffer + p_aout->p_mixer->fmt.i_bytes_per_frame
                      > mixer_nb_bytes) &&
-                   (i_nb_bytes < p_aout->p_mixer->fmt.i_bytes_per_frame
+                   (i_buffer < p_aout->p_mixer->fmt.i_bytes_per_frame
                      + mixer_nb_bytes)) )
             {
                 msg_Warn( p_aout, "mixer start isn't output start (%"PRId64")",
-                          i_nb_bytes - mixer_nb_bytes );
+                          i_buffer - mixer_nb_bytes );
 
                 /* Round to the nearest multiple */
-                i_nb_bytes /= p_aout->p_mixer->fmt.i_bytes_per_frame;
-                i_nb_bytes *= p_aout->p_mixer->fmt.i_bytes_per_frame;
-                if( i_nb_bytes < 0 )
+                i_buffer /= p_aout->p_mixer->fmt.i_bytes_per_frame;
+                i_buffer *= p_aout->p_mixer->fmt.i_bytes_per_frame;
+                if( i_buffer < 0 )
                 {
                     /* Is it really the best way to do it ? */
                     aout_lock_output_fifo( p_aout );
@@ -321,7 +321,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                     break;
                 }
 
-                p_input->mixer.begin = p_buffer->p_buffer + i_nb_bytes;
+                p_input->mixer.begin = p_buffer->p_buffer + i_buffer;
             }
         }
     }
@@ -349,7 +349,7 @@ static int MixBuffer( aout_instance_t * p_aout )
     if ( p_aout->p_mixer->allocation.b_alloc )
     {
         p_output_buffer->i_nb_samples = p_aout->output.i_nb_samples;
-        p_output_buffer->i_nb_bytes = p_aout->output.i_nb_samples
+        p_output_buffer->i_buffer = p_aout->output.i_nb_samples
                               * p_aout->p_mixer->fmt.i_bytes_per_frame
                               / p_aout->p_mixer->fmt.i_frame_length;
     }

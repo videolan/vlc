@@ -652,7 +652,7 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
 
             memcpy( p_out->p_buffer,
                     &p_sys->out_buffer[2 * p_sys->i_out * p_dec->fmt_out.audio.i_channels],
-                    p_out->i_nb_bytes );
+                    p_out->i_buffer );
 
             p_sys->i_out += i_frames;
         }

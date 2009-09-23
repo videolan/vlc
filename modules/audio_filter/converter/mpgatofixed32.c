@@ -129,12 +129,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_nb_bytes = p_in_buf->i_nb_samples * sizeof(vlc_fixed_t) *
+    p_out_buf->i_buffer = p_in_buf->i_nb_samples * sizeof(vlc_fixed_t) *
                                aout_FormatNbChannels( &p_filter->output );
 
     /* Do the actual decoding now. */
     mad_stream_buffer( &p_sys->mad_stream, p_in_buf->p_buffer,
-                       p_in_buf->i_nb_bytes );
+                       p_in_buf->i_buffer );
     if ( mad_frame_decode( &p_sys->mad_frame, &p_sys->mad_stream ) == -1 )
     {
         msg_Dbg( p_aout, "libmad error: %s",
@@ -151,7 +151,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         if( p_filter->output.i_format == VLC_CODEC_FL32 )
         {
             int i;
-            int i_size = p_out_buf->i_nb_bytes / sizeof(float);
+            int i_size = p_out_buf->i_buffer / sizeof(float);
 
             float * a = (float *)p_out_buf->p_buffer;
             for ( i = 0 ; i < i_size ; i++ )
@@ -159,7 +159,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
         else
         {
-            memset( p_out_buf->p_buffer, 0, p_out_buf->i_nb_bytes );
+            memset( p_out_buf->p_buffer, 0, p_out_buf->i_buffer );
         }
         p_sys->i_reject_count--;
         return;
@@ -396,17 +396,17 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
 
     in_buf.p_buffer = p_block->p_buffer;
     in_buf.i_flags = 0;
-    in_buf.i_nb_bytes = p_block->i_buffer;
+    in_buf.i_buffer = p_block->i_buffer;
     in_buf.i_nb_samples = p_block->i_nb_samples;
     out_buf.p_buffer = p_out->p_buffer;
-    out_buf.i_nb_bytes = p_out->i_buffer;
+    out_buf.i_buffer = p_out->i_buffer;
     out_buf.i_nb_samples = p_out->i_nb_samples;
 
     DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
 
     block_Release( p_block );
 
-    p_out->i_buffer = out_buf.i_nb_bytes;
+    p_out->i_buffer = out_buf.i_buffer;
     p_out->i_nb_samples = out_buf.i_nb_samples;
 
     return p_out;

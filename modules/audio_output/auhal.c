@@ -1328,7 +1328,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
  
         if( p_buffer != NULL )
         {
-            uint32_t i_second_mData_bytes = __MIN( p_buffer->i_nb_bytes, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
+            uint32_t i_second_mData_bytes = __MIN( p_buffer->i_buffer, ioData->mBuffers[0].mDataByteSize - i_mData_bytes );
  
             vlc_memcpy( (uint8_t *)ioData->mBuffers[0].mData + i_mData_bytes,
                         p_buffer->p_buffer, i_second_mData_bytes );
@@ -1336,7 +1336,7 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
 
             if( i_mData_bytes >= ioData->mBuffers[0].mDataByteSize )
             {
-                p_sys->i_total_bytes = p_buffer->i_nb_bytes - i_second_mData_bytes;
+                p_sys->i_total_bytes = p_buffer->i_buffer - i_second_mData_bytes;
                 vlc_memcpy( p_sys->p_remainder_buffer,
                             &p_buffer->p_buffer[i_second_mData_bytes],
                             p_sys->i_total_bytes );
@@ -1394,11 +1394,11 @@ static OSStatus RenderCallbackSPDIF( AudioDeviceID inDevice,
 #define BUFFER outOutputData->mBuffers[p_sys->i_stream_index]
     if( p_buffer != NULL )
     {
-        if( (int)BUFFER.mDataByteSize != (int)p_buffer->i_nb_bytes)
-            msg_Warn( p_aout, "bytesize: %d nb_bytes: %d", (int)BUFFER.mDataByteSize, (int)p_buffer->i_nb_bytes );
+        if( (int)BUFFER.mDataByteSize != (int)p_buffer->i_buffer)
+            msg_Warn( p_aout, "bytesize: %d nb_bytes: %d", (int)BUFFER.mDataByteSize, (int)p_buffer->i_buffer );
  
         /* move data into output data buffer */
-        vlc_memcpy( BUFFER.mData, p_buffer->p_buffer, p_buffer->i_nb_bytes );
+        vlc_memcpy( BUFFER.mData, p_buffer->p_buffer, p_buffer->i_buffer );
         aout_BufferFree( p_buffer );
     }
     else

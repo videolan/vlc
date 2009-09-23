@@ -323,7 +323,7 @@ static void Play( aout_instance_t * p_aout )
 
     p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
 
-    if( fwrite( p_buffer->p_buffer, p_buffer->i_nb_bytes, 1,
+    if( fwrite( p_buffer->p_buffer, p_buffer->i_buffer, 1,
                 p_aout->output.p_sys->p_file ) != 1 )
     {
         msg_Err( p_aout, "write error (%m)" );
@@ -332,7 +332,7 @@ static void Play( aout_instance_t * p_aout )
     if( p_aout->output.p_sys->b_add_wav_header )
     {
         /* Update Wave Header */
-        p_aout->output.p_sys->waveh.DataLength += p_buffer->i_nb_bytes;
+        p_aout->output.p_sys->waveh.DataLength += p_buffer->i_buffer;
     }
 
     aout_BufferFree( p_buffer );
