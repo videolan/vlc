@@ -3584,9 +3584,13 @@ AC_ARG_ENABLE(xvmc,
 ])
 AS_IF([test "${enable_xvmc}" != "no"], [
   AC_CHECK_HEADERS(X11/extensions/vldXvMC.h, [
-    VLC_ADD_PLUGIN([xvmc])
-    VLC_ADD_LIBS([xvmc],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXvMCW -lXv ${LIBMPEG2_LIBS}])
-    VLC_ADD_CPPFLAGS([xvmc],[${X_CFLAGS} ${LIBMPEG2_CFLAGS}])
+    AS_IF([test "${enable_libmpeg2}" = "yes"], [
+      VLC_ADD_PLUGIN([xvmc])
+      VLC_ADD_LIBS([xvmc],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXvMCW -lXv ${LIBMPEG2_LIBS}])
+      VLC_ADD_CPPFLAGS([xvmc],[${X_CFLAGS} ${LIBMPEG2_CFLAGS}])
+    ], [
+      AC_MSG_ERROR([XVideo-MotionCompensation needs libmpeg2 which isn't available])
+    ])
   ], [
     AC_MSG_ERROR([XVideo-MotionCompensation extension not found!])
   ])
