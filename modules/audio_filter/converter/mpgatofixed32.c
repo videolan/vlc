@@ -141,7 +141,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                   mad_stream_errorstr( &p_sys->mad_stream ) );
         p_sys->i_reject_count = 3;
     }
-    else if( p_in_buf->i_flags & BLOCK_FLAG_DISCONUITY )
+    else if( p_in_buf->i_flags & BLOCK_FLAG_DISCONTINUITY )
     {
         p_sys->i_reject_count = 3;
     }
