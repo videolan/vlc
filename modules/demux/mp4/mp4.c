@@ -156,6 +156,7 @@ struct demux_sys_t
     uint64_t     i_duration;     /* movie duration */
     unsigned int i_tracks;       /* number of tracks */
     mp4_track_t  *track;         /* array of track */
+    float        f_fps;          /* number of frame per seconds */
 
     /* */
     MP4_Box_t    *p_tref_chap;
@@ -843,8 +844,9 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case DEMUX_GET_FPS:
-            msg_Warn( p_demux, "DEMUX_GET_FPS unimplemented !!" );
-            return VLC_EGENERIC;
+            pf = (double*)va_arg( args, double* );
+            *pf = (double)p_sys->f_fps;
+            return VLC_SUCCESS;
 
         case DEMUX_GET_META:
         {
@@ -1562,6 +1564,8 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         TrackGetESSampleRate( &p_track->fmt.video.i_frame_rate,
                               &p_track->fmt.video.i_frame_rate_base,
                               p_track, i_sample_description_index, i_chunk );
+        p_demux->p_sys->f_fps = (float)p_track->fmt.video.i_frame_rate /
+                                (float)p_track->fmt.video.i_frame_rate_base;
         break;
 
     case AUDIO_ES:
