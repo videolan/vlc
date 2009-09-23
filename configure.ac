@@ -3374,7 +3374,7 @@ if test "${enable_x264}" != "no"; then
         fi
       ],[
         if test "${enable_x264}" = "yes"; then
-            AC_MSG_ERROR([Could not find libx264 on your system: you may get it from http://www.videolan.org/x264.html])
+            AC_MSG_ERROR([Could not find libx264 >= 0.76 on your system: you may get it from http://www.videolan.org/x264.html])
           fi
       ])
     LDFLAGS="${LDFLAGS_save}"
