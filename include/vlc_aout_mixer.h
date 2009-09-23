@@ -88,7 +88,7 @@ struct aout_mixer_t {
     aout_mixer_input_t    **input;
 
     /* Mix input into the given buffer (mandatory) */
-    void (*mix)(aout_mixer_t *, struct aout_buffer_t *);
+    void (*mix)(aout_mixer_t *, aout_buffer_t *);
 
     /* Private place holder for the aout_mixer_t module (optional)
      *
