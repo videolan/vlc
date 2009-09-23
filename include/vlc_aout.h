@@ -133,7 +133,7 @@ struct aout_buffer_t
      * is the number of significative bytes in it. */
     size_t                  i_size, i_nb_bytes;
     unsigned int            i_nb_samples;
-    bool                    b_discontinuity; /* Set on discontinuity (for non pcm stream) */
+    uint32_t                i_flags;
     mtime_t                 i_pts, end_date;
 
     struct aout_buffer_t *  p_next;

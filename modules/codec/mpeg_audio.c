@@ -541,7 +541,8 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
     p_buf->i_pts = date_Get( &p_sys->end_date );
     p_buf->end_date =
         date_Increment( &p_sys->end_date, p_sys->i_frame_length );
-    p_buf->b_discontinuity = p_sys->b_discontinuity;
+    if( p_sys->b_discontinuity )
+        p_buf->i_flags |= BLOCK_FLAG_DISCONTINUITY;
     p_sys->b_discontinuity = false;
 
     /* Hack for libmad filter */
