@@ -29,6 +29,7 @@ wrappers for most methods.
 """
 
 import sys
+import os
 import re
 import time
 import operator
@@ -513,7 +514,7 @@ class PythonGenerator(object):
         self.output("""if hasattr(dll, '%s'):""" % method)
         if params:
             self.output("    prototype=ctypes.CFUNCTYPE(%s, %s)" % (self.type2class.get(rtype, 'FIXME_%s' % rtype),
-                                                                ",".join( self.type2class[p[0]] for p in params )))
+                                                                ", ".join( self.type2class[p[0]] for p in params )))
         else:
             self.output("    prototype=ctypes.CFUNCTYPE(%s)" % self.type2class.get(rtype, 'FIXME_%s' % rtype))
 
@@ -523,7 +524,7 @@ class PythonGenerator(object):
         elif len(params) == 1:
             flags="    paramflags=( (%d, ), )" % parameter_passing[params[0][0]]
         else:
-            flags="    paramflags=%s" % ",".join( '(%d,)' % parameter_passing[p[0]] for p in params )
+            flags="    paramflags=%s" % ", ".join( '(%d,)' % parameter_passing[p[0]] for p in params )
         self.output(flags)
         self.output('    %s = prototype( ("%s", dll), paramflags )' % (method, method))
         if '3' in flags:
@@ -690,6 +691,186 @@ class PythonGenerator(object):
 """ % method)
         return ret
 
+class JavaGenerator(object):
+    # C-type to java/jna type conversion.
+    # Note that enum types conversions are generated (cf convert_enum_names)
+    type2class={
+        'libvlc_exception_t*': 'libvlc_exception_t',
+        'libvlc_media_player_t*': 'LibVlcMediaPlayer',
+        'libvlc_instance_t*': 'LibVlcInstance',
+        'libvlc_media_t*': 'LibVlcMedia',
+        'libvlc_log_t*': 'LibVlcLog',
+        'libvlc_log_iterator_t*': 'LibVlcLogIterator',
+        'libvlc_log_message_t*': 'libvlc_log_message_t',
+        'libvlc_event_type_t': 'int',
+        'libvlc_event_manager_t*': 'LibVlcEventManager',
+        'libvlc_media_discoverer_t*': 'LibVlcMediaDiscoverer',
+        'libvlc_media_library_t*': 'LibVlcMediaLibrary',
+        'libvlc_media_list_t*': 'LibVlcMediaList',
+        'libvlc_media_list_player_t*': 'LibVlcMediaListPlayer',
+        'libvlc_media_list_view_t*': 'LibVlcMediaListView',
+
+        'libvlc_track_description_t*': 'LibVlcTrackDescription',
+        'libvlc_audio_output_t*': 'LibVlcAudioOutput',
+
+        'void': 'void',
+        'void*': 'Pointer',
+        'short': 'short',
+        'char*': 'String',
+        'char**': 'String[]',
+        'uint32_t': 'uint32',
+        'float': 'float',
+        'unsigned': 'int',
+        'int': 'int',
+        '...': 'FIXMEva_list',
+        'libvlc_callback_t': 'LibVlcCallback',
+        'libvlc_time_t': 'long',
+
+        'mediacontrol_RGBPicture*': 'Pointer',
+        'mediacontrol_PlaylistSeq*': 'Pointer',
+        'mediacontrol_StreamInformation*': 'Pointer',
+        }
+
+    def __init__(self, parser=None):
+        self.parser=parser
+
+        # Blacklist all mediacontrol methods
+        for (rt, met, params, c) in self.parser.methods:
+            if met.startswith('mediacontrol'):
+                blacklist.append(met)
+        # Generate Java names for enums
+        self.type2class.update(self.convert_enum_names(parser.enums))
+        self.check_types()
+
+    def save(self, dirname=None):
+        if dirname is None or dirname == '-':
+            dirname='internal'
+            if not os.path.isdir(dirname):
+                os.mkdir(dirname)
+
+        print "Generating java code in %s/" % dirname
+
+        # Generate enum files
+        self.generate_enums(dirname, self.parser.enums)
+
+        # Generate LibVlc.java code
+        self.generate_libvlc(dirname)
+
+    def output(self, fd, *p):
+        fd.write(" ".join(p))
+        fd.write("\n")
+
+    def check_types(self):
+        """Make sure that all types are properly translated.
+
+        This method must be called *after* convert_enum_names, since
+        the latter populates type2class with converted enum names.
+        """
+        for (rt, met, params, c) in self.parser.methods:
+            if met in blacklist:
+                continue
+            for typ, name in params:
+                if not typ in self.type2class:
+                    raise Exception("No conversion for %s (from %s:%s)" % (typ, met, name))
+
+    def convert_enum_names(self, enums):
+        """Convert enum names into Java names.
+        """
+        res={}
+        for (typ, name, values, comment) in enums:
+            if typ != 'enum':
+                raise Exception('This method only handles enums')
+            pyname=re.findall('(libvlc|mediacontrol)_(.+?)(_t)?$', name)[0][1]
+            if '_' in pyname:
+                pyname=pyname.title().replace('_', '')
+            elif not pyname[0].isupper():
+                pyname=pyname.capitalize()
+            res[name]=pyname
+        return res
+
+    def insert_code(self, fd, filename):
+        """Generate header/footer code.
+        """
+        f=open(filename, 'r')
+        for l in f:
+            if l.startswith('build_date'):
+                self.output(fd, 'build_date="%s";' % time.ctime())
+            else:
+                self.output(fd, l.rstrip())
+        f.close()
+
+    def generate_header(self, fd):
+        """Generate LibVlc header.
+        """
+        for (c_type, jna_type) in self.type2class.iteritems():
+            if c_type.endswith('*') and jna_type.startswith('LibVlc'):
+                self.output(fd, '''    public class %s extends PointerType
+    {
+    }
+''' % jna_type)
+
+    def generate_libvlc(self, dirname):
+        """Generate LibVlc.java JNA glue code.
+        """
+        filename=os.path.join(dirname, 'LibVlc.java')
+        fd=open(filename, 'w')
+
+        self.insert_code(fd, 'boilerplate.java')
+        self.insert_code(fd, 'LibVlc-header.java')
+        #wrapped_methods=self.generate_wrappers(self.parser.methods)
+        self.generate_header(fd)
+        for (rtype, method, params, comment) in self.parser.methods:
+            if method in blacklist:
+                # FIXME
+                continue
+            self.output(fd, "%s %s(%s);\n" % (self.type2class.get(rtype, 'FIXME_%s' % rtype),
+                                          method,
+                                          ", ".join( ("%s %s" % (self.type2class[p[0]],
+                                                                 p[1])) for p in params )))
+        self.insert_code(fd, 'LibVlc-footer.java')
+        fd.close()
+
+    def generate_enums(self, dirname, enums):
+        """Generate JNA glue code for enums
+        """
+        for (typ, name, values, comment) in enums:
+            if typ != 'enum':
+                raise Exception('This method only handles enums')
+            javaname=self.type2class[name]
+
+            filename=javaname+".java"
+
+            fd=open(os.path.join(dirname, filename), 'w')
+
+            self.insert_code(fd, 'boilerplate.java')
+            self.output(fd, """package org.videolan.jvlc.internal;
+
+
+public enum %s
+{
+""" % javaname)
+            # FIXME: write comment
+
+            for k, v in values:
+                self.output(fd, "        %s, // %s," % (k, v))
+            self.output(fd, "}")
+            fd.close()
+
+    def fix_python_comment(self, c):
+        """Fix comment by removing first and last parameters (self and exception)
+        """
+        data=c.replace('@{', '').replace('@see', 'See').splitlines()
+        body=itertools.takewhile(lambda l: not '@param' in l and not '@return' in l, data)
+        param=[ python_param_re.sub('\\1:\\2', l) for l in  itertools.ifilter(lambda l: '@param' in l, data) ]
+        ret=[ l.replace('@return', '@return:') for l in itertools.ifilter(lambda l: '@return' in l, data) ]
+
+        if len(param) >= 2:
+            param=param[1:-1]
+        elif len(param) == 1:
+            param=[]
+
+        return "\n".join(itertools.chain(body, param, ret))
+
 def process(output, list_of_includes):
     p=Parser(list_of_includes)
     g=PythonGenerator(p)
@@ -707,9 +888,13 @@ if __name__ == '__main__':
                       default=False,
                       help="Check mode")
 
+    opt.add_option("-j", "--java", dest="java", action="store_true",
+                      default=False,
+                      help="Generate java bindings (default is python)")
+
     opt.add_option("-o", "--output", dest="output", action="store",
                       type="str", default="-",
-                      help="Output filename")
+                      help="Output filename(python)/dirname(java)")
 
     (options, args) = opt.parse_args()
 
@@ -735,6 +920,9 @@ if __name__ == '__main__':
     if options.check or options.debug:
         sys.exit(0)
 
-    g=PythonGenerator(p)
+    if options.java:
+        g=JavaGenerator(p)
+    else:
+        g=PythonGenerator(p)
 
     g.save(options.output)
