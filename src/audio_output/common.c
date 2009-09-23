@@ -707,18 +707,8 @@ aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
         return old_buffer;
     }
 
-    aout_buffer_t *buffer;
-    int i_alloc_size;
-
-    i_alloc_size = (int)( (uint64_t)allocation->i_bytes_per_sec
+    size_t i_alloc_size = (int)( (uint64_t)allocation->i_bytes_per_sec
                                         * (microseconds) / 1000000 + 1 );
 
-    buffer = malloc( i_alloc_size + sizeof(aout_buffer_t) );
-    if ( !buffer )
-        return NULL;
-
-    buffer->i_size = i_alloc_size;
-    buffer->p_buffer = (uint8_t *)buffer + sizeof(aout_buffer_t);
-    buffer->i_flags = 0;
-    return buffer;
+    return block_Alloc( i_alloc_size );
 }

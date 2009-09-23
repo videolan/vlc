@@ -1284,8 +1284,7 @@ static int transcode_audio_process( sout_stream_t *p_stream,
                                     block_t *in, block_t **out )
 {
     sout_stream_sys_t *p_sys = p_stream->p_sys;
-    aout_buffer_t *p_audio_buf;
-    block_t *p_block, *p_audio_block;
+    block_t *p_block, *p_audio_buf;
     *out = NULL;
 
     while( (p_audio_buf = id->p_decoder->pf_decode_audio( id->p_decoder,
@@ -1307,36 +1306,29 @@ static int transcode_audio_process( sout_stream_t *p_stream,
             p_audio_buf->i_pts -= p_sys->i_master_drift;
         }
 
-        p_audio_block = p_audio_buf->p_sys;
-        p_audio_block->i_buffer = p_audio_buf->i_buffer;
-        p_audio_block->i_dts = p_audio_block->i_pts =
-            p_audio_buf->i_pts;
-        p_audio_block->i_length = p_audio_buf->i_length;
-        p_audio_block->i_nb_samples = p_audio_buf->i_nb_samples;
+        p_audio_buf->i_dts = p_audio_buf->i_pts;
 
         /* Run filter chain */
         if( id->p_uf_chain )
         {
-            p_audio_block = filter_chain_AudioFilter( id->p_uf_chain, p_audio_block );
-            assert( p_audio_block );
+            p_audio_buf = filter_chain_AudioFilter( id->p_uf_chain,
+                                                    p_audio_buf );
+            if( !p_audio_buf )
+                abort();
         }
 
-        p_audio_block = filter_chain_AudioFilter( id->p_f_chain, p_audio_block );
-        assert( p_audio_block );
+        p_audio_buf = filter_chain_AudioFilter( id->p_f_chain, p_audio_buf );
+        if( !p_audio_buf )
+            abort();
 
-        p_audio_buf->p_buffer = p_audio_block->p_buffer;
-        p_audio_buf->i_buffer = p_audio_block->i_buffer;
-        p_audio_buf->i_nb_samples = p_audio_block->i_nb_samples;
-        p_audio_buf->i_pts = p_audio_block->i_dts;
-        p_audio_buf->i_length = p_audio_block->i_length;
+        p_audio_buf->i_pts = p_audio_buf->i_dts;
 
         audio_timer_start( id->p_encoder );
         p_block = id->p_encoder->pf_encode_audio( id->p_encoder, p_audio_buf );
         audio_timer_stop( id->p_encoder );
 
         block_ChainAppend( out, p_block );
-        block_Release( p_audio_block );
-        free( p_audio_buf );
+        block_Release( p_audio_buf );
     }
 
     return VLC_SUCCESS;
@@ -1344,7 +1336,6 @@ static int transcode_audio_process( sout_stream_t *p_stream,
 
 static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
 {
-    aout_buffer_t *p_buffer;
     block_t *p_block;
     int i_size;
 
@@ -1364,24 +1355,15 @@ static aout_buffer_t *audio_new_buffer( decoder_t *p_dec, int i_samples )
         i_size = i_samples * 4 * p_dec->fmt_out.audio.i_channels;
     }
 
-    p_buffer = malloc( sizeof(aout_buffer_t) );
-    if( !p_buffer ) return NULL;
-    p_buffer->i_flags = 0;
-    p_buffer->p_sys = p_block = block_New( p_dec, i_size );
-
-    p_buffer->p_buffer = p_block->p_buffer;
-    p_buffer->i_size = p_buffer->i_buffer = p_block->i_buffer;
-    p_buffer->i_nb_samples = i_samples;
+    p_block = block_New( p_dec, i_size );
     p_block->i_nb_samples = i_samples;
-
-    return p_buffer;
+    return p_block;
 }
 
 static void audio_del_buffer( decoder_t *p_dec, aout_buffer_t *p_buffer )
 {
     VLC_UNUSED(p_dec);
-    if( p_buffer && p_buffer->p_sys ) block_Release( p_buffer->p_sys );
-    free( p_buffer );
+    block_Release( p_buffer );
 }
 
 /*

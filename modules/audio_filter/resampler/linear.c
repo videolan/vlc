@@ -147,16 +147,18 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Check if we really need to run the resampler */
     if( p_aout->mixer_format.i_rate == p_filter->input.i_rate )
     {
-        if( p_filter->b_continuity &&
-            p_in_buf->i_size >=
-              p_in_buf->i_buffer + sizeof(float) * i_nb_channels )
+#if 0   /* FIXME: needs audio filter2 for block_Realloc */
+        if( p_filter->b_continuity )
         {
-            /* output the whole thing with the last sample from last time */
-            memmove( ((float *)(p_in_buf->p_buffer)) + i_nb_channels,
-                     p_in_buf->p_buffer, p_in_buf->i_buffer );
+            p_in_buf = block_Realloc( p_in_buf, sizeof(float) * i_nb_channels,
+                                      p_in_buf->i_buffer );
+            if( !p_in_buf )
+                abort();
+
             memcpy( p_in_buf->p_buffer, p_prev_sample,
                     i_nb_channels * sizeof(float) );
         }
+#endif
         p_filter->b_continuity = false;
         return;
     }

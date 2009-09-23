@@ -125,25 +125,7 @@ typedef int32_t vlc_fixed_t;
  * Main audio output structures
  *****************************************************************************/
 
-/** audio output buffer */
-struct aout_buffer_t
-{
-    uint8_t *               p_buffer;
-    /* i_size is the real size of the buffer (used for debug ONLY), i_nb_bytes
-     * is the number of significative bytes in it. */
-    size_t                  i_size, i_buffer;
-    unsigned int            i_nb_samples;
-    uint32_t                i_flags;
-    mtime_t                 i_pts, i_length;
-
-    struct aout_buffer_t *  p_next;
-    void                 *p_sys;
-};
-
-static inline void aout_BufferFree( aout_buffer_t *buffer )
-{
-    free( buffer );
-}
+#define aout_BufferFree( buffer ) block_Release( buffer )
 
 /* Size of a frame for S/PDIF output. */
 #define AOUT_SPDIF_SIZE 6144
@@ -171,6 +153,7 @@ struct aout_fifo_t
 
 /* FIXME to remove once aout.h is cleaned a bit more */
 #include <vlc_aout_mixer.h>
+#include <vlc_block.h>
 
 /* */
 typedef struct

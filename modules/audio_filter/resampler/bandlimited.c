@@ -201,16 +201,16 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Check if we really need to run the resampler */
     if( i_out_rate == p_filter->input.i_rate )
     {
+#if 0   /* FIXME: needs audio filter2 to use block_Realloc */
         if( /*p_filter->b_continuity && /--* What difference does it make ? :) */
-            p_sys->i_old_wing &&
-            p_in_buf->i_size >=
-              p_in_buf->i_buffer + p_sys->i_old_wing *
-              p_filter->input.i_bytes_per_frame )
+            p_sys->i_old_wing )
         {
             /* output the whole thing with the samples from last time */
-            memmove( ((float *)(p_in_buf->p_buffer)) +
-                     i_nb_channels * p_sys->i_old_wing,
-                     p_in_buf->p_buffer, p_in_buf->i_buffer );
+            p_in_buf = block_Realloc( p_in_buf,
+                p_sys->i_old_wing * p_filter->input.i_bytes_per_frame,
+                p_in_buf->i_buffer );
+            if( !p_in_buf )
+                abort();
             memcpy( p_in_buf->p_buffer, p_sys->p_buf +
                     i_nb_channels * p_sys->i_old_wing,
                     p_sys->i_old_wing *
@@ -227,6 +227,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             p_out_buf->i_buffer = p_out_buf->i_nb_samples *
                 p_filter->input.i_bytes_per_frame;
         }
+#endif
         p_filter->b_continuity = false;
         p_sys->i_old_wing = 0;
         return;
@@ -269,7 +270,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 p_in_buf->i_nb_samples * p_filter->input.i_bytes_per_frame );
 
     /* Make sure the output buffer is reset */
-    memset( p_out, 0, p_out_buf->i_size );
+    memset( p_out, 0, p_out_buf->i_buffer );
 
     /* Calculate the new length of the filter wing */
     d_factor = (double)i_out_rate / p_filter->input.i_rate;
@@ -327,7 +328,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #endif
 
                 /* Sanity check */
-                if( p_out_buf->i_size/p_filter->input.i_bytes_per_frame
+                if( p_out_buf->i_buffer/p_filter->input.i_bytes_per_frame
                     <= (unsigned int)i_out+1 )
                 {
                     p_out += i_nb_channels;
@@ -402,7 +403,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 }
 #endif
                 /* Sanity check */
-                if( p_out_buf->i_size/p_filter->input.i_bytes_per_frame
+                if( p_out_buf->i_buffer/p_filter->input.i_bytes_per_frame
                     <= (unsigned int)i_out+1 )
                 {
                     p_out += i_nb_channels;
@@ -448,7 +449,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
 #if 0
-    msg_Err( p_filter, "p_out size: %i, nb bytes out: %i", p_out_buf->i_size,
+    msg_Err( p_filter, "p_out size: %i, nb bytes out: %i", p_out_buf->i_buffer,
              i_out * p_filter->input.i_bytes_per_frame );
 #endif
 
@@ -586,10 +587,10 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
     p_filter->p_sys->b_first = false;
 
     in_buf.p_buffer = p_block->p_buffer;
-    in_buf.i_buffer = in_buf.i_size = p_block->i_buffer;
+    in_buf.i_buffer = p_block->i_buffer;
     in_buf.i_nb_samples = p_block->i_nb_samples;
     out_buf.p_buffer = p_out->p_buffer;
-    out_buf.i_buffer = out_buf.i_size = p_out->i_buffer;
+    out_buf.i_buffer = p_out->i_buffer;
     out_buf.i_nb_samples = p_out->i_nb_samples;
 
     DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );

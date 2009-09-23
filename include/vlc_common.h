@@ -206,7 +206,7 @@ typedef struct aout_instance_t aout_instance_t;
 typedef struct aout_sys_t aout_sys_t;
 typedef struct aout_fifo_t aout_fifo_t;
 typedef struct aout_input_t aout_input_t;
-typedef struct aout_buffer_t aout_buffer_t;
+typedef struct block_t aout_buffer_t;
 typedef audio_format_t audio_sample_format_t;
 typedef struct audio_date_t audio_date_t;
 typedef struct aout_filter_t aout_filter_t;

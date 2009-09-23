@@ -501,7 +501,13 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     size_t i_outsize = calculate_output_buffer_size ( p_filter, p_in_buf->i_buffer );
-    if( i_outsize > p_out_buf->i_size ) {
+    if( i_outsize > p_out_buf->i_buffer ) {
+#if 0   /* FIXME: This requires audio filter2 to work */
+        p_out_buf = block_Realloc( p_out_buf, i_outsize, 0 );
+        if( p_out_buf == NULL )
+            abort();
+#else   /* This fails horribly if we have more than two buffers in the
+         * pipeline, or if the buffer is passed to another thread... XXX */
         void *temp = realloc( p->p_buffers[ p->i_buf ], i_outsize );
         if( temp == NULL )
         {
@@ -510,6 +516,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         p->p_buffers[ p->i_buf ] = temp;
         p_out_buf->p_buffer = p->p_buffers[ p->i_buf ];
         p->i_buf = ! p->i_buf;
+#endif
     }
 
     size_t bytes_out = transform_buffer( p_filter,
