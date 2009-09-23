@@ -2706,13 +2706,14 @@ static char *EITConvertToUTF8( const unsigned char *psz_instring,
 
         *psz_out = '\0';
 
-        /* Replace EIT-coded CR/LFs by spaces */
+        /* Convert EIT-coded CR/LFs */
         unsigned char *pbuf = (unsigned char *)psz_outstring;
         for( ; pbuf < (unsigned char *)psz_out ; pbuf++)
         {
             if( pbuf[0] == 0xc2 && pbuf[1] == 0x8a )
             {
-                pbuf[0] = pbuf[1] = ' ';
+                pbuf[0] = ' ';
+                pbuf[1] = '\n';
             }
         }
 
