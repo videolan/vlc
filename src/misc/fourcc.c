@@ -1114,9 +1114,6 @@ static const entry_t p_list_spu[] = {
     B(VLC_CODEC_ITU_T140, "ITU T.140 subtitles"),
         A("t140"),
 
-    B(VLC_CODEC_ITU_T140, "ITU T.140 subtitles"),
-        A("t140"),
-
     B(VLC_CODEC_USF, "USF subtitles"),
         A("usf "),
 
