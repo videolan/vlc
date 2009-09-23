@@ -65,7 +65,7 @@ void block_Init( block_t *restrict b, void *buf, size_t size )
     b->i_dts = VLC_TS_INVALID;
     b->i_length = 0;
     b->i_rate = 0;
-    b->i_samples = 0;
+    b->i_nb_samples = 0;
     b->p_buffer = buf;
     b->i_buffer = size;
 #ifndef NDEBUG
@@ -86,7 +86,7 @@ static void BlockMetaCopy( block_t *restrict out, const block_t *in )
     out->i_flags   = in->i_flags;
     out->i_length  = in->i_length;
     out->i_rate    = in->i_rate;
-    out->i_samples = in->i_samples;
+    out->i_nb_samples = in->i_nb_samples;
 }
 
 /* Memory alignment */

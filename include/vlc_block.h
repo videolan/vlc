@@ -102,7 +102,7 @@ struct block_t
     mtime_t     i_dts;
     mtime_t     i_length;
 
-    int         i_samples; /* Used for audio */
+    unsigned    i_nb_samples; /* Used for audio */
     int         i_rate;
 
     size_t      i_buffer;
@@ -146,7 +146,7 @@ static inline block_t *block_Duplicate( block_t *p_block )
     p_dup->i_flags   = p_block->i_flags;
     p_dup->i_length  = p_block->i_length;
     p_dup->i_rate    = p_block->i_rate;
-    p_dup->i_samples = p_block->i_samples;
+    p_dup->i_nb_samples = p_block->i_nb_samples;
     memcpy( p_dup->p_buffer, p_block->p_buffer, p_block->i_buffer );
 
     return p_dup;

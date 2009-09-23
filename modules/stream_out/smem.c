@@ -368,7 +368,7 @@ static int SendAudio( sout_stream_t *p_stream, sout_stream_id_t *id,
     vlc_memcpy( p_pcm_buffer, p_buffer->p_buffer, i_size );
     /* Calling the postrender callback to tell the user his buffer is ready */
     p_sys->pf_audio_postrender_callback( id->p_data, p_pcm_buffer,
-                                         id->format->audio.i_channels, id->format->audio.i_rate, p_buffer->i_samples,
+                                         id->format->audio.i_channels, id->format->audio.i_rate, p_buffer->i_nb_samples,
                                          id->format->audio.i_bitspersample, i_size, p_buffer->i_pts );
     block_ChainRelease( p_buffer );
     return VLC_SUCCESS;

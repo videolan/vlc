@@ -459,14 +459,14 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     unsigned int i_samples;
     int i_out_size;
 
-    if( !p_block || !p_block->i_samples )
+    if( !p_block || !p_block->i_nb_samples )
     {
         if( p_block )
             block_Release( p_block );
         return NULL;
     }
 
-    i_out_size = p_block->i_samples * p_filter->p_sys->i_bitspersample/8 *
+    i_out_size = p_block->i_nb_samples * p_filter->p_sys->i_bitspersample/8 *
                  aout_FormatNbChannels( &(p_filter->fmt_out.audio) );
 
     p_out = p_filter->pf_audio_buffer_new( p_filter, i_out_size );
@@ -476,7 +476,8 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
         block_Release( p_block );
         return NULL;
     }
-    p_out->i_samples = (p_block->i_samples / p_filter->p_sys->i_nb_channels) *
+    p_out->i_nb_samples =
+                  (p_block->i_nb_samples / p_filter->p_sys->i_nb_channels) *
                        aout_FormatNbChannels( &(p_filter->fmt_out.audio) );
     p_out->i_dts = p_block->i_dts;
     p_out->i_pts = p_block->i_pts;
@@ -490,7 +491,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
 
     in_buf.p_buffer = p_block->p_buffer;
     in_buf.i_nb_bytes = p_block->i_buffer;
-    in_buf.i_nb_samples = p_block->i_samples;
+    in_buf.i_nb_samples = p_block->i_nb_samples;
 
 #if 0
     unsigned int i_in_size = in_buf.i_nb_samples  * (p_filter->p_sys->i_bitspersample/8) *
@@ -504,7 +505,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
 
     out_buf.p_buffer = p_out->p_buffer;
     out_buf.i_nb_bytes = p_out->i_buffer;
-    out_buf.i_nb_samples = p_out->i_samples;
+    out_buf.i_nb_samples = p_out->i_nb_samples;
 
     memset( p_out->p_buffer, 0, i_out_size );
     if( p_filter->p_sys->b_downmix )
@@ -518,7 +519,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     }
 
     p_out->i_buffer = out_buf.i_nb_bytes;
-    p_out->i_samples = out_buf.i_nb_samples;
+    p_out->i_nb_samples = out_buf.i_nb_samples;
 
     block_Release( p_block );
     return p_out;

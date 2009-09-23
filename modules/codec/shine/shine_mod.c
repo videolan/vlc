@@ -216,7 +216,7 @@ static block_t *EncodeFrame( encoder_t *p_enc, aout_buffer_t *p_block )
         start_date += p_mp3_block->i_length;
         p_mp3_block->i_dts = p_mp3_block->i_pts = start_date;
 
-        p_mp3_block->i_samples = SAMP_PER_FRAME1;
+        p_mp3_block->i_nb_samples = SAMP_PER_FRAME1;
 
         block_ChainAppend( &p_chain, p_mp3_block );
 

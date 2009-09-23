@@ -643,14 +643,14 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     block_t *p_out;
     int i_out_size;
 
-    if( !p_block || !p_block->i_samples )
+    if( !p_block || !p_block->i_nb_samples )
     {
         if( p_block )
             block_Release( p_block );
         return NULL;
     }
 
-    i_out_size = p_block->i_samples *
+    i_out_size = p_block->i_nb_samples *
       p_filter->fmt_out.audio.i_bitspersample/8 *
         aout_FormatNbChannels( &(p_filter->fmt_out.audio) );
 
@@ -662,7 +662,7 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
         return NULL;
     }
 
-    p_out->i_samples = p_block->i_samples;
+    p_out->i_nb_samples = p_block->i_nb_samples;
     p_out->i_dts = p_block->i_dts;
     p_out->i_pts = p_block->i_pts;
     p_out->i_length = p_block->i_length;
@@ -676,15 +676,15 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
 
     in_buf.p_buffer = p_block->p_buffer;
     in_buf.i_nb_bytes = p_block->i_buffer;
-    in_buf.i_nb_samples = p_block->i_samples;
+    in_buf.i_nb_samples = p_block->i_nb_samples;
     out_buf.p_buffer = p_out->p_buffer;
     out_buf.i_nb_bytes = p_out->i_buffer;
-    out_buf.i_nb_samples = p_out->i_samples;
+    out_buf.i_nb_samples = p_out->i_nb_samples;
 
     DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
 
     p_out->i_buffer = out_buf.i_nb_bytes;
-    p_out->i_samples = out_buf.i_nb_samples;
+    p_out->i_nb_samples = out_buf.i_nb_samples;
 
     block_Release( p_block );
     return p_out;

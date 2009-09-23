@@ -341,7 +341,7 @@ static block_t *S24toFloat32( filter_t *p_filter, block_t *p_block )
         p_in += 3; p_out++;
     }
 
-    p_block_out->i_samples = p_block->i_samples;
+    p_block_out->i_nb_samples = p_block->i_nb_samples;
     p_block_out->i_dts = p_block->i_dts;
     p_block_out->i_pts = p_block->i_pts;
     p_block_out->i_length = p_block->i_length;
@@ -410,7 +410,7 @@ static block_t *S16toFloat32( filter_t *p_filter, block_t *p_block )
         p_in++; p_out++;
     }
 
-    p_block_out->i_samples = p_block->i_samples;
+    p_block_out->i_nb_samples = p_block->i_nb_samples;
     p_block_out->i_dts = p_block->i_dts;
     p_block_out->i_pts = p_block->i_pts;
     p_block_out->i_length = p_block->i_length;
@@ -443,7 +443,7 @@ static block_t *U16toFloat32( filter_t *p_filter, block_t *p_block )
         *p_out++ = (float)(*p_in++ - 32768) / 32768.0;
     }
 
-    p_block_out->i_samples = p_block->i_samples;
+    p_block_out->i_nb_samples = p_block->i_nb_samples;
     p_block_out->i_dts = p_block->i_dts;
     p_block_out->i_pts = p_block->i_pts;
     p_block_out->i_length = p_block->i_length;
@@ -483,7 +483,7 @@ static block_t *S16toS24( filter_t *p_filter, block_t *p_block )
 #endif
     }
 
-    p_block_out->i_samples = p_block->i_samples;
+    p_block_out->i_nb_samples = p_block->i_nb_samples;
     p_block_out->i_dts = p_block->i_dts;
     p_block_out->i_pts = p_block->i_pts;
     p_block_out->i_length = p_block->i_length;
@@ -618,7 +618,7 @@ static block_t *S8toU16( filter_t *p_filter, block_t *p_block )
     for( i = p_block->i_buffer; i--; )
         *p_out++ = ((*p_in++) + 128) << 8;
 
-    p_block_out->i_samples = p_block->i_samples;
+    p_block_out->i_nb_samples = p_block->i_nb_samples;
     p_block_out->i_dts = p_block->i_dts;
     p_block_out->i_pts = p_block->i_pts;
     p_block_out->i_length = p_block->i_length;
@@ -649,7 +649,7 @@ static block_t *U8toS16( filter_t *p_filter, block_t *p_block )
     for( i = p_block->i_buffer; i--; )
         *p_out++ = ((*p_in++) - 128) << 8;
 
-    p_block_out->i_samples = p_block->i_samples;
+    p_block_out->i_nb_samples = p_block->i_nb_samples;
     p_block_out->i_dts = p_block->i_dts;
     p_block_out->i_pts = p_block->i_pts;
     p_block_out->i_length = p_block->i_length;
@@ -681,7 +681,7 @@ static block_t *S8toS16( filter_t *p_filter, block_t *p_block )
     for( i = p_block->i_buffer; i--; )
         *p_out++ = (*p_in++) << 8;
 
-    p_block_out->i_samples = p_block->i_samples;
+    p_block_out->i_nb_samples = p_block->i_nb_samples;
     p_block_out->i_dts = p_block->i_dts;
     p_block_out->i_pts = p_block->i_pts;
     p_block_out->i_length = p_block->i_length;
@@ -712,7 +712,7 @@ static block_t *U8toU16( filter_t *p_filter, block_t *p_block )
     for( i = p_block->i_buffer; i--; )
         *p_out++ = (*p_in++) << 8;
 
-    p_block_out->i_samples = p_block->i_samples;
+    p_block_out->i_nb_samples = p_block->i_nb_samples;
     p_block_out->i_dts = p_block->i_dts;
     p_block_out->i_pts = p_block->i_pts;
     p_block_out->i_length = p_block->i_length;
