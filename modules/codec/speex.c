@@ -712,7 +712,7 @@ static aout_buffer_t *DecodeRtpSpeexPacket( decoder_t *p_dec, block_t **pp_block
       Handle date management on the audio output buffer. 
     */
     p_aout_buffer->i_pts = date_Get( &p_sys->end_date );
-    p_aout_buffer->end_date = date_Increment( &p_sys->end_date, 
+    p_aout_buffer->i_length = date_Increment( &p_sys->end_date,
         p_sys->p_header->frame_size ) - p_aout_buffer->i_pts;
     
     
