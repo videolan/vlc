@@ -724,8 +724,8 @@ static aout_buffer_t *Decode( decoder_t *p_dec, block_t **pp_block )
 
         /* Date management */
         p_aout_buffer->i_pts = date_Get( &p_sys->end_date );
-        p_aout_buffer->end_date =
-            date_Increment( &p_sys->end_date, i_samples );
+        p_aout_buffer->i_length = date_Increment( &p_sys->end_date, i_samples )
+                                  - p_aout_buffer->i_pts;
     }
 
     block_Release( p_block );

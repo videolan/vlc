@@ -375,7 +375,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
 #undef p_effect
     }
 
-    p_outpic->date = ( p_in_buf->i_pts + p_in_buf->end_date ) / 2;
+    p_outpic->date = p_in_buf->i_pts + (p_in_buf->i_length / 2);
 
     vout_DisplayPicture( p_sys->p_vout, p_outpic );
 }

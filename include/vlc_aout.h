@@ -134,7 +134,7 @@ struct aout_buffer_t
     size_t                  i_size, i_nb_bytes;
     unsigned int            i_nb_samples;
     uint32_t                i_flags;
-    mtime_t                 i_pts, end_date;
+    mtime_t                 i_pts, i_length;
 
     struct aout_buffer_t *  p_next;
     void                 *p_sys;

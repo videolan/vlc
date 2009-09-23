@@ -744,8 +744,6 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 #endif
 
     /* Adding the start date will be managed by aout_FifoPush(). */
-    p_buffer->end_date = start_date +
-        (p_buffer->end_date - p_buffer->i_pts);
     p_buffer->i_pts = start_date;
 
     aout_lock_input_fifos( p_aout );

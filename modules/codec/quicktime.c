@@ -647,7 +647,8 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         if( p_out )
         {
             p_out->i_pts = date_Get( &p_sys->date );
-            p_out->end_date = date_Increment( &p_sys->date, i_frames );
+            p_out->i_length = date_Increment( &p_sys->date, i_frames )
+                              - p_out->i_pts;
 
             memcpy( p_out->p_buffer,
                     &p_sys->out_buffer[2 * p_sys->i_out * p_dec->fmt_out.audio.i_channels],

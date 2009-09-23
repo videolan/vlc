@@ -663,8 +663,7 @@ DecoderWriteCallback( const FLAC__StreamDecoder *decoder,
 
     /* Date management (already done by packetizer) */
     p_sys->p_aout_buffer->i_pts = p_sys->p_block->i_pts;
-    p_sys->p_aout_buffer->end_date =
-        p_sys->p_block->i_pts + p_sys->p_block->i_length;
+    p_sys->p_aout_buffer->i_length = p_sys->p_block->i_length;
 
     return FLAC__STREAM_DECODER_WRITE_STATUS_CONTINUE;
 }

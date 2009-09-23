@@ -231,8 +231,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         date_Set( &p_sys->end_date, p_in_buf->i_pts );
     }
 
-    p_out_buf->end_date = date_Increment( &p_sys->end_date,
-                                              p_out_buf->i_nb_samples );
+    p_out_buf->i_length = date_Increment( &p_sys->end_date,
+                                  p_out_buf->i_nb_samples ) - p_out_buf->i_pts;
 
     p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
         i_nb_channels * sizeof(int32_t);

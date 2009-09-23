@@ -1171,7 +1171,7 @@ static void DecoderPlayAudio( decoder_t *p_dec, aout_buffer_t *p_audio,
         const bool b_dated = p_audio->i_pts > VLC_TS_INVALID;
         int i_rate = INPUT_RATE_DEFAULT;
 
-        DecoderFixTs( p_dec, &p_audio->i_pts, &p_audio->end_date, NULL,
+        DecoderFixTs( p_dec, &p_audio->i_pts, NULL, &p_audio->i_length,
                       &i_rate, AOUT_MAX_ADVANCE_TIME, false );
 
         vlc_mutex_unlock( &p_owner->lock );

@@ -394,7 +394,8 @@ static aout_buffer_t *GetAoutBuffer( decoder_t *p_dec )
     if( p_buf == NULL ) return NULL;
 
     p_buf->i_pts = date_Get( &p_sys->end_date );
-    p_buf->end_date = date_Increment( &p_sys->end_date, p_sys->frame.i_samples );
+    p_buf->i_length = date_Increment( &p_sys->end_date,
+                                      p_sys->frame.i_samples ) - p_buf->i_pts;
 
     return p_buf;
 }

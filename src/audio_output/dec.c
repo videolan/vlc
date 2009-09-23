@@ -281,7 +281,7 @@ aout_buffer_t * aout_DecNewBuffer( aout_input_t * p_input,
         return NULL;
 
     p_buffer->i_nb_samples = i_nb_samples;
-    p_buffer->i_pts = p_buffer->end_date = 0;
+    p_buffer->i_pts = p_buffer->i_length = 0;
     return p_buffer;
 }
 
@@ -306,8 +306,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
     assert( p_buffer->i_pts > 0 );
 
-    p_buffer->end_date = p_buffer->i_pts
-                            + (mtime_t)p_buffer->i_nb_samples * 1000000
+    p_buffer->i_length = (mtime_t)p_buffer->i_nb_samples * 1000000
                                 / p_input->input.i_rate;
 
     aout_lock_input( p_aout, p_input );
@@ -332,7 +331,7 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         p_new_buffer->i_nb_samples = p_buffer->i_nb_samples;
         p_new_buffer->i_nb_bytes = p_buffer->i_nb_bytes;
         p_new_buffer->i_pts = p_buffer->i_pts;
-        p_new_buffer->end_date = p_buffer->end_date;
+        p_new_buffer->i_length = p_buffer->i_length;
         aout_BufferFree( p_buffer );
         p_buffer = p_new_buffer;
         p_input->b_changed = false;
@@ -384,7 +383,6 @@ void aout_DecChangePause( aout_instance_t *p_aout, aout_input_t *p_input, bool b
         for( aout_buffer_t *p = p_input->mixer.fifo.p_first; p != NULL; p = p->p_next )
         {
             p->i_pts += i_duration;
-            p->end_date += i_duration;
         }
         aout_unlock_mixer( p_aout );
     }

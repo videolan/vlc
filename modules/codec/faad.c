@@ -415,7 +415,9 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
 
         p_out->i_pts = date_Get( &p_sys->date );
-        p_out->end_date = date_Increment( &p_sys->date, frame.samples / frame.channels );
+        p_out->i_length = date_Increment( &p_sys->date,
+                                          frame.samples / frame.channels ),
+                          - p_out->i_pts;
 
         DoReordering( (uint32_t *)p_out->p_buffer, samples,
                       frame.samples / frame.channels, frame.channels,

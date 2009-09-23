@@ -243,7 +243,8 @@ static aout_buffer_t *SplitBuffer( decoder_t *p_dec )
         return NULL;
 
     p_buffer->i_pts = date_Get( &p_sys->end_date );
-    p_buffer->end_date = date_Increment( &p_sys->end_date, i_samples );
+    p_buffer->i_length = date_Increment( &p_sys->end_date, i_samples )
+                         - p_buffer->i_pts;
 
     if( p_sys->b_extract )
         aout_ChannelExtract( p_buffer->p_buffer, p_dec->fmt_out.audio.i_channels,

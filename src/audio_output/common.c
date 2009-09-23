@@ -370,12 +370,13 @@ void aout_FifoPush( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
     if ( date_Get( &p_fifo->end_date ) )
     {
         p_buffer->i_pts = date_Get( &p_fifo->end_date );
-        p_buffer->end_date = date_Increment( &p_fifo->end_date,
+        p_buffer->i_length = date_Increment( &p_fifo->end_date,
                                              p_buffer->i_nb_samples );
+        p_buffer->i_length -= p_buffer->i_pts;
     }
     else
     {
-        date_Set( &p_fifo->end_date, p_buffer->end_date );
+        date_Set( &p_fifo->end_date, p_buffer->i_pts + p_buffer->i_length );
     }
 }
 
@@ -417,7 +418,6 @@ void aout_FifoMoveDates( aout_instance_t * p_aout, aout_fifo_t * p_fifo,
     while ( p_buffer != NULL )
     {
         p_buffer->i_pts += difference;
-        p_buffer->end_date += difference;
         p_buffer = p_buffer->p_next;
     }
 }

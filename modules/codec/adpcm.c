@@ -301,8 +301,8 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
 
         p_out->i_pts = date_Get( &p_sys->end_date );
-        p_out->end_date =
-            date_Increment( &p_sys->end_date, p_sys->i_samplesperblock );
+        p_out->i_length = date_Increment( &p_sys->end_date,
+                                     p_sys->i_samplesperblock ) - p_out->i_pts;
 
         switch( p_sys->codec )
         {

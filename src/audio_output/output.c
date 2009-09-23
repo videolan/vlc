@@ -288,7 +288,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     {
         msg_Dbg( p_aout, "audio output is too slow (%"PRId64"), "
                  "trashing %"PRId64"us", mdate() - p_buffer->i_pts,
-                 p_buffer->end_date - p_buffer->i_pts );
+                 p_buffer->i_length );
         p_buffer = p_buffer->p_next;
         aout_BufferFree( p_aout->output.fifo.p_first );
         p_aout->output.fifo.p_first = p_buffer;
@@ -317,8 +317,7 @@ aout_buffer_t * aout_OutputNextBuffer( aout_instance_t * p_aout,
     /* Here we suppose that all buffers have the same duration - this is
      * generally true, and anyway if it's wrong it won't be a disaster.
      */
-    if ( p_buffer->i_pts > start_date
-                         + (p_buffer->end_date - p_buffer->i_pts) )
+    if ( p_buffer->i_pts > start_date + p_buffer->i_length )
     /*
      *                   + AOUT_PTS_TOLERANCE )
      * There is no reason to want that, it just worsen the scheduling of

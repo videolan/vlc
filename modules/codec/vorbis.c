@@ -560,7 +560,8 @@ static aout_buffer_t *DecodePacket( decoder_t *p_dec, ogg_packet *p_oggpacket )
 
         /* Date management */
         p_aout_buffer->i_pts = date_Get( &p_sys->end_date );
-        p_aout_buffer->end_date = date_Increment( &p_sys->end_date, i_samples );
+        p_aout_buffer->i_length = date_Increment( &p_sys->end_date,
+                                           i_samples ) - p_aout_buffer->i_pts;
         return p_aout_buffer;
     }
     else

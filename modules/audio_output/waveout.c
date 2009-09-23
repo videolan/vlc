@@ -1062,8 +1062,7 @@ static void* WaveOutThread( vlc_object_t *p_this )
 
                 if( p_buffer )
                 {
-                    mtime_t buffer_length = (p_buffer->end_date
-                                             - p_buffer->i_pts);
+                    mtime_t buffer_length = p_buffer->i_length;
                     next_date = next_date + buffer_length;
                     i_buffer_length = buffer_length/1000;
                 }

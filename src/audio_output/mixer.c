@@ -225,13 +225,14 @@ static int MixBuffer( aout_instance_t * p_aout )
         }
 
         /* Check for the continuity of start_date */
-        while ( p_buffer != NULL && p_buffer->end_date < start_date - 1 )
+        while ( p_buffer != NULL
+             && p_buffer->i_pts + p_buffer->i_length < start_date - 1 )
         {
             /* We authorize a +-1 because rounding errors get compensated
              * regularly. */
             aout_buffer_t * p_next = p_buffer->p_next;
             msg_Warn( p_aout, "the mixer got a packet in the past (%"PRId64")",
-                      start_date - p_buffer->end_date );
+                      start_date - (p_buffer->i_pts + p_buffer->i_length) );
             aout_BufferFree( p_buffer );
             p_fifo->p_first = p_buffer = p_next;
             p_input->mixer.begin = NULL;
@@ -247,10 +248,10 @@ static int MixBuffer( aout_instance_t * p_aout )
         {
             p_buffer = p_fifo->p_first;
             if ( p_buffer == NULL ) break;
-            if ( p_buffer->end_date >= end_date ) break;
+            if ( p_buffer->i_pts + p_buffer->i_length >= end_date ) break;
 
             /* Check that all buffers are contiguous. */
-            prev_date = p_fifo->p_first->end_date;
+            prev_date = p_fifo->p_first->i_pts + p_fifo->p_first->i_length;
             p_buffer = p_buffer->p_next;
             b_drop_buffers = 0;
             for ( ; p_buffer != NULL; p_buffer = p_buffer->p_next )
@@ -263,8 +264,8 @@ static int MixBuffer( aout_instance_t * p_aout )
                     b_drop_buffers = 1;
                     break;
                 }
-                if ( p_buffer->end_date >= end_date ) break;
-                prev_date = p_buffer->end_date;
+                if ( p_buffer->i_pts + p_buffer->i_length >= end_date ) break;
+                prev_date = p_buffer->i_pts + p_buffer->i_length;
             }
             if ( b_drop_buffers )
             {
@@ -353,7 +354,7 @@ static int MixBuffer( aout_instance_t * p_aout )
                               / p_aout->p_mixer->fmt.i_frame_length;
     }
     p_output_buffer->i_pts = start_date;
-    p_output_buffer->end_date = end_date;
+    p_output_buffer->i_length = end_date - start_date;
 
     p_aout->p_mixer->mix( p_aout->p_mixer, p_output_buffer );
 

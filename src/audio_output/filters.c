@@ -354,7 +354,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
         if( p_output_buffer == NULL )
             return;
         p_output_buffer->i_pts = (*pp_input_buffer)->i_pts;
-        p_output_buffer->end_date = (*pp_input_buffer)->end_date;
+        p_output_buffer->i_length = (*pp_input_buffer)->i_length;
 
         /* Please note that p_output_buffer->i_nb_samples & i_nb_bytes
          * shall be set by the filter plug-in. */

@@ -1305,15 +1305,13 @@ static int transcode_audio_process( sout_stream_t *p_stream,
             p_sys->i_master_drift = p_audio_buf->i_pts - i_dts;
             date_Increment( &id->interpolated_pts, p_audio_buf->i_nb_samples );
             p_audio_buf->i_pts -= p_sys->i_master_drift;
-            p_audio_buf->end_date -= p_sys->i_master_drift;
         }
 
         p_audio_block = p_audio_buf->p_sys;
         p_audio_block->i_buffer = p_audio_buf->i_nb_bytes;
         p_audio_block->i_dts = p_audio_block->i_pts =
             p_audio_buf->i_pts;
-        p_audio_block->i_length = p_audio_buf->end_date -
-            p_audio_buf->i_pts;
+        p_audio_block->i_length = p_audio_buf->i_length;
         p_audio_block->i_nb_samples = p_audio_buf->i_nb_samples;
 
         /* Run filter chain */
@@ -1330,7 +1328,7 @@ static int transcode_audio_process( sout_stream_t *p_stream,
         p_audio_buf->i_nb_bytes = p_audio_block->i_buffer;
         p_audio_buf->i_nb_samples = p_audio_block->i_nb_samples;
         p_audio_buf->i_pts = p_audio_block->i_dts;
-        p_audio_buf->end_date = p_audio_block->i_dts + p_audio_block->i_length;
+        p_audio_buf->i_length = p_audio_block->i_length;
 
         audio_timer_start( id->p_encoder );
         p_block = id->p_encoder->pf_encode_audio( id->p_encoder, p_audio_buf );

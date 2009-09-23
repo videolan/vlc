@@ -198,7 +198,8 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
         goto drop;
 
     p_out->i_pts = date_Get (&p_sys->end_date );
-    p_out->end_date   = date_Increment (&p_sys->end_date, samples);
+    p_out->i_length = date_Increment (&p_sys->end_date, samples)
+                      - p_out->i_pts;
     if (!p_sys->fixed)
         fluid_synth_write_float (p_sys->synth, samples,
                                  p_out->p_buffer, 0, 2,

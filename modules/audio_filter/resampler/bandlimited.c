@@ -220,9 +220,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 p_sys->i_old_wing;
 
             p_out_buf->i_pts = date_Get( &p_sys->end_date );
-            p_out_buf->end_date =
+            p_out_buf->i_length =
                 date_Increment( &p_sys->end_date,
-                                p_out_buf->i_nb_samples );
+                                p_out_buf->i_nb_samples ) - p_out_buf->i_pts;
 
             p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
                 p_filter->input.i_bytes_per_frame;
@@ -455,8 +455,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Finalize aout buffer */
     p_out_buf->i_nb_samples = i_out;
     p_out_buf->i_pts = date_Get( &p_sys->end_date );
-    p_out_buf->end_date = date_Increment( &p_sys->end_date,
-                                          p_out_buf->i_nb_samples );
+    p_out_buf->i_length = date_Increment( &p_sys->end_date,
+                                  p_out_buf->i_nb_samples ) - p_out_buf->i_pts;
 
     p_out_buf->i_nb_bytes = p_out_buf->i_nb_samples *
         i_nb_channels * sizeof(int32_t);
