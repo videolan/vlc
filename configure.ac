@@ -3354,7 +3354,7 @@ if test "${enable_x264}" != "no"; then
       AC_MSG_ERROR([the specified tree doesn't have x264.h])
     fi
   else
-      PKG_CHECK_MODULES(X264,x264, [
+      PKG_CHECK_MODULES(X264,x264 >= 0.76, [
         VLC_ADD_PLUGIN([x264])
         VLC_ADD_LDFLAGS([x264],[${X264_LIBS}])
 
