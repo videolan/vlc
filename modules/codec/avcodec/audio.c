@@ -96,6 +96,9 @@ int InitAudioDec( decoder_t *p_dec, AVCodecContext *p_context,
         return VLC_ENOMEM;
     }
 
+    p_codec->type = CODEC_TYPE_AUDIO;
+    p_context->codec_type = CODEC_TYPE_AUDIO;
+    p_context->codec_id = i_codec_id;
     p_sys->p_context = p_context;
     p_sys->p_codec = p_codec;
     p_sys->i_codec_id = i_codec_id;

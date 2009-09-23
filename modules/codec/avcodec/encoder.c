@@ -279,6 +279,7 @@ int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_buffer_out = 0;
 
     p_sys->p_context = p_context = avcodec_alloc_context();
+    p_sys->p_context->codec_id = p_sys->p_codec->id;
     p_context->debug = config_GetInt( p_enc, "ffmpeg-debug" );
     p_context->opaque = (void *)p_this;
 
@@ -425,6 +426,8 @@ int OpenEncoder( vlc_object_t *p_this )
             free( p_sys );
             return VLC_EGENERIC;
         }
+
+        p_context->codec_type = CODEC_TYPE_VIDEO;
 
         p_context->width = p_enc->fmt_in.video.i_width;
         p_context->height = p_enc->fmt_in.video.i_height;
@@ -584,6 +587,7 @@ int OpenEncoder( vlc_object_t *p_this )
         if( i_codec_id == CODEC_ID_MP3 && p_enc->fmt_in.audio.i_channels > 2 )
             p_enc->fmt_in.audio.i_channels = 2;
 
+        p_context->codec_type = CODEC_TYPE_AUDIO;
         p_enc->fmt_in.i_codec  = VLC_CODEC_S16N;
         p_context->sample_rate = p_enc->fmt_out.audio.i_rate;
         p_context->channels    = p_enc->fmt_out.audio.i_channels;
