@@ -421,12 +421,73 @@ static void VoutDisplayResetRender(vout_display_t *vd)
     VoutDisplayDestroyRender(vd);
     VoutDisplayCreateRender(vd);
 }
-static void VoutDisplayEventMouse(vout_display_t *vd, const vlc_mouse_t *mouse)
+static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
     /* */
-    vlc_mouse_t m = *mouse;
+    vlc_mouse_t m = osys->mouse.state;
+    bool is_ignored = false;
+
+    switch (event) {
+    case VOUT_DISPLAY_EVENT_MOUSE_STATE: {
+        const int x = (int)va_arg(args, int);
+        const int y = (int)va_arg(args, int);
+        const int button_mask = (int)va_arg(args, int);
+
+        vlc_mouse_Init(&m);
+        m.i_x = x;
+        m.i_y = y;
+        m.i_pressed = button_mask;
+        break;
+    }
+    case VOUT_DISPLAY_EVENT_MOUSE_MOVED: {
+        const int x = (int)va_arg(args, int);
+        const int y = (int)va_arg(args, int);
+        if (x != osys->mouse.state.i_x || y != osys->mouse.state.i_y) {
+            msg_Dbg(vd, "VoutDisplayEvent 'mouse' @%d,%d", x, y);
+
+            m.i_x = x;
+            m.i_y = y;
+            m.b_double_click = false;
+        } else {
+            is_ignored = true;
+        }
+        break;
+    }
+    case VOUT_DISPLAY_EVENT_MOUSE_PRESSED:
+    case VOUT_DISPLAY_EVENT_MOUSE_RELEASED: {
+        const int button = (int)va_arg(args, int);
+        const int button_mask = 1 << button;
+
+        /* Ignore inconsistent event */
+        if ((event == VOUT_DISPLAY_EVENT_MOUSE_PRESSED  &&  (osys->mouse.state.i_pressed & button_mask)) ||
+            (event == VOUT_DISPLAY_EVENT_MOUSE_RELEASED && !(osys->mouse.state.i_pressed & button_mask))) {
+            is_ignored = true;
+            break;
+        }
+
+        /* */
+        msg_Dbg(vd, "VoutDisplayEvent 'mouse button' %d t=%d", button, event);
+
+        m.b_double_click = false;
+        if (event == VOUT_DISPLAY_EVENT_MOUSE_PRESSED)
+            m.i_pressed |= button_mask;
+        else
+            m.i_pressed &= ~button_mask;
+        break;
+    }
+    case VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK:
+        msg_Dbg(vd, "VoutDisplayEvent 'double click'");
+
+        m.b_double_click = true;
+        break;
+    default:
+        assert(0);
+    }
+
+    if (is_ignored)
+        return;
 
     /* Emulate double-click if needed */
     if (!vd->info.has_double_click &&
@@ -444,13 +505,14 @@ static void VoutDisplayEventMouse(vout_display_t *vd, const vlc_mouse_t *mouse)
     /* */
     osys->mouse.state = m;
 
-    vout_SendDisplayEventMouse(osys->vout, &m);
-
     /* */
     osys->mouse.is_hidden = false;
     if (!vd->info.has_hide_mouse)
         osys->mouse.last_moved = mdate();
+
+    /* */
     vout_SendEventMouseVisible(osys->vout);
+    vout_SendDisplayEventMouse(osys->vout, &m);
 }
 
 static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
@@ -469,69 +531,13 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         vout_SendEventKey(osys->vout, key);
         break;
     }
-    case VOUT_DISPLAY_EVENT_MOUSE_STATE: {
-        const int x = (int)va_arg(args, int);
-        const int y = (int)va_arg(args, int);
-        const int button_mask = (int)va_arg(args, int);
-
-        vlc_mouse_t m;
-
-        vlc_mouse_Init(&m);
-        m.i_x = x;
-        m.i_y = y;
-        m.i_pressed = button_mask;
-
-        VoutDisplayEventMouse(vd, &m);
-        break;
-    }
-    case VOUT_DISPLAY_EVENT_MOUSE_MOVED: {
-        const int x = (int)va_arg(args, int);
-        const int y = (int)va_arg(args, int);
-        if (x != osys->mouse.state.i_x || y != osys->mouse.state.i_y) {
-            msg_Dbg(vd, "VoutDisplayEvent 'mouse' @%d,%d", x, y);
-
-            /* */
-            vlc_mouse_t m = osys->mouse.state;
-            m.i_x = x;
-            m.i_y = y;
-            m.b_double_click = false;
-
-            VoutDisplayEventMouse(vd, &m);
-        }
-        break;
-    }
+    case VOUT_DISPLAY_EVENT_MOUSE_STATE:
+    case VOUT_DISPLAY_EVENT_MOUSE_MOVED:
     case VOUT_DISPLAY_EVENT_MOUSE_PRESSED:
-    case VOUT_DISPLAY_EVENT_MOUSE_RELEASED: {
-        const int button = (int)va_arg(args, int);
-        const int button_mask = 1 << button;
-
-        /* Ignore inconistent event */
-        if (event == VOUT_DISPLAY_EVENT_MOUSE_PRESSED && (osys->mouse.state.i_pressed & button_mask))
-            break;
-        if (event == VOUT_DISPLAY_EVENT_MOUSE_RELEASED && !(osys->mouse.state.i_pressed & button_mask))
-            break;
-
-        /* */
-        msg_Dbg(vd, "VoutDisplayEvent 'mouse button' %d t=%d", button, event);
-
-        vlc_mouse_t m = osys->mouse.state;
-        m.b_double_click = false;
-        if (event == VOUT_DISPLAY_EVENT_MOUSE_PRESSED)
-            m.i_pressed |= button_mask;
-        else
-            m.i_pressed &= ~button_mask;
-
-        VoutDisplayEventMouse(vd, &m);
+    case VOUT_DISPLAY_EVENT_MOUSE_RELEASED:
+    case VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK:
+        VoutDisplayEventMouse(vd, event, args);
         break;
-    }
-    case VOUT_DISPLAY_EVENT_MOUSE_DOUBLE_CLICK: {
-        msg_Dbg(vd, "VoutDisplayEvent 'double click'");
-
-        vlc_mouse_t m = osys->mouse.state;
-        m.b_double_click = true;
-        VoutDisplayEventMouse(vd, &m);
-        break;
-    }
 
     case VOUT_DISPLAY_EVENT_FULLSCREEN: {
         const int is_fullscreen = (int)va_arg(args, int);
