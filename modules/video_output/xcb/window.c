@@ -119,6 +119,19 @@ void set_ascii_prop (xcb_connection_t *conn, xcb_window_t window,
     set_string (conn, window, atom, XA_STRING, value);
 }
 
+static inline
+void set_wm_hints (xcb_connection_t *conn, xcb_window_t window)
+{
+    static const uint32_t wm_hints[8] = {
+        3, /* flags: Input, Initial state */
+        1, /* input: True */
+        1, /* initial state: Normal */
+        0, 0, 0, 0, 0, /* Icon */
+    };
+    xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, XA_WM_HINTS,
+                         XA_WM_HINTS, 32, 8, wm_hints);
+}
+
 /** Set the Window ICCCM client machine property */
 static inline
 void set_hostname_prop (xcb_connection_t *conn, xcb_window_t window)
@@ -256,6 +269,7 @@ static int Open (vlc_object_t *obj)
                   vlc_pgettext ("ASCII", "VLC media player"));
     set_ascii_prop (conn, window, XA_WM_ICON_NAME,
                     vlc_pgettext ("ASCII", "VLC"));
+    set_wm_hints (conn, window);
     xcb_change_property (conn, XCB_PROP_MODE_REPLACE, window, XA_WM_CLASS,
                          XA_STRING, 8, 8, "vlc\0Vlc");
     set_hostname_prop (conn, window);
