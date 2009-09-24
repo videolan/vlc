@@ -2367,6 +2367,33 @@ static char* FontConfig_Select( FcConfig* priv, const char* family,
     FcPatternDestroy( p_pat );
     return strdup( (const char*)val_s );
 }
+#else
+
+static void SetupLine( filter_t *p_filter, const char *psz_text_in,
+                       uint32_t **psz_text_out, uint32_t *pi_runs,
+                       uint32_t **ppi_run_lengths, ft_style_t ***ppp_styles,
+                       ft_style_t *p_style )
+{
+        VLC_UNUSED(p_filter);
+        VLC_UNUSED(psz_text_in);
+        VLC_UNUSED(psz_text_out);
+        VLC_UNUSED(pi_runs);
+        VLC_UNUSED(ppi_run_lengths);
+        VLC_UNUSED(ppp_styles);
+        VLC_UNUSED(p_style);
+}
+
+static ft_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
+        font_stack_t **p_fonts, bool b_bold, bool b_italic,
+        bool b_uline )
+{
+        VLC_UNUSED(p_sys);
+        VLC_UNUSED(p_fonts);
+        VLC_UNUSED(b_bold);
+        VLC_UNUSED(b_italic);
+        VLC_UNUSED(b_uline);
+        return NULL;
+}
 #endif
 
 static void FreeLine( line_desc_t *p_line )
