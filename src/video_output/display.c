@@ -445,6 +445,12 @@ static void VoutDisplayEventMouse(vout_display_t *vd, const vlc_mouse_t *mouse)
     osys->mouse.state = m;
 
     vout_SendDisplayEventMouse(osys->vout, &m);
+
+    /* */
+    osys->mouse.is_hidden = false;
+    if (!vd->info.has_hide_mouse)
+        osys->mouse.last_moved = mdate();
+    vout_SendEventMouseVisible(osys->vout);
 }
 
 static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
@@ -485,11 +491,6 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
             msg_Dbg(vd, "VoutDisplayEvent 'mouse' @%d,%d", x, y);
 
             /* */
-            osys->mouse.is_hidden = false;
-            if (!vd->info.has_hide_mouse)
-                osys->mouse.last_moved = mdate();
-            vout_SendEventMouseVisible(osys->vout);
-
             vlc_mouse_t m = osys->mouse.state;
             m.i_x = x;
             m.i_y = y;
@@ -512,11 +513,6 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
 
         /* */
         msg_Dbg(vd, "VoutDisplayEvent 'mouse button' %d t=%d", button, event);
-
-        osys->mouse.is_hidden = false;
-        if (!vd->info.has_hide_mouse)
-            osys->mouse.last_moved = mdate();
-        vout_SendEventMouseVisible(osys->vout);
 
         vlc_mouse_t m = osys->mouse.state;
         m.b_double_click = false;
