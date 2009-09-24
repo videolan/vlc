@@ -59,10 +59,12 @@
 /* Format string sanity checks */
 #ifdef __GNUC__
 #   define LIBVLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
+#   define LIBVLC_FORMAT_ARG(x) __attribute__ ((format_arg(x)))
 #   define LIBVLC_USED __attribute__ ((warn_unused_result))
 #   define LIBVLC_MALLOC __attribute__ ((malloc))
 #else
 #   define LIBVLC_FORMAT(x,y)
+#   define LIBVLC_FORMAT_ARG(x)
 #   define LIBVLC_USED
 #   define LIBVLC_MALLOC
 #endif
@@ -794,8 +796,9 @@ VLC_EXPORT( void *, vlc_memset, ( void *, int, size_t ) );
 /*****************************************************************************
  * I18n stuff
  *****************************************************************************/
-VLC_EXPORT( char *, vlc_gettext, ( const char *msgid ) LIBVLC_USED );
+VLC_EXPORT( char *, vlc_gettext, ( const char *msgid ) LIBVLC_FORMAT_ARG(1) );
 
+LIBVLC_FORMAT_ARG(2)
 static inline const char *vlc_pgettext( const char *ctx, const char *id )
 {
     const char *tr = vlc_gettext( id );
