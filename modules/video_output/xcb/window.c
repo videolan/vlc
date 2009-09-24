@@ -90,6 +90,8 @@ vlc_module_end ()
 static int Control (vout_window_t *, int, va_list ap);
 static void *Thread (void *);
 
+#define MATCHBOX_HACK 1 /* Matchbox focus hack */
+
 struct vout_window_sys_t
 {
     xcb_connection_t *conn;
@@ -100,6 +102,9 @@ struct vout_window_sys_t
     xcb_atom_t wm_state;
     xcb_atom_t wm_state_above;
     xcb_atom_t wm_state_fullscreen;
+#ifdef MATCHBOX_HACK
+    xcb_atom_t mb_current_app_window;
+#endif
 };
 
 /** Set an X window property from a nul-terminated string */
@@ -185,10 +190,17 @@ static void CacheAtoms (vout_window_sys_t *p_sys)
     wm_state_ck = intern_string (conn, "_NET_WM_STATE");
     wm_state_above_ck = intern_string (conn, "_NET_WM_STATE_ABOVE");
     wm_state_fs_ck = intern_string (conn, "_NET_WM_STATE_FULLSCREEN");
+#ifdef MATCHBOX_HACK
+    xcb_intern_atom_cookie_t mb_current_app_window;
+    mb_current_app_window = intern_string (conn, "_MB_CURRENT_APP_WINDOW");
+#endif
 
     p_sys->wm_state = get_atom (conn, wm_state_ck);
     p_sys->wm_state_above = get_atom (conn, wm_state_above_ck);
     p_sys->wm_state_fullscreen = get_atom (conn, wm_state_fs_ck);
+#ifdef MATCHBOX_HACK
+    p_sys->mb_current_app_window = get_atom (conn, mb_current_app_window);
+#endif
 }
 
 /**
@@ -302,6 +314,12 @@ static int Open (vlc_object_t *obj)
     xcb_atom_t wm_window_role = get_atom (conn, wm_window_role_ck);
     set_ascii_prop (conn, window, wm_window_role, "vlc-video");
 
+#ifdef MATCHBOX_HACK
+    uint32_t value = XCB_EVENT_MASK_PROPERTY_CHANGE;
+    xcb_change_window_attributes (conn, scr->root,
+                                  XCB_CW_EVENT_MASK, &value);
+#endif
+
     /* Make the window visible */
     xcb_map_window (conn, window);
 
@@ -314,8 +332,11 @@ static int Open (vlc_object_t *obj)
      && vlc_clone (&p_sys->thread, Thread, wnd, VLC_THREAD_PRIORITY_LOW))
         DestroyKeyHandler (p_sys->keys);
 
+#ifdef MATCHBOX_HACK
+    xcb_set_input_focus (p_sys->conn, XCB_INPUT_FOCUS_POINTER_ROOT,
+                         wnd->handle.xid, XCB_CURRENT_TIME);
+#endif
     xcb_flush (conn); /* Make sure map_window is sent (should be useless) */
-
     return VLC_SUCCESS;
 
 error:
@@ -368,7 +389,34 @@ static void *Thread (void *data)
         {
             if (ProcessKeyEvent (p_sys->keys, ev) == 0)
                 continue;
-            msg_Dbg (wnd, "unhandled event: %"PRIu8, ev->response_type);
+#ifdef MATCHBOX_HACK
+            if ((ev->response_type & 0x7f) == XCB_PROPERTY_NOTIFY)
+            {
+                const xcb_property_notify_event_t *pne =
+                    (xcb_property_notify_event_t *)ev;
+                if (pne->atom == p_sys->mb_current_app_window
+                 && pne->state == XCB_PROPERTY_NEW_VALUE)
+                {
+                    xcb_get_property_reply_t *r =
+                        xcb_get_property_reply (conn,
+                            xcb_get_property (conn, 0, pne->window, pne->atom,
+                                              XA_WINDOW, 0, 4), NULL);
+                    if (r != NULL
+                     && !memcmp (xcb_get_property_value (r), &wnd->handle.xid,
+                                 4))
+                    {
+                        msg_Dbg (wnd, "asking Matchbox for input focus");
+                        xcb_set_input_focus (conn,
+                                             XCB_INPUT_FOCUS_POINTER_ROOT,
+                                             wnd->handle.xid, pne->time);
+                        xcb_flush (conn);
+                    }
+                    free (r);
+                }
+            }
+            else
+#endif
+                msg_Dbg (wnd, "unhandled event: %"PRIu8, ev->response_type);
             free (ev);
         }
         vlc_restorecancel (canc);
