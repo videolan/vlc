@@ -6,6 +6,7 @@ SOURCES_a52tofloat32 = a52tofloat32.c
 SOURCES_dtstospdif = dtstospdif.c
 SOURCES_dtstofloat32 = dtstofloat32.c
 SOURCES_mpgatofixed32 = mpgatofixed32.c
+SOURCES_audio_format = format.c
 
 libvlc_LTLIBRARIES += \
 	libconverter_fixed_plugin.la \

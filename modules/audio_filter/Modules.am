@@ -1,7 +1,6 @@
 SUBDIRS = channel_mixer converter resampler spatializer
 SOURCES_equalizer = equalizer.c equalizer_presets.h
 SOURCES_normvol = normvol.c
-SOURCES_audio_format = converter/format.c
 SOURCES_param_eq = param_eq.c
 SOURCES_scaletempo = scaletempo.c
 SOURCES_chorus_flanger = chorus_flanger.c
