@@ -1058,7 +1058,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     /* Any thread still running must not assume pl_Hold() succeeds. */
     msg_Dbg( p_libvlc, "removing playlist" );
 
-    libvlc_priv(p_playlist->p_libvlc)->p_playlist = NULL;
+    libvlc_priv(p_libvlc)->p_playlist = NULL;
     barrier();  /* FIXME is that correct ? */
 
     vlc_object_release( p_playlist );
