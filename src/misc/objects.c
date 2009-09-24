@@ -81,9 +81,6 @@ static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 
 static void vlc_object_destroy( vlc_object_t *p_this );
 static void vlc_object_detach_unlocked (vlc_object_t *p_this);
-#ifndef NDEBUG
-static void vlc_object_dump( vlc_object_t *p_this );
-#endif
 
 /*****************************************************************************
  * Local structure lock
@@ -919,19 +916,6 @@ void vlc_list_release( vlc_list_t *p_list )
     free( p_list->p_values );
     free( p_list );
 }
-
-/*****************************************************************************
- * dump an object. (Debug function)
- *****************************************************************************/
-#ifndef NDEBUG
-static void vlc_object_dump( vlc_object_t *p_this )
-{
-    char psz_foo[2 * MAX_DUMPSTRUCTURE_DEPTH + 1];
-    psz_foo[0] = '|';
-
-    DumpStructure( p_this, 0, psz_foo );
-}
-#endif
 
 /* Following functions are local */
 
