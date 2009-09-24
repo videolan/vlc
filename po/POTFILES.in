@@ -309,6 +309,7 @@ modules/access/vcdx/vcdplayer.c
 modules/access/vcdx/vcdplayer.h
 modules/access/videodev2.h
 modules/access/videodev_mjpeg.h
+modules/access/zip/zipstream.c
 modules/access_output/bonjour.c
 modules/access_output/bonjour.h
 modules/access_output/dummy.c
@@ -329,10 +330,11 @@ modules/audio_filter/converter/dtstofloat32.c
 modules/audio_filter/converter/dtstospdif.c
 modules/audio_filter/converter/fixed.c
 modules/audio_filter/converter/float.c
+modules/audio_filter/converter/format.c
 modules/audio_filter/converter/mpgatofixed32.c
+modules/audio_filter/converter/neon.c
 modules/audio_filter/equalizer.c
 modules/audio_filter/equalizer_presets.h
-modules/audio_filter/format.c
 modules/audio_filter/normvol.c
 modules/audio_filter/param_eq.c
 modules/audio_filter/resampler/bandlimited.c
@@ -1102,6 +1104,7 @@ modules/packetizer/mpegvideo.c
 modules/packetizer/vc1.c
 modules/services_discovery/bonjour.c
 modules/services_discovery/hal.c
+modules/services_discovery/mediadirs.c
 modules/services_discovery/podcast.c
 modules/services_discovery/sap.c
 modules/services_discovery/shout.c
@@ -1126,6 +1129,7 @@ modules/stream_out/rtp.c
 modules/stream_out/rtp.h
 modules/stream_out/rtpfmt.c
 modules/stream_out/rtsp.c
+modules/stream_out/smem.c
 modules/stream_out/standard.c
 modules/stream_out/switcher.c
 modules/stream_out/transcode.c
@@ -1142,6 +1146,7 @@ modules/video_chroma/i420_yuy2.h
 modules/video_chroma/i422_i420.c
 modules/video_chroma/i422_yuy2.c
 modules/video_chroma/i422_yuy2.h
+modules/video_chroma/neon.c
 modules/video_chroma/yuy2_i420.c
 modules/video_chroma/yuy2_i422.c
 modules/video_filter/adjust.c
@@ -1200,6 +1205,7 @@ modules/video_filter/invert.c
 modules/video_filter/logo.c
 modules/video_filter/magnify.c
 modules/video_filter/marq.c
+modules/video_filter/mirror.c
 modules/video_filter/mosaic.c
 modules/video_filter/mosaic.h
 modules/video_filter/motionblur.c
@@ -1259,6 +1265,7 @@ modules/video_output/xcb/x11.c
 modules/video_output/xcb/xvideo.c
 modules/video_output/yuv.c
 modules/visualization/goom.c
+modules/visualization/projectm.cpp
 modules/visualization/visual/effects.c
 modules/visualization/visual/fft.c
 modules/visualization/visual/fft.h
