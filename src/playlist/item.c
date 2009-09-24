@@ -902,6 +902,10 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
         set_current_status_item( p_playlist, NULL );
     }
 
+    ARRAY_BSEARCH( p_playlist->current,->i_id, int, i_id, i );
+    if( i != -1 )
+        ARRAY_REMOVE( p_playlist->current, i );
+
     PL_DEBUG( "deleting item `%s'", p_item->p_input->psz_name );
 
     /* Remove the item from its parent */
