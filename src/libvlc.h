@@ -185,7 +185,6 @@ typedef struct vlc_object_internals_t
     vlc_destructor_t pf_destructor;
 
     /* Objects tree structure */
-    vlc_object_t    *prev, *next;
     vlc_object_t   **pp_children;
     int              i_children;
 } vlc_object_internals_t;
