@@ -597,7 +597,8 @@ void __vlc_object_release( vlc_object_t *p_this )
 
     if( b_should_destroy )
     {
-        if (p_this->p_parent)
+        parent = p_this->p_parent;
+        if (parent)
             /* Detach from parent to protect against FIND_CHILDREN */
             vlc_object_detach_unlocked (p_this);
 
