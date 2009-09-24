@@ -116,7 +116,7 @@ static inline
 void set_ascii_prop (xcb_connection_t *conn, xcb_window_t window,
                      xcb_atom_t atom, const char *value)
 {
-    set_string (conn, window, atom, XA_STRING, value);
+    set_string (conn, window, XA_STRING, atom, value);
 }
 
 static inline
