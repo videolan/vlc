@@ -60,9 +60,11 @@
 #ifdef __GNUC__
 #   define LIBVLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
 #   define LIBVLC_USED __attribute__ ((warn_unused_result))
+#   define LIBVLC_MALLOC __attribute__ ((malloc))
 #else
 #   define LIBVLC_FORMAT(x,y)
 #   define LIBVLC_USED
+#   define LIBVLC_MALLOC
 #endif
 
 /*****************************************************************************
