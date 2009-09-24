@@ -75,6 +75,7 @@ static picture_t *Filter( filter_t *, picture_t * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
+    set_shortname( N_("Cropadd") )
     set_description( N_("Video scaling filter") )
     set_capability( "video filter2", 0 )
     set_callbacks( OpenFilter, CloseFilter )

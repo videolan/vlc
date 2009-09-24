@@ -101,6 +101,7 @@ static int alloc_init( filter_t *, void * );
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
+    set_shortname( N_("Canvas") )
     set_description( N_("Automatically resize and pad a video") )
     set_capability( "video filter2", 0 )
     set_callbacks( Activate, Destroy )
