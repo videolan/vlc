@@ -819,6 +819,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
 
         PrintObject( p_object, "" );
 
+        vlc_mutex_lock( &vlc_internals( p_object )->var_lock );
         if( !vlc_internals( p_object )->i_vars )
             printf( " `-o No variables\n" );
         for( i = 0; i < vlc_internals( p_object )->i_vars; i++ )
@@ -889,6 +890,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
             }
             printf( "\n" );
         }
+        vlc_mutex_unlock( &vlc_internals( p_object )->var_lock );
     }
     libvlc_unlock (p_this->p_libvlc);
 
