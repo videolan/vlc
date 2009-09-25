@@ -1115,9 +1115,13 @@ static int AccessOpen( vlc_object_t * p_this )
         if( FindMainDevice( p_this, p_sys, false ) == VLC_SUCCESS)
         {
             if( p_sys->io == IO_METHOD_READ )
+            {
                 ACCESS_SET_CALLBACKS( AccessReadStream, NULL, AccessControl, NULL );
+            }
             else
+            {
                 ACCESS_SET_CALLBACKS( NULL, AccessRead, AccessControl, NULL );
+            }
             return VLC_SUCCESS;
         }
     }
@@ -1128,9 +1132,13 @@ static int AccessOpen( vlc_object_t * p_this )
     if( FindMainDevice( p_this, p_sys, false ) == VLC_SUCCESS )
     {
         if( p_sys->io == IO_METHOD_READ )
+        {
             ACCESS_SET_CALLBACKS( AccessReadStream, NULL, AccessControl, NULL );
+        }
         else
+        {
             ACCESS_SET_CALLBACKS( NULL, AccessRead, AccessControl, NULL );
+        }
         return VLC_SUCCESS;
     }
 
@@ -2395,18 +2403,24 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     if( p_sys->io == IO_METHOD_AUTO )
     {
         if( p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING )
-        {
-            msg_Err(p_obj, "Set p_sys->io to MMAP" );
             p_sys->io = IO_METHOD_MMAP;
-        }
         else if( p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE )
-        {
-            msg_Err(p_obj, "Set p_sys->io to READ" );
             p_sys->io = IO_METHOD_READ;
-        }
         else
             msg_Err( p_obj, "No known I/O method supported" );
     }
+
+    if( p_sys->dev_cap.capabilities & V4L2_CAP_RDS_CAPTURE )
+        msg_Dbg( p_obj, "device supports RDS" );
+
+    if( p_sys->dev_cap.capabilities & V4L2_CAP_HW_FREQ_SEEK )
+        msg_Dbg( p_obj, "device supports hardware frequency seeking" );
+
+    if( p_sys->dev_cap.capabilities & V4L2_CAP_VBI_CAPTURE )
+        msg_Dbg( p_obj, "device support raw VBI capture" );
+
+    if( p_sys->dev_cap.capabilities & V4L2_CAP_SLICED_VBI_CAPTURE )
+        msg_Dbg( p_obj, "device support sliced VBI capture" );
 
     /* Now, enumerate all the video inputs. This is useless at the moment
        since we have no way to present that info to the user except with
