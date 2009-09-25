@@ -151,7 +151,7 @@ static uint8_t *SetLength( uint8_t *p_data, int i_length )
  * Transport layer
  */
 
-#define MAX_TPDU_SIZE  2048
+#define MAX_TPDU_SIZE  4096
 #define MAX_TPDU_DATA  (MAX_TPDU_SIZE - 4)
 
 #define DATA_INDICATOR 0x80
