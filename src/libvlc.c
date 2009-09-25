@@ -307,7 +307,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     bool   b_exit = false;
     int          i_ret = VLC_EEXIT;
     playlist_t  *p_playlist = NULL;
-    vlc_value_t  val;
+    char        *psz_val;
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 # if defined (WIN32) || defined (__APPLE__)
@@ -1011,16 +1011,15 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Get --open argument
      */
-    var_Create( p_libvlc, "open", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_libvlc, "open", &val );
-    if ( val.psz_string != NULL && *val.psz_string )
+    psz_val = var_CreateGetString( p_libvlc, "open" );
+    if ( psz_val != NULL && *psz_val )
     {
         playlist_t *p_playlist = pl_Hold( p_libvlc );
-        playlist_AddExt( p_playlist, val.psz_string, NULL, PLAYLIST_INSERT, 0,
+        playlist_AddExt( p_playlist, psz_val, NULL, PLAYLIST_INSERT, 0,
                          -1, 0, NULL, 0, true, pl_Unlocked );
         pl_Release( p_libvlc );
     }
-    free( val.psz_string );
+    free( psz_val );
 
     return VLC_SUCCESS;
 }
