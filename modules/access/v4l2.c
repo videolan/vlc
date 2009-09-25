@@ -209,6 +209,7 @@ static void AccessClose( vlc_object_t * );
 #define ASPECT_LONGTEXT N_("Define input picture aspect-ratio to use. Default is 4:3" )
 
 typedef enum {
+    IO_METHOD_AUTO,
     IO_METHOD_READ,
     IO_METHOD_MMAP,
     IO_METHOD_USERPTR,
@@ -220,9 +221,9 @@ static const char *const psz_standards_list_text[] =
     { N_("Default"), N_("SECAM"), N_("PAL"),  N_("NTSC") };
 
 static const int i_iomethod_list[] =
-    { IO_METHOD_READ, IO_METHOD_MMAP, IO_METHOD_USERPTR };
+    { IO_METHOD_AUTO, IO_METHOD_READ, IO_METHOD_MMAP, IO_METHOD_USERPTR };
 static const char *const psz_iomethod_list_text[] =
-    { N_("READ"), N_("MMAP"),  N_("USERPTR") };
+    { N_("AUTO"), N_("READ"), N_("MMAP"),  N_("USERPTR") };
 
 static const int i_tuner_audio_modes_list[] =
     { V4L2_TUNER_MODE_MONO, V4L2_TUNER_MODE_STEREO,
@@ -255,7 +256,7 @@ vlc_module_begin ()
                 true )
     add_integer( CFG_PREFIX "audio-input", 0, NULL, AUDIO_INPUT_TEXT,
                  AUDIO_INPUT_LONGTEXT, true )
-    add_integer( CFG_PREFIX "io", IO_METHOD_MMAP, NULL, IOMETHOD_TEXT,
+    add_integer( CFG_PREFIX "io", IO_METHOD_AUTO, NULL, IOMETHOD_TEXT,
                  IOMETHOD_LONGTEXT, true )
         change_integer_list( i_iomethod_list, psz_iomethod_list_text, NULL )
     add_integer( CFG_PREFIX "width", -1, NULL, WIDTH_TEXT,
@@ -369,6 +370,7 @@ static int AccessControl( access_t *, int, va_list );
 
 static int Demux( demux_t * );
 static block_t *AccessRead( access_t * );
+static ssize_t AccessReadStream( access_t * p_access, uint8_t * p_buffer, size_t i_len );
 
 static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys );
 static block_t* ProcessVideoFrame( vlc_object_t *p_demux, uint8_t *p_frame, size_t );
@@ -812,6 +814,11 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
                     p_sys->io = IO_METHOD_USERPTR;
                     psz_parser += strlen( "userptr" );
                 }
+                else if( !strncmp( psz_parser, "auto", strlen( "auto" ) ) )
+                {
+                    p_sys->io = IO_METHOD_AUTO;
+                    psz_parser += strlen( "auto" );
+                }
                 else
                 {
                     p_sys->io = strtol( psz_parser, &psz_parser, 0 );
@@ -1020,6 +1027,9 @@ static void DemuxClose( vlc_object_t *p_this )
             }
 
             break;
+
+        default:
+            break;
         }
     }
 
@@ -1046,6 +1056,9 @@ static void DemuxClose( vlc_object_t *p_this )
             {
                free( p_sys->p_buffers[i].start );
             }
+            break;
+
+        default:
             break;
         }
         free( p_sys->p_buffers );
@@ -1086,7 +1099,6 @@ static int AccessOpen( vlc_object_t * p_this )
     if( *p_access->psz_access == '\0' ) return VLC_EGENERIC;
 
     access_InitFields( p_access );
-    ACCESS_SET_CALLBACKS( NULL, AccessRead, AccessControl, NULL );
     p_sys = calloc( 1, sizeof( demux_sys_t ));
     if( !p_sys ) return VLC_ENOMEM;
     p_access->p_sys = (access_sys_t*)p_sys;
@@ -1101,14 +1113,26 @@ static int AccessOpen( vlc_object_t * p_this )
         msg_Dbg( p_this, "Trying direct kernel v4l2" );
         use_kernel_v4l2( p_sys );
         if( FindMainDevice( p_this, p_sys, false ) == VLC_SUCCESS)
+        {
+            if( p_sys->io == IO_METHOD_READ )
+                ACCESS_SET_CALLBACKS( AccessReadStream, NULL, AccessControl, NULL );
+            else
+                ACCESS_SET_CALLBACKS( NULL, AccessRead, AccessControl, NULL );
             return VLC_SUCCESS;
+        }
     }
 
     msg_Dbg( p_this, "Trying libv4l2 wrapper" );
     use_libv4l2( p_sys );
 #endif
     if( FindMainDevice( p_this, p_sys, false ) == VLC_SUCCESS )
+    {
+        if( p_sys->io == IO_METHOD_READ )
+            ACCESS_SET_CALLBACKS( AccessReadStream, NULL, AccessControl, NULL );
+        else
+            ACCESS_SET_CALLBACKS( NULL, AccessRead, AccessControl, NULL );
         return VLC_SUCCESS;
+    }
 
     AccessClose( p_this );
     return VLC_EGENERIC;
@@ -1209,6 +1233,46 @@ static block_t *AccessRead( access_t * p_access )
     }
 
     return NULL;
+}
+
+static ssize_t AccessReadStream( access_t * p_access, uint8_t * p_buffer, size_t i_len )
+{
+    demux_sys_t *p_sys = (demux_sys_t *) p_access->p_sys;
+    struct pollfd ufd;
+    int i_ret;
+
+    ufd.fd = p_sys->i_fd;
+    ufd.events = POLLIN;
+
+    if( p_access->info.b_eof )
+        return 0;
+
+    do
+    {
+        if( !vlc_object_alive (p_access) )
+            return 0;
+
+        ufd.revents = 0;
+    }
+    while( ( i_ret = poll( &ufd, 1, 500 ) ) == 0 );
+
+    if( i_ret < 0 )
+    {
+        msg_Err( p_access, "Polling error (%m)." );
+        return -1;
+    }
+
+    i_ret = v4l2_read( p_sys->i_fd, p_buffer, i_len );
+    if( i_ret == 0 )
+    {
+        p_access->info.b_eof = true;
+    }
+    else if( i_ret > 0 )
+    {
+        p_access->info.i_pos += i_ret;
+    }
+
+    return i_ret;
 }
 
 /*****************************************************************************
@@ -1369,6 +1433,8 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
 
         break;
 
+    default:
+        break;
     }
 
     /* Timestamp */
@@ -1855,6 +1921,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
                 msg_Err( p_obj, "device does not support read i/o" );
                 goto open_failed;
             }
+            msg_Dbg( p_obj, "using read i/o" );
             break;
 
         case IO_METHOD_MMAP:
@@ -1864,6 +1931,10 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
                 msg_Err( p_obj, "device does not support streaming i/o" );
                 goto open_failed;
             }
+            if( p_sys->io == IO_METHOD_MMAP )
+                msg_Dbg( p_obj, "using streaming i/o (mmap)" );
+            else
+                msg_Dbg( p_obj, "using streaming i/o (userptr)" );
             break;
 
         default:
@@ -1878,16 +1949,19 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     {
         crop.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
         crop.c = cropcap.defrect; /* reset to default */
-        if( v4l2_ioctl( i_fd, VIDIOC_S_CROP, &crop ) < 0 )
+        if( crop.c.width > 0 && crop.c.height > 0 ) /* Fix for fm tuners */
         {
-            switch( errno )
+            if( v4l2_ioctl( i_fd, VIDIOC_S_CROP, &crop ) < 0 )
             {
-                case EINVAL:
-                    /* Cropping not supported. */
-                    break;
-                default:
-                    /* Errors ignored. */
-                    break;
+                switch( errno )
+                {
+                    case EINVAL:
+                        /* Cropping not supported. */
+                        break;
+                    default:
+                        /* Errors ignored. */
+                        break;
+                }
             }
         }
     }
@@ -2140,7 +2214,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     switch( p_sys->io )
     {
     case IO_METHOD_READ:
-        if( InitRead( p_obj, p_sys, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
+        if( b_demux )
+            if( InitRead( p_obj, p_sys, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
         break;
 
     case IO_METHOD_MMAP:
@@ -2151,17 +2226,20 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         if( InitUserP( p_obj, p_sys, i_fd, fmt.fmt.pix.sizeimage ) != VLC_SUCCESS ) goto open_failed;
         break;
 
+    default:
+        goto open_failed;
+        break;
     }
-
-    /* Add */
-    es_fmt.video.i_width  = p_sys->i_width;
-    es_fmt.video.i_height = p_sys->i_height;
-
-    /* Get aspect-ratio */
-    es_fmt.video.i_aspect = p_sys->i_aspect;
 
     if( b_demux )
     {
+        /* Add */
+        es_fmt.video.i_width  = p_sys->i_width;
+        es_fmt.video.i_height = p_sys->i_height;
+
+        /* Get aspect-ratio */
+        es_fmt.video.i_aspect = p_sys->i_aspect;
+
         demux_t *p_demux = (demux_t *) p_obj;
         msg_Dbg( p_demux, "added new video es %4.4s %dx%d",
             (char*)&es_fmt.i_codec, es_fmt.video.i_width, es_fmt.video.i_height );
@@ -2228,6 +2306,10 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             goto open_failed;
         }
 
+        break;
+
+    default:
+        goto open_failed;
         break;
     }
 
@@ -2296,10 +2378,12 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
     msg_Dbg( p_obj, "the device has the capabilities: (%c) Video Capure, "
                                                        "(%c) Audio, "
-                                                       "(%c) Tuner",
+                                                       "(%c) Tuner, "
+                                                       "(%c) Radio",
              ( p_sys->dev_cap.capabilities & V4L2_CAP_VIDEO_CAPTURE  ? 'X':' '),
              ( p_sys->dev_cap.capabilities & V4L2_CAP_AUDIO  ? 'X':' '),
-             ( p_sys->dev_cap.capabilities & V4L2_CAP_TUNER  ? 'X':' ') );
+             ( p_sys->dev_cap.capabilities & V4L2_CAP_TUNER  ? 'X':' '),
+             ( p_sys->dev_cap.capabilities & V4L2_CAP_RADIO  ? 'X':' ') );
 
     msg_Dbg( p_obj, "supported I/O methods are: (%c) Read/Write, "
                                                  "(%c) Streaming, "
@@ -2307,6 +2391,22 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             ( p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE ? 'X':' ' ),
             ( p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING ? 'X':' ' ),
             ( p_sys->dev_cap.capabilities & V4L2_CAP_ASYNCIO ? 'X':' ' ) );
+
+    if( p_sys->io == IO_METHOD_AUTO )
+    {
+        if( p_sys->dev_cap.capabilities & V4L2_CAP_STREAMING )
+        {
+            msg_Err(p_obj, "Set p_sys->io to MMAP" );
+            p_sys->io = IO_METHOD_MMAP;
+        }
+        else if( p_sys->dev_cap.capabilities & V4L2_CAP_READWRITE )
+        {
+            msg_Err(p_obj, "Set p_sys->io to READ" );
+            p_sys->io = IO_METHOD_READ;
+        }
+        else
+            msg_Err( p_obj, "No known I/O method supported" );
+    }
 
     /* Now, enumerate all the video inputs. This is useless at the moment
        since we have no way to present that info to the user except with
