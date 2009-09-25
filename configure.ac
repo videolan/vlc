@@ -2299,7 +2299,16 @@ then
       then
         AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.1])
       fi
-    ])
+    ],
+    [#if defined( HAVE_STDINT_H )
+#   include <stdint.h>
+#elif defined( HAVE_INTTYPES_H )
+#   include <inttypes.h>
+#endif
+#include <dvbpsi/dvbpsi.h>
+#include <dvbpsi/descriptor.h>
+#include <dvbpsi/pat.h>
+#include <dvbpsi/pmt.h>])
     CPPFLAGS="${CPPFLAGS_save}"
   ;;
   esac
