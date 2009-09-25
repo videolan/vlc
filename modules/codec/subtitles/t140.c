@@ -101,5 +101,9 @@ static block_t *Encode( encoder_t *p_enc, subpicture_t *p_spu )
     p_block = block_New( p_enc, len );
     memcpy( p_block->p_buffer, p_region->psz_text, len );
 
+    p_block->i_pts = p_block->i_dts = p_spu->i_start;
+    if( !p_spu->b_ephemer && ( p_spu->i_stop > p_spu->i_start ) )
+        p_block->i_length = p_spu->i_stop - p_spu->i_start;
+
     return p_block;
 }
