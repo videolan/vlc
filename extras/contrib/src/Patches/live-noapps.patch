@@ -1,13 +1,11 @@
---- live/Makefile.tail.orig	2007-05-14 17:15:25.000000000 +0200
-+++ live/Makefile.tail	2007-05-14 17:16:17.000000000 +0200
-@@ -18,9 +18,7 @@
- ALL =	$(LIVEMEDIA_LIB) \
- 	$(GROUPSOCK_LIB) \
- 	$(USAGE_ENVIRONMENT_LIB) \
--	$(BASIC_USAGE_ENVIRONMENT_LIB) \
--	$(TESTPROGS_APP) \
--	$(MEDIA_SERVER_APP)
-+	$(BASIC_USAGE_ENVIRONMENT_LIB)
- all:	$(ALL)
+--- live/Makefile.tail.orig	2009-09-21 03:42:12.000000000 +0200
++++ live/Makefile.tail	2009-09-25 10:38:11.000000000 +0200
+@@ -14,8 +14,6 @@
+ 	cd $(GROUPSOCK_DIR) ; $(MAKE)
+ 	cd $(USAGE_ENVIRONMENT_DIR) ; $(MAKE)
+ 	cd $(BASIC_USAGE_ENVIRONMENT_DIR) ; $(MAKE)
+-	cd $(TESTPROGS_DIR) ; $(MAKE)
+-	cd $(MEDIA_SERVER_DIR) ; $(MAKE)
  
- 
+ clean:
+ 	cd $(LIVEMEDIA_DIR) ; $(MAKE) clean
