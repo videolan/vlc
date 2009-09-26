@@ -4950,8 +4950,8 @@ AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 dnl Tests for Osso and Xsp
 AC_CHECK_LIB(osso, osso_display_blanking_pause, [
   PKG_CHECK_MODULES(GLIB2, glib-2.0, [
-    VLC_ADD_CPPFLAGS([xvmc glx omapfb],[-DHAVE_OSSO ${DBUS_CFLAGS} ${GLIB2_CFLAGS}])
-    VLC_ADD_LIBS([xvmc glx omapfb],[-losso])
+    VLC_ADD_CPPFLAGS([xvmc glx],[-DHAVE_OSSO ${DBUS_CFLAGS} ${GLIB2_CFLAGS}])
+    VLC_ADD_LIBS([xvmc glx],[-losso])
  ])
 ])
 AC_CHECK_LIB(Xsp, XSPSetPixelDoubling,[

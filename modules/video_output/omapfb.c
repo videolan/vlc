@@ -41,10 +41,6 @@
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
 
-#ifdef HAVE_OSSO
-#include <libosso.h>
-#endif
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
@@ -73,10 +69,6 @@ static void UpdateScreen     ( vout_thread_t *,
 static int  InitWindow       ( vout_thread_t * );
 static void CreateWindow     ( vout_sys_t * );
 static void ToggleFullScreen ( vout_thread_t * );
-
-#ifdef HAVE_OSSO
-static const int i_backlight_on_interval = 300;
-#endif
 
 /*****************************************************************************
  * Module descriptor
@@ -165,11 +157,6 @@ struct vout_sys_t
     /* Dummy memory */
     int        i_null_fd;
     uint8_t   *p_null;
-
-#ifdef HAVE_OSSO
-    osso_context_t      *p_octx;
-    int                 i_backlight_on_counter;
-#endif
 };
 
 /*****************************************************************************
@@ -211,16 +198,6 @@ static int Create( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-#ifdef HAVE_OSSO
-    p_vout->p_sys->i_backlight_on_counter = i_backlight_on_interval;
-    p_vout->p_sys->p_octx = osso_initialize( "vlc", VERSION, 0, NULL );
-    if ( p_vout->p_sys->p_octx == NULL ) {
-        msg_Err( p_vout, "Could not get osso context" );
-    } else {
-        msg_Dbg( p_vout, "Initialized osso context" );
-    }
-#endif
-
     return VLC_SUCCESS;
 }
 
@@ -240,13 +217,6 @@ static void Destroy( vlc_object_t *p_this )
         vout_window_Delete( p_vout->p_sys->owner_window );
         XCloseDisplay( p_vout->p_sys->p_display );
     }
-
-#ifdef HAVE_OSSO
-    if ( p_vout->p_sys->p_octx != NULL ) {
-        msg_Dbg( p_vout, "Deinitializing osso context" );
-        osso_deinitialize( p_vout->p_sys->p_octx );
-    }
-#endif
 
     /* Destroy structure */
     free( p_vout->p_sys );
@@ -439,23 +409,6 @@ static int Manage( vout_thread_t *p_vout )
             return VLC_EGENERIC;
         }
     }
-
-
-#ifdef HAVE_OSSO
-    if ( p_vout->p_sys->p_octx != NULL ) {
-        if ( p_vout->p_sys->i_backlight_on_counter == i_backlight_on_interval ) {
-            if ( osso_display_blanking_pause( p_vout->p_sys->p_octx ) != OSSO_OK ) {
-                msg_Err( p_vout, "Could not disable backlight blanking" );
-        } else {
-                msg_Dbg( p_vout, "Backlight blanking disabled" );
-            }
-            p_vout->p_sys->i_backlight_on_counter = 0;
-        } else {
-            p_vout->p_sys->i_backlight_on_counter ++;
-        }
-    }
-#endif
-
     return VLC_SUCCESS;
 }
 
