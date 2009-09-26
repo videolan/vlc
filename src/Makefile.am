@@ -511,14 +511,14 @@ revision.c: revision.txt
 	echo "const char psz_vlc_changeset[] = \"$$(cat revision.txt)\";" \
 		> revision.c
 
-revision.txt:
+revision.txt: Makefile.am
 	$(MAKE) stamp-revision
 	touch revision.txt
 
 stamp-revision:
 	rm -f -- revision.tmp
 	(git --git-dir="$(top_srcdir)/.git/" describe --tags --long \
-		--always || echo exported) > revision.tmp
+		--match '?.*.*' --always || echo exported) > revision.tmp
 	if diff revision.tmp revision.txt >/dev/null; then \
 		rm -f -- revision.tmp; \
 	else \
