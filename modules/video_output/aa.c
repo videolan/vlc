@@ -126,7 +126,7 @@ static int Open(vlc_object_t *object)
     sys->state = *vd->cfg;
     sys->state.is_fullscreen = false;
     vout_display_SendEventFullscreen(vd, false);
-    vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height);
+    vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height, false);
 
     return VLC_SUCCESS;
 
@@ -284,7 +284,7 @@ static void Manage(vout_display_t *vd)
             aa_resize(sys->aa_context);
             vout_display_SendEventDisplaySize(vd,
                                               aa_imgwidth(sys->aa_context),
-                                              aa_imgheight(sys->aa_context));
+                                              aa_imgheight(sys->aa_context), false);
             break;
 
         /* TODO keys support to complete */

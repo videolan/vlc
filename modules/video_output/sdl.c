@@ -344,7 +344,7 @@ static int Open(vlc_object_t *object)
     vd->manage  = Manage;
 
     /* */
-    vout_display_SendEventDisplaySize(vd, display_width, display_height);
+    vout_display_SendEventDisplaySize(vd, display_width, display_height, vd->cfg->is_fullscreen);
     return VLC_SUCCESS;
 
 error:
@@ -512,7 +512,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
 
             vout_display_PlacePicture(&sys->place, &vd->source, &cfg, !sys->overlay);
         }
-        vout_display_SendEventDisplaySize(vd, cfg.display.width, cfg.display.height);
+        vout_display_SendEventDisplaySize(vd, cfg.display.width, cfg.display.height, cfg.is_fullscreen);
         return VLC_SUCCESS;
     }
     case VOUT_DISPLAY_CHANGE_ZOOM:
@@ -652,7 +652,7 @@ static void Manage(vout_display_t *vd)
         }
 
         case SDL_VIDEORESIZE:
-            vout_display_SendEventDisplaySize(vd, event.resize.w, event.resize.h);
+            vout_display_SendEventDisplaySize(vd, event.resize.w, event.resize.h, vd->cfg->is_fullscreen);
             break;
 
         default:

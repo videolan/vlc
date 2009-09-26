@@ -269,7 +269,7 @@ static int Open(vlc_object_t *object)
 
     /* */
     vout_display_SendEventFullscreen(vd, true);
-    vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height);
+    vout_display_SendEventDisplaySize(vd, fmt.i_width, fmt.i_height, true);
     return VLC_SUCCESS;
 }
 

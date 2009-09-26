@@ -79,7 +79,7 @@ HandleParentStructure (vout_display_t *vd, xcb_configure_notify_event_t *ev)
 {
     if (ev->width  != vd->cfg->display.width ||
         ev->height != vd->cfg->display.height)
-        vout_display_SendEventDisplaySize (vd, ev->width, ev->height);
+        vout_display_SendEventDisplaySize (vd, ev->width, ev->height, vd->cfg->is_fullscreen);
 }
 
 /**
