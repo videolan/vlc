@@ -3,7 +3,7 @@
   <modelVersion>4.0.0</modelVersion>
   <groupId>org.videolan</groupId>
   <artifactId>jvlc-parent</artifactId>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
   <packaging>pom</packaging>
   <name>JVLC</name>
   <description>Java Bindings for VideoLAN</description>

@@ -4,13 +4,13 @@
   <parent>
     <groupId>org.videolan</groupId>
     <artifactId>jvlc-parent</artifactId>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
   </parent>
   <artifactId>jvlc-samples</artifactId>
   <packaging>pom</packaging>
   <name>JVLC - Samples</name>
   <description>Java Bindings for VideoLAN - Samples</description>
-  <version>1.0.1</version>
+  <version>1.0.2-SNAPSHOT</version>
 
   <modules>
     <module>client</module>
