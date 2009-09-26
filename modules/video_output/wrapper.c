@@ -416,21 +416,15 @@ static void Render(vout_thread_t *vout, picture_t *picture)
     vout_display_t *vd = sys->vd;
 
     assert(sys->use_dr || !picture->p_sys->direct);
+    assert(vout_IsDisplayFiltered(vd) == !sys->use_dr);
 
     if (sys->use_dr) {
-        assert(!vout_IsDisplayFiltered(vd));
         assert(picture->p_sys->direct);
-
         vout_display_Prepare(vd, picture->p_sys->direct);
     } else {
-        picture_t *filtered = vout_FilterDisplay(vd, picture);
-        if (filtered) {
-            picture_t *direct = picture->p_sys->direct = vout_display_Get(vd);
-            if (direct) {
-                picture_Copy(direct, filtered);
-                vout_display_Prepare(vd, direct);
-            }
-            picture_Release(filtered);
+        picture_t *direct = picture->p_sys->direct = vout_FilterDisplay(vd, picture);
+        if (direct) {
+            vout_display_Prepare(vd, direct);
         }
     }
 }
