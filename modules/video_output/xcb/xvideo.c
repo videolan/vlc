@@ -339,6 +339,7 @@ static int Open (vlc_object_t *obj)
          xcb_xv_adaptor_info_next (&it))
     {
         const xcb_xv_adaptor_info_t *a = it.data;
+        char *name;
 
         if (forced_adaptor != -1 && forced_adaptor != 0)
         {
@@ -407,6 +408,12 @@ static int Open (vlc_object_t *obj)
         continue;
 
     grabbed_port:
+        name = strndup (xcb_xv_adaptor_info_name (a), a->name_size);
+        if (name != NULL)
+        {
+            msg_Dbg (vd, "using adaptor %s", name);
+            free (name);
+        }
         msg_Dbg (vd, "using port %"PRIu32, p_sys->port);
 
         p_sys->id = xfmt->id;
@@ -445,7 +452,7 @@ static int Open (vlc_object_t *obj)
         if (CheckError (vd, conn, "cannot create X11 window", c))
             goto error;
         p_sys->window = window;
-        msg_Dbg (vd, "using X11 window %08"PRIx32, window);
+        msg_Dbg (vd, "using X11 window 0x%08"PRIx32, window);
         xcb_map_window (conn, window);
 
         vout_display_place_t place;
@@ -465,7 +472,7 @@ static int Open (vlc_object_t *obj)
     /* Create graphic context */
     p_sys->gc = xcb_generate_id (conn);
     xcb_create_gc (conn, p_sys->gc, p_sys->window, 0, NULL);
-    msg_Dbg (vd, "using X11 graphic context %08"PRIx32, p_sys->gc);
+    msg_Dbg (vd, "using X11 graphic context 0x%08"PRIx32, p_sys->gc);
 
     /* */
     p_sys->pool = NULL;
