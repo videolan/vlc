@@ -1,7 +1,7 @@
 /*****************************************************************************
  * wizard.m: MacOS X Streaming Wizard
  *****************************************************************************
- * Copyright (C) 2005-2008 the VideoLAN team
+ * Copyright (C) 2005-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Felix Kühne <fkuehne at videolan dot org>
@@ -627,7 +627,6 @@ static VLCWizard *_o_sharedInstance = nil;
             [o_userSelections setObject:@"1" forKey:@"stmgMhd"];
  
             /* disable all codecs which don't support ASF / ASFH */
-            [o_t4_pop_audioCodec removeItemWithTitle:@"MPEG 4 Audio"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Vorbis"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"FLAC"];
             [o_t4_pop_audioCodec removeItemWithTitle:@"Speex"];
