@@ -47,14 +47,14 @@ static void SplitterClose(vout_display_t *vd);
  *****************************************************************************/
 static picture_t *VideoBufferNew(filter_t *filter)
 {
+    vout_display_t *vd = (vout_display_t*)filter->p_owner;
     const video_format_t *fmt = &filter->fmt_out.video;
 
-    picture_t *picture = picture_New(fmt->i_chroma,
-                                     fmt->i_width, fmt->i_height,
-                                     fmt->i_aspect);
-    if (!picture)
-        msg_Err(filter, "Failed to allocate picture");
-    return picture;
+    assert(vd->fmt.i_chroma == fmt->i_chroma &&
+           vd->fmt.i_width  == fmt->i_width  &&
+           vd->fmt.i_height == fmt->i_height);
+
+    return vout_display_Get(vd);
 }
 static void VideoBufferDelete(filter_t *filter, picture_t *picture)
 {
@@ -62,12 +62,11 @@ static void VideoBufferDelete(filter_t *filter, picture_t *picture)
     picture_Release(picture);
 }
 
-static int  FilterAllocationInit(filter_t *filter, void *data)
+static int  FilterAllocationInit(filter_t *filter, void *vd)
 {
-    VLC_UNUSED(data);
-
     filter->pf_vout_buffer_new = VideoBufferNew;
     filter->pf_vout_buffer_del = VideoBufferDelete;
+    filter->p_owner            = vd;
 
     return VLC_SUCCESS;
 }
@@ -75,6 +74,7 @@ static void FilterAllocationClean(filter_t *filter)
 {
     filter->pf_vout_buffer_new = NULL;
     filter->pf_vout_buffer_del = NULL;
+    filter->p_owner            = NULL;
 }
 
 /*****************************************************************************
@@ -379,7 +379,7 @@ static void VoutDisplayCreateRender(vout_display_t *vd)
 
     osys->filters = filter_chain_New(vd, "video filter2", false,
                                      FilterAllocationInit,
-                                     FilterAllocationClean, NULL);
+                                     FilterAllocationClean, vd);
     assert(osys->filters); /* TODO critical */
 
     /* */
@@ -849,8 +849,7 @@ picture_t *vout_FilterDisplay(vout_display_t *vd, picture_t *picture)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (!osys->filters)
-        return picture;
+    assert(osys->filters);
     return filter_chain_VideoFilter(osys->filters, picture);
 }
 
@@ -1137,6 +1136,7 @@ static void SplitterPrepare(vout_display_t *vd, picture_t *picture)
 
     for (int i = 0; i < sys->count; i++) {
         /* */
+        /* FIXME now vout_FilterDisplay already return a direct buffer FIXME */
         sys->picture[i] = vout_FilterDisplay(sys->display[i], sys->picture[i]);
         if (!sys->picture[i])
             continue;
