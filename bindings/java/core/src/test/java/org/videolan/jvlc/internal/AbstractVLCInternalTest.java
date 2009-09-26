@@ -91,8 +91,7 @@ public abstract class AbstractVLCInternalTest
 
     protected void catchException(libvlc_exception_t exception)
     {
-        Assert.assertEquals(libvlc.libvlc_exception_get_message(exception), 0, libvlc
-            .libvlc_exception_raised(exception));
+        Assert.assertEquals(libvlc.libvlc_errmsg(), 0, libvlc.libvlc_exception_raised(exception));
     }
 
     private void downloadSample()

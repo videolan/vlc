@@ -48,7 +48,7 @@ public class LibVlcLogTest extends AbstractVLCInternalTest
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcLog libvlcLog = libvlc.libvlc_log_open(libvlcInstance, exception);
-        libvlc.libvlc_log_close(libvlcLog, exception);
+        libvlc.libvlc_log_close(libvlcLog);
         Assert.assertEquals(0, exception.b_raised);
     }
 
@@ -57,9 +57,8 @@ public class LibVlcLogTest extends AbstractVLCInternalTest
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcLog libvlcLog = libvlc.libvlc_log_open(libvlcInstance, exception);
-        libvlc.libvlc_log_clear(libvlcLog, exception);
-        Assert.assertEquals(0, exception.b_raised);
-        Assert.assertEquals(0, libvlc.libvlc_log_count(libvlcLog, exception));
+        libvlc.libvlc_log_clear(libvlcLog);
+        Assert.assertEquals(0, libvlc.libvlc_log_count(libvlcLog));
     }
 
     //@Test
@@ -67,9 +66,9 @@ public class LibVlcLogTest extends AbstractVLCInternalTest
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcLog libvlcLog = libvlc.libvlc_log_open(libvlcInstance, exception);
-        libvlc.libvlc_log_clear(libvlcLog, exception);
+        libvlc.libvlc_log_clear(libvlcLog);
         Assert.assertEquals(0, exception.b_raised);
-        Assert.assertEquals(0, libvlc.libvlc_log_count(libvlcLog, exception));
+        Assert.assertEquals(0, libvlc.libvlc_log_count(libvlcLog));
         LibVlcLogIterator logIterator = libvlc.libvlc_log_get_iterator(libvlcLog, exception);
         Assert.assertNotNull(logIterator);
     }

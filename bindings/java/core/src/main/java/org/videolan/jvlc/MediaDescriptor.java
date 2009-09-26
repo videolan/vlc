@@ -68,7 +68,8 @@ public class MediaDescriptor
     
     public String getMrl()
     {
-        return libvlc.libvlc_media_get_mrl(instance);
+        libvlc_exception_t exception = new libvlc_exception_t();
+        return libvlc.libvlc_media_get_mrl(instance, exception);
     }
     
     public MediaPlayer getMediaPlayer()

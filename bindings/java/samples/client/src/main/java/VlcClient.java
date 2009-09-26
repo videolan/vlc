@@ -31,16 +31,20 @@ import java.awt.event.WindowEvent;
 import javax.swing.JPanel;
 
 import org.videolan.jvlc.JVLC;
-import org.videolan.jvlc.Playlist;
-import org.videolan.jvlc.VLCException;
+import org.videolan.jvlc.MediaPlayer;
 
 
 class VLCPlayerFrame extends Frame
 {
 
-    private Playlist playlist;
+    /**
+     * 
+     */
+    private static final long serialVersionUID = -7471950211795850421L;
 
     public Canvas jvcanvas;
+
+    private MediaPlayer mediaPlayer;
 
     public VLCPlayerFrame(String[] args)
     {
@@ -62,11 +66,10 @@ class VLCPlayerFrame extends Frame
         jvcanvas = new java.awt.Canvas();
         jvcanvas.setSize(200, 200);
         jvcc.add(jvcanvas);
-        
-        jvlc = new JVLC(args);
-        
-        playlist = new Playlist(jvlc);
 
+        jvlc = new JVLC(args);
+        jvlc.setVideoOutput(jvcanvas);
+        
         setLayout(new java.awt.GridBagLayout());
 
         gridBagConstraints = new java.awt.GridBagConstraints();
@@ -150,41 +153,31 @@ class VLCPlayerFrame extends Frame
 
     private void stopButtonActionPerformed(java.awt.event.ActionEvent evt)
     {
-        try
+        if (mediaPlayer == null)
         {
-            playlist.stop();
+            return;
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        mediaPlayer.stop();
     }
 
     private void pauseButtonActionPerformed(java.awt.event.ActionEvent evt)
     {
-        try
+        if (mediaPlayer == null)
         {
-            playlist.togglePause();
+            return;
         }
-        catch (Exception e)
-        {
-            e.printStackTrace();
-        }
+        mediaPlayer.pause();
     }
 
     private void setButtonActionPerformed(java.awt.event.ActionEvent evt)
     {
-        try
+        if (mediaPlayer != null)
         {
-            jvlc.setVideoOutput(jvcanvas);
-            playlist.add(jTextField1.getText(), "a.avi");
-            playlist.play();
+            mediaPlayer.stop();
+            mediaPlayer.release();
+            jvcanvas = new java.awt.Canvas();
         }
-        catch (VLCException e)
-        {
-            // TODO Auto-generated catch block
-            e.printStackTrace();
-        }
+        mediaPlayer = jvlc.play(jTextField1.getText());
     }
 
     private void fullScreenButtonActionPerformed(java.awt.event.ActionEvent evt)

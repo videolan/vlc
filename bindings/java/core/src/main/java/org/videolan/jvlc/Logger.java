@@ -54,20 +54,17 @@ public class Logger
     
     public void clear()
     {
-        libvlc_exception_t exception = new libvlc_exception_t();    
-        libvlc.libvlc_log_clear(logInstance, exception);
+        libvlc.libvlc_log_clear(logInstance);
     }
     
     public void close()
     {
-        libvlc_exception_t exception = new libvlc_exception_t();    
-        libvlc.libvlc_log_close(logInstance, exception);
+        libvlc.libvlc_log_close(logInstance);
     }
     
     public int count()
     {
-        libvlc_exception_t exception = new libvlc_exception_t();    
-        return libvlc.libvlc_log_count(logInstance, exception);
+        return libvlc.libvlc_log_count(logInstance);
     }
     
     public Iterator<LoggerMessage> iterator()

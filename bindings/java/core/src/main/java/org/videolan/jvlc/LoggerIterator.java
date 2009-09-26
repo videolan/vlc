@@ -53,8 +53,7 @@ public class LoggerIterator implements Iterator<LoggerMessage>
      */
     public boolean hasNext()
     {
-        libvlc_exception_t exception = new libvlc_exception_t();
-        return logger.libvlc.libvlc_log_iterator_has_next(logIterator, exception) != 0;
+        return logger.libvlc.libvlc_log_iterator_has_next(logIterator) != 0;
     }
 
     /**
@@ -84,8 +83,7 @@ public class LoggerIterator implements Iterator<LoggerMessage>
     @Override
     protected void finalize() throws Throwable
     {
-        libvlc_exception_t exception = new libvlc_exception_t();
-        logger.libvlc.libvlc_log_iterator_free(logIterator, exception);
+        logger.libvlc.libvlc_log_iterator_free(logIterator);
         super.finalize();
     }
 

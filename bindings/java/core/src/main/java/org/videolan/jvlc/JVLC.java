@@ -110,15 +110,13 @@ public class JVLC
     
     public LoggerVerbosityLevel getLogVerbosity()
     {
-        libvlc_exception_t exception = new libvlc_exception_t();
-        int level = libvlc.libvlc_get_log_verbosity(instance, exception);
+        int level = libvlc.libvlc_get_log_verbosity(instance);
         return LoggerVerbosityLevel.getSeverity(level);
     }
 
     public void setLogVerbosity(LoggerVerbosityLevel level)
     {
-        libvlc_exception_t exception = new libvlc_exception_t();
-        libvlc.libvlc_set_log_verbosity(instance, level.ordinal(), exception);
+        libvlc.libvlc_set_log_verbosity(instance, level.ordinal());
     }
 
     

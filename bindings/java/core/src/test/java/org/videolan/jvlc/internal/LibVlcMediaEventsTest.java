@@ -27,7 +27,6 @@ package org.videolan.jvlc.internal;
 
 import junit.framework.Assert;
 
-import org.junit.After;
 import org.junit.Test;
 import org.videolan.jvlc.internal.LibVlc.LibVlcCallback;
 import org.videolan.jvlc.internal.LibVlc.LibVlcEventManager;

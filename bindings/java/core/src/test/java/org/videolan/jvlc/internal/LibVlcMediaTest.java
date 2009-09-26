@@ -50,7 +50,7 @@ public class LibVlcMediaTest extends AbstractVLCInternalTest
     {
         libvlc_exception_t exception = new libvlc_exception_t();
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
-        String mdMrl = libvlc.libvlc_media_get_mrl(md);
+        String mdMrl = libvlc.libvlc_media_get_mrl(md, exception);
         Assert.assertEquals(mrl, mdMrl);
     }
     
@@ -61,7 +61,7 @@ public class LibVlcMediaTest extends AbstractVLCInternalTest
         LibVlcMedia md = libvlc.libvlc_media_new(libvlcInstance, mrl, exception);
         LibVlcMedia md2 = libvlc.libvlc_media_duplicate(md);
         Assert.assertNotSame(md.getPointer(), md2.getPointer());
-        Assert.assertEquals(libvlc.libvlc_media_get_mrl(md2), libvlc.libvlc_media_get_mrl(md));
+        Assert.assertEquals(libvlc.libvlc_media_get_mrl(md2, exception), libvlc.libvlc_media_get_mrl(md, exception));
     }
     
     @Test
