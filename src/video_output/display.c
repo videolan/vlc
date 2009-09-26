@@ -161,7 +161,8 @@ static int vout_display_Control(vout_display_t *vd, int query, ...)
 }
 static void vout_display_Manage(vout_display_t *vd)
 {
-    vd->manage(vd);
+    if (vd->manage)
+        vd->manage(vd);
 }
 
 /* */

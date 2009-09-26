@@ -293,7 +293,7 @@ struct vout_display_t {
     /* Control on the module (mandatory) */
     int        (*control)(vout_display_t *, int, va_list);
 
-    /* Manage pending event (mandatory for now) */
+    /* Manage pending event (optional) */
     void       (*manage)(vout_display_t *);
 
     /* Private place holder for the vout_display_t module (optional)
