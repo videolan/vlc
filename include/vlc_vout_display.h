@@ -207,8 +207,10 @@ struct vout_display_owner_t {
      * be overwritten nor used directly (use the vout_display_SendEvent*
      * wrapper.
      *
-     * You can send it at any time i.e. from any vout_display_t functions
-     * (TODO add support from a private thread).
+     * You can send it at any time i.e. from any vout_display_t functions or
+     * from another thread.
+     * Becarefull, it does not ensure correct serialization if it is used
+     * from multiple threads.
      */
     void            (*event)(vout_display_t *, int, va_list);
 
