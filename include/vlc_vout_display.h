@@ -174,7 +174,7 @@ enum {
 
     VOUT_DISPLAY_EVENT_FULLSCREEN,
 
-    VOUT_DISPLAY_EVENT_DISPLAY_SIZE,        /* The display size need to change : int i_width, int i_height */
+    VOUT_DISPLAY_EVENT_DISPLAY_SIZE,        /* The display size need to change : int i_width, int i_height, bool is_fullscreen */
 
     /* */
     VOUT_DISPLAY_EVENT_CLOSE,
@@ -315,9 +315,9 @@ static inline void vout_display_SendEvent(vout_display_t *vd, int query, ...)
     va_end(args);
 }
 
-static inline void vout_display_SendEventDisplaySize(vout_display_t *vd, int width, int height)
+static inline void vout_display_SendEventDisplaySize(vout_display_t *vd, int width, int height, bool is_fullscreen)
 {
-    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_DISPLAY_SIZE, width, height);
+    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_DISPLAY_SIZE, width, height, is_fullscreen);
 }
 static inline void vout_display_SendEventPicturesInvalid(vout_display_t *vd)
 {

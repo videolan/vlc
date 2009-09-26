@@ -314,6 +314,7 @@ struct vout_display_owner_sys_t {
     bool ch_display_size;
     int  display_width;
     int  display_height;
+    bool display_is_fullscreen;
 
     bool ch_display_filled;
     bool is_display_filled;
@@ -554,12 +555,15 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
     case VOUT_DISPLAY_EVENT_DISPLAY_SIZE: {
         const int width  = (int)va_arg(args, int);
         const int height = (int)va_arg(args, int);
-        msg_Dbg(vd, "VoutDisplayEvent 'resize' %dx%d", width, height);
+        const bool is_fullscreen = (bool)va_arg(args, int);
+        msg_Dbg(vd, "VoutDisplayEvent 'resize' %dx%d %s",
+                width, height, is_fullscreen ? "fullscreen" : "window");
 
         /* */
-        osys->ch_display_size = true;
-        osys->display_width   = width;
-        osys->display_height  = height;
+        osys->ch_display_size       = true;
+        osys->display_width         = width;
+        osys->display_height        = height;
+        osys->display_is_fullscreen = is_fullscreen;
         break;
     }
 
@@ -647,8 +651,10 @@ void vout_ManageDisplay(vout_display_t *vd)
             cfg.display.width  = osys->display_width;
             cfg.display.height = osys->display_height;
 
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg)) {
-                msg_Err(vd, "Failed to resize display");
+            if (!cfg.is_fullscreen != !osys->display_is_fullscreen ||
+                vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg)) {
+                if (!cfg.is_fullscreen == !osys->display_is_fullscreen)
+                    msg_Err(vd, "Failed to resize display");
 
                 /* We ignore the resized */
                 osys->display_width  = osys->cfg.display.width;
@@ -657,7 +663,7 @@ void vout_ManageDisplay(vout_display_t *vd)
             osys->cfg.display.width  = osys->display_width;
             osys->cfg.display.height = osys->display_height;
 
-            if (!osys->is_fullscreen) {
+            if (!osys->display_is_fullscreen) {
                 osys->width_saved  = osys->display_width;
                 osys->height_saved = osys->display_height;
             }
@@ -698,9 +704,10 @@ void vout_ManageDisplay(vout_display_t *vd)
                 osys->zoom.num = osys->cfg.zoom.num;
                 osys->zoom.den = osys->cfg.zoom.den;
             } else if (cfg.is_display_filled) {
-                osys->ch_display_size = true;
-                osys->display_width  = (int64_t)vd->source.i_width  * osys->zoom.num / osys->zoom.den;
-                osys->display_height = (int64_t)vd->source.i_height * osys->zoom.num / osys->zoom.den;
+                const int display_width  = (int64_t)vd->source.i_width  * osys->zoom.num / osys->zoom.den;
+                const int display_height = (int64_t)vd->source.i_height * osys->zoom.num / osys->zoom.den;
+
+                vout_display_SendEventDisplaySize(vd, display_width, display_height, osys->cfg.is_fullscreen);
             }
 
             osys->cfg.zoom.num = osys->zoom.num;
