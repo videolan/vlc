@@ -148,7 +148,6 @@ struct vout_sys_t
     uint32_t             i_video_height;                     /* video height */
     vlc_fourcc_t         i_chroma;
     int                  i_color_format;                   /* OMAPFB_COLOR_* */
-    bool                 b_embed;
     bool                 b_video_enabled;        /* Video must be displayed? */
     picture_t           *p_output_picture;
 
@@ -200,8 +199,6 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_render = NULL;
     p_vout->pf_display = DisplayVideo;
     p_vout->pf_control = Control;
-
-    p_sys->b_embed = var_CreateGetInteger( p_vout, "omap-embedded" );
     p_sys->b_video_enabled = true;
 
     if( OpenDisplay( p_vout ) )
@@ -240,7 +237,7 @@ static void Destroy( vlc_object_t *p_this )
 
     CloseDisplay( p_vout );
 
-    if( p_vout->p_sys->b_embed )
+    if( p_vout->p_sys->owner_window )
     {
         vout_window_Delete( p_vout->p_sys->owner_window );
         XCloseDisplay( p_vout->p_sys->p_display );
@@ -467,10 +464,12 @@ static int Manage( vout_thread_t *p_vout )
     if( p_vout->i_changes & VOUT_FULLSCREEN_CHANGE )
     {
         /* Update the object variable and trigger callback */
-        var_SetBool( p_vout, "fullscreen", !p_vout->b_fullscreen );
+        p_vout->b_fullscreen = !p_vout->b_fullscreen;
+        var_SetBool( p_vout, "fullscreen", p_vout->b_fullscreen );
 
-        if( p_vout->p_sys->b_embed )
-            ToggleFullScreen( p_vout );
+        if( p_vout->p_sys->owner_window )
+            vout_window_SetFullscreen( p_vout->p_sys->owner_window,
+                                       p_vout->b_fullscreen );
         p_vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
     }
 
@@ -658,7 +657,7 @@ static int InitWindow( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = (vout_sys_t *)p_vout->p_sys;
 
-    if( p_sys->b_embed )
+    if( var_CreateGetBool( p_vout, "omap-embedded" ) )
     {
         p_sys->p_display = XOpenDisplay( NULL );
 
@@ -718,58 +717,3 @@ static void CreateWindow( vout_sys_t *p_sys )
     XSetInputFocus( p_sys->p_display, p_sys->window, RevertToParent, CurrentTime );
 }
 
-static void ToggleFullScreen ( vout_thread_t * p_vout )
-{
-    p_vout->b_fullscreen = !p_vout->b_fullscreen;
-
-    if( p_vout->b_fullscreen )
-    {
-        msg_Dbg( p_vout, "Entering fullscreen mode" );
-        XReparentWindow( p_vout->p_sys->p_display,
-                         p_vout->p_sys->window,
-                         DefaultRootWindow( p_vout->p_sys->p_display ),
-                         0, 0 );
-
-        XEvent xev;
-
-        /* init X event structure for _NET_WM_FULLSCREEN client msg */
-        xev.xclient.type = ClientMessage;
-        xev.xclient.serial = 0;
-        xev.xclient.send_event = True;
-        xev.xclient.message_type = XInternAtom( p_vout->p_sys->p_display,
-                                                "_NET_WM_STATE", False );
-        xev.xclient.window = p_vout->p_sys->window;
-        xev.xclient.format = 32;
-        if( p_vout->b_fullscreen )
-            xev.xclient.data.l[0] = 1;
-        else
-            xev.xclient.data.l[0] = 0;
-        xev.xclient.data.l[1] = XInternAtom( p_vout->p_sys->p_display,
-                                            "_NET_WM_STATE_FULLSCREEN", False );
-        xev.xclient.data.l[2] = 0;
-        xev.xclient.data.l[3] = 0;
-        xev.xclient.data.l[4] = 0;
-
-        XSendEvent( p_vout->p_sys->p_display,
-                    DefaultRootWindow( p_vout->p_sys->p_display ), False,
-                    SubstructureRedirectMask | SubstructureNotifyMask, &xev);
-
-        p_vout->p_sys->main_window.i_x = p_vout->p_sys->main_window.i_y = 0;
-        p_vout->p_sys->main_window.i_width = p_vout->p_sys->fb_vinfo.xres;
-        p_vout->p_sys->main_window.i_height = p_vout->p_sys->fb_vinfo.yres;
-    }
-    else
-    {
-        msg_Dbg( p_vout, "Leaving fullscreen mode" );
-
-        XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
-
-        p_vout->p_sys->main_window = p_vout->p_sys->embedded_window;
-        CreateWindow( p_vout->p_sys );
-    }
-
-    XSync( p_vout->p_sys->p_display, False);
-
-    /* signal that the size needs to be updated */
-    p_vout->i_changes |= VOUT_SIZE_CHANGE;
-}
