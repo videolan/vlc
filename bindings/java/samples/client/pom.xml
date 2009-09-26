@@ -4,14 +4,14 @@
   <parent>
     <groupId>org.videolan</groupId>
     <artifactId>jvlc-samples</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
+    <version>1.0.1-SNAPSHOT</version>
   </parent>
   <groupId>org.videolan</groupId>
   <artifactId>jvlc-samples-client</artifactId>
   <packaging>jar</packaging>
   <name>JVLC - Client sample</name>
   <description>Java Bindings for VideoLAN - Client sample</description>
-  <version>1.0.0-SNAPSHOT</version>
+  <version>1.0.1-SNAPSHOT</version>
 
    <build>
     <plugins>
