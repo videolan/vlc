@@ -40,7 +40,6 @@
 /* Embedded window handling */
 #include <X11/Xlib.h>
 #include <X11/Xutil.h>
-#include <X11/keysym.h>
 
 #ifdef HAVE_OSSO
 #include <libosso.h>
@@ -48,7 +47,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_keys.h>
 #include <vlc_vout.h>
 #include <vlc_vout_window.h>
 #include <vlc_playlist.h>
@@ -404,50 +402,9 @@ static int Manage( vout_thread_t *p_vout )
             p_vout->p_sys->i_time_button_last_pressed =
                         ((XButtonEvent *)&xevent)->time;
         }
-        else if( xevent.type == KeyPress )
-        {
-            KeySym x_key_symbol;
-            vlc_value_t val;
-
-            x_key_symbol = XKeycodeToKeysym( p_vout->p_sys->p_display,
-                                             xevent.xkey.keycode, 0 );
-
-            switch( x_key_symbol )
-            {
-            case XK_Return:
-                val.i_int = ACTIONID_PLAY_PAUSE; break;
-            case XK_Escape:
-                val.i_int = ACTIONID_QUIT; break;
-            case XK_Down:
-                val.i_int = ACTIONID_JUMP_BACKWARD_MEDIUM; break;
-            case XK_Up:
-                val.i_int = ACTIONID_JUMP_FORWARD_MEDIUM; break;
-            case XK_Right:
-                val.i_int = ACTIONID_JUMP_FORWARD_SHORT; break;
-            case XK_Left:
-                val.i_int = ACTIONID_JUMP_BACKWARD_SHORT; break;
-            case XK_F6:
-                val.i_int = ACTIONID_TOGGLE_FULLSCREEN; break;
-            case XK_F7:
-                val.i_int = ACTIONID_VOL_UP; break;
-            case XK_F8:
-                val.i_int = ACTIONID_VOL_DOWN; break;
-            }
-            var_SetInteger( p_vout->p_libvlc, "key-action", val.i_int );
-        }
-        else if( ( xevent.type == VisibilityNotify &&
-                 xevent.xvisibility.state == VisibilityUnobscured ) ||
-                 xevent.type == FocusIn )
-        {
-            p_vout->p_sys->b_video_enabled = true;
-            p_vout->p_sys->p_output_picture->p->p_pixels =
-                p_vout->p_sys->p_center;
-            XSetInputFocus( p_vout->p_sys->p_display, p_vout->p_sys->window,
-                            RevertToParent, CurrentTime );
-        }
         else if( ( xevent.type == VisibilityNotify &&
                  xevent.xvisibility.state != VisibilityUnobscured ) ||
-                 xevent.type == FocusOut || xevent.type == UnmapNotify )
+                 xevent.type == UnmapNotify )
         {
             UpdateScreen( p_vout, 0, 0,
                           p_vout->p_sys->fb_vinfo.xres,
@@ -675,7 +632,6 @@ static int InitWindow( vout_thread_t *p_vout )
         p_sys->main_window = p_sys->embedded_window;
 
         // We have to create a new window to get some events
-        // (ButtonPress for example)
         CreateWindow( p_sys );
     }
     else
@@ -697,7 +653,8 @@ static void CreateWindow( vout_sys_t *p_sys )
     xwindow_attributes.backing_store = Always;
     xwindow_attributes.background_pixel =
         BlackPixel( p_sys->p_display, DefaultScreen(p_sys->p_display) );
-    xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask;
+    xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask
+                                  | VisibilityChangeMask;
     p_sys->window = XCreateWindow( p_sys->p_display,
                                    p_sys->owner_window->handle.xid,
                                    0, 0,
@@ -709,11 +666,7 @@ static void CreateWindow( vout_sys_t *p_sys )
                                    &xwindow_attributes );
 
     XMapWindow( p_sys->p_display, p_sys->window );
-    XSelectInput( p_sys->p_display, p_sys->window,
-                  KeyPressMask | ButtonPressMask | StructureNotifyMask |
-                  VisibilityChangeMask | FocusChangeMask );
     XSelectInput( p_sys->p_display, p_sys->owner_window->handle.xid,
                   StructureNotifyMask );
-    XSetInputFocus( p_sys->p_display, p_sys->window, RevertToParent, CurrentTime );
 }
 
