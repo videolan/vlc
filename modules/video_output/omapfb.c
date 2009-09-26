@@ -243,8 +243,6 @@ static void Destroy( vlc_object_t *p_this )
     if( p_vout->p_sys->b_embed )
     {
         vout_window_Delete( p_vout->p_sys->owner_window );
-        if( p_vout->b_fullscreen )
-            XDestroyWindow( p_vout->p_sys->p_display, p_vout->p_sys->window );
         XCloseDisplay( p_vout->p_sys->p_display );
     }
 
