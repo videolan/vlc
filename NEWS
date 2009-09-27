@@ -4,6 +4,9 @@ Changes between 1.0.2 and 1.1.0-git:
 Access:
  * Port of the screen module from Xlib to XCB
 
+Decoders:
+ * Support for Atrac1
+
 Demuxers:
  * Support for ADPCM in .flv streams
  * EXPERIMENTAL support for .aob files from DVD-Audio (MLP and LPCM)

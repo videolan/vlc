@@ -233,6 +233,7 @@
 #define VLC_CODEC_WAVPACK   VLC_FOURCC('W','V','P','K')
 #define VLC_CODEC_GSM       VLC_FOURCC('g','s','m',' ')
 #define VLC_CODEC_GSM_MS    VLC_FOURCC('a','g','s','m')
+#define VLC_CODEC_ATRAC1    VLC_FOURCC('a','t','r','1')
 #define VLC_CODEC_ATRAC3    VLC_FOURCC('a','t','r','c')
 #define VLC_CODEC_SONIC     VLC_FOURCC('S','O','N','C')
 #define VLC_CODEC_IMC       VLC_FOURCC(0x1,0x4,0x0,0x0)

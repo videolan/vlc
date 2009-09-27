@@ -954,6 +954,9 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_GSM_MS, "Microsoft GSM Audio"),
         A("agsm"),
 
+    B(VLC_CODEC_ATRAC1, "atrac 1"),
+        A("atr1"),
+
     B(VLC_CODEC_ATRAC3, "atrac 3"),
         A("atrc"),
         A("\x70\x02\x00\x00"),
