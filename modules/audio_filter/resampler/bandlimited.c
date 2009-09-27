@@ -77,7 +77,6 @@ struct filter_sys_t
     int32_t *p_buf;                        /* this filter introduces a delay */
     int i_buf_size;
 
-    int i_old_rate;
     double d_old_factor;
     int i_old_wing;
 
@@ -240,7 +239,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         p_sys->i_remainder = 0;
         date_Init( &p_sys->end_date, i_out_rate, 1 );
         date_Set( &p_sys->end_date, p_in_buf->i_pts );
-        p_sys->i_old_rate   = p_filter->fmt_in.audio.i_rate;
         p_sys->d_old_factor = 1;
         p_sys->i_old_wing   = 0;
     }
@@ -366,7 +364,6 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Apply the new rate for the rest of the samples */
     if( i_in < i_in_nb - i_filter_wing )
     {
-        p_sys->i_old_rate   = p_filter->fmt_in.audio.i_rate;
         p_sys->d_old_factor = d_factor;
         p_sys->i_old_wing   = i_filter_wing;
     }
@@ -496,18 +493,18 @@ static int OpenFilter( vlc_object_t *p_this )
     d_factor = (double)i_out_rate / p_filter->fmt_in.audio.i_rate;
     i_filter_wing = ((SMALL_FILTER_NMULT + 1)/2.0)
                       * __MAX(1.0, 1.0/d_factor) + 10;
-    p_filter->p_sys->i_buf_size = p_filter->fmt_in.audio.i_channels *
+    p_sys->i_buf_size = p_filter->fmt_in.audio.i_channels *
         sizeof(int32_t) * 2 * i_filter_wing;
 
     /* Allocate enough memory to buffer previous samples */
-    p_filter->p_sys->p_buf = malloc( p_filter->p_sys->i_buf_size );
-    if( p_filter->p_sys->p_buf == NULL )
+    p_sys->p_buf = malloc( p_sys->i_buf_size );
+    if( p_sys->p_buf == NULL )
     {
         free( p_sys );
         return VLC_ENOMEM;
     }
 
-    p_filter->p_sys->i_old_wing = 0;
+    p_sys->i_old_wing = 0;
     p_sys->b_filter2 = true;
     p_filter->pf_audio_filter = Resample;
 
