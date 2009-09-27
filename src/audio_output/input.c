@@ -811,6 +811,11 @@ vout_thread_t *aout_filter_RequestVout( aout_filter_t *p_filter,
     aout_input_t *p_input = p_filter->p_owner->p_input;
     aout_request_vout_t *p_request = &p_input->request_vout;
 
+    /* XXX: this only works from audio input */
+    /* If you want to use visualization filters from another place, you will
+     * need to add a new pf_aout_request_vout callback or store a pointer
+     * to aout_request_vout_t inside filter_t (i.e. a level of indirection). */
+
     return p_request->pf_request_vout( p_request->p_private,
                                        p_vout, p_fmt, p_input->b_recycle_vout );
 }
