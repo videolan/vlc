@@ -31,7 +31,6 @@
 
 #include <vlc_input.h>
 #include <vlc_vout.h>
-#include <vlc_aout.h>
 
 #include "qt4.hpp"
 

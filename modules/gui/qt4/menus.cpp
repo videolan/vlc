@@ -33,6 +33,7 @@
 
 #include <vlc_intf_strings.h>
 #include <vlc_services_discovery.h>
+#include <vlc_aout.h>
 
 #include "menus.hpp"
 

@@ -36,8 +36,6 @@
 #include "components/controller.hpp"
 #include "components/controller_widget.hpp"
 
-//#include <vlc_aout.h> Visualizer
-
 #include <QWidget>
 #include <QFrame>
 #include <QLabel>
