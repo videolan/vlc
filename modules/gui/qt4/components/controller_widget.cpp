@@ -173,6 +173,7 @@ void SoundWidget::updateVolume()
 
 void SoundWidget::showVolumeMenu( QPoint pos )
 {
+    volumeMenu->setFixedHeight( volumeMenu->sizeHint().height() );
     volumeMenu->exec( QCursor::pos() - pos - QPoint( 0, volumeMenu->height()/2 )
                           + QPoint( width(), height() /2) );
 }
