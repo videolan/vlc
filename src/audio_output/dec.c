@@ -32,10 +32,6 @@
 
 #include <vlc_common.h>
 
-#ifdef HAVE_ALLOCA_H
-#   include <alloca.h>
-#endif
-
 #include <vlc_aout.h>
 #include <vlc_input.h>
 

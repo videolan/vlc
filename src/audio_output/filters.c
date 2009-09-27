@@ -33,10 +33,6 @@
 #include <vlc_common.h>
 #include <vlc_dialog.h>
 
-#ifdef HAVE_ALLOCA_H
-#   include <alloca.h>
-#endif
-
 #include <vlc_aout.h>
 #include "aout_internal.h"
 #include <libvlc.h>
