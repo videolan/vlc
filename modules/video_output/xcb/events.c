@@ -41,19 +41,19 @@
 
 /* FIXME we assume direct mapping between XCB and VLC */
 static void HandleButtonPress (vout_display_t *vd,
-                               xcb_button_press_event_t *ev)
+                               const xcb_button_press_event_t *ev)
 {
     vout_display_SendEventMousePressed (vd, ev->detail - 1);
 }
 
 static void HandleButtonRelease (vout_display_t *vd,
-                                 xcb_button_release_event_t *ev)
+                                 const xcb_button_release_event_t *ev)
 {
     vout_display_SendEventMouseReleased (vd, ev->detail - 1);
 }
 
 static void HandleMotionNotify (vout_display_t *vd,
-                                xcb_motion_notify_event_t *ev)
+                                const xcb_motion_notify_event_t *ev)
 {
     vout_display_place_t place;
 
@@ -75,7 +75,8 @@ static void HandleMotionNotify (vout_display_t *vd,
 }
 
 static void
-HandleParentStructure (vout_display_t *vd, xcb_configure_notify_event_t *ev)
+HandleParentStructure (vout_display_t *vd,
+                       const xcb_configure_notify_event_t *ev)
 {
     if (ev->width  != vd->cfg->display.width ||
         ev->height != vd->cfg->display.height)
