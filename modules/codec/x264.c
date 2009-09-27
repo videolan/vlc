@@ -657,13 +657,6 @@ static int  Open ( vlc_object_t *p_this )
     /* X264_POINTVER or X264_VERSION are not available */
     msg_Dbg ( p_enc, "version x264 0.%d.X", X264_BUILD );
 
-    if( X264_BUILD < 76 )
-    {
-        msg_Warn( p_enc, "x264 version needs to be 0.76 or higher");
-        return VLC_EGENERIC;
-    }
-
-
     config_ChainParse( p_enc, SOUT_CFG_PREFIX, ppsz_sout_options, p_enc->p_cfg );
 
     p_enc->fmt_out.i_cat = VIDEO_ES;
