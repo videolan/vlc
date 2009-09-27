@@ -84,22 +84,22 @@ static int Create( vlc_object_t *p_this )
     aout_filter_sys_t *p_sys;
 
     /* Validate audio filter format */
-    if ( p_filter->input.i_physical_channels != (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
-       || ! ( p_filter->input.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
-       || aout_FormatNbChannels( &p_filter->output ) <= 2
-       || ( p_filter->input.i_original_channels & ~AOUT_CHAN_DOLBYSTEREO )
-          != ( p_filter->output.i_original_channels & ~AOUT_CHAN_DOLBYSTEREO ) )
+    if ( p_filter->fmt_in.audio.i_physical_channels != (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
+       || ! ( p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
+       || aout_FormatNbChannels( &p_filter->fmt_out.audio ) <= 2
+       || ( p_filter->fmt_in.audio.i_original_channels & ~AOUT_CHAN_DOLBYSTEREO )
+          != ( p_filter->fmt_out.audio.i_original_channels & ~AOUT_CHAN_DOLBYSTEREO ) )
     {
         return VLC_EGENERIC;
     }
 
-    if ( p_filter->input.i_rate != p_filter->output.i_rate )
+    if ( p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate )
     {
         return VLC_EGENERIC;
     }
 
-    if ( p_filter->input.i_format != VLC_CODEC_FL32
-          || p_filter->output.i_format != VLC_CODEC_FL32 )
+    if ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
         return VLC_EGENERIC;
     }
@@ -117,7 +117,7 @@ static int Create( vlc_object_t *p_this )
 
     while ( pi_channels[i] )
     {
-        if ( p_filter->output.i_physical_channels & pi_channels[i] )
+        if ( p_filter->fmt_out.audio.i_physical_channels & pi_channels[i] )
         {
             switch ( pi_channels[i] )
             {
@@ -171,13 +171,13 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     float * p_in = (float*) p_in_buf->p_buffer;
     float * p_out = (float*) p_out_buf->p_buffer;
     size_t i_nb_samples = p_in_buf->i_nb_samples;
-    size_t i_nb_channels = aout_FormatNbChannels( &p_filter->output );
+    size_t i_nb_channels = aout_FormatNbChannels( &p_filter->fmt_out.audio );
     size_t i_nb_rear = 0;
     size_t i;
 
     p_out_buf->i_nb_samples = i_nb_samples;
     p_out_buf->i_buffer = sizeof(float) * i_nb_samples
-                            * aout_FormatNbChannels( &p_filter->output );
+                            * aout_FormatNbChannels( &p_filter->fmt_out.audio );
     memset( p_out, 0, p_out_buf->i_buffer );
 
 

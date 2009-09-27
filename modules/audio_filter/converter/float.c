@@ -132,20 +132,20 @@ static int Create_F32ToFL32( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if( ( p_filter->input.i_format != VLC_CODEC_FI32
-           || p_filter->output.i_format != VLC_CODEC_FL32 )
-      && ( p_filter->input.i_format != VLC_CODEC_FL32
-            || p_filter->output.i_format != VLC_CODEC_FI32 ) )
+    if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FI32
+           || p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
+      && ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
+            || p_filter->fmt_out.audio.i_format != VLC_CODEC_FI32 ) )
     {
         return -1;
     }
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         return -1;
     }
 
-    if( p_filter->input.i_format == VLC_CODEC_FI32 )
+    if( p_filter->fmt_in.audio.i_format == VLC_CODEC_FI32 )
     {
         p_filter->pf_do_work = Do_F32ToFL32;
     }
@@ -168,7 +168,7 @@ static void Do_F32ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     float * p_out = (float *)p_out_buf->p_buffer;
 
     for ( i = p_in_buf->i_nb_samples
-               * aout_FormatNbChannels( &p_filter->input ) ; i-- ; )
+               * aout_FormatNbChannels( &p_filter->fmt_in.audio ) ; i-- ; )
     {
         *p_out++ = (float)*p_in++ / (float)FIXED32_ONE;
     }
@@ -186,7 +186,7 @@ static void Do_FL32ToF32( aout_instance_t * p_aout, aout_filter_t * p_filter,
     vlc_fixed_t * p_out = (vlc_fixed_t *)p_out_buf->p_buffer;
 
     for ( i = p_in_buf->i_nb_samples
-               * aout_FormatNbChannels( &p_filter->input ) ; i-- ; )
+               * aout_FormatNbChannels( &p_filter->fmt_in.audio ) ; i-- ; )
     {
         *p_out++ = (vlc_fixed_t)( *p_in++ * (float)FIXED32_ONE );
     }
@@ -202,13 +202,13 @@ static int Create_FL32ToS16( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_CODEC_FL32
-          || p_filter->output.i_format != VLC_CODEC_S16N )
+    if ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_S16N )
     {
         return -1;
     }
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         return -1;
     }
@@ -228,7 +228,7 @@ static void Do_FL32ToS16( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int16_t * p_out = (int16_t *)p_out_buf->p_buffer;
 
     for ( i = p_in_buf->i_nb_samples
-               * aout_FormatNbChannels( &p_filter->input ); i-- ; )
+               * aout_FormatNbChannels( &p_filter->fmt_in.audio ); i-- ; )
     {
 #if 0
         /* Slow version. */
@@ -257,13 +257,13 @@ static int Create_FL32ToS8( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_CODEC_FL32
-          || p_filter->output.i_format != VLC_CODEC_S8 )
+    if ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_S8 )
     {
         return -1;
     }
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         return -1;
     }
@@ -283,7 +283,7 @@ static void Do_FL32ToS8( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int8_t * p_out = (int8_t *)p_out_buf->p_buffer;
 
     for ( i = p_in_buf->i_nb_samples
-               * aout_FormatNbChannels( &p_filter->input ); i-- ; )
+               * aout_FormatNbChannels( &p_filter->fmt_in.audio ); i-- ; )
     {
         if ( *p_in >= 1.0 ) *p_out = 127;
         else if ( *p_in < -1.0 ) *p_out = -128;
@@ -302,13 +302,13 @@ static int Create_FL32ToU16( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_CODEC_FL32
-          || p_filter->output.i_format != VLC_CODEC_U16N )
+    if ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_U16N )
     {
         return -1;
     }
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         return -1;
     }
@@ -328,7 +328,7 @@ static void Do_FL32ToU16( aout_instance_t * p_aout, aout_filter_t * p_filter,
     uint16_t * p_out = (uint16_t *)p_out_buf->p_buffer;
 
     for ( i = p_in_buf->i_nb_samples
-               * aout_FormatNbChannels( &p_filter->input ); i-- ; )
+               * aout_FormatNbChannels( &p_filter->fmt_in.audio ); i-- ; )
     {
         if ( *p_in >= 1.0 ) *p_out = 65535;
         else if ( *p_in < -1.0 ) *p_out = 0;
@@ -347,13 +347,13 @@ static int Create_FL32ToU8( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_CODEC_FL32
-          || p_filter->output.i_format != VLC_CODEC_U8 )
+    if ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_U8 )
     {
         return -1;
     }
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         return -1;
     }
@@ -373,7 +373,7 @@ static void Do_FL32ToU8( aout_instance_t * p_aout, aout_filter_t * p_filter,
     uint8_t * p_out = (uint8_t *)p_out_buf->p_buffer;
 
     for ( i = p_in_buf->i_nb_samples
-               * aout_FormatNbChannels( &p_filter->input ); i-- ; )
+               * aout_FormatNbChannels( &p_filter->fmt_in.audio ); i-- ; )
     {
         if ( *p_in >= 1.0 ) *p_out = 255;
         else if ( *p_in < -1.0 ) *p_out = 0;
@@ -392,22 +392,22 @@ static int Create_S16ToFL32( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( ( p_filter->input.i_format != VLC_CODEC_S16N &&
-           p_filter->input.i_format != VLC_CODEC_S24N &&
-           p_filter->input.i_format != VLC_CODEC_S32N )
-          || p_filter->output.i_format != VLC_CODEC_FL32 )
+    if ( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_S16N &&
+           p_filter->fmt_in.audio.i_format != VLC_CODEC_S24N &&
+           p_filter->fmt_in.audio.i_format != VLC_CODEC_S32N )
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
         return -1;
     }
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         return -1;
     }
 
-    if( p_filter->input.i_format == VLC_CODEC_S32N )
+    if( p_filter->fmt_in.audio.i_format == VLC_CODEC_S32N )
         p_filter->pf_do_work = Do_S32ToFL32;
-    else if( p_filter->input.i_format == VLC_CODEC_S24N )
+    else if( p_filter->fmt_in.audio.i_format == VLC_CODEC_S24N )
         p_filter->pf_do_work = Do_S24ToFL32;
     else
         p_filter->pf_do_work = Do_S16ToFL32;
@@ -421,7 +421,7 @@ static void Do_S16ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
                           aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
-    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
     /* We start from the end because b_in_place is true */
     int16_t * p_in = (int16_t *)p_in_buf->p_buffer + i - 1;
@@ -452,7 +452,7 @@ static void Do_S24ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
                           aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
-    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
     /* We start from the end because b_in_place is true */
     uint8_t * p_in = (uint8_t *)p_in_buf->p_buffer + (i - 1) * 3;
@@ -478,7 +478,7 @@ static void Do_S32ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
                           aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
-    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
     /* We start from the end because b_in_place is true */
     int32_t * p_in = (int32_t *)p_in_buf->p_buffer + i - 1;
@@ -500,15 +500,15 @@ static int Create_S16ToFL32_SW( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         return -1;
     }
 
-    if ( (p_filter->input.i_format == VLC_CODEC_S16L ||
-         p_filter->input.i_format == VLC_CODEC_S16B)
-         && p_filter->output.i_format == VLC_CODEC_FL32
-         && p_filter->input.i_format != VLC_CODEC_S16N )
+    if ( (p_filter->fmt_in.audio.i_format == VLC_CODEC_S16L ||
+         p_filter->fmt_in.audio.i_format == VLC_CODEC_S16B)
+         && p_filter->fmt_out.audio.i_format == VLC_CODEC_FL32
+         && p_filter->fmt_in.audio.i_format != VLC_CODEC_S16N )
     {
         p_filter->pf_do_work = Do_S16ToFL32_SW;
         p_filter->b_in_place = true;
@@ -516,10 +516,10 @@ static int Create_S16ToFL32_SW( vlc_object_t *p_this )
         return 0;
     }
 
-    if ( (p_filter->input.i_format == VLC_CODEC_S24L ||
-         p_filter->input.i_format == VLC_CODEC_S24B)
-         && p_filter->output.i_format == VLC_CODEC_FL32
-         && p_filter->input.i_format != VLC_CODEC_S24N )
+    if ( (p_filter->fmt_in.audio.i_format == VLC_CODEC_S24L ||
+         p_filter->fmt_in.audio.i_format == VLC_CODEC_S24B)
+         && p_filter->fmt_out.audio.i_format == VLC_CODEC_FL32
+         && p_filter->fmt_in.audio.i_format != VLC_CODEC_S24N )
     {
         p_filter->pf_do_work = Do_S24ToFL32_SW;
         p_filter->b_in_place = true;
@@ -527,10 +527,10 @@ static int Create_S16ToFL32_SW( vlc_object_t *p_this )
         return 0;
     }
 
-    if ( (p_filter->input.i_format == VLC_CODEC_S32L ||
-         p_filter->input.i_format == VLC_CODEC_S32B)
-         && p_filter->output.i_format == VLC_CODEC_FL32
-         && p_filter->input.i_format != VLC_CODEC_S32N )
+    if ( (p_filter->fmt_in.audio.i_format == VLC_CODEC_S32L ||
+         p_filter->fmt_in.audio.i_format == VLC_CODEC_S32B)
+         && p_filter->fmt_out.audio.i_format == VLC_CODEC_FL32
+         && p_filter->fmt_in.audio.i_format != VLC_CODEC_S32N )
     {
         p_filter->pf_do_work = Do_S32ToFL32_SW;
         p_filter->b_in_place = true;
@@ -545,7 +545,7 @@ static void Do_S16ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
                              aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
-    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
     /* We start from the end because b_in_place is true */
     int16_t * p_in;
@@ -568,7 +568,7 @@ static void Do_S24ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
                              aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
-    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
     /* We start from the end because b_in_place is true */
     uint8_t * p_in = (uint8_t *)p_in_buf->p_buffer + (i - 1) * 3;
@@ -600,7 +600,7 @@ static void Do_S32ToFL32_SW( aout_instance_t * p_aout, aout_filter_t * p_filter,
                              aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
-    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
     /* We start from the end because b_in_place is true */
     int32_t * p_in = (int32_t *)p_in_buf->p_buffer + i - 1;
@@ -623,13 +623,13 @@ static int Create_S8ToFL32( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_CODEC_S8
-          || p_filter->output.i_format != VLC_CODEC_FL32 )
+    if ( p_filter->fmt_in.audio.i_format != VLC_CODEC_S8
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
         return -1;
     }
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         return -1;
     }
@@ -644,7 +644,7 @@ static void Do_S8ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
                          aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
-    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
     /* We start from the end because b_in_place is true */
     int8_t * p_in = (int8_t *)p_in_buf->p_buffer + i - 1;
@@ -667,13 +667,13 @@ static int Create_U8ToFL32( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_CODEC_U8
-          || p_filter->output.i_format != VLC_CODEC_FL32 )
+    if ( p_filter->fmt_in.audio.i_format != VLC_CODEC_U8
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
         return -1;
     }
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         return -1;
     }
@@ -688,7 +688,7 @@ static void Do_U8ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
                          aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
-    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->input );
+    int i = p_in_buf->i_nb_samples * aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
     /* We start from the end because b_in_place is true */
     uint8_t * p_in = (uint8_t *)p_in_buf->p_buffer + i - 1;

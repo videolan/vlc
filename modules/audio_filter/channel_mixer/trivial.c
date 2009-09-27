@@ -59,21 +59,21 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( (p_filter->input.i_physical_channels
-           == p_filter->output.i_physical_channels
-           && p_filter->input.i_original_channels
-               == p_filter->output.i_original_channels)
-          || p_filter->input.i_format != p_filter->output.i_format
-          || p_filter->input.i_rate != p_filter->output.i_rate
-          || (p_filter->input.i_format != VLC_CODEC_FL32
-               && p_filter->input.i_format != VLC_CODEC_FI32) )
+    if ( (p_filter->fmt_in.audio.i_physical_channels
+           == p_filter->fmt_out.audio.i_physical_channels
+           && p_filter->fmt_in.audio.i_original_channels
+               == p_filter->fmt_out.audio.i_original_channels)
+          || p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format
+          || p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate
+          || (p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
+               && p_filter->fmt_in.audio.i_format != VLC_CODEC_FI32) )
     {
         return -1;
     }
 
     p_filter->pf_do_work = DoWork;
-    if ( aout_FormatNbChannels( &p_filter->input )
-           > aout_FormatNbChannels( &p_filter->output ) )
+    if ( aout_FormatNbChannels( &p_filter->fmt_in.audio )
+           > aout_FormatNbChannels( &p_filter->fmt_out.audio ) )
     {
         /* Downmixing */
         p_filter->b_in_place = 1;
@@ -113,26 +113,26 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     VLC_UNUSED(p_aout);
-    int i_input_nb = aout_FormatNbChannels( &p_filter->input );
-    int i_output_nb = aout_FormatNbChannels( &p_filter->output );
+    int i_input_nb = aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    int i_output_nb = aout_FormatNbChannels( &p_filter->fmt_out.audio );
     int32_t * p_dest = (int32_t *)p_out_buf->p_buffer;
     int32_t * p_src = (int32_t *)p_in_buf->p_buffer;
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_buffer = p_in_buf->i_buffer * i_output_nb / i_input_nb;
 
-    if ( (p_filter->output.i_original_channels & AOUT_CHAN_PHYSMASK)
-                != (p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK)
-           && (p_filter->input.i_original_channels & AOUT_CHAN_PHYSMASK)
+    if ( (p_filter->fmt_out.audio.i_original_channels & AOUT_CHAN_PHYSMASK)
+                != (p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_PHYSMASK)
+           && (p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_PHYSMASK)
                 == (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT) )
     {
         int i;
         /* This is a bit special. */
-        if ( !(p_filter->output.i_original_channels & AOUT_CHAN_LEFT) )
+        if ( !(p_filter->fmt_out.audio.i_original_channels & AOUT_CHAN_LEFT) )
         {
             p_src++;
         }
-        if ( p_filter->output.i_physical_channels == AOUT_CHAN_CENTER )
+        if ( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHAN_CENTER )
         {
             /* Mono mode */
             for ( i = p_in_buf->i_nb_samples; i--; )
@@ -155,7 +155,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             }
         }
     }
-    else if ( p_filter->output.i_original_channels
+    else if ( p_filter->fmt_out.audio.i_original_channels
                                     & AOUT_CHAN_REVERSESTEREO )
     {
         /* Reverse-stereo mode */

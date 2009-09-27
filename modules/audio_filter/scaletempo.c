@@ -392,17 +392,17 @@ static int Open( vlc_object_t *p_this )
     aout_filter_sys_t *p_sys;
     bool b_fit = true;
 
-    if( p_filter->input.i_format != VLC_CODEC_FL32 ||
-        p_filter->output.i_format != VLC_CODEC_FL32 )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
+        p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
         b_fit = false;
-        p_filter->input.i_format = p_filter->output.i_format = VLC_CODEC_FL32;
+        p_filter->fmt_in.audio.i_format = p_filter->fmt_out.audio.i_format = VLC_CODEC_FL32;
         msg_Warn( p_filter, "bad input or output format" );
     }
-    if( ! AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if( ! AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         b_fit = false;
-        memcpy( &p_filter->output, &p_filter->input, sizeof(audio_sample_format_t) );
+        memcpy( &p_filter->fmt_out.audio, &p_filter->fmt_in.audio, sizeof(audio_sample_format_t) );
         msg_Warn( p_filter, "input and output formats are not similar" );
     }
 
@@ -418,8 +418,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->scale             = 1.0;
-    p_sys->sample_rate       = p_filter->input.i_rate;
-    p_sys->samples_per_frame = aout_FormatNbChannels( &p_filter->input );
+    p_sys->sample_rate       = p_filter->fmt_in.audio.i_rate;
+    p_sys->samples_per_frame = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     p_sys->bytes_per_sample  = 4;
     p_sys->bytes_per_frame   = p_sys->samples_per_frame * p_sys->bytes_per_sample;
 
@@ -481,14 +481,14 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     VLC_UNUSED(p_aout);
     aout_filter_sys_t *p = p_filter->p_sys;
 
-    if( p_filter->input.i_rate == p->sample_rate ) {
+    if( p_filter->fmt_in.audio.i_rate == p->sample_rate ) {
       memcpy( p_out_buf->p_buffer, p_in_buf->p_buffer, p_in_buf->i_buffer );
       p_out_buf->i_buffer   = p_in_buf->i_buffer;
       p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
       return;
     }
 
-    double scale = p_filter->input.i_rate / (double)p->sample_rate;
+    double scale = p_filter->fmt_in.audio.i_rate / (double)p->sample_rate;
     if( scale != p->scale ) {
       p->scale = scale;
       p->bytes_stride_scaled  = p->bytes_stride * p->scale;

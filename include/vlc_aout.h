@@ -162,12 +162,13 @@ struct aout_filter_t
 {
     VLC_COMMON_MEMBERS
 
-    audio_sample_format_t   input;
-    audio_sample_format_t   output;
-    aout_alloc_t            output_alloc;
-
     module_t *              p_module;
     aout_filter_sys_t       *p_sys;
+
+    es_format_t             fmt_in;
+    es_format_t             fmt_out;
+
+    aout_alloc_t            output_alloc;
 
     bool                    b_in_place;
     bool                    b_continuity;

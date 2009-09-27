@@ -81,9 +81,9 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if( p_filter->input.i_format != VLC_CODEC_DTS ||
-        ( p_filter->output.i_format != VLC_CODEC_SPDIFL &&
-          p_filter->output.i_format != VLC_CODEC_SPDIFB ) )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_DTS ||
+        ( p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFL &&
+          p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFB ) )
     {
         return -1;
     }
@@ -170,7 +170,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
 
         /* Copy the S/PDIF headers. */
-        if( p_filter->output.i_format == VLC_CODEC_SPDIFB )
+        if( p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFB )
         {
             vlc_memcpy( p_out, p_sync_be, 6 );
             p_out[5] = i_ac5_spdif_type;
@@ -185,8 +185,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             p_out[7] = (( i_length ) >> 5 ) & 0xFF;
         }
 
-        if( ( (p_in[0] == 0x1F || p_in[0] == 0x7F) && p_filter->output.i_format == VLC_CODEC_SPDIFL ) ||
-            ( (p_in[0] == 0xFF || p_in[0] == 0xFE) && p_filter->output.i_format == VLC_CODEC_SPDIFB ) )
+        if( ( (p_in[0] == 0x1F || p_in[0] == 0x7F) && p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFL ) ||
+            ( (p_in[0] == 0xFF || p_in[0] == 0xFE) && p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFB ) )
         {
             /* We are dealing with a big endian bitstream and a little endian output
              * or a little endian bitstream and a big endian output.

@@ -150,18 +150,18 @@ static int Open( vlc_object_t *p_this )
     aout_filter_sys_t *p_sys;
     bool         b_fit = true;
 
-    if( p_filter->input.i_format != VLC_CODEC_FL32 ||
-        p_filter->output.i_format != VLC_CODEC_FL32 )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
+        p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
         b_fit = false;
-        p_filter->input.i_format = VLC_CODEC_FL32;
-        p_filter->output.i_format = VLC_CODEC_FL32;
+        p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
+        p_filter->fmt_out.audio.i_format = VLC_CODEC_FL32;
         msg_Warn( p_filter, "bad input or output format" );
     }
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         b_fit = false;
-        memcpy( &p_filter->output, &p_filter->input,
+        memcpy( &p_filter->fmt_out.audio, &p_filter->fmt_in.audio,
                 sizeof(audio_sample_format_t) );
         msg_Warn( p_filter, "input and output formats are not similar" );
     }
@@ -180,7 +180,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     vlc_mutex_init( &p_sys->lock );
-    if( EqzInit( p_filter, p_filter->input.i_rate ) != VLC_SUCCESS )
+    if( EqzInit( p_filter, p_filter->fmt_in.audio.i_rate ) != VLC_SUCCESS )
     {
         vlc_mutex_destroy( &p_sys->lock );
         free( p_sys );
@@ -217,7 +217,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     EqzFilter( p_filter, (float*)p_out_buf->p_buffer,
                (float*)p_in_buf->p_buffer, p_in_buf->i_nb_samples,
-               aout_FormatNbChannels( &p_filter->input ) );
+               aout_FormatNbChannels( &p_filter->fmt_in.audio ) );
 }
 
 /*****************************************************************************

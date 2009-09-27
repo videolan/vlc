@@ -484,10 +484,10 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     p_out->i_length = p_block->i_length;
 
     aout_filter.p_sys = (struct aout_filter_sys_t *)p_filter->p_sys;
-    aout_filter.input = p_filter->fmt_in.audio;
-    aout_filter.input.i_format = p_filter->fmt_in.i_codec;
-    aout_filter.output = p_filter->fmt_out.audio;
-    aout_filter.output.i_format = p_filter->fmt_out.i_codec;
+    aout_filter.fmt_in.audio = p_filter->fmt_in.audio;
+    aout_filter.fmt_in.audio.i_format = p_filter->fmt_in.i_codec;
+    aout_filter.fmt_out.audio = p_filter->fmt_out.audio;
+    aout_filter.fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
 
     in_buf.p_buffer = p_block->p_buffer;
     in_buf.i_buffer = p_block->i_buffer;
@@ -535,8 +535,8 @@ static void stereo2mono_downmix( aout_filter_t * p_filter,
 {
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
 
-    int i_input_nb = aout_FormatNbChannels( &p_filter->input );
-    int i_output_nb = aout_FormatNbChannels( &p_filter->output );
+    int i_input_nb = aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    int i_output_nb = aout_FormatNbChannels( &p_filter->fmt_out.audio );
 
     int16_t * p_in = (int16_t*) p_in_buf->p_buffer;
     uint8_t * p_out;

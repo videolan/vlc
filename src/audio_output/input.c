@@ -288,9 +288,9 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
             p_filter->p_owner->p_input = p_input;
 
             /* request format */
-            memcpy( &p_filter->input, &chain_output_format,
+            memcpy( &p_filter->fmt_in.audio, &chain_output_format,
                     sizeof(audio_sample_format_t) );
-            memcpy( &p_filter->output, &chain_output_format,
+            memcpy( &p_filter->fmt_out.audio, &chain_output_format,
                     sizeof(audio_sample_format_t) );
 
 
@@ -308,13 +308,13 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
                 if ( p_filter->p_module == NULL )
                 {
                     /* if the filter requested a special format, retry */
-                    if ( !( AOUT_FMTS_IDENTICAL( &p_filter->input,
+                    if ( !( AOUT_FMTS_IDENTICAL( &p_filter->fmt_in.audio,
                                                  &chain_input_format )
-                            && AOUT_FMTS_IDENTICAL( &p_filter->output,
+                            && AOUT_FMTS_IDENTICAL( &p_filter->fmt_out.audio,
                                                     &chain_output_format ) ) )
                     {
-                        aout_FormatPrepare( &p_filter->input );
-                        aout_FormatPrepare( &p_filter->output );
+                        aout_FormatPrepare( &p_filter->fmt_in.audio );
+                        aout_FormatPrepare( &p_filter->fmt_out.audio );
                         p_filter->p_module = module_need( p_filter,
                                                           "audio filter",
                                                           psz_parser, true );
@@ -322,9 +322,9 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
                     /* try visual filters */
                     else
                     {
-                        memcpy( &p_filter->input, &chain_output_format,
+                        memcpy( &p_filter->fmt_in.audio, &chain_output_format,
                                 sizeof(audio_sample_format_t) );
-                        memcpy( &p_filter->output, &chain_output_format,
+                        memcpy( &p_filter->fmt_out.audio, &chain_output_format,
                                 sizeof(audio_sample_format_t) );
                         p_filter->p_module = module_need( p_filter,
                                                           "visualization",
@@ -348,12 +348,13 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
             }
 
             /* complete the filter chain if necessary */
-            if ( !AOUT_FMTS_IDENTICAL( &chain_input_format, &p_filter->input ) )
+            if ( !AOUT_FMTS_IDENTICAL( &chain_input_format,
+                                       &p_filter->fmt_in.audio ) )
             {
                 if ( aout_FiltersCreatePipeline( p_aout, p_input->pp_filters,
                                                  &p_input->i_nb_filters,
                                                  &chain_input_format,
-                                                 &p_filter->input ) < 0 )
+                                                 &p_filter->fmt_in.audio ) < 0 )
                 {
                     msg_Err( p_aout, "cannot add user filter %s (skipped)",
                              psz_parser );
@@ -371,7 +372,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
             /* success */
             p_filter->b_continuity = false;
             p_input->pp_filters[p_input->i_nb_filters++] = p_filter;
-            memcpy( &chain_input_format, &p_filter->output,
+            memcpy( &chain_input_format, &p_filter->fmt_out.audio,
                     sizeof( audio_sample_format_t ) );
 
             if( i_visual == 0 ) /* scaletempo */
@@ -428,7 +429,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
         p_input->input_alloc.b_alloc = true;
 
         /* Setup the initial rate of the resampler */
-        p_input->pp_resamplers[0]->input.i_rate = p_input->input.i_rate;
+        p_input->pp_resamplers[0]->fmt_in.audio.i_rate = p_input->input.i_rate;
     }
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
 
@@ -563,7 +564,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* Handle input rate change, but keep drift correction */
     if( i_input_rate != p_input->i_last_input_rate )
     {
-        unsigned int * const pi_rate = &p_input->p_playback_rate_filter->input.i_rate;
+        unsigned int * const pi_rate = &p_input->p_playback_rate_filter->fmt_in.audio.i_rate;
 #define F(r,ir) ( INPUT_RATE_DEFAULT * (r) / (ir) )
         const int i_delta = *pi_rate - F(p_input->input.i_rate,p_input->i_last_input_rate);
         *pi_rate = F(p_input->input.i_rate + i_delta, i_input_rate);
@@ -679,11 +680,11 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
         if( p_input->i_resampling_type == AOUT_RESAMPLING_UP )
         {
-            p_input->pp_resamplers[0]->input.i_rate += 2; /* Hz */
+            p_input->pp_resamplers[0]->fmt_in.audio.i_rate += 2; /* Hz */
         }
         else
         {
-            p_input->pp_resamplers[0]->input.i_rate -= 2; /* Hz */
+            p_input->pp_resamplers[0]->fmt_in.audio.i_rate -= 2; /* Hz */
         }
 
         /* Check if everything is back to normal, in which case we can stop the
@@ -692,7 +693,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
           (p_input->pp_resamplers[0] == p_input->p_playback_rate_filter)
           ? INPUT_RATE_DEFAULT * p_input->input.i_rate / i_input_rate
           : p_input->input.i_rate;
-        if( p_input->pp_resamplers[0]->input.i_rate == i_nominal_rate )
+        if( p_input->pp_resamplers[0]->fmt_in.audio.i_rate == i_nominal_rate )
         {
             p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
             msg_Warn( p_aout, "resampling stopped after %"PRIi64" usec "
@@ -789,7 +790,7 @@ static void inputResamplingStop( aout_input_t *p_input )
     p_input->i_resampling_type = AOUT_RESAMPLING_NONE;
     if( p_input->i_nb_resamplers != 0 )
     {
-        p_input->pp_resamplers[0]->input.i_rate =
+        p_input->pp_resamplers[0]->fmt_in.audio.i_rate =
             ( p_input->pp_resamplers[0] == p_input->p_playback_rate_filter )
             ? INPUT_RATE_DEFAULT * p_input->input.i_rate / p_input->i_last_input_rate
             : p_input->input.i_rate;

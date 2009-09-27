@@ -122,17 +122,17 @@ static int Create( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     int i_ret;
 
-    if ( p_filter->input.i_format != VLC_CODEC_A52
+    if ( p_filter->fmt_in.audio.i_format != VLC_CODEC_A52
 #ifdef LIBA52_FIXED
-          || p_filter->output.i_format != VLC_CODEC_FI32 )
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_FI32 )
 #else
-          || p_filter->output.i_format != VLC_CODEC_FL32 )
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
 #endif
     {
         return -1;
     }
 
-    if ( p_filter->input.i_rate != p_filter->output.i_rate )
+    if ( p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate )
     {
         return -1;
     }
@@ -144,7 +144,7 @@ static int Create( vlc_object_t *p_this )
         return -1;
 
     i_ret = Open( VLC_OBJECT(p_filter), p_sys,
-                  p_filter->input, p_filter->output );
+                  p_filter->fmt_in.audio, p_filter->fmt_out.audio );
 
     p_filter->pf_do_work = DoWork;
     p_filter->b_in_place = 0;
@@ -371,13 +371,13 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         if ( ((p_sys->i_flags & A52_CHANNEL_MASK) == A52_CHANNEL1
                || (p_sys->i_flags & A52_CHANNEL_MASK) == A52_CHANNEL2
                || (p_sys->i_flags & A52_CHANNEL_MASK) == A52_MONO)
-              && (p_filter->output.i_physical_channels
+              && (p_filter->fmt_out.audio.i_physical_channels
                    & (AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT)) )
         {
             Duplicate( (sample_t *)(p_out_buf->p_buffer + i * i_bytes_per_block),
                        p_samples );
         }
-        else if ( p_filter->output.i_original_channels
+        else if ( p_filter->fmt_out.audio.i_original_channels
                     & AOUT_CHAN_REVERSESTEREO )
         {
             Exchange( (sample_t *)(p_out_buf->p_buffer + i * i_bytes_per_block),
@@ -488,10 +488,10 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     p_out->i_length = p_block->i_length;
 
     aout_filter.p_sys = (struct aout_filter_sys_t *)p_filter->p_sys;
-    aout_filter.input = p_filter->fmt_in.audio;
-    aout_filter.input.i_format = p_filter->fmt_in.i_codec;
-    aout_filter.output = p_filter->fmt_out.audio;
-    aout_filter.output.i_format = p_filter->fmt_out.i_codec;
+    aout_filter.fmt_in.audio = p_filter->fmt_in.audio;
+    aout_filter.fmt_in.audio.i_format = p_filter->fmt_in.i_codec;
+    aout_filter.fmt_out.audio = p_filter->fmt_out.audio;
+    aout_filter.fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
 
     in_buf.p_buffer = p_block->p_buffer;
     in_buf.i_buffer = p_block->i_buffer;

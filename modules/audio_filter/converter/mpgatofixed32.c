@@ -88,15 +88,15 @@ static int Create( vlc_object_t *p_this )
     aout_filter_t *p_filter = (aout_filter_t *)p_this;
     struct filter_sys_t *p_sys;
 
-    if ( (p_filter->input.i_format != VLC_CODEC_MPGA
-           && p_filter->input.i_format != VLC_FOURCC('m','p','g','3'))
-            || (p_filter->output.i_format != VLC_CODEC_FL32
-                 && p_filter->output.i_format != VLC_CODEC_FI32) )
+    if ( (p_filter->fmt_in.audio.i_format != VLC_CODEC_MPGA
+           && p_filter->fmt_in.audio.i_format != VLC_FOURCC('m','p','g','3'))
+            || (p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32
+                 && p_filter->fmt_out.audio.i_format != VLC_CODEC_FI32) )
     {
         return -1;
     }
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         return -1;
     }
@@ -130,7 +130,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_buffer = p_in_buf->i_nb_samples * sizeof(vlc_fixed_t) *
-                               aout_FormatNbChannels( &p_filter->output );
+                               aout_FormatNbChannels( &p_filter->fmt_out.audio );
 
     /* Do the actual decoding now. */
     mad_stream_buffer( &p_sys->mad_stream, p_in_buf->p_buffer,
@@ -148,7 +148,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     if( p_sys->i_reject_count > 0 )
     {
-        if( p_filter->output.i_format == VLC_CODEC_FL32 )
+        if( p_filter->fmt_out.audio.i_format == VLC_CODEC_FL32 )
         {
             int i;
             int i_size = p_out_buf->i_buffer / sizeof(float);
@@ -168,7 +168,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     mad_synth_frame( &p_sys->mad_synth, &p_sys->mad_frame );
 
-    if ( p_filter->output.i_format == VLC_CODEC_FI32 )
+    if ( p_filter->fmt_out.audio.i_format == VLC_CODEC_FI32 )
     {
         /* Interleave and keep buffers in mad_fixed_t format */
         mad_fixed_t * p_samples = (mad_fixed_t *)p_out_buf->p_buffer;
@@ -180,14 +180,14 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         switch ( p_pcm->channels )
         {
         case 2:
-            if ( p_filter->output.i_physical_channels == AOUT_CHAN_CENTER )
+            if ( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHAN_CENTER )
             {
                 while ( i_samples-- )
                 {
                     *p_samples++ = (*p_left++ >> 1) + (*p_right++ >> 1);
                 }
             }
-            else if ( p_filter->output.i_original_channels == AOUT_CHAN_LEFT )
+            else if ( p_filter->fmt_out.audio.i_original_channels == AOUT_CHAN_LEFT )
             {
                 while ( i_samples-- )
                 {
@@ -195,7 +195,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     *p_samples++ = *p_left++;
                 }
             }
-            else if ( p_filter->output.i_original_channels == AOUT_CHAN_RIGHT )
+            else if ( p_filter->fmt_out.audio.i_original_channels == AOUT_CHAN_RIGHT )
             {
                 while ( i_samples-- )
                 {
@@ -235,7 +235,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         switch ( p_pcm->channels )
         {
         case 2:
-            if ( p_filter->output.i_physical_channels == AOUT_CHAN_CENTER )
+            if ( p_filter->fmt_out.audio.i_physical_channels == AOUT_CHAN_CENTER )
             {
                 while ( i_samples-- )
                 {
@@ -243,7 +243,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                                    (float)*p_right++ / f_temp / 2;
                 }
             }
-            else if ( p_filter->output.i_original_channels == AOUT_CHAN_LEFT )
+            else if ( p_filter->fmt_out.audio.i_original_channels == AOUT_CHAN_LEFT )
             {
                 while ( i_samples-- )
                 {
@@ -251,7 +251,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     *p_samples++ = (float)*p_left++ / f_temp;
                 }
             }
-            else if ( p_filter->output.i_original_channels == AOUT_CHAN_RIGHT )
+            else if ( p_filter->fmt_out.audio.i_original_channels == AOUT_CHAN_RIGHT )
             {
                 while ( i_samples-- )
                 {
@@ -389,10 +389,10 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     p_out->i_length = p_block->i_length;
 
     aout_filter.p_sys = (struct aout_filter_sys_t *)p_filter->p_sys;
-    aout_filter.input = p_filter->fmt_in.audio;
-    aout_filter.input.i_format = p_filter->fmt_in.i_codec;
-    aout_filter.output = p_filter->fmt_out.audio;
-    aout_filter.output.i_format = p_filter->fmt_out.i_codec;
+    aout_filter.fmt_in.audio = p_filter->fmt_in.audio;
+    aout_filter.fmt_in.audio.i_format = p_filter->fmt_in.i_codec;
+    aout_filter.fmt_out.audio = p_filter->fmt_out.audio;
+    aout_filter.fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
 
     in_buf.p_buffer = p_block->p_buffer;
     in_buf.i_flags = 0;

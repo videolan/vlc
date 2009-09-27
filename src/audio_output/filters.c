@@ -53,8 +53,8 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
     if ( p_filter == NULL ) return NULL;
     vlc_object_attach( p_filter, p_aout );
 
-    memcpy( &p_filter->input, p_input_format, sizeof(audio_sample_format_t) );
-    memcpy( &p_filter->output, p_output_format,
+    memcpy( &p_filter->fmt_in.audio, p_input_format, sizeof(audio_sample_format_t) );
+    memcpy( &p_filter->fmt_out.audio, p_output_format,
             sizeof(audio_sample_format_t) );
     p_filter->p_module = module_need( p_filter, "audio filter", NULL, false );
     if ( p_filter->p_module == NULL )
@@ -206,12 +206,12 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
                       AOUT_MAX_FILTERS );
         return -1;
     }
-    pp_filters[1] = FindFilter( p_aout, &pp_filters[0]->output,
+    pp_filters[1] = FindFilter( p_aout, &pp_filters[0]->fmt_out.audio,
                                 p_output_format );
     if ( pp_filters[1] == NULL )
     {
         /* Try to split the conversion. */
-        i_nb_conversions = SplitConversion( &pp_filters[0]->output,
+        i_nb_conversions = SplitConversion( &pp_filters[0]->fmt_out.audio,
                                            p_output_format, &temp_format );
         if ( !i_nb_conversions )
         {
@@ -229,7 +229,7 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
                           AOUT_MAX_FILTERS );
             return -1;
         }
-        pp_filters[1] = FindFilter( p_aout, &pp_filters[0]->output,
+        pp_filters[1] = FindFilter( p_aout, &pp_filters[0]->fmt_out.audio,
                                     &temp_format );
         pp_filters[2] = FindFilter( p_aout, &temp_format,
                                     p_output_format );
@@ -298,12 +298,12 @@ void aout_FiltersHintBuffers( aout_instance_t * p_aout,
     {
         aout_filter_t * p_filter = pp_filters[i];
 
-        int i_output_size = p_filter->output.i_bytes_per_frame
-                             * p_filter->output.i_rate * AOUT_MAX_INPUT_RATE
-                             / p_filter->output.i_frame_length;
-        int i_input_size = p_filter->input.i_bytes_per_frame
-                             * p_filter->input.i_rate * AOUT_MAX_INPUT_RATE
-                             / p_filter->input.i_frame_length;
+        int i_output_size = p_filter->fmt_out.audio.i_bytes_per_frame
+                         * p_filter->fmt_out.audio.i_rate * AOUT_MAX_INPUT_RATE
+                         / p_filter->fmt_out.audio.i_frame_length;
+        int i_input_size = p_filter->fmt_in.audio.i_bytes_per_frame
+                         * p_filter->fmt_in.audio.i_rate * AOUT_MAX_INPUT_RATE
+                         / p_filter->fmt_in.audio.i_frame_length;
 
         p_first_alloc->i_bytes_per_sec = __MAX( p_first_alloc->i_bytes_per_sec,
                                                 i_output_size );
@@ -345,7 +345,7 @@ void aout_FiltersPlay( aout_instance_t * p_aout,
          * slightly bigger buffers. */
         p_output_buffer = aout_BufferAlloc( &p_filter->output_alloc,
                               ((mtime_t)(*pp_input_buffer)->i_nb_samples + 2)
-                              * 1000000 / p_filter->input.i_rate,
+                              * 1000000 / p_filter->fmt_in.audio.i_rate,
                               *pp_input_buffer );
         if( p_output_buffer == NULL )
             return;

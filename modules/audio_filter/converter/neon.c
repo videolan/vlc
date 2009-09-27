@@ -45,13 +45,13 @@ static int Open (vlc_object_t *obj)
 {
     aout_filter_t *filter = (aout_filter_t *)obj;
 
-    if (!AOUT_FMTS_SIMILAR (&filter->input, &filter->output))
+    if (!AOUT_FMTS_SIMILAR (&filter->fmt_in.audio, &filter->fmt_out.audio))
         return VLC_EGENERIC;
 
-    switch (filter->input.i_format)
+    switch (filter->fmt_in.audio.i_format)
     {
         case VLC_CODEC_FL32:
-            switch (filter->output.i_format)
+            switch (filter->fmt_out.audio.i_format)
             {
                 case VLC_CODEC_FI32:
                     filter->pf_do_work = Do_F32_S32;
@@ -62,7 +62,7 @@ static int Open (vlc_object_t *obj)
             break;
 
         case VLC_CODEC_FI32:
-            switch (filter->output.i_format)
+            switch (filter->fmt_out.audio.i_format)
             {
                 case VLC_CODEC_S16N:
                     filter->pf_do_work = Do_S32_S16;
@@ -86,7 +86,7 @@ static void Do_F32_S32 (aout_instance_t *aout, aout_filter_t *filter,
                         aout_buffer_t *inbuf, aout_buffer_t *outbuf)
 {
     unsigned nb_samples = inbuf->i_nb_samples
-                     * aout_FormatNbChannels (&filter->input);
+                     * aout_FormatNbChannels (&filter->fmt_in.audio);
     const float *inp = (float *)inbuf->p_buffer;
     const float *endp = inp + nb_samples;
     int32_t *outp = (int32_t *)outbuf->p_buffer;
@@ -144,7 +144,7 @@ static void Do_S32_S16 (aout_instance_t *aout, aout_filter_t *filter,
                         aout_buffer_t *inbuf, aout_buffer_t *outbuf)
 {
     unsigned nb_samples = inbuf->i_nb_samples
-                     * aout_FormatNbChannels (&filter->input);
+                     * aout_FormatNbChannels (&filter->fmt_in.audio);
     int32_t *inp = (int32_t *)inbuf->p_buffer;
     const int32_t *endp = inp + nb_samples;
     int16_t *outp = (int16_t *)outbuf->p_buffer;

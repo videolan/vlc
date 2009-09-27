@@ -116,17 +116,17 @@ static int Open( vlc_object_t *p_this )
     aout_filter_t *p_filter = (aout_filter_t*)p_this;
     aout_filter_sys_t *p_sys;
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         msg_Err( p_filter, "input and output formats are not similar" );
         return VLC_EGENERIC;
     }
 
-    if( p_filter->input.i_format != VLC_CODEC_FL32 ||
-        p_filter->output.i_format != VLC_CODEC_FL32 )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
+        p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
-        p_filter->input.i_format = VLC_CODEC_FL32;
-        p_filter->output.i_format = VLC_CODEC_FL32;
+        p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
+        p_filter->fmt_out.audio.i_format = VLC_CODEC_FL32;
         msg_Warn( p_filter, "bad input or output format" );
     }
 
@@ -137,7 +137,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->i_channels       = aout_FormatNbChannels( &p_filter->input );
+    p_sys->i_channels       = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     p_sys->f_delayTime      = var_CreateGetFloat( p_this, "delay-time" );
     p_sys->f_sweepDepth     = var_CreateGetFloat( p_this, "sweep-depth" );
     p_sys->f_sweepRate      = var_CreateGetFloat( p_this, "sweep-rate" );
@@ -168,12 +168,12 @@ static int Open( vlc_object_t *p_this )
 
     /* Max delay = delay + depth. Min = delay - depth */
     p_sys->i_bufferLength = p_sys->i_channels * ( (int)( ( p_sys->f_delayTime
-                + p_sys->f_sweepDepth ) * p_filter->input.i_rate/1000 ) + 1 );
+                + p_sys->f_sweepDepth ) * p_filter->fmt_in.audio.i_rate/1000 ) + 1 );
 
     msg_Dbg( p_filter , "Buffer length:%d, Channels:%d, Sweep Depth:%f, Delay "
             "time:%f, Sweep Rate:%f, Sample Rate: %d", p_sys->i_bufferLength,
             p_sys->i_channels, p_sys->f_sweepDepth, p_sys->f_delayTime,
-            p_sys->f_sweepRate, p_filter->input.i_rate );
+            p_sys->f_sweepRate, p_filter->fmt_in.audio.i_rate );
     if( p_sys->i_bufferLength <= 0 )
     {
         msg_Err( p_filter, "Delay-time, Sampl rate or Channels was incorrect" );
@@ -199,14 +199,14 @@ static int Open( vlc_object_t *p_this )
     p_sys->pf_write = p_sys->pf_delayLineStart;
 
     if( p_sys->f_sweepDepth < small_value() ||
-            p_filter->input.i_rate < small_value() ) {
+            p_filter->fmt_in.audio.i_rate < small_value() ) {
         p_sys->f_sinMultiplier = 0.0;
     }
     else {
         p_sys->f_sinMultiplier = 11 * p_sys->f_sweepRate /
-            ( 7 * p_sys->f_sweepDepth * p_filter->input.i_rate ) ;
+            ( 7 * p_sys->f_sweepDepth * p_filter->fmt_in.audio.i_rate ) ;
     }
-    p_sys->i_sampleRate = p_filter->input.i_rate;
+    p_sys->i_sampleRate = p_filter->fmt_in.audio.i_rate;
 
     return VLC_SUCCESS;
 }

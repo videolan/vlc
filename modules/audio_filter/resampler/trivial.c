@@ -59,14 +59,14 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_rate == p_filter->output.i_rate
-          || p_filter->input.i_format != p_filter->output.i_format
-          || p_filter->input.i_physical_channels
-              != p_filter->output.i_physical_channels
-          || p_filter->input.i_original_channels
-              != p_filter->output.i_original_channels
-          || (p_filter->input.i_format != VLC_CODEC_FL32
-               && p_filter->input.i_format != VLC_CODEC_FI32) )
+    if ( p_filter->fmt_in.audio.i_rate == p_filter->fmt_out.audio.i_rate
+          || p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format
+          || p_filter->fmt_in.audio.i_physical_channels
+              != p_filter->fmt_out.audio.i_physical_channels
+          || p_filter->fmt_in.audio.i_original_channels
+              != p_filter->fmt_out.audio.i_original_channels
+          || (p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
+               && p_filter->fmt_in.audio.i_format != VLC_CODEC_FI32) )
     {
         return -1;
     }
@@ -84,13 +84,13 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
     int i_in_nb = p_in_buf->i_nb_samples;
-    int i_out_nb = i_in_nb * p_filter->output.i_rate
-                    / p_filter->input.i_rate;
-    int i_sample_bytes = aout_FormatNbChannels( &p_filter->input )
+    int i_out_nb = i_in_nb * p_filter->fmt_out.audio.i_rate
+                    / p_filter->fmt_in.audio.i_rate;
+    int i_sample_bytes = aout_FormatNbChannels( &p_filter->fmt_in.audio )
                           * sizeof(int32_t);
 
     /* Check if we really need to run the resampler */
-    if( p_aout->mixer_format.i_rate == p_filter->input.i_rate )
+    if( p_aout->mixer_format.i_rate == p_filter->fmt_in.audio.i_rate )
     {
         return;
     }
@@ -114,5 +114,5 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->i_buffer = i_out_nb * i_sample_bytes;
     p_out_buf->i_pts = p_in_buf->i_pts;
     p_out_buf->i_length = p_out_buf->i_nb_samples *
-        1000000 / p_filter->output.i_rate;
+        1000000 / p_filter->fmt_out.audio.i_rate;
 }

@@ -358,7 +358,7 @@ static int Create( vlc_object_t *p_this )
     bool b_fit = true;
 
     /* Activate this filter only with stereo devices */
-    if( p_filter->output.i_physical_channels
+    if( p_filter->fmt_out.audio.i_physical_channels
             != (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT) )
     {
         msg_Dbg( p_filter, "filter discarded (incompatible format)" );
@@ -366,31 +366,31 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Request a specific format if not already compatible */
-    if( p_filter->input.i_original_channels
-            != p_filter->output.i_original_channels )
+    if( p_filter->fmt_in.audio.i_original_channels
+            != p_filter->fmt_out.audio.i_original_channels )
     {
         b_fit = false;
-        p_filter->input.i_original_channels =
-                                        p_filter->output.i_original_channels;
+        p_filter->fmt_in.audio.i_original_channels =
+                                        p_filter->fmt_out.audio.i_original_channels;
     }
-    if( p_filter->input.i_format != VLC_CODEC_FL32
-          || p_filter->output.i_format != VLC_CODEC_FL32 )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
+          || p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
         b_fit = false;
-        p_filter->input.i_format = VLC_CODEC_FL32;
-        p_filter->output.i_format = VLC_CODEC_FL32;
+        p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
+        p_filter->fmt_out.audio.i_format = VLC_CODEC_FL32;
     }
-    if( p_filter->input.i_rate != p_filter->output.i_rate )
+    if( p_filter->fmt_in.audio.i_rate != p_filter->fmt_out.audio.i_rate )
     {
         b_fit = false;
-        p_filter->input.i_rate = p_filter->output.i_rate;
+        p_filter->fmt_in.audio.i_rate = p_filter->fmt_out.audio.i_rate;
     }
-    if( p_filter->input.i_physical_channels == (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
-          && ( p_filter->input.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
+    if( p_filter->fmt_in.audio.i_physical_channels == (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
+          && ( p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
           && ! config_GetInt ( p_filter , "headphone-dolby" ) )
     {
         b_fit = false;
-        p_filter->input.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
+        p_filter->fmt_in.audio.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                                               AOUT_CHAN_CENTER |
                                               AOUT_CHAN_REARLEFT |
                                               AOUT_CHAN_REARRIGHT;
@@ -412,9 +412,9 @@ static int Create( vlc_object_t *p_this )
     p_sys->p_atomic_operations = NULL;
 
     if( Init( VLC_OBJECT(p_filter), p_sys
-                , aout_FormatNbChannels ( &p_filter->input )
-                , p_filter->input.i_physical_channels
-                , p_filter->input.i_rate ) < 0 )
+                , aout_FormatNbChannels ( &p_filter->fmt_in.audio )
+                , p_filter->fmt_in.audio.i_physical_channels
+                , p_filter->fmt_in.audio.i_rate ) < 0 )
     {
         free( p_sys );
         return VLC_EGENERIC;
@@ -446,8 +446,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 {
     VLC_UNUSED(p_aout);
     aout_filter_sys_t *p_sys = p_filter->p_sys;
-    int i_input_nb = aout_FormatNbChannels( &p_filter->input );
-    int i_output_nb = aout_FormatNbChannels( &p_filter->output );
+    int i_input_nb = aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    int i_output_nb = aout_FormatNbChannels( &p_filter->fmt_out.audio );
 
     float * p_in = (float*) p_in_buf->p_buffer;
     uint8_t * p_out;
@@ -668,10 +668,10 @@ static block_t *Convert( filter_t *p_filter, block_t *p_block )
     p_out->i_length = p_block->i_length;
 
     aout_filter.p_sys = (struct aout_filter_sys_t *)p_filter->p_sys;
-    aout_filter.input = p_filter->fmt_in.audio;
-    aout_filter.input.i_format = p_filter->fmt_in.i_codec;
-    aout_filter.output = p_filter->fmt_out.audio;
-    aout_filter.output.i_format = p_filter->fmt_out.i_codec;
+    aout_filter.fmt_in.audio = p_filter->fmt_in.audio;
+    aout_filter.fmt_in.audio.i_format = p_filter->fmt_in.i_codec;
+    aout_filter.fmt_out.audio = p_filter->fmt_out.audio;
+    aout_filter.fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
     aout_filter.b_in_place = 0;
 
     in_buf.p_buffer = p_block->p_buffer;

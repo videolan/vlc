@@ -115,13 +115,13 @@ static int Create( vlc_object_t *p_this )
     double d_factor;
     int i_filter_wing;
 
-    if ( p_filter->input.i_rate == p_filter->output.i_rate
-          || p_filter->input.i_format != p_filter->output.i_format
-          || p_filter->input.i_physical_channels
-              != p_filter->output.i_physical_channels
-          || p_filter->input.i_original_channels
-              != p_filter->output.i_original_channels
-          || p_filter->input.i_format != VLC_CODEC_FL32 )
+    if ( p_filter->fmt_in.audio.i_rate == p_filter->fmt_out.audio.i_rate
+          || p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format
+          || p_filter->fmt_in.audio.i_physical_channels
+              != p_filter->fmt_out.audio.i_physical_channels
+          || p_filter->fmt_in.audio.i_original_channels
+              != p_filter->fmt_out.audio.i_original_channels
+          || p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 )
     {
         return VLC_EGENERIC;
     }
@@ -140,11 +140,11 @@ static int Create( vlc_object_t *p_this )
     p_filter->p_sys = (struct aout_filter_sys_t *)p_sys;
 
     /* Calculate worst case for the length of the filter wing */
-    d_factor = (double)p_filter->output.i_rate
-                        / p_filter->input.i_rate / AOUT_MAX_INPUT_RATE;
+    d_factor = (double)p_filter->fmt_out.audio.i_rate
+                        / p_filter->fmt_in.audio.i_rate / AOUT_MAX_INPUT_RATE;
     i_filter_wing = ((SMALL_FILTER_NMULT + 1)/2.0)
                       * __MAX(1.0, 1.0/d_factor) + 10;
-    p_sys->i_buf_size = aout_FormatNbChannels( &p_filter->input ) *
+    p_sys->i_buf_size = aout_FormatNbChannels( &p_filter->fmt_in.audio ) *
         sizeof(int32_t) * 2 * i_filter_wing;
 
     /* Allocate enough memory to buffer previous samples */
@@ -186,7 +186,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
     float *p_out = (float *)p_out_buf->p_buffer;
 
-    int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
+    int i_nb_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     int i_in_nb = p_in_buf->i_nb_samples;
     int i_in, i_out = 0;
     unsigned int i_out_rate;
@@ -194,12 +194,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     int i_filter_wing;
 
     if( p_sys->b_filter2 )
-        i_out_rate = p_filter->output.i_rate;
+        i_out_rate = p_filter->fmt_out.audio.i_rate;
     else
         i_out_rate = p_aout->mixer_format.i_rate;
 
     /* Check if we really need to run the resampler */
-    if( i_out_rate == p_filter->input.i_rate )
+    if( i_out_rate == p_filter->fmt_in.audio.i_rate )
     {
 #if 0   /* FIXME: needs audio filter2 to use block_Realloc */
         if( /*p_filter->b_continuity && /--* What difference does it make ? :) */
@@ -207,14 +207,14 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         {
             /* output the whole thing with the samples from last time */
             p_in_buf = block_Realloc( p_in_buf,
-                p_sys->i_old_wing * p_filter->input.i_bytes_per_frame,
+                p_sys->i_old_wing * p_filter->fmt_in.audio.i_bytes_per_frame,
                 p_in_buf->i_buffer );
             if( !p_in_buf )
                 abort();
             memcpy( p_in_buf->p_buffer, p_sys->p_buf +
                     i_nb_channels * p_sys->i_old_wing,
                     p_sys->i_old_wing *
-                    p_filter->input.i_bytes_per_frame );
+                    p_filter->fmt_in.audio.i_bytes_per_frame );
 
             p_out_buf->i_nb_samples = p_in_buf->i_nb_samples +
                 p_sys->i_old_wing;
@@ -225,7 +225,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                                 p_out_buf->i_nb_samples ) - p_out_buf->i_pts;
 
             p_out_buf->i_buffer = p_out_buf->i_nb_samples *
-                p_filter->input.i_bytes_per_frame;
+                p_filter->fmt_in.audio.i_bytes_per_frame;
         }
 #endif
         p_filter->b_continuity = false;
@@ -241,7 +241,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         p_sys->i_remainder = 0;
         date_Init( &p_sys->end_date, i_out_rate, 1 );
         date_Set( &p_sys->end_date, p_in_buf->i_pts );
-        p_sys->i_old_rate   = p_filter->input.i_rate;
+        p_sys->i_old_rate   = p_filter->fmt_in.audio.i_rate;
         p_sys->d_old_factor = 1;
         p_sys->i_old_wing   = 0;
     }
@@ -255,7 +255,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     /* Prepare the source buffer */
     i_in_nb += (p_sys->i_old_wing * 2);
 
-    float p_in_orig[i_in_nb * p_filter->input.i_bytes_per_frame / 4],
+    float p_in_orig[i_in_nb * p_filter->fmt_in.audio.i_bytes_per_frame / 4],
          *p_in = p_in_orig;
 
     /* Copy all our samples in p_in */
@@ -263,17 +263,17 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     {
         vlc_memcpy( p_in, p_sys->p_buf,
                     p_sys->i_old_wing * 2 *
-                      p_filter->input.i_bytes_per_frame );
+                      p_filter->fmt_in.audio.i_bytes_per_frame );
     }
     vlc_memcpy( p_in + p_sys->i_old_wing * 2 * i_nb_channels,
                 p_in_buf->p_buffer,
-                p_in_buf->i_nb_samples * p_filter->input.i_bytes_per_frame );
+                p_in_buf->i_nb_samples * p_filter->fmt_in.audio.i_bytes_per_frame );
 
     /* Make sure the output buffer is reset */
     memset( p_out, 0, p_out_buf->i_buffer );
 
     /* Calculate the new length of the filter wing */
-    d_factor = (double)i_out_rate / p_filter->input.i_rate;
+    d_factor = (double)i_out_rate / p_filter->fmt_in.audio.i_rate;
     i_filter_wing = ((SMALL_FILTER_NMULT+1)/2.0) * __MAX(1.0,1.0/d_factor) + 1;
 
     /* Account for increased filter gain when using factors less than 1 */
@@ -291,14 +291,14 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         {
             /* Just copy the samples */
             memcpy( p_out, p_in,
-                    p_filter->input.i_bytes_per_frame );
+                    p_filter->fmt_in.audio.i_bytes_per_frame );
             p_in += i_nb_channels;
             p_out += i_nb_channels;
             i_out++;
             continue;
         }
 
-        while( p_sys->i_remainder < p_filter->output.i_rate )
+        while( p_sys->i_remainder < p_filter->fmt_out.audio.i_rate )
         {
 
             if( p_sys->d_old_factor >= 1 )
@@ -309,14 +309,14 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 FilterFloatUP( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
                                SMALL_FILTER_NWING, p_in, p_out,
                                p_sys->i_remainder,
-                               p_filter->output.i_rate,
+                               p_filter->fmt_out.audio.i_rate,
                                -1, i_nb_channels );
                 /* Perform right-wing inner product */
                 FilterFloatUP( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
                                SMALL_FILTER_NWING, p_in + i_nb_channels, p_out,
-                               p_filter->output.i_rate -
+                               p_filter->fmt_out.audio.i_rate -
                                p_sys->i_remainder,
-                               p_filter->output.i_rate,
+                               p_filter->fmt_out.audio.i_rate,
                                1, i_nb_channels );
 
 #if 0
@@ -328,12 +328,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 #endif
 
                 /* Sanity check */
-                if( p_out_buf->i_buffer/p_filter->input.i_bytes_per_frame
+                if( p_out_buf->i_buffer/p_filter->fmt_in.audio.i_bytes_per_frame
                     <= (unsigned int)i_out+1 )
                 {
                     p_out += i_nb_channels;
                     i_out++;
-                    p_sys->i_remainder += p_filter->input.i_rate;
+                    p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
                     break;
                 }
             }
@@ -343,37 +343,37 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 FilterFloatUD( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
                                SMALL_FILTER_NWING, p_in, p_out,
                                p_sys->i_remainder,
-                               p_filter->output.i_rate, p_filter->input.i_rate,
+                               p_filter->fmt_out.audio.i_rate, p_filter->fmt_in.audio.i_rate,
                                -1, i_nb_channels );
                 /* Perform right-wing inner product */
                 FilterFloatUD( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
                                SMALL_FILTER_NWING, p_in + i_nb_channels, p_out,
-                               p_filter->output.i_rate -
+                               p_filter->fmt_out.audio.i_rate -
                                p_sys->i_remainder,
-                               p_filter->output.i_rate, p_filter->input.i_rate,
+                               p_filter->fmt_out.audio.i_rate, p_filter->fmt_in.audio.i_rate,
                                1, i_nb_channels );
             }
 
             p_out += i_nb_channels;
             i_out++;
 
-            p_sys->i_remainder += p_filter->input.i_rate;
+            p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
         }
 
         p_in += i_nb_channels;
-        p_sys->i_remainder -= p_filter->output.i_rate;
+        p_sys->i_remainder -= p_filter->fmt_out.audio.i_rate;
     }
 
     /* Apply the new rate for the rest of the samples */
     if( i_in < i_in_nb - i_filter_wing )
     {
-        p_sys->i_old_rate   = p_filter->input.i_rate;
+        p_sys->i_old_rate   = p_filter->fmt_in.audio.i_rate;
         p_sys->d_old_factor = d_factor;
         p_sys->i_old_wing   = i_filter_wing;
     }
     for( ; i_in < i_in_nb - i_filter_wing; i_in++ )
     {
-        while( p_sys->i_remainder < p_filter->output.i_rate )
+        while( p_sys->i_remainder < p_filter->fmt_out.audio.i_rate )
         {
 
             if( d_factor >= 1 )
@@ -384,15 +384,15 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 FilterFloatUP( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
                                SMALL_FILTER_NWING, p_in, p_out,
                                p_sys->i_remainder,
-                               p_filter->output.i_rate,
+                               p_filter->fmt_out.audio.i_rate,
                                -1, i_nb_channels );
 
                 /* Perform right-wing inner product */
                 FilterFloatUP( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
                                SMALL_FILTER_NWING, p_in + i_nb_channels, p_out,
-                               p_filter->output.i_rate -
+                               p_filter->fmt_out.audio.i_rate -
                                p_sys->i_remainder,
-                               p_filter->output.i_rate,
+                               p_filter->fmt_out.audio.i_rate,
                                1, i_nb_channels );
 
 #if 0
@@ -403,12 +403,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 }
 #endif
                 /* Sanity check */
-                if( p_out_buf->i_buffer/p_filter->input.i_bytes_per_frame
+                if( p_out_buf->i_buffer/p_filter->fmt_in.audio.i_bytes_per_frame
                     <= (unsigned int)i_out+1 )
                 {
                     p_out += i_nb_channels;
                     i_out++;
-                    p_sys->i_remainder += p_filter->input.i_rate;
+                    p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
                     break;
                 }
             }
@@ -418,25 +418,25 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 FilterFloatUD( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
                                SMALL_FILTER_NWING, p_in, p_out,
                                p_sys->i_remainder,
-                               p_filter->output.i_rate, p_filter->input.i_rate,
+                               p_filter->fmt_out.audio.i_rate, p_filter->fmt_in.audio.i_rate,
                                -1, i_nb_channels );
                 /* Perform right-wing inner product */
                 FilterFloatUD( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
                                SMALL_FILTER_NWING, p_in + i_nb_channels, p_out,
-                               p_filter->output.i_rate -
+                               p_filter->fmt_out.audio.i_rate -
                                p_sys->i_remainder,
-                               p_filter->output.i_rate, p_filter->input.i_rate,
+                               p_filter->fmt_out.audio.i_rate, p_filter->fmt_in.audio.i_rate,
                                1, i_nb_channels );
             }
 
             p_out += i_nb_channels;
             i_out++;
 
-            p_sys->i_remainder += p_filter->input.i_rate;
+            p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
         }
 
         p_in += i_nb_channels;
-        p_sys->i_remainder -= p_filter->output.i_rate;
+        p_sys->i_remainder -= p_filter->fmt_out.audio.i_rate;
     }
 
     /* Buffer i_filter_wing * 2 samples for next time */
@@ -445,12 +445,12 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         memcpy( p_sys->p_buf,
                 p_in_orig + (i_in_nb - 2 * p_sys->i_old_wing) *
                 i_nb_channels, (2 * p_sys->i_old_wing) *
-                p_filter->input.i_bytes_per_frame );
+                p_filter->fmt_in.audio.i_bytes_per_frame );
     }
 
 #if 0
     msg_Err( p_filter, "p_out size: %i, nb bytes out: %i", p_out_buf->i_buffer,
-             i_out * p_filter->input.i_bytes_per_frame );
+             i_out * p_filter->fmt_in.audio.i_bytes_per_frame );
 #endif
 
     /* Finalize aout buffer */
@@ -577,11 +577,11 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
     p_out->i_length = p_block->i_length;
 
     aout_filter.p_sys = (struct aout_filter_sys_t *)p_filter->p_sys;
-    aout_filter.input = p_filter->fmt_in.audio;
-    aout_filter.input.i_bytes_per_frame = p_filter->fmt_in.audio.i_channels *
+    aout_filter.fmt_in.audio = p_filter->fmt_in.audio;
+    aout_filter.fmt_in.audio.i_bytes_per_frame = p_filter->fmt_in.audio.i_channels *
                   p_filter->fmt_in.audio.i_bitspersample / 8;
-    aout_filter.output = p_filter->fmt_out.audio;
-    aout_filter.output.i_bytes_per_frame = p_filter->fmt_out.audio.i_channels *
+    aout_filter.fmt_out.audio = p_filter->fmt_out.audio;
+    aout_filter.fmt_out.audio.i_bytes_per_frame = p_filter->fmt_out.audio.i_channels *
                   p_filter->fmt_out.audio.i_bitspersample / 8;
     aout_filter.b_continuity = !p_filter->p_sys->b_first;
     p_filter->p_sys->b_first = false;

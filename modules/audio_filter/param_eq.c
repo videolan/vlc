@@ -111,18 +111,18 @@ static int Open( vlc_object_t *p_this )
     bool         b_fit = true;
     int                i_samplerate;
 
-    if( p_filter->input.i_format != VLC_CODEC_FL32 ||
-        p_filter->output.i_format != VLC_CODEC_FL32 )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
+        p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
         b_fit = false;
-        p_filter->input.i_format = VLC_CODEC_FL32;
-        p_filter->output.i_format = VLC_CODEC_FL32;
+        p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
+        p_filter->fmt_out.audio.i_format = VLC_CODEC_FL32;
         msg_Warn( p_filter, "bad input or output format" );
     }
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         b_fit = false;
-        memcpy( &p_filter->output, &p_filter->input,
+        memcpy( &p_filter->fmt_out.audio, &p_filter->fmt_in.audio,
                 sizeof(audio_sample_format_t) );
         msg_Warn( p_filter, "input and output formats are not similar" );
     }
@@ -156,7 +156,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->f_gain3 = config_GetFloat( p_this, "param-eq-gain3");
  
 
-    i_samplerate = p_filter->input.i_rate;
+    i_samplerate = p_filter->fmt_in.audio.i_rate;
     CalcPeakEQCoeffs(p_sys->f_f1, p_sys->f_Q1, p_sys->f_gain1,
                      i_samplerate, p_sys->coeffs+0*5);
     CalcPeakEQCoeffs(p_sys->f_f2, p_sys->f_Q2, p_sys->f_gain2,
@@ -167,7 +167,7 @@ static int Open( vlc_object_t *p_this )
                       i_samplerate, p_sys->coeffs+3*5);
     CalcShelfEQCoeffs(p_sys->f_highf, 1, p_sys->f_highgain, 0,
                       i_samplerate, p_sys->coeffs+4*5);
-    p_sys->p_state = (float*)calloc( p_filter->input.i_channels*5*4,
+    p_sys->p_state = (float*)calloc( p_filter->fmt_in.audio.i_channels*5*4,
                                      sizeof(float) );
 
     return VLC_SUCCESS;
@@ -194,7 +194,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     ProcessEQ( (float*)p_in_buf->p_buffer, (float*)p_out_buf->p_buffer,
                p_filter->p_sys->p_state,
-               p_filter->input.i_channels, p_in_buf->i_nb_samples,
+               p_filter->fmt_in.audio.i_channels, p_in_buf->i_nb_samples,
                p_filter->p_sys->coeffs, 5 );
 }
 

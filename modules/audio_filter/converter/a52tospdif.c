@@ -64,9 +64,9 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_format != VLC_CODEC_A52 ||
-         ( p_filter->output.i_format != VLC_CODEC_SPDIFB &&
-           p_filter->output.i_format != VLC_CODEC_SPDIFL ) )
+    if ( p_filter->fmt_in.audio.i_format != VLC_CODEC_A52 ||
+         ( p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFB &&
+           p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFL ) )
     {
         return -1;
     }
@@ -95,7 +95,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     uint8_t * p_out = p_out_buf->p_buffer;
 
     /* Copy the S/PDIF headers. */
-    if( p_filter->output.i_format == VLC_CODEC_SPDIFB )
+    if( p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFB )
     {
         vlc_memcpy( p_out, p_sync_be, 6 );
         p_out[4] = p_in[5] & 0x7; /* bsmod */

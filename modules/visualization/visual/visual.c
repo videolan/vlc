@@ -194,8 +194,8 @@ static int Open( vlc_object_t *p_this )
     char *psz_effects, *psz_parser;
     video_format_t fmt;
 
-    if( ( p_filter->input.i_format != VLC_CODEC_FL32 &&
-          p_filter->input.i_format != VLC_CODEC_FI32 ) )
+    if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 &&
+          p_filter->fmt_in.audio.i_format != VLC_CODEC_FI32 ) )
     {
         return VLC_EGENERIC;
     }
@@ -229,7 +229,7 @@ static int Open( vlc_object_t *p_this )
             break;
         p_effect->i_width = p_sys->i_width;
         p_effect->i_height= p_sys->i_height;
-        p_effect->i_nb_chans = aout_FormatNbChannels( &p_filter->input);
+        p_effect->i_nb_chans = aout_FormatNbChannels( &p_filter->fmt_in.audio);
         p_effect->i_idx_left  = 0;
         p_effect->i_idx_right = __MIN( 1, p_effect->i_nb_chans-1 );
 
@@ -344,8 +344,8 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_buffer = p_in_buf->i_buffer *
-                            aout_FormatNbChannels( &p_filter->output ) /
-                            aout_FormatNbChannels( &p_filter->input );
+                            aout_FormatNbChannels( &p_filter->fmt_out.audio ) /
+                            aout_FormatNbChannels( &p_filter->fmt_in.audio );
 
     /* First, get a new picture */
     while( ( p_outpic = vout_CreatePicture( p_sys->p_vout, 0, 0, 3 ) ) == NULL)

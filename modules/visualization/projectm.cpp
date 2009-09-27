@@ -162,13 +162,13 @@ static int Open( vlc_object_t * p_this )
     projectm_thread_t   *p_thread;
 
     /* Test the audio format */
-    if( p_filter->input.i_format != VLC_CODEC_FL32 ||
-        p_filter->output.i_format != VLC_CODEC_FL32 )
+    if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
+        p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
         msg_Warn( p_filter, "bad input or output format" );
         return VLC_EGENERIC;
     }
-    if( !AOUT_FMTS_SIMILAR( &p_filter->input, &p_filter->output ) )
+    if( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
         msg_Warn( p_filter, "input and outut are not similar" );
         return VLC_EGENERIC;
@@ -198,7 +198,7 @@ static int Open( vlc_object_t * p_this )
         return i_ret;
     }
 
-    p_thread->i_channels = aout_FormatNbChannels( &p_filter->input );
+    p_thread->i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     p_thread->psz_config = var_CreateGetString( p_filter, "projectm-config" );
     vlc_mutex_init( &p_thread->lock );
     p_thread->p_buffer = NULL;

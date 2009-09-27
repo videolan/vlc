@@ -59,14 +59,14 @@ static int Create( vlc_object_t *p_this )
 {
     aout_filter_t * p_filter = (aout_filter_t *)p_this;
 
-    if ( p_filter->input.i_rate == p_filter->output.i_rate
-          || p_filter->input.i_format != p_filter->output.i_format
-          || p_filter->input.i_physical_channels
-              != p_filter->output.i_physical_channels
-          || p_filter->input.i_original_channels
-              != p_filter->output.i_original_channels
-          || (p_filter->input.i_format != VLC_CODEC_FL32
-               && p_filter->input.i_format != VLC_CODEC_FI32) )
+    if ( p_filter->fmt_in.audio.i_rate == p_filter->fmt_out.audio.i_rate
+          || p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format
+          || p_filter->fmt_in.audio.i_physical_channels
+              != p_filter->fmt_out.audio.i_physical_channels
+          || p_filter->fmt_in.audio.i_original_channels
+              != p_filter->fmt_out.audio.i_original_channels
+          || (p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
+               && p_filter->fmt_in.audio.i_format != VLC_CODEC_FI32) )
     {
         return VLC_EGENERIC;
     }
@@ -88,15 +88,15 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 {
     int32_t *p_out = (int32_t*)p_out_buf->p_buffer;
 
-    unsigned int i_nb_channels = aout_FormatNbChannels( &p_filter->input );
+    unsigned int i_nb_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     unsigned int i_in_nb = p_in_buf->i_nb_samples;
-    unsigned int i_out_nb = i_in_nb * p_filter->output.i_rate
-                                    / p_filter->input.i_rate;
+    unsigned int i_out_nb = i_in_nb * p_filter->fmt_out.audio.i_rate
+                                    / p_filter->fmt_in.audio.i_rate;
     unsigned int i_sample_bytes = i_nb_channels * sizeof(int32_t);
     unsigned int i_out, i_chan, i_remainder = 0;
 
     /* Check if we really need to run the resampler */
-    if( p_aout->mixer_format.i_rate == p_filter->input.i_rate )
+    if( p_aout->mixer_format.i_rate == p_filter->fmt_in.audio.i_rate )
     {
         return;
     }
@@ -115,11 +115,11 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         }
         p_out += i_nb_channels;
 
-        i_remainder += p_filter->input.i_rate;
-        while( i_remainder >= p_filter->output.i_rate )
+        i_remainder += p_filter->fmt_in.audio.i_rate;
+        while( i_remainder >= p_filter->fmt_out.audio.i_rate )
         {
             p_in += i_nb_channels;
-            i_remainder -= p_filter->output.i_rate;
+            i_remainder -= p_filter->fmt_out.audio.i_rate;
         }
     }
 
@@ -127,5 +127,5 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     p_out_buf->i_buffer = i_out_nb * i_sample_bytes;
     p_out_buf->i_pts = p_in_buf->i_pts;
     p_out_buf->i_length = p_out_buf->i_nb_samples *
-        1000000 / p_filter->output.i_rate;
+        1000000 / p_filter->fmt_out.audio.i_rate;
 }
