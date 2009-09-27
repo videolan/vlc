@@ -1264,10 +1264,8 @@ if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGIN([equalizer])
   VLC_ADD_PLUGIN([param_eq])
   VLC_ADD_PLUGIN([scaletempo])
-  VLC_ADD_PLUGIN([converter_float])
   VLC_ADD_PLUGIN([a52tospdif])
   VLC_ADD_PLUGIN([dtstospdif])
-  VLC_ADD_PLUGIN([audio_format])
   ALIASES="${ALIASES} rvlc"
 fi
 
@@ -1281,10 +1279,8 @@ if test "${SYS}" = "mingwce"; then
   VLC_ADD_PLUGIN([simple_channel_mixer])
   VLC_ADD_PLUGIN([headphone_channel_mixer])
   VLC_ADD_PLUGIN([normvol])
-  VLC_ADD_PLUGIN([converter_float])
   VLC_ADD_PLUGIN([a52tospdif])
   VLC_ADD_PLUGIN([dtstospdif])
-  VLC_ADD_PLUGIN([audio_format])
   VLC_ADD_PLUGIN([i420_yuy2])
   VLC_ADD_PLUGIN([i422_yuy2])
   VLC_ADD_PLUGIN([i420_ymga])

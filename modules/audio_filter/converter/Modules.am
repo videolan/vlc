@@ -1,5 +1,3 @@
-SOURCES_converter_fixed = fixed.c
-SOURCES_converter_float = float.c
 SOURCES_converter_neon = neon.c
 SOURCES_a52tospdif = a52tospdif.c
 SOURCES_a52tofloat32 = a52tofloat32.c
@@ -9,7 +7,7 @@ SOURCES_mpgatofixed32 = mpgatofixed32.c
 SOURCES_audio_format = format.c
 
 libvlc_LTLIBRARIES += \
-	libconverter_fixed_plugin.la \
+	libaudio_format_plugin.la \
 	$(NULL)
 if HAVE_NEON
 libvlc_LTLIBRARIES += libconverter_neon_plugin.la
