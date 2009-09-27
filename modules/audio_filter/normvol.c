@@ -253,9 +253,6 @@ static void Close( vlc_object_t *p_this )
     aout_filter_t *p_filter = (aout_filter_t*)p_this;
     aout_filter_sys_t *p_sys = p_filter->p_sys;
 
-    if( p_sys )
-    {
-        free( p_sys->p_last );
-        free( p_sys );
-    }
+    free( p_sys->p_last );
+    free( p_sys );
 }
