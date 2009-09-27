@@ -29,7 +29,7 @@
 #include <vlc_picture.h>
 #include <vlc_vout_display.h>
 
-int ManageEvent (vout_display_t *vd, xcb_connection_t *conn, xcb_window_t window);
+int ManageEvent (vout_display_t *vd, xcb_connection_t *conn, bool *);
 
 /* keys.c */
 typedef struct key_handler_t key_handler_t;

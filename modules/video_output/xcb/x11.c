@@ -79,6 +79,7 @@ struct vout_display_sys_t
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
     bool shm; /* whether to use MIT-SHM */
+    bool visible; /* whether to draw */
     uint8_t bpp; /* bits per pixel */
     uint8_t pad; /* scanline pad */
     uint8_t depth; /* useful bits per pixel */
@@ -256,7 +257,7 @@ static int Open (vlc_object_t *obj)
         const uint32_t values[] = {
             /* XCB_CW_EVENT_MASK */
             XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE |
-            XCB_EVENT_MASK_POINTER_MOTION,
+            XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_VISIBILITY_CHANGE,
             /* XCB_CW_COLORMAP */
             cmap,
         };
@@ -276,6 +277,7 @@ static int Open (vlc_object_t *obj)
     }
     msg_Dbg (vd, "using X11 window %08"PRIx32, p_sys->window);
     msg_Dbg (vd, "using X11 graphic context %08"PRIx32, p_sys->gc);
+    p_sys->visible = false;
 
     /* */
     vout_display_info_t info = vd->info;
@@ -391,6 +393,8 @@ static void Display (vout_display_t *vd, picture_t *pic)
     xcb_shm_seg_t segment = pic->p_sys->segment;
     xcb_void_cookie_t ck;
 
+    if (!p_sys->visible)
+        goto out;
     if (segment != 0)
         ck = xcb_shm_put_image_checked (p_sys->conn, p_sys->window, p_sys->gc,
           /* real width */ pic->p->i_pitch / pic->p->i_pixel_pitch,
@@ -427,6 +431,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
     /* FIXME might be WAY better to wait in some case (be carefull with
      * VOUT_DISPLAY_RESET_PICTURES if done) + does not work with
      * vout_display wrapper. */
+out:
     picture_Release (pic);
 }
 
@@ -516,7 +521,7 @@ static void Manage (vout_display_t *vd)
 {
     vout_display_sys_t *p_sys = vd->sys;
 
-    ManageEvent (vd, p_sys->conn, p_sys->window);
+    ManageEvent (vd, p_sys->conn, &p_sys->visible);
 }
 
 static void ResetPictures (vout_display_t *vd)

@@ -93,6 +93,7 @@ struct vout_display_sys_t
     uint16_t height;     /* display height */
     uint32_t data_size;  /* picture byte size (for non-SHM) */
     bool shm;            /* whether to use MIT-SHM */
+    bool visible;        /* whether it makes sense to draw at all */
 
     xcb_xv_query_image_attributes_reply_t *att;
     picture_pool_t *pool; /* picture pool */
@@ -440,7 +441,7 @@ static int Open (vlc_object_t *obj)
         const uint32_t mask =
             /* XCB_CW_EVENT_MASK */
             XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE |
-            XCB_EVENT_MASK_POINTER_MOTION;
+            XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_VISIBILITY_CHANGE;
         xcb_void_cookie_t c;
         xcb_window_t window = xcb_generate_id (conn);
 
@@ -468,6 +469,7 @@ static int Open (vlc_object_t *obj)
                               XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
                               values);
     }
+    p_sys->visible = false;
 
     /* Create graphic context */
     p_sys->gc = xcb_generate_id (conn);
@@ -613,6 +615,8 @@ static void Display (vout_display_t *vd, picture_t *pic)
     xcb_shm_seg_t segment = pic->p_sys->segment;
     xcb_void_cookie_t ck;
 
+    if (!p_sys->visible)
+        goto out;
     if (segment)
         ck = xcb_xv_shm_put_image_checked (p_sys->conn, p_sys->port,
                               p_sys->window, p_sys->gc, segment, p_sys->id, 0,
@@ -642,7 +646,7 @@ static void Display (vout_display_t *vd, picture_t *pic)
         msg_Dbg (vd, "%s: X11 error %d", "cannot put image", e->error_code);
         free (e);
     }
-
+out:
     picture_Release (pic);
 }
 
@@ -727,6 +731,6 @@ static void Manage (vout_display_t *vd)
 {
     vout_display_sys_t *p_sys = vd->sys;
 
-    ManageEvent (vd, p_sys->conn, p_sys->window);
+    ManageEvent (vd, p_sys->conn, &p_sys->visible);
 }
 

@@ -74,6 +74,13 @@ static void HandleMotionNotify (vout_display_t *vd,
         vout_display_SendEventMouseMoved (vd, x, y);
 }
 
+static void HandleVisibilityNotify (vout_display_t *vd, bool *visible,
+                                    const xcb_visibility_notify_event_t *ev)
+{
+    *visible = ev->state != XCB_VISIBILITY_FULLY_OBSCURED;
+    msg_Dbg (vd, "display is %svisible", *visible ? "" : "not ");
+}
+
 static void
 HandleParentStructure (vout_display_t *vd,
                        const xcb_configure_notify_event_t *ev)
@@ -86,8 +93,8 @@ HandleParentStructure (vout_display_t *vd,
 /**
  * Process an X11 event.
  */
-static int ProcessEvent (vout_display_t *vd,
-                         xcb_window_t window, xcb_generic_event_t *ev)
+static int ProcessEvent (vout_display_t *vd, bool *visible,
+                         xcb_generic_event_t *ev)
 {
     switch (ev->response_type & 0x7f)
     {
@@ -103,15 +110,14 @@ static int ProcessEvent (vout_display_t *vd,
             HandleMotionNotify (vd, (xcb_motion_notify_event_t *)ev);
             break;
 
-        case XCB_CONFIGURE_NOTIFY:
-        {
-            xcb_configure_notify_event_t *cn =
-                (xcb_configure_notify_event_t *)ev;
-
-            assert (cn->window != window);
-            HandleParentStructure (vd, cn);
+        case XCB_VISIBILITY_NOTIFY:
+            HandleVisibilityNotify (vd, visible,
+                                    (xcb_visibility_notify_event_t *)ev);
             break;
-        }
+
+        case XCB_CONFIGURE_NOTIFY:
+            HandleParentStructure (vd, (xcb_configure_notify_event_t *)ev);
+            break;
 
         /* FIXME I am not sure it is the right one */
         case XCB_DESTROY_NOTIFY:
@@ -132,12 +138,12 @@ static int ProcessEvent (vout_display_t *vd,
 /**
  * Process incoming X events.
  */
-int ManageEvent (vout_display_t *vd, xcb_connection_t *conn, xcb_window_t window)
+int ManageEvent (vout_display_t *vd, xcb_connection_t *conn, bool *visible)
 {
     xcb_generic_event_t *ev;
 
     while ((ev = xcb_poll_for_event (conn)) != NULL)
-        ProcessEvent (vd, window, ev);
+        ProcessEvent (vd, visible, ev);
 
     if (xcb_connection_has_error (conn))
     {
