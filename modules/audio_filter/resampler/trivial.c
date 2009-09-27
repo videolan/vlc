@@ -1,7 +1,7 @@
 /*****************************************************************************
  * trivial.c : trivial resampler (skips samples or pads with zeroes)
  *****************************************************************************
- * Copyright (C) 2002, 2006 the VideoLAN team
+ * Copyright (C) 2002-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Christophe Massiot <massiot@via.ecp.fr>
@@ -32,21 +32,21 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 
-static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                        aout_buffer_t * );
+static block_t *DoWork( filter_t *, block_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("Audio filter for trivial resampling") )
-    set_capability( "audio filter", 1 )
+    set_capability( "audio filter2", 1 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )
     set_callbacks( Create, NULL )
@@ -57,7 +57,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    aout_filter_t * p_filter = (aout_filter_t *)p_this;
+    filter_t * p_filter = (filter_t *)p_this;
 
     if ( p_filter->fmt_in.audio.i_rate == p_filter->fmt_out.audio.i_rate
           || p_filter->fmt_in.audio.i_format != p_filter->fmt_out.audio.i_format
@@ -68,51 +68,41 @@ static int Create( vlc_object_t *p_this )
           || (p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
                && p_filter->fmt_in.audio.i_format != VLC_CODEC_FI32) )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
-    p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = true;
-
-    return 0;
+    p_filter->pf_audio_filter = DoWork;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * DoWork: convert a buffer
  *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+static block_t *DoWork( filter_t * p_filter, block_t * p_block )
 {
-    int i_in_nb = p_in_buf->i_nb_samples;
+    /* Check if we really need to run the resampler */
+    if( p_filter->fmt_out.audio.i_rate == p_filter->fmt_in.audio.i_rate )
+        return p_block;
+
+    int i_in_nb = p_block->i_nb_samples;
     int i_out_nb = i_in_nb * p_filter->fmt_out.audio.i_rate
                     / p_filter->fmt_in.audio.i_rate;
     int i_sample_bytes = aout_FormatNbChannels( &p_filter->fmt_in.audio )
                           * sizeof(int32_t);
 
-    /* Check if we really need to run the resampler */
-    if( p_aout->mixer_format.i_rate == p_filter->fmt_in.audio.i_rate )
-    {
-        return;
-    }
+    p_block = block_Realloc( p_block, 0, i_out_nb * i_sample_bytes );
+    if( !p_block )
+        return NULL;
 
-    if ( p_out_buf != p_in_buf )
-    {
-        /* For whatever reason the buffer allocator decided to allocate
-         * a new buffer. Currently, this never happens. */
-        vlc_memcpy( p_out_buf->p_buffer, p_in_buf->p_buffer,
-                    __MIN(i_out_nb, i_in_nb) * i_sample_bytes );
-    }
-
-    if ( i_out_nb > i_in_nb )
+    if( i_out_nb > i_in_nb )
     {
         /* Pad with zeroes. */
-        memset( p_out_buf->p_buffer + i_in_nb * i_sample_bytes,
+        memset( p_block->p_buffer + i_in_nb * i_sample_bytes,
                 0, (i_out_nb - i_in_nb) * i_sample_bytes );
     }
 
-    p_out_buf->i_nb_samples = i_out_nb;
-    p_out_buf->i_buffer = i_out_nb * i_sample_bytes;
-    p_out_buf->i_pts = p_in_buf->i_pts;
-    p_out_buf->i_length = p_out_buf->i_nb_samples *
-        1000000 / p_filter->fmt_out.audio.i_rate;
+    p_block->i_nb_samples = i_out_nb;
+    p_block->i_length = p_block->i_nb_samples *
+        CLOCK_FREQ / p_filter->fmt_out.audio.i_rate;
+    return p_block;
 }
