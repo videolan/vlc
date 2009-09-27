@@ -32,6 +32,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 
 #include "visual.h"
 
@@ -155,7 +156,7 @@ vlc_module_begin ()
              PEAK_WIDTH_TEXT, PEAK_WIDTH_LONGTEXT, true )
     add_integer("spect-peak-height", 1, NULL,
              PEAK_HEIGHT_TEXT, PEAK_HEIGHT_LONGTEXT, true )
-    set_capability( "visualization", 0 )
+    set_capability( "visualization2", 0 )
     set_callbacks( Open, Close )
     add_shortcut( "visualizer")
 vlc_module_end ()
@@ -164,15 +165,14 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void DoWork( aout_instance_t *, aout_filter_t *,
-                    aout_buffer_t *, aout_buffer_t * );
+static block_t *DoWork( filter_t *, block_t * );
 static int FilterCallback( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 static const struct
 {
     const char *psz_name;
-    int  (*pf_run)( visual_effect_t *, aout_instance_t *,
-                    aout_buffer_t *, picture_t *);
+    int  (*pf_run)( visual_effect_t *, vlc_object_t *,
+                    const block_t *, picture_t *);
 } pf_effect_run[]=
 {
     { "scope",        scope_Run },
@@ -188,8 +188,8 @@ static const struct
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    aout_filter_t     *p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t *p_sys;
+    filter_t     *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
 
     char *psz_effects, *psz_parser;
     video_format_t fmt;
@@ -200,7 +200,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys = p_filter->p_sys = malloc( sizeof( aout_filter_sys_t ) );
+    p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
     if( p_sys == NULL )
         return VLC_EGENERIC;
 
@@ -324,8 +324,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place= 1;
+    p_filter->pf_audio_filter = DoWork;
 
     return VLC_SUCCESS;
 }
@@ -335,25 +334,18 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************
  * Audio part pasted from trivial.c
  ****************************************************************************/
-static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
-                    aout_buffer_t *p_in_buf, aout_buffer_t *p_out_buf )
+static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
     picture_t *p_outpic;
     int i;
 
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_buffer *
-                            aout_FormatNbChannels( &p_filter->fmt_out.audio ) /
-                            aout_FormatNbChannels( &p_filter->fmt_in.audio );
-
     /* First, get a new picture */
     while( ( p_outpic = vout_CreatePicture( p_sys->p_vout, 0, 0, 3 ) ) == NULL)
-    {
-        if( !vlc_object_alive (p_aout) )
-        {
-            return;
-        }
+    {   /* XXX: This looks like a bad idea. Don't run to me for sympathy if it
+         * dead locks... */
+        if( !vlc_object_alive (p_sys->p_vout) )
+            return NULL;
         msleep( VOUT_OUTMEM_SLEEP );
     }
 
@@ -370,7 +362,8 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
 #define p_effect p_sys->effect[i]
         if( p_effect->pf_run )
         {
-            p_effect->pf_run( p_effect, p_aout, p_out_buf, p_outpic );
+            p_effect->pf_run( p_effect, VLC_OBJECT(p_filter),
+                              p_in_buf, p_outpic );
         }
 #undef p_effect
     }
@@ -378,6 +371,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
     p_outpic->date = p_in_buf->i_pts + (p_in_buf->i_length / 2);
 
     vout_DisplayPicture( p_sys->p_vout, p_outpic );
+    return p_in_buf;
 }
 
 /*****************************************************************************
@@ -385,8 +379,8 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    aout_filter_t * p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
+    filter_t * p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
     int i;
 

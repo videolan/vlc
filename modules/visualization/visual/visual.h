@@ -25,8 +25,8 @@ typedef struct visual_effect_t
 {
     const char *psz_name;    /* Filter name*/
 
-    int        (*pf_run)( struct visual_effect_t * , aout_instance_t *,
-                          aout_buffer_t *, picture_t *);
+    int        (*pf_run)( struct visual_effect_t * , vlc_object_t *,
+                          const block_t *, picture_t *);
     void *     p_data; /* The effect stores whatever it wants here */
     int        i_width;
     int        i_height;
@@ -51,7 +51,7 @@ typedef struct spectrum_data
  * This structure is part of the audio filter descriptor.
  * It describes some visualizer specific variables.
  *****************************************************************************/
-struct aout_filter_sys_t
+struct filter_sys_t
 {
     vout_thread_t   *p_vout;
 
@@ -64,17 +64,17 @@ struct aout_filter_sys_t
 
 /* Prototypes */
 int scope_Run
-        (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
+        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
 int vuMeter_Run
-        (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
+        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
 int dummy_Run
-        (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
+        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
 int random_Run
-        (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
+        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
 int spectrum_Run
-        (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
+        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
 int spectrometer_Run
-        (visual_effect_t * , aout_instance_t *, aout_buffer_t *, picture_t *);
+        (visual_effect_t * , vlc_object_t *, const block_t *, picture_t *);
 
 /* Default vout size */
 #define VOUT_WIDTH 800
