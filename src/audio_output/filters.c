@@ -34,18 +34,25 @@
 #include <vlc_dialog.h>
 
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 #include "aout_internal.h"
 #include <libvlc.h>
+
+block_t *aout_FilterBufferNew( filter_t *p_filter, int size )
+{
+    (void) p_filter;
+    return block_Alloc( size );
+}
 
 /*****************************************************************************
  * FindFilter: find an audio filter for a specific transformation
  *****************************************************************************/
-static aout_filter_t * FindFilter( aout_instance_t * p_aout,
-                             const audio_sample_format_t * p_input_format,
-                             const audio_sample_format_t * p_output_format )
+static filter_t * FindFilter( aout_instance_t * p_aout,
+                              const audio_sample_format_t * p_input_format,
+                              const audio_sample_format_t * p_output_format )
 {
-    static const char typename[] = "audio output";
-    aout_filter_t * p_filter;
+    static const char typename[] = "audio filter";
+    filter_t * p_filter;
 
     p_filter = vlc_custom_create( p_aout, sizeof(*p_filter),
                                   VLC_OBJECT_GENERIC, typename );
@@ -53,10 +60,15 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
     if ( p_filter == NULL ) return NULL;
     vlc_object_attach( p_filter, p_aout );
 
-    memcpy( &p_filter->fmt_in.audio, p_input_format, sizeof(audio_sample_format_t) );
+    memcpy( &p_filter->fmt_in.audio, p_input_format,
+            sizeof(audio_sample_format_t) );
+    p_filter->fmt_in.i_codec = p_input_format->i_format;
     memcpy( &p_filter->fmt_out.audio, p_output_format,
             sizeof(audio_sample_format_t) );
-    p_filter->p_module = module_need( p_filter, "audio filter", NULL, false );
+    p_filter->fmt_out.i_codec = p_output_format->i_format;
+    p_filter->pf_audio_buffer_new = aout_FilterBufferNew;
+
+    p_filter->p_module = module_need( p_filter, "audio filter2", NULL, false );
     if ( p_filter->p_module == NULL )
     {
         vlc_object_detach( p_filter );
@@ -64,6 +76,7 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
         return NULL;
     }
 
+    assert( p_filter->pf_audio_filter );
     return p_filter;
 }
 
@@ -118,7 +131,7 @@ static int SplitConversion( const audio_sample_format_t * p_input_format,
     return 2;
 }
 
-static void ReleaseFilter( aout_filter_t * p_filter )
+static void ReleaseFilter( filter_t * p_filter )
 {
     module_unneed( p_filter, p_filter->p_module );
     vlc_object_detach( p_filter );
@@ -132,12 +145,12 @@ static void ReleaseFilter( aout_filter_t * p_filter )
  * pi_nb_filters must be initialized before calling this function
  *****************************************************************************/
 int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
-                                aout_filter_t ** pp_filters_start,
+                                filter_t ** pp_filters_start,
                                 int * pi_nb_filters,
                                 const audio_sample_format_t * p_input_format,
                                 const audio_sample_format_t * p_output_format )
 {
-    aout_filter_t** pp_filters = pp_filters_start + *pi_nb_filters;
+    filter_t** pp_filters = pp_filters_start + *pi_nb_filters;
     audio_sample_format_t temp_format;
     int i_nb_conversions;
 
@@ -263,7 +276,7 @@ int aout_FiltersCreatePipeline( aout_instance_t * p_aout,
  * aout_FiltersDestroyPipeline: deallocate a filters pipeline
  *****************************************************************************/
 void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
-                                  aout_filter_t ** pp_filters,
+                                  filter_t ** pp_filters,
                                   int i_nb_filters )
 {
     int i;
@@ -271,7 +284,7 @@ void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
 
     for ( i = 0; i < i_nb_filters; i++ )
     {
-        aout_filter_t *p_filter = pp_filters[i];
+        filter_t *p_filter = pp_filters[i];
 
         module_unneed( p_filter, p_filter->p_module );
         free( p_filter->p_owner );
@@ -285,7 +298,7 @@ void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
  *                          buffer allocations
  *****************************************************************************/
 void aout_FiltersHintBuffers( aout_instance_t * p_aout,
-                              aout_filter_t ** pp_filters,
+                              filter_t ** pp_filters,
                               int i_nb_filters, aout_alloc_t * p_first_alloc )
 {
     int i;
@@ -294,7 +307,7 @@ void aout_FiltersHintBuffers( aout_instance_t * p_aout,
 
     for ( i = i_nb_filters - 1; i >= 0; i-- )
     {
-        aout_filter_t * p_filter = pp_filters[i];
+        filter_t * p_filter = pp_filters[i];
 
         int i_output_size = p_filter->fmt_out.audio.i_bytes_per_frame
                          * p_filter->fmt_out.audio.i_rate * AOUT_MAX_INPUT_RATE
@@ -303,71 +316,30 @@ void aout_FiltersHintBuffers( aout_instance_t * p_aout,
                          * p_filter->fmt_in.audio.i_rate * AOUT_MAX_INPUT_RATE
                          / p_filter->fmt_in.audio.i_frame_length;
 
-        p_first_alloc->i_bytes_per_sec = __MAX( p_first_alloc->i_bytes_per_sec,
-                                                i_output_size );
-
-        if ( p_filter->b_in_place )
-        {
-            p_first_alloc->i_bytes_per_sec = __MAX(
-                                         p_first_alloc->i_bytes_per_sec,
-                                         i_input_size );
-            p_filter->output_alloc.b_alloc = false;
-        }
-        else
-        {
-            /* We're gonna need a buffer allocation. */
-            memcpy( &p_filter->output_alloc, p_first_alloc,
-                    sizeof(aout_alloc_t) );
-            p_first_alloc->b_alloc = true;
+        if( i_output_size > p_first_alloc->i_bytes_per_sec )
+            p_first_alloc->i_bytes_per_sec = i_output_size;
+        if( i_input_size > p_first_alloc->i_bytes_per_sec )
             p_first_alloc->i_bytes_per_sec = i_input_size;
-        }
     }
 }
 
 /*****************************************************************************
  * aout_FiltersPlay: play a buffer
  *****************************************************************************/
-void aout_FiltersPlay( aout_instance_t * p_aout,
-                       aout_filter_t ** pp_filters,
-                       int i_nb_filters, aout_buffer_t ** pp_input_buffer )
+void aout_FiltersPlay( filter_t ** pp_filters,
+                       unsigned i_nb_filters, block_t ** pp_block )
 {
-    int i;
+    block_t *p_block = *pp_block;
 
-    for( i = 0; i < i_nb_filters; i++ )
+    /* TODO: use filter chain */
+    for( unsigned i = 0; i < i_nb_filters; i++ )
     {
-        aout_filter_t * p_filter = pp_filters[i];
-        aout_buffer_t * p_output_buffer;
+        filter_t * p_filter = pp_filters[i];
 
-        /* Resamplers can produce slightly more samples than (i_in_nb *
-         * p_filter->output.i_rate / p_filter->input.i_rate) so we need
-         * slightly bigger buffers. */
-        p_output_buffer = aout_BufferAlloc( &p_filter->output_alloc,
-                              ((mtime_t)(*pp_input_buffer)->i_nb_samples + 2)
-                              * 1000000 / p_filter->fmt_in.audio.i_rate,
-                              *pp_input_buffer );
-        if( p_output_buffer == NULL )
-            return;
-        p_output_buffer->i_pts = (*pp_input_buffer)->i_pts;
-        p_output_buffer->i_length = (*pp_input_buffer)->i_length;
-
-        /* Please note that p_output_buffer->i_nb_samples & i_buffer
+        /* Please note that p_block->i_nb_samples & i_buffer
          * shall be set by the filter plug-in. */
-        if( (*pp_input_buffer)->i_nb_samples > 0 )
-        {
-            p_filter->pf_do_work( p_aout, p_filter, *pp_input_buffer,
-                                  p_output_buffer );
-        }
-        else
-        {
-            p_output_buffer->i_buffer = 0;
-            p_output_buffer->i_nb_samples = 0;
-        }
-
-        if( !p_filter->b_in_place )
-        {
-            aout_BufferFree( *pp_input_buffer );
-            *pp_input_buffer = p_output_buffer;
-        }
+        p_block = p_filter->pf_audio_filter( p_filter, p_block );
     }
+    *pp_block = p_block;
 }
 

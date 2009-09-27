@@ -192,7 +192,7 @@ typedef struct aout_output_t
     bool              b_starving;
 
     /* post-filters */
-    aout_filter_t *         pp_filters[AOUT_MAX_FILTERS];
+    filter_t *              pp_filters[AOUT_MAX_FILTERS];
     int                     i_nb_filters;
 
     aout_fifo_t             fifo;
@@ -330,7 +330,7 @@ VLC_EXPORT( void, aout_EnableFilter, (vlc_object_t *, const char *, bool ));
         aout_EnableFilter( VLC_OBJECT(o), n, b )
 
 /* */
-VLC_EXPORT( vout_thread_t *, aout_filter_RequestVout, ( aout_filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt ) );
+VLC_EXPORT( vout_thread_t *, aout_filter_RequestVout, ( filter_t *, vout_thread_t *p_vout, video_format_t *p_fmt ) );
 
 # ifdef __cplusplus
 }

@@ -42,6 +42,7 @@
 #include <vlc_vout.h>                  /* for vout_Request */
 
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 #include <libvlc.h>
 
 #include "aout_internal.h"
@@ -248,7 +249,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
 
         while( psz_parser && *psz_parser )
         {
-            aout_filter_t * p_filter = NULL;
+            filter_t * p_filter = NULL;
 
             if( p_input->i_nb_filters >= AOUT_MAX_FILTERS )
             {
@@ -290,19 +291,21 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
             /* request format */
             memcpy( &p_filter->fmt_in.audio, &chain_output_format,
                     sizeof(audio_sample_format_t) );
+            p_filter->fmt_in.i_codec = chain_output_format.i_format;
             memcpy( &p_filter->fmt_out.audio, &chain_output_format,
                     sizeof(audio_sample_format_t) );
-
+            p_filter->fmt_out.i_codec = chain_output_format.i_format;
+            p_filter->pf_audio_buffer_new = aout_FilterBufferNew;
 
             /* try to find the requested filter */
             if( i_visual == 2 ) /* this can only be a visualization module */
             {
-                p_filter->p_module = module_need( p_filter, "visualization",
+                p_filter->p_module = module_need( p_filter, "visualization2",
                                                   psz_parser, true );
             }
             else /* this can be a audio filter module as well as a visualization module */
             {
-                p_filter->p_module = module_need( p_filter, "audio filter",
+                p_filter->p_module = module_need( p_filter, "audio filter2",
                                               psz_parser, true );
 
                 if ( p_filter->p_module == NULL )
@@ -316,7 +319,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
                         aout_FormatPrepare( &p_filter->fmt_in.audio );
                         aout_FormatPrepare( &p_filter->fmt_out.audio );
                         p_filter->p_module = module_need( p_filter,
-                                                          "audio filter",
+                                                          "audio filter2",
                                                           psz_parser, true );
                     }
                     /* try visual filters */
@@ -327,7 +330,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
                         memcpy( &p_filter->fmt_out.audio, &chain_output_format,
                                 sizeof(audio_sample_format_t) );
                         p_filter->p_module = module_need( p_filter,
-                                                          "visualization",
+                                                          "visualization2",
                                                           psz_parser, true );
                     }
                 }
@@ -639,8 +642,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 
 #ifndef AOUT_PROCESS_BEFORE_CHEKS
     /* Run pre-filters. */
-    aout_FiltersPlay( p_aout, p_input->pp_filters, p_input->i_nb_filters,
-                      &p_buffer );
+    aout_FiltersPlay( p_input->pp_filters, p_input->i_nb_filters, &p_buffer );
 #endif
 
     /* Run the resampler if needed.
@@ -729,8 +731,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* Actually run the resampler now. */
     if ( p_input->i_nb_resamplers > 0 )
     {
-        aout_FiltersPlay( p_aout, p_input->pp_resamplers,
-                          p_input->i_nb_resamplers,
+        aout_FiltersPlay( p_input->pp_resamplers, p_input->i_nb_resamplers,
                           &p_buffer );
     }
 
@@ -807,7 +808,7 @@ static vout_thread_t *RequestVout( void *p_private,
     return vout_Request( p_aout, p_vout, p_fmt );
 }
 
-vout_thread_t *aout_filter_RequestVout( aout_filter_t *p_filter,
+vout_thread_t *aout_filter_RequestVout( filter_t *p_filter,
                                         vout_thread_t *p_vout, video_format_t *p_fmt )
 {
     aout_input_t *p_input = p_filter->p_owner->p_input;
