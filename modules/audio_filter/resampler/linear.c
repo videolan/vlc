@@ -148,7 +148,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     if( p_aout->mixer_format.i_rate == p_filter->fmt_in.audio.i_rate )
     {
 #if 0   /* FIXME: needs audio filter2 for block_Realloc */
-        if( p_filter->b_continuity )
+        if( !(p_in_buf->i_flags & BLOCK_FLAG_DISCONTINUITY) )
         {
             p_in_buf = block_Realloc( p_in_buf, sizeof(float) * i_nb_channels,
                                       p_in_buf->i_buffer );
@@ -159,7 +159,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                     i_nb_channels * sizeof(float) );
         }
 #endif
-        p_filter->b_continuity = false;
+        p_out_buf->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         return;
     }
 
@@ -168,9 +168,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     vlc_memcpy( p_in, p_in_buf->p_buffer, p_in_buf->i_buffer );
 
     /* Take care of the previous input sample (if any) */
-    if( !p_filter->b_continuity )
+    if( p_in_buf->i_flags & BLOCK_FLAG_DISCONTINUITY )
     {
-        p_filter->b_continuity = true;
+        p_out_buf->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         p_sys->i_remainder = 0;
         date_Init( &p_sys->end_date, p_filter->fmt_out.audio.i_rate, 1 );
     }
@@ -335,7 +335,6 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
     aout_filter.p_sys = (struct aout_filter_sys_t *)p_filter->p_sys;
     aout_filter.fmt_in.audio = p_filter->fmt_in.audio;
     aout_filter.fmt_out.audio = p_filter->fmt_out.audio;
-    aout_filter.b_continuity = false;
 
     in_buf.p_buffer = p_block->p_buffer;
     in_buf.i_buffer = p_block->i_buffer;

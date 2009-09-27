@@ -370,7 +370,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
             }
 
             /* success */
-            p_filter->b_continuity = false;
             p_input->pp_filters[p_input->i_nb_filters++] = p_filter;
             memcpy( &chain_input_format, &p_filter->fmt_out.audio,
                     sizeof( audio_sample_format_t ) );
@@ -593,6 +592,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
+        p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         start_date = 0;
     }
 
@@ -623,6 +623,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         if ( p_input->i_resampling_type != AOUT_RESAMPLING_NONE )
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
         inputResamplingStop( p_input );
+        p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         start_date = 0;
     }
     else if ( start_date != 0 &&
@@ -720,6 +721,7 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
              * is bad. We'd better stop the resampling right now. */
             msg_Warn( p_aout, "timing screwed, stopping resampling" );
             inputResamplingStop( p_input );
+            p_buffer->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         }
     }
 
@@ -794,7 +796,6 @@ static void inputResamplingStop( aout_input_t *p_input )
             ( p_input->pp_resamplers[0] == p_input->p_playback_rate_filter )
             ? INPUT_RATE_DEFAULT * p_input->input.i_rate / p_input->i_last_input_rate
             : p_input->input.i_rate;
-        p_input->pp_resamplers[0]->b_continuity = false;
     }
 }
 

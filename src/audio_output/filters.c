@@ -64,8 +64,6 @@ static aout_filter_t * FindFilter( aout_instance_t * p_aout,
         return NULL;
     }
 
-    p_filter->b_continuity = false;
-
     return p_filter;
 }
 

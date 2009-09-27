@@ -171,7 +171,6 @@ struct aout_filter_t
     aout_alloc_t            output_alloc;
 
     bool                    b_in_place;
-    bool                    b_continuity;
 
     void                    (*pf_do_work)( aout_instance_t *, aout_filter_t *,
                                            aout_buffer_t *, aout_buffer_t * );

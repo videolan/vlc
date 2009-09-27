@@ -85,7 +85,6 @@ struct filter_sys_t
 
     date_t end_date;
 
-    bool b_first;
     bool b_filter2;
 };
 
@@ -228,16 +227,16 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
                 p_filter->fmt_in.audio.i_bytes_per_frame;
         }
 #endif
-        p_filter->b_continuity = false;
+        p_out_buf->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         p_sys->i_old_wing = 0;
         return;
     }
 
-    if( !p_filter->b_continuity )
+    if( p_in_buf->i_flags & BLOCK_FLAG_DISCONTINUITY )
     {
         /* Continuity in sound samples has been broken, we'd better reset
          * everything. */
-        p_filter->b_continuity = true;
+        p_out_buf->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         p_sys->i_remainder = 0;
         date_Init( &p_sys->end_date, i_out_rate, 1 );
         date_Set( &p_sys->end_date, p_in_buf->i_pts );
@@ -509,7 +508,6 @@ static int OpenFilter( vlc_object_t *p_this )
     }
 
     p_filter->p_sys->i_old_wing = 0;
-    p_sys->b_first = true;
     p_sys->b_filter2 = true;
     p_filter->pf_audio_filter = Resample;
 
@@ -583,8 +581,6 @@ static block_t *Resample( filter_t *p_filter, block_t *p_block )
     aout_filter.fmt_out.audio = p_filter->fmt_out.audio;
     aout_filter.fmt_out.audio.i_bytes_per_frame = p_filter->fmt_out.audio.i_channels *
                   p_filter->fmt_out.audio.i_bitspersample / 8;
-    aout_filter.b_continuity = !p_filter->p_sys->b_first;
-    p_filter->p_sys->b_first = false;
 
     in_buf.p_buffer = p_block->p_buffer;
     in_buf.i_buffer = p_block->i_buffer;
