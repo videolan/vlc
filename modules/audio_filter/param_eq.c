@@ -43,7 +43,8 @@ static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 static void CalcPeakEQCoeffs( float, float, float, float, float * );
 static void CalcShelfEQCoeffs( float, float, float, int, float, float * );
-static void ProcessEQ( float *, float *, float *, unsigned, unsigned, float *, unsigned );
+static void ProcessEQ( const float *, float *, float *, unsigned, unsigned,
+                       const float *, unsigned );
 static void DoWork( aout_instance_t *, aout_filter_t *,
                     aout_buffer_t *, aout_buffer_t * );
 
@@ -305,23 +306,22 @@ static void CalcShelfEQCoeffs( float f0, float slope, float gainDB, int high,
   samples is not premultiplied by channels
   size of coeffs is 5*eqCount
 */
-void ProcessEQ( float *src, float *dest, float *state,
-                unsigned channels, unsigned samples, float *coeffs,
+void ProcessEQ( const float *src, float *dest, float *state,
+                unsigned channels, unsigned samples, const float *coeffs,
                 unsigned eqCount )
 {
     unsigned i, chn, eq;
     float   b0, b1, b2, a1, a2;
     float   x, y = 0;
-    float   *src1, *dest1;
-    float   *coeffs1, *state1;
-    src1 = src;
-    dest1 = dest;
+    const float *src1 = src;
+    float *dest1 = dest;
+
     for (i = 0; i < samples; i++)
     {
-        state1 = state;
+        float *state1 = state;
         for (chn = 0; chn < channels; chn++)
         {
-            coeffs1 = coeffs;
+            const float *coeffs1 = coeffs;
             x = *src1++;
             /* Direct form 1 IIRs */
             for (eq = 0; eq < eqCount; eq++)
