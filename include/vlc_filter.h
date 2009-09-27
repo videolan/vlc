@@ -60,46 +60,49 @@ struct filter_t
     /* Filter configuration */
     config_chain_t *    p_cfg;
 
-    picture_t *         ( * pf_video_filter ) ( filter_t *, picture_t * );
-    block_t *           ( * pf_audio_filter ) ( filter_t *, block_t * );
-    void                ( * pf_video_blend )  ( filter_t *,
-                                                picture_t *, const picture_t *,
-                                                int, int, int );
+    union
+    {
+        picture_t *     (*pf_video_filter) ( filter_t *, picture_t * );
+        block_t *       (*pf_audio_filter) ( filter_t *, block_t * );
+        void            (*pf_video_blend)  ( filter_t *,
+                                             picture_t *, const picture_t *,
+                                             int, int, int );
 
-    subpicture_t *      ( *pf_sub_filter ) ( filter_t *, mtime_t );
-    int                 ( *pf_render_text ) ( filter_t *, subpicture_region_t *,
-                                              subpicture_region_t * );
-    int                 ( *pf_render_html ) ( filter_t *, subpicture_region_t *,
-                                              subpicture_region_t * );
+        subpicture_t *  (*pf_sub_filter) ( filter_t *, mtime_t );
+        int             (*pf_render_text) ( filter_t *, subpicture_region_t *,
+                                            subpicture_region_t * );
+    };
+    union
+    {
+        /* Filter mouse state.
+         *
+         * If non-NULL, you must convert from output format to input format:
+         * - If VLC_SUCCESS is returned, the mouse state is then propagated.
+         * - Otherwise, the mouse change is not propagated.
+         * If NULL, the mouse state is considered unchanged and will be
+         * propagated.
+         */
+        int             (*pf_mouse)( filter_t *, vlc_mouse_t *,
+                                     const vlc_mouse_t *p_old,
+                                     const vlc_mouse_t *p_new );
+        int             (*pf_render_html) ( filter_t *, subpicture_region_t *,
+                                            subpicture_region_t * );
+    };
 
-    /* Filter mouse state.
-     *
-     * If non NULL, you must convert from output format to input format,
-     * if VLC_SUCCESS is returned, the mouse state is then propagated.
-     * If NULL, the mouse state is considered unchanged and will be
-     * propagated.
-     *
-     * If VLC_SUCCESS is not returned, the mouse changes are not propagated.
-     */
-    int                 ( *pf_mouse )( filter_t *, vlc_mouse_t *,
-                                       const vlc_mouse_t *p_old,
-                                       const vlc_mouse_t *p_new );
     /*
      * Buffers allocation
      */
-
-    /* Audio output callbacks */
-    block_t *       ( * pf_audio_buffer_new) ( filter_t *, int );
-
-    /* Video output callbacks */
-    picture_t     * ( * pf_vout_buffer_new) ( filter_t * );
-    void            ( * pf_vout_buffer_del) ( filter_t *, picture_t * );
-    /* void            ( * pf_picture_link)    ( picture_t * );
-    void            ( * pf_picture_unlink)  ( picture_t * ); */
-
-    /* SPU output callbacks */
-    subpicture_t *  ( * pf_sub_buffer_new) ( filter_t * );
-    void            ( * pf_sub_buffer_del) ( filter_t *, subpicture_t * );
+    union
+    {
+        block_t *      (*pf_audio_buffer_new) ( filter_t *, int );
+        picture_t *    (*pf_vout_buffer_new) ( filter_t * );
+        subpicture_t * (*pf_sub_buffer_new) ( filter_t * );
+    };
+    union
+    {
+        void           (*pf_vout_buffer_del) ( filter_t *, picture_t * );
+        void           (*pf_sub_buffer_del) ( filter_t *, subpicture_t * );
+    };
 
     /* Private structure for the owner of the decoder */
     filter_owner_sys_t *p_owner;
