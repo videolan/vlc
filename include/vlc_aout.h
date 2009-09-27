@@ -155,14 +155,6 @@ struct aout_fifo_t
 #include <vlc_aout_mixer.h>
 #include <vlc_block.h>
 
-/* */
-typedef struct
-{
-    vout_thread_t  *(*pf_request_vout)( void *,
-                                        vout_thread_t *, video_format_t *, bool b_recycle );
-    void *p_private;
-} aout_request_vout_t;
-
 /** audio output filter */
 typedef struct aout_filter_owner_sys_t aout_filter_owner_sys_t;
 typedef struct aout_filter_sys_t aout_filter_sys_t;
@@ -182,13 +174,6 @@ struct aout_filter_t
 
     void                    (*pf_do_work)( aout_instance_t *, aout_filter_t *,
                                            aout_buffer_t *, aout_buffer_t * );
-
-    /* Owner fieldS
-     * XXX You MUST not use them directly */
-
-    /* Vout callback
-     * XXX use aout_filter_RequestVout */
-    aout_request_vout_t request_vout;
 
     /* Private structure for the owner of the filter */
     aout_filter_owner_sys_t *p_owner;

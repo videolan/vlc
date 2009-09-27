@@ -31,6 +31,13 @@
 aout_buffer_t *aout_BufferAlloc(aout_alloc_t *allocation, mtime_t microseconds,
         aout_buffer_t *old_buffer);
 
+typedef struct
+{
+    struct vout_thread_t  *(*pf_request_vout)( void *, struct vout_thread_t *,
+                                               video_format_t *, bool );
+    void *p_private;
+} aout_request_vout_t;
+
 struct aout_filter_owner_sys_t
 {
     aout_instance_t *p_aout;

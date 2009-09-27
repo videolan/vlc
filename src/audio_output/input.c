@@ -63,8 +63,6 @@ static void ReplayGainSelect( aout_instance_t *, aout_input_t * );
 
 static vout_thread_t *RequestVout( void *,
                                    vout_thread_t *, video_format_t *, bool );
-static vout_thread_t *RequestVoutFromFilter( void *,
-                                             vout_thread_t *, video_format_t *, bool  );
 
 /*****************************************************************************
  * aout_InputNew : allocate a new input and rework the filter pipeline
@@ -284,9 +282,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
             }
 
             vlc_object_attach( p_filter , p_aout );
-
-            p_filter->request_vout.pf_request_vout = RequestVoutFromFilter;
-            p_filter->request_vout.p_private = p_input;
 
             p_filter->p_owner = malloc( sizeof(*p_filter->p_owner) );
             p_filter->p_owner->p_aout  = p_aout;
@@ -810,14 +805,14 @@ static vout_thread_t *RequestVout( void *p_private,
     return vout_Request( p_aout, p_vout, p_fmt );
 }
 
-static vout_thread_t *RequestVoutFromFilter( void *p_private,
-                                            vout_thread_t *p_vout, video_format_t *p_fmt, bool b_recycle )
+vout_thread_t *aout_filter_RequestVout( aout_filter_t *p_filter,
+                                        vout_thread_t *p_vout, video_format_t *p_fmt )
 {
-    aout_input_t *p_input = p_private;
+    aout_input_t *p_input = p_filter->p_owner->p_input;
     aout_request_vout_t *p_request = &p_input->request_vout;
 
     return p_request->pf_request_vout( p_request->p_private,
-                                       p_vout, p_fmt, p_input->b_recycle_vout && b_recycle );
+                                       p_vout, p_fmt, p_input->b_recycle_vout );
 }
 
 static int ChangeFiltersString( aout_instance_t * p_aout, const char* psz_variable,
