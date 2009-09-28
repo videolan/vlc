@@ -804,6 +804,8 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         if( p_vout->p_sys->hparent &&
             hwnd != p_vout->p_sys->hfswnd && p_vout->b_fullscreen )
         {
+            event_thread_t *p_event = p_vout->p_sys->p_event;
+
             vlc_mutex_lock( &p_event->lock );
             p_event->i_changes |= VOUT_FULLSCREEN_CHANGE;
             vlc_mutex_unlock( &p_event->lock );
