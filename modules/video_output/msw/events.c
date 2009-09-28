@@ -73,10 +73,34 @@
     BOOL SHFullScreen(HWND hwndRequester, DWORD dwState);
 #endif*/
 
-
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+struct event_thread_t
+{
+    vout_thread_t *p_vout;
+
+    /* */
+    vlc_thread_t thread;
+    vlc_mutex_t  lock;
+    vlc_cond_t   wait;
+    bool         b_ready;
+    bool         b_done;
+    bool         b_error;
+
+    /* Mouse */
+    volatile bool    b_cursor_hidden;
+    volatile mtime_t i_lastmoved;
+    mtime_t          i_mouse_hide_timeout;
+
+    /* Title */
+    char *psz_title;
+
+    /* */
+    unsigned i_changes;
+
+};
+
 static int  DirectXCreateWindow( vout_thread_t *p_vout );
 static void DirectXCloseWindow ( vout_thread_t *p_vout );
 static long FAR PASCAL DirectXEventProc( HWND, UINT, WPARAM, LPARAM );

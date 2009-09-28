@@ -25,30 +25,7 @@
 /*****************************************************************************
  * event_thread_t: event thread
  *****************************************************************************/
-typedef struct
-{
-    vout_thread_t *p_vout;
-
-    /* */
-    vlc_thread_t thread;
-    vlc_mutex_t  lock;
-    vlc_cond_t   wait;
-    bool         b_ready;
-    bool         b_done;
-    bool         b_error;
-
-    /* Mouse */
-    volatile bool    b_cursor_hidden;
-    volatile mtime_t i_lastmoved;
-    mtime_t          i_mouse_hide_timeout;
-
-    /* Title */
-    char *psz_title;
-
-    /* */
-    unsigned i_changes;
-
-} event_thread_t;
+#include "events.h"
 
 #ifdef MODULE_NAME_IS_wingapi
     typedef struct GXDisplayProperties {
@@ -259,18 +236,6 @@ struct vout_sys_t
  * Prototypes from directx.c
  *****************************************************************************/
 int DirectDrawUpdateOverlay( vout_thread_t *p_vout );
-
-/*****************************************************************************
- * Prototypes from events.c
- *****************************************************************************/
-event_thread_t *EventThreadCreate( vout_thread_t * );
-void            EventThreadDestroy( event_thread_t * );
-int             EventThreadStart( event_thread_t * );
-void            EventThreadStop( event_thread_t * );
-
-void            EventThreadMouseAutoHide( event_thread_t * );
-void            EventThreadUpdateTitle( event_thread_t *, const char *psz_fallback );
-unsigned        EventThreadRetreiveChanges( event_thread_t * );
 
 /*****************************************************************************
  * Prototypes from common.c
