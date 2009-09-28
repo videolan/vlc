@@ -115,7 +115,7 @@ int OpenDemux( vlc_object_t *p_this )
 
     /* Init Probe data */
     pd.filename = p_demux->psz_path;
-    if( ( pd.buf_size = stream_Peek( p_demux->s, &pd.buf, 2048 ) ) <= 0 )
+    if( ( pd.buf_size = stream_Peek( p_demux->s, &pd.buf, 2048 + 213 ) ) <= 0 )
     {
         msg_Warn( p_demux, "cannot peek" );
         return VLC_EGENERIC;
