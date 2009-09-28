@@ -219,8 +219,6 @@ struct vout_sys_t
     RGBQUAD    green;
     RGBQUAD    blue;
 
-    bool b_parent_focus;
-
     HINSTANCE  gapi_dll;                   /* handle of the opened gapi dll */
 
     /* GAPI functions */
