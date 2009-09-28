@@ -25,25 +25,24 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 #include <vlc_cpu.h>
 
 static int Open (vlc_object_t *);
 
 vlc_module_begin ()
     set_description (N_("ARM NEON audio format conversions") )
-    set_capability ("audio filter", 20)
+    set_capability ("audio filter2", 20)
     set_callbacks (Open, NULL)
     add_requirement (NEON)
 vlc_module_end ()
 
-static void Do_F32_S32 (aout_instance_t *, aout_filter_t *,
-                        aout_buffer_t *, aout_buffer_t *);
-static void Do_S32_S16 (aout_instance_t *, aout_filter_t *,
-                        aout_buffer_t *, aout_buffer_t *);
+static block_t *Do_F32_S32 (filter_t *, block_t *);
+static block_t *Do_S32_S16 (filter_t *, block_t *);
 
 static int Open (vlc_object_t *obj)
 {
-    aout_filter_t *filter = (aout_filter_t *)obj;
+    filter_t *filter = (filter_t *)obj;
 
     if (!AOUT_FMTS_SIMILAR (&filter->fmt_in.audio, &filter->fmt_out.audio))
         return VLC_EGENERIC;
@@ -54,7 +53,7 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.audio.i_format)
             {
                 case VLC_CODEC_FI32:
-                    filter->pf_do_work = Do_F32_S32;
+                    filter->pf_audio_filter = Do_F32_S32;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -65,7 +64,7 @@ static int Open (vlc_object_t *obj)
             switch (filter->fmt_out.audio.i_format)
             {
                 case VLC_CODEC_S16N:
-                    filter->pf_do_work = Do_S32_S16;
+                    filter->pf_audio_filter = Do_S32_S16;
                     break;
                 default:
                     return VLC_EGENERIC;
@@ -74,80 +73,72 @@ static int Open (vlc_object_t *obj)
         default:
             return VLC_EGENERIC;
     }
-
-    filter->b_in_place = true;
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /**
- * Half-precision floating point to signed fixed point conversion.
+ * Single-precision floating point to signed fixed point conversion.
  */
-static void Do_F32_S32 (aout_instance_t *aout, aout_filter_t *filter,
-                        aout_buffer_t *inbuf, aout_buffer_t *outbuf)
+static block_t *Do_F32_S32 (filter_t *filter, block_t *inbuf)
 {
     unsigned nb_samples = inbuf->i_nb_samples
                      * aout_FormatNbChannels (&filter->fmt_in.audio);
-    const float *inp = (float *)inbuf->p_buffer;
-    const float *endp = inp + nb_samples;
-    int32_t *outp = (int32_t *)outbuf->p_buffer;
+    int32_t *outp = (int32_t *)inbuf->p_buffer;
+    int32_t *endp = outp + nb_samples;
 
     if (nb_samples & 1)
     {
         asm volatile (
-            "vldr.32 s0, [%[inp]]\n"
+            "vldr.32 s0, [%[outp]]\n"
             "vcvt.s32.f32 d0, d0, #28\n"
             "vstr.32 s0, [%[outp]]\n"
             :
-            : [outp] "r" (outp), [inp] "r" (inp)
+            : [outp] "r" (outp)
             : "d0", "memory");
         outp++;
-        inp++;
     }
 
     if (nb_samples & 2)
         asm volatile (
-            "vld1.f32 {d0}, [%[inp]]!\n"
+            "vld1.f32 {d0}, [%[outp]]\n"
             "vcvt.s32.f32 d0, d0, #28\n"
             "vst1.s32 {d0}, [%[outp]]!\n"
-            : [outp] "+r" (outp), [inp] "+r" (inp)
+            : [outp] "+r" (outp)
             :
             : "d0", "memory");
 
     if (nb_samples & 4)
         asm volatile (
-            "vld1.f32 {q0}, [%[inp]]!\n"
+            "vld1.f32 {q0}, [%[outp]]\n"
             "vcvt.s32.f32 q0, q0, #28\n"
             "vst1.s32 {q0}, [%[outp]]!\n"
-            : [outp] "+r" (outp), [inp] "+r" (inp)
+            : [outp] "+r" (outp)
             :
             : "q0", "memory");
 
-    while (inp != endp)
+    while (outp != endp)
         asm volatile (
-            "vld1.f32 {q0-q1}, [%[inp]]!\n"
+            "vld1.f32 {q0-q1}, [%[outp]]\n"
             "vcvt.s32.f32 q0, q0, #28\n"
             "vcvt.s32.f32 q1, q1, #28\n"
             "vst1.s32 {q0-q1}, [%[outp]]!\n"
-            : [outp] "+r" (outp), [inp] "+r" (inp)
+            : [outp] "+r" (outp)
             :
             : "q0", "q1", "memory");
 
-    outbuf->i_nb_samples = inbuf->i_nb_samples;
-    outbuf->i_buffer = inbuf->i_buffer;
-    (void) aout;
+    return inbuf;
 }
 
 /**
  * Signed 32-bits fixed point to signed 16-bits integer
  */
-static void Do_S32_S16 (aout_instance_t *aout, aout_filter_t *filter,
-                        aout_buffer_t *inbuf, aout_buffer_t *outbuf)
+static block_t *Do_S32_S16 (filter_t *filter, block_t *inbuf)
 {
     unsigned nb_samples = inbuf->i_nb_samples
                      * aout_FormatNbChannels (&filter->fmt_in.audio);
     int32_t *inp = (int32_t *)inbuf->p_buffer;
     const int32_t *endp = inp + nb_samples;
-    int16_t *outp = (int16_t *)outbuf->p_buffer;
+    int16_t *outp = (int16_t *)inp;
 
     while (nb_samples & 3)
     {
@@ -195,7 +186,6 @@ static void Do_S32_S16 (aout_instance_t *aout, aout_filter_t *filter,
             :
             : "q0", "q1", "q2", "q3", "memory");
 
-    outbuf->i_nb_samples = inbuf->i_nb_samples;
-    outbuf->i_buffer = inbuf->i_buffer / 2;
-    (void) aout;
+    inbuf->i_buffer /= 2;
+    return inbuf;
 }
