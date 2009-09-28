@@ -1,6 +1,8 @@
 SOURCES_converter_fixed = fixed.c
 SOURCES_converter_float = float.c
-SOURCES_converter_neon = neon.c
+SOURCES_converter_neon = \
+	neon_s32_s16.S \
+	neon.c
 SOURCES_a52tospdif = a52tospdif.c
 SOURCES_a52tofloat32 = a52tofloat32.c
 SOURCES_dtstospdif = dtstospdif.c

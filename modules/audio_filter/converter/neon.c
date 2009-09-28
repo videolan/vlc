@@ -28,6 +28,8 @@
 #include <vlc_filter.h>
 #include <vlc_cpu.h>
 
+#include <assert.h>
+
 static int Open (vlc_object_t *);
 
 vlc_module_begin ()
@@ -129,63 +131,32 @@ static block_t *Do_F32_S32 (filter_t *filter, block_t *inbuf)
     return inbuf;
 }
 
+void s32_s16_neon_unaligned (int16_t *out, const int32_t *in, unsigned nb);
+void s32_s16_neon (int16_t *out, const int32_t *in, unsigned nb);
+
 /**
  * Signed 32-bits fixed point to signed 16-bits integer
  */
 static block_t *Do_S32_S16 (filter_t *filter, block_t *inbuf)
 {
-    unsigned nb_samples = inbuf->i_nb_samples
-                     * aout_FormatNbChannels (&filter->fmt_in.audio);
-    int32_t *inp = (int32_t *)inbuf->p_buffer;
-    const int32_t *endp = inp + nb_samples;
-    int16_t *outp = (int16_t *)inp;
+    const int32_t *in = (int32_t *)inbuf->p_buffer;
+    int16_t *out = (int16_t *)in;
+    unsigned nb;
 
-    while (nb_samples & 3)
-    {
-        const int16_t roundup = 1 << 12;
-        asm volatile (
-            "qadd r0, %[inv], %[roundup]\n"
-            "ssat %[outv], #16, r0, asr #13\n"
-            : [outv] "=r" (*outp)
-            : [inv] "r" (*inp), [roundup] "r" (roundup)
-            : "r0");
-        inp++;
-        outp++;
-        nb_samples--;
-    }
+    nb = ((-(uintptr_t)in) & 12) >> 2;
+    out += nb; /* fix up misalignment */
+    inbuf->p_buffer += 2 * nb;
 
-    if (nb_samples & 4)
-        asm volatile (
-            "vld1.s32 {q0}, [%[inp]]!\n"
-            "vrshrn.i32 d0, q0, #13\n"
-            "vst1.s16 {d0}, [%[outp]]!\n"
-            : [outp] "+r" (outp), [inp] "+r" (inp)
-            :
-            : "q0", "memory");
+    s32_s16_neon_unaligned (out, in, nb);
+    in += nb;
+    out += nb;
 
-    if (nb_samples & 8)
-        asm volatile (
-            "vld1.s32 {q0-q1}, [%[inp]]!\n"
-            "vrshrn.i32 d0, q0, #13\n"
-            "vrshrn.i32 d1, q1, #13\n"
-            "vst1.s16 {q0}, [%[outp]]!\n"
-            : [outp] "+r" (outp), [inp] "+r" (inp)
-            :
-            : "q0", "q1", "memory");
+    nb = inbuf->i_nb_samples
+         * aout_FormatNbChannels (&filter->fmt_in.audio) - nb;
+    assert (!(((uintptr_t)in) & 15));
+    assert (!(((uintptr_t)out) & 15));
 
-    while (inp != endp)
-        asm volatile (
-            "vld1.s32 {q0-q1}, [%[inp]]!\n"
-            "vld1.s32 {q2-q3}, [%[inp]]!\n"
-            "vrshrn.s32 d0, q0, #13\n"
-            "vrshrn.s32 d1, q1, #13\n"
-            "vrshrn.s32 d2, q2, #13\n"
-            "vrshrn.s32 d3, q3, #13\n"
-            "vst1.s16 {q0-q1}, [%[outp]]!\n"
-            : [outp] "+r" (outp), [inp] "+r" (inp)
-            :
-            : "q0", "q1", "q2", "q3", "memory");
-
+    s32_s16_neon (out, in, nb);
     inbuf->i_buffer /= 2;
     return inbuf;
 }
