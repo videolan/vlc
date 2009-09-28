@@ -6,20 +6,25 @@ Access:
 
 Decoders:
  * Support for Atrac1
+ * HD dvb subtitles - Display Definition Segment support
+ * Invmem modules improvements
 
 Demuxers:
  * Support for ADPCM in .flv streams
  * EXPERIMENTAL support for .aob files from DVD-Audio (MLP and LPCM)
    (Full disc support is NOT present yet)
  * Support for TwinVQ (.vqf) files
+ * Various EGP improvements
 
 Playlist:
  * WPL playlist support
  * ZPL playlist support
- * Lua scripts for Mpora and Vimeo playback
+ * Lua scripts for Mpora, Vimeo playback and Rockbox FM radios
+ * New Play-And-Pause function to stop playback on latest video image
 
 Audio filters:
  * Chorus/Flanger audio filter
+ * 3F1R to stereo downmix filter
 
 Encoders:
  * x264, add psy-rd parameter and change default settings
@@ -30,6 +35,7 @@ Encoders:
  * libx264-version 0.76 or higher is required
 
 Video Output:
+ * Rewrite of the video output core and most video outputs
  * Added desktop mode to the Direct3D output module. It differs from DirectX
    desktop mode, because it hides the desktop icons, but reacts to mouse clicks.
  * New x11 and xv modules based on XCB
@@ -40,11 +46,17 @@ Visualisation:
 Service discovery:
  * Service discovery for Picture/Music/Video user directories
 
+Stream output:
+ * New smem module, streaming to memory
+
 Mac OS X Interface:
  * Completely reworked user interface (based upon works from GSoC 2008)
 
 Windows port:
  * Integration in Windows 7 taskbar
+
+Maemo port:
+ * Multiple improvements for N900 compliance and efficiency
 
 Removed modules:
  * csri
