@@ -123,7 +123,7 @@ static int Init( vout_thread_t *p_vout )
     int iFormat;
 
     /* Change the window title bar text */
-    PostMessage( p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
+    EventThreadUpdateTitle( p_vout->p_sys->p_event, VOUT_TITLE " (OpenGL output)" );
 
     p_vout->p_sys->hGLDC = GetDC( p_vout->p_sys->hvideownd );
 

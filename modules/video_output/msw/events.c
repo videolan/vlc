@@ -330,50 +330,30 @@ static void *EventThread( void *p_this )
             break;
 
         case WM_VLC_CHANGE_TEXT:
-            var_Get( p_vout, "video-title", &val );
-            if( !val.psz_string || !*val.psz_string ) /* Default video title */
+        {
+            vlc_mutex_lock( &p_event->lock );
+            wchar_t *pwz_title = NULL;
+            if( p_event->psz_title )
             {
-                free( val.psz_string );
-
-#ifdef MODULE_NAME_IS_wingdi
-                val.psz_string = strdup( VOUT_TITLE " (WinGDI output)" );
-#endif
-#ifdef MODULE_NAME_IS_wingapi
-                val.psz_string = strdup( VOUT_TITLE " (WinGAPI output)" );
-#endif
-#ifdef MODULE_NAME_IS_glwin32
-                val.psz_string = strdup( VOUT_TITLE " (OpenGL output)" );
-#endif
-#ifdef MODULE_NAME_IS_direct3d
-                val.psz_string = strdup( VOUT_TITLE " (Direct3D output)" );
-#endif
-#ifdef MODULE_NAME_IS_directx
-                if( p_event->p_vout->p_sys->b_using_overlay ) val.psz_string =
-                    strdup( VOUT_TITLE " (hardware YUV overlay DirectX output)" );
-                else if( p_event->p_vout->p_sys->b_hw_yuv ) val.psz_string =
-                    strdup( VOUT_TITLE " (hardware YUV DirectX output)" );
-                else val.psz_string =
-                    strdup( VOUT_TITLE " (software RGB DirectX output)" );
-#endif
-            }
-
-            {
-                wchar_t *psz_title = malloc( strlen(val.psz_string) * 2 + 2 );
-                if( psz_title )
+                const size_t i_length = strlen(p_event->psz_title);
+                pwz_title = malloc( 2 * (i_length + 1) );
+                if( pwz_title )
                 {
-                    mbstowcs( psz_title, val.psz_string, strlen(val.psz_string)*2);
-                    psz_title[strlen(val.psz_string)] = 0;
-                    free( val.psz_string ); val.psz_string = (char *)psz_title;
+                    mbstowcs( pwz_title, p_event->psz_title, 2 * i_length );
+                    pwz_title[i_length] = 0;
                 }
             }
+            vlc_mutex_unlock( &p_event->lock );
 
-            SetWindowText( p_event->p_vout->p_sys->hwnd,
-                           (LPCTSTR)val.psz_string );
-            if( p_event->p_vout->p_sys->hfswnd )
-                SetWindowText( p_event->p_vout->p_sys->hfswnd,
-                               (LPCTSTR)val.psz_string );
-            free( val.psz_string );
+            if( pwz_title )
+            {
+                SetWindowText( p_vout->p_sys->hwnd, (LPCTSTR)pwz_title );
+                if( p_vout->p_sys->hfswnd )
+                    SetWindowText( p_vout->p_sys->hfswnd, (LPCTSTR)pwz_title );
+                free( pwz_title );
+            }
             break;
+        }
 
         default:
             /* Messages we don't handle directly are dispatched to the
@@ -913,6 +893,21 @@ void EventThreadMouseAutoHide( event_thread_t *p_event )
         }
     }
 }
+void EventThreadUpdateTitle( event_thread_t *p_event, const char *psz_fallback )
+{
+    char *psz_title = var_GetNonEmptyString( p_event->p_vout, "video-title" );
+    if( !psz_title )
+        psz_title = strdup( psz_fallback );
+    if( !psz_title )
+        return;
+
+    vlc_mutex_lock( &p_event->lock );
+    free( p_event->psz_title );
+    p_event->psz_title = psz_title;
+    vlc_mutex_unlock( &p_event->lock );
+
+    PostMessage( p_event->p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
+}
 
 event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
 {
@@ -936,12 +931,14 @@ event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
     p_event->i_lastmoved          = mdate();
     p_event->i_mouse_hide_timeout =
         var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
+    p_event->psz_title = NULL;
    
     return p_event;
 }
 
 void EventThreadDestroy( event_thread_t *p_event )
 {
+    free( p_event->psz_title );
     vlc_cond_destroy( &p_event->wait );
     vlc_mutex_destroy( &p_event->lock );
     free( p_event );

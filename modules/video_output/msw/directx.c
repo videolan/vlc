@@ -385,10 +385,18 @@ static int Init( vout_thread_t *p_vout )
         NewPictureVec( p_vout, p_vout->p_picture );
     }
 
-    /* Change the window title bar text */
-    PostMessage( p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
-
     p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
+
+    /* Change the window title bar text */
+    const char *psz_fallback;
+    if( p_vout->p_sys->b_using_overlay )
+        psz_fallback = VOUT_TITLE " (hardware YUV overlay DirectX output)";
+    else if( p_vout->p_sys->b_hw_yuv )
+        psz_fallback = VOUT_TITLE " (hardware YUV DirectX output)";
+    else
+        psz_fallback = VOUT_TITLE " (software RGB DirectX output)";
+    EventThreadUpdateTitle( p_vout->p_sys->p_event, psz_fallback );
+
     return VLC_SUCCESS;
 }
 

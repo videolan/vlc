@@ -275,7 +275,7 @@ static int Init( vout_thread_t *p_vout )
     }
 
     /* Change the window title bar text */
-    PostMessage( p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
+    EventThreadUpdateTitle( p_vout->p_sys->p_event, VOUT_TITLE " (Direct3D output)" );
 
     p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
     return VLC_SUCCESS;

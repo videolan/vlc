@@ -42,6 +42,9 @@ typedef struct
     volatile mtime_t i_lastmoved;
     mtime_t          i_mouse_hide_timeout;
 
+    /* Title */
+    char *psz_title;
+
 } event_thread_t;
 
 #ifdef MODULE_NAME_IS_wingapi
@@ -263,6 +266,7 @@ int             EventThreadStart( event_thread_t * );
 void            EventThreadStop( event_thread_t * );
 
 void            EventThreadMouseAutoHide( event_thread_t * );
+void            EventThreadUpdateTitle( event_thread_t *, const char *psz_fallback );
 
 /*****************************************************************************
  * Prototypes from common.c
