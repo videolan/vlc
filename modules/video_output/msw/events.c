@@ -778,7 +778,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     case WM_KILLFOCUS:
 #ifdef MODULE_NAME_IS_wingapi
-        p_vout->p_sys->b_focus = false;
         if( !p_vout->p_sys->b_parent_focus ) GXSuspend();
 #endif
 #ifdef UNDER_CE
@@ -798,7 +797,6 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     case WM_SETFOCUS:
 #ifdef MODULE_NAME_IS_wingapi
-        p_vout->p_sys->b_focus = true;
         GXResume();
 #endif
 #ifdef UNDER_CE

@@ -149,7 +149,6 @@ static int OpenVideo ( vlc_object_t *p_this )
 #ifdef MODULE_NAME_IS_wingapi
     p_vout->pf_display = FirstDisplayGAPI;
 
-    p_vout->p_sys->b_focus = 0;
     p_vout->p_sys->b_parent_focus = 0;
 #else
     p_vout->pf_display = FirstDisplayGDI;
