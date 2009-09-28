@@ -89,10 +89,16 @@ int CommonInit( vout_thread_t *p_vout )
     var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     /* Set main window's size */
-    p_sys->i_window_width  = p_vout->i_window_width;
-    p_sys->i_window_height = p_vout->i_window_height;
+    vout_window_cfg_t wnd_cfg;
 
-    p_sys->p_event = EventThreadCreate( p_vout );
+    memset( &wnd_cfg, 0, sizeof(wnd_cfg) );
+    wnd_cfg.type   = VOUT_WINDOW_TYPE_HWND;
+    wnd_cfg.x      = 0;
+    wnd_cfg.y      = 0;
+    wnd_cfg.width  = p_vout->i_window_width;
+    wnd_cfg.height = p_vout->i_window_height;
+
+    p_sys->p_event = EventThreadCreate( p_vout, &wnd_cfg );
     if( !p_sys->p_event )
         return VLC_EGENERIC;
     if( EventThreadStart( p_sys->p_event ) )
@@ -311,21 +317,14 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
     ClientToScreen( p_vout->p_sys->hwnd, &point );
 
     /* If nothing changed, we can return */
-    if( !b_force
-         && p_vout->p_sys->i_window_width == rect.right
-         && p_vout->p_sys->i_window_height == rect.bottom
-         && p_vout->p_sys->i_window_x == point.x
-         && p_vout->p_sys->i_window_y == point.y )
-    {
+    bool b_changed;
+    EventThreadUpdateWindowPosition( p_vout->p_sys->p_event, &b_changed,
+                                     point.x, point.y,
+                                     rect.right, rect.bottom );
+    if( !b_force && !b_changed )
         return;
-    }
 
     /* Update the window position and size */
-    p_vout->p_sys->i_window_x = point.x;
-    p_vout->p_sys->i_window_y = point.y;
-    p_vout->p_sys->i_window_width = rect.right;
-    p_vout->p_sys->i_window_height = rect.bottom;
-
     vout_PlacePicture( p_vout, rect.right, rect.bottom,
                        &i_x, &i_y, &i_width, &i_height );
 

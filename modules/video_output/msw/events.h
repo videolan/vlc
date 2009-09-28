@@ -22,12 +22,14 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc_vout_window.h>
+
 /**
  * HWNDs manager.
  */
 typedef struct event_thread_t event_thread_t;
 
-event_thread_t *EventThreadCreate( vout_thread_t * );
+event_thread_t *EventThreadCreate( vout_thread_t *, const vout_window_cfg_t * );
 void            EventThreadDestroy( event_thread_t * );
 int             EventThreadStart( event_thread_t * );
 void            EventThreadStop( event_thread_t * );
@@ -36,3 +38,5 @@ void            EventThreadMouseAutoHide( event_thread_t * );
 void            EventThreadUpdateTitle( event_thread_t *, const char *psz_fallback );
 unsigned        EventThreadRetreiveChanges( event_thread_t * );
 int             EventThreadGetWindowStyle( event_thread_t * );
+void            EventThreadUpdateWindowPosition( event_thread_t *, bool *pb_changed,
+                                                 int x, int y, int w, int h );

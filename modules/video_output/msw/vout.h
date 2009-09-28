@@ -90,12 +90,6 @@ struct vout_sys_t
     /* size of the overall window (including black bands) */
     RECT         rect_parent;
 
-    /* Window position and size */
-    int          i_window_x;
-    int          i_window_y;
-    int          i_window_width;
-    int          i_window_height;
-
     volatile uint16_t i_changes;        /* changes made to the video display */
 
     /* Misc */

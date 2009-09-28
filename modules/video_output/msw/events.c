@@ -95,7 +95,9 @@ struct event_thread_t
 
     /* Title */
     char *psz_title;
-    int  i_window_style;
+
+    int               i_window_style;
+    vout_window_cfg_t wnd_cfg;
 
     /* */
     unsigned i_changes;
@@ -194,10 +196,12 @@ static void *EventThread( void *p_this )
         {
 
         case WM_MOUSEMOVE:
+            vlc_mutex_lock( &p_event->lock );
             vout_PlacePicture( p_event->p_vout,
-                               p_event->p_vout->p_sys->i_window_width,
-                               p_event->p_vout->p_sys->i_window_height,
+                               p_event->wnd_cfg.width,
+                               p_event->wnd_cfg.height,
                                &i_x, &i_y, &i_width, &i_height );
+            vlc_mutex_unlock( &p_event->lock );
 
             if( msg.hwnd == p_event->p_vout->p_sys->hvideownd )
             {
@@ -437,16 +441,8 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     if( !p_vout->p_sys->b_desktop )
     {
     #endif
-        vout_window_cfg_t wnd_cfg;
-        memset( &wnd_cfg, 0, sizeof(wnd_cfg) );
-        wnd_cfg.type   = VOUT_WINDOW_TYPE_HWND;
-        wnd_cfg.x      = p_vout->p_sys->i_window_x;
-        wnd_cfg.y      = p_vout->p_sys->i_window_y;
-        wnd_cfg.width  = p_vout->p_sys->i_window_width;
-        wnd_cfg.height = p_vout->p_sys->i_window_height;
-
         /* If an external window was specified, we'll draw in it. */
-        p_vout->p_sys->parent_window = vout_window_New( VLC_OBJECT(p_vout), NULL, &wnd_cfg );
+        p_vout->p_sys->parent_window = vout_window_New( VLC_OBJECT(p_vout), NULL, &p_event->wnd_cfg );
         if( p_vout->p_sys->parent_window )
             p_vout->p_sys->hparent = p_vout->p_sys->parent_window->handle.hwnd;
     #ifdef MODULE_NAME_IS_direct3d
@@ -522,8 +518,8 @@ static int DirectXCreateWindow( event_thread_t *p_event )
      * the window corresponding to the useable surface we want */
     rect_window.top    = 10;
     rect_window.left   = 10;
-    rect_window.right  = rect_window.left + p_vout->p_sys->i_window_width;
-    rect_window.bottom = rect_window.top + p_vout->p_sys->i_window_height;
+    rect_window.right  = rect_window.left + p_event->wnd_cfg.width;
+    rect_window.bottom = rect_window.top  + p_event->wnd_cfg.height;
 
     if( var_GetBool( p_vout, "video-deco" ) )
     {
@@ -555,10 +551,10 @@ static int DirectXCreateWindow( event_thread_t *p_event )
                     _T("VLC DirectX"),               /* name of window class */
                     _T(VOUT_TITLE) _T(" (DirectX Output)"),  /* window title */
                     i_style,                                 /* window style */
-                    (p_vout->p_sys->i_window_x < 0) ? CW_USEDEFAULT :
-                        (UINT)p_vout->p_sys->i_window_x,   /* default X coordinate */
-                    (p_vout->p_sys->i_window_y < 0) ? CW_USEDEFAULT :
-                        (UINT)p_vout->p_sys->i_window_y,   /* default Y coordinate */
+                    (p_event->wnd_cfg.x < 0) ? CW_USEDEFAULT :
+                        (UINT)p_event->wnd_cfg.x,   /* default X coordinate */
+                    (p_event->wnd_cfg.y < 0) ? CW_USEDEFAULT :
+                        (UINT)p_event->wnd_cfg.y,   /* default Y coordinate */
                     rect_window.right - rect_window.left,    /* window width */
                     rect_window.bottom - rect_window.top,   /* window height */
                     p_vout->p_sys->hparent,                 /* parent window */
@@ -955,7 +951,22 @@ int EventThreadGetWindowStyle( event_thread_t *p_event )
     return p_event->i_window_style;
 }
 
-event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
+void EventThreadUpdateWindowPosition( event_thread_t *p_event, bool *pb_changed,
+                                      int x, int y, int w, int h )
+{
+    vlc_mutex_lock( &p_event->lock );
+    *pb_changed = x != p_event->wnd_cfg.x ||
+                  y != p_event->wnd_cfg.y ||
+                  w != p_event->wnd_cfg.width ||
+                  h != p_event->wnd_cfg.height;
+
+    p_event->wnd_cfg.x      = x;
+    p_event->wnd_cfg.y      = y;
+    p_event->wnd_cfg.width  = y;
+    p_event->wnd_cfg.height = h;
+    vlc_mutex_unlock( &p_event->lock );
+}
+event_thread_t *EventThreadCreate( vout_thread_t *p_vout, const vout_window_cfg_t *p_wnd_cfg )
 {
      /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
@@ -978,6 +989,7 @@ event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
     p_event->i_mouse_hide_timeout =
         var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
     p_event->psz_title = NULL;
+    p_event->wnd_cfg = *p_wnd_cfg;
    
     return p_event;
 }
