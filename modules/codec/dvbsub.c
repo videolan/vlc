@@ -3,7 +3,7 @@
  *            DVB subtitles encoder (developed for Anevia, www.anevia.com)
  *****************************************************************************
  * Copyright (C) 2003 ANEVIA
- * Copyright (C) 2003-2005 the VideoLAN team
+ * Copyright (C) 2003-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
@@ -11,6 +11,7 @@
  *          Laurent Aimar <fenrir@via.ecp.fr>
  *          Jean-Paul Saman <jpsaman #_at_# m2x dot nl>
  *          Derk-Jan Hartman <hartman #at# videolan dot org>
+ *          Simon Hailes <simon _a_ screen.subtitling.com>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,6 +27,7 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
+
 /*****************************************************************************
  * Preamble
  *
@@ -39,6 +41,8 @@
  * in the subtitle descriptor. Potentially it's designed for widechar
  * (but not for UTF-*) codepages.
  *****************************************************************************
+ *
+ *****************************************************************************
  * Notes on DDS (Display Definition Segment)
  * DDS (Display Definition Segment) tells the decoder how the subtitle image relates to
  * the video image.
@@ -47,15 +51,15 @@
  * Also, for SD, the subtitle image is drawn 'on the glass' (i.e. after video scaling,
        + * letterbox, etc.)
  * For 'HD' (subs marked type 0x14/0x24 in PSI), a DDS must be present, and the subs area
- * is drawn onto the video area (scales if necessary).  The DDS tells the decoder what 
- * resolution the subtitle images were intended for, and hence how to scale the subtitle 
- * images for a particular video size  
+ * is drawn onto the video area (scales if necessary).  The DDS tells the decoder what
+ * resolution the subtitle images were intended for, and hence how to scale the subtitle
+ * images for a particular video size
  * i.e. if HD video is presented as letterbox, the subs will
  * be in the same place on the video as if the video was presented on an HD set
  * indeed, if the HD video was pillarboxed by the decoder, the subs may be cut off as
  * well as the video.  The intent here is that the subs can be placed accurately on the video
  * - somthing which was missed in the original spec.
- * 
+ *
  * A DDS may also specify a window - this is where the subs images are moved so that the (0,0)
  * origin of decode is offset.
  ********************************************************************************************/
@@ -171,7 +175,7 @@ typedef struct dvbsub_display_s
     int                     i_width;
     int                     i_height;
 
-    bool              b_windowed;
+    bool                    b_windowed;
     /* these values are only relevant if windowed */
     int                     i_x;
     int                     i_y;
@@ -240,25 +244,25 @@ typedef struct
 
 struct decoder_sys_t
 {
-    bs_t            bs;
+    bs_t               bs;
 
     /* Decoder internal data */
-    int             i_id;
-    int             i_ancillary_id;
-    mtime_t         i_pts;
+    int                i_id;
+    int                i_ancillary_id;
+    mtime_t            i_pts;
 
-    bool      b_absolute;
-    int             i_spu_position;
-    int             i_spu_x;
-    int             i_spu_y;
+    bool               b_absolute;
+    int                i_spu_position;
+    int                i_spu_x;
+    int                i_spu_y;
 
-    bool      b_page;
-    dvbsub_page_t   *p_page;
-    dvbsub_region_t *p_regions;
-    dvbsub_clut_t   *p_cluts;
+    bool               b_page;
+    dvbsub_page_t      *p_page;
+    dvbsub_region_t    *p_regions;
+    dvbsub_clut_t      *p_cluts;
     /* this is very small, so keep forever */
-    dvbsub_display_t display;
-    dvbsub_clut_t    default_clut;
+    dvbsub_display_t   display;
+    dvbsub_clut_t      default_clut;
 };
 
 
@@ -1553,8 +1557,8 @@ static subpicture_t *render( decoder_t *p_dec )
         if (p_region)
         {
                 msg_Dbg( p_dec, "rendering region %i (%i,%i) to (%i,%i)", i,
-                        p_regiondef->i_x, p_regiondef->i_y, 
-                p_regiondef->i_x + p_region->i_width, 
+                        p_regiondef->i_x, p_regiondef->i_y,
+                p_regiondef->i_x + p_region->i_width,
                 p_regiondef->i_y + p_region->i_height );
         }
         else
@@ -1581,7 +1585,7 @@ static subpicture_t *render( decoder_t *p_dec )
             continue;
         }
 
-        /* FIXME: don't create a subpicture region with VLC CODEC YUVP 
+        /* FIXME: don't create a subpicture region with VLC CODEC YUVP
          * when it actually is a TEXT region */
 
         /* Create new SPU region */
