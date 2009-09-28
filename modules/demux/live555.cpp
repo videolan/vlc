@@ -694,6 +694,8 @@ static int SessionsSetup( demux_t *p_demux )
             i_buffer = 100000;
         else if( !strcmp( sub->mediumName(), "video" ) )
             i_buffer = 2000000;
+        else if( !strcmp( sub->mediumName(), "text" ) )
+            ;
         else continue;
 
         if( i_client_port != -1 )
@@ -1001,6 +1003,15 @@ static int SessionsSetup( demux_t *p_demux )
                     tk->b_discard_trunc = true;
                     tk->p_out_muxed = stream_DemuxNew( p_demux, "rawdv",
                                                        p_demux->out );
+                }
+            }
+            else if( !strcmp( sub->mediumName(), "text" ) )
+            {
+                es_format_Init( &tk->fmt, SPU_ES, VLC_FOURCC('u','n','d','f') );
+
+                if( !strcmp( sub->codecName(), "T140" ) )
+                {
+                    tk->fmt.i_codec = VLC_CODEC_ITU_T140;
                 }
             }
 
