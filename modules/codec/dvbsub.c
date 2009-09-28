@@ -38,7 +38,28 @@
  * refers to the character index in the codepage belonging to the language specified
  * in the subtitle descriptor. Potentially it's designed for widechar
  * (but not for UTF-*) codepages.
- *****************************************************************************/
+ *****************************************************************************
+ * Notes on DDS (Display Definition Segment)
+ * DDS (Display Definition Segment) tells the decoder how the subtitle image relates to
+ * the video image.
+ * For SD, the subtitle image is always considered to be for display at 720x576
+ * (although it's assumed that for NTSC, this is 720x480, this is not documented well)
+ * Also, for SD, the subtitle image is drawn 'on the glass' (i.e. after video scaling,
+       + * letterbox, etc.)
+ * For 'HD' (subs marked type 0x14/0x24 in PSI), a DDS must be present, and the subs area
+ * is drawn onto the video area (scales if necessary).  The DDS tells the decoder what 
+ * resolution the subtitle images were intended for, and hence how to scale the subtitle 
+ * images for a particular video size  
+ * i.e. if HD video is presented as letterbox, the subs will
+ * be in the same place on the video as if the video was presented on an HD set
+ * indeed, if the HD video was pillarboxed by the decoder, the subs may be cut off as
+ * well as the video.  The intent here is that the subs can be placed accurately on the video
+ * - somthing which was missed in the original spec.
+ * 
+ * A DDS may also specify a window - this is where the subs images are moved so that the (0,0)
+ * origin of decode is offset.
+ ********************************************************************************************/
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -151,6 +172,7 @@ typedef struct dvbsub_display_s
     int                     i_height;
 
     bool              b_windowed;
+    /* these values are only relevant if windowed */
     int                     i_x;
     int                     i_y;
     int                     i_max_x;
@@ -997,11 +1019,20 @@ static void decode_display_definition( decoder_t *p_dec, bs_t *s )
         p_sys->display.i_max_y = bs_read( s, 16 );
         i_processed_length += 64;
     }
+    else
+    {
+        /* if not windowed, setup the window variables to good defaults */
+        /* not necessary, but to avoid future confusion.. */
+        p_sys->display.i_x     = 0;
+        p_sys->display.i_max_x = p_sys->display.i_width-1;
+        p_sys->display.i_y     = 0;
+        p_sys->display.i_max_y = p_sys->display.i_height-1;
+    }
 
     if( i_processed_length != i_segment_length*8 )
     {
-        msg_Err( p_dec, "processed length %d != segment length %d",
-                 i_processed_length, i_segment_length );
+        msg_Err( p_dec, "processed length %d bytes != segment length %d bytes",
+                 i_processed_length / 8 , i_segment_length );
     }
 
 #ifdef DEBUG_DVBSUB
@@ -1474,9 +1505,14 @@ static subpicture_t *render( decoder_t *p_dec )
 
     if( p_sys->display.b_windowed )
     {
-        /* TODO: check that this actually works */
-        p_spu->i_original_picture_width = p_sys->display.i_max_x - p_sys->display.i_x;
-        p_spu->i_original_picture_height = p_sys->display.i_max_y - p_sys->display.i_y;
+        /* From en_300743v01 - */
+        /* the DDS is there to indicate intended size/position of text */
+        /* the intended video area is ->i_width/height */
+        /* the window is within this... SO... we should leave i_original_picture_width etc. as is */
+        /* and ONLY change i_base_x.  effectively i_max_x/y are only there to limit memory requirements*/
+        /* we COULD use the upper limits to limit rendering to within these? */
+
+        /* see notes on DDS at the top of the file */
         i_base_x += p_sys->display.i_x;
         i_base_y += p_sys->display.i_y;
     }
@@ -1505,17 +1541,28 @@ static subpicture_t *render( decoder_t *p_dec )
 
         p_regiondef = &p_sys->p_page->p_region_defs[i];
 
-#ifdef DEBUG_DVBSUB
-        msg_Dbg( p_dec, "rendering region %i (%i,%i)", i,
-                 p_regiondef->i_x, p_regiondef->i_y );
-#endif
-
         /* Find associated region */
         for( p_region = p_sys->p_regions; p_region != NULL;
              p_region = p_region->p_next )
         {
             if( p_regiondef->i_id == p_region->i_id ) break;
         }
+
+#ifdef DEBUG_DVBSUB
+        /* if a region exists, then print it's size */
+        if (p_region)
+        {
+                msg_Dbg( p_dec, "rendering region %i (%i,%i) to (%i,%i)", i,
+                        p_regiondef->i_x, p_regiondef->i_y, 
+                p_regiondef->i_x + p_region->i_width, 
+                p_regiondef->i_y + p_region->i_height );
+        }
+        else
+        {
+                msg_Dbg( p_dec, "rendering region %i (%i,%i) (no region matched to render)", i,
+                      p_regiondef->i_x, p_regiondef->i_y );
+        }
+#endif
 
         if( !p_region )
         {
@@ -1716,7 +1763,8 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
                         + p_region->p_picture->p[0].i_pitch * 1 / 3;
         int i_tolerance = 0;
 
-#ifdef DEBUG_DVBSUB
+#ifdef DEBUG_DVBSUB1
+        /* p_enc not valid here */
         msg_Dbg( p_enc, "YuvaYuvp: i_pixels=%d, i_iterator=%d", i_pixels, i_iterator );
 #endif
         p_fmt->i_chroma = VLC_CODEC_YUVP;
@@ -1793,7 +1841,8 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
             }
         }
 
-#ifdef DEBUG_DVBSUB
+#ifdef DEBUG_DVBSUB1
+        /* p_enc not valid here */
         msg_Dbg( p_enc, "best palette has %d colors", p_fmt->p_palette->i_entries );
 #endif
 
@@ -1887,7 +1936,8 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
             p_fmt->p_palette->palette[i][3] = 0;
         }
         p_fmt->p_palette->i_entries = i_max_entries;
-#ifdef DEBUG_DVBSUB
+#ifdef DEBUG_DVBSUB1
+        /* p_enc not valid here */
         msg_Dbg( p_enc, "best palette has %d colors", p_fmt->p_palette->i_entries );
 #endif
     }
