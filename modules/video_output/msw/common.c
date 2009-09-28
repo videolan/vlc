@@ -187,6 +187,9 @@ void CommonManage( vout_thread_t *p_vout )
         vlc_mutex_unlock( &p_vout->p_sys->lock );
     }
 
+    /* */
+    p_vout->p_sys->i_changes |= EventThreadRetreiveChanges( p_vout->p_sys->p_event );
+
     /* autoscale toggle */
     if( p_vout->i_changes & VOUT_SCALE_CHANGE )
     {

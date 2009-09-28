@@ -45,6 +45,9 @@ typedef struct
     /* Title */
     char *psz_title;
 
+    /* */
+    unsigned i_changes;
+
 } event_thread_t;
 
 #ifdef MODULE_NAME_IS_wingapi
@@ -267,6 +270,7 @@ void            EventThreadStop( event_thread_t * );
 
 void            EventThreadMouseAutoHide( event_thread_t * );
 void            EventThreadUpdateTitle( event_thread_t *, const char *psz_fallback );
+unsigned        EventThreadRetreiveChanges( event_thread_t * );
 
 /*****************************************************************************
  * Prototypes from common.c

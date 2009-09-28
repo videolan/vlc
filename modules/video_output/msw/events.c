@@ -240,7 +240,9 @@ static void *EventThread( void *p_this )
             break;
 
         case WM_LBUTTONDBLCLK:
-            p_event->p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
+            vlc_mutex_lock( &p_event->lock );
+            p_event->i_changes |= VOUT_FULLSCREEN_CHANGE;
+            vlc_mutex_unlock( &p_event->lock );
             break;
 
         case WM_MBUTTONDOWN:
@@ -779,7 +781,11 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 #ifdef UNDER_CE
         if( p_vout->p_sys->hparent &&
             hwnd != p_vout->p_sys->hfswnd && p_vout->b_fullscreen )
-            p_vout->p_sys->i_changes |= VOUT_FULLSCREEN_CHANGE;
+        {
+            vlc_mutex_lock( &p_event->lock );
+            p_event->i_changes |= VOUT_FULLSCREEN_CHANGE;
+            vlc_mutex_unlock( &p_event->lock );
+        }
 
         if( hwnd == p_vout->p_sys->hfswnd )
         {
@@ -908,6 +914,15 @@ void EventThreadUpdateTitle( event_thread_t *p_event, const char *psz_fallback )
 
     PostMessage( p_event->p_vout->p_sys->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
 }
+unsigned EventThreadRetreiveChanges( event_thread_t *p_event )
+{
+    vlc_mutex_lock( &p_event->lock );
+    unsigned i_changes = p_event->i_changes;
+    p_event->i_changes = 0;
+    vlc_mutex_unlock( &p_event->lock );
+
+    return i_changes;
+}
 
 event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
 {
@@ -946,6 +961,8 @@ void EventThreadDestroy( event_thread_t *p_event )
 
 int EventThreadStart( event_thread_t *p_event )
 {
+    p_event->i_changes = 0;
+
     p_event->b_ready = false;
     p_event->b_done  = false;
     p_event->b_error = false;
@@ -989,8 +1006,5 @@ void EventThreadStop( event_thread_t *p_event )
 
     vlc_join( p_event->thread, NULL );
     p_event->b_ready = false;
-
-    /* clear the changes formerly signaled */
-    p_event->p_vout->p_sys->i_changes = 0;
 }
 
