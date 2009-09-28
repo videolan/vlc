@@ -1011,7 +1011,7 @@ if test "${ac_cv_c_ntohl_sys_param_h}" != "no"; then
 fi
 CFLAGS="${CFLAGS_save}"
 
-RDC_PROG_CC_WFLAGS([all extra sign-compare undef pointer-arith bad-function-cast cast-align write-strings missing-prototypes volatile-register-var error-implicit-function-declaration])
+RDC_PROG_CC_WFLAGS([all extra sign-compare undef pointer-arith bad-function-cast write-strings missing-prototypes volatile-register-var error-implicit-function-declaration])
 RDC_PROG_CC_FLAGS([-pipe])
 
 AC_ARG_ENABLE(warnings-as-error,
