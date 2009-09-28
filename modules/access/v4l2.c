@@ -2413,8 +2413,10 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     if( p_sys->dev_cap.capabilities & V4L2_CAP_RDS_CAPTURE )
         msg_Dbg( p_obj, "device supports RDS" );
 
+#ifdef V4L2_CAP_HW_FREQ_SEEK
     if( p_sys->dev_cap.capabilities & V4L2_CAP_HW_FREQ_SEEK )
         msg_Dbg( p_obj, "device supports hardware frequency seeking" );
+#endif
 
     if( p_sys->dev_cap.capabilities & V4L2_CAP_VBI_CAPTURE )
         msg_Dbg( p_obj, "device support raw VBI capture" );
