@@ -761,14 +761,8 @@ else
 endif
 endif
 	patch -p0 < Patches/libtheora-includes.patch
-ifdef HAVE_WIN32
-	patch -p0 < Patches/theora-doc.patch
-endif
 
 THEORACONF = --disable-sdltest --disable-oggtest --disable-vorbistest --disable-examples
-ifdef HAVE_WIN32
-THEORACONF += --disable-docs
-endif
 
 ifdef HAVE_DARWIN_64
 THEORACONF += --disable-asm
