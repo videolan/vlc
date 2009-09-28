@@ -93,7 +93,6 @@ struct vout_sys_t
     struct vout_window_t *parent_window;         /* Parent window VLC object */
     HWND                 hparent;             /* Handle of the parent window */
     HWND                 hfswnd;          /* Handle of the fullscreen window */
-    WNDPROC              pf_wndproc;             /* Window handling callback */
 
     /* Multi-monitor support */
     HMONITOR             hmonitor;          /* handle of the current monitor */

@@ -455,9 +455,6 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
     }
     #endif
 
-    /* We create the window ourself, there is no previous window proc. */
-    p_vout->p_sys->pf_wndproc = NULL;
-
     /* Get the Icon from the main app */
     vlc_icon = NULL;
 #ifndef UNDER_CE
