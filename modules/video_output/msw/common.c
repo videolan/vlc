@@ -507,7 +507,7 @@ int Control( vout_thread_t *p_vout, int i_query, va_list args )
         rect_window.bottom = va_arg( args, unsigned int );
         if( !rect_window.right ) rect_window.right = p_vout->i_window_width;
         if( !rect_window.bottom ) rect_window.bottom = p_vout->i_window_height;
-        AdjustWindowRect( &rect_window, p_vout->p_sys->i_window_style, 0 );
+        AdjustWindowRect( &rect_window, EventThreadGetWindowStyle( p_vout->p_sys->p_event ), 0 );
 
         SetWindowPos( p_vout->p_sys->hwnd, 0, 0, 0,
                       rect_window.right - rect_window.left,
@@ -658,7 +658,7 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
     {
         msg_Dbg( p_vout, "leaving fullscreen mode" );
         /* Change window style, no borders and no title bar */
-        SetWindowLong( hwnd, GWL_STYLE, p_vout->p_sys->i_window_style );
+        SetWindowLong( hwnd, GWL_STYLE, EventThreadGetWindowStyle( p_vout->p_sys->p_event ) );
 
         if( p_vout->p_sys->hparent )
         {

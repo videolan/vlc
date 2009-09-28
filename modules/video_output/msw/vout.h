@@ -95,7 +95,6 @@ struct vout_sys_t
     int          i_window_y;
     int          i_window_width;
     int          i_window_height;
-    int          i_window_style;
 
     volatile uint16_t i_changes;        /* changes made to the video display */
 

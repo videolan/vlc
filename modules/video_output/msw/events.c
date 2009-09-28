@@ -95,13 +95,14 @@ struct event_thread_t
 
     /* Title */
     char *psz_title;
+    int  i_window_style;
 
     /* */
     unsigned i_changes;
 
 };
 
-static int  DirectXCreateWindow( vout_thread_t *p_vout );
+static int  DirectXCreateWindow( event_thread_t * );
 static void DirectXCloseWindow ( vout_thread_t *p_vout );
 static long FAR PASCAL DirectXEventProc( HWND, UINT, WPARAM, LPARAM );
 
@@ -137,7 +138,7 @@ static void *EventThread( void *p_this )
     /* Create a window for the video */
     /* Creating a window under Windows also initializes the thread's event
      * message queue */
-    if( DirectXCreateWindow( p_event->p_vout ) )
+    if( DirectXCreateWindow( p_event ) )
         p_event->b_error = true;
 
     p_event->b_ready = true;
@@ -416,8 +417,9 @@ static void *EventThread( void *p_this )
  * the video will be displayed. This window will also allow us to capture the
  * events.
  *****************************************************************************/
-static int DirectXCreateWindow( vout_thread_t *p_vout )
+static int DirectXCreateWindow( event_thread_t *p_event )
 {
+    vout_thread_t *p_vout = p_event->p_vout;
     HINSTANCE  hInstance;
     HMENU      hMenu;
     RECT       rect_window;
@@ -545,7 +547,7 @@ static int DirectXCreateWindow( vout_thread_t *p_vout )
         i_stylex = 0;
     }
 
-    p_vout->p_sys->i_window_style = i_style;
+    p_event->i_window_style = i_style;
 
     /* Create the window */
     p_vout->p_sys->hwnd =
@@ -946,6 +948,11 @@ unsigned EventThreadRetreiveChanges( event_thread_t *p_event )
     vlc_mutex_unlock( &p_event->lock );
 
     return i_changes;
+}
+int EventThreadGetWindowStyle( event_thread_t *p_event )
+{
+    /* No need to lock, it is serialized by EventThreadStart */
+    return p_event->i_window_style;
 }
 
 event_thread_t *EventThreadCreate( vout_thread_t *p_vout )
