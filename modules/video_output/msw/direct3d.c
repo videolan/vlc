@@ -186,6 +186,8 @@ static int OpenVideo( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    p_vout->p_sys->b_desktop = false;
+
     /* Initialisations */
     p_vout->pf_init = Init;
     p_vout->pf_end = End;
@@ -197,7 +199,6 @@ static int OpenVideo( vlc_object_t *p_this )
     if( CommonInit( p_vout ) )
         goto error;
 
-    p_vout->p_sys->b_desktop = false;
     var_Create( p_vout, "directx-hw-yuv", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_vout, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
