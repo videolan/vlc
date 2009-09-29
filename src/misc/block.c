@@ -215,7 +215,6 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
     if( (size_t)(p_block->p_buffer - p_start) < (size_t)i_prebody
      || (size_t)(p_end - p_block->p_buffer) < i_body )
     {
-        /* FIXME: this is really dumb, we should use realloc() */
         block_t *p_rea = block_Alloc( requested );
         if( p_rea )
         {
@@ -232,16 +231,15 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
      * XXX it might not preserve the alignment of p_buffer */
     if( p_end - (p_block->p_buffer + i_body) > BLOCK_WASTE_SIZE )
     {
-        const ptrdiff_t i_prebody = p_block->p_buffer - p_start;
-        const size_t i_new = requested + 1 * BLOCK_PADDING;
-        block_sys_t *p_new = realloc( p_sys, sizeof (*p_sys) + i_new );
-
-        if( p_new != NULL )
+        block_t *p_rea = block_Alloc( requested );
+        if( p_rea )
         {
-            p_sys = p_new;
-            p_sys->i_allocated_buffer = i_new;
-            p_block = &p_sys->self;
-            p_block->p_buffer = &p_sys->p_allocated_buffer[i_prebody];
+            BlockMetaCopy( p_rea, p_block );
+            p_rea->p_buffer += i_prebody;
+            p_rea->i_buffer -= i_prebody;
+            memcpy( p_rea->p_buffer, p_block->p_buffer, p_block->i_buffer );
+            block_Release( p_block );
+            p_block = p_rea;
         }
     }
 
