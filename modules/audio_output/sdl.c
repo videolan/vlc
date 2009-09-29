@@ -108,11 +108,9 @@ static int Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if ( var_Type( p_aout, "audio-device" ) != 0 )
+    if( var_Get( p_aout, "audio-device" ) != VLC_ENOVAR )
     {
         /* The user has selected an audio device. */
-        vlc_value_t val;
-        var_Get( p_aout, "audio-device", &val );
         if ( val.i_int == AOUT_VAR_STEREO )
         {
             p_aout->output.output.i_physical_channels
