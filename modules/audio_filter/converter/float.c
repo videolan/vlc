@@ -1,7 +1,7 @@
 /*****************************************************************************
  * float.c: Floating point audio format conversions
  *****************************************************************************
- * Copyright (C) 2002, 2006 the VideoLAN team
+ * Copyright (C) 2002, 2006-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Paul Saman <jpsaman _at_ videolan _dot_ org>
@@ -35,21 +35,15 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Create_F32ToFL32 ( vlc_object_t * );
-static void Do_F32ToFL32( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                           aout_buffer_t * );
-static void Do_FL32ToF32 ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                           aout_buffer_t * );
+static block_t *Do_F32ToFL32( filter_t *, block_t * );
+static block_t *Do_FL32ToF32 ( filter_t *, block_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -57,7 +51,7 @@ static void Do_FL32ToF32 ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
 vlc_module_begin ()
     set_description( N_("Floating-point audio format conversions") )
     add_submodule ()
-        set_capability( "audio filter", 10 )
+        set_capability( "audio filter2", 10 )
         set_callbacks( Create_F32ToFL32, NULL )
 vlc_module_end ()
 
@@ -66,67 +60,57 @@ vlc_module_end ()
  *****************************************************************************/
 static int Create_F32ToFL32( vlc_object_t *p_this )
 {
-    aout_filter_t * p_filter = (aout_filter_t *)p_this;
+    filter_t * p_filter = (filter_t *)p_this;
 
     if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FI32
            || p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
       && ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
             || p_filter->fmt_out.audio.i_format != VLC_CODEC_FI32 ) )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
     if( p_filter->fmt_in.audio.i_format == VLC_CODEC_FI32 )
     {
-        p_filter->pf_do_work = Do_F32ToFL32;
+        p_filter->pf_audio_filter = Do_F32ToFL32;
     }
     else
     {
-        p_filter->pf_do_work = Do_FL32ToF32;
+        p_filter->pf_audio_filter = Do_FL32ToF32;
     }
 
-    p_filter->b_in_place = 1;
-
-    return 0;
+    return VLC_SUCCESS;
 }
 
-static void Do_F32ToFL32( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                          aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+static block_t *Do_F32ToFL32( filter_t * p_filter, block_t * p_in_buf )
 {
-    VLC_UNUSED(p_aout);
     int i;
     vlc_fixed_t * p_in = (vlc_fixed_t *)p_in_buf->p_buffer;
-    float * p_out = (float *)p_out_buf->p_buffer;
+    float * p_out = (float *)p_in_buf->p_buffer;
 
     for ( i = p_in_buf->i_nb_samples
                * aout_FormatNbChannels( &p_filter->fmt_in.audio ) ; i-- ; )
     {
         *p_out++ = (float)*p_in++ / (float)FIXED32_ONE;
     }
-
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_buffer;
+    return p_in_buf;
 }
 
-static void Do_FL32ToF32( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                          aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+static block_t *Do_FL32ToF32( filter_t * p_filter, block_t * p_in_buf )
 {
-    VLC_UNUSED(p_aout);
     int i;
     float * p_in = (float *)p_in_buf->p_buffer;
-    vlc_fixed_t * p_out = (vlc_fixed_t *)p_out_buf->p_buffer;
+    vlc_fixed_t * p_out = (vlc_fixed_t *)p_in_buf->p_buffer;
 
     for ( i = p_in_buf->i_nb_samples
                * aout_FormatNbChannels( &p_filter->fmt_in.audio ) ; i-- ; )
     {
         *p_out++ = (vlc_fixed_t)( *p_in++ * (float)FIXED32_ONE );
     }
-
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_buffer;
+    return p_in_buf;
 }
