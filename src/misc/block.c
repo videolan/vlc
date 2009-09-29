@@ -224,6 +224,8 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
             memcpy( p_rea->p_buffer, p_block->p_buffer, p_block->i_buffer );
         }
         block_Release( p_block );
+        if( p_rea == NULL )
+            return NULL;
         p_block = p_rea;
     }
     else
