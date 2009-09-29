@@ -93,8 +93,6 @@ static void BlockMetaCopy( block_t *restrict out, const block_t *in )
 #define BLOCK_ALIGN        16
 /* Initial reserved header and footer size (must be multiple of alignment) */
 #define BLOCK_PADDING      32
-/* Maximum size of reserved footer before we release with realloc() */
-#define BLOCK_WASTE_SIZE   2048
 
 block_t *block_Alloc( size_t i_size )
 {
@@ -224,23 +222,6 @@ block_t *block_Realloc( block_t *p_block, ssize_t i_prebody, size_t i_body )
         }
         block_Release( p_block );
         p_block = p_rea;
-    }
-    else
-    /* We have a very large reserved footer now? Release some of it.
-     * XXX it might not preserve the alignment of p_buffer */
-    if( p_end - (p_block->p_buffer + i_body) > BLOCK_WASTE_SIZE )
-    {
-        const ptrdiff_t i_prebody = p_block->p_buffer - p_start;
-        const size_t i_new = requested + 1 * BLOCK_PADDING;
-        block_sys_t *p_new = realloc( p_sys, sizeof (*p_sys) + i_new );
-
-        if( p_new != NULL )
-        {
-            p_sys = p_new;
-            p_sys->i_allocated_buffer = i_new;
-            p_block = &p_sys->self;
-            p_block->p_buffer = &p_sys->p_allocated_buffer[i_prebody];
-        }
     }
 
     /* NOTE: p_start and p_end are corrupted from this point */
