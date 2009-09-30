@@ -396,30 +396,6 @@ static VLCMain *_o_sharedMainInstance = nil;
        because VLCMain is the owner */
     if( nib_main_loaded ) return;
 
-    /* check whether the user runs a valid version of OS X */
-    if( MACOS_VERSION < 10.5f )
-    {
-        NSAlert *ourAlert;
-        int i_returnValue;
-        NSString *o_blabla;
-        if( MACOS_VERSION == 10.4f )
-            o_blabla = _NS("VLC's last release for your OS is the 0.9 series." );
-        else if( MACOS_VERSION == 10.3f )
-            o_blabla = _NS("VLC's last release for your OS is VLC 0.8.6i, which is prone to known security issues." );
-        else // 10.2 and 10.1, still 3% of the OS X market share
-            o_blabla = _NS("VLC's last release for your OS is VLC 0.7.2, which is highly out of date and prone to " \
-                         "known security issues. We recommend you to update your Mac to a modern version of Mac OS X.");
-        ourAlert = [NSAlert alertWithMessageText: _NS("Your version of Mac OS X is no longer supported")
-                                   defaultButton: _NS("Quit")
-                                 alternateButton: NULL
-                                     otherButton: NULL
-                       informativeTextWithFormat: _NS("VLC media player %s requires Mac OS X 10.5 or higher.\n\n%@"), VLC_Version(), o_blabla];
-        [ourAlert setAlertStyle: NSCriticalAlertStyle];
-        i_returnValue = [ourAlert runModal];
-        [NSApp performSelectorOnMainThread: @selector(terminate:) withObject:nil waitUntilDone:NO];
-        return;
-    }
-
     [self initStrings];
 
     [o_window setExcludedFromWindowsMenu: YES];
