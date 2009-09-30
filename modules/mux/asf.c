@@ -141,7 +141,7 @@ struct sout_mux_sys_t
 
     vlc_array_t     *p_tracks;
 
-    bool      b_write_header;
+    bool            b_write_header;
 
     block_t         *pk;
     int             i_pk_used;
@@ -641,6 +641,9 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     vlc_array_append( p_sys->p_tracks, (void *)tk);
     tk->i_id = vlc_array_index_of_item( p_sys->p_tracks, tk ) + 1;
 
+
+    p_sys->b_write_header = true;
+
     return VLC_SUCCESS;
 }
 
@@ -674,6 +677,8 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
 
     vlc_array_remove( p_sys->p_tracks, vlc_array_index_of_item( p_sys->p_tracks, (void *)tk ) );
 
+
+    p_sys->b_write_header = true;
     return VLC_SUCCESS;
 }
 
