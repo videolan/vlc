@@ -326,7 +326,7 @@ static int Control( sout_mux_t *p_mux, int i_query, va_list args )
        case MUX_CAN_ADD_STREAM_WHILE_MUXING:
            pb_bool = (bool*)va_arg( args, bool * );
            if( p_sys->b_asf_http ) *pb_bool = true;
-           else *pb_bool = false;
+           else *pb_bool = true;
            return VLC_SUCCESS;
 
        case MUX_GET_ADD_STREAM_WAIT:
