@@ -35,6 +35,7 @@
 #include <vlc_aout.h>
 #include <vlc_filter.h>
 #include <vlc_block.h>
+#include <vlc_cpu.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -43,7 +44,13 @@ static int  OpenFilter ( vlc_object_t * );
 static void CloseFilter( vlc_object_t * );
 static block_t *Resample( filter_t *, block_t * );
 
+#if 1
 typedef float sample_t;
+# define VLC_CODEC_NATIVE VLC_CODEC_FL32
+#else
+typedef int32_t sample_t;
+# define VLC_CODEC_NATIVE VLC_CODEC_FI32
+#endif
 
 /*****************************************************************************
  * Local structures
@@ -130,7 +137,11 @@ static block_t *Resample( filter_t *p_filter, block_t *p_in_buf )
             for( unsigned i = 0; i < i_nb_channels ; i++ )
             {
                 p_out[i] = p_prev_sample[i];
+#if CPU_CAPABILITY_FPU
                 p_out[i] += (p_in[i] - p_prev_sample[i])
+#else
+                p_out[i] += (int64_t)(p_in[i] - p_prev_sample[i])
+#endif
                     * p_sys->i_remainder / p_filter->fmt_out.audio.i_rate;
             }
             p_out += i_nb_channels;
@@ -149,7 +160,11 @@ static block_t *Resample( filter_t *p_filter, block_t *p_in_buf )
             for( unsigned i = 0; i < i_nb_channels ; i++ )
             {
                 p_out[i] = p_in[i];
+#if CPU_CAPABILITY_FPU
                 p_out[i] += (p_in[i + i_nb_channels] - p_in[i])
+#else
+                p_out[i] += (int64_t)(p_in[i + i_nb_channels] - p_in[i])
+#endif
                     * p_sys->i_remainder / p_filter->fmt_out.audio.i_rate;
             }
             p_out += i_nb_channels;
@@ -194,7 +209,7 @@ static int OpenFilter( vlc_object_t *p_this )
     int i_out_rate  = p_filter->fmt_out.audio.i_rate;
 
     if( p_filter->fmt_in.audio.i_rate == p_filter->fmt_out.audio.i_rate ||
-        p_filter->fmt_in.i_codec != VLC_CODEC_FL32 )
+        p_filter->fmt_in.i_codec != VLC_CODEC_NATIVE )
     {
         return VLC_EGENERIC;
     }
