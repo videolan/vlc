@@ -27,4 +27,5 @@
       --enable-activex \
       --enable-sse --enable-mmx \
       --disable-cddax --disable-vcdx --disable-libcdio --disable-vcdinfo \
-      --disable-libcddb --disable-dvb --enable-zvbi --disable-telx 
+      --disable-libcddb --disable-dvb --enable-zvbi --disable-telx \
+      --enable-peflags
