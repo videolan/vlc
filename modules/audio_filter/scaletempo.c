@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 
 #include <string.h> /* for memset */
 #include <limits.h> /* form INT_MIN */
@@ -40,13 +41,12 @@
  *****************************************************************************/
 static int  Open( vlc_object_t * );
 static void Close( vlc_object_t * );
-static void DoWork( aout_instance_t *, aout_filter_t *,
-                    aout_buffer_t *, aout_buffer_t * );
+static block_t *DoWork( filter_t *, block_t * );
 
 vlc_module_begin ()
     set_description( N_("Audio tempo scaler synched with rate") )
     set_shortname( N_("Scaletempo") )
-    set_capability( "audio filter", 0 )
+    set_capability( "audio filter2", 0 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
@@ -76,7 +76,7 @@ vlc_module_end ()
  * frame: a single set of samples, one for each channel
  * VLC uses these terms differently
  */
-struct aout_filter_sys_t
+struct filter_sys_t
 {
     /* Filter static config */
     double    scale;
@@ -105,23 +105,20 @@ struct aout_filter_sys_t
     unsigned  bytes_standing;
     void     *buf_overlap;
     void     *table_blend;
-    void    (*output_overlap)( aout_filter_t *p_filter, void *p_out_buf, unsigned bytes_off );
+    void    (*output_overlap)( filter_t *p_filter, void *p_out_buf, unsigned bytes_off );
     /* best overlap */
     unsigned  frames_search;
     void     *buf_pre_corr;
     void     *table_window;
-    unsigned(*best_overlap_offset)( aout_filter_t *p_filter );
-    /* for "audio filter" only, manage own buffers */
-    int       i_buf;
-    uint8_t  *p_buffers[2];
+    unsigned(*best_overlap_offset)( filter_t *p_filter );
 };
 
 /*****************************************************************************
  * best_overlap_offset: calculate best offset for overlap
  *****************************************************************************/
-static unsigned best_overlap_offset_float( aout_filter_t *p_filter )
+static unsigned best_overlap_offset_float( filter_t *p_filter )
 {
-    aout_filter_sys_t *p = p_filter->p_sys;
+    filter_sys_t *p = p_filter->p_sys;
     float *pw, *po, *ppc, *search_start;
     float best_corr = INT_MIN;
     unsigned best_off = 0;
@@ -156,11 +153,11 @@ static unsigned best_overlap_offset_float( aout_filter_t *p_filter )
 /*****************************************************************************
  * output_overlap: blend end of previous stride with beginning of current stride
  *****************************************************************************/
-static void output_overlap_float( aout_filter_t   *p_filter,
+static void output_overlap_float( filter_t        *p_filter,
                                   void            *buf_out,
                                   unsigned         bytes_off )
 {
-    aout_filter_sys_t *p = p_filter->p_sys;
+    filter_sys_t *p = p_filter->p_sys;
     float *pout = buf_out;
     float *pb   = p->table_blend;
     float *po   = p->buf_overlap;
@@ -174,12 +171,12 @@ static void output_overlap_float( aout_filter_t   *p_filter,
 /*****************************************************************************
  * fill_queue: fill p_sys->buf_queue as much possible, skipping samples as needed
  *****************************************************************************/
-static size_t fill_queue( aout_filter_t *p_filter,
+static size_t fill_queue( filter_t      *p_filter,
                           uint8_t       *p_buffer,
                           size_t         i_buffer,
                           size_t         offset )
 {
-    aout_filter_sys_t *p = p_filter->p_sys;
+    filter_sys_t *p = p_filter->p_sys;
     unsigned bytes_in = i_buffer - offset;
     size_t offset_unchanged = offset;
 
@@ -217,12 +214,12 @@ static size_t fill_queue( aout_filter_t *p_filter,
 /*****************************************************************************
  * transform_buffer: main filter loop
  *****************************************************************************/
-static size_t transform_buffer( aout_filter_t   *p_filter,
+static size_t transform_buffer( filter_t        *p_filter,
                                 uint8_t         *p_buffer,
                                 size_t           i_buffer,
                                 uint8_t         *pout )
 {
-    aout_filter_sys_t *p = p_filter->p_sys;
+    filter_sys_t *p = p_filter->p_sys;
 
     size_t offset_in = fill_queue( p_filter, p_buffer, i_buffer, 0 );
     unsigned bytes_out = 0;
@@ -260,10 +257,10 @@ static size_t transform_buffer( aout_filter_t   *p_filter,
 /*****************************************************************************
  * calculate_output_buffer_size
  *****************************************************************************/
-static size_t calculate_output_buffer_size( aout_filter_t   *p_filter,
+static size_t calculate_output_buffer_size( filter_t        *p_filter,
                                             size_t           bytes_in )
 {
-    aout_filter_sys_t *p = p_filter->p_sys;
+    filter_sys_t *p = p_filter->p_sys;
     size_t bytes_out = 0;
     int bytes_to_out = bytes_in + p->bytes_queued - p->bytes_to_slide;
     if( bytes_to_out >= (int)p->bytes_queue_max ) {
@@ -278,9 +275,9 @@ static size_t calculate_output_buffer_size( aout_filter_t   *p_filter,
 /*****************************************************************************
  * reinit_buffers: reinitializes buffers in p_filter->p_sys
  *****************************************************************************/
-static int reinit_buffers( aout_filter_t *p_filter )
+static int reinit_buffers( filter_t *p_filter )
 {
-    aout_filter_sys_t *p = p_filter->p_sys;
+    filter_sys_t *p = p_filter->p_sys;
     unsigned i,j;
 
     unsigned frames_stride = p->ms_stride * p->sample_rate / 1000.0;
@@ -388,8 +385,8 @@ static int reinit_buffers( aout_filter_t *p_filter )
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    aout_filter_t     *p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t *p_sys;
+    filter_t     *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
     bool b_fit = true;
 
     if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
@@ -409,13 +406,12 @@ static int Open( vlc_object_t *p_this )
     if( ! b_fit )
         return VLC_EGENERIC;
 
-    p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = false;
-
     /* Allocate structure */
-    p_sys = p_filter->p_sys = malloc( sizeof(aout_filter_sys_t) );
+    p_sys = p_filter->p_sys = malloc( sizeof(*p_sys) );
     if( ! p_sys )
         return VLC_ENOMEM;
+
+    p_filter->pf_audio_filter = DoWork;
 
     p_sys->scale             = 1.0;
     p_sys->sample_rate       = p_filter->fmt_in.audio.i_rate;
@@ -435,10 +431,6 @@ static int Open( vlc_object_t *p_this )
 
     msg_Dbg( p_this, "params: %i stride, %.3f overlap, %i search",
              p_sys->ms_stride, p_sys->percent_overlap, p_sys->ms_search );
-
-    p_sys->i_buf = 0;
-    p_sys->p_buffers[0] = NULL;
-    p_sys->p_buffers[1] = NULL;
 
     p_sys->buf_queue      = NULL;
     p_sys->buf_overlap    = NULL;
@@ -460,33 +452,25 @@ static int Open( vlc_object_t *p_this )
 
 static void Close( vlc_object_t *p_this )
 {
-    aout_filter_t *p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
+    filter_t *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
     free( p_sys->buf_queue );
     free( p_sys->buf_overlap );
     free( p_sys->table_blend );
     free( p_sys->buf_pre_corr );
     free( p_sys->table_window );
-    free( p_sys->p_buffers[0] );
-    free( p_sys->p_buffers[1] );
-    free( p_filter->p_sys );
+    free( p_sys );
 }
 
 /*****************************************************************************
- * DoWork: aout_filter wrapper for transform_buffer
+ * DoWork: filter wrapper for transform_buffer
  *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
 {
-    VLC_UNUSED(p_aout);
-    aout_filter_sys_t *p = p_filter->p_sys;
+    filter_sys_t *p = p_filter->p_sys;
 
-    if( p_filter->fmt_in.audio.i_rate == p->sample_rate ) {
-      memcpy( p_out_buf->p_buffer, p_in_buf->p_buffer, p_in_buf->i_buffer );
-      p_out_buf->i_buffer   = p_in_buf->i_buffer;
-      p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-      return;
-    }
+    if( p_filter->fmt_in.audio.i_rate == p->sample_rate )
+        return p_in_buf;
 
     double scale = p_filter->fmt_in.audio.i_rate / (double)p->sample_rate;
     if( scale != p->scale ) {
@@ -501,28 +485,16 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     }
 
     size_t i_outsize = calculate_output_buffer_size ( p_filter, p_in_buf->i_buffer );
-    if( i_outsize > p_out_buf->i_buffer ) {
-#if 0   /* FIXME: This requires audio filter2 to work */
-        p_out_buf = block_Realloc( p_out_buf, i_outsize, 0 );
-        if( p_out_buf == NULL )
-            abort();
-#else   /* This fails horribly if we have more than two buffers in the
-         * pipeline, or if the buffer is passed to another thread... XXX */
-        void *temp = realloc( p->p_buffers[ p->i_buf ], i_outsize );
-        if( temp == NULL )
-        {
-            return;
-        }
-        p->p_buffers[ p->i_buf ] = temp;
-        p_out_buf->p_buffer = p->p_buffers[ p->i_buf ];
-        p->i_buf = ! p->i_buf;
-#endif
-    }
+    block_t *p_out_buf = filter_NewAudioBuffer( p_filter, i_outsize );
+    if( p_out_buf == NULL )
+        return NULL;
 
     size_t bytes_out = transform_buffer( p_filter,
         p_in_buf->p_buffer, p_in_buf->i_buffer,
         p_out_buf->p_buffer );
 
+    block_Release( p_in_buf );
     p_out_buf->i_buffer   = bytes_out;
     p_out_buf->i_nb_samples = bytes_out / p->bytes_per_frame;
+    return p_out_buf;
 }
