@@ -428,7 +428,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     HMENU      hMenu;
     RECT       rect_window;
     WNDCLASS   wc;                            /* window class components */
-    HICON      vlc_icon = NULL;
+    HICON      vlc_icon;
     char       vlc_path[MAX_PATH+1];
     int        i_style, i_stylex;
 
