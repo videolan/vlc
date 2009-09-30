@@ -101,8 +101,24 @@ int CommonInit( vout_thread_t *p_vout )
     p_sys->p_event = EventThreadCreate( p_vout, &wnd_cfg );
     if( !p_sys->p_event )
         return VLC_EGENERIC;
-    if( EventThreadStart( p_sys->p_event ) )
+
+    event_cfg_t cfg;
+    memset(&cfg, 0, sizeof(cfg));
+#ifdef MODULE_NAME_IS_direct3d
+    cfg.use_desktop = p_vout->p_sys->b_desktop;
+#endif
+#ifdef MODULE_NAME_IS_directx
+    cfg.use_overlay = p_vout->p_sys->b_using_overlay;
+#endif
+    event_hwnd_t hwnd;
+    if( EventThreadStart( p_sys->p_event, &hwnd, &cfg ) )
         return VLC_EGENERIC;
+
+    p_sys->parent_window = hwnd.parent_window;
+    p_sys->hparent       = hwnd.hparent;
+    p_sys->hwnd          = hwnd.hwnd;
+    p_sys->hvideownd     = hwnd.hvideownd;
+    p_sys->hfswnd        = hwnd.hfswnd;
 
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */

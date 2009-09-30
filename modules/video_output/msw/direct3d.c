@@ -303,6 +303,8 @@ static void End( vout_thread_t *p_vout )
  *****************************************************************************/
 static int Manage( vout_thread_t *p_vout )
 {
+    vout_sys_t *p_sys = p_vout->p_sys;
+
     CommonManage( p_vout );
 
     /*
@@ -346,7 +348,18 @@ static int Manage( vout_thread_t *p_vout )
         p_vout->p_sys->b_desktop = !p_vout->p_sys->b_desktop;
         p_vout->pf_display = FirstDisplay;
 
-        EventThreadStart( p_vout->p_sys->p_event );
+        event_cfg_t cfg;
+        memset(&cfg, 0, sizeof(cfg));
+        cfg.use_desktop = p_vout->p_sys->b_desktop;
+
+        event_hwnd_t hwnd;
+        EventThreadStart( p_vout->p_sys->p_event, &hwnd, &cfg );
+
+        p_sys->parent_window = hwnd.parent_window;
+        p_sys->hparent       = hwnd.hparent;
+        p_sys->hwnd          = hwnd.hwnd;
+        p_sys->hvideownd     = hwnd.hvideownd;
+        p_sys->hfswnd        = hwnd.hfswnd;
 
         Init( p_vout );
 

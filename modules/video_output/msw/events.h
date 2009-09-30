@@ -29,9 +29,22 @@
  */
 typedef struct event_thread_t event_thread_t;
 
+typedef struct {
+    bool use_desktop; /* direct3d */
+    bool use_overlay; /* directx */
+} event_cfg_t;
+
+typedef struct {
+    vout_window_t *parent_window;
+    HWND hparent;
+    HWND hwnd;
+    HWND hvideownd;
+    HWND hfswnd;
+} event_hwnd_t;
+
 event_thread_t *EventThreadCreate( vout_thread_t *, const vout_window_cfg_t * );
 void            EventThreadDestroy( event_thread_t * );
-int             EventThreadStart( event_thread_t * );
+int             EventThreadStart( event_thread_t *, event_hwnd_t *, const event_cfg_t * );
 void            EventThreadStop( event_thread_t * );
 
 void            EventThreadMouseAutoHide( event_thread_t * );
