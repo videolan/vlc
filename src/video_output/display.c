@@ -353,6 +353,7 @@ struct vout_display_owner_sys_t {
     int  display_width;
     int  display_height;
     bool display_is_fullscreen;
+    bool display_is_forced;
 };
 
 static void VoutDisplayCreateRender(vout_display_t *vd)
@@ -581,6 +582,7 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         osys->display_width         = width;
         osys->display_height        = height;
         osys->display_is_fullscreen = is_fullscreen;
+        osys->display_is_forced     = false;
 
         vlc_mutex_unlock(&osys->lock);
         break;
@@ -659,6 +661,7 @@ void vout_ManageDisplay(vout_display_t *vd)
         int  display_width         = osys->display_width;
         int  display_height        = osys->display_height;
         bool display_is_fullscreen = osys->display_is_fullscreen;
+        bool display_is_forced     = osys->display_is_forced;
         osys->ch_display_size = false;
 
         bool reset_pictures = osys->reset_pictures;
@@ -701,7 +704,7 @@ void vout_ManageDisplay(vout_display_t *vd)
             cfg.display.height = display_height;
 
             if (!cfg.is_fullscreen != !display_is_fullscreen ||
-                vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg)) {
+                vout_display_Control(vd, VOUT_DISPLAY_CHANGE_DISPLAY_SIZE, &cfg, display_is_forced)) {
                 if (!cfg.is_fullscreen == !display_is_fullscreen)
                     msg_Err(vd, "Failed to resize display");
 
@@ -755,7 +758,15 @@ void vout_ManageDisplay(vout_display_t *vd)
                 const int display_width  = (int64_t)vd->source.i_width  * osys->zoom.num / osys->zoom.den;
                 const int display_height = (int64_t)vd->source.i_height * osys->zoom.num / osys->zoom.den;
 
-                vout_display_SendEventDisplaySize(vd, display_width, display_height, osys->cfg.is_fullscreen);
+                vlc_mutex_lock(&osys->lock);
+
+                osys->ch_display_size       = true;
+                osys->display_width         = display_width;
+                osys->display_height        = display_height;
+                osys->display_is_fullscreen = osys->cfg.is_fullscreen;
+                osys->display_is_forced     = true;
+
+                vlc_mutex_unlock(&osys->lock);
             }
 
             osys->cfg.zoom.num = osys->zoom.num;
