@@ -43,12 +43,14 @@ static int  OpenFilter ( vlc_object_t * );
 static void CloseFilter( vlc_object_t * );
 static block_t *Resample( filter_t *, block_t * );
 
+typedef float sample_t;
+
 /*****************************************************************************
  * Local structures
  *****************************************************************************/
 struct filter_sys_t
 {
-    int32_t *p_prev_sample;       /* this filter introduces a 1 sample delay */
+    sample_t *p_prev_sample;      /* this filter introduces a 1 sample delay */
 
     unsigned int i_remainder;                /* remainder of previous sample */
 
@@ -80,20 +82,21 @@ static block_t *Resample( filter_t *p_filter, block_t *p_in_buf )
 
     filter_sys_t *p_sys = p_filter->p_sys;
     unsigned i_nb_channels = p_filter->fmt_in.audio.i_channels;
-    float *p_prev_sample = (float *)p_sys->p_prev_sample;
+    sample_t *p_prev_sample = p_sys->p_prev_sample;
 
     /* Check if we really need to run the resampler */
     if( p_filter->fmt_out.audio.i_rate == p_filter->fmt_in.audio.i_rate )
     {
         if( !(p_in_buf->i_flags & BLOCK_FLAG_DISCONTINUITY) )
         {
-            p_in_buf = block_Realloc( p_in_buf, sizeof(float) * i_nb_channels,
+            p_in_buf = block_Realloc( p_in_buf,
+                                      sizeof(sample_t) * i_nb_channels,
                                       p_in_buf->i_buffer );
             if( !p_in_buf )
                 return NULL;
 
             memcpy( p_in_buf->p_buffer, p_prev_sample,
-                    i_nb_channels * sizeof(float) );
+                    i_nb_channels * sizeof(sample_t) );
         }
         return p_in_buf;
     }
@@ -107,11 +110,11 @@ static block_t *Resample( filter_t *p_filter, block_t *p_in_buf )
     if( !p_out_buf )
         goto out;
 
-    float *p_out = (float *)p_out_buf->p_buffer;
+    sample_t *p_out = (sample_t *)p_out_buf->p_buffer;
 
     unsigned i_in_nb = p_in_buf->i_nb_samples;
     unsigned i_out = 0;
-    const float *p_in = (float *)p_in_buf->p_buffer;
+    const sample_t *p_in = (sample_t *)p_in_buf->p_buffer;
 
     /* Take care of the previous input sample (if any) */
     if( p_in_buf->i_flags & BLOCK_FLAG_DISCONTINUITY )
@@ -124,13 +127,11 @@ static block_t *Resample( filter_t *p_filter, block_t *p_in_buf )
     {
         while( p_sys->i_remainder < p_filter->fmt_out.audio.i_rate )
         {
-            for( unsigned i_chan = i_nb_channels ; i_chan ; )
+            for( unsigned i = 0; i < i_nb_channels ; i++ )
             {
-                i_chan--;
-                p_out[i_chan] = p_prev_sample[i_chan];
-                p_out[i_chan] += ( ( p_in[i_chan] - p_prev_sample[i_chan] )
-                                   * p_sys->i_remainder
-                                   / p_filter->fmt_out.audio.i_rate );
+                p_out[i] = p_prev_sample[i];
+                p_out[i] += (p_in[i] - p_prev_sample[i])
+                    * p_sys->i_remainder / p_filter->fmt_out.audio.i_rate;
             }
             p_out += i_nb_channels;
             i_out++;
@@ -145,13 +146,11 @@ static block_t *Resample( filter_t *p_filter, block_t *p_in_buf )
     {
         while( p_sys->i_remainder < p_filter->fmt_out.audio.i_rate )
         {
-            for( unsigned i_chan = i_nb_channels ; i_chan ; )
+            for( unsigned i = 0; i < i_nb_channels ; i++ )
             {
-                i_chan--;
-                p_out[i_chan] = p_in[i_chan];
-                p_out[i_chan] += ( ( p_in[i_chan + i_nb_channels]
-                    - p_in[i_chan] )
-                    * p_sys->i_remainder / p_filter->fmt_out.audio.i_rate );
+                p_out[i] = p_in[i];
+                p_out[i] += (p_in[i + i_nb_channels] - p_in[i])
+                    * p_sys->i_remainder / p_filter->fmt_out.audio.i_rate;
             }
             p_out += i_nb_channels;
             i_out++;
@@ -164,11 +163,7 @@ static block_t *Resample( filter_t *p_filter, block_t *p_in_buf )
     }
 
     /* Backup the last input sample for next time */
-    for( unsigned i_chan = i_nb_channels ; i_chan ; )
-    {
-        i_chan--;
-        p_prev_sample[i_chan] = p_in[i_chan];
-    }
+    memcpy( p_prev_sample, p_in, i_nb_channels * sizeof(sample_t) );
 
     p_out_buf->i_nb_samples = i_out;
     p_out_buf->i_pts = p_in_buf->i_pts;
@@ -183,7 +178,7 @@ static block_t *Resample( filter_t *p_filter, block_t *p_in_buf )
                                   p_out_buf->i_nb_samples ) - p_out_buf->i_pts;
 
     p_out_buf->i_buffer = p_out_buf->i_nb_samples *
-        i_nb_channels * sizeof(int32_t);
+        i_nb_channels * sizeof(sample_t);
 out:
     block_Release( p_in_buf );
     return p_out_buf;
@@ -210,7 +205,7 @@ static int OpenFilter( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->p_prev_sample = malloc(
-        p_filter->fmt_in.audio.i_channels * sizeof(int32_t) );
+        p_filter->fmt_in.audio.i_channels * sizeof(sample_t) );
     if( p_sys->p_prev_sample == NULL )
     {
         free( p_sys );
