@@ -475,10 +475,12 @@ void VLCPlugin::initVLC()
     ppsz_argv[ppsz_argc++] = "--no-one-instance";
 
     /* common settings */
+    ppsz_argv[ppsz_argc++] = "-vv";
     ppsz_argv[ppsz_argc++] = "--no-stats";
     ppsz_argv[ppsz_argc++] = "--no-media-library";
-    ppsz_argv[ppsz_argc++] = "--ignore-config";
     ppsz_argv[ppsz_argc++] = "--intf=dummy";
+    ppsz_argv[ppsz_argc++] = "--no-video-title-show";
+
 
     // loop mode is a configuration option only
     if( _b_autoloop )
