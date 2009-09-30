@@ -65,6 +65,7 @@ static const entry_t p_list_video[] = {
         A("mp2v"),
         A("MPEG"),
         A("mpg2"),
+        A("MPG2"),
 
         E("PIM1", "Pinnacle DC1000 (MPEG-1 Video)"),
 
