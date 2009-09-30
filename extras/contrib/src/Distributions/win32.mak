@@ -7,5 +7,5 @@ all: .iconv .intl .freetype .fribidi .zlib \
         .dvdnav .dvbpsi .qt4_win32 .schroedinger .SDL_image \
         .dx_headers .dshow_headers .gecko-win32 .dca \
         .lua .tag .fontconfig .portaudio .kate .libass .zvbi \
-        .fluid .aclocal
+        .fluid .aclocal .peflags
 #       .daap .cddb .cdio .vcdimager

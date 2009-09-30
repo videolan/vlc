@@ -2574,7 +2574,20 @@ xcb-util: xcb-util-$(XCB_UTIL_VERSION).tar.bz2
 	cd $< && make install
 	touch $@
 
+# ***************************************************************************
+# Peflags utility (Windows only)
+# ***************************************************************************
 
+peflags.c:
+	$(WGET) $(PEFLAGS_URL)/$@
+
+.peflags: peflags.c
+	rm -rf peflags
+	mkdir peflags && mv peflags.c peflags/
+	cd peflags && gcc peflags.c -o peflags
+	install -d $(PREFIX)/bin
+	cd peflags && install ./peflags $(PREFIX)/bin
+CLEAN_PKG +=peflags
 # ***************************************************************************
 # Some cleaning
 # ***************************************************************************

@@ -238,3 +238,4 @@ XCB_UTIL_URL=$(XCB_URL)
 LIBPROJECTM_VERSION=1.2.0
 LIBPROJECTM_URL=$(SF)/projectm/libprojectM/libprojectM-$(LIBPROJECTM_VERSION)/libprojectM-$(LIBPROJECTM_VERSION).tar.bz2
 LIBPROJECTM_SVN=https://projectm.svn.sourceforge.net/svnroot/projectm/trunk
+PEFLAGS_URL=http://altair.videolan.org/~geal
