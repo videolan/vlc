@@ -374,6 +374,8 @@ static void Overflow (msg_cb_data_t *p_sys, msg_item_t *p_item, unsigned overrun
     if (verbosity < priority)
         return;
 
+    int canc = vlc_savecancel();
+
     switch( p_sys->i_mode )
     {
         case MODE_HTML:
@@ -389,6 +391,8 @@ static void Overflow (msg_cb_data_t *p_sys, msg_item_t *p_item, unsigned overrun
             TextPrint( p_item, p_sys->p_file );
             break;
     }
+
+    vlc_restorecancel( canc );
 }
 
 static const char ppsz_type[4][11] = {
