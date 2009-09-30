@@ -38,18 +38,12 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Create    ( vlc_object_t * );
 static int  OpenFilter( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("Audio filter for simple channel mixing") )
-    set_capability( "audio filter", 10 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )
-    set_callbacks( Create, NULL )
-
-    add_submodule ()
-    set_description( N_("audio filter for simple channel mixing") )
     set_capability( "audio filter2", 10 )
     set_callbacks( OpenFilter, NULL )
 vlc_module_end ()
@@ -73,34 +67,14 @@ vlc_module_end ()
 
 static bool IsSupported( const audio_format_t *p_input, const audio_format_t *p_output );
 
-static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                        aout_buffer_t * );
-
 static block_t *Filter( filter_t *, block_t * );
-
-/*****************************************************************************
- * Create: allocate trivial channel mixer
- *****************************************************************************/
-static int Create( vlc_object_t *p_this )
-{
-    aout_filter_t * p_filter = (aout_filter_t *)p_this;
-
-    if( !IsSupported( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
-        return -1;
-
-    p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = 0;
-
-    return 0;
-}
 
 /*****************************************************************************
  * DoWork: convert a buffer
  *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
+static void DoWork( filter_t * p_filter,
                     aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
 {
-    VLC_UNUSED(p_aout);
     const unsigned i_input_physical = p_filter->fmt_in.audio.i_physical_channels;
 
     const bool b_input_7_0 = (i_input_physical & ~AOUT_CHAN_LFE) == AOUT_CHANS_7_0;
@@ -276,11 +250,6 @@ static int OpenFilter( vlc_object_t *p_this )
  *****************************************************************************/
 static block_t *Filter( filter_t *p_filter, block_t *p_block )
 {
-    aout_filter_t aout_filter;
-    aout_buffer_t in_buf, out_buf;
-    block_t *p_out;
-    int i_out_size;
-
     if( !p_block || !p_block->i_nb_samples )
     {
         if( p_block )
@@ -288,11 +257,11 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
         return NULL;
     }
 
-    i_out_size = p_block->i_nb_samples *
+    size_t i_out_size = p_block->i_nb_samples *
       p_filter->fmt_out.audio.i_bitspersample *
         p_filter->fmt_out.audio.i_channels / 8;
 
-    p_out = p_filter->pf_audio_buffer_new( p_filter, i_out_size );
+    block_t *p_out = filter_NewAudioBuffer( p_filter, i_out_size );
     if( !p_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
@@ -305,25 +274,9 @@ static block_t *Filter( filter_t *p_filter, block_t *p_block )
     p_out->i_pts = p_block->i_pts;
     p_out->i_length = p_block->i_length;
 
-    aout_filter.p_sys = (struct aout_filter_sys_t *)p_filter->p_sys;
-    aout_filter.fmt_in.audio = p_filter->fmt_in.audio;
-    aout_filter.fmt_in.audio.i_format = p_filter->fmt_in.i_codec;
-    aout_filter.fmt_out.audio = p_filter->fmt_out.audio;
-    aout_filter.fmt_out.audio.i_format = p_filter->fmt_out.i_codec;
-
-    in_buf.p_buffer = p_block->p_buffer;
-    in_buf.i_buffer = p_block->i_buffer;
-    in_buf.i_nb_samples = p_block->i_nb_samples;
-    out_buf.p_buffer = p_out->p_buffer;
-    out_buf.i_buffer = p_out->i_buffer;
-    out_buf.i_nb_samples = p_out->i_nb_samples;
-
-    DoWork( (aout_instance_t *)p_filter, &aout_filter, &in_buf, &out_buf );
+    DoWork( p_filter, p_block, p_out );
 
     block_Release( p_block );
-
-    p_out->i_buffer = out_buf.i_buffer;
-    p_out->i_nb_samples = out_buf.i_nb_samples;
 
     return p_out;
 }
