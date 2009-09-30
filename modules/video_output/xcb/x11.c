@@ -451,10 +451,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     {
         const vout_display_cfg_t *p_cfg =
             (const vout_display_cfg_t*)va_arg (ap, const vout_display_cfg_t *);
+        const bool is_forced = (bool)va_arg (ap, int);
 
-        if (vout_window_SetSize (p_sys->embed,
-                                  p_cfg->display.width,
-                                  p_cfg->display.height))
+        if (is_forced
+         && vout_window_SetSize (p_sys->embed,
+                                 p_cfg->display.width,
+                                 p_cfg->display.height))
             return VLC_EGENERIC;
 
         vout_display_place_t place;
