@@ -32,21 +32,21 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
 
-static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                        aout_buffer_t * );
+static block_t *DoWork( filter_t *, block_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("Audio filter for trivial channel mixing") )
-    set_capability( "audio filter", 1 )
+    set_capability( "audio filter2", 1 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )
     set_callbacks( Create, NULL )
@@ -57,7 +57,7 @@ vlc_module_end ()
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    aout_filter_t * p_filter = (aout_filter_t *)p_this;
+    filter_t * p_filter = (filter_t *)p_this;
 
     if ( (p_filter->fmt_in.audio.i_physical_channels
            == p_filter->fmt_out.audio.i_physical_channels
@@ -68,23 +68,11 @@ static int Create( vlc_object_t *p_this )
           || (p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
                && p_filter->fmt_in.audio.i_format != VLC_CODEC_FI32) )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
-    p_filter->pf_do_work = DoWork;
-    if ( aout_FormatNbChannels( &p_filter->fmt_in.audio )
-           > aout_FormatNbChannels( &p_filter->fmt_out.audio ) )
-    {
-        /* Downmixing */
-        p_filter->b_in_place = 1;
-    }
-    else
-    {
-        /* Upmixing */
-        p_filter->b_in_place = 0;
-    }
-
-    return 0;
+    p_filter->pf_audio_filter = DoWork;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -109,17 +97,28 @@ static void SparseCopy( int32_t * p_dest, const int32_t * p_src, size_t i_len,
 /*****************************************************************************
  * DoWork: convert a buffer
  *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
 {
-    VLC_UNUSED(p_aout);
     int i_input_nb = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     int i_output_nb = aout_FormatNbChannels( &p_filter->fmt_out.audio );
-    int32_t * p_dest = (int32_t *)p_out_buf->p_buffer;
-    int32_t * p_src = (int32_t *)p_in_buf->p_buffer;
 
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_buffer * i_output_nb / i_input_nb;
+    block_t *p_out_buf;
+    if( i_input_nb >= i_output_nb )
+    {
+        p_out_buf = p_in_buf; /* mix in place */
+        p_out_buf->i_buffer = p_in_buf->i_buffer / i_input_nb * i_output_nb;
+    }
+    else
+    {
+        p_out_buf = filter_NewAudioBuffer( p_filter,
+                              p_in_buf->i_buffer / i_input_nb * i_output_nb );
+        if( !p_out_buf )
+            goto out;
+        p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
+    }
+
+    int32_t * p_dest = (int32_t *)p_out_buf->p_buffer;
+    const int32_t * p_src = (int32_t *)p_in_buf->p_buffer;
 
     if ( (p_filter->fmt_out.audio.i_original_channels & AOUT_CHAN_PHYSMASK)
                 != (p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_PHYSMASK)
@@ -174,5 +173,9 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
         SparseCopy( p_dest, p_src, p_in_buf->i_nb_samples, i_output_nb,
                     i_input_nb );
     }
+out:
+    if( p_in_buf != p_out_buf )
+        block_Release( p_in_buf );
+    return p_out_buf;
 }
 
