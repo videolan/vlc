@@ -611,9 +611,9 @@ static void* update_DownloadReal( vlc_object_t *p_this )
         psz_downloaded = size_str( l_downloaded );
         f_progress = (float)l_downloaded/(float)l_size;
 
-        if( asprintf( &psz_status, _( "%s\nDownloading... %s/%s %.1f%% done" ),
+        if( asprintf( &psz_status, _( "%s\nDownloading... %s/%s - %.1f%% done" ),
                       p_update->release.psz_url, psz_downloaded, psz_size,
-                      f_progress ) != -1 )
+                      f_progress*100 ) != -1 )
         {
             dialog_ProgressSet( p_progress, psz_status, f_progress );
             free( psz_status );
