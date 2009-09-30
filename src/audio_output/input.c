@@ -546,6 +546,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     /* Run pre-filters. */
     aout_FiltersPlay( p_aout, p_input->pp_filters, p_input->i_nb_filters,
                       &p_buffer );
+    if( !p_buffer )
+        return 0;
 
     /* Actually run the resampler now. */
     if ( p_input->i_nb_resamplers > 0 )
@@ -556,9 +558,11 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                           &p_buffer );
     }
 
+    if( !p_buffer )
+        return 0;
     if( p_buffer->i_nb_samples <= 0 )
     {
-        aout_BufferFree( p_buffer );
+        block_Release( p_buffer );
         return 0;
     }
 #endif
@@ -643,6 +647,8 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 #ifndef AOUT_PROCESS_BEFORE_CHEKS
     /* Run pre-filters. */
     aout_FiltersPlay( p_input->pp_filters, p_input->i_nb_filters, &p_buffer );
+    if( !p_buffer )
+        return 0;
 #endif
 
     /* Run the resampler if needed.
@@ -735,9 +741,11 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                           &p_buffer );
     }
 
+    if( !p_buffer )
+        return 0;
     if( p_buffer->i_nb_samples <= 0 )
     {
-        aout_BufferFree( p_buffer );
+        block_Release( p_buffer );
         return 0;
     }
 #endif

@@ -249,9 +249,11 @@ void aout_OutputPlay( aout_instance_t * p_aout, aout_buffer_t * p_buffer )
     aout_FiltersPlay( p_aout->output.pp_filters, p_aout->output.i_nb_filters,
                       &p_buffer );
 
+    if( !p_buffer )
+        return;
     if( p_buffer->i_buffer == 0 )
     {
-        aout_BufferFree( p_buffer );
+        block_Release( p_buffer );
         return;
     }
 
