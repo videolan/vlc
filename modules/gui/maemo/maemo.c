@@ -119,7 +119,7 @@ static void Close( vlc_object_t *p_this )
 *****************************************************************************/
 static void Run( intf_thread_t *p_intf )
 {
-    char  *p_args[] = { "", NULL };
+    char  *p_args[] = { (char *)"vlc", NULL };
     char **pp_args  = p_args;
     int    i_args   = 1;
 
