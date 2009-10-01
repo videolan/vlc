@@ -701,7 +701,7 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
         }
 
         /* Make sure the mouse cursor is displayed */
-        PostMessage( p_vout->p_sys->hwnd, WM_VLC_SHOW_MOUSE, 0, 0 );
+        EventThreadMouseShow( p_vout->p_sys->p_event );
     }
 
     /* Update the object variable and trigger callback */

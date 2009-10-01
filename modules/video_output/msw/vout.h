@@ -250,9 +250,6 @@ void RestoreScreensaver ( vout_thread_t *p_vout );
 /*****************************************************************************
  * Constants
  *****************************************************************************/
-#define WM_VLC_HIDE_MOUSE WM_APP
-#define WM_VLC_SHOW_MOUSE WM_APP + 1
-#define WM_VLC_CHANGE_TEXT WM_APP + 2
 #define IDM_TOGGLE_ON_TOP WM_USER + 1
 #define DX_POSITION_CHANGE 0x1000
 #define DX_WALLPAPER_CHANGE 0x2000

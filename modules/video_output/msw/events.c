@@ -76,6 +76,10 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
+#define WM_VLC_HIDE_MOUSE   (WM_APP + 0)
+#define WM_VLC_SHOW_MOUSE   (WM_APP + 1)
+#define WM_VLC_CHANGE_TEXT  (WM_APP + 2)
+
 struct event_thread_t
 {
     vout_thread_t *p_vout;
@@ -932,6 +936,10 @@ void EventThreadMouseAutoHide( event_thread_t *p_event )
             p_event->i_lastmoved = mdate();
         }
     }
+}
+void EventThreadMouseShow( event_thread_t *p_event )
+{
+    PostMessage( p_event->hwnd, WM_VLC_SHOW_MOUSE, 0, 0 );
 }
 void EventThreadUpdateTitle( event_thread_t *p_event, const char *psz_fallback )
 {

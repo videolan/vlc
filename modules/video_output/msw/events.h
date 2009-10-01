@@ -48,6 +48,7 @@ int             EventThreadStart( event_thread_t *, event_hwnd_t *, const event_
 void            EventThreadStop( event_thread_t * );
 
 void            EventThreadMouseAutoHide( event_thread_t * );
+void            EventThreadMouseShow( event_thread_t * );
 void            EventThreadUpdateTitle( event_thread_t *, const char *psz_fallback );
 unsigned        EventThreadRetreiveChanges( event_thread_t * );
 int             EventThreadGetWindowStyle( event_thread_t * );
