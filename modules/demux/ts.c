@@ -2080,6 +2080,9 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
     case 0x85:  /* DTS (audio) */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_DTS );
         break;
+    case 0x87: /* E-AC3 */
+        es_format_Init( fmt, AUDIO_ES, VLC_CODEC_EAC3 );
+        break;
 
     case 0x91:  /* A52 vls (audio) */
         es_format_Init( fmt, AUDIO_ES, VLC_FOURCC( 'a', '5', '2', 'b' ) );
@@ -3685,7 +3688,6 @@ static void PMTSetupEsHDMV( demux_t *p_demux, ts_pid_t *pid,
         break;
 
     case 0x84: /* E-AC3 */
-    case 0x87: /* E-AC3 */
     case 0xA1: /* Secondary E-AC3 */
         p_fmt->i_cat = AUDIO_ES;
         p_fmt->i_codec = VLC_CODEC_EAC3;
