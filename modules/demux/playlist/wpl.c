@@ -44,7 +44,6 @@ struct demux_sys_t
  *****************************************************************************/
 static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
-static char* ParseUriValue(char* psz_string);
 
 /*****************************************************************************
  * Import_WPL: main import function
@@ -77,16 +76,11 @@ void Close_WPL( vlc_object_t *p_this )
 static int Demux( demux_t *p_demux )
 {
     char       *psz_line;
-    char       *psz_uri = NULL;
-    char       *psz_parse;
-    input_item_t *p_input;
-
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
-    psz_line = stream_ReadLine( p_demux->s );
-    while( psz_line )
+    while( (psz_line = stream_ReadLine( p_demux->s )) )
     {
-        psz_parse = psz_line;
+        char *psz_parse = psz_line;
         /* Skip leading tabs and spaces */
         while( *psz_parse == ' '  || *psz_parse == '\t' ||
                *psz_parse == '\n' || *psz_parse == '\r' )
@@ -95,20 +89,23 @@ static int Demux( demux_t *p_demux )
         /* if the line is the uri of the media item */
         if( !strncasecmp( psz_parse, "<media src=\"", strlen( "<media src=\"" ) ) )
         {
-            psz_uri = ParseUriValue( psz_parse );
-            if( !EMPTY_STR(psz_uri) )
+            char *psz_uri = psz_parse + strlen( "<media src=\"" );
+
+            psz_parse = strchr( psz_uri, '"' );
+            if( psz_parse != NULL )
             {
+                input_item_t *p_input;
+
+                *psz_parse = '\0';
                 psz_uri = ProcessMRL( psz_uri, p_demux->p_sys->psz_prefix );
                 p_input = input_item_NewExt( p_demux, psz_uri, psz_uri,
                                         0, NULL, 0, -1 );
                 input_item_AddSubItem( p_current_input, p_input );
             }
-            free( psz_uri );
         }
 
         /* Fetch another line */
         free( psz_line );
-        psz_line = stream_ReadLine( p_demux->s );
 
     }
     vlc_gc_decref(p_current_input);
@@ -121,19 +118,3 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
     VLC_UNUSED(p_demux); VLC_UNUSED(i_query); VLC_UNUSED(args);
     return VLC_EGENERIC;
 }
-
-static char* ParseUriValue( char* psz_string )
-{
-    int i_len = strlen( psz_string );
-    if( i_len <= 3 )
-        return NULL;
-    char* psz_value = calloc( i_len, 1 );
-    if( !psz_value )
-        return NULL;
-
-    sscanf( psz_string, "%*[^=]=\"%[^\r\t\n\"]", psz_value );
-
-    return psz_value;
-}
-
-
