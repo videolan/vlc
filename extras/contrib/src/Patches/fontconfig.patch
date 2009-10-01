@@ -1,15 +1,4 @@
 diff -ruN fontconfig/src/fcint.h fontconfig.good/src/fcint.h
---- fontconfig/src/fcint.h	2009-06-24 19:52:13.000000000 +0200
-+++ fontconfig.good/src/fcint.h	2009-07-03 00:13:56.000000000 +0200
-@@ -538,7 +538,7 @@
- 
- #ifdef _WIN32
- FcPrivate int
--FcStat (const char *file, struct stat *statb)
-+FcStat (const char *file, struct stat *statb);
- #else
- #define FcStat stat
- #endif
 --- fontconfig/src/Makefile.in	2009-06-24 21:05:27.000000000 +0200
 +++ fontconfig.good/src/Makefile.in	2009-07-03 00:13:38.000000000 +0200
 @@ -664,7 +664,6 @@
