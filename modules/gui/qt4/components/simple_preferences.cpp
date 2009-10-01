@@ -719,13 +719,14 @@ void SPrefsPanel::apply()
     case SPrefsInputAndCodecs:
     {
         /* Device default selection */
-        const char *psz_devicepath =
-              qtu( qobject_cast<QLineEdit *>(optionWidgets[inputLE] )->text() );
+        char *psz_devicepath =
+            strdup( qtu( qobject_cast<QLineEdit *>(optionWidgets[inputLE] )->text() ) );
         if( !EMPTY_STR( psz_devicepath ) )
         {
             config_PutPsz( p_intf, "dvd", psz_devicepath );
             config_PutPsz( p_intf, "vcd", psz_devicepath );
             config_PutPsz( p_intf, "cd-audio", psz_devicepath );
+            free( psz_devicepath );
         }
 
 #define CaCi( name, int ) config_PutInt( p_intf, name, int * i_comboValue )
