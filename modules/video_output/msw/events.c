@@ -30,23 +30,16 @@
 # include "config.h"
 #endif
 
-#include <errno.h>                                                 /* ENOMEM */
-#include <ctype.h>                                              /* tolower() */
-
-#ifndef _WIN32_WINNT
-#   define _WIN32_WINNT 0x0500
-#endif
-
 #include <vlc_common.h>
-#include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_vout.h>
 #include <vlc_vout_window.h>
 
 #include <windows.h>
-#include <tchar.h>
 #include <windowsx.h>
 #include <shellapi.h>
+
+#include <ctype.h>
 
 #ifdef MODULE_NAME_IS_directx
 #include <ddraw.h>

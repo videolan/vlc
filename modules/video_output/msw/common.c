@@ -30,21 +30,11 @@
 # include "config.h"
 #endif
 
-#include <errno.h>                                                 /* ENOMEM */
-#include <ctype.h>                                              /* tolower() */
-
-#ifndef _WIN32_WINNT
-#   define _WIN32_WINNT 0x0500
-#endif
-
 #include <vlc_common.h>
-#include <vlc_interface.h>
-#include <vlc_playlist.h>
 #include <vlc_vout.h>
 #include <vlc_vout_window.h>
 
 #include <windows.h>
-#include <tchar.h>
 #include <windowsx.h>
 #include <shellapi.h>
 
@@ -58,7 +48,6 @@
 #include <GL/gl.h>
 #endif
 
-#include <vlc_keys.h>
 #include "vout.h"
 
 #ifndef UNDER_CE

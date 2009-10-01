@@ -20,16 +20,12 @@
  * along with this program; if not, write to the Free Software
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
-
-#include <errno.h>                                                 /* ENOMEM */
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_interface.h>
 #include <vlc_vout.h>
 
 #include <windows.h>

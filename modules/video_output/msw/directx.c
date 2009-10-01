@@ -34,9 +34,6 @@
  * display video in window mode.
  *
  *****************************************************************************/
-
-#include <errno.h>                                                 /* ENOMEM */
-
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
