@@ -422,33 +422,6 @@ static void *Thread( void *obj )
     /* Explain to the core how to show a dialog :D */
     p_intf->pf_show_dialog = ShowDialog;
 
-#ifdef ENABLE_NLS
-    // Translation - get locale
-#   if defined (WIN32) || defined (__APPLE__)
-    char* psz_tmp = config_GetPsz( p_intf, "language" );
-    QString lang = qfu( psz_tmp );
-    free( psz_tmp);
-    if (lang == "auto")
-        lang = QLocale::system().name();
-#   else
-    QString lang = QLocale::system().name();
-#   endif
-    // Translations for qt's own dialogs
-    QTranslator qtTranslator( 0 );
-    // Let's find the right path for the translation file
-#if !defined( WIN32 )
-    QString path =  QString( QT4LOCALEDIR );
-#else
-    QString path = QString( QString(config_GetDataDir()) + DIR_SEP +
-                            "locale" + DIR_SEP + "qt4" + DIR_SEP );
-#endif
-    // files depending on locale
-    bool b_loaded = qtTranslator.load( path + "qt_" + lang );
-    if (!b_loaded)
-        msg_Dbg( p_intf, "Error while initializing qt-specific localization" );
-    app.installTranslator( &qtTranslator );
-#endif  //ENABLE_NLS
-
     /* Last settings */
     app.setQuitOnLastWindowClosed( false );
 
@@ -460,7 +433,6 @@ static void *Thread( void *obj )
     QString s_style = getSettings()->value( "MainWindow/QtStyle", "" ).toString();
     if( s_style.compare("") != 0 )
         QApplication::setStyle( s_style );
-
 
     /* Launch */
     app.exec();
