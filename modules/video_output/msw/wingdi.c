@@ -70,10 +70,6 @@ static void SetPalette( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
 
 static void InitBuffers        ( vout_thread_t * );
 
-
-
-#define DX_POSITION_CHANGE 0x1000
-
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
