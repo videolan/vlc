@@ -47,6 +47,4 @@ struct intf_sys_t
 
     GtkWidget *p_video_window;
     vout_thread_t *p_vout;
-    vlc_cond_t p_video_cond;
-    vlc_mutex_t p_video_mutex;
 };
