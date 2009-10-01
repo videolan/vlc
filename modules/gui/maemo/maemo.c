@@ -35,6 +35,7 @@
 #include <hildon/hildon-program.h>
 #include <hildon/hildon-banner.h>
 #include <gtk/gtk.h>
+#include <gdk/gdkx.h>
 #include <stdio.h>
 #include <inttypes.h>
 
