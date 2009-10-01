@@ -74,18 +74,6 @@ void Close_ZPL( vlc_object_t *p_this )
     free( p_demux->p_sys );
 }
 
-static inline void MaybeFromLocaleRep (char **str)
-{
-    char *const orig_str = *str;
-
-    if ((orig_str != NULL) && !IsUTF8 (orig_str))
-    {
-        *str = FromLocaleDup (orig_str);
-        free (orig_str);
-    }
-}
-
-
 static int Demux( demux_t *p_demux )
 {
     char       *psz_line;
@@ -132,8 +120,6 @@ static int Demux( demux_t *p_demux )
             if( !EMPTY_STR(psz_tabvalue) )
             {
                 psz_mrl = ProcessMRL( psz_tabvalue, p_demux->p_sys->psz_prefix );
-                if( psz_mrl )
-                    MaybeFromLocaleRep( &psz_mrl );
             }
             free( psz_tabvalue );
         }
