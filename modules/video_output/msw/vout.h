@@ -206,11 +206,6 @@ struct vout_sys_t
     int (*GXResume)();
 #endif
 
-#ifndef UNDER_CE
-    /* suspend display */
-    bool   b_suspend_display;
-#endif
-
     event_thread_t *p_event;
     vlc_mutex_t    lock;
 };
