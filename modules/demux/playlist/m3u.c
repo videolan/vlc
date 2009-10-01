@@ -114,28 +114,6 @@ void Close_M3U( vlc_object_t *p_this )
 }
 
 
-/* Gruik! */
-static inline char *MaybeFromLocaleDup (const char *str)
-{
-    if (str == NULL)
-        return NULL;
-
-    return IsUTF8 (str) ? strdup (str) : FromLocaleDup (str);
-}
-
-
-static inline void MaybeFromLocaleRep (char **str)
-{
-    char *const orig_str = *str;
-
-    if ((orig_str != NULL) && !IsUTF8 (orig_str))
-    {
-        *str = FromLocaleDup (orig_str);
-        free (orig_str);
-    }
-}
-
-
 static int Demux( demux_t *p_demux )
 {
     char       *psz_line;
@@ -178,9 +156,9 @@ static int Demux( demux_t *p_demux )
                 if( i_parsed_duration >= 0 )
                     i_duration = i_parsed_duration * INT64_C(1000000);
                 if( psz_name )
-                    psz_name = strdup( psz_name );
+                    psz_name = FromLocaleDup( psz_name );
                 if( psz_artist )
-                    psz_artist = strdup( psz_artist );
+                    psz_artist = FromLocaleDup( psz_artist );
             }
             else if( !strncasecmp( psz_parse, "EXTVLCOPT:",
                                    sizeof("EXTVLCOPT:") -1 ) )
@@ -190,7 +168,7 @@ static int Demux( demux_t *p_demux )
                 psz_parse += sizeof("EXTVLCOPT:") -1;
                 if( !*psz_parse ) goto error;
 
-                psz_option = MaybeFromLocaleDup( psz_parse );
+                psz_option = FromLocaleDup( psz_parse );
                 if( psz_option )
                     INSERT_ELEM( ppsz_options, i_options, i_options,
                                  psz_option );
@@ -203,14 +181,13 @@ static int Demux( demux_t *p_demux )
         else if( *psz_parse )
         {
             char *psz_mrl;
-            if( !psz_name || !*psz_name )
-            {
+
+            psz_parse = FromLocale( psz_parse );
+            if( !psz_name && psz_parse )
                 /* Use filename as name for relative entries */
-                psz_name = MaybeFromLocaleDup( psz_parse );
-            }
+                psz_name = strdup( psz_parse );
 
             psz_mrl = ProcessMRL( psz_parse, p_demux->p_sys->psz_prefix );
-            MaybeFromLocaleRep( &psz_mrl );
 
             b_cleanup = true;
             if( !psz_mrl ) goto error;
