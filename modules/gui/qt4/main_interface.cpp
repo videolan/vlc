@@ -118,6 +118,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Are we in the enhanced always-video mode or not ? */
     i_visualmode = config_GetInt( p_intf, "qt-display-mode" );
 
+        /* Do we want anoying popups or not */
+    notificationEnabled = (bool)config_GetInt( p_intf, "qt-notification" );
+
     /* Set the other interface settings */
     settings = getSettings();
     settings->beginGroup( "MainWindow" );
@@ -130,9 +133,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      **/
     mainBasedSize = settings->value( "mainBasedSize", QSize( 350, 120 ) ).toSize();
     mainVideoSize = settings->value( "mainVideoSize", QSize( 400, 300 ) ).toSize();
-
-    /* Do we want anoying popups or not */
-    notificationEnabled = (bool)config_GetInt( p_intf, "qt-notification" );
 
     /**************
      * Status Bar *
@@ -164,40 +164,37 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     dockPL->hide();
 #endif
 
-    /********************
-     * Input Manager    *
-     ********************/
-    MainInputManager::getInstance( p_intf );
-
     /*********************************
      * Create the Systray Management *
      *********************************/
     initSystray();
 
-    /**************************
-     * Various CONNECTs on IM *
-     **************************/
-    /* Connect the input manager to the GUI elements it manages */
+    /********************
+     * Input Manager    *
+     ********************/
+    MainInputManager::getInstance( p_intf );
 
+    /************************************************************
+     * Connect the input manager to the GUI elements it manages *
+     ************************************************************/
     /**
      * Connects on nameChanged()
-     * Those connects are not merged because different options can trigger
-     * them down.
-     */
-    /* Naming in the controller statusbar */
+     * Those connects are different because options can impeach them to trigger.
+     **/
+    /* Main Interface statusbar */
     CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
              this, setName( const QString& ) );
-    /* and in the systray */
+    /* and systray */
     if( sysTray )
     {
-        CONNECT( THEMIM->getIM(), nameChanged( const QString& ), this,
-                 updateSystrayTooltipName( const QString& ) );
+        CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
+                 this, updateSystrayTooltipName( const QString& ) );
     }
-    /* and in the title of the controller */
+    /* and title of the Main Interface*/
     if( config_GetInt( p_intf, "qt-name-in-title" ) )
     {
-        CONNECT( THEMIM->getIM(), nameChanged( const QString& ), this,
-             setVLCWindowsTitle( const QString& ) );
+        CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
+                 this, setVLCWindowsTitle( const QString& ) );
     }
 
     /**
@@ -209,7 +206,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         CONNECT( THEMIM->getIM(), statusChanged( int ),
                  this, updateSystrayTooltipStatus( int ) );
     }
-
 
     /* END CONNECTS ON IM */
 
@@ -261,11 +257,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
        }
     }
 
-    bool b_visible = settings->value( "playlist-visible", 0 ).toInt();
+    bool b_pl_visible = settings->value( "playlist-visible", 0 ).toInt();
     settings->endGroup();
 
     /* Playlist */
-    if( b_visible ) togglePlaylist();
+    if( b_pl_visible ) togglePlaylist();
 
     /* Enable the popup menu in the MI */
     setContextMenuPolicy( Qt::CustomContextMenu );
@@ -283,7 +279,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
         toggleMinimalView( true );
 
     /* Update the geometry : It is useful if you switch between
-       qt-display-modes ?*/
+       qt-display-modes */
     updateGeometry();
     resize( sizeHint() );
 
@@ -1238,30 +1234,27 @@ void MainInterface::dropEvent(QDropEvent *event)
 
 void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
 {
-     event->setDropAction( Qt::CopyAction );
-     if( !event->possibleActions() & Qt::CopyAction )
-         return;
+    event->setDropAction( Qt::CopyAction );
+    if( !event->possibleActions() & Qt::CopyAction )
+        return;
 
-     const QMimeData *mimeData = event->mimeData();
+    const QMimeData *mimeData = event->mimeData();
 
-     /* D&D of a subtitles file, add it on the fly */
-     if( mimeData->urls().size() == 1 )
-     {
-        if( THEMIM->getIM()->hasInput() )
+    /* D&D of a subtitles file, add it on the fly */
+    if( mimeData->urls().size() == 1 && THEMIM->getIM()->hasInput() )
+    {
+        if( !input_AddSubtitle( THEMIM->getInput(),
+                 qtu( toNativeSeparators( mimeData->urls()[0].toLocalFile() ) ),
+                 true ) )
         {
-            if( !input_AddSubtitle( THEMIM->getInput(),
-                                    qtu( toNativeSeparators(
-                                         mimeData->urls()[0].toLocalFile() ) ),
-                                    true ) )
-            {
-                event->accept();
-                return;
-            }
+            event->accept();
+            return;
         }
-     }
-     bool first = b_play;
-     foreach( const QUrl &url, mimeData->urls() )
-     {
+    }
+
+    bool first = b_play;
+    foreach( const QUrl &url, mimeData->urls() )
+    {
         QString s = toNativeSeparators( url.toLocalFile() );
 
         if( s.length() > 0 ) {
@@ -1273,8 +1266,8 @@ void MainInterface::dropEventPlay( QDropEvent *event, bool b_play )
             first = false;
             RecentsMRL::getInstance( p_intf )->addRecent( s );
         }
-     }
-     event->accept();
+    }
+    event->accept();
 }
 void MainInterface::dragEnterEvent(QDragEnterEvent *event)
 {

@@ -54,8 +54,8 @@ class QMenu;
 class QSize;
 
 enum {
-    CONTROLS_VISIBLE = 0x1,
-    CONTROLS_HIDDEN = 0x2,
+    CONTROLS_VISIBLE  = 0x1,
+    CONTROLS_HIDDEN   = 0x2,
     CONTROLS_ADVANCED = 0x4,
 };
 
@@ -83,8 +83,8 @@ public:
     int controlVideo( int i_query, va_list args );
 
     /* Getters */
-    QSystemTrayIcon *getSysTray() { return sysTray; };
-    QMenu *getSysTrayMenu() { return systrayMenu; };
+    QSystemTrayIcon *getSysTray() { return sysTray; }
+    QMenu *getSysTrayMenu() { return systrayMenu; }
     int getControlsVisibilityStatus();
 
     /* Sizehint() */
