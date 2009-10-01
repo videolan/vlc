@@ -218,6 +218,7 @@ static int OpenVideo( vlc_object_t *p_this )
     p_vout->p_sys = calloc( 1, sizeof( vout_sys_t ) );
     if( p_vout->p_sys == NULL )
         return VLC_ENOMEM;
+    vlc_mutex_init( &p_vout->p_sys->lock );
 
     /* Initialisations */
     p_vout->pf_init = Init;
@@ -431,6 +432,7 @@ static void CloseVideo( vlc_object_t *p_this )
 
     CommonClean( p_vout );
 
+    vlc_mutex_destroy( &p_vout->p_sys->lock );
     free( p_vout->p_sys );
 }
 

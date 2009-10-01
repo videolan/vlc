@@ -84,7 +84,6 @@ int CommonInit( vout_thread_t *p_vout )
     p_sys->i_changes = 0;
     SetRectEmpty( &p_sys->rect_display );
     SetRectEmpty( &p_sys->rect_parent );
-    vlc_mutex_init( &p_sys->lock );
 
     var_Create( p_vout, "video-title", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
@@ -145,8 +144,6 @@ void CommonClean( vout_thread_t *p_vout )
         EventThreadDestroy( p_sys->p_event );
     }
 
-    vlc_mutex_destroy( &p_sys->lock );
-
 #if !defined(UNDER_CE) && !defined(MODULE_NAME_IS_glwin32)
     RestoreScreensaver( p_vout );
 #endif
@@ -156,13 +153,10 @@ void CommonManage( vout_thread_t *p_vout )
 {
     /* If we do not control our window, we check for geometry changes
      * ourselves because the parent might not send us its events. */
-    vlc_mutex_lock( &p_vout->p_sys->lock );
     if( p_vout->p_sys->hparent && !p_vout->b_fullscreen )
     {
         RECT rect_parent;
         POINT point;
-
-        vlc_mutex_unlock( &p_vout->p_sys->lock );
 
         GetClientRect( p_vout->p_sys->hparent, &rect_parent );
         point.x = point.y = 0;
@@ -203,10 +197,6 @@ void CommonManage( vout_thread_t *p_vout )
 #endif
 #endif
         }
-    }
-    else
-    {
-        vlc_mutex_unlock( &p_vout->p_sys->lock );
     }
 
     /* */

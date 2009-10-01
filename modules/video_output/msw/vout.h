@@ -140,6 +140,7 @@ struct vout_sys_t
     LPDIRECTDRAWSURFACE2 p_current_surface;   /* surface currently displayed */
     LPDIRECTDRAWCLIPPER  p_clipper;             /* clipper used for blitting */
     HINSTANCE            hddraw_dll;       /* handle of the opened ddraw dll */
+    vlc_mutex_t    lock;
 #endif
 
 #ifdef MODULE_NAME_IS_glwin32
@@ -207,7 +208,6 @@ struct vout_sys_t
 #endif
 
     event_thread_t *p_event;
-    vlc_mutex_t    lock;
 };
 
 #ifdef MODULE_NAME_IS_wingapi
