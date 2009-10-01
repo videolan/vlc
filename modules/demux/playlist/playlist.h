@@ -24,7 +24,7 @@
 #include <vlc_input.h>
 #include <vlc_playlist.h>
 
-char *ProcessMRL( char *, char * );
+char *ProcessMRL( const char *, const char * );
 char *FindPrefix( demux_t * );
 
 int Import_Old ( vlc_object_t * );

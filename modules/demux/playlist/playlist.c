@@ -202,7 +202,7 @@ char *FindPrefix( demux_t *p_demux )
  * Add the directory part of the playlist file to the start of the
  * mrl, if the mrl is a relative file path
  */
-char *ProcessMRL( char *psz_mrl, char *psz_prefix )
+char *ProcessMRL( const char *psz_mrl, const char *psz_prefix )
 {
     /* Check for a protocol name.
      * for URL, we should look for "://"
@@ -222,8 +222,8 @@ char *ProcessMRL( char *psz_mrl, char *psz_prefix )
     if( strchr( psz_mrl, ':' ) ) return strdup( psz_mrl );
 
     /* This a relative path, prepend the prefix */
-    if( asprintf( &psz_mrl, "%s%s", psz_prefix, psz_mrl ) != -1 )
-        return psz_mrl;
-    else
-        return NULL;
+    char *ret;
+    if( asprintf( &ret, "%s%s", psz_prefix, psz_mrl ) == -1 )
+        ret = NULL;
+    return ret;
 }
