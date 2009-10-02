@@ -133,7 +133,6 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
                 date_Increment( &p_sys->end_date,
                                 p_in_buf->i_nb_samples ) - p_in_buf->i_pts;
         }
-        p_in_buf->i_flags |= BLOCK_FLAG_DISCONTINUITY;
         p_sys->i_old_wing = 0;
         return p_in_buf;
     }
