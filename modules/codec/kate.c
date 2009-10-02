@@ -852,7 +852,7 @@ static void PostprocessTigerImage( plane_t *p_plane, unsigned int i_width )
             if( a )
             {
 #ifdef WORDS_BIGENDIAN
-                uint8_t tmp = pixel[2];
+                uint8_t tmp = p_pixel[2];
                 p_pixel[0] = p_pixel[3] * 255 / a;
                 p_pixel[3] = a;
                 p_pixel[2] = p_pixel[1] * 255 / a;
