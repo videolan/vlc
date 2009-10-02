@@ -445,7 +445,7 @@ static int EncryptAesKeyBase64( vlc_object_t *p_this, char **result )
     unsigned char ps_padded_key[256];
     unsigned char *ps_value;
     size_t i_value_size;
-    int i_err = VLC_SUCCESS;
+    int i_err;
 
     /* Add RSA-OAES-SHA1 padding */
     i_err = AddOaepPadding( p_this,
@@ -454,25 +454,20 @@ static int EncryptAesKeyBase64( vlc_object_t *p_this, char **result )
                             NULL, 0 );
     if ( i_err != VLC_SUCCESS )
         goto error;
+    i_err = VLC_EGENERIC;
 
     /* Read public key */
     i_gcrypt_err = gcry_mpi_scan( &mpi_pubkey, GCRYMPI_FMT_USG,
                                   ps_raop_rsa_pubkey,
                                   sizeof( ps_raop_rsa_pubkey ) - 1, NULL );
     if ( CheckForGcryptError( p_stream, i_gcrypt_err ) )
-    {
-        i_err = VLC_EGENERIC;
         goto error;
-    }
 
     /* Read exponent */
     i_gcrypt_err = gcry_mpi_scan( &mpi_exp, GCRYMPI_FMT_USG, ps_raop_rsa_exp,
                                   sizeof( ps_raop_rsa_exp ) - 1, NULL );
     if ( CheckForGcryptError( p_stream, i_gcrypt_err ) )
-    {
-        i_err = VLC_EGENERIC;
         goto error;
-    }
 
     /* If the input data starts with a set bit (0x80), gcrypt thinks it's a
      * signed integer and complains. Prefixing it with a zero byte (\0)
@@ -483,45 +478,32 @@ static int EncryptAesKeyBase64( vlc_object_t *p_this, char **result )
                                   ps_padded_key, sizeof( ps_padded_key ),
                                   NULL);
     if ( CheckForGcryptError( p_stream, i_gcrypt_err ) )
-    {
-        i_err = VLC_EGENERIC;
         goto error;
-    }
 
     /* Build S-expression with RSA parameters */
     i_gcrypt_err = gcry_sexp_build( &sexp_rsa_params, NULL,
                                     "(public-key(rsa(n %m)(e %m)))",
                                     mpi_pubkey, mpi_exp );
     if ( CheckForGcryptError( p_stream, i_gcrypt_err ) )
-    {
-        i_err = VLC_EGENERIC;
         goto error;
-    }
 
     /* Build S-expression for data */
     i_gcrypt_err = gcry_sexp_build( &sexp_input, NULL, "(data(value %m))",
                                     mpi_input );
     if ( CheckForGcryptError( p_stream, i_gcrypt_err ) )
-    {
-        i_err = VLC_EGENERIC;
         goto error;
-    }
 
     /* Encrypt data */
     i_gcrypt_err = gcry_pk_encrypt( &sexp_encrypted, sexp_input,
                                     sexp_rsa_params );
     if ( CheckForGcryptError( p_stream, i_gcrypt_err ) )
-    {
-        i_err = VLC_EGENERIC;
         goto error;
-    }
 
     /* Extract encrypted data */
     sexp_token_a = gcry_sexp_find_token( sexp_encrypted, "a", 0 );
     if ( !sexp_token_a )
     {
         msg_Err( p_this , "Token 'a' not found in result S-expression" );
-        i_err = VLC_EGENERIC;
         goto error;
     }
 
@@ -529,7 +511,6 @@ static int EncryptAesKeyBase64( vlc_object_t *p_this, char **result )
     if ( !mpi_output )
     {
         msg_Err( p_this, "Unable to extract MPI from result" );
-        i_err = VLC_EGENERIC;
         goto error;
     }
 
@@ -538,12 +519,12 @@ static int EncryptAesKeyBase64( vlc_object_t *p_this, char **result )
                                     mpi_output );
     if ( CheckForGcryptError( p_stream, i_gcrypt_err ) )
     {
-        i_err = VLC_EGENERIC;
         goto error;
     }
 
     /* Encode in Base64 */
     *result = vlc_b64_encode_binary( ps_value, i_value_size );
+    i_err = VLC_SUCCESS;
 
 error:
     gcry_sexp_release( sexp_rsa_params );
@@ -645,15 +626,12 @@ static int ReadStatusLine( vlc_object_t *p_this )
     char *psz_line = NULL;
     char *psz_token;
     char *psz_next;
-    int i_result;
+    int i_result = VLC_EGENERIC;
 
     p_sys->psz_last_status_line = net_Gets( p_this, p_sys->i_control_fd,
                                             NULL );
     if ( !p_sys->psz_last_status_line )
-    {
-        i_result = VLC_EGENERIC;
         goto error;
-    }
 
     /* Create working copy */
     psz_line = strdup( p_sys->psz_last_status_line );
@@ -665,7 +643,6 @@ static int ReadStatusLine( vlc_object_t *p_this )
     {
         msg_Err( p_this, "Unknown protocol (%s)",
                  p_sys->psz_last_status_line );
-        i_result = VLC_EGENERIC;
         goto error;
     }
 
@@ -675,7 +652,6 @@ static int ReadStatusLine( vlc_object_t *p_this )
     {
         msg_Err( p_this, "Request failed (%s)",
                  p_sys->psz_last_status_line );
-        i_result = VLC_EGENERIC;
         goto error;
     }
 
