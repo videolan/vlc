@@ -132,7 +132,7 @@ static __inline__ void en50221_MMIFree( en50221_mmi_object_t *p_object )
         FREENULL( p_object->u.menu.psz_bottom );
         for ( i = 0; i < p_object->u.menu.i_choices; i++ )
         {
-            FREENULL( p_object->u.menu.ppsz_choices[i] );
+            free( p_object->u.menu.ppsz_choices[i] );
         }
         FREENULL( p_object->u.menu.ppsz_choices );
         break;
@@ -245,8 +245,8 @@ char *dvbsi_to_utf8( const char *psz_instring, size_t i_length );
 #ifdef ENABLE_HTTPD
 int HTTPOpen( access_t *p_access );
 void HTTPClose( access_t *p_access );
-char *HTTPExtractValue( const char *psz_uri, const char *psz_name,
-                        char *psz_value, int i_value_max );
+const char *HTTPExtractValue( const char *psz_uri, const char *psz_name,
+                              char *psz_value, int i_value_max );
 #endif
 /*****************************************************************************
  * Hacks
