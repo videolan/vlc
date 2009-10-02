@@ -134,6 +134,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
                                 p_in_buf->i_nb_samples ) - p_in_buf->i_pts;
         }
         p_sys->i_old_wing = 0;
+        p_sys->b_first = true;
         return p_in_buf;
     }
 
