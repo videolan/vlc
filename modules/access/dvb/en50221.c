@@ -2343,7 +2343,7 @@ static inline void *FixUTF8( char *p )
     return p;
 }
 
-char *dvbsi_to_utf8( char *psz_instring, size_t i_length )
+char *dvbsi_to_utf8( const char *psz_instring, size_t i_length )
 {
     const char *psz_encoding, *psz_stringstart;
     char *psz_outstring, *psz_tmp;

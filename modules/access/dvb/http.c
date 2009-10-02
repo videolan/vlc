@@ -300,8 +300,8 @@ static int HttpCallback( httpd_file_sys_t *p_args,
 /****************************************************************************
  * HTTPExtractValue: Extract a GET variable from psz_request
  ****************************************************************************/
-char *HTTPExtractValue( char *psz_uri, const char *psz_name,
-                            char *psz_value, int i_value_max )
+char *HTTPExtractValue( const char *psz_uri, const char *psz_name,
+                        char *psz_value, int i_value_max )
 {
     char *p = psz_uri;
 

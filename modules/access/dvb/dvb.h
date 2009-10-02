@@ -240,13 +240,13 @@ void en50221_SendMMIObject( access_t * p_access, int i_slot,
                                 en50221_mmi_object_t *p_object );
 void en50221_End( access_t * );
 
-char *dvbsi_to_utf8( char *psz_instring, size_t i_length );
+char *dvbsi_to_utf8( const char *psz_instring, size_t i_length );
 
 #ifdef ENABLE_HTTPD
 int HTTPOpen( access_t *p_access );
 void HTTPClose( access_t *p_access );
-char *HTTPExtractValue( char *psz_uri, const char *psz_name,
-                            char *psz_value, int i_value_max );
+char *HTTPExtractValue( const char *psz_uri, const char *psz_name,
+                        char *psz_value, int i_value_max );
 #endif
 /*****************************************************************************
  * Hacks
