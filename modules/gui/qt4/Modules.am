@@ -179,19 +179,27 @@ DEPS_res = \
 
 BUILT_SOURCES += $(nodist_SOURCES_qt4)
 
+moc_verbose = $(moc_verbose_$(V))
+moc_verbose_ = $(moc_verbose_$(AM_DEFAULT_VERBOSITY))
+moc_verbose_0 = @echo "  MOC   " $@;
+
+uic_verbose = $(uic_verbose_$(V))
+uic_verbose_ = $(uic_verbose_$(AM_DEFAULT_VERBOSITY))
+uic_verbose_0 = @echo "  UIC   " $@;
+
 resources.cpp: vlc.qrc $(DEPS_res)
-	$(RCC) -name vlc -o $@ $<
+	$(AM_V_GEN)$(RCC) -name vlc -o $@ $<
 
 .hpp.moc.cpp:
-	$(MOC) $(DEFS) $(CPPFLAGS) -I$(top_builddir) `$(VLC_CONFIG) --cppflags plugin qt4` -o $@ $<
+	$(moc_verbose)$(MOC) $(DEFS) $(CPPFLAGS) -I$(top_builddir) `$(VLC_CONFIG) --cppflags plugin qt4` -o $@ $<
 
 .ui.h:
-	mkdir -p -- ui
-	rm -f $@ $@.tmp
-	echo "#define Q_(a,b) QString::fromUtf8(_(a))" > $@.tmp
-	$(UIC) -tr "Q_" $< >> $@.tmp
-	sed -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@.tmp >$@
-	rm -f $@.tmp
+	$(AM_V_at)mkdir -p -- ui
+	$(AM_V_at)rm -f $@ $@.tmp
+	$(AM_V_at)echo "#define Q_(a,b) QString::fromUtf8(_(a))" > $@.tmp
+	$(uic_verbose)$(UIC) -tr "Q_" $< >> $@.tmp
+	$(AM_V_at)sed -e 's/Q_(\"_(\\\"\(.*\)\\\")"/Q_("\1"/' $@.tmp >$@
+	$(AM_V_at)rm -f $@.tmp
 
 SOURCES_qt4 = 	qt4.cpp \
 		menus.cpp \
