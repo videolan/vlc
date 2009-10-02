@@ -209,6 +209,18 @@ private:
                              vlc_value_t oldVal, vlc_value_t newVal,
                              void *pParam );
 
+    static int onInteraction( vlc_object_t *pObj, const char *pVariable,
+                              vlc_value_t oldVal, vlc_value_t newVal,
+                              void *pParam );
+
+    static int onEqBandsChange( vlc_object_t *pObj, const char *pVariable,
+                                vlc_value_t oldVal, vlc_value_t newVal,
+                                void *pParam );
+
+    static int onEqPreampChange( vlc_object_t *pObj, const char *pVariable,
+                                 vlc_value_t oldVal, vlc_value_t newVal,
+                                 void *pParam );
+
     /// Generic Callback
     static int onGenericCallback( vlc_object_t *pObj, const char *pVariable,
                                   vlc_value_t oldVal, vlc_value_t newVal,
