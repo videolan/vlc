@@ -112,7 +112,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
     /* Check if we really need to run the resampler */
     if( i_out_rate == p_filter->fmt_in.audio.i_rate )
     {
-        if( /*p_filter->b_continuity && /--* What difference does it make ? :) */
+        if( !(p_in_buf->i_flags & BLOCK_FLAG_DISCONTINUITY) &&
             p_sys->i_old_wing )
         {
             /* output the whole thing with the samples from last time */
