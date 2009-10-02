@@ -209,17 +209,9 @@ static int Open( vlc_object_t *p_this )
         free( val.psz_string );
     }
 
-    var_Get( p_stream, SOUT_CFG_PREFIX "mux", &val );
-    psz_mux = *val.psz_string ? val.psz_string : NULL;
-    if( !*val.psz_string ) free( val.psz_string );
-
-    var_Get( p_stream, SOUT_CFG_PREFIX "bind", &val );
-    psz_bind = *val.psz_string ? val.psz_string : NULL;
-    if( !*val.psz_string ) free( val.psz_string);
-
-    var_Get( p_stream, SOUT_CFG_PREFIX "path", &val );
-    psz_path = *val.psz_string ? val.psz_string : NULL;
-    if( !*val.psz_string ) free( val.psz_string);
+    psz_mux = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "mux" );
+    psz_bind = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "bind" );
+    psz_path = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "path" );
 
     if( psz_bind ) psz_url = psz_bind;
     if( psz_url && psz_path ) 
