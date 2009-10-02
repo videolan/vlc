@@ -179,6 +179,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->pf_audio_postrender_callback = (void (*) (void*, uint8_t*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, int))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
+    /* Create the remaining variables for a later use */
+    var_Create( p_stream, SOUT_PREFIX_VIDEO "data", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+    var_Create( p_stream, SOUT_PREFIX_AUDIO "data", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
+
     /* Setting stream out module callbacks */
     p_stream->pf_add    = Add;
     p_stream->pf_del    = Del;
@@ -250,7 +254,7 @@ static sout_stream_id_t *AddVideo( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( !id )
         return NULL;
 
-    psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_VIDEO "data" );
+    psz_tmp = var_GetString( p_stream, SOUT_PREFIX_VIDEO "data" );
     id->p_data = (void *)( intptr_t )atoll( psz_tmp );
     free( psz_tmp );
 
@@ -301,7 +305,7 @@ static sout_stream_id_t *AddAudio( sout_stream_t *p_stream, es_format_t *p_fmt )
     if( !id )
         return NULL;
 
-    psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_AUDIO "data" );
+    psz_tmp = var_GetString( p_stream, SOUT_PREFIX_AUDIO "data" );
     id->p_data = (void *)( intptr_t )atoll( psz_tmp );
     free( psz_tmp );
 
