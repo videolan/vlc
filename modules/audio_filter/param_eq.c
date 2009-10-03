@@ -35,6 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -45,13 +46,12 @@ static void CalcPeakEQCoeffs( float, float, float, float, float * );
 static void CalcShelfEQCoeffs( float, float, float, int, float, float * );
 static void ProcessEQ( const float *, float *, float *, unsigned, unsigned,
                        const float *, unsigned );
-static void DoWork( aout_instance_t *, aout_filter_t *,
-                    aout_buffer_t *, aout_buffer_t * );
+static block_t *DoWork( filter_t *, block_t * );
 
 vlc_module_begin ()
     set_description( N_("Parametric Equalizer") )
     set_shortname( N_("Parametric Equalizer" ) )
-    set_capability( "audio filter", 0 )
+    set_capability( "audio filter2", 0 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
@@ -83,7 +83,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct aout_filter_sys_t
+struct filter_sys_t
 {
     /* Filter static config */
     float   f_lowf, f_lowgain;
@@ -95,7 +95,6 @@ struct aout_filter_sys_t
     float   coeffs[5*5];
     /* State */
     float  *p_state;
- 
 };
 
 
@@ -106,10 +105,10 @@ struct aout_filter_sys_t
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    aout_filter_t     *p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t *p_sys;
+    filter_t     *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
     bool         b_fit = true;
-    int                i_samplerate;
+    unsigned     i_samplerate;
 
     if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
         p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
@@ -132,11 +131,12 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = true;
-
     /* Allocate structure */
-    p_sys = p_filter->p_sys = malloc( sizeof( aout_filter_sys_t ) );
+    p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
+    if( !p_sys )
+        return VLC_EGENERIC;
+
+    p_filter->pf_audio_filter = DoWork;
 
     p_sys->f_lowf = config_GetFloat( p_this, "param-eq-lowf");
     p_sys->f_lowgain = config_GetFloat( p_this, "param-eq-lowgain");
@@ -175,7 +175,7 @@ static int Open( vlc_object_t *p_this )
 
 static void Close( vlc_object_t *p_this )
 {
-    aout_filter_t *p_filter = (aout_filter_t *)p_this;
+    filter_t *p_filter = (filter_t *)p_this;
     free( p_filter->p_sys->p_state );
     free( p_filter->p_sys );
 }
@@ -185,17 +185,13 @@ static void Close( vlc_object_t *p_this )
  *****************************************************************************
  *
  *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
 {
-    VLC_UNUSED(p_aout);
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_buffer;
-
-    ProcessEQ( (float*)p_in_buf->p_buffer, (float*)p_out_buf->p_buffer,
+    ProcessEQ( (float*)p_in_buf->p_buffer, (float*)p_in_buf->p_buffer,
                p_filter->p_sys->p_state,
                p_filter->fmt_in.audio.i_channels, p_in_buf->i_nb_samples,
                p_filter->p_sys->coeffs, 5 );
+    return p_in_buf;
 }
 
 /*
