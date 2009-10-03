@@ -257,6 +257,16 @@ static const char *const psz_tuner_audio_modes_list_text[] =
 #define V4L2_DEFAULT "/dev/video0"
 #define CFG_PREFIX "v4l2-"
 
+#ifdef HAVE_MAEMO
+# define DEFAULT_WIDTH	640
+# define DEFAULT_HEIGHT	492
+#endif
+
+#ifndef DEFAULT_WIDTH
+# define DEFAULT_WIDTH	(-1)
+# define DEFAULT_HEIGHT	(-1)
+#endif
+
 vlc_module_begin ()
     set_shortname( N_("Video4Linux2") )
     set_description( N_("Video4Linux2 input") )
@@ -276,9 +286,9 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "io", IO_METHOD_AUTO, NULL, IOMETHOD_TEXT,
                  IOMETHOD_LONGTEXT, true )
         change_integer_list( i_iomethod_list, psz_iomethod_list_text, NULL )
-    add_integer( CFG_PREFIX "width", -1, NULL, WIDTH_TEXT,
+    add_integer( CFG_PREFIX "width", DEFAULT_WIDTH, NULL, WIDTH_TEXT,
                 WIDTH_LONGTEXT, true )
-    add_integer( CFG_PREFIX "height", -1, NULL, HEIGHT_TEXT,
+    add_integer( CFG_PREFIX "height", DEFAULT_HEIGHT, NULL, HEIGHT_TEXT,
                 HEIGHT_LONGTEXT, true )
     add_string( CFG_PREFIX "aspect-ratio", "4:3", NULL, ASPECT_TEXT,
               ASPECT_LONGTEXT, true )
