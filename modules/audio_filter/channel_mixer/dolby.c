@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -39,8 +40,7 @@
 static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
-static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                        aout_buffer_t * );
+static block_t *DoWork( filter_t *, block_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -50,14 +50,14 @@ vlc_module_begin ()
     set_shortname( N_("Dolby Surround decoder") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACODEC )
-    set_capability( "audio filter", 5 )
+    set_capability( "audio filter2", 5 )
     set_callbacks( Create, Destroy )
 vlc_module_end ()
 
 /*****************************************************************************
  * Internal data structures
  *****************************************************************************/
-struct aout_filter_sys_t
+struct filter_sys_t
 {
     int i_left;
     int i_center;
@@ -80,8 +80,8 @@ static int Create( vlc_object_t *p_this )
 {
     int i = 0;
     int i_offset = 0;
-    aout_filter_t * p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t *p_sys;
+    filter_t * p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
 
     /* Validate audio filter format */
     if ( p_filter->fmt_in.audio.i_physical_channels != (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
@@ -105,7 +105,7 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Allocate the memory needed to store the module's structure */
-    p_sys = p_filter->p_sys = malloc( sizeof(struct aout_filter_sys_t) );
+    p_sys = p_filter->p_sys = malloc( sizeof(*p_sys) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
     p_sys->i_left = -1;
@@ -145,8 +145,7 @@ static int Create( vlc_object_t *p_this )
         ++i;
     }
 
-    p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = 0;
+    p_filter->pf_audio_filter = DoWork;
 
     return VLC_SUCCESS;
 }
@@ -156,30 +155,29 @@ static int Create( vlc_object_t *p_this )
  *****************************************************************************/
 static void Destroy( vlc_object_t *p_this )
 {
-    aout_filter_t * p_filter = (aout_filter_t *)p_this;
+    filter_t * p_filter = (filter_t *)p_this;
     free( p_filter->p_sys );
 }
 
 /*****************************************************************************
  * DoWork: convert a buffer
  *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
 {
-    VLC_UNUSED(p_aout);
-    aout_filter_sys_t * p_sys = p_filter->p_sys;
+    filter_sys_t * p_sys = p_filter->p_sys;
     float * p_in = (float*) p_in_buf->p_buffer;
-    float * p_out = (float*) p_out_buf->p_buffer;
     size_t i_nb_samples = p_in_buf->i_nb_samples;
     size_t i_nb_channels = aout_FormatNbChannels( &p_filter->fmt_out.audio );
     size_t i_nb_rear = 0;
     size_t i;
+    block_t *p_out_buf = filter_NewAudioBuffer( p_filter,
+                                sizeof(float) * i_nb_samples * i_nb_channels );
+    if( !p_out_buf )
+        goto out;
 
+    float * p_out = (float*) p_out_buf->p_buffer;
     p_out_buf->i_nb_samples = i_nb_samples;
-    p_out_buf->i_buffer = sizeof(float) * i_nb_samples
-                            * aout_FormatNbChannels( &p_filter->fmt_out.audio );
     memset( p_out, 0, p_out_buf->i_buffer );
-
 
     if( p_sys->i_rear_left >= 0 )
     {
@@ -230,4 +228,7 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
             p_out[ i * i_nb_channels + p_sys->i_rear_right ] = f_rear;
         }
     }
+out:
+    block_Release( p_in_buf );
+    return p_out_buf;
 }
