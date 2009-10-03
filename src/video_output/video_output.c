@@ -1794,6 +1794,8 @@ static const deinterlace_mode_t p_deinterlace_mode[] = {
     { "bob",        "Bob",      true },
     { "linear",     "Linear",   true },
     { "x",          "X",        false },
+    { "yadif",      "Yadif",    true },
+    { "yadif2x",    "Yadif (2x)", true },
     { NULL, NULL, true }
 };
 
