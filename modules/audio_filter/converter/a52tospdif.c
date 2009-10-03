@@ -33,18 +33,14 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-#ifdef HAVE_UNISTD_H
-#   include <unistd.h>
-#endif
-
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
 static int  Create    ( vlc_object_t * );
-static void DoWork    ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                        aout_buffer_t * );
+static block_t *DoWork( filter_t *, block_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -53,7 +49,7 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_MISC )
     set_description( N_("Audio filter for A/52->S/PDIF encapsulation") )
-    set_capability( "audio filter", 10 )
+    set_capability( "audio filter2", 10 )
     set_callbacks( Create, NULL )
 vlc_module_end ()
 
@@ -62,28 +58,25 @@ vlc_module_end ()
  *****************************************************************************/
 static int Create( vlc_object_t *p_this )
 {
-    aout_filter_t * p_filter = (aout_filter_t *)p_this;
+    filter_t * p_filter = (filter_t *)p_this;
 
     if ( p_filter->fmt_in.audio.i_format != VLC_CODEC_A52 ||
          ( p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFB &&
            p_filter->fmt_out.audio.i_format != VLC_CODEC_SPDIFL ) )
     {
-        return -1;
+        return VLC_EGENERIC;
     }
 
-    p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = 0;
+    p_filter->pf_audio_filter = DoWork;
 
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * DoWork: convert a buffer
  *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+static block_t *DoWork( filter_t * p_filter, block_t *p_in_buf )
 {
-    VLC_UNUSED(p_aout);
     /* AC3 is natively big endian. Most SPDIF devices have the native
      * endianness of the computer system.
      * On Mac OS X however, little endian devices are also common.
@@ -92,6 +85,10 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
     static const uint8_t p_sync_be[6] = { 0xF8, 0x72, 0x4E, 0x1F, 0x00, 0x01 };
     uint16_t i_frame_size = p_in_buf->i_buffer / 2;
     uint8_t * p_in = p_in_buf->p_buffer;
+
+    block_t *p_out_buf = filter_NewAudioBuffer( p_filter, AOUT_SPDIF_SIZE );
+    if( !p_out_buf )
+        goto out;
     uint8_t * p_out = p_out_buf->p_buffer;
 
     /* Copy the S/PDIF headers. */
@@ -116,5 +113,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_buffer = AOUT_SPDIF_SIZE;
+out:
+    block_Release( p_in_buf );
+    return p_out_buf;
 }
 
