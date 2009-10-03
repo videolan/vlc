@@ -78,6 +78,14 @@ typedef struct block_sys_t block_sys_t;
 #define BLOCK_FLAG_PREROLL       0x0800
 /** This block is corrupted and/or there is data loss  */
 #define BLOCK_FLAG_CORRUPTED     0x1000
+/** This block contains an interlaced picture with top field first */
+#define BLOCK_FLAG_TOP_FIELD_FIRST 0x2000
+/** This block contains an interlaced picture with bottom field first */
+#define BLOCK_FLAG_BOTTOM_FIELD_FIRST 0x4000
+
+/** This block contains an interlaced picture */
+#define BLOCK_FLAG_INTERLACED_MASK \
+    (BLOCK_FLAG_TOP_FIELD_FIRST|BLOCK_FLAG_BOTTOM_FIELD_FIRST)
 
 #define BLOCK_FLAG_TYPE_MASK \
     (BLOCK_FLAG_TYPE_I|BLOCK_FLAG_TYPE_P|BLOCK_FLAG_TYPE_B|BLOCK_FLAG_TYPE_PB)

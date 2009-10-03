@@ -553,6 +553,7 @@ struct demux_sys_t
     float f_fps;            /* <= 0.0 mean to grab at full rate */
     mtime_t i_video_pts;    /* only used when f_fps > 0 */
     int i_fourcc;
+    uint32_t i_block_flags;
 
     es_out_id_t *p_es;
 
@@ -1456,6 +1457,7 @@ static block_t* GrabVideo( vlc_object_t *p_demux, demux_sys_t *p_sys )
 
     /* Timestamp */
     p_sys->i_video_pts = p_block->i_pts = p_block->i_dts = mdate();
+    p_block->i_flags |= p_sys->i_block_flags;
 
     return p_block;
 }
@@ -2146,29 +2148,33 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             break;
         case V4L2_FIELD_INTERLACED:
             msg_Dbg( p_obj, "Interlacing setting: interleaved (bottom top if M/NTSC, top bottom otherwise)" );
+            if( p_sys->i_selected_standard_id == V4L2_STD_NTSC )
+                p_sys->i_block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
+            else
+                p_sys->i_block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
             break;
         case V4L2_FIELD_SEQ_TB:
-            msg_Dbg( p_obj, "Interlacing setting: sequential top bottom" );
+            msg_Dbg( p_obj, "Interlacing setting: sequential top bottom (TODO)" );
             break;
         case V4L2_FIELD_SEQ_BT:
-            msg_Dbg( p_obj, "Interlacing setting: sequential bottom top" );
+            msg_Dbg( p_obj, "Interlacing setting: sequential bottom top (TODO)" );
             break;
         case V4L2_FIELD_ALTERNATE:
-            msg_Dbg( p_obj, "Interlacing setting: alternate fields" );
+            msg_Dbg( p_obj, "Interlacing setting: alternate fields (TODO)" );
             break;
         case V4L2_FIELD_INTERLACED_TB:
             msg_Dbg( p_obj, "Interlacing setting: interleaved top bottom" );
+            p_sys->i_block_flags = BLOCK_FLAG_TOP_FIELD_FIRST;
             break;
         case V4L2_FIELD_INTERLACED_BT:
             msg_Dbg( p_obj, "Interlacing setting: interleaved bottom top" );
+            p_sys->i_block_flags = BLOCK_FLAG_BOTTOM_FIELD_FIRST;
             break;
         default:
             msg_Warn( p_obj, "Interlacing setting: unknown type (%d)",
                       fmt.fmt.pix.field );
             break;
     }
-    if( fmt.fmt.pix.field != V4L2_FIELD_NONE )
-        msg_Warn( p_obj, "Interlaced inputs haven't been tested. Please report any issue." );
 
     /* Look up final fourcc */
     p_sys->i_fourcc = 0;
