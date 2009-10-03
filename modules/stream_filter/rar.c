@@ -525,7 +525,7 @@ static int SkipFile( stream_t *s,const rar_block_t *p_hdr )
             rar_file_chunk_t *p_chunk = malloc( sizeof( *p_chunk ) );
             if( p_chunk )
             {
-                p_chunk->i_offset = stream_Tell( s->p_source );
+                p_chunk->i_offset = stream_Tell( s->p_source ) + p_hdr->i_size;
                 p_chunk->i_size = p_hdr->i_add_size;
                 p_chunk->i_cummulated_size = 0;
                 if( p_current->i_chunk > 0 )
