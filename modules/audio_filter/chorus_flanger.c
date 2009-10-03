@@ -38,6 +38,7 @@
 #include <vlc_plugin.h>
 
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 
 /*****************************************************************************
  * Local prototypes
@@ -45,10 +46,9 @@
 
 static int  Open     ( vlc_object_t * );
 static void Close    ( vlc_object_t * );
-static void DoWork   ( aout_instance_t * , aout_filter_t *,
-                       aout_buffer_t * , aout_buffer_t * );
+static block_t *DoWork( filter_t *, block_t * );
 
-struct aout_filter_sys_t
+struct filter_sys_t
 {
     /* TODO: Cleanup and optimise */
     int i_cumulative;
@@ -93,7 +93,7 @@ vlc_module_begin ()
         N_("Wet mix"), N_("Level of delayed signal"), true )
     add_float_with_range( "dry-mix", 0.4, -0.999, 0.999, NULL,
         N_("Dry Mix"), N_("Level of input signal"), true )
-    set_capability( "audio filter", 0 )
+    set_capability( "audio filter2", 0 )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -113,8 +113,8 @@ static inline float small_value()
  */
 static int Open( vlc_object_t *p_this )
 {
-    aout_filter_t *p_filter = (aout_filter_t*)p_this;
-    aout_filter_sys_t *p_sys;
+    filter_t *p_filter = (filter_t*)p_this;
+    filter_sys_t *p_sys;
 
     if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
@@ -130,10 +130,9 @@ static int Open( vlc_object_t *p_this )
         msg_Warn( p_filter, "bad input or output format" );
     }
 
-    p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = true;
+    p_filter->pf_audio_filter = DoWork;
 
-    p_sys = p_filter->p_sys = malloc( sizeof( aout_filter_sys_t ) );
+    p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -225,31 +224,24 @@ static inline void sanitize( float * f_value )
 
 /**
  * DoWork : delays and finds the value of the current frame
- * @param p_aout Audio output object
  * @param p_filter This filter object
  * @param p_in_buf Input buffer
- * @param p_out_buf Output buffer
+ * @return Output buffer
  */
-static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
-                    aout_buffer_t *p_in_buf, aout_buffer_t *p_out_buf )
+static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
-    VLC_UNUSED( p_aout );
-
-    struct aout_filter_sys_t *p_sys = p_filter->p_sys;
+    struct filter_sys_t *p_sys = p_filter->p_sys;
     int i_chan;
-    int i_samples = p_in_buf->i_nb_samples; /* Gives the number of samples */
+    unsigned i_samples = p_in_buf->i_nb_samples; /* number of samples */
     /* maximum number of samples to offset in buffer */
     int i_maxOffset = floor( p_sys->f_sweepDepth * p_sys->i_sampleRate / 1000 );
-    float *p_out = (float*)p_out_buf->p_buffer;
+    float *p_out = (float*)p_in_buf->p_buffer;
     float *p_in =  (float*)p_in_buf->p_buffer;
 
     float *pf_ptr, f_diff = 0, f_frac = 0, f_temp = 0 ;
 
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_buffer;
-
     /* Process each sample */
-    for( int i = 0; i < i_samples ; i++ )
+    for( unsigned i = 0; i < i_samples ; i++ )
     {
         /* Use a sine function as a oscillator wave. TODO */
         /* f_offset = sinf( ( p_sys->i_cumulative ) * p_sys->f_sinMultiplier ) *
@@ -316,7 +308,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
         }
 
     }
-    return;
+    return p_in_buf;
 }
 
 /**
@@ -325,8 +317,8 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
  */
 static void Close( vlc_object_t *p_this )
 {
-    aout_filter_t *p_filter = ( aout_filter_t* )p_this;
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
+    filter_t *p_filter = ( filter_t* )p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
     free( p_sys->pf_delayLineStart );
     free( p_sys );
