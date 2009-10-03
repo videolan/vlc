@@ -2432,12 +2432,14 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     {
         struct v4l2_input t_input;
         memset( &t_input, 0, sizeof(t_input) );
+        p_sys->i_input = 0;
         while( v4l2_ioctl( i_fd, VIDIOC_ENUMINPUT, &t_input ) >= 0 )
         {
             p_sys->i_input++;
             t_input.index = p_sys->i_input;
         }
 
+        free( p_sys->p_inputs );
         p_sys->p_inputs = calloc( 1, p_sys->i_input * sizeof( struct v4l2_input ) );
         if( !p_sys->p_inputs ) goto open_failed;
 
@@ -2473,6 +2475,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             t_standards.index = p_sys->i_standard;
         }
 
+        free( p_sys->p_standards );
         p_sys->p_standards = calloc( 1, p_sys->i_standard * sizeof( struct v4l2_standard ) );
         if( !p_sys->p_standards ) goto open_failed;
 
@@ -2538,6 +2541,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             tuner.index = p_sys->i_tuner;
         }
 
+        free( p_sys->p_tuners );
         p_sys->p_tuners = calloc( 1, p_sys->i_tuner * sizeof( struct v4l2_tuner ) );
         if( !p_sys->p_tuners ) goto open_failed;
 
@@ -2601,6 +2605,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
         p_sys->i_codec = i_index;
 
+        free( p_sys->p_codecs );
         p_sys->p_codecs = calloc( 1, p_sys->i_codec * sizeof( struct v4l2_fmtdesc ) );
 
         for( i_index = 0; i_index < p_sys->i_codec; i_index++ )
