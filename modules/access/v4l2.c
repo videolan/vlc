@@ -2005,8 +2005,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         msg_Dbg( p_obj, "trying specified size %dx%d", p_sys->i_width, p_sys->i_height );
     }
 
-    fmt.fmt.pix.width = p_sys->i_width;
-    fmt.fmt.pix.height = p_sys->i_height;
+    fmt.fmt.pix.width = __MAX(0, p_sys->i_width);
+    fmt.fmt.pix.height = __MAX(0, p_sys->i_height);
     fmt.fmt.pix.field = V4L2_FIELD_NONE;
 
     if (b_demux)
