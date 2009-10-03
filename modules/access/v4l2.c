@@ -216,9 +216,26 @@ typedef enum {
 } io_method;
 
 static const int i_standards_list[] =
-    { V4L2_STD_UNKNOWN, V4L2_STD_SECAM, V4L2_STD_PAL, V4L2_STD_NTSC };
+    { V4L2_STD_UNKNOWN, V4L2_STD_SECAM, V4L2_STD_PAL, V4L2_STD_NTSC,
+      V4L2_STD_PAL_B, V4L2_STD_PAL_B1, V4L2_STD_PAL_G, V4L2_STD_PAL_H,
+      V4L2_STD_PAL_I, V4L2_STD_PAL_D, V4L2_STD_PAL_D1, V4L2_STD_PAL_K,
+      V4L2_STD_PAL_M, V4L2_STD_PAL_N, V4L2_STD_PAL_Nc, V4L2_STD_PAL_60,
+      V4L2_STD_NTSC_M, V4L2_STD_NTSC_M_JP, V4L2_STD_NTSC_443,
+      V4L2_STD_NTSC_M_KR,
+      V4L2_STD_SECAM_B, V4L2_STD_SECAM_D, V4L2_STD_SECAM_G,
+      V4L2_STD_SECAM_H, V4L2_STD_SECAM_K, V4L2_STD_SECAM_K1,
+      V4L2_STD_SECAM_L, V4L2_STD_SECAM_LC,
+      V4L2_STD_ATSC_8_VSB, V4L2_STD_ATSC_16_VSB,
+      };
 static const char *const psz_standards_list_text[] =
-    { N_("Default"), N_("SECAM"), N_("PAL"),  N_("NTSC") };
+    { N_("Default"), "SECAM", "PAL",  "NTSC",
+      "PAL_B", "PAL_B1", "PAL_G", "PAL_H", "PAL_I", "PAL_D",
+      "PAL_D1", "PAL_K", "PAL_M", "PAL_N", "PAL_Nc", "PAL_60",
+      "NTSC_M", "NTSC_M_JP", "NTSC_443", "NTSC_M_KR",
+      "SECAM_B", "SECAM_D", "SECAM_G", "SECAM_H", "SECAM_K",
+      "SECAM_K1", "SECAM_L", "SECAM_LC",
+      "ATSC_8_VSB", "ATSC_16_VSB"
+    };
 
 static const int i_iomethod_list[] =
     { IO_METHOD_AUTO, IO_METHOD_READ, IO_METHOD_MMAP, IO_METHOD_USERPTR };
@@ -737,30 +754,22 @@ static void ParseMRL( demux_sys_t *p_sys, char *psz_path, vlc_object_t *p_obj )
             if( !strncmp( psz_parser, "standard=", strlen( "standard=" ) ) )
             {
                 psz_parser += strlen( "standard=" );
-                if( !strncmp( psz_parser, "pal", strlen( "pal" ) ) )
+                size_t i;
+                for( i = 0; i < ARRAY_SIZE(psz_standards_list_text); i++ )
                 {
-                    p_sys->i_selected_standard_id = V4L2_STD_PAL;
-                    psz_parser += strlen( "pal" );
+                    const char *psz_value = psz_standards_list_text[i];
+                    size_t i_len = strlen( psz_value );
+                    if( !strncasecmp( psz_parser, psz_value, i_len ) &&
+                        ( psz_parser[i_len] == ':' || psz_parser[i_len] == 0 ) )
+                    {
+                        p_sys->i_selected_standard_id = i_standards_list[i];
+                        psz_parser += i_len;
+                        break;
+                    }
                 }
-                else if( !strncmp( psz_parser, "ntsc", strlen( "ntsc" ) ) )
-                {
-                    p_sys->i_selected_standard_id = V4L2_STD_NTSC;
-                    psz_parser += strlen( "ntsc" );
-                }
-                else if( !strncmp( psz_parser, "secam", strlen( "secam" ) ) )
-                {
-                    p_sys->i_selected_standard_id = V4L2_STD_SECAM;
-                    psz_parser += strlen( "secam" );
-                }
-                else if( !strncmp( psz_parser, "default", strlen( "default" ) ) )
-                {
-                    p_sys->i_selected_standard_id = V4L2_STD_UNKNOWN;
-                    psz_parser += strlen( "default" );
-                }
-                else
-                {
+
+                if( i == ARRAY_SIZE(psz_standards_list_text) )
                     p_sys->i_selected_standard_id = i_standards_list[strtol( psz_parser, &psz_parser, 0 )];
-                }
             }
             else if( !strncmp( psz_parser, "chroma=", strlen( "chroma=" ) ) )
             {
@@ -1877,7 +1886,21 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             msg_Err( p_obj, "cannot set standard (%m)" );
             goto open_failed;
         }
-        msg_Dbg( p_obj, "Set standard" );
+        if( v4l2_ioctl( i_fd, VIDIOC_G_STD, &p_sys->i_selected_standard_id ) < 0 )
+        {
+            msg_Err( p_obj, "cannot get standard (%m). This should never happen!" );
+            goto open_failed;
+        }
+        msg_Dbg( p_obj, "Set standard to (0x%"PRIx64"):", p_sys->i_selected_standard_id );
+        int i_standard;
+        for( i_standard = 0; i_standard<p_sys->i_standard; i_standard++)
+        {
+            if( p_sys->p_standards[i_standard].id & p_sys->i_selected_standard_id )
+            {
+                msg_Dbg( p_obj, "  %s",
+                        p_sys->p_standards[i_standard].name );
+            }
+        }
     }
 
     /* Select input */
@@ -2491,7 +2514,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             msg_Dbg( p_obj, "video standard %i is: %s %c",
                                 i_standard,
                                 p_sys->p_standards[i_standard].name,
-                                (unsigned)i_standard == p_sys->i_selected_standard_id ? '*' : ' ' );
+                                (p_sys->p_standards[i_standard].id & p_sys->i_selected_standard_id) ? '*' : ' ' );
         }
     }
 
