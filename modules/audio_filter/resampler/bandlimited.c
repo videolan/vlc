@@ -71,7 +71,7 @@ static void FilterFloatUD( const float Imp[], const float ImpD[], uint16_t Nwing
 struct filter_sys_t
 {
     int32_t *p_buf;                        /* this filter introduces a delay */
-    int i_buf_size;
+    size_t i_buf_size;
 
     double d_old_factor;
     int i_old_wing;
@@ -360,9 +360,32 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
         p_sys->i_remainder -= p_filter->fmt_out.audio.i_rate;
     }
 
+    /* Finalize aout buffer */
+    p_out_buf->i_nb_samples = i_out;
+    p_out_buf->i_pts = date_Get( &p_sys->end_date );
+    p_out_buf->i_length = date_Increment( &p_sys->end_date,
+                                  p_out_buf->i_nb_samples ) - p_out_buf->i_pts;
+
+    p_out_buf->i_buffer = p_out_buf->i_nb_samples *
+        i_nb_channels * sizeof(int32_t);
+
     /* Buffer i_filter_wing * 2 samples for next time */
     if( p_sys->i_old_wing )
     {
+        size_t newsize = p_sys->i_old_wing * 2
+                         * p_filter->fmt_in.audio.i_bytes_per_frame;
+        if( newsize > p_sys->i_buf_size )
+        {
+            free( p_sys->p_buf );
+            p_sys->p_buf = malloc( newsize );
+            if( p_sys->p_buf != NULL )
+                p_sys->i_buf_size = newsize;
+            else
+            {
+                p_sys->i_buf_size = p_sys->i_old_wing = 0; /* oops! */
+                return p_out_buf;
+            }
+        }
         memcpy( p_sys->p_buf,
                 p_in_orig + (i_in_nb - 2 * p_sys->i_old_wing) *
                 i_nb_channels, (2 * p_sys->i_old_wing) *
@@ -374,14 +397,6 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
              i_out * p_filter->fmt_in.audio.i_bytes_per_frame );
 #endif
 
-    /* Finalize aout buffer */
-    p_out_buf->i_nb_samples = i_out;
-    p_out_buf->i_pts = date_Get( &p_sys->end_date );
-    p_out_buf->i_length = date_Increment( &p_sys->end_date,
-                                  p_out_buf->i_nb_samples ) - p_out_buf->i_pts;
-
-    p_out_buf->i_buffer = p_out_buf->i_nb_samples *
-        i_nb_channels * sizeof(int32_t);
     return p_out_buf;
 }
 
@@ -393,8 +408,6 @@ static int OpenFilter( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys;
     unsigned int i_out_rate  = p_filter->fmt_out.audio.i_rate;
-    double d_factor;
-    int i_filter_wing;
 
     if( p_filter->fmt_in.audio.i_rate == p_filter->fmt_out.audio.i_rate ||
         p_filter->fmt_in.i_codec != VLC_CODEC_FL32 )
@@ -414,20 +427,8 @@ static int OpenFilter( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    /* Calculate worst case for the length of the filter wing */
-    d_factor = (double)i_out_rate / p_filter->fmt_in.audio.i_rate;
-    i_filter_wing = ((SMALL_FILTER_NMULT + 1)/2.0)
-                      * __MAX(1.0, 1.0/d_factor) + 10;
-    p_sys->i_buf_size = p_filter->fmt_in.audio.i_channels *
-        sizeof(int32_t) * 2 * i_filter_wing;
-
-    /* Allocate enough memory to buffer previous samples */
-    p_sys->p_buf = malloc( p_sys->i_buf_size );
-    if( p_sys->p_buf == NULL )
-    {
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
+    p_sys->p_buf = NULL;
+    p_sys->i_buf_size = 0;
 
     p_sys->i_old_wing = 0;
     p_sys->b_first = true;
