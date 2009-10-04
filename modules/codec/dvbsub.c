@@ -323,7 +323,6 @@ static int Open( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t *) p_this;
     decoder_sys_t *p_sys;
-    vlc_value_t    val;
     int i_posx, i_posy;
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_DVBS )
@@ -332,10 +331,9 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_dec->pf_decode_sub = Decode;
-    p_sys = p_dec->p_sys = malloc( sizeof(decoder_sys_t) );
+    p_sys = p_dec->p_sys = calloc( 1, sizeof(decoder_sys_t) );
     if( !p_sys )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof(decoder_sys_t) );
 
     p_sys->i_pts          = (mtime_t) 0;
     p_sys->i_id           = p_dec->fmt_in.subs.dvb.i_id & 0xFFFF;
@@ -348,18 +346,10 @@ static int Open( vlc_object_t *p_this )
     /* configure for SD res in case DDS is not present */
     default_dds_init( p_dec );
 
-    var_Create( p_this, DVBSUB_CFG_PREFIX "position",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, DVBSUB_CFG_PREFIX "position", &val );
-    p_sys->i_spu_position = val.i_int;
-    var_Create( p_this, DVBSUB_CFG_PREFIX "x",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, DVBSUB_CFG_PREFIX "x", &val );
-    i_posx = val.i_int;
-    var_Create( p_this, DVBSUB_CFG_PREFIX "y",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, DVBSUB_CFG_PREFIX "y", &val );
-    i_posy = val.i_int;
+    p_sys->i_spu_position = var_CreateGetInteger( p_this,
+                                    DVBSUB_CFG_PREFIX "position" );
+    i_posx = var_CreateGetInteger( p_this, DVBSUB_CFG_PREFIX "x" );
+    i_posy = var_CreateGetInteger( p_this, DVBSUB_CFG_PREFIX "y" );
 
     /* Check if subpicture position was overridden */
     p_sys->b_absolute = true;
@@ -876,10 +866,9 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
 #ifdef DEBUG_DVBSUB
         msg_Dbg( p_dec, "new region: %i", i_id );
 #endif
-        p_region = *pp_region = malloc( sizeof(dvbsub_region_t) );
+        p_region = *pp_region = calloc( 1, sizeof(dvbsub_region_t) );
         if( !p_region )
             return;
-        memset( p_region, 0, sizeof(dvbsub_region_t) );
         p_region->p_object_defs = NULL;
         p_region->p_pixbuf = NULL;
         p_region->p_next = NULL;
@@ -1708,7 +1697,6 @@ static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
-    vlc_value_t val;
 
     if( ( p_enc->fmt_out.i_codec != VLC_CODEC_DVBS ) &&
         !p_enc->b_force )
@@ -1733,12 +1721,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_regions = 0;
     p_sys->p_regions = 0;
 
-    var_Create( p_this, ENC_CFG_PREFIX "x", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, ENC_CFG_PREFIX "x", &val );
-    p_sys->i_offset_x = val.i_int;
-    var_Create( p_this, ENC_CFG_PREFIX "y", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_this, ENC_CFG_PREFIX "y", &val );
-    p_sys->i_offset_y = val.i_int;
+    p_sys->i_offset_x = var_CreateGetInteger( p_this, ENC_CFG_PREFIX "x" );
+    p_sys->i_offset_y = var_CreateGetInteger( p_this, ENC_CFG_PREFIX "y" );
 
     return VLC_SUCCESS;
 }

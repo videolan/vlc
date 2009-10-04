@@ -129,7 +129,6 @@ static int OpenEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys;
-    vlc_value_t val;
     int i_frequency;
 
     if( p_enc->fmt_out.i_codec != VLC_CODEC_MPGA &&
@@ -216,8 +215,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     else
     {
         twolame_set_num_channels( p_sys->p_twolame, 2 );
-        var_Get( p_enc, ENC_CFG_PREFIX "mode", &val );
-        switch ( val.i_int )
+        switch( var_GetInteger( p_enc, ENC_CFG_PREFIX "mode" ) )
         {
         case 1:
             twolame_set_mode( p_sys->p_twolame, TWOLAME_DUAL_CHANNEL );
@@ -232,8 +230,8 @@ static int OpenEncoder( vlc_object_t *p_this )
         }
     }
 
-    var_Get( p_enc, ENC_CFG_PREFIX "psy", &val );
-    twolame_set_psymodel( p_sys->p_twolame, val.i_int );
+    twolame_set_psymodel( p_sys->p_twolame,
+                          var_GetInteger( p_enc, ENC_CFG_PREFIX "psy" ) );
 
     if ( twolame_init_params( p_sys->p_twolame ) )
     {

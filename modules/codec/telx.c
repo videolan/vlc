@@ -171,8 +171,8 @@ static int Open( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t *) p_this;
     decoder_sys_t *p_sys = NULL;
-    vlc_value_t    val;
-    int            i;
+    int            i_val;
+
 
     if( p_dec->fmt_in.i_codec != VLC_CODEC_TELETEXT)
     {
@@ -187,25 +187,21 @@ static int Open( vlc_object_t *p_this )
     p_dec->fmt_out.i_codec = 0;
 
     p_sys->i_align = 0;
-    for ( i = 0; i < 9; i++ )
+    for ( int i = 0; i < 9; i++ )
         p_sys->pi_active_national_set[i] = ppi_national_subsets[1];
 
-    var_Create( p_dec, "telx-override-page",
-                VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "telx-override-page", &val );
-    if( val.i_int == -1 &&
-        p_dec->fmt_in.subs.teletext.i_magazine != -1 &&
+    i_val = var_CreateGetInteger( p_dec, "telx-override-page" );
+    if( i_val == -1 && p_dec->fmt_in.subs.teletext.i_magazine != -1 &&
         ( p_dec->fmt_in.subs.teletext.i_magazine != 1 ||
           p_dec->fmt_in.subs.teletext.i_page != 0 ) ) /* ignore if TS demux wants page 100 (unlikely to be sub) */
     {
+        bool b_val;
         p_sys->i_wanted_magazine = p_dec->fmt_in.subs.teletext.i_magazine;
         p_sys->i_wanted_page = p_dec->fmt_in.subs.teletext.i_page;
 
-        var_Create( p_dec, "telx-french-workaround",
-                    VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-        var_Get( p_dec, "telx-french-workaround", &val );
+        b_val = var_CreateGetBool( p_dec, "telx-french-workaround" );
         if( p_sys->i_wanted_page < 100 &&
-              (val.b_bool || (p_sys->i_wanted_page % 16) >= 10))
+            (b_val || (p_sys->i_wanted_page % 16) >= 10))
         {
             /* See http://www.nada.kth.se/~ragge/vdr/ttxtsubs/TROUBLESHOOTING.txt
              * paragraph about French channels - they mix up decimal and
@@ -214,21 +210,19 @@ static int Open( vlc_object_t *p_this )
                                    (p_sys->i_wanted_page % 10);
         }
     }
-    else if( val.i_int <= 0 )
+    else if( i_val <= 0 )
     {
         p_sys->i_wanted_magazine = -1;
         p_sys->i_wanted_page = -1;
     }
     else
     {
-        p_sys->i_wanted_magazine = val.i_int / 100;
-        p_sys->i_wanted_page = (((val.i_int % 100) / 10) << 4)
-                                | ((val.i_int % 100) % 10);
+        p_sys->i_wanted_magazine = i_val / 100;
+        p_sys->i_wanted_page = (((i_val % 100) / 10) << 4)
+                               |((i_val % 100) % 10);
     }
-    var_Create( p_dec, "telx-ignore-subtitle-flag",
-                VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "telx-ignore-subtitle-flag", &val );
-    p_sys->b_ignore_sub_flag = val.b_bool;
+    p_sys->b_ignore_sub_flag = var_CreateGetBool( p_dec,
+                                    "telx-ignore-subtitle-flag" );
 
     msg_Dbg( p_dec, "starting telx on magazine %d page %02x flag %d",
              p_sys->i_wanted_magazine, p_sys->i_wanted_page,

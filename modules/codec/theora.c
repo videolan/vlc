@@ -605,7 +605,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     encoder_sys_t *p_sys;
     ogg_packet header;
     uint8_t *p_extra;
-    vlc_value_t val;
     int i_quality, i;
 
     if( p_enc->fmt_out.i_codec != VLC_CODEC_THEORA &&
@@ -625,8 +624,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
-    var_Get( p_enc, ENC_CFG_PREFIX "quality", &val );
-    i_quality = val.i_int;
+    i_quality = var_GetInteger( p_enc, ENC_CFG_PREFIX "quality" );
     if( i_quality > 10 ) i_quality = 10;
     if( i_quality < 0 ) i_quality = 0;
 

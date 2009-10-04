@@ -202,7 +202,9 @@ int OpenEncoder( vlc_object_t *p_this )
     AVCodec *p_codec;
     int i_codec_id, i_cat;
     const char *psz_namecodec;
-    vlc_value_t val;
+    float f_val;
+    char *psz_val;
+    int i_val;
 
     if( !GetFfmpegCodec( p_enc->fmt_out.i_codec, &i_cat, &i_codec_id,
                              &psz_namecodec ) )
@@ -306,106 +308,77 @@ int OpenEncoder( vlc_object_t *p_this )
 
     config_ChainParse( p_enc, ENC_CFG_PREFIX, ppsz_enc_options, p_enc->p_cfg );
 
-    var_Get( p_enc, ENC_CFG_PREFIX "keyint", &val );
-    p_sys->i_key_int = val.i_int;
+    p_sys->i_key_int = var_GetInteger( p_enc, ENC_CFG_PREFIX "keyint" );
+    p_sys->i_b_frames = var_GetInteger( p_enc, ENC_CFG_PREFIX "bframes" );
+    p_sys->i_vtolerance = var_GetInteger( p_enc, ENC_CFG_PREFIX "vt" ) * 1000;
+    p_sys->b_interlace = var_GetBool( p_enc, ENC_CFG_PREFIX "interlace" );
+    p_sys->b_interlace_me = var_GetBool( p_enc, ENC_CFG_PREFIX "interlace-me" );
+    p_sys->b_pre_me = var_GetBool( p_enc, ENC_CFG_PREFIX "pre-me" );
+    p_sys->b_hurry_up = var_GetBool( p_enc, ENC_CFG_PREFIX "hurry-up" );
 
-    var_Get( p_enc, ENC_CFG_PREFIX "bframes", &val );
-    p_sys->i_b_frames = val.i_int;
-
-    var_Get( p_enc, ENC_CFG_PREFIX "vt", &val );
-    p_sys->i_vtolerance = val.i_int * 1000;
-
-    var_Get( p_enc, ENC_CFG_PREFIX "interlace", &val );
-    p_sys->b_interlace = val.b_bool;
-
-    var_Get( p_enc, ENC_CFG_PREFIX "interlace-me", &val );
-    p_sys->b_interlace_me = val.b_bool;
-
-    var_Get( p_enc, ENC_CFG_PREFIX "pre-me", &val );
-    p_sys->b_pre_me = val.b_bool;
-
-    var_Get( p_enc, ENC_CFG_PREFIX "hurry-up", &val );
-    p_sys->b_hurry_up = val.b_bool;
     if( p_sys->b_hurry_up )
     {
         /* hurry up mode needs noise reduction, even small */
         p_sys->i_noise_reduction = 1;
     }
 
-    var_Get( p_enc, ENC_CFG_PREFIX "rc-buffer-size", &val );
-    p_sys->i_rc_buffer_size = val.i_int;
-    var_Get( p_enc, ENC_CFG_PREFIX "rc-buffer-aggressivity", &val );
-    p_sys->f_rc_buffer_aggressivity = val.f_float;
+    p_sys->i_rc_buffer_size = var_GetInteger( p_enc, ENC_CFG_PREFIX "rc-buffer-size" );
+    p_sys->f_rc_buffer_aggressivity = var_GetFloat( p_enc, ENC_CFG_PREFIX "rc-buffer-aggressivity" );
+    p_sys->f_i_quant_factor = var_GetFloat( p_enc, ENC_CFG_PREFIX "i-quant-factor" );
+    p_sys->i_noise_reduction = var_GetInteger( p_enc, ENC_CFG_PREFIX "noise-reduction" );
+    p_sys->b_mpeg4_matrix = var_GetBool( p_enc, ENC_CFG_PREFIX "mpeg4-matrix" );
 
-    var_Get( p_enc, ENC_CFG_PREFIX "i-quant-factor", &val );
-    p_sys->f_i_quant_factor = val.f_float;
+    f_val = var_GetFloat( p_enc, ENC_CFG_PREFIX "qscale" );
+    if( f_val < 0.01 || f_val > 255.0 ) f_val = 0;
+    p_sys->i_quality = (int)(FF_QP2LAMBDA * f_val + 0.5);
 
-    var_Get( p_enc, ENC_CFG_PREFIX "noise-reduction", &val );
-    p_sys->i_noise_reduction = val.i_int;
-
-    var_Get( p_enc, ENC_CFG_PREFIX "mpeg4-matrix", &val );
-    p_sys->b_mpeg4_matrix = val.b_bool;
-
-    var_Get( p_enc, ENC_CFG_PREFIX "qscale", &val );
-    if( val.f_float < 0.01 || val.f_float > 255.0 ) val.f_float = 0;
-    p_sys->i_quality = (int)(FF_QP2LAMBDA * val.f_float + 0.5);
-
-    var_Get( p_enc, ENC_CFG_PREFIX "hq", &val );
+    psz_val = var_GetString( p_enc, ENC_CFG_PREFIX "hq" );
     p_sys->i_hq = FF_MB_DECISION_RD;
-    if( val.psz_string && *val.psz_string )
+    if( psz_val && *psz_val )
     {
-        if( !strcmp( val.psz_string, "rd" ) )
+        if( !strcmp( psz_val, "rd" ) )
             p_sys->i_hq = FF_MB_DECISION_RD;
-        else if( !strcmp( val.psz_string, "bits" ) )
+        else if( !strcmp( psz_val, "bits" ) )
             p_sys->i_hq = FF_MB_DECISION_BITS;
-        else if( !strcmp( val.psz_string, "simple" ) )
+        else if( !strcmp( psz_val, "simple" ) )
             p_sys->i_hq = FF_MB_DECISION_SIMPLE;
         else
             p_sys->i_hq = FF_MB_DECISION_RD;
     }
     else
         p_sys->i_hq = FF_MB_DECISION_RD;
-    free( val.psz_string );
+    free( psz_val );
 
-    var_Get( p_enc, ENC_CFG_PREFIX "qmin", &val );
-    p_sys->i_qmin = val.i_int;
-    var_Get( p_enc, ENC_CFG_PREFIX "qmax", &val );
-    p_sys->i_qmax = val.i_int;
-    var_Get( p_enc, ENC_CFG_PREFIX "trellis", &val );
-    p_sys->b_trellis = val.b_bool;
+    p_sys->i_qmin = var_GetInteger( p_enc, ENC_CFG_PREFIX "qmin" );
+    p_sys->i_qmax = var_GetInteger( p_enc, ENC_CFG_PREFIX "qmax" );
+    p_sys->b_trellis = var_GetBool( p_enc, ENC_CFG_PREFIX "trellis" );
 
-    var_Get( p_enc, ENC_CFG_PREFIX "strict", &val );
-    if( val.i_int < - 1 || val.i_int > 1 ) val.i_int = 0;
-    p_context->strict_std_compliance = val.i_int;
+    i_val = var_GetInteger( p_enc, ENC_CFG_PREFIX "strict" );
+    if( i_val < - 1 || i_val > 1 ) i_val = 0;
+    p_context->strict_std_compliance = i_val;
 
-    var_Get( p_enc, ENC_CFG_PREFIX "lumi-masking", &val );
-    p_sys->f_lumi_masking = val.f_float;
-    var_Get( p_enc, ENC_CFG_PREFIX "dark-masking", &val );
-    p_sys->f_dark_masking = val.f_float;
-    var_Get( p_enc, ENC_CFG_PREFIX "p-masking", &val );
-    p_sys->f_p_masking = val.f_float;
-    var_Get( p_enc, ENC_CFG_PREFIX "border-masking", &val );
-    p_sys->f_border_masking = val.f_float;
-    var_Get( p_enc, ENC_CFG_PREFIX "luma-elim-threshold", &val );
-    p_sys->i_luma_elim = val.i_int;
-    var_Get( p_enc, ENC_CFG_PREFIX "chroma-elim-threshold", &val );
-    p_sys->i_chroma_elim = val.i_int;
+    p_sys->f_lumi_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "lumi-masking" );
+    p_sys->f_dark_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "dark-masking" );
+    p_sys->f_p_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "p-masking" );
+    p_sys->f_border_masking = var_GetFloat( p_enc, ENC_CFG_PREFIX "border-masking" );
+    p_sys->i_luma_elim = var_GetInteger( p_enc, ENC_CFG_PREFIX "luma-elim-threshold" );
+    p_sys->i_chroma_elim = var_GetInteger( p_enc, ENC_CFG_PREFIX "chroma-elim-threshold" );
 
-    var_Get( p_enc, ENC_CFG_PREFIX "aac-profile", &val );
+    psz_val = var_GetString( p_enc, ENC_CFG_PREFIX "aac-profile" );
     /* ffmpeg uses faac encoder atm, and it has issues with
      * other than low-complexity profile, so default to that */
     p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
-    if( val.psz_string && *val.psz_string )
+    if( psz_val && *psz_val )
     {
-        if( !strncmp( val.psz_string, "main", 4 ) )
+        if( !strncmp( psz_val, "main", 4 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_MAIN;
-        else if( !strncmp( val.psz_string, "low", 3 ) )
+        else if( !strncmp( psz_val, "low", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
 #if 0    /* Not supported by FAAC encoder */
-        else if( !strncmp( val.psz_string, "ssr", 3 ) )
+        else if( !strncmp( psz_val, "ssr", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_SSR;
 #endif
-        else  if( !strncmp( val.psz_string, "ltp", 3 ) )
+        else  if( !strncmp( psz_val, "ltp", 3 ) )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LTP;
         else
         {
@@ -413,7 +386,7 @@ int OpenEncoder( vlc_object_t *p_this )
             p_sys->i_aac_profile = FF_PROFILE_AAC_LOW;
         }
     }
-    free( val.psz_string );
+    free( psz_val );
 
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {

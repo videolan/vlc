@@ -228,7 +228,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 {
     decoder_t     *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
-    vlc_value_t    val;
 
     switch( p_dec->fmt_in.i_codec )
     {
@@ -312,9 +311,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     }
     free (psz_charset);
 
-    var_Create( p_dec, "subsdec-align", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    var_Get( p_dec, "subsdec-align", &val );
-    p_sys->i_align = val.i_int;
+    p_sys->i_align = var_CreateGetInteger( p_dec, "subsdec-align" );
 
     if( p_dec->fmt_in.i_codec == VLC_CODEC_SSA
      && var_CreateGetBool( p_dec, "subsdec-formatted" ) )
@@ -685,6 +682,7 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
     psz_tag[ 0 ] = '\0';
 
     /* */
+    //Oo + 100 ???
     size_t i_buf_size = strlen( psz_subtitle ) + 100;
     char   *psz_html_start = malloc( i_buf_size );
     char   *psz_html = psz_html_start;
