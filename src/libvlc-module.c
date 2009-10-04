@@ -451,6 +451,18 @@ static const char *const ppsz_align_descriptions[] =
     "Hide mouse cursor and fullscreen controller after " \
     "n milliseconds, default is 3000 ms (3 sec.)")
 
+#define DEINTERLACE_TEXT N_("Deinterlace mode")
+#define DEINTERLACE_LONGTEXT N_( \
+    "Deinterlace method to use for video processing.")
+static const char * const ppsz_deinterlace[] = {
+    "", "discard", "blend", "mean", "bob",
+    "linear", "x", "yadif", "yadif2x"
+};
+static const char * const ppsz_deinterlace_text[] = {
+    N_("Disable"), N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"),
+    N_("Linear"), "X", "Yadif", "Yadif (2x)"
+};
+
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *const ppsz_pos_descriptions[] =
 { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -1665,7 +1677,10 @@ vlc_module_begin ()
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, true )
         change_integer_list( pi_align_values, ppsz_align_descriptions, NULL )
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, true )
-
+    add_string( "deinterlace", "", NULL,
+                DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
+        change_string_list( ppsz_deinterlace, ppsz_deinterlace_text, 0 )
+        change_safe()
 
     set_subcategory( SUBCAT_VIDEO_VOUT )
     add_module( "vout", "video output", NULL, NULL, VOUT_TEXT, VOUT_LONGTEXT,
