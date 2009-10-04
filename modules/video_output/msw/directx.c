@@ -1272,6 +1272,7 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic )
                         }
                     }
                 }
+                free( pi_codes );
             }
 
             if( b_result )
