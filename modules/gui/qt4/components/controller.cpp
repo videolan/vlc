@@ -710,11 +710,14 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
              this, setVoutList( vout_thread_t **, int ) );
 
     /* First Move */
+    QRect rect1 = getSettings()->value( "FullScreen/screen" ).toRect();
     QPoint pos1 = getSettings()->value( "FullScreen/pos" ).toPoint();
     int number =  config_GetInt( p_intf, "qt-fullscreen-screennumber" );
     if( number == -1 || number > QApplication::desktop()->numScreens() )
         number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
-    if( QApplication::desktop()->screenGeometry( number ).contains( pos1, true ) )
+
+    QRect rect = QApplication::desktop()->screenGeometry( number );
+    if( rect == rect1 && rect.contains( pos1, true ) )
     {
         move( pos1 );
         i_screennumber = number;
@@ -729,7 +732,11 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
 
 FullscreenControllerWidget::~FullscreenControllerWidget()
 {
-    getSettings()->setValue( "FullScreen/pos", pos() );
+    QPoint pos1 = pos();
+    QRect rect1 = QApplication::desktop()->screenGeometry( pos1 );
+    getSettings()->setValue( "FullScreen/pos", pos1 );
+    getSettings()->setValue( "FullScreen/screen", rect1 );
+
     setVoutList( NULL, 0 );
     vlc_mutex_destroy( &lock );
 }
