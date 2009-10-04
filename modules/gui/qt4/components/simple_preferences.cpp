@@ -209,7 +209,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.hwYUVBox->setVisible( false );
 #endif
 
-            CONFIG_GENERIC( "deinterlace-mode", StringList, ui.deinterLabel, deinterlaceBox );
+            CONFIG_GENERIC( "deinterlace", StringList, ui.deinterLabel, deinterlaceBox );
             CONFIG_GENERIC( "aspect-ratio", String, ui.arLabel, arLine );
 
             CONFIG_GENERIC_FILE( "snapshot-path", Directory, ui.dirLabel,
