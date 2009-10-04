@@ -2700,7 +2700,7 @@ vlc_module_begin ()
         change_short( 'p' )
         change_internal ()
         change_unsaveable ()
-    add_bool( "ignore-config", false, NULL, IGNORE_CONFIG_TEXT, "", false )
+    add_bool( "ignore-config", true, NULL, IGNORE_CONFIG_TEXT, "", false )
         change_internal ()
         change_unsaveable ()
     add_bool( "save-config", false, NULL, SAVE_CONFIG_TEXT, "",

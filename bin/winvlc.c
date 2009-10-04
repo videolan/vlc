@@ -126,7 +126,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     char *argv[argc + 1];
     BOOL crash_handling = TRUE;
     int j = 0;
-    for (int i = 0; i < argc; i++)
+
+    argv[j++] = FromWide( L"--no-ignore-config" );
+    for (int i = 1; i < argc; i++)
     {
         if(!wcscmp(wargv[i], L"--no-crashdump"))
         {
@@ -166,7 +168,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 
     /* Initialize libvlc */
     libvlc_instance_t *vlc;
-    vlc = libvlc_new (argc - 1, (const char **)argv + 1, &ex);
+    vlc = libvlc_new (argc, (const char **)argv, &ex);
     if (vlc != NULL)
     {
         libvlc_add_intf (vlc, "globalhotkeys,none", &ex);

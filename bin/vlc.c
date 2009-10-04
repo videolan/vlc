@@ -124,6 +124,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     const char *argv[i_argc + 3];
     int argc = 0;
 
+    argv[argc++] = "--no-ignore-config";
 #ifdef TOP_BUILDDIR
     argv[argc++] = FromLocale ("--plugin-path="TOP_BUILDDIR"/modules");
 #endif
@@ -136,6 +137,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     for (int i = 1; i < i_argc; i++)
         if ((argv[argc++] = FromLocale (ppsz_argv[i])) == NULL)
             return 1; // BOOM!
+    argv[argc] = NULL;
 
     libvlc_exception_t ex, dummy;
     libvlc_exception_init (&ex);
