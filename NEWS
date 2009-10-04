@@ -39,6 +39,7 @@ Video Output:
  * Added desktop mode to the Direct3D output module. It differs from DirectX
    desktop mode, because it hides the desktop icons, but reacts to mouse clicks.
  * New x11 and xv modules based on XCB
+ * New deinterlacing modes based on yadif and yadif(x2)
 
 Visualisation:
  * Support of .milk visualisation files using projectM libraries
