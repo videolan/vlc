@@ -195,12 +195,14 @@ static int Demux( demux_t *p_demux )
             p_input = input_item_NewExt( p_demux, psz_mrl, psz_name,
                                         i_options, ppsz_options, 0, i_duration );
 
+            LocaleFree( psz_parse );
+            free( psz_mrl );
+
             if ( psz_artist && *psz_artist )
                 input_item_SetArtist( p_input, psz_artist );
 
             input_item_AddSubItem( p_current_input, p_input );
             vlc_gc_decref( p_input );
-            free( psz_mrl );
         }
 
  error:
