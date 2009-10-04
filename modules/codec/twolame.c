@@ -177,16 +177,13 @@ static int OpenEncoder( vlc_object_t *p_this )
     twolame_set_in_samplerate( p_sys->p_twolame, p_enc->fmt_out.audio.i_rate );
     twolame_set_out_samplerate( p_sys->p_twolame, p_enc->fmt_out.audio.i_rate );
 
-    var_Get( p_enc, ENC_CFG_PREFIX "vbr", &val );
-    if ( val.b_bool )
+    if( var_GetBool( p_enc, ENC_CFG_PREFIX "vbr" ) )
     {
-        float i_quality;
-        var_Get( p_enc, ENC_CFG_PREFIX "quality", &val );
-        i_quality = val.i_int;
-        if ( i_quality > 50.0 ) i_quality = 50.0;
-        if ( i_quality < 0.0 ) i_quality = 0.0;
+        float f_quality = var_GetFloat( p_enc, ENC_CFG_PREFIX "quality" );
+        if ( f_quality > 50.0 ) f_quality = 50.0;
+        if ( f_quality < 0.0 ) f_quality = 0.0;
         twolame_set_VBR( p_sys->p_twolame, 1 );
-        twolame_set_VBR_q( p_sys->p_twolame, i_quality );
+        twolame_set_VBR_q( p_sys->p_twolame, f_quality );
     }
     else
     {
