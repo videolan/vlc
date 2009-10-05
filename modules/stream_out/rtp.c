@@ -233,6 +233,7 @@ static int               MuxSend( sout_stream_t *, sout_stream_id_t *,
 
 static sout_access_out_t *GrabberCreate( sout_stream_t *p_sout );
 static void* ThreadSend( vlc_object_t *p_this );
+static void *rtp_listen_thread( void * );
 
 static void SDPHandleUrl( sout_stream_t *, const char * );
 
@@ -319,7 +320,10 @@ struct sout_stream_id_t
     int               sinkc;
     rtp_sink_t       *sinkv;
     rtsp_stream_id_t *rtsp_id;
-    int              *listen_fd;
+    struct {
+        int          *fd;
+        vlc_thread_t  thread;
+    } listen;
 
     block_fifo_t     *p_fifo;
     int64_t           i_caching;
@@ -713,8 +717,8 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
 
         /* Oh boy, this is really ugly! (+ race condition on lock_es) */
         dstlen = sizeof( dst );
-        if( p_sys->es[0]->listen_fd != NULL )
-            getsockname( p_sys->es[0]->listen_fd[0],
+        if( p_sys->es[0]->listen.fd != NULL )
+            getsockname( p_sys->es[0]->listen.fd[0],
                          (struct sockaddr *)&dst, &dstlen );
         else
             getpeername( p_sys->es[0]->sinkv[0].rtp_fd,
@@ -802,7 +806,7 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
         }
         else
         {
-            if( id->listen_fd != NULL )
+            if( id->listen.fd != NULL )
                 sdp_AddAttribute( &psz_sdp, "setup", "passive" );
             if( p_sys->proto == IPPROTO_DCCP )
                 sdp_AddAttribute( &psz_sdp, "dccp-service-code",
@@ -965,7 +969,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->sinkv = NULL;
     id->rtsp_id = NULL;
     id->p_fifo = NULL;
-    id->listen_fd = NULL;
+    id->listen.fd = NULL;
 
     id->i_caching =
         (int64_t)1000 * var_GetInteger( p_stream, SOUT_CFG_PREFIX "caching");
@@ -986,12 +990,19 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 var_SetString (p_stream, "dccp-service", code);
             }   /* fall through */
             case IPPROTO_TCP:
-                id->listen_fd = net_Listen( VLC_OBJECT(p_stream),
+                id->listen.fd = net_Listen( VLC_OBJECT(p_stream),
                                             p_sys->psz_destination, i_port,
                                             p_sys->proto );
-                if( id->listen_fd == NULL )
+                if( id->listen.fd == NULL )
                 {
                     msg_Err( p_stream, "passive COMEDIA RTP socket failed" );
+                    goto error;
+                }
+                if( vlc_clone( &id->listen.thread, rtp_listen_thread, id,
+                               VLC_THREAD_PRIORITY_LOW ) )
+                {
+                    net_ListenClose( id->listen.fd );
+                    id->listen.fd = NULL;
                     goto error;
                 }
                 break;
@@ -1325,8 +1336,12 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         RtspDelId( p_sys->rtsp, id->rtsp_id );
     if( id->sinkc > 0 )
         rtp_del_sink( id, id->sinkv[0].rtp_fd ); /* sink for explicit dst= */
-    if( id->listen_fd != NULL )
-        net_ListenClose( id->listen_fd );
+    if( id->listen.fd != NULL )
+    {
+        vlc_cancel( id->listen.thread );
+        vlc_join( id->listen.thread, NULL );
+        net_ListenClose( id->listen.fd );
+    }
     if( id->srtp != NULL )
         srtp_destroy( id->srtp );
 
@@ -1560,20 +1575,32 @@ static void* ThreadSend( vlc_object_t *p_this )
             msg_Dbg( id, "removing socket %d", deadv[i] );
             rtp_del_sink( id, deadv[i] );
         }
-
-        /* Hopefully we won't overflow the SO_MAXCONN accept queue */
-        while( id->listen_fd != NULL )
-        {
-            int fd = net_Accept( id, id->listen_fd, 0 );
-            if( fd == -1 )
-                break;
-            msg_Dbg( id, "adding socket %d", fd );
-            rtp_add_sink( id, fd, true );
-        }
         vlc_restorecancel (canc);
     }
     return NULL;
 }
+
+
+/* This thread dequeues incoming connections (DCCP streaming) */
+static void *rtp_listen_thread( void *data )
+{
+    sout_stream_id_t *id = data;
+
+    assert( id->listen.fd != NULL );
+
+    for( ;; )
+    {
+        int fd = net_Accept( id, id->listen.fd, -1 );
+        if( fd == -1 )
+            continue;
+        int canc = vlc_savecancel( );
+        rtp_add_sink( id, fd, true );
+        vlc_restorecancel( canc );
+    }
+
+    assert( 0 );
+}
+
 
 int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux )
 {
