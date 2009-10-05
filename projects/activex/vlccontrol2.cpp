@@ -148,14 +148,8 @@ STDMETHODIMP VLCAudio::get_mute(VARIANT_BOOL* mute)
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        *mute = libvlc_audio_get_mute(p_libvlc, &ex) ?
+        *mute = libvlc_audio_get_mute(p_libvlc) ?
                         VARIANT_TRUE : VARIANT_FALSE;
-        hr = exception_bridge(&ex);
-    }
     return hr;
 };
 
@@ -164,13 +158,7 @@ STDMETHODIMP VLCAudio::put_mute(VARIANT_BOOL mute)
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_audio_set_mute(p_libvlc, VARIANT_FALSE != mute, &ex);
-        hr = exception_bridge(&ex);
-    }
+        libvlc_audio_set_mute(p_libvlc, VARIANT_FALSE != mute);
     return hr;
 };
 
@@ -182,13 +170,7 @@ STDMETHODIMP VLCAudio::get_volume(long* volume)
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        *volume = libvlc_audio_get_volume(p_libvlc, &ex);
-        hr = exception_bridge(&ex);
-    }
+        *volume = libvlc_audio_get_volume(p_libvlc);
     return hr;
 };
 
@@ -349,13 +331,7 @@ STDMETHODIMP VLCAudio::toggleMute()
     libvlc_instance_t* p_libvlc;
     HRESULT hr = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_audio_toggle_mute(p_libvlc, &ex);
-        hr = exception_bridge(&ex);
-    }
+        libvlc_audio_toggle_mute(p_libvlc);
     return hr;
 };
 

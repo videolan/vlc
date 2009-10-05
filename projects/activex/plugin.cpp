@@ -504,7 +504,7 @@ void VLCPlugin::initVLC()
     libvlc_audio_set_volume(_p_libvlc, _i_volume, NULL);
     if( _b_mute )
     {
-        libvlc_audio_set_mute(_p_libvlc, TRUE, NULL);
+        libvlc_audio_set_mute(_p_libvlc, TRUE);
     }
 
     // initial playlist item

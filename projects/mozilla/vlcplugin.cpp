@@ -748,8 +748,7 @@ void VlcPlugin::redrawToolbar()
     libvlc_exception_init( &ex );
 
     /* get mute info */
-    b_mute = libvlc_audio_get_mute( getVLC(), &ex );
-    libvlc_exception_clear( &ex );
+    b_mute = libvlc_audio_get_mute( getVLC() );
 
     gcv.foreground = BlackPixel( p_display, 0 );
     gc = XCreateGC( p_display, control, GCForeground, &gcv );
@@ -857,8 +856,7 @@ vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos
     libvlc_exception_clear( &ex );
 
     /* get mute info */
-    b_mute = libvlc_audio_get_mute( getVLC(), &ex );
-    libvlc_exception_clear( &ex );
+    b_mute = libvlc_audio_get_mute( getVLC() );
 
     /* is Pause of Play button clicked */
     if( (is_playing != 1) &&

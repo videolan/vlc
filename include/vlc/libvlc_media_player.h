@@ -962,27 +962,24 @@ VLC_PUBLIC_API void libvlc_audio_output_set_device_type( libvlc_instance_t *,
  * Toggle mute status.
  *
  * \param p_instance libvlc instance
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_audio_toggle_mute( libvlc_instance_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_audio_toggle_mute( libvlc_instance_t * );
 
 /**
  * Get current mute status.
  *
  * \param p_instance libvlc instance
- * \param p_e an initialized exception pointer
  * \return the mute status (boolean)
  */
-VLC_PUBLIC_API int libvlc_audio_get_mute( libvlc_instance_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_audio_get_mute( libvlc_instance_t * );
 
 /**
  * Set mute status.
  *
  * \param p_instance libvlc instance
  * \param status If status is true then mute, otherwise unmute
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_audio_set_mute( libvlc_instance_t *, int , libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_audio_set_mute( libvlc_instance_t *, int );
 
 /**
  * Get current audio level.
@@ -991,7 +988,7 @@ VLC_PUBLIC_API void libvlc_audio_set_mute( libvlc_instance_t *, int , libvlc_exc
  * \param p_e an initialized exception pointer
  * \return the audio level (int)
  */
-VLC_PUBLIC_API int libvlc_audio_get_volume( libvlc_instance_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_audio_get_volume( libvlc_instance_t * );
 
 /**
  * Set current audio level.

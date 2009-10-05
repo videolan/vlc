@@ -50,17 +50,12 @@ NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
 
 - (void)setMute:(BOOL)value
 {
-    libvlc_audio_set_mute([library instance], value, NULL);
+    libvlc_audio_set_mute([library instance], value);
 }
 
 - (BOOL)isMuted
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    BOOL result = libvlc_audio_get_mute([library instance], &ex);
-    catch_exception(&ex);
-    
-    return result;
+    return libvlc_audio_get_mute([library instance]);
 }
 
 - (void)setVolume:(int)value
@@ -74,10 +69,6 @@ NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
 
 - (int)volume
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    int result = libvlc_audio_get_volume([library instance], &ex);
-    catch_exception(&ex);
-    return result;
+    return libvlc_audio_get_volume([library instance]);
 }
 @end

@@ -349,13 +349,7 @@ STDMETHODIMP VLCControl::toggleMute(void)
     libvlc_instance_t* p_libvlc;
     HRESULT result = _p_instance->getVLC(&p_libvlc);
     if( SUCCEEDED(result) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_audio_toggle_mute(p_libvlc, &ex);
-        result = exception_bridge(&ex);
-    }
+        libvlc_audio_toggle_mute(p_libvlc);
     return result;
 };
 

@@ -206,14 +206,11 @@ unsigned short
 mediacontrol_sound_get_volume( mediacontrol_Instance *self,
                                mediacontrol_Exception *exception )
 {
-    libvlc_exception_t ex;
     int i_ret = 0;
 
     mediacontrol_exception_init( exception );
-    libvlc_exception_init( &ex );
 
-    i_ret = libvlc_audio_get_volume( self->p_instance, &ex );
-    HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
+    i_ret = libvlc_audio_get_volume( self->p_instance );
     /* FIXME: Normalize in [0..100] */
     return (unsigned short)i_ret;
 }
