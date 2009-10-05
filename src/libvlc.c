@@ -87,6 +87,7 @@
 
 #include <vlc_charset.h>
 #include <vlc_cpu.h>
+#include <vlc_url.h>
 
 #include "libvlc.h"
 
@@ -1305,13 +1306,16 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, const char *ppsz_argv[
 
         /* TODO: write an internal function of this one, to avoid
          *       unnecessary lookups. */
+        char *mrl = make_URI( ppsz_argv[i_opt] );
+        if( !mrl )
+            continue;
 
         playlist_t *p_playlist = pl_Hold( p_vlc );
-        playlist_AddExt( p_playlist, ppsz_argv[i_opt], NULL, PLAYLIST_INSERT,
-                         0, -1,
-                         i_options, ( i_options ? &ppsz_argv[i_opt + 1] : NULL ), VLC_INPUT_OPTION_TRUSTED,
-                         true, pl_Unlocked );
+        playlist_AddExt( p_playlist, mrl, NULL, PLAYLIST_INSERT,
+                0, -1, i_options, ( i_options ? &ppsz_argv[i_opt + 1] : NULL ),
+                VLC_INPUT_OPTION_TRUSTED, true, pl_Unlocked );
         pl_Release( p_vlc );
+        free( mrl );
     }
 
     return VLC_SUCCESS;
