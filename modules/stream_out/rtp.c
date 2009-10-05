@@ -1590,7 +1590,7 @@ static void *rtp_listen_thread( void *data )
 
     for( ;; )
     {
-        int fd = net_Accept( id, id->listen.fd, -1 );
+        int fd = net_Accept( id, id->listen.fd );
         if( fd == -1 )
             continue;
         int canc = vlc_savecancel( );

@@ -249,7 +249,7 @@ msg_Unsubscribe
 msleep
 mstrtime
 mwait
-__net_Accept
+net_Accept
 net_AcceptSingle
 __net_Connect
 __net_ConnectDgram

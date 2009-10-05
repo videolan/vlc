@@ -202,7 +202,7 @@ static int Open( vlc_object_t *p_this )
             goto error2;
         }
 
-        p_sys->p_thread->fd = net_Accept( p_access, p_fd_listen, -1 );
+        p_sys->p_thread->fd = net_Accept( p_access, p_fd_listen );
 
         net_ListenClose( p_fd_listen );
 

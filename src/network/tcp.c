@@ -272,49 +272,46 @@ int net_AcceptSingle (vlc_object_t *obj, int lfd)
 }
 
 
-/*****************************************************************************
- * __net_Accept:
- *****************************************************************************
- * Accept a connection on a set of listening sockets and return it
- *****************************************************************************/
-int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
+#undef net_Accept
+/**
+ * Accepts an new connection on a set of listening sockets.
+ * If there are no pending connections, this function will wait.
+ * @note If the thread needs to handle events other than incoming connections,
+ * you need to use poll() and net_AcceptSingle() instead.
+ *
+ * @param p_this VLC object for logging and object kill signal
+ * @param pi_fd listening socket set
+ * @return -1 on error (may be transient error due to network issues),
+ * a new socket descriptor on success.
+ */
+int net_Accept (vlc_object_t *p_this, int *pi_fd)
 {
-    int timeout = (i_wait < 0) ? -1 : i_wait / 1000;
     int evfd = vlc_object_waitpipe (p_this);
 
-    assert( pi_fd != NULL );
+    assert (pi_fd != NULL);
+
+    unsigned n = 0;
+    while (pi_fd[n] != -1)
+        n++;
+    struct pollfd ufd[n + 1];
+
+    /* Initialize file descriptor set */
+    for (unsigned i = 0; i <= n; i++)
+    {
+        ufd[i].fd = (i < n) ? pi_fd[i] : evfd;
+        ufd[i].events = POLLIN;
+    }
+    ufd[n].revents = 0;
 
     for (;;)
     {
-        unsigned n = 0;
-        while (pi_fd[n] != -1)
-            n++;
-        struct pollfd ufd[n + 1];
-
-        /* Initialize file descriptor set */
-        for (unsigned i = 0; i <= n; i++)
+        while (poll (ufd, n + (evfd != -1), -1) == -1)
         {
-            ufd[i].fd = (i < n) ? pi_fd[i] : evfd;
-            ufd[i].events = POLLIN;
-            ufd[i].revents = 0;
-        }
-
-        switch (poll (ufd, n + (evfd != -1), timeout))
-        {
-            case -1:
-                if (net_errno == EINTR)
-                    continue;
+            if (net_errno != EINTR)
+            {
                 msg_Err (p_this, "poll error: %m");
                 return -1;
-            case 0:
-                errno = ETIMEDOUT;
-                return -1;
-        }
-
-        if (ufd[n].revents)
-        {
-            errno = EINTR;
-            break;
+            }
         }
 
         for (unsigned i = 0; i < n; i++)
@@ -334,6 +331,12 @@ int __net_Accept( vlc_object_t *p_this, int *pi_fd, mtime_t i_wait )
             memmove (pi_fd + i, pi_fd + i + 1, n - (i + 1));
             pi_fd[n - 1] = sfd;
             return fd;
+        }
+
+        if (ufd[n].revents)
+        {
+            errno = EINTR;
+            break;
         }
     }
     return -1;

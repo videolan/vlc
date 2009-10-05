@@ -484,8 +484,7 @@ static void Run( intf_thread_t *p_intf )
             p_intf->p_sys->i_socket == -1 )
         {
             p_intf->p_sys->i_socket =
-                net_Accept( p_intf, p_intf->p_sys->pi_socket_listen,
-                            INTF_IDLE_SLEEP );
+                net_Accept( p_intf, p_intf->p_sys->pi_socket_listen );
             if( p_intf->p_sys->i_socket == -1 ) continue;
         }
 
