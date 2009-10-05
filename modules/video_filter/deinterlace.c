@@ -138,7 +138,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
     set_section( N_("Display"),NULL)
-    add_string( "deinterlace-mode", "discard", NULL, MODE_TEXT,
+    add_string( "filter-deinterlace-mode", "discard", NULL, MODE_TEXT,
                 MODE_LONGTEXT, false )
         change_string_list( mode_list, mode_list_text, 0 )
         change_safe ()
@@ -271,11 +271,11 @@ static int Create( vlc_object_t *p_this )
     }
 
     /* Look what method was requested */
-    psz_mode = var_CreateGetString( p_vout, "deinterlace-mode" );
+    psz_mode = var_CreateGetString( p_vout, "filter-deinterlace-mode" );
 
     if( !psz_mode )
     {
-        msg_Err( p_vout, "configuration variable deinterlace-mode empty" );
+        msg_Err( p_vout, "configuration variable filter-deinterlace-mode empty" );
         msg_Err( p_vout, "no deinterlace mode provided, using \"discard\"" );
 
         psz_mode = strdup( "discard" );
@@ -433,7 +433,7 @@ static int Init( vout_thread_t *p_vout )
 
     vout_filter_AddChild( p_vout, p_vout->p_sys->p_vout, MouseEvent );
 
-    var_AddCallback( p_vout, "deinterlace-mode", FilterCallback, NULL );
+    var_AddCallback( p_vout, "filter-deinterlace-mode", FilterCallback, NULL );
 
     return VLC_SUCCESS;
 }
@@ -458,7 +458,7 @@ static void End( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    var_DelCallback( p_vout, "deinterlace-mode", FilterCallback, NULL );
+    var_DelCallback( p_vout, "filter-deinterlace-mode", FilterCallback, NULL );
 
     for( int i = 0; i < HISTORY_SIZE; i++ )
     {
@@ -2058,8 +2058,8 @@ static int OpenFilter( vlc_object_t *p_this )
                    p_filter->p_cfg );
     var_Get( p_filter, FILTER_CFG_PREFIX "mode", &val );
 
-    var_Create( p_filter, "deinterlace-mode", VLC_VAR_STRING );
-    var_Set( p_filter, "deinterlace-mode", val );
+    var_Create( p_filter, "filter-deinterlace-mode", VLC_VAR_STRING );
+    var_Set( p_filter, "filter-deinterlace-mode", val );
     free( val.psz_string );
 
     if( Create( VLC_OBJECT(p_vout) ) != VLC_SUCCESS )

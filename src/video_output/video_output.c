@@ -1909,8 +1909,8 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
         var_Create( p_input, "deinterlace", VLC_VAR_STRING );
         var_SetString( p_input, "deinterlace", *p_mode->psz_mode ? p_mode->psz_mode : "disable" );
 
-        var_Create( p_input, "deinterlace-mode", VLC_VAR_STRING );
-        var_SetString( p_input, "deinterlace-mode", p_mode->psz_mode );
+        var_Create( p_input, "filter-deinterlace-mode", VLC_VAR_STRING );
+        var_SetString( p_input, "filter-deinterlace-mode", p_mode->psz_mode );
 
         var_Create( p_input, "sout-deinterlace-mode", VLC_VAR_STRING );
         var_SetString( p_input, "sout-deinterlace-mode", p_mode->psz_mode );
@@ -1922,7 +1922,7 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
 
     if( p_mode->b_vout_filter )
     {
-        psz_old = var_CreateGetString( p_vout, "deinterlace-mode" );
+        psz_old = var_CreateGetString( p_vout, "filter-deinterlace-mode" );
     }
     else
     {
@@ -1990,7 +1990,7 @@ static void DeinterlaceEnable( vout_thread_t *p_vout )
     {
         /* Get the initial value from filters if present */
         if( DeinterlaceIsPresent( p_vout, true ) )
-            psz_mode = var_CreateGetNonEmptyString( p_vout, "deinterlace-mode" );
+            psz_mode = var_CreateGetNonEmptyString( p_vout, "filter-deinterlace-mode" );
         else if( DeinterlaceIsPresent( p_vout, false ) )
             psz_mode = var_CreateGetNonEmptyString( p_vout, "sout-deinterlace-mode" );
     }
