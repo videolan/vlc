@@ -627,7 +627,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
          || !strcmp(psz_mode, "mean")    || !strcmp(psz_mode, "x") )
         {
             /* set deinterlace filter chosen */
-            var_SetString( p_vout, "deinterlace", psz_mode );
+            var_SetString( p_vout, "deinterlace-mode", psz_mode );
         }
         else
         {
@@ -638,7 +638,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
     else
     {
         /* disable deinterlace filter */
-        var_SetString( p_vout, "deinterlace", "" );
+        var_SetString( p_vout, "deinterlace-mode", "" );
     }
 
     vlc_object_release( p_vout );

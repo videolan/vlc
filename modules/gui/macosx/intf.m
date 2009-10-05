@@ -1925,7 +1925,7 @@ end:
                 var: "video-device" selector: @selector(toggleVar:)];
 
             [o_controls setupVarMenuItem: o_mi_deinterlace target: (vlc_object_t *)p_vout
-                var: "deinterlace" selector: @selector(toggleVar:)];
+                var: "deinterlace-mode" selector: @selector(toggleVar:)];
 
 #if 1
            [o_controls setupVarMenuItem: o_mi_ffmpeg_pp target:

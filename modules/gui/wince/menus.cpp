@@ -136,7 +136,7 @@ void PopupMenu( intf_thread_t *p_intf, HWND p_parent, POINT point )
         pi_objects[i++] = p_object;
         ppsz_varnames[i] = "zoom";
         pi_objects[i++] = p_object;
-        ppsz_varnames[i] = "deinterlace";
+        ppsz_varnames[i] = "deinterlace-mode";
         pi_objects[i++] = p_object;
         ppsz_varnames[i] = "aspect-ratio";
         pi_objects[i++] = p_object;
@@ -328,7 +328,7 @@ void RefreshVideoMenu( intf_thread_t *p_intf, HMENU hMenu )
 #endif
         ppsz_varnames[i] = "zoom";
         pi_objects[i++] = p_object;
-        ppsz_varnames[i] = "deinterlace";
+        ppsz_varnames[i] = "deinterlace-mode";
         pi_objects[i++] = p_object;
         ppsz_varnames[i] = "aspect-ratio";
         pi_objects[i++] = p_object;

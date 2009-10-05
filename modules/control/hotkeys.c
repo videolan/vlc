@@ -595,8 +595,8 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             else if( i_action == ACTIONID_DEINTERLACE && p_vout )
             {
                 vlc_value_t val={0}, val_list, text_list;
-                var_Get( p_vout, "deinterlace", &val );
-                if( var_Change( p_vout, "deinterlace", VLC_VAR_GETLIST,
+                var_Get( p_vout, "deinterlace-mode", &val );
+                if( var_Change( p_vout, "deinterlace-mode", VLC_VAR_GETLIST,
                                 &val_list, &text_list ) >= 0 )
                 {
                     int i;
@@ -610,7 +610,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                         }
                     }
                     if( i == val_list.p_list->i_count ) i = 0;
-                    var_SetString( p_vout, "deinterlace",
+                    var_SetString( p_vout, "deinterlace-mode",
                                    val_list.p_list->p_values[i].psz_string );
                     vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                      _("Deinterlace mode: %s"),
