@@ -50,13 +50,6 @@ vlc_module_end ()
 
 static int Control (vout_window_t *, int, va_list);
 
-/* TODO: move to vlc_variables.h */
-static inline void *var_GetAddress (vlc_object_t *o, const char *name)
-{
-    vlc_value_t val;
-    return var_Get (o, name, &val) ? NULL : val.p_address;
-}
-
 static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 
 /**
@@ -79,7 +72,7 @@ static int Open (vlc_object_t *obj)
      * more than one video track in the stream. */
     vlc_mutex_lock (&serializer);
     /* TODO: per-type list of busy drawables */
-    used = var_GetAddress (VLC_OBJECT (obj->p_libvlc), "drawables-in-use");
+    used = var_GetAddress (obj->p_libvlc, "drawables-in-use");
     if (used != NULL)
     {
         while (used[n] != NULL)
@@ -125,7 +118,7 @@ static void Close (vlc_object_t *obj)
 
     /* Remove this drawable from the list of busy ones */
     vlc_mutex_lock (&serializer);
-    used = var_GetAddress (VLC_OBJECT (obj->p_libvlc), "hwnd-in-use");
+    used = var_GetAddress (obj->p_libvlc, "hwnd-in-use");
     assert (used);
     while (used[n] != val)
     {

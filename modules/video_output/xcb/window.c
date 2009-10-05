@@ -497,7 +497,6 @@ static vlc_mutex_t serializer = VLC_STATIC_MUTEX;
 /** Acquire a drawable */
 static int AcquireDrawable (vlc_object_t *obj, xcb_window_t window)
 {
-    vlc_value_t val;
     xcb_window_t *used;
     size_t n = 0;
 
@@ -507,8 +506,7 @@ static int AcquireDrawable (vlc_object_t *obj, xcb_window_t window)
     /* Keep a list of busy drawables, so we don't overlap videos if there are
      * more than one video track in the stream. */
     vlc_mutex_lock (&serializer);
-    var_Get (VLC_OBJECT (obj->p_libvlc), "xid-in-use", &val);
-    used = val.p_address;
+    used = var_GetAddress (obj->p_libvlc, "xid-in-use");
     if (used != NULL)
     {
         while (used[n])
@@ -524,8 +522,7 @@ static int AcquireDrawable (vlc_object_t *obj, xcb_window_t window)
     {
         used[n] = window;
         used[n + 1] = 0;
-        val.p_address = used;
-        var_Set (obj->p_libvlc, "xid-in-use", val);
+        var_SetAddress (obj->p_libvlc, "xid-in-use", used);
     }
     else
     {
@@ -541,13 +538,11 @@ skip:
 /** Remove this drawable from the list of busy ones */
 static void ReleaseDrawable (vlc_object_t *obj, xcb_window_t window)
 {
-    vlc_value_t val;
     xcb_window_t *used;
     size_t n = 0;
 
     vlc_mutex_lock (&serializer);
-    var_Get (VLC_OBJECT (obj->p_libvlc), "xid-in-use", &val);
-    used = val.p_address;
+    used = var_GetAddress (obj->p_libvlc, "xid-in-use");
     assert (used);
     while (used[n] != window)
     {
