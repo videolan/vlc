@@ -229,6 +229,7 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
     PUSH_VAR( "autoscale" );
     PUSH_VAR( "aspect-ratio" );
     PUSH_VAR( "crop" );
+    PUSH_VAR( "deinterlace" );
     PUSH_VAR( "deinterlace-mode" );
     PUSH_VAR( "postprocess" );
 
@@ -571,7 +572,8 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
         ACT_ADDCHECK( current, "autoscale", qtr( "Sca&le" ) );
         ACT_ADDMENU( current, "aspect-ratio", qtr( "&Aspect Ratio" ) );
         ACT_ADDMENU( current, "crop", qtr( "&Crop" ) );
-        ACT_ADDMENU( current, "deinterlace-mode", qtr( "&Deinterlace" ) );
+        ACT_ADDMENU( current, "deinterlace", qtr( "&Deinterlace" ) );
+        ACT_ADDMENU( current, "deinterlace-mode", qtr( "&Deinterlace mode" ) );
         ACT_ADDMENU( current, "postprocess", qtr( "&Post processing" ) );
     }
 
