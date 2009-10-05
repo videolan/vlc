@@ -416,6 +416,15 @@ static inline char *__var_GetNonEmptyString( vlc_object_t *p_obj, const char *ps
     return NULL;
 }
 
+LIBVLC_USED
+static inline void *__var_GetAddress( vlc_object_t *p_obj, const char *psz_name )
+{
+    vlc_value_t val;
+    if( var_GetChecked( p_obj, psz_name, VLC_VAR_ADDRESS, &val ) )
+        return NULL;
+    else
+        return val.p_address;
+}
 
 /**
  * __var_GetInteger() with automatic casting
@@ -438,6 +447,10 @@ static inline char *__var_GetNonEmptyString( vlc_object_t *p_obj, const char *ps
  */
 #define var_GetString(a,b)   __var_GetString( VLC_OBJECT(a),b)
 #define var_GetNonEmptyString(a,b)   __var_GetNonEmptyString( VLC_OBJECT(a),b)
+/**
+ * __var_GetAddress() with automatic casting
+ */
+#define var_GetAddress(a,b)  __var_GetAddress( VLC_OBJECT(a),b)
 
 
 
