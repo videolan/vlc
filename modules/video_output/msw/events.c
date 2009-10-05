@@ -774,13 +774,10 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         {
             case IDM_TOGGLE_ON_TOP:            /* toggle the "on top" status */
             {
-                vlc_value_t val;
                 msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND: IDM_TOGGLE_ON_TOP");
 
                 /* Change the current value */
-                var_Get( p_vout, "video-on-top", &val );
-                val.b_bool = !val.b_bool;
-                var_Set( p_vout, "video-on-top", val );
+                var_ToggleBool( p_vout, "video-on-top" );
                 return 0;
             }
         }

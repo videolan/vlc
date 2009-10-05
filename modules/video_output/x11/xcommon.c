@@ -1121,9 +1121,7 @@ static int ManageVideo( vout_thread_t *p_vout )
                         val.i_int &= ~2;
                         var_Set( p_vout, "mouse-button-down", val );
 
-                        var_Get( p_vout->p_libvlc, "intf-show", &val );
-                        val.b_bool = !val.b_bool;
-                        var_Set( p_vout->p_libvlc, "intf-show", val );
+                        var_ToggleBool( p_vout->p_libvlc, "intf-show" );
                     }
                     break;
 
