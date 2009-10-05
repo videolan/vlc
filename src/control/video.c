@@ -624,10 +624,12 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
         /* be sure that the filter name given is supported */
         if( !strcmp(psz_mode, "blend")   || !strcmp(psz_mode, "bob")
          || !strcmp(psz_mode, "discard") || !strcmp(psz_mode, "linear")
-         || !strcmp(psz_mode, "mean")    || !strcmp(psz_mode, "x") )
+         || !strcmp(psz_mode, "mean")    || !strcmp(psz_mode, "x")
+         || !strcmp(psz_mode, "yadif")   || !strcmp(psz_mode, "yadif2x") )
         {
             /* set deinterlace filter chosen */
             var_SetString( p_vout, "deinterlace-mode", psz_mode );
+            var_SetInteger( p_vout, "deinterlace", 1 );
         }
         else
         {
@@ -638,7 +640,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
     else
     {
         /* disable deinterlace filter */
-        var_SetString( p_vout, "deinterlace-mode", "" );
+        var_SetInteger( p_vout, "deinterlace", 0 );
     }
 
     vlc_object_release( p_vout );
