@@ -409,19 +409,17 @@ int libvlc_audio_get_track( libvlc_media_player_t *p_mi,
     vlc_value_t val_list;
     vlc_value_t val;
     int i_track = -1;
-    int i_ret = -1;
     int i;
 
     if( !p_input_thread )
         return -1;
 
-    i_ret = var_Get( p_input_thread, "audio-es", &val );
-    if( i_ret < 0 )
+    if( var_Get( p_input_thread, "audio-es", &val ) < 0 )
     {
         vlc_object_release( p_input_thread );
         libvlc_exception_raise( p_e );
         libvlc_printerr( "Audio track information not found" );
-        return i_ret;
+        return -1;
     }
 
     var_Change( p_input_thread, "audio-es", VLC_VAR_GETCHOICES, &val_list, NULL );
