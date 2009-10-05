@@ -165,7 +165,7 @@ int main( int i_argc, const char *ppsz_argv[] )
         libvlc_release (vlc);
     }
 
-    for (int i = 0; i < argc; i++)
+    for (int i = 1; i < argc; i++)
         LocaleFree (argv[i]);
 
     return vlc == NULL || libvlc_exception_raised (&ex);
