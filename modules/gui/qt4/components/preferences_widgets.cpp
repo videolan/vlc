@@ -214,7 +214,8 @@ void InterfacePreviewWidget::setPreview( int comboid )
     */
     const char * pixmaps[] = { ":/prefsmenu/sample_classic",
                                ":/prefsmenu/sample_complete",
-                               ":/prefsmenu/sample_minimal" };
+                               ":/prefsmenu/sample_minimal",
+                                ":/prefsmenu/sample_skins" };
     setPixmap( QPixmap( pixmaps[ comboid ] ) );
 }
 
