@@ -413,9 +413,7 @@ void libvlc_media_release( libvlc_media_t *p_md )
  **************************************************************************/
 void libvlc_media_retain( libvlc_media_t *p_md )
 {
-    if (!p_md)
-        return;
-
+    assert (p_md);
     p_md->i_refcount++;
 }
 
