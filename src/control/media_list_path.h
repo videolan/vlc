@@ -127,7 +127,7 @@ get_path_rec( const libvlc_media_list_path_t path, libvlc_media_list_t * p_curre
         if( p_md == p_searched_md )
             return libvlc_media_list_path_copy_by_appending( path, i ); /* Found! */
 
-        libvlc_media_list_t * p_subitems = libvlc_media_subitems( p_md, NULL );
+        libvlc_media_list_t * p_subitems = libvlc_media_subitems( p_md );
         libvlc_media_release( p_md );
         if( p_subitems )
         {
@@ -175,7 +175,7 @@ libvlc_media_list_item_at_path( libvlc_media_list_t * p_mlist, const libvlc_medi
         if( path[i+1] == -1 )
             return p_md;
 
-        p_current_mlist = libvlc_media_subitems( p_md, NULL );
+        p_current_mlist = libvlc_media_subitems( p_md );
         libvlc_media_release( p_md );
  
         if( !p_current_mlist )
@@ -211,7 +211,7 @@ libvlc_media_list_parentlist_at_path( libvlc_media_list_t * p_mlist, const libvl
 
         p_md = libvlc_media_list_item_at_index( p_current_mlist, path[i], NULL );
 
-        p_current_mlist = libvlc_media_subitems( p_md, NULL );
+        p_current_mlist = libvlc_media_subitems( p_md );
         libvlc_media_release( p_md );
  
         if( !p_current_mlist )
@@ -236,7 +236,7 @@ libvlc_media_list_sublist_at_path( libvlc_media_list_t * p_mlist, const libvlc_m
     if( !p_md )
         return NULL;
  
-    ret = libvlc_media_subitems( p_md, NULL );
+    ret = libvlc_media_subitems( p_md );
     libvlc_media_release( p_md );
  
     return ret;

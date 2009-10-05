@@ -25,6 +25,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc/libvlc.h>
 #include <vlc/libvlc_media.h>
 #include <vlc/libvlc_media_list.h> // For the subitems, here for convenience
@@ -491,7 +493,6 @@ libvlc_media_set_state( libvlc_media_t *p_md,
                                    libvlc_state_t state )
 {
     libvlc_event_t event;
-    VLC_UNUSED(p_e);
 
     p_md->state = state;
 
@@ -529,7 +530,7 @@ libvlc_media_event_manager( libvlc_media_t * p_md )
  * Get duration of media object (in ms)
  **************************************************************************/
 int64_t
-libvlc_media_get_duration( libvlc_media_t * p_md )
+libvlc_media_get_duration( libvlc_media_t * p_md, libvlc_exception_t *p_e )
 {
     assert( p_md );
 
@@ -550,14 +551,9 @@ int
 libvlc_media_is_preparsed( libvlc_media_t * p_md )
 {
     assert( p_md );
-    VLC_UNUSED(p_e);
 
     if( !p_md->p_input_item )
-    {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "No input item" );
         return false;
-    }
 
     return input_item_IsPreparsed( p_md->p_input_item );
 }

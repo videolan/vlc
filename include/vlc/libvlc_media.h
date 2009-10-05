@@ -136,12 +136,11 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_new_as_node(
  *
  * \param p_instance the instance
  * \param ppsz_options the options (as a string)
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_media_add_option(
                                    libvlc_media_t * p_md,
-                                   const char * ppsz_options,
-                                   libvlc_exception_t * p_e );
+                                   const char * ppsz_options );
+
 /**
  * Add an option to the media with configurable flags.
  *
@@ -154,13 +153,11 @@ VLC_PUBLIC_API void libvlc_media_add_option(
  * \param p_instance the instance
  * \param ppsz_options the options (as a string)
  * \param i_flags the flags for this option
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_media_add_option_flag(
                                    libvlc_media_t * p_md,
                                    const char * ppsz_options,
-                                   libvlc_media_option_t i_flags,
-                                   libvlc_exception_t * p_e );
+                                   libvlc_media_option_t i_flags );
 
 
 /**
@@ -190,11 +187,9 @@ VLC_PUBLIC_API void libvlc_media_release(
  * Get the media resource locator (mrl) from a media descriptor object
  *
  * \param p_md a media descriptor object
- * \param p_e an initialized exception object
  * \return string with mrl of media descriptor object
  */
-VLC_PUBLIC_API char * libvlc_media_get_mrl( libvlc_media_t * p_md,
-                                                       libvlc_exception_t * p_e );
+VLC_PUBLIC_API char * libvlc_media_get_mrl( libvlc_media_t * p_md );
 
 /**
  * Duplicate a media descriptor object.
@@ -208,13 +203,12 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_duplicate( libvlc_media_t * );
  *
  * \param p_meta_desc the media to read
  * \param e_meta the meta to read
- * \param p_e an initialized exception pointer
  * \return the media's meta
  */
 VLC_PUBLIC_API char * libvlc_media_get_meta(
                                    libvlc_media_t *p_meta_desc,
-                                   libvlc_meta_t e_meta,
-                                   libvlc_exception_t *p_e );
+                                   libvlc_meta_t e_meta );
+
 /**
  * Get current state of media descriptor object. Possible media states
  * are defined in libvlc_structures.c ( libvlc_NothingSpecial=0,
@@ -224,12 +218,10 @@ VLC_PUBLIC_API char * libvlc_media_get_meta(
  *
  * @see libvlc_state_t
  * \param p_meta_desc a media descriptor object
- * \param p_e an initialized exception object
  * \return state of media descriptor object
  */
 VLC_PUBLIC_API libvlc_state_t libvlc_media_get_state(
-                                   libvlc_media_t *p_meta_desc,
-                                   libvlc_exception_t *p_e );
+                                   libvlc_media_t *p_meta_desc );
 
 
 /**
@@ -238,7 +230,6 @@ VLC_PUBLIC_API libvlc_state_t libvlc_media_get_state(
  * libvlc_media_list_release() to decrement the reference counting.
  *
  * \param p_md media descriptor object
- * \param p_e initalized exception object
  * \return list of media descriptor subitems or NULL
  */
 
@@ -247,20 +238,17 @@ VLC_PUBLIC_API libvlc_state_t libvlc_media_get_state(
 #define VLC_FORWARD_DECLARE_OBJECT(a) struct a
 
 VLC_PUBLIC_API VLC_FORWARD_DECLARE_OBJECT(libvlc_media_list_t *)
-libvlc_media_subitems( libvlc_media_t *p_md,
-                      libvlc_exception_t *p_e );
+libvlc_media_subitems( libvlc_media_t *p_md );
 
 /**
  * Get event manager from media descriptor object.
  * NOTE: this function doesn't increment reference counting.
  *
  * \param p_md a media descriptor object
- * \param p_e an initialized exception object
  * \return event manager object
  */
 VLC_PUBLIC_API libvlc_event_manager_t *
-    libvlc_media_event_manager( libvlc_media_t * p_md,
-                                           libvlc_exception_t * p_e );
+    libvlc_media_event_manager( libvlc_media_t * p_md );
 
 /**
  * Get duration (in ms) of media descriptor object item.
@@ -277,12 +265,10 @@ VLC_PUBLIC_API libvlc_time_t
  * Get preparsed status for media descriptor object.
  *
  * \param p_md media descriptor object
- * \param p_e an initialized exception object
  * \return true if media object has been preparsed otherwise it returns false
  */
 VLC_PUBLIC_API int
-   libvlc_media_is_preparsed( libvlc_media_t * p_md,
-                                         libvlc_exception_t * p_e );
+   libvlc_media_is_preparsed( libvlc_media_t * p_md );
 
 /**
  * Sets media descriptor's user_data. user_data is specialized data
@@ -291,12 +277,10 @@ VLC_PUBLIC_API int
  *
  * \param p_md media descriptor object
  * \param p_new_user_data pointer to user data
- * \param p_e an initialized exception object
  */
 VLC_PUBLIC_API void
     libvlc_media_set_user_data( libvlc_media_t * p_md,
-                                           void * p_new_user_data,
-                                           libvlc_exception_t * p_e);
+                                           void * p_new_user_data );
 
 /**
  * Get media descriptor's user_data. user_data is specialized data
@@ -304,11 +288,9 @@ VLC_PUBLIC_API void
  * an native object that references a libvlc_media_t pointer
  *
  * \param p_md media descriptor object
- * \param p_e an initialized exception object
  */
 VLC_PUBLIC_API void *
-    libvlc_media_get_user_data( libvlc_media_t * p_md,
-                                           libvlc_exception_t * p_e);
+    libvlc_media_get_user_data( libvlc_media_t * p_md );
 
 /** @}*/
 

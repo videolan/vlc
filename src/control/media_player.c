@@ -166,7 +166,7 @@ input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_media_player_t * p_mi = p_userdata;
     libvlc_event_t event;
 
-    libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
+    libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial );
     event.type = libvlc_MediaPlayerSeekableChanged;
     event.u.media_player_seekable_changed.new_seekable = newval.b_bool;
 
@@ -185,7 +185,7 @@ input_pausable_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_media_player_t * p_mi = p_userdata;
     libvlc_event_t event;
 
-    libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, NULL);
+    libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial );
     event.type = libvlc_MediaPlayerPausableChanged;
     event.u.media_player_pausable_changed.new_pausable = newval.b_bool;
 
@@ -240,7 +240,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
                 return VLC_SUCCESS;
         }
 
-        libvlc_media_set_state( p_mi->p_md, libvlc_state, NULL );
+        libvlc_media_set_state( p_mi->p_md, libvlc_state );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_ABORT )
@@ -248,7 +248,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         libvlc_state_t libvlc_state = libvlc_Stopped;
         event.type = libvlc_MediaPlayerStopped;
 
-        libvlc_media_set_state( p_mi->p_md, libvlc_state, NULL );
+        libvlc_media_set_state( p_mi->p_md, libvlc_state );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_POSITION )
@@ -486,7 +486,7 @@ void libvlc_media_player_set_media(
                           !p_mi->p_input_thread->b_error );
 
     if( p_mi->p_md )
-        libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial, p_e );
+        libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial );
 
     libvlc_media_release( p_mi->p_md );
 
@@ -659,7 +659,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
     {
         /* Send a stop notification event only if we are in playing,
          * buffering or paused states */
-        libvlc_media_set_state( p_mi->p_md, libvlc_Stopped, p_e );
+        libvlc_media_set_state( p_mi->p_md, libvlc_Stopped );
 
         /* Construct and send the event */
         libvlc_event_t event;
@@ -1091,7 +1091,7 @@ libvlc_state_t libvlc_media_player_get_state(
         return state;
     }
 
-    state = libvlc_media_get_state( p_mi->p_md, NULL );
+    state = libvlc_media_get_state( p_mi->p_md );
     if( state == libvlc_Playing )
     {
         float caching;

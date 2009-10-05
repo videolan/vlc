@@ -61,7 +61,7 @@ install_md_listener( libvlc_media_list_view_t * p_mlv,
                      libvlc_media_t * p_md)
 {
     libvlc_media_list_t * p_mlist;
-    if((p_mlist = libvlc_media_subitems( p_md, NULL )))
+    if((p_mlist = libvlc_media_subitems( p_md )))
     {
         libvlc_media_list_lock( p_mlist );
         int i, count = libvlc_media_list_count( p_mlist, NULL );
@@ -110,7 +110,7 @@ uninstall_md_listener( libvlc_media_list_view_t * p_mlv,
                          media_list_subitem_added, p_mlv, &ignored_exception );
     if( libvlc_exception_raised( &ignored_exception ) )
         libvlc_exception_clear( &ignored_exception ); /* We don't care if we encounter an exception */
-    if((p_mlist = libvlc_media_subitems( p_md, NULL )))
+    if((p_mlist = libvlc_media_subitems( p_md )))
     {
         libvlc_media_list_lock( p_mlist );
         libvlc_event_detach( p_mlist->p_event_manager,
@@ -160,7 +160,7 @@ media_list_subitem_added( const libvlc_event_t * p_event, void * p_user_data )
     libvlc_media_t * p_submd = p_event->u.media_subitem_added.new_child;
     libvlc_media_t * p_md = p_event->p_obj;
 
-    if((p_mlist = libvlc_media_subitems( p_md, NULL )))
+    if((p_mlist = libvlc_media_subitems( p_md )))
     {
         /* We have a mlist to which we're going to listen to events
          * thus, no need to wait for SubItemAdded events */
@@ -449,7 +449,7 @@ libvlc_media_list_view_children_for_item( libvlc_media_list_view_t * p_mlv,
     libvlc_media_list_t * p_mlist;
     libvlc_media_list_view_t * ret;
 
-    p_mlist = libvlc_media_subitems(p_md, p_e);
+    p_mlist = libvlc_media_subitems(p_md);
     if(!p_mlist) return NULL;
 
     ret = p_mlv->pf_constructor( p_mlist, p_e );

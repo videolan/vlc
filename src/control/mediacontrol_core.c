@@ -208,7 +208,7 @@ mediacontrol_start( mediacontrol_Instance *self,
     {
         /* A media was defined. Get its mrl to reuse it, but reset the options
            (because start-time may have been set on the previous invocation */
-        psz_name = libvlc_media_get_mrl( p_media, &ex );
+        psz_name = libvlc_media_get_mrl( p_media );
         HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
 
         /* Create a new media */
@@ -224,7 +224,7 @@ mediacontrol_start( mediacontrol_Instance *self,
             psz_from = ( char * )malloc( 20 * sizeof( char ) );
             i_from = private_mediacontrol_position2microsecond( self->p_media_player, a_position ) / 1000000;
             snprintf( psz_from, 20, "start-time=%"PRId64, i_from );
-            libvlc_media_add_option( p_media, psz_from, &ex );
+            libvlc_media_add_option( p_media, psz_from );
             HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
         }
 
@@ -315,7 +315,7 @@ mediacontrol_get_mrl( mediacontrol_Instance *self,
     {
         char * psz_mrl;
 
-        psz_mrl = libvlc_media_get_mrl( p_media, &ex );
+        psz_mrl = libvlc_media_get_mrl( p_media );
         HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
         return psz_mrl;
     }
@@ -406,7 +406,7 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
             break;
         }
 
-        retval->url = libvlc_media_get_mrl( p_media, &ex );
+        retval->url = libvlc_media_get_mrl( p_media );
 
         retval->position = libvlc_media_player_get_time( self->p_media_player, &ex );
         if( libvlc_exception_raised( &ex ) )

@@ -1070,14 +1070,7 @@ int  VLCPlugin::playlist_add_extended_untrusted(const char *mrl, int optc, const
         return -1;
 
     for( int i = 0; i < optc; ++i )
-    {
-        libvlc_media_add_option_flag(p_m, optv[i], libvlc_media_option_unique, ex);
-        if( libvlc_exception_raised(ex) )
-        {
-            libvlc_media_release(p_m);
-            return -1;
-        }
-    }
+        libvlc_media_add_option_flag(p_m, optv[i], libvlc_media_option_unique);
 
     libvlc_media_list_lock(_p_mlist);
     libvlc_media_list_add_media(_p_mlist,p_m,ex);

@@ -68,7 +68,7 @@ hierarch_node_media_list_view_count( libvlc_media_list_view_t * p_mlv,
     {
         p_md = libvlc_media_list_item_at_index( p_mlv->p_mlist, i, p_e );
         if( !p_md ) continue;
-        p_submlist = libvlc_media_subitems( p_md, p_e );
+        p_submlist = libvlc_media_subitems( p_md );
         if( !p_submlist ) continue;
         libvlc_media_release( p_md );
         libvlc_media_list_release( p_submlist );
@@ -96,7 +96,7 @@ hierarch_node_media_list_view_item_at_index( libvlc_media_list_view_t * p_mlv,
     {
         p_md = libvlc_media_list_item_at_index( p_mlv->p_mlist, i, p_e );
         if( !p_md ) continue;
-        p_submlist = libvlc_media_subitems( p_md, p_e );
+        p_submlist = libvlc_media_subitems( p_md );
         if( !p_submlist ) continue;
         libvlc_media_list_release( p_submlist );
         current_index++;
@@ -124,7 +124,7 @@ hierarch_node_media_list_view_children_at_index( libvlc_media_list_view_t * p_ml
     libvlc_media_list_view_t * p_ret;
     p_md = hierarch_node_media_list_view_item_at_index( p_mlv, index, p_e );
     if( !p_md ) return NULL;
-    p_submlist = libvlc_media_subitems( p_md, p_e );
+    p_submlist = libvlc_media_subitems( p_md );
     libvlc_media_release( p_md );
     if( !p_submlist ) return NULL;
     p_ret = libvlc_media_list_hierarchical_node_view( p_submlist, p_e );
@@ -146,7 +146,7 @@ index_of_item( libvlc_media_list_view_t * p_mlv, libvlc_media_t * p_md )
     {
         p_iter_md = libvlc_media_list_item_at_index( p_mlv->p_mlist, i, NULL );
         if( !p_iter_md ) continue;
-        p_submlist = libvlc_media_subitems( p_iter_md, NULL );
+        p_submlist = libvlc_media_subitems( p_iter_md );
         if( !p_submlist ) continue;
         libvlc_media_list_release( p_submlist );
         libvlc_media_release( p_iter_md );
@@ -162,7 +162,7 @@ item_is_already_added( libvlc_media_t * p_md )
 {
     libvlc_media_list_t * p_submlist;
 
-    p_submlist = libvlc_media_subitems( p_md, NULL );
+    p_submlist = libvlc_media_subitems( p_md );
     if( !p_submlist ) return false;
     int count = libvlc_media_list_count( p_submlist, NULL );
     libvlc_media_list_release( p_submlist );

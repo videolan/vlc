@@ -155,7 +155,7 @@ import_mlist_rec( libvlc_media_list_view_t * p_mlv,
         libvlc_media_list_t * p_submlist;
         p_md = libvlc_media_list_item_at_index( p_mlist, i, p_e );
         vlc_array_append( &p_mlv->p_this_view_data->array, p_md );
-        p_submlist = libvlc_media_subitems( p_md, p_e );
+        p_submlist = libvlc_media_subitems( p_md );
         if( p_submlist )
         {
             libvlc_media_list_lock( p_submlist );
