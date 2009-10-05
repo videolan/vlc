@@ -594,31 +594,37 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             }
             else if( i_action == ACTIONID_DEINTERLACE && p_vout )
             {
-                vlc_value_t val={0}, val_list, text_list;
-                var_Get( p_vout, "deinterlace-mode", &val );
-                if( var_Change( p_vout, "deinterlace-mode", VLC_VAR_GETLIST,
-                                &val_list, &text_list ) >= 0 )
+                int i_deinterlace = var_GetInteger( p_vout, "deinterlace" );
+                if( i_deinterlace != 0 )
                 {
-                    int i;
-                    for( i = 0; i < val_list.p_list->i_count; i++ )
-                    {
-                        if( !strcmp( val_list.p_list->p_values[i].psz_string,
-                                     val.psz_string ) )
-                        {
-                            i++;
-                            break;
-                        }
-                    }
-                    if( i == val_list.p_list->i_count ) i = 0;
-                    var_SetString( p_vout, "deinterlace-mode",
-                                   val_list.p_list->p_values[i].psz_string );
+                    var_SetInteger( p_vout, "deinterlace", 0 );
                     vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
-                                     _("Deinterlace mode: %s"),
-                                     text_list.p_list->p_values[i].psz_string );
-
-                    var_FreeList( &val_list, &text_list );
+                                     "%s", _("Deinterlace off") );
                 }
-                free( val.psz_string );
+                else
+                {
+                    var_SetInteger( p_vout, "deinterlace", 1 );
+
+                    char *psz_mode = var_GetString( p_vout, "deinterlace-mode" );
+                    vlc_value_t vlist, tlist;
+                    if( psz_mode && !var_Change( p_vout, "deinterlace-mode", VLC_VAR_GETCHOICES, &vlist, &tlist ) >= 0 )
+                    {
+                        const char *psz_text = NULL;
+                        for( int i = 0; i < vlist.p_list->i_count; i++ )
+                        {
+                            if( !strcmp( vlist.p_list->p_values[i].psz_string, psz_mode ) )
+                            {
+                                psz_text = tlist.p_list->p_values[i].psz_string;
+                                break;
+                            }
+                        }
+                        vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
+                                         "%s (%s)", _("Deinterlace on"), psz_text ? psz_text : psz_mode );
+
+                        var_FreeList( &vlist, &tlist );
+                    }
+                    free( psz_mode );
+                }
             }
             else if( ( i_action == ACTIONID_ZOOM ||
                        i_action == ACTIONID_UNZOOM ) && p_vout )
