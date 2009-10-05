@@ -451,15 +451,25 @@ static const char *const ppsz_align_descriptions[] =
     "Hide mouse cursor and fullscreen controller after " \
     "n milliseconds, default is 3000 ms (3 sec.)")
 
+#define DEINTERLACE_TEXT N_("Deinterlace")
+#define DEINTERLACE_LONGTEXT N_(\
+    "Deinterlace")
+static const int pi_deinterlace[] = {
+    0, -1, 1
+};
+static const char * const  ppsz_deinterlace_text[] = {
+    "Off", "Automatic", "On"
+};
+
 #define DEINTERLACE_MODE_TEXT N_("Deinterlace mode")
 #define DEINTERLACE_MODE_LONGTEXT N_( \
     "Deinterlace method to use for video processing.")
 static const char * const ppsz_deinterlace_mode[] = {
-    "", "discard", "blend", "mean", "bob",
+    "discard", "blend", "mean", "bob",
     "linear", "x", "yadif", "yadif2x"
 };
 static const char * const ppsz_deinterlace_mode_text[] = {
-    N_("Disable"), N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"),
+    N_("Discard"), N_("Blend"), N_("Mean"), N_("Bob"),
     N_("Linear"), "X", "Yadif", "Yadif (2x)"
 };
 
@@ -1677,7 +1687,11 @@ vlc_module_begin ()
     add_integer( "align", 0, NULL, ALIGN_TEXT, ALIGN_LONGTEXT, true )
         change_integer_list( pi_align_values, ppsz_align_descriptions, NULL )
     add_float( "zoom", 1, NULL, ZOOM_TEXT, ZOOM_LONGTEXT, true )
-    add_string( "deinterlace-mode", "", NULL,
+    add_integer( "deinterlace", 0, NULL,
+                 DEINTERLACE_TEXT, DEINTERLACE_LONGTEXT, false )
+        change_integer_list( pi_deinterlace, ppsz_deinterlace_text, 0 )
+        change_safe()
+    add_string( "deinterlace-mode", "blend", NULL,
                 DEINTERLACE_MODE_TEXT, DEINTERLACE_MODE_LONGTEXT, false )
         change_string_list( ppsz_deinterlace_mode, ppsz_deinterlace_mode_text, 0 )
         change_safe()
