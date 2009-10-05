@@ -84,22 +84,22 @@ void Close_IFO( vlc_object_t *p_this )
 
 static int Demux( demux_t *p_demux )
 {
-    char *psz_url = NULL;
-    size_t len = 0;
-    input_item_t *p_input;
+    size_t len = strlen( "dvd://" ) + strlen( p_demux->psz_path )
+               - strlen( "VIDEO_TS.IFO" );
+    char *psz_url;
 
-    input_item_t *p_current_input = GetCurrentItem(p_demux);
-
-    len = strlen( "dvd://" ) + strlen( p_demux->psz_path )
-          - strlen( "VIDEO_TS.IFO" );
-    psz_url = (char *)malloc( len+1 );
+    psz_url = malloc( len+1 );
+    if( !psz_url )
+        return 0;
     snprintf( psz_url, len+1, "dvd://%s", p_demux->psz_path );
 
-    p_input = input_item_New( p_demux, psz_url, psz_url );
+    input_item_t *p_current_input = GetCurrentItem(p_demux);
+    input_item_t *p_input = input_item_New( p_demux, psz_url, psz_url );
     input_item_AddSubItem( p_current_input, p_input );
     vlc_gc_decref( p_input );
 
     vlc_gc_decref(p_current_input);
+    free( psz_url );
 
     return 0; /* Needed for correct operation of go back */
 }
