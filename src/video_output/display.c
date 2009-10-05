@@ -455,7 +455,7 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
         const int x = (int)va_arg(args, int);
         const int y = (int)va_arg(args, int);
         if (x != osys->mouse.state.i_x || y != osys->mouse.state.i_y) {
-            msg_Dbg(vd, "VoutDisplayEvent 'mouse' @%d,%d", x, y);
+            //msg_Dbg(vd, "VoutDisplayEvent 'mouse' @%d,%d", x, y);
 
             m.i_x = x;
             m.i_y = y;
