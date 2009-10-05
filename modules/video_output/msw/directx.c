@@ -599,20 +599,20 @@ BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
                                  HMONITOR hmon )
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_context;
-    vlc_value_t device;
+    char *psz_device;
 
     msg_Dbg( p_vout, "DirectXEnumCallback: %s, %s", psz_desc, psz_drivername );
 
     if( hmon )
     {
-        var_Get( p_vout, "directx-device", &device );
+        psz_device = var_GetString( p_vout, "directx-device" );
 
-        if( ( !device.psz_string || !*device.psz_string ) &&
+        if( ( !psz_device || !*psz_device ) &&
             hmon == p_vout->p_sys->hmonitor )
         {
-            free( device.psz_string );
+            free( psz_device );
         }
-        else if( strcmp( psz_drivername, device.psz_string ) == 0 )
+        else if( strcmp( psz_drivername, psz_device ) == 0 )
         {
             MONITORINFO monitor_info;
             monitor_info.cbSize = sizeof( MONITORINFO );
@@ -636,11 +636,11 @@ BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
             }
 
             p_vout->p_sys->hmonitor = hmon;
-            free( device.psz_string );
+            free( psz_device );
         }
         else
         {
-            free( device.psz_string );
+            free( psz_device );
             return TRUE; /* Keep enumerating */
         }
 
@@ -691,13 +691,13 @@ static int DirectXInitDDraw( vout_thread_t *p_vout )
 
     if( OurDirectDrawEnumerateEx && p_vout->p_sys->MonitorFromWindow )
     {
-        vlc_value_t device;
+        char *psz_device;
 
-        var_Get( p_vout, "directx-device", &device );
-        if( device.psz_string )
+        psz_device = var_GetString( p_vout, "directx-device" );
+        if( psz_device )
         {
-            msg_Dbg( p_vout, "directx-device: %s", device.psz_string );
-            free( device.psz_string );
+            msg_Dbg( p_vout, "directx-device: %s", psz_device );
+            free( psz_device );
         }
 
         p_vout->p_sys->hmonitor =
