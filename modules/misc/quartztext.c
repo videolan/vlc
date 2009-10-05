@@ -31,22 +31,16 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout.h>
 #include <vlc_osd.h>
-#include <vlc_block.h>
-#include <vlc_filter.h>
 #include <vlc_stream.h>
 #include <vlc_xml.h>
 #include <vlc_input.h>
-#include <vlc_strings.h>
-
-#include <math.h>
 
 // Fix ourselves ColorSync headers that gets included in ApplicationServices.
 #define DisposeCMProfileIterateUPP(a) DisposeCMProfileIterateUPP(CMProfileIterateUPP userUPP __attribute__((unused)))
 #define DisposeCMMIterateUPP(a) DisposeCMMIterateUPP(CMProfileIterateUPP userUPP __attribute__((unused)))
 #define __MACHINEEXCEPTIONS__
-#include <Carbon/Carbon.h>
+#include <ApplicationServices/ApplicationServices.h>
 
 #define DEFAULT_FONT           "Arial Black"
 #define DEFAULT_FONT_COLOR     0xffffff
@@ -110,8 +104,8 @@ static const char *const ppsz_sizes_text[] = {
     N_("Smaller"), N_("Small"), N_("Normal"), N_("Large"), N_("Larger") };
 
 vlc_module_begin ()
-    set_shortname( N_("Mac Text renderer"))
-    set_description( N_("Quartz font renderer") )
+    set_shortname( N_("Text renderer for Mac"))
+    set_description( N_("CoreText font renderer") )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
 
@@ -320,8 +314,10 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     char         *psz_string;
     int           i_font_alpha, i_font_size;
     uint32_t      i_font_color;
+    bool          b_bold, b_uline, b_italic;
     vlc_value_t val;
     int i_scale = 1000;
+    b_bold = b_uline = b_italic = FALSE;
 
     p_sys->i_font_size    = GetFontSize( p_filter );
 
@@ -338,6 +334,15 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         i_font_color = __MAX( __MIN( p_region_in->p_style->i_font_color, 0xFFFFFF ), 0 );
         i_font_alpha = __MAX( __MIN( p_region_in->p_style->i_font_alpha, 255 ), 0 );
         i_font_size  = __MAX( __MIN( p_region_in->p_style->i_font_size, 255 ), 0 ) * i_scale / 1000;
+        if( p_region_in->p_style->i_style_flags )
+        {
+            if( p_region_in->p_style->i_style_flags & STYLE_BOLD )
+                b_bold = TRUE;
+            if( p_region_in->p_style->i_style_flags & STYLE_ITALIC )
+                b_italic = TRUE;
+            if( p_region_in->p_style->i_style_flags & STYLE_UNDERLINE )
+                b_uline = TRUE;
+        }
     }
     else
     {
@@ -373,7 +378,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         CFRelease( p_cfString );
         len = CFAttributedStringGetLength( p_attrString );
 
-        setFontAttibutes( p_sys->psz_font_name, i_font_size, i_font_color, FALSE, FALSE, FALSE,
+        setFontAttibutes( p_sys->psz_font_name, i_font_size, i_font_color, b_bold, b_italic, b_uline,
                                              CFRangeMake( 0, len ), p_attrString);
 
         RenderYUVA( p_filter, p_region_out, p_attrString );
@@ -552,7 +557,7 @@ static void setFontAttibutes( char *psz_fontname, int i_font_size, uint32_t i_fo
 {
     CFStringRef p_cfString;
     CTFontRef   p_font;
-
+    
     // Handle font name and size
     p_cfString = CFStringCreateWithCString( NULL,
                                             psz_fontname,

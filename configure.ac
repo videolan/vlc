@@ -1309,7 +1309,7 @@ else
 fi
 if test "${SYS}" = "darwin"; then
     VLC_ADD_PLUGIN([quartztext])
-    VLC_ADD_LDFLAGS([quartztext],[-Wl,-framework,Carbon,-framework,ApplicationServices])
+    VLC_ADD_LDFLAGS([quartztext],[-Wl,-framework,ApplicationServices])
 fi
 
 dnl
