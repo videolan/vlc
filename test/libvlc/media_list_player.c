@@ -71,13 +71,13 @@ static void check_items_order_callback(const libvlc_event_t * p_event, void * us
     assert(checks->index < checks->count);
     if (checks->items[checks->index] != md)
     {
-        char *title = libvlc_media_get_meta(md, libvlc_meta_Title, NULL);
+        char *title = libvlc_media_get_meta(md, libvlc_meta_Title);
         log ("Got items %s\n", title);
         free(title);
     }
     assert(checks->items[checks->index] == md);
     
-    char *title = libvlc_media_get_meta(md, libvlc_meta_Title, NULL);
+    char *title = libvlc_media_get_meta(md, libvlc_meta_Title);
     log ("Item %d '%s' was correctly queued\n", checks->index, title);
     free(title);
     
@@ -133,8 +133,7 @@ static void test_media_list_player_items_queue(const char** argv, int argc)
     queue_expected_item(&check, node);
 
     // Add items to that node
-    libvlc_media_list_t *subitems = libvlc_media_subitems(node, &ex);
-    catch ();
+    libvlc_media_list_t *subitems = libvlc_media_subitems(node);
     queue_expected_item(&check, media_list_add_file_path(vlc, subitems, file));
     queue_expected_item(&check, media_list_add_file_path(vlc, subitems, file));
     queue_expected_item(&check, media_list_add_file_path(vlc, subitems, file));
