@@ -606,6 +606,25 @@ static int Demux( demux_t *p_demux )
                             i_strlen = psz_parse-psz_backup;
                             if( i_strlen < 1 ) continue;
 
+                            if( psz_href )
+                            {
+                                /* we have allready one href in this entry, lets make new input from it and
+                                continue with new href, don't free meta/options*/
+                                input_item_t *p_entry = NULL;
+                                char *psz_name = input_item_GetName( p_current_input );
+
+                                p_entry = input_item_NewExt( p_demux, psz_href, psz_name,
+                                                     0, NULL, VLC_INPUT_OPTION_TRUSTED, -1 );
+                                input_item_CopyOptions( p_current_input, p_entry );
+                                if( psz_title_entry ) input_item_SetTitle( p_entry, psz_title_entry );
+                                if( psz_artist_entry ) input_item_SetArtist( p_entry, psz_artist_entry );
+                                if( psz_copyright_entry ) input_item_SetCopyright( p_entry, psz_copyright_entry );
+                                if( psz_moreinfo_entry ) input_item_SetURL( p_entry, psz_moreinfo_entry );
+                                if( psz_abstract_entry ) input_item_SetDescription( p_entry, psz_abstract_entry );
+                                input_item_AddSubItem( p_current_input, p_entry );
+                                vlc_gc_decref( p_entry );
+                            }
+
                             free( psz_href );
                             psz_href = malloc( i_strlen +1);
                             memcpy( psz_href, psz_backup, i_strlen );
