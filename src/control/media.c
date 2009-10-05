@@ -356,10 +356,8 @@ libvlc_media_t * libvlc_media_new_as_node(
  **************************************************************************/
 void libvlc_media_add_option(
                                    libvlc_media_t * p_md,
-                                   const char * psz_option,
-                                   libvlc_exception_t *p_e )
+                                   const char * psz_option )
 {
-    VLC_UNUSED(p_e);
     input_item_AddOption( p_md->p_input_item, psz_option,
                           VLC_INPUT_OPTION_UNIQUE|VLC_INPUT_OPTION_TRUSTED );
 }
@@ -370,10 +368,8 @@ void libvlc_media_add_option(
 void libvlc_media_add_option_flag(
                                    libvlc_media_t * p_md,
                                    const char * ppsz_option,
-                                   libvlc_media_option_t i_flags,
-                                   libvlc_exception_t *p_e )
+                                   libvlc_media_option_t i_flags )
 {
-    VLC_UNUSED(p_e);
     input_item_AddOption( p_md->p_input_item, ppsz_option,
                           i_flags );
 }
@@ -435,10 +431,9 @@ libvlc_media_duplicate( libvlc_media_t *p_md_orig )
  * Get mrl from a media descriptor object
  **************************************************************************/
 char *
-libvlc_media_get_mrl( libvlc_media_t * p_md,
-                                 libvlc_exception_t * p_e )
+libvlc_media_get_mrl( libvlc_media_t * p_md )
 {
-    VLC_UNUSED(p_e);
+    assert( p_md );
     return input_item_GetURI( p_md->p_input_item );
 }
 
@@ -446,13 +441,11 @@ libvlc_media_get_mrl( libvlc_media_t * p_md,
  * Getter for meta information
  **************************************************************************/
 
-char * libvlc_media_get_meta( libvlc_media_t *p_md,
-                                         libvlc_meta_t e_meta,
-                                         libvlc_exception_t *p_e )
+char *libvlc_media_get_meta( libvlc_media_t *p_md, libvlc_meta_t e_meta )
 {
     char * psz_meta;
-    VLC_UNUSED(p_e);
 
+    assert( p_md );
     /* XXX: locking */
 
     preparse_if_needed( p_md );
@@ -483,10 +476,9 @@ char * libvlc_media_get_meta( libvlc_media_t *p_md,
  **************************************************************************/
 
 libvlc_state_t
-libvlc_media_get_state( libvlc_media_t *p_md,
-                                   libvlc_exception_t *p_e )
+libvlc_media_get_state( libvlc_media_t *p_md )
 {
-    VLC_UNUSED(p_e);
+    assert( p_md );
     return p_md->state;
 }
 
@@ -496,8 +488,7 @@ libvlc_media_get_state( libvlc_media_t *p_md,
 
 void
 libvlc_media_set_state( libvlc_media_t *p_md,
-                                   libvlc_state_t state,
-                                   libvlc_exception_t *p_e )
+                                   libvlc_state_t state )
 {
     libvlc_event_t event;
     VLC_UNUSED(p_e);
@@ -516,11 +507,8 @@ libvlc_media_set_state( libvlc_media_t *p_md,
  * subitems
  **************************************************************************/
 libvlc_media_list_t *
-libvlc_media_subitems( libvlc_media_t * p_md,
-                                  libvlc_exception_t * p_e )
+libvlc_media_subitems( libvlc_media_t * p_md )
 {
-    VLC_UNUSED(p_e);
-
     if( p_md->p_subitems )
         libvlc_media_list_retain( p_md->p_subitems );
     return p_md->p_subitems;
@@ -530,10 +518,9 @@ libvlc_media_subitems( libvlc_media_t * p_md,
  * event_manager
  **************************************************************************/
 libvlc_event_manager_t *
-libvlc_media_event_manager( libvlc_media_t * p_md,
-                                       libvlc_exception_t * p_e )
+libvlc_media_event_manager( libvlc_media_t * p_md )
 {
-    VLC_UNUSED(p_e);
+    assert( p_md );
 
     return p_md->p_event_manager;
 }
@@ -542,12 +529,11 @@ libvlc_media_event_manager( libvlc_media_t * p_md,
  * Get duration of media object (in ms)
  **************************************************************************/
 int64_t
-libvlc_media_get_duration( libvlc_media_t * p_md,
-                                      libvlc_exception_t * p_e )
+libvlc_media_get_duration( libvlc_media_t * p_md )
 {
-    VLC_UNUSED(p_e);
+    assert( p_md );
 
-    if( !p_md || !p_md->p_input_item)
+    if( !p_md->p_input_item )
     {
         libvlc_exception_raise( p_e );
         libvlc_printerr( "No input item" );
@@ -561,12 +547,12 @@ libvlc_media_get_duration( libvlc_media_t * p_md,
  * Get preparsed status for media object.
  **************************************************************************/
 int
-libvlc_media_is_preparsed( libvlc_media_t * p_md,
-                                       libvlc_exception_t * p_e )
+libvlc_media_is_preparsed( libvlc_media_t * p_md )
 {
+    assert( p_md );
     VLC_UNUSED(p_e);
 
-    if( !p_md || !p_md->p_input_item)
+    if( !p_md->p_input_item )
     {
         libvlc_exception_raise( p_e );
         libvlc_printerr( "No input item" );
@@ -582,16 +568,10 @@ libvlc_media_is_preparsed( libvlc_media_t * p_md,
  * an native object that references a libvlc_media_t pointer
  **************************************************************************/
 void 
-libvlc_media_set_user_data( libvlc_media_t * p_md,
-                                       void * p_new_user_data,
-                                       libvlc_exception_t * p_e )
+libvlc_media_set_user_data( libvlc_media_t * p_md, void * p_new_user_data )
 {
-    VLC_UNUSED(p_e);
-
-    if( p_md )
-    {
-        p_md->p_user_data = p_new_user_data;
-    }
+    assert( p_md );
+    p_md->p_user_data = p_new_user_data;
 }
 
 /**************************************************************************
@@ -600,9 +580,8 @@ libvlc_media_set_user_data( libvlc_media_t * p_md,
  * an native object that references a libvlc_media_t pointer
  **************************************************************************/
 void *
-libvlc_media_get_user_data( libvlc_media_t * p_md,
-                                       libvlc_exception_t * p_e )
+libvlc_media_get_user_data( libvlc_media_t * p_md )
 {
-    VLC_UNUSED(p_e);
-    return p_md ? p_md->p_user_data : NULL;
+    assert( p_md );
+    return p_md->p_user_data;
 }
