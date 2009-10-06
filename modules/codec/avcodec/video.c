@@ -335,7 +335,6 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /* Set output properties */
     p_dec->fmt_out.i_cat = VIDEO_ES;
-    p_dec->fmt_in.video.i_aspect = 0;
     if( GetVlcChroma( &p_dec->fmt_out.video, p_context->pix_fmt ) != VLC_SUCCESS )
     {
         /* we are doomed. but not really, because most codecs set their pix_fmt later on */
