@@ -92,6 +92,7 @@ static int  PostProcessCallback( vlc_object_t *, char const *,
                                  vlc_value_t, vlc_value_t, void * );
 /* */
 static void DeinterlaceEnable( vout_thread_t * );
+static void DeinterlaceNeeded( vout_thread_t *, bool );
 
 /* From vout_intf.c */
 int vout_Snapshot( vout_thread_t *, picture_t * );
@@ -396,6 +397,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     p_vout->p->b_picture_displayed = false;
     p_vout->p->b_picture_empty = false;
     p_vout->p->i_picture_qtype = QTYPE_NONE;
+    p_vout->p->b_picture_interlaced = false;
 
     vlc_mouse_Init( &p_vout->p->mouse );
 
@@ -974,6 +976,8 @@ static void* RunThread( void *p_this )
     vout_thread_t *p_vout = p_this;
     int             i_idle_loops = 0;  /* loops without displaying a picture */
     int             i_picture_qtype_last = QTYPE_NONE;
+    bool            b_picture_interlaced_last = false;
+    mtime_t         i_picture_interlaced_last_date;
 
 
     vlc_mutex_lock( &p_vout->change_lock );
@@ -999,6 +1003,7 @@ static void* RunThread( void *p_this )
 
     /* */
     const bool b_drop_late = var_CreateGetBool( p_vout, "drop-late-frames" );
+    i_picture_interlaced_last_date = mdate();
 
     /*
      * Main loop - it is not executed if an error occurred during
@@ -1130,6 +1135,9 @@ static void* RunThread( void *p_this )
         /* */
         const int i_postproc_type = p_vout->p->i_picture_qtype;
         const int i_postproc_state = (p_vout->p->i_picture_qtype != QTYPE_NONE) - (i_picture_qtype_last != QTYPE_NONE);
+
+        const bool b_picture_interlaced = p_vout->p->b_picture_interlaced;
+        const int  i_picture_interlaced_state = (!!p_vout->p->b_picture_interlaced) - (!!b_picture_interlaced_last);
 
         vlc_mutex_unlock( &p_vout->picture_lock );
 
@@ -1360,6 +1368,18 @@ static void* RunThread( void *p_this )
             PostProcessDisable( p_vout );
         if( i_postproc_state != 0 )
             i_picture_qtype_last = i_postproc_type;
+
+        /* Deinterlacing
+         * Wait 30s before quiting interlacing mode */
+        if( ( i_picture_interlaced_state == 1 ) ||
+            ( i_picture_interlaced_state == -1 && i_picture_interlaced_last_date + 30000000 < current_date ) )
+        {
+            DeinterlaceNeeded( p_vout, b_picture_interlaced );
+            b_picture_interlaced_last = b_picture_interlaced;
+        }
+        if( b_picture_interlaced )
+            i_picture_interlaced_last_date = current_date;
+
 
         /* Check for "video filter2" changes */
         vlc_mutex_lock( &p_vout->p->vfilter_lock );
@@ -1881,7 +1901,7 @@ static void DeinterlaceAdd( vout_thread_t *p_vout, bool b_vout_filter )
     }
 }
 
-static void DeinterlaceSave( vout_thread_t *p_vout, int i_deinterlace, const char *psz_mode )
+static void DeinterlaceSave( vout_thread_t *p_vout, int i_deinterlace, const char *psz_mode, bool is_needed )
 {
     /* We have to set input variable to ensure restart support
      * XXX it is only needed because of vout-filter but must be done
@@ -1889,6 +1909,10 @@ static void DeinterlaceSave( vout_thread_t *p_vout, int i_deinterlace, const cha
     vlc_object_t *p_input = vlc_object_find( p_vout, VLC_OBJECT_INPUT, FIND_PARENT );
     if( !p_input )
         return;
+
+    /* Another hack for "vout filter" mode */
+    if( i_deinterlace < 0 )
+        i_deinterlace = is_needed ? -2 : -3;
 
     var_Create( p_input, "deinterlace", VLC_VAR_INTEGER );
     var_SetInteger( p_input, "deinterlace", i_deinterlace );
@@ -1914,12 +1938,13 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
     /* */
-    const int i_deinterlace = var_GetInteger( p_this, "deinterlace" );
-    char      *psz_mode     = var_GetString( p_this, "deinterlace-mode" );
+    const int  i_deinterlace = var_GetInteger( p_this, "deinterlace" );
+    char       *psz_mode     = var_GetString( p_this, "deinterlace-mode" );
+    const bool is_needed     = var_GetBool( p_this, "deinterlace-needed" );
     if( !psz_mode )
         return VLC_EGENERIC;
 
-    DeinterlaceSave( p_vout, i_deinterlace, psz_mode );
+    DeinterlaceSave( p_vout, i_deinterlace, psz_mode, is_needed );
 
     /* */
     bool b_vout_filter = true;
@@ -1944,15 +1969,14 @@ static int DeinterlaceCallback( vlc_object_t *p_this, char const *psz_cmd,
         var_SetString( p_vout, "sout-deinterlace-mode", psz_mode );
     }
 
-    if( i_deinterlace == 0 )
+    msg_Dbg( p_vout, "deinterlace %d, mode %s, is_needed %d", i_deinterlace, psz_mode, is_needed );
+    if( i_deinterlace == 0 || ( i_deinterlace == -1 && !is_needed ) )
     {
         DeinterlaceRemove( p_vout, false );
         DeinterlaceRemove( p_vout, true );
     }
     else
     {
-        /* TODO auto mode(-1)
-         * It is assumed equal to "on" for now */
         if( !DeinterlaceIsPresent( p_vout, b_vout_filter ) )
         {
             DeinterlaceRemove( p_vout, !b_vout_filter );
@@ -2015,6 +2039,9 @@ static void DeinterlaceEnable( vout_thread_t *p_vout )
         var_Change( p_vout, "deinterlace-mode", VLC_VAR_ADDCHOICE, &val, &text );
     }
     var_AddCallback( p_vout, "deinterlace-mode", DeinterlaceCallback, NULL );
+    /* */
+    var_Create( p_vout, "deinterlace-needed", VLC_VAR_BOOL );
+    var_AddCallback( p_vout, "deinterlace-needed", DeinterlaceCallback, NULL );
 
     /* Override the initial value from filters if present */
     char *psz_filter_mode = NULL;
@@ -2025,15 +2052,36 @@ static void DeinterlaceEnable( vout_thread_t *p_vout )
     if( psz_filter_mode )
     {
         free( psz_deinterlace );
-        i_deinterlace = 1;
+        if( i_deinterlace >= -1 )
+            i_deinterlace = 1;
         psz_deinterlace = psz_filter_mode;
     }
 
     /* */
+    bool is_needed;
+    if( i_deinterlace == -2 )
+        is_needed = true;
+    else if( i_deinterlace == -3 )
+        is_needed = false;
+    if( i_deinterlace < 0 )
+        i_deinterlace = -1;
+
+    p_vout->p->b_picture_interlaced == is_needed;
+
+    /* */
     val.psz_string = psz_deinterlace ? psz_deinterlace : p_optm->orig.psz;
     var_Change( p_vout, "deinterlace-mode", VLC_VAR_SETVALUE, &val, NULL );
+    val.b_bool = is_needed;
+    var_Change( p_vout, "deinterlace-needed", VLC_VAR_SETVALUE, &val, NULL );
 
     var_SetInteger( p_vout, "deinterlace", i_deinterlace );
     free( psz_deinterlace );
+}
+
+static void DeinterlaceNeeded( vout_thread_t *p_vout, bool is_interlaced )
+{
+    msg_Dbg( p_vout, "Detected %s video",
+             is_interlaced ? "interlaced" : "progressive" );
+    var_SetBool( p_vout, "deinterlace-needed", is_interlaced );
 }
 

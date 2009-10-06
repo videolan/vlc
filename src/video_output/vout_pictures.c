@@ -65,6 +65,7 @@ void vout_DisplayPicture( vout_thread_t *p_vout, picture_t *p_pic )
                          p_pic, p_pic->i_status );
     }
     p_vout->p->i_picture_qtype = p_pic->i_qtype;
+    p_vout->p->b_picture_interlaced = !p_pic->b_progressive;
 
     vlc_mutex_unlock( &p_vout->picture_lock );
 }

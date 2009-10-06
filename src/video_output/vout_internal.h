@@ -56,6 +56,7 @@ struct vout_thread_sys_t
     mtime_t         i_picture_displayed_date;
     picture_t       *p_picture_displayed;
     int             i_picture_qtype;
+    bool            b_picture_interlaced;
     vlc_cond_t      picture_wait;
 
     /* */
