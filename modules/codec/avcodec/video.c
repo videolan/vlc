@@ -641,18 +641,18 @@ picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         if( !p_dec->fmt_in.video.i_aspect )
         {
             /* Fetch again the aspect ratio in case it changed */
-            p_dec->fmt_in.video.i_aspect =
+            p_dec->fmt_out.video.i_aspect =
                 VOUT_ASPECT_FACTOR
                     * ( av_q2d(p_sys->p_context->sample_aspect_ratio)
                     * p_sys->p_context->width / p_sys->p_context->height );
-            p_dec->fmt_in.video.i_sar_num
+            p_dec->fmt_out.video.i_sar_num
                 = p_sys->p_context->sample_aspect_ratio.num;
-            p_dec->fmt_in.video.i_sar_den
+            p_dec->fmt_out.video.i_sar_den
                 = p_sys->p_context->sample_aspect_ratio.den;
 
-            if( p_dec->fmt_in.video.i_aspect == 0 )
+            if( p_dec->fmt_out.video.i_aspect == 0 )
             {
-                p_dec->fmt_in.video.i_aspect = VOUT_ASPECT_FACTOR
+                p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR
                     * p_sys->p_context->width / p_sys->p_context->height;
             }
         }
