@@ -2066,7 +2066,7 @@ static void DeinterlaceEnable( vout_thread_t *p_vout )
     if( i_deinterlace < 0 )
         i_deinterlace = -1;
 
-    p_vout->p->b_picture_interlaced == is_needed;
+    p_vout->p->b_picture_interlaced = is_needed;
 
     /* */
     val.psz_string = psz_deinterlace ? psz_deinterlace : p_optm->orig.psz;
