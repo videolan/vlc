@@ -96,9 +96,6 @@ PKG_WITH_MODULES([$1],[$3],
          ),
     [$4],[$5])
 
-AM_CONDITIONAL([HAVE_][$1],
-               [test "$AS_TR_SH([with_]enable_arg)" = "yes"])
-
 m4_popdef([module_name])
 m4_popdef([enable_arg])
 
