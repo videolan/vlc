@@ -180,12 +180,14 @@ DEPS_res = \
 BUILT_SOURCES += $(nodist_SOURCES_qt4)
 
 moc_verbose = $(moc_verbose_$(V))
-moc_verbose_ = $(moc_verbose_$(AM_DEFAULT_VERBOSITY))
+moc_verbose_ = $(moc_verbose__$(AM_DEFAULT_VERBOSITY))
 moc_verbose_0 = @echo "  MOC   " $@;
+moc_verbose__0 = $(oc_verbose_0)
 
 uic_verbose = $(uic_verbose_$(V))
-uic_verbose_ = $(uic_verbose_$(AM_DEFAULT_VERBOSITY))
+uic_verbose_ = $(uic_verbose__$(AM_DEFAULT_VERBOSITY))
 uic_verbose_0 = @echo "  UIC   " $@;
+uic_verbose__0 = $(uic_verbose_0)
 
 resources.cpp: vlc.qrc $(DEPS_res)
 	$(AM_V_GEN)$(RCC) -name vlc -o $@ $<
