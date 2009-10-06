@@ -1,4 +1,3 @@
-if HAVE_GCRYPT
 # RTP plugin
 libvlc_LTLIBRARIES += \
 	librtp_plugin.la
@@ -7,9 +6,12 @@ librtp_plugin_la_SOURCES = \
 	rtp.h \
 	input.c \
 	session.c
-librtp_plugin_la_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/libs/srtp
-librtp_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(top_builddir)/libs/srtp/libvlc_srtp.la
-librtp_plugin_la_DEPENDENCIES = \
-	$(top_builddir)/libs/srtp/libvlc_srtp.la
+librtp_plugin_la_CFLAGS = $(AM_CFLAGS)
+librtp_plugin_la_LIBADD = $(AM_LIBADD)
+librtp_plugin_la_DEPENDENCIES =
+
+if HAVE_GCRYPT
+librtp_plugin_la_CFLAGS += -DHAVE_SRTP -I$(top_srcdir)/libs/srtp
+librtp_plugin_la_LIBADD += $(top_builddir)/libs/srtp/libvlc_srtp.la
+librtp_plugin_la_DEPENDENCIES += $(top_builddir)/libs/srtp/libvlc_srtp.la
 endif

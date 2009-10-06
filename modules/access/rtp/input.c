@@ -35,7 +35,9 @@
 #endif
 
 #include "rtp.h"
-#include <srtp.h>
+#ifdef HAVE_SRTP
+# include <srtp.h>
+#endif
 
 static bool fd_dead (int fd)
 {
@@ -139,7 +141,7 @@ static block_t *rtp_recv (demux_t *demux)
         const uint8_t ptype = rtp_ptype (block);
         if (ptype >= 72 && ptype <= 76)
             continue; /* Muxed RTCP, ignore for now */
-
+#ifdef HAVE_SRTP
         if (p_sys->srtp)
         {
             size_t len = block->i_buffer;
@@ -155,6 +157,7 @@ static block_t *rtp_recv (demux_t *demux)
             }
             block->i_buffer = len;
         }
+#endif
         return block; /* success! */
     }
     return NULL;

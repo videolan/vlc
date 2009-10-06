@@ -38,7 +38,6 @@
 #include <vlc_codecs.h>
 
 #include "rtp.h"
-#include <srtp.h>
 
 /* PT=dynamic
  * vorbis: Xiph Vorbis audio (draft-ietf-avt-rtp-vorbis-09, RFC FIXME)

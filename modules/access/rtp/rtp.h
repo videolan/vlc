@@ -52,7 +52,9 @@ void *rtp_thread (void *data);
 struct demux_sys_t
 {
     rtp_session_t *session;
+#ifdef HAVE_SRTP
     struct srtp_session_t *srtp;
+#endif
     int           fd;
     int           rtcp_fd;
     vlc_thread_t  thread;

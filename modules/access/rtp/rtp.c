@@ -37,7 +37,9 @@
 #include <vlc_codecs.h>
 
 #include "rtp.h"
-#include <srtp.h>
+#ifdef HAVE_SRTP
+# include <srtp.h>
+#endif
 
 #define RTP_CACHING_TEXT N_("RTP de-jitter buffer length (msec)")
 #define RTP_CACHING_LONGTEXT N_( \
@@ -97,10 +99,12 @@ vlc_module_begin ()
                  RTCP_PORT_LONGTEXT, false)
         change_integer_range (0, 65535)
         change_safe ()
+#ifdef HAVE_SRTP
     add_string ("srtp-key", "", NULL,
                 SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false)
     add_string ("srtp-salt", "", NULL,
                 SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false)
+#endif
     add_integer ("rtp-max-src", 1, NULL, RTP_MAX_SRC_TEXT,
                  RTP_MAX_SRC_LONGTEXT, true)
         change_integer_range (1, 255)
@@ -236,7 +240,9 @@ static int Open (vlc_object_t *obj)
     }
 
     vlc_mutex_init (&p_sys->lock);
+#ifdef HAVE_SRTP
     p_sys->srtp         = NULL;
+#endif
     p_sys->fd           = fd;
     p_sys->rtcp_fd      = rtcp_fd;
     p_sys->caching      = var_CreateGetInteger (obj, "rtp-caching");
@@ -254,6 +260,7 @@ static int Open (vlc_object_t *obj)
     if (p_sys->session == NULL)
         goto error;
 
+#ifdef HAVE_SRTP
     char *key = var_CreateGetNonEmptyString (demux, "srtp-key");
     if (key)
     {
@@ -275,6 +282,7 @@ static int Open (vlc_object_t *obj)
             goto error;
         }
     }
+#endif
 
     if (vlc_clone (&p_sys->thread, rtp_thread, demux,
                    VLC_THREAD_PRIORITY_INPUT))
@@ -303,8 +311,10 @@ static void Close (vlc_object_t *obj)
     }
     vlc_mutex_destroy (&p_sys->lock);
 
+#ifdef HAVE_SRTP
     if (p_sys->srtp)
         srtp_destroy (p_sys->srtp);
+#endif
     if (p_sys->session)
         rtp_session_destroy (demux, p_sys->session);
     if (p_sys->rtcp_fd != -1)
