@@ -361,10 +361,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     i_lastShownVolume = -1;
 
-    o_remote = [[AppleRemote alloc] init];
-    [o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
-    [o_remote setDelegate: _o_sharedMainInstance];
-
     o_eyetv = [[VLCEyeTVController alloc] init];
 
     /* announce our launch to a potential eyetv plugin */
@@ -554,6 +550,11 @@ static VLCMain *_o_sharedMainInstance = nil;
                                              selector: @selector( controlTintChanged )
                                                  name: NSControlTintDidChangeNotification
                                                object: nil];
+
+    /* init Apple Remote support */
+    o_remote = [[AppleRemote alloc] init];
+    [o_remote setClickCountEnabledButtons: kRemoteButtonPlay];
+    [o_remote setDelegate: _o_sharedMainInstance];
 
     /* yeah, we are done */
     nib_main_loaded = TRUE;
