@@ -855,8 +855,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             case clicked_Mute:
             case clicked_Unmute:
             {
-                libvlc_audio_toggle_mute( p_plugin->getVLC(), &ex );
-                libvlc_exception_clear( &ex );
+                libvlc_audio_toggle_mute( p_plugin->getVLC() );
             }
             break;
 
