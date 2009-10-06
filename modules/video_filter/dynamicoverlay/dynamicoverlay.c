@@ -173,8 +173,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_sys->i_inputfd = open( p_sys->psz_inputfile, O_RDONLY | O_NONBLOCK );
         if( p_sys->i_inputfd == -1 )
         {
-            msg_Warn( p_filter, "Failed to grab input file: %s (%s)",
-                      p_sys->psz_inputfile, strerror( errno ) );
+            msg_Warn( p_filter, "Failed to grab input file: %s (%m)",
+                      p_sys->psz_inputfile );
         }
         else
         {
@@ -191,8 +191,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         {
             if( errno != ENXIO )
             {
-                msg_Warn( p_filter, "Failed to grab output file: %s (%s)",
-                          p_sys->psz_outputfile, strerror( errno ) );
+                msg_Warn( p_filter, "Failed to grab output file: %s (%m)",
+                          p_sys->psz_outputfile );
             }
         }
         else
@@ -213,8 +213,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             /* We hit an error */
             if( errno != EAGAIN )
             {
-                msg_Warn( p_filter, "Error on input file: %s",
-                          strerror( errno ) );
+                msg_Warn( p_filter, "Error on input file: %m" );
                 close( p_sys->i_inputfd );
                 p_sys->i_inputfd = -1;
             }
@@ -321,8 +320,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
             /* We hit an error */
             if( errno != EAGAIN )
             {
-                msg_Warn( p_filter, "Error on output file: %s",
-                          strerror( errno ) );
+                msg_Warn( p_filter, "Error on output file: %m" );
                 close( p_sys->i_outputfd );
                 p_sys->i_outputfd = -1;
             }

@@ -1062,7 +1062,7 @@ static int OpenDisplay( intf_thread_t *p_intf )
     p_sys->i_fd = open( psz_device, O_RDWR );
     if( p_sys->i_fd == -1 )
     {
-        msg_Err( p_intf, "cannot open %s (%s)", psz_device, strerror(errno) );
+        msg_Err( p_intf, "cannot open %s (%m)", psz_device );
         free( psz_device );
         return VLC_EGENERIC;
     }
@@ -1071,7 +1071,7 @@ static int OpenDisplay( intf_thread_t *p_intf )
     /* Get framebuffer device information */
     if( ioctl( p_sys->i_fd, FBIOGET_VSCREENINFO, &p_sys->var_info ) )
     {
-        msg_Err( p_intf, "cannot get fb info (%s)", strerror(errno) );
+        msg_Err( p_intf, "cannot get fb info (%m)" );
         close( p_sys->i_fd );
         return VLC_EGENERIC;
     }

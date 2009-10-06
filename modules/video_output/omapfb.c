@@ -478,13 +478,13 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     if( ioctl( p_sys->i_fd, FBIOGET_VSCREENINFO, &p_sys->fb_vinfo ) )
     {
-        msg_Err( p_vout, "Can't get VSCREENINFO: %s", strerror(errno) );
+        msg_Err( p_vout, "Can't get VSCREENINFO: %m" );
         close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
     if( ioctl( p_sys->i_fd, FBIOGET_FSCREENINFO, &p_sys->fb_finfo ) )
     {
-        msg_Err( p_vout, "Can't get FSCREENINFO: %s", strerror(errno) );
+        msg_Err( p_vout, "Can't get FSCREENINFO: %m" );
         close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
@@ -496,7 +496,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( (p_sys->p_video = (uint8_t *)mmap( 0, p_sys->i_page_size, PROT_READ | PROT_WRITE, MAP_SHARED,
                                             p_sys->i_fd, 0 )) == MAP_FAILED )
     {
-        msg_Err( p_vout, "Can't mmap: %s", strerror(errno) );
+        msg_Err( p_vout, "Can't mmap: %m" );
         close( p_sys->i_fd );
         return VLC_EGENERIC;
     }
@@ -516,7 +516,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     if( (p_sys->p_null = (uint8_t *)mmap( 0, p_sys->i_page_size, PROT_READ | PROT_WRITE,
                                           MAP_PRIVATE, p_sys->i_null_fd, 0 )) == MAP_FAILED )
     {
-        msg_Err( p_vout, "Can't mmap 2: %s", strerror(errno) );
+        msg_Err( p_vout, "Can't mmap 2: %m" );
         munmap( p_sys->p_video, p_sys->i_page_size );
         close( p_sys->i_null_fd );
         close( p_sys->i_fd );
