@@ -40,7 +40,9 @@
 #include <vlc_charset.h>
 #include <vlc_strings.h>
 #include <vlc_rand.h>
-#include <srtp.h>
+#ifdef HAVE_SRTP
+# include <srtp.h>
+#endif
 
 #include "rtp.h"
 
@@ -201,10 +203,12 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "rtcp-mux", false, NULL,
               RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, false )
 
+#ifdef HAVE_SRTP
     add_string( SOUT_CFG_PREFIX "key", "", NULL,
                 SRTP_KEY_TEXT, SRTP_KEY_LONGTEXT, false )
     add_string( SOUT_CFG_PREFIX "salt", "", NULL,
                 SRTP_SALT_TEXT, SRTP_SALT_LONGTEXT, false )
+#endif
 
     add_bool( SOUT_CFG_PREFIX "mp4a-latm", false, NULL, RFC3016_TEXT,
                  RFC3016_LONGTEXT, false )
@@ -312,7 +316,9 @@ struct sout_stream_id_t
 
     /* Packetizer specific fields */
     int                 i_mtu;
+#ifdef HAVE_SRTP
     srtp_session_t     *srtp;
+#endif
     pf_rtp_packetizer_t pf_packetize;
 
     /* Packets sinks */
@@ -938,8 +944,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->i_mtu = 576 - 20 - 8; /* pessimistic */
     msg_Dbg( p_stream, "maximum RTP packet size: %d bytes", id->i_mtu );
 
-    id->srtp = NULL;
     id->pf_packetize = NULL;
+
+#ifdef HAVE_SRTP
+    id->srtp = NULL;
 
     char *key = var_CreateGetNonEmptyString (p_stream, SOUT_CFG_PREFIX"key");
     if (key)
@@ -963,6 +971,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         }
         id->i_sequence = 0; /* FIXME: awful hack for libvlc_srtp */
     }
+#endif
 
     vlc_mutex_init( &id->lock_sink );
     id->sinkc = 0;
@@ -1342,8 +1351,10 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         vlc_join( id->listen.thread, NULL );
         net_ListenClose( id->listen.fd );
     }
+#ifdef HAVE_SRTP
     if( id->srtp != NULL )
         srtp_destroy( id->srtp );
+#endif
 
     vlc_mutex_destroy( &id->lock_sink );
 
@@ -1503,6 +1514,7 @@ static void* ThreadSend( vlc_object_t *p_this )
         block_t *out = block_FifoGet( id->p_fifo );
         block_cleanup_push (out);
 
+#ifdef HAVE_SRTP
         if( id->srtp )
         {   /* FIXME: this is awfully inefficient */
             size_t len = out->i_buffer;
@@ -1522,8 +1534,8 @@ static void* ThreadSend( vlc_object_t *p_this )
             else
                 out->i_buffer = len;
         }
-
         if (out)
+#endif
             mwait (out->i_dts + i_caching);
         vlc_cleanup_pop ();
         if (out == NULL)
@@ -1538,7 +1550,9 @@ static void* ThreadSend( vlc_object_t *p_this )
 
         for( int i = 0; i < id->sinkc; i++ )
         {
+#ifdef HAVE_SRTP
             if( !id->srtp ) /* FIXME: SRTCP support */
+#endif
                 SendRTCP( id->sinkv[i].rtcp, out );
 
             if( send( id->sinkv[i].rtp_fd, out->p_buffer, len, 0 ) >= 0 )

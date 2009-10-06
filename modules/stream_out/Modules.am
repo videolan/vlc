@@ -30,15 +30,18 @@ libvlc_LTLIBRARIES += \
 	libstream_out_smem_plugin.la \
 	$(NULL)
 
-if HAVE_GCRYPT
 # RTP plugin
 libvlc_LTLIBRARIES += \
 	libstream_out_rtp_plugin.la
 libstream_out_rtp_plugin_la_SOURCES = \
 	rtp.c rtp.h rtpfmt.c rtcp.c rtsp.c
-libstream_out_rtp_plugin_la_CFLAGS = $(AM_CFLAGS) -I$(top_srcdir)/libs/srtp
-libstream_out_rtp_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(top_builddir)/libs/srtp/libvlc_srtp.la
-libstream_out_rtp_plugin_la_DEPENDENCIES = \
-	$(top_builddir)/libs/srtp/libvlc_srtp.la
+libstream_out_rtp_plugin_la_CFLAGS = $(AM_CFLAGS)
+libstream_out_rtp_plugin_la_LIBADD = $(AM_LIBADD)
+libstream_out_rtp_plugin_la_DEPENDENCIES =
+if HAVE_GCRYPT
+SRTP_CFLAGS = -I$(top_srcdir)/libs/srtp
+SRTP_LIBS = $(top_builddir)/libs/srtp/libvlc_srtp.la
+libstream_out_rtp_plugin_la_CFLAGS += -DHAVE_SRTP $(SRTP_CFLAGS)
+libstream_out_rtp_plugin_la_LIBADD += $(SRTP_LIBS)
+libstream_out_rtp_plugin_la_DEPENDENCIES += $(SRTP_LIBS)
 endif
