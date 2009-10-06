@@ -2646,15 +2646,11 @@ dnl
 PKG_ENABLE_MODULES_VLC([OGG], [], [ogg >= 1.0], [Ogg demux support], [auto])
 if test "${enable_sout}" != "no"; then
     PKG_ENABLE_MODULES_VLC([MUX_OGG], [], [ogg >= 1.0], [Ogg demux support], [auto])
-else
-    AM_CONDITIONAL(HAVE_MUX_OGG, 0)
 fi
 
 if test "${enable_sout}" != "no"; then
 dnl Check for libshout
 PKG_ENABLE_MODULES_VLC([shout], [access_output_shout], [shout >= 2.1], [libshout output plugin], [auto])
-else
-    AM_CONDITIONAL(HAVE_shout, 0)
 fi
 
 dnl
