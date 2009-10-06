@@ -1,4 +1,4 @@
-if HAVE_LIBGCRYPT
+if HAVE_GCRYPT
 # RTP plugin
 libvlc_LTLIBRARIES += \
 	librtp_plugin.la

@@ -18,7 +18,6 @@ You will need the following tools if you plan to use the GIT version of vlc:
  - Automake version 1.9 or later
  - gettext version 0.16.1 or later
  - pkg-config
- - libgcrypt 1.2 (or compatible)
 
 After retrieving the GIT tree, you need to run the bootstrap script to
 generate all the files needed to build vlc. You can then run configure.

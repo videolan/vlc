@@ -23,7 +23,7 @@ SUBDIRS = po compat src
 if LOADER
 SUBDIRS += libs/loader
 endif
-if HAVE_LIBGCRYPT
+if HAVE_GCRYPT
 SUBDIRS += libs/srtp
 endif
 if HAVE_ZLIB

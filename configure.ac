@@ -4588,16 +4588,27 @@ dnl
 dnl libgcrypt
 dnl
 AC_ARG_ENABLE(libgcrypt,
-  [  --disable-libgcrypt      libgcrypts support (default enabled)])
+  [  --disable-libgcrypt      gcrypt support (default enabled)])
 AS_IF([test "${enable_libgcrypt}" != "no"], [
-  AM_PATH_LIBGCRYPT([1:1.1.94], [have_libgcrypt="yes"], [have_libgcrypt="no"])
+  AC_CHECK_DECL([GCRYCTL_SET_THREAD_CBS], [
+    have_libgcrypt="yes"
+    GCRYPT_CFLAGS=""
+    GCRYPT_LIBS="-lgcrypt"
+  ], [
+    AS_IF([test "${enable_libgcrypt}"], [
+      AC_MSG_ERROR([libgcrypt version 1.1.94 or higher not found.])
+    ])
+    have_libgcrypt="no"
+  ], [#include <gcrypt.h>])
 ])
 if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"; then
   AS_IF([test "${have_libgcrypt}" = "yes"],[
-    VLC_ADD_LIBS([rtp stream_out_rtp], [${LIBGCRYPT_LIBS}])
+    VLC_ADD_LIBS([rtp stream_out_rtp], [${GCRYPT_LIBS}])
   ])
 fi
-AM_CONDITIONAL([HAVE_LIBGCRYPT], [test "${have_libgcrypt}" = "yes"])
+AC_SUBST(GCRYPT_CFLAGS)
+AC_SUBST(GCRYPT_LIBS)
+AM_CONDITIONAL([HAVE_GCRYPT], [test "${have_libgcrypt}" = "yes"])
 
 dnl
 dnl TLS/SSL
@@ -4616,8 +4627,8 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     ])
     dnl The GnuTLS plugin invokes gcry_control directly.
     AS_IF([test "${have_libgcrypt}" = "yes"],[
-      VLC_ADD_LIBS([gnutls], [${LIBGCRYPT_LIBS}])
-      VLC_ADD_CFLAGS([gnutls], [${LIBGCRYPT_CFLAGS}])
+      VLC_ADD_LIBS([gnutls], [${GCRYPT_LIBS}])
+      VLC_ADD_CFLAGS([gnutls], [${GCRYPT_CFLAGS}])
     ])
     VLC_ADD_LIBS([gnutls], [$GNUTLS_LIBS])
   ], [
@@ -4637,8 +4648,8 @@ AC_ARG_ENABLE(remoteosd,
 AS_IF([test "${enable_remoteosd}" != "no"], [
   AS_IF([test "${have_libgcrypt}" = "yes"],[
     VLC_ADD_PLUGIN([remoteosd])
-    VLC_ADD_LIBS([remoteosd], ${LIBGCRYPT_LIBS})
-    VLC_ADD_CFLAGS([remoteosd], ${LIBGCRYPT_CFLAGS})
+    VLC_ADD_LIBS([remoteosd], ${GCRYPT_LIBS})
+    VLC_ADD_CFLAGS([remoteosd], ${GCRYPT_CFLAGS})
   ], [
     AC_MSG_ERROR([libgcrypt support required for RemoteOSD plugin])
   ])
@@ -4652,8 +4663,8 @@ AC_MSG_CHECKING([whether to enable RAOP plugin])
 AS_IF([test "${have_libgcrypt}" = "yes"], [
   AC_MSG_RESULT(yes)
   VLC_ADD_PLUGIN([stream_out_raop])
-  VLC_ADD_LIBS([stream_out_raop], [${LIBGCRYPT_LIBS} -lgpg-error])
-  VLC_ADD_CFLAGS([stream_out_raop], [${LIBGCRYPT_CFLAGS}])
+  VLC_ADD_LIBS([stream_out_raop], [${GCRYPT_LIBS} -lgpg-error])
+  VLC_ADD_CFLAGS([stream_out_raop], [${GCRYPT_CFLAGS}])
 ], [
   AC_MSG_RESULT(no)
   AC_MSG_WARN([libgcrypt support required for RAOP plugin])
@@ -4671,8 +4682,8 @@ then
   then
     AC_MSG_ERROR([libgcrypt is required for update checking system])
   fi
-  VLC_ADD_LIBS([libvlccore], [${LIBGCRYPT_LIBS}])
-  VLC_ADD_CFLAGS([libvlccore], [${LIBGCRYPT_CFLAGS}])
+  VLC_ADD_LIBS([libvlccore], [${GCRYPT_LIBS}])
+  VLC_ADD_CFLAGS([libvlccore], [${GCRYPT_CFLAGS}])
   AC_DEFINE([UPDATE_CHECK], 1, [Define if you want to use the VLC update mechanism])
 fi
 

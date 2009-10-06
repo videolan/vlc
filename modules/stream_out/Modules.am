@@ -30,7 +30,7 @@ libvlc_LTLIBRARIES += \
 	libstream_out_smem_plugin.la \
 	$(NULL)
 
-if HAVE_LIBGCRYPT
+if HAVE_GCRYPT
 # RTP plugin
 libvlc_LTLIBRARIES += \
 	libstream_out_rtp_plugin.la
