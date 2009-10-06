@@ -40,7 +40,6 @@ function parse()
         if not line then break end
         for path in string.gmatch( line, "http://movies.apple.com/movies/.-%.mov" ) do
             path = vlc.strings.decode_uri( path )
-            path = string.gsub( path, "http://movies", "http://www" )
             if string.match( path, "320" ) then
                 extraname = " (320p)"
             elseif string.match( path, "480" ) then
@@ -54,7 +53,7 @@ function parse()
             else
                 extraname = ""
             end
-            table.insert( p, { path = path; name = title..extraname; description = description; url = vlc.path } )
+            table.insert( p, { path = path; name = title..extraname; description = description; url = vlc.path; options = ":http-user-agent=\"QuickTime\"" } )
         end
         if string.match( line, "<title>" )
         then
