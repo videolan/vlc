@@ -10,7 +10,6 @@ The French company Cybervia (Actech) gave €2000 to pay for webserver hosting
 The VideoLAN team would like to thank the following contributors:
 
 Adam Sampson <ats @t offog d0t org> - libFLAC >= 1.1.3 API support
-Adem Gunes aka Yuksel Yildirim <xleopar at yahoo d0t com> - Turkish localisation 
 Adrien Grand <jpountz -at- jpountz 0 net> - Java and VLM corrections
 Adrien Maglo - VU meter, Direct3D desktop mode and various fixes
 Alan Wright <the dot smoothness at gmail d0t com> - Forum help and support
@@ -319,6 +318,7 @@ Xavier Marchesini <xav at alarue.net> - Win32 fixes
 Xènia Albà Cantero <xenia_alba at hotmail.com> - Catalan translation
 Ye zhang <yzhang90003 _at_ gmail dot com> - Fix for VLM RTSP concurent LEAVE make VLC crash
 Yuehua Zhao <zhao908@hotmail.com> - real video codec
+Yuksel Yildirim <xleopar at yahoo d0t com> - Turkish localisation
 Yves Duret <yves at zarb.org> - RPM packages
 Zhang Tong <admin at wisestudio dot org> - Chinese translation
 
