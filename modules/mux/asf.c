@@ -30,6 +30,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
@@ -933,6 +935,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     int i_ci_size, i_cm_size = 0, i_cd_size = 0;
     block_t *out;
     bo_t bo;
+    tk=NULL;
 
     msg_Dbg( p_mux, "Asf muxer creating header" );
 
@@ -1063,7 +1066,7 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
         bo_addle_u32( &bo, 0 );                 /* Alternate Initial buffer fullness */
         bo_addle_u32( &bo, 0 );                 /* Maximum object size (0 = unkown) */
         bo_addle_u32( &bo, 0x02 );              /* Flags (seekable) */
-        bo_addle_u16( &bo, tk->i_id ); /* Stream number */
+        bo_addle_u16( &bo, p_track->i_id ); /* Stream number */
         bo_addle_u16( &bo, 0 ); /* Stream language index */
         bo_addle_u64( &bo, i_avg_duration );    /* Average time per frame */
         bo_addle_u16( &bo, 0 ); /* Stream name count */
@@ -1076,12 +1079,14 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
         int64_t i_num, i_den;
         unsigned int i_dst_num, i_dst_den;
         asf_track_t *tk;
+        tk=NULL;
 
         for( i = 0; i < vlc_array_count( p_sys->p_tracks ); i++ )
         {
             tk = vlc_array_item_at_index( p_sys->p_tracks, i );
             if( tk->i_cat == VIDEO_ES ) break;
         }
+        assert( tk != NULL );
 
         i_num = tk->fmt.video.i_aspect *
             (int64_t)tk->fmt.video.i_height;
