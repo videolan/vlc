@@ -282,7 +282,7 @@ static void Mapping( intf_thread_t *p_intf )
     p_sys->p_map = NULL;
 
     /* Registering of Hotkeys */
-    for( struct hotkey *p_hotkey = p_intf->p_libvlc->p_hotkeys;
+    for( const struct hotkey *p_hotkey = p_intf->p_libvlc->p_hotkeys;
             p_hotkey->psz_action != NULL;
             p_hotkey++ )
     {
@@ -301,7 +301,7 @@ static void Mapping( intf_thread_t *p_intf )
         const xcb_keycode_t key = xcb_key_symbols_get_keycode( p_sys->p_symbols, GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
         const unsigned i_modifier = GetX11Modifier( p_sys->p_connection, p_sys->p_symbols, i_vlc_key & KEY_MODIFIER );
 
-        for( int j = 0; j < sizeof(p_x11_modifier_ignored)/sizeof(*p_x11_modifier_ignored); j++ )
+        for( unsigned int j = 0; j < sizeof(p_x11_modifier_ignored)/sizeof(*p_x11_modifier_ignored); j++ )
         {
             const unsigned i_ignored = GetModifier( p_sys->p_connection, p_sys->p_symbols, p_x11_modifier_ignored[j] );
             if( j != 0 && i_ignored == 0x00)
