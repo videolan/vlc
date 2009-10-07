@@ -65,9 +65,6 @@ static int  Open    ( vlc_object_t * );
 static void Close   ( vlc_object_t * );
 static void Run     ( intf_thread_t * );
 
-static void dbus_dispatch( DBusConnection *connection,
-    DBusDispatchStatus new_status, void *data );
-
 static int StateChange( intf_thread_t *, int );
 static int TrackChange( intf_thread_t * );
 static int StatusChangeEmit( intf_thread_t *);
@@ -112,8 +109,6 @@ struct intf_sys_t
     dbus_int32_t    i_caps;
     bool            b_dead;
     vlc_array_t    *p_events;
-
-    vlc_cond_t      wait;
     vlc_mutex_t     lock;
 };
 
@@ -778,7 +773,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_conn = p_conn;
     p_sys->p_events = vlc_array_new();
     vlc_mutex_init( &p_sys->lock );
-    vlc_cond_init( &p_sys->wait );
 
     p_playlist = pl_Hold( p_intf );
     PL_LOCK;
@@ -794,9 +788,6 @@ static int Open( vlc_object_t *p_this )
 
     UpdateCaps( p_intf );
 
-    dbus_connection_set_dispatch_status_function( p_conn, dbus_dispatch,
-        (void*)p_intf, dbus_free);
-
     return VLC_SUCCESS;
 }
 
@@ -807,7 +798,6 @@ static int Open( vlc_object_t *p_this )
 static void Close   ( vlc_object_t *p_this )
 {
     intf_thread_t   *p_intf     = (intf_thread_t*) p_this;
-    intf_sys_t      *p_sys      = p_intf->p_sys;
     playlist_t      *p_playlist = pl_Hold( p_intf );;
     input_thread_t  *p_input;
 
@@ -828,18 +818,17 @@ static void Close   ( vlc_object_t *p_this )
 
     pl_Release( p_intf );
 
-    dbus_connection_unref( p_sys->p_conn );
+    dbus_connection_unref( p_intf->p_sys->p_conn );
 
     // Free the events array
-    for( int i = 0; i < vlc_array_count( p_sys->p_events ); i++ )
+    for( int i = 0; i < vlc_array_count( p_intf->p_sys->p_events ); i++ )
     {
-        callback_info_t* info = vlc_array_item_at_index( p_sys->p_events, i );
+        callback_info_t* info = vlc_array_item_at_index( p_intf->p_sys->p_events, i );
         free( info );
     }
-    vlc_mutex_destroy( &p_sys->lock );
-    vlc_cond_destroy( &p_sys->wait );
-    vlc_array_destroy( p_sys->p_events );
-    free( p_sys );
+    vlc_mutex_destroy( &p_intf->p_sys->lock );
+    vlc_array_destroy( p_intf->p_sys->p_events );
+    free( p_intf->p_sys );
 }
 
 /*****************************************************************************
@@ -848,35 +837,32 @@ static void Close   ( vlc_object_t *p_this )
 
 static void Run          ( intf_thread_t *p_intf )
 {
-    intf_sys_t *p_sys = p_intf->p_sys;
-
-    for(;;)
+    for( ;; )
     {
-        vlc_mutex_lock( &p_sys->lock );
-        vlc_cond_wait( &p_sys->wait, &p_sys->lock );
-        vlc_mutex_unlock( &p_sys->lock );
-
+        if( dbus_connection_get_dispatch_status(p_intf->p_sys->p_conn)
+                                             == DBUS_DISPATCH_COMPLETE )
+            msleep( INTF_IDLE_SLEEP );
         int canc = vlc_savecancel();
-        dbus_connection_read_write_dispatch( p_sys->p_conn, 0 );
+        dbus_connection_read_write_dispatch( p_intf->p_sys->p_conn, 0 );
 
         /* Get the list of events to process
          *
-         * We can't keep the lock on p_sys->p_events, else we risk a
+         * We can't keep the lock on p_intf->p_sys->p_events, else we risk a
          * deadlock:
          * The signal functions could lock mutex X while p_events is locked;
          * While some other function in vlc (playlist) might lock mutex X
          * and then set a variable which would call AllCallback(), which itself
          * needs to lock p_events to add a new event.
          */
-        vlc_mutex_lock( &p_sys->lock );
-        int i_events = vlc_array_count( p_sys->p_events );
+        vlc_mutex_lock( &p_intf->p_sys->lock );
+        int i_events = vlc_array_count( p_intf->p_sys->p_events );
         callback_info_t* info[i_events];
         for( int i = i_events - 1; i >= 0; i-- )
         {
-            info[i] = vlc_array_item_at_index( p_sys->p_events, i );
-            vlc_array_remove( p_sys->p_events, i );
+            info[i] = vlc_array_item_at_index( p_intf->p_sys->p_events, i );
+            vlc_array_remove( p_intf->p_sys->p_events, i );
         }
-        vlc_mutex_unlock( &p_sys->lock );
+        vlc_mutex_unlock( &p_intf->p_sys->lock );
 
         for( int i = 0; i < i_events; i++ )
         {
@@ -905,21 +891,6 @@ static void Run          ( intf_thread_t *p_intf )
         }
         vlc_restorecancel( canc );
     }
-}
-
-static void dbus_dispatch( DBusConnection *connection,
-    DBusDispatchStatus new_status, void *data )
-{
-    (void)connection;
-    intf_thread_t *p_intf = (intf_thread_t*) data;
-    intf_sys_t *p_sys = p_intf->p_sys;
-
-    if(new_status == DBUS_DISPATCH_COMPLETE)
-        return;
-
-    vlc_mutex_lock( &p_sys->lock );
-    vlc_cond_signal( &p_sys->wait );
-    vlc_mutex_unlock( &p_sys->lock );
 }
 
 
