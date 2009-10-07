@@ -175,8 +175,7 @@ char *KeyToString (uint_fast32_t sym)
 {
     key_descriptor_t *d;
 
-    d = (key_descriptor_t *)
-        bsearch ((void *)(uintptr_t)sym, vlc_keys, vlc_num_keys,
+    d = bsearch ((void *)(uintptr_t)sym, vlc_keys, vlc_num_keys,
                  sizeof (vlc_keys[0]), cmpkey);
     return d ? strdup (d->psz_key_string) : NULL;
 }
@@ -238,14 +237,16 @@ char *ConfigKeyToString (uint_fast32_t i_key)
                            vlc_modifiers[i].psz_key_string);
         }
     }
-    for (size_t i = 0; i < vlc_num_keys; i++)
-    {
-        if ((i_key & ~KEY_MODIFIER) == vlc_keys[i].i_key_code)
-        {
-            p += snprintf (p, psz_end - p, "%s",
-                           vlc_keys[i].psz_key_string);
-            break;
-        }
-    }
+
+    key_descriptor_t *d;
+
+    i_key &= ~KEY_MODIFIER;
+    d = bsearch ((void *)(uintptr_t)i_key, vlc_keys, vlc_num_keys,
+                 sizeof (vlc_keys[0]), cmpkey);
+    if (d)
+        p += snprintf (p, psz_end - p, "%s", d->psz_key_string);
+    else
+        return NULL;
+
     return psz_key;
 }
