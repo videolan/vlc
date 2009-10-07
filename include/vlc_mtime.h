@@ -75,7 +75,6 @@ VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int secs ) );
  */
 # define VLC_HARD_MIN_SLEEP 10000   /* 10 milliseconds = 1 tick at 100Hz */
 # define VLC_SOFT_MIN_SLEEP 9000000 /* 9 seconds */
-#endif
 
 static
 __attribute__((unused))
