@@ -24,14 +24,9 @@
 #ifndef VLC_KEYS_H
 #define VLC_KEYS_H 1
 
-#ifdef __APPLE__
-#include <stdint.h>
-#endif
-
 /**
  * \file
- * This file defines keys, functions and structures for hotkey handling in vlc
- *
+ * This file defines keys and functions
  */
 
 #define KEY_MODIFIER         0xFF000000
@@ -91,170 +86,8 @@
 #define KEY_MOUSEWHEELLEFT   0x00F20000
 #define KEY_MOUSEWHEELRIGHT  0x00F30000
 
-typedef struct key_descriptor_s
-{
-    const char *psz_key_string;
-    uint32_t i_key_code;
-} key_descriptor_t;
-
-#define ADD_KEY(a) { a, *a }
-
-static const struct key_descriptor_s vlc_modifiers[] =
-{
-    { "Alt", KEY_MODIFIER_ALT },
-    { "Shift", KEY_MODIFIER_SHIFT },
-    { "Ctrl", KEY_MODIFIER_CTRL },
-    { "Meta", KEY_MODIFIER_META },
-    { "Command", KEY_MODIFIER_COMMAND }
-};
-enum { vlc_num_modifiers=sizeof(vlc_modifiers)
-                        /sizeof(struct key_descriptor_s) };
-
-static const struct key_descriptor_s vlc_keys[] =
-{
-    { "Unset", KEY_UNSET },
-    { "Space", ' ' },
-    { "!", '!' },
-    { "\"", '\"' },
-    { "#", '#' },
-    { "$", '$' },
-    { "%", '%' },
-    { "&", '&' },
-    { "'", '\'' },
-    { "(", ')' },
-    { ")", ')' },
-    { "*", '*' },
-    { "+", '+' },
-    { ",", ',' },
-    { "-", '-' },
-    { ".", '.' },
-    { "/", '/' },
-    { "0", '0' },
-    { "1", '1' },
-    { "2", '2' },
-    { "3", '3' },
-    { "4", '4' },
-    { "5", '5' },
-    { "6", '6' },
-    { "7", '7' },
-    { "8", '8' },
-    { "9", '9' },
-    { ":", ':' },
-    { ";", ';' },
-    { "<", '<' },
-    { "=", '=' },
-    { ">", '>' },
-    { "?", '?' },
-    { "@", '@' },
-    { "[", '[' },
-    { "\\", '\\' },
-    { "]", ']' },
-    { "^", '^' },
-    { "_", '_' },
-    { "`", '`' },
-    { "a", 'a' },
-    { "b", 'b' },
-    { "c", 'c' },
-    { "d", 'd' },
-    { "e", 'e' },
-    { "f", 'f' },
-    { "g", 'g' },
-    { "h", 'h' },
-    { "i", 'i' },
-    { "j", 'j' },
-    { "k", 'k' },
-    { "l", 'l' },
-    { "m", 'm' },
-    { "n", 'n' },
-    { "o", 'o' },
-    { "p", 'p' },
-    { "q", 'q' },
-    { "r", 'r' },
-    { "s", 's' },
-    { "t", 't' },
-    { "u", 'u' },
-    { "v", 'v' },
-    { "w", 'w' },
-    { "x", 'x' },
-    { "y", 'y' },
-    { "z", 'z' },
-    { "Left", KEY_LEFT },
-    { "Right", KEY_RIGHT },
-    { "Up", KEY_UP },
-    { "Down", KEY_DOWN },
-    { "Enter", KEY_ENTER },
-    { "F1", KEY_F1 },
-    { "F2", KEY_F2 },
-    { "F3", KEY_F3 },
-    { "F4", KEY_F4 },
-    { "F5", KEY_F5 },
-    { "F6", KEY_F6 },
-    { "F7", KEY_F7 },
-    { "F8", KEY_F8 },
-    { "F9", KEY_F9 },
-    { "F10", KEY_F10 },
-    { "F11", KEY_F11 },
-    { "F12", KEY_F12 },
-    { "Home", KEY_HOME },
-    { "End", KEY_END },
-    { "Insert", KEY_INSERT },
-    { "Delete", KEY_DELETE },
-    { "Menu", KEY_MENU },
-    { "Esc", KEY_ESC },
-    { "Page Up", KEY_PAGEUP },
-    { "Page Down", KEY_PAGEDOWN },
-    { "Tab", KEY_TAB },
-    { "Backspace", KEY_BACKSPACE },
-    { "Browser Back", KEY_BROWSER_BACK },
-    { "Browser Forward", KEY_BROWSER_FORWARD },
-    { "Browser Refresh", KEY_BROWSER_REFRESH },
-    { "Browser Stop", KEY_BROWSER_STOP },
-    { "Browser Search", KEY_BROWSER_SEARCH },
-    { "Browser Favorites", KEY_BROWSER_FAVORITES },
-    { "Browser Home", KEY_BROWSER_HOME },
-    { "Volume Mute", KEY_VOLUME_MUTE },
-    { "Volume Down", KEY_VOLUME_DOWN },
-    { "Volume Up", KEY_VOLUME_UP },
-    { "Media Next Track", KEY_MEDIA_NEXT_TRACK },
-    { "Media Prev Track", KEY_MEDIA_PREV_TRACK },
-    { "Media Stop", KEY_MEDIA_STOP },
-    { "Media Play Pause", KEY_MEDIA_PLAY_PAUSE },
-    { "Mouse Wheel Up", KEY_MOUSEWHEELUP },
-    { "Mouse Wheel Down", KEY_MOUSEWHEELDOWN },
-    { "Mouse Wheel Left", KEY_MOUSEWHEELLEFT },
-    { "Mouse Wheel Right", KEY_MOUSEWHEELRIGHT },
-};
-enum { vlc_num_keys=sizeof(vlc_keys)/sizeof(struct key_descriptor_s) };
-
-#include <stdlib.h>
-
-static inline int cmpkey (const void *key, const void *elem)
-{
-    return ((uintptr_t)key) - ((key_descriptor_t *)elem)->i_key_code;
-}
-
-static inline const char *KeyToString( uint32_t i_key )
-{
-    key_descriptor_t *d;
-
-    d = (key_descriptor_t *)
-        bsearch ((void *)(uintptr_t)i_key, vlc_keys, vlc_num_keys,
-                 sizeof (vlc_keys[0]), cmpkey);
-    return d ? d->psz_key_string : NULL;
-}
-
-static inline int StringToKey( char *psz_key )
-{
-    size_t i;
-    for ( i = 0; i < vlc_num_keys; ++i )
-    {
-        if ( !strcmp( vlc_keys[i].psz_key_string, psz_key ))
-        {
-            return vlc_keys[i].i_key_code;
-        }
-    }
-    return 0;
-}
+VLC_EXPORT( const char *, KeyToString, (uint_fast32_t i_key) ) LIBVLC_USED;
+VLC_EXPORT( uint_fast32_t, StringToKey,  (char *psz_key) ) LIBVLC_USED;
 
 typedef enum vlc_key {
     ACTIONID_QUIT = 1,

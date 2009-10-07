@@ -26,8 +26,8 @@
 #include <stdint.h>
 #include <stdbool.h>
 
-#include <vlc_common.h>
-#include <vlc_keys.h>
+#define __LIBVLC__
+#include "../config/keys.c"
 
 int main (void)
 {

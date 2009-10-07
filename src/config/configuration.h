@@ -52,7 +52,8 @@ static inline int IsConfigFloatType (int type)
     return type == CONFIG_ITEM_FLOAT;
 }
 
-int ConfigStringToKey( const char * );
+uint_fast32_t ConfigStringToKey( const char * );
+char *ConfigKeyToString( uint_fast32_t );
 
 /* The configuration file */
 #define CONFIG_FILE                     "vlcrc"

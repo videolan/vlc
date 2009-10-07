@@ -44,8 +44,6 @@
 #include "configuration.h"
 #include "modules/modules.h"
 
-static char *ConfigKeyToString( int );
-
 static inline char *strdupnull (const char *src)
 {
     return src ? strdup (src) : NULL;
@@ -746,69 +744,3 @@ int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     return SaveConfigFile( p_this, psz_module_name, false );
 }
-
-int ConfigStringToKey( const char *psz_key )
-{
-    int i_key = 0;
-    size_t i;
-    const char *psz_parser = strchr( psz_key, '-' );
-    while( psz_parser && psz_parser != psz_key )
-    {
-        for( i = 0; i < vlc_num_modifiers; ++i )
-        {
-            if( !strncasecmp( vlc_modifiers[i].psz_key_string, psz_key,
-                              strlen( vlc_modifiers[i].psz_key_string ) ) )
-            {
-                i_key |= vlc_modifiers[i].i_key_code;
-            }
-        }
-        psz_key = psz_parser + 1;
-        psz_parser = strchr( psz_key, '-' );
-    }
-    for( i = 0; i < vlc_num_keys; ++i )
-    {
-        if( !strcasecmp( vlc_keys[i].psz_key_string, psz_key ) )
-        {
-            i_key |= vlc_keys[i].i_key_code;
-            break;
-        }
-    }
-    return i_key;
-}
-
-char *ConfigKeyToString( int i_key )
-{
-    // Worst case appears to be 45 characters:
-    // "Command-Meta-Ctrl-Shift-Alt-Browser Favorites"
-    enum { keylen=64 };
-    char *psz_key = malloc( keylen );
-    char *p;
-    size_t index;
-
-    if ( !psz_key )
-    {
-        return NULL;
-    }
-    *psz_key = '\0';
-    p = psz_key;
-
-    for( index = 0; index < vlc_num_modifiers; ++index )
-    {
-        if( i_key & vlc_modifiers[index].i_key_code )
-        {
-            p += snprintf( p, keylen-(psz_key-p), "%s-",
-                           vlc_modifiers[index].psz_key_string );
-        }
-    }
-    for( index = 0; index < vlc_num_keys; ++index )
-    {
-        if( (int)( i_key & ~KEY_MODIFIER ) == vlc_keys[index].i_key_code )
-        {
-            p += snprintf( p, keylen-(psz_key-p), "%s",
-                           vlc_keys[index].psz_key_string );
-            break;
-        }
-    }
-    return psz_key;
-}
-
