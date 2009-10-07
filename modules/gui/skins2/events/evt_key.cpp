@@ -39,9 +39,12 @@ const string EvtKey::getAsString() const
         msg_Warn( getIntf(), "Unknown action type" );
 
     // Add the key
-    const char *keyName = KeyToString( m_key );
+    char *keyName = KeyToString( m_key );
     if( keyName )
+    {
         event += (string)":" + keyName;
+        free( keyName );
+    }
     else
         msg_Warn( getIntf(), "Unknown key: %d", m_key );
 

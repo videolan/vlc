@@ -171,14 +171,14 @@ static int cmpkey (const void *key, const void *elem)
     return ((uintptr_t)key) - ((key_descriptor_t *)elem)->i_key_code;
 }
 
-const char *KeyToString (uint_fast32_t sym)
+char *KeyToString (uint_fast32_t sym)
 {
     key_descriptor_t *d;
 
     d = (key_descriptor_t *)
         bsearch ((void *)(uintptr_t)sym, vlc_keys, vlc_num_keys,
                  sizeof (vlc_keys[0]), cmpkey);
-    return d ? d->psz_key_string : NULL;
+    return d ? strdup (d->psz_key_string) : NULL;
 }
 
 uint_fast32_t StringToKey (char *name)

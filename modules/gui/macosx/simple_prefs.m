@@ -86,9 +86,12 @@ static VLCSimplePrefs *_o_sharedInstance = nil;
     if( val & KEY_MODIFIER_COMMAND )
         [o_temp_str appendString: [NSString stringWithUTF8String: "\xE2\x8C\x98"]];
 
-    const char *base = KeyToString( val & ~KEY_MODIFIER );
+    char *base = KeyToString( val & ~KEY_MODIFIER );
     if( base )
+    {
         [o_temp_str appendString: [NSString stringWithUTF8String: base]];
+        free( base );
+    }
     else
         o_temp_str = [NSMutableString stringWithString:_NS("Not Set")];
     return o_temp_str;

@@ -231,16 +231,23 @@ int qtWheelEventToVLCKey( QWheelEvent *e )
 
 QString VLCKeyToString( int val )
 {
-    const char *base = KeyToString (val & ~KEY_MODIFIER);
+    char *base = KeyToString (val & ~KEY_MODIFIER);
 
     QString r = "";
     if( val & KEY_MODIFIER_CTRL )
-        r+= "Ctrl+";
+        r+= qfu( "Ctrl+" );
     if( val & KEY_MODIFIER_ALT )
-        r+= "Alt+";
+        r+= qfu( "Alt+" );
     if( val & KEY_MODIFIER_SHIFT )
-        r+= "Shift+";
+        r+= qfu( "Shift+" );
 
-    return r + (base ? base : qtr( "Unset" ) );
+    if (base)
+    {
+        r += qfu( base );
+        free( base );
+    }
+    else
+        r += qtr( "Unset" );
+    return r;
 }
 
