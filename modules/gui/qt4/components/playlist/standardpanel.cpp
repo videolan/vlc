@@ -302,7 +302,7 @@ void StandardPLPanel::setRoot( playlist_item_t *p_item )
 
     /* cosmetics, ..still need playlist locking.. */
     char *psz_title = input_item_GetName( p_item->p_input );
-    title->setText( psz_title );
+    title->setText( qfu(psz_title) );
     free( psz_title );
 
     QPL_UNLOCK;
