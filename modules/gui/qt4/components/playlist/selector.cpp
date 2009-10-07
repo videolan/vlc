@@ -132,7 +132,7 @@ void PLSelector::createItems()
     QTreeWidgetItem *sd_item;
     for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
     {
-        sd_item = new QTreeWidgetItem( QStringList( *ppsz_longname ) );
+        sd_item = new QTreeWidgetItem( QStringList( qfu(*ppsz_longname) ) );
         sd_item->setData( 0, TYPE_ROLE, SD_TYPE );
         sd_item->setData( 0, NAME_ROLE, qfu( *ppsz_name ) );
         sd_item->setFlags( sd_item->flags() & ~Qt::ItemIsDropEnabled );
