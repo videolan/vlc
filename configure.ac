@@ -3644,7 +3644,11 @@ AS_IF([test "${enable_xcb}" != "no"], [
   ], [true])
 
   dnl xcb-utils
-  PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms])
+  PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4],
+    [true],
+    [PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms])
+    VLC_ADD_CFLAGS([globalhotkeys], [-DXCB_KEYSYM_OLD_API])]
+  )
 
   VLC_ADD_PLUGIN([xcb_window])
   VLC_ADD_PLUGIN([globalhotkeys])
