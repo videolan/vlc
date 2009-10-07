@@ -165,16 +165,19 @@ static void Close( vlc_object_t *p_this )
 static unsigned GetModifier( xcb_connection_t *p_connection, xcb_key_symbols_t *p_symbols, xcb_keysym_t sym )
 {
     static const unsigned pi_mask[8] = {
-        XCB_MOD_MASK_SHIFT, XCB_MOD_MASK_LOCK, XCB_MOD_MASK_CONTROL, XCB_MOD_MASK_1,
-        XCB_MOD_MASK_2, XCB_MOD_MASK_3, XCB_MOD_MASK_4, XCB_MOD_MASK_5
+        XCB_MOD_MASK_SHIFT, XCB_MOD_MASK_LOCK, XCB_MOD_MASK_CONTROL,
+        XCB_MOD_MASK_1, XCB_MOD_MASK_2, XCB_MOD_MASK_3,
+        XCB_MOD_MASK_4, XCB_MOD_MASK_5
     };
 
     const xcb_keycode_t key = xcb_key_symbols_get_keycode( p_symbols, sym );
     if( key == 0 )
         return 0;
 
-    xcb_get_modifier_mapping_cookie_t r = xcb_get_modifier_mapping( p_connection );
-    xcb_get_modifier_mapping_reply_t *p_map = xcb_get_modifier_mapping_reply( p_connection, r, NULL );
+    xcb_get_modifier_mapping_cookie_t r =
+            xcb_get_modifier_mapping( p_connection );
+    xcb_get_modifier_mapping_reply_t *p_map =
+            xcb_get_modifier_mapping_reply( p_connection, r, NULL );
     if( !p_map )
         return 0;
 
@@ -195,7 +198,8 @@ static unsigned GetModifier( xcb_connection_t *p_connection, xcb_key_symbols_t *
     free( p_map ); // FIXME to check
     return i_mask;
 }
-static unsigned GetX11Modifier( xcb_connection_t *p_connection, xcb_key_symbols_t *p_symbols, unsigned i_vlc )
+static unsigned GetX11Modifier( xcb_connection_t *p_connection,
+        xcb_key_symbols_t *p_symbols, unsigned i_vlc )
 {
     unsigned i_mask = 0;
 
@@ -298,17 +302,23 @@ static void Mapping( intf_thread_t *p_intf )
         if( !i_vlc_key )
             continue;
 
-        const xcb_keycode_t key = xcb_key_symbols_get_keycode( p_sys->p_symbols, GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
-        const unsigned i_modifier = GetX11Modifier( p_sys->p_connection, p_sys->p_symbols, i_vlc_key & KEY_MODIFIER );
+        const xcb_keycode_t key = xcb_key_symbols_get_keycode(
+                p_sys->p_symbols, GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
+        const unsigned i_modifier = GetX11Modifier( p_sys->p_connection,
+                p_sys->p_symbols, i_vlc_key & KEY_MODIFIER );
 
-        for( unsigned int j = 0; j < sizeof(p_x11_modifier_ignored)/sizeof(*p_x11_modifier_ignored); j++ )
+        const size_t max = sizeof(p_x11_modifier_ignored) /
+                sizeof(*p_x11_modifier_ignored);
+        for( unsigned int i = 0; i < max; i++ )
         {
-            const unsigned i_ignored = GetModifier( p_sys->p_connection, p_sys->p_symbols, p_x11_modifier_ignored[j] );
-            if( j != 0 && i_ignored == 0x00)
+            const unsigned i_ignored = GetModifier( p_sys->p_connection,
+                    p_sys->p_symbols, p_x11_modifier_ignored[i] );
+            if( i != 0 && i_ignored == 0x00)
                 continue;
 
             hotkey_mapping_t *p_map_old = p_sys->p_map;
-            p_sys->p_map = realloc( p_sys->p_map, sizeof(*p_sys->p_map) * (p_sys->i_map+1) );
+            p_sys->p_map = realloc( p_sys->p_map,
+                    sizeof(*p_sys->p_map) * (p_sys->i_map+1) );
             if( !p_sys->p_map )
             {
                 p_sys->p_map = p_map_old;
@@ -342,7 +352,8 @@ static void Unregister( intf_thread_t *p_intf )
     for( int i = 0; i < p_sys->i_map; i++ )
     {
         const hotkey_mapping_t *p_map = &p_sys->p_map[i];
-        xcb_ungrab_key( p_sys->p_connection, p_map->i_x11, p_sys->root, p_map->i_modifier );
+        xcb_ungrab_key( p_sys->p_connection, p_map->i_x11, p_sys->root,
+                p_map->i_modifier );
     }
 }
 
@@ -391,7 +402,8 @@ static void *Thread( void *p_data )
                 if( p_map->i_x11 == e->detail &&
                     p_map->i_modifier == e->state )
                 {
-                    var_SetInteger( p_intf->p_libvlc, "key-action", p_map->i_action );
+                    var_SetInteger( p_intf->p_libvlc, "key-action",
+                            p_map->i_action );
                     break;
                 }
             }
