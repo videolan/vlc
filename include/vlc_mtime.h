@@ -68,9 +68,14 @@ VLC_EXPORT( void,    mwait,    ( mtime_t date ) );
 VLC_EXPORT( void,    msleep,   ( mtime_t delay ) );
 VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int secs ) );
 
-#if defined (__GNUC__) && defined (__linux__)
-# define VLC_HARD_MIN_SLEEP 10000 /* Linux has 100, 250, 300 or 1000Hz */
-# define VLC_SOFT_MIN_SLEEP 9000000
+#if (defined (__GNUC__) && defined (__linux__)) || defined (__FreeBSD__)
+/* Linux has 100, 250, 300 or 1000Hz
+ *
+ * HZ=100 by default on FreeBSD, but some architectures use a 1000Hz timer
+ */
+# define VLC_HARD_MIN_SLEEP 10000   /* 10 milliseconds = 1 tick at 100Hz */
+# define VLC_SOFT_MIN_SLEEP 9000000 /* 9 seconds */
+#endif
 
 static
 __attribute__((unused))
