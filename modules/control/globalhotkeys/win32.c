@@ -187,6 +187,8 @@ static void *Thread( void *p_data )
 #define HANDLE( key ) case KEY_##key: i_vk = VK_##key; break
 #define HANDLE2( key, key2 ) case KEY_##key: i_vk = VK_##key2; break
 
+#define KEY_SPACE ' '
+
 #ifndef VK_VOLUME_DOWN
 #define VK_VOLUME_DOWN          0xAE
 #define VK_VOLUME_UP            0xAF
