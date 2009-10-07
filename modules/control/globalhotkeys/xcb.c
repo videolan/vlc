@@ -185,6 +185,7 @@ static unsigned GetModifier( xcb_connection_t *p_connection, xcb_key_symbols_t *
 #ifdef XCB_KEYSYM_OLD_API /* as seen in Debian Lenny */
     const xcb_keycode_t key = xcb_key_symbols_get_keycode( p_symbols, sym );
     if( key == 0 )
+        return 0;
 #else
     const xcb_keycode_t *p_keys = xcb_key_symbols_get_keycode( p_symbols, sym );
     if( !p_keys )
