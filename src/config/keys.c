@@ -54,70 +54,6 @@ static const struct key_descriptor_s vlc_keys[] =
 {
     { "Unset", KEY_UNSET },
     { "Space", ' ' },
-    { "!", '!' },
-    { "\"", '\"' },
-    { "#", '#' },
-    { "$", '$' },
-    { "%", '%' },
-    { "&", '&' },
-    { "'", '\'' },
-    { "(", ')' },
-    { ")", ')' },
-    { "*", '*' },
-    { "+", '+' },
-    { ",", ',' },
-    { "-", '-' },
-    { ".", '.' },
-    { "/", '/' },
-    { "0", '0' },
-    { "1", '1' },
-    { "2", '2' },
-    { "3", '3' },
-    { "4", '4' },
-    { "5", '5' },
-    { "6", '6' },
-    { "7", '7' },
-    { "8", '8' },
-    { "9", '9' },
-    { ":", ':' },
-    { ";", ';' },
-    { "<", '<' },
-    { "=", '=' },
-    { ">", '>' },
-    { "?", '?' },
-    { "@", '@' },
-    { "[", '[' },
-    { "\\", '\\' },
-    { "]", ']' },
-    { "^", '^' },
-    { "_", '_' },
-    { "`", '`' },
-    { "a", 'a' },
-    { "b", 'b' },
-    { "c", 'c' },
-    { "d", 'd' },
-    { "e", 'e' },
-    { "f", 'f' },
-    { "g", 'g' },
-    { "h", 'h' },
-    { "i", 'i' },
-    { "j", 'j' },
-    { "k", 'k' },
-    { "l", 'l' },
-    { "m", 'm' },
-    { "n", 'n' },
-    { "o", 'o' },
-    { "p", 'p' },
-    { "q", 'q' },
-    { "r", 'r' },
-    { "s", 's' },
-    { "t", 't' },
-    { "u", 'u' },
-    { "v", 'v' },
-    { "w", 'w' },
-    { "x", 'x' },
-    { "y", 'y' },
-    { "z", 'z' },
     { "Left", KEY_LEFT },
     { "Right", KEY_RIGHT },
     { "Up", KEY_UP },
@@ -171,13 +107,85 @@ static int cmpkey (const void *key, const void *elem)
     return ((uintptr_t)key) - ((key_descriptor_t *)elem)->i_key_code;
 }
 
+/* Convert Unicode code point to UTF-8 */
+static char *utf8_cp (uint_fast32_t cp, char *buf)
+{
+    if (cp < (1 << 7))
+    {
+        buf[1] = 0;
+        buf[0] = cp;
+    }
+    else if (cp < (1 << 11))
+    {
+        buf[2] = 0;
+        buf[1] = 0x80 | (cp & 0x3F);
+        cp >>= 6;
+        buf[0] = 0xC0 | cp;
+    }
+    else if (cp < (1 << 16))
+    {
+        buf[3] = 0;
+        buf[2] = 0x80 | (cp & 0x3F);
+        cp >>= 6;
+        buf[1] = 0x80 | (cp & 0x3F);
+        cp >>= 6;
+        buf[0] = 0xE0 | cp;
+    }
+    else if (cp < (1 << 21))
+    {
+        buf[4] = 0;
+        buf[3] = 0x80 | (cp & 0x3F);
+        cp >>= 6;
+        buf[2] = 0x80 | (cp & 0x3F);
+        cp >>= 6;
+        buf[1] = 0x80 | (cp & 0x3F);
+        cp >>= 6;
+        buf[0] = 0xE0 | cp;
+    }
+    else
+        return NULL;
+    return buf;
+}
+
+/* Convert UTF-8 to Unicode code point */
+static uint_fast32_t cp_utf8 (const char *utf8)
+{
+    uint8_t f = utf8[0];
+    size_t l = strlen (utf8);
+
+    if (f < 0x80) /* ASCII (7 bits) */
+        return f;
+    if (f < 0xC0 || l < 2) /* bad */
+        return 0;
+    if (f < 0xE0) /* two bytes (11 bits) */
+        return ((f & 0x1F) << 6) | (utf8[1] & 0x3F);
+    if (l < 3) /* bad */
+        return 0;
+    if (f < 0xF0) /* three bytes (16 bits) */
+        return ((f & 0x0F) << 12) | ((utf8[1] & 0x3F) << 6)
+               | (utf8[2] & 0x3F);
+    if (l < 4)
+        return 0;
+    if (f < 0xF8) /* four bytes (21 bits) */
+        return ((f & 0x07) << 18) | ((utf8[1] & 0x3F) << 12)
+               | ((utf8[2] & 0x3F) << 6) | (utf8[3] & 0x3F);
+    return 0;
+}
+
 char *KeyToString (uint_fast32_t sym)
 {
     key_descriptor_t *d;
 
     d = bsearch ((void *)(uintptr_t)sym, vlc_keys, vlc_num_keys,
                  sizeof (vlc_keys[0]), cmpkey);
-    return d ? strdup (d->psz_key_string) : NULL;
+    if (d)
+        return strdup (d->psz_key_string);
+
+    char buf[5];
+    if (utf8_cp (sym, buf))
+        return strdup (buf);
+
+    return NULL;
 }
 
 uint_fast32_t StringToKey (char *name)
@@ -186,7 +194,7 @@ uint_fast32_t StringToKey (char *name)
         if (!strcmp (vlc_keys[i].psz_key_string, name))
             return vlc_keys[i].i_key_code;
 
-    return 0;
+    return cp_utf8 (name);
 }
 
 uint_fast32_t ConfigStringToKey (const char *name)
@@ -215,7 +223,7 @@ uint_fast32_t ConfigStringToKey (const char *name)
         if (!strcasecmp( vlc_keys[i].psz_key_string, name))
             return vlc_keys[i].i_key_code | mods;
 
-    return 0;
+    return cp_utf8 (name) | mods;
 }
 
 char *ConfigKeyToString (uint_fast32_t i_key)
@@ -239,12 +247,15 @@ char *ConfigKeyToString (uint_fast32_t i_key)
     }
 
     key_descriptor_t *d;
+    char buf[5];
 
     i_key &= ~KEY_MODIFIER;
     d = bsearch ((void *)(uintptr_t)i_key, vlc_keys, vlc_num_keys,
                  sizeof (vlc_keys[0]), cmpkey);
     if (d)
         p += snprintf (p, psz_end - p, "%s", d->psz_key_string);
+    else if (utf8_cp (i_key, buf))
+        p += snprintf (p, psz_end - p, "%s", buf);
     else
         return NULL;
 
