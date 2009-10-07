@@ -468,7 +468,7 @@ QStringList PLModel::selectedURIs()
                 char *psz = input_item_GetURI( p_item->p_input );
                 if( psz )
                 {
-                    lst.append( psz );
+                    lst.append( qfu(psz) );
                     free( psz );
                 }
             }
