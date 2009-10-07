@@ -47,7 +47,6 @@
 #define KEY_RIGHT            0x00220000
 #define KEY_UP               0x00230000
 #define KEY_DOWN             0x00240000
-#define KEY_SPACE            0x00250000
 #define KEY_ENTER            0x00260000
 #define KEY_F1               0x00270000
 #define KEY_F2               0x00280000
@@ -114,6 +113,7 @@ enum { vlc_num_modifiers=sizeof(vlc_modifiers)
 static const struct key_descriptor_s vlc_keys[] =
 {
     { "Unset", KEY_UNSET },
+    { "Space", ' ' },
     { "!", '!' },
     { "\"", '\"' },
     { "#", '#' },
@@ -182,7 +182,6 @@ static const struct key_descriptor_s vlc_keys[] =
     { "Right", KEY_RIGHT },
     { "Up", KEY_UP },
     { "Down", KEY_DOWN },
-    { "Space", KEY_SPACE },
     { "Enter", KEY_ENTER },
     { "F1", KEY_F1 },
     { "F2", KEY_F2 },

@@ -684,7 +684,7 @@ static const struct {
 
     { SDLK_RETURN, KEY_ENTER },
     { SDLK_KP_ENTER, KEY_ENTER },
-    { SDLK_SPACE, KEY_SPACE },
+    { SDLK_SPACE, ' ' },
     { SDLK_ESCAPE, KEY_ESC },
 
     { SDLK_MENU, KEY_MENU },

@@ -430,7 +430,7 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
                     }
                 }
             }
-            else if( key == KEY_ENTER || key == KEY_SPACE )
+            else if( key == KEY_ENTER || key == ' ' )
             {
                 // Go up one level (and close node)
                 if( &*it == m_pLastSelected )

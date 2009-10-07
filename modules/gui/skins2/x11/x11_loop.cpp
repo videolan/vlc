@@ -67,7 +67,6 @@ X11Loop::X11Loop( intf_thread_t *pIntf, X11Display &rDisplay ):
     keysymToVlcKey[XK_F11] = KEY_F11;
     keysymToVlcKey[XK_F12] = KEY_F12;
     keysymToVlcKey[XK_Return] = KEY_ENTER;
-    keysymToVlcKey[XK_space] = KEY_SPACE;
     keysymToVlcKey[XK_Escape] = KEY_ESC;
     keysymToVlcKey[XK_Left] = KEY_LEFT;
     keysymToVlcKey[XK_Right] = KEY_RIGHT;

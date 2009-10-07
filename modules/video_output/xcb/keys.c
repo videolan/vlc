@@ -105,7 +105,7 @@ static int ConvertKeySym (xcb_keysym_t sym)
         { XK_Begin,         KEY_HOME, },
         { XK_Insert,        KEY_INSERT, },
         { XK_Menu,          KEY_MENU },
-        { XK_KP_Space,      KEY_SPACE, },
+        { XK_KP_Space,      ' ', },
         { XK_KP_Tab,        KEY_TAB, },
         { XK_KP_Enter,      KEY_ENTER, },
         { XK_KP_F1,         KEY_F1, },
@@ -156,10 +156,7 @@ static int ConvertKeySym (xcb_keysym_t sym)
         { XF86XK_Reload,           KEY_BROWSER_REFRESH, },
     };
 
-    /* X11 and VLC both use the ASCII code for printable ASCII characters,
-     * except for space (only X11). */
-    if (sym == XK_space)
-        return KEY_SPACE;
+    /* X11 and VLC both use the ASCII code for printable ASCII characters. */
     if (isascii(sym))
         return sym;
 

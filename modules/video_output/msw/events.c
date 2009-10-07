@@ -861,7 +861,7 @@ static struct
     { VK_F12, KEY_F12 },
 
     { VK_RETURN, KEY_ENTER },
-    { VK_SPACE, KEY_SPACE },
+    { VK_SPACE, ' ' },
     { VK_ESCAPE, KEY_ESC },
 
     { VK_LEFT, KEY_LEFT },

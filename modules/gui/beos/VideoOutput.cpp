@@ -112,7 +112,7 @@ static const int beos_keys[][2] =
     { B_RIGHT_ARROW, KEY_RIGHT },
     { B_UP_ARROW,    KEY_UP },
     { B_DOWN_ARROW,  KEY_DOWN },
-    { B_SPACE,       KEY_SPACE },
+    { B_SPACE,       ' ' },
     { B_ENTER,       KEY_ENTER },
     { B_F1_KEY,      KEY_F1 },
     { B_F2_KEY,      KEY_F2 },

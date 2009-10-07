@@ -2298,7 +2298,7 @@ vlc_module_begin ()
      */
 #   define KEY_TOGGLE_FULLSCREEN  'f'
 #   define KEY_LEAVE_FULLSCREEN   KEY_ESC
-#   define KEY_PLAY_PAUSE         KEY_SPACE
+#   define KEY_PLAY_PAUSE         ' '
 #   define KEY_PAUSE              KEY_UNSET
 #   define KEY_PLAY               KEY_UNSET
 #   define KEY_FASTER             '+'

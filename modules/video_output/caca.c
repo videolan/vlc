@@ -436,8 +436,6 @@ static const struct {
     { CACA_KEY_PAGEUP,  KEY_PAGEUP },
     { CACA_KEY_PAGEDOWN,KEY_PAGEDOWN },
 
-    { ' ',              KEY_SPACE },
-
     /* */
     { -1, -1 }
 };

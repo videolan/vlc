@@ -230,7 +230,6 @@ static const struct
 
     { XK_Return, KEY_ENTER },
     { XK_KP_Enter, KEY_ENTER },
-    { XK_space, KEY_SPACE },
     { XK_Escape, KEY_ESC },
 
     { XK_Menu, KEY_MENU },
@@ -258,15 +257,15 @@ static const struct
 };
 static xcb_keysym_t GetX11Key( unsigned i_vlc )
 {
+    /* X11 and VLC use ASCII for printable ASCII characters */
+    if( i_vlc >= 32 && i_vlc <= 127 )
+        return i_vlc;
+
     for( int i = 0; x11keys_to_vlckeys[i].i_vlc != 0; i++ )
     {
         if( x11keys_to_vlckeys[i].i_vlc == i_vlc )
             return x11keys_to_vlckeys[i].i_x11;
     }
-
-    /* Copied from xcb, it seems that xcb use ascii code for ascii characters */
-    if( isascii( i_vlc ) )
-        return i_vlc;
 
     return XK_VoidSymbol;
 }

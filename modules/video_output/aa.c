@@ -306,9 +306,6 @@ static void Manage(vout_display_t *vd)
         case AA_ESC:
             vout_display_SendEventKey(vd, KEY_ESC);
             break;
-        case 0x20:
-                vout_display_SendEventKey(vd, KEY_SPACE);
-                break;
         default:
             if (event >= 0x20 && event <= 0x7f)
                 vout_display_SendEventKey(vd, event);

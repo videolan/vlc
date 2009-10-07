@@ -60,7 +60,7 @@ Win32Loop::Win32Loop( intf_thread_t *pIntf ): OSLoop( pIntf )
     virtKeyToVlcKey[VK_F11] = KEY_F11;
     virtKeyToVlcKey[VK_F12] = KEY_F12;
     virtKeyToVlcKey[VK_RETURN] = KEY_ENTER;
-    virtKeyToVlcKey[VK_SPACE] = KEY_SPACE;
+    virtKeyToVlcKey[VK_SPACE] = ' ';
     virtKeyToVlcKey[VK_ESCAPE] = KEY_ESC;
     virtKeyToVlcKey[VK_LEFT] = KEY_LEFT;
     virtKeyToVlcKey[VK_RIGHT] = KEY_RIGHT;
