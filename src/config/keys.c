@@ -201,10 +201,9 @@ uint_fast32_t ConfigStringToKey (const char *name)
 {
     uint_fast32_t mods = 0;
 
-    const char *psz_parser = name;
     for (;;)
     {
-        psz_parser = strchr (psz_parser, '-');
+        const char *psz_parser = strchr (name, '-');
         if (psz_parser == NULL || psz_parser == name)
             break;
 
