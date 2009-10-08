@@ -78,6 +78,8 @@ struct decoder_sys_t
     int64_t i_previous_layout;
 };
 
+#define BLOCK_FLAG_PRIVATE_REALLOCATED (1 << BLOCK_FLAG_PRIVATE_SHIFT)
+
 static void SetupOutputFormat( decoder_t *p_dec, bool b_trust );
 
 /*****************************************************************************
@@ -306,11 +308,16 @@ aout_buffer_t * DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    *pp_block = p_block = block_Realloc( p_block, 0, p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
-    if( !p_block )
-        return NULL;
-    p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
-    memset( &p_block->p_buffer[p_block->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE );
+    if( (p_block->i_flags & BLOCK_FLAG_PRIVATE_REALLOCATED) == 0 )
+    {
+        *pp_block = p_block = block_Realloc( p_block, 0, p_block->i_buffer + FF_INPUT_BUFFER_PADDING_SIZE );
+        if( !p_block )
+            return NULL;
+        p_block->i_buffer -= FF_INPUT_BUFFER_PADDING_SIZE;
+        memset( &p_block->p_buffer[p_block->i_buffer], 0, FF_INPUT_BUFFER_PADDING_SIZE );
+
+        p_block->i_flags |= BLOCK_FLAG_PRIVATE_REALLOCATED;
+    }
 
     do
     {
