@@ -224,10 +224,18 @@ int Open_LuaIntf( vlc_object_t *p_this )
     if( asprintf( &psz_command,
                   "package.path = \"%s"DIR_SEP"modules"DIR_SEP"?.lua;\"..package.path",
                   p_sys->psz_filename ) < 0 )
+    {
+        free( psz_name );
+        free( p_sys );
         return VLC_EGENERIC;
+    }
     *psz_char = DIR_SEP_CHAR;
     if( luaL_dostring( L, psz_command ) )
+    {
+        free( psz_name );
+        free( p_sys );
         return VLC_EGENERIC;
+    }
     }
     /* </gruik> */
 
