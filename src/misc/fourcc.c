@@ -377,7 +377,9 @@ static const entry_t p_list_video[] = {
         A("WMV3"),
         A("wmv3"),
 
-    B(VLC_CODEC_WMVA, "Windows Media Video Advanced"),
+    /* WMVA is the VC-1 codec before the standardization proces,
+     * it is not bitstream compatible and deprecated  */
+    B(VLC_CODEC_WMVA, "Windows Media Video Advanced Profile"),
         A("WMVA"),
         A("wmva"),
         A("WVP2"),
@@ -388,9 +390,6 @@ static const entry_t p_list_video[] = {
         A("wvc1"),
         A("vc-1"),
         A("VC-1"),
-        /* WMVA is the VC-1 codec before the standardization proces,
-         * it is not bitstream compatible and deprecated  */
-        E("WMVA", "Windows Media Video Advanced Profile"),
 
     /* Microsoft Video 1 */
     B(VLC_CODEC_MSVIDEO1, "Microsoft Video 1"),
