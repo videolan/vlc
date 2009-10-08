@@ -1482,8 +1482,7 @@ static void DecSysRelease( decoder_sys_t *p_sys )
 #ifdef HAVE_TIGER
     if( p_sys->p_tr )
         tiger_renderer_destroy( p_sys->p_tr );
-    if( p_sys->psz_tiger_default_font_desc )
-        free( p_sys->psz_tiger_default_font_desc );
+    free( p_sys->psz_tiger_default_font_desc );
 #endif
 
     if (p_sys->b_ready)

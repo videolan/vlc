@@ -1730,8 +1730,7 @@ static void DecoderProcessSout( decoder_t *p_dec, block_t *p_block )
             p_owner->sout.i_id = p_dec->fmt_in.i_id;
             if( p_dec->fmt_in.psz_language )
             {
-                if( p_owner->sout.psz_language )
-                    free( p_owner->sout.psz_language );
+                free( p_owner->sout.psz_language );
                 p_owner->sout.psz_language =
                     strdup( p_dec->fmt_in.psz_language );
             }

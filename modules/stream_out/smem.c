@@ -317,8 +317,7 @@ static sout_stream_id_t *AddAudio( sout_stream_t *p_stream, es_format_t *p_fmt )
 static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 {
     VLC_UNUSED( p_stream );
-    if ( id != NULL )
-        free( id );
+    free( id );
     return VLC_SUCCESS;
 }
 

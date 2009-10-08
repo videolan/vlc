@@ -238,8 +238,7 @@ static int Peek( stream_t *s, const uint8_t **pp_peek, unsigned int i_peek )
         return i_read;
     }
 
-    if( p_sys->p_peek_alloc )
-        free( p_sys->p_peek_alloc );
+    free( p_sys->p_peek_alloc );
 
     p_sys->p_peek_alloc =
     p_sys->p_peek       = p_peek;

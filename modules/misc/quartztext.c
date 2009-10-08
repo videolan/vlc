@@ -506,7 +506,7 @@ static int HandleFontAttributes( xml_reader_t *p_xml_reader,
         {
             if( !strcasecmp( "face", psz_name ) )
             {
-                if( psz_fontname ) free( psz_fontname );
+                free( psz_fontname );
                 psz_fontname = strdup( psz_value );
             }
             else if( !strcasecmp( "size", psz_name ) )
