@@ -50,6 +50,7 @@ class ControlsWidget;
 class InputControlsWidget;
 class FullscreenControllerWidget;
 class SpeedControlWidget;
+class QVBoxLayout;
 class QMenu;
 class QSize;
 
@@ -123,7 +124,7 @@ private:
     QMenu               *systrayMenu;
 #endif
     QString              input_name;
-    QGridLayout         *mainLayout;
+    QVBoxLayout         *mainLayout;
     ControlsWidget      *controls;
     InputControlsWidget *inputC;
     FullscreenControllerWidget *fullscreenControls;

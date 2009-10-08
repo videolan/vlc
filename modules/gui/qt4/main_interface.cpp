@@ -57,6 +57,7 @@
 #include <QLabel>
 #include <QGroupBox>
 #include <QPushButton>
+#include <QStackedWidget>
 
 #ifdef WIN32
  #include <vlc_windows_interfaces.h>
@@ -365,9 +366,9 @@ void MainInterface::recreateToolbars()
              this, doComponentsUpdate() );
     inputC = new InputControlsWidget( p_intf, this );
 
-    mainLayout->addWidget( inputC, 2, 0, 1, -1, Qt::AlignBottom );
-    mainLayout->addWidget( controls, settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
-                              0, 1, -1, Qt::AlignBottom );
+    mainLayout->insertWidget( 2, inputC );
+    mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
+                               controls );
     settings->endGroup();
 }
 
@@ -376,7 +377,7 @@ void MainInterface::createMainWidget( QSettings *settings )
     /* Create the main Widget and the mainLayout */
     QWidget *main = new QWidget;
     setCentralWidget( main );
-    mainLayout = new QGridLayout( main );
+    mainLayout = new QVBoxLayout( main );
 
     /* Margins, spacing */
     main->setContentsMargins( 0, 0, 0, 0 );
@@ -392,6 +393,7 @@ void MainInterface::createMainWidget( QSettings *settings )
     visualSelector->hide();
     #endif
 
+    QStackedWidget *stackCentralW = new QStackedWidget( main );
     /* Bg Cone */
     bgWidget = new BackgroundWidget( p_intf );
     bgWidget->resize(
@@ -403,10 +405,14 @@ void MainInterface::createMainWidget( QSettings *settings )
     {
         bgWidget->hide();
     }
+    stackCentralW->addWidget( bgWidget );
 
     /* And video Outputs */
     if( videoEmbeddedFlag )
+    {
         videoWidget = new VideoWidget( p_intf );
+        stackCentralW->addWidget( videoWidget );
+    }
 
     /* Create the CONTROLS Widget */
     controls = new ControlsWidget( p_intf,
@@ -417,17 +423,12 @@ void MainInterface::createMainWidget( QSettings *settings )
              this, doComponentsUpdate() );
     inputC = new InputControlsWidget( p_intf, this );
 
+    mainLayout->insertWidget( 1, stackCentralW, 10 );
 
-    /* Add the controls Widget to the main Widget */
-    if( videoWidget ){
-        mainLayout->addWidget( videoWidget, 0, 0, 1, -1 );
-        mainLayout->setRowStretch( 0, 10 );
-    }
-    mainLayout->addWidget( bgWidget, 1, 0, 1, -1 );
     //mainLayout->setRowStretch( 1, 10 );
-    mainLayout->addWidget( inputC, 2, 0, 1, -1, Qt::AlignBottom );
-    mainLayout->addWidget( controls, settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
-                           0, 1, -1, Qt::AlignBottom );
+    mainLayout->insertWidget( 2, inputC );
+    mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
+                              controls );
 
     /* Finish the sizing */
     main->updateGeometry();
@@ -655,7 +656,7 @@ int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
     {                                                             \
         control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
                 p_config, options, false, optionsLayout, line );  \
-        controls->append( control );                               \
+        controls->append( control );                              \
     }
 
 #define CONFIG_GENERIC_NOBOOL( option, type )                     \
@@ -663,8 +664,8 @@ int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
     if( p_config )                                                \
     {                                                             \
         control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
-                p_config, options, optionsLayout, line );  \
-        controls->append( control );                               \
+                p_config, options, optionsLayout, line );         \
+        controls->append( control );                              \
     }
 
     CONFIG_GENERIC( "album-art", IntegerList ); line++;
