@@ -739,13 +739,13 @@ static int FrontendInfo( access_t *p_access )
  *****************************************************************************/
 static fe_spectral_inversion_t DecodeInversion( access_t *p_access )
 {
-    vlc_value_t         val;
+    int i_val;
     fe_spectral_inversion_t fe_inversion = 0;
 
-    var_Get( p_access, "dvb-inversion", &val );
-    msg_Dbg( p_access, "using inversion=%d", val.i_int );
+    i_val = var_GetInteger( p_access, "dvb-inversion" );
+    msg_Dbg( p_access, "using inversion=%d", i_val );
 
-    switch( val.i_int )
+    switch( i_val )
     {
         case 0: fe_inversion = INVERSION_OFF; break;
         case 1: fe_inversion = INVERSION_ON; break;
@@ -838,20 +838,20 @@ static fe_modulation_t DecodeModulationATSC( access_t *p_access )
  *****************************************************************************/
 static fe_sec_voltage_t DecodeVoltage( access_t *p_access )
 {
-    vlc_value_t         val;
+    int i_val;
     fe_sec_voltage_t    fe_voltage;
 
-    var_Get( p_access, "dvb-voltage", &val );
-    msg_Dbg( p_access, "using voltage=%d", val.i_int );
+    i_val = var_GetInteger( p_access, "dvb-voltage" );
+    msg_Dbg( p_access, "using voltage=%d", i_val );
 
-    switch( val.i_int )
+    switch( i_val )
     {
         case 0: fe_voltage = SEC_VOLTAGE_OFF; break;
         case 13: fe_voltage = SEC_VOLTAGE_13; break;
         case 18: fe_voltage = SEC_VOLTAGE_18; break;
         default:
             fe_voltage = SEC_VOLTAGE_OFF;
-            msg_Err( p_access, "argument has invalid voltage (%d)", val.i_int );
+            msg_Err( p_access, "argument has invalid voltage (%d)", i_val );
             break;
     }
     return fe_voltage;
@@ -859,19 +859,19 @@ static fe_sec_voltage_t DecodeVoltage( access_t *p_access )
 
 static fe_sec_tone_mode_t DecodeTone( access_t *p_access )
 {
-    vlc_value_t         val;
+    int i_val;
     fe_sec_tone_mode_t  fe_tone;
 
-    var_Get( p_access, "dvb-tone", &val );
-    msg_Dbg( p_access, "using tone=%d", val.i_int );
+    i_val = var_GetInteger( p_access, "dvb-tone" );
+    msg_Dbg( p_access, "using tone=%d", i_val );
 
-    switch( val.i_int )
+    switch( i_val )
     {
         case 0: fe_tone = SEC_TONE_OFF; break;
         case 1: fe_tone = SEC_TONE_ON; break;
         default:
             fe_tone = SEC_TONE_OFF;
-            msg_Err( p_access, "argument has invalid tone mode (%d)", val.i_int);
+            msg_Err( p_access, "argument has invalid tone mode (%d)", i_val );
             break;
     }
     return fe_tone;
@@ -886,25 +886,24 @@ struct diseqc_cmd_t
 static int DoDiseqc( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
-    vlc_value_t val;
+    int i_val;
+    bool b_val;
     int i_frequency, i_lnb_slof;
     fe_sec_voltage_t fe_voltage;
     fe_sec_tone_mode_t fe_tone;
     int i_err;
 
-    var_Get( p_access, "dvb-frequency", &val );
-    i_frequency = val.i_int;
-    var_Get( p_access, "dvb-lnb-slof", &val );
-    i_lnb_slof = val.i_int;
+    i_frequency = var_GetInteger( p_access, "dvb-frequency" );
+    i_lnb_slof = var_GetInteger( p_access, "dvb-lnb-slof" );
 
-    var_Get( p_access, "dvb-tone", &val );
-    if( val.i_int == -1 /* auto */ )
+    i_val = var_GetInteger( p_access, "dvb-tone" );
+    if( i_val == -1 /* auto */ )
     {
         if( i_frequency >= i_lnb_slof )
-            val.i_int = 1;
+            i_val = 1;
         else
-            val.i_int = 0;
-        var_Set( p_access, "dvb-tone", val );
+            i_val = 0;
+        var_SetInteger( p_access, "dvb-tone", i_val );
     }
 
     fe_voltage = DecodeVoltage( p_access );
@@ -926,20 +925,20 @@ static int DoDiseqc( access_t *p_access )
         return i_err;
     }
 
-    var_Get( p_access, "dvb-high-voltage", &val );
+    b_val = var_GetBool( p_access, "dvb-high-voltage" );
     if( (i_err = ioctl( p_sys->i_frontend_handle, FE_ENABLE_HIGH_LNB_VOLTAGE,
-                        val.b_bool )) < 0 && val.b_bool )
+                        b_val )) < 0 && b_val )
     {
         msg_Err( p_access,
                  "ioctl FE_ENABLE_HIGH_LNB_VOLTAGE failed, val=%d (%d) %m",
-                 val.b_bool, i_err );
+                 b_val, i_err );
     }
 
     /* Wait for at least 15 ms. */
     msleep(15000);
 
-    var_Get( p_access, "dvb-satno", &val );
-    if( val.i_int > 0 && val.i_int < 5 )
+    i_val = var_GetInteger( p_access, "dvb-satno" );
+    if( i_val > 0 && i_val < 5 )
     {
         /* digital satellite equipment control,
          * specification is available from http://www.eutelsat.com/
@@ -952,7 +951,7 @@ static int DoDiseqc( access_t *p_access )
          * bits are: option, position, polarization, band
          */
         cmd.cmd.msg[3] = 0xf0 /* reset bits */
-                          | (((val.i_int - 1) * 4) & 0xc)
+                          | (((i_val - 1) * 4) & 0xc)
                           | (fe_voltage == SEC_VOLTAGE_13 ? 0 : 2)
                           | (fe_tone == SEC_TONE_ON ? 1 : 0);
 
@@ -968,7 +967,7 @@ static int DoDiseqc( access_t *p_access )
 
         /* A or B simple diseqc ("diseqc-compatible") */
         if( (i_err = ioctl( p_sys->i_frontend_handle, FE_DISEQC_SEND_BURST,
-                      ((val.i_int - 1) % 2) ? SEC_MINI_B : SEC_MINI_A )) < 0 )
+                      ((i_val - 1) % 2) ? SEC_MINI_B : SEC_MINI_A )) < 0 )
         {
             msg_Err( p_access, "ioctl FE_SEND_BURST failed (%d) %m",
                      i_err );
@@ -994,15 +993,14 @@ static int FrontendSetQPSK( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     struct dvb_frontend_parameters fep;
     int i_ret;
-    vlc_value_t val;
+    int i_val;
     int i_frequency, i_lnb_slof = 0, i_lnb_lof1, i_lnb_lof2 = 0;
 
     /* Prepare the fep structure */
-    var_Get( p_access, "dvb-frequency", &val );
-    i_frequency = val.i_int;
+    i_frequency = var_GetInteger( p_access, "dvb-frequency" );
 
-    var_Get( p_access, "dvb-lnb-lof1", &val );
-    if ( val.i_int == 0 )
+    i_val = var_GetInteger( p_access, "dvb-lnb-lof1" );
+    if( i_val == 0 )
     {
         /* Automatic mode. */
         if ( i_frequency >= 950000 && i_frequency <= 2150000 )
@@ -1043,20 +1041,15 @@ static int FrontendSetQPSK( access_t *p_access )
                      "oscillator frequency" );
             return VLC_EGENERIC;
         }
-        val.i_int = i_lnb_lof1;
-        var_Set( p_access, "dvb-lnb-lof1", val );
-        val.i_int = i_lnb_lof2;
-        var_Set( p_access, "dvb-lnb-lof2", val );
-        val.i_int = i_lnb_slof;
-        var_Set( p_access, "dvb-lnb-slof", val );
+        var_SetInteger( p_access, "dvb-lnb-lof1", i_lnb_lof1 );
+        var_SetInteger( p_access, "dvb-lnb-lof2", i_lnb_lof2 );
+        var_SetInteger( p_access, "dvb-lnb-slof", i_lnb_slof );
     }
     else
     {
-        i_lnb_lof1 = val.i_int;
-        var_Get( p_access, "dvb-lnb-lof2", &val );
-        i_lnb_lof2 = val.i_int;
-        var_Get( p_access, "dvb-lnb-slof", &val );
-        i_lnb_slof = val.i_int;
+        i_lnb_lof1 = i_val;
+        i_lnb_lof2 = var_GetInteger( p_access, "dvb-lnb-lof2" );
+        i_lnb_slof = var_GetInteger( p_access, "dvb-lnb-slof" );
     }
 
     if( i_lnb_slof && i_frequency >= i_lnb_slof )
@@ -1071,11 +1064,9 @@ static int FrontendSetQPSK( access_t *p_access )
 
     fep.inversion = DecodeInversion( p_access );
 
-    var_Get( p_access, "dvb-srate", &val );
-    fep.u.qpsk.symbol_rate = val.i_int;
+    fep.u.qpsk.symbol_rate = var_GetInteger( p_access, "dvb-srate" );
 
-    var_Get( p_access, "dvb-fec", &val );
-    fep.u.qpsk.fec_inner = DecodeFEC( p_access, val.i_int );
+    fep.u.qpsk.fec_inner = DecodeFEC( p_access, var_GetInteger( p_access, "dvb-fec" ) );
 
     if( DoDiseqc( p_access ) < 0 )
     {
@@ -1109,13 +1100,12 @@ static int FrontendSetQAM( access_t *p_access )
     access_sys_t *p_sys = p_access->p_sys;
     frontend_t *p_frontend = p_sys->p_frontend;
     struct dvb_frontend_parameters fep;
-    vlc_value_t val;
+    int i_val;
     int i_ret;
 
     /* Prepare the fep structure */
 
-    var_Get( p_access, "dvb-frequency", &val );
-    fep.frequency = val.i_int;
+    fep.frequency = var_GetInteger( p_access, "dvb-frequency" );
 
     fep.inversion = DecodeInversion( p_access );
 
@@ -1123,15 +1113,15 @@ static int FrontendSetQAM( access_t *p_access )
      * for dvb-c, so if it's over the limit of frontend, default to
      * somewhat common value
      */
-    var_Get( p_access, "dvb-srate", &val );
-    if( val.i_int < p_frontend->info.symbol_rate_max &&
-        val.i_int > p_frontend->info.symbol_rate_min )
-        fep.u.qam.symbol_rate = val.i_int;
+    i_val = var_GetInteger( p_access, "dvb-srate" );
+    if( i_val < p_frontend->info.symbol_rate_max &&
+        i_val > p_frontend->info.symbol_rate_min )
+        fep.u.qam.symbol_rate = i_val;
     else
         fep.u.qam.symbol_rate = 6875000;
 
-    var_Get( p_access, "dvb-fec", &val );
-    fep.u.qam.fec_inner = DecodeFEC( p_access, val.i_int );
+    fep.u.qam.fec_inner = DecodeFEC( p_access, var_GetInteger( p_access,
+                                                               "dvb-fec" ) );
 
     fep.u.qam.modulation = DecodeModulationQAM( p_access );
 
@@ -1159,13 +1149,12 @@ static int FrontendSetQAM( access_t *p_access )
  *****************************************************************************/
 static fe_bandwidth_t DecodeBandwidth( access_t *p_access )
 {
-    vlc_value_t         val;
     fe_bandwidth_t      fe_bandwidth = 0;
+    int i_bandwith = var_GetInteger( p_access, "dvb-bandwidth" );
 
-    var_Get( p_access, "dvb-bandwidth", &val );
-    msg_Dbg( p_access, "using bandwidth=%d", val.i_int );
+    msg_Dbg( p_access, "using bandwidth=%d", i_bandwith );
 
-    switch( val.i_int )
+    switch( i_bandwith )
     {
         case 0: fe_bandwidth = BANDWIDTH_AUTO; break;
         case 6: fe_bandwidth = BANDWIDTH_6_MHZ; break;
@@ -1181,13 +1170,12 @@ static fe_bandwidth_t DecodeBandwidth( access_t *p_access )
 
 static fe_transmit_mode_t DecodeTransmission( access_t *p_access )
 {
-    vlc_value_t         val;
     fe_transmit_mode_t  fe_transmission = 0;
+    int i_transmission = var_GetInteger( p_access, "dvb-transmission" );
 
-    var_Get( p_access, "dvb-transmission", &val );
-    msg_Dbg( p_access, "using transmission=%d", val.i_int );
+    msg_Dbg( p_access, "using transmission=%d", i_transmission );
 
-    switch( val.i_int )
+    switch( i_transmission )
     {
         case 0: fe_transmission = TRANSMISSION_MODE_AUTO; break;
         case 2: fe_transmission = TRANSMISSION_MODE_2K; break;
@@ -1202,13 +1190,12 @@ static fe_transmit_mode_t DecodeTransmission( access_t *p_access )
 
 static fe_guard_interval_t DecodeGuardInterval( access_t *p_access )
 {
-    vlc_value_t         val;
     fe_guard_interval_t fe_guard = 0;
+    int i_guard = var_GetInteger( p_access, "dvb-guard" );
 
-    var_Get( p_access, "dvb-guard", &val );
-    msg_Dbg( p_access, "using guard=%d", val.i_int );
+    msg_Dbg( p_access, "using guard=%d", i_guard );
 
-    switch( val.i_int )
+    switch( i_guard )
     {
         case 0: fe_guard = GUARD_INTERVAL_AUTO; break;
         case 4: fe_guard = GUARD_INTERVAL_1_4; break;
@@ -1225,13 +1212,12 @@ static fe_guard_interval_t DecodeGuardInterval( access_t *p_access )
 
 static fe_hierarchy_t DecodeHierarchy( access_t *p_access )
 {
-    vlc_value_t         val;
     fe_hierarchy_t      fe_hierarchy = 0;
+    int i_hierarchy = var_GetInteger( p_access, "dvb-hierarchy" );
 
-    var_Get( p_access, "dvb-hierarchy", &val );
-    msg_Dbg( p_access, "using hierarchy=%d", val.i_int );
+    msg_Dbg( p_access, "using hierarchy=%d", i_hierarchy );
 
-    switch( val.i_int )
+    switch( i_hierarchy )
     {
         case -1: fe_hierarchy = HIERARCHY_NONE; break;
         case 0: fe_hierarchy = HIERARCHY_AUTO; break;
@@ -1250,21 +1236,19 @@ static int FrontendSetOFDM( access_t * p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     struct dvb_frontend_parameters fep;
-    vlc_value_t val;
     int ret;
 
     /* Prepare the fep structure */
 
-    var_Get( p_access, "dvb-frequency", &val );
-    fep.frequency = val.i_int;
+    fep.frequency = var_GetInteger( p_access, "dvb-frequency" );
 
     fep.inversion = DecodeInversion( p_access );
 
     fep.u.ofdm.bandwidth = DecodeBandwidth( p_access );
-    var_Get( p_access, "dvb-code-rate-hp", &val );
-    fep.u.ofdm.code_rate_HP = DecodeFEC( p_access, val.i_int );
-    var_Get( p_access, "dvb-code-rate-lp", &val );
-    fep.u.ofdm.code_rate_LP = DecodeFEC( p_access, val.i_int );
+    fep.u.ofdm.code_rate_HP = DecodeFEC( p_access, var_GetInteger( p_access,
+                                                        "dvb-code-rate-hp" ) );
+    fep.u.ofdm.code_rate_LP = DecodeFEC( p_access, var_GetInteger( p_access,
+                                                        "dvb-code-rate-lp" ) );
     fep.u.ofdm.constellation = DecodeModulationOFDM( p_access );
     fep.u.ofdm.transmission_mode = DecodeTransmission( p_access );
     fep.u.ofdm.guard_interval = DecodeGuardInterval( p_access );
@@ -1296,13 +1280,11 @@ static int FrontendSetATSC( access_t *p_access )
 {
     access_sys_t *p_sys = p_access->p_sys;
     struct dvb_frontend_parameters fep;
-    vlc_value_t val;
     int i_ret;
 
     /* Prepare the fep structure */
 
-    var_Get( p_access, "dvb-frequency", &val );
-    fep.frequency = val.i_int;
+    fep.frequency = var_GetInteger( p_access, "dvb-frequency" );
 
     fep.u.vsb.modulation = DecodeModulationATSC( p_access );
 
@@ -1339,12 +1321,9 @@ int DMXSetFilter( access_t * p_access, int i_pid, int * pi_fd, int i_type )
     int i_ret;
     unsigned int i_adapter, i_device;
     char dmx[128];
-    vlc_value_t val;
 
-    var_Get( p_access, "dvb-adapter", &val );
-    i_adapter = val.i_int;
-    var_Get( p_access, "dvb-device", &val );
-    i_device = val.i_int;
+    i_adapter = var_GetInteger( p_access, "dvb-adapter" );
+    i_device = var_GetInteger( p_access, "dvb-device" );
 
     if( snprintf( dmx, sizeof(dmx), DMX, i_adapter, i_device )
             >= (int)sizeof(dmx) )
@@ -1499,12 +1478,9 @@ int DVROpen( access_t * p_access )
     access_sys_t *p_sys = p_access->p_sys;
     unsigned int i_adapter, i_device;
     char dvr[128];
-    vlc_value_t val;
 
-    var_Get( p_access, "dvb-adapter", &val );
-    i_adapter = val.i_int;
-    var_Get( p_access, "dvb-device", &val );
-    i_device = val.i_int;
+    i_adapter = var_GetInteger( p_access, "dvb-adapter" );
+    i_device = var_GetInteger( p_access, "dvb-device" );
 
     if( snprintf( dvr, sizeof(dvr), DVR, i_adapter, i_device )
             >= (int)sizeof(dvr) )

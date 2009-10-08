@@ -201,7 +201,6 @@ static int Open( vlc_object_t *p_this )
     char         *psz_dvdcss_env;
     dvd_reader_t *p_dvdread;
     ifo_handle_t *p_vmg_file;
-    vlc_value_t  val;
 
     if( !p_demux->psz_path || !*p_demux->psz_path )
     {
@@ -280,9 +279,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_title = p_sys->i_chapter = -1;
     p_sys->i_mux_rate = 0;
 
-    var_Create( p_demux, "dvdread-angle", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "dvdread-angle", &val );
-    p_sys->i_angle = val.i_int > 0 ? val.i_int : 1;
+    p_sys->i_angle = var_CreateGetInteger( p_demux, "dvdread-angle" );
+    if( p_sys->i_angle <= 0 ) p_sys->i_angle = 1;
 
     DemuxTitles( p_demux, &p_sys->i_angle );
     if( DvdReadSetArea( p_demux, 0, 0, p_sys->i_angle ) != VLC_SUCCESS )

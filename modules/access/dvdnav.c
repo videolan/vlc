@@ -183,7 +183,6 @@ static int Open( vlc_object_t *p_this )
     int         i_angle;
     char        *psz_name;
     char        *psz_code;
-    vlc_value_t val;
 
     if( !p_demux->psz_path || !*p_demux->psz_path )
     {
@@ -303,9 +302,7 @@ static int Open( vlc_object_t *p_this )
 
     DemuxTitles( p_demux );
 
-    var_Create( p_demux, "dvdnav-menu", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "dvdnav-menu", &val );
-    if( val.b_bool )
+    if( var_CreateGetBool( p_demux, "dvdnav-menu" ) )
     {
         msg_Dbg( p_demux, "trying to go to dvd menu" );
 
@@ -330,9 +327,8 @@ static int Open( vlc_object_t *p_this )
         }
     }
 
-    var_Create( p_demux, "dvdnav-angle", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "dvdnav-angle", &val );
-    i_angle = val.i_int > 0 ? val.i_int : 1;
+    i_angle = var_CreateGetInteger( p_demux, "dvdnav-angle" );
+    if( i_angle <= 0 ) i_angle = 1;
 
     /* Update default_pts to a suitable value for dvdnav access */
     var_Create( p_demux, "dvdnav-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT );
