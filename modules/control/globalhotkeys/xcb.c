@@ -332,14 +332,11 @@ static void Mapping( intf_thread_t *p_intf )
 #else
         xcb_keycode_t *p_keys = xcb_key_symbols_get_keycode(
                 p_sys->p_symbols, GetX11Key( i_vlc_key & ~KEY_MODIFIER ) );
-        printf("%s -> %x\n", p_hotkey->psz_action, i_vlc_key );
-        printf("got %p\n", p_keys );
         if( !p_keys )
             continue;
 #endif
         const unsigned i_modifier = GetX11Modifier( p_sys->p_connection,
                 p_sys->p_symbols, i_vlc_key & KEY_MODIFIER );
-        printf("modif = %d\n", i_modifier);
 
         const size_t max = sizeof(p_x11_modifier_ignored) /
                 sizeof(*p_x11_modifier_ignored);
@@ -385,7 +382,6 @@ static void Register( intf_thread_t *p_intf )
 #else
         for( int j = 0; p_map->p_keys[j] != XCB_NO_SYMBOL; j++ )
         {
-            printf("grabbing %d (j=%d, map = %d)\n", p_map->p_keys[j], j, i);
             xcb_grab_key( p_sys->p_connection, true, p_sys->root,
                           p_map->i_modifier, p_map->p_keys[j],
                           XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC );
