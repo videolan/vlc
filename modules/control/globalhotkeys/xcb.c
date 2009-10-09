@@ -182,6 +182,9 @@ static unsigned GetModifier( xcb_connection_t *p_connection, xcb_key_symbols_t *
         XCB_MOD_MASK_4, XCB_MOD_MASK_5
     };
 
+    if( sym == 0 )
+        return 0; /* no modifier */
+
 #ifdef XCB_KEYSYM_OLD_API /* as seen in Debian Lenny */
     const xcb_keycode_t key = xcb_key_symbols_get_keycode( p_symbols, sym );
     if( key == 0 )
@@ -189,6 +192,21 @@ static unsigned GetModifier( xcb_connection_t *p_connection, xcb_key_symbols_t *
 #else
     const xcb_keycode_t *p_keys = xcb_key_symbols_get_keycode( p_symbols, sym );
     if( !p_keys )
+        return 0;
+
+    int i = 0;
+    bool no_modifier = true;
+    while( p_keys[i] != XCB_NO_SYMBOL )
+    {
+        if( p_keys[i] != 0 )
+        {
+            no_modifier = false;
+            break;
+        }
+        i++;
+    }
+
+    if( no_modifier )
         return 0;
 #endif
 
@@ -344,7 +362,7 @@ static void Mapping( intf_thread_t *p_intf )
         {
             const unsigned i_ignored = GetModifier( p_sys->p_connection,
                     p_sys->p_symbols, p_x11_modifier_ignored[i] );
-            if( i != 0 && i_ignored == 0x00)
+            if( i != 0 && i_ignored == 0)
                 continue;
 
             hotkey_mapping_t *p_map_old = p_sys->p_map;
