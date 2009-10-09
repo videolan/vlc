@@ -344,7 +344,11 @@ int VaExtract( vlc_va_t *p_va, picture_t *p_picture, AVFrame *p_ff )
 {
     VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)p_ff->data[3];
 
+#if VA_CHECK_VERSION(0,31,0)
+    if( vaSyncSurface( p_va->p_display, i_surface_id ) )
+#else
     if( vaSyncSurface( p_va->p_display, p_va->i_context_id, i_surface_id ) )
+#endif
         return VLC_EGENERIC;
 
     /* XXX vaDeriveImage may be better but it is not supported by
