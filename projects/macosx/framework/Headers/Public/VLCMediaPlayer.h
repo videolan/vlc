@@ -190,6 +190,58 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
  */
 - (void)rewindAtRate:(float)rate;
 
+/**
+ * Jumps shortly backward in current stream if seeking is supported.
+ * \param interval to skip, in sec.
+ */
+- (void)jumpBackward:(NSInteger)interval;
+
+/**
+ * Jumps shortly forward in current stream if seeking is supported.
+ * \param interval to skip, in sec.
+ */
+- (void)jumpForward:(NSInteger)interval;
+
+/**
+ * Jumps shortly backward in current stream if seeking is supported.
+ */
+- (void)extraShortJumpBackward;
+
+/**
+ * Jumps shortly forward in current stream if seeking is supported.
+ */
+- (void)extraShortJumpForward;
+
+/**
+ * Jumps shortly backward in current stream if seeking is supported.
+ */
+- (void)shortJumpBackward;
+
+/**
+ * Jumps shortly forward in current stream if seeking is supported.
+ */
+- (void)shortJumpForward;
+
+/**
+ * Jumps shortly backward in current stream if seeking is supported.
+ */
+- (void)mediumJumpBackward;
+
+/**
+ * Jumps shortly forward in current stream if seeking is supported.
+ */
+- (void)mediumJumpForward;
+
+/**
+ * Jumps shortly backward in current stream if seeking is supported.
+ */
+- (void)longJumpBackward;
+
+/**
+ * Jumps shortly forward in current stream if seeking is supported.
+ */
+- (void)longJumpForward;
+
 /* Playback Information */
 /**
  * Playback state flag identifying that the stream is currently playing.

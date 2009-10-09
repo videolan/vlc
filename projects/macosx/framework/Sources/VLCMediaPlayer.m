@@ -325,7 +325,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     NSSize result = NSMakeSize(libvlc_video_get_height((libvlc_media_player_t *)instance, &ex),
                                libvlc_video_get_width((libvlc_media_player_t *)instance, &ex));
     catch_exception( &ex );
-    return result;    
+    return result;
 }
 
 - (BOOL)hasVideoOut
@@ -514,6 +514,64 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 - (void)rewindAtRate:(float)rate
 {
     [self setRate: -rate];
+}
+
+- (void)jumpBackward:(NSInteger)interval
+{
+    if( [self isSeekable] )
+    {
+        interval = interval * 1000000;
+        [self setTime: [VLCTime timeWithInt: ([[self time] intValue] - interval)]];
+    }
+}
+
+- (void)jumpForward:(NSInteger)interval
+{
+    if( [self isSeekable] )
+    {
+        interval = interval * 1000000;
+        [self setTime: [VLCTime timeWithInt: ([[self time] intValue] + interval)]];
+    }
+}
+
+- (void)extraShortJumpBackward
+{
+    [self jumpBackward:3];
+}
+
+- (void)extraShortJumpForward
+{
+    [self jumpForward:3];
+}
+
+- (void)shortJumpBackward
+{
+    [self jumpBackward:10];
+}
+
+- (void)shortJumpForward
+{
+    [self jumpForward:10];
+}
+
+- (void)mediumJumpBackward
+{
+    [self jumpBackward:60];
+}
+
+- (void)mediumJumpForward
+{
+    [self jumpForward:60];
+}
+
+- (void)longJumpBackward
+{
+    [self jumpBackward:300];
+}
+
+- (void)longJumpForward
+{
+    [self jumpForward:300];
 }
 
 + (NSSet *)keyPathsForValuesAffectingIsPlaying
