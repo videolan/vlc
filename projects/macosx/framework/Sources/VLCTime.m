@@ -39,6 +39,11 @@
     return [[[VLCTime alloc] initWithNumber:aNumber] autorelease];
 }
 
++ (VLCTime *)timeWithInt:(int)aInt
+{
+    return [[[VLCTime alloc] initWithInt:aInt] autorelease];
+}
+
 /* Initializers */
 - (id)initWithNumber:(NSNumber *)aNumber
 {
@@ -46,6 +51,18 @@
     {
         if (aNumber)
             value = [[aNumber copy] retain];
+        else
+            value = nil;
+    }
+    return self;
+}
+
+- (id)initWithInt:(int)aInt
+{
+    if (self = [super init])
+    {
+        if (aInt)
+            value = [[NSNumber numberWithInt: aInt] retain];
         else
             value = nil;
     }
@@ -98,6 +115,13 @@
         // Return a string that represents an undefined time.
         return @"--:--";
     }
+}
+
+- (int)intValue
+{
+    if( value )
+        return [value intValue];
+    return 0;
 }
 
 - (NSComparisonResult)compare:(VLCTime *)aTime

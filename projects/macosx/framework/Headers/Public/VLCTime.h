@@ -35,13 +35,16 @@
 /* Factories */
 + (VLCTime *)nullTime;
 + (VLCTime *)timeWithNumber:(NSNumber *)aNumber;
++ (VLCTime *)timeWithInt:(int)aInt;
 
 /* Initializers */
 - (id)initWithNumber:(NSNumber *)aNumber;
+- (id)initWithInt:(int)aInt;
 
 /* Properties */
 @property (readonly) NSNumber * numberValue;
 @property (readonly) NSString * stringValue;
+@property (readonly) int intValue;
 
 /* Comparitors */
 - (NSComparisonResult)compare:(VLCTime *)aTime;
