@@ -420,10 +420,15 @@ static int Open( vlc_object_t *p_this )
     }
 
     if( !i_ret )
+    {
+        free( p_access->psz_demux );
         p_access->psz_demux = strdup( "ts" );
+    }
     else
+    {
         msg_Warn( p_access, "DVB_Open: Unsupported Network %s",
                   p_access->psz_access);
+    }
     return i_ret;
 }
 
