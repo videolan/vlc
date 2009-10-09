@@ -230,7 +230,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
             /* We must make sure we won't receive new event after an upcoming dealloc
              * We also may receive a -retain in some event callback that may occcur
              * Before libvlc_event_detach. So this can't happen in dealloc */
-            libvlc_event_manager_t * p_em = libvlc_media_event_manager(p_md, NULL);
+            libvlc_event_manager_t * p_em = libvlc_media_event_manager(p_md);
             libvlc_event_detach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self, NULL);
 //            libvlc_event_detach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self, NULL);
             libvlc_event_detach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self, NULL);
@@ -311,7 +311,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
 - (BOOL)isPreparsed
 {
-    return libvlc_media_is_preparsed( p_md, NULL );
+    return libvlc_media_is_preparsed( p_md );
 }
 
 @synthesize url;
@@ -335,9 +335,6 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 {
     if (self = [super init])
     {
-        libvlc_exception_t ex;
-        libvlc_exception_init( &ex );
-                
         libvlc_media_retain( md );
         p_md = md;
         
@@ -432,25 +429,22 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
     artFetched = NO;
 
-    char * p_url = libvlc_media_get_mrl( p_md, &ex );
-    catch_exception( &ex );
+    char * p_url = libvlc_media_get_mrl( p_md );
 
     url = [[NSURL URLWithString:[NSString stringWithUTF8String:p_url]] retain];
     if( !url ) /* Attempt to interpret as a file path then */
         url = [[NSURL fileURLWithPath:[NSString stringWithUTF8String:p_url]] retain];
     free( p_url );
 
-    libvlc_media_set_user_data( p_md, (void*)self, &ex );
-    catch_exception( &ex );
+    libvlc_media_set_user_data( p_md, (void*)self );
 
-    libvlc_event_manager_t * p_em = libvlc_media_event_manager( p_md, &ex );
+    libvlc_event_manager_t * p_em = libvlc_media_event_manager( p_md );
     libvlc_event_attach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self, &ex);
 //    libvlc_event_attach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self, &ex);
     libvlc_event_attach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self, &ex);
     libvlc_event_attach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self, &ex);
-    catch_exception( &ex );
     
-    libvlc_media_list_t * p_mlist = libvlc_media_subitems( p_md, NULL );
+    libvlc_media_list_t * p_mlist = libvlc_media_subitems( p_md );
 
     if (!p_mlist)
         subitems = nil;
@@ -460,7 +454,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         libvlc_media_list_release( p_mlist );
     }
 
-    state = LibVLCStateToMediaState(libvlc_media_get_state( p_md, NULL ));
+    state = LibVLCStateToMediaState(libvlc_media_get_state( p_md ));
 
     /* Force VLCMetaInformationTitle, that will trigger preparsing
      * And all the other meta will be added through the libvlc event system */
@@ -469,7 +463,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
 - (void)fetchMetaInformationFromLibVLCWithType:(NSString *)metaType
 {
-    char * psz_value = libvlc_media_get_meta( p_md, [VLCMedia stringToMetaType:metaType], NULL);
+    char * psz_value = libvlc_media_get_meta( p_md, [VLCMedia stringToMetaType:metaType] );
     NSString * newValue = psz_value ? [NSString stringWithUTF8String: psz_value] : nil;
     NSString * oldValue = [metaDictionary valueForKey:metaType];
     free(psz_value);
@@ -530,7 +524,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     if( subitems )
         return; /* Nothing to do */
 
-    libvlc_media_list_t * p_mlist = libvlc_media_subitems( p_md, NULL );
+    libvlc_media_list_t * p_mlist = libvlc_media_subitems( p_md );
 
     NSAssert( p_mlist, @"The mlist shouldn't be nil, we are receiving a subItemAdded");
 
