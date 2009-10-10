@@ -108,7 +108,7 @@ static int Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    if( var_Get( p_aout, "audio-device" ) != VLC_ENOVAR )
+    if( var_Get( p_aout, "audio-device", &val ) != VLC_ENOVAR )
     {
         /* The user has selected an audio device. */
         if ( val.i_int == AOUT_VAR_STEREO )
