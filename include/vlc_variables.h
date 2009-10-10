@@ -561,7 +561,7 @@ static inline char *__var_CreateGetNonEmptyString( vlc_object_t *p_obj,
  * \param psz_name The name of the variable
  */
 LIBVLC_USED
-static inline char *__var_CreateGetAddress( vlc_object_t *p_obj,
+static inline void *__var_CreateGetAddress( vlc_object_t *p_obj,
                                            const char *psz_name )
 {
     __var_Create( p_obj, psz_name, VLC_VAR_ADDRESS | VLC_VAR_DOINHERIT );
