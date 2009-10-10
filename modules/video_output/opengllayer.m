@@ -167,7 +167,6 @@ static int Init( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
     int i_pixel_pitch;
-    vlc_value_t val;
 
 #if ( defined( WORDS_BIGENDIAN ) && VLCGL_FORMAT == GL_YCBCR_422_APPLE ) || (VLCGL_FORMAT == YCBCR_MESA)
     p_vout->output.i_chroma = VLC_CODEC_YUYV;
@@ -184,12 +183,9 @@ static int Init( vout_thread_t *p_vout )
     p_vout->output.i_aspect = p_vout->render.i_aspect;
 
     /* We do need a drawable to work properly */
-    vlc_value_t value_drawable;
-    var_Create( p_vout, "drawable-gl", VLC_VAR_DOINHERIT );
-    var_Get( p_vout, "drawable-gl", &value_drawable );
+    p_vout->p_sys->o_cocoa_container = (id)var_CreateGetAddress( p_vout,
+                                                    "drawable-nsobject" );
 
-    p_vout->p_sys->o_cocoa_container = (id) value_drawable.i_int;
-    
     p_vout->fmt_out = p_vout->fmt_in;
     p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
 
