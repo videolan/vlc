@@ -25,6 +25,10 @@
 #import "VLCAudio.h"
 #import "VLCLibVLCBridging.h"
 
+#define VOLUME_STEP                6
+#define VOLUME_MAX                 200
+#define VOLUME_MIN                 0
+
 /* Notification Messages */
 NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged"; 
 
@@ -60,11 +64,31 @@ NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
 
 - (void)setVolume:(int)value
 {
-    if (value < 0)
-        value = 0;
-    else if (value > 200)
-        value = 200;
+    if (value < VOLUME_MIN)
+        value = VOLUME_MIN;
+    else if (value > VOLUME_MAX)
+        value = VOLUME_MAX;
     libvlc_audio_set_volume([library instance], value, NULL);
+}
+
+- (void)volumeUp
+{
+    int tempVolume = [self volume] + VOLUME_STEP;
+    if (tempVolume > VOLUME_MAX)
+        tempVolume = VOLUME_MAX;
+    else if (tempVolume < VOLUME_MIN)
+        tempVolume = VOLUME_MIN;
+    [self setVolume: tempVolume];
+}
+
+- (void)volumeDown
+{
+    int tempVolume = [self volume] - VOLUME_STEP;
+    if (tempVolume > VOLUME_MAX)
+        tempVolume = VOLUME_MAX;
+    else if (tempVolume < VOLUME_MIN)
+        tempVolume = VOLUME_MIN;
+    [self setVolume: tempVolume];
 }
 
 - (int)volume

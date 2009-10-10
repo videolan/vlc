@@ -45,4 +45,7 @@ extern NSString * VLCMediaPlayerVolumeChanged;
 
 @property (setter=setMute:) BOOL isMuted;
 @property (assign) int volume;
+
+- (void)volumeDown;
+- (void)volumeUp;
 @end
