@@ -34,6 +34,7 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>
 
+#include <vlc_common.h>
 #include <vlc_keys.h>
 
 #include "intf.h"

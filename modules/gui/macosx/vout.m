@@ -44,13 +44,15 @@
 /* SystemUIMode */
 #import <Carbon/Carbon.h>
 
-#include <vlc_keys.h>
 
 #include "intf.h"
 #include "fspanel.h"
 #include "vout.h"
 #import "controls.h"
 #import "embeddedwindow.h"
+
+#include <vlc_common.h>
+#include <vlc_keys.h>
 
 /*****************************************************************************
  * DeviceCallback: Callback triggered when the video-device variable is changed
