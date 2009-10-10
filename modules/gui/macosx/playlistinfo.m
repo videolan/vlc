@@ -386,7 +386,7 @@ static VLCInfo *_o_sharedInstance = nil;
     input_item_SetLanguage( p_item, utf8( o_language_txt ) );
 
     playlist_t * p_playlist = pl_Hold( VLCIntf );
-    input_item_WriteMeta( p_playlist, p_item );
+    input_item_WriteMeta( VLC_OBJECT(p_playlist), p_item );
 
     var_SetBool( p_playlist, "intf-change", true );
     [self updatePanelWithItem: p_item];
