@@ -39,7 +39,6 @@
 #include <string.h>
 #include <math.h>
 #include <sys/mount.h>
-#include <vlc_keys.h>
 
 #import "intf.h"
 #import "wizard.h"
@@ -47,11 +46,14 @@
 #import "playlistinfo.h"
 #import "playlist.h"
 #import "controls.h"
-#import "vlc_osd.h"
 #import "misc.h"
 #import "sidebarview.h"
-#import <vlc_interface.h>
+
+#include <vlc_keys.h>
 #import <vlc_services_discovery.h>
+#import <vlc_osd.h>
+#import <vlc_interface.h>
+
 
 /*****************************************************************************
  * VLCPlaylistView implementation
