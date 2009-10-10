@@ -555,6 +555,20 @@ static inline char *__var_CreateGetNonEmptyString( vlc_object_t *p_obj,
 }
 
 /**
+ * Create an address variable with inherit and get its value.
+ *
+ * \param p_obj The object that holds the variable
+ * \param psz_name The name of the variable
+ */
+LIBVLC_USED
+static inline char *__var_CreateGetAddress( vlc_object_t *p_obj,
+                                           const char *psz_name )
+{
+    __var_Create( p_obj, psz_name, VLC_VAR_ADDRESS | VLC_VAR_DOINHERIT );
+    return __var_GetAddress( p_obj, psz_name );
+}
+
+/**
  * __var_CreateGetInteger() with automatic casting
  */
 #define var_CreateGetInteger(a,b)   __var_CreateGetInteger( VLC_OBJECT(a),b)
@@ -575,6 +589,10 @@ static inline char *__var_CreateGetNonEmptyString( vlc_object_t *p_obj,
  */
 #define var_CreateGetString(a,b)   __var_CreateGetString( VLC_OBJECT(a),b)
 #define var_CreateGetNonEmptyString(a,b)   __var_CreateGetNonEmptyString( VLC_OBJECT(a),b)
+/**
+ * __var_CreateGetString() with automatic casting
+ */
+#define var_CreateGetAddress(a,b)  __var_CreateGetAddress( VLC_OBJECT(a),b)
 
 /**
  * Create a integer command variable with inherit and get its value.
