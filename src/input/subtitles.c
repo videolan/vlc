@@ -266,7 +266,11 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
         return NULL;
 
     if( !strncmp( psz_fname, "file://", 7 ) )
+    {
         psz_fname += 7;
+        if( !strncmp( psz_fname, "localhost", 9 ) )
+            psz_fname += 9;
+    }
 
     /* extract filename & dirname from psz_fname */
     tmp = strrchr( psz_fname, DIR_SEP_CHAR );
