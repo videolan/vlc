@@ -360,6 +360,8 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
 
 - (void) update
 {
+    if (!p_vout)
+        return;
     if( kCGLNoError != CGLLockContext([[self openGLContext] CGLContextObj]) )
         return;
     [super update];
@@ -368,6 +370,8 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
 
 - (void) drawRect: (NSRect) rect
 {
+    if (!p_vout)
+        return;
     if( kCGLNoError != CGLLockContext([[self openGLContext] CGLContextObj]) )
         return;
     [[self openGLContext] flushBuffer];
