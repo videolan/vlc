@@ -457,6 +457,8 @@ static int DirectXCreateWindow( event_thread_t *p_event )
         p_event->parent_window = vout_window_New( VLC_OBJECT(p_vout), NULL, &p_event->wnd_cfg );
         if( p_event->parent_window )
             p_event->hparent = p_event->parent_window->handle.hwnd;
+        else
+            p_event->hparent = NULL;
     #ifdef MODULE_NAME_IS_direct3d
     }
     else
@@ -600,6 +602,10 @@ static int DirectXCreateWindow( event_thread_t *p_event )
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             CW_USEDEFAULT, CW_USEDEFAULT,
                             NULL, NULL, hInstance, NULL );
+    }
+    else
+    {
+        p_event->hfswnd = NULL;
     }
 
     /* Append a "Always On Top" entry in the system menu */
@@ -1049,7 +1055,10 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
     }
     msg_Dbg( p_event->p_vout, "Vout EventThread running" );
 
-    p_hwnd->parent_window = p_event->parent_window;
+    if( !p_event->use_desktop )
+        p_hwnd->parent_window = p_event->parent_window;
+    else
+        p_hwnd->parent_window = NULL;
     p_hwnd->hparent       = p_event->hparent;
     p_hwnd->hwnd          = p_event->hwnd;
     p_hwnd->hvideownd     = p_event->hvideownd;
