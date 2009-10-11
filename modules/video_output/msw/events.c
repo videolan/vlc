@@ -710,13 +710,18 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     if( hwnd == p_event->hvideownd )
     {
+#ifdef MODULE_NAME_IS_directx
+        vlc_mutex_lock( &p_event->lock );
+        const bool use_overlay = p_event->use_overlay;
+        vlc_mutex_unlock( &p_event->lock );
+#endif
+
         switch( message )
         {
 #ifdef MODULE_NAME_IS_directx
         case WM_ERASEBKGND:
         /* For overlay, we need to erase background */
-            return !p_event->use_overlay ?
-                1 : DefWindowProc(hwnd, message, wParam, lParam);
+            return !use_overlay ? 1 : DefWindowProc(hwnd, message, wParam, lParam);
         case WM_PAINT:
         /*
         ** For overlay, DefWindowProc() will erase dirty regions
@@ -725,7 +730,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         ** regular interval, therefore dirty regions can be ignored
         ** to minimize repaint.
         */
-            if( !p_event->use_overlay )
+            if( !use_overlay )
             {
                 ValidateRect(hwnd, NULL);
             }
@@ -987,6 +992,14 @@ void EventThreadUpdateWindowPosition( event_thread_t *p_event, bool *pb_changed,
     p_event->wnd_cfg.height = h;
     vlc_mutex_unlock( &p_event->lock );
 }
+
+void EventThreadUseOverlay( event_thread_t *p_event, bool b_used )
+{
+    vlc_mutex_lock( &p_event->lock );
+    p_event->use_overlay = b_used;
+    vlc_mutex_unlock( &p_event->lock );
+}
+
 event_thread_t *EventThreadCreate( vout_thread_t *p_vout, const vout_window_cfg_t *p_wnd_cfg )
 {
      /* Create the Vout EventThread, this thread is created by us to isolate

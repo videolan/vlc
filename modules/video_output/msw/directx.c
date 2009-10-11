@@ -381,7 +381,7 @@ static int Init( vout_thread_t *p_vout )
     {
         /* If it still didn't work then don't try to use an overlay */
         p_vout->output.i_chroma = i_chroma_backup;
-        p_vout->p_sys->b_using_overlay = 0;
+        p_vout->p_sys->b_using_overlay = false;
         msg_Warn( p_vout, "Could not initialize directx overlay" ) ;
         NewPictureVec( p_vout, p_vout->p_picture );
     }
@@ -397,6 +397,7 @@ static int Init( vout_thread_t *p_vout )
     else
         psz_fallback = VOUT_TITLE " (software RGB DirectX output)";
     EventThreadUpdateTitle( p_vout->p_sys->p_event, psz_fallback );
+    EventThreadUseOverlay( p_vout->p_sys->p_event, p_vout->p_sys->b_using_overlay );
 
     return VLC_SUCCESS;
 }

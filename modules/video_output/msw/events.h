@@ -54,3 +54,4 @@ unsigned        EventThreadRetreiveChanges( event_thread_t * );
 int             EventThreadGetWindowStyle( event_thread_t * );
 void            EventThreadUpdateWindowPosition( event_thread_t *, bool *pb_changed,
                                                  int x, int y, int w, int h );
+void            EventThreadUseOverlay( event_thread_t *, bool b_used );
