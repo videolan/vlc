@@ -304,6 +304,22 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     return result;
 }
 
+- (void)saveVideoSnapshotAt: (NSString *)path withWidth:(NSUInteger)width andHeight:(NSUInteger)height
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_video_take_snapshot( instance, [path UTF8String], width, height, &ex );
+    catch_exception( &ex );
+}
+
+- (void)setDeinterlaceFilter: (NSString *)name enabled: (BOOL)enabled
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_video_set_deinterlace( instance, (int)enabled , [name UTF8String], &ex );
+    catch_exception( &ex );
+}
+
 - (void)setRate:(float)value
 {
     libvlc_media_player_set_rate( instance, value, NULL );
