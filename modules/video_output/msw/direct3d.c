@@ -650,6 +650,10 @@ typedef struct
 } d3d_format_t;
 
 static const d3d_format_t p_d3d_formats[] = {
+    /* YV12 is always used for planar 420, the planes are then swapped in Lock() */
+    { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_YV12,  0,0,0 },
+    { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_I420,  0,0,0 },
+    { "YV12",       MAKEFOURCC('Y','V','1','2'),    VLC_CODEC_J420,  0,0,0 },
     { "UYVY",       D3DFMT_UYVY,    VLC_CODEC_UYVY,  0,0,0 },
     { "YUY2",       D3DFMT_YUY2,    VLC_CODEC_YUYV,  0,0,0 },
     { "X8R8G8B8",   D3DFMT_X8R8G8B8,VLC_CODEC_RGB32, 0xff0000, 0x00ff00, 0x0000ff },
@@ -808,6 +812,21 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
                     p_pic->p->i_pixel_pitch;
                 p_pic->i_planes = 1;
                 break;
+            case VLC_CODEC_I420:
+            case VLC_CODEC_J420:
+            case VLC_CODEC_YV12:
+                p_pic->i_planes = 3;
+                for( int n = 0; n < p_pic->i_planes; n++ )
+                {
+                    const unsigned d = 1 + (n > 0);
+                    plane_t *p = &p_pic->p[n];
+
+                    p->i_pixel_pitch = 1;
+                    p->i_lines         =
+                    p->i_visible_lines = p_vout->output.i_height / d;
+                    p->i_visible_pitch = p_vout->output.i_width / d;
+                }
+                break;
             default:
                 Direct3DVoutReleasePictures(p_vout);
                 return VLC_EGENERIC;
@@ -882,6 +901,28 @@ static int Direct3DVoutLockSurface( vout_thread_t *p_vout, picture_t *p_pic )
     /* fill in buffer info in first plane */
     p_pic->p->p_pixels = d3drect.pBits;
     p_pic->p->i_pitch  = d3drect.Pitch;
+
+    /*  Fill chroma planes for planar YUV */
+    if( p_pic->format.i_chroma == VLC_CODEC_I420 ||
+        p_pic->format.i_chroma == VLC_CODEC_J420 ||
+        p_pic->format.i_chroma == VLC_CODEC_YV12 )
+    {
+        for( int n = 1; n < p_pic->i_planes; n++ )
+        {
+            const plane_t *o = &p_pic->p[n-1];
+            plane_t *p = &p_pic->p[n];
+
+            p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
+            p->i_pitch  = d3drect.Pitch / 2;
+        }
+        /* The d3d buffer is always allocated as YV12 */
+        if( vlc_fourcc_AreUVPlanesSwapped( p_pic->format.i_chroma, VLC_CODEC_YV12 ) )
+        {
+            uint8_t *p_tmp = p_pic->p[1].p_pixels;
+            p_pic->p[1].p_pixels = p_pic->p[2].p_pixels;
+            p_pic->p[2].p_pixels = p_tmp;
+        }
+    }
 
     return VLC_SUCCESS;
 }
