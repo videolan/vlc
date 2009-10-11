@@ -486,6 +486,7 @@ vlc_fourcc_GetCodecAudio
 vlc_fourcc_GetCodecFromString
 vlc_fourcc_GetDescription
 vlc_fourcc_IsYUV
+vlc_fourcc_GetRGBFallback
 vlc_fourcc_GetYUVFallback
 vlc_fourcc_AreUVPlanesSwapped
 vlc_gai_strerror

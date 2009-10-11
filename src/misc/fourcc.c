@@ -1425,14 +1425,77 @@ static const vlc_fourcc_t p_list_YUV[] = {
     0,
 };
 
+/* */
+static const vlc_fourcc_t p_RGB32_fallback[] = {
+    VLC_CODEC_RGB32,
+    VLC_CODEC_RGB24,
+    VLC_CODEC_RGB16,
+    VLC_CODEC_RGB15,
+    VLC_CODEC_RGB8,
+    0,
+};
+static const vlc_fourcc_t p_RGB24_fallback[] = {
+    VLC_CODEC_RGB24,
+    VLC_CODEC_RGB32,
+    VLC_CODEC_RGB16,
+    VLC_CODEC_RGB15,
+    VLC_CODEC_RGB8,
+    0,
+};
+static const vlc_fourcc_t p_RGB16_fallback[] = {
+    VLC_CODEC_RGB16,
+    VLC_CODEC_RGB24,
+    VLC_CODEC_RGB32,
+    VLC_CODEC_RGB15,
+    VLC_CODEC_RGB8,
+    0,
+};
+static const vlc_fourcc_t p_RGB15_fallback[] = {
+    VLC_CODEC_RGB15,
+    VLC_CODEC_RGB16,
+    VLC_CODEC_RGB24,
+    VLC_CODEC_RGB32,
+    VLC_CODEC_RGB8,
+    0,
+};
+static const vlc_fourcc_t p_RGB8_fallback[] = {
+    VLC_CODEC_RGB8,
+    VLC_CODEC_RGB15,
+    VLC_CODEC_RGB16,
+    VLC_CODEC_RGB24,
+    VLC_CODEC_RGB32,
+    0,
+};
+static const vlc_fourcc_t *pp_RGB_fallback[] = {
+    p_RGB32_fallback,
+    p_RGB24_fallback,
+    p_RGB16_fallback,
+    p_RGB15_fallback,
+    p_RGB8_fallback,
+    NULL,
+};
+
+
+/* */
+static const vlc_fourcc_t *GetFallback( vlc_fourcc_t i_fourcc,
+                                        const vlc_fourcc_t *pp_fallback[],
+                                        const vlc_fourcc_t p_list[] )
+{
+    for( unsigned i = 0; pp_fallback[i]; i++ )
+    {
+        if( pp_fallback[i][0] == i_fourcc )
+            return pp_fallback[i];
+    }
+    return p_list;
+}
+
 const vlc_fourcc_t *vlc_fourcc_GetYUVFallback( vlc_fourcc_t i_fourcc )
 {
-    for( unsigned i = 0; pp_YUV_fallback[i]; i++ )
-    {
-        if( pp_YUV_fallback[i][0] == i_fourcc )
-            return pp_YUV_fallback[i];
-    }
-    return p_list_YUV;
+    return GetFallback( i_fourcc, pp_YUV_fallback, p_list_YUV );
+}
+const vlc_fourcc_t *vlc_fourcc_GetRGBFallback( vlc_fourcc_t i_fourcc )
+{
+    return GetFallback( i_fourcc, pp_RGB_fallback, p_RGB32_fallback );
 }
 
 bool vlc_fourcc_AreUVPlanesSwapped( vlc_fourcc_t a, vlc_fourcc_t b )

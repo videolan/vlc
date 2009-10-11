@@ -366,6 +366,14 @@ VLC_EXPORT( const char *, vlc_fourcc_GetDescription, ( int i_cat, vlc_fourcc_t i
 VLC_EXPORT( const vlc_fourcc_t *, vlc_fourcc_GetYUVFallback, ( vlc_fourcc_t ) );
 
 /**
+ * It returns a list (terminated with the value 0) of RGB fourccs in
+ * decreasing priority order for the given chroma.
+ *
+ * It will always return a non NULL pointer that must not be freed.
+ */
+VLC_EXPORT( const vlc_fourcc_t *, vlc_fourcc_GetRGBFallback, ( vlc_fourcc_t ) );
+
+/**
  * It returns true if the given fourcc is YUV and false otherwise.
  */
 VLC_EXPORT( bool, vlc_fourcc_IsYUV, ( vlc_fourcc_t ) );
