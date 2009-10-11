@@ -797,7 +797,7 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.b_aud = true;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "keyint" );
-    if(( i_val > 0 ) p_sys->param.i_keyint_max = i_val;
+    if( i_val > 0 ) p_sys->param.i_keyint_max = i_val;
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "min-keyint" );
     if( i_val > 0 ) p_sys->param.i_keyint_min = i_val;
