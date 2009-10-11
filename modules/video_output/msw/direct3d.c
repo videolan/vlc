@@ -611,205 +611,90 @@ static int Direct3DVoutResetDevice( vout_thread_t *p_vout )
     return VLC_SUCCESS;
 }
 
-static D3DFORMAT Direct3DVoutSelectFormat( vout_thread_t *p_vout, D3DFORMAT target,
-    const D3DFORMAT *formats, size_t count)
+static int Direct3DVoutCheckFormat( vout_thread_t *p_vout,
+                                    D3DFORMAT target, D3DFORMAT format )
 {
     LPDIRECT3D9 p_d3dobj = p_vout->p_sys->p_d3dobj;
-    size_t c;
+    HRESULT hr;
 
-    for( c=0; c<count; ++c )
+    /* test whether device can create a surface of that format */
+    hr = IDirect3D9_CheckDeviceFormat(p_d3dobj, D3DADAPTER_DEFAULT,
+            D3DDEVTYPE_HAL, target, 0, D3DRTYPE_SURFACE, format);
+    if( SUCCEEDED(hr) )
     {
-        HRESULT hr;
-        D3DFORMAT format = formats[c];
-        /* test whether device can create a surface of that format */
-        hr = IDirect3D9_CheckDeviceFormat(p_d3dobj, D3DADAPTER_DEFAULT,
-                D3DDEVTYPE_HAL, target, 0, D3DRTYPE_SURFACE, format);
-        if( SUCCEEDED(hr) )
-        {
-            /* test whether device can perform color-conversion
-            ** from that format to target format
-            */
-            hr = IDirect3D9_CheckDeviceFormatConversion(p_d3dobj,
-                    D3DADAPTER_DEFAULT, D3DDEVTYPE_HAL,
-                    format, target);
-        }
-        if( SUCCEEDED(hr) )
-        {
-            // found a compatible format
-            switch( format )
-            {
-                case D3DFMT_UYVY:
-                    msg_Dbg( p_vout, "selected surface pixel format is UYVY");
-                    break;
-                case D3DFMT_YUY2:
-                    msg_Dbg( p_vout, "selected surface pixel format is YUY2");
-                    break;
-                case D3DFMT_X8R8G8B8:
-                    msg_Dbg( p_vout, "selected surface pixel format is X8R8G8B8");
-                    break;
-                case D3DFMT_A8R8G8B8:
-                    msg_Dbg( p_vout, "selected surface pixel format is A8R8G8B8");
-                    break;
-                case D3DFMT_R8G8B8:
-                    msg_Dbg( p_vout, "selected surface pixel format is R8G8B8");
-                    break;
-                case D3DFMT_R5G6B5:
-                    msg_Dbg( p_vout, "selected surface pixel format is R5G6B5");
-                    break;
-                case D3DFMT_X1R5G5B5:
-                    msg_Dbg( p_vout, "selected surface pixel format is X1R5G5B5");
-                    break;
-                default:
-                    msg_Dbg( p_vout, "selected surface pixel format is 0x%0X", format);
-                    break;
-            }
-            return format;
-        }
-        else if( D3DERR_NOTAVAILABLE != hr )
-        {
-            msg_Err( p_vout, "Could not query adapter supported formats. (hr=0x%lX)", hr);
-            break;
-        }
+        /* test whether device can perform color-conversion
+        ** from that format to target format
+        */
+        hr = IDirect3D9_CheckDeviceFormatConversion(p_d3dobj,
+                                                    D3DADAPTER_DEFAULT,
+                                                    D3DDEVTYPE_HAL,
+                                                    format, target);
     }
-    return D3DFMT_UNKNOWN;
+    if( !SUCCEEDED(hr) )
+    {
+        if( D3DERR_NOTAVAILABLE != hr )
+            msg_Err( p_vout, "Could not query adapter supported formats. (hr=0x%lX)", hr);
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
 }
 
-static D3DFORMAT Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3DFORMAT target)
+typedef struct
 {
-    //if( p_vout->p_sys->b_hw_yuv && ! _got_vista_or_above )
-    if( p_vout->p_sys->b_hw_yuv )
-    {
-    /* it sounds like vista does not support YUV surfaces at all */
-        switch( i_chroma )
-        {
-            case VLC_CODEC_UYVY:
-            {
-                static const D3DFORMAT formats[] =
-                    { D3DFMT_UYVY, D3DFMT_YUY2, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
-                return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
-            }
-            case VLC_CODEC_I420:
-            case VLC_CODEC_I422:
-            case VLC_CODEC_YV12:
-            {
-                /* typically 3D textures don't support planar format
-                ** fallback to packed version and use CPU for the conversion
-                */
-                static const D3DFORMAT formats[] =
-                    { D3DFMT_YUY2, D3DFMT_UYVY, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
-                return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
-            }
-            case VLC_CODEC_YUYV:
-            {
-                static const D3DFORMAT formats[] =
-                    { D3DFMT_YUY2, D3DFMT_UYVY, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
-                return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
-            }
-        }
-    }
+    const char   *name;
+    D3DFORMAT    format;
+    vlc_fourcc_t fourcc;
+    uint32_t     rmask;
+    uint32_t     gmask;
+    uint32_t     bmask;
+} d3d_format_t;
 
-    switch( i_chroma )
-    {
-        case VLC_CODEC_RGB15:
-        {
-            static const D3DFORMAT formats[] =
-                { D3DFMT_X1R5G5B5 };
-            return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
-        }
-        case VLC_CODEC_RGB16:
-        {
-            static const D3DFORMAT formats[] =
-                { D3DFMT_R5G6B5 };
-            return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
-        }
-        case VLC_CODEC_RGB24:
-        {
-            static const D3DFORMAT formats[] =
-                { D3DFMT_R8G8B8, D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8 };
-            return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
-        }
-        case VLC_CODEC_RGB32:
-        {
-            static const D3DFORMAT formats[] =
-                { D3DFMT_A8R8G8B8, D3DFMT_X8R8G8B8 };
-            return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
-        }
-        default:
-        {
-            /* use display default format */
-            LPDIRECT3D9 p_d3dobj = p_vout->p_sys->p_d3dobj;
-            D3DDISPLAYMODE d3ddm;
+static const d3d_format_t p_d3d_formats[] = {
+    { "UYVY",       D3DFMT_UYVY,    VLC_CODEC_UYVY,  0,0,0 },
+    { "YUY2",       D3DFMT_YUY2,    VLC_CODEC_YUYV,  0,0,0 },
+    { "X8R8G8B8",   D3DFMT_X8R8G8B8,VLC_CODEC_RGB32, 0xff0000, 0x00ff00, 0x0000ff },
+    { "A8R8G8B8",   D3DFMT_A8R8G8B8,VLC_CODEC_RGB32, 0xff0000, 0x00ff00, 0x0000ff },
+    { "8G8B8",      D3DFMT_R8G8B8,  VLC_CODEC_RGB24, 0xff0000, 0x00ff00, 0x0000ff },
+    { "R5G6B5",     D3DFMT_R5G6B5,  VLC_CODEC_RGB16, 0x1f<<11, 0x3f<<5,  0x1f<<0 },
+    { "X1R5G5B5",   D3DFMT_X1R5G5B5,VLC_CODEC_RGB15, 0x1f<<10, 0x1f<<5,  0x1f<<0 },
 
-            HRESULT hr = IDirect3D9_GetAdapterDisplayMode(p_d3dobj, D3DADAPTER_DEFAULT, &d3ddm );
-            if( SUCCEEDED(hr))
+    { NULL, 0, 0, 0,0,0}
+};
+
+static const d3d_format_t *Direct3DVoutFindFormat(vout_thread_t *p_vout, int i_chroma, D3DFORMAT target)
+{
+    for( unsigned pass = 0; pass < 2; pass++ )
+    {
+        const vlc_fourcc_t *p_chromas;
+
+        if( pass == 0 && p_vout->p_sys->b_hw_yuv && vlc_fourcc_IsYUV( i_chroma ) )
+            p_chromas = vlc_fourcc_GetYUVFallback( i_chroma );
+        else if( pass == 1 )
+            p_chromas = vlc_fourcc_GetRGBFallback( i_chroma );
+        else
+            continue;
+
+        for( unsigned i = 0; p_chromas[i] != 0; i++ )
+        {
+            for( unsigned j = 0; p_d3d_formats[j].name; j++ )
             {
-                /*
-                ** some professional cards could use some advanced pixel format as default,
-                ** make sure we stick with chromas that we can handle internally
-                */
-                switch( d3ddm.Format )
+                const d3d_format_t *p_format = &p_d3d_formats[j];
+
+                if( p_format->fourcc != p_chromas[i] )
+                    continue;
+
+                msg_Warn( p_vout, "trying surface pixel format: %s",
+                          p_format->name );
+                if( !Direct3DVoutCheckFormat( p_vout, target, p_format->format ) )
                 {
-                    case D3DFMT_R8G8B8:
-                    case D3DFMT_X8R8G8B8:
-                    case D3DFMT_A8R8G8B8:
-                    case D3DFMT_R5G6B5:
-                    case D3DFMT_X1R5G5B5:
-                        msg_Dbg( p_vout, "defaulting to adapter pixel format");
-                        return Direct3DVoutSelectFormat(p_vout, target, &d3ddm.Format, 1);
-                    default:
-                    {
-                        /* if we fall here, that probably means that we need to render some YUV format */
-                        static const D3DFORMAT formats[] =
-                            { D3DFMT_X8R8G8B8, D3DFMT_A8R8G8B8, D3DFMT_R5G6B5, D3DFMT_X1R5G5B5 };
-                        msg_Dbg( p_vout, "defaulting to built-in pixel format");
-                        return Direct3DVoutSelectFormat(p_vout, target, formats, sizeof(formats)/sizeof(D3DFORMAT));
-                    }
+                    msg_Dbg( p_vout, "selected surface pixel format is %s",
+                             p_format->name );
+                    return p_format;
                 }
             }
         }
     }
-    return D3DFMT_UNKNOWN;
-}
-
-static int Direct3DVoutSetOutputFormat(vout_thread_t *p_vout, D3DFORMAT format)
-{
-    switch( format )
-    {
-        case D3DFMT_YUY2:
-            p_vout->output.i_chroma = VLC_CODEC_YUYV;
-            break;
-        case D3DFMT_UYVY:
-            p_vout->output.i_chroma = VLC_CODEC_UYVY;
-            break;
-        case D3DFMT_R8G8B8:
-            p_vout->output.i_chroma = VLC_CODEC_RGB24;
-            p_vout->output.i_rmask = 0xff0000;
-            p_vout->output.i_gmask = 0x00ff00;
-            p_vout->output.i_bmask = 0x0000ff;
-            break;
-        case D3DFMT_X8R8G8B8:
-        case D3DFMT_A8R8G8B8:
-            p_vout->output.i_chroma = VLC_CODEC_RGB32;
-            p_vout->output.i_rmask = 0x00ff0000;
-            p_vout->output.i_gmask = 0x0000ff00;
-            p_vout->output.i_bmask = 0x000000ff;
-            break;
-        case D3DFMT_R5G6B5:
-            p_vout->output.i_chroma = VLC_CODEC_RGB16;
-            p_vout->output.i_rmask = (0x1fL)<<11;
-            p_vout->output.i_gmask = (0x3fL)<<5;
-            p_vout->output.i_bmask = (0x1fL)<<0;
-            break;
-        case D3DFMT_X1R5G5B5:
-            p_vout->output.i_chroma = VLC_CODEC_RGB15;
-            p_vout->output.i_rmask = (0x1fL)<<10;
-            p_vout->output.i_gmask = (0x1fL)<<5;
-            p_vout->output.i_bmask = (0x1fL)<<0;
-            break;
-        default:
-            return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
+    return NULL;
 }
 
 /*****************************************************************************
@@ -823,7 +708,6 @@ static int Direct3DVoutSetOutputFormat(vout_thread_t *p_vout, D3DFORMAT format)
 static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics )
 {
     LPDIRECT3DDEVICE9       p_d3ddev  = p_vout->p_sys->p_d3ddev;
-    D3DFORMAT               format;
     HRESULT hr;
     size_t c;
     // if vout is already running, use current chroma, otherwise choose from upstream
@@ -837,13 +721,18 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
     ** the requested chroma which is usable by the hardware in an offscreen surface, as they
     ** typically support more formats than textures
     */
-    format = Direct3DVoutFindFormat(p_vout, i_chroma, p_vout->p_sys->bbFormat);
-    if( VLC_SUCCESS != Direct3DVoutSetOutputFormat(p_vout, format) )
+    const d3d_format_t *p_format = Direct3DVoutFindFormat(p_vout, i_chroma, p_vout->p_sys->bbFormat);
+    if( !p_format )
     {
         msg_Err(p_vout, "surface pixel format is not supported.");
         return VLC_EGENERIC;
     }
+    p_vout->output.i_chroma = p_format->fourcc;
+    p_vout->output.i_rmask  = p_format->rmask;
+    p_vout->output.i_gmask  = p_format->gmask;
+    p_vout->output.i_bmask  = p_format->bmask;
 
+    /* */
     for( c=0; c<i_num_pics; )
     {
 
@@ -853,7 +742,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
         hr = IDirect3DDevice9_CreateOffscreenPlainSurface(p_d3ddev,
                 p_vout->render.i_width,
                 p_vout->render.i_height,
-                format,
+                p_format->format,
                 D3DPOOL_DEFAULT,
                 &p_d3dsurf,
                 NULL);
@@ -866,6 +755,9 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
 
         /* fill surface with black color */
         IDirect3DDevice9_ColorFill(p_d3ddev, p_d3dsurf, NULL, D3DCOLOR_ARGB(0xFF, 0, 0, 0) );
+
+        /* */
+        video_format_Setup( &p_pic->format, p_vout->output.i_chroma, p_vout->output.i_width, p_vout->output.i_height, p_vout->output.i_aspect );
 
         /* assign surface to internal structure */
         p_pic->p_sys = (void *)p_d3dsurf;
@@ -1177,7 +1069,6 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
         msg_Dbg( p_vout, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
         return;
     }
-
     /*  retrieve picture surface */
     p_d3dsrc = (LPDIRECT3DSURFACE9)p_pic->p_sys;
     if( NULL == p_d3dsrc )
@@ -1311,7 +1202,6 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
         return;
     }
 }
-
 
 /*****************************************************************************
  * DesktopCallback: desktop mode variable callback
