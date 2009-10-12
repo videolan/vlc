@@ -4679,7 +4679,7 @@ then
   then
     AC_MSG_ERROR([libgcrypt is required for update checking system])
   fi
-  VLC_ADD_LIBS([libvlccore], [${GCRYPT_LIBS}])
+  VLC_ADD_LIBS([libvlccore], [${GCRYPT_LIBS} -lgpg-error])
   VLC_ADD_CFLAGS([libvlccore], [${GCRYPT_CFLAGS}])
   AC_DEFINE([UPDATE_CHECK], 1, [Define if you want to use the VLC update mechanism])
 fi
