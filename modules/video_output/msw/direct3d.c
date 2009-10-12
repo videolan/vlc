@@ -225,9 +225,9 @@ static void CloseVideo( vlc_object_t *p_this )
 {
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
-    Direct3DVoutRelease( p_vout );
-
     CommonClean( p_vout );
+
+    Direct3DVoutRelease( p_vout );
 
     free( p_vout->p_sys );
 }
