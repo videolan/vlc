@@ -61,6 +61,9 @@
         <property name="text">
          <string>Album art download policy:</string>
         </property>
+        <property name="buddy">
+         <cstring>artFetcher</cstring>
+        </property>
        </widget>
       </item>
       <item row="0" column="2" colspan="2">
@@ -126,6 +129,9 @@
         <property name="margin">
          <number>5</number>
         </property>
+        <property name="buddy">
+         <cstring>recentlyPlayedFilters</cstring>
+        </property>
        </widget>
       </item>
       <item row="2" column="2" colspan="2">
@@ -163,6 +169,9 @@
         </property>
         <property name="alignment">
          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+        </property>
+        <property name="buddy">
+         <cstring>language</cstring>
         </property>
        </widget>
       </item>
@@ -392,6 +401,9 @@
            <property name="text">
             <string>Force window style:</string>
            </property>
+           <property name="buddy">
+            <cstring>stylesCombo</cstring>
+           </property>
           </widget>
          </item>
         </layout>
@@ -410,11 +422,31 @@
         </property>
        </widget>
       </item>
+      <item row="1" column="0" colspan="2">
+       <widget class="InterfacePreviewWidget" name="mainPreview">
+        <property name="alignment">
+         <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
+        </property>
+        <property name="buddy">
+         <cstring>displayModeBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="0" colspan="2">
+       <widget class="InterfacePreviewWidget" name="skinsPreview"/>
+      </item>
      </layout>
     </widget>
    </item>
   </layout>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>InterfacePreviewWidget</class>
+   <extends>QLabel</extends>
+   <header>components/preferences_widgets.hpp</header>
+  </customwidget>
+ </customwidgets>
  <tabstops>
   <tabstop>OneInterfaceMode</tabstop>
   <tabstop>artFetcher</tabstop>

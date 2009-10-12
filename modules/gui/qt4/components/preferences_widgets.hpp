@@ -64,6 +64,10 @@ class InterfacePreviewWidget : public QLabel
 public:
     InterfacePreviewWidget( QWidget * );
 public slots:
+    /* 0: sample_classic, aka VLC 0.8.6
+       1: sample_complete, aka MPC
+       2: sample_minimal, aka WMP12 minimal
+       3: sample_skins */
     void setPreview( int );
 };
 

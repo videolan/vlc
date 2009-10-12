@@ -200,8 +200,7 @@ void ConfigControl::doApply( intf_thread_t *p_intf )
 /*******************************************************
  * Simple widgets
  *******************************************************/
-InterfacePreviewWidget::InterfacePreviewWidget
-        ( QWidget *parent ) : QLabel( parent, 0 )
+InterfacePreviewWidget::InterfacePreviewWidget ( QWidget *parent ) : QLabel( parent )
 {
     setGeometry( 0, 0, 128, 100 );
     setSizePolicy( QSizePolicy::Fixed, QSizePolicy::Fixed );

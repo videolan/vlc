@@ -542,15 +542,9 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             ui.native_zone->setEnabled( ui.qt4->isChecked() );
             CONNECT( ui.qt4, toggled( bool ), ui.native_zone, setEnabled( bool ) );
 
-            InterfacePreviewWidget *preview = new InterfacePreviewWidget( this );
-            ( (QGridLayout *) ui.LooknfeelBox->layout() )->
-                    addWidget( preview, 1, 0, 1, 2 );
             CONNECT( ui.displayModeBox, currentIndexChanged( int ),
-                     preview, setPreview( int ) );
-            InterfacePreviewWidget *skinspreview = new InterfacePreviewWidget( this );
-            skinspreview->setPreview(3); /* skins_preview resource index */
-            ( (QGridLayout *) ui.LooknfeelBox->layout() )->
-                    addWidget( skinspreview, 7, 0, 1, 2 );
+                     ui.mainPreview, setPreview( int ) );
+            ui.skinsPreview->setPreview( 3 ); /* skins_preview resource index */
 
             CONFIG_GENERIC( "qt-display-mode", IntegerList, ui.displayLabel,
                             displayModeBox );
