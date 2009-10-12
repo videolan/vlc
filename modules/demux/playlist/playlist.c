@@ -182,7 +182,17 @@ char *FindPrefix( demux_t *p_demux )
 {
     char *psz_file;
     char *psz_prefix;
-    const char *psz_path = p_demux->psz_path;
+    char *psz_path;
+    if( p_demux->psz_access )
+    {
+        if( asprintf( &psz_path,"%s://%s", p_demux->psz_access, p_demux->psz_path ) == -1 )
+            return NULL;
+    }
+    else
+    {
+        if( asprintf( &psz_path,"%s", p_demux->psz_path ) == -1 )
+            return NULL;
+    }
 
 #ifdef WIN32
     psz_file = strrchr( psz_path, '\\' );
@@ -194,6 +204,7 @@ char *FindPrefix( demux_t *p_demux )
         psz_prefix = strndup( psz_path, psz_file - psz_path + 1 );
     else
         psz_prefix = strdup( "" );
+    free( psz_path );
 
     return psz_prefix;
 }
