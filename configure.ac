@@ -1770,7 +1770,6 @@ then
       ])
     ])
   if test "x${have_lua}" = "xyes" ;  then
-     AC_DEFINE(HAVE_LUA, 1, [Define if you have the lua library])
      VLC_ADD_LIBS([lua],[$LUA_LIBS])
      VLC_ADD_CFLAGS([lua],[$LUA_CFLAGS])
   fi
@@ -1859,8 +1858,7 @@ AC_ARG_ENABLE(taglib,
   [  --disable-taglib        Taglib support (default enabled) ])
   AS_IF([test "${enable_taglib}" != "no"],[
     PKG_CHECK_MODULES(TAGLIB, taglib >= 1.5,
-      [ AC_DEFINE( HAVE_TAGLIB, 1, [Define if you have taglib plugin built] )
-        VLC_ADD_PLUGIN([taglib])
+      [ VLC_ADD_PLUGIN([taglib])
         VLC_ADD_LIBS([taglib],[$TAGLIB_LIBS -lz])
        VLC_ADD_CXXFLAGS([taglib],[$TAGLIB_CFLAGS]) ],
       [AC_MSG_WARN(TagLib library not found)])
@@ -2429,9 +2427,7 @@ then
   if test "${enable_vcdinfo}" != "no"
   then
     PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.22,
-       [have_libvcdinfo=yes
-       AC_DEFINE(HAVE_VCDINFO, 1,
-       [Define if you have libvcdinfo 0.7.22 or greater installed])],
+       [have_libvcdinfo=yes],
        [AC_MSG_WARN(VCD information library not found)])
   fi
 fi
@@ -3306,8 +3302,7 @@ AC_CHECK_HEADERS(png.h, [
     VLC_ADD_LIBS([png],[-lpng -lz])
     VLC_ADD_PLUGIN([png])
     VLC_ADD_PLUGIN([osdmenu])
-    VLC_ADD_PLUGIN([osd_parser])
-    AC_DEFINE(HAVE_LIBPNG, 1, [Define if you have the PNG library: libpng])],
+    VLC_ADD_PLUGIN([osd_parser])],
     [],[-lz])
     LDFLAGS="${LDFLAGS_save}"
   ])
@@ -4306,7 +4301,6 @@ then
     VLC_ADD_LIBS([maemo],[${HILDON_LIBS}])
     VLC_ADD_PLUGIN([maemo])
     VLC_ADD_PLUGIN([swscale_maemo])
-    AC_DEFINE([BUILD_MAEMO], 1, [Define if you are using Maemo interfaces])
     ALIASES="${ALIASES} mvlc"
   ], [
     AS_IF([test "${enable_maemo}" = "yes"],[
@@ -4327,7 +4321,6 @@ AC_ARG_ENABLE(qt4,
 AS_IF([test "${enable_qt4}" != "no"], [
   PKG_CHECK_MODULES(QT4, [QtCore QtGui >= 4.4.0], [
     VLC_ADD_PLUGIN([qt4])
-    AC_DEFINE([HAVE_QT4], 1, [Define to 1 if you have QT4 library.])
     ALIASES="${ALIASES} qvlc"
     AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "darwin"], [
         VLC_ADD_LIBS([qt4],[$QT4_LIBS -lX11])
