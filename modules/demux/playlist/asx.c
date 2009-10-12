@@ -240,8 +240,8 @@ static int Demux( demux_t *p_demux )
     if( p_sys->i_data_len < 0 )
     {
         int64_t i_pos = 0;
-        p_sys->i_data_len = stream_Size( p_demux->s ) +1; /* This is a cheat to prevent unnecessary realloc */
-        if( p_sys->i_data_len <= 0 && p_sys->i_data_len < 16384 ) p_sys->i_data_len = 1024;
+        p_sys->i_data_len = stream_Size( p_demux->s ) + 1; /* This is a cheat to prevent unnecessary realloc */
+        if( p_sys->i_data_len <= 0 || p_sys->i_data_len > 16384 ) p_sys->i_data_len = 1024;
         p_sys->psz_data = malloc( p_sys->i_data_len +1);
 
         /* load the complete file */
@@ -252,10 +252,9 @@ static int Demux( demux_t *p_demux )
 
             if( i_read < p_sys->i_data_len - i_pos ) break; /* Done */
 
-            /* XXX this looks fishy and inefficient */
             i_pos += i_read;
-            p_sys->i_data_len += 1024;
-            p_sys->psz_data = realloc( p_sys->psz_data, p_sys->i_data_len * sizeof( char * ) +1 );
+            p_sys->i_data_len <<= 1 ;
+            p_sys->psz_data = realloc( p_sys->psz_data, p_sys->i_data_len * sizeof( char * ) + 1 );
         }
         if( p_sys->i_data_len <= 0 ) return -1;
     }
