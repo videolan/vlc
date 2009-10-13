@@ -53,11 +53,17 @@ class SpeedControlWidget;
 class QVBoxLayout;
 class QMenu;
 class QSize;
+class QStackedWidget;
 
 enum {
     CONTROLS_VISIBLE  = 0x1,
     CONTROLS_HIDDEN   = 0x2,
     CONTROLS_ADVANCED = 0x4,
+};
+enum {
+    BACKG_TAB,
+    VIDEO_TAB,
+    PLAYL_TAB,
 };
 
 typedef enum pl_dock_e {
@@ -118,6 +124,10 @@ private:
     void initSystray();
     bool isDocked() { return ( i_pl_dock != PL_UNDOCKED ); }
 
+    void showTab( int i_tab );
+    void showVideo() { showTab( VIDEO_TAB ); }
+    void showBg() { showTab( BACKG_TAB ); }
+
     QSettings           *settings;
 #ifndef HAVE_MAEMO
     QSystemTrayIcon     *sysTray;
@@ -128,7 +138,7 @@ private:
     ControlsWidget      *controls;
     InputControlsWidget *inputC;
     FullscreenControllerWidget *fullscreenControls;
-
+    QStackedWidget      *stackCentralW;
     /* Video */
     VideoWidget         *videoWidget;
 

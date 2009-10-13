@@ -584,8 +584,6 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
                                 QWidget *_parent ) :
                                 AbstractController( _p_i, _parent )
 {
-    setSizePolicy( QSizePolicy::Preferred , QSizePolicy::Maximum );
-
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
 
