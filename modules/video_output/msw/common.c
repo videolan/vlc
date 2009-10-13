@@ -624,6 +624,7 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
             HMONITOR hmon = MonitorFromWindow(p_vout->p_sys->hparent,
                                             MONITOR_DEFAULTTONEAREST);
             MONITORINFO mi;
+            mi.cbSize = sizeof(MONITORINFO);
             if (GetMonitorInfo(hmon, &mi))
             SetWindowPos( hwnd, 0,
                             mi.rcMonitor.left,
