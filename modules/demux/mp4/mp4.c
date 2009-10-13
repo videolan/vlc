@@ -845,7 +845,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 
         case DEMUX_GET_FPS:
             pf = (double*)va_arg( args, double* );
-            *pf = (double)p_sys->f_fps;
+            *pf = p_sys->f_fps;
             return VLC_SUCCESS;
 
         case DEMUX_GET_META:
