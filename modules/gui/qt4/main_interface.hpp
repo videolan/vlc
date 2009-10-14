@@ -167,7 +167,7 @@ private:
     int                  i_visualmode;        ///< Visual Mode
     pl_dock_e            i_pl_dock;
     int                  i_bg_height;         ///< Save height of bgWidget
-    bool                 b_shouldHide;
+    bool                 b_hideAfterCreation;
 
 #ifdef WIN32
     HIMAGELIST himl;

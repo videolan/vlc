@@ -86,13 +86,14 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 #ifndef HAVE_MAEMO
     sysTray              = NULL;
 #endif
-    playlistVisible      = false;
-    input_name           = "";
     fullscreenControls   = NULL;
     cryptedLabel         = NULL;
     controls             = NULL;
     inputC               = NULL;
-    b_shouldHide         = false;
+
+    b_hideAfterCreation  = false;
+    playlistVisible      = false; // FIXME remove
+    input_name           = "";
 
     stackCentralOldState = HIDDEN_TAB;
     i_bg_height          = 0;
@@ -277,7 +278,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     debug();
 
     /* Final sizing and showing */
-    setVisible( !b_shouldHide );
+    setVisible( !b_hideAfterCreation );
     //setMinimumSize( QSize( 0, 0 ) );
 //    setMinimumWidth( __MAX( controls->sizeHint().width(),
   //                          menuBar()->sizeHint().width() ) );
@@ -304,9 +305,7 @@ MainInterface::~MainInterface()
 
     /* Unsure we hide the videoWidget before destroying it */
     if( stackCentralOldState == VIDEO_TAB )
-    {
         showBg();
-    }
 
     /* Save playlist state */
     if( playlistWidget )
@@ -347,7 +346,6 @@ MainInterface::~MainInterface()
     /* Save this size */
     QVLCTools::saveWidgetPosition(settings, this);
     settings->endGroup();
-
 
     /* Unregister callbacks */
     var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
@@ -583,7 +581,7 @@ inline void MainInterface::initSystray()
         if( b_systrayAvailable )
         {
             b_systrayWanted = true;
-            b_shouldHide = true;
+            b_hideAfterCreation = true;
         }
         else
             msg_Err( p_intf, "cannot start minimized without system tray bar" );
@@ -811,7 +809,6 @@ void MainInterface::debug()
             msg_Dbg( p_intf, "Input minimuSize: %i - %i", inputC->minimumSize().height(), inputC->minimumSize().width() );
             msg_Dbg( p_intf, "Status minimumsize: %i - %i", statusBar()->minimumSize().height(), statusBar()->minimumSize().width() );
     msg_Dbg( p_intf, "minimumsize: %i - %i", minimumSize().height(), minimumSize().width() );
-
 
     /*if( videoWidget && videoWidget->isVisible() )
     {
