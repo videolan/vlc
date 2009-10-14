@@ -2071,11 +2071,14 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         {
             unsigned int i;
             o_keys_menu = [[NSMenu alloc] initWithTitle: @"Keys Menu"];
+#warning this doesn't work anymore. FIXME.
+#if 0
             for ( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++)
                 if( vlc_keys[i].psz_key_string )
                     POPULATE_A_KEY( o_keys_menu,
                         [NSString stringWithUTF8String:vlc_keys[i].psz_key_string]
                         , vlc_keys[i].i_key_code)
+#endif
         }
         [o_popup setMenu:[o_keys_menu copyWithZone:nil]];
         [o_popup selectItem:[[o_popup menu] itemWithTag:p_item->value.i]];
