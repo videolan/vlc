@@ -432,7 +432,7 @@ VLC-release.app: vlc
 	for i in vlc.xcodeproj Resources README.MacOSX.rtf ; do \
 	  cp -R $(srcdir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
 	done
-	REVISION=`git describe --always` && \
+	REVISION=`(git describe --always || echo exported)` && \
 	cat $(top_builddir)/extras/package/macosx/Info.plist | \
 	sed "s/#REVISION#/$$REVISION/g" > $(top_builddir)/tmp/extras/package/macosx/Info.plist
 	cp -R $(top_builddir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx/
@@ -585,7 +585,7 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	for i in vlc.xcodeproj Resources README.MacOSX.rtf; do \
 	  cp -R $(srcdir)/extras/package/macosx/$$i $(top_builddir)/tmp/extras/package/macosx/; \
 	done
-	REVISION=`git describe --always` && \
+	REVISION=`(git describe --always || echo exported)` && \
 	cat $(top_builddir)/extras/package/macosx/Info.plist | \
 	sed "s/#REVISION#/$$REVISION/g" > $(top_builddir)/tmp/extras/package/macosx/Info.plist
 	cp -R $(top_builddir)/extras/package/macosx/Resources $(top_builddir)/tmp/extras/package/macosx/
