@@ -679,6 +679,7 @@ static int Demux( demux_t *p_demux )
     p_parent_input->i_type = ITEM_TYPE_NET;
 
     vlc_mutex_unlock( &p_parent_input->lock );
+    vlc_object_release( p_input );
     return VLC_SUCCESS;
 }
 
