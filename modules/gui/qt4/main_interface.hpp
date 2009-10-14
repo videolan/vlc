@@ -60,11 +60,7 @@ enum {
     CONTROLS_HIDDEN   = 0x2,
     CONTROLS_ADVANCED = 0x4,
 };
-enum {
-    BACKG_TAB,
-    VIDEO_TAB,
-    PLAYL_TAB,
-};
+
 
 typedef enum pl_dock_e {
     PL_UNDOCKED,
@@ -151,12 +147,20 @@ private:
     QLabel              *cryptedLabel;
 
     /* Status and flags */
-    bool                 videoIsActive;       ///< Having a video now / THEMIM->hasV
+    enum {
+        HIDDEN_TAB = -1,
+        BACKG_TAB  =  0,
+        VIDEO_TAB,
+        PLAYL_TAB,
+    };
+    int                  stackCentralOldState;
+
+//    bool                 videoIsActive;       ///< Having a video now / THEMIM->hasV
     bool                 videoEmbeddedFlag;   ///< Want an external Video Window
     bool                 playlistVisible;     ///< Is the playlist visible ?
     bool                 visualSelectorEnabled;
     bool                 notificationEnabled; /// Systray Notifications
-    bool                 bgWasVisible;
+
     bool                 b_keep_size;         ///< persistent resizeable window
     QSize                mainBasedSize;       ///< based Wnd (normal mode only)
     QSize                mainVideoSize;       ///< Wnd with video (all modes)

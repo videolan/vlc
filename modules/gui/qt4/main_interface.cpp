@@ -86,7 +86,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
 #ifndef HAVE_MAEMO
     sysTray              = NULL;
 #endif
-    videoIsActive        = false;
     playlistVisible      = false;
     input_name           = "";
     fullscreenControls   = NULL;
@@ -95,7 +94,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     inputC               = NULL;
     b_shouldHide         = false;
 
-    bgWasVisible         = false;
+    stackCentralOldState = HIDDEN_TAB;
     i_bg_height          = 0;
 
     /* Ask for privacy */
@@ -294,7 +293,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     updateGeometry();
     resize( sizeHint() );
 
-
 #ifdef WIN32
     createTaskBarButtons();
 #endif
@@ -305,7 +303,7 @@ MainInterface::~MainInterface()
     msg_Dbg( p_intf, "Destroying the main interface" );
 
     /* Unsure we hide the videoWidget before destroying it */
-    if( videoIsActive )
+    if( stackCentralOldState == VIDEO_TAB )
     {
         showBg();
     }
@@ -389,19 +387,12 @@ void MainInterface::createMainWidget( QSettings *settings )
 
     /* Margins, spacing */
     main->setContentsMargins( 0, 0, 0, 0 );
-//    main->setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Maximum );
     mainLayout->setSpacing( 0 );
     mainLayout->setMargin( 0 );
 
-    /* Visualisation */
-    /* Disabled for now, they SUCK */
-    #if 0
-    visualSelector = new VisualSelector( p_intf );
-    mainLayout->insertWidget( 0, visualSelector );
-    visualSelector->hide();
-    #endif
-
+    /* */
     stackCentralW = new QStackedWidget( main );
+
     /* Bg Cone */
     bgWidget = new BackgroundWidget( p_intf );
     bgWidget->resize(
@@ -422,7 +413,6 @@ void MainInterface::createMainWidget( QSettings *settings )
         stackCentralW->insertWidget( VIDEO_TAB, videoWidget );
     }
     mainLayout->insertWidget( 1, stackCentralW, 100 );
-
     /* Create the CONTROLS Widget */
     controls = new ControlsWidget( p_intf,
                    settings->value( "adv-controls", false ).toBool(), this );
@@ -436,6 +426,14 @@ void MainInterface::createMainWidget( QSettings *settings )
     mainLayout->insertWidget( 2, inputC );
     mainLayout->insertWidget( settings->value( "ToolbarPos", 0 ).toInt() ? 0: 3,
                               controls );
+
+    /* Visualisation */
+    /* Disabled for now, they SUCK */
+    #if 0
+    visualSelector = new VisualSelector( p_intf );
+    mainLayout->insertWidget( 0, visualSelector );
+    visualSelector->hide();
+    #endif
 
     /* Finish the sizing */
     main->updateGeometry();
@@ -780,13 +778,14 @@ void MainInterface::doComponentsUpdate()
     msg_Err( p_intf, "Updating the geometry" );
     /* Here we resize to sizeHint() and not adjustsize because we want
        the videoWidget to be exactly the correctSize */
-    //mainLayout->invalidate();
-//    setMinimumSize( 0, 0 );
+
 #if 1
     debug();
 #endif
-
+    /* This is WRONG */
+    setMinimumSize( 0, 0 );
     resize( sizeHint() );
+
     //adjustSize()  ;
 }
 
@@ -798,6 +797,9 @@ void MainInterface::debug()
     else
         msg_Dbg( p_intf, "CentralStack inVisible" );
     //msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->sizeHint().height(), stackCentralW->sizeHint().width() );
+    msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->size().height(), size().width() );
+    msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->widget( VIDEO_TAB )->size().height(), stackCentralW->widget( VIDEO_TAB )->size().width() );
+
     msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
     msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
     //msg_Dbg( p_intf, "maximumsize: %i - %i", maximumSize().height(), maximumSize().width() );
@@ -890,21 +892,10 @@ void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
     *p_id = ret;
     if( ret ) /* The videoWidget is available */
     {
-        /* Did we have a bg ? Hide it! */
-        if( stackCentralW->isVisible() &&
-            stackCentralW->currentIndex() == BACKG_TAB )
-        {
-            showBg();
-            bgWasVisible = true;
-        }
-        else
-            bgWasVisible = false;
-
         /* ask videoWidget to show */
         videoWidget->SetSizing( *pi_width, *pi_height );
 
         /* Consider the video active now */
-        videoIsActive = true;
         showVideo();
 
         stackCentralW->resize( *pi_width, *pi_height );
@@ -915,6 +906,8 @@ void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
 
 inline void MainInterface::showTab( int i_tab )
 {
+    stackCentralOldState = stackCentralW->currentIndex();
+
     stackCentralW->setCurrentIndex( i_tab );
     if( stackCentralW->isHidden() ) stackCentralW->show();
 }
@@ -930,18 +923,16 @@ void MainInterface::releaseVideoSlot( void )
 {
     videoWidget->release( );
 
-    if( bgWasVisible )
+    /* Restore the previous State */
+    if( stackCentralOldState == BACKG_TAB )
     {
-        /* Reset the bg state */
-        bgWasVisible = false;
         showBg();
     }
-    else {
+    else
+    {
         stackCentralW->hide();
-        stackCentralW->setMinimumSize(QSize(0, 0));
+        stackCentralOldState == -1;
     }
-
-    videoIsActive = false;
 
     /* Try to resize, except when you are in Fullscreen mode */
     doComponentsUpdate();
@@ -1056,8 +1047,11 @@ void MainInterface::toggleMinimalView( bool b_switch )
         }
         else
         {
-            /* If video is visible, then toggle the status of bgWidget */
-            bgWasVisible = !bgWasVisible;
+            /* If video is visible, then toggle the status of bgWidget */ //bgWasVisible = !bgWasVisible;
+            if( stackCentralOldState == BACKG_TAB )
+                stackCentralOldState = HIDDEN_TAB;
+            else
+                stackCentralOldState = BACKG_TAB;
         }
     }
 
