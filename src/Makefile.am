@@ -109,7 +109,6 @@ noinst_HEADERS = \
 	../include/mmx.h \
 	../include/vlc_codec_synchro.h \
 	../include/vlc_codecs.h \
-	../include/vlc_devices.h \
 	../include/vlc_fixups.h \
 	../include/vlc_interface.h \
 	../include/vlc_intf_strings.h \
@@ -433,7 +432,6 @@ SOURCES_libvlc_common = \
 	misc/update.c \
 	misc/update_crypto.c \
 	misc/xml.c \
-	misc/devices.c \
 	extras/libc.c \
 	misc/filter.c \
 	misc/filter_chain.c \

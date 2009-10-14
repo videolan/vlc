@@ -132,7 +132,6 @@ $Id$
  * growl: announce currently playing stream to growl
  * growl_udp: growl UDP notification plugin
  * h264: H264 decoder
- * hal: Linux HAL services discovery module
  * hd1000a: audio output module for the Roku HD1000 Set-Top-Box
  * hd1000v: video output module for the Roku HD1000 Set-Top-Box
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect

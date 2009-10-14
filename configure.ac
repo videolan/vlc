@@ -4559,7 +4559,7 @@ PKG_ENABLE_MODULES_VLC([BONJOUR], [], [avahi-client >= 0.6], [Bonjour services d
 
 dnl
 dnl  HAL services discovery
-PKG_ENABLE_MODULES_VLC([HAL], [], [hal >= 0.5.0], [Linux HAL services discovery], [auto])
+PKG_CHECK_MODULES([HAL], [hal >= 0.5.0],, [true])
 
 dnl
 dnl MTP devices services discovery
@@ -5188,7 +5188,6 @@ AC_CONFIG_FILES([
   modules/misc/osd/Makefile
   modules/misc/stats/Makefile
   modules/misc/xml/Makefile
-  modules/misc/probe/Makefile
   modules/mux/Makefile
   modules/mux/mpeg/Makefile
   modules/packetizer/Makefile

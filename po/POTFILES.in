@@ -17,7 +17,6 @@ include/vlc_config.h
 include/vlc_configuration.h
 include/vlc_demux.h
 include/vlc/deprecated.h
-include/vlc_devices.h
 include/vlc_epg.h
 include/vlc_es.h
 include/vlc_es_out.h
@@ -146,7 +145,6 @@ src/misc/beos_specific.cpp
 src/misc/block.c
 src/misc/cpu.c
 src/misc/darwin_specific.c
-src/misc/devices.c
 src/misc/error.c
 src/misc/es_format.c
 src/misc/events.c
