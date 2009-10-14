@@ -468,11 +468,10 @@ static void Close( vlc_object_t *p_this )
 static void CloseDemux( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    if( p_demux->p_sys )
-    {
-        if( p_demux->p_sys->p_sdp ) { FreeSDP( p_demux->p_sys->p_sdp ); p_demux->p_sys->p_sdp = NULL; }
-        free( p_demux->p_sys );
-    }
+
+    if( p_demux->p_sys->p_sdp )
+        FreeSDP( p_demux->p_sys->p_sdp );
+    free( p_demux->p_sys );
 }
 
 /*****************************************************************************
