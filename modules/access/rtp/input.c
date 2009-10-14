@@ -198,9 +198,11 @@ void *rtp_thread (void *data)
             autodetect = false;
         }
 
+        int canc = vlc_savecancel ();
         vlc_mutex_lock (&p_sys->lock);
         rtp_queue (demux, p_sys->session, block);
         vlc_mutex_unlock (&p_sys->lock);
+        vlc_restorecancel (canc);
 
         rtp_process (demux);
     }
