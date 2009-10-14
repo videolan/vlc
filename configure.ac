@@ -4559,7 +4559,7 @@ PKG_ENABLE_MODULES_VLC([BONJOUR], [], [avahi-client >= 0.6], [Bonjour services d
 
 dnl
 dnl  HAL services discovery
-PKG_CHECK_MODULES([HAL], [hal >= 0.5.0],, [true])
+PKG_ENABLE_MODULES_VLC([HAL], [], [hal >= 0.5.0], [Linux HAL services discovery], [auto])
 
 dnl
 dnl MTP devices services discovery
