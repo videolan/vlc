@@ -635,7 +635,6 @@
 				VLC_FRAMEWORK = "$(TARGET_BUILD_DIR)/$(PROJECT_NAME).framework";
 				VLC_SRC_DIR = ../../..;
 				WRAPPER_EXTENSION = framework;
-				ZERO_LINK = YES;
 			};
 			name = Debug;
 		};
@@ -675,7 +674,7 @@
 				PRODUCT_NAME = VLCKit;
 				SCAN_ALL_SOURCE_FILES_FOR_INCLUDES = YES;
 				SDKROOT = macosx10.5;
-				VLC_BUILD_DIR = "$(VLC_SRC_DIR)";
+				VLC_BUILD_DIR = "$(SYMROOT)/vlc_build_dir";
 				VLC_FRAMEWORK = "$(TARGET_BUILD_DIR)/$(PROJECT_NAME).framework";
 				VLC_SRC_DIR = ../../..;
 				WRAPPER_EXTENSION = framework;
