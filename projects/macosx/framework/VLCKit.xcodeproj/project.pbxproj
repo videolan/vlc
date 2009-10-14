@@ -516,7 +516,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test \"$ACTION\" = \"clean\"; then\n    rm -Rf $SYMROOT/vlc_build_dir\n    exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nif test \"$ARCHS\" = \"x86_64\"; then\n    setenv CFLAGS -m64\n    setenv CXXFLAGS -m64\n    setenv CPPFLAGS -m64\n    setenv OBJCFLAGS -m64\nfi\nif test \"$ARCHS\" = \"i386\"; then\n    setenv CFLAGS -m32\n    setenv CXXFLAGS -m32\n    setenv CPPFLAGS -m32\n    setenv OBJCFLAGS -m32\nfi\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir && $top_srcdir/configure --disable-nls --enable-debug --with-macosx-sdk=$SDKROOT\n";
+			shellScript = "if test \"$ACTION\" = \"clean\"; then\n    rm -Rf $SYMROOT/vlc_build_dir\n    exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir\nCFLAGS=\"-arch $ARCHS\" CXXFLAGS=\"-arch $ARCHS\" CPPFLAGS=\"-arch $ARCHS\" OBJCFLAGS=\"-arch $ARCHS\" $top_srcdir/configure --disable-nls --enable-debug --with-macosx-sdk=$SDKROOT\n";
 			showEnvVarsInLog = 0;
 		};
 		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
@@ -689,6 +689,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				SDKROOT = "";
 			};
@@ -702,6 +703,7 @@
 				GCC_VERSION = com.apple.compilers.llvmgcc42;
 				GCC_WARN_ABOUT_RETURN_TYPE = YES;
 				GCC_WARN_UNUSED_VARIABLE = YES;
+				ONLY_ACTIVE_ARCH = YES;
 				PREBINDING = NO;
 				SDKROOT = "";
 			};
