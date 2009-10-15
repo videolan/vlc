@@ -168,7 +168,7 @@ static int Open( vlc_object_t *p_this )
     shout_t *p_shout;
     long i_ret;
     unsigned int i_port;
-    vlc_value_t val;
+    char *psz_val;
 
     char *psz_accessname = NULL;
     char *psz_parser = NULL;
@@ -219,29 +219,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
 
-    var_Get( p_access, SOUT_CFG_PREFIX "name", &val );
-    if( *val.psz_string )
-        psz_name = val.psz_string;
-    else
-        free( val.psz_string );
-
-    var_Get( p_access, SOUT_CFG_PREFIX "description", &val );
-    if( *val.psz_string )
-        psz_description = val.psz_string;
-    else
-        free( val.psz_string );
-
-    var_Get( p_access, SOUT_CFG_PREFIX "genre", &val );
-    if( *val.psz_string )
-        psz_genre = val.psz_string;
-    else
-        free( val.psz_string );
-
-    var_Get( p_access, SOUT_CFG_PREFIX "url", &val );
-    if( *val.psz_string )
-        psz_url = val.psz_string;
-    else
-        free( val.psz_string );
+    psz_name = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "name" );
+    psz_description = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "description" );
+    psz_genre = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "genre" );
+    psz_url = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "url" );
 
     p_shout = p_sys->p_shout = shout_new();
     if( !p_shout
@@ -275,8 +256,7 @@ static int Open( vlc_object_t *p_this )
     free( psz_genre );
     free( psz_url );
 
-    var_Get( p_access, SOUT_CFG_PREFIX "mp3", &val );
-    if( val.b_bool == true )
+    if( var_GetBool( p_access, SOUT_CFG_PREFIX "mp3" ) )
         i_ret = shout_set_format( p_shout, SHOUT_FORMAT_MP3 );
     else
         i_ret = shout_set_format( p_shout, SHOUT_FORMAT_OGG );
@@ -291,14 +271,14 @@ static int Open( vlc_object_t *p_this )
 
     /* Don't force bitrate to 0 but only use when specified. This will otherwise
        show an empty field on icecast directory listing instead of NA */
-    var_Get( p_access, SOUT_CFG_PREFIX "bitrate", &val );
-    if( *val.psz_string )
+    psz_val = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "bitrate" );
+    if( psz_val )
     {
-        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_BITRATE, val.psz_string );
+        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_BITRATE, psz_val );
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the bitrate" );
-            free( val.psz_string );
+            free( psz_val );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
@@ -310,63 +290,55 @@ static int Open( vlc_object_t *p_this )
            listings (sorting, stream info etc.) */
         msg_Warn( p_access, "no bitrate information specified (required for listing " \
                             "the server as public on the shoutcast website)" );
-        free( val.psz_string );
     }
 
     /* Information about samplerate, channels and quality will not be propagated
        through the YP protocol for icecast to the public directory listing when
        the icecast server is operating in shoutcast compatibility mode */
 
-    var_Get( p_access, SOUT_CFG_PREFIX "samplerate", &val );
-    if( *val.psz_string )
+    psz_val = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "samplerate" );
+    if( psz_val )
     {
-        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_SAMPLERATE, val.psz_string );
+        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_SAMPLERATE, psz_val );
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the samplerate" );
-            free( val.psz_string );
+            free( psz_val );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
         }
     }
-    else
-        free( val.psz_string );
 
-    var_Get( p_access, SOUT_CFG_PREFIX "channels", &val );
-    if( *val.psz_string )
+    psz_val = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "channels" );
+    if( psz_val )
     {
-        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_CHANNELS, val.psz_string );
+        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_CHANNELS, psz_val );
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the number of channels" );
-            free( val.psz_string );
+            free( psz_val );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
         }
     }
-    else
-        free( val.psz_string );
 
-    var_Get( p_access, SOUT_CFG_PREFIX "quality", &val );
-    if( *val.psz_string )
+    psz_val = var_GetNonEmptyString( p_access, SOUT_CFG_PREFIX "quality" );
+    if( psz_val )
     {
-        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_QUALITY, val.psz_string );
+        i_ret = shout_set_audio_info( p_shout, SHOUT_AI_QUALITY, psz_val );
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about Ogg Vorbis quality" );
-            free( val.psz_string );
+            free( psz_val );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
         }
     }
-    else
-        free( val.psz_string );
 
-    var_Get( p_access, SOUT_CFG_PREFIX "public", &val );
-    if( val.b_bool == true )
+    if( var_GetBool( p_access, SOUT_CFG_PREFIX "public" ) )
     {
         i_ret = shout_set_public( p_shout, 1 );
         if( i_ret != SHOUTERR_SUCCESS )
