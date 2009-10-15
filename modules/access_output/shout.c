@@ -264,9 +264,7 @@ static int Open( vlc_object_t *p_this )
     if( i_ret != SHOUTERR_SUCCESS )
     {
         msg_Err( p_access, "failed to set the shoutcast streaming format" );
-        free( p_access->p_sys );
-        free( psz_accessname );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     /* Don't force bitrate to 0 but only use when specified. This will otherwise
@@ -279,9 +277,7 @@ static int Open( vlc_object_t *p_this )
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the bitrate" );
-            free( p_access->p_sys );
-            free( psz_accessname );
-            return VLC_EGENERIC;
+            goto error;
         }
     }
     else
@@ -304,9 +300,7 @@ static int Open( vlc_object_t *p_this )
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the samplerate" );
-            free( p_access->p_sys );
-            free( psz_accessname );
-            return VLC_EGENERIC;
+            goto error;
         }
     }
 
@@ -318,9 +312,7 @@ static int Open( vlc_object_t *p_this )
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the number of channels" );
-            free( p_access->p_sys );
-            free( psz_accessname );
-            return VLC_EGENERIC;
+            goto error;
         }
     }
 
@@ -332,9 +324,7 @@ static int Open( vlc_object_t *p_this )
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about Ogg Vorbis quality" );
-            free( p_access->p_sys );
-            free( psz_accessname );
-            return VLC_EGENERIC;
+            goto error;
         }
     }
 
@@ -344,9 +334,7 @@ static int Open( vlc_object_t *p_this )
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the server status setting to public" );
-            free( p_access->p_sys );
-            free( psz_accessname );
-            return VLC_EGENERIC;
+            goto error;
         }
     }
 
@@ -367,9 +355,7 @@ static int Open( vlc_object_t *p_this )
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the protocol to 'icy'" );
-            free( p_access->p_sys );
-            free( psz_accessname );
-            return VLC_EGENERIC;
+            goto error;
         }
         i_ret = shout_open( p_shout );
         if( i_ret == SHOUTERR_SUCCESS )
@@ -393,9 +379,7 @@ static int Open( vlc_object_t *p_this )
             if( i_ret != SHOUTERR_SUCCESS )
             {
                 msg_Err( p_access, "failed to set the protocol to 'http'" );
-                free( p_access->p_sys );
-                free( psz_accessname );
-                return VLC_EGENERIC;
+                goto error;
             }
             i_ret = shout_open( p_shout );
             if( i_ret == SHOUTERR_SUCCESS )
@@ -439,6 +423,11 @@ static int Open( vlc_object_t *p_this )
     free( psz_accessname );
 
     return VLC_SUCCESS;
+
+error:
+    free( psz_accessname );
+    free( p_sys );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
