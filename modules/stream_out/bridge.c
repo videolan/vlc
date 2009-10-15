@@ -167,24 +167,6 @@ typedef struct bridge_t
     int i_es_num;
 } bridge_t;
 
-#define GetBridge(a,b) __GetBridge( VLC_OBJECT(a), b )
-static bridge_t *__GetBridge( vlc_object_t *p_object, const char *psz_name )
-{
-    bridge_t *p_bridge;
-    vlc_value_t val;
-
-    if( var_Get( p_object->p_libvlc, psz_name, &val ) )
-    {
-        p_bridge = NULL;
-    }
-    else
-    {
-        p_bridge = val.p_address;
-    }
-
-    return p_bridge;
-}
-
 
 /*
  * Bridge out
@@ -272,17 +254,14 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     vlc_mutex_lock( p_sys->p_lock );
 
-    p_bridge = GetBridge( p_stream, p_sys->psz_name );
+    p_bridge = var_GetAddress( p_stream, p_sys->psz_name );
     if ( p_bridge == NULL )
     {
         vlc_object_t *p_libvlc = VLC_OBJECT( p_stream->p_libvlc );
-        vlc_value_t val;
-
         p_bridge = malloc( sizeof( bridge_t ) );
 
         var_Create( p_libvlc, p_sys->psz_name, VLC_VAR_ADDRESS );
-        val.p_address = p_bridge;
-        var_Set( p_libvlc, p_sys->psz_name, val );
+        var_SetAddress( p_libvlc, p_sys->psz_name, p_bridge );
 
         p_bridge->i_es_num = 0;
         p_bridge->pp_es = NULL;
@@ -557,7 +536,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
     /* Then check all bridged streams */
     vlc_mutex_lock( p_sys->p_lock );
 
-    p_bridge = GetBridge( p_stream, p_sys->psz_name );
+    p_bridge = var_GetAddress( p_stream, p_sys->psz_name );
 
     if( p_bridge )
     {
