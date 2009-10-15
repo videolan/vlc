@@ -137,7 +137,11 @@ void PLSelector::createItems()
         sd_item->setData( 0, NAME_ROLE, qfu( *ppsz_name ) );
         sd_item->setFlags( sd_item->flags() & ~Qt::ItemIsDropEnabled );
         sds->addChild( sd_item );
+        free( *ppsz_name );
+        free( *ppsz_longname );
     }
+    free( ppsz_names );
+    free( ppsz_longnames );
 }
 
 QStringList PLSelector::mimeTypes() const
