@@ -1059,7 +1059,6 @@ modules/misc/playlist/m3u.c
 modules/misc/playlist/old.c
 modules/misc/playlist/xspf.c
 modules/misc/playlist/xspf.h
-modules/misc/probe/hal.c
 modules/misc/qte_main.cpp
 modules/misc/quartztext.c
 modules/misc/rtsp.c
