@@ -41,15 +41,12 @@ function parse()
         if string.match( line, "<title>" )
         then
             title = vlc.strings.decode_uri( find( line, "<title>(.-)<" ) )
-            vlc.msg.info("found title: "..title)
         end
         if string.match( line, "<li class=\"program\"" )
         then
             description = vlc.strings.resolve_xml_special_chars( find( line, "title=\"(.-)\"" ) )
-            vlc.msg.info("found description:"..description)
         end
         for programid in string.gmatch( line, "<li class=\"program\" id=\"program(.-)\"" ) do
-            vlc.msg.info("found program id "..programid)
             path = "http://www.katsomo.fi/metafile.asx?p="..programid.."&bw=800"
             table.insert( p, { path = path; name = title; description = description; url = vlc.path;} )
         end
