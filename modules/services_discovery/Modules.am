@@ -7,3 +7,4 @@ SOURCES_bonjour = bonjour.c
 SOURCES_podcast = podcast.c
 SOURCES_mtp = mtp.c
 SOURCES_mediadirs = mediadirs.c
+SOURCES_udev = udev.c
