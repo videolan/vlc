@@ -178,7 +178,7 @@ struct sout_input_t
 };
 
 
-VLC_EXPORT( sout_mux_t *,   sout_MuxNew,          ( sout_instance_t*, char *, sout_access_out_t * ) );
+VLC_EXPORT( sout_mux_t *,   sout_MuxNew,          ( sout_instance_t*, const char *, sout_access_out_t * ) );
 VLC_EXPORT( sout_input_t *, sout_MuxAddStream,    ( sout_mux_t *, es_format_t * ) );
 VLC_EXPORT( void,           sout_MuxDeleteStream, ( sout_mux_t *, sout_input_t * ) );
 VLC_EXPORT( void,           sout_MuxDelete,       ( sout_mux_t * ) );

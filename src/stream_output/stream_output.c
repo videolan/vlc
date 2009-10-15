@@ -404,7 +404,7 @@ int sout_AccessOutControl (sout_access_out_t *access, int query, ...)
 /*****************************************************************************
  * sout_MuxNew: create a new mux
  *****************************************************************************/
-sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, char *psz_mux,
+sout_mux_t * sout_MuxNew( sout_instance_t *p_sout, const char *psz_mux,
                           sout_access_out_t *p_access )
 {
     static const char typename[] = "mux";
