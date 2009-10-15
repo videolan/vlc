@@ -25,6 +25,10 @@ Playlist:
 Audio filters:
  * Chorus/Flanger audio filter
  * 3F1R to stereo downmix filter
+ * Dolby mixer, parameterized equalizer, trivial mixer, scaletempo, bandlimited resampler,
+   linear resampler, ugly resampler, converter_float, converter_fixed, DTS to SPDIF and
+   A/52 to SPDIF filters have been upgraded to the "audio filter2" API
+ * NEON assembly audio converter module
 
 Encoders:
  * x264, add psy-rd parameter and change default settings
@@ -46,6 +50,7 @@ Visualisation:
 
 Service discovery:
  * Service discovery for Picture/Music/Video user directories
+ * Service discovery based on libudev
 
 Stream output:
  * New smem module, streaming to memory
