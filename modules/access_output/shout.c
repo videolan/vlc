@@ -170,17 +170,17 @@ static int Open( vlc_object_t *p_this )
     unsigned int i_port;
     char *psz_val;
 
-    char *psz_accessname = NULL;
-    char *psz_parser = NULL;
-    char *psz_user = NULL;
-    char *psz_pass = NULL;
-    char *psz_host = NULL;
-    char *psz_mount = NULL;
-    char *psz_name = NULL;
-    char *psz_description = NULL;
-    char *tmp_port = NULL;
-    char *psz_genre = NULL;
-    char *psz_url = NULL;
+    char *psz_accessname;
+    char *psz_parser;
+    const char *psz_user;
+    const char *psz_pass;
+    const char *psz_host;
+    const char *psz_mount;
+    const char *psz_port;
+    char *psz_name;
+    char *psz_description;
+    char *psz_genre;
+    char *psz_url;
 
     config_ChainParse( p_access, SOUT_CFG_PREFIX, ppsz_sout_options, p_access->p_cfg );
 
@@ -205,12 +205,12 @@ static int Open( vlc_object_t *p_this )
     psz_host = psz_parser;
     while( psz_parser[0] && psz_parser[0] != ':' ) psz_parser++;
     if( psz_parser[0] ) { psz_parser[0] = 0; psz_parser++; }
-    tmp_port = psz_parser;
+    psz_port = psz_parser;
     while( psz_parser[0] && psz_parser[0] != '/' ) psz_parser++;
     if( psz_parser[0] ) { psz_parser[0] = 0; psz_parser++; }
     psz_mount = psz_parser;
 
-    i_port = atoi( tmp_port );
+    i_port = atoi( psz_port );
 
     p_sys = p_access->p_sys = malloc( sizeof( sout_access_out_sys_t ) );
     if( !p_sys )
