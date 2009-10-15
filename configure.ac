@@ -4590,9 +4590,11 @@ AC_ARG_ENABLE(libgcrypt,
   [  --disable-libgcrypt      gcrypt support (default enabled)])
 AS_IF([test "${enable_libgcrypt}" != "no"], [
   AC_CHECK_DECL([GCRYCTL_SET_THREAD_CBS], [
+    libgcrypt-config --version >/dev/null || AC_MSG_ERROR(
+        [gcrypt.h present but libgcrypt-config could not be found])
     have_libgcrypt="yes"
-    GCRYPT_CFLAGS=""
-    GCRYPT_LIBS="-lgcrypt"
+    GCRYPT_CFLAGS="`libgcrypt-config --cflags`"
+    GCRYPT_LIBS="`libgcrypt-config --libs`"
   ], [
     AS_IF([test "${enable_libgcrypt}"], [
       AC_MSG_ERROR([libgcrypt version 1.1.94 or higher not found.])
