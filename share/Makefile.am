@@ -200,6 +200,7 @@ DIST_lua= \
 	lua/playlist/dailymotion.lua \
 	lua/playlist/france2.lua \
 	lua/playlist/joox.lua \
+	lua/playlist/katsomo.lua \
 	lua/playlist/lelombrik.lua \
 	lua/playlist/youtube.lua \
 	lua/playlist/youtube_homepage.lua \
