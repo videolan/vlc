@@ -225,7 +225,7 @@ static void HandleDevice (services_discovery_t *sd, struct udev_device *dev,
     const char *scheme = "v4l2"; /* FIXME: V4L v1 */
     const char *node = udev_device_get_devnode (dev);
     char *vnd = decode_property (dev, "ID_VENDOR_ENC");
-    char *name = decode_property (dev, "ID_MODEL_ENC");
+    const char *name = udev_device_get_property_value (dev, "ID_V4L_PRODUCT");
 
     char *mrl;
     if (asprintf (&mrl, "%s://%s", scheme, node) == -1)
@@ -238,7 +238,6 @@ static void HandleDevice (services_discovery_t *sd, struct udev_device *dev,
                                    name ? name : "Unnamed",
                                    0, NULL, 0, -1, ITEM_TYPE_CARD);
     msg_Dbg (sd, "adding %s", mrl);
-    free (name);
     free (mrl);
 
     if (item != NULL)
