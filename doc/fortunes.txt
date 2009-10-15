@@ -899,4 +899,9 @@ VLC development is NOT about being a sed god.
 < linkfanel> and what, your dick shoot lava?
  -- #videolan
 %
-
+< funman> some program for fun
+< funman> some program for profit
+< funman> i program for beers
+< funman> gtg
+ -- #videolan
+%
