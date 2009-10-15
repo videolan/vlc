@@ -102,7 +102,7 @@ private:
     QStringList SeparateEntries( const QString& );
 
     QPushButton *cancelButton, *selectButton;
-    QPushButton *playButton;
+    QToolButton *playButton;
 
     void finish( bool );
 

@@ -30,10 +30,10 @@
    <string>Dialog</string>
   </property>
   <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0" colspan="4">
+   <item row="0" column="0" colspan="3">
     <widget class="QTabWidget" name="Tab"/>
    </item>
-   <item row="1" column="0" colspan="4">
+   <item row="1" column="0" colspan="3">
     <widget class="QCheckBox" name="advancedCheckBox">
      <property name="toolTip">
       <string>Show extended options</string>
@@ -43,7 +43,7 @@
      </property>
     </widget>
    </item>
-   <item row="2" column="0" colspan="4">
+   <item row="2" column="0" colspan="3">
     <widget class="QGroupBox" name="advancedFrame">
      <layout class="QGridLayout" name="gridLayout_2">
       <item row="0" column="0">
@@ -207,36 +207,21 @@
      </property>
     </spacer>
    </item>
-   <item row="3" column="1">
-    <widget class="QToolButton" name="menuButton">
+   <item row="3" column="2">
+    <widget class="QDialogButtonBox" name="buttonsBox">
      <property name="sizePolicy">
-      <sizepolicy hsizetype="Fixed" vsizetype="Minimum">
+      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
        <horstretch>0</horstretch>
        <verstretch>0</verstretch>
       </sizepolicy>
      </property>
-     <property name="maximumSize">
-      <size>
-       <width>16</width>
-       <height>16777215</height>
-      </size>
-     </property>
-     <property name="focusPolicy">
-      <enum>Qt::ClickFocus</enum>
-     </property>
-     <property name="toolTip">
-      <string>Select play mode</string>
-     </property>
-     <property name="popupMode">
-      <enum>QToolButton::InstantPopup</enum>
-     </property>
-     <property name="arrowType">
-      <enum>Qt::NoArrow</enum>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::NoButton</set>
      </property>
     </widget>
    </item>
-   <item row="3" column="2">
-    <widget class="QPushButton" name="playButton">
+   <item row="3" column="1">
+    <widget class="QToolButton" name="playButton">
      <property name="sizePolicy">
       <sizepolicy hsizetype="Minimum" vsizetype="Minimum">
        <horstretch>0</horstretch>
@@ -252,21 +237,8 @@
      <property name="text">
       <string>Play</string>
      </property>
-     <property name="default">
-      <bool>true</bool>
-     </property>
-    </widget>
-   </item>
-   <item row="3" column="3">
-    <widget class="QDialogButtonBox" name="buttonsBox">
-     <property name="sizePolicy">
-      <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
-       <horstretch>0</horstretch>
-       <verstretch>0</verstretch>
-      </sizepolicy>
-     </property>
-     <property name="standardButtons">
-      <set>QDialogButtonBox::NoButton</set>
+     <property name="popupMode">
+      <enum>QToolButton::MenuButtonPopup</enum>
      </property>
     </widget>
    </item>
@@ -281,7 +253,6 @@
   <tabstop>slaveText</tabstop>
   <tabstop>slaveBrowseButton</tabstop>
   <tabstop>playButton</tabstop>
-  <tabstop>menuButton</tabstop>
   <tabstop>buttonsBox</tabstop>
  </tabstops>
  <resources/>

@@ -123,8 +123,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     openButtonMenu->addAction( qtr( "&Convert" ), this, SLOT( transcode() ) ,
                                     QKeySequence( "Alt+C" ) );
 
-    ui.menuButton->setMenu( openButtonMenu );
-    ui.menuButton->setIcon( QIcon( ":/down_arrow" ) );
+    playButton->setMenu( openButtonMenu );
 
     /* Add the three Buttons */
     ui.buttonsBox->addButton( selectButton, QDialogButtonBox::AcceptRole );
@@ -223,7 +222,6 @@ void OpenDialog::setMenuAction()
         }
         playButton->show();
         selectButton->hide();
-        playButton->setDefault( true );
     }
 }
 
