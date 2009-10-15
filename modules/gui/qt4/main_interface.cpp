@@ -359,7 +359,7 @@ MainInterface::~MainInterface()
  *****************************/
 void MainInterface::recreateToolbars()
 {
-    msg_Err( p_intf, "Recreating the toolbars" );
+    msg_Dbg( p_intf, "Recreating the toolbars" );
     settings->beginGroup( "MainWindow" );
     delete controls;
     delete inputC;
@@ -773,28 +773,23 @@ void MainInterface::doComponentsUpdate()
 {
     if( isFullScreen() || isMaximized() ) return;
 
-    msg_Err( p_intf, "Updating the geometry" );
+    msg_Warn( p_intf, "Updating the geometry" );
     /* Here we resize to sizeHint() and not adjustsize because we want
        the videoWidget to be exactly the correctSize */
 
-#if 1
+#ifndef NDEBUG
     debug();
 #endif
-    /* This is WRONG */
+    /* This is WRONG, but I believe there is a Qt bug here */
     setMinimumSize( 0, 0 );
     resize( sizeHint() );
 
-    //adjustSize()  ;
+    //adjustSize() ; /* This is not needed, but might help in the future */
 }
 
 void MainInterface::debug()
 {
-#if 1
-    if( stackCentralW->isVisible() )
-        msg_Dbg( p_intf, "CentralStack visible" );
-    else
-        msg_Dbg( p_intf, "CentralStack inVisible" );
-    //msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->sizeHint().height(), stackCentralW->sizeHint().width() );
+#ifndef NDEBUG
     msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->size().height(), size().width() );
     msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->widget( VIDEO_TAB )->size().height(), stackCentralW->widget( VIDEO_TAB )->size().width() );
 
@@ -805,9 +800,9 @@ void MainInterface::debug()
     msg_Dbg( p_intf, "Stack minimumsize: %i - %i", stackCentralW->minimumSize().height(), stackCentralW->minimumSize().width() );
     msg_Dbg( p_intf, "Controls minimumsize: %i - %i", controls->minimumSize().height(), controls->minimumSize().width() );
     msg_Dbg( p_intf, "Central minimumsize: %i - %i", centralWidget()->minimumSize().height(), centralWidget()->minimumSize().width() );
-        msg_Dbg( p_intf, "Menu minimumsize: %i - %i", menuBar()->minimumSize().height(), menuBar()->minimumSize().width() );
-            msg_Dbg( p_intf, "Input minimuSize: %i - %i", inputC->minimumSize().height(), inputC->minimumSize().width() );
-            msg_Dbg( p_intf, "Status minimumsize: %i - %i", statusBar()->minimumSize().height(), statusBar()->minimumSize().width() );
+    msg_Dbg( p_intf, "Menu minimumsize: %i - %i", menuBar()->minimumSize().height(), menuBar()->minimumSize().width() );
+    msg_Dbg( p_intf, "Input minimuSize: %i - %i", inputC->minimumSize().height(), inputC->minimumSize().width() );
+    msg_Dbg( p_intf, "Status minimumsize: %i - %i", statusBar()->minimumSize().height(), statusBar()->minimumSize().width() );
     msg_Dbg( p_intf, "minimumsize: %i - %i", minimumSize().height(), minimumSize().width() );
 
     /*if( videoWidget && videoWidget->isVisible() )
@@ -820,9 +815,8 @@ void MainInterface::debug()
 
 void MainInterface::destroyPopupMenu()
 {
-    QVLCMenu::PopupMenu(p_intf, false );
+    QVLCMenu::PopupMenu( p_intf, false );
 }
-
 
 void MainInterface::toggleFSC()
 {
@@ -938,10 +932,10 @@ void MainInterface::releaseVideoSlot( void )
 /* Asynchronous call from WindowControl function */
 int MainInterface::controlVideo( int i_query, va_list args )
 {
+    /* Debug to check if VOUT_WINDOW_SET_SIZE is called, because this is broken now */
+    msg_Warn( p_intf, "Control Video: %i", i_query );
     switch( i_query )
     {
-        /* Debug to check if VOUT_WINDOW_SET_SIZE is called? */
-        msg_Dbg( p_intf, "Control Video: %i", i_query );
     case VOUT_WINDOW_SET_SIZE:
     {
         unsigned int i_width  = va_arg( args, unsigned int );
@@ -1044,7 +1038,8 @@ void MainInterface::toggleMinimalView( bool b_switch )
         }
         else
         {
-            /* If video is visible, then toggle the status of bgWidget */ //bgWasVisible = !bgWasVisible;
+            /* If video is visible, then toggle the status of bgWidget */
+            //bgWasVisible = !bgWasVisible;
             if( stackCentralOldState == BACKG_TAB )
                 stackCentralOldState = HIDDEN_TAB;
             else
@@ -1421,7 +1416,7 @@ void MainInterface::resizeEvent( QResizeEvent * event )
     }
 #endif
     QVLCMW::resizeEvent( event );
-    msg_Warn( p_intf, "%i", size().height() );
+    msg_Dbg( p_intf, "Resize Event, height: %i", size().height() );
 }
 
 void MainInterface::wheelEvent( QWheelEvent *e )
