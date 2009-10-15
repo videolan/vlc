@@ -70,7 +70,6 @@ vlc_module_end ()
  *****************************************************************************/
 struct intf_sys_t
 {
-    char *psz_file;
     struct lirc_config *config;
 
     int i_fd;
@@ -90,6 +89,7 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys;
+    char *psz_file;
 
     /* Allocate instance and initialize some members */
     p_intf->p_sys = p_sys = malloc( sizeof( intf_sys_t ) );
@@ -98,7 +98,6 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->pf_run = Run;
 
-    p_sys->psz_file = var_CreateGetNonEmptyString( p_intf, "lirc-file" );
     p_sys->i_fd = lirc_init( "vlc", 1 );
     if( p_sys->i_fd == -1 )
     {
@@ -109,19 +108,21 @@ static int Open( vlc_object_t *p_this )
     /* We want polling */
     fcntl( p_sys->i_fd, F_SETFL, fcntl( p_sys->i_fd, F_GETFL ) | O_NONBLOCK );
 
-    /* */
-    if( lirc_readconfig( p_sys->psz_file, &p_sys->config, NULL ) != 0 )
+    /* Read the configuration file */
+    psz_file = var_CreateGetNonEmptyString( p_intf, "lirc-file" );
+    if( lirc_readconfig( psz_file, &p_sys->config, NULL ) != 0 )
     {
         msg_Err( p_intf, "failure while reading lirc config" );
+        free( psz_file );
         goto exit;
     }
+    free( psz_file );
 
     return VLC_SUCCESS;
 
 exit:
     if( p_sys->i_fd != -1 )
         lirc_deinit();
-    free( p_sys->psz_file );
     free( p_sys );
     return VLC_EGENERIC;
 }
@@ -137,7 +138,6 @@ static void Close( vlc_object_t *p_this )
     /* Destroy structure */
     lirc_freeconfig( p_sys->config );
     lirc_deinit();
-    free( p_sys->psz_file );
     free( p_sys );
 }
 
