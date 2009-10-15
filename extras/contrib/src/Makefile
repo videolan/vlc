@@ -2422,7 +2422,7 @@ libass:
 	$(GIT) clone $(ASS_GIT)
 	(cd $@; autoreconf -ivf)
 
-.libass: libass
+.libass: libass .freetype
 	(cd $<; $(HOSTCC) ./configure --disable-png $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
 	touch $@
 
