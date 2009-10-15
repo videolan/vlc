@@ -4594,18 +4594,21 @@ AC_ARG_ENABLE(libgcrypt,
   [  --disable-libgcrypt      gcrypt support (default enabled)])
 AS_IF([test "${enable_libgcrypt}" != "no"], [
   AC_CHECK_DECL([GCRYCTL_SET_THREAD_CBS], [
-    libgcrypt-config --version >/dev/null || AC_MSG_ERROR(
-        [gcrypt.h present but libgcrypt-config could not be found])
-    have_libgcrypt="yes"
-    GCRYPT_CFLAGS="`libgcrypt-config --cflags`"
-    GCRYPT_LIBS="`libgcrypt-config --libs`"
-  ], [
-    AS_IF([test "${enable_libgcrypt}"], [
-      AC_MSG_ERROR([libgcrypt version 1.1.94 or higher not found.])
+    libgcrypt-config --version >/dev/null || \
+        AC_MSG_ERROR([gcrypt.h present but libgcrypt-config could not be found])
+    AC_CHECK_LIB(gcrypt, gcry_control, [
+      have_libgcrypt="yes"
+      GCRYPT_CFLAGS="`libgcrypt-config --cflags`"
+      GCRYPT_LIBS="`libgcrypt-config --libs`"
+    ], [
+      AC_MSG_ERROR([libgcrypt not found. Install libgcrypt or use --disable-libgcrypt. Have a nice day.])
     ])
-    have_libgcrypt="no"
-  ], [#include <gcrypt.h>])
+  ], [
+    AC_MSG_ERROR([libgcrypt version 1.1.94 or higher not found. Install libgcrypt or use --disable-libgcrypt. Have a nice day.])
+  ], [#include <gcrypt.h>]
+  )
 ])
+
 if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"; then
   AS_IF([test "${have_libgcrypt}" = "yes"],[
     VLC_ADD_LIBS([rtp stream_out_rtp], [${GCRYPT_LIBS}])
