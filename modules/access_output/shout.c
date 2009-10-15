@@ -275,10 +275,10 @@ static int Open( vlc_object_t *p_this )
     if( psz_val )
     {
         i_ret = shout_set_audio_info( p_shout, SHOUT_AI_BITRATE, psz_val );
+        free( psz_val );
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the bitrate" );
-            free( psz_val );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
@@ -300,10 +300,10 @@ static int Open( vlc_object_t *p_this )
     if( psz_val )
     {
         i_ret = shout_set_audio_info( p_shout, SHOUT_AI_SAMPLERATE, psz_val );
+        free( psz_val );
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the samplerate" );
-            free( psz_val );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
@@ -314,10 +314,10 @@ static int Open( vlc_object_t *p_this )
     if( psz_val )
     {
         i_ret = shout_set_audio_info( p_shout, SHOUT_AI_CHANNELS, psz_val );
+        free( psz_val );
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about the number of channels" );
-            free( psz_val );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
@@ -328,10 +328,10 @@ static int Open( vlc_object_t *p_this )
     if( psz_val )
     {
         i_ret = shout_set_audio_info( p_shout, SHOUT_AI_QUALITY, psz_val );
+        free( psz_val );
         if( i_ret != SHOUTERR_SUCCESS )
         {
             msg_Err( p_access, "failed to set the information about Ogg Vorbis quality" );
-            free( psz_val );
             free( p_access->p_sys );
             free( psz_accessname );
             return VLC_EGENERIC;
