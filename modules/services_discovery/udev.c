@@ -212,6 +212,14 @@ static char *decode_property (struct udev_device *dev, const char *name)
     return decode (udev_device_get_property_value (dev, name));
 }
 
+static bool is_v4l_legacy (struct udev_device *dev)
+{
+    const char *version;
+
+    version = udev_device_get_property_value (dev, "ID_V4L_VERSION");
+    return version && !strcmp (version, "1");
+}
+
 static void HandleDevice (services_discovery_t *sd, struct udev_device *dev,
                           bool add)
 {
@@ -222,7 +230,9 @@ static void HandleDevice (services_discovery_t *sd, struct udev_device *dev,
         return;
     }
 
-    const char *scheme = "v4l2"; /* FIXME: V4L v1 */
+    const char *scheme = "v4l2";
+    if (is_v4l_legacy (dev))
+        scheme = "v4l";
     const char *node = udev_device_get_devnode (dev);
     char *vnd = decode_property (dev, "ID_VENDOR_ENC");
     const char *name = udev_device_get_property_value (dev, "ID_V4L_PRODUCT");
