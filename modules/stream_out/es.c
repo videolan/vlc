@@ -208,8 +208,8 @@ struct sout_stream_id_t
     sout_mux_t   *p_mux;
 };
 
-static char * es_print_url( char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count,
-                            char *psz_access, char *psz_mux )
+static char * es_print_url( const char *psz_fmt, vlc_fourcc_t i_fourcc, int i_count,
+                            const char *psz_access, const char *psz_mux )
 {
     char *psz_dst, *p;
 
@@ -275,8 +275,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_instance_t   *p_sout = p_stream->p_sout;
     sout_stream_id_t  *id;
 
-    char              *psz_access;
-    char              *psz_mux;
+    const char        *psz_access;
+    const char        *psz_mux;
     char              *psz_dst;
 
     sout_access_out_t *p_access;
