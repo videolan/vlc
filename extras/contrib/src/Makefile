@@ -2587,6 +2587,8 @@ peflags.c:
 	cd peflags && gcc peflags.c -o peflags
 	install -d $(PREFIX)/bin
 	cd peflags && install ./peflags $(PREFIX)/bin
+	touch $@
+
 CLEAN_PKG +=peflags
 # ***************************************************************************
 # Some cleaning
