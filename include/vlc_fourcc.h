@@ -110,6 +110,8 @@
 #define VLC_CODEC_MDEC      VLC_FOURCC('M','D','E','C')
 #define VLC_CODEC_VMDVIDEO  VLC_FOURCC('V','M','D','V')
 #define VLC_CODEC_CDG       VLC_FOURCC('C','D','G',' ')
+#define VLC_CODEC_FRWU      VLC_FOURCC('F','R','W','U')
+
 
 /* Planar YUV 4:2:0 Y:V:U */
 #define VLC_CODEC_YV12      VLC_FOURCC('Y','V','1','2')

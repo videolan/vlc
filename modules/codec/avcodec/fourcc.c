@@ -187,8 +187,16 @@ static const struct
     { VLC_CODEC_MIMIC, CODEC_ID_MIMIC, VIDEO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 55, 0 )
+    { VLC_CODEC_DIRAC, CODEC_ID_DIRAC, VIDEO_ES },
+#endif
+
 #if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 29, 0 )
     { VLC_CODEC_V210, CODEC_ID_V210, VIDEO_ES },
+#endif
+
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 37, 0 )
+    { VLC_CODEC_FRWU, CODEC_ID_FRWU, VIDEO_ES },
 #endif
 
     /* Videogames Codecs */
@@ -245,10 +253,6 @@ static const struct
     { VLC_CODEC_GIF, CODEC_ID_GIF, VIDEO_ES },
     { VLC_CODEC_TARGA, CODEC_ID_TARGA, VIDEO_ES },
     { VLC_CODEC_SGI, CODEC_ID_SGI, VIDEO_ES },
-
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 51, 55, 0 )
-    { VLC_CODEC_DIRAC, CODEC_ID_DIRAC, VIDEO_ES },
-#endif
 
     /*
      *  Audio Codecs

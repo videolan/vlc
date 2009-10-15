@@ -602,6 +602,9 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_CDG, "CD-G Video"),
         A("CDG "),
 
+    B(VLC_CODEC_FRWU, "Forward Uncompressed" ),
+        A("FRWU"),
+
     /* */
     B(VLC_CODEC_YV12, "Planar 4:2:0 YVU"),
         A("YV12"),
