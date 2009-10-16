@@ -31,7 +31,7 @@
 #include <poll.h>
 #include <errno.h>
 
-static int  Open (vlc_object_t *);
+static int OpenV4L (vlc_object_t *);
 static void Close (vlc_object_t *);
 
 /*
@@ -43,13 +43,22 @@ vlc_module_begin ()
     set_category (CAT_PLAYLIST)
     set_subcategory (SUBCAT_PLAYLIST_SD)
     set_capability ("services_discovery", 0)
-    set_callbacks (Open, Close)
+    set_callbacks (OpenV4L, Close)
 
     add_shortcut ("udev")
 vlc_module_end ()
 
+struct subsys
+{
+    const char *name;
+    char * (*get_mrl) (struct udev_device *dev);
+    char * (*get_name) (struct udev_device *dev);
+    char * (*get_cat) (struct udev_device *dev);
+};
+
 struct services_discovery_sys_t
 {
+    const struct subsys *subsys;
     struct udev_monitor *monitor;
     vlc_thread_t         thread;
     input_item_t       **itemv;
@@ -62,15 +71,15 @@ static void HandleDevice (services_discovery_t *, struct udev_device *, bool);
 /**
  * Probes and initializes.
  */
-static int Open (vlc_object_t *obj)
+static int Open (vlc_object_t *obj, const struct subsys *subsys)
 {
-    const char subsys[] = "video4linux";
     services_discovery_t *sd = (services_discovery_t *)obj;
     services_discovery_sys_t *p_sys = malloc (sizeof (*p_sys));
 
     if (p_sys == NULL)
         return VLC_ENOMEM;
     sd->p_sys = p_sys;
+    p_sys->subsys = subsys;
     p_sys->itemv = NULL;
     p_sys->itemc = 0;
 
@@ -81,7 +90,8 @@ static int Open (vlc_object_t *obj)
 
     mon = udev_monitor_new_from_netlink (udev, "udev");
     if (mon == NULL
-     || udev_monitor_filter_add_match_subsystem_devtype (mon, subsys, NULL))
+     || udev_monitor_filter_add_match_subsystem_devtype (mon, subsys->name,
+                                                         NULL))
         goto error;
     p_sys->monitor = mon;
 
@@ -89,7 +99,7 @@ static int Open (vlc_object_t *obj)
     struct udev_enumerate *devenum = udev_enumerate_new (udev);
     if (devenum == NULL)
         goto error;
-    if (udev_enumerate_add_match_subsystem (devenum, subsys))
+    if (udev_enumerate_add_match_subsystem (devenum, subsys->name))
     {
         udev_enumerate_unref (devenum);
         goto error;
@@ -174,9 +184,10 @@ static void *Run (void *data)
             continue;
 
         /* FIXME: handle change, offline, online */
-        if (!strcmp (udev_device_get_action (dev), "add"))
+        const char *action = udev_device_get_action (dev);
+        if (!strcmp (action, "add"))
             HandleDevice (sd, dev, true);
-        else if (!strcmp (udev_device_get_action (dev), "remove"))
+        else if (!strcmp (action, "remove"))
             HandleDevice (sd, dev, false);
 
         udev_device_unref (dev);
@@ -228,26 +239,14 @@ static char *decode_property (struct udev_device *dev, const char *name)
     return decode (udev_device_get_property_value (dev, name));
 }
 
-static bool is_v4l_legacy (struct udev_device *dev)
-{
-    const char *version;
-
-    version = udev_device_get_property_value (dev, "ID_V4L_VERSION");
-    return version && !strcmp (version, "1");
-}
-
 static void HandleDevice (services_discovery_t *sd, struct udev_device *dev,
                           bool add)
 {
     services_discovery_sys_t *p_sys = sd->p_sys;
 
     /* Determine media location */
-    const char *scheme = "v4l2";
-    if (is_v4l_legacy (dev))
-        scheme = "v4l";
-    const char *node = udev_device_get_devnode (dev);
-    char *mrl;
-    if (asprintf (&mrl, "%s://%s", scheme, node) == -1)
+    char *mrl = p_sys->subsys->get_mrl (dev);
+    if (mrl == NULL)
         return;
 
     /* Find item in list */
@@ -269,19 +268,20 @@ static void HandleDevice (services_discovery_t *sd, struct udev_device *dev,
     /* Add/Remove old item */
     if (add && (item == NULL))
     {
-        char *vnd = decode_property (dev, "ID_VENDOR_ENC");
-        const char *name = udev_device_get_property_value (dev,
-                                                           "ID_V4L_PRODUCT");
+        char *name = p_sys->subsys->get_name (dev);
         item = input_item_NewWithType (VLC_OBJECT (sd), mrl,
                                        name ? name : "Unnamed",
                                        0, NULL, 0, -1, ITEM_TYPE_CARD);
-        msg_Dbg (sd, "adding %s", mrl);
+        free (name);
         if (item != NULL)
         {
-            services_discovery_AddItem (sd, item, vnd ? vnd : "Generic");
+            msg_Dbg (sd, "adding %s", mrl);
+            name = p_sys->subsys->get_cat (dev);
+            services_discovery_AddItem (sd, item, name ? name : "Generic");
+            free (name);
+
             TAB_APPEND (p_sys->itemc, p_sys->itemv, item);
         }
-        free (vnd);
     }
     else if (!add && (item != NULL))
     {
@@ -291,4 +291,47 @@ static void HandleDevice (services_discovery_t *sd, struct udev_device *dev,
         TAB_REMOVE (p_sys->itemc, p_sys->itemv, i);
     }
     free (mrl);
+}
+
+/*** Video4Linux support ***/
+static bool is_v4l_legacy (struct udev_device *dev)
+{
+    const char *version;
+
+    version = udev_device_get_property_value (dev, "ID_V4L_VERSION");
+    return version && !strcmp (version, "1");
+}
+
+static char *v4l_get_mrl (struct udev_device *dev)
+{
+    /* Determine media location */
+    const char *scheme = "v4l2";
+    if (is_v4l_legacy (dev))
+        scheme = "v4l";
+    const char *node = udev_device_get_devnode (dev);
+    char *mrl;
+
+    if (asprintf (&mrl, "%s://%s", scheme, node) == -1)
+        mrl = NULL;
+    return mrl;
+}
+
+static char *v4l_get_name (struct udev_device *dev)
+{
+    const char *prd = udev_device_get_property_value (dev, "ID_V4L_PRODUCT");
+    return prd ? strdup (prd) : NULL;
+}
+
+static char *v4l_get_cat (struct udev_device *dev)
+{
+    return decode_property (dev, "ID_VENDOR_ENC");
+}
+
+int OpenV4L (vlc_object_t *obj)
+{
+    static const struct subsys subsys = {
+        "video4linux", v4l_get_mrl, v4l_get_name, v4l_get_cat,
+    };
+
+    return Open (obj, &subsys);
 }
