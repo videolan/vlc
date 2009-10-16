@@ -163,7 +163,7 @@ static void *Run (void *data)
         else if (!strcmp (udev_device_get_action (dev), "remove"))
             HandleDevice (sd, dev, false);
 
-        //udev_device_unref (dev);
+        udev_device_unref (dev);
     }
     return NULL;
 }
