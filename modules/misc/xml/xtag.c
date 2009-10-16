@@ -361,13 +361,12 @@ static XList *xlist_append( XList *list, void *data )
     if( !list )
         return l;
 
-    for( last = list; last; last = last->next )
-    {
-        if( !last->next )
-            break;
-    }
+    /* Find the last element */
+    last = list;
+    while( last->next )
+        last = last->next;
 
-    if( last ) last->next = l;
+    last->next = l;
     l->prev = last;
     return list;
 }
