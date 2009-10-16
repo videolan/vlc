@@ -428,6 +428,8 @@ static int Restart( access_t *p_access )
         msg_Err( p_access, "describe failed" );
         return VLC_EGENERIC;
     }
+    free( psz_location );
+
     /* */
     if( Start( p_access, 0 ) )
     {
@@ -672,6 +674,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
         *ppsz_location = psz_location;
         return VLC_SUCCESS;
     }
+    free( psz_location );
 
     /* Read the asf header */
     GetHeader( p_access );
