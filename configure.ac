@@ -4622,7 +4622,7 @@ AS_IF([test "${enable_libgcrypt}" != "no"], [
       GCRYPT_LIBS="`libgcrypt-config --libs`"
     ], [
       AC_MSG_ERROR([libgcrypt not found. Install libgcrypt or use --disable-libgcrypt. Have a nice day.])
-    ])
+    ], [`libgcrypt-config --libs`])
   ], [
     AC_MSG_ERROR([libgcrypt version 1.1.94 or higher not found. Install libgcrypt or use --disable-libgcrypt. Have a nice day.])
   ], [#include <gcrypt.h>]
