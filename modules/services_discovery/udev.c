@@ -52,6 +52,8 @@ struct services_discovery_sys_t
 {
     struct udev_monitor *monitor;
     vlc_thread_t         thread;
+    input_item_t       **itemv;
+    size_t               itemc;
 };
 
 static void *Run (void *);
@@ -69,6 +71,8 @@ static int Open (vlc_object_t *obj)
     if (p_sys == NULL)
         return VLC_ENOMEM;
     sd->p_sys = p_sys;
+    p_sys->itemv = NULL;
+    p_sys->itemc = 0;
 
     struct udev_monitor *mon = NULL;
     struct udev *udev = udev_new ();
@@ -108,7 +112,11 @@ static int Open (vlc_object_t *obj)
     udev_enumerate_unref (devenum);
 
     if (vlc_clone (&p_sys->thread, Run, sd, VLC_THREAD_PRIORITY_LOW))
-        goto error;
+    {   /* Fallback without thread */
+        udev_monitor_unref (mon);
+        udev_unref (udev);
+        p_sys->monitor = NULL;
+    }
     return VLC_SUCCESS;
 
 error:
@@ -128,12 +136,20 @@ static void Close (vlc_object_t *obj)
 {
     services_discovery_t *sd = (services_discovery_t *)obj;
     services_discovery_sys_t *p_sys = sd->p_sys;
-    struct udev *udev = udev_monitor_get_udev (p_sys->monitor);
 
-    vlc_cancel (p_sys->thread);
-    vlc_join (p_sys->thread, NULL);
-    udev_monitor_unref (p_sys->monitor);
-    udev_unref (udev);
+    if (p_sys->monitor != NULL)
+    {
+        struct udev *udev = udev_monitor_get_udev (p_sys->monitor);
+
+        vlc_cancel (p_sys->thread);
+        vlc_join (p_sys->thread, NULL);
+        udev_monitor_unref (p_sys->monitor);
+        udev_unref (udev);
+    }
+
+    for (size_t i = 0; i < p_sys->itemc; i++)
+        vlc_gc_decref (p_sys->itemv[i]);
+    free (p_sys->itemv);
     free (p_sys);
 }
 
@@ -223,37 +239,56 @@ static bool is_v4l_legacy (struct udev_device *dev)
 static void HandleDevice (services_discovery_t *sd, struct udev_device *dev,
                           bool add)
 {
-    //services_discovery_sys_t *p_sys = sd->p_sys;
-    if (!add)
-    {
-        msg_Err (sd, "FIXME: removing device not implemented!");
-        return;
-    }
+    services_discovery_sys_t *p_sys = sd->p_sys;
 
+    /* Determine media location */
     const char *scheme = "v4l2";
     if (is_v4l_legacy (dev))
         scheme = "v4l";
     const char *node = udev_device_get_devnode (dev);
-    char *vnd = decode_property (dev, "ID_VENDOR_ENC");
-    const char *name = udev_device_get_property_value (dev, "ID_V4L_PRODUCT");
-
     char *mrl;
     if (asprintf (&mrl, "%s://%s", scheme, node) == -1)
         return;
 
-    /* FIXME: check for duplicates (race between monitor starting to receive
-     * and initial enumeration). */
-    input_item_t *item;
-    item = input_item_NewWithType (VLC_OBJECT (sd), mrl,
-                                   name ? name : "Unnamed",
-                                   0, NULL, 0, -1, ITEM_TYPE_CARD);
-    msg_Dbg (sd, "adding %s", mrl);
-    free (mrl);
+    /* Find item in list */
+    input_item_t *item = NULL;
+    size_t i;
 
-    if (item != NULL)
+    for (i = 0; i < p_sys->itemc; i++)
     {
-        services_discovery_AddItem (sd, item, vnd ? vnd : "Generic");
-        vlc_gc_decref (item);
+        input_item_t *oitem = p_sys->itemv[i];
+        char *omrl = input_item_GetURI (oitem);
+
+        if (!strcmp (omrl, mrl))
+        {
+            item = oitem;
+            break;
+        }
     }
-    free (vnd);
+
+    /* Add/Remove old item */
+    if (add && (item == NULL))
+    {
+        char *vnd = decode_property (dev, "ID_VENDOR_ENC");
+        const char *name = udev_device_get_property_value (dev,
+                                                           "ID_V4L_PRODUCT");
+        item = input_item_NewWithType (VLC_OBJECT (sd), mrl,
+                                       name ? name : "Unnamed",
+                                       0, NULL, 0, -1, ITEM_TYPE_CARD);
+        msg_Dbg (sd, "adding %s", mrl);
+        if (item != NULL)
+        {
+            services_discovery_AddItem (sd, item, vnd ? vnd : "Generic");
+            TAB_APPEND (p_sys->itemc, p_sys->itemv, item);
+        }
+        free (vnd);
+    }
+    else if (!add && (item != NULL))
+    {
+        msg_Dbg (sd, "removing %s", mrl);
+        services_discovery_RemoveItem (sd, item);
+        vlc_gc_decref (item);
+        TAB_REMOVE (p_sys->itemc, p_sys->itemv, i);
+    }
+    free (mrl);
 }
