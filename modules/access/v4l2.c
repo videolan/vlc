@@ -2413,7 +2413,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                             p_sys->dev_cap.version & 0xFF,
                             p_sys->dev_cap.bus_info );
 
-    msg_Dbg( p_obj, "the device has the capabilities: (%c) Video Capure, "
+    msg_Dbg( p_obj, "the device has the capabilities: (%c) Video Capture, "
                                                        "(%c) Audio, "
                                                        "(%c) Tuner, "
                                                        "(%c) Radio",
