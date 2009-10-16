@@ -91,10 +91,14 @@ void * DestroySharedLibraryAtExit( void )
         libvlc_exception_init( &ex );
         
         const char * lib_vlc_params[] = { 
-            "-I", "dummy", "--vout=minimal_macosx", 
-            "--no-video-title-show", "--no-sout-keep", "--ignore-config",
-			"--opengl-provider=minimal_macosx",
-			"-verbose=-1"
+            "-I", "dummy",               // No interface 
+            "--no-video-title-show",     // Don't show the title on overlay when starting to play
+            "--no-sout-keep",
+            "--ignore-config",           // Don't read and write VLC config files.
+			"--opengl-provider=minimal_macosx", // Use minimal_macosx
+            "--vout=minimal_macosx",
+			"-verbose=-1",               // Don't polute the log
+            "--play-and-pause"           // When ending a stream pause it instead of stopping it.
             //, "--control=motion", "--motion-use-rotate", "--video-filter=rotate"
         };
         
