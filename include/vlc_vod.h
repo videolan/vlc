@@ -78,6 +78,8 @@ enum vod_query_e
     VOD_MEDIA_FORWARD,      /* arg1= double         res=    */
 };
 
-/**}*/
+/**
+ * @}
+ */
 
 #endif
