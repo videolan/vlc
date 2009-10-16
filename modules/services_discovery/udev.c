@@ -32,6 +32,7 @@
 #include <errno.h>
 
 static int OpenV4L (vlc_object_t *);
+static int OpenDisc (vlc_object_t *);
 static void Close (vlc_object_t *);
 
 /*
@@ -44,8 +45,17 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_PLAYLIST_SD)
     set_capability ("services_discovery", 0)
     set_callbacks (OpenV4L, Close)
+    add_shortcut ("v4l")
 
-    add_shortcut ("udev")
+    add_submodule ()
+    set_shortname (N_("Discs"))
+    set_description (N_("Discs"))
+    set_category (CAT_PLAYLIST)
+    set_subcategory (SUBCAT_PLAYLIST_SD)
+    set_capability ("services_discovery", 0)
+    set_callbacks (OpenDisc, Close)
+    add_shortcut ("disc")
+
 vlc_module_end ()
 
 struct subsys
@@ -331,6 +341,81 @@ int OpenV4L (vlc_object_t *obj)
 {
     static const struct subsys subsys = {
         "video4linux", v4l_get_mrl, v4l_get_name, v4l_get_cat,
+    };
+
+    return Open (obj, &subsys);
+}
+
+/*** Discs support ***/
+static char *disc_get_mrl (struct udev_device *dev)
+{
+    const char *val;
+
+    val = udev_device_get_property_value (dev, "ID_CDROM");
+    if (val == NULL)
+        return NULL; /* Ignore non-optical block devices */
+
+    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_STATE");
+    if ((val == NULL) || !strcmp (val, "blank"))
+        return NULL; /* ignore empty drives and virgin recordable discs */
+
+    const char *scheme = "file";
+    val = udev_device_get_property_value (dev,
+                                          "ID_CDROM_MEDIA_TRACK_COUNT_AUDIO");
+    if (val && atoi (val))
+        scheme = "cdda"; /* Audio CD rather than file system */
+#if 0 /* we can use file:// for DVDs */
+    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_DVD");
+    if (val && atoi (val))
+        scheme = "dvd";
+#endif
+    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_BD");
+    if (val && atoi (val))
+        scheme = "bd";
+#ifdef LOL
+    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_HDDVD");
+    if (val && atoi (val))
+        scheme = "hddvd";
+#endif
+
+    val = udev_device_get_devnode (dev);
+    char *mrl;
+
+    if (asprintf (&mrl, "%s://%s", scheme, val) == -1)
+        mrl = NULL;
+    return mrl;
+}
+
+static char *disc_get_name (struct udev_device *dev)
+{
+    return decode_property (dev, "ID_FS_LABEL_ENC");
+}
+
+static char *disc_get_cat (struct udev_device *dev)
+{
+    const char *val;
+    const char *cat = "Unknown";
+
+    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_CD");
+    if (val && atoi (val))
+        cat = "CD";
+    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_DVD");
+    if (val && atoi (val))
+        cat = "DVD";
+    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_BD");
+    if (val && atoi (val))
+        cat = "Blue-ray disc";
+    val = udev_device_get_property_value (dev, "ID_CDROM_MEDIA_HDDVD");
+    if (val && atoi (val))
+        cat = "HD DVD";
+
+    return strdup (cat);
+}
+
+int OpenDisc (vlc_object_t *obj)
+{
+    static const struct subsys subsys = {
+        "block", disc_get_mrl, disc_get_name, disc_get_cat,
     };
 
     return Open (obj, &subsys);
