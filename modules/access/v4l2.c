@@ -2003,7 +2003,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     memset( &fmt, 0, sizeof(fmt) );
     fmt.type = V4L2_BUF_TYPE_VIDEO_CAPTURE;
 
-    if( p_sys->i_width == 0 || p_sys->i_height == 0 )
+    if( p_sys->i_width <= 0 || p_sys->i_height <= 0 )
     {
         /* Use current width and height settings */
         if( v4l2_ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 )
@@ -2012,26 +2012,22 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             goto open_failed;
         }
 
-        p_sys->i_width = fmt.fmt.pix.width;
-        p_sys->i_height = fmt.fmt.pix.height;
+        msg_Dbg( p_obj, "found default width and height of %ux%u",
+                 fmt.fmt.pix.width, fmt.fmt.pix.height );
 
-        if( fmt.fmt.pix.field == V4L2_FIELD_ALTERNATE )
+        if( p_sys->i_width < 0 || p_sys->i_height < 0 )
         {
-            p_sys->i_height = p_sys->i_height * 2;
+            msg_Dbg( p_obj, "will try to find optimal width and height." );
         }
-    }
-    else if( p_sys->i_width < 0 || p_sys->i_height < 0 )
-    {
-        msg_Dbg( p_obj, "will try to find optimal width and height." );
     }
     else
     {
         /* Use user specified width and height */
         msg_Dbg( p_obj, "trying specified size %dx%d", p_sys->i_width, p_sys->i_height );
+        fmt.fmt.pix.width = p_sys->i_width;
+        fmt.fmt.pix.height = p_sys->i_height;
     }
 
-    fmt.fmt.pix.width = __MAX(0, p_sys->i_width);
-    fmt.fmt.pix.height = __MAX(0, p_sys->i_height);
     fmt.fmt.pix.field = V4L2_FIELD_NONE;
 
     if (b_demux)
@@ -2114,22 +2110,27 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
                               &i_width, &i_height );
             if( i_width || i_height )
             {
-                msg_Dbg( p_demux, "Found optimal dimensions for framerate %f of %dx%d",
-                         p_sys->f_fps, i_width, i_height );
+                msg_Dbg( p_demux, "Found optimal dimensions for framerate %f "
+                                  "of %ux%u", p_sys->f_fps, i_width, i_height );
                 fmt.fmt.pix.width = i_width;
                 fmt.fmt.pix.height = i_height;
-                if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 ) {;}
+                if( v4l2_ioctl( i_fd, VIDIOC_S_FMT, &fmt ) < 0 )
+                {
+                    msg_Err( p_obj, "Cannot set size to optimal dimensions "
+                                    "%ux%u", i_width, i_height );
+                    goto open_failed;
+                }
             }
             else
             {
-                msg_Warn( p_obj, "Could not find optimal width and height." );
+                msg_Warn( p_obj, "Could not find optimal width and height, "
+                                 "falling back to driver default." );
             }
         }
-
-        /* Reassign width, height and chroma incase driver override */
-        p_sys->i_width = fmt.fmt.pix.width;
-        p_sys->i_height = fmt.fmt.pix.height;
     }
+
+    p_sys->i_width = fmt.fmt.pix.width;
+    p_sys->i_height = fmt.fmt.pix.height;
 
     if( v4l2_ioctl( i_fd, VIDIOC_G_FMT, &fmt ) < 0 ) {;}
     /* Print extra info */
@@ -2161,6 +2162,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
             break;
         case V4L2_FIELD_ALTERNATE:
             msg_Dbg( p_obj, "Interlacing setting: alternate fields (TODO)" );
+            p_sys->i_height = p_sys->i_height * 2;
             break;
         case V4L2_FIELD_INTERLACED_TB:
             msg_Dbg( p_obj, "Interlacing setting: interleaved top bottom" );
