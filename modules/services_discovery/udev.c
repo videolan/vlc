@@ -172,15 +172,6 @@ static void RemoveDevice (services_discovery_t *sd, struct udev_device *dev)
     DestroyDevice (d);
 }
 
-static void HandleDevice (services_discovery_t *sd, struct udev_device *dev,
-                          bool add)
-{
-    if (!add)
-        RemoveDevice (sd, dev);
-    else
-        AddDevice (sd, dev);
-}
-
 static void *Run (void *);
 
 /**
@@ -230,7 +221,7 @@ static int Open (vlc_object_t *obj, const struct subsys *subsys)
     {
         const char *path = udev_list_entry_get_name (deventry);
         struct udev_device *dev = udev_device_new_from_syspath (udev, path);
-        HandleDevice (sd, dev, true);
+        AddDevice (sd, dev);
         udev_device_unref (dev);
     }
     udev_enumerate_unref (devenum);
@@ -293,13 +284,16 @@ static void *Run (void *data)
         if (dev == NULL)
             continue;
 
-        /* FIXME: handle change, offline, online */
         const char *action = udev_device_get_action (dev);
         if (!strcmp (action, "add"))
-            HandleDevice (sd, dev, true);
+            AddDevice (sd, dev);
         else if (!strcmp (action, "remove"))
-            HandleDevice (sd, dev, false);
-
+            RemoveDevice (sd, dev);
+        else if (!strcmp (action, "change"))
+        {
+            RemoveDevice (sd, dev);
+            AddDevice (sd, dev);
+        }
         udev_device_unref (dev);
     }
     return NULL;
