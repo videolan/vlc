@@ -34,7 +34,7 @@
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_demux.h>
-
+#include <vlc_charset.h>
 
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>
@@ -545,7 +545,7 @@ static void OpenAudioDev( demux_t *p_demux )
     int i_format = AFMT_S16_LE;
     int result;
 
-    p_sys->fd_audio = open( psz_device, O_RDONLY | O_NONBLOCK );
+    p_sys->fd_audio = utf8_open( psz_device, O_RDONLY | O_NONBLOCK );
     if( p_sys->fd_audio  < 0 )
     {
         msg_Err( p_demux, "cannot open audio device (%s)", psz_device );
