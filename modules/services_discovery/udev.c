@@ -28,6 +28,7 @@
 #include <vlc_common.h>
 #include <vlc_services_discovery.h>
 #include <vlc_plugin.h>
+#include <search.h>
 #include <poll.h>
 #include <errno.h>
 
@@ -58,6 +59,12 @@ vlc_module_begin ()
 
 vlc_module_end ()
 
+struct device
+{
+    dev_t devnum; /* must be first */
+    input_item_t *item;
+};
+
 struct subsys
 {
     const char *name;
@@ -71,12 +78,108 @@ struct services_discovery_sys_t
     const struct subsys *subsys;
     struct udev_monitor *monitor;
     vlc_thread_t         thread;
-    input_item_t       **itemv;
-    size_t               itemc;
+    void                *root;
 };
 
+/**
+ * Compares two devices (to support binary search).
+ */
+static int cmpdev (const void *a, const void *b)
+{
+    const dev_t *da = a, *db = b;
+    dev_t delta = *da - *db;
+
+    if (sizeof (delta) > sizeof (int))
+        return delta ? ((delta > 0) ? 1 : -1) : 0;
+    return (signed)delta;
+}
+
+static void DestroyDevice (void *data)
+{
+    struct device *d = data;
+
+    vlc_gc_decref (d->item);
+    free (d);
+}
+
+static char *decode_property (struct udev_device *, const char *);
+
+/**
+ * Adds a udev device.
+ */
+static int AddDevice (services_discovery_t *sd, struct udev_device *dev)
+{
+    services_discovery_sys_t *p_sys = sd->p_sys;
+
+    char *mrl = p_sys->subsys->get_mrl (dev);
+    if (mrl == NULL)
+        return 0; /* don't know if it was an error... */
+    char *name = p_sys->subsys->get_name (dev);
+    input_item_t *item = input_item_NewWithType (VLC_OBJECT (sd), mrl,
+                                                 name ? name : mrl,
+                                                 0, NULL, 0, -1, ITEM_TYPE_CARD);
+    msg_Dbg (sd, "adding %s (%s)", mrl, name);
+    free (name);
+    free (mrl);
+    if (item == NULL)
+        return -1;
+
+    struct device *d = malloc (sizeof (*d));
+    if (d == NULL)
+    {
+        vlc_gc_decref (item);
+        return -1;
+    }
+    d->item = item;
+    d->devnum = udev_device_get_devnum (dev);
+
+    struct device **dp = tsearch (d, &p_sys->root, cmpdev);
+    if (dp == NULL) /* Out-of-memory */
+    {
+        DestroyDevice (d);
+        return -1;
+    }
+    if (*dp != d) /* Overwrite existing device */
+    {
+        services_discovery_RemoveItem (sd, (*dp)->item);
+        DestroyDevice (*dp);
+        *dp = d;
+    }
+
+    name = p_sys->subsys->get_cat (dev);
+    services_discovery_AddItem (sd, item, name ? name : "Generic");
+    free (name);
+    return 0;
+}
+
+/**
+ * Removes a udev device (if present).
+ */
+static void RemoveDevice (services_discovery_t *sd, struct udev_device *dev)
+{
+    services_discovery_sys_t *p_sys = sd->p_sys;
+
+    dev_t num = udev_device_get_devnum (dev);
+    struct device **dp = tfind (&(dev_t){ num }, &p_sys->root, cmpdev);
+    if (dp == NULL)
+        return;
+
+    struct device *d = *dp;
+    services_discovery_RemoveItem (sd, d->item);
+    tdelete (d, &p_sys->root, cmpdev);
+    DestroyDevice (d);
+}
+
+static void HandleDevice (services_discovery_t *sd, struct udev_device *dev,
+                          bool add)
+{
+    if (!add)
+        RemoveDevice (sd, dev);
+    else
+        AddDevice (sd, dev);
+}
+
 static void *Run (void *);
-static void HandleDevice (services_discovery_t *, struct udev_device *, bool);
 
 /**
  * Probes and initializes.
@@ -90,8 +193,7 @@ static int Open (vlc_object_t *obj, const struct subsys *subsys)
         return VLC_ENOMEM;
     sd->p_sys = p_sys;
     p_sys->subsys = subsys;
-    p_sys->itemv = NULL;
-    p_sys->itemc = 0;
+    p_sys->root = NULL;
 
     struct udev_monitor *mon = NULL;
     struct udev *udev = udev_new ();
@@ -148,7 +250,6 @@ error:
     return VLC_EGENERIC;
 }
 
-
 /**
  * Releases resources
  */
@@ -167,12 +268,9 @@ static void Close (vlc_object_t *obj)
         udev_unref (udev);
     }
 
-    for (size_t i = 0; i < p_sys->itemc; i++)
-        vlc_gc_decref (p_sys->itemv[i]);
-    free (p_sys->itemv);
+    tdestroy (p_sys->root, DestroyDevice);
     free (p_sys);
 }
-
 
 static void *Run (void *data)
 {
@@ -205,6 +303,9 @@ static void *Run (void *data)
     return NULL;
 }
 
+/**
+ * Converts an hexadecimal digit to an integer.
+ */
 static int hex (char c)
 {
     if (c >= '0' && c <= '9')
@@ -216,6 +317,9 @@ static int hex (char c)
     return -1;
 }
 
+/**
+ * Decodes a udev hexadecimal-encoded property.
+ */
 static char *decode (const char *enc)
 {
     char *ret = enc ? strdup (enc) : NULL;
@@ -247,60 +351,6 @@ static char *decode (const char *enc)
 static char *decode_property (struct udev_device *dev, const char *name)
 {
     return decode (udev_device_get_property_value (dev, name));
-}
-
-static void HandleDevice (services_discovery_t *sd, struct udev_device *dev,
-                          bool add)
-{
-    services_discovery_sys_t *p_sys = sd->p_sys;
-
-    /* Determine media location */
-    char *mrl = p_sys->subsys->get_mrl (dev);
-    if (mrl == NULL)
-        return;
-
-    /* Find item in list */
-    input_item_t *item = NULL;
-    size_t i;
-
-    for (i = 0; i < p_sys->itemc; i++)
-    {
-        input_item_t *oitem = p_sys->itemv[i];
-        char *omrl = input_item_GetURI (oitem);
-
-        if (!strcmp (omrl, mrl))
-        {
-            item = oitem;
-            break;
-        }
-    }
-
-    /* Add/Remove old item */
-    if (add && (item == NULL))
-    {
-        char *name = p_sys->subsys->get_name (dev);
-        item = input_item_NewWithType (VLC_OBJECT (sd), mrl,
-                                       name ? name : "Unnamed",
-                                       0, NULL, 0, -1, ITEM_TYPE_CARD);
-        free (name);
-        if (item != NULL)
-        {
-            msg_Dbg (sd, "adding %s", mrl);
-            name = p_sys->subsys->get_cat (dev);
-            services_discovery_AddItem (sd, item, name ? name : "Generic");
-            free (name);
-
-            TAB_APPEND (p_sys->itemc, p_sys->itemv, item);
-        }
-    }
-    else if (!add && (item != NULL))
-    {
-        msg_Dbg (sd, "removing %s", mrl);
-        services_discovery_RemoveItem (sd, item);
-        vlc_gc_decref (item);
-        TAB_REMOVE (p_sys->itemc, p_sys->itemv, i);
-    }
-    free (mrl);
 }
 
 /*** Video4Linux support ***/
