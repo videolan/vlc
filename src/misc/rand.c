@@ -35,6 +35,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <pthread.h>
+#include <vlc_charset.h>
 
 #include <vlc_md5.h>
 
@@ -57,7 +58,7 @@ static void vlc_rand_init (void)
     uint8_t key[BLOCK_SIZE];
 
     /* Get non-predictible value as key for HMAC */
-    int fd = open (randfile, O_RDONLY);
+    int fd = utf8_open (randfile, O_RDONLY);
     if (fd == -1)
         return; /* Uho! */
 
