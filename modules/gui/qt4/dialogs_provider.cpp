@@ -569,7 +569,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
                                        bool b_transcode_only,
                                        QStringList options )
 {
-    char *psz_soutoption;
+    QString soutoption;
 
     /* Stream */
     if( !b_transcode_only )
@@ -577,7 +577,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         SoutDialog *s = new SoutDialog( parent, p_intf, mrl );
         if( s->exec() == QDialog::Accepted )
         {
-            psz_soutoption = strdup( qtu( s->getMrl() ) );
+            soutoption = s->getMrl();
             delete s;
         }
         else
@@ -589,7 +589,7 @@ void DialogsProvider::streamingDialog( QWidget *parent,
         ConvertDialog *s = new ConvertDialog( parent, p_intf, mrl );
         if( s->exec() == QDialog::Accepted )
         {
-            psz_soutoption = strdup( qtu( s->getMrl() ) );
+            soutoption = s->getMrl();
             delete s;
         }
         else
@@ -599,9 +599,9 @@ void DialogsProvider::streamingDialog( QWidget *parent,
     }
 
     /* Get SoutMRL */
-    if( !EMPTY_STR( psz_soutoption ) )
+    if( !soutoption.isEmpty() )
     {
-        options += QString( psz_soutoption ).split( " :");
+        options += soutoption.split( " :");
 
         /* Create Input */
         input_item_t *p_input;
@@ -627,7 +627,6 @@ void DialogsProvider::streamingDialog( QWidget *parent,
 
         RecentsMRL::getInstance( p_intf )->addRecent( mrl );
     }
-    free( psz_soutoption );
 }
 
 void DialogsProvider::openAndStreamingDialogs()
