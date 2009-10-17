@@ -481,11 +481,12 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             if (module_exists ("livedotcom"))
                 TestCaCi( "rtsp-caching", 4 );
             TestCaCi( "ftp-caching", 2 );
-            TestCaCi( "http-caching", 4 );
+            TestCaCi( "http-caching", 2 );
             if (module_exists ("access_realrtsp"))
                 TestCaCi( "realrtsp-caching", 10 );
-            TestCaCi( "mms-caching", 19 );
-            if( b_cache_equal ) ui.cachingCombo->setCurrentIndex(
+            TestCaCi( "mms-caching", 10 );
+            if( b_cache_equal == 1 )
+                ui.cachingCombo->setCurrentIndex(
                 ui.cachingCombo->findData( QVariant( i_cache ) ) );
 #undef TestCaCi
 #undef TestCaC
