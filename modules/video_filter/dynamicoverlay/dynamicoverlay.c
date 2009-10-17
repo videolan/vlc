@@ -34,6 +34,7 @@
 #include <vlc_vout.h>
 #include <vlc_filter.h>
 #include <vlc_osd.h>
+#include <vlc_charset.h>
 
 #include <ctype.h>
 #include <fcntl.h>
@@ -170,7 +171,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
     vlc_mutex_lock( &p_sys->lock );
     if( p_sys->i_inputfd == -1 )
     {
-        p_sys->i_inputfd = open( p_sys->psz_inputfile, O_RDONLY | O_NONBLOCK );
+        p_sys->i_inputfd = utf8_open( p_sys->psz_inputfile, O_RDONLY | O_NONBLOCK );
         if( p_sys->i_inputfd == -1 )
         {
             msg_Warn( p_filter, "Failed to grab input file: %s (%m)",
@@ -185,7 +186,7 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
 
     if( p_sys->i_outputfd == -1 )
     {
-        p_sys->i_outputfd = open( p_sys->psz_outputfile,
+        p_sys->i_outputfd = utf8_open( p_sys->psz_outputfile,
                                   O_WRONLY | O_NONBLOCK );
         if( p_sys->i_outputfd == -1 )
         {
