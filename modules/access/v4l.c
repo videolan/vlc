@@ -682,7 +682,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
     struct mjpeg_params mjpeg;
     int i;
 
-    if( ( i_fd = open( psz_device, O_RDWR ) ) < 0 )
+    if( ( i_fd = utf8_open( psz_device, O_RDWR ) ) < 0 )
     {
         msg_Err( p_demux, "cannot open device (%m)" );
         goto vdev_failed;
