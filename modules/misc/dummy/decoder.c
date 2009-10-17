@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_codec.h>
+#include <vlc_charset.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h> /* write(), close() */
@@ -92,7 +93,7 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
     }
     if( b_force_dump )
     {
-        p_sys->i_fd = open( psz_file, O_WRONLY | O_CREAT | O_TRUNC, 00644 );
+        p_sys->i_fd = utf8_open( psz_file, O_WRONLY | O_CREAT | O_TRUNC, 00644 );
 
         if( p_sys->i_fd == -1 )
         {
