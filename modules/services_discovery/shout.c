@@ -179,8 +179,7 @@ static void ItemAdded( const vlc_event_t * p_event, void * user_data )
     const struct shout_item_t * p_parent = params->p_parent;
     input_item_t * p_input = p_event->u.input_item_subitem_added.p_new_child;
 
-    int i;
-    for( i = 0; p_parent->ppsz_options[i] != NULL; i++ )
+    for(int i = 0; p_parent->ppsz_options[i] != NULL; i++)
         input_item_AddOption( p_input, p_parent->ppsz_options[i], VLC_INPUT_OPTION_TRUSTED);
 
     services_discovery_AddItem( params->p_sd, p_input, params->psz_category );
@@ -192,13 +191,12 @@ static void ItemAdded( const vlc_event_t * p_event, void * user_data )
 static input_item_t * CreateInputItemFromShoutItem( services_discovery_t *p_sd,
                                          const struct shout_item_t * p_item )
 {
-    int i;
     /* Create the item */
     input_item_t *p_input = input_item_New( p_sd, p_item->psz_url,
                                             vlc_gettext(p_item->psz_name) );
 
     /* Copy options */
-    for( i = 0; p_item->ppsz_options[i] != NULL; i++ )
+    for(int i = 0; p_item->ppsz_options[i] != NULL; i++)
         input_item_AddOption( p_input, p_item->ppsz_options[i], VLC_INPUT_OPTION_TRUSTED );
     input_item_AddOption( p_input, "no-playlist-autostart", VLC_INPUT_OPTION_TRUSTED );
 
