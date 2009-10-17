@@ -3671,6 +3671,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
   VLC_ADD_PLUGIN([globalhotkeys])
   VLC_ADD_CFLAGS([globalhotkeys],[${XCB_KEYSYMS_CFLAGS} ${XCB_CFLAGS}] )
   VLC_ADD_LIBS([globalhotkeys],[${XCB_KEYSYMS_LIBS} ${XCB_LIBS}] )
+  VLC_ADD_PLUGIN([xdg_screensaver])
 ])
 
 

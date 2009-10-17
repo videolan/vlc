@@ -19,6 +19,7 @@ SOURCES_gnutls = gnutls.c dhparams.h
 SOURCES_svg = svg.c
 SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_inhibit = inhibit.c
+SOURCES_xdg_screensaver = xdg-screensaver.c
 
 libvlc_LTLIBRARIES += \
 	liblogger_plugin.la
