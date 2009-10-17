@@ -24,6 +24,7 @@
 function probe()
     return vlc.access == "http"
         and string.match( vlc.path, "www.katsomo.fi" )
+        and ( string.match( vlc.path, "treeId" ) or string.match( vlc.path, "progId" ) )
 end
 
 function find( haystack, needle )
@@ -34,6 +35,13 @@ end
 -- Parse function.
 function parse()
     p = {}
+    if string.match( vlc.path, "progId" )
+    then
+       programid = string.match( vlc.path, "progId=(%d+)")
+       path = "http://www.katsomo.fi/metafile.asx?p="..programid.."&bw=800"
+       table.insert(p, { path = path; } )
+       return p
+    end
     while true
     do
         line = vlc.readline()
@@ -42,11 +50,8 @@ function parse()
         then
             title = vlc.strings.decode_uri( find( line, "<title>(.-)<" ) )
         end
-        if string.match( line, "<li class=\"program\"" )
-        then
-            description = vlc.strings.resolve_xml_special_chars( find( line, "title=\"(.-)\"" ) )
-        end
-        for programid in string.gmatch( line, "<li class=\"program\" id=\"program(.-)\"" ) do
+        for programid in string.gmatch( line, "<li class=\"program\" id=\"program(%d+)\"" ) do
+            description = vlc.strings.resolve_xml_special_chars( find( line, "title=\"(.+)\"" ) )
             path = "http://www.katsomo.fi/metafile.asx?p="..programid.."&bw=800"
             table.insert( p, { path = path; name = title; description = description; url = vlc.path;} )
         end
