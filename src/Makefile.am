@@ -72,6 +72,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_http.h \
 	../include/vlc_httpd.h \
 	../include/vlc_image.h \
+	../include/vlc_inhibit.h \
 	../include/vlc_input.h \
 	../include/vlc_input_item.h \
 	../include/vlc_main.h \
@@ -357,6 +358,8 @@ SOURCES_libvlc_common = \
 	video_output/display.c \
 	video_output/display.h \
 	video_output/event.h \
+	video_output/inhibit.c \
+	video_output/inhibit.h \
 	video_output/snapshot.c \
 	video_output/snapshot.h \
 	video_output/statistic.h \
