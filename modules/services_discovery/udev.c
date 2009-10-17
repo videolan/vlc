@@ -280,6 +280,7 @@ static void *Run (void *data)
             if (errno != EINTR)
                 break;
 
+        int canc = vlc_savecancel ();
         struct udev_device *dev = udev_monitor_receive_device (mon);
         if (dev == NULL)
             continue;
@@ -295,6 +296,7 @@ static void *Run (void *data)
             AddDevice (sd, dev);
         }
         udev_device_unref (dev);
+        vlc_restorecancel (canc);
     }
     return NULL;
 }
