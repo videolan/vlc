@@ -118,7 +118,7 @@ int FrontendOpen( access_t *p_access )
         return VLC_ENOMEM;
 
     msg_Dbg( p_access, "Opening device %s", frontend );
-    if( (p_sys->i_frontend_handle = open(frontend, O_RDWR | O_NONBLOCK)) < 0 )
+    if( (p_sys->i_frontend_handle = utf8_open(frontend, O_RDWR | O_NONBLOCK)) < 0 )
     {
         msg_Err( p_access, "FrontEndOpen: opening device failed (%m)" );
         free( p_frontend );
