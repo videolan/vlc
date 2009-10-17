@@ -69,8 +69,9 @@ Removed modules:
  * galaktos
  * showintf
  * transrate
- * x11, xvideo, xvid
- * gtk_main, gtk_main2, gnome_main, gnome_main2 and pda interface
+ * Xlib x11, Xlib xvideo (use XCB instead)
+ * HAL (use libudev instead)
+ * gtk_main, gtk_main2, gnome_main, gnome_main2 and pda interfaces
 
 
 Changes between 1.0.1 and 1.0.2:
