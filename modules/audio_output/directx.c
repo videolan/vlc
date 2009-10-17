@@ -230,7 +230,7 @@ static const char *const speaker_list[] = { "Windows default", "Mono", "Stereo",
 #define FLOAT_LONGTEXT N_( \
     "The option allows you to enable or disable the high-quality float32 " \
     "audio output mode (which is not well supported by some soundcards)." )
-#define SPEAKER_TEXT N_("Select speaker configuration")
+#define SPEAKER_TEXT N_("Speaker configuration")
 #define SPEAKER_LONGTEXT N_("Select speaker configuration you want to use. " \
     "This option doesn't upmix! So NO e.g. Stereo -> 5.1 conversion." )
 
