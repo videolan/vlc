@@ -4578,10 +4578,6 @@ dnl  Bonjour services discovery
 PKG_ENABLE_MODULES_VLC([BONJOUR], [], [avahi-client >= 0.6], [Bonjour services discovery], [auto])
 
 dnl
-dnl  HAL services discovery
-PKG_ENABLE_MODULES_VLC([HAL], [], [hal >= 0.5.0], [Linux HAL services discovery], [auto])
-
-dnl
 dnl  libudev services discovery
 PKG_ENABLE_MODULES_VLC([UDEV], [], [libudev >= 142], [Linux udev services discovery], [auto])
 

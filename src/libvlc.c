@@ -75,10 +75,6 @@
 #   include <dbus/dbus.h>
 #endif
 
-#ifdef HAVE_HAL
-#   include <hal/libhal.h>
-#endif
-
 #include <vlc_playlist.h>
 #include <vlc_interface.h>
 
@@ -226,8 +222,6 @@ static void ShowConsole   ( bool );
 static void PauseConsole  ( void );
 #endif
 static int  ConsoleWidth  ( void );
-
-static void InitDeviceValues( libvlc_int_t * );
 
 static vlc_mutex_t global_lock = VLC_STATIC_MUTEX;
 
@@ -541,11 +535,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank( p_libvlc, true );
         return i_ret;
     }
-
-    /*
-     * Init device values
-     */
-    InitDeviceValues( p_libvlc );
 
     /*
      * Override default configuration with config file settings
@@ -2090,73 +2079,6 @@ static int ConsoleWidth( void )
 #endif
 
     return i_width;
-}
-
-/*****************************************************************************
- * InitDeviceValues: initialize device values
- *****************************************************************************
- * This function inits the dvd, vcd and cd-audio values
- *****************************************************************************/
-static void InitDeviceValues( libvlc_int_t *p_vlc )
-{
-#ifdef HAVE_HAL
-    LibHalContext * ctx = NULL;
-    int i, i_devices;
-    char **devices = NULL;
-    char *block_dev = NULL;
-    dbus_bool_t b_dvd;
-
-    DBusConnection *p_connection = NULL;
-    DBusError       error;
-
-    ctx = libhal_ctx_new();
-    if( !ctx ) return;
-    dbus_error_init( &error );
-    p_connection = dbus_bus_get ( DBUS_BUS_SYSTEM, &error );
-    if( dbus_error_is_set( &error ) || !p_connection )
-    {
-        libhal_ctx_free( ctx );
-        dbus_error_free( &error );
-        return;
-    }
-    libhal_ctx_set_dbus_connection( ctx, p_connection );
-    if( libhal_ctx_init( ctx, &error ) )
-    {
-        if( ( devices = libhal_get_all_devices( ctx, &i_devices, NULL ) ) )
-        {
-            for( i = 0; i < i_devices; i++ )
-            {
-                if( !libhal_device_property_exists( ctx, devices[i],
-                                                "storage.cdrom.dvd", NULL ) )
-                {
-                    continue;
-                }
-                b_dvd = libhal_device_get_property_bool( ctx, devices[ i ],
-                                                 "storage.cdrom.dvd", NULL  );
-                block_dev = libhal_device_get_property_string( ctx,
-                                devices[ i ], "block.device" , NULL );
-                if( b_dvd )
-                {
-                    config_PutPsz( p_vlc, "dvd", block_dev );
-                }
-
-                config_PutPsz( p_vlc, "vcd", block_dev );
-                config_PutPsz( p_vlc, "cd-audio", block_dev );
-                libhal_free_string( block_dev );
-            }
-            libhal_free_string_array( devices );
-        }
-        libhal_ctx_shutdown( ctx, NULL );
-        dbus_connection_unref( p_connection );
-        libhal_ctx_free( ctx );
-    }
-    else
-    {
-        msg_Warn( p_vlc, "Unable to get HAL device properties" );
-    }
-#else
-    (void)p_vlc;
-#endif /* HAVE_HAL */
 }
 
 #include <vlc_avcodec.h>
