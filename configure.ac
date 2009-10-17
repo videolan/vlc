@@ -3032,7 +3032,7 @@ then
       VLC_SAVE_FLAGS
       CPPFLAGS="${CPPFLAGS} ${POSTPROC_CFLAGS}"
       CFLAGS="${CFLAGS} ${POSTPROC_CFLAGS}"
-      AC_CHECK_HEADERS(libpostproc/postproc.h postproc/postprocess.h)
+      AC_CHECK_HEADERS(postproc/postprocess.h)
       VLC_ADD_PLUGIN([postproc])
       VLC_ADD_LIBS([postproc],[$POSTPROC_LIBS $AVUTIL_LIBS])
       VLC_ADD_CFLAGS([postproc],[$POSTPROC_CFLAGS $AVUTIL_CFLAGS])
