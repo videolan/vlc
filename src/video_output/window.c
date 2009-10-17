@@ -30,15 +30,16 @@
 #include <assert.h>
 
 #include <vlc_common.h>
-#include <vlc_plugin.h>
 #include <vlc_vout_window.h>
+#include <libvlc.h>
 
 vout_window_t *vout_window_New(vlc_object_t *obj,
                                const char *module,
                                const vout_window_cfg_t *cfg)
 {
-    vout_window_t *window = vlc_object_create(obj, sizeof(*window));
-
+    static char const name[] = "window";
+    vout_window_t *window = vlc_custom_create(obj, sizeof(*window),
+                                              VLC_OBJECT_GENERIC, name);
     window->cfg = cfg;
     memset(&window->handle, 0, sizeof(window->handle));
     window->control = NULL;
