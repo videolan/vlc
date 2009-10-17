@@ -979,9 +979,6 @@ static void* RunThread( void *p_this )
     bool            b_picture_interlaced_last = false;
     mtime_t         i_picture_interlaced_last_date;
 
-
-    vlc_mutex_lock( &p_vout->change_lock );
-
     /*
      * Initialize thread
      */
@@ -989,6 +986,9 @@ static void* RunThread( void *p_this )
                                     p_vout->p->psz_module_type,
                                     p_vout->p->psz_module_name,
                                     !strcmp(p_vout->p->psz_module_type, "video filter") );
+
+    vlc_mutex_lock( &p_vout->change_lock );
+
     if( p_vout->p_module )
         p_vout->b_error = InitThread( p_vout );
     else
