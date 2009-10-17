@@ -71,6 +71,7 @@ struct subsys
     char * (*get_mrl) (struct udev_device *dev);
     char * (*get_name) (struct udev_device *dev);
     char * (*get_cat) (struct udev_device *dev);
+    int item_type;
 };
 
 struct services_discovery_sys_t
@@ -117,7 +118,8 @@ static int AddDevice (services_discovery_t *sd, struct udev_device *dev)
     char *name = p_sys->subsys->get_name (dev);
     input_item_t *item = input_item_NewWithType (VLC_OBJECT (sd), mrl,
                                                  name ? name : mrl,
-                                                 0, NULL, 0, -1, ITEM_TYPE_CARD);
+                                                 0, NULL, 0, -1,
+                                                 p_sys->subsys->item_type);
     msg_Dbg (sd, "adding %s (%s)", mrl, name);
     free (name);
     free (mrl);
@@ -390,7 +392,7 @@ static char *v4l_get_cat (struct udev_device *dev)
 int OpenV4L (vlc_object_t *obj)
 {
     static const struct subsys subsys = {
-        "video4linux", v4l_get_mrl, v4l_get_name, v4l_get_cat,
+        "video4linux", v4l_get_mrl, v4l_get_name, v4l_get_cat, ITEM_TYPE_CARD,
     };
 
     return Open (obj, &subsys);
@@ -465,7 +467,7 @@ static char *disc_get_cat (struct udev_device *dev)
 int OpenDisc (vlc_object_t *obj)
 {
     static const struct subsys subsys = {
-        "block", disc_get_mrl, disc_get_name, disc_get_cat,
+        "block", disc_get_mrl, disc_get_name, disc_get_cat, ITEM_TYPE_DISC,
     };
 
     return Open (obj, &subsys);
