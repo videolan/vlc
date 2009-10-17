@@ -38,6 +38,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
+#include <vlc_charset.h>
 
 #ifdef SYS_BSD
 #include <sys/types.h>                                     /* typedef ushort */
@@ -139,7 +140,7 @@ static int Create( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
         return( 1 );
 
-    p_vout->p_sys->i_fd = open( "/dev/mga_vid", O_RDWR );
+    p_vout->p_sys->i_fd = utf8_open( "/dev/mga_vid", O_RDWR );
     if( p_vout->p_sys->i_fd == -1 )
     {
         msg_Err( p_vout, "cannot open MGA driver /dev/mga_vid" );
