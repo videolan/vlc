@@ -41,14 +41,7 @@
 #include "fetcher.h"
 #include "preparser.h"
 
-typedef struct playlist_services_discovery_support_t {
-    /* the playlist items for category and onelevel */
-    playlist_item_t      *p_cat;
-    playlist_item_t      *p_one;
-    services_discovery_t *p_sd; /**< Loaded service discovery modules */
-    char                 *psz_name;
-} vlc_sd_internal_t;
-
+typedef struct vlc_sd_internal_t vlc_sd_internal_t;
 
 typedef struct playlist_private_t
 {

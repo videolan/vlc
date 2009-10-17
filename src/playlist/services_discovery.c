@@ -32,6 +32,14 @@
 #include "playlist_internal.h"
 #include "../libvlc.h"
 
+struct vlc_sd_internal_t
+{
+    /* the playlist items for category and onelevel */
+    playlist_item_t      *p_cat;
+    playlist_item_t      *p_one;
+    services_discovery_t *p_sd; /**< Loaded service discovery modules */
+    char                 *psz_name;
+};
 
 static void services_discovery_Destructor ( vlc_object_t *p_obj );
 
@@ -256,8 +264,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
     }
 
     /* Free in playlist_ServicesDiscoveryRemove */
-    struct playlist_services_discovery_support_t * p_sds;
-    p_sds = malloc( sizeof(struct playlist_services_discovery_support_t) );
+    vlc_sd_internal_t * p_sds = malloc( sizeof(*p_sds) );
     if( !p_sds )
     {
         vlc_sd_Destroy( p_sd );
@@ -315,7 +322,7 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
                                       const char *psz_name )
 {
     playlist_private_t *priv = pl_priv( p_playlist );
-    struct playlist_services_discovery_support_t * p_sds = NULL;
+    vlc_sd_internal_t * p_sds = NULL;
 
     PL_LOCK;
     for( int i = 0; i < priv->i_sds; i++ )
