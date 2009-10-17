@@ -493,7 +493,10 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
     else if( state_value.i_int == PAUSE_S )
         p_sys->time_pause = mdate();
     else if( p_sys->time_pause > 0 && state_value.i_int == PLAYING_S )
+    {
         p_sys->time_total_pauses += ( mdate() - p_sys->time_pause );
+        p_sys->time_pause = 0;
+    }
 
     return VLC_SUCCESS;
 }
