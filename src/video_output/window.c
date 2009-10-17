@@ -31,12 +31,14 @@
 
 #include <vlc_common.h>
 #include <vlc_vout_window.h>
+#include "inhibit.h"
 #include <libvlc.h>
 
 typedef struct
 {
     vout_window_t wnd;
     module_t *module;
+    vlc_inhibit_t *inhibit;
 } window_t;
 
 vout_window_t *vout_window_New(vlc_object_t *obj,
@@ -72,6 +74,15 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
         vlc_object_release(window);
         return NULL;
     }
+
+    /* Hook for screensaver inhibition */
+    if (cfg->type == VOUT_WINDOW_TYPE_XID) {
+        w->inhibit = vlc_inhibit_Create (VLC_OBJECT (window),
+                                         window->handle.xid);
+        if (w->inhibit != NULL)
+            vlc_inhibit_Set (w->inhibit, true);
+            /* FIXME: ^ wait for vout activation, pause */
+    }
     return window;
 }
 
@@ -81,6 +92,8 @@ void vout_window_Delete(vout_window_t *window)
         return;
 
     window_t *w = (window_t *)window;
+    if (w->inhibit)
+        vlc_inhibit_Destroy (w->inhibit);
     vlc_object_detach(window);
 
     module_unneed(window, w->module);
