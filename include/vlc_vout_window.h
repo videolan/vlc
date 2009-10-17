@@ -78,9 +78,6 @@ typedef struct {
 struct vout_window_t {
     VLC_COMMON_MEMBERS
 
-    /* Module */
-    module_t *module;
-
     /* Initial state (reserved).
      * Once the open function is called, it will be set to NULL
      */

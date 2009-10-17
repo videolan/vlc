@@ -33,13 +33,20 @@
 #include <vlc_vout_window.h>
 #include <libvlc.h>
 
+typedef struct
+{
+    vout_window_t wnd;
+    module_t *module;
+} window_t;
+
 vout_window_t *vout_window_New(vlc_object_t *obj,
                                const char *module,
                                const vout_window_cfg_t *cfg)
 {
     static char const name[] = "window";
-    vout_window_t *window = vlc_custom_create(obj, sizeof(*window),
-                                              VLC_OBJECT_GENERIC, name);
+    window_t *w = vlc_custom_create(obj, sizeof(*w), VLC_OBJECT_GENERIC, name);
+    vout_window_t *window = &w->wnd;
+
     window->cfg = cfg;
     memset(&window->handle, 0, sizeof(window->handle));
     window->control = NULL;
@@ -59,9 +66,8 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
         assert(0);
     }
 
-    window->module = module_need(window, type,
-                                 module, module && *module != '\0');
-    if (!window->module) {
+    w->module = module_need(window, type, module, module && *module != '\0');
+    if (!w->module) {
         vlc_object_detach(window);
         vlc_object_release(window);
         return NULL;
@@ -74,9 +80,10 @@ void vout_window_Delete(vout_window_t *window)
     if (!window)
         return;
 
+    window_t *w = (window_t *)window;
     vlc_object_detach(window);
 
-    module_unneed(window, window->module);
+    module_unneed(window, w->module);
 
     vlc_object_release(window);
 }
