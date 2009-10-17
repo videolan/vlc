@@ -46,6 +46,7 @@
 #include <vlc_vout.h>
 #include <vlc_vout_window.h>
 #include <vlc_playlist.h>
+#include <vlc_charset.h>
 
 /*****************************************************************************
 * Local prototypes
@@ -453,7 +454,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
         return VLC_EGENERIC;
     }
 
-    p_sys->i_fd = open( psz_device, O_RDWR );
+    p_sys->i_fd = utf8_open( psz_device, O_RDWR );
     if( p_sys->i_fd == -1 )
     {
         msg_Err( p_vout, "cannot open %s (%m)", psz_device );
@@ -504,7 +505,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     p_sys->p_display = XOpenDisplay( NULL );
 
     /* Open /dev/null and map it */
-    p_sys->i_null_fd = open( "/dev/zero", O_RDWR );
+    p_sys->i_null_fd = utf8_open( "/dev/zero", O_RDWR );
     if( p_sys->i_null_fd == -1 )
     {
         msg_Err( p_vout, "cannot open /dev/zero (%m)" );
