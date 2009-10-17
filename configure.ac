@@ -4583,7 +4583,7 @@ PKG_ENABLE_MODULES_VLC([HAL], [], [hal >= 0.5.0], [Linux HAL services discovery]
 
 dnl
 dnl  libudev services discovery
-PKG_ENABLE_MODULES_VLC([UDEV], [], [libudev], [Linux udev services discovery], [auto])
+PKG_ENABLE_MODULES_VLC([UDEV], [], [libudev >= 142], [Linux udev services discovery], [auto])
 
 dnl
 dnl MTP devices services discovery
