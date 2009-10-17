@@ -34,6 +34,7 @@
 #include <vlc_common.h>
 #include <vlc_input.h>
 #include <vlc_charset.h>
+#include <vlc_url.h>
 
 #ifdef HAVE_DIRENT_H
 #   include <dirent.h>
@@ -260,11 +261,11 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
 
     vlc_subfn_t *result = NULL; /* unsorted results */
     char **result2; /* sorted results */
-    const char *psz_fname = psz_name_org;
 
     if( !psz_fname )
         return NULL;
 
+    const char *psz_fname = decode_URI( psz_name_org );
     if( !strncmp( psz_fname, "file://", 7 ) )
     {
         psz_fname += 7;
