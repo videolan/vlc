@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
+#include <vlc_charset.h>
 #include <limits.h>
 
 #ifdef HAVE_UNISTD_H
@@ -141,7 +142,7 @@ vcddev_t *ioctl_Open( vlc_object_t *p_this, const char *psz_dev )
         i_ret = win32_vcd_open( p_this, psz_dev, p_vcddev );
 #else
         p_vcddev->i_device_handle = -1;
-        p_vcddev->i_device_handle = open( psz_dev, O_RDONLY | O_NONBLOCK );
+        p_vcddev->i_device_handle = utf8_open( psz_dev, O_RDONLY | O_NONBLOCK );
         i_ret = (p_vcddev->i_device_handle == -1) ? -1 : 0;
 #endif
     }
