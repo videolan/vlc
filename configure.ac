@@ -969,8 +969,8 @@ then
   dnl api stable dbus
   PKG_CHECK_MODULES(DBUS, dbus-1 >= 1.0.0,
     [ AC_DEFINE( HAVE_DBUS, 1, [Define if you have the D-BUS library] )
-      VLC_ADD_LIBS([screensaver libvlccore],[$DBUS_LIBS])
-      VLC_ADD_CFLAGS([screensaver libvlccore],[$DBUS_CFLAGS])
+      VLC_ADD_LIBS([libvlccore],[$DBUS_LIBS])
+      VLC_ADD_CFLAGS([libvlccore],[$DBUS_CFLAGS])
       dnl Check for dbus control interface
         AC_ARG_ENABLE(dbus-control, [  --disable-dbus-control  D-BUS control interface (default enabled)])
         if test "${enable_dbus_control}" != "no"

@@ -41,20 +41,6 @@
 #include <unistd.h>
 #include <signal.h>
 
-#ifdef HAVE_DBUS
-
-#include <dbus/dbus.h>
-
-#define GS_SERVICE   "org.gnome.ScreenSaver"
-#define GS_PATH      "/org/gnome/ScreenSaver"
-#define GS_INTERFACE "org.gnome.ScreenSaver"
-
-#define FDS_SERVICE   "org.freedesktop.ScreenSaver"
-#define FDS_PATH      "/ScreenSaver"
-#define FDS_INTERFACE "org.freedesktop.ScreenSaver"
-
-#endif
-
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
@@ -63,25 +49,8 @@ static void  Deactivate   ( vlc_object_t * );
 
 static void Timer( void * );
 
-#ifdef HAVE_DBUS
-
-static DBusConnection * dbus_init( intf_thread_t *p_intf );
-static void poke_screensaver( intf_thread_t *p_intf,
-                              DBusConnection *p_connection );
-static void screensaver_send_message_void ( intf_thread_t *p_intf,
-                                       DBusConnection *p_connection,
-                                       const char *psz_service,
-                                       const char *psz_path,
-                                       const char *psz_interface,
-                                       const char *psz_name );
-static bool screensaver_is_running( DBusConnection *p_connection, const char *psz_service );
-#endif
-
 struct intf_sys_t
 {
-#ifdef HAVE_DBUS
-    DBusConnection *p_connection;
-#endif
     vlc_timer_t timer;
 };
 
@@ -114,9 +83,6 @@ static int Activate( vlc_object_t *p_this )
     }
     vlc_timer_schedule( p_sys->timer, false, 30*CLOCK_FREQ, 30*CLOCK_FREQ );
 
-#ifdef HAVE_DBUS
-    p_sys->p_connection = dbus_init( p_intf );
-#endif
     return VLC_SUCCESS;
 }
 
@@ -129,10 +95,6 @@ static void Deactivate( vlc_object_t *p_this )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     vlc_timer_destroy( p_sys->timer );
-#ifdef HAVE_DBUS
-    if( p_sys->p_connection )
-        dbus_connection_unref( p_sys->p_connection );
-#endif
 
     free( p_sys );
 }
@@ -201,111 +163,7 @@ static void Timer( void *data )
         "xscreensaver-command -deactivate &", (char*)NULL };
     Execute( p_intf, ppsz_xsargs );
 
-    /* If we have dbus support, let's communicate directly with
-     * gnome-screensave else, run gnome-screensaver-command */
-#ifdef HAVE_DBUS
-    poke_screensaver( p_intf, p_intf->p_sys->p_connection );
-#else
     const char *const ppsz_gsargs[] = { "/bin/sh", "-c",
         "gnome-screensaver-command --poke &", (char*)NULL };
     Execute( p_intf, ppsz_gsargs );
-#endif
-    /* FIXME: add support for other screensavers */
 }
-
-#ifdef HAVE_DBUS
-
-static DBusConnection * dbus_init( intf_thread_t *p_intf )
-{
-    DBusError dbus_error;
-
-    dbus_error_init (&dbus_error);
-    DBusConnection * p_connection = dbus_bus_get( DBUS_BUS_SESSION, &dbus_error );
-
-    if ( !p_connection )
-    {
-        msg_Warn( p_intf, "failed to connect to the D-BUS daemon: %s",
-                          dbus_error.message);
-        dbus_error_free( &dbus_error );
-        return NULL;
-    }
-
-    return p_connection;
-}
-
-static void poke_screensaver( intf_thread_t *p_intf,
-                              DBusConnection *p_connection )
-{
-    if( screensaver_is_running( p_connection, GS_SERVICE ) )
-    {
-#   ifdef SCREENSAVER_DEBUG
-        msg_Dbg( p_intf, "found a running gnome-screensaver instance" );
-#   endif
-        /* gnome-screensaver changed it's D-Bus interface, so we need both */
-        screensaver_send_message_void( p_intf, p_connection, GS_SERVICE, GS_PATH,
-                                       GS_INTERFACE, "Poke" );
-        screensaver_send_message_void( p_intf, p_connection, GS_SERVICE, GS_PATH,
-                                       GS_INTERFACE, "SimulateUserActivity" );
-    }
-    else if( screensaver_is_running( p_connection, FDS_SERVICE ) )
-    {
-#   ifdef SCREENSAVER_DEBUG
-        msg_Dbg( p_intf, "found a running freedesktop-screensaver instance" );
-#   endif
-        screensaver_send_message_void( p_intf, p_connection, FDS_SERVICE, FDS_PATH,
-                                       FDS_INTERFACE, "SimulateUserActivity" );
-    }
-#   ifdef SCREENSAVER_DEBUG
-    else
-    {
-        msg_Dbg( p_intf, "found no running (gnome|freedesktop)-screensaver instance" );
-    }
-#   endif
-
-}
-
-static void screensaver_send_message_void ( intf_thread_t *p_intf,
-                                       DBusConnection *p_connection,
-                                       const char *psz_service,
-                                       const char *psz_path,
-                                       const char *psz_interface,
-                                       const char *psz_name )
-{
-    DBusMessage *p_message;
-
-    if( !p_connection || !psz_name ) return;
-
-    p_message = dbus_message_new_method_call( psz_service, psz_path,
-                                              psz_interface, psz_name );
-    if( p_message == NULL )
-    {
-        msg_Err( p_intf, "DBUS initialization failed: message initialization" );
-        return;
-    }
-
-    if( !dbus_connection_send( p_connection, p_message, NULL ) )
-    {
-        msg_Err( p_intf, "DBUS communication failed" );
-    }
-
-    dbus_connection_flush( p_connection );
-
-    dbus_message_unref( p_message );
-}
-
-static bool screensaver_is_running( DBusConnection *p_connection, const char *psz_service )
-{
-    DBusError error;
-    bool b_return;
-
-    if( !p_connection ) return false;
-
-    dbus_error_init( &error );
-    b_return = dbus_bus_name_has_owner( p_connection, psz_service, &error );
-    if( dbus_error_is_set( &error ) ) dbus_error_free (&error);
-
-    return b_return;
-}
-
-#endif
-
