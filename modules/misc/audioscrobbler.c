@@ -26,6 +26,7 @@
  * http://www.audioscrobbler.net/development/protocol/
  *
  * TODO:    "Now Playing" feature (not mandatory)
+ *          Update to new API? http://www.lastfm.fr/api
  */
 /*****************************************************************************
  * Preamble
@@ -540,9 +541,9 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     var_Change( p_input, "video-es", VLC_VAR_CHOICESCOUNT, &video_val, NULL );
-    if( ( video_val.i_int > 0 ) || p_item->i_type == ITEM_TYPE_NET )
+    if( video_val.i_int > 0 )
     {
-        msg_Dbg( p_this, "Not an audio local file, not submitting");
+        msg_Dbg( p_this, "Not an audio-only input, not submitting");
         vlc_object_release( p_input );
         return VLC_SUCCESS;
     }
