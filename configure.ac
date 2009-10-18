@@ -733,7 +733,7 @@ AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LIBS([headphone_channel_mixer normvol speex mono colorthres extract],[-lm])
 ])
 AC_CHECK_LIB(m,ceil,[
-  VLC_ADD_LIBS([hotkeys mosaic swscale_maemo],[-lm])
+  VLC_ADD_LIBS([hotkeys mosaic swscale_omap],[-lm])
 ])
 AC_CHECK_LIB(m,exp,[
   VLC_ADD_LIBS([gaussianblur],[-lm])
@@ -3959,6 +3959,7 @@ AC_ARG_ENABLE(omapfb,
         AC_CHECK_HEADERS(X11/Xlib.h, [
           VLC_ADD_LIBS([omapfb],[${X_LIBS} ${X_PRE_LIBS} -lX11]) ])
       ])
+      VLC_ADD_PLUGIN([swscale_omap])
     fi
 
 dnl
@@ -4323,7 +4324,6 @@ then
     VLC_ADD_CFLAGS([maemo],[${HILDON_CFLAGS}])
     VLC_ADD_LIBS([maemo],[${HILDON_LIBS}])
     VLC_ADD_PLUGIN([maemo])
-    VLC_ADD_PLUGIN([swscale_maemo])
     ALIASES="${ALIASES} mvlc"
   ], [
     AS_IF([test "${enable_maemo}" = "yes"],[

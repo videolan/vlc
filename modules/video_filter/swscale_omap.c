@@ -1,5 +1,5 @@
 /*****************************************************************************
- * swscale_maemo.c: scaling and chroma conversion using libswscale_nokia770
+ * swscale_omap.c: scaling and chroma conversion using libswscale_nokia770
  *****************************************************************************
  * Copyright (C) 1999-2008 the VideoLAN team
  * $Id$

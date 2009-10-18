@@ -43,7 +43,7 @@ SOURCES_blendbench = blendbench.c
 SOURCES_chain = chain.c
 SOURCES_postproc = postproc.c
 SOURCES_swscale = swscale.c ../codec/avcodec/chroma.c
-SOURCES_swscale_maemo = swscale_maemo.c \
+SOURCES_swscale_omap = swscale_omap.c \
 	libswscale_nokia770/arm_jit_swscale.c \
 	libswscale_nokia770/arm_colorconv.S \
 	libswscale_nokia770/arm_jit_swscale.h \
