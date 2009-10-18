@@ -634,7 +634,7 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
         else
         {
             libvlc_exception_raise( p_e );
-            libvlc_printerr( "Bad or unsuported deinterlacing mode" );
+            libvlc_printerr( "Bad or unsupported deinterlacing mode" );
         }
     }
     else
