@@ -271,7 +271,7 @@ static int Init( vout_thread_t *p_vout )
     }
 
     p_vout->output.i_chroma =
-    p_vout->fmt_out.i_chroma = VLC_CODEC_I420;
+    p_vout->fmt_out.i_chroma = VLC_FOURCC( 'Y','4','2','0' );
     p_sys->i_color_format = OMAPFB_COLOR_YUV420;
 
     // place in the framebuffer where we have to write
