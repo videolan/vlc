@@ -676,11 +676,11 @@ int OpenEncoder( vlc_object_t *p_this )
         if( p_enc->fmt_out.p_extra )
         {
             uint8_t *p = p_enc->fmt_out.p_extra;
-            p[0] = 0x66;
-            p[1] = 0x4C;
-            p[2] = 0x61;
-            p[3] = 0x43;
-            p[4] = 0x00;
+            p[0] = 0x66;    /* f */
+            p[1] = 0x4C;    /* L */
+            p[2] = 0x61;    /* a */
+            p[3] = 0x43;    /* C */
+            p[4] = 0x80;    /* streaminfo block, last block before audio */
             p[5] = ( p_context->extradata_size >> 16 ) & 0xff;
             p[6] = ( p_context->extradata_size >>  8 ) & 0xff;
             p[7] = ( p_context->extradata_size       ) & 0xff;
