@@ -4697,6 +4697,11 @@ AS_IF([test "${have_libgcrypt}" = "yes"], [
 
 
 dnl
+dnl OSSO (Maemo screen blanking) plugin
+dnl
+PKG_ENABLE_MODULES_VLC([OSSO], [], [libosso], [Maemo support], [auto])
+
+dnl
 dnl update checking system
 dnl
 AC_ARG_ENABLE(update-check,

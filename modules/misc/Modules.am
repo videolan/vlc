@@ -20,6 +20,7 @@ SOURCES_svg = svg.c
 SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_inhibit = inhibit.c
 SOURCES_xdg_screensaver = xdg-screensaver.c
+SOURCES_osso = osso.c
 
 libvlc_LTLIBRARIES += \
 	liblogger_plugin.la
