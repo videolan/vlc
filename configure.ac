@@ -4979,13 +4979,7 @@ fi
 AC_LANG_POP(C++)
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
-dnl Tests for Osso and Xsp
-AC_CHECK_LIB(osso, osso_display_blanking_pause, [
-  PKG_CHECK_MODULES(GLIB2, glib-2.0, [
-    VLC_ADD_CPPFLAGS([xvmc glx],[-DHAVE_OSSO ${DBUS_CFLAGS} ${GLIB2_CFLAGS}])
-    VLC_ADD_LIBS([xvmc glx],[-losso])
- ])
-])
+dnl Tests for Xsp
 AC_CHECK_LIB(Xsp, XSPSetPixelDoubling,[
   VLC_ADD_CPPFLAGS([xvmc glx],[-DHAVE_XSP])
   VLC_ADD_LIBS([xvmc glx],[-lXsp])

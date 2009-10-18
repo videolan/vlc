@@ -51,10 +51,6 @@
         VLC_FOURCC( i & 0xff, (i >> 8) & 0xff, (i >> 16) & 0xff, \
                     (i >> 24) & 0xff )
 
-#ifdef HAVE_OSSO
-#include <libosso.h>
-#endif
-
 struct vout_window_t;
 
 /*****************************************************************************
@@ -307,11 +303,6 @@ struct vout_sys_t
 
 #ifdef HAVE_XSP
     int                 i_hw_scale;
-#endif
-
-#ifdef HAVE_OSSO
-    osso_context_t      *p_octx;
-    int                 i_backlight_on_counter;
 #endif
 };
 

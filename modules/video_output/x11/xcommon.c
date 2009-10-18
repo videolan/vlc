@@ -127,10 +127,6 @@ static void EnablePixelDoubling( vout_thread_t *p_vout );
 static void DisablePixelDoubling( vout_thread_t *p_vout );
 #endif
 
-#ifdef HAVE_OSSO
-static const int i_backlight_on_interval = 300;
-#endif
-
 
 
 /*****************************************************************************
@@ -399,16 +395,6 @@ int Activate ( vlc_object_t *p_this )
     p_vout->p_sys->i_hw_scale = 1;
 #endif
 
-#ifdef HAVE_OSSO
-    p_vout->p_sys->i_backlight_on_counter = i_backlight_on_interval;
-    p_vout->p_sys->p_octx = osso_initialize( "vlc", VERSION, 0, NULL );
-    if ( p_vout->p_sys->p_octx == NULL ) {
-        msg_Err( p_vout, "Could not get osso context" );
-    } else {
-        msg_Dbg( p_vout, "Initialized osso context" );
-    }
-#endif
-
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
     var_TriggerCallback( p_vout, "video-on-top" );
@@ -463,13 +449,6 @@ void Deactivate ( vlc_object_t *p_this )
     /* Destroy structure */
 #ifdef MODULE_NAME_IS_xvmc
     free_context_lock( &p_vout->p_sys->xvmc_lock );
-#endif
-
-#ifdef HAVE_OSSO
-    if ( p_vout->p_sys->p_octx != NULL ) {
-        msg_Dbg( p_vout, "Deinitializing osso context" );
-        osso_deinitialize( p_vout->p_sys->p_octx );
-    }
 #endif
 
     free( p_vout->p_sys );
@@ -1329,20 +1308,6 @@ static int ManageVideo( vout_thread_t *p_vout )
     xvmc_context_reader_unlock( &p_vout->p_sys->xvmc_lock );
 #endif
 
-#ifdef HAVE_OSSO
-    if ( p_vout->p_sys->p_octx != NULL ) {
-        if ( p_vout->p_sys->i_backlight_on_counter == i_backlight_on_interval ) {
-            if ( osso_display_blanking_pause( p_vout->p_sys->p_octx ) != OSSO_OK ) {
-                msg_Err( p_vout, "Could not disable backlight blanking" );
-        } else {
-                msg_Dbg( p_vout, "Backlight blanking disabled" );
-            }
-            p_vout->p_sys->i_backlight_on_counter = 0;
-        } else {
-            p_vout->p_sys->i_backlight_on_counter ++;
-        }
-    }
-#endif
     return 0;
 }
 
@@ -2237,13 +2202,8 @@ static int X11ErrorHandler( Display * display, XErrorEvent * event )
     }
 #endif
 
-#ifndef HAVE_OSSO
     XSetErrorHandler(NULL);
     return (XSetErrorHandler(X11ErrorHandler))( display, event );
-#else
-    /* Work-around Maemo Xvideo bug */
-    return 0;
-#endif
 }
 
 /*****************************************************************************
