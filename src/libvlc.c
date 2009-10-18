@@ -918,17 +918,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         intf_Create( p_libvlc, "inhibit,none" );
 #endif
 
-    /*
-     * If needed, load the Xscreensaver interface
-     * Currently, only for X
-     */
-#ifdef HAVE_X11_XLIB_H
-    if( config_GetInt( p_libvlc, "disable-screensaver" ) )
-    {
-        intf_Create( p_libvlc, "screensaver,none" );
-    }
-#endif
-
     if( (config_GetInt( p_libvlc, "file-logging" ) > 0) &&
         !config_GetInt( p_libvlc, "syslog" ) )
     {
