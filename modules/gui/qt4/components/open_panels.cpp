@@ -606,7 +606,8 @@ void NetOpenPanel::updateMRL() {
                 mrl += addr;
             else
             {
-                mrl += qfu( "@" );
+                if( !addr.contains( "@" ) )
+                    mrl += qfu( "@" );
                 switch( addr.count( ":" ) )
                 {
                     case 0: /* DNS or IPv4 literal, no port number */
