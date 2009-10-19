@@ -4713,6 +4713,11 @@ dnl OSSO (Maemo screen blanking) plugin
 dnl
 PKG_ENABLE_MODULES_VLC([OSSO], [], [libosso], [Maemo support], [auto])
 
+AS_IF([test -f "/etc/maemo_version"], [
+  AC_DEFINE([HAVE_MAEMO], 1, [Define to 1 if building for the Maemo platform.])
+])
+
+
 dnl
 dnl update checking system
 dnl
