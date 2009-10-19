@@ -25,6 +25,8 @@
 #define QVLC_PLUGIN_DIALOG_H_ 1
 
 #include "util/qvlcframe.hpp"
+#include <QTreeWidget>
+#include <QStringList>
 
 class QTreeWidget;
 class QLineEdit;
@@ -55,6 +57,14 @@ private:
     SearchLineEdit *edit;
 private slots:
     void search( const QString& );
+};
+
+class PluginTreeItem : public QTreeWidgetItem
+{
+public:
+    PluginTreeItem(QStringList &qs_item, int Type = QTreeWidgetItem::Type) : QTreeWidgetItem (qs_item, Type)
+    { }
+    virtual bool operator< ( const QTreeWidgetItem & other ) const;
 };
 
 #endif
