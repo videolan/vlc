@@ -41,6 +41,7 @@ SOURCES_access_jack = jack.c
 SOURCES_access_alsa = alsa.c
 SOURCES_access_oss = oss.c
 SOURCES_access_mtp = mtp.c
+SOURCES_access_sftp = sftp.c
 
 libaccess_rtmp_plugin_la_SOURCES = \
         rtmp/access.c \
