@@ -3,6 +3,7 @@ Changes between 1.0.2 and 1.1.0-git:
 
 Access:
  * Port of the screen module from Xlib to XCB
+ * Support for the sftp protocol
 
 Decoders:
  * Support for Atrac1
@@ -21,6 +22,7 @@ Playlist:
  * ZPL playlist support
  * Lua scripts for Mpora, Vimeo playback and Rockbox FM radios
  * New Play-And-Pause function to stop playback on latest video image
+ * Podcast images are now displayed
 
 Audio filters:
  * Chorus/Flanger audio filter
