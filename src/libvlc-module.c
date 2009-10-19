@@ -36,6 +36,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_cpu.h>
 #include "libvlc.h"
 
 //#define Nothing here, this is just to prevent update-po from being stupid
@@ -1568,7 +1569,7 @@ vlc_module_begin ()
     add_bool( "audio-replay-gain-peak-protection", true, NULL,
               AUDIO_REPLAY_GAIN_PEAK_PROTECTION_TEXT, AUDIO_REPLAY_GAIN_PEAK_PROTECTION_LONGTEXT, true )
 
-    add_bool( "audio-time-stretch", true, NULL,
+    add_bool( "audio-time-stretch", HAVE_FPU, NULL,
               AUDIO_TIME_STRETCH_TEXT, AUDIO_TIME_STRETCH_LONGTEXT, false )
 
     set_subcategory( SUBCAT_AUDIO_AOUT )
