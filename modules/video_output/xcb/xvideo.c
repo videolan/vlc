@@ -388,7 +388,6 @@ static int Open (vlc_object_t *obj)
 
     found_format:
         /* Grab a port */
-        /* XXX: assume all of an adapter's ports have the same formats */
         for (unsigned i = 0; i < a->num_ports; i++)
         {
              xcb_xv_port_t port = a->base_id + i;
