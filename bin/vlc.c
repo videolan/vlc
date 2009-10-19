@@ -154,7 +154,9 @@ int main( int i_argc, const char *ppsz_argv[] )
             libvlc_exception_clear (&ex);
             pthread_sigmask (SIG_UNBLOCK, &set, NULL);
         }
+#if !defined (HAVE_MAEMO)
         libvlc_add_intf (vlc, "globalhotkeys,none", &ex);
+#endif
         libvlc_exception_clear (&ex);
         libvlc_add_intf (vlc, NULL, &ex);
         libvlc_playlist_play (vlc, -1, 0, NULL, &dummy);
