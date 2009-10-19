@@ -333,7 +333,6 @@ static int Open (vlc_object_t *obj)
     video_format_t fmt = vd->fmt;
     bool found_adaptor = false;
 
-    /* FIXME: check max image size */
     xcb_xv_adaptor_info_iterator_t it;
     for (it = xcb_xv_query_adaptors_info_iterator (adaptors);
          it.rem > 0;
