@@ -44,7 +44,7 @@ static int  OpenFilter ( vlc_object_t * );
 static void CloseFilter( vlc_object_t * );
 static block_t *Resample( filter_t *, block_t * );
 
-#if 1
+#if HAVE_FPU
 typedef float sample_t;
 # define VLC_CODEC_NATIVE VLC_CODEC_FL32
 #else
@@ -137,7 +137,7 @@ static block_t *Resample( filter_t *p_filter, block_t *p_in_buf )
             for( unsigned i = 0; i < i_nb_channels ; i++ )
             {
                 p_out[i] = p_prev_sample[i];
-#if CPU_CAPABILITY_FPU
+#if HAVE_FPU
                 p_out[i] += (p_in[i] - p_prev_sample[i])
 #else
                 p_out[i] += (int64_t)(p_in[i] - p_prev_sample[i])
@@ -160,7 +160,7 @@ static block_t *Resample( filter_t *p_filter, block_t *p_in_buf )
             for( unsigned i = 0; i < i_nb_channels ; i++ )
             {
                 p_out[i] = p_in[i];
-#if CPU_CAPABILITY_FPU
+#if HAVE_FPU
                 p_out[i] += (p_in[i + i_nb_channels] - p_in[i])
 #else
                 p_out[i] += (int64_t)(p_in[i + i_nb_channels] - p_in[i])
