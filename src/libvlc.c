@@ -914,10 +914,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
              && config_GetInt( p_libvlc, "started-from-file" ) ) )
         intf_Create( p_libvlc, "dbus,none" );
 
+# if !defined (HAVE_MAEMO)
     /* Prevents the power management daemon from suspending the system
      * when VLC is active */
     if( config_GetInt( p_libvlc, "inhibit" ) > 0 )
         intf_Create( p_libvlc, "inhibit,none" );
+# endif
 #endif
 
     if( (config_GetInt( p_libvlc, "file-logging" ) > 0) &&
