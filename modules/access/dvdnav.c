@@ -199,8 +199,11 @@ static int Open( vlc_object_t *p_this )
         psz_name = ToLocaleDup( p_demux->psz_path );
 
 #ifdef WIN32
-    if( psz_name[0] && psz_name[1] == ':' &&
-        psz_name[2] == '\\' && psz_name[3] == '\0' ) psz_name[2] = '\0';
+    /* Remove trailing backslash, otherwise dvdnav_open will fail */
+    if( *psz_name && *(psz_name + strlen(psz_name) - 1) == '\\' )
+    {
+        *(psz_name + strlen(psz_name) - 1) = '\0';
+    }
 #endif
 
     /* Try some simple probing to avoid going through dvdnav_open too often */
