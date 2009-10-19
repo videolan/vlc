@@ -383,10 +383,11 @@ static void Display( vout_thread_t *p_vout, picture_t *p_pic )
     LPDIRECT3DDEVICE9       p_d3ddev = p_vout->p_sys->p_d3ddev;
 
     // Present the back buffer contents to the display
-    // stretching and filtering happens here
-    HRESULT hr = IDirect3DDevice9_Present(p_d3ddev,
-                    &(p_vout->p_sys->rect_src_clipped),
-                    NULL, NULL, NULL);
+    // No stretching should happen here !
+    RECT src = p_vout->p_sys->rect_dest_clipped;
+    RECT dst = p_vout->p_sys->rect_dest_clipped;
+    HRESULT hr = IDirect3DDevice9_Present(p_d3ddev, &src, &dst,
+                                          NULL, NULL);
     if( FAILED(hr) )
         msg_Dbg( p_vout, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
 }
@@ -489,7 +490,7 @@ static void Direct3DVoutRelease( vout_thread_t *p_vout )
     }
 }
 
-static int Direct3DFillPresentationParameters(vout_thread_t *p_vout, D3DPRESENT_PARAMETERS *d3dpp)
+static int Direct3DFillPresentationParameters(vout_thread_t *p_vout)
 {
     LPDIRECT3D9 p_d3dobj = p_vout->p_sys->p_d3dobj;
     D3DDISPLAYMODE d3ddm;
@@ -506,22 +507,26 @@ static int Direct3DFillPresentationParameters(vout_thread_t *p_vout, D3DPRESENT_
        return VLC_EGENERIC;
     }
 
-    /* keep a copy of current desktop format */
-    p_vout->p_sys->bbFormat = d3ddm.Format;
-
     /* Set up the structure used to create the D3DDevice. */
+    D3DPRESENT_PARAMETERS *d3dpp = &p_vout->p_sys->d3dpp;
     ZeroMemory( d3dpp, sizeof(D3DPRESENT_PARAMETERS) );
     d3dpp->Flags                  = D3DPRESENTFLAG_VIDEO;
     d3dpp->Windowed               = TRUE;
     d3dpp->hDeviceWindow          = p_vout->p_sys->hvideownd;
-    d3dpp->BackBufferWidth        = p_vout->output.i_width;
-    d3dpp->BackBufferHeight       = p_vout->output.i_height;
+    d3dpp->BackBufferWidth        = d3ddm.Width;
+    d3dpp->BackBufferHeight       = d3ddm.Height;
     d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
     d3dpp->MultiSampleType        = D3DMULTISAMPLE_NONE;
     d3dpp->PresentationInterval   = D3DPRESENT_INTERVAL_DEFAULT;
     d3dpp->BackBufferFormat       = d3ddm.Format;
     d3dpp->BackBufferCount        = 1;
     d3dpp->EnableAutoDepthStencil = FALSE;
+
+    RECT *display = &p_vout->p_sys->rect_display;
+    display->left   = 0;
+    display->top    = 0;
+    display->right  = d3dpp->BackBufferWidth;
+    display->bottom = d3dpp->BackBufferHeight;
 
     return VLC_SUCCESS;
 }
@@ -537,10 +542,9 @@ static int Direct3DVoutOpen( vout_thread_t *p_vout )
 {
     LPDIRECT3D9 p_d3dobj = p_vout->p_sys->p_d3dobj;
     LPDIRECT3DDEVICE9 p_d3ddev;
-    D3DPRESENT_PARAMETERS d3dpp;
     HRESULT hr;
 
-    if( VLC_SUCCESS != Direct3DFillPresentationParameters(p_vout, &d3dpp) )
+    if( VLC_SUCCESS != Direct3DFillPresentationParameters(p_vout) )
         return VLC_EGENERIC;
 
     // Create the D3DDevice
@@ -548,7 +552,7 @@ static int Direct3DVoutOpen( vout_thread_t *p_vout )
                                  D3DDEVTYPE_HAL, p_vout->p_sys->hvideownd,
                                  D3DCREATE_SOFTWARE_VERTEXPROCESSING|
                                  D3DCREATE_MULTITHREADED,
-                                 &d3dpp, &p_d3ddev );
+                                 &p_vout->p_sys->d3dpp, &p_d3ddev );
     if( FAILED(hr) )
     {
        msg_Err(p_vout, "Could not create the D3D device! (hr=0x%lX)", hr);
@@ -583,17 +587,16 @@ static void Direct3DVoutClose( vout_thread_t *p_vout )
 static int Direct3DVoutResetDevice( vout_thread_t *p_vout )
 {
     LPDIRECT3DDEVICE9       p_d3ddev = p_vout->p_sys->p_d3ddev;
-    D3DPRESENT_PARAMETERS   d3dpp;
     HRESULT hr;
 
-    if( VLC_SUCCESS != Direct3DFillPresentationParameters(p_vout, &d3dpp) )
+    if( VLC_SUCCESS != Direct3DFillPresentationParameters(p_vout) )
         return VLC_EGENERIC;
 
     // release all D3D objects
     Direct3DVoutReleaseScene( p_vout );
     Direct3DVoutReleasePictures( p_vout );
 
-    hr = IDirect3DDevice9_Reset(p_d3ddev, &d3dpp);
+    hr = IDirect3DDevice9_Reset(p_d3ddev, &p_vout->p_sys->d3dpp);
     if( SUCCEEDED(hr) )
     {
         // re-create them
@@ -725,7 +728,7 @@ static int Direct3DVoutCreatePictures( vout_thread_t *p_vout, size_t i_num_pics 
     ** the requested chroma which is usable by the hardware in an offscreen surface, as they
     ** typically support more formats than textures
     */
-    const d3d_format_t *p_format = Direct3DVoutFindFormat(p_vout, i_chroma, p_vout->p_sys->bbFormat);
+    const d3d_format_t *p_format = Direct3DVoutFindFormat(p_vout, i_chroma, p_vout->p_sys->d3dpp.BackBufferFormat);
     if( !p_format )
     {
         msg_Err(p_vout, "surface pixel format is not supported.");
@@ -968,11 +971,11 @@ static int Direct3DVoutCreateScene( vout_thread_t *p_vout )
     ** which would usually be a RGB format
     */
     hr = IDirect3DDevice9_CreateTexture(p_d3ddev,
-            p_vout->render.i_width,
-            p_vout->render.i_height,
+            p_vout->p_sys->d3dpp.BackBufferWidth,
+            p_vout->p_sys->d3dpp.BackBufferHeight,
             1,
             D3DUSAGE_RENDERTARGET,
-            p_vout->p_sys->bbFormat,
+            p_vout->p_sys->d3dpp.BackBufferFormat,
             D3DPOOL_DEFAULT,
             &p_d3dtex,
             NULL);
@@ -1126,8 +1129,12 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
         return;
     }
 
-    /* Copy picture surface into texture surface, color space conversion happens here */
-    hr = IDirect3DDevice9_StretchRect(p_d3ddev, p_d3dsrc, NULL, p_d3ddest, NULL, D3DTEXF_NONE);
+    /* Copy picture surface into texture surface
+     * color space conversion and scaling happen here */
+    RECT src = p_vout->p_sys->rect_src_clipped;
+    RECT dst = p_vout->p_sys->rect_dest_clipped;
+
+    hr = IDirect3DDevice9_StretchRect(p_d3ddev, p_d3dsrc, &src, p_d3ddest, &dst, D3DTEXF_LINEAR);
     IDirect3DSurface9_Release(p_d3ddest);
     if( FAILED(hr) )
     {
@@ -1144,8 +1151,8 @@ static void Direct3DVoutRenderScene( vout_thread_t *p_vout, picture_t *p_pic )
     }
 
     /* Setup vertices */
-    f_width  = (float)(p_vout->output.i_width);
-    f_height = (float)(p_vout->output.i_height);
+    f_width  = (float)p_vout->p_sys->d3dpp.BackBufferWidth;
+    f_height = (float)p_vout->p_sys->d3dpp.BackBufferHeight;
 
     /* -0.5f is a "feature" of DirectX and it seems to apply to Direct3d also */
     /* http://www.sjbrown.co.uk/2003/05/01/fix-directx-rasterisation/ */

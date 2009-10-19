@@ -340,6 +340,12 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
                       SWP_NOCOPYBITS|SWP_NOZORDER|SWP_ASYNCWINDOWPOS );
 
     /* Destination image position and dimensions */
+#if defined(MODULE_NAME_IS_direct3d)
+    rect_dest.left   = 0;
+    rect_dest.right  = i_width;
+    rect_dest.top    = 0;
+    rect_dest.bottom = i_height;
+#else
     rect_dest.left = point.x + i_x;
     rect_dest.right = rect_dest.left + i_width;
     rect_dest.top = point.y + i_y;
@@ -359,9 +365,14 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
                 p_vout->p_sys->i_align_dest_size / 2 ) &
                 ~p_vout->p_sys->i_align_dest_size) + rect_dest.left;
     }
+#endif
 
+#endif
+
+#if defined(MODULE_NAME_IS_directx) || defined(MODULE_NAME_IS_direct3d)
     /* UpdateOverlay directdraw function doesn't automatically clip to the
-     * display size so we need to do it otherwise it will fail */
+     * display size so we need to do it otherwise it will fail
+     * It is also needed for d3d to avoid exceding our surface size */
 
     /* Clip the destination window */
     if( !IntersectRect( &rect_dest_clipped, &rect_dest,
@@ -378,7 +389,7 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
                      rect_dest_clipped.right, rect_dest_clipped.bottom );
 #endif
 
-#else /* MODULE_NAME_IS_directx */
+#else
 
     /* AFAIK, there are no clipping constraints in Direct3D, OpenGL and GDI */
     rect_dest_clipped = rect_dest;
@@ -430,6 +441,12 @@ void UpdateRects( vout_thread_t *p_vout, bool b_force )
                 p_vout->p_sys->i_align_src_size / 2 ) &
                 ~p_vout->p_sys->i_align_src_size) + rect_src_clipped.left;
     }
+#elif defined(MODULE_NAME_IS_direct3d)
+    /* Needed at least with YUV content */
+    rect_src_clipped.left &= ~1;
+    rect_src_clipped.right &= ~1;
+    rect_src_clipped.top &= ~1;
+    rect_src_clipped.bottom &= ~1;
 #endif
 
 #ifndef NDEBUG

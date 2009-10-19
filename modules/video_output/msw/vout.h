@@ -156,7 +156,7 @@ struct vout_sys_t
     HINSTANCE               hd3d9_dll;       /* handle of the opened d3d9 dll */
     LPDIRECT3D9             p_d3dobj;
     LPDIRECT3DDEVICE9       p_d3ddev;
-    D3DFORMAT               bbFormat;
+    D3DPRESENT_PARAMETERS   d3dpp;
     // scene objects
     LPDIRECT3DTEXTURE9      p_d3dtex;
     LPDIRECT3DVERTEXBUFFER9 p_d3dvtc;
