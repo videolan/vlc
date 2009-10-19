@@ -727,9 +727,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( priv->b_color )
         priv->b_color = config_GetInt( p_libvlc, "color" ) > 0;
 
-    if( !config_GetInt( p_libvlc, "fpu" ) )
-        cpu_flags &= ~CPU_CAPABILITY_FPU;
-
     char p_capabilities[200];
 #define PRINT_CAPABILITY( capability, string )                              \
     if( vlc_CPU() & capability )                                            \
@@ -772,7 +769,12 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
 #endif
 
-    PRINT_CAPABILITY( CPU_CAPABILITY_FPU, "FPU" );
+#if HAVE_FPU
+    strncat( p_capabilities, "FPU ",
+             sizeof(p_capabilities) - strlen( p_capabilities) );
+    p_capabilities[sizeof(p_capabilities) - 1] = '\0';
+#endif
+
     msg_Dbg( p_libvlc, "CPU has capabilities %s", p_capabilities );
 
     /*

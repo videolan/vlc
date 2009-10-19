@@ -1011,11 +1011,6 @@ static const char *const ppsz_clock_descriptions[] =
     "These options allow you to enable special CPU optimizations. " \
     "You should always leave all these enabled." )
 
-#define FPU_TEXT N_("Enable FPU support")
-#define FPU_LONGTEXT N_( \
-    "If your processor has a floating point calculation unit, VLC can take " \
-    "advantage of it.")
-
 #define MMX_TEXT N_("Enable CPU MMX support")
 #define MMX_LONGTEXT N_( \
     "If your processor supports the MMX instructions set, VLC can take " \
@@ -1959,8 +1954,7 @@ vlc_module_begin ()
     set_category( CAT_ADVANCED )
     set_subcategory( SUBCAT_ADVANCED_CPU )
     add_category_hint( N_("CPU"), CPU_CAT_LONGTEXT, true )
-    add_bool( "fpu", 1, NULL, FPU_TEXT, FPU_LONGTEXT, true )
-        change_need_restart ()
+    add_obsolete_bool( "fpu" )
 #if defined( __i386__ ) || defined( __x86_64__ )
     add_bool( "mmx", 1, NULL, MMX_TEXT, MMX_LONGTEXT, true )
         change_need_restart ()

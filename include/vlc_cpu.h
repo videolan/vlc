@@ -58,12 +58,27 @@
 #  define CPU_CAPABILITY_NEON    (0)
 # endif
 
-/** Are floating point oeprations fast?
+VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
+
+/** Are floating point operations fast?
  * If this bit is not set, you should try to use fixed-point instead.
  */
-# define CPU_CAPABILITY_FPU     (1<<31)
+# if defined (__i386__) || defined (__x86_64__)
+#  define HAVE_FPU 1
 
-VLC_EXPORT( unsigned, vlc_CPU, ( void ) );
+# elif defined (__powerpc__) || defined (__ppc__) || defined (__pc64__)
+#  define HAVE_FPU 1
+
+# elif defined (__arm__)
+#  define HAVE_FPU 0 /* revisit later? */
+
+# elif defined (__sparc__)
+#  define HAVE_FPU 1
+
+# else
+#  define HAVE_FPU 0
+
+# endif
 
 typedef void *(*vlc_memcpy_t) (void *tgt, const void *src, size_t n);
 typedef void *(*vlc_memset_t) (void *tgt, int c, size_t n);

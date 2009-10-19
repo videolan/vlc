@@ -169,7 +169,7 @@ static int Open ( vlc_object_t *p_this )
     msg_Dbg(p_aout, "%d audio channels", ss.channels);
 
     ss.rate = p_aout->output.output.i_rate;
-    if (vlc_CPU() & CPU_CAPABILITY_FPU)
+    if (HAVE_FPU)
     {
         ss.format = PA_SAMPLE_FLOAT32NE;
         p_aout->output.output.i_format = VLC_CODEC_FL32;

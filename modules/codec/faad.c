@@ -138,7 +138,7 @@ static int Open( vlc_object_t *p_this )
     date_Set( &p_sys->date, 0 );
     p_dec->fmt_out.i_cat = AUDIO_ES;
 
-    if (vlc_CPU() & CPU_CAPABILITY_FPU)
+    if (HAVE_FPU)
         p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
     else
         p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
@@ -177,7 +177,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Set the faad config */
     cfg = faacDecGetCurrentConfiguration( p_sys->hfaad );
-    if (vlc_CPU() & CPU_CAPABILITY_FPU)
+    if (HAVE_FPU)
         cfg->outputFormat = FAAD_FMT_FLOAT;
     else
         cfg->outputFormat = FAAD_FMT_16BIT;
@@ -483,7 +483,7 @@ static void DoReordering( uint32_t *p_out, uint32_t *p_in, int i_samples,
     }
 
     /* Do the actual reordering */
-    if( vlc_CPU() & CPU_CAPABILITY_FPU )
+    if( HAVE_FPU )
         for( i = 0; i < i_samples; i++ )
             for( j = 0; j < i_nb_channels; j++ )
                 p_out[i * i_nb_channels + pi_chan_table[j]] =

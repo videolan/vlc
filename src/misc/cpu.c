@@ -113,8 +113,6 @@ uint32_t CPUCapabilities( void )
                          : "cc" );
 #   endif
 
-    i_capabilities |= CPU_CAPABILITY_FPU;
-
 # if defined (__i386__) && !defined (__i486__) && !defined (__i586__) \
   && !defined (__i686__) && !defined (__pentium4__) \
   && !defined (__k6__) && !defined (__athlon__) && !defined (__k8__)
@@ -252,17 +250,12 @@ uint32_t CPUCapabilities( void )
 out:
 
 #elif defined( __arm__ )
-#   if defined( __ARM_EABI__ ) && !defined( __SOFTFP__ )
-//    i_capabilities |= CPU_CAPABILITY_FPU;
-#   endif
 #   if defined( __ARM_NEON__ )
     i_capabilities |= CPU_CAPABILITY_NEON;
 #   endif
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __powerpc64__ ) \
     || defined( __ppc64__ )
-
-    i_capabilities |= CPU_CAPABILITY_FPU;
 
 #   if defined(__APPLE__)
     int selectors[2] = { CTL_HW, HW_VECTORUNIT };
@@ -288,12 +281,6 @@ out:
         i_capabilities |= CPU_CAPABILITY_ALTIVEC;
 
 #   endif
-
-#elif defined( __sparc__ )
-    i_capabilities |= CPU_CAPABILITY_FPU;
-
-#elif defined( _MSC_VER ) && !defined( UNDER_CE )
-    i_capabilities |= CPU_CAPABILITY_FPU;
 
 #endif
     return i_capabilities;

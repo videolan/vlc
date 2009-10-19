@@ -359,7 +359,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Choose the linear PCM format (read the comment above about FPU
        and float32) */
-    if( vlc_CPU() & CPU_CAPABILITY_FPU )
+    if( HAVE_FPU )
     {
         i_vlc_pcm_format = VLC_CODEC_FL32;
         i_snd_pcm_format = SND_PCM_FORMAT_FLOAT;

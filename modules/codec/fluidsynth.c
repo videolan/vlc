@@ -109,7 +109,7 @@ static int Open (vlc_object_t *p_this)
     p_dec->fmt_out.audio.i_original_channels =
     p_dec->fmt_out.audio.i_physical_channels =
         AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT;
-    if (vlc_CPU () & CPU_CAPABILITY_FPU)
+    if (HAVE_FPU)
     {
         p_dec->fmt_out.i_codec = VLC_CODEC_FL32;
         p_dec->fmt_out.audio.i_bitspersample = 32;
