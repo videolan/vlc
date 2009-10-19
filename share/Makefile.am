@@ -47,7 +47,7 @@ if BUILD_MOZILLA
 # TODO: move to the mozilla directory
 nobase_vlcdata_DATA += $(DIST_mozilla)
 endif
-if BUILD_MAEMO
+if BUILD_HILDON
 nobase_vlcdata_DATA += $(DIST_maemo) $(maemo_FILES)
 endif
 

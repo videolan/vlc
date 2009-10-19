@@ -4327,25 +4327,24 @@ AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes" ||
 	  test "${SYS}" != "mingwce" && test "${enable_skins2}" != "no")])
 
 dnl
-dnl Maemo
+dnl Hildon UI
 dnl
-AC_ARG_ENABLE(maemo,
-  [  --enable-maemo          Internet tablets based on Maemo SDK (default disabled)])
-if test "${enable_maemo}" = "yes"
-then
+AC_ARG_ENABLE(hildon,
+  [  --enable-hildon         Hildon touchscreen UI (default disabled)])
+AS_IF([test "${enable_hildon}" = "yes"], [
   PKG_CHECK_MODULES(HILDON, [hildon-1 hildon-fm-2], [
-    VLC_ADD_CFLAGS([maemo],[${HILDON_CFLAGS}])
-    VLC_ADD_LIBS([maemo],[${HILDON_LIBS}])
-    VLC_ADD_PLUGIN([maemo])
+    VLC_ADD_CFLAGS([hildon],[${HILDON_CFLAGS}])
+    VLC_ADD_LIBS([hildon],[${HILDON_LIBS}])
+    VLC_ADD_PLUGIN([hildon])
     ALIASES="${ALIASES} mvlc"
   ], [
-    AS_IF([test "${enable_maemo}" = "yes"],[
+    AS_IF([test "${enable_hildon}" = "yes"],[
       AC_MSG_ERROR([Hildon libraries not found])
     ])
-    enable_maemo="no"
+    enable_hildon="no"
   ])
-fi
-AM_CONDITIONAL(BUILD_MAEMO, [test "${enable_maemo}" = "yes"])
+])
+AM_CONDITIONAL(BUILD_HILDON, [test "${enable_hildon}" = "yes"])
 
 dnl
 dnl QT 4
@@ -5209,7 +5208,7 @@ AC_CONFIG_FILES([
   modules/gui/Makefile
   modules/gui/beos/Makefile
   modules/gui/macosx/Makefile
-  modules/gui/maemo/Makefile
+  modules/gui/hildon/Makefile
   modules/gui/minimal_macosx/Makefile
   modules/gui/qnx/Makefile
   modules/gui/qt4/Makefile

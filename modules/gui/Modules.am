@@ -1,4 +1,4 @@
-DIST_SUBDIRS = beos macosx maemo minimal_macosx qnx qt4 skins2 wince
+DIST_SUBDIRS = beos macosx hildon minimal_macosx qnx qt4 skins2 wince
 SUBDIRS =
 
 if HAVE_BEOS
@@ -7,8 +7,8 @@ endif
 if HAVE_DARWIN
 SUBDIRS += macosx minimal_macosx
 endif
-if BUILD_MAEMO
-SUBDIRS += maemo
+if BUILD_HILDON
+SUBDIRS += hildon
 endif
 SUBDIRS += qnx
 if ENABLE_QT4

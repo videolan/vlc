@@ -1,4 +1,4 @@
-SOURCES_maemo = maemo.c \
+SOURCES_hildon = maemo.c \
 		maemo.h \
 		maemo_callbacks.c \
 		maemo_callbacks.h \
