@@ -376,6 +376,16 @@ static int Open (vlc_object_t *obj)
         for (size_t i = 0; chromas[i] && (xfmt == NULL); i++)
         {
             chroma = chromas[i];
+
+            /* Oink oink! */
+            if ((chroma == VLC_CODEC_I420 || chroma == VLC_CODEC_YV12)
+             && a->name_size >= 4
+             && !memcmp ("OMAP", xcb_xv_adaptor_info_name (a), 4))
+            {
+                msg_Dbg (vd, "skipping slow I420 format");
+                continue; /* OMAP framebuffer sucks at YUV 4:2:0 */
+            }
+
             xfmt = FindFormat (vd, chroma, &fmt, a->base_id, r, &p_sys->att);
         }
 
