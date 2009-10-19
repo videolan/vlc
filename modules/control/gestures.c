@@ -86,6 +86,12 @@ static void RunIntf        ( intf_thread_t *p_intf );
 #define BUTTON_LONGTEXT N_( \
     "Trigger button for mouse gestures." )
 
+#if defined (HAVE_MAEMO)
+# define BUTTON_DEFAULT "left"
+#else
+# define BUTTON_DEFAULT "right"
+#endif
+
 static const char *const button_list[] = { "left", "middle", "right" };
 static const char *const button_list_text[] =
                                    { N_("Left"), N_("Middle"), N_("Right") };
@@ -96,7 +102,7 @@ vlc_module_begin ()
     set_subcategory( SUBCAT_INTERFACE_CONTROL )
     add_integer( "gestures-threshold", 30, NULL,
                  THRESHOLD_TEXT, THRESHOLD_LONGTEXT, true )
-    add_string( "gestures-button", "right", NULL,
+    add_string( "gestures-button", BUTTON_DEFAULT, NULL,
                 BUTTON_TEXT, BUTTON_LONGTEXT, false )
         change_string_list( button_list, button_list_text, 0 )
     set_description( N_("Mouse gestures control interface") )
