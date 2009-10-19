@@ -1,7 +1,7 @@
 /*****************************************************************************
  * fourcc.c: libavcodec <-> libvlc conversion routines
  *****************************************************************************
- * Copyright (C) 1999-2008 the VideoLAN team
+ * Copyright (C) 1999-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -195,7 +195,7 @@ static const struct
     { VLC_CODEC_V210, CODEC_ID_V210, VIDEO_ES },
 #endif
 
-#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 37, 0 )
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 37, 1 )
     { VLC_CODEC_FRWU, CODEC_ID_FRWU, VIDEO_ES },
 #endif
 
