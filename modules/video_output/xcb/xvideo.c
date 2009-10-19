@@ -356,9 +356,8 @@ static int Open (vlc_object_t *obj)
         if (r == NULL)
             continue;
 
-        const xcb_xv_image_format_info_t *xfmt;
-
-        /* */
+        /* Look for an image format */
+        const xcb_xv_image_format_info_t *xfmt = NULL;
         const vlc_fourcc_t *chromas, chromas_default[] = {
             fmt.i_chroma,
             VLC_CODEC_RGB32,
@@ -373,20 +372,19 @@ static int Open (vlc_object_t *obj)
         else
             chromas = chromas_default;
 
-        for (size_t i = 0; chromas[i]; i++)
+        vlc_fourcc_t chroma;
+        for (size_t i = 0; chromas[i] && (xfmt == NULL); i++)
         {
-            vlc_fourcc_t chroma = chromas[i];
+            chroma = chromas[i];
             xfmt = FindFormat (vd, chroma, &fmt, a->base_id, r, &p_sys->att);
-            if (xfmt != NULL)
-            {
-                fmt.i_chroma = chroma;
-                goto found_format;
-            }
         }
-        free (r);
-        continue;
 
-    found_format:
+        if (xfmt == NULL) /* No acceptable image formats */
+        {
+            free (r);
+            continue;
+        }
+
         /* Grab a port */
         for (unsigned i = 0; i < a->num_ports; i++)
         {
@@ -417,6 +415,7 @@ static int Open (vlc_object_t *obj)
 
         p_sys->id = xfmt->id;
         msg_Dbg (vd, "using image format 0x%"PRIx32, p_sys->id);
+        fmt.i_chroma = chroma;
         if (xfmt->type == XCB_XV_IMAGE_FORMAT_INFO_TYPE_RGB)
         {
             fmt.i_rmask = xfmt->red_mask;
