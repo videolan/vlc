@@ -2207,6 +2207,19 @@ if test "${enable_smb}" != "no"; then
      fi ])
 fi
 
+
+dnl
+dnl sftp access support
+dnl
+AC_ARG_ENABLE(sftp,
+  [  --enable-sftp           sftp input access module (default disable)])
+if test "${enable_sftp}" = "yes"; then
+  AC_CHECK_HEADERS(libssh2.h, [
+    VLC_ADD_PLUGIN([access_sftp])
+    VLC_ADD_LIBS([access_sftp], [-lssh2])
+  ])
+fi
+
 dnl
 dnl  libdvbpsi ts demux/mux
 dnl
