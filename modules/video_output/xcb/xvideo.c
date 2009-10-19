@@ -335,7 +335,7 @@ static int Open (vlc_object_t *obj)
 
     xcb_xv_adaptor_info_iterator_t it;
     for (it = xcb_xv_query_adaptors_info_iterator (adaptors);
-         it.rem > 0;
+         it.rem > 0 && !found_adaptor;
          xcb_xv_adaptor_info_next (&it))
     {
         const xcb_xv_adaptor_info_t *a = it.data;
@@ -380,10 +380,7 @@ static int Open (vlc_object_t *obj)
         }
 
         if (xfmt == NULL) /* No acceptable image formats */
-        {
-            free (r);
-            continue;
-        }
+            goto skip_adaptor;
 
         /* Grab a port */
         for (unsigned i = 0; i < a->num_ports; i++)
@@ -398,13 +395,15 @@ static int Open (vlc_object_t *obj)
              if (result == 0)
              {
                  p_sys->port = port;
-                 goto grabbed_port;
+                 found_adaptor = true;
+                 break;
              }
              msg_Dbg (vd, "cannot grab port %"PRIu32, port);
         }
-        continue;
+        if (!found_adaptor)
+            goto skip_adaptor;
 
-    grabbed_port:
+        /* Found port - initialize selected format */
         name = strndup (xcb_xv_adaptor_info_name (a), a->name_size);
         if (name != NULL)
         {
@@ -422,9 +421,9 @@ static int Open (vlc_object_t *obj)
             fmt.i_gmask = xfmt->green_mask;
             fmt.i_bmask = xfmt->blue_mask;
         }
+
+    skip_adaptor:
         free (r);
-        found_adaptor = true;
-        break;
     }
     free (adaptors);
     if (!found_adaptor)
