@@ -29,6 +29,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_vout.h>
+#include <vlc_filter.h>
 
 #include <libprojectM/projectM.hpp>
 
@@ -52,7 +53,7 @@ static void Close        ( vlc_object_t * );
 vlc_module_begin ()
     set_shortname( N_("projectM"))
     set_description( N_("libprojectM effect") )
-    set_capability( "visualization", 0 )
+    set_capability( "visualization2", 0 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
     add_file( "projectm-config", "/usr/share/projectM/config.inp", NULL,
@@ -95,14 +96,13 @@ typedef struct
 } projectm_thread_t;
 
 
-struct aout_filter_sys_t
+struct filter_sys_t
 {
     projectm_thread_t *p_thread;
 };
 
 
-static void DoWork( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                    aout_buffer_t * );
+static block_t *DoWork( filter_t *, block_t * );
 static void* Thread( vlc_object_t * );
 
 
@@ -157,8 +157,8 @@ static int initOpenGL( projectm_thread_t *p_thread )
  */
 static int Open( vlc_object_t * p_this )
 {
-    aout_filter_t       *p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t   *p_sys;
+    filter_t            *p_filter = (filter_t *)p_this;
+    filter_sys_t        *p_sys;
     projectm_thread_t   *p_thread;
 
     /* Test the audio format */
@@ -174,10 +174,9 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
 
-    p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = true;
+    p_filter->pf_audio_filter = DoWork;
 
-    p_sys = p_filter->p_sys = (aout_filter_sys_t*)malloc( sizeof( *p_sys ) );
+    p_sys = p_filter->p_sys = (filter_sys_t*)malloc( sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -226,8 +225,8 @@ static int Open( vlc_object_t * p_this )
  */
 static void Close( vlc_object_t *p_this )
 {
-    aout_filter_t     *p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
+    filter_t     *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
     projectm_thread_t *p_thread = p_sys->p_thread;
 
     /* Stop the thread */
@@ -253,13 +252,9 @@ static void Close( vlc_object_t *p_this )
  * @param p_in_buf: input buffer
  * @param p_out_buf: output buffer
  */
-static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
-                    aout_buffer_t *p_in_buf, aout_buffer_t *p_out_buf )
+static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
     projectm_thread_t *p_thread = p_filter->p_sys->p_thread;
-
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_buffer;
 
     vlc_mutex_lock( &p_thread->lock );
     if( p_thread->i_buffer_size > 0 )
@@ -273,7 +268,7 @@ static void DoWork( aout_instance_t *p_aout, aout_filter_t *p_filter,
 
     vlc_mutex_unlock( &p_thread->lock );
 
-    return;
+    return p_in_buf;
 }
 
 
