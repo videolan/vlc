@@ -37,6 +37,7 @@
 #include <vlc_vout.h>
 #include <vlc_block.h>
 #include <vlc_input.h>
+#include <vlc_filter.h>
 
 #ifdef USE_GOOM_TREE
 #   ifdef OLD_GOOM
@@ -74,7 +75,7 @@ vlc_module_begin ()
     set_description( N_("Goom effect") )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
-    set_capability( "visualization", 0 )
+    set_capability( "visualization2", 0 )
     add_integer( "goom-width", 800, NULL,
                  WIDTH_TEXT, RES_LONGTEXT, false )
     add_integer( "goom-height", 640, NULL,
@@ -112,14 +113,13 @@ typedef struct
 
 } goom_thread_t;
 
-struct aout_filter_sys_t
+struct filter_sys_t
 {
     goom_thread_t *p_thread;
 
 };
 
-static void DoWork   ( aout_instance_t *, aout_filter_t *, aout_buffer_t *,
-                       aout_buffer_t * );
+static block_t *DoWork ( filter_t *, block_t * );
 
 static void* Thread   ( vlc_object_t * );
 
@@ -130,11 +130,11 @@ static char *TitleGet( vlc_object_t * );
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    aout_filter_t     *p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t *p_sys;
-    goom_thread_t     *p_thread;
-    int                width, height;
-    video_format_t     fmt;
+    filter_t       *p_filter = (filter_t *)p_this;
+    filter_sys_t   *p_sys;
+    goom_thread_t  *p_thread;
+    int             width, height;
+    video_format_t fmt;
 
 
     if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
@@ -149,11 +149,10 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = 1;
+    p_filter->pf_audio_filter = DoWork;
 
     /* Allocate structure */
-    p_sys = p_filter->p_sys = malloc( sizeof( aout_filter_sys_t ) );
+    p_sys = p_filter->p_sys = malloc( sizeof( filter_sys_t ) );
 
     /* Create goom thread */
     p_sys->p_thread = p_thread =
@@ -212,30 +211,24 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************
  * This function queues the audio buffer to be processed by the goom thread
  *****************************************************************************/
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
-    VLC_UNUSED( p_aout );
-
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
     block_t *p_block;
-
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_buffer;
 
     /* Queue sample */
     vlc_mutex_lock( &p_sys->p_thread->lock );
     if( p_sys->p_thread->i_blocks == MAX_BLOCKS )
     {
         vlc_mutex_unlock( &p_sys->p_thread->lock );
-        return;
+        return p_in_buf;
     }
 
     p_block = block_New( p_sys->p_thread, p_in_buf->i_buffer );
     if( !p_block )
     {
         vlc_mutex_unlock( &p_sys->p_thread->lock );
-        return;
+        return p_in_buf;
     }
     memcpy( p_block->p_buffer, p_in_buf->p_buffer, p_in_buf->i_buffer );
     p_block->i_pts = p_in_buf->i_pts;
@@ -244,6 +237,8 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
 
     vlc_cond_signal( &p_sys->p_thread->wait );
     vlc_mutex_unlock( &p_sys->p_thread->lock );
+
+    return p_in_buf;
 }
 
 /*****************************************************************************
@@ -386,8 +381,8 @@ static void* Thread( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    aout_filter_t     *p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
+    filter_t     *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
     /* Stop Goom Thread */
     vlc_object_kill( p_sys->p_thread );
