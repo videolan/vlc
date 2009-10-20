@@ -91,10 +91,21 @@ static void Close( vlc_object_t * );
 #define B_BIAS_LONGTEXT N_( "Bias the choice to use B-frames. Positive values " \
     "cause more B-frames, negative values cause less B-frames." )
 
+
 #define BPYRAMID_TEXT N_("Keep some B-frames as references")
+#if X264_BUILD >= 78
+#define BPYRAMID_LONGTEXT N_( "Allows B-frames to be used as references for " \
+    "predicting other frames. Keeps the middle of 2+ consecutive B-frames " \
+    "as a reference, and reorders frame appropriately.\n" \
+    " - none: Disabled\n" \
+    " - strict: Strictly hierarchical pyramid\n" \
+    " - normal: Non-strict (not Blu-ray compatible)\n"\
+    )
+#else
 #define BPYRAMID_LONGTEXT N_( "Allows B-frames to be used as references for " \
     "predicting other frames. Keeps the middle of 2+ consecutive B-frames " \
     "as a reference, and reorders frame appropriately." )
+#endif
 
 #define CABAC_TEXT N_("CABAC")
 #define CABAC_LONGTEXT N_( "CABAC (Context-Adaptive Binary Arithmetic "\
@@ -352,6 +363,11 @@ static const char *const enc_me_list_text[] =
 static const char *const profile_list[] =
   { "baseline", "main", "high" };
 
+#if X264_BUILD >= 78
+static const char *const bpyramid_list[] =
+  { "none", "strict", "normal" };
+#endif
+
 static const char *const enc_analyse_list[] =
   { "none", "fast", "normal", "slow", "all" };
 static const char *const enc_analyse_list_text[] =
@@ -396,8 +412,14 @@ vlc_module_begin ()
                  B_BIAS_LONGTEXT, false )
         change_integer_range( -100, 100 )
 
+#if X264_BUILD >= 78
+    add_string( SOUT_CFG_PREFIX "bpyramid", "none", NULL, BPYRAMID_TEXT,
+              BPYRAMID_LONGTEXT, false )
+        change_string_list( bpyramid_list, bpyramid_list, 0 );
+#else
     add_bool( SOUT_CFG_PREFIX "bpyramid", false, NULL, BPYRAMID_TEXT,
               BPYRAMID_LONGTEXT, false )
+#endif
 
     add_bool( SOUT_CFG_PREFIX "cabac", true, NULL, CABAC_TEXT, CABAC_LONGTEXT,
               false )
@@ -806,7 +828,22 @@ static int  Open ( vlc_object_t *p_this )
     if( i_val >= 0 && i_val <= 16 )
         p_sys->param.i_bframe = i_val;
 
+#if X264_BUILD >= 78
+    psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "bpyramid" );
+    p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_NONE;
+    if( !strcmp( psz_val, "none" ) )
+    {
+       p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_NONE;
+    } else if ( !strcmp( psz_val, "strict" ) )
+    {
+       p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_STRICT;
+    } else if ( !strcmp( psz_val, "normal" ) )
+    {
+       p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_NORMAL;
+    }
+#else
     p_sys->param.b_bframe_pyramid = var_GetBool( p_enc, SOUT_CFG_PREFIX "bpyramid" );
+ #endif
 
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "ref" );
     if( i_val > 0 && i_val <= 15 )
