@@ -223,7 +223,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
             i_row *= p_in->i_lines / i_rows;
             i_last_row *= p_in->i_lines / i_rows;
 
-            if( p_sys->b_blackslot && p_sys->b_finished && i == p_sys->i_selected )
+            if( p_sys->b_blackslot && !p_sys->b_finished && i == p_sys->i_selected )
             {
                 uint8_t color = ( i_plane == Y_PLANE ? 0x0 : 0x80 );
                 for( ; i_row < i_last_row; i_row++, i_orow++ )
