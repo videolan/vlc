@@ -89,6 +89,7 @@ static void
 vlc_thread_fatal (const char *action, int error,
                   const char *function, const char *file, unsigned line)
 {
+    int canc = vlc_savecancel ();
     fprintf (stderr, "LibVLC fatal error %s (%d) in thread %lu ",
              action, error, vlc_threadid ());
     vlc_trace (function, file, line);
@@ -119,6 +120,7 @@ vlc_thread_fatal (const char *action, int error,
 #endif
     fflush (stderr);
 
+    vlc_restorecancel (canc);
     abort ();
 }
 
