@@ -732,10 +732,10 @@ static void GetAR( decoder_t *p_dec )
         if( p_sys->p_info->sequence->pixel_height > 0 )
         {
             p_sys->i_aspect =
-                ((uint64_t)p_sys->p_info->sequence->picture_width) *
+                ((uint64_t)p_sys->p_info->sequence->display_width) *
                 p_sys->p_info->sequence->pixel_width *
                 VOUT_ASPECT_FACTOR /
-                p_sys->p_info->sequence->picture_height /
+                p_sys->p_info->sequence->display_height /
                 p_sys->p_info->sequence->pixel_height;
             p_sys->i_sar_num = p_sys->p_info->sequence->pixel_width;
             p_sys->i_sar_den = p_sys->p_info->sequence->pixel_height;
