@@ -259,18 +259,18 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     vlc_subfn_t *result = NULL; /* unsorted results */
     char **result2; /* sorted results */
 
-    const char *psz_fname = psz_name_org;
-
-    if( !psz_fname )
+    if( !psz_name_org )
         return NULL;
 
-    if( !strncmp( psz_fname, "file://", 7 ) )
+    if( !strncmp( psz_name_org, "file://", 7 ) )
     {
-        psz_fname += 7;
-        if( !strncmp( psz_fname, "localhost", 9 ) )
-            psz_fname += 9;
+        psz_name_org += 7;
+        if( !strncmp( psz_name_org, "localhost", 9 ) )
+            psz_name_org += 9;
     }
-    psz_fname = decode_URI( psz_fname );
+    char *psz_fname = decode_URI_duplicate( psz_name_org );
+    if( !psz_fname )
+        return NULL;
 
     /* extract filename & dirname from psz_fname */
     tmp = strrchr( psz_fname, DIR_SEP_CHAR );
@@ -289,7 +289,10 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
         char *psz_cwd = NULL;
 #endif
         if( !psz_cwd )
+        {
+            free( psz_fname );
             return NULL;
+        }
 
         f_fname = strdup( psz_fname );
         if( asprintf( &f_dir, "%s%c", psz_cwd, DIR_SEP_CHAR ) == -1 )
@@ -300,6 +303,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     {
         free( f_fname );
         free( f_dir );
+        free( psz_fname );
         return NULL;
     }
 
@@ -313,6 +317,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
         free( f_dir );
         free( f_fname_noext );
         free( f_fname_trim );
+        free( psz_fname );
         return NULL;
     }
 
@@ -428,6 +433,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     free( f_dir );
     free( f_fname_trim );
     free( f_fname_noext );
+    free( psz_fname );
 
     if( !result )
         return NULL;
