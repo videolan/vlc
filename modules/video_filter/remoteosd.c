@@ -202,8 +202,6 @@ static void vnc_encrypt_bytes( unsigned char *bytes, char *passwd );
  *****************************************************************************/
 struct filter_sys_t
 {
-    VLC_COMMON_MEMBERS
-
     bool          b_need_update;       /* VNC picture is updated, do update the OSD*/
     mtime_t       i_vnc_poll_interval; /* Update the OSD menu every n ms */
 
@@ -253,10 +251,9 @@ static int CreateFilter ( vlc_object_t *p_this )
 
     msg_Dbg( p_filter, "Creating vnc osd filter..." );
 
-    p_filter->p_sys = p_sys = malloc( sizeof(*p_sys) );
+    p_filter->p_sys = p_sys = calloc( 1, sizeof(*p_sys) );
     if( !p_filter->p_sys )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof(*p_sys) );
 
     /* Populating struct */
     vlc_mutex_init( &p_sys->lock );
