@@ -178,8 +178,11 @@ static void RenderBlur( filter_sys_t *p_sys, picture_t *p_newpic,
                         picture_t *p_outpic )
 {
     int i_plane;
-    int i_oldfactor = p_sys->i_factor;
+    vlc_spin_lock( &p_sys->lock );
+    const int i_oldfactor = p_sys->i_factor;
+    vlc_spin_unlock( &p_sys->lock );
     int i_newfactor = 128 - i_oldfactor;
+
     for( i_plane = 0; i_plane < p_outpic->i_planes; i_plane++ )
     {
         uint8_t *p_old, *p_new, *p_out, *p_out_end, *p_out_line_end;
