@@ -630,7 +630,7 @@ modules/gui/macosx/vout.m
 modules/gui/macosx/voutgl.m
 modules/gui/macosx/wizard.h
 modules/gui/macosx/wizard.m
-modules/gui/maemo/maemo.c
+modules/gui/hildon/maemo.c
 modules/gui/minimal_macosx/VLCMinimalVoutWindow.h
 modules/gui/minimal_macosx/VLCMinimalVoutWindow.m
 modules/gui/minimal_macosx/VLCOpenGLVoutView.h
