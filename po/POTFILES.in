@@ -289,6 +289,7 @@ modules/access/screen/screen.c
 modules/access/screen/screen.h
 modules/access/screen/win32.c
 modules/access/screen/xcb.c
+modules/access/sftp.c
 modules/access/smb.c
 modules/access/tcp.c
 modules/access/udp.c
