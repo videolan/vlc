@@ -97,6 +97,12 @@ struct filter_sys_t
     /* */
     vlc_mutex_t lock;
     bool b_change;
+    struct
+    {
+        int i_cols;
+        int i_rows;
+        bool b_blackslot;
+    } change;
 };
 
 #define SHUFFLE_WIDTH 81
@@ -145,9 +151,12 @@ static int Open( vlc_object_t *p_this )
     p_sys->pi_order = NULL;
 
     vlc_mutex_init( &p_sys->lock );
-    p_sys->i_rows = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "rows" );
-    p_sys->i_cols = var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "cols" );
-    p_sys->b_blackslot = var_CreateGetBoolCommand( p_filter, CFG_PREFIX "black-slot" );
+    p_sys->change.i_rows =
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "rows" );
+    p_sys->change.i_cols =
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "cols" );
+    p_sys->change.b_blackslot =
+        var_CreateGetBoolCommand( p_filter, CFG_PREFIX "black-slot" );
     p_sys->b_change = true;
 
     var_AddCallback( p_filter, CFG_PREFIX "rows", PuzzleCallback, p_sys );
@@ -196,7 +205,11 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     vlc_mutex_lock( &p_sys->lock );
     if( p_sys->b_change )
     {
+        p_sys->i_rows      = p_sys->change.i_rows;
+        p_sys->i_cols      = p_sys->change.i_cols;
+        p_sys->b_blackslot = p_sys->change.b_blackslot;
         p_sys->b_change = false;
+
         Shuffle( p_sys );
     }
     vlc_mutex_unlock( &p_sys->lock );
@@ -362,15 +375,15 @@ static int PuzzleCallback( vlc_object_t *p_this, char const *psz_var,
     vlc_mutex_lock( &p_sys->lock );
     if( !strcmp( psz_var, CFG_PREFIX "rows" ) )
     {
-        p_sys->i_rows = __MAX( 1, newval.i_int );
+        p_sys->change.i_rows = __MAX( 1, newval.i_int );
     }
     else if( !strcmp( psz_var, CFG_PREFIX "cols" ) )
     {
-        p_sys->i_cols = __MAX( 1, newval.i_int );
+        p_sys->change.i_cols = __MAX( 1, newval.i_int );
     }
     else if( !strcmp( psz_var, CFG_PREFIX "black-slot" ) )
     {
-        p_sys->b_blackslot = newval.b_bool;
+        p_sys->change.b_blackslot = newval.b_bool;
     }
     p_sys->b_change = true;
     vlc_mutex_unlock( &p_sys->lock );
