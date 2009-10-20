@@ -841,6 +841,7 @@ static int  Open ( vlc_object_t *p_this )
     {
        p_sys->param.i_bframe_pyramid = X264_B_PYRAMID_NORMAL;
     }
+    free( psz_val );
 #else
     p_sys->param.b_bframe_pyramid = var_GetBool( p_enc, SOUT_CFG_PREFIX "bpyramid" );
  #endif
