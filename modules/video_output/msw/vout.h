@@ -25,7 +25,7 @@
 /*****************************************************************************
  * event_thread_t: event thread
  *****************************************************************************/
-#include "events.h"
+#include "events_vo.h"
 
 #ifdef MODULE_NAME_IS_wingapi
     typedef struct GXDisplayProperties {
