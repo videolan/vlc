@@ -205,7 +205,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     const int i_rows = p_sys->i_rows;
     const int i_cols = p_sys->i_cols;
 
-    /* */
+    /* Draw each piece of the puzzle at the right place */
     for( int i_plane = 0; i_plane < p_outpic->i_planes; i_plane++ )
     {
         const plane_t *p_in = &p_pic->p[i_plane];
@@ -244,6 +244,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         }
     }
 
+    /* Draw the borders of the selected slot */
     if( p_sys->i_selected != -1 && !p_sys->b_blackslot )
     {
         const plane_t *p_in = &p_pic->p[Y_PLANE];
@@ -269,6 +270,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                 0xff, i_pitch / i_cols );
     }
 
+    /* Draw the 'Shuffle' button if the puzzle is finished */
     if( p_sys->b_finished )
     {
         plane_t *p_out = &p_outpic->p[Y_PLANE];
@@ -291,6 +293,7 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
     filter_sys_t *p_sys = p_filter->p_sys;
     const video_format_t  *p_fmt = &p_filter->fmt_in.video;
 
+    /* Only take events inside the puzzle erea */
     if( p_new->i_x < 0 || p_new->i_x >= (int)p_fmt->i_width ||
         p_new->i_y < 0 || p_new->i_y >= (int)p_fmt->i_height )
         return VLC_EGENERIC;
@@ -298,6 +301,7 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
     /* */
     const bool b_clicked = vlc_mouse_HasPressed( p_old, p_new, MOUSE_BUTTON_LEFT );
 
+    /* If the puzzle is finished, shuffle it if needed */
     if( p_sys->b_finished )
     {
         if( b_clicked &&
@@ -334,15 +338,12 @@ static int Mouse( filter_t *p_filter, vlc_mouse_t *p_mouse,
           || p_sys->i_selected == i_pos + p_sys->i_cols
           || p_sys->i_selected == i_pos - p_sys->i_cols )
     {
+        /* Swap two pieces */
         int a = p_sys->pi_order[ p_sys->i_selected ];
         p_sys->pi_order[ p_sys->i_selected ] = p_sys->pi_order[ i_pos ];
         p_sys->pi_order[ i_pos ] = a;
 
-        if( p_sys->b_blackslot )
-            p_sys->i_selected = i_pos;
-        else
-            p_sys->i_selected = -1;
-
+        p_sys->i_selected = p_sys->b_blackslot ? i_pos : -1;
         p_sys->b_finished = IsFinished( p_sys );
     }
     return VLC_EGENERIC;
