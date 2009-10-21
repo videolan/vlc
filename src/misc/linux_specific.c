@@ -24,6 +24,7 @@
 
 #include <stdio.h>
 #include <string.h>
+#include <sys/stat.h>
 
 #include <vlc_common.h>
 #include "../libvlc.h"
@@ -87,13 +88,31 @@ void system_Init (libvlc_int_t *libvlc, int *argc, const char *argv[])
      * process might have called setlocale(). */
     if (strverscmp (glcv, "2.5") >= 0 && strverscmp (glcv, "2.8") < 0)
     {
-        fputs ("LibVLC has detected an unusable buggy GNU/libc version.\n"
-               "Please update to version 2.8 or newer.\n", stderr);
+        fputs ("LibVLC has detected an unusable buggy GNU/libc version.\n",
+               stderr);
+        fputs ("Please update to version 2.8 or newer.\n", stderr);
         fflush (stderr);
 #ifndef DISABLE_BUGGY_GLIBC_CHECK
         abort ();
 #endif
     }
+
+# ifdef __i386__
+    /* glibc 2.10, 2.10.1 fail in pthread_cond_wait on 686 */
+    struct stat st;
+    if (strverscmp (glcv, "2.10") >= 0
+     && strverscmp (glcv, "2.10.1") <= 0 /* update version when fixed */
+     && !stat ("/lib/i686/cmov/libpthread.so.0", &st))
+    {
+        fputs ("LibVLC has detected an unusable buggy GNU/libc version.\n",
+               stderr);
+        fputs ("Please remove GNU/libc acceleration for 686.\n", stderr);
+        fflush (stderr);
+#  ifndef DISABLE_BUGGY_GLIBC_CHECK
+        abort ();
+#  endif
+    }
+# endif
 #endif
 
 #if 0
