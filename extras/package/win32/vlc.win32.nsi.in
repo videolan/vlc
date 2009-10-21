@@ -260,6 +260,7 @@ FunctionEnd
   !insertmacro ${_action} ".asx"
   !insertmacro ${_action} ".bin"
   !insertmacro ${_action} ".cue"
+  !insertmacro ${_action} ".ifo"
   !insertmacro ${_action} ".m3u"
   !insertmacro ${_action} ".pls"
   !insertmacro ${_action} ".vlc"
