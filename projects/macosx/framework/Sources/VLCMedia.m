@@ -283,9 +283,10 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         {
             [self setLength:[VLCTime timeWithNumber:[NSNumber numberWithLongLong:duration]]];
             return [[length retain] autorelease];
-        } 
+        }
+        return [VLCTime nullTime];
     }
-    return [VLCTime nullTime];
+    return [[length retain] autorelease];
 }
 
 - (VLCTime *)lengthWaitUntilDate:(NSDate *)aDate
