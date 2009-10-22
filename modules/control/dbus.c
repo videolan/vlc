@@ -176,7 +176,6 @@ DBUS_METHOD( PositionGet )
 { /* returns position in milliseconds */
     REPLY_INIT;
     OUT_ARGUMENTS;
-    vlc_value_t position;
     dbus_int32_t i_pos;
 
     playlist_t *p_playlist = pl_Hold( ((vlc_object_t*) p_this) );
@@ -186,8 +185,7 @@ DBUS_METHOD( PositionGet )
         i_pos = 0;
     else
     {
-        var_Get( p_input, "time", &position );
-        i_pos = position.i_time / 1000;
+        i_pos = var_GetTime( p_input, "time" ) / 1000;
         vlc_object_release( p_input );
     }
     pl_Release( ((vlc_object_t*) p_this) );
@@ -1261,7 +1259,7 @@ static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args )
 
     DBusMessageIter status;
     dbus_int32_t i_state, i_random, i_repeat, i_loop;
-    vlc_value_t val;
+    int i_val;
     playlist_t* p_playlist = NULL;
     input_thread_t* p_input = NULL;
 
@@ -1272,12 +1270,12 @@ static int MarshalStatus( intf_thread_t* p_intf, DBusMessageIter* args )
     p_input = playlist_CurrentInput( p_playlist );
     if( p_input )
     {
-        var_Get( p_input, "state", &val );
-        if( val.i_int >= END_S )
+        i_val = var_GetInteger( p_input, "state" );
+        if( i_val >= END_S )
             i_state = 2;
-        else if( val.i_int == PAUSE_S )
+        else if( i_val == PAUSE_S )
             i_state = 1;
-        else if( val.i_int <= PLAYING_S )
+        else if( i_val <= PLAYING_S )
             i_state = 0;
         vlc_object_release( p_input );
     }

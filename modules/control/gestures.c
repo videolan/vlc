@@ -198,7 +198,6 @@ static void RunIntf( intf_thread_t *p_intf )
          */
         if( p_sys->b_got_gesture )
         {
-            vlc_value_t val;
             int i_interval = 0;
             /* Do something */
             /* If you modify this, please try to follow this convention:
@@ -215,8 +214,8 @@ static void RunIntf( intf_thread_t *p_intf )
                     i_interval = config_GetInt( p_intf , "short-jump-size" );
                     if ( i_interval > 0 )
                     {
-                        val.i_time = ( (mtime_t)( -i_interval ) * 1000000L);
-                        var_Set( p_input, "time-offset", val );
+                        mtime_t i_time = ( (mtime_t)( -i_interval ) * 1000000L);
+                        var_SetTime( p_input, "time-offset", i_time );
                     }
                     vlc_object_release( p_input );
                 }
@@ -230,8 +229,8 @@ static void RunIntf( intf_thread_t *p_intf )
                     i_interval = config_GetInt( p_intf , "short-jump-size" );
                     if ( i_interval > 0 )
                     {
-                        val.i_time = ( (mtime_t)( i_interval ) * 1000000L);
-                        var_Set( p_input, "time-offset", val );
+                        mtime_t i_time = ( (mtime_t)( i_interval ) * 1000000L);
+                        var_SetTime( p_input, "time-offset", i_time );
                     }
                     vlc_object_release( p_input );
                 }
@@ -264,9 +263,9 @@ static void RunIntf( intf_thread_t *p_intf )
  
                 if( p_input )
                 {
-                    var_Get( p_input, "state", &val);
-                    val.i_int = ( val.i_int != PLAYING_S ) ? PLAYING_S : PAUSE_S;
-                    var_Set( p_input, "state", val);
+                    int i_state = var_GetInteger( p_input, "state" );
+                    var_SetInteger( p_input, "state", ( i_state != PLAYING_S )
+                                                      ? PLAYING_S : PAUSE_S );
                     vlc_object_release( p_input );
                 }
                 break;
@@ -297,14 +296,14 @@ static void RunIntf( intf_thread_t *p_intf )
 
             case GESTURE(UP,RIGHT,NONE,NONE):
                 {
-                    vlc_value_t val, list, list2;
-                    int i_count, i;
+                    vlc_value_t list, list2;
+                    int i_count, i, i_audio_es;
 
                     p_input = playlist_CurrentInput( p_playlist );
                     if( !p_input )
                         break;
 
-                    var_Get( p_input, "audio-es", &val );
+                    i_audio_es = var_GetInteger( p_input, "audio-es" );
                     var_Change( p_input, "audio-es", VLC_VAR_GETCHOICES,
                                 &list, &list2 );
                     i_count = list.p_list->i_count;
@@ -316,7 +315,7 @@ static void RunIntf( intf_thread_t *p_intf )
                     }
                     for( i = 0; i < i_count; i++ )
                     {
-                        if( val.i_int == list.p_list->p_values[i].i_int )
+                        if( i_audio_es == list.p_list->p_values[i].i_int )
                             break;
                     }
                     /* value of audio-es was not in choices list */
@@ -330,21 +329,21 @@ static void RunIntf( intf_thread_t *p_intf )
                         i = 1;
                     else
                         i++;
-                    var_Set( p_input, "audio-es", list.p_list->p_values[i] );
+                    var_SetInteger( p_input, "audio-es", list.p_list->p_values[i].i_int );
                     var_FreeList( &list, &list2 );
                     vlc_object_release( p_input );
                 }
                 break;
             case GESTURE(DOWN,RIGHT,NONE,NONE):
                 {
-                    vlc_value_t val, list, list2;
-                    int i_count, i;
+                    vlc_value_t list, list2;
+                    int i_count, i, i_spu_es;
 
                     p_input = playlist_CurrentInput( p_playlist );
                     if( !p_input )
                         break;
 
-                    var_Get( p_input, "spu-es", &val );
+                    i_spu_es = var_GetInteger( p_input, "spu-es" );
 
                     var_Change( p_input, "spu-es", VLC_VAR_GETCHOICES,
                             &list, &list2 );
@@ -357,7 +356,7 @@ static void RunIntf( intf_thread_t *p_intf )
                     }
                     for( i = 0; i < i_count; i++ )
                     {
-                        if( val.i_int == list.p_list->p_values[i].i_int )
+                        if( i_spu_es == list.p_list->p_values[i].i_int )
                         {
                             break;
                         }
@@ -373,7 +372,7 @@ static void RunIntf( intf_thread_t *p_intf )
                         i = 0;
                     else
                         i++;
-                    var_Set( p_input, "spu-es", list.p_list->p_values[i] );
+                    var_SetInteger( p_input, "spu-es", list.p_list->p_values[i].i_int);
                     var_FreeList( &list, &list2 );
                     vlc_object_release( p_input );
                 }
@@ -382,9 +381,7 @@ static void RunIntf( intf_thread_t *p_intf )
             case GESTURE(UP,LEFT,NONE,NONE):
                 if( p_sys->p_vout )
                 {
-                    var_Get( p_sys->p_vout, "fullscreen", &val );
-                    val.b_bool = !val.b_bool;
-                    var_Set( p_sys->p_vout, "fullscreen", val );
+                    var_ToggleBool( p_sys->p_vout, "fullscreen" );
                 }
                 break;
 
