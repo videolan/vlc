@@ -405,7 +405,7 @@ static bool IsValid( filter_sys_t *p_sys )
 {
     const int i_count = p_sys->i_cols * p_sys->i_rows;
 
-    if( p_sys->b_blackslot )
+    if( !p_sys->b_blackslot )
         return true;
 
     int d = 0;
@@ -447,7 +447,7 @@ static void Shuffle( filter_sys_t *p_sys )
         }
         p_sys->b_finished = IsFinished( p_sys );
 
-    } while( p_sys->b_finished || IsValid( p_sys ) );
+    } while( p_sys->b_finished || !IsValid( p_sys ) );
 
     if( p_sys->b_blackslot )
     {
