@@ -79,7 +79,7 @@ static int keysymcmp (const void *pa, const void *pb)
     return a - b;
 }
 
-static int ConvertKeySym (xcb_keysym_t sym)
+static uint_fast32_t ConvertKeySym (xcb_keysym_t sym)
 {
     static const struct
     {
@@ -105,6 +105,8 @@ static int ConvertKeySym (xcb_keysym_t sym)
         { XK_Begin,         KEY_HOME, },
         { XK_Insert,        KEY_INSERT, },
         { XK_Menu,          KEY_MENU },
+
+        /* Numeric pad keys */
         { XK_KP_Space,      ' ', },
         { XK_KP_Tab,        KEY_TAB, },
         { XK_KP_Enter,      KEY_ENTER, },
@@ -120,9 +122,27 @@ static int ConvertKeySym (xcb_keysym_t sym)
         { XK_KP_Page_Up,    KEY_PAGEUP, },
         { XK_KP_Page_Down,  KEY_PAGEDOWN, },
         { XK_KP_End,        KEY_END, },
-        { XK_KP_Begin,      KEY_HOME, },
+        { XK_KP_Begin,      KEY_HOME, }, /* KP middle (5 without numlock) */
         { XK_KP_Insert,     KEY_INSERT, },
         { XK_KP_Delete,     KEY_DELETE, },
+        { XK_KP_Equal,      '=', },
+        { XK_KP_Multiply,   '*', },
+        { XK_KP_Add,        '+', },
+        { XK_KP_Separator,  ',', },
+        { XK_KP_Subtract,   '-', },
+        { XK_KP_Decimal,    ',', }, /* FIXME: I don't know that key */
+        { XK_KP_Divide,     '/', },
+        { XK_KP_0,          '0', },
+        { XK_KP_1,          '1', },
+        { XK_KP_2,          '2', },
+        { XK_KP_3,          '3', },
+        { XK_KP_4,          '4', },
+        { XK_KP_5,          '5', },
+        { XK_KP_6,          '6', },
+        { XK_KP_7,          '7', },
+        { XK_KP_8,          '8', },
+        { XK_KP_9,          '9', },
+
         { XK_F1,            KEY_F1, },
         { XK_F2,            KEY_F2, },
         { XK_F3,            KEY_F3, },
@@ -187,8 +207,9 @@ int ProcessKeyEvent (key_handler_t *ctx, xcb_generic_event_t *ev)
         {
             xcb_key_press_event_t *e = (xcb_key_press_event_t *)ev;
             xcb_keysym_t sym = xcb_key_press_lookup_keysym (ctx->syms, e, 0);
-            int vk = ConvertKeySym (sym);
+            uint_fast32_t vk = ConvertKeySym (sym);
 
+            msg_Dbg (ctx->obj, "key: 0x%08"PRIxFAST32, vk);
             if (vk == KEY_UNSET)
                 break;
             if (e->state & XCB_MOD_MASK_SHIFT)
