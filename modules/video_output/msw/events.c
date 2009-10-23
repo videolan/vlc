@@ -31,8 +31,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_playlist.h>
-#include <vlc_vout.h>
+#include <vlc_vout_display.h>
 #include <vlc_vout_window.h>
 
 #include <windows.h>
@@ -52,7 +51,7 @@
 #endif
 
 #include <vlc_keys.h>
-#include "vout.h"
+#include "common.h"
 
 #ifdef UNDER_CE
 #include <aygshell.h>
@@ -75,7 +74,7 @@
 
 struct event_thread_t
 {
-    vout_thread_t *p_vout;
+    vout_display_t *vd;
 
     /* */
     vlc_thread_t thread;
@@ -101,24 +100,20 @@ struct event_thread_t
     vout_window_cfg_t wnd_cfg;
 
     /* */
-    unsigned i_changes;
-
-    /* */
     vout_window_t *parent_window;
     HWND hparent;
     HWND hwnd;
     HWND hvideownd;
     HWND hfswnd;
+    video_format_t       source;
+    vout_display_place_t place;
+
+    bool has_moved;
 };
 
 static int  DirectXCreateWindow( event_thread_t * );
 static void DirectXCloseWindow ( event_thread_t * );
 static long FAR PASCAL DirectXEventProc( HWND, UINT, WPARAM, LPARAM );
-
-static void DirectXPopupMenu( event_thread_t *p_event, bool b_open )
-{
-    var_SetBool( p_event->p_vout->p_libvlc, "intf-popupmenu", b_open );
-}
 
 static int DirectXConvertKey( int i_key );
 
@@ -133,11 +128,9 @@ static int DirectXConvertKey( int i_key );
 static void *EventThread( void *p_this )
 {
     event_thread_t *p_event = (event_thread_t *)p_this;
-    vout_thread_t *p_vout = p_event->p_vout;
+    vout_display_t *vd = p_event->vd;
     MSG msg;
     POINT old_mouse_pos = {0,0}, mouse_pos;
-    vlc_value_t val;
-    unsigned int i_width, i_height, i_x, i_y;
     HMODULE hkernel32;
     int canc = vlc_savecancel ();
 
@@ -173,7 +166,7 @@ static void *EventThread( void *p_this )
             /* Prevent monitor from powering off */
             OurSetThreadExecutionState( ES_DISPLAY_REQUIRED | ES_CONTINUOUS );
         else
-            msg_Dbg( p_vout, "no support for SetThreadExecutionState()" );
+            msg_Dbg( vd, "no support for SetThreadExecutionState()" );
     }
 #endif
 
@@ -181,6 +174,9 @@ static void *EventThread( void *p_this )
     /* GetMessage will sleep if there's no message in the queue */
     for( ;; )
     {
+        vout_display_place_t place;
+        video_format_t       source;
+
         if( !GetMessage( &msg, 0, 0, 0 ) )
         {
             vlc_mutex_lock( &p_event->lock );
@@ -199,37 +195,30 @@ static void *EventThread( void *p_this )
         /* */
         switch( msg.message )
         {
-
         case WM_MOUSEMOVE:
             vlc_mutex_lock( &p_event->lock );
-            vout_PlacePicture( p_event->p_vout,
-                               p_event->wnd_cfg.width,
-                               p_event->wnd_cfg.height,
-                               &i_x, &i_y, &i_width, &i_height );
+            place  = p_event->place;
+            source = p_event->source;
             vlc_mutex_unlock( &p_event->lock );
 
-            if( msg.hwnd == p_event->hvideownd )
+            if( place.width > 0 && place.height > 0 )
             {
-                /* Child window */
-                i_x = i_y = 0;
+                if( msg.hwnd == p_event->hvideownd )
+                {
+                    /* Child window */
+                    place.x = 0;
+                    place.y = 0;
+                }
+                const int x = source.i_x_offset +
+                    (int64_t)(GET_X_LPARAM(msg.lParam) - place.x) * source.i_width  / place.width;
+                const int y = source.i_y_offset +
+                    (int64_t)(GET_Y_LPARAM(msg.lParam) - place.y) * source.i_height / place.height;
+                vout_display_SendEventMouseMoved(vd, x, y);
             }
-
-            if( i_width && i_height )
-            {
-                val.i_int = ( GET_X_LPARAM(msg.lParam) - i_x ) *
-                    p_event->p_vout->fmt_in.i_visible_width / i_width +
-                    p_event->p_vout->fmt_in.i_x_offset;
-                var_Set( p_event->p_vout, "mouse-x", val );
-                val.i_int = ( GET_Y_LPARAM(msg.lParam) - i_y ) *
-                    p_event->p_vout->fmt_in.i_visible_height / i_height +
-                    p_event->p_vout->fmt_in.i_y_offset;
-                var_Set( p_event->p_vout, "mouse-y", val );
-
-                var_SetBool( p_event->p_vout, "mouse-moved", true );
-            }
-
+            /* Fall through */
         case WM_NCMOUSEMOVE:
             GetCursorPos( &mouse_pos );
+            /* FIXME, why this >2 limits ? */
             if( (abs(mouse_pos.x - old_mouse_pos.x) > 2 ||
                 (abs(mouse_pos.y - old_mouse_pos.y)) > 2 ) )
             {
@@ -238,132 +227,114 @@ static void *EventThread( void *p_this )
 
                 if( p_event->b_cursor_hidden )
                 {
-                    p_event->b_cursor_hidden = 0;
+                    p_event->b_cursor_hidden = false;
                     ShowCursor( TRUE );
                 }
             }
             break;
 
         case WM_VLC_HIDE_MOUSE:
-            if( p_event->b_cursor_hidden ) break;
+            if( p_event->b_cursor_hidden )
+                break;
             p_event->b_cursor_hidden = true;
             GetCursorPos( &old_mouse_pos );
             ShowCursor( FALSE );
             break;
 
         case WM_VLC_SHOW_MOUSE:
-            if( !p_event->b_cursor_hidden ) break;
+            if( !p_event->b_cursor_hidden )
+                break;
             p_event->b_cursor_hidden = false;
             GetCursorPos( &old_mouse_pos );
             ShowCursor( TRUE );
             break;
 
         case WM_LBUTTONDOWN:
-            var_Get( p_event->p_vout, "mouse-button-down", &val );
-            val.i_int |= 1;
-            var_Set( p_event->p_vout, "mouse-button-down", val );
-            DirectXPopupMenu( p_event, false );
+            vout_display_SendEventMousePressed(vd, MOUSE_BUTTON_LEFT);
             break;
-
         case WM_LBUTTONUP:
-            var_Get( p_event->p_vout, "mouse-button-down", &val );
-            val.i_int &= ~1;
-            var_Set( p_event->p_vout, "mouse-button-down", val );
-
-            var_SetBool( p_event->p_vout, "mouse-clicked", true );
+            vout_display_SendEventMouseReleased(vd, MOUSE_BUTTON_LEFT);
             break;
-
         case WM_LBUTTONDBLCLK:
-            vlc_mutex_lock( &p_event->lock );
-            p_event->i_changes |= VOUT_FULLSCREEN_CHANGE;
-            vlc_mutex_unlock( &p_event->lock );
+            vout_display_SendEventMouseDoubleClick(vd);
             break;
 
         case WM_MBUTTONDOWN:
-            var_Get( p_event->p_vout, "mouse-button-down", &val );
-            val.i_int |= 2;
-            var_Set( p_event->p_vout, "mouse-button-down", val );
-            DirectXPopupMenu( p_event, false );
+            vout_display_SendEventMousePressed(vd, MOUSE_BUTTON_CENTER);
             break;
-
         case WM_MBUTTONUP:
-            var_Get( p_event->p_vout, "mouse-button-down", &val );
-            val.i_int &= ~2;
-            var_Set( p_event->p_vout, "mouse-button-down", val );
+            vout_display_SendEventMouseReleased(vd, MOUSE_BUTTON_CENTER);
             break;
 
         case WM_RBUTTONDOWN:
-            var_Get( p_event->p_vout, "mouse-button-down", &val );
-            val.i_int |= 4;
-            var_Set( p_event->p_vout, "mouse-button-down", val );
-            DirectXPopupMenu( p_event, false );
+            vout_display_SendEventMousePressed(vd, MOUSE_BUTTON_RIGHT);
             break;
-
         case WM_RBUTTONUP:
-            var_Get( p_event->p_vout, "mouse-button-down", &val );
-            val.i_int &= ~4;
-            var_Set( p_event->p_vout, "mouse-button-down", val );
-            DirectXPopupMenu( p_event, true );
+            vout_display_SendEventMouseReleased(vd, MOUSE_BUTTON_RIGHT);
             break;
 
         case WM_KEYDOWN:
         case WM_SYSKEYDOWN:
+        {
             /* The key events are first processed here and not translated
              * into WM_CHAR events because we need to know the status of the
              * modifier keys. */
-            val.i_int = DirectXConvertKey( msg.wParam );
-            if( !val.i_int )
+            int i_key = DirectXConvertKey( msg.wParam );
+            if( !i_key )
             {
                 /* This appears to be a "normal" (ascii) key */
-                val.i_int = tolower( MapVirtualKey( msg.wParam, 2 ) );
+                i_key = tolower( MapVirtualKey( msg.wParam, 2 ) );
             }
 
-            if( val.i_int )
+            if( i_key )
             {
                 if( GetKeyState(VK_CONTROL) & 0x8000 )
                 {
-                    val.i_int |= KEY_MODIFIER_CTRL;
+                    i_key |= KEY_MODIFIER_CTRL;
                 }
                 if( GetKeyState(VK_SHIFT) & 0x8000 )
                 {
-                    val.i_int |= KEY_MODIFIER_SHIFT;
+                    i_key |= KEY_MODIFIER_SHIFT;
                 }
                 if( GetKeyState(VK_MENU) & 0x8000 )
                 {
-                    val.i_int |= KEY_MODIFIER_ALT;
+                    i_key |= KEY_MODIFIER_ALT;
                 }
 
-                var_Set( p_vout->p_libvlc, "key-pressed", val );
+                vout_display_SendEventKey(vd, i_key);
             }
             break;
+        }
 
         case WM_MOUSEWHEEL:
+        {
+            int i_key;
             if( GET_WHEEL_DELTA_WPARAM( msg.wParam ) > 0 )
             {
-                val.i_int = KEY_MOUSEWHEELUP;
+                i_key = KEY_MOUSEWHEELUP;
             }
             else
             {
-                val.i_int = KEY_MOUSEWHEELDOWN;
+                i_key = KEY_MOUSEWHEELDOWN;
             }
-            if( val.i_int )
+            if( i_key )
             {
                 if( GetKeyState(VK_CONTROL) & 0x8000 )
                 {
-                    val.i_int |= KEY_MODIFIER_CTRL;
+                    i_key |= KEY_MODIFIER_CTRL;
                 }
                 if( GetKeyState(VK_SHIFT) & 0x8000 )
                 {
-                    val.i_int |= KEY_MODIFIER_SHIFT;
+                    i_key |= KEY_MODIFIER_SHIFT;
                 }
                 if( GetKeyState(VK_MENU) & 0x8000 )
                 {
-                    val.i_int |= KEY_MODIFIER_ALT;
+                    i_key |= KEY_MODIFIER_ALT;
                 }
-
-                var_Set( p_vout->p_libvlc, "key-pressed", val );
+                vout_display_SendEventKey(vd, i_key);
             }
             break;
+        }
 
         case WM_VLC_CHANGE_TEXT:
         {
@@ -405,11 +376,11 @@ static void *EventThread( void *p_this )
     /* Check for WM_QUIT if we created the window */
     if( !p_event->hparent && msg.message == WM_QUIT )
     {
-        msg_Warn( p_vout, "WM_QUIT... should not happen!!" );
+        msg_Warn( vd, "WM_QUIT... should not happen!!" );
         p_event->hwnd = NULL; /* Window already destroyed */
     }
 
-    msg_Dbg( p_vout, "DirectXEventThread terminating" );
+    msg_Dbg( vd, "DirectXEventThread terminating" );
 
     DirectXCloseWindow( p_event );
     vlc_restorecancel(canc);
@@ -428,7 +399,7 @@ static void *EventThread( void *p_this )
  *****************************************************************************/
 static int DirectXCreateWindow( event_thread_t *p_event )
 {
-    vout_thread_t *p_vout = p_event->p_vout;
+    vout_display_t *vd = p_event->vd;
     HINSTANCE  hInstance;
     HMENU      hMenu;
     RECT       rect_window;
@@ -437,7 +408,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     char       vlc_path[MAX_PATH+1];
     int        i_style, i_stylex;
 
-    msg_Dbg( p_vout, "DirectXCreateWindow" );
+    msg_Dbg( vd, "DirectXCreateWindow" );
 
     /* Get this module's instance */
     hInstance = GetModuleHandle(NULL);
@@ -447,7 +418,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     {
     #endif
         /* If an external window was specified, we'll draw in it. */
-        p_event->parent_window = vout_window_New( VLC_OBJECT(p_vout), NULL, &p_event->wnd_cfg );
+        p_event->parent_window = vout_display_NewWindow(vd, &p_event->wnd_cfg );
         if( p_event->parent_window )
             p_event->hparent = p_event->parent_window->handle.hwnd;
         else
@@ -461,7 +432,8 @@ static int DirectXCreateWindow( event_thread_t *p_event )
         if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SHELLDLL_DefView"), NULL );
         if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SysListView32"), NULL );
         if( !hwnd )
-            msg_Err( p_vout, "Couldn't find desktop icon window. Desktop mode can't be established." );
+            msg_Err( vd, "Couldn't find desktop icon window. Desktop mode can't be established." );
+        p_event->parent_window = NULL;
         p_event->hparent = hwnd;
     }
     #endif
@@ -498,7 +470,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
          * then fine, otherwise return with an error. */
         if( !GetClassInfo( hInstance, _T("VLC DirectX"), &wndclass ) )
         {
-            msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
+            msg_Err( vd, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
             return VLC_EGENERIC;
         }
     }
@@ -514,7 +486,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
          * then fine, otherwise return with an error. */
         if( !GetClassInfo( hInstance, _T("VLC DirectX video"), &wndclass ) )
         {
-            msg_Err( p_vout, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
+            msg_Err( vd, "DirectXCreateWindow RegisterClass FAILED (err=%lu)", GetLastError() );
             return VLC_EGENERIC;
         }
     }
@@ -528,7 +500,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     rect_window.right  = rect_window.left + p_event->wnd_cfg.width;
     rect_window.bottom = rect_window.top  + p_event->wnd_cfg.height;
 
-    if( var_GetBool( p_vout, "video-deco" ) )
+    if( var_GetBool( vd, "video-deco" ) )
     {
         /* Open with window decoration */
         AdjustWindowRect( &rect_window, WS_OVERLAPPEDWINDOW|WS_SIZEBOX, 0 );
@@ -567,11 +539,11 @@ static int DirectXCreateWindow( event_thread_t *p_event )
                     p_event->hparent,                       /* parent window */
                     NULL,                          /* no menu in this window */
                     hInstance,            /* handle of this program instance */
-                    (LPVOID)p_event );           /* send p_vout to WM_CREATE */
+                    (LPVOID)p_event );           /* send vd to WM_CREATE */
 
     if( !p_event->hwnd )
     {
-        msg_Warn( p_vout, "DirectXCreateWindow create window FAILED (err=%lu)", GetLastError() );
+        msg_Warn( vd, "DirectXCreateWindow create window FAILED (err=%lu)", GetLastError() );
         return VLC_EGENERIC;
     }
 
@@ -610,20 +582,21 @@ static int DirectXCreateWindow( event_thread_t *p_event )
     /* Create video sub-window. This sub window will always exactly match
      * the size of the video, which allows us to use crazy overlay colorkeys
      * without having them shown outside of the video area. */
+    /* FIXME vd->source.i_width/i_height seems wrong */
     p_event->hvideownd =
     CreateWindow( _T("VLC DirectX video"), _T(""),   /* window class */
         WS_CHILD,                   /* window style, not visible initially */
         0, 0,
-        p_vout->render.i_width,          /* default width */
-        p_vout->render.i_height,        /* default height */
-        p_event->hwnd,                   /* parent window */
+        vd->source.i_width,          /* default width */
+        vd->source.i_height,        /* default height */
+        p_event->hwnd,               /* parent window */
         NULL, hInstance,
-        (LPVOID)p_event );    /* send p_vout to WM_CREATE */
+        (LPVOID)p_event );    /* send vd to WM_CREATE */
 
     if( !p_event->hvideownd )
-        msg_Warn( p_vout, "can't create video sub-window" );
+        msg_Warn( vd, "can't create video sub-window" );
     else
-        msg_Dbg( p_vout, "created video sub-window" );
+        msg_Dbg( vd, "created video sub-window" );
 
     /* Now display the window */
     ShowWindow( p_event->hwnd, SW_SHOW );
@@ -638,16 +611,17 @@ static int DirectXCreateWindow( event_thread_t *p_event )
  *****************************************************************************/
 static void DirectXCloseWindow( event_thread_t *p_event )
 {
-    vout_thread_t *p_vout = p_event->p_vout;
-    msg_Dbg( p_vout, "DirectXCloseWindow" );
+    vout_display_t *vd = p_event->vd;
+    msg_Dbg( vd, "DirectXCloseWindow" );
 
     DestroyWindow( p_event->hwnd );
-    if( p_event->hfswnd ) DestroyWindow( p_event->hfswnd );
+    if( p_event->hfswnd )
+        DestroyWindow( p_event->hfswnd );
 
     #ifdef MODULE_NAME_IS_direct3d
     if( !p_event->use_desktop )
     #endif
-        vout_window_Delete( p_event->parent_window );
+        vout_display_DeleteWindow( vd, p_event->parent_window );
     p_event->hwnd = NULL;
 
     /* We don't unregister the Window Class because it could lead to race
@@ -673,7 +647,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
 
     if( message == WM_CREATE )
     {
-        /* Store p_vout for future use */
+        /* Store vd for future use */
         p_event = (event_thread_t *)((CREATESTRUCT *)lParam)->lpCreateParams;
         SetWindowLongPtr( hwnd, GWLP_USERDATA, (LONG_PTR)p_event );
         return TRUE;
@@ -689,14 +663,14 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
             return DefWindowProc(hwnd, message, wParam, lParam);
         }
     }
-    vout_thread_t *p_vout = p_event->p_vout;
+    vout_display_t *vd = p_event->vd;
 
 #ifndef UNDER_CE
     /* Catch the screensaver and the monitor turn-off */
     if( message == WM_SYSCOMMAND &&
         ( (wParam & 0xFFF0) == SC_SCREENSAVE || (wParam & 0xFFF0) == SC_MONITORPOWER ) )
     {
-        //if( p_vout ) msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND screensaver" );
+        //if( vd ) msg_Dbg( vd, "WinProc WM_SYSCOMMAND screensaver" );
         return 0; /* this stops them from happening */
     }
 #endif
@@ -751,24 +725,19 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     {
 
     case WM_WINDOWPOSCHANGED:
-        UpdateRects( p_vout, true );
+        vlc_mutex_lock( &p_event->lock );
+        p_event->has_moved = true;
+        vlc_mutex_unlock( &p_event->lock );
         return 0;
 
     /* the user wants to close the window */
     case WM_CLOSE:
-    {
-        playlist_t * p_playlist = pl_Hold( p_vout );
-        if( p_playlist )
-        {
-            playlist_Stop( p_playlist );
-            pl_Release( p_vout );
-        }
+        vout_display_SendEventClose(vd);
         return 0;
-    }
 
     /* the window has been closed so shut down everything now */
     case WM_DESTROY:
-        msg_Dbg( p_vout, "WinProc WM_DESTROY" );
+        msg_Dbg( vd, "WinProc WM_DESTROY" );
         /* just destroy the window */
         PostQuitMessage( 0 );
         return 0;
@@ -776,14 +745,15 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
     case WM_SYSCOMMAND:
         switch (wParam)
         {
-            case IDM_TOGGLE_ON_TOP:            /* toggle the "on top" status */
-            {
-                msg_Dbg( p_vout, "WinProc WM_SYSCOMMAND: IDM_TOGGLE_ON_TOP");
-
-                /* Change the current value */
-                var_ToggleBool( p_vout, "video-on-top" );
-                return 0;
-            }
+        case IDM_TOGGLE_ON_TOP:            /* toggle the "on top" status */
+        {
+            msg_Dbg(vd, "WinProc WM_SYSCOMMAND: IDM_TOGGLE_ON_TOP");
+            HMENU hMenu = GetSystemMenu(vd->sys->hwnd, FALSE);
+            vout_display_SendEventOnTop(vd, (GetMenuState(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND) & MF_CHECKED) == 0);
+            return 0;
+        }
+        default:
+            break;
         }
         break;
 
@@ -816,13 +786,11 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         GXResume();
 #endif
 #ifdef UNDER_CE
+        /* FIXME vd->cfg is not lock[ed/able] */
+#warning "FIXME: race condition"
         if( p_event->hparent &&
-            hwnd != p_event->hfswnd && p_vout->b_fullscreen )
-        {
-            vlc_mutex_lock( &p_event->lock );
-            p_event->i_changes |= VOUT_FULLSCREEN_CHANGE;
-            vlc_mutex_unlock( &p_event->lock );
-        }
+            hwnd != p_event->hfswnd && vd->cfg->is_fullscreen )
+            vout_display_SendEventFullscreen(vd, false);
 
         if( hwnd == p_event->hfswnd )
         {
@@ -839,7 +807,7 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         return 0;
 
     default:
-        //msg_Dbg( p_vout, "WinProc WM Default %i", message );
+        //msg_Dbg( vd, "WinProc WM Default %i", message );
         break;
     }
 
@@ -915,10 +883,7 @@ static int DirectXConvertKey( int i_key )
 
 void EventThreadMouseAutoHide( event_thread_t *p_event )
 {
-    vout_thread_t *p_vout = p_event->p_vout;
-
-    if( p_vout->b_fullscreen &&
-        !p_event->b_cursor_hidden &&
+    if (!p_event->b_cursor_hidden &&
         (mdate() - p_event->i_lastmoved) > p_event->i_mouse_hide_timeout )
     {
         /* Hide the cursor only if it is inside our window */
@@ -942,7 +907,7 @@ void EventThreadMouseShow( event_thread_t *p_event )
 }
 void EventThreadUpdateTitle( event_thread_t *p_event, const char *psz_fallback )
 {
-    char *psz_title = var_GetNonEmptyString( p_event->p_vout, "video-title" );
+    char *psz_title = var_GetNonEmptyString( p_event->vd, "video-title" );
     if( !psz_title )
         psz_title = strdup( psz_fallback );
     if( !psz_title )
@@ -954,15 +919,6 @@ void EventThreadUpdateTitle( event_thread_t *p_event, const char *psz_fallback )
     vlc_mutex_unlock( &p_event->lock );
 
     PostMessage( p_event->hwnd, WM_VLC_CHANGE_TEXT, 0, 0 );
-}
-unsigned EventThreadRetreiveChanges( event_thread_t *p_event )
-{
-    vlc_mutex_lock( &p_event->lock );
-    unsigned i_changes = p_event->i_changes;
-    p_event->i_changes = 0;
-    vlc_mutex_unlock( &p_event->lock );
-
-    return i_changes;
 }
 int EventThreadGetWindowStyle( event_thread_t *p_event )
 {
@@ -986,14 +942,33 @@ void EventThreadUpdateWindowPosition( event_thread_t *p_event, bool *pb_changed,
     vlc_mutex_unlock( &p_event->lock );
 }
 
+void EventThreadUpdateSourceAndPlace( event_thread_t *p_event,
+                                      const video_format_t *p_source,
+                                      const vout_display_place_t *p_place )
+{
+    vlc_mutex_lock( &p_event->lock );
+    p_event->source = *p_source;
+    p_event->place  = *p_place;
+    vlc_mutex_unlock( &p_event->lock );
+}
+
 void EventThreadUseOverlay( event_thread_t *p_event, bool b_used )
 {
     vlc_mutex_lock( &p_event->lock );
     p_event->use_overlay = b_used;
     vlc_mutex_unlock( &p_event->lock );
 }
+bool EventThreadGetAndResetHasMoved( event_thread_t *p_event )
+{
+    vlc_mutex_lock( &p_event->lock );
+    const bool has_moved = p_event->has_moved;
+    p_event->has_moved = false;
+    vlc_mutex_unlock( &p_event->lock );
 
-event_thread_t *EventThreadCreate( vout_thread_t *p_vout, const vout_window_cfg_t *p_wnd_cfg )
+    return has_moved;
+}
+
+event_thread_t *EventThreadCreate( vout_display_t *vd)
 {
      /* Create the Vout EventThread, this thread is created by us to isolate
      * the Win32 PeekMessage function calls. We want to do this because
@@ -1002,22 +977,23 @@ event_thread_t *EventThreadCreate( vout_thread_t *p_vout, const vout_window_cfg_
      * Vout EventThread will take care of the creation of the video
      * window (because PeekMessage has to be called from the same thread which
      * created the window). */
-    msg_Dbg( p_vout, "creating Vout EventThread" );
+    msg_Dbg( vd, "creating Vout EventThread" );
     event_thread_t *p_event = malloc( sizeof(*p_event) );
     if( !p_event )
         return NULL;
 
-    p_event->p_vout = p_vout;
+    p_event->vd = vd;
     vlc_mutex_init( &p_event->lock );
     vlc_cond_init( &p_event->wait );
 
     p_event->b_cursor_hidden      = false;
     p_event->i_lastmoved          = mdate();
     p_event->i_mouse_hide_timeout =
-        var_GetInteger(p_vout, "mouse-hide-timeout") * 1000;
+        var_GetInteger(vd, "mouse-hide-timeout") * 1000;
     p_event->psz_title = NULL;
-    p_event->wnd_cfg = *p_wnd_cfg;
-   
+    p_event->source = vd->source;
+    vout_display_PlacePicture(&p_event->place, &vd->source, vd->cfg, true);
+
     return p_event;
 }
 
@@ -1033,8 +1009,9 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
 {
     p_event->use_desktop = p_cfg->use_desktop;
     p_event->use_overlay = p_cfg->use_overlay;
+    p_event->wnd_cfg     = p_cfg->win;
 
-    p_event->i_changes = 0;
+    p_event->has_moved = false;
 
     p_event->b_ready = false;
     p_event->b_done  = false;
@@ -1043,7 +1020,7 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
     if( vlc_clone( &p_event->thread, EventThread, p_event,
                    VLC_THREAD_PRIORITY_LOW ) )
     {
-        msg_Err( p_event->p_vout, "cannot create Vout EventThread" );
+        msg_Err( p_event->vd, "cannot create Vout EventThread" );
         return VLC_EGENERIC;
     }
 
@@ -1059,12 +1036,10 @@ int EventThreadStart( event_thread_t *p_event, event_hwnd_t *p_hwnd, const event
         p_event->b_ready = false;
         return VLC_EGENERIC;
     }
-    msg_Dbg( p_event->p_vout, "Vout EventThread running" );
+    msg_Dbg( p_event->vd, "Vout EventThread running" );
 
-    if( !p_event->use_desktop )
-        p_hwnd->parent_window = p_event->parent_window;
-    else
-        p_hwnd->parent_window = NULL;
+    /* */
+    p_hwnd->parent_window = p_event->parent_window;
     p_hwnd->hparent       = p_event->hparent;
     p_hwnd->hwnd          = p_event->hwnd;
     p_hwnd->hvideownd     = p_event->hvideownd;
