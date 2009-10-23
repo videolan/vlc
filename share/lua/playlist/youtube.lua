@@ -1,7 +1,7 @@
 --[[
  $Id$
 
- Copyright © 2007 the VideoLAN team
+ Copyright © 2007-2009 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -74,7 +74,8 @@ function parse()
             end
             -- OLD: var swfArgs = {hl:'en',BASE_YT_URL:'http://youtube.com/',video_id:'XPJ7d8dq0t8',l:'292',t:'OEgsToPDskLFdOYrrlDm3FQPoQBYaCP1',sk:'0gnr-AE6QZJEZmCMd3lq_AC'};
             -- NEW: var swfArgs = { "BASE_YT_URL": "http://youtube.com", "video_id": "OHVvVmUNBFc", "l": 88, "sk": "WswKuJzDBsdD6oG3IakCXgC", "t": "OEgsToPDskK3zO44y0QN8Fr5ZSAZwCQp", "plid": "AARGnwWMrmGkbpOxAAAA4AT4IAA", "tk": "mEL4E7PqHeaZp5OG19NQThHt9mXJU4PbRTOw6lz9osHi4Hixp7RE1w=="};
-            if string.match( line, "swfArgs" ) and string.match( line, "video_id" ) then
+            -- NEWER: 'SWF_ARGS': { [a lot of stuff...], "video_id": "OHVvVmUNBFc", "sk": "WswKuJzDBsdD6oG3IakCXgC", "t": "OEgsToPDskK3zO44y0QN8Fr5ZSAZwCQp", "plid": "AARGnwWMrmGkbpOxAAAA4AT4IAA"};
+            if ( string.match( line, "SWF_ARGS" ) or string.match( line, "swfArgs" ) ) and string.match( line, "video_id" ) then
                 if string.match( line, "BASE_YT_URL" ) then
                     _,_,base_yt_url = string.find( line, "\"BASE_YT_URL\": \"(.-)\"" )
                 end
