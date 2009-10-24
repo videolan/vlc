@@ -119,7 +119,8 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
                     free( psz_readme );
                 }
                 /* Remove the old configuration file so that --reset-config
-                 * can work properly. */
+                 * can work properly. Fortunately, Linux allows removing
+                 * open files - with most filesystems. */
                 unlink( psz_old );
             }
             free( psz_old );
