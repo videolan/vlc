@@ -63,12 +63,9 @@ struct aout_sys_t
     snd_output_t      * p_snd_stderr;
 #endif
 
-    bool b_playing;  /* playing status */
-    mtime_t start_date;
-
+    mtime_t      start_date;
     vlc_thread_t thread;
-    vlc_mutex_t lock;
-    vlc_cond_t  wait ;
+    vlc_sem_t    wait;
 };
 
 #define A52_FRAME_NB 1536
@@ -314,10 +311,6 @@ static int Open( vlc_object_t *p_this )
     p_aout->output.p_sys = p_sys = malloc( sizeof( aout_sys_t ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
-    p_sys->b_playing = false;
-    p_sys->start_date = 0;
-    vlc_cond_init( &p_sys->wait );
-    vlc_mutex_init( &p_sys->lock );
 
     /* Get device name */
     if( (psz_device = config_GetPsz( p_aout, "alsa-audio-device" )) == NULL )
@@ -661,11 +654,15 @@ static int Open( vlc_object_t *p_this )
     snd_output_printf( p_sys->p_snd_stderr, "\n" );
 #endif
 
+    p_sys->start_date = 0;
+    vlc_sem_init( &p_sys->wait, 0 );
+
     /* Create ALSA thread and wait for its readiness. */
     if( vlc_clone( &p_sys->thread, ALSAThread, p_aout,
                    VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create ALSA thread (%m)" );
+        vlc_sem_destroy( &p_sys->wait );
         goto error;
     }
 
@@ -680,24 +677,24 @@ error:
     return VLC_EGENERIC;
 }
 
+static void PlayIgnore( aout_instance_t *p_aout )
+{   /* Already playing - nothing to do */
+    (void) p_aout;
+}
+
 /*****************************************************************************
- * Play: nothing to do
+ * Play: start playback
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
-    if( !p_aout->output.p_sys->b_playing )
-    {
-        p_aout->output.p_sys->b_playing = true;
+    p_aout->output.pf_play = PlayIgnore;
 
-        /* get the playing date of the first aout buffer */
-        vlc_mutex_lock( &p_aout->output.p_sys->lock );
-        p_aout->output.p_sys->start_date =
-            aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
+    /* get the playing date of the first aout buffer */
+    p_aout->output.p_sys->start_date =
+        aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
 
-        /* wake up the audio output thread */
-        vlc_cond_signal( &p_aout->output.p_sys->wait );
-        vlc_mutex_unlock( &p_aout->output.p_sys->lock );
-    }
+    /* wake up the audio output thread */
+    sem_post( &p_aout->output.p_sys->wait );
 }
 
 /*****************************************************************************
@@ -712,11 +709,7 @@ static void Close( vlc_object_t *p_this )
     /* Make sure that the thread will stop once it is waken up */
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
-
-    /* make sure the audio output thread is waken up */
-    vlc_mutex_lock( &p_aout->output.p_sys->lock );
-    vlc_cond_signal( &p_aout->output.p_sys->wait );
-    vlc_mutex_unlock( &p_aout->output.p_sys->lock );
+    vlc_sem_destroy( &p_sys->wait );
 
     /* */
     i_snd_rc = snd_pcm_close( p_sys->p_snd_pcm );
@@ -748,12 +741,7 @@ static void* ALSAThread( void *data )
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
 
     /* Wait for the exact time to start playing (avoids resampling) */
-    vlc_mutex_lock( &p_sys->lock );
-    mutex_cleanup_push( &p_sys->lock );
-    while( !p_sys->start_date )
-        vlc_cond_wait( &p_sys->wait, &p_sys->lock );
-    vlc_cleanup_run();
-
+    vlc_sem_wait( &p_sys->wait );
     mwait( p_sys->start_date - AOUT_PTS_TOLERANCE / 4 );
 
     vlc_cleanup_push( pcm_drop, p_sys->p_snd_pcm );
