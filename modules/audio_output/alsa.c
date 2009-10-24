@@ -820,25 +820,26 @@ static void ALSAFill( aout_instance_t * p_aout )
         if( delay == 0 ) /* workaround buggy alsa drivers */
             if( snd_pcm_delay( p_sys->p_snd_pcm, &delay ) < 0 )
                 delay = 0; /* FIXME: use a positive minimal delay */
-        int i_bytes = snd_pcm_frames_to_bytes( p_sys->p_snd_pcm, delay );
-        next_date = mdate() + ( (mtime_t)i_bytes * 1000000
+
+        size_t i_bytes = snd_pcm_frames_to_bytes( p_sys->p_snd_pcm, delay );
+        mtime_t delay_us = CLOCK_FREQ * i_bytes
                 / p_aout->output.output.i_bytes_per_frame
                 / p_aout->output.output.i_rate
-                * p_aout->output.output.i_frame_length );
+                * p_aout->output.output.i_frame_length;
 
 #ifdef ALSA_DEBUG
         snd_pcm_state_t state = snd_pcm_status_get_state( p_status );
         if( state != SND_PCM_STATE_RUNNING )
             msg_Err( p_aout, "pcm status (%d) != RUNNING", state );
 
-        msg_Dbg( p_aout, "Delay is %ld frames (%d bytes)", delay, i_bytes );
+        msg_Dbg( p_aout, "Delay is %ld frames (%zu bytes)", delay, i_bytes );
 
         msg_Dbg( p_aout, "Bytes per frame: %d", p_aout->output.output.i_bytes_per_frame );
         msg_Dbg( p_aout, "Rate: %d", p_aout->output.output.i_rate );
         msg_Dbg( p_aout, "Frame length: %d", p_aout->output.output.i_frame_length );
-
-        msg_Dbg( p_aout, "Next date is in %d microseconds", (int)(next_date - mdate()) );
+        msg_Dbg( p_aout, "Next date: in %"PRId64" microseconds", delay_us );
 #endif
+        next_date = mdate() + delay_us;
     }
 
     p_buffer = aout_OutputNextBuffer( p_aout, next_date,
