@@ -68,8 +68,6 @@ struct aout_sys_t
 
     vlc_mutex_t lock;
     vlc_cond_t  wait ;
-
-    snd_pcm_status_t *p_status;
 };
 
 #define A52_FRAME_NB 1536
@@ -745,7 +743,6 @@ static void* ALSAThread( vlc_object_t* p_this )
     aout_instance_t * p_aout = (aout_instance_t*)p_this;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     int canc = vlc_savecancel ();
-    p_sys->p_status = (snd_pcm_status_t *)malloc(snd_pcm_status_sizeof());
 
     /* Wait for the exact time to start playing (avoids resampling) */
     vlc_mutex_lock( &p_sys->lock );
@@ -765,7 +762,6 @@ static void* ALSAThread( vlc_object_t* p_this )
 
 cleanup:
     snd_pcm_drop( p_sys->p_snd_pcm );
-    free( p_aout->output.p_sys->p_status );
     vlc_restorecancel (canc);
     return NULL;
 }
@@ -777,13 +773,14 @@ static void ALSAFill( aout_instance_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
     aout_buffer_t * p_buffer;
-    snd_pcm_status_t * p_status = p_sys->p_status;
+    snd_pcm_status_t * p_status;
     int i_snd_rc;
     mtime_t next_date;
 
     /* Fill in the buffer until space or audio output buffer shortage */
 
     /* Get the status */
+    snd_pcm_status_alloca(&p_status);
     i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
     if( i_snd_rc < 0 )
     {
