@@ -1426,8 +1426,13 @@ libcddb-$(CDDB_VERSION).tar.bz2:
 
 libcddb: libcddb-$(CDDB_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
+	(cd $@; patch -p0 < ../Patches/libcddb-cross.patch && autoreconf -fisv)
 
+ifdef HAVE_WIN32
+.cddb: libcddb .regex
+else
 .cddb: libcddb
+endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="$(LDFLAGS) -liconv" && make && make install)
 	touch $@
 
@@ -2597,6 +2602,25 @@ peflags/peflags.c:
 
 CLEAN_PKG += peflags
 CLEAN_FILES += .peflags
+
+# ************
+# Regex
+# ************
+
+regex-$(REGEX_VERSION).tar.gz:
+	$(WGET) $(REGEX_URL)
+
+regex: regex-$(REGEX_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.regex: regex
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make subirs= && $(AR) ru libregex.a regex.o && $(RANLIB) libregex.a && cp -v regex.h $(PREFIX)/include && cp -v libregex.a $(PREFIX)/lib )
+
+CLEAN_FILE += .regex
+CLEAN_PKG += regex
+DISTCLEAN_PKG += regex-$(REGEX_VERSION).tar.gz
+
+
 # ***************************************************************************
 # Some cleaning
 # ***************************************************************************

@@ -1,0 +1,29 @@
+--- Makefile.am.orig	2009-10-24 17:24:43.000000000 +0200
++++ Makefile.am	2009-10-24 17:26:58.000000000 +0200
+@@ -1,5 +1,5 @@
+ 
+-SUBDIRS	= include lib examples tests
++SUBDIRS	= include lib 
+ EXTRA_DIST = doc/doxygen.conf misc/$(PACKAGE).ebuild
+ 
+ dist-hook:
+--- configure.ac.orig	2009-10-25 01:51:35.000000000 +0200
++++ configure.ac	2009-10-25 01:51:44.000000000 +0200
+@@ -107,8 +107,6 @@
+ AC_TYPE_SIZE_T
+ 
+ dnl Checks for library functions.
+-AC_FUNC_MALLOC
+-AC_FUNC_REALLOC
+ AC_FUNC_STAT
+ AC_FUNC_VPRINTF
+ AC_FUNC_SELECT_ARGTYPES
+--- libcddb.pc.in.orig	2009-10-25 21:36:57.000000000 +0100
++++ libcddb.pc.in	2009-10-25 21:36:11.000000000 +0100
+@@ -6,5 +6,5 @@
+ Name: libcddb
+ Description: CDDB server access library
+ Version: @VERSION@
+-Libs: -L${libdir} -lcddb @LIBICONV@
++Libs: -L${libdir} -lcddb ${libdir}/libregex.a @LIBICONV@
+ Cflags: -I${includedir}
