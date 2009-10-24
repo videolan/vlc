@@ -66,6 +66,7 @@ struct aout_sys_t
     bool b_playing;  /* playing status */
     mtime_t start_date;
 
+    vlc_thread_t thread;
     vlc_mutex_t lock;
     vlc_cond_t  wait ;
 };
@@ -92,7 +93,7 @@ struct aout_sys_t
 static int   Open         ( vlc_object_t * );
 static void  Close        ( vlc_object_t * );
 static void  Play         ( aout_instance_t * );
-static void* ALSAThread   ( vlc_object_t * );
+static void* ALSAThread   ( void * );
 static void  ALSAFill     ( aout_instance_t * );
 static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
                                 vlc_value_t newval, vlc_value_t oldval, void *p_unused );
@@ -661,8 +662,8 @@ static int Open( vlc_object_t *p_this )
 #endif
 
     /* Create ALSA thread and wait for its readiness. */
-    if( vlc_thread_create( p_aout, "aout", ALSAThread,
-                           VLC_THREAD_PRIORITY_OUTPUT ) )
+    if( vlc_clone( &p_sys->thread, ALSAThread, p_aout,
+                   VLC_THREAD_PRIORITY_OUTPUT ) )
     {
         msg_Err( p_aout, "cannot create ALSA thread (%m)" );
         goto error;
@@ -709,7 +710,8 @@ static void Close( vlc_object_t *p_this )
     int i_snd_rc;
 
     /* Make sure that the thread will stop once it is waken up */
-    vlc_object_kill( p_aout );
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
 
     /* make sure the audio output thread is waken up */
     vlc_mutex_lock( &p_aout->output.p_sys->lock );
@@ -717,9 +719,6 @@ static void Close( vlc_object_t *p_this )
     vlc_mutex_unlock( &p_aout->output.p_sys->lock );
 
     /* */
-    vlc_thread_join( p_aout );
-    p_aout->b_die = false;
-
     i_snd_rc = snd_pcm_close( p_sys->p_snd_pcm );
 
     if( i_snd_rc > 0 )
@@ -735,35 +734,34 @@ static void Close( vlc_object_t *p_this )
     free( p_sys );
 }
 
+static void pcm_drop(void *pcm)
+{
+    snd_pcm_drop(pcm);
+}
+
 /*****************************************************************************
  * ALSAThread: asynchronous thread used to DMA the data to the device
  *****************************************************************************/
-static void* ALSAThread( vlc_object_t* p_this )
+static void* ALSAThread( void *data )
 {
-    aout_instance_t * p_aout = (aout_instance_t*)p_this;
+    aout_instance_t * p_aout = data;
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
-    int canc = vlc_savecancel ();
 
     /* Wait for the exact time to start playing (avoids resampling) */
     vlc_mutex_lock( &p_sys->lock );
-    while( !p_sys->start_date && vlc_object_alive (p_aout) )
+    mutex_cleanup_push( &p_sys->lock );
+    while( !p_sys->start_date )
         vlc_cond_wait( &p_sys->wait, &p_sys->lock );
-    vlc_mutex_unlock( &p_sys->lock );
-
-    if( !vlc_object_alive (p_aout) )
-        goto cleanup;
+    vlc_cleanup_run();
 
     mwait( p_sys->start_date - AOUT_PTS_TOLERANCE / 4 );
 
-    while ( vlc_object_alive (p_aout) )
-    {
+    vlc_cleanup_push( pcm_drop, p_sys->p_snd_pcm );
+    for(;;)
         ALSAFill( p_aout );
-    }
 
-cleanup:
-    snd_pcm_drop( p_sys->p_snd_pcm );
-    vlc_restorecancel (canc);
-    return NULL;
+    assert(0);
+    vlc_cleanup_pop();
 }
 
 /*****************************************************************************
@@ -772,16 +770,17 @@ cleanup:
 static void ALSAFill( aout_instance_t * p_aout )
 {
     struct aout_sys_t * p_sys = p_aout->output.p_sys;
-    aout_buffer_t * p_buffer;
+    snd_pcm_t *p_pcm = p_sys->p_snd_pcm;
     snd_pcm_status_t * p_status;
     int i_snd_rc;
     mtime_t next_date;
 
+    int canc = vlc_savecancel();
     /* Fill in the buffer until space or audio output buffer shortage */
 
     /* Get the status */
     snd_pcm_status_alloca(&p_status);
-    i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
+    i_snd_rc = snd_pcm_status( p_pcm, p_status );
     if( i_snd_rc < 0 )
     {
         msg_Err( p_aout, "cannot get device status" );
@@ -792,8 +791,7 @@ static void ALSAFill( aout_instance_t * p_aout )
     if( snd_pcm_status_get_state( p_status ) == SND_PCM_STATE_XRUN )
     {
         /* Prepare the device */
-        i_snd_rc = snd_pcm_prepare( p_sys->p_snd_pcm );
-
+        i_snd_rc = snd_pcm_prepare( p_pcm );
         if( i_snd_rc )
         {
             msg_Err( p_aout, "cannot recover from buffer underrun" );
@@ -803,7 +801,7 @@ static void ALSAFill( aout_instance_t * p_aout )
         msg_Dbg( p_aout, "recovered from buffer underrun" );
 
         /* Get the new status */
-        i_snd_rc = snd_pcm_status( p_sys->p_snd_pcm, p_status );
+        i_snd_rc = snd_pcm_status( p_pcm, p_status );
         if( i_snd_rc < 0 )
         {
             msg_Err( p_aout, "cannot get device status after recovery" );
@@ -818,10 +816,10 @@ static void ALSAFill( aout_instance_t * p_aout )
         /* Here the device should be in RUNNING state, p_status is valid. */
         snd_pcm_sframes_t delay = snd_pcm_status_get_delay( p_status );
         if( delay == 0 ) /* workaround buggy alsa drivers */
-            if( snd_pcm_delay( p_sys->p_snd_pcm, &delay ) < 0 )
+            if( snd_pcm_delay( p_pcm, &delay ) < 0 )
                 delay = 0; /* FIXME: use a positive minimal delay */
 
-        size_t i_bytes = snd_pcm_frames_to_bytes( p_sys->p_snd_pcm, delay );
+        size_t i_bytes = snd_pcm_frames_to_bytes( p_pcm, delay );
         mtime_t delay_us = CLOCK_FREQ * i_bytes
                 / p_aout->output.output.i_bytes_per_frame
                 / p_aout->output.output.i_rate
@@ -842,7 +840,7 @@ static void ALSAFill( aout_instance_t * p_aout )
         next_date = mdate() + delay_us;
     }
 
-    p_buffer = aout_OutputNextBuffer( p_aout, next_date,
+    block_t *p_buffer = aout_OutputNextBuffer( p_aout, next_date,
            (p_aout->output.output.i_format ==  VLC_CODEC_SPDIFL) );
 
     /* Audio output buffer shortage -> stop the fill process and wait */
@@ -851,37 +849,58 @@ static void ALSAFill( aout_instance_t * p_aout )
 
     for (;;)
     {
-        i_snd_rc = snd_pcm_writei( p_sys->p_snd_pcm, p_buffer->p_buffer,
-                                   p_buffer->i_nb_samples );
-        if( i_snd_rc != -ESTRPIPE )
-            break;
+        int n = snd_pcm_poll_descriptors_count(p_pcm);
+        struct pollfd ufd[n];
+        unsigned short revents;
+
+        snd_pcm_poll_descriptors(p_pcm, ufd, n);
+        do
+        {
+            vlc_restorecancel(canc);
+            poll(ufd, n, -1);
+            canc = vlc_savecancel();
+            snd_pcm_poll_descriptors_revents(p_pcm, ufd, n, &revents);
+        }
+        while(!revents);
+
+        if(revents & POLLOUT)
+        {
+            i_snd_rc = snd_pcm_writei( p_pcm, p_buffer->p_buffer,
+                                       p_buffer->i_nb_samples );
+            if( i_snd_rc != -ESTRPIPE )
+                break;
+        }
 
         /* a suspend event occurred
          * (stream is suspended and waiting for an application recovery) */
         msg_Dbg( p_aout, "entering in suspend mode, trying to resume..." );
 
-        while( vlc_object_alive (p_aout) && vlc_object_alive (p_aout->p_libvlc) &&
-               ( i_snd_rc = snd_pcm_resume( p_sys->p_snd_pcm ) ) == -EAGAIN )
+        while( ( i_snd_rc = snd_pcm_resume( p_pcm ) ) == -EAGAIN )
         {
-            msleep( 1000000 );
+            vlc_restorecancel(canc);
+            msleep(CLOCK_FREQ); /* device still suspended, wait... */
+            canc = vlc_savecancel();
         }
 
         if( i_snd_rc < 0 )
-            /* Device does not supprot resuming, restart it */
-            i_snd_rc = snd_pcm_prepare( p_sys->p_snd_pcm );
+            /* Device does not support resuming, restart it */
+            i_snd_rc = snd_pcm_prepare( p_pcm );
 
     }
 
     if( i_snd_rc < 0 )
         msg_Err( p_aout, "cannot write: %s", snd_strerror( i_snd_rc ) );
 
-    aout_BufferFree( p_buffer );
+    vlc_restorecancel(canc);
+    block_Release( p_buffer );
     return;
 
 error:
     if( i_snd_rc < 0 )
         msg_Err( p_aout, "ALSA error: %s", snd_strerror( i_snd_rc ) );
-    msleep( p_sys->i_period_time >> 1 );
+
+    vlc_restorecancel(canc);
+    msleep(p_sys->i_period_time / 2);
 }
 
 static void GetDevicesForCard( module_config_t *p_item, int i_card );
