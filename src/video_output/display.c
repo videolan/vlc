@@ -568,6 +568,20 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         break;
     }
 
+    case VOUT_DISPLAY_EVENT_ON_TOP: {
+        const int is_on_top = (int)va_arg(args, int);
+
+        msg_Dbg(vd, "VoutDisplayEvent 'on top' %d", is_on_top);
+
+        vlc_mutex_lock(&osys->lock);
+        if (!is_on_top != !osys->is_on_top) {
+            osys->ch_on_top = true;
+            osys->is_on_top = is_on_top;
+        }
+        vlc_mutex_unlock(&osys->lock);
+        break;
+    }
+
     case VOUT_DISPLAY_EVENT_DISPLAY_SIZE: {
         const int width  = (int)va_arg(args, int);
         const int height = (int)va_arg(args, int);
@@ -657,6 +671,10 @@ void vout_ManageDisplay(vout_display_t *vd)
         bool is_fullscreen  = osys->is_fullscreen;
         osys->ch_fullscreen = false;
 
+        bool ch_on_top  = osys->ch_on_top;
+        bool is_on_top  = osys->is_on_top;
+        osys->ch_on_top = false;
+
         bool ch_display_size       = osys->ch_display_size;
         int  display_width         = osys->display_width;
         int  display_height        = osys->display_height;
@@ -674,7 +692,7 @@ void vout_ManageDisplay(vout_display_t *vd)
             !reset_pictures &&
             !osys->ch_display_filled &&
             !osys->ch_zoom &&
-            !osys->ch_on_top &&
+            !ch_on_top &&
             !osys->ch_sar &&
             !osys->ch_crop)
             break;
@@ -776,16 +794,12 @@ void vout_ManageDisplay(vout_display_t *vd)
             vout_SendEventZoom(osys->vout, osys->cfg.zoom.num, osys->cfg.zoom.den);
         }
         /* */
-        if (osys->ch_on_top) {
-            bool is_on_top = osys->is_on_top;
-
+        if (ch_on_top) {
             if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ON_TOP, is_on_top)) {
                 msg_Err(vd, "Failed to set on top");
                 is_on_top = osys->is_on_top_initial;
             }
-            osys->is_on_top_initial =
-            osys->is_on_top         = is_on_top;
-            osys->ch_on_top = false;
+            osys->is_on_top_initial = is_on_top;
 
             /* */
             vout_SendEventOnTop(osys->vout, osys->is_on_top_initial);
@@ -957,10 +971,12 @@ void vout_SetDisplayOnTop(vout_display_t *vd, bool is_on_top)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
+    vlc_mutex_lock(&osys->lock);
     if (!osys->is_on_top != !is_on_top) {
         osys->ch_on_top = true;
         osys->is_on_top = is_on_top;
     }
+    vlc_mutex_unlock(&osys->lock);
 }
 void vout_SetDisplayAspect(vout_display_t *vd, unsigned sar_num, unsigned sar_den)
 {

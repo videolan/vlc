@@ -133,7 +133,7 @@ enum {
     VOUT_DISPLAY_CHANGE_FULLSCREEN,     /* const vout_display_cfg_t *p_cfg */
 
     /* Ask the module to acknowledge/refuse the "always on top" state change
-     * after being requested externally */
+     * after being requested externally or by VOUT_DISPLAY_EVENT_ON_TOP */
     VOUT_DISPLAY_CHANGE_ON_TOP,         /* int b_on_top */
 
     /* Ask the module to acknowledge/refuse the display size change requested
@@ -173,6 +173,7 @@ enum {
     VOUT_DISPLAY_EVENT_PICTURES_INVALID,    /* The buffer are now invalid and need to be changed */
 
     VOUT_DISPLAY_EVENT_FULLSCREEN,
+    VOUT_DISPLAY_EVENT_ON_TOP,
 
     VOUT_DISPLAY_EVENT_DISPLAY_SIZE,        /* The display size need to change : int i_width, int i_height, bool is_fullscreen */
 
@@ -336,6 +337,10 @@ static inline void vout_display_SendEventKey(vout_display_t *vd, int key)
 static inline void vout_display_SendEventFullscreen(vout_display_t *vd, bool is_fullscreen)
 {
     vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_FULLSCREEN, is_fullscreen);
+}
+static inline void vout_display_SendEventOnTop(vout_display_t *vd, bool is_on_top)
+{
+    vout_display_SendEvent(vd, VOUT_DISPLAY_EVENT_ON_TOP, is_on_top);
 }
 /* The mouse position (State and Moved event) must be expressed against vout_display_t::source unit */
 static inline void vout_display_SendEventMouseState(vout_display_t *vd, int x, int y, int button_mask)
