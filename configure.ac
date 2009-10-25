@@ -932,6 +932,12 @@ AC_ARG_VAR(PKG_CONFIG_PATH,
 	   [Paths where to find .pc not at the default location])
 PKG_PROG_PKG_CONFIG()
 
+dnl On some OS we need static linking 
+AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "darwin" ],[
+       PKG_CONFIG = "${PKG_CONFIG} --static"
+    ])
+
+
 dnl
 dnl Check for zlib.h and -lz along with system -lminizip if available
 dnl 
