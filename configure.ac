@@ -3646,6 +3646,7 @@ AC_ARG_ENABLE(xvideo,
     enable_xvideo="$enable_xcb"
 ])
 
+need_xid_provider="no"
 AS_IF([test "${enable_xcb}" != "no"], [
   PKG_CHECK_MODULES(XPROTO, [xproto])
 
@@ -3674,16 +3675,24 @@ AS_IF([test "${enable_xcb}" != "no"], [
   ], [true])
 
   dnl xcb-utils
-  PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4],
-    [true],
-    [PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms])
-    VLC_ADD_CFLAGS([globalhotkeys], [-DXCB_KEYSYM_OLD_API])]
-  )
+  PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms >= 0.3.4], [
+    have_xcb_keysyms="yes"
+  ], [
+    PKG_CHECK_MODULES(XCB_KEYSYMS, [xcb-keysyms], [
+      have_xcb_keysyms="yes"
+      VLC_ADD_CFLAGS([globalhotkeys], [-DXCB_KEYSYM_OLD_API])
+    ], [
+      have_xcb_keysyms="no"
+      need_xid_provider="yes"
+    ])
+  ])
 
-  VLC_ADD_PLUGIN([xcb_window])
-  VLC_ADD_PLUGIN([globalhotkeys])
-  VLC_ADD_CFLAGS([globalhotkeys],[${XCB_KEYSYMS_CFLAGS} ${XCB_CFLAGS}] )
-  VLC_ADD_LIBS([globalhotkeys],[${XCB_KEYSYMS_LIBS} ${XCB_LIBS}] )
+  AS_IF([test "${have_xcb_keysyms}" = "yes"], [
+    VLC_ADD_PLUGIN([xcb_window])
+    VLC_ADD_PLUGIN([globalhotkeys])
+    VLC_ADD_CFLAGS([globalhotkeys], [${XCB_KEYSYMS_CFLAGS} ${XCB_CFLAGS}])
+    VLC_ADD_LIBS([globalhotkeys], [${XCB_KEYSYMS_LIBS} ${XCB_LIBS}])
+  ])
   VLC_ADD_PLUGIN([xdg_screensaver])
 ])
 
@@ -4320,6 +4329,7 @@ if test "${enable_skins2}" = "yes" ||
     VLC_ADD_CPPFLAGS([skins2],[-Imodules/gui/skins2 ${X_CFLAGS} -DX11_SKINS])
     VLC_ADD_CXXFLAGS([skins2],[-O2 -fno-rtti])
     VLC_ADD_LIBS([skins2],[${X_LIBS} ${X_PRE_LIBS} -lXext -lX11])
+    need_xid_provider="no"
   fi fi fi
 fi
 AM_CONDITIONAL(BUILD_SKINS, [test "${enable_skins2}" = "yes" ||
@@ -4337,6 +4347,7 @@ AS_IF([test "${enable_hildon}" = "yes"], [
     VLC_ADD_LIBS([hildon],[${HILDON_LIBS}])
     VLC_ADD_PLUGIN([hildon])
     ALIASES="${ALIASES} mvlc"
+    need_xid_provider="no"
   ], [
     AS_IF([test "${enable_hildon}" = "yes"],[
       AC_MSG_ERROR([Hildon libraries not found])
@@ -4359,6 +4370,7 @@ AS_IF([test "${enable_qt4}" != "no"], [
     ALIASES="${ALIASES} qvlc"
     AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "darwin"], [
         VLC_ADD_LIBS([qt4],[$QT4_LIBS -lX11])
+        need_xid_provider="no"
     ], [
         VLC_ADD_LIBS([qt4],[$QT4_LIBS -lole32])
     ])
@@ -4551,6 +4563,13 @@ then
     VLC_ADD_PLUGIN([fbosd])
  ])
 fi
+
+dnl
+dnl Post-interface configuration checks
+dnl
+AS_IF([test "$need_xid_provider" = "yes"], [
+  AC_MSG_ERROR([X11 video outputs need a window provider (Qt4, Skins2, Hildon or xcb-utils), but none were found. Please install xcb-keysyms.])
+])
 
 dnl
 dnl Visualisation plugin
