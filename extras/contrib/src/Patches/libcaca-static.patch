@@ -1,0 +1,7 @@
+--- libcaca/caca/caca.pc.in (revision 2878)
++++ libcaca/caca/caca.pc.in (revision 3647)
+@@ -10,3 +10,4 @@
+ Conflicts: 
+ Libs: -L${libdir} -lcaca
++Libs.private: @ZLIB_LIBS@
+ Cflags: -I${includedir}

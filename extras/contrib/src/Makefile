@@ -1290,6 +1290,7 @@ libcaca-$(LIBCACA_VERSION).tar.gz:
 
 libcaca: libcaca-$(LIBCACA_VERSION).tar.gz
 	$(EXTRACT_GZ)
+	patch -p0 < Patches/libcaca-static.patch
 ifdef HAVE_DARWIN_OS
 	#remove me at next libcaca upgrade
 	patch -p0 < Patches/libcaca_driver_cocoa.diff
