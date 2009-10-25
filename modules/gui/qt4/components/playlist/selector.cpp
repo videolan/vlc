@@ -82,21 +82,23 @@ void PLSelector::setSource( QTreeWidgetItem *item )
         if( !playlist_IsServicesDiscoveryLoaded( THEPL, qtu( qs ) ) )
         {
             playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
+#warning FIXME
+            playlist_item_t *pl_item =
+                    THEPL->p_root_category->pp_children[THEPL->p_root_category->i_children-1];
+            item->setData( 0, PPL_ITEM_ROLE, QVariant::fromValue( pl_item ) );
 
+            emit activated( pl_item );
+            return;
         }
     }
 
     if( i_type == SD_TYPE )
         msg_Dbg( p_intf, "SD already loaded, reloading" );
 
-    playlist_Lock( THEPL );
     playlist_item_t *pl_item =
-            playlist_ChildSearchName( THEPL->p_root_onelevel, qtu( item->data(0, LONGNAME_ROLE ).toString() ) );
-    playlist_Unlock( THEPL );
+            item->data( 0, PPL_ITEM_ROLE ).value<playlist_item_t *>();
     if( pl_item )
             emit activated( pl_item );
-    else
-            msg_Info( p_intf, "no node found for %s", qtu( item->data(0, LONGNAME_ROLE ).toString() ) );
 }
 
 void PLSelector::createItems()
@@ -133,7 +135,6 @@ void PLSelector::createItems()
         sd_item = new QTreeWidgetItem( QStringList( qfu(*ppsz_longname) ) );
         sd_item->setData( 0, TYPE_ROLE, SD_TYPE );
         sd_item->setData( 0, NAME_ROLE, qfu( *ppsz_name ) );
-        sd_item->setData( 0, LONGNAME_ROLE, qfu( *ppsz_longname ) );
         sd_item->setFlags( sd_item->flags() & ~Qt::ItemIsDropEnabled );
         sds->addChild( sd_item );
         free( *ppsz_name );

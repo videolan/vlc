@@ -48,7 +48,6 @@ enum {
     TYPE_ROLE = Qt::UserRole,
     PPL_ITEM_ROLE,
     NAME_ROLE,
-    LONGNAME_ROLE,
 };
 
 Q_DECLARE_METATYPE( playlist_item_t *);
