@@ -560,6 +560,7 @@ static int PresetCallback( vlc_object_t *p_this, char const *psz_cmd,
             return VLC_SUCCESS;
         }
     }
+    vlc_mutex_unlock( &p_sys->lock );
     msg_Err( p_aout, "equalizer preset '%s' not found", psz_preset );
     msg_Info( p_aout, "full list:" );
     for( unsigned i = 0; eqz_preset_10b[i] != NULL; i++ )
