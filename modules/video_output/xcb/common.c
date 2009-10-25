@@ -260,11 +260,8 @@ void PictureResourceFree (picture_resource_t *res, xcb_connection_t *conn)
 {
     xcb_shm_seg_t segment = res->p_sys->segment;
 
-    if (segment != 0)
-    {
-        assert (conn != NULL);
+    if (conn != NULL && segment != 0)
         xcb_shm_detach (conn, segment);
-    }
     shmdt (res->p->p_pixels);
 }
 

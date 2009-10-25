@@ -529,7 +529,7 @@ static void Close (vlc_object_t *obj)
 
             if (!res->p->p_pixels)
                 break;
-            PictureResourceFree (res, p_sys->conn);
+            PictureResourceFree (res, NULL);
         }
         picture_pool_Delete (p_sys->pool);
     }
