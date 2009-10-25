@@ -80,15 +80,11 @@ protected:
  * This class handles resize issues
  **********************************************************************/
 
-VideoWidget::VideoWidget( intf_thread_t *_p_i ) : QFrame( NULL ), p_intf( _p_i )
+VideoWidget::VideoWidget( intf_thread_t *_p_i )
+    : QFrame( NULL )
+      , p_intf( _p_i )
+      , reparentable( NULL )
 {
-    /* Init */
-    reparentable = NULL;
-    videoSize.rwidth() = -1;
-    videoSize.rheight() = -1;
-
-    hide();
-
     /* Set the policy to expand in both directions */
 //    setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
 
@@ -147,7 +143,6 @@ WId VideoWidget::request( int *pi_x, int *pi_y,
 
     innerLayout->addWidget( stable );
 
-    reparentable->setLayout( innerLayout );
     layout->addWidget( reparentable );
 
 #ifdef Q_WS_X11
@@ -178,8 +173,8 @@ void VideoWidget::SetSizing( unsigned int w, unsigned int h )
     if (reparentable->windowState() & Qt::WindowFullScreen )
         return;
     msg_Dbg( p_intf, "Video is resizing to: %i %i", w, h );
-    videoSize.rwidth() = w;
-    videoSize.rheight() = h;
+    videoSize.setWidth( w );
+    videoSize.setHeight( h );
     if( !isVisible() ) show();
     updateGeometry(); // Needed for deinterlace
     videoSync();
@@ -271,8 +266,7 @@ void VideoWidget::release( void )
 
     delete reparentable;
     reparentable = NULL;
-    videoSize.rwidth() = 0;
-    videoSize.rheight() = 0;
+    videoSize = QSize();
     updateGeometry();
     hide();
 }
