@@ -433,6 +433,8 @@ static int Demux( demux_t *p_demux )
                 }
                 if( ( psz_parse = strcasestr( psz_parse, "/>" ) ) )
                     psz_parse += 2;
+                else if( ( psz_parse = strcasestr( psz_parse, "</MoreInfo>") ) )
+                    psz_parse += 11;
                 else continue;
             }
             else if( !strncasecmp( psz_parse, "<ABSTRACT>", 10 ) )
