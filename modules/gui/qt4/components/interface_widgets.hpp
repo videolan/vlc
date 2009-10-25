@@ -42,7 +42,6 @@
 #include <QMouseEvent>
 
 class ResizeEvent;
-class QPalette;
 class QPixmap;
 class QHBoxLayout;
 class QMenu;
@@ -95,7 +94,6 @@ public:
     virtual ~BackgroundWidget();
 
 private:
-    QPalette plt;
     QLabel *label;
     virtual void contextMenuEvent( QContextMenuEvent *event );
     intf_thread_t *p_intf;

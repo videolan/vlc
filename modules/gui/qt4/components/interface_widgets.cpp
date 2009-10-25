@@ -299,7 +299,7 @@ BackgroundWidget::BackgroundWidget( intf_thread_t *_p_i )
 
     /* A dark background */
     setAutoFillBackground( true );
-    plt = palette();
+    QPalette plt = palette();
     plt.setColor( QPalette::Active, QPalette::Window , Qt::black );
     plt.setColor( QPalette::Inactive, QPalette::Window , Qt::black );
     setPalette( plt );
