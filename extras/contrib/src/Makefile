@@ -2581,12 +2581,11 @@ xcb-util: xcb-util-$(XCB_UTIL_VERSION).tar.bz2
 # Peflags utility (Windows only)
 # ***************************************************************************
 
-peflags.c:
-	$(WGET) $(PEFLAGS_URL)/$@
+peflags/peflags.c:
+	mkdir -p peflags
+	cd peflags && $(WGET) $(PEFLAGS_URL)/peflags.c
 
-.peflags: peflags.c
-	rm -rf peflags
-	mkdir peflags && mv peflags.c peflags/
+.peflags: peflags/peflags.c
 	cd peflags && gcc peflags.c -o peflags
 	install -d $(PREFIX)/bin
 	cd peflags && install ./peflags $(PREFIX)/bin
