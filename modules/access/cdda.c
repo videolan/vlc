@@ -41,16 +41,15 @@
 #include <vlc_input.h>
 #include <vlc_access.h>
 #include <vlc_meta.h>
-#include <vlc_charset.h>
+#include <vlc_charset.h> /* ToLocaleDup */
 
 #include <vlc_codecs.h> /* For WAVEHEADER */
-#include "vcd/cdrom.h"
+#include "vcd/cdrom.h"  /* For CDDA_DATA_SIZE */
 
 #ifdef HAVE_LIBCDDB
-#include <cddb/cddb.h>
+ #include <cddb/cddb.h>
+ #include <errno.h>
 #endif
-
-#include <errno.h>
 
 /*****************************************************************************
  * Module descriptior
@@ -64,7 +63,7 @@ static void Close( vlc_object_t * );
     "value should be set in milliseconds." )
 
 vlc_module_begin ()
-    set_shortname( N_("Audio CD"))
+    set_shortname( N_("Audio CD") )
     set_description( N_("Audio CD input") )
     set_capability( "access", 10 )
     set_category( CAT_INPUT )
@@ -109,11 +108,11 @@ struct access_sys_t
 
     /* Current position */
     int         i_sector;                                  /* Current Sector */
-    int *       p_sectors;                                  /* Track sectors */
+    int        *p_sectors;                                  /* Track sectors */
 
     /* Wave header for the output data */
     WAVEHEADER  waveheader;
-    bool  b_header;
+    bool        b_header;
 
     int         i_track;
     int         i_first_sector;
@@ -137,9 +136,8 @@ static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
-    vcddev_t *vcddev;
-    char *psz_name;
-    int i_ret;
+    vcddev_t     *vcddev;
+    char         *psz_name;
 
     if( !p_access->psz_path || !*p_access->psz_path )
     {
@@ -161,7 +159,7 @@ static int Open( vlc_object_t *p_this )
 #endif
 
     /* Open CDDA */
-    if( (vcddev = ioctl_Open( VLC_OBJECT(p_access), psz_name )) == NULL )
+    if( (vcddev = ioctl_Open( VLC_OBJECT(p_access), psz_name ) ) == NULL )
     {
         msg_Warn( p_access, "could not open %s", psz_name );
         free( psz_name );
@@ -181,7 +179,7 @@ static int Open( vlc_object_t *p_this )
         /* We only do separate items if the whole disc is requested */
         input_thread_t *p_input = access_GetParentInput( p_access );
 
-        i_ret = -1;
+        int i_ret = -1;
         if( p_input )
         {
             input_item_t *p_current = input_GetItem( p_input );
@@ -404,6 +402,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
     /* Retreive CDDB informations */
 #ifdef HAVE_LIBCDDB
     char psz_year_buffer[4+1];
+    msg_Dbg( p_access, "fetching infos with CDDB" );
     cddb_disc_t *p_disc = GetCDDBInfo( p_access, i_titles, p_sys->p_sectors );
     if( p_disc )
     {
@@ -436,7 +435,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
     }
 #endif
 
-    /* */
+    /* CD-Text */
     vlc_meta_t **pp_cd_text;
     int        i_cd_text;
 
@@ -662,14 +661,19 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
     }
 
     const int i_matches = cddb_query( p_cddb, p_disc );
-    if( i_matches <= 0 )
+    if( i_matches < 0 )
     {
-        msg_Warn( p_access, "CDDB error: %s", cddb_error_str(errno));
+        msg_Warn( p_access, "CDDB error: %s", cddb_error_str(errno) );
         goto error;
     }
-
-    if( i_matches > 1 )
+    else if( i_matches == 0 )
+    {
+        msg_Dbg( p_access, "Couldn't find any matches in CDDB." );
+        goto error;
+    }
+    else if( i_matches > 1 )
         msg_Warn( p_access, "found %d matches in CDDB. Using first one.", i_matches );
+
     cddb_read( p_cddb, p_disc );
 
     cddb_destroy( p_cddb);
