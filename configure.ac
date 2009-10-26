@@ -4380,12 +4380,12 @@ AS_IF([test "${enable_qt4}" != "no"], [
     ], [
         VLC_ADD_LIBS([qt4],[$QT4_LIBS -lole32])
     ])
-    QT4LOCALEDIR="$($PKG_CONFIG --variable=prefix QtCore)/share/qt4/translations/"
+    QT4LOCALEDIR="$(eval $PKG_CONFIG --variable=prefix QtCore)/share/qt4/translations/"
     AC_SUBST(QT4LOCALEDIR)
     VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS -DQT4LOCALEDIR=\\\\\\\"${QT4LOCALEDIR}\\\\\\\"])
-    AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
-    AC_PATH_PROG(RCC, rcc, rcc,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
-    AC_PATH_PROGS(UIC, [uic-qt4 uic], uic,`$PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+    AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+    AC_PATH_PROG(RCC, rcc, rcc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
+    AC_PATH_PROGS(UIC, [uic-qt4 uic], uic,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
   ], [
     AS_IF([test "${enable_qt4}" = "yes"],[
       AC_MSG_ERROR([Qt 4 library not found])
@@ -4887,8 +4887,8 @@ then
             echo "Using $i.pc files." >&5
             echo "Using $i.pc files." >&6
 	    found=1
-	    MOZILLA_CFLAGS=$( $PKG_CONFIG --cflags "$i" )
-	    MOZILLA_LIBS=$( $PKG_CONFIG --libs "$i" )
+	    MOZILLA_CFLAGS=$(eval $PKG_CONFIG --cflags "$i" )
+	    MOZILLA_LIBS=$(eval $PKG_CONFIG --libs "$i" )
 	    break
 	  fi
 	done
