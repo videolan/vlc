@@ -4,6 +4,7 @@ Changes between 1.0.2 and 1.1.0-git:
 Access:
  * Port of the screen module from Xlib to XCB
  * Support for the sftp protocol
+ * Support for CDDB servers for Audio-CD on Windows version
 
 Decoders:
  * Support for Atrac1
