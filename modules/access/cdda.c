@@ -1,7 +1,7 @@
 /*****************************************************************************
  * cdda.c : CD digital audio input module for vlc
  *****************************************************************************
- * Copyright (C) 2000, 2003 the VideoLAN team
+ * Copyright (C) 2000, 2003-2006, 2008-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Laurent Aimar <fenrir@via.ecp.fr>
@@ -83,12 +83,14 @@ vlc_module_begin ()
     add_integer( "cdda-last-sector", -1, NULL, NULL, NULL, true )
         change_internal ()
 
+#ifdef HAVE_LIBCDDB
     add_string( "cddb-server", "freedb.freedb.org", NULL,
                 N_( "CDDB Server" ), N_( "Address of the CDDB server to use." ),
                 true )
     add_integer( "cddb-port", 8880, NULL,
-                N_( "CDDB port" ), N_( "CDDB Server port to use." ),
-                true )
+                N_( "CDDB port" ), N_( "CDDB Server port to use." ), true )
+#endif
+
     add_shortcut( "cdda" )
     add_shortcut( "cddasimple" )
 vlc_module_end ()
@@ -630,7 +632,7 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
     cddb_set_timeout( p_cddb, 10 );
 
     /// \todo
-    cddb_http_disable( p_cddb);
+    cddb_http_disable( p_cddb );
 
     /* */
     cddb_disc_t *p_disc = cddb_disc_new();
