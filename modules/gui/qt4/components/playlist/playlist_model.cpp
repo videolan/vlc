@@ -803,8 +803,7 @@ void PLModel::updateChildren( playlist_item_t *p_node, PLItem *root )
 void PLModel::updateTreeItem( PLItem *item )
 {
     if( !item ) return;
-    rebuild();
-    //emit dataChanged( index( item, 0 ) , index( item, columnCount( QModelIndex() ) ) );
+    emit dataChanged( index( item, 0 ) , index( item, columnCount( QModelIndex() ) ) );
 }
 
 /************************* Actions ******************************/
