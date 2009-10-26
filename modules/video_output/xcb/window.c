@@ -192,7 +192,9 @@ static void CacheAtoms (vout_window_sys_t *p_sys)
     wm_state_fs_ck = intern_string (conn, "_NET_WM_STATE_FULLSCREEN");
 #ifdef MATCHBOX_HACK
     xcb_intern_atom_cookie_t mb_current_app_window;
-    mb_current_app_window = intern_string (conn, "_MB_CURRENT_APP_WINDOW");
+    mb_current_app_window = xcb_intern_atom (conn, true,
+                                             strlen ("_MB_CURRENT_APP_WINDOW"),
+                                             "_MB_CURRENT_APP_WINDOW");
 #endif
 
     p_sys->wm_state = get_atom (conn, wm_state_ck);
@@ -314,17 +316,19 @@ static int Open (vlc_object_t *obj)
     xcb_atom_t wm_window_role = get_atom (conn, wm_window_role_ck);
     set_ascii_prop (conn, window, wm_window_role, "vlc-video");
 
+    /* Cache any EWMH atom we may need later */
+    CacheAtoms (p_sys);
 #ifdef MATCHBOX_HACK
-    uint32_t value = XCB_EVENT_MASK_PROPERTY_CHANGE;
-    xcb_change_window_attributes (conn, scr->root,
-                                  XCB_CW_EVENT_MASK, &value);
+    if (p_sys->mb_current_app_window)
+    {
+        uint32_t value = XCB_EVENT_MASK_PROPERTY_CHANGE;
+        xcb_change_window_attributes (conn, scr->root,
+                                      XCB_CW_EVENT_MASK, &value);
+    }
 #endif
 
     /* Make the window visible */
     xcb_map_window (conn, window);
-
-    /* Cache any EWMH atom we may need later */
-    CacheAtoms (p_sys);
 
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
@@ -333,8 +337,9 @@ static int Open (vlc_object_t *obj)
         DestroyKeyHandler (p_sys->keys);
 
 #ifdef MATCHBOX_HACK
-    xcb_set_input_focus (p_sys->conn, XCB_INPUT_FOCUS_POINTER_ROOT,
-                         wnd->handle.xid, XCB_CURRENT_TIME);
+    if (p_sys->mb_current_app_window)
+        xcb_set_input_focus (p_sys->conn, XCB_INPUT_FOCUS_POINTER_ROOT,
+                             wnd->handle.xid, XCB_CURRENT_TIME);
 #endif
     xcb_flush (conn); /* Make sure map_window is sent (should be useless) */
     return VLC_SUCCESS;
@@ -390,7 +395,8 @@ static void *Thread (void *data)
             if (ProcessKeyEvent (p_sys->keys, ev) == 0)
                 continue;
 #ifdef MATCHBOX_HACK
-            if ((ev->response_type & 0x7f) == XCB_PROPERTY_NOTIFY)
+            if (p_sys->mb_current_app_window
+             && (ev->response_type & 0x7f) == XCB_PROPERTY_NOTIFY)
             {
                 const xcb_property_notify_event_t *pne =
                     (xcb_property_notify_event_t *)ev;
