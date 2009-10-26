@@ -344,8 +344,8 @@ static void DeleteDirectShowGraph( access_sys_t *p_sys )
 static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
                        bool b_access_demux )
 {
-    vlc_value_t  val;
     int i;
+    char *psz_val;
 
     /* Get/parse options and open device(s) */
     string vdevname, adevname;
@@ -359,31 +359,29 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     var_Create( p_this, "dshow-config", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
     var_Create( p_this, "dshow-tuner", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_this, "dshow-vdev", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "dshow-vdev", &val );
-    if( val.psz_string )
+    psz_val = var_CreateGetString( p_this, "dshow-vdev" );
+    if( psz_val )
     {
-        msg_Dbg( p_this, "dshow-vdev: %s", val.psz_string ) ;
+        msg_Dbg( p_this, "dshow-vdev: %s", psz_val ) ;
         /* skip none device */
-        if ( strncasecmp( val.psz_string, "none", 4 ) != 0 )
-            vdevname = string( val.psz_string );
+        if ( strncasecmp( psz_val, "none", 4 ) != 0 )
+            vdevname = string( psz_val );
         else
             b_use_video = false ;
     }
-    free( val.psz_string );
+    free( psz_val );
 
-    var_Create( p_this, "dshow-adev", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "dshow-adev", &val );
-    if( val.psz_string )
+    psz_val = var_CreateGetString( p_this, "dshow-adev" );
+    if( psz_val )
     {
-        msg_Dbg( p_this, "dshow-adev: %s", val.psz_string ) ;
+        msg_Dbg( p_this, "dshow-adev: %s", psz_val ) ;
         /* skip none device */
-        if ( strncasecmp( val.psz_string, "none", 4 ) != 0 )
-            adevname = string( val.psz_string );
+        if ( strncasecmp( psz_val, "none", 4 ) != 0 )
+            adevname = string( psz_val );
         else
             b_use_audio = false ;
     }
-    free( val.psz_string );
+    free( psz_val );
 
     static struct {const char *psz_size; int  i_width; int  i_height;} size_table[] =
     { { "subqcif", 128, 96 }, { "qsif", 160, 120 }, { "qcif", 176, 144 },
@@ -391,13 +389,12 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
       { 0, 0, 0 },
     };
 
-    var_Create( p_this, "dshow-size", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "dshow-size", &val );
-    if( val.psz_string && *val.psz_string )
+    psz_val = var_CreateGetString( p_this, "dshow-size" );
+    if( !EMPTY_STR(psz_val) )
     {
         for( i = 0; size_table[i].psz_size; i++ )
         {
-            if( !strcmp( val.psz_string, size_table[i].psz_size ) )
+            if( !strcmp( psz_val, size_table[i].psz_size ) )
             {
                 i_width = size_table[i].i_width;
                 i_height = size_table[i].i_height;
@@ -407,7 +404,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
         if( !size_table[i].psz_size ) /* Try to parse "WidthxHeight" */
         {
             char *psz_parser;
-            i_width = strtol( val.psz_string, &psz_parser, 0 );
+            i_width = strtol( psz_val, &psz_parser, 0 );
             if( *psz_parser == 'x' || *psz_parser == 'X')
             {
                 i_height = strtol( psz_parser + 1, &psz_parser, 0 );
@@ -415,15 +412,12 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
             msg_Dbg( p_this, "width x height %dx%d", i_width, i_height );
         }
     }
-    free( val.psz_string );
+    free( psz_val );
 
-    p_sys->b_chroma = false;
-    var_Create( p_this, "dshow-chroma", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Get( p_this, "dshow-chroma", &val );
-
-    i_chroma = vlc_fourcc_GetCodecFromString( UNKNOWN_ES, val.psz_string );
+    psz_val = var_CreateGetString( p_this, "dshow-chroma" );
+    i_chroma = vlc_fourcc_GetCodecFromString( UNKNOWN_ES, psz_val );
     p_sys->b_chroma = i_chroma != 0;
-    free( val.psz_string );
+    free( psz_val );
 
     var_Create( p_this, "dshow-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
     var_Create( p_this, "dshow-tuner-channel",
@@ -510,8 +504,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
                 return VLC_EGENERIC;
             }
 
-            var_Get( p_this, "dshow-tuner", &val );
-            if( val.b_bool )
+            if( var_GetBool( p_this, "dshow-tuner" ) )
             {
                 /* FIXME: we do MEDIATYPE_Stream here so we don't do
                  * it twice. */
@@ -545,18 +538,18 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
 
     for( i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
     {
-            var_Get( p_this, "dshow-video-input", &val );
-            if( val.i_int >= 0 )
-                    p_sys->crossbar_routes[i].VideoInputIndex=val.i_int;
-            var_Get( p_this, "dshow-video-output", &val );
-            if( val.i_int >= 0 )
-                    p_sys->crossbar_routes[i].VideoOutputIndex=val.i_int;
-            var_Get( p_this, "dshow-audio-input", &val );
-            if( val.i_int >= 0 )
-                    p_sys->crossbar_routes[i].AudioInputIndex=val.i_int;
-            var_Get( p_this, "dshow-audio-output", &val );
-            if( val.i_int >= 0 )
-                    p_sys->crossbar_routes[i].AudioOutputIndex=val.i_int;
+        int i_val = var_GetInteger( p_this, "dshow-video-input" );
+        if( i_val >= 0 )
+            p_sys->crossbar_routes[i].VideoInputIndex = i_val;
+        i_val = var_GetInteger( p_this, "dshow-video-output" );
+        if( i_val >= 0 )
+            p_sys->crossbar_routes[i].VideoOutputIndex = i_val;
+        i_val = var_GetInteger( p_this, "dshow-audio-input" );
+        if( i_val >= 0 )
+            p_sys->crossbar_routes[i].AudioInputIndex = i_val;
+        i_val = var_GetInteger( p_this, "dshow-audio-output" );
+        if( i_val >= 0 )
+            p_sys->crossbar_routes[i].AudioOutputIndex = i_val;
 
         IAMCrossbar *pXbar = p_sys->crossbar_routes[i].pXbar;
         LONG VideoInputIndex = p_sys->crossbar_routes[i].VideoInputIndex;
@@ -589,8 +582,7 @@ static int CommonOpen( vlc_object_t *p_this, access_sys_t *p_sys,
     /*
     ** Show properties pages from other filters in graph
     */
-    var_Get( p_this, "dshow-config", &val );
-    if( val.b_bool )
+    if( var_GetBool( p_this, "dshow-config" ) )
     {
         for( i = p_sys->i_crossbar_route_depth-1; i >= 0 ; --i )
         {
@@ -1054,9 +1046,7 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
 
         /* Show Device properties. Done here so the VLC stream is setup with
          * the proper parameters. */
-        vlc_value_t val;
-        var_Get( p_this, "dshow-config", &val );
-        if( val.b_bool )
+        if( var_GetBool( p_this, "dshow-config" ) )
         {
             ShowDeviceProperties( p_this, p_sys->p_capture_graph_builder2,
                                   p_device_filter, b_audio );
@@ -1065,8 +1055,8 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
         ConfigTuner( p_this, p_sys->p_capture_graph_builder2,
                      p_device_filter );
 
-        var_Get( p_this, "dshow-tuner", &val );
-        if( val.b_bool && dshow_stream.mt.majortype != MEDIATYPE_Stream )
+        if( var_GetBool( p_this, "dshow-tuner" ) &&
+            dshow_stream.mt.majortype != MEDIATYPE_Stream )
         {
             /* FIXME: we do MEDIATYPE_Stream later so we don't do it twice. */
             ShowTunerProperties( p_this, p_sys->p_capture_graph_builder2,
