@@ -1142,7 +1142,7 @@ static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_
     if( pi_time )
         *pi_time = 0;
 
-    if( p_sys->b_access_control && p_sys->i_dvb_length > 0 )
+    if( p_sys->i_dvb_length > 0 )
     {
         /* FIXME we should not use time() but read the date from the tdt */
         const time_t t = time( NULL );
@@ -3028,7 +3028,9 @@ static void EITCallBack( demux_t *p_demux,
     }
     if( p_epg->i_event > 0 )
     {
-        if( p_eit->i_service_id == p_sys->i_current_program && b_current_following )
+        if( b_current_following &&
+            (  p_sys->i_current_program == -1 ||
+               p_sys->i_current_program == p_eit->i_service_id ) )
         {
             p_sys->i_dvb_length = 0;
             p_sys->i_dvb_start = 0;
