@@ -3466,17 +3466,13 @@ AC_ARG_ENABLE(libass,
 AS_IF( [test "${enable_libass}" = "yes"], [
   PKG_CHECK_MODULES(LIBASS, libass >= 0.9.6,
       [
-        VLC_ADD_LDFLAGS([libass],[$LIBASS_LIBS])
+        VLC_ADD_LIBS([libass],[$LIBASS_LIBS])
         VLC_ADD_CFLAGS([libass],[$LIBASS_CFLAGS])
         VLC_ADD_PLUGIN([libass])
 
         AC_CHECK_HEADERS(fontconfig/fontconfig.h,
           [VLC_ADD_CPPFLAGS([libass],[-DHAVE_FONTCONFIG])
-        if test "${SYS}" = "mingw32"; then
-           VLC_ADD_LIBS([libass],[-lfontconfig -lfreetype -liconv -lz])
-        else
            VLC_ADD_LIBS([libass],[-lfontconfig])
-        fi
        ])
       ],[
         AC_MSG_WARN([LIBASS library not found])
