@@ -292,7 +292,7 @@ void sout_MuxDeleteStream (sout_mux_t *mux, sout_input_t *input)
     assert (0);
 }
 
-sout_mux_t *sout_MuxNew (sout_instance_t *instance, char *mux,
+sout_mux_t *sout_MuxNew (sout_instance_t *instance, const char *mux,
                          sout_access_out_t *out)
 {
     assert (0);
