@@ -1426,7 +1426,11 @@ libcddb-$(CDDB_VERSION).tar.bz2:
 
 libcddb: libcddb-$(CDDB_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-	(cd $@; patch -p0 < ../Patches/libcddb-cross.patch && autoreconf -fisv)
+	(cd $@; patch -p0 < ../Patches/libcddb-cross.patch )
+ifdef HAVE_WIN32
+	(cd $@; patch -p0 < ../Patches/libcddb-win32.patch )
+endif
+	(cd $@; autoreconf -fisv)
 
 ifdef HAVE_WIN32
 .cddb: libcddb .regex

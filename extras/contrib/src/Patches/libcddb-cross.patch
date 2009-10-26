@@ -18,15 +18,6 @@
  AC_FUNC_STAT
  AC_FUNC_VPRINTF
  AC_FUNC_SELECT_ARGTYPES
---- libcddb.pc.in.orig	2009-10-25 21:36:57.000000000 +0100
-+++ libcddb.pc.in	2009-10-25 21:36:11.000000000 +0100
-@@ -6,5 +6,5 @@
- Name: libcddb
- Description: CDDB server access library
- Version: @VERSION@
--Libs: -L${libdir} -lcddb @LIBICONV@
-+Libs: -L${libdir} -lcddb ${libdir}/libregex.a @LIBICONV@
- Cflags: -I${includedir}
 --- include/cddb/cddb_ni.h.orig	2009-10-25 21:58:20.000000000 +0100
 +++ include/cddb/cddb_ni.h	2009-10-25 21:58:46.000000000 +0100
 @@ -35,6 +35,7 @@
