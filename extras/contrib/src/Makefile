@@ -1430,10 +1430,11 @@ libcddb: libcddb-$(CDDB_VERSION).tar.bz2
 
 ifdef HAVE_WIN32
 .cddb: libcddb .regex
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static --without-iconv CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" && make && make install)
 else
 .cddb: libcddb
-endif
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-shared --enable-static CFLAGS="$(CFLAGS) -D_BSD_SOCKLEN_T_=int" LDFLAGS="$(LDFLAGS) -liconv" && make && make install)
+endif
 	touch $@
 
 CLEAN_FILE += .cddb
