@@ -715,7 +715,9 @@ void EndVideoDec( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
 
-    avcodec_flush_buffers( p_sys->p_context );
+    /* do not flush buffers if codec hasn't been opened (theora/vorbis/VC1) */
+    if( p_sys->p_context->codec )
+        avcodec_flush_buffers( p_sys->p_context );
 
     if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
 
