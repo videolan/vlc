@@ -1344,9 +1344,6 @@ x264:
 ifdef HAVE_WIN32
 	(cd x264; patch -p0 < ../Patches/x264-svn-win32.patch )
 endif
-ifdef HAVE_DARWIN_OS
-	(cd $@; patch -p0 < ../Patches/x264-svn-darwin.patch )
-endif
 
 else
 
