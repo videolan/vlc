@@ -151,12 +151,12 @@ private:
     void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList );
     void doDeleteItem( PLItem *item, QModelIndexList *fullList );
     void updateTreeItem( PLItem * );
+    void removeItem ( PLItem * );
     void takeItem( PLItem * ); //will not delete item
     void insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos );
     void dropAppendCopy( QByteArray& data, PLItem *target );
     void dropMove( QByteArray& data, PLItem *target, int new_pos );
     /* The following actions will not signal the view! */
-    void removeItem ( PLItem * );
     void updateChildren( PLItem * );
     void updateChildren( playlist_item_t *, PLItem * );
 

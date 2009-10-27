@@ -653,9 +653,6 @@ void PLModel::processInputItemUpdate( input_item_t *p_item )
 void PLModel::processItemRemoval( int i_id )
 {
     if( i_id <= 0 ) return;
-    if( i_id == i_cached_id ) i_cached_id = -1;
-    i_cached_input_id = -1;
-
     removeItem( i_id );
 }
 
@@ -760,13 +757,22 @@ void PLModel::removeItem( PLItem *item )
 {
     if( !item ) return;
 
+    if( item->i_id == i_cached_id ) i_cached_id = -1;
+    i_cached_input_id = -1;
+
     if( currentItem == item )
     {
         currentItem = NULL;
         emit currentChanged( QModelIndex() );
     }
 
-    if( item->parentItem ) item->parentItem->removeChild( item );
+    if( item->parentItem ) {
+        int i = item->parentItem->children.indexOf( item );
+        beginRemoveRows( index( item->parentItem, 0), i, i );
+        item->parentItem->children.removeAt(i);
+        delete item;
+        endRemoveRows();
+    }
     else delete item;
 
     if(item == rootItem)
@@ -862,11 +868,9 @@ void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
     else
         playlist_NodeDelete( p_playlist, p_item, true, false );
     PL_UNLOCK;
+
     /* And finally, remove it from the tree */
-    int itemIndex = item->parentItem->children.indexOf( item );
-    beginRemoveRows( index( item->parentItem, 0), itemIndex, itemIndex );
     removeItem( item );
-    endRemoveRows();
 }
 
 /******* Volume III: Sorting and searching ********/
