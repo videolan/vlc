@@ -263,6 +263,7 @@ FunctionEnd
   !insertmacro ${_action} ".ifo"
   !insertmacro ${_action} ".m3u"
   !insertmacro ${_action} ".pls"
+  !insertmacro ${_action} ".sdp"
   !insertmacro ${_action} ".vlc"
   !insertmacro ${_action} ".xspf"
 !macroend

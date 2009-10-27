@@ -931,8 +931,8 @@ void SPrefsPanel::assoDialog()
                             : Qt::Unchecked );
 
     i_temp = 0;
-    aTo( ".asx" ); aTo( ".b4s" ); aTo( ".ifo" ); aTo( ".m3u" ); aTo( ".pls" ); aTo( ".vlc" );
-    aTo( ".xspf" );
+    aTo( ".asx" ); aTo( ".b4s" ); aTo( ".ifo" ); aTo( ".m3u" ); aTo( ".pls" );
+    aTo( ".sdp" ); aTo( ".vlc" ); aTo( ".xspf" );
     otherType->setCheckState( 0, ( i_temp > 0 ) ?
                               ( ( i_temp == audioType->childCount() ) ?
                                Qt::Checked : Qt::PartiallyChecked )
