@@ -667,8 +667,8 @@ void PLModel::processItemAppend( const playlist_add_t *p_add )
     PLItem *nodeItem = findById( rootItem, p_add->i_node );
     if( !nodeItem ) return;
 
-		foreach( PLItem *existing, nodeItem->children )
-			if( existing->i_id == p_add->i_item ) { return; }
+    foreach( PLItem *existing, nodeItem->children )
+      if( existing->i_id == p_add->i_item ) return;
 
     PL_LOCK;
     p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
