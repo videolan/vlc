@@ -83,11 +83,10 @@ vlc_module_begin ()
         change_internal ()
 
 #ifdef HAVE_LIBCDDB
-    add_string( "cddb-server", "freedb.freedb.org", NULL,
-                N_( "CDDB Server" ), N_( "Address of the CDDB server to use." ),
-                true )
-    add_integer( "cddb-port", 8880, NULL,
-                N_( "CDDB port" ), N_( "CDDB Server port to use." ), true )
+    add_string( "cddb-server", "freedb.freedb.org", NULL, N_( "CDDB Server" ),
+            N_( "Address of the CDDB server to use." ), true )
+    add_integer( "cddb-port", 8880, NULL, N_( "CDDB port" ),
+            N_( "CDDB Server port to use." ), true )
 #endif
 
     add_shortcut( "cdda" )
@@ -446,7 +445,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         pp_cd_text = NULL;
     }
 
-    /* Retreive CD-TEXT informations but prefer CDDB */
+    /* Retrieve CD-TEXT informations but prefer CDDB */
     if( i_cd_text > 0 && pp_cd_text[0] )
     {
         const vlc_meta_t *p_disc = pp_cd_text[0];
