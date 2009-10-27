@@ -130,7 +130,7 @@ typedef struct scene_t {
 struct filter_sys_t
 {
     image_handler_t *p_image;
-    scene_t *p_scene;
+    scene_t scene;
 
     char *psz_path;
     char *psz_prefix;
@@ -158,18 +158,10 @@ static int Create( vlc_object_t *p_this )
     if( p_filter->p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_sys->p_scene = calloc( 1, sizeof( scene_t ) );
-    if( !p_sys->p_scene )
-    {
-        free( p_sys );
-        return VLC_ENOMEM;
-    }
-
     p_sys->p_image = image_HandlerCreate( p_this );
     if( !p_sys->p_image )
     {
         msg_Err( p_this, "Couldn't get handle to image conversion routines." );
-        free( p_sys->p_scene );
         free( p_sys );
         return VLC_EGENERIC;
     }
@@ -181,7 +173,6 @@ static int Create( vlc_object_t *p_this )
         msg_Err( p_filter, "Could not find FOURCC for image type '%s'",
                  p_sys->psz_format );
         image_HandlerDelete( p_sys->p_image );
-        free( p_sys->p_scene );
         free( p_sys->psz_format );
         free( p_sys );
         return VLC_EGENERIC;
@@ -210,9 +201,8 @@ static void Destroy( vlc_object_t *p_this )
 
     image_HandlerDelete( p_sys->p_image );
 
-    if( p_sys->p_scene && p_sys->p_scene->p_pic )
-    picture_Release( p_sys->p_scene->p_pic );
-    free( p_sys->p_scene );
+    if( p_sys->scene.p_pic )
+        picture_Release( p_sys->scene.p_pic );
     free( p_sys->psz_format );
     free( p_sys->psz_prefix );
     free( p_sys->psz_path );
@@ -242,8 +232,8 @@ static void SnapshotRatio( filter_t *p_filter, picture_t *p_pic )
     }
     p_sys->i_frames++;
 
-    if( p_sys->p_scene->p_pic )
-        picture_Release( p_sys->p_scene->p_pic );
+    if( p_sys->scene.p_pic )
+        picture_Release( p_sys->scene.p_pic );
 
     if( (p_sys->i_width <= 0) && (p_sys->i_height > 0) )
     {
@@ -259,13 +249,13 @@ static void SnapshotRatio( filter_t *p_filter, picture_t *p_pic )
         p_sys->i_height = p_pic->format.i_height;
     }
 
-    p_sys->p_scene->p_pic = picture_New( p_pic->format.i_chroma,
+    p_sys->scene.p_pic = picture_New( p_pic->format.i_chroma,
                 p_pic->format.i_width, p_pic->format.i_height,
                 p_pic->format.i_sar_num );
-    if( p_sys->p_scene->p_pic )
+    if( p_sys->scene.p_pic )
     {
-        picture_Copy( p_sys->p_scene->p_pic, p_pic );
-        SavePicture( p_filter, p_sys->p_scene->p_pic );
+        picture_Copy( p_sys->scene.p_pic, p_pic );
+        SavePicture( p_filter, p_sys->scene.p_pic );
     }
 }
 
