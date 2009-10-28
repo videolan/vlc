@@ -85,6 +85,7 @@ struct vout_display_sys_t
     xcb_connection_t *conn;
     vout_window_t *embed;/* VLC window */
 
+    xcb_cursor_t cursor; /* blank cursor */
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc;   /* context to put images */
     xcb_xv_port_t port;  /* XVideo port */
@@ -482,6 +483,9 @@ static int Open (vlc_object_t *obj)
     xcb_create_gc (conn, p_sys->gc, p_sys->window, 0, NULL);
     msg_Dbg (vd, "using X11 graphic context 0x%08"PRIx32, p_sys->gc);
 
+    /* Create cursor */
+    p_sys->cursor = CreateBlankCursor (conn, screen);
+
     /* */
     p_sys->pool = NULL;
 
@@ -723,12 +727,12 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         return vout_window_SetOnTop (p_sys->embed, on_top);
     }
 
-    /* TODO */
-#if 0
     /* Hide the mouse. It will be send when
      * vout_display_t::info.b_hide_mouse is false */
-    VOUT_DISPLAY_HIDE_MOUSE,
-#endif
+    case VOUT_DISPLAY_HIDE_MOUSE:
+        xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid,
+                                  XCB_CW_CURSOR, &(uint32_t){ p_sys->cursor });
+        return VLC_SUCCESS;
     case VOUT_DISPLAY_RESET_PICTURES:
         assert(0);
     default:
