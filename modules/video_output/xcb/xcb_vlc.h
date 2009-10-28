@@ -45,6 +45,7 @@ struct vout_window_t *GetWindow (vout_display_t *obj,
                                  bool *restrict pshm);
 int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
                    unsigned *restrict width, unsigned *restrict height);
+xcb_cursor_t CreateBlankCursor (xcb_connection_t *, const xcb_screen_t *);
 
 int CheckError (vout_display_t *, xcb_connection_t *conn,
                 const char *str, xcb_void_cookie_t);
