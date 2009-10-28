@@ -52,10 +52,14 @@ static void HandleButtonRelease (vout_display_t *vd,
     vout_display_SendEventMouseReleased (vd, ev->detail - 1);
 }
 
-static void HandleMotionNotify (vout_display_t *vd,
+static void HandleMotionNotify (vout_display_t *vd, xcb_connection_t *conn,
                                 const xcb_motion_notify_event_t *ev)
 {
     vout_display_place_t place;
+
+    /* show the default cursor */
+    xcb_change_window_attributes (conn, ev->event, XCB_CW_CURSOR,
+                                  &(uint32_t) { XCB_CURSOR_NONE });
 
     /* TODO it could be saved */
     vout_display_PlacePicture (&place, &vd->source, vd->cfg, false);
@@ -68,7 +72,6 @@ static void HandleMotionNotify (vout_display_t *vd,
     const int y = vd->source.i_y_offset +
         (int64_t)(ev->event_y - place.y) * vd->source.i_visible_height/ place.height;
 
-    /* TODO show the cursor ? */
     if (x >= vd->source.i_x_offset && x < vd->source.i_x_offset + vd->source.i_visible_width &&
         y >= vd->source.i_y_offset && y < vd->source.i_y_offset + vd->source.i_visible_height)
         vout_display_SendEventMouseMoved (vd, x, y);
@@ -93,8 +96,8 @@ HandleParentStructure (vout_display_t *vd,
 /**
  * Process an X11 event.
  */
-static int ProcessEvent (vout_display_t *vd, bool *visible,
-                         xcb_generic_event_t *ev)
+static int ProcessEvent (vout_display_t *vd, xcb_connection_t *conn,
+                         bool *visible, xcb_generic_event_t *ev)
 {
     switch (ev->response_type & 0x7f)
     {
@@ -107,7 +110,7 @@ static int ProcessEvent (vout_display_t *vd, bool *visible,
             break;
 
         case XCB_MOTION_NOTIFY:
-            HandleMotionNotify (vd, (xcb_motion_notify_event_t *)ev);
+            HandleMotionNotify (vd, conn, (xcb_motion_notify_event_t *)ev);
             break;
 
         case XCB_VISIBILITY_NOTIFY:
@@ -143,7 +146,7 @@ int ManageEvent (vout_display_t *vd, xcb_connection_t *conn, bool *visible)
     xcb_generic_event_t *ev;
 
     while ((ev = xcb_poll_for_event (conn)) != NULL)
-        ProcessEvent (vd, visible, ev);
+        ProcessEvent (vd, conn, visible, ev);
 
     if (xcb_connection_has_error (conn))
     {
