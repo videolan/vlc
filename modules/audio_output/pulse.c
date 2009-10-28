@@ -233,7 +233,7 @@ static int Open ( vlc_object_t *p_this )
     pa_threaded_mainloop_wait(p_sys->mainloop);
 
     if (pa_context_get_state(p_sys->context) != PA_CONTEXT_READY) {
-        msg_Err(p_aout, "Failed to connect to server: %s", pa_strerror(pa_context_errno(p_sys->context)));
+        msg_Dbg(p_aout, "Failed to connect to server: %s", pa_strerror(pa_context_errno(p_sys->context)));
         goto unlock_and_fail;
     }
 
@@ -297,7 +297,7 @@ unlock_and_fail:
     if (p_sys->mainloop)
         pa_threaded_mainloop_unlock(p_sys->mainloop);
 fail:
-    msg_Err(p_aout, "Pulse initialization failed");
+    msg_Dbg(p_aout, "Pulse initialization failed");
     uninit(p_aout);
     return VLC_EGENERIC;
 }
