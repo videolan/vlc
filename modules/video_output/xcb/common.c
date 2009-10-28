@@ -221,7 +221,7 @@ xcb_cursor_t CreateBlankCursor (xcb_connection_t *conn,
         fprintf (stderr, "Cannot create pixmap: %d", err->error_code);
         free (err);
     }
-    ck = xcb_create_cursor_checked (conn, cur, pix, pix, 0, 0, 0, 0, 0, 0, 0, 0);
+    ck = xcb_create_cursor_checked (conn, cur, pix, pix, 0, 0, 0, 1, 1, 1, 0, 0);
     err = xcb_request_check (conn, ck);
     if (err)
     {
