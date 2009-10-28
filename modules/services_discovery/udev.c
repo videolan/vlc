@@ -63,6 +63,7 @@ struct device
 {
     dev_t devnum; /* must be first */
     input_item_t *item;
+    services_discovery_t *sd;
 };
 
 struct subsys
@@ -99,6 +100,8 @@ static void DestroyDevice (void *data)
 {
     struct device *d = data;
 
+    if (d->sd)
+        services_discovery_RemoveItem (d->sd, d->item);
     vlc_gc_decref (d->item);
     free (d);
 }
@@ -132,8 +135,9 @@ static int AddDevice (services_discovery_t *sd, struct udev_device *dev)
         vlc_gc_decref (item);
         return -1;
     }
-    d->item = item;
     d->devnum = udev_device_get_devnum (dev);
+    d->item = item;
+    d->sd = NULL;
 
     struct device **dp = tsearch (d, &p_sys->root, cmpdev);
     if (dp == NULL) /* Out-of-memory */
@@ -143,13 +147,13 @@ static int AddDevice (services_discovery_t *sd, struct udev_device *dev)
     }
     if (*dp != d) /* Overwrite existing device */
     {
-        services_discovery_RemoveItem (sd, (*dp)->item);
         DestroyDevice (*dp);
         *dp = d;
     }
 
     name = p_sys->subsys->get_cat (dev);
     services_discovery_AddItem (sd, item, name ? name : "Generic");
+    d->sd = sd;
     free (name);
     return 0;
 }
@@ -167,7 +171,6 @@ static void RemoveDevice (services_discovery_t *sd, struct udev_device *dev)
         return;
 
     struct device *d = *dp;
-    services_discovery_RemoveItem (sd, d->item);
     tdelete (d, &p_sys->root, cmpdev);
     DestroyDevice (d);
 }
