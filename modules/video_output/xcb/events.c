@@ -64,9 +64,9 @@ static void HandleMotionNotify (vout_display_t *vd,
         return;
 
     const int x = vd->source.i_x_offset +
-        (int64_t)(ev->event_x -0*place.x) * vd->source.i_visible_width / place.width;
+        (int64_t)(ev->event_x - place.x) * vd->source.i_visible_width / place.width;
     const int y = vd->source.i_y_offset +
-        (int64_t)(ev->event_y -0*place.y) * vd->source.i_visible_height/ place.height;
+        (int64_t)(ev->event_y - place.y) * vd->source.i_visible_height/ place.height;
 
     /* TODO show the cursor ? */
     if (x >= vd->source.i_x_offset && x < vd->source.i_x_offset + vd->source.i_visible_width &&
@@ -153,6 +153,3 @@ int ManageEvent (vout_display_t *vd, xcb_connection_t *conn, bool *visible)
 
     return VLC_SUCCESS;
 }
-
-
-

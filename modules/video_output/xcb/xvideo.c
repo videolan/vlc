@@ -447,7 +447,7 @@ static int Open (vlc_object_t *obj)
         const uint32_t mask =
             /* XCB_CW_EVENT_MASK */
             XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE |
-            XCB_EVENT_MASK_POINTER_MOTION | XCB_EVENT_MASK_VISIBILITY_CHANGE;
+            XCB_EVENT_MASK_VISIBILITY_CHANGE;
         xcb_void_cookie_t c;
         xcb_window_t window = xcb_generate_id (conn);
 

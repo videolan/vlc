@@ -126,7 +126,8 @@ vout_window_t *GetWindow (vout_display_t *vd,
         free (geo);
 
         /* Subscribe to parent window resize events */
-        uint32_t value = XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+        uint32_t value = XCB_EVENT_MASK_POINTER_MOTION
+                       | XCB_EVENT_MASK_STRUCTURE_NOTIFY;
         xcb_change_window_attributes (conn, wnd->handle.xid,
                                       XCB_CW_EVENT_MASK, &value);
         /* Try to subscribe to click events */
