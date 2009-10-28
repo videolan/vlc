@@ -211,23 +211,9 @@ xcb_cursor_t CreateBlankCursor (xcb_connection_t *conn,
 {
     xcb_cursor_t cur = xcb_generate_id (conn);
     xcb_pixmap_t pix = xcb_generate_id (conn);
-    xcb_void_cookie_t ck;
-    xcb_generic_error_t *err;
 
-    ck = xcb_create_pixmap_checked (conn, 1, pix, scr->root, 1, 1);
-    err = xcb_request_check (conn, ck);
-    if (err)
-    {
-        fprintf (stderr, "Cannot create pixmap: %d", err->error_code);
-        free (err);
-    }
-    ck = xcb_create_cursor_checked (conn, cur, pix, pix, 0, 0, 0, 1, 1, 1, 0, 0);
-    err = xcb_request_check (conn, ck);
-    if (err)
-    {
-        fprintf (stderr, "Cannot create pixmap: %d", err->error_code);
-        free (err);
-    }
+    xcb_create_pixmap (conn, 1, pix, scr->root, 1, 1);
+    xcb_create_cursor (conn, cur, pix, pix, 0, 0, 0, 1, 1, 1, 0, 0);
     return cur;
 }
 
