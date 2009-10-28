@@ -76,6 +76,7 @@ struct vout_display_sys_t
     xcb_connection_t *conn;
     vout_window_t *embed; /* VLC window (when windowed) */
 
+    xcb_cursor_t cursor; /* blank cursor */
     xcb_window_t window; /* drawable X window */
     xcb_gcontext_t gc; /* context to put images */
     bool shm; /* whether to use MIT-SHM */
@@ -277,6 +278,8 @@ static int Open (vlc_object_t *obj)
     }
     msg_Dbg (vd, "using X11 window %08"PRIx32, p_sys->window);
     msg_Dbg (vd, "using X11 graphic context %08"PRIx32, p_sys->gc);
+    p_sys->cursor = CreateBlankCursor (p_sys->conn, scr);
+
     p_sys->visible = false;
 
     /* */
@@ -507,12 +510,13 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         return VLC_SUCCESS;
     }
 
-    /* TODO */
-#if 0
     /* Hide the mouse. It will be send when
      * vout_display_t::info.b_hide_mouse is false */
-    VOUT_DISPLAY_HIDE_MOUSE,
-#endif
+    case VOUT_DISPLAY_HIDE_MOUSE:
+        xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid,
+                                  XCB_CW_CURSOR, &(uint32_t){ p_sys->cursor });
+        return VLC_SUCCESS;
+
     default:
         msg_Err (vd, "Unknown request in XCB vout display");
         return VLC_EGENERIC;
