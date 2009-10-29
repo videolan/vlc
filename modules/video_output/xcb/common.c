@@ -132,9 +132,13 @@ vout_window_t *GetWindow (vout_display_t *vd,
                                       XCB_CW_EVENT_MASK, &value);
         /* Try to subscribe to click events */
         /* (only one X11 client can get them, so might not work) */
-        value |= XCB_EVENT_MASK_BUTTON_PRESS | XCB_EVENT_MASK_BUTTON_RELEASE;
-        xcb_change_window_attributes (conn, wnd->handle.xid,
-                                      XCB_CW_EVENT_MASK, &value);
+        if (var_CreateGetBool (vd, "mouse-events"))
+        {
+            value |= XCB_EVENT_MASK_BUTTON_PRESS
+                   | XCB_EVENT_MASK_BUTTON_RELEASE;
+            xcb_change_window_attributes (conn, wnd->handle.xid,
+                                          XCB_CW_EVENT_MASK, &value);
+        }
     }
 
     /* Find the selected screen */
