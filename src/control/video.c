@@ -112,6 +112,16 @@ void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi,
     vlc_object_release( p_vout );
 }
 
+void libvlc_video_set_key_input( libvlc_media_player_t *p_mi, unsigned on )
+{
+    p_mi->keyboard_events = !!on;
+}
+
+void libvlc_video_set_mouse_input( libvlc_media_player_t *p_mi, unsigned on )
+{
+    p_mi->mouse_events = !!on;
+}
+
 void
 libvlc_video_take_snapshot( libvlc_media_player_t *p_mi, const char *psz_filepath,
         unsigned int i_width, unsigned int i_height, libvlc_exception_t *p_e )

@@ -336,6 +336,7 @@ libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
     mp->drawable.xid = 0;
     mp->drawable.hwnd = NULL;
     mp->drawable.nsobject = NULL;
+    mp->keyboard_events = mp->mouse_events = 1;
     mp->p_libvlc_instance = instance;
     mp->p_input_thread = NULL;
     mp->p_input_resource = NULL;
@@ -595,6 +596,11 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
     var_Create( p_input_thread, "drawable-nsobject", VLC_VAR_ADDRESS );
     if( p_mi->drawable.nsobject != NULL )
         var_SetAddress( p_input_thread, "drawable-nsobject", p_mi->drawable.nsobject );
+
+    var_Create( p_input_thread, "keyboard-events", VLC_VAR_BOOL );
+    var_SetBool( p_input_thread, "keyboard-events", p_mi->keyboard_events );
+    var_Create( p_input_thread, "mouse-events", VLC_VAR_BOOL );
+    var_SetBool( p_input_thread, "mouse-events", p_mi->mouse_events );
 
     var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
     var_AddCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );

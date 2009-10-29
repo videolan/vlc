@@ -50,6 +50,8 @@ struct libvlc_media_player_t
         uint32_t xid;
         uint32_t agl;
     } drawable;
+    unsigned keyboard_events:1;
+    unsigned mouse_events:1;
 };
 
 /* Media player - audio, video */

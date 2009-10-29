@@ -537,6 +537,39 @@ VLC_PUBLIC_API void libvlc_set_fullscreen( libvlc_media_player_t *, int, libvlc_
 VLC_PUBLIC_API int libvlc_get_fullscreen( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
+ * Enable or disable key press events handling, according to the LibVLC hotkeys
+ * configuration. By default and for historical reasons, keyboard events are
+ * handled by the LibVLC video widget.
+ *
+ * \note On X11, there can be only one subscriber for key press and mouse
+ * click events per window. If your application has subscribed to those events
+ * for the X window ID of the video widget, then LibVLC will not be able to
+ * handle key presses and mouse clicks in any case.
+ *
+ * \warning This function is only implemented for X11 at the moment.
+ *
+ * \param mp the media player
+ * \param on true to handle key press events, false to ignore them.
+ */
+VLC_PUBLIC_API
+void libvlc_video_set_key_input( libvlc_media_player_t *mp, unsigned on );
+
+/**
+ * Enable or disable mouse click events handling. By default, those events are
+ * handled. This is needed for DVD menus to work, as well as a few video
+ * filters such as "puzzle".
+ *
+ * \note See also \func libvlc_video_set_key_input().
+ *
+ * \warning This function is only implemented for X11 at the moment.
+ *
+ * \param mp the media player
+ * \param on true to handle mouse click events, false to ignore them.
+ */
+VLC_PUBLIC_API
+void libvlc_video_set_mouse_input( libvlc_media_player_t *mp, unsigned on );
+
+/**
  * Get current video height.
  *
  * \param p_mediaplayer the media player
