@@ -79,7 +79,7 @@
 #endif
 
 /* TDT support */
-#ifdef _DVBPSI_TOT_H_
+#ifdef _DVBPSI_DR_58_H_
 #   define TS_USE_TDT 1
 #   ifdef HAVE_DVBPSI_DR_H
 #       include <dvbpsi/tot.h>
@@ -3119,7 +3119,7 @@ static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
     }
 #ifdef TS_USE_TDT
     else if( p_demux->p_sys->pid[0x11].psi->i_sdt_version != -1 &&
-              i_table_id == 0x73 )  /* TDT */
+              i_table_id == 0x70 )  /* TDT */
     {
          msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
                  i_table_id, i_table_id, i_extension, i_extension );
