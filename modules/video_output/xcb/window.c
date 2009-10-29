@@ -273,7 +273,10 @@ static int Open (vlc_object_t *obj)
     wnd->sys = p_sys;
 
     p_sys->conn = conn;
-    p_sys->keys = CreateKeyHandler (obj, conn);
+    if (var_CreateGetBool (obj, "keyboard-events"))
+        p_sys->keys = CreateKeyHandler (obj, conn);
+    else
+        p_sys->keys = NULL;
     p_sys->root = scr->root;
 
     /* ICCCM
@@ -605,7 +608,7 @@ static int EmOpen (vlc_object_t *obj)
     p_sys->root = geo->root;
     free (geo);
 
-    if (var_CreateGetInteger (obj, "vout-event") != 3) /* FIXME: <- cleanup */
+    if (var_CreateGetBool (obj, "keyboard-events"))
     {
         p_sys->keys = CreateKeyHandler (obj, conn);
         if (p_sys->keys != NULL)
