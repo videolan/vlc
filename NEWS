@@ -1,4 +1,4 @@
-Changes between 1.0.2 and 1.1.0-git:
+Changes between 1.0.3 and 1.1.0-git:
 ------------------------------------
 
 Access:
@@ -75,6 +75,40 @@ Removed modules:
  * Xlib x11, Xlib xvideo (use XCB instead)
  * HAL (use libudev instead)
  * gtk_main, gtk_main2, gnome_main, gnome_main2 and pda interfaces
+
+
+Changes between 1.0.2 and 1.0.3:
+--------------------------------
+
+Video outputs:
+ * Fix video quality when resizing the video on Windows Vista and 7, due to
+   regressions in most popular drivers
+ * New deinterlacers modules based on yadif and yadif(x2) algorithms
+
+Decoders:
+ * Windows version supports now natively the WMA Professional codec, as it
+   didn't work in the packaged version of 1.0.2
+ * Fix downmixing of particual 4.0 AC-3 audio tracks
+
+Encoders:
+ * x264 has profile-limitter, like:
+    #transcode{vcodec=h264,venc=x264{profile=baseline,level=12}..}
+
+Input:
+ * Update for appletrailers lua script
+ * Fixes on the RAR stream filter
+ * Fix for E-AC3 in ATSC/TS streams
+ * Various fixes for v4l and v4l2
+ * Fix a crash in mjpeg demuxer
+
+Service discovery:
+ * New udev module for linux
+
+Qt4 interface:
+ * Fixes on the playlist and the stream output panels
+
+Translations:
+ * French, Galician, Korean, Polish, Russian, Romanian, Slovak and Ukrainian updates
 
 
 Changes between 1.0.1 and 1.0.2:
