@@ -77,6 +77,17 @@
 #       include "tables/eit.h"
 #   endif
 #endif
+
+/* TDT support */
+#ifdef _DVBPSI_TOT_H_
+#   define TS_USE_TDT 1
+#   ifdef HAVE_DVBPSI_DR_H
+#       include <dvbpsi/tot.h>
+#   else
+#       include "tables/tot.h"
+#   endif
+#endif
+
 #include <time.h>
 #undef TS_DEBUG
 
@@ -357,6 +368,7 @@ struct demux_sys_t
 
     /* */
     bool        b_dvb_meta;
+    int64_t     i_tdt_delta;
     int64_t     i_dvb_start;
     int64_t     i_dvb_length;
 
@@ -623,6 +635,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_dvb_meta = true;
     p_sys->b_access_control = true;
     p_sys->i_current_program = 0;
+    p_sys->i_tdt_delta = 0;
     p_sys->i_dvb_start = 0;
     p_sys->i_dvb_length = 0;
 
@@ -653,6 +666,7 @@ static int Open( vlc_object_t *p_this )
     {
         ts_pid_t *sdt = &p_sys->pid[0x11];
         ts_pid_t *eit = &p_sys->pid[0x12];
+        ts_pid_t *tdt = &p_sys->pid[0x14];
 
         PIDInit( sdt, true, NULL );
         sdt->psi->handle =
@@ -662,10 +676,20 @@ static int Open( vlc_object_t *p_this )
         eit->psi->handle =
             dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
                                 p_demux );
+#ifdef TS_USE_TDT
+        PIDInit( tdt, true, NULL );
+        tdt->psi->handle =
+            dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
+                                p_demux );
+#endif
         if( p_sys->b_access_control )
         {
             if( stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                 ACCESS_SET_PRIVATE_ID_STATE, 0x11, true ) ||
+#ifdef TS_USE_TDT
+                stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                                ACCESS_SET_PRIVATE_ID_STATE, 0x14, true ) ||
+#endif
                 stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
                                 ACCESS_SET_PRIVATE_ID_STATE, 0x12, true ) )
                 p_sys->b_access_control = false;
@@ -798,9 +822,9 @@ static void Close( vlc_object_t *p_this )
                 free( pid->psi );
                 break;
             default:
-                if( p_sys->b_dvb_meta && ( pid->i_pid == 0x11 || pid->i_pid == 0x12 ) )
+                if( p_sys->b_dvb_meta && ( pid->i_pid == 0x11 || pid->i_pid == 0x12 || pid->i_pid == 0x14 ) )
                 {
-                    /* SDT or EIT */
+                    /* SDT or EIT or TDT */
                     dvbpsi_DetachDemux( pid->psi->handle );
                     free( pid->psi );
                 }
@@ -1081,7 +1105,7 @@ static int Demux( demux_t *p_demux )
         {
             if( p_pid->psi )
             {
-                if( p_pid->i_pid == 0 || ( p_sys->b_dvb_meta && ( p_pid->i_pid == 0x11 || p_pid->i_pid == 0x12 ) ) )
+                if( p_pid->i_pid == 0 || ( p_sys->b_dvb_meta && ( p_pid->i_pid == 0x11 || p_pid->i_pid == 0x12 || p_pid->i_pid == 0x14 ) ) )
                 {
                     dvbpsi_PushPacket( p_pid->psi->handle, p_pkt->p_buffer );
                 }
@@ -1144,8 +1168,7 @@ static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_
 
     if( p_sys->i_dvb_length > 0 )
     {
-        /* FIXME we should not use time() but read the date from the tdt */
-        const time_t t = time( NULL );
+        const time_t t = time (NULL) + p_sys->i_tdt_delta;
         if( p_sys->i_dvb_start <= t && t < p_sys->i_dvb_start + p_sys->i_dvb_length )
         {
             if( pi_length )
@@ -2548,16 +2571,17 @@ static void ValidateDVBMeta( demux_t *p_demux, int i_pid )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( !p_sys->b_dvb_meta || ( i_pid != 0x11 && i_pid != 0x12 ) )
+    if( !p_sys->b_dvb_meta || ( i_pid != 0x11 && i_pid != 0x12 && i_pid != 0x14 ) )
         return;
 
     msg_Warn( p_demux, "Switching to non DVB mode" );
 
     /* This doesn't look like a DVB stream so don't try
-     * parsing the SDT/EDT */
+     * parsing the SDT/EDT/TDT */
 
-    for( int i = 0x11; i <= 0x12; i++ )
+    for( int i = 0x11; i <= 0x14; i++ )
     {
+        if( i == 0x13 ) continue;
         ts_pid_t *p_pid = &p_sys->pid[i];
         if( p_pid->psi )
         {
@@ -2907,6 +2931,16 @@ static int EITConvertDuration( uint32_t i_duration )
 }
 #undef CVT_FROM_BCD
 
+#ifdef TS_USE_TDT
+static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
+{
+    demux_sys_t        *p_sys = p_demux->p_sys;
+
+    p_sys->i_tdt_delta = EITConvertStartTime( p_tdt->i_utc_time ) - time (NULL);
+    dvbpsi_DeleteTOT(p_tdt);
+}
+#endif
+
 
 static void EITCallBack( demux_t *p_demux,
                          dvbpsi_eit_t *p_eit, bool b_current_following )
@@ -3083,6 +3117,17 @@ static void PSINewTableCallBack( demux_t *p_demux, dvbpsi_handle h,
                                     (dvbpsi_eit_callback)EITCallBackSchedule;
         dvbpsi_AttachEIT( h, i_table_id, i_extension, cb, p_demux );
     }
+#ifdef TS_USE_TDT
+    else if( p_demux->p_sys->pid[0x11].psi->i_sdt_version != -1 &&
+              i_table_id == 0x73 )  /* TDT */
+    {
+         msg_Dbg( p_demux, "PSINewTableCallBack: table 0x%x(%d) ext=0x%x(%d)",
+                 i_table_id, i_table_id, i_extension, i_extension );
+         dvbpsi_AttachTOT( h, i_table_id, i_extension,
+                           (dvbpsi_tot_callback)TDTCallBack, p_demux);
+    }
+#endif
+
 }
 #endif
 
