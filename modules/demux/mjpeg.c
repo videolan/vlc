@@ -128,7 +128,7 @@ static char* GetLine( demux_t *p_demux, int *p_pos )
     int         i;
     char        *p_line;
 
-    while( *p_pos > p_sys->i_data_peeked )
+    while( *p_pos >= p_sys->i_data_peeked )
     {
         if( ! Peek( p_demux, false ) )
         {
