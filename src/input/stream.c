@@ -1547,7 +1547,6 @@ char *stream_ReadLine( stream_t *s )
                 {
                     var_Create( p_input, "subsdec-encoding", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
                     var_SetString( p_input, "subsdec-encoding", "UTF-8" );
-                    vlc_object_release( p_input );
                 }
             }
         }
