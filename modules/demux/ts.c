@@ -666,7 +666,6 @@ static int Open( vlc_object_t *p_this )
     {
         ts_pid_t *sdt = &p_sys->pid[0x11];
         ts_pid_t *eit = &p_sys->pid[0x12];
-        ts_pid_t *tdt = &p_sys->pid[0x14];
 
         PIDInit( sdt, true, NULL );
         sdt->psi->handle =
@@ -677,6 +676,7 @@ static int Open( vlc_object_t *p_this )
             dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
                                 p_demux );
 #ifdef TS_USE_TDT
+        ts_pid_t *tdt = &p_sys->pid[0x14];
         PIDInit( tdt, true, NULL );
         tdt->psi->handle =
             dvbpsi_AttachDemux( (dvbpsi_demux_new_cb_t)PSINewTableCallBack,
