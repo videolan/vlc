@@ -595,15 +595,13 @@ static const char *const ppsz_pos_descriptions[] =
     "This avoids flooding the message log with debug output from the " \
     "video output synchronization mechanism.")
 
-#define VOUT_EVENT_TEXT N_("key and mouse event handling at vout level.")
-#define VOUT_EVENT_LONGTEXT N_( \
-    "This parameter accepts values : 1 (full event handling support), " \
-    "2 (event handling only for fullscreen) or 3 (No event handling). "  \
-    "Full event handling support is the default value.")
+#define KEYBOARD_EVENTS_TEXT N_("Key press events")
+#define KEYBOARD_EVENTS_LONGTEXT N_( \
+    "This enables VLC hotkeys from the (non-embedded) video window." )
 
-static const int pi_vout_event_values[] = { 1, 2, 3 };
-static const char *const ppsz_vout_event_descriptions[] =
-     { N_("Full support"), N_("Fullscreen-only"), N_("None") };
+#define MOUSE_EVENTS_TEXT N_("Key press events")
+#define MOUSE_EVENTS_LONGTEXT N_( \
+    "This enables handling of mouse clicks on the video." )
 
 /*****************************************************************************
  * Input
@@ -1614,10 +1612,12 @@ vlc_module_begin ()
               SKIP_FRAMES_LONGTEXT, true )
     add_bool( "quiet-synchro", 0, NULL, QUIET_SYNCHRO_TEXT,
               QUIET_SYNCHRO_LONGTEXT, true )
-    add_integer( "vout-event", 1, NULL, VOUT_EVENT_TEXT, VOUT_EVENT_LONGTEXT, true )
-        change_safe()
-        change_integer_list( pi_vout_event_values, ppsz_vout_event_descriptions, NULL )
-        add_deprecated_alias( "x11-event" ) /* renamed since 1.0.0 */
+    add_bool( "keyboard-events", true, NULL, KEYBOARD_EVENTS_TEXT,
+              KEYBOARD_EVENTS_LONGTEXT, true )
+    add_bool( "mouse-events", true, NULL, MOUSE_EVENTS_TEXT,
+              MOUSE_EVENTS_LONGTEXT, true )
+    add_obsolete_integer( "vout-event" ) /* deprecated since 1.1.0 */
+    add_obsolete_integer( "x11-event" ) /* renamed since 1.0.0 */
 #ifndef __APPLE__
     add_bool( "overlay", 1, NULL, OVERLAY_TEXT, OVERLAY_LONGTEXT, false )
 #endif
