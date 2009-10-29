@@ -147,6 +147,7 @@ QStringList Backend::availableMimeTypes() const
         << QLatin1String("audio/aiff")
         << QLatin1String("audio/basic")
         << QLatin1String("audio/mp3")
+        << QLatin1String("audio/mp4")
         << QLatin1String("audio/mpeg")
         << QLatin1String("audio/mpeg2")
         << QLatin1String("audio/mpeg3")
