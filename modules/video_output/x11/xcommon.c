@@ -165,9 +165,6 @@ int Activate ( vlc_object_t *p_this )
     if( p_vout->p_sys == NULL )
         return VLC_ENOMEM;
 
-    /* key and mouse event handling */
-    p_vout->p_sys->i_vout_event = var_CreateGetInteger( p_vout, "vout-event" );
-
     /* Open display, using the "display" config variable or the DISPLAY
      * environment variable */
     psz_display = config_GetPsz( p_vout, MODULE_STRING "-display" );
@@ -1284,21 +1281,12 @@ static int ManageVideo( vout_thread_t *p_vout )
                            i_x, i_y, i_width, i_height );
     }
 
-    /* cursor hiding depending on --vout-event option
-     *      activated if:
-     *            value = 1 (Fullsupport) (default value)
-     *         or value = 2 (Fullscreen-Only) and condition met
-     */
-    bool b_vout_event = (   ( p_vout->p_sys->i_vout_event == 1 )
-                         || ( p_vout->p_sys->i_vout_event == 2 && p_vout->b_fullscreen )
-                        );
-
     /* Autohide Cursour */
     if( mdate() - p_vout->p_sys->i_time_mouse_last_moved >
         p_vout->p_sys->i_mouse_hide_timeout )
     {
         /* Hide the mouse automatically */
-        if( b_vout_event && p_vout->p_sys->b_mouse_pointer_visible )
+        if( p_vout->p_sys->b_mouse_pointer_visible )
         {
             ToggleCursor( p_vout );
         }
@@ -1444,19 +1432,10 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
         }
     } while( !b_map_notify );
 
-    /* key and mouse events handling depending on --vout-event option
-     *      activated if:
-     *            value = 1 (Fullsupport) (default value)
-     *         or value = 2 (Fullscreen-Only) and condition met
-     */
-    bool b_vout_event = (   ( p_vout->p_sys->i_vout_event == 1 )
-                         || ( p_vout->p_sys->i_vout_event == 2 && p_vout->b_fullscreen )
-                        );
-    if ( b_vout_event )
-        XSelectInput( p_vout->p_sys->p_display, p_win->base_window,
-                      StructureNotifyMask |
-                      ButtonPressMask | ButtonReleaseMask |
-                      PointerMotionMask );
+    long mask = StructureNotifyMask | PointerMotionMask;
+    if( var_CreateGetBool( p_vout, "mouse-events" ) )
+        mask |= ButtonPressMask | ButtonReleaseMask;
+    XSelectInput( p_vout->p_sys->p_display, p_win->base_window, mask );
 
     /* Create video output sub-window. */
     p_win->video_window =  XCreateSimpleWindow(

@@ -207,9 +207,6 @@ struct vout_sys_t
     /* Our window */
     x11_window_t        window;
 
-    /* key and mouse event handling */
-    int                 i_vout_event;  /* 1(Fullsupport), 2(FullscreenOnly), 3(none) */
-
     /* X11 generic properties */
 #ifdef HAVE_SYS_SHM_H
     int                 i_shm_opcode;      /* shared memory extension opcode */
