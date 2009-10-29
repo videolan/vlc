@@ -27,11 +27,9 @@ libxcb_x11_plugin_la_SOURCES = \
 	xcb/common.c \
 	xcb/events.c
 libxcb_x11_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) \
-	$(XPROTO_CFLAGS)
+	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS)
 libxcb_x11_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(XCB_LIBS) $(XCB_SHM_LIBS) \
-	$(XPROTO_LIBS)
+	$(XCB_LIBS) $(XCB_SHM_LIBS)
 libxcb_x11_plugin_la_DEPENDENCIES =
 
 libxcb_xv_plugin_la_SOURCES = \
@@ -40,18 +38,18 @@ libxcb_xv_plugin_la_SOURCES = \
 	xcb/common.c \
 	xcb/events.c
 libxcb_xv_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) $(XCB_XV_CFLAGS) \
-	$(XPROTO_CFLAGS)
+	$(XCB_CFLAGS) $(XCB_SHM_CFLAGS) $(XCB_XV_CFLAGS)
 libxcb_xv_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_XV_LIBS) \
-	$(XPROTO_LIBS)
+	$(XCB_LIBS) $(XCB_SHM_LIBS) $(XCB_XV_LIBS)
 libxcb_xv_plugin_la_DEPENDENCIES =
 
 libxcb_window_plugin_la_SOURCES = xcb/window.c xcb/keys.c
 libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(XPROTO_CFLAGS) \
 	$(XCB_CFLAGS) \
 	$(XCB_KEYSYMS_CFLAGS)
 libxcb_window_plugin_la_LIBADD = $(AM_LIBADD) \
+	$(XPROTO_LIBS) \
 	$(XCB_LIBS) \
 	$(XCB_KEYSYMS_LIBS)
 libxcb_window_plugin_la_DEPENDENCIES =

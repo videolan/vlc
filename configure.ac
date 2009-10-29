@@ -3650,8 +3650,6 @@ AC_ARG_ENABLE(xvideo,
 
 need_xid_provider="no"
 AS_IF([test "${enable_xcb}" != "no"], [
-  PKG_CHECK_MODULES(XPROTO, [xproto])
-
   dnl libxcb
   PKG_CHECK_MODULES(XCB, [xcb])
   PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
@@ -3690,6 +3688,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
   ])
 
   AS_IF([test "${have_xcb_keysyms}" = "yes"], [
+    PKG_CHECK_MODULES(XPROTO, [xproto])
     VLC_ADD_PLUGIN([xcb_window])
     VLC_ADD_PLUGIN([globalhotkeys])
     VLC_ADD_CFLAGS([globalhotkeys], [${XCB_KEYSYMS_CFLAGS} ${XCB_CFLAGS}])
