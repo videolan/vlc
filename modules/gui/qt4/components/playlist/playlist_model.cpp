@@ -760,11 +760,14 @@ void PLModel::removeItem( PLItem *item )
     if( item->i_id == i_cached_id ) i_cached_id = -1;
     i_cached_input_id = -1;
 
-    if( currentItem == item )
+    if( currentItem == item || rootItem == item)
     {
         currentItem = NULL;
         emit currentChanged( QModelIndex() );
     }
+
+    if(item == rootItem)
+        rootItem = NULL;
 
     if( item->parentItem ) {
         int i = item->parentItem->children.indexOf( item );
@@ -775,11 +778,6 @@ void PLModel::removeItem( PLItem *item )
     }
     else delete item;
 
-    if(item == rootItem)
-    {
-        rootItem = NULL;
-        reset();
-    }
 }
 
 /* This function must be entered WITH the playlist lock */
