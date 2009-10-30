@@ -570,8 +570,31 @@ int __vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
     }
 
     /* Calculate how big the new image should be */
-    size_t i_bytes = (size_t)p_pic->format.i_bits_per_pixel *
-        i_width_aligned * i_height_aligned / 8;
+
+    /*
+     * bytes = width_aligned * height_aligned * bpp / 8
+     * We need to check for an integer overflow at each multiplication since
+     * height & width (and bpp?) could be arbitrary large
+     */
+
+    size_t i_bytes = 0;
+    /* i_width_aligned is a multiple of 16, so we can divide by 8 now */
+    size_t i_width_aligned_divided = i_width_aligned / 8;
+    if( i_width_aligned_divided <= (SIZE_MAX/i_height_aligned) )
+    {
+        size_t i_pixels_divided = i_width_aligned_divided * i_height_aligned;
+        size_t i_bpp = p_pic->format.i_bits_per_pixel;
+        if( i_pixels_divided <= (SIZE_MAX/i_bpp) )
+        {
+            i_bytes = i_pixels_divided * i_bpp;
+        }
+    }
+
+    if( i_bytes == 0 )
+    {
+        p_pic->i_planes = 0;
+        return VLC_ENOMEM;
+    }
 
     p_pic->p_data = vlc_memalign( &p_pic->p_data_orig, 16, i_bytes );
 
