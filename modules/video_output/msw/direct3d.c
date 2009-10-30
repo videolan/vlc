@@ -522,6 +522,16 @@ static int Direct3DFillPresentationParameters(vout_thread_t *p_vout)
     d3dpp->BackBufferCount        = 1;
     d3dpp->EnableAutoDepthStencil = FALSE;
 
+    const unsigned i_adapter_count = IDirect3D9_GetAdapterCount(p_d3dobj);
+    for( unsigned i = 1; i < i_adapter_count; i++ )
+    {
+        hr = IDirect3D9_GetAdapterDisplayMode(p_d3dobj, i, &d3ddm );
+        if( FAILED(hr) )
+            continue;
+        d3dpp->BackBufferWidth  = __MAX(d3dpp->BackBufferWidth,  d3ddm.Width);
+        d3dpp->BackBufferHeight = __MAX(d3dpp->BackBufferHeight, d3ddm.Height);
+    }
+
     RECT *display = &p_vout->p_sys->rect_display;
     display->left   = 0;
     display->top    = 0;
