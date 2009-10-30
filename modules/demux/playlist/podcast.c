@@ -203,6 +203,8 @@ static int Demux( demux_t *p_demux )
             }
             case XML_READER_TEXT:
             {
+                if(!psz_elname) break;
+
                 char *psz_text = xml_ReaderValue( p_xml_reader );
 
 #define SET_DATA( field, name )                 \
