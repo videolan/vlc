@@ -666,15 +666,6 @@ QMenu *QVLCMenu::SDMenu( intf_thread_t *p_intf, QWidget *parent )
     char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
     for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
     {
-        QAction *a = new QAction( qfu( *ppsz_longname ), menu );
-        a->setCheckable( true );
-        if( playlist_IsServicesDiscoveryLoaded( THEPL, *ppsz_name ) )
-            a->setChecked( true );
-        CONNECT( a, triggered(), THEDP->SDMapper, map() );
-        THEDP->SDMapper->setMapping( a, QString( *ppsz_name ) );
-        menu->addAction( a );
-
-        /* Special case for podcast */
         if( !strcmp( *ppsz_name, "podcast" ) )
         {
             QAction *b = new QAction( qtr( "Configure podcasts..." ), menu );
