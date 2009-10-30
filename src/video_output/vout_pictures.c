@@ -556,7 +556,7 @@ int __vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
                             int i_width, int i_height, int i_aspect )
 {
     VLC_UNUSED(p_this);
-    int i_bytes, i_index, i_width_aligned, i_height_aligned;
+    int i_index, i_width_aligned, i_height_aligned;
 
     /* Make sure the real dimensions are a multiple of 16 */
     i_width_aligned = (i_width + 15) >> 4 << 4;
@@ -570,7 +570,7 @@ int __vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
     }
 
     /* Calculate how big the new image should be */
-    i_bytes = p_pic->format.i_bits_per_pixel *
+    size_t i_bytes = (size_t)p_pic->format.i_bits_per_pixel *
         i_width_aligned * i_height_aligned / 8;
 
     p_pic->p_data = vlc_memalign( &p_pic->p_data_orig, 16, i_bytes );
