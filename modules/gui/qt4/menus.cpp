@@ -331,7 +331,6 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
         updateRecents( p_intf );
         menu->addMenu( recentsMenu );
     }
-    menu->addMenu( SDMenu( p_intf, menu ) );
     menu->addSeparator();
 
     addDPStaticEntry( menu, qtr( I_PL_SAVE ), "", SLOT( saveAPlaylist() ),
