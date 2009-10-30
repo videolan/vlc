@@ -421,8 +421,11 @@ static int Open( vlc_object_t *p_this )
     else
         p_sys->i_read_once = DVB_READ_ONCE_START;
 
-    free( p_access->psz_demux );
-    p_access->psz_demux = strdup( "ts" );
+    if( !p_sys->b_scan_mode )
+    {
+        free( p_access->psz_demux );
+        p_access->psz_demux = strdup( "ts" );
+    }
     return VLC_SUCCESS;
 }
 
