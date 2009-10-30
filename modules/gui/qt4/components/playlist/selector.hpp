@@ -31,6 +31,7 @@
 
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
+#include <QStyledItemDelegate>
 
 #include <vlc_playlist.h>
 
@@ -51,6 +52,17 @@ enum {
     LONGNAME_ROLE,
 };
 
+class PLSelectorDelegate : public QStyledItemDelegate
+{
+  private:
+    QSize sizeHint ( const QStyleOptionViewItem& option, const QModelIndex& index ) const
+    {
+      QSize sz = QStyledItemDelegate::sizeHint( option, index );
+      if( sz.height() < 25 ) sz.setHeight(25);
+      return sz;
+    }
+};
+
 Q_DECLARE_METATYPE( playlist_item_t *);
 class PLSelector: public QTreeWidget
 {
@@ -62,6 +74,7 @@ protected:
     friend class PlaylistWidget;
 private:
     QStringList mimeTypes () const;
+    void makeStandardItem( QTreeWidgetItem*, const QString& );
     bool dropMimeData ( QTreeWidgetItem * parent, int index, const QMimeData * data, Qt::DropAction action );
     void createItems();
     intf_thread_t *p_intf;

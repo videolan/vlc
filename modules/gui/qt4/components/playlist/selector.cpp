@@ -31,10 +31,13 @@
 #include "components/playlist/selector.hpp"
 #include "playlist_item.hpp"
 #include "qt4.hpp"
+#include "../../dialogs_provider.hpp"
 
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QMimeData>
+#include <QPushButton>
+#include <QLabel>
 
 #include <vlc_playlist.h>
 #include <vlc_services_discovery.h>
@@ -42,13 +45,14 @@
 PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
            : QTreeWidget( p ), p_intf(_p_intf)
 {
+    setItemDelegate( new PLSelectorDelegate() );
+    setFrameStyle( QFrame::StyledPanel | QFrame::Plain );
     setIconSize( QSize( 24,24 ) );
-//    view->setAlternatingRowColors( true );
-    setIndentation( 10 );
+    setIndentation( 15 );
     header()->hide();
     setRootIsDecorated( false );
-//    model = new PLModel( THEPL, p_intf, THEPL->p_root_category, 1, this );
-//    view->setModel( model );
+    setAlternatingRowColors( true );
+
     viewport()->setAcceptDrops(true);
     setDropIndicatorShown(true);
     invisibleRootItem()->setFlags( invisibleRootItem()->flags() & ~Qt::ItemIsDropEnabled );
@@ -82,7 +86,6 @@ void PLSelector::setSource( QTreeWidgetItem *item )
         if( !playlist_IsServicesDiscoveryLoaded( THEPL, qtu( qs ) ) )
         {
             playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
-
         }
     }
 
@@ -103,27 +106,35 @@ void PLSelector::setSource( QTreeWidgetItem *item )
        emit activated( pl_item );
 }
 
+void PLSelector::makeStandardItem( QTreeWidgetItem* item, const QString& str )
+{
+  item->setText( 0,str );
+}
+
 void PLSelector::createItems()
 {
     QTreeWidgetItem *pl = new QTreeWidgetItem( this );
-    pl->setText( 0, qtr( "Playlist" ) );
+    makeStandardItem( pl, qtr( "Playlist" ) );
     pl->setData( 0, TYPE_ROLE, PL_TYPE );
     pl->setData( 0, PPL_ITEM_ROLE, QVariant::fromValue( THEPL->p_local_category ) );
-/*  QTreeWidgetItem *empty = new QTreeWidgetItem( view );
-    empty->setFlags(Qt::NoItemFlags); */
 
     QTreeWidgetItem *lib = new QTreeWidgetItem( this );
-    lib->setText( 0, qtr( "Library" ) );
+    makeStandardItem( lib, qtr( "Media Library" ) );
     lib->setData( 0, TYPE_ROLE, ML_TYPE );
     lib->setData( 0, PPL_ITEM_ROLE, QVariant::fromValue( THEPL->p_ml_category ) );
 
-/*  QTreeWidgetItem *empty2 = new QTreeWidgetItem( view );
-    empty2->setFlags(Qt::NoItemFlags);*/
-
     QTreeWidgetItem *sds = new QTreeWidgetItem( this );
+    makeStandardItem( sds, qtr( "Services" ) );
     sds->setExpanded( true );
-    sds->setText( 0, qtr( "Libraries" ) );
     sds->setFlags( sds->flags() & ~Qt::ItemIsDropEnabled );
+
+    QTreeWidgetItem *mfldrs = new QTreeWidgetItem( sds );
+    makeStandardItem( mfldrs, qtr( "Media Folders" ) );
+    mfldrs->setFlags( mfldrs->flags() & ~Qt::ItemIsDropEnabled );
+
+    QTreeWidgetItem *shouts = new QTreeWidgetItem( sds );
+    makeStandardItem( shouts, qtr( "Shoutcast" ) );
+    shouts->setFlags( shouts->flags() & ~Qt::ItemIsDropEnabled );
 
     char **ppsz_longnames;
     char **ppsz_names = vlc_sd_GetNames( &ppsz_longnames );
@@ -134,12 +145,52 @@ void PLSelector::createItems()
     QTreeWidgetItem *sd_item;
     for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
     {
-        sd_item = new QTreeWidgetItem( QStringList( qfu(*ppsz_longname) ) );
+        sd_item = new QTreeWidgetItem(  );
+
+#define SD_IS( name ) ( !strcmp( *ppsz_name, name ) )
+
+        if( SD_IS("shoutcast") || SD_IS("shoutcasttv") ||
+            SD_IS("frenchtv") || SD_IS("freebox") )
+        {
+            shouts->addChild( sd_item );
+            makeStandardItem( sd_item, qfu(*ppsz_longname) );
+        }
+        else if( SD_IS("video_dir") || SD_IS("audio_dir") || SD_IS("picture_dir") )
+        {
+            mfldrs->addChild( sd_item );
+            makeStandardItem( sd_item, qfu(*ppsz_longname) );
+        }
+        else if( SD_IS("podcast") )
+        {
+            sds->addChild( sd_item );
+
+            QLabel *lbl = new QLabel("Podcasts");
+            lbl->setMargin(3);
+            QPushButton *btn = new QPushButton();
+            btn->setMaximumWidth(30);
+            btn->setIcon( QIcon( ":/menu/preferences" ) );
+            QHBoxLayout *hbox = new QHBoxLayout();
+            hbox->setContentsMargins(0,0,0,0);
+            hbox->addWidget(lbl);
+            hbox->addWidget(btn);
+            QWidget *w = new QWidget();
+            w->setLayout(hbox);
+
+            CONNECT( btn, clicked(), THEDP, podcastConfigureDialog() );
+            setItemWidget( sd_item, 0, w );
+        }
+        else
+        {
+            sds->addChild( sd_item );
+            makeStandardItem( sd_item, qfu(*ppsz_longname) );
+        }
+
+#undef SD_IS
+
         sd_item->setData( 0, TYPE_ROLE, SD_TYPE );
         sd_item->setData( 0, NAME_ROLE, qfu( *ppsz_name ) );
         sd_item->setData( 0, LONGNAME_ROLE, qfu( *ppsz_longname ) );
         sd_item->setFlags( sd_item->flags() & ~Qt::ItemIsDropEnabled );
-        sds->addChild( sd_item );
         free( *ppsz_name );
         free( *ppsz_longname );
     }
