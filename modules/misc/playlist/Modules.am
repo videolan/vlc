@@ -4,7 +4,6 @@ SOURCES_export = \
 	m3u.c \
 	xspf.c \
 	xspf.h \
-	old.c \
 	$(NULL)
 
 libvlc_LTLIBRARIES += libexport_plugin.la
