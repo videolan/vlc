@@ -101,6 +101,8 @@ static void Inhibit (vlc_inhibit_t *ih, bool suspend)
         p_sys->id,
         NULL,
     };
+
+    extern char **environ;
     if (posix_spawnp (&pid, "xdg-screensaver", NULL, NULL, argv, environ) == 0)
     {
         msg_Dbg (ih, "started xdg-screensaver (PID = %d)", (int)pid);
