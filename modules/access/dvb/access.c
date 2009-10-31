@@ -421,11 +421,8 @@ static int Open( vlc_object_t *p_this )
     else
         p_sys->i_read_once = DVB_READ_ONCE_START;
 
-    if( !p_sys->b_scan_mode )
-    {
-        free( p_access->psz_demux );
-        p_access->psz_demux = strdup( "ts" );
-    }
+    free( p_access->psz_demux );
+    p_access->psz_demux = strdup( p_sys->b_scan_mode ? "m3u8" : "ts" );
     return VLC_SUCCESS;
 }
 
