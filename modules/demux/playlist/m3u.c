@@ -39,6 +39,7 @@
 struct demux_sys_t
 {
     char *psz_prefix;
+    char *(*pf_dup) (const char *);
 };
 
 /*****************************************************************************
@@ -57,14 +58,25 @@ int Import_M3U( vlc_object_t *p_this )
     demux_t *p_demux = (demux_t *)p_this;
     const uint8_t *p_peek;
     CHECK_PEEK( p_peek, 8 );
+    char *(*pf_dup) (const char *);
 
-    if(! ( POKE( p_peek, "#EXTM3U", 7 ) || POKE( p_peek, "RTSPtext", 8 ) ||
-           demux_IsPathExtension( p_demux, ".m3u" ) || demux_IsPathExtension( p_demux, ".vlc" ) ||
-           demux_IsForced( p_demux,  "m3u" ) || ContainsURL( p_demux ) ) )
+    if( POKE( p_peek, "RTSPtext", 8 ) /* QuickTime */
+     || demux_IsPathExtension( p_demux, ".m3u8" )
+     || demux_IsForced( p_demux, "m3u8" ) )
+        pf_dup = strdup; /* UTF-8 */
+    else
+    if( POKE( p_peek, "#EXTM3U", 7 )
+     || demux_IsPathExtension( p_demux, ".m3u" )
+     || demux_IsPathExtension( p_demux, ".vlc" )
+     || demux_IsForced( p_demux, "m3u" )
+     || ContainsURL( p_demux ) )
+        pf_dup = FromLocaleDup; /* locale character set (?) */
+    else
         return VLC_EGENERIC;
 
     STANDARD_DEMUX_INIT_MSG( "found valid M3U playlist" );
     p_demux->p_sys->psz_prefix = FindPrefix( p_demux );
+    p_demux->p_sys->pf_dup = pf_dup;
 
     return VLC_SUCCESS;
 }
@@ -122,6 +134,7 @@ static int Demux( demux_t *p_demux )
     int        i_parsed_duration = 0;
     mtime_t    i_duration = -1;
     const char**ppsz_options = NULL;
+    char *    (*pf_dup) (const char *) = p_demux->p_sys->pf_dup;
     int        i_options = 0;
     bool b_cleanup = false;
     input_item_t *p_input;
@@ -156,9 +169,9 @@ static int Demux( demux_t *p_demux )
                 if( i_parsed_duration >= 0 )
                     i_duration = i_parsed_duration * INT64_C(1000000);
                 if( psz_name )
-                    psz_name = FromLocaleDup( psz_name );
+                    psz_name = pf_dup( psz_name );
                 if( psz_artist )
-                    psz_artist = FromLocaleDup( psz_artist );
+                    psz_artist = pf_dup( psz_artist );
             }
             else if( !strncasecmp( psz_parse, "EXTVLCOPT:",
                                    sizeof("EXTVLCOPT:") -1 ) )
@@ -168,7 +181,7 @@ static int Demux( demux_t *p_demux )
                 psz_parse += sizeof("EXTVLCOPT:") -1;
                 if( !*psz_parse ) goto error;
 
-                psz_option = FromLocaleDup( psz_parse );
+                psz_option = pf_dup( psz_parse );
                 if( psz_option )
                     INSERT_ELEM( ppsz_options, i_options, i_options,
                                  psz_option );
@@ -182,7 +195,7 @@ static int Demux( demux_t *p_demux )
         {
             char *psz_mrl;
 
-            psz_parse = FromLocale( psz_parse );
+            psz_parse = pf_dup( psz_parse );
             if( !psz_name && psz_parse )
                 /* Use filename as name for relative entries */
                 psz_name = strdup( psz_parse );
