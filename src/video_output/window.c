@@ -83,6 +83,8 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
             vlc_inhibit_Set (w->inhibit, true);
             /* FIXME: ^ wait for vout activation, pause */
     }
+    else
+        w->inhibit = NULL;
     return window;
 }
 
