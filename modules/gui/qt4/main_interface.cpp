@@ -590,6 +590,7 @@ inline void MainInterface::initSystray()
 
 inline void MainInterface::askForPrivacy()
 {
+#ifndef HAVE_MAEMO
     /**
      * Ask for the network policy on FIRST STARTUP
      **/
@@ -610,6 +611,7 @@ inline void MainInterface::askForPrivacy()
             config_SaveConfigFile( p_intf, NULL );
         }
     }
+#endif
 }
 
 int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
