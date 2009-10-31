@@ -83,8 +83,10 @@ public:
     int controlVideo( int i_query, va_list args );
 
     /* Getters */
+#ifndef HAVE_MAEMO
     QSystemTrayIcon *getSysTray() { return sysTray; }
     QMenu *getSysTrayMenu() { return systrayMenu; }
+#endif
     int getControlsVisibilityStatus();
 
     /* Sizehint() */
@@ -116,8 +118,10 @@ private:
     bool isDocked() { return ( i_pl_dock != PL_UNDOCKED ); }
 
     QSettings           *settings;
+#ifndef HAVE_MAEMO
     QSystemTrayIcon     *sysTray;
     QMenu               *systrayMenu;
+#endif
     QString              input_name;
     QGridLayout         *mainLayout;
     ControlsWidget      *controls;
@@ -161,7 +165,9 @@ public slots:
     void dockPlaylist( pl_dock_e i_pos = PL_BOTTOM );
     void toggleMinimalView( bool );
     void togglePlaylist();
+#ifndef HAVE_MAEMO
     void toggleUpdateSystrayMenu();
+#endif
     void toggleAdvanced();
     void toggleFullScreen();
     void toggleFSC();
@@ -183,10 +189,11 @@ private slots:
 #if 0
     void visual();
 #endif
+#ifndef HAVE_MAEMO
     void handleSystrayClick( QSystemTrayIcon::ActivationReason );
     void updateSystrayTooltipName( const QString& );
     void updateSystrayTooltipStatus( int );
-
+#endif
     void showCryptedLabel( bool );
 
     void handleKeyPress( QKeyEvent * );

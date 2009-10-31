@@ -82,7 +82,9 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     bgWidget             = NULL;
     videoWidget          = NULL;
     playlistWidget       = NULL;
+#ifndef HAVE_MAEMO
     sysTray              = NULL;
+#endif
     videoIsActive        = false;
     playlistVisible      = false;
     input_name           = "";
@@ -185,11 +187,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
              this, setName( const QString& ) );
     /* and systray */
+#ifndef HAVE_MAEMO
     if( sysTray )
     {
         CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
                  this, updateSystrayTooltipName( const QString& ) );
     }
+#endif
     /* and title of the Main Interface*/
     if( config_GetInt( p_intf, "qt-name-in-title" ) )
     {
@@ -201,11 +205,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      * CONNECTS on PLAY_STATUS
      **/
     /* Status on the systray */
+#ifndef HAVE_MAEMO
     if( sysTray )
     {
         CONNECT( THEMIM->getIM(), statusChanged( int ),
                  this, updateSystrayTooltipStatus( int ) );
     }
+#endif
 
     /* END CONNECTS ON IM */
 
@@ -562,6 +568,7 @@ void MainInterface::createTaskBarButtons()
 
 inline void MainInterface::initSystray()
 {
+#ifndef HAVE_MAEMO
     bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
     bool b_systrayWanted = config_GetInt( p_intf, "qt-system-tray" );
 
@@ -578,6 +585,7 @@ inline void MainInterface::initSystray()
 
     if( b_systrayAvailable && b_systrayWanted )
             createSystray();
+#endif
 }
 
 inline void MainInterface::askForPrivacy()
@@ -1080,7 +1088,7 @@ void MainInterface::showCryptedLabel( bool b_show )
 /*****************************************************************************
  * Systray Icon and Systray Menu
  *****************************************************************************/
-
+#ifndef HAVE_MAEMO
 /**
  * Create a SystemTray icon and a menu that would go with it.
  * Connects to a click handler on the icon.
@@ -1223,6 +1231,7 @@ void MainInterface::updateSystrayTooltipStatus( int i_status )
     }
     QVLCMenu::updateSystrayMenu( this, p_intf );
 }
+#endif
 
 /************************************************************************
  * D&D Events

@@ -1000,6 +1000,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
 #undef ACT_ADDMENU
 #undef ACT_ADDCHECK
 
+#ifndef HAVE_MAEMO
 /************************************************************************
  * Systray Menu                                                         *
  ************************************************************************/
@@ -1042,6 +1043,7 @@ void QVLCMenu::updateSystrayMenu( MainInterface *mi,
     /* Set the menu */
     mi->getSysTray()->setContextMenu( sysMenu );
 }
+#endif
 
 #undef CREATE_POPUP
 #undef POPUP_BOILERPLATE
