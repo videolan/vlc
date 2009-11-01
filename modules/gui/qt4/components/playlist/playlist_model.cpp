@@ -113,15 +113,7 @@ Qt::ItemFlags PLModel::flags( const QModelIndex &index ) const
 
     PLItem *item = index.isValid() ? getItem( index ) : rootItem;
 
-    input_item_t *pl_input =
-        p_playlist->p_local_category ?
-        p_playlist->p_local_category->p_input : NULL;
-    input_item_t *ml_input =
-        p_playlist->p_ml_category ?
-        p_playlist->p_ml_category->p_input : NULL;
-
-    if( ( pl_input && rootItem->p_input == pl_input ) ||
-              ( ml_input && rootItem->p_input == ml_input ) )
+    if( canEdit() )
     {
         PL_LOCK;
         playlist_item_t *plItem =
@@ -610,6 +602,19 @@ int PLModel::columnFromMeta( int meta_col ) const
     return column;
 }
 
+bool PLModel::canEdit() const
+{
+  return (
+    rootItem != NULL &&
+    (
+      rootItem->p_input == p_playlist->p_local_category->p_input ||
+      (
+        p_playlist->p_ml_category &&
+        rootItem->p_input == p_playlist->p_ml_category->p_input
+      )
+    )
+  );
+}
 /************************* Updates handling *****************************/
 void PLModel::customEvent( QEvent *event )
 {
@@ -823,6 +828,8 @@ void PLModel::updateTreeItem( PLItem *item )
  */
 void PLModel::doDelete( QModelIndexList selected )
 {
+    if( !canEdit() ) return;
+
     for( int i = selected.size() -1 ; i >= 0; i-- )
     {
         QModelIndex index = selected[i];

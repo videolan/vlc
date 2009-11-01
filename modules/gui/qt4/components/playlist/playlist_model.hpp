@@ -171,6 +171,7 @@ private:
     static inline PLItem *getItem( QModelIndex index );
     int columnFromMeta( int meta_column ) const;
     int columnToMeta( int column ) const;
+    bool canEdit() const;
     PLItem *p_cached_item;
     PLItem *p_cached_item_bi;
     int i_cached_id;
