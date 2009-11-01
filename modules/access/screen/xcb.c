@@ -24,6 +24,7 @@
 # include <config.h>
 #endif
 #include <stdarg.h>
+#include <assert.h>
 #include <xcb/xcb.h>
 #include <vlc_common.h>
 #include <vlc_demux.h>
@@ -54,6 +55,10 @@
 #define HEIGHT_LONGTEXT N_( \
     "Pixel height of the capture region, or 0 for full height")
 
+#define FOLLOW_MOUSE_TEXT N_( "Follow the mouse" )
+#define FOLLOW_MOUSE_LONGTEXT N_( \
+    "Follow the mouse when capturing a subscreen." )
+
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
 
@@ -83,6 +88,8 @@ vlc_module_begin ()
     add_integer ("screen-height", 0, NULL, LEFT_TEXT, LEFT_LONGTEXT, true)
         change_integer_range (0, 65535)
         change_safe ()
+    add_bool ("screen-follow-mouse", false, NULL, FOLLOW_MOUSE_TEXT,
+              FOLLOW_MOUSE_LONGTEXT, true)
 
     add_shortcut ("screen")
     add_shortcut ("window")
@@ -103,6 +110,7 @@ struct demux_sys_t
     xcb_window_t      root, window;
     int16_t           x, y;
     uint16_t          w, h;
+    bool              follow_mouse;
     /* fmt, es and pts are protected by the lock. The rest is read-only. */
     vlc_mutex_t       lock;
     /* Timer does not use this, only input thread: */
@@ -176,6 +184,7 @@ static int Open (vlc_object_t *obj)
     p_sys->y = var_CreateGetInteger (obj, "screen-top");
     p_sys->w = var_CreateGetInteger (obj, "screen-width");
     p_sys->h = var_CreateGetInteger (obj, "screen-height");
+    p_sys->follow_mouse = var_CreateGetBool (obj, "screen-follow-mouse");
 
     uint32_t chroma = 0;
     uint8_t bpp;
@@ -356,10 +365,13 @@ static void Demux (void *data)
     xcb_get_geometry_cookie_t gc = xcb_get_geometry (conn, p_sys->window);
     int16_t x = p_sys->x, y = p_sys->y;
     xcb_translate_coordinates_cookie_t tc;
+    xcb_query_pointer_cookie_t qc;
 
     if (p_sys->window != p_sys->root)
         tc = xcb_translate_coordinates (conn, p_sys->window, p_sys->root,
                                         x, y);
+    if (p_sys->follow_mouse)
+        qc = xcb_query_pointer (conn, p_sys->window);
 
     xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply (conn, gc, NULL);
     if (geo == NULL)
@@ -368,23 +380,51 @@ static void Demux (void *data)
         return;
     }
 
-    uint16_t w = geo->width - x;
-    uint16_t h = geo->height - y;
+    uint16_t ow = geo->width - x;
+    uint16_t oh = geo->height - y;
+    uint16_t w = p_sys->w;
+    uint16_t h = p_sys->h;
+    if (w == 0 || w > ow)
+        w = ow;
+    if (h == 0 || h > oh)
+        h = oh;
     free (geo);
-    if (p_sys->w > 0 && p_sys->w < w)
-        w = p_sys->w;
-    if (p_sys->h > 0 && p_sys->h < h)
-        h = p_sys->h;
 
     if (p_sys->window != p_sys->root)
     {
         xcb_translate_coordinates_reply_t *coords =
              xcb_translate_coordinates_reply (conn, tc, NULL);
-        if (coords == NULL)
-            return;
-        x = coords->dst_x;
-        y = coords->dst_y;
-        free (coords);
+        if (coords != NULL)
+        {
+            x = coords->dst_x;
+            y = coords->dst_y;
+            free (coords);
+        }
+    }
+
+    if (p_sys->follow_mouse)
+    {
+        xcb_query_pointer_reply_t *ptr =
+            xcb_query_pointer_reply (conn, qc, NULL);
+        if (ptr != NULL)
+        {
+            int16_t min_x = x + (w / 2);
+            int16_t min_y = y + (h / 2);
+            int16_t max_x = x + ow - ((w + 1) / 2);
+            int16_t max_y = y + oh - ((h + 1) / 2);
+
+            assert (max_x >= min_x); /* max_x - min_x = ow - w >= 0 */
+            if (ptr->root_x > max_x)
+                x += ow - w;
+            else if (ptr->root_x > min_x)
+                x += ptr->root_x - min_x;
+
+            assert (max_y >= min_y);
+            if (ptr->root_y > max_y)
+                y += oh - h;
+            else if (ptr->root_y > min_y)
+                y += ptr->root_y - min_y;
+        }
     }
 
     xcb_get_image_reply_t *img;
