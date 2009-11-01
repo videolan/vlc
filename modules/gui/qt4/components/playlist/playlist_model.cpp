@@ -219,7 +219,9 @@ void PLModel::dropAppendCopy( QByteArray& data, PLItem *target )
             PLAYLIST_APPEND | PLAYLIST_SPREPARSE, PLAYLIST_END,
             p_input->i_duration,
             p_input->i_options, p_input->ppsz_options, p_input->optflagc,
-            p_parent == p_playlist->p_local_category, true );
+            ( p_parent == p_playlist->p_local_category ||
+            p_parent == p_playlist->p_local_onelevel ),
+            true );
     }
     PL_UNLOCK;
 }
