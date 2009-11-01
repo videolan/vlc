@@ -7,3 +7,15 @@ SOURCES_podcast = podcast.c
 SOURCES_mtp = mtp.c
 SOURCES_mediadirs = mediadirs.c
 SOURCES_udev = udev.c
+
+libxcb_apps_plugin_la_SOURCES = xcb_apps.c
+libxcb_apps_plugin_la_CFLAGS = $(AM_CFLAGS) \
+	$(XCB_CFLAGS)
+libxcb_apps_plugin_la_LIBADD = $(AM_LIBADD) \
+	$(XCB_LIBS)
+libxcb_apps_plugin_la_DEPENDENCIES =
+
+EXTRA_LTLIBRARIES += \
+	libxcb_apps_plugin.la
+libvlc_LTLIBRARIES += \
+	$(LTLIBxcb_apps)

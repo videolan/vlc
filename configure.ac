@@ -3658,6 +3658,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
   PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
   VLC_ADD_PLUGIN([xcb_x11])
   VLC_ADD_PLUGIN([xcb_screen])
+  VLC_ADD_PLUGIN([xcb_apps])
   VLC_SET_CFLAGS_WERROR([xcb_screen], [-Wno-error=uninitialized]) # some gcc report a warning which doesn't reveal an error
 
   AS_IF([test "${enable_xvideo}" != "no"], [
