@@ -91,6 +91,9 @@ struct services_discovery_sys_t
     char **ppsz_urls;
     int i_urls;
 
+    input_item_t **pp_items;
+    int i_items;
+
     vlc_thread_t thread;
     vlc_mutex_t lock;
     vlc_cond_t  wait;
@@ -120,6 +123,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->ppsz_urls = NULL;
     p_sys->i_input = 0;
     p_sys->pp_input = NULL;
+    p_sys->pp_items = NULL;
+    p_sys->i_items = 0;
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->wait );
     p_sys->b_update = true;
@@ -172,6 +177,8 @@ static void Close( vlc_object_t *p_this )
     free( p_sd->p_sys->pp_input );
     for( i = 0; i < p_sys->i_urls; i++ ) free( p_sys->ppsz_urls[i] );
     free( p_sys->ppsz_urls );
+    for( i = 0; i < p_sys->i_items; i++ ) vlc_gc_decref( p_sys->pp_items[i] );
+    free( p_sys->pp_items );
     free( p_sys );
 }
 
@@ -193,8 +200,7 @@ static void *Run( void *data )
         int canc = vlc_savecancel ();
         msg_Dbg( p_sd, "Update required" );
         char* psz_urls = var_GetNonEmptyString( p_sd, "podcast-urls" );
-        if( psz_urls != NULL )
-            ParseUrls( p_sd, psz_urls );
+        ParseUrls( p_sd, psz_urls );
         free( psz_urls );
         p_sys->b_update = false;
 
@@ -237,31 +243,66 @@ static int UrlsChange( vlc_object_t *p_this, char const *psz_var,
 static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
 {
     services_discovery_sys_t *p_sys = p_sd->p_sys;
+    int i_new_items = 0;
+    input_item_t **pp_new_items;
+
+    int i_new_urls;
+    char **ppsz_new_urls = NULL;
+
+    int i, j;
+
     for( ;; )
     {
-        int i;
+        if( !psz_urls ) break;
+
         char *psz_tok = strchr( psz_urls, '|' );
         if( psz_tok ) *psz_tok = '\0';
+
         for( i = 0; i < p_sys->i_urls; i++ )
             if( !strcmp( psz_urls, p_sys->ppsz_urls[i] ) )
                 break;
         if( i == p_sys->i_urls )
         {
-            /* Only add new urls.
-             * FIXME: We don't delete urls which have been removed from
-             * the config since we don't have a way to know which inputs
-             * they spawned */
-            input_item_t *p_input;
-            INSERT_ELEM( p_sys->ppsz_urls, p_sys->i_urls, p_sys->i_urls,
+            INSERT_ELEM( ppsz_new_urls, i_new_urls, i_new_urls,
                          strdup( psz_urls ) );
+
+            input_item_t *p_input;
             p_input = input_item_New( p_sd, psz_urls, psz_urls );
             input_item_AddOption( p_input, "demux=podcast", VLC_INPUT_OPTION_TRUSTED );
+
+            INSERT_ELEM( pp_new_items, i_new_items, i_new_items, p_input );
             services_discovery_AddItem( p_sd, p_input, NULL /* no cat */ );
-            vlc_gc_decref( p_input );
+
             INSERT_ELEM( p_sys->pp_input, p_sys->i_input, p_sys->i_input,
                          input_CreateAndStart( p_sd, p_input, NULL ) );
         }
+        else
+        {
+            INSERT_ELEM( ppsz_new_urls, i_new_urls, i_new_urls,
+                         strdup( p_sys->ppsz_urls[i]) );
+            INSERT_ELEM( pp_new_items, i_new_items, i_new_items, p_sys->pp_items[i] );
+        }
         if( psz_tok )  psz_urls = psz_tok+1;
-        else           return;
+        else break;
     }
+
+    /* delete removed items and signal the removal */
+    for( i = 0; i<p_sys->i_items; ++i )
+    {
+        for( j = 0; j < i_new_items; ++j )
+            if( pp_new_items[j] == p_sys->pp_items[i] ) break;
+        if( j == i_new_items )
+        {
+          services_discovery_RemoveItem( p_sd, p_sys->pp_items[i] );
+          vlc_gc_decref( p_sys->pp_items[i] );
+        }
+    }
+    free( p_sys->pp_items );
+    for( int i = 0; i < p_sys->i_urls; i++ ) free( p_sys->ppsz_urls[i] );
+    free( p_sys->ppsz_urls );
+
+    p_sys->ppsz_urls = ppsz_new_urls;
+    p_sys->i_urls = i_new_urls;
+    p_sys->pp_items = pp_new_items;
+    p_sys->i_items = i_new_items;
 }
