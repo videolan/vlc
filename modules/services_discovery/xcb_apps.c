@@ -30,6 +30,7 @@ typedef xcb_atom_t Atom;
 #include <vlc_common.h>
 #include <vlc_services_discovery.h>
 #include <vlc_dialog.h>
+#include <vlc_charset.h>
 #include <vlc_plugin.h>
 #include <poll.h>
 #include <search.h>
@@ -56,6 +57,7 @@ struct services_discovery_sys_t
     xcb_connection_t *conn;
     vlc_thread_t      thread;
     xcb_atom_t        net_client_list;
+    xcb_atom_t        net_wm_name;
     xcb_window_t      root_window;
     void             *nodes;
 };
@@ -113,10 +115,14 @@ static int Open (vlc_object_t *obj)
 
     /* TODO: check that _NET_CLIENT_LIST is in _NET_SUPPORTED
      * (and _NET_SUPPORTING_WM_CHECK) */
-    xcb_intern_atom_cookie_t ck;
-    ck = xcb_intern_atom (conn, 1, strlen ("_NET_CLIENT_LIST"),
+    xcb_intern_atom_reply_t *r;
+    xcb_intern_atom_cookie_t ncl, nwn;
+
+    ncl = xcb_intern_atom (conn, 1, strlen ("_NET_CLIENT_LIST"),
                           "_NET_CLIENT_LIST");
-    xcb_intern_atom_reply_t *r = xcb_intern_atom_reply (conn, ck, NULL);
+    nwn = xcb_intern_atom (conn, 0, strlen ("_NET_WM_NAME"), "_NET_WM_NAME");
+
+    r = xcb_intern_atom_reply (conn, ncl, NULL);
     if (r == NULL || r->atom == 0)
     {
         dialog_Fatal (sd, _("Application list failure"),
@@ -127,6 +133,12 @@ static int Open (vlc_object_t *obj)
     }
     p_sys->net_client_list = r->atom;
     free (r);
+    r = xcb_intern_atom_reply (conn, nwn, NULL);
+    if (r != NULL)
+    {
+        p_sys->net_wm_name = r->atom;
+        free (r);
+    }
 
     p_sys->nodes = NULL;
     Update (sd);
@@ -199,15 +211,32 @@ struct app
 
 static struct app *AddItem (services_discovery_t *sd, xcb_window_t xid)
 {
-    char *mrl;
+    services_discovery_sys_t *p_sys = sd->p_sys;
+    char *mrl, *name;
+
     if (asprintf (&mrl, "window://0x%"PRIx8, xid) == -1)
         return NULL;
 
+    xcb_get_property_reply_t *r =
+        xcb_get_property_reply (p_sys->conn,
+            xcb_get_property (p_sys->conn, 0, xid, p_sys->net_wm_name, 0,
+                              0, 1023 /* max size */), NULL);
+    if (r != NULL)
+    {
+        name = strndup (xcb_get_property_value (r),
+                        xcb_get_property_value_length (r));
+        if (name != NULL)
+            EnsureUTF8 (name); /* don't trust third party apps too much ;-) */
+        free (r);
+    }
+    /* TODO: use WM_NAME (Latin-1) for very old apps */
+
     input_item_t *item = input_item_NewWithType (VLC_OBJECT (sd), mrl,
-                                                 mrl,
+                                                 name ? name : mrl,
                                                  0, NULL, 0, -1,
                                                  ITEM_TYPE_CARD /* FIXME */);
     free (mrl);
+    free (name);
     if (item == NULL)
         return NULL;
 
