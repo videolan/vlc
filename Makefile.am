@@ -48,7 +48,6 @@ EXTRA_DIST = \
 	INSTALL.wince \
 	extras/package/win32/vlc.exe.manifest \
 	extras/package/win32/libvlc.dll.manifest \
-	MAINTAINERS \
 	extras/package/macosx/README.MacOSX.rtf \
 	vlc-config.in.in \
 	extras/package/rpm/vlc.fedora.spec \
