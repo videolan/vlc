@@ -230,6 +230,8 @@ static struct app *AddItem (services_discovery_t *sd, xcb_window_t xid)
         free (r);
     }
     /* TODO: use WM_NAME (Latin-1) for very old apps */
+    else
+        name = NULL;
 
     input_item_t *item = input_item_NewWithType (VLC_OBJECT (sd), mrl,
                                                  name ? name : mrl,
