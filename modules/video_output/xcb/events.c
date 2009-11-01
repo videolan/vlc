@@ -75,9 +75,7 @@ static void HandleMotionNotify (vout_display_t *vd, xcb_connection_t *conn,
     const int y = vd->source.i_y_offset +
         (int64_t)(ev->event_y - place.y) * vd->source.i_visible_height/ place.height;
 
-    if (x >= vd->source.i_x_offset && x < vd->source.i_x_offset + vd->source.i_visible_width &&
-        y >= vd->source.i_y_offset && y < vd->source.i_y_offset + vd->source.i_visible_height)
-        vout_display_SendEventMouseMoved (vd, x, y);
+    vout_display_SendEventMouseMoved (vd, x, y);
 }
 
 static void HandleVisibilityNotify (vout_display_t *vd, bool *visible,
