@@ -24,8 +24,8 @@
     correctly
   - copy the tar.bz2 file on ftp.videolan.org in
     /opt/ftp/pub/videolan/testing/vlc-X.X.X/
-  - generate SHA1 plus md5 hashes and gpg signature of these files
-    (use gpg --sign --detach --armor)
+  - generate SHA, MD5 hashes and OpenPGP signature of these files
+    (use sha*sum --binary, md5sum --binary, gpg --sign --detach --armor)
 
  * Contribs
   - Put a copy of the libraries or git snapshot in vlc-X.X.X/contrib
@@ -38,7 +38,7 @@
     Build in the "buildbeos" chroot on altair.
     # add the .zip files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/beos/
     generate md5 plus SHA1 hashes and gpg signature of these files
-    (use gpg --sign --detach --armor)
+    (c.f. Tarballs)
 
  * Win32 Packages
     make the packages using the nightly builds configure/options/... , don't
@@ -47,7 +47,7 @@
     uninstaller was broken ... kind of suxxs)
     add the .zip and .exe files to /opt/ftp/pub/videolan/testing/vlc-X.X.X/win32/
     generate md5 plus SHA1 hashes and gpg signature of these files
-    (use gpg --sign --detach --armor)
+    (c.f. Tarballs)
 
  * OS X packages
     Information on compilation: wiki.videolan.org/OSXCompile
@@ -61,7 +61,7 @@
      vlc-plugin-X.X.X-$(PLATFORM).dmg and vlckit-X.X.X-$(PLATFORM).dmg. 
     Don't put any platform for the UB package.
     generate md5 plus SHA1 hashes and gpg signature of these files
-     (use gpg --sign --detach --armor)
+     (c.f. gpg --sign --detach --armor)
 
  * Commit changes ... it never works the first time
 
