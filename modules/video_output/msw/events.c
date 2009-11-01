@@ -988,7 +988,7 @@ void EventThreadUpdateWindowPosition( event_thread_t *p_event, bool *pb_changed,
 
     p_event->wnd_cfg.x      = x;
     p_event->wnd_cfg.y      = y;
-    p_event->wnd_cfg.width  = y;
+    p_event->wnd_cfg.width  = w;
     p_event->wnd_cfg.height = h;
     vlc_mutex_unlock( &p_event->lock );
 }
