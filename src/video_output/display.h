@@ -96,7 +96,7 @@ void vout_DeleteDisplay(vout_display_t *, vout_display_state_t *);
 
 picture_t *vout_FilterDisplay(vout_display_t *, picture_t *);
 
-void vout_ManageDisplay(vout_display_t *);
+void vout_ManageDisplay(vout_display_t *, bool allow_reset_pictures);
 
 void vout_SetDisplayFullscreen(vout_display_t *, bool is_fullscreen);
 void vout_SetDisplayFilled(vout_display_t *, bool is_filled);

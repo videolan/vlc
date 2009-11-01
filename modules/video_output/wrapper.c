@@ -192,8 +192,7 @@ static void Close(vlc_object_t *object)
     vout_thread_t *vout = (vout_thread_t *)object;
     vout_sys_t *sys = vout->p_sys;
 
-    if (sys->vd)
-        vout_DeleteDisplay(sys->vd, NULL);
+    vout_DeleteDisplay(sys->vd, NULL);
     free(sys->title);
     free(sys );
 }
@@ -311,7 +310,11 @@ static void End(vout_thread_t *vout)
         if (!sys->use_dr)
             free(picture->p_data_orig);
         free(picture->p_sys);
+
+        picture->i_status = FREE_PICTURE;
     }
+    if (sys->use_dr && vout_AreDisplayPicturesInvalid(sys->vd))
+        vout_ManageDisplay(sys->vd, true);
 }
 
 /*****************************************************************************
@@ -402,8 +405,7 @@ static int Manage(vout_thread_t *vout)
     if (sys->use_dr && vout_AreDisplayPicturesInvalid(vd)) {
         vout->i_changes |= VOUT_PICTURE_BUFFERS_CHANGE;
     }
-
-    vout_ManageDisplay(vd);
+    vout_ManageDisplay(vd, !sys->use_dr);
     return VLC_SUCCESS;
 }
 
@@ -480,4 +482,3 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
     else if (align_mask & 0x8)
         cfg->align.horizontal = VOUT_DISPLAY_ALIGN_BOTTOM;
 }
-

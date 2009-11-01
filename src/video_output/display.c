@@ -633,7 +633,7 @@ static void VoutDisplayDelWindow(vout_display_t *vd, vout_window_t *window)
     vout_DeleteDisplayWindow(osys->vout, vd, window);
 }
 
-void vout_ManageDisplay(vout_display_t *vd)
+void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
@@ -682,8 +682,13 @@ void vout_ManageDisplay(vout_display_t *vd)
         bool display_is_forced     = osys->display_is_forced;
         osys->ch_display_size = false;
 
-        bool reset_pictures = osys->reset_pictures;
-        osys->reset_pictures = false;
+        bool reset_pictures;
+        if (allow_reset_pictures) {
+            reset_pictures = osys->reset_pictures;
+            osys->reset_pictures = false;
+        } else {
+            reset_pictures = false;
+        }
 
         vlc_mutex_unlock(&osys->lock);
 

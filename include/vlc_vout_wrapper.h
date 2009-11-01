@@ -79,7 +79,7 @@ VLC_EXPORT(bool, vout_IsDisplayFiltered, (vout_display_t *));
 VLC_EXPORT(picture_t *, vout_FilterDisplay, (vout_display_t *, picture_t *));
 VLC_EXPORT(bool, vout_AreDisplayPicturesInvalid, (vout_display_t *));
 
-VLC_EXPORT(void, vout_ManageDisplay, (vout_display_t *));
+VLC_EXPORT(void, vout_ManageDisplay, (vout_display_t *, bool allow_reset_pictures));
 
 VLC_EXPORT(void, vout_SetDisplayFullscreen, (vout_display_t *, bool is_fullscreen));
 VLC_EXPORT(void, vout_SetDisplayFilled, (vout_display_t *, bool is_filled));
