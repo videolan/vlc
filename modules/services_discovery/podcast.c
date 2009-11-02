@@ -244,9 +244,9 @@ static void ParseUrls( services_discovery_t *p_sd, char *psz_urls )
 {
     services_discovery_sys_t *p_sys = p_sd->p_sys;
     int i_new_items = 0;
-    input_item_t **pp_new_items;
+    input_item_t **pp_new_items = NULL;
 
-    int i_new_urls;
+    int i_new_urls = 0;
     char **ppsz_new_urls = NULL;
 
     int i, j;
