@@ -35,10 +35,10 @@ yv12_to_yuy2_line_arm:
 #define WIDTH   ip
 
         ldr     ip, [sp], #0
-        stmfd   sp!, {r4-r8, r10, lr}
+        stmfd   sp!, {r4-r8, lr}
 
 #define TMP1    r8
-#define TMP2    r10
+#define TMP2    r12
 #define TMP3    lr
 
         bic     WIDTH, #1
@@ -96,7 +96,7 @@ yv12_to_yuy2_line_arm:
         subs    WIDTH, WIDTH, #2
         bgt     3b
 4:
-        ldmfd  sp!, {r4-r8, r10, pc}
+        ldmfd  sp!, {r4-r8, pc}
 
 #undef  DST
 #undef  SRC_Y
@@ -116,7 +116,7 @@ yv12_to_yuy2_line_arm:
 #define SRC_U   r2
 #define WIDTH   r3
 #define TMP1    r10
-#define TMP2    r11
+#define TMP2    r12
 #define TMP3    lr
 
 .macro YUV420_function_template function_name, USE_PLD, USE_ARMV6
@@ -244,7 +244,7 @@ yv12_to_yuy2_line_arm:
 .if \USE_PLD
         pld     [SRC_Y]
 .endif
-        stmfd   sp!, {r4-r8, r10-r11, lr}
+        stmfd   sp!, {r4-r8, r10, lr}
 
         /* Destination buffer should be at least 16-bit aligned, image width should be multiple of 4 */
         bic     DST, #1
@@ -304,7 +304,7 @@ yv12_to_yuy2_line_arm:
         subs    WIDTH, #4
         bgt     4b
 6:      /* Restore all registers and return */
-        ldmfd  sp!, {r4-r8, r10-r11, pc}
+        ldmfd  sp!, {r4-r8, r10, pc}
 
 .purgem CONVERT_4_PIXELS_MACROBLOCK
 .purgem CONVERT_8_PIXELS_MACROBLOCK_1
