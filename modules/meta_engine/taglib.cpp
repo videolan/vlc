@@ -407,6 +407,15 @@ static int ReadMeta( vlc_object_t* p_this)
         else if( Ogg::Vorbis::File* ogg_vorbis = dynamic_cast<Ogg::Vorbis::File*>(f.file()) )
             ReadMetaFromXiph( ogg_vorbis->tag(), p_demux, p_demux_meta, p_meta );
     }
+#ifdef TAGLIB_WITH_ASF
+    else if( RIFF::File* riff = dynamic_cast<RIFF::File*>(f.file()) )
+    {
+        if( RIFF::AIFF::File* riff_aiff = dynamic_cast<RIFF::AIFF::File*>(f.file()) )
+            ReadMetaFromId3v2( riff_aiff->tag(), p_demux, p_demux_meta, p_meta );
+        else if( RIFF::WAV::File* riff_wav = dynamic_cast<RIFF::WAV::File*>(f.file()) )
+            ReadMetaFromId3v2( riff_wav->tag(), p_demux, p_demux_meta, p_meta );
+    }
+#endif
     else if( TrueAudio::File* trueaudio = dynamic_cast<TrueAudio::File*>(f.file()) )
     {
         if( trueaudio->ID3v2Tag() )
