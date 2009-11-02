@@ -104,6 +104,9 @@
 #define ARATE_TEXT N_("Audio sample rate")
 #define ARATE_LONGTEXT N_( \
  "Sample rate of the transcoded audio stream (11250, 22500, 44100 or 48000).")
+#define ALANG_TEXT N_("Audio Language")
+#define ALANG_LONGTEXT N_( \
+    "This is the language of the audio stream.")
 #define ACHANS_TEXT N_("Audio channels")
 #define ACHANS_LONGTEXT N_( \
     "Number of audio channels in the transcoded streams." )
@@ -204,6 +207,8 @@ vlc_module_begin ()
                 ACODEC_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "ab", 0, NULL, AB_TEXT,
                  AB_LONGTEXT, false )
+    add_string( SOUT_CFG_PREFIX "alang", NULL, NULL, ALANG_TEXT,
+                ALANG_LONGTEXT, true )
     add_integer( SOUT_CFG_PREFIX "channels", 0, NULL, ACHANS_TEXT,
                  ACHANS_LONGTEXT, false )
     add_integer( SOUT_CFG_PREFIX "samplerate", 0, NULL, ARATE_TEXT,
@@ -240,7 +245,7 @@ vlc_module_end ()
 static const char *const ppsz_sout_options[] = {
     "venc", "vcodec", "vb",
     "scale", "fps", "width", "height", "vfilter", "deinterlace",
-    "deinterlace-module", "threads", "hurry-up", "aenc", "acodec", "ab",
+    "deinterlace-module", "threads", "hurry-up", "aenc", "acodec", "ab", "alang",
     "afilter", "samplerate", "channels", "senc", "scodec", "soverlay",
     "sfilter", "osd", "audio-sync", "high-priority", "maxwidth", "maxheight",
     NULL
@@ -317,6 +322,7 @@ struct sout_stream_sys_t
     /* Audio */
     vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
     char            *psz_aenc;
+    char            *psz_alang;
     config_chain_t  *p_audio_cfg;
     uint32_t        i_sample_rate;
     uint32_t        i_channels;
@@ -411,6 +417,8 @@ static int Open( vlc_object_t *p_this )
         p_sys->i_acodec = VLC_FOURCC( fcc[0], fcc[1], fcc[2], fcc[3] );
     }
     free( val.psz_string );
+
+    p_sys->psz_alang = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "alang" );
 
     var_Get( p_stream, SOUT_CFG_PREFIX "ab", &val );
     p_sys->i_abitrate = val.i_int;
@@ -637,6 +645,7 @@ static void Close( vlc_object_t * p_this )
 
     config_ChainDestroy( p_sys->p_audio_cfg );
     free( p_sys->psz_aenc );
+    free( p_sys->psz_alang );
 
     free( p_sys->psz_vf2 );
 
@@ -712,7 +721,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     es_format_Init( &id->p_encoder->fmt_out, p_fmt->i_cat, 0 );
     id->p_encoder->fmt_out.i_id    = p_fmt->i_id;
     id->p_encoder->fmt_out.i_group = p_fmt->i_group;
-    if( p_fmt->psz_language )
+
+    if( p_sys->psz_alang )
+        id->p_encoder->fmt_out.psz_language = strdup( p_sys->psz_alang );
+    else if( p_fmt->psz_language )
         id->p_encoder->fmt_out.psz_language = strdup( p_fmt->psz_language );
 
     if( p_fmt->i_cat == AUDIO_ES && (p_sys->i_acodec || p_sys->psz_aenc) )
