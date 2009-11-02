@@ -373,10 +373,11 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             = pi_channels_guessed[frame.channels];
 
         /* Adjust stream info when dealing with SBR/PS */
-        if( p_sys->b_sbr != frame.sbr || p_sys->b_ps != frame.ps )
+        bool b_sbr = (frame.sbr == 1) || (frame.sbr == 2);
+        if( p_sys->b_sbr != b_sbr || p_sys->b_ps != frame.ps )
         {
-            const char *psz_ext = (frame.sbr && frame.ps) ? "SBR+PS" :
-                                    frame.sbr ? "SBR" : "PS";
+            const char *psz_ext = (b_sbr && frame.ps) ? "SBR+PS" :
+                                    b_sbr ? "SBR" : "PS";
 
             msg_Dbg( p_dec, "AAC %s (channels: %u, samplerate: %lu)",
                     psz_ext, frame.channels, frame.samplerate );
@@ -386,7 +387,8 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             if( p_dec->p_description )
                 vlc_meta_AddExtra( p_dec->p_description, _("AAC extension"), psz_ext );
 
-            p_sys->b_sbr = frame.sbr; p_sys->b_ps = frame.ps;
+            p_sys->b_sbr = b_sbr;
+            p_sys->b_ps = frame.ps;
         }
 
         /* Convert frame.channel_position to our own channel values */
