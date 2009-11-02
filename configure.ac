@@ -2436,7 +2436,7 @@ AC_ARG_ENABLE(libcdio,
   [  --enable-libcdio        CD input and control library support (default enabled)])
 
 AC_ARG_ENABLE(vcdinfo,
-  [  --enable-libvcdinfo     VCD information library support (default enabled)])
+  [  --enable-vcdinfo        VCD information library support (default enabled)])
 
 have_libcdio=no
 have_libvcdinfo=no
