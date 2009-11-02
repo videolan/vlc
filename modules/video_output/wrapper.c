@@ -56,15 +56,20 @@ DECLARE_OPEN(directfb);
 DECLARE_OPEN(yuv);
 DECLARE_OPEN(snapshot);
 DECLARE_OPEN(vmem);
+DECLARE_OPEN(direct3d_xp);
+DECLARE_OPEN(direct3d_vista);
 
 #undef DECLARE_OPEN
 
-#define DECLARE_MODULE(name, priority)                  \
-    set_description( "Video display "#name" wrapper" )  \
-    set_shortname( "Video display "#name" wrapper" )    \
+#define DECLARE_MODULE_EXT(name, module, priority)      \
+    set_description( "Video display "#module" wrapper" )  \
+    set_shortname( "Video display "#module" wrapper" )    \
     set_capability( "video output", priority )          \
-    set_callbacks( Open##name, Close )                  \
+    set_callbacks( Open##module, Close )                \
     add_shortcut( #name )
+
+#define DECLARE_MODULE(name, priority)                  \
+    DECLARE_MODULE_EXT(name, name, priority)
 
 vlc_module_begin()
     set_category( CAT_VIDEO )
@@ -102,6 +107,12 @@ vlc_module_begin()
     add_submodule()
     DECLARE_MODULE(vmem, 0)
 
+    add_submodule()
+    DECLARE_MODULE_EXT(direct3d, direct3d_vista, 150)
+
+    add_submodule()
+    DECLARE_MODULE_EXT(direct3d, direct3d_xp, 50)
+
 vlc_module_end()
 
 #undef DECLARE_MODULE
@@ -110,6 +121,7 @@ vlc_module_end()
  *
  *****************************************************************************/
 struct vout_sys_t {
+    const char     *name;
     char           *title;
     vout_display_t *vd;
     bool           use_dr;
@@ -131,6 +143,10 @@ static void Display(vout_thread_t *, picture_t *);
 static void VoutGetDisplayCfg(vout_thread_t *,
                               vout_display_cfg_t *, const char *title);
 
+static int  Forward(vlc_object_t *, char const *,
+                    vlc_value_t, vlc_value_t, void *);
+
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -146,6 +162,7 @@ static int Open(vlc_object_t *object, const char *module)
     if (!sys)
         return VLC_ENOMEM;
 
+    sys->name = module;
     sys->title = var_CreateGetNonEmptyString(vout, "video-title");
 
     /* */
@@ -173,6 +190,12 @@ static int Open(vlc_object_t *object, const char *module)
     }
 
     /* */
+    if (!strcmp(sys->name, "direct3d_xp") || !strcmp(sys->name, "direct3d_vista")) {
+        var_Create(vout, "direct3d-desktop", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
+        var_AddCallback(vout, "direct3d-desktop", Forward, NULL);
+    }
+
+    /* */
     vout->pf_init    = Init;
     vout->pf_end     = End;
     vout->pf_manage  = Manage;
@@ -191,6 +214,11 @@ static void Close(vlc_object_t *object)
 {
     vout_thread_t *vout = (vout_thread_t *)object;
     vout_sys_t *sys = vout->p_sys;
+
+    /* */
+    if (!strcmp(sys->name, "direct3d_xp") || !strcmp(sys->name, "direct3d_vista")) {
+        var_DelCallback(vout, "direct3d-desktop", Forward, NULL);
+    }
 
     vout_DeleteDisplay(sys->vd, NULL);
     free(sys->title);
@@ -482,3 +510,14 @@ static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, cons
     else if (align_mask & 0x8)
         cfg->align.horizontal = VOUT_DISPLAY_ALIGN_BOTTOM;
 }
+
+static int Forward(vlc_object_t *object, char const *var,
+                   vlc_value_t oldval, vlc_value_t newval, void *data)
+{
+    vout_thread_t *vout = (vout_thread_t*)object;
+
+    VLC_UNUSED(oldval);
+    VLC_UNUSED(data);
+    return var_Set(vout->p_sys->vd, var, newval);
+}
+
