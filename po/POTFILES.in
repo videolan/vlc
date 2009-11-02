@@ -1057,7 +1057,6 @@ modules/misc/osd/xml.c
 modules/misc/playlist/export.c
 modules/misc/playlist/html.c
 modules/misc/playlist/m3u.c
-modules/misc/playlist/old.c
 modules/misc/playlist/xspf.c
 modules/misc/playlist/xspf.h
 modules/misc/qte_main.cpp
