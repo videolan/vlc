@@ -3465,8 +3465,8 @@ dnl
 dnl libass subtitle rendering module
 dnl
 AC_ARG_ENABLE(libass,
-  [  --enable-libass         Subtitle support using libass (default disabled)])
-AS_IF( [test "${enable_libass}" = "yes"], [
+  [  --enable-libass         Subtitle support using libass (default enabled)])
+AS_IF( [test "${enable_libass}" != "no"], [
   PKG_CHECK_MODULES(LIBASS, libass >= 0.9.6,
       [
         VLC_ADD_LIBS([libass],[$LIBASS_LIBS])
