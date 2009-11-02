@@ -57,6 +57,12 @@
 #include <mpegfile.h>
 #include <oggfile.h>
 #include <oggflacfile.h>
+
+#ifdef TAGLIB_WITH_ASF
+# include <aifffile.h>
+# include <wavfile.h>
+#endif
+
 #include <speexfile.h>
 #include <trueaudiofile.h>
 #include <vorbisfile.h>
@@ -642,6 +648,15 @@ static int WriteMeta( vlc_object_t *p_this )
         else if( Ogg::Vorbis::File* ogg_vorbis = dynamic_cast<Ogg::Vorbis::File*>(f.file()) )
             WriteMetaToXiph( ogg_vorbis->tag(), p_item );
     }
+#ifdef TAGLIB_WITH_ASF
+    else if( RIFF::File* riff = dynamic_cast<RIFF::File*>(f.file()) )
+    {
+        if( RIFF::AIFF::File* riff_aiff = dynamic_cast<RIFF::AIFF::File*>(f.file()) )
+            WriteMetaToId3v2( riff_aiff->tag(), p_item );
+        else if( RIFF::WAV::File* riff_wav = dynamic_cast<RIFF::WAV::File*>(f.file()) )
+            WriteMetaToId3v2( riff_wav->tag(), p_item );
+    }
+#endif
     else if( TrueAudio::File* trueaudio = dynamic_cast<TrueAudio::File*>(f.file()) )
     {
         if( trueaudio->ID3v2Tag() )
