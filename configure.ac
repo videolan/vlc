@@ -2016,8 +2016,8 @@ dnl
 dnl - special access module for dc1394 input
 dnl - dv module: digital video module check for libraw1394
 dnl
-PKG_ENABLE_MODULES_VLC([dc1394], [], [libraw1394 >= 2.0.1 libdc1394 >= 1.0.0], [dc1394 access module], [auto])
-PKG_ENABLE_MODULES_VLC([dv], [access_dv], [libraw1394 >= 2.0.1 libavc1394 >= 0.5.3], [DV input module], [auto])
+PKG_ENABLE_MODULES_VLC([DC1394], [], [libraw1394 >= 2.0.1 libdc1394 >= 1.0.0], [dc1394 access module], [auto])
+PKG_ENABLE_MODULES_VLC([DV], [access_dv], [libraw1394 >= 2.0.1 libavc1394 >= 0.5.3], [DV input module], [auto])
 
 dnl
 dnl dvdread module: check for libdvdread
@@ -2670,7 +2670,7 @@ fi
 
 if test "${enable_sout}" != "no"; then
 dnl Check for libshout
-PKG_ENABLE_MODULES_VLC([shout], [access_output_shout], [shout >= 2.1], [libshout output plugin], [auto])
+PKG_ENABLE_MODULES_VLC([SHOUT], [access_output_shout], [shout >= 2.1], [libshout output plugin], [auto])
 fi
 
 dnl
@@ -3115,7 +3115,7 @@ fi
 dnl
 dnl twolame encoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([twolame], [], [twolame], [MPEG Audio Layer 2 encoder], [auto], [], [], [ -DLIBTWOLAME_STATIC])
+PKG_ENABLE_MODULES_VLC([TWOLAME], [], [twolame], [MPEG Audio Layer 2 encoder], [auto], [], [], [ -DLIBTWOLAME_STATIC])
 
 dnl
 dnl  QuickTime plugin
@@ -3831,7 +3831,7 @@ fi
 dnl
 dnl  libxml2 module
 dnl
-PKG_ENABLE_MODULES_VLC([libxml2], [xml], [libxml-2.0 >= 2.5], [libxml2 support],[auto])
+PKG_ENABLE_MODULES_VLC([LIBXML2], [xml], [libxml-2.0 >= 2.5], [libxml2 support],[auto])
 
 dnl
 dnl  SVG module
@@ -4110,7 +4110,7 @@ fi
 dnl
 dnl  libcaca plugin
 dnl
-PKG_ENABLE_MODULES_VLC([caca], [], [caca >= 0.99.beta1], [libcaca output],[auto])
+PKG_ENABLE_MODULES_VLC([CACA], [], [caca >= 0.99.beta1], [libcaca output],[auto])
 
 dnl
 dnl  Audio plugins
@@ -4589,12 +4589,12 @@ fi
 dnl
 dnl  goom visualization plugin
 dnl
-PKG_ENABLE_MODULES_VLC([goom], [], [libgoom2], [goom visualization plugin], [auto])
+PKG_ENABLE_MODULES_VLC([GOOM], [], [libgoom2], [goom visualization plugin], [auto])
 
 dnl
 dnl libprojectM visualization plugin
 dnl
-PKG_ENABLE_MODULES_VLC([projectm], [], [libprojectM], [projectM visualization plugin], [auto])
+PKG_ENABLE_MODULES_VLC([PROJECTM], [], [libprojectM], [projectM visualization plugin], [auto])
 
 dnl
 dnl  AtmoLight (homebrew AmbiLight)
