@@ -111,7 +111,7 @@ vlc_module_begin()
     DECLARE_MODULE_EXT(direct3d, direct3d_vista, 150)
 
     add_submodule()
-    DECLARE_MODULE_EXT(direct3d, direct3d_xp, 50)
+    DECLARE_MODULE_EXT(direct3d, direct3d_xp, 70)
 
 vlc_module_end()
 
