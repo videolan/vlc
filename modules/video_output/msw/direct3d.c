@@ -277,27 +277,14 @@ static void Display(vout_display_t *vd, picture_t *picture)
     if (FAILED(hr)) {
         msg_Dbg(vd, "%s:%d (hr=0x%0lX)", __FUNCTION__, __LINE__, hr);
     }
-
-    if (sys->is_first_display) {
-        /* Video window is initially hidden, show it now since we got a
-         * picture to show.
-         */
-        SetWindowPos(vd->sys->hvideownd, 0, 0, 0, 0, 0,
-                     SWP_ASYNCWINDOWPOS|
-                     SWP_FRAMECHANGED|
-                     SWP_SHOWWINDOW|
-                     SWP_NOMOVE|
-                     SWP_NOSIZE|
-                     SWP_NOZORDER);
-        sys->is_first_display = false;
-    }
-
 #if 0
     VLC_UNUSED(picture);
 #else
     /* XXX See Prepare() */
     picture_Release(picture);
 #endif
+
+    CommonDisplay(vd);
 }
 static int ControlResetDevice(vout_display_t *vd)
 {

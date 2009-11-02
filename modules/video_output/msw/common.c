@@ -207,6 +207,30 @@ void CommonManage(vout_display_t *vd)
     EventThreadMouseAutoHide(sys->event);
 }
 
+/**
+ * It ensures that the video window is shown after the first picture
+ * is displayed.
+ */
+void CommonDisplay(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    if (!sys->is_first_display)
+        return;
+
+    /* Video window is initially hidden, show it now since we got a
+     * picture to show.
+     */
+    SetWindowPos(sys->hvideownd, 0, 0, 0, 0, 0,
+                 SWP_ASYNCWINDOWPOS|
+                 SWP_FRAMECHANGED|
+                 SWP_SHOWWINDOW|
+                 SWP_NOMOVE|
+                 SWP_NOSIZE|
+                 SWP_NOZORDER);
+    sys->is_first_display = false;
+}
+
 /*****************************************************************************
  * UpdateRects: update clipping rectangles
  *****************************************************************************

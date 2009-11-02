@@ -252,6 +252,7 @@ int  CommonInit(vout_display_t *);
 void CommonClean(vout_display_t *);
 void CommonManage(vout_display_t *);
 int  CommonControl(vout_display_t *, int , va_list );
+void CommonDisplay(vout_display_t *);
 
 void UpdateRects (vout_display_t *,
                   const vout_display_cfg_t *,
