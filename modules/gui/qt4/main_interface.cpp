@@ -964,9 +964,21 @@ void MainInterface::togglePlaylist()
     else
     {
     /* toggle the visibility of the playlist */
-       TOGGLEV( playlistWidget );
-       playlistVisible = !playlistVisible;
-       //doComponentsUpdate(); //resize( sizeHint() );
+      //TOGGLEV( playlistWidget );
+
+      if( playlistWidget->isVisible() && !playlistWidget->isMinimized() )
+      {
+          playlistWidget->hide();
+      }
+      else
+      {
+          playlistWidget->setWindowState(
+              playlistWidget->windowState() & ~Qt::WindowMinimized | Qt::WindowActive);
+          playlistWidget->show();
+      }
+
+      playlistVisible = !playlistVisible;
+      //doComponentsUpdate(); //resize( sizeHint() );
     }
 }
 

@@ -132,12 +132,11 @@ void PlaylistWidget::closeEvent( QCloseEvent *event )
     if( THEDP->isDying() )
     {
         /* FIXME is it needed ? */
-        close();
+        event->accept();
     }
     else
     {
-        if( p_intf->p_sys->p_mi )
-            p_intf->p_sys->p_mi->togglePlaylist();
+        hide();
+        event->ignore();
     }
-    event->accept();
 }
