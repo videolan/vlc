@@ -90,6 +90,7 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
     VLC_UNUSED(oldval);
     input_thread_t *p_input = (input_thread_t *)p_this;
     vlm_t *p_vlm = libvlc_priv( p_input->p_libvlc )->p_vlm;
+    assert( p_vlm );
     vlm_media_sys_t *p_media = p_data;
     const char *psz_instance_name = NULL;
 
@@ -159,6 +160,8 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
         return NULL;
     }
 
+    *pp_vlm = p_vlm; /* for future reference */
+
     /* Load our configuration file */
     psz_vlmconf = var_CreateGetString( p_vlm, "vlm-conf" );
     if( psz_vlmconf && *psz_vlmconf )
@@ -180,7 +183,6 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     free( psz_vlmconf );
 
     vlc_object_set_destructor( p_vlm, (vlc_destructor_t)vlm_Destructor );
-    *pp_vlm = p_vlm; /* for future reference */
     vlc_mutex_unlock( lockval.p_address );
 
     return p_vlm;
