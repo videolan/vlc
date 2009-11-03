@@ -959,32 +959,33 @@ void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
     PL_UNLOCK;
 
     current_selection = list;
-    QMenu *menu = new QMenu;
+
+    QMenu menu;
     if( i_popup_item > -1 )
     {
-        menu->addAction( qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
-        menu->addAction( qtr(I_POP_DEL), this, SLOT( popupDel() ) );
-        menu->addSeparator();
-        menu->addAction( qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
-        menu->addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
-        menu->addSeparator();
-        menu->addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
-        menu->addSeparator();
-        QMenu *sort_menu = menu->addMenu( qtr( "Sort by ") +
+        menu.addAction( qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
+        menu.addAction( qtr(I_POP_DEL), this, SLOT( popupDel() ) );
+        menu.addSeparator();
+        menu.addAction( qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
+        menu.addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
+        menu.addSeparator();
+        menu.addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
+        menu.addSeparator();
+        QMenu *sort_menu = menu.addMenu( qtr( "Sort by ") +
             qfu( psz_column_title( columnToMeta( index.column() ) ) ) );
         sort_menu->addAction( qtr( "Ascending" ),
             this, SLOT( popupSortAsc() ) );
         sort_menu->addAction( qtr( "Descending" ),
             this, SLOT( popupSortDesc() ) );
     }
-    if( tree )
-        menu->addAction( qtr(I_POP_ADD), this, SLOT( popupAddNode() ) );
+    if( tree && canEdit() )
+        menu.addAction( qtr(I_POP_ADD), this, SLOT( popupAddNode() ) );
     if( i_popup_item > -1 )
     {
-        menu->addSeparator();
-        menu->addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
+        menu.addSeparator();
+        menu.addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
     }
-    menu->popup( point );
+    if( !menu.isEmpty() ) menu.exec( point );
 }
 
 void PLModel::popupDel()
