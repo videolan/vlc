@@ -89,15 +89,6 @@
 
 
 /*****************************************************************************
- * Local Prototypes
- *****************************************************************************/
-static void EmptyRelease( update_t *p_update );
-static bool GetUpdateFile( update_t *p_update );
-static char * size_str( long int l_size );
-
-
-
-/*****************************************************************************
  * Update_t functions
  *****************************************************************************/
 
@@ -451,7 +442,9 @@ bool update_NeedUpgrade( update_t *p_update )
         *PACKAGE_VERSION_MAJOR - '0',
         *PACKAGE_VERSION_MINOR - '0',
         *PACKAGE_VERSION_REVISION - '0',
-        *PACKAGE_VERSION_EXTRA
+        /* extra string of development versions is "-git", "-rc" ..
+         * so make sure version a.b.c is newer than a.b.c-XXX */
+        (*PACKAGE_VERSION_EXTRA == '-') ? -1 : *PACKAGE_VERSION_EXTRA
     };
     int latest_version[] = {
         p_update->release.i_major,
