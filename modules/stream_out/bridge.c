@@ -254,14 +254,13 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     vlc_mutex_lock( p_sys->p_lock );
 
-    p_bridge = var_GetAddress( p_stream, p_sys->psz_name );
+    p_bridge = var_GetAddress( p_stream->p_libvlc, p_sys->psz_name );
     if ( p_bridge == NULL )
     {
-        vlc_object_t *p_libvlc = VLC_OBJECT( p_stream->p_libvlc );
         p_bridge = malloc( sizeof( bridge_t ) );
 
-        var_Create( p_libvlc, p_sys->psz_name, VLC_VAR_ADDRESS );
-        var_SetAddress( p_libvlc, p_sys->psz_name, p_bridge );
+        var_Create( p_stream->p_libvlc, p_sys->psz_name, VLC_VAR_ADDRESS );
+        var_SetAddress( p_stream->p_libvlc, p_sys->psz_name, p_bridge );
 
         p_bridge->i_es_num = 0;
         p_bridge->pp_es = NULL;
@@ -536,7 +535,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
     /* Then check all bridged streams */
     vlc_mutex_lock( p_sys->p_lock );
 
-    p_bridge = var_GetAddress( p_stream, p_sys->psz_name );
+    p_bridge = var_GetAddress( p_stream->p_libvlc, p_sys->psz_name );
 
     if( p_bridge )
     {
@@ -674,12 +673,11 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     if( b_no_es )
     {
-        vlc_object_t *p_libvlc = VLC_OBJECT( p_stream->p_libvlc );
         for ( i = 0; i < p_bridge->i_es_num; i++ )
             free( p_bridge->pp_es[i] );
         free( p_bridge->pp_es );
         free( p_bridge );
-        var_Destroy( p_libvlc, p_sys->psz_name );
+        var_Destroy( p_stream->p_libvlc, p_sys->psz_name );
     }
     }
 
