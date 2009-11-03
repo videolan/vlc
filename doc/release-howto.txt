@@ -88,7 +88,7 @@
 
  * "Check for updates" functionality
   - add /opt/ftp/pub/videolan/vlc/X.X.X/vlc-X.X.X-announce
-  - edit update.videolan.org/vlc/status.xml
+  - edit update.videolan.org/vlc/status
 
  * Mirrors
   - Forwarn the mirror admins
