@@ -186,6 +186,7 @@ static bool GetUpdateFile( update_t *p_update )
     int i_revision = 0;
     unsigned char extra;
     char *psz_version_line = NULL;
+    char *psz_update_data = NULL;
 
     p_stream = stream_UrlNew( p_update->p_libvlc, UPDATE_VLC_STATUS_URL );
     if( !p_stream )
@@ -195,15 +196,34 @@ static bool GetUpdateFile( update_t *p_update )
         goto error;
     }
 
-    /* Start reading the status file */
-    if( !( psz_version_line = stream_ReadLine( p_stream ) ) )
+    const int64_t i_read = stream_Size( p_stream );
+    psz_update_data = malloc( i_read + 1 ); /* terminating '\0' */
+    if( !psz_update_data )
+        goto error;
+
+    if( stream_Read( p_stream, psz_update_data, i_read ) != i_read )
     {
-        msg_Err( p_update->p_libvlc, "Update file %s is corrupted : missing version",
-                 UPDATE_VLC_STATUS_URL );
+        msg_Err( p_update->p_libvlc, "Couldn't download update file %s",
+                UPDATE_VLC_STATUS_URL );
         goto error;
     }
+    psz_update_data[i_read] = '\0';
+
+    stream_Delete( p_stream );
+    p_stream = NULL;
 
     /* first line : version number */
+    char *psz_update_data_parser = psz_update_data;
+    size_t i_len = strcspn( psz_update_data, "\r\n" );
+    psz_update_data_parser += i_len;
+    while( *psz_update_data_parser == '\r' || *psz_update_data_parser == '\n' )
+        psz_update_data_parser++;
+
+    if( !(psz_version_line = malloc( i_len + 1)) )
+        goto error;
+    strncpy( psz_version_line, psz_update_data, i_len );
+    psz_version_line[i_len] = '\0';
+
     p_update->release.extra = 0;
     switch( sscanf( psz_version_line, "%i.%i.%i%c",
                     &i_major, &i_minor, &i_revision, &extra ) )
@@ -221,16 +241,27 @@ static bool GetUpdateFile( update_t *p_update )
     }
 
     /* second line : URL */
-    if( !( p_update->release.psz_url = stream_ReadLine( p_stream ) ) )
+    i_len = strcspn( psz_update_data_parser, "\r\n" );
+    if( i_len == 0 )
     {
-        msg_Err( p_update->p_libvlc, "Update file %s is corrupted : URL missing",
+        msg_Err( p_update->p_libvlc, "Update file %s is corrupted: URL missing",
                  UPDATE_VLC_STATUS_URL );
+
         goto error;
     }
 
+    if( !(p_update->release.psz_url = malloc( i_len + 1)) )
+        goto error;
+    strncpy( p_update->release.psz_url, psz_update_data_parser, i_len );
+    p_update->release.psz_url[i_len] = '\0';
+
+    psz_update_data_parser += i_len;
+    while( *psz_update_data_parser == '\r' || *psz_update_data_parser == '\n' )
+        psz_update_data_parser++;
+
     /* Remaining data : description */
-    int i_read = stream_Size( p_stream ) - stream_Tell( p_stream );
-    if( i_read <= 0 )
+    i_len = strlen( psz_update_data_parser );
+    if( i_len == 0 )
     {
         msg_Err( p_update->p_libvlc,
                 "Update file %s is corrupted: description missing",
@@ -238,20 +269,12 @@ static bool GetUpdateFile( update_t *p_update )
         goto error;
     }
 
-    p_update->release.psz_desc = (char*) malloc( i_read + 1 );
-    if( !p_update->release.psz_desc )
+    if( !(p_update->release.psz_desc = malloc( i_len + 1)) )
         goto error;
+    strncpy( p_update->release.psz_desc, psz_update_data_parser, i_len );
+    p_update->release.psz_desc[i_len] = '\0';
 
-    if( stream_Read( p_stream, p_update->release.psz_desc, i_read ) != i_read )
-    {
-        msg_Err( p_update->p_libvlc, "Couldn't download update file %s",
-                UPDATE_VLC_STATUS_URL );
-        goto error;
-    }
-    p_update->release.psz_desc[i_read] = '\0';
-
-    stream_Delete( p_stream );
-    p_stream = NULL;
+    printf("desc %s\n", p_update->release.psz_desc);
 
     /* Now that we know the status is valid, we must download its signature
      * to authenticate it */
@@ -321,16 +344,7 @@ static bool GetUpdateFile( update_t *p_update )
         }
     }
 
-    /* FIXME : read the status file all at once instead of line per line */
-    char *psz_text;
-    if( asprintf( &psz_text, "%s\n%s\n%s", psz_version_line,
-                p_update->release.psz_url, p_update->release.psz_desc ) == -1 )
-    {
-        goto error;
-    }
-    FREENULL( psz_version_line );
-
-    uint8_t *p_hash = hash_sha1_from_text( psz_text, &sign );
+    uint8_t *p_hash = hash_sha1_from_text( psz_update_data, &sign );
     if( !p_hash )
     {
         msg_Warn( p_update->p_libvlc, "Can't compute SHA1 hash for status file" );
@@ -361,6 +375,7 @@ error:
     if( p_stream )
         stream_Delete( p_stream );
     free( psz_version_line );
+    free( psz_update_data );
     return false;
 }
 

@@ -653,34 +653,6 @@ error:
 }
 
 
-/* hash a text
- *   * provided as a buffer (\0 terminated)
- *   * with "\r\n" line endings if it's a text signature, else use UNIX line
- *   *  endings
- */
-static int hash_from_string( const char *psz_string, gcry_md_hd_t hd,
-        bool text_signature )
-{
-    while( *psz_string )
-    {
-        size_t i_len = strcspn( psz_string, "\r\n" );
-        if( !i_len )
-            break;
-
-        gcry_md_write( hd, psz_string, i_len );
-        if( text_signature )
-            gcry_md_putc( hd, '\r' );
-        gcry_md_putc( hd, '\n' );
-
-        psz_string += i_len;
-        while( *psz_string == '\r' || *psz_string == '\n' )
-            psz_string++;
-    }
-
-    return 0;
-}
-
-
 /* hash a binary file */
 static int hash_from_binary_file( const char *psz_file, gcry_md_hd_t hd )
 {
@@ -754,11 +726,23 @@ uint8_t *hash_sha1_from_text( const char *psz_string,
     if( gcry_md_open( &hd, GCRY_MD_SHA1, 0 ) )
         return NULL;
 
-    if( hash_from_string( psz_string, hd, p_sig->type == TEXT_SIGNATURE ) < 0 )
+    if( p_sig->type == TEXT_SIGNATURE )
+    while( *psz_string )
     {
-        gcry_md_close( hd );
-        return NULL;
+        size_t i_len = strcspn( psz_string, "\r\n" );
+        if( !i_len )
+            break;
+
+        gcry_md_write( hd, psz_string, i_len );
+        gcry_md_putc( hd, '\r' );
+        gcry_md_putc( hd, '\n' );
+
+        psz_string += i_len;
+        while( *psz_string == '\r' || *psz_string == '\n' )
+            psz_string++;
     }
+    else
+        gcry_md_write( hd, psz_string, strlen( psz_string ) );
 
     return hash_finish( hd, p_sig );
 }
