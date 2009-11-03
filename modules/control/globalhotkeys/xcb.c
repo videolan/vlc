@@ -101,7 +101,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_connection = xcb_connect( psz_display, &i_screen_default );
     free( psz_display );
 
-    if( !p_sys->p_connection )
+    if( xcb_connection_has_error( p_sys->p_connection ) )
         goto error;
 
     /* Get the root windows of the default screen */
@@ -142,8 +142,7 @@ static int Open( vlc_object_t *p_this )
 error:
     if( p_sys->p_symbols )
         xcb_key_symbols_free( p_sys->p_symbols );
-    if( p_sys->p_connection )
-        xcb_disconnect( p_sys->p_connection );
+    xcb_disconnect( p_sys->p_connection );
     free( p_sys );
     return VLC_EGENERIC;
 }
