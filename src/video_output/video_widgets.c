@@ -44,7 +44,7 @@ void vout_OSDSlider( vlc_object_t *p_caller, int i_channel, int i_position,
     vout_thread_t *p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT,
                                              FIND_ANYWHERE );
 
-    if( p_vout && ( config_GetInt( p_caller, "osd" ) || ( i_position >= 0 ) ) )
+    if( p_vout && ( config_GetInt( p_caller, "osd" ) && ( i_position >= 0 ) ) )
     {
         osd_Slider( p_caller, p_vout->p_spu, p_vout->render.i_width,
             p_vout->render.i_height, p_vout->fmt_in.i_x_offset,
