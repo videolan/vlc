@@ -74,7 +74,7 @@ vlc_module_begin ()
     linked_with_a_crap_library_which_uses_atexit()
 
     add_submodule()
-        set_capability("video output", 150)
+        set_capability("vout display", 150)
         add_shortcut("direct3d_vista")
         set_callbacks(OpenVideoVista, Close)
 vlc_module_end ()
