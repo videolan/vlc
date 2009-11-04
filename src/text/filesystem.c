@@ -99,6 +99,10 @@ int utf8_open (const char *filename, int flags, ...)
         mode = va_arg (ap, unsigned int);
     va_end (ap);
 
+#ifdef O_CLOEXEC
+    flags |= O_CLOEXEC;
+#endif
+
 #ifdef UNDER_CE
     /*_open translates to wchar internally on WinCE*/
     return _open (filename, flags, mode);
@@ -119,22 +123,11 @@ int utf8_open (const char *filename, int flags, ...)
         return -1;
     }
 
-    int fd;
-
-#ifdef O_CLOEXEC
-    fd = open (local_name, flags | O_CLOEXEC, mode);
-    if (fd == -1 && errno == EINVAL)
-#endif
-    {
-        fd = open (local_name, flags, mode);
+    int fd = open (local_name, flags | O_CLOEXEC, mode);
 #ifdef HAVE_FCNTL
-        if (fd != -1)
-        {
-            int flags = fcntl (fd, F_GETFD);
-            fcntl (fd, F_SETFD, FD_CLOEXEC | ((flags != -1) ? flags : 0));
-        }
+    if (fd != -1)
+        fcntl (fd, F_SETFD, FD_CLOEXEC);
 #endif
-    }
 
     LocaleFree (local_name);
     return fd;
