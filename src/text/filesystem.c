@@ -123,7 +123,7 @@ int utf8_open (const char *filename, int flags, ...)
         return -1;
     }
 
-    int fd = open (local_name, flags | O_CLOEXEC, mode);
+    int fd = open (local_name, flags, mode);
 #ifdef HAVE_FCNTL
     if (fd != -1)
         fcntl (fd, F_SETFD, FD_CLOEXEC);
