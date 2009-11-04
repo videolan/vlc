@@ -890,7 +890,7 @@ endif
 	find vlc-$(VERSION)/sdk.tmp -type d | sort -r | xargs rmdir
 	rm -Rf vlc-$(VERSION)/sdk/bin
 
-#strip exe and main dll
+# Strip DLLs
 package-win-common-strip: package-win32-base-debug
 	@if test -e "$(win32_debugdir)"; then \
 	  echo "Error: please remove $(win32_debugdir), it is in the way"; \
@@ -898,23 +898,18 @@ package-win-common-strip: package-win32-base-debug
 	else \
 	  echo "OK."; mkdir -p "$(win32_debugdir)"; \
 	fi
-	for i in "" vlc-$(VERSION)/*$(LIBEXT) ; \
-      do if test -n "$$i" ; then \
-      $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
-      $(OBJCOPY) --strip-all "$$i" ; \
-      $(OBJCOPY) --add-gnu-debuglink="$$i.dbg" "$$i" ; \
-	  mv "$$i.dbg" "$(win32_debugdir)"; \
-    fi; done
+	for i in "" $(win32_destdir)/*$(LIBEXT) \
+	            $(win32_destdir)/plugins/*$(LIBEXT) \
+	; do \
+	  if test -n "$$i" ; then \
+	    $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
+	    $(OBJCOPY) --strip-all "$$i" ; \
+	    $(OBJCOPY) --add-gnu-debuglink="$$i.dbg" "$$i" ; \
+	    mv "$$i.dbg" "$(win32_debugdir)"; \
+	  fi ; \
+	done
 
-#strip all plugins dll
 package-win32-base: package-win-common-strip
-	for i in "" $(win32_destdir)/plugins/*$(LIBEXT) ; \
-	  do if test -n "$$i" ; then \
-	  $(OBJCOPY) --only-keep-debug "$$i" "$$i.dbg"; \
-	  $(OBJCOPY) --strip-all "$$i" ; \
-	  $(OBJCOPY) --add-gnu-debuglink="$$i.dbg" "$$i" ; \
-	  mv "$$i.dbg" "$(win32_debugdir)"; \
-	fi ; done
 
 package-win32-base-exe: package-win32-base
 # Create package
@@ -980,13 +975,14 @@ package-win32-debug: package-win32-base-debug-zip package-win32-base-debug-7zip
 # Clean up
 	rm -Rf $(win32_destdir)
 
-package-wince-base: package-win-common package-win-common-strip
+package-wince-base: package-win-common-strip
 
-package-wince-base-zip:
+package-wince-base-zip: package-wince-base
 # Create package 
-	zip -r vlc-$(VERSION)-wince.zip vlc-$(VERSION)
+	rm -f -- vlc-$(VERSION)-wince.zip
+	zip -r -9 vlc-$(VERSION)-wince.zip vlc-$(VERSION)
 
-package-wince: package-wince-base  package-wince-base-zip
+package-wince: package-wince-base-zip
 # Clean up
 	rm -Rf $(win32_destdir)
 
