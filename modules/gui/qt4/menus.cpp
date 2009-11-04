@@ -1416,11 +1416,11 @@ void QVLCMenu::DoAction( QObject *data )
 
 void QVLCMenu::updateRecents( intf_thread_t *p_intf )
 {
-    if (recentsMenu)
+    if( recentsMenu )
     {
         QAction* action;
         RecentsMRL* rmrl = RecentsMRL::getInstance( p_intf );
-        QList<QString> l = rmrl->recents();
+        QStringList l = rmrl->recents();
 
         recentsMenu->clear();
 
