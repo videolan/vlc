@@ -40,6 +40,7 @@ using std::nothrow;
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_filter.h>
 
 #include "revmodel.hpp"
 #define SPAT_AMP 0.3
@@ -69,7 +70,7 @@ static void Close( vlc_object_t * );
 vlc_module_begin ()
     set_description( N_("Audio Spatializer") )
     set_shortname( N_("Spatializer" ) )
-    set_capability( "audio filter", 0 )
+    set_capability( "audio filter2", 0 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
 
@@ -86,7 +87,7 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-struct aout_filter_sys_t
+struct filter_sys_t
 {
     vlc_mutex_t lock;
     revmodel *p_reverbm;
@@ -118,46 +119,37 @@ static const callback_s callbacks[] = {
 };
 enum { num_callbacks=sizeof(callbacks)/sizeof(callback_s) };
 
-static void DoWork( aout_instance_t *, aout_filter_t *,
-                    aout_buffer_t *, aout_buffer_t * );
+static block_t *DoWork( filter_t *, block_t * );
 
 /*****************************************************************************
  * Open:
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    aout_filter_t     *p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t *p_sys;
-    aout_instance_t   *p_aout = (aout_instance_t *)p_filter->p_parent;
-    bool               b_fit = true;
-    msg_Dbg( p_this, "Opening filter spatializer" );
+    filter_t     *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
+    vlc_object_t *p_aout = p_filter->p_parent;
 
     if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
         p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
     {
-        b_fit = false;
         p_filter->fmt_in.audio.i_format = VLC_CODEC_FL32;
         p_filter->fmt_out.audio.i_format = VLC_CODEC_FL32;
         msg_Warn( p_filter, "bad input or output format" );
+        return VLC_EGENERIC;
     }
     if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
     {
-        b_fit = false;
         memcpy( &p_filter->fmt_out.audio, &p_filter->fmt_in.audio,
                 sizeof(audio_sample_format_t) );
         msg_Warn( p_filter, "input and output formats are not similar" );
-    }
-
-    if ( ! b_fit )
-    {
         return VLC_EGENERIC;
     }
 
-    p_filter->pf_do_work = DoWork;
-    p_filter->b_in_place = true;
+    p_filter->pf_audio_filter = DoWork;
 
      /* Allocate structure */
-    p_sys = p_filter->p_sys = (aout_filter_sys_t*)malloc( sizeof( aout_filter_sys_t ) );
+    p_sys = p_filter->p_sys = (filter_sys_t*)malloc( sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
 
@@ -189,9 +181,9 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    aout_filter_t     *p_filter = (aout_filter_t *)p_this;
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
-    aout_instance_t *p_aout = (aout_instance_t *)p_filter->p_parent;
+    filter_t     *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    vlc_object_t *p_aout = p_filter->p_parent;
 
     /* Delete the callbacks */
     for(unsigned i=0;i<num_callbacks;++i)
@@ -211,17 +203,15 @@ static void Close( vlc_object_t *p_this )
  * DoWork: call SpatFilter
  *****************************************************************************/
 
-static inline
-void SpatFilter( aout_instance_t *p_aout, aout_filter_t *p_filter,
-                 float *out, float *in, int i_samples, int i_channels )
+static void SpatFilter( filter_t *p_filter, float *out, float *in,
+                        unsigned i_samples, unsigned i_channels )
 {
-    aout_filter_sys_t *p_sys = p_filter->p_sys;
+    filter_sys_t *p_sys = p_filter->p_sys;
     vlc_mutex_locker locker( &p_sys->lock );
 
-    int i, ch;
-    for( i = 0; i < i_samples; i++ )
+    for( unsigned i = 0; i < i_samples; i++ )
     {
-        for( ch = 0 ; ch < 2; ch++)
+        for( unsigned ch = 0 ; ch < 2; ch++)
         {
             in[ch] = in[ch] * SPAT_AMP;
         }
@@ -231,15 +221,12 @@ void SpatFilter( aout_instance_t *p_aout, aout_filter_t *p_filter,
     }
 }
 
-static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
-                    aout_buffer_t * p_in_buf, aout_buffer_t * p_out_buf )
+static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
 {
-    p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
-    p_out_buf->i_buffer = p_in_buf->i_buffer;
-
-    SpatFilter( p_aout, p_filter, (float*)p_out_buf->p_buffer,
+    SpatFilter( p_filter, (float*)p_in_buf->p_buffer,
                (float*)p_in_buf->p_buffer, p_in_buf->i_nb_samples,
                aout_FormatNbChannels( &p_filter->fmt_in.audio ) );
+    return p_in_buf;
 }
 
 
@@ -247,11 +234,10 @@ static void DoWork( aout_instance_t * p_aout, aout_filter_t * p_filter,
  * Variables callbacks
  *****************************************************************************/
 
-static int RoomCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int RoomCallback( vlc_object_t *p_this, char const *,
+                         vlc_value_t, vlc_value_t newval, void *p_data )
 {
-    (void)psz_cmd;    (void)oldval;
-    aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
+    filter_sys_t *p_sys = (filter_sys_t*)p_data;
     vlc_mutex_locker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setroomsize(newval.f_float);
@@ -259,44 +245,43 @@ static int RoomCallback( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
-static int WidthCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+static int WidthCallback( vlc_object_t *p_this, char const *,
+                          vlc_value_t, vlc_value_t newval, void *p_data )
 {
-    (void)psz_cmd;    (void)oldval;
-    aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
+    filter_sys_t *p_sys = (filter_sys_t*)p_data;
     vlc_mutex_locker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setwidth(newval.f_float);
     msg_Dbg( p_this, "width is now %3.1f", newval.f_float );
     return VLC_SUCCESS;
 }
-static int WetCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+
+static int WetCallback( vlc_object_t *p_this, char const *,
+                        vlc_value_t, vlc_value_t newval, void *p_data )
 {
-    (void)psz_cmd;    (void)oldval;
-    aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
+    filter_sys_t *p_sys = (filter_sys_t*)p_data;
     vlc_mutex_locker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setwet(newval.f_float);
     msg_Dbg( p_this, "'wet' value is now %3.1f", newval.f_float );
     return VLC_SUCCESS;
 }
-static int DryCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+
+static int DryCallback( vlc_object_t *p_this, char const *,
+                        vlc_value_t, vlc_value_t newval, void *p_data )
 {
-    (void)psz_cmd;    (void)oldval;
-    aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
+    filter_sys_t *p_sys = (filter_sys_t*)p_data;
     vlc_mutex_locker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setdry(newval.f_float);
     msg_Dbg( p_this, "'dry' value is now %3.1f", newval.f_float );
     return VLC_SUCCESS;
 }
-static int DampCallback( vlc_object_t *p_this, char const *psz_cmd,
-                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+
+static int DampCallback( vlc_object_t *p_this, char const *,
+                         vlc_value_t, vlc_value_t newval, void *p_data )
 {
-    (void)psz_cmd;    (void)oldval;
-    aout_filter_sys_t *p_sys = (aout_filter_sys_t*)p_data;
+    filter_sys_t *p_sys = (filter_sys_t*)p_data;
     vlc_mutex_locker locker( &p_sys->lock );
 
     p_sys->p_reverbm->setdamp(newval.f_float);
