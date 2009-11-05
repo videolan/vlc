@@ -305,7 +305,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
             }
             else /* this can be a audio filter module as well as a visualization module */
             {
-                p_filter->p_module = module_need( p_filter, "audio filter2",
+                p_filter->p_module = module_need( p_filter, "audio filter",
                                               psz_parser, true );
 
                 if ( p_filter->p_module == NULL )
@@ -319,7 +319,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
                         aout_FormatPrepare( &p_filter->fmt_in.audio );
                         aout_FormatPrepare( &p_filter->fmt_out.audio );
                         p_filter->p_module = module_need( p_filter,
-                                                          "audio filter2",
+                                                          "audio filter",
                                                           psz_parser, true );
                     }
                     /* try visual filters */

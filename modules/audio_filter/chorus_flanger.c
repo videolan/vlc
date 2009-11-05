@@ -93,7 +93,7 @@ vlc_module_begin ()
         N_("Wet mix"), N_("Level of delayed signal"), true )
     add_float_with_range( "dry-mix", 0.4, -0.999, 0.999, NULL,
         N_("Dry Mix"), N_("Level of input signal"), true )
-    set_capability( "audio filter2", 0 )
+    set_capability( "audio filter", 0 )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

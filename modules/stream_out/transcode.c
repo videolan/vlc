@@ -215,7 +215,7 @@ vlc_module_begin ()
                  ARATE_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "audio-sync", false, NULL, ASYNC_TEXT,
               ASYNC_LONGTEXT, false )
-    add_module_list( SOUT_CFG_PREFIX "afilter",  "audio filter2",
+    add_module_list( SOUT_CFG_PREFIX "afilter",  "audio filter",
                      NULL, NULL,
                      AFILTER_TEXT, AFILTER_LONGTEXT, false )
 
@@ -1239,7 +1239,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         }
         fmt_last = fmt_fl32;
 
-        id->p_uf_chain = filter_chain_New( p_stream, "audio filter2", false,
+        id->p_uf_chain = filter_chain_New( p_stream, "audio filter", false,
                                            transcode_audio_filter_allocation_init, NULL, NULL );
         filter_chain_Reset( id->p_uf_chain, &fmt_last, &fmt_fl32 );
         if( filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_af2 ) > 0 )
@@ -1247,7 +1247,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
     }
 
     /* Load conversion filters */
-    id->p_f_chain = filter_chain_New( p_stream, "audio filter2", true,
+    id->p_f_chain = filter_chain_New( p_stream, "audio filter", true,
                     transcode_audio_filter_allocation_init, NULL, NULL );
     filter_chain_Reset( id->p_f_chain, &fmt_last, &id->p_encoder->fmt_in );
 

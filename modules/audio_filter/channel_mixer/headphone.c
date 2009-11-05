@@ -85,7 +85,7 @@ vlc_module_begin ()
     add_bool( "headphone-dolby", false, NULL, HEADPHONE_DOLBY_TEXT,
               HEADPHONE_DOLBY_LONGTEXT, true )
 
-    set_capability( "audio filter2", 0 )
+    set_capability( "audio filter", 0 )
     set_callbacks( OpenFilter, CloseFilter )
     add_shortcut( "headphone" )
 vlc_module_end ()

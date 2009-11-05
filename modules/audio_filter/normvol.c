@@ -89,7 +89,7 @@ vlc_module_begin ()
                  true )
     add_float( "norm-max-level", 2.0, NULL, LEVEL_TEXT,
                LEVEL_LONGTEXT, true )
-    set_capability( "audio filter2", 0 )
+    set_capability( "audio filter", 0 )
     set_callbacks( Open, Close )
 vlc_module_end ()
 

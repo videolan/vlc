@@ -31,7 +31,6 @@ Audio filters:
  * 3F1R to stereo downmix filter
  * Dolby mixer, parameterized equalizer, trivial mixer, scaletempo, bandlimited resampler,
    linear resampler, ugly resampler, converter_float, converter_fixed, DTS to SPDIF and
-   A/52 to SPDIF filters have been upgraded to the "audio filter2" API
  * NEON assembly audio converter module
 
 Encoders:

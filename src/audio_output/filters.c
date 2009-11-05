@@ -68,7 +68,7 @@ static filter_t * FindFilter( aout_instance_t * p_aout,
     p_filter->fmt_out.i_codec = p_output_format->i_format;
     p_filter->pf_audio_buffer_new = aout_FilterBufferNew;
 
-    p_filter->p_module = module_need( p_filter, "audio filter2", NULL, false );
+    p_filter->p_module = module_need( p_filter, "audio filter", NULL, false );
     if ( p_filter->p_module == NULL )
     {
         vlc_object_detach( p_filter );

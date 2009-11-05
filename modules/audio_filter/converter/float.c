@@ -51,7 +51,7 @@ static block_t *Do_FL32ToF32 ( filter_t *, block_t * );
 vlc_module_begin ()
     set_description( N_("Floating-point audio format conversions") )
     add_submodule ()
-        set_capability( "audio filter2", 10 )
+        set_capability( "audio filter", 10 )
         set_callbacks( Create_F32ToFL32, NULL )
 vlc_module_end ()
 
