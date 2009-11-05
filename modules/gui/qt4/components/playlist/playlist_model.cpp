@@ -77,7 +77,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     rootItem          = NULL; /* PLItem rootItem, will be set in rebuild( ) */
 
     /* Icons initialization */
-#define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( QPixmap( x ) )
+#define ADD_ICON(type, x) icons[ITEM_TYPE_##type] = QIcon( x )
     ADD_ICON( UNKNOWN , type_unknown_xpm );
     ADD_ICON( FILE, ":/type/file" );
     ADD_ICON( DIRECTORY, ":/type/directory" );

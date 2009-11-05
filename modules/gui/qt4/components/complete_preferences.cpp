@@ -61,7 +61,7 @@ PrefsTree::PrefsTree( intf_thread_t *_p_intf, QWidget *_parent ) :
     setTextElideMode( Qt::ElideNone );
 
     /* Nice icons */
-#define BI( a,b) QIcon a##_icon = QIcon( QPixmap( b ))
+#define BI( a,b) QIcon a##_icon = QIcon( b )
     BI( audio, ":/prefsmenu/advanced/audio" );
     BI( video, ":/prefsmenu/advanced/video" );
     BI( input, ":/prefsmenu/advanced/codec" );

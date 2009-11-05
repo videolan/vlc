@@ -381,9 +381,9 @@ static void *Thread( void *obj )
 
     /* Icon setting */
     if( QDate::currentDate().dayOfYear() >= 352 ) /* One Week before Xmas */
-        app.setWindowIcon( QIcon( QPixmap(vlc_christmas_xpm) ) );
+        app.setWindowIcon( QIcon(vlc_christmas_xpm) );
     else
-        app.setWindowIcon( QIcon( QPixmap(vlc_xpm) ) );
+        app.setWindowIcon( QIcon(vlc_xpm) );
 
     /* Initialize timers and the Dialog Provider */
     DialogsProvider::getInstance( p_intf );
