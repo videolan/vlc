@@ -755,13 +755,6 @@ libtheora-$(THEORA_VERSION).tar.bz2:
 
 libtheora: libtheora-$(THEORA_VERSION).tar.bz2
 	$(EXTRACT_BZ2)
-ifdef HAVE_DARWIN_OS
-ifdef HAVE_DARWIN_OS_ON_INTEL
-	patch -p0 < Patches/theora_mac_intel32.patch
-else
-	patch -p0 < Patches/theora_mac_ppc.patch
-endif
-endif
 	patch -p0 < Patches/libtheora-includes.patch
 
 THEORACONF = --disable-sdltest --disable-oggtest --disable-vorbistest --disable-examples
@@ -775,8 +768,8 @@ endif
 
 .theora: libtheora .ogg
 ifdef HAVE_DARWIN_OS
-	cd $<; $(HOSTCC) ./autogen.sh $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF)
-endif
+	cd $<; ($(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF) && make && make install)
+else
 ifdef HAVE_WIN32
 	cd $<; $(HOSTCC) ./autogen.sh $(HOSTCONF) --prefix=$(PREFIX) $(THEORACONF)
 endif
@@ -786,6 +779,7 @@ endif
 			--prefix=$(PREFIX) $(THEORACONF) ; \
 	fi
 	cd $< && make && make install
+endif
 	$(INSTALL_NAME)
 	touch $@
 
