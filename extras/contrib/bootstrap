@@ -180,7 +180,7 @@ case $HOST in
         CFLAGS_TUNING=" -march=core2 -mtune=core2 -m64 -arch x86_64"
         echo "HAVE_DARWIN_64 = 1" >> config.mak
         EXTRA_CFLAGS=" -D\${ENVP} -isysroot \${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
-        EXTRA_LDFLAGS=" -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
+        EXTRA_LDFLAGS=" -arch x86_64 -isysroot \${MACOSX_SDK} -Wl,-syslibroot,\${MACOSX_SDK} -mmacosx-version-min=\${SDK_TARGET}"
         echo "PATH = /bin:/usr/bin:/usr/local/bin" >> config.mak
         CC="/Developer/usr/bin/gcc-4.2"
         CXX="/Developer/usr/bin/g++-4.2"
