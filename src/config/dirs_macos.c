@@ -45,7 +45,6 @@ const char *config_GetDataDir (void)
 
 static char *config_GetHomeDir (void)
 {
-    /* 1/ Try $HOME  */
     const char *home = getenv ("HOME");
 
     if (home == NULL)
@@ -53,11 +52,6 @@ static char *config_GetHomeDir (void)
 
     return FromLocaleDup (home);
 }
-/*
-static char *config_GetAppDir (void)
-{
-    return config_GetUserDir (VLC_CONFIG_DIR);
-} */
 
 char *config_GetUserDir (vlc_userdir_t type)
 {
