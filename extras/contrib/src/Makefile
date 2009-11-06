@@ -1007,17 +1007,12 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 
 ifdef SVN
 ffmpeg:
-	$(SVN) co $(FFMPEG_SVN) ffmpeg
+	$(SVN) co $(FFMPEG_SVN) ffmpeg -r 19836
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
 ifdef HAVE_WINCE
 	patch -p1 < Patches/ffmpeg-svn-wince.patch
-endif
-ifdef HAVE_DARWIN_OS
-ifndef HAVE_DARWIN_OS_ON_INTEL
-	(cd $@; patch -p0 < ../Patches/ffmpeg-darwin-ppc-mdynamic.patch)
-endif
 endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
