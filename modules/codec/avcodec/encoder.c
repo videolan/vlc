@@ -147,7 +147,7 @@ struct encoder_sys_t
 static const char *const ppsz_enc_options[] = {
     "keyint", "bframes", "vt", "qmin", "qmax", "hq",
     "rc-buffer-size", "rc-buffer-aggressivity", "pre-me", "hurry-up",
-    "interlace", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
+    "interlace", "interlace-me", "i-quant-factor", "noise-reduction", "mpeg4-matrix",
     "trellis", "qscale", "strict", "lumi-masking", "dark-masking",
     "p-masking", "border-masking", "luma-elim-threshold",
     "chroma-elim-threshold",
