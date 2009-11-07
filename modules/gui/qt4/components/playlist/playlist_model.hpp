@@ -44,7 +44,6 @@
 #include <QAbstractItemModel>
 #include <QVariant>
 
-class PlaylistEventManager;
 class QSignalMapper;
 class PLItem;
 
@@ -100,7 +99,6 @@ public:
 private:
 
     /* General */
-    PlaylistEventManager *plEM;
     PLItem *rootItem;
     PLItem *currentItem;
 

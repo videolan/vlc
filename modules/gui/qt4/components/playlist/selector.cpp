@@ -108,11 +108,9 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
     setDropIndicatorShown(true);
     invisibleRootItem()->setFlags( invisibleRootItem()->flags() & ~Qt::ItemIsDropEnabled );
 
-    plEM = new PlaylistEventManager( THEPL );
-
-    CONNECT( plEM, itemAdded( int, int ),
+    CONNECT( THEMIM, playlistItemAppended( int, int ),
              this, plItemAdded( int, int ) );
-    CONNECT( plEM, itemRemoved( int ),
+    CONNECT( THEMIM, playlistItemRemoved( int ),
              this, plItemRemoved( int ) );
     CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
             this, inputItemUpdate( input_item_t * ) );
@@ -131,8 +129,6 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
 
 PLSelector::~PLSelector()
 {
-    delete plEM;
-
     if( podcastsParent )
     {
         int c = podcastsParent->childCount();

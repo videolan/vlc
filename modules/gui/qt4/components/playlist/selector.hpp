@@ -42,7 +42,6 @@
 #include "qt4.hpp"
 
 class PlaylistWidget;
-class PlaylistEventManager;
 
 enum SelectorItemType {
     CATEGORY_TYPE,
@@ -136,7 +135,6 @@ private:
     PLSelItem * addPodcastItem( playlist_item_t *p_item );
     inline PLSelItem * itemWidget( QTreeWidgetItem * );
     intf_thread_t *p_intf;
-    PlaylistEventManager *plEM;
     QTreeWidgetItem *podcastsParent;
     int podcastsParentId;
 private slots:

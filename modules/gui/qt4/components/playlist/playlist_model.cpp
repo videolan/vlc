@@ -32,7 +32,6 @@
 #include "components/playlist/playlist_model.hpp"
 #include "dialogs/mediainfo.hpp"
 #include "dialogs/playlist.hpp"
-#include "playlist.hpp"
 #include <vlc_intf_strings.h>
 
 #include "pixmaps/types/type_unknown.xpm"
@@ -65,7 +64,6 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 {
     p_intf            = _p_intf;
     p_playlist        = _p_playlist;
-    plEM              = new PlaylistEventManager( _p_playlist );
     i_cached_id       = -1;
     i_cached_input_id = -1;
     i_popup_item      = i_popup_parent = -1;
@@ -91,14 +89,15 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
             this, processInputItemUpdate( input_item_t *) );
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
             this, processInputItemUpdate( input_thread_t* ) );
-    CONNECT( plEM, itemAdded( int, int ), this, processItemAppend( int, int ) );
-    CONNECT( plEM, itemRemoved( int ), this, processItemRemoval( int ) );
+    CONNECT( THEMIM, playlistItemAppended( int, int ),
+             this, processItemAppend( int, int ) );
+    CONNECT( THEMIM, playlistItemRemoved( int ),
+             this, processItemRemoval( int ) );
 }
 
 PLModel::~PLModel()
 {
     delete rootItem;
-    delete plEM;
 }
 
 Qt::DropActions PLModel::supportedDropActions() const
