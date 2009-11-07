@@ -308,7 +308,7 @@ function help(name,client,arg)
 end
 
 function input_info(name,client)
-    local categories = vlc.input_info()
+    local categories = vlc.input.info()
     for cat, infos in pairs(categories) do
         client:append("+----[ "..cat.." ]")
         client:append("|")
