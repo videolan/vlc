@@ -1054,13 +1054,11 @@ void Equalizer::setCorePreset( int i_preset )
     aout_instance_t *p_aout= THEMIM->getAout();
     if( p_aout )
     {
-        delCallbacks( p_aout );
         var_SetString( p_aout , "equalizer-preset" , preset_list[i_preset] );
 
         var_SetString( p_aout, "equalizer-bands", psz_values );
         var_SetFloat( p_aout, "equalizer-preamp",
                       eqz_preset_10b[i_preset]->f_preamp );
-        addCallbacks( p_aout );
         vlc_object_release( p_aout );
     }
     config_PutPsz( p_intf, "equalizer-bands", psz_values );
