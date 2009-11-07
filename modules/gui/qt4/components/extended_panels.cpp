@@ -885,7 +885,7 @@ void Equalizer::clean()
 /* Write down initial values */
 void Equalizer::updateUIFromCore()
 {
-    char *psz_af, *psz_pres;
+    char *psz_af, *psz_pres, *psz_bands;
     float f_preamp;
     int i_preset;
 
@@ -897,6 +897,7 @@ void Equalizer::updateUIFromCore()
         if( var_GetBool( p_aout, "equalizer-2pass" ) )
             ui.eq2PassCheck->setChecked( true );
         f_preamp = var_GetFloat( p_aout, "equalizer-preamp" );
+        psz_bands = var_GetNonEmptyString( p_aout, "equalizer-bands" );
         i_preset = presetsComboBox->findData( QVariant( psz_pres ) );
         vlc_object_release( p_aout );
     }
@@ -907,6 +908,7 @@ void Equalizer::updateUIFromCore()
         if( config_GetInt( p_intf, "equalizer-2pass" ) )
             ui.eq2PassCheck->setChecked( true );
         f_preamp = config_GetFloat( p_intf, "equalizer-preamp" );
+        psz_bands = config_GetPsz( p_intf, "equalizer-bands" );
         i_preset = presetsComboBox->findData( QVariant( psz_pres ) );
     }
     if( psz_af && strstr( psz_af, "equalizer" ) != NULL )
@@ -914,6 +916,23 @@ void Equalizer::updateUIFromCore()
     enable( ui.enableCheck->isChecked() );
 
     presetsComboBox->setCurrentIndex( i_preset );
+
+    ui.preampSlider->setValue( (int)( ( f_preamp + 20 ) * 10 ) );
+
+    if( psz_bands && strlen( psz_bands ) > 1 )
+    {
+    	char *psz_bands_orig = psz_bands;
+        for( int i = 0; i < BANDS; i++ )
+        {
+            const float f = us_strtod(psz_bands, &psz_bands );
+            bands[i]->setValue( (int)( ( f + 20 ) * 10 )  );
+            if( psz_bands == NULL || *psz_bands == '\0' ) break;
+            psz_bands++;
+            if( *psz_bands == '\0' ) break;
+        }
+        free( psz_bands_orig );
+    }
+    else free( psz_bands );
 
     free( psz_af );
     free( psz_pres );
