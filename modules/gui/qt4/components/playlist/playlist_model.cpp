@@ -32,6 +32,7 @@
 #include "components/playlist/playlist_model.hpp"
 #include "dialogs/mediainfo.hpp"
 #include "dialogs/playlist.hpp"
+#include "playlist.hpp"
 #include <vlc_intf_strings.h>
 
 #include "pixmaps/types/type_unknown.xpm"
@@ -46,11 +47,6 @@
 #include "sorting.h"
 
 QIcon PLModel::icons[ITEM_TYPE_NUMBER];
-
-static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
-                         vlc_value_t oval, vlc_value_t nval, void *param );
-static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
-                        vlc_value_t oval, vlc_value_t nval, void *param );
 
 /*************************************************************************
  * Playlist model implementation
@@ -69,6 +65,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
 {
     p_intf            = _p_intf;
     p_playlist        = _p_playlist;
+    plEM              = new PlaylistEventManager( _p_playlist );
     i_cached_id       = -1;
     i_cached_input_id = -1;
     i_popup_item      = i_popup_parent = -1;
@@ -89,18 +86,19 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     ADD_ICON( NODE, ":/type/node" );
 #undef ADD_ICON
 
-    addCallbacks();
     rebuild( p_root, true );
     CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
             this, processInputItemUpdate( input_item_t *) );
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
             this, processInputItemUpdate( input_thread_t* ) );
+    CONNECT( plEM, itemAdded( int, int ), this, processItemAppend( int, int ) );
+    CONNECT( plEM, itemRemoved( int ), this, processItemRemoval( int ) );
 }
 
 PLModel::~PLModel()
 {
-    delCallbacks();
     delete rootItem;
+    delete plEM;
 }
 
 Qt::DropActions PLModel::supportedDropActions() const
@@ -288,20 +286,6 @@ void PLModel::removeItem( int i_id )
 {
     PLItem *item = findById( rootItem, i_id );
     removeItem( item );
-}
-
-/* callbacks and slots */
-void PLModel::addCallbacks()
-{
-    /* One item has been updated */
-    var_AddCallback( p_playlist, "playlist-item-append", ItemAppended, this );
-    var_AddCallback( p_playlist, "playlist-item-deleted", ItemDeleted, this );
-}
-
-void PLModel::delCallbacks()
-{
-    var_DelCallback( p_playlist, "playlist-item-append", ItemAppended, this );
-    var_DelCallback( p_playlist, "playlist-item-deleted", ItemDeleted, this );
 }
 
 void PLModel::activateItem( const QModelIndex &index )
@@ -619,20 +603,6 @@ bool PLModel::canEdit() const
   );
 }
 /************************* Updates handling *****************************/
-void PLModel::customEvent( QEvent *event )
-{
-    int type = event->type();
-    if( type != ItemAppend_Type &&
-        type != ItemDelete_Type )
-        return;
-
-    PLEvent *ple = static_cast<PLEvent *>(event);
-
-    if( type == ItemAppend_Type )
-        processItemAppend( &ple->add );
-    else if( type == ItemDelete_Type )
-        processItemRemoval( ple->i_id );
-}
 
 /**** Events processing ****/
 void PLModel::processInputItemUpdate( input_thread_t *p_input )
@@ -664,19 +634,19 @@ void PLModel::processItemRemoval( int i_id )
     removeItem( i_id );
 }
 
-void PLModel::processItemAppend( const playlist_add_t *p_add )
+void PLModel::processItemAppend( int i_item, int i_parent )
 {
     playlist_item_t *p_item = NULL;
     PLItem *newItem = NULL;
 
-    PLItem *nodeItem = findById( rootItem, p_add->i_node );
+    PLItem *nodeItem = findById( rootItem, i_parent );
     if( !nodeItem ) return;
 
     foreach( PLItem *existing, nodeItem->children )
-      if( existing->i_id == p_add->i_item ) return;
+      if( existing->i_id == i_item ) return;
 
     PL_LOCK;
-    p_item = playlist_ItemGetById( p_playlist, p_add->i_item );
+    p_item = playlist_ItemGetById( p_playlist, i_item );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
 
     newItem = new PLItem( p_item, nodeItem );
@@ -1100,26 +1070,3 @@ void PLModel::popupSortDesc()
 {
     sort( i_popup_parent, i_popup_column, Qt::DescendingOrder );
 }
-/**********************************************************************
- * Playlist callbacks
- **********************************************************************/
-
-static int ItemDeleted( vlc_object_t *p_this, const char *psz_variable,
-                        vlc_value_t oval, vlc_value_t nval, void *param )
-{
-    PLModel *p_model = (PLModel *) param;
-    PLEvent *event = new PLEvent( ItemDelete_Type, nval.i_int );
-    QApplication::postEvent( p_model, event );
-    return VLC_SUCCESS;
-}
-
-static int ItemAppended( vlc_object_t *p_this, const char *psz_variable,
-                         vlc_value_t oval, vlc_value_t nval, void *param )
-{
-    PLModel *p_model = (PLModel *) param;
-    const playlist_add_t *p_add = (playlist_add_t *)nval.p_address;
-    PLEvent *event = new PLEvent( p_add );
-    QApplication::postEvent( p_model, event );
-    return VLC_SUCCESS;
-}
-

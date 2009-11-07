@@ -44,40 +44,9 @@
 #include <QAbstractItemModel>
 #include <QVariant>
 
+class PlaylistEventManager;
 class QSignalMapper;
-
 class PLItem;
-
-#define DEPTH_PL -1
-#define DEPTH_SEL 1
-
-enum {
-    ItemUpdate_Type = QEvent::User + PLEventType + 2,
-    ItemDelete_Type = QEvent::User + PLEventType + 3,
-    ItemAppend_Type = QEvent::User + PLEventType + 4,
-};
-
-class PLEvent : public QEvent
-{
-public:
-    PLEvent( int type, int id ) : QEvent( (QEvent::Type)(type) )
-    {
-        i_id = id;
-        add.i_node = -1;
-        add.i_item = -1;
-    };
-
-    PLEvent( const playlist_add_t  *a ) : QEvent( (QEvent::Type)(ItemAppend_Type) )
-    {
-        add = *a;
-    };
-
-    virtual ~PLEvent() { };
-
-    int i_id;
-    playlist_add_t add;
-};
-
 
 class PLModel : public QAbstractItemModel
 {
@@ -131,6 +100,7 @@ public:
 private:
 
     /* General */
+    PlaylistEventManager *plEM;
     PLItem *rootItem;
     PLItem *currentItem;
 
@@ -139,13 +109,6 @@ private:
     int i_depth;
 
     static QIcon icons[ITEM_TYPE_NUMBER];
-
-    /* Callbacks related */
-    void addCallbacks();
-    void delCallbacks();
-    void customEvent( QEvent * );
-    void processItemRemoval( int i_id );
-    void processItemAppend( const playlist_add_t *p_add );
 
     /* Actions */
     void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList );
@@ -199,6 +162,8 @@ private slots:
     void popupSortDesc();
     void processInputItemUpdate( input_item_t *);
     void processInputItemUpdate( input_thread_t* p_input );
+    void processItemRemoval( int i_id );
+    void processItemAppend( int item, int parent );
 };
 
 #endif

@@ -99,8 +99,8 @@ public:
     ~PlaylistEventManager();
 
 signals:
-    void itemAdded( int, int );
-    void itemRemoved( int );
+    void itemAdded( int i_item, int i_parent );
+    void itemRemoved( int i_id );
 
 private:
     static int itemAddedCb ( vlc_object_t *, const char *,
