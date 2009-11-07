@@ -295,7 +295,8 @@ void StandardPLPanel::setRoot( playlist_item_t *p_item )
     QPL_LOCK;
     assert( p_item );
 
-    p_item = playlist_GetPreferredNode( THEPL, p_item );
+    playlist_item_t *p_pref_item = playlist_GetPreferredNode( THEPL, p_item );
+    if( p_pref_item ) p_item = p_pref_item;
 
     /* needed for popupAdd() */
     currentRootId = p_item->i_id;

@@ -32,38 +32,92 @@
 #include <QTreeWidget>
 #include <QTreeWidgetItem>
 #include <QStyledItemDelegate>
+#include <QPainter>
+#include <QPushButton>
+#include <QLabel>
+#include <QHBoxLayout>
 
 #include <vlc_playlist.h>
 
 #include "qt4.hpp"
 
 class PlaylistWidget;
+class PlaylistEventManager;
 
-enum {
-    PL_TYPE,
-    ML_TYPE,
+enum SelectorItemType {
+    CATEGORY_TYPE,
     SD_TYPE,
+    PL_ITEM_TYPE
+};
+
+enum SpecialData {
+    IS_PODCAST = 1,
+    IS_PL,
+    IS_ML
 };
 
 enum {
     TYPE_ROLE = Qt::UserRole,
-    PPL_ITEM_ROLE,
-    NAME_ROLE,
-    LONGNAME_ROLE,
+    NAME_ROLE, //QString
+    LONGNAME_ROLE, //QString
+    PL_ITEM_ROLE, //playlist_item_t*
+    PL_ITEM_ID_ROLE, //playlist_item_t->i_id
+    IN_ITEM_ROLE, //input_item_t->i_id
+    SPECIAL_ROLE //SpecialData
+};
+
+enum ItemAction {
+    ADD_ACTION,
+    RM_ACTION
+};
+
+class PLSelItem : public QWidget
+{
+    Q_OBJECT;
+public:
+    PLSelItem( QTreeWidgetItem*, const QString& );
+    void setText( const QString& );
+    void addAction( ItemAction, const QString& toolTip = 0 );
+    QTreeWidgetItem *treeItem() { return qitem; }
+    QString text() { return lbl->text(); }
+public slots:
+    void showAction();
+    void hideAction();
+private slots:
+    void triggerAction() { emit action( this ); }
+signals:
+    void action( PLSelItem* );
+private:
+    void enterEvent( QEvent* );
+    void leaveEvent( QEvent* );
+    QTreeWidgetItem* qitem;
+    QPushButton* btnAction;
+    QLabel *lbl;
+    QHBoxLayout *layout;
 };
 
 class PLSelectorDelegate : public QStyledItemDelegate
 {
-  private:
+private:
+    /*void paint ( QPainter * painter,
+        const QStyleOptionViewItem & option, const QModelIndex & index ) const
+    {
+        if( index.data( TYPE_ROLE ).toInt() == CATEGORY_TYPE )
+            painter->fillRect( option.rect, QColor( 200,200,200 ) );
+        QRect r = option.rect;
+        r.setLeft( r.left() + 5 );
+        painter->drawText( r, Qt::AlignLeft | Qt::AlignVCenter, index.data().toString() );
+    }*/
     QSize sizeHint ( const QStyleOptionViewItem& option, const QModelIndex& index ) const
     {
-      QSize sz = QStyledItemDelegate::sizeHint( option, index );
-      if( sz.height() < 25 ) sz.setHeight(25);
-      return sz;
+        QSize sz = QStyledItemDelegate::sizeHint( option, index );
+        if( sz.height() < 23 ) sz.setHeight(23);
+        return sz;
     }
 };
 
 Q_DECLARE_METATYPE( playlist_item_t *);
+Q_DECLARE_METATYPE( input_item_t *);
 class PLSelector: public QTreeWidget
 {
     Q_OBJECT;
@@ -74,12 +128,25 @@ protected:
     friend class PlaylistWidget;
 private:
     QStringList mimeTypes () const;
-    void makeStandardItem( QTreeWidgetItem*, const QString& );
     bool dropMimeData ( QTreeWidgetItem * parent, int index, const QMimeData * data, Qt::DropAction action );
     void createItems();
+    PLSelItem * addItem (
+        SelectorItemType type, const QString& str, bool drop,
+        QTreeWidgetItem* parentItem = 0 );
+    PLSelItem * addPodcastItem( playlist_item_t *p_item );
+    inline PLSelItem * itemWidget( QTreeWidgetItem * );
     intf_thread_t *p_intf;
+    PlaylistEventManager *plEM;
+    QTreeWidgetItem *podcastsParent;
+    int podcastsParentId;
 private slots:
     void setSource( QTreeWidgetItem *item );
+    void plItemAdded( int, int );
+    void plItemRemoved( int );
+    void inputItemUpdate( input_item_t * );
+    void podcastAdd( PLSelItem* );
+    void podcastRemove( PLSelItem* );
+
 signals:
     void activated( playlist_item_t * );
 };

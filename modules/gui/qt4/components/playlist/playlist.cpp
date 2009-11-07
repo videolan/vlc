@@ -33,6 +33,9 @@
 #include "input_manager.hpp" /* art signal */
 #include "main_interface.hpp" /* DropEvent TODO remove this*/
 
+#include <QGroupBox>
+
+#include <iostream>
 /**********************************************************************
  * Playlist Widget. The embedded playlist
  **********************************************************************/
@@ -46,7 +49,12 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) : p_intf ( _p_i )
 
     /* Source Selector */
     selector = new PLSelector( this, p_intf );
-    leftW->addWidget( selector );
+    QVBoxLayout *selBox = new QVBoxLayout();
+    selBox->setContentsMargins(0,5,0,0);
+    selBox->addWidget( selector );
+    QGroupBox *selGroup = new QGroupBox( qtr( "Media Browser") );
+    selGroup->setLayout( selBox );
+    leftW->addWidget( selGroup );
 
     /* Create a Container for the Art Label
        in order to have a beautiful resizing for the selector above it */
@@ -139,4 +147,55 @@ void PlaylistWidget::closeEvent( QCloseEvent *event )
         hide();
         event->ignore();
     }
+}
+
+PlaylistEventManager::PlaylistEventManager( playlist_t *_pl )
+    : pl( _pl )
+{
+  var_AddCallback( pl, "playlist-item-append", itemAddedCb, this );
+  var_AddCallback( pl, "playlist-item-deleted", itemRemovedCb, this );
+}
+
+PlaylistEventManager::~PlaylistEventManager()
+{
+  var_DelCallback( pl, "playlist-item-append", itemAddedCb, this );
+  var_DelCallback( pl, "playlist-item-deleted", itemRemovedCb, this );
+}
+
+int PlaylistEventManager::itemAddedCb
+( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
+{
+    PlaylistEventManager *p_this = static_cast<PlaylistEventManager*>(data);
+    p_this->trigger( cur, ItemAddedEv );
+    return VLC_SUCCESS;
+}
+
+int PlaylistEventManager::itemRemovedCb
+( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
+{
+    PlaylistEventManager *p_this = static_cast<PlaylistEventManager*>(data);
+    p_this->trigger( cur, ItemRemovedEv );
+    return VLC_SUCCESS;
+}
+
+void PlaylistEventManager::trigger( vlc_value_t val, int type )
+{
+    if( type == ItemAddedEv )
+    {
+        playlist_add_t *p_add = static_cast<playlist_add_t*>( val.p_address );
+        QApplication::postEvent( this, new PLEMEvent( type, p_add->i_item, p_add->i_node ) );
+    }
+    else
+    {
+        QApplication::postEvent( this, new PLEMEvent( type, val.i_int, 0 ) );
+    }
+}
+
+void PlaylistEventManager::customEvent( QEvent *e )
+{
+    PLEMEvent *ev = static_cast<PLEMEvent*>(e);
+    if( (int) ev->type() == ItemAddedEv )
+        emit itemAdded( ev->item, ev->parent );
+    else
+        emit itemRemoved( ev->item );
 }

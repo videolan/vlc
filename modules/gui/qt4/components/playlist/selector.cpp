@@ -32,30 +32,92 @@
 #include "playlist_item.hpp"
 #include "qt4.hpp"
 #include "../../dialogs_provider.hpp"
+#include "playlist.hpp"
 
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QMimeData>
-#include <QPushButton>
-#include <QLabel>
+#include <QInputDialog>
+#include <QMessageBox>
 
 #include <vlc_playlist.h>
 #include <vlc_services_discovery.h>
 
+#include <iostream>
+
+PLSelItem::PLSelItem ( QTreeWidgetItem *i, const QString& text )
+    : qitem(i), btnAction( NULL )
+{
+    layout = new QHBoxLayout();
+    layout->setContentsMargins(0,0,0,0);
+
+    lbl = new QLabel( text );
+    lbl->setMargin(3);
+    layout->addWidget(lbl);
+
+    setLayout( layout );
+}
+
+void PLSelItem::addAction( ItemAction act, const QString& tooltip )
+{
+    if( btnAction ) return;
+
+    switch( act )
+    {
+    case ADD_ACTION:
+        btnAction = new QPushButton("+"); break;
+    case RM_ACTION:
+        btnAction = new QPushButton("-"); break;
+    }
+    if( !tooltip.isEmpty() ) btnAction->setToolTip( tooltip );
+    btnAction->setMaximumWidth(23);
+
+    layout->addWidget( btnAction );
+    btnAction->hide();
+
+    CONNECT( btnAction, clicked(), this, triggerAction() );
+}
+
+void PLSelItem::showAction() { if( btnAction ) btnAction->show(); }
+
+void PLSelItem::hideAction() { if( btnAction ) btnAction->hide(); }
+
+void PLSelItem::setText( const QString& text ) { lbl->setText( text ); }
+
+void PLSelItem::enterEvent( QEvent *ev ){ showAction(); }
+
+void PLSelItem::leaveEvent( QEvent *ev ){ hideAction(); }
+
 PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
            : QTreeWidget( p ), p_intf(_p_intf)
 {
-    setItemDelegate( new PLSelectorDelegate() );
-    setFrameStyle( QFrame::StyledPanel | QFrame::Plain );
+    /* custom QItemDelegate just to assure the minimum row height,
+       which otherwise fails when new child item is inserted */
+    setFrameStyle( QFrame::NoFrame );
+    viewport()->setAutoFillBackground( false );
     setIconSize( QSize( 24,24 ) );
-    setIndentation( 15 );
+    setIndentation( 10 );
     header()->hide();
+    //setHeaderLabel( qtr( "Medias" ) );
+    //header()->setMovable( false );
     setRootIsDecorated( false );
-    setAlternatingRowColors( true );
+    setAlternatingRowColors( false );
+    setItemDelegate( new PLSelectorDelegate() );
+    podcastsParent = NULL;
+    podcastsParentId = -1;
 
     viewport()->setAcceptDrops(true);
     setDropIndicatorShown(true);
     invisibleRootItem()->setFlags( invisibleRootItem()->flags() & ~Qt::ItemIsDropEnabled );
+
+    plEM = new PlaylistEventManager( THEPL );
+
+    CONNECT( plEM, itemAdded( int, int ),
+             this, plItemAdded( int, int ) );
+    CONNECT( plEM, itemRemoved( int ),
+             this, plItemRemoved( int ) );
+    CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
+            this, inputItemUpdate( input_item_t * ) );
 
     createItems();
     CONNECT( this, itemActivated( QTreeWidgetItem *, int ),
@@ -69,6 +131,20 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
 //  view->setCurrentIndex( model->index( 0, 0, QModelIndex() ) );
 }
 
+PLSelector::~PLSelector()
+{
+    if( podcastsParent )
+    {
+        int c = podcastsParent->childCount();
+        for( int i = 0; i < c; i++ )
+        {
+            QTreeWidgetItem *item = podcastsParent->child(i);
+            input_item_t *p_input = item->data( 0, IN_ITEM_ROLE ).value<input_item_t*>();
+            vlc_gc_decref( p_input );
+        }
+    }
+}
+
 void PLSelector::setSource( QTreeWidgetItem *item )
 {
     if( !item )
@@ -76,65 +152,107 @@ void PLSelector::setSource( QTreeWidgetItem *item )
 
     bool b_ok;
     int i_type = item->data( 0, TYPE_ROLE ).toInt( &b_ok );
-    if( !b_ok )
+    if( !b_ok || i_type == CATEGORY_TYPE )
         return;
 
-    assert( ( i_type == PL_TYPE || i_type == ML_TYPE || i_type == SD_TYPE ) );
+    bool sd_loaded;
     if( i_type == SD_TYPE )
     {
         QString qs = item->data( 0, NAME_ROLE ).toString();
-        if( !playlist_IsServicesDiscoveryLoaded( THEPL, qtu( qs ) ) )
-        {
+        sd_loaded = playlist_IsServicesDiscoveryLoaded( THEPL, qtu( qs ) );
+        if( !sd_loaded )
             playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
-        }
     }
 
-    if( i_type == SD_TYPE )
-        msg_Dbg( p_intf, "SD already loaded, reloading" );
-
     playlist_Lock( THEPL );
+
     playlist_item_t *pl_item = NULL;
+
     if( i_type == SD_TYPE )
-       pl_item = playlist_ChildSearchName( THEPL->p_root_category, qtu( item->data(0, LONGNAME_ROLE ).toString() ) );
-    else if ( i_type == PL_TYPE )
-       pl_item = THEPL->p_local_category;
-    else if ( i_type == ML_TYPE )
-       pl_item = THEPL->p_ml_category;
+    {
+        pl_item = playlist_ChildSearchName( THEPL->p_root_category, qtu( item->data(0, LONGNAME_ROLE ).toString() ) );
+        if( item->data( 0, SPECIAL_ROLE ).toInt() == IS_PODCAST )
+        {
+            if( pl_item && !sd_loaded )
+            {
+                podcastsParentId = pl_item->i_id;
+                for( int i=0; i < pl_item->i_children; i++ )
+                    addPodcastItem( pl_item->pp_children[i] );
+            }
+            pl_item = NULL; //to prevent activating it
+        }
+    }
+    else
+        pl_item = item->data( 0, PL_ITEM_ROLE ).value<playlist_item_t*>();
+
     playlist_Unlock( THEPL );
 
     if( pl_item )
        emit activated( pl_item );
 }
 
-void PLSelector::makeStandardItem( QTreeWidgetItem* item, const QString& str )
+PLSelItem * PLSelector::addItem (
+  SelectorItemType type, const QString& str, bool drop,
+  QTreeWidgetItem* parentItem )
 {
-  item->setText( 0,str );
+  QTreeWidgetItem *item = parentItem ?
+      new QTreeWidgetItem( parentItem ) : new QTreeWidgetItem( this );
+  PLSelItem *selItem = new PLSelItem( item, str );
+  setItemWidget( item, 0, selItem );
+  item->setData( 0, TYPE_ROLE, (int)type );
+  if( !drop ) item->setFlags( item->flags() & ~Qt::ItemIsDropEnabled );
+
+  return selItem;
+}
+
+PLSelItem * putSDData( PLSelItem* item, const char* name, const char* longname )
+{
+    item->treeItem()->setData( 0, NAME_ROLE, qfu( name ) );
+    item->treeItem()->setData( 0, LONGNAME_ROLE, qfu( longname ) );
+    return item;
+}
+
+PLSelItem * putPLData( PLSelItem* item, playlist_item_t* plItem )
+{
+    item->treeItem()->setData( 0, PL_ITEM_ROLE, QVariant::fromValue( plItem ) );
+/*    item->setData( 0, PL_ITEM_ID_ROLE, plItem->i_id );
+    item->setData( 0, IN_ITEM_ROLE, QVariant::fromValue( (void*) plItem->p_input ) ); );*/
+    return item;
+}
+
+PLSelItem *PLSelector::addPodcastItem( playlist_item_t *p_item )
+{
+  vlc_gc_incref( p_item->p_input );
+  char *psz_name = input_item_GetName( p_item->p_input );
+  PLSelItem *item = addItem(
+      PL_ITEM_TYPE, qfu( psz_name ), false, podcastsParent );
+  item->addAction( RM_ACTION, qtr( "Remove this podcast subscription" ) );
+  item->treeItem()->setData( 0, PL_ITEM_ROLE, QVariant::fromValue( p_item ) );
+  item->treeItem()->setData( 0, PL_ITEM_ID_ROLE, QVariant(p_item->i_id) );
+  item->treeItem()->setData( 0, IN_ITEM_ROLE, QVariant::fromValue( p_item->p_input ) );
+  CONNECT( item, action( PLSelItem* ), this, podcastRemove( PLSelItem* ) );
+  free( psz_name );
+  return item;
 }
 
 void PLSelector::createItems()
 {
-    QTreeWidgetItem *pl = new QTreeWidgetItem( this );
-    makeStandardItem( pl, qtr( "Playlist" ) );
-    pl->setData( 0, TYPE_ROLE, PL_TYPE );
-    pl->setData( 0, PPL_ITEM_ROLE, QVariant::fromValue( THEPL->p_local_category ) );
+    PLSelItem *pl = putPLData( addItem( PL_ITEM_TYPE, qtr( "Playlist" ), true ),
+                              THEPL->p_local_category );
+    pl->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
 
-    QTreeWidgetItem *lib = new QTreeWidgetItem( this );
-    makeStandardItem( lib, qtr( "Media Library" ) );
-    lib->setData( 0, TYPE_ROLE, ML_TYPE );
-    lib->setData( 0, PPL_ITEM_ROLE, QVariant::fromValue( THEPL->p_ml_category ) );
+    PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, qtr( "Media Library" ), true ),
+                              THEPL->p_ml_category );
+    ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
 
-    QTreeWidgetItem *sds = new QTreeWidgetItem( this );
-    makeStandardItem( sds, qtr( "Services" ) );
-    sds->setExpanded( true );
-    sds->setFlags( sds->flags() & ~Qt::ItemIsDropEnabled );
+    QTreeWidgetItem *msrc = addItem( CATEGORY_TYPE, qtr( "Media Sources" ),
+                                      false )->treeItem();
 
-    QTreeWidgetItem *mfldrs = new QTreeWidgetItem( sds );
-    makeStandardItem( mfldrs, qtr( "Media Folders" ) );
-    mfldrs->setFlags( mfldrs->flags() & ~Qt::ItemIsDropEnabled );
+    QTreeWidgetItem *mfldrs = NULL;
 
-    QTreeWidgetItem *shouts = new QTreeWidgetItem( sds );
-    makeStandardItem( shouts, qtr( "Shoutcast" ) );
-    shouts->setFlags( shouts->flags() & ~Qt::ItemIsDropEnabled );
+    QTreeWidgetItem *shouts = NULL;
+
+    msrc->setExpanded( true );
 
     char **ppsz_longnames;
     char **ppsz_names = vlc_sd_GetNames( &ppsz_longnames );
@@ -142,55 +260,45 @@ void PLSelector::createItems()
         return;
 
     char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
-    QTreeWidgetItem *sd_item;
     for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
     {
-        sd_item = new QTreeWidgetItem(  );
-
+        //msg_Dbg( p_intf, "Adding a SD item: %s", *ppsz_longname );
 #define SD_IS( name ) ( !strcmp( *ppsz_name, name ) )
 
         if( SD_IS("shoutcast") || SD_IS("shoutcasttv") ||
             SD_IS("frenchtv") || SD_IS("freebox") )
         {
-            shouts->addChild( sd_item );
-            makeStandardItem( sd_item, qfu(*ppsz_longname) );
+            if( !shouts ) shouts = addItem( CATEGORY_TYPE, qtr( "Shoutcast" ),
+                                            false, msrc )->treeItem();
+            putSDData( addItem( SD_TYPE, *ppsz_longname, false, shouts ),
+                       *ppsz_name, *ppsz_longname );
         }
         else if( SD_IS("video_dir") || SD_IS("audio_dir") || SD_IS("picture_dir") )
         {
-            mfldrs->addChild( sd_item );
-            makeStandardItem( sd_item, qfu(*ppsz_longname) );
+            if( !mfldrs ) mfldrs = addItem( CATEGORY_TYPE, qtr( "Media Folders" ),
+                                            false, msrc )->treeItem();
+            putSDData( addItem( SD_TYPE, *ppsz_longname, false, mfldrs ),
+                       *ppsz_name, *ppsz_longname );
         }
         else if( SD_IS("podcast") )
         {
-            sds->addChild( sd_item );
 
-            QLabel *lbl = new QLabel("Podcasts");
-            lbl->setMargin(3);
-            QPushButton *btn = new QPushButton();
-            btn->setMaximumWidth(30);
-            btn->setIcon( QIcon( ":/menu/preferences" ) );
-            QHBoxLayout *hbox = new QHBoxLayout();
-            hbox->setContentsMargins(0,0,0,0);
-            hbox->addWidget(lbl);
-            hbox->addWidget(btn);
-            QWidget *w = new QWidget();
-            w->setLayout(hbox);
+            PLSelItem *podItem = addItem( SD_TYPE, qtr( "Podcasts" ), false, msrc );
+            putSDData( podItem, *ppsz_name, *ppsz_longname );
+            podItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PODCAST ) );
+            podItem->addAction( ADD_ACTION, qtr( "Subscribe to a podcast" ) );
+            CONNECT( podItem, action( PLSelItem* ), this, podcastAdd( PLSelItem* ) );
 
-            CONNECT( btn, clicked(), THEDP, podcastConfigureDialog() );
-            setItemWidget( sd_item, 0, w );
+            podcastsParent = podItem->treeItem();
         }
         else
         {
-            sds->addChild( sd_item );
-            makeStandardItem( sd_item, qfu(*ppsz_longname) );
+            putSDData( addItem( SD_TYPE, qtr( *ppsz_longname ), false, msrc ),
+                       *ppsz_name, *ppsz_longname );
         }
 
 #undef SD_IS
 
-        sd_item->setData( 0, TYPE_ROLE, SD_TYPE );
-        sd_item->setData( 0, NAME_ROLE, qfu( *ppsz_name ) );
-        sd_item->setData( 0, LONGNAME_ROLE, qfu( *ppsz_longname ) );
-        sd_item->setFlags( sd_item->flags() & ~Qt::ItemIsDropEnabled );
         free( *ppsz_name );
         free( *ppsz_longname );
     }
@@ -212,9 +320,10 @@ bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int index,
 
     QVariant type = parent->data( 0, TYPE_ROLE );
     if( type == QVariant() ) return false;
-    int i_type = type.toInt();
-    if( i_type != PL_TYPE && i_type != ML_TYPE ) return false;
-    bool to_pl = i_type == PL_TYPE;
+    int i_truth = parent->data( 0, SPECIAL_ROLE ).toInt();
+
+    if( i_truth != IS_PL && i_truth != IS_ML ) return false;
+    bool to_pl = ( i_truth == IS_PL );
 
     if( data->hasFormat( "vlc/qt-playlist-item" ) )
     {
@@ -238,6 +347,120 @@ bool PLSelector::dropMimeData ( QTreeWidgetItem * parent, int index,
     return true;
 }
 
-PLSelector::~PLSelector()
+void PLSelector::plItemAdded( int item, int parent )
 {
+    if( parent != podcastsParentId ) return;
+
+    playlist_Lock( THEPL );
+
+    playlist_item_t *p_item = playlist_ItemGetById( THEPL, item );
+    if( !p_item ) {
+        playlist_Unlock( THEPL );
+        return;
+    }
+
+    int c = podcastsParent->childCount();
+    for( int i = 0; i < c; i++ )
+    {
+        QTreeWidgetItem *podItem = podcastsParent->child(i);
+        if( podItem->data( 0, PL_ITEM_ID_ROLE ).toInt() == item )
+        {
+          //msg_Dbg( p_intf, "Podcast already in: (%d) %s", item, p_item->p_input->psz_uri);
+          playlist_Unlock( THEPL );
+          return;
+        }
+    }
+
+    //msg_Dbg( p_intf, "Adding podcast: (%d) %s", item, p_item->p_input->psz_uri );
+    addPodcastItem( p_item );
+
+    playlist_Unlock( THEPL );
+
+    podcastsParent->setExpanded( true );
+}
+
+void PLSelector::plItemRemoved( int id )
+{
+    int c = podcastsParent->childCount();
+    for( int i = 0; i < c; i++ )
+    {
+        QTreeWidgetItem *item = podcastsParent->child(i);
+        if( item->data( 0, PL_ITEM_ID_ROLE ).toInt() == id )
+        {
+            input_item_t *p_input = item->data( 0, IN_ITEM_ROLE ).value<input_item_t*>();
+            //msg_Dbg( p_intf, "Removing podcast: (%d) %s", id, p_input->psz_uri );
+            vlc_gc_decref( p_input );
+            delete item;
+            return;
+        }
+    }
+}
+
+void PLSelector::inputItemUpdate( input_item_t *arg )
+{
+    int c = podcastsParent->childCount();
+    for( int i = 0; i < c; i++ )
+    {
+        QTreeWidgetItem *item = podcastsParent->child(i);
+        input_item_t *p_input = item->data( 0, IN_ITEM_ROLE ).value<input_item_t*>();
+        if( p_input == arg )
+        {
+            PLSelItem *si = itemWidget( item );
+            char *psz_name = input_item_GetName( p_input );
+            si->setText( qfu( psz_name ) );
+            free( psz_name );
+            return;
+        }
+    }
+}
+
+void PLSelector::podcastAdd( PLSelItem* item )
+{
+    bool ok;
+    QString url = QInputDialog::getText( this, qtr( "Subscribe" ),
+                                         qtr( "Enter URL of the podcast to subscribe to:" ),
+                                         QLineEdit::Normal, QString(), &ok );
+    if( !ok || url.isEmpty() ) return;
+
+    setSource( podcastsParent ); //to load the SD in case it's not loaded
+
+    vlc_object_t *p_obj = (vlc_object_t*) vlc_object_find_name(
+        p_intf->p_libvlc, "podcast", FIND_CHILD );
+    if( !p_obj ) return;
+
+    QString request("ADD:");
+    request += url;
+    var_SetString( p_obj, "podcast-request", qtu( request ) );
+    vlc_object_release( p_obj );
+}
+
+void PLSelector::podcastRemove( PLSelItem* item )
+{
+    //FIXME will translators know to leave that %1 somewhere inside?
+    QString question ( qtr( "Do you really want to unsubscribe from %1?" ) );
+    question = question.arg( item->text() );
+    QMessageBox::StandardButton res =
+        QMessageBox::question( this, qtr( "Unsubscribe" ), question,
+                               QMessageBox::Ok | QMessageBox::Cancel,
+                               QMessageBox::Cancel );
+    if( res == QMessageBox::Cancel ) return;
+
+    input_item_t *input = item->treeItem()->data( 0, IN_ITEM_ROLE ).value<input_item_t*>();
+    if( !input ) return;
+
+    vlc_object_t *p_obj = (vlc_object_t*) vlc_object_find_name(
+        p_intf->p_libvlc, "podcast", FIND_CHILD );
+    if( !p_obj ) return;
+
+    QString request("RM:");
+    char *psz_uri = input_item_GetURI( input );
+    request += qfu( psz_uri );
+    var_SetString( p_obj, "podcast-request", qtu( request ) );
+    vlc_object_release( p_obj );
+    free( psz_uri );
+}
+
+PLSelItem * PLSelector::itemWidget( QTreeWidgetItem *item )
+{
+    return ( static_cast<PLSelItem*>( QTreeWidget::itemWidget( item, 0 ) ) );
 }
