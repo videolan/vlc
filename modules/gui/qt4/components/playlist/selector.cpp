@@ -43,8 +43,6 @@
 #include <vlc_playlist.h>
 #include <vlc_services_discovery.h>
 
-#include <iostream>
-
 PLSelItem::PLSelItem ( QTreeWidgetItem *i, const QString& text )
     : qitem(i), btnAction( NULL )
 {
@@ -133,6 +131,8 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
 
 PLSelector::~PLSelector()
 {
+    delete plEM;
+
     if( podcastsParent )
     {
         int c = podcastsParent->childCount();
