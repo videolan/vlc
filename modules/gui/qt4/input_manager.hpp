@@ -85,6 +85,21 @@ private:
     input_item_t *p_item;
 };
 
+enum PLEventTypes
+{
+    PLItemAppended_Type = QEvent::User + PLEventType + 1,
+    PLItemRemoved_Type
+};
+
+class PLEvent : public QEvent
+{
+public:
+    PLEvent( PLEventTypes t, int i, int p )
+        : QEvent( (QEvent::Type)t ), i_item(i), i_parent(p) {}
+    int i_item;
+    int i_parent;
+};
+
 class InputManager : public QObject
 {
     Q_OBJECT;
@@ -251,6 +266,8 @@ public slots:
 signals:
     void inputChanged( input_thread_t * );
     void volumeChanged();
+    void playlistItemAppended( int itemId, int parentId );
+    void playlistItemRemoved( int itemId );
 };
 
 #endif

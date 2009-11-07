@@ -39,6 +39,10 @@ static int ItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int PLItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
+static int PLItemAppended( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
+static int PLItemRemoved( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
 static int VolumeChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 
@@ -881,6 +885,8 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     var_AddCallback( THEPL, "item-change", ItemChanged, im );
     var_AddCallback( THEPL, "item-current", PLItemChanged, this );
     var_AddCallback( THEPL, "activity", PLItemChanged, this );
+    var_AddCallback( THEPL, "playlist-item-append", PLItemAppended, this );
+    var_AddCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
 
     var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
 
@@ -918,6 +924,8 @@ MainInputManager::~MainInputManager()
     var_DelCallback( THEPL, "item-change", ItemChanged, im );
 
     var_DelCallback( THEPL, "item-current", PLItemChanged, this );
+    var_DelCallback( THEPL, "playlist-item-append", PLItemAppended, this );
+    var_DelCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
 }
 
 vout_thread_t* MainInputManager::getVout()
@@ -933,14 +941,25 @@ aout_instance_t * MainInputManager::getAout()
 void MainInputManager::customEvent( QEvent *event )
 {
     int type = event->type();
-    if ( type != ItemChanged_Type && type != VolumeChanged_Type )
-        return;
+
+    PLEvent *plEv;
 
     // msg_Dbg( p_intf, "New MainIM Event of type: %i", type );
-    if( type == VolumeChanged_Type )
+    switch( type )
     {
+    case VolumeChanged_Type:
         emit volumeChanged();
         return;
+    case PLItemAppended_Type:
+        plEv = static_cast<PLEvent*>( event );
+        emit playlistItemAppended( plEv->i_item, plEv->i_parent );
+        return;
+    case PLItemRemoved_Type:
+        plEv = static_cast<PLEvent*>( event );
+        emit playlistItemRemoved( plEv->i_item );
+        return;
+    default:
+        if( type != ItemChanged_Type ) return;
     }
 
     /* Should be PLItemChanged Event */
@@ -1035,3 +1054,22 @@ static int VolumeChanged( vlc_object_t *p_this, const char *psz_var,
     return VLC_SUCCESS;
 }
 
+static int PLItemAppended
+( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
+{
+    MainInputManager *mim = static_cast<MainInputManager*>(data);
+    playlist_add_t *p_add = static_cast<playlist_add_t*>( cur.p_address );
+
+    PLEvent *event = new PLEvent( PLItemAppended_Type, p_add->i_item, p_add->i_node  );
+    QApplication::postEvent( mim, event );
+    return VLC_SUCCESS;
+}
+static int PLItemRemoved
+( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
+{
+    MainInputManager *mim = static_cast<MainInputManager*>(data);
+
+    PLEvent *event = new PLEvent( PLItemRemoved_Type, cur.i_int, 0  );
+    QApplication::postEvent( mim, event );
+    return VLC_SUCCESS;
+}
