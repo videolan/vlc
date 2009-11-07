@@ -81,34 +81,4 @@ enum PLEventType {
     ItemRemovedEv
 };
 
-class PLEMEvent : public QEvent
-{
-public:
-    PLEMEvent( int t, int i, int p )
-        : QEvent( (QEvent::Type)t ), item(i), parent(p) {}
-    int item;
-    int parent;
-};
-
-class PlaylistEventManager : public QObject
-{
-    Q_OBJECT;
-
-public:
-    PlaylistEventManager( playlist_t* );
-    ~PlaylistEventManager();
-
-signals:
-    void itemAdded( int i_item, int i_parent );
-    void itemRemoved( int i_id );
-
-private:
-    static int itemAddedCb ( vlc_object_t *, const char *,
-                              vlc_value_t, vlc_value_t, void * );
-    static int itemRemovedCb ( vlc_object_t *, const char *,
-                                vlc_value_t, vlc_value_t, void * );
-    void trigger( vlc_value_t, int );
-    void customEvent( QEvent* );
-    playlist_t *pl;
-};
 #endif
