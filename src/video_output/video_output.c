@@ -2060,9 +2060,9 @@ static void DeinterlaceEnable( vout_thread_t *p_vout )
     /* */
     bool is_needed;
     if( i_deinterlace == -2 )
-        is_needed = true;
+        p_vout->p->b_picture_interlaced = true;
     else if( i_deinterlace == -3 )
-        is_needed = false;
+        p_vout->p->b_picture_interlaced = false;
     if( i_deinterlace < 0 )
         i_deinterlace = -1;
 
@@ -2071,7 +2071,7 @@ static void DeinterlaceEnable( vout_thread_t *p_vout )
     /* */
     val.psz_string = psz_deinterlace ? psz_deinterlace : p_optm->orig.psz;
     var_Change( p_vout, "deinterlace-mode", VLC_VAR_SETVALUE, &val, NULL );
-    val.b_bool = is_needed;
+    val.b_bool = p_vout->p->b_picture_interlaced;
     var_Change( p_vout, "deinterlace-needed", VLC_VAR_SETVALUE, &val, NULL );
 
     var_SetInteger( p_vout, "deinterlace", i_deinterlace );
