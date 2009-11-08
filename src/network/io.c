@@ -96,15 +96,29 @@ int net_SetupSocket (int fd)
 int net_Socket (vlc_object_t *p_this, int family, int socktype,
                 int protocol)
 {
-    int fd = socket (family, socktype, protocol);
-    if (fd == -1)
+    int fd;
+
+#ifdef SOCK_CLOEXEC
+    fd = socket (family, socktype | SOCK_NONBLOCK | SOCK_CLOEXEC, protocol);
+    if (fd == -1 && errno == EINVAL)
+#endif
     {
-        if (net_errno != EAFNOSUPPORT)
-            msg_Err (p_this, "cannot create socket: %m");
-        return -1;
+        fd = socket (family, socktype, protocol);
+        if (fd == -1)
+        {
+            if (net_errno != EAFNOSUPPORT)
+                msg_Err (p_this, "cannot create socket: %m");
+            return -1;
+        }
+#ifndef WIN32
+        fcntl (fd, F_SETFD, FD_CLOEXEC);
+        fcntl (fd, F_SETFL, fcntl (fd, F_GETFL, 0) | O_NONBLOCK);
+#else
+        ioctlsocket (fd, FIONBIO, &(unsigned long){ 1 });
+#endif
     }
 
-    net_SetupSocket (fd);
+    setsockopt (fd, SOL_SOCKET, SO_REUSEADDR, &(int){ 1 }, sizeof (int));
 
 #ifdef IPV6_V6ONLY
     /*
