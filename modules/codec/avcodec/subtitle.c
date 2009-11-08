@@ -183,8 +183,10 @@ void EndSubtitleDec(decoder_t *dec)
  */
 static subpicture_region_t *ConvertRegionRGBA(AVSubtitleRect *ffregion)
 {
-    video_format_t fmt;
+    if (ffregion->w <= 0 || ffregion->h <= 0)
+        return NULL;
 
+    video_format_t fmt;
     memset(&fmt, 0, sizeof(fmt));
     fmt.i_chroma         = VLC_FOURCC('R','G','B','A');
     fmt.i_aspect         = 0;
