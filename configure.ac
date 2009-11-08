@@ -583,7 +583,7 @@ AC_CHECK_FUNCS(fdatasync,,
 ])
 
 dnl Check for non-standard system calls
-AC_CHECK_FUNCS([vmsplice eventfd fstatfs])
+AC_CHECK_FUNCS([vmsplice eventfd fstatfs accept4])
 
 AH_BOTTOM([#include <vlc_fixups.h>])
 

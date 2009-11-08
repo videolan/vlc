@@ -255,8 +255,15 @@ next_ai: /* failure */
 int net_AcceptSingle (vlc_object_t *obj, int lfd)
 {
     int fd;
+
     do
+    {
+#ifdef HAVE_ACCEPT4
+        fd = accept4 (lfd, NULL, NULL, SOCK_CLOEXEC);
+        if (fd == -1 && errno == ENOSYS)
+#endif
         fd = accept (lfd, NULL, NULL);
+    }
     while (fd == -1 && errno == EINTR);
 
     if (fd == -1)

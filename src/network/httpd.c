@@ -2517,6 +2517,10 @@ static void* httpd_HostThread( void *data )
                 continue;
 
             /* */
+#ifdef HAVE_ACCEPT4
+            fd = accept4 (fd, NULL, NULL, SOCK_CLOEXEC);
+            if (fd == -1 && errno == ENOSYS)
+#endif
             fd = accept (fd, NULL, NULL);
             if (fd == -1)
                 continue;
