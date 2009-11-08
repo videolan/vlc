@@ -1048,7 +1048,9 @@ FFMPEGCONF += \
 	--disable-protocols \
 	--disable-network
 ifdef HAVE_WIN32
-FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=ac3 --enable-libmp3lame
+FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=ac3 --enable-libmp3lame --enable-w32threads
+else
+FFMPEGCONFG += --enable-pthreads
 endif
 
 ifdef HAVE_WINCE
