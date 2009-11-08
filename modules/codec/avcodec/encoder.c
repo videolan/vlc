@@ -68,10 +68,6 @@ static block_t *EncodeVideo( encoder_t *, picture_t * );
 static block_t *EncodeAudio( encoder_t *, aout_buffer_t * );
 
 struct thread_context_t;
-static void* FfmpegThread( vlc_object_t *p_this );
-static int FfmpegExecute( AVCodecContext *s,
-                          int (*pf_func)(AVCodecContext *c2, void *arg2),
-                          void *arg, int *ret, int count, int );
 
 /*****************************************************************************
  * thread_context_t : for multithreaded encoding
@@ -509,7 +505,7 @@ int OpenEncoder( vlc_object_t *p_this )
             p_context->flags |= CODEC_FLAG_QSCALE;
 
         if ( p_enc->i_threads >= 1 )
-            p_context->thread_count = p_enc->i_threads;
+            avcodec_thread_init( p_context, p_enc->i_threads );
 
         if( p_sys->i_vtolerance > 0 )
             p_context->bit_rate_tolerance = p_sys->i_vtolerance;
@@ -719,82 +715,6 @@ int OpenEncoder( vlc_object_t *p_this )
 }
 
 /****************************************************************************
- * Ffmpeg threading system
- ****************************************************************************/
-static void* FfmpegThread( vlc_object_t *p_this )
-{
-    struct thread_context_t *p_context = (struct thread_context_t *)p_this;
-    int canc = vlc_savecancel ();
-    while ( vlc_object_alive (p_context) && !p_context->b_error )
-    {
-        vlc_mutex_lock( &p_context->lock );
-        while ( !p_context->b_work && vlc_object_alive (p_context) && !p_context->b_error )
-        {
-            vlc_cond_wait( &p_context->cond, &p_context->lock );
-        }
-        p_context->b_work = 0;
-        vlc_mutex_unlock( &p_context->lock );
-        if ( !vlc_object_alive (p_context) || p_context->b_error )
-            break;
-
-        if ( p_context->pf_func )
-        {
-            p_context->i_ret = p_context->pf_func( p_context->p_context,
-                                                   p_context->arg );
-        }
-
-        vlc_mutex_lock( &p_context->lock );
-        p_context->b_done = 1;
-        vlc_cond_signal( &p_context->cond );
-        vlc_mutex_unlock( &p_context->lock );
-    }
-
-    vlc_restorecancel (canc);
-    return NULL;
-}
-
-static int FfmpegExecute( AVCodecContext *s,
-                          int (*pf_func)(AVCodecContext *c2, void *arg2),
-                          void *arg, int *ret, int count, int size )
-{
-    struct thread_context_t ** pp_contexts =
-                         (struct thread_context_t **)s->thread_opaque;
-    void **argv = arg;
-
-    /* Note, we can be certain that this is not called with the same
-     * AVCodecContext by different threads at the same time */
-    for ( int i = 0; i < count; i++ )
-    {
-        vlc_mutex_lock( &pp_contexts[i]->lock );
-        pp_contexts[i]->arg = argv[i];
-        pp_contexts[i]->pf_func = pf_func;
-        pp_contexts[i]->i_ret = 12345;
-        pp_contexts[i]->b_work = 1;
-        vlc_cond_signal( &pp_contexts[i]->cond );
-        vlc_mutex_unlock( &pp_contexts[i]->lock );
-    }
-    for ( int i = 0; i < count; i++ )
-    {
-        vlc_mutex_lock( &pp_contexts[i]->lock );
-        while ( !pp_contexts[i]->b_done )
-        {
-            vlc_cond_wait( &pp_contexts[i]->cond, &pp_contexts[i]->lock );
-        }
-        pp_contexts[i]->b_done = 0;
-        pp_contexts[i]->pf_func = NULL;
-        vlc_mutex_unlock( &pp_contexts[i]->lock );
-
-        if ( ret )
-        {
-            ret[i] = pp_contexts[i]->i_ret;
-        }
-    }
-
-    (void)size;
-    return 0;
-}
-
-/****************************************************************************
  * EncodeVideo: the whole thing
  ****************************************************************************/
 static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
@@ -803,35 +723,6 @@ static block_t *EncodeVideo( encoder_t *p_enc, picture_t *p_pict )
     AVFrame frame;
     int i_out, i_plane;
 
-    if ( !p_sys->b_inited && p_enc->i_threads >= 1 )
-    {
-        struct thread_context_t ** pp_contexts;
-        int i;
-
-        p_sys->b_inited = 1;
-        pp_contexts = malloc( sizeof(struct thread_context_t *)
-                                 * p_enc->i_threads );
-        p_sys->p_context->thread_opaque = (void *)pp_contexts;
-
-        for ( i = 0; i < p_enc->i_threads; i++ )
-        {
-            pp_contexts[i] = vlc_object_create( p_enc,
-                                     sizeof(struct thread_context_t) );
-            pp_contexts[i]->p_context = p_sys->p_context;
-            vlc_mutex_init( &pp_contexts[i]->lock );
-            vlc_cond_init( &pp_contexts[i]->cond );
-            pp_contexts[i]->b_work = 0;
-            pp_contexts[i]->b_done = 0;
-            if ( vlc_thread_create( pp_contexts[i], "encoder", FfmpegThread,
-                                    VLC_THREAD_PRIORITY_VIDEO ) )
-            {
-                msg_Err( p_enc, "cannot spawn encoder thread, expect to die soon" );
-                return NULL;
-            }
-        }
-
-        p_sys->p_context->execute = FfmpegExecute;
-    }
 
     memset( &frame, 0, sizeof( AVFrame ) );
     for( i_plane = 0; i_plane < p_pict->i_planes; i_plane++ )
@@ -1107,24 +998,6 @@ void CloseEncoder( vlc_object_t *p_this )
 {
     encoder_t *p_enc = (encoder_t *)p_this;
     encoder_sys_t *p_sys = p_enc->p_sys;
-
-    if ( p_sys->b_inited && p_enc->i_threads >= 1 )
-    {
-        int i;
-        struct thread_context_t ** pp_contexts =
-                (struct thread_context_t **)p_sys->p_context->thread_opaque;
-        for ( i = 0; i < p_enc->i_threads; i++ )
-        {
-            vlc_object_kill( pp_contexts[i] );
-            vlc_cond_signal( &pp_contexts[i]->cond );
-            vlc_thread_join( pp_contexts[i] );
-            vlc_mutex_destroy( &pp_contexts[i]->lock );
-            vlc_cond_destroy( &pp_contexts[i]->cond );
-            vlc_object_release( pp_contexts[i] );
-        }
-
-        free( pp_contexts );
-    }
 
     vlc_avcodec_lock();
     avcodec_close( p_sys->p_context );
