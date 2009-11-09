@@ -578,35 +578,23 @@ static int WriteMeta( vlc_object_t *p_this )
 
     char *psz_meta;
 
-#define SET( a, b )                                         \
-    if( b )                                                 \
-    {                                                       \
-        String* psz_tmp = new String( b, String::UTF8 );    \
-        p_tag->set##a( *psz_tmp );                          \
-        delete psz_tmp;                                     \
-    }
+#define SET( a, b )                                             \
+    psz_meta = input_item_Get ## a( p_item );                   \
+    if( psz_meta )                                              \
+    {                                                           \
+        String* psz_tmp = new String( psz_meta, String::UTF8 ); \
+        p_tag->set##b( *psz_tmp );                              \
+        delete psz_tmp;                                         \
+    }                                                           \
+    free( psz_meta );
 
     // Saving all common fields
     // If the title is empty, use the name
-    psz_meta = input_item_GetTitleFbName( p_item );
-    SET( Title, psz_meta );
-    free( psz_meta );
-
-    psz_meta = input_item_GetArtist( p_item );
-    SET( Artist, psz_meta );
-    free( psz_meta );
-
-    psz_meta = input_item_GetAlbum( p_item );
-    SET( Album, psz_meta );
-    free( psz_meta );
-
-    psz_meta = input_item_GetDescription( p_item );
-    SET( Comment, psz_meta );
-    free( psz_meta );
-
-    psz_meta = input_item_GetGenre( p_item );
-    SET( Genre, psz_meta );
-    free( psz_meta );
+    SET( TitleFbName, Title );
+    SET( Artist, Artist );
+    SET( Album, Album );
+    SET( Description, Comment );
+    SET( Genre, Genre );
 
 #undef SET
 
