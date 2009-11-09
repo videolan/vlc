@@ -84,7 +84,7 @@ static int    CacheSaveConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 4
+#define CACHE_SUBVERSION_NUM 5
 
 /* Format string for the cache filename */
 #define CACHENAME_FORMAT \
@@ -108,7 +108,6 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
     FILE *file;
     int i, j, i_size, i_read;
     char p_cachestring[sizeof("cache " COPYRIGHT_MESSAGE)];
-    char p_cachelang[6], p_lang[6];
     int i_cache;
     module_cache_t **pp_cache = 0;
     int32_t i_file_size, i_marker;
@@ -204,17 +203,6 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
     {
         msg_Warn( p_this, "This doesn't look like a valid plugins cache "
                   "(corrupted header)" );
-        fclose( file );
-        return;
-    }
-
-    /* Check the language hasn't changed */
-    sprintf( p_lang, "%5.5s", _("C") ); i_size = 5;
-    i_read = fread( p_cachelang, 1, i_size, file );
-    if( i_read != i_size || memcmp( p_cachelang, p_lang, i_size ) )
-    {
-        msg_Warn( p_this, "This doesn't look like a valid plugins cache "
-                  "(language changed)" );
         fclose( file );
         return;
     }
@@ -529,10 +517,6 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
      * structure changes) */
     i_file_size = CACHE_SUBVERSION_NUM;
     if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1 )
-        goto error;
-
-    /* Language */
-    if (fprintf (file, "%5.5s", _("C")) == EOF)
         goto error;
 
     /* Header marker */
