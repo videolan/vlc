@@ -66,6 +66,7 @@ vlc_module_begin ()
         CACHING_TEXT, CACHING_LONGTEXT, true )
     set_capability( "access_demux", 60 )
     add_shortcut( "bd" )
+    add_shortcut( "file" )
     set_callbacks( Open, Close )
 vlc_module_end ()
 
@@ -152,7 +153,9 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
-    if( *p_demux->psz_access && strcmp( p_demux->psz_access, "bd" ) )
+    if( *p_demux->psz_access &&
+        strcmp( p_demux->psz_access, "bd" ) &&
+        strcmp( p_demux->psz_access, "file" ) )
         return VLC_EGENERIC;
 
     /* */
