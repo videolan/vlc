@@ -4131,7 +4131,8 @@ then
   AC_CHECK_HEADERS([soundcard.h sys/soundcard.h], [
     VLC_ADD_PLUGIN([oss])
     VLC_ADD_PLUGIN([access_oss])
-    AC_CHECK_LIB(ossaudio,main,[VLC_ADD_LIBS([oss],[-lossaudio])])
+    AC_CHECK_LIB(ossaudio,main,[VLC_ADD_LIBS([oss],[-lossaudio])
+                                VLC_ADD_LIBS([access_oss],[-lossaudio])])
   ])
 fi
 
