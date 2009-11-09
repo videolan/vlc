@@ -1899,11 +1899,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
 static void ListModules( libvlc_int_t *p_this, bool b_verbose )
 {
     module_t *p_parser;
-    char psz_spaces[22];
 
     bool b_color = config_GetInt( p_this, "color" ) > 0;
-
-    memset( psz_spaces, ' ', 22 );
 
 #ifdef WIN32
     ShowConsole( true );
@@ -1917,20 +1914,14 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
     {
         int i;
 
-        /* Nasty hack, but right now I'm too tired to think about a nice
-         * solution */
-        i = 22 - strlen( p_parser->psz_object_name ) - 1;
-        if( i < 0 ) i = 0;
-        psz_spaces[i] = 0;
-
         if( b_color )
-            utf8_fprintf( stdout, GREEN"  %s%s "WHITE"%s\n"GRAY,
+            utf8_fprintf( stdout, GREEN"  %-22s "WHITE"%s\n"GRAY,
                           p_parser->psz_object_name,
-                          psz_spaces, _( p_parser->psz_longname ) );
+                          _( p_parser->psz_longname ) );
         else
-            utf8_fprintf( stdout, "  %s%s %s\n",
+            utf8_fprintf( stdout, "  %-22s %s\n",
                           p_parser->psz_object_name,
-                          psz_spaces, _( p_parser->psz_longname ) );
+                          _( p_parser->psz_longname ) );
 
         if( b_verbose )
         {
@@ -1960,8 +1951,6 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
                                   p_parser->i_score );
             }
         }
-
-        psz_spaces[i] = ' ';
     }
     module_list_free (list);
 
