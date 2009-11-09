@@ -42,6 +42,7 @@
 #include "qt4.hpp"
 
 class PlaylistWidget;
+class QVLCIconLabel;
 
 enum SelectorItemType {
     CATEGORY_TYPE,
@@ -90,29 +91,9 @@ private:
     void enterEvent( QEvent* );
     void leaveEvent( QEvent* );
     QTreeWidgetItem* qitem;
-    QPushButton* btnAction;
+    QVLCIconLabel *lblAction;
     QLabel *lbl;
     QHBoxLayout *layout;
-};
-
-class PLSelectorDelegate : public QStyledItemDelegate
-{
-private:
-    /*void paint ( QPainter * painter,
-        const QStyleOptionViewItem & option, const QModelIndex & index ) const
-    {
-        if( index.data( TYPE_ROLE ).toInt() == CATEGORY_TYPE )
-            painter->fillRect( option.rect, QColor( 200,200,200 ) );
-        QRect r = option.rect;
-        r.setLeft( r.left() + 5 );
-        painter->drawText( r, Qt::AlignLeft | Qt::AlignVCenter, index.data().toString() );
-    }*/
-    QSize sizeHint ( const QStyleOptionViewItem& option, const QModelIndex& index ) const
-    {
-        QSize sz = QStyledItemDelegate::sizeHint( option, index );
-        if( sz.height() < 23 ) sz.setHeight(23);
-        return sz;
-    }
 };
 
 Q_DECLARE_METATYPE( playlist_item_t *);

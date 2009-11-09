@@ -146,6 +146,36 @@ void SearchLineEdit::updateText( const QString& text )
     emit textChanged( text );
 }
 
+QVLCIconLabel::QVLCIconLabel( const QIcon& i, QWidget *p )
+    : QLabel( p ), icon( i )
+{
+    setPixmap( icon.pixmap( pixmapSize( QIcon::Normal ), QIcon::Normal ) );
+}
+
+void QVLCIconLabel::setIcon( const QIcon& i )
+{ icon = i; }
+
+void QVLCIconLabel::enterEvent( QEvent * )
+{
+    setPixmap( icon.pixmap( pixmapSize( QIcon::Active ), QIcon::Active ) );
+}
+void QVLCIconLabel::leaveEvent( QEvent * )
+{
+    setPixmap( icon.pixmap( pixmapSize( QIcon::Normal ), QIcon::Normal ) );
+}
+
+void QVLCIconLabel::mouseReleaseEvent( QMouseEvent * )
+{
+    emit clicked();
+}
+
+QSize QVLCIconLabel::pixmapSize( QIcon::Mode mode, QIcon::State state )
+{
+    QList<QSize> sizes = icon.availableSizes( mode, state );
+    if( sizes.isEmpty() ) sizes = icon.availableSizes();
+    return ( !sizes.isEmpty() ? sizes[0] : QSize() );
+}
+
 /***************************************************************************
  * Hotkeys converters
  ***************************************************************************/

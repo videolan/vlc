@@ -33,6 +33,7 @@
 #include "qt4.hpp"
 #include "../../dialogs_provider.hpp"
 #include "playlist.hpp"
+#include "util/customwidgets.hpp"
 
 #include <QVBoxLayout>
 #include <QHeaderView>
@@ -44,41 +45,49 @@
 #include <vlc_services_discovery.h>
 
 PLSelItem::PLSelItem ( QTreeWidgetItem *i, const QString& text )
-    : qitem(i), btnAction( NULL )
+    : qitem(i), lblAction( NULL)
 {
     layout = new QHBoxLayout();
     layout->setContentsMargins(0,0,0,0);
+    layout->addSpacing( 3 );
 
     lbl = new QLabel( text );
-    lbl->setMargin(3);
-    layout->addWidget(lbl);
+
+    layout->addWidget(lbl, 1);
 
     setLayout( layout );
+
+    setMinimumHeight( 22 ); //Action icon height plus 6
 }
 
 void PLSelItem::addAction( ItemAction act, const QString& tooltip )
 {
-    if( btnAction ) return;
+    if( lblAction ) return; //might change later
+
+    QIcon icon;
 
     switch( act )
     {
     case ADD_ACTION:
-        btnAction = new QPushButton("+"); break;
+        icon = QIcon( ":/buttons/playlist/playlist_add" ); break;
     case RM_ACTION:
-        btnAction = new QPushButton("-"); break;
+        icon = QIcon( ":/buttons/playlist/playlist_remove" ); break;
     }
-    if( !tooltip.isEmpty() ) btnAction->setToolTip( tooltip );
-    btnAction->setMaximumWidth(23);
 
-    layout->addWidget( btnAction );
-    btnAction->hide();
+    lblAction = new QVLCIconLabel( icon );
 
-    CONNECT( btnAction, clicked(), this, triggerAction() );
+    if( !tooltip.isEmpty() ) lblAction->setToolTip( tooltip );
+
+    layout->addWidget( lblAction, 0 );
+    lblAction->hide();
+    layout->addSpacing( 3 );
+
+    CONNECT( lblAction, clicked(), this, triggerAction() );
 }
 
-void PLSelItem::showAction() { if( btnAction ) btnAction->show(); }
+void PLSelItem::showAction() { if( lblAction ) lblAction->show(); }
 
-void PLSelItem::hideAction() { if( btnAction ) btnAction->hide(); }
+void PLSelItem::hideAction() { if( lblAction ) lblAction->hide(); }
 
 void PLSelItem::setText( const QString& text ) { lbl->setText( text ); }
 
@@ -89,18 +98,13 @@ void PLSelItem::leaveEvent( QEvent *ev ){ hideAction(); }
 PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
            : QTreeWidget( p ), p_intf(_p_intf)
 {
-    /* custom QItemDelegate just to assure the minimum row height,
-       which otherwise fails when new child item is inserted */
     setFrameStyle( QFrame::NoFrame );
     viewport()->setAutoFillBackground( false );
     setIconSize( QSize( 24,24 ) );
     setIndentation( 10 );
     header()->hide();
-    //setHeaderLabel( qtr( "Medias" ) );
-    //header()->setMovable( false );
     setRootIsDecorated( false );
     setAlternatingRowColors( false );
-    setItemDelegate( new PLSelectorDelegate() );
     podcastsParent = NULL;
     podcastsParentId = -1;
 

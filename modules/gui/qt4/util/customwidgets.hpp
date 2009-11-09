@@ -28,6 +28,8 @@
 #define _CUSTOMWIDGETS_H_
 
 #include <QLineEdit>
+#include <QLabel>
+#include <QIcon>
 
 /**
   This class provides a QLineEdit which contains a greyed-out hinting
@@ -72,6 +74,23 @@ private slots:
 
 signals:
     void textChanged( const QString& );
+};
+
+class QVLCIconLabel : public QLabel
+{
+    Q_OBJECT
+public:
+    QVLCIconLabel( const QIcon&, QWidget *parent = 0 );
+    void setIcon( const QIcon& );
+signals:
+    void clicked();
+protected:
+    virtual void enterEvent( QEvent * );
+    virtual void leaveEvent( QEvent * );
+    virtual void mouseReleaseEvent( QMouseEvent * );
+private:
+    inline QSize pixmapSize( QIcon::Mode = QIcon::Normal, QIcon::State = QIcon::Off );
+    QIcon icon;
 };
 
 /*****************************************************************

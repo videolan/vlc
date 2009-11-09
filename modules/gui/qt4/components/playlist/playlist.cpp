@@ -50,7 +50,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) : p_intf ( _p_i )
     /* Source Selector */
     selector = new PLSelector( this, p_intf );
     QVBoxLayout *selBox = new QVBoxLayout();
-    selBox->setContentsMargins(0,5,0,0);
+    selBox->setContentsMargins(5,5,5,0);
     selBox->addWidget( selector );
     QGroupBox *selGroup = new QGroupBox( qtr( "Media Browser") );
     selGroup->setLayout( selBox );
