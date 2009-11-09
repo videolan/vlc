@@ -240,6 +240,12 @@ static void Close( vlc_object_t * );
 #define WEIGHTB_TEXT N_("Weighted prediction for B-frames")
 #define WEIGHTB_LONGTEXT N_( "Weighted prediction for B-frames.")
 
+#define WEIGHTP_TEXT N_("Weighted prediction for P-frames")
+#define WEIGHTP_LONGTEXT N_(" Weighted prediction for P-frames: "\
+    " - 0: Disabled\n"\
+    " - 1: Blind offset\n"\
+    " - 2: Smart analysis\n" )
+
 #define ME_TEXT N_("Integer pixel motion estimation method")
 #define ME_LONGTEXT N_( "Selects the motion estimation algorithm: "\
     " - dia: diamond search, radius 1 (fast)\n" \
@@ -539,6 +545,10 @@ vlc_module_begin ()
     add_bool( SOUT_CFG_PREFIX "weightb", true, NULL, WEIGHTB_TEXT,
               WEIGHTB_LONGTEXT, false )
 
+    add_integer( SOUT_CFG_PREFIX "weightp", 2, NULL, WEIGHTP_TEXT,
+              WEIGHTP_LONGTEXT, false )
+        change_integer_range( 0, 2 )
+
     add_string( SOUT_CFG_PREFIX "me", "hex", NULL, ME_TEXT,
                 ME_LONGTEXT, false )
         change_string_list( enc_me_list, enc_me_list_text, 0 );
@@ -640,7 +650,7 @@ static const char *const ppsz_sout_options[] = {
     "pre-scenecut", "psnr", "qblur", "qp", "qcomp", "qpstep", "qpmax",
     "qpmin", "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut",
     "sps-id", "ssim", "stats", "subme", "subpel", "tolerance", "trellis",
-    "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "aq-mode",
+    "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp", "aq-mode",
     "aq-strength", "psy-rd", "profile", NULL
 };
 
@@ -917,6 +927,9 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->param.analyse.b_ssim = var_GetBool( p_enc, SOUT_CFG_PREFIX "ssim" );
     p_sys->param.analyse.b_weighted_bipred = var_GetBool( p_enc,
                                     SOUT_CFG_PREFIX "weightb" );
+#if X264_BUILD >= 79
+    p_sys->param.analyse.i_weighted_pred = var_GetInteger( p_enc, SOUT_CFG_PREFIX "weightp" );
+#endif
     p_sys->param.i_bframe_adaptive = var_GetInteger( p_enc,
                                     SOUT_CFG_PREFIX "b-adapt" );
 
@@ -1041,6 +1054,9 @@ static int  Open ( vlc_object_t *p_this )
             p_sys->param.analyse.b_transform_8x8 = 0;
             p_sys->param.b_cabac = 0;
             p_sys->param.i_bframe = 0;
+#if X264_BUILD >= 79
+            p_sys->param.analyse.i_weighted_pred = X264_WEIGHTP_NONE;
+#endif
         }
         else if (!strcasecmp( psz_val, "main" ) )
         {
