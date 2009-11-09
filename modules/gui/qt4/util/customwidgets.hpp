@@ -88,9 +88,11 @@ protected:
     virtual void enterEvent( QEvent * );
     virtual void leaveEvent( QEvent * );
     virtual void mouseReleaseEvent( QMouseEvent * );
+    virtual void resizeEvent( QResizeEvent * );
 private:
-    inline QSize pixmapSize( QIcon::Mode = QIcon::Normal, QIcon::State = QIcon::Off );
+    inline void updatePixmap( );
     QIcon icon;
+    QIcon::Mode iconMode;
 };
 
 /*****************************************************************

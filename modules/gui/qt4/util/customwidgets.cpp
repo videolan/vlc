@@ -147,21 +147,32 @@ void SearchLineEdit::updateText( const QString& text )
 }
 
 QVLCIconLabel::QVLCIconLabel( const QIcon& i, QWidget *p )
-    : QLabel( p ), icon( i )
+    : QLabel( p ), icon( i ), iconMode( QIcon::Normal )
 {
-    setPixmap( icon.pixmap( pixmapSize( QIcon::Normal ), QIcon::Normal ) );
+    updatePixmap();
 }
 
 void QVLCIconLabel::setIcon( const QIcon& i )
-{ icon = i; }
+{
+  icon = i;
+  updatePixmap();
+}
+
+void QVLCIconLabel::resizeEvent( QResizeEvent * event )
+{
+    updatePixmap();
+}
 
 void QVLCIconLabel::enterEvent( QEvent * )
 {
-    setPixmap( icon.pixmap( pixmapSize( QIcon::Active ), QIcon::Active ) );
+    iconMode = QIcon::Active;
+    updatePixmap();
 }
+
 void QVLCIconLabel::leaveEvent( QEvent * )
 {
-    setPixmap( icon.pixmap( pixmapSize( QIcon::Normal ), QIcon::Normal ) );
+    iconMode = QIcon::Normal;
+    updatePixmap();
 }
 
 void QVLCIconLabel::mouseReleaseEvent( QMouseEvent * )
@@ -169,11 +180,9 @@ void QVLCIconLabel::mouseReleaseEvent( QMouseEvent * )
     emit clicked();
 }
 
-QSize QVLCIconLabel::pixmapSize( QIcon::Mode mode, QIcon::State state )
+void QVLCIconLabel::updatePixmap()
 {
-    QList<QSize> sizes = icon.availableSizes( mode, state );
-    if( sizes.isEmpty() ) sizes = icon.availableSizes();
-    return ( !sizes.isEmpty() ? sizes[0] : QSize() );
+    setPixmap( icon.pixmap( size(), iconMode ) );
 }
 
 /***************************************************************************
