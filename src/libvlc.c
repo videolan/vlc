@@ -1398,17 +1398,16 @@ static void print_help_section( module_config_t *p_item, bool b_color, bool b_de
     if( !p_item ) return;
     if( b_color )
     {
-        utf8_fprintf( stdout, RED"   %s:\n"GRAY,
-                      p_item->psz_text );
+        utf8_fprintf( stdout, RED"   %s:\n"GRAY, _( p_item->psz_text ) );
         if( b_description && p_item->psz_longtext )
             utf8_fprintf( stdout, MAGENTA"   %s\n"GRAY,
-                          p_item->psz_longtext );
+                          _( p_item->psz_longtext ) );
     }
     else
     {
-        utf8_fprintf( stdout, "   %s:\n", p_item->psz_text );
+        utf8_fprintf( stdout, "   %s:\n", _( p_item->psz_text ) );
         if( b_description && p_item->psz_longtext )
-            utf8_fprintf( stdout, "   %s\n", p_item->psz_longtext );
+            utf8_fprintf( stdout, "   %s\n", _( p_item->psz_longtext ) );
     }
 }
 
@@ -1548,17 +1547,18 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
         {
             if( b_color )
                 utf8_fprintf( stdout, "\n " GREEN "%s" GRAY " (%s)\n",
-                              p_parser->psz_longname,
-                               p_parser->psz_object_name );
+                              _( p_parser->psz_longname ),
+                              p_parser->psz_object_name );
             else
-                utf8_fprintf( stdout, "\n %s\n", p_parser->psz_longname );
+                utf8_fprintf( stdout, "\n %s\n", _( p_parser->psz_longname ) );
         }
         if( p_parser->psz_help )
         {
             if( b_color )
-                utf8_fprintf( stdout, CYAN" %s\n"GRAY, p_parser->psz_help );
+                utf8_fprintf( stdout, CYAN" %s\n"GRAY,
+                              _( p_parser->psz_help ) );
             else
-                utf8_fprintf( stdout, " %s\n", p_parser->psz_help );
+                utf8_fprintf( stdout, " %s\n",  _( p_parser->psz_help ) );
         }
 
         /* Print module options */
@@ -1592,17 +1592,19 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 {
                     if( b_color )
                         utf8_fprintf( stdout, GREEN "\n %s\n" GRAY,
-                                      p_item->psz_text );
+                                      _( p_item->psz_text ) );
                     else
-                        utf8_fprintf( stdout, "\n %s\n", p_item->psz_text );
+                        utf8_fprintf( stdout, "\n %s\n",
+                                      _( p_item->psz_text ) );
                 }
                 if( b_description && p_item->psz_longtext )
                 {
                     if( b_color )
                         utf8_fprintf( stdout, CYAN " %s\n" GRAY,
-                                      p_item->psz_longtext );
+                                      _( p_item->psz_longtext ) );
                     else
-                        utf8_fprintf( stdout, " %s\n", p_item->psz_longtext );
+                        utf8_fprintf( stdout, " %s\n",
+                                      _( p_item->psz_longtext ) );
                 }
                 break;
 
@@ -1666,7 +1668,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                         if( i ) strcat( psz_buffer, ", " );
                         sprintf( psz_buffer + strlen(psz_buffer), "%i (%s)",
                                  p_item->pi_list[i],
-                                 p_item->ppsz_list_text[i] );
+                                 _( p_item->ppsz_list_text[i] ) );
                     }
                     psz_ket = "}";
                 }
@@ -1746,7 +1748,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
             psz_spaces[i] = ' ';
 
             /* We wrap the rest of the output */
-            sprintf( psz_buffer, "%s%s", p_item->psz_text, psz_suf );
+            sprintf( psz_buffer, "%s%s", _( p_item->psz_text ),
+                     psz_suf );
             b_description_hack = b_description;
 
  description:
@@ -1838,7 +1841,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
 
             if( b_description_hack && p_item->psz_longtext )
             {
-                sprintf( psz_buffer, "%s%s", p_item->psz_longtext, psz_suf );
+                sprintf( psz_buffer, "%s%s", _( p_item->psz_longtext ),
+                         psz_suf );
                 b_description_hack = false;
                 psz_spaces = psz_spaces_longtext;
                 utf8_fprintf( stdout, "%s", psz_spaces );
@@ -1922,12 +1926,11 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
         if( b_color )
             utf8_fprintf( stdout, GREEN"  %s%s "WHITE"%s\n"GRAY,
                           p_parser->psz_object_name,
-                          psz_spaces,
-                          p_parser->psz_longname );
+                          psz_spaces, _( p_parser->psz_longname ) );
         else
             utf8_fprintf( stdout, "  %s%s %s\n",
                           p_parser->psz_object_name,
-                          psz_spaces, p_parser->psz_longname );
+                          psz_spaces, _( p_parser->psz_longname ) );
 
         if( b_verbose )
         {
