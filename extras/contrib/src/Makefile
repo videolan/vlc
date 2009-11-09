@@ -125,7 +125,7 @@ endif
 
 ifdef HAVE_WINCE
 HOSTCONF+= --without-pic --disable-shared
-FFMPEGCONF+= --enable-mingwce --cpu=armv4l --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols
+FFMPEGCONF+= --arch=armv4l --cpu=armv4t --disable-encoders --disable-muxers --disable-mpegaudio-hp --disable-decoder=snow --disable-decoder=vc9 --disable-decoder=wmv3 --disable-decoder=vorbis --disable-decoder=dvdsub --disable-decoder=dvbsub --disable-protocols
 endif
 
 ifdef HAVE_UCLIBC
@@ -1010,9 +1010,6 @@ ffmpeg:
 	$(SVN) co $(FFMPEG_SVN) ffmpeg
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
-endif
-ifdef HAVE_WINCE
-	patch -p1 < Patches/ffmpeg-svn-wince.patch
 endif
 ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-uclibc.patch
