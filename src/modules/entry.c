@@ -28,25 +28,9 @@
 #include <assert.h>
 #include <stdarg.h>
 
-#ifdef ENABLE_NLS
-# include <libintl.h>
-#endif
-
 #include "modules/modules.h"
 #include "config/configuration.h"
 #include "libvlc.h"
-
-static const char *mdgettext (const char *domain, const char *msg)
-{
-    assert (msg);
-#ifdef ENABLE_NLS
-    if (*msg) /* Do not translate ""! */
-        return dgettext (domain, msg);
-#else
-    VLC_UNUSED(domain);
-#endif
-    return msg;
-}
 
 static void vlc_module_destruct (gc_object_t *obj)
 {
@@ -242,31 +226,16 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
         }
 
         case VLC_MODULE_SHORTNAME:
-        {
-            const char *domain = va_arg (ap, const char *);
-            if (domain == NULL)
-                domain = PACKAGE;
-            module->psz_shortname = mdgettext (domain, va_arg (ap, char *));
+            module->psz_shortname = va_arg (ap, char *);
             break;
-        }
 
         case VLC_MODULE_DESCRIPTION:
-        {
-            const char *domain = va_arg (ap, const char *);
-            if (domain == NULL)
-                domain = PACKAGE;
-            module->psz_longname = mdgettext (domain, va_arg (ap, char *));
+            module->psz_longname = va_arg (ap, char *);
             break;
-        }
 
         case VLC_MODULE_HELP:
-        {
-            const char *domain = va_arg (ap, const char *);
-            if (domain == NULL)
-                domain = PACKAGE;
-            module->psz_help = mdgettext (domain, va_arg (ap, char *));
+            module->psz_help = va_arg (ap, char *);
             break;
-        }
 
         case VLC_CONFIG_NAME:
         {
@@ -369,21 +338,16 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
 
         case VLC_CONFIG_DESC:
         {
-            const char *domain = va_arg (ap, const char *);
             const char *text = va_arg (ap, const char *);
             const char *longtext = va_arg (ap, const char *);
 
-            if (domain == NULL)
-                domain = PACKAGE;
-            item->psz_text = text ? strdup (mdgettext (domain, text)) : NULL;
-            item->psz_longtext =
-                longtext ? strdup (mdgettext (domain, longtext)) : NULL;
+            item->psz_text = text ? strdup (text) : NULL;
+            item->psz_longtext = longtext ? strdup (longtext) : NULL;
             break;
         }
 
         case VLC_CONFIG_LIST:
         {
-            const char *domain = va_arg (ap, const char *);
             size_t len = va_arg (ap, size_t);
 
             /* Copy values */
@@ -417,9 +381,6 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
                 break;
 
             /* Copy textual descriptions */
-            if (domain == NULL)
-                domain = PACKAGE;
-
             const char *const *text = va_arg (ap, const char *const *);
             if (text != NULL)
             {
@@ -427,9 +388,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
                 if( dtext != NULL )
                 {
                     for (size_t i = 0; i < len; i++)
-                        dtext[i] = text[i] ?
-                                        strdup (mdgettext( domain, text[i] )) :
-                                        NULL;
+                        dtext[i] = text[i] ? strdup (text[i]) : NULL;
                     dtext[len] = NULL;
                 }
                 item->ppsz_list_text = dtext;
@@ -444,7 +403,6 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
 
         case VLC_CONFIG_ADD_ACTION:
         {
-            const char *domain = va_arg (ap, const char *);
             vlc_callback_t cb = va_arg (ap, vlc_callback_t), *tabcb;
             const char *name = va_arg (ap, const char *);
             char **tabtext;
@@ -463,10 +421,8 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
                 break;
             item->ppsz_action_text = tabtext;
 
-            if (domain == NULL)
-                domain = PACKAGE;
             if (name)
-                tabtext[item->i_action] = strdup (mdgettext (domain, name));
+                tabtext[item->i_action] = strdup (name);
             else
                 tabtext[item->i_action] = NULL;
             tabtext[item->i_action + 1] = NULL;

@@ -174,7 +174,6 @@ enum vlc_module_properties
     __VLC_SYMBOL(vlc_entry) ( module_t *p_module )                            \
     {                                                                         \
         module_config_t *p_config = NULL;                                     \
-        const char *domain = NULL;                                            \
         if (vlc_module_set (p_module, VLC_MODULE_NAME,                        \
                             (const char *)(MODULE_STRING)))                   \
             goto error;                                                       \
@@ -206,17 +205,17 @@ enum vlc_module_properties
         goto error;
 
 #define set_shortname( shortname ) \
-    if (vlc_module_set (p_submodule, VLC_MODULE_SHORTNAME, domain, \
+    if (vlc_module_set (p_submodule, VLC_MODULE_SHORTNAME, \
                         (const char *)(shortname))) \
         goto error;
 
 #define set_description( desc ) \
-    if (vlc_module_set (p_submodule, VLC_MODULE_DESCRIPTION, domain, \
+    if (vlc_module_set (p_submodule, VLC_MODULE_DESCRIPTION, \
                         (const char *)(desc))) \
         goto error;
 
 #define set_help( help ) \
-    if (vlc_module_set (p_submodule, VLC_MODULE_HELP, domain, \
+    if (vlc_module_set (p_submodule, VLC_MODULE_HELP, \
                         (const char *)(help))) \
         goto error;
 
@@ -255,7 +254,7 @@ enum vlc_module_properties
 
 #define add_typedesc_inner( type, text, longtext ) \
     add_type_inner( type ) \
-    vlc_config_set (p_config, VLC_CONFIG_DESC, domain, \
+    vlc_config_set (p_config, VLC_CONFIG_DESC, \
                     (const char *)(text), (const char *)(longtext));
 
 #define add_typeadv_inner( type, text, longtext, advc ) \
@@ -402,14 +401,14 @@ enum vlc_module_properties
     vlc_config_set (p_config, VLC_CONFIG_SHORTCUT, (int)(ch));
 
 #define change_string_list( list, list_text, list_update_func ) \
-    vlc_config_set (p_config, VLC_CONFIG_LIST, domain, \
+    vlc_config_set (p_config, VLC_CONFIG_LIST, \
                     (size_t)(sizeof (list) / sizeof (char *)), \
                     (const char *const *)(list), \
                     (const char *const *)(list_text), \
                     (vlc_callback_t)(list_update_func));
 
 #define change_integer_list( list, list_text, list_update_func ) \
-    vlc_config_set (p_config, VLC_CONFIG_LIST, domain, \
+    vlc_config_set (p_config, VLC_CONFIG_LIST, \
                     (size_t)(sizeof (list) / sizeof (int)), \
                     (const int *)(list), \
                     (const char *const *)(list_text), \
@@ -423,7 +422,7 @@ enum vlc_module_properties
                     (double)(minv), (double)(maxv));
 
 #define change_action_add( pf_action, text ) \
-    vlc_config_set (p_config, VLC_CONFIG_ADD_ACTION, domain, \
+    vlc_config_set (p_config, VLC_CONFIG_ADD_ACTION, \
                     (vlc_callback_t)(pf_action), (const char *)(text));
 
 #define change_internal() \
