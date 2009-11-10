@@ -1912,8 +1912,6 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
     /* Enumerate each module */
     for (size_t j = 0; (p_parser = list[j]) != NULL; j++)
     {
-        int i;
-
         if( b_color )
             utf8_fprintf( stdout, GREEN"  %-22s "WHITE"%s\n"GRAY,
                           p_parser->psz_object_name,
