@@ -45,6 +45,7 @@
 #define ALSA_PCM_NEW_HW_PARAMS_API
 #define ALSA_PCM_NEW_SW_PARAMS_API
 #include <alsa/asoundlib.h>
+#include <alsa/version.h>
 
 /*#define ALSA_DEBUG*/
 
@@ -261,10 +262,24 @@ static void Probe( aout_instance_t * p_aout,
     }
 
     var_Change( p_aout, "audio-device", VLC_VAR_CHOICESCOUNT, &val, NULL );
+#if (SND_LIB_VERSION <= 0x010015)
+# warning Please update alsa-lib to version > 1.0.21a.
+    var_Create( p_aout->p_libvlc, "alsa-working", VLC_VAR_BOOL );
+    if( val.i_int <= 0 )
+    {
+        if( var_GetBool( p_aout->p_libvlc, "alsa-working" ) )
+            dialog_FatalWait( p_aout, "ALSA version problem",
+                "VLC failed to re-open your sound card.\n"
+                "Please update alsa-lib to version 1.0.22 or higher "
+                "to fix this issue." );
+    }
+    else
+        var_SetBool( p_aout->p_libvlc, "alsa-working", true );
+#endif
     if( val.i_int <= 0 )
     {
         /* Probe() has failed. */
-        msg_Dbg( p_aout, "failed to find a usable alsa configuration" );
+        msg_Dbg( p_aout, "failed to find a usable ALSA configuration" );
         var_Destroy( p_aout, "audio-device" );
         return;
     }
