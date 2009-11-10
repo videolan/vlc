@@ -16,6 +16,7 @@ All the Lua standard libraries are available.
  * Playlist (see playlist/README.txt)
  * Art fetcher (see meta/README.txt)
  * Interface (see intf/README.txt)
+ * Extensions (see extensions/README.txt)
 
 Lua scripts are tried in alphabetical order in the user's VLC config
 directory lua/{playlist,meta,intf}/ subdirectory on Windows and Mac OS X or
@@ -46,6 +47,45 @@ Configuration
 -------------
 config.get( name ): Get the VLC configuration option "name"'s value.
 config.set( name, value ): Set the VLC configuration option "name"'s value.
+
+Dialog
+------
+local d = vlc.dialog( "My VLC Extension" ): Create a new UI dialog, with a human-readble title: "My VLC Extension"
+d:show(): Show this dialog.
+d:hide(): Hide (but not close) this dialog.
+d:close(): Close and delete this dialog.
+d:del_widget( widget ): Delete 'widget'. It disappears from the dialog and repositionning may occur.
+
+In the following functions, you can always add some optional parameters: col, row, col_span, row_span.
+They define the position of a widget in the dialog:
+- row, col are the absolute positions on a grid of widgets. First row, col are 1.
+- row_span, col_span represent the relative size of a widget on the grid. A widget with col_span = 4 will be displayed as wide as 4 widgets of col_span = 1.
+Example: w = d:add_label( "My Label", 2, 3, 4, 5 ) will create a label at row 3, col 2, with a relative width of 4, height of 5.
+
+d:add_button( text, func, ... ): Create a button with caption "text" (string). When clicked, call function "func". func is a string.
+d:add_label( text, ... ): Create a text label with caption "text" (string).
+d:add_html( text, ... ): Create a rich text label with caption "text" (string), that supports basic HTML formatting (such as <i> or <h1> for instance).
+d:add_text_input( text, ... ): Create an editable text field, in order to read user input.
+d:add_password( text, ... ): Create an editable text field, in order to read user input. Text entered in this box will not be readable (replaced by asterisks).
+d:add_check_box( text, ... ): Create a check box with a text. They have a boolean state (true/false).
+d:add_dropdown( ... ): Create a drop-down widget. Only 1 element can be selected the same time.
+d:add_list( ... ): Create a list widget. Allows multiple or empty selections.
+d:add_image( path, ... ): Create an image label. path is a relative or absolute path to the image on the local computer.
+
+Some functions can also be applied on widgets:
+w:set_text( text ): Change text displayed by the widget. Applies to: button, label, html, text_input, password, check_box.
+w:get_text(): Read text displayed by the widget. Returns a string. Applies to: button, label, html, text_input, password, check_box.
+w:set_checked( bool ): Set check state of a check box. Applies to: check_box.
+w:get_checked(): Read check state of a check box. Returns a boolean. Applies to: check_box.
+w:add_value( text, id ): Add a value with identifier 'id' (integer) and text 'text'. It's always best to have unique identifiers. Applies to: drop_down.
+w:get_value(): Return identifier of the selected item. Corresponds to the text value chosen by the user. Applies to: drop_down.
+w:clear(): Clear a list or drop_down widget. After that, all values previously added are lost.
+w:get_selection(): Retrieve a table representing the current selection. Keys are the ids, values are the texts associated. Applies to: list.
+
+
+Extension
+---------
+deactivate(): Deactivate current extension (after the end of the current function).
 
 HTTPd
 -----
