@@ -292,6 +292,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
  ****************************************************************************
  * - block_FifoNew : create and init a new fifo
  * - block_FifoRelease : destroy a fifo and free all blocks in it.
+ * - block_FifoPace : wait for a fifo to drain to a specified number of packets or total data size
  * - block_FifoEmpty : free all blocks in a fifo
  * - block_FifoPut : put a block
  * - block_FifoGet : get a packet from the fifo (and wait if it is empty)
@@ -307,8 +308,7 @@ static inline block_t *block_ChainGather( block_t *p_list )
 
 VLC_EXPORT( block_fifo_t *, block_FifoNew,      ( void ) LIBVLC_USED );
 VLC_EXPORT( void,           block_FifoRelease,  ( block_fifo_t * ) );
-/* TODO: do we need to export this? */
-void block_FifoPace (block_fifo_t *fifo, size_t max_depth, size_t max_size);
+VLC_EXPORT( void,           block_FifoPace,     ( block_fifo_t *fifo, size_t max_depth, size_t max_size ) );
 VLC_EXPORT( void,           block_FifoEmpty,    ( block_fifo_t * ) );
 VLC_EXPORT( size_t,         block_FifoPut,      ( block_fifo_t *, block_t * ) );
 VLC_EXPORT( void,           block_FifoWake,     ( block_fifo_t * ) );

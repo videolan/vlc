@@ -34,6 +34,7 @@ block_FifoCount
 block_FifoEmpty
 block_FifoGet
 block_FifoNew
+block_FifoPace
 block_FifoPut
 block_FifoRelease
 block_FifoShow
