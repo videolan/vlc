@@ -2041,7 +2041,7 @@ dnl
 dnl - special access module for dc1394 input
 dnl - dv module: digital video module check for libraw1394
 dnl
-PKG_ENABLE_MODULES_VLC([DC1394], [], [libraw1394 >= 2.0.1 libdc1394 >= 1.0.0], [dc1394 access module], [auto])
+PKG_ENABLE_MODULES_VLC([DC1394], [], [libraw1394 >= 2.0.1 libdc1394-2 >= 2.1.0], [dc1394 access module], [auto])
 PKG_ENABLE_MODULES_VLC([DV], [access_dv], [libraw1394 >= 2.0.1 libavc1394 >= 0.5.3], [DV input module], [auto])
 
 dnl

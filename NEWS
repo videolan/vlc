@@ -5,6 +5,7 @@ Access:
  * Port of the screen module from Xlib to XCB
  * Support for the sftp protocol
  * Support for CDDB servers for Audio-CD on Windows version
+ * Port of the dc1394 module from libdc1394 to libdc1394 v2.0
 
 Decoders:
  * Support for Atrac1
