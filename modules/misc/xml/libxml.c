@@ -246,8 +246,7 @@ static char *ReaderName( xml_reader_t *p_reader )
     const xmlChar *psz_name =
         xmlTextReaderConstName( p_reader->p_sys->p_reader );
 
-    if( psz_name ) return strdup( (const char *)psz_name );
-    else return 0;
+    return psz_name ? strdup( (const char *)psz_name ) : NULL;
 }
 
 static char *ReaderValue( xml_reader_t *p_reader )
@@ -255,8 +254,7 @@ static char *ReaderValue( xml_reader_t *p_reader )
     const xmlChar *psz_value =
         xmlTextReaderConstValue( p_reader->p_sys->p_reader );
 
-    if( psz_value ) return strdup( (const char *)psz_value );
-    else return 0;
+    return psz_value ? strdup( (const char *)psz_value ) : NULL;
 }
 
 static int ReaderNextAttr( xml_reader_t *p_reader )
