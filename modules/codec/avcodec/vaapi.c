@@ -41,7 +41,7 @@
 #endif
 
 #include "avcodec.h"
-#include "vaapi.h"
+#include "va.h"
 
 #ifdef HAVE_AVCODEC_VAAPI
 
@@ -57,8 +57,10 @@ typedef struct
 
 } vlc_va_surface_t;
 
-struct vlc_va_t
+typedef struct
 {
+    vlc_va_t     va;
+
     /* */
     Display      *p_display_x11;
     VADisplay     p_display;
@@ -83,56 +85,15 @@ struct vlc_va_t
 
     VAImage      image;
 
-};
+} vlc_va_vaapi_t;
 
-static int VaOpen( vlc_va_t *p_va, int i_codec_id );
-static void VaClose( vlc_va_t *p_va );
-
-static int VaCreateSurfaces( vlc_va_t *p_va, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
-                             int i_width, int i_height );
-static void VaDestroySurfaces( vlc_va_t *p_va );
-
-vlc_va_t *VaNew( int i_codec_id )
+static vlc_va_vaapi_t *vlc_va_vaapi_Get( void *p_va )
 {
-    vlc_va_t *p_va = calloc( 1, sizeof(*p_va) );
-    if( !p_va )
-        return NULL;
-
-    if( VaOpen( p_va, i_codec_id ) )
-    {
-        free( p_va );
-        return NULL;
-    }
     return p_va;
 }
-void VaDelete( vlc_va_t *p_va )
-{
-    VaClose( p_va );
-    free( p_va );
-}
-int VaSetup( vlc_va_t *p_va, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
-             int i_width, int i_height )
-{
-    if( p_va->i_surface_width == i_width &&
-        p_va->i_surface_height == i_height )
-        return VLC_SUCCESS;
 
-    *pp_hw_ctx = NULL;
-    *pi_chroma = 0;
-    if( p_va->i_surface_width || p_va->i_surface_height )
-        VaDestroySurfaces( p_va );
-
-    if( i_width > 0 && i_height > 0 )
-        return VaCreateSurfaces( p_va, pp_hw_ctx, pi_chroma, i_width, i_height );
-
-    return VLC_EGENERIC;
-}
-void VaVersion( vlc_va_t *p_va, char *psz_version, size_t i_version )
-{
-    snprintf( psz_version, i_version, "%d.%d", p_va->i_version_major, p_va->i_version_minor );
-}
-
-static int VaOpen( vlc_va_t *p_va, int i_codec_id )
+/* */
+static int Open( vlc_va_vaapi_t *p_va, int i_codec_id )
 {
     VAProfile i_profile;
     int i_surface_count;
@@ -200,26 +161,42 @@ static int VaOpen( vlc_va_t *p_va, int i_codec_id )
 
     p_va->i_surface_count = i_surface_count;
 
+    if( asprintf( &p_va->va.description, "VA API version %d.%d",
+                  p_va->i_version_major, p_va->i_version_minor ) < 0 )
+        p_va->va.description = NULL;
+
     return VLC_SUCCESS;
 
 error:
     return VLC_EGENERIC;
 }
-static void VaClose( vlc_va_t *p_va )
+
+static void DestroySurfaces( vlc_va_vaapi_t *p_va )
 {
-    if( p_va->i_surface_width || p_va->i_surface_height )
-        VaDestroySurfaces( p_va );
+    if( p_va->image.image_id )
+        vaDestroyImage( p_va->p_display, p_va->image.image_id );
 
-    if( p_va->i_config_id )
-        vaDestroyConfig( p_va->p_display, p_va->i_config_id );
-    if( p_va->p_display )
-        vaTerminate( p_va->p_display );
-    if( p_va->p_display_x11 )
-        XCloseDisplay( p_va->p_display_x11 );
+    if( p_va->i_context_id )
+        vaDestroyContext( p_va->p_display, p_va->i_context_id );
+
+    for( int i = 0; i < p_va->i_surface_count && p_va->p_surface; i++ )
+    {
+        vlc_va_surface_t *p_surface = &p_va->p_surface[i];
+
+        if( p_surface->i_id != VA_INVALID_SURFACE )
+            vaDestroySurfaces( p_va->p_display, &p_surface->i_id, 1 );
+    }
+    free( p_va->p_surface );
+
+    /* */
+    p_va->image.image_id = 0;
+    p_va->i_context_id = 0;
+    p_va->p_surface = NULL;
+    p_va->i_surface_width = 0;
+    p_va->i_surface_height = 0;
 }
-
-static int VaCreateSurfaces( vlc_va_t *p_va, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
-                             int i_width, int i_height )
+static int CreateSurfaces( vlc_va_vaapi_t *p_va, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
+                           int i_width, int i_height )
 {
     assert( i_width > 0 && i_height > 0 );
 
@@ -312,36 +289,33 @@ static int VaCreateSurfaces( vlc_va_t *p_va, void **pp_hw_ctx, vlc_fourcc_t *pi_
     return VLC_SUCCESS;
 
 error:
-    VaDestroySurfaces( p_va );
+    DestroySurfaces( p_va );
     return VLC_EGENERIC;
 }
-static void VaDestroySurfaces( vlc_va_t *p_va )
+
+static int Setup( vlc_va_t *p_external, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
+                  int i_width, int i_height )
 {
-    if( p_va->image.image_id )
-        vaDestroyImage( p_va->p_display, p_va->image.image_id );
+    vlc_va_vaapi_t *p_va = vlc_va_vaapi_Get(p_external);
 
-    if( p_va->i_context_id )
-        vaDestroyContext( p_va->p_display, p_va->i_context_id );
+    if( p_va->i_surface_width == i_width &&
+        p_va->i_surface_height == i_height )
+        return VLC_SUCCESS;
 
-    for( int i = 0; i < p_va->i_surface_count && p_va->p_surface; i++ )
-    {
-        vlc_va_surface_t *p_surface = &p_va->p_surface[i];
+    *pp_hw_ctx = NULL;
+    *pi_chroma = 0;
+    if( p_va->i_surface_width || p_va->i_surface_height )
+        DestroySurfaces( p_va );
 
-        if( p_surface->i_id != VA_INVALID_SURFACE )
-            vaDestroySurfaces( p_va->p_display, &p_surface->i_id, 1 );
-    }
-    free( p_va->p_surface );
+    if( i_width > 0 && i_height > 0 )
+        return CreateSurfaces( p_va, pp_hw_ctx, pi_chroma, i_width, i_height );
 
-    /* */
-    p_va->image.image_id = 0;
-    p_va->i_context_id = 0;
-    p_va->p_surface = NULL;
-    p_va->i_surface_width = 0;
-    p_va->i_surface_height = 0;
+    return VLC_EGENERIC;
 }
-
-int VaExtract( vlc_va_t *p_va, picture_t *p_picture, AVFrame *p_ff )
+static int Extract( vlc_va_t *p_external, picture_t *p_picture, AVFrame *p_ff )
 {
+    vlc_va_vaapi_t *p_va = vlc_va_vaapi_Get(p_external);
+
     VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)p_ff->data[3];
 
 #if VA_CHECK_VERSION(0,31,0)
@@ -393,8 +367,9 @@ int VaExtract( vlc_va_t *p_va, picture_t *p_picture, AVFrame *p_ff )
 
     return VLC_SUCCESS;
 }
-int VaGrabSurface( vlc_va_t *p_va, AVFrame *p_ff )
+static int Get( vlc_va_t *p_external, AVFrame *p_ff )
 {
+    vlc_va_vaapi_t *p_va = vlc_va_vaapi_Get(p_external);
     int i_old;
     int i;
 
@@ -429,8 +404,10 @@ int VaGrabSurface( vlc_va_t *p_va, AVFrame *p_ff )
     }
     return VLC_SUCCESS;
 }
-void VaUngrabSurface( vlc_va_t *p_va, AVFrame *p_ff )
+static void Release( vlc_va_t *p_external, AVFrame *p_ff )
 {
+    vlc_va_vaapi_t *p_va = vlc_va_vaapi_Get(p_external);
+
     VASurfaceID i_surface_id = (VASurfaceID)(uintptr_t)p_ff->data[3];
 
     for( int i = 0; i < p_va->i_surface_count; i++ )
@@ -442,52 +419,51 @@ void VaUngrabSurface( vlc_va_t *p_va, AVFrame *p_ff )
     }
 }
 
-#else
-
-vlc_va_t *VaNew( int i_codec_id )
+static void Close( vlc_va_vaapi_t *p_va )
 {
-    VLC_UNUSED(i_codec_id);
+    if( p_va->i_surface_width || p_va->i_surface_height )
+        DestroySurfaces( p_va );
+
+    if( p_va->i_config_id )
+        vaDestroyConfig( p_va->p_display, p_va->i_config_id );
+    if( p_va->p_display )
+        vaTerminate( p_va->p_display );
+    if( p_va->p_display_x11 )
+        XCloseDisplay( p_va->p_display_x11 );
+}
+static void Delete( vlc_va_t *p_external )
+{
+    vlc_va_vaapi_t *p_va = vlc_va_vaapi_Get(p_external);
+    Close( p_va );
+    free( p_va->va.description );
+    free( p_va );
+}
+
+/* */
+vlc_va_t *vlc_va_NewVaapi( int i_codec_id )
+{
+    vlc_va_vaapi_t *p_va = calloc( 1, sizeof(*p_va) );
+    if( !p_va )
+        return NULL;
+
+    if( Open( p_va, i_codec_id ) )
+    {
+        free( p_va );
+        return NULL;
+    }
+
+    /* */
+    p_va->va.setup = Setup;
+    p_va->va.get = Get;
+    p_va->va.release = Release;
+    p_va->va.extract = Extract;
+    p_va->va.close = Delete;
+    return &p_va->va;
+}
+#else
+vlc_va_t *vlc_va_NewVaapi( int i_codec_id )
+{
+    VLC_UNUSED( i_codec_id );
     return NULL;
 }
-void VaDelete( vlc_va_t *p_va )
-{
-    VLC_UNUSED(p_va);
-    assert( 0 );
-}
-
-void VaVersion( vlc_va_t *p_va, char *psz_version, size_t i_version )
-{
-    VLC_UNUSED(p_va); VLC_UNUSED(psz_version); VLC_UNUSED(i_version);
-    assert(0);
-}
-
-int VaSetup( vlc_va_t *p_va, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
-             int i_width, int i_height )
-{
-    VLC_UNUSED(p_va); VLC_UNUSED(pp_hw_ctx); VLC_UNUSED(pi_chroma);
-    VLC_UNUSED(i_width); VLC_UNUSED(i_height);
-    assert(0);
-    return -1;
-}
-
-int VaExtract( vlc_va_t *p_va, picture_t *p_picture, AVFrame *p_ff )
-{
-    VLC_UNUSED(p_va); VLC_UNUSED(p_picture); VLC_UNUSED(p_ff);
-    assert(0);
-    return -1;
-}
-
-int VaGrabSurface( vlc_va_t *p_va, AVFrame *p_ff )
-{
-    VLC_UNUSED(p_va); VLC_UNUSED(p_ff);
-    assert(0);
-    return -1;
-}
-
-void VaUngrabSurface( vlc_va_t *p_va, AVFrame *p_ff )
-{
-    VLC_UNUSED(p_va); VLC_UNUSED(p_ff);
-    assert(0);
-}
-
 #endif

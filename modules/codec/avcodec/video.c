@@ -48,7 +48,7 @@
 #endif
 
 #include "avcodec.h"
-#include "vaapi.h"
+#include "va.h"
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
@@ -722,7 +722,7 @@ void EndVideoDec( decoder_t *p_dec )
     if( p_sys->p_ff_pic ) av_free( p_sys->p_ff_pic );
 
     if( p_sys->p_va )
-        VaDelete( p_sys->p_va );
+        vlc_va_Delete( p_sys->p_va );
 }
 
 /*****************************************************************************
@@ -825,13 +825,8 @@ static int ffmpeg_OpenCodec( decoder_t *p_dec )
 
     p_sys->b_delayed_open = false;
 
-    if( p_sys->p_va )
-    {
-        char psz_version[128];
-
-        VaVersion( p_sys->p_va, psz_version, sizeof(psz_version) );
-        msg_Info( p_dec, "Using VA API version %s for hardware decoding.", psz_version );
-    }
+    if( p_sys->p_va && p_sys->p_va->description )
+        msg_Info( p_dec, "Using %s for hardware decoding.", p_sys->p_va->description );
 
     return VLC_SUCCESS;
 }
@@ -846,7 +841,7 @@ static void ffmpeg_CopyPicture( decoder_t *p_dec,
 
     if( p_sys->p_va )
     {
-        VaExtract( p_sys->p_va, p_pic, p_ff_pic );
+        vlc_va_Extract( p_sys->p_va, p_pic, p_ff_pic );
     }
     else if( TestFfmpegChroma( p_sys->p_context->pix_fmt, -1 ) == VLC_SUCCESS )
     {
@@ -904,9 +899,9 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
     {
 #ifdef HAVE_AVCODEC_VAAPI
         /* hwaccel_context is not present in old fffmpeg version */
-        if( VaSetup( p_sys->p_va,
-                     &p_sys->p_context->hwaccel_context, &p_dec->fmt_out.video.i_chroma,
-                     p_sys->p_context->width, p_sys->p_context->height ) )
+        if( vlc_va_Setup( p_sys->p_va,
+                          &p_sys->p_context->hwaccel_context, &p_dec->fmt_out.video.i_chroma,
+                          p_sys->p_context->width, p_sys->p_context->height ) )
         {
             msg_Err( p_dec, "VaSetup failed" );
             return -1;
@@ -920,7 +915,7 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
         /* FIXME what is that, should give good value */
         p_ff_pic->age = 256*256*256*64; // FIXME FIXME from ffmpeg
 
-        if( VaGrabSurface( p_sys->p_va, p_ff_pic ) )
+        if( vlc_va_Get( p_sys->p_va, p_ff_pic ) )
         {
             msg_Err( p_dec, "VaGrabSurface failed" );
             return -1;
@@ -1036,7 +1031,7 @@ static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *p_context,
 
     if( p_sys->p_va )
     {
-        VaUngrabSurface( p_sys->p_va, p_ff_pic );
+        vlc_va_Release( p_sys->p_va, p_ff_pic );
 
         /* */
         for( int i = 0; i < 4; i++ )
@@ -1100,7 +1095,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
 
     if( p_sys->p_va )
     {
-        VaDelete( p_sys->p_va );
+        vlc_va_Delete( p_sys->p_va );
         p_sys->p_va = NULL;
     }
 
@@ -1121,7 +1116,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
         if( pi_fmt[i] == PIX_FMT_VAAPI_VLD )
         {
             msg_Dbg( p_dec, "Trying VA API" );
-            p_sys->p_va = VaNew( p_sys->i_codec_id );
+            p_sys->p_va = vlc_va_NewVaapi( p_sys->i_codec_id );
             if( p_sys->p_va )
             {
                 /* FIXME this will disabled direct rendering

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * vaapi.h: VAAPI helpers for the ffmpeg decoder
+ * va.h: Video Acceleration API for avcodec
  *****************************************************************************
  * Copyright (C) 2009 Laurent Aimar
  * $Id$
@@ -21,23 +21,44 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef _VLC_VAAPI_H
-#define _VLC_VAAPI_H 1
+#ifndef _VLC_VA_H
+#define _VLC_VA_H 1
 
 typedef struct vlc_va_t vlc_va_t;
+struct vlc_va_t {
+    char *description;
 
-vlc_va_t *VaNew( int i_codec_id );
-void VaDelete( vlc_va_t *p_va );
+    int  (*setup)(vlc_va_t *, void **hw, vlc_fourcc_t *output,
+                  int width, int height);
+    int  (*get)(vlc_va_t *, AVFrame *frame);
+    void (*release)(vlc_va_t *, AVFrame *frame);
+    int  (*extract)(vlc_va_t *, picture_t *dst, AVFrame *src);
+    void (*close)(vlc_va_t *);
+};
 
-void VaVersion( vlc_va_t *p_va, char *psz_version, size_t i_version );
+static inline int vlc_va_Setup(vlc_va_t *va, void **hw, vlc_fourcc_t *output,
+                                int width, int height)
+{
+    return va->setup(va, hw, output, width, height);
+}
+static inline int vlc_va_Get(vlc_va_t *va, AVFrame *frame)
+{
+    return va->get(va, frame);
+}
+static inline void vlc_va_Release(vlc_va_t *va, AVFrame *frame)
+{
+    va->release(va, frame);
+}
+static inline int vlc_va_Extract(vlc_va_t *va, picture_t *dst, AVFrame *src)
+{
+    return va->extract(va, dst, src);
+}
+static inline void vlc_va_Delete(vlc_va_t *va)
+{
+    va->close(va);
+}
 
-int VaSetup( vlc_va_t *p_va, void **pp_hw_ctx, vlc_fourcc_t *pi_chroma,
-             int i_width, int i_height );
-
-int VaExtract( vlc_va_t *p_va, picture_t *p_picture, AVFrame *p_ff );
-
-int VaGrabSurface( vlc_va_t *p_va, AVFrame *p_ff );
-
-void VaUngrabSurface( vlc_va_t *p_va, AVFrame *p_ff );
+vlc_va_t *vlc_va_NewVaapi(int codec_id);
 
 #endif
+
