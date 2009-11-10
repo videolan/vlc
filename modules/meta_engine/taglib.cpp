@@ -582,9 +582,8 @@ static int WriteMeta( vlc_object_t *p_this )
     psz_meta = input_item_Get ## a( p_item );                   \
     if( psz_meta )                                              \
     {                                                           \
-        String* psz_tmp = new String( psz_meta, String::UTF8 ); \
-        p_tag->set##b( *psz_tmp );                              \
-        delete psz_tmp;                                         \
+        String tmp( psz_meta, String::UTF8 );                   \
+        p_tag->set##b( tmp );                                   \
     }                                                           \
     free( psz_meta );
 
