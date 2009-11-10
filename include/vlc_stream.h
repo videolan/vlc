@@ -182,6 +182,11 @@ VLC_EXPORT( stream_t *,__stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buff
 VLC_EXPORT( stream_t *,__stream_UrlNew, (vlc_object_t *p_this, const char *psz_url ) );
 
 /**
+ * Try to add a stream filter to an open stream.
+ * @return New stream to use, or NULL if the filter could not be added.
+ **/
+VLC_EXPORT( stream_t*, stream_FilterNew, ( stream_t *p_source, const char *psz_stream_filter ) );
+/**
  * @}
  */
 

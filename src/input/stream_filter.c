@@ -29,6 +29,8 @@
 #include <vlc_stream.h>
 #include <libvlc.h>
 
+#include <assert.h>
+
 #include "stream.h"
 
 static void StreamDelete( stream_t * );
@@ -37,6 +39,7 @@ stream_t *stream_FilterNew( stream_t *p_source,
                             const char *psz_stream_filter )
 {
     stream_t *s;
+    assert( p_source != NULL );
 
     s = stream_CommonNew( VLC_OBJECT( p_source ) );
     if( s == NULL )
