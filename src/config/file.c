@@ -32,7 +32,7 @@
 #include <sys/stat.h>
 #ifdef __APPLE__
 #   include <xlocale.h>
-#else
+#elif defined(HAVE_USELOCALE)
 #include <locale.h>
 #endif
 
