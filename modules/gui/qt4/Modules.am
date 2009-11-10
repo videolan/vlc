@@ -20,6 +20,7 @@ nodist_SOURCES_qt4 = \
 		dialogs_provider.moc.cpp \
 		input_manager.moc.cpp \
 		actions_manager.moc.cpp \
+		extensions_manager.moc.cpp \
 		recents.moc.cpp \
 		variables.moc.cpp \
 		dialogs/playlist.moc.cpp \
@@ -41,6 +42,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/podcast_configuration.moc.cpp \
 		dialogs/vlm.moc.cpp \
 		dialogs/firstrun.moc.cpp \
+		dialogs/extensions.moc.cpp \
 		components/extended_panels.moc.cpp \
 		components/info_panels.moc.cpp \
 		components/preferences_widgets.moc.cpp \
@@ -210,6 +212,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs_provider.cpp \
 		input_manager.cpp \
 		actions_manager.cpp \
+		extensions_manager.cpp \
 		recents.cpp \
 		variables.cpp \
 		dialogs/playlist.cpp \
@@ -231,6 +234,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/vlm.cpp \
 		dialogs/firstrun.cpp \
 		dialogs/podcast_configuration.cpp \
+		dialogs/extensions.cpp \
 		components/extended_panels.cpp \
 		components/info_panels.cpp \
 		components/preferences_widgets.cpp \
@@ -258,6 +262,7 @@ noinst_HEADERS = \
 	dialogs_provider.hpp \
 	input_manager.hpp \
 	actions_manager.hpp \
+	extensions_manager.hpp \
 	recents.hpp \
 	variables.hpp \
 	dialogs/playlist.hpp \
@@ -279,6 +284,7 @@ noinst_HEADERS = \
 	dialogs/vlm.hpp \
 	dialogs/firstrun.hpp \
 	dialogs/podcast_configuration.hpp \
+	dialogs/extensions.hpp \
 	components/extended_panels.hpp \
 	components/info_panels.hpp \
 	components/preferences_widgets.hpp \

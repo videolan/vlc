@@ -43,6 +43,7 @@
 #include "input_manager.hpp"     /* Input Management */
 #include "recents.hpp"           /* Recent Items */
 #include "actions_manager.hpp"
+#include "extensions_manager.hpp"
 
 #include <QMenu>
 #include <QMenuBar>
@@ -471,6 +472,13 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
         ":/menu/preferences", SLOT( toolbarDialog() ) );
     menu->addSeparator();
 
+    /* Extensions */
+    menu->addSeparator();
+    QMenu *extmenu = ExtensionsMenu( p_intf, menu );
+    MenuFunc *f = new MenuFunc( menu, 5 );
+    CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() );
+    THEDP->menusUpdateMapper->setMapping( menu, f );
+
     return menu;
 }
 
@@ -485,6 +493,44 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
     objects.push_back( VLC_OBJECT(p_intf) );
 
     return Populate( p_intf, current, varnames, objects );
+}
+
+/**
+ * Extensions Sub-Menu
+ * EXPERIMENTAL
+ **/
+QMenu *QVLCMenu::ExtensionsMenu( intf_thread_t *p_intf, QMenu *current )
+{
+    QMenu *extMenu = NULL;
+
+    QAction *extAction = NULL;
+    foreach( QAction *action, current->actions() )
+    {
+        if( action->text() == qtr( "&Extensions" ) )
+        {
+            extAction = action;
+            break;
+        }
+    }
+
+    ExtensionsManager *extMgr = ExtensionsManager::getInstance( p_intf );
+
+    extMenu = new QMenu( qtr( "&Extensions" ) );
+    if( extMgr->isLoaded() )
+    {
+        /* Let the ExtensionsManager build itself the menu */
+        extMgr->menu( extMenu );
+    }
+    else
+    {
+        extMenu->addAction( qtr( "&Load extensions" ),
+                            extMgr, SLOT( loadExtensions() ) );
+    }
+
+    if( extAction )
+        extAction->setMenu( extMenu );
+    else
+        current->addMenu( extMenu );
 }
 
 /**

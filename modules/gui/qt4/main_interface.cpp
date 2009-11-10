@@ -32,6 +32,7 @@
 #include "main_interface.hpp"
 #include "input_manager.hpp"
 #include "actions_manager.hpp"
+#include "extensions_manager.hpp" // killInstance
 
 #include "util/customwidgets.hpp"
 #include "util/qt_dirs.hpp"
@@ -317,6 +318,9 @@ MainInterface::~MainInterface()
 
     /* Be sure to kill the actionsManager... FIXME */
     ActionsManager::killInstance();
+
+    /* Idem, FIXME */
+    ExtensionsManager::killInstance();
 
     /* Delete the FSC controller */
     delete fullscreenControls;
