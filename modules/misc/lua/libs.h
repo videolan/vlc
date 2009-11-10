@@ -26,7 +26,7 @@
 
 void luaopen_acl( lua_State * );
 void luaopen_config( lua_State * );
-void luaopen_volume( lua_State * );
+void luaopen_dialog( lua_State *, void * );
 void luaopen_httpd( lua_State * );
 void luaopen_input( lua_State * );
 void luaopen_msg( lua_State * );

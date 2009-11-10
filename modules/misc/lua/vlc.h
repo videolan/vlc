@@ -54,6 +54,9 @@ void Close_LuaPlaylist( vlc_object_t * );
 int Open_LuaIntf( vlc_object_t * );
 void Close_LuaIntf( vlc_object_t * );
 
+int Open_Extension( vlc_object_t * );
+void Close_Extension( vlc_object_t * );
+
 
 /*****************************************************************************
  * Lua debug

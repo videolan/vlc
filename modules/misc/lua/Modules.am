@@ -1,4 +1,6 @@
 SOURCES_lua = \
+	extension.c \
+	extension_thread.c \
 	intf.c \
 	meta.c \
 	demux.c \
@@ -8,6 +10,7 @@ SOURCES_lua = \
 	libs/acl.c \
 	libs/configuration.c \
 	libs/gettext.c \
+	libs/dialog.c \
 	libs/httpd.c \
 	libs/input.c \
 	libs/input.h \
