@@ -52,6 +52,7 @@ enum vlc_module_properties
     VLC_MODULE_SHORTNAME,
     VLC_MODULE_DESCRIPTION,
     VLC_MODULE_HELP,
+    VLC_MODULE_TEXTDOMAIN,
     /* Insert new VLC_MODULE_* here */
 
     /* DO NOT EVER REMOVE, INSERT OR REPLACE ANY ITEM! It would break the ABI!
@@ -234,7 +235,9 @@ enum vlc_module_properties
     if (vlc_module_set (p_submodule, VLC_MODULE_NO_UNLOAD)) \
         goto error;
 
-#define set_text_domain( dom ) domain = (dom);
+#define set_text_domain( dom ) \
+    if (vlc_module_set (p_module, VLC_MODULE_TEXTDOMAIN, (dom))) \
+        goto error;
 
 /*****************************************************************************
  * Macros used to build the configuration structure.

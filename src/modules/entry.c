@@ -237,6 +237,11 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             module->psz_help = va_arg (ap, char *);
             break;
 
+        case VLC_MODULE_TEXTDOMAIN:
+            (void) va_arg (ap, const char *);
+            /* FIXME: not implemented */
+            break;
+
         case VLC_CONFIG_NAME:
         {
             const char *name = va_arg (ap, const char *);
