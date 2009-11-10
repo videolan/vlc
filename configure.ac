@@ -1937,6 +1937,9 @@ lternatively you can use --disable-live555 to disable the liveMedia plugin.])
       if test "${SYS}" = "mingw32"; then
         # add ws2_32 for closesocket, select, recv
         other_libs="$other_libs -lws2_32"
+      elif test "${SYS}" = "mingwce"; then
+        # add ws2 for closesocket, select, recv
+        other_libs="$other_libs -lws2"
       fi
     dnl We need to check for pic because live555 don't provide shared libs
     dnl and we want to build a plugins so we need -fPIC on some arch.
