@@ -342,6 +342,27 @@ static int vlclua_add_callback( lua_State *L )
     lua_settop( L, 4 ); /* makes sure that optional data arg is set */
     if( !lua_isfunction( L, 3 ) )
         return vlclua_error( L );
+
+    if( !pp_obj || !*pp_obj )
+        return vlclua_error( L );
+
+    /* Check variable type, in order to avoid PANIC */
+    switch( var_Type( *pp_obj, psz_var ) )
+    {
+        case VLC_VAR_BOOL:
+        case VLC_VAR_INTEGER:
+        case VLC_VAR_STRING:
+        case VLC_VAR_FLOAT:
+        case VLC_VAR_TIME:
+            break;
+        case VLC_VAR_ADDRESS:
+        case VLC_VAR_VOID:
+        case VLC_VAR_MUTEX:
+        case VLC_VAR_LIST:
+        default:
+            return vlclua_error( L );
+    }
+
     i_index++;
 
     p_callback = (vlclua_callback_t*)malloc( sizeof( vlclua_callback_t ) );
