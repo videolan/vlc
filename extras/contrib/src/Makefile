@@ -1204,9 +1204,15 @@ live: live555-$(LIVEDOTCOM_VERSION).tar.gz
 ifdef HAVE_WIN64
 	patch -p0 < Patches/live-win64.patch
 endif
+ifdef HAVE_WINCE
+	patch -p0 < Patches/live-wince.patch
+endif
 
 .live: live
 ifdef HAVE_WIN32
+	(cd $<;./genMakefiles mingw && make $(HOSTCC))
+else
+ifdef HAVE_WINCE
 	(cd $<;./genMakefiles mingw && make $(HOSTCC))
 else
 ifdef HAVE_DARWIN_OS
@@ -1221,6 +1227,7 @@ endif
 else
 	(cd $<; sed -e 's%-D_FILE_OFFSET_BITS=64%-D_FILE_OFFSET_BITS=64\ -fPIC\ -DPIC%' -i.orig config.linux)
 	(cd $<; ./genMakefiles linux && make $(HOSTCC))
+endif
 endif
 endif
 endif
