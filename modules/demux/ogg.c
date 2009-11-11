@@ -1832,7 +1832,7 @@ static void Ogg_ReadAnnodexHeader( vlc_object_t *p_this,
             uint8_t *p = memchr( &p_oggpacket->packet[42], '\r',
                                  p_oggpacket->bytes - 1 );
             if( p && p[0] == '\r' && p[1] == '\n' )
-                sscanf( (char*)(&p_oggpacket->packet[42]), "%1024s\r\n",
+                sscanf( (char*)(&p_oggpacket->packet[42]), "%1023s\r\n",
                         content_type_string );
         }
 
