@@ -137,7 +137,9 @@ endif
 FFMPEGCONF+= --enable-small --disable-mpegaudio-hp
 FFMPEG_CFLAGS += -DHAVE_LRINTF --std=c99
 else
+ifndef HAVE_WINCE
 FFMPEGCONF+= --enable-libmp3lame --enable-libgsm
+endif
 endif
 
 ifdef HAVE_DARWIN_OS_ON_INTEL
