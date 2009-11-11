@@ -87,6 +87,8 @@ static int vlclua_is_playing( lua_State *L )
 {
     input_thread_t * p_input = vlclua_get_input_internal( L );
     lua_pushboolean( L, !!p_input );
+    if( p_input )
+        vlc_object_release( p_input );
     return 1;
 }
 
@@ -130,6 +132,8 @@ static int vlclua_input_stats( lua_State *L )
 #undef STATS_INT
 #undef STATS_FLOAT
     }
+    if( p_input )
+        vlc_object_release( p_input );
     return 1;
 }
 
