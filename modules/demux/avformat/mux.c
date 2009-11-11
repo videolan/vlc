@@ -483,7 +483,6 @@ static int64_t IOSeek( void *opaque, int64_t offset, int whence )
 {
     URLContext *p_url = opaque;
     sout_mux_t *p_mux = p_url->priv_data;
-    int64_t i_absolute;
 
 #ifdef AVFORMAT_DEBUG
     msg_Dbg( p_mux, "IOSeek offset: %"PRId64", whence: %i", offset, whence );
@@ -492,18 +491,10 @@ static int64_t IOSeek( void *opaque, int64_t offset, int whence )
     switch( whence )
     {
     case SEEK_SET:
-        i_absolute = offset;
-        break;
+        return sout_AccessOutSeek( p_mux->p_access, offset );
     case SEEK_CUR:
     case SEEK_END:
     default:
         return -1;
     }
-
-    if( sout_AccessOutSeek( p_mux->p_access, i_absolute ) )
-    {
-        return -1;
-    }
-
-    return 0;
 }
