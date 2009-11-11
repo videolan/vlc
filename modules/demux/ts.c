@@ -86,9 +86,10 @@
 #   else
 #       include "tables/tot.h"
 #   endif
+#else
+#   include <time.h>
 #endif
 
-#include <time.h>
 #undef TS_DEBUG
 
 /*****************************************************************************
@@ -1168,13 +1169,18 @@ static int DVBEventInformation( demux_t *p_demux, int64_t *pi_time, int64_t *pi_
 
     if( p_sys->i_dvb_length > 0 )
     {
-        const time_t t = time (NULL) + p_sys->i_tdt_delta;
+#ifdef TS_USE_TDT
+        const int64_t t = mdate() + p_sys->i_tdt_delta;
+#else
+        const int64_t t = CLOCK_FREQ * time ( NULL );
+#endif
+
         if( p_sys->i_dvb_start <= t && t < p_sys->i_dvb_start + p_sys->i_dvb_length )
         {
             if( pi_length )
-                *pi_length = p_sys->i_dvb_length * INT64_C(1000000);
+                *pi_length = p_sys->i_dvb_length;
             if( pi_time )
-                *pi_time   = (t - p_sys->i_dvb_start) * INT64_C(1000000);
+                *pi_time   = t - p_sys->i_dvb_start;
             return VLC_SUCCESS;
         }
     }
@@ -2936,7 +2942,8 @@ static void TDTCallBack( demux_t *p_demux, dvbpsi_tot_t *p_tdt )
 {
     demux_sys_t        *p_sys = p_demux->p_sys;
 
-    p_sys->i_tdt_delta = EITConvertStartTime( p_tdt->i_utc_time ) - time (NULL);
+    p_sys->i_tdt_delta = CLOCK_FREQ * EITConvertStartTime( p_tdt->i_utc_time )
+                         - mdate();
     dvbpsi_DeleteTOT(p_tdt);
 }
 #endif
@@ -3071,8 +3078,8 @@ static void EITCallBack( demux_t *p_demux,
 
             if( p_epg->p_current )
             {
-                p_sys->i_dvb_start = p_epg->p_current->i_start;
-                p_sys->i_dvb_length = p_epg->p_current->i_duration;
+                p_sys->i_dvb_start = CLOCK_FREQ * p_epg->p_current->i_start;
+                p_sys->i_dvb_length = CLOCK_FREQ * p_epg->p_current->i_duration;
             }
         }
         es_out_Control( p_demux->out, ES_OUT_SET_GROUP_EPG, p_eit->i_service_id, p_epg );
