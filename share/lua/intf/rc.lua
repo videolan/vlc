@@ -26,14 +26,14 @@ description=
  Remote control interface for VLC
 
  This is a modules/control/rc.c look alike (with a bunch of new features)
- 
+
  Use on local term:
     vlc -I luarc
  Use on tcp connection:
     vlc -I luarc --lua-config "rc={host='localhost:4212'}"
  Use on multiple hosts (term + 2 tcp ports):
     vlc -I luarc --lua-config "rc={hosts={'*console','localhost:4212','localhost:5678'}}"
- 
+
  Note:
     -I luarc is an alias for -I lua --lua-intf rc
 
@@ -352,7 +352,7 @@ function titlechap(name,client,value)
     else
         local item = vlc.var.get( input, var )
         -- Todo: add item name conversion
-        client:apped(item)
+        client:append(item)
     end
 end
 function titlechap_offset(client,offset)
