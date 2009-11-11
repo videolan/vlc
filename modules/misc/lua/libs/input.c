@@ -46,6 +46,9 @@
 #include "../vlc.h"
 #include "../libs.h"
 
+static const luaL_Reg vlclua_input_reg[];
+static const luaL_Reg vlclua_input_item_reg[];
+
 input_thread_t * vlclua_get_input_internal( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
@@ -203,6 +206,125 @@ static int vlclua_input_add_subtitle( lua_State *L )
 }
 
 /*****************************************************************************
+ * Input items
+ *****************************************************************************/
+
+static input_item_t* vlclua_input_item_get_internal( lua_State *L )
+{
+    input_item_t **pp_item = luaL_checkudata( L, 1, "input_item" );
+    input_item_t *p_item = *pp_item;
+
+    if( !p_item )
+        luaL_error( L, "script went completely foobar" );
+
+    return p_item;
+}
+
+/* Garbage collection of an input_item_t */
+static int vlclua_input_item_delete( lua_State *L )
+{
+    input_item_t **pp_item = luaL_checkudata( L, 1, "input_item" );
+    input_item_t *p_item = *pp_item;
+
+    if( !p_item )
+        return luaL_error( L, "script went completely foobar" );
+
+    *pp_item = NULL;
+    vlc_gc_decref( p_item );
+
+    return 1;
+}
+
+static int vlclua_input_item_get_current( lua_State *L )
+{
+    input_thread_t *p_input = vlclua_get_input_internal( L );
+    input_item_t *p_item = ( p_input && p_input->p ) ? input_GetItem( p_input ) : NULL;
+    if( !p_item )
+    {
+        lua_pushnil( L );
+        if( p_input ) vlc_object_release( p_input );
+        return 1;
+    }
+
+    vlc_gc_incref( p_item );
+
+    input_item_t **pp = lua_newuserdata( L, sizeof( void* ) );
+    *pp = p_item;
+
+    if( luaL_newmetatable( L, "input_item" ) )
+    {
+        lua_newtable( L );
+        luaL_register( L, NULL, vlclua_input_item_reg );
+        lua_setfield( L, -2, "__index" );
+        lua_pushcfunction( L, vlclua_input_item_delete );
+        lua_setfield( L, -2, "__gc" );
+    }
+
+    lua_setmetatable( L, -2 );
+
+    if( p_input ) vlc_object_release( p_input );
+    return 1;
+}
+
+static int vlclua_input_item_metas( lua_State *L )
+{
+    vlclua_input_metas_internal( L, vlclua_input_item_get_internal( L ) );
+    return 1;
+}
+
+static int vlclua_input_item_set_meta( lua_State *L )
+{
+    input_item_t *p_item = vlclua_input_item_get_internal( L );
+    lua_settop( L, 1 + 2 ); // two arguments
+    const char *psz_name = luaL_checkstring( L, 2 ),
+               *psz_value = luaL_checkstring( L, 3 );
+
+#define META_TYPE( n ) { #n, vlc_meta_ ## n }
+    static const struct
+    {
+        const char *psz_name;
+        vlc_meta_type_t type;
+    } pp_meta_types[] = {
+        META_TYPE( Title ),
+        META_TYPE( Artist ),
+        META_TYPE( Genre ),
+        META_TYPE( Copyright ),
+        META_TYPE( Album ),
+        META_TYPE( TrackNumber ),
+        META_TYPE( Description ),
+        META_TYPE( Rating ),
+        META_TYPE( Date ),
+        META_TYPE( Setting ),
+        META_TYPE( URL ),
+        META_TYPE( Language ),
+        META_TYPE( NowPlaying ),
+        META_TYPE( Publisher ),
+        META_TYPE( EncodedBy ),
+        META_TYPE( ArtworkURL ),
+        META_TYPE( TrackID ),
+    };
+#undef META_TYPE
+
+    vlc_meta_type_t type = vlc_meta_Title;
+    bool ok = false;
+    for( unsigned i = 0; i < VLC_META_TYPE_COUNT; i++ )
+    {
+        if( !strcasecmp( pp_meta_types[i].psz_name, psz_name ) )
+        {
+            type = pp_meta_types[i].type;
+            ok = true;
+        }
+    }
+
+    if( !ok )
+        return luaL_error( L, "unknown meta type '%s'", psz_name );
+
+    input_item_SetMeta( p_item, type, psz_value );
+
+    return 1;
+}
+
+/*****************************************************************************
  * Lua bindings
  *****************************************************************************/
 static const luaL_Reg vlclua_input_reg[] = {
@@ -210,6 +332,7 @@ static const luaL_Reg vlclua_input_reg[] = {
     { "is_playing", vlclua_input_is_playing },
     { "get_title", vlclua_input_get_title },
     { "metas", vlclua_input_metas },
+    { "item", vlclua_input_item_get_current },
     { "stats", vlclua_input_stats },
     { "add_subtitle", vlclua_input_add_subtitle },
     { NULL, NULL }
@@ -221,3 +344,9 @@ void luaopen_input( lua_State *L )
     luaL_register( L, NULL, vlclua_input_reg );
     lua_setfield( L, -2, "input" );
 }
+
+static const luaL_Reg vlclua_input_item_reg[] = {
+    { "metas", vlclua_input_item_metas },
+    { "set_meta", vlclua_input_item_set_meta },
+    { NULL, NULL }
+};
