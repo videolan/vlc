@@ -537,6 +537,14 @@ static int vlclua_del_callback( lua_State *L )
     return 0;
 }
 
+static int vlclua_trigger_callback( lua_State *L )
+{
+    vlc_object_t **pp_obj = luaL_checkudata( L, 1, "vlc_object" );
+    const char *psz_var = luaL_checkstring( L, 2 );
+
+    return vlclua_push_ret( L, var_TriggerCallback( *pp_obj, psz_var ) );
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -547,6 +555,7 @@ static const luaL_Reg vlclua_var_reg[] = {
     { "create", vlclua_var_create },
     { "add_callback", vlclua_add_callback },
     { "del_callback", vlclua_del_callback },
+    { "trigger_callback", vlclua_trigger_callback },
     { "command", vlclua_command },
     { "libvlc_command", vlclua_libvlc_command },
     { NULL, NULL }
