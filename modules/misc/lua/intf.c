@@ -177,6 +177,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     if( !L )
     {
         msg_Err( p_intf, "Could not create new Lua State" );
+        free( p_sys->psz_filename );
         free( psz_name );
         free( p_sys );
         return VLC_EGENERIC;
@@ -225,6 +226,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
                   "package.path = \"%s"DIR_SEP"modules"DIR_SEP"?.lua;\"..package.path",
                   p_sys->psz_filename ) < 0 )
     {
+        free( p_sys->psz_filename );
         free( psz_name );
         free( p_sys );
         return VLC_EGENERIC;
@@ -232,10 +234,13 @@ int Open_LuaIntf( vlc_object_t *p_this )
     *psz_char = DIR_SEP_CHAR;
     if( luaL_dostring( L, psz_command ) )
     {
+        free( psz_command );
+        free( p_sys->psz_filename );
         free( psz_name );
         free( p_sys );
         return VLC_EGENERIC;
     }
+    free( psz_command );
     }
     /* </gruik> */
 
@@ -305,6 +310,8 @@ void Close_LuaIntf( vlc_object_t *p_this )
     vlc_mutex_destroy( &p_sys->lock );
 
     lua_close( p_sys->L );
+
+    free( p_sys->psz_filename );
     free( p_sys );
 }
 
