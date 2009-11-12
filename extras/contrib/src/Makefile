@@ -2587,7 +2587,7 @@ xcb-util: xcb-util-$(XCB_UTIL_VERSION).tar.bz2
 	cd $< && make install
 	touch $@
 
-CLEAN_FILES += .xcb-util .xcb
+CLEAN_FILE += .xcb-util .xcb
 CLEAN_PKG += xcb-util xcb
 DISTCLEAN_PKG += xcb-util-$(XCB_UTIL_VERSION).tar.bz2 libxcb-$(XCB_VERSION).tar.bz2
 
@@ -2606,7 +2606,7 @@ peflags/peflags.c:
 	touch $@
 
 CLEAN_PKG += peflags
-CLEAN_FILES += .peflags
+CLEAN_FILE += .peflags
 
 # ************
 # Regex
