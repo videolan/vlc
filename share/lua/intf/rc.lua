@@ -384,6 +384,10 @@ function rate(name,client)
     end
 end
 
+function frame(name,client)
+    vlc.var.trigger_callback(vlc.object.input(),"frame-next");
+end
+
 function listvalue(obj,var)
     return function(client,value)
         local o = vlc.object.find(nil,obj,"anywhere")
@@ -443,8 +447,10 @@ commands_ordered = {
     { "faster"; { func = rate; help = "faster playing of stream" } };
     { "slower"; { func = rate; help = "slower playing of stream" } };
     { "normal"; { func = rate; help = "normal playing of stream" } };
+    { "frame"; { func = frame; help = "play frame by frame" } };
     { "fullscreen"; { func = skip2(vlc.video.fullscreen); args = "[on|off]"; help = "toggle fullscreen"; aliases = { "f", "F" } } };
     { "info"; { func = input_info; help = "information about the current stream" } };
+    { "states"; { func = fixme; help = "show statistical information" } };
     { "get_time"; { func = get_time("time"); help = "seconds elapsed since stream's beginning" } };
     { "is_playing"; { func = is_playing; help = "1 if a stream plays, 0 otherwise" } };
     { "get_title"; { func = ret_print(vlc.input.get_title); help = "the title of the current stream" } };
