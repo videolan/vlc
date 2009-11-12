@@ -1188,8 +1188,7 @@ HRESULT BDAGraph::Build()
     if( FAILED( hr ) )
     {
         msg_Warn( p_access, "Build: "\
-            "Cannot save Tuning Space: hr=0x%8lx", hr );
-        return hr;
+            "Cannot save Tuning Space: hr=0x%8lx (ignored)", hr );
     }
 
     /* If we have already have a filter graph, rebuild it*/
