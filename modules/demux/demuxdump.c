@@ -93,7 +93,6 @@ static int Open( vlc_object_t * p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     const char  *psz_mode;
-    vlc_value_t val;
     bool  b_append;
 
     /* Accept only if forced */
@@ -104,9 +103,7 @@ static int Open( vlc_object_t * p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    var_Create( p_demux, "demuxdump-append", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "demuxdump-append", &val );
-    b_append = val.b_bool;
+    b_append = var_CreateGetBool( p_demux, "demuxdump-append" );
     if ( b_append )
         psz_mode = "ab";
     else

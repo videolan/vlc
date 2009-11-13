@@ -192,7 +192,6 @@ static int Open( vlc_object_t *p_this )
 {
     sout_mux_t     *p_mux = (sout_mux_t*)p_this;
     sout_mux_sys_t *p_sys;
-    vlc_value_t    val;
     int i;
 
     msg_Dbg( p_mux, "asf muxer opened" );
@@ -241,20 +240,11 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Meta data */
-    var_Get( p_mux, SOUT_CFG_PREFIX "title", &val );
-    p_sys->psz_title = val.psz_string;
-
-    var_Get( p_mux, SOUT_CFG_PREFIX "author", &val );
-    p_sys->psz_author = val.psz_string;
-
-    var_Get( p_mux, SOUT_CFG_PREFIX "copyright", &val );
-    p_sys->psz_copyright = val.psz_string;
-
-    var_Get( p_mux, SOUT_CFG_PREFIX "comment", &val );
-    p_sys->psz_comment = val.psz_string;
-
-    var_Get( p_mux, SOUT_CFG_PREFIX "rating", &val );
-    p_sys->psz_rating = val.psz_string;
+    p_sys->psz_title = var_GetString( p_mux, SOUT_CFG_PREFIX "title" );
+    p_sys->psz_author = var_GetString( p_mux, SOUT_CFG_PREFIX "author" );
+    p_sys->psz_copyright = var_GetString( p_mux, SOUT_CFG_PREFIX "copyright" );
+    p_sys->psz_comment = var_GetString( p_mux, SOUT_CFG_PREFIX "comment" );
+    p_sys->psz_rating = var_GetString( p_mux, SOUT_CFG_PREFIX "rating" );
 
     msg_Dbg( p_mux, "meta data: title='%s', author='%s', copyright='%s', "
              "comment='%s', rating='%s'",

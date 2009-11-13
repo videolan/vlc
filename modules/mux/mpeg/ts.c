@@ -529,8 +529,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_audio_bound = 0;
     p_sys->i_video_bound = 0;
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "es-id-pid", &val );
-    p_sys->b_es_id_pid = val.b_bool;
+    p_sys->b_es_id_pid = var_GetBool( p_mux, SOUT_CFG_PREFIX "es-id-pid" );
 
     var_Get( p_mux, SOUT_CFG_PREFIX "muxpmt", &val );
     /*

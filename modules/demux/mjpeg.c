@@ -303,7 +303,7 @@ static int Open( vlc_object_t * p_this )
     demux_sys_t *p_sys;
     int         i_size;
     bool        b_matched = false;
-    vlc_value_t val;
+    float       f_fps;
 
     p_demux->pf_control = Control;
     p_demux->p_sys      = p_sys = malloc( sizeof( demux_sys_t ) );
@@ -340,8 +340,7 @@ static int Open( vlc_object_t * p_this )
     }
 
 
-    var_Create( p_demux, "mjpeg-fps", VLC_VAR_FLOAT | VLC_VAR_DOINHERIT );
-    var_Get( p_demux, "mjpeg-fps", &val );
+    f_fps = var_CreateGetFloat( p_demux, "mjpeg-fps" );
     p_sys->i_frame_length = 0;
 
     /* Check for jpeg file extension */
@@ -351,9 +350,9 @@ static int Open( vlc_object_t * p_this )
         demux_IsPathExtension( p_demux, ".jpg" ) )
     {
         p_sys->b_still = true;
-        if( val.f_float)
+        if( f_fps )
         {
-            p_sys->i_still_length = 1000000.0 / val.f_float;
+            p_sys->i_still_length = 1000000.0 / f_fps;
         }
         else
         {
@@ -361,9 +360,9 @@ static int Open( vlc_object_t * p_this )
             p_sys->i_still_length = 1000000;
         }
     }
-    else if ( val.f_float )
+    else if ( f_fps )
     {
-        p_sys->i_frame_length = 1000000.0 / val.f_float;
+        p_sys->i_frame_length = 1000000.0 / f_fps;
     }
 
     es_format_Init( &p_sys->fmt, VIDEO_ES, 0 );

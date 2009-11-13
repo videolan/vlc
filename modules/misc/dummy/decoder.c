@@ -73,7 +73,6 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
     decoder_t *p_dec = (decoder_t*)p_this;
     decoder_sys_t *p_sys;
     char psz_file[ PATH_MAX ];
-    vlc_value_t val;
 
     /* Allocate the memory needed to store the decoder's structure */
     if( ( p_dec->p_sys = p_sys =
@@ -87,9 +86,7 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
 #ifndef UNDER_CE
     if( !b_force_dump )
     {
-        var_Create( p_dec, "dummy-save-es", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-        var_Get( p_dec, "dummy-save-es", &val );
-        b_force_dump = val.b_bool;
+        b_force_dump = var_CreateGetBool( p_dec, "dummy-save-es" );
     }
     if( b_force_dump )
     {
