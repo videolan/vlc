@@ -44,20 +44,17 @@ static void test_meta (const char ** argv, int argc)
     /* Tell that we are interested in this precise meta data
      * This is needed to trigger meta data reading
      * (the first calls return NULL) */
-    artist = libvlc_media_get_meta (media, libvlc_meta_Artist, &ex);
-    catch ();
+    artist = libvlc_media_get_meta (media, libvlc_meta_Artist);
 
     free (artist);
 
     /* Wait for the meta */
-    while (!libvlc_media_is_preparsed (media, &ex))
+    while (!libvlc_media_is_preparsed (media))
     {
-        catch ();
         usleep (10000);
     }
 
-    artist = libvlc_media_get_meta (media, libvlc_meta_Artist, &ex);
-    catch ();
+    artist = libvlc_media_get_meta (media, libvlc_meta_Artist);
 
     const char *expected_artist = "mike";
 
