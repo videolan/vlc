@@ -121,12 +121,8 @@ package-win32:
 	done;
 # Change Prefix.
 	./change_prefix.sh tmp $(PREFIX) $(DISTDIR)
-# Hack for qt4
-	(cd tmp/$(DISTDIR)/bin; mv uic.exe uic.ex; mv rcc.exe rcc.ex; mv moc.exe moc.ex)
-#	Remove unused and potentially harmful files	
-	(cd tmp/$(DISTDIR)/bin; rm -rfv *.exe; chmod a+x *)
-# Hack for qt4
-	(cd tmp/$(DISTDIR)/bin; mv uic.ex uic.exe; mv rcc.ex rcc.exe; mv moc.ex moc.exe)
+# Remove unused and potentially harmful files (but skip qt4 executables)
+	(cd tmp/$(DISTDIR)/bin && rm -fv `find . -name 'uic.exe' -o -name 'rcc.exe' -o -name 'moc.exe' -o -name '*.exe' -printf '%p '` && chmod a+x * || true)
 # Tar it.
 	(cd tmp; tar cf - $(DISTDIR)) | bzip2 -c > contrib-`date +%Y%m%d`-win32-bin-gcc-`$(CC) --version|head -n 1|cut -f 3 -d ' '`-runtime-`/bin/echo -e "#include <_mingw.h>\n__MINGW32_VERSION"|$(CC) -E -|grep -v ^#|grep -v ' '`-only.tar.bz2
 	rm -rf tmp
