@@ -320,6 +320,34 @@ function input_info(name,client)
     client:append("+----[ end of stream info ]")
 end
 
+function stats(name,client)
+    local stats_tab = vlc.input.stats()
+
+    client:append("bla"..stats_tab["demux_bitrate"])
+    client:append("+----[ begin of statistical info")
+    client:append("+-[Incoming]")
+    client:append("| input bytes read : "..string.format("%8.0f kB",stats_tab["read_bytes"]/1000))
+    client:append("| input bitrate    :   "..string.format("%6.0f bB/s",stats_tab["input_bitrate"]*8000))
+    client:append("| demux bytes read : "..string.format("%8.0f kB",stats_tab["demux_read_bytes"]/1000))
+    client:append("| demux bitrate    :   "..string.format("%6.0f kB/s",stats_tab["demux_bitrate"]*8000))
+    client:append("|")
+    client:append("+-[Video Decoding]")
+    client:append("| video decoded    :    "..string.format("%5i",stats_tab["decoded_video"]))
+    client:append("| frames displayed :    "..string.format("%5i",stats_tab["displayed_pictures"]))
+    client:append("| frames lost      :    "..string.format("%5i",stats_tab["lost_pictures"]))
+    client:append("|")
+    client:append("+-[Audio Decoding]")
+    client:append("| audio decoded    :    "..string.format("%5i",stats_tab["decoded_audio"]))
+    client:append("| buffers played   :    "..string.format("%5i",stats_tab["played_abuffers"]))
+    client:append("| buffers lost     :    "..string.format("%5i",stats_tab["lost_abuffers"]))
+    client:append("|")
+    client:append("+-[Streaming]")
+    client:append("| packets sent     :    "..string.format("%5i",stats_tab["sent_packets"]))
+    client:append("| bytes sent       : "..string.format("%8.0f kB",stats_tab["sent_bytes"]/1000))
+    client:append("| sending bitrate  :   "..string.format("%6.0f kb/s",stats_tab["send_bitrate"]*8000))
+    client:append("+----[ end of statistical info ]")
+end
+
 function playlist_status(name,client)
     local a,b,c = vlc.playlist.status()
     client:append( "( new input: " .. tostring(a) .. " )" )
@@ -450,7 +478,7 @@ commands_ordered = {
     { "frame"; { func = frame; help = "play frame by frame" } };
     { "fullscreen"; { func = skip2(vlc.video.fullscreen); args = "[on|off]"; help = "toggle fullscreen"; aliases = { "f", "F" } } };
     { "info"; { func = input_info; help = "information about the current stream" } };
-    { "states"; { func = fixme; help = "show statistical information" } };
+    { "stats"; { func = stats; help = "show statistical information" } };
     { "get_time"; { func = get_time("time"); help = "seconds elapsed since stream's beginning" } };
     { "is_playing"; { func = is_playing; help = "1 if a stream plays, 0 otherwise" } };
     { "get_title"; { func = ret_print(vlc.input.get_title); help = "the title of the current stream" } };
