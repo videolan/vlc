@@ -323,7 +323,6 @@ end
 function stats(name,client)
     local stats_tab = vlc.input.stats()
 
-    client:append("bla"..stats_tab["demux_bitrate"])
     client:append("+----[ begin of statistical info")
     client:append("+-[Incoming]")
     client:append("| input bytes read : "..string.format("%8.0f kB",stats_tab["read_bytes"]/1000))
