@@ -100,9 +100,9 @@ package-macosx:
 	rm -f contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
 	mv contrib-macosx.tar.bz2 contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
 
-DISTDIR = usr/win32
+DISTDIR = usr/win$*
 
-package-win32:
+package-win%:
 	@if test -d tmp; then \
 		echo "Move away ./tmp, it's in the way" ; \
 		exit 1 ; \
@@ -124,7 +124,7 @@ package-win32:
 # Remove unused and potentially harmful files (but skip qt4 executables)
 	(cd tmp/$(DISTDIR)/bin && rm -fv `find . -name 'uic.exe' -o -name 'rcc.exe' -o -name 'moc.exe' -o -name '*.exe' -printf '%p '` && chmod a+x * || true)
 # Tar it.
-	(cd tmp; tar cf - $(DISTDIR)) | bzip2 -c > contrib-`date +%Y%m%d`-win32-bin-gcc-`$(CC) --version|head -n 1|cut -f 3 -d ' '`-runtime-`/bin/echo -e "#include <_mingw.h>\n__MINGW32_VERSION"|$(CC) -E -|grep -v ^#|grep -v ' '`-only.tar.bz2
+	(cd tmp; tar cf - $(DISTDIR)) | bzip2 -c > contrib-`date +%Y%m%d`-win$*-bin-gcc-`$(CC) --version|head -n 1|cut -f 3 -d ' '`-runtime-`/bin/echo -e "#include <_mingw.h>\n__MINGW32_VERSION"|$(CC) -E -|grep -v ^#|grep -v ' '`-only.tar.bz2
 	rm -rf tmp
 
-.PHONY: all clean-src clean-bin clean package-macosx package-win32
+.PHONY: all clean-src clean-bin clean package-macosx
