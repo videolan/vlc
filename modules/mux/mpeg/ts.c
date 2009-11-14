@@ -856,16 +856,13 @@ static void Close( vlc_object_t * p_this )
     sout_mux_sys_t      *p_sys = p_mux->p_sys;
     int i;
 
-    vlc_mutex_lock( &p_sys->csa_lock );
     if( p_sys->csa )
     {
         var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa-ck", ChangeKeyCallback, NULL );
         var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa2-ck", ChangeKeyCallback, NULL );
         var_DelCallback( p_mux, SOUT_CFG_PREFIX "csa-use", ActiveKeyCallback, NULL );
         csa_Delete( p_sys->csa );
-        p_sys->csa = NULL;
     }
-    vlc_mutex_unlock( &p_sys->csa_lock );
 
     for( i = 0; i < MAX_PMT; i++ )
     {
