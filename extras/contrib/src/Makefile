@@ -561,6 +561,9 @@ libmpeg2-$(LIBMPEG2_VERSION).tar.gz:
 
 libmpeg2: libmpeg2-$(LIBMPEG2_VERSION).tar.gz
 	$(EXTRACT_GZ)
+ifdef HAVE_WINCE
+	patch -p0 < Patches/libmpeg2-arm-pld.patch
+endif
 	cd libmpeg2 && patch -p0 < ../Patches/libmpeg2-mc-neon.patch
 	cd libmpeg2 && ./bootstrap
 

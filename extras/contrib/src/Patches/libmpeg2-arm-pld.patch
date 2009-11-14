@@ -1,0 +1,13 @@
+diff -urNp libmpeg2.orig/libmpeg2/motion_comp_arm_s.S libmpeg2/libmpeg2/motion_comp_arm_s.S
+--- libmpeg2.orig/libmpeg2/motion_comp_arm_s.S	2008-07-09 21:16:05.000000000 +0200
++++ libmpeg2/libmpeg2/motion_comp_arm_s.S	2009-11-13 23:09:46.000000000 +0100
+@@ -21,6 +21,9 @@
+ 
+ 	.text
+ 
++.macro pld reg
++.endm
++
+ @ ----------------------------------------------------------------
+ 	.align
+ 	.global MC_put_o_16_arm
