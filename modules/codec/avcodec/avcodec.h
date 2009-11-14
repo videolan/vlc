@@ -265,6 +265,7 @@ void EndSubtitleDec( decoder_t *p_dec );
 #   define AV_VERSION_INT(a, b, c) ((a)<<16 | (b)<<8 | (c))
 #endif
 
-/* Uncomment it to enable compilation with vaapi (you also must change the build
+/* Uncomment it to enable compilation with vaapi/dxva2 (you also must change the build
  * system) */
 //#define HAVE_AVCODEC_VAAPI 1
+//#define HAVE_AVCODEC_DXVA2 1

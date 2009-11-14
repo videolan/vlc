@@ -9,6 +9,7 @@ libavcodec_plugin_la_SOURCES = \
 	fourcc.c \
 	chroma.c \
 	vaapi.c \
+	dxva2.c \
 	va.h \
 	$(NULL)
 if ENABLE_SOUT

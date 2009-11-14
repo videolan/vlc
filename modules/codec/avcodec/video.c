@@ -41,6 +41,9 @@
 #   ifdef HAVE_AVCODEC_VAAPI
 #       include <libavcodec/vaapi.h>
 #   endif
+#   ifdef HAVE_AVCODEC_DXVA2
+#       include <libavcodec/dxva2.h>
+#   endif
 #elif defined(HAVE_FFMPEG_AVCODEC_H)
 #   include <ffmpeg/avcodec.h>
 #else
@@ -49,6 +52,9 @@
 
 #include "avcodec.h"
 #include "va.h"
+#if defined(HAVE_AVCODEC_VAAPI) || defined(HAVE_AVCODEC_DXVA2)
+#   define HAVE_AVCODEC_VA
+#endif
 
 /*****************************************************************************
  * decoder_sys_t : decoder descriptor
@@ -105,7 +111,7 @@ static int  ffmpeg_ReGetFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_ReleaseFrameBuf( struct AVCodecContext *, AVFrame * );
 static void ffmpeg_NextPts( decoder_t * );
 
-#ifdef HAVE_AVCODEC_VAAPI
+#ifdef HAVE_AVCODEC_VA
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *,
                                           const enum PixelFormat * );
 #endif
@@ -320,7 +326,7 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
     p_sys->p_context->release_buffer = ffmpeg_ReleaseFrameBuf;
     p_sys->p_context->opaque = p_dec;
 
-#ifdef HAVE_AVCODEC_VAAPI
+#ifdef HAVE_AVCODEC_VA
     if( var_CreateGetBool( p_dec, "ffmpeg-hw" ) )
         p_sys->p_context->get_format = ffmpeg_GetFormat;
 #endif
@@ -897,13 +903,13 @@ static int ffmpeg_GetFrameBuf( struct AVCodecContext *p_context,
 
     if( p_sys->p_va )
     {
-#ifdef HAVE_AVCODEC_VAAPI
+#ifdef HAVE_AVCODEC_VA
         /* hwaccel_context is not present in old fffmpeg version */
         if( vlc_va_Setup( p_sys->p_va,
                           &p_sys->p_context->hwaccel_context, &p_dec->fmt_out.video.i_chroma,
                           p_sys->p_context->width, p_sys->p_context->height ) )
         {
-            msg_Err( p_dec, "VaSetup failed" );
+            msg_Err( p_dec, "vlc_va_Setup failed" );
             return -1;
         }
 #else
@@ -1086,7 +1092,7 @@ static void ffmpeg_NextPts( decoder_t *p_dec )
     }
 }
 
-#ifdef HAVE_AVCODEC_VAAPI
+#ifdef HAVE_AVCODEC_VA
 static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
                                           const enum PixelFormat *pi_fmt )
 {
@@ -1115,20 +1121,41 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
         /* Only VLD supported */
         if( pi_fmt[i] == PIX_FMT_VAAPI_VLD )
         {
+#ifdef HAVE_AVCODEC_VAAPI
             msg_Dbg( p_dec, "Trying VA API" );
             p_sys->p_va = vlc_va_NewVaapi( p_sys->i_codec_id );
-            if( p_sys->p_va )
-            {
-                /* FIXME this will disabled direct rendering
-                 * even if a new pixel format is renegociated
-                 *
-                 * FIXME Try to call VaSetup when possible
-                 * to detect errors when possible (later is too late) */
-                p_sys->b_direct_rendering = false;
-                p_sys->p_context->draw_horiz_band = NULL;
-                return pi_fmt[i];
-            }
-            msg_Warn( p_dec, "Failed to open VA API" );
+            if( !p_sys->p_va )
+                msg_Warn( p_dec, "Failed to open VA API" );
+#else
+            continue;
+#endif
+        }
+        if( pi_fmt[i] == PIX_FMT_DXVA2_VLD )
+        {
+#ifdef HAVE_AVCODEC_DXVA2
+            msg_Dbg( p_dec, "Trying DXVA2" );
+            p_sys->p_va = vlc_va_NewDxva2( VLC_OBJECT(p_dec), p_sys->i_codec_id );
+            if( !p_sys->p_va )
+                msg_Warn( p_dec, "Failed to open DXVA2" );
+#else
+            continue;
+#endif
+        }
+        else
+        {
+            continue;
+        }
+
+        if( p_sys->p_va )
+        {
+            /* FIXME this will disabled direct rendering
+             * even if a new pixel format is renegociated
+             *
+             * FIXME Try to call vlc_va_Setup when possible
+             * to detect errors when possible (later is too late) */
+            p_sys->b_direct_rendering = false;
+            p_sys->p_context->draw_horiz_band = NULL;
+            return pi_fmt[i];
         }
     }
 

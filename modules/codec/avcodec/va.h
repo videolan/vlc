@@ -59,6 +59,7 @@ static inline void vlc_va_Delete(vlc_va_t *va)
 }
 
 vlc_va_t *vlc_va_NewVaapi(int codec_id);
+vlc_va_t *vlc_va_NewDxva2(vlc_object_t *log, int codec_id);
 
 #endif
 
