@@ -1,6 +1,6 @@
 # WinCE rules
-all: .errno .zlib \
-        .a52 .ogg .tremor .theora .ffmpeg \
+all: .errno .iconv .zlib \
+        .a52 .mpeg2 .ogg .tremor .theora .vorbis .ffmpeg \
         .live .dvbpsi
-#       .faad .vorbis .lame .mpeg2
+#       .faad .lame
 
