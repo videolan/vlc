@@ -423,6 +423,10 @@ libiconv: libiconv-$(LIBICONV_VERSION).tar.gz
 ifdef HAVE_WIN64
 	patch -p0 < Patches/libiconv-win64.patch
 endif
+ifdef HAVE_WINCE
+	patch -p0 < Patches/libiconv-wince.patch
+	patch -p0 < Patches/libiconv-wince-hack.patch
+endif
 
 libiconv-snowleopard.tar.bz2:
 	$(WGET) $(LIBICONVMAC_URL)
