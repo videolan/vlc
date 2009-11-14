@@ -300,7 +300,11 @@ static int Setup( vlc_va_t *p_external, void **pp_hw_ctx, vlc_fourcc_t *pi_chrom
 
     if( p_va->i_surface_width == i_width &&
         p_va->i_surface_height == i_height )
+    {
+        *pp_hw_ctx = &p_va->hw_ctx;
+        *pi_chroma = p_va->i_surface_chroma;
         return VLC_SUCCESS;
+    }
 
     *pp_hw_ctx = NULL;
     *pi_chroma = 0;
