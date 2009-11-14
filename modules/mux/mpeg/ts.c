@@ -650,8 +650,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_sdt = false;
 #endif
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "alignment", &val );
-    p_sys->b_data_alignment = val.b_bool;
+    p_sys->b_data_alignment = var_GetBool( p_mux, SOUT_CFG_PREFIX "alignment" );
 
     var_Get( p_mux, SOUT_CFG_PREFIX "program-pmt", &val );
     if( val.psz_string && *val.psz_string )
@@ -705,22 +704,19 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->i_pid_free = p_sys->pmt[p_sys->i_num_pmt - 1].i_pid + 1;
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "pid-video", &val );
-    p_sys->i_pid_video = val.i_int;
+    p_sys->i_pid_video = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-video" );
     if ( p_sys->i_pid_video > p_sys->i_pid_free )
     {
         p_sys->i_pid_free = p_sys->i_pid_video + 1;
     }
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "pid-audio", &val );
-    p_sys->i_pid_audio = val.i_int;
+    p_sys->i_pid_audio = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-audio" );
     if ( p_sys->i_pid_audio > p_sys->i_pid_free )
     {
         p_sys->i_pid_free = p_sys->i_pid_audio + 1;
     }
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "pid-spu", &val );
-    p_sys->i_pid_spu = val.i_int;
+    p_sys->i_pid_spu = var_GetInteger( p_mux, SOUT_CFG_PREFIX "pid-spu" );
     if ( p_sys->i_pid_spu > p_sys->i_pid_free )
     {
         p_sys->i_pid_free = p_sys->i_pid_spu + 1;
@@ -734,11 +730,9 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_null_continuity_counter = 0;
 
     /* Allow to create constrained stream */
-    var_Get( p_mux, SOUT_CFG_PREFIX "bmin", &val );
-    p_sys->i_bitrate_min = val.i_int;
+    p_sys->i_bitrate_min = var_GetInteger( p_mux, SOUT_CFG_PREFIX "bmin" );
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "bmax", &val );
-    p_sys->i_bitrate_max = val.i_int;
+    p_sys->i_bitrate_max = var_GetInteger( p_mux, SOUT_CFG_PREFIX "bmax" );
 
     if( p_sys->i_bitrate_min > 0 && p_sys->i_bitrate_max > 0 &&
         p_sys->i_bitrate_min > p_sys->i_bitrate_max )
@@ -781,8 +775,7 @@ static int Open( vlc_object_t *p_this )
     msg_Dbg( p_mux, "shaping=%"PRId64" pcr=%"PRId64" dts_delay=%"PRId64,
              p_sys->i_shaping_delay, p_sys->i_pcr_delay, p_sys->i_dts_delay );
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "use-key-frames", &val );
-    p_sys->b_use_key_frames = val.b_bool;
+    p_sys->b_use_key_frames = var_GetBool( p_mux, SOUT_CFG_PREFIX "use-key-frames" );
 
     /* for TS generation */
     p_sys->i_pcr    = 0;
@@ -847,11 +840,9 @@ static int Open( vlc_object_t *p_this )
     }
     free( val.psz_string );
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "crypt-audio", &val );
-    p_sys->b_crypt_audio = val.b_bool;
+    p_sys->b_crypt_audio = var_GetBool( p_mux, SOUT_CFG_PREFIX "crypt-audio" );
 
-    var_Get( p_mux, SOUT_CFG_PREFIX "crypt-video", &val );
-    p_sys->b_crypt_video = val.b_bool;
+    p_sys->b_crypt_video = var_GetBool( p_mux, SOUT_CFG_PREFIX "crypt-video" );
 
     return VLC_SUCCESS;
 }
