@@ -2015,10 +2015,10 @@ lternatively you can use --disable-live555 to disable the liveMedia plugin.])
         VLC_ADD_LIBS([live555],[-lws2_32])
       fi
 
-      VLC_ADD_LIBS([live555],[-L${real_live555_tree}/liveMedia -lliveMedia])
+      VLC_ADD_LIBS([live555],[-L${real_live555_tree}/UsageEnvironment -lUsageEnvironment])
       VLC_ADD_LIBS([live555],[-L${real_live555_tree}/BasicUsageEnvironment -lBasicUsageEnvironment])
       VLC_ADD_LIBS([live555],[-L${real_live555_tree}/groupsock -lgroupsock])
-      VLC_ADD_LIBS([live555],[-L${real_live555_tree}/UsageEnvironment -lUsageEnvironment])
+      VLC_ADD_LIBS([live555],[-L${real_live555_tree}/liveMedia -lliveMedia])
 
       VLC_ADD_CXXFLAGS([live555],[-I${real_live555_tree}/BasicUsageEnvironment/include])
       VLC_ADD_CXXFLAGS([live555],[-I${real_live555_tree}/groupsock/include])
