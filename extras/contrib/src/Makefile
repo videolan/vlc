@@ -722,9 +722,7 @@ libvorbis-$(VORBIS_VERSION).tar.gz:
 
 libvorbis: libvorbis-$(VORBIS_VERSION).tar.gz
 	$(EXTRACT_GZ)
-ifdef HAVE_WINCE
 	patch -p0 < Patches/vorbis-noapps.patch
-endif
 
 .vorbis: libvorbis .ogg
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
