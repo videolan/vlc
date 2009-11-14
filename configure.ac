@@ -3546,9 +3546,21 @@ AS_IF([test "${enable_kate}" != "no"], [
 
 
 dnl
-dnl  tiger decoder plugin
+dnl  tiger rendering for kate decoder plugin
 dnl
-PKG_ENABLE_MODULES_VLC([TIGER], [], [tiger >= 0.3.1], [Tiger rendering library for Kate streams],[auto])
+AC_ARG_ENABLE(tiger,
+[  --enable-tiger          Tiger rendering library for Kate streams (default enabled)])
+AS_IF([test "${enable_tiger}" != "no"], [
+  PKG_CHECK_MODULES(TIGER,[tiger >= 0.3.1], [
+      AC_DEFINE(HAVE_TIGER, 1, [Define if libtiger is available.])
+      VLC_ADD_CFLAGS([kate],[$TIGER_CFLAGS])
+      VLC_ADD_LIBS([kate],[$TIGER_LIBS]) ],[
+        AS_IF([test "x${enable_tiger}" != "x"], [
+          AC_MSG_ERROR([libtiger does not appear to be installed on your system.])
+        ])
+  ])
+])
+
 
 
 dnl
