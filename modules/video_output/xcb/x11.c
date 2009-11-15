@@ -193,7 +193,7 @@ static int Open (vlc_object_t *obj)
           case 32:
             if (fmt->bits_per_pixel != 32)
                 continue;
-            fmt_pic.i_chroma = VLC_CODEC_RGB32; /* ARGB, we ignore alpha */
+            fmt_pic.i_chroma = VLC_CODEC_RGBA;
             break;
           case 24:
             if (fmt->bits_per_pixel == 32)
