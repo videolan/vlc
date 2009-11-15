@@ -190,6 +190,11 @@ static int Open (vlc_object_t *obj)
         /* Check that the pixmap format is supported by VLC. */
         switch (fmt->depth)
         {
+          case 32:
+            if (fmt->bits_per_pixel != 32)
+                continue;
+            fmt_pic.i_chroma = VLC_CODEC_RGB32; /* ARGB, we ignore alpha */
+            break;
           case 24:
             if (fmt->bits_per_pixel == 32)
                 fmt_pic.i_chroma = VLC_CODEC_RGB32;
