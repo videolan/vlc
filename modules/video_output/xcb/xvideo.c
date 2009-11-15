@@ -320,6 +320,7 @@ static int Open (vlc_object_t *obj)
     /* */
     p_sys->att = NULL;
     p_sys->pool = NULL;
+    p_sys->window = xcb_generate_id (conn);
 
     /* Cache adaptors infos */
     xcb_xv_query_adaptors_reply_t *adaptors =
@@ -418,14 +419,13 @@ static int Open (vlc_object_t *obj)
              if (result == 0)
              {
                  p_sys->port = port;
-                 found_adaptor = true;
-                 break;
+                 goto grabbed_port;
              }
              msg_Dbg (vd, "cannot grab port %"PRIu32, port);
         }
-        if (!found_adaptor)
-            continue;
+        continue; /* No usable port */
 
+    grabbed_port:
         /* Found port - initialize selected format */
         name = strndup (xcb_xv_adaptor_info_name (a), a->name_size);
         if (name != NULL)
@@ -435,6 +435,35 @@ static int Open (vlc_object_t *obj)
         }
         msg_Dbg (vd, "using port %"PRIu32, p_sys->port);
         msg_Dbg (vd, "using image format 0x%"PRIx32, p_sys->id);
+
+        /* Look for an X11 visual, create a window */
+        xcb_xv_format_t *f = xcb_xv_adaptor_info_formats (a);
+        for (uint_fast16_t i = a->num_formats; i > 0; i--, f++)
+        {
+            const uint32_t mask =
+                /* XCB_CW_EVENT_MASK */
+                XCB_EVENT_MASK_VISIBILITY_CHANGE;
+            xcb_void_cookie_t c;
+
+            c = xcb_create_window_checked (conn, f->depth, p_sys->window,
+                 p_sys->embed->handle.xid, 0, 0, 1, 1, 0,
+                 XCB_WINDOW_CLASS_INPUT_OUTPUT, f->visual,
+                 XCB_CW_EVENT_MASK, &mask);
+
+            if (!CheckError (vd, conn, "cannot create X11 window", c))
+            {
+                msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32
+                         " (depth: %"PRIu8")", f->visual, f->depth);
+                msg_Dbg (vd, "using X11 window 0x%08"PRIx32, p_sys->window);
+                goto created_window;
+            }
+        }
+        xcb_xv_ungrab_port (conn, p_sys->port, XCB_CURRENT_TIME);
+        continue; /* No workable XVideo format (visual/depth) */
+
+    created_window:
+        found_adaptor = true;
+        break;
     }
     free (adaptors);
     if (!found_adaptor)
@@ -442,25 +471,9 @@ static int Open (vlc_object_t *obj)
         msg_Err (vd, "no available XVideo adaptor");
         goto error;
     }
-
-    /* Create window */
+    else
     {
-        const uint32_t mask =
-            /* XCB_CW_EVENT_MASK */
-            XCB_EVENT_MASK_VISIBILITY_CHANGE;
-        xcb_void_cookie_t c;
-        xcb_window_t window = xcb_generate_id (conn);
-
-        c = xcb_create_window_checked (conn, screen->root_depth, window,
-                                       p_sys->embed->handle.xid, 0, 0, 1, 1, 0,
-                                       XCB_WINDOW_CLASS_INPUT_OUTPUT,
-                                       screen->root_visual,
-                                       XCB_CW_EVENT_MASK, &mask);
-        if (CheckError (vd, conn, "cannot create X11 window", c))
-            goto error;
-        p_sys->window = window;
-        msg_Dbg (vd, "using X11 window 0x%08"PRIx32, window);
-        xcb_map_window (conn, window);
+        xcb_map_window (conn, p_sys->window);
 
         vout_display_place_t place;
 
@@ -469,10 +482,12 @@ static int Open (vlc_object_t *obj)
         p_sys->height = place.height;
 
         /* */
-        const uint32_t values[] = { place.x, place.y, place.width, place.height };
-        xcb_configure_window (conn, window,
+        const uint32_t values[] = {
+            place.x, place.y, place.width, place.height };
+        xcb_configure_window (conn, p_sys->window,
                               XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y |
-                              XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
+                              XCB_CONFIG_WINDOW_WIDTH |
+                              XCB_CONFIG_WINDOW_HEIGHT,
                               values);
     }
     p_sys->visible = false;
