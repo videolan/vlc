@@ -361,6 +361,11 @@ static void Close( vlc_object_t * );
 #define AUD_TEXT N_("Access unit delimiters")
 #define AUD_LONGTEXT N_( "Generate access unit delimiter NAL units.")
 
+#define LOOKAHEAD_TEXT N_("Framecount to use on frametype lookahead")
+#define LOOKAHEAD_LONGTEXT N_("Framecount to use on frametype lookahead. " \
+    "Currently default is lower than x264 default because unmuxable output" \
+    "doesn't handle larger values that well yet" )
+
 static const char *const enc_me_list[] =
   { "dia", "hex", "umh", "esa", "tesa" };
 static const char *const enc_me_list_text[] =
@@ -585,6 +590,10 @@ vlc_module_begin ()
                  TRELLIS_LONGTEXT, false )
         change_integer_range( 0, 2 )
 
+    add_integer( SOUT_CFG_PREFIX "lookahead", 5, NULL, LOOKAHEAD_TEXT,
+                 LOOKAHEAD_LONGTEXT, false )
+        change_integer_range( 0, 60 )
+
     add_bool( SOUT_CFG_PREFIX "fast-pskip", true, NULL, FAST_PSKIP_TEXT,
               FAST_PSKIP_LONGTEXT, false )
 
@@ -651,7 +660,7 @@ static const char *const ppsz_sout_options[] = {
     "qpmin", "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut",
     "sps-id", "ssim", "stats", "subme", "subpel", "tolerance", "trellis",
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp", "aq-mode",
-    "aq-strength", "psy-rd", "profile", NULL
+    "aq-strength", "psy-rd", "profile", "lookahead", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -1141,7 +1150,7 @@ static int  Open ( vlc_object_t *p_this )
     /* Set lookahead value to lower than default,
      * as rtp-output without mux doesn't handle
      * difference that well yet*/
-    p_sys->param.rc.i_lookahead=5;
+    p_sys->param.rc.i_lookahead= var_GetInteger( p_enc, SOUT_CFG_PREFIX "lookahead" );
 
     /* Open the encoder */
     p_sys->h = x264_encoder_open( &p_sys->param );
