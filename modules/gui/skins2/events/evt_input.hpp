@@ -35,10 +35,7 @@ public:
     virtual ~EvtInput() { }
 
     /// Masks for modifier keys
-    static const int kModNone;
-    static const int kModAlt;
-    static const int kModCtrl;
-    static const int kModShift;
+    enum { kModNone=0, kModAlt=1, kModCtrl=2, kModShift=4 };
 
     /// Get the modifiers
     virtual int getMod() const { return m_mod; }

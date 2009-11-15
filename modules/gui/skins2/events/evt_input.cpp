@@ -24,16 +24,9 @@
 
 #include "evt_input.hpp"
 
-const int EvtInput::kModNone  = 0;
-const int EvtInput::kModAlt   = 1;
-const int EvtInput::kModCtrl  = 2;
-const int EvtInput::kModShift = 4;
 
-
-EvtInput::EvtInput( intf_thread_t *pIntf, int mod ):
-    EvtGeneric( pIntf), m_mod( mod )
-{
-}
+EvtInput::EvtInput( intf_thread_t *pIntf, int mod )
+    : EvtGeneric( pIntf), m_mod( mod ) { }
 
 
 void EvtInput::addModifier( string &rEvtString ) const
@@ -44,21 +37,14 @@ void EvtInput::addModifier( string &rEvtString ) const
     }
     else
     {
-        string modList = ":";
+        string m = ":";
         if( m_mod & kModAlt )
-        {
-            modList += "alt,";
-        }
+            m += "alt,";
         if( m_mod & kModCtrl )
-        {
-            modList += "ctrl,";
-        }
+            m += "ctrl,";
         if( m_mod & kModShift )
-        {
-            modList += "shift,";
-        }
-        // Remove the last ','
-        modList = modList.substr( 0, modList.size() - 1 );
-        rEvtString += modList;
+            m += "shift,";
+        // Append the result except the last ','
+        rEvtString.insert( rEvtString.end(), m.begin(), m.end()-1 );
     }
 }
