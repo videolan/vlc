@@ -120,7 +120,8 @@ static int Open (vlc_object_t *obj)
 
     /* Get window */
     const xcb_screen_t *scr;
-    p_sys->embed = GetWindow (vd, p_sys->conn, &scr, &p_sys->shm);
+    p_sys->embed = GetWindow (vd, p_sys->conn, &scr, &p_sys->depth,
+                              &p_sys->shm);
     if (p_sys->embed == NULL)
     {
         xcb_disconnect (p_sys->conn);
@@ -134,44 +135,83 @@ static int Open (vlc_object_t *obj)
     /* */
     video_format_t fmt_pic = vd->fmt;
 
-    /* Determine our video format. */
+    /* Check that the selected screen supports this depth */
+    xcb_depth_t *d = NULL;
+    for (xcb_depth_iterator_t it = xcb_screen_allowed_depths_iterator (scr);
+         it.rem > 0 && d == NULL;
+         xcb_depth_next (&it))
+        if (it.data->depth == p_sys->depth)
+            d = it.data;
+    if (d == NULL)
+    {
+        msg_Err (obj, "unexpected color depth msimatch");
+        goto error; /* WTH? depth not supported on screen */
+    }
+
+    /* Find a visual type for the selected depth */
     xcb_visualid_t vid = 0;
-    uint8_t depth = 0;
     bool gray = true;
+    const xcb_visualtype_t *vt = xcb_depth_visuals (d);
+    for (int i = xcb_depth_visuals_length (d); i > 0; i--)
+    {
+        if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
+        {
+            vid = vt->visual_id;
+            fmt_pic.i_rmask = vt->red_mask;
+            fmt_pic.i_gmask = vt->green_mask;
+            fmt_pic.i_bmask = vt->blue_mask;
+            gray = false;
+            break;
+        }
+        if (p_sys->depth == 8 && vt->_class == XCB_VISUAL_CLASS_STATIC_GRAY
+         && vid == 0)
+        {
+            vid = vt->visual_id;
+        }
+    }
+
+    if (!vid)
+    {
+        msg_Err (obj, "unexpected visual type mismatch");
+        goto error;
+    }
+    msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32" (depth: %"PRIu8")", vid,
+             p_sys->depth);
+
+    /* Determine our pixel format */
+    p_sys->bpp = 0;
     for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
              *end = fmt + xcb_setup_pixmap_formats_length (setup);
-         fmt < end; fmt++)
+         fmt < end && !p_sys->bpp; fmt++)
     {
-        vlc_fourcc_t chroma = 0;
-
-        if (fmt->depth < depth)
-            continue; /* We already found a better format! */
+        if (fmt->depth != p_sys->depth)
+            continue; /* Wrong depth! */
 
         /* Check that the pixmap format is supported by VLC. */
         switch (fmt->depth)
         {
           case 24:
             if (fmt->bits_per_pixel == 32)
-                chroma = VLC_CODEC_RGB32;
+                fmt_pic.i_chroma = VLC_CODEC_RGB32;
             else if (fmt->bits_per_pixel == 24)
-                chroma = VLC_CODEC_RGB24;
+                fmt_pic.i_chroma = VLC_CODEC_RGB24;
             else
                 continue;
             break;
           case 16:
             if (fmt->bits_per_pixel != 16)
                 continue;
-            chroma = VLC_CODEC_RGB16;
+            fmt_pic.i_chroma = VLC_CODEC_RGB16;
             break;
           case 15:
             if (fmt->bits_per_pixel != 16)
                 continue;
-            chroma = VLC_CODEC_RGB15;
+            fmt_pic.i_chroma = VLC_CODEC_RGB15;
             break;
           case 8:
             if (fmt->bits_per_pixel != 8)
                 continue;
-            chroma = VLC_CODEC_RGB8;
+            fmt_pic.i_chroma = gray ? VLC_CODEC_GREY : VLC_CODEC_RGB8;
             break;
           default:
             continue;
@@ -184,56 +224,17 @@ static int Open (vlc_object_t *obj)
         if (fmt->bits_per_pixel == 16 && setup->image_byte_order != ORDER)
             continue;
 
-        /* Check that the selected screen supports this depth */
-        xcb_depth_iterator_t it = xcb_screen_allowed_depths_iterator (scr);
-        while (it.rem > 0 && it.data->depth != fmt->depth)
-             xcb_depth_next (&it);
-        if (!it.rem)
-            continue; /* Depth not supported on this screen */
-
-        /* Find a visual type for the selected depth */
-        const xcb_visualtype_t *vt = xcb_depth_visuals (it.data);
-        for (int i = xcb_depth_visuals_length (it.data); i > 0; i--)
-        {
-            if (vt->_class == XCB_VISUAL_CLASS_TRUE_COLOR)
-            {
-                gray = false;
-                goto found_vt;
-            }
-            if (fmt->depth == 8 && vt->_class == XCB_VISUAL_CLASS_STATIC_GRAY)
-            {
-                if (!gray)
-                    continue; /* Prefer color over gray scale */
-                chroma = VLC_CODEC_GREY;
-                goto found_vt;
-            }
-        }
-        continue; /* The screen does not *really* support this depth */
-
-    found_vt:
-        fmt_pic.i_chroma = chroma;
-        vid = vt->visual_id;
-        if (!gray)
-        {
-            fmt_pic.i_rmask = vt->red_mask;
-            fmt_pic.i_gmask = vt->green_mask;
-            fmt_pic.i_bmask = vt->blue_mask;
-        }
         p_sys->bpp = fmt->bits_per_pixel;
         p_sys->pad = fmt->scanline_pad;
-        p_sys->depth = depth = fmt->depth;
+        msg_Dbg (vd, " %"PRIu8" bits per pixels, %"PRIu8" bits line pad",
+                 p_sys->bpp, p_sys->pad);
     }
 
-    if (depth == 0)
+    if (!p_sys->bpp)
     {
-        msg_Err (vd, "no supported pixmap formats or visual types");
+        msg_Err (vd, "no supported pixmap formats");
         goto error;
     }
-
-    msg_Dbg (vd, "using X11 visual ID 0x%"PRIx32" (depth: %"PRIu8")", vid,
-             p_sys->depth);
-    msg_Dbg (vd, " %"PRIu8" bits per pixels, %"PRIu8" bits line pad",
-             p_sys->bpp, p_sys->pad);
 
     /* Create colormap (needed to select non-default visual) */
     xcb_colormap_t cmap;
@@ -263,7 +264,8 @@ static int Open (vlc_object_t *obj)
         };
         xcb_void_cookie_t c;
 
-        c = xcb_create_window_checked (p_sys->conn, depth, p_sys->window,
+        c = xcb_create_window_checked (p_sys->conn, p_sys->depth,
+                                       p_sys->window,
                                        p_sys->embed->handle.xid, 0, 0,
                                        width, height, 0,
                                        XCB_WINDOW_CLASS_INPUT_OUTPUT,

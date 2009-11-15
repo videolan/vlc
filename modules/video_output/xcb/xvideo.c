@@ -309,7 +309,8 @@ static int Open (vlc_object_t *obj)
     }
 
     const xcb_screen_t *screen;
-    p_sys->embed = GetWindow (vd, conn, &screen, &p_sys->shm);
+    uint8_t depth;
+    p_sys->embed = GetWindow (vd, conn, &screen, &depth, &p_sys->shm);
     if (p_sys->embed == NULL)
     {
         xcb_disconnect (conn);
@@ -440,6 +441,9 @@ static int Open (vlc_object_t *obj)
         xcb_xv_format_t *f = xcb_xv_adaptor_info_formats (a);
         for (uint_fast16_t i = a->num_formats; i > 0; i--, f++)
         {
+            if (f->depth != depth)
+                continue; /* this would fail anyway */
+
             const uint32_t mask =
                 /* XCB_CW_EVENT_MASK */
                 XCB_EVENT_MASK_VISIBILITY_CHANGE;

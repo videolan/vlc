@@ -42,6 +42,7 @@ xcb_connection_t *Connect (vlc_object_t *obj);
 struct vout_window_t *GetWindow (vout_display_t *obj,
                                  xcb_connection_t *pconn,
                                  const xcb_screen_t **restrict pscreen,
+                                 uint8_t *restrict pdepth,
                                  bool *restrict pshm);
 int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
                    unsigned *restrict width, unsigned *restrict height);

@@ -93,6 +93,7 @@ xcb_connection_t *Connect (vlc_object_t *obj)
 vout_window_t *GetWindow (vout_display_t *vd,
                           xcb_connection_t *conn,
                           const xcb_screen_t **restrict pscreen,
+                          uint8_t *restrict pdepth,
                           bool *restrict pshm)
 {
     /* Get window */
@@ -123,6 +124,7 @@ vout_window_t *GetWindow (vout_display_t *vd,
             goto error;
         }
         root = geo->root;
+        *pdepth = geo->depth;
         free (geo);
 
         /* Subscribe to parent window resize events */
