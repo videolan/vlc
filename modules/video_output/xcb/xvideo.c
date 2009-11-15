@@ -374,7 +374,7 @@ static int Open (vlc_object_t *obj)
             chromas = chromas_default;
 
         vlc_fourcc_t chroma;
-        for (size_t i = 0; chromas[i] && (xfmt == NULL); i++)
+        for (size_t i = 0; chromas[i]; i++)
         {
             chroma = chromas[i];
 
@@ -388,10 +388,22 @@ static int Open (vlc_object_t *obj)
             }
 
             xfmt = FindFormat (vd, chroma, &fmt, a->base_id, r, &p_sys->att);
+            if (xfmt != NULL)
+            {
+                p_sys->id = xfmt->id;
+                fmt.i_chroma = chroma;
+                if (xfmt->type == XCB_XV_IMAGE_FORMAT_INFO_TYPE_RGB)
+                {
+                    fmt.i_rmask = xfmt->red_mask;
+                    fmt.i_gmask = xfmt->green_mask;
+                    fmt.i_bmask = xfmt->blue_mask;
+                }
+                break;
+            }
         }
-
+        free (r);
         if (xfmt == NULL) /* No acceptable image formats */
-            goto skip_adaptor;
+            continue;
 
         /* Grab a port */
         for (unsigned i = 0; i < a->num_ports; i++)
@@ -412,7 +424,7 @@ static int Open (vlc_object_t *obj)
              msg_Dbg (vd, "cannot grab port %"PRIu32, port);
         }
         if (!found_adaptor)
-            goto skip_adaptor;
+            continue;
 
         /* Found port - initialize selected format */
         name = strndup (xcb_xv_adaptor_info_name (a), a->name_size);
@@ -422,19 +434,7 @@ static int Open (vlc_object_t *obj)
             free (name);
         }
         msg_Dbg (vd, "using port %"PRIu32, p_sys->port);
-
-        p_sys->id = xfmt->id;
         msg_Dbg (vd, "using image format 0x%"PRIx32, p_sys->id);
-        fmt.i_chroma = chroma;
-        if (xfmt->type == XCB_XV_IMAGE_FORMAT_INFO_TYPE_RGB)
-        {
-            fmt.i_rmask = xfmt->red_mask;
-            fmt.i_gmask = xfmt->green_mask;
-            fmt.i_bmask = xfmt->blue_mask;
-        }
-
-    skip_adaptor:
-        free (r);
     }
     free (adaptors);
     if (!found_adaptor)
