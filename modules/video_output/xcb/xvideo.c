@@ -698,7 +698,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     {
         const vout_display_cfg_t *cfg;
         const video_format_t *source;
-        bool is_forced;
+        bool is_forced = false;
 
         if (query == VOUT_DISPLAY_CHANGE_SOURCE_ASPECT
          || query == VOUT_DISPLAY_CHANGE_SOURCE_CROP)
