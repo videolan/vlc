@@ -51,6 +51,18 @@ class Instance:
         p._instance=self
         return p
 
+    def media_new(self, mrl, *options):
+        """Create an empty Media Player object
+
+        Options can be specified as supplementary string parameters, e.g.
+        m=i.media_new('foo.avi', 'sub-filter=marq{marquee=Hello}', 'vout-filter=invert')
+        """
+        e=VLCException()
+        m=libvlc_media_new(self, mrl, e)
+        for o in options:
+            libvlc_media_add_option(m, o, e)
+        return m
+
 class MediaControl:
     """Create a new MediaControl instance
 
