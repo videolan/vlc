@@ -601,6 +601,12 @@ void block_FifoWake( block_fifo_t *p_fifo )
     vlc_mutex_unlock( &p_fifo->lock );
 }
 
+/**
+ * Dequeue the first block from the FIFO. If necessary, wait until there is
+ * one block in the queue. This function is (always) cancellation point.
+ *
+ * @return a valid block, or NULL if block_FifoWake() was called.
+ */
 block_t *block_FifoGet( block_fifo_t *p_fifo )
 {
     block_t *b;
@@ -643,6 +649,17 @@ block_t *block_FifoGet( block_fifo_t *p_fifo )
     return b;
 }
 
+/**
+ * Peeks the first block in the FIFO.
+ * If necessary, wait until there is one block.
+ * This function is (always) a cancellation point.
+ *
+ * @warning This function leaves the block in the FIFO.
+ * You need to protect against concurrent threads who could dequeue the block.
+ * Preferrably, there should be only one thread reading from the FIFO.
+ *
+ * @return a valid block.
+ */
 block_t *block_FifoShow( block_fifo_t *p_fifo )
 {
     block_t *b;
