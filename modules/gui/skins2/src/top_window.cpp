@@ -218,7 +218,7 @@ void TopWindow::processEvent( EvtKey &rEvtKey )
     }
 
     // Only do the action when the key is down
-    if( rEvtKey.getAsString().find( "key:down") != string::npos )
+    if( rEvtKey.getKeyState() == EvtKey::kDown )
     {
         //XXX not to be hardcoded!
         // Ctrl-S = Change skin
@@ -240,30 +240,13 @@ void TopWindow::processEvent( EvtKey &rEvtKey )
             return;
         }
 
-        vlc_value_t val;
-        // Set the key
-        val.i_int = rEvtKey.getKey();
-        // Set the modifiers
-        if( rEvtKey.getMod() & EvtInput::kModAlt )
-        {
-            val.i_int |= KEY_MODIFIER_ALT;
-        }
-        if( rEvtKey.getMod() & EvtInput::kModCtrl )
-        {
-            val.i_int |= KEY_MODIFIER_CTRL;
-        }
-        if( rEvtKey.getMod() & EvtInput::kModShift )
-        {
-            val.i_int |= KEY_MODIFIER_SHIFT;
-        }
-
-        var_Set( getIntf()->p_libvlc, "key-pressed", val );
+        var_SetInteger( getIntf()->p_libvlc, "key-pressed",
+                        rEvtKey.getModKey() );
     }
 
     // Always store the modifier, which can be needed for scroll events
     m_currModifier = rEvtKey.getMod();
 }
-
 
 void TopWindow::processEvent( EvtScroll &rEvtScroll )
 {
@@ -289,20 +272,11 @@ void TopWindow::processEvent( EvtScroll &rEvtScroll )
     }
     else
     {
-        // Treat the scroll event as a hotkey
-        vlc_value_t val;
-        if( rEvtScroll.getDirection() == EvtScroll::kUp )
-        {
-            val.i_int = KEY_MOUSEWHEELUP;
-        }
-        else
-        {
-            val.i_int = KEY_MOUSEWHEELDOWN;
-        }
-        // Add the modifiers
-        val.i_int |= m_currModifier;
+        // Treat the scroll event as a hotkey plus current modifiers
+        int i = (rEvtScroll.getDirection() == EvtScroll::kUp ?
+                 KEY_MOUSEWHEELUP : KEY_MOUSEWHEELDOWN) | m_currModifier;
 
-        var_Set( getIntf()->p_libvlc, "key-pressed", val );
+        var_SetInteger( getIntf()->p_libvlc, "key-pressed", i );
     }
 }
 

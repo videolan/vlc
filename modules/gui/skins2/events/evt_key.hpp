@@ -44,6 +44,9 @@ public:
     virtual const string getAsString() const;
 
     int getKey() const { return m_key; }
+    int getModKey() const;
+
+    ActionType_t getKeyState() const { return m_action; }
 
 private:
     /// The concerned key, stored according to the '#define's in vlc_keys.h

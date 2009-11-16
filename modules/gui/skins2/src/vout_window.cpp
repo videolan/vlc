@@ -97,26 +97,8 @@ void VoutWindow::setFullscreen( bool b_fullscreen )
 void VoutWindow::processEvent( EvtKey &rEvtKey )
 {
     // Only do the action when the key is down
-    if( rEvtKey.getAsString().find( "key:down") != string::npos )
-    {
-        vlc_value_t val;
-        // Set the key
-        val.i_int = rEvtKey.getKey();
-        // Set the modifiers
-        if( rEvtKey.getMod() & EvtInput::kModAlt )
-        {
-            val.i_int |= KEY_MODIFIER_ALT;
-        }
-        if( rEvtKey.getMod() & EvtInput::kModCtrl )
-        {
-            val.i_int |= KEY_MODIFIER_CTRL;
-        }
-        if( rEvtKey.getMod() & EvtInput::kModShift )
-        {
-            val.i_int |= KEY_MODIFIER_SHIFT;
-        }
-
-        var_Set( getIntf()->p_libvlc, "key-pressed", val );
-    }
+    if( rEvtKey.getKeyState() == EvtKey::kDown )
+        var_SetInteger( getIntf()->p_libvlc, "key-pressed",
+                         rEvtKey.getModKey() );
 }
 
