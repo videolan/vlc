@@ -566,25 +566,26 @@ void block_FifoPace (block_fifo_t *fifo, size_t max_depth, size_t max_size)
  * Immediately queue one block at the end of a FIFO.
  * @param fifo queue
  * @param block head of a block list to queue (may be NULL)
+ * @return total number of bytes appended to the queue
  */
 size_t block_FifoPut( block_fifo_t *p_fifo, block_t *p_block )
 {
-    size_t i_size = 0;
-    vlc_mutex_lock( &p_fifo->lock );
+    size_t i_size = 0, i_depth = 0;
 
-    while (p_block != NULL)
+    if (p_block == NULL)
+        return 0;
+    for (block_t *b = p_block; b != NULL; b = b->p_next)
     {
-        i_size += p_block->i_buffer;
-
-        *p_fifo->pp_last = p_block;
-        p_fifo->pp_last = &p_block->p_next;
-        p_fifo->i_depth++;
-        p_fifo->i_size += p_block->i_buffer;
-
-        p_block = p_block->p_next;
+        i_size += b->i_buffer;
+        i_depth++;
     }
 
-    /* We queued one block: wake up one read-waiting thread */
+    vlc_mutex_lock (&p_fifo->lock);
+    *p_fifo->pp_last = p_block;
+    p_fifo->pp_last = &p_block->p_next;
+    p_fifo->i_depth += i_depth;
+    p_fifo->i_size += i_size;
+    /* We queued at least one block: wake up one read-waiting thread */
     vlc_cond_signal( &p_fifo->wait );
     vlc_mutex_unlock( &p_fifo->lock );
 
