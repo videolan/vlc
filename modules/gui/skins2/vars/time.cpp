@@ -45,12 +45,9 @@ const string StreamTime::getAsStringPercent() const
 {
     int value = (int)(100. * get());
     // 0 <= value <= 100, so we need 4 chars
-    char *str = new char[4];
+    char str[4];
     snprintf( str, 4, "%d", value );
-    string ret = str;
-    delete[] str;
-
-    return ret;
+    return string(str);
 }
 
 
@@ -121,7 +118,7 @@ const string StreamTime::getAsStringDuration( bool bShortFormat ) const
 
 const string StreamTime::formatTime( int seconds, bool bShortFormat ) const
 {
-    char *psz_time = new char[MSTRTIME_MAX_SIZE];
+    char psz_time[MSTRTIME_MAX_SIZE];
     if( bShortFormat && (seconds < 60 * 60) )
     {
         snprintf( psz_time, MSTRTIME_MAX_SIZE, "%02d:%02d",
@@ -135,9 +132,5 @@ const string StreamTime::formatTime( int seconds, bool bShortFormat ) const
                   (int) (seconds / 60 % 60),
                   (int) (seconds % 60) );
     }
-
-    string ret = psz_time;
-    delete[] psz_time;
-
-    return ret;
+    return string(psz_time);
 }
