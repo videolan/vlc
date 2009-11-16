@@ -583,33 +583,40 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
 
     if( i_request )
     {
-        asprintf( &psz_tmp, "QUERY_STRING=%s", p_request );
+        if( -1==asprintf( &psz_tmp, "QUERY_STRING=%s", p_request ) )
+            psz_tmp = NULL;
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
-        asprintf( &psz_tmp, "REQUEST_URI=%s?%s", p_url, p_request );
+        if( -1==asprintf( &psz_tmp, "REQUEST_URI=%s?%s", p_url, p_request ) )
+            psz_tmp = NULL;
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
     else
     {
-        asprintf( &psz_tmp, "REQUEST_URI=%s", p_url );
+        if( -1==asprintf( &psz_tmp, "REQUEST_URI=%s", p_url ) )
+            psz_tmp = NULL;
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
-    asprintf( &psz_tmp, "SCRIPT_NAME=%s", p_url );
+    if( -1==asprintf( &psz_tmp, "SCRIPT_NAME=%s", p_url ) )
+        psz_tmp = NULL;
     TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
 #define p_sys p_args->file.p_intf->p_sys
-    asprintf( &psz_tmp, "SERVER_NAME=%s", p_sys->psz_address );
+    if( -1==asprintf( &psz_tmp, "SERVER_NAME=%s", p_sys->psz_address ) )
+        psz_tmp = NULL;
     TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
-    asprintf( &psz_tmp, "SERVER_PORT=%u", p_sys->i_port );
+    if( -1==asprintf( &psz_tmp, "SERVER_PORT=%u", p_sys->i_port ) )
+        psz_tmp = NULL;
     TAB_APPEND( i_env, ppsz_env, psz_tmp );
 #undef p_sys
 
     p = getenv( "PATH" );
     if( p != NULL )
     {
-        asprintf( &psz_tmp, "PATH=%s", p );
+        if( -1==asprintf( &psz_tmp, "PATH=%s", p ) )
+            psz_tmp = NULL;
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
@@ -617,20 +624,23 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
     p = getenv( "windir" );
     if( p != NULL )
     {
-        asprintf( &psz_tmp, "SYSTEMROOT=%s", p );
+        if( -1==asprintf( &psz_tmp, "SYSTEMROOT=%s", p ) )
+            psz_tmp = NULL;
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 #endif
 
     if( psz_remote_addr != NULL && *psz_remote_addr )
     {
-        asprintf( &psz_tmp, "REMOTE_ADDR=%s", psz_remote_addr );
+        if( -1==asprintf( &psz_tmp, "REMOTE_ADDR=%s", psz_remote_addr ) )
+            psz_tmp = NULL;
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
     if( psz_remote_host != NULL && *psz_remote_host )
     {
-        asprintf( &psz_tmp, "REMOTE_HOST=%s", psz_remote_host );
+        if( -1==asprintf( &psz_tmp, "REMOTE_HOST=%s", psz_remote_host ) )
+            psz_tmp = NULL;
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
     }
 
@@ -645,7 +655,8 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
                 if( end == NULL )
                     break;
                 *end = '\0';
-                asprintf( &psz_tmp, "CONTENT_TYPE=%s", p );
+                if( -1==asprintf( &psz_tmp, "CONTENT_TYPE=%s", p ) )
+                    psz_tmp = NULL;
                 TAB_APPEND( i_env, ppsz_env, psz_tmp );
                 *end = '\r';
             }
@@ -656,7 +667,8 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
                 if( end == NULL )
                     break;
                 *end = '\0';
-                asprintf( &psz_tmp, "CONTENT_LENGTH=%s", p );
+                if( -1==asprintf( &psz_tmp, "CONTENT_LENGTH=%s", p ) )
+                    psz_tmp = NULL;
                 TAB_APPEND( i_env, ppsz_env, psz_tmp );
                 *end = '\r';
             }
@@ -675,7 +687,8 @@ int  HandlerCallback( httpd_handler_sys_t *p_args,
     if( psz_file != NULL )
     {
         psz_file++;
-        asprintf( &psz_tmp, "SCRIPT_FILENAME=%s", psz_file );
+        if( -1==asprintf( &psz_tmp, "SCRIPT_FILENAME=%s", psz_file ) )
+            psz_tmp = NULL;
         TAB_APPEND( i_env, ppsz_env, psz_tmp );
 
         TAB_APPEND( p_args->p_association->i_argc,
@@ -818,6 +831,8 @@ int  ArtCallback( httpd_handler_sys_t *p_args,
                 "\n"
         i_header_size = asprintf( &psz_header, HEADER, psz_ext, i_data );
 #undef HEADER
+
+        assert( i_header_size != -1 );
 
         *pi_data = i_header_size + i_data;
         *pp_data = (uint8_t*)malloc( *pi_data );
