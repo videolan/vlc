@@ -44,7 +44,7 @@ public:
     virtual const string getAsString() const;
 
     int getKey() const { return m_key; }
-    int getModKey() const;
+    int getModKey() const { return m_key | getMod(); }
 
     ActionType_t getKeyState() const { return m_action; }
 

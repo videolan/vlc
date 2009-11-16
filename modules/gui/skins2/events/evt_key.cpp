@@ -53,14 +53,3 @@ const string EvtKey::getAsString() const
 
     return event;
 }
-
-int EvtKey::getModKey() const {
-    int i = getKey();
-    if( getMod() & kModAlt )
-        i |= KEY_MODIFIER_ALT;
-    if( getMod() & kModCtrl )
-        i |= KEY_MODIFIER_CTRL;
-    if( getMod() & kModShift )
-        i |= KEY_MODIFIER_SHIFT;
-}
-

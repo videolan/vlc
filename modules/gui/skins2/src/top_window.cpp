@@ -244,7 +244,7 @@ void TopWindow::processEvent( EvtKey &rEvtKey )
                         rEvtKey.getModKey() );
     }
 
-    // Always store the modifier, which can be needed for scroll events
+    // Always store the modifier, which can be needed for scroll events.
     m_currModifier = rEvtKey.getMod();
 }
 

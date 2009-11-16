@@ -23,7 +23,15 @@
  *****************************************************************************/
 
 #include "evt_input.hpp"
+#include "vlc_keys.h"
 
+const int
+    EvtInput::kModNone=0,
+    EvtInput::kModAlt=KEY_MODIFIER_ALT,
+    EvtInput::kModShift=KEY_MODIFIER_SHIFT,
+    EvtInput::kModCtrl=KEY_MODIFIER_CTRL,
+    EvtInput::kModMeta=KEY_MODIFIER_META,
+    EvtInput::kModCmd=KEY_MODIFIER_COMMAND;
 
 EvtInput::EvtInput( intf_thread_t *pIntf, int mod )
     : EvtGeneric( pIntf), m_mod( mod ) { }
@@ -44,6 +52,10 @@ void EvtInput::addModifier( string &rEvtString ) const
             m += "ctrl,";
         if( m_mod & kModShift )
             m += "shift,";
+        if( m_mod & kModMeta )
+            m += "meta,";
+        if( m_mod & kModCmd )
+            m += "cmd,";
         // Append the result except the last ','
         rEvtString.insert( rEvtString.end(), m.begin(), m.end()-1 );
     }

@@ -27,7 +27,6 @@
 
 #include "evt_generic.hpp"
 
-
 /// Base class for mouse and key events
 class EvtInput: public EvtGeneric
 {
@@ -35,16 +34,17 @@ public:
     virtual ~EvtInput() { }
 
     /// Masks for modifier keys
-    enum { kModNone=0, kModAlt=1, kModCtrl=2, kModShift=4 };
+    static const int
+        kModNone, kModAlt, kModShift, kModCtrl, kModMeta, kModCmd;
 
     /// Get the modifiers
-    virtual int getMod() const { return m_mod; }
+    int getMod() const { return m_mod; }
 
 protected:
     EvtInput( intf_thread_t *pIntf, int mod = kModNone );
 
     /// Add the modifier to the event string
-    virtual void addModifier( string &rEvtString ) const;
+    void addModifier( string &rEvtString ) const;
 
 private:
     /// Modifiers (special key(s) pressed during the mouse event)
