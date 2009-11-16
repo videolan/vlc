@@ -111,6 +111,8 @@ static block_t *DoWork( filter_t * p_filter, block_t *p_in_buf )
     vlc_memset( p_out + 8 + i_frame_size * 2, 0,
                 AOUT_SPDIF_SIZE - i_frame_size * 2 - 8 );
 
+    p_out_buf->i_dts = p_in_buf->i_dts;
+    p_out_buf->i_pts = p_in_buf->i_pts;
     p_out_buf->i_nb_samples = p_in_buf->i_nb_samples;
     p_out_buf->i_buffer = AOUT_SPDIF_SIZE;
 out:

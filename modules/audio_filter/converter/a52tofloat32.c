@@ -353,7 +353,9 @@ static int OpenFilter( vlc_object_t *p_this )
     filter_sys_t *p_sys;
     int i_ret;
 
-    if( p_filter->fmt_in.i_codec != VLC_CODEC_A52  )
+    if( p_filter->fmt_in.i_codec != VLC_CODEC_A52 ||
+        p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFB ||
+        p_filter->fmt_out.audio.i_format == VLC_CODEC_SPDIFL )
     {
         return VLC_EGENERIC;
     }
