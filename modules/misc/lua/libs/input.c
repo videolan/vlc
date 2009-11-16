@@ -167,6 +167,7 @@ static int vlclua_input_stats( lua_State *L )
     lua_newtable( L );
     if( p_item )
     {
+        vlc_mutex_lock( &p_item->p_stats->lock );
 #define STATS_INT( n ) lua_pushinteger( L, p_item->p_stats->i_ ## n ); \
                        lua_setfield( L, -2, #n );
 #define STATS_FLOAT( n ) lua_pushnumber( L, p_item->p_stats->f_ ## n ); \
@@ -186,6 +187,7 @@ static int vlclua_input_stats( lua_State *L )
         STATS_FLOAT( send_bitrate )
 #undef STATS_INT
 #undef STATS_FLOAT
+        vlc_mutex_unlock( &p_item->p_stats->lock );
     }
     if( p_input )
         vlc_object_release( p_input );
