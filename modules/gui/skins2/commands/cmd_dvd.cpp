@@ -84,10 +84,7 @@ void CmdDvdRootMenu::execute()
 
     if( p_input )
     {
-        vlc_value_t val;
-        val.i_int = 2;
-
-        var_Set( p_input, "title  0", val);
+        var_SetInteger( p_input, "title  0", 2);
         vlc_object_release( p_input );
     }
 }

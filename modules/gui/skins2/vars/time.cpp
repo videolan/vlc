@@ -32,12 +32,7 @@ void StreamTime::set( float percentage, bool updateVLC )
 
     // Avoid looping forever...
     if( updateVLC && getIntf()->p_sys->p_input )
-    {
-        vlc_value_t pos;
-        pos.f_float = percentage;
-
-        var_Set( getIntf()->p_sys->p_input, "position", pos );
-    }
+        var_SetFloat( getIntf()->p_sys->p_input, "position", percentage );
 }
 
 
