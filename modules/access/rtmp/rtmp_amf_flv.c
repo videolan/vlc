@@ -878,6 +878,7 @@ rtmp_build_flv_over_rtmp( rtmp_control_thread_t *p_thread, block_t *p_buffer )
     return rtmp_packet;
 }
 
+/* This function must be cancellation-safe! */
 rtmp_packet_t *
 rtmp_read_net_packet( rtmp_control_thread_t *p_thread )
 {
@@ -1288,8 +1289,6 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
                         }
                         else if( strcmp( "NetConnection.Connect.InvalidApp", string2 ) == 0 )
                         {
-                            p_thread->b_die = 1; 
-
                             vlc_mutex_lock( &p_thread->lock );
                             vlc_cond_signal( &p_thread->wait );
                             vlc_mutex_unlock( &p_thread->lock );

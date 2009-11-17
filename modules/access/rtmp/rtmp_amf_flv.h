@@ -66,6 +66,7 @@ struct rtmp_control_thread_t
 
     vlc_mutex_t lock;
     vlc_cond_t  wait;
+    vlc_thread_t thread;
 
     int result_connect;
     int result_publish;
