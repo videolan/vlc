@@ -96,7 +96,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_thread =
         vlc_object_create( p_access, sizeof( rtmp_control_thread_t ) );
     if( !p_sys->p_thread )
+    {
+        free( p_sys );
         return VLC_ENOMEM;
+    }
     vlc_object_attach( p_sys->p_thread, p_access );
 
     /* Parse URI - remove spaces */
@@ -247,10 +250,9 @@ error2:
     if( p_sys->p_thread->fd != -1 )
         net_Close( p_sys->p_thread->fd );
 error:
+    vlc_UrlClean( &p_sys->p_thread->url );
     vlc_object_detach( p_sys->p_thread );
     vlc_object_release( p_sys->p_thread );
-
-    vlc_UrlClean( &p_sys->p_thread->url );
     free( p_sys );
 
     return VLC_EGENERIC;
