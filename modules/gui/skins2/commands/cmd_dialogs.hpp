@@ -72,8 +72,6 @@ DEFC( HideMiscPopupMenu,  showPopupMenu(false,INTF_DIALOG_MISCPOPUPMENU) )
 
 #undef DEFC
 
-#undef  DEF
-
 class CmdInteraction: public CmdGeneric
 {
 public:
