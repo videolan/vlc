@@ -31,33 +31,8 @@
 
 #include <vlc_interface.h>
 
-#define DEFINE_DIALOGS \
-    DEF( ChangeSkin,         showChangeSkin() ) \
-    DEF( FileSimple,         showFileSimple( true ) ) \
-    DEF( File,               showFile( true ) ) \
-    DEF( Disc,               showDisc( true ) ) \
-    DEF( Net,                showNet( true ) ) \
-    DEF( Messages,           showMessages() ) \
-    DEF( Prefs,              showPrefs() ) \
-    DEF( FileInfo,           showFileInfo() ) \
-    \
-    DEF( Add,                showFile( false ) ) \
-    DEF( PlaylistLoad,       showPlaylistLoad() ) \
-    DEF( PlaylistSave,       showPlaylistSave() ) \
-    DEF( Directory,          showDirectory( true ) ) \
-    DEF( StreamingWizard,    showStreamingWizard() ) \
-    DEF( Playlist,           showPlaylist() ) \
-    \
-    DEF( ShowPopupMenu,      showPopupMenu(true,INTF_DIALOG_POPUPMENU) ) \
-    DEF( HidePopupMenu,      showPopupMenu(false,INTF_DIALOG_POPUPMENU) ) \
-    DEF( ShowAudioPopupMenu, showPopupMenu(true,INTF_DIALOG_AUDIOPOPUPMENU) ) \
-    DEF( HideAudioPopupMenu, showPopupMenu(false,INTF_DIALOG_AUDIOPOPUPMENU) ) \
-    DEF( ShowVideoPopupMenu, showPopupMenu(true,INTF_DIALOG_VIDEOPOPUPMENU) ) \
-    DEF( HideVideoPopupMenu, showPopupMenu(false,INTF_DIALOG_VIDEOPOPUPMENU) ) \
-    DEF( ShowMiscPopupMenu,  showPopupMenu(true,INTF_DIALOG_MISCPOPUPMENU) ) \
-    DEF( HideMiscPopupMenu,  showPopupMenu(false,INTF_DIALOG_MISCPOPUPMENU) )
 
-#define DEF( a, c ) \
+#define DEFC( a, c ) \
 class CmdDlg##a: public CmdGeneric                              \
 {   public:                                                     \
     CmdDlg##a( intf_thread_t *pIntf ): CmdGeneric( pIntf ) { }  \
@@ -70,7 +45,32 @@ class CmdDlg##a: public CmdGeneric                              \
     virtual string getType() const { return #a" dialog"; }      \
 };
 
-DEFINE_DIALOGS
+DEFC( ChangeSkin,         showChangeSkin() )
+DEFC( FileSimple,         showFileSimple( true ) )
+DEFC( File,               showFile( true ) )
+DEFC( Disc,               showDisc( true ) )
+DEFC( Net,                showNet( true ) )
+DEFC( Messages,           showMessages() )
+DEFC( Prefs,              showPrefs() )
+DEFC( FileInfo,           showFileInfo() )
+
+DEFC( Add,                showFile( false ) )
+DEFC( PlaylistLoad,       showPlaylistLoad() )
+DEFC( PlaylistSave,       showPlaylistSave() )
+DEFC( Directory,          showDirectory( true ) )
+DEFC( StreamingWizard,    showStreamingWizard() )
+DEFC( Playlist,           showPlaylist() )
+
+DEFC( ShowPopupMenu,      showPopupMenu(true,INTF_DIALOG_POPUPMENU) )
+DEFC( HidePopupMenu,      showPopupMenu(false,INTF_DIALOG_POPUPMENU) )
+DEFC( ShowAudioPopupMenu, showPopupMenu(true,INTF_DIALOG_AUDIOPOPUPMENU) )
+DEFC( HideAudioPopupMenu, showPopupMenu(false,INTF_DIALOG_AUDIOPOPUPMENU) )
+DEFC( ShowVideoPopupMenu, showPopupMenu(true,INTF_DIALOG_VIDEOPOPUPMENU) )
+DEFC( HideVideoPopupMenu, showPopupMenu(false,INTF_DIALOG_VIDEOPOPUPMENU) )
+DEFC( ShowMiscPopupMenu,  showPopupMenu(true,INTF_DIALOG_MISCPOPUPMENU) )
+DEFC( HideMiscPopupMenu,  showPopupMenu(false,INTF_DIALOG_MISCPOPUPMENU) )
+
+#undef DEFC
 
 class CmdInteraction: public CmdGeneric
 {
