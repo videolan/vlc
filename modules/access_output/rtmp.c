@@ -404,6 +404,7 @@ static void* ThreadControl( vlc_object_t *p_this )
         else
         {
             /* Sometimes server close connection too soon */
+#warning Locking bug here.
             if( p_thread->result_connect )
             {
                 vlc_mutex_lock( &p_thread->lock );

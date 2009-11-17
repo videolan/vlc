@@ -1277,6 +1277,7 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
                     msg_Dbg( p_thread, "key: %s value: %s", string, string2 );
                     if( strcmp( "code", string ) == 0 )
                     {
+#warning Locking bugs here.
                         if( strcmp( "NetConnection.Connect.Success", string2 ) == 0 )
                         {
                             p_thread->result_connect = 0;

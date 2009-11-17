@@ -351,8 +351,10 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             if( !p_sys->p_thread->metadata_received )
             {
                 /* Wait until enough data is received for extracting metadata */
+#warning This is not thread-safe (because block_FifoCount() is not)!
                 if( block_FifoCount( p_sys->p_thread->p_fifo_input ) < 10 )
                 {
+#warning This is wrong!
                     msleep(100000);
                     continue;
                 }
@@ -549,6 +551,7 @@ static void* ThreadControl( vlc_object_t *p_this )
             /* Sometimes server close connection too soon */
             if( p_thread->result_connect )
             {
+#warning There must be a bug here!
                 vlc_mutex_lock( &p_thread->lock );
                 vlc_cond_signal( &p_thread->wait );
                 vlc_mutex_unlock( &p_thread->lock );
