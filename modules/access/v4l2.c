@@ -468,7 +468,7 @@ static const struct
  *
  * Try YUV chromas first, then RGB little endian and MJPEG as last resort.
  */
-static const __u32 p_chroma_fallbacks[] =
+static const uint32_t p_chroma_fallbacks[] =
 { V4L2_PIX_FMT_YUV420, V4L2_PIX_FMT_YVU420, V4L2_PIX_FMT_YUV422P,
   V4L2_PIX_FMT_YUYV, V4L2_PIX_FMT_UYVY, V4L2_PIX_FMT_BGR24,
   V4L2_PIX_FMT_BGR32, V4L2_PIX_FMT_MJPEG, V4L2_PIX_FMT_JPEG };
@@ -568,6 +568,7 @@ struct demux_sys_t
 
 #ifdef HAVE_LIBV4L2
     /* */
+    int (*pf_open)(const char *, int, ...);
     int (*pf_close)( int );
     int (*pf_dup)( int );
     int (*pf_ioctl)( int, unsigned long int, ... );
@@ -581,6 +582,7 @@ struct demux_sys_t
 #ifdef HAVE_LIBV4L2
 static void use_kernel_v4l2( demux_sys_t *p_sys )
 {
+    p_sys->pf_open = utf8_open;
     p_sys->pf_close = close;
     p_sys->pf_dup = dup;
     p_sys->pf_ioctl = ioctl;
@@ -592,6 +594,7 @@ static void use_kernel_v4l2( demux_sys_t *p_sys )
 
 static void use_libv4l2( demux_sys_t *p_sys )
 {
+    p_sys->pf_open = v4l2_open;
     p_sys->pf_close = v4l2_close;
     p_sys->pf_dup = v4l2_dup;
     p_sys->pf_ioctl = v4l2_ioctl;
@@ -601,6 +604,7 @@ static void use_libv4l2( demux_sys_t *p_sys )
     p_sys->b_libv4l2 = true;
 }
 
+#   define v4l2_open (p_sys->pf_open)
 #   define v4l2_close (p_sys->pf_close)
 #   define v4l2_dup (p_sys->pf_dup)
 #   define v4l2_ioctl (p_sys->pf_ioctl)
@@ -608,6 +612,7 @@ static void use_libv4l2( demux_sys_t *p_sys )
 #   define v4l2_mmap (p_sys->pf_mmap)
 #   define v4l2_munmap (p_sys->pf_munmap)
 #else
+#   define v4l2_open utf8_open
 #   define v4l2_close close
 #   define v4l2_dup dup
 #   define v4l2_ioctl ioctl
@@ -1816,7 +1821,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
     const char *psz_device = p_sys->psz_device;
     es_format_t es_fmt;
 
-    if( ( i_fd = utf8_open( psz_device, O_RDWR ) ) < 0 )
+    if( ( i_fd = v4l2_open( psz_device, O_RDWR ) ) < 0 )
     {
         msg_Err( p_obj, "cannot open device (%m)" );
         goto open_failed;
@@ -2377,7 +2382,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
 
     int i_fd;
 
-    if( ( i_fd = utf8_open( psz_device, O_RDWR ) ) < 0 )
+    if( ( i_fd = v4l2_open( psz_device, O_RDWR ) ) < 0 )
     {
         msg_Err( p_obj, "cannot open video device '%s' (%m)", psz_device );
         goto open_failed;
