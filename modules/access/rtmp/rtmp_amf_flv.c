@@ -894,7 +894,7 @@ rtmp_read_net_packet( rtmp_control_thread_t *p_thread )
         if( i_ret != 1 )
             goto error;
 
-        length_header = rtmp_decode_header_size( (vlc_object_t *) p_thread,
+        length_header = rtmp_decode_header_size( VLC_OBJECT(p_thread),
                                           p_read[0] & RTMP_HEADER_SIZE_MASK );
         stream_index = p_read[0] & RTMP_HEADER_STREAM_INDEX_MASK;
         header = p_thread->rtmp_headers_recv+stream_index;
@@ -956,7 +956,7 @@ rtmp_read_net_packet( rtmp_control_thread_t *p_thread )
         if( header->length_body == header->body->length_body )
         {
             rtmp_packet_t *rpkt = (rtmp_packet_t*)malloc(sizeof(rtmp_packet_t));
-            if( !rpkt ) goto error;
+            if( !rpkt ) return NULL;
 
             rpkt->stream_index       = stream_index;
             rpkt->timestamp          = header->timestamp;
