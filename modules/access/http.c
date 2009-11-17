@@ -59,7 +59,7 @@
 #endif
 
 #ifdef WIN32
-#   include <Windows.h>
+#   include <windows.h>
 #endif
 
 /*****************************************************************************
