@@ -64,6 +64,9 @@
 #include <linux/videodev.h>
 #include "videodev_mjpeg.h"
 
+#ifdef HAVE_LIBV4L1
+#include <libv4l1.h>
+#endif
 /*****************************************************************************
  * Module descriptior
  *****************************************************************************/
@@ -280,6 +283,14 @@ struct demux_sys_t
     es_out_id_t  *p_es;
 };
 
+#ifndef HAVE_LIBV4L1
+#   define v4l1_close close
+#   define v4l1_ioctl ioctl
+#   define v4l1_mmap mmap
+#   define v4l1_munmap munmap
+#   define v4l1_open utf8_open
+#endif
+
 /*****************************************************************************
  * Open: opens v4l device
  *****************************************************************************
@@ -391,21 +402,21 @@ static void Close( vlc_object_t *p_this )
     demux_sys_t *p_sys   = p_demux->p_sys;
 
     free( p_sys->psz_device );
-    if( p_sys->i_fd >= 0 ) close( p_sys->i_fd );
+    if( p_sys->i_fd >= 0 ) v4l1_close( p_sys->i_fd );
 
     if( p_sys->b_mjpeg )
     {
         int i_noframe = -1;
-        ioctl( p_sys->i_fd, MJPIOC_QBUF_CAPT, &i_noframe );
+        v4l1_ioctl( p_sys->i_fd, MJPIOC_QBUF_CAPT, &i_noframe );
     }
 
     if( p_sys->p_video_mmap && p_sys->p_video_mmap != MAP_FAILED )
     {
         if( p_sys->b_mjpeg )
-            munmap( p_sys->p_video_mmap, p_sys->mjpeg_buffers.size *
+            v4l1_munmap( p_sys->p_video_mmap, p_sys->mjpeg_buffers.size *
                     p_sys->mjpeg_buffers.count );
         else
-            munmap( p_sys->p_video_mmap, p_sys->vid_mbuf.size );
+            v4l1_munmap( p_sys->p_video_mmap, p_sys->vid_mbuf.size );
     }
 
     free( p_sys );
@@ -682,13 +693,13 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
     struct mjpeg_params mjpeg;
     int i;
 
-    if( ( i_fd = utf8_open( psz_device, O_RDWR ) ) < 0 )
+    if( ( i_fd = v4l1_open( psz_device, O_RDWR ) ) < 0 )
     {
         msg_Err( p_demux, "cannot open device (%m)" );
         goto vdev_failed;
     }
 
-    if( ioctl( i_fd, VIDIOCGCAP, &p_sys->vid_cap ) < 0 )
+    if( v4l1_ioctl( i_fd, VIDIOCGCAP, &p_sys->vid_cap ) < 0 )
     {
         msg_Err( p_demux, "cannot get capabilities (%m)" );
         goto vdev_failed;
@@ -733,7 +744,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
     }
 
     vid_channel.channel = p_sys->i_channel;
-    if( ioctl( i_fd, VIDIOCGCHAN, &vid_channel ) < 0 )
+    if( v4l1_ioctl( i_fd, VIDIOCGCHAN, &vid_channel ) < 0 )
     {
         msg_Err( p_demux, "cannot get channel infos (%m)" );
         goto vdev_failed;
@@ -750,7 +761,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
     }
 
     vid_channel.norm = p_sys->i_norm;
-    if( ioctl( i_fd, VIDIOCSCHAN, &vid_channel ) < 0 )
+    if( v4l1_ioctl( i_fd, VIDIOCSCHAN, &vid_channel ) < 0 )
     {
         msg_Err( p_demux, "cannot set channel (%m)" );
         goto vdev_failed;
@@ -765,7 +776,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
         if( p_sys->i_tuner >= 0 )
         {
             vid_tuner.tuner = p_sys->i_tuner;
-            if( ioctl( i_fd, VIDIOCGTUNER, &vid_tuner ) < 0 )
+            if( v4l1_ioctl( i_fd, VIDIOCGTUNER, &vid_tuner ) < 0 )
             {
                 msg_Err( p_demux, "cannot get tuner (%m)" );
                 goto vdev_failed;
@@ -780,7 +791,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
 
             /* FIXME FIXME to be checked FIXME FIXME */
             //vid_tuner.mode = p_sys->i_norm;
-            if( ioctl( i_fd, VIDIOCSTUNER, &vid_tuner ) < 0 )
+            if( v4l1_ioctl( i_fd, VIDIOCSTUNER, &vid_tuner ) < 0 )
             {
                 msg_Err( p_demux, "cannot set tuner (%m)" );
                 goto vdev_failed;
@@ -796,7 +807,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
         if( p_sys->i_frequency >= 0 )
         {
             int driver_frequency = p_sys->i_frequency * 16 /1000;
-            if( ioctl( i_fd, VIDIOCSFREQ, &driver_frequency ) < 0 )
+            if( v4l1_ioctl( i_fd, VIDIOCSFREQ, &driver_frequency ) < 0 )
             {
                 msg_Err( p_demux, "cannot set frequency (%m)" );
                 goto vdev_failed;
@@ -815,7 +826,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
         if( p_sys->i_audio >= 0 )
         {
             vid_audio.audio = p_sys->i_audio;
-            if( ioctl( i_fd, VIDIOCGAUDIO, &vid_audio ) < 0 )
+            if( v4l1_ioctl( i_fd, VIDIOCGAUDIO, &vid_audio ) < 0 )
             {
                 msg_Err( p_demux, "cannot get audio (%m)" );
                 goto vdev_failed;
@@ -824,7 +835,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
             /* unmute audio */
             vid_audio.flags &= ~VIDEO_AUDIO_MUTE;
 
-            if( ioctl( i_fd, VIDIOCSAUDIO, &vid_audio ) < 0 )
+            if( v4l1_ioctl( i_fd, VIDIOCSAUDIO, &vid_audio ) < 0 )
             {
                 msg_Err( p_demux, "cannot set audio (%m)" );
                 goto vdev_failed;
@@ -840,7 +851,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
         struct quicktime_mjpeg_app1 p_app1;
         int32_t i_offset;
 
-        if( ioctl( i_fd, MJPIOC_G_PARAMS, &mjpeg ) < 0 )
+        if( v4l1_ioctl( i_fd, MJPIOC_G_PARAMS, &mjpeg ) < 0 )
         {
             msg_Err( p_demux, "cannot get mjpeg params (%m)" );
             goto vdev_failed;
@@ -890,7 +901,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
          * optional.  They will be present in the output. */
         mjpeg.jpeg_markers = JPEG_MARKER_DHT | JPEG_MARKER_DQT;
 
-        if( ioctl( i_fd, MJPIOC_S_PARAMS, &mjpeg ) < 0 )
+        if( v4l1_ioctl( i_fd, MJPIOC_S_PARAMS, &mjpeg ) < 0 )
         {
             msg_Err( p_demux, "cannot set mjpeg params (%m)" );
             goto vdev_failed;
@@ -906,7 +917,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
     {
         struct video_window vid_win;
 
-        if( ioctl( i_fd, VIDIOCGWIN, &vid_win ) < 0 )
+        if( v4l1_ioctl( i_fd, VIDIOCGWIN, &vid_win ) < 0 )
         {
             msg_Err( p_demux, "cannot get win (%m)" );
             goto vdev_failed;
@@ -933,7 +944,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
     if( !p_sys->b_mjpeg )
     {
         /* set hue/color/.. */
-        if( ioctl( i_fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
+        if( v4l1_ioctl( i_fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
         {
             struct video_picture vid_picture = p_sys->vid_picture;
 
@@ -953,7 +964,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
             {
                 vid_picture.contrast = p_sys->i_contrast;
             }
-            if( ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
+            if( v4l1_ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
             {
                 msg_Dbg( p_demux, "v4l device uses brightness: %d",
                          vid_picture.brightness );
@@ -967,7 +978,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
         }
 
         /* Find out video format used by device */
-        if( ioctl( i_fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
+        if( v4l1_ioctl( i_fd, VIDIOCGPICT, &p_sys->vid_picture ) == 0 )
         {
             struct video_picture vid_picture = p_sys->vid_picture;
             char *psz;
@@ -996,7 +1007,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
             free( psz );
 
             if( vid_picture.palette &&
-                !ioctl( i_fd, VIDIOCSPICT, &vid_picture ) )
+                !v4l1_ioctl( i_fd, VIDIOCSPICT, &vid_picture ) )
             {
                 p_sys->vid_picture = vid_picture;
             }
@@ -1004,14 +1015,14 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
             {
                 /* Try to set the format to something easy to encode */
                 vid_picture.palette = VIDEO_PALETTE_YUV420P;
-                if( ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
+                if( v4l1_ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
                 {
                     p_sys->vid_picture = vid_picture;
                 }
                 else
                 {
                     vid_picture.palette = VIDEO_PALETTE_YUV422P;
-                    if( ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
+                    if( v4l1_ioctl( i_fd, VIDIOCSPICT, &vid_picture ) == 0 )
                     {
                         p_sys->vid_picture = vid_picture;
                     }
@@ -1042,13 +1053,13 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
         p_sys->mjpeg_buffers.count = 8;
         p_sys->mjpeg_buffers.size = MJPEG_BUFFER_SIZE;
 
-        if( ioctl( i_fd, MJPIOC_REQBUFS, &p_sys->mjpeg_buffers ) < 0 )
+        if( v4l1_ioctl( i_fd, MJPIOC_REQBUFS, &p_sys->mjpeg_buffers ) < 0 )
         {
             msg_Err( p_demux, "mmap unsupported" );
             goto vdev_failed;
         }
 
-        p_sys->p_video_mmap = mmap( 0,
+        p_sys->p_video_mmap = v4l1_mmap( 0,
                 p_sys->mjpeg_buffers.size * p_sys->mjpeg_buffers.count,
                 PROT_READ | PROT_WRITE, MAP_SHARED, i_fd, 0 );
         if( p_sys->p_video_mmap == MAP_FAILED )
@@ -1063,7 +1074,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
         /* queue up all the frames */
         for( i = 0; i < (int)p_sys->mjpeg_buffers.count; i++ )
         {
-            if( ioctl( i_fd, MJPIOC_QBUF_CAPT, &i ) < 0 )
+            if( v4l1_ioctl( i_fd, MJPIOC_QBUF_CAPT, &i ) < 0 )
             {
                 msg_Err( p_demux, "unable to queue frame" );
                 goto vdev_failed;
@@ -1093,13 +1104,13 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
                 (char*)&p_sys->i_fourcc );
 
         /* Allocate mmap buffer */
-        if( ioctl( i_fd, VIDIOCGMBUF, &p_sys->vid_mbuf ) < 0 )
+        if( v4l1_ioctl( i_fd, VIDIOCGMBUF, &p_sys->vid_mbuf ) < 0 )
         {
             msg_Err( p_demux, "mmap unsupported" );
             goto vdev_failed;
         }
 
-        p_sys->p_video_mmap = mmap( 0, p_sys->vid_mbuf.size,
+        p_sys->p_video_mmap = v4l1_mmap( 0, p_sys->vid_mbuf.size,
                                     PROT_READ|PROT_WRITE, MAP_SHARED,
                                     i_fd, 0 );
         if( p_sys->p_video_mmap == MAP_FAILED )
@@ -1114,7 +1125,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
         p_sys->vid_mmap.width  = p_sys->i_width;
         p_sys->vid_mmap.height = p_sys->i_height;
         p_sys->vid_mmap.format = p_sys->vid_picture.palette;
-        if( ioctl( i_fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
+        if( v4l1_ioctl( i_fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
         {
             msg_Warn( p_demux, "%4.4s refused", (char*)&p_sys->i_fourcc );
             msg_Err( p_demux, "chroma selection failed" );
@@ -1125,7 +1136,7 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
 
 vdev_failed:
 
-    if( i_fd >= 0 ) close( i_fd );
+    if( i_fd >= 0 ) v4l1_close( i_fd );
     return -1;
 }
 
@@ -1139,7 +1150,7 @@ static uint8_t *GrabCapture( demux_t *p_demux )
 
     p_sys->vid_mmap.frame = (p_sys->i_frame_pos + 1) % p_sys->vid_mbuf.frames;
 
-    while( ioctl( p_sys->i_fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
+    while( v4l1_ioctl( p_sys->i_fd, VIDIOCMCAPTURE, &p_sys->vid_mmap ) < 0 )
     {
         if( errno != EAGAIN )
         {
@@ -1155,7 +1166,7 @@ static uint8_t *GrabCapture( demux_t *p_demux )
         msg_Dbg( p_demux, "grab failed, trying again" );
     }
 
-    while( ioctl(p_sys->i_fd, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 )
+    while( v4l1_ioctl(p_sys->i_fd, VIDIOCSYNC, &p_sys->i_frame_pos) < 0 )
     {
         if( errno != EAGAIN && errno != EINTR )
         {
@@ -1181,7 +1192,7 @@ static uint8_t *GrabMJPEG( demux_t *p_demux )
     /* re-queue the last frame we sync'd */
     if( p_sys->i_frame_pos != -1 )
     {
-        while( ioctl( p_sys->i_fd, MJPIOC_QBUF_CAPT,
+        while( v4l1_ioctl( p_sys->i_fd, MJPIOC_QBUF_CAPT,
                                        &p_sys->i_frame_pos ) < 0 )
         {
             if( errno != EAGAIN && errno != EINTR )
@@ -1193,7 +1204,7 @@ static uint8_t *GrabMJPEG( demux_t *p_demux )
     }
 
     /* sync on the next frame */
-    while( ioctl( p_sys->i_fd, MJPIOC_SYNC, &sync ) < 0 )
+    while( v4l1_ioctl( p_sys->i_fd, MJPIOC_SYNC, &sync ) < 0 )
     {
         if( errno != EAGAIN && errno != EINTR )
         {
