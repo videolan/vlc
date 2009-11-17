@@ -883,7 +883,7 @@ rtmp_read_net_packet( rtmp_control_thread_t *p_thread )
 {
     int length_header;
     int stream_index;
-    int bytes_left;
+    size_t bytes_left;
     uint8_t p_read[12];
     rtmp_packet_t *header;
     ssize_t i_ret;
@@ -948,7 +948,7 @@ rtmp_read_net_packet( rtmp_control_thread_t *p_thread )
         i_ret = net_Read( p_thread, p_thread->fd, NULL,
             header->body->body + header->body->length_body, bytes_left, true );
 
-        if( i_ret != bytes_left )
+        if( i_ret != (ssize_t)bytes_left )
             goto error;
 
         header->body->length_body += bytes_left;
