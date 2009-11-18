@@ -406,12 +406,8 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             i_ret = net_Write( p_sys->p_thread, p_sys->p_thread->fd, NULL, tmp_buffer, rtmp_packet->length_encoded );
             if( i_ret != rtmp_packet->length_encoded )
             {
-                free( rtmp_packet->body->body );
-                free( rtmp_packet->body );
-                free( rtmp_packet );
-                free( tmp_buffer );
                 msg_Err( p_access, "failed send publish start" );
-                return -1;
+                goto error;
             }
             free( rtmp_packet->body->body );
             free( rtmp_packet->body );
@@ -428,11 +424,8 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         i_ret = net_Write( p_sys->p_thread, p_sys->p_thread->fd, NULL, tmp_buffer, rtmp_packet->length_encoded );
         if( i_ret != rtmp_packet->length_encoded )
         {
-            free( rtmp_packet->body->body );
-            free( rtmp_packet->body );
-            free( rtmp_packet );
-            free( tmp_buffer );
             msg_Err( p_access, "failed send bytes read" );
+            goto error;
             return -1;
         }
         free( rtmp_packet->body->body );
@@ -442,6 +435,13 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
     }
 
     return i_len_tmp;
+
+error:
+    free( rtmp_packet->body->body );
+    free( rtmp_packet->body );
+    free( rtmp_packet );
+    free( tmp_buffer );
+    return -1;
 }
 
 /*****************************************************************************
