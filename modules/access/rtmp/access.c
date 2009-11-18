@@ -426,7 +426,6 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         {
             msg_Err( p_access, "failed send bytes read" );
             goto error;
-            return -1;
         }
         free( rtmp_packet->body->body );
         free( rtmp_packet->body );
