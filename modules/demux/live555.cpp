@@ -1428,7 +1428,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 return VLC_SUCCESS;
             if( ( b_pause && !p_sys->rtsp->pauseMediaSession( *p_sys->ms ) ) ||
                     ( !b_pause && !p_sys->rtsp->playMediaSession( *p_sys->ms,
-                       p_sys->f_seek_request ) ) )
+                       p_sys->f_seek_request, -1.0f, p_sys->ms->scale() ) ) )
             {
                     msg_Err( p_demux, "PLAY or PAUSE failed %s", p_sys->env->getResultMsg() );
                     return VLC_EGENERIC;
