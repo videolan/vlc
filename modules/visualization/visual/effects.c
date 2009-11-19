@@ -105,10 +105,7 @@ int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     {
         p_effect->p_data = p_data = malloc( sizeof( spectrum_data ) );
         if( !p_data )
-        {
-            free( p_s16_buff );
             return -1;
-        }
 
         p_data->peaks = calloc( 80, sizeof(int) );
         p_data->prev_heights = calloc( 80, sizeof(int) );
