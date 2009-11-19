@@ -142,8 +142,8 @@ struct sout_stream_sys_t
     vlc_mutex_t *p_lock;
     void ( *pf_video_prerender_callback ) ( void* p_video_data, uint8_t** pp_pixel_buffer , int size );
     void ( *pf_audio_prerender_callback ) ( void* p_audio_data, uint8_t** pp_pcm_buffer , unsigned int size );
-    void ( *pf_video_postrender_callback ) ( void* p_video_data, uint8_t* p_pixel_buffer, int width, int height, int pixel_pitch, int size, int pts );
-    void ( *pf_audio_postrender_callback ) ( void* p_audio_data, uint8_t* p_pcm_buffer, unsigned int channels, unsigned int rate, unsigned int nb_samples, unsigned int bits_per_sample, unsigned int size, int pts );
+    void ( *pf_video_postrender_callback ) ( void* p_video_data, uint8_t* p_pixel_buffer, int width, int height, int pixel_pitch, int size, mtime_t pts );
+    void ( *pf_audio_postrender_callback ) ( void* p_audio_data, uint8_t* p_pcm_buffer, unsigned int channels, unsigned int rate, unsigned int nb_samples, unsigned int bits_per_sample, unsigned int size, mtime_t pts );
     bool time_sync;
 };
 
@@ -172,11 +172,11 @@ static int Open( vlc_object_t *p_this )
     free( psz_tmp );
 
     psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_VIDEO "postrender-callback" );
-    p_sys->pf_video_postrender_callback = (void (*) (void*, uint8_t*, int, int, int, int, int))(intptr_t)atoll( psz_tmp );
+    p_sys->pf_video_postrender_callback = (void (*) (void*, uint8_t*, int, int, int, int, mtime_t))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
     psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_AUDIO "postrender-callback" );
-    p_sys->pf_audio_postrender_callback = (void (*) (void*, uint8_t*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, int))(intptr_t)atoll( psz_tmp );
+    p_sys->pf_audio_postrender_callback = (void (*) (void*, uint8_t*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, mtime_t))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
     /* Create the remaining variables for a later use */
@@ -371,7 +371,7 @@ static int SendAudio( sout_stream_t *p_stream, sout_stream_id_t *id,
     vlc_memcpy( p_pcm_buffer, p_buffer->p_buffer, i_size );
     /* Calling the postrender callback to tell the user his buffer is ready */
     p_sys->pf_audio_postrender_callback( id->p_data, p_pcm_buffer,
-                                         id->format->audio.i_channels, id->format->audio.i_rate, p_buffer->i_nb_samples,
+                                         id->format->audio.i_channels, id->format->audio.i_rate, i_samples,
                                          id->format->audio.i_bitspersample, i_size, p_buffer->i_pts );
     block_ChainRelease( p_buffer );
     return VLC_SUCCESS;
