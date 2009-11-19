@@ -429,7 +429,7 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
 
     if( !p_effect->p_data )
     {
-        p_effect->p_data=(void *)calloc( 80, sizeof(int) );
+        p_effect->p_data = calloc( 80, sizeof(int) );
         if( !p_effect->p_data )
         {
             free( p_s16_buff );
@@ -438,7 +438,7 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     }
     peaks =(int *)p_effect->p_data;
 
-    height = (int *)malloc( i_nb_bands * sizeof(int) );
+    height = malloc( i_nb_bands * sizeof(int) );
     if( !height)
     {
         free( p_effect->p_data );
@@ -882,7 +882,7 @@ int vuMeter_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     if( !p_effect->p_data )
     {
         /* Allocate memory to save hand positions */
-        p_effect->p_data = (void *)malloc( 2 * sizeof(float) );
+        p_effect->p_data = malloc( 2 * sizeof(float) );
         i_value = p_effect->p_data;
         i_value[0] = i_value_l;
         i_value[1] = i_value_r;
