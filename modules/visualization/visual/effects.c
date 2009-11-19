@@ -432,22 +432,14 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
 
     if( !p_effect->p_data )
     {
-        p_effect->p_data=(void *)malloc( 80 * sizeof(int) );
+        p_effect->p_data=(void *)calloc( 80, sizeof(int) );
         if( !p_effect->p_data )
         {
             free( p_s16_buff );
             return -1;
         }
-        peaks = (int *)p_effect->p_data;
-        for( i = 0 ; i < i_nb_bands ; i++ )
-        {
-           peaks[i] = 0;
-        }
     }
-    else
-    {
-        peaks =(int *)p_effect->p_data;
-    }
+    peaks =(int *)p_effect->p_data;
 
     height = (int *)malloc( i_nb_bands * sizeof(int) );
     if( !height)
