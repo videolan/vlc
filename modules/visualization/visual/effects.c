@@ -386,7 +386,7 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     fft_state *p_state;                 /* internal FFT data */
 
     int i , j , k;
-    int i_line;
+    int i_line = 0;
     int16_t p_dest[FFT_BUFFER_SIZE];      /* Adapted FFT result */
     int16_t p_buffer1[FFT_BUFFER_SIZE];   /* Buffer on which we perform
                                              the FFT (first channel) */
@@ -395,8 +395,6 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
 
     int16_t  *p_buffs;                    /* int16_t converted buffer */
     int16_t  *p_s16_buff;                /* int16_t converted buffer */
-
-    i_line = 0;
 
     p_s16_buff = malloc( p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(int16_t) );
     if( !p_s16_buff )
@@ -441,7 +439,6 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     height = malloc( i_nb_bands * sizeof(int) );
     if( !height)
     {
-        free( p_effect->p_data );
         free( p_s16_buff );
         return -1;
     }
@@ -463,7 +460,6 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     {
         msg_Err(p_aout,"unable to initialize FFT transform");
         free( height );
-        free( p_effect->p_data );
         free( p_s16_buff );
         return -1;
     }
