@@ -269,7 +269,7 @@ static void Probe( aout_instance_t * p_aout,
     {
         if( var_GetBool( p_aout->p_libvlc, "alsa-working" ) )
             dialog_FatalWait( p_aout, "ALSA version problem",
-                "VLC failed to re-open your sound card.\n"
+                "VLC failed to re-initialize your sound output device.\n"
                 "Please update alsa-lib to version 1.0.22 or higher "
                 "to fix this issue." );
     }
