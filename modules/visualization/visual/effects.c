@@ -130,15 +130,9 @@ int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
 
         p_data->peaks = calloc( 80, sizeof(int) );
         p_data->prev_heights = calloc( 80, sizeof(int) );
-
-        peaks = ( int * )p_data->peaks;
-        prev_heights = ( int * )p_data->prev_heights;
     }
-    else
-    {
-        peaks = (int *)p_data->peaks;
-        prev_heights = (int *)p_data->prev_heights;
-    }
+    peaks = (int *)p_data->peaks;
+    prev_heights = (int *)p_data->prev_heights;
 
 
     height = malloc( i_nb_bands * sizeof(int) );
