@@ -1,7 +1,7 @@
 /*****************************************************************************
  * decomp.c : Decompression module for vlc
  *****************************************************************************
- * Copyright © 2008 Rémi Denis-Courmont
+ * Copyright © 2008-2009 Rémi Denis-Courmont
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU Lesser General Public License as published by
@@ -47,6 +47,7 @@
 
 static int  OpenGzip (vlc_object_t *);
 static int  OpenBzip2 (vlc_object_t *);
+static int  OpenXZ (vlc_object_t *);
 static void Close (vlc_object_t *);
 
 vlc_module_begin ()
@@ -54,6 +55,9 @@ vlc_module_begin ()
     set_category (CAT_INPUT)
     set_subcategory (SUBCAT_INPUT_STREAM_FILTER)
     set_capability ("stream_filter", 20)
+    set_callbacks (OpenXZ, Close)
+
+    add_submodule ()
     set_callbacks (OpenBzip2, Close)
     /* TODO: access shortnames for stream_UrlNew() */
 
@@ -408,3 +412,21 @@ static int OpenBzip2 (vlc_object_t *obj)
     return Open (stream, "bzcat");
 }
 
+/**
+ * Detects xz file format
+ */
+static int OpenXZ (vlc_object_t *obj)
+{
+    stream_t      *stream = (stream_t *)obj;
+    const uint8_t *peek;
+
+    /* (Try to) parse the xz stream header */
+    if (stream_Peek (stream->p_source, &peek, 8) < 8)
+        return VLC_EGENERIC;
+
+    if (memcmp (peek, "\xfd\x37\x7a\x58\x5a", 6))
+        return VLC_EGENERIC;
+
+    msg_Dbg (obj, "detected xz compressed stream");
+    return Open (stream, "xzcat");
+}
