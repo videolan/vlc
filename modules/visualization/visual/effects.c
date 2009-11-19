@@ -100,11 +100,38 @@ int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     int16_t  *p_buffs;                    /* int16_t converted buffer */
     int16_t  *p_s16_buff;                 /* int16_t converted buffer */
 
-    p_s16_buff = malloc( p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(int16_t));
-    if( !p_s16_buff )
-        return -1;
+    /* Create p_data if needed */
+    if( !p_data )
+    {
+        p_effect->p_data = p_data = malloc( sizeof( spectrum_data ) );
+        if( !p_data )
+        {
+            free( p_s16_buff );
+            return -1;
+        }
 
-    p_buffs = p_s16_buff;
+        p_data->peaks = calloc( 80, sizeof(int) );
+        p_data->prev_heights = calloc( 80, sizeof(int) );
+
+        p_data->i_prev_nb_samples = 0;
+        p_data->p_prev_s16_buff = NULL;
+    }
+    peaks = (int *)p_data->peaks;
+    prev_heights = (int *)p_data->prev_heights;
+
+    /* Allocate the buffer only if the number of samples change */
+    if( p_buffer->i_nb_samples != p_data->i_prev_nb_samples )
+    {
+        free( p_data->p_prev_s16_buff );
+        p_data->p_prev_s16_buff = malloc( p_buffer->i_nb_samples *
+                                          p_effect->i_nb_chans *
+                                          sizeof(int16_t));
+        p_data->i_prev_nb_samples = p_buffer->i_nb_samples;
+        if( !p_data->p_prev_s16_buff )
+            return -1;
+    }
+    p_buffs = p_s16_buff = p_data->p_prev_s16_buff;
+
     i_80_bands = config_GetInt ( p_aout, "visual-80-bands" );
     i_peak     = config_GetInt ( p_aout, "visual-peaks" );
 
@@ -119,26 +146,9 @@ int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
         i_nb_bands = 20;
     }
 
-    if( !p_data )
-    {
-        p_effect->p_data = p_data = malloc( sizeof( spectrum_data ) );
-        if( !p_data )
-        {
-            free( p_s16_buff );
-            return -1;
-        }
-
-        p_data->peaks = calloc( 80, sizeof(int) );
-        p_data->prev_heights = calloc( 80, sizeof(int) );
-    }
-    peaks = (int *)p_data->peaks;
-    prev_heights = (int *)p_data->prev_heights;
-
-
     height = malloc( i_nb_bands * sizeof(int) );
     if( !height )
     {
-        free( p_s16_buff );
         return -1;
     }
     /* Convert the buffer to int16_t  */
@@ -157,7 +167,6 @@ int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     if( !p_state)
     {
         free( height );
-        free( p_s16_buff );
         msg_Err(p_aout,"unable to initialize FFT transform");
         return -1;
     }
@@ -321,7 +330,6 @@ int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
 
     fft_close( p_state );
 
-    free( p_s16_buff );
     free( height );
 
     return 0;

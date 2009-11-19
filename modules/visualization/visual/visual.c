@@ -397,6 +397,7 @@ static void Close( vlc_object_t *p_this )
         {
             free( ( ( spectrum_data * )p_effect->p_data )->peaks );
             free( ( ( spectrum_data * )p_effect->p_data )->prev_heights );
+            free( ( ( spectrum_data * )p_effect->p_data )->p_prev_s16_buff );
         }
         free( p_effect->p_data );
         free( p_effect->psz_args );

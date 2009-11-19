@@ -42,6 +42,9 @@ typedef struct spectrum_data
 {
     int *peaks;
     int *prev_heights;
+
+    unsigned i_prev_nb_samples;
+    int16_t *p_prev_s16_buff;
 } spectrum_data;
 
 
