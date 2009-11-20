@@ -37,6 +37,7 @@ typedef struct block_bytestream_t
 /*****************************************************************************
  * block_bytestream_t management
  *****************************************************************************/
+LIBVLC_USED
 static inline block_bytestream_t block_BytestreamInit( void )
 {
     block_bytestream_t bytestream;
