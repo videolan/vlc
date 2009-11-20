@@ -395,14 +395,16 @@ static void Close( vlc_object_t *p_this )
 #define p_effect p_sys->effect[i]
         if( !strncmp( p_effect->psz_name, "spectrum", strlen( "spectrum" ) ) )
         {
-            free( ( ( spectrum_data * )p_effect->p_data )->peaks );
-            free( ( ( spectrum_data * )p_effect->p_data )->prev_heights );
-            free( ( ( spectrum_data * )p_effect->p_data )->p_prev_s16_buff );
+            spectrum_data *p_data = p_effect->p_data;
+            free( p_data->peaks );
+            free( p_data->prev_heights );
+            free( p_data->p_prev_s16_buff );
         }
         if( !strncmp( p_effect->psz_name, "spectrometer", strlen( "spectrometer" ) ) )
         {
-            free( ((spectrometer_data*)p_effect->p_data)->peaks );
-            free( ((spectrometer_data*)p_effect->p_data)->p_prev_s16_buff );
+            spectrometer_data *p_data = p_effect->p_data;
+            free( p_data->peaks );
+            free( p_data->p_prev_s16_buff );
         }
         free( p_effect->p_data );
         free( p_effect->psz_args );
