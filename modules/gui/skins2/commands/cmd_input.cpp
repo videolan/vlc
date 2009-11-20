@@ -84,10 +84,7 @@ void CmdSlower::execute()
 
     if( pInput )
     {
-        vlc_value_t val;
-        val.b_bool = true;
-
-        var_Set( pInput, "rate-slower", val );
+        var_TriggerCallback( pInput, "rate-slower" );
         vlc_object_release( pInput );
     }
 }
@@ -100,10 +97,7 @@ void CmdFaster::execute()
 
     if( pInput )
     {
-        vlc_value_t val;
-        val.b_bool = true;
-
-        var_Set( pInput, "rate-faster", val );
+        var_TriggerCallback( pInput, "rate-faster" );
         vlc_object_release( pInput );
     }
 }
