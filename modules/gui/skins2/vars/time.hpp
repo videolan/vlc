@@ -51,6 +51,8 @@ public:
 private:
     /// Convert a number of seconds into "h:mm:ss" format
     const string formatTime( int seconds, bool bShortFormat ) const;
+    /// Return true when there is a non-null input and its position is not 0.0.
+    bool havePosition() const;
 };
 
 #endif

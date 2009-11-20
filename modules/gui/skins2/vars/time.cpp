@@ -17,14 +17,20 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
-#include "time.hpp"
 #include <vlc_input.h>
+#include "time.hpp"
+
+
+inline bool StreamTime::havePosition() const {
+    input_thread_t *p_input = getIntf()->p_sys->p_input;
+    return p_input && ( var_GetFloat( p_input, "position" ) != 0.0 );
+}
+
 
 void StreamTime::set( float percentage, bool updateVLC )
 {
@@ -48,66 +54,33 @@ const string StreamTime::getAsStringPercent() const
 
 const string StreamTime::getAsStringCurrTime( bool bShortFormat ) const
 {
-    if( getIntf()->p_sys->p_input == NULL )
-    {
+    if( !havePosition() )
         return "-:--:--";
-    }
 
-    vlc_value_t pos; pos.f_float = 0.0;
-    var_Get( getIntf()->p_sys->p_input, "position", &pos );
-    if( pos.f_float == 0.0 )
-    {
-        return "-:--:--";
-    }
-
-    vlc_value_t time; time.i_time = 0L;
-    var_Get( getIntf()->p_sys->p_input, "time", &time );
-
-    return formatTime( time.i_time / 1000000, bShortFormat );
+    mtime_t time = var_GetTime( getIntf()->p_sys->p_input, "time" );
+    return formatTime( time / 1000000, bShortFormat );
 }
 
 
 const string StreamTime::getAsStringTimeLeft( bool bShortFormat ) const
 {
-    if( getIntf()->p_sys->p_input == NULL )
-    {
+    if( !havePosition() )
         return "-:--:--";
-    }
 
-    vlc_value_t pos;
-    var_Get( getIntf()->p_sys->p_input, "position", &pos );
-    if( pos.f_float == 0.0 )
-    {
-        return "-:--:--";
-    }
+    mtime_t time = var_GetTime( getIntf()->p_sys->p_input, "time" ),
+        duration = var_GetTime( getIntf()->p_sys->p_input, "length" );
 
-    vlc_value_t time, duration;
-    var_Get( getIntf()->p_sys->p_input, "time", &time );
-    var_Get( getIntf()->p_sys->p_input, "length", &duration );
-
-    return formatTime( (duration.i_time - time.i_time) / 1000000,
-                       bShortFormat );
+    return formatTime( (duration - time) / 1000000, bShortFormat );
 }
 
 
 const string StreamTime::getAsStringDuration( bool bShortFormat ) const
 {
-    if( getIntf()->p_sys->p_input == NULL )
-    {
+    if( !havePosition() )
         return "-:--:--";
-    }
 
-    vlc_value_t pos; pos.f_float = 0.0;
-    var_Get( getIntf()->p_sys->p_input, "position", &pos );
-    if( pos.f_float == 0.0 )
-    {
-        return "-:--:--";
-    }
-
-    vlc_value_t time;
-    var_Get( getIntf()->p_sys->p_input, "length", &time );
-
-    return formatTime( time.i_time / 1000000, bShortFormat );
+    mtime_t time = var_GetTime( getIntf()->p_sys->p_input, "length" );
+    return formatTime( time / 1000000, bShortFormat );
 }
 
 
