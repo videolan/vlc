@@ -845,9 +845,8 @@ void Interface::OnSlowStream( void )
         vlc_object_find( p_intf, VLC_OBJECT_INPUT, FIND_ANYWHERE );
 
     if( p_input == NULL ) return;
-
     vlc_value_t val; val.b_bool = true;
-    var_Set( p_input, "rate-slower", val );
+    var_TriggerCallback( p_input, "rate-slower" );
     vlc_object_release( p_input );
 }
 
@@ -858,8 +857,7 @@ void Interface::OnFastStream( void )
 
     if( p_input == NULL ) return;
 
-    vlc_value_t val; val.b_bool = true;
-    var_Set( p_input, "rate-faster", val );
+    var_TriggerCallback( p_input, "rate-faster" );
     vlc_object_release( p_input );
 }
 
