@@ -1896,6 +1896,10 @@ static int updateStatistics( intf_thread_t *p_intf, input_item_t *p_item )
             (float)(p_item->p_stats->i_demux_read_bytes)/1000 );
     msg_rc(_("| demux bitrate    :   %6.0f kb/s"),
             (float)(p_item->p_stats->f_demux_bitrate)*8000 );
+    msg_rc(_("| demux corrupted  :    %5i"),
+            p_item->p_stats->i_demux_corrupted );
+    msg_rc(_("| discontinuities  :    %5i"),
+            p_item->p_stats->i_demux_discontinuity );
     msg_rc("|");
     /* Video */
     msg_rc("%s", _("+-[Video Decoding]"));
