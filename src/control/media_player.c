@@ -1019,18 +1019,16 @@ float libvlc_media_player_get_fps(
 int libvlc_media_player_will_play( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e)
 {
+    bool b_will_play;
     input_thread_t *p_input_thread =
                             libvlc_get_input_thread ( p_mi, p_e);
     if ( !p_input_thread )
         return false;
 
-    if ( !p_input_thread->b_die && !p_input_thread->b_dead )
-    {
-        vlc_object_release( p_input_thread );
-        return true;
-    }
+    b_will_play = !p_input_thread->b_die && !p_input_thread->b_dead;
     vlc_object_release( p_input_thread );
-    return false;
+
+    return b_will_play;
 }
 
 void libvlc_media_player_set_rate(
