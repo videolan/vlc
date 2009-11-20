@@ -719,9 +719,9 @@ static void GetV4L2Params( demux_sys_t *p_sys, vlc_object_t *p_obj )
     p_sys->psz_set_ctrls = var_CreateGetString( p_obj, "v4l2-set-ctrls" );
 
     char *psz_aspect = var_CreateGetString( p_obj, "v4l2-aspect-ratio" );
-    if( psz_aspect && *psz_aspect && strchr( psz_aspect, ':' ) )
+    char *psz_delim = !EMPTY_STR(psz_aspect) ? strchr( psz_aspect, ':' ) : NULL;
+    if( psz_delim )
     {
-        char *psz_delim = strchr( psz_aspect, ':' );
         p_sys->i_aspect = atoi( psz_aspect ) * VOUT_ASPECT_FACTOR / atoi( psz_delim + 1 );
     }
     else
@@ -2453,7 +2453,6 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
     if( p_sys->dev_cap.capabilities & V4L2_CAP_HW_FREQ_SEEK )
         msg_Dbg( p_obj, "device supports hardware frequency seeking" );
 #endif
-
     if( p_sys->dev_cap.capabilities & V4L2_CAP_VBI_CAPTURE )
         msg_Dbg( p_obj, "device support raw VBI capture" );
 
