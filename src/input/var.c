@@ -565,7 +565,9 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
     input_thread_t *p_input = (input_thread_t*)p_this;
     VLC_UNUSED(oldval); VLC_UNUSED(p_data);
 
-    /* Problem with this way: the "rate" variable is update after the input thread do the change */
+    /* Problem with this way: the "rate" variable is updated after the
+     * input thread did the change */
+
     if( !strcmp( psz_cmd, "rate-slower" ) )
     {
         input_ControlPush( p_input, INPUT_CONTROL_SET_RATE_SLOWER, NULL );
