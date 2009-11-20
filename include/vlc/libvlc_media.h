@@ -99,6 +99,44 @@ typedef enum libvlc_media_option_t
     libvlc_media_option_unique = 0x100
 } libvlc_media_option_t;
 
+
+/** defgroup libvlc_media_stats_t libvlc_media_stats_t
+ * \ingroup libvlc_media
+ * LibVLC Media statistics
+ * @{
+ */
+typedef struct libvlc_media_stats_t
+{
+    /* Input */
+    int         i_read_bytes;
+    float       f_input_bitrate;
+
+    /* Demux */
+    int         i_demux_read_bytes;
+    float       f_demux_bitrate;
+    int         i_demux_corrupted;
+    int         i_demux_discontinuity;
+
+    /* Decoders */
+    int         i_decoded_video;
+    int         i_decoded_audio;
+
+    /* Video Output */
+    int         i_displayed_pictures;
+    int         i_lost_pictures;
+
+    /* Audio output */
+    int         i_played_abuffers;
+    int         i_lost_abuffers;
+
+    /* Stream output */
+    int         i_sent_packets;
+    int         i_sent_bytes;
+    float       f_send_bitrate;
+} libvlc_media_stats_t;
+/** @}*/
+
+
 /**
  * Create a media with the given MRL.
  *
@@ -223,6 +261,16 @@ VLC_PUBLIC_API char * libvlc_media_get_meta(
 VLC_PUBLIC_API libvlc_state_t libvlc_media_get_state(
                                    libvlc_media_t *p_meta_desc );
 
+
+/**
+ * get the current statistics about the media
+ * @param p_md: media descriptor object
+ * @param p_stats: structure that contain the statistics about the media
+ *                 (this structure must be allocated by the caller)
+ * @return true if the statistics are available, false otherwise
+ */
+VLC_PUBLIC_API int libvlc_media_get_stats( libvlc_media_t *p_md,
+                                           libvlc_media_stats_t *p_stats );
 
 /**
  * Get subitems of media descriptor object. This will increment

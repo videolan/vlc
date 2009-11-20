@@ -514,6 +514,41 @@ libvlc_media_subitems( libvlc_media_t * p_md )
 }
 
 /**************************************************************************
+ * Setter for state information (LibVLC Internal)
+ **************************************************************************/
+int libvlc_media_get_stats( libvlc_media_t *p_md,
+                            libvlc_media_stats_t *p_stats )
+{
+    if( !p_md->p_input_item )
+        return false;
+
+    input_stats_t *p_itm_stats = p_md->p_input_item->p_stats;
+    vlc_mutex_lock( &p_itm_stats->lock );
+    p_stats->i_read_bytes = p_itm_stats->i_read_bytes;
+    p_stats->f_input_bitrate = p_itm_stats->f_input_bitrate;
+
+    p_stats->i_demux_read_bytes = p_itm_stats->i_demux_read_bytes;
+    p_stats->f_demux_bitrate = p_itm_stats->f_demux_bitrate;
+    p_stats->i_demux_corrupted = p_itm_stats->i_demux_corrupted;
+    p_stats->i_demux_discontinuity = p_itm_stats->i_demux_discontinuity;
+
+    p_stats->i_decoded_video = p_itm_stats->i_decoded_video;
+    p_stats->i_decoded_audio = p_itm_stats->i_decoded_audio;
+
+    p_stats->i_displayed_pictures = p_itm_stats->i_displayed_pictures;
+    p_stats->i_lost_pictures = p_itm_stats->i_lost_pictures;
+
+    p_stats->i_played_abuffers = p_itm_stats->i_played_abuffers;
+    p_stats->i_lost_abuffers = p_itm_stats->i_lost_abuffers;
+
+    p_stats->i_sent_packets = p_itm_stats->i_sent_packets;
+    p_stats->i_sent_bytes = p_itm_stats->i_sent_bytes;
+    p_stats->f_send_bitrate = p_itm_stats->f_send_bitrate;
+    vlc_mutex_unlock( &p_itm_stats->lock );
+    return true;
+}
+
+/**************************************************************************
  * event_manager
  **************************************************************************/
 libvlc_event_manager_t *
