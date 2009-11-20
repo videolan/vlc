@@ -396,11 +396,38 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     int16_t  *p_buffs;                    /* int16_t converted buffer */
     int16_t  *p_s16_buff;                /* int16_t converted buffer */
 
-    p_s16_buff = malloc( p_buffer->i_nb_samples * p_effect->i_nb_chans * sizeof(int16_t) );
-    if( !p_s16_buff )
-        return -1;
+    /* Create the data struct if needed */
+    spectrometer_data *p_data = p_effect->p_data;
+    if( !p_data )
+    {
+        p_data = malloc( sizeof(spectrometer_data) );
+        if( !p_data )
+            return -1;
+        p_data->peaks = calloc( 80, sizeof(int) );
+        if( !p_data->peaks )
+        {
+            free( p_data );
+            return -1;
+        }
+        p_data->i_prev_nb_samples = 0;
+        p_data->p_prev_s16_buff = NULL;
+        p_effect->p_data = (void*)p_data;
+    }
+    peaks = p_data->peaks;
 
-    p_buffs = p_s16_buff;
+    /* Allocate the buffer only if the number of samples change */
+    if( p_buffer->i_nb_samples != p_data->i_prev_nb_samples )
+    {
+        free( p_data->p_prev_s16_buff );
+        p_data->p_prev_s16_buff = malloc( p_buffer->i_nb_samples *
+                                          p_effect->i_nb_chans *
+                                          sizeof(int16_t));
+        p_data->i_prev_nb_samples = p_buffer->i_nb_samples;
+        if( !p_data->p_prev_s16_buff )
+            return -1;
+    }
+    p_buffs = p_s16_buff = p_data->p_prev_s16_buff;
+
     i_original     = config_GetInt ( p_aout, "spect-show-original" );
     i_80_bands     = config_GetInt ( p_aout, "spect-80-bands" );
     i_separ        = config_GetInt ( p_aout, "spect-separ" );
@@ -425,23 +452,9 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
         i_nb_bands = 20;
     }
 
-    if( !p_effect->p_data )
-    {
-        p_effect->p_data = calloc( 80, sizeof(int) );
-        if( !p_effect->p_data )
-        {
-            free( p_s16_buff );
-            return -1;
-        }
-    }
-    peaks =(int *)p_effect->p_data;
-
     height = malloc( i_nb_bands * sizeof(int) );
     if( !height)
-    {
-        free( p_s16_buff );
         return -1;
-    }
 
     /* Convert the buffer to int16_t  */
     /* Pasted from float32tos16.c */
@@ -460,7 +473,6 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     {
         msg_Err(p_aout,"unable to initialize FFT transform");
         free( height );
-        free( p_s16_buff );
         return -1;
     }
     p_buffs = p_s16_buff;
@@ -772,7 +784,6 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
 
     fft_close( p_state );
 
-    free( p_s16_buff );
     free( height );
 
     return 0;
