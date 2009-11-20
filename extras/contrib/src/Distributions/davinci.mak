@@ -1,8 +1,8 @@
 # Contrib configuration for TI Davinci based SoC
 
 all: \
-	.a52 .id3tag .mad .ogg .theora \
-	.flac .faad \
+	.a52 .mad .ogg .theora \
+	.flac .faad .ffmpeg \
 	.live .png .dvbpsi .tremor
-# .ffmpeg # ARM assembly code can't be built by the old montavista toolchain
-#FFMPEGCONF += --arch=arm
+
+FFMPEGCONF += --arch=arm
