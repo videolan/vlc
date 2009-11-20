@@ -60,11 +60,8 @@ string Volume::getAsStringPercent() const
 {
     int value = (int)(100. * VarPercent::get());
     // 0 <= value <= 100, so we need 4 chars
-    char *str = new char[4];
+    char str[4];
     snprintf( str, 4, "%d", value );
-    string ret = str;
-    delete[] str;
-
-    return ret;
+    return string(str);
 }
 
