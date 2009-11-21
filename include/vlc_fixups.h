@@ -146,6 +146,10 @@ char *getcwd (char *buf, size_t size);
 pid_t getpid (void);
 #endif
 
+#ifndef HAVE_STRTOK_R
+char *strtok_r(char *, const char *, char **);
+#endif
+
 #ifdef __cplusplus
 } /* extern "C" */
 #endif
