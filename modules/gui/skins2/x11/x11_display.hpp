@@ -99,8 +99,7 @@ private:
     type blendPixel(type v,type r, type g, type b,type a) const;
 
     /// Calculate shifts from a color mask
-    void getShifts( uint32_t mask, int &rLeftShift,
-                    int &rRightShift ) const;
+    static void getShifts( uint32_t mask, int &rLeftShift, int &rRightShift );
 
     /// 8 bpp version of blendPixel
     void blendPixel8( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,

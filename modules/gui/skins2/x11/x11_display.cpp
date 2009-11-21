@@ -253,8 +253,7 @@ X11Display::~X11Display()
 }
 
 
-void X11Display::getShifts( uint32_t mask, int &rLeftShift,
-                            int &rRightShift ) const
+void X11Display::getShifts( uint32_t mask, int &rLeftShift, int &rRightShift )
 {
     for( rLeftShift = 0; (rLeftShift < 32) && !(mask & 1); rLeftShift++ )
     {
