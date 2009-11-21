@@ -38,11 +38,33 @@ class X11TimerLoop;
 /// Class used to instanciate X11 specific objects
 class X11Factory: public OSFactory
 {
+private:
+    /** ptrmap is an associative container (like std::map, in fact it builds
+      * on std::map) that provides only operator[] in non-const and const
+      * variants, and has the property that a (const) lookup of a non-existent
+      * key does not cause an empty node to be inserted. Instead it returns
+      * NULL if there was no entry; so it only stores pointers. */
+    template<class K, class V> class ptrmap {
+    private:
+        typedef V *value_type;
+        typedef std::map<K,value_type> map_t;
+        map_t m_map;
+        ptrmap &operator=(const ptrmap &);
+        ptrmap(const ptrmap &);
+    public:
+        ptrmap() { }
+        value_type &operator[](K k) { return m_map.operator[](k); }
+        value_type  operator[](K k) const
+        {
+            typename map_t::const_iterator i=m_map.find(k);
+            return i!=m_map.end() ? i->second : NULL;
+        }
+    };
 public:
-    /// Map to find the GenericWindow associated to a X11Window
-    map<Window, GenericWindow*> m_windowMap;
-    /// Map to find the Dnd object associated to a X11Window
-    map<Window, X11DragDrop*> m_dndMap;
+    /// Map to find the GenericWindow* associated to a X11Window
+    ptrmap<Window, GenericWindow> m_windowMap;
+    /// Map to find the Dnd object (X11DragDrop*) associated to a X11Window
+    ptrmap<Window, X11DragDrop> m_dndMap;
 
     X11Factory( intf_thread_t *pIntf );
     virtual ~X11Factory();
