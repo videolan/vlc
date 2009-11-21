@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifdef X11_SKINS
@@ -31,24 +31,27 @@
 #include "x11_display.hpp"
 #include "../src/logger.hpp"
 
-// Macro to compute a pixel value
-#define PUT_PIXEL(value, r, g, b, type) \
-    value = \
-        ( ((type)r >> m_redRightShift) << m_redLeftShift ) | \
-        ( ((type)g >> m_greenRightShift) << m_greenLeftShift ) | \
-        ( ((type)b >> m_blueRightShift) << m_blueLeftShift );
+template<class type> type X11Display::putPixel(type r, type g, type b) const
+{
+    return ( (r >> m_redRightShift)   << m_redLeftShift   ) |
+           ( (g >> m_greenRightShift) << m_greenLeftShift ) |
+           ( (b >> m_blueRightShift)  << m_blueLeftShift  );
+}
 
-// Macro to blend a pixel with another color
-#define BLEND_PIXEL(value, r, g, b, a, type) \
-    uint16_t temp; \
-    temp = ((uint8_t)((value >> m_redLeftShift) << m_redRightShift)); \
-    uint8_t red = r + ( temp * (255 - a) ) / 255; \
-    temp = ((uint8_t)((value >> m_greenLeftShift) << m_greenRightShift)); \
-    uint8_t green = g + ( temp * (255 - a) ) / 255; \
-    temp = ((uint8_t)((value >> m_blueLeftShift) << m_blueRightShift)); \
-    uint8_t blue = b + ( temp * (255 - a) ) / 255; \
-    PUT_PIXEL(value, red, green, blue, type)
+template<class type>
+type X11Display::blendPixel(type v,type r, type g, type b, type a) const
+{
+    uint16_t temp;
 
+    temp = ((uint8_t)((v >> m_redLeftShift) << m_redRightShift));
+    uint8_t red = r + ( temp * (255 - a) ) / 255;
+    temp = ((uint8_t)((v >> m_greenLeftShift) << m_greenRightShift));
+    uint8_t green = g + ( temp * (255 - a) ) / 255;
+    temp = ((uint8_t)((v >> m_blueLeftShift) << m_blueRightShift));
+    uint8_t blue = b + ( temp * (255 - a) ) / 255;
+
+    return putPixel<type>(red,green,blue);
+}
 
 X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
     m_mainWindow( 0 ), m_gc( NULL ), m_colormap( 0 )
@@ -287,11 +290,7 @@ void X11Display::getShifts( uint32_t mask, int &rLeftShift,
 void X11Display::blendPixel8( uint8_t *pPixel, uint8_t r, uint8_t g,
                               uint8_t b, uint8_t a ) const
 {
-    uint8_t value = 255 - *pPixel;
-
-    BLEND_PIXEL(value, r, g, b, a, uint8_t)
-
-    *pPixel = 255 - value;
+    *pPixel = 255 - blendPixel<uint8_t>(255 - *pPixel,r,g,b,a);
 }
 
 
@@ -300,7 +299,7 @@ void X11Display::blendPixel16MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
 {
     uint16_t value = pPixel[1] | pPixel[0] << 8;
 
-    BLEND_PIXEL(value, r, g, b, a, uint16_t)
+    value = blendPixel<uint16_t>(value,r,g,b,a);
 
     pPixel[1] = value; value >>= 8;
     pPixel[0] = value;
@@ -312,7 +311,7 @@ void X11Display::blendPixel16LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
 {
     uint16_t value = pPixel[0] | pPixel[1] << 8;
 
-    BLEND_PIXEL(value, r, g, b, a, uint16_t)
+    value = blendPixel<uint16_t>(value,r,g,b,a);
 
     pPixel[0] = value; value >>= 8;
     pPixel[1] = value;
@@ -325,7 +324,7 @@ void X11Display::blendPixel32MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
     uint32_t value = pPixel[3] | pPixel[2] << 8 | pPixel[1] << 16 |
                           pPixel[0] << 24;
 
-    BLEND_PIXEL(value, r, g, b, a, uint32_t)
+    value = blendPixel<uint32_t>(value,r,g,b,a);
 
     pPixel[3] = value; value >>= 8;
     pPixel[2] = value; value >>= 8;
@@ -340,7 +339,7 @@ void X11Display::blendPixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
     uint32_t value = pPixel[0] | pPixel[1] << 8 | pPixel[2] << 16 |
                           pPixel[3] << 24;
 
-    BLEND_PIXEL(value, r, g, b, a, uint32_t)
+    value = blendPixel<uint32_t>(value,r,g,b,a);
 
     pPixel[0] = value; value >>= 8;
     pPixel[1] = value; value >>= 8;
@@ -352,20 +351,14 @@ void X11Display::blendPixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
 void X11Display::putPixel8( uint8_t *pPixel, uint8_t r, uint8_t g,
                             uint8_t b, uint8_t a ) const
 {
-    uint8_t value = 255 - *pPixel;
-
-    PUT_PIXEL(value, r, g, b, uint8_t)
-
-    *pPixel = 255 - value;
+    *pPixel = 255 - putPixel<uint8_t>(r,g,b);
 }
 
 
 void X11Display::putPixel16MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
                                 uint8_t b, uint8_t a ) const
 {
-    uint16_t value = pPixel[1] | pPixel[0] << 8;
-
-    PUT_PIXEL(value, r, g, b, uint16_t)
+    uint16_t value = putPixel<uint16_t>(r, g, b);
 
     pPixel[1] = value; value >>= 8;
     pPixel[0] = value;
@@ -375,10 +368,7 @@ void X11Display::putPixel16MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
 void X11Display::putPixel16LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
                                 uint8_t b, uint8_t a ) const
 {
-    uint16_t value = pPixel[0] | pPixel[1] << 8;
-
-    PUT_PIXEL(value, r, g, b, uint16_t)
-
+    uint16_t value = putPixel<uint16_t>(r,g,b);
     pPixel[0] = value; value >>= 8;
     pPixel[1] = value;
 }
@@ -387,10 +377,7 @@ void X11Display::putPixel16LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
 void X11Display::putPixel32MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
                                 uint8_t b, uint8_t a ) const
 {
-    uint32_t value = pPixel[3] | pPixel[2] << 8 | pPixel[1] << 16 |
-                          pPixel[0] << 24;
-
-    PUT_PIXEL(value, r, g, b, uint32_t)
+    uint32_t value = putPixel<uint32_t>(r,g,b);
 
     pPixel[3] = value; value >>= 8;
     pPixel[2] = value; value >>= 8;
@@ -402,10 +389,7 @@ void X11Display::putPixel32MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
 void X11Display::putPixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
                                 uint8_t b, uint8_t a ) const
 {
-    uint32_t value = pPixel[0] | pPixel[1] << 8 | pPixel[2] << 16 |
-                          pPixel[3] << 24;
-
-    PUT_PIXEL(value, r, g, b, uint32_t)
+    uint32_t value = putPixel<uint32_t>(r,g,b);
 
     pPixel[0] = value; value >>= 8;
     pPixel[1] = value; value >>= 8;
@@ -417,9 +401,7 @@ void X11Display::putPixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
 unsigned long X11Display::getPixelValue( uint8_t r, uint8_t g, uint8_t b )
     const
 {
-    unsigned long value;
-
-    PUT_PIXEL(value, r, g, b, uint32_t)
+    unsigned long value = putPixel<unsigned long>(r,g,b);
 
     if( m_pixelSize == 1 )
     {

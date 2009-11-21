@@ -94,6 +94,10 @@ private:
     /// Pointer on the right implementation of putPixel
     MakePixelFunc_t putPixelImpl;
 
+    template<class type> type putPixel(type r, type g, type b) const;
+    template<class type>
+    type blendPixel(type v,type r, type g, type b,type a) const;
+
     /// Calculate shifts from a color mask
     void getShifts( uint32_t mask, int &rLeftShift,
                     int &rRightShift ) const;
