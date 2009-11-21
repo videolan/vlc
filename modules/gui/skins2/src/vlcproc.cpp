@@ -520,35 +520,25 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
     input_thread_t* pInput = (input_thread_t*) p_obj;
 
-    StreamTime *pTime = (StreamTime*)m_cVarTime.get();
-    VarBoolImpl *pVarSeekable = (VarBoolImpl*)m_cVarSeekable.get();
-    VarBoolImpl *pVarRecordable = (VarBoolImpl*)m_cVarRecordable.get();
-    VarBoolImpl *pVarRecording  = (VarBoolImpl*)m_cVarRecording.get();
-    VarBoolImpl *pVarDvdActive = (VarBoolImpl*)m_cVarDvdActive.get();
-    VarBoolImpl *pVarHasVout = (VarBoolImpl*)m_cVarHasVout.get();
-    VarBoolImpl *pVarHasAudio = (VarBoolImpl*)m_cVarHasAudio.get();
-    VarBoolImpl *pVarFullscreen = (VarBoolImpl*)m_cVarFullscreen.get();
-    VarBoolImpl *pVarPlaying = (VarBoolImpl*)m_cVarPlaying.get();
-    VarBoolImpl *pVarStopped = (VarBoolImpl*)m_cVarStopped.get();
-    VarBoolImpl *pVarPaused = (VarBoolImpl*)m_cVarPaused.get();
-    VarBoolImpl *pVarEqualizer = (VarBoolImpl*)m_cVarEqualizer.get();
+#   define SET_BOOL(m,v)         ((VarBoolImpl*)(m).get())->set(v)
+#   define SET_STREAMTIME(m,v,b) ((StreamTime*)(m).get())->set(v,b)
 
     switch( newVal.i_int )
     {
         case INPUT_EVENT_STATE:
         {
             int state = var_GetInteger( pInput, "state" );
-            pVarStopped->set( false );
-            pVarPlaying->set( state != PAUSE_S );
-            pVarPaused->set( state == PAUSE_S );
+            SET_BOOL( m_cVarStopped, false );
+            SET_BOOL( m_cVarPlaying, state != PAUSE_S );
+            SET_BOOL( m_cVarPaused, state == PAUSE_S );
             break;
         }
 
         case INPUT_EVENT_POSITION:
         {
             float pos = var_GetFloat( pInput, "position" );
-            pTime->set( pos, false );
-            pVarSeekable->set( pos != 0.0 );
+            SET_STREAMTIME( m_cVarTime, pos, false );
+            SET_BOOL( m_cVarSeekable, pos != 0.0 );
             break;
         }
 
@@ -558,17 +548,18 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
             vlc_value_t audio_es;
             var_Change( pInput, "audio-es", VLC_VAR_CHOICESCOUNT,
                             &audio_es, NULL );
-            pVarHasAudio->set( audio_es.i_int > 0 );
+            SET_BOOL( m_cVarHasAudio, audio_es.i_int > 0 );
             break;
         }
 
         case INPUT_EVENT_VOUT:
         {
             vout_thread_t* pVout = input_GetVout( pInput );
-            pVarHasVout->set( pVout != NULL );
+            SET_BOOL( m_cVarHasVout, pVout != NULL );
             if( pVout )
             {
-                pVarFullscreen->set( var_GetBool( pVout, "fullscreen" ) );
+                SET_BOOL( m_cVarFullscreen,
+                                         var_GetBool( pVout, "fullscreen" ) );
                 vlc_object_release( pVout );
             }
             break;
@@ -609,7 +600,7 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
             char *pFilters = var_GetNonEmptyString( pAout, "audio-filter" );
             bool b_equalizer = pFilters && strstr( pFilters, "equalizer" );
             free( pFilters );
-            pVarEqualizer->set( b_equalizer );
+            SET_BOOL( m_cVarEqualizer, b_equalizer );
             if( b_equalizer )
             {
                 var_AddCallback( pAout, "equalizer-bands",
@@ -627,12 +618,12 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
             vlc_value_t chapters_count;
             var_Change( pInput, "chapter", VLC_VAR_CHOICESCOUNT,
                         &chapters_count, NULL );
-            pVarDvdActive->set( chapters_count.i_int > 0 );
+            SET_BOOL( m_cVarDvdActive, chapters_count.i_int > 0 );
             break;
         }
 
         case INPUT_EVENT_RECORD:
-            pVarRecording->set( var_GetBool( pInput, "record" ) );
+            SET_BOOL( m_cVarRecording, var_GetBool( pInput, "record" ) );
             break;
 
         case INPUT_EVENT_DEAD:
@@ -642,6 +633,10 @@ void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
         default:
             break;
     }
+
+#   undef  SET_BOOL
+#   undef  SET_STREAMTIME
+
 }
 
 void VlcProc::on_bit_rate_changed( vlc_object_t* p_obj, vlc_value_t newVal )
@@ -810,7 +805,6 @@ void VlcProc::init_variables()
 
 void VlcProc::update_equalizer()
 {
-    VarBoolImpl *pVarEqualizer = (VarBoolImpl*)m_cVarEqualizer.get();
 
     char *pFilters;
     if( m_pAout )
@@ -820,6 +814,8 @@ void VlcProc::update_equalizer()
 
     bool b_equalizer = pFilters && strstr( pFilters, "equalizer" );
     free( pFilters );
+
+    VarBoolImpl *pVarEqualizer = (VarBoolImpl*)m_cVarEqualizer.get();
     pVarEqualizer->set( b_equalizer );
 }
 
