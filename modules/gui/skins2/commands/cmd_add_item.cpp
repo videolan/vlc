@@ -41,18 +41,9 @@ void CmdAddItem::execute()
     if( !psz_uri )
         return;
 
-    if( m_playNow )
-    {
-        // Enqueue and play the item
-        playlist_Add( pPlaylist, psz_uri, NULL,
-                      PLAYLIST_APPEND | PLAYLIST_GO, PLAYLIST_END, true,
-                      false );
-    }
-    else
-    {
-        // Enqueue the item only
-        playlist_Add( pPlaylist, psz_uri, NULL,
-                      PLAYLIST_APPEND, PLAYLIST_END, true, false );
-    }
+    playlist_Add( pPlaylist, psz_uri, NULL,
+                  m_playNow ? PLAYLIST_APPEND | PLAYLIST_GO : PLAYLIST_APPEND,
+                  PLAYLIST_END, true, false );
+
     free( psz_uri );
 }

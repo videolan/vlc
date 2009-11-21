@@ -16,9 +16,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #include "cmd_voutwindow.hpp"
@@ -27,46 +27,39 @@
 
 
 CmdNewVoutWindow::CmdNewVoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd )
-   : CmdGeneric( pIntf ), m_pWnd( pWnd )
-{
-}
+    : CmdGeneric( pIntf ), m_pWnd( pWnd ) { }
 
 
 void CmdNewVoutWindow::execute()
 {
-    vlc_mutex_lock( &getIntf()->p_sys->vout_lock );
+    intf_sys_t *p_sys = getIntf()->p_sys;
 
-    VoutManager* p_VoutManager = getIntf()->p_sys->p_voutManager;
+    vlc_mutex_lock( &p_sys->vout_lock );
 
-    void* handle = p_VoutManager->acceptWnd( m_pWnd );
+    p_sys->handle = p_sys->p_voutManager->acceptWnd( m_pWnd );
+    p_sys->b_vout_ready = true;
+    vlc_cond_signal( &p_sys->vout_wait );
 
-    getIntf()->p_sys->handle = handle;
-    getIntf()->p_sys->b_vout_ready = true;
-    vlc_cond_signal( &getIntf()->p_sys->vout_wait );
-
-    vlc_mutex_unlock( &getIntf()->p_sys->vout_lock );
+    vlc_mutex_unlock( &p_sys->vout_lock );
 }
 
 
 CmdReleaseVoutWindow::CmdReleaseVoutWindow( intf_thread_t *pIntf,
                                             vout_window_t* pWnd )
-   : CmdGeneric( pIntf ), m_pWnd( pWnd )
-{
-}
+    : CmdGeneric( pIntf ), m_pWnd( pWnd ) { }
 
 
 void CmdReleaseVoutWindow::execute()
 {
-    vlc_mutex_lock( &getIntf()->p_sys->vout_lock );
+    intf_sys_t *p_sys = getIntf()->p_sys;
 
-    VoutManager* p_VoutManager = getIntf()->p_sys->p_voutManager;
+    vlc_mutex_lock( &p_sys->vout_lock );
 
-    p_VoutManager->releaseWnd( m_pWnd );
+    p_sys->p_voutManager->releaseWnd( m_pWnd );
+    p_sys->b_vout_ready = true;
+    vlc_cond_signal( &p_sys->vout_wait );
 
-    getIntf()->p_sys->b_vout_ready = true;
-    vlc_cond_signal( &getIntf()->p_sys->vout_wait );
-
-    vlc_mutex_unlock( &getIntf()->p_sys->vout_lock );
+    vlc_mutex_unlock( &p_sys->vout_lock );
 }
 
 

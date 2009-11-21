@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #include "cmd_playlist.hpp"
@@ -36,9 +36,7 @@ void CmdPlaylistNext::execute()
 {
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
     if( pPlaylist != NULL )
-    {
         playlist_Next( pPlaylist );
-    }
 }
 
 
@@ -46,9 +44,7 @@ void CmdPlaylistPrevious::execute()
 {
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
     if( pPlaylist != NULL )
-    {
         playlist_Prev( pPlaylist );
-    }
 }
 
 
@@ -89,29 +85,25 @@ void CmdPlaylistSave::execute()
     playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
     if( pPlaylist != NULL )
     {
-        static const char psz_xspf[] = "export-xspf",
-                          psz_m3u[] = "export-m3u",
-                          psz_html[] = "export-html";
         const char *psz_module;
         if( m_file.find( ".xsp", 0 ) != string::npos )
-            psz_module = psz_xspf;
+            psz_module = "export-xspf";
         else if( m_file.find( "m3u", 0 ) != string::npos )
-            psz_module = psz_m3u;
+            psz_module = "export-m3u";
         else if( m_file.find( "html", 0 ) != string::npos )
-            psz_module = psz_html;
+            psz_module = "export-html";
         else
         {
-            msg_Err( getIntf(), "Impossible to recognise the file type" );
+            msg_Err(getIntf(),"Did not recognise playlist export file type");
             return;
         }
 
-        playlist_Export( pPlaylist, m_file.c_str(), pPlaylist->p_local_category, psz_module );
+        playlist_Export( pPlaylist, m_file.c_str(),
+                         pPlaylist->p_local_category, psz_module );
     }
 }
 
 void CmdPlaylistFirst::execute()
 {
-    playlist_t *pPlaylist = getIntf()->p_sys->p_playlist;
-
-    playlist_Control( pPlaylist, PLAYLIST_PLAY, pl_Unlocked );
+    playlist_Control(getIntf()->p_sys->p_playlist,PLAYLIST_PLAY,pl_Unlocked);
 }

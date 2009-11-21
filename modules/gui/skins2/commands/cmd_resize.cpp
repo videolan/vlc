@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #include "cmd_resize.hpp"
@@ -31,11 +31,9 @@
 
 
 CmdResize::CmdResize( intf_thread_t *pIntf, const WindowManager &rWindowManager,
-                      GenericLayout &rLayout, int width, int height ):
-    CmdGeneric( pIntf ), m_rWindowManager( rWindowManager ),
-    m_rLayout( rLayout ), m_width( width ), m_height( height )
-{
-}
+                      GenericLayout &rLayout, int width, int height )
+    : CmdGeneric( pIntf ), m_rWindowManager( rWindowManager ),
+      m_rLayout( rLayout ), m_width( width ), m_height( height ) { }
 
 
 void CmdResize::execute()
@@ -48,9 +46,7 @@ void CmdResize::execute()
 
 CmdResizeInnerVout::CmdResizeInnerVout( intf_thread_t *pIntf,
                     CtrlVideo* pCtrlVideo )
-         : CmdGeneric( pIntf ), m_pCtrlVideo( pCtrlVideo )
-{
-}
+    : CmdGeneric( pIntf ), m_pCtrlVideo( pCtrlVideo ) { }
 
 
 void CmdResizeInnerVout::execute()
@@ -61,30 +57,23 @@ void CmdResizeInnerVout::execute()
 
 CmdResizeVout::CmdResizeVout( intf_thread_t *pIntf, vout_window_t* pWnd,
                               int width, int height )
-  : CmdGeneric( pIntf ), m_pWnd( pWnd ), m_width( width ), m_height( height )
-{
-}
+    : CmdGeneric( pIntf ), m_pWnd( pWnd ), m_width( width ),
+      m_height( height ) { }
 
 
 void CmdResizeVout::execute()
 {
-    VoutManager* p_VoutManager = getIntf()->p_sys->p_voutManager;
-
-    p_VoutManager->setSizeWnd( m_pWnd, m_width, m_height );
+    getIntf()->p_sys->p_voutManager->setSizeWnd( m_pWnd, m_width, m_height );
 }
 
 CmdSetFullscreen::CmdSetFullscreen( intf_thread_t *pIntf,
                                     vout_window_t * pWnd, bool fullscreen )
-    : CmdGeneric( pIntf ), m_pWnd( pWnd ), m_bFullscreen( fullscreen )
-{
-}
+    : CmdGeneric( pIntf ), m_pWnd( pWnd ), m_bFullscreen( fullscreen ) { }
 
 
 void CmdSetFullscreen::execute()
 {
-    VoutManager* p_VoutManager = getIntf()->p_sys->p_voutManager;
-
-    p_VoutManager->setFullscreenWnd( m_pWnd, m_bFullscreen );
+    getIntf()->p_sys->p_voutManager->setFullscreenWnd( m_pWnd, m_bFullscreen );
 }
 
 

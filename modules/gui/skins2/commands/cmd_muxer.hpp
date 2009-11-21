@@ -32,8 +32,8 @@
 class CmdMuxer: public CmdGeneric
 {
 public:
-    CmdMuxer( intf_thread_t *pIntf, const list<CmdGeneric*> &rList ):
-        CmdGeneric( pIntf ), m_list( rList ) { }
+    CmdMuxer( intf_thread_t *pIntf, const list<CmdGeneric*> &rList )
+        : CmdGeneric( pIntf ), m_list( rList ) { }
     virtual ~CmdMuxer() { }
     virtual void execute();
     virtual string getType() const { return "muxer"; }
