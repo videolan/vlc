@@ -144,18 +144,16 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
                                  &xVInfoTemplate, &vCount );
         if( pVInfo == NULL )
         {
-            msg_Err( getIntf(), "No TrueColor visual for depth %d",
-                     depth );
+            msg_Err( getIntf(), "No TrueColor visual for depth %d", depth );
             m_pDisplay = NULL;
             break;
         }
         m_pVisual = pVInfo->visual;
 
         // Compute the color shifts
-        getShifts( pVInfo->red_mask, m_redLeftShift, m_redRightShift );
-        getShifts( pVInfo->green_mask, m_greenLeftShift,
-                   m_greenRightShift );
-        getShifts( pVInfo->blue_mask, m_blueLeftShift, m_blueRightShift );
+        getShifts( pVInfo->red_mask,   m_redLeftShift,   m_redRightShift   );
+        getShifts( pVInfo->green_mask, m_greenLeftShift, m_greenRightShift );
+        getShifts( pVInfo->blue_mask,  m_blueLeftShift,  m_blueRightShift  );
 
         if( depth == 15 || depth == 16 )
         {
@@ -238,7 +236,6 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
                              mask, ShapeSet );
         XDestroyRegion( mask );
 
-        // Map the window
         XMapWindow( m_pDisplay, m_mainWindow);
 
         // Move it outside the screen to avoid seeing it in workspace selector
@@ -249,22 +246,10 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
 X11Display::~X11Display()
 {
-    if( m_mainWindow )
-    {
-        XDestroyWindow( m_pDisplay, m_mainWindow );
-    }
-    if( m_gc )
-    {
-        XFreeGC( m_pDisplay, m_gc );
-    }
-    if( m_colormap )
-    {
-        XFreeColormap( m_pDisplay, m_colormap );
-    }
-    if( m_pDisplay )
-    {
-        XCloseDisplay( m_pDisplay );
-    }
+    if( m_mainWindow ) XDestroyWindow( m_pDisplay, m_mainWindow );
+    if( m_gc )         XFreeGC( m_pDisplay, m_gc );
+    if( m_colormap )   XFreeColormap( m_pDisplay, m_colormap );
+    if( m_pDisplay )   XCloseDisplay( m_pDisplay );
 }
 
 
@@ -321,8 +306,8 @@ void X11Display::blendPixel16LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
 void X11Display::blendPixel32MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
                                   uint8_t b, uint8_t a ) const
 {
-    uint32_t value = pPixel[3] | pPixel[2] << 8 | pPixel[1] << 16 |
-                          pPixel[0] << 24;
+    uint32_t value = pPixel[3] | pPixel[2] << 8 |
+                     pPixel[1] << 16 | pPixel[0] << 24;
 
     value = blendPixel<uint32_t>(value,r,g,b,a);
 
@@ -336,8 +321,8 @@ void X11Display::blendPixel32MSB( uint8_t *pPixel, uint8_t r, uint8_t g,
 void X11Display::blendPixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g,
                                   uint8_t b, uint8_t a ) const
 {
-    uint32_t value = pPixel[0] | pPixel[1] << 8 | pPixel[2] << 16 |
-                          pPixel[3] << 24;
+    uint32_t value = pPixel[0] | pPixel[1] << 8 |
+                     pPixel[2] << 16 | pPixel[3] << 24;
 
     value = blendPixel<uint32_t>(value,r,g,b,a);
 
@@ -403,14 +388,7 @@ unsigned long X11Display::getPixelValue( uint8_t r, uint8_t g, uint8_t b )
 {
     unsigned long value = putPixel<unsigned long>(r,g,b);
 
-    if( m_pixelSize == 1 )
-    {
-        return 255 - value;
-    }
-    else
-    {
-        return value;
-    }
+    return m_pixelSize==1 ? 255 - value : value;
 }
 
 

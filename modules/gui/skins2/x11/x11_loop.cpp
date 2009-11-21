@@ -372,21 +372,13 @@ void X11Loop::handleX11Event()
             }
 
             if( type == "XdndEnter" )
-            {
                 pDnd->dndEnter( event.xclient.data.l );
-            }
             else if( type == "XdndPosition" )
-            {
                 pDnd->dndPosition( event.xclient.data.l );
-            }
             else if( type == "XdndLeave" )
-            {
                 pDnd->dndLeave( event.xclient.data.l );
-            }
             else if( type == "XdndDrop" )
-            {
                 pDnd->dndDrop( event.xclient.data.l );
-            }
             break;
         }
     }
