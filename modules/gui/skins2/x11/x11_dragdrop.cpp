@@ -120,18 +120,11 @@ void X11DragDrop::dndPosition( ldata_t data )
     event.xclient.message_type = typeAtom;
     event.xclient.format = 32;
     event.xclient.data.l[0] = m_wnd;
-    if( m_target != None )
-    {
-        // Accept the drop
-        event.xclient.data.l[1] = 1;
-    }
-    else
-    {
-        // Do not accept the drop
-        event.xclient.data.l[1] = 0;
-    }
-    int w = X11Factory::instance( getIntf() )->getScreenWidth();
-    int h = X11Factory::instance( getIntf() )->getScreenHeight();
+    // Accept the drop (1), or not (0).
+    event.xclient.data.l[1] = m_target != None ? 1 : 0;
+    OSFactory *pOsFactory = X11Factory::instance( getIntf() );
+    int w = pOsFactory->getScreenWidth();
+    int h = pOsFactory->getScreenHeight();
     event.xclient.data.l[2] = 0;
     event.xclient.data.l[3] = (w << 16) | h;
     event.xclient.data.l[4] = actionAtom;
@@ -174,8 +167,8 @@ void X11DragDrop::dndDrop( ldata_t data )
     if( buffer != NULL )
     {
         selection = buffer;
+        XFree( buffer );
     }
-    XFree( buffer );
 
     if( selection != "" )
     {
