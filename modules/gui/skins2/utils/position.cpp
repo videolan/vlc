@@ -120,14 +120,14 @@ int Position::getLeft() const
     {
         switch( m_refLeftTop )
         {
-            case kLeftTop:
-            case kLeftBottom:
-                return m_rRect.getLeft() + m_left;
-                break;
-            case kRightTop:
-            case kRightBottom:
-                return m_rRect.getLeft() + m_rRect.getWidth() + m_left - 1;
-                break;
+        case kLeftTop:
+        case kLeftBottom:
+            return m_rRect.getLeft() + m_left;
+            break;
+        case kRightTop:
+        case kRightBottom:
+            return m_rRect.getLeft() + m_rRect.getWidth() + m_left - 1;
+            break;
         }
         // Avoid a warning
         return 0;

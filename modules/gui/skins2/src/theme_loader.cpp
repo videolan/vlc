@@ -579,34 +579,33 @@ int tar_extract_all( TAR *t, char *prefix )
 
             switch( buffer.header.typeflag )
             {
-                case DIRTYPE:
-                    makedir( fname );
-                    break;
-                case REGTYPE:
-                case AREGTYPE:
-                    remaining = getoct( buffer.header.size, 12 );
-                    if( remaining )
+            case DIRTYPE:
+                makedir( fname );
+                break;
+            case REGTYPE:
+            case AREGTYPE:
+                remaining = getoct( buffer.header.size, 12 );
+                if( !remaining ) outfile = NULL; else
+                {
+                    outfile = fopen( fname, "wb" );
+                    if( outfile == NULL )
                     {
-                        outfile = fopen( fname, "wb" );
-                        if( outfile == NULL )
+                        /* try creating directory */
+                        char *p = strrchr( fname, '/' );
+                        if( p != NULL )
                         {
-                            /* try creating directory */
-                            char *p = strrchr( fname, '/' );
-                            if( p != NULL )
+                            *p = '\0';
+                            makedir( fname );
+                            *p = '/';
+                            outfile = fopen( fname, "wb" );
+                            if( !outfile )
                             {
-                                *p = '\0';
-                                makedir( fname );
-                                *p = '/';
-                                outfile = fopen( fname, "wb" );
-                                if( !outfile )
-                                {
-                                    fprintf( stderr, "tar couldn't create %s\n",
-                                             fname );
-                                }
+                                fprintf( stderr, "tar couldn't create %s\n",
+                                         fname );
                             }
                         }
                     }
-                    else outfile = NULL;
+                }
 
                 /*
                  * could have no contents
@@ -741,16 +740,16 @@ int gzopen_frontend( const char *pathname, int oflags, int mode )
 
     switch( oflags )
     {
-        case O_WRONLY:
-            gzflags = "wb";
-            break;
-        case O_RDONLY:
-            gzflags = "rb";
-            break;
-        case O_RDWR:
-        default:
-            errno = EINVAL;
-            return -1;
+    case O_WRONLY:
+        gzflags = "wb";
+        break;
+    case O_RDONLY:
+        gzflags = "rb";
+        break;
+    case O_RDWR:
+    default:
+        errno = EINVAL;
+        return -1;
     }
 
     gzf = gzopen( pathname, gzflags );

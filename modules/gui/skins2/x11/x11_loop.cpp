@@ -222,12 +222,12 @@ void X11Loop::handleX11Event()
             EvtMouse::ActionType_t action = EvtMouse::kDown;
             switch( event.type )
             {
-                case ButtonPress:
-                    action = EvtMouse::kDown;
-                    break;
-                case ButtonRelease:
-                    action = EvtMouse::kUp;
-                    break;
+            case ButtonPress:
+                action = EvtMouse::kDown;
+                break;
+            case ButtonRelease:
+                action = EvtMouse::kUp;
+                break;
             }
 
             // Get the modifiers
@@ -345,12 +345,12 @@ void X11Loop::handleX11Event()
 
             switch( event.type )
             {
-                case KeyPress:
-                    action = EvtKey::kDown;
-                    break;
-                case KeyRelease:
-                    action = EvtKey::kUp;
-                    break;
+            case KeyPress:
+                action = EvtKey::kDown;
+                break;
+            case KeyRelease:
+                action = EvtKey::kUp;
+                break;
             }
             EvtKey evt( getIntf(), key, action, mod );
             pWin->processEvent( evt );

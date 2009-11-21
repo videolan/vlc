@@ -87,110 +87,110 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
     switch( depth )
     {
-        case 8:
-            xVInfoTemplate.c_class = DirectColor;
-            // Get the DirectColor visual
-            pVInfo = XGetVisualInfo( m_pDisplay, VisualScreenMask |
-                                     VisualClassMask, &xVInfoTemplate,
-                                     &vCount );
-            if( pVInfo == NULL )
-            {
-                msg_Err( getIntf(), "no DirectColor visual available" );
-                m_pDisplay = NULL;
-                break;
-            }
-            m_pVisual = pVInfo->visual;
-
-            // Compute the color shifts
-            getShifts( pVInfo->red_mask, m_redLeftShift, m_redRightShift );
-            getShifts( pVInfo->green_mask, m_greenLeftShift,
-                       m_greenRightShift );
-            getShifts( pVInfo->blue_mask, m_blueLeftShift, m_blueRightShift );
-
-            // Create a color map
-            m_colormap = XCreateColormap( m_pDisplay, root,
-                    DefaultVisual( m_pDisplay, screen ), AllocAll );
-
-            // Create the palette
-            XColor pColors[255];
-            for( uint16_t i = 0; i < 255; i++ )
-            {
-                // kludge: colors are indexed reversely because color 255 seems
-                // to bereserved for black even if we try to set it to white
-                pColors[i].pixel = 254-i;
-                pColors[i].pad   = 0;
-                pColors[i].flags = DoRed | DoGreen | DoBlue;
-                pColors[i].red   =
-                    (i >> m_redLeftShift) << (m_redRightShift + 8);
-                pColors[i].green =
-                    (i >> m_greenLeftShift) << (m_greenRightShift + 8);
-                pColors[i].blue  =
-                    (i >> m_blueLeftShift) << (m_blueRightShift + 8);
-            }
-            XStoreColors( m_pDisplay, m_colormap, pColors, 255 );
-            blendPixelImpl = &X11Display::blendPixel8;
-            putPixelImpl = &X11Display::putPixel8;
-            m_pixelSize = 1;
+    case 8:
+        xVInfoTemplate.c_class = DirectColor;
+        // Get the DirectColor visual
+        pVInfo = XGetVisualInfo( m_pDisplay, VisualScreenMask |
+                                 VisualClassMask, &xVInfoTemplate,
+                                 &vCount );
+        if( pVInfo == NULL )
+        {
+            msg_Err( getIntf(), "no DirectColor visual available" );
+            m_pDisplay = NULL;
             break;
+        }
+        m_pVisual = pVInfo->visual;
 
-        case 15:
-        case 16:
-        case 24:
-        case 32:
-            // Get the TrueColor visual
-            xVInfoTemplate.c_class = TrueColor;
-            pVInfo = XGetVisualInfo( m_pDisplay, VisualScreenMask |
-                                     VisualDepthMask | VisualClassMask,
-                                     &xVInfoTemplate, &vCount );
-            if( pVInfo == NULL )
+        // Compute the color shifts
+        getShifts( pVInfo->red_mask, m_redLeftShift, m_redRightShift );
+        getShifts( pVInfo->green_mask, m_greenLeftShift,
+                   m_greenRightShift );
+        getShifts( pVInfo->blue_mask, m_blueLeftShift, m_blueRightShift );
+
+        // Create a color map
+        m_colormap = XCreateColormap( m_pDisplay, root,
+                DefaultVisual( m_pDisplay, screen ), AllocAll );
+
+        // Create the palette
+        XColor pColors[255];
+        for( uint16_t i = 0; i < 255; i++ )
+        {
+            // kludge: colors are indexed reversely because color 255 seems
+            // to bereserved for black even if we try to set it to white
+            pColors[i].pixel = 254-i;
+            pColors[i].pad   = 0;
+            pColors[i].flags = DoRed | DoGreen | DoBlue;
+            pColors[i].red   =
+                (i >> m_redLeftShift) << (m_redRightShift + 8);
+            pColors[i].green =
+                (i >> m_greenLeftShift) << (m_greenRightShift + 8);
+            pColors[i].blue  =
+                (i >> m_blueLeftShift) << (m_blueRightShift + 8);
+        }
+        XStoreColors( m_pDisplay, m_colormap, pColors, 255 );
+        blendPixelImpl = &X11Display::blendPixel8;
+        putPixelImpl = &X11Display::putPixel8;
+        m_pixelSize = 1;
+        break;
+
+    case 15:
+    case 16:
+    case 24:
+    case 32:
+        // Get the TrueColor visual
+        xVInfoTemplate.c_class = TrueColor;
+        pVInfo = XGetVisualInfo( m_pDisplay, VisualScreenMask |
+                                 VisualDepthMask | VisualClassMask,
+                                 &xVInfoTemplate, &vCount );
+        if( pVInfo == NULL )
+        {
+            msg_Err( getIntf(), "No TrueColor visual for depth %d",
+                     depth );
+            m_pDisplay = NULL;
+            break;
+        }
+        m_pVisual = pVInfo->visual;
+
+        // Compute the color shifts
+        getShifts( pVInfo->red_mask, m_redLeftShift, m_redRightShift );
+        getShifts( pVInfo->green_mask, m_greenLeftShift,
+                   m_greenRightShift );
+        getShifts( pVInfo->blue_mask, m_blueLeftShift, m_blueRightShift );
+
+        if( depth == 15 || depth == 16 )
+        {
+            if( order == MSBFirst )
             {
-                msg_Err( getIntf(), "No TrueColor visual for depth %d",
-                         depth );
-                m_pDisplay = NULL;
-                break;
-            }
-            m_pVisual = pVInfo->visual;
-
-            // Compute the color shifts
-            getShifts( pVInfo->red_mask, m_redLeftShift, m_redRightShift );
-            getShifts( pVInfo->green_mask, m_greenLeftShift,
-                       m_greenRightShift );
-            getShifts( pVInfo->blue_mask, m_blueLeftShift, m_blueRightShift );
-
-            if( depth == 15 || depth == 16 )
-            {
-                if( order == MSBFirst )
-                {
-                    blendPixelImpl = &X11Display::blendPixel16MSB;
-                    putPixelImpl = &X11Display::putPixel16MSB;
-                }
-                else
-                {
-                    blendPixelImpl = &X11Display::blendPixel16LSB;
-                    putPixelImpl = &X11Display::putPixel16LSB;
-                }
-                m_pixelSize = 2;
+                blendPixelImpl = &X11Display::blendPixel16MSB;
+                putPixelImpl = &X11Display::putPixel16MSB;
             }
             else
             {
-                if( order == MSBFirst )
-                {
-                    blendPixelImpl = &X11Display::blendPixel32MSB;
-                    putPixelImpl = &X11Display::putPixel32MSB;
-                }
-                else
-                {
-                    blendPixelImpl = &X11Display::blendPixel32LSB;
-                    putPixelImpl = &X11Display::putPixel32LSB;
-                }
-                m_pixelSize = 4;
+                blendPixelImpl = &X11Display::blendPixel16LSB;
+                putPixelImpl = &X11Display::putPixel16LSB;
             }
-            break;
+            m_pixelSize = 2;
+        }
+        else
+        {
+            if( order == MSBFirst )
+            {
+                blendPixelImpl = &X11Display::blendPixel32MSB;
+                putPixelImpl = &X11Display::putPixel32MSB;
+            }
+            else
+            {
+                blendPixelImpl = &X11Display::blendPixel32LSB;
+                putPixelImpl = &X11Display::putPixel32LSB;
+            }
+            m_pixelSize = 4;
+        }
+        break;
 
-        default:
-            msg_Err( getIntf(), "unsupported depth: %d bpp\n", depth );
-            m_pDisplay = NULL;
-            break;
+    default:
+        msg_Err( getIntf(), "unsupported depth: %d bpp\n", depth );
+        m_pDisplay = NULL;
+        break;
     }
 
     // Free the visual info
