@@ -17,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #include "theme.hpp"
@@ -159,77 +159,41 @@ void Theme::saveConfig()
 }
 
 
-// Useful macro
-#define FIND_OBJECT( mapData, mapName ) \
-    map<string, mapData>::const_iterator it; \
-    it = mapName.find( id ); \
-    if( it == mapName.end() ) \
-    { \
-        return NULL; \
-    } \
-    return (*it).second.get();
-
-// This macro takes an ID of the form "id1;id2;id3", and returns the object
+// Takes an ID of the form "id1;id2;id3", and returns the object
 // corresponding to the first valid ID. If no ID is valid, it returns NULL.
-// XXX: should we use a template method instead?
-#define FIND_FIRST_OBJECT( mapDataPtr, mapName ) \
-    string rightPart = id; \
-    string::size_type pos; \
-    do \
-    { \
-        pos = rightPart.find( ";" ); \
-        string leftPart = rightPart.substr( 0, pos ); \
-        map<string, mapDataPtr>::const_iterator it = mapName.find( leftPart ); \
-        if( it != mapName.end() ) \
-        { \
-            return (*it).second.get(); \
-            break; \
-        } \
- \
-        if( pos != string::npos ) \
-        { \
-            rightPart = rightPart.substr( pos, rightPart.size() ); \
-            rightPart = \
-                rightPart.substr( rightPart.find_first_not_of( " \t;" ), \
-                                  rightPart.size() ); \
-        } \
-    } \
-    while( pos != string::npos ); \
+// XXX The string handling here probably could be improved.
+template<class T> typename T::pointer
+Theme::IDmap<T>::find_first_object( const string &id ) const
+{
+    string rightPart = id;
+    string::size_type pos;
+    do
+    {
+        pos = rightPart.find( ";" );
+        string leftPart = rightPart.substr( 0, pos );
+
+        typename T::pointer p = find_object( leftPart );
+        if( p ) return p;
+
+        if( pos != string::npos )
+        {
+            rightPart = rightPart.substr( pos, rightPart.size() );
+            rightPart =
+                rightPart.substr( rightPart.find_first_not_of( " \t;" ),
+                                  rightPart.size() );
+        }
+    }
+    while( pos != string::npos );
     return NULL;
+}
 
 GenericBitmap *Theme::getBitmapById( const string &id ) const
 {
-    FIND_FIRST_OBJECT( GenericBitmapPtr, m_bitmaps );
+    m_bitmaps.find_first_object( id );
 }
 
 GenericFont *Theme::getFontById( const string &id ) const
 {
-    FIND_FIRST_OBJECT( GenericFontPtr, m_fonts );
+    m_fonts.find_first_object( id );
 }
-
-Popup *Theme::getPopupById( const string &id ) const
-{
-    FIND_OBJECT( PopupPtr, m_popups );
-}
-
-TopWindow *Theme::getWindowById( const string &id ) const
-{
-    FIND_OBJECT( TopWindowPtr, m_windows );
-}
-
-GenericLayout *Theme::getLayoutById( const string &id ) const
-{
-    FIND_OBJECT( GenericLayoutPtr, m_layouts );
-}
-
-CtrlGeneric *Theme::getControlById( const string &id ) const
-{
-    FIND_OBJECT( CtrlGenericPtr, m_controls );
-}
-
-Position *Theme::getPositionById( const string &id ) const
-{
-    FIND_OBJECT( PositionPtr, m_positions );
-}
-
 
