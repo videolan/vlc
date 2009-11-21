@@ -61,7 +61,15 @@ private:
     static int m_dblClickDelay;
     /// Map associating special (i.e. non ascii) virtual key codes with
     /// internal vlc key codes
-    map<KeySym, int> keysymToVlcKey;
+    typedef std::map<KeySym, int> keymap_t;
+    static keymap_t m_keymap;
+    /// Translate X11 KeySyms to VLC key codes.
+    static int keysymToVlcKey( KeySym keysym )
+    {
+        keymap_t::const_iterator i=m_keymap.find(keysym);
+        return i!=m_keymap.end() ? (i->second) : keysym;
+    }
+    static int X11ModToMod( unsigned state );
 
     // Private because it's a singleton
     X11Loop( intf_thread_t *pIntf, X11Display &rDisplay );

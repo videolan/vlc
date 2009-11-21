@@ -48,36 +48,39 @@
 // Maximum interval between clicks for a double-click (in microsec)
 int X11Loop::m_dblClickDelay = 400000;
 
+X11Loop::keymap_t X11Loop::m_keymap;
 
 X11Loop::X11Loop( intf_thread_t *pIntf, X11Display &rDisplay ):
     OSLoop( pIntf ), m_rDisplay( rDisplay ), m_exit( false ),
     m_lastClickTime( 0 ), m_lastClickPosX( 0 ), m_lastClickPosY( 0 )
 {
-    // Initialize the key map
-    keysymToVlcKey[XK_F1] = KEY_F1;
-    keysymToVlcKey[XK_F2] = KEY_F2;
-    keysymToVlcKey[XK_F3] = KEY_F3;
-    keysymToVlcKey[XK_F4] = KEY_F4;
-    keysymToVlcKey[XK_F5] = KEY_F5;
-    keysymToVlcKey[XK_F6] = KEY_F6;
-    keysymToVlcKey[XK_F7] = KEY_F7;
-    keysymToVlcKey[XK_F8] = KEY_F8;
-    keysymToVlcKey[XK_F9] = KEY_F9;
-    keysymToVlcKey[XK_F10] = KEY_F10;
-    keysymToVlcKey[XK_F11] = KEY_F11;
-    keysymToVlcKey[XK_F12] = KEY_F12;
-    keysymToVlcKey[XK_Return] = KEY_ENTER;
-    keysymToVlcKey[XK_Escape] = KEY_ESC;
-    keysymToVlcKey[XK_Left] = KEY_LEFT;
-    keysymToVlcKey[XK_Right] = KEY_RIGHT;
-    keysymToVlcKey[XK_Up] = KEY_UP;
-    keysymToVlcKey[XK_Down] = KEY_DOWN;
-    keysymToVlcKey[XK_Home] = KEY_HOME;
-    keysymToVlcKey[XK_End] = KEY_END;
-    keysymToVlcKey[XK_Prior] = KEY_PAGEUP;
-    keysymToVlcKey[XK_Next] = KEY_PAGEDOWN;
-    keysymToVlcKey[XK_Delete] = KEY_DELETE;
-    keysymToVlcKey[XK_Insert] = KEY_INSERT;
+    if(m_keymap.empty()) {
+        // Initialize the key map where VLC keys differ from X11 keys.
+        m_keymap[XK_F1] = KEY_F1;
+        m_keymap[XK_F2] = KEY_F2;
+        m_keymap[XK_F3] = KEY_F3;
+        m_keymap[XK_F4] = KEY_F4;
+        m_keymap[XK_F5] = KEY_F5;
+        m_keymap[XK_F6] = KEY_F6;
+        m_keymap[XK_F7] = KEY_F7;
+        m_keymap[XK_F8] = KEY_F8;
+        m_keymap[XK_F9] = KEY_F9;
+        m_keymap[XK_F10] = KEY_F10;
+        m_keymap[XK_F11] = KEY_F11;
+        m_keymap[XK_F12] = KEY_F12;
+        m_keymap[XK_Return] = KEY_ENTER;
+        m_keymap[XK_Escape] = KEY_ESC;
+        m_keymap[XK_Left] = KEY_LEFT;
+        m_keymap[XK_Right] = KEY_RIGHT;
+        m_keymap[XK_Up] = KEY_UP;
+        m_keymap[XK_Down] = KEY_DOWN;
+        m_keymap[XK_Home] = KEY_HOME;
+        m_keymap[XK_End] = KEY_END;
+        m_keymap[XK_Prior] = KEY_PAGEUP;
+        m_keymap[XK_Next] = KEY_PAGEDOWN;
+        m_keymap[XK_Delete] = KEY_DELETE;
+        m_keymap[XK_Insert] = KEY_INSERT;
+    }
 }
 
 
@@ -139,6 +142,19 @@ void X11Loop::run()
 void X11Loop::exit()
 {
     m_exit = true;
+}
+
+
+inline int X11Loop::X11ModToMod( unsigned state )
+{
+    int mod = EvtInput::kModNone;
+    if( state & Mod1Mask )
+        mod |= EvtInput::kModAlt;
+    if( state & ControlMask )
+        mod |= EvtInput::kModCtrl;
+    if( state & ShiftMask )
+        mod |= EvtInput::kModShift;
+    return mod;
 }
 
 
@@ -230,20 +246,7 @@ void X11Loop::handleX11Event()
                 break;
             }
 
-            // Get the modifiers
-            int mod = EvtInput::kModNone;
-            if( event.xbutton.state & Mod1Mask )
-            {
-                mod |= EvtInput::kModAlt;
-            }
-            if( event.xbutton.state & ControlMask )
-            {
-                mod |= EvtInput::kModCtrl;
-            }
-            if( event.xbutton.state & ShiftMask )
-            {
-                mod |= EvtInput::kModShift;
-            }
+            int mod = X11ModToMod( event.xbutton.state );
 
             // Check for double clicks
             if( event.type == ButtonPress &&
@@ -316,43 +319,12 @@ void X11Loop::handleX11Event()
         case KeyPress:
         case KeyRelease:
         {
-            EvtKey::ActionType_t action = EvtKey::kDown;
-            int mod = EvtInput::kModNone;
-            // Get the modifiers
-            if( event.xkey.state & Mod1Mask )
-            {
-                mod |= EvtInput::kModAlt;
-            }
-            if( event.xkey.state & ControlMask )
-            {
-                mod |= EvtInput::kModCtrl;
-            }
-            if( event.xkey.state & ShiftMask )
-            {
-                mod |= EvtInput::kModShift;
-            }
+            // Take the first keysym = lower case character, and translate.
+            int key = keysymToVlcKey( XLookupKeysym( &event.xkey, 0 ) );
 
-            // Take the first keysym = lower case character
-            KeySym keysym = XLookupKeysym( &event.xkey, 0 );
-
-            // Get VLC key code from the keysym
-            int key = keysymToVlcKey[keysym];
-            if( !key )
-            {
-                // Normal key
-                key = keysym;
-            }
-
-            switch( event.type )
-            {
-            case KeyPress:
-                action = EvtKey::kDown;
-                break;
-            case KeyRelease:
-                action = EvtKey::kUp;
-                break;
-            }
-            EvtKey evt( getIntf(), key, action, mod );
+            EvtKey evt( getIntf(), key,
+                        event.type==KeyRelease ? EvtKey::kUp : EvtKey::kDown,
+                        X11ModToMod( event.xkey.state ) );
             pWin->processEvent( evt );
             break;
         }
