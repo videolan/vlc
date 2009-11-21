@@ -733,7 +733,7 @@ AC_CHECK_LIB(m,pow,[
   VLC_ADD_LIBS([avcodec avformat swscale postproc ffmpegaltivec i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realaudio realvideo opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
-  VLC_ADD_LIBS([headphone_channel_mixer normvol speex mono colorthres extract],[-lm])
+  VLC_ADD_LIBS([headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract],[-lm])
 ])
 AC_CHECK_LIB(m,ceil,[
   VLC_ADD_LIBS([hotkeys mosaic swscale_omap],[-lm])
@@ -1272,6 +1272,7 @@ if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGIN([dolby_surround_decoder])
   VLC_ADD_PLUGIN([headphone_channel_mixer])
   VLC_ADD_PLUGIN([normvol])
+  VLC_ADD_PLUGIN([audiobargraph_a])
   VLC_ADD_PLUGIN([equalizer])
   VLC_ADD_PLUGIN([param_eq])
   VLC_ADD_PLUGIN([scaletempo])
@@ -1290,6 +1291,7 @@ if test "${SYS}" = "mingwce"; then
   VLC_ADD_PLUGIN([simple_channel_mixer])
   VLC_ADD_PLUGIN([headphone_channel_mixer])
   VLC_ADD_PLUGIN([normvol])
+  VLC_ADD_PLUGIN([audiobargraph_a])
   VLC_ADD_PLUGIN([a52tospdif])
   VLC_ADD_PLUGIN([dtstospdif])
   VLC_ADD_PLUGIN([i420_yuy2])
