@@ -72,7 +72,7 @@ CtrlRadialSlider::CtrlRadialSlider( intf_thread_t *pIntf,
 CtrlRadialSlider::~CtrlRadialSlider()
 {
     m_rVariable.delObserver( this );
-    SKINS_DELETE( m_pImgSeq );
+    delete m_pImgSeq;
 }
 
 

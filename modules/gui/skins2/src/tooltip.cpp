@@ -49,8 +49,8 @@ Tooltip::Tooltip( intf_thread_t *pIntf, const GenericFont &rFont, int delay ):
 Tooltip::~Tooltip()
 {
     VarManager::instance( getIntf() )->getTooltipText().delObserver( this );
-    SKINS_DELETE( m_pTimer );
-    SKINS_DELETE( m_pOsTooltip );
+    delete m_pTimer;
+    delete m_pOsTooltip;
     delete m_pImage;
 }
 

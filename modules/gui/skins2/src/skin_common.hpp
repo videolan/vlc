@@ -59,18 +59,6 @@ class ThemeRepository;
 #pragma warning ( disable:4786 )
 #endif
 
-// Useful macros
-#define SKINS_DELETE( p ) \
-   if( p ) \
-   { \
-       delete p; \
-   } \
-   else \
-   { \
-       msg_Err( getIntf(), "delete NULL pointer in %s at line %d", \
-                __FILE__, __LINE__ ); \
-   }
-
 
 /// Wrapper around FromLocale, to avoid the need to call LocaleFree()
 static inline string sFromLocale( const string &rLocale )

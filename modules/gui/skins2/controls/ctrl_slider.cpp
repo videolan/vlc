@@ -99,9 +99,9 @@ CtrlSliderCursor::CtrlSliderCursor( intf_thread_t *pIntf,
 CtrlSliderCursor::~CtrlSliderCursor()
 {
     m_rVariable.delObserver( this );
-    SKINS_DELETE( m_pImgUp );
-    SKINS_DELETE( m_pImgDown );
-    SKINS_DELETE( m_pImgOver );
+    delete m_pImgUp;
+    delete m_pImgDown;
+    delete m_pImgOver;
 }
 
 

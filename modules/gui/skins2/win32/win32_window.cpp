@@ -193,18 +193,8 @@ void Win32Window::setOpacity( uint8_t value ) const
 
 void Win32Window::toggleOnTop( bool onTop ) const
 {
-    if( onTop )
-    {
-        // Set the window on top
-        SetWindowPos( m_hWnd, HWND_TOPMOST, 0, 0, 0, 0,
-                      SWP_NOSIZE | SWP_NOMOVE );
-    }
-    else
-    {
-        // Set the window not on top
-        SetWindowPos( m_hWnd, HWND_NOTOPMOST, 0, 0, 0, 0,
-                      SWP_NOSIZE | SWP_NOMOVE );
-    }
+    SetWindowPos( m_hWnd, onTop ? HWND_TOPMOST : HWND_NOTOPMOST,
+                  0, 0, 0, 0, SWP_NOSIZE | SWP_NOMOVE );
 }
 
 

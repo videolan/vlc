@@ -47,7 +47,7 @@ CtrlImage::CtrlImage( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
 
 CtrlImage::~CtrlImage()
 {
-    SKINS_DELETE( m_pImage );
+    delete m_pImage;
 }
 
 
@@ -108,7 +108,7 @@ void CtrlImage::draw( OSGraphics &rImage, int xDest, int yDest )
                     OSFactory *pOsFactory = OSFactory::instance( getIntf() );
                     // Rescale the image with the actual size of the control
                     ScaledBitmap bmp( getIntf(), m_rBitmap, width, height );
-                    SKINS_DELETE( m_pImage );
+                    delete m_pImage;
                     m_pImage = pOsFactory->createOSGraphics( width, height );
                     m_pImage->drawBitmap( bmp, 0, 0 );
                 }
