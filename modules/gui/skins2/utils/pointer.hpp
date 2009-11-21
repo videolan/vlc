@@ -30,14 +30,17 @@
 template <class T> class CountedPtr
 {
 public:
-    explicit CountedPtr( T *pPtr = 0 ): m_pCounter( 0 )
+    typedef T *pointer;
+    typedef T &reference;
+
+    explicit CountedPtr( pointer pPtr = 0 ): m_pCounter( 0 )
     {
         if( pPtr ) m_pCounter = new Counter( pPtr );
     }
 
     ~CountedPtr() { release(); }
 
-    CountedPtr(const CountedPtr &rPtr ) { acquire( rPtr.m_pCounter ); }
+    CountedPtr( const CountedPtr &rPtr ) { acquire( rPtr.m_pCounter ); }
 
     CountedPtr &operator=( const CountedPtr &rPtr )
     {
@@ -49,11 +52,11 @@ public:
         return *this;
     }
 
-    T &operator*() const { return *m_pCounter->m_pPtr; }
+    // XXX Somebody explain why operator* and operator-> don't use get()
+    reference operator*() const { return *m_pCounter->m_pPtr; }
+    pointer   operator->() const { return m_pCounter->m_pPtr; }
 
-    T *operator->() const {return m_pCounter->m_pPtr; }
-
-    T *get() const { return m_pCounter ? m_pCounter->m_pPtr : 0; }
+    pointer get() const { return m_pCounter ? m_pCounter->m_pPtr : 0; }
 
     bool unique() const
     {
@@ -63,9 +66,9 @@ public:
 private:
     struct Counter
     {
-        Counter( T* pPtr = 0, unsigned int c = 1 )
+        Counter( pointer pPtr = 0, unsigned int c = 1 )
                : m_pPtr( pPtr ), m_count( c ) { }
-        T* m_pPtr;
+        pointer m_pPtr;
         unsigned int m_count;
     } *m_pCounter;
 
