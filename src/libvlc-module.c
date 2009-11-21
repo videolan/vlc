@@ -727,6 +727,10 @@ static const char *const ppsz_clock_descriptions[] =
 #define INPUT_FAST_SEEK_LONGTEXT N_( \
     "Favor speed over precision while seeking" )
 
+#define INPUT_RATE_TEXT N_("Playback speed")
+#define INPUT_RATE_LONGTEXT N_( \
+    "This defines the playback speed (nominal speed is 1.0)." )
+
 #define INPUT_LIST_TEXT N_("Input list")
 #define INPUT_LIST_LONGTEXT N_( \
     "You can give a comma-separated list " \
@@ -1794,6 +1798,8 @@ vlc_module_begin ()
     add_bool( "input-fast-seek", false, NULL,
               INPUT_FAST_SEEK_TEXT, INPUT_FAST_SEEK_LONGTEXT, false )
         change_safe ()
+    add_float( "rate", 1., NULL,
+               INPUT_RATE_TEXT, INPUT_RATE_LONGTEXT, false )
 
     add_string( "input-list", NULL, NULL,
                  INPUT_LIST_TEXT, INPUT_LIST_LONGTEXT, true )
