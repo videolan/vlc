@@ -34,55 +34,51 @@ template <class S, class ARG> class Observer;
 /// Template for subjects in the Observer design pattern
 template <class S, class ARG = void> class Subject
 {
-public:
-    virtual ~Subject() { }
+private:
+    typedef std::set<Observer<S, ARG>*> observers_t;
 
+public:
+    ~Subject() { }
+
+#if 0
     /// Remove all observers; should only be used for debugging purposes
-    virtual void clearObservers()
+    void clearObservers()
     {
         m_observers.clear();
     }
+#endif
 
-    /// Add an observer to this subject
-    /// Note: adding twice the same observer is not harmful
-    virtual void addObserver( Observer<S, ARG>* pObserver )
+    /// Add an observer to this subject. Ignore NULL observers.
+    /// Note: adding the same observer twice is not harmful.
+    void addObserver( Observer<S, ARG>* pObserver )
     {
-        m_observers.insert( pObserver );
+        if( pObserver ) m_observers.insert( pObserver );
     }
 
-    /// Remove an observer from this subject
-    /// Note: removing twice the same observer is not harmful
-    virtual void delObserver( Observer<S, ARG>* pObserver )
+    /// Remove an observer from this subject. Ignore NULL observers.
+    /// Note: removing the same observer twice is not harmful.
+    void delObserver( Observer<S, ARG>* pObserver )
     {
-        m_observers.erase( pObserver );
+        if( pObserver ) m_observers.erase( pObserver );
     }
 
     /// Notify the observers when the status has changed
-    virtual void notify( ARG *arg )
+    void notify( ARG *arg )
     {
-        // This stupid gcc 3.2 needs "typename"
-        typename set<Observer<S, ARG>*>::const_iterator iter;
-        for( iter = m_observers.begin(); iter != m_observers.end();
-             iter++ )
-        {
-            if( *iter == NULL )
-            {
-                fprintf( stderr, "iter NULL !\n" );
-                return;
-            }
+        typename observers_t::const_iterator iter;
+        for( iter = m_observers.begin(); iter != m_observers.end(); ++iter )
             (*iter)->onUpdate( *this , arg );
-        }
     }
 
     /// Notify without any argument
-    virtual void notify() { notify( NULL ); }
+    void notify() { notify( NULL ); }
 
 protected:
     Subject() { }
 
 private:
     /// Set of observers for this subject
-    set<Observer<S, ARG>*> m_observers;
+    observers_t m_observers;
 };
 
 
