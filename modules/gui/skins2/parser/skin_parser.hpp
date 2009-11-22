@@ -87,6 +87,15 @@ private:
 
     /// Check if the id is unique, and if not generate a new one
     const string uniqueId( const string &id );
+
+    /// Helper for handleBeginElement: Provide default attribute if missing.
+    static void DefaultAttr( AttrList_t &attr, const char *a, const char *b )
+    {
+        if( attr.find(a) == attr.end() ) attr[strdup(a)] = strdup(b);
+    }
+    /// Helper for handleBeginElement: Complain if a named attribute is missing.
+    bool MissingAttr( AttrList_t &attr, const string &name, const char *a );
+
 };
 
 #endif
