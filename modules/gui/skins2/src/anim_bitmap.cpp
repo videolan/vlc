@@ -56,9 +56,7 @@ AnimBitmap::~AnimBitmap()
 void AnimBitmap::startAnim()
 {
     if( m_nbFrames > 1 && m_frameRate > 0 )
-    {
         m_pTimer->start( 1000 / m_frameRate, false );
-    }
 }
 
 
@@ -87,14 +85,8 @@ void AnimBitmap::draw( OSGraphics &rImage, int xDest, int yDest )
 bool AnimBitmap::hit( int x, int y ) const
 {
     int height = m_pImage->getHeight() / m_nbFrames;
-    if( y >= 0 && y < height )
-    {
-        return m_pImage->hit( x, m_curFrame * height + y );
-    }
-    else
-    {
-        return false;
-    }
+    return y >= 0 && y < height &&
+           m_pImage->hit( x, m_curFrame * height + y );
 }
 
 
