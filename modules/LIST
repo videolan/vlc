@@ -161,7 +161,6 @@ $Id$
  * kate: kate text bitstream decoder
  * libass: Subtitle renderers using libass
  * libmpeg2: Mpeg2 video decoder using libmpeg2
- * linear_resampler: linear audio resampler
  * lirc: Linux infrared control module
  * live555: rtp demux based on liveMedia (live555.com)
  * logger: file logger plugin
