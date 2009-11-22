@@ -49,6 +49,8 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     /// Create the generic commands
 #define REGISTER_CMD( name, cmd ) \
     m_commandMap[name] = CmdGenericPtr( new cmd( getIntf() ) );
+#define REGISTER_CMD1( name, cmd, a1 ) \
+    m_commandMap[name] = CmdGenericPtr( new cmd( getIntf(), a1 ) );
 
     REGISTER_CMD( "none", CmdDummy )
     REGISTER_CMD( "dialogs.changeSkin()", CmdDlgChangeSkin )
@@ -78,23 +80,15 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "playlist.add()", CmdDlgAdd )
     REGISTER_CMD( "playlist.next()", CmdPlaylistNext )
     REGISTER_CMD( "playlist.previous()", CmdPlaylistPrevious )
-    m_commandMap["playlist.setRandom(true)"] =
-        CmdGenericPtr( new CmdPlaylistRandom( getIntf(), true ) );
-    m_commandMap["playlist.setRandom(false)"] =
-        CmdGenericPtr( new CmdPlaylistRandom( getIntf(), false ) );
-    m_commandMap["playlist.setLoop(true)"] =
-        CmdGenericPtr( new CmdPlaylistLoop( getIntf(), true ) );
-    m_commandMap["playlist.setLoop(false)"] =
-        CmdGenericPtr( new CmdPlaylistLoop( getIntf(), false ) );
-    m_commandMap["playlist.setRepeat(true)"] =
-        CmdGenericPtr( new CmdPlaylistRepeat( getIntf(), true ) );
-    m_commandMap["playlist.setRepeat(false)"] =
-        CmdGenericPtr( new CmdPlaylistRepeat( getIntf(), false ) );
+    REGISTER_CMD1( "playlist.setRandom(true)", CmdPlaylistRandom, true )
+    REGISTER_CMD1( "playlist.setRandom(false)", CmdPlaylistRandom, false )
+    REGISTER_CMD1( "playlist.setLoop(true)", CmdPlaylistLoop, true )
+    REGISTER_CMD1( "playlist.setLoop(false)", CmdPlaylistLoop, false )
+    REGISTER_CMD1( "playlist.setRepeat(true)", CmdPlaylistRepeat, true )
+    REGISTER_CMD1( "playlist.setRepeat(false)", CmdPlaylistRepeat, false )
     VarTree &rVarTree = VlcProc::instance( getIntf() )->getPlaytreeVar();
-    m_commandMap["playlist.del()"] =
-        CmdGenericPtr( new CmdPlaytreeDel( getIntf(), rVarTree ) );
-    m_commandMap["playtree.del()"] =
-        CmdGenericPtr( new CmdPlaytreeDel( getIntf(), rVarTree ) );
+    REGISTER_CMD1( "playlist.del()", CmdPlaytreeDel, rVarTree )
+    REGISTER_CMD1( "playtree.del()", CmdPlaytreeDel, rVarTree )
     REGISTER_CMD( "playlist.sort()", CmdPlaytreeSort )
     REGISTER_CMD( "playtree.sort()", CmdPlaytreeSort )
     REGISTER_CMD( "vlc.fullscreen()", CmdFullscreen )
@@ -112,10 +106,8 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     REGISTER_CMD( "vlc.toggleRecord()", CmdToggleRecord )
     REGISTER_CMD( "vlc.nextFrame()", CmdNextFrame )
     REGISTER_CMD( "vlc.quit()", CmdQuit )
-    m_commandMap["equalizer.enable()"] =
-        CmdGenericPtr( new CmdSetEqualizer( getIntf(), true ) );
-    m_commandMap["equalizer.disable()"] =
-        CmdGenericPtr( new CmdSetEqualizer( getIntf(), false ) );
+    REGISTER_CMD1( "equalizer.enable()", CmdSetEqualizer, true )
+    REGISTER_CMD1( "equalizer.disable()", CmdSetEqualizer, false )
 
     // Register the constant bool variables in the var manager
     VarManager *pVarManager = VarManager::instance( getIntf() );
@@ -123,6 +115,9 @@ Interpreter::Interpreter( intf_thread_t *pIntf ): SkinObject( pIntf )
     pVarManager->registerVar( VariablePtr( pVarTrue ), "true" );
     VarBool *pVarFalse = new VarBoolFalse( getIntf() );
     pVarManager->registerVar( VariablePtr( pVarFalse ), "false" );
+
+#undef  REGISTER_CMD
+#undef  REGISTER_CMD1
 }
 
 
@@ -130,12 +125,9 @@ Interpreter *Interpreter::instance( intf_thread_t *pIntf )
 {
     if( ! pIntf->p_sys->p_interpreter )
     {
-        Interpreter *pInterpreter;
-        pInterpreter = new Interpreter( pIntf );
+        Interpreter *pInterpreter = new (std::nothrow) Interpreter( pIntf );
         if( pInterpreter )
-        {
             pIntf->p_sys->p_interpreter = pInterpreter;
-        }
     }
     return pIntf->p_sys->p_interpreter;
 }
@@ -515,40 +507,29 @@ VarBool *Interpreter::getVarBool( const string &rName, Theme *pTheme )
 
 VarPercent *Interpreter::getVarPercent( const string &rName, Theme *pTheme )
 {
-    // Try to get the variable from the variable manager
     VarManager *pVarManager = VarManager::instance( getIntf() );
-    VarPercent *pVar = (VarPercent*)pVarManager->getVar( rName, "percent" );
-    return pVar;
+    return static_cast<VarPercent*>(pVarManager->getVar( rName, "percent" ));
 }
 
 
 VarList *Interpreter::getVarList( const string &rName, Theme *pTheme )
 {
-    // Try to get the variable from the variable manager
     VarManager *pVarManager = VarManager::instance( getIntf() );
-    VarList *pVar = (VarList*)pVarManager->getVar( rName, "list" );
-    return pVar;
+    return static_cast<VarList*>(pVarManager->getVar( rName, "list" ));
 }
 
 
 VarTree *Interpreter::getVarTree( const string &rName, Theme *pTheme )
 {
-    // Try to get the variable from the variable manager
     VarManager *pVarManager = VarManager::instance( getIntf() );
-    VarTree *pVar = (VarTree*)pVarManager->getVar( rName, "tree" );
-    return pVar;
+    return static_cast<VarTree*>(pVarManager->getVar( rName, "tree" ));
 }
 
 
 string Interpreter::getConstant( const string &rValue )
 {
-    // Check if the value is a registered constant
+    // Check if the value is a registered constant; if not, keep as is.
     string val = VarManager::instance( getIntf() )->getConst( rValue );
-    if( val.empty() )
-    {
-        // if not, keep the value as is
-        val = rValue;
-    }
-    return val;
+    return val.empty() ? rValue : val;
 }
 
