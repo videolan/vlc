@@ -91,6 +91,10 @@ private:
     void addTree( const BuilderData::Tree &rData );
     void addVideo( const BuilderData::Video &rData );
 
+    /// Helper for build(); gluing BuilderData::list<T>s to addType(T&)
+    template<class T> void add_objects(const std::list<T> &list,
+                                       void (Builder::*addfn)(const T &));
+
     /// Compute the position of a control
     const Position makePosition( const string &rLeftTop,
                                  const string &rRightBottom,

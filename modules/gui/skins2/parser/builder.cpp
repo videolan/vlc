@@ -75,24 +75,23 @@ CmdGeneric *Builder::parseAction( const string &rAction )
     return Interpreter::instance( getIntf() )->parseAction( rAction, m_pTheme );
 }
 
-
-// Useful macro
-#define ADD_OBJECTS( type ) \
-    list<BuilderData::type>::const_iterator it##type; \
-    for( it##type = m_rData.m_list##type.begin(); \
-         it##type != m_rData.m_list##type.end(); it##type++ ) \
-    { \
-        add##type( *it##type ); \
-    }
-
+template<class T> inline
+void Builder::add_objects(const std::list<T> &list,
+                          void (Builder::*addfn)(const T &))
+{
+    typename std::list<T>::const_iterator i;
+    for( i = list.begin(); i != list.end(); ++i )
+        (this->*addfn)( *i );
+}
 
 Theme *Builder::build()
 {
-    m_pTheme = new Theme( getIntf() );
+#define ADD_OBJECTS( type ) \
+    add_objects(m_rData.m_list##type,&Builder::add##type)
+
+    m_pTheme = new (std::nothrow) Theme( getIntf() );
     if( m_pTheme == NULL )
-    {
         return NULL;
-    }
 
     // Create everything from the data in the XML
     ADD_OBJECTS( Theme );
@@ -123,6 +122,8 @@ Theme *Builder::build()
     ADD_OBJECTS( MenuSeparator );
 
     return m_pTheme;
+
+#undef  ADD_OBJECTS
 }
 
 
