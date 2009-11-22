@@ -67,7 +67,7 @@ private:
     /// File name
     const string m_name;
     /// Buffer to store the font
-    void *m_buffer;
+    char *m_buffer;
     /// Pixel size of the font
     int m_size;
     /// Handle to FT library
@@ -81,6 +81,7 @@ private:
 
     /// Get the glyph corresponding to the given code
     Glyph_t &getGlyph( uint32_t code ) const;
+    bool error( unsigned err, const char *msg );
 };
 
 

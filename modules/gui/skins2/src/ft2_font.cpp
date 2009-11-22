@@ -22,8 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <errno.h>
 #include "ft2_font.hpp"
 #include "ft2_bitmap.hpp"
+#include "ft2_err.h"
 #include "../utils/ustring.hpp"
 
 #ifdef HAVE_FRIBIDI
@@ -40,59 +42,58 @@ FT2Font::FT2Font( intf_thread_t *pIntf, const string &rName, int size ):
 
 FT2Font::~FT2Font()
 {
-    // Clear the glyph cache
     GlyphMap_t::iterator iter;
     for( iter = m_glyphCache.begin(); iter != m_glyphCache.end(); ++iter )
-    {
         FT_Done_Glyph( (*iter).second.m_glyph );
-    }
-    if( m_face )
-    {
-        FT_Done_Face( m_face );
-    }
-    if( m_lib )
-    {
-        FT_Done_FreeType( m_lib );
-    }
-    free( m_buffer );
+    if( m_face ) FT_Done_Face( m_face );
+    if( m_lib )  FT_Done_FreeType( m_lib );
+    delete[] m_buffer;
 }
 
 
 bool FT2Font::init()
 {
-    int err;
+    unsigned err;
 
-    // Initialize libfreetype
-    if( FT_Init_FreeType( &m_lib ) )
+    if( err = FT_Init_FreeType( &m_lib ) )
     {
-        msg_Err( getIntf(), "failed to initialize freetype" );
+        msg_Err( getIntf(), "failed to initialize freetype (%s)",
+                 ft2_strerror( err ) );
         return false;
     }
 
-    // Open the font
     FILE *file = fopen( m_name.c_str(), "rb" );
-    if( file )
+    if( !file )
     {
-        msg_Dbg( getIntf(), "loading font %s", m_name.c_str() );
-    }
-    else
-    {
-        msg_Dbg( getIntf(), "unable to open the font %s", m_name.c_str() );
+        msg_Dbg( getIntf(), "failed to open font %s (%s)",
+                 m_name.c_str(), strerror(errno) );
         return false;
     }
-    // Get the file size
+    msg_Dbg( getIntf(), "loading font %s", m_name.c_str() );
+
     fseek( file, 0, SEEK_END );
-    int size = ftell( file );
+    long size = ftell( file );
     rewind( file );
-    // Allocate the buffer
-    m_buffer = malloc( size );
-    if( !m_buffer )
+
+    if( -1==size )
+    {
+        msg_Dbg( getIntf(), "fseek loading font %s (%s)",
+                 m_name.c_str(), strerror(errno) );
+        fclose( file );
         return false;
-    // Read the font data
+    }
+
+    m_buffer = new (std::nothrow) char[size];
+    if( !m_buffer )
+    {
+        fclose( file );
+        return false;
+    }
+
     fread( m_buffer, size, 1, file );
     fclose( file );
 
-    // Load the font from the buffer
+
     err = FT_New_Memory_Face( m_lib, (const FT_Byte*)m_buffer, size, 0,
                               &m_face );
     if ( err == FT_Err_Unknown_File_Format )
@@ -102,22 +103,24 @@ bool FT2Font::init()
     }
     else if ( err )
     {
-        msg_Err( getIntf(), "error opening font (%s)", m_name.c_str() );
+        msg_Err( getIntf(), "error opening font %s (%s)",
+                 m_name.c_str(), ft2_strerror(err) );
         return false;
     }
 
     // Select the charset
-    if( FT_Select_Charmap( m_face, ft_encoding_unicode ) )
+    if( err = FT_Select_Charmap( m_face, ft_encoding_unicode ) )
     {
-        msg_Err( getIntf(), "font has no UNICODE table (%s)", m_name.c_str() );
+        msg_Err( getIntf(), "font %s has no UNICODE table (%s)",
+                 m_name.c_str(), ft2_strerror(err) );
         return false;
     }
 
     // Set the pixel size
-    if( FT_Set_Pixel_Sizes( m_face, 0, m_size ) )
+    if( err = FT_Set_Pixel_Sizes( m_face, 0, m_size ) )
     {
-        msg_Warn( getIntf(), "cannot set a pixel size of %d (%s)", m_size,
-                  m_name.c_str() );
+        msg_Warn( getIntf(), "cannot set a pixel size of %d for %s (%s)",
+                  m_size, m_name.c_str(), ft2_strerror(err) );
     }
 
     // Get the font metrucs

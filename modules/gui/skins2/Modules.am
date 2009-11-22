@@ -113,6 +113,8 @@ SOURCES_skins2 = \
 	src/ft2_bitmap.hpp \
 	src/ft2_font.cpp \
 	src/ft2_font.hpp \
+	src/ft2_err.c \
+	src/ft2_err.h \
 	src/generic_bitmap.cpp \
 	src/generic_bitmap.hpp \
 	src/generic_font.hpp \
