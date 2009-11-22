@@ -331,7 +331,6 @@ $Id$
  * tremor: a vorbis audio decoder using the libvorbisidec (aka tremor) library
  * trivial_channel_mixer: Simple channel mixer plugin
  * trivial_mixer: Trivial audio mixer plugin
- * trivial_resampler: Simple audio resampler
  * ts: MPEG-TS demuxer
  * tta: Lossless True Audio parser
  * twolame: a mp1 mp2 audio encoder based on twolame
