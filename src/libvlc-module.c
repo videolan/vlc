@@ -1548,7 +1548,7 @@ vlc_module_begin ()
                             VOLUME_STEP_LONGTEXT, true )
     add_integer( "aout-rate", -1, NULL, AOUT_RATE_TEXT,
                  AOUT_RATE_LONGTEXT, true )
-#if !defined( __APPLE__ )
+#if HAVE_FPU && !defined( __APPLE__ )
     add_bool( "hq-resampling", 1, NULL, AOUT_RESAMP_TEXT,
               AOUT_RESAMP_LONGTEXT, true )
 #endif
