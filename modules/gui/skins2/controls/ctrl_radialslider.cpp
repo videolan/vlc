@@ -44,9 +44,8 @@ CtrlRadialSlider::CtrlRadialSlider( intf_thread_t *pIntf,
     m_cmdMove( this )
 {
     // Build the images of the sequence
-    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
-    m_pImgSeq = pOsFactory->createOSGraphics( rBmpSeq.getWidth(),
-                                              rBmpSeq.getHeight() );
+    m_pImgSeq = OSFactory::instance( getIntf() )->createOSGraphics(
+                                     rBmpSeq.getWidth(), rBmpSeq.getHeight() );
     m_pImgSeq->drawBitmap( rBmpSeq, 0, 0 );
 
     m_width = rBmpSeq.getWidth();
@@ -125,7 +124,7 @@ void CtrlRadialSlider::CmdDownUp::execute()
 
 void CtrlRadialSlider::CmdMove::execute()
 {
-    EvtMouse *pEvtMouse = (EvtMouse*)m_pParent->m_pEvt;
+    EvtMouse *pEvtMouse = static_cast<EvtMouse*>(m_pParent->m_pEvt);
 
     // Change the position of the cursor, in blocking mode
     m_pParent->setCursor( pEvtMouse->getXPos(), pEvtMouse->getYPos(), true );

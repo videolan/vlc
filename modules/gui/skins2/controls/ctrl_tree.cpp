@@ -574,7 +574,10 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
 
     else if( rEvent.getAsString().find( "scroll" ) != string::npos )
     {
-        int direction = ((EvtScroll&)rEvent).getDirection();
+        // XXX ctrl_slider.cpp has two more (but slightly different)
+        // XXX implementations of `scroll'. Figure out where it belongs.
+
+        int direction = static_cast<EvtScroll&>(rEvent).getDirection();
 
         double percentage = m_rTree.getPositionVar().get();
         double step = 2.0 / (double)( m_flat ? m_rTree.countLeafs()
@@ -622,17 +625,14 @@ void CtrlTree::handleEvent( EvtGeneric &rEvent )
 bool CtrlTree::mouseOver( int x, int y ) const
 {
     const Position *pPos = getPosition();
-    return ( pPos
-       ? x >= 0 && x <= pPos->getWidth() && y >= 0 && y <= pPos->getHeight()
-       : false);
+    return !pPos ? false :
+        x >= 0 && x <= pPos->getWidth() && y >= 0 && y <= pPos->getHeight();
 }
 
 void CtrlTree::draw( OSGraphics &rImage, int xDest, int yDest )
 {
     if( m_pImage )
-    {
         rImage.drawGraphics( *m_pImage, 0, 0, xDest, yDest );
-    }
 }
 
 bool CtrlTree::ensureVisible( VarTree::Iterator item )
@@ -776,7 +776,9 @@ void CtrlTree::makeImage()
         for( int yPos = 0; yPos < height; yPos += i_itemHeight )
         {
             int rectHeight = __MIN( i_itemHeight, height - yPos );
-            if( it != m_rTree.end() )
+            if( it == m_rTree.end() )
+                m_pImage->fillRect( 0, yPos, width, rectHeight, bgColor );
+            else
             {
                 uint32_t color = ( it->m_selected ? m_selColor : bgColor );
                 m_pImage->fillRect( 0, yPos, width, rectHeight, color );
@@ -785,10 +787,6 @@ void CtrlTree::makeImage()
                     it = m_flat ? m_rTree.getNextLeaf( it )
                                 : m_rTree.getNextVisibleItem( it );
                 } while( it != m_rTree.end() && it->m_deleted );
-            }
-            else
-            {
-                m_pImage->fillRect( 0, yPos, width, rectHeight, bgColor );
             }
             bgColor = ( bgColor == m_bgColor1 ? m_bgColor2 : m_bgColor1 );
         }

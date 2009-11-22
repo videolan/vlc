@@ -37,10 +37,9 @@ CtrlImage::CtrlImage( intf_thread_t *pIntf, const GenericBitmap &rBitmap,
     CtrlFlat( pIntf, rHelp, pVisible ), m_rBitmap( rBitmap ),
     m_rCommand( rCommand ), m_resizeMethod( resizeMethod )
 {
-    OSFactory *pOsFactory = OSFactory::instance( pIntf );
     // Create an initial unscaled image in the buffer
-    m_pImage = pOsFactory->createOSGraphics( rBitmap.getWidth(),
-                                             rBitmap.getHeight() );
+    m_pImage = OSFactory::instance( pIntf )->createOSGraphics(
+                                    rBitmap.getWidth(), rBitmap.getHeight() );
     m_pImage->drawBitmap( m_rBitmap );
 }
 
@@ -56,13 +55,11 @@ void CtrlImage::handleEvent( EvtGeneric &rEvent )
     // No FSM for this simple transition
     if( rEvent.getAsString() == "mouse:right:up:none" )
     {
-        CmdDlgShowPopupMenu cmd( getIntf() );
-        cmd.execute();
+        CmdDlgShowPopupMenu( getIntf() ).execute();
     }
     else if( rEvent.getAsString() == "mouse:left:up:none" )
     {
-        CmdDlgHidePopupMenu cmd( getIntf() );
-        cmd.execute();
+        CmdDlgHidePopupMenu( getIntf() ).execute();
     }
     else if( rEvent.getAsString() == "mouse:left:dblclick:none" )
     {
@@ -79,13 +76,10 @@ bool CtrlImage::mouseOver( int x, int y ) const
     {
         // In mosaic mode, convert the coordinates to make them fit to the
         // size of the original image
-        return m_pImage->hit( x % m_pImage->getWidth(),
-                              y % m_pImage->getHeight() );
+        x %= m_pImage->getWidth();
+        y %= m_pImage->getHeight();
     }
-    else
-    {
-        return m_pImage->hit( x, y );
-    }
+    return m_pImage->hit( x, y );
 }
 
 
