@@ -412,6 +412,7 @@ AM_CONDITIONAL(HAVE_LINUX, [test "${SYS}" = "linux"])
 AM_CONDITIONAL(HAVE_WIN32, test "${SYS}" = "mingw32")
 AM_CONDITIONAL(HAVE_WINCE, test "${SYS}" = "mingwce")
 AM_CONDITIONAL(USE_PEFLAGS, [test "${enable_peflags}" = "yes"])
+AM_CONDITIONAL(USE_X11_FOR_SKINS2, [case "${SYS}" in linux*|openbsd*) true;; *) false;; esac])
 
 dnl
 dnl Sadly autoconf doesn't think about testing foo.exe when ask to test

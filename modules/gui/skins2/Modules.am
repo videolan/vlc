@@ -211,7 +211,7 @@ SOURCES_skins2 += \
     $(NULL)
 endif
 
-if HAVE_LINUX
+if USE_X11_FOR_SKINS2
 SOURCES_skins2 += \
 	x11/x11_display.cpp \
 	x11/x11_display.hpp \
