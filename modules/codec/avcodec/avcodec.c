@@ -277,6 +277,22 @@ static int OpenDecoder( vlc_object_t *p_this )
     {
         p_context->dsp_mask |= FF_MM_SSE2;
     }
+#ifdef FF_MM_SSE3
+    if( !(i_cpu & CPU_CAPABILITY_SSE3) )
+        p_context->dsp_mask |= FF_MM_SSE3;
+#endif
+#ifdef FF_MM_SSSE3
+    if( !(i_cpu & CPU_CAPABILITY_SSSE3) )
+        p_context->dsp_mask |= FF_MM_SSSE3;
+#endif
+#ifdef FF_MM_SSE4
+    if( !(i_cpu & CPU_CAPABILITY_SSE4_1) )
+        p_context->dsp_mask |= FF_MM_SSE4;
+#endif
+#ifdef FF_MM_SSE42
+    if( !(i_cpu & CPU_CAPABILITY_SSE4_2) )
+        p_context->dsp_mask |= FF_MM_SSE42;
+#endif
 
     p_dec->b_need_packetized = true;
     switch( i_cat )
