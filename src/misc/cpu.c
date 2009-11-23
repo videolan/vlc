@@ -201,6 +201,30 @@ uint32_t CPUCapabilities( void )
                           "movsldup %%xmm1, %%xmm0\n" );
 # endif
 
+# if defined (__SSSE3__)
+    i_capabilities |= CPU_CAPABILITY_SSSE3;
+# elif defined (CAN_COMPILE_SSSE3)
+    if( i_ecx & 0x00000200 )
+        check_capability( "SSSE3", CPU_CAPABILITY_SSSE3,
+                          "pabsw %%xmm1, %%xmm0\n" );
+# endif
+
+# if defined (__SSE4_1__)
+    i_capabilities |= CPU_CAPABILITY_SSE4_1;
+# elif defined (CAN_COMPILE_SSE4_1)
+    if( i_ecx & 0x00080000 )
+        check_capability( "SSE4.1", CPU_CAPABILITY_SSE4_1,
+                          "pmaxsb %%xmm1, %%xmm0\n" );
+# endif
+
+# if defined (__SSE4_2__)
+    i_capabilities |= CPU_CAPABILITY_SSE4_2;
+# elif defined (CAN_COMPILE_SSE4_2)
+    if( i_ecx & 0x00100000 )
+        check_capability( "SSE4.2", CPU_CAPABILITY_SSE4_2,
+                          "pcmpgtq %%xmm1, %%xmm0\n" );
+# endif
+
     /* test for additional capabilities */
     cpuid( 0x80000000 );
 

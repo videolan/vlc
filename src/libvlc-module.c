@@ -1044,6 +1044,20 @@ static const char *const ppsz_clock_descriptions[] =
     "If your processor supports the SSE3 instructions set, VLC can take " \
     "advantage of them.")
 
+#define SSSE3_TEXT N_("Enable CPU SSSE3 support")
+#define SSSE3_LONGTEXT N_( \
+    "If your processor supports the SSSE3 instructions set, VLC can take " \
+    "advantage of them.")
+
+#define SSE4_1_TEXT N_("Enable CPU SSE4.1 support")
+#define SSE4_1_LONGTEXT N_( \
+    "If your processor supports the SSE4.1 instructions set, VLC can take " \
+    "advantage of them.")
+
+#define SSE4_2_TEXT N_("Enable CPU SSE4.2 support")
+#define SSE4_2_LONGTEXT N_( \
+    "If your processor supports the SSE4.2 instructions set, VLC can take " \
+    "advantage of them.")
 
 #define ALTIVEC_TEXT N_("Enable CPU AltiVec support")
 #define ALTIVEC_LONGTEXT N_( \
@@ -1979,6 +1993,12 @@ vlc_module_begin ()
     add_bool( "sse2", 1, NULL, SSE2_TEXT, SSE2_LONGTEXT, true )
         change_need_restart ()
     add_bool( "sse3", 1, NULL, SSE3_TEXT, SSE3_LONGTEXT, true )
+        change_need_restart ()
+    add_bool( "ssse3", 1, NULL, SSSE3_TEXT, SSSE3_LONGTEXT, true )
+        change_need_restart ()
+    add_bool( "sse41", 1, NULL, SSE4_1_TEXT, SSE4_1_LONGTEXT, true )
+        change_need_restart ()
+    add_bool( "sse42", 1, NULL, SSE4_2_TEXT, SSE4_2_LONGTEXT, true )
         change_need_restart ()
 #endif
 #if defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
