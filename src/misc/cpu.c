@@ -112,6 +112,18 @@ uint32_t CPUCapabilities( void )
                          : "a"  ( reg )        \
                          : "cc" );
 #   endif
+     /* Check if the OS really supports the requested instructions */
+#   define check_capability(name, flag, code)  \
+     do {                                      \
+        pid_t pid = fork();                    \
+        if( pid == 0 )                         \
+        {                                      \
+            __asm__ __volatile__ ( code : : ); \
+            exit(0);                           \
+        }                                      \
+        if( check_OS_capability((name), pid )) \
+            i_capabilities |= (flag);          \
+    while(0)
 
 # if defined (__i386__) && !defined (__i486__) && !defined (__i586__) \
   && !defined (__i686__) && !defined (__pentium4__) \
@@ -167,16 +179,8 @@ uint32_t CPUCapabilities( void )
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
 
 #   ifdef CAN_COMPILE_SSE
-        /* We test if OS supports the SSE instructions */
-        pid_t pid = fork();
-        if( pid == 0 )
-        {
-            /* Test a SSE instruction */
-            __asm__ __volatile__ ( "xorps %%xmm0,%%xmm0\n" : : );
-            exit(0);
-        }
-        if( check_OS_capability( "SSE", pid ) )
-            i_capabilities |= CPU_CAPABILITY_SSE;
+        check_capability( "SSE", CPU_CAPABILITY_SSE,
+                          "xorps %%xmm0,%%xmm0\n" );
 #   endif
     }
 # endif
@@ -185,36 +189,16 @@ uint32_t CPUCapabilities( void )
     i_capabilities |= CPU_CAPABILITY_SSE2;
 # elif defined (CAN_COMPILE_SSE)
     if( i_edx & 0x04000000 )
-    {
-        /* We test if OS supports the SSE2 instructions */
-        pid_t pid = fork();
-        if( pid == 0 )
-        {
-            /* Test a SSE2 instruction */
-            __asm__ __volatile__ ( "movupd %%xmm0, %%xmm0\n" : : );
-            exit(0);
-        }
-        if( check_OS_capability( "SSE2", pid ) )
-            i_capabilities |= CPU_CAPABILITY_SSE2;
-    }
+        check_capability( "SSE2", CPU_CAPABILITY_SSE2,
+                          "movupd %%xmm0, %%xmm0\n" );
 # endif
 
 # if defined (__SSE3__)
     i_capabilities |= CPU_CAPABILITY_SSE3;
 # elif defined (CAN_COMPILE_SSE3)
     if( i_ecx & 0x00000001 )
-    {
-        /* We test if OS supports the SSE3 instructions */
-        pid_t pid = fork();
-        if( pid == 0 )
-        {
-            /* Test a SSE3 instruction */
-            __asm__ __volatile__ ( "movsldup %%xmm1, %%xmm0\n" : : );
-            exit(0);
-        }
-        if( check_OS_capability( "SSE3", pid ) )
-            i_capabilities |= CPU_CAPABILITY_SSE3;
-    }
+        check_capability( "SSE3", CPU_CAPABILITY_SSE3,
+                          "movsldup %%xmm1, %%xmm0\n" );
 # endif
 
     /* test for additional capabilities */
@@ -230,17 +214,8 @@ uint32_t CPUCapabilities( void )
     i_capabilities |= CPU_CAPABILITY_3DNOW;
 # elif defined (CAN_COMPILE_3DNOW)
     if( i_edx & 0x80000000 )
-    {
-        pid_t pid = fork();
-        if( pid == 0 )
-        {
-            /* Test a 3D Now! instruction */
-            __asm__ __volatile__ ( "pfadd %%mm0,%%mm0\n" "femms\n" : : );
-            exit(0);
-        }
-        if( check_OS_capability( "3D Now!", pid ) )
-            i_capabilities |= CPU_CAPABILITY_3DNOW;
-    }
+        check_capability( "3D Now!", CPU_CAPABILITY_3DNOW,
+                          "pfadd %%mm0,%%mm0\n" "femms\n" );
 # endif
 
     if( b_amd && ( i_edx & 0x00400000 ) )
