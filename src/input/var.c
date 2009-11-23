@@ -574,7 +574,7 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     else
     {
-        int i_rate = INPUT_RATE_DEFAULT / newval.f_float;
+        newval.i_int = INPUT_RATE_DEFAULT / newval.f_float;
         input_ControlPush( p_input, INPUT_CONTROL_SET_RATE, &newval );
     }
     return VLC_SUCCESS;
