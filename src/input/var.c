@@ -136,8 +136,8 @@ void input_ControlVarInit ( input_thread_t *p_input )
     var_Change( p_input, "state", VLC_VAR_SETVALUE, &val, NULL );
 
     /* Rate */
-    var_Create( p_input, "rate", VLC_VAR_INTEGER );
-    val.i_int = p_input->p->i_rate;
+    var_Create( p_input, "rate", VLC_VAR_FLOAT );
+    val.f_float = (float)INPUT_RATE_DEFAULT / (float)p_input->p->i_rate;
     var_Change( p_input, "rate", VLC_VAR_SETVALUE, &val, NULL );
 
     var_Create( p_input, "rate-slower", VLC_VAR_VOID );
@@ -574,6 +574,7 @@ static int RateCallback( vlc_object_t *p_this, char const *psz_cmd,
     }
     else
     {
+        int i_rate = INPUT_RATE_DEFAULT / newval.f_float;
         input_ControlPush( p_input, INPUT_CONTROL_SET_RATE, &newval );
     }
     return VLC_SUCCESS;

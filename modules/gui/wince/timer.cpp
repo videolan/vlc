@@ -195,7 +195,7 @@ void Timer::Notify( void )
 
             /* Manage Speed status */
             var_Get( p_input, "rate", &val );
-            if( i_old_rate != val.i_int )
+            if( i_old_rate != (int)((float)INPUT_RATE_DEFAULT / val.f_float) )
             {
                 TCHAR psz_text[15];
                 _stprintf( psz_text + 2, _T("x%.2f"), 1000.0 / val.i_int );

@@ -1052,7 +1052,7 @@ void libvlc_media_player_set_rate(
         return;
     }
 
-    var_SetInteger( p_input_thread, "rate", 1000.0f/rate );
+    var_SetFloat( p_input_thread, "rate", rate );
     vlc_object_release( p_input_thread );
 }
 
@@ -1061,23 +1061,24 @@ float libvlc_media_player_get_rate(
                                  libvlc_exception_t *p_e )
 {
     input_thread_t *p_input_thread;
-    int i_rate;
+    float f_rate;
     bool b_can_rewind;
 
     p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
     if( !p_input_thread )
         return 0.0;  /* rate < 0 indicates rewind */
 
-    i_rate = var_GetInteger( p_input_thread, "rate" );
+    f_rate = var_GetFloat( p_input_thread, "rate" );
     b_can_rewind = var_GetBool( p_input_thread, "can-rewind" );
-    if( i_rate < 0 && !b_can_rewind )
+    /* FIXME: why are negative values forbidden ?? (rewinding) */
+    if( f_rate < 0 && !b_can_rewind )
     {
         vlc_object_release( p_input_thread );
         return 0.0;
     }
     vlc_object_release( p_input_thread );
 
-    return (float)1000.0f/i_rate;
+    return f_rate;
 }
 
 libvlc_state_t libvlc_media_player_get_state(

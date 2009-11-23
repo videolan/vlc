@@ -710,7 +710,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             }
             else if( i_action == ACTIONID_RATE_NORMAL )
             {
-                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT );
+                var_SetFloat( p_input, "rate", 1. );
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                  "%s", _("1.00x") );
             }
@@ -721,9 +721,12 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                  * and we want to increase/decrease it by 0.1 while making sure
                  * that the resulting playback rate is a multiple of 0.1
                  */
-                int i_rate = var_GetInteger( p_input, "rate" );
-                if( i_rate == 0 )
+                int i_rate = 1. * INPUT_RATE_DEFAULT
+                             / var_GetFloat( p_input, "rate" );
+                if( i_rate < INPUT_RATE_MIN )
                     i_rate = INPUT_RATE_MIN;
+                else if( i_rate > INPUT_RATE_MAX )
+                    i_rate = INPUT_RATE_MAX;
                 int i_sign = i_rate < 0 ? -1 : 1;
                 const int i_dir = i_action == ACTIONID_RATE_FASTER_FINE ? 1 : -1;
 
@@ -735,7 +738,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
                 i_rate = i_sign * __MIN( __MAX( i_rate, INPUT_RATE_MIN ), INPUT_RATE_MAX );
 
-                var_SetInteger( p_input, "rate", i_rate );
+                var_SetFloat( p_input, "rate", i_rate );
 
                 char psz_msg[7+1];
                 snprintf( psz_msg, sizeof(psz_msg), _("%.2fx"), (double)INPUT_RATE_DEFAULT / i_rate );
@@ -809,9 +812,9 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             }
             else if( i_action == ACTIONID_PLAY )
             {
-                if( var_GetInteger( p_input, "rate" ) != INPUT_RATE_DEFAULT )
+                if( var_GetFloat( p_input, "rate" ) != 1. )
                     /* Return to normal speed */
-                    var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT );
+                    var_SetFloat( p_input, "rate", 1. );
                 else
                 {
                     ClearChannels( p_intf, p_vout );

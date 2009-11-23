@@ -487,49 +487,49 @@ void InterfaceWindow::MessageReceived( BMessage * p_message )
         case HEIGHTH_PLAY:
             if( p_input )
             {
-                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT * 8 );
+                var_SetFloat( p_input, "rate", .125 );
             }
             break;
 
         case QUARTER_PLAY:
             if( p_input )
             {
-                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT * 4 );
+                var_SetFloat( p_input, "rate", .25 );
             }
             break;
 
         case HALF_PLAY:
             if( p_input )
             {
-                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT * 2 );
+                var_SetFloat( p_input, "rate", .5 );
             }
             break;
 
         case NORMAL_PLAY:
             if( p_input )
             {
-                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT );
+                var_SetFloat( p_input, "rate", 1. );
             }
             break;
 
         case TWICE_PLAY:
             if( p_input )
             {
-                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT / 2 );
+                var_SetFloat( p_input, "rate", 2. );
             }
             break;
 
         case FOUR_PLAY:
             if( p_input )
             {
-                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT / 4 );
+                var_SetFloat( p_input, "rate", 4. );
             }
             break;
 
         case HEIGHT_PLAY:
             if( p_input )
             {
-                var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT / 8 );
+                var_SetFloat( p_input, "rate", 8. );
             }
             break;
 
@@ -840,12 +840,12 @@ void InterfaceWindow::UpdateInterface()
         p_mediaControl->SetEnabled( true );
         bool hasTitles   = !var_Get( p_input, "title", &val );
         bool hasChapters = !var_Get( p_input, "chapter", &val );
-        p_mediaControl->SetStatus( var_GetInteger( p_input, "state" ),
-                                   var_GetInteger( p_input, "rate" ) );
+        p_mediaControl->SetStatus( INPUT_RATE_DEFAULT / var_GetFloat( p_input, "state" ),
+                                   INPUT_RATE_DEFAULT / var_GetFloat( p_input, "rate" ) );
         var_Get( p_input, "position", &val );
         p_mediaControl->SetProgress( val.f_float );
         _SetMenusEnabled( true, hasChapters, hasTitles );
-        _UpdateSpeedMenu( var_GetInteger( p_input, "rate" ) );
+        _UpdateSpeedMenu( INPUT_RATE_DEFAULT / var_GetFloat( p_input, "rate" ) );
 
         // enable/disable skip buttons
 #if 0

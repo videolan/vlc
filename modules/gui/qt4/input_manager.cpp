@@ -407,7 +407,7 @@ void InputManager::UpdateStatus()
 void InputManager::UpdateRate()
 {
     /* Update Rate */
-    int i_new_rate = var_GetInteger( p_input, "rate");
+    int i_new_rate = INPUT_RATE_DEFAULT / var_GetFloat( p_input, "rate" );
     if( i_new_rate != i_rate )
     {
         i_rate = i_new_rate;
@@ -776,8 +776,8 @@ void InputManager::reverse()
 {
     if( hasInput() )
     {
-        int i_rate = var_GetInteger( p_input, "rate" );
-        var_SetInteger( p_input, "rate", -i_rate );
+        float f_rate = var_GetFloat( p_input, "rate" );
+        var_SetFloat( p_input, "rate", -f_rate );
     }
 }
 
@@ -806,13 +806,14 @@ void InputManager::littleslower()
 void InputManager::normalRate()
 {
     if( hasInput() )
-        var_SetInteger( p_input, "rate", INPUT_RATE_DEFAULT );
+        var_SetFloat( p_input, "rate", 1. );
 }
 
 void InputManager::setRate( int new_rate )
 {
     if( hasInput() )
-        var_SetInteger( p_input, "rate", new_rate );
+        var_SetFloat( p_input, "rate",
+                      (float)INPUT_RATE_DEFAULT / (float)new_rate );
 }
 
 void InputManager::jumpFwd()

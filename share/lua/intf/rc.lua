@@ -407,7 +407,7 @@ end
 function rate(name,client)
     local input = vlc.object.input()
     if name == "normal" then
-        vlc.var.set(input,"rate",1000) -- FIXME: INPUT_RATE_DEFAULT
+        vlc.var.set(input,"rate",1)
     else
         vlc.var.set(input,"rate-"..name,nil)
     end

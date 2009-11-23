@@ -858,8 +858,8 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
                 case 'R':
                     if( p_input )
                     {
-                        int r = var_GetInteger( p_input, "rate" );
-                        snprintf( buf, 10, "%d.%d", r/1000, r%1000 );
+                        float f = var_GetFloat( p_input, "rate" );
+                        snprintf( buf, 10, "%.3f", f );
                     }
                     else
                     {

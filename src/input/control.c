@@ -99,12 +99,13 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
 
         case INPUT_GET_RATE:
             pi_int = (int*)va_arg( args, int * );
-            *pi_int = var_GetInteger( p_input, "rate" );
+            *pi_int = INPUT_RATE_DEFAULT / var_GetFloat( p_input, "rate" );
             return VLC_SUCCESS;
 
         case INPUT_SET_RATE:
             i_int = (int)va_arg( args, int );
-            return var_SetInteger( p_input, "rate", i_int );
+            return var_SetFloat( p_input, "rate",
+                                 (float)INPUT_RATE_DEFAULT / (float)i_int );
 
         case INPUT_GET_STATE:
             pi_int = (int*)va_arg( args, int * );
