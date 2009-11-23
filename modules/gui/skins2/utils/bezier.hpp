@@ -98,7 +98,7 @@ private:
     /// Helper function to compute a coefficient of the curve
     inline float computeCoeff( int i, int n, float t ) const;
     /// x^n
-    inline float power( float x, int n ) const;
+    static inline float power( float x, int n );
 };
 
 
