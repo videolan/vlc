@@ -123,7 +123,7 @@ uint32_t CPUCapabilities( void )
         }                                      \
         if( check_OS_capability((name), pid )) \
             i_capabilities |= (flag);          \
-    while(0)
+     } while(0)
 
 # if defined (__i386__) && !defined (__i486__) && !defined (__i586__) \
   && !defined (__i686__) && !defined (__pentium4__) \
