@@ -149,6 +149,28 @@ else:
         def clear(self):
             libvlc_exception_clear(self)
 
+class MediaStats(ctypes.Structure):
+    _fields_= [
+                ('read_bytes',          ctypes.c_int  ),
+                ('input_bitrate',       ctypes.c_float),
+                ('demux_read_bytes',    ctypes.c_int  ),
+                ('demux_bitrate',       ctypes.c_float),
+                ('demux_corrupted',     ctypes.c_int  ),
+                ('demux_discontinuity', ctypes.c_int  ),
+                ('decoded_video',       ctypes.c_int  ),
+                ('decoded_audio',       ctypes.c_int  ),
+                ('displayed_pictures',  ctypes.c_int  ),
+                ('lost_pictures',       ctypes.c_int  ),
+                ('played_abuffers',     ctypes.c_int  ),
+                ('lost_abuffers',       ctypes.c_int  ),
+                ('sent_packets',        ctypes.c_int  ),
+                ('sent_bytes',          ctypes.c_int  ),
+                ('send_bitrate',        ctypes.c_float),
+                ]
+
+    def __str__(self):
+        return "MediaStats\n%s" % "\n".join( "%s:\t%s" % (n, getattr(self, n)) for n in self._fields_ )
+
 class PlaylistItem(ctypes.Structure):
     _fields_= [
                 ('id', ctypes.c_int),
