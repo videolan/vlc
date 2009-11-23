@@ -168,6 +168,19 @@ class MediaControl:
         e=MediaControlException()
         return mediacontrol_get_stream_information(self, key, e).contents
 
+class Media:
+    def add_options(self, *list_of_options):
+        """Add a list of options to the media.
+
+        Options must be written without the double-dash, e.g.:
+        m.add_options('sub-filter=marq@test{marquee=Hello}', 'video-filter=invert')
+
+        Note that you also can directly pass these options in the Instance.media_new method:
+        m=instance.media_new( 'foo.avi', 'sub-filter=marq@test{marquee=Hello}', 'video-filter=invert')
+        """
+        for o in list_of_options:
+            self.add_option(o)
+
 class MediaPlayer:
     """Create a new MediaPlayer instance.
 
