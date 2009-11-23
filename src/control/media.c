@@ -514,7 +514,7 @@ libvlc_media_subitems( libvlc_media_t * p_md )
 }
 
 /**************************************************************************
- * Setter for state information (LibVLC Internal)
+ * Getter for statistics information
  **************************************************************************/
 int libvlc_media_get_stats( libvlc_media_t *p_md,
                             libvlc_media_stats_t *p_stats )
