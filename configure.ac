@@ -205,6 +205,12 @@ case "${host_os}" in
         LDFLAGS_save="${LDFLAGS_save} -L/usr/local/lib"
         LDFLAGS="${LDFLAGS_save}"
         ;;
+      openbsd*)
+        CPPFLAGS_save="${CPPFLAGS_save} -I/usr/local/include -I/usr/X11R6/include"
+        CPPFLAGS="${CPPFLAGS_save}"
+        LDFLAGS_save="${LDFLAGS_save} -L/usr/local/lib -L/usr/X11R6/lib/"
+        LDFLAGS="${LDFLAGS_save}"
+        ;;
     esac
     ;;
   darwin*)
