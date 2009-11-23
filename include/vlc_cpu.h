@@ -34,7 +34,9 @@
 #  define CPU_CAPABILITY_SSE2    (1<<7)
 #  define CPU_CAPABILITY_SSE3    (1<<8)
 #  define CPU_CAPABILITY_SSSE3   (1<<9)
-#  define CPU_CAPABILITY_SSE4    (1<<10)
+#  define CPU_CAPABILITY_SSE4_1  (1<<10)
+#  define CPU_CAPABILITY_SSE4_2  (1<<11)
+#  define CPU_CAPABILITY_SSE4A   (1<<12)
 # else
 #  define CPU_CAPABILITY_MMX     (0)
 #  define CPU_CAPABILITY_3DNOW   (0)
@@ -43,7 +45,9 @@
 #  define CPU_CAPABILITY_SSE2    (0)
 #  define CPU_CAPABILITY_SSE3    (0)
 #  define CPU_CAPABILITY_SSSE3   (0)
-#  define CPU_CAPABILITY_SSE4    (0)
+#  define CPU_CAPABILITY_SSE4_1  (0)
+#  define CPU_CAPABILITY_SSE4_2  (0)
+#  define CPU_CAPABILITY_SSE4A   (0)
 # endif
 
 # if defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
