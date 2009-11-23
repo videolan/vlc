@@ -187,7 +187,7 @@ uint32_t CPUCapabilities( void )
 
 # if defined (__SSE2__)
     i_capabilities |= CPU_CAPABILITY_SSE2;
-# elif defined (CAN_COMPILE_SSE)
+# elif defined (CAN_COMPILE_SSE2)
     if( i_edx & 0x04000000 )
         check_capability( "SSE2", CPU_CAPABILITY_SSE2,
                           "movupd %%xmm0, %%xmm0\n" );
