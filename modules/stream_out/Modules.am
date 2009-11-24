@@ -1,7 +1,8 @@
+SUBDIRS = transcode
+
 SOURCES_stream_out_dummy = dummy.c
 SOURCES_stream_out_description = description.c
 SOURCES_stream_out_standard = standard.c
-SOURCES_stream_out_transcode = transcode.c
 SOURCES_stream_out_duplicate = duplicate.c
 SOURCES_stream_out_es = es.c
 SOURCES_stream_out_display = display.c
@@ -18,7 +19,6 @@ libvlc_LTLIBRARIES += \
 	libstream_out_dummy_plugin.la \
 	libstream_out_description_plugin.la \
 	libstream_out_standard_plugin.la \
-	libstream_out_transcode_plugin.la \
 	libstream_out_duplicate_plugin.la \
 	libstream_out_es_plugin.la \
 	libstream_out_display_plugin.la \
