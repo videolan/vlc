@@ -1555,7 +1555,7 @@ static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8
 
     switch( i_codec )
     {
-    /* 3 headers with the 2° one being the comments */
+    /* 3 headers with the 2Â° one being the comments */
     case VLC_CODEC_VORBIS:
         Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+6, false );
         break;
@@ -1566,7 +1566,7 @@ static void Ogg_ExtractMeta( demux_t *p_demux, vlc_fourcc_t i_codec, const uint8
         Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 0, false );
         break;
 
-    /* N headers with the 2° one being the comments */
+    /* N headers with the 2Â° one being the comments */
     case VLC_CODEC_KATE:
         /* 1 byte for header type, 7 bit for magic, 1 reserved zero byte */
         Ogg_ExtractXiphMeta( p_demux, p_headers, i_headers, 1+7+1, true );
