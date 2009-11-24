@@ -5323,13 +5323,15 @@ chmod 0755 vlc-config
 /bin/echo -n "Enabled modules: "
 ./vlc-config --list plugin
 
+dnl Do we have to use make or gmake ?
+USE_MAKE_OR_GMAKE=`case "${SYS}" in openbsd*) echo "gmake";; *) echo "make";; esac`
 dnl Shortcut to nice compile message
 rm -f compile
 echo '#! /bin/sh' >compile
 echo rm -f .error\$\$ >>compile
 echo ERROR=0 >>compile
 echo export PATH=$PATH LANG=C >>compile
-echo "(make V=1 \$@ 2>&1 || touch .error\$\$)| \\" >>compile
+echo "($USE_MAKE_OR_GMAKE V=1 \$@ 2>&1 || touch .error\$\$)| \\" >>compile
 echo '`sed -ne "s/^top_srcdir *= *//p" < Makefile`/extras/buildsystem/make.pl' >>compile
 echo test -f .error\$\$ \&\& ERROR=1 >>compile
 echo rm -f .error\$\$ >>compile
@@ -5357,7 +5359,7 @@ fi
 echo "plugins/bindings      :${PLUGINS_BINDINGS}
 
 You can tune the compiler flags in vlc-config.
-To build vlc and its plugins, type \`./compile' or \`make'.
+To build vlc and its plugins, type \`./compile' or \`$USE_MAKE_OR_GMAKE'.
 "
 if test "x$ac_ld_does_not_support_text_reloc" = "xyes"; then
    echo ""
