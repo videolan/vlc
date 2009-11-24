@@ -204,4 +204,9 @@ static inline locale_t newlocale(int mask, const char * locale, locale_t base)
 void swab (const void *, void *, ssize_t);
 #endif
 
+#ifndef HAVE_TDESTROY
+typedef void (*__free_fn_t) (void *__nodep);
+void tdestroy (void *vroot, __free_fn_t freefct);
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */
