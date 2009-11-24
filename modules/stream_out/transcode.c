@@ -328,7 +328,7 @@ struct sout_stream_sys_t
     uint32_t        i_channels;
     int             i_abitrate;
 
-    char            *psz_af2;
+    char            *psz_af;
 
     /* Video */
     vlc_fourcc_t    i_vcodec;   /* codec video (0 if not transcode) */
@@ -446,11 +446,11 @@ static int Open( vlc_object_t *p_this )
 
     var_Get( p_stream, SOUT_CFG_PREFIX "afilter", &val );
     if( val.psz_string && *val.psz_string )
-        p_sys->psz_af2 = val.psz_string;
+        p_sys->psz_af = val.psz_string;
     else
     {
         free( val.psz_string );
-        p_sys->psz_af2 = NULL;
+        p_sys->psz_af = NULL;
     }
 
     /* Video transcoding parameters */
@@ -641,7 +641,7 @@ static void Close( vlc_object_t * p_this )
 
     sout_StreamDelete( p_sys->p_out );
 
-    free( p_sys->psz_af2 );
+    free( p_sys->psz_af );
 
     config_ChainDestroy( p_sys->p_audio_cfg );
     free( p_sys->psz_aenc );
@@ -1226,7 +1226,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         aout_BitsPerSample( id->p_encoder->fmt_in.i_codec );
 
     /* Load user specified audio filters */
-    if( p_sys->psz_af2 )
+    if( p_sys->psz_af )
     {
         es_format_t fmt_fl32 = fmt_last;
         fmt_fl32.i_codec =
@@ -1242,7 +1242,7 @@ static int transcode_audio_new( sout_stream_t *p_stream,
         id->p_uf_chain = filter_chain_New( p_stream, "audio filter", false,
                                            transcode_audio_filter_allocation_init, NULL, NULL );
         filter_chain_Reset( id->p_uf_chain, &fmt_last, &fmt_fl32 );
-        if( filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_af2 ) > 0 )
+        if( filter_chain_AppendFromString( id->p_uf_chain, p_sys->psz_af ) > 0 )
             fmt_last = *filter_chain_GetFmtOut( id->p_uf_chain );
     }
 
