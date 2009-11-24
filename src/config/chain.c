@@ -186,7 +186,7 @@ char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg,
 
     if( !psz_chain )
         return NULL;
-    psz_chain += strspn( psz_chain, " \t" );
+    SKIPSPACE( psz_chain );
 
     /* Look for parameter (a {...} or :...) or end of name (space or nul) */
     len = strcspn( psz_chain, "{: \t" );
@@ -194,14 +194,14 @@ char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg,
     psz_chain += len;
 
     /* Parse the parameters */
-    psz_chain += strspn( psz_chain, " \t" );
+    SKIPSPACE( psz_chain );
     if( *psz_chain == '{' )
     {
         /* Parse all name=value[,] elements */
         do
         {
             psz_chain++; /* skip previous delimiter */
-            psz_chain += strspn( psz_chain, " \t" );
+            SKIPSPACE( psz_chain );
 
             /* Look for the end of the name (,={}_space_) */
             len = strcspn( psz_chain, "=,{} \t" );
@@ -221,17 +221,17 @@ char *config_ChainCreate( char **ppsz_name, config_chain_t **pp_cfg,
             pp_next = &p_cfg->p_next;
 
             /* Extract the option value */
-            psz_chain += strspn( psz_chain, " \t" );
+            SKIPSPACE( psz_chain );
             if( strchr( "={", *psz_chain ) )
             {
                 p_cfg->psz_value = ChainGetValue( &psz_chain );
-                psz_chain += strspn( psz_chain, " \t" );
+                SKIPSPACE( psz_chain );
             }
         }
         while( !memchr( "}", *psz_chain, 2 ) );
 
         if( *psz_chain ) psz_chain++; /* skip '}' */;
-        psz_chain += strspn( psz_chain, " \t" );
+        SKIPSPACE( psz_chain );
     }
 
     if( *psz_chain == ':' )
