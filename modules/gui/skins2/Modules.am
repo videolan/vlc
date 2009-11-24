@@ -209,9 +209,26 @@ SOURCES_skins2 += \
 	win32/win32_window.cpp \
 	win32/win32_window.hpp \
     $(NULL)
-endif
-
-if USE_X11_FOR_SKINS2
+else if HAVE_DARWIN
+SOURCES_skins2 += \
+	macosx/macosx_dragdrop.cpp \
+	macosx/macosx_dragdrop.hpp \
+	macosx/macosx_factory.cpp \
+	macosx/macosx_factory.hpp \
+	macosx/macosx_graphics.cpp \
+	macosx/macosx_graphics.hpp \
+	macosx/macosx_loop.cpp \
+	macosx/macosx_loop.hpp \
+	macosx/macosx_popup.cpp \
+	macosx/macosx_popup.hpp \
+	macosx/macosx_timer.cpp \
+	macosx/macosx_timer.hpp \
+	macosx/macosx_window.cpp \
+	macosx/macosx_window.hpp \
+	macosx/macosx_tooltip.cpp \
+	macosx/macosx_tooltip.hpp \
+    $(NULL)
+else
 SOURCES_skins2 += \
 	x11/x11_display.cpp \
 	x11/x11_display.hpp \
@@ -234,23 +251,3 @@ SOURCES_skins2 += \
     $(NULL)
 endif
 
-if HAVE_DARWIN
-SOURCES_skins2 += \
-	macosx/macosx_dragdrop.cpp \
-	macosx/macosx_dragdrop.hpp \
-	macosx/macosx_factory.cpp \
-	macosx/macosx_factory.hpp \
-	macosx/macosx_graphics.cpp \
-	macosx/macosx_graphics.hpp \
-	macosx/macosx_loop.cpp \
-	macosx/macosx_loop.hpp \
-	macosx/macosx_popup.cpp \
-	macosx/macosx_popup.hpp \
-	macosx/macosx_timer.cpp \
-	macosx/macosx_timer.hpp \
-	macosx/macosx_window.cpp \
-	macosx/macosx_window.hpp \
-	macosx/macosx_tooltip.cpp \
-	macosx/macosx_tooltip.hpp \
-    $(NULL)
-endif
