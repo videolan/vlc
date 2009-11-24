@@ -57,7 +57,7 @@
  * have a significant return value and should take a single argument of type NSNotification, 
  * or no arguments.
  *
- * See “Selectors” for a description of the SEL type.
+ * See ‚ÄúSelectors‚Äù for a description of the SEL type.
  * \param aNotificiationName The name of the notification that should be sent to the 
  * distributed notification center.
  */
@@ -78,7 +78,7 @@
  * have a significant return value and should take a single argument of type id, 
  * or no arguments.
  *
- * See “Selectors” for a description of the SEL type.
+ * See ‚ÄúSelectors‚Äù for a description of the SEL type.
  * \param arg The argument to pass in the message.  Pass nil if the method does not take an 
  * argument.
  * distributed notification center.
