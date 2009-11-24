@@ -161,9 +161,6 @@
  * (~1 Mbyte) before using huge values */
 #define VOUT_MAX_PICTURES              16
 
-/* Statistics are displayed every n loops (=~ pictures) */
-#define VOUT_STATS_NB_LOOPS             100
-
 /*
  * Time settings
  */
