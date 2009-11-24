@@ -27,8 +27,6 @@
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
-#else
-# define N_(str) (str)
 #endif
 
 #include <vlc_common.h>
