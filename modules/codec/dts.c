@@ -665,10 +665,12 @@ static int SyncInfo( const uint8_t *p_buf,
     {
         case 0x0:
             /* Mono */
+            *pi_channels = 1;
             *pi_channels_conf = AOUT_CHAN_CENTER;
             break;
         case 0x1:
             /* Dual-mono = stereo + dual-mono */
+            *pi_channels = 2;
             *pi_channels_conf = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
                            AOUT_CHAN_DUALMONO;
             break;
