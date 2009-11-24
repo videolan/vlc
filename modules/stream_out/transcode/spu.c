@@ -31,6 +31,7 @@
 #include "transcode.h"
 
 #include <vlc_meta.h>
+#include <vlc_osd.h>
 #include <assert.h>
 
 static subpicture_t *spu_new_buffer( decoder_t *p_dec )

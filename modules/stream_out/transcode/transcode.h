@@ -8,7 +8,6 @@
 #include <vlc_filter.h>
 #include <vlc_es.h>
 #include <vlc_codec.h>
-#include <vlc_osd.h>
 
 
 #define PICTURE_RING_SIZE 64

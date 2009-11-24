@@ -31,6 +31,7 @@
 #include "transcode.h"
 
 #include <vlc_meta.h>
+#include <vlc_osd.h>
 
 #define ENC_FRAMERATE (25 * 1000 + .5)
 #define ENC_FRAMERATE_BASE 1000
