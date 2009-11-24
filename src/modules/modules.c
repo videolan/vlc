@@ -196,25 +196,15 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
                     p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->p_module );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache]->psz_file );
             free( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] );
-            p_bank->pp_loaded_cache[p_bank->i_loaded_cache] = NULL;
         }
     }
-    if( p_bank->pp_loaded_cache )
-    {
-        free( p_bank->pp_loaded_cache );
-        p_bank->pp_loaded_cache = NULL;
-    }
+    free( p_bank->pp_loaded_cache );
     while( p_bank->i_cache-- )
     {
         free( p_bank->pp_cache[p_bank->i_cache]->psz_file );
         free( p_bank->pp_cache[p_bank->i_cache] );
-        p_bank->pp_cache[p_bank->i_cache] = NULL;
     }
-    if( p_bank->pp_cache )
-    {
-        free( p_bank->pp_cache );
-        p_bank->pp_cache = NULL;
-    }
+    free( p_bank->pp_cache );
 #endif
 
     while( p_bank->head != NULL )
