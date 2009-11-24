@@ -209,7 +209,8 @@ SOURCES_skins2 += \
 	win32/win32_window.cpp \
 	win32/win32_window.hpp \
     $(NULL)
-else if HAVE_DARWIN
+else
+if HAVE_DARWIN
 SOURCES_skins2 += \
 	macosx/macosx_dragdrop.cpp \
 	macosx/macosx_dragdrop.hpp \
@@ -250,4 +251,4 @@ SOURCES_skins2 += \
 	x11/x11_tooltip.hpp \
     $(NULL)
 endif
-
+endif
