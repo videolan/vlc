@@ -41,6 +41,9 @@ InputSlider::InputSlider( Qt::Orientation q, QWidget *_parent ) :
                                  QSlider( q, _parent )
 {
     b_isSliding = false;
+    lastSeeked = 0;
+    timer = new QTimer(this);
+    timer->setSingleShot(true);
     setMinimum( 0 );
     setMouseTracking(true);
     setMaximum( 1000 );
@@ -51,6 +54,7 @@ InputSlider::InputSlider( Qt::Orientation q, QWidget *_parent ) :
     secstotimestr( psz_length, 0 );
     setFocusPolicy( Qt::NoFocus );
     CONNECT( this, valueChanged(int), this, userDrag( int ) );
+    CONNECT( timer, timeout(), this, seekTick() );
 }
 
 void InputSlider::setPosition( float pos, int a, int b )
@@ -68,9 +72,15 @@ void InputSlider::setPosition( float pos, int a, int b )
 
 void InputSlider::userDrag( int new_value )
 {
-    if( b_isSliding )
-    {
-        float f_pos = (float)(new_value)/1000.0;
+    if( b_isSliding && !timer->isActive() )
+            timer->start( 150 );
+}
+
+void InputSlider::seekTick()
+{
+    if( value() != lastSeeked ) {
+        lastSeeked = value();
+        float f_pos = (float)(lastSeeked)/1000.0;
         emit sliderDragged( f_pos );
     }
 }
@@ -97,6 +107,8 @@ void InputSlider::mousePressEvent(QMouseEvent* event)
         Qt::MouseButtons( event->buttons() ^ Qt::LeftButton ^ Qt::MidButton ),
         event->modifiers() );
     QSlider::mousePressEvent( &newEvent );
+
+    seekTick();
 }
 
 void InputSlider::mouseMoveEvent(QMouseEvent *event)

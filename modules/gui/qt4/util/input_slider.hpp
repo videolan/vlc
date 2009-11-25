@@ -31,6 +31,7 @@
 
 #include <QMouseEvent>
 #include <QWheelEvent>
+#include <QTimer>
 
 /* Input Slider derived from QSlider */
 class InputSlider : public QSlider
@@ -49,11 +50,14 @@ private:
     bool b_isSliding; /* Whether we are currently sliding by user action */
     int inputLength;  /* InputLength that can change */
     char psz_length[MSTRTIME_MAX_SIZE]; /* Used for the ToolTip */
+    int lastSeeked;
+    QTimer *timer;
 
 public slots:
     void setPosition( float, int, int );
 private slots:
     void userDrag( int );
+    void seekTick();
 
 signals:
     void sliderDragged( float );
