@@ -35,6 +35,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
+#include <vlc_dialog.h>
 
 #include "xcb_vlc.h"
 
@@ -269,6 +270,19 @@ FindFormat (vout_display_t *vd,
             msg_Warn (vd, "incompatible size %ux%u -> %"PRIu32"x%"PRIu32,
                       fmt->i_width, fmt->i_height,
                       i->width, i->height);
+            var_Create (vd->p_libvlc, "xvideo-resolution-error", VLC_VAR_BOOL);
+            if (!var_GetBool (vd->p_libvlc, "xvideo-resolution-error"))
+            {
+                dialog_FatalWait (vd, _("Video acceleration not available"),
+                    _("Your video output acceleration driver does not support "
+                      "the required resolution: %ux%u pixels. The maximum "
+                      "supported resolution is %"PRIu32"x%"PRIu32".\n"
+                      "Video output acceleration will be disabled. However, "
+                      "rendering videos with overly large resolution "
+                      "may cause severe performance degration."),
+                                  width, height, i->width, i->height);
+                var_SetBool (vd->p_libvlc, "xvideo-resolution-error", true);
+            }
             free (i);
             continue;
         }
