@@ -2628,6 +2628,21 @@ CLEAN_FILE += .regex
 CLEAN_PKG += regex
 DISTCLEAN_PKG += regex-$(REGEX_VERSION).tar.gz
 
+# SQLite
+sqlite-amalgamation-$(SQLITE_VERSION).tar.gz:
+	$(WGET) $(SQLITE_URL)
+
+sqlite-$(SQLITE_VERSION): sqlite-amalgamation-$(SQLITE_VERSION).tar.gz
+	$(EXTRACT_GZ)
+
+.sqlite3: sqlite-$(SQLITE_VERSION)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install )
+
+CLEAN_FILE += .sqlite3
+CLEAN_PKG += sqlite3
+DISTCLEAN_PKG += sqlite-amalgamation-$(SQLITE_VERSION).tar.gz
+
+
 
 # ***************************************************************************
 # Some cleaning
