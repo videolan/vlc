@@ -1129,7 +1129,7 @@ modules/stream_out/rtsp.c
 modules/stream_out/smem.c
 modules/stream_out/standard.c
 modules/stream_out/switcher.c
-modules/stream_out/transcode.c
+modules/stream_out/transcode/transcode.c
 modules/video_chroma/grey_yuv.c
 modules/video_chroma/i420_rgb.c
 modules/video_chroma/i420_rgb.h
