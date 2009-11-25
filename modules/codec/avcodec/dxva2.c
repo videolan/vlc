@@ -33,8 +33,6 @@
 #include <vlc_cpu.h>
 #include <assert.h>
 
-#define HAVE_AVCODEC_DXVA2
-
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
 #   include <libavcodec/avcodec.h>
 #   ifdef HAVE_AVCODEC_DXVA2
