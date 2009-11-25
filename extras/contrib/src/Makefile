@@ -2399,8 +2399,6 @@ liboil: liboil-$(OIL_VERSION).tar.gz
 	patch -d liboil -p1 < Patches/liboil-Xcompile.patch
 	(cd $@; autoreconf)
 
-
-
 .liboil: liboil
 ifdef HAVE_DARWIN_OS
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS)")
@@ -2433,7 +2431,7 @@ CLEAN_PKG += schroedinger
 DISTCLEAN_PKG += schroedinger-$(SCHROED_VERSION).tar.gz
 
 # ***************************************************************************
-# ASS library
+# libass
 # ***************************************************************************
 
 libass-$(ASS_VERSION).tar.bz2:
@@ -2487,9 +2485,9 @@ CLEAN_FILE += .libupnp
 CLEAN_PKG += libupnp
 DISTCLEAN_PKG += libupnp-$(UPNP_VERSION).tar.bz2
 
-# *********
+# ***************************************************************************
 # GSM
-# *********
+# ***************************************************************************
 gsm-$(GSM_VERSION).tar.gz:
 	$(WGET) $(GSM_URL)
 
@@ -2512,9 +2510,9 @@ CLEAN_FILE += .gsm
 CLEAN_PKG += gsm
 DISTCLEAN_PKG += gsm-$(GSM_VERSION).tar.gz
 
-# *********
+# ***************************************************************************
 # projectM
-# *********
+# ***************************************************************************
 ifdef SVN
 libprojectM:
 	$(SVN) co $(LIBPROJECTM_SVN) libprojectM
@@ -2611,10 +2609,9 @@ peflags/peflags.c:
 CLEAN_PKG += peflags
 CLEAN_FILE += .peflags
 
-# ************
+# ***************************************************************************
 # Regex
-# ************
-
+# ***************************************************************************
 regex-$(REGEX_VERSION).tar.gz:
 	$(WGET) $(REGEX_URL)
 
@@ -2628,7 +2625,9 @@ CLEAN_FILE += .regex
 CLEAN_PKG += regex
 DISTCLEAN_PKG += regex-$(REGEX_VERSION).tar.gz
 
+# ***************************************************************************
 # SQLite
+# ***************************************************************************
 sqlite-amalgamation-$(SQLITE_VERSION).tar.gz:
 	$(WGET) $(SQLITE_URL)
 
@@ -2639,9 +2638,8 @@ sqlite-$(SQLITE_VERSION): sqlite-amalgamation-$(SQLITE_VERSION).tar.gz
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install )
 
 CLEAN_FILE += .sqlite3
-CLEAN_PKG += sqlite3
+CLEAN_PKG += sqlite-$(SQLITE_VERSION)
 DISTCLEAN_PKG += sqlite-amalgamation-$(SQLITE_VERSION).tar.gz
-
 
 
 # ***************************************************************************
