@@ -1428,13 +1428,14 @@ static void AStreamPrebufferStream( stream_t *s )
 
         int64_t i_date = mdate();
         int i_read;
+        int i_buffered = tk->i_end - tk->i_start;
 
-        if( s->b_die || tk->i_end >= STREAM_CACHE_PREBUFFER_SIZE )
+        if( s->b_die || i_buffered >= STREAM_CACHE_PREBUFFER_SIZE )
         {
             int64_t i_byterate;
 
             /* Update stat */
-            p_sys->stat.i_bytes = tk->i_end - tk->i_start;
+            p_sys->stat.i_bytes = i_buffered;
             p_sys->stat.i_read_time = i_date - i_start;
             i_byterate = ( INT64_C(1000000) * p_sys->stat.i_bytes ) /
                          (p_sys->stat.i_read_time+1);
@@ -1448,9 +1449,9 @@ static void AStreamPrebufferStream( stream_t *s )
         }
 
         /* */
-        i_read = STREAM_CACHE_TRACK_SIZE - tk->i_end;
+        i_read = STREAM_CACHE_TRACK_SIZE - i_buffered;
         i_read = __MIN( p_sys->stream.i_read_size, i_read );
-        i_read = AReadStream( s, &tk->p_buffer[tk->i_end], i_read );
+        i_read = AReadStream( s, &tk->p_buffer[i_buffered], i_read );
         if( i_read <  0 )
             continue;
         else if( i_read == 0 )
