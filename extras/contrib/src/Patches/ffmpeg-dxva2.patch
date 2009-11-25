@@ -1,0 +1,772 @@
+Index: configure
+===================================================================
+--- configure	(revision 20532)
++++ configure	(working copy)
+@@ -106,6 +106,7 @@
+   --disable-rdft           disable RDFT code
+   --disable-vaapi          disable VAAPI code
+   --disable-vdpau          disable VDPAU code
++  --disable-dxva2          disable DXVA2 code
+   --enable-runtime-cpudetect detect cpu capabilities at runtime (bigger binary)
+   --enable-hardcoded-tables use hardcoded tables instead of runtime generation
+   --enable-memalign-hack   emulate memalign, interferes with memory debuggers
+@@ -873,6 +874,7 @@
+     swscale_alpha
+     vaapi
+     vdpau
++    dxva2
+     version3
+     x11grab
+     zlib
+@@ -1114,6 +1116,8 @@
+ h264_vaapi_hwaccel_select="vaapi"
+ h264_vdpau_decoder_deps="vdpau_vdpau_h vdpau_vdpau_x11_h"
+ h264_vdpau_decoder_select="vdpau h264_decoder"
++h264_dxva2_hwaccel_deps="dxva2api_h"
++h264_dxva2_hwaccel_select="dxva2 h264_decoder"
+ imc_decoder_select="fft mdct"
+ jpegls_decoder_select="golomb"
+ jpegls_encoder_select="golomb"
+@@ -2313,6 +2317,7 @@
+ check_header vdpau/vdpau.h
+ check_header vdpau/vdpau_x11.h
+ check_header X11/extensions/XvMClib.h
++check_header dxva2api.h
+ 
+ if ! enabled_any memalign memalign_hack posix_memalign malloc_aligned &&
+      enabled_any $need_memalign ; then
+Index: libavutil/pixdesc.c
+===================================================================
+--- libavutil/pixdesc.c	(revision 20532)
++++ libavutil/pixdesc.c	(working copy)
+@@ -646,6 +646,12 @@
+         },
+         .flags = PIX_FMT_BE,
+     },
++    [PIX_FMT_DXVA2_VLD] = {
++        .name = "dxva2_vld",
++        .log2_chroma_w = 1,
++        .log2_chroma_h = 1,
++        .flags = PIX_FMT_HWACCEL,
++    },
+ };
+ 
+ int av_get_bits_per_pixel(const AVPixFmtDescriptor *pixdesc)
+Index: libavutil/pixfmt.h
+===================================================================
+--- libavutil/pixfmt.h	(revision 20532)
++++ libavutil/pixfmt.h	(working copy)
+@@ -117,6 +117,7 @@
+     PIX_FMT_VAAPI_IDCT, ///< HW acceleration through VA API at IDCT entry-point, Picture.data[3] contains a vaapi_render_state struct which contains fields extracted from headers
+     PIX_FMT_VAAPI_VLD,  ///< HW decoding through VA API, Picture.data[3] contains a vaapi_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
+ 
++
+     PIX_FMT_YUV420P16LE,  ///< planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), little-endian
+     PIX_FMT_YUV420P16BE,  ///< planar YUV 4:2:0, 24bpp, (1 Cr & Cb sample per 2x2 Y samples), big-endian
+     PIX_FMT_YUV422P16LE,  ///< planar YUV 4:2:2, 32bpp, (1 Cr & Cb sample per 2x1 Y samples), little-endian
+@@ -124,6 +125,7 @@
+     PIX_FMT_YUV444P16LE,  ///< planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), little-endian
+     PIX_FMT_YUV444P16BE,  ///< planar YUV 4:4:4, 48bpp, (1 Cr & Cb sample per 1x1 Y samples), big-endian
+     PIX_FMT_VDPAU_MPEG4,  ///< MPEG4 HW decoding with VDPAU, data[0] contains a vdpau_render_state struct which contains the bitstream of the slices as well as various fields extracted from headers
++    PIX_FMT_DXVA2_VLD,    ///< HW decoding through DXVA2, Picture.data[3] contains a LPDIRECT3DSURFACE9 pointer
+     PIX_FMT_NB,        ///< number of pixel formats, DO NOT USE THIS if you want to link with shared libav* because the number of formats might differ between versions
+ };
+ 
+Index: libavcodec/dxva2_h264.c
+===================================================================
+--- libavcodec/dxva2_h264.c	(revision 0)
++++ libavcodec/dxva2_h264.c	(revision 0)
+@@ -0,0 +1,559 @@
++/*
++ * DXVA2 H264 HW acceleration.
++ *
++ * copyright (c) 2009 Laurent Aimar
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#ifdef HAVE_CONFIG_H
++# include "config.h"
++#endif
++#include <assert.h>
++
++#include "dxva2.h"
++#include "avcodec.h"
++
++#include "mpegvideo.h"
++#include "h264.h"
++#include "h264data.h"
++
++/* */
++struct dxva2_picture_context
++{
++    DXVA_PicParams_H264   pp;
++    DXVA_Qmatrix_H264     qm;
++    unsigned              slice_count;
++    DXVA_Slice_H264_Short slice_short[MAX_SLICES];
++    DXVA_Slice_H264_Long  slice_long[MAX_SLICES];
++    const uint8_t         *bitstream;
++    unsigned              bitstream_size;
++};
++
++/* */
++static void *get_surface(const Picture *picture)
++{
++    return (void*)picture->data[3];
++}
++static unsigned get_surface_index(const struct dxva_context *ctx,
++                                  const Picture *picture)
++{
++    void *surface = get_surface(picture);
++    unsigned i;
++
++    for (i = 0; i < ctx->surface_count; i++) {
++        if (ctx->surface[i] == surface)
++            return i;
++    }
++    //assert(0); FIXME activate it ?
++    return 0;
++}
++
++static int commit_buffer(AVCodecContext *avctx,
++                         struct dxva_context *ctx,
++                         DXVA2_DecodeBufferDesc *dsc,
++                         unsigned type, const void *data, unsigned size,
++                         unsigned mb_count)
++{
++    void     *dxva_data;
++    unsigned dxva_size;
++
++
++    if (FAILED(IDirectXVideoDecoder_GetBuffer(ctx->decoder, type, &dxva_data, &dxva_size))) {
++        av_log(avctx, AV_LOG_DEBUG, "Failed to get a buffer for %d\n", type);
++        return -1;
++    }
++    if (size <= dxva_size) {
++        memcpy(dxva_data, data, size);
++
++        memset(dsc, 0, sizeof(*dsc));
++        dsc->CompressedBufferType = type;
++        dsc->DataSize = size;
++        dsc->NumMBsInBuffer = mb_count;
++    }
++    if (FAILED(IDirectXVideoDecoder_ReleaseBuffer(ctx->decoder, type))) {
++        av_log(avctx, AV_LOG_DEBUG, "Failed to release buffer type %d\n", type);
++        return -1;
++    }
++    if (dxva_size < size) {
++        av_log(avctx, AV_LOG_DEBUG, "Buffer for type %d was too small\n", type);
++        return -1;
++    }
++    return 0;
++}
++
++static void fill_picture_parameters(struct dxva_context *ctx, const H264Context *h,
++                                    DXVA_PicParams_H264 *pp)
++{
++    const MpegEncContext *s = &h->s;
++    const Picture *current_picture = s->current_picture_ptr;
++    int i;
++
++    /* */
++    memset(pp, 0, sizeof(*pp));
++    /* Configure current picture */
++    pp->CurrPic.Index7Bits     = get_surface_index(ctx, current_picture);
++    pp->CurrPic.AssociatedFlag = s->picture_structure == PICT_BOTTOM_FIELD;
++    /* Configure the set of references */
++    pp->UsedForReferenceFlags  = 0;
++    pp->NonExistingFrameFlags  = 0;
++    for (i = 0; i < FF_ARRAY_ELEMS(pp->RefFrameList); i++) {
++        if (i < h->short_ref_count + h->long_ref_count) {
++            const Picture *r;
++            if (i < h->short_ref_count) {
++                r = h->short_ref[i];
++                assert(!r->long_ref);
++            } else {
++                r = h->long_ref[i - h->short_ref_count];
++                assert(r->long_ref);
++            }
++            pp->RefFrameList[i].Index7Bits = get_surface_index(ctx, r);
++            pp->RefFrameList[i].AssociatedFlag = r->long_ref != 0;
++
++            if ((r->reference & PICT_TOP_FIELD) && r->field_poc[0] != INT_MAX)
++                pp->FieldOrderCntList[i][0] = r->field_poc[0];
++            if ((r->reference & PICT_BOTTOM_FIELD) && r->field_poc[1] != INT_MAX)
++                pp->FieldOrderCntList[i][1] = r->field_poc[1];
++
++            pp->FrameNumList[i] = r->long_ref ? r->pic_id : r->frame_num;
++            if (r->reference & PICT_TOP_FIELD)
++                pp->UsedForReferenceFlags |= 1 << (2*i + 0);
++            if (r->reference & PICT_BOTTOM_FIELD)
++                pp->UsedForReferenceFlags |= 1 << (2*i + 1);
++#if 0
++            if (r->field_poc[0] == INT_MAX || r->field_poc[1] == INT_MAX)
++                pp->NonExistingFrameFlags = 1 << i; /* FIXME to check */
++#endif
++        } else {
++            pp->RefFrameList[i].bPicEntry = 0xff;
++            pp->FieldOrderCntList[i][0] = 0;
++            pp->FieldOrderCntList[i][1] = 0;
++            pp->FrameNumList[i] = 0;
++        }
++    }
++    /* */
++    pp->wFrameWidthInMbsMinus1        = s->mb_width  - 1;
++    pp->wFrameHeightInMbsMinus1       = s->mb_height - 1;
++    pp->num_ref_frames                = h->sps.ref_frame_count;
++    /* */
++    pp->field_pic_flag                = s->picture_structure != PICT_FRAME;
++    pp->MbaffFrameFlag                = h->sps.mb_aff;
++    pp->residual_colour_transform_flag= (h->sps.profile_idc >= 100 && h->sps.chroma_format_idc == 3) ? h->sps.residual_color_transform_flag : 0;
++    pp->sp_for_switch_flag            = 0; /* XXX not implemented by FFmpeg */
++    pp->chroma_format_idc             = h->sps.chroma_format_idc;
++    pp->RefPicFlag                    = h->nal_ref_idc != 0;
++    pp->constrained_intra_pred_flag   = h->pps.constrained_intra_pred;
++    pp->weighted_pred_flag            = h->pps.weighted_pred;
++    pp->weighted_bipred_idc           = h->pps.weighted_bipred_idc;
++    pp->MbsConsecutiveFlag            = 1; /* FIXME "The value shall be 1 unless the restricted-mode profile in use explicitly supports the value 0."*/
++    pp->frame_mbs_only_flag           = h->sps.frame_mbs_only_flag;
++    pp->transform_8x8_mode_flag       = h->pps.transform_8x8_mode;
++    pp->MinLumaBipredSize8x8Flag      = h->sps.level_idc >= 31;
++    pp->IntraPicFlag                  = 1; /* XXX Modified if we detect a non intra slice in decode_slice */
++    /* */
++    if (h->sps.profile_idc >= 100) {
++        pp->bit_depth_luma_minus8     = h->sps.bit_depth_luma - 8;
++        pp->bit_depth_chroma_minus8   = h->sps.bit_depth_chroma - 8;
++    } else {
++        pp->bit_depth_luma_minus8     = 0;
++        pp->bit_depth_chroma_minus8   = 0;
++    }
++    pp->Reserved16Bits                = 3; /* FIXME is there a way to detect the right mode ? */
++    pp->StatusReportFeedbackNumber    = 1 + ctx->report_id++;
++    pp->CurrFieldOrderCnt[0] = 0;
++    if ((s->picture_structure & PICT_TOP_FIELD) &&
++        current_picture->field_poc[0] != INT_MAX)
++        pp->CurrFieldOrderCnt[0] = current_picture->field_poc[0];
++    pp->CurrFieldOrderCnt[1] = 0;
++    if ((s->picture_structure & PICT_BOTTOM_FIELD) &&
++        current_picture->field_poc[1] != INT_MAX)
++        pp->CurrFieldOrderCnt[1] = current_picture->field_poc[1];
++    pp->pic_init_qs_minus26           = h->pps.init_qs - 26;
++    pp->chroma_qp_index_offset        = h->pps.chroma_qp_index_offset[0];
++    pp->second_chroma_qp_index_offset = h->pps.chroma_qp_index_offset[1];
++    pp->ContinuationFlag              = 1;
++    pp->pic_init_qp_minus26           = h->pps.init_qp - 26;
++    pp->num_ref_idx_l0_active_minus1  = h->pps.ref_count[0] - 1;
++    pp->num_ref_idx_l1_active_minus1  = h->pps.ref_count[1] - 1;
++    pp->Reserved8BitsA                = 0;
++    pp->frame_num                     = h->frame_num;
++    pp->log2_max_frame_num_minus4     = h->sps.log2_max_frame_num - 4;
++    pp->pic_order_cnt_type            = h->sps.poc_type;
++    if (h->sps.poc_type == 0)
++        pp->log2_max_pic_order_cnt_lsb_minus4 = h->sps.log2_max_poc_lsb - 4;
++    else if (h->sps.poc_type == 1)
++        pp->delta_pic_order_always_zero_flag = h->sps.delta_pic_order_always_zero_flag;
++    pp->direct_8x8_inference_flag     = h->sps.direct_8x8_inference_flag;
++    pp->entropy_coding_mode_flag      = h->pps.cabac;
++    pp->pic_order_present_flag        = h->pps.pic_order_present;
++    pp->num_slice_groups_minus1       = h->pps.slice_group_count - 1;
++    pp->slice_group_map_type          = h->pps.mb_slice_group_map_type;
++    pp->deblocking_filter_control_present_flag = h->pps.deblocking_filter_parameters_present;
++    pp->redundant_pic_cnt_present_flag= h->pps.redundant_pic_cnt_present;
++    pp->Reserved8BitsB                = 0;
++    pp->slice_group_change_rate_minus1= 0;  /* XXX not implemented by FFmpeg */
++    //pp->SliceGroupMap[810];               /* XXX not implemented by FFmpeg */
++}
++
++static void fill_scaling_lists(const H264Context *h, DXVA_Qmatrix_H264 *qm)
++{
++    unsigned i, j;
++    memset(qm, 0, sizeof(*qm));
++    for (i = 0; i < 6; i++) {
++        for (j = 0; j < 16; j++)
++            qm->bScalingLists4x4[i][j] = h->pps.scaling_matrix4[i][zigzag_scan[j]];
++    }
++    for (i = 0; i < 2; i++) {
++        for (j = 0; j < 64; j++)
++            qm->bScalingLists8x8[i][j] = h->pps.scaling_matrix8[i][ff_zigzag_direct[j]];
++    }
++}
++
++static int is_slice_short(struct dxva_context *ctx)
++{
++    assert(ctx->cfg->ConfigBitstreamRaw == 1 ||
++           ctx->cfg->ConfigBitstreamRaw == 2);
++    return ctx->cfg->ConfigBitstreamRaw == 2;
++}
++
++static void fill_slice_short(DXVA_Slice_H264_Short *slice, unsigned position, unsigned size)
++{
++    memset(slice, 0, sizeof(*slice));
++    slice->BSNALunitDataLocation = position;
++    slice->SliceBytesInBuffer = size;
++    slice->wBadSliceChopping = 0;
++}
++
++static void fill_slice_long(AVCodecContext *avctx,
++                            DXVA_Slice_H264_Long *slice, unsigned position, unsigned size)
++{
++    H264Context *h = avctx->priv_data; /* FIXME Can't use const because of get_bits_count */
++    struct dxva_context *ctx = avctx->hwaccel_context;
++    MpegEncContext *s = &h->s;
++    unsigned list;
++
++    /* */
++    memset(slice, 0, sizeof(*slice));
++    slice->BSNALunitDataLocation = position;
++    slice->SliceBytesInBuffer = size;
++    slice->wBadSliceChopping = 0;
++    /* */
++    slice->first_mb_in_slice = (s->mb_y >> FIELD_OR_MBAFF_PICTURE) * s->mb_width + s->mb_x;
++    slice->NumMbsForSlice = 0; /* XXX it is set once we have all slices */
++    slice->BitOffsetToSliceData = get_bits_count(&s->gb) + 8;
++    switch (h->slice_type) {
++    case FF_P_TYPE:  slice->slice_type = 0; break;
++    case FF_B_TYPE:  slice->slice_type = 1; break;
++    case FF_I_TYPE:  slice->slice_type = 2; break;
++    case FF_SP_TYPE: slice->slice_type = 3; break;
++    case FF_SI_TYPE: slice->slice_type = 4; break;
++    default:
++         break;
++    }
++    if (h->slice_type_fixed)
++        slice->slice_type += 5;
++    slice->luma_log2_weight_denom = h->luma_log2_weight_denom;
++    slice->chroma_log2_weight_denom = h->chroma_log2_weight_denom;
++    if (h->list_count > 0)
++        slice->num_ref_idx_l0_active_minus1 = h->ref_count[0] - 1;
++    if (h->list_count > 1)
++        slice->num_ref_idx_l1_active_minus1 = h->ref_count[1] - 1;
++    slice->slice_alpha_c0_offset_div2 = h->slice_alpha_c0_offset / 2;
++    slice->slice_beta_offset_div2 = h->slice_beta_offset / 2;
++    slice->Reserved8Bits = 0;
++
++    for (list = 0; list < 2; list++) {
++        unsigned i;
++        for (i = 0; i < FF_ARRAY_ELEMS(slice->RefPicList[list]); i++) {
++            if (list < h->list_count && i < h->ref_count[list]) {
++                const Picture *r = &h->ref_list[list][i];
++                unsigned plane;
++                 /* FIXME I don't know if it is the frame index OR the index into pp->RefFrameList FIXME */
++#if 1
++                slice->RefPicList[list][i].Index7Bits = get_surface_index(ctx, r);
++#else
++                unsigned j;
++                for (j = 0; j < FF_ARRAY_ELEMS(ctx->pp.RefFrameList); j++) {
++                    if (ctx->pp.RefFrameList[j].Index7Bits == get_surface_index(ctx, r)) {
++                        slice->RefPicList[list][i].Index7Bits = j;
++                        break;
++                    }
++                }
++#endif
++                slice->RefPicList[list][i].AssociatedFlag = r->reference == PICT_BOTTOM_FIELD;
++                if (h->luma_weight_flag[list]) {
++                    slice->Weights[list][i][0][0] = h->luma_weight[list][i];
++                    slice->Weights[list][i][0][1] = h->luma_offset[list][i];
++                } else {
++                    slice->Weights[list][i][0][0] = 1 << h->luma_weight_flag[list];
++                    slice->Weights[list][i][0][1] = 0;
++                }
++                for (plane = 1; plane < 3; plane++) {
++                    int w, o;
++                    if (h->chroma_weight_flag[list]) {
++                        w = h->chroma_weight[list][i][plane-1];
++                        o = h->chroma_offset[list][i][plane-1];
++                    } else {
++                        w = 1 << h->chroma_log2_weight_denom;
++                        o = 0;
++                    }
++                    slice->Weights[list][i][plane][0] = w;
++                    slice->Weights[list][i][plane][1] = o;
++                }
++            } else {
++                unsigned plane;
++                slice->RefPicList[list][i].bPicEntry = 0xff;
++                for (plane = 0; plane < 3; plane++) {
++                    slice->Weights[list][i][plane][0] = 0;
++                    slice->Weights[list][i][plane][1] = 0;
++                }
++            }
++        }
++    }
++    slice->slice_qs_delta = 0; /* XXX not implemented by FFmpeg */
++    slice->slice_qp_delta = s->qscale - h->pps.init_qp;
++    if (h->pps.redundant_pic_cnt_present)
++        slice->redundant_pic_cnt = h->redundant_pic_count;
++    if (h->slice_type == FF_B_TYPE)
++        slice->direct_spatial_mv_pred_flag = h->direct_spatial_mv_pred;
++    slice->cabac_init_idc = h->pps.cabac ? h->cabac_init_idc : 0;
++    if (h->deblocking_filter < 2)
++        slice->disable_deblocking_filter_idc = 1 - h->deblocking_filter;
++    else
++        slice->disable_deblocking_filter_idc = h->deblocking_filter;
++    slice->slice_id = h->current_slice - 1; /* TODO to check */
++}
++
++
++/* */
++static int start_frame(AVCodecContext *avctx, av_unused const uint8_t *buffer, av_unused uint32_t size)
++{
++    const H264Context *h = avctx->priv_data;
++    struct dxva_context *ctx = avctx->hwaccel_context;
++    struct dxva2_picture_context *ctx_pic = h->s.current_picture_ptr->hwaccel_picture_private;
++
++    if (!ctx->decoder || !ctx->cfg || ctx->surface_count <= 0)
++        return -1;
++    assert(ctx_pic);
++
++    /* Fill up DXVA_PicParams_H264 */
++    fill_picture_parameters(ctx, h, &ctx_pic->pp);
++
++    /* Fill up DXVA_Qmatrix_H264 */
++    fill_scaling_lists(h, &ctx_pic->qm);
++
++    /* */
++    ctx_pic->slice_count = 0;
++    ctx_pic->bitstream_size = 0;
++    ctx_pic->bitstream = NULL;
++
++	return 0;
++}
++
++static int decode_slice(AVCodecContext *avctx, const uint8_t *buffer, uint32_t size)
++{
++    H264Context *h = avctx->priv_data; /* FIXME Can't use const because of get_bits_count */
++    struct dxva_context *ctx = avctx->hwaccel_context;
++    const Picture *current_picture = h->s.current_picture_ptr;
++    struct dxva2_picture_context *ctx_pic = current_picture->hwaccel_picture_private;
++    unsigned position;
++
++    /* */
++    if (ctx_pic->slice_count >= MAX_SLICES)
++        return -1;
++
++    /* */
++    if (!ctx_pic->bitstream)
++        ctx_pic->bitstream = buffer;
++    ctx_pic->bitstream_size += size;
++
++    /* */
++    position = buffer - ctx_pic->bitstream;
++    if (is_slice_short(ctx)) {
++        fill_slice_short(&ctx_pic->slice_short[ctx_pic->slice_count],
++                         position, size);
++    } else {
++        fill_slice_long(avctx, &ctx_pic->slice_long[ctx_pic->slice_count],
++                        position, size);
++    }
++    ctx_pic->slice_count++;
++
++    /* */
++    if (h->slice_type != FF_I_TYPE && h->slice_type != FF_SI_TYPE)
++        ctx_pic->pp.IntraPicFlag = 0;
++	return 0;
++}
++
++static int end_frame(AVCodecContext *avctx)
++{
++    H264Context *h = avctx->priv_data;
++    MpegEncContext *s = &h->s;
++    const unsigned mb_count = s->mb_width * s->mb_height;
++    struct dxva_context *ctx = avctx->hwaccel_context;
++    const Picture *current_picture = h->s.current_picture_ptr;
++    struct dxva2_picture_context *ctx_pic = current_picture->hwaccel_picture_private;
++    unsigned               buffer_count = 0;
++    DXVA2_DecodeBufferDesc buffer[4];
++    DXVA2_DecodeExecuteParams exe;
++    void     *slice_data;
++    unsigned slice_size;
++    uint8_t  *dxva_data;
++    unsigned dxva_size;
++
++    /* */
++    if (ctx_pic->slice_count <= 0 || ctx_pic->bitstream_size <= 0)
++        return -1;
++
++    /* */
++    if (FAILED(IDirectXVideoDecoder_BeginFrame(ctx->decoder, get_surface(current_picture), NULL))) {
++        av_log(avctx, AV_LOG_DEBUG, "Failed to begin frame\n");
++        return -1;
++    }
++
++    /* */
++    if (!commit_buffer(avctx, ctx, &buffer[buffer_count], DXVA2_PictureParametersBufferType, &ctx_pic->pp, sizeof(ctx_pic->pp), 0))
++        buffer_count++;
++    else
++        av_log(avctx, AV_LOG_DEBUG, "Failed to add PP\n");
++
++    if (!commit_buffer(avctx, ctx, &buffer[buffer_count], DXVA2_InverseQuantizationMatrixBufferType, &ctx_pic->qm, sizeof(ctx_pic->qm), 0))
++        buffer_count++;
++    else
++        av_log(avctx, AV_LOG_DEBUG, "Failed to add QM\n");
++
++    /* Create an annexe B bitstream buffer with only slice NAL and finalize slice */
++    if (!FAILED(IDirectXVideoDecoder_GetBuffer(ctx->decoder, DXVA2_BitStreamDateBufferType,
++                                               &dxva_data, &dxva_size))) {
++        uint8_t *current = dxva_data;
++        unsigned i;
++
++        for (i = 0; i < ctx_pic->slice_count; i++) {
++            static const uint8_t start_code[] = { 0, 0, 1 };
++            static const unsigned start_code_size = sizeof(start_code);
++            DXVA_Slice_H264_Short *slice;
++            unsigned position, size;
++            unsigned padding;
++
++            /* */
++#define OFFSET_OF(t,f) ((intptr_t)&((t*)NULL)->f)
++            assert(OFFSET_OF(DXVA_Slice_H264_Short, BSNALunitDataLocation) == 
++                   OFFSET_OF(DXVA_Slice_H264_Long,  BSNALunitDataLocation));
++            assert(OFFSET_OF(DXVA_Slice_H264_Short, SliceBytesInBuffer) == 
++                   OFFSET_OF(DXVA_Slice_H264_Long,  SliceBytesInBuffer));
++#undef OFFSET_OF
++            if (is_slice_short(ctx))
++                slice = &ctx_pic->slice_short[i];
++            else
++                slice = (DXVA_Slice_H264_Short*)&ctx_pic->slice_long[i];
++
++            /* */
++            position = slice->BSNALunitDataLocation;
++            size     = slice->SliceBytesInBuffer;
++            if (i == ctx_pic->slice_count - 1)
++                padding = 128 - ((&current[start_code_size + size] - dxva_data) % 128);
++            else
++                padding = 0;
++
++            slice->BSNALunitDataLocation = current - dxva_data;
++            slice->SliceBytesInBuffer    = start_code_size + size + padding;
++
++            if (!is_slice_short(ctx)) {
++                DXVA_Slice_H264_Long *slice_long = (DXVA_Slice_H264_Long*)slice;
++                if (i < ctx_pic->slice_count - 1) {
++                    slice_long->NumMbsForSlice = slice_long[1].first_mb_in_slice - slice_long[0].first_mb_in_slice;
++                } else {
++                    slice_long->NumMbsForSlice = mb_count - slice_long->first_mb_in_slice;
++                }
++            }
++
++            /* */
++            if (&current[start_code_size + size] > &dxva_data[dxva_size]) {
++                av_log(avctx, AV_LOG_DEBUG, "Failed to build bitstream");
++                break;
++            }
++
++            memcpy(current, start_code,                start_code_size);
++            current += start_code_size;
++
++            memcpy(current, &ctx_pic->bitstream[position], size);
++            current += size;
++
++            if (padding > 0) {
++                memset(current, 0, padding);
++                current += padding;
++            }
++        }
++        assert(((current - dxva_data) % 128) == 0);
++        if (!FAILED(IDirectXVideoDecoder_ReleaseBuffer(ctx->decoder, DXVA2_BitStreamDateBufferType))) {
++            DXVA2_DecodeBufferDesc *dsc = &buffer[buffer_count++];
++            memset(dsc, 0, sizeof(*dsc));
++            dsc->CompressedBufferType = DXVA2_BitStreamDateBufferType;
++            dsc->DataSize = current - dxva_data;
++            dsc->NumMBsInBuffer = mb_count; /* FIXME ? */
++        }
++        else
++            av_log(avctx, AV_LOG_DEBUG, "Failed to add BS\n");
++    }
++    if (is_slice_short(ctx)) {
++        slice_data = ctx_pic->slice_short;
++        slice_size = ctx_pic->slice_count * sizeof(*ctx_pic->slice_short);
++    } else {
++        slice_data = ctx_pic->slice_long;
++        slice_size = ctx_pic->slice_count * sizeof(*ctx_pic->slice_long);
++    }
++    if (!commit_buffer(avctx, ctx, &buffer[buffer_count], DXVA2_SliceControlBufferType,
++                       slice_data, slice_size, mb_count))
++        buffer_count++;
++    else
++        av_log(avctx, AV_LOG_DEBUG, "Failed to add SC\n");
++    /* TODO Film Grain when possible */
++
++    if (buffer_count != 4)
++        av_log(avctx, AV_LOG_DEBUG,
++               "Failed to filled up all buffers (%d instead of 4)\n",
++               buffer_count);
++
++    /* */
++    memset(&exe, 0, sizeof(exe));
++    exe.NumCompBuffers = buffer_count;
++    exe.pCompressedBuffers = buffer;
++    exe.pExtensionData = NULL;
++    if (FAILED(IDirectXVideoDecoder_Execute(ctx->decoder, &exe)))
++        av_log(avctx, AV_LOG_DEBUG, "Failed to execute\n");
++
++    /* */
++    if (FAILED(IDirectXVideoDecoder_EndFrame(ctx->decoder, NULL)))
++        av_log(avctx, AV_LOG_DEBUG, "Failed to end frame\n");
++
++    /* */
++    ff_draw_horiz_band(s, 0, s->avctx->height);
++	return 0;
++}
++
++/* */
++AVHWAccel h264_dxva2_hwaccel = {
++    .name           = "h264_dxva2",
++    .type           = CODEC_TYPE_VIDEO,
++    .id             = CODEC_ID_H264,
++    .pix_fmt        = PIX_FMT_DXVA2_VLD,
++    .capabilities   = 0,
++    .start_frame    = start_frame,
++    .decode_slice   = decode_slice,
++    .end_frame      = end_frame,
++    .priv_data_size = sizeof(struct dxva2_picture_context),
++};
++
+Index: libavcodec/mpegvideo.c
+===================================================================
+--- libavcodec/mpegvideo.c	(revision 20532)
++++ libavcodec/mpegvideo.c	(working copy)
+@@ -81,6 +81,7 @@
+ };
+ 
+ const enum PixelFormat ff_hwaccel_pixfmt_list_420[] = {
++    PIX_FMT_DXVA2_VLD,
+     PIX_FMT_VAAPI_VLD,
+     PIX_FMT_YUV420P,
+     PIX_FMT_NONE
+Index: libavcodec/allcodecs.c
+===================================================================
+--- libavcodec/allcodecs.c	(revision 20532)
++++ libavcodec/allcodecs.c	(working copy)
+@@ -59,6 +59,7 @@
+     REGISTER_HWACCEL (MPEG4_VAAPI, mpeg4_vaapi);
+     REGISTER_HWACCEL (VC1_VAAPI, vc1_vaapi);
+     REGISTER_HWACCEL (WMV3_VAAPI, wmv3_vaapi);
++    REGISTER_HWACCEL (H264_DXVA2, h264_dxva2);
+ 
+     /* video codecs */
+     REGISTER_DECODER (AASC, aasc);
+Index: libavcodec/imgconvert.c
+===================================================================
+--- libavcodec/imgconvert.c	(revision 20532)
++++ libavcodec/imgconvert.c	(working copy)
+@@ -527,6 +527,11 @@
+         .is_hwaccel = 1,
+         .x_chroma_shift = 1, .y_chroma_shift = 1,
+     },
++    [PIX_FMT_DXVA2_VLD] = {
++        .name = "dxva2_vld",
++        .is_hwaccel = 1,
++        .x_chroma_shift = 1, .y_chroma_shift = 1,
++    },
+ };
+ 
+ void avcodec_get_chroma_sub_sample(enum PixelFormat pix_fmt, int *h_shift, int *v_shift)
+Index: libavcodec/dxva2.h
+===================================================================
+--- libavcodec/dxva2.h	(revision 0)
++++ libavcodec/dxva2.h	(revision 0)
+@@ -0,0 +1,68 @@
++/*
++ * DXVA2 HW acceleration.
++ *
++ * copyright (c) 2009 Laurent Aimar
++ *
++ * This file is part of FFmpeg.
++ *
++ * FFmpeg is free software; you can redistribute it and/or
++ * modify it under the terms of the GNU Lesser General Public
++ * License as published by the Free Software Foundation; either
++ * version 2.1 of the License, or (at your option) any later version.
++ *
++ * FFmpeg is distributed in the hope that it will be useful,
++ * but WITHOUT ANY WARRANTY; without even the implied warranty of
++ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the GNU
++ * Lesser General Public License for more details.
++ *
++ * You should have received a copy of the GNU Lesser General Public
++ * License along with FFmpeg; if not, write to the Free Software
++ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301 USA
++ */
++
++#ifndef AVCODEC_DXVA_H
++#define AVCODEC_DXVA_H
++
++#include <stdint.h>
++
++#include <dxva2api.h>
++
++/**
++ * This structure is used to provides the necessary configurations and data
++ * to the DXVA2 FFmpeg HWAccel implementation.
++ *
++ * The application must make it available as AVCodecContext.hwaccel_context.
++ */
++struct dxva_context {
++    /**
++     * DXVA2 decoder object
++     */
++    LPDIRECTXVIDEODECODER decoder;
++
++    /**
++     * DXVA2 configuration used to create the decoder
++     */
++    const DXVA2_ConfigPictureDecode *cfg;
++
++    /**
++     * The number of surface in the surface array.
++     */
++    unsigned surface_count;
++
++    /**
++     * The array of Direct3D surfaces used to create the decoder
++     */
++    LPDIRECT3DSURFACE9 *surface;
++
++    /**
++     * A bit field configuring the workarounds needed for using the decoder
++     */
++    uint64_t workaround;
++
++    /**
++     * Private to the FFmpeg AVHWAccel implementation
++     */
++    unsigned report_id;
++};
++
++#endif /* AVCODEC_DXVA_H */
+Index: libavcodec/Makefile
+===================================================================
+--- libavcodec/Makefile	(revision 20532)
++++ libavcodec/Makefile	(working copy)
+@@ -3,7 +3,7 @@
+ NAME = avcodec
+ FFLIBS = avutil
+ 
+-HEADERS = avcodec.h opt.h vdpau.h xvmc.h
++HEADERS = avcodec.h opt.h vdpau.h xvmc.h dxva2.h
+ 
+ OBJS = allcodecs.o                                                      \
+        audioconvert.o                                                   \
+@@ -137,6 +137,7 @@
+ OBJS-$(CONFIG_H264_DECODER)            += h264.o h264idct.o h264pred.o \
+                                           h264_parser.o cabac.o        \
+                                           mpegvideo.o error_resilience.o
++OBJS-$(CONFIG_H264_DXVA2_HWACCEL)      += dxva2_h264.o
+ OBJS-$(CONFIG_H264_ENCODER)            += h264enc.o h264dspenc.o
+ OBJS-$(CONFIG_HUFFYUV_DECODER)         += huffyuv.o
+ OBJS-$(CONFIG_HUFFYUV_ENCODER)         += huffyuv.o

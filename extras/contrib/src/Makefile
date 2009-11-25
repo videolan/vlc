@@ -1035,6 +1035,7 @@ ifdef HAVE_UCLIBC
 endif
 ifdef HAVE_WIN32
 	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-win32.patch)
+	(cd $@; patch -p0 < ../Patches/ffmpeg-dxva2.patch)
 endif
 ifdef NO_TEXT_RELOCATION
 	echo "Broken LD. Fix your tools."
