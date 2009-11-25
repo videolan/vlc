@@ -20,25 +20,8 @@
       <string>Network Protocol</string>
      </property>
      <layout class="QGridLayout" >
-      <item row="1" column="0" >
-       <widget class="QComboBox" name="protocolCombo" >
-        <property name="toolTip" >
-         <string>Select the protocol for the URL.</string>
-        </property>
-       </widget>
-      </item>
       <item row="0" column="0" >
-       <widget class="QLabel" name="label" >
-        <property name="text" >
-         <string>Protocol</string>
-        </property>
-        <property name="buddy" >
-         <cstring>protocolCombo</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="0" column="1" >
-       <widget class="QLabel" name="label_2" >
+       <widget class="QLabel" name="label_1" >
         <property name="sizePolicy" >
          <sizepolicy vsizetype="Fixed" hsizetype="Preferred" >
           <horstretch>0</horstretch>
@@ -46,17 +29,17 @@
          </sizepolicy>
         </property>
         <property name="text" >
-         <string>Address</string>
+         <string>URL</string>
         </property>
         <property name="buddy" >
-         <cstring>addressText</cstring>
+         <cstring>urlText</cstring>
         </property>
        </widget>
       </item>
-      <item row="1" column="1" >
-       <widget class="QLineEdit" name="addressText" >
+      <item row="1" column="0" >
+       <widget class="QLineEdit" name="urlText" >
         <property name="toolTip" >
-         <string>Enter the URL of the network stream here, with or without the protocol.</string>
+         <string>Enter the URL of the network stream here.</string>
         </property>
        </widget>
       </item>
@@ -82,8 +65,7 @@
   </layout>
  </widget>
  <tabstops>
-  <tabstop>protocolCombo</tabstop>
-  <tabstop>addressText</tabstop>
+  <tabstop>urlText</tabstop>
  </tabstops>
  <resources/>
  <connections/>

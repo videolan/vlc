@@ -492,30 +492,16 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.setupUi( this );
 
     /* CONNECTs */
-    CONNECT( ui.protocolCombo, activated( int ),
-             this, updateProtocol( int ) );
-    CONNECT( ui.addressText, textChanged( const QString& ), this, updateMRL());
-
-    ui.protocolCombo->addItem( "" );
-    ui.protocolCombo->addItem("HTTP", QVariant("http"));
-    ui.protocolCombo->addItem("HTTPS", QVariant("https"));
-    ui.protocolCombo->addItem("MMS", QVariant("mms"));
-    ui.protocolCombo->addItem("FTP", QVariant("ftp"));
-    ui.protocolCombo->addItem("RTSP", QVariant("rtsp"));
-    ui.protocolCombo->addItem("RTP", QVariant("rtp"));
-    ui.protocolCombo->addItem("UDP", QVariant("udp"));
-    ui.protocolCombo->addItem("RTMP", QVariant("rtmp"));
-
-    updateProtocol( ui.protocolCombo->currentIndex() );
+    CONNECT( ui.urlText, textChanged( const QString& ), this, updateMRL());
 
     if( config_GetInt( p_intf, "qt-recentplay" ) )
     {
         mrlList = new QStringListModel(
                 getSettings()->value( "Open/netMRL" ).toStringList() );
         QCompleter *completer = new QCompleter( mrlList, this );
-        ui.addressText->setCompleter( completer );
+        ui.urlText->setCompleter( completer );
 
-        CONNECT( ui.addressText, editingFinished(), this, updateCompleter() );
+        CONNECT( ui.urlText, editingFinished(), this, updateCompleter() );
     }
     else
         mrlList = NULL;
@@ -536,80 +522,49 @@ NetOpenPanel::~NetOpenPanel()
 void NetOpenPanel::clear()
 {}
 
-/* update the widgets according the type of protocol */
-void NetOpenPanel::updateProtocol( int idx_proto ) {
-    QString addr = ui.addressText->text();
-    QString proto = ui.protocolCombo->itemData( idx_proto ).toString();
-
-    if( idx_proto == NO_PROTO ) return;
-
-    /* If we already have a protocol in the address, replace it */
-    if( addr.contains( "://"))
-    {
-        if( idx_proto != UDP_PROTO && idx_proto != RTP_PROTO )
-            addr.replace( QRegExp("^.*://@*"), proto + "://");
-        else if ( ( addr.contains(QRegExp("://((22[4-9])|(23\\d)|(\\[?[fF]{2}[0-9a-fA-F]{2}:))"))) ||
-                ( !addr.contains(QRegExp("^\\d{1,3}[.]\\d{1,3}[.]\\d{1,3}[.]\\d{1,3}")) &&
-                !addr.contains(QRegExp(":[a-fA-F0-9]{1,4}:")) ) )
-             addr.replace( QRegExp("^.*://"), proto + "://@");
-    else
-             addr.replace( QRegExp("^.*://"), proto + "://");
-        addr.replace( QRegExp("@+"), "@");
-        ui.addressText->setText( addr );
-    }
-    updateMRL();
+static int strcmp_void( const void *k, const void *e )
+{
+    return strcmp( (const char *)k, (const char *)e );
 }
 
-void NetOpenPanel::updateMRL() {
-    QString mrl = "";
-    QString addr = ui.addressText->text();
-    int idx_proto = ui.protocolCombo->currentIndex();
-    if( addr.contains( "://"))
+void NetOpenPanel::updateMRL()
+{
+    static const struct caching_map
     {
-        /* Match the correct item in the comboBox */
-        ui.protocolCombo->setCurrentIndex(
-                ui.protocolCombo->findData( addr.section( ':', 0, 0 ) ) );
-        mrl = addr;
-    }
-    else
-    {
-        switch( idx_proto ) {
-        case HTTP_PROTO:
-            mrl = "http://" + addr;
-            emit methodChanged("http-caching");
-            break;
-        case HTTPS_PROTO:
-            mrl = "https://" + addr;
-            emit methodChanged("http-caching");
-            break;
-        case MMS_PROTO:
-            mrl = "mms://" + addr;
-            emit methodChanged("mms-caching");
-            break;
-        case FTP_PROTO:
-            mrl = "ftp://" + addr;
-            emit methodChanged("ftp-caching");
-            break;
-        case RTSP_PROTO:
-            mrl = "rtsp://" + addr;
-            emit methodChanged("rtsp-caching");
-            break;
-        case RTP_PROTO:
-        case UDP_PROTO:
-            mrl = qfu(((idx_proto == RTP_PROTO) ? "rtp" : "udp"));
-            mrl += qfu( "://" );
-            mrl += addr;
-            emit methodChanged(idx_proto == RTP_PROTO
-                                   ? "rtp-caching" : "udp-caching");
-            break;
-        case RTMP_PROTO:
-            mrl = "rtmp://" + addr;
-            emit methodChanged("rtmp-caching");
-            break;
-        }
-    }
+        char proto[6];
+        char caching[6];
+    } schemes[] =
+    {   /* KEEP alphabetical order on first column!! */
+        { "ftp",   "ftp"   },
+        { "ftps",  "ftp"   },
+        { "http",  "http"  },
+        { "https", "http"  },
+        { "mms",   "mms"   },
+        { "mmsh",  "mms"   },
+        { "mmst",  "mms"   },
+        { "mmsu",  "mms"   },
+        { "sftp",  "sftp"  },
+        { "smb",   "smb"   },
+        { "rtmp",  "rtmp"  },
+        { "rtp",   "rtp"   },
+        { "rtsp",  "rtsp"  },
+        { "udp",   "udp"   },
+    };
 
-    QStringList qsl; qsl<< mrl;
+    QString url = ui.urlText->text();
+    if( !url.contains( "://") )
+        return; /* nothing to do this far */
+
+    /* Match the correct item in the comboBox */
+    QString proto = url.section( ':', 0, 0 );
+    const struct caching_map *r = (const struct caching_map *)
+        bsearch( qtu(proto), schemes, sizeof(schemes) / sizeof(schemes[0]),
+                 sizeof(schemes[0]), strcmp_void );
+    if( r != NULL )
+        emit methodChanged( qfu( r->caching ) + qfu( "-caching" ) );
+
+    QStringList qsl;
+    qsl << url;
     emit mrlUpdated( qsl, "" );
 }
 
@@ -617,8 +572,8 @@ void NetOpenPanel::updateCompleter()
 {
     assert( mrlList );
     QStringList tempL = mrlList->stringList();
-    if( !tempL.contains( ui.addressText->text() ) )
-        tempL.append( ui.addressText->text() );
+    if( !tempL.contains( ui.urlText->text() ) )
+        tempL.append( ui.urlText->text() );
     mrlList->setStringList( tempL );
 }
 
