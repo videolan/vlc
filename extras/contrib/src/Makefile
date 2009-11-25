@@ -294,9 +294,6 @@ cmake-$(CMAKE_VERSION).tar.gz:
 cmake: cmake-$(CMAKE_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
-#cmake:
-#	cvs -d :pserver:anonymous:cmake@www.cmake.org:/cvsroot/CMake co -d cmake CMake
-
 .cmake: cmake
 	(cd $<; ./configure --prefix=$(PREFIX) && make && make install)
 	touch $@
@@ -502,11 +499,7 @@ freetype2: freetype-$(FREETYPE2_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .freetype: freetype2
-ifdef HAVE_CYGWIN
-	(cd $<; ./configure --target=$(HOST) --disable-pic --disable-shared --prefix=$(PREFIX) && make && make install)
-else
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
-endif
 	$(INSTALL_NAME)
 	touch $@
 
@@ -1141,8 +1134,6 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 # ***************************************************************************
 # libdvdread: We use dvdnav's dvdread
 # ***************************************************************************
-
-
 libdvdread:
 	$(SVN) co $(LIBDVDREAD_SVN)  libdvdread
 	(cd $@; patch  -p 0 < ../Patches/libdvdread.patch)
