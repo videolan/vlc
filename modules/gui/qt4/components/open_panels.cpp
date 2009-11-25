@@ -494,7 +494,6 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* CONNECTs */
     CONNECT( ui.protocolCombo, activated( int ),
              this, updateProtocol( int ) );
-    CONNECT( ui.portSpin, valueChanged( int ), this, updateMRL() );
     CONNECT( ui.addressText, textChanged( const QString& ), this, updateMRL());
 
     ui.protocolCombo->addItem( "" );
@@ -541,9 +540,6 @@ void NetOpenPanel::clear()
 void NetOpenPanel::updateProtocol( int idx_proto ) {
     QString addr = ui.addressText->text();
     QString proto = ui.protocolCombo->itemData( idx_proto ).toString();
-
-    ui.portSpin->setEnabled( idx_proto == UDP_PROTO ||
-                             idx_proto == RTP_PROTO );
 
     if( idx_proto == NO_PROTO ) return;
 
@@ -602,35 +598,7 @@ void NetOpenPanel::updateMRL() {
         case UDP_PROTO:
             mrl = qfu(((idx_proto == RTP_PROTO) ? "rtp" : "udp"));
             mrl += qfu( "://" );
-            if( addr[0] == ':' ) /* Port number without address */
-                mrl += addr;
-            else
-            {
-                if( !addr.contains( "@" ) )
-                    mrl += qfu( "@" );
-                switch( addr.count( ":" ) )
-                {
-                    case 0: /* DNS or IPv4 literal, no port number */
-                        mrl += addr;
-                        mrl += QString(":%1").arg( ui.portSpin->value() );
-                        break;
-                    case 1: /* DNS or IPv4 literal plus port number */
-                        mrl += addr;
-                        break;
-                    default: /* IPv6 literal */
-                        if( !addr.contains( "]:" ) )
-                        {
-                            if( addr[0] != '[' ) /* Missing brackets */
-                                mrl += qfu( "[" ) + addr + qfu( "]" );
-                            else
-                                mrl += addr;
-                            mrl += QString(":%1").arg( ui.portSpin->value() );
-                        }
-                        else /* Brackets present, port present */
-                            mrl += addr;
-                        break;
-                }
-            }
+            mrl += addr;
             emit methodChanged(idx_proto == RTP_PROTO
                                    ? "rtp-caching" : "udp-caching");
             break;
