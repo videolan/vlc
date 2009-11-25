@@ -116,7 +116,9 @@ static int Open( vlc_object_t *p_this )
     /* Connect to the JACK server */
     snprintf( psz_name, sizeof(psz_name), "vlc_%d", getpid());
     psz_name[sizeof(psz_name) - 1] = '\0';
-    p_sys->p_jack_client = jack_client_new( psz_name );
+    p_sys->p_jack_client = jack_client_open( psz_name,
+                                             JackNullOption | JackNoStartServer,
+                                             NULL );
     if( p_sys->p_jack_client == NULL )
     {
         msg_Err( p_aout, "failed to connect to JACK server" );
