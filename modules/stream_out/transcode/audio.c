@@ -210,8 +210,8 @@ int transcode_audio_new( sout_stream_t *p_stream,
     es_format_t fmt_last;
 
     /*
- *      * Open decoder
- *           */
+     * Open decoder
+     */
 
     /* Initialization of decoder structures */
     id->p_decoder->fmt_out = id->p_decoder->fmt_in;
@@ -239,8 +239,8 @@ int transcode_audio_new( sout_stream_t *p_stream,
         fmt_last.audio.i_rate = id->p_decoder->fmt_in.audio.i_rate;
 
     /*
- *      * Open encoder
- *           */
+     * Open encoder
+     */
 
     /* Initialization of encoder format structures */
     es_format_Init( &id->p_encoder->fmt_in, id->p_decoder->fmt_in.i_cat,
