@@ -132,9 +132,6 @@ static int FindCamera( demux_sys_t *sys, demux_t *p_demux )
     {
         msg_Err(p_demux, "Can not ennumerate cameras");
         dc1394_camera_free_list (list);
-        dc1394_free( sys->p_dccontext );
-        free( sys );
-        p_demux->p_sys = NULL;
         return VLC_EGENERIC;
     }
 
@@ -142,9 +139,6 @@ static int FindCamera( demux_sys_t *sys, demux_t *p_demux )
     {
         msg_Err(p_demux, "Can not find cameras");
         dc1394_camera_free_list (list);
-        dc1394_free( sys->p_dccontext );
-        free( sys );
-        p_demux->p_sys = NULL;
         return VLC_EGENERIC;
     }
 
@@ -169,9 +163,6 @@ static int FindCamera( demux_sys_t *sys, demux_t *p_demux )
             msg_Err( p_demux, "Can't find camera with uid : 0x%llx.",
                      sys->selected_uid );
             dc1394_camera_free_list (list);
-            dc1394_free( sys->p_dccontext );
-            free( sys );
-            p_demux->p_sys = NULL;
             return VLC_EGENERIC;
         }
     }
@@ -180,9 +171,6 @@ static int FindCamera( demux_sys_t *sys, demux_t *p_demux )
         msg_Err( p_demux, "There are not this many cameras. (%d/%d)",
                  sys->selected_camera, sys->num_cameras );
         dc1394_camera_free_list (list);
-        dc1394_free( sys->p_dccontext );
-        free( sys );
-        p_demux->p_sys = NULL;
         return VLC_EGENERIC;
     }
     else if( sys->selected_camera >= 0 )
@@ -263,7 +251,12 @@ static int Open( vlc_object_t *p_this )
     }
 
     if( FindCamera( p_sys, p_demux ) != VLC_SUCCESS )
+    {
+        dc1394_free( p_sys->p_dccontext );
+        free( p_sys );
+        p_demux->p_sys = NULL;
         return VLC_EGENERIC;
+    }
 
     if( !p_sys->camera )
     {
