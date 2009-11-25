@@ -248,7 +248,10 @@ int Process( jack_nframes_t i_frames, void *p_arg )
     jack_sample_t *p_src = NULL;
 
     /* Get the next audio data buffer */
+    vlc_mutex_lock( &p_aout->output_fifo_lock );
     aout_buffer_t *p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
+    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+
     if( p_buffer != NULL )
     {
         p_src = (jack_sample_t *)p_buffer->p_buffer;
