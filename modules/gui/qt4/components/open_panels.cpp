@@ -560,7 +560,7 @@ void NetOpenPanel::updateMRL()
     const struct caching_map *r = (const struct caching_map *)
         bsearch( qtu(proto), schemes, sizeof(schemes) / sizeof(schemes[0]),
                  sizeof(schemes[0]), strcmp_void );
-    if( r != NULL )
+    if( r != NULL && module_exists( r->caching ) )
         emit methodChanged( qfu( r->caching ) + qfu( "-caching" ) );
 
     QStringList qsl;
