@@ -535,6 +535,7 @@ void NetOpenPanel::updateMRL()
         char caching[6];
     } schemes[] =
     {   /* KEEP alphabetical order on first column!! */
+        { "dccp",  "rtp"   },
         { "ftp",   "ftp"   },
         { "ftps",  "ftp"   },
         { "http",  "http"  },
