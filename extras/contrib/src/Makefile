@@ -2171,11 +2171,17 @@ DISTCLEAN_PKG += win32-dx7headers.tgz
 # *************************************************************************
 dshow-headers.tgz:
 	$(WGET) $(DSHOW_HEADERS_URL)
-.dshow_headers: dshow-headers.tgz
+
+dxva2api.h:
+	$(WGET) $(DXVA2_URL)
+
+.dshow_headers: dshow-headers.tgz dxva2api.h
 	(cd ../include ; tar xzf ../src/$<)
+	(cp dxva2api.h ../include)
 	touch $@
+
 CLEAN_FILE += .dshow_headers
-DISTCLEAN_PKG += dshow-headers.tgz
+DISTCLEAN_PKG += dshow-headers.tgz dxva2api.h
 
 # ***************************************************************************
 # libexpat
