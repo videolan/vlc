@@ -53,14 +53,11 @@ int aout_OutputNew( aout_instance_t * p_aout,
         p_aout->output.output.i_rate = i_rate;
     aout_FormatPrepare( &p_aout->output.output );
 
-    aout_lock_output_fifo( p_aout );
-
     /* Find the best output plug-in. */
     p_aout->output.p_module = module_need( p_aout, "audio output", "$aout", false );
     if ( p_aout->output.p_module == NULL )
     {
         msg_Err( p_aout, "no suitable audio output module" );
-        aout_unlock_output_fifo( p_aout );
         return -1;
     }
 
@@ -162,6 +159,8 @@ int aout_OutputNew( aout_instance_t * p_aout,
     var_Set( p_aout, "intf-change", val );
 
     aout_FormatPrepare( &p_aout->output.output );
+
+    aout_lock_output_fifo( p_aout );
 
     /* Prepare FIFO. */
     aout_FifoInit( p_aout, &p_aout->output.fifo,
