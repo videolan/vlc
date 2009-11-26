@@ -2,6 +2,5 @@ SOURCES_ugly_resampler = ugly.c
 SOURCES_bandlimited_resampler = bandlimited.c bandlimited.h
 
 libvlc_LTLIBRARIES += \
-	libtrivial_resampler_plugin.la \
 	libugly_resampler_plugin.la \
 	$(NULL)
