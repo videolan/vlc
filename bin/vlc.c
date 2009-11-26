@@ -34,6 +34,10 @@
 #include <stdlib.h>
 #include <locale.h>
 
+#ifdef __APPLE__
+#include <string.h>
+#endif
+
 
 /* Explicit HACK */
 extern void LocaleFree (const char *);
@@ -134,7 +138,16 @@ int main( int i_argc, const char *ppsz_argv[] )
 # endif
 #endif
 
-    for (int i = 1; i < i_argc; i++)
+    int i = 1;
+#ifdef __APPLE__
+    /* When VLC.app is run by double clicking in Mac OS X, the 2nd arg
+     * is the PSN - process serial number (a unique PID-ish thingie)
+     * still ok for real Darwin & when run from command line
+     * for example -psn_0_9306113 */
+    if(i_argc >= 2 && !strncmp( ppsz_argv[1] , "-psn" , 4 ))
+        i = 2;
+#endif
+    for (; i < i_argc; i++)
         if ((argv[argc++] = FromLocale (ppsz_argv[i])) == NULL)
             return 1; // BOOM!
     argv[argc] = NULL;

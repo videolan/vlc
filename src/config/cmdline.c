@@ -65,24 +65,6 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
     module_config_t *pp_shortopts[256];
     char *psz_shortopts;
 
-#ifdef __APPLE__
-    /* When VLC.app is run by double clicking in Mac OS X, the 2nd arg
-     * is the PSN - process serial number (a unique PID-ish thingie)
-     * still ok for real Darwin & when run from command line */
-    if ( (*pi_argc > 1) && (strncmp( ppsz_argv[ 1 ] , "-psn" , 4 ) == 0) )
-                                        /* for example -psn_0_9306113 */
-    {
-        /* GDMF!... I can't do this or else the MacOSX window server will
-         * not pick up the PSN and not register the app and we crash...
-         * hence the following kludge otherwise we'll get confused w/ argv[1]
-         * being an input file name.
-         * As there won't be any more args to parse, just exit. */
-        assert( *pi_argc == 2 );
-        *pi_argc = 1;
-        return 0;
-    }
-#endif
-
     /* List all modules */
     module_t **list = module_list_get (NULL);
 
