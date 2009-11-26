@@ -196,21 +196,43 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Parse connection data user:pwd@host:port/mountpoint */
-    psz_user = psz_parser;
-    while( psz_parser[0] && psz_parser[0] != ':' ) psz_parser++;
-    if( psz_parser[0] ) { psz_parser[0] = 0; psz_parser++; }
-    psz_pass = psz_parser;
-    while( psz_parser[0] && psz_parser[0] != '@' ) psz_parser++;
-    if( psz_parser[0] ) { psz_parser[0] = 0; psz_parser++; }
-    psz_host = psz_parser;
-    while( psz_parser[0] && psz_parser[0] != ':' ) psz_parser++;
-    if( psz_parser[0] ) { psz_parser[0] = 0; psz_parser++; }
-    psz_port = psz_parser;
-    while( psz_parser[0] && psz_parser[0] != '/' ) psz_parser++;
-    if( psz_parser[0] ) { psz_parser[0] = 0; psz_parser++; }
-    psz_mount = psz_parser;
+    psz_host = strchr( psz_parser, '@' );
+    if( psz_host )
+    {
+        psz_user = psz_parser;
+        *(psz_host++) = '\0';
+    }
+    else
+        psz_user = "";
 
-    i_port = atoi( psz_port );
+    psz_pass = strchr( psz_user, ':' );
+    if( psz_pass )
+        *(psz_pass++) = '\0';
+    else
+        psz_pass = "";
+
+    psz_mount = strchr( psz_host, '/' );
+    if( psz_mount )
+        *(psz_mount++) = '\0';
+    else
+        psz_mount = "";
+
+    if( psz_host[0] == '[' )
+    {
+        psz_port = strstr( psz_host, "]:" );
+        if( psz_port )
+        {
+            *psz_port = '\0';
+            psz_port += 2;
+        }
+    }
+    else
+    {
+        psz_port = strchr( psz_host, ':' );
+        if( psz_port )
+            *(psz_port++) = '\0';
+    }
+    i_port = psz_port ? atoi( psz_port ) : 8000;
 
     p_sys = p_access->p_sys = malloc( sizeof( sout_access_out_sys_t ) );
     if( !p_sys )
