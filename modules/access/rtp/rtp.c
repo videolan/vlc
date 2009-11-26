@@ -170,17 +170,26 @@ static int Open (vlc_object_t *obj)
         return VLC_EGENERIC;
 
     char *tmp = strdup (demux->psz_path);
-    char *shost = tmp;
-    if (shost == NULL)
+    if (tmp == NULL)
         return VLC_ENOMEM;
 
-    char *dhost = strchr (shost, '@');
-    if (dhost)
-        *dhost++ = '\0';
+    char *shost;
+    char *dhost = strchr (tmp, '@');
+    if (dhost != NULL)
+    {
+        *(dhost++) = '\0';
+        shost = tmp;
+    }
+    else
+    {
+        dhost = tmp;
+        shost = NULL;
+    }
 
     /* Parses the port numbers */
     int sport = 0, dport = 0;
-    sport = extract_port (&shost);
+    if (shost != NULL)
+        sport = extract_port (&shost);
     if (dhost != NULL)
         dport = extract_port (&dhost);
     if (dport == 0)
@@ -213,14 +222,14 @@ static int Open (vlc_object_t *obj)
 #ifdef SOCK_DCCP
             var_Create (obj, "dccp-service", VLC_VAR_STRING);
             var_SetString (obj, "dccp-service", "RTPV"); /* FIXME: RTPA? */
-            fd = net_Connect (obj, shost, sport, SOCK_DCCP, tp);
+            fd = net_Connect (obj, dhost, dport, SOCK_DCCP, tp);
 #else
             msg_Err (obj, "DCCP support not included");
 #endif
             break;
 
         case IPPROTO_TCP:
-            fd = net_Connect (obj, shost, sport, SOCK_STREAM, tp);
+            fd = net_Connect (obj, dhost, dport, SOCK_STREAM, tp);
             break;
     }
 
