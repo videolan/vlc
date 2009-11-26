@@ -110,7 +110,7 @@ struct sql_t
     int (*pf_commit) ( sql_t* );
 
     /** Rollback transaction */
-    int (*pf_rollback) ( sql_t* );
+    void (*pf_rollback) ( sql_t* );
 
     /** Create a statement object */
     sql_stmt_t* (*pf_prepare) ( sql_t* p_sql, const char* p_fmt,
@@ -295,7 +295,7 @@ static inline int sql_CommitTransaction( sql_t *p_sql )
  * @return VLC error code or success
  * @note This function is threadsafe
  **/
-static inline int sql_RollbackTransaction( sql_t *p_sql )
+static inline void sql_RollbackTransaction( sql_t *p_sql )
 {
     return p_sql->pf_rollback( p_sql );
 }
