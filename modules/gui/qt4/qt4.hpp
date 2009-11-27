@@ -33,7 +33,6 @@
 #include <vlc_interface.h> /* intf_thread_t */
 #include <vlc_playlist.h>  /* playlist_t */
 
-#include <QEvent>
 #include <QString>
 
 #if ( QT_VERSION < 0x040400 )

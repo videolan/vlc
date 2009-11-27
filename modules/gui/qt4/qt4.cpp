@@ -27,12 +27,7 @@
 #endif
 
 #include <QApplication>
-#include <QLocale>
-#include <QTranslator>
 #include <QDate>
-#include <QMutex>
-#include <QMutexLocker>
-#include <QWaitCondition>
 
 #include "qt4.hpp"
 
@@ -51,7 +46,7 @@
 #include "../../../share/vlc32x32-christmas.xpm"
 #include <vlc_plugin.h>
 
-#ifdef WIN32
+#ifdef WIN32 /* For static builds */
  #include <QtPlugin>
  Q_IMPORT_PLUGIN(qjpeg)
  Q_IMPORT_PLUGIN(qtaccessiblewidgets)
@@ -476,7 +471,6 @@ static void *Thread( void *obj )
     MainInputManager::killInstance();
 
 
-
     /* Delete the application automatically */
 #ifdef Q_WS_X11
     free( display );
@@ -563,3 +557,4 @@ static void WindowClose( vlc_object_t *p_obj )
     msg_Dbg( p_obj, "releasing video..." );
     p_mi->releaseVideo();
 }
+
