@@ -21,13 +21,13 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-
 #include "dialogs/firstrun.hpp"
 
 #include "components/preferences_widgets.hpp"
 
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QSettings>
 
 FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf )
          : QWidget( _p ), p_intf( _p_intf )
@@ -36,13 +36,18 @@ FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf )
     /**
      * Ask for the network policy on FIRST STARTUP
      **/
-    if( config_GetInt( p_intf, "qt-privacy-ask") )
+    if( getSettings()->value( "IsFirstRun", 1 ).toInt() )
     {
-        buildPrivDialog();
-        setVisible( true );
+        if( config_GetInt( p_intf, "qt-privacy-ask") )
+        {
+            buildPrivDialog();
+            setVisible( true );
+        }
+        else
+            close();
+
+        getSettings()->setValue( "IsFirstRun", 0 );
     }
-    else
-        close();
 #endif
 }
 
