@@ -1578,7 +1578,6 @@ static bool Control( input_thread_t *p_input,
             break;
 
         case INPUT_CONTROL_SET_POSITION:
-        case INPUT_CONTROL_SET_POSITION_OFFSET:
         {
             double f_pos;
 
@@ -1614,7 +1613,6 @@ static bool Control( input_thread_t *p_input,
         }
 
         case INPUT_CONTROL_SET_TIME:
-        case INPUT_CONTROL_SET_TIME_OFFSET:
         {
             int64_t i_time;
             int i_ret;
