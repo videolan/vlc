@@ -1236,6 +1236,8 @@ static void CopyFromYv12(picture_t *dst, const D3DLOCKED_RECT *src,
 #else
 vlc_va_t *vlc_va_NewDxva2(vlc_object_t *log, int codec_id)
 {
+    (void)log;
+    (void)codec_id;
     return NULL;
 }
 #endif
