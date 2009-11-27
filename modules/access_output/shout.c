@@ -173,10 +173,10 @@ static int Open( vlc_object_t *p_this )
     char *psz_accessname;
     char *psz_parser;
     const char *psz_user;
-    const char *psz_pass;
-    const char *psz_host;
-    const char *psz_mount;
-    const char *psz_port;
+    char *psz_pass;
+    char *psz_host;
+    char *psz_mount;
+    char *psz_port;
     char *psz_name;
     char *psz_description;
     char *psz_genre;
