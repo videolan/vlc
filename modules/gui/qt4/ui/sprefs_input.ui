@@ -311,12 +311,18 @@
  <tabstops>
   <tabstop>DVDDevice</tabstop>
   <tabstop>DVDBrowse</tabstop>
+  <tabstop>AviRepair</tabstop>
+  <tabstop>recordPath</tabstop>
+  <tabstop>recordBrowse</tabstop>
   <tabstop>UDPPort</tabstop>
   <tabstop>proxy</tabstop>
+  <tabstop>live555TransportHTTPRadio</tabstop>
+  <tabstop>live555TransportRTSP_TCPRadio</tabstop>
   <tabstop>cachingCombo</tabstop>
   <tabstop>PostProcLevel</tabstop>
-  <tabstop>AviRepair</tabstop>
-  <tabstop>live555TransportRTSP_TCPRadio</tabstop>
+  <tabstop>hwAccelBox</tabstop>
+  <tabstop>systemCodecBox</tabstop>
+  <tabstop>loopFilterBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>
