@@ -36,10 +36,10 @@
 #include <QString>
 
 #if ( QT_VERSION < 0x040400 )
-# error Update your Qt version
+# error Update your Qt version to at least 4.4.0
 #endif
 #if QT_VERSION == 0x040500
-# warning Please update Qt version to 4.5.1. This warning will become an error.
+# error Please update Qt version to 4.5.1. 4.5.0 is too buggy
 #endif
 
 enum {
