@@ -40,6 +40,7 @@ nodist_SOURCES_qt4 = \
 		dialogs/openurl.moc.cpp \
 		dialogs/podcast_configuration.moc.cpp \
 		dialogs/vlm.moc.cpp \
+		dialogs/firstrun.moc.cpp \
 		components/extended_panels.moc.cpp \
 		components/info_panels.moc.cpp \
 		components/preferences_widgets.moc.cpp \
@@ -228,6 +229,7 @@ SOURCES_qt4 = 	qt4.cpp \
 		dialogs/open.cpp \
 		dialogs/openurl.cpp \
 		dialogs/vlm.cpp \
+		dialogs/firstrun.cpp \
 		dialogs/podcast_configuration.cpp \
 		components/extended_panels.cpp \
 		components/info_panels.cpp \
@@ -275,6 +277,7 @@ noinst_HEADERS = \
 	dialogs/open.hpp \
 	dialogs/openurl.hpp \
 	dialogs/vlm.hpp \
+	dialogs/firstrun.hpp \
 	dialogs/podcast_configuration.hpp \
 	components/extended_panels.hpp \
 	components/info_panels.hpp \

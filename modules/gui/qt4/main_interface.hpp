@@ -111,9 +111,6 @@ private:
     void createMainWidget( QSettings* );
     void createStatusBar();
 
-    void askForPrivacy();
-    int  privacyDialog( QList<ConfigControl *> *controls );
-
     /* Systray */
     void handleSystray();
     void createSystray();

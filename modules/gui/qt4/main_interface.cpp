@@ -40,6 +40,7 @@
 #include "components/controller.hpp"
 #include "components/playlist/playlist.hpp"
 #include "dialogs/external.hpp"
+#include "dialogs/firstrun.hpp"
 
 #include "menus.hpp"
 #include "recents.hpp"
@@ -98,8 +99,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     stackCentralOldState = HIDDEN_TAB;
     i_bg_height          = 0;
 
-    /* Ask for privacy */
-    askForPrivacy();
+    /* Ask for Privacy */
+    new FirstRun( this, p_intf );
 
     /**
      *  Configuration and settings
@@ -590,98 +591,6 @@ inline void MainInterface::initSystray()
     if( b_systrayAvailable && b_systrayWanted )
             createSystray();
 #endif
-}
-
-inline void MainInterface::askForPrivacy()
-{
-#ifndef HAVE_MAEMO
-    /**
-     * Ask for the network policy on FIRST STARTUP
-     **/
-    if( config_GetInt( p_intf, "qt-privacy-ask") )
-    {
-        QList<ConfigControl *> controls;
-        if( privacyDialog( &controls ) == QDialog::Accepted )
-        {
-            QList<ConfigControl *>::Iterator i;
-            for(  i = controls.begin() ; i != controls.end() ; i++ )
-            {
-                ConfigControl *c = qobject_cast<ConfigControl *>(*i);
-                c->doApply( p_intf );
-            }
-
-            config_PutInt( p_intf,  "qt-privacy-ask" , 0 );
-            /* We have to save here because the user may not launch Prefs */
-            config_SaveConfigFile( p_intf, NULL );
-        }
-    }
-#endif
-}
-
-int MainInterface::privacyDialog( QList<ConfigControl *> *controls )
-{
-    QDialog *privacy = new QDialog( this );
-
-    privacy->setWindowTitle( qtr( "Privacy and Network Policies" ) );
-    privacy->setWindowRole( "vlc-privacy" );
-
-    QGridLayout *gLayout = new QGridLayout( privacy );
-
-    QGroupBox *blabla = new QGroupBox( qtr( "Privacy and Network Warning" ) );
-    QGridLayout *blablaLayout = new QGridLayout( blabla );
-    QLabel *text = new QLabel( qtr(
-        "<p>The <i>VideoLAN Team</i> doesn't like when an application goes "
-        "online without authorization.</p>\n "
-        "<p><i>VLC media player</i> can retreive limited information from "
-        "the Internet in order to get CD covers or to check "
-        "for available updates.</p>\n"
-        "<p><i>VLC media player</i> <b>DOES NOT</b> send or collect <b>ANY</b> "
-        "information, even anonymously, about your usage.</p>\n"
-        "<p>Therefore please select from the following options, the default being "
-        "almost no access to the web.</p>\n") );
-    text->setWordWrap( true );
-    text->setTextFormat( Qt::RichText );
-
-    blablaLayout->addWidget( text, 0, 0 ) ;
-
-    QGroupBox *options = new QGroupBox;
-    QGridLayout *optionsLayout = new QGridLayout( options );
-
-    gLayout->addWidget( blabla, 0, 0, 1, 3 );
-    gLayout->addWidget( options, 1, 0, 1, 3 );
-    module_config_t *p_config;
-    ConfigControl *control;
-    int line = 0;
-
-#define CONFIG_GENERIC( option, type )                            \
-    p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
-    if( p_config )                                                \
-    {                                                             \
-        control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
-                p_config, options, false, optionsLayout, line );  \
-        controls->append( control );                              \
-    }
-
-#define CONFIG_GENERIC_NOBOOL( option, type )                     \
-    p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
-    if( p_config )                                                \
-    {                                                             \
-        control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
-                p_config, options, optionsLayout, line );         \
-        controls->append( control );                              \
-    }
-
-    CONFIG_GENERIC( "album-art", IntegerList ); line++;
-#ifdef UPDATE_CHECK
-    CONFIG_GENERIC_NOBOOL( "qt-updates-notif", Bool ); line++;
-#endif
-
-    QPushButton *ok = new QPushButton( qtr( "OK" ) );
-
-    gLayout->addWidget( ok, 2, 2 );
-
-    CONNECT( ok, clicked(), privacy, accept() );
-    return privacy->exec();
 }
 
 
