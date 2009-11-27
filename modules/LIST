@@ -16,6 +16,7 @@ $Id$
  * access_ftp: FTP Network access module
  * access_gnomevfs: GnomeVFS access
  * access_http: HTTP Network access module
+ * access_imem: memory input access module
  * access_jack: JACK audio input module
  * access_mmap: mmap file access
  * access_mms: MMS over TCP, UDP and HTTP access module
@@ -29,6 +30,7 @@ $Id$
  * access_output_udp: UDP Network access_output module
  * access_realrtsp: Real RTSP access
  * access_rtmp: RTMP network access
+ * access_sftp: SFTP network access module
  * access_smb: SMB shares access module
  * access_tcp: TCP Network access module
  * access_udp: UDP Network access module
@@ -136,6 +138,7 @@ $Id$
  * hd1000a: audio output module for the Roku HD1000 Set-Top-Box
  * hd1000v: video output module for the Roku HD1000 Set-Top-Box
  * headphone_channel_mixer:  headphone channel mixer with virtual spatialization effect
+ * hildon: Maemo interface based on Hildon
  * hotkeys: hotkeys control module
  * http: HTTP remote control webinterface
  * i420_rgb: planar YUV to packed RGB conversion functions
@@ -169,7 +172,6 @@ $Id$
  * lua: Lua scripting inteface
  * m4v: MPEG-4 Video Stream demuxer
  * macosx: Video output, and interface module for Mac OS X
- * maemo: Maemo interface
  * magnify: zoom video filter
  * marq: Overlays a marquee on the video
  * mash: OpenMash based decoder
@@ -241,7 +243,6 @@ $Id$
  * podcast: podcast feed parser
  * portaudio: audio output module that uses the portaudio library (www.portaudio.com)
  * postproc: Video post processing filter
- * probe_hal: HAL probing module
  * projectm: visualisation using libprojectM
  * ps: input module for MPEG PS decapsulation
  * psychedelic: Psychedelic video filter
@@ -314,7 +315,7 @@ $Id$
  * svg: a svg renderer module
  * svgalib: SGVAlib output plugin
  * swscale: Video scaling filter
- * swscale_maemo: Video scaling filter for maemo platform
+ * swscale_omap: Video scaling filter for maemo/omap platform
  * t140: T.140 text encoder
  * taglib: Taglib tags parser and writer
  * tarkin: a tarkin video decoder using libtarkin
@@ -335,6 +336,7 @@ $Id$
  * tta: Lossless True Audio parser
  * twolame: a mp1 mp2 audio encoder based on twolame
  * ty: TY demuxer
+ * udev: udev probing module
  * ugly_resampler: Ugly audio resampler
  * upnp: Universal Plug'n play discovery module
  * upnp_cc: Cyberlink UPNP discovery

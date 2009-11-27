@@ -79,6 +79,7 @@ Removed modules:
  * Xlib x11, Xlib xvideo (use XCB instead)
  * HAL (use libudev instead)
  * gtk_main, gtk_main2, gnome_main, gnome_main2 and pda interfaces
+ * linear_resampler and trivial_resampler are removed. Use the ugly one.
 
 
 Changes between 1.0.2 and 1.0.3:
