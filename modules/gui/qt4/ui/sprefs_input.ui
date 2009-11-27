@@ -8,7 +8,7 @@
     <x>0</x>
     <y>0</y>
     <width>687</width>
-    <height>489</height>
+    <height>548</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -227,22 +227,6 @@
       <string>Codecs</string>
      </property>
      <layout class="QGridLayout" name="gridLayout">
-      <item row="2" column="0">
-       <widget class="QLabel" name="ppLabel">
-        <property name="minimumSize">
-         <size>
-          <width>250</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Video quality post-processing level</string>
-        </property>
-        <property name="buddy">
-         <cstring>PostProcLevel</cstring>
-        </property>
-       </widget>
-      </item>
       <item row="7" column="0">
        <widget class="QLabel" name="filterLabel">
         <property name="text">
@@ -289,17 +273,33 @@
         </item>
        </layout>
       </item>
-      <item row="1" column="0">
-       <widget class="QLabel" name="systemCodecLabel">
+      <item row="2" column="0">
+       <widget class="QLabel" name="ppLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
         <property name="text">
-         <string>System codecs (better quality)</string>
+         <string>Video quality post-processing level</string>
+        </property>
+        <property name="buddy">
+         <cstring>PostProcLevel</cstring>
         </property>
        </widget>
       </item>
-      <item row="1" column="1">
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="hwAccelBox">
+        <property name="text">
+         <string>Use GPU acceleration (experimental)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="4" column="0" colspan="2">
        <widget class="QCheckBox" name="systemCodecBox">
         <property name="text">
-         <string>Use host codecs if available</string>
+         <string>Use system codecs if available (better quality, but dangerous)</string>
         </property>
        </widget>
       </item>
@@ -317,7 +317,6 @@
   <tabstop>PostProcLevel</tabstop>
   <tabstop>AviRepair</tabstop>
   <tabstop>live555TransportRTSP_TCPRadio</tabstop>
-  <tabstop>systemCodecBox</tabstop>
  </tabstops>
  <resources/>
  <connections/>

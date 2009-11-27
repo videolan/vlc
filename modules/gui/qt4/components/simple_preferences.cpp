@@ -429,8 +429,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "prefer-system-codecs", Bool, NULL, systemCodecBox );
 #else
             ui.systemCodecBox->hide();
-            ui.systemCodecLabel->hide();
 #endif
+            CONFIG_GENERIC( "ffmpeg-hw", Bool, NULL, hwAccelBox );
             optionWidgets.append( ui.DVDDevice );
             optionWidgets.append( ui.cachingCombo );
             CONFIG_GENERIC( "ffmpeg-skiploopfilter", IntegerList, ui.filterLabel, loopFilterBox );
