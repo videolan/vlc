@@ -74,7 +74,6 @@ static void             MainLoop( input_thread_t *p_input, bool b_interactive );
 static void ObjectKillChildrens( input_thread_t *, vlc_object_t * );
 
 static inline int ControlPop( input_thread_t *, int *, vlc_value_t *, mtime_t i_deadline );
-static void       ControlReduce( input_thread_t * );
 static void       ControlRelease( int i_type, vlc_value_t val );
 static bool       Control( input_thread_t *, int, vlc_value_t );
 
@@ -775,7 +774,6 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 i_deadline = __MIN( i_intf_update, i_statistic_update );
 
             /* Handle control */
-            ControlReduce( p_input );
             while( !ControlPop( p_input, &i_type, &val, i_deadline ) )
             {
 
@@ -1401,6 +1399,41 @@ void input_ControlPush( input_thread_t *p_input,
     vlc_mutex_unlock( &p_input->p->lock_control );
 }
 
+static int ControlGetReducedIndexLocked( input_thread_t *p_input )
+{
+    const int i_lt = p_input->p->control[0].i_type;
+    int i;
+    for( i = 1; i < p_input->p->i_control; i++ )
+    {
+        const int i_ct = p_input->p->control[i].i_type;
+
+        if( i_lt == i_ct &&
+            ( i_ct == INPUT_CONTROL_SET_STATE ||
+              i_ct == INPUT_CONTROL_SET_RATE ||
+              i_ct == INPUT_CONTROL_SET_POSITION ||
+              i_ct == INPUT_CONTROL_SET_TIME ||
+              i_ct == INPUT_CONTROL_SET_PROGRAM ||
+              i_ct == INPUT_CONTROL_SET_TITLE ||
+              i_ct == INPUT_CONTROL_SET_SEEKPOINT ||
+              i_ct == INPUT_CONTROL_SET_BOOKMARK ) )
+        {
+            continue;
+        }
+        else
+        {
+            /* TODO but that's not that important
+                - merge SET_X with SET_X_CMD
+                - ignore SET_SEEKPOINT/SET_POSITION/SET_TIME before a SET_TITLE
+                - ignore SET_SEEKPOINT/SET_POSITION/SET_TIME before another among them
+                - ?
+                */
+            break;
+        }
+    }
+    return i - 1;
+}
+
+
 static inline int ControlPop( input_thread_t *p_input,
                               int *pi_type, vlc_value_t *p_val,
                               mtime_t i_deadline )
@@ -1425,59 +1458,19 @@ static inline int ControlPop( input_thread_t *p_input,
     }
 
     /* */
-    *pi_type = p_sys->control[0].i_type;
-    *p_val   = p_sys->control[0].val;
+    const int i_index = ControlGetReducedIndexLocked( p_input );
 
-    p_sys->i_control--;
+    /* */
+    *pi_type = p_sys->control[i_index].i_type;
+    *p_val   = p_sys->control[i_index].val;
+
+    p_sys->i_control -= i_index + 1;
     if( p_sys->i_control > 0 )
-        memmove( &p_sys->control[0], &p_sys->control[1],
+        memmove( &p_sys->control[0], &p_sys->control[i_index+1],
                  sizeof(*p_sys->control) * p_sys->i_control );
     vlc_mutex_unlock( &p_sys->lock_control );
 
     return VLC_SUCCESS;
-}
-
-static void ControlReduce( input_thread_t *p_input )
-{
-    vlc_mutex_lock( &p_input->p->lock_control );
-
-    for( int i = 1; i < p_input->p->i_control; i++ )
-    {
-        const int i_lt = p_input->p->control[i-1].i_type;
-        const int i_ct = p_input->p->control[i].i_type;
-
-        /* XXX We can't merge INPUT_CONTROL_SET_ES */
-/*        msg_Dbg( p_input, "[%d/%d] l=%d c=%d", i, p_input->p->i_control,
-                 i_lt, i_ct );
-*/
-        if( i_lt == i_ct &&
-            ( i_ct == INPUT_CONTROL_SET_STATE ||
-              i_ct == INPUT_CONTROL_SET_RATE ||
-              i_ct == INPUT_CONTROL_SET_POSITION ||
-              i_ct == INPUT_CONTROL_SET_TIME ||
-              i_ct == INPUT_CONTROL_SET_PROGRAM ||
-              i_ct == INPUT_CONTROL_SET_TITLE ||
-              i_ct == INPUT_CONTROL_SET_SEEKPOINT ||
-              i_ct == INPUT_CONTROL_SET_BOOKMARK ) )
-        {
-            int j;
-//            msg_Dbg( p_input, "merged at %d", i );
-            /* Remove the i-1 */
-            for( j = i; j <  p_input->p->i_control; j++ )
-                p_input->p->control[j-1] = p_input->p->control[j];
-            p_input->p->i_control--;
-        }
-        else
-        {
-            /* TODO but that's not that important
-                - merge SET_X with SET_X_CMD
-                - remove SET_SEEKPOINT/SET_POSITION/SET_TIME before a SET_TITLE
-                - remove SET_SEEKPOINT/SET_POSITION/SET_TIME before another among them
-                - ?
-                */
-        }
-    }
-    vlc_mutex_unlock( &p_input->p->lock_control );
 }
 
 static void ControlRelease( int i_type, vlc_value_t val )
