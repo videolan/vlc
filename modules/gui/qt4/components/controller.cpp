@@ -180,6 +180,12 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout,
 #define ENABLE_ON_INPUT( a ) \
     CONNECT( this, inputExists( bool ), a, setEnabled( bool ) ); \
     a->setEnabled( THEMIM->getIM()->hasInput() ); /* TODO: is this necessary? when input is started before the interface? */
+#define NORMAL_BUTTON( name ) \
+    QToolButton * name ## Button = new QToolButton; \
+    setupButton( name ## Button ); \
+    CONNECT_MAP_SET( name ## Button, name ## _ACTION ); \
+    BUTTON_SET_BAR( name ## Button ); \
+    widget = name ## Button;
 
 QWidget *AbstractController::createWidget( buttonType_e button, int options )
 {
@@ -203,72 +209,39 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case STOP_BUTTON:{
-        QToolButton *stopButton = new QToolButton;
-        setupButton( stopButton );
-        CONNECT_MAP_SET( stopButton, STOP_ACTION );
-        BUTTON_SET_BAR(  stopButton );
-        widget = stopButton;
+        NORMAL_BUTTON( STOP );
         }
         break;
     case OPEN_BUTTON:{
-        QToolButton *openButton = new QToolButton;
-        setupButton( openButton );
-        CONNECT_MAP_SET( openButton, OPEN_ACTION );
-        BUTTON_SET_BAR( openButton );
-        widget = openButton;
+        NORMAL_BUTTON( OPEN );
         }
         break;
     case PREVIOUS_BUTTON:{
-        QToolButton *prevButton = new QToolButton;
-        setupButton( prevButton );
-        CONNECT_MAP_SET( prevButton, PREVIOUS_ACTION );
-        BUTTON_SET_BAR( prevButton );
-        widget = prevButton;
+        NORMAL_BUTTON( PREVIOUS );
         }
         break;
-    case NEXT_BUTTON:
-        {
-        QToolButton *nextButton = new QToolButton;
-        setupButton( nextButton );
-        CONNECT_MAP_SET( nextButton, NEXT_ACTION );
-        BUTTON_SET_BAR( nextButton );
-        widget = nextButton;
+    case NEXT_BUTTON: {
+        NORMAL_BUTTON( NEXT );
         }
         break;
     case SLOWER_BUTTON:{
-        QToolButton *slowerButton = new QToolButton;
-        setupButton( slowerButton );
-        CONNECT_MAP_SET( slowerButton, SLOWER_ACTION );
-        BUTTON_SET_BAR(  slowerButton );
-        ENABLE_ON_INPUT( slowerButton );
-        widget = slowerButton;
+        NORMAL_BUTTON( SLOWER );
+        ENABLE_ON_INPUT( SLOWERButton );
         }
         break;
     case FASTER_BUTTON:{
-        QToolButton *fasterButton = new QToolButton;
-        setupButton( fasterButton );
-        CONNECT_MAP_SET( fasterButton, FASTER_ACTION );
-        BUTTON_SET_BAR(  fasterButton );
-        ENABLE_ON_INPUT( fasterButton );
-        widget = fasterButton;
+        NORMAL_BUTTON( FASTER );
+        ENABLE_ON_INPUT( FASTERButton );
         }
         break;
     case FRAME_BUTTON: {
-        QToolButton *frameButton = new QToolButton;
-        setupButton( frameButton );
-        CONNECT_MAP_SET( frameButton, FRAME_ACTION );
-        BUTTON_SET_BAR(  frameButton );
-        ENABLE_ON_VIDEO( frameButton );
-        widget = frameButton;
+        NORMAL_BUTTON( FRAME );
+        ENABLE_ON_VIDEO( FRAMEButton );
         }
         break;
     case FULLSCREEN_BUTTON:{
-        QToolButton *fullscreenButton = new QToolButton;
-        setupButton( fullscreenButton );
-        CONNECT_MAP_SET( fullscreenButton, FULLSCREEN_ACTION );
-        BUTTON_SET_BAR( fullscreenButton );
-        ENABLE_ON_VIDEO( fullscreenButton );
-        widget = fullscreenButton;
+        NORMAL_BUTTON( FULLSCREEN );
+        ENABLE_ON_VIDEO( FULLSCREENButton );
         }
         break;
     case DEFULLSCREEN_BUTTON:{
@@ -281,28 +254,16 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case EXTENDED_BUTTON:{
-        QToolButton *extSettingsButton = new QToolButton;
-        setupButton( extSettingsButton );
-        CONNECT_MAP_SET( extSettingsButton, EXTENDED_ACTION );
-        BUTTON_SET_BAR( extSettingsButton )
-        widget = extSettingsButton;
+        NORMAL_BUTTON( EXTENDED );
         }
         break;
     case PLAYLIST_BUTTON:{
-        QToolButton *playlistButton = new QToolButton;
-        setupButton( playlistButton );
-        CONNECT_MAP_SET( playlistButton, PLAYLIST_ACTION );
-        BUTTON_SET_BAR( playlistButton );
-        widget = playlistButton;
+        NORMAL_BUTTON( PLAYLIST );
         }
         break;
     case SNAPSHOT_BUTTON:{
-        QToolButton *snapshotButton = new QToolButton;
-        setupButton( snapshotButton );
-        CONNECT_MAP_SET( snapshotButton, SNAPSHOT_ACTION );
-        BUTTON_SET_BAR(  snapshotButton );
-        ENABLE_ON_VIDEO( snapshotButton );
-        widget = snapshotButton;
+        NORMAL_BUTTON( SNAPSHOT );
+        ENABLE_ON_VIDEO( SNAPSHOTButton );
         }
         break;
     case RECORD_BUTTON:{
@@ -393,29 +354,21 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case SKIP_BACK_BUTTON: {
-        QToolButton *skipBakButton = new QToolButton;
-        setupButton( skipBakButton );
-        CONNECT_MAP_SET( skipBakButton, SKIP_BACK_ACTION );
-        BUTTON_SET_BAR(  skipBakButton );
-        ENABLE_ON_INPUT( skipBakButton );
-        widget = skipBakButton;
+        NORMAL_BUTTON( SKIP_BACK );
+        ENABLE_ON_INPUT( SKIP_BACKButton );
         }
         break;
     case SKIP_FW_BUTTON: {
-        QToolButton *skipFwButton = new QToolButton;
-        setupButton( skipFwButton );
-        CONNECT_MAP_SET( skipFwButton, SKIP_FW_ACTION );
-        BUTTON_SET_BAR(  skipFwButton );
-        ENABLE_ON_INPUT( skipFwButton );
-        widget = skipFwButton;
+        NORMAL_BUTTON( SKIP_FW );
+        ENABLE_ON_INPUT( SKIP_FWButton );
         }
         break;
     case QUIT_BUTTON: {
-        QToolButton *quitButton = new QToolButton;
-        setupButton( quitButton );
-        CONNECT_MAP_SET( quitButton, QUIT_ACTION );
-        BUTTON_SET_BAR(  quitButton );
-        widget = quitButton;
+        NORMAL_BUTTON( QUIT );
+        }
+        break;
+    case RANDOM_BUTTON: {
+        NORMAL_BUTTON( RANDOM );
         }
         break;
     default:
@@ -442,6 +395,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     }
     return widget;
 }
+#undef NORMAL_BUTTON
 
 void AbstractController::applyAttributes( QToolButton *tmpButton, bool b_flat, bool b_big )
 {
