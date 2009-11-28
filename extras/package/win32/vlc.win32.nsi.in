@@ -441,7 +441,7 @@ Section $Name_Section01 SEC01
 
   !insertmacro CloseUninstallLog
 
-  ; Add VLC to "recomended programs" for the following extensions
+  ; Add VLC to "recommended programs" for the following extensions
   WriteRegStr HKCR Applications\vlc.exe "" ""
   WriteRegStr HKCR Applications\vlc.exe "FriendlyAppName" "VLC media player"
   WriteRegStr HKCR Applications\vlc.exe\shell\Open "" $ContextMenuEntry_PlayWith
@@ -459,6 +459,11 @@ Section $Name_Section01 SEC01
   WriteRegStr HKLM "Software\RegisteredApplications" "VLC" "Software\Clients\Media\VLC\Capabilities"
   WriteRegStr HKLM "Software\Clients\Media\VLC\Capabilities" "ApplicationName" "VLC media player"
   WriteRegStr HKLM "Software\Clients\Media\VLC\Capabilities" "ApplicationDescription" "VLC - The video swiss knife"
+  WriteRegStr HKLM "Software\Clients\Media\VLC" "" "VLC media player"
+  WriteRegStr HKLM "Software\Clients\Media\VLC\InstallInfo" "HideIconsCommand" "$\"$INSTDIR\spad-setup.exe$\" /HideIcons /S"
+  WriteRegStr HKLM "Software\Clients\Media\VLC\InstallInfo" "ShowIconsCommand" "$\"$INSTDIR\spad-setup.exe$\" /ShowIcons /S"
+  WriteRegStr HKLM "Software\Clients\Media\VLC\InstallInfo" "ReinstallCommand" "$\"$INSTDIR\spad-setup.exe$\" /Reinstall /S"
+  WriteRegDWORD HKLM "Software\Clients\Media\VLC\InstallInfo" "IconsVisible" 0x001
 
   lbl_done:
 SectionEnd
@@ -870,6 +875,7 @@ Section "un.$Name_Section91" SEC91
   DeleteRegValue HKLM "Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\EventHandlers\PlayCDAudioOnArrival" "VLCPlayCDAudioOnArrival"
   DeleteRegKey HKLM Software\Microsoft\Windows\CurrentVersion\Explorer\AutoplayHandlers\Handlers\VLCPlayCDAudioOnArrival
   DeleteRegKey HKLM Software\Clients\Media\VLC
+  DeleteRegValue HKLM "Software\RegisteredApplications" "VLC"
   DeleteRegKey HKCR "VLC.MediaFile"
 
   DeleteRegKey HKLM \

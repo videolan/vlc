@@ -53,6 +53,7 @@ EXTRA_DIST = \
 	extras/package/rpm/vlc.fedora.spec \
 	extras/package/rpm/vlc.altlinux.spec \
 	extras/package/win32/vlc.win32.nsi.in \
+	extras/package/win32/spad.nsi.in \
 	extras/package/win32/languages/declaration.nsh \
 	extras/package/win32/languages/english.nsh \
 	extras/package/win32/languages/french.nsh
@@ -60,7 +61,7 @@ EXTRA_DIST = \
 dist_noinst_SCRIPTS = bootstrap toolbox
 nodist_noinst_SCRIPTS = compile
 
-BUILT_SOURCES_distclean = vlc-config extras/package/win32/vlc.win32.nsi
+BUILT_SOURCES_distclean = vlc-config extras/package/win32/vlc.win32.nsi extras/package/win32/spad.nsi
 if HAVE_DARWIN
 BUILT_SOURCES_clean = macosx-sdk
 else
@@ -752,6 +753,7 @@ package-win32-base-debug: package-win-common
 # Copy relevant files
 # Script installer
 	cp "$(top_builddir)/extras/package/win32/vlc.win32.nsi" "$(win32_destdir)/"
+	cp "$(top_builddir)/extras/package/win32/spad.nsi" "$(win32_destdir)/"
 	mkdir "$(win32_destdir)/languages"
 	cp $(srcdir)/extras/package/win32/languages/*.nsh "$(win32_destdir)/languages/"
 
@@ -925,6 +927,7 @@ package-win32-base-exe: package-win32-base
 	else \
 	    echo 'Error: cannot locate makensis tool'; exit 1; \
 	fi; \
+	eval "$$MAKENSIS $(win32_destdir)/spad.nsi"
 	eval "$$MAKENSIS $(win32_destdir)/vlc.win32.nsi"
 
 package-win32-base-zip: package-win32-base
