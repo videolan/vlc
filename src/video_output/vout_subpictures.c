@@ -156,6 +156,8 @@ static void SpuRenderRegion( spu_t *,
 static void UpdateSPU   ( spu_t *, vlc_object_t * );
 static int  CropCallback( vlc_object_t *, char const *,
                           vlc_value_t, vlc_value_t, void * );
+static int MarginCallback( vlc_object_t *, char const *,
+                           vlc_value_t, vlc_value_t, void * );
 
 static int SpuControl( spu_t *, int, va_list );
 
@@ -243,7 +245,10 @@ int spu_Init( spu_t *p_spu )
     spu_private_t *p_sys = p_spu->p;
 
     /* If the user requested a sub margin, we force the position. */
-    p_sys->i_margin = var_CreateGetInteger( p_spu, "sub-margin" );
+    /* NOTE position is initialized from "sub-margin" belonging to
+       input_thread_t in UpdateSPU() */
+    p_sys->i_margin = 0;
+    //obsolete: p_sys->i_margin = var_CreateGetInteger( p_spu, "sub-margin" );
 
     var_Create( p_spu, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_AddCallback( p_spu, "sub-filter", SubFilterCallback, p_spu );
@@ -304,12 +309,14 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
     {
         UpdateSPU( p_spu, VLC_OBJECT(p_input) );
         var_AddCallback( p_input, "highlight", CropCallback, p_spu );
+        var_AddCallback( p_input, "sub-margin", MarginCallback, p_spu->p );
         vlc_object_release( p_input );
     }
     else
     {
         /* Delete callback */
         var_DelCallback( p_input, "highlight", CropCallback, p_spu );
+        var_DelCallback( p_input, "sub-margin", MarginCallback, p_spu->p );
         vlc_object_release( p_input );
     }
 }
@@ -1758,6 +1765,7 @@ static void UpdateSPU( spu_t *p_spu, vlc_object_t *p_object )
     p_sys->i_crop_y = var_GetInteger( p_object, "y-start" );
     p_sys->i_crop_width  = var_GetInteger( p_object, "x-end" ) - p_sys->i_crop_x;
     p_sys->i_crop_height = var_GetInteger( p_object, "y-end" ) - p_sys->i_crop_y;
+    p_sys->i_margin = var_GetInteger( p_object, "sub-margin" );
 
     if( var_Get( p_object, "menu-palette", &val ) == VLC_SUCCESS )
     {
@@ -1783,6 +1791,22 @@ static int CropCallback( vlc_object_t *p_object, char const *psz_var,
     VLC_UNUSED(oldval); VLC_UNUSED(newval); VLC_UNUSED(psz_var);
 
     UpdateSPU( (spu_t *)p_data, p_object );
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * MarginCallback: called when requested subtitle position has changed         *
+ *****************************************************************************/
+
+static int MarginCallback( vlc_object_t *p_object, char const *psz_var,
+                         vlc_value_t oldval, vlc_value_t newval, void *p_data )
+{
+    VLC_UNUSED( psz_var ); VLC_UNUSED( oldval ); VLC_UNUSED( p_object );
+    spu_private_t *p_sys = ( spu_private_t* ) p_data;
+
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->i_margin = newval.i_int;
+    vlc_mutex_unlock( &p_sys->lock );
     return VLC_SUCCESS;
 }
 

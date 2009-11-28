@@ -1359,6 +1359,10 @@ static const char *const ppsz_albumart_descriptions[] =
 #define SUBDELAY_UP_KEY_LONGTEXT N_("Select the key to increase the subtitle delay.")
 #define SUBDELAY_DOWN_KEY_TEXT N_("Subtitle delay down")
 #define SUBDELAY_DOWN_KEY_LONGTEXT N_("Select the key to decrease the subtitle delay.")
+#define SUBPOS_UP_KEY_TEXT N_("Subtitle position up")
+#define SUBPOS_UP_KEY_LONGTEXT N_("Select the key to move subtitles higher.")
+#define SUBPOS_DOWN_KEY_TEXT N_("Subtitle position down")
+#define SUBPOS_DOWN_KEY_LONGTEXT N_("Select the key to move subtitles lower.")
 #define AUDIODELAY_UP_KEY_TEXT N_("Audio delay up")
 #define AUDIODELAY_UP_KEY_LONGTEXT N_("Select the key to increase the audio delay.")
 #define AUDIODELAY_DOWN_KEY_TEXT N_("Audio delay down")
@@ -2241,6 +2245,8 @@ vlc_module_begin ()
 #   define KEY_VOL_MUTE           KEY_MODIFIER_COMMAND|KEY_MODIFIER_ALT|KEY_DOWN
 #   define KEY_SUBDELAY_UP        'j'
 #   define KEY_SUBDELAY_DOWN      'h'
+#   define KEY_SUBPOS_DOWN        KEY_UNSET
+#   define KEY_SUBPOS_UP          KEY_UNSET
 #   define KEY_AUDIODELAY_UP      'g'
 #   define KEY_AUDIODELAY_DOWN    'f'
 #   define KEY_AUDIO_TRACK        'l'
@@ -2356,6 +2362,8 @@ vlc_module_begin ()
 #   define KEY_VOL_MUTE           'm'
 #   define KEY_SUBDELAY_UP        'h'
 #   define KEY_SUBDELAY_DOWN      'g'
+#   define KEY_SUBPOS_DOWN        KEY_UNSET
+#   define KEY_SUBPOS_UP          KEY_UNSET
 #   define KEY_AUDIODELAY_UP      'k'
 #   define KEY_AUDIODELAY_DOWN    'j'
 #   define KEY_RANDOM             'r'
@@ -2517,6 +2525,10 @@ vlc_module_begin ()
              SUBDELAY_UP_KEY_TEXT, SUBDELAY_UP_KEY_LONGTEXT, true )
     add_key( "key-subdelay-down", KEY_SUBDELAY_DOWN, NULL,
              SUBDELAY_DOWN_KEY_TEXT, SUBDELAY_DOWN_KEY_LONGTEXT, true )
+    add_key( "key-subpos-up", KEY_SUBPOS_UP, NULL,
+             SUBPOS_UP_KEY_TEXT, SUBPOS_UP_KEY_LONGTEXT, true )
+    add_key( "key-subpos-down", KEY_SUBPOS_DOWN, NULL,
+             SUBPOS_DOWN_KEY_TEXT, SUBPOS_DOWN_KEY_LONGTEXT, true )
     add_key( "key-audiodelay-up", KEY_AUDIODELAY_UP, NULL,
              AUDIODELAY_UP_KEY_TEXT, AUDIODELAY_UP_KEY_LONGTEXT, true )
     add_key( "key-audiodelay-down", KEY_AUDIODELAY_DOWN, NULL,
@@ -2810,6 +2822,8 @@ const struct action libvlc_actions[] =
     { "key-vol-mute", ACTIONID_VOL_MUTE, },
     { "key-subdelay-down", ACTIONID_SUBDELAY_DOWN, },
     { "key-subdelay-up", ACTIONID_SUBDELAY_UP, },
+    { "key-subpos-down", ACTIONID_SUBPOS_DOWN, },
+    { "key-subpos-up", ACTIONID_SUBPOS_UP, },
     { "key-audiodelay-down", ACTIONID_AUDIODELAY_DOWN, },
     { "key-audiodelay-up", ACTIONID_AUDIODELAY_UP, },
     { "key-audio-track", ACTIONID_AUDIO_TRACK, },

@@ -790,6 +790,26 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                                 _( "Subtitle delay %i ms" ),
                                  (int)(i_delay/1000) );
             }
+            else if( i_action == ACTIONID_SUBPOS_DOWN )
+            {
+                int i_pos = var_GetInteger( p_input, "sub-margin" );
+                --i_pos;
+                var_SetInteger( p_input, "sub-margin", i_pos );
+                ClearChannels( p_intf, p_vout );
+                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                                _( "Subtitle position %i px" ),
+                                 (int)(i_pos) );
+            }
+            else if( i_action == ACTIONID_SUBPOS_UP )
+            {
+                int i_pos = var_GetInteger( p_input, "sub-margin" );
+                ++i_pos;
+                var_SetInteger( p_input, "sub-margin", i_pos );
+                ClearChannels( p_intf, p_vout );
+                vout_OSDMessage( p_intf, DEFAULT_CHAN,
+                                _( "Subtitle position %i px" ),
+                                 (int)(i_pos) );
+            }
             else if( i_action == ACTIONID_AUDIODELAY_DOWN )
             {
                 int64_t i_delay = var_GetTime( p_input, "audio-delay" );
