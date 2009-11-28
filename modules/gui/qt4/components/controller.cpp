@@ -1,7 +1,7 @@
 /*****************************************************************************
  * Controller.cpp : Controller for the main interface
  ****************************************************************************
- * Copyright (C) 2006-2008 the VideoLAN team
+ * Copyright (C) 2006-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Jean-Baptiste Kempf <jb@videolan.org>
@@ -240,17 +240,9 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         }
         break;
     case FULLSCREEN_BUTTON:{
+    case DEFULLSCREEN_BUTTON:{
         NORMAL_BUTTON( FULLSCREEN );
         ENABLE_ON_VIDEO( FULLSCREENButton );
-        }
-        break;
-    case DEFULLSCREEN_BUTTON:{
-        QToolButton *fullscreenButton = new QToolButton;
-        setupButton( fullscreenButton );
-        CONNECT_MAP_SET( fullscreenButton, FULLSCREEN_ACTION );
-        BUTTON_SET_BAR( fullscreenButton )
-        ENABLE_ON_VIDEO( fullscreenButton );
-        widget = fullscreenButton;
         }
         break;
     case EXTENDED_BUTTON:{
