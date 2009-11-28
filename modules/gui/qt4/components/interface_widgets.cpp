@@ -619,12 +619,10 @@ void TimeLabel::setDisplayPosition( float pos, int time, int length )
                                                            : time );
 
     QString timestr;
-    timestr.sprintf( "%s/%s", psz_time,
-                            ( !length && time ) ? "--:--" : psz_length );
+    timestr.sprintf( " %s%s/%s ", (b_remainingTime && length) ? "-" : "",
+                     psz_time, ( !length && time ) ? "--:--" : psz_length );
 
-    /* Add a minus to remaining time*/
-    if( b_remainingTime && length ) setText( " -"+timestr+" " );
-    else setText( " "+timestr+" " );
+    setText( timestr );
 }
 
 void TimeLabel::toggleTimeDisplay()
@@ -635,8 +633,8 @@ void TimeLabel::toggleTimeDisplay()
 void TimeLabel::setCaching( float f_cache )
 {
     QString amount;
-    amount.setNum( (int)(100 * f_cache) );
-    setText( "Buff: " + amount + "%" );
+    amount.sprintf("Buff: %i%%", (int)(100*f_cache) );
+    setText( amount );
 }
 
 
