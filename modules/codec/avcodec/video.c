@@ -1113,6 +1113,7 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
             [PIX_FMT_VAAPI_IDCT] = "PIX_FMT_VAAPI_IDCT",
             [PIX_FMT_VAAPI_VLD] = "PIX_FMT_VAAPI_VLD",
             [PIX_FMT_VAAPI_MOCO] = "PIX_FMT_VAAPI_MOCO",
+            [PIX_FMT_DXVA2_VLD] = "PIX_FMT_DXVA2_VLD",
             [PIX_FMT_YUYV422] = "PIX_FMT_YUYV422",
             [PIX_FMT_YUV420P] = "PIX_FMT_YUV420P",
         };
