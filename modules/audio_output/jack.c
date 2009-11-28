@@ -249,10 +249,14 @@ int Process( jack_nframes_t i_frames, void *p_arg )
     struct aout_sys_t *p_sys = p_aout->output.p_sys;
     jack_sample_t *p_src = NULL;
 
+    /* we assume that data we send to jack now will be played one buffer size samples
+       after the start of this jack cycle */
+    jack_nframes_t dframes = i_frames - jack_frames_since_cycle_start( p_sys->p_jack_client );
+    jack_time_t dtime = dframes * 1000 * 1000 / jack_get_sample_rate( p_sys->p_jack_client );
+    mtime_t play_date = mdate() + (mtime_t) ( dtime );
+
     /* Get the next audio data buffer */
-    vlc_mutex_lock( &p_aout->output_fifo_lock );
-    aout_buffer_t *p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
-    vlc_mutex_unlock( &p_aout->output_fifo_lock );
+    aout_buffer_t *p_buffer = aout_OutputNextBuffer( p_aout, play_date, false );
 
     if( p_buffer != NULL )
     {
@@ -301,7 +305,7 @@ int Process( jack_nframes_t i_frames, void *p_arg )
  *****************************************************************************/
 static void Play( aout_instance_t *p_aout )
 {
-    aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
+    VLC_UNUSED( p_aout );
 }
 
 /*****************************************************************************
