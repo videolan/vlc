@@ -4133,16 +4133,11 @@ static void PMTCallBack( demux_t *p_demux, dvbpsi_pmt_t *p_pmt )
         }
     }
 
-    if( ProgramIsSelected( p_demux, prg->i_number ) )
-    {
-        /* Set CAM descrambling */
-        stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
-                        ACCESS_SET_PRIVATE_ID_CA, p_pmt );
-    }
-    else
-    {
+    /* Set CAM descrambling */
+    if( !ProgramIsSelected( p_demux, prg->i_number )
+     || stream_Control( p_demux->s, STREAM_CONTROL_ACCESS,
+                        ACCESS_SET_PRIVATE_ID_CA, p_pmt ) != VLC_SUCCESS )
         dvbpsi_DeletePMT( p_pmt );
-    }
 
     for( int i = 0; i < i_clean; i++ )
     {

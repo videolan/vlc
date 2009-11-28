@@ -577,7 +577,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
         b_bool = (bool)va_arg( args, int );
         break;
     case ACCESS_SET_PRIVATE_ID_CA:  /* 12 -From Demux */
-        break;
+        return VLC_EGENERIC;
     default:
         msg_Warn( p_access,
                   "DVB_Control: Unimplemented query in control %d", i_query );
