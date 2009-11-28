@@ -73,8 +73,9 @@ static void             MainLoop( input_thread_t *p_input, bool b_interactive );
 
 static void ObjectKillChildrens( input_thread_t *, vlc_object_t * );
 
-static inline int ControlPop( input_thread_t *, int *, vlc_value_t *, mtime_t i_deadline );
+static inline int ControlPop( input_thread_t *, int *, vlc_value_t *, mtime_t i_deadline, bool b_postpone_seek );
 static void       ControlRelease( int i_type, vlc_value_t val );
+static bool       ControlIsSeekRequest( int i_type );
 static bool       Control( input_thread_t *, int, vlc_value_t );
 
 static int  UpdateTitleSeekpointFromAccess( input_thread_t * );
@@ -710,6 +711,7 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     mtime_t i_start_mdate = mdate();
     mtime_t i_intf_update = 0;
     mtime_t i_statistic_update = 0;
+    mtime_t i_last_seek_mdate = 0;
     bool b_pause_after_eof = b_interactive &&
                              var_CreateGetBool( p_input, "play-and-pause" );
 
@@ -719,10 +721,8 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
     while( vlc_object_alive( p_input ) && !p_input->b_error )
     {
         bool b_force_update;
-        int i_type;
         vlc_value_t val;
         mtime_t i_current;
-        mtime_t i_deadline;
         mtime_t i_wakeup;
         bool b_paused;
         bool b_demux_polled;
@@ -769,18 +769,44 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
 
         /* */
         do {
-            i_deadline = i_wakeup;
+            mtime_t i_deadline = i_wakeup;
             if( b_paused || !b_demux_polled )
                 i_deadline = __MIN( i_intf_update, i_statistic_update );
 
             /* Handle control */
-            while( !ControlPop( p_input, &i_type, &val, i_deadline ) )
+            for( ;; )
             {
+                mtime_t i_limit = i_deadline;
+
+                /* We will postpone the execution of a seek until we have
+                 * finished the ES bufferisation (postpone is limited to
+                 * 125ms) */
+                bool b_buffering = es_out_GetBuffering( p_input->p->p_es_out ) &&
+                                   !p_input->p->input.b_eof;
+                if( b_buffering )
+                {
+                    /* When postpone is in order, check the ES level every 20ms */
+                    mtime_t i_current = mdate();
+                    if( i_last_seek_mdate + INT64_C(125000) >= i_current )
+                        i_limit = __MIN( i_deadline, i_current + INT64_C(20000) );
+                }
+
+                int i_type;
+                if( ControlPop( p_input, &i_type, &val, i_limit, b_buffering ) )
+                {
+                    if( b_buffering && i_limit < i_deadline )
+                        continue;
+                    break;
+                }
 
                 msg_Dbg( p_input, "control type=%d", i_type );
 
                 if( Control( p_input, i_type, val ) )
+                {
+                    if( ControlIsSeekRequest( i_type ) )
+                        i_last_seek_mdate = mdate();
                     b_force_update = true;
+                }
             }
 
             /* Update interface and statistics */
@@ -1436,12 +1462,13 @@ static int ControlGetReducedIndexLocked( input_thread_t *p_input )
 
 static inline int ControlPop( input_thread_t *p_input,
                               int *pi_type, vlc_value_t *p_val,
-                              mtime_t i_deadline )
+                              mtime_t i_deadline, bool b_postpone_seek )
 {
     input_thread_private_t *p_sys = p_input->p;
 
     vlc_mutex_lock( &p_sys->lock_control );
-    while( p_sys->i_control <= 0 )
+    while( p_sys->i_control <= 0 ||
+           ( b_postpone_seek && ControlIsSeekRequest( p_sys->control[0].i_type ) ) )
     {
         if( !vlc_object_alive( p_input ) || i_deadline < 0 )
         {
@@ -1471,6 +1498,24 @@ static inline int ControlPop( input_thread_t *p_input,
     vlc_mutex_unlock( &p_sys->lock_control );
 
     return VLC_SUCCESS;
+}
+static bool ControlIsSeekRequest( int i_type )
+{
+    switch( i_type )
+    {
+    case INPUT_CONTROL_SET_POSITION:
+    case INPUT_CONTROL_SET_TIME:
+    case INPUT_CONTROL_SET_TITLE:
+    case INPUT_CONTROL_SET_TITLE_NEXT:
+    case INPUT_CONTROL_SET_TITLE_PREV:
+    case INPUT_CONTROL_SET_SEEKPOINT:
+    case INPUT_CONTROL_SET_SEEKPOINT_NEXT:
+    case INPUT_CONTROL_SET_SEEKPOINT_PREV:
+    case INPUT_CONTROL_SET_BOOKMARK:
+        return true;
+    default:
+        return false;
+    }
 }
 
 static void ControlRelease( int i_type, vlc_value_t val )
