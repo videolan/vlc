@@ -172,7 +172,6 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout,
     button->setToolTip( tooltip );          \
     button->setIcon( QIcon( ":/"#image ) );
 
-
 #define ENABLE_ON_VIDEO( a ) \
     CONNECT( THEMIM->getIM(), voutChanged( bool ), a, setEnabled( bool ) ); \
     a->setEnabled( THEMIM->getIM()->hasVideo() ); /* TODO: is this necessary? when input is started before the interface? */
@@ -180,18 +179,19 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout,
 #define ENABLE_ON_INPUT( a ) \
     CONNECT( this, inputExists( bool ), a, setEnabled( bool ) ); \
     a->setEnabled( THEMIM->getIM()->hasInput() ); /* TODO: is this necessary? when input is started before the interface? */
-#define NORMAL_BUTTON( name ) \
-    QToolButton * name ## Button = new QToolButton; \
-    setupButton( name ## Button ); \
+
+#define NORMAL_BUTTON( name )                           \
+    QToolButton * name ## Button = new QToolButton;     \
+    setupButton( name ## Button );                      \
     CONNECT_MAP_SET( name ## Button, name ## _ACTION ); \
-    BUTTON_SET_BAR( name ## Button ); \
+    BUTTON_SET_BAR( name ## Button );                   \
     widget = name ## Button;
 
 QWidget *AbstractController::createWidget( buttonType_e button, int options )
 {
 
-    bool b_flat = options & WIDGET_FLAT;
-    bool b_big = options & WIDGET_BIG;
+    bool b_flat  = options & WIDGET_FLAT;
+    bool b_big   = options & WIDGET_BIG;
     bool b_shiny = options & WIDGET_SHINY;
     bool b_special = false;
 
@@ -239,8 +239,9 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         ENABLE_ON_VIDEO( FRAMEButton );
         }
         break;
-    case FULLSCREEN_BUTTON:{
-    case DEFULLSCREEN_BUTTON:{
+    case FULLSCREEN_BUTTON:
+    case DEFULLSCREEN_BUTTON:
+        {
         NORMAL_BUTTON( FULLSCREEN );
         ENABLE_ON_VIDEO( FULLSCREENButton );
         }
@@ -361,6 +362,7 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         break;
     case RANDOM_BUTTON: {
         NORMAL_BUTTON( RANDOM );
+        RANDOMButton->setCheckable( true );
         }
         break;
     default:

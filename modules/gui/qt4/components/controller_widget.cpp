@@ -235,4 +235,3 @@ void AtoB_Button::setIcons( bool timeA, bool timeB )
     }
 }
 
-

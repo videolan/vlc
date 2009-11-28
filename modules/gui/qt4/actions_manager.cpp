@@ -89,6 +89,9 @@ void ActionsManager::doAction( int id_action )
             break;
         case QUIT_ACTION:
             THEDP->quit();  break;
+        case RANDOM_ACTION:
+            // FIXME
+            break;
         default:
             msg_Dbg( p_intf, "Action: %i", id_action );
             break;
