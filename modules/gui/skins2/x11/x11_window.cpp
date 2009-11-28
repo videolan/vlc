@@ -185,7 +185,16 @@ void X11Window::raise() const
 
 void X11Window::setOpacity( uint8_t value ) const
 {
-    // Sorry, the opacity cannot be changed :)
+    Atom opaq = XInternAtom(XDISPLAY, "_NET_WM_WINDOW_OPACITY", False);
+    if( 255==value )
+        XDeleteProperty(XDISPLAY, m_wnd, opaq);
+    else
+    {
+        uint32_t opacity = value * ((uint32_t)-1/255);
+        XChangeProperty(XDISPLAY, m_wnd, opaq, XA_CARDINAL, 32,
+                        PropModeReplace, (unsigned char *) &opacity, 1L);
+    }
+    XSync( XDISPLAY, False );
 }
 
 
