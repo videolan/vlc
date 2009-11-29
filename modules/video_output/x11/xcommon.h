@@ -89,10 +89,6 @@ struct vout_sys_t
     GLXContext          gwctx;
     GLXWindow           gwnd;
 #endif
-
-#ifdef HAVE_XSP
-    int                 i_hw_scale;
-#endif
 };
 
 /*****************************************************************************

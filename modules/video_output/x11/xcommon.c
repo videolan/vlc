@@ -44,10 +44,6 @@
 #   include <sys/ipc.h>
 #endif
 
-#ifdef HAVE_XSP
-#include <X11/extensions/Xsp.h>
-#endif
-
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xmd.h>
@@ -84,13 +80,6 @@ static void DestroyCursor  ( vout_thread_t * );
 static void ToggleCursor   ( vout_thread_t * );
 
 static int X11ErrorHandler( Display *, XErrorEvent * );
-
-#ifdef HAVE_XSP
-static void EnablePixelDoubling( vout_thread_t *p_vout );
-static void DisablePixelDoubling( vout_thread_t *p_vout );
-#endif
-
-
 
 /*****************************************************************************
  * Activate: allocate X11 video thread output method
@@ -208,10 +197,6 @@ int Activate ( vlc_object_t *p_this )
     /* Misc init */
     p_vout->p_sys->i_time_button_last_pressed = 0;
 
-#ifdef HAVE_XSP
-    p_vout->p_sys->i_hw_scale = 1;
-#endif
-
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
     var_TriggerCallback( p_vout, "video-on-top" );
@@ -234,10 +219,6 @@ void Deactivate ( vlc_object_t *p_this )
         ToggleCursor( p_vout );
     }
 
-#ifdef HAVE_XSP
-    DisablePixelDoubling(p_vout);
-#endif
-
     DestroyCursor( p_vout );
     EnableXScreenSaver( p_vout );
     DestroyWindow( p_vout, &p_vout->p_sys->window );
@@ -246,40 +227,6 @@ void Deactivate ( vlc_object_t *p_this )
     /* Destroy structure */
     free( p_vout->p_sys );
 }
-
-#ifdef HAVE_XSP
-/*****************************************************************************
- * EnablePixelDoubling: Enables pixel doubling
- *****************************************************************************
- * Checks if the double size image fits in current window, and enables pixel
- * doubling accordingly. The i_hw_scale is the integer scaling factor.
- *****************************************************************************/
-static void EnablePixelDoubling( vout_thread_t *p_vout )
-{
-    int i_hor_scale = ( p_vout->p_sys->window.i_width ) / p_vout->render.i_width;
-    int i_vert_scale =  ( p_vout->p_sys->window.i_height ) / p_vout->render.i_height;
-    if ( ( i_hor_scale > 1 ) && ( i_vert_scale > 1 ) ) {
-        p_vout->p_sys->i_hw_scale = 2;
-        msg_Dbg( p_vout, "Enabling pixel doubling, scaling factor %d", p_vout->p_sys->i_hw_scale );
-        XSPSetPixelDoubling( p_vout->p_sys->p_display, 0, 1 );
-    }
-}
-
-/*****************************************************************************
- * DisablePixelDoubling: Disables pixel doubling
- *****************************************************************************
- * The scaling factor i_hw_scale is reset to the no-scaling value 1.
- *****************************************************************************/
-static void DisablePixelDoubling( vout_thread_t *p_vout )
-{
-    if ( p_vout->p_sys->i_hw_scale > 1 ) {
-        msg_Dbg( p_vout, "Disabling pixel doubling" );
-        XSPSetPixelDoubling( p_vout->p_sys->p_display, 0, 0 );
-        p_vout->p_sys->i_hw_scale = 1;
-    }
-}
-#endif
-
 
 /*****************************************************************************
  * ManageVideo: handle X11 events
@@ -798,13 +745,6 @@ static void ToggleFullScreen ( vout_thread_t *p_vout )
     p_vout->b_fullscreen = !p_vout->b_fullscreen;
     vout_window_SetFullScreen( p_vout->p_sys->window.owner_window,
                                p_vout->b_fullscreen );
-
-#ifdef HAVE_XSP
-    if( p_vout->b_fullscreen )
-        EnablePixelDoubling( p_vout );
-    else
-        DisablePixelDoubling( p_vout );
-#endif
 }
 
 /*****************************************************************************

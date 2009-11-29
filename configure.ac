@@ -5084,12 +5084,6 @@ fi
 AC_LANG_POP(C++)
 AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
-dnl Tests for Xsp
-AC_CHECK_LIB(Xsp, XSPSetPixelDoubling,[
-  VLC_ADD_CPPFLAGS([glx],[-DHAVE_XSP])
-  VLC_ADD_LIBS([glx],[-lXsp])
-])
-
 dnl
 dnl  test plugins
 dnl
