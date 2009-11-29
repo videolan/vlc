@@ -85,10 +85,6 @@ static void SwitchContext( vout_thread_t * );
     "X11 hardware display to use. By default VLC will " \
     "use the value of the DISPLAY environment variable.")
 
-#define SHM_TEXT N_("Use shared memory")
-#define SHM_LONGTEXT N_( \
-    "Use shared memory to communicate between VLC and the X server.")
-
 vlc_module_begin ()
     set_shortname( "OpenGL(GLX)" )
     set_category( CAT_VIDEO )
@@ -100,7 +96,7 @@ vlc_module_begin ()
     add_string( "glx-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
     add_obsolete_integer( "glx-adaptor" ) /* Deprecated since 1.0.4 */
 #ifdef HAVE_SYS_SHM_H
-    add_bool( "glx-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true )
+    add_obsolete_bool( "glx-shm" ) /* Deprecated since 1.0.4 */
 #endif
 vlc_module_end ()
 
