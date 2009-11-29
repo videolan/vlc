@@ -130,8 +130,8 @@ static int MixBuffer( aout_instance_t * p_aout )
     }
 
 
-    aout_lock_output_fifo( p_aout );
     aout_lock_input_fifos( p_aout );
+    aout_lock_output_fifo( p_aout );
 
     /* Retrieve the date of the next buffer. */
     exact_start_date = p_aout->output.fifo.end_date;
