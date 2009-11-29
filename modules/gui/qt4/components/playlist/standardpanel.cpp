@@ -55,27 +55,32 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   playlist_item_t *p_root ):
                                   QWidget( _parent ), p_intf( _p_intf )
 {
-    model = new PLModel( p_playlist, p_intf, p_root, this );
-
-    QVBoxLayout *layout = new QVBoxLayout();
+    QVBoxLayout *layout = new QVBoxLayout( this );
     layout->setSpacing( 0 ); layout->setMargin( 0 );
+
+    model = new PLModel( p_playlist, p_intf, p_root, this );
 
     /* Create and configure the QTreeView */
     view = new QVLCTreeView;
     view->setModel( model );
+
     view->setIconSize( QSize( 20, 20 ) );
     view->setAlternatingRowColors( true );
     view->setAnimated( true );
+    view->setUniformRowHeights( true );
+    view->setSortingEnabled( true );
+    view->header()->setSortIndicator( -1 , Qt::AscendingOrder );
+    view->header()->setSortIndicatorShown( true );
+    view->header()->setClickable( true );
+    view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
+
     view->setSelectionBehavior( QAbstractItemView::SelectRows );
     view->setSelectionMode( QAbstractItemView::ExtendedSelection );
     view->setDragEnabled( true );
     view->setAcceptDrops( true );
     view->setDropIndicatorShown( true );
-    view->header()->setSortIndicator( -1 , Qt::AscendingOrder );
-    view->setUniformRowHeights( true );
-    view->setSortingEnabled( true );
 
-
+    /* Saved Settings */
     getSettings()->beginGroup("Playlist");
     if( getSettings()->contains( "headerStateV2" ) )
     {
@@ -84,17 +89,13 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     }
     else
     {
-        int m, c;
-        for( m = 1, c = 0; m != COLUMN_END; m <<= 1, c++ )
+        for( int m = 1, c = 0; m != COLUMN_END; m <<= 1, c++ )
         {
             view->setColumnHidden( c, !( m & COLUMN_DEFAULT ) );
             if( m == COLUMN_TITLE ) view->header()->resizeSection( c, 200 );
             else if( m == COLUMN_DURATION ) view->header()->resizeSection( c, 80 );
         }
     }
-    view->header()->setSortIndicatorShown( true );
-    view->header()->setClickable( true );
-    view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
     getSettings()->endGroup();
 
     /* Connections for the TreeView */
@@ -149,10 +150,16 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->addWidget( view );
     layout->addLayout( buttons );
 //    layout->addWidget( bar );
-    setLayout( layout );
 
     selectColumnsSigMapper = new QSignalMapper( this );
     CONNECT( selectColumnsSigMapper, mapped( int ), this, toggleColumnShown( int ) );
+}
+
+StandardPLPanel::~StandardPLPanel()
+{
+    getSettings()->beginGroup("Playlist");
+    getSettings()->setValue( "headerStateV2", view->header()->saveState() );
+    getSettings()->endGroup();
 }
 
 void StandardPLPanel::gotoPlayingItem()
@@ -290,12 +297,5 @@ void StandardPLPanel::deleteSelection()
     QItemSelectionModel *selection = view->selectionModel();
     QModelIndexList list = selection->selectedIndexes();
     model->doDelete( list );
-}
-
-StandardPLPanel::~StandardPLPanel()
-{
-    getSettings()->beginGroup("Playlist");
-    getSettings()->setValue( "headerStateV2", view->header()->saveState() );
-    getSettings()->endGroup();
 }
 
