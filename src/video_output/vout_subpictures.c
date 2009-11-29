@@ -1199,14 +1199,11 @@ static bool spu_area_overlap( spu_area_t a, spu_area_t b )
  * Avoid area overlapping
  */
 static void SpuAreaFixOverlap( spu_area_t *p_dst,
-                               const spu_area_t *p_master,
                                const spu_area_t *p_sub, int i_sub, int i_align )
 {
     spu_area_t a = spu_area_scaled( *p_dst );
     bool b_moved = false;
     bool b_ok;
-
-    assert( p_master->i_x == 0 && p_master->i_y == 0 );
 
     /* Check for overlap
      * XXX It is not fast O(n^2) but we should not have a lot of region */
@@ -1224,8 +1221,6 @@ static void SpuAreaFixOverlap( spu_area_t *p_dst,
             {
                 /* We go down */
                 int i_y = sub.i_y + sub.i_height;
-                if( i_y + a.i_height > p_master->i_height )
-                    break;
                 a.i_y = i_y;
                 b_moved = true;
             }
@@ -1233,8 +1228,6 @@ static void SpuAreaFixOverlap( spu_area_t *p_dst,
             {
                 /* We go up */
                 int i_y = sub.i_y - a.i_height;
-                if( i_y < 0 )
-                    break;
                 a.i_y = i_y;
                 b_moved = true;
             }
@@ -1255,13 +1248,31 @@ static void SpuAreaFixOverlap( spu_area_t *p_dst,
 }
 
 
+static void SpuAreaFitInside( spu_area_t *p_area, const spu_area_t *p_boundary )
+{
+  spu_area_t a = spu_area_scaled( *p_area );
+
+  const int i_error_x = (a.i_x + a.i_width) - p_boundary->i_width;
+  if( i_error_x > 0 )
+      a.i_x -= i_error_x;
+  if( a.i_x < 0 )
+      a.i_x = 0;
+
+  const int i_error_y = (a.i_y + a.i_height) - p_boundary->i_height;
+  if( i_error_y > 0 )
+      a.i_y -= i_error_y;
+  if( a.i_y < 0 )
+      a.i_y = 0;
+
+  *p_area = spu_area_unscaled( a, p_area->scale );
+}
+
 /**
  * Place a region
  */
 static void SpuRegionPlace( int *pi_x, int *pi_y,
                             const subpicture_t *p_subpic,
-                            const subpicture_region_t *p_region,
-                            int i_margin_y )
+                            const subpicture_region_t *p_region )
 {
     const int i_delta_x = p_region->i_x;
     const int i_delta_y = p_region->i_y;
@@ -1301,10 +1312,12 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
     }
 
     /* Margin shifts all subpictures */
+    /* NOTE We have margin only for subtitles, so we don't really need this here
     if( i_margin_y != 0 )
-        i_y -= i_margin_y;
+        i_y -= i_margin_y;*/
 
     /* Clamp offset to not go out of the screen (when possible) */
+    /* NOTE Again, useful only for subtitles, otherwise goes against the alignment logic above
     const int i_error_x = (i_x + p_region->fmt.i_width) - p_subpic->i_original_picture_width;
     if( i_error_x > 0 )
         i_x -= i_error_x;
@@ -1315,7 +1328,7 @@ static void SpuRegionPlace( int *pi_x, int *pi_y,
     if( i_error_y > 0 )
         i_y -= i_error_y;
     if( i_y < 0 )
-        i_y = 0;
+        i_y = 0;*/
 
     *pi_x = i_x;
     *pi_y = i_y;
@@ -1402,7 +1415,7 @@ static void SpuRenderRegion( spu_t *p_spu,
     /* Place the picture
      * We compute the position in the rendered size */
     SpuRegionPlace( &i_x_offset, &i_y_offset,
-                    p_subpic, p_region, i_margin_y );
+                    p_subpic, p_region );
 
     /* Save this position for subtitle overlap support
      * it is really important that there are given without scale_size applied */
@@ -1413,16 +1426,26 @@ static void SpuRenderRegion( spu_t *p_spu,
     /* Handle overlapping subtitles when possible */
     if( p_subpic->b_subtitle && !p_subpic->b_absolute )
     {
-        spu_area_t display = spu_area_create( 0, 0, p_fmt->i_width, p_fmt->i_height,
-                                              spu_scale_unit() );
-
-        SpuAreaFixOverlap( p_area, &display, p_subtitle_area, i_subtitle_area,
+        SpuAreaFixOverlap( p_area, p_subtitle_area, i_subtitle_area,
                            p_region->i_align );
     }
 
+    /* we copy the area: for the subtitle overlap support we want
+     * to only save the area without margin applied */
+    spu_area_t restrained = *p_area;
+
+    /* apply margin to subtitles and correct if they go over the picture edge */
+    if( p_subpic->b_subtitle )
+    {
+        restrained.i_y -= i_margin_y;
+        spu_area_t display = spu_area_create( 0, 0, p_fmt->i_width, p_fmt->i_height,
+                                              spu_scale_unit() );
+        SpuAreaFitInside( &restrained, &display );
+    }
+
     /* Fix the position for the current scale_size */
-    i_x_offset = spu_scale_w( p_area->i_x, p_area->scale );
-    i_y_offset = spu_scale_h( p_area->i_y, p_area->scale );
+    i_x_offset = spu_scale_w( restrained.i_x, restrained.scale );
+    i_y_offset = spu_scale_h( restrained.i_y, restrained.scale );
 
     /* */
     if( b_force_palette )
