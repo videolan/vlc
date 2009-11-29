@@ -258,6 +258,7 @@ private:
 
 public slots:
     void togglePlayPause();
+    void toggleRandom();
     void stop();
     void next();
     void prev();

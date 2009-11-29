@@ -1029,6 +1029,11 @@ void MainInputManager::togglePlayPause()
         getIM()->togglePlayPause();
 }
 
+void MainInputManager::toggleRandom()
+{
+    var_ToggleBool( THEPL, "random" );
+}
+
 void MainInputManager::activatePlayQuit( bool b_exit )
 {
     var_SetBool( THEPL, "play-and-exit", b_exit );

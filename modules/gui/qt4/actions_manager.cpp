@@ -90,8 +90,7 @@ void ActionsManager::doAction( int id_action )
         case QUIT_ACTION:
             THEDP->quit();  break;
         case RANDOM_ACTION:
-            // FIXME
-            break;
+            THEMIM->toggleRandom(); break;
         default:
             msg_Dbg( p_intf, "Action: %i", id_action );
             break;
