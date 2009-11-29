@@ -214,6 +214,8 @@ spu_t *__spu_Create( vlc_object_t *p_this )
     p_sys->p_scale = NULL;
     p_sys->p_scale_yuvp = NULL;
 
+    p_sys->i_margin = config_GetInt( p_spu, "sub-margin" );
+
     /* Register the default subpicture channel */
     p_sys->i_channel = 2;
 
@@ -242,14 +244,6 @@ spu_t *__spu_Create( vlc_object_t *p_this )
  */
 int spu_Init( spu_t *p_spu )
 {
-    spu_private_t *p_sys = p_spu->p;
-
-    /* If the user requested a sub margin, we force the position. */
-    /* NOTE position is initialized from "sub-margin" belonging to
-       input_thread_t in UpdateSPU() */
-    p_sys->i_margin = 0;
-    //obsolete: p_sys->i_margin = var_CreateGetInteger( p_spu, "sub-margin" );
-
     var_Create( p_spu, "sub-filter", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
     var_AddCallback( p_spu, "sub-filter", SubFilterCallback, p_spu );
     var_TriggerCallback( p_spu, "sub-filter" );
@@ -310,6 +304,11 @@ void spu_Attach( spu_t *p_spu, vlc_object_t *p_this, bool b_attach )
         UpdateSPU( p_spu, VLC_OBJECT(p_input) );
         var_AddCallback( p_input, "highlight", CropCallback, p_spu );
         var_AddCallback( p_input, "sub-margin", MarginCallback, p_spu->p );
+
+        vlc_mutex_lock( &p_spu->p->lock );
+        p_spu->p->i_margin = var_GetInteger( p_input, "sub-margin" );
+        vlc_mutex_unlock( &p_spu->p->lock );
+
         vlc_object_release( p_input );
     }
     else
@@ -1760,7 +1759,6 @@ static void UpdateSPU( spu_t *p_spu, vlc_object_t *p_object )
     p_sys->i_crop_y = var_GetInteger( p_object, "y-start" );
     p_sys->i_crop_width  = var_GetInteger( p_object, "x-end" ) - p_sys->i_crop_x;
     p_sys->i_crop_height = var_GetInteger( p_object, "y-end" ) - p_sys->i_crop_y;
-    p_sys->i_margin = var_GetInteger( p_object, "sub-margin" );
 
     if( var_Get( p_object, "menu-palette", &val ) == VLC_SUCCESS )
     {
