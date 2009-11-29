@@ -87,11 +87,6 @@ static void SwitchContext( vout_thread_t * );
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define ADAPTOR_TEXT N_("XVideo adaptor number")
-#define ADAPTOR_LONGTEXT N_( \
-    "If your graphics card provides several adaptors, you have " \
-    "to choose which one will be used (you shouldn't have to change this).")
-
 #define DISPLAY_TEXT N_("X11 display")
 #define DISPLAY_LONGTEXT N_( \
     "X11 hardware display to use. By default VLC will " \
@@ -110,7 +105,7 @@ vlc_module_begin ()
     set_callbacks( CreateOpenGL, DestroyOpenGL )
 
     add_string( "glx-display", NULL, NULL, DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
-    add_integer( "glx-adaptor", -1, NULL, ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true )
+    add_obsolete_integer( "glx-adaptor" ) /* Deprecated since 1.0.4 */
 #ifdef HAVE_SYS_SHM_H
     add_bool( "glx-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true )
 #endif
