@@ -52,6 +52,7 @@ typedef enum actionType_e
     SKIP_FW_ACTION,
     QUIT_ACTION,
     RANDOM_ACTION,
+    LOOP_ACTION,
 } actionType_e;
 
 class ActionsManager : public QObject

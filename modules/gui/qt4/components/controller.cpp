@@ -367,6 +367,13 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
                  RANDOMButton, setChecked( bool ) );
         }
         break;
+    case LOOP_BUTTON:{
+        LoopButton *loopButton = new LoopButton;
+        setupButton( loopButton );
+        loopButton->setToolTip( qtr( "Click to toggle between loop one, loop all" ) );
+        loopButton->setCheckable( true );
+        }
+        break;
     default:
         msg_Warn( p_intf, "This should not happen %i", button );
         break;
