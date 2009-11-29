@@ -40,7 +40,7 @@
 #include <QLabel>
 
 class PLSelector;
-class PLPanel;
+class StandardPLPanel;
 class QPushButton;
 class CoverArtLabel;
 class ArtLabel;
@@ -53,7 +53,7 @@ public:
     virtual ~PlaylistWidget();
 private:
     PLSelector *selector;
-    PLPanel *rightPanel;
+    StandardPLPanel *rightPanel;
     QPushButton *addButton;
     ArtLabel *art;
 protected:

@@ -52,7 +52,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
                                   playlist_item_t *p_root ):
-                                  PLPanel( _parent, _p_intf )
+                                  QWidget( _parent ), p_intf( _p_intf )
 {
     model = new PLModel( p_playlist, p_intf, p_root, this );
 

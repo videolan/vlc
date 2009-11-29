@@ -43,42 +43,29 @@ class PLModel;
 class QPushButton;
 class QKeyEvent;
 
-class PLPanel: public QWidget
+class StandardPLPanel: public QWidget
 {
-    Q_OBJECT;
-public:
-    PLPanel( PlaylistWidget *p, intf_thread_t *_p_intf ) : QWidget( p )
-    {
-        p_intf = _p_intf;
-        parent = p;
-    }
-    virtual ~PLPanel() {};
-protected:
-    intf_thread_t *p_intf;
-    QFrame *parent;
-public slots:
-    virtual void setRoot( playlist_item_t * ) = 0;
-};
+    Q_OBJECT
 
-
-class StandardPLPanel: public PLPanel
-{
-    Q_OBJECT;
 public:
     StandardPLPanel( PlaylistWidget *, intf_thread_t *,
                      playlist_t *,playlist_item_t * );
     virtual ~StandardPLPanel();
 protected:
-    virtual void keyPressEvent( QKeyEvent *e );
-protected:
-    PLModel *model;
     friend class PlaylistWidget;
+
+    virtual void keyPressEvent( QKeyEvent *e );
+
+    PLModel *model;
 private:
+    intf_thread_t *p_intf;
+    QWidget *parent;
     QLabel *title;
     QTreeView *view;
     QPushButton *repeatButton, *randomButton, *addButton, *gotoPlayingButton;
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
+
 public slots:
     void removeItem( int );
     virtual void setRoot( playlist_item_t * );
