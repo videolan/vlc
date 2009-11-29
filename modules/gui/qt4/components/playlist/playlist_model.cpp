@@ -456,35 +456,6 @@ QStringList PLModel::selectedURIs()
     return lst;
 }
 
-/************************* General playlist status ***********************/
-
-bool PLModel::hasRandom()
-{
-    return var_GetBool( p_playlist, "random" );
-}
-bool PLModel::hasRepeat()
-{
-    return var_GetBool( p_playlist, "repeat" );
-}
-bool PLModel::hasLoop()
-{
-    return var_GetBool( p_playlist, "loop" );
-}
-void PLModel::setLoop( bool on )
-{
-    var_SetBool( p_playlist, "loop", on ? true:false );
-    config_PutInt( p_playlist, "loop", on ? 1: 0 );
-}
-void PLModel::setRepeat( bool on )
-{
-    var_SetBool( p_playlist, "repeat", on ? true:false );
-    config_PutInt( p_playlist, "repeat", on ? 1: 0 );
-}
-void PLModel::setRandom( bool on )
-{
-    var_SetBool( p_playlist, "random", on ? true:false );
-    config_PutInt( p_playlist, "random", on ? 1: 0 );
-}
 
 /************************* Lookups *****************************/
 

@@ -1,10 +1,11 @@
 /*****************************************************************************
  * standardpanel.cpp : The "standard" playlist panel : just a treeview
  ****************************************************************************
- * Copyright (C) 2000-2005 the VideoLAN team
+ * Copyright (C) 2000-2009 VideoLAN
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
+ *          JB Kempf
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -118,38 +119,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     BUTTONACT( addButton, popupAdd() );
     buttons->addWidget( addButton );
 
-    /* Random 2-state button */
-    randomButton = new QPushButton( this );
-    randomButton->setIcon( QIcon( ":/buttons/playlist/shuffle_on" ));
-    randomButton->setToolTip( qtr( I_PL_RANDOM ));
-    randomButton->setCheckable( true );
-    randomButton->setChecked( model->hasRandom() );
-    BUTTONACT( randomButton, toggleRandom() );
-    buttons->addWidget( randomButton );
-
-    /* Repeat 3-state button */
-    repeatButton = new QPushButton( this );
-    repeatButton->setToolTip( qtr( "Click to toggle between loop one, loop all" ) );
-    repeatButton->setCheckable( true );
-
-    if( model->hasRepeat() )
-    {
-        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_one" ) );
-        repeatButton->setChecked( true );
-    }
-    else if( model->hasLoop() )
-    {
-        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_all" ) );
-        repeatButton->setChecked( true );
-    }
-    else
-    {
-        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_one" ) );
-        repeatButton->setChecked( false );
-    }
-    BUTTONACT( repeatButton, toggleRepeat() );
-    buttons->addWidget( repeatButton );
-
     /* Goto */
     gotoPlayingButton = new QPushButton;
     BUTTON_SET_ACT_I( gotoPlayingButton, "", buttons/playlist/jump_to,
@@ -184,36 +153,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     selectColumnsSigMapper = new QSignalMapper( this );
     CONNECT( selectColumnsSigMapper, mapped( int ), this, toggleColumnShown( int ) );
-}
-
-/* Function to toggle between the Repeat states */
-void StandardPLPanel::toggleRepeat()
-{
-    if( model->hasRepeat() )
-    {
-        model->setRepeat( false ); model->setLoop( true );
-        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_all" ) );
-        repeatButton->setChecked( true );
-    }
-    else if( model->hasLoop() )
-    {
-        model->setRepeat( false ) ; model->setLoop( false );
-        repeatButton->setChecked( false );
-        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_one" ) );
-    }
-    else
-    {
-        model->setRepeat( true ); model->setLoop( false );
-        repeatButton->setChecked( true );
-        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_one" ) );
-    }
-}
-
-/* Function to toggle between the Random states */
-void StandardPLPanel::toggleRandom()
-{
-    bool prev = model->hasRandom();
-    model->setRandom( !prev );
 }
 
 void StandardPLPanel::gotoPlayingItem()

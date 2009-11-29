@@ -62,7 +62,7 @@ private:
     QWidget *parent;
     QLabel *title;
     QTreeView *view;
-    QPushButton *repeatButton, *randomButton, *addButton, *gotoPlayingButton;
+    QPushButton *addButton, *gotoPlayingButton;
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
 
@@ -72,8 +72,6 @@ public slots:
 private slots:
     void deleteSelection();
     void handleExpansion( const QModelIndex& );
-    void toggleRandom();
-    void toggleRepeat();
     void gotoPlayingItem();
     void doPopup( QModelIndex index, QPoint point );
     void search( const QString& searchText );

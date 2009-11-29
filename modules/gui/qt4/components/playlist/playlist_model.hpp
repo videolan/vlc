@@ -81,7 +81,6 @@ public:
 
     /* Lookups */
     QStringList selectedURIs();
-    bool hasRandom(); bool hasLoop(); bool hasRepeat();
     QModelIndex index( PLItem *, int c ) const;
     QModelIndex currentIndex( ) { return index( currentItem, 0 ); };
     bool isCurrent( const QModelIndex &index ) const;
@@ -144,9 +143,6 @@ signals:
 public slots:
     void activateItem( const QModelIndex &index );
     void activateItem( playlist_item_t *p_item );
-    void setRandom( bool );
-    void setLoop( bool );
-    void setRepeat( bool );
 
 private slots:
     void popupPlay();
