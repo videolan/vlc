@@ -286,15 +286,16 @@ static int aout_Restart( aout_instance_t * p_aout )
         return -1;
     }
 
-    /* Lock all inputs. */
-    aout_lock_input_fifos( p_aout );
-
     for ( i = 0; i < p_aout->i_nb_inputs; i++ )
     {
         aout_lock_input( p_aout, p_aout->pp_inputs[i] );
+        aout_lock_input_fifos( p_aout );
         aout_InputDelete( p_aout, p_aout->pp_inputs[i] );
+        aout_unlock_input_fifos( p_aout );
     }
 
+    /* Lock all inputs. */
+    aout_lock_input_fifos( p_aout );
     aout_MixerDelete( p_aout );
 
     /* Re-open the output plug-in. */
