@@ -100,16 +100,19 @@ vlc_module_end ()
  */
 static void Demux (void *);
 static int Control (demux_t *, int, va_list);
+static es_out_id_t *InitES (demux_t *, uint_fast16_t, uint_fast16_t,
+                            uint_fast8_t);
 
 struct demux_sys_t
 {
     xcb_connection_t *conn;
     es_out_id_t      *es;
-    es_format_t       fmt;
     mtime_t           pts, interval;
-    xcb_window_t      root, window;
+    float             rate;
+    xcb_window_t      window;
     int16_t           x, y;
     uint16_t          w, h;
+    uint16_t          cur_w, cur_h;
     bool              follow_mouse;
     /* fmt, es and pts are protected by the lock. The rest is read-only. */
     vlc_mutex_t       lock;
@@ -141,30 +144,30 @@ static int Open (vlc_object_t *obj)
     }
     p_sys->conn = conn;
 
-    /* Find configured screen */
-    const xcb_setup_t *setup = xcb_get_setup (conn);
-    const xcb_screen_t *scr = NULL;
-    for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);
-         i.rem > 0; xcb_screen_next (&i))
-    {
-        if (snum == 0)
-        {
-            scr = i.data;
-            break;
-        }
-        snum--;
-    }
-    if (scr == NULL)
-    {
-        msg_Err (obj, "bad X11 screen number");
-        goto error;
-    }
-
-    /* Determine capture window */
-    p_sys->root = scr->root;
+   /* Find configured screen */
     if (!strcmp (demux->psz_access, "screen"))
-        p_sys->window = p_sys->root;
+    {
+        const xcb_setup_t *setup = xcb_get_setup (conn);
+        const xcb_screen_t *scr = NULL;
+        for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);
+             i.rem > 0; xcb_screen_next (&i))
+        {
+            if (snum == 0)
+            {
+               scr = i.data;
+                break;
+            }
+            snum--;
+        }
+        if (scr == NULL)
+        {
+            msg_Err (obj, "bad X11 screen number");
+            goto error;
+        }
+        p_sys->window = scr->root;
+    }
     else
+    /* Determine capture window */
     if (!strcmp (demux->psz_access, "window"))
     {
         char *end;
@@ -186,68 +189,17 @@ static int Open (vlc_object_t *obj)
     p_sys->h = var_CreateGetInteger (obj, "screen-height");
     p_sys->follow_mouse = var_CreateGetBool (obj, "screen-follow-mouse");
 
-    uint32_t chroma = 0;
-    uint8_t bpp;
-    for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
-             *end = fmt + xcb_setup_pixmap_formats_length (setup);
-         fmt < end; fmt++)
-    {
-        if (fmt->depth != scr->root_depth)
-            continue;
-        bpp = fmt->depth;
-        switch (fmt->depth)
-        {
-            case 32:
-                if (fmt->bits_per_pixel == 32)
-                    chroma = VLC_CODEC_RGBA;
-                break;
-            case 24:
-                if (fmt->bits_per_pixel == 32)
-                {
-                    chroma = VLC_CODEC_RGB32;
-                    bpp = 32;
-                }
-                else if (fmt->bits_per_pixel == 24)
-                    chroma = VLC_CODEC_RGB24;
-                break;
-            case 16:
-                if (fmt->bits_per_pixel == 16)
-                    chroma = VLC_CODEC_RGB16;
-                break;
-            case 15:
-                if (fmt->bits_per_pixel == 16)
-                    chroma = VLC_CODEC_RGB15;
-                break;
-            case 8: /* XXX: screw grey scale! */
-                if (fmt->bits_per_pixel == 8)
-                    chroma = VLC_CODEC_RGB8;
-                break;
-        }
-        if (chroma != 0)
-            break;
-    }
-
-    if (!chroma)
-    {
-        msg_Err (obj, "unsupported pixmap formats");
-        goto error;
-    }
-
     /* Initializes format */
-    float rate = var_CreateGetFloat (obj, "screen-fps");
-    if (!rate)
+    p_sys->rate = var_CreateGetFloat (obj, "screen-fps");
+    if (!p_sys->rate)
         goto error;
-    p_sys->interval = (float)CLOCK_FREQ / rate;
+    p_sys->interval = (float)CLOCK_FREQ / p_sys->rate;
     if (!p_sys->interval)
         goto error;
     var_Create (obj, "screen-caching", VLC_VAR_INTEGER|VLC_VAR_DOINHERIT);
 
-    es_format_Init (&p_sys->fmt, VIDEO_ES, chroma);
-    p_sys->fmt.video.i_chroma = chroma;
-    p_sys->fmt.video.i_bits_per_pixel = bpp;
-    p_sys->fmt.video.i_sar_num = p_sys->fmt.video.i_sar_den = 1;
-    p_sys->fmt.video.i_frame_rate = 1000 * rate;
-    p_sys->fmt.video.i_frame_rate_base = 1000;
+    p_sys->cur_w = 0;
+    p_sys->cur_h = 0;
     p_sys->es = NULL;
     p_sys->pts = VLC_TS_INVALID;
     vlc_mutex_init (&p_sys->lock);
@@ -362,23 +314,26 @@ static void Demux (void *data)
     xcb_connection_t *conn = p_sys->conn;
 
     /* Update capture region (if needed) */
-    xcb_get_geometry_cookie_t gc = xcb_get_geometry (conn, p_sys->window);
-    int16_t x = p_sys->x, y = p_sys->y;
-    xcb_translate_coordinates_cookie_t tc;
-    xcb_query_pointer_cookie_t qc;
 
-    if (p_sys->window != p_sys->root)
-        tc = xcb_translate_coordinates (conn, p_sys->window, p_sys->root,
-                                        x, y);
-    if (p_sys->follow_mouse)
-        qc = xcb_query_pointer (conn, p_sys->window);
-
-    xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply (conn, gc, NULL);
+    xcb_get_geometry_reply_t *geo =
+        xcb_get_geometry_reply (conn,
+            xcb_get_geometry (conn, p_sys->window), NULL);
     if (geo == NULL)
     {
         msg_Err (demux, "bad X11 drawable 0x%08"PRIx32, p_sys->window);
         return;
     }
+
+    xcb_window_t root = geo->root;
+    int16_t x = p_sys->x, y = p_sys->y;
+    xcb_translate_coordinates_cookie_t tc;
+    xcb_query_pointer_cookie_t qc;
+
+    if (p_sys->window != root)
+        tc = xcb_translate_coordinates (conn, p_sys->window, root,
+                                        x, y);
+    if (p_sys->follow_mouse)
+        qc = xcb_query_pointer (conn, p_sys->window);
 
     uint16_t ow = geo->width - x;
     uint16_t oh = geo->height - y;
@@ -388,9 +343,10 @@ static void Demux (void *data)
         w = ow;
     if (h == 0 || h > oh)
         h = oh;
+    uint8_t depth = geo->depth;
     free (geo);
 
-    if (p_sys->window != p_sys->root)
+    if (p_sys->window != root)
     {
         xcb_translate_coordinates_reply_t *coords =
              xcb_translate_coordinates_reply (conn, tc, NULL);
@@ -429,7 +385,7 @@ static void Demux (void *data)
 
     xcb_get_image_reply_t *img;
     img = xcb_get_image_reply (conn,
-        xcb_get_image (conn, XCB_IMAGE_FORMAT_Z_PIXMAP, p_sys->root,
+        xcb_get_image (conn, XCB_IMAGE_FORMAT_Z_PIXMAP, root,
                        x, y, w, h, ~0), NULL);
     if (img == NULL)
         return;
@@ -441,14 +397,16 @@ static void Demux (void *data)
         return;
 
     vlc_mutex_lock (&p_sys->lock);
-    if (w != p_sys->fmt.video.i_visible_width
-     || h != p_sys->fmt.video.i_visible_height)
+    if (w != p_sys->cur_w || h != p_sys->cur_h)
     {
         if (p_sys->es != NULL)
             es_out_Del (demux->out, p_sys->es);
-        p_sys->fmt.video.i_visible_width = p_sys->fmt.video.i_width = w;
-        p_sys->fmt.video.i_visible_height = p_sys->fmt.video.i_height = h;
-        p_sys->es = es_out_Add (demux->out, &p_sys->fmt);
+        p_sys->es = InitES (demux, w, h, depth);
+        if (p_sys->es != NULL)
+        {
+            p_sys->cur_w = w;
+            p_sys->cur_h = h;
+        }
     }
 
     /* Capture screen */
@@ -463,4 +421,71 @@ static void Demux (void *data)
         p_sys->pts += p_sys->interval;
     }
     vlc_mutex_unlock (&p_sys->lock);
+}
+
+static es_out_id_t *InitES (demux_t *demux, uint_fast16_t width,
+                            uint_fast16_t height, uint_fast8_t depth)
+{
+    demux_sys_t *p_sys = demux->p_sys;
+    const xcb_setup_t *setup = xcb_get_setup (p_sys->conn);
+    uint32_t chroma = 0;
+    uint8_t bpp;
+
+    for (const xcb_format_t *fmt = xcb_setup_pixmap_formats (setup),
+             *end = fmt + xcb_setup_pixmap_formats_length (setup);
+         fmt < end; fmt++)
+    {
+        if (fmt->depth != depth)
+            continue;
+        bpp = fmt->depth;
+        switch (fmt->depth)
+        {
+            case 32:
+                if (fmt->bits_per_pixel == 32)
+                    chroma = VLC_CODEC_RGBA;
+                break;
+            case 24:
+                if (fmt->bits_per_pixel == 32)
+                {
+                    chroma = VLC_CODEC_RGB32;
+                    bpp = 32;
+                }
+                else if (fmt->bits_per_pixel == 24)
+                    chroma = VLC_CODEC_RGB24;
+                break;
+            case 16:
+                if (fmt->bits_per_pixel == 16)
+                    chroma = VLC_CODEC_RGB16;
+                break;
+            case 15:
+                if (fmt->bits_per_pixel == 16)
+                    chroma = VLC_CODEC_RGB15;
+                break;
+            case 8: /* XXX: screw grey scale! */
+                if (fmt->bits_per_pixel == 8)
+                    chroma = VLC_CODEC_RGB8;
+                break;
+        }
+        if (chroma != 0)
+            break;
+    }
+
+    if (!chroma)
+    {
+        msg_Err (demux, "unsupported pixmap formats");
+        return NULL;
+    }
+
+    es_format_t fmt;
+
+    es_format_Init (&fmt, VIDEO_ES, chroma);
+    fmt.video.i_chroma = chroma;
+    fmt.video.i_bits_per_pixel = bpp;
+    fmt.video.i_sar_num = fmt.video.i_sar_den = 1;
+    fmt.video.i_frame_rate = 1000 * p_sys->rate;
+    fmt.video.i_frame_rate_base = 1000;
+    fmt.video.i_visible_width = fmt.video.i_width = width;
+    fmt.video.i_visible_height = fmt.video.i_height = height;
+
+    return es_out_Add (demux->out, &fmt);
 }
