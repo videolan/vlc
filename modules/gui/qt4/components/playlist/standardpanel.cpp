@@ -132,12 +132,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     BUTTONACT( addButton, popupAdd() );
     layout->addWidget( addButton, 0, 2 );
 
-    /* Goto */
-    gotoPlayingButton = new QPushButton;
-    BUTTON_SET_ACT_I( gotoPlayingButton, "", buttons/playlist/jump_to,
-            qtr( "Show the current item" ), gotoPlayingItem() );
-    layout->addWidget( gotoPlayingButton, 0, 3 );
-
     /* Finish the layout */
     layout->addWidget( view, 1, 0, 1, -1 );
 
@@ -152,6 +146,7 @@ StandardPLPanel::~StandardPLPanel()
     getSettings()->endGroup();
 }
 
+/* Unused anymore, but might be useful, like in right-click menu */
 void StandardPLPanel::gotoPlayingItem()
 {
     view->scrollTo( model->currentIndex() );

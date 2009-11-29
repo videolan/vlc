@@ -62,7 +62,7 @@ private:
     QWidget *parent;
     QLabel *title;
     QTreeView *view;
-    QPushButton *addButton, *gotoPlayingButton;
+    QPushButton *addButton;
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
 
