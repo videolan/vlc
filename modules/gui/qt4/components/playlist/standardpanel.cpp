@@ -30,7 +30,7 @@
 #include "dialogs_provider.hpp"
 
 #include "components/playlist/playlist_model.hpp"
-#include "components/playlist/panels.hpp"
+#include "components/playlist/standardpanel.hpp"
 #include "util/customwidgets.hpp"
 
 #include <vlc_intf_strings.h>

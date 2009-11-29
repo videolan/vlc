@@ -655,7 +655,6 @@ modules/gui/qt4/components/interface_widgets.cpp
 modules/gui/qt4/components/interface_widgets.hpp
 modules/gui/qt4/components/open_panels.cpp
 modules/gui/qt4/components/open_panels.hpp
-modules/gui/qt4/components/playlist/panels.hpp
 modules/gui/qt4/components/playlist/playlist.cpp
 modules/gui/qt4/components/playlist/playlist.hpp
 modules/gui/qt4/components/playlist/playlist_item.cpp
@@ -665,6 +664,7 @@ modules/gui/qt4/components/playlist/playlist_model.hpp
 modules/gui/qt4/components/playlist/selector.cpp
 modules/gui/qt4/components/playlist/selector.hpp
 modules/gui/qt4/components/playlist/sorting.h
+modules/gui/qt4/components/playlist/standardpanel.hpp
 modules/gui/qt4/components/playlist/standardpanel.cpp
 modules/gui/qt4/components/preferences_widgets.cpp
 modules/gui/qt4/components/preferences_widgets.hpp

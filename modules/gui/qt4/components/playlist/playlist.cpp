@@ -26,7 +26,7 @@
 # include "config.h"
 #endif
 
-#include "components/playlist/panels.hpp"
+#include "components/playlist/standardpanel.hpp"
 #include "components/playlist/selector.hpp"
 #include "components/playlist/playlist.hpp"
 

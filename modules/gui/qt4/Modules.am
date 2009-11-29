@@ -52,7 +52,7 @@ nodist_SOURCES_qt4 = \
 		components/controller_widget.moc.cpp \
 		components/playlist/playlist_model.moc.cpp \
 		components/playlist/playlist.moc.cpp \
-		components/playlist/panels.moc.cpp \
+		components/playlist/standardpanel.moc.cpp \
 		components/playlist/selector.moc.cpp \
 		components/sout/profile_selector.moc.cpp \
 		components/sout/sout_widgets.moc.cpp \
@@ -290,7 +290,7 @@ noinst_HEADERS = \
 	components/controller_widget.hpp \
 	components/playlist/playlist_model.hpp \
 	components/playlist/playlist_item.hpp \
-	components/playlist/panels.hpp \
+	components/playlist/standardpanel.hpp \
 	components/playlist/playlist.hpp \
 	components/playlist/selector.hpp \
 	components/playlist/sorting.h \
