@@ -164,50 +164,82 @@ int aout_DecGetResetLost( aout_instance_t *, aout_input_t * );
 void aout_DecChangePause( aout_instance_t *, aout_input_t *, bool b_paused, mtime_t i_date );
 void aout_DecFlush( aout_instance_t *, aout_input_t * );
 
-/* Helpers */
+/* Audio output locking */
+
+#if !defined (NDEBUG) \
+ && defined __linux__ && (defined (__i386__) || defined (__x86_64__))
+# define AOUT_DEBUG 1
+#endif
+
+#ifdef AOUT_DEBUG
+enum
+{
+    MIXER_LOCK=1,
+    INPUT_LOCK=2,
+    INPUT_FIFO_LOCK=4,
+    OUTPUT_FIFO_LOCK=8,
+};
+
+void aout_lock (unsigned);
+void aout_unlock (unsigned);
+
+#else
+# define aout_lock( i )   (void)0
+# define aout_unlock( i ) (void)0
+#endif
 
 static inline void aout_lock_mixer( aout_instance_t *p_aout )
 {
+    aout_lock( MIXER_LOCK );
     vlc_mutex_lock( &p_aout->mixer_lock );
 }
 
 static inline void aout_unlock_mixer( aout_instance_t *p_aout )
 {
+    aout_unlock( MIXER_LOCK );
     vlc_mutex_unlock( &p_aout->mixer_lock );
 }
 
 static inline void aout_lock_input_fifos( aout_instance_t *p_aout )
 {
+    aout_lock( INPUT_FIFO_LOCK );
     vlc_mutex_lock( &p_aout->input_fifos_lock );
 }
 
 static inline void aout_unlock_input_fifos( aout_instance_t *p_aout )
 {
+    aout_unlock( INPUT_FIFO_LOCK );
     vlc_mutex_unlock( &p_aout->input_fifos_lock );
 }
 
 static inline void aout_lock_output_fifo( aout_instance_t *p_aout )
 {
+    aout_lock( OUTPUT_FIFO_LOCK );
     vlc_mutex_lock( &p_aout->output_fifo_lock );
 }
 
 static inline void aout_unlock_output_fifo( aout_instance_t *p_aout )
 {
+    aout_unlock( OUTPUT_FIFO_LOCK );
     vlc_mutex_unlock( &p_aout->output_fifo_lock );
 }
 
 static inline void aout_lock_input( aout_instance_t *p_aout, aout_input_t * p_input )
 {
     (void)p_aout;
+    aout_lock( INPUT_LOCK );
     vlc_mutex_lock( &p_input->lock );
 }
 
 static inline void aout_unlock_input( aout_instance_t *p_aout, aout_input_t * p_input )
 {
     (void)p_aout;
+    aout_unlock( INPUT_LOCK );
     vlc_mutex_unlock( &p_input->lock );
 }
 
+
+/* Helpers */
 
 /**
  * This function will safely mark aout input to be restarted as soon as

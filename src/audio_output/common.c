@@ -114,6 +114,54 @@ static void aout_Destructor( vlc_object_t * p_this )
     vlc_mutex_destroy( &p_aout->output_fifo_lock );
 }
 
+/* Lock ordering rules:
+ *
+ *            Mixer Input IFIFO OFIFO (< Inner lock)
+ * Mixer       No!   N/A   Yes   Yes
+ * Input       N/A   No!   Yes   N/A
+ * In FIFOs    No!   No!   No!   No!
+ * Out FIFOs   No!   N/A   Yes   No!
+ * (^ Outer lock)
+ */
+#ifdef AOUT_DEBUG
+/* Lock debugging */
+static __thread unsigned aout_locks = 0;
+
+void aout_lock (unsigned i)
+{
+    unsigned allowed;
+    switch (i)
+    {
+        case MIXER_LOCK:
+            allowed = 0;
+            break;
+        case INPUT_LOCK:
+            allowed = 0;
+            break;
+        case OUTPUT_FIFO_LOCK:
+            allowed = MIXER_LOCK;
+            break;
+        case INPUT_FIFO_LOCK:
+            allowed = MIXER_LOCK|INPUT_LOCK|OUTPUT_FIFO_LOCK;
+            break;
+    }
+
+    if (aout_locks & ~allowed)
+    {
+        fprintf (stderr, "Illegal audio lock transition (%x -> %x)\n",
+                 aout_locks, aout_locks|i);
+        vlc_backtrace ();
+        //abort ();
+    }
+    aout_locks |= i;
+}
+
+void aout_unlock (unsigned i)
+{
+    assert (aout_locks & i);
+    aout_locks &= ~i;
+}
+#endif
 
 /*
  * Formats management (internal and external)
