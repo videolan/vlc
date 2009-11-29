@@ -55,7 +55,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   playlist_item_t *p_root ):
                                   QWidget( _parent ), p_intf( _p_intf )
 {
-    QVBoxLayout *layout = new QVBoxLayout( this );
+    QGridLayout *layout = new QGridLayout( this );
     layout->setSpacing( 0 ); layout->setMargin( 0 );
 
     model = new PLModel( p_playlist, p_intf, p_root, this );
@@ -110,46 +110,36 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     currentRootId = -1;
 
-    /* Buttons configuration */
-    QHBoxLayout *buttons = new QHBoxLayout;
-
-    /* Add item to the playlist button */
-    addButton = new QPushButton;
-    addButton->setIcon( QIcon( ":/buttons/playlist/playlist_add" ) );
-    addButton->setMaximumWidth( 30 );
-    BUTTONACT( addButton, popupAdd() );
-    buttons->addWidget( addButton );
-
-    /* Goto */
-    gotoPlayingButton = new QPushButton;
-    BUTTON_SET_ACT_I( gotoPlayingButton, "", buttons/playlist/jump_to,
-            qtr( "Show the current item" ), gotoPlayingItem() );
-    buttons->addWidget( gotoPlayingButton );
-
-    /* A Spacer and the search possibilities */
-    QSpacerItem *spacer = new QSpacerItem( 10, 20 );
-    buttons->addItem( spacer );
-
-    QLabel *filter = new QLabel( qtr(I_PL_SEARCH) + " " );
-    buttons->addWidget( filter );
-
-    SearchLineEdit *search = new SearchLineEdit( this );
-    buttons->addWidget( search );
-    filter->setBuddy( search );
-    CONNECT( search, textChanged( const QString& ), this, search( const QString& ) );
-
     /* Title label */
     title = new QLabel;
     QFont titleFont;
     titleFont.setPointSize( titleFont.pointSize() + 6 );
     titleFont.setFamily( "Verdana" );
     title->setFont( titleFont );
+    layout->addWidget( title, 0, 0 );
+
+    /* A Spacer and the search possibilities */
+    layout->setRowStretch( 1, 10 );
+
+    SearchLineEdit *search = new SearchLineEdit( this );
+    layout->addWidget( search, 0, 4 );
+    CONNECT( search, textChanged( const QString& ), this, search( const QString& ) );
+
+    /* Add item to the playlist button */
+    addButton = new QPushButton;
+    addButton->setIcon( QIcon( ":/buttons/playlist/playlist_add" ) );
+    addButton->setMaximumWidth( 30 );
+    BUTTONACT( addButton, popupAdd() );
+    layout->addWidget( addButton, 0, 2 );
+
+    /* Goto */
+    gotoPlayingButton = new QPushButton;
+    BUTTON_SET_ACT_I( gotoPlayingButton, "", buttons/playlist/jump_to,
+            qtr( "Show the current item" ), gotoPlayingItem() );
+    layout->addWidget( gotoPlayingButton, 0, 3 );
 
     /* Finish the layout */
-    layout->addWidget( title );
-    layout->addWidget( view );
-    layout->addLayout( buttons );
-//    layout->addWidget( bar );
+    layout->addWidget( view, 1, 0, 1, -1 );
 
     selectColumnsSigMapper = new QSignalMapper( this );
     CONNECT( selectColumnsSigMapper, mapped( int ), this, toggleColumnShown( int ) );
