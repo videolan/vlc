@@ -57,6 +57,7 @@ enum {
     BookmarksChanged_Type,
     RecordingEvent_Type,
     ProgramChanged_Type,
+    RandomChanged_Type,
 /*    SignalChanged_Type, */
 
     FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
@@ -269,6 +270,7 @@ signals:
     void volumeChanged();
     void playlistItemAppended( int itemId, int parentId );
     void playlistItemRemoved( int itemId );
+    void randomChanged( bool );
 };
 
 #endif

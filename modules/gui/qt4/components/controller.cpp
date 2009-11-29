@@ -363,6 +363,8 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
     case RANDOM_BUTTON: {
         NORMAL_BUTTON( RANDOM );
         RANDOMButton->setCheckable( true );
+        CONNECT( THEMIM, randomChanged( bool ),
+                 RANDOMButton, setChecked( bool ) );
         }
         break;
     default:

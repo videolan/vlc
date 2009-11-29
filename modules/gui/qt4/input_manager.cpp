@@ -46,6 +46,10 @@ static int PLItemRemoved( vlc_object_t *, const char *,
 static int VolumeChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 
+static int RandomChanged( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
+
+
 static int InputEvent( vlc_object_t *, const char *,
                        vlc_value_t, vlc_value_t, void * );
 static int VbiEvent( vlc_object_t *, const char *,
@@ -888,6 +892,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     var_AddCallback( THEPL, "activity", PLItemChanged, this );
     var_AddCallback( THEPL, "playlist-item-append", PLItemAppended, this );
     var_AddCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
+    var_AddCallback( THEPL, "random", RandomChanged, this );
 
     var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
 
@@ -958,6 +963,9 @@ void MainInputManager::customEvent( QEvent *event )
     case PLItemRemoved_Type:
         plEv = static_cast<PLEvent*>( event );
         emit playlistItemRemoved( plEv->i_item );
+        return;
+    case RandomChanged_Type:
+        emit randomChanged( var_GetBool( THEPL, "random" ) );
         return;
     default:
         if( type != ItemChanged_Type ) return;
@@ -1076,6 +1084,16 @@ static int PLItemRemoved
     MainInputManager *mim = static_cast<MainInputManager*>(data);
 
     PLEvent *event = new PLEvent( PLItemRemoved_Type, cur.i_int, 0  );
+    QApplication::postEvent( mim, event );
+    return VLC_SUCCESS;
+}
+
+static int RandomChanged
+( vlc_object_t * obj, const char *var, vlc_value_t old, vlc_value_t cur, void *data )
+{
+    MainInputManager *mim = static_cast<MainInputManager*>(data);
+
+    IMEvent *event = new IMEvent( RandomChanged_Type );
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }
