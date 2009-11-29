@@ -208,7 +208,7 @@ struct vout_sys_t
     x11_window_t        window;
 
     /* X11 generic properties */
-#ifdef HAVE_SYS_SHM_H
+#if defined (HAVE_SYS_SHM_H) && !defined (MODULE_NAME_IS_glx)
     int                 i_shm_opcode;      /* shared memory extension opcode */
 #endif
 
@@ -303,6 +303,7 @@ struct vout_sys_t
 #endif
 };
 
+#ifndef MODULE_NAME_IS_glx
 /*****************************************************************************
  * picture_sys_t: direct buffer method descriptor
  *****************************************************************************
@@ -325,6 +326,7 @@ struct picture_sys_t
     int                  nb_display;
 #endif
 };
+#endif
 
 /*****************************************************************************
  * mwmhints_t: window manager hints

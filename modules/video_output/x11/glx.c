@@ -37,17 +37,10 @@
 #include <vlc_interface.h>
 #include <vlc_vout.h>
 
-#ifdef HAVE_SYS_SHM_H
-#   include <sys/shm.h>                                /* shmget(), shmctl() */
-#endif
-
 #include <X11/Xlib.h>
 #include <X11/Xmd.h>
 #include <X11/Xutil.h>
 #include <X11/keysym.h>
-#ifdef HAVE_SYS_SHM_H
-#   include <X11/extensions/XShm.h>
-#endif
 #ifdef DPMSINFO_IN_DPMS_H
 #   include <X11/extensions/dpms.h>
 #endif

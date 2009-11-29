@@ -48,15 +48,12 @@
 #include <X11/extensions/Xsp.h>
 #endif
 
-#ifdef HAVE_SYS_SHM_H
-#   include <sys/shm.h>                                /* shmget(), shmctl() */
-#endif
-
 #include <X11/Xlib.h>
 #include <X11/Xproto.h>
 #include <X11/Xmd.h>
 #include <X11/Xutil.h>
-#ifdef HAVE_SYS_SHM_H
+#if defined (HAVE_SYS_SHM_H) && !defined (MODULE_NAME_IS_glx)
+#   include <sys/shm.h>                                /* shmget(), shmctl() */
 #   include <X11/extensions/XShm.h>
 #endif
 #ifdef DPMSINFO_IN_DPMS_H
@@ -86,11 +83,10 @@ void Deactivate ( vlc_object_t * );
 static int  InitVideo      ( vout_thread_t * );
 static void EndVideo       ( vout_thread_t * );
 static void DisplayVideo   ( vout_thread_t *, picture_t * );
+static int  InitDisplay    ( vout_thread_t * );
 #endif
 static int  ManageVideo    ( vout_thread_t * );
 static int  Control        ( vout_thread_t *, int, va_list );
-
-static int  InitDisplay    ( vout_thread_t * );
 
 static int  CreateWindow   ( vout_thread_t *, x11_window_t * );
 static void DestroyWindow  ( vout_thread_t *, x11_window_t * );
@@ -98,10 +94,9 @@ static void DestroyWindow  ( vout_thread_t *, x11_window_t * );
 #ifndef MODULE_NAME_IS_glx
 static int  NewPicture     ( vout_thread_t *, picture_t * );
 static void FreePicture    ( vout_thread_t *, picture_t * );
-#endif
-
-#ifdef HAVE_SYS_SHM_H
+# ifdef HAVE_SYS_SHM_H
 static int i_shm_major = 0;
+# endif
 #endif
 
 static void ToggleFullScreen      ( vout_thread_t * );
@@ -316,6 +311,7 @@ int Activate ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+#ifndef MODULE_NAME_IS_glx
     /* Open and initialize device. */
     if( InitDisplay( p_vout ) )
     {
@@ -326,6 +322,7 @@ int Activate ( vlc_object_t *p_this )
         free( p_vout->p_sys );
         return VLC_EGENERIC;
     }
+#endif
 
     /* Disable screen saver */
     DisableXScreenSaver( p_vout );
@@ -2011,6 +2008,7 @@ static int XVideoGetPort( vout_thread_t *p_vout,
 }
 #endif
 
+#ifndef MODULE_NAME_IS_glx
 /*****************************************************************************
  * InitDisplay: open and initialize X11 device
  *****************************************************************************
@@ -2052,8 +2050,6 @@ static int InitDisplay( vout_thread_t *p_vout )
 
     return VLC_SUCCESS;
 }
-
-#ifndef MODULE_NAME_IS_glx
 
 #ifdef HAVE_SYS_SHM_H
 /*****************************************************************************
@@ -2169,7 +2165,7 @@ static int X11ErrorHandler( Display * display, XErrorEvent * event )
         return 0;
     }
 
-#ifdef HAVE_SYS_SHM_H
+#if defined (HAVE_SYS_SHM_H) && !defined (MODULE_NAME_IS_glx)
     if( event->request_code == i_shm_major ) /* MIT-SHM */
     {
         fprintf( stderr,
