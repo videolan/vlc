@@ -519,17 +519,10 @@ void spu_RenderSubpictures( spu_t *p_spu,
             if( p_subpic->b_subtitle )
             {
                 area = spu_area_unscaled( area, scale );
-                if( !p_subpic->b_absolute && area.i_width > 0 && area.i_height > 0 )
-                {
-                    p_region->i_x = area.i_x;
-                    p_region->i_y = area.i_y;
-                }
                 if( p_subtitle_area )
                     p_subtitle_area[i_subtitle_area++] = area;
             }
         }
-        if( p_subpic->b_subtitle )
-            p_subpic->b_absolute = true;
     }
 
     /* */
@@ -1670,6 +1663,8 @@ static int SubpictureCmp( const void *s0, const void *s1 )
         r = IntegerCmp( p_subpic0->i_channel, p_subpic1->i_channel );
     if( !r )
         r = IntegerCmp( p_subpic0->i_order, p_subpic1->i_order );
+    //NOTE We swap subtitle order so that newer subtitles push older ones higher.
+    if( p_subpic0->b_subtitle && p_subpic1->b_subtitle ) r = !r;
     return r;
 }
 
