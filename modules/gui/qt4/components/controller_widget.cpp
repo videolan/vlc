@@ -235,22 +235,9 @@ void AtoB_Button::setIcons( bool timeA, bool timeB )
     }
 }
 
-void LoopButton::update()
+void LoopButton::updateIcons( int value )
 {
-/*    if( model->hasRepeat() )
-    {
-        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_one" ) );
-        repeatButton->setChecked( true );
-    }
-    else if( model->hasLoop() )
-    {
-        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_all" ) );
-        repeatButton->setChecked( true );
-    }
-    else
-    {
-        repeatButton->setIcon( QIcon( ":/buttons/playlist/repeat_one" ) );
-        repeatButton->setChecked( false );
-    }*/
-    //BUTTONACT( repeatButton, toggleRepeat() );
+    setChecked( value != NORMAL );
+    setIcon( ( value == REPEAT_ALL ) ? QIcon( ":/buttons/playlist/repeat_all" )
+                                     : QIcon( ":/buttons/playlist/repeat_one" ) );
 }

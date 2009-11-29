@@ -58,12 +58,19 @@ enum {
     RecordingEvent_Type,
     ProgramChanged_Type,
     RandomChanged_Type,
+    LoopChanged_Type,
+    RepeatChanged_Type,
 /*    SignalChanged_Type, */
 
     FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
     FullscreenControlShow_Type,
     FullscreenControlHide_Type,
     FullscreenControlPlanHide_Type,
+};
+
+enum { NORMAL,    /* loop: 0, repeat: 0 */
+       REPEAT_ONE,/* loop: 1, repeat: 0 */
+       REPEAT_ALL,/* loop: 0, repeat: 1 */
 };
 
 class IMEvent : public QEvent
@@ -257,6 +264,7 @@ private:
     input_thread_t          *p_input;
     intf_thread_t           *p_intf;
 
+    void notifyRepeatLoop();
 public slots:
     void togglePlayPause();
     void toggleRandom();
@@ -265,12 +273,15 @@ public slots:
     void prev();
     void activatePlayQuit( bool );
 
+    void loopRepeatLoopStatus();
+
 signals:
     void inputChanged( input_thread_t * );
     void volumeChanged();
     void playlistItemAppended( int itemId, int parentId );
     void playlistItemRemoved( int itemId );
     void randomChanged( bool );
+    void repeatLoopChanged( int );
 };
 
 #endif

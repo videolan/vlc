@@ -372,6 +372,10 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         setupButton( loopButton );
         loopButton->setToolTip( qtr( "Click to toggle between loop one, loop all" ) );
         loopButton->setCheckable( true );
+        loopButton->updateIcons( NORMAL );
+        CONNECT( THEMIM, repeatLoopChanged( int ), loopButton, updateIcons( int ) );
+        CONNECT( loopButton, clicked(), THEMIM, loopRepeatLoopStatus() );
+        widget = loopButton;
         }
         break;
     default:

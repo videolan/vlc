@@ -56,8 +56,8 @@ private slots:
 class LoopButton : public QToolButton
 {
     Q_OBJECT
-private slots:
-    void update();
+public slots:
+    void updateIcons( int );
 };
 
 class AtoB_Button : public QToolButton
