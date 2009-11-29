@@ -1083,7 +1083,10 @@ void MainInputManager::activatePlayQuit( bool b_exit )
     var_SetBool( THEPL, "play-and-exit", b_exit );
 }
 
-/* Static callbacks for MIM */
+
+/****************************
+ * Static callbacks for MIM *
+ ****************************/
 static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
                         vlc_value_t oldval, vlc_value_t, void *param )
 {
