@@ -151,7 +151,7 @@ void aout_lock (unsigned i)
         fprintf (stderr, "Illegal audio lock transition (%x -> %x)\n",
                  aout_locks, aout_locks|i);
         vlc_backtrace ();
-        //abort ();
+        abort ();
     }
     aout_locks |= i;
 }
