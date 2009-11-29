@@ -238,8 +238,8 @@ public:
         instance = NULL;
     }
 
-    input_thread_t *getInput() { return p_input; };
-    InputManager *getIM() { return im; };
+    input_thread_t *getInput() { return p_input; }
+    InputManager *getIM() { return im; }
 
     vout_thread_t* getVout();
     aout_instance_t *getAout();
