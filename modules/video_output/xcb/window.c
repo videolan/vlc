@@ -40,11 +40,6 @@ typedef xcb_atom_t Atom;
 
 #include "xcb_vlc.h"
 
-#define DISPLAY_TEXT N_("X11 display")
-#define DISPLAY_LONGTEXT N_( \
-    "X11 hardware display to use. By default VLC will " \
-    "use the value of the DISPLAY environment variable.")
-
 #define XID_TEXT N_("ID of the video output X window")
 #define XID_LONGTEXT N_( \
     "VLC can embed its video output in an existing X11 window. " \
@@ -66,8 +61,6 @@ vlc_module_begin ()
     set_capability ("vout window xid", 10)
     set_callbacks (Open, Close)
 
-    add_string ("x11-display", NULL, NULL,
-                DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
     /* Obsolete since 1.1.0: */
     add_obsolete_bool ("x11-altfullscreen")
     add_obsolete_bool ("xvideo-altfullscreen")
