@@ -366,7 +366,6 @@ $Id$
  * xml: LibXML xml parser
  * xosd: X On Screen Display interface
  * xtag: XTAG xml parser
- * xvmc: XVMC video output and decoder
  * yuv: yuv video output
  * yuvp: YUVP to YUVA/RGBA chroma converter
  * yuy2_i420: yuy2 to 4:2:0 conversions functions

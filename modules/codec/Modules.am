@@ -1,4 +1,4 @@
-SUBDIRS = cmml dmo avcodec shine subtitles spudec wmafixed xvmc
+SUBDIRS = cmml dmo avcodec shine subtitles spudec wmafixed
 SOURCES_a52 = a52.c a52.h
 SOURCES_dts = dts.c
 SOURCES_flac = flac.c

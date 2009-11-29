@@ -3661,28 +3661,6 @@ AS_IF([test "${enable_glx}" != "no"], [
     ],[AC_MSG_ERROR([Please install GL development package. Alternatively you can also configure with --disable-glx.])])
 ])
 
-dnl
-dnl  XVMC module
-dnl  (disabled by default except on win32)
-dnl
-AC_ARG_ENABLE(xvmc,
-  [  --enable-xvmc           XvMC support (default disabled)],, [
-  enable_xvmc="no"
-])
-AS_IF([test "${enable_xvmc}" != "no"], [
-  AC_CHECK_HEADERS(X11/extensions/vldXvMC.h, [
-    AS_IF([test "${enable_libmpeg2}" = "yes"], [
-      VLC_ADD_PLUGIN([xvmc])
-      VLC_ADD_LIBS([xvmc],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lXvMCW -lXv ${LIBMPEG2_LIBS}])
-      VLC_ADD_CPPFLAGS([xvmc],[${X_CFLAGS} ${LIBMPEG2_CFLAGS}])
-    ], [
-      AC_MSG_ERROR([XVideo-MotionCompensation needs libmpeg2 which isn't available])
-    ])
-  ], [
-    AC_MSG_ERROR([XVideo-MotionCompensation extension not found!])
-  ])
-])
-
 dnl End of Xlib tests
 CPPFLAGS="${CPPFLAGS_save}"
 
@@ -5108,8 +5086,8 @@ AM_CONDITIONAL(BUILD_MOZILLA,${mozilla})
 
 dnl Tests for Xsp
 AC_CHECK_LIB(Xsp, XSPSetPixelDoubling,[
-  VLC_ADD_CPPFLAGS([xvmc glx],[-DHAVE_XSP])
-  VLC_ADD_LIBS([xvmc glx],[-lXsp])
+  VLC_ADD_CPPFLAGS([glx],[-DHAVE_XSP])
+  VLC_ADD_LIBS([glx],[-lXsp])
 ])
 
 dnl
@@ -5309,7 +5287,6 @@ AC_CONFIG_FILES([
   modules/codec/subtitles/Makefile
   modules/codec/spudec/Makefile
   modules/codec/wmafixed/Makefile
-  modules/codec/xvmc/Makefile
   modules/control/Makefile
   modules/control/http/Makefile
   modules/control/globalhotkeys/Makefile

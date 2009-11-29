@@ -1,5 +1,0 @@
-SOURCES_xvmc = \
-	xxmc.c \
-        accel_xvmc.h \
-        mpeg2_internal.h \
-	$(NULL)

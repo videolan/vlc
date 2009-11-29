@@ -3,10 +3,3 @@ SOURCES_glx = \
 	xcommon.c \
 	xcommon.h \
 	$(NULL)
-
-SOURCES_xvmc = \
-        xvmc.c \
-        xcommon.c \
-        xcommon.h \
-        $(NULL)
-
