@@ -265,6 +265,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             vlc_object_t *obj = p_vout ? VLC_OBJECT(p_vout)
                                        : VLC_OBJECT(p_playlist);
             var_ToggleBool( obj, "directx-wallpaper" );
+            break;
         }
 #endif
 
@@ -286,6 +287,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         case ACTIONID_RANDOM:
         {
             var_ToggleBool( p_playlist, "random" );
+            break;
         }
 
         case ACTIONID_PLAY_PAUSE:
