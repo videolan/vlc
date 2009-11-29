@@ -144,6 +144,8 @@ void aout_lock (unsigned i)
         case OUTPUT_FIFO_LOCK:
             allowed = MIXER_LOCK|INPUT_LOCK|INPUT_FIFO_LOCK;
             break;
+        default:
+            abort ();
     }
 
     if (aout_locks & ~allowed)
