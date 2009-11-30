@@ -51,6 +51,7 @@ int rtp_packetize_mpa  (sout_stream_id_t *, block_t *);
 int rtp_packetize_mpv  (sout_stream_id_t *, block_t *);
 int rtp_packetize_ac3  (sout_stream_id_t *, block_t *);
 int rtp_packetize_split(sout_stream_id_t *, block_t *);
+int rtp_packetize_swab (sout_stream_id_t *, block_t *);
 int rtp_packetize_mp4a (sout_stream_id_t *, block_t *);
 int rtp_packetize_mp4a_latm (sout_stream_id_t *, block_t *);
 int rtp_packetize_h263 (sout_stream_id_t *, block_t *);

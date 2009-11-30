@@ -1066,6 +1066,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             rtp_set_ptime (id, 20, 1);
             break;
         case VLC_CODEC_S16B:
+        case VLC_CODEC_S16L:
             if( p_fmt->audio.i_channels == 1 && p_fmt->audio.i_rate == 44100 )
             {
                 id->i_payload_type = 11;
@@ -1076,7 +1077,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                 id->i_payload_type = 10;
             }
             id->psz_enc = "L16";
-            id->pf_packetize = rtp_packetize_split;
+            if( p_fmt->i_codec == VLC_CODEC_S16B )
+                id->pf_packetize = rtp_packetize_split;
+            else
+                id->pf_packetize = rtp_packetize_swab;
             rtp_set_ptime (id, 20, 2);
             break;
         case VLC_CODEC_U8:
