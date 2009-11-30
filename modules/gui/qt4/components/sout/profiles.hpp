@@ -14,6 +14,7 @@ static const char video_profile_name_list[][32] = {
     "Audio - MP3",
     "Audio - AAC (MP4)",
     "Audio - FLAC",
+    "Audio - CD",
 };
 
 static const char video_profile_value_list[][48] = {
@@ -34,6 +35,7 @@ static const char video_profile_value_list[][48] = {
     "raw;0;1;0;0;800;1;0;0;0;mp3;128;2;44100;0;0",
     "mp4;0;1;0;0;800;1;0;0;0;mp4a;128;2;44100;0;0",
     "raw;0;1;0;0;800;1;0;0;0;flac;128;2;44100;0;0",
+    "wav;0;1;0;0;800;1;0;0;0;s16l;128;2;44100;0;0",
 };
 
 
