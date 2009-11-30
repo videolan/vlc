@@ -140,55 +140,41 @@ void SoutDialog::closeTab()
 
 void SoutDialog::addDest( )
 {
-    int index;
+    VirtualDestBox *db;
+    QString caption;
+
     switch( ui.destBox->currentIndex() )
     {
         case 0:
-            {
-                FileDestBox *fdb = new FileDestBox( this );
-                index = ui.destTab->addTab( fdb, qtr( "File" ) );
-                CONNECT( fdb, mrlUpdated(), this, updateMRL() );
-            }
+            db = new FileDestBox( this );
+            caption = qtr( "File" );
             break;
         case 1:
-            {
-                HTTPDestBox *hdb = new HTTPDestBox( this );
-                index = ui.destTab->addTab( hdb, "HTTP" );
-                CONNECT( hdb, mrlUpdated(), this, updateMRL() );
-            }
+            db = new HTTPDestBox( this );
+            caption = qfu( "HTTP" );
             break;
         case 2:
-            {
-                MMSHDestBox *mdb = new MMSHDestBox( this );
-                index = ui.destTab->addTab( mdb, "WMSP" );
-                CONNECT( mdb, mrlUpdated(), this, updateMRL() );
-            }
+            db = new MMSHDestBox( this );
+            caption = qfu( "WMSP" );
             break;
         case 3:
-            {
-                RTPDestBox *rdb = new RTPDestBox( this );
-                index = ui.destTab->addTab( rdb, "RTP/TS" );
-                CONNECT( rdb, mrlUpdated(), this, updateMRL() );
-            }
+            db = new RTPDestBox( this );
+            caption = "RTP/TS";
             break;
         case 4:
-            {
-                UDPDestBox *udb = new UDPDestBox( this );
-                index = ui.destTab->addTab( udb, "UDP" );
-                CONNECT( udb, mrlUpdated(), this, updateMRL() );
-            }
+            db = new UDPDestBox( this );
+            caption = "UDP";
             break;
         case 5:
-            {
-                ICEDestBox *idb = new ICEDestBox( this );
-                index = ui.destTab->addTab( idb, "Icecast" );
-                CONNECT( idb, mrlUpdated(), this, updateMRL() );
-            }
+            db = new ICEDestBox( this );
+            caption = "Icecast";
             break;
         default:
             assert(0);
     }
 
+    int index = ui.destTab->addTab( db, caption );
+    CONNECT( db, mrlUpdated(), this, updateMRL() );
     ui.destTab->setCurrentIndex( index );
     updateMRL();
 }
