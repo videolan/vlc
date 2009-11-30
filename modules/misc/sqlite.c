@@ -104,6 +104,9 @@ static int GetColumnTypeFromStatement( sql_t* p_sql,
                                        sql_stmt_t* p_stmt,
                                        int i_col,
                                        int* pi_type );
+static int GetColumnSize( sql_t* p_sql,
+                          sql_stmt_t* p_stmt,
+                          int i_col );
 
 /*****************************************************************************
  * Module description
@@ -160,6 +163,7 @@ static int load( vlc_object_t *p_this )
     p_sql->pf_finalize = StatementFinalize;
     p_sql->pf_gettype = GetColumnTypeFromStatement;
     p_sql->pf_getcolumn = GetColumnFromStatement;
+    p_sql->pf_getcolumnsize = GetColumnSize;
 
     return VLC_SUCCESS;
 }
@@ -657,6 +661,9 @@ static int GetColumnFromStatement( sql_t* p_sql, sql_stmt_t* p_stmt, int i_col,
     assert( p_stmt->p_sqlitestmt );
     int i_ret = VLC_SUCCESS;
     vlc_mutex_lock( &p_sql->p_sys->lock );
+    const unsigned char* psz;
+    const void* ptr;
+    int size;
     switch( type )
     {
         case SQL_INT:
@@ -666,10 +673,22 @@ static int GetColumnFromStatement( sql_t* p_sql, sql_stmt_t* p_stmt, int i_col,
             p_res->value.dbl = sqlite3_column_double( p_stmt->p_sqlitestmt, i_col );
             break;
         case SQL_TEXT:
-            p_res->value.psz = sqlite3_column_text( p_stmt->p_sqlitestmt, i_col );
+            psz = sqlite3_column_text( p_stmt->p_sqlitestmt, i_col );
+            if( psz )
+                p_res->value.psz = strdup( (const char* ) psz );
             break;
         case SQL_BLOB:
-            p_res->value.ptr = sqlite3_column_blob( p_stmt->p_sqlitestmt, i_col );
+            ptr = sqlite3_column_blob( p_stmt->p_sqlitestmt, i_col );
+            size = sqlite3_column_bytes( p_stmt->p_sqlitestmt, i_col );
+            if( ptr )
+            {
+                p_res->value.ptr = malloc( size );
+                p_res->length = size;
+                if( p_res->value.ptr )
+                    memcpy( p_res->value.ptr, ptr, size );
+                else
+                    i_ret = VLC_ENOMEM;
+            }
             break;
         case SQL_NULL:
         default:
@@ -719,4 +738,18 @@ static int GetColumnTypeFromStatement( sql_t* p_sql, sql_stmt_t* p_stmt, int i_c
     }
     vlc_mutex_unlock( &p_sql->p_sys->lock );
     return i_ret;
+}
+
+/**
+ * @brief Get the size of the column in bytes
+ * @param p_sql The SQL object
+ * @param p_stmt The sql statement object
+ * @param i_col The column
+ * @return Size of the column in bytes, undefined for invalid columns
+ */
+static int GetColumnSize( sql_t* p_sql, sql_stmt_t* p_stmt, int i_col )
+{
+    assert( p_sql->p_sys->db );
+    assert( p_stmt->p_sqlitestmt );
+    return sqlite3_column_bytes( p_stmt->p_sqlitestmt, i_col );
 }

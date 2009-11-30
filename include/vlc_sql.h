@@ -136,6 +136,9 @@ struct sql_t
     /** Get the data from a specified column */
     int (*pf_getcolumn) ( sql_t* p_sql, sql_stmt_t* p_stmt, int i_col,
                           int type, sql_value_t *p_res );
+
+    /** Get column size of a specified column */
+    int (*pf_getcolumnsize) ( sql_t* p_sql, sql_stmt_t* p_stmt, int i_col );
 };
 
 /*****************************************************************************
@@ -555,6 +558,19 @@ static inline int sql_GetColumnBlob( sql_t* p_sql, sql_stmt_t* p_stmt,
     if( i_ret == VLC_SUCCESS )
         *pp_res = tmp.value.ptr;
     return i_ret;
+}
+
+/**
+ * @brief Get the size of the column in bytes
+ * @param p_sql The SQL object
+ * @param p_stmt The sql statement object
+ * @param i_col The column
+ * @return Size of the column in bytes, excluding the zero terminator
+ */
+static inline int sql_GetColumnSize( sql_t* p_sql, sql_stmt_t* p_stmt,
+        int i_col )
+{
+    return p_sql->pf_getcolumnsize( p_sql, p_stmt, i_col );
 }
 
 # ifdef __cplusplus
