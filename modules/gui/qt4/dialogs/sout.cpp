@@ -146,7 +146,7 @@ void SoutDialog::addDest( )
         case 0:
             {
                 FileDestBox *fdb = new FileDestBox( this );
-                index = ui.destTab->addTab( fdb, "File" );
+                index = ui.destTab->addTab( fdb, qtr( "File" ) );
                 CONNECT( fdb, mrlUpdated(), this, updateMRL() );
             }
             break;
