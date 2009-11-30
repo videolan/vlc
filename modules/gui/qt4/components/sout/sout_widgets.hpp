@@ -110,8 +110,6 @@ class RTPDestBox: public VirtualDestBox
     private:
         QLineEdit *RTPEdit;
         QSpinBox *RTPPort;
-        QSpinBox *RTPPortVideo;
-        QSpinBox *RTPPortAudio;
 };
 
 class ICEDestBox: public VirtualDestBox

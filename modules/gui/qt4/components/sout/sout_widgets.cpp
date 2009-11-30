@@ -275,7 +275,7 @@ RTPDestBox::RTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     layout->addWidget(rtpOutput, 0, 0, 1, -1);
 
     QLabel *RTPLabel = new QLabel( qtr("Address"), this );
-    QLabel *RTPPortLabel = new QLabel( qtr("Port"), this );
+    QLabel *RTPPortLabel = new QLabel( qtr("Base port"), this );
     layout->addWidget(RTPLabel, 1, 0, 1, 1);
     layout->addWidget(RTPPortLabel, 2, 0, 1, 1);
 
@@ -288,34 +288,10 @@ RTPDestBox::RTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     RTPPort->setMaximum(65535);
     RTPPort->setValue(5004);
 
-    RTPPortAudio = new QSpinBox(this);
-    RTPPortAudio->setMaximumSize(QSize(90, 16777215));
-    RTPPortAudio->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-    RTPPortAudio->setMinimum(-1);
-    RTPPortAudio->setMaximum(65535);
-    RTPPortAudio->setValue(-1);
-
-    RTPPortVideo = new QSpinBox(this);
-    RTPPortVideo->setMaximumSize(QSize(90, 16777215));
-    RTPPortVideo->setAlignment(Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter);
-    RTPPortVideo->setMinimum(-1);
-    RTPPortVideo->setMaximum(65535);
-    RTPPortVideo->setValue(-1);
-
     layout->addWidget(RTPEdit, 1, 1, 1, 1);
     layout->addWidget(RTPPort, 2, 1, 1, 1);
 
-    QLabel *RTPPortAudioLabel = new QLabel( qtr("Audio Port"), this );
-    QLabel *RTPPortVideoLabel = new QLabel( qtr("Video Port"), this );
-    layout->addWidget(RTPPortAudioLabel, 3, 0, 1, 1);
-    layout->addWidget(RTPPortAudio, 3, 1, 1, 1);
-    layout->addWidget(RTPPortVideoLabel, 3, 2, 1, 1);
-    layout->addWidget(RTPPortVideo, 3, 3, 1, 1);
-
-
     CS( RTPPort );
-    CS( RTPPortAudio );
-    CS( RTPPortVideo );
     CT( RTPEdit );
 }
 
@@ -329,12 +305,6 @@ QString RTPDestBox::getMRL( const QString& mux )
     m.option( "port", RTPPort->value() );
     if( !mux.isEmpty() )
         m.option( "mux", mux );
-    if( mux.isEmpty() || mux.compare( "ts", Qt::CaseInsensitive ) )
-    {
-
-        m.option( "port-audio", RTPPortAudio->value() );
-        m.option( "port-video", RTPPortVideo->value() );
-    }
     m.end();
 
     return m.getMrl();
