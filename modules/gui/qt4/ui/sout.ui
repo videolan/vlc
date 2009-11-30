@@ -289,17 +289,10 @@
           <string>Miscellaneous Options</string>
          </property>
          <layout class="QGridLayout" name="gridLayout_4">
-          <item row="0" column="0" colspan="3">
+          <item row="0" column="0" colspan="5">
            <widget class="QCheckBox" name="soutAll">
             <property name="text">
              <string>Stream all elementary streams</string>
-            </property>
-           </widget>
-          </item>
-          <item row="0" column="3" rowspan="2" colspan="2">
-           <widget class="QCheckBox" name="soutKeep">
-            <property name="text">
-             <string>Keep stream output open</string>
             </property>
            </widget>
           </item>
