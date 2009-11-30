@@ -105,11 +105,12 @@ class RTPDestBox: public VirtualDestBox
 {
     Q_OBJECT;
     public:
-        RTPDestBox( QWidget *_parent = NULL );
+        RTPDestBox( QWidget *_parent = NULL, const char *mux = NULL );
         virtual QString getMRL( const QString& );
     private:
         QLineEdit *RTPEdit;
         QSpinBox *RTPPort;
+        const char *mux;
 };
 
 class ICEDestBox: public VirtualDestBox

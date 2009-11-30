@@ -265,7 +265,8 @@ QString UDPDestBox::getMRL( const QString& mux )
 
 
 
-RTPDestBox::RTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
+RTPDestBox::RTPDestBox( QWidget *_parent, const char *_mux )
+    : VirtualDestBox( _parent ), mux( _mux )
 {
     QGridLayout *layout = new QGridLayout( this );
 
@@ -295,7 +296,7 @@ RTPDestBox::RTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     CT( RTPEdit );
 }
 
-QString RTPDestBox::getMRL( const QString& mux )
+QString RTPDestBox::getMRL( const QString& )
 {
     if( RTPEdit->text().isEmpty() ) return "";
 
@@ -303,8 +304,8 @@ QString RTPDestBox::getMRL( const QString& mux )
     m.begin( "rtp" );
     m.option( "dst", RTPEdit->text() );
     m.option( "port", RTPPort->value() );
-    if( !mux.isEmpty() )
-        m.option( "mux", mux );
+    if( mux != NULL )
+        m.option( "mux", qfu( mux ) );
     m.end();
 
     return m.getMrl();
