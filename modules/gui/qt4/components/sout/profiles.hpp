@@ -1,5 +1,5 @@
-/* Increase this value if you add a new profile */
-#define NB_PROFILE 12
+#define NB_PROFILE \
+    (sizeof(video_profile_value_list)/sizeof(video_profile_value_list[0]))
 
 static const char *const video_profile_name_list[] = {
     "Video - H.264 + AAC (TS)",
