@@ -1,7 +1,7 @@
 #define NB_PROFILE \
     (sizeof(video_profile_value_list)/sizeof(video_profile_value_list[0]))
 
-static const char *const video_profile_name_list[] = {
+static const char video_profile_name_list[][32] = {
     "Video - H.264 + AAC (TS)",
     "Video - Dirac + AAC (TS)",
     "Video - Theora + Vorbis (OGG)",
@@ -16,7 +16,7 @@ static const char *const video_profile_name_list[] = {
     "Audio - FLAC",
 };
 
-static const char *const video_profile_value_list[] = {
+static const char video_profile_value_list[][48] = {
     /* Container(string), transcode video(bool), transcode audio(bool), */
     /* use subtitles(bool), video codec(string), video bitrate(integer), */
     /* scale(float), fps(float), width(integer, height(integer), */
