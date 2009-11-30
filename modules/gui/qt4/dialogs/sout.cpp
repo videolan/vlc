@@ -73,9 +73,9 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
 
     ui.destBox->addItem( qtr( "File" ) );
     ui.destBox->addItem( "HTTP" );
-    ui.destBox->addItem( "MMS" );
-    ui.destBox->addItem( "UDP" );
-    ui.destBox->addItem( "RTP" );
+    ui.destBox->addItem( "MS-WMSP (MMSH)" );
+    ui.destBox->addItem( "RTP / Transport Stream" );
+    ui.destBox->addItem( "UDP (legacy)" );
     ui.destBox->addItem( "IceCast" );
 
     BUTTONACT( ui.addButton, addDest() );
@@ -160,22 +160,22 @@ void SoutDialog::addDest( )
         case 2:
             {
                 MMSHDestBox *mdb = new MMSHDestBox( this );
-                index = ui.destTab->addTab( mdb, "MMSH" );
+                index = ui.destTab->addTab( mdb, "WMSP" );
                 CONNECT( mdb, mrlUpdated(), this, updateMRL() );
             }
             break;
         case 3:
             {
-                UDPDestBox *udb = new UDPDestBox( this );
-                index = ui.destTab->addTab( udb, "UDP" );
-                CONNECT( udb, mrlUpdated(), this, updateMRL() );
+                RTPDestBox *rdb = new RTPDestBox( this );
+                index = ui.destTab->addTab( rdb, "RTP/TS" );
+                CONNECT( rdb, mrlUpdated(), this, updateMRL() );
             }
             break;
         case 4:
             {
-                RTPDestBox *rdb = new RTPDestBox( this );
-                index = ui.destTab->addTab( rdb, "RTP" );
-                CONNECT( rdb, mrlUpdated(), this, updateMRL() );
+                UDPDestBox *udb = new UDPDestBox( this );
+                index = ui.destTab->addTab( udb, "UDP" );
+                CONNECT( udb, mrlUpdated(), this, updateMRL() );
             }
             break;
         case 5:
