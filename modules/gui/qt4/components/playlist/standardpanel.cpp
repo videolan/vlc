@@ -76,10 +76,10 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
 
     getSettings()->beginGroup("Playlist");
-    if( getSettings()->contains( "headerState" ) )
+    if( getSettings()->contains( "headerStateV2" ) )
     {
         view->header()->restoreState(
-                getSettings()->value( "headerState" ).toByteArray() );
+                getSettings()->value( "headerStateV2" ).toByteArray() );
     }
     else
     {
@@ -356,7 +356,7 @@ void StandardPLPanel::deleteSelection()
 StandardPLPanel::~StandardPLPanel()
 {
     getSettings()->beginGroup("Playlist");
-    getSettings()->setValue( "headerState", view->header()->saveState() );
+    getSettings()->setValue( "headerStateV2", view->header()->saveState() );
     getSettings()->endGroup();
 }
 
