@@ -71,7 +71,7 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
 
         volumeControlWidget = new QFrame;
         subLayout = new QVBoxLayout( volumeControlWidget );
-        subLayout->setLayoutMargins( 4, 4, 4, 4, 4 );
+        subLayout->setContentsMargins( 4, 4, 4, 4 );
         volumeMenu = new QMenu( this );
 
         QWidgetAction *widgetAction = new QWidgetAction( volumeControlWidget );

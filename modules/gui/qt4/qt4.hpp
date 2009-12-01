@@ -115,8 +115,6 @@ struct intf_sys_t
 #define TOGGLEV( x ) { if( x->isVisible() ) x->hide();          \
             else  x->show(); }
 
-#define setLayoutMargins( a, b, c, d, e) setContentsMargins( a, b, c, d )
-
 #define getSettings() p_intf->p_sys->mainSettings
 
 static inline QString QVLCUserDir( vlc_userdir_t type )

@@ -43,7 +43,7 @@ ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     setWindowRole( "vlc-extended" );
 
     QGridLayout *layout = new QGridLayout( this );
-    layout->setLayoutMargins( 0, 2, 0, 1, 1 );
+    layout->setContentsMargins( 0, 2, 0, 1 );
     layout->setSpacing( 3 );
 
     mainTabW = new QTabWidget( this );

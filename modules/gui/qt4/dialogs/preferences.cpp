@@ -107,7 +107,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
 
     /* Margins */
     tree_panel_l->setMargin( 1 );
-    main_panel_l->setLayoutMargins( 6, 0, 0, 3, 3 );
+    main_panel_l->setContentsMargins( 6, 0, 0, 3 );
 
     b_small = (p_intf->p_sys->i_screenHeight < 750);
     if( b_small ) msg_Dbg( p_intf, "Small");
