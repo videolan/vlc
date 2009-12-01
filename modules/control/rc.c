@@ -1637,7 +1637,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( !strcmp( psz_cmd, "snapshot" ) )
     {
-        i_error = var_SetBool( p_vout, psz_variable, true );
+        var_TriggerCallback( p_vout, psz_variable );
     }
     else
     {
