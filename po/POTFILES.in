@@ -437,9 +437,6 @@ modules/codec/twolame.c
 modules/codec/vorbis.c
 modules/codec/wmafixed/wma.c
 modules/codec/x264.c
-modules/codec/xvmc/accel_xvmc.h
-modules/codec/xvmc/mpeg2_internal.h
-modules/codec/xvmc/xxmc.c
 modules/codec/zvbi.c
 modules/control/dbus.c
 modules/control/dbus.h
@@ -1236,7 +1233,6 @@ modules/video_output/vmem.c
 modules/video_output/x11/glx.c
 modules/video_output/x11/xcommon.c
 modules/video_output/x11/xcommon.h
-modules/video_output/x11/xvmc.c
 modules/video_output/xcb/window.c
 modules/video_output/xcb/x11.c
 modules/video_output/xcb/xvideo.c
