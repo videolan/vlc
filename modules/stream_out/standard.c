@@ -182,6 +182,8 @@ static int Open( vlc_object_t *p_this )
 
     const char          *psz_mux_byext = NULL;
 
+    (void)p_stream->psz_object_name;
+
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                    p_stream->p_cfg );
 

@@ -245,10 +245,29 @@ void SoutDialog::updateMRL()
 
     mrl = smrl.getMrl();
 
-    /* FIXME, deal with SAP
-    sout.b_sap = ui.sap->isChecked();
-    sout.psz_group = strdup( qtu( ui.sapGroup->text() ) );
-    sout.psz_name = strdup( qtu( ui.sapName->text() ) ); */
+    if( ui.sap->isChecked() )
+    {
+        QString group = ui.sapGroup->text();
+        QString name = ui.sapName->text();
+
+        /* FIXME: This sucks. We should really return a QStringList instead of
+         * (mis)quoting, concatainating and split input item paramters. */
+        name = name.replace( " ", " " );
+        group = group.replace( " ", " " );
+
+        /* We need to add options for both standard and rtp targets */
+        /* This is inelegant but simple and functional */
+        mrl.append( qfu( " :sout-rtp-sap" ) );
+        mrl.append( qfu( " :sout-rtp-name=" ) + name );
+        mrl.append( qfu( " :sout-standard-sap" ) );
+        mrl.append( qfu( " :sout-standard-name=" ) + name );
+        mrl.append( qfu( " :sout-standard-group=" ) + group );
+    }
+    else
+    {
+        mrl.append( qfu( " :no-sout-rtp-sap" ) );
+        mrl.append( qfu( " :no-sout-standard-sap" ) );
+    }
 
     if( ui.soutAll->isChecked() )  mrl.append( " :sout-all" );
 
