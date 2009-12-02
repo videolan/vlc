@@ -1154,6 +1154,7 @@ static void* DirectSoundThread( vlc_object_t *p_this )
     while( vlc_object_alive (p_notif) )
     {
         long l_read, l_free_slots;
+        unsigned i_frame_siz = p_aout->output.i_nb_samples;
         mtime_t mtime = mdate();
         int i;
 
@@ -1178,27 +1179,28 @@ static void* DirectSoundThread( vlc_object_t *p_this )
         last_time = mtime;
 
         /* Try to fill in as many frame buffers as possible */
-        l_read /= p_aout->output.output.i_bytes_per_frame;
-        l_queued = p_notif->i_write_slot * FRAME_SIZE - l_read;
-        if( l_queued < 0 ) l_queued += (FRAME_SIZE * FRAMES_NUM);
-        l_free_slots = (FRAMES_NUM * FRAME_SIZE - l_queued) / FRAME_SIZE;
+        l_read /= (p_aout->output.output.i_bytes_per_frame /
+            p_aout->output.output.i_frame_length);
+        l_queued = p_notif->i_write_slot * i_frame_siz - l_read;
+        if( l_queued < 0 ) l_queued += (i_frame_siz * FRAMES_NUM);
+        l_free_slots = (FRAMES_NUM * i_frame_siz - l_queued) / i_frame_siz;
 
         for( i = 0; i < l_free_slots; i++ )
         {
             aout_buffer_t *p_buffer = aout_OutputNextBuffer( p_aout,
-                mtime + INT64_C(1000000) * (i * FRAME_SIZE + l_queued) /
+                mtime + INT64_C(1000000) * (i * i_frame_siz + l_queued) /
                 p_aout->output.output.i_rate, b_sleek );
 
             /* If there is no audio data available and we have some buffered
              * already, then just wait for the next time */
-            if( !p_buffer && (i || l_queued / FRAME_SIZE) ) break;
+            if( !p_buffer && (i || l_queued / i_frame_siz) ) break;
 
             if( FillBuffer( p_aout, p_notif->i_write_slot % FRAMES_NUM,
                             p_buffer ) != VLC_SUCCESS ) break;
         }
 
         /* Sleep a reasonable amount of time */
-        l_queued += (i * FRAME_SIZE);
+        l_queued += (i * i_frame_siz);
         msleep( INT64_C(1000000) * l_queued / p_aout->output.output.i_rate / 2 );
     }
 
