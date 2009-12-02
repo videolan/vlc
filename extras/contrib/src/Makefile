@@ -2354,7 +2354,8 @@ ncurses: ncurses-$(NCURSES_VERSION).tar.gz
 	$(EXTRACT_GZ)
 
 .ncurses: ncurses
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --without-debug --enable-widec --without-develop --without-shared && make && make install)
+	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=/usr --without-debug --enable-widec --without-develop --without-shared && make -C ncurses && make -C include && make -C ncurses DESTDIR=$(PREFIX) install && make -C include DESTDIR=$(PREFIX) install)
+	(cp -R $(PREFIX)/usr/* $(PREFIX) && rm -rf $(PREFIX)/usr)
 	touch $@
 
 CLEAN_FILE += .ncurses
