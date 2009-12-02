@@ -1591,7 +1591,7 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         playlist_CurrentInput( p_intf->p_sys->p_playlist );
     vout_thread_t * p_vout;
     const char * psz_variable = NULL;
-    int i_error;
+    int i_error = VLC_SUCCESS;
 
     if( !p_input )
         return VLC_ENOOBJ;
@@ -1705,8 +1705,6 @@ static int VideoConfig( vlc_object_t *p_this, char const *psz_cmd,
         msg_rc( "+----[ end of %s ]", val_name.psz_string );
 
         free( val_name.psz_string );
-
-        i_error = VLC_SUCCESS;
     }
     vlc_object_release( p_vout );
     return i_error;
