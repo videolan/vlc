@@ -1,0 +1,93 @@
+diff -ruN libprojectM/Renderer/TextureManager.cpp libprojectM.new/Renderer/TextureManager.cpp
+--- libprojectM/Renderer/TextureManager.cpp	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new/Renderer/TextureManager.cpp	2009-12-03 23:28:44.000000000 +0100
+@@ -59,7 +59,7 @@
+ 	ilLoadL(IL_TYPE_UNKNOWN,(ILvoid*) M_data, M_bytes);
+ 	GLuint tex = ilutGLBindTexImage();
+ #else
+-	 uint tex = SOIL_load_OGL_texture_from_memory(
++	 unsigned int tex = SOIL_load_OGL_texture_from_memory(
+ 					  M_data,
+ 					  M_bytes,
+ 					  SOIL_LOAD_AUTO,
+@@ -173,7 +173,7 @@
+ #else
+        int width, height;
+ 
+-       uint tex = SOIL_load_OGL_texture_size(
++       unsigned int tex = SOIL_load_OGL_texture_size(
+     		   imageURL.c_str(),
+ 					  SOIL_LOAD_AUTO,
+ 					  SOIL_CREATE_NEW_ID,
+diff -ruN libprojectM/win32-dirent.h libprojectM.new/win32-dirent.h
+--- libprojectM/win32-dirent.h	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new/win32-dirent.h	2009-12-03 23:29:13.000000000 +0100
+@@ -19,7 +19,7 @@
+ 
+ typedef struct DIR DIR;
+ 
+-static int errno;
++//static int errno;
+ 
+ struct dirent
+ {
+diff -ruN libprojectM/PresetLoader.hpp libprojectM.new2/PresetLoader.hpp
+--- libprojectM/PresetLoader.hpp	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new2/PresetLoader.hpp	2009-12-04 00:29:20.000000000 +0100
+@@ -6,7 +6,7 @@
+ #include <sys/types.h>
+ 
+ #ifdef WIN32
+-#include "win32-dirent.h"
++#include <dirent.h>
+ #endif
+ 
+ #ifdef LINUX
+diff -ruN libprojectM/projectM.cpp libprojectM.new2/projectM.cpp
+--- libprojectM/projectM.cpp	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new2/projectM.cpp	2009-12-04 00:28:29.000000000 +0100
+@@ -24,9 +24,6 @@
+ #include "fatal.h"
+ #include "Common.hpp"
+ 
+-#ifdef WIN32
+-#include "win32-dirent.h"
+-#endif
+ 
+ #include "timer.h"
+ #include <iostream>
+diff -ruN libprojectM/projectM.hpp libprojectM.new2/projectM.hpp
+--- libprojectM/projectM.hpp	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new2/projectM.hpp	2009-12-04 00:28:22.000000000 +0100
+@@ -29,11 +29,7 @@
+ #ifndef _PROJECTM_HPP
+ #define _PROJECTM_HPP
+ 
+-#ifdef WIN32
+-#include "win32-dirent.h"
+-#else
+ #include <dirent.h>
+-#endif /** WIN32 */
+ #include <cmath>
+ #include <cstdio>
+ #include <string>
+
+--- libprojectM/CMakeLists.txt	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new/CMakeLists.txt	2009-12-04 00:34:12.000000000 +0100
+@@ -121,15 +121,13 @@
+ 
+ SET_TARGET_PROPERTIES(projectM PROPERTIES VERSION 2.00 SOVERSION 2)
+ 
+-ADD_DEFINITIONS(-DUSE_THREADS)
+-
+ if (APPLE)
+ ADD_DEFINITIONS(-DMACOS -DSTBI_NO_DDS -DUSE_THREADS)
+ set(RESOURCE_PREFIX "Resources")
+ else (APPLE)
+ if (WIN32)
+ set (RESOURCE_PREFIX "Resources")
+-ADD_DEFINITIONS(-DWIN32 -DSTBI_NO_DDS -DUSE_THREADS)
++ADD_DEFINITIONS(-DWIN32 -DSTBI_NO_DDS )
+ else(WIN32)
+ set (RESOURCE_PREFIX "share/projectM")
+ ADD_DEFINITIONS(-DLINUX -DSTBI_NO_DDS -DUSE_THREADS)
