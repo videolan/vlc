@@ -57,7 +57,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
     wchar_t psz_wpath[MAX_PATH];
     if( GetModuleFileName( NULL, psz_wpath, MAX_PATH ) )
     {
-        WideCharToMultiByte( CP_ACP, 0, psz_wpath, -1,
+        WideCharToMultiByte( CP_UTF8, 0, psz_wpath, -1,
                              psz_path, MAX_PATH, NULL, NULL );
     }
     else psz_path[0] = '\0';
