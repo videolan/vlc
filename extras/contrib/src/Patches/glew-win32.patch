@@ -1,0 +1,77 @@
+--- glew/Makefile	2008-11-03 07:25:21.000000000 +0100
++++ glew.new/Makefile	2009-12-03 22:30:47.000000000 +0100
+@@ -31,7 +31,7 @@
+ include config/version
+ 
+ SHELL = /bin/sh
+-SYSTEM = $(shell config/config.guess | cut -d - -f 3 | sed -e 's/[0-9\.]//g;')
++SYSTEM = mingw
+ SYSTEM.SUPPORTED = $(shell test -f config/Makefile.$(SYSTEM) && echo 1)
+ 
+ ifeq ($(SYSTEM.SUPPORTED), 1)
+@@ -48,9 +48,7 @@
+ TARDIR = ../glew-$(GLEW_VERSION)
+ TARBALL = ../glew_$(GLEW_VERSION).tar.gz
+ 
+-AR = ar
+ INSTALL = install
+-STRIP = strip
+ RM = rm -f
+ LN = ln -sf
+ ifeq ($(MAKECMDGOALS), debug)
+@@ -75,7 +73,7 @@
+ VISUALINFO.BIN.OBJS = $(VISUALINFO_BIN.SRCS:.c=.o)
+ BIN.LIBS = -Llib $(LDFLAGS.DYNAMIC) -l$(NAME) $(LDFLAGS.EXTRA) $(LDFLAGS.GL)
+ 
+-all debug: lib/$(LIB.SHARED) lib/$(LIB.STATIC) bin/$(GLEWINFO.BIN) bin/$(VISUALINFO.BIN)
++all debug: lib/$(LIB.SHARED) lib/$(LIB.STATIC)
+ 
+ lib:
+ 	mkdir lib
+@@ -112,27 +110,17 @@
+ 	$(INSTALL) -d -m 0755 $(INCDIR)
+ 	$(INSTALL) -d -m 0755 $(LIBDIR)
+ # runtime
+-ifeq ($(patsubst mingw%,mingw,$(SYSTEM)), mingw)
+-	$(STRIP) -x lib/$(LIB.SHARED)
+-	$(INSTALL) -m 0644 lib/$(LIB.SHARED) $(BINDIR)/
+-else
+ 	$(STRIP) -x lib/$(LIB.SHARED)
+ 	$(INSTALL) -m 0644 lib/$(LIB.SHARED) $(LIBDIR)/
+ 	$(LN) $(LIB.SHARED) $(LIBDIR)/$(LIB.SONAME)
+-endif
+ # development files
+ 	$(INSTALL) -m 0644 include/GL/wglew.h $(INCDIR)/
+ 	$(INSTALL) -m 0644 include/GL/glew.h $(INCDIR)/
+ 	$(INSTALL) -m 0644 include/GL/glxew.h $(INCDIR)/
+-ifeq ($(patsubst mingw%,mingw,$(SYSTEM)), mingw)
+-	$(INSTALL) -m 0644 lib/$(LIB.DEVLNK) $(LIBDIR)/
+-else
+-	strip -x lib/$(LIB.STATIC)
++	$(STRIP) -x lib/$(LIB.STATIC)
+ 	$(INSTALL) -m 0644 lib/$(LIB.STATIC) $(LIBDIR)/
+ 	$(LN) $(LIB.SHARED) $(LIBDIR)/$(LIB.DEVLNK)
+-endif
+ # utilities
+-	$(INSTALL) -s -m 0755 bin/$(GLEWINFO.BIN) bin/$(VISUALINFO.BIN) $(BINDIR)/
+ 
+ uninstall:
+ 	$(RM) $(INCDIR)/wglew.h
+--- glew/config/Makefile.mingw	2008-11-03 07:25:20.000000000 +0100
++++ glew.new/config/Makefile.mingw	2009-12-03 22:18:32.000000000 +0100
+@@ -1,13 +1,11 @@
+ NAME = glew32
+-CC = gcc
+ # use gcc for linking, with ld it does not work
+-LD = gcc
+ ifneq (undefined, $(origin GLEW_MX))
+ CFLAGS.EXTRA = -DGLEW_MX
+ endif
+-CFLAGS.SO = -DGLEW_BUILD
++CFLAGS.SO = -DGLEW_BUILD -DSTATIC
+ #LDFLAGS.SO = -shared -soname $(LIB.SONAME) --out-implib lib/$(LIB.DEVLNK)
+-LDFLAGS.SO = -shared -Wl,-soname,$(LIB.SONAME) -Wl,--out-implib,lib/$(LIB.DEVLNK)
++#LDFLAGS.SO = -shared -Wl,-soname,$(LIB.SONAME) -Wl,--out-implib,lib/$(LIB.DEVLNK)
+ LDFLAGS.GL = -lglu32 -lopengl32 -lgdi32 -luser32 -lkernel32
+ LDFLAGS.EXTRA = -L/mingw/lib
+ WARN = -Wall -W

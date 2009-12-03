@@ -2510,6 +2510,25 @@ CLEAN_PKG += gsm
 DISTCLEAN_PKG += gsm-$(GSM_VERSION).tar.gz
 
 # ***************************************************************************
+### GLEW 
+# ***************************************************************************
+glew-$(GLEW_VERSION)-src.tgz:
+	$(WGET) $(GLEW_URL)
+
+glew: glew-$(GLEW_VERSION)-src.tgz
+	$(EXTRACT_GZ)
+	(patch -p0 < Patches/glew-win32.patch)
+
+.glew: glew
+	(cd $<; $(HOSTCC) make && $(HOSTCC) GLEW_DEST=$(PREFIX) make install)
+	touch $@
+
+CLEAN_FILE += .glew
+CLEAN_PKG += glew
+DISTCLEAN_PKG += glew-$(GLEW_VERSION)-src.tgz
+
+
+# ***************************************************************************
 # projectM
 # ***************************************************************************
 libprojectM-$(LIBPROJECTM_VERSION)-Source.tar.gz:
