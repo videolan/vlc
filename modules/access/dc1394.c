@@ -65,12 +65,12 @@ static void Close( vlc_object_t * );
 static void OpenAudioDev( demux_t *p_demux );
 static inline void CloseAudioDev( demux_t *p_demux );
 
-vlc_module_begin ()
+vlc_module_begin()
     set_description( N_("dc1394 input") )
     set_capability( "access_demux", 10 )
     add_shortcut( "dc1394" )
     set_callbacks( Open, Close )
-vlc_module_end ()
+vlc_module_end()
 
 struct demux_sys_t
 {
@@ -104,9 +104,6 @@ struct demux_sys_t
     int                 i_audio_max_frame_size;
     int                 fd_audio;
     char                *audio_device;
-#define NO_ROTATION 0
-#define ROTATION_LEFT 1
-#define ROTATION_RIGHT 2
     es_out_id_t         *p_es_audio;
 };
 
@@ -237,7 +234,6 @@ static int Open( vlc_object_t *p_this )
                           "(MRL was: %s)",
                           p_demux->psz_path );
         free( p_sys );
-        p_demux->p_sys = NULL;
         return VLC_EGENERIC;
     }
 
@@ -245,8 +241,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys->p_dccontext )
     {
         msg_Err( p_demux, "Failed to initialise libdc1394");
-        free(p_demux->p_sys);
-        p_demux->p_sys = NULL;
+        free( p_sys );
         return VLC_EGENERIC;
     }
 
@@ -254,7 +249,6 @@ static int Open( vlc_object_t *p_this )
     {
         dc1394_free( p_sys->p_dccontext );
         free( p_sys );
-        p_demux->p_sys = NULL;
         return VLC_EGENERIC;
     }
 
@@ -263,7 +257,6 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_demux, "No camera found !!" );
         dc1394_free( p_sys->p_dccontext );
         free( p_sys );
-        p_demux->p_sys = NULL;
         return VLC_EGENERIC;
     }
 
@@ -493,14 +486,10 @@ static void OpenAudioDev( demux_t *p_demux )
 
 static inline void CloseAudioDev( demux_t *p_demux )
 {
-    demux_sys_t *p_sys = NULL;
+    demux_sys_t *p_sys = p_demux->p_sys;
 
-    if( p_demux )
-    {
-        p_sys = p_demux->p_sys;
-        if( p_sys->fd_audio >= 0 )
-            close( p_sys->fd_audio );
-    }
+    if( p_sys->fd_audio >= 0 )
+        close( p_sys->fd_audio );
 }
 
 /*****************************************************************************
@@ -524,9 +513,7 @@ static void Close( vlc_object_t *p_this )
     dc1394_camera_free(p_sys->camera);
     dc1394_free(p_sys->p_dccontext);
 
-    if( p_sys->audio_device )
-        free( p_sys->audio_device );
-
+    free( p_sys->audio_device );
     free( p_sys );
 }
 
@@ -716,9 +703,6 @@ static int process_options( demux_t *p_demux )
     const char *in_size = NULL;
     const char *in_fmt = NULL;
     float rate_f;
-
-    if( strncmp(p_demux->psz_access, "dc1394", 6) != 0 )
-        return VLC_EGENERIC;
 
     psz_dup = strdup( p_demux->psz_path );
     psz_parser = psz_dup;
