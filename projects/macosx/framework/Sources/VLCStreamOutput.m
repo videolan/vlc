@@ -44,17 +44,20 @@
 }
 + (id)rtpBroadcastStreamOutputWithSAPAnnounce:(NSString *)announceName
 {
-    return [self streamOutputWithOptionDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
+    NSString *name = [announceName copy];
+    id output = [self streamOutputWithOptionDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
                                             [NSDictionary dictionaryWithObjectsAndKeys:
                                                 @"ts", @"muxer",
                                                 @"file", @"access",
                                                 @"sap", @"sdp",
-                                                [announceName copy], @"name",
+                                                name, @"name",
                                                 @"239.255.1.1", @"destination", nil
                                             ], @"rtpOptions",
                                             nil
                                             ]
                                         ];
+    [name release];
+    return output;
 }
 
 + (id)rtpBroadcastStreamOutput
