@@ -188,7 +188,7 @@ rm -rf "$RPM_BUILD_ROOT"
 %files
 %defattr(-,root,root)
 %doc %{_datadir}/doc/vlc/
-%doc NEWS AUTHORS COPYING HACKING THANKS MAINTAINERS README ChangeLog
+%doc NEWS AUTHORS COPYING HACKING THANKS README ChangeLog
 %{_datadir}/vlc/
 %{_bindir}/*vlc
 %{_bindir}/vlc-config

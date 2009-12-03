@@ -1236,7 +1236,7 @@ strfile %buildroot%_gamesdatadir/fortune/vlc %buildroot%_gamesdatadir/fortune/vl
 %dir %_vlc_pluginsdir/meta_engine
 %_vlc_pluginsdir/meta_engine/libfolder_plugin.so*
 
-%doc AUTHORS README MAINTAINERS NEWS THANKS
+%doc AUTHORS README NEWS THANKS
 
 %files interface-ncurses
 %_vlc_pluginsdir/gui/libncurses_plugin.so*

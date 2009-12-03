@@ -706,7 +706,7 @@ package-win-common:
 	cp "$(top_builddir)/src/.libs/libvlc$(LIBEXT)" "$(win32_destdir)/"
 
 # Copy Text files
-	for file in AUTHORS MAINTAINERS THANKS ; \
+	for file in AUTHORS THANKS ; \
 	  do sed 's/@/_AT_/' < "$(srcdir)/$$file" > "$(win32_destdir)/$${file}.txt" ; done;
 	for file in NEWS COPYING README; \
 	  do cp "$(srcdir)/$$file" "$(win32_destdir)/$${file}.txt"; done

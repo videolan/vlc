@@ -536,7 +536,7 @@ rm -rf $RPM_BUILD_ROOT __doc
 
 %files -f %{name}.lang
 %defattr(-,root,root,-)
-%doc AUTHORS COPYING ChangeLog MAINTAINERS NEWS README THANKS __doc/*
+%doc AUTHORS COPYING ChangeLog NEWS README THANKS __doc/*
 %{_bindir}/vlc
 %{_bindir}/svlc
 %{_datadir}/vlc/
