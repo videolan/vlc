@@ -69,7 +69,7 @@
 {
     return [self streamOutputWithOptionDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
                                             [NSDictionary dictionaryWithObjectsAndKeys:
-                                                @"mp4v", @"videoCodec",
+                                                @"h264", @"videoCodec",
                                                 @"1024",  @"videoBitrate",
                                                 @"mp4a", @"audioCodec",
                                                 @"192", @"audioBitrate",
