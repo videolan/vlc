@@ -54,6 +54,7 @@ struct aout_sys_t
     jack_port_t   **p_jack_ports;
     jack_sample_t **p_jack_buffers;
     unsigned int    i_channels;
+    jack_nframes_t latency;
 };
 
 /*****************************************************************************
@@ -63,6 +64,7 @@ static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 static void Play         ( aout_instance_t * );
 static int  Process      ( jack_nframes_t i_frames, void *p_arg );
+static int  GraphChange  ( void *p_arg );
 
 #define AUTO_CONNECT_OPTION "jack-auto-connect"
 #define AUTO_CONNECT_TEXT N_("Automatically connect to writable clients")
@@ -112,6 +114,7 @@ static int Open( vlc_object_t *p_this )
         goto error_out;
     }
     p_aout->output.p_sys = p_sys;
+    p_sys->latency = 0;
 
     /* Connect to the JACK server */
     snprintf( psz_name, sizeof(psz_name), "vlc_%d", getpid());
@@ -128,6 +131,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Set the process callback */
     jack_set_process_callback( p_sys->p_jack_client, Process, p_aout );
+    jack_set_graph_order_callback ( p_sys->p_jack_client, GraphChange, p_aout );
 
     p_aout->output.pf_play = Play;
     aout_VolumeSoftInit( p_aout );
@@ -249,9 +253,9 @@ int Process( jack_nframes_t i_frames, void *p_arg )
     struct aout_sys_t *p_sys = p_aout->output.p_sys;
     jack_sample_t *p_src = NULL;
 
-    /* we assume that data we send to jack now will be played one buffer size samples
-       after the start of this jack cycle */
-    jack_nframes_t dframes = i_frames - jack_frames_since_cycle_start( p_sys->p_jack_client );
+    jack_nframes_t dframes = p_sys->latency
+                             - jack_frames_since_cycle_start( p_sys->p_jack_client );
+
     jack_time_t dtime = dframes * 1000 * 1000 / jack_get_sample_rate( p_sys->p_jack_client );
     mtime_t play_date = mdate() + (mtime_t) ( dtime );
 
@@ -299,6 +303,31 @@ int Process( jack_nframes_t i_frames, void *p_arg )
     return 0;
 }
 
+/*****************************************************************************
+ * GraphChange: callback when JACK reorders it's process graph.
+                We update latency information.
+ *****************************************************************************/
+
+static int GraphChange( void *p_arg )
+{
+  aout_instance_t *p_aout = (aout_instance_t*) p_arg;
+  struct aout_sys_t *p_sys = p_aout->output.p_sys;
+  unsigned int i;
+  jack_nframes_t port_latency;
+
+  p_sys->latency = 0;
+
+  for( i = 0; i < p_sys->i_channels; ++i )
+  {
+    port_latency = jack_port_get_total_latency( p_sys->p_jack_client,
+                                                  p_sys->p_jack_ports[i] );
+    p_sys->latency = __MAX( p_sys->latency, port_latency );
+  }
+
+  msg_Dbg(p_aout, "JACK graph reordered. Our maximum latency=%d.", p_sys->latency);
+
+  return 0;
+}
 
 /*****************************************************************************
  * Play: nothing to do
