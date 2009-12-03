@@ -303,6 +303,19 @@ echo "EXTRA_CPPFLAGS = ${EXTRA_CPPFLAGS} -isystem \$(PREFIX)/include" >> config.
 echo "EXTRA_LDFLAGS = ${EXTRA_LDFLAGS}" >> config.mak
 echo "EXTRA_PATH = ${EXTRA_PATH}" >> config.mak
 
+#CMAKE
+if test "$HOST" != "$BUILD"; then
+if test ${DISTRO} = "win32"; then
+echo "SET(CMAKE_SYSTEM_NAME Windows)" >> toolchain.cmake
+fi
+echo "SET(CMAKE_C_COMPILER ${CC})" >> toolchain.cmake
+echo "SET(CMAKE_CXX_COMPILER ${CXX})" >> toolchain.cmake
+echo "SET(CMAKE_FIND_ROOT_PATH  `pwd` )" >> toolchain.cmake
+echo "set(CMAKE_FIND_ROOT_PATH_MODE_PROGRAM NEVER)" >> toolchain.cmake
+echo "set(CMAKE_FIND_ROOT_PATH_MODE_LIBRARY ONLY)" >> toolchain.cmake
+echo "set(CMAKE_FIND_ROOT_PATH_MODE_INCLUDE ONLY)" >> toolchain.cmake
+fi
+
 if wget --version >/dev/null 2>&1; then
     echo "WGET = `which wget` -c --passive" >> config.mak
 elif test -z `curl --version >/dev/null 2>&1`; then
