@@ -2512,20 +2512,17 @@ DISTCLEAN_PKG += gsm-$(GSM_VERSION).tar.gz
 # ***************************************************************************
 # projectM
 # ***************************************************************************
-ifdef SVN
-libprojectM:
-	$(SVN) co $(LIBPROJECTM_SVN) libprojectM
-	patch -d libprojectM -p0 < Patches/libprojectM-fpic.patch
-else
-libprojectM-$(LIBPROJECTM_VERSION).tar.bz2:
+libprojectM-$(LIBPROJECTM_VERSION)-Source.tar.gz:
 	$(WGET) $(LIBPROJECTM_URL)
 
-libprojectM: libprojectM-$(LIBPROJECTM_VERSION).tar.bz2
-	$(EXTRACT_BZ2)
-endif
+libprojectM: libprojectM-$(LIBPROJECTM_VERSION)-Source.tar.gz
+	rm -rf $@ || true
+	gunzip -c $< | tar xf - --exclude='[*?:<>\|]'
+	mv projectM-$(LIBPROJECTM_VERSION)-Source $@ || true
+	cd $@; rm CMakeCache.txt
 
 .libprojectM: libprojectM
-	(cd $</src; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DUSE_FBO:STRING=FALSE -DUSE_FBO:BOOL=OFF -DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF -DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF -DINCLUDE-PROJECTM-QT:BOOL=OFF -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
+	(cd $<; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DUSE_FBO:STRING=FALSE -DUSE_FBO:BOOL=OFF -DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF -DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF -DINCLUDE-PROJECTM-QT:BOOL=OFF -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
 	touch $@
 
 CLEAN_FILE += .libprojectM
