@@ -37,9 +37,7 @@ extern "C" {
 
 #define AOUT_FMTS_IDENTICAL( p_first, p_second ) (                          \
     ((p_first)->i_format == (p_second)->i_format)                           \
-      && ((p_first)->i_rate == (p_second)->i_rate)                          \
-      && ((p_first)->i_physical_channels == (p_second)->i_physical_channels)\
-      && ((p_first)->i_original_channels == (p_second)->i_original_channels) )
+      && AOUT_FMTS_SIMILAR(p_first, p_second) )
 
 /* Check if i_rate == i_rate and i_channels == i_channels */
 #define AOUT_FMTS_SIMILAR( p_first, p_second ) (                            \
