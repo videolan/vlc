@@ -2619,6 +2619,7 @@ regex: regex-$(REGEX_VERSION).tar.gz
 
 .regex: regex
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make subirs= && $(AR) ru libregex.a regex.o && $(RANLIB) libregex.a && cp -v regex.h $(PREFIX)/include && cp -v libregex.a $(PREFIX)/lib )
+	touch $@
 
 CLEAN_FILE += .regex
 CLEAN_PKG += regex
@@ -2635,6 +2636,7 @@ sqlite-$(SQLITE_VERSION): sqlite-amalgamation-$(SQLITE_VERSION).tar.gz
 
 .sqlite3: sqlite-$(SQLITE_VERSION)
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install )
+	touch $@
 
 CLEAN_FILE += .sqlite3
 CLEAN_PKG += sqlite-$(SQLITE_VERSION)
