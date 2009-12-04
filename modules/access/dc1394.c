@@ -122,21 +122,20 @@ static int process_options( demux_t *p_demux);
 static int FindCamera( demux_sys_t *sys, demux_t *p_demux )
 {
     dc1394camera_list_t *list;
+    int i_ret = VLC_EGENERIC;
 
     msg_Dbg( p_demux, "Scanning for ieee1394 ports ..." );
 
     if( dc1394_camera_enumerate (sys->p_dccontext, &list) != DC1394_SUCCESS )
     {
         msg_Err(p_demux, "Can not ennumerate cameras");
-        dc1394_camera_free_list (list);
-        return VLC_EGENERIC;
+        goto end;
     }
 
     if( list->num == 0 )
     {
         msg_Err(p_demux, "Can not find cameras");
-        dc1394_camera_free_list (list);
-        return VLC_EGENERIC;
+        goto end;
     }
 
     sys->num_cameras = list->num;
@@ -159,16 +158,14 @@ static int FindCamera( demux_sys_t *sys, demux_t *p_demux )
         {
             msg_Err( p_demux, "Can't find camera with uid : 0x%llx.",
                      sys->selected_uid );
-            dc1394_camera_free_list (list);
-            return VLC_EGENERIC;
+            goto end;
         }
     }
     else if( sys->selected_camera >= (int)list->num )
     {
         msg_Err( p_demux, "There are not this many cameras. (%d/%d)",
                  sys->selected_camera, sys->num_cameras );
-        dc1394_camera_free_list (list);
-        return VLC_EGENERIC;
+        goto end;
     }
     else if( sys->selected_camera >= 0 )
     {
@@ -181,8 +178,11 @@ static int FindCamera( demux_sys_t *sys, demux_t *p_demux )
                                           list->ids[0].guid);
     }
 
+    i_ret = VLC_SUCCESS;
+
+end:
     dc1394_camera_free_list (list);
-    return VLC_SUCCESS;
+    return i_ret;
 }
 
 /*****************************************************************************
