@@ -618,7 +618,10 @@ static block_t *GrabAudio( demux_t *p_demux )
                    p_sys->i_audio_max_frame_size );
 
     if( i_read <= 0 )
+    {
+        block_Release( p_block );
         return NULL;
+    }
 
     p_block->i_buffer = i_read;
 
