@@ -318,7 +318,8 @@ static int Open( vlc_object_t *p_this )
             msg_Err( p_demux, "Unable to set initial focus to %u",
                      p_sys->focus );
         }
-        msg_Dbg( p_demux, "Initial focus set to %u", p_sys->focus );
+        else
+            msg_Dbg( p_demux, "Initial focus set to %u", p_sys->focus );
     }
 
     if( dc1394_feature_set_value( p_sys->camera,
@@ -328,7 +329,8 @@ static int Open( vlc_object_t *p_this )
         msg_Err( p_demux, "Unable to set initial brightness to %u",
                  p_sys->brightness );
     }
-    msg_Dbg( p_demux, "Initial brightness set to %u", p_sys->brightness );
+    else
+        msg_Dbg( p_demux, "Initial brightness set to %u", p_sys->brightness );
 
     if( dc1394_video_set_framerate( p_sys->camera,
                     p_sys->frame_rate ) != DC1394_SUCCESS )
