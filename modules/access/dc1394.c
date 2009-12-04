@@ -521,6 +521,7 @@ static void Close( vlc_object_t *p_this )
     dc1394_camera_free(p_sys->camera);
     dc1394_free(p_sys->p_dccontext);
 
+    free( p_sys->video_device );
     free( p_sys->audio_device );
     free( p_sys );
 }
@@ -969,5 +970,7 @@ static int process_options( demux_t *p_demux )
         else // YUV422 default
             p_sys->video_mode = DC1394_VIDEO_MODE_640x480_YUV422;
     }
+
+    free( psz_dup );
     return VLC_SUCCESS;
 }
