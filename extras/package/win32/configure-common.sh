@@ -8,7 +8,7 @@
       --enable-twolame \
       --enable-quicktime \
       --enable-real \
-      --enable-avcodec \
+      --enable-avcodec  --enable-merge-ffmpeg \
       --enable-dca \
       --enable-mpc \
       --enable-libass \
