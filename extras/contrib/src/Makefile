@@ -2544,7 +2544,7 @@ libprojectM: libprojectM-$(LIBPROJECTM_VERSION)-Source.tar.gz
 	patch -p0 < Patches/libprojectM-win32.patch
 	cd $@; rm CMakeCache.txt
 
-.libprojectM: libprojectM
+.libprojectM: libprojectM .glew
 	(cd $<; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF -DDISABLE_NATIVE_PRESETS:BOOL=ON -DUSE_FTGL:BOOL=OFF -DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF -DINCLUDE-PROJECTM-QT:BOOL=OFF -DBUILD_PROJECTM_STATIC:BOOL=ON -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
 ifdef HAVE_WIN32
 	(cd $<;cp Renderer/libRenderer.a MilkdropPresetFactory/libMilkdropPresetFactory.a $(PREFIX)/lib)
