@@ -161,6 +161,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_stream->p_sys = p_sys;
 
+    config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
+                       p_stream->p_cfg );
+
     p_sys->time_sync = var_CreateGetBool( p_stream, SOUT_CFG_PREFIX "time-sync" );
 
     psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_VIDEO "prerender-callback" );
