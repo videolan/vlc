@@ -8,5 +8,5 @@ CPPFLAGS="-I/usr/win32/include -I/usr/win32/include/ebml" \
 LDFLAGS="-L/usr/win32/lib" \
 CC=i586-mingw32msvc-gcc CXX=i586-mingw32msvc-g++ \
 CONFIG="${root}configure --host=i586-mingw32msvc --build=i386-linux
- --enable-dirac --enable-mkv --enable-taglib --enable-debug" \
+ --enable-dirac --enable-mkv --enable-taglib --enable-debug --enable-projectm" \
 sh ${root}extras/package/win32/configure-common.sh
