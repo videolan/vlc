@@ -2520,7 +2520,10 @@ glew: glew-$(GLEW_VERSION)-src.tgz
 	(patch -p0 < Patches/glew-win32.patch)
 
 .glew: glew
-	(cd $<; $(HOSTCC) make && $(HOSTCC) GLEW_DEST=$(PREFIX) make install)
+	(cd $<; $(HOSTCC) CFLAGS="$(CFLAGS) -DGLEW_STATIC" make && $(HOSTCC) GLEW_DEST=$(PREFIX) make install)
+ifdef HAVE_WIN32
+	rm -rf $(PREFIX)/lib/libglew32.dll*
+endif
 	touch $@
 
 CLEAN_FILE += .glew
@@ -2542,7 +2545,10 @@ libprojectM: libprojectM-$(LIBPROJECTM_VERSION)-Source.tar.gz
 	cd $@; rm CMakeCache.txt
 
 .libprojectM: libprojectM
-	(cd $<; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF -DDISABLE_NATIVE_PRESETS:BOOL=ON -DUSE_FTGL:BOOL=OFF -DUSE_NATIVE_GLEW:BOOL=ON -DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF -DINCLUDE-PROJECTM-QT:BOOL=OFF -DBUILD_PROJECTM_STATIC:BOOL=ON -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
+	(cd $<; $(HOSTCC) CPPFLAGS="$(CPPFLAGS)" cmake . -DCMAKE_TOOLCHAIN_FILE=../../toolchain.cmake -DINCLUDE-PROJECTM-LIBVISUAL:BOOL=OFF -DDISABLE_NATIVE_PRESETS:BOOL=ON -DUSE_FTGL:BOOL=OFF -DINCLUDE-PROJECTM-PULSEAUDIO:BOOL=OFF -DINCLUDE-PROJECTM-QT:BOOL=OFF -DBUILD_PROJECTM_STATIC:BOOL=ON -DCMAKE_INSTALL_PREFIX=$(PREFIX) && make install)
+ifdef HAVE_WIN32
+	(cd $<;cp Renderer/libRenderer.a MilkdropPresetFactory/libMilkdropPresetFactory.a $(PREFIX)/lib)
+endif
 	touch $@
 
 CLEAN_FILE += .libprojectM
