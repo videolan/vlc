@@ -2958,7 +2958,7 @@ AS_IF([test "${enable_id3tag}" = "yes"], [
 ])
 
 AC_ARG_ENABLE(merge-ffmpeg,
-[  --enable-merged-ffmpeg  merge FFmpeg-based plugins (default disabled)],, [
+[  --enable-merge-ffmpeg  merge FFmpeg-based plugins (default disabled)],, [
   enable_merge_ffmpeg="no"
 ])
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
