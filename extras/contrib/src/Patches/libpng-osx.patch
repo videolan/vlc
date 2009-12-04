@@ -1,14 +1,14 @@
-diff -ruN libpng-1.2.30/scripts/makefile.darwin libpng/scripts/makefile.darwin
---- libpng-1.2.30/scripts/makefile.darwin	2008-08-15 16:14:44.000000000 +0200
-+++ libpng/scripts/makefile.darwin	2008-08-20 01:48:40.000000000 +0200
-@@ -7,14 +7,14 @@
- # For conditions of distribution and use, see copyright notice in png.h
- 
+diff -urN libpng-1.2.41/scripts/makefile.darwin libpng/scripts/makefile.darwin
+--- libpng-1.2.41/scripts/makefile.darwin       2009-12-03 04:46:02 +0300
++++ libpng/scripts/makefile.darwin       2009-12-04 14:37:52 +0300
+@@ -10,14 +10,14 @@
+ # and license in png.h
+
  # where "make install" puts libpng.a, libpng12.dylib, png.h and pngconf.h
 -prefix=/usr/local
 +prefix=??PREFIX??
  exec_prefix=$(prefix)
- 
+
  # Where the zlib library and include files are located
 -#ZLIBLIB=/usr/local/lib
 -#ZLIBINC=/usr/local/include
@@ -18,35 +18,35 @@ diff -ruN libpng-1.2.30/scripts/makefile.darwin libpng/scripts/makefile.darwin
 +ZLIBINC=/usr/include
 +#ZLIBLIB=../zlib
 +#ZLIBINC=../zlib
- 
+
  # Library name:
  LIBNAME = libpng12
-@@ -39,8 +39,8 @@
+@@ -42,8 +42,8 @@
  RM_F=/bin/rm -f
- 
+
  # CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE
--CFLAGS=-I$(ZLIBINC) -W -Wall -O -funroll-loops
+-CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -W -Wall -O -funroll-loops
 -LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
-+CFLAGS=??EXTRA_CFLAGS?? -I$(ZLIBINC) -W -Wall -O -funroll-loops
++CFLAGS=-DPNG_CONFIGURE_LIBPNG ??EXTRA_CFLAGS?? -I$(ZLIBINC) -W -Wall -O -funroll-loops
 +LDFLAGS=??EXTRA_LDFLAGS?? -L. -L$(ZLIBLIB) -lpng12 -lz
- 
+
  INCPATH=$(prefix)/include
  LIBPATH=$(exec_prefix)/lib
-@@ -73,7 +73,7 @@
+@@ -76,7 +76,7 @@
  .c.pic.o:
- 	$(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
- 
+        $(CC) -c $(CFLAGS) -fno-common -o $@ $*.c
+
 -all: libpng.a $(LIBSO) pngtest libpng.pc libpng-config
 +all: libpng.a $(LIBSO) libpng.pc libpng-config
- 
+
  libpng.a: $(OBJS)
- 	$(AR_RC) $@ $(OBJS)
-@@ -182,7 +182,7 @@
- 	chmod 755 $(DB)/$(LIBNAME)-config
- 	(cd $(DB); $(LN_SF) $(LIBNAME)-config libpng-config)
- 
+        $(AR_RC) $@ $(OBJS)
+@@ -185,7 +185,7 @@
+        chmod 755 $(DB)/$(LIBNAME)-config
+        (cd $(DB); $(LN_SF) $(LIBNAME)-config libpng-config)
+
 -install: install-static install-shared install-man install-config
 +install: install-static install-man install-config
- 
+
  # If you installed in $(DESTDIR), test-installed won't work until you
  # move the library to its final location.  Use test-dd to test it
