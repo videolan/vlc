@@ -464,3 +464,4 @@ PLSelItem * PLSelector::itemWidget( QTreeWidgetItem *item )
 {
     return ( static_cast<PLSelItem*>( QTreeWidget::itemWidget( item, 0 ) ) );
 }
+

@@ -119,9 +119,10 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->addWidget( title, 0, 0 );
 
     /* A Spacer and the search possibilities */
-    layout->setRowStretch( 1, 10 );
+    layout->setColumnStretch( 1, 10 );
 
     SearchLineEdit *search = new SearchLineEdit( this );
+    search->setMaximumWidth( 160 );
     layout->addWidget( search, 0, 4 );
     CONNECT( search, textChanged( const QString& ), this, search( const QString& ) );
 
@@ -130,7 +131,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     addButton->setIcon( QIcon( ":/buttons/playlist/playlist_add" ) );
     addButton->setMaximumWidth( 30 );
     BUTTONACT( addButton, popupAdd() );
-    layout->addWidget( addButton, 0, 2 );
+    layout->addWidget( addButton, 0, 3 );
 
     /* Finish the layout */
     layout->addWidget( view, 1, 0, 1, -1 );
