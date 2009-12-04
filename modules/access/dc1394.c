@@ -62,7 +62,7 @@
  *****************************************************************************/
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
-static void OpenAudioDev( demux_t *p_demux );
+static int OpenAudioDev( demux_t *p_demux );
 static inline void CloseAudioDev( demux_t *p_demux );
 
 vlc_module_begin()
@@ -400,8 +400,7 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->audio_device )
     {
-        OpenAudioDev( p_demux );
-        if( p_sys->fd_audio >= 0 )
+        if( OpenAudioDev( p_demux ) == VLC_SUCCESS )
         {
             es_format_t fmt;
             es_format_Init( &fmt, AUDIO_ES, VLC_CODEC_S16L ); /* FIXME: hmm, ?? */
@@ -435,7 +434,7 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
-static void OpenAudioDev( demux_t *p_demux )
+static int OpenAudioDev( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     char *psz_device = p_sys->audio_device;
@@ -446,7 +445,7 @@ static void OpenAudioDev( demux_t *p_demux )
     if( p_sys->fd_audio  < 0 )
     {
         msg_Err( p_demux, "Cannot open audio device (%s)", psz_device );
-        CloseAudioDev( p_demux );
+        return VLC_EGENERIC;
     }
 
     if( !p_sys->i_sample_rate )
@@ -457,7 +456,7 @@ static void OpenAudioDev( demux_t *p_demux )
     {
         msg_Err( p_demux, "Cannot set audio format (16b little endian) "
                           "(%d)", i_format );
-        CloseAudioDev( p_demux );
+        goto error;
     }
 
     result = ioctl( p_sys->fd_audio, SNDCTL_DSP_CHANNELS, &p_sys->channels );
@@ -465,7 +464,7 @@ static void OpenAudioDev( demux_t *p_demux )
     {
         msg_Err( p_demux, "Cannot set audio channels count (%d)",
                  p_sys->channels );
-        CloseAudioDev( p_demux );
+        goto error;
     }
 
     result = ioctl( p_sys->fd_audio, SNDCTL_DSP_SPEED, &p_sys->i_sample_rate );
@@ -473,7 +472,7 @@ static void OpenAudioDev( demux_t *p_demux )
     {
         msg_Err( p_demux, "Cannot set audio sample rate (%d)",
          p_sys->i_sample_rate );
-        CloseAudioDev( p_demux );
+        goto error;
     }
 
     msg_Dbg( p_demux, "Opened adev=`%s' %s %dHz",
@@ -482,6 +481,13 @@ static void OpenAudioDev( demux_t *p_demux )
              p_sys->i_sample_rate );
 
     p_sys->i_audio_max_frame_size = 32 * 1024;
+
+    return VLC_SUCCESS;
+
+error:
+    CloseAudioDev( p_demux );
+    p_sys->fd_audio = -1;
+    return VLC_EGENERIC;
 }
 
 static inline void CloseAudioDev( demux_t *p_demux )
@@ -633,7 +639,7 @@ static int Demux( demux_t *p_demux )
     block_t *p_blockv = NULL;
 
     /* Try grabbing audio frames first */
-    if( p_sys->fd_audio > 0 )
+    if( p_sys->fd_audio >= 0 )
         p_blocka = GrabAudio( p_demux );
 
     /* Try grabbing video frame */
