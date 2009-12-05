@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include "libvlc.h"
 
+#include <assert.h>
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */
@@ -228,8 +229,11 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
     }
 
     if( i_cache )
+    {
         pp_cache = p_bank->pp_loaded_cache =
                    malloc( i_cache * sizeof(void *) );
+        assert( pp_cache );
+    }
 
 #define LOAD_IMMEDIATE(a) \
     if( fread( (void *)&a, sizeof(char), sizeof(a), file ) != sizeof(a) ) goto error
@@ -259,6 +263,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
         int i_submodules;
 
         pp_cache[i] = malloc( sizeof(module_cache_t) );
+        assert( pp_cache[i] );
         p_bank->i_loaded_cache++;
 
         /* Load common info */
@@ -430,8 +435,10 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
         {
             p_module->p_config[i].ppf_action =
                 malloc( p_module->p_config[i].i_action * sizeof(void *) );
+            assert( p_module->p_config[i].ppf_action );
             p_module->p_config[i].ppsz_action_text =
                 malloc( p_module->p_config[i].i_action * sizeof(char *) );
+            assert( p_module->p_config[i].ppsz_action_text );
 
             for (int j = 0; j < p_module->p_config[i].i_action; j++)
             {
