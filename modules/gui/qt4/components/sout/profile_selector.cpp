@@ -91,7 +91,7 @@ inline void VLCProfileSelector::fillProfilesCombo()
     }
     if( i_size == 0 )
     {
-        for( int i = 0; i < NB_PROFILE; i++ )
+        for( size_t i = 0; i < NB_PROFILE; i++ )
         {
             profileBox->addItem( video_profile_name_list[i],
                                  video_profile_value_list[i] );
