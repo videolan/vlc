@@ -164,27 +164,23 @@ static int Open( vlc_object_t *p_this )
     config_ChainParse( p_stream, SOUT_CFG_PREFIX, ppsz_sout_options,
                        p_stream->p_cfg );
 
-    p_sys->time_sync = var_CreateGetBool( p_stream, SOUT_CFG_PREFIX "time-sync" );
+    p_sys->time_sync = var_GetBool( p_stream, SOUT_CFG_PREFIX "time-sync" );
 
-    psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_VIDEO "prerender-callback" );
+    psz_tmp = var_GetString( p_stream, SOUT_PREFIX_VIDEO "prerender-callback" );
     p_sys->pf_video_prerender_callback = (void (*) (void *, uint8_t**, int))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
-    psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_AUDIO "prerender-callback" );
+    psz_tmp = var_GetString( p_stream, SOUT_PREFIX_AUDIO "prerender-callback" );
     p_sys->pf_audio_prerender_callback = (void (*) (void* , uint8_t**, unsigned int))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
-    psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_VIDEO "postrender-callback" );
+    psz_tmp = var_GetString( p_stream, SOUT_PREFIX_VIDEO "postrender-callback" );
     p_sys->pf_video_postrender_callback = (void (*) (void*, uint8_t*, int, int, int, int, mtime_t))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
 
-    psz_tmp = var_CreateGetString( p_stream, SOUT_PREFIX_AUDIO "postrender-callback" );
+    psz_tmp = var_GetString( p_stream, SOUT_PREFIX_AUDIO "postrender-callback" );
     p_sys->pf_audio_postrender_callback = (void (*) (void*, uint8_t*, unsigned int, unsigned int, unsigned int, unsigned int, unsigned int, mtime_t))(intptr_t)atoll( psz_tmp );
     free( psz_tmp );
-
-    /* Create the remaining variables for a later use */
-    var_Create( p_stream, SOUT_PREFIX_VIDEO "data", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-    var_Create( p_stream, SOUT_PREFIX_AUDIO "data", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
 
     /* Setting stream out module callbacks */
     p_stream->pf_add    = Add;
