@@ -367,7 +367,7 @@ static void ProcessHeader( decoder_t *p_dec )
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
         p_dec->fmt_out.p_extra = realloc_or_free( p_dec->fmt_out.p_extra,
                                                   p_dec->fmt_out.i_extra );
-        assert( p_dec->fmt_out.p_extra );
+        /*assert( p_dec->fmt_out.p_extra ); assert undefined here? */
         memcpy( p_dec->fmt_out.p_extra,
                 p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
     }

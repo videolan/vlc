@@ -182,7 +182,7 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
             if( i_index >= i_index_max )
             {
                 i_index_max += 1024;
-                p_indexes = realloc_or_free( p_indexes,
+                p_indexes = (mkv_index_t*)realloc_or_free( p_indexes,
                                         sizeof( mkv_index_t ) * i_index_max );
                 assert( p_indexes );
             }
@@ -377,7 +377,7 @@ void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
     if( i_index >= i_index_max )
     {
         i_index_max += 1024;
-        p_indexes = realloc_or_free( p_indexes,
+        p_indexes = (mkv_index_t*)realloc_or_free( p_indexes,
                                         sizeof( mkv_index_t ) * i_index_max );
         assert( p_indexes );
     }

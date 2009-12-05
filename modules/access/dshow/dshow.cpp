@@ -1104,8 +1104,9 @@ static int OpenDevice( vlc_object_t *p_this, access_sys_t *p_sys,
             dshow_stream.p_device_filter = p_device_filter;
             dshow_stream.p_capture_filter = p_capture_filter;
 
-            p_sys->pp_streams = realloc_or_free( p_sys->pp_streams,
-                sizeof(dshow_stream_t *) * (p_sys->i_streams + 1) );
+            p_sys->pp_streams = (dshow_stream_t **)realloc_or_free(
+                                                           p_sys->pp_streams,
+                          sizeof(dshow_stream_t *) * (p_sys->i_streams + 1) );
             assert( p_sys->pp_streams );
             p_sys->pp_streams[p_sys->i_streams] = new dshow_stream_t;
             *p_sys->pp_streams[p_sys->i_streams++] = dshow_stream;
@@ -1967,10 +1968,10 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 
     if( !list_devices.size() ) return VLC_SUCCESS;
 
-    p_item->ppsz_list = realloc_or_free( p_item->ppsz_list,
+    p_item->ppsz_list = (char**)realloc_or_free( p_item->ppsz_list,
                           (list_devices.size()+3) * sizeof(char *) );
     assert( p_item->ppsz_list );
-    p_item->ppsz_list_text = realloc_or_free( p_item->ppsz_list_text,
+    p_item->ppsz_list_text = (char**)realloc_or_free( p_item->ppsz_list_text,
                           (list_devices.size()+3) * sizeof(char *) );
     assert( p_item->ppsz_list_text );
 
