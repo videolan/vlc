@@ -401,11 +401,13 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
                             MainInterface *mi,
                             bool with_intf )
 {
+    QAction *action;
+
     assert( mi );
 
     QMenu *menu = new QMenu( qtr( "V&iew" ), mi );
 
-    QAction *act = menu->addAction( QIcon( ":/menu/playlist_menu" ),
+    menu->addAction( QIcon( ":/menu/playlist_menu" ),
             qtr( "Play&list" ), mi,
             SLOT( togglePlaylist() ), qtr( "Ctrl+L" ) );
 
@@ -425,7 +427,7 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
     }
 
     /* Minimal View */
-    QAction *action = menu->addAction( qtr( "Mi&nimal View" ) );
+    action = menu->addAction( qtr( "Mi&nimal View" ) );
     action->setShortcut( qtr( "Ctrl+H" ) );
     action->setCheckable( true );
     action->setChecked( !with_intf &&
@@ -960,7 +962,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
     if( !b_isFullscreen )
     {
         QMenu *submenu = new QMenu( qtr( "Interface" ), menu );
-        QMenu *tools = ToolsMenu( submenu );
+        /*QMenu *tools =*/ ToolsMenu( submenu );
         submenu->addSeparator();
 
         /* In skins interface, append some items */
