@@ -50,6 +50,11 @@ static int Control( demux_t *p_demux, int i_query, va_list args );
 static void parseEXTINF( char *psz_string, char **ppsz_artist, char **ppsz_name, int *pi_duration );
 static bool ContainsURL( demux_t *p_demux );
 
+static char *GuessEncoding (const char *str)
+{
+    return IsUTF8 (str) ? strdup (str) : FromLatin1 (str);
+}
+
 /*****************************************************************************
  * Import_M3U: main import function
  *****************************************************************************/
@@ -70,7 +75,7 @@ int Import_M3U( vlc_object_t *p_this )
      || demux_IsPathExtension( p_demux, ".vlc" )
      || demux_IsForced( p_demux, "m3u" )
      || ContainsURL( p_demux ) )
-        pf_dup = FromLocaleDup; /* locale character set (?) */
+        pf_dup = GuessEncoding;
     else
         return VLC_EGENERIC;
 
