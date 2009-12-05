@@ -96,7 +96,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     playlistVisible      = false; // FIXME remove
     input_name           = "";
 
-    stackCentralOldState = HIDDEN_TAB;
     i_bg_height          = 0;
 
     /* Ask for Privacy */
@@ -138,6 +137,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     mainBasedSize = settings->value( "mainBasedSize", QSize( 350, 120 ) ).toSize();
     mainVideoSize = settings->value( "mainVideoSize", QSize( 400, 300 ) ).toSize();
 
+
     /**************
      * Status Bar *
      **************/
@@ -177,6 +177,10 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
      * Input Manager    *
      ********************/
     MainInputManager::getInstance( p_intf );
+
+#ifdef WIN32
+    createTaskBarButtons();
+#endif
 
     /************************************************************
      * Connect the input manager to the GUI elements it manages *
@@ -247,7 +251,15 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     CONNECT( this, askUpdate(), this, doComponentsUpdate() );
     CONNECT( THEDP, toolBarConfUpdated(), this, recreateToolbars() );
 
-    /* Size and placement of interface */
+        /* Enable the popup menu in the MI */
+    setContextMenuPolicy( Qt::CustomContextMenu );
+    CONNECT( this, customContextMenuRequested( const QPoint& ),
+             this, popupMenu( const QPoint& ) );
+
+    /** END of CONNECTS**/
+
+
+    /**** FINAL SIZING and placement of interface */
     settings->beginGroup( "MainWindow" );
     QVLCTools::restoreWidgetPosition( settings, this, QSize(380, 60) );
 
@@ -265,18 +277,11 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
        }
     }
 
-    bool b_pl_visible = settings->value( "playlist-visible", 0 ).toInt();
-    settings->endGroup();
-
+    msg_Dbg( p_intf, "%i", stackCentralOldState );
     /* Playlist */
-    if( b_pl_visible ) togglePlaylist();
-
-    /* Enable the popup menu in the MI */
-    setContextMenuPolicy( Qt::CustomContextMenu );
-    CONNECT( this, customContextMenuRequested( const QPoint& ),
-             this, popupMenu( const QPoint& ) );
-
-    debug();
+    if( settings->value( "playlist-visible", 0 ).toInt() )
+        togglePlaylist();
+    settings->endGroup();
 
     /* Final sizing and showing */
     setVisible( !b_hideAfterCreation );
@@ -295,9 +300,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     updateGeometry();
     resize( sizeHint() );
 
-#ifdef WIN32
-    createTaskBarButtons();
-#endif
 }
 
 MainInterface::~MainInterface()
@@ -399,11 +401,6 @@ void MainInterface::createMainWidget( QSettings *settings )
     bgWidget->updateGeometry();
     stackCentralW->insertWidget( BACKG_TAB, bgWidget );
 
-    if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
-        i_visualmode != QT_MINIMAL_MODE )
-    {
-        stackCentralW->hide();
-    }
 
     /* And video Outputs */
     if( videoEmbeddedFlag )
@@ -412,6 +409,20 @@ void MainInterface::createMainWidget( QSettings *settings )
         stackCentralW->insertWidget( VIDEO_TAB, videoWidget );
     }
     mainLayout->insertWidget( 1, stackCentralW, 100 );
+
+
+    if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
+        i_visualmode != QT_MINIMAL_MODE )
+    {
+        hideStackWidget();
+        stackCentralOldState = HIDDEN_TAB;
+    }
+    else
+    {
+        showTab( BACKG_TAB );
+        stackCentralOldState = BACKG_TAB;
+    }
+
     /* Create the CONTROLS Widget */
     controls = new ControlsWidget( p_intf,
                    settings->value( "adv-controls", false ).toBool(), this );
@@ -448,6 +459,28 @@ void MainInterface::createMainWidget( QSettings *settings )
         CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
                  this, handleKeyPress( QKeyEvent * ) );
     }
+}
+
+inline void MainInterface::initSystray()
+{
+#ifndef HAVE_MAEMO
+    bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
+    bool b_systrayWanted = config_GetInt( p_intf, "qt-system-tray" );
+
+    if( config_GetInt( p_intf, "qt-start-minimized") > 0 )
+    {
+        if( b_systrayAvailable )
+        {
+            b_systrayWanted = true;
+            b_hideAfterCreation = true;
+        }
+        else
+            msg_Err( p_intf, "cannot start minimized without system tray bar" );
+    }
+
+    if( b_systrayAvailable && b_systrayWanted )
+        createSystray();
+#endif
 }
 
 inline void MainInterface::createStatusBar()
@@ -571,27 +604,6 @@ void MainInterface::createTaskBarButtons()
 #endif
 
 
-inline void MainInterface::initSystray()
-{
-#ifndef HAVE_MAEMO
-    bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
-    bool b_systrayWanted = config_GetInt( p_intf, "qt-system-tray" );
-
-    if( config_GetInt( p_intf, "qt-start-minimized") > 0 )
-    {
-        if( b_systrayAvailable )
-        {
-            b_systrayWanted = true;
-            b_hideAfterCreation = true;
-        }
-        else
-            msg_Err( p_intf, "cannot start minimized without system tray bar" );
-    }
-
-    if( b_systrayAvailable && b_systrayWanted )
-            createSystray();
-#endif
-}
 
 
 /**********************************************************************
@@ -722,6 +734,37 @@ void MainInterface::debug()
 #endif
 }
 
+inline void MainInterface::showTab( int i_tab )
+{
+    msg_Warn( p_intf, "stackCentralOldState %i", stackCentralOldState );
+    stackCentralOldState = stackCentralW->isVisible() ? stackCentralW->currentIndex()
+                                          : HIDDEN_TAB;
+    msg_Dbg( p_intf, "State chnage %i",  stackCentralW->currentIndex() );
+
+    if( i_visualmode == QT_NORMAL_MODE )
+    {
+        stackCentralW->setVisible( i_tab != HIDDEN_TAB );
+    }
+    else
+        if( i_tab == HIDDEN_TAB ) i_tab == BACKG_TAB;
+
+    stackCentralW->setCurrentIndex( i_tab );
+}
+
+inline void MainInterface::restoreStackOldWidget()
+{
+    msg_Warn( p_intf, "stackCentralOldState %i", stackCentralOldState );
+    int temp = stackCentralW->isVisible() ? stackCentralW->currentIndex()
+                                          : HIDDEN_TAB;
+    stackCentralW->setCurrentIndex( stackCentralOldState );
+    if( i_visualmode == QT_NORMAL_MODE )
+        stackCentralW->setVisible( stackCentralOldState != HIDDEN_TAB );
+
+    stackCentralOldState = temp;
+    msg_Dbg( p_intf, "Here %i %i", temp, stackCentralW->currentIndex() );
+
+}
+
 void MainInterface::destroyPopupMenu()
 {
     QVLCMenu::PopupMenu( p_intf, false );
@@ -804,13 +847,7 @@ void MainInterface::getVideoSlot( WId *p_id, int *pi_x, int *pi_y,
     }
 }
 
-inline void MainInterface::showTab( int i_tab )
-{
-    stackCentralOldState = stackCentralW->currentIndex();
 
-    stackCentralW->setCurrentIndex( i_tab );
-    if( stackCentralW->isHidden() ) stackCentralW->show();
-}
 
 /* Asynchronous call from the WindowClose function */
 void MainInterface::releaseVideo( void )
@@ -823,19 +860,10 @@ void MainInterface::releaseVideoSlot( void )
 {
     videoWidget->release( );
 
-    /* Restore the previous State */
-    if( stackCentralOldState == BACKG_TAB )
-    {
-        showBg();
-    }
-    else
-    {
-        stackCentralW->hide();
-        stackCentralOldState == -1;
-    }
+    restoreStackOldWidget();
 
     /* Try to resize, except when you are in Fullscreen mode */
-    doComponentsUpdate();
+//    doComponentsUpdate();
 }
 
 /* Asynchronous call from WindowControl function */
@@ -877,50 +905,61 @@ int MainInterface::controlVideo( int i_query, va_list args )
 /**
  * Toggle the playlist widget or dialog
  **/
-void MainInterface::togglePlaylist()
+void MainInterface::createPlaylist( bool b_show )
 {
-    /* CREATION
-    If no playlist exist, then create one and attach it to the DockPL*/
-    if( !playlistWidget )
+    playlistWidget = new PlaylistWidget( p_intf );
+
+    i_pl_dock = PL_BOTTOM;
+    /* i_pl_dock = (pl_dock_e)getSettings()
+      ->value( "pl-dock-status", PL_UNDOCKED ).toInt(); */
+
+    if( i_pl_dock == PL_UNDOCKED )
     {
-        playlistWidget = new PlaylistWidget( p_intf );
+        playlistWidget->setWindowFlags( Qt::Window );
 
-        i_pl_dock = PL_BOTTOM;
-        /*i_pl_dock = (pl_dock_e)getSettings()
-                         ->value( "pl-dock-status", PL_UNDOCKED ).toInt();*/
-
-        if( i_pl_dock == PL_UNDOCKED )
-        {
-            playlistWidget->setWindowFlags( Qt::Window );
-
-            /* This will restore the geometry but will not work for position,
-               because of parenting */
-            QVLCTools::restoreWidgetPosition( p_intf, "Playlist",
-                    playlistWidget, QSize( 600, 300 ) );
-        }
-        else
-        {
-            stackCentralW->insertWidget(PLAYL_TAB, playlistWidget );
-            stackCentralW->setCurrentWidget( playlistWidget );
-            stackCentralW->show();
-        }
-        playlistVisible = true;
-
-        playlistWidget->show();
+        /* This will restore the geometry but will not work for position,
+           because of parenting */
+        QVLCTools::restoreWidgetPosition( p_intf, "Playlist",
+                playlistWidget, QSize( 600, 300 ) );
     }
     else
     {
-    /* toggle the visibility of the playlist */
+        msg_Warn( p_intf, "Here 12 %i", stackCentralW->currentIndex() );
+        stackCentralW->insertWidget( PLAYL_TAB, playlistWidget );
+        msg_Warn( p_intf, "Here 12 %i", stackCentralW->currentIndex() );
+    }
+
+    if( b_show )
+    {
+        playlistVisible = true;
+        stackCentralW->show();
+    }
+}
+
+void MainInterface::togglePlaylist()
+{
+    msg_Warn( p_intf, "Here toggling %i %i", stackCentralW->currentIndex(), stackCentralOldState );
+    if( !playlistWidget )
+    {
+        createPlaylist( true );
+    }
+    msg_Warn( p_intf, "Here toggling %i %i", stackCentralW->currentIndex(), stackCentralOldState );
+
+    if( i_pl_dock != PL_UNDOCKED )
+    {
+        /* Playlist not visible */
         if( stackCentralW->currentIndex() != PLAYL_TAB )
         {
-            stackCentralW->insertWidget(PLAYL_TAB, playlistWidget );
-            stackCentralW->setCurrentWidget( playlistWidget );
+            msg_Warn( p_intf, "Here 42" );
+            showTab( PLAYL_TAB );
             stackCentralW->show();
         }
         else
-            stackCentralW->setCurrentIndex( VIDEO_TAB );
-       playlistVisible = !playlistVisible;
-       //doComponentsUpdate(); //resize( sizeHint() );
+        {
+            restoreStackOldWidget();
+        }
+        playlistVisible = ( stackCentralW->currentIndex() == PLAYL_TAB );
+        //doComponentsUpdate(); //resize( sizeHint() );
     }
 }
 

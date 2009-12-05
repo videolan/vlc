@@ -118,8 +118,10 @@ private:
     bool isDocked() { return ( i_pl_dock != PL_UNDOCKED ); }
 
     void showTab( int i_tab );
+    void restoreStackOldWidget();
     void showVideo() { showTab( VIDEO_TAB ); }
     void showBg() { showTab( BACKG_TAB ); }
+    void hideStackWidget() { showTab( HIDDEN_TAB ); }
 
     QSettings           *settings;
 #ifndef HAVE_MAEMO
@@ -147,8 +149,8 @@ private:
     enum {
         HIDDEN_TAB = -1,
         BACKG_TAB  =  0,
-        VIDEO_TAB,
-        PLAYL_TAB,
+        VIDEO_TAB  = 1,
+        PLAYL_TAB  = 2,
     };
     int                  stackCentralOldState;
 
@@ -171,6 +173,7 @@ private:
     LPTASKBARLIST3 p_taskbl;
     void createTaskBarButtons();
 #endif
+    void createPlaylist( bool );
 
 public slots:
     void undockPlaylist();
