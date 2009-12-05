@@ -765,7 +765,7 @@ package-win32-base-debug: package-win-common
 	  fi ; done
 
 # Contrib *.dll's
-	cp $(srcdir)/extras/contrib/lib/*.dll "vlc-$(VERSION)/" || true
+#	cp $(srcdir)/extras/contrib/lib/*.dll "vlc-$(VERSION)/" || true
 
 #Enable DEP and ASLR for all the binaries
 if USE_PEFLAGS
