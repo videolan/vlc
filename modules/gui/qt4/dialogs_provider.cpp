@@ -78,7 +78,7 @@ DialogsProvider::DialogsProvider( intf_thread_t *_p_intf ) :
     SDMapper = new QSignalMapper();
     CONNECT( SDMapper, mapped (QString), this, SDMenuAction( QString ) );
 
-    DialogHandler *dialogHandler = new DialogHandler (p_intf, this );
+    new DialogHandler (p_intf, this );
 }
 
 DialogsProvider::~DialogsProvider()
