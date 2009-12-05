@@ -22,6 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc_memory.h>
+
 typedef struct font_stack_t font_stack_t;
 struct font_stack_t
 {
@@ -442,8 +444,7 @@ static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
 
                 if( *ppi_k_durations )
                 {
-                    *ppi_k_durations = (uint32_t *)
-                        realloc( *ppi_k_durations,
+                    *ppi_k_durations = realloc_or_free( *ppi_k_durations,
                                  *pi_k_runs * sizeof( uint32_t ) );
                 }
                 else if( *pi_k_runs == 1 )
@@ -454,8 +455,7 @@ static void SetupKaraoke( xml_reader_t *p_xml_reader, uint32_t *pi_k_runs,
 
                 if( *ppi_k_run_lengths )
                 {
-                    *ppi_k_run_lengths = (uint32_t *)
-                        realloc( *ppi_k_run_lengths,
+                    *ppi_k_run_lengths = realloc_or_free( *ppi_k_run_lengths,
                                  *pi_k_runs * sizeof( uint32_t ) );
                 }
                 else if( *pi_k_runs == 1 )

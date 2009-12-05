@@ -31,6 +31,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_osd.h>
@@ -40,6 +42,7 @@
 #include <vlc_input.h>
 #include <vlc_strings.h>
 #include <vlc_dialog.h>
+#include <vlc_memory.h>
 
 #include <math.h>
 #include <errno.h>
@@ -360,6 +363,7 @@ static int Create( vlc_object_t *p_this )
      * current contribs. So just tell default windows font directory
      * is the place to search fonts
      */
+    assert( path );
     GetWindowsDirectory( path, PATH_MAX + 1 );
     strcat( path, "\\fonts" );
     if( p_dialog )
@@ -1673,15 +1677,16 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
     {
         (*pi_runs)++;
 
+        /* XXX this logic looks somewhat broken */
+
         if( *ppp_styles )
         {
-            *ppp_styles = (ft_style_t **)
-                realloc( *ppp_styles, *pi_runs * sizeof( ft_style_t * ) );
+            *ppp_styles = realloc_or_free( *ppp_styles,
+                                          *pi_runs * sizeof( ft_style_t * ) );
         }
         else if( *pi_runs == 1 )
         {
-            *ppp_styles = (ft_style_t **)
-                malloc( *pi_runs * sizeof( ft_style_t * ) );
+            *ppp_styles = malloc( *pi_runs * sizeof( ft_style_t * ) );
         }
 
         /* We have just malloc'ed this memory successfully -
@@ -1692,10 +1697,12 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
             p_style = NULL;
         }
 
+        /* XXX more iffy logic */
+
         if( *ppi_run_lengths )
         {
-            *ppi_run_lengths = (uint32_t *)
-                realloc( *ppi_run_lengths, *pi_runs * sizeof( uint32_t ) );
+            *ppi_run_lengths = realloc_or_free( *ppi_run_lengths,
+                                              *pi_runs * sizeof( uint32_t ) );
         }
         else if( *pi_runs == 1 )
         {

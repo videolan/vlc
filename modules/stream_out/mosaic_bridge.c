@@ -42,6 +42,8 @@
 #include <vlc_image.h>
 #include <vlc_filter.h>
 
+#include <vlc_memory.h>
+
 #include "../video_filter/mosaic.h"
 
 #include <assert.h>
@@ -362,6 +364,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         vlc_value_t val;
 
         p_bridge = malloc( sizeof( bridge_t ) );
+        assert( p_bridge );
 
         var_Create( p_libvlc, "mosaic-struct", VLC_VAR_ADDRESS );
         val.p_address = p_bridge;
@@ -379,11 +382,12 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     if ( i == p_bridge->i_es_num )
     {
-        p_bridge->pp_es = realloc( p_bridge->pp_es,
-                                   (p_bridge->i_es_num + 1)
-                                     * sizeof(bridged_es_t *) );
+        p_bridge->pp_es = realloc_or_free( p_bridge->pp_es,
+                          (p_bridge->i_es_num + 1) * sizeof(bridged_es_t *) );
+        assert( p_bridge->pp_es );
         p_bridge->i_es_num++;
         p_bridge->pp_es[i] = malloc( sizeof(bridged_es_t) );
+        assert( p_bridge->pp_es[i] );
     }
 
     p_sys->p_es = p_es = p_bridge->pp_es[i];

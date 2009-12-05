@@ -32,6 +32,8 @@
 #include <string.h>
 #include "xarray.h"
 
+#include <vlc_memory.h>
+
 /* local prototypes */
 XArray * xarray_New (unsigned int);
 
@@ -50,7 +52,7 @@ XArray * xarray_New (unsigned int);
 
 #define XARRAY_GROW_ARRAY(xarray) \
     { \
-        xarray->array = (void *) realloc (xarray->array, xarray->size * 2); \
+        xarray->array = realloc_or_free (xarray->array, xarray->size * 2); \
         if (xarray->array == NULL) return XARRAY_ENOMEM; \
     }
 

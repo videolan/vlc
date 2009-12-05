@@ -31,11 +31,14 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_codec.h>
 #include <vlc_block.h>
+#include <vlc_memory.h>
 
 #include <vlc_bits.h>
 #include <vlc_block_helper.h>
@@ -157,6 +160,7 @@ static int Open( vlc_object_t *p_this )
         /* We have a vol */
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
         p_dec->fmt_out.p_extra = malloc( p_dec->fmt_in.i_extra );
+        assert( p_dec->fmt_out.p_extra );
         memcpy( p_dec->fmt_out.p_extra, p_dec->fmt_in.p_extra,
                 p_dec->fmt_in.i_extra );
 
@@ -287,7 +291,8 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         if( (size_t)p_dec->fmt_out.i_extra != p_frag->i_buffer )
         {
             p_dec->fmt_out.p_extra =
-                realloc( p_dec->fmt_out.p_extra, p_frag->i_buffer );
+                realloc_or_free( p_dec->fmt_out.p_extra, p_frag->i_buffer );
+            assert( p_dec->fmt_out.p_extra );
             p_dec->fmt_out.i_extra = p_frag->i_buffer;
         }
         memcpy( p_dec->fmt_out.p_extra, p_frag->p_buffer, p_frag->i_buffer );

@@ -148,10 +148,12 @@ static int Open( vlc_object_t *p_this )
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = (demux_sys_t *)malloc( sizeof( demux_sys_t ) );
+    assert(p_sys);
 
     msg_Dbg( p_demux, "loading complete file (could be long)" );
     p_sys->i_data = stream_Size( p_demux->s );
     p_sys->p_data = (uint8_t *)malloc( p_sys->i_data );
+    assert(p_sys->p_data);
     p_sys->i_data = stream_Read( p_demux->s, p_sys->p_data, p_sys->i_data );
     if( p_sys->i_data <= 0 )
     {
@@ -455,6 +457,7 @@ switch( i_query )
 
                 *pi_int = p_sys->i_tracks;
                 *ppp_title = (input_title_t**)malloc( sizeof( input_title_t**) * p_sys->i_tracks );
+                assert( *ppp_sitle );
 
                 for( int i = 0; i < p_sys->i_tracks; i++ )
                 {
@@ -499,6 +502,7 @@ static void inflate_gzbuf(uint8_t * p_buffer, size_t i_size, uint8_t ** pp_obuff
 
     out_size = i_size * 2;
     out_buffer = (uint8_t*)malloc(out_size);
+    assert(out_buffer);
 
     z_str.next_in   = (unsigned char*)p_buffer;
     z_str.avail_in  = i_size;
@@ -520,7 +524,8 @@ static void inflate_gzbuf(uint8_t * p_buffer, size_t i_size, uint8_t ** pp_obuff
         case Z_BUF_ERROR:
             offset = z_str.next_out - out_buffer;
             out_size *= 2;
-            out_buffer = (uint8_t *)realloc(out_buffer, out_size);
+            out_buffer = (uint8_t *)realloc_or_free(out_buffer, out_size);
+            assert(out_buffer);
             z_str.next_out  = out_buffer + offset;
             z_str.avail_out = out_size - offset;
             break;
@@ -535,7 +540,8 @@ static void inflate_gzbuf(uint8_t * p_buffer, size_t i_size, uint8_t ** pp_obuff
 
     inflateEnd(&z_str);
  
-    out_buffer = (uint8_t *)realloc(out_buffer, *pi_osize);
+    out_buffer = (uint8_t *)realloc_or_free(out_buffer, *pi_osize);
+    assert(out_buffer);
     (*pp_obuffer) = out_buffer;
 }
 #endif

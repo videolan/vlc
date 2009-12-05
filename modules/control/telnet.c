@@ -30,10 +30,13 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_input.h>
+#include <vlc_memory.h>
 
 #include <stdbool.h>
 #include <sys/stat.h>
@@ -573,6 +576,7 @@ static char *MessageToString( vlm_message_t *message, int i_level )
 
     i_message += strlen( message->psz_name ) + i_level * sizeof( "    " ) + 1;
     psz_message = malloc( i_message );
+    assert( psz_message );
     *psz_message = 0;
     for( i = 0; i < i_level; i++ ) strcat( psz_message, "    " );
     strcat( psz_message, message->psz_name );
@@ -581,7 +585,8 @@ static char *MessageToString( vlm_message_t *message, int i_level )
     {
         i_message += sizeof( " : " ) + strlen( message->psz_value ) +
             sizeof( STRING_CR );
-        psz_message = realloc( psz_message, i_message );
+        psz_message = realloc_or_free( psz_message, i_message );
+        assert( psz_message );
         strcat( psz_message, " : " );
         strcat( psz_message, message->psz_value );
         strcat( psz_message, STRING_CR );
@@ -589,7 +594,8 @@ static char *MessageToString( vlm_message_t *message, int i_level )
     else
     {
         i_message += sizeof( STRING_CR );
-        psz_message = realloc( psz_message, i_message );
+        psz_message = realloc_or_free( psz_message, i_message );
+        assert( psz_message );
         strcat( psz_message, STRING_CR );
     }
 
@@ -599,7 +605,8 @@ static char *MessageToString( vlm_message_t *message, int i_level )
             MessageToString( message->child[i], i_level + 1 );
 
         i_message += strlen( child_message );
-        psz_message = realloc( psz_message, i_message );
+        psz_message = realloc_or_free( psz_message, i_message );
+        assert( psz_message );
         strcat( psz_message, child_message );
         free( child_message );
     }

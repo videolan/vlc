@@ -29,7 +29,10 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
+#include <vlc_memory.h>
 
 #include "asf.h"
 #include "buffer.h"
@@ -41,11 +44,8 @@ int var_buffer_initwrite( var_buffer_t *p_buf, int i_default_size )
 {
     p_buf->i_size =  ( i_default_size > 0 ) ? i_default_size : 2048;
     p_buf->i_data = 0;
-    if( !( p_buf->p_data = malloc( p_buf->i_size ) ) )
-    {
-        return( -1 );
-    }
-    return( 0 );
+    p_buf->p_data = malloc( p_buf->i_size );
+    return p_buf->p_data ? 0 : -1;
 }
 
 int var_buffer_reinitwrite( var_buffer_t *p_buf, int i_default_size )
@@ -62,11 +62,7 @@ int var_buffer_reinitwrite( var_buffer_t *p_buf, int i_default_size )
         p_buf->i_size =  ( i_default_size > 0 ) ? i_default_size : 2048;
         p_buf->p_data = malloc( p_buf->i_size );
     }
-    if( !p_buf->p_data )
-    {
-        return( -1 );
-    }
-    return( 0 );
+    return p_buf->p_data ? 0 : -1;
 }
 
 void var_buffer_add8 ( var_buffer_t *p_buf, uint8_t  i_byte )
@@ -75,7 +71,8 @@ void var_buffer_add8 ( var_buffer_t *p_buf, uint8_t  i_byte )
     if( p_buf->i_data >= p_buf->i_size )
     {
         p_buf->i_size += 1024;
-        p_buf->p_data = realloc( p_buf->p_data, p_buf->i_size );
+        p_buf->p_data = realloc_or_free( p_buf->p_data, p_buf->i_size );
+        assert( p_buf->p_data );
     }
     p_buf->p_data[p_buf->i_data] = i_byte&0xff;
     p_buf->i_data++;
@@ -105,12 +102,11 @@ void var_buffer_addmemory( var_buffer_t *p_buf, void *p_mem, int i_mem )
     if( p_buf->i_data + i_mem >= p_buf->i_size )
     {
         p_buf->i_size += i_mem + 1024;
-        p_buf->p_data = realloc( p_buf->p_data, p_buf->i_size );
+        p_buf->p_data = realloc_or_free( p_buf->p_data, p_buf->i_size );
+        assert( p_buf->p_data );
     }
 
-    memcpy( p_buf->p_data + p_buf->i_data,
-            p_mem,
-            i_mem );
+    memcpy( p_buf->p_data + p_buf->i_data, p_mem, i_mem );
     p_buf->i_data += i_mem;
 }
 
@@ -129,6 +125,7 @@ void var_buffer_addUTF16( var_buffer_t *p_buf, const char *p_str )
         char *psz_out, *psz_tmp;
 
         psz_out = psz_tmp = malloc( i_out + 1 );
+        assert( psz_out );
         iconv_handle = vlc_iconv_open( "UTF-16LE", "UTF-8" );
         vlc_iconv( iconv_handle, &p_str, &i_in, &psz_tmp, &i_out );
         vlc_iconv_close( iconv_handle );

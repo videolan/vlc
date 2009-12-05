@@ -31,6 +31,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
@@ -39,6 +41,8 @@
 
 #include <vlc_aout.h>
 #include <vlc_cpu.h>
+
+#include <vlc_memory.h>
 
 /* ALSA part
    Note: we use the new API which is available since 0.9.0beta10a. */
@@ -1000,12 +1004,12 @@ static void GetDevicesForCard( module_config_t *p_item, int i_card )
             break;
         }
 
-        p_item->ppsz_list =
-            (char **)realloc( p_item->ppsz_list,
+        p_item->ppsz_list = realloc_or_free( p_item->ppsz_list,
                               (p_item->i_list + 2) * sizeof(char *) );
-        p_item->ppsz_list_text =
-            (char **)realloc( p_item->ppsz_list_text,
+        assert( p_item->ppsz_list );
+        p_item->ppsz_list_text = realloc_or_free( p_item->ppsz_list_text,
                               (p_item->i_list + 2) * sizeof(char *) );
+        assert( p_item->ppsz_list_text );
         p_item->ppsz_list[ p_item->i_list ] = psz_device;
         p_item->ppsz_list_text[ p_item->i_list ] = psz_descr;
         p_item->i_list++;

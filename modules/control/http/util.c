@@ -27,9 +27,12 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include "http.h"
 #include <vlc_strings.h>
+#include <vlc_memory.h>
 
 /****************************************************************************
  * File and directory functions
@@ -91,10 +94,13 @@ int FileLoad( FILE *f, char **pp_data, int *pi_data )
     /* just load the file */
     *pi_data = 0;
     *pp_data = malloc( 1025 );  /* +1 for \0 */
+    assert( *pp_data );
+
     while( ( i_read = fread( &(*pp_data)[*pi_data], 1, 1024, f ) ) == 1024 )
     {
         *pi_data += 1024;
-        *pp_data = realloc( *pp_data, *pi_data  + 1025 );
+        *pp_data = realloc_or_free( *pp_data, *pi_data  + 1025 );
+        assert( *pp_data );
     }
     if( i_read > 0 )
     {
@@ -235,6 +241,7 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
                 f = malloc( sizeof( httpd_file_sys_t ) );
                 f->b_handler = false;
             }
+            assert( f );
 
             f->p_intf  = p_intf;
             f->p_file = NULL;
@@ -921,6 +928,7 @@ char *RealPath( const char *psz_src )
     int i_len = strlen(psz_src);
 
     psz_dir = malloc( i_len + 2 );
+    assert( psz_dir );
     strcpy( psz_dir, psz_src );
 
     /* Add a trailing sep to ease the .. step */

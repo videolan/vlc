@@ -34,9 +34,12 @@
 
 #include <math.h>
 #include <limits.h> /* INT_MAX */
+#include <assert.h>
 
 #include <vlc_filter.h>
 #include <vlc_image.h>
+
+#include <vlc_memory.h>
 
 #include "mosaic.h"
 
@@ -254,14 +257,16 @@ static void __mosaic_ParseSetOffsets( vlc_object_t *p_this,
         {
             i_index++;
 
-            p_sys->pi_x_offsets =
-                realloc( p_sys->pi_x_offsets, i_index * sizeof(int) );
+            p_sys->pi_x_offsets = realloc_or_free( p_sys->pi_x_offsets,
+                                                   i_index * sizeof(int) );
+            assert( p_sys->pi_x_offsets );
             p_sys->pi_x_offsets[i_index - 1] = atoi( psz_offsets );
             psz_end = strchr( psz_offsets, ',' );
             psz_offsets = psz_end + 1;
 
-            p_sys->pi_y_offsets =
-                realloc( p_sys->pi_y_offsets, i_index * sizeof(int) );
+            p_sys->pi_y_offsets = realloc_or_free( p_sys->pi_y_offsets,
+                                                   i_index * sizeof(int) );
+            assert( p_sys->pi_y_offsets );
             p_sys->pi_y_offsets[i_index - 1] = atoi( psz_offsets );
             psz_end = strchr( psz_offsets, ',' );
             psz_offsets = psz_end + 1;
@@ -359,8 +364,9 @@ static int CreateFilter( vlc_object_t *p_this )
         {
             psz_end = strchr( psz_order, ',' );
             i_index++;
-            p_sys->ppsz_order = realloc( p_sys->ppsz_order,
-                                         i_index * sizeof(char *) );
+            p_sys->ppsz_order = realloc_or_free( p_sys->ppsz_order,
+                                                 i_index * sizeof(char *) );
+            assert( p_sys->ppsz_order );
             p_sys->ppsz_order[i_index - 1] = strndup( psz_order,
                                            psz_end - psz_order );
             psz_order = psz_end+1;
@@ -876,8 +882,9 @@ static int MosaicCallback( vlc_object_t *p_this, char const *psz_var,
             {
                 psz_end = strchr( psz_order, ',' );
                 i_index++;
-                p_sys->ppsz_order = realloc( p_sys->ppsz_order,
-                                    i_index * sizeof(char *) );
+                p_sys->ppsz_order = realloc_or_free( p_sys->ppsz_order,
+                                                   i_index * sizeof(char *) );
+                assert( p_sys->ppsz_order );
                 p_sys->ppsz_order[i_index - 1] = strndup( psz_order,
                                            psz_end - psz_order );
                 psz_order = psz_end+1;

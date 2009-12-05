@@ -29,9 +29,12 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
+#include <vlc_memory.h>
 
 #define BLUESCREEN_HELP N_( \
     "This effect, also known as \"greenscreen\" or \"chroma key\" blends " \
@@ -185,7 +188,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         return NULL;
     }
 
-    p_sys->p_at = realloc( p_sys->p_at, i_lines * i_pitch * sizeof( uint8_t ) );
+    p_sys->p_at = realloc_or_free( p_sys->p_at,
+                                   i_lines * i_pitch * sizeof( uint8_t ) );
+    assert( p_sys->p_at );
     p_at = p_sys->p_at;
 
     vlc_mutex_lock( &p_sys->lock );

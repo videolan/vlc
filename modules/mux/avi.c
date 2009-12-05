@@ -31,11 +31,14 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_codecs.h>
+#include <vlc_memory.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -482,8 +485,9 @@ static int Mux      ( sout_mux_t *p_mux )
             if( p_sys->idx1.i_entry_count >= p_sys->idx1.i_entry_max )
             {
                 p_sys->idx1.i_entry_max += 10000;
-                p_sys->idx1.entry = realloc( p_sys->idx1.entry,
-                                             p_sys->idx1.i_entry_max * sizeof( avi_idx1_entry_t ) );
+                p_sys->idx1.entry = realloc_or_free( p_sys->idx1.entry,
+                       p_sys->idx1.i_entry_max * sizeof( avi_idx1_entry_t ) );
+                assert( p_sys->idx1.entry );
             }
 
             p_data = block_Realloc( p_data, 8, p_data->i_buffer );

@@ -671,7 +671,9 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         p_stream->p_headers =
             realloc( p_sav = p_stream->p_headers, p_stream->i_headers +
                      p_oggpacket->bytes + (b_store_size ? 2 : 0) + (b_store_num_headers ? 1 : 0) );
-        if( p_stream->p_headers )
+        if( !p_stream->p_headers )
+            p_stream->p_headers = p_sav;
+        else
         {
             uint8_t *p_extra = p_stream->p_headers + p_stream->i_headers;
 
@@ -713,10 +715,6 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                 /* we're not at BOS anymore for this logical stream */
                 p_ogg->i_bos--;
             }
-        }
-        else
-        {
-                p_stream->p_headers = p_sav;
         }
 
         b_selected = false; /* Discard the header packet */

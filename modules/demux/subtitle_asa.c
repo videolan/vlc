@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_input.h>
+#include <vlc_memory.h>
 
 
 #include <errno.h>
@@ -280,8 +281,8 @@ static int ProcessLine( demux_t *p_demux, void *p_arg,
     if( p_sys->i_subtitles >= p_sys->i_subs_alloc )
     {
         p_sys->i_subs_alloc += 500;
-        if( !( p_sys->subtitle = realloc( p_sys->subtitle, sizeof(subtitle_t)
-                                          * p_sys->i_subs_alloc ) ) )
+        if( !( p_sys->subtitle = realloc_or_free( p_sys->subtitle,
+                                sizeof(subtitle_t) * p_sys->i_subs_alloc ) ) )
         {
             return VLC_ENOMEM;
         }

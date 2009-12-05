@@ -31,12 +31,15 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_aout.h>
 #include <vlc_input.h>
 #include <vlc_sout.h>
+#include <vlc_memory.h>
 
 #include <ogg/ogg.h>
 
@@ -318,9 +321,9 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* Backup headers as extra data */
         uint8_t *p_extra;
 
-        p_dec->fmt_in.p_extra =
-            realloc( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra +
-                     oggpacket.bytes + 2 );
+        p_dec->fmt_in.p_extra = realloc_or_free( p_dec->fmt_in.p_extra,
+                                p_dec->fmt_in.i_extra + oggpacket.bytes + 2 );
+        assert( p_dec->fmt_in.p_extra );
         p_extra = (uint8_t *)p_dec->fmt_in.p_extra + p_dec->fmt_in.i_extra;
         *(p_extra++) = oggpacket.bytes >> 8;
         *(p_extra++) = oggpacket.bytes & 0xFF;
@@ -454,8 +457,9 @@ static int ProcessHeaders( decoder_t *p_dec )
     else
     {
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
-        p_dec->fmt_out.p_extra =
-            realloc( p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+        p_dec->fmt_out.p_extra = realloc_or_free( p_dec->fmt_out.p_extra,
+                                                  p_dec->fmt_out.i_extra );
+        assert( p_dec->fmt_out.p_extra );
         memcpy( p_dec->fmt_out.p_extra,
                 p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
     }
@@ -879,6 +883,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_out.i_extra = 3 * 2 + header[0].bytes +
        header[1].bytes + header[2].bytes;
     p_extra = p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
+    assert( p_extra );
     for( i = 0; i < 3; i++ )
     {
         *(p_extra++) = header[i].bytes >> 8;

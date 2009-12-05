@@ -34,6 +34,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_input.h>
+#include <vlc_memory.h>
 
 #include <errno.h>
 #ifdef HAVE_SYS_TYPES_H
@@ -481,10 +482,9 @@ static int Open ( vlc_object_t *p_this )
         if( p_sys->i_subtitles >= i_max )
         {
             i_max += 500;
-            if( !( p_sys->subtitle = realloc( p_sys->subtitle,
+            if( !( p_sys->subtitle = realloc_or_free( p_sys->subtitle,
                                               sizeof(subtitle_t) * i_max ) ) )
             {
-                free( p_sys->subtitle );
                 TextUnload( &p_sys->txt );
                 free( p_sys );
                 return VLC_ENOMEM;
@@ -747,6 +747,8 @@ static int TextLoad( text_t *txt, stream_t *s )
     txt->i_line_count   = 0;
     txt->i_line         = 0;
     txt->line           = calloc( i_line_max, sizeof( char * ) );
+    if( !txt->line )
+        return VLC_ENOMEM;
 
     /* load the complete file */
     for( ;; )
@@ -760,8 +762,11 @@ static int TextLoad( text_t *txt, stream_t *s )
         if( txt->i_line_count >= i_line_max )
         {
             i_line_max += 100;
-            txt->line = realloc( txt->line, i_line_max * sizeof( char * ) );
+            txt->line = realloc_or_free( txt->line, i_line_max * sizeof( char * ) );
+            if( !txt->line )
+                return VLC_ENOMEM;
         }
+        free( psz );
     }
 
     if( txt->i_line_count <= 0 )
@@ -928,7 +933,7 @@ static int ParseSubRipSubViewer( demux_t *p_demux, subtitle_t *p_subtitle,
         }
 
         i_old = strlen( psz_text );
-        psz_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
         if( !psz_text )
         {
             return VLC_ENOMEM;
@@ -1061,9 +1066,9 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle,
         if( !p_sys->psz_header )
             return VLC_ENOMEM;
 
-        p_sys->psz_header =
-            realloc( p_sys->psz_header,
-                     strlen( p_sys->psz_header ) + strlen( s ) + 2 );
+        p_sys->psz_header = realloc_or_free( p_sys->psz_header,
+                              strlen( p_sys->psz_header ) + strlen( s ) + 2 );
+        assert( p_sys->psz_header );
         strcat( p_sys->psz_header,  s );
         strcat( p_sys->psz_header, "\n" );
     }
@@ -1295,7 +1300,7 @@ static int ParseDVDSubtitle( demux_t *p_demux, subtitle_t *p_subtitle,
         }
 
         i_old = strlen( psz_text );
-        psz_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
         if( !psz_text )
             return VLC_ENOMEM;
         strcat( psz_text, s );
@@ -1402,7 +1407,7 @@ static int ParseAQT( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         else
         {
             i_old = strlen( psz_text ) + 1;
-            psz_text = realloc( psz_text, i_old + strlen( s ) + 1 );
+            psz_text = realloc_or_free( psz_text, i_old + strlen( s ) + 1 );
             if( !psz_text )
                  return VLC_ENOMEM;
             strcat( psz_text, s );
@@ -1548,7 +1553,7 @@ static int ParseMPSub( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
         int i_old = strlen( psz_text );
 
-        psz_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
         if( !psz_text )
              return VLC_ENOMEM;
 
@@ -1694,7 +1699,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
         int i_old = strlen( psz_text );
 
-        psz_text = realloc( psz_text, i_old + i_len + 1 );
+        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 );
         if( !psz_text )
              return VLC_ENOMEM;
 
@@ -1714,6 +1719,7 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         /* Directives are NOT parsed yet */
         /* This has probably a better place in a decoder ? */
         /* directive = malloc( strlen( psz_text ) + 1 );
+           assert( directive );
            if( sscanf( psz_text, "%s %[^\n\r]", directive, psz_text2 ) == 2 )*/
     }
 
@@ -1942,7 +1948,7 @@ static int ParseRealText( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
 
         int i_old = strlen( psz_text );
 
-        psz_text = realloc( psz_text, i_old + i_len + 1 + 1 );
+        psz_text = realloc_or_free( psz_text, i_old + i_len + 1 + 1 );
         if( !psz_text )
             return VLC_ENOMEM;
 

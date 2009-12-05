@@ -36,7 +36,7 @@
 #include "xarray.h"
 
 #ifdef HAVE_STDLIB_H
-#   include <stdlib.h>                                          /* realloc() */
+#   include <stdlib.h>                                           /* malloc() */
 #endif
 
 #undef HISTORY_DEBUG

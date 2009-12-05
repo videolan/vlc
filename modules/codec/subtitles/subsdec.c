@@ -31,6 +31,8 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include "subsdec.h"
 #include <vlc_plugin.h>
 
@@ -458,6 +460,8 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
             char *psz_convert_buffer_out = psz_new_subtitle;
             const char *psz_convert_buffer_in = psz_subtitle;
 
+            assert( psz_new_subtitle );
+
             size_t ret = vlc_iconv( p_sys->iconv_handle,
                                     &psz_convert_buffer_in, &inbytes_left,
                                     &psz_convert_buffer_out, &outbytes_left );
@@ -476,6 +480,8 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
 
             psz_subtitle = realloc( psz_new_subtitle,
                                     psz_convert_buffer_out - psz_new_subtitle );
+            if( !psz_subtitle )
+                psz_subtitle = psz_new_subtitle;
         }
     }
 
@@ -617,7 +623,8 @@ static char *StripTags( char *psz_subtitle )
         psz_subtitle++;
     }
     *psz_text = '\0';
-    psz_text_start = realloc( psz_text_start, strlen( psz_text_start ) + 1 );
+    char *psz = realloc( psz_text_start, strlen( psz_text_start ) + 1 );
+    if( psz ) psz_text_start = psz;
 
     return psz_text_start;
 }

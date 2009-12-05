@@ -30,10 +30,13 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_block.h>
+#include <vlc_memory.h>
 
 #include <vlc_bits.h>
 #include <vlc_block_helper.h>
@@ -138,6 +141,7 @@ static int Open( vlc_object_t *p_this )
     /* Create the output format */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->p_sys = p_sys = malloc( sizeof( decoder_sys_t ) );
+    assert( p_sys );
 
     packetizer_Init( &p_sys->packetizer,
                      p_vc1_startcode, sizeof(p_vc1_startcode),
@@ -309,7 +313,8 @@ static void BuildExtraData( decoder_t *p_dec )
     if( p_es->i_extra != i_extra )
     {
         p_es->i_extra = i_extra;
-        p_es->p_extra = realloc( p_dec->fmt_out.p_extra, p_es->i_extra );
+        p_es->p_extra = realloc_or_free( p_es->p_extra, p_es->i_extra );
+        assert( p_es->p_extra );
     }
     memcpy( p_es->p_extra,
             p_sys->sh.p_sh->p_buffer, p_sys->sh.p_sh->i_buffer );

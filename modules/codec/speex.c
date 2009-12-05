@@ -28,11 +28,14 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_codec.h>
 #include <vlc_aout.h>
+#include <vlc_memory.h>
 
 #include <ogg/ogg.h>
 #include <speex/speex.h>
@@ -306,9 +309,9 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     {
         uint8_t *p_extra;
 
-        p_dec->fmt_in.p_extra =
-            realloc( p_dec->fmt_in.p_extra, p_dec->fmt_in.i_extra +
-                     oggpacket.bytes + 2 );
+        p_dec->fmt_in.p_extra = realloc_or_free( p_dec->fmt_in.p_extra,
+                                p_dec->fmt_in.i_extra + oggpacket.bytes + 2 );
+        assert( p_dec->fmt_in.p_extra );
         p_extra = ((uint8_t *)p_dec->fmt_in.p_extra) + p_dec->fmt_in.i_extra;
         *(p_extra++) = oggpacket.bytes >> 8;
         *(p_extra++) = oggpacket.bytes & 0xFF;
@@ -392,8 +395,9 @@ static int ProcessHeaders( decoder_t *p_dec )
     if( p_sys->b_packetizer )
     {
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
-        p_dec->fmt_out.p_extra =
-            realloc( p_dec->fmt_out.p_extra, p_dec->fmt_out.i_extra );
+        p_dec->fmt_out.p_extra = realloc_or_free( p_dec->fmt_out.p_extra,
+                                                  p_dec->fmt_out.i_extra );
+        assert( p_dec->fmt_out.p_extra );
         memcpy( p_dec->fmt_out.p_extra,
                 p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
     }
@@ -530,6 +534,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
 
 	    i_pcm_output_size = p_sys->p_header->frame_size;
 	    p_frame_holder = (short*)malloc( sizeof(short)*i_pcm_output_size );
+            assert( p_frame_holder );
 
             speex_bits_read_from( &p_sys->bits, (char*)p_oggpacket->packet,
 	        p_oggpacket->bytes);
@@ -1001,6 +1006,7 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_frame_size = p_sys->i_frame_length *
         sizeof(int16_t) * p_enc->fmt_in.audio.i_channels;
     p_sys->p_buffer = malloc( p_sys->i_frame_size );
+    assert( p_sys->p_buffer );
 
     /* Create and store headers */
     pp_header[0] = speex_header_to_packet( &p_sys->header, &pi_header[0] );
@@ -1009,6 +1015,7 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     p_enc->fmt_out.i_extra = 3 * 2 + pi_header[0] + pi_header[1];
     p_extra = p_enc->fmt_out.p_extra = malloc( p_enc->fmt_out.i_extra );
+    assert( p_extra );
     for( i = 0; i < 2; i++ )
     {
         *(p_extra++) = pi_header[i] >> 8;

@@ -37,6 +37,7 @@
 #include <vlc_meta.h>
 #include <vlc_codecs.h>
 #include <vlc_charset.h>
+#include <vlc_memory.h>
 
 #include "libavi.h"
 
@@ -2107,8 +2108,8 @@ static void AVI_IndexAddEntry( demux_sys_t *p_sys,
     if( tk->i_idxnb >= tk->i_idxmax )
     {
         tk->i_idxmax += 16384;
-        tk->p_index = realloc( tk->p_index,
-                               tk->i_idxmax * sizeof( avi_entry_t ) );
+        tk->p_index = realloc_or_free( tk->p_index,
+                                       tk->i_idxmax * sizeof( avi_entry_t ) );
         if( tk->p_index == NULL )
         {
             return;

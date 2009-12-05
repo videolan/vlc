@@ -36,6 +36,7 @@
 #include <vlc_xml.h>
 #include <vlc_block.h>
 #include <vlc_stream.h>
+#include <vlc_memory.h>
 
 #include <ctype.h>
 #include <stdarg.h>
@@ -174,7 +175,7 @@ static void CatalogAdd( xml_t *p_xml, const char *psz_arg1,
 static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
 {
     xml_reader_t *p_reader;
-    char *p_buffer, *p_new;
+    char *p_buffer;
     int i_size, i_pos = 0, i_buffer = 2048;
     XTag *p_root;
 
@@ -187,13 +188,9 @@ static xml_reader_t *ReaderCreate( xml_t *p_xml, stream_t *s )
     {
         i_pos += i_size;
         i_buffer += i_size;
-        p_new = realloc( p_buffer, i_buffer );
-        if( !p_new )
-        {
-            free( p_buffer );
+        p_buffer = realloc_or_free( p_buffer, i_buffer );
+        if( !p_buffer )
             return NULL;
-        }
-        p_buffer = p_new;
     }
     if( i_pos + i_size == 0 )
     {
@@ -355,6 +352,7 @@ static XList *xlist_append( XList *list, void *data )
     XList *l, *last;
 
     l = (XList *)malloc( sizeof(XList) );
+    assert( l );
     l->prev = l->next = NULL;
     l->data = data;
 
@@ -460,6 +458,7 @@ static char *xtag_slurp_to( XTagParser *parser, int good_end, int bad_end )
     if( xi > 0 && xtag_cin (s[xi], good_end) )
     {
         ret = malloc( xi+1 );
+        assert( ret );
         strncpy( ret, s, xi );
         ret[xi] = '\0';
         parser->start = &s[xi];
@@ -513,6 +512,7 @@ static char *xtag_slurp_quoted( XTagParser *parser )
     }
 
     ret = malloc( xi+1 );
+    assert( ret );
     strncpy( ret, s, xi );
     ret[xi] = '\0';
     parser->start = &s[xi];
@@ -565,6 +565,7 @@ static XAttribute *xtag_parse_attribute( XTagParser *parser )
     }
 
     attr = malloc( sizeof (*attr) );
+    assert( attr );
     attr->name = name;
     attr->value = value;
     return attr;
@@ -639,6 +640,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
     if( (pcdata = xtag_slurp_to( parser, X_OPENTAG, X_NONE )) != NULL )
     {
         tag = malloc( sizeof(*tag) );
+        assert( tag );
         tag->name = NULL;
         tag->pcdata = pcdata;
         tag->parent = parser->current_tag;
@@ -693,6 +695,7 @@ static XTag *xtag_parse_tag( XTagParser *parser )
 #endif
 
     tag = malloc( sizeof(*tag) );
+    assert( tag );
     tag->name = name;
     tag->pcdata = NULL;
     tag->parent = parser->current_tag;
@@ -832,6 +835,7 @@ static XTag *xtag_new_parse( const char *s, int n )
         }
 
         wrapper = malloc( sizeof(XTag) );
+        assert( wrapper );
         wrapper->name = NULL;
         wrapper->pcdata = NULL;
         wrapper->parent = NULL;

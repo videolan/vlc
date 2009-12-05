@@ -42,6 +42,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
 #include <vlc_playlist.h>   /* needed for wallpaper */
+#include <vlc_memory.h>
 
 #include <ddraw.h>
 #include <commctrl.h>       /* ListView_(Get|Set)* */
@@ -1817,12 +1818,12 @@ BOOL WINAPI DirectXEnumCallback2( GUID* p_guid, LPTSTR psz_desc,
 
     module_config_t *p_item = (module_config_t *)p_context;
 
-    p_item->ppsz_list =
-        (char **)realloc( p_item->ppsz_list,
+    p_item->ppsz_list = realloc_or_free( p_item->ppsz_list,
                           (p_item->i_list+2) * sizeof(char *) );
-    p_item->ppsz_list_text =
-        (char **)realloc( p_item->ppsz_list_text,
+    assert( p_item->ppsz_list );
+    p_item->ppsz_list_text = realloc_or_free( p_item->ppsz_list_text,
                           (p_item->i_list+2) * sizeof(char *) );
+    assert( p_item->ppsz_list_text );
 
     p_item->ppsz_list[p_item->i_list] = strdup( psz_drivername );
     p_item->ppsz_list_text[p_item->i_list] = NULL;

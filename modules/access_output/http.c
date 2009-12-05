@@ -30,14 +30,15 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
-
-
 #include <vlc_input.h>
 #include <vlc_playlist.h>
+#include <vlc_memory.h>
 
 #if 0 //def HAVE_AVAHI_CLIENT
     #include "bonjour.h"
@@ -319,10 +320,15 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_header_size      = 0;
     p_sys->p_header           = malloc( p_sys->i_header_allocated );
     p_sys->b_header_complete  = false;
+    if( !p_sys->p_header )
+        p_sys->i_header_allocated = 0;
 
     p_access->pf_write       = Write;
     p_access->pf_seek        = Seek;
     p_access->pf_control     = Control;
+
+    /* XXX Do we deal gracefully with p_sys->p_header == NULL? */
+    assert( p_sys->p_header );
 
     return VLC_SUCCESS;
 }
@@ -393,8 +399,9 @@ static ssize_t Write( sout_access_out_t *p_access, block_t *p_buffer )
             {
                 p_sys->i_header_allocated =
                     p_buffer->i_buffer + p_sys->i_header_size + 1024;
-                p_sys->p_header =
-                    realloc( p_sys->p_header, p_sys->i_header_allocated );
+                p_sys->p_header = realloc_or_free( p_sys->p_header,
+                                                  p_sys->i_header_allocated );
+                assert( p_sys->p_header );
             }
             memcpy( &p_sys->p_header[p_sys->i_header_size],
                     p_buffer->p_buffer,

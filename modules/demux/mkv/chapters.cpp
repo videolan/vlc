@@ -26,6 +26,9 @@
 
 #include "chapter_command.hpp"
 
+#include <assert.h>
+#include <vlc_memory.h>
+
 chapter_item_c::~chapter_item_c()
 {
     std::vector<chapter_codec_cmds_c*>::iterator index = codecs.begin();
@@ -62,7 +65,9 @@ int chapter_item_c::PublishChapters( input_title_t & title, int & i_user_chapter
 
         // A start time of '0' is ok. A missing ChapterTime element is ok, too, because '0' is its default value.
         title.i_seekpoint++;
-        title.seekpoint = (seekpoint_t**)realloc( title.seekpoint, title.i_seekpoint * sizeof( seekpoint_t* ) );
+        title.seekpoint = realloc_or_free( title.seekpoint,
+                                 title.i_seekpoint * sizeof( seekpoint_t* ) );
+        assert( title.seekpoint );
         title.seekpoint[title.i_seekpoint-1] = sk;
 
         if ( b_user_display )

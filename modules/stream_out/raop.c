@@ -42,6 +42,7 @@
 #include <vlc_gcrypt.h>
 #include <vlc_es.h>
 #include <vlc_http.h>
+#include <vlc_memory.h>
 
 #define RAOP_PORT 5000
 #define RAOP_USER_AGENT "VLC " VERSION
@@ -1299,7 +1300,7 @@ static void SendAudio( sout_stream_t *p_stream, block_t *p_buffer )
             /* Grow in blocks of 4K */
             i_realloc_len = (1 + (i_len / 4096)) * 4096;
 
-            p_sys->p_sendbuf = realloc( p_sys->p_sendbuf, i_realloc_len );
+            p_sys->p_sendbuf = realloc_or_free( p_sys->p_sendbuf, i_realloc_len );
             if ( p_sys->p_sendbuf == NULL )
                 goto error;
 

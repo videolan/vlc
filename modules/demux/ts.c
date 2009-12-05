@@ -32,6 +32,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_memory.h>
 
 #include <ctype.h>
 #include <assert.h>
@@ -515,6 +516,10 @@ static int Open( vlc_object_t *p_this )
         char *psz_event_text = malloc(130);
         char *psz_ext_text = malloc(1025);
 
+        assert( psz_name );
+        assert( psz_event_text );
+        assert( psz_ext_text );
+
         // 2 bytes version Uimsbf (4,5)
         // 2 bytes reserved (6,7)
         // 2 bytes duration in minutes Uimsbf (8,9(
@@ -619,6 +624,7 @@ static int Open( vlc_object_t *p_this )
                 p_sys->i_ts_read = 1500 / p_sys->i_packet_size;
             }
             p_sys->buffer = malloc( p_sys->i_packet_size * p_sys->i_ts_read );
+            assert( p_sys->buffer );
             msg_Info( p_demux, "%s raw stream to file `%s' reading packets %d",
                       b_append ? "appending" : "dumping", p_sys->psz_file,
                       p_sys->i_ts_read );
@@ -3018,7 +3024,9 @@ static void EITCallBack( demux_t *p_demux,
                         {
                             msg_Dbg( p_demux, "       - text='%s'", psz_text );
 
-                            psz_extra = realloc( psz_extra, strlen(psz_extra) + strlen(psz_text) + 1 );
+                            psz_extra = realloc_or_free( psz_extra,
+                                   strlen(psz_extra) + strlen(psz_text) + 1 );
+                            assert( psz_extra );
                             strcat( psz_extra, psz_text );
                             free( psz_text );
                         }
@@ -3034,7 +3042,10 @@ static void EITCallBack( demux_t *p_demux,
                         {
                             msg_Dbg( p_demux, "       - desc='%s' item='%s'", psz_dsc, psz_itm );
 #if 0
-                            psz_extra = realloc( psz_extra, strlen(psz_extra) + strlen(psz_dsc) + strlen(psz_itm) + 3 + 1 );
+                            psz_extra = realloc_or_free( psz_extra,
+                                         strlen(psz_extra) + strlen(psz_dsc) +
+                                         strlen(psz_itm) + 3 + 1 );
+                            assert( psz_extra );
                             strcat( psz_extra, "(" );
                             strcat( psz_extra, psz_dsc );
                             strcat( psz_extra, " " );

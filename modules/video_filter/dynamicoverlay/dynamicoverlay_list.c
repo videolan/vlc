@@ -28,6 +28,7 @@
 
 #include <vlc_common.h>
 #include <vlc_osd.h>
+#include <vlc_memory.h>
 
 #include <fcntl.h>
 #include "dynamicoverlay.h"
@@ -80,8 +81,8 @@ ssize_t ListAdd( list_t *p_list, overlay_t *p_new )
     /* Have to expand */
     size_t i_size = p_list->pp_tail - p_list->pp_head;
     size_t i_newsize = i_size * 2;
-    p_list->pp_head = realloc( p_list->pp_head,
-                               i_newsize * sizeof( overlay_t * ) );
+    p_list->pp_head = realloc_or_free( p_list->pp_head,
+                                       i_newsize * sizeof( overlay_t * ) );
     if( p_list->pp_head == NULL )
         return VLC_ENOMEM;
 

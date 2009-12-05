@@ -45,6 +45,7 @@
 #include <vlc_dialog.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>
+#include <vlc_memory.h>
 
 #include <iostream>
 #include <limits.h>
@@ -367,7 +368,8 @@ static int  Open ( vlc_object_t *p_this )
             }
 
             i_sdp_max += 1000;
-            p_sdp = (uint8_t*)realloc( p_sdp, i_sdp_max );
+            p_sdp = (uint8_t*)realloc_or_free( p_sdp, i_sdp_max );
+            assert( p_sdp );
         }
         p_sys->p_sdp = (char*)p_sdp;
     }
@@ -867,6 +869,7 @@ static int SessionsSetup( demux_t *p_demux )
                     {
                         tk->fmt.i_extra = i_extra;
                         tk->fmt.p_extra = malloc( i_extra );
+                        assert( tk->fmt.p_extra );
                         memcpy( tk->fmt.p_extra, p_extra, i_extra );
                         delete[] p_extra;
                     }
@@ -887,6 +890,7 @@ static int SessionsSetup( demux_t *p_demux )
                     {
                         tk->fmt.i_extra = i_extra;
                         tk->fmt.p_extra = malloc( i_extra );
+                        assert( tk->fmt.p_extra );
                         memcpy( tk->fmt.p_extra, p_extra, i_extra );
                         delete[] p_extra;
                     }
@@ -945,6 +949,7 @@ static int SessionsSetup( demux_t *p_demux )
                     {
                         tk->fmt.i_extra = i_extra;
                         tk->fmt.p_extra = malloc( i_extra );
+                        assert( tk->fmt.p_extra );
                         memcpy( tk->fmt.p_extra, p_extra, i_extra );
 
                         delete[] p_extra;
@@ -966,6 +971,7 @@ static int SessionsSetup( demux_t *p_demux )
                     {
                         tk->fmt.i_extra = i_extra;
                         tk->fmt.p_extra = malloc( i_extra );
+                        assert( tk->fmt.p_extra );
                         memcpy( tk->fmt.p_extra, p_extra, i_extra );
                         delete[] p_extra;
                     }
@@ -1028,7 +1034,9 @@ static int SessionsSetup( demux_t *p_demux )
             if( tk->p_es || tk->b_quicktime || tk->b_muxed || tk->b_asf )
             {
                 /* Append */
-                p_sys->track = (live_track_t**)realloc( p_sys->track, sizeof( live_track_t ) * ( p_sys->i_track + 1 ) );
+                p_sys->track = (live_track_t**)realloc_or_free( p_sys->track,
+                            sizeof( live_track_t ) * ( p_sys->i_track + 1 ) );
+                assert( p_sys->track );
                 p_sys->track[p_sys->i_track++] = tk;
             }
             else
@@ -1618,6 +1626,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
                     {
                         tk->fmt.i_extra = atomLength-8;
                         tk->fmt.p_extra = malloc( tk->fmt.i_extra );
+                        assert( tk->fmt.p_extra );
                         memcpy(tk->fmt.p_extra, pos+8, atomLength-8);
                         break;
                     }
@@ -1628,6 +1637,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
             {
                 tk->fmt.i_extra        = qtState.sdAtomSize - 16;
                 tk->fmt.p_extra        = malloc( tk->fmt.i_extra );
+                assert( tk->fmt.p_extra );
                 memcpy( tk->fmt.p_extra, &sdAtom[12], tk->fmt.i_extra );
             }
         }

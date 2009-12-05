@@ -29,8 +29,11 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_memory.h>
 
 #include <vlc_filter.h>
 #include "filter_picture.h"
@@ -101,6 +104,8 @@ static void gaussianblur_InitDistribution( filter_sys_t *p_sys )
     int i_dim = (int)(3.*f_sigma);
     type_t *pt_distribution = malloc( (2*i_dim+1) * sizeof( type_t ) );
     int x;
+
+    assert( pt_distribution );
 
     for( x = -i_dim; x <= i_dim; x++ )
     {
@@ -199,10 +204,9 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
     if( !p_sys->pt_buffer )
     {
-        p_sys->pt_buffer = realloc( p_sys->pt_buffer,
-                                    p_pic->p[Y_PLANE].i_visible_lines *
-                                        p_pic->p[Y_PLANE].i_pitch *
-                                        sizeof( type_t ) );
+        p_sys->pt_buffer = realloc_or_free( p_sys->pt_buffer,
+                               p_pic->p[Y_PLANE].i_visible_lines *
+                               p_pic->p[Y_PLANE].i_pitch * sizeof( type_t ) );
     }
 
     pt_buffer = p_sys->pt_buffer;
@@ -215,6 +219,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         p_sys->pt_scale = malloc( i_visible_lines * i_pitch * sizeof( type_t ) );
         pt_scale = p_sys->pt_scale;
+        assert( pt_scale );
 
         for( i_line = 0 ; i_line < i_visible_lines ; i_line++ )
         {

@@ -30,10 +30,13 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
+#include <vlc_memory.h>
 
 /*****************************************************************************
  * Module descriptor
@@ -195,6 +198,7 @@ static int OpenOut( vlc_object_t *p_this )
                    p_stream->p_cfg );
 
     p_sys          = malloc( sizeof( out_sout_stream_sys_t ) );
+    assert( p_sys );
     p_sys->b_inited = false;
 
     var_Create( p_this->p_libvlc, "bridge-lock", VLC_VAR_MUTEX );
@@ -258,6 +262,7 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
     if ( p_bridge == NULL )
     {
         p_bridge = malloc( sizeof( bridge_t ) );
+        assert( p_bridge );
 
         var_Create( p_stream->p_libvlc, p_sys->psz_name, VLC_VAR_ADDRESS );
         var_SetAddress( p_stream->p_libvlc, p_sys->psz_name, p_bridge );
@@ -274,11 +279,12 @@ static sout_stream_id_t * AddOut( sout_stream_t *p_stream, es_format_t *p_fmt )
 
     if ( i == p_bridge->i_es_num )
     {
-        p_bridge->pp_es = realloc( p_bridge->pp_es,
-                                   (p_bridge->i_es_num + 1)
-                                     * sizeof(bridged_es_t *) );
+        p_bridge->pp_es = realloc_or_free( p_bridge->pp_es,
+                          (p_bridge->i_es_num + 1) * sizeof(bridged_es_t *) );
+        assert( p_bridge->pp_es );
         p_bridge->i_es_num++;
         p_bridge->pp_es[i] = malloc( sizeof(bridged_es_t) );
+        assert( p_bridge->pp_es[i] );
     }
 
     p_sys->p_es = p_es = p_bridge->pp_es[i];
@@ -391,6 +397,7 @@ static int OpenIn( vlc_object_t *p_this )
     vlc_value_t val;
 
     p_sys          = malloc( sizeof( in_sout_stream_sys_t ) );
+    assert( p_sys );
 
     p_sys->p_out = sout_StreamNew( p_stream->p_sout, p_stream->psz_next );
     if( !p_sys->p_out )

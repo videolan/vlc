@@ -38,6 +38,7 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_vout.h>
+#include <vlc_memory.h>
 
 /*****************************************************************************
  * vout_sys_t: video output QNX method descriptor
@@ -316,16 +317,10 @@ static int QNXManage( vout_thread_t *p_vout )
 
         if( i_ev == Ph_RESIZE_MSG )
         {
-            PhEvent_t *buf;
-
             i_buflen = PhGetMsgSize( p_event );
-            buf = realloc( p_event, i_buflen );
-            if( buf == NULL )
-            {
-                free( p_event );
+            p_event = realloc_or_free( p_event, i_buflen );
+            if( p_event == NULL )
                 return( 1 );
-            }
-            p_event = buf;
         }
         else if( i_ev == Ph_EVENT_MSG )
         {

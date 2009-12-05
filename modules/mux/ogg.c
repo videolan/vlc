@@ -30,11 +30,14 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
 #include <vlc_codecs.h>
+#include <vlc_memory.h>
 
 #include <ogg/ogg.h>
 
@@ -535,9 +538,9 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
         /* move input in delete queue */
         if( !p_stream->b_new )
         {
-            p_sys->pp_del_streams = realloc( p_sys->pp_del_streams,
-                                             (p_sys->i_del_streams + 1) *
-                                             sizeof(ogg_stream_t *) );
+            p_sys->pp_del_streams = realloc_or_free( p_sys->pp_del_streams,
+                        (p_sys->i_del_streams + 1) * sizeof(ogg_stream_t *) );
+            assert( p_sys->pp_del_streams );
             p_sys->pp_del_streams[p_sys->i_del_streams++] = p_stream;
         }
         else

@@ -273,6 +273,7 @@ static int TPDURecv( access_t * p_access, uint8_t i_slot, uint8_t *pi_tag,
     if ( pi_size == NULL )
     {
         p_data = malloc( MAX_TPDU_SIZE );
+        assert( p_data );
     }
 
     for ( ; ; )
@@ -357,6 +358,8 @@ static int SPDUSend( access_t * p_access, int i_session_id,
     uint8_t *p = p_spdu;
     uint8_t i_tag;
     uint8_t i_slot = p_sys->p_sessions[i_session_id - 1].i_slot;
+
+    assert( p_spdu );
 
     *p++ = ST_SESSION_NUMBER;
     *p++ = 0x02;
@@ -806,6 +809,8 @@ static int APDUSend( access_t * p_access, int i_session_id, int i_tag,
     ca_msg_t ca_msg;
     int i_ret;
 
+    assert( p_apdu );
+
     *p++ = (i_tag >> 16);
     *p++ = (i_tag >> 8) & 0xff;
     *p++ = i_tag & 0xff;
@@ -1051,6 +1056,8 @@ static uint8_t *CAPMTHeader( system_ids_t *p_ids, uint8_t i_list_mgt,
     else
         p_data = malloc( 6 );
 
+    assert( p_data );
+
     p_data[0] = i_list_mgt;
     p_data[1] = i_program_number >> 8;
     p_data[2] = i_program_number & 0xff;
@@ -1104,6 +1111,8 @@ static uint8_t *CAPMTES( system_ids_t *p_ids, uint8_t *p_capmt,
         p_data = realloc( p_capmt, i_capmt_size + 6 + i_size );
     else
         p_data = realloc( p_capmt, i_capmt_size + 5 );
+
+    assert( p_data );
 
     i = i_capmt_size;
 
@@ -1573,6 +1582,7 @@ static void MMISendObject( access_t *p_access, int i_session_id,
         i_tag = AOT_ANSW;
         i_size = 1 + strlen( p_object->u.answ.psz_answ );
         p_data = malloc( i_size );
+        assert( p_data );
         p_data[0] = (p_object->u.answ.b_ok == true) ? 0x1 : 0x0;
         strncpy( (char *)&p_data[1], p_object->u.answ.psz_answ, i_size - 1 );
         break;
@@ -1581,6 +1591,7 @@ static void MMISendObject( access_t *p_access, int i_session_id,
         i_tag = AOT_MENU_ANSW;
         i_size = 1;
         p_data = malloc( i_size );
+        assert( p_data );
         p_data[0] = p_object->u.menu_answ.i_choice;
         break;
 
@@ -1667,6 +1678,7 @@ static void MMIHandleEnq( access_t *p_access, int i_session_id,
     d += 2; /* skip answer_text_length because it is not mandatory */
     l -= 2;
     p_mmi->last_object.u.enq.psz_text = malloc( l + 1 );
+    assert( p_mmi->last_object.u.enq.psz_text );
     strncpy( p_mmi->last_object.u.enq.psz_text, (char *)d, l );
     p_mmi->last_object.u.enq.psz_text[l] = '\0';
 
@@ -1810,6 +1822,7 @@ static void MMIOpen( access_t *p_access, int i_session_id )
     p_sys->p_sessions[i_session_id - 1].pf_close = MMIClose;
     p_sys->p_sessions[i_session_id - 1].p_sys = malloc(sizeof(mmi_t));
     p_mmi = (mmi_t *)p_sys->p_sessions[i_session_id - 1].p_sys;
+    assert( p_mmi );
     p_mmi->last_object.i_object_type = EN50221_MMI_NONE;
 }
 
@@ -2440,6 +2453,7 @@ char *dvbsi_to_utf8( const char *psz_instring, size_t i_length )
     i_in = i_length - (psz_stringstart - psz_instring );
     i_out = i_in * 6;
     psz_outstring = psz_tmp = (char*)malloc( i_out + 1 );
+    assert( psz_outstring );
     vlc_iconv( iconv_handle, &psz_stringstart, &i_in, &psz_tmp, &i_out );
     vlc_iconv_close( iconv_handle );
     *psz_tmp = '\0';

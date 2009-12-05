@@ -30,8 +30,11 @@
 # include "config.h"
 #endif
 
+#include <assert.h>
+
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_memory.h>
 
 #include <errno.h>                                                 /* ENOMEM */
 #include <ctype.h>
@@ -2106,7 +2109,9 @@ static input_item_t *parse_MRL( intf_thread_t *p_intf, char *psz_mrl )
         else if( *psz_item )
         {
             i_options++;
-            ppsz_options = realloc( ppsz_options, i_options * sizeof(char *) );
+            ppsz_options = realloc_or_free( ppsz_options,
+                                            i_options * sizeof(char *) );
+            assert( ppsz_options );
             ppsz_options[i_options - 1] = &psz_item[1];
         }
 
