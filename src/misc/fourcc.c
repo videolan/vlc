@@ -591,6 +591,8 @@ static const entry_t p_list_video[] = {
         A("AVs2"),
         A("avs2"),
 
+    B(VLC_CODEC_AMV, "AMV"),
+
     /* */
     B(VLC_CODEC_DNXHD, "DNxHD"),
         A("AVdn"),
@@ -919,6 +921,8 @@ static const entry_t p_list_audio[] = {
 
     B(VLC_CODEC_ADPCM_IMA_WAV, "IMA WAV ADPCM Audio"),
         A("ms\x00\x11"),
+
+    B(VLC_CODEC_ADPCM_IMA_AMV, "IMA AMV ADPCM Audio"),
 
     /* AMR */
     B(VLC_CODEC_AMR_NB, "AMR narrow band"),

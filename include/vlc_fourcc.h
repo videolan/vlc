@@ -111,6 +111,7 @@
 #define VLC_CODEC_VMDVIDEO  VLC_FOURCC('V','M','D','V')
 #define VLC_CODEC_CDG       VLC_FOURCC('C','D','G',' ')
 #define VLC_CODEC_FRWU      VLC_FOURCC('F','R','W','U')
+#define VLC_CODEC_AMV       VLC_FOURCC('A','M','V',' ')
 
 
 /* Planar YUV 4:2:0 Y:V:U */
@@ -270,6 +271,7 @@
 #define VLC_CODEC_FL32      VLC_FOURCC('f','l','3','2')
 #define VLC_CODEC_FL64      VLC_FOURCC('f','l','6','4')
 #define VLC_CODEC_TWINVQ    VLC_FOURCC('T','W','I','N')
+#define VLC_CODEC_ADPCM_IMA_AMV VLC_FOURCC('i','m','a','v')
 
 /* Subtitle */
 #define VLC_CODEC_SPU       VLC_FOURCC('s','p','u',' ')

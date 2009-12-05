@@ -19,7 +19,7 @@ Demuxers:
  * Support for ADPCM in .flv streams
  * EXPERIMENTAL support for .aob files from DVD-Audio (MLP and LPCM)
    (Full disc support is NOT present yet)
- * Support for TwinVQ (.vqf) files
+ * Support for TwinVQ (.vqf) and AMV (.amv) files
  * Various EGP improvements
 
 Playlist:
