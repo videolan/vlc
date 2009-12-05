@@ -25,6 +25,9 @@
 #ifndef _LIBVLC_MEDIA_LIST_PATH_H
 #define _LIBVLC_MEDIA_LIST_PATH_H 1
 
+#include <assert.h>
+#include <vlc_memory.h>
+
 typedef int * libvlc_media_list_path_t; /* (Media List Player Internal) */
 
 /**************************************************************************
@@ -50,6 +53,7 @@ static inline void libvlc_media_list_path_dump( const libvlc_media_list_path_t p
 static inline libvlc_media_list_path_t libvlc_media_list_path_empty( void )
 {
     libvlc_media_list_path_t ret = malloc(sizeof(int));
+    assert( ret );
     ret[0] = -1;
     return ret;
 }
@@ -60,6 +64,7 @@ static inline libvlc_media_list_path_t libvlc_media_list_path_empty( void )
 static inline libvlc_media_list_path_t libvlc_media_list_path_with_root_index( int index )
 {
     libvlc_media_list_path_t ret = malloc(sizeof(int)*2);
+    assert( ret );
     ret[0] = index;
     ret[1] = -1;
     return ret;
@@ -81,7 +86,8 @@ static inline int libvlc_media_list_path_depth( const libvlc_media_list_path_t p
 static inline void libvlc_media_list_path_append( libvlc_media_list_path_t * p_path, int index )
 {
     int old_depth = libvlc_media_list_path_depth( *p_path );
-    *p_path = realloc( *p_path, sizeof(int)*(old_depth+2));
+    *p_path = realloc_or_free( *p_path, sizeof(int)*(old_depth+2));
+    assert( *p_path );
     *p_path[old_depth] = index;
     *p_path[old_depth+1] = -1;
 }
@@ -94,6 +100,7 @@ static inline libvlc_media_list_path_t libvlc_media_list_path_copy_by_appending(
     libvlc_media_list_path_t ret;
     int old_depth = libvlc_media_list_path_depth( path );
     ret = malloc( sizeof(int) * (old_depth + 2) );
+    assert( ret );
     memcpy( ret, path, sizeof(int) * old_depth );
     ret[old_depth] = index;
     ret[old_depth+1] = -1;
@@ -108,6 +115,7 @@ static inline libvlc_media_list_path_t libvlc_media_list_path_copy( const libvlc
     libvlc_media_list_path_t ret;
     int depth = libvlc_media_list_path_depth( path );
     ret = malloc( sizeof(int)*(depth+1) );
+    assert( ret );
     memcpy( ret, path, sizeof(int)*(depth+1) );
     return ret;
 }

@@ -32,11 +32,11 @@
 #include <vlc_stream.h>
 #include <limits.h>
 #include <vlc_art_finder.h>
+#include <vlc_memory.h>
 
 #include "art.h"
 #include "fetcher.h"
 #include "playlist_internal.h"
-
 
 /*****************************************************************************
  * Structures/definitions
@@ -293,7 +293,7 @@ static int DownloadArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
         if( i_data >= INT_MAX - i_read )
             break;
 
-        p_data = realloc( p_data, i_data + i_read );
+        p_data = realloc_or_free( p_data, i_data + i_read );
         if( !p_data )
             break;
 

@@ -607,6 +607,7 @@ char *str_format_time( const char *tformat )
                     {                                               \
                         int len = strlen( string );                 \
                         dst = realloc( dst, i_size = i_size + len );\
+                        assert( dst );                              \
                         memcpy( (dst+d), string, len );             \
                         d += len;                                   \
                         free( string );                             \
@@ -622,6 +623,7 @@ char *str_format_time( const char *tformat )
                     {                                               \
                         int len = strlen( string );                 \
                         dst = realloc( dst, i_size = i_size + len );\
+                        assert( dst );                              \
                         memcpy( dst+d, string, len );               \
                         d += len;                                   \
                     }

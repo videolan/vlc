@@ -30,6 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_memory.h>
 #include "libvlc.h"
 
 #include <stdlib.h>                                      /* free(), strtol() */
@@ -1077,7 +1078,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
     /* Add entry to cache */
     module_cache_t **pp_cache = p_bank->pp_cache;
 
-    pp_cache = realloc( pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
+    pp_cache = realloc_or_free( pp_cache, (p_bank->i_cache + 1) * sizeof(void *) );
     if( pp_cache == NULL )
         return -1;
     pp_cache[p_bank->i_cache] = malloc( sizeof(module_cache_t) );

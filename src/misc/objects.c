@@ -37,6 +37,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_memory.h>
 
 #include "../libvlc.h"
 #include <vlc_aout.h>
@@ -1123,11 +1124,9 @@ static void DumpStructure( vlc_object_t *p_this, int i_level, char *psz_foo )
 
 static vlc_list_t * NewList( int i_count )
 {
-    vlc_list_t * p_list = (vlc_list_t *)malloc( sizeof( vlc_list_t ) );
+    vlc_list_t * p_list = malloc( sizeof( vlc_list_t ) );
     if( p_list == NULL )
-    {
         return NULL;
-    }
 
     p_list->i_count = i_count;
 
@@ -1169,8 +1168,8 @@ static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,
         return;
     }
 
-    p_list->p_values = realloc( p_list->p_values, (p_list->i_count + 1)
-                                * sizeof( vlc_value_t ) );
+    p_list->p_values = realloc_or_free( p_list->p_values,
+                              (p_list->i_count + 1) * sizeof( vlc_value_t ) );
     if( p_list->p_values == NULL )
     {
         p_list->i_count = 0;

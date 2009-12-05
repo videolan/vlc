@@ -55,6 +55,7 @@
 #endif
 
 #include <vlc_network.h>
+#include <vlc_memory.h>
 
 #ifndef INADDR_ANY
 #   define INADDR_ANY  0x00000000
@@ -522,7 +523,8 @@ char *__net_Gets( vlc_object_t *p_this, int fd, const v_socket_t *p_vs )
         if( i_line == i_max )
         {
             i_max += 1024;
-            psz_line = realloc( psz_line, i_max );
+            psz_line = realloc_or_free( psz_line, i_max );
+            assert( psz_line );
             ptr = psz_line + i_line;
         }
 

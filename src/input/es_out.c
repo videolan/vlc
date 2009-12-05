@@ -39,6 +39,8 @@
 #include <vlc_aout.h>
 #include <vlc_fourcc.h>
 
+#include <vlc_memory.h>
+
 #include "input_internal.h"
 #include "clock.h"
 #include "decoder.h"
@@ -2346,7 +2348,9 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             if( p_fmt->i_extra )
             {
                 es->fmt.i_extra = p_fmt->i_extra;
-                es->fmt.p_extra = realloc( es->fmt.p_extra, p_fmt->i_extra );
+                es->fmt.p_extra = realloc_or_free( es->fmt.p_extra,
+                                                             p_fmt->i_extra );
+                assert( es->fmt.p_extra );
                 memcpy( es->fmt.p_extra, p_fmt->p_extra, p_fmt->i_extra );
 
                 if( !es->p_dec )
@@ -2358,7 +2362,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 #else
                 es->p_dec->fmt_in.i_extra = p_fmt->i_extra;
                 es->p_dec->fmt_in.p_extra =
-                    realloc( es->p_dec->fmt_in.p_extra, p_fmt->i_extra );
+                  realloc_or_free( es->p_dec->fmt_in.p_extra, p_fmt->i_extra );
+                assert( es->p_dec->fmt_in.p_extra );
                 memcpy( es->p_dec->fmt_in.p_extra,
                         p_fmt->p_extra, p_fmt->i_extra );
 #endif

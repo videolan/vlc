@@ -32,6 +32,7 @@
 #include <vlc_strings.h>
 #include <vlc_osd.h>
 #include <vlc_charset.h>
+#include <vlc_memory.h>
 
 #include <libvlc.h>
 
@@ -805,7 +806,7 @@ static int AStreamPeekBlock( stream_t *s, const uint8_t **pp_peek, unsigned int 
     /* We need to create a local copy */
     if( p_sys->i_peek < i_read )
     {
-        p_sys->p_peek = realloc( p_sys->p_peek, i_read );
+        p_sys->p_peek = realloc_or_free( p_sys->p_peek, i_read );
         if( !p_sys->p_peek )
         {
             p_sys->i_peek = 0;
@@ -1112,7 +1113,7 @@ static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, unsigned int
 
     if( p_sys->i_peek < i_read )
     {
-        p_sys->p_peek = realloc( p_sys->p_peek, i_read );
+        p_sys->p_peek = realloc_or_free( p_sys->p_peek, i_read );
         if( !p_sys->p_peek )
         {
             p_sys->i_peek = 0;
@@ -1601,7 +1602,8 @@ char *stream_ReadLine( stream_t *s )
         if( psz_eol )
         {
             i_data = (psz_eol - (char *)p_data) + 1;
-            p_line = realloc( p_line, i_line + i_data + s->p_text->i_char_width ); /* add \0 */
+            p_line = realloc_or_free( p_line,
+                     i_line + i_data + s->p_text->i_char_width ); /* add \0 */
             if( !p_line )
                 goto error;
             i_data = stream_Read( s, &p_line[i_line], i_data );
@@ -1614,7 +1616,8 @@ char *stream_ReadLine( stream_t *s )
         }
 
         /* Read data (+1 for easy \0 append) */
-        p_line = realloc( p_line, i_line + STREAM_PROBE_LINE + s->p_text->i_char_width );
+        p_line = realloc_or_free( p_line,
+                       i_line + STREAM_PROBE_LINE + s->p_text->i_char_width );
         if( !p_line )
             goto error;
         i_data = stream_Read( s, &p_line[i_line], STREAM_PROBE_LINE );

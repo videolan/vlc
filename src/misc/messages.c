@@ -33,6 +33,7 @@
 #endif
 
 #include <vlc_common.h>
+#include <vlc_memory.h>
 
 #include <stdarg.h>                                       /* va_list for BSD */
 
@@ -381,7 +382,6 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
     }
 
     msg_item_t * p_item = malloc (sizeof (*p_item));
-
     if (p_item == NULL)
         return; /* Uho! */
 
@@ -401,13 +401,15 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
             if( psz_header )
             {
                 psz_old = strdup( psz_header );
-                psz_header = (char*)realloc( psz_header, i_header_size );
+                psz_header = realloc_or_free( psz_header, i_header_size );
+                assert( psz_header );
                 snprintf( psz_header, i_header_size , "[%s] %s",
                           p_obj->psz_header, psz_old );
             }
             else
             {
-                psz_header = (char *)malloc( i_header_size );
+                psz_header = malloc( i_header_size );
+                assert( psz_header );
                 snprintf( psz_header, i_header_size, "[%s]",
                           p_obj->psz_header );
             }

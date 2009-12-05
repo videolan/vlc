@@ -25,6 +25,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
+#include <vlc_memory.h>
 #include <assert.h>
 #include <stdarg.h>
 
@@ -128,7 +129,7 @@ static module_config_t *vlc_config_create (module_t *module, int type)
 
     if ((confsize & 0xf) == 0)
     {
-        tab = realloc (tab, (confsize + 17) * sizeof (*tab));
+        tab = realloc_or_free (tab, (confsize + 17) * sizeof (*tab));
         if (tab == NULL)
             return NULL;
 
