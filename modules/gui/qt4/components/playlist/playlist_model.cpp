@@ -336,9 +336,8 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
     }
     else if( role == Qt::DecorationRole && index.column() == 0  )
     {
-        /* Use to segfault here because i_type wasn't always initialized */
-        if( item->p_input->i_type >= 0 )
-            return QVariant( PLModel::icons[item->p_input->i_type] );
+        /* Used to segfault here because i_type wasn't always initialized */
+        return QVariant( PLModel::icons[item->p_input->i_type] );
     }
     else if( role == Qt::FontRole )
     {
