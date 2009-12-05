@@ -57,6 +57,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 {
     QGridLayout *layout = new QGridLayout( this );
     layout->setSpacing( 0 ); layout->setMargin( 0 );
+    setMinimumWidth( 300 );
 
     model = new PLModel( p_playlist, p_intf, p_root, this );
 
