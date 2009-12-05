@@ -37,7 +37,7 @@
 #include <QMutex>
 
 DialogHandler::DialogHandler (intf_thread_t *intf, QObject *_parent)
-    : intf (intf), QObject( _parent ),
+    : QObject( _parent ), intf (intf),
       critical (VLC_OBJECT(intf), "dialog-critical"),
       login (VLC_OBJECT(intf), "dialog-login"),
       question (VLC_OBJECT(intf), "dialog-question"),
@@ -181,8 +181,8 @@ QVLCProgressDialog::QVLCProgressDialog (DialogHandler *parent,
                                         struct dialog_progress_bar_t *data)
     : QProgressDialog (qfu(data->message),
                        data->cancel ? ("&" + qfu(data->cancel)) : 0, 0, 1000),
-      cancelled (false),
-      handler (parent)
+      handler (parent),
+      cancelled (false)
 {
     if (data->title != NULL)
         setWindowTitle (qfu(data->title));
