@@ -460,8 +460,7 @@ httpd_file_t *httpd_FileNew( httpd_host_t *host,
                              const vlc_acl_t *p_acl, httpd_file_callback_t pf_fill,
                              httpd_file_sys_t *p_sys )
 {
-    httpd_file_t *file = malloc( sizeof( httpd_file_t ) );
-    assert( file );
+    httpd_file_t *file = xmalloc( sizeof( httpd_file_t ) );
 
     if( ( file->url = httpd_UrlNewUnique( host, psz_url, psz_user,
                                           psz_password, p_acl )
@@ -593,8 +592,7 @@ httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
         psz_status = httpd_ReasonFromCode( i_status );
         answer->i_body = sizeof("HTTP/1.0 xxx \r\n")
                         + strlen(psz_status) + i_headers - 1;
-        psz_new = (char *)malloc( answer->i_body + 1);
-        assert( psz_new );
+        psz_new = (char *)xmalloc( answer->i_body + 1);
         sprintf( psz_new, "HTTP/1.0 %03d %s\r\n", i_status, psz_status );
         memcpy( &psz_new[strlen(psz_new)], psz_headers, i_headers );
         free( answer->p_body );
@@ -611,8 +609,7 @@ httpd_handler_t *httpd_HandlerNew( httpd_host_t *host, const char *psz_url,
                                    httpd_handler_callback_t pf_fill,
                                    httpd_handler_sys_t *p_sys )
 {
-    httpd_handler_t *handler = malloc( sizeof( httpd_handler_t ) );
-    assert( handler );
+    httpd_handler_t *handler = xmalloc( sizeof( httpd_handler_t ) );
 
     if( ( handler->url = httpd_UrlNewUnique( host, psz_url, psz_user,
                                              psz_password, p_acl )
@@ -683,8 +680,7 @@ static int httpd_RedirectCallBack( httpd_callback_sys_t *p_sys,
 httpd_redirect_t *httpd_RedirectNew( httpd_host_t *host, const char *psz_url_dst,
                                      const char *psz_url_src )
 {
-    httpd_redirect_t *rdir = malloc( sizeof( httpd_redirect_t ) );
-    assert( rdir );
+    httpd_redirect_t *rdir = xmalloc( sizeof( httpd_redirect_t ) );
 
     if( !( rdir->url = httpd_UrlNewUnique( host, psz_url_src, NULL, NULL, NULL ) ) )
     {
@@ -790,8 +786,7 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
         answer->i_type   = HTTPD_MSG_ANSWER;
 
         answer->i_body = i_write;
-        answer->p_body = malloc( i_write );
-        assert( answer->p_body );
+        answer->p_body = xmalloc( i_write );
         memcpy( answer->p_body, &stream->p_buffer[i_pos], i_write );
 
         answer->i_body_offset += i_write;
@@ -814,8 +809,7 @@ static int httpd_StreamCallBack( httpd_callback_sys_t *p_sys,
             if( stream->i_header > 0 )
             {
                 answer->i_body = stream->i_header;
-                answer->p_body = malloc( stream->i_header );
-                assert( answer->p_body );
+                answer->p_body = xmalloc( stream->i_header );
                 memcpy( answer->p_body, stream->p_header, stream->i_header );
             }
             answer->i_body_offset = stream->i_buffer_last_pos;
@@ -868,8 +862,7 @@ httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
                                  const char *psz_user, const char *psz_password,
                                  const vlc_acl_t *p_acl )
 {
-    httpd_stream_t *stream = malloc( sizeof( httpd_stream_t ) );
-    assert( stream );
+    httpd_stream_t *stream = xmalloc( sizeof( httpd_stream_t ) );
 
     if( ( stream->url = httpd_UrlNewUnique( host, psz_url, psz_user,
                                             psz_password, p_acl )
@@ -890,8 +883,7 @@ httpd_stream_t *httpd_StreamNew( httpd_host_t *host,
     stream->i_header = 0;
     stream->p_header = NULL;
     stream->i_buffer_size = 5000000;    /* 5 Mo per stream */
-    stream->p_buffer = malloc( stream->i_buffer_size );
-    assert( stream->p_buffer );
+    stream->p_buffer = xmalloc( stream->i_buffer_size );
     /* We set to 1 to make life simpler
      * (this way i_body_offset can never be 0) */
     stream->i_buffer_pos = 1;
@@ -916,8 +908,7 @@ int httpd_StreamHeader( httpd_stream_t *stream, uint8_t *p_data, int i_data )
     stream->i_header = i_data;
     if( i_data > 0 )
     {
-        stream->p_header = malloc( i_data );
-        assert( stream->p_header );
+        stream->p_header = xmalloc( i_data );
         memcpy( stream->p_header, p_data, i_data );
     }
     vlc_mutex_unlock( &stream->lock );
@@ -1247,8 +1238,7 @@ static httpd_url_t *httpd_UrlNewPrivate( httpd_host_t *host, const char *psz_url
         }
     }
 
-    url = malloc( sizeof( httpd_url_t ) );
-    assert( url );
+    url = xmalloc( sizeof( httpd_url_t ) );
     url->host = host;
 
     vlc_mutex_init( &url->lock );
@@ -1416,8 +1406,7 @@ static void httpd_ClientInit( httpd_client_t *cl, mtime_t now )
     cl->i_activity_timeout = INT64_C(10000000);
     cl->i_buffer_size = HTTPD_CL_BUFSIZE;
     cl->i_buffer = 0;
-    cl->p_buffer = malloc( cl->i_buffer_size );
-    assert( cl->p_buffer );
+    cl->p_buffer = xmalloc( cl->i_buffer_size );
     cl->i_mode   = HTTPD_CLIENT_FILE;
     cl->b_read_waiting = false;
 
@@ -1565,8 +1554,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
             cl->query.i_type  = HTTPD_MSG_CHANNEL;
             cl->query.i_channel = cl->p_buffer[1];
             cl->query.i_body  = (cl->p_buffer[2] << 8)|cl->p_buffer[3];
-            cl->query.p_body  = malloc( cl->query.i_body );
-            assert( cl->query.p_body );
+            cl->query.p_body  = xmalloc( cl->query.i_body );
             cl->i_buffer      -= 4;
             memcpy( cl->query.p_body, cl->p_buffer + 4, cl->i_buffer );
         }
@@ -1847,8 +1835,7 @@ static void httpd_ClientRecv( httpd_client_t *cl )
                     /* TODO Mhh, handle the case client will only send a
                      * request and close the connection
                      * to mark and of body (probably only RTSP) */
-                    cl->query.p_body = malloc( cl->query.i_body );
-                    assert( cl->query.p_body );
+                    cl->query.p_body = xmalloc( cl->query.i_body );
                     cl->i_buffer = 0;
                 }
                 else
@@ -1936,8 +1923,7 @@ static void httpd_ClientSend( httpd_client_t *cl )
         {
             cl->i_buffer_size = i_size;
             free( cl->p_buffer );
-            cl->p_buffer = malloc( i_size );
-            assert( cl->p_buffer );
+            cl->p_buffer = xmalloc( i_size );
         }
         p = (char *)cl->p_buffer;
 
@@ -2380,8 +2366,7 @@ static void* httpd_HostThread( void *data )
                         cl->i_buffer = 0;
                         cl->i_buffer_size = 1000;
                         free( cl->p_buffer );
-                        cl->p_buffer = malloc( cl->i_buffer_size );
-                        assert( cl->p_buffer );
+                        cl->p_buffer = xmalloc( cl->i_buffer_size );
                         cl->i_state = HTTPD_CLIENT_RECEIVING;
                     }
                     else
@@ -2399,8 +2384,7 @@ static void* httpd_HostThread( void *data )
                     cl->i_buffer = 0;
                     cl->i_buffer_size = 1000;
                     free( cl->p_buffer );
-                    cl->p_buffer = malloc( cl->i_buffer_size );
-                    assert( cl->p_buffer );
+                    cl->p_buffer = xmalloc( cl->i_buffer_size );
                     cl->i_state = HTTPD_CLIENT_RECEIVING;
                     cl->b_read_waiting = false;
                 }

@@ -31,7 +31,6 @@
 #include <vlc_common.h>
 #include "libvlc.h"
 
-#include <assert.h>
 #include <stdlib.h>                                      /* free(), strtol() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */
@@ -229,11 +228,8 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
     }
 
     if( i_cache )
-    {
         pp_cache = p_bank->pp_loaded_cache =
-                   malloc( i_cache * sizeof(void *) );
-        assert( pp_cache );
-    }
+                   xmalloc( i_cache * sizeof(void *) );
 
 #define LOAD_IMMEDIATE(a) \
     if( fread( (void *)&a, sizeof(char), sizeof(a), file ) != sizeof(a) ) goto error
@@ -244,7 +240,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
      || ( i_size > 16384 ) ) \
         goto error; \
     if( i_size ) { \
-        char *psz = malloc( i_size ); \
+        char *psz = xmalloc( i_size ); \
         if( fread( psz, i_size, 1, file ) != 1 ) { \
             free( psz ); \
             goto error; \
@@ -262,8 +258,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
         uint16_t i_size;
         int i_submodules;
 
-        pp_cache[i] = malloc( sizeof(module_cache_t) );
-        assert( pp_cache[i] );
+        pp_cache[i] = xmalloc( sizeof(module_cache_t) );
         p_bank->i_loaded_cache++;
 
         /* Load common info */
@@ -399,7 +394,7 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
             {
                 int j;
                 p_module->p_config[i].ppsz_list =
-                    malloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
+                    xmalloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
                 if( p_module->p_config[i].ppsz_list )
                 {
                     for( j = 0; j < p_module->p_config[i].i_list; j++ )
@@ -411,7 +406,7 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
             {
                 int j;
                 p_module->p_config[i].ppsz_list_text =
-                    malloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
+                    xmalloc( (p_module->p_config[i].i_list+1) * sizeof(char *));
                 if( p_module->p_config[i].ppsz_list_text )
                 {
                   for( j = 0; j < p_module->p_config[i].i_list; j++ )
@@ -422,7 +417,7 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
             if( p_module->p_config[i].pi_list )
             {
                 p_module->p_config[i].pi_list =
-                    malloc( (p_module->p_config[i].i_list + 1) * sizeof(int) );
+                    xmalloc( (p_module->p_config[i].i_list + 1) * sizeof(int) );
                 if( p_module->p_config[i].pi_list )
                 {
                     for (int j = 0; j < p_module->p_config[i].i_list; j++)
@@ -434,11 +429,9 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
         if( p_module->p_config[i].i_action )
         {
             p_module->p_config[i].ppf_action =
-                malloc( p_module->p_config[i].i_action * sizeof(void *) );
-            assert( p_module->p_config[i].ppf_action );
+                xmalloc( p_module->p_config[i].i_action * sizeof(void *) );
             p_module->p_config[i].ppsz_action_text =
-                malloc( p_module->p_config[i].i_action * sizeof(char *) );
-            assert( p_module->p_config[i].ppsz_action_text );
+                xmalloc( p_module->p_config[i].i_action * sizeof(char *) );
 
             for (int j = 0; j < p_module->p_config[i].i_action; j++)
             {
