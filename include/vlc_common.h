@@ -69,6 +69,15 @@
 #   define LIBVLC_MALLOC
 #endif
 
+/* Branch prediction */
+#ifdef __GNUC__
+#   define likely(p)   __builtin_expect(!!(p), 1)
+#   define unlikely(p) __builtin_expect(!!(p), 0)
+#else
+#   define likely(p)   (!!(p))
+#   define unlikely(p) (!!(p))
+#endif
+
 /*****************************************************************************
  * Basic types definitions
  *****************************************************************************/
