@@ -71,13 +71,10 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_sout.h>
-#include <vlc_memory.h>
 
 #include <vlc_bits.h>
 
@@ -916,8 +913,7 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
             free( p_region->p_pixbuf );
         }
 
-        p_region->p_pixbuf = malloc( i_height * i_width );
-        assert( p_region->p_pixbuf );
+        p_region->p_pixbuf = xmalloc( i_height * i_width );
         p_region->i_depth = 0;
         b_fill = true;
     }
@@ -951,9 +947,8 @@ static void decode_region_composition( decoder_t *p_dec, bs_t *s )
 
         /* We create a new object */
         p_region->i_object_defs++;
-        p_region->p_object_defs = realloc_or_free( p_region->p_object_defs,
+        p_region->p_object_defs = xrealloc( p_region->p_object_defs,
                      sizeof(dvbsub_objectdef_t) * p_region->i_object_defs );
-        assert( p_region->p_object_defs );
 
         /* We parse object properties */
         p_obj = &p_region->p_object_defs[p_region->i_object_defs - 1];
@@ -1169,9 +1164,8 @@ static void decode_object( decoder_t *p_dec, bs_t *s )
                 if( p_region->p_object_defs[i].i_id != i_id ) continue;
 
                 p_region->p_object_defs[i].psz_text =
-                    realloc_or_free( p_region->p_object_defs[i].psz_text,
+                    xrealloc( p_region->p_object_defs[i].psz_text,
                              i_number_of_codes + 1 );
-                assert( p_region->p_object_defs[i].psz_text );
 
                 /* FIXME 16bits -> char ??? See Preamble */
                 for( j = 0; j < i_number_of_codes; j++ )
@@ -1843,9 +1837,8 @@ static subpicture_t *YuvaYuvp( subpicture_t *p_subpic )
 #endif
 
 #ifndef RANDOM_DITHERING
-        pi_delta = malloc( ( p_region->p_picture->p[0].i_pitch + 1 )
+        pi_delta = xmalloc( ( p_region->p_picture->p[0].i_pitch + 1 )
                             * sizeof(int) * 4  );
-        assert( pi_delta );
         for( i = 0; i < (p_region->p_picture->p[0].i_pitch + 1) * 4 ; i++ )
         {
             pi_delta[ i ] = 0;
@@ -2084,9 +2077,8 @@ static void encode_page_composition( encoder_t *p_enc, bs_t *s,
         {
             encoder_region_t region;
             region.i_width = region.i_height = 0;
-            p_sys->p_regions = realloc_or_free( p_sys->p_regions,
+            p_sys->p_regions = xrealloc( p_sys->p_regions,
                           sizeof(encoder_region_t) * (p_sys->i_regions + 1) );
-            assert( p_sys->p_regions );
             p_sys->p_regions[p_sys->i_regions++] = region;
         }
 

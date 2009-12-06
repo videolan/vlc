@@ -28,9 +28,6 @@
 
 #include "demux.hpp"
 
-#include <assert.h>
-#include <vlc_memory.h>
-
 extern "C" {
 #include "../vobsub.h"
 }
@@ -182,9 +179,8 @@ void matroska_segment_c::LoadCues( KaxCues *cues )
             if( i_index >= i_index_max )
             {
                 i_index_max += 1024;
-                p_indexes = (mkv_index_t*)realloc_or_free( p_indexes,
+                p_indexes = (mkv_index_t*)xrealloc( p_indexes,
                                         sizeof( mkv_index_t ) * i_index_max );
-                assert( p_indexes );
             }
 #undef idx
         }
@@ -377,9 +373,8 @@ void matroska_segment_c::IndexAppendCluster( KaxCluster *cluster )
     if( i_index >= i_index_max )
     {
         i_index_max += 1024;
-        p_indexes = (mkv_index_t*)realloc_or_free( p_indexes,
+        p_indexes = (mkv_index_t*)xrealloc( p_indexes,
                                         sizeof( mkv_index_t ) * i_index_max );
-        assert( p_indexes );
     }
 #undef idx
 }
@@ -671,8 +666,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 tracks[i_track]->fmt.i_extra       = GetDWLE( &p_bih->biSize ) - sizeof( BITMAPINFOHEADER );
                 if( tracks[i_track]->fmt.i_extra > 0 )
                 {
-                    tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->fmt.i_extra );
-                    assert( tracks[i_track]->fmt.p_extra );
+                    tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->fmt.i_extra );
                     memcpy( tracks[i_track]->fmt.p_extra, &p_bih[1], tracks[i_track]->fmt.i_extra );
                 }
             }
@@ -723,8 +717,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                         + 6;
                     if( i_size1 > 0 && i_size2 > 0 && i_size3 > 0  ) {
                         tracks[i_track]->fmt.p_extra =
-                            malloc( tracks[i_track]->fmt.i_extra );
-                        assert( tracks[i_track]->fmt.p_extra );
+                            xmalloc( tracks[i_track]->fmt.i_extra );
                         uint8_t *p_out = (uint8_t*)tracks[i_track]->fmt.p_extra;
                         *p_out++ = (i_size1>>8) & 0xFF;
                         *p_out++ = i_size1 & 0xFF;
@@ -794,15 +787,13 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 else
                     tracks[i_track]->fmt.i_codec = VLC_CODEC_MP4V;
                 tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
-                tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
-                assert( tracks[i_track]->fmt.p_extra );
+                tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
                 memcpy( tracks[i_track]->fmt.p_extra,tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
             }
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "V_QUICKTIME" ) )
         {
-            MP4_Box_t *p_box = (MP4_Box_t*)malloc( sizeof( MP4_Box_t ) );
-            assert( p_box );
+            MP4_Box_t *p_box = (MP4_Box_t*)xmalloc( sizeof( MP4_Box_t ) );
             stream_t *p_mp4_stream = stream_MemoryNew( VLC_OBJECT(&sys.demuxer),
                                                        tracks[i_track]->p_extra_data,
                                                        tracks[i_track]->i_extra_data,
@@ -814,8 +805,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 tracks[i_track]->fmt.video.i_width = p_box->data.p_sample_vide->i_width;
                 tracks[i_track]->fmt.video.i_height = p_box->data.p_sample_vide->i_height;
                 tracks[i_track]->fmt.i_extra = p_box->data.p_sample_vide->i_qt_image_description;
-                tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->fmt.i_extra );
-                assert( tracks[i_track]->fmt.p_extra );
+                tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->fmt.i_extra );
                 memcpy( tracks[i_track]->fmt.p_extra, p_box->data.p_sample_vide->p_qt_image_description, tracks[i_track]->fmt.i_extra );
                 MP4_FreeBox_sample_vide( p_box );
             }
@@ -847,8 +837,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 tracks[i_track]->fmt.i_extra            = GetWLE( &p_wf->cbSize );
                 if( tracks[i_track]->fmt.i_extra > 0 )
                 {
-                    tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->fmt.i_extra );
-                    assert( tracks[i_track]->fmt.p_extra );
+                    tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->fmt.i_extra );
                     memcpy( tracks[i_track]->fmt.p_extra, &p_wf[1], tracks[i_track]->fmt.i_extra );
                 }
             }
@@ -885,8 +874,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             tracks[i_track]->fmt.i_codec = VLC_CODEC_FLAC;
             tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
-            tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
-            assert( tracks[i_track]->fmt.p_extra );
+            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
             memcpy( tracks[i_track]->fmt.p_extra,tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_VORBIS" ) )
@@ -915,8 +903,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             i_size[2] = tracks[i_track]->i_extra_data - i_offset - i_size[0] - i_size[1];
 
             tracks[i_track]->fmt.i_extra = 3 * 2 + i_size[0] + i_size[1] + i_size[2];
-            tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->fmt.i_extra );
-            assert( tracks[i_track]->fmt.p_extra );
+            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->fmt.i_extra );
             p_extra = (uint8_t *)tracks[i_track]->fmt.p_extra; i_extra = 0;
             for( i = 0; i < 3; i++ )
             {
@@ -973,8 +960,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             msg_Dbg( &sys.demuxer, "profile=%d srate=%d", i_profile, i_srate );
 
             tracks[i_track]->fmt.i_extra = sbr ? 5 : 2;
-            tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->fmt.i_extra );
-            assert( tracks[i_track]->fmt.p_extra );
+            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->fmt.i_extra );
             ((uint8_t*)tracks[i_track]->fmt.p_extra)[0] = ((i_profile + 1) << 3) | ((i_srate&0xe) >> 1);
             ((uint8_t*)tracks[i_track]->fmt.p_extra)[1] = ((i_srate & 0x1) << 7) | (tracks[i_track]->fmt.audio.i_channels << 3);
             if (sbr != 0)
@@ -993,16 +979,14 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
         {
             tracks[i_track]->fmt.i_codec = VLC_CODEC_MP4A;
             tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
-            tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
-            assert( tracks[i_track]->fmt.p_extra );
+            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
             memcpy( tracks[i_track]->fmt.p_extra, tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_WAVPACK4" ) )
         {
             tracks[i_track]->fmt.i_codec = VLC_CODEC_WAVPACK;
             tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
-            tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
-            assert( tracks[i_track]->fmt.p_extra );
+            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
             memcpy( tracks[i_track]->fmt.p_extra, tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
         }
         else if( !strcmp( tracks[i_track]->psz_codec, "A_TTA1" ) )
@@ -1011,15 +995,13 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             p_fmt->i_extra = p_tk->i_extra_data;
             if( p_fmt->i_extra > 0 )
             {
-                p_fmt->p_extra = malloc( p_tk->i_extra_data );
-                assert( p_fmt->p_extra );
+                p_fmt->p_extra = xmalloc( p_tk->i_extra_data );
                 memcpy( p_fmt->p_extra, p_tk->p_extra_data, p_tk->i_extra_data );
             }
             else
             {
                 p_fmt->i_extra = 30;
-                p_fmt->p_extra = malloc( p_fmt->i_extra );
-                assert( p_fmt->p_extra );
+                p_fmt->p_extra = xmalloc( p_fmt->i_extra );
                 uint8_t *p_extra = (uint8_t*)p_fmt->p_extra;
                 memcpy( &p_extra[ 0], "TTA1", 4 );
                 SetWLE( &p_extra[ 4], 1 );
@@ -1078,8 +1060,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             msg_Dbg( &sys.demuxer, "kate last header (%d) is %d bytes", num_headers-1, pi_size[num_headers-1]);
 
             tracks[i_track]->fmt.i_extra = 1 + num_headers * 2 + size_so_far + pi_size[num_headers-1];
-            tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->fmt.i_extra );
-            assert( tracks[i_track]->fmt.p_extra );
+            tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->fmt.i_extra );
 
             p_extra = (uint8_t *)tracks[i_track]->fmt.p_extra;
             i_extra = 0;
@@ -1113,8 +1094,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             if( tracks[i_track]->i_extra_data )
             {
                 tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
-                tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
-                assert( tracks[i_track]->fmt.p_extra );
+                tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
                 memcpy( tracks[i_track]->fmt.p_extra, tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
             }
         }
@@ -1128,8 +1108,7 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
             if( tracks[i_track]->i_extra_data )
             {
                 tracks[i_track]->fmt.i_extra = tracks[i_track]->i_extra_data;
-                tracks[i_track]->fmt.p_extra = malloc( tracks[i_track]->i_extra_data );
-                assert( tracks[i_track]->fmt.p_extra );
+                tracks[i_track]->fmt.p_extra = xmalloc( tracks[i_track]->i_extra_data );
                 memcpy( tracks[i_track]->fmt.p_extra, tracks[i_track]->p_extra_data, tracks[i_track]->i_extra_data );
             }
         }

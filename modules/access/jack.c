@@ -541,9 +541,8 @@ static void Port_finder( demux_t *p_demux )
                 i_out_ports++;
             }
             /* alloc an array to store all the matched ports */
-            p_sys->pp_jack_port_table = realloc( p_sys->pp_jack_port_table,
+            p_sys->pp_jack_port_table = xrealloc( p_sys->pp_jack_port_table,
                 (i_out_ports * sizeof( char * ) + i_total_out_ports * sizeof( char * ) ) );
-            assert( p_sys->pp_jack_port_table );
 
             for(int i=0; i<i_out_ports;i++)
             {

@@ -31,8 +31,6 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_demux.h>
 
@@ -40,7 +38,6 @@
 #include <vlc_charset.h>
 #include "playlist.h"
 #include <vlc_meta.h>
-#include <vlc_memory.h>
 
 struct demux_sys_t
 {
@@ -245,8 +242,7 @@ static int Demux( demux_t *p_demux )
         int64_t i_pos = 0;
         p_sys->i_data_len = stream_Size( p_demux->s ) + 1; /* This is a cheat to prevent unnecessary realloc */
         if( p_sys->i_data_len <= 0 || p_sys->i_data_len > 16384 ) p_sys->i_data_len = 1024;
-        p_sys->psz_data = malloc( p_sys->i_data_len +1);
-        assert( p_sys->psz_data );
+        p_sys->psz_data = xmalloc( p_sys->i_data_len +1);
 
         /* load the complete file */
         for( ;; )
@@ -258,9 +254,8 @@ static int Demux( demux_t *p_demux )
 
             i_pos += i_read;
             p_sys->i_data_len <<= 1 ;
-            p_sys->psz_data = realloc_or_free( p_sys->psz_data,
+            p_sys->psz_data = xrealloc( p_sys->psz_data,
                                    p_sys->i_data_len * sizeof( char * ) + 1 );
-            assert( p_sys->psz_data );
         }
         if( p_sys->i_data_len <= 0 ) return -1;
     }
@@ -318,8 +313,7 @@ static int Demux( demux_t *p_demux )
                             i_strlen = psz_parse-psz_backup;
                             if( i_strlen < 1 ) continue;
                             msg_Dbg( p_demux, "param name strlen: %d", i_strlen);
-                            psz_string = malloc( i_strlen + 1);
-                            assert( psz_string );
+                            psz_string = xmalloc( i_strlen + 1);
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
                             msg_Dbg( p_demux, "param name: %s", psz_string);
@@ -341,8 +335,7 @@ static int Demux( demux_t *p_demux )
                             i_strlen = psz_parse-psz_backup;
                             if( i_strlen < 1 ) continue;
                             msg_Dbg( p_demux, "param value strlen: %d", i_strlen);
-                            psz_string = malloc( i_strlen +1);
-                            assert( psz_string );
+                            psz_string = xmalloc( i_strlen +1);
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
                             msg_Dbg( p_demux, "param value: %s", psz_string);
@@ -467,8 +460,7 @@ static int Demux( demux_t *p_demux )
                         {
                             i_strlen = psz_parse-psz_backup;
                             if( i_strlen < 1 ) continue;
-                            psz_string = malloc( i_strlen +1);
-                            assert( psz_string );
+                            psz_string = xmalloc( i_strlen +1);
                             memcpy( psz_string, psz_backup, i_strlen );
                             psz_string[i_strlen] = '\0';
                             input_item_t *p_input;
@@ -640,8 +632,7 @@ static int Demux( demux_t *p_demux )
                             }
 
                             free( psz_href );
-                            psz_href = malloc( i_strlen +1);
-                            assert( psz_string );
+                            psz_href = xmalloc( i_strlen +1);
                             memcpy( psz_href, psz_backup, i_strlen );
                             psz_href[i_strlen] = '\0';
                             psz_tmp = psz_href + (i_strlen-1);

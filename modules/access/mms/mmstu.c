@@ -31,7 +31,6 @@
 
 #include <vlc_common.h>
 #include <vlc_access.h>
-#include <vlc_memory.h>
 
 #include <errno.h>
 #include <assert.h>
@@ -604,8 +603,7 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
 #define GETUTF16( psz, size ) \
     { \
         int i; \
-        psz = malloc( size + 1); \
-        assert( psz ); \
+        psz = xmalloc( size + 1); \
         for( i = 0; i < size; i++ ) \
         { \
             psz[i] = p[i]; \
@@ -1187,8 +1185,7 @@ static int  mms_ParseCommand( access_t *p_access,
 
     free( p_sys->p_cmd );
     p_sys->i_cmd = i_data;
-    p_sys->p_cmd = malloc( i_data );
-    assert( p_sys->p_cmd );
+    p_sys->p_cmd = xmalloc( i_data );
     memcpy( p_sys->p_cmd, p_data, i_data );
 
     *pi_used = i_data; /* by default */
@@ -1311,9 +1308,8 @@ static int  mms_ParsePacket( access_t *p_access,
     {
         if( p_sys->p_header )
         {
-            p_sys->p_header = realloc_or_free( p_sys->p_header,
+            p_sys->p_header = xrealloc( p_sys->p_header,
                                       p_sys->i_header + i_packet_length - 8 );
-            assert( p_sys->p_header );
             memcpy( &p_sys->p_header[p_sys->i_header],
                     p_data + 8, i_packet_length - 8 );
             p_sys->i_header += i_packet_length - 8;
@@ -1321,8 +1317,7 @@ static int  mms_ParsePacket( access_t *p_access,
         }
         else
         {
-            uint8_t* p_packet = malloc( i_packet_length - 8 ); // don't bother with preheader
-            assert( p_packet );
+            uint8_t* p_packet = xmalloc( i_packet_length - 8 ); // don't bother with preheader
             memcpy( p_packet, p_data + 8, i_packet_length - 8 );
             p_sys->p_header = p_packet;
             p_sys->i_header = i_packet_length - 8;
@@ -1335,8 +1330,7 @@ static int  mms_ParsePacket( access_t *p_access,
     }
     else
     {
-        uint8_t* p_packet = malloc( i_packet_length - 8 ); // don't bother with preheader
-        assert( p_packet );
+        uint8_t* p_packet = xmalloc( i_packet_length - 8 ); // don't bother with preheader
         memcpy( p_packet, p_data + 8, i_packet_length - 8 );
         FREENULL( p_sys->p_media );
         p_sys->p_media = p_packet;

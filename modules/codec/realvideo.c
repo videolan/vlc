@@ -26,8 +26,6 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
@@ -216,7 +214,9 @@ static int InitVideo(decoder_t *p_dec)
     int  i_vide = p_dec->fmt_in.i_extra;
     unsigned int *p_vide = p_dec->fmt_in.p_extra;
     decoder_sys_t *p_sys = calloc( 1, sizeof( decoder_sys_t ) );
-    assert( p_sys );
+
+    if( !p_sys )
+        return VLC_ENOMEM;
 
     if( i_vide < 8 )
     {

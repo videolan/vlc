@@ -31,8 +31,6 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include "subsdec.h"
 #include <vlc_plugin.h>
 
@@ -456,11 +454,9 @@ static subpicture_t *ParseText( decoder_t *p_dec, block_t *p_block )
         {
             size_t inbytes_left = strlen( psz_subtitle );
             size_t outbytes_left = 6 * inbytes_left;
-            char *psz_new_subtitle = malloc( outbytes_left + 1 );
+            char *psz_new_subtitle = xmalloc( outbytes_left + 1 );
             char *psz_convert_buffer_out = psz_new_subtitle;
             const char *psz_convert_buffer_in = psz_subtitle;
-
-            assert( psz_new_subtitle );
 
             size_t ret = vlc_iconv( p_sys->iconv_handle,
                                     &psz_convert_buffer_in, &inbytes_left,

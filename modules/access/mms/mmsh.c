@@ -29,13 +29,10 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_access.h>
 #include <vlc_strings.h>
 #include <vlc_input.h>
-#include <vlc_memory.h>
 
 #include <vlc_network.h>
 #include <vlc_url.h>
@@ -737,8 +734,7 @@ static void GetHeader( access_t *p_access )
         if( ck.i_data > 0 )
         {
             p_sys->i_header += ck.i_data;
-            p_sys->p_header = realloc_or_free( p_sys->p_header, p_sys->i_header );
-            assert( p_sys->p_header );
+            p_sys->p_header = xrealloc( p_sys->p_header, p_sys->i_header );
             memcpy( &p_sys->p_header[p_sys->i_header - ck.i_data],
                     ck.p_data, ck.i_data );
         }

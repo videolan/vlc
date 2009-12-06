@@ -29,10 +29,6 @@
 #include "http.h"
 #include <limits.h>
 
-#include <assert.h>
-
-#include <vlc_memory.h>
-
 /* Utility function for scandir */
 static int Filter( const char *foo )
 {
@@ -56,8 +52,7 @@ mvar_t *mvar_New( const char *name, const char *value )
     v->value = strdup( value ? value : "" );
 
     v->i_field = 0;
-    v->field = malloc( sizeof( mvar_t * ) );
-    assert( v->field );
+    v->field = xmalloc( sizeof( mvar_t * ) );
     v->field[0] = NULL;
 
     return v;
@@ -80,9 +75,7 @@ void mvar_Delete( mvar_t *v )
 
 void mvar_AppendVar( mvar_t *v, mvar_t *f )
 {
-    v->field = realloc_or_free( v->field,
-                                sizeof( mvar_t * ) * ( v->i_field + 2 ) );
-    assert( v->field );
+    v->field = xrealloc( v->field, sizeof( mvar_t * ) * ( v->i_field + 2 ) );
     v->field[v->i_field] = f;
     v->i_field++;
 }
@@ -103,9 +96,7 @@ mvar_t *mvar_Duplicate( const mvar_t *v )
 
 void mvar_PushVar( mvar_t *v, mvar_t *f )
 {
-    v->field = realloc_or_free( v->field,
-                                sizeof( mvar_t * ) * ( v->i_field + 2 ) );
-    assert( v->field );
+    v->field = xrealloc( v->field, sizeof( mvar_t * ) * ( v->i_field + 2 ) );
     if( v->i_field > 0 )
     {
         memmove( &v->field[1], &v->field[0], sizeof( mvar_t * ) * v->i_field );

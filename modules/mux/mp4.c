@@ -30,13 +30,10 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_sout.h>
 #include <vlc_block.h>
-#include <vlc_memory.h>
 
 #include <time.h>
 
@@ -600,9 +597,8 @@ again:
         if( p_stream->i_entry_count >= p_stream->i_entry_max - 1 )
         {
             p_stream->i_entry_max += 1000;
-            p_stream->entry = realloc_or_free( p_stream->entry,
+            p_stream->entry = xrealloc( p_stream->entry,
                          p_stream->i_entry_max * sizeof( mp4_entry_t ) );
-            assert( p_stream->entry );
         }
 
         /* update */
@@ -1950,8 +1946,7 @@ static void bo_init( bo_t *p_bo, int i_size, uint8_t *p_buffer,
     if( !p_buffer )
     {
         p_bo->i_buffer_size = __MAX( i_size, 1024 );
-        p_bo->p_buffer = malloc( p_bo->i_buffer_size );
-        assert( p_bo->p_buffer );
+        p_bo->p_buffer = xmalloc( p_bo->i_buffer_size );
     }
     else
     {
@@ -1972,8 +1967,7 @@ static void bo_add_8( bo_t *p_bo, uint8_t i )
     else if( p_bo->b_grow )
     {
         p_bo->i_buffer_size += 1024;
-        p_bo->p_buffer = realloc_or_free( p_bo->p_buffer, p_bo->i_buffer_size );
-        assert( p_bo->p_buffer );
+        p_bo->p_buffer = xrealloc( p_bo->p_buffer, p_bo->i_buffer_size );
         p_bo->p_buffer[p_bo->i_buffer] = i;
     }
 

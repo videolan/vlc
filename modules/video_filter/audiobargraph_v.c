@@ -28,7 +28,6 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-#include <assert.h>
 #include <string.h>
 
 #include <vlc_common.h>
@@ -37,8 +36,6 @@
 
 #include <vlc_image.h>
 #include <vlc_osd.h>
-
-#include <vlc_memory.h>
 
 #ifdef LoadImage
 #   undef LoadImage
@@ -942,9 +939,8 @@ void parse_i_values( BarGraph_t *p_BarGraph, char *i_values)
     res = strtok_r(i_values, delim, &tok);
     while (res != NULL) {
         p_BarGraph->nbChannels++;
-        p_BarGraph->i_values = realloc_or_free(p_BarGraph->i_values,
+        p_BarGraph->i_values = xrealloc(p_BarGraph->i_values,
                                           p_BarGraph->nbChannels*sizeof(int));
-        assert(p_BarGraph->i_values);
         p_BarGraph->i_values[p_BarGraph->nbChannels-1] = __MAX( __MIN( atof(res)*p_BarGraph->scale, p_BarGraph->scale ), 0 );
         res = strtok_r(NULL, delim, &tok);
     }

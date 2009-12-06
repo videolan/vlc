@@ -30,13 +30,10 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_codec.h>
-#include <vlc_memory.h>
 
 #if !defined (__APPLE__) && !defined(WIN32)
 # define LOADER 1
@@ -585,8 +582,7 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
         if( p_sys->i_buffer_size < p_sys->i_buffer + p_block->i_buffer )
         {
             p_sys->i_buffer_size = p_sys->i_buffer + p_block->i_buffer + 1024;
-            p_sys->p_buffer = realloc_or_free( p_sys->p_buffer, p_sys->i_buffer_size );
-            assert( p_sys->p_buffer );
+            p_sys->p_buffer = xrealloc( p_sys->p_buffer, p_sys->i_buffer_size );
         }
         memcpy( &p_sys->p_buffer[p_sys->i_buffer], p_block->p_buffer,
                 p_block->i_buffer );

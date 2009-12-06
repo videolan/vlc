@@ -35,8 +35,6 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
@@ -49,8 +47,6 @@
 #include <vlc_charset.h>
 
 #include <vlc_image.h>
-
-#include <vlc_memory.h>
 
 #include <time.h>
 
@@ -710,9 +706,8 @@ static bool ParseFeed( filter_t *p_filter, xml_reader_t *p_xml_reader,
             {
                 b_is_item = true;
                 p_feed->i_items++;
-                p_feed->p_items = realloc_or_free( p_feed->p_items,
+                p_feed->p_items = xrealloc( p_feed->p_items,
                                      p_feed->i_items * sizeof( rss_item_t ) );
-                assert( p_feed->p_items );
                 p_feed->p_items[p_feed->i_items-1].psz_title = NULL;
                 p_feed->p_items[p_feed->i_items-1].psz_description = NULL;
                 p_feed->p_items[p_feed->i_items-1].psz_link = NULL;

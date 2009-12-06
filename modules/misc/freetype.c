@@ -31,8 +31,6 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_osd.h>
@@ -357,13 +355,11 @@ static int Create( vlc_object_t *p_this )
             _("Building font cache"),
             _("Please wait while your font cache is rebuilt.\n"
                 "This should take less than few minutes."), NULL );
-    char *path;
-    path = (char *)malloc( PATH_MAX + 1 );
+    char *path = xmalloc( PATH_MAX + 1 );
     /* Fontconfig doesnt seem to know where windows fonts are with
      * current contribs. So just tell default windows font directory
      * is the place to search fonts
      */
-    assert( path );
     GetWindowsDirectory( path, PATH_MAX + 1 );
     strcat( path, "\\fonts" );
     if( p_dialog )

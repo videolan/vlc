@@ -26,12 +26,9 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include "http.h"
 #include "macros.h"
 #include <vlc_url.h>
-#include <vlc_memory.h>
 
 static int MacroParse( macro_t *m, char *psz_src )
 {
@@ -152,8 +149,7 @@ static void MacroDo( httpd_file_sys_t *p_args,
     {               \
         int __i__ = *pp_dst - *pp_data; \
         *pi_data += (l);                  \
-        *pp_data = realloc_or_free( *pp_data, *pi_data );   \
-        assert( *pp_data ); \
+        *pp_data = xrealloc( *pp_data, *pi_data );   \
         *pp_dst = (*pp_data) + __i__;   \
     }
 #define PRINT( str ) \
@@ -369,9 +365,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         if( !*item ) continue;
 
                         int i_item = atoi( item );
-                        p_items = realloc_or_free( p_items,
+                        p_items = xrealloc( p_items,
                                         (i_nb_items + 1) * sizeof(*p_items) );
-                        assert( p_items );
                         p_items[i_nb_items] = i_item;
                         i_nb_items++;
                     }
@@ -407,9 +402,8 @@ static void MacroDo( httpd_file_sys_t *p_args,
                         if( !*item ) continue;
 
                         int i_item = atoi( item );
-                        p_items = realloc_or_free( p_items,
+                        p_items = xrealloc( p_items,
                                         (i_nb_items + 1) * sizeof(*p_items) );
-                        assert( p_items );
                         p_items[i_nb_items] = i_item;
                         i_nb_items++;
                     }
@@ -549,12 +543,10 @@ static void MacroDo( httpd_file_sys_t *p_args,
                     };
                     vlm_message_t *vlm_answer;
                     char name[512];
-                    char *psz = malloc( strlen( p_request ) + 1000 );
+                    char *psz = xmalloc( strlen( p_request ) + 1000 );
                     char *p = psz;
                     char *vlm_error;
                     int i;
-
-                    assert( psz );
 
                     if( p_intf->p_sys->p_vlm == NULL )
                         p_intf->p_sys->p_vlm = vlm_New( p_intf );
@@ -885,10 +877,8 @@ void Execute( httpd_file_sys_t *p_args,
     char *src, *dup, *end;
     char *dst = *pp_dst;
 
-    src = dup = malloc( _end - _src + 1 );
+    src = dup = xmalloc( _end - _src + 1 );
     end = src +( _end - _src );
-
-    assert( src );
 
     memcpy( src, _src, _end - _src );
     *end = '\0';
@@ -1128,8 +1118,7 @@ void Execute( httpd_file_sys_t *p_args,
             int i_index = dst - *pp_data;
 
             *pi_data += i_copy;
-            *pp_data = realloc_or_free( *pp_data, *pi_data );
-            assert( *pp_data );
+            *pp_data = xrealloc( *pp_data, *pi_data );
             dst = (*pp_data) + i_index;
 
             memcpy( dst, src, i_copy );

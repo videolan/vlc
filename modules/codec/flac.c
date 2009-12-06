@@ -30,13 +30,10 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_aout.h>
-#include <vlc_memory.h>
 
 #ifdef HAVE_FLAC_STREAM_DECODER_H
 #   include <FLAC/stream_decoder.h>
@@ -365,9 +362,8 @@ static void ProcessHeader( decoder_t *p_dec )
     if( p_dec->fmt_out.i_codec == VLC_CODEC_FLAC )
     {
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
-        p_dec->fmt_out.p_extra = realloc_or_free( p_dec->fmt_out.p_extra,
+        p_dec->fmt_out.p_extra = xrealloc( p_dec->fmt_out.p_extra,
                                                   p_dec->fmt_out.i_extra );
-        /*assert( p_dec->fmt_out.p_extra ); assert undefined here? */
         memcpy( p_dec->fmt_out.p_extra,
                 p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
     }
@@ -1372,8 +1368,7 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     if( p_sys->i_buffer < p_aout_buf->i_buffer * 2 )
     {
         p_sys->p_buffer =
-            realloc_or_free( p_sys->p_buffer, p_aout_buf->i_buffer * 2 );
-        assert( p_sys->p_buffer );
+            xrealloc( p_sys->p_buffer, p_aout_buf->i_buffer * 2 );
         p_sys->i_buffer = p_aout_buf->i_buffer * 2;
     }
 
@@ -1441,8 +1436,7 @@ EncoderWriteCallback( const FLAC__StreamEncoder *encoder,
 
             /* Backup the STREAMINFO metadata block */
             p_enc->fmt_out.i_extra = STREAMINFO_SIZE + 4;
-            p_enc->fmt_out.p_extra = malloc( STREAMINFO_SIZE + 4 );
-            assert( p_enc->fmt_out.p_extra );
+            p_enc->fmt_out.p_extra = xmalloc( STREAMINFO_SIZE + 4 );
             memcpy( p_enc->fmt_out.p_extra, "fLaC", 4 );
             memcpy( ((uint8_t *)p_enc->fmt_out.p_extra) + 4, buffer,
                     STREAMINFO_SIZE );

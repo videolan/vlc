@@ -29,12 +29,9 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
-#include <vlc_memory.h>
 
 /* TODO:
  *  - test
@@ -926,9 +923,8 @@ static void demux_IndexAppend( demux_index_t *p_idx,
         else
         {
             p_idx->i_idx_max += 1000;
-            p_idx->idx = realloc_or_free( p_idx->idx,
+            p_idx->idx = xrealloc( p_idx->idx,
                                 p_idx->i_idx_max*sizeof(demux_index_entry_t));
-            assert( p_idx->idx );
         }
     }
 

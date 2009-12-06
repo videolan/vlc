@@ -30,13 +30,10 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_charset.h>
-#include <vlc_memory.h>
 
 #include <windows.h>
 #include <mmsystem.h>
@@ -1174,12 +1171,10 @@ static int ReloadWaveoutDevices( vlc_object_t *p_this, char const *psz_name,
 
     int wave_devices = waveOutGetNumDevs();
 
-    p_item->ppsz_list = realloc_or_free( p_item->ppsz_list,
+    p_item->ppsz_list = xrealloc( p_item->ppsz_list,
                           (wave_devices+2) * sizeof(char *) );
-    assert( p_item->ppsz_list );
-    p_item->ppsz_list_text = realloc_or_free( p_item->ppsz_list_text,
+    p_item->ppsz_list_text = xrealloc( p_item->ppsz_list_text,
                           (wave_devices+2) * sizeof(char *) );
-    assert( p_item->ppsz_list_text );
 
     WAVEOUTCAPS caps;
     char sz_dev_name[MAXPNAMELEN+32];

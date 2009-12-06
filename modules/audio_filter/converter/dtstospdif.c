@@ -28,15 +28,11 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
 #include <vlc_aout.h>
 #include <vlc_filter.h>
-
-#include <vlc_memory.h>
 
 /*****************************************************************************
  * Local structures
@@ -129,9 +125,8 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
                   p_filter->p_sys->i_frame_size, p_in_buf->i_buffer );
 
         p_filter->p_sys->i_frame_size = p_in_buf->i_buffer;
-        p_filter->p_sys->p_buf = realloc_or_free( p_filter->p_sys->p_buf,
+        p_filter->p_sys->p_buf = xrealloc( p_filter->p_sys->p_buf,
                                                   p_in_buf->i_buffer * 3 );
-        assert( p_filter->p_sys->p_buf );
         p_filter->p_sys->i_frames = 0;
     }
 

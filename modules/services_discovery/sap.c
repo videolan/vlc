@@ -414,7 +414,8 @@ static int OpenDemux( vlc_object_t *p_this )
     if( p_sdp->psz_uri == NULL ) goto error;
 
     p_demux->p_sys = (demux_sys_t *)malloc( sizeof(demux_sys_t) );
-    assert( p_demux->p_sys );
+    if( unlikely( !p_demux->p_sys ) )
+        goto error;
     p_demux->p_sys->p_sdp = p_sdp;
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;

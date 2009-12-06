@@ -28,14 +28,11 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_codec.h>
 #include <vlc_sout.h>
 #include <vlc_input.h>
-#include <vlc_memory.h>
 #include <ogg/ogg.h>
 
 #include <theora/theora.h>
@@ -218,9 +215,8 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* Backup headers as extra data */
         uint8_t *p_extra;
 
-        p_dec->fmt_in.p_extra = realloc_or_free( p_dec->fmt_in.p_extra,
+        p_dec->fmt_in.p_extra = xrealloc( p_dec->fmt_in.p_extra,
                                 p_dec->fmt_in.i_extra + oggpacket.bytes + 2 );
-        assert( p_dec->fmt_in.p_extra );
         p_extra = ((uint8_t *)p_dec->fmt_in.p_extra) + p_dec->fmt_in.i_extra;
         *(p_extra++) = oggpacket.bytes >> 8;
         *(p_extra++) = oggpacket.bytes & 0xFF;
@@ -407,9 +403,8 @@ static int ProcessHeaders( decoder_t *p_dec )
     else
     {
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
-        p_dec->fmt_out.p_extra = realloc_or_free( p_dec->fmt_out.p_extra,
+        p_dec->fmt_out.p_extra = xrealloc( p_dec->fmt_out.p_extra,
                                                   p_dec->fmt_out.i_extra );
-        assert( p_dec->fmt_out.p_extra );
         memcpy( p_dec->fmt_out.p_extra,
                 p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
     }
@@ -710,9 +705,8 @@ static int OpenEncoder( vlc_object_t *p_this )
         else if( i == 1 ) theora_encode_comment( &p_sys->tc, &header );
         else if( i == 2 ) theora_encode_tables( &p_sys->td, &header );
 
-        p_enc->fmt_out.p_extra = realloc_or_free( p_enc->fmt_out.p_extra,
+        p_enc->fmt_out.p_extra = xrealloc( p_enc->fmt_out.p_extra,
                                       p_enc->fmt_out.i_extra + header.bytes );
-        assert( p_enc->fmt_out.p_extra );
         p_extra = p_enc->fmt_out.p_extra;
         p_extra += p_enc->fmt_out.i_extra + (i-3)*2;
         p_enc->fmt_out.i_extra += header.bytes;

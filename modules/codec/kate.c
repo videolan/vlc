@@ -28,14 +28,11 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_codec.h>
 #include <vlc_osd.h>
-#include <vlc_memory.h>
 
 #include <kate/kate.h>
 #ifdef HAVE_TIGER
@@ -506,9 +503,8 @@ static subpicture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         /* Backup headers as extra data */
         uint8_t *p_extra;
 
-        p_dec->fmt_in.p_extra = realloc_or_free( p_dec->fmt_in.p_extra,
+        p_dec->fmt_in.p_extra = xrealloc( p_dec->fmt_in.p_extra,
                                       p_dec->fmt_in.i_extra + kp.nbytes + 2 );
-        assert( p_dec->fmt_in.p_extra );
         p_extra = (void*)(((unsigned char*)p_dec->fmt_in.p_extra) + p_dec->fmt_in.i_extra);
         *(p_extra++) = kp.nbytes >> 8;
         *(p_extra++) = kp.nbytes & 0xFF;
@@ -628,9 +624,8 @@ static int ProcessHeaders( decoder_t *p_dec )
     else
     {
         p_dec->fmt_out.i_extra = p_dec->fmt_in.i_extra;
-        p_dec->fmt_out.p_extra = realloc_or_free( p_dec->fmt_out.p_extra,
+        p_dec->fmt_out.p_extra = xrealloc( p_dec->fmt_out.p_extra,
                                                   p_dec->fmt_out.i_extra );
-        assert( p_dec->fmt_out.p_extra );
         memcpy( p_dec->fmt_out.p_extra,
                 p_dec->fmt_in.p_extra, p_dec->fmt_out.i_extra );
     }

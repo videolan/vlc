@@ -35,21 +35,23 @@
 #include <vlc_common.h>
 #include <vlc_input.h>
 #include <vlc_demux.h>
-#include <vlc_memory.h>
 
 #include <limits.h>
 #include <string.h>
-#include <assert.h>
 
 #include "asademux.h"
 
 #define MAXDELTA	4	/**< nr of times kept for delta backref */
 #define MAXGROUP	24	/**< maximum number of regex match groups */
 
-#define xmalloc malloc
-#define xrealloc realloc_or_free
 #define xfree free
-#define xstrdup strdup
+static inline char *xstrdup(const char *str)
+{
+    char *ret = strdup (str);
+    if (unlikely(ret == NULL))
+        abort();
+    return ret;
+}
 
 /** state of a running import */
 struct asa_import_state {
@@ -249,7 +251,6 @@ static int asai_select (struct asa_import_state *state,
 	if (state->selstr)
 		xfree(state->selstr);
 	state->selstr = xstrdup(state->matches[insn->v.select]);
-	assert(state->selstr);
 	state->sellen = strlen(state->selstr);
 	return 0;
 }
@@ -265,7 +266,6 @@ static ptrdiff_t asai_process_replace(struct asa_import_state *state,
 
 	newstr_size = v[0] * 2;
 	newstr = (char *)xmalloc(newstr_size);
-	assert(newstr);
 	memcpy(newstr, state->selstr, v[0]);
 	newpos = v[0];
 
@@ -290,7 +290,6 @@ static ptrdiff_t asai_process_replace(struct asa_import_state *state,
 		if (need > avail) {
 			newstr_size += need - avail + 256;
 			newstr = (char *)xrealloc(newstr, newstr_size);
-			assert(newstr);
 		}
 		memcpy(newstr + newpos, src, need);
 		newpos += need;
@@ -298,7 +297,6 @@ static ptrdiff_t asai_process_replace(struct asa_import_state *state,
 	firstold = newpos;
 	newstr_size = newpos + state->sellen - v[1];
 	newstr = (char *)xrealloc(newstr, newstr_size + 1);
-	assert(newstr);
 	memcpy(newstr + newpos, state->selstr + v[1],
 		state->sellen - v[1] + 1);
 	state->selstr = newstr;
@@ -358,7 +356,6 @@ static void asai_set_matches(struct asa_import_state *state,
 	if (state->selstr)
 		xfree(state->selstr);
 	state->selstr = xstrdup(state->matches[0]);
-	assert(state->selstr);
 	state->sellen = strlen(state->selstr);
 }
 
@@ -390,7 +387,6 @@ static int asai_append (struct asa_import_state *state,
 {
 	state->out = (char *)xrealloc(state->out,
 		state->outlen + state->sellen + 1);
-	assert(state->out);
 	memcpy(state->out + state->outlen, state->selstr, state->sellen);
 	state->outlen += state->sellen;
 	state->out[state->outlen] = '\0';

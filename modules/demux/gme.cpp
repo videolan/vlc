@@ -148,12 +148,17 @@ static int Open( vlc_object_t *p_this )
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = (demux_sys_t *)malloc( sizeof( demux_sys_t ) );
-    assert(p_sys);
+    if( unlikely( !p_sys ) )
+        return VLC_ENOMEM;
 
     msg_Dbg( p_demux, "loading complete file (could be long)" );
     p_sys->i_data = stream_Size( p_demux->s );
     p_sys->p_data = (uint8_t *)malloc( p_sys->i_data );
-    assert(p_sys->p_data);
+    if( unlikely( !p_sys->p_data ) )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
     p_sys->i_data = stream_Read( p_demux->s, p_sys->p_data, p_sys->i_data );
     if( p_sys->i_data <= 0 )
     {
@@ -456,8 +461,7 @@ switch( i_query )
                 int *pi_int    = (int*)va_arg( args, int* );
 
                 *pi_int = p_sys->i_tracks;
-                *ppp_title = (input_title_t**)malloc( sizeof( input_title_t**) * p_sys->i_tracks );
-                assert( *ppp_sitle );
+                *ppp_title = (input_title_t**)xmalloc( sizeof( input_title_t**) * p_sys->i_tracks );
 
                 for( int i = 0; i < p_sys->i_tracks; i++ )
                 {
@@ -501,8 +505,7 @@ static void inflate_gzbuf(uint8_t * p_buffer, size_t i_size, uint8_t ** pp_obuff
     memset(&z_str, 0, sizeof(z_str));
 
     out_size = i_size * 2;
-    out_buffer = (uint8_t*)malloc(out_size);
-    assert(out_buffer);
+    out_buffer = (uint8_t*)xmalloc(out_size);
 
     z_str.next_in   = (unsigned char*)p_buffer;
     z_str.avail_in  = i_size;
@@ -524,8 +527,7 @@ static void inflate_gzbuf(uint8_t * p_buffer, size_t i_size, uint8_t ** pp_obuff
         case Z_BUF_ERROR:
             offset = z_str.next_out - out_buffer;
             out_size *= 2;
-            out_buffer = (uint8_t *)realloc_or_free(out_buffer, out_size);
-            assert(out_buffer);
+            out_buffer = (uint8_t *)xrealloc(out_buffer, out_size);
             z_str.next_out  = out_buffer + offset;
             z_str.avail_out = out_size - offset;
             break;
@@ -540,8 +542,7 @@ static void inflate_gzbuf(uint8_t * p_buffer, size_t i_size, uint8_t ** pp_obuff
 
     inflateEnd(&z_str);
  
-    out_buffer = (uint8_t *)realloc_or_free(out_buffer, *pi_osize);
-    assert(out_buffer);
+    out_buffer = (uint8_t *)xrealloc(out_buffer, *pi_osize);
     (*pp_obuffer) = out_buffer;
 }
 #endif

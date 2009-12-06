@@ -29,11 +29,8 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_memory.h>
 
 #include <errno.h>
 #include <sys/types.h>
@@ -155,12 +152,17 @@ static int Open ( vlc_object_t *p_this )
     p_demux->pf_demux = Demux;
     p_demux->pf_control = Control;
     p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    assert( p_sys );
+    if( unlikely( !p_sys ) )
+        return VLC_ENOMEM;
     p_sys->i_length = 0;
     p_sys->p_vobsub_stream = NULL;
     p_sys->i_tracks = 0;
-    p_sys->track = (vobsub_track_t *)malloc( sizeof( vobsub_track_t ) );
-    assert( p_sys->track );
+    p_sys->track = malloc( sizeof( vobsub_track_t ) );
+    if( unlikely( !p_sys->track ) )
+    {
+        free( p_sys );
+        return VLC_ENOMEM;
+    }
     p_sys->i_original_frame_width = -1;
     p_sys->i_original_frame_height = -1;
     p_sys->b_palette = false;
@@ -527,9 +529,8 @@ static int ParseVobSubIDX( demux_t *p_demux )
                         language, &i_track_id ) == 2 )
             {
                 p_sys->i_tracks++;
-                p_sys->track = realloc_or_free( p_sys->track,
+                p_sys->track = xrealloc( p_sys->track,
                           sizeof( vobsub_track_t ) * (p_sys->i_tracks + 1 ) );
-                assert( p_sys->track );
                 language[2] = '\0';
 
                 /* Init the track */
@@ -537,8 +538,7 @@ static int ParseVobSubIDX( demux_t *p_demux )
                 memset( current_tk, 0, sizeof( vobsub_track_t ) );
                 current_tk->i_current_subtitle = 0;
                 current_tk->i_subtitles = 0;
-                current_tk->p_subtitles = malloc( sizeof( subtitle_t ) );;
-                assert( current_tk->p_subtitles );
+                current_tk->p_subtitles = xmalloc( sizeof( subtitle_t ) );;
                 current_tk->i_track_id = i_track_id;
                 current_tk->i_delay = (int64_t)0;
 
@@ -590,9 +590,8 @@ static int ParseVobSubIDX( demux_t *p_demux )
 
                 current_tk->i_subtitles++;
                 current_tk->p_subtitles =
-                    realloc_or_free( current_tk->p_subtitles,
+                    xrealloc( current_tk->p_subtitles,
                       sizeof( subtitle_t ) * (current_tk->i_subtitles + 1 ) );
-                assert( current_tk->p_subtitles );
                 current_sub = &current_tk->p_subtitles[current_tk->i_subtitles - 1];
 
                 current_sub->i_start = i_start * i_sign;

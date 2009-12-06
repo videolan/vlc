@@ -31,8 +31,6 @@
 # include "config.h"
 #endif
 
-#include <assert.h>
-
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_input.h>
@@ -1063,16 +1061,11 @@ static int  ParseSSA( demux_t *p_demux, subtitle_t *p_subtitle,
         free( psz_text );
 
         /* All the other stuff we add to the header field */
-        if( !p_sys->psz_header )
-            p_sys->psz_header = strdup( "" );
-        if( !p_sys->psz_header )
+        char *psz_header;
+        if( asprintf( &psz_header, "%s%s\n",
+                       p_sys->psz_header ? p_sys->psz_header : "", s ) == -1 )
             return VLC_ENOMEM;
-
-        p_sys->psz_header = realloc_or_free( p_sys->psz_header,
-                              strlen( p_sys->psz_header ) + strlen( s ) + 2 );
-        assert( p_sys->psz_header );
-        strcat( p_sys->psz_header,  s );
-        strcat( p_sys->psz_header, "\n" );
+        p_sys->psz_header = psz_header;
     }
 }
 
@@ -1721,7 +1714,6 @@ static int ParseJSS( demux_t *p_demux, subtitle_t *p_subtitle, int i_idx )
         /* Directives are NOT parsed yet */
         /* This has probably a better place in a decoder ? */
         /* directive = malloc( strlen( psz_text ) + 1 );
-           assert( directive );
            if( sscanf( psz_text, "%s %[^\n\r]", directive, psz_text2 ) == 2 )*/
     }
 

@@ -28,9 +28,6 @@
 #endif
 
 #include <stdio.h>
-#include <assert.h>
-
-#include <vlc_memory.h>
 
 #include "xurl.h"
 
@@ -385,8 +382,7 @@ char *XURL_GetHead( const char *psz_path )
         size_t i_characters_until_last_slash;
 
         i_characters_until_last_slash = pc_last_slash - psz_path;
-        psz_path_head = malloc( i_characters_until_last_slash + 1 );
-        assert( psz_path_head );
+        psz_path_head = xmalloc( i_characters_until_last_slash + 1 );
         strncpy( psz_path_head, psz_path, i_characters_until_last_slash + 1 );
 
         /* terminate the resulting string with '\0' */
@@ -439,8 +435,7 @@ static char *streallocat( char *psz_string, const char *psz_to_append )
     size_t i_new_string_length = strlen( psz_string ) +
         strlen( psz_to_append ) + 1;
 
-    psz_string = realloc_or_free( psz_string, i_new_string_length );
-    assert( psz_string );
+    psz_string = xrealloc( psz_string, i_new_string_length );
  
     return strcat( psz_string, psz_to_append );
 }
