@@ -32,58 +32,12 @@
 # include "config.h"
 #endif
 
-#include <errno.h>                                                 /* ENOMEM */
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_vout.h>
-
-#ifdef __APPLE__
-# include <OpenGL/gl.h>
-# include <OpenGL/glext.h>
-#else
-# include <GL/gl.h>
-#endif
-
-#ifndef YCBCR_MESA
-# define YCBCR_MESA 0x8757
-#endif
-#ifndef UNSIGNED_SHORT_8_8_MESA
-# define UNSIGNED_SHORT_8_8_MESA 0x85BA
-#endif
-/* RV16 */
-#ifndef GL_UNSIGNED_SHORT_5_6_5
-# define GL_UNSIGNED_SHORT_5_6_5 0x8363
-#endif
-#ifndef GL_CLAMP_TO_EDGE
-# define GL_CLAMP_TO_EDGE 0x812F
-#endif
-
-#ifdef __APPLE__
-/* On OS X, use GL_TEXTURE_RECTANGLE_EXT instead of GL_TEXTURE_2D.
-   This allows sizes which are not powers of 2 */
-# define VLCGL_TARGET GL_TEXTURE_RECTANGLE_EXT
-
-/* OS X OpenGL supports YUV. Hehe. */
-# define VLCGL_FORMAT GL_YCBCR_422_APPLE
-# define VLCGL_TYPE   GL_UNSIGNED_SHORT_8_8_APPLE
-#else
-
-# define VLCGL_TARGET GL_TEXTURE_2D
-
-/* RV32 */
-# define VLCGL_RGB_FORMAT GL_RGBA
-# define VLCGL_RGB_TYPE GL_UNSIGNED_BYTE
-
-/* YUY2 */
-# define VLCGL_YUV_FORMAT YCBCR_MESA
-# define VLCGL_YUV_TYPE UNSIGNED_SHORT_8_8_MESA
-
-/* Use RGB on Win32/GLX */
-# define VLCGL_FORMAT VLCGL_RGB_FORMAT
-# define VLCGL_TYPE   VLCGL_RGB_TYPE
-#endif
-
+#include "opengl.h"
 
 /*****************************************************************************
  * Vout interface
@@ -97,9 +51,6 @@ static void Render       ( vout_thread_t *, picture_t * );
 static void DisplayVideo ( vout_thread_t *, picture_t * );
 static int  Control      ( vout_thread_t *, int, va_list );
 
-static inline int GetAlignedSize( int );
-
-static int InitTextures  ( vout_thread_t * );
 static int SendEvents    ( vlc_object_t *, char const *,
                            vlc_value_t, vlc_value_t, void * );
 
@@ -132,12 +83,11 @@ vlc_module_end ()
 struct vout_sys_t
 {
     vout_thread_t *p_vout;
+    vout_opengl_t gl;
+    vout_display_opengl_t vgl;
 
-    uint8_t    *pp_buffer[2];
-    int         i_index;
-    int         i_tex_width;
-    int         i_tex_height;
-    GLuint      p_textures[2];
+    picture_pool_t *p_pool;
+    picture_t *p_current;
 };
 
 /*****************************************************************************
@@ -153,19 +103,6 @@ static int CreateVout( vlc_object_t *p_this )
     p_vout->p_sys = p_sys = malloc( sizeof( vout_sys_t ) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
-
-    p_sys->i_index = 0;
-#ifdef __APPLE__
-    p_sys->i_tex_width  = p_vout->fmt_in.i_width;
-    p_sys->i_tex_height = p_vout->fmt_in.i_height;
-#else
-    /* A texture must have a size aligned on a power of 2 */
-    p_sys->i_tex_width  = GetAlignedSize( p_vout->fmt_in.i_width );
-    p_sys->i_tex_height = GetAlignedSize( p_vout->fmt_in.i_height );
-#endif
-
-    msg_Dbg( p_vout, "Texture size: %dx%d", p_sys->i_tex_width,
-             p_sys->i_tex_height );
 
     /* Get window */
     p_sys->p_vout =
@@ -237,64 +174,67 @@ static int CreateVout( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+static int OpenglLock(vout_opengl_t *gl)
+{
+    vout_thread_t *p_vout = gl->sys;
+
+    if( !p_vout->pf_lock )
+        return VLC_SUCCESS;
+    return p_vout->pf_lock( p_vout );
+}
+static void OpenglUnlock(vout_opengl_t *gl)
+{
+    vout_thread_t *p_vout = gl->sys;
+
+    if( p_vout->pf_unlock )
+        p_vout->pf_unlock( p_vout );
+}
+static void OpenglSwap(vout_opengl_t *gl)
+{
+    vout_thread_t *p_vout = gl->sys;
+    p_vout->pf_swap( p_vout );
+}
+
 /*****************************************************************************
  * Init: initialize the OpenGL video thread output method
  *****************************************************************************/
 static int Init( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
-    int i_pixel_pitch;
 
     p_sys->p_vout->pf_init( p_sys->p_vout );
 
-/* TODO: We use YCbCr on Mac which is Y422, but on OSX it seems to == YUY2. Verify */
-#if ( defined( WORDS_BIGENDIAN ) && VLCGL_FORMAT == GL_YCBCR_422_APPLE ) || (VLCGL_FORMAT == YCBCR_MESA)
-    p_vout->output.i_chroma = VLC_CODEC_YUYV;
-    i_pixel_pitch = 2;
+    p_sys->gl.lock = OpenglLock;
+    p_sys->gl.unlock = OpenglUnlock;
+    p_sys->gl.swap = OpenglSwap;
+    p_sys->gl.sys = p_sys->p_vout;
 
-#elif defined( GL_YCBCR_422_APPLE ) && (VLCGL_FORMAT == GL_YCBCR_422_APPLE)
-    p_vout->output.i_chroma = VLC_CODEC_UYVY;
-    i_pixel_pitch = 2;
+    video_format_t fmt;
+    video_format_Setup( &fmt,
+                        p_vout->render.i_chroma,
+                        p_vout->render.i_width,
+                        p_vout->render.i_height,
+                        p_vout->render.i_aspect );
 
-#elif VLCGL_FORMAT == GL_RGB
-#   if VLCGL_TYPE == GL_UNSIGNED_BYTE
-    p_vout->output.i_chroma = VLC_CODEC_RGB24;
-#       if defined( WORDS_BIGENDIAN )
-    p_vout->output.i_rmask = 0x00ff0000;
-    p_vout->output.i_gmask = 0x0000ff00;
-    p_vout->output.i_bmask = 0x000000ff;
-#       else
-    p_vout->output.i_rmask = 0x000000ff;
-    p_vout->output.i_gmask = 0x0000ff00;
-    p_vout->output.i_bmask = 0x00ff0000;
-#       endif
-    i_pixel_pitch = 3;
-#   else
-    p_vout->output.i_chroma = VLC_CODEC_RGB16;
-#       if defined( WORDS_BIGENDIAN )
-    p_vout->output.i_rmask = 0x001f;
-    p_vout->output.i_gmask = 0x07e0;
-    p_vout->output.i_bmask = 0xf800;
-#       else
-    p_vout->output.i_rmask = 0xf800;
-    p_vout->output.i_gmask = 0x07e0;
-    p_vout->output.i_bmask = 0x001f;
-#       endif
-    i_pixel_pitch = 2;
-#   endif
-#else
-    p_vout->output.i_chroma = VLC_CODEC_RGB32;
-#       if defined( WORDS_BIGENDIAN )
-    p_vout->output.i_rmask = 0xff000000;
-    p_vout->output.i_gmask = 0x00ff0000;
-    p_vout->output.i_bmask = 0x0000ff00;
-#       else
-    p_vout->output.i_rmask = 0x000000ff;
-    p_vout->output.i_gmask = 0x0000ff00;
-    p_vout->output.i_bmask = 0x00ff0000;
-#       endif
-    i_pixel_pitch = 4;
-#endif
+
+    if( vout_display_opengl_Init( &p_sys->vgl, &fmt, &p_sys->gl ) )
+    {
+        I_OUTPUTPICTURES = 0;
+        return VLC_EGENERIC;
+    }
+    p_sys->p_pool = vout_display_opengl_GetPool( &p_sys->vgl );
+    if( !p_sys->p_pool )
+    {
+        vout_display_opengl_Clean( &p_sys->vgl );
+        I_OUTPUTPICTURES = 0;
+        return VLC_EGENERIC;
+    }
+
+    /* */
+    p_vout->output.i_chroma = fmt.i_chroma;
+    p_vout->output.i_rmask  = fmt.i_rmask;
+    p_vout->output.i_gmask  = fmt.i_gmask;
+    p_vout->output.i_bmask  = fmt.i_bmask;
 
     /* Since OpenGL can do rescaling for us, stick to the default
      * coordinates and aspect. */
@@ -305,56 +245,22 @@ static int Init( vout_thread_t *p_vout )
     p_vout->fmt_out = p_vout->fmt_in;
     p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
 
-    /* We know the chroma, allocate one buffer which will be used
-     * directly by the decoder */
-    p_sys->pp_buffer[0] =
-        malloc( p_sys->i_tex_width * p_sys->i_tex_height * i_pixel_pitch );
-    if( !p_sys->pp_buffer[0] )
-        return -1;
-    p_sys->pp_buffer[1] =
-        malloc( p_sys->i_tex_width * p_sys->i_tex_height * i_pixel_pitch );
-    if( !p_sys->pp_buffer[1] )
-        return -1;
-
-    p_vout->p_picture[0].i_planes = 1;
-    p_vout->p_picture[0].p->p_pixels = p_sys->pp_buffer[0];
-    p_vout->p_picture[0].p->i_lines = p_vout->output.i_height;
-    p_vout->p_picture[0].p->i_visible_lines = p_vout->output.i_height;
-    p_vout->p_picture[0].p->i_pixel_pitch = i_pixel_pitch;
-    p_vout->p_picture[0].p->i_pitch = p_vout->output.i_width *
-        p_vout->p_picture[0].p->i_pixel_pitch;
-    p_vout->p_picture[0].p->i_visible_pitch = p_vout->output.i_width *
-        p_vout->p_picture[0].p->i_pixel_pitch;
-
+    /* */
+    p_sys->p_current = picture_pool_Get( p_sys->p_pool );
+    msg_Err(p_vout, "pitch %d visible_p %d w %d",
+            p_sys->p_current->p[0].i_pitch,
+            p_sys->p_current->p[0].i_visible_pitch,
+            p_vout->render.i_width );
+    p_vout->p_picture[0] = *p_sys->p_current;
     p_vout->p_picture[0].i_status = DESTROYED_PICTURE;
     p_vout->p_picture[0].i_type   = DIRECT_PICTURE;
-
-    PP_OUTPUTPICTURE[ 0 ] = &p_vout->p_picture[0];
+    p_vout->p_picture[0].i_refcount = 0;
+    p_vout->p_picture[0].p_sys = NULL;
+    PP_OUTPUTPICTURE[0] = &p_vout->p_picture[0];
 
     I_OUTPUTPICTURES = 1;
 
-    if( p_sys->p_vout->pf_lock &&
-        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
-    {
-        msg_Warn( p_vout, "could not lock OpenGL provider" );
-        return 0;
-    }
-
-    InitTextures( p_vout );
-
-    glDisable(GL_BLEND);
-    glDisable(GL_DEPTH_TEST);
-    glDepthMask(GL_FALSE);
-    glDisable(GL_CULL_FACE);
-    glClearColor( 0.0f, 0.0f, 0.0f, 1.0f );
-    glClear( GL_COLOR_BUFFER_BIT );
-
-    if( p_sys->p_vout->pf_unlock )
-    {
-        p_sys->p_vout->pf_unlock( p_sys->p_vout );
-    }
-
-    return 0;
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
@@ -364,24 +270,15 @@ static void End( vout_thread_t *p_vout )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    if( p_sys->p_vout->pf_lock &&
-        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
+    if( I_OUTPUTPICTURES > 0 )
     {
-        msg_Warn( p_vout, "could not lock OpenGL provider" );
-        return;
-    }
 
-    glFinish();
-    glFlush();
+        if( p_sys->p_current )
+            picture_Release( p_sys->p_current );
+        vout_display_opengl_Clean( &p_sys->vgl );
 
-    /* Free the texture buffer*/
-    glDeleteTextures( 2, p_sys->p_textures );
-    free( p_sys->pp_buffer[0] );
-    free( p_sys->pp_buffer[1] );
-
-    if( p_sys->p_vout->pf_unlock )
-    {
-        p_sys->p_vout->pf_unlock( p_sys->p_vout );
+        p_vout->p_picture[0].i_status = FREE_PICTURE;
+        I_OUTPUTPICTURES = 0;
     }
 
     /* We must release the opengl provider here: opengl requiere init and end
@@ -437,25 +334,15 @@ static int Manage( vout_thread_t *p_vout )
     p_vout->i_changes = p_sys->p_vout->i_changes;
 
 #ifdef __APPLE__
-    if( p_sys->p_vout->pf_lock &&
-        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
-    {
-        msg_Warn( p_vout, "could not lock OpenGL provider" );
-        return i_ret;
-    }
-
     /* On OS X, we create the window and the GL view when entering
        fullscreen - the textures have to be inited again */
     if( i_fullscreen_change )
     {
-        InitTextures( p_vout );
-    }
-
-    if( p_sys->p_vout->pf_unlock )
-    {
-        p_sys->p_vout->pf_unlock( p_sys->p_vout );
+        /* FIXME should we release p_current ? */
+        vout_display_opengl_ResetTextures( &p_sys->vgl );
     }
 #endif
+
 // to align in real time in OPENGL
     if (p_sys->p_vout->i_alignment != p_vout->i_alignment)
     {
@@ -488,64 +375,21 @@ static int Manage( vout_thread_t *p_vout )
  *****************************************************************************/
 static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    VLC_UNUSED(p_pic);
     vout_sys_t *p_sys = p_vout->p_sys;
 
-    /* On Win32/GLX, we do this the usual way:
-       + Fill the buffer with new content,
-       + Reload the texture,
-       + Use the texture.
-
-       On OS X with VRAM or AGP texturing, the order has to be:
-       + Reload the texture,
-       + Fill the buffer with new content,
-       + Use the texture.
-
-       (Thanks to gcc from the Arstechnica forums for the tip)
-
-       Therefore, we have to use two buffers and textures. On Win32/GLX,
-       we reload the texture to be displayed and use it right away. On
-       OS X, we first render, then reload the texture to be used next
-       time. */
-
-    if( p_sys->p_vout->pf_lock &&
-        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
+    if( p_sys->p_current )
     {
-        msg_Warn( p_vout, "could not lock OpenGL provider" );
-        return;
+        assert( p_sys->p_current->p[0].p_pixels == p_pic->p[0].p_pixels );
+
+        vout_display_opengl_Prepare( &p_sys->vgl, p_sys->p_current );
+        picture_Release( p_sys->p_current );
     }
 
-#ifdef __APPLE__
-    int i_new_index;
-    i_new_index = ( p_sys->i_index + 1 ) & 1;
+    p_sys->p_current = picture_pool_Get( p_sys->p_pool );
+    if( p_sys->p_current )
+        p_pic->p[0].p_pixels = p_sys->p_current->p[0].p_pixels;
 
-
-    /* Update the texture */
-    glBindTexture( VLCGL_TARGET, p_sys->p_textures[i_new_index] );
-    glTexSubImage2D( VLCGL_TARGET, 0, 0, 0,
-                     p_vout->fmt_out.i_width,
-                     p_vout->fmt_out.i_height,
-                     VLCGL_FORMAT, VLCGL_TYPE, p_sys->pp_buffer[i_new_index] );
-
-    /* Bind to the previous texture for drawing */
-    glBindTexture( VLCGL_TARGET, p_sys->p_textures[p_sys->i_index] );
-
-    /* Switch buffers */
-    p_sys->i_index = i_new_index;
-    p_pic->p->p_pixels = p_sys->pp_buffer[p_sys->i_index];
-
-#else
-    /* Update the texture */
-    glTexSubImage2D( GL_TEXTURE_2D, 0, 0, 0,
-                     p_vout->fmt_out.i_width,
-                     p_vout->fmt_out.i_height,
-                     VLCGL_FORMAT, VLCGL_TYPE, p_sys->pp_buffer[0] );
-#endif
-
-    if( p_sys->p_vout->pf_unlock )
-    {
-        p_sys->p_vout->pf_unlock( p_sys->p_vout );
-    }
+    VLC_UNUSED( p_pic );
 }
 
 /*****************************************************************************
@@ -553,68 +397,10 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
  *****************************************************************************/
 static void DisplayVideo( vout_thread_t *p_vout, picture_t *p_pic )
 {
-    VLC_UNUSED(p_pic);
     vout_sys_t *p_sys = p_vout->p_sys;
-    float f_width, f_height, f_x, f_y;
 
-    if( p_sys->p_vout->pf_lock &&
-        p_sys->p_vout->pf_lock( p_sys->p_vout ) )
-    {
-        msg_Warn( p_vout, "could not lock OpenGL provider" );
-        return;
-    }
-
-    /* glTexCoord works differently with GL_TEXTURE_2D and
-       GL_TEXTURE_RECTANGLE_EXT */
-#ifdef __APPLE__
-    f_x = (float)p_vout->fmt_out.i_x_offset;
-    f_y = (float)p_vout->fmt_out.i_y_offset;
-    f_width = (float)p_vout->fmt_out.i_x_offset +
-              (float)p_vout->fmt_out.i_visible_width;
-    f_height = (float)p_vout->fmt_out.i_y_offset +
-               (float)p_vout->fmt_out.i_visible_height;
-#else
-    f_x = (float)p_vout->fmt_out.i_x_offset / p_sys->i_tex_width;
-    f_y = (float)p_vout->fmt_out.i_y_offset / p_sys->i_tex_height;
-    f_width = ( (float)p_vout->fmt_out.i_x_offset +
-                p_vout->fmt_out.i_visible_width ) / p_sys->i_tex_width;
-    f_height = ( (float)p_vout->fmt_out.i_y_offset +
-                 p_vout->fmt_out.i_visible_height ) / p_sys->i_tex_height;
-#endif
-
-    /* Why drawing here and not in Render()? Because this way, the
-       OpenGL providers can call pf_display to force redraw. Currently,
-       the OS X provider uses it to get a smooth window resizing */
-
-    glClear( GL_COLOR_BUFFER_BIT );
-
-    glEnable( VLCGL_TARGET );
-    glBegin( GL_POLYGON );
-    glTexCoord2f( f_x, f_y ); glVertex2f( -1.0, 1.0 );
-    glTexCoord2f( f_width, f_y ); glVertex2f( 1.0, 1.0 );
-    glTexCoord2f( f_width, f_height ); glVertex2f( 1.0, -1.0 );
-    glTexCoord2f( f_x, f_height ); glVertex2f( -1.0, -1.0 );
-    glEnd();
-
-    glDisable( VLCGL_TARGET );
-
-    p_sys->p_vout->pf_swap( p_sys->p_vout );
-
-    if( p_sys->p_vout->pf_unlock )
-    {
-        p_sys->p_vout->pf_unlock( p_sys->p_vout );
-    }
-}
-
-int GetAlignedSize( int i_size )
-{
-    /* Return the nearest power of 2 */
-    int i_result = 1;
-    while( i_result < i_size )
-    {
-        i_result *= 2;
-    }
-    return i_result;
+    vout_display_opengl_Display( &p_sys->vgl, &p_vout->fmt_out );
+    VLC_UNUSED( p_pic );
 }
 
 /*****************************************************************************
@@ -629,55 +415,6 @@ static int Control( vout_thread_t *p_vout, int i_query, va_list args )
     return VLC_EGENERIC;
 }
 
-static int InitTextures( vout_thread_t *p_vout )
-{
-    vout_sys_t *p_sys = p_vout->p_sys;
-    int i_index;
-
-    glDeleteTextures( 2, p_sys->p_textures );
-    glGenTextures( 2, p_sys->p_textures );
-
-    for( i_index = 0; i_index < 2; i_index++ )
-    {
-        glBindTexture( VLCGL_TARGET, p_sys->p_textures[i_index] );
-
-        /* Set the texture parameters */
-        glTexParameterf( VLCGL_TARGET, GL_TEXTURE_PRIORITY, 1.0 );
-
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE );
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE );
-
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MAG_FILTER, GL_LINEAR );
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_MIN_FILTER, GL_LINEAR );
-
-        glTexEnvf( GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_MODULATE );
-
-#ifdef __APPLE__
-        /* Tell the driver not to make a copy of the texture but to use
-           our buffer */
-        glEnable( GL_UNPACK_CLIENT_STORAGE_APPLE );
-        glPixelStorei( GL_UNPACK_CLIENT_STORAGE_APPLE, GL_TRUE );
-
-#if 0
-        /* Use VRAM texturing */
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
-                         GL_STORAGE_CACHED_APPLE );
-#else
-        /* Use AGP texturing */
-        glTexParameteri( VLCGL_TARGET, GL_TEXTURE_STORAGE_HINT_APPLE,
-                         GL_STORAGE_SHARED_APPLE );
-#endif
-#endif
-
-        /* Call glTexImage2D only once, and use glTexSubImage2D later */
-        glTexImage2D( VLCGL_TARGET, 0, 3, p_sys->i_tex_width,
-                      p_sys->i_tex_height, 0, VLCGL_FORMAT, VLCGL_TYPE,
-                      p_sys->pp_buffer[i_index] );
-    }
-
-    return 0;
-}
-
 /*****************************************************************************
  * SendEvents: forward mouse and keyboard events to the parent p_vout
  *****************************************************************************/
@@ -687,3 +424,4 @@ static int SendEvents( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
     return var_Set( (vlc_object_t *)_p_vout, psz_var, newval );
 }
+
