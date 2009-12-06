@@ -815,6 +815,25 @@ static inline const char *vlc_pgettext( const char *ctx, const char *id )
 }
 
 /*****************************************************************************
+ * Loosy memory allocation functions. Do not use in new code.
+ *****************************************************************************/
+static inline void *xmalloc (size_t len)
+{
+    void *ptr = malloc (len);
+    if (unlikely (ptr == NULL))
+        abort ();
+    return ptr;
+}
+
+static inline void *xrealloc (void *ptr, size_t len)
+{
+    void *nptr = realloc (ptr, len);
+    if (unlikely (nptr == NULL))
+        abort ();
+    return nptr;
+}
+
+/*****************************************************************************
  * libvlc features
  *****************************************************************************/
 VLC_EXPORT( const char *, VLC_Version, ( void ) LIBVLC_USED );
