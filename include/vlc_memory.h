@@ -23,6 +23,8 @@
 #ifndef VLC_MEMORY_H
 #define VLC_MEMORY_H 1
 
+#include <stdlib.h>
+
 /**
  * \file
  * This file deals with memory fixups
