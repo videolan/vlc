@@ -167,11 +167,40 @@ typedef enum vlc_dialog {
 /* Useful text messages shared by interfaces */
 #define INTF_ABOUT_MSG LICENSE_MSG
 
-#define EXTENSIONS_AUDIO "*.a52;*.aac;*.ac3;*.aiff;*.aob;*.ape;" \
-                         "*.dts;*.flac;*.it;" \
-                         "*.m4a;*.m4p;*.mka;*.mlp;*.mod;*.mp1;*.mp2;*.mp3;*.mpc" \
-                         "*.oga;*.ogg;*.oma;*.s3m;*.spx;" \
-                         "*.vqf;*.w64;*.wav;*.wma;*.wv;*.xm"
+#define EXTENSIONS_AUDIO \
+    "*.a52;" \
+    "*.aac;" \
+    "*.ac3;" \
+    "*.aiff;"\
+    "*.aob;" \
+    "*.ape;" \
+    "*.dts;" \
+    "*.flac;"\
+    "*.it;"  \
+    "*.m4a;" \
+    "*.m4p;" \
+    "*.mid;" \
+    "*.mka;" \
+    "*.mlp;" \
+    "*.mod;" \
+    "*.mp1;" \
+    "*.mp2;" \
+    "*.mp3;" \
+    "*.mpc;" \
+    "*.oga;" \
+    "*.ogg;" \
+    "*.oma;" \
+    "*.rmi;" \
+    "*.s3m;" \
+    "*.spx;" \
+    "*.voc;" \
+    "*.vqf;" \
+    "*.w64;" \
+    "*.wav;" \
+    "*.wma;" \
+    "*.wv;"  \
+    "*.xa;"  \
+    "*.xm"
 
 #define EXTENSIONS_VIDEO "*.amv;*.asf;*.avi;*.divx;*.dv;*.flv;*.gxf;*.iso;*.m1v;*.m2v;" \
                          "*.m2t;*.m2ts;*.m4v;*.mkv;*.mov;*.mp2;*.mp4;*.mpeg;*.mpeg1;" \
