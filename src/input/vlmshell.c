@@ -31,7 +31,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_memory.h>
 
 #include <stdio.h>
 #include <ctype.h>                                              /* tolower() */
@@ -641,9 +640,8 @@ static int ExecuteScheduleProperty( vlm_t *p_vlm, vlm_schedule_sys_t *p_schedule
             psz_line = strdup( ppsz_property[i] );
             for( j = i+1; j < i_property; j++ )
             {
-                psz_line = realloc_or_free( psz_line,
+                psz_line = xrealloc( psz_line,
                         strlen(psz_line) + strlen(ppsz_property[j]) + 1 + 1 );
-                assert( psz_line );
                 strcat( psz_line, " " );
                 strcat( psz_line, ppsz_property[j] );
             }

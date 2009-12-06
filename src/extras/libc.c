@@ -30,7 +30,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_memory.h>
 
 #include <ctype.h>
 
@@ -866,8 +865,7 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
               || i_read == 0 )
             break;
         *pi_data += i_read;
-        *pp_data = realloc_or_free( *pp_data, *pi_data + 1025 );
-        assert( *pp_data );
+        *pp_data = xrealloc( *pp_data, *pi_data + 1025 );
     }
 
     while ( !p_object->b_die

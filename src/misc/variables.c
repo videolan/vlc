@@ -30,7 +30,6 @@
 
 #include <vlc_common.h>
 #include <vlc_charset.h>
-#include <vlc_memory.h>
 #include "variables.h"
 
 #include "libvlc.h"
@@ -218,9 +217,8 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 
     if( (p_priv->i_vars & 15) == 15 )
     {
-        p_priv->p_vars = realloc_or_free( p_priv->p_vars,
+        p_priv->p_vars = xrealloc( p_priv->p_vars,
                                   (p_priv->i_vars+17) * sizeof(variable_t) );
-        assert( p_priv->p_vars );
     }
 
     memmove( p_priv->p_vars + i_new + 1,

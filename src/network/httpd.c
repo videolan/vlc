@@ -563,8 +563,7 @@ httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
         {
             p[4] = '\0';
             answer->i_body = strlen((char*)answer->p_body) + 1;
-            uint8_t *p_body = realloc( answer->p_body, answer->i_body );
-            if( p_body ) answer->p_body = p_body;
+            answer->p_body = xrealloc( answer->p_body, answer->i_body );
         }
     }
 

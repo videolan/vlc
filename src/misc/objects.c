@@ -37,7 +37,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_memory.h>
 
 #include "../libvlc.h"
 #include <vlc_aout.h>

@@ -606,8 +606,7 @@ char *str_format_time( const char *tformat )
                     if( string != NULL )                            \
                     {                                               \
                         int len = strlen( string );                 \
-                        dst = realloc( dst, i_size = i_size + len );\
-                        assert( dst );                              \
+                        dst = xrealloc( dst, i_size = i_size + len );\
                         memcpy( (dst+d), string, len );             \
                         d += len;                                   \
                         free( string );                             \
@@ -622,8 +621,7 @@ char *str_format_time( const char *tformat )
 #define INSERT_STRING_NO_FREE( string )                             \
                     {                                               \
                         int len = strlen( string );                 \
-                        dst = realloc( dst, i_size = i_size + len );\
-                        assert( dst );                              \
+                        dst = xrealloc( dst, i_size = i_size + len );\
                         memcpy( dst+d, string, len );               \
                         d += len;                                   \
                     }

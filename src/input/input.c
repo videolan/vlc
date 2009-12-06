@@ -30,7 +30,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_memory.h>
 
 #include <ctype.h>
 #include <limits.h>
@@ -2926,9 +2925,8 @@ static void AppendAttachment( int *pi_attachment, input_attachment_t ***ppp_atta
     input_attachment_t **attachment = *ppp_attachment;
     int i;
 
-    attachment = realloc_or_free( attachment,
+    attachment = xrealloc( attachment,
                     sizeof(input_attachment_t**) * ( i_attachment + i_new ) );
-    assert( attachment );
     for( i = 0; i < i_new; i++ )
         attachment[i_attachment++] = pp_new[i];
     free( pp_new );
