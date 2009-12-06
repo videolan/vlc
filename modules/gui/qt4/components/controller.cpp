@@ -46,6 +46,8 @@
 #include <QSignalMapper>
 #include <QTimer>
 
+//#define DEBUG_LAYOUT 1
+
 /**********************************************************************
  * TEH controls
  **********************************************************************/
@@ -143,13 +145,13 @@ void AbstractController::createAndAddWidget( QBoxLayout *controlLayout,
     /* Special case for SPACERS, who aren't QWidgets */
     if( i_type == WIDGET_SPACER )
     {
-        controlLayout->insertSpacing( i_index, 16 );
+        controlLayout->insertSpacing( i_index, 12 );
         return;
     }
 
     if(  i_type == WIDGET_SPACER_EXTEND )
     {
-        controlLayout->insertStretch( i_index, 16 );
+        controlLayout->insertStretch( i_index, 12 );
         return;
     }
 
@@ -547,19 +549,22 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 {
     /* advanced Controls handling */
     b_advancedVisible = b_advControls;
+#if DEBUG_LAYOUT
+    setStyleSheet( " background: red ");
+#endif
 
     QVBoxLayout *controlLayout = new QVBoxLayout( this );
-    controlLayout->setContentsMargins( 5, 3, 5, 2 );
+    controlLayout->setContentsMargins( 4, 2, 4, 0 );
     controlLayout->setSpacing( 0 );
     QHBoxLayout *controlLayout1 = new QHBoxLayout;
-    controlLayout1->setSpacing( 0 );
+    controlLayout1->setSpacing( 0 ); controlLayout1->setMargin( 0 );
 
     QString line1 = getSettings()->value( "MainToolbar1", MAIN_TB1_DEFAULT )
                                         .toString();
     parseAndCreate( line1, controlLayout1 );
 
     QHBoxLayout *controlLayout2 = new QHBoxLayout;
-    controlLayout2->setSpacing( 0 );
+    controlLayout2->setSpacing( 0 ); controlLayout2->setMargin( 0 );
     QString line2 = getSettings()->value( "MainToolbar2", MAIN_TB2_DEFAULT )
                                         .toString();
     parseAndCreate( line2, controlLayout2 );
@@ -596,6 +601,10 @@ AdvControlsWidget::AdvControlsWidget( intf_thread_t *_p_i, QWidget *_parent ) :
     controlLayout = new QHBoxLayout( this );
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
+#if DEBUG_LAYOUT
+    setStyleSheet( " background: orange ");
+#endif
+
 
     QString line = getSettings()->value( "AdvToolbar", ADV_TB_DEFAULT )
         .toString();
@@ -608,6 +617,9 @@ InputControlsWidget::InputControlsWidget( intf_thread_t *_p_i, QWidget *_parent 
     controlLayout = new QHBoxLayout( this );
     controlLayout->setMargin( 0 );
     controlLayout->setSpacing( 0 );
+#if DEBUG_LAYOUT
+    setStyleSheet( " background: green ");
+#endif
 
     QString line = getSettings()->value( "InputToolbar", INPT_TB_DEFAULT ).toString();
     parseAndCreate( line, controlLayout );
