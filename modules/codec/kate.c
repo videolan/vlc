@@ -371,7 +371,7 @@ static int OpenDecoder( vlc_object_t *p_this )
     p_sys->b_packetizer = false;
 #endif
     p_sys->b_ready = false;
-    p_sys->i_pts = 0;
+    p_sys->i_pts =
     p_sys->i_max_stop = VLC_TS_INVALID;
 
     kate_comment_init( &p_sys->kc );
@@ -645,7 +645,7 @@ static subpicture_t *ProcessPacket( decoder_t *p_dec, kate_packet *p_kp,
     subpicture_t *p_buf = NULL;
 
     /* Date management */
-    if( p_block->i_pts > 0 && p_block->i_pts != p_sys->i_pts )
+    if( p_block->i_pts > VLC_TS_INVALID && p_block->i_pts != p_sys->i_pts )
     {
         p_sys->i_pts = p_block->i_pts;
     }
