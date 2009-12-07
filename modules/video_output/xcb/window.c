@@ -261,7 +261,7 @@ static int Open (vlc_object_t *obj)
         goto error;
     }
 
-    wnd->handle.xid = window;
+    wnd->xid = window;
     wnd->control = Control;
     wnd->sys = p_sys;
 
@@ -335,7 +335,7 @@ static int Open (vlc_object_t *obj)
 #ifdef MATCHBOX_HACK
     if (p_sys->mb_current_app_window)
         xcb_set_input_focus (p_sys->conn, XCB_INPUT_FOCUS_POINTER_ROOT,
-                             wnd->handle.xid, XCB_CURRENT_TIME);
+                             wnd->xid, XCB_CURRENT_TIME);
 #endif
     xcb_flush (conn); /* Make sure map_window is sent (should be useless) */
     return VLC_SUCCESS;
@@ -404,13 +404,13 @@ static void *Thread (void *data)
                             xcb_get_property (conn, 0, pne->window, pne->atom,
                                               XA_WINDOW, 0, 4), NULL);
                     if (r != NULL
-                     && !memcmp (xcb_get_property_value (r), &wnd->handle.xid,
+                     && !memcmp (xcb_get_property_value (r), &wnd->xid,
                                  4))
                     {
                         msg_Dbg (wnd, "asking Matchbox for input focus");
                         xcb_set_input_focus (conn,
                                              XCB_INPUT_FOCUS_POINTER_ROOT,
-                                             wnd->handle.xid, pne->time);
+                                             wnd->xid, pne->time);
                         xcb_flush (conn);
                     }
                     free (r);
@@ -440,7 +440,7 @@ static void set_wm_state (vout_window_t *wnd, bool on, xcb_atom_t state)
     xcb_client_message_event_t ev = {
          .response_type = XCB_CLIENT_MESSAGE,
          .format = 32,
-         .window = wnd->handle.xid,
+         .window = wnd->xid,
          .type = sys->wm_state,
     };
 
@@ -470,7 +470,7 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
             unsigned height = va_arg (ap, unsigned);
             const uint32_t values[] = { width, height, };
 
-            xcb_configure_window (conn, wnd->handle.xid,
+            xcb_configure_window (conn, wnd->xid,
                                   XCB_CONFIG_WINDOW_WIDTH |
                                   XCB_CONFIG_WINDOW_HEIGHT, values);
             break;
@@ -585,7 +585,7 @@ static int EmOpen (vlc_object_t *obj)
     if (p_sys == NULL || xcb_connection_has_error (conn))
         goto error;
 
-    wnd->handle.xid = window;
+    wnd->xid = window;
     wnd->control = Control;
     wnd->sys = p_sys;
 
@@ -633,7 +633,7 @@ error:
 static void EmClose (vlc_object_t *obj)
 {
     vout_window_t *wnd = (vout_window_t *)obj;
-    xcb_window_t window = wnd->handle.xid;
+    xcb_window_t window = wnd->xid;
 
     Close (obj);
     ReleaseDrawable (obj, window);

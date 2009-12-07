@@ -116,7 +116,7 @@ vout_window_t *GetWindow (vout_display_t *vd,
         xcb_get_geometry_reply_t *geo;
         xcb_get_geometry_cookie_t ck;
 
-        ck = xcb_get_geometry (conn, wnd->handle.xid);
+        ck = xcb_get_geometry (conn, wnd->xid);
         geo = xcb_get_geometry_reply (conn, ck, NULL);
         if (geo == NULL)
         {
@@ -130,7 +130,7 @@ vout_window_t *GetWindow (vout_display_t *vd,
         /* Subscribe to parent window resize events */
         uint32_t value = XCB_EVENT_MASK_POINTER_MOTION
                        | XCB_EVENT_MASK_STRUCTURE_NOTIFY;
-        xcb_change_window_attributes (conn, wnd->handle.xid,
+        xcb_change_window_attributes (conn, wnd->xid,
                                       XCB_CW_EVENT_MASK, &value);
         /* Try to subscribe to click events */
         /* (only one X11 client can get them, so might not work) */
@@ -138,7 +138,7 @@ vout_window_t *GetWindow (vout_display_t *vd,
         {
             value |= XCB_EVENT_MASK_BUTTON_PRESS
                    | XCB_EVENT_MASK_BUTTON_RELEASE;
-            xcb_change_window_attributes (conn, wnd->handle.xid,
+            xcb_change_window_attributes (conn, wnd->xid,
                                           XCB_CW_EVENT_MASK, &value);
         }
     }
@@ -193,7 +193,7 @@ error:
 int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
                    unsigned *restrict width, unsigned *restrict height)
 {
-    xcb_get_geometry_cookie_t ck = xcb_get_geometry (conn, wnd->handle.xid);
+    xcb_get_geometry_cookie_t ck = xcb_get_geometry (conn, wnd->xid);
     xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply (conn, ck, NULL);
 
     if (!geo)

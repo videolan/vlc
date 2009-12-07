@@ -90,7 +90,7 @@ struct vout_window_t {
     union {
         void     *hwnd;   /* Win32 window handle */
         uint32_t xid;     /* X11 windows ID */
-    } handle;
+    };
 
     /* Control on the module (mandatory)
      *

@@ -528,13 +528,13 @@ static int WindowOpen( vlc_object_t *p_obj )
     unsigned i_height = p_wnd->cfg->height;
 
 #if defined (Q_WS_X11)
-    p_wnd->handle.xid = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
-    if( !p_wnd->handle.xid )
+    p_wnd->xid = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
+    if( !p_wnd->xid )
         return VLC_EGENERIC;
 
 #elif defined (WIN32)
-    p_wnd->handle.hwnd = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
-    if( !p_wnd->handle.hwnd )
+    p_wnd->hwnd = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
+    if( !p_wnd->hwnd )
         return VLC_EGENERIC;
 #endif
 

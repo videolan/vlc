@@ -385,9 +385,9 @@ static int WindowOpen( vlc_object_t *p_this )
 
     vlc_mutex_lock( &serializer );
 
-    pWnd->handle.hwnd = VoutManager::getWindow( pIntf, pWnd );
+    pWnd->hwnd = VoutManager::getWindow( pIntf, pWnd );
 
-    if( pWnd->handle.hwnd )
+    if( pWnd->hwnd )
     {
         pWnd->control = &VoutManager::controlWindow;
         pWnd->sys = (vout_window_sys_t*)pIntf;

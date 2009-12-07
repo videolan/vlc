@@ -242,7 +242,7 @@ static int ManageVideo( vout_thread_t *p_vout )
 
     /* Handle events from the owner window */
     while( XCheckWindowEvent( p_vout->p_sys->p_display,
-                              p_vout->p_sys->window.owner_window->handle.xid,
+                              p_vout->p_sys->window.owner_window->xid,
                               StructureNotifyMask, &xevent ) == True )
     {
         /* ConfigureNotify event: prepare  */
@@ -602,11 +602,11 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
 
         /* Select events we are interested in. */
         XSelectInput( p_vout->p_sys->p_display,
-                      p_win->owner_window->handle.xid, StructureNotifyMask );
+                      p_win->owner_window->xid, StructureNotifyMask );
 
         /* Get the parent window's geometry information */
         XGetGeometry( p_vout->p_sys->p_display,
-                      p_win->owner_window->handle.xid,
+                      p_win->owner_window->xid,
                       &(Window){ 0 }, &(int){ 0 }, &(int){ 0 },
                       &p_win->i_width,
                       &p_win->i_height,
@@ -616,7 +616,7 @@ static int CreateWindow( vout_thread_t *p_vout, x11_window_t *p_win )
          * ButtonPress event, so we need to open a new window anyway. */
         p_win->base_window =
             XCreateWindow( p_vout->p_sys->p_display,
-                           p_win->owner_window->handle.xid,
+                           p_win->owner_window->xid,
                            0, 0,
                            p_win->i_width, p_win->i_height,
                            0,
