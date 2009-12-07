@@ -115,6 +115,7 @@ noinst_HEADERS = \
 	../include/vlc_intf_strings.h \
 	../include/vlc_iso_lang.h \
 	../include/vlc_keys.h \
+	../include/vlc_memory.h \
 	../include/vlc_network.h \
 	../include/vlc_osd.h \
 	../include/vlc_pgpkey.h \
