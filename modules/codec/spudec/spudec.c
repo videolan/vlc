@@ -200,7 +200,7 @@ static block_t *Reassemble( decoder_t *p_dec, block_t **pp_block )
     *pp_block = NULL;
 
     if( p_sys->i_spu_size <= 0 &&
-        ( p_block->i_pts <= 0 || p_block->i_buffer < 4 ) )
+        ( p_block->i_pts <= VLC_TS_INVALID || p_block->i_buffer < 4 ) )
     {
         msg_Dbg( p_dec, "invalid starting packet (size < 4 or pts <=0)" );
         msg_Dbg( p_dec, "spu size: %d, i_pts: %"PRId64" i_buffer: %zu",
