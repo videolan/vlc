@@ -34,6 +34,7 @@
     libvlc_media_list_player_release(instance);
     [_mediaPlayer release];
     [_rootMedia release];
+    [_mediaList release];
     [super dealloc];
 }
 - (VLCMediaPlayer *)mediaPlayer
