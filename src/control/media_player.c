@@ -155,6 +155,30 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_player_t *p_mi,
     return p_input_thread;
 }
 
+/*
+ * Set the internal state of the media_player. (media player Internal)
+ *
+ * Function will lock the media_player.
+ */
+static void set_state( libvlc_media_player_t *p_mi, libvlc_state_t state )
+{    
+    lock(p_mi);
+    p_mi->state = state;
+    libvlc_media_t *media = p_mi->p_md;
+    if (media)
+        libvlc_media_retain(media);
+    unlock(p_mi);
+
+
+    if (media) {
+        // Also set the state of the corresponding media
+        // This is strictly for convenience.
+        libvlc_media_set_state(media, state);
+        
+        libvlc_media_release(media);        
+    }
+}
+
 static int
 input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
                         vlc_value_t oldval, vlc_value_t newval,
@@ -166,7 +190,6 @@ input_seekable_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_media_player_t * p_mi = p_userdata;
     libvlc_event_t event;
 
-    libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial );
     event.type = libvlc_MediaPlayerSeekableChanged;
     event.u.media_player_seekable_changed.new_seekable = newval.b_bool;
 
@@ -185,7 +208,6 @@ input_pausable_changed( vlc_object_t * p_this, char const * psz_cmd,
     libvlc_media_player_t * p_mi = p_userdata;
     libvlc_event_t event;
 
-    libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial );
     event.type = libvlc_MediaPlayerPausableChanged;
     event.u.media_player_pausable_changed.new_pausable = newval.b_bool;
 
@@ -239,8 +261,8 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
             default:
                 return VLC_SUCCESS;
         }
-
-        libvlc_media_set_state( p_mi->p_md, libvlc_state );
+        
+        set_state( p_mi, libvlc_state );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_ABORT )
@@ -248,7 +270,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         libvlc_state_t libvlc_state = libvlc_Stopped;
         event.type = libvlc_MediaPlayerStopped;
 
-        libvlc_media_set_state( p_mi->p_md, libvlc_state );
+        set_state( p_mi, libvlc_state );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_POSITION )
@@ -337,6 +359,7 @@ libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
     mp->drawable.hwnd = NULL;
     mp->drawable.nsobject = NULL;
     mp->keyboard_events = mp->mouse_events = 1;
+    mp->state = libvlc_NothingSpecial;
     mp->p_libvlc_instance = instance;
     mp->p_input_thread = NULL;
     mp->p_input_resource = NULL;
@@ -415,8 +438,13 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int,
                      "snapshot-file", snapshot_was_taken, p_mi );
 
-    /* Release the input thread */
-    release_input_thread( p_mi, true );
+    /* If the input thread hasn't been already deleted it means
+     * that the owners didn't stop the thread before releasing it. */
+    assert(!p_mi->p_input_thread);
+
+    /* Fallback for those who don't use NDEBUG */
+    if (p_mi->p_input_thread)
+        release_input_thread(p_mi, true);
 
     if( p_mi->p_input_resource )
     {
@@ -474,9 +502,6 @@ void libvlc_media_player_set_media(
 {
     VLC_UNUSED(p_e);
 
-    if( !p_mi )
-        return;
-
     lock(p_mi);
 
     /* FIXME I am not sure if it is a user request or on die(eof/error)
@@ -485,9 +510,11 @@ void libvlc_media_player_set_media(
                           p_mi->p_input_thread &&
                           !p_mi->p_input_thread->b_eof &&
                           !p_mi->p_input_thread->b_error );
+    unlock(p_mi);
 
-    if( p_mi->p_md )
-        libvlc_media_set_state( p_mi->p_md, libvlc_NothingSpecial );
+    set_state( p_mi, libvlc_NothingSpecial );
+
+    lock(p_mi);
 
     libvlc_media_release( p_mi->p_md );
 
@@ -659,23 +686,21 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
 {
     libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
 
-    if( state == libvlc_Playing ||
-        state == libvlc_Paused ||
-        state == libvlc_Buffering )
+    lock(p_mi);
+    release_input_thread( p_mi, true ); /* This will stop the input thread */
+    unlock(p_mi);
+
+    /* Force to go to stopped state, in case we were in Ended, or Error
+     * state. */
+    if( state != libvlc_Stopped )
     {
-        /* Send a stop notification event only if we are in playing,
-         * buffering or paused states */
-        libvlc_media_set_state( p_mi->p_md, libvlc_Stopped );
+        set_state( p_mi, libvlc_Stopped );
 
         /* Construct and send the event */
         libvlc_event_t event;
         event.type = libvlc_MediaPlayerStopped;
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
-
-    lock(p_mi);
-    release_input_thread( p_mi, true ); /* This will stop the input thread */
-    unlock(p_mi);
 }
 
 /**************************************************************************
@@ -1081,30 +1106,12 @@ float libvlc_media_player_get_rate(
     return f_rate;
 }
 
-libvlc_state_t libvlc_media_player_get_state(
-                                 libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e )
+libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread;
-    libvlc_state_t state = libvlc_Ended;
-
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
-    if( !p_input_thread )
-    {
-        /* We do return the right value, no need to throw an exception */
-        clear_if_needed(p_e);
-        return state;
-    }
-
-    state = libvlc_media_get_state( p_mi->p_md );
-    if( state == libvlc_Playing )
-    {
-        float caching;
-        caching = var_GetFloat( p_input_thread, "cache" );
-        if( caching > 0.0 && caching < 1.0 )
-            state = libvlc_Buffering;
-    }
-    vlc_object_release( p_input_thread );
+    VLC_UNUSED(p_e);
+    lock(p_mi);
+    libvlc_state_t state = p_mi->state;
+    unlock(p_mi);
     return state;
 }
 

@@ -684,7 +684,7 @@ static void stop(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
 {
     assert_locked(p_mlp);
 
-    if (p_mlp->p_mi && p_mlp->current_playing_item_path)
+    if (p_mlp->p_mi)
     {
         /* We are not interested in getting media stop event now */
         uninstall_media_player_observer(p_mlp);
