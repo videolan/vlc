@@ -166,7 +166,7 @@ static picture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             goto exit;
 
         Render( p_sys, p_pic );
-        p_pic->date = p_block->i_pts > 0 ? p_block->i_pts : p_block->i_dts;
+        p_pic->date = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
     }
 
 exit:
