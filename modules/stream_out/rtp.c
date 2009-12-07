@@ -1029,6 +1029,10 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                     msg_Err( p_stream, "cannot create RTP socket" );
                     goto error;
                 }
+                /* Ignore any unexpected incoming packet (including RTCP-RR
+                 * packets in case of rtcp-mux) */
+                setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &(int){ 0 },
+                            sizeof (int));
                 rtp_add_sink( id, fd, p_sys->rtcp_mux );
             }
         }

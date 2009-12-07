@@ -557,6 +557,9 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         continue;
                     }
 
+                    /* Ignore any unexpected incoming packet */
+                    setsockopt (track.fd, SOL_SOCKET, SO_RCVBUF, &(int){ 0 },
+                                sizeof (int));
                     net_GetSockAddress( track.fd, src, &sport );
 
                     vlc_mutex_lock( &rtsp->lock );
