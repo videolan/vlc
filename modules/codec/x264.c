@@ -1253,6 +1253,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         }
         else
         {
+#if 1       /* XXX: remove me when 0 is a valid timestamp (see #3135) */
             if( p_sys->i_interpolated_dts )
             {
                 p_block->i_dts = p_sys->i_interpolated_dts;
@@ -1262,7 +1263,9 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
                 /* Let's put something sensible */
                 p_block->i_dts = p_block->i_pts;
             }
-
+#else
+            p_block->i_dts = p_sys->i_interpolated_dts;
+#endif
             p_sys->i_interpolated_dts += p_block->i_length;
         }
     }
