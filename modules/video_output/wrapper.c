@@ -58,6 +58,7 @@ DECLARE_OPEN(snapshot);
 DECLARE_OPEN(vmem);
 DECLARE_OPEN(direct3d_xp);
 DECLARE_OPEN(direct3d_vista);
+DECLARE_OPEN(glwin32);
 
 #undef DECLARE_OPEN
 
@@ -112,6 +113,9 @@ vlc_module_begin()
 
     add_submodule()
     DECLARE_MODULE_EXT(direct3d, direct3d_xp, 70)
+
+    add_submodule()
+    DECLARE_MODULE(glwin32, 20)
 
 vlc_module_end()
 
