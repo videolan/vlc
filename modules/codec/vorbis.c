@@ -475,7 +475,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     block_t *p_block = *pp_block;
 
     /* Date management */
-    if( p_block && p_block->i_pts > 0 &&
+    if( p_block && p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
@@ -765,11 +765,6 @@ struct encoder_sys_t
     int i_channels;
 
     /*
-     * Common properties
-     */
-    mtime_t i_pts;
-
-    /*
     ** Channel reordering
     */
     int pi_chan_table[AOUT_CHAN_MAX];
@@ -889,7 +884,6 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->i_channels = p_enc->fmt_in.audio.i_channels;
     p_sys->i_last_block_size = 0;
     p_sys->i_samples_delay = 0;
-    p_sys->i_pts = 0;
 
     ConfigureChannelOrder(p_sys->pi_chan_table, p_sys->vi.channels,
             p_enc->fmt_in.audio.i_physical_channels, true);
@@ -911,7 +905,7 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     int i;
     unsigned int j;
 
-    p_sys->i_pts = p_aout_buf->i_pts -
+    mtime_t i_pts = p_aout_buf->i_pts -
                 (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
                 (mtime_t)p_enc->fmt_in.audio.i_rate;
 
@@ -953,12 +947,12 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
             p_block->i_length = (mtime_t)1000000 *
                 (mtime_t)i_samples / (mtime_t)p_enc->fmt_in.audio.i_rate;
 
-            p_block->i_dts = p_block->i_pts = p_sys->i_pts;
+            p_block->i_dts = p_block->i_pts = i_pts;
 
             p_sys->i_samples_delay -= i_samples;
 
             /* Update pts */
-            p_sys->i_pts += p_block->i_length;
+            i_pts += p_block->i_length;
             block_ChainAppend( &p_chain, p_block );
         }
     }
