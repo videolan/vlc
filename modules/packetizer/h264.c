@@ -221,8 +221,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->slice.i_pic_order_cnt_lsb = -1;
     p_sys->slice.i_delta_pic_order_cnt_bottom = -1;
 
-    p_sys->i_frame_dts = -1;
-    p_sys->i_frame_pts = -1;
+    p_sys->i_frame_dts = VLC_TS_INVALID;
+    p_sys->i_frame_pts = VLC_TS_INVALID;
 
     /* Setup properties */
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
@@ -340,8 +340,8 @@ static int Open( vlc_object_t *p_this )
         p_dec->pf_get_cc = GetCc;
 
         /* */
-        p_sys->i_cc_pts = 0;
-        p_sys->i_cc_dts = 0;
+        p_sys->i_cc_pts = VLC_TS_INVALID;
+        p_sys->i_cc_dts = VLC_TS_INVALID;
         p_sys->i_cc_flags = 0;
         cc_Init( &p_sys->cc );
         cc_Init( &p_sys->cc_next );
@@ -502,8 +502,8 @@ static void PacketizeReset( void *p_private, bool b_broken )
         p_sys->slice.i_frame_type = 0;
         p_sys->b_slice = false;
     }
-    p_sys->i_frame_pts = -1;
-    p_sys->i_frame_dts = -1;
+    p_sys->i_frame_pts = VLC_TS_INVALID;
+    p_sys->i_frame_dts = VLC_TS_INVALID;
 }
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
 {
@@ -671,7 +671,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
         block_ChainAppend( &p_sys->p_frame, p_frag );
 
     *pb_used_ts = false;
-    if( p_sys->i_frame_dts < 0 && p_sys->i_frame_pts < 0 )
+    if( p_sys->i_frame_dts <= VLC_TS_INVALID && 
+        p_sys->i_frame_pts <= VLC_TS_INVALID )
     {
         p_sys->i_frame_dts = i_frag_dts;
         p_sys->i_frame_pts = i_frag_pts;
@@ -720,8 +721,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
 
     p_sys->slice.i_frame_type = 0;
     p_sys->p_frame = NULL;
-    p_sys->i_frame_dts = -1;
-    p_sys->i_frame_pts = -1;
+    p_sys->i_frame_dts = VLC_TS_INVALID;
+    p_sys->i_frame_pts = VLC_TS_INVALID;
     p_sys->b_slice = false;
 
     /* CC */
