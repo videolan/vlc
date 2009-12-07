@@ -263,7 +263,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         }
     }
 
-    p_pic->date = p_block->i_pts > 0 ? p_block->i_pts : p_block->i_dts;
+    p_pic->date = (p_block->i_pts > VLC_TS_INVALID) ?
+        p_block->i_pts : p_block->i_dts;
 
     SDL_FreeSurface( p_surface );
     block_Release( p_block ); *pp_block = NULL;
