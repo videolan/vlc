@@ -215,7 +215,7 @@ bool decoder_SynchroChoose( decoder_synchro_t * p_synchro, int i_coding_type,
                                     + p_synchro->i_render_time)
 #define S (*p_synchro)
     mtime_t         now, period;
-    mtime_t         pts = 0;
+    mtime_t         pts;
     bool      b_decode = 0;
     int       i_current_rate;
 
