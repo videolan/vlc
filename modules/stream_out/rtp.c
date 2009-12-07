@@ -301,7 +301,6 @@ struct sout_stream_id_t
 
     sout_stream_t *p_stream;
     /* rtp field */
-    uint32_t    i_timestamp;
     uint16_t    i_sequence;
     uint8_t     i_payload_type;
     uint8_t     ssrc[4];
@@ -909,8 +908,6 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     vlc_object_attach( id, p_stream );
 
     id->p_stream   = p_stream;
-
-    id->i_timestamp = 0; /* It will be filled when the first packet is sent */
 
     /* Look for free dymanic payload type */
     id->i_payload_type = 96;
@@ -1669,13 +1666,6 @@ uint16_t rtp_get_seq( const sout_stream_id_t *id )
     return id->i_sequence;
 }
 
-uint32_t rtp_get_ts( const sout_stream_id_t *id )
-{
-    /* ... and this will return the value for the last packet.
-     * Lame, but close enough. */
-    return id->i_timestamp;
-}
-
 /* FIXME: this is pretty bad - if we remove and then insert an ES
  * the number will get unsynched from inside RTSP */
 unsigned rtp_get_num( const sout_stream_id_t *id )
@@ -1712,7 +1702,6 @@ void rtp_packetize_common( sout_stream_id_t *id, block_t *out,
     memcpy( out->p_buffer + 8, id->ssrc, 4 );
 
     out->i_buffer = 12;
-    id->i_timestamp = i_timestamp;
     id->i_sequence++;
 }
 
