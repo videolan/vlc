@@ -306,35 +306,26 @@ static int Open (vlc_object_t *obj)
     vd->sys = p_sys;
 
     /* Connect to X */
-    xcb_connection_t *conn = Connect (obj);
-    if (conn == NULL)
+    xcb_connection_t *conn;
+    const xcb_screen_t *screen;
+    uint8_t depth;
+    p_sys->embed = GetWindow (vd, &conn, &screen, &depth, &p_sys->shm);
+    if (p_sys->embed == NULL)
     {
         free (p_sys);
         return VLC_EGENERIC;
     }
+
     p_sys->conn = conn;
+    p_sys->att = NULL;
+    p_sys->pool = NULL;
 
     if (!CheckXVideo (vd, conn))
     {
         msg_Warn (vd, "Please enable XVideo 2.2 for faster video display");
-        xcb_disconnect (conn);
-        free (p_sys);
-        return VLC_EGENERIC;
+        goto error;
     }
 
-    const xcb_screen_t *screen;
-    uint8_t depth;
-    p_sys->embed = GetWindow (vd, conn, &screen, &depth, &p_sys->shm);
-    if (p_sys->embed == NULL)
-    {
-        xcb_disconnect (conn);
-        free (p_sys);
-        return VLC_EGENERIC;
-    }
-
-    /* */
-    p_sys->att = NULL;
-    p_sys->pool = NULL;
     p_sys->window = xcb_generate_id (conn);
 
     /* Cache adaptors infos */
@@ -571,8 +562,8 @@ static void Close (vlc_object_t *obj)
     }
 
     free (p_sys->att);
-    vout_display_DeleteWindow (vd, p_sys->embed);
     xcb_disconnect (p_sys->conn);
+    vout_display_DeleteWindow (vd, p_sys->embed);
     free (p_sys);
 }
 

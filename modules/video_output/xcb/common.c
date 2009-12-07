@@ -59,15 +59,13 @@ int CheckError (vout_display_t *vd, xcb_connection_t *conn,
 /**
  * Connect to the X server.
  */
-xcb_connection_t *Connect (vlc_object_t *obj)
+static xcb_connection_t *Connect (vlc_object_t *obj, const char *display)
 {
-    char *display = var_CreateGetNonEmptyString (obj, "x11-display");
     xcb_connection_t *conn = xcb_connect (display, NULL);
-
-    free (display);
     if (xcb_connection_has_error (conn) /*== NULL*/)
     {
-        msg_Err (obj, "cannot connect to X server");
+        msg_Err (obj, "cannot connect to X server (%s)",
+                 display ? display : "default");
         xcb_disconnect (conn);
         return NULL;
     }
@@ -87,11 +85,12 @@ xcb_connection_t *Connect (vlc_object_t *obj)
 
 
 /**
- * Create a VLC video X window object, find the corresponding X server screen,
+ * Create a VLC video X window object, connect to the corresponding X server,
+ * find the corresponding X server screen,
  * and probe the MIT-SHM extension.
  */
 vout_window_t *GetWindow (vout_display_t *vd,
-                          xcb_connection_t *conn,
+                          xcb_connection_t **restrict pconn,
                           const xcb_screen_t **restrict pscreen,
                           uint8_t *restrict pdepth,
                           bool *restrict pshm)
@@ -109,6 +108,13 @@ vout_window_t *GetWindow (vout_display_t *vd,
     if (wnd == NULL)
     {
         msg_Err (vd, "parent window not available");
+        return NULL;
+    }
+
+    xcb_connection_t *conn = Connect (VLC_OBJECT(vd), wnd->x11_display);
+    if (conn == NULL)
+    {
+        vout_display_DeleteWindow (vd, wnd);
         return NULL;
     }
     else
@@ -178,11 +184,13 @@ vout_window_t *GetWindow (vout_display_t *vd,
         free (r);
     }
 
+    *pconn = conn;
     *pscreen = screen;
     *pshm = shm;
     return wnd;
 
 error:
+    xcb_disconnect (conn);
     vout_display_DeleteWindow (vd, wnd);
     return NULL;
 }

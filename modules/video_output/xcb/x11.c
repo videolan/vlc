@@ -110,21 +110,12 @@ static int Open (vlc_object_t *obj)
     vd->sys = p_sys;
     p_sys->pool = NULL;
 
-    /* Connect to X */
-    p_sys->conn = Connect (obj);
-    if (p_sys->conn == NULL)
-    {
-        free (p_sys);
-        return VLC_EGENERIC;
-    }
-
-    /* Get window */
+    /* Get window, connect to X server */
     const xcb_screen_t *scr;
-    p_sys->embed = GetWindow (vd, p_sys->conn, &scr, &p_sys->depth,
+    p_sys->embed = GetWindow (vd, &p_sys->conn, &scr, &p_sys->depth,
                               &p_sys->shm);
     if (p_sys->embed == NULL)
     {
-        xcb_disconnect (p_sys->conn);
         free (p_sys);
         return VLC_EGENERIC;
     }
@@ -323,9 +314,9 @@ static void Close (vlc_object_t *obj)
     vout_display_sys_t *p_sys = vd->sys;
 
     ResetPictures (vd);
-    vout_display_DeleteWindow (vd, p_sys->embed);
     /* colormap, window and context are garbage-collected by X */
     xcb_disconnect (p_sys->conn);
+    vout_display_DeleteWindow (vd, p_sys->embed);
     free (p_sys);
 }
 
