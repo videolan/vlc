@@ -16,10 +16,10 @@ SOURCES_direct3d = \
 
 SOURCES_glwin32 = \
 	glwin32.c \
-	vout.h \
-	events_vo.h \
-	events_vo.c \
-	common_vo.c \
+	common.h \
+	events.h \
+	events.c \
+	common.c \
 	$(NULL)
 
 SOURCES_wingdi = \

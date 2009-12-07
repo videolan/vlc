@@ -47,7 +47,7 @@
 #include <d3d9.h>
 #endif
 #ifdef MODULE_NAME_IS_glwin32
-#include <GL/gl.h>
+#include "../opengl.h"
 #endif
 
 #include <vlc_keys.h>

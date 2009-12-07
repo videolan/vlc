@@ -148,8 +148,11 @@ struct vout_display_sys_t
 #endif
 
 #ifdef MODULE_NAME_IS_glwin32
-    HDC hGLDC;
-    HGLRC hGLRC;
+    HDC                   hGLDC;
+    HGLRC                 hGLRC;
+    vout_opengl_t         gl;
+    vout_display_opengl_t vgl;
+    picture_pool_t        *pool;
 #endif
 
 #ifdef MODULE_NAME_IS_direct3d
