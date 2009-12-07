@@ -153,6 +153,8 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
  */
 - (VLCTime *)time;
 
+@property (readonly) VLCTime *remainingTime;
+
 - (void)setChapter:(int)value;
 - (int)chapter;
 - (int)countOfChapters;

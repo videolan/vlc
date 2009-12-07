@@ -117,6 +117,30 @@
     }
 }
 
+- (NSString *)verboseStringValue
+{
+    if (value)
+    {
+        long long duration = [value longLongValue] / 1000000;
+        long long positiveDuration = llabs(duration);
+        long hours = positiveDuration / 3600;
+        long mins = (positiveDuration / 60) % 60;
+        long seconds = positiveDuration % 60;
+        const char * remaining = duration < 0 ? " remaining" : "";
+        if (hours > 0)
+            return [NSString stringWithFormat:@"%d hours %d minutes%s", hours, mins, remaining];
+        else if (mins > 5)
+            return [NSString stringWithFormat:@"%d minutes%s", mins, remaining];
+        else
+            return [NSString stringWithFormat:@"%d seconds%s", seconds, remaining];
+    }
+    else
+    {
+        // Return a string that represents an undefined time.
+        return @"";
+    }
+}
+
 - (int)intValue
 {
     if( value )

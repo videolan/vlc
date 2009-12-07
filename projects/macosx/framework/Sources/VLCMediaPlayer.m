@@ -384,6 +384,13 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     return cachedTime;
 }
 
+- (VLCTime *)remainingTime
+{
+    double currentTime = [[cachedTime numberValue] doubleValue];
+    double remaining = currentTime / position * (1 - position);
+    return [VLCTime timeWithNumber:[NSNumber numberWithDouble:-remaining]];
+}
+
 - (void)setChapter:(int)value;
 {
     libvlc_media_player_set_chapter( instance, value, NULL );
@@ -726,9 +733,11 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
 - (void)mediaPlayerTimeChanged:(NSNumber *)newTime
 {
     [self willChangeValueForKey:@"time"];
+    [self willChangeValueForKey:@"remainingTime"];
     [cachedTime release];
     cachedTime = [[VLCTime timeWithNumber:newTime] retain];
 
+    [self didChangeValueForKey:@"remainingTime"];
     [self didChangeValueForKey:@"time"];
 }
 

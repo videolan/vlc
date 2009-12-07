@@ -44,6 +44,7 @@
 /* Properties */
 @property (readonly) NSNumber * numberValue;
 @property (readonly) NSString * stringValue;
+@property (readonly) NSString * verboseStringValue;
 @property (readonly) int intValue;
 
 /* Comparitors */
