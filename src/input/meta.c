@@ -145,7 +145,7 @@ int input_item_WriteMeta( vlc_object_t *obj, input_item_t *p_item )
     vlc_mutex_lock( &p_item->lock );
     type = p_item->i_type;
     vlc_mutex_unlock( &p_item->lock );
-    if( type != ITEM_TYPE_FILE )
+    if( type == ITEM_TYPE_FILE )
     {
         char *psz_uri = input_item_GetURI( p_item );
 
