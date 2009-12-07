@@ -140,14 +140,14 @@ static block_t *Packetize ( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     *pp_block = NULL;
 
-    if( p_block->i_dts <= 0 )
+    if( p_block->i_dts <= VLC_TS_INVALID )
     {
         p_block->i_dts = p_block->i_pts;
     }
 
-    if( p_block->i_dts <= 0 )
+    if( p_block->i_dts <= VLC_TS_INVALID )
     {
-        msg_Dbg( p_dec, "need dts > 0" );
+        msg_Dbg( p_dec, "need valid dts" );
         block_Release( p_block );
         return NULL;
     }
@@ -179,14 +179,14 @@ static block_t *PacketizeSub( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     *pp_block = NULL;
 
-    if( p_block->i_dts <= 0 )
+    if( p_block->i_dts <= VLC_TS_INVALID )
     {
         p_block->i_dts = p_block->i_pts;
     }
 
-    if( p_block->i_dts <= 0 )
+    if( p_block->i_dts <= VLC_TS_INVALID )
     {
-        msg_Dbg( p_dec, "need dts > 0" );
+        msg_Dbg( p_dec, "need valid dts" );
         block_Release( p_block );
         return NULL;
     }
