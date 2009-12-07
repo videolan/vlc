@@ -503,7 +503,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     block_t *p_block = *pp_block;
 
     /* Date management */
-    if( p_block && p_block->i_pts > 0 && 
+    if( p_block && p_block->i_pts > VLC_TS_INVALID &&
         p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
@@ -611,7 +611,8 @@ static aout_buffer_t *DecodeRtpSpeexPacket( decoder_t *p_dec, block_t **pp_block
     int i_decode_ret;
     unsigned int i_speex_frame_size;
 
-    if ( !p_speex_bit_block || p_speex_bit_block->i_pts == 0 ) return NULL;
+    if ( !p_speex_bit_block || p_speex_bit_block->i_pts <= VLC_TS_INVALID )
+        return NULL;
 
     /* 
       If the SpeexBits buffer size is 0 (a default value),
@@ -891,11 +892,6 @@ struct encoder_sys_t
     int i_frame_length;
     int i_samples_delay;
     int i_frame_size;
-
-    /*
-     * Common properties
-     */
-    mtime_t i_pts;
 };
 
 /*****************************************************************************
@@ -992,7 +988,6 @@ static int OpenEncoder( vlc_object_t *p_this )
 
     p_sys->i_frames_in_packet = 0;
     p_sys->i_samples_delay = 0;
-    p_sys->i_pts = 0;
 
     speex_encoder_ctl( p_sys->p_state, SPEEX_GET_FRAME_SIZE,
                        &p_sys->i_frame_length );
@@ -1037,7 +1032,7 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
     int i_samples = p_aout_buf->i_nb_samples;
     int i_samples_delay = p_sys->i_samples_delay;
 
-    p_sys->i_pts = p_aout_buf->i_pts -
+    mtime_t i_pts = p_aout_buf->i_pts -
                 (mtime_t)1000000 * (mtime_t)p_sys->i_samples_delay /
                 (mtime_t)p_enc->fmt_in.audio.i_rate;
 
@@ -1101,10 +1096,10 @@ static block_t *Encode( encoder_t *p_enc, aout_buffer_t *p_aout_buf )
             (mtime_t)p_sys->i_frame_length * p_sys->header.frames_per_packet /
             (mtime_t)p_enc->fmt_in.audio.i_rate;
 
-        p_block->i_dts = p_block->i_pts = p_sys->i_pts;
+        p_block->i_dts = p_block->i_pts = i_pts;
 
         /* Update pts */
-        p_sys->i_pts += p_block->i_length;
+        i_pts += p_block->i_length;
         block_ChainAppend( &p_chain, p_block );
 
     }
