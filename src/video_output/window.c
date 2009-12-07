@@ -66,6 +66,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
     case VOUT_WINDOW_TYPE_XID:
         type = "vout window xid";
         window->xid = 0;
+        window->x11_display = NULL;
         break;
     default:
         assert(0);

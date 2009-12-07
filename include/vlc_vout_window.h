@@ -92,6 +92,11 @@ struct vout_window_t {
         uint32_t xid;     /* X11 windows ID */
     };
 
+    /* display server (mandatory) */
+    union {
+        char     *x11_display; /* X11 display (NULL = use default) */
+    };
+
     /* Control on the module (mandatory)
      *
      * Do not use it directly; use vout_window_Control instead.
