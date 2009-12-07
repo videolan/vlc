@@ -83,6 +83,7 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
     VLCTime * cachedTime;               //< Cached time of the media being played
     VLCMediaPlayerState cachedState;    //< Cached state of the media being played
     float position;                     //< The position of the media being played
+    id drawable;                        //< The drawable associated to this media player
 }
 
 /* Initializers */

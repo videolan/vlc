@@ -44,7 +44,7 @@ int  cocoaglvoutviewLock( vout_thread_t * p_vout );
 void cocoaglvoutviewUnlock( vout_thread_t * p_vout );
 
 /* To commmunicate with the VLC.framework */
-@protocol VLCOpenGLVoutEmbedding
+@protocol VLCOpenGLVoutEmbedding <NSObject>
 - (void)addVoutSubview:(NSView *)view;
 - (void)removeVoutSubview:(NSView *)view;
 

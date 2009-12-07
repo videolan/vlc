@@ -192,15 +192,23 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)dealloc
 {
+    NSAssert(libvlc_media_player_get_state(instance, NULL) == libvlc_Stopped, @"You released the media player before ensuring that it is stopped");
+
     // Always get rid of the delegate first so we can stop sending messages to it
     // TODO: Should we tell the delegate that we're shutting down?
     delegate = nil;
 
-    libvlc_media_player_release((libvlc_media_player_t *)instance);
+    // Clear our drawable as we are going to release it, we don't
+    // want the core to use it from this point. This won't happen as
+    // the media player must be stopped.
+    libvlc_media_player_set_nsobject(instance, nil, NULL);
+
+    libvlc_media_player_release(instance);
     
     // Get rid of everything else
     [media release];
     [cachedTime release];
+    [drawable release];
 
     [super dealloc];
 }
@@ -503,16 +511,6 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)stop
 {
-    if( 0 && [NSThread isMainThread] )
-    {
-        /* Hack because we create a dead lock here, when the vout is stopped
-         * and tries to recontact us on the main thread */
-        /* FIXME: to do this properly we need to do some locking. We may want 
-         * to move that to libvlc */
-        [self performSelectorInBackground:@selector(stop) withObject:nil];
-        return;
-    }
-    
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     libvlc_media_player_stop((libvlc_media_player_t *)instance, &ex);

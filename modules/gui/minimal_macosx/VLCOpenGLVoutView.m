@@ -54,7 +54,9 @@ int cocoaglvoutviewInit( vout_thread_t * p_vout )
 
     p_vout->p_sys->o_pool = [[NSAutoreleasePool alloc] init];
 
-    o_cocoaglview_container = (id) value_drawable.p_address;
+    /* This will be released in cocoaglvoutviewEnd(), on
+     * main thread, after we are done using it. */
+    o_cocoaglview_container = [(id) value_drawable.p_address retain];
     if (!o_cocoaglview_container)
     {
         msg_Warn( p_vout, "No drawable!, spawing a window" );
@@ -98,6 +100,9 @@ void cocoaglvoutviewEnd( vout_thread_t * p_vout )
     /* Let the view go and release it, _without_blocking_ */
     [p_vout->p_sys->o_glview performSelectorOnMainThread:@selector(removeFromSuperviewAndRelease) withObject:nil waitUntilDone:NO];
     p_vout->p_sys->o_glview = nil;
+
+    /* Release the container now that we don't use it */
+    [o_cocoaglview_container performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
 
     [p_vout->p_sys->o_pool release];
     p_vout->p_sys->o_pool = nil;
