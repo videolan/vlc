@@ -1183,7 +1183,7 @@ static int  Open ( vlc_object_t *p_this )
         Close( VLC_OBJECT(p_enc) );
         return VLC_ENOMEM;
     }
-    void *p_tmp = p_enc->fmt_out.p_extra;
+    uint8_t *p_tmp = p_enc->fmt_out.p_extra;
     for( i = 0; i < i_nal; i++ )
     {
         memcpy( p_tmp, nal[i].p_payload, nal[i].i_payload );
