@@ -206,13 +206,13 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
         if( id->p_dec && p_buffer->i_buffer > 0 )
         {
-            if( p_buffer->i_dts <= 0 )
-                p_buffer->i_dts= 0;
+            if( p_buffer->i_dts <= VLC_TS_INVALID )
+                p_buffer->i_dts = 0;
             else
                 p_buffer->i_dts += p_sys->i_delay;
 
-            if( p_buffer->i_pts <= 0 )
-                p_buffer->i_pts= 0;
+            if( p_buffer->i_pts <= VLC_TS_INVALID )
+                p_buffer->i_pts = 0;
             else
                 p_buffer->i_pts += p_sys->i_delay;
 
