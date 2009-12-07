@@ -295,7 +295,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
         date_Init( &p_sys->date, i_rate, 1 );
     }
 
-    if( p_block->i_pts != 0 && p_block->i_pts != date_Get( &p_sys->date ) )
+    if( p_block->i_pts > VLC_TS_INVALID && p_block->i_pts != date_Get( &p_sys->date ) )
     {
         date_Set( &p_sys->date, p_block->i_pts );
     }
@@ -364,7 +364,7 @@ static aout_buffer_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
             date_Init( &p_sys->date, frame.samplerate, 1 );
             date_Set( &p_sys->date, p_block->i_pts );
         }
-        p_block->i_pts = 0;  /* PTS is valid only once */
+        p_block->i_pts = VLC_TS_INVALID;  /* PTS is valid only once */
 
         p_dec->fmt_out.audio.i_rate = frame.samplerate;
         p_dec->fmt_out.audio.i_channels = frame.channels;
