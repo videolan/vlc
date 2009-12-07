@@ -144,7 +144,7 @@ static int OpenDecoder( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_dec->p_sys->b_packetizer = false;
 
-    p_sys->i_pts = 0;
+    p_sys->i_pts = VLC_TS_INVALID;
     p_sys->b_decoded_first_keyframe = false;
 
     /* Set output properties */
@@ -431,7 +431,7 @@ static void *ProcessPacket( decoder_t *p_dec, ogg_packet *p_oggpacket,
     }
 
     /* Date management */
-    if( p_block->i_pts > 0 && p_block->i_pts != p_sys->i_pts )
+    if( p_block->i_pts > VLC_TS_INVALID && p_block->i_pts != p_sys->i_pts )
     {
         p_sys->i_pts = p_block->i_pts;
     }
