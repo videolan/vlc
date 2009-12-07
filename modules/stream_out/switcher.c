@@ -510,7 +510,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
         while ( id->p_queued != NULL )
         {
-            mtime_t i_dts = 0;
+            mtime_t i_dts;
             int i;
 
             if ( p_sys->i_old_cmd != p_sys->i_cmd )
