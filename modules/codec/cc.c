@@ -294,11 +294,11 @@ static block_t *Pop( decoder_t *p_dec )
         return NULL;
 
     p_block = p_sys->pp_block[i_index = 0];
-    if( p_block->i_pts > 0 )
+    if( p_block->i_pts > VLC_TS_INVALID )
     {
         for( i = 1; i < p_sys->i_block-1; i++ )
         {
-            if( p_sys->pp_block[i]->i_pts > 0 && p_block->i_pts > 0 &&
+            if( p_sys->pp_block[i]->i_pts > VLC_TS_INVALID && p_block->i_pts > VLC_TS_INVALID &&
                 p_sys->pp_block[i]->i_pts < p_block->i_pts )
                 p_block = p_sys->pp_block[i_index = i];
         }
@@ -317,7 +317,7 @@ static subpicture_t *Subtitle( decoder_t *p_dec, char *psz_subtitle, char *psz_h
     video_format_t fmt;
 
     /* We cannot display a subpicture with no date */
-    if( i_pts == 0 )
+    if( i_pts <= VLC_TS_INVALID )
     {
         msg_Warn( p_dec, "subtitle without a date" );
         return NULL;
