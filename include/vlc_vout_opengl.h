@@ -33,23 +33,23 @@
 
 typedef struct vout_opengl_t vout_opengl_t;
 struct vout_opengl_t {
-	/* */
-	int  (*lock)(vout_opengl_t *);
-	void (*swap)(vout_opengl_t *);
-	void (*unlock)(vout_opengl_t *);
+    /* */
+    int  (*lock)(vout_opengl_t *);
+    void (*swap)(vout_opengl_t *);
+    void (*unlock)(vout_opengl_t *);
     /* */
     void *sys;
 };
 
 static inline int vout_opengl_Lock(vout_opengl_t *gl)
 {
-	if (!gl->lock)
-		return VLC_SUCCESS;
+    if (!gl->lock)
+        return VLC_SUCCESS;
     return gl->lock(gl);
 }
 static inline void vout_opengl_Unlock(vout_opengl_t *gl)
 {
-	if (gl->unlock)
+    if (gl->unlock)
         gl->unlock(gl);
 }
 static inline void vout_opengl_Swap(vout_opengl_t *gl)
