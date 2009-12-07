@@ -299,13 +299,13 @@ static block_t *PacketizeRawBlock( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     *pp_block = NULL; /* Don't reuse this block */
 
-    if( !date_Get( &p_sys->end_date ) && !p_block->i_pts )
+    if( !date_Get( &p_sys->end_date ) && p_block->i_pts <= VLC_TS_INVALID )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( p_block );
         return NULL;
     }
-    else if( p_block->i_pts != 0 &&
+    else if( p_block->i_pts > VLC_TS_INVALID &&
              p_block->i_pts != date_Get( &p_sys->end_date ) )
     {
         date_Set( &p_sys->end_date, p_block->i_pts );
@@ -992,7 +992,7 @@ static block_t *PacketizeStreamBlock( decoder_t *p_dec, block_t **pp_block )
         return NULL;
     }
 
-    if( !date_Get( &p_sys->end_date ) && !(*pp_block)->i_pts )
+    if( !date_Get( &p_sys->end_date ) && (*pp_block)->i_pts <= VLC_TS_INVALID )
     {
         /* We've just started the stream, wait for the first PTS. */
         block_Release( *pp_block );
@@ -1042,7 +1042,7 @@ static block_t *PacketizeStreamBlock( decoder_t *p_dec, block_t **pp_block )
         case STATE_SYNC:
             /* New frame, set the Presentation Time Stamp */
             p_sys->i_pts = p_sys->bytestream.p_block->i_pts;
-            if( p_sys->i_pts != 0 &&
+            if( p_sys->i_pts > VLC_TS_INVALID &&
                 p_sys->i_pts != date_Get( &p_sys->end_date ) )
             {
                 date_Set( &p_sys->end_date, p_sys->i_pts );
@@ -1179,7 +1179,7 @@ static block_t *PacketizeStreamBlock( decoder_t *p_dec, block_t **pp_block )
             SetupOutput( p_dec, p_out_buffer );
             /* Make sure we don't reuse the same pts twice */
             if( p_sys->i_pts == p_sys->bytestream.p_block->i_pts )
-                p_sys->i_pts = p_sys->bytestream.p_block->i_pts = 0;
+                p_sys->i_pts = p_sys->bytestream.p_block->i_pts = VLC_TS_INVALID;
 
             /* So p_block doesn't get re-added several times */
             *pp_block = block_BytestreamPop( &p_sys->bytestream );
