@@ -456,7 +456,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     *pp_block = NULL;
 
-    i_pts = p_block->i_pts ? p_block->i_pts : p_block->i_dts;
+    i_pts = (p_block->i_pts > VLC_TS_INVALID) ? p_block->i_pts : p_block->i_dts;
 
     vlc_mutex_lock( &rm_mutex );
 
