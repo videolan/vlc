@@ -153,7 +153,7 @@ static aout_buffer_t *DecodeBlock (decoder_t *p_dec, block_t **pp_block)
         return NULL;
     *pp_block = NULL;
 
-    if (p_block->i_pts && !date_Get (&p_sys->end_date))
+    if (p_block->i_pts > VLC_TS_INVALID && !date_Get (&p_sys->end_date))
         date_Set (&p_sys->end_date, p_block->i_pts);
     else
     if (p_block->i_pts < date_Get (&p_sys->end_date))
