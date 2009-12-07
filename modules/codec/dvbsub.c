@@ -335,7 +335,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->i_pts          = (mtime_t) 0;
+    p_sys->i_pts          = VLC_TS_INVALID;
     p_sys->i_id           = p_dec->fmt_in.subs.dvb.i_id & 0xFFFF;
     p_sys->i_ancillary_id = p_dec->fmt_in.subs.dvb.i_id >> 16;
 
@@ -405,7 +405,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
         default_dds_init( p_dec );
 
     p_sys->i_pts = p_block->i_pts;
-    if( p_sys->i_pts <= 0 )
+    if( p_sys->i_pts <= VLC_TS_INVALID )
     {
 #ifdef DEBUG_DVBSUB
         /* Some DVB channels send stuffing segments in non-dated packets so
@@ -1483,7 +1483,7 @@ static subpicture_t *render( decoder_t *p_dec )
 
     p_spu->b_absolute = p_sys->b_absolute;
     /* Set the pf_render callback */
-    p_spu->i_start = (mtime_t) p_sys->i_pts;
+    p_spu->i_start = p_sys->i_pts;
     //p_spu->i_stop = (mtime_t) 0;
     p_spu->b_ephemer = true;
     //p_spu->b_fade = true;
