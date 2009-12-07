@@ -618,7 +618,7 @@ static aout_buffer_t *DecodeAudio( decoder_t *p_dec, block_t **pp_block )
                          p_sys->i_buffer );
             }
 
-            if( p_sys->pts != 0 &&
+            if( p_sys->pts > VLC_TS_INVALID &&
                 p_sys->pts != date_Get( &p_sys->date ) )
             {
                 date_Set( &p_sys->date, p_sys->pts );
@@ -897,7 +897,7 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     p_block = *pp_block;
     *pp_block = NULL;
  
-    i_pts = p_block->i_pts ? p_block->i_pts : p_block->i_dts;
+    i_pts = p_block->i_pts > VLC_TS_INVALID ? p_block->i_pts : p_block->i_dts;
 
     mtime_t i_display_date = 0;
     if( !(p_block->i_flags & BLOCK_FLAG_PREROLL) )
