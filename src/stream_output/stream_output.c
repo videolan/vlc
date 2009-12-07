@@ -268,7 +268,8 @@ int sout_InputSendBuffer( sout_packetizer_input_t *p_input,
         block_Release( p_buffer );
         return VLC_SUCCESS;
     }
-    if( p_buffer->i_dts <= 0 )
+
+    if( p_buffer->i_dts <= VLC_TS_INVALID )
     {
         msg_Warn( p_sout, "trying to send non-dated packet to stream output!");
         block_Release( p_buffer );
