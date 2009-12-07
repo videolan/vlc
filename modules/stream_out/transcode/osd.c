@@ -119,7 +119,7 @@ int transcode_osd_process( sout_stream_t *p_stream, sout_stream_id_t *id,
     subpicture_t *p_subpic = NULL;
 
     /* Check if we have a subpicture to send */
-    if( p_sys->p_spu && in->i_dts > 0)
+    if( p_sys->p_spu && in->i_dts > VLC_TS_INVALID )
     {
         p_subpic = spu_SortSubpictures( p_sys->p_spu, in->i_dts, false );
     }
