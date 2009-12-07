@@ -131,6 +131,8 @@
             return [NSString stringWithFormat:@"%d hours %d minutes%s", hours, mins, remaining];
         else if (mins > 5)
             return [NSString stringWithFormat:@"%d minutes%s", mins, remaining];
+        else if (mins > 0)
+            return [NSString stringWithFormat:@"%d minutes %d seconds%s", mins, seconds, remaining];
         else
             return [NSString stringWithFormat:@"%d seconds%s", seconds, remaining];
     }
