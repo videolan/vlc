@@ -452,44 +452,6 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     return VLC_SUCCESS;
 }
 
-static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
-{
-    mtime_t i_dts;
-    int     i_stream, i;
-
-    for( i = 0, i_dts = 0, i_stream = -1; i < p_mux->i_nb_inputs; i++ )
-    {
-        block_fifo_t   *p_fifo = p_mux->pp_inputs[i]->p_fifo;
-        block_t *p_buf;
-
-        if( block_FifoCount( p_fifo ) <= 1 )
-        {
-            if( p_mux->pp_inputs[i]->p_fmt->i_cat != SPU_ES )
-            {
-                return -1; // wait that all fifo have at least 2 packets
-            }
-            /* For SPU, we wait only 1 packet */
-            continue;
-        }
-
-        p_buf = block_FifoShow( p_fifo );
-        if( i_stream < 0 || p_buf->i_dts < i_dts )
-        {
-            i_dts = p_buf->i_dts;
-            i_stream = i;
-        }
-    }
-    if( pi_stream )
-    {
-        *pi_stream = i_stream;
-    }
-    if( pi_dts )
-    {
-        *pi_dts = i_dts;
-    }
-    return i_stream;
-}
-
 /*****************************************************************************
  * Mux:
  *****************************************************************************/
@@ -500,12 +462,12 @@ static int Mux( sout_mux_t *p_mux )
     for( ;; )
     {
         sout_input_t    *p_input;
-        int             i_stream;
         mp4_stream_t    *p_stream;
         block_t         *p_data;
         mtime_t         i_dts;
 
-        if( MuxGetStream( p_mux, &i_stream, &i_dts) < 0 )
+        int i_stream = sout_MuxGetStream( p_mux, 2, &i_dts);
+        if( i_stream < 0 )
         {
             return( VLC_SUCCESS );
         }

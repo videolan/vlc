@@ -161,8 +161,6 @@ struct sout_mux_sys_t
     char            *psz_rating;
 };
 
-static int MuxGetStream( sout_mux_t *, int *pi_stream, mtime_t *pi_dts );
-
 static block_t *asf_header_create( sout_mux_t *, bool );
 static block_t *asf_packet_create( sout_mux_t *, asf_track_t *, block_t * );
 static block_t *asf_stream_end_create( sout_mux_t *);
@@ -695,12 +693,12 @@ static int Mux( sout_mux_t *p_mux )
     {
         sout_input_t  *p_input;
         asf_track_t   *tk;
-        int           i_stream;
         mtime_t       i_dts;
         block_t *data;
         block_t *pk;
 
-        if( MuxGetStream( p_mux, &i_stream, &i_dts ) )
+        int i_stream = sout_MuxGetStream( p_mux, 1, &i_dts );
+        if( i_stream < 0 )
         {
             /* not enough data */
             return VLC_SUCCESS;
@@ -743,43 +741,6 @@ static int Mux( sout_mux_t *p_mux )
             sout_AccessOutWrite( p_mux->p_access, pk );
         }
     }
-
-    return VLC_SUCCESS;
-}
-
-static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
-{
-    mtime_t i_dts;
-    int     i_stream;
-    int     i;
-
-    for( i = 0, i_dts = 0, i_stream = -1; i < p_mux->i_nb_inputs; i++ )
-    {
-        sout_input_t  *p_input = p_mux->pp_inputs[i];
-        block_t *p_data;
-
-        if( block_FifoCount( p_input->p_fifo ) <= 0 )
-        {
-            if( p_input->p_fmt->i_cat == AUDIO_ES ||
-                p_input->p_fmt->i_cat == VIDEO_ES )
-            {
-                /* We need that audio+video fifo contain at least 1 packet */
-                return VLC_EGENERIC;
-            }
-            /* SPU */
-            continue;
-        }
-
-        p_data = block_FifoShow( p_input->p_fifo );
-        if( i_stream == -1 || p_data->i_dts < i_dts )
-        {
-            i_stream = i;
-            i_dts    = p_data->i_dts;
-        }
-    }
-
-    *pi_stream = i_stream;
-    *pi_dts = i_dts;
 
     return VLC_SUCCESS;
 }

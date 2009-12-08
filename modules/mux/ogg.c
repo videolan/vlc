@@ -127,43 +127,6 @@ typedef struct
 
 } oggds_header_t;
 
-/*
- * TODO  move this function to src/stream_output.c (used by nearly all muxers)
- */
-static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
-{
-    mtime_t i_dts = 0;
-    int     i_stream = -1;
-
-    for( int i = 0; i < p_mux->i_nb_inputs; i++ )
-    {
-        block_fifo_t  *p_fifo;
-
-        p_fifo = p_mux->pp_inputs[i]->p_fifo;
-
-        /* We don't really need to have anything in the SPU fifo */
-        if( p_mux->pp_inputs[i]->p_fmt->i_cat == SPU_ES &&
-            block_FifoCount( p_fifo ) == 0 ) continue;
-
-        if( block_FifoCount( p_fifo ) )
-        {
-            block_t *p_buf;
-
-            p_buf = block_FifoShow( p_fifo );
-            if( i_stream < 0 || p_buf->i_dts < i_dts )
-            {
-                i_dts = p_buf->i_dts;
-                i_stream = i;
-            }
-        }
-        else return -1;
-
-    }
-    if( pi_stream ) *pi_stream = i_stream;
-    if( pi_dts ) *pi_dts = i_dts;
-    return i_stream;
-}
-
 /*****************************************************************************
  * Definitions of structures and functions used by this plugins
  *****************************************************************************/
@@ -896,13 +859,12 @@ static int Mux( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     block_t        *p_og = NULL;
-    int            i_stream;
     mtime_t        i_dts;
 
     if( p_sys->i_add_streams || p_sys->i_del_streams )
     {
         /* Open new ogg stream */
-        if( MuxGetStream( p_mux, &i_stream, &i_dts) < 0 )
+        if( sout_MuxGetStream( p_mux, 1, &i_dts) < 0 )
         {
             msg_Dbg( p_mux, "waiting for data..." );
             return VLC_SUCCESS;
@@ -941,7 +903,9 @@ static int Mux( sout_mux_t *p_mux )
 
     for( ;; )
     {
-        if( MuxGetStream( p_mux, &i_stream, 0 ) < 0 ) return VLC_SUCCESS;
+        int i_stream = sout_MuxGetStream( p_mux, 1, NULL );
+        if( i_stream < 0 )
+            return VLC_SUCCESS;
         MuxBlock( p_mux, p_mux->pp_inputs[i_stream] );
     }
 
