@@ -942,9 +942,11 @@ AC_ARG_VAR(PKG_CONFIG_PATH,
 PKG_PROG_PKG_CONFIG()
 
 dnl On some OS we need static linking 
-AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "darwin" ],[
-       PKG_CONFIG="${PKG_CONFIG} --static"
-    ])
+       AS_IF([test -n "${PKG_CONFIG}" ],[
+	      AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce" -o "${SYS}" = "darwin" ],[
+	          PKG_CONFIG="${PKG_CONFIG} --static"
+   	      ])
+       ])
 
 
 dnl
