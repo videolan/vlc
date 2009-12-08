@@ -471,6 +471,24 @@ char *libvlc_media_get_meta( libvlc_media_t *p_md, libvlc_meta_t e_meta )
 }
 
 /**************************************************************************
+ * Setter for meta information
+ **************************************************************************/
+
+void libvlc_media_set_meta( libvlc_media_t *p_md, libvlc_meta_t e_meta, const char *psz_value )
+{
+    assert( p_md );
+    input_item_SetMeta( p_md->p_input_item, libvlc_to_vlc_meta[e_meta], psz_value );
+}
+
+int libvlc_media_save_meta( libvlc_media_t *p_md )
+{
+    assert( p_md );
+    vlc_object_t *p_obj = VLC_OBJECT(libvlc_priv(
+                            p_md->p_libvlc_instance->p_libvlc_int)->p_playlist);
+    return input_item_WriteMeta( p_obj, p_md->p_input_item ) == VLC_SUCCESS;
+}
+
+/**************************************************************************
  * Getter for state information
  * Can be error, playing, buffering, NothingSpecial.
  **************************************************************************/

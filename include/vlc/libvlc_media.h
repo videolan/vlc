@@ -248,6 +248,28 @@ VLC_PUBLIC_API char * libvlc_media_get_meta(
                                    libvlc_meta_t e_meta );
 
 /**
+ * Set the meta of the media (this function will not save the meta, call
+ * libvlc_media_save_meta in order to save the meta)
+ *
+ * \param p_md the media descriptor
+ * \param e_meta the meta to read
+ * \param the media's meta
+ */
+VLC_PUBLIC_API void libvlc_media_set_meta( libvlc_media_t *p_md,
+                                           libvlc_meta_t e_meta,
+                                           const char *psz_value );
+
+
+/**
+ * Save the meta previously set
+ *
+ * \param p_md the media desriptor
+ * \return true if the werite was successfull
+ */
+VLC_PUBLIC_API int libvlc_media_save_meta( libvlc_media_t *p_md );
+
+
+/**
  * Get current state of media descriptor object. Possible media states
  * are defined in libvlc_structures.c ( libvlc_NothingSpecial=0,
  * libvlc_Opening, libvlc_Buffering, libvlc_Playing, libvlc_Paused,
