@@ -378,7 +378,7 @@ Index: libavcodec/dxva2_h264.c
 +                    slice->Weights[list][i][0][0] = h->luma_weight[list][i];
 +                    slice->Weights[list][i][0][1] = h->luma_offset[list][i];
 +                } else {
-+                    slice->Weights[list][i][0][0] = 1 << h->luma_weight_flag[list];
++                    slice->Weights[list][i][0][0] = 1 << h->luma_log2_weight_denom;
 +                    slice->Weights[list][i][0][1] = 0;
 +                }
 +                for (plane = 1; plane < 3; plane++) {
