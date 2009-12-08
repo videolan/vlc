@@ -259,6 +259,9 @@ vlc_module_end ()
 
 /* Ugly, but the Qt4 interface assumes single instance anyway */
 static vlc_sem_t ready;
+#ifdef Q_WS_X11
+static char *x11_display = NULL;
+#endif
 
 /*****************************************************************************
  * Module callbacks
@@ -270,9 +273,8 @@ static int Open( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
 #ifdef Q_WS_X11
-    char *psz_display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
-    Display *p_display = XOpenDisplay( psz_display );
-    free( psz_display );
+    x11_display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
+    Display *p_display = XOpenDisplay( x11_display );
     if( !p_display )
     {
         msg_Err( p_intf, "Could not connect to X server" );
@@ -338,6 +340,9 @@ static void Close( vlc_object_t *p_this )
     vlc_join (p_sys->thread, NULL);
     pl_Release (p_this);
     delete p_sys;
+#ifdef Q_WS_X11
+    free (x11_display);
+#endif
 }
 
 static void *Thread( void *obj )
@@ -352,11 +357,10 @@ static void *Thread( void *obj )
 
     /* Start the QApplication here */
 #ifdef Q_WS_X11
-    char *display = var_CreateGetNonEmptyString( p_intf, "x11-display" );
-    if( display )
+    if( x11_display != NULL )
     {
         argv[argc++] = const_cast<char *>("-display");
-        argv[argc++] = display;
+        argv[argc++] = x11_display;
         argv[argc] = NULL;
     }
 #endif
@@ -473,7 +477,7 @@ static void *Thread( void *obj )
 
     /* Delete the application automatically */
 #ifdef Q_WS_X11
-    free( display );
+    free( x11_display );
 #endif
     return NULL;
 }
@@ -531,6 +535,7 @@ static int WindowOpen( vlc_object_t *p_obj )
     p_wnd->xid = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
     if( !p_wnd->xid )
         return VLC_EGENERIC;
+    p_wnd->x11_display = x11_display;
 
 #elif defined (Q_WS_WIN)
     p_wnd->hwnd = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
