@@ -304,8 +304,10 @@ static picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
         memset(&rsc, 0, sizeof(rsc));
 #ifdef __APPLE__
         rsc.p_sys = malloc(sizeof(*rsc.p_sys));
-        if (rsc.p_sys)
+        if (rsc.p_sys) {
             rsc.p_sys->vgl = vgl;
+            rsc.p_sys->texture = vgl->texture[i];
+        }
 #endif
         rsc.p[0].p_pixels = vgl->buffer[i];
         rsc.p[0].i_pitch  = vgl->fmt.i_width * vgl->tex_pixel_size;
