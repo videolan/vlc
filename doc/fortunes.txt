@@ -905,3 +905,6 @@ VLC development is NOT about being a sed god.
 < funman> gtg
  -- #videolan
 %
+< xand_> guys how can i force ffplay to use avcodec ?
+ -- #videolan
+%
