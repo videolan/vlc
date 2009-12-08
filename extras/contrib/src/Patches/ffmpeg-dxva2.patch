@@ -660,22 +660,6 @@ Index: libavcodec/allcodecs.c
  
      /* video codecs */
      REGISTER_DECODER (AASC, aasc);
-Index: libavcodec/imgconvert.c
-===================================================================
---- libavcodec/imgconvert.c	(revision 20532)
-+++ libavcodec/imgconvert.c	(working copy)
-@@ -527,6 +527,11 @@
-         .is_hwaccel = 1,
-         .x_chroma_shift = 1, .y_chroma_shift = 1,
-     },
-+    [PIX_FMT_DXVA2_VLD] = {
-+        .name = "dxva2_vld",
-+        .is_hwaccel = 1,
-+        .x_chroma_shift = 1, .y_chroma_shift = 1,
-+    },
- };
- 
- void avcodec_get_chroma_sub_sample(enum PixelFormat pix_fmt, int *h_shift, int *v_shift)
 Index: libavcodec/dxva2.h
 ===================================================================
 --- libavcodec/dxva2.h	(revision 0)
