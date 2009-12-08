@@ -421,6 +421,11 @@ static const char *const ppsz_align_descriptions[] =
 #define EMBEDDED_LONGTEXT N_( \
     "Embed the video output in the main interface." )
 
+#define DISPLAY_TEXT N_("X11 display")
+#define DISPLAY_LONGTEXT N_( \
+    "X11 hardware display to use. By default VLC will " \
+    "use the value of the DISPLAY environment variable.")
+
 #define FULLSCREEN_TEXT N_("Fullscreen video output")
 #define FULLSCREEN_LONGTEXT N_( \
     "Start video in fullscreen mode" )
@@ -1627,6 +1632,9 @@ vlc_module_begin ()
 #ifdef __APPLE__
        add_deprecated_alias( "macosx-embedded" ) /*deprecated since 0.9.0 */
 #endif
+    add_string( "x11-display", NULL, NULL,
+                DISPLAY_TEXT, DISPLAY_LONGTEXT, true )
+        add_deprecated_alias( "xvideo-display" ) /* deprecated since 1.1.0 */
     add_bool( "drop-late-frames", 1, NULL, DROP_LATE_FRAMES_TEXT,
               DROP_LATE_FRAMES_LONGTEXT, true )
     /* Used in vout_synchro */

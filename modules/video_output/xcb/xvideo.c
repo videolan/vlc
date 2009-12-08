@@ -39,11 +39,6 @@
 
 #include "xcb_vlc.h"
 
-#define DISPLAY_TEXT N_("X11 display")
-#define DISPLAY_LONGTEXT N_( \
-    "X11 hardware display to use. By default, VLC will " \
-    "use the value of the DISPLAY environment variable.")
-
 #define ADAPTOR_TEXT N_("XVideo adaptor number")
 #define ADAPTOR_LONGTEXT N_( \
     "XVideo hardware adaptor to use. By default, VLC will " \
@@ -67,9 +62,6 @@ vlc_module_begin ()
     set_capability ("vout display", 155)
     set_callbacks (Open, Close)
 
-    add_string ("x11-display", NULL, NULL,
-                DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
-        add_deprecated_alias ("xvideo-display")
     add_integer ("xvideo-adaptor", -1, NULL,
                  ADAPTOR_TEXT, ADAPTOR_LONGTEXT, true)
     add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)

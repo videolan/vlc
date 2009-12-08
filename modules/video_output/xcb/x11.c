@@ -37,11 +37,6 @@
 
 #include "xcb_vlc.h"
 
-#define DISPLAY_TEXT N_("X11 display")
-#define DISPLAY_LONGTEXT N_( \
-    "X11 hardware display to use. By default VLC will " \
-    "use the value of the DISPLAY environment variable.")
-
 #define SHM_TEXT N_("Use shared memory")
 #define SHM_LONGTEXT N_( \
     "Use shared memory to communicate between VLC and the X server.")
@@ -60,8 +55,6 @@ vlc_module_begin ()
     set_capability ("vout display", 75)
     set_callbacks (Open, Close)
 
-    add_string ("x11-display", NULL, NULL,
-                DISPLAY_TEXT, DISPLAY_LONGTEXT, true)
     add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)
 vlc_module_end ()
 
