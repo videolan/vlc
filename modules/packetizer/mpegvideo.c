@@ -179,7 +179,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->pp_last = &p_sys->p_frame;
     p_sys->b_frame_slice = false;
 
-    p_sys->i_dts = p_sys->i_pts = 0;
+    p_sys->i_dts = p_sys->i_pts = VLC_TS_INVALID;
 
     p_sys->i_frame_rate = 1;
     p_sys->i_frame_rate_base = 1;
@@ -195,8 +195,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_progressive_frame = 0;
     p_sys->b_inited = 0;
 
-    p_sys->i_interpolated_dts = 0;
-    p_sys->i_last_ref_pts = 0;
+    p_sys->i_interpolated_dts = VLC_TS_INVALID;
+    p_sys->i_last_ref_pts = VLC_TS_INVALID;
     p_sys->b_second_field = 0;
 
     p_sys->b_discontinuity = false;
@@ -294,10 +294,10 @@ static void PacketizeReset( void *p_private, bool b_broken )
         p_sys->pp_last = &p_sys->p_frame;
         p_sys->b_frame_slice = false;
     }
-    p_sys->i_dts = 0;
-    p_sys->i_pts = 0;
-    p_sys->i_interpolated_dts = 0;
-    p_sys->i_last_ref_pts = 0;
+    p_sys->i_dts =
+    p_sys->i_pts =
+    p_sys->i_interpolated_dts =
+    p_sys->i_last_ref_pts = VLC_TS_INVALID;
 }
 
 static block_t *PacketizeParse( void *p_private, bool *pb_ts_used, block_t *p_block )
@@ -333,16 +333,16 @@ static int PacketizeValidate( void *p_private, block_t *p_au )
 
     /* We've just started the stream, wait for the first PTS.
      * We discard here so we can still get the sequence header. */
-    if( p_sys->i_dts <= 0 && p_sys->i_pts <= 0 &&
-        p_sys->i_interpolated_dts <= 0 )
+    if( p_sys->i_dts <= VLC_TS_INVALID && p_sys->i_pts <= VLC_TS_INVALID &&
+        p_sys->i_interpolated_dts <= VLC_TS_INVALID )
     {
         msg_Dbg( p_dec, "need a starting pts/dts" );
         return VLC_EGENERIC;
     }
 
     /* When starting the stream we can have the first frame with
-     * a null DTS (i_interpolated_pts is initialized to 0) */
-    if( !p_au->i_dts )
+     * an invalid DTS (i_interpolated_pts is initialized to VLC_TS_INVALID) */
+    if( p_au->i_dts <= VLC_TS_INVALID )
         p_au->i_dts = p_au->i_pts;
 
     return VLC_SUCCESS;
@@ -425,15 +425,18 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         {
             /* Trivial case (DTS == PTS) */
             /* Correct interpolated dts when we receive a new pts/dts */
-            if( p_sys->i_pts > 0 ) p_sys->i_interpolated_dts = p_sys->i_pts;
-            if( p_sys->i_dts > 0 ) p_sys->i_interpolated_dts = p_sys->i_dts;
+            if( p_sys->i_pts > VLC_TS_INVALID )
+                p_sys->i_interpolated_dts = p_sys->i_pts;
+            if( p_sys->i_dts > VLC_TS_INVALID )
+                p_sys->i_interpolated_dts = p_sys->i_dts;
         }
         else
         {
             /* Correct interpolated dts when we receive a new pts/dts */
-            if( p_sys->i_last_ref_pts > 0 && !p_sys->b_second_field )
+            if(p_sys->i_last_ref_pts > VLC_TS_INVALID && !p_sys->b_second_field)
                 p_sys->i_interpolated_dts = p_sys->i_last_ref_pts;
-            if( p_sys->i_dts > 0 ) p_sys->i_interpolated_dts = p_sys->i_dts;
+            if( p_sys->i_dts > VLC_TS_INVALID )
+                p_sys->i_interpolated_dts = p_sys->i_dts;
 
             if( !p_sys->b_second_field )
                 p_sys->i_last_ref_pts = p_sys->i_pts;
@@ -443,7 +446,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         p_sys->i_interpolated_dts += i_duration;
 
         /* Set PTS only if we have a B frame or if it comes from the stream */
-        if( p_sys->i_pts > 0 )
+        if( p_sys->i_pts > VLC_TS_INVALID )
         {
             p_pic->i_pts = p_sys->i_pts;
         }
@@ -453,7 +456,7 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
         }
         else
         {
-            p_pic->i_pts = 0;
+            p_pic->i_pts = VLC_TS_INVALID;
         }
 
         switch ( p_sys->i_picture_type )
