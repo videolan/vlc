@@ -1024,7 +1024,7 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 
 ifdef SVN
 ffmpeg:
-	$(SVN) co -r 20620 $(FFMPEG_SVN) ffmpeg
+	$(SVN) co $(FFMPEG_SVN) ffmpeg
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
 endif
