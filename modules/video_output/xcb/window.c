@@ -216,7 +216,6 @@ static int Open (vlc_object_t *obj)
     int snum;
 
     xcb_connection_t *conn = xcb_connect (display, &snum);
-    free (display);
     if (xcb_connection_has_error (conn) /*== NULL*/)
         goto error;
 
@@ -262,6 +261,7 @@ static int Open (vlc_object_t *obj)
     }
 
     wnd->xid = window;
+    wnd->x11_display = display;
     wnd->control = Control;
     wnd->sys = p_sys;
 
@@ -342,6 +342,7 @@ static int Open (vlc_object_t *obj)
 
 error:
     xcb_disconnect (conn);
+    free (display);
     free (p_sys);
     return VLC_EGENERIC;
 }
@@ -363,6 +364,7 @@ static void Close (vlc_object_t *obj)
         DestroyKeyHandler (p_sys->keys);
     }
     xcb_disconnect (conn);
+    free (wnd->x11_display);
     free (p_sys);
 }
 
