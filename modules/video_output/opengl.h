@@ -263,8 +263,15 @@ static int vout_display_opengl_ResetTextures(vout_display_opengl_t *vgl)
 /* XXX See comment vout_display_opengl_Prepare */
 struct picture_sys_t {
     vout_display_opengl_t *vgl;
-    GLuint texture;
+    GLuint *texture;
 };
+
+/* Small helper */
+static inline GLuint get_texture(picture_t *picture)
+{
+    return *picture->p_sys->texture;
+}
+
 static int PictureLock(picture_t *picture)
 {
     if (!picture->p_sys)
@@ -273,7 +280,7 @@ static int PictureLock(picture_t *picture)
     vout_display_opengl_t *vgl = picture->p_sys->vgl;
     if (!vout_opengl_Lock(vgl->gl)) {
 
-        glBindTexture(VLCGL_TARGET, picture->p_sys->texture);
+        glBindTexture(VLCGL_TARGET, get_texture(picture));
         glTexSubImage2D(VLCGL_TARGET, 0, 0, 0,
                         vgl->fmt.i_width, vgl->fmt.i_height,
                         VLCGL_FORMAT, VLCGL_TYPE, picture->p[0].p_pixels);
@@ -304,9 +311,10 @@ static picture_pool_t *vout_display_opengl_GetPool(vout_display_opengl_t *vgl)
         memset(&rsc, 0, sizeof(rsc));
 #ifdef __APPLE__
         rsc.p_sys = malloc(sizeof(*rsc.p_sys));
-        if (rsc.p_sys) {
+        if (rsc.p_sys)
+        {
             rsc.p_sys->vgl = vgl;
-            rsc.p_sys->texture = vgl->texture[i];
+            rsc.p_sys->texture = &vgl->texture[i];
         }
 #endif
         rsc.p[0].p_pixels = vgl->buffer[i];
@@ -372,7 +380,7 @@ static int vout_display_opengl_Prepare(vout_display_opengl_t *vgl,
 
 #ifdef __APPLE__
     /* Bind to the texture for drawing */
-    glBindTexture(VLCGL_TARGET, picture->p_sys->texture);
+    glBindTexture(VLCGL_TARGET, get_texture(picture));
 #else
     /* Update the texture */
     glTexSubImage2D(GL_TEXTURE_2D, 0, 0, 0,
