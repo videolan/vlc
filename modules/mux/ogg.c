@@ -132,10 +132,10 @@ typedef struct
  */
 static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
 {
-    mtime_t i_dts;
-    int     i_stream, i;
+    mtime_t i_dts = 0;
+    int     i_stream = -1;
 
-    for( i = 0, i_dts = 0, i_stream = -1; i < p_mux->i_nb_inputs; i++ )
+    for( int i = 0; i < p_mux->i_nb_inputs; i++ )
     {
         block_fifo_t  *p_fifo;
 
@@ -253,17 +253,15 @@ static void Close( vlc_object_t * p_this )
     if( p_sys->i_del_streams )
     {
         block_t *p_og = NULL;
-        mtime_t i_dts = -1;
-        int i;
+        mtime_t i_dts = p_sys->pp_del_streams[p_sys->i_del_streams - 1]->i_dts;
 
         /* Close the current ogg stream */
         msg_Dbg( p_mux, "writing footer" );
         block_ChainAppend( &p_og, OggCreateFooter( p_mux ) );
 
         /* Remove deleted logical streams */
-        for( i = 0; i < p_sys->i_del_streams; i++ )
+        for(int i = 0; i < p_sys->i_del_streams; i++ )
         {
-            i_dts = p_sys->pp_del_streams[i]->i_dts;
             ogg_stream_clear( &p_sys->pp_del_streams[i]->os );
             FREENULL( p_sys->pp_del_streams[i]->p_oggds_header );
             FREENULL( p_sys->pp_del_streams[i] );
