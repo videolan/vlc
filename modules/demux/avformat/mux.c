@@ -303,44 +303,6 @@ static int DelStream( sout_mux_t *p_mux, sout_input_t *p_input )
     return VLC_SUCCESS;
 }
 
-/*
- * TODO  move this function to src/stream_output.c (used by nearly all muxers)
- */
-static int MuxGetStream( sout_mux_t *p_mux, int *pi_stream, mtime_t *pi_dts )
-{
-    mtime_t i_dts;
-    int     i_stream, i;
-
-    for( i = 0, i_dts = 0, i_stream = -1; i < p_mux->i_nb_inputs; i++ )
-    {
-        block_fifo_t  *p_fifo;
-
-        p_fifo = p_mux->pp_inputs[i]->p_fifo;
-
-        /* We don't really need to have anything in the SPU fifo */
-        if( p_mux->pp_inputs[i]->p_fmt->i_cat == SPU_ES &&
-            block_FifoCount( p_fifo ) == 0 ) continue;
-
-        if( block_FifoCount( p_fifo ) )
-        {
-            block_t *p_buf;
-
-            p_buf = block_FifoShow( p_fifo );
-            if( i_stream < 0 || p_buf->i_dts < i_dts )
-            {
-                i_dts = p_buf->i_dts;
-                i_stream = i;
-            }
-        }
-        else return -1;
-
-    }
-    if( pi_stream ) *pi_stream = i_stream;
-    if( pi_dts ) *pi_dts = i_dts;
-    if( !p_mux->p_sys->i_initial_dts ) p_mux->p_sys->i_initial_dts = i_dts;
-    return i_stream;
-}
-
 static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
@@ -392,7 +354,6 @@ static int MuxBlock( sout_mux_t *p_mux, sout_input_t *p_input )
 static int Mux( sout_mux_t *p_mux )
 {
     sout_mux_sys_t *p_sys = p_mux->p_sys;
-    int i_stream;
 
     if( p_sys->b_error ) return VLC_EGENERIC;
 
@@ -418,7 +379,15 @@ static int Mux( sout_mux_t *p_mux )
 
     for( ;; )
     {
-        if( MuxGetStream( p_mux, &i_stream, 0 ) < 0 ) return VLC_SUCCESS;
+        mtime_t i_dts;
+
+        int i_stream = sout_MuxGetStream( p_mux, 1, &i_dts );
+        if( i_stream < 0 )
+            return VLC_SUCCESS;
+
+        if( !p_mux->p_sys->i_initial_dts )
+            p_mux->p_sys->i_initial_dts = i_dts;
+
         MuxBlock( p_mux, p_mux->pp_inputs[i_stream] );
     }
 
