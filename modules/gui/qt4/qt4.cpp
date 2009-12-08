@@ -279,7 +279,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
     XCloseDisplay( p_display );
-    putenv( "XLIB_SKIP_ARGB_VISUALS=1" );
+    putenv( (char *)"XLIB_SKIP_ARGB_VISUALS=1" );
 #endif
 
     /* Allocations of p_sys */
