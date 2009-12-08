@@ -172,7 +172,7 @@ VLC_PUBLIC_API libvlc_media_t * libvlc_media_new_as_node(
  *
  * The options are detailed in vlc --long-help, for instance "--sout-all"
  *
- * \param p_instance the instance
+ * \param p_md the media descriptor
  * \param ppsz_options the options (as a string)
  */
 VLC_PUBLIC_API void libvlc_media_add_option(
@@ -188,7 +188,7 @@ VLC_PUBLIC_API void libvlc_media_add_option(
  *
  * The options are detailed in vlc --long-help, for instance "--sout-all"
  *
- * \param p_instance the instance
+ * \param p_md the media descriptor
  * \param ppsz_options the options (as a string)
  * \param i_flags the flags for this option
  */
@@ -203,10 +203,9 @@ VLC_PUBLIC_API void libvlc_media_add_option_flag(
  * libvlc_media_release() to decrement the reference count of a
  * media descriptor object.
  *
- * \param p_meta_desc a media descriptor object.
+ * \param p_md the media descriptor
  */
-VLC_PUBLIC_API void libvlc_media_retain(
-                                   libvlc_media_t *p_meta_desc );
+VLC_PUBLIC_API void libvlc_media_retain( libvlc_media_t *p_md );
 
 /**
  * Decrement the reference count of a media descriptor object. If the
@@ -215,10 +214,9 @@ VLC_PUBLIC_API void libvlc_media_retain(
  * to all listeners. If the media descriptor object has been released it
  * should not be used again.
  *
- * \param p_meta_desc a media descriptor object.
+ * \param p_md the media descriptor
  */
-VLC_PUBLIC_API void libvlc_media_release(
-                                   libvlc_media_t *p_meta_desc );
+VLC_PUBLIC_API void libvlc_media_release( libvlc_media_t *p_md );
 
 
 /**
@@ -234,18 +232,17 @@ VLC_PUBLIC_API char * libvlc_media_get_mrl( libvlc_media_t * p_md );
  *
  * \param p_meta_desc a media descriptor object.
  */
-VLC_PUBLIC_API libvlc_media_t * libvlc_media_duplicate( libvlc_media_t * );
+VLC_PUBLIC_API libvlc_media_t * libvlc_media_duplicate( libvlc_media_t *p_md );
 
 /**
  * Read the meta of the media.
  *
- * \param p_meta_desc the media to read
+ * \param p_md the media descriptor
  * \param e_meta the meta to read
  * \return the media's meta
  */
-VLC_PUBLIC_API char * libvlc_media_get_meta(
-                                   libvlc_media_t *p_meta_desc,
-                                   libvlc_meta_t e_meta );
+VLC_PUBLIC_API char * libvlc_media_get_meta( libvlc_media_t *p_md,
+                                             libvlc_meta_t e_meta );
 
 /**
  * Set the meta of the media (this function will not save the meta, call
