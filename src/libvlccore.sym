@@ -362,6 +362,7 @@ sout_MethodRelease
 sout_MuxAddStream
 sout_MuxDelete
 sout_MuxDeleteStream
+sout_MuxGetStream
 sout_MuxNew
 sout_MuxSendBuffer
 sout_SAPMethod
