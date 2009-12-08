@@ -247,10 +247,6 @@ static int Init( vout_thread_t *p_vout )
 
     /* */
     p_sys->p_current = picture_pool_Get( p_sys->p_pool );
-    msg_Err(p_vout, "pitch %d visible_p %d w %d",
-            p_sys->p_current->p[0].i_pitch,
-            p_sys->p_current->p[0].i_visible_pitch,
-            p_vout->render.i_width );
     p_vout->p_picture[0] = *p_sys->p_current;
     p_vout->p_picture[0].i_status = DESTROYED_PICTURE;
     p_vout->p_picture[0].i_type   = DIRECT_PICTURE;
