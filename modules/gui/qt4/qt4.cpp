@@ -243,11 +243,11 @@ vlc_module_begin ()
 
         set_callbacks( OpenDialogs, Close )
 
-#if defined(Q_WS_X11) || defined(WIN32)
+#if defined(Q_WS_X11) || defined(Q_WS_WIN)
     add_submodule ()
 #if defined(Q_WS_X11)
         set_capability( "vout window xid", 50 )
-#elif defined(WIN32)
+#elif defined(Q_WS_WIN)
         set_capability( "vout window hwnd", 50 )
 #endif
         set_callbacks( WindowOpen, WindowClose )
@@ -532,10 +532,12 @@ static int WindowOpen( vlc_object_t *p_obj )
     if( !p_wnd->xid )
         return VLC_EGENERIC;
 
-#elif defined (WIN32)
+#elif defined (Q_WS_WIN)
     p_wnd->hwnd = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
     if( !p_wnd->hwnd )
         return VLC_EGENERIC;
+#else
+# error FIXME
 #endif
 
     p_wnd->control = WindowControl;
