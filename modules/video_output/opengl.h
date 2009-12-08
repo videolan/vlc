@@ -270,7 +270,7 @@ static int PictureLock(picture_t *picture)
     if (!picture->p_sys)
         return VLC_SUCCESS;
 
-    vout_display_opengl_t *vgl = !picture->p_sys->vgl;
+    vout_display_opengl_t *vgl = picture->p_sys->vgl;
     if (!vout_opengl_Lock(vgl->gl)) {
 
         glBindTexture(VLCGL_TARGET, picture->p_sys->texture);
