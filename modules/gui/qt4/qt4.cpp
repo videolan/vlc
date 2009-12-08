@@ -345,7 +345,7 @@ static void *Thread( void *obj )
     intf_thread_t *p_intf = (intf_thread_t *)obj;
     MainInterface *p_mi;
     char dummy[] = "vlc"; /* for WM_CLASS */
-    char *argv[] = { dummy, NULL, };
+    char *argv[4] = { dummy, NULL, };
     int argc = 1;
 
     Q_INIT_RESOURCE( vlc );
