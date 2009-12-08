@@ -433,3 +433,5 @@ VLC_PUBLIC_API libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterat
 # endif
 
 #endif /* <vlc/libvlc.h> */
+
+/** @} */

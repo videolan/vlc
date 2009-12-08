@@ -301,7 +301,7 @@ void Execute( httpd_file_sys_t *p_args,
 /**
  * Core stuff
  */
-/** \struct
+/** \struct httpd_file_sys_t
  * This structure represent a single HTML file to be parsed by the macros
  * handling engine */
 struct httpd_file_sys_t
@@ -321,7 +321,7 @@ struct httpd_file_sys_t
     mvar_t        *vars;
 };
 
-/** \struct
+/** \struct http_association_t
  * Structure associating an extension to an external program
  */
 typedef struct http_association_t
@@ -331,7 +331,7 @@ typedef struct http_association_t
     char                **ppsz_argv;
 } http_association_t;
 
-/** \struct
+/** \struct httpd_handler_sys_t
  * This structure represent a single CGI file to be parsed by the macros
  * handling engine */
 struct httpd_handler_sys_t
@@ -344,7 +344,7 @@ struct httpd_handler_sys_t
     http_association_t *p_association;
 };
 
-/** \struct
+/** \struct intf_sys_t
  * Internal service structure for the HTTP interface
  */
 struct intf_sys_t
