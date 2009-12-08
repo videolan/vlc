@@ -706,7 +706,7 @@ static int Mux( sout_mux_t *p_mux )
             return VLC_SUCCESS;
         }
 
-        if( p_sys->i_dts_first < VLC_TS_INVALID )
+        if( p_sys->i_dts_first <= VLC_TS_INVALID )
         {
             p_sys->i_dts_first = i_dts;
         }
