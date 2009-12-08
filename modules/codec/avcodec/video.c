@@ -1113,7 +1113,9 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
             [PIX_FMT_VAAPI_IDCT] = "PIX_FMT_VAAPI_IDCT",
             [PIX_FMT_VAAPI_VLD] = "PIX_FMT_VAAPI_VLD",
             [PIX_FMT_VAAPI_MOCO] = "PIX_FMT_VAAPI_MOCO",
+#ifdef HAVE_AVCODEC_DXVA2
             [PIX_FMT_DXVA2_VLD] = "PIX_FMT_DXVA2_VLD",
+#endif
             [PIX_FMT_YUYV422] = "PIX_FMT_YUYV422",
             [PIX_FMT_YUV420P] = "PIX_FMT_YUV420P",
         };
@@ -1131,21 +1133,15 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
             continue;
 #endif
         }
+#ifdef HAVE_AVCODEC_DXVA2
         if( pi_fmt[i] == PIX_FMT_DXVA2_VLD )
         {
-#ifdef HAVE_AVCODEC_DXVA2
             msg_Dbg( p_dec, "Trying DXVA2" );
             p_sys->p_va = vlc_va_NewDxva2( VLC_OBJECT(p_dec), p_sys->i_codec_id );
             if( !p_sys->p_va )
                 msg_Warn( p_dec, "Failed to open DXVA2" );
-#else
-            continue;
+        }
 #endif
-        }
-        else
-        {
-            continue;
-        }
 
         if( p_sys->p_va &&
             p_sys->p_context->width > 0 && p_sys->p_context->height > 0 )
