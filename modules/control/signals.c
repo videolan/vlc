@@ -84,6 +84,16 @@ static void Close (vlc_object_t *obj)
     free (p_sys);
 }
 
+static bool ignored (int signum)
+{
+    struct sigaction sa;
+
+    if (sigaction (signum, NULL, &sa))
+        return false;
+    return ((sa.sa_flags & SA_SIGINFO)
+            ? (void *)sa.sa_sigaction : (void *)sa.sa_handler) == SIG_IGN;
+}
+
 static void *SigThread (void *data)
 {
     intf_thread_t *obj = data;
@@ -91,7 +101,8 @@ static void *SigThread (void *data)
     int signum;
 
     sigemptyset (&set);
-    sigaddset (&set, SIGHUP);
+    if (!ignored (SIGHUP)) /* <- needed to handle nohup properly */
+        sigaddset (&set, SIGHUP);
     sigaddset (&set, SIGINT);
     sigaddset (&set, SIGQUIT);
     sigaddset (&set, SIGTERM);
