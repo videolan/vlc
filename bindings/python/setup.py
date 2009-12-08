@@ -1,3 +1,4 @@
+import sys
 from distutils.core import setup, Extension
 import os
 import commands
@@ -75,6 +76,22 @@ def get_ldflags():
             # workaround the problem.
             ldflags.append('-lvlc')
         return ldflags
+
+# Import
+if '--force-deprecated' in sys.argv:
+    sys.argv.remove('--force-deprecated')
+else:
+    print """This native version of VLC bindings is now deprecated. 
+
+Please use the new ctypes-based bindings, which can be built from the
+bindings/python-ctypes directory of the VLC source tree, or directly
+get the generated python module from
+http://www.advene.org/download/python-ctypes
+
+However, if you insist on building this deprecated version, you should
+pass the --force-deprecated option on the setup.py command line.
+"""
+    sys.exit(1)
 
 #source_files = [ 'vlc_module.c', 'vlc_mediacontrol.c',
 #                 'vlc_position.c', 'vlc_instance.c', 'vlc_input.c' ]
