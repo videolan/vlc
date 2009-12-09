@@ -32,15 +32,27 @@
 #include <vlc_charset.h>
 #include <vlc_configuration.h>
 
+static char *configdir = NULL;
+static char *datadir = NULL;
+
+static pthread_once_t once = PTHREAD_ONCE_INIT;
+
+static void init_dirs( void )
+{
+    configdir = config_GetUserDir(VLC_CONFIG_DIR);
+    datadir = config_GetUserDir(VLC_DATA_DIR);
+}
 
 const char *config_GetConfDir( void )
 {
-    return config_GetUserDir (VLC_CONFIG_DIR);
+    pthread_once(&once, init_dirs);
+    return configdir;
 }
 
 const char *config_GetDataDir (void)
 {
-    return config_GetUserDir (VLC_DATA_DIR);
+    pthread_once(&once, init_dirs);
+    return datadir;
 }
 
 static char *config_GetHomeDir (void)
@@ -56,7 +68,7 @@ static char *config_GetHomeDir (void)
 char *config_GetUserDir (vlc_userdir_t type)
 {
     char *psz_dir;
-    const char *psz_parent = config_GetHomeDir ();
+    char *psz_parent = config_GetHomeDir ();
     const char *psz_path;
 
     switch (type)
@@ -98,5 +110,6 @@ char *config_GetUserDir (vlc_userdir_t type)
     }
     if( asprintf( &psz_dir, psz_path, psz_parent ) == -1 )
         psz_dir = NULL;
+    free(psz_parent);
     return psz_dir;
 }
