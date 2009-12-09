@@ -555,7 +555,7 @@ ControlsWidget::ControlsWidget( intf_thread_t *_p_i,
 #endif
 
     QVBoxLayout *controlLayout = new QVBoxLayout( this );
-    controlLayout->setContentsMargins( 4, 2, 4, 0 );
+    controlLayout->setContentsMargins( 4, 1, 4, 0 );
     controlLayout->setSpacing( 0 );
     QHBoxLayout *controlLayout1 = new QHBoxLayout;
     controlLayout1->setSpacing( 0 ); controlLayout1->setMargin( 0 );
