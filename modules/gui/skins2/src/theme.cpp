@@ -189,11 +189,11 @@ Theme::IDmap<T>::find_first_object( const string &id ) const
 
 GenericBitmap *Theme::getBitmapById( const string &id ) const
 {
-    m_bitmaps.find_first_object( id );
+    return m_bitmaps.find_first_object( id );
 }
 
 GenericFont *Theme::getFontById( const string &id ) const
 {
-    m_fonts.find_first_object( id );
+    return m_fonts.find_first_object( id );
 }
 
