@@ -50,7 +50,7 @@
     if (self = [super init])
     {
         if (aNumber)
-            value = [[aNumber copy] retain];
+            value = [aNumber copy];
         else
             value = nil;
     }
