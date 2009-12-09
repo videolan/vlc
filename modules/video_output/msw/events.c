@@ -354,9 +354,9 @@ static void *EventThread( void *p_this )
 
             if( pwz_title )
             {
-                SetWindowText( p_event->hwnd, (LPCTSTR)pwz_title );
+                SetWindowTextW( p_event->hwnd, (LPCTSTR)pwz_title );
                 if( p_event->hfswnd )
-                    SetWindowText( p_event->hfswnd, (LPCTSTR)pwz_title );
+                    SetWindowTextW( p_event->hfswnd, (LPCTSTR)pwz_title );
                 free( pwz_title );
             }
             break;
