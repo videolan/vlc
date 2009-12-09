@@ -121,7 +121,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Are we in the enhanced always-video mode or not ? */
     i_visualmode = config_GetInt( p_intf, "qt-display-mode" );
 
-        /* Do we want anoying popups or not */
+    /* Do we want anoying popups or not */
     notificationEnabled = (bool)config_GetInt( p_intf, "qt-notification" );
 
     /* Set the other interface settings */
@@ -155,18 +155,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     QVLCMenu::createMenuBar( this, p_intf );
     CONNECT( THEMIM->getIM(), voutListChanged( vout_thread_t **, int ),
              this, destroyPopupMenu() );
-
-#if 0
-    /* Create a Dock to get the playlist */
-    dockPL = new QDockWidget( qtr( "Playlist" ), this );
-    dockPL->setSizePolicy( QSizePolicy::Preferred,
-                           QSizePolicy::Expanding );
-    dockPL->setFeatures( QDockWidget::AllDockWidgetFeatures );
-    dockPL->setAllowedAreas( Qt::LeftDockWidgetArea
-                           | Qt::RightDockWidgetArea
-                           | Qt::BottomDockWidgetArea );
-    dockPL->hide();
-#endif
 
     /*********************************
      * Create the Systray Management *
@@ -286,8 +274,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     /* Final sizing and showing */
     setVisible( !b_hideAfterCreation );
     //setMinimumSize( QSize( 0, 0 ) );
-//    setMinimumWidth( __MAX( controls->sizeHint().width(),
-  //                          menuBar()->sizeHint().width() ) );
+    //    setMinimumWidth( __MAX( controls->sizeHint().width(),
+    //                          menuBar()->sizeHint().width() ) );
 
     debug();
     /* And switch to minimal view if needed
@@ -299,7 +287,6 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
        qt-display-modes */
     updateGeometry();
     resize( sizeHint() );
-
 }
 
 MainInterface::~MainInterface()
@@ -362,15 +349,17 @@ MainInterface::~MainInterface()
  *****************************/
 void MainInterface::recreateToolbars()
 {
-    msg_Dbg( p_intf, "Recreating the toolbars" );
+    //msg_Dbg( p_intf, "Recreating the toolbars" );
     settings->beginGroup( "MainWindow" );
     delete controls;
     delete inputC;
+
     controls = new ControlsWidget( p_intf, false, this ); /* FIXME */
     CONNECT( controls, advancedControlsToggled( bool ),
              this, doComponentsUpdate() );
     CONNECT( controls, sizeChanged(),
              this, doComponentsUpdate() );
+
     inputC = new InputControlsWidget( p_intf, this );
 
     mainLayout->insertWidget( 2, inputC );
@@ -388,8 +377,7 @@ void MainInterface::createMainWidget( QSettings *settings )
 
     /* Margins, spacing */
     main->setContentsMargins( 0, 0, 0, 0 );
-    mainLayout->setSpacing( 0 );
-    mainLayout->setMargin( 0 );
+    mainLayout->setSpacing( 0 ); mainLayout->setMargin( 0 );
 
     /* */
     stackCentralW = new QStackedWidget( main );
@@ -411,6 +399,15 @@ void MainInterface::createMainWidget( QSettings *settings )
     mainLayout->insertWidget( 1, stackCentralW, 100 );
 
 
+    /* Create the CONTROLS Widget */
+    controls = new ControlsWidget( p_intf,
+                   settings->value( "adv-controls", false ).toBool(), this );
+    CONNECT( controls, advancedControlsToggled( bool ),
+             this, doComponentsUpdate() );
+    CONNECT( controls, sizeChanged(),
+             this, doComponentsUpdate() );
+    inputC = new InputControlsWidget( p_intf, this );
+
     if( i_visualmode != QT_ALWAYS_VIDEO_MODE &&
         i_visualmode != QT_MINIMAL_MODE )
     {
@@ -423,14 +420,6 @@ void MainInterface::createMainWidget( QSettings *settings )
         stackCentralOldState = BACKG_TAB;
     }
 
-    /* Create the CONTROLS Widget */
-    controls = new ControlsWidget( p_intf,
-                   settings->value( "adv-controls", false ).toBool(), this );
-    CONNECT( controls, advancedControlsToggled( bool ),
-             this, doComponentsUpdate() );
-    CONNECT( controls, sizeChanged(),
-             this, doComponentsUpdate() );
-    inputC = new InputControlsWidget( p_intf, this );
 
     //mainLayout->setRowStretch( 1, 10 );
     mainLayout->insertWidget( 2, inputC );
@@ -694,7 +683,7 @@ void MainInterface::doComponentsUpdate()
 {
     if( isFullScreen() || isMaximized() ) return;
 
-    msg_Warn( p_intf, "Updating the geometry" );
+//    msg_Warn( p_intf, "Updating the geometry" );
     /* Here we resize to sizeHint() and not adjustsize because we want
        the videoWidget to be exactly the correctSize */
 
@@ -736,32 +725,39 @@ void MainInterface::debug()
 
 inline void MainInterface::showTab( int i_tab )
 {
-    msg_Warn( p_intf, "stackCentralOldState %i", stackCentralOldState );
+    msg_Err( p_intf, "showTab %i", i_tab );
+    msg_Warn( p_intf, "Old stackCentralOldState %i", stackCentralOldState );
     stackCentralOldState = stackCentralW->isVisible() ? stackCentralW->currentIndex()
                                           : HIDDEN_TAB;
-    msg_Dbg( p_intf, "State chnage %i",  stackCentralW->currentIndex() );
+    msg_Warn( p_intf, "State change %i %i",  stackCentralW->currentIndex(), i_tab );
 
     if( i_visualmode == QT_NORMAL_MODE )
     {
         stackCentralW->setVisible( i_tab != HIDDEN_TAB );
+        doComponentsUpdate(); // resize the player
     }
     else
         if( i_tab == HIDDEN_TAB ) i_tab == BACKG_TAB;
 
     stackCentralW->setCurrentIndex( i_tab );
+
+    msg_Warn( p_intf, "New stackCentralOldState %i", stackCentralOldState );
 }
 
 inline void MainInterface::restoreStackOldWidget()
 {
-    msg_Warn( p_intf, "stackCentralOldState %i", stackCentralOldState );
+    msg_Warn( p_intf, "Old stackCentralOldState %i", stackCentralOldState );
     int temp = stackCentralW->isVisible() ? stackCentralW->currentIndex()
                                           : HIDDEN_TAB;
     stackCentralW->setCurrentIndex( stackCentralOldState );
     if( i_visualmode == QT_NORMAL_MODE )
+    {
         stackCentralW->setVisible( stackCentralOldState != HIDDEN_TAB );
+        doComponentsUpdate(); // resize the player
+    }
 
     stackCentralOldState = temp;
-    msg_Dbg( p_intf, "Here %i %i", temp, stackCentralW->currentIndex() );
+    msg_Warn( p_intf, "Debug %i %i", temp, stackCentralW->currentIndex() );
 
 }
 
@@ -924,9 +920,9 @@ void MainInterface::createPlaylist( bool b_show )
     }
     else
     {
-        msg_Warn( p_intf, "Here 12 %i", stackCentralW->currentIndex() );
+        msg_Warn( p_intf, "Here %i", stackCentralW->currentIndex() );
         stackCentralW->insertWidget( PLAYL_TAB, playlistWidget );
-        msg_Warn( p_intf, "Here 12 %i", stackCentralW->currentIndex() );
+        msg_Warn( p_intf, "Here %i", stackCentralW->currentIndex() );
     }
 
     if( b_show )
