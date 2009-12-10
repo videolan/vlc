@@ -139,6 +139,7 @@ error:
 #define GET_VALUE( a ) \
                         if( !strcmp( psz_attrname, #a ) ) \
                         { \
+                            free(psz_ ## a); \
                             psz_ ## a = psz_attrvalue; \
                         }
 /* <genrelist>
@@ -413,6 +414,7 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         input_item_SetRating( p_input, psz_rt );
                     input_item_AddSubItem( p_current_input, p_input );
                     vlc_gc_decref( p_input );
+                    FREENULL( psz_base );
                     FREENULL( psz_name );
                     FREENULL( psz_mt );
                     FREENULL( psz_id );
