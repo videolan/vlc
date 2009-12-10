@@ -369,7 +369,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         b_daemon = true;
 
         /* lets check if we need to write the pidfile */
-        psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
+        psz_pidfile = var_CreateGetNonEmptyString( p_libvlc, "pidfile" );
         if( psz_pidfile != NULL )
         {
             FILE *pidfile;
@@ -438,8 +438,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
 
     /* Check if the user specified a custom language */
-    psz_language = config_GetPsz( p_libvlc, "language" );
-    if( psz_language && *psz_language && strcmp( psz_language, "auto" ) )
+    psz_language = var_CreateGetNonEmptyString( p_libvlc, "language" );
+    if( psz_language && strcmp( psz_language, "auto" ) )
     {
         /* Reset the default domain */
         SetLanguage( psz_language );
@@ -482,7 +482,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         abort();
     }
     /* Check for help on modules */
-    if( (p_tmp = config_GetPsz( p_libvlc, "module" )) )
+    if( (p_tmp = var_CreateGetNonEmptyString( p_libvlc, "module" )) )
     {
         Help( p_libvlc, p_tmp );
         free( p_tmp );
@@ -696,7 +696,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Message queue options
      */
-    char * psz_verbose_objects = config_GetPsz( p_libvlc, "verbose-objects" );
+    char * psz_verbose_objects = var_CreateGetNonEmptyString( p_libvlc, "verbose-objects" );
     if( psz_verbose_objects )
     {
         char * psz_object, * iter = psz_verbose_objects;
@@ -851,8 +851,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     vlc_object_attach( p_playlist, p_libvlc );
 
     /* Add service discovery modules */
-    psz_modules = config_GetPsz( p_playlist, "services-discovery" );
-    if( psz_modules && *psz_modules )
+    psz_modules = var_CreateGetNonEmptyString( p_playlist, "services-discovery" );
+    if( psz_modules )
     {
         char *p = psz_modules, *m;
         while( ( m = strsep( &p, " :," ) ) != NULL )
@@ -862,8 +862,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
 #ifdef ENABLE_VLM
     /* Initialize VLM if vlm-conf is specified */
-    psz_parser = config_GetPsz( p_libvlc, "vlm-conf" );
-    if( psz_parser && *psz_parser )
+    psz_parser = var_CreateGetNonEmptyString( p_libvlc, "vlm-conf" );
+    if( psz_parser )
     {
         priv->p_vlm = vlm_New( p_libvlc );
         if( !priv->p_vlm )
@@ -879,10 +879,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
        all interfaces as they can use it) */
     var_Create( p_libvlc, "volume-change", VLC_VAR_BOOL );
 
-    psz_modules = config_GetPsz( p_libvlc, "extraintf" );
-    psz_control = config_GetPsz( p_libvlc, "control" );
+    psz_modules = var_CreateGetNonEmptyString( p_libvlc, "extraintf" );
+    psz_control = var_CreateGetNonEmptyString( p_libvlc, "control" );
 
-    if( psz_modules && *psz_modules && psz_control && *psz_control )
+    if( psz_modules && psz_control )
     {
         char* psz_tmp;
         if( asprintf( &psz_tmp, "%s:%s", psz_modules, psz_control ) != -1 )
@@ -891,7 +891,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             psz_modules = psz_tmp;
         }
     }
-    else if( psz_control && *psz_control )
+    else if( psz_control )
     {
         free( psz_modules );
         psz_modules = strdup( psz_control );
@@ -968,19 +968,19 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef WIN32
     if( config_GetInt( p_libvlc, "prefer-system-codecs") > 0 )
     {
-        char *psz_codecs = config_GetPsz( p_playlist, "codec" );
+        char *psz_codecs = var_CreateGetNonEmptyString( p_playlist, "codec" );
         if( psz_codecs )
         {
             char *psz_morecodecs;
             if( asprintf(&psz_morecodecs, "%s,dmo,quicktime", psz_codecs) != -1 )
             {
-                config_PutPsz( p_libvlc, "codec", psz_morecodecs);
+                var_SetString( p_libvlc, "codec", psz_morecodecs);
                 free( psz_morecodecs );
             }
+            free( psz_codecs );
         }
         else
-            config_PutPsz( p_libvlc, "codec", "dmo,quicktime");
-        free( psz_codecs );
+            var_SetString( p_libvlc, "codec", "dmo,quicktime");
     }
 #endif
 
@@ -1071,7 +1071,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 
     if( b_daemon )
     {
-        psz_pidfile = config_GetPsz( p_libvlc, "pidfile" );
+        psz_pidfile = var_CreateGetNonEmptyString( p_libvlc, "pidfile" );
         if( psz_pidfile != NULL )
         {
             msg_Dbg( p_libvlc, "removing pid file %s", psz_pidfile );
@@ -1146,8 +1146,8 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
 
     if( !psz_module ) /* requesting the default interface */
     {
-        char *psz_interface = config_GetPsz( p_libvlc, "intf" );
-        if( !psz_interface || !*psz_interface ) /* "intf" has not been set */
+        char *psz_interface = var_CreateGetNonEmptyString( p_libvlc, "intf" );
+        if( !psz_interface ) /* "intf" has not been set */
         {
 #ifndef WIN32
             if( b_daemon )
@@ -1164,13 +1164,12 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
     }
 
     /* Try to create the interface */
-    if( intf_Create( p_libvlc, psz_module ? psz_module : "$intf" ) )
-    {
+    int ret = intf_Create( p_libvlc, psz_module ? psz_module : "$intf" );
+    if( ret )
         msg_Err( p_libvlc, "interface \"%s\" initialization failed",
                  psz_module ? psz_module : "default" );
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
+    var_Destroy( p_libvlc, "intf" );
+    return ret;
 }
 
 static vlc_mutex_t exit_lock = VLC_STATIC_MUTEX;

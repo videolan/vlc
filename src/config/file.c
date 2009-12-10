@@ -54,7 +54,8 @@ static inline char *strdupnull (const char *src)
  */
 static char *config_GetConfigFile( vlc_object_t *obj )
 {
-    char *psz_file = config_GetPsz( obj, "config" );
+    char *psz_file = var_CreateGetNonEmptyString( obj, "config" );
+    var_Destroy( obj, "config" );
     if( psz_file == NULL )
     {
         char *psz_dir = config_GetUserDir( VLC_CONFIG_DIR );

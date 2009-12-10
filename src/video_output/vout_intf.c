@@ -129,24 +129,23 @@ static const struct
 static void AddCustomRatios( vout_thread_t *p_vout, const char *psz_var,
                              char *psz_list )
 {
-    if( psz_list && *psz_list )
+    assert( psz_list );
+
+    char *psz_cur = psz_list;
+    char *psz_next;
+    while( psz_cur && *psz_cur )
     {
-        char *psz_cur = psz_list;
-        char *psz_next;
-        while( psz_cur && *psz_cur )
+        vlc_value_t val, text;
+        psz_next = strchr( psz_cur, ',' );
+        if( psz_next )
         {
-            vlc_value_t val, text;
-            psz_next = strchr( psz_cur, ',' );
-            if( psz_next )
-            {
-                *psz_next = '\0';
-                psz_next++;
-            }
-            val.psz_string = psz_cur;
-            text.psz_string = psz_cur;
-            var_Change( p_vout, psz_var, VLC_VAR_ADDCHOICE, &val, &text);
-            psz_cur = psz_next;
+            *psz_next = '\0';
+            psz_next++;
         }
+        val.psz_string = psz_cur;
+        text.psz_string = psz_cur;
+        var_Change( p_vout, psz_var, VLC_VAR_ADDCHOICE, &val, &text);
+        psz_cur = psz_next;
     }
 }
 
@@ -244,9 +243,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
     var_Create( p_vout, "crop-update", VLC_VAR_VOID );
 
     /* Add custom crop ratios */
-    psz_buf = config_GetPsz( p_vout, "custom-crop-ratios" );
-    AddCustomRatios( p_vout, "crop", psz_buf );
-    free( psz_buf );
+    psz_buf = var_CreateGetNonEmptyString( p_vout, "custom-crop-ratios" );
+    if( psz_buf )
+    {
+        AddCustomRatios( p_vout, "crop", psz_buf );
+        free( psz_buf );
+    }
 
     var_AddCallback( p_vout, "crop", CropCallback, NULL );
     var_Get( p_vout, "crop", &old_val );
@@ -305,9 +307,12 @@ void vout_IntfInit( vout_thread_t *p_vout )
     }
 
     /* Add custom aspect ratios */
-    psz_buf = config_GetPsz( p_vout, "custom-aspect-ratios" );
-    AddCustomRatios( p_vout, "aspect-ratio", psz_buf );
-    free( psz_buf );
+    psz_buf = var_CreateGetNonEmptyString( p_vout, "custom-aspect-ratios" );
+    if( psz_buf )
+    {
+        AddCustomRatios( p_vout, "aspect-ratio", psz_buf );
+        free( psz_buf );
+    }
 
     var_AddCallback( p_vout, "aspect-ratio", AspectCallback, NULL );
     var_Get( p_vout, "aspect-ratio", &old_val );
