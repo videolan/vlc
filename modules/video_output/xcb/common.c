@@ -86,14 +86,12 @@ static xcb_connection_t *Connect (vlc_object_t *obj, const char *display)
 
 /**
  * Create a VLC video X window object, connect to the corresponding X server,
- * find the corresponding X server screen,
- * and probe the MIT-SHM extension.
+ * find the corresponding X server screen.
  */
 vout_window_t *GetWindow (vout_display_t *vd,
                           xcb_connection_t **restrict pconn,
                           const xcb_screen_t **restrict pscreen,
-                          uint8_t *restrict pdepth,
-                          bool *restrict pshm)
+                          uint8_t *restrict pdepth)
 {
     /* Get window */
     xcb_window_t root;
@@ -166,27 +164,8 @@ vout_window_t *GetWindow (vout_display_t *vd,
     }
     msg_Dbg (vd, "using screen 0x%"PRIx32, root);
 
-    /* Check MIT-SHM shared memory support */
-    bool shm = var_CreateGetBool (vd, "x11-shm") > 0;
-    if (shm)
-    {
-        xcb_shm_query_version_cookie_t ck;
-        xcb_shm_query_version_reply_t *r;
-
-        ck = xcb_shm_query_version (conn);
-        r = xcb_shm_query_version_reply (conn, ck, NULL);
-        if (!r)
-        {
-            msg_Err (vd, "shared memory (MIT-SHM) not available");
-            msg_Warn (vd, "display will be slow");
-            shm = false;
-        }
-        free (r);
-    }
-
     *pconn = conn;
     *pscreen = screen;
-    *pshm = shm;
     return wnd;
 
 error:
@@ -211,6 +190,28 @@ int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
     *height = geo->height;
     free (geo);
     return 0;
+}
+
+/** Check MIT-SHM shared memory support */
+void CheckSHM (vlc_object_t *obj, xcb_connection_t *conn, bool *restrict pshm)
+{
+    bool shm = var_CreateGetBool (obj, "x11-shm") > 0;
+    if (shm)
+    {
+        xcb_shm_query_version_cookie_t ck;
+        xcb_shm_query_version_reply_t *r;
+
+        ck = xcb_shm_query_version (conn);
+        r = xcb_shm_query_version_reply (conn, ck, NULL);
+        if (!r)
+        {
+            msg_Err (obj, "shared memory (MIT-SHM) not available");
+            msg_Warn (obj, "display will be slow");
+            shm = false;
+        }
+        free (r);
+    }
+    *pshm = shm;
 }
 
 /**

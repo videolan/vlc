@@ -41,10 +41,10 @@ int ProcessKeyEvent (key_handler_t *, xcb_generic_event_t *);
 struct vout_window_t *GetWindow (vout_display_t *obj,
                                  xcb_connection_t **restrict pconn,
                                  const xcb_screen_t **restrict pscreen,
-                                 uint8_t *restrict pdepth,
-                                 bool *restrict pshm);
+                                 uint8_t *restrict pdepth);
 int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
                    unsigned *restrict width, unsigned *restrict height);
+void CheckSHM (vlc_object_t *obj, xcb_connection_t *conn, bool *restrict pshm);
 xcb_cursor_t CreateBlankCursor (xcb_connection_t *, const xcb_screen_t *);
 
 int CheckError (vout_display_t *, xcb_connection_t *conn,

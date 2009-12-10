@@ -105,8 +105,7 @@ static int Open (vlc_object_t *obj)
 
     /* Get window, connect to X server */
     const xcb_screen_t *scr;
-    p_sys->embed = GetWindow (vd, &p_sys->conn, &scr, &p_sys->depth,
-                              &p_sys->shm);
+    p_sys->embed = GetWindow (vd, &p_sys->conn, &scr, &p_sys->depth);
     if (p_sys->embed == NULL)
     {
         free (p_sys);
@@ -271,6 +270,8 @@ static int Open (vlc_object_t *obj)
     p_sys->cursor = CreateBlankCursor (p_sys->conn, scr);
 
     p_sys->visible = false;
+
+    CheckSHM (obj, p_sys->conn, &p_sys->shm);
 
     /* */
     vout_display_info_t info = vd->info;
