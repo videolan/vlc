@@ -82,7 +82,7 @@
                                             [NSDictionary dictionaryWithObjectsAndKeys:
                                                 @"mp4", @"muxer",
                                                 @"file", @"access",
-                                                [filePath copy], @"destination", nil
+                                                [[filePath copy] autorelease], @"destination", nil
                                             ], @"outputOptions",
                                             nil
                                             ]
@@ -102,7 +102,7 @@
                                             [NSDictionary dictionaryWithObjectsAndKeys:
                                                 @"mp4", @"muxer",
                                                 @"file", @"access",
-                                                [filePath copy], @"destination", nil
+                                                [[filePath copy] autorelease], @"destination", nil
                                             ], @"outputOptions",
                                             nil
                                             ]
@@ -115,7 +115,7 @@
                                             [NSDictionary dictionaryWithObjectsAndKeys:
                                                 @"ps", @"muxer",
                                                 @"file", @"access",
-                                                [filePath copy], @"destination", nil
+                                                [[filePath copy] autorelease], @"destination", nil
                                             ], @"outputOptions",
                                             nil
                                             ]
@@ -136,7 +136,7 @@
                                             [NSDictionary dictionaryWithObjectsAndKeys:
                                                 @"mpeg", @"muxer",
                                                 @"file", @"access",
-                                                [filePath copy], @"destination", nil
+                                                [[filePath copy] autorelease], @"destination", nil
                                             ], @"outputOptions",
                                             nil
                                             ]
