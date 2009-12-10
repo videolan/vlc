@@ -37,8 +37,8 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 633BD6EC0D2ADF460012A314 /* Build configuration list for PBXAggregateTarget "vlc-contrib" */;
 			buildPhases = (
-				633BD6E30D2ADF030012A314 /* ShellScript */,
-				633BD6EB0D2ADF280012A314 /* ShellScript */,
+				633BD6E30D2ADF030012A314 /* bootstrap */,
+				633BD6EB0D2ADF280012A314 /* make bin */,
 			);
 			dependencies = (
 			);
@@ -49,8 +49,8 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 63FFDBD50D2AE3250092FC96 /* Build configuration list for PBXAggregateTarget "vlc-configure" */;
 			buildPhases = (
-				631A90420D5A007D0014A2CE /* ShellScript */,
-				63FFDBCD0D2AE2AE0092FC96 /* ShellScript */,
+				631A90420D5A007D0014A2CE /* bootstrap */,
+				63FFDBCD0D2AE2AE0092FC96 /* configure */,
 			);
 			dependencies = (
 			);
@@ -459,7 +459,7 @@
 /* End PBXResourcesBuildPhase section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		631A90420D5A007D0014A2CE /* ShellScript */ = {
+		631A90420D5A007D0014A2CE /* bootstrap */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -467,6 +467,7 @@
 			inputPaths = (
 				"$(SRCROOT)/../../../bootstrap",
 			);
+			name = bootstrap;
 			outputPaths = (
 				"$(SRCROOT)/../../../configure",
 			);
@@ -475,7 +476,7 @@
 			shellScript = "top_srcdir=`pwd`/../../..\n\nif test $ACTION = \"clean\"\nthen\n    exit 0\nfi\n\ncd $top_srcdir && ./bootstrap\n";
 			showEnvVarsInLog = 0;
 		};
-		633BD6E30D2ADF030012A314 /* ShellScript */ = {
+		633BD6E30D2ADF030012A314 /* bootstrap */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -483,6 +484,7 @@
 			inputPaths = (
 				$SRCROOT/../../../extras/contrib/bootstrap,
 			);
+			name = bootstrap;
 			outputPaths = (
 				$SRCROOT/../../../extras/contrib/config.mak,
 			);
@@ -491,13 +493,14 @@
 			shellScript = "if test $ACTION = \"clean\"\nthen\n    cd ../../../extras/contrib && make clean\n    exit 0\nfi\nif test $ARCHS = \"x86_64\"\nthen\n    cd ../../../extras/contrib && ./bootstrap x86_64-apple-darwin10\nelse\n    cd ../../../extras/contrib && ./bootstrap\nfi";
 			showEnvVarsInLog = 0;
 		};
-		633BD6EB0D2ADF280012A314 /* ShellScript */ = {
+		633BD6EB0D2ADF280012A314 /* make bin */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = "make bin";
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -505,18 +508,19 @@
 			shellScript = "if test \"$ACTION\" = \"clean\"; then\n    exit 0\nfi\nif test \"$ARCHS\" = \"x86_64\"; then\n    cd ../../../extras/contrib && make && ./bootstrap\nelse\n    cd ../../../extras/contrib && make\nfi";
 			showEnvVarsInLog = 0;
 		};
-		63FFDBCD0D2AE2AE0092FC96 /* ShellScript */ = {
+		63FFDBCD0D2AE2AE0092FC96 /* configure */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
 			);
 			inputPaths = (
 			);
+			name = configure;
 			outputPaths = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test \"$ACTION\" = \"clean\"; then\n    rm -Rf $SYMROOT/vlc_build_dir\n    exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir\nCFLAGS=\"-arch $ARCHS\" CXXFLAGS=\"-arch $ARCHS\" CPPFLAGS=\"-arch $ARCHS\" OBJCFLAGS=\"-arch $ARCHS\" $top_srcdir/configure --disable-nls --enable-debug --with-macosx-sdk=$SDKROOT\n";
+			shellScript = "if test \"$ACTION\" = \"clean\"; then\n    rm -Rf $SYMROOT/vlc_build_dir\n    exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir\n\necho \"Building for $ARCHS with sdk=\\\"$SDKROOT\\\"\"\nargs=\"--enable-faad\"\nargs=\"--enable-flac $args\"\nargs=\"--enable-theora $args\"\nargs=\"--enable-shout $args\"\nargs=\"--enable-cddax $args\"\nargs=\"--enable-caca $args\"\nargs=\"--enable-vcdx $args\"\nargs=\"--enable-ncurses $args\"\nargs=\"--enable-twolame $args\"\nargs=\"--enable-realrtsp $args\"\nargs=\"--enable-libass $args\"\nargs=\"--enable-asademux $args\"\nargs=\"--disable-skins2 $args\"\nargs=\"--disable-x11 $args\"\nargs=\"--disable-glx $args\"\nargs=\"--disable-xvideo $args\"\nargs=\"--disable-xcb $args\"\nargs=\"--with-macosx-version-min=10.5 $args\"\nargs=\"--with-macosx-sdk=$SDKROOT $args\"\nargs=\"--enable-macosx $args\"\nargs=\"--enable-debug $args\"\nargs=\"--disable-nls $args\"\nargs=\"--disable-macosx-defaults $args\"\nargs=\"--prefix=$SYMROOT/vlc_build_dir/vlc_install_dir $args\"\n\nif test $ARCHS = \"x86_64\"\nthen\n\targs=\"--disable-sdl --disable-sdl-image --build=x86_64-apple-darwin10 $args\"\nfi\n\necho \"Running configure $args\"\nCFLAGS=\"-arch $ARCHS\" CXXFLAGS=\"-arch $ARCHS\" CPPFLAGS=\"-arch $ARCHS\" OBJCFLAGS=\"-arch $ARCHS\" exec $top_srcdir/configure $args";
 			showEnvVarsInLog = 0;
 		};
 		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
