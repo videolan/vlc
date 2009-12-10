@@ -946,7 +946,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_SYSLOG_H
     if( config_GetInt( p_libvlc, "syslog" ) > 0 )
     {
-        char *logmode = var_CreateGetString( p_libvlc, "logmode" );
+        char *logmode = var_CreateGetNonEmptyString( p_libvlc, "logmode" );
         var_SetString( p_libvlc, "logmode", "syslog" );
         intf_Create( p_libvlc, "logger,none" );
 
@@ -955,8 +955,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             var_SetString( p_libvlc, "logmode", logmode );
             free( logmode );
         }
-        else
-            var_Destroy( p_libvlc, "logmode" );
+        var_Destroy( p_libvlc, "logmode" );
     }
 #endif
 
