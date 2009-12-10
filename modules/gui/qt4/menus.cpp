@@ -1437,8 +1437,8 @@ void QVLCMenu::updateRecents( intf_thread_t *p_intf )
             {
                 action = recentsMenu->addAction(
                         QString( "&%1: " ).arg( i + 1 ) + l.at( i ),
-                        rmrl->signalMapper,
-                        SLOT( map() ) );
+                        rmrl->signalMapper, SLOT( map() ),
+                        i <= 9 ? QString( "Ctrl+%1" ).arg( i + 1 ) : "" );
                 rmrl->signalMapper->setMapping( action, l.at( i ) );
             }
 
