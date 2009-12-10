@@ -65,6 +65,51 @@ static xcb_connection_t *Connect (vlc_object_t *obj, const char *display)
     return conn;
 }
 
+/**
+ * Find screen matching a given root window.
+ */
+static const xcb_screen_t *FindScreen (vlc_object_t *obj,
+                                       xcb_connection_t *conn,
+                                       xcb_window_t root)
+{
+    /* Find the selected screen */
+    const xcb_setup_t *setup = xcb_get_setup (conn);
+    const xcb_screen_t *screen = NULL;
+    for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);
+         i.rem > 0 && screen == NULL; xcb_screen_next (&i))
+    {
+        if (i.data->root == root)
+            screen = i.data;
+    }
+
+    if (screen == NULL)
+    {
+        msg_Err (obj, "parent window screen not found");
+        return NULL;
+    }
+    msg_Dbg (obj, "using screen 0x%"PRIx32, root);
+    return screen;
+}
+
+static const xcb_screen_t *FindWindow (vlc_object_t *obj,
+                                       xcb_connection_t *conn,
+                                       xcb_window_t xid,
+                                       uint8_t *restrict pdepth)
+{
+    xcb_get_geometry_reply_t *geo =
+        xcb_get_geometry_reply (conn, xcb_get_geometry (conn, xid), NULL);
+    if (geo == NULL)
+    {
+        msg_Err (obj, "parent window not valid");
+        return NULL;
+    }
+
+    const xcb_screen_t *screen = FindScreen (obj, conn, geo->root);
+    *pdepth = geo->depth;
+    free (geo);
+    return screen;
+}
+
 
 /**
  * Create a VLC video X window object, connect to the corresponding X server,
@@ -76,7 +121,6 @@ vout_window_t *GetWindow (vout_display_t *vd,
                           uint8_t *restrict pdepth)
 {
     /* Get window */
-    xcb_window_t root;
     vout_window_cfg_t wnd_cfg;
 
     memset( &wnd_cfg, 0, sizeof(wnd_cfg) );
@@ -93,65 +137,20 @@ vout_window_t *GetWindow (vout_display_t *vd,
 
     xcb_connection_t *conn = Connect (VLC_OBJECT(vd), wnd->x11_display);
     if (conn == NULL)
-    {
-        vout_display_DeleteWindow (vd, wnd);
-        return NULL;
-    }
-    else
-    {
-        xcb_get_geometry_reply_t *geo;
-        xcb_get_geometry_cookie_t ck;
+        goto error;
+    *pconn = conn;
 
-        ck = xcb_get_geometry (conn, wnd->xid);
-        geo = xcb_get_geometry_reply (conn, ck, NULL);
-        if (geo == NULL)
-        {
-            msg_Err (vd, "parent window not valid");
-            goto error;
-        }
-        root = geo->root;
-        *pdepth = geo->depth;
-        free (geo);
-
-        /* Subscribe to parent window resize events */
-        uint32_t value = XCB_EVENT_MASK_POINTER_MOTION
-                       | XCB_EVENT_MASK_STRUCTURE_NOTIFY;
-        xcb_change_window_attributes (conn, wnd->xid,
-                                      XCB_CW_EVENT_MASK, &value);
-        /* Try to subscribe to click events */
-        /* (only one X11 client can get them, so might not work) */
-        if (var_CreateGetBool (vd, "mouse-events"))
-        {
-            value |= XCB_EVENT_MASK_BUTTON_PRESS
-                   | XCB_EVENT_MASK_BUTTON_RELEASE;
-            xcb_change_window_attributes (conn, wnd->xid,
-                                          XCB_CW_EVENT_MASK, &value);
-        }
-    }
-
-    /* Find the selected screen */
-    const xcb_setup_t *setup = xcb_get_setup (conn);
-    const xcb_screen_t *screen = NULL;
-    for (xcb_screen_iterator_t i = xcb_setup_roots_iterator (setup);
-         i.rem > 0 && screen == NULL; xcb_screen_next (&i))
+    *pscreen = FindWindow (VLC_OBJECT(vd), conn, wnd->xid, pdepth);
+    if (*pscreen == NULL)
     {
-        if (i.data->root == root)
-            screen = i.data;
-    }
-
-    if (screen == NULL)
-    {
-        msg_Err (vd, "parent window screen not found");
+        xcb_disconnect (conn);
         goto error;
     }
-    msg_Dbg (vd, "using screen 0x%"PRIx32, root);
 
-    *pconn = conn;
-    *pscreen = screen;
+    RegisterMouseEvents (VLC_OBJECT(vd), conn, wnd->xid);
     return wnd;
 
 error:
-    xcb_disconnect (conn);
     vout_display_DeleteWindow (vd, wnd);
     return NULL;
 }

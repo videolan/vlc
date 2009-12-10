@@ -91,6 +91,28 @@ xcb_cursor_t CreateBlankCursor (xcb_connection_t *conn,
     return cur;
 }
 
+/**
+ * (Try to) register to mouse events on a window if needed.
+ */
+void RegisterMouseEvents (vlc_object_t *obj, xcb_connection_t *conn,
+                          xcb_window_t wnd)
+{
+    /* Subscribe to parent window resize events */
+    uint32_t value = XCB_EVENT_MASK_POINTER_MOTION
+                   | XCB_EVENT_MASK_STRUCTURE_NOTIFY;
+    xcb_change_window_attributes (conn, wnd, XCB_CW_EVENT_MASK, &value);
+    /* Try to subscribe to click events */
+    /* (only one X11 client can get them, so might not work) */
+    if (var_CreateGetBool (obj, "mouse-events"))
+    {
+        value |= XCB_EVENT_MASK_BUTTON_PRESS
+               | XCB_EVENT_MASK_BUTTON_RELEASE;
+        xcb_change_window_attributes (conn, wnd,
+                                      XCB_CW_EVENT_MASK, &value);
+    }
+    var_Destroy (obj, "mouse-events");
+}
+
 /* NOTE: we assume no other thread will be _setting_ our video output events
  * variables. Afterall, only this plugin is supposed to know when these occur.
   * Otherwise, we'd var_OrInteger() and var_NandInteger() functions...
