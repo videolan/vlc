@@ -211,7 +211,7 @@ void VoutManager::releaseWnd( vout_window_t *pWnd )
     {
         if( (*it).pWnd == pWnd )
         {
-            msg_Dbg( getIntf(), "vout released vout=0x%p, VideoCtrl=0x%p",
+            msg_Dbg( getIntf(), "vout released vout=%p, VideoCtrl=%p",
                              pWnd, (*it).pCtrlVideo );
 
             // if a video control was being used, detach from it
