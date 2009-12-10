@@ -502,7 +502,6 @@ static int Open (vlc_object_t *obj)
     p_sys->cursor = CreateBlankCursor (conn, screen);
 
     /* */
-    p_sys->pool = NULL;
 
     /* */
     vout_display_info_t info = vd->info;
