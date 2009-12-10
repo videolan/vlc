@@ -710,6 +710,7 @@ class JavaGenerator(object):
         'libvlc_media_list_t*': 'LibVlcMediaList',
         'libvlc_media_list_player_t*': 'LibVlcMediaListPlayer',
         'libvlc_media_list_view_t*': 'LibVlcMediaListView',
+        'libvlc_media_stats_t*': 'LibVlcMediaStats',
 
         'libvlc_track_description_t*': 'LibVlcTrackDescription',
         'libvlc_audio_output_t*': 'LibVlcAudioOutput',
