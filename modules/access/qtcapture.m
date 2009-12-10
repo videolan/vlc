@@ -170,9 +170,9 @@ static int qtchroma_to_fourcc( int i_qt )
     } qtchroma_to_fourcc[] =
     {
         /* Raw data types */
-        { k422YpCbCr8CodecType,    VLC_CODEC_UYVY },
-        { kComponentVideoCodecType,VLC_CODEC_YUYV },
-        { kComponentVideoUnsigned, VLC_CODEC_YUYV },
+        { '2vuy',    VLC_CODEC_UYVY },
+        { 'yuv2',VLC_CODEC_YUYV },
+        { 'yuvs', VLC_CODEC_YUYV },
         { 0, 0 }
     };
     int i;
@@ -255,12 +255,12 @@ static int Open( vlc_object_t *p_this )
     /* Get the formats */
     NSArray *format_array = [p_sys->device formatDescriptions];
     QTFormatDescription* camera_format = NULL;
-    for( int k=0; k < [format_array count]; k++ )
+    for( int k = 0; k < [format_array count]; k++ )
     {
         camera_format = [format_array objectAtIndex: k];
 
-        NSLog( [camera_format localizedFormatSummary] );
-        NSLog( [[camera_format formatDescriptionAttributes] description] );
+        NSLog( @"%@", [camera_format localizedFormatSummary] );
+        NSLog( @"%@",[[camera_format formatDescriptionAttributes] description] );
     }
     if( [format_array count] )
         camera_format = [format_array objectAtIndex: 0];
