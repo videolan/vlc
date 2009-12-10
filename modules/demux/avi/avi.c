@@ -280,6 +280,7 @@ static int Open( vlc_object_t * p_this )
     if( AVI_ChunkReadRoot( p_demux->s, &p_sys->ck_root ) )
     {
         msg_Err( p_demux, "avi module discarded (invalid file)" );
+        free(p_sys);
         return VLC_EGENERIC;
     }
 
