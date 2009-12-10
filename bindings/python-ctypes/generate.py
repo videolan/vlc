@@ -854,7 +854,11 @@ public enum %s
             # FIXME: write comment
 
             for k, v in values:
-                self.output(fd, "        %s, // %s," % (k, v))
+                self.output(fd, "        %s (%s)," % (k, v))
+            self.output(fd, "");
+            self.output(fd, "        private final int _value;");
+            self.output(fd, "        %s(int value) { this._value = value; }" % javaname);
+            self.output(fd, "        public int value() { return this._value; }");
             self.output(fd, "}")
             fd.close()
 
