@@ -77,7 +77,7 @@
     sfm.mChannelsPerFrame, sfm.mBitsPerChannel
 
 #define FRAMESIZE 2048
-#define BUFSIZE 0xffffff
+#define BUFSIZE (FRAMESIZE * 8)
 #define AOUT_VAR_SPDIF_FLAG 0xf00000
 
 /*
@@ -1359,6 +1359,8 @@ static OSStatus RenderCallbackAnalog( vlc_object_t *_p_aout,
                 vlc_memcpy( p_sys->p_remainder_buffer,
                             &p_buffer->p_buffer[i_second_mData_bytes],
                             p_sys->i_total_bytes );
+                aout_BufferFree( p_buffer );
+                break;
             }
             else
             {
