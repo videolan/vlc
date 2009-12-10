@@ -475,12 +475,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     module_list_free( list );
     msg_Dbg( p_libvlc, "module bank initialized (%zu modules)", module_count );
 
-    if( module_count <= 1)
-    {
-        msg_Err( p_libvlc, "No modules were found, refusing to start. Check "
-                           "that you properly gave a module path with --plugin-path.");
-        abort();
-    }
     /* Check for help on modules */
     if( (p_tmp = var_CreateGetNonEmptyString( p_libvlc, "module" )) )
     {
@@ -534,6 +528,14 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
             config_SaveConfigFile( p_libvlc, NULL );
         }
+    }
+
+    if( module_count <= 1)
+    {
+        msg_Err( p_libvlc, "No modules were found, refusing to start. Check "
+                "that you properly gave a module path with --plugin-path.");
+        b_exit = true;
+        i_ret = VLC_ENOITEM;
     }
 
     if( b_exit )
