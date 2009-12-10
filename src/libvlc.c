@@ -1008,8 +1008,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Get --open argument
      */
-    psz_val = var_CreateGetString( p_libvlc, "open" );
-    if ( psz_val != NULL && *psz_val )
+    psz_val = var_CreateGetNonEmptyString( p_libvlc, "open" );
+    if ( psz_val != NULL )
     {
         playlist_t *p_playlist = pl_Hold( p_libvlc );
         playlist_AddExt( p_playlist, psz_val, NULL, PLAYLIST_INSERT, 0,
