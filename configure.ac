@@ -3733,6 +3733,17 @@ AS_IF([test "${enable_xcb}" != "no"], [
   VLC_ADD_PLUGIN([xdg_screensaver])
 ])
 
+AC_ARG_ENABLE(glx,
+  [  --enable-glx            X11 OpenGL (GLX) support (default enabled)],, [
+  enable_glx="$enable_xcb"
+])
+AS_IF([test "${enable_glx}" != "no"], [
+  PKG_CHECK_MODULES(XLIB_XCB, [x11-xcb])
+  PKG_CHECK_MODULES(GLU, [glu])
+
+  VLC_ADD_PLUGIN([xcb_glx])
+])
+
 
 dnl
 dnl  OpenGL module
