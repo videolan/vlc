@@ -49,29 +49,6 @@ void __catch_exception( void * e, const char * function, const char * file, int 
     }
 }
 
-void * CreateSharedLibraryOnStartup( void ) 
-{
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-    
-    /* This library is not loaded for no reason, so let's create
-     * a VLCLibrary instance. */
-    [VLCLibrary sharedLibrary];
-    
-    [pool release];
-    
-    return NULL;
-}
-
-void * DestroySharedLibraryAtExit( void )
-{
-    /* Release the global object that may have been alloc-ed
-     * in -[VLCLibrary init] */
-    [sharedLibrary release];
-    sharedLibrary = nil;
-
-    return NULL;
-}
-
 @implementation VLCLibrary
 + (VLCLibrary *)sharedLibrary
 {
