@@ -421,6 +421,7 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                     FREENULL( psz_ct );
                     FREENULL( psz_lc );
                     FREENULL( psz_rt );
+                    FREENULL( psz_load );
                 }
                 free( psz_eltname );
                 break;
