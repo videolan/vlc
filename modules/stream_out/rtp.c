@@ -129,6 +129,11 @@
     "This sends and receives RTCP packet multiplexed over the same port " \
     "as RTP packets." )
 
+#define CACHING_TEXT N_("Caching value (ms)")
+#define CACHING_LONGTEXT N_( \
+    "Default caching value for outbound RTP streams. This " \
+    "value should be set in milliseconds." )
+
 #define PROTO_TEXT N_("Transport protocol")
 #define PROTO_LONGTEXT N_( \
     "This selects which transport protocol to use for RTP." )
@@ -202,6 +207,8 @@ vlc_module_begin ()
                  TTL_LONGTEXT, true )
     add_bool( SOUT_CFG_PREFIX "rtcp-mux", false, NULL,
               RTCP_MUX_TEXT, RTCP_MUX_LONGTEXT, false )
+    add_integer( SOUT_CFG_PREFIX "caching", DEFAULT_PTS_DELAY / 1000, NULL,
+                 CACHING_TEXT, CACHING_LONGTEXT, true )
 
 #ifdef HAVE_SRTP
     add_string( SOUT_CFG_PREFIX "key", "", NULL,
@@ -222,7 +229,7 @@ vlc_module_end ()
 static const char *const ppsz_sout_options[] = {
     "dst", "name", "port", "port-audio", "port-video", "*sdp", "ttl", "mux",
     "sap", "description", "url", "email", "phone",
-    "proto", "rtcp-mux", "key", "salt",
+    "proto", "rtcp-mux", "caching", "key", "salt",
     "mp4a-latm", NULL
 };
 
