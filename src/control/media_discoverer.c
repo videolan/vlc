@@ -100,6 +100,8 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
     libvlc_media_list_lock( p_mlist );
     _libvlc_media_list_add_media( p_mlist, p_md, NULL );
     libvlc_media_list_unlock( p_mlist );
+
+    libvlc_media_release( p_md );
 }
 
 /**************************************************************************
