@@ -113,7 +113,8 @@ typedef enum VLCMediaState
     VLCTime *             length;            //< Cached duration of the media
     NSMutableDictionary * metaDictionary;    //< Meta data storage
     id                    delegate;          //< Delegate object
-    BOOL                  artFetched;        //< Value used to determine of the artwork has been preparsed
+    BOOL                  isArtFetched;      //< Value used to determine of the artwork has been preparsed
+    BOOL                  areOthersMetaFetched; //< Value used to determine of the other meta has been preparsed
     VLCMediaState         state;             //< Current state of the media
 }
 
