@@ -43,6 +43,7 @@ SOURCES_access_oss = oss.c
 SOURCES_access_mtp = mtp.c
 SOURCES_access_sftp = sftp.c
 SOURCES_access_imem = imem.c
+SOURCES_access_avio = avio.c avio.h
 
 libaccess_rtmp_plugin_la_SOURCES = \
         rtmp/access.c \

@@ -223,7 +223,7 @@ case "${host_os}" in
     VLC_ADD_LDFLAGS([mkv mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([vlc],[-Wl,-undefined,dynamic_lookup])
     VLC_ADD_LDFLAGS([libvlc],[-Wl,-undefined,dynamic_lookup])
-    VLC_ADD_LDFLAGS([avcodec avformat swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
+    VLC_ADD_LDFLAGS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
     VLC_ADD_LDFLAGS([libvlccore],[-Wl,-framework,CoreFoundation])
     VLC_ADD_LDFLAGS([motion],[-Wl,-framework,IOKit,-framework,CoreFoundation])
@@ -730,7 +730,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LIBS([avcodec avformat swscale postproc ffmpegaltivec i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realaudio realvideo opengl],[-lm])
+  VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc ffmpegaltivec i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realaudio realvideo opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LIBS([headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract],[-lm])
@@ -3043,6 +3043,10 @@ then
         VLC_ADD_PLUGIN([avformat])
         VLC_ADD_LIBS([avformat],[$AVFORMAT_LIBS $AVUTIL_LIBS])
         VLC_ADD_CFLAGS([avformat],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
+
+        VLC_ADD_PLUGIN([access_avio])
+        VLC_ADD_LIBS([access_avio],[$AVFORMAT_LIBS $AVUTIL_LIBS])
+        VLC_ADD_CFLAGS([access_avio],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
       ], [
         VLC_ADD_LIBS([avcodec],[$AVFORMAT_LIBS $AVUTIL_LIBS])
         VLC_ADD_CFLAGS([avcodec],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])

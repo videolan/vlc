@@ -22,7 +22,8 @@ libavcodec_plugin_la_DEPENDENCIES =
 
 if MERGE_FFMPEG
 libavcodec_plugin_la_SOURCES += \
-	../../demux/avformat/demux.c
+	../../demux/avformat/demux.c \
+	../../access/avio.c
 if ENABLE_SOUT
 libavcodec_plugin_la_SOURCES += \
 	../../demux/avformat/mux.c
