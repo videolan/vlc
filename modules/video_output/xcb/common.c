@@ -39,24 +39,6 @@
 #include "xcb_vlc.h"
 
 /**
- * Check for an error
- */
-int CheckError (vout_display_t *vd, xcb_connection_t *conn,
-                const char *str, xcb_void_cookie_t ck)
-{
-    xcb_generic_error_t *err;
-
-    err = xcb_request_check (conn, ck);
-    if (err)
-    {
-        msg_Err (vd, "%s: X11 error %d", str, err->error_code);
-        free (err);
-        return VLC_EGENERIC;
-    }
-    return VLC_SUCCESS;
-}
-
-/**
  * Connect to the X server.
  */
 static xcb_connection_t *Connect (vlc_object_t *obj, const char *display)
@@ -174,24 +156,6 @@ error:
     return NULL;
 }
 
-/**
- * Gets the size of an X window.
- */
-int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
-                   unsigned *restrict width, unsigned *restrict height)
-{
-    xcb_get_geometry_cookie_t ck = xcb_get_geometry (conn, wnd->xid);
-    xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply (conn, ck, NULL);
-
-    if (!geo)
-        return -1;
-
-    *width = geo->width;
-    *height = geo->height;
-    free (geo);
-    return 0;
-}
-
 /** Check MIT-SHM shared memory support */
 void CheckSHM (vlc_object_t *obj, xcb_connection_t *conn, bool *restrict pshm)
 {
@@ -212,24 +176,6 @@ void CheckSHM (vlc_object_t *obj, xcb_connection_t *conn, bool *restrict pshm)
         free (r);
     }
     *pshm = shm;
-}
-
-/**
- * Create a blank cursor.
- * Note that the pixmaps are leaked (until the X disconnection). Hence, this
- * function should be called no more than once per X connection.
- * @param conn XCB connection
- * @param scr target XCB screen
- */
-xcb_cursor_t CreateBlankCursor (xcb_connection_t *conn,
-                                const xcb_screen_t *scr)
-{
-    xcb_cursor_t cur = xcb_generate_id (conn);
-    xcb_pixmap_t pix = xcb_generate_id (conn);
-
-    xcb_create_pixmap (conn, 1, pix, scr->root, 1, 1);
-    xcb_create_cursor (conn, cur, pix, pix, 0, 0, 0, 1, 1, 1, 0, 0);
-    return cur;
 }
 
 /**
