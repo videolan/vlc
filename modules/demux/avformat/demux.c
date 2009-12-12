@@ -121,7 +121,9 @@ int OpenDemux( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    vlc_avcodec_lock();
     av_register_all(); /* Can be called several times */
+    vlc_avcodec_unlock();
 
     /* Guess format */
     if( !( fmt = av_probe_input_format( &pd, 1 ) ) )
