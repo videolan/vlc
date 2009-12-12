@@ -38,7 +38,7 @@
 #include "recents.hpp"          /* Recents Item destruction */
 #include "util/qvlcapp.hpp"     /* QVLCApplication definition */
 
-#ifdef HAVE_X11_XLIB_H
+#ifdef Q_WS_X11
  #include <X11/Xlib.h>
 #endif
 

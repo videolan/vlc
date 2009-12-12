@@ -269,8 +269,6 @@ case "${host_os}" in
 
         enable_skins2="no"
         echo "  Assuming --disable-skins2"
-        enable_x11="no"
-        echo "  Assuming --disable-x11"
         enable_xcb="no"
         echo "  Assuming --disable-xcb"
     fi
@@ -3609,24 +3607,6 @@ dnl  Xlib
 dnl
 
 AC_PATH_XTRA()
-AC_ARG_ENABLE(x11,
-  [  --enable-x11            X11 support with Xlib (default enabled)],, [
-  AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"], [
-    enable_x11="yes"
-  ], [
-    enable_x11="no"
-  ])
-])
-
-CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
-
-AS_IF([test "${enable_x11}" != "no"], [
-  AC_CHECK_HEADERS(X11/Xlib.h)
-])
-
-dnl End of Xlib tests
-CPPFLAGS="${CPPFLAGS_save}"
-
 
 dnl
 dnl  X C Bindings modules
