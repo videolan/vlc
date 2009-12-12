@@ -3684,10 +3684,18 @@ AC_ARG_ENABLE(glx,
 ])
 AS_IF([test "${enable_glx}" != "no"], [
   PKG_CHECK_MODULES(XLIB_XCB, [x11-xcb])
-  PKG_CHECK_MODULES(GL, [gl])
-
+  PKG_CHECK_MODULES(GL, [gl],, [
+    AC_CHECK_HEADER([GL/gl.h], [
+      GL_CFLAGS=""
+      GL_LIBS="-lGL"
+    ], [
+      AC_MSG_ERROR([GLX (libGL) cannot be found. If you do not need OpenGL with X11, use --disable-glx.])
+    ])
+  ])
   VLC_ADD_PLUGIN([xcb_glx])
 ])
+AC_SUBST([GL_CFLAGS])
+AC_SUBST([GL_LIBS])
 
 
 dnl
