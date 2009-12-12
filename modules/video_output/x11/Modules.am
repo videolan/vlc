@@ -1,5 +1,0 @@
-SOURCES_glx = \
-	glx.c \
-	xcommon.c \
-	xcommon.h \
-	$(NULL)

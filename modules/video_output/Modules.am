@@ -1,4 +1,4 @@
-SUBDIRS = msw qte x11
+SUBDIRS = msw qte
 # Automake forgets to add a proper tag to libtool with Objective-C files.
 # Moreocer Libtool should default tag to CC when none is specified but
 # obviously does not. Here is a fix for that.

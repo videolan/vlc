@@ -3642,27 +3642,6 @@ dnl Check for DPMS
   ])
 ])
 
-dnl
-dnl  GLX module
-dnl  (enabled by default except on win32)
-dnl
-AC_ARG_ENABLE(glx,
-  [  --enable-glx            X11 OpenGL (GLX) support (default enabled)],, [
-  enable_glx="$enable_x11"
-])
-AS_IF([test "${enable_glx}" != "no"], [
-  AC_CHECK_HEADERS(X11/Xlib.h GL/glu.h GL/glx.h)
-  AC_COMPILE_IFELSE(AC_LANG_PROGRAM(
-    [[#if !defined(HAVE_X11_XLIB_H) || !defined(HAVE_GL_GLU_H) || !defined(HAVE_GL_GLX_H)
-    choke me
-    #endif]]),
-    [
-      VLC_ADD_PLUGIN([glx])
-      VLC_ADD_LIBS([glx],[${X_LIBS} ${X_PRE_LIBS} -lX11 -lXext -lGL -lGLU])
-      VLC_ADD_CPPFLAGS([glx],[${X_CFLAGS}])
-    ],[AC_MSG_ERROR([Please install GL development package. Alternatively you can also configure with --disable-glx.])])
-])
-
 dnl End of Xlib tests
 CPPFLAGS="${CPPFLAGS_save}"
 
@@ -5338,7 +5317,6 @@ AC_CONFIG_FILES([
   modules/video_output/Makefile
   modules/video_output/msw/Makefile
   modules/video_output/qte/Makefile
-  modules/video_output/x11/Makefile
   modules/visualization/Makefile
   modules/visualization/visual/Makefile
 ])
