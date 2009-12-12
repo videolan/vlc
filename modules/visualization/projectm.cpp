@@ -70,12 +70,12 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-typedef struct
+struct filter_sys_t
 {
-    VLC_COMMON_MEMBERS
-
     /* */
-    vlc_sem_t ready;
+    vlc_thread_t thread;
+    vlc_sem_t    ready;
+    bool         b_error;
 
     /* video output module and opengl provider */
     vout_thread_t *p_opengl;
@@ -91,22 +91,16 @@ typedef struct
 
     /* audio info */
     int i_channels;
+
+    vlc_mutex_t lock;
     float *p_buffer;
     int   i_buffer_size;
     int   i_nb_samples;
-
-    vlc_mutex_t lock;
-} projectm_thread_t;
-
-
-struct filter_sys_t
-{
-    projectm_thread_t *p_thread;
 };
 
 
 static block_t *DoWork( filter_t *, block_t * );
-static void* Thread( vlc_object_t * );
+static void *Thread( void * );
 
 
 /**
@@ -114,38 +108,40 @@ static void* Thread( vlc_object_t * );
  * p_thread: projectm thread object
  * @return VLC_SUCCESS or vlc error codes
  */
-static int initOpenGL( projectm_thread_t *p_thread )
+static int initOpenGL( filter_t *p_filter )
 {
-    p_thread->p_opengl = (vout_thread_t *)vlc_object_create( p_thread,
-                                                    sizeof( vout_thread_t ) );
-    if( !p_thread->p_opengl )
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    p_sys->p_opengl =
+        (vout_thread_t *)vlc_object_create( p_filter, sizeof(vout_thread_t) );
+    if( !p_sys->p_opengl )
         return VLC_ENOMEM;
 
-    vlc_object_attach( p_thread->p_opengl, p_thread );
+    vlc_object_attach( p_sys->p_opengl, p_filter );
 
     /* Initialize the opengl object */
-    video_format_Setup( &p_thread->p_opengl->fmt_in, VLC_CODEC_RGB32,
-                        p_thread->i_width, p_thread->i_height, 1 );
-    p_thread->p_opengl->i_window_width = p_thread->i_width;
-    p_thread->p_opengl->i_window_height = p_thread->i_height;
-    p_thread->p_opengl->render.i_width = p_thread->i_width;
-    p_thread->p_opengl->render.i_height = p_thread->i_height;
-    p_thread->p_opengl->render.i_aspect = VOUT_ASPECT_FACTOR;
-    p_thread->p_opengl->b_fullscreen = false;
-    p_thread->p_opengl->b_autoscale = true;
-    p_thread->p_opengl->i_alignment = 0;
-    p_thread->p_opengl->fmt_in.i_sar_num = 1;
-    p_thread->p_opengl->fmt_in.i_sar_den = 1;
-    p_thread->p_opengl->fmt_render = p_thread->p_opengl->fmt_in;
+    video_format_Setup( &p_sys->p_opengl->fmt_in, VLC_CODEC_RGB32,
+                        p_sys->i_width, p_sys->i_height, 1 );
+    p_sys->p_opengl->i_window_width = p_sys->i_width;
+    p_sys->p_opengl->i_window_height = p_sys->i_height;
+    p_sys->p_opengl->render.i_width = p_sys->i_width;
+    p_sys->p_opengl->render.i_height = p_sys->i_height;
+    p_sys->p_opengl->render.i_aspect = VOUT_ASPECT_FACTOR;
+    p_sys->p_opengl->b_fullscreen = false;
+    p_sys->p_opengl->b_autoscale = true;
+    p_sys->p_opengl->i_alignment = 0;
+    p_sys->p_opengl->fmt_in.i_sar_num = 1;
+    p_sys->p_opengl->fmt_in.i_sar_den = 1;
+    p_sys->p_opengl->fmt_render = p_sys->p_opengl->fmt_in;
 
     /* Ask for the opengl provider */
-    p_thread->p_module = module_need( p_thread->p_opengl, "opengl provider",
-                                      NULL, false );
-    if( !p_thread->p_module )
+    p_sys->p_module = module_need( p_sys->p_opengl, "opengl provider",
+                                   NULL, false );
+    if( !p_sys->p_module )
     {
-        msg_Err( p_thread, "unable to initialize OpenGL" );
-        vlc_object_detach( p_thread->p_opengl );
-        vlc_object_release( p_thread->p_opengl );
+        msg_Err( p_filter, "unable to initialize OpenGL" );
+        vlc_object_detach( p_sys->p_opengl );
+        vlc_object_release( p_sys->p_opengl );
         return VLC_EGENERIC;
     }
 
@@ -160,9 +156,8 @@ static int initOpenGL( projectm_thread_t *p_thread )
  */
 static int Open( vlc_object_t * p_this )
 {
-    filter_t            *p_filter = (filter_t *)p_this;
-    filter_sys_t        *p_sys;
-    projectm_thread_t   *p_thread;
+    filter_t     *p_filter = (filter_t *)p_this;
+    filter_sys_t *p_sys;
 
     /* Test the audio format */
     if( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32 ||
@@ -184,37 +179,32 @@ static int Open( vlc_object_t * p_this )
         return VLC_ENOMEM;
 
     /* Create the object for the thread */
-    p_sys->p_thread = p_thread = (projectm_thread_t *)
-                    vlc_object_create( p_filter, sizeof( projectm_thread_t ) );
-    vlc_object_attach( p_sys->p_thread, p_filter );
-    vlc_sem_init( &p_thread->ready, 0 );
-    p_thread->b_error = false;
-    p_thread->i_width  = var_CreateGetInteger( p_filter, "projectm-width" );
-    p_thread->i_height = var_CreateGetInteger( p_filter, "projectm-height" );
-
-    p_thread->i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
-    p_thread->psz_config = var_CreateGetString( p_filter, "projectm-config" );
-    vlc_mutex_init( &p_thread->lock );
-    p_thread->p_buffer = NULL;
-    p_thread->i_buffer_size = 0;
-    p_thread->i_nb_samples = 0;
+    vlc_sem_init( &p_sys->ready, 0 );
+    p_sys->b_error  = false;
+    p_sys->i_width  = var_CreateGetInteger( p_filter, "projectm-width" );
+    p_sys->i_height = var_CreateGetInteger( p_filter, "projectm-height" );
+    p_sys->i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    p_sys->psz_config = var_CreateGetString( p_filter, "projectm-config" );
+    vlc_mutex_init( &p_sys->lock );
+    p_sys->p_buffer = NULL;
+    p_sys->i_buffer_size = 0;
+    p_sys->i_nb_samples = 0;
 
     /* Create the thread */
-    if( vlc_thread_create( p_thread, "projectm update thread", Thread,
-                           VLC_THREAD_PRIORITY_LOW ) )
+    if( vlc_clone( &p_sys->thread, Thread, p_filter, VLC_THREAD_PRIORITY_LOW ) )
         goto error;
 
-    vlc_sem_wait( &p_thread->ready );
-    if( p_thread->b_error )
+    vlc_sem_wait( &p_sys->ready );
+    if( p_sys->b_error )
+    {
+        vlc_join( p_sys->thread, NULL );
         goto error;
+    }
 
     return VLC_SUCCESS;
 
 error:
-    vlc_thread_join( p_thread );
-    vlc_sem_destroy( &p_thread->ready );
-    vlc_object_detach( p_thread );
-    vlc_object_release( p_thread );
+    vlc_sem_destroy( &p_sys->ready );
     free (p_sys );
     return VLC_EGENERIC;
 }
@@ -228,21 +218,16 @@ static void Close( vlc_object_t *p_this )
 {
     filter_t     *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
-    projectm_thread_t *p_thread = p_sys->p_thread;
 
     /* Stop the thread */
-    vlc_object_kill( p_thread );
-    vlc_thread_join( p_thread );
+    vlc_cancel( p_sys->thread );
+    vlc_join( p_sys->thread, NULL );
 
     /* Free the ressources */
-    vlc_sem_destroy( &p_thread->ready );
-    vlc_mutex_destroy( &p_thread->lock );
-    free( p_thread->p_buffer );
-    free( p_thread->psz_config );
-
-    vlc_object_detach( p_thread );
-    vlc_object_release( p_thread );
-
+    vlc_sem_destroy( &p_sys->ready );
+    vlc_mutex_destroy( &p_sys->lock );
+    free( p_sys->p_buffer );
+    free( p_sys->psz_config );
     free( p_sys );
 }
 
@@ -256,88 +241,95 @@ static void Close( vlc_object_t *p_this )
  */
 static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 {
-    projectm_thread_t *p_thread = p_filter->p_sys->p_thread;
+    filter_sys_t *p_sys = p_filter->p_sys;
 
-    vlc_mutex_lock( &p_thread->lock );
-    if( p_thread->i_buffer_size > 0 )
+    vlc_mutex_lock( &p_sys->lock );
+    if( p_sys->i_buffer_size > 0 )
     {
-        p_thread->p_buffer[0] = 0;
-        p_thread->i_nb_samples = __MIN( p_thread->i_buffer_size,
-                                        p_in_buf->i_nb_samples );
-        for( int i = 0; i < p_thread->i_nb_samples; i++ )
-            p_thread->p_buffer[i] = p_in_buf->p_buffer[i];
+        p_sys->p_buffer[0] = 0;
+        p_sys->i_nb_samples = __MIN( p_sys->i_buffer_size,
+                                     p_in_buf->i_nb_samples );
+        for( int i = 0; i < p_sys->i_nb_samples; i++ )
+            p_sys->p_buffer[i] = p_in_buf->p_buffer[i];
     }
-
-    vlc_mutex_unlock( &p_thread->lock );
+    vlc_mutex_unlock( &p_sys->lock );
 
     return p_in_buf;
 }
 
+/**
+ * Clean up function when Thread() is cancelled.
+ */
+static void ThreadCleanup( void *p_data )
+{
+    filter_t     *p_filter = (filter_t*)p_data;
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    /* Cleanup */
+    delete p_sys->p_projectm;
+
+    /* Free the openGL provider */
+    module_unneed( p_sys->p_opengl, p_sys->p_module );
+    vlc_object_detach( p_sys->p_opengl );
+    vlc_object_release( p_sys->p_opengl );
+}
 
 /**
  * ProjectM update thread which do the rendering
  * @param p_this: the p_thread object
  */
-static void* Thread( vlc_object_t *p_this )
+static void *Thread( void *p_data )
 {
-    /* we don't want to be interupted in this thread */
+    filter_t     *p_filter = (filter_t*)p_data;
+    filter_sys_t *p_sys = p_filter->p_sys;
     int cancel = vlc_savecancel();
-    projectm_thread_t *p_thread = (projectm_thread_t *)p_this;
 
     /* Create the openGL provider */
-    if( initOpenGL( p_thread ) )
+    if( initOpenGL( p_filter ) )
     {
-        p_thread->b_error = true;
-        vlc_sem_post( &p_thread->ready );
+        p_sys->b_error = true;
+        vlc_sem_post( &p_sys->ready );
         return NULL;
     }
+    vlc_cleanup_push( ThreadCleanup, p_filter );
 
     /* Initialize the opengl provider for this thread */
-    p_thread->p_opengl->pf_init( p_thread->p_opengl );
+    p_sys->p_opengl->pf_init( p_sys->p_opengl );
 
     /* Create the projectM object */
-    p_thread->p_projectm = new projectM( p_thread->psz_config );
-    p_thread->i_buffer_size = p_thread->p_projectm->pcm()->maxsamples;
-    p_thread->p_buffer = (float*)malloc( p_thread->i_buffer_size *
-                                         sizeof( float ) );
+    p_sys->p_projectm = new projectM( p_sys->psz_config );
+    p_sys->i_buffer_size = p_sys->p_projectm->pcm()->maxsamples;
+    p_sys->p_buffer = (float*)calloc( p_sys->i_buffer_size,
+                                      sizeof( float ) );
 
-    vlc_sem_post( &p_thread->ready );
+    vlc_sem_post( &p_sys->ready );
 
     /* TODO: Give to projectm the name of the input
-    p_thread->p_projectm->projectM_setTitle( "" ); */
+    p_sys->p_projectm->projectM_setTitle( "" ); */
 
     /* Reset the dislay to get the right size */
-    p_thread->p_projectm->projectM_resetGL( p_thread->i_width,
-                                            p_thread->i_height );
+    p_sys->p_projectm->projectM_resetGL( p_sys->i_width,
+                                         p_sys->i_height );
 
-    while( vlc_object_alive( p_thread ) )
+    for( ;; )
     {
         /* Manage the events */
-        p_thread->p_opengl->pf_manage( p_thread->p_opengl );
+        p_sys->p_opengl->pf_manage( p_sys->p_opengl );
         /* Render the image and swap the buffers */
-        vlc_mutex_lock( &p_thread->lock );
-        if( p_thread->i_nb_samples > 0 )
-            p_thread->p_projectm->pcm()->addPCMfloat( p_thread->p_buffer,
-                                                      p_thread->i_nb_samples );
+        vlc_mutex_lock( &p_sys->lock );
+        if( p_sys->i_nb_samples > 0 )
+            p_sys->p_projectm->pcm()->addPCMfloat( p_sys->p_buffer,
+                                                   p_sys->i_nb_samples );
 
-        p_thread->p_projectm->renderFrame();
-        p_thread->p_opengl->pf_swap( p_thread->p_opengl );
-        vlc_mutex_unlock( &p_thread->lock );
+        p_sys->p_projectm->renderFrame();
+        p_sys->p_opengl->pf_swap( p_sys->p_opengl );
+        vlc_mutex_unlock( &p_sys->lock );
 
         /* TODO: use a fps limiter */
+        vlc_restorecancel( cancel );
         msleep( 10000 );
+        cancel = vlc_savecancel();
     }
-
-
-    /* Cleanup */
-    delete p_thread->p_projectm;
-
-    /* Free the openGL provider */
-    module_unneed( p_thread->p_opengl, p_thread->p_module );
-    vlc_object_detach( p_thread->p_opengl );
-    vlc_object_release( p_thread->p_opengl );
-
-
-    vlc_restorecancel( cancel );
-    return NULL;
+    vlc_cleanup_pop();
 }
+
