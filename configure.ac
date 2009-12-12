@@ -3622,20 +3622,6 @@ CPPFLAGS="${CPPFLAGS_save} ${X_CFLAGS}"
 
 AS_IF([test "${enable_x11}" != "no"], [
   AC_CHECK_HEADERS(X11/Xlib.h)
-
-dnl Check for DPMS
-  AC_CHECK_HEADERS(X11/extensions/dpms.h, [
-    AC_MSG_CHECKING(for DPMSInfo in X11/extensions/dpms.h)
-    AC_EGREP_HEADER(DPMSInfo,X11/extensions/dpms.h,[
-      AC_MSG_RESULT(yes)
-      AC_DEFINE(DPMSINFO_IN_DPMS_H, 1,
-                Define if <X11/extensions/dpms.h> defines DPMSInfo.)
-    ],[
-      AC_MSG_RESULT(no)
-    ])
-  ],,[
-    #include <X11/Xlib.h>
-  ])
 ])
 
 dnl End of Xlib tests
