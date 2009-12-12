@@ -2525,8 +2525,13 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
             if( !p_sys->b_buffering )
             {
+                mtime_t i_delay;
+
                 /* Fix for buffering delay */
-                const mtime_t i_delay = EsOutGetBuffering( out );
+                if( !out->b_sout || !p_sys->p_input->p->b_out_pace_control )
+                    i_delay = EsOutGetBuffering( out );
+                else
+                    i_delay = 0;
 
                 i_time -= i_delay;
                 if( i_time < 0 )
