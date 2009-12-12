@@ -1,7 +1,7 @@
 /*****************************************************************************
  * interface_widgets.hpp : Playlist Widgets
  ****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -19,8 +19,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #ifndef _PLAYLISTWIDGET_H_
@@ -32,43 +32,22 @@
 
 #include "qt4.hpp"
 
-#include "dialogs_provider.hpp" /* Media Info from ArtLabel */
-#include "components/interface_widgets.hpp"
+#include "dialogs_provider.hpp"              /* Media Info from ArtLabel */
+#include "components/interface_widgets.hpp"  /* CoverArt */
 //#include <vlc_playlist.h>
 
 #include <QSplitter>
-#include <QLabel>
 
 class PLSelector;
 class StandardPLPanel;
 class QPushButton;
-class CoverArtLabel;
-class ArtLabel;
-
-class PlaylistWidget : public QSplitter
-{
-    Q_OBJECT;
-public:
-    PlaylistWidget( intf_thread_t *_p_i );
-    virtual ~PlaylistWidget();
-private:
-    PLSelector *selector;
-    StandardPLPanel *rightPanel;
-    QPushButton *addButton;
-    ArtLabel *art;
-protected:
-    intf_thread_t *p_intf;
-    virtual void dropEvent( QDropEvent *);
-    virtual void dragEnterEvent( QDragEnterEvent * );
-    virtual void closeEvent( QCloseEvent * );
-};
 
 class ArtLabel : public CoverArtLabel
 {
-    Q_OBJECT
 public:
     ArtLabel( QWidget *parent, intf_thread_t *intf )
             : CoverArtLabel( parent, intf ) {};
+
     virtual void mouseDoubleClickEvent( QMouseEvent *event )
     {
         THEDP->mediaInfoDialog();
@@ -76,9 +55,22 @@ public:
     }
 };
 
-enum PLEventType {
-    ItemAddedEv = QEvent::User,
-    ItemRemovedEv
+class PlaylistWidget : public QSplitter
+{
+    Q_OBJECT
+public:
+    PlaylistWidget( intf_thread_t *_p_i, QWidget * );
+    virtual ~PlaylistWidget();
+private:
+    PLSelector      *selector;
+    ArtLabel        *art;
+    StandardPLPanel *rightPanel;
+    QPushButton     *addButton;
+protected:
+    intf_thread_t *p_intf;
+    virtual void dropEvent( QDropEvent *);
+    virtual void dragEnterEvent( QDragEnterEvent * );
+    virtual void closeEvent( QCloseEvent * );
 };
 
 #endif

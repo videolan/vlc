@@ -913,7 +913,7 @@ int MainInterface::controlVideo( int i_query, va_list args )
  **/
 void MainInterface::createPlaylist( bool b_show )
 {
-    playlistWidget = new PlaylistWidget( p_intf );
+    playlistWidget = new PlaylistWidget( p_intf, this );
 
     i_pl_dock = PL_BOTTOM;
     /* i_pl_dock = (pl_dock_e)getSettings()

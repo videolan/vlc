@@ -40,7 +40,8 @@
  * Playlist Widget. The embedded playlist
  **********************************************************************/
 
-PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i ) : p_intf ( _p_i )
+PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
+               : QSplitter( _par ), p_intf ( _p_i )
 {
     setContentsMargins( 3, 3, 3, 3 );
 
