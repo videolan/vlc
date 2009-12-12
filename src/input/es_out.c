@@ -2288,7 +2288,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                     /* Check buffering state on master clock update */
                     EsOutDecodersStopBuffering( out, false );
                 }
-                else if( b_late )
+                else if( b_late && ( !out->b_sout ||
+                                     !p_sys->p_input->p->b_out_pace_control ) )
                 {
                     mtime_t i_pts_delay = input_clock_GetJitter( p_pgrm->p_clock );
 
