@@ -142,6 +142,27 @@ FindWindow (vout_display_t *vd, xcb_connection_t *conn,
     return screen;
 }
 
+static bool CheckGLX (vout_display_t *vd, Display *dpy)
+{
+    int major, minor;
+    bool ok = false;
+
+    if (!glXQueryVersion (dpy, &major, &minor))
+        msg_Dbg (vd, "GLX extension not available");
+    else
+    if (major != 1)
+        msg_Dbg (vd, "GLX extension version %d.%d unknown", major, minor);
+    else
+    if (minor < 2)
+        msg_Dbg (vd, "GLX extension version %d.%d too old", major, minor);
+    else
+    {
+        msg_Dbg (vd, "using GLX extension version %d.%d", major, minor);
+        ok = true;
+    }
+    return ok;
+}
+
 /**
  * Probe the X server.
  */
@@ -176,6 +197,9 @@ static int Open (vlc_object_t *obj)
     sys->display = dpy;
     sys->ctx = NULL;
     XSetEventQueueOwner (dpy, XCBOwnsEventQueue);
+
+    if (!CheckGLX (vd, dpy))
+        goto error;
 
     xcb_connection_t *conn = XGetXCBConnection (dpy);
     assert (conn);
@@ -294,9 +318,11 @@ static void Close (vlc_object_t *obj)
     if (sys->gl.sys != NULL)
         vout_display_opengl_Clean (&sys->vgl);
 
-    glXMakeCurrent (dpy, 0, NULL);
     if (sys->ctx != NULL)
+    {
+        glXMakeCurrent (dpy, 0, NULL);
         glXDestroyContext (dpy, sys->ctx);
+    }
     XCloseDisplay (dpy);
     vout_display_DeleteWindow (vd, sys->embed);
     free (sys);
