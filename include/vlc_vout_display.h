@@ -157,6 +157,9 @@ enum {
      * The cropping requested is stored by video_format_t::i_x/y_offset and
      * video_format_t::i_visible_width/height */
     VOUT_DISPLAY_CHANGE_SOURCE_CROP,   /* const video_format_t *p_source */
+
+    /* Ask an opengl interface if available. */
+    VOUT_DISPLAY_GET_OPENGL,           /* vout_opengl_t ** */
 };
 
 /**
