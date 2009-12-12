@@ -42,4 +42,5 @@
 @property (readonly) BOOL isComplete;
 
 - (void)startStreaming;
+- (void)stopStreaming;
 @end

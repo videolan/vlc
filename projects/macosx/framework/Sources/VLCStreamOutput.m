@@ -70,19 +70,20 @@
     return [self streamOutputWithOptionDictionary:[NSDictionary dictionaryWithObjectsAndKeys:
                                             [NSDictionary dictionaryWithObjectsAndKeys:
                                                 @"h264", @"videoCodec",
-                                                @"1024",  @"videoBitrate",
+                                                @"1024",  @"videoBitrate", // max by Apple: 1.5 mbps
                                                 @"mp4a", @"audioCodec",
-                                                @"192", @"audioBitrate",
+                                                @"128", @"audioBitrate", // max by Apple: 160 kbps
                                                 @"2",   @"channels",
-                                                @"320", @"width",
-                                                @"240", @"canvasHeight",
+                                                @"640", @"width", // max by Apple: do.
+                                                @"480", @"canvasHeight", // max by Apple: do.
                                                 @"Yes", @"audio-sync",
                                                 nil
                                             ], @"transcodingOptions",
                                             [NSDictionary dictionaryWithObjectsAndKeys:
                                                 @"mp4", @"muxer",
                                                 @"file", @"access",
-                                                [[filePath copy] autorelease], @"destination", nil
+                                                [[filePath copy] autorelease], @"destination", 
+                                                nil
                                             ], @"outputOptions",
                                             nil
                                             ]
@@ -128,13 +129,13 @@
                                             [NSDictionary dictionaryWithObjectsAndKeys:
                                                 @"mp2v", @"videoCodec",
                                                 @"1024", @"videoBitrate",
-                                                @"mp2a",   @"audioCodec",
+                                                @"mpga",   @"audioCodec",
                                                 @"128",   @"audioBitrate",
                                                 @"Yes",   @"audio-sync",
                                                 nil
                                             ], @"transcodingOptions",
                                             [NSDictionary dictionaryWithObjectsAndKeys:
-                                                @"mpeg", @"muxer",
+                                                @"ps", @"muxer",
                                                 @"file", @"access",
                                                 [[filePath copy] autorelease], @"destination", nil
                                             ], @"outputOptions",

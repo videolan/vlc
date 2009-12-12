@@ -57,20 +57,25 @@
 }
 
 
-- (void)startStreaming;
+- (void)startStreaming
 {
     self.isComplete = NO;
     [self play];
 }
 
-- (BOOL)play;
+- (void)stopStreaming
+{
+    self.isComplete = YES;
+    [super stop];
+}
+
+- (BOOL)play
 {
     NSString * libvlcArgs;
     if( self.drawable )
         libvlcArgs = [NSString stringWithFormat:@"duplicate{dst=display,dst=\"%@\"}",[streamOutput representedLibVLCOptions]];
     else
         libvlcArgs = [streamOutput representedLibVLCOptions];
-
     if( libvlcArgs )
     {
         [super setMedia: [VLCMedia mediaWithMedia:originalMedia andLibVLCOptions:
