@@ -52,6 +52,9 @@
 #   include <fcntl.h>
 #   include <sys/stat.h>
 #endif
+#ifdef HAVE_ARPA_INET_H
+#   include <arpa/inet.h>
+#endif
 #ifdef HAVE_LINUX_DCCP_H
 #   include <linux/dccp.h>
 #endif
@@ -311,6 +314,9 @@ struct sout_stream_id_t
     uint16_t    i_sequence;
     uint8_t     i_payload_type;
     uint8_t     ssrc[4];
+
+    /* for rtsp */
+    uint16_t    i_seq_sent_next;
 
     /* for sdp */
     const char  *psz_enc;
@@ -925,6 +931,8 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     vlc_rand_bytes (&id->i_sequence, sizeof (id->i_sequence));
     vlc_rand_bytes (id->ssrc, sizeof (id->ssrc));
 
+    id->i_seq_sent_next = id->i_sequence;
+
     id->psz_enc    = NULL;
     id->psz_fmtp   = NULL;
     id->i_clock_rate = 90000; /* most common case for video */
@@ -1037,7 +1045,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
                  * packets in case of rtcp-mux) */
                 setsockopt (fd, SOL_SOCKET, SO_RCVBUF, &(int){ 0 },
                             sizeof (int));
-                rtp_add_sink( id, fd, p_sys->rtcp_mux );
+                rtp_add_sink( id, fd, p_sys->rtcp_mux, NULL );
             }
         }
 
@@ -1596,6 +1604,7 @@ static void* ThreadSend( vlc_object_t *p_this )
 
             deadv[deadc++] = id->sinkv[i].rtp_fd;
         }
+        id->i_seq_sent_next = ntohs(((uint16_t *) out->p_buffer)[1]) + 1;
         vlc_mutex_unlock( &id->lock_sink );
         block_Release( out );
 
@@ -1623,7 +1632,7 @@ static void *rtp_listen_thread( void *data )
         if( fd == -1 )
             continue;
         int canc = vlc_savecancel( );
-        rtp_add_sink( id, fd, true );
+        rtp_add_sink( id, fd, true, NULL );
         vlc_restorecancel( canc );
     }
 
@@ -1631,7 +1640,7 @@ static void *rtp_listen_thread( void *data )
 }
 
 
-int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux )
+int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux, uint16_t *seq )
 {
     rtp_sink_t sink = { fd, NULL };
     sink.rtcp = OpenRTCP( VLC_OBJECT( id->p_stream ), fd, IPPROTO_UDP,
@@ -1641,6 +1650,8 @@ int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux )
 
     vlc_mutex_lock( &id->lock_sink );
     INSERT_ELEM( id->sinkv, id->sinkc, id->sinkc, sink );
+    if( seq != NULL )
+        *seq = id->i_seq_sent_next;
     vlc_mutex_unlock( &id->lock_sink );
     return VLC_SUCCESS;
 }
@@ -1666,11 +1677,16 @@ void rtp_del_sink( sout_stream_id_t *id, int fd )
     net_Close( sink.rtp_fd );
 }
 
-uint16_t rtp_get_seq( const sout_stream_id_t *id )
+uint16_t rtp_get_seq( sout_stream_id_t *id )
 {
-    /* This will return values for the next packet.
-     * Accounting for caching would not be totally trivial. */
-    return id->i_sequence;
+    /* This will return values for the next packet. */
+    uint16_t seq;
+
+    vlc_mutex_lock( &id->lock_sink );
+    seq = id->i_seq_sent_next;
+    vlc_mutex_unlock( &id->lock_sink );
+
+    return seq;
 }
 
 /* FIXME: this is pretty bad - if we remove and then insert an ES

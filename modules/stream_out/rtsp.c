@@ -646,16 +646,19 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                     rtsp_strack_t *tr = ses->trackv + i;
                     if( ( id == NULL ) || ( tr->id == id->sout_id ) )
                     {
+                        uint16_t seq;
                         if( !tr->playing )
                         {
                             tr->playing = true;
-                            rtp_add_sink( tr->id, tr->fd, false );
+                            rtp_add_sink( tr->id, tr->fd, false, &seq );
                         }
+                        else
+                            seq = rtp_get_seq( tr->id );
                         infolen += sprintf( info + infolen,
                                             "url=%s/trackID=%u;seq=%u, ",
                                             control,
                                             rtp_get_num( tr->id ),
-                                            rtp_get_seq( tr->id ) );
+                                            seq );
                     }
                 }
                 if( infolen > 0 )
