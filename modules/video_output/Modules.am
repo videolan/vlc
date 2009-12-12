@@ -48,9 +48,9 @@ libxcb_glx_plugin_la_SOURCES = \
 	xcb/glx.c \
 	xcb/events.c
 libxcb_glx_plugin_la_CFLAGS = $(AM_CFLAGS) \
-	$(XLIB_XCB_CFLAGS) $(GLU_CFLAGS)
+	$(XLIB_XCB_CFLAGS) $(GL_CFLAGS)
 libxcb_glx_plugin_la_LIBADD = $(AM_LIBADD) \
-	$(XLIB_XCB_LIBS) $(GLU_LIBS)
+	$(XLIB_XCB_LIBS) $(GL_LIBS)
 libxcb_glx_plugin_la_DEPENDENCIES =
 
 libxcb_window_plugin_la_SOURCES = xcb/window.c xcb/keys.c

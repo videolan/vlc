@@ -3684,7 +3684,7 @@ AC_ARG_ENABLE(glx,
 ])
 AS_IF([test "${enable_glx}" != "no"], [
   PKG_CHECK_MODULES(XLIB_XCB, [x11-xcb])
-  PKG_CHECK_MODULES(GLU, [glu])
+  PKG_CHECK_MODULES(GL, [gl])
 
   VLC_ADD_PLUGIN([xcb_glx])
 ])
