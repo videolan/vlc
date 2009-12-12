@@ -71,6 +71,7 @@
 #include <vlc_vout_window.h>
 #include <vlc_vout.h>
 
+// #define DEBUG_INTF
 /* Callback prototypes */
 static int PopupMenuCB( vlc_object_t *p_this, const char *psz_variable,
                         vlc_value_t old_val, vlc_value_t new_val, void *param );
@@ -725,11 +726,15 @@ void MainInterface::debug()
 
 inline void MainInterface::showTab( int i_tab )
 {
+#ifdef DEBUG_INTF
     msg_Err( p_intf, "showTab %i", i_tab );
     msg_Warn( p_intf, "Old stackCentralOldState %i", stackCentralOldState );
+#endif
     stackCentralOldState = stackCentralW->isVisible() ? stackCentralW->currentIndex()
                                           : HIDDEN_TAB;
+#ifdef DEBUG_INTF
     msg_Warn( p_intf, "State change %i %i",  stackCentralW->currentIndex(), i_tab );
+#endif
 
     if( i_visualmode == QT_NORMAL_MODE )
     {
@@ -741,12 +746,16 @@ inline void MainInterface::showTab( int i_tab )
 
     stackCentralW->setCurrentIndex( i_tab );
 
+#ifdef DEBUG_INTF
     msg_Warn( p_intf, "New stackCentralOldState %i", stackCentralOldState );
+#endif
 }
 
 inline void MainInterface::restoreStackOldWidget()
 {
+#ifdef DEBUG_INTF
     msg_Warn( p_intf, "Old stackCentralOldState %i", stackCentralOldState );
+#endif
     int temp = stackCentralW->isVisible() ? stackCentralW->currentIndex()
                                           : HIDDEN_TAB;
     stackCentralW->setCurrentIndex( stackCentralOldState );
@@ -757,8 +766,9 @@ inline void MainInterface::restoreStackOldWidget()
     }
 
     stackCentralOldState = temp;
+#ifdef DEBUG_INTF
     msg_Warn( p_intf, "Debug %i %i", temp, stackCentralW->currentIndex() );
-
+#endif
 }
 
 void MainInterface::destroyPopupMenu()
@@ -920,9 +930,13 @@ void MainInterface::createPlaylist( bool b_show )
     }
     else
     {
+#ifdef DEBUG_INTF
         msg_Warn( p_intf, "Here %i", stackCentralW->currentIndex() );
+#endif
         stackCentralW->insertWidget( PLAYL_TAB, playlistWidget );
+#ifdef DEBUG_INTF
         msg_Warn( p_intf, "Here %i", stackCentralW->currentIndex() );
+#endif
     }
 
     if( b_show )
@@ -934,19 +948,22 @@ void MainInterface::createPlaylist( bool b_show )
 
 void MainInterface::togglePlaylist()
 {
+#ifdef DEBUG_INTF
     msg_Warn( p_intf, "Here toggling %i %i", stackCentralW->currentIndex(), stackCentralOldState );
+#endif
     if( !playlistWidget )
     {
         createPlaylist( true );
     }
+#ifdef DEBUG_INTF
     msg_Warn( p_intf, "Here toggling %i %i", stackCentralW->currentIndex(), stackCentralOldState );
 
+#endif
     if( i_pl_dock != PL_UNDOCKED )
     {
         /* Playlist not visible */
         if( stackCentralW->currentIndex() != PLAYL_TAB )
         {
-            msg_Warn( p_intf, "Here 42" );
             showTab( PLAYL_TAB );
             stackCentralW->show();
         }
