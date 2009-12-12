@@ -290,7 +290,7 @@ static int Open (vlc_object_t *obj)
             goto error;
         }
 
-        if (glXMakeContextCurrent (dpy, sys->glwin, sys->glwin, sys->ctx))
+        if (!glXMakeContextCurrent (dpy, sys->glwin, sys->glwin, sys->ctx))
             goto error;
     }
     else
