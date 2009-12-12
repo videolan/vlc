@@ -66,8 +66,6 @@ struct vout_display_sys_t
     xcb_cursor_t cursor; /* blank cursor */
     xcb_window_t window; /* drawable X window */
     xcb_window_t glwin; /* GLX window */
-    uint16_t width; /* render pixel width */
-    uint16_t height; /* render pixel height */
     bool visible; /* whether to draw */
     bool v1_3; /* whether GLX >= 1.3 is available */
 
@@ -172,7 +170,8 @@ static bool CheckGLX (vout_display_t *vd, Display *dpy, bool *restrict pv13)
 }
 
 static int CreateWindow (vout_display_t *vd, xcb_connection_t *conn,
-                         uint_fast8_t depth, xcb_visualid_t vid)
+                         uint_fast8_t depth, xcb_visualid_t vid,
+                         uint_fast16_t width, uint_fast16_t height)
 {
     vout_display_sys_t *sys = vd->sys;
     const uint32_t mask = XCB_CW_EVENT_MASK;
@@ -184,7 +183,7 @@ static int CreateWindow (vout_display_t *vd, xcb_connection_t *conn,
 
     cc = xcb_create_window_checked (conn, depth, sys->window,
                                     sys->embed->xid, 0, 0,
-                                    sys->width, sys->height, 0,
+                                    width, height, 0,
                                     XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                     vid, mask, values);
     cm = xcb_map_window_checked (conn, sys->window);
@@ -241,8 +240,9 @@ static int Open (vlc_object_t *obj)
     /* Find window parameters */
     unsigned snum;
     uint8_t depth;
+    uint16_t width, height;
     const xcb_screen_t *scr = FindWindow (vd, conn, &snum, &depth,
-                                          &sys->width, &sys->height);
+                                          &width, &height);
     if (scr == NULL)
         goto error;
 
@@ -269,7 +269,7 @@ static int Open (vlc_object_t *obj)
         }
 
         /*XVisualInfo *vi = glXGetVisualFromFBConfig (dpy, confs[0]);*/
-        CreateWindow (vd, conn, depth, 0 /* ??? */);
+        CreateWindow (vd, conn, depth, 0 /* ??? */, width, height);
         /*XFree (vi);*/
 
         sys->glwin = glXCreateWindow (dpy, confs[0], sys->window, NULL );
@@ -311,7 +311,7 @@ static int Open (vlc_object_t *obj)
         }
         msg_Dbg (vd, "using GLX visual ID 0x%"PRIx32, (uint32_t)vi->visualid);
 
-        if (CreateWindow (vd, conn, depth, 0 /* ??? */) == 0)
+        if (CreateWindow (vd, conn, depth, 0 /* ??? */, width, height) == 0)
             sys->ctx = glXCreateContext (dpy, vi, 0, True);
         XFree (vi);
         if (sys->ctx == NULL)
@@ -355,7 +355,7 @@ static int Open (vlc_object_t *obj)
 
     /* */
     vout_display_SendEventFullscreen (vd, false);
-    vout_display_SendEventDisplaySize (vd, sys->width, sys->height, false);
+    vout_display_SendEventDisplaySize (vd, width, height, false);
 
     return VLC_SUCCESS;
 
@@ -397,7 +397,6 @@ static void SwapBuffers (vout_opengl_t *gl)
 {
     vout_display_sys_t *sys = gl->sys;
 
-    glViewport (0, 0, sys->width, sys->height);
     glXSwapBuffers (sys->display, sys->glwin);
 }
 
@@ -486,17 +485,19 @@ static int Control (vout_display_t *vd, int query, va_list ap)
 
         vout_display_place_t place;
         vout_display_PlacePicture (&place, source, cfg, false);
-        sys->width  = place.width;
-        sys->height = place.height;
 
         /* Move the picture within the window */
         const uint32_t values[] = { place.x, place.y,
                                     place.width, place.height, };
-        xcb_configure_window (conn, sys->window,
-                              XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y
-                            | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
+        xcb_void_cookie_t ck =
+            xcb_configure_window_checked (conn, sys->window,
+                            XCB_CONFIG_WINDOW_X | XCB_CONFIG_WINDOW_Y
+                          | XCB_CONFIG_WINDOW_WIDTH | XCB_CONFIG_WINDOW_HEIGHT,
                               values);
-        xcb_flush (conn);
+        if (CheckError (vd, conn, "cannot resize X11 window", ck))
+            return VLC_EGENERIC;
+
+        glViewport (0, 0, place.width, place.height);
         return VLC_SUCCESS;
     }
 
