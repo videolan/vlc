@@ -50,6 +50,7 @@ DECLARE_OPEN(caca);
 DECLARE_OPEN(sdl);
 DECLARE_OPEN(xcb_x11);
 DECLARE_OPEN(xcb_xv);
+DECLARE_OPEN(xcb_glx);
 DECLARE_OPEN(dummy);
 DECLARE_OPEN(fb);
 DECLARE_OPEN(directfb);
@@ -89,6 +90,9 @@ vlc_module_begin()
 
     add_submodule()
     DECLARE_MODULE(xcb_xv, 155)
+
+    add_submodule()
+    DECLARE_MODULE(xcb_glx, 20)
 
     add_submodule()
     DECLARE_MODULE(dummy, 1)
