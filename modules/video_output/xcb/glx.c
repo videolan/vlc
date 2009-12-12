@@ -260,6 +260,14 @@ static int Open (vlc_object_t *obj)
             GLX_DRAWABLE_TYPE, GLX_WINDOW_BIT,
             None };
 
+        xcb_get_window_attributes_reply_t *wa =
+            xcb_get_window_attributes_reply (conn,
+                xcb_get_window_attributes (conn, sys->embed->xid), NULL);
+        if (wa == NULL)
+            goto error;
+        xcb_visualid_t visual = wa->visual;
+        free (wa);
+
         int nelem;
         GLXFBConfig *confs = glXChooseFBConfig (dpy, snum, attr, &nelem);
         if (confs == NULL)
@@ -268,22 +276,41 @@ static int Open (vlc_object_t *obj)
             goto error;
         }
 
-        /*XVisualInfo *vi = glXGetVisualFromFBConfig (dpy, confs[0]);*/
-        CreateWindow (vd, conn, depth, 0 /* ??? */, width, height);
-        /*XFree (vi);*/
+        GLXFBConfig conf;
+        bool found = false;
 
-        sys->glwin = glXCreateWindow (dpy, confs[0], sys->window, NULL );
+        for (int i = 0; i < nelem && !found; i++)
+        {
+            conf = confs[i];
+
+            XVisualInfo *vi = glXGetVisualFromFBConfig (dpy, conf);
+            if (vi == NULL)
+                continue;
+
+            if (vi->visualid == visual)
+                found = true;
+            XFree (vi);
+        }
+        XFree (confs);
+
+        if (!found)
+        {
+            msg_Err (vd, "no matching GLX frame buffer configuration");
+            goto error;
+        }
+
+        sys->glwin = None;
+        if (!CreateWindow (vd, conn, depth, 0 /* ??? */, width, height))
+            sys->glwin = glXCreateWindow (dpy, conf, sys->window, NULL );
         if (sys->glwin == None)
         {
             msg_Err (vd, "cannot create GLX window");
-            XFree (confs);
             goto error;
         }
 
         /* Create an OpenGL context */
-        sys->ctx = glXCreateNewContext (dpy, confs[0], GLX_RGBA_TYPE, NULL,
+        sys->ctx = glXCreateNewContext (dpy, conf, GLX_RGBA_TYPE, NULL,
                                         True);
-        XFree (confs);
         if (sys->ctx == NULL)
         {
             msg_Err (vd, "cannot create GLX context");
