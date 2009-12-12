@@ -74,6 +74,9 @@ typedef struct
 {
     VLC_COMMON_MEMBERS
 
+    /* */
+    vlc_sem_t ready;
+
     /* video output module and opengl provider */
     vout_thread_t *p_opengl;
     module_t      *p_module;
@@ -184,18 +187,10 @@ static int Open( vlc_object_t * p_this )
     p_sys->p_thread = p_thread = (projectm_thread_t *)
                     vlc_object_create( p_filter, sizeof( projectm_thread_t ) );
     vlc_object_attach( p_sys->p_thread, p_filter );
+    vlc_sem_init( &p_thread->ready, 0 );
+    p_thread->b_error = false;
     p_thread->i_width  = var_CreateGetInteger( p_filter, "projectm-width" );
     p_thread->i_height = var_CreateGetInteger( p_filter, "projectm-height" );
-
-    /* Create the openGL provider */
-    int i_ret = initOpenGL( p_sys->p_thread );
-    if( i_ret != VLC_SUCCESS )
-    {
-        vlc_object_detach( p_sys->p_thread );
-        vlc_object_release( p_sys->p_thread );
-        free( p_sys );
-        return i_ret;
-    }
 
     p_thread->i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
     p_thread->psz_config = var_CreateGetString( p_filter, "projectm-config" );
@@ -207,15 +202,21 @@ static int Open( vlc_object_t * p_this )
     /* Create the thread */
     if( vlc_thread_create( p_thread, "projectm update thread", Thread,
                            VLC_THREAD_PRIORITY_LOW ) )
-    {
-        msg_Err( p_filter, "cannot launch the projectm thread" );
-        vlc_object_detach( p_thread );
-        vlc_object_release( p_thread );
-        free (p_sys );
-        return VLC_EGENERIC;
-    }
+        goto error;
+
+    vlc_sem_wait( &p_thread->ready );
+    if( p_thread->b_error )
+        goto error;
 
     return VLC_SUCCESS;
+
+error:
+    vlc_thread_join( p_thread );
+    vlc_sem_destroy( &p_thread->ready );
+    vlc_object_detach( p_thread );
+    vlc_object_release( p_thread );
+    free (p_sys );
+    return VLC_EGENERIC;
 }
 
 
@@ -234,6 +235,7 @@ static void Close( vlc_object_t *p_this )
     vlc_thread_join( p_thread );
 
     /* Free the ressources */
+    vlc_sem_destroy( &p_thread->ready );
     vlc_mutex_destroy( &p_thread->lock );
     free( p_thread->p_buffer );
     free( p_thread->psz_config );
@@ -281,6 +283,15 @@ static void* Thread( vlc_object_t *p_this )
     /* we don't want to be interupted in this thread */
     int cancel = vlc_savecancel();
     projectm_thread_t *p_thread = (projectm_thread_t *)p_this;
+
+    /* Create the openGL provider */
+    if( initOpenGL( p_thread ) )
+    {
+        p_thread->b_error = true;
+        vlc_sem_post( &p_thread->ready );
+        return NULL;
+    }
+    vlc_sem_post( &p_thread->ready );
 
     /* Initialize the opengl provider for this thread */
     p_thread->p_opengl->pf_init( p_thread->p_opengl );
