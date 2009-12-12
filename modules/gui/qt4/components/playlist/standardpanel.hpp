@@ -39,6 +39,7 @@
 
 class QSignalMapper;
 class QTreeView;
+class QListView;
 class PLModel;
 class QPushButton;
 class QKeyEvent;
@@ -59,10 +60,15 @@ protected:
     PLModel *model;
 private:
     intf_thread_t *p_intf;
-    QWidget *parent;
-    QLabel *title;
-    QTreeView *view;
+
+    QWidget     *parent;
+    QLabel      *title;
     QPushButton *addButton;
+    QGridLayout *layout;
+
+    QTreeView   *view;
+    QListView   *view2;
+
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
 
@@ -78,6 +84,7 @@ private slots:
     void popupAdd();
     void popupSelectColumn( QPoint );
     void toggleColumnShown( int );
+    void toggleView();
 };
 
 #endif

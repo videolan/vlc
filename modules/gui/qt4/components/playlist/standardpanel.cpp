@@ -53,7 +53,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   playlist_item_t *p_root ):
                                   QWidget( _parent ), p_intf( _p_intf )
 {
-    QGridLayout *layout = new QGridLayout( this );
+    layout = new QGridLayout( this );
     layout->setSpacing( 0 ); layout->setMargin( 0 );
     setMinimumWidth( 300 );
 
@@ -62,6 +62,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     /* Create and configure the QTreeView */
     view = new QVLCTreeView;
     view->setModel( model );
+    view2 = NULL;
 
     view->setIconSize( QSize( 20, 20 ) );
     view->setAlternatingRowColors( true );
@@ -133,6 +134,11 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     addButton->setMaximumWidth( 30 );
     BUTTONACT( addButton, popupAdd() );
     layout->addWidget( addButton, 0, 3 );
+
+    QPushButton *viewButton = new QPushButton( this );
+    viewButton->setIcon( QIcon( ":/buttons/playlist/playlist_add" ) );
+    layout->addWidget( viewButton, 0, 2 );
+    BUTTONACT( viewButton, toggleView() );
 
     /* Finish the layout */
     layout->addWidget( view, 1, 0, 1, -1 );
@@ -287,3 +293,26 @@ void StandardPLPanel::deleteSelection()
     model->doDelete( list );
 }
 
+void StandardPLPanel::toggleView()
+{
+    if( view && view->isVisible() )
+    {
+        if( view2 == NULL )
+        {
+            view2 = new QListView;
+            view2->setModel( model );
+            view2->setViewMode( QListView::IconMode );
+            view2->setMovement( QListView::Snap );
+            layout->addWidget( view2, 1, 0, 1, -1 );
+        }
+        view->hide();
+        view2->show();
+    }
+    else
+    {
+        view2->hide();
+        view->show();
+    }
+
+
+}
