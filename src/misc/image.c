@@ -541,7 +541,7 @@ static const struct
     { VLC_CODEC_TIFF,              "tif" },
     { VLC_CODEC_TIFF,              "tiff" },
     { VLC_FOURCC('l','b','m',' '), "lbm" },
-    { VLC_FOURCC('p','p','m',' '), "ppm" },
+    { VLC_CODEC_PPM,               "ppm" },
     { 0, NULL }
 };
 
