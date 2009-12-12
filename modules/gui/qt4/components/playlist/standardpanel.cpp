@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
- *          JB Kempf
+ *          JB Kempf <jb@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -36,15 +36,13 @@
 #include <vlc_intf_strings.h>
 
 #include <QPushButton>
-#include <QHBoxLayout>
-#include <QVBoxLayout>
 #include <QHeaderView>
 #include <QKeyEvent>
 #include <QModelIndexList>
 #include <QLabel>
-#include <QSpacerItem>
 #include <QMenu>
 #include <QSignalMapper>
+
 #include <assert.h>
 
 #include "sorting.h"
@@ -123,9 +121,11 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->setColumnStretch( 1, 10 );
 
     SearchLineEdit *search = new SearchLineEdit( this );
-    search->setMaximumWidth( 160 );
+    search->setMaximumWidth( 200 );
     layout->addWidget( search, 0, 4 );
-    CONNECT( search, textChanged( const QString& ), this, search( const QString& ) );
+    CONNECT( search, textChanged( const QString& ),
+             this, search( const QString& ) );
+    layout->setColumnStretch( 4, 1 );
 
     /* Add item to the playlist button */
     addButton = new QPushButton;
@@ -138,7 +138,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->addWidget( view, 1, 0, 1, -1 );
 
     selectColumnsSigMapper = new QSignalMapper( this );
-    CONNECT( selectColumnsSigMapper, mapped( int ), this, toggleColumnShown( int ) );
+    CONNECT( selectColumnsSigMapper, mapped( int ),
+             this, toggleColumnShown( int ) );
 }
 
 StandardPLPanel::~StandardPLPanel()
