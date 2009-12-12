@@ -55,6 +55,7 @@ vlc_module_begin()
     set_description(N_("OpenGL video output"))
     set_capability("vout display", 20)
     add_shortcut("glwin32")
+    add_shortcut("opengl")
     set_callbacks(Open, Close)
 
     /* FIXME: Hack to avoid unregistering our window class */
@@ -208,7 +209,15 @@ static void Display(vout_display_t *vd, picture_t *picture)
 
 static int Control(vout_display_t *vd, int query, va_list args)
 {
-    return CommonControl(vd, query, args);
+    switch (query) {
+    case VOUT_DISPLAY_GET_OPENGL: {
+        vout_opengl_t **gl = va_arg(args, vout_opengl_t **);
+        *gl = &vd->sys->gl;
+        return VLC_SUCCESS;
+    }
+    default:
+        return CommonControl(vd, query, args);
+    }
 }
 
 static void Manage (vout_display_t *vd)
