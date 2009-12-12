@@ -273,10 +273,6 @@ case "${host_os}" in
         echo "  Assuming --disable-x11"
         enable_xcb="no"
         echo "  Assuming --disable-xcb"
-        enable_glx="no"
-        echo "  Assuming --disable-glx"
-        enable_xvideo="no"
-        echo "  Assuming --disable-xvideo"
     fi
     dnl
     dnl  Check for Mac OS X SDK settings
