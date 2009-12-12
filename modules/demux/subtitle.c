@@ -766,7 +766,6 @@ static int TextLoad( text_t *txt, stream_t *s )
             if( !txt->line )
                 return VLC_ENOMEM;
         }
-        free( psz );
     }
 
     if( txt->i_line_count <= 0 )
