@@ -1,6 +1,6 @@
 # Maemo 5
 all: \
-	.mad .a52 .dca .mpcdec .lame .mpeg2 \
+	.mad .mpcdec .lame .mpeg2 \
 	.id3tag \
 	.ogg .tremor .vorbisenc .flac .speex .theora .kate .tiger \
 	.twolame .x264 \
