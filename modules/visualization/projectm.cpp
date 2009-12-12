@@ -291,7 +291,6 @@ static void* Thread( vlc_object_t *p_this )
         vlc_sem_post( &p_thread->ready );
         return NULL;
     }
-    vlc_sem_post( &p_thread->ready );
 
     /* Initialize the opengl provider for this thread */
     p_thread->p_opengl->pf_init( p_thread->p_opengl );
@@ -301,6 +300,8 @@ static void* Thread( vlc_object_t *p_this )
     p_thread->i_buffer_size = p_thread->p_projectm->pcm()->maxsamples;
     p_thread->p_buffer = (float*)malloc( p_thread->i_buffer_size *
                                          sizeof( float ) );
+
+    vlc_sem_post( &p_thread->ready );
 
     /* TODO: Give to projectm the name of the input
     p_thread->p_projectm->projectM_setTitle( "" ); */
