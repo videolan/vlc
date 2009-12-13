@@ -1,6 +1,6 @@
 /*
  * Secure RTP with libgcrypt
- * Copyright (C) 2007  Rémi Denis-Courmont <rdenis # simphalempin , com>
+ * Copyright (C) 2007  Rémi Denis-Courmont
  *
  * This library is free software; you can redistribute it and/or
  * modify it under the terms of the GNU Lesser General Public
