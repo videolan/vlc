@@ -74,13 +74,13 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static picture_t *Get    (vout_display_t *);
-static void       Prepare(vout_display_t *, picture_t *);
-static void       Display(vout_display_t *, picture_t *);
-static int        Control(vout_display_t *, int, va_list);
-static void       Manage (vout_display_t *);
+static picture_pool_t *Pool  (vout_display_t *, unsigned);
+static void           Prepare(vout_display_t *, picture_t *);
+static void           Display(vout_display_t *, picture_t *);
+static int            Control(vout_display_t *, int, va_list);
+static void           Manage (vout_display_t *);
 
-static void       Swap   (vout_opengl_t *);
+static void           Swap   (vout_opengl_t *);
 
 /**
  * It creates an OpenGL vout display.
@@ -140,7 +140,7 @@ static int Open(vlc_object_t *object)
     vd->fmt  = fmt;
     vd->info = info;
 
-    vd->get     = Get;
+    vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
@@ -177,16 +177,14 @@ static void Close(vlc_object_t *object)
 }
 
 /* */
-static picture_t *Get(vout_display_t *vd)
+static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
     vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(count);
 
-    if (!sys->pool) {
+    if (!sys->pool)
         sys->pool = vout_display_opengl_GetPool(&sys->vgl);
-        if (!sys->pool)
-            return NULL;
-    }
-    return picture_pool_Get(sys->pool);
+    return sys->pool;
 }
 
 static void Prepare(vout_display_t *vd, picture_t *picture)

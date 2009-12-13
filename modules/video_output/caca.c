@@ -55,10 +55,10 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static picture_t *Get    (vout_display_t *);
-static void       Prepare(vout_display_t *, picture_t *);
-static void       Display(vout_display_t *, picture_t *);
-static int        Control(vout_display_t *, int, va_list);
+static picture_pool_t *Pool  (vout_display_t *, unsigned);
+static void           Prepare(vout_display_t *, picture_t *);
+static void           Display(vout_display_t *, picture_t *);
+static int            Control(vout_display_t *, int, va_list);
 
 /* */
 static void Manage(vout_display_t *);
@@ -164,11 +164,6 @@ static int Open(vlc_object_t *object)
         fmt.i_bmask = 0x000000ff;
     }
 
-    /* */
-    sys->pool = picture_pool_NewFromFormat(&fmt, 1);
-    if (!sys->pool)
-        goto error;
-
     /* TODO */
     vout_display_info_t info = vd->info;
 
@@ -176,11 +171,11 @@ static int Open(vlc_object_t *object)
     vd->fmt = fmt;
     vd->info = info;
 
-    vd->get = Get;
+    vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
-    vd->manage = Manage;
+    vd->manage  = Manage;
 
     /* Fix initial state */
     vout_display_SendEventFullscreen(vd, false);
@@ -215,7 +210,8 @@ static void Close(vlc_object_t *object)
     vout_display_t *vd = (vout_display_t *)object;
     vout_display_sys_t *sys = vd->sys;
 
-    picture_pool_Delete(sys->pool);
+    if (sys->pool)
+        picture_pool_Delete(sys->pool);
     if (sys->dither)
         cucul_free_dither(sys->dither);
     caca_free_display(sys->dp);
@@ -229,13 +225,15 @@ static void Close(vlc_object_t *object)
 }
 
 /**
- * Return a direct buffer
+ * Return a pool of direct buffers
  */
-static picture_t *Get(vout_display_t *vd)
+static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
     vout_display_sys_t *sys = vd->sys;
 
-    return picture_pool_Get(sys->pool);
+    if (!sys->pool)
+        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
+    return sys->pool;
 }
 
 /**

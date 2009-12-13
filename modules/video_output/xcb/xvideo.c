@@ -94,7 +94,7 @@ struct vout_display_sys_t
     picture_resource_t resource[MAX_PICTURES];
 };
 
-static picture_t *Get (vout_display_t *);
+static picture_pool_t *Pool (vout_display_t *, unsigned);
 static void Display (vout_display_t *, picture_t *);
 static int Control (vout_display_t *, int, va_list);
 static void Manage (vout_display_t *);
@@ -514,7 +514,7 @@ static int Open (vlc_object_t *obj)
     vd->fmt = fmt;
     vd->info = info;
 
-    vd->get = Get;
+    vd->pool = Pool;
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
@@ -564,9 +564,10 @@ static void Close (vlc_object_t *obj)
 /**
  * Return a direct buffer
  */
-static picture_t *Get (vout_display_t *vd)
+static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *p_sys = vd->sys;
+    (void)requested_count;
 
     if (!p_sys->pool)
     {
@@ -621,16 +622,11 @@ static picture_t *Get (vout_display_t *vd)
             return NULL;
 
         p_sys->pool = picture_pool_New (count, pic_array);
-        if (!p_sys->pool)
-        {
-            /* TODO release picture resources */
-            return NULL;
-        }
-        /* FIXME should also do it in case of error ? */
+        /* TODO release picture resources if NULL */
         xcb_flush (p_sys->conn);
     }
 
-    return picture_pool_Get (p_sys->pool);
+    return p_sys->pool;
 }
 
 /**

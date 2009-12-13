@@ -90,10 +90,10 @@ vlc_module_end ()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static picture_t *Get    (vout_display_t *);
-static void       Display(vout_display_t *, picture_t *);
-static int        Control(vout_display_t *, int, va_list);
-static void       Manage (vout_display_t *);
+static picture_pool_t *Pool  (vout_display_t *, unsigned);
+static void           Display(vout_display_t *, picture_t *);
+static int            Control(vout_display_t *, int, va_list);
+static void           Manage (vout_display_t *);
 
 typedef struct {
   mtime_t date;         /* Presentation time */
@@ -243,7 +243,7 @@ static int Open(vlc_object_t *object)
     /* */
     vd->fmt     = fmt;
     vd->info    = info;
-    vd->get     = Get;
+    vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
@@ -281,9 +281,10 @@ static void Close(vlc_object_t *object)
 /*****************************************************************************
  *
  *****************************************************************************/
-static picture_t *Get(vout_display_t *vd)
+static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
-    return picture_pool_Get(vd->sys->pool);
+    VLC_UNUSED(count);
+    return vd->sys->pool;
 }
 
 /* Return the position in ms from the start of the movie */

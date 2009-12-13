@@ -58,10 +58,10 @@ vlc_module_end()
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static picture_t *Get    (vout_display_t *);
-static void       Prepare(vout_display_t *, picture_t *);
-static void       Display(vout_display_t *, picture_t *);
-static int        Control(vout_display_t *, int, va_list);
+static picture_pool_t *Pool   (vout_display_t *, unsigned);
+static void            Prepare(vout_display_t *, picture_t *);
+static void            Display(vout_display_t *, picture_t *);
+static int             Control(vout_display_t *, int, va_list);
 
 /* */
 static void Manage(vout_display_t *);
@@ -115,11 +115,11 @@ static int Open(vlc_object_t *object)
     vd->fmt = fmt;
     vd->info = info;
 
-    vd->get = Get;
+    vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
-    vd->manage = Manage;
+    vd->manage  = Manage;
 
     /* Inspect initial configuration and send correction events
      * FIXME how to handle aspect ratio with aa ? */
@@ -152,11 +152,12 @@ static void Close(vlc_object_t *object)
 }
 
 /**
- * Return a direct buffer
+ * Return a pool of direct buffers
  */
-static picture_t *Get(vout_display_t *vd)
+static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
     vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(count);
 
     if (!sys->pool) {
         picture_resource_t rsc;
@@ -171,11 +172,8 @@ static picture_t *Get(vout_display_t *vd)
             return NULL;
 
         sys->pool = picture_pool_New(1, &p_picture);
-        if (!sys->pool)
-            return NULL;
     }
-
-    return picture_pool_Get(sys->pool);
+    return sys->pool;
 }
 
 /**

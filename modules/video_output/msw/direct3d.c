@@ -97,11 +97,11 @@ struct picture_sys_t
 
 static int  Open(vlc_object_t *);
 
-static picture_t *Get    (vout_display_t *);
-static void       Prepare(vout_display_t *, picture_t *);
-static void       Display(vout_display_t *, picture_t *);
-static int        Control(vout_display_t *, int, va_list);
-static void       Manage (vout_display_t *);
+static picture_pool_t *Pool  (vout_display_t *, unsigned);
+static void           Prepare(vout_display_t *, picture_t *);
+static void           Display(vout_display_t *, picture_t *);
+static int            Control(vout_display_t *, int, va_list);
+static void           Manage (vout_display_t *);
 
 static int  Direct3DCreate (vout_display_t *);
 static int  Direct3DReset  (vout_display_t *);
@@ -177,7 +177,7 @@ static int Open(vlc_object_t *object)
     vd->fmt  = fmt;
     vd->info = info;
 
-    vd->get     = Get;
+    vd->pool    = Pool;
     vd->prepare = Prepare;
     vd->display = Display;
     vd->control = Control;
@@ -231,13 +231,10 @@ static void Close(vlc_object_t *object)
 }
 
 /* */
-static picture_t *Get(vout_display_t *vd)
+static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
-    vout_display_sys_t *sys = vd->sys;
-
-    if (!sys->pool)
-        return NULL;
-    return picture_pool_Get(sys->pool);
+    VLC_UNUSED(count);
+    return vd->sys->pool;
 }
 
 static int  Direct3DLockSurface(picture_t *);

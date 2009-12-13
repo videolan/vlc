@@ -301,7 +301,10 @@ static int Init(vout_thread_t *vout)
         picture->p_sys = malloc(sizeof(*picture->p_sys));
 
         if (sys->use_dr) {
-            picture_t *direct = vout_display_Get(vd);
+            picture_pool_t *pool = vout_display_Pool(vd, picture_max);
+            if (!pool)
+                break;
+            picture_t *direct = picture_pool_Get(pool);
             if (!direct)
                 break;
             picture->format = direct->format;

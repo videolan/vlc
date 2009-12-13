@@ -98,13 +98,13 @@ struct vout_display_sys_t {
     picture_pool_t *pool;
 };
 
-static picture_t *Get    (vout_display_t *);
-static void       Display(vout_display_t *, picture_t *);
-static int        Control(vout_display_t *, int, va_list);
-static void       Manage (vout_display_t *);
+static picture_pool_t *Pool  (vout_display_t *, unsigned);
+static void           Display(vout_display_t *, picture_t *);
+static int            Control(vout_display_t *, int, va_list);
+static void           Manage (vout_display_t *);
 
-static int        Lock(picture_t *);
-static void       Unlock(picture_t *);
+static int            Lock(picture_t *);
+static void           Unlock(picture_t *);
 
 /*****************************************************************************
  * Open: allocates video thread
@@ -228,7 +228,7 @@ static int Open(vlc_object_t *object)
     /* */
     vd->fmt     = fmt;
     vd->info    = info;
-    vd->get     = Get;
+    vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
@@ -250,9 +250,10 @@ static void Close(vlc_object_t *object)
 }
 
 /* */
-static picture_t *Get(vout_display_t *vd)
+static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
-    return picture_pool_Get(vd->sys->pool);
+    VLC_UNUSED(count);
+    return vd->sys->pool;
 }
 
 static void Display(vout_display_t *vd, picture_t *picture)

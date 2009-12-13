@@ -76,7 +76,7 @@ struct vout_display_sys_t
     picture_pool_t *pool; /* picture pool */
 };
 
-static picture_t *Get (vout_display_t *);
+static picture_pool_t *Pool (vout_display_t *, unsigned);
 static void PictureRender (vout_display_t *, picture_t *);
 static void PictureDisplay (vout_display_t *, picture_t *);
 static int Control (vout_display_t *, int, va_list);
@@ -375,7 +375,7 @@ static int Open (vlc_object_t *obj)
     /* Setup vout_display_t once everything is fine */
     vd->info = info;
 
-    vd->get = Get;
+    vd->pool = Pool;
     vd->prepare = PictureRender;
     vd->display = PictureDisplay;
     vd->control = Control;
@@ -431,17 +431,14 @@ static void SwapBuffers (vout_opengl_t *gl)
 /**
  * Return a direct buffer
  */
-static picture_t *Get (vout_display_t *vd)
+static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
 {
     vout_display_sys_t *sys = vd->sys;
+    (void)requested_count;
 
     if (!sys->pool)
-    {
         sys->pool = vout_display_opengl_GetPool (&sys->vgl);
-        if (!sys->pool)
-            return NULL;
-    }
-    return picture_pool_Get (sys->pool);
+    return sys->pool;
 }
 
 static void PictureRender (vout_display_t *vd, picture_t *pic)

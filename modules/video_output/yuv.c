@@ -80,10 +80,10 @@ static const char *const ppsz_vout_options[] = {
 };
 
 /* */
-static picture_t *Get    (vout_display_t *);
-static void       Display(vout_display_t *, picture_t *);
-static int        Control(vout_display_t *, int, va_list);
-static void       Manage (vout_display_t *);
+static picture_pool_t *Pool  (vout_display_t *, unsigned);
+static void           Display(vout_display_t *, picture_t *);
+static int            Control(vout_display_t *, int, va_list);
+static void           Manage (vout_display_t *);
 
 /*****************************************************************************
  * vout_display_sys_t: video output descriptor
@@ -92,7 +92,6 @@ struct vout_display_sys_t {
     FILE *f;
     bool  is_first;
     bool  is_yuv4mpeg2;
-    bool  use_dr;
 
     picture_pool_t *pool;
 };
@@ -133,7 +132,6 @@ static int Open(vlc_object_t *object)
             return VLC_EGENERIC;
         }
     }
-    sys->use_dr = chroma == vd->fmt.i_chroma;
     msg_Dbg(vd, "Using chroma %4.4s", (char *)&chroma);
 
     /* */
@@ -166,7 +164,7 @@ static int Open(vlc_object_t *object)
     /* */
     vd->fmt     = fmt;
     vd->info    = info;
-    vd->get     = Get;
+    vd->pool    = Pool;
     vd->prepare = NULL;
     vd->display = Display;
     vd->control = Control;
@@ -191,15 +189,12 @@ static void Close(vlc_object_t *object)
 /*****************************************************************************
  *
  *****************************************************************************/
-static picture_t *Get(vout_display_t *vd)
+static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
 {
     vout_display_sys_t *sys = vd->sys;
-    if (!sys->pool) {
-        sys->pool = picture_pool_NewFromFormat(&vd->fmt, sys->use_dr ? VOUT_MAX_PICTURES : 1);
-        if (!sys->pool)
-            return NULL;
-    }
-    return picture_pool_Get(sys->pool);
+    if (!sys->pool)
+        sys->pool = picture_pool_NewFromFormat(&vd->fmt, count);
+    return sys->pool;
 }
 
 static void Display(vout_display_t *vd, picture_t *picture)
