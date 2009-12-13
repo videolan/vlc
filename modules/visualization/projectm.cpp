@@ -335,9 +335,11 @@ static void *Thread( void *p_data )
         /* Render the image and swap the buffers */
         vlc_mutex_lock( &p_sys->lock );
         if( p_sys->i_nb_samples > 0 )
+        {
             p_sys->p_projectm->pcm()->addPCMfloat( p_sys->p_buffer,
                                                    p_sys->i_nb_samples );
-
+            p_sys->i_nb_samples = 0;
+        }
         p_sys->p_projectm->renderFrame();
         vlc_mutex_unlock( &p_sys->lock );
 
