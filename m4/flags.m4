@@ -1,3 +1,4 @@
+# Copyright © 2006 Rémi Denis-Courmont
 # <rdenis (at) simphalempin (dot) com>.
 # This file (flags.m4) is free software; unlimited permission to
 # copy and/or distribute it , with or without modifications, as long
