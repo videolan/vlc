@@ -210,6 +210,7 @@ static int Init( vout_thread_t *p_vout )
     p_sys->gl.sys = p_sys->p_vout;
 
     video_format_t fmt;
+    video_format_Init( &fmt, 0 );
     video_format_Setup( &fmt,
                         p_vout->render.i_chroma,
                         p_vout->render.i_width,
