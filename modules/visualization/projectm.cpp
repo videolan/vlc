@@ -29,6 +29,7 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_vout.h>
+#include <vlc_vout_wrapper.h>
 #include <vlc_filter.h>
 
 #include <libprojectM/projectM.hpp>
@@ -77,9 +78,9 @@ struct filter_sys_t
     vlc_sem_t    ready;
     bool         b_error;
 
-    /* video output module and opengl provider */
-    vout_thread_t *p_opengl;
-    module_t      *p_module;
+    /* Opengl */
+    vout_thread_t  *p_vout;
+    vout_display_t *p_vd;
 
     /* libprojectM objects */
     projectM      *p_projectm;
@@ -101,53 +102,6 @@ struct filter_sys_t
 
 static block_t *DoWork( filter_t *, block_t * );
 static void *Thread( void * );
-
-
-/**
- * Init the openGL context
- * p_thread: projectm thread object
- * @return VLC_SUCCESS or vlc error codes
- */
-static int initOpenGL( filter_t *p_filter )
-{
-    filter_sys_t *p_sys = p_filter->p_sys;
-
-    p_sys->p_opengl =
-        (vout_thread_t *)vlc_object_create( p_filter, sizeof(vout_thread_t) );
-    if( !p_sys->p_opengl )
-        return VLC_ENOMEM;
-
-    vlc_object_attach( p_sys->p_opengl, p_filter );
-
-    /* Initialize the opengl object */
-    video_format_Setup( &p_sys->p_opengl->fmt_in, VLC_CODEC_RGB32,
-                        p_sys->i_width, p_sys->i_height, 1 );
-    p_sys->p_opengl->i_window_width = p_sys->i_width;
-    p_sys->p_opengl->i_window_height = p_sys->i_height;
-    p_sys->p_opengl->render.i_width = p_sys->i_width;
-    p_sys->p_opengl->render.i_height = p_sys->i_height;
-    p_sys->p_opengl->render.i_aspect = VOUT_ASPECT_FACTOR;
-    p_sys->p_opengl->b_fullscreen = false;
-    p_sys->p_opengl->b_autoscale = true;
-    p_sys->p_opengl->i_alignment = 0;
-    p_sys->p_opengl->fmt_in.i_sar_num = 1;
-    p_sys->p_opengl->fmt_in.i_sar_den = 1;
-    p_sys->p_opengl->fmt_render = p_sys->p_opengl->fmt_in;
-
-    /* Ask for the opengl provider */
-    p_sys->p_module = module_need( p_sys->p_opengl, "opengl provider",
-                                   NULL, false );
-    if( !p_sys->p_module )
-    {
-        msg_Err( p_filter, "unable to initialize OpenGL" );
-        vlc_object_detach( p_sys->p_opengl );
-        vlc_object_release( p_sys->p_opengl );
-        return VLC_EGENERIC;
-    }
-
-    return VLC_SUCCESS;
-}
-
 
 /**
  * Open the module
@@ -258,6 +212,20 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
 }
 
 /**
+ * Variable callback for the dummy vout
+ */
+static int VoutCallback( vlc_object_t *p_vout, char const *psz_name,
+                         vlc_value_t oldv, vlc_value_t newv, void *p_data )
+{
+    vout_display_t *p_vd = (vout_display_t*)p_data;
+
+    if( !strcmp(psz_name, "fullscreen") )
+    {
+        vout_SetDisplayFullscreen( p_vd, newv.b_bool );
+    }
+}
+
+/**
  * Clean up function when Thread() is cancelled.
  */
 static void ThreadCleanup( void *p_data )
@@ -269,10 +237,10 @@ static void ThreadCleanup( void *p_data )
     delete p_sys->p_projectm;
 
     /* Free the openGL provider */
-    module_unneed( p_sys->p_opengl, p_sys->p_module );
-    vlc_object_detach( p_sys->p_opengl );
-    vlc_object_release( p_sys->p_opengl );
+    vout_DeleteDisplay( p_sys->p_vd, NULL );
+    vlc_object_release( p_sys->p_vout );
 }
+
 
 /**
  * ProjectM update thread which do the rendering
@@ -283,18 +251,50 @@ static void *Thread( void *p_data )
     filter_t     *p_filter = (filter_t*)p_data;
     filter_sys_t *p_sys = p_filter->p_sys;
     int cancel = vlc_savecancel();
+    video_format_t fmt;
+    vout_opengl_t *gl;
 
     /* Create the openGL provider */
-    if( initOpenGL( p_filter ) )
+    p_sys->p_vout =
+        (vout_thread_t *)vlc_object_create( p_filter, sizeof(vout_thread_t) );
+    if( !p_sys->p_vout )
+        goto error;
+
+    /* */
+    video_format_Init( &fmt, 0 );
+    video_format_Setup( &fmt, VLC_CODEC_RGB32,
+                        p_sys->i_width, p_sys->i_height, 0 );
+    fmt.i_sar_num = 1;
+    fmt.i_sar_den = 1;
+
+    vout_display_state_t state;
+    memset( &state, 0, sizeof(state) );
+    state.cfg.display.sar.num = 1;
+    state.cfg.display.sar.den = 1;
+    state.cfg.is_display_filled = true;
+    state.cfg.zoom.num = 1;
+    state.cfg.zoom.den = 1;
+    state.sar.num = 1;
+    state.sar.den = 1;
+
+    p_sys->p_vd = vout_NewDisplay( p_sys->p_vout, &fmt, &state, "opengl",
+                                   300000, 1000000 );
+    if( !p_sys->p_vd )
     {
-        p_sys->b_error = true;
-        vlc_sem_post( &p_sys->ready );
-        return NULL;
+        vlc_object_release( p_sys->p_vout );
+        goto error;
+    }
+    var_Create( p_sys->p_vout, "fullscreen", VLC_VAR_BOOL );
+    var_AddCallback( p_sys->p_vout, "fullscreen", VoutCallback, p_sys->p_vd );
+
+    gl = vout_GetDisplayOpengl( p_sys->p_vd );
+    if( !gl )
+    {
+        vout_DeleteDisplay( p_sys->p_vd, NULL );
+        vlc_object_release( p_sys->p_vout );
+        goto error;
     }
     vlc_cleanup_push( ThreadCleanup, p_filter );
-
-    /* Initialize the opengl provider for this thread */
-    p_sys->p_opengl->pf_init( p_sys->p_opengl );
 
     /* Create the projectM object */
     p_sys->p_projectm = new projectM( p_sys->psz_config );
@@ -307,14 +307,25 @@ static void *Thread( void *p_data )
     /* TODO: Give to projectm the name of the input
     p_sys->p_projectm->projectM_setTitle( "" ); */
 
-    /* Reset the dislay to get the right size */
-    p_sys->p_projectm->projectM_resetGL( p_sys->i_width,
-                                         p_sys->i_height );
-
+    /* */
+    int i_last_width  = 0;
+    int i_last_height = 0;
     for( ;; )
     {
         /* Manage the events */
-        p_sys->p_opengl->pf_manage( p_sys->p_opengl );
+        vout_ManageDisplay( p_sys->p_vd, true );
+        if( p_sys->p_vd->cfg->display.width  != i_last_width ||
+            p_sys->p_vd->cfg->display.height != i_last_height )
+        {
+            /* FIXME it is not perfect as we will have black bands */
+            vout_display_place_t place;
+            vout_display_PlacePicture( &place, &p_sys->p_vd->source, p_sys->p_vd->cfg, false );
+            p_sys->p_projectm->projectM_resetGL( place.width, place.height );
+
+            i_last_width  = p_sys->p_vd->cfg->display.width;
+            i_last_height = p_sys->p_vd->cfg->display.height;
+        }
+
         /* Render the image and swap the buffers */
         vlc_mutex_lock( &p_sys->lock );
         if( p_sys->i_nb_samples > 0 )
@@ -322,8 +333,13 @@ static void *Thread( void *p_data )
                                                    p_sys->i_nb_samples );
 
         p_sys->p_projectm->renderFrame();
-        p_sys->p_opengl->pf_swap( p_sys->p_opengl );
         vlc_mutex_unlock( &p_sys->lock );
+
+        if( !vout_opengl_Lock(gl) )
+        {
+            vout_opengl_Swap( gl );
+            vout_opengl_Unlock( gl );
+        }
 
         /* TODO: use a fps limiter */
         vlc_restorecancel( cancel );
@@ -331,5 +347,12 @@ static void *Thread( void *p_data )
         cancel = vlc_savecancel();
     }
     vlc_cleanup_pop();
+    abort();
+
+error:
+    p_sys->b_error = true;
+    vlc_sem_post( &p_sys->ready );
+    return NULL;
+
 }
 
