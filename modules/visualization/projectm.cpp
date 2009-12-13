@@ -24,6 +24,9 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#ifndef __STDC_CONSTANT_MACROS
+# define __STDC_CONSTANT_MACROS
+#endif
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -318,6 +321,7 @@ static void *Thread( void *p_data )
     int i_last_height = 0;
     for( ;; )
     {
+        const mtime_t i_deadline = mdate() + CLOCK_FREQ / 50; /* 50 fps max */
         /* Manage the events */
         vout_ManageDisplay( p_sys->p_vd, true );
         if( p_sys->p_vd->cfg->display.width  != i_last_width ||
@@ -344,16 +348,16 @@ static void *Thread( void *p_data )
 
         p_sys->p_projectm->renderFrame();
 
+        /* */
+        vlc_restorecancel( cancel );
+        mwait( i_deadline );
+        cancel = vlc_savecancel();
+
         if( !vout_opengl_Lock(gl) )
         {
             vout_opengl_Swap( gl );
             vout_opengl_Unlock( gl );
         }
-
-        /* TODO: use a fps limiter */
-        vlc_restorecancel( cancel );
-        msleep( 10000 );
-        cancel = vlc_savecancel();
     }
     vlc_cleanup_pop();
     abort();
