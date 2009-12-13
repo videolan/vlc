@@ -200,11 +200,17 @@ static block_t *DoWork( filter_t *p_filter, block_t *p_in_buf )
     vlc_mutex_lock( &p_sys->lock );
     if( p_sys->i_buffer_size > 0 )
     {
-        p_sys->p_buffer[0] = 0;
         p_sys->i_nb_samples = __MIN( p_sys->i_buffer_size,
                                      p_in_buf->i_nb_samples );
+
+        const float *p_src = (float*)p_in_buf->p_buffer;
         for( int i = 0; i < p_sys->i_nb_samples; i++ )
-            p_sys->p_buffer[i] = p_in_buf->p_buffer[i];
+        {
+            float v = 0;
+            for( int j = 0; j < p_sys->i_channels; j++ )
+                v += p_src[p_sys->i_channels * i + j];
+            p_sys->p_buffer[i] = v / p_sys->i_channels;
+        }
     }
     vlc_mutex_unlock( &p_sys->lock );
 
