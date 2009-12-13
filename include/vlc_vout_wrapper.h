@@ -30,11 +30,11 @@
 /* XXX DO NOT use it outside the vout module wrapper XXX */
 
 /**
- * It retreive a picture from the display
+ * It retreives a picture pool from the display
  */
-static inline picture_t *vout_display_Get(vout_display_t *vd)
+static inline picture_pool_t *vout_display_Pool(vout_display_t *vd, unsigned count)
 {
-    return vd->get(vd);
+    return vd->pool(vd, count);
 }
 
 /**

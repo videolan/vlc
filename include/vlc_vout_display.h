@@ -31,6 +31,7 @@
 
 #include <vlc_es.h>
 #include <vlc_picture.h>
+#include <vlc_picture_pool.h>
 #include <vlc_subpicture.h>
 #include <vlc_keys.h>
 #include <vlc_mouse.h>
@@ -265,14 +266,16 @@ struct vout_display_t {
      */
     vout_display_info_t info;
 
-    /* Return a new picture_t (mandatory).
+    /* Return a pointer over the current picture_pool_t* (mandatory).
      *
+     * For performance reasons, it is best to provide at least count
+     * pictures but it is not mandatory.
      * You can return NULL when you cannot/do not want to allocate
-     * more pictures.
-     * If you want to create a pool of reusable pictures, you can
-     * use a picture_pool_t.
+     * pictures.
+     * The vout display module keeps the ownership of the pool and can
+     * destroy it only when closing or on invalid pictures control.
      */
-    picture_t *(*get)(vout_display_t *);
+    picture_pool_t *(*pool)(vout_display_t *, unsigned count);
 
     /* Prepare a picture for display (optional).
      *

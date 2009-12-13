@@ -58,7 +58,10 @@ static picture_t *VideoBufferNew(filter_t *filter)
            vd->fmt.i_width  == fmt->i_width  &&
            vd->fmt.i_height == fmt->i_height);
 
-    return vout_display_Get(vd);
+    picture_pool_t *pool = vout_display_Pool(vd, 1);
+    if (!pool)
+        return NULL;
+    return picture_pool_Get(pool);
 }
 static void VideoBufferDelete(filter_t *filter, picture_t *picture)
 {
@@ -112,7 +115,7 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     vd->info.has_pictures_invalid = false;
 
     vd->cfg = cfg;
-    vd->get = NULL;
+    vd->pool = NULL;
     vd->prepare = NULL;
     vd->display = NULL;
     vd->control = NULL;

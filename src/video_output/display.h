@@ -34,9 +34,9 @@
 /**
  * It retreive a picture from the display
  */
-static inline picture_t *vout_display_Get(vout_display_t *vd)
+static inline picture_pool_t *vout_display_Pool(vout_display_t *vd, unsigned count)
 {
-    return vd->get(vd);
+    return vd->pool(vd, count);
 }
 
 /**
