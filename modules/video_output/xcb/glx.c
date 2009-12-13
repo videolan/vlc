@@ -56,6 +56,7 @@ vlc_module_begin ()
 
     add_shortcut ("xcb-glx")
     add_shortcut ("glx")
+    add_shortcut ("opengl")
 vlc_module_end ()
 
 struct vout_display_sys_t
@@ -535,6 +536,14 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                                       sys->embed->xid,
                                     XCB_CW_CURSOR, &(uint32_t){ sys->cursor });
         return VLC_SUCCESS;
+
+    case VOUT_DISPLAY_GET_OPENGL:
+    {
+        vout_opengl_t **gl = va_arg (ap, vout_opengl_t **);
+        *gl = &sys->gl;
+        return VLC_SUCCESS;
+    }
+
     case VOUT_DISPLAY_RESET_PICTURES:
         assert (0);
     default:
