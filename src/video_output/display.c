@@ -40,6 +40,10 @@
 
 #include "event.h"
 
+/* It must be present as long as a vout_display_t must be created using a dummy
+ * vout (as an opengl provider) */
+#define ALLOW_DUMMY_VOUT
+
 static void SplitterClose(vout_display_t *vd);
 
 /*****************************************************************************
@@ -354,7 +358,13 @@ struct vout_display_owner_sys_t {
     int  display_height;
     bool display_is_fullscreen;
     bool display_is_forced;
+
+#ifdef ALLOW_DUMMY_VOUT
+    vlc_mouse_t vout_mouse;
+#endif
 };
+
+static void DummyVoutSendDisplayEventMouse(vout_thread_t *, vlc_mouse_t *fallback, const vlc_mouse_t *m);
 
 static void VoutDisplayCreateRender(vout_display_t *vd)
 {
@@ -527,7 +537,11 @@ static void VoutDisplayEventMouse(vout_display_t *vd, int event, va_list args)
 
     /* */
     vout_SendEventMouseVisible(osys->vout);
+#ifdef ALLOW_DUMMY_VOUT
+    DummyVoutSendDisplayEventMouse(osys->vout, &osys->vout_mouse, &m);
+#else
     vout_SendDisplayEventMouse(osys->vout, &m);
+#endif
 }
 
 static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
@@ -1078,6 +1092,9 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
 
     osys->sar.num = osys->sar_initial.num ? osys->sar_initial.num : source.i_sar_num;
     osys->sar.den = osys->sar_initial.den ? osys->sar_initial.den : source.i_sar_den;
+#ifdef ALLOW_DUMMY_VOUT
+    vlc_mouse_Init(&osys->vout_mouse);
+#endif
 
     vout_display_owner_t owner;
     if (owner_ptr) {
@@ -1431,6 +1448,22 @@ void vout_SendDisplayEventMouse(vout_thread_t *vout, const vlc_mouse_t *m)
         vout_SendEventMouseDoubleClick(vout);
     vout->p->mouse = *m;
 }
+#ifdef ALLOW_DUMMY_VOUT
+static void DummyVoutSendDisplayEventMouse(vout_thread_t *vout, vlc_mouse_t *fallback, const vlc_mouse_t *m)
+{
+    vout_thread_sys_t p;
+
+    if (!vout->p) {
+        p.mouse = *fallback;
+        vout->p = &p;
+    }
+    vout_SendDisplayEventMouse(vout, m);
+    if (vout->p == &p) {
+        *fallback = p.mouse;
+        vout->p = NULL;
+    }
+}
+#endif
 vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout, vout_display_t *vd, const vout_window_cfg_t *cfg)
 {
     VLC_UNUSED(vd);
