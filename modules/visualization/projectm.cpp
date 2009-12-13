@@ -340,8 +340,9 @@ static void *Thread( void *p_data )
                                                    p_sys->i_nb_samples );
             p_sys->i_nb_samples = 0;
         }
-        p_sys->p_projectm->renderFrame();
         vlc_mutex_unlock( &p_sys->lock );
+
+        p_sys->p_projectm->renderFrame();
 
         if( !vout_opengl_Lock(gl) )
         {
