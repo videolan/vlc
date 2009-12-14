@@ -279,8 +279,3 @@ load_dir( http_dir )
 
 while not vlc.misc.lock_and_wait() do end -- everything happens in callbacks
 
--- FIXME: We shouldn't need to do this ourselves.
-for i=1,#files do
-    getmetatable(files[i]).__gc(files[i])
-    files[i] = nil
-end
