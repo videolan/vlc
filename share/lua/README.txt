@@ -292,6 +292,8 @@ var.add_callback( object, name, function, data ): Add a callback to the
 var.del_callback( object, name, function, data ): Delete a callback to
   the object's "name" variable. "function" and "data" must be the same as
   when add_callback() was called.
+var.trigger_callback( object, name ): Trigger the callbacks associated with the
+  object's "name" variable.
 
 var.command( object name, name, argument ): Issue "object name"'s "name"
   command with argument "argument".
