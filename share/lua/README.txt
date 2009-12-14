@@ -192,7 +192,7 @@ playlist.play(): Play.
 playlist.pause(): Pause.
 playlist.stop(): Stop.
 playlist.clear(): Clear the playlist.
-playlist.repeat( [status] ): Toggle item repeat or set to specified value.
+playlist.repeat_( [status] ): Toggle item repeat or set to specified value.
 playlist.loop( [status] ): Toggle playlist loop or set to specified value.
 playlist.random( [status] ): Toggle playlsit random or set to specified value.
 playlist.goto( id ): Go to specified track.

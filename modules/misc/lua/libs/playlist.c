@@ -432,7 +432,8 @@ static const luaL_Reg vlclua_playlist_reg[] = {
     { "pause", vlclua_playlist_pause },
     { "stop", vlclua_playlist_stop },
     { "clear", vlclua_playlist_clear },
-    { "repeat", vlclua_playlist_repeat },
+    { "repeat", vlclua_playlist_repeat }, // repeat is a reserved lua keyword...
+    { "repeat_", vlclua_playlist_repeat }, // ... provide repeat_ too.
     { "loop", vlclua_playlist_loop },
     { "random", vlclua_playlist_random },
     { "goto", vlclua_playlist_goto },
