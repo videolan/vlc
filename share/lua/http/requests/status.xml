@@ -116,13 +116,23 @@ local vout = input and vlc.object.find(input,'vout','child')
   <loop><?vlc print(vlc.var.get(playlist,"loop")) ?></loop>
   <repeat><?vlc print(vlc.var.get(playlist,"repeat")) ?></repeat>
   <information>
+    <category name="meta">
+    <?vlc
+      if input then
+        local metas = vlc.input.metas()
+        for k,v in pairs(metas) do
+          print("<info name='"..k.."'>"..vlc.strings.convert_xml_special_chars(v).."</info>")
+        end
+      end
+    ?>
+    </category>
   <?vlc
     if input then
       local info = vlc.input.info()
       for k, v in pairs(info) do
         print("<category name='"..k.."'>")
           for k2, v2 in pairs(v) do
-            print("<info name='"..k2.."'>"..string.gsub(v2,'&','&amp;').."</info>")
+            print("<info name='"..k2.."'>"..vlc.strings.convert_xml_special_chars(v2).."</info>")
           end
         print("</category>")
       end
