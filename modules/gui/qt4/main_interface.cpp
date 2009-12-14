@@ -702,7 +702,12 @@ void MainInterface::debug()
 {
 #ifndef NDEBUG
     msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->size().height(), size().width() );
-    msg_Dbg( p_intf, "Stack Size: %i - %i", stackCentralW->widget( VIDEO_TAB )->size().height(), stackCentralW->widget( VIDEO_TAB )->size().width() );
+    if( videoEmbeddedFlag )
+        msg_Dbg( p_intf, "Stack Size: %i - %i",
+                 stackCentralW->widget( VIDEO_TAB )->size().height(),
+                 stackCentralW->widget( VIDEO_TAB )->size().width() );
+    else
+        msg_Dbg( p_intf, "no embedded video" );
 
     msg_Dbg( p_intf, "size: %i - %i", size().height(), size().width() );
     msg_Dbg( p_intf, "sizeHint: %i - %i", sizeHint().height(), sizeHint().width() );
