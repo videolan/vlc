@@ -258,9 +258,9 @@ local function load_dir(dir,root,parent_acl)
                 local mime = mimes[ext]
                 -- print(url,mime)
                 if mime and string.match(mime,"^text/") then
-                    table.insert(files,file(h,dir.."/"..f,url,my_acl and my_acl.private,mime))
+                    table.insert(files,file(h,dir.."/"..f,url,my_acl,mime))
                 else
-                    table.insert(files,rawfile(h,dir.."/"..f,url,my_acl and my_acl.private))
+                    table.insert(files,rawfile(h,dir.."/"..f,url,my_acl))
                 end
             elseif s.type == "dir" then
                 load_dir(dir.."/"..f,root..f.."/",my_acl)
@@ -269,11 +269,11 @@ local function load_dir(dir,root,parent_acl)
     end
     if not has_index and not config.no_index then
         -- print("Adding index for", root)
-        table.insert(files,dirlisting(root,d,my_acl and my_acl.private))
+        table.insert(files,dirlisting(root,d,my_acl))
     end
 end
 
-local u = vlc.net.url_parse( config.host or "localhost:8080" )
+local u = vlc.net.url_parse( config.host or "0.0.0.0:8080" )
 h = vlc.httpd(u.host,u.port)
 load_dir( http_dir )
 
