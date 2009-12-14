@@ -38,6 +38,19 @@ vlc.msg.info("Lua HTTP interface")
 open_tag = "<?vlc"
 close_tag = "?>"
 
+-- TODO: use internal VLC mime lookup function for mimes not included here
+local mimes = {
+    txt = "text/plain",
+    html = "text/html",
+    xml = "text/xml",
+    js = "text/javascript",
+    css = "text/css",
+    png = "image/png",
+    jpg = "image/jpeg",
+    jpeg = "image/jpeg",
+    ico = "image/x-icon",
+}
+
 function escape(s)
     return (string.gsub(s,"([%^%$%%%.%[%]%*%+%-%?])","%%%1"))
 end
@@ -66,6 +79,7 @@ function process_raw(filename)
     --]]
     return assert(loadstring(code,filename))
 end
+
 function process(filename)
     local mtime = 0    -- vlc.net.stat(filename).modification_time
     local func = false -- process_raw(filename)
@@ -121,6 +135,36 @@ function dirlisting(url,listing,acl_)
 </html>]]
     end
     return h:file(url,"text/html",nil,nil,acl_,callback,nil)
+end
+
+-- FIXME: Experimental art support. Needs some cleaning up.
+function callback_art(data, request)
+    local art = function(data, request)
+        local metas = vlc.input.metas()
+        local filename = vlc.strings.decode_uri(string.gsub(metas["artwork_url"],"file://",""))
+        local size = vlc.net.stat(filename).size
+        local ext = string.match(filename,"%.([^%.]-)$")
+        local raw = io.open(filename):read("*a")
+        local content = [[Content-Type: ]]..mimes[ext]..[[
+
+Content-Length: ]]..size..[[
+
+
+]]..raw..[[
+
+]]
+        return content
+    end
+
+    local ok, content = pcall(art, data, request)
+    if not ok then
+        return [[Content-Type: text/plain
+Content-Length: 5
+
+Error
+]]
+    end
+    return content
 end
 
 function file(h,path,url,acl_,mime)
@@ -220,15 +264,6 @@ do
     package.path = oldpath
 end
 local files = {}
-local mimes = {
-    txt = "text/plain",
-    html = "text/html",
-    xml = "text/xml",
-    js = "text/javascript",
-    css = "text/css",
-    png = "image/png",
-    ico = "image/x-icon",
-}
 local function load_dir(dir,root,parent_acl)
     local root = root or "/"
     local has_index = false
@@ -271,11 +306,13 @@ local function load_dir(dir,root,parent_acl)
         -- print("Adding index for", root)
         table.insert(files,dirlisting(root,d,my_acl))
     end
+    return my_acl
 end
 
 local u = vlc.net.url_parse( config.host or "0.0.0.0:8080" )
 h = vlc.httpd(u.host,u.port)
-load_dir( http_dir )
+local root_acl = load_dir( http_dir )
+local a = h:handler("/art",nil,nil,root_acl,callback_art,nil)
 
 while not vlc.misc.lock_and_wait() do end -- everything happens in callbacks
 
