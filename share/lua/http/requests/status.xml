@@ -122,7 +122,7 @@ local vout = input and vlc.object.find(input,'vout','child')
       for k, v in pairs(info) do
         print("<category name='"..k.."'>")
           for k2, v2 in pairs(v) do
-            print("<info name='"..k2.."'>"..v2.replace('&','&amp;').."</info>")
+            print("<info name='"..k2.."'>"..string.gsub(v2,'&','&amp;').."</info>")
           end
         print("</category>")
       end
