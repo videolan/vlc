@@ -45,16 +45,18 @@ bool vlcInit()
 
     QString path = vlcPath();
     if (!path.isEmpty()) {
-        QString pluginsPath = path;
+        QString pluginsPath = QString("--plugin-path=") + QDir::toNativeSeparators(QFileInfo(vlcPath()).dir().path());
 #if defined(Q_OS_UNIX)
         pluginsPath.append("/vlc");
 #elif defined(Q_OS_WIN)
         pluginsPath.append("\\plugins");
 #endif
+        QByteArray p = path.toLatin1();
+        QByteArray pp = pluginsPath.toLatin1();
         // VLC command line options. See vlc --full-help
         const char *vlcArgs[] = {
-            path.toLatin1().constData(),
-            "--plugin-path=", pluginsPath.toAscii().constData(),
+            p.constData(),
+            pp.constData(),
             "--verbose=2",
             "--intf=dummy",
             "--extraintf=logger",
@@ -157,7 +159,7 @@ static QStringList findAllLibVlc()
     QString vlcVersion = settings.value("Version").toString();
     QString vlcInstallDir = settings.value("InstallDir").toString();
     if (vlcVersion.startsWith("1.0") && !vlcInstallDir.isEmpty()) {
-        paths << vlcInstallDir + QLatin1Char('\\') + "libvlc";
+        paths << vlcInstallDir + QLatin1Char('\\') + "libvlc.dll";
         return paths;
     } else {
         return QString();

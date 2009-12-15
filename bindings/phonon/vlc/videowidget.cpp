@@ -61,7 +61,7 @@ void VideoWidget::connectToMediaObject(PrivateMediaObject *mediaObject)
     connect(mediaObject, SIGNAL(videoWidgetSizeChanged(int, int)),
             SLOT(videoWidgetSizeChanged(int, int)));
 
-    mediaObject->setVideoWidgetId((int) p_video_widget->winId());
+    mediaObject->setVideoWidgetId(p_video_widget->winId());
 }
 
 Phonon::VideoWidget::AspectRatio VideoWidget::aspectRatio() const

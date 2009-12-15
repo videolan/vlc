@@ -25,6 +25,7 @@
 #include <phonon/mediaobjectinterface.h>
 
 #include <QtCore/QObject>
+#include <QtGui/QWidget>
 
 namespace Phonon
 {
@@ -45,7 +46,7 @@ public:
     /**
      * Widget Id where VLC will show the videos.
      */
-    void setVideoWidgetId(int i_widget_id);
+    void setVideoWidgetId(WId i_widget_id);
 
     void play();
     void seek(qint64 milliseconds);
@@ -69,8 +70,8 @@ public:
 signals:
 
     void aboutToFinish();
-//    void bufferStatus( int i_percent_filled );
-//    void currentSourceChanged( const MediaSource & newSource );
+    void bufferStatus( int i_percent_filled );
+    void currentSourceChanged( const MediaSource & newSource );
     void finished();
     void hasVideoChanged(bool b_has_video);
     void metaDataChanged(const QMultiMap<QString, QString> & metaData);
@@ -93,7 +94,7 @@ protected:
 
     virtual qint64 currentTimeInternal() const = 0;
 
-    int i_video_widget_id;
+    WId i_video_widget_id;
 
 private slots:
 

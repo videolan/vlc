@@ -61,7 +61,7 @@ MediaObject::~MediaObject()
 {
 }
 
-void MediaObject::setVideoWidgetId(int i_widget_id)
+void MediaObject::setVideoWidgetId(WId i_widget_id)
 {
     i_video_widget_id = i_widget_id;
 }

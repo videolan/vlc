@@ -32,12 +32,6 @@
 #include <QtCore/QPointer>
 #include <QtCore/QStringList>
 
-#ifdef MAKE_PHONON_VLC_LIB // We are building this library
-# define PHONON_VLC_EXPORT Q_DECL_EXPORT
-#else // We are using this library
-# define PHONON_VLC_EXPORT Q_DECL_IMPORT
-#endif
-
 namespace Phonon
 {
 namespace VLC {
