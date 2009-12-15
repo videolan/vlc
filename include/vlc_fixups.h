@@ -209,4 +209,34 @@ typedef void (*__free_fn_t) (void *__nodep);
 void tdestroy (void *vroot, __free_fn_t freefct);
 #endif
 
+/* Socket stuff */
+#ifndef HAVE_INET_PTON
+# define inet_pton vlc_inet_pton
+#endif
+
+#ifndef HAVE_INET_NTOP
+# define inet_ntop vlc_inet_ntop
+#endif
+
+#ifndef HAVE_POLL
+enum
+{
+    POLLIN=1,
+    POLLOUT=2,
+    POLLPRI=4,
+    POLLERR=8,  // unsupported stub
+    POLLHUP=16, // unsupported stub
+    POLLNVAL=32 // unsupported stub
+};
+
+struct pollfd
+{
+    int fd;
+    unsigned events;
+    unsigned revents;
+};
+
+# define poll(a, b, c) vlc_poll(a, b, c)
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */

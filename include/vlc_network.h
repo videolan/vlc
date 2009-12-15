@@ -151,37 +151,9 @@ VLC_EXPORT( ssize_t, net_Printf, ( vlc_object_t *p_this, int fd, const v_socket_
 VLC_EXPORT( ssize_t, __net_vaPrintf, ( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args ) );
 
 
-/* Don't go to an extra call layer if we have the symbol */
-#ifndef HAVE_INET_PTON
-#define inet_pton vlc_inet_pton
-#endif
-#ifndef HAVE_INET_NTOP
-#define inet_ntop vlc_inet_ntop
-#endif
-
 VLC_EXPORT (int, vlc_inet_pton, (int af, const char *src, void *dst) );
 VLC_EXPORT (const char *, vlc_inet_ntop, (int af, const void *src,
                                           char *dst, socklen_t cnt) );
-
-#ifndef HAVE_POLL
-enum
-{
-    POLLIN=1,
-    POLLOUT=2,
-    POLLPRI=4,
-    POLLERR=8,  // unsupported stub
-    POLLHUP=16, // unsupported stub
-    POLLNVAL=32 // unsupported stub
-};
-
-struct pollfd
-{
-    int fd;
-    int events;
-    int revents;
-};
-# define poll(a, b, c) vlc_poll(a, b, c)
-#endif
 struct pollfd;
 VLC_EXPORT (int, vlc_poll, (struct pollfd *fds, unsigned nfds, int timeout));
 
