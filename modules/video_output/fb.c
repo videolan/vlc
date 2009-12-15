@@ -234,8 +234,7 @@ static int Open(vlc_object_t *object)
             msg_Warn(vd, "chroma %s invalid, using default", chroma);
 
         free(chroma);
-    }
-    else
+    } else
         sys->chroma = 0;
 
     /* tty handling */
@@ -259,8 +258,7 @@ static int Open(vlc_object_t *object)
 
     if (sys->chroma) {
         fmt.i_chroma = sys->chroma;
-    }
-    else {
+    } else {
         /* Assume RGB */
 
         msg_Dbg(vd, "%d bppd", sys->var_info.bits_per_pixel);
