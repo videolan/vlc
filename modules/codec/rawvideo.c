@@ -159,7 +159,8 @@ static int OpenDecoder( vlc_object_t *p_this )
     video_format_Setup( &p_dec->fmt_out.video, p_dec->fmt_in.i_codec,
                         p_dec->fmt_in.video.i_width,
                         p_dec->fmt_in.video.i_height,
-                        p_dec->fmt_in.video.i_aspect );
+                        p_dec->fmt_in.video.i_aspect * p_dec->fmt_in.video.i_height,
+                        VOUT_ASPECT_FACTOR           * p_dec->fmt_in.video.i_width );
     p_sys->i_raw_size = p_dec->fmt_out.video.i_bits_per_pixel *
         p_dec->fmt_out.video.i_width * p_dec->fmt_out.video.i_height / 8;
 

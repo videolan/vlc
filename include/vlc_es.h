@@ -175,7 +175,7 @@ static inline void video_format_Clean( video_format_t *p_src )
  * It will fill up a video_format_tvideo_format_t using the given arguments.
  * Becarefull that the video_format_t must already be initialized.
  */
-VLC_EXPORT( void, video_format_Setup, ( video_format_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect ) );
+VLC_EXPORT( void, video_format_Setup, ( video_format_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
 
 /**
  * This function will check if the first video format is similar

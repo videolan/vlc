@@ -215,7 +215,8 @@ static int Init( vout_thread_t *p_vout )
                         p_vout->render.i_chroma,
                         p_vout->render.i_width,
                         p_vout->render.i_height,
-                        p_vout->render.i_aspect );
+                        p_vout->render.i_aspect * p_vout->render.i_height,
+                        VOUT_ASPECT_FACTOR      * p_vout->render.i_width );
 
 
     if( vout_display_opengl_Init( &p_sys->vgl, &fmt, &p_sys->gl ) )

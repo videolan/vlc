@@ -129,7 +129,9 @@ void video_format_FixRgb( video_format_t *p_fmt )
                  p_fmt->i_bmask );
 }
 
-void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect )
+void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma,
+                         int i_width, int i_height,
+                         int i_sar_num, int i_sar_den )
 {
     p_fmt->i_chroma         = vlc_fourcc_GetCodec( VIDEO_ES, i_chroma );
     p_fmt->i_width          =
@@ -138,7 +140,13 @@ void video_format_Setup( video_format_t *p_fmt, vlc_fourcc_t i_chroma, int i_wid
     p_fmt->i_visible_height = i_height;
     p_fmt->i_x_offset       =
     p_fmt->i_y_offset       = 0;
-    p_fmt->i_aspect         = i_aspect;
+    vlc_ureduce( &p_fmt->i_sar_num, &p_fmt->i_sar_den,
+                 i_sar_num, i_sar_den, 0 );
+    if( p_fmt->i_sar_den > 0 && i_height > 0 )
+        p_fmt->i_aspect     = (int64_t)p_fmt->i_sar_num * i_width * VOUT_ASPECT_FACTOR /
+                              p_fmt->i_sar_den / i_height;
+    else
+        p_fmt->i_aspect     = 0;
 
     switch( p_fmt->i_chroma )
     {

@@ -714,7 +714,8 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma, int i_width, int
     p_picture->i_qstride = 0;
     p_picture->p_q = NULL;
 
-    video_format_Setup( &p_picture->format, i_chroma, i_width, i_height, i_aspect );
+    video_format_Setup( &p_picture->format, i_chroma, i_width, i_height,
+                        i_aspect * i_height, VOUT_ASPECT_FACTOR * i_width );
 
     /* Make sure the real dimensions are a multiple of 16 */
     i_width_aligned = (i_width + 15) >> 4 << 4;
@@ -947,7 +948,9 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
 
     /* It is needed to be sure all informations are filled */
     video_format_Setup( &fmt, p_fmt->i_chroma,
-                              p_fmt->i_width, p_fmt->i_height, p_fmt->i_aspect );
+                              p_fmt->i_width, p_fmt->i_height,
+                              p_fmt->i_aspect    * p_fmt->i_height,
+                              VOUT_ASPECT_FACTOR * p_fmt->i_width );
 
     /* */
     picture_t *p_picture = calloc( 1, sizeof(*p_picture) );
@@ -996,7 +999,8 @@ picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_
     video_format_t fmt;
 
     memset( &fmt, 0, sizeof(fmt) );
-    video_format_Setup( &fmt, i_chroma, i_width, i_height, i_aspect );
+    video_format_Setup( &fmt, i_chroma, i_width, i_height,
+                        i_aspect * i_height, VOUT_ASPECT_FACTOR * i_width );
 
     return picture_NewFromFormat( &fmt );
 }

@@ -145,7 +145,8 @@ static int Open( vlc_object_t *p_this, const char *psz_name, bool b_filter )
     es_format_Init( &fmt, VIDEO_ES, p_vout->render.i_chroma );
     video_format_Setup( &fmt.video, p_vout->render.i_chroma,
                         p_vout->render.i_width, p_vout->render.i_height,
-                        p_vout->render.i_aspect );
+                        p_vout->render.i_aspect * p_vout->render.i_height,
+                        VOUT_ASPECT_FACTOR      * p_vout->render.i_width );
     if( fmt.video.i_sar_num <= 0 || fmt.video.i_sar_den <= 0 )
     {
         fmt.video.i_sar_num = fmt.video.i_aspect * fmt.video.i_visible_height;
