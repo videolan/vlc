@@ -75,7 +75,7 @@
     "in software.")
 
 #define CHROMA_TEXT N_("Image format (default RGB).")
-#define CHROMA_LONGTEXT N_("Chroma fourcc used by the framebuffer. Default is RGB since the fb device has no way to repot its chroma.")
+#define CHROMA_LONGTEXT N_("Chroma fourcc used by the framebuffer. Default is RGB since the fb device has no way to report its chroma.")
 
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
