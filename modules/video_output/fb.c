@@ -153,13 +153,11 @@ struct vout_display_sys_t {
 };
 
 
-static void clear_screen(vout_display_sys_t *sys)
+static void ClearScreen(vout_display_sys_t *sys)
 {
-    switch (sys->chroma)
-    {
+    switch (sys->chroma) {
     /* XXX: add other chromas */
-    case VLC_CODEC_UYVY:
-    {
+    case VLC_CODEC_UYVY: {
         unsigned int j, size = sys->video_size / 4;
         uint32_t *ptr = (uint32_t*)((uintptr_t)(sys->video_ptr + 3) & ~3);
         for(j=0; j < size; j++)
@@ -226,17 +224,16 @@ static int Open(vlc_object_t *object)
         break;
     }
 
-    char *psz_chroma = var_CreateGetNonEmptyString (vd, "fb-chroma");
-    if (psz_chroma)
-    {
-        sys->chroma = vlc_fourcc_GetCodecFromString (VIDEO_ES, psz_chroma);
+    char *chroma = var_CreateGetNonEmptyString(vd, "fb-chroma");
+    if (chroma) {
+        sys->chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, chroma);
 
         if (sys->chroma)
-            msg_Dbg (vd, "forcing chroma '%s'", psz_chroma);
+            msg_Dbg(vd, "forcing chroma '%s'", chroma);
         else
-            msg_Warn (vd, "chroma %s invalid, using default", psz_chroma);
+            msg_Warn(vd, "chroma %s invalid, using default", chroma);
 
-        free(psz_chroma);
+        free(chroma);
     }
     else
         sys->chroma = 0;
@@ -260,15 +257,13 @@ static int Open(vlc_object_t *object)
     /* */
     video_format_t fmt = vd->fmt;
 
-    if (sys->chroma)
-    {
+    if (sys->chroma) {
         fmt.i_chroma = sys->chroma;
     }
-    else
-    {
+    else {
         /* Assume RGB */
 
-        msg_Dbg (vd, "%d bppd", sys->var_info.bits_per_pixel);
+        msg_Dbg(vd, "%d bppd", sys->var_info.bits_per_pixel);
         switch (sys->var_info.bits_per_pixel) {
         case 8: /* FIXME: set the palette */
             fmt.i_chroma = VLC_CODEC_RGB8;
@@ -426,7 +421,7 @@ static void Manage (vout_display_t *vd)
 
         vout_display_SendEventDisplaySize();
 
-        clear_screen (vd->sys);
+        ClearScreen(vd->sys);
     }
 #endif
 }
@@ -671,7 +666,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         return VLC_EGENERIC;
     }
 
-    clear_screen (sys);
+    ClearScreen(sys);
 
     msg_Dbg(vd,
             "framebuffer type=%d, visual=%d, ypanstep=%d, ywrap=%d, accel=%d",
@@ -688,7 +683,7 @@ static void CloseDisplay(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->video_ptr != MAP_FAILED) {
-        clear_screen (sys);
+        ClearScreen(sys);
         munmap(sys->video_ptr, sys->video_size);
     }
 
