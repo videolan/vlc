@@ -60,6 +60,13 @@ VoutManager::VoutManager( intf_thread_t *pIntf ): SkinObject( pIntf ),
      m_pCtrlVideoVecBackup(), m_SavedWndVec()
 {
     m_pVoutMainWindow = new VoutMainWindow( getIntf() );
+
+    OSFactory *pOsFactory = OSFactory::instance( getIntf() );
+    int width = pOsFactory->getScreenWidth();
+    int height = pOsFactory->getScreenHeight();
+
+    m_pVoutMainWindow->move( 0, 0 );
+    m_pVoutMainWindow->resize( width, height );
 }
 
 
@@ -256,19 +263,18 @@ void VoutManager::setSizeWnd( vout_window_t *pWnd, int width, int height )
 
 void VoutManager::setFullscreenWnd( vout_window_t *pWnd, bool b_fullscreen )
 {
-   msg_Dbg( pWnd, "setFullscreen (%d) received from vout thread",
-                   b_fullscreen ? 1 : 0 );
+    msg_Dbg( pWnd, "setFullscreen (%d) received from vout thread",
+                    b_fullscreen ? 1 : 0 );
 
-   vector<SavedWnd>::iterator it;
-   for( it = m_SavedWndVec.begin(); it != m_SavedWndVec.end(); it++ )
-   {
-       if( (*it).pWnd == pWnd )
-       {
-           VoutWindow* pVoutWindow = (*it).pVoutWindow;
+    VlcProc::instance( getIntf() )->setFullscreenVar( b_fullscreen );
 
-           pVoutWindow->setFullscreen( b_fullscreen );
-           break;
-       }
+    if( b_fullscreen )
+    {
+        m_pVoutMainWindow->show();
+    }
+    else
+    {
+        m_pVoutMainWindow->hide();
     }
 }
 

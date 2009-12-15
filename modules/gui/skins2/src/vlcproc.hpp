@@ -84,6 +84,10 @@ public:
     /// Getter for the vout size variable
     VarBox &getVoutSizeVar() { return m_varVoutSize; }
 
+    /// Getter/Setter for the fullscreen variable
+    VarBool &getFullscreenVar() { return *((VarBool*)(m_cVarFullscreen.get())); }
+    void setFullscreenVar( bool );
+
     /// Indicate whether the embedded video output is currently used
     bool isVoutUsed() const { return m_pVout != NULL; }
 

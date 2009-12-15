@@ -45,6 +45,9 @@ CtrlVideo::CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
         VarBox &rVoutSize = VlcProc::instance( pIntf )->getVoutSizeVar();
         rVoutSize.addObserver( this );
     }
+
+    VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
+    rFullscreen.addObserver( this );
 }
 
 
@@ -52,6 +55,9 @@ CtrlVideo::~CtrlVideo()
 {
     VarBox &rVoutSize = VlcProc::instance( getIntf() )->getVoutSizeVar();
     rVoutSize.delObserver( this );
+
+    VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
+    rFullscreen.delObserver( this );
 
     //m_pLayout->getActiveVar().delObserver( this );
 }
@@ -167,7 +173,16 @@ void CtrlVideo::onUpdate( Subject<VarBool> &rVariable, void *arg  )
                       m_pLayout->getActiveVar().get() );
     }
 
-    m_bIsUseable = isVisible() && m_pLayout->getActiveVar().get();
+    VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
+    if( &rVariable == &rFullscreen )
+    {
+        msg_Dbg( getIntf(), "VideoCtrl : fullscreen toggled (fullscreen = %d)",
+                      rFullscreen.get() );
+    }
+
+    m_bIsUseable = isVisible() &&
+                   m_pLayout->getActiveVar().get() &&
+                   !rFullscreen.get();
 
     if( m_bIsUseable && !isUsed() )
     {

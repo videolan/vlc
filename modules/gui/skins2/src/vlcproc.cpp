@@ -770,6 +770,11 @@ void VlcProc::update_equalizer()
     SET_BOOL( m_cVarEqualizer, b_equalizer );
 }
 
+void VlcProc::setFullscreenVar( bool b_fullscreen )
+{
+    SET_BOOL( m_cVarFullscreen, b_fullscreen );
+}
+
 #undef  SET_BOOL
 #undef  SET_STREAMTIME
 #undef  SET_TEXT
