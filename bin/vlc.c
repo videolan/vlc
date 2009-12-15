@@ -50,6 +50,13 @@ extern void vlc_enable_override (void);
 #include <unistd.h>
 #include <dlfcn.h>
 
+#ifdef HAVE_MAEMO
+static void dummy_handler (int signum)
+{
+    (void) signum;
+}
+#endif
+
 /*****************************************************************************
  * main: parse command line, start interface and spawn threads.
  *****************************************************************************/
@@ -132,6 +139,13 @@ int main( int i_argc, const char *ppsz_argv[] )
     sigemptyset (&set);
     for (unsigned i = 0; i < sizeof (sigs) / sizeof (sigs[0]); i++)
         sigaddset (&set, sigs[i]);
+#ifdef HAVE_MAEMO
+    sigaddset (&set, SIGRTMIN);
+    {
+        struct sigaction act = { .sa_handler = dummy_handler, };
+        sigaction (SIGRTMIN, &act, NULL);
+    }
+#endif
 
     /* Block all these signals */
     pthread_sigmask (SIG_BLOCK, &set, NULL);

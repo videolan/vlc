@@ -30,7 +30,39 @@
 #include <vlc_network.h>
 
 
-#ifdef HAVE_POLL
+#if HAVE_MAEMO
+# include <signal.h>
+# include <errno.h>
+# include <poll.h>
+
+int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
+{
+    struct timespec tsbuf, *ts;
+    sigset_t set;
+    int canc, ret;
+
+    if (timeout != -1)
+    {
+        div_t d = div (timeout, 1000);
+        tsbuf.tv_sec = d.quot;
+        tsbuf.tv_nsec = d.rem * 1000000;
+        ts = &tsbuf;
+    }
+    else
+        ts = NULL;
+
+    pthread_sigmask (SIG_BLOCK, NULL, &set);
+    sigdelset (&set, SIGRTMIN);
+
+    canc = vlc_savecancel ();
+    ret = ppoll (fds, nfds, ts, &set);
+    vlc_restorecancel (canc);
+
+    vlc_testcancel ();
+    return ret;
+}
+
+#elif defined (HAVE_POLL)
 struct pollfd;
 
 int vlc_poll (struct pollfd *fds, unsigned nfds, int timeout)
