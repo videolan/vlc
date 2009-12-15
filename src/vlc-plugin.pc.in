@@ -8,6 +8,7 @@ Name: VLC plugin API
 Description: VLC media player plugin interface
 Version: @VERSION@
 Cflags: -I${includedir} -I${pkgincludedir}/plugins \
+	-D__PLUGIN__ \
 	-D_FILE_OFFSET_BITS=64 \
 	-D__USE_UNIX98 \
 	-D_LARGEFILE64_SOURCE \
