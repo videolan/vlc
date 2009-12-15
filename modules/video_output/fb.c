@@ -129,6 +129,7 @@ struct vout_display_sys_t {
     int                         fd;                       /* device handle */
     struct fb_var_screeninfo    old_info;       /* original mode information */
     struct fb_var_screeninfo    var_info;        /* current mode information */
+    struct fb_fix_screeninfo    fix_info;     /* framebuffer fix information */
     bool                        has_pan;   /* does device supports panning ? */
     struct fb_cmap              fb_cmap;                /* original colormap */
     uint16_t                    *palette;                /* original palette */
@@ -307,12 +308,7 @@ static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
             memset(&rsc, 0, sizeof(rsc));
             rsc.p[0].p_pixels = sys->video_ptr;
             rsc.p[0].i_lines  = sys->var_info.yres;
-            if (sys->var_info.xres_virtual)
-                rsc.p[0].i_pitch = sys->var_info.xres_virtual *
-                                   sys->bytes_per_pixel;
-            else
-                rsc.p[0].i_pitch = sys->var_info.xres *
-                                   sys->bytes_per_pixel;
+            rsc.p[0].i_pitch = sys->fix_info.line_length;
 
             sys->picture = picture_NewFromResource(&vd->fmt, &rsc);
             if (!sys->picture)
@@ -484,7 +480,6 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
 {
     vout_display_sys_t *sys = vd->sys;
     char *psz_device;                             /* framebuffer device path */
-    struct fb_fix_screeninfo    fix_info;     /* framebuffer fix information */
 
     /* Open framebuffer device */
     if (!(psz_device = config_GetPsz(vd, FB_DEV_VAR))) {
@@ -527,7 +522,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
     }
 
     /* Get some information again, in the definitive configuration */
-    if (ioctl(sys->fd, FBIOGET_FSCREENINFO, &fix_info) ||
+    if (ioctl(sys->fd, FBIOGET_FSCREENINFO, &sys->fix_info) ||
         ioctl(sys->fd, FBIOGET_VSCREENINFO, &sys->var_info)) {
         msg_Err(vd, "cannot get additional fb info (%m)");
 
@@ -559,7 +554,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
             sys->width, sys->height);
 
     sys->palette = NULL;
-    sys->has_pan = (fix_info.ypanstep || fix_info.ywrapstep);
+    sys->has_pan = (sys->fix_info.ypanstep || sys->fix_info.ywrapstep);
 
     switch (sys->var_info.bits_per_pixel) {
     case 8:
@@ -608,7 +603,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         return VLC_EGENERIC;
     }
 
-    sys->video_size = sys->width * sys->height * sys->bytes_per_pixel;
+    sys->video_size = sys->fix_info.line_length * sys->var_info.yres_virtual;
 
     /* Map a framebuffer at the beginning */
     sys->video_ptr = mmap(NULL, sys->video_size,
@@ -633,8 +628,8 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
 
     msg_Dbg(vd,
             "framebuffer type=%d, visual=%d, ypanstep=%d, ywrap=%d, accel=%d",
-            fix_info.type, fix_info.visual,
-            fix_info.ypanstep, fix_info.ywrapstep, fix_info.accel);
+            sys->fix_info.type, sys->fix_info.visual,
+            sys->fix_info.ypanstep, sys->fix_info.ywrapstep, sys->fix_info.accel);
     return VLC_SUCCESS;
 }
 
