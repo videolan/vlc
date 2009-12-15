@@ -616,10 +616,7 @@ vlc_fourcc_t image_Mime2Fourcc( const char *psz_mime )
 static picture_t *video_new_buffer( decoder_t *p_dec )
 {
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-    return picture_New( p_dec->fmt_out.video.i_chroma,
-                        p_dec->fmt_out.video.i_width,
-                        p_dec->fmt_out.video.i_height,
-                        p_dec->fmt_out.video.i_aspect );
+    return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
 
 static void video_del_buffer( decoder_t *p_dec, picture_t *p_pic )

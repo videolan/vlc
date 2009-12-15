@@ -822,8 +822,7 @@ subpicture_region_t *subpicture_region_New( const video_format_t *p_fmt )
     if( p_fmt->i_chroma == VLC_CODEC_TEXT )
         return p_region;
 
-    p_region->p_picture = picture_New( p_fmt->i_chroma, p_fmt->i_width, p_fmt->i_height,
-                                       p_fmt->i_aspect );
+    p_region->p_picture = picture_NewFromFormat( p_fmt );
     if( !p_region->p_picture )
     {
         free( p_fmt->p_palette );
@@ -1871,8 +1870,7 @@ static picture_t *spu_new_video_buffer( filter_t *p_filter )
     const video_format_t *p_fmt = &p_filter->fmt_out.video;
 
     VLC_UNUSED(p_filter);
-    return picture_New( p_fmt->i_chroma,
-                        p_fmt->i_width, p_fmt->i_height, p_fmt->i_aspect );
+    return picture_NewFromFormat( p_fmt );
 }
 static void spu_del_video_buffer( filter_t *p_filter, picture_t *p_picture )
 {
