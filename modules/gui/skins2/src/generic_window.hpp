@@ -49,9 +49,18 @@ private:
     friend class VoutManager;
     friend class CtrlVideo;
 public:
+
+    enum WindowType_t
+    {
+        TopWindow,
+        VoutWindow,
+        FullscreenWindow,
+    };
+
     GenericWindow( intf_thread_t *pIntf, int xPos, int yPos,
                    bool dragDrop, bool playOnDrop,
-                   GenericWindow *pParent = NULL );
+                   GenericWindow *pParent = NULL,
+                   WindowType_t type = TopWindow );
     virtual ~GenericWindow();
 
     /// Methods to process OS events.

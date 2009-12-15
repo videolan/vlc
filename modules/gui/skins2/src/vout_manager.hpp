@@ -58,7 +58,8 @@ class VoutMainWindow: public GenericWindow
 public:
 
     VoutMainWindow( intf_thread_t *pIntf, int left = 0, int top = 0 ) :
-            GenericWindow( pIntf, left, top, false, false, NULL )
+            GenericWindow( pIntf, left, top, false, false, NULL,
+                           GenericWindow::FullscreenWindow )
     {
         resize( 10, 10 );
         move( -50, -50 );

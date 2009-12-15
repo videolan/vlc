@@ -30,7 +30,7 @@
 #include <string>
 #include <list>
 
-class GenericWindow;
+#include "../src/generic_window.hpp"
 class CmdGeneric;
 class OSBitmap;
 class OSGraphics;
@@ -102,7 +102,7 @@ public:
     /// Instantiate an object OSWindow
     virtual OSWindow *createOSWindow( GenericWindow &rWindow,
                                       bool dragDrop, bool playOnDrop,
-                                      OSWindow *pParent ) = 0;
+                                      OSWindow *pParent, GenericWindow::WindowType_t ) = 0;
 
     /// Instantiate an object OSTooltip
     virtual OSTooltip *createOSTooltip() = 0;

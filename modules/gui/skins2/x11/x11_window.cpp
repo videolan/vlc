@@ -37,14 +37,30 @@
 
 X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                       X11Display &rDisplay, bool dragDrop, bool playOnDrop,
-                      X11Window *pParentWindow ):
+                      X11Window *pParentWindow, GenericWindow::WindowType_t type ):
     OSWindow( pIntf ), m_rDisplay( rDisplay ), m_pParent( pParentWindow ),
     m_dragDrop( dragDrop )
 {
     XSetWindowAttributes attr;
     unsigned long valuemask;
+    string name_type;
 
-    if (pParentWindow)
+    if( type == GenericWindow::FullscreenWindow )
+    {
+        m_wnd_parent = DefaultRootWindow( XDISPLAY );
+
+        int i_screen = DefaultScreen( XDISPLAY );
+
+        attr.event_mask = ExposureMask | StructureNotifyMask;
+        attr.background_pixel = BlackPixel( XDISPLAY, i_screen );
+        attr.backing_store = Always;
+        attr.override_redirect = True;
+        valuemask = CWBackingStore | CWOverrideRedirect |
+                    CWBackPixel | CWEventMask;
+
+        name_type = "Fullscreen";
+    }
+    else if( type == GenericWindow::VoutWindow )
     {
         m_wnd_parent = pParentWindow->m_wnd;
 
@@ -54,6 +70,8 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         attr.backing_store = Always;
         attr.background_pixel = BlackPixel( XDISPLAY, i_screen );
         valuemask = CWBackingStore | CWBackPixel | CWEventMask;
+
+        name_type = "VoutWindow";
     }
     else
     {
@@ -61,6 +79,8 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
 
         attr.event_mask = ExposureMask | StructureNotifyMask;
         valuemask = CWEventMask;
+
+        name_type = "TopWindow";
     }
 
     // Create the window
@@ -118,7 +138,8 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     }
 
     // Change the window title
-    XStoreName( XDISPLAY, m_wnd, "VLC" );
+    string name_window = "VLC (" + name_type + ")";
+    XStoreName( XDISPLAY, m_wnd, name_window.c_str() );
 
     // Associate the window to the main "parent" window
     XSetTransientForHint( XDISPLAY, m_wnd, m_rDisplay.getMainWindow() );

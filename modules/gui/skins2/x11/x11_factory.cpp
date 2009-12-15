@@ -38,6 +38,7 @@
 #include "x11_window.hpp"
 #include "x11_tooltip.hpp"
 
+#include "../src/generic_window.hpp"
 
 X11Factory::X11Factory( intf_thread_t *pIntf ): OSFactory( pIntf ),
     m_pDisplay( NULL ), m_pTimerLoop( NULL ), m_dirSep( "/" )
@@ -140,10 +141,11 @@ OSTimer *X11Factory::createOSTimer( CmdGeneric &rCmd )
 
 
 OSWindow *X11Factory::createOSWindow( GenericWindow &rWindow, bool dragDrop,
-                                      bool playOnDrop, OSWindow *pParent )
+                                      bool playOnDrop, OSWindow *pParent,
+                                      GenericWindow::WindowType_t type )
 {
     return new X11Window( getIntf(), rWindow, *m_pDisplay, dragDrop,
-                          playOnDrop, (X11Window*)pParent );
+                          playOnDrop, (X11Window*)pParent, type );
 }
 
 

@@ -38,7 +38,8 @@ int VoutWindow::count = 0;
 
 VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
                         int width, int height, GenericWindow* pParent ) :
-      GenericWindow( pIntf, 0, 0, false, false, pParent ),
+      GenericWindow( pIntf, 0, 0, false, false, pParent,
+                     GenericWindow::VoutWindow ),
       m_pWnd( pWnd ), original_width( width ), original_height( height ),
       m_pParentWindow( pParent ), m_pCtrlVideo( NULL ), m_bFullscreen( false )
 {
@@ -64,6 +65,7 @@ void VoutWindow::setCtrlVideo( CtrlVideo* pCtrlVideo )
 {
     if( pCtrlVideo )
     {
+        hide();
         const Position *pPos = pCtrlVideo->getPosition();
         int x = pPos->getLeft();
         int y = pPos->getTop();
@@ -77,6 +79,7 @@ void VoutWindow::setCtrlVideo( CtrlVideo* pCtrlVideo )
     }
     else
     {
+        hide();
         int w = VoutManager::instance( getIntf() )->getVoutMainWindow()->getWidth();
         int h = VoutManager::instance( getIntf() )->getVoutMainWindow()->getHeight();
 
@@ -84,6 +87,7 @@ void VoutWindow::setCtrlVideo( CtrlVideo* pCtrlVideo )
                    0, 0, w, h );
         m_pParentWindow =
                   VoutManager::instance( getIntf() )->getVoutMainWindow();
+        show();
     }
 
     m_pCtrlVideo = pCtrlVideo;

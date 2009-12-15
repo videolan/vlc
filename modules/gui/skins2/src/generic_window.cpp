@@ -31,7 +31,7 @@
 
 GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
                               bool dragDrop, bool playOnDrop,
-                              GenericWindow *pParent ):
+                              GenericWindow *pParent, WindowType_t type ):
     SkinObject( pIntf ), m_left( left ), m_top( top ), m_width( 0 ),
     m_height( 0 ), m_pVarVisible( NULL )
 {
@@ -47,7 +47,7 @@ GenericWindow::GenericWindow( intf_thread_t *pIntf, int left, int top,
 
     // Create an OSWindow to handle OS specific processing
     m_pOsWindow = pOsFactory->createOSWindow( *this, dragDrop, playOnDrop,
-                                              pOSParent );
+                                              pOSParent, type );
 
     // Create the visibility variable and register it in the manager
     m_pVarVisible = new VarBoolImpl( pIntf );

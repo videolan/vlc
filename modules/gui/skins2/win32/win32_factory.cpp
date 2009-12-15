@@ -33,6 +33,7 @@
 #include "win32_loop.hpp"
 #include "../src/theme.hpp"
 #include "../src/window_manager.hpp"
+#include "../src/generic_window.hpp"
 #include "../commands/cmd_dialogs.hpp"
 #include "../commands/cmd_minimize.hpp"
 
@@ -323,7 +324,8 @@ OSTimer *Win32Factory::createOSTimer( CmdGeneric &rCmd )
 
 
 OSWindow *Win32Factory::createOSWindow( GenericWindow &rWindow, bool dragDrop,
-                                        bool playOnDrop, OSWindow *pParent )
+                                        bool playOnDrop, OSWindow *pParent,
+                                        GenericWindow::WindowType_t type )
 {
     return new Win32Window( getIntf(), rWindow, m_hInst, m_hParentWindow,
                             dragDrop, playOnDrop, (Win32Window*)pParent );

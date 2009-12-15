@@ -32,6 +32,8 @@
 #include <windows.h>
 #include <shellapi.h>
 #include "../src/os_factory.hpp"
+#include "../src/generic_window.hpp"
+
 #include <map>
 
 
@@ -78,7 +80,8 @@ public:
     /// Instantiate an OSWindow object
     virtual OSWindow *createOSWindow( GenericWindow &rWindow,
                                       bool dragDrop, bool playOnDrop,
-                                      OSWindow *pParent );
+                                      OSWindow *pParent,
+                                      GenericWindow::WindowType_t type );
 
     /// Instantiate an object OSTooltip
     virtual OSTooltip *createOSTooltip();

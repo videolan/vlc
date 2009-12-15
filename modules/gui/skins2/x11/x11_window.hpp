@@ -27,6 +27,7 @@
 
 #include <X11/Xlib.h>
 
+#include "../src/generic_window.hpp"
 #include "../src/os_window.hpp"
 
 class X11Display;
@@ -39,7 +40,7 @@ class X11Window: public OSWindow
 public:
     X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                X11Display &rDisplay, bool dragDrop, bool playOnDrop,
-               X11Window *pParentWindow );
+               X11Window *pParentWindow, GenericWindow::WindowType_t );
 
     virtual ~X11Window();
 
