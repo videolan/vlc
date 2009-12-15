@@ -74,6 +74,9 @@
     "in hardware then you must disable this option. It then does double buffering " \
     "in software.")
 
+#define CHROMA_TEXT N_("Image format (default RGB).")
+#define CHROMA_LONGTEXT N_("Chroma fourcc used by the framebuffer. Default is RGB since the fb device has no way to repot its chroma.")
+
 static int  Open (vlc_object_t *);
 static void Close(vlc_object_t *);
 
@@ -84,7 +87,7 @@ vlc_module_begin ()
     add_file(FB_DEV_VAR, "/dev/fb0", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
               false)
     add_bool("fb-tty", true, NULL, TTY_TEXT, TTY_LONGTEXT, true)
-    add_obsolete_string("fb-chroma")
+    add_string( "fb-chroma", NULL, NULL, CHROMA_TEXT, CHROMA_LONGTEXT, true )
     add_obsolete_string("fb-aspect-ratio")
     add_integer("fb-mode", 4, NULL, FB_MODE_TEXT, FB_MODE_LONGTEXT,
                  true)
@@ -138,6 +141,7 @@ struct vout_display_sys_t {
     uint32_t width;
     uint32_t height;
     uint32_t line_length;
+    vlc_fourcc_t chroma;
     int      bytes_per_pixel;
 
     /* Video memory */
@@ -147,6 +151,25 @@ struct vout_display_sys_t {
     picture_t       *picture;
     picture_pool_t  *pool;
 };
+
+
+static void clear_screen(vout_display_sys_t *sys)
+{
+    switch (sys->chroma)
+    {
+    /* XXX: add other chromas */
+    case VLC_CODEC_UYVY:
+    {
+        unsigned int j, size = sys->video_size / 4;
+        uint32_t *ptr = (uint32_t*)((uintptr_t)(sys->video_ptr + 3) & ~3);
+        for(j=0; j < size; j++)
+            ptr[j] = 0x10801080;    /* U = V = 16, Y = 128 */
+        break;
+    }
+    default:    /* RGB */
+        memset(sys->video_ptr, 0, sys->video_size);
+    }
+}
 
 /**
  * This function allocates and initializes a FB vout method.
@@ -203,6 +226,21 @@ static int Open(vlc_object_t *object)
         break;
     }
 
+    char *psz_chroma = var_CreateGetNonEmptyString (vd, "fb-chroma");
+    if (psz_chroma)
+    {
+        sys->chroma = vlc_fourcc_GetCodecFromString (VIDEO_ES, psz_chroma);
+
+        if (sys->chroma)
+            msg_Dbg (vd, "forcing chroma '%s'", psz_chroma);
+        else
+            msg_Warn (vd, "chroma %s invalid, using default", psz_chroma);
+
+        free(psz_chroma);
+    }
+    else
+        sys->chroma = 0;
+
     /* tty handling */
     if (sys->is_tty && TtyInit(vd)) {
         free(sys);
@@ -222,37 +260,46 @@ static int Open(vlc_object_t *object)
     /* */
     video_format_t fmt = vd->fmt;
 
-    msg_Err(vd, "var_info.bits_per_pixel = %d", sys->var_info.bits_per_pixel);
-    switch (sys->var_info.bits_per_pixel) {
-    case 8: /* FIXME: set the palette */
-        fmt.i_chroma = VLC_CODEC_RGB8;
-        break;
-    case 15:
-        fmt.i_chroma = VLC_CODEC_RGB15;
-        break;
-    case 16:
-        fmt.i_chroma = VLC_CODEC_RGB16;
-        break;
-    case 24:
-        fmt.i_chroma = VLC_CODEC_RGB24;
-        break;
-    case 32:
-        fmt.i_chroma = VLC_CODEC_RGB32;
-        break;
-    default:
-        msg_Err(vd, "unknown screen depth %i",
-                sys->var_info.bits_per_pixel);
-        Close(VLC_OBJECT(vd));
-        return VLC_EGENERIC;
+    if (sys->chroma)
+    {
+        fmt.i_chroma = sys->chroma;
     }
-    if (sys->var_info.bits_per_pixel != 8) {
-        fmt.i_rmask = ((1 << sys->var_info.red.length) - 1)
-                             << sys->var_info.red.offset;
-        fmt.i_gmask = ((1 << sys->var_info.green.length) - 1)
-                             << sys->var_info.green.offset;
-        fmt.i_bmask = ((1 << sys->var_info.blue.length) - 1)
-                             << sys->var_info.blue.offset;
+    else
+    {
+        /* Assume RGB */
+
+        msg_Dbg (vd, "%d bppd", sys->var_info.bits_per_pixel);
+        switch (sys->var_info.bits_per_pixel) {
+        case 8: /* FIXME: set the palette */
+            fmt.i_chroma = VLC_CODEC_RGB8;
+            break;
+        case 15:
+            fmt.i_chroma = VLC_CODEC_RGB15;
+            break;
+        case 16:
+            fmt.i_chroma = VLC_CODEC_RGB16;
+            break;
+        case 24:
+            fmt.i_chroma = VLC_CODEC_RGB24;
+            break;
+        case 32:
+            fmt.i_chroma = VLC_CODEC_RGB32;
+            break;
+        default:
+            msg_Err(vd, "unknown screendepth %i", sys->var_info.bits_per_pixel);
+            Close(VLC_OBJECT(vd));
+            return VLC_EGENERIC;
+        }
+        if (sys->var_info.bits_per_pixel != 8) {
+            fmt.i_rmask = ((1 << sys->var_info.red.length) - 1)
+                                 << sys->var_info.red.offset;
+            fmt.i_gmask = ((1 << sys->var_info.green.length) - 1)
+                                 << sys->var_info.green.offset;
+            fmt.i_bmask = ((1 << sys->var_info.blue.length) - 1)
+                                 << sys->var_info.blue.offset;
+        }
     }
+
     fmt.i_width  = sys->width;
     fmt.i_height = sys->height;
 
@@ -379,9 +426,7 @@ static void Manage (vout_display_t *vd)
 
         vout_display_SendEventDisplaySize();
 
-        /* Clear screen */
-        memset(vd->sys->video_ptr, 0, vd->sys->video_size);
-
+        clear_screen (vd->sys);
     }
 #endif
 }
@@ -625,8 +670,8 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         close(sys->fd);
         return VLC_EGENERIC;
     }
-    /* Clear the screen */
-    memset(sys->video_ptr, 0, sys->video_size);
+
+    clear_screen (sys);
 
     msg_Dbg(vd,
             "framebuffer type=%d, visual=%d, ypanstep=%d, ywrap=%d, accel=%d",
@@ -643,8 +688,7 @@ static void CloseDisplay(vout_display_t *vd)
     vout_display_sys_t *sys = vd->sys;
 
     if (sys->video_ptr != MAP_FAILED) {
-        /* Clear display */
-        memset(sys->video_ptr, 0, sys->video_size);
+        clear_screen (sys);
         munmap(sys->video_ptr, sys->video_size);
     }
 
