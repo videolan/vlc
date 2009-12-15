@@ -134,8 +134,6 @@ void CloseAvio(vlc_object_t *object)
 
 static ssize_t Read(access_t *access, uint8_t *data, size_t size)
 {
-    access_sys_t *sys = access->p_sys;
-
     /* FIXME I am unsure of the meaning of the return value in case
      * of error.
      */
