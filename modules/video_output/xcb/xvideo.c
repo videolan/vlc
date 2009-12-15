@@ -572,7 +572,7 @@ static picture_pool_t *Pool (vout_display_t *vd, unsigned requested_count)
     if (!p_sys->pool)
     {
         picture_t *pic = picture_New (vd->fmt.i_chroma, p_sys->att->width,
-                                      p_sys->att->height, 0);
+                                      p_sys->att->height, 0, 1);
         if (!pic)
             return NULL;
 

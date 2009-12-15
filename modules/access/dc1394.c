@@ -382,8 +382,7 @@ static int Open( vlc_object_t *p_this )
     i_height = p_sys->height;
 
     if( picture_Setup( &p_sys->pic, VLC_CODEC_UYVY,
-                       i_width, i_height,
-                       i_width * VOUT_ASPECT_FACTOR / i_height ) )
+                       i_width, i_height, 1, 1 ) )
     {
         msg_Err( p_demux ,"unknown chroma" );
         Close( p_this );

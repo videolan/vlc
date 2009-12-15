@@ -551,7 +551,7 @@ static picture_t *LoadImage( vlc_object_t *p_this, int nbChannels, int* i_values
     moinsDix = 0.32*scale + 20;
     moinsVingt = 0.1*scale + 20;
     
-    p_pic = picture_New(VLC_FOURCC('Y','U','V','A'), i_width+20, scale+30, VOUT_ASPECT_FACTOR * (i_width+20)/(scale+30));
+    p_pic = picture_New(VLC_FOURCC('Y','U','V','A'), i_width+20, scale+30, 1, 1);
     
     // blacken the whole picture
     for( i = 0 ; i < p_pic->i_planes ; i++ )

@@ -615,8 +615,7 @@ static int UnpackFromFile( sout_stream_t *p_stream, const char *psz_file,
     }
 
     if( picture_Setup( p_pic, VLC_CODEC_I420,
-                       i_width, i_height,
-                       i_width * VOUT_ASPECT_FACTOR / i_height ) )
+                       i_width, i_height, 1, 1 ) )
     {
         msg_Err( p_stream, "unknown chroma" );
         return -1;

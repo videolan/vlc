@@ -334,7 +334,7 @@ static block_t *SendFrame( decoder_t *p_dec, block_t *p_block )
         /* Fill in picture_t fields */
         picture_Setup( &pic, p_dec->fmt_out.i_codec,
                        p_dec->fmt_out.video.i_width,
-                       p_dec->fmt_out.video.i_height, VOUT_ASPECT_FACTOR );
+                       p_dec->fmt_out.video.i_height, 0, 1 );
 
         if( !pic.i_planes )
         {

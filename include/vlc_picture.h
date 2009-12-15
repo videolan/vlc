@@ -135,7 +135,7 @@ struct picture_t
  * with picture_Hold and picture_Release. This default management will release
  * p_sys, p_q, p_data_orig fields if non NULL.
  */
-VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect ) );
+VLC_EXPORT( picture_t *, picture_New, ( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
 
 /**
  * This function will create a new picture using the given format.
@@ -298,7 +298,7 @@ VLC_EXPORT( int, picture_Export, ( vlc_object_t *p_obj, block_t **pp_image, vide
  *
  * It can be usefull to get the properties of planes.
  */
-VLC_EXPORT( int, picture_Setup, ( picture_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect ) );
+VLC_EXPORT( int, picture_Setup, ( picture_t *, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
 
 /*****************************************************************************
  * Flags used to describe the status of a picture

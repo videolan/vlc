@@ -1085,8 +1085,8 @@ static int OpenVideoDev( demux_t *p_demux, char *psz_device )
     {
         /* Fill in picture_t fields */
         if( picture_Setup( &p_sys->pic, p_sys->i_fourcc,
-                           p_sys->i_width, p_sys->i_height, p_sys->i_width *
-                           VOUT_ASPECT_FACTOR / p_sys->i_height ) )
+                           p_sys->i_width, p_sys->i_height,
+                           1, 1 ) )
         {
             msg_Err( p_demux, "unsupported chroma" );
             goto vdev_failed;

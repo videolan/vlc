@@ -592,7 +592,8 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
             p_new_pic = picture_New( p_pic->format.i_chroma,
                                      p_pic->format.i_width, p_pic->format.i_height,
-                                     p_sys->p_decoder->fmt_out.video.i_aspect );
+                                     p_sys->p_decoder->fmt_out.video.i_aspect * p_pic->format.i_height,
+                                     VOUT_ASPECT_FACTOR                       * p_pic->format.i_width );
             if( !p_new_pic )
             {
                 picture_Release( p_pic );

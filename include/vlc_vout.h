@@ -80,9 +80,9 @@ struct picture_heap_t
  * \param i_height the wanted height for the picture.
  * \param i_aspect the wanted aspect ratio for the picture.
  */
-#define vout_AllocatePicture(a,b,c,d,e,f) \
-        __vout_AllocatePicture(VLC_OBJECT(a),b,c,d,e,f)
-VLC_EXPORT( int, __vout_AllocatePicture,( vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_aspect ) );
+#define vout_AllocatePicture(a,b,c,d,e,f,g) \
+        __vout_AllocatePicture(VLC_OBJECT(a),b,c,d,e,f,g)
+VLC_EXPORT( int, __vout_AllocatePicture,( vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
 
 
 /**

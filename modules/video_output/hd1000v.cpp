@@ -259,7 +259,8 @@ static int NewPicture( vout_thread_t *p_vout, picture_t *p_pic )
     /* Fill in picture_t fields */
     picture_Setup( p_pic, p_vout->output.i_chroma,
                    p_vout->output.i_width, p_vout->output.i_height,
-                   p_vout->output.i_aspect );
+                   p_vout->output.i_aspect * p_vout->output.i_height,
+                   VOUT_ASPECT_FACTOR      * p_vout->output.i_width );
 
     p_pic->p_sys->p_image = new CascadeSharedMemZone();
     if( p_pic->p_sys->p_image == NULL )

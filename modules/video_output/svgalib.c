@@ -183,7 +183,8 @@ static int Init( vout_thread_t *p_vout )
 
     vout_AllocatePicture( p_vout, p_pic, p_vout->output.i_chroma,
                           p_vout->output.i_width, p_vout->output.i_height,
-                          p_vout->output.i_aspect );
+                          p_vout->output.i_aspect * p_vout->output.i_height,
+                          VOUT_ASPECT_FACTOR      * p_vout->output.i_width );
 
     if( p_pic->i_planes == 0 )
     {

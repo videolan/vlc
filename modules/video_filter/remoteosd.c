@@ -695,7 +695,7 @@ static void* vnc_worker_thread( vlc_object_t *p_thread_obj )
     /* Create an empty picture for VNC the data */
     vlc_mutex_lock( &p_sys->lock );
     p_sys->p_pic = picture_New( VLC_CODEC_YUVA,
-                                p_sys->i_vnc_width, p_sys->i_vnc_height, VOUT_ASPECT_FACTOR );
+                                p_sys->i_vnc_width, p_sys->i_vnc_height, 1, 1 );
     if( !p_sys->p_pic )
     {
         vlc_mutex_unlock( &p_sys->lock );

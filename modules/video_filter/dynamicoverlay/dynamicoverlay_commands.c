@@ -492,7 +492,9 @@ static int exec_DataSharedMem( filter_t *p_filter,
                             1, 1 );
         if( vout_AllocatePicture( p_filter, p_ovl->data.p_pic,
                                   p_ovl->format.i_chroma, p_params->i_width,
-                                  p_params->i_height, p_ovl->format.i_aspect ) )
+                                  p_params->i_height,
+                                  p_ovl->format.i_aspect * p_params->i_height,
+                                  VOUT_ASPECT_FACTOR     * p_params->i_width ) )
         {
             msg_Err( p_filter, "Unable to allocate picture" );
             free( p_ovl->data.p_pic );

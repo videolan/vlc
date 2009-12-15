@@ -50,7 +50,8 @@ static inline void vout_filter_AllocateDirectBuffers( vout_thread_t *p_vout, int
         vout_AllocatePicture( VLC_OBJECT(p_vout), p_pic, p_vout->output.i_chroma,
                               p_vout->output.i_width,
                               p_vout->output.i_height,
-                              p_vout->output.i_aspect );
+                              p_vout->output.i_aspect * p_vout->output.i_height,
+                              VOUT_ASPECT_FACTOR      * p_vout->output.i_width );
 
         if( !p_pic->i_planes )
             break;

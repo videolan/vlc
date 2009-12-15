@@ -170,7 +170,8 @@ picture_t *vout_CreatePicture( vout_thread_t *p_vout,
         vout_AllocatePicture( VLC_OBJECT(p_vout),
                               p_freepic, p_vout->render.i_chroma,
                               p_vout->render.i_width, p_vout->render.i_height,
-                              p_vout->render.i_aspect );
+                              p_vout->render.i_aspect * p_vout->render.i_height,
+                              VOUT_ASPECT_FACTOR      * p_vout->render.i_width);
 
         if( p_freepic->i_planes )
         {
@@ -408,7 +409,8 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                                   p_tmp_pic, p_vout->fmt_out.i_chroma,
                                   p_vout->fmt_out.i_width,
                                   p_vout->fmt_out.i_height,
-                                  p_vout->fmt_out.i_aspect );
+                                  p_vout->fmt_out.i_aspect * p_vout->fmt_out.i_height,
+                                  VOUT_ASPECT_FACTOR       * p_vout->fmt_out.i_width );
             p_tmp_pic->i_type = MEMORY_PICTURE;
             p_tmp_pic->i_status = RESERVED_PICTURE;
         }
@@ -553,7 +555,8 @@ void vout_PlacePicture( const vout_thread_t *p_vout,
  */
 int __vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
                             vlc_fourcc_t i_chroma,
-                            int i_width, int i_height, int i_aspect )
+                            int i_width, int i_height,
+                            int i_sar_num, int i_sar_den )
 {
     VLC_UNUSED(p_this);
     int i_index, i_width_aligned, i_height_aligned;
@@ -562,8 +565,8 @@ int __vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
     i_width_aligned = (i_width + 15) >> 4 << 4;
     i_height_aligned = (i_height + 15) >> 4 << 4;
 
-    if( picture_Setup( p_pic, i_chroma,
-                       i_width, i_height, i_aspect ) != VLC_SUCCESS )
+    if( picture_Setup( p_pic, i_chroma, i_width, i_height,
+                       i_sar_num, i_sar_den ) != VLC_SUCCESS )
     {
         p_pic->i_planes = 0;
         return VLC_EGENERIC;
@@ -693,7 +696,8 @@ void picture_Reset( picture_t *p_picture )
 /*****************************************************************************
  *
  *****************************************************************************/
-int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect )
+int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
+                   int i_width, int i_height, int i_sar_num, int i_sar_den )
 {
     int i_index, i_width_aligned, i_height_aligned;
 
@@ -715,7 +719,7 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma, int i_width, int
     p_picture->p_q = NULL;
 
     video_format_Setup( &p_picture->format, i_chroma, i_width, i_height,
-                        i_aspect * i_height, VOUT_ASPECT_FACTOR * i_width );
+                        i_sar_num, i_sar_den );
 
     /* Make sure the real dimensions are a multiple of 16 */
     i_width_aligned = (i_width + 15) >> 4 << 4;
@@ -959,7 +963,8 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
 
     if( p_resource )
     {
-        if( picture_Setup( p_picture, fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect ) )
+        if( picture_Setup( p_picture, fmt.i_chroma, fmt.i_width, fmt.i_height,
+                           fmt.i_sar_num, fmt.i_sar_den ) )
         {
             free( p_picture );
             return NULL;
@@ -976,7 +981,8 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     else
     {
         if( __vout_AllocatePicture( NULL, p_picture,
-                                    fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect ) )
+                                    fmt.i_chroma, fmt.i_width, fmt.i_height,
+                                    fmt.i_sar_num, fmt.i_sar_den ) )
         {
             free( p_picture );
             return NULL;
@@ -994,13 +1000,13 @@ picture_t *picture_NewFromFormat( const video_format_t *p_fmt )
 {
     return picture_NewFromResource( p_fmt, NULL );
 }
-picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_aspect )
+picture_t *picture_New( vlc_fourcc_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den )
 {
     video_format_t fmt;
 
     memset( &fmt, 0, sizeof(fmt) );
     video_format_Setup( &fmt, i_chroma, i_width, i_height,
-                        i_aspect * i_height, VOUT_ASPECT_FACTOR * i_width );
+                        i_sar_num, i_sar_den );
 
     return picture_NewFromFormat( &fmt );
 }

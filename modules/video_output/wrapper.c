@@ -318,7 +318,8 @@ static int Init(vout_thread_t *vout)
             vout_AllocatePicture(VLC_OBJECT(vd), picture,
                                  vd->source.i_chroma,
                                  vd->source.i_width, vd->source.i_height,
-                                 vd->source.i_aspect);
+                                 vd->source.i_aspect * vd->source.i_height,
+                                 VOUT_ASPECT_FACTOR  * vd->source.i_width);
             if (!picture->i_planes)
                 break;
             picture->p_sys->direct = NULL;
