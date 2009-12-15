@@ -120,6 +120,8 @@ error:
     free(sys);
     return VLC_EGENERIC;
 }
+
+
 void CloseAvio(vlc_object_t *object)
 {
     access_t *access = (access_t*)object;
@@ -131,6 +133,7 @@ void CloseAvio(vlc_object_t *object)
 
     free(sys);
 }
+
 
 static ssize_t Read(access_t *access, uint8_t *data, size_t size)
 {
@@ -144,6 +147,8 @@ static ssize_t Read(access_t *access, uint8_t *data, size_t size)
     access->info.i_pos += r;
     return r;
 }
+
+
 static int Seek(access_t *access, int64_t position)
 {
     access_sys_t *sys = access->p_sys;
@@ -157,6 +162,8 @@ static int Seek(access_t *access, int64_t position)
     access->info.b_eof = false;
     return VLC_SUCCESS;
 }
+
+
 static int Control(access_t *access, int query, va_list args)
 {
     access_sys_t *sys = access->p_sys;
@@ -206,11 +213,14 @@ static int Control(access_t *access, int query, va_list args)
 static vlc_mutex_t avio_lock = VLC_STATIC_MUTEX;
 static access_t *current_access = NULL;
 
+
 static int UrlInterruptCallback(void)
 {
     assert(current_access);
     return !vlc_object_alive(current_access);
 }
+
+
 static int SetupAvio(access_t *access)
 {
     vlc_mutex_lock(&avio_lock);
