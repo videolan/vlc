@@ -97,9 +97,19 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     }
 
     // Select events received by the window
-    XSelectInput( XDISPLAY, m_wnd, ExposureMask|KeyPressMask|
-                  PointerMotionMask|ButtonPressMask|ButtonReleaseMask|
-                  LeaveWindowMask|FocusChangeMask );
+    long event_mask;
+    if( type == GenericWindow::VoutWindow )
+    {
+        event_mask =  ExposureMask|KeyPressMask|
+                      LeaveWindowMask|FocusChangeMask;
+    }
+    else
+    {
+        event_mask =  ExposureMask|KeyPressMask|
+                      PointerMotionMask|ButtonPressMask|ButtonReleaseMask|
+                      LeaveWindowMask|FocusChangeMask;
+    }
+    XSelectInput( XDISPLAY, m_wnd, event_mask );
 
     // Store a pointer on the generic window in a map
     X11Factory *pFactory = (X11Factory*)X11Factory::instance( getIntf() );
