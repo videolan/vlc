@@ -56,7 +56,7 @@ void VoutManager::destroy( intf_thread_t *pIntf )
 
 
 VoutManager::VoutManager( intf_thread_t *pIntf ): SkinObject( pIntf ),
-     m_pVoutMainWindow( NULL ), m_pCtrlVideoVec(),
+     m_pVoutMainWindow( NULL ), m_pFscWindow( NULL ), m_pCtrlVideoVec(),
      m_pCtrlVideoVecBackup(), m_SavedWndVec()
 {
     m_pVoutMainWindow = new VoutMainWindow( getIntf() );
@@ -79,6 +79,16 @@ VoutManager::~VoutManager( )
 void VoutManager::registerCtrlVideo( CtrlVideo* p_CtrlVideo )
 {
     m_pCtrlVideoVec.push_back( p_CtrlVideo );
+}
+
+
+void VoutManager::registerFSC( TopWindow* p_Win )
+{
+    m_pFscWindow = p_Win;
+
+    int x = p_Win->getLeft();
+    int y = p_Win->getTop();
+    p_Win->setParent( m_pVoutMainWindow, x , y, 0, 0 );
 }
 
 

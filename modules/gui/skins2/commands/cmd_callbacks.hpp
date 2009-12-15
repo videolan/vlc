@@ -80,6 +80,8 @@ ADD_COMMAND( volume_changed )
 
 ADD_COMMAND( audio_filter_changed )
 
+ADD_COMMAND( intf_show_changed )
+
 #undef ADD_COMMAND
 
 #endif

@@ -145,11 +145,11 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     // so they must put commands in the queue and NOT do anything else
     // (X11 calls are not reentrant)
 
-    // Called when volume sound changes
 #define ADD_CALLBACK( p_object, var ) \
     var_AddCallback( p_object, var, onGenericCallback, this );
 
     ADD_CALLBACK( pIntf->p_libvlc, "volume-change" )
+    ADD_CALLBACK( pIntf->p_libvlc, "intf-show" )
 
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "item-current" )
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "random" )
@@ -168,9 +168,6 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
     // TODO: properly handle item-deleted
     var_AddCallback( pIntf->p_sys->p_playlist, "playlist-item-deleted",
                      onItemDelete, this );
-    // Called when the "interface shower" wants us to show the skin
-    var_AddCallback( pIntf->p_libvlc, "intf-show",
-                     onIntfShow, this );
     // Called when the current input changes
     var_AddCallback( pIntf->p_sys->p_playlist, "input-current",
                      onInputNew, this );
@@ -210,6 +207,8 @@ VlcProc::~VlcProc()
 
     var_DelCallback( getIntf()->p_libvlc, "volume-change",
                      onGenericCallback, this );
+    var_DelCallback( getIntf()->p_libvlc, "intf-show",
+                     onGenericCallback, this );
 
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-current",
                      onGenericCallback, this );
@@ -219,14 +218,13 @@ VlcProc::~VlcProc()
                      onGenericCallback, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "repeat",
                      onGenericCallback, this );
+
     var_DelCallback( getIntf()->p_sys->p_playlist, "intf-change",
                      onIntfChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-item-append",
                      onItemAppend, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-item-deleted",
                      onItemDelete, this );
-    var_DelCallback( getIntf()->p_libvlc, "intf-show",
-                     onIntfShow, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "input-current",
                      onInputNew, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "item-change",
@@ -277,25 +275,6 @@ int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
 }
 
 
-int VlcProc::onIntfShow( vlc_object_t *pObj, const char *pVariable,
-                         vlc_value_t oldVal, vlc_value_t newVal,
-                         void *pParam )
-{
-    if (newVal.b_bool)
-    {
-        VlcProc *pThis = (VlcProc*)pParam;
-
-        // Create a raise all command
-        CmdRaiseAll *pCmd = new CmdRaiseAll( pThis->getIntf(),
-            pThis->getIntf()->p_sys->p_theme->getWindowManager() );
-
-        // Push the command in the asynchronous command queue
-        AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-        pQueue->push( CmdGenericPtr( pCmd ) );
-    }
-
-    return VLC_SUCCESS;
-}
 
 int VlcProc::onInputNew( vlc_object_t *pObj, const char *pVariable,
                          vlc_value_t oldval, vlc_value_t newval, void *pParam )
@@ -480,6 +459,8 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     ADD_CALLBACK_ENTRY( "repeat", repeat_changed )
 
     ADD_CALLBACK_ENTRY( "audio-filter", audio_filter_changed )
+
+    ADD_CALLBACK_ENTRY( "intf-show", intf_show_changed )
 
 #undef ADD_CALLBACK_ENTRY
 
@@ -718,6 +699,51 @@ void VlcProc::on_audio_filter_changed( vlc_object_t* p_obj, vlc_value_t newVal )
         var_AddCallback( pAout, "equalizer-bands", onEqBandsChange, this );
         var_AddCallback( pAout, "equalizer-preamp", onEqPreampChange, this );
         m_bEqualizer_started = true;
+    }
+}
+
+void VlcProc::on_intf_show_changed( vlc_object_t* p_obj, vlc_value_t newVal )
+{
+    (void)p_obj;
+    bool b_fullscreen = getFullscreenVar().get();
+
+    if( !b_fullscreen )
+    {
+        if( newVal.b_bool )
+        {
+            // Create a raise all command
+            CmdRaiseAll *pCmd = new CmdRaiseAll( getIntf(),
+                getIntf()->p_sys->p_theme->getWindowManager() );
+
+            // Push the command in the asynchronous command queue
+            AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
+            pQueue->push( CmdGenericPtr( pCmd ) );
+        }
+    }
+    else
+    {
+        Theme* pTheme =  getIntf()->p_sys->p_theme;
+        TopWindow *pWin = pTheme->getWindowById( "fullscreenController" );
+        if( pWin )
+        {
+            bool b_visible = pWin->getVisibleVar().get();
+            AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
+
+            if( !b_visible )
+            {
+               CmdShowWindow* pCmd = new CmdShowWindow( getIntf(),
+                             getIntf()->p_sys->p_theme->getWindowManager(),
+                             *pWin );
+               pQueue->push( CmdGenericPtr( pCmd ) );
+            }
+            else
+            {
+               CmdHideWindow* pCmd = new CmdHideWindow( getIntf(),
+                              getIntf()->p_sys->p_theme->getWindowManager(),
+                              *pWin );
+               pQueue->push( CmdGenericPtr( pCmd ) );
+            }
+        }
     }
 }
 

@@ -104,6 +104,9 @@ public:
     // Register Video Controls (when building theme)
     void registerCtrlVideo( CtrlVideo* p_CtrlVideo );
 
+    // Register Video Controls (when building theme)
+    void registerFSC( TopWindow* p_Win );
+
     // save and restore vouts (when changing theme)
     void saveVoutConfig( );
     void restoreVoutConfig( bool b_success );
@@ -133,6 +136,8 @@ private:
     vector<SavedWnd> m_SavedWndVec;
 
     VoutMainWindow* m_pVoutMainWindow;
+
+    TopWindow* m_pFscWindow;
 };
 
 

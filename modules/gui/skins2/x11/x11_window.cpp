@@ -39,7 +39,7 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                       X11Display &rDisplay, bool dragDrop, bool playOnDrop,
                       X11Window *pParentWindow, GenericWindow::WindowType_t type ):
     OSWindow( pIntf ), m_rDisplay( rDisplay ), m_pParent( pParentWindow ),
-    m_dragDrop( dragDrop )
+    m_dragDrop( dragDrop ), m_type ( type )
 {
     XSetWindowAttributes attr;
     unsigned long valuemask;
@@ -188,7 +188,15 @@ void X11Window::reparent( void* OSHandle, int x, int y, int w, int h )
 void X11Window::show() const
 {
     // Map the window
-    XMapRaised( XDISPLAY, m_wnd );
+    if( m_type == GenericWindow::VoutWindow )
+    {
+       XLowerWindow( XDISPLAY, m_wnd );
+       XMapWindow( XDISPLAY, m_wnd );
+    }
+    else
+    {
+        XMapRaised( XDISPLAY, m_wnd );
+    }
 }
 
 

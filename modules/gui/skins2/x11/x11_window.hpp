@@ -88,6 +88,8 @@ private:
     bool m_dragDrop;
     /// Drop target
     X11DragDrop *m_pDropTarget;
+    /// window type
+    GenericWindow::WindowType_t m_type;
 };
 
 

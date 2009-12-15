@@ -38,6 +38,7 @@
 #include "../src/popup.hpp"
 #include "../src/theme.hpp"
 #include "../src/window_manager.hpp"
+#include "../src/vout_manager.hpp"
 #include "../commands/cmd_generic.hpp"
 #include "../controls/ctrl_button.hpp"
 #include "../controls/ctrl_checkbox.hpp"
@@ -351,6 +352,9 @@ void Builder::addWindow( const BuilderData::Window &rData )
                        rData.m_visible );
 
     m_pTheme->m_windows[rData.m_id] = TopWindowPtr( pWin );
+
+    if( rData.m_id == "fullscreenController" )
+        VoutManager::instance( getIntf())->registerFSC( pWin );
 }
 
 
