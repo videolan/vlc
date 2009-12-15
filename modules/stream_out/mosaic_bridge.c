@@ -666,10 +666,7 @@ static picture_t *video_new_buffer( vlc_object_t *p_this,
     /* */
     fmt_out->video.i_chroma = fmt_out->i_codec;
 
-    return picture_New( fmt_out->video.i_chroma,
-                        fmt_out->video.i_width,
-                        fmt_out->video.i_height,
-                        fmt_out->video.i_aspect );
+    return picture_NewFromFormat( &fmt_out->video );
 }
 
 inline static void video_del_buffer_decoder( decoder_t *p_this,

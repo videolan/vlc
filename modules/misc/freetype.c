@@ -632,7 +632,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     fmt.i_x_offset = fmt.i_y_offset = 0;
 
     assert( !p_region->p_picture );
-    p_region->p_picture = picture_New( fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect );
+    p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
         return VLC_EGENERIC;
     p_region->fmt = fmt;
@@ -897,7 +897,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
         fmt.i_visible_height = p_region->fmt.i_visible_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
 
-    p_region->p_picture = picture_New( fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect );
+    p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
         return VLC_EGENERIC;
     p_region->fmt = fmt;

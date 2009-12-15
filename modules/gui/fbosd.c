@@ -622,9 +622,7 @@ static void CloseTextRenderer( intf_thread_t *p_intf )
  *****************************************************************************/
 static picture_t *AllocatePicture( video_format_t *p_fmt )
 {
-    picture_t *p_picture = picture_New( p_fmt->i_chroma,
-                                        p_fmt->i_width, p_fmt->i_height,
-                                        p_fmt->i_aspect );
+    picture_t *p_picture = picture_NewFromFormat( p_fmt );
     if( !p_picture )
         return NULL;
 

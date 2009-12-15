@@ -96,19 +96,13 @@ static picture_t *video_new_buffer_decoder( decoder_t *p_dec )
     }
 
     p_dec->fmt_out.video.i_chroma = p_dec->fmt_out.i_codec;
-    return picture_New( p_dec->fmt_out.video.i_chroma,
-                        p_dec->fmt_out.video.i_width,
-                        p_dec->fmt_out.video.i_height,
-                        p_dec->fmt_out.video.i_aspect );
+    return picture_NewFromFormat( &p_dec->fmt_out.video );
 }
 
 static picture_t *transcode_video_filter_buffer_new( filter_t *p_filter )
 {
     p_filter->fmt_out.video.i_chroma = p_filter->fmt_out.i_codec;
-    return picture_New( p_filter->fmt_out.video.i_chroma,
-                        p_filter->fmt_out.video.i_width,
-                        p_filter->fmt_out.video.i_height,
-                        p_filter->fmt_out.video.i_aspect );
+    return picture_NewFromFormat( &p_filter->fmt_out.video );
 }
 static void transcode_video_filter_buffer_del( filter_t *p_filter, picture_t *p_pic )
 {

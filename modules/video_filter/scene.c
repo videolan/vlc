@@ -249,9 +249,7 @@ static void SnapshotRatio( filter_t *p_filter, picture_t *p_pic )
         p_sys->i_height = p_pic->format.i_height;
     }
 
-    p_sys->scene.p_pic = picture_New( p_pic->format.i_chroma,
-                p_pic->format.i_width, p_pic->format.i_height,
-                p_pic->format.i_sar_num );
+    p_sys->scene.p_pic = picture_NewFromFormat( &p_pic->format );
     if( p_sys->scene.p_pic )
     {
         picture_Copy( p_sys->scene.p_pic, p_pic );

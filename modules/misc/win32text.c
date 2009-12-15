@@ -240,7 +240,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
         fmt.p_palette->palette[i][3] = pi_gamma[i];
     }
 
-    p_region->p_picture = picture_New( fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect );
+    p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
     {
         free( fmt.p_palette );

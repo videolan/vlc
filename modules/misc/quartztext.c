@@ -1050,7 +1050,7 @@ static int RenderYUVA( filter_t *p_filter, subpicture_region_t *p_region,
     fmt.i_height = fmt.i_visible_height = __MIN( i_height, i_textblock_height + VERTICAL_MARGIN * 2);
     fmt.i_x_offset = fmt.i_y_offset = 0;
 
-    p_region->p_picture = picture_New( fmt.i_chroma, fmt.i_width, fmt.i_height, fmt.i_aspect );
+    p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
         return VLC_EGENERIC;
     p_region->fmt = fmt;

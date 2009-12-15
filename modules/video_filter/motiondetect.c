@@ -114,8 +114,7 @@ static int Create( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     p_sys->b_old = false;
-    p_sys->p_old = picture_New( p_fmt->i_chroma,
-                                p_fmt->i_width, p_fmt->i_height, 0 );
+    p_sys->p_old = picture_NewFromFormat( p_fmt );
     p_sys->p_buf  = calloc( p_fmt->i_width * p_fmt->i_height, sizeof(*p_sys->p_buf) );
     p_sys->p_buf2 = calloc( p_fmt->i_width * p_fmt->i_height, sizeof(*p_sys->p_buf) );
 
