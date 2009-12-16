@@ -307,8 +307,7 @@ static void *DecodeFrame( decoder_t *p_dec, block_t **pp_block )
                           p_block->p_buffer );
         break;
     default:
-        assert(0);
-        i_ret = VLC_EGENERIC;
+        abort();
     }
 
     if( i_ret || p_block->i_buffer <= p_sys->i_header_size + i_padding )
