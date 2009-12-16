@@ -510,7 +510,8 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
     /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_CODEC_YUVP;
-    fmt.i_aspect = VOUT_ASPECT_FACTOR;
+    fmt.i_sar_num = 1;
+    fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = p_sys->i_width;
     fmt.i_height = fmt.i_visible_height = p_sys->i_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;

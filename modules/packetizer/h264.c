@@ -911,12 +911,16 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
                 h = 0;
             }
 
-            if( h != 0 )
-                p_dec->fmt_out.video.i_aspect = (int64_t)VOUT_ASPECT_FACTOR *
-                        ( w * p_dec->fmt_out.video.i_width ) /
-                        ( h * p_dec->fmt_out.video.i_height);
+            if( w != 0 && h != 0 )
+            {
+                p_dec->fmt_out.video.i_sar_num = w;
+                p_dec->fmt_out.video.i_sar_den = h;
+            }
             else
-                p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR;
+            {
+                p_dec->fmt_out.video.i_sar_num = 1;
+                p_dec->fmt_out.video.i_sar_den = 1;
+            }
         }
     }
 

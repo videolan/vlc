@@ -360,7 +360,8 @@ static int Open( vlc_object_t *p_this )
     es_format_Init( &fmt, VIDEO_ES, p_sys->i_fourcc );
     fmt.video.i_width  = p_sys->i_width;
     fmt.video.i_height = p_sys->i_height;
-    fmt.video.i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;
+    fmt.video.i_sar_num = 4 * fmt.video.i_height;
+    fmt.video.i_sar_den = 3 * fmt.video.i_width;
 
     /* Setup rgb mask for RGB formats */
     switch( p_sys->i_fourcc )

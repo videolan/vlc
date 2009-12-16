@@ -409,8 +409,8 @@ picture_t *vout_RenderPicture( vout_thread_t *p_vout, picture_t *p_pic,
                                   p_tmp_pic, p_vout->fmt_out.i_chroma,
                                   p_vout->fmt_out.i_width,
                                   p_vout->fmt_out.i_height,
-                                  p_vout->fmt_out.i_aspect * p_vout->fmt_out.i_height,
-                                  VOUT_ASPECT_FACTOR       * p_vout->fmt_out.i_width );
+                                  p_vout->fmt_out.i_sar_num,
+                                  p_vout->fmt_out.i_sar_den );
             p_tmp_pic->i_type = MEMORY_PICTURE;
             p_tmp_pic->i_status = RESERVED_PICTURE;
         }
@@ -953,8 +953,7 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     /* It is needed to be sure all informations are filled */
     video_format_Setup( &fmt, p_fmt->i_chroma,
                               p_fmt->i_width, p_fmt->i_height,
-                              p_fmt->i_aspect    * p_fmt->i_height,
-                              VOUT_ASPECT_FACTOR * p_fmt->i_width );
+                              p_fmt->i_sar_num, p_fmt->i_sar_den );
 
     /* */
     picture_t *p_picture = calloc( 1, sizeof(*p_picture) );

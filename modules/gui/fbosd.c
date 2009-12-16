@@ -331,6 +331,10 @@ static int Create( vlc_object_t *p_this )
     p_sys->i_alpha = var_CreateGetIntegerCommand( p_intf, "fbosd-alpha" );
     var_AddCallback( p_intf, "fbosd-alpha", OverlayCallback, NULL );
 
+    /* Use PAL by default */
+    p_sys->i_width  = p_sys->fmt_out.i_width  = 704;
+    p_sys->i_height = p_sys->fmt_out.i_height = 576;
+
     p_sys->i_aspect = -1;
     psz_aspect =
             var_CreateGetNonEmptyString( p_intf, "fbosd-aspect-ratio" );
@@ -343,17 +347,14 @@ static int Create( vlc_object_t *p_this )
             *psz_parser++ = '\0';
             p_sys->i_aspect = ( atoi( psz_aspect )
                               * VOUT_ASPECT_FACTOR ) / atoi( psz_parser );
-            p_sys->fmt_out.i_aspect = p_sys->i_aspect;
+            p_sys->fmt_out.i_sar_num = p_sys->i_aspect    * p_sys->i_height;
+            p_sys->fmt_out.i_sar_den = VOUT_ASPECT_FACTOR * p_sys->i_width;
         }
         msg_Dbg( p_intf, "using aspect ratio %d:%d",
                   atoi( psz_aspect ), atoi( psz_parser ) );
 
         free( psz_aspect );
     }
-
-    /* Use PAL by default */
-    p_sys->i_width  = p_sys->fmt_out.i_width  = 704;
-    p_sys->i_height = p_sys->fmt_out.i_height = 576;
 
     psz_tmp = var_CreateGetNonEmptyStringCommand( p_intf, "fbosd-image" );
     var_AddCallback( p_intf, "fbosd-image", OverlayCallback, NULL );
@@ -532,8 +533,10 @@ static int OpenBlending( intf_thread_t *p_intf )
     vlc_object_attach( p_intf->p_sys->p_blend, p_intf );
     p_intf->p_sys->p_blend->fmt_out.video.i_x_offset =
         p_intf->p_sys->p_blend->fmt_out.video.i_y_offset = 0;
-    p_intf->p_sys->p_blend->fmt_out.video.i_aspect =
-            p_intf->p_sys->fmt_out.i_aspect;
+    p_intf->p_sys->p_blend->fmt_out.video.i_sar_num =
+            p_intf->p_sys->fmt_out.i_sar_num;
+    p_intf->p_sys->p_blend->fmt_out.video.i_sar_den =
+            p_intf->p_sys->fmt_out.i_sar_den;
     p_intf->p_sys->p_blend->fmt_out.video.i_chroma =
             p_intf->p_sys->fmt_out.i_chroma;
     if( config_GetInt( p_intf, "freetype-yuvp" ) )
@@ -845,7 +848,6 @@ static picture_t *RenderText( intf_thread_t *p_intf, const char *psz_string,
 
         memset( &fmt, 0, sizeof(fmt) );
         fmt.i_chroma = VLC_CODEC_TEXT;
-        fmt.i_aspect = 0;
         fmt.i_width  = fmt.i_visible_width = 0;
         fmt.i_height = fmt.i_visible_height = 0;
         fmt.i_x_offset = 0;
@@ -981,12 +983,14 @@ static int Init( intf_thread_t *p_intf )
     /* Assume we have square pixels */
     if( p_sys->i_aspect < 0 )
     {
-        p_sys->fmt_out.i_aspect = ( p_sys->i_width
-                                  * VOUT_ASPECT_FACTOR ) / p_sys->i_height;
+        p_sys->fmt_out.i_sar_num = 1;
+        p_sys->fmt_out.i_sar_den = 1;
     }
-    else p_sys->fmt_out.i_aspect = p_sys->i_aspect;
-
-    p_sys->fmt_out.i_sar_num = p_sys->fmt_out.i_sar_den = 1;
+    else
+    {
+        p_sys->fmt_out.i_sar_num = p_sys->i_aspect    * p_sys->i_height;
+        p_sys->fmt_out.i_sar_den = VOUT_ASPECT_FACTOR * p_sys->i_width;
+    }
 
     /* Allocate overlay buffer */
     p_sys->p_overlay = AllocatePicture( &p_sys->fmt_out );

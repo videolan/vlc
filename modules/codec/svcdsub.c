@@ -488,7 +488,8 @@ static subpicture_t *DecodePacket( decoder_t *p_dec, block_t *p_data )
        Two candidates are the video and the other possibility would be
        the access module.
     */
-    fmt.i_aspect = VOUT_ASPECT_FACTOR;
+    fmt.i_sar_num = p_sys->i_height;
+    fmt.i_sar_den = p_sys->i_width;
 
     fmt.i_width = fmt.i_visible_width = p_sys->i_width;
     fmt.i_height = fmt.i_visible_height = p_sys->i_height;

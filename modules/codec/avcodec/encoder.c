@@ -386,8 +386,6 @@ int OpenEncoder( vlc_object_t *p_this )
 
     if( p_enc->fmt_in.i_cat == VIDEO_ES )
     {
-        int i_aspect_num, i_aspect_den;
-
         if( !p_enc->fmt_in.video.i_width || !p_enc->fmt_in.video.i_height )
         {
             msg_Warn( p_enc, "invalid size %ix%i", p_enc->fmt_in.video.i_width,
@@ -430,13 +428,10 @@ int OpenEncoder( vlc_object_t *p_this )
                p_enc->fmt_out.i_codec == VLC_CODEC_MP1V ) )
             p_context->flags |= CODEC_FLAG_LOW_DELAY;
 
-        av_reduce( &i_aspect_num, &i_aspect_den,
-                   p_enc->fmt_in.video.i_aspect,
-                   VOUT_ASPECT_FACTOR, 1 << 30 /* something big */ );
         av_reduce( &p_context->sample_aspect_ratio.num,
                    &p_context->sample_aspect_ratio.den,
-                   i_aspect_num * (int64_t)p_context->height,
-                   i_aspect_den * (int64_t)p_context->width, 1 << 30 );
+                   p_enc->fmt_in.video.i_sar_num,
+                   p_enc->fmt_in.video.i_sar_den, 1 << 30 );
 
         p_sys->i_buffer_out = p_context->height * p_context->width * 3;
         if( p_sys->i_buffer_out < FF_MIN_BUFFER_SIZE )

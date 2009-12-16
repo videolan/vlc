@@ -184,7 +184,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     p_dec->fmt_out.i_codec = VLC_CODEC_RGBA;
     p_dec->fmt_out.video.i_width = i_width;
     p_dec->fmt_out.video.i_height = i_height;
-    p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * i_width / i_height;
+    p_dec->fmt_out.video.i_sar_num = 1;
+    p_dec->fmt_out.video.i_sar_den = 1;
     p_dec->fmt_out.video.i_rmask = 0x000000ff;
     p_dec->fmt_out.video.i_gmask = 0x0000ff00;
     p_dec->fmt_out.video.i_bmask = 0x00ff0000;

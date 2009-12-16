@@ -2253,7 +2253,8 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         p_dec->fmt_out.video.i_width != p_owner->video.i_width ||
         p_dec->fmt_out.video.i_height != p_owner->video.i_height ||
         p_dec->fmt_out.video.i_chroma != p_owner->video.i_chroma ||
-        p_dec->fmt_out.video.i_aspect != p_owner->video.i_aspect )
+        (int64_t)p_dec->fmt_out.video.i_sar_num * p_owner->video.i_sar_den !=
+        (int64_t)p_dec->fmt_out.video.i_sar_den * p_owner->video.i_sar_num )
     {
         vout_thread_t *p_vout;
 
@@ -2299,11 +2300,8 @@ static picture_t *vout_new_buffer( decoder_t *p_dec )
         if( !p_dec->fmt_out.video.i_sar_num ||
             !p_dec->fmt_out.video.i_sar_den )
         {
-            p_dec->fmt_out.video.i_sar_num = p_dec->fmt_out.video.i_aspect *
-              p_dec->fmt_out.video.i_visible_height;
-
-            p_dec->fmt_out.video.i_sar_den = VOUT_ASPECT_FACTOR *
-              p_dec->fmt_out.video.i_visible_width;
+            p_dec->fmt_out.video.i_sar_num = 1;
+            p_dec->fmt_out.video.i_sar_den = 1;
         }
 
         vlc_ureduce( &p_dec->fmt_out.video.i_sar_num,

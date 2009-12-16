@@ -232,7 +232,9 @@ static int Init( vout_thread_t *p_vout )
     vout_sys_t *p_sys = (vout_sys_t *)p_vout->p_sys;
 
     // We want to keep the same aspect
-    p_vout->fmt_out.i_aspect = p_vout->output.i_aspect = p_vout->render.i_aspect;
+    p_vout->output.i_aspect = p_vout->render.i_aspect;
+    p_vout->fmt_out.i_sar_num = p_vout->render.i_aspect * p_vout->render.i_height;
+    p_vout->fmt_out.i_sar_den = VOUT_ASPECT_FACTOR      * p_vout->render.i_width;
     // We ask where the video should be displayed in the video area
     vout_PlacePicture( p_vout, p_sys->main_window.i_width,
                        p_sys->main_window.i_height,

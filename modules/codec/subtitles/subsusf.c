@@ -383,7 +383,6 @@ static subpicture_region_t *CreateTextRegion( decoder_t *p_dec,
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_CODEC_TEXT;
-    fmt.i_aspect = 0;
     fmt.i_width = fmt.i_height = 0;
     fmt.i_x_offset = fmt.i_y_offset = 0;
     p_text_region = subpicture_region_New( &fmt );
@@ -1163,7 +1162,6 @@ static subpicture_region_t *LoadEmbeddedImage( decoder_t *p_dec,
     memset( &fmt_out, 0, sizeof( video_format_t));
 
     fmt_out.i_chroma = VLC_CODEC_YUVA;
-    fmt_out.i_aspect = VOUT_ASPECT_FACTOR;
     fmt_out.i_sar_num = fmt_out.i_sar_den = 1;
     fmt_out.i_width =
         fmt_out.i_visible_width = p_pic->format.i_visible_width;

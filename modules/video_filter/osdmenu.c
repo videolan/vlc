@@ -372,7 +372,6 @@ static subpicture_region_t *create_text_region( filter_t *p_filter, subpicture_t
     /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_CODEC_TEXT;
-    fmt.i_aspect = VOUT_ASPECT_FACTOR;
     fmt.i_sar_num = fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
@@ -410,7 +409,6 @@ static subpicture_region_t *create_picture_region( filter_t *p_filter, subpictur
     /* Create new SPU region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = (p_pic == NULL) ? VLC_CODEC_YUVP : VLC_CODEC_YUVA;
-    fmt.i_aspect = VOUT_ASPECT_FACTOR;
     fmt.i_sar_num = fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;

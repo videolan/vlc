@@ -130,7 +130,6 @@ static int OpenDecoder( vlc_object_t *p_this )
 static void SetVideoFormat( decoder_t *p_dec )
 {
     decoder_sys_t *p_sys = p_dec->p_sys;
-    double f_aspect;
 
     p_sys->p_format = schro_decoder_get_video_format(p_sys->p_schro);
     if( p_sys->p_format == NULL ) return;
@@ -158,11 +157,8 @@ static void SetVideoFormat( decoder_t *p_dec )
     p_dec->fmt_out.video.i_height = p_sys->p_format->height;
 
     /* aspect_ratio_[numerator|denominator] describes the pixel aspect ratio */
-    f_aspect = (double)
-        ( p_sys->p_format->aspect_ratio_numerator * p_sys->p_format->width ) /
-        ( p_sys->p_format->aspect_ratio_denominator * p_sys->p_format->height);
-
-    p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * f_aspect;
+    p_dec->fmt_out.video.i_sar_num = p_sys->p_format->aspect_ratio_numerator;
+    p_dec->fmt_out.video.i_sar_den = p_sys->p_format->aspect_ratio_denominator;
 
     p_dec->fmt_out.video.i_frame_rate =
         p_sys->p_format->frame_rate_numerator;

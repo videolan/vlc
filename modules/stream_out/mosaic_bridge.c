@@ -555,17 +555,21 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
             else
                 fmt_out.i_chroma = VLC_CODEC_I420;
 
+            const unsigned i_fmt_in_aspect =
+                (int64_t)VOUT_ASPECT_FACTOR *
+                fmt_in.i_sar_num * fmt_in.i_width /
+                (fmt_in.i_sar_den * fmt_in.i_height);
             if ( !p_sys->i_height )
             {
                 fmt_out.i_width = p_sys->i_width;
                 fmt_out.i_height = (p_sys->i_width * VOUT_ASPECT_FACTOR
-                    * p_sys->i_sar_num / p_sys->i_sar_den / fmt_in.i_aspect)
+                    * p_sys->i_sar_num / p_sys->i_sar_den / i_fmt_in_aspect)
                       & ~0x1;
             }
             else if ( !p_sys->i_width )
             {
                 fmt_out.i_height = p_sys->i_height;
-                fmt_out.i_width = (p_sys->i_height * fmt_in.i_aspect
+                fmt_out.i_width = (p_sys->i_height * i_fmt_in_aspect
                     * p_sys->i_sar_den / p_sys->i_sar_num / VOUT_ASPECT_FACTOR)
                       & ~0x1;
             }
@@ -592,8 +596,8 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
             p_new_pic = picture_New( p_pic->format.i_chroma,
                                      p_pic->format.i_width, p_pic->format.i_height,
-                                     p_sys->p_decoder->fmt_out.video.i_aspect * p_pic->format.i_height,
-                                     VOUT_ASPECT_FACTOR                       * p_pic->format.i_width );
+                                     p_sys->p_decoder->fmt_out.video.i_sar_num,
+                                     p_sys->p_decoder->fmt_out.video.i_sar_den );
             if( !p_new_pic )
             {
                 picture_Release( p_pic );
@@ -636,18 +640,9 @@ static picture_t *video_new_buffer( vlc_object_t *p_this,
     if( fmt_out->video.i_width != p_sys->video.i_width ||
         fmt_out->video.i_height != p_sys->video.i_height ||
         fmt_out->video.i_chroma != p_sys->video.i_chroma ||
-        fmt_out->video.i_aspect != p_sys->video.i_aspect )
+        (int64_t)fmt_out->video.i_sar_num * p_sys->video.i_sar_den !=
+        (int64_t)fmt_out->video.i_sar_den * p_sys->video.i_sar_num )
     {
-        if( !fmt_out->video.i_sar_num ||
-            !fmt_out->video.i_sar_den )
-        {
-            fmt_out->video.i_sar_num =
-                fmt_out->video.i_aspect * fmt_out->video.i_height;
-
-            fmt_out->video.i_sar_den =
-                VOUT_ASPECT_FACTOR * fmt_out->video.i_width;
-        }
-
         vlc_ureduce( &fmt_out->video.i_sar_num,
                      &fmt_out->video.i_sar_den,
                      fmt_out->video.i_sar_num,

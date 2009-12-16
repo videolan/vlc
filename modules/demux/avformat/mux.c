@@ -245,13 +245,10 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
         codec->codec_type = CODEC_TYPE_VIDEO;
         codec->width = p_input->p_fmt->video.i_width;
         codec->height = p_input->p_fmt->video.i_height;
-        av_reduce( &i_aspect_num, &i_aspect_den,
-                   p_input->p_fmt->video.i_aspect,
-                   VOUT_ASPECT_FACTOR, 1 << 30 /* something big */ );
         av_reduce( &codec->sample_aspect_ratio.num,
                    &codec->sample_aspect_ratio.den,
-                   i_aspect_num * (int64_t)codec->height,
-                   i_aspect_den * (int64_t)codec->width, 1 << 30 );
+                   p_input->p_fmt->video.i_sar_num,
+                   p_input->p_fmt->video.i_sar_den, 1 << 30 /* something big */ );
 #if LIBAVFORMAT_VERSION_INT >= ((52<<16)+(21<<8)+0)
         stream->sample_aspect_ratio.num = codec->sample_aspect_ratio.num;
         stream->sample_aspect_ratio.den = codec->sample_aspect_ratio.den;

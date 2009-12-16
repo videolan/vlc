@@ -195,7 +195,6 @@ static int Open( vlc_object_t *p_this )
     int i;
     int i_width;
     int i_height;
-    int i_aspect;
     int result = 0;
 
     /* Only when selected */
@@ -285,7 +284,8 @@ static int Open( vlc_object_t *p_this )
     fmt.video.i_height = p_sys->height = encoded_size.height;
     if( par_size.width != encoded_size.width )
     {
-        fmt.video.i_aspect = par_size.width * VOUT_ASPECT_FACTOR / encoded_size.width ;
+        fmt.video.i_sar_num = (int64_t)encoded_size.height * par_size.width / encoded_size.width;
+        fmt.video.i_sar_den = encoded_size.width;
     }
 
     NSLog( @"encoded_size %d %d", (int)encoded_size.width, (int)encoded_size.height );

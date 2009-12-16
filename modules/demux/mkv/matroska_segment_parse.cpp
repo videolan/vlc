@@ -563,7 +563,10 @@ void matroska_segment_c::ParseTrackEntry( KaxTrackEntry *m )
                 }
             }
             if( i_display_height && i_display_width )
-                tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * i_display_width / i_display_height;
+            {
+                tk->fmt.video.i_sar_num = i_display_width  * tk->fmt.video.i_height;
+                tk->fmt.video.i_sar_den = i_display_height * tk->fmt.video.i_width;
+            }
             if( i_crop_left || i_crop_right || i_crop_top || i_crop_bottom )
             {
                 tk->fmt.video.i_visible_width = tk->fmt.video.i_width;

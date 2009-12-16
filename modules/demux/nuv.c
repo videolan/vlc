@@ -306,7 +306,8 @@ static int Open( vlc_object_t * p_this )
         fmt.video.i_height = p_sys->hdr.i_height;
         fmt.i_extra = p_sys->i_extra_f;
         fmt.p_extra = p_sys->p_extra_f;
-        fmt.video.i_aspect = VOUT_ASPECT_FACTOR * p_sys->hdr.d_aspect;
+        fmt.video.i_sar_num = p_sys->hdr.d_aspect * fmt.video.i_height;
+        fmt.video.i_sar_den = fmt.video.i_width;
 
         p_sys->p_es_video = es_out_Add( p_demux->out, &fmt );
     }

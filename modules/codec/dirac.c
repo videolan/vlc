@@ -506,9 +506,8 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_sys->ctx.src_params.frame_rate.denominator = p_enc->fmt_in.video.i_frame_rate_base;
     unsigned u_asr_num, u_asr_den;
     vlc_ureduce( &u_asr_num, &u_asr_den,
-                 p_enc->fmt_in.video.i_height * p_enc->fmt_in.video.i_aspect,
-                 p_enc->fmt_in.video.i_width * VOUT_ASPECT_FACTOR,
-                 0 );
+                 p_enc->fmt_in.video.i_sar_num,
+                 p_enc->fmt_in.video.i_sar_den, 0 );
     p_sys->ctx.src_params.pix_asr.numerator = u_asr_num;
     p_sys->ctx.src_params.pix_asr.denominator = u_asr_den;
 

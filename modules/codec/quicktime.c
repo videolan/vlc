@@ -844,7 +844,8 @@ static int OpenVideo( decoder_t *p_dec )
     es_format_Init( &p_dec->fmt_out, VIDEO_ES, VLC_CODEC_YUYV);
     p_dec->fmt_out.video.i_width = p_dec->fmt_in.video.i_width;
     p_dec->fmt_out.video.i_height= p_dec->fmt_in.video.i_height;
-    p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * p_dec->fmt_in.video.i_width / p_dec->fmt_in.video.i_height;
+    p_dec->fmt_out.video.i_sar_num = 1;
+    p_dec->fmt_out.video.i_sar_den = 1;
 
     vlc_mutex_unlock( &qt_mutex );
     return VLC_SUCCESS;

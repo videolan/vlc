@@ -1582,7 +1582,8 @@ static subpicture_t *render( decoder_t *p_dec )
         /* Create new SPU region */
         memset( &fmt, 0, sizeof(video_format_t) );
         fmt.i_chroma = VLC_CODEC_YUVP;
-        fmt.i_aspect = 0; /* 0 means use aspect ratio of background video */
+        fmt.i_sar_num = 0; /* 0 means use aspect ratio of background video */
+        fmt.i_sar_den = 1;
         fmt.i_width = fmt.i_visible_width = p_region->i_width;
         fmt.i_height = fmt.i_visible_height = p_region->i_height;
         fmt.i_x_offset = fmt.i_y_offset = 0;
@@ -1635,7 +1636,8 @@ static subpicture_t *render( decoder_t *p_dec )
             /* Create new SPU region */
             memset( &fmt, 0, sizeof(video_format_t) );
             fmt.i_chroma = VLC_CODEC_TEXT;
-            fmt.i_aspect = VOUT_ASPECT_FACTOR;
+            fmt.i_sar_num = 1;
+            fmt.i_sar_den = 1;
             fmt.i_width = fmt.i_visible_width = p_region->i_width;
             fmt.i_height = fmt.i_visible_height = p_region->i_height;
             fmt.i_x_offset = fmt.i_y_offset = 0;

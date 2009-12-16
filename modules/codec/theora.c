@@ -313,14 +313,13 @@ static int ProcessHeaders( decoder_t *p_dec )
 
     if( p_sys->ti.aspect_denominator && p_sys->ti.aspect_numerator )
     {
-        p_dec->fmt_out.video.i_aspect = ((int64_t)VOUT_ASPECT_FACTOR) *
-            ( p_sys->ti.aspect_numerator * p_dec->fmt_out.video.i_width ) /
-            ( p_sys->ti.aspect_denominator * p_dec->fmt_out.video.i_height );
+        p_dec->fmt_out.video.i_sar_num = p_sys->ti.aspect_numerator;
+        p_dec->fmt_out.video.i_sar_den = p_sys->ti.aspect_denominator;
     }
     else
     {
-        p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
-            p_sys->ti.frame_width / p_sys->ti.frame_height;
+        p_dec->fmt_out.video.i_sar_num = 1;
+        p_dec->fmt_out.video.i_sar_den = 1;
     }
 
     if( p_sys->ti.fps_numerator > 0 && p_sys->ti.fps_denominator > 0 )
@@ -664,14 +663,12 @@ static int OpenEncoder( vlc_object_t *p_this )
         p_sys->ti.fps_denominator = p_enc->fmt_in.video.i_frame_rate_base;
     }
 
-    if( p_enc->fmt_in.video.i_aspect )
+    if( p_enc->fmt_in.video.i_sar_num > 0 && p_enc->fmt_in.video.i_sar_den > 0 )
     {
-        uint64_t i_num, i_den;
         unsigned i_dst_num, i_dst_den;
-
-        i_num = p_enc->fmt_in.video.i_aspect * (int64_t)p_sys->ti.height;
-        i_den = VOUT_ASPECT_FACTOR * p_sys->ti.width;
-        vlc_ureduce( &i_dst_num, &i_dst_den, i_num, i_den, 0 );
+        vlc_ureduce( &i_dst_num, &i_dst_den,
+                     p_enc->fmt_in.video.i_sar_num,
+                     p_enc->fmt_in.video.i_sar_den, 0 );
         p_sys->ti.aspect_numerator = i_dst_num;
         p_sys->ti.aspect_denominator = i_dst_den;
     }

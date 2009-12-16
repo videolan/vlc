@@ -269,12 +269,13 @@ static int OpenDecoder( vlc_object_t *p_this )
 
     if ( i_aspect )
     {
-        fmt_out.i_aspect = i_aspect;
+        fmt_out.i_sar_num = i_aspect           * fmt_out.i_height;
+        fmt_out.i_sar_den = VOUT_ASPECT_FACTOR * fmt_out.i_width;
     }
     else
     {
-        fmt_out.i_aspect = fmt_out.i_width
-                            * VOUT_ASPECT_FACTOR / fmt_out.i_height;
+        fmt_out.i_sar_num = 1;
+        fmt_out.i_sar_den = 1;
     }
 
     if( var_CreateGetBool( p_dec, "fake-deinterlace" ) )

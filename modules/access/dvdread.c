@@ -172,7 +172,8 @@ struct demux_sys_t
     input_title_t **titles;
 
     /* Video */
-    int i_aspect;
+    int i_sar_num;
+    int i_sar_den;
 
     /* SPU */
     uint32_t clut[16];
@@ -266,7 +267,8 @@ static int Open( vlc_object_t *p_this )
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
 
     ps_track_init( p_sys->tk );
-    p_sys->i_aspect = -1;
+    p_sys->i_sar_num = 0;
+    p_sys->i_sar_den = 0;
     p_sys->i_title_cur_time = (mtime_t) 0;
     p_sys->i_cell_cur_time = (mtime_t) 0;
     p_sys->i_cell_duration = (mtime_t) 0;
@@ -713,16 +715,8 @@ static void ESNew( demux_t *p_demux, int i_id, int i_lang )
     /* Add a new ES */
     if( tk->fmt.i_cat == VIDEO_ES )
     {
-        switch( p_sys->i_aspect )
-        {
-        case 1: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR; break;
-        case 2: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * 4 / 3; break;
-        case 3: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * 16 / 9; break;
-        case 4: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * 221 / 10; break;
-        default:
-            tk->fmt.video.i_aspect = 0;
-            break;
-        }
+        tk->fmt.video.i_sar_num = p_sys->i_sar_num;
+        tk->fmt.video.i_sar_den = p_sys->i_sar_den;
     }
     else if( tk->fmt.i_cat == AUDIO_ES )
     {
@@ -906,7 +900,41 @@ static int DvdReadSetArea( demux_t *p_demux, int i_title, int i_chapter,
 
 
         ESNew( p_demux, 0xe0, 0 ); /* Video, FIXME ? */
-        p_sys->i_aspect = p_vts->vtsi_mat->vts_video_attr.display_aspect_ratio;
+        const video_attr_t *p_attr = &p_vts->vtsi_mat->vts_video_attr;
+        int i_video_height = p_attr->video_format != 0 ? 576 : 480;
+        int i_video_width;
+        switch( p_attr->picture_size )
+        {
+        case 0:
+            i_video_width = 720;
+            break;
+        case 1:
+            i_video_width = 704;
+            break;
+        case 2:
+            i_video_width = 352;
+            break;
+        default:
+        case 3:
+            i_video_width = 352;
+            i_video_height /= 2;
+            break;
+        }
+        switch( p_attr->display_aspect_ratio )
+        {
+        case 0:
+            p_sys->i_sar_num = 4 * i_video_height;
+            p_sys->i_sar_den = 3 * i_video_width;
+            break;
+        case 3:
+            p_sys->i_sar_num = 16 * i_video_height;
+            p_sys->i_sar_den =  9 * i_video_width;
+            break;
+        default:
+            p_sys->i_sar_num = 0;
+            p_sys->i_sar_den = 0;
+            break;
+        }
 
 #define audio_control \
     p_sys->p_vts_file->vts_pgcit->pgci_srp[pgc_id-1].pgc->audio_control[i-1]

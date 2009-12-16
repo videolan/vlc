@@ -242,9 +242,6 @@ static int Init( vout_thread_t *p_vout )
         fmt.i_visible_height = p_vout->fmt_out.i_visible_width;
         fmt.i_y_offset = p_vout->fmt_out.i_x_offset;
 
-        fmt.i_aspect = VOUT_ASPECT_FACTOR *
-            (uint64_t)VOUT_ASPECT_FACTOR / fmt.i_aspect;
-
         fmt.i_sar_num = p_vout->fmt_out.i_sar_den;
         fmt.i_sar_den = p_vout->fmt_out.i_sar_num;
     }

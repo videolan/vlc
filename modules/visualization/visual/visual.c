@@ -307,7 +307,6 @@ static int Open( vlc_object_t *p_this )
     fmt.i_width = fmt.i_visible_width = p_sys->i_width;
     fmt.i_height = fmt.i_visible_height = p_sys->i_height;
     fmt.i_chroma = VLC_CODEC_I420;
-    fmt.i_aspect = VOUT_ASPECT_FACTOR * p_sys->i_width/p_sys->i_height;
     fmt.i_sar_num = fmt.i_sar_den = 1;
 
     p_sys->p_vout = aout_filter_RequestVout( p_filter, NULL, &fmt );

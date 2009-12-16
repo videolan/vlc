@@ -147,11 +147,6 @@ static int Open( vlc_object_t *p_this, const char *psz_name, bool b_filter )
                         p_vout->render.i_width, p_vout->render.i_height,
                         p_vout->render.i_aspect * p_vout->render.i_height,
                         VOUT_ASPECT_FACTOR      * p_vout->render.i_width );
-    if( fmt.video.i_sar_num <= 0 || fmt.video.i_sar_den <= 0 )
-    {
-        fmt.video.i_sar_num = fmt.video.i_aspect * fmt.video.i_visible_height;
-        fmt.video.i_sar_den = VOUT_ASPECT_FACTOR * fmt.video.i_visible_width;
-    }
 
     /* Try to open our real module */
     filter_chain_t   *p_chain = NULL;

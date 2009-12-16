@@ -647,7 +647,8 @@ static int DemuxOpen( vlc_object_t *p_this )
 
             fmt.video.i_width  = p_stream->header.video.bmiHeader.biWidth;
             fmt.video.i_height = p_stream->header.video.bmiHeader.biHeight;
-            fmt.video.i_aspect = 4 * VOUT_ASPECT_FACTOR / 3;
+            fmt.video.i_sar_num = 4 * fmt.video.i_height;
+            fmt.video.i_sar_den = 4 * fmt.video.i_width;
 
             if( !p_stream->header.video.bmiHeader.biCompression )
             {

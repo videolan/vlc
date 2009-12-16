@@ -224,7 +224,6 @@ void CommonManage( vout_thread_t *p_vout )
         p_vout->fmt_out.i_y_offset = p_vout->fmt_in.i_y_offset;
         p_vout->fmt_out.i_visible_width = p_vout->fmt_in.i_visible_width;
         p_vout->fmt_out.i_visible_height = p_vout->fmt_in.i_visible_height;
-        p_vout->fmt_out.i_aspect = p_vout->fmt_in.i_aspect;
         p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
         p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
         p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;

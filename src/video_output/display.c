@@ -105,7 +105,6 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
 
     /* Picture buffer does not have the concept of aspect ratio */
     video_format_Copy(&vd->fmt, fmt);
-    vd->fmt.i_aspect = 0;
     vd->fmt.i_sar_num = 0;
     vd->fmt.i_sar_den = 0;
 
@@ -376,12 +375,10 @@ static void VoutDisplayCreateRender(vout_display_t *vd)
     osys->filters = NULL;
 
     video_format_t v_src = vd->source;
-    v_src.i_aspect  = 0;
     v_src.i_sar_num = 0;
     v_src.i_sar_den = 0;
 
     video_format_t v_dst = vd->fmt;
-    v_dst.i_aspect  = 0;
     v_dst.i_sar_num = 0;
     v_dst.i_sar_den = 0;
 

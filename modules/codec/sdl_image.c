@@ -173,8 +173,8 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
     }
     p_dec->fmt_out.video.i_width = p_surface->w;
     p_dec->fmt_out.video.i_height = p_surface->h;
-    p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR * p_surface->w
-                                     / p_surface->h;
+    p_dec->fmt_out.video.i_sar_num = 1;
+    p_dec->fmt_out.video.i_sar_den = 1;
 
     /* Get a new picture. */
     p_pic = decoder_NewPicture( p_dec );

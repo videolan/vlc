@@ -157,12 +157,18 @@ static picture_t *ImageRead( image_handler_t *p_image, block_t *p_block,
     if( !p_fmt_out->i_chroma )
         p_fmt_out->i_chroma = p_image->p_dec->fmt_out.video.i_chroma;
     if( !p_fmt_out->i_width && p_fmt_out->i_height )
-        p_fmt_out->i_width = p_fmt_out->i_height
-                              * p_image->p_dec->fmt_out.video.i_aspect
-                              / VOUT_ASPECT_FACTOR;
+        p_fmt_out->i_width = (int64_t)p_image->p_dec->fmt_out.video.i_width *
+                             p_image->p_dec->fmt_out.video.i_sar_num *
+                             p_fmt_out->i_height /
+                             p_image->p_dec->fmt_out.video.i_height /
+                             p_image->p_dec->fmt_out.video.i_sar_den;
+
     if( !p_fmt_out->i_height && p_fmt_out->i_width )
-        p_fmt_out->i_height = p_fmt_out->i_width * VOUT_ASPECT_FACTOR
-                               / p_image->p_dec->fmt_out.video.i_aspect;
+        p_fmt_out->i_height = (int64_t)p_image->p_dec->fmt_out.video.i_height *
+                              p_image->p_dec->fmt_out.video.i_sar_den *
+                              p_fmt_out->i_width /
+                              p_image->p_dec->fmt_out.video.i_width /
+                              p_image->p_dec->fmt_out.video.i_sar_num;
     if( !p_fmt_out->i_width )
         p_fmt_out->i_width = p_image->p_dec->fmt_out.video.i_width;
     if( !p_fmt_out->i_height )
@@ -426,7 +432,6 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
         p_fmt_out->i_height = p_fmt_out->i_visible_height = p_fmt_in->i_height;
     if( !p_fmt_out->i_sar_num ) p_fmt_out->i_sar_num = p_fmt_in->i_sar_num;
     if( !p_fmt_out->i_sar_den ) p_fmt_out->i_sar_den = p_fmt_in->i_sar_den;
-    if( !p_fmt_out->i_aspect ) p_fmt_out->i_aspect = p_fmt_in->i_aspect;
 
     if( p_image->p_filter )
     if( p_image->p_filter->fmt_in.video.i_chroma != p_fmt_in->i_chroma ||

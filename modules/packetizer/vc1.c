@@ -492,7 +492,8 @@ static block_t *ParseIDU( decoder_t *p_dec, bool *pb_used_ts, block_t *p_frag )
                 const int i_display_width  = bs_read( &s, 14 )+1;
                 const int i_display_height = bs_read( &s, 14 )+1;
 
-                p_es->video.i_aspect = VOUT_ASPECT_FACTOR * i_display_width / i_display_height;
+                p_es->video.i_sar_num = i_display_width  * p_es->video.i_height;
+                p_es->video.i_sar_den = i_display_height * p_es->video.i_width;
 
                 if( !p_sys->b_sequence_header )
                     msg_Dbg( p_dec, "display size %dx%d", i_display_width, i_display_height );

@@ -247,7 +247,7 @@ static int Init(vout_thread_t *vout)
     vout->output.i_chroma = source.i_chroma;
     vout->output.i_width  = source.i_width;
     vout->output.i_height = source.i_height;
-    vout->output.i_aspect = source.i_aspect;
+    vout->output.i_aspect = (int64_t)source.i_sar_num * source.i_width * VOUT_ASPECT_FACTOR / source.i_sar_den / source.i_height;
     vout->output.i_rmask  = source.i_rmask;
     vout->output.i_gmask  = source.i_gmask;
     vout->output.i_bmask  = source.i_bmask;
@@ -259,7 +259,8 @@ static int Init(vout_thread_t *vout)
     vout->fmt_out.i_visible_width  = vout->output.i_width;
     vout->fmt_out.i_height         =
     vout->fmt_out.i_visible_height = vout->output.i_height;
-    vout->fmt_out.i_aspect         = vout->output.i_aspect;
+    vout->fmt_out.i_sar_num        = vout->output.i_aspect * vout->output.i_height;
+    vout->fmt_out.i_sar_den        = VOUT_ASPECT_FACTOR    * vout->output.i_width;
     vout->fmt_out.i_x_offset       = 0;
     vout->fmt_out.i_y_offset       = 0;
 
@@ -318,8 +319,7 @@ static int Init(vout_thread_t *vout)
             vout_AllocatePicture(VLC_OBJECT(vd), picture,
                                  vd->source.i_chroma,
                                  vd->source.i_width, vd->source.i_height,
-                                 vd->source.i_aspect * vd->source.i_height,
-                                 VOUT_ASPECT_FACTOR  * vd->source.i_width);
+                                 vd->source.i_sar_num, vd->source.i_sar_den);
             if (!picture->i_planes)
                 break;
             picture->p_sys->direct = NULL;
@@ -380,8 +380,8 @@ static int Manage(vout_thread_t *vout)
             vout->i_changes &= ~VOUT_FULLSCREEN_CHANGE;
         }
         if (vout->i_changes & VOUT_ASPECT_CHANGE) {
-            vout->output.i_aspect   =
-            vout->fmt_out.i_aspect  = vout->fmt_in.i_aspect;
+            vout->output.i_aspect   = (int64_t)vout->fmt_in.i_sar_num * vout->fmt_in.i_width * VOUT_ASPECT_FACTOR /
+                                      vout->fmt_in.i_sar_den / vout->fmt_in.i_height;
             vout->fmt_out.i_sar_num = vout->fmt_in.i_sar_num;
             vout->fmt_out.i_sar_den = vout->fmt_in.i_sar_den;
 

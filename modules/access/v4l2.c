@@ -2282,7 +2282,8 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         es_fmt.video.i_height = p_sys->i_height;
 
         /* Get aspect-ratio */
-        es_fmt.video.i_aspect = p_sys->i_aspect;
+        es_fmt.video.i_sar_num = p_sys->i_aspect    * es_fmt.video.i_height;
+        es_fmt.video.i_sar_den = VOUT_ASPECT_FACTOR * es_fmt.video.i_width;
 
         demux_t *p_demux = (demux_t *) p_obj;
         msg_Dbg( p_demux, "added new video es %4.4s %dx%d",

@@ -285,7 +285,6 @@ int transcode_video_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     }
     return VLC_SUCCESS;
 }
-
 static void transcode_video_encoder_init( sout_stream_t *p_stream,
                                           sout_stream_id_t *id )
 {
@@ -305,11 +304,12 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
     int i_dst_height;
 
     /* aspect ratio */
-    float f_aspect = (float)id->p_decoder->fmt_out.video.i_aspect /
-                            VOUT_ASPECT_FACTOR;
+    float f_aspect = (double)id->p_decoder->fmt_out.video.i_sar_num *
+                     id->p_decoder->fmt_out.video.i_width /
+                     id->p_decoder->fmt_out.video.i_sar_den /
+                     id->p_decoder->fmt_out.video.i_height;
 
-    msg_Dbg( p_stream, "decoder aspect is %i:%i",
-                 id->p_decoder->fmt_out.video.i_aspect, VOUT_ASPECT_FACTOR );
+    msg_Dbg( p_stream, "decoder aspect is %f:1", f_aspect );
 
     /* Change f_aspect from source frame to source pixel */
     f_aspect = f_aspect * i_src_height / i_src_width;
@@ -432,16 +432,22 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
                id->p_encoder->fmt_out.video.i_frame_rate_base );
 
     /* Check whether a particular aspect ratio was requested */
-    if( !id->p_encoder->fmt_out.video.i_aspect )
+    if( id->p_encoder->fmt_out.video.i_sar_num <= 0 ||
+        id->p_encoder->fmt_out.video.i_sar_den <= 0 )
     {
-        id->p_encoder->fmt_out.video.i_aspect =
-                (int)( f_aspect * VOUT_ASPECT_FACTOR + 0.5 );
+        id->p_encoder->fmt_out.video.i_sar_num =
+            f_aspect * id->p_encoder->fmt_out.video.i_height + 0.5;
+        id->p_encoder->fmt_out.video.i_sar_num =
+            VOUT_ASPECT_FACTOR * id->p_encoder->fmt_out.video.i_width;
     }
-    id->p_encoder->fmt_in.video.i_aspect =
-        id->p_encoder->fmt_out.video.i_aspect;
+    id->p_encoder->fmt_in.video.i_sar_num =
+        id->p_encoder->fmt_out.video.i_sar_num;
+    id->p_encoder->fmt_in.video.i_sar_den =
+        id->p_encoder->fmt_out.video.i_sar_den;
 
     msg_Dbg( p_stream, "encoder aspect is %i:%i",
-             id->p_encoder->fmt_out.video.i_aspect, VOUT_ASPECT_FACTOR );
+             id->p_encoder->fmt_out.video.i_sar_num * id->p_encoder->fmt_out.video.i_width,
+             id->p_encoder->fmt_out.video.i_sar_den * id->p_encoder->fmt_out.video.i_height );
 
     id->p_encoder->fmt_in.video.i_chroma = id->p_encoder->fmt_in.i_codec;
 }
@@ -633,8 +639,10 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                     id->p_encoder->fmt_in.video.i_width;
                 id->p_encoder->fmt_out.video.i_height =
                     id->p_encoder->fmt_in.video.i_height;
-                id->p_encoder->fmt_out.video.i_aspect =
-                    id->p_encoder->fmt_in.video.i_aspect;
+                id->p_encoder->fmt_out.video.i_sar_num =
+                    id->p_encoder->fmt_in.video.i_sar_num;
+                id->p_encoder->fmt_out.video.i_sar_den =
+                    id->p_encoder->fmt_in.video.i_sar_den;
             }
 
             if( transcode_video_encoder_open( p_stream, id ) != VLC_SUCCESS )
@@ -682,10 +690,6 @@ int transcode_video_process( sout_stream_t *p_stream, sout_stream_id_t *id,
                 fmt = filter_chain_GetFmtOut( id->p_f_chain )->video;
             else
                 fmt = id->p_decoder->fmt_out.video;
-
-            /* FIXME (shouldn't have to be done here) */
-            fmt.i_sar_num = fmt.i_aspect * fmt.i_height / fmt.i_width;
-            fmt.i_sar_den = VOUT_ASPECT_FACTOR;
 
             /* FIXME the mdate() seems highly suspicious */
             spu_RenderSubpictures( p_sys->p_spu, p_pic, &fmt,

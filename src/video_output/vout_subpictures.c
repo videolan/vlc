@@ -475,16 +475,8 @@ void spu_RenderSubpictures( spu_t *p_spu,
         p_region = p_subpic->p_region;
         if( !p_region->fmt.i_sar_num || !p_region->fmt.i_sar_den )
         {
-            if( p_region->fmt.i_aspect != 0 )
-            {
-                p_region->fmt.i_sar_den = p_region->fmt.i_aspect;
-                p_region->fmt.i_sar_num = VOUT_ASPECT_FACTOR;
-            }
-            else
-            {
-                p_region->fmt.i_sar_den = p_fmt_dst->i_sar_den;
-                p_region->fmt.i_sar_num = p_fmt_dst->i_sar_num;
-            }
+            p_region->fmt.i_sar_den = p_fmt_dst->i_sar_den;
+            p_region->fmt.i_sar_num = p_fmt_dst->i_sar_num;
         }
 
         /* Take care of the aspect ratio */
@@ -778,7 +770,6 @@ subpicture_t *subpicture_NewFromPicture( vlc_object_t *p_obj,
     p_subpic->i_original_picture_width  = fmt_out.i_width;
     p_subpic->i_original_picture_height = fmt_out.i_height;
 
-    fmt_out.i_aspect = 0;
     fmt_out.i_sar_num =
     fmt_out.i_sar_den = 0;
 

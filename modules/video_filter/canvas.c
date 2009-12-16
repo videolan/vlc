@@ -144,6 +144,7 @@ static int Activate( vlc_object_t *p_this )
     int i_padd,i_offset;
     char *psz_aspect, *psz_parser;
     bool b_padd;
+    unsigned i_fmt_in_aspect;
 
     if( !p_filter->b_allow_fmt_out_change )
     {
@@ -177,6 +178,11 @@ static int Activate( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
+    i_fmt_in_aspect = (int64_t)p_filter->fmt_in.video.i_sar_num *
+                      p_filter->fmt_in.video.i_width *
+                      VOUT_ASPECT_FACTOR /
+                      p_filter->fmt_in.video.i_sar_den /
+                      p_filter->fmt_in.video.i_height;
     psz_aspect = var_CreateGetNonEmptyString( p_filter, CFG_PREFIX "aspect" );
     if( psz_aspect )
     {
@@ -200,7 +206,7 @@ static int Activate( vlc_object_t *p_this )
         /* aspect = subpic_sar * canvas_width / canvas_height
          *  where subpic_sar = subpic_ph * subpic_par / subpic_pw */
         i_canvas_aspect = (uint64_t) p_filter->fmt_in.video.i_height
-                        * p_filter->fmt_in.video.i_aspect
+                        * i_fmt_in_aspect
                         * i_canvas_width
                         / (i_canvas_height * p_filter->fmt_in.video.i_width);
     }
@@ -230,7 +236,7 @@ static int Activate( vlc_object_t *p_this )
     if( b_padd )
     {
         /* Padd */
-        if( i_canvas_aspect > p_filter->fmt_in.video.i_aspect )
+        if( i_canvas_aspect > i_fmt_in_aspect )
         {
             /* The canvas has a wider aspect than the subpicture:
              *  ie, pillarbox the [scaled] subpicture */
@@ -239,7 +245,7 @@ static int Activate( vlc_object_t *p_this )
              *  where canvas_sar = canvas_width / (canvas_height * canvas_par)
              * then simplify */
             fmt.video.i_width = i_canvas_width
-                              * p_filter->fmt_in.video.i_aspect
+                              * i_fmt_in_aspect
                               / i_canvas_aspect;
             if( fmt.video.i_width & 1 ) fmt.video.i_width -= 1;
 
@@ -254,7 +260,7 @@ static int Activate( vlc_object_t *p_this )
              *  ie, letterbox the [scaled] subpicture */
             fmt.video.i_height = i_canvas_height
                                * i_canvas_aspect
-                               / p_filter->fmt_in.video.i_aspect;
+                               / i_fmt_in_aspect;
             if( fmt.video.i_height & 1 ) fmt.video.i_height -= 1;
 
             i_padd = (i_canvas_height - fmt.video.i_height ) / 2;
@@ -266,12 +272,12 @@ static int Activate( vlc_object_t *p_this )
     else
     {
         /* Crop */
-        if( i_canvas_aspect < p_filter->fmt_in.video.i_aspect )
+        if( i_canvas_aspect < i_fmt_in_aspect )
         {
             /* The canvas has a narrower aspect than the subpicture:
              *  ie, crop the [scaled] subpicture horizontally */
             fmt.video.i_width = i_canvas_width
-                              * p_filter->fmt_in.video.i_aspect
+                              * i_fmt_in_aspect
                               / i_canvas_aspect;
             if( fmt.video.i_width & 1 ) fmt.video.i_width -= 1;
 
@@ -286,7 +292,7 @@ static int Activate( vlc_object_t *p_this )
              *  ie, crop the [scaled] subpicture vertically */
             fmt.video.i_height = i_canvas_height
                                * i_canvas_aspect
-                               / p_filter->fmt_in.video.i_aspect;
+                               / i_fmt_in_aspect;
             if( fmt.video.i_height & 1 ) fmt.video.i_height -= 1;
 
             i_padd = (fmt.video.i_height - i_canvas_height) / 2;
@@ -312,7 +318,10 @@ static int Activate( vlc_object_t *p_this )
     fmt = *filter_chain_GetFmtOut( p_sys->p_chain );
     es_format_Copy( &p_filter->fmt_out, &fmt );
 
-    p_filter->fmt_out.video.i_aspect = i_canvas_aspect;
+    p_filter->fmt_out.video.i_sar_num =
+        i_canvas_aspect    * p_filter->fmt_out.video.i_height;
+    p_filter->fmt_out.video.i_sar_den =
+        VOUT_ASPECT_FACTOR * p_filter->fmt_out.video.i_width;
 
     if( p_filter->fmt_out.video.i_width != i_canvas_width
      || p_filter->fmt_out.video.i_height != i_canvas_height )

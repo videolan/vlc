@@ -1553,8 +1553,10 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
         if( p_track->i_width > 0 && p_track->i_height > 0 &&
             /* Work-around buggy muxed files */
             p_sample->data.p_sample_vide->i_width != p_track->i_width )
-            p_track->fmt.video.i_aspect =
-                VOUT_ASPECT_FACTOR * p_track->i_width / p_track->i_height;
+        {
+            p_track->fmt.video.i_sar_num = p_track->i_width  / p_track->fmt.video.i_height;
+            p_track->fmt.video.i_sar_den = p_track->i_height * p_track->fmt.video.i_width;
+        }
 
         /* Support for cropping (eg. in H263 files) */
         p_track->fmt.video.i_visible_width = p_track->fmt.video.i_width;

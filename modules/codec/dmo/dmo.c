@@ -520,14 +520,16 @@ static int DecOpen( decoder_t *p_dec )
         p_dec->fmt_out.video.i_bits_per_pixel = i_bpp;
 
         /* If an aspect-ratio was specified in the input format then force it */
-        if( p_dec->fmt_in.video.i_aspect )
+        if( p_dec->fmt_in.video.i_sar_num > 0 &&
+            p_dec->fmt_in.video.i_sar_den > 0 )
         {
-            p_dec->fmt_out.video.i_aspect = p_dec->fmt_in.video.i_aspect;
+            p_dec->fmt_out.video.i_sar_num = p_dec->fmt_in.video.i_sar_num;
+            p_dec->fmt_out.video.i_sar_den = p_dec->fmt_in.video.i_sar_den;
         }
         else
         {
-            p_dec->fmt_out.video.i_aspect = VOUT_ASPECT_FACTOR *
-                p_dec->fmt_out.video.i_width / p_dec->fmt_out.video.i_height;
+            p_dec->fmt_out.video.i_sar_num = 1;
+            p_dec->fmt_out.video.i_sar_den = 1;
         }
 
         p_bih = &p_vih->bmiHeader;

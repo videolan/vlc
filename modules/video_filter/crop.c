@@ -351,9 +351,9 @@ static int Init( vout_thread_t *p_vout )
                      p_vout->p_sys->i_x, p_vout->p_sys->i_y,
                      p_vout->p_sys->b_autocrop ? "" : "not " );
     /* Set current output image properties */
-    p_vout->p_sys->i_aspect = p_vout->fmt_out.i_aspect
-           * p_vout->fmt_out.i_visible_height / p_vout->p_sys->i_height
-           * p_vout->p_sys->i_width / p_vout->fmt_out.i_visible_width;
+    p_vout->p_sys->i_aspect = (int64_t)VOUT_ASPECT_FACTOR *
+        p_vout->fmt_out.i_sar_num * p_vout->p_sys->i_width /
+        (p_vout->fmt_out.i_sar_den * p_vout->p_sys->i_height);
 
 #ifdef BEST_AUTOCROP
     msg_Info( p_vout, "ratio %d",  p_vout->p_sys->i_aspect / 432);
@@ -362,9 +362,8 @@ static int Init( vout_thread_t *p_vout )
     fmt.i_height = fmt.i_visible_height = p_vout->p_sys->i_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
     fmt.i_chroma = p_vout->render.i_chroma;
-    fmt.i_aspect = p_vout->p_sys->i_aspect;
-    fmt.i_sar_num = p_vout->p_sys->i_aspect * fmt.i_height / fmt.i_width;
-    fmt.i_sar_den = VOUT_ASPECT_FACTOR;
+    fmt.i_sar_num = p_vout->p_sys->i_aspect * fmt.i_height;
+    fmt.i_sar_den = VOUT_ASPECT_FACTOR * fmt.i_width;
 
     /* Try to open the real video output */
     p_vout->p_sys->p_vout = vout_Create( p_vout, &fmt );
@@ -455,7 +454,6 @@ static int Manage( vout_thread_t *p_vout )
     fmt.i_height = fmt.i_visible_height = p_vout->p_sys->i_height;
     fmt.i_x_offset = fmt.i_y_offset = 0;
     fmt.i_chroma = p_vout->render.i_chroma;
-    fmt.i_aspect = p_vout->p_sys->i_aspect;
     fmt.i_sar_num = p_vout->p_sys->i_aspect * fmt.i_height / fmt.i_width;
     fmt.i_sar_den = VOUT_ASPECT_FACTOR;
 

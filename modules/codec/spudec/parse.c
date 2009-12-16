@@ -688,7 +688,8 @@ static void Render( decoder_t *p_dec, subpicture_t *p_spu,
     /* Create a new subpicture region */
     memset( &fmt, 0, sizeof(video_format_t) );
     fmt.i_chroma = VLC_CODEC_YUVP;
-    fmt.i_aspect = 0; /* 0 means use aspect ratio of background video */
+    fmt.i_sar_num = 0; /* 0 means use aspect ratio of background video */
+    fmt.i_sar_den = 1;
     fmt.i_width = fmt.i_visible_width = p_spu_properties->i_width;
     fmt.i_height = fmt.i_visible_height = p_spu_properties->i_height -
         p_spu_data->i_y_top_offset - p_spu_data->i_y_bottom_offset;

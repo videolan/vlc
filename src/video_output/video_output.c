@@ -71,8 +71,6 @@ static void     ErrorThread       ( vout_thread_t * );
 static void     CleanThread       ( vout_thread_t * );
 static void     EndThread         ( vout_thread_t * );
 
-static void     AspectRatio       ( int, int *, int * );
-
 static void VideoFormatImportRgb( video_format_t *, const picture_heap_t * );
 static void PictureHeapFixRgb( picture_heap_t * );
 
@@ -224,44 +222,37 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
         else
         {
             /* This video output is cool! Hijack it. */
-            if( p_vout->fmt_render.i_aspect != p_fmt->i_aspect )
-            {
-                /* Correct aspect ratio on change
-                 * FIXME factorize this code with other aspect ration related code */
-                unsigned int i_sar_num;
-                unsigned int i_sar_den;
-                unsigned int i_aspect;
-
-                i_aspect = p_fmt->i_aspect;
-                vlc_ureduce( &i_sar_num, &i_sar_den,
-                             p_fmt->i_sar_num, p_fmt->i_sar_den, 50000 );
+            /* Correct aspect ratio on change
+             * FIXME factorize this code with other aspect ration related code */
+            unsigned int i_sar_num;
+            unsigned int i_sar_den;
+            vlc_ureduce( &i_sar_num, &i_sar_den,
+                         p_fmt->i_sar_num, p_fmt->i_sar_den, 50000 );
 #if 0
-                /* What's that, it does not seems to be used correcly everywhere
-                 * beside the previous p_vout->fmt_render.i_aspect != p_fmt->i_aspect
-                 * should be fixed to use it too then */
-                if( p_vout->i_par_num > 0 && p_vout->i_par_den > 0 )
-                {
-                    i_sar_num *= p_vout->i_par_den;
-                    i_sar_den *= p_vout->i_par_num;
-                    i_aspect = i_aspect * p_vout->i_par_den / p_vout->i_par_num;
-                }
+            /* What's that, it does not seems to be used correcly everywhere */
+            if( p_vout->i_par_num > 0 && p_vout->i_par_den > 0 )
+            {
+                i_sar_num *= p_vout->i_par_den;
+                i_sar_den *= p_vout->i_par_num;
+            }
 #endif
 
-                if( i_sar_num > 0 && i_sar_den > 0 && i_aspect > 0 )
-                {
-                    p_vout->fmt_in.i_sar_num = i_sar_num;
-                    p_vout->fmt_in.i_sar_den = i_sar_den;
-                    p_vout->fmt_in.i_aspect  = i_aspect;
+            if( i_sar_num > 0 && i_sar_den > 0 &&
+                ( i_sar_num != p_vout->fmt_render.i_sar_num ||
+                  i_sar_den != p_vout->fmt_render.i_sar_den ) )
+            {
+                p_vout->fmt_in.i_sar_num = i_sar_num;
+                p_vout->fmt_in.i_sar_den = i_sar_den;
 
-                    p_vout->fmt_render.i_sar_num = i_sar_num;
-                    p_vout->fmt_render.i_sar_den = i_sar_den;
-                    p_vout->fmt_render.i_aspect  = i_aspect;
+                p_vout->fmt_render.i_sar_num = i_sar_num;
+                p_vout->fmt_render.i_sar_den = i_sar_den;
 
-                    p_vout->render.i_aspect   = i_aspect;
-
-                    p_vout->i_changes |= VOUT_ASPECT_CHANGE;
-
-                }
+                p_vout->render.i_aspect = (int64_t)i_sar_num *
+                                                   p_vout->fmt_render.i_width *
+                                                   VOUT_ASPECT_FACTOR /
+                                                   i_sar_den /
+                                                   p_vout->fmt_render.i_height;
+                p_vout->i_changes |= VOUT_ASPECT_CHANGE;
             }
             vlc_mutex_unlock( &p_vout->change_lock );
 
@@ -305,19 +296,23 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     unsigned int i_width = p_fmt->i_width;
     unsigned int i_height = p_fmt->i_height;
     vlc_fourcc_t i_chroma = vlc_fourcc_GetCodec( VIDEO_ES, p_fmt->i_chroma );
-    unsigned int i_aspect = p_fmt->i_aspect;
 
     config_chain_t *p_cfg;
     char *psz_parser;
     char *psz_name;
 
-    if( i_width <= 0 || i_height <= 0 || i_aspect <= 0 )
+    if( i_width <= 0 || i_height <= 0 )
         return NULL;
 
     vlc_ureduce( &p_fmt->i_sar_num, &p_fmt->i_sar_den,
                  p_fmt->i_sar_num, p_fmt->i_sar_den, 50000 );
     if( p_fmt->i_sar_num <= 0 || p_fmt->i_sar_den <= 0 )
         return NULL;
+    unsigned int i_aspect = (int64_t)p_fmt->i_sar_num *
+                                     i_width *
+                                     VOUT_ASPECT_FACTOR /
+                                     p_fmt->i_sar_den /
+                                     i_height;
 
     /* Allocate descriptor */
     static const char typename[] = "video output";
@@ -807,7 +802,7 @@ static bool ChromaIsEqual( const picture_heap_t *p_output, const picture_heap_t 
 
 static int InitThread( vout_thread_t *p_vout )
 {
-    int i, i_aspect_x, i_aspect_y;
+    int i;
 
     /* Initialize output method, it allocates direct buffers for us */
     if( p_vout->pf_init( p_vout ) )
@@ -833,10 +828,6 @@ static int InitThread( vout_thread_t *p_vout )
 
     msg_Dbg( p_vout, "got %i direct buffer(s)", I_OUTPUTPICTURES );
 
-    AspectRatio( p_vout->fmt_render.i_aspect, &i_aspect_x, &i_aspect_y );
-
-    AspectRatio( p_vout->fmt_in.i_aspect, &i_aspect_x, &i_aspect_y );
-
     if( !p_vout->fmt_out.i_width || !p_vout->fmt_out.i_height )
     {
         p_vout->fmt_out.i_width = p_vout->fmt_out.i_visible_width =
@@ -845,12 +836,11 @@ static int InitThread( vout_thread_t *p_vout )
             p_vout->output.i_height;
         p_vout->fmt_out.i_x_offset =  p_vout->fmt_out.i_y_offset = 0;
 
-        p_vout->fmt_out.i_aspect = p_vout->output.i_aspect;
         p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
     }
     if( !p_vout->fmt_out.i_sar_num || !p_vout->fmt_out.i_sar_num )
     {
-        p_vout->fmt_out.i_sar_num = p_vout->fmt_out.i_aspect *
+        p_vout->fmt_out.i_sar_num = p_vout->output.i_aspect *
             p_vout->fmt_out.i_height;
         p_vout->fmt_out.i_sar_den = VOUT_ASPECT_FACTOR *
             p_vout->fmt_out.i_width;
@@ -858,8 +848,6 @@ static int InitThread( vout_thread_t *p_vout )
 
     vlc_ureduce( &p_vout->fmt_out.i_sar_num, &p_vout->fmt_out.i_sar_den,
                  p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den, 0 );
-
-    AspectRatio( p_vout->fmt_out.i_aspect, &i_aspect_x, &i_aspect_y );
 
     /* FIXME removed the need of both fmt_* and heap infos */
     /* Calculate shifts from system-updated masks */
@@ -871,33 +859,30 @@ static int InitThread( vout_thread_t *p_vout )
 
     /* print some usefull debug info about different vout formats
      */
-    msg_Dbg( p_vout, "pic render sz %ix%i, of (%i,%i), vsz %ix%i, 4cc %4.4s, ar %i:%i, sar %i:%i, msk r0x%x g0x%x b0x%x",
+    msg_Dbg( p_vout, "pic render sz %ix%i, of (%i,%i), vsz %ix%i, 4cc %4.4s, sar %i:%i, msk r0x%x g0x%x b0x%x",
              p_vout->fmt_render.i_width, p_vout->fmt_render.i_height,
              p_vout->fmt_render.i_x_offset, p_vout->fmt_render.i_y_offset,
              p_vout->fmt_render.i_visible_width,
              p_vout->fmt_render.i_visible_height,
              (char*)&p_vout->fmt_render.i_chroma,
-             i_aspect_x, i_aspect_y,
              p_vout->fmt_render.i_sar_num, p_vout->fmt_render.i_sar_den,
              p_vout->fmt_render.i_rmask, p_vout->fmt_render.i_gmask, p_vout->fmt_render.i_bmask );
 
-    msg_Dbg( p_vout, "pic in sz %ix%i, of (%i,%i), vsz %ix%i, 4cc %4.4s, ar %i:%i, sar %i:%i, msk r0x%x g0x%x b0x%x",
+    msg_Dbg( p_vout, "pic in sz %ix%i, of (%i,%i), vsz %ix%i, 4cc %4.4s, sar %i:%i, msk r0x%x g0x%x b0x%x",
              p_vout->fmt_in.i_width, p_vout->fmt_in.i_height,
              p_vout->fmt_in.i_x_offset, p_vout->fmt_in.i_y_offset,
              p_vout->fmt_in.i_visible_width,
              p_vout->fmt_in.i_visible_height,
              (char*)&p_vout->fmt_in.i_chroma,
-             i_aspect_x, i_aspect_y,
              p_vout->fmt_in.i_sar_num, p_vout->fmt_in.i_sar_den,
              p_vout->fmt_in.i_rmask, p_vout->fmt_in.i_gmask, p_vout->fmt_in.i_bmask );
 
-    msg_Dbg( p_vout, "pic out sz %ix%i, of (%i,%i), vsz %ix%i, 4cc %4.4s, ar %i:%i, sar %i:%i, msk r0x%x g0x%x b0x%x",
+    msg_Dbg( p_vout, "pic out sz %ix%i, of (%i,%i), vsz %ix%i, 4cc %4.4s, sar %i:%i, msk r0x%x g0x%x b0x%x",
              p_vout->fmt_out.i_width, p_vout->fmt_out.i_height,
              p_vout->fmt_out.i_x_offset, p_vout->fmt_out.i_y_offset,
              p_vout->fmt_out.i_visible_width,
              p_vout->fmt_out.i_visible_height,
              (char*)&p_vout->fmt_out.i_chroma,
-             i_aspect_x, i_aspect_y,
              p_vout->fmt_out.i_sar_num, p_vout->fmt_out.i_sar_den,
              p_vout->fmt_out.i_rmask, p_vout->fmt_out.i_gmask, p_vout->fmt_out.i_bmask );
 
@@ -1555,12 +1540,6 @@ static void ChromaDestroy( vout_thread_t *p_vout )
 }
 
 /* following functions are local */
-static void AspectRatio( int i_aspect, int *i_aspect_x, int *i_aspect_y )
-{
-    const int i_pgcd = i_aspect ? GCD( i_aspect, VOUT_ASPECT_FACTOR ) : 1;
-    *i_aspect_x = i_aspect / i_pgcd;
-    *i_aspect_y = VOUT_ASPECT_FACTOR / i_pgcd;
-}
 
 /**
  * This function copies all RGB informations from a picture_heap_t into

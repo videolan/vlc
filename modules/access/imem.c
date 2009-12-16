@@ -254,7 +254,6 @@ static int Open(vlc_object_t *object)
         fmt.video.i_height = var_CreateGetInteger(demux, "imem-height");
         unsigned num, den;
         if (!var_CreateGetRational(demux, &num, &den, "imem-dar") && num > 0 && den > 0) {
-            fmt.video.i_aspect = VOUT_ASPECT_FACTOR * num / den;
             if (fmt.video.i_width > 0 && fmt.video.i_height > 0) {
                 fmt.video.i_sar_num = num * fmt.video.i_height;
                 fmt.video.i_sar_den = den * fmt.video.i_width;

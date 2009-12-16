@@ -887,9 +887,8 @@ static int DemuxInit( demux_t *p_demux )
 
                 if( i_aspect_x && i_aspect_y )
                 {
-                    fmt.video.i_aspect = i_aspect_x *
-                        (int64_t)fmt.video.i_width * VOUT_ASPECT_FACTOR /
-                        fmt.video.i_height / i_aspect_y;
+                    fmt.video.i_sar_num = i_aspect_x;
+                    fmt.video.i_sar_den = i_aspect_y;
                 }
             }
 

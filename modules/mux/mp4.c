@@ -1632,11 +1632,12 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
         else if( p_stream->fmt.i_cat == VIDEO_ES )
         {
             int i_width = p_stream->fmt.video.i_width << 16;
-            if( p_stream->fmt.video.i_aspect > 0 )
+            if( p_stream->fmt.video.i_sar_num > 0 &&
+                p_stream->fmt.video.i_sar_den > 0 )
             {
-                i_width = (int64_t)p_stream->fmt.video.i_aspect *
-                          ((int64_t)p_stream->fmt.video.i_height << 16) /
-                          VOUT_ASPECT_FACTOR;
+                i_width = (int64_t)p_stream->fmt.video.i_sar_num *
+                          ((int64_t)p_stream->fmt.video.i_width << 16) /
+                          p_stream->fmt.video.i_sar_den;
             }
             // width (presentation)
             bo_add_32be( tkhd, i_width );
@@ -1653,12 +1654,14 @@ static bo_t *GetMoovBox( sout_mux_t *p_mux )
                 mp4_stream_t *tk = p_sys->pp_streams[i];
                 if( tk->fmt.i_cat == VIDEO_ES )
                 {
-                    if( p_stream->fmt.video.i_aspect )
-                        i_width = (int64_t)p_stream->fmt.video.i_aspect *
-                                   ((int64_t)p_stream->fmt.video.i_height<<16) / VOUT_ASPECT_FACTOR;
+                    if( tk->fmt.video.i_sar_num > 0 &&
+                        tk->fmt.video.i_sar_den > 0 )
+                        i_width = (int64_t)tk->fmt.video.i_sar_num *
+                                  ((int64_t)tk->fmt.video.i_width << 16) /
+                                  tk->fmt.video.i_sar_den;
                     else
-                        i_width = p_stream->fmt.video.i_width << 16;
-                    i_height = p_stream->fmt.video.i_height;
+                        i_width = tk->fmt.video.i_width << 16;
+                    i_height = tk->fmt.video.i_height;
                     break;
                 }
             }

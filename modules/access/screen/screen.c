@@ -340,8 +340,8 @@ void RenderCursor( demux_t *p_demux, int i_x, int i_y,
                        p_sys->fmt.video.i_chroma,
                        p_sys->fmt.video.i_width,
                        p_sys->fmt.video.i_height,
-                       p_sys->fmt.video.i_aspect * p_sys->fmt.video.i_height,
-                       VOUT_ASPECT_FACTOR        * p_sys->fmt.video.i_width );
+                       p_sys->fmt.video.i_sar_num,
+                       p_sys->fmt.video.i_sar_den );
     if( !p_sys->p_blend )
     {
         p_sys->p_blend = vlc_object_create( p_demux, sizeof(filter_t) );

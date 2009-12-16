@@ -535,7 +535,6 @@ static void Render ( vout_thread_t *p_vout, picture_t *p_pic )
     {
         p_vout->i_changes &= ~VOUT_ASPECT_CHANGE;
 
-        p_vout->fmt_out.i_aspect = p_vout->fmt_in.i_aspect;
         p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
         p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
 

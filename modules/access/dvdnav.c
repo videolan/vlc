@@ -139,8 +139,6 @@ struct demux_sys_t
     bool b_spu_change;
 
     /* */
-    int i_aspect;
-
     int           i_title;
     input_title_t **title;
 
@@ -228,7 +226,6 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_reset_pcr = false;
 
     ps_track_init( p_sys->tk );
-    p_sys->i_aspect = -1;
     p_sys->i_mux_rate = 0;
     p_sys->i_pgc_length = 0;
     p_sys->b_spu_change = false;
@@ -728,10 +725,6 @@ static int Demux( demux_t *p_demux )
         msg_Dbg( p_demux, "     - vtsN=%d", event->new_vtsN );
         msg_Dbg( p_demux, "     - domain=%d", event->new_domain );
 
-        /* dvdnav_get_video_aspect / dvdnav_get_video_scale_permission */
-        /* TODO check if we always have VTS and CELL */
-        p_sys->i_aspect = dvdnav_get_video_aspect( p_sys->dvdnav );
-
         /* reset PCR */
         es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
@@ -1183,16 +1176,6 @@ static void ESNew( demux_t *p_demux, int i_id )
     /* Add a new ES */
     if( tk->fmt.i_cat == VIDEO_ES )
     {
-        switch( p_sys->i_aspect )
-        {
-        case 1: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR; break;
-        case 2: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * 4 / 3; break;
-        case 3: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * 16 / 9; break;
-        case 4: tk->fmt.video.i_aspect = VOUT_ASPECT_FACTOR * 221 / 10; break;
-        default:
-            tk->fmt.video.i_aspect = 0;
-            break;
-        }
         b_select = true;
     }
     else if( tk->fmt.i_cat == AUDIO_ES )

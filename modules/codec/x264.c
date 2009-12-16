@@ -1018,16 +1018,13 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->param.analyse.b_transform_8x8 = var_GetBool( p_enc,
                                     SOUT_CFG_PREFIX "8x8dct" );
 
-    if( p_enc->fmt_in.video.i_aspect > 0 )
+    if( p_enc->fmt_in.video.i_sar_num > 0 &&
+        p_enc->fmt_in.video.i_sar_den > 0 )
     {
-        int64_t i_num, i_den;
         unsigned int i_dst_num, i_dst_den;
-
-        i_num = p_enc->fmt_in.video.i_aspect *
-            (int64_t)p_enc->fmt_in.video.i_height;
-        i_den = VOUT_ASPECT_FACTOR * p_enc->fmt_in.video.i_width;
-        vlc_ureduce( &i_dst_num, &i_dst_den, i_num, i_den, 0 );
-
+        vlc_ureduce( &i_dst_num, &i_dst_den,
+                     p_enc->fmt_in.video.i_sar_num,
+                     p_enc->fmt_in.video.i_sar_den );
         p_sys->param.vui.i_sar_width = i_dst_num;
         p_sys->param.vui.i_sar_height = i_dst_den;
     }
