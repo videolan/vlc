@@ -433,6 +433,7 @@ static void stream_state_cb(pa_stream *s, void * userdata) {
 }
 
 static void stream_request_cb(pa_stream *s, size_t length, void *userdata) {
+    VLC_UNUSED( s );
     aout_instance_t *p_aout = (aout_instance_t *)userdata;
     struct aout_sys_t * p_sys = (struct aout_sys_t *) p_aout->output.p_sys;
     mtime_t next_date;
@@ -486,6 +487,7 @@ static void stream_request_cb(pa_stream *s, size_t length, void *userdata) {
 }
 
 static void stream_latency_update_cb(pa_stream *s, void *userdata) {
+    VLC_UNUSED( s );
     aout_instance_t *p_aout = (aout_instance_t *)userdata;
     struct aout_sys_t * p_sys = (struct aout_sys_t *) p_aout->output.p_sys;
 
@@ -498,6 +500,7 @@ static void stream_latency_update_cb(pa_stream *s, void *userdata) {
 
 static void success_cb(pa_stream *s, int sucess, void *userdata)
 {
+    VLC_UNUSED( s );
     aout_instance_t *p_aout = (aout_instance_t *)userdata;
     struct aout_sys_t * p_sys = (struct aout_sys_t *) p_aout->output.p_sys;
 
