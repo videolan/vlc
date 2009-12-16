@@ -18,6 +18,7 @@ doc
 info
 Sparkle
 *.bak
+toolchain.cmake
 # Ignore fetched contrib
 src/*
 # But not our files
