@@ -66,8 +66,8 @@ static void Close( vlc_object_t * );
     "interfaces (address 0.0.0.0), on port 554, with no path.\nTo listen " \
     "only on the local interface, use \"localhost\" as address." )
 
-#define THROTLE_TEXT N_( "Maximum number of connections" )
-#define THROTLE_LONGTEXT N_( "This limits the maximum number of clients " \
+#define THROTTLE_TEXT N_( "Maximum number of connections" )
+#define THROTTLE_LONGTEXT N_( "This limits the maximum number of clients " \
     "that can connect to the RTSP VOD. 0 means no limit."  )
 
 #define RAWMUX_TEXT N_( "MUX for RAW RTSP transport" )
@@ -90,8 +90,8 @@ vlc_module_begin ()
     add_string ( "rtsp-host", NULL, NULL, HOST_TEXT, HOST_LONGTEXT, true )
     add_string( "rtsp-raw-mux", "ts", NULL, RAWMUX_TEXT,
                 RAWMUX_TEXT, true )
-    add_integer( "rtsp-throttle-users", 0, NULL, THROTLE_TEXT,
-                                           THROTLE_LONGTEXT, true )
+    add_integer( "rtsp-throttle-users", 0, NULL, THROTTLE_TEXT,
+                 THROTTLE_LONGTEXT, true )
     add_integer( "rtsp-session-timeout", 5, NULL, SESSION_TIMEOUT_TEXT,
                  SESSION_TIMEOUT_LONGTEXT, true )
 vlc_module_end ()
