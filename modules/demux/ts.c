@@ -2082,7 +2082,7 @@ static int PIDFillFormat( ts_pid_t *pid, int i_stream_type )
     case 0x04:  /* MPEG-2 audio */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_MPGA );
         break;
-    case 0x11:  /* MPEG4 (audio) */
+    case 0x11:  /* MPEG4 (audio) LATM */
     case 0x0f:  /* ISO/IEC 13818-7 Audio with ADTS transport syntax */
         es_format_Init( fmt, AUDIO_ES, VLC_CODEC_MP4A );
         break;
