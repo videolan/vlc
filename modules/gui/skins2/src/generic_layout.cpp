@@ -186,9 +186,7 @@ void GenericLayout::resize( int width, int height )
     {
         // Resize the window
         pWindow->resize( width, height );
-        refreshAll();
         // Change the shape of the window and redraw it
-        pWindow->updateShape();
         refreshAll();
     }
 }
@@ -223,6 +221,9 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
     TopWindow *pWindow = getWindow();
     if( pWindow )
     {
+        // first apply new shape to the window
+        pWindow->updateShape();
+
         // Check boundaries
         if( x < 0 )
             x = 0;

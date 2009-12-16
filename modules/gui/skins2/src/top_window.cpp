@@ -316,7 +316,6 @@ void TopWindow::setActiveLayout( GenericLayout *pLayout )
     // Get the size of the layout and resize the window
     resize( pLayout->getWidth(), pLayout->getHeight() );
 
-    updateShape();
     if( isVisible )
     {
         pLayout->onShow();
@@ -335,10 +334,9 @@ const GenericLayout& TopWindow::getActiveLayout() const
 
 void TopWindow::innerShow()
 {
-    // First, refresh the layout and update the shape of the window
+    // First, refresh the layout
     if( m_pActiveLayout )
     {
-        updateShape();
         m_pActiveLayout->onShow();
     }
 

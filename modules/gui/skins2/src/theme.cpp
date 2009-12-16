@@ -88,19 +88,9 @@ void Theme::loadConfig()
         if( pLayout->getWidth() != width ||
             pLayout->getHeight() != height )
         {
-            // XXX FIXME XXX: big kludge
-            // As resizing a hidden window causes some trouble (at least on
-            // Windows), first show the window off screen, resize it, and
-            // hide it again.
-            // This has to be investigated more deeply!
-            m_windowManager.startMove( *pWin );
-            m_windowManager.move( *pWin, -width - pLayout->getWidth(), 0);
-            m_windowManager.stopMove();
-            m_windowManager.show( *pWin );
             m_windowManager.startResize( *pLayout, WindowManager::kResizeSE );
             m_windowManager.resize( *pLayout, width, height );
             m_windowManager.stopResize();
-            m_windowManager.hide( *pWin );
         }
         // Move the window (which incidentally takes care of the anchoring)
         m_windowManager.startMove( *pWin );
