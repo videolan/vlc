@@ -57,6 +57,8 @@ protected:
 
     virtual void keyPressEvent( QKeyEvent *e );
 
+    bool eventFilter(QObject *obj, QEvent *event);
+
     PLModel *model;
 private:
     intf_thread_t *p_intf;
@@ -72,6 +74,7 @@ private:
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
 
+    void doPopup( QModelIndex index, QPoint point );
 public slots:
     void removeItem( int );
     virtual void setRoot( playlist_item_t * );
@@ -79,7 +82,6 @@ private slots:
     void deleteSelection();
     void handleExpansion( const QModelIndex& );
     void gotoPlayingItem();
-    void doPopup( QModelIndex index, QPoint point );
     void search( const QString& searchText );
     void popupAdd();
     void popupSelectColumn( QPoint );

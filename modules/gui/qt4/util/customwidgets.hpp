@@ -95,55 +95,11 @@ private:
     QIcon::Mode iconMode;
 };
 
-/*****************************************************************
- * Custom views
- *****************************************************************/
-#include <QMouseEvent>
-#include <QTreeView>
-#include <QCursor>
-#include <QPoint>
-#include <QModelIndex>
-
-/**
-  Special QTreeView that can emit rightClicked()
-  */
-class QVLCTreeView : public QTreeView
-{
-    Q_OBJECT;
-public:
-    void mouseReleaseEvent( QMouseEvent* e )
-    {
-        if( e->button() & Qt::RightButton )
-            return; /* Do NOT forward to QTreeView!! */
-        QTreeView::mouseReleaseEvent( e );
-    }
-
-    void mousePressEvent( QMouseEvent* e )
-    {
-        if( e->button() & Qt::RightButton )
-        {
-            QModelIndex index = indexAt( QPoint( e->x(), e->y() ) );
-            if( index.isValid() )
-                setSelection( visualRect( index ), QItemSelectionModel::ClearAndSelect );
-            emit rightClicked( index, QCursor::pos() );
-            return;
-        }
-        if( e->button() & Qt::LeftButton )
-        {
-            if( !indexAt( QPoint( e->x(), e->y() ) ).isValid() )
-                clearSelection();
-        }
-        QTreeView::mousePressEvent( e );
-    }
-
-signals:
-    void rightClicked( QModelIndex, QPoint  );
-};
-
 /* VLC Key/Wheel hotkeys interactions */
 
 class QKeyEvent;
 class QWheelEvent;
+class QInputEvent;
 
 int qtKeyModifiersToVLC( QInputEvent* e );
 int qtEventToVLCKey( QKeyEvent *e );

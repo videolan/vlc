@@ -48,6 +48,7 @@
 #include <QTreeWidgetItem>
 #include <QSignalMapper>
 #include <QDialogButtonBox>
+#include <QKeyEvent>
 
 #define MINWIDTH_BOX 90
 #define LAST_COLUMN 10
