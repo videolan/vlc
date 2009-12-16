@@ -226,7 +226,9 @@ void CommonManage( vout_thread_t *p_vout )
         p_vout->fmt_out.i_visible_height = p_vout->fmt_in.i_visible_height;
         p_vout->fmt_out.i_sar_num = p_vout->fmt_in.i_sar_num;
         p_vout->fmt_out.i_sar_den = p_vout->fmt_in.i_sar_den;
-        p_vout->output.i_aspect = p_vout->fmt_in.i_aspect;
+        p_vout->output.i_aspect = (int64_t)VOUT_ASPECT_FACTOR *
+                                   p_vout->fmt_in.i_sar_num * p_vout->fmt_in.i_width /
+                                   (p_vout->fmt_in.i_sar_den * p_vout->fmt_in.i_height);
         UpdateRects( p_vout, true );
     }
 
