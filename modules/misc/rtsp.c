@@ -113,7 +113,6 @@ typedef struct
 typedef struct
 {
     char *psz_session;
-    int64_t i_last; /* for timeout */
 
     bool b_playing; /* is it in "play" state */
     bool b_paused; /* is it in "pause" state */
@@ -134,7 +133,6 @@ struct media_es_t
     vod_media_t *p_media;
 
     es_format_t fmt;
-    int         i_port;
     uint8_t     i_payload_type;
     char        *psz_rtpmap;
     char        *psz_fmtp;
@@ -154,16 +152,10 @@ struct vod_media_t
     char         *psz_rtsp_control_v6;
     char         *psz_rtsp_path;
 
-    int  i_port;
-    int  i_port_audio;
-    int  i_port_video;
-    int  i_ttl;
     int  i_payload_type;
 
     int64_t i_sdp_id;
     int     i_sdp_version;
-
-    bool b_multicast;
 
     vlc_mutex_t lock;
 
@@ -178,10 +170,6 @@ struct vod_media_t
     rtsp_client_t **rtsp;
 
     /* Infos */
-    char *psz_session_name;
-    char *psz_session_description;
-    char *psz_session_url;
-    char *psz_session_email;
     mtime_t i_length;
 };
 
@@ -460,14 +448,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     p_media->p_vod = p_vod;
 
     vlc_mutex_init( &p_media->lock );
-    p_media->psz_session_name = strdup("");
-    p_media->psz_session_description = strdup("");
-    p_media->psz_session_url = strdup("");
-    p_media->psz_session_email = strdup("");
 
-    p_media->i_port_audio = 1234;
-    p_media->i_port_video = 1236;
-    p_media->i_port       = 1238;
     p_media->i_payload_type = 96;
 
     p_media->i_sdp_id = mdate();
@@ -517,10 +498,6 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
 
     vlc_mutex_destroy( &p_media->lock );
 
-    free( p_media->psz_session_name );
-    free( p_media->psz_session_description );
-    free( p_media->psz_session_url );
-    free( p_media->psz_session_email );
     free( p_media->psz_mux );
     free( p_media );
 }
@@ -738,34 +715,6 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     es_format_Copy( &p_es->fmt, p_fmt );
     p_es->p_vod = p_vod;
     p_es->p_media = p_media;
-
-#if 0
-    /* Choose the port */
-    if( p_fmt->i_cat == AUDIO_ES && p_media->i_port_audio > 0 )
-    {
-        p_es->i_port = p_media->i_port_audio;
-        p_media->i_port_audio = 0;
-    }
-    else if( p_fmt->i_cat == VIDEO_ES && p_media->i_port_video > 0 )
-    {
-        p_es->i_port = p_media->i_port_video;
-        p_media->i_port_video = 0;
-    }
-    while( !p_es->i_port )
-    {
-        if( p_media->i_port != p_media->i_port_audio &&
-            p_media->i_port != p_media->i_port_video )
-        {
-            p_es->i_port = p_media->i_port;
-            p_media->i_port += 2;
-            break;
-        }
-        p_media->i_port += 2;
-    }
-#else
-
-    p_es->i_port = 0;
-#endif
 
     vlc_mutex_lock( &p_media->lock );
     TAB_APPEND( p_media->i_es, p_media->es, p_es );
@@ -1609,10 +1558,6 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
     /* Calculate size */
     i_size = sizeof( "v=0\r\n" ) +
         sizeof( "o=- * * IN IP4 \r\n" ) + 10 + NI_MAXNUMERICHOST +
-        sizeof( "s=*\r\n" ) + strlen( p_media->psz_session_name ) +
-        sizeof( "i=*\r\n" ) + strlen( p_media->psz_session_description ) +
-        sizeof( "u=*\r\n" ) + strlen( p_media->psz_session_url ) +
-        sizeof( "e=*\r\n" ) + strlen( p_media->psz_session_email ) +
         sizeof( "c=IN IP4 0.0.0.0\r\n" ) + 20 + 10 +
         sizeof( "t=0 0\r\n" ) + /* FIXME */
         sizeof( "a=tool:"PACKAGE_STRING"\r\n" ) +
@@ -1642,14 +1587,6 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
     p += sprintf( p, "v=0\r\n" );
     p += sprintf( p, "o=- %"PRId64" %d IN IP%c %s\r\n",
                   p_media->i_sdp_id, p_media->i_sdp_version, ipv, ip );
-    if( *p_media->psz_session_name )
-        p += sprintf( p, "s=%s\r\n", p_media->psz_session_name );
-    if( *p_media->psz_session_description )
-        p += sprintf( p, "i=%s\r\n", p_media->psz_session_description );
-    if( *p_media->psz_session_url )
-        p += sprintf( p, "u=%s\r\n", p_media->psz_session_url );
-    if( *p_media->psz_session_email )
-        p += sprintf( p, "e=%s\r\n", p_media->psz_session_email );
 
     p += sprintf( p, "c=IN IP%c %s\r\n", ipv, ipv == '6' ? "::" : "0.0.0.0" );
     p += sprintf( p, "t=0 0\r\n" ); /* FIXME */
@@ -1669,12 +1606,12 @@ static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
         if( p_es->fmt.i_cat == AUDIO_ES )
         {
             p += sprintf( p, "m=audio %d RTP/AVP %d\r\n",
-                          p_es->i_port, p_es->i_payload_type );
+                          0 /* p_es->i_port */, p_es->i_payload_type );
         }
         else if( p_es->fmt.i_cat == VIDEO_ES )
         {
             p += sprintf( p, "m=video %d RTP/AVP %d\r\n",
-                          p_es->i_port, p_es->i_payload_type );
+                          0 /* p_es->i_port */, p_es->i_payload_type );
         }
         else
         {
