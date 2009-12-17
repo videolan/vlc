@@ -26,6 +26,10 @@
 #include <errno.h>
 #include <vlc_network.h>
 
+#ifndef WSA_QOS_EUNKNOWNPSOBJ
+# define WSA_QOS_EUNKNOWNPSOBJ 11024L
+#endif
+
 typedef struct
 {
     int code;
