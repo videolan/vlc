@@ -209,7 +209,7 @@ static int OpenDatabase( sql_t *p_sql )
 {
     assert( p_sql->psz_host && *p_sql->psz_host );
 
-    if( sqlite3_threadsafe() != 0 )
+    if( sqlite3_threadsafe() == 0 )
     {
         msg_Err( p_sql, "Sqlite library on your system is not threadsafe" );
         return VLC_EGENERIC;
