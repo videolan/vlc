@@ -374,17 +374,40 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
 {
     vout_sys_t *p_sys = p_vout->p_sys;
 
+    picture_t *p_next = p_sys->p_current;
+
+    if( VLCGL_TEXTURE_COUNT > 1 )
+    {
+        /* Get the next picture to display */
+        p_next = picture_pool_Get( p_sys->p_pool );
+        assert( p_next );
+    }
+  
     if( p_sys->p_current )
     {
         assert( p_sys->p_current->p[0].p_pixels == p_pic->p[0].p_pixels );
 
+        /* Make sure we have the prepare after the picture_pool_Get,
+         * because picture_pool_Get() will bind the new picture texture,
+         * and vout_display_opengl_Prepare() bind the current rendered picture
+         * texture.
+         * DisplayVideo() will effectively use the last binded texture. */
+
         vout_display_opengl_Prepare( &p_sys->vgl, p_sys->p_current );
-        picture_Release( p_sys->p_current );
     }
 
-    p_sys->p_current = picture_pool_Get( p_sys->p_pool );
-    if( p_sys->p_current )
+    if( p_sys->p_current != p_next ) {
+        if( p_sys->p_current )
+            picture_Release( p_sys->p_current );
+        
+        /* Swap the picture texture on opengl vout side. */
+        p_sys->p_current = p_next;
+
+        /* Now, switch the only picture that is being used
+         * to render in the backend to point to our "next"
+         * picture texture */
         p_pic->p[0].p_pixels = p_sys->p_current->p[0].p_pixels;
+    }
 
     VLC_UNUSED( p_pic );
 }
