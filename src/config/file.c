@@ -685,7 +685,11 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
      */
     fflush (file); /* Flush from run-time */
 #ifndef WIN32
+#ifdef __APPLE__
+    fsync (fd); /* Flush from OS */
+#else
     fdatasync (fd); /* Flush from OS */
+#endif
     /* Atomically replace the file... */
     if (utf8_rename (temporary, permanent))
         utf8_unlink (temporary);
