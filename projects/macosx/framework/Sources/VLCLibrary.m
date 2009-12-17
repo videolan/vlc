@@ -74,7 +74,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
             "--ignore-config",           // Don't read and write VLC config files.
 			"--opengl-provider=minimal_macosx", // Use minimal_macosx
             "--vout=minimal_macosx",
-			"-verbose=-1",               // Don't polute the log
+			"--verbose=2",               // Don't polute the log
             "--play-and-pause"           // When ending a stream pause it instead of stopping it.
             //, "--control=motion", "--motion-use-rotate", "--video-filter=rotate"
         };
