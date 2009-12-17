@@ -66,8 +66,12 @@ if test "${ACTION}" = "build"; then
             mkdir -p ${2}
 
             # Lets copy the library from the source folder to our new destination folder
-            install -m 644 ${1} ${lib_dest}
-
+            if [ "${3}" != "bin" ]; then
+                install -m 644 ${1} ${lib_dest}
+            else
+                install -m 755 ${1} ${lib_dest}
+            fi
+            
             # Update the dynamic library so it will know where to look for the other libraries
             echo "Installing ${3} `basename ${lib_dest}`"
 
@@ -108,6 +112,8 @@ if test "${ACTION}" = "build"; then
         install_library "${VLC_BUILD_DIR}/projects/mozilla/${prefix}npvlc.${suffix}" "${target}" "library" "@loader_path/lib"
         mv ${target}/npvlc.${suffix} "${target}/VLC Plugin"
         chmod +x "${target}/VLC Plugin"
+    else
+        install_library "${VLC_BUILD_DIR}/bin/${prefix}vlc" "${target}/bin" "bin" "@loader_path/../lib"
     fi
 
     ##########################
@@ -136,6 +142,7 @@ if test "${ACTION}" = "build"; then
         ln -sf Versions/Current/${modules} .
         ln -sf Versions/Current/${include} .
         ln -sf Versions/Current/${share} .
+        ln -sf Versions/Current/bin .
 
         popd > /dev/null
     fi
