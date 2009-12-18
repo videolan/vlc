@@ -81,6 +81,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
         
         instance = (void *)libvlc_new( sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]), lib_vlc_params, &ex );
         catch_exception( &ex );
+        NSAssert(instance, @"libvlc failed to initialize");
         
         // Assignment unneeded, as the audio unit will do it for us
         /*audio = */ [[VLCAudio alloc] initWithLibrary:self];
