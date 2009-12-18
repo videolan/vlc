@@ -58,4 +58,13 @@
  * \return The library's shared audio instance.
  */
 @property (readonly) VLCAudio * audio;
+
+
+/**
+ * Returns the library's version
+ * \return The library version example "0.9.0-git Grishenko".
+ */
+
+@property (readonly) NSString * version;
+
 @end
