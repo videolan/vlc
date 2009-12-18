@@ -506,7 +506,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test \"$ACTION\" = \"clean\"; then\n    exit 0\nfi\nif test \"$ARCHS\" = \"x86_64\"; then\n    cd ../../../extras/contrib && make && ./bootstrap\nelse\n    cd ../../../extras/contrib && make\nfi";
+			shellScript = "if test \"$ACTION\" = \"clean\"; then\n    exit 0\nfi\ncd ../../../extras/contrib && make\n";
 			showEnvVarsInLog = 0;
 		};
 		63FFDBCD0D2AE2AE0092FC96 /* configure */ = {
