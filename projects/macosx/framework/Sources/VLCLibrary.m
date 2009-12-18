@@ -94,6 +94,11 @@ void __catch_exception( void * e, const char * function, const char * file, int 
     return [NSString stringWithUTF8String:libvlc_get_version()];
 }
 
+- (NSString *)changeset 
+{
+    return [NSString stringWithUTF8String:libvlc_get_changeset()];
+}
+
 - (void)dealloc 
 {
     if( instance ) 

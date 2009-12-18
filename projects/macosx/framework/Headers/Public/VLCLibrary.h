@@ -67,4 +67,11 @@
 
 @property (readonly) NSString * version;
 
+/**
+ * Returns the library's changeset
+ * \return The library version example "adfee99".
+ */
+
+@property (readonly) NSString * changeset;
+
 @end
