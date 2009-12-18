@@ -4463,8 +4463,8 @@ then
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,CoreServices])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,AGL])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,IOKit])
-  VLC_ADD_LDFLAGS([macosx],                           [-F\\\${top_srcdir}/extras/contrib/Sparkle -Wl,-framework,Sparkle])
-  VLC_ADD_OBJCFLAGS([macosx],                         [-F\\\${top_srcdir}/extras/contrib/Sparkle])
+  VLC_ADD_LDFLAGS([macosx],                           [-F\\\${CONTRIB_DIR}/Sparkle -Wl,-framework,Sparkle])
+  VLC_ADD_OBJCFLAGS([macosx],                         [-F\\\${CONTRIB_DIR}/Sparkle])
   dnl For bug report
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,AddressBook])
   VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,QTKit])
