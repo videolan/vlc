@@ -106,7 +106,9 @@ struct intf_sys_t
     id o_wizard;                /* VLCWizard      */
     id o_extended;              /* VLCExtended    */
     id o_bookmarks;             /* VLCBookmarks   */
+#ifdef ENABLE_VLM
     id o_vlm;                   /* VLCVLMController */
+#endif
     id o_embedded_list;         /* VLCEmbeddedList*/
     id o_coredialogs;           /* VLCCoreDialogProvider */
     VLCInformation * o_info;    /* VLCInformation */
@@ -119,7 +121,9 @@ struct intf_sys_t
     BOOL nib_bookmarks_loaded;  /* bookmarks nibfile */
     BOOL nib_prefs_loaded;      /* preferences nibfile */
     BOOL nib_info_loaded;       /* information panel nibfile */
+#ifdef ENABLE_VLM
     BOOL nib_vlm_loaded;        /* VLM Panel nibfile */
+#endif
     BOOL nib_coredialogs_loaded; /* CoreDialogs nibfile */
 
     IBOutlet VLCControllerWindow * o_window;                     /* main window */
