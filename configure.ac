@@ -126,6 +126,11 @@ AC_ARG_WITH(contrib,
          topdir="`pwd`/$topdir"
       fi
       CONTRIB_DIR=${topdir}/extras/contrib/hosts/${host}
+      if ! test -d "$CONTRIB_DIR"
+      then
+        gccmachine=`$CC -dumpmachine`
+        CONTRIB_DIR=${topdir}/extras/contrib/hosts/${gccmachine}
+      fi
     fi
     AC_MSG_CHECKING([for libs in ${CONTRIB_DIR}])
   AS_IF([test -d ${CONTRIB_DIR}/lib],[
