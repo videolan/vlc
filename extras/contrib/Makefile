@@ -58,16 +58,17 @@ using-bin: contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
 		exit 1 ; \
 	fi
 	mkdir tmp
+	mkdir -p $(PREFIX)
 	(cd tmp && tar jxvf ../$<)
 	./change_prefix.sh tmp @@CONTRIB_PREFIX@@  $(PREFIX)
-	(cd tmp && find . -type d) | while read dir; do mkdir -p -- "$$dir"; done
-	(cd tmp && find . -not -type d) | while read i; do mv -f -- tmp/"$$i" "$$i"; done
+	(cd tmp && find . -type d) | while read dir; do mkdir -p -- "$(PREFIX)/$$dir"; done
+	(cd tmp && find . -not -type d) | while read i; do mv -f -- tmp/"$$i" "$(PREFIX)/$$i"; done
 	rm -rf tmp
     # libiconv.la is no longer present on Snow Leopard, so fix possible references to it, which would
     # result in linking issues
 ifdef HAVE_DARWIN_10
 	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%g' -i.orig *.la && rm -f *.la.orig)
-	(cd $(PREFIX)/src && $(MAKE) .iconv)
+	(cd src && $(MAKE) .iconv)
 endif
 endif
 
@@ -91,9 +92,7 @@ package-macosx:
 		exit 1 ; \
 	fi
 	mkdir tmp
-	tar cf - bin sbin include lib share/aclocal* share/autoconf* \
-		share/automake* share/gettext* share/libtool* gecko-sdk Sparkle \
-		| (cd tmp; tar xf -)
+	(cd $(PREFIX); tar cf - *) | (cd tmp; tar xf -)
 	./change_prefix.sh tmp $(PREFIX) @@CONTRIB_PREFIX@@
 	(cd tmp; tar cf - .) | bzip2 -c > contrib-macosx.tar.bz2
 	rm -rf tmp
@@ -108,9 +107,9 @@ package-win%:
 		exit 1 ; \
 	fi
 	mkdir -p tmp/$(DISTDIR)
-	tar cf - --dereference bin sbin include lib share/aclocal*\
+	(cd $(PREFIX); tar cf - --dereference bin sbin include lib share/aclocal*\
 		share/autoconf* share/qt4* \
-		share/automake* share/gettext* gecko-sdk\
+		share/automake* share/gettext* gecko-sdk)\
 		| (cd tmp/$(DISTDIR); tar xpf -)
 #kludge for live.com
 	mkdir -p tmp/$(DISTDIR)/live.com

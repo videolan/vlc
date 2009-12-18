@@ -125,19 +125,10 @@ AC_ARG_WITH(contrib,
       if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
          topdir="`pwd`/$topdir"
       fi
-      CONTRIB_DIR=${topdir}/extras/contrib
+      CONTRIB_DIR=${topdir}/extras/contrib/hosts/${host}
     fi
     AC_MSG_CHECKING([for libs in ${CONTRIB_DIR}])
   AS_IF([test -d ${CONTRIB_DIR}/lib],[
-   AS_IF([test "`grep HOST ${CONTRIB_DIR}/config.mak 2>/dev/null|awk '{print $3}'`" != "`$CC -dumpmachine`"],[
-      if test "${with_contrib}" = "yes"; then
-        AC_MSG_RESULT([no])
-        AC_MSG_ERROR([ not using the libs in extras/contrib as it is not the same host])
-      else
-        AC_MSG_RESULT([no])
-        AC_MSG_WARN([ not using the libs in extras/contrib as it is not the same host])
-      fi
-     ],[
     AC_MSG_RESULT([yes])
     export PATH=${CONTRIB_DIR}/bin:$PATH
     CPPFLAGS="${CPPFLAGS} -I${CONTRIB_DIR}/include"
@@ -170,10 +161,9 @@ AC_ARG_WITH(contrib,
       export LIBRARY_PATH=${CONTRIB_DIR}/lib:$LIBRARY_PATH
       export BELIBRARIES=${CONTRIB_DIR}/lib:$BELIBRARIES
     fi
+    ],[
+       AC_MSG_RESULT([no])
     ])
-  ],[
-    AC_MSG_RESULT([no])
-  ])
 ])
 dnl
 dnl  Set default values

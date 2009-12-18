@@ -290,7 +290,9 @@ cat src/Distributions/"${DISTRO}".mak >> distro.mak
 echo "BUILD = $BUILD" >> config.mak
 echo "HOST = $HOST" >> config.mak
 
-echo "PREFIX = `pwd`" >> config.mak
+echo "PREFIX = `pwd`/hosts/$HOST" >> config.mak
+
+ln -sfn hosts/$HOST build 
 
 echo "CC = ${CC}" >> config.mak
 echo "CXX = ${CXX}" >> config.mak

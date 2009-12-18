@@ -1,4 +1,6 @@
 # Ignore install path
+build
+hosts
 translations
 demos
 examples
@@ -6,17 +8,6 @@ mkspecs
 phrasebooks
 *.xml
 *.tar.bz2
-share
-bin
-lib
-include
-man
-sbin
-etc
-gecko-sdk
-doc
-info
-Sparkle
 *.bak
 toolchain.cmake
 # Ignore fetched contrib
