@@ -135,6 +135,7 @@ AC_ARG_WITH(contrib,
     AC_MSG_CHECKING([for libs in ${CONTRIB_DIR}])
   AS_IF([test -d ${CONTRIB_DIR}/lib],[
     AC_MSG_RESULT([yes])
+    AC_SUBST(CONTRIB_DIR)
     export PATH=${CONTRIB_DIR}/bin:$PATH
     CPPFLAGS="${CPPFLAGS} -I${CONTRIB_DIR}/include"
     CPPFLAGS_save="${CPPFLAGS_save} -I${CONTRIB_DIR}/include"

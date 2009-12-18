@@ -357,9 +357,9 @@ vlc-bundle: vlc
 	    cp "$$i$(LIBEXT)" $(top_builddir)/vlc-bundle/plugins/ ; \
 	  fi ; \
 	done
-	if test -d $(top_builddir)/extras/contrib/vlc-lib ; then \
+	if test -d $(CONTRIB_DIR)/vlc-lib ; then \
 	  mkdir -p $(top_builddir)/vlc-bundle/lib ; \
-	  for i in $(top_builddir)/extras/contrib/vlc-lib/*.so ; do \
+	  for i in $(CONTRIB_DIR)/vlc-lib/*.so ; do \
 	    cp $$i $(top_builddir)/vlc-bundle/lib/ ; \
 	  done ; \
 	fi
@@ -440,7 +440,7 @@ VLC-release.app: vlc
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
 	mkdir -p $(top_builddir)/tmp/extras/contrib/Sparkle
-	cp -R $(top_srcdir)/extras/contrib/Sparkle/Sparkle.framework $(top_builddir)/tmp/extras/contrib/Sparkle
+	cp -R $(CONTRIB_DIR)/Sparkle/Sparkle.framework $(top_builddir)/tmp/extras/contrib/Sparkle
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
 	mkdir -p $(top_builddir)/tmp/modules/gui/macosx
 	for i in \
@@ -593,7 +593,7 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 	  cp "$(srcdir)/$$i" $(top_builddir)/tmp; \
 	done
 	mkdir -p $(top_builddir)/tmp/extras/contrib/Sparkle
-	cp -R $(top_srcdir)/extras/contrib/Sparkle/Sparkle.framework $(top_builddir)/tmp/extras/contrib/Sparkle
+	cp -R $(CONTRIB_DIR)/Sparkle/Sparkle.framework $(top_builddir)/tmp/extras/contrib/Sparkle
 	mkdir -p $(top_builddir)/tmp/modules/audio_output
 	mkdir -p $(top_builddir)/tmp/modules/gui/macosx
 	for i in \
@@ -765,7 +765,7 @@ package-win32-base-debug: package-win-common
 	  fi ; done
 
 # Contrib *.dll's
-#	cp $(srcdir)/extras/contrib/lib/*.dll "vlc-$(VERSION)/" || true
+#	cp $(CONTRIB_DIR)/lib/*.dll "vlc-$(VERSION)/" || true
 
 #Enable DEP and ASLR for all the binaries
 if USE_PEFLAGS
