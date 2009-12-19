@@ -36,9 +36,11 @@ void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t * );
 
 char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url );
 
+uint32_t rtp_compute_ts( const sout_stream_id_t *id, int64_t i_pts );
 int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux, uint16_t *seq );
 void rtp_del_sink( sout_stream_id_t *id, int fd );
 uint16_t rtp_get_seq( sout_stream_id_t *id );
+int64_t rtp_get_ts( const sout_stream_t *p_stream );
 unsigned rtp_get_num( const sout_stream_id_t *id );
 
 /* RTP packetization */

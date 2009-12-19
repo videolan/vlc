@@ -275,6 +275,12 @@ struct sout_stream_sys_t
     /* RTSP */
     rtsp_stream_t *rtsp;
 
+    /* RTSP NPT and timestamp computations */
+    mtime_t      i_npt_zero;    /* when NPT=0 packet is sent */
+    int64_t      i_pts_zero;    /* predicts PTS of NPT=0 packet */
+    int64_t      i_pts_offset;  /* matches actual PTS to prediction */
+    vlc_mutex_t  lock_ts;
+
     /* */
     char     *psz_destination;
     uint32_t  payload_bitmap;
@@ -313,6 +319,8 @@ struct sout_stream_id_t
     /* rtp field */
     uint16_t    i_sequence;
     uint8_t     i_payload_type;
+    bool        b_ts_init;
+    uint32_t    i_ts_offset;
     uint8_t     ssrc[4];
 
     /* for rtsp */
@@ -459,6 +467,14 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_latm = var_GetBool( p_stream, SOUT_CFG_PREFIX "mp4a-latm" );
 
+    /* NPT=0 time will be determined when we packetize the first packet
+     * (of any ES). But we want to be able to report rtptime in RTSP
+     * without waiting. So until then, we use an arbitrary reference
+     * PTS for timestamp computations, and then actual PTS will catch
+     * up using offsets. */
+    p_sys->i_npt_zero = VLC_TS_INVALID;
+    p_sys->i_pts_zero = mdate(); /* arbitrary value, could probably be
+                                  * random */
     p_sys->payload_bitmap = 0;
     p_sys->i_es = 0;
     p_sys->es   = NULL;
@@ -475,6 +491,7 @@ static int Open( vlc_object_t *p_this )
     p_stream->p_sys     = p_sys;
 
     vlc_mutex_init( &p_sys->lock_sdp );
+    vlc_mutex_init( &p_sys->lock_ts );
     vlc_mutex_init( &p_sys->lock_es );
 
     psz = var_GetNonEmptyString( p_stream, SOUT_CFG_PREFIX "mux" );
@@ -606,6 +623,7 @@ static void Close( vlc_object_t * p_this )
         RtspUnsetup( p_sys->rtsp );
 
     vlc_mutex_destroy( &p_sys->lock_sdp );
+    vlc_mutex_destroy( &p_sys->lock_ts );
     vlc_mutex_destroy( &p_sys->lock_es );
 
     if( p_sys->p_httpd_file )
@@ -868,6 +886,13 @@ rtp_set_ptime (sout_stream_id_t *id, unsigned ptime_ms, size_t bytes)
         id->i_mtu = 12 + spl;
     else /* MTU is too small for ptime, align to a sample boundary */
         id->i_mtu = 12 + (((id->i_mtu - 12) / bytes) * bytes);
+}
+
+uint32_t rtp_compute_ts( const sout_stream_id_t *id, int64_t i_pts )
+{
+    /* NOTE: this plays nice with offsets because the calculations are
+     * linear. */
+    return i_pts * (int64_t)id->i_clock_rate / CLOCK_FREQ;
 }
 
 /** Add an ES as a new RTP stream */
@@ -1307,6 +1332,12 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         net_SetCSCov( id->sinkv[0].rtp_fd, cscov, -1 );
 #endif
 
+    vlc_mutex_lock( &p_sys->lock_ts );
+    id->b_ts_init = ( p_sys->i_npt_zero != VLC_TS_INVALID );
+    vlc_mutex_unlock( &p_sys->lock_ts );
+    if( id->b_ts_init )
+        id->i_ts_offset = rtp_compute_ts( id, p_sys->i_pts_offset );
+
     if( p_sys->rtsp != NULL )
         id->rtsp_id = RtspAddId( p_sys->rtsp, id, p_sys->i_es,
                                  GetDWBE( id->ssrc ),
@@ -1689,6 +1720,26 @@ uint16_t rtp_get_seq( sout_stream_id_t *id )
     return seq;
 }
 
+/* Return a timestamp corresponding to packets being sent now, and that
+ * can be passed to rtp_compute_ts() to get rtptime values for each ES. */
+int64_t rtp_get_ts( const sout_stream_t *p_stream )
+{
+    sout_stream_sys_t *p_sys = p_stream->p_sys;
+    mtime_t i_npt_zero;
+    vlc_mutex_lock( &p_sys->lock_ts );
+    i_npt_zero = p_sys->i_npt_zero;
+    vlc_mutex_unlock( &p_sys->lock_ts );
+
+    if( i_npt_zero == VLC_TS_INVALID )
+        return p_sys->i_pts_zero;
+
+    mtime_t now = mdate();
+    if( now < i_npt_zero )
+        return p_sys->i_pts_zero;
+
+    return p_sys->i_pts_zero + (now - i_npt_zero); 
+}
+
 /* FIXME: this is pretty bad - if we remove and then insert an ES
  * the number will get unsynched from inside RTSP */
 unsigned rtp_get_num( const sout_stream_id_t *id )
@@ -1711,7 +1762,27 @@ unsigned rtp_get_num( const sout_stream_id_t *id )
 void rtp_packetize_common( sout_stream_id_t *id, block_t *out,
                            int b_marker, int64_t i_pts )
 {
-    uint32_t i_timestamp = i_pts * (int64_t)id->i_clock_rate / CLOCK_FREQ;
+    if( !id->b_ts_init )
+    {
+        sout_stream_sys_t *p_sys = id->p_stream->p_sys;
+        vlc_mutex_lock( &p_sys->lock_ts );
+        if( p_sys->i_npt_zero == VLC_TS_INVALID )
+        {
+            /* This is the first packet of any ES. We initialize the
+             * NPT=0 time reference, and the offset to match the
+             * arbitrary PTS reference. */
+            p_sys->i_npt_zero = i_pts + id->i_caching;
+            p_sys->i_pts_offset = p_sys->i_pts_zero - i_pts;
+        }
+        vlc_mutex_unlock( &p_sys->lock_ts );
+
+        /* And in any case this is the first packet of this ES, so we
+         * initialize the offset for this ES. */
+        id->i_ts_offset = rtp_compute_ts( id, p_sys->i_pts_offset );
+        id->b_ts_init = true;
+    }
+
+    uint32_t i_timestamp = rtp_compute_ts( id, i_pts ) + id->i_ts_offset;
 
     out->p_buffer[0] = 0x80;
     out->p_buffer[1] = (b_marker?0x80:0x00)|id->i_payload_type;

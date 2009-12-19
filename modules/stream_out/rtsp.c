@@ -638,8 +638,10 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             {
                 /* FIXME: we really need to limit the number of tracks... */
                 char info[ses->trackc * ( strlen( control )
-                              + sizeof("url=/trackID=123;seq=65535, ") ) + 1];
+                              + sizeof("url=/trackID=123;seq=65535;"
+                                       "rtptime=4294967295, ") ) + 1];
                 size_t infolen = 0;
+                int64_t ts = rtp_get_ts( rtsp->owner );
 
                 for( int i = 0; i < ses->trackc; i++ )
                 {
@@ -655,10 +657,11 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         else
                             seq = rtp_get_seq( tr->id );
                         infolen += sprintf( info + infolen,
-                                            "url=%s/trackID=%u;seq=%u, ",
+                                    "url=%s/trackID=%u;seq=%u;rtptime=%u, ",
                                             control,
                                             rtp_get_num( tr->id ),
-                                            seq );
+                                            seq,
+                                            rtp_compute_ts( tr->id, ts ) );
                     }
                 }
                 if( infolen > 0 )
