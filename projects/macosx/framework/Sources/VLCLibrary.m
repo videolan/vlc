@@ -78,6 +78,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
             [defaultParams addObject:@"--vout=minimal_macosx"];
             [defaultParams addObject:@"--verbose=2"];                               // Don't polute the log
             [defaultParams addObject:@"--vout=minimal_macosx"];
+            [defaultParams addObject:@"--no-color"];
             [defaultParams addObject:@"--play-and-pause"];                          // When ending a stream pause it instead of stopping it
             vlcParams = defaultParams;
         }
