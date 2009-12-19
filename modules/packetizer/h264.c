@@ -755,8 +755,10 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
 
     bs_init( &s, pb_dec, i_dec );
     int i_profile_idc = bs_read( &s, 8 );
-    /* Skip constraint_set0123, reserved(4), level(8) */
-    bs_skip( &s, 1+1+1+1 + 4 + 8 );
+    p_dec->fmt_out.i_profile = i_profile_idc;
+    /* Skip constraint_set0123, reserved(4) */
+    bs_skip( &s, 1+1+1+1 + 4 );
+    p_dec->fmt_out.i_level = bs_read( &s, 8 );
     /* sps id */
     i_sps_id = bs_read_ue( &s );
     if( i_sps_id >= SPS_MAX )
