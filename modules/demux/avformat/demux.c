@@ -446,11 +446,11 @@ static int Demux( demux_t *p_demux )
         ( p_sys->ic->start_time * 1000000 / AV_TIME_BASE )  : 0;
 
     p_frame->i_dts = ( pkt.dts == (int64_t)AV_NOPTS_VALUE ) ?
-        0 : (pkt.dts) * 1000000 *
+        VLC_TS_INVALID : (pkt.dts) * 1000000 *
         p_stream->time_base.num /
         p_stream->time_base.den - i_start_time;
     p_frame->i_pts = ( pkt.pts == (int64_t)AV_NOPTS_VALUE ) ?
-        0 : (pkt.pts) * 1000000 *
+        VLC_TS_INVALID : (pkt.pts) * 1000000 *
         p_stream->time_base.num /
         p_stream->time_base.den - i_start_time;
     if( pkt.duration > 0 )
@@ -463,14 +463,14 @@ static int Demux( demux_t *p_demux )
     {
         /* Add here notoriously bugged file formats/samples regarding PTS */
         if( !strcmp( p_sys->fmt->name, "flv" ) )
-            p_frame->i_pts = 0;
+            p_frame->i_pts = VLC_TS_INVALID;
     }
 #ifdef AVFORMAT_DEBUG
     msg_Dbg( p_demux, "tk[%d] dts=%"PRId64" pts=%"PRId64,
              pkt.stream_index, p_frame->i_dts, p_frame->i_pts );
 #endif
 
-    if( pkt.dts > 0  &&
+    if( p_frame->i_dts > VLC_TS_INVALID  &&
         ( pkt.stream_index == p_sys->i_pcr_tk || p_sys->i_pcr_tk < 0 ) )
     {
         p_sys->i_pcr_tk = pkt.stream_index;
