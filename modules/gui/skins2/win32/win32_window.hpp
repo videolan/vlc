@@ -25,6 +25,7 @@
 #ifndef WIN32_WINDOW_HPP
 #define WIN32_WINDOW_HPP
 
+#include "../src/generic_window.hpp"
 #include "../src/os_window.hpp"
 #include <windows.h>
 #include <ole2.h>   // LPDROPTARGET
@@ -37,7 +38,7 @@ public:
     Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                  HINSTANCE hInst, HWND hParentWindow,
                  bool dragDrop, bool playOnDrop,
-                 Win32Window *pParentWindow );
+                 Win32Window *pParentWindow, GenericWindow::WindowType_t );
     virtual ~Win32Window();
 
     // Show the window
@@ -80,6 +81,9 @@ private:
     mutable bool m_isLayered;
     /// Parent window
     Win32Window *m_pParent;
+    /// window type
+    GenericWindow::WindowType_t m_type;
+
 };
 
 

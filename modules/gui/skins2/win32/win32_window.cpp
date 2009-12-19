@@ -46,9 +46,10 @@
 Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
                           HINSTANCE hInst, HWND hParentWindow,
                           bool dragDrop, bool playOnDrop,
-                          Win32Window *pParentWindow ):
+                          Win32Window *pParentWindow,
+                          GenericWindow::WindowType_t type ):
     OSWindow( pIntf ), m_dragDrop( dragDrop ), m_isLayered( false ),
-    m_pParent( pParentWindow )
+    m_pParent( pParentWindow ), m_type ( type )
 {
     // Create the window
     if( pParentWindow )
