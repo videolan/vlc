@@ -29,8 +29,48 @@
 #include "vlc_playlist.h"
 #include "vlc_events.h"
 #include <vlc_services_discovery.h>
+#include <vlc_probe.h>
 #include "playlist_internal.h"
 #include "../libvlc.h"
+
+#undef vlc_sd_GetNames
+
+typedef struct
+{
+    char *name;
+    char *longname;
+} vlc_sd_probe_t;
+
+/**
+ * Gets the list of available services discovery plugins.
+ */
+char **vlc_sd_GetNames (vlc_object_t *obj, char ***pppsz_longnames)
+{
+    size_t count;
+    vlc_sd_probe_t *tab = vlc_probe (obj, "services probe", &count);
+
+    if (count == 0)
+    {
+        free (tab);
+        return NULL;
+    }
+
+    char **names = malloc (sizeof(char *) * (count + 1));
+    char **longnames = malloc (sizeof(char *) * (count + 1));
+
+    if (unlikely (names == NULL || longnames == NULL))
+        abort();
+    for( size_t i = 0; i < count; i++ )
+    {
+        names[i] = tab[i].name;
+        longnames[i] = tab[i].longname;
+    }
+    free (tab);
+    names[count] = longnames[count] = NULL;
+    *pppsz_longnames = longnames;
+    return names;
+}
+
 
 struct vlc_sd_internal_t
 {
@@ -49,17 +89,6 @@ static void services_discovery_Destructor ( vlc_object_t *p_obj );
  * sd's event manager.
  * That's how the playlist get's Service Discovery information
  */
-
-#undef vlc_sd_GetNames
-
-/**
- * Gets the list of available services discovery plugins.
- */
-char **vlc_sd_GetNames( vlc_object_t *obj, char ***pppsz_longnames )
-{
-    return module_GetModulesNamesForCapability( "services_discovery",
-                                                pppsz_longnames );
-}
 
 /***********************************************************************
  * Create
