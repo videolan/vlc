@@ -51,10 +51,12 @@
 static int vlclua_stream_read( lua_State * );
 static int vlclua_stream_readline( lua_State * );
 static int vlclua_stream_delete( lua_State * );
+static int vlclua_stream_add_filter( lua_State *L );
 
 static const luaL_Reg vlclua_stream_reg[] = {
     { "read", vlclua_stream_read },
     { "readline", vlclua_stream_readline },
+    { "addfilter", vlclua_stream_add_filter },
     { NULL, NULL }
 };
 
@@ -108,6 +110,56 @@ static int vlclua_stream_readline( lua_State *L )
     }
     else
         lua_pushnil( L );
+    return 1;
+}
+
+static int vlclua_stream_add_filter( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+
+    /* Make sure that we have 1 argument (+ 1 object) */
+    lua_settop( L, 2 );
+
+    stream_t **pp_stream = (stream_t **)luaL_checkudata( L, 1, "stream" );
+    if( !*pp_stream ) return vlclua_error( L );
+    const char *psz_filter = NULL;
+
+    if( lua_isstring( L, 2 ) )
+        psz_filter = lua_tostring( L, 2 );
+
+    if( !psz_filter || !*psz_filter )
+    {
+        msg_Dbg( p_this, "adding all automatic stream filters" );
+        while( true )
+        {
+            /* Add next automatic stream */
+            stream_t *p_filtered = stream_FilterNew( *pp_stream, NULL );
+            if( !p_filtered )
+                break;
+            else
+            {
+                msg_Dbg( p_this, "inserted an automatic stream filter" );
+                *pp_stream = p_filtered;
+            }
+        }
+        luaL_getmetatable( L, "stream" );
+        lua_setmetatable( L, 1 );
+    }
+    else
+    {
+        /* Add a named filter */
+        stream_t *p_filter = stream_FilterNew( *pp_stream, psz_filter );
+        if( !p_filter )
+            msg_Dbg( p_this, "Unable to open requested stream filter '%s'",
+                     psz_filter );
+        else
+        {
+            *pp_stream = p_filter;
+            luaL_getmetatable( L, "stream" );
+            lua_setmetatable( L, 1 );
+        }
+    }
+
     return 1;
 }
 
