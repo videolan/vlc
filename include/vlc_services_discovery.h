@@ -24,6 +24,10 @@
 #ifndef VLC_SERVICES_DISCOVERY_H_
 #define VLC_SERVICES_DISCOVERY_H_
 
+#include <vlc_input.h>
+#include <vlc_events.h>
+#include <vlc_probe.h>
+
 /**
  * \file
  * This file functions and structures for service discovery in vlc
@@ -36,9 +40,6 @@ extern "C" {
 /*
  * @{
  */
-
-#include <vlc_input.h>
-#include <vlc_events.h>
 
 struct services_discovery_t
 {
@@ -87,6 +88,22 @@ VLC_EXPORT( vlc_event_manager_t *,  services_discovery_EventManager, ( services_
      * for more options, directly set the (meta) data on the input item */
 VLC_EXPORT( void,                   services_discovery_AddItem, ( services_discovery_t * p_this, input_item_t * p_item, const char * psz_category ) );
 VLC_EXPORT( void,                   services_discovery_RemoveItem, ( services_discovery_t * p_this, input_item_t * p_item ) );
+
+
+/* SD probing */
+
+VLC_EXPORT(int, vlc_sd_probe_Add, (vlc_probe_t *, const char *, const char *));
+
+#define VLC_SD_PROBE_SUBMODULE \
+    add_submodule() \
+        set_capability( "services probe", 100 ) \
+        set_callbacks( vlc_sd_probe_Open, NULL )
+
+#define VLC_SD_PROBE_HELPER(name, longname) \
+static int vlc_sd_probe_Open (vlc_object_t *obj) \
+{ \
+    return vlc_sd_probe_Add ((struct vlc_probe_t *)obj, name, longname); \
+}
 
 /** @} */
 # ifdef __cplusplus

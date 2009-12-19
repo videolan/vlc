@@ -33,13 +33,28 @@
 #include "playlist_internal.h"
 #include "../libvlc.h"
 
-#undef vlc_sd_GetNames
-
 typedef struct
 {
     char *name;
     char *longname;
 } vlc_sd_probe_t;
+
+int vlc_sd_probe_Add (vlc_probe_t *probe, const char *name,
+                      const char *longname)
+{
+    vlc_sd_probe_t names = { strdup(name), strdup(longname) };
+
+    if (unlikely (names.name == NULL || names.longname == NULL
+               || vlc_probe_add (probe, &names, sizeof (names))))
+    {
+        free (names.name);
+        free (names.longname);
+        return VLC_ENOMEM;
+    }
+    return VLC_PROBE_CONTINUE;
+}
+
+#undef vlc_sd_GetNames
 
 /**
  * Gets the list of available services discovery plugins.
