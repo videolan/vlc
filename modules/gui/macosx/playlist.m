@@ -419,7 +419,7 @@
     o_tc_sortColumn = nil;
 
     char ** ppsz_name;
-    char ** ppsz_services = vlc_sd_GetNames( &ppsz_name );
+    char ** ppsz_services = vlc_sd_GetNames( VLCIntf, &ppsz_name );
     if( !ppsz_services )
     {
         pl_Release( VLCIntf );

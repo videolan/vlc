@@ -50,10 +50,12 @@ static void services_discovery_Destructor ( vlc_object_t *p_obj );
  * That's how the playlist get's Service Discovery information
  */
 
+#undef vlc_sd_GetNames
+
 /**
  * Gets the list of available services discovery plugins.
  */
-char **vlc_sd_GetNames( char ***pppsz_longnames )
+char **vlc_sd_GetNames( vlc_object_t *obj, char ***pppsz_longnames )
 {
     return module_GetModulesNamesForCapability( "services_discovery",
                                                 pppsz_longnames );

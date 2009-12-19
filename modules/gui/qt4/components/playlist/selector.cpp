@@ -255,7 +255,7 @@ void PLSelector::createItems()
     msrc->setExpanded( true );
 
     char **ppsz_longnames;
-    char **ppsz_names = vlc_sd_GetNames( &ppsz_longnames );
+    char **ppsz_names = vlc_sd_GetNames( THEPL, &ppsz_longnames );
     if( !ppsz_names )
         return;
 

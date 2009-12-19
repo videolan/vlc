@@ -49,8 +49,10 @@
  *****************************************************************************/
 static int vlclua_sd_get_services_names( lua_State *L )
 {
+    playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     char **ppsz_longnames;
-    char **ppsz_names = vlc_sd_GetNames( &ppsz_longnames );
+    char **ppsz_names = vlc_sd_GetNames( p_playlist, &ppsz_longnames );
+    vlclua_release_playlist_internal( p_playlist );
     if( !ppsz_names )
         return 0;
 
