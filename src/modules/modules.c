@@ -400,7 +400,8 @@ static int modulecmp (const void *a, const void *b)
  * \param p_this the vlc object
  * \param psz_capability list of capabilities needed
  * \param psz_name name of the module asked
- * \param b_strict TRUE yto use the strict mode
+ * \param b_strict if true, do not fallback to plugin with a different name
+ *                 but the same capability
  * \return the module or NULL in case of a failure
  */
 module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
