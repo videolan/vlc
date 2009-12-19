@@ -49,7 +49,8 @@
                                             [NSDictionary dictionaryWithObjectsAndKeys:
                                                 @"ts", @"muxer",
                                                 @"file", @"access",
-                                                @"sap", @"sdp",
+                                                @"sdp", @"sdp",
+                                                @"sap", @"sap",
                                                 name, @"name",
                                                 @"239.255.1.1", @"destination", nil
                                             ], @"rtpOptions",
@@ -200,9 +201,11 @@
         NSString * destination = [rtpOptions objectForKey:@"destination"];
         NSString * sdp = [rtpOptions objectForKey:@"sdp"];
         NSString * name = [rtpOptions objectForKey:@"name"];
+        NSString * sap = [rtpOptions objectForKey:@"sap"];
         if( muxer )       [subOptions addObject:[NSString stringWithFormat:@"muxer=%@", muxer]];
         if( destination ) [subOptions addObject:[NSString stringWithFormat:@"dst=%@", destination]];
         if( sdp )      [subOptions addObject:[NSString stringWithFormat:@"sdp=%@", sdp]];
+        if( sap )      [subOptions addObject:@"sap"];
         if( name )      [subOptions addObject:[NSString stringWithFormat:@"name=\"%@\"", name]];
         [optionsAsArray addObject:[NSString stringWithFormat:@"rtp{%@}", [subOptions componentsJoinedByString:@","]]];
         [subOptions removeAllObjects];
