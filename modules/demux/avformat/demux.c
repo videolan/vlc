@@ -448,11 +448,11 @@ static int Demux( demux_t *p_demux )
     p_frame->i_dts = ( pkt.dts == (int64_t)AV_NOPTS_VALUE ) ?
         VLC_TS_INVALID : (pkt.dts) * 1000000 *
         p_stream->time_base.num /
-        p_stream->time_base.den - i_start_time;
+        p_stream->time_base.den - i_start_time + VLC_TS_0;
     p_frame->i_pts = ( pkt.pts == (int64_t)AV_NOPTS_VALUE ) ?
         VLC_TS_INVALID : (pkt.pts) * 1000000 *
         p_stream->time_base.num /
-        p_stream->time_base.den - i_start_time;
+        p_stream->time_base.den - i_start_time + VLC_TS_0;
     if( pkt.duration > 0 )
         p_frame->i_length = pkt.duration * 1000000 *
             p_stream->time_base.num /
