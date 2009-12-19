@@ -1074,9 +1074,9 @@ void CaptureOpenPanel::updateMRL()
         mrl+= " :dshow-vdev=" +
             colon_escape( QString("%1").arg( vdevDshowW->getValue() ) );
         mrl+= " :dshow-adev=" +
-            colon_escape( QString("%1").arg( adevDshowW->getValue() ) );
+            colon_escape( QString("%1").arg( adevDshowW->getValue() ) )+" ";
         if( dshowVSizeLine->isModified() )
-            mrl += " :dshow-size=" + dshowVSizeLine->text();
+            mrl += ":dshow-size=" + dshowVSizeLine->text();
         emit methodChanged( "dshow-caching" );
         break;
 #else
