@@ -271,6 +271,7 @@ stream( url ): Instantiate a stream object for specific url.
 s = vlc.stream( "http://www.videolan.org/" )
 s:read( 128 ) -- read up to 128 characters. Return 0 if no more data is available (FIXME?).
 s:readline() -- read a line. Return nil if EOF was reached.
+s:addfilter() -- add a stream filter. If no argument was specified, try to add all automatic stream filters.
 
 Strings
 -------
