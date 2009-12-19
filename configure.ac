@@ -1857,6 +1857,7 @@ AS_IF([test "${enable_growl}" != "no"], [
     AC_CHECK_HEADERS(Growl/GrowlDefines.h, [
       VLC_ADD_PLUGIN([growl])
       VLC_ADD_LDFLAGS([growl], [-Wl,-framework,Growl,-framework,AppKit])
+      VLC_ADD_OBJCFLAGS([growl], [-fobjc-exceptions] )
     ])
   ]
 )
@@ -4454,7 +4455,7 @@ dnl
 dnl  MacOS X video output/gui modules
 dnl
 AC_ARG_ENABLE(macosx,
-  [  --enable-macosx         MacOS X support (default enabled on MacOS X)])
+  [  --enable-macosx         full Mac OS X support (default enabled on Mac OS X)])
 if test "x${enable_macosx}" = "xyes"
 then
   VLC_ADD_LDFLAGS([access_eyetv],                     [-Wl,-framework,Foundation])
@@ -4473,11 +4474,35 @@ then
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
   VLC_ADD_LDFLAGS([opengllayer qtcapture],            [-Wl,-framework,QuartzCore])
   VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreVideo])
-  VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer growl opengllayer], [-fobjc-exceptions] )
+  VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer growl], [-fobjc-exceptions] )
 
   VLC_ADD_PLUGIN([access_eyetv])
   VLC_ADD_PLUGIN([qtcapture])
   VLC_ADD_PLUGIN([macosx])
+  VLC_ADD_PLUGIN([minimal_macosx])
+  VLC_ADD_PLUGIN([opengllayer])
+fi
+
+dnl
+dnl  MacOS X video output/gui modules
+dnl
+AC_ARG_ENABLE(macosx-minimal,
+  [  --enable-macosx-minimal minimal Mac OS X support (default disabled)])
+if test "x${enable_macosx_minimal}" = "xyes"
+then
+  VLC_ADD_LDFLAGS([minimal_macosx opengllayer qtcapture],[-Wl,-framework,Cocoa])
+  VLC_ADD_LDFLAGS([minimal_macosx opengllayer],[-Wl,-framework,OpenGL])
+  VLC_ADD_LDFLAGS([minimal_macosx],            [-Wl,-framework,Carbon])
+  VLC_ADD_LDFLAGS([minimal_macosx],            [-Wl,-framework,CoreServices])
+  VLC_ADD_LDFLAGS([minimal_macosx],            [-Wl,-framework,AGL])
+
+  VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,QTKit])
+  VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreAudio])
+  VLC_ADD_LDFLAGS([opengllayer qtcapture],            [-Wl,-framework,QuartzCore])
+  VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreVideo])
+  VLC_ADD_OBJCFLAGS([minimal_macosx opengllayer], [-fobjc-exceptions] )
+
+  VLC_ADD_PLUGIN([qtcapture])
   VLC_ADD_PLUGIN([minimal_macosx])
   VLC_ADD_PLUGIN([opengllayer])
 fi
