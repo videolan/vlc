@@ -88,6 +88,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_picture_pool.h \
 	../include/vlc_playlist.h \
 	../include/vlc_plugin.h \
+	../include/vlc_probe.h \
 	../include/vlc_rand.h \
 	../include/vlc_services_discovery.h \
 	../include/vlc_sql.h \
@@ -402,6 +403,7 @@ SOURCES_libvlc_common = \
 	text/iso_lang.c \
 	text/iso-639_def.h \
 	misc/md5.c \
+	misc/probe.c \
 	misc/rand.c \
 	misc/mtime.c \
 	misc/block.c \
