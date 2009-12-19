@@ -70,7 +70,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
         NSArray *vlcParams = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"VLCParams"];
         if (!vlcParams) {
             NSMutableArray *defaultParams = [NSMutableArray array];
-            [defaultParams addObject:@"-I"]; [defaultParams addObject:@"dummy"];    // No interface
+            [defaultParams addObject:@"-I dummy"];                                  // No interface
             [defaultParams addObject:@"--no-video-title-show"];                     // Don't show the title on overlay when starting to play
             [defaultParams addObject:@"--no-sout-keep"];
             [defaultParams addObject:@"--ignore-config"];                           // Don't read and write VLC config files
@@ -79,18 +79,17 @@ void __catch_exception( void * e, const char * function, const char * file, int 
             [defaultParams addObject:@"--verbose=2"];                               // Don't polute the log
             [defaultParams addObject:@"--vout=minimal_macosx"];
             [defaultParams addObject:@"--play-and-pause"];                          // When ending a stream pause it instead of stopping it
-            // [defaultParams addObject:@"--control=motion"];
-            // [defaultParams addObject:@"--motion-use-rotate"];
-            // [defaultParams addObject:@"--video-filter=rotate"];
             vlcParams = defaultParams;
         }
-        
+    
+        int paramNum = 0;
         const char *lib_vlc_params[[vlcParams count]];
-        for (int paramNum = 0; paramNum < [vlcParams count]; paramNum ++) {
+        while (paramNum < [vlcParams count]) {
             NSString *vlcParam = [vlcParams objectAtIndex:paramNum];
             lib_vlc_params[paramNum] = [vlcParam cStringUsingEncoding:NSASCIIStringEncoding];
+            paramNum++;
         }
-        instance = (void *)libvlc_new([vlcParams count], lib_vlc_params, &ex );
+        instance = (void *)libvlc_new( sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]), lib_vlc_params, &ex );
         catch_exception( &ex );
         NSAssert(instance, @"libvlc failed to initialize");
         
