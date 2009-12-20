@@ -214,7 +214,8 @@ VLC_EXPORT( int,    __config_SaveConfigFile, ( vlc_object_t *, const char * ) );
 VLC_EXPORT( void,   __config_ResetAll, ( vlc_object_t * ) );
 
 VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) LIBVLC_USED );
-VLC_EXPORT(const char *, config_GetDataDir, ( void ) LIBVLC_USED);
+VLC_EXPORT(char *, __config_GetDataDir, ( vlc_object_t * ) LIBVLC_USED);
+#define config_GetDataDir(a) __config_GetDataDir(VLC_OBJECT(a))
 VLC_EXPORT(const char *, config_GetConfDir, ( void ) LIBVLC_USED);
 
 typedef enum vlc_userdir

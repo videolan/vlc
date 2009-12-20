@@ -57,11 +57,11 @@ static const char * const ppsz_intf_options[] = { "intf", "config", NULL };
 /*****************************************************************************
  *
  *****************************************************************************/
-static char *FindFile( const char *psz_name )
+static char *FindFile( vlc_object_t *p_this, const char *psz_name )
 {
     char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
     char **ppsz_dir;
-    vlclua_dir_list( "intf", ppsz_dir_list );
+    vlclua_dir_list( p_this, "intf", ppsz_dir_list );
     for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
     {
         char *psz_filename;
@@ -162,7 +162,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     p_sys = p_intf->p_sys;
-    p_sys->psz_filename = FindFile( psz_name );
+    p_sys->psz_filename = FindFile( p_this, psz_name );
     if( !p_sys->psz_filename )
     {
         msg_Err( p_intf, "Couldn't find lua interface script \"%s\".",

@@ -115,9 +115,10 @@ static int Open( vlc_object_t *p_this )
     p_sys->app_name = CFSTR( "VLC media player" );
     p_sys->notification_type = CFSTR( "New input playing" );
 
-    const char *data_path = config_GetDataDir ();
+    char *data_path = config_GetDataDir ( p_this );
     char buf[strlen (data_path) + sizeof ("/vlc48x48.png")];
     snprintf (buf, sizeof (buf), "%s/vlc48x48.png", data_path);
+    free( data_path );
     p_sys->default_icon = (CFDataRef) readFile( buf );
 
     playlist_t *p_playlist = pl_Hold( p_intf );

@@ -132,7 +132,7 @@ static int vlclua_net_accept( lua_State *L )
     int i_fd = -1;
 
     unsigned int i_count = 1;
-    while( pi_fd[0][i_count] != -1 )
+    while( pi_fd[i_count] != -1 )
         i_count++;
 
     struct pollfd ufd[i_count+1];

@@ -40,7 +40,7 @@
  *
  * @return a string (always succeeds).
  */
-const char *config_GetDataDir( void )
+const char *config_GetDataDirDefault( void )
 {
     return DATA_PATH;
 }

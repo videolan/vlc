@@ -105,7 +105,7 @@ int vlclua_push_ret( lua_State *, int i_error );
 int vlclua_scripts_batch_execute( vlc_object_t *p_this, const char * luadirname,
         int (*func)(vlc_object_t *, const char *, lua_State *, void *),
         lua_State * L, void * user_data );
-int vlclua_dir_list( const char *luadirname, char **ppsz_dir_list );
+int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname, char **ppsz_dir_list );
 void vlclua_dir_list_free( char **ppsz_dir_list );
 
 /*****************************************************************************

@@ -43,7 +43,7 @@
 #include <assert.h>
 #include <limits.h>
 
-const char *config_GetDataDir( void )
+const char *config_GetDataDirDefault( void )
 {
     static char path[PATH_MAX] = "";
 #warning FIXME: thread-safety!

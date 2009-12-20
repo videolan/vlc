@@ -158,12 +158,13 @@ static void Run( intf_thread_t *p_intf )
 
     // A little theming
     char *psz_rc_file = NULL;
-    if( asprintf( &psz_rc_file, "%s/maemo/vlc_intf.rc",
-                  config_GetDataDir() ) != -1 )
+    char *psz_data = config_GetDataDir( p_intf );
+    if( asprintf( &psz_rc_file, "%s/maemo/vlc_intf.rc", psz_data ) != -1 )
     {
         gtk_rc_parse( psz_rc_file );
         free( psz_rc_file );
     }
+    free( psz_data );
 
     // We create the main vertical box
     main_vbox = gtk_vbox_new( FALSE, 0 );

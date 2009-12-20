@@ -114,7 +114,9 @@ static int vlclua_quit( lua_State *L )
  *****************************************************************************/
 static int vlclua_datadir( lua_State *L )
 {
-    lua_pushstring( L, config_GetDataDir() );
+    char *psz_data = config_GetDataDir( vlclua_get_this( L ) );
+    lua_pushstring( L, psz_data );
+    free( psz_data );
     return 1;
 }
 
@@ -157,7 +159,8 @@ static int vlclua_datadir_list( lua_State *L )
     char **ppsz_dir = ppsz_dir_list;
     int i = 1;
 
-    if( vlclua_dir_list( psz_dirname, ppsz_dir_list ) != VLC_SUCCESS )
+    if( vlclua_dir_list( vlclua_get_this( L ), psz_dirname, ppsz_dir_list )
+        != VLC_SUCCESS )
         return 0;
     lua_newtable( L );
     for( ; *ppsz_dir; ppsz_dir++ )

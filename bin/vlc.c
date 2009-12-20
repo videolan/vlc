@@ -133,9 +133,7 @@ int main( int i_argc, const char *ppsz_argv[] )
     argv[argc++] = FromLocale ("--plugin-path="TOP_BUILDDIR"/modules");
 #endif
 #ifdef TOP_SRCDIR
-# ifdef ENABLE_HTTPD
-    argv[argc++] = FromLocale ("--http-src="TOP_SRCDIR"/share/http");
-# endif
+    argv[argc++] = FromLocale ("--data-path="TOP_SRCDIR"/share");
 #endif
 
     int i = 1;

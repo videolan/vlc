@@ -49,7 +49,7 @@ const char *config_GetConfDir( void )
     return configdir;
 }
 
-const char *config_GetDataDir (void)
+const char *config_GetDataDirDefault (void)
 {
     pthread_once(&once, init_dirs);
     return datadir;

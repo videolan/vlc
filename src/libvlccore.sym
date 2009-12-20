@@ -52,7 +52,7 @@ __config_ChainParse
 __config_ExistIntf
 config_FindConfig
 config_GetConfDir
-config_GetDataDir
+__config_GetDataDir
 __config_GetFloat
 config_GetUserDir
 __config_GetInt

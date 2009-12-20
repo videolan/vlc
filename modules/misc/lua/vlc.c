@@ -105,7 +105,7 @@ static int file_compare( const char **a, const char **b )
     return strcmp( *a, *b );
 }
 
-int vlclua_dir_list( const char *luadirname, char **ppsz_dir_list )
+int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname, char **ppsz_dir_list )
 {
     int i = 0;
     char *datadir = config_GetUserDir( VLC_DATA_DIR );
@@ -121,25 +121,26 @@ int vlclua_dir_list( const char *luadirname, char **ppsz_dir_list )
     free( datadir );
     i++;
 
+    char *psz_datapath = config_GetDataDir( p_this );
 #   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
     {
-        const char *psz_vlcpath = config_GetDataDir();
         if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "lua" DIR_SEP "%s",
-                      psz_vlcpath, luadirname )  < 0 )
+                      psz_datapath, luadirname )  < 0 )
             return VLC_ENOMEM;
         i++;
         if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "share" DIR_SEP "lua" DIR_SEP "%s",
-                      psz_vlcpath, luadirname )  < 0 )
+                      psz_datapath, luadirname )  < 0 )
             return VLC_ENOMEM;
         i++;
 
     }
 #   else
     if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "lua" DIR_SEP "%s",
-                  config_GetDataDir (), luadirname ) < 0 )
+                  psz_datapath, luadirname ) < 0 )
         return VLC_ENOMEM;
     i++;
 #   endif
+    free( psz_datapath );
     return VLC_SUCCESS;
 }
 
@@ -169,7 +170,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
     char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
     char **ppsz_dir;
 
-    i_ret = vlclua_dir_list( luadirname, ppsz_dir_list );
+    i_ret = vlclua_dir_list( p_this, luadirname, ppsz_dir_list );
     if( i_ret != VLC_SUCCESS )
         return i_ret;
     i_ret = VLC_EGENERIC;

@@ -229,14 +229,12 @@ bool Win32Factory::init()
     char *datadir = config_GetUserDir( VLC_DATA_DIR );
     m_resourcePath.push_back( (string)datadir + "\\skins" );
     free( datadir );
-    m_resourcePath.push_back( (string)config_GetDataDir() +
-                              "\\skins" );
-    m_resourcePath.push_back( (string)config_GetDataDir() +
-                              "\\skins2" );
-    m_resourcePath.push_back( (string)config_GetDataDir() +
-                              "\\share\\skins" );
-    m_resourcePath.push_back( (string)config_GetDataDir() +
-                              "\\share\\skins2" );
+    datadir = config_GetDataDir( getIntf() );
+    m_resourcePath.push_back( (string)datadir + "\\skins" );
+    m_resourcePath.push_back( (string)datadir + "\\skins2" );
+    m_resourcePath.push_back( (string)datadir + "\\share\\skins" );
+    m_resourcePath.push_back( (string)datadir + "\\share\\skins2" );
+    free( datadir );
 
     // All went well
     return true;
