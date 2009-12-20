@@ -106,7 +106,8 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (void)setVideoAspectRatio:(char *)value;
 - (char *)videoAspectRatio;
 - (void)setVideoSubTitles:(int)value;
-- (int)videoSubTitles;
+- (int)countOfVideoSubTitles;
+- (int)currentVideoSubTitles;
 
 - (void)setVideoCropGeometry:(char *)value;
 - (char *)videoCropGeometry;
@@ -159,16 +160,16 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 @property (readonly) int fps;
 
 - (void)setChapter:(int)value;
-- (int)chapter;
+- (int)currentChapter;
 - (int)countOfChapters;
 
-- (void)setTitle:(int)value;
-- (int)title;
+- (void)setCurrentTitle:(int)value;
+- (int)currentTitle;
 - (int)countOfTitles;
 
 /* Audio Options */
 - (void)setAudioTrack:(int)value;
-- (int)audioTrack;
+- (int)currentAudioTrack;
 - (int)countOfAudioTracks;
 
 - (void)setAudioChannel:(int)value;

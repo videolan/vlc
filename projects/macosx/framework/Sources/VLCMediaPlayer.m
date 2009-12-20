@@ -283,13 +283,30 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     catch_exception( &ex );
 }
 
-- (int)videoSubTitles
+- (int)countOfVideoSubTitles
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     int result = libvlc_video_get_spu( instance, &ex );
     catch_exception( &ex );
     return result;
+}
+
+- (int)currentVideoSubTitles
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    int result = libvlc_video_get_spu( instance, &ex );
+    if (libvlc_exception_raised(&ex))
+    {
+        libvlc_exception_clear(&ex);
+        return -1;
+    }
+    else
+    {
+        libvlc_exception_clear(&ex);
+        return result;
+    }
 }
 
 - (void)setVideoCropGeometry:(char *)value
@@ -467,7 +484,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     catch_exception( &ex );
 }
 
-- (void)setTitle:(int)value
+- (void)setCurrentTitle:(int)value
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
@@ -501,7 +518,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     catch_exception( &ex );
 }
 
-- (int)audioTrack
+- (int)currentAudioTrack
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
