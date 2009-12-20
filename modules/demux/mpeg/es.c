@@ -228,7 +228,7 @@ static int Demux( demux_t *p_demux )
         swab( p_block_in->p_buffer, p_block_in->p_buffer, p_block_in->i_buffer );
     }
 
-    p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start || p_sys->b_initial_sync_failed ? 1 : 0;
+    p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start || p_sys->b_initial_sync_failed ? VLC_TS_0 : VLC_TS_INVALID;
     p_sys->b_initial_sync_failed = p_sys->b_start; /* Only try to resync once */
 
     while( ( p_block_out = p_sys->p_packetizer->pf_packetize( p_sys->p_packetizer, &p_block_in ) ) )
@@ -261,18 +261,23 @@ static int Demux( demux_t *p_demux )
                     p_sys->i_bitrate_avg = p_sys->p_packetizer->fmt_out.i_bitrate;
             }
 
-            p_sys->i_pts = p_block_out->i_pts;
+            p_sys->i_pts = p_block_out->i_pts - VLC_TS_0;
 
             /* Re-estimate bitrate */
-            if( p_sys->b_estimate_bitrate && p_sys->i_pts > 1 + INT64_C(500000) )
+            if( p_sys->b_estimate_bitrate && p_sys->i_pts > INT64_C(500000) )
                 p_sys->i_bitrate_avg = 8*INT64_C(1000000)*p_sys->i_bytes/(p_sys->i_pts-1);
             p_sys->i_bytes += p_block_out->i_buffer;
 
             /* Correct timestamp */
-            p_block_out->i_pts += p_sys->i_time_offset;
-            p_block_out->i_dts += p_sys->i_time_offset;
-
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
+            if( p_block_out->i_pts > VLC_TS_INVALID )
+            {
+                p_block_out->i_pts += p_sys->i_time_offset;
+            }
+            if( p_block_out->i_dts > VLC_TS_INVALID )
+            {
+                p_block_out->i_dts += p_sys->i_time_offset;
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block_out->i_dts );
+            }
 
             es_out_Send( p_demux->out, p_sys->p_es, p_block_out );
 
