@@ -146,7 +146,6 @@ static int Create( vlc_object_t *p_this )
     var_AddCallback( p_filter, FILTER_PREFIX "deciangle",
                      PreciseRotateCallback, p_sys );
 
-
     return VLC_SUCCESS;
 }
 
@@ -171,7 +170,6 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-    int i_sin, i_cos;
 
     if( !p_pic ) return NULL;
 
@@ -183,8 +181,8 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
 
     vlc_spin_lock( &p_sys->lock );
-    i_sin = p_sys->i_sin;
-    i_cos = p_sys->i_cos;
+    const int i_sin = p_sys->i_sin;
+    const int i_cos = p_sys->i_cos;
     vlc_spin_unlock( &p_sys->lock );
 
     for( int i_plane = 0 ; i_plane < p_pic->i_planes ; i_plane++ )
@@ -296,7 +294,6 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 {
     picture_t *p_outpic;
     filter_sys_t *p_sys = p_filter->p_sys;
-    const int i_sin = p_sys->i_sin, i_cos = p_sys->i_cos;
 
     if( !p_pic ) return NULL;
 
@@ -332,6 +329,11 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
 
     const int i_line_center = i_visible_lines>>1;
     const int i_col_center  = i_visible_pitch>>1;
+
+    vlc_spin_lock( &p_sys->lock );
+    const int i_sin = p_sys->i_sin;
+    const int i_cos = p_sys->i_cos;
+    vlc_spin_unlock( &p_sys->lock );
 
     int i_col, i_line;
     for( i_line = 0; i_line < i_visible_lines; i_line++ )
