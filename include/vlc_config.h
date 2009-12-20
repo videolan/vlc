@@ -41,6 +41,7 @@
 /* All timestamp below or equal to this define are invalid/unset
  * XXX the numerical value is 0 because of historical reason and will change.*/
 #define VLC_TS_INVALID (0)
+#define VLC_TS_0 (1)
 
 #define CLOCK_FREQ INT64_C(1000000)
 
