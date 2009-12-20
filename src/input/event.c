@@ -233,6 +233,10 @@ void input_SendEventMetaName( input_thread_t *p_input, const char *psz_name )
     vlc_event_send( &p_input->p->p_item->event_manager, &event );
 }
 
+void input_SendEventMetaEpg( input_thread_t *p_input )
+{
+    Trigger( p_input, INPUT_EVENT_ITEM_EPG );
+}
 /*****************************************************************************
  * Event for es_out.c
  *****************************************************************************/

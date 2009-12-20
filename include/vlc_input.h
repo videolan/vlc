@@ -414,6 +414,8 @@ typedef enum input_event_type_e
     INPUT_EVENT_ITEM_INFO,
     /* input_item_t name has changed */
     INPUT_EVENT_ITEM_NAME,
+    /* input_item_t epg has changed */
+    INPUT_EVENT_ITEM_EPG,
 
     /* Input statistics have been updated */
     INPUT_EVENT_STATISTICS,

@@ -52,6 +52,7 @@ void input_SendEventCache( input_thread_t *p_input, double f_level );
 void input_SendEventMeta( input_thread_t *p_input );
 void input_SendEventMetaInfo( input_thread_t *p_input );
 void input_SendEventMetaName( input_thread_t *p_input, const char *psz_name );
+void input_SendEventMetaEpg( input_thread_t *p_input );
 
 /*****************************************************************************
  * Event for es_out.c

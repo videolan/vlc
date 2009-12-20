@@ -373,6 +373,7 @@ static void EsOutDelete( es_out_t *out )
     TAB_CLEAN( p_sys->i_pgrm, p_sys->pgrm );
 
     input_item_SetEpgOffline( p_sys->p_input->p->p_item );
+    input_SendEventMetaEpg( p_sys->p_input );
 
     vlc_mutex_destroy( &p_sys->lock );
 
@@ -1267,6 +1268,7 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     epg.psz_name = psz_cat;
 
     input_item_SetEpg( p_item, &epg );
+    input_SendEventMetaEpg( p_sys->p_input );
 
     /* Update now playing */
     free( p_pgrm->psz_now_playing );
