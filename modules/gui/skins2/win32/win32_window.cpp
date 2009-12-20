@@ -52,19 +52,30 @@ Win32Window::Win32Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     m_pParent( pParentWindow ), m_type ( type )
 {
     // Create the window
-    if( pParentWindow )
+    if( type == GenericWindow::VoutWindow )
     {
         // Child window (for vout)
         m_hWnd_parent = pParentWindow->getHandle();
         m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW | WS_EX_NOPARENTNOTIFY,
-                     "SkinWindowClass", "default name", WS_CHILD,
+                     "VoutWindowClass", "default name",
+                     WS_CHILD | WS_CLIPCHILDREN | WS_CLIPSIBLINGS,
                      CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT, CW_USEDEFAULT,
                      m_hWnd_parent, 0, hInst, NULL );
     }
+    else if( type == GenericWindow::FullscreenWindow )
+    {
+        // Normal window
+        m_hWnd_parent = NULL;
+        m_hWnd = CreateWindowEx( WS_EX_APPWINDOW, "SkinWindowClass",
+            "default name", WS_POPUP | WS_CLIPCHILDREN,
+            CW_USEDEFAULT, CW_USEDEFAULT,
+            CW_USEDEFAULT, CW_USEDEFAULT, m_hWnd_parent, 0, hInst, NULL );
+    }
+
     else
     {
         // Normal window
-        m_hWnd_parent = hParentWindow;
+        m_hWnd_parent =  NULL;
         m_hWnd = CreateWindowEx( WS_EX_TOOLWINDOW, "SkinWindowClass",
             "default name", WS_POPUP | WS_CLIPCHILDREN,
             CW_USEDEFAULT, CW_USEDEFAULT,
@@ -121,7 +132,12 @@ void Win32Window::reparent( void* OSHandle, int x, int y, int w, int h )
 
 void Win32Window::show() const
 {
-    ShowWindow( m_hWnd, SW_SHOW );
+
+   if( m_type == GenericWindow::VoutWindow )
+       SetWindowPos( m_hWnd, HWND_BOTTOM, 0, 0, 0, 0,
+            SWP_NOMOVE | SWP_NOSIZE );
+
+   ShowWindow( m_hWnd, SW_SHOW );
 }
 
 

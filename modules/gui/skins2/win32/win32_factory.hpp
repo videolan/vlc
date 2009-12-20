@@ -31,6 +31,7 @@
 
 #include <windows.h>
 #include <shellapi.h>
+// #include <wingdi.h>
 #include "../src/os_factory.hpp"
 #include "../src/generic_window.hpp"
 
