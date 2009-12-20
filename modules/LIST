@@ -356,7 +356,6 @@ $Id$
  * wave: Wave video effect
  * waveout: simple audio output module for Windows
  * win32text: Text renderer using native Win32 API
- * wince: Pocket PC interface
  * wingapi: Win CE video output
  * wingdi: WIN 32 / WIN CE GDI video output
  * wma_fixed: wma decoder using integer decoder from Rockbox
