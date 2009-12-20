@@ -247,7 +247,7 @@ static int Open ( vlc_object_t *p_this )
         p_sys->i_length = p_sys->subtitle[p_sys->i_subtitles-1].i_stop;
         /* +1 to avoid 0 */
         if( p_sys->i_length <= 0 )
-            p_sys->i_length = p_sys->subtitle[p_sys->i_subtitles-1].i_start+1;
+            p_sys->i_length = p_sys->subtitle[p_sys->i_subtitles-1].i_start + VLC_TS_0;
     }
 
     /* *** add subtitle ES *** */
@@ -447,9 +447,9 @@ static int Demux( demux_t *p_demux )
             continue;
         }
 
-        p_block->i_pts = p_sys->subtitle[p_sys->i_subtitle].i_start;
-        p_block->i_dts = p_block->i_pts;
-        if( p_sys->subtitle[p_sys->i_subtitle].i_stop > 0 )
+        p_block->i_pts = VLC_TS_0 + p_sys->subtitle[p_sys->i_subtitle].i_start;
+        p_block->i_dts = VLC_TS_0 + p_block->i_pts;
+        if( p_sys->subtitle[p_sys->i_subtitle].i_stop >= 0 )
         {
             p_block->i_length =
                 p_sys->subtitle[p_sys->i_subtitle].i_stop - p_block->i_pts;
@@ -457,7 +457,7 @@ static int Demux( demux_t *p_demux )
 
         memcpy( p_block->p_buffer,
                 p_sys->subtitle[p_sys->i_subtitle].psz_text, i_len );
-        if( p_block->i_pts > 0 )
+        if( p_block->i_pts > VLC_TS_INVALID )
         {
             es_out_Send( p_demux->out, p_sys->es, p_block );
         }
