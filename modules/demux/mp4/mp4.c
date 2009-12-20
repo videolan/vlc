@@ -616,7 +616,7 @@ static int Demux( demux_t *p_demux )
     MP4_UpdateSeekpoint( p_demux );
 
     /* first wait for the good time to read a packet */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr + 1 );
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
 
     p_sys->i_pcr = MP4_GetMoviePTS( p_sys );
 
@@ -713,7 +713,7 @@ static int Demux( demux_t *p_demux )
                     }
                 }
                 /* dts */
-                p_block->i_dts = MP4_TrackGetDTS( p_demux, tk ) + 1;
+                p_block->i_dts = VLC_TS_0 + MP4_TrackGetDTS( p_demux, tk );
                 /* pts */
                 i_delta = MP4_TrackGetPTSDelta( tk );
                 if( i_delta != -1 )
@@ -721,7 +721,7 @@ static int Demux( demux_t *p_demux )
                 else if( tk->fmt.i_cat != VIDEO_ES )
                     p_block->i_pts = p_block->i_dts;
                 else
-                    p_block->i_pts = 0;
+                    p_block->i_pts = VLC_TS_INVALID;
 
                 if( !tk->b_drms || ( tk->b_drms && tk->p_drms ) )
                     es_out_Send( p_demux->out, tk->p_es, p_block );
