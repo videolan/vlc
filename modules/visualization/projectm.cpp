@@ -96,7 +96,9 @@ struct filter_sys_t
     /* audio info */
     int i_channels;
 
+    /* */
     vlc_mutex_t lock;
+    bool  b_quit;
     float *p_buffer;
     int   i_buffer_size;
     int   i_nb_samples;
@@ -138,6 +140,7 @@ static int Open( vlc_object_t * p_this )
     /* Create the object for the thread */
     vlc_sem_init( &p_sys->ready, 0 );
     p_sys->b_error  = false;
+    p_sys->b_quit   = false;
     p_sys->i_width  = var_CreateGetInteger( p_filter, "projectm-width" );
     p_sys->i_height = var_CreateGetInteger( p_filter, "projectm-height" );
     p_sys->i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
@@ -176,8 +179,13 @@ static void Close( vlc_object_t *p_this )
     filter_t     *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    /* Stop the thread */
-    vlc_cancel( p_sys->thread );
+    /* Stop the thread
+     * XXX vlc_cleanup_push does not seems to work with C++ so no
+     * vlc_cancel()... */
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->b_quit = true;
+    vlc_mutex_unlock( &p_sys->lock );
+
     vlc_join( p_sys->thread, NULL );
 
     /* Free the ressources */
@@ -235,23 +243,6 @@ static int VoutCallback( vlc_object_t *p_vout, char const *psz_name,
 }
 
 /**
- * Clean up function when Thread() is cancelled.
- */
-static void ThreadCleanup( void *p_data )
-{
-    filter_t     *p_filter = (filter_t*)p_data;
-    filter_sys_t *p_sys = p_filter->p_sys;
-
-    /* Cleanup */
-    delete p_sys->p_projectm;
-
-    /* Free the openGL provider */
-    vout_DeleteDisplay( p_sys->p_vd, NULL );
-    vlc_object_release( p_sys->p_vout );
-}
-
-
-/**
  * ProjectM update thread which do the rendering
  * @param p_this: the p_thread object
  */
@@ -262,6 +253,8 @@ static void *Thread( void *p_data )
     int cancel = vlc_savecancel();
     video_format_t fmt;
     vout_opengl_t *gl;
+    int i_last_width  = 0;
+    int i_last_height = 0;
 
     /* Create the openGL provider */
     p_sys->p_vout =
@@ -303,7 +296,6 @@ static void *Thread( void *p_data )
         vlc_object_release( p_sys->p_vout );
         goto error;
     }
-    vlc_cleanup_push( ThreadCleanup, p_filter );
 
     /* Create the projectM object */
     p_sys->p_projectm = new projectM( p_sys->psz_config );
@@ -317,8 +309,6 @@ static void *Thread( void *p_data )
     p_sys->p_projectm->projectM_setTitle( "" ); */
 
     /* */
-    int i_last_width  = 0;
-    int i_last_height = 0;
     for( ;; )
     {
         const mtime_t i_deadline = mdate() + CLOCK_FREQ / 50; /* 50 fps max */
@@ -344,14 +334,21 @@ static void *Thread( void *p_data )
                                                    p_sys->i_nb_samples );
             p_sys->i_nb_samples = 0;
         }
+        if( p_sys->b_quit )
+        {
+            vlc_mutex_unlock( &p_sys->lock );
+
+            delete p_sys->p_projectm;
+            vout_DeleteDisplay( p_sys->p_vd, NULL );
+            vlc_object_release( p_sys->p_vout );
+            return NULL;
+        }
         vlc_mutex_unlock( &p_sys->lock );
 
         p_sys->p_projectm->renderFrame();
 
         /* */
-        vlc_restorecancel( cancel );
         mwait( i_deadline );
-        cancel = vlc_savecancel();
 
         if( !vout_opengl_Lock(gl) )
         {
@@ -359,13 +356,11 @@ static void *Thread( void *p_data )
             vout_opengl_Unlock( gl );
         }
     }
-    vlc_cleanup_pop();
     abort();
 
 error:
     p_sys->b_error = true;
     vlc_sem_post( &p_sys->ready );
     return NULL;
-
 }
 
