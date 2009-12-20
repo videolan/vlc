@@ -281,7 +281,7 @@ static int Demux( demux_t *p_demux )
     /* */
     p_data->i_buffer = i_ret * sizeof(MPC_SAMPLE_FORMAT) * p_sys->info.channels;
     p_data->i_dts = p_data->i_pts =
-            1 + INT64_C(1000000) * p_sys->i_position / p_sys->info.sample_freq;
+            VLC_TS_0 + INT64_C(1000000) * p_sys->i_position / p_sys->info.sample_freq;
 
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_data->i_dts );
 
