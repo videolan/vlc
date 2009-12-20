@@ -204,7 +204,7 @@ static int Demux( demux_t *p_demux )
     if( !( p_block_in = stream_Block( p_demux->s, FLAC_PACKET_SIZE ) ) )
         return 0;
 
-    p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start ? 1 : 0;
+    p_block_in->i_pts = p_block_in->i_dts = p_sys->b_start ? VLC_TS_0 : VLC_TS_INVALID;
     p_sys->b_start = false;
 
     while( (p_block_out = p_sys->p_packetizer->pf_packetize(
@@ -223,7 +223,7 @@ static int Demux( demux_t *p_demux )
                 p_sys->p_es = es_out_Add( p_demux->out, &p_sys->p_packetizer->fmt_out);
             }
 
-            p_sys->i_pts = p_block_out->i_dts;
+            p_sys->i_pts = p_block_out->i_dts - VLC_TS_0;
 
             /* Correct timestamp */
             p_block_out->i_pts += p_sys->i_time_offset;
