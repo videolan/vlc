@@ -594,10 +594,11 @@ static int DemuxPacket( demux_t *p_demux )
                 /* send complete packet to decoder */
                 block_t *p_gather = block_ChainGather( tk->p_frame );
 
-                tk->i_time = p_gather->i_dts;
+                if( p_gather->i_dts > VLC_TS_INVALID )
+                    tk->i_time = p_gather->i_dts - VLC_TS_0;
 
                 if( p_sys->i_time < 0 )
-                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, tk->i_time+1 );
+                    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + tk->i_time );
 
                 es_out_Send( p_demux->out, tk->p_es, p_gather );
 
@@ -617,13 +618,13 @@ static int DemuxPacket( demux_t *p_demux )
 
             if( tk->p_frame == NULL )
             {
-                p_frag->i_pts = i_pts + i_payload * (mtime_t)i_pts_delta;
+                p_frag->i_pts = VLC_TS_0 + i_pts + i_payload * (mtime_t)i_pts_delta;
                 if( tk->i_cat != VIDEO_ES )
-                    p_frag->i_dts = p_frag->i_pts;
+                    p_frag->i_dts = VLC_TS_0 + p_frag->i_pts;
                 else
                 {
-                    p_frag->i_dts = p_frag->i_pts;
-                    p_frag->i_pts = 0;
+                    p_frag->i_dts = VLC_TS_0 + p_frag->i_pts;
+                    p_frag->i_pts = VLC_TS_INVALID;
                 }
             }
 
