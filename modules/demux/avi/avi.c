@@ -1169,7 +1169,7 @@ static int Demux_Seekable( demux_t *p_demux )
         else
         {
             p_frame->i_dts = p_frame->i_pts;
-            p_frame->i_pts = 0;
+            p_frame->i_pts = VLC_TS_INVALID;
         }
 
         //p_pes->i_rate = p_demux->stream.control.i_rate;
@@ -1287,7 +1287,7 @@ static int Demux_UnSeekable( demux_t *p_demux )
                 else
                 {
                     p_frame->i_dts = p_frame->i_pts;
-                    p_frame->i_pts = 0;
+                    p_frame->i_pts = VLC_TS_INVALID;
                 }
 
                 //p_pes->i_rate = p_demux->stream.control.i_rate;
