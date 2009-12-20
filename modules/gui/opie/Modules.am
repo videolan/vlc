@@ -1,5 +1,0 @@
-SOURCES_opie = \
-	$(NULL)
-
-EXTRA_DIST += opie.ui \
-	$(NULL)

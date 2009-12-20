@@ -224,7 +224,6 @@ $Id$
  * opencv_wrapper: OpenCV wrapper video filter
  * opengl: a opengl video output that uses opengl provider modules
  * opengllayer: a simple openGL video output
- * opie: interface for Opie using QT/Embedded library
  * osd_parser: OSD import module
  * osdmenu: video_filter for displaying and streaming a On Screen Display menu
  * oss: audio output module using the OSS /dev/dsp interface
@@ -253,8 +252,6 @@ $Id$
  * qnx: QNX RTOS plugin
  * qt4: interface module using the cross-platform Qt4 library
  * qtcapture: Quicktime Capture
- * qte: video output module for Qt Embedded
- * qte_main: a QT Embedded GUI wrapper module
  * quartztext: Text renderer using native Mac OS X API
  * quicktime: Quicktime decoder that uses the QT library
  * rawaud: raw audio input module for vlc

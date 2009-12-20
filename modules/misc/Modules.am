@@ -9,7 +9,6 @@ SUBDIRS += lua
 endif
 
 SOURCES_screensaver = screensaver.c
-SOURCES_qte_main = qte_main.cpp
 SOURCES_freetype = freetype.c text_renderer.h
 SOURCES_win32text = win32text.c
 SOURCES_quartztext = quartztext.c text_renderer.h

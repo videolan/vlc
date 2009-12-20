@@ -1005,9 +1005,6 @@ fi
 ;;
 esac
 
-dnl build the qte plugin ?
-NEED_QTE_MAIN=no
-
 dnl Check for ntohl, etc.
 AC_CACHE_CHECK([for ntohl in sys/param.h],
     [ac_cv_c_ntohl_sys_param_h],
@@ -3842,33 +3839,6 @@ then
 fi
 
 dnl
-dnl  Qt Embedded module
-dnl  (disabled by default)
-dnl
-AC_ARG_ENABLE(qte,
-  [  --enable-qte            QT Embedded support (default disabled)])
-if test "${enable_qte}" = "yes"
-then
-  AC_ARG_WITH(qte,
-  [    --with-qte=PATH       Qt Embedded headers and libraries])
-  if test "${with_qte}" != "no" -a -n "${with_qte}"
-  then
-    VLC_ADD_LIBS([qte],[-L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte])
-    VLC_ADD_CXXFLAGS([qte],[-I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti])
-  else
-    VLC_ADD_LIBS([qte],[-L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte])
-    VLC_ADD_CXXFLAGS([qte],[-I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti])
-  fi
-  VLC_ADD_PLUGIN([qte])
-  NEED_QTE_MAIN=yes
-  CPPFLAGS="${CPPFLAGS_save} ${CXXFLAGS_qte}"
-  AC_CHECK_HEADERS(qt.h jpeglib.h, ,[
-    AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."])
-  ] )
-  CPPFLAGS="${CPPFLAGS_save}"
-fi
-
-dnl
 dnl Roku HD1000 Video output module
 dnl
 AC_ARG_ENABLE(hd1000v,
@@ -4396,40 +4366,6 @@ dnl
 AS_IF([test "${enable_skins2}" != "no" && test "x$enable_qt4" = "xno"], [
   AC_MSG_ERROR([The skins2 module depends on a the Qt4 development package. Without it you won't be able to open any dialog box from the interface, which makes the skins2 interface rather useless. Install the Qt4 development package or alternatively you can also configure with: --disable-qt4 --disable-skins2.])
 ])
-
-dnl
-dnl  Opie QT embedded module
-dnl
-AC_ARG_ENABLE(opie,
-  [  --enable-opie           Qt embedded interface support (default disabled)],
-  [if test "${enable_opie}" = "yes"; then
-     AC_ARG_WITH(qte,
-     [    --with-qte=PATH       Qt Embedded headers and libraries])
-     if test "${with_qte}" != "no" -a -n "${with_qte}"
-     then
-       VLC_ADD_LIBS([qte],[-L${with_qte}/lib `echo -L${with_qte}/lib | sed 's,opt/QtPalmtop,usr,'` -ljpeg -lqte])
-       VLC_ADD_CXXFLAGS([qte],[-I${with_qte}/include `echo -I${with_qte}/include | sed 's,opt/QtPalmtop,usr,'` -DQT_QWS_IPAQ -DQWS -fno-exceptions -fno-rtti])
-     else
-       VLC_ADD_LIBS([qte],[-L${QTDIR}/lib `echo -L${QTDIR}/lib | sed 's,opt/QtPalmtop,usr,'`])
-       VLC_ADD_CXXFLAGS([qte],[-I${QTDIR}/include `echo -I${QTDIR}/include | sed 's,opt/QtPalmtop,usr,'`])
-     fi
-     CPPFLAGS="${CPPFLAGS_save} ${CXXFLAGS_qte}"
-     AC_CHECK_HEADERS(qt.h jpeglib.h, ,[
-       AC_MSG_ERROR([echo "Cannot find QT Embedded development headers."])
-     ] )
-     CPPFLAGS="${CPPFLAGS_save}"
-
-     VLC_ADD_PLUGIN([opie])
-     NEED_QTE_MAIN=yes
-     VLC_ADD_LIBS([opie],[-lqpe ${LDFLAGS_qte}])
-     VLC_ADD_CXXFLAGS([opie],[${CXXFLAGS_qte}])
-     if test "${with_qte}" != "no" -a -n "${with_qte}"
-     then
-       MOC=${with_qte}/bin/moc
-     else
-       MOC=${QTDIR}/bin/moc
-     fi
-   fi])
 
 dnl
 dnl  MacOS X video output/gui modules
@@ -5073,17 +5009,6 @@ then
 fi
 
 dnl
-dnl  qte_main plugin
-dnl
-if test "${NEED_QTE_MAIN}" != "no"
-then
-    VLC_ADD_PLUGIN([qte_main])
-    VLC_ADD_CXXFLAGS([opie qte qt_video],[-DNEED_QTE_MAIN])
-    VLC_ADD_CXXFLAGS([qte_main],[${CXXFLAGS_qte} ${CXXFLAGS_qt_video}])
-    VLC_ADD_LDFLAGS([qte_main],[${LDFLAGS_qte} ${LDFLAGS_qt_video}])
-fi
-
-dnl
 dnl  Plugin and builtin checks
 dnl
 plugin_support=yes
@@ -5290,7 +5215,6 @@ AC_CONFIG_FILES([
   modules/video_filter/dynamicoverlay/Makefile
   modules/video_output/Makefile
   modules/video_output/msw/Makefile
-  modules/video_output/qte/Makefile
   modules/visualization/Makefile
   modules/visualization/visual/Makefile
 ])

@@ -1020,7 +1020,6 @@ modules/misc/playlist/html.c
 modules/misc/playlist/m3u.c
 modules/misc/playlist/xspf.c
 modules/misc/playlist/xspf.h
-modules/misc/qte_main.cpp
 modules/misc/quartztext.c
 modules/misc/rtsp.c
 modules/misc/screensaver.c
@@ -1208,8 +1207,6 @@ modules/video_output/msw/wingdi.c
 modules/video_output/omapfb.c
 modules/video_output/opengl.c
 modules/video_output/opengllayer.m
-modules/video_output/qte/qte.cpp
-modules/video_output/qte/qte.h
 modules/video_output/sdl.c
 modules/video_output/snapshot.c
 modules/video_output/svgalib.c
