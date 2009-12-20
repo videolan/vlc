@@ -478,6 +478,7 @@ static block_t *PacketizeBlock( decoder_t *p_dec, block_t **pp_block )
             {
                 p_dec->fmt_out.audio.i_rate = p_sys->i_rate;
                 date_Init( &p_sys->end_date, p_sys->i_rate, 1 );
+                date_Set( &p_sys->end_date, p_sys->i_pts );
             }
             p_sys->i_state = STATE_NEXT_SYNC;
             p_sys->i_frame_size = 1;
