@@ -73,7 +73,7 @@ static bool osd_ParserLoad( osd_menu_t *p_menu, const char *psz_file )
     if( !p_menu->p_image || !p_menu->psz_file )
     {
         msg_Err( p_menu, "unable to load images, aborting .." );
-        return true;
+        return false;
     }
     else
     {
@@ -109,8 +109,8 @@ static void osd_ParserUnload( osd_menu_t *p_menu )
 /**
  * Change state on an osd_button_t.
  *
- * This function selects the specified state and returns a pointer vlc_custom_createto it. The
- * following states are currently supported:
+ * This function selects the specified state and returns a pointer
+ * vlc_custom_create to it. The following states are currently supported:
  * \see OSD_BUTTON_UNSELECT
  * \see OSD_BUTTON_SELECT
  * \see OSD_BUTTON_PRESSED
@@ -121,7 +121,7 @@ static osd_state_t *osd_StateChange( osd_button_t *p_button, const int i_state )
     osd_state_t *p_temp = NULL;
     int i = 0;
 
-    for( i=0; p_current != NULL; i++ )
+    for( i= 0; p_current != NULL; i++ )
     {
         if( p_current->i_state == i_state )
         {
