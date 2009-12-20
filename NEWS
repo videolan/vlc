@@ -63,6 +63,11 @@ Service discovery:
 Stream output:
  * New smem module, streaming to memory
 
+Interfaces:
+ * Renamed the legacy rc, telnet and http interfaces to oldrc, oldtelnet
+   and oldhttp.
+ * rc, telnet and http are now implemented using the lua interface system.
+
 Mac OS X Interface:
  * Completely reworked user interface (based upon works from GSoC 2008)
 

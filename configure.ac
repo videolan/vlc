@@ -1794,6 +1794,8 @@ then
   if test "x${have_lua}" = "xyes" ;  then
      VLC_ADD_LIBS([lua],[$LUA_LIBS])
      VLC_ADD_CFLAGS([lua],[$LUA_CFLAGS])
+  else
+      AC_MSG_ERROR([Could not find lua. Lua is needed for some interfaces (rc, telnet, http) as well as many other custom scripts. Use --disable-lua to ignore this error.])
   fi
 fi
 AM_CONDITIONAL(BUILD_LUA, [test "${have_lua}" = "yes"])
