@@ -785,7 +785,7 @@ static int SessionsSetup( demux_t *p_demux )
             tk->p_out_muxed = NULL;
             tk->waiting     = 0;
             tk->b_rtcp_sync = false;
-            tk->i_pts       = 0;
+            tk->i_pts       = VLC_TS_INVALID;
             tk->i_npt       = 0.;
             tk->i_buffer    = 65536;
             tk->p_buffer    = (uint8_t *)malloc( 65536 );
@@ -1156,7 +1156,7 @@ static int Demux( demux_t *p_demux )
     if( p_sys->i_pcr > 0 )
     {
         if( b_send_pcr )
-            es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
+            es_out_Control( p_demux->out, ES_OUT_SET_PCR, 1 + p_sys->i_pcr );
     }
 
     /* First warn we want to read data */
@@ -1194,7 +1194,7 @@ static int Demux( demux_t *p_demux )
             es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
             tk->b_rtcp_sync = true;
             /* reset PCR */
-            tk->i_pts = 0;
+            tk->i_pts = VLC_TS_INVALID;
             tk->i_npt = 0.;
             p_sys->i_pcr = 0;
             p_sys->i_npt = 0.;
@@ -1323,7 +1323,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 for( i = 0; i < p_sys->i_track; i++ )
                 {
                     p_sys->track[i]->b_rtcp_sync = false;
-                    p_sys->track[i]->i_pts = 0;
+                    p_sys->track[i]->i_pts = VLC_TS_INVALID;
                 }
 
                 /* Retrieve the starttime if possible */
@@ -1462,7 +1462,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 {
                     live_track_t *tk = p_sys->track[i];
                     tk->b_rtcp_sync = false;
-                    tk->i_pts = 0;
+                    tk->i_pts = VLC_TS_INVALID;
                     p_sys->i_pcr = 0;
                     es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
                 }
@@ -1735,7 +1735,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
 
     if( (i_pts != tk->i_pts) && (!tk->b_muxed) )
     {
-        p_block->i_pts = i_pts;
+        p_block->i_pts = VLC_TS_0 + i_pts;
     }
 
     /* Update our global npt value */
@@ -1745,7 +1745,7 @@ static void StreamRead( void *p_private, unsigned int i_size,
     if( !tk->b_muxed )
     {
         /*FIXME: for h264 you should check that packetization-mode=1 in sdp-file */
-        p_block->i_dts = ( tk->fmt.i_codec == VLC_CODEC_MPGV ) ? 0 : i_pts;
+        p_block->i_dts = ( tk->fmt.i_codec == VLC_CODEC_MPGV ) ? VLC_TS_INVALID : (VLC_TS_0 + i_pts);
     }
 
     if( tk->b_muxed )
