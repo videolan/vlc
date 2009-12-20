@@ -683,7 +683,7 @@ static void SDPHandleUrl( sout_stream_t *p_stream, const char *psz_url )
         if( p_sys->p_mux != NULL )
         {
             sout_stream_id_t *id = p_sys->es[0];
-            id->rtsp_id = RtspAddId( p_sys->rtsp, id, 0, GetDWBE( id->ssrc ),
+            id->rtsp_id = RtspAddId( p_sys->rtsp, id, GetDWBE( id->ssrc ),
                                      p_sys->psz_destination, p_sys->i_ttl,
                                      id->i_port, id->i_port + 1 );
         }
@@ -1339,7 +1339,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->i_ts_offset = rtp_compute_ts( id, p_sys->i_pts_offset );
 
     if( p_sys->rtsp != NULL )
-        id->rtsp_id = RtspAddId( p_sys->rtsp, id, p_sys->i_es,
+        id->rtsp_id = RtspAddId( p_sys->rtsp, id,
                                  GetDWBE( id->ssrc ),
                                  p_sys->psz_destination,
                                  p_sys->i_ttl, id->i_port, id->i_port + 1 );
@@ -1739,25 +1739,6 @@ int64_t rtp_get_ts( const sout_stream_t *p_stream )
 
     return p_sys->i_pts_zero + (now - i_npt_zero); 
 }
-
-/* FIXME: this is pretty bad - if we remove and then insert an ES
- * the number will get unsynched from inside RTSP */
-unsigned rtp_get_num( const sout_stream_id_t *id )
-{
-    sout_stream_sys_t *p_sys = id->p_stream->p_sys;
-    int i;
-
-    vlc_mutex_lock( &p_sys->lock_es );
-    for( i = 0; i < p_sys->i_es; i++ )
-    {
-        if( id == p_sys->es[i] )
-            break;
-    }
-    vlc_mutex_unlock( &p_sys->lock_es );
-
-    return i;
-}
-
 
 void rtp_packetize_common( sout_stream_id_t *id, block_t *out,
                            int b_marker, int64_t i_pts )

@@ -29,7 +29,7 @@ rtsp_stream_t *RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url );
 void RtspUnsetup( rtsp_stream_t *rtsp );
 
 rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
-                             unsigned i, uint32_t ssrc,
+                             uint32_t ssrc,
                              const char *dst, int ttl,
                              unsigned loport, unsigned hiport );
 void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t * );
@@ -41,7 +41,6 @@ int rtp_add_sink( sout_stream_id_t *id, int fd, bool rtcp_mux, uint16_t *seq );
 void rtp_del_sink( sout_stream_id_t *id, int fd );
 uint16_t rtp_get_seq( sout_stream_id_t *id );
 int64_t rtp_get_ts( const sout_stream_t *p_stream );
-unsigned rtp_get_num( const sout_stream_id_t *id );
 
 /* RTP packetization */
 void rtp_packetize_common (sout_stream_id_t *id, block_t *out,
