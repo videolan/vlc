@@ -433,7 +433,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     catch_exception( &ex );
 }
 
-- (int)chapter
+- (int)currentChapter
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
@@ -475,7 +475,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     catch_exception( &ex );
 }
 
-- (int)title
+- (int)currentTitle
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
@@ -583,7 +583,13 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     libvlc_media_player_pause( (libvlc_media_player_t *)instance, &ex );
-    catch_exception( &ex );
+
+    // fail gracefully
+    // in most cases, it's just EOF so let's stop
+    if (libvlc_exception_raised(&ex))
+        [self stop];
+
+    libvlc_exception_clear(&ex);
 }
 
 - (void)stop
