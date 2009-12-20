@@ -187,7 +187,7 @@ static int Open (vlc_object_t * p_this)
 
     /* Default SMF tempo is 120BPM, i.e. half a second per quarter note */
     date_Init (&p_sys->pts, ppqn * 2, 1);
-    date_Set (&p_sys->pts, 1);
+    date_Set (&p_sys->pts, 0);
     p_sys->pulse        = 0;
     p_sys->ppqn         = ppqn;
 
@@ -545,7 +545,7 @@ int HandleMessage (demux_t *p_demux, mtrk_t *tr)
             stream_Read (s, block->p_buffer + 2, datalen - 1);
     }
 
-    block->i_dts = block->i_pts = date_Get (&p_demux->p_sys->pts);
+    block->i_dts = block->i_pts = VLC_TS_0 + date_Get (&p_demux->p_sys->pts);
     es_out_Send (p_demux->out, p_demux->p_sys->es, block);
 
 skip:
@@ -571,7 +571,7 @@ static int Demux (demux_t *p_demux)
     if (pulse == UINT64_MAX)
         return 0; /* all tracks are done */
 
-    es_out_Control (p_demux->out, ES_OUT_SET_PCR, date_Get (&p_sys->pts));
+    es_out_Control (p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + date_Get (&p_sys->pts));
 
     for (unsigned i = 0; i < p_sys->trackc; i++)
     {
@@ -605,7 +605,7 @@ static int Demux (demux_t *p_demux)
             break;
 
         tick->p_buffer[0] = 0xF9;
-        tick->i_dts = tick->i_pts = cur_tick++ * 10000;
+        tick->i_dts = tick->i_pts = VLC_TS_0 + cur_tick++ * 10000;
         es_out_Send (p_demux->out, p_sys->es, tick);
     }
 
