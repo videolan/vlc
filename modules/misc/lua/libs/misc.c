@@ -181,9 +181,10 @@ static int vlclua_lock_and_wait( lua_State *L )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     vlc_mutex_lock( &p_sys->lock );
+    mutex_cleanup_push( &p_sys->lock );
     while( !p_sys->exiting )
         vlc_cond_wait( &p_sys->wait, &p_sys->lock );
-    vlc_mutex_unlock( &p_sys->lock );
+    vlc_cleanup_pop();
     lua_pushboolean( L, 1 );
     return 1;
 }
