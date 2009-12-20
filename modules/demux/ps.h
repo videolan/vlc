@@ -399,6 +399,8 @@ static inline int ps_pkt_parse_pes( block_t *p_pes, int i_skip_extra )
 {
     uint8_t header[34];
     unsigned int i_skip  = 0;
+    int64_t i_pts = -1;
+    int64_t i_dts = -1;
 
     memcpy( header, p_pes->p_buffer, __MIN( p_pes->i_buffer, 34 ) );
 
@@ -423,19 +425,19 @@ static inline int ps_pkt_parse_pes( block_t *p_pes, int i_skip_extra )
 
                 if( header[7]&0x80 )    /* has pts */
                 {
-                    p_pes->i_pts = ((mtime_t)(header[ 9]&0x0e ) << 29)|
-                                    (mtime_t)(header[10] << 22)|
-                                   ((mtime_t)(header[11]&0xfe) << 14)|
-                                    (mtime_t)(header[12] << 7)|
-                                    (mtime_t)(header[13] >> 1);
+                    i_pts = ((mtime_t)(header[ 9]&0x0e ) << 29)|
+                             (mtime_t)(header[10] << 22)|
+                            ((mtime_t)(header[11]&0xfe) << 14)|
+                             (mtime_t)(header[12] << 7)|
+                             (mtime_t)(header[13] >> 1);
 
                     if( header[7]&0x40 )    /* has dts */
                     {
-                         p_pes->i_dts = ((mtime_t)(header[14]&0x0e ) << 29)|
-                                         (mtime_t)(header[15] << 22)|
-                                        ((mtime_t)(header[16]&0xfe) << 14)|
-                                         (mtime_t)(header[17] << 7)|
-                                         (mtime_t)(header[18] >> 1);
+                         i_dts = ((mtime_t)(header[14]&0x0e ) << 29)|
+                                  (mtime_t)(header[15] << 22)|
+                                 ((mtime_t)(header[16]&0xfe) << 14)|
+                                  (mtime_t)(header[17] << 7)|
+                                  (mtime_t)(header[18] >> 1);
                     }
                 }
             }
@@ -499,8 +501,10 @@ static inline int ps_pkt_parse_pes( block_t *p_pes, int i_skip_extra )
     p_pes->p_buffer += i_skip;
     p_pes->i_buffer -= i_skip;
 
-    p_pes->i_dts = 100 * p_pes->i_dts / 9;
-    p_pes->i_pts = 100 * p_pes->i_pts / 9;
+    if( i_dts >= 0 )
+        p_pes->i_dts = VLC_TS_0 + 100 * i_dts / 9;
+    if( i_pts >= 0 )
+        p_pes->i_pts = VLC_TS_0 + 100 * i_pts / 9;
 
     return VLC_SUCCESS;
 }

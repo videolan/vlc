@@ -397,8 +397,8 @@ static int Demux( demux_t *p_demux )
                 p_sys->i_scr = -1;
             }
 
-            if( p_sys->i_scr > 0 )
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_scr );
+            if( p_sys->i_scr >= 0 )
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_scr );
 
             p_sys->i_scr = -1;
 
@@ -411,7 +411,7 @@ static int Demux( demux_t *p_demux )
             {
                 if( !b_new && !p_sys->b_have_pack &&
                     (tk->fmt.i_cat == AUDIO_ES) &&
-                    (p_pkt->i_pts > 0) )
+                    (p_pkt->i_pts > VLC_TS_INVALID) )
                 {
                     /* A hack to sync the A/V on PES files. */
                     msg_Dbg( p_demux, "force SCR: %"PRId64, p_pkt->i_pts );
