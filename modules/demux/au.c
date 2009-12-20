@@ -132,7 +132,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
-    p_sys->i_time = 1;
+    p_sys->i_time = 0;
     p_sys->i_header_size = GetDWBE( &hdr[0] );
 
     /* skip extra header data */
@@ -293,7 +293,7 @@ static int Demux( demux_t *p_demux )
     block_t     *p_block;
 
     /* set PCR */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_time );
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
 
     if( ( p_block = stream_Block( p_demux->s, p_sys->i_frame_size ) ) == NULL )
     {
@@ -302,7 +302,7 @@ static int Demux( demux_t *p_demux )
     }
 
     p_block->i_dts =
-    p_block->i_pts = p_sys->i_time;
+    p_block->i_pts = VLC_TS_0 + p_sys->i_time;
 
     es_out_Send( p_demux->out, p_sys->es, p_block );
 
