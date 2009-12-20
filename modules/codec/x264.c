@@ -1216,15 +1216,20 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
 
     if( !i_nal ) return NULL;
 
+
+    /* Get size of block we need */
     for( i = 0, i_out = 0; i < i_nal; i++ )
-    {
-        memcpy( p_sys->p_buffer + i_out, nal[i].p_payload, nal[i].i_payload );
         i_out += nal[i].i_payload;
-    }
 
     p_block = block_New( p_enc, i_out );
     if( !p_block ) return NULL;
-    memcpy( p_block->p_buffer, p_sys->p_buffer, i_out );
+
+    /* copy encoded data directly to block, instead taking via p_sys->p_buffer */
+    for( i = 0, i_out = 0; i < i_nal; i++ )
+    {
+        memcpy( p_block->p_buffer + i_out, nal[i].p_payload, nal[i].i_payload );
+        i_out += nal[i].i_payload;
+    }
 
     if( pic.i_type == X264_TYPE_IDR || pic.i_type == X264_TYPE_I )
         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
