@@ -675,6 +675,11 @@ struct encoder_sys_t
     char *psz_stat_name;
 };
 
+#ifdef PTW32_STATIC_LIB
+static vlc_mutex_t pthread_win32_mutex = VLC_STATIC_MUTEX;
+static int pthread_win32_count = 0;
+#endif
+
 /*****************************************************************************
  * Open: probe the encoder
  *****************************************************************************/
@@ -1114,30 +1119,21 @@ static int  Open ( vlc_object_t *p_this )
        but only once for the whole application. Since pthreadw32
        doesn't keep a refcount, do it ourselves. */
 #ifdef PTW32_STATIC_LIB
-    vlc_value_t lock, count;
+    vlc_mutex_lock( &pthread_win32_mutex );
 
-    var_Create( p_enc->p_libvlc, "pthread_win32_mutex", VLC_VAR_MUTEX );
-    var_Get( p_enc->p_libvlc, "pthread_win32_mutex", &lock );
-    vlc_mutex_lock( lock.p_address );
-
-    var_Create( p_enc->p_libvlc, "pthread_win32_count", VLC_VAR_INTEGER );
-    var_Get( p_enc->p_libvlc, "pthread_win32_count", &count );
-
-    if( count.i_int == 0 )
+    if( pthread_win32_count == 0 )
     {
         msg_Dbg( p_enc, "initializing pthread-win32" );
         if( !pthread_win32_process_attach_np() || !pthread_win32_thread_attach_np() )
         {
             msg_Warn( p_enc, "pthread Win32 Initialization failed" );
-            vlc_mutex_unlock( lock.p_address );
+            vlc_mutex_unlock( &pthread_win32_mutex );
             return VLC_EGENERIC;
         }
     }
 
-    count.i_int++;
-    var_Set( p_enc->p_libvlc, "pthread_win32_count", count );
-    vlc_mutex_unlock( lock.p_address );
-
+    pthread_win32_count++;
+    vlc_mutex_unlock( &pthread_win32_mutex );
 #endif
 
     /* Set lookahead value to lower than default,
@@ -1279,22 +1275,17 @@ static void Close( vlc_object_t *p_this )
         x264_encoder_close( p_sys->h );
 
 #ifdef PTW32_STATIC_LIB
-    vlc_value_t lock, count;
+    vlc_mutex_lock( &pthread_win32_mutex );
+    pthread_win32_count--;
 
-    var_Get( p_enc->p_libvlc, "pthread_win32_mutex", &lock );
-    vlc_mutex_lock( lock.p_address );
-
-    var_Get( p_enc->p_libvlc, "pthread_win32_count", &count );
-    count.i_int--;
-    var_Set( p_enc->p_libvlc, "pthread_win32_count", count );
-
-    if( count.i_int == 0 )
+    if( pthread_win32_count == 0 )
     {
         pthread_win32_thread_detach_np();
         pthread_win32_process_detach_np();
         msg_Dbg( p_enc, "pthread-win32 deinitialized" );
     }
-    vlc_mutex_unlock( lock.p_address );
+
+    vlc_mutex_unlock( &pthread_win32_mutex );
 #endif
 
     free( p_sys );
