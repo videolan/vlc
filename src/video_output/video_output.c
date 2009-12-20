@@ -589,21 +589,6 @@ static void vout_Destructor( vlc_object_t * p_this )
 
     free( p_vout->p );
 
-#ifndef __APPLE__
-    vout_thread_t *p_another_vout;
-
-    /* This is a dirty hack mostly for Linux, where there is no way to get the
-     * GUI back if you closed it while playing video. This is solved in
-     * Mac OS X, where we have this novelty called menubar, that will always
-     * allow you access to the applications main functionality. They should try
-     * that on linux sometime. */
-    p_another_vout = vlc_object_find( p_this->p_libvlc,
-                                      VLC_OBJECT_VOUT, FIND_ANYWHERE );
-    if( p_another_vout == NULL )
-        var_SetBool( p_this->p_libvlc, "intf-show", true );
-    else
-        vlc_object_release( p_another_vout );
-#endif
 }
 
 /* */
