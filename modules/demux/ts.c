@@ -1822,13 +1822,11 @@ static void ParsePES( demux_t *p_demux, ts_pid_t *pid )
         int i;
 
         if( i_dts >= 0 )
-        {
-            p_pes->i_dts = i_dts * 100 / 9;
-        }
+            p_pes->i_dts = VLC_TS_0 + i_dts * 100 / 9;
+
         if( i_pts >= 0 )
-        {
-            p_pes->i_pts = i_pts * 100 / 9;
-        }
+            p_pes->i_pts = VLC_TS_0 + i_pts * 100 / 9;
+
         p_pes->i_length = i_length * 100 / 9;
 
         p_block = block_ChainGather( p_pes );
@@ -1882,7 +1880,7 @@ static void PCRHandle( demux_t *p_demux, ts_pid_t *pid, block_t *p_bk )
                 {
                     es_out_Control( p_demux->out, ES_OUT_SET_GROUP_PCR,
                                     (int)p_sys->pmt[i]->psi->prg[i_prg]->i_number,
-                                    (int64_t)(i_pcr * 100 / 9) );
+                                    (int64_t)(VLC_TS_0 + i_pcr * 100 / 9) );
                 }
             }
         }
