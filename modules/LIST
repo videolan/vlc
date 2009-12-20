@@ -5,6 +5,7 @@ $Id$
  * a52tospdif: Audio converter module to encapsulate A/52 into S/PDIF
  * aa: Ascii art video output
  * access_alsa: Alsa access module
+ * access_avio: Access module using FFmpeg libavformat network
  * access_bd: Blu-Ray Disc access
  * access_directory: Access module to read files in a directory
  * access_dv: Raw1394 Digital Video (Firewire/IEEE1394/I-Link) access module
@@ -124,7 +125,6 @@ $Id$
  * ggi: video output module using the GGI API
  * globalhotkeys: module to catch hotkeys when application doesn't have the focus
  * glwin32: a opengl provider using DirectX OpenGL
- * glx: a opengl provider using X11 OpenGL
  * gme: game music files demuxer
  * gnutls: GNU TLS encryption/decryption module
  * goom: visualisation plugin based on goom
@@ -302,6 +302,7 @@ $Id$
  * stream_out_mosaic_bridge: stream output module to make a mosaic. To be used with VLM
  * stream_out_raop: Remote Audio Output Protocol (AirTunes) stream out
  * stream_out_record: record stream output module
+ * stream_out_smem: stream output module to a memory buffer
  * stream_out_standard: standard stream output module
  * stream_out_switcher: stream output module to display backgrounds
  * stream_out_transcode: audio & video transcoder using FFmpeg
@@ -361,6 +362,11 @@ $Id$
  * wma_fixed: wma decoder using integer decoder from Rockbox
  * x264: H264 video decoder using X264
  * xa: XA demuxer
+ * xcb_glx: a opengl provider using XCB OpenGL
+ * xcb_screensaver: screensaver disabling module
+ * xcb_x11: a X11 video output using XCB
+ * xcb_xv: a XVideo video output using XCB
+ * xdg_screensaver: screensaver disabling module following XDG specifications
  * xml: LibXML xml parser
  * xosd: X On Screen Display interface
  * xtag: XTAG xml parser
