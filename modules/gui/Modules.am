@@ -1,4 +1,4 @@
-DIST_SUBDIRS = beos macosx hildon minimal_macosx qnx qt4 skins2 wince
+DIST_SUBDIRS = beos macosx hildon minimal_macosx qnx qt4 skins2
 SUBDIRS =
 
 if HAVE_BEOS
@@ -16,9 +16,6 @@ SUBDIRS += qt4
 endif
 if BUILD_SKINS
 SUBDIRS += skins2
-endif
-if HAVE_WINCE
-SUBDIRS += wince
 endif
 
 SOURCES_ncurses = ncurses.c

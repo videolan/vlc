@@ -4391,26 +4391,6 @@ AS_IF([test "${enable_qt4}" != "no"], [
 AM_CONDITIONAL(ENABLE_QT4, [test "x$enable_qt4" != "xno"])
 
 dnl
-dnl  WinCE GUI module
-dnl
-AC_ARG_ENABLE(wince,
-  [  --enable-wince          Windows CE interface (default enabled with MinGW)])
-if test "${enable_wince}" != "no"; then
-  if test "${SYS}" = "mingwce"; then
-    VLC_ADD_PLUGIN([wince])
-    VLC_ADD_CXXFLAGS([wince],[])
-    VLC_ADD_LIBS([wince],[-lcommctrl -lcommdlg -laygshell])
-    dnl Gross hack
-    VLC_ADD_LIBS([wince],[\\\${top_builddir}modules/gui/wince/wince_rc.o])
-  elif test "${SYS}" = "mingw32"; then
-    VLC_ADD_CXXFLAGS([wince],[])
-    VLC_ADD_LIBS([wince],[-lcomctl32 -lcomdlg32 -lgdi32 -lole32])
-    dnl Gross hack
-    VLC_ADD_LIBS([wince],[\\\${top_builddir}modules/gui/wince/wince_rc.o])
-  fi
-fi
-
-dnl
 dnl Simple test for skins2 dependency
 dnl
 AS_IF([test "${enable_skins2}" != "no" && test "x$enable_qt4" = "xno"], [
@@ -5287,7 +5267,6 @@ AC_CONFIG_FILES([
   modules/gui/qnx/Makefile
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
-  modules/gui/wince/Makefile
   modules/meta_engine/Makefile
   modules/misc/Makefile
   modules/misc/dummy/Makefile
