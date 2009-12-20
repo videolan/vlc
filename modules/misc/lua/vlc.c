@@ -73,16 +73,21 @@ vlc_module_begin ()
         set_callbacks( Import_LuaPlaylist, Close_LuaPlaylist )
 
     add_submodule ()
-        add_shortcut( "luaintf" )
+        set_description( N_("Lua Interface Module (shortcuts)") )
         add_shortcut( "luarc" )
-        /* add_shortcut( "rc" ) */
+        add_shortcut( "rc" )
+        set_capability( "interface", 25 )
+        set_callbacks( Open_LuaIntf, Close_LuaIntf )
+
+    add_submodule ()
+        set_description( N_("Lua Interface Module") )
+        add_shortcut( "luaintf" )
+        add_shortcut( "luahttp" )
+        add_shortcut( "http" )
+        add_shortcut( "luatelnet" )
+        add_shortcut( "telnet" )
         add_shortcut( "luahotkeys" )
         /* add_shortcut( "hotkeys" ) */
-        add_shortcut( "luatelnet" )
-        /* add_shortcut( "telnet" ) */
-        add_shortcut( "luahttp" )
-        /* add_shortcut( "http" ) */
-        set_description( N_("Lua Interface Module") )
         set_capability( "interface", 0 )
         add_string( "lua-intf", "dummy", NULL,
                     INTF_TEXT, INTF_LONGTEXT, false )

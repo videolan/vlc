@@ -99,13 +99,13 @@ static const struct
     const char *psz_name;
 } pp_shortcuts[] = {
     { "luarc", "rc" },
-    /* { "rc", "rc" }, */
+    { "rc", "rc" },
     { "luahotkeys", "hotkeys" },
     /* { "hotkeys", "hotkeys" }, */
     { "luatelnet", "telnet" },
-    /* { "telnet", "telnet" }, */
+    { "telnet", "telnet" },
     { "luahttp", "http" },
-    /* { "http", "http" }, */
+    { "http", "http" },
     { NULL, NULL } };
 
 static bool WordInList( const char *psz_list, const char *psz_word )

@@ -1,11 +1,11 @@
 SUBDIRS = http globalhotkeys
 SOURCES_gestures = gestures.c
-SOURCES_telnet = telnet.c
+SOURCES_oldtelnet = telnet.c
 SOURCES_netsync = netsync.c
 SOURCES_ntservice = ntservice.c
 SOURCES_hotkeys = hotkeys.c
 SOURCES_lirc = lirc.c
-SOURCES_rc = rc.c
+SOURCES_oldrc = rc.c
 SOURCES_dbus = dbus.c dbus.h
 SOURCES_signals = signals.c
 if HAVE_DARWIN
