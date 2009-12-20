@@ -112,25 +112,22 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
 /*****************************************************************************
  * vlm_New:
  *****************************************************************************/
+static vlc_mutex_t vlm_mutex = VLC_STATIC_MUTEX;
+
 vlm_t *__vlm_New ( vlc_object_t *p_this )
 {
-    vlc_value_t lockval;
     vlm_t *p_vlm = NULL, **pp_vlm = &(libvlc_priv (p_this->p_libvlc)->p_vlm);
     char *psz_vlmconf;
     static const char vlm_object_name[] = "vlm daemon";
 
     /* Avoid multiple creation */
-    if( var_Create( p_this->p_libvlc, "vlm_mutex", VLC_VAR_MUTEX ) ||
-        var_Get( p_this->p_libvlc, "vlm_mutex", &lockval ) )
-        return NULL;
-
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_lock( &vlm_mutex );
 
     p_vlm = *pp_vlm;
     if( p_vlm )
     {   /* VLM already exists */
         vlc_object_hold( p_vlm );
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( &vlm_mutex );
         return p_vlm;
     }
 
@@ -140,7 +137,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
                                vlm_object_name );
     if( !p_vlm )
     {
-        vlc_mutex_unlock( lockval.p_address );
+        vlc_mutex_unlock( &vlm_mutex );
         return NULL;
     }
 
@@ -157,6 +154,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     {
         vlc_mutex_destroy( &p_vlm->lock );
         vlc_object_release( p_vlm );
+        vlc_mutex_unlock( &vlm_mutex );
         return NULL;
     }
 
@@ -183,7 +181,7 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
     free( psz_vlmconf );
 
     vlc_object_set_destructor( p_vlm, (vlc_destructor_t)vlm_Destructor );
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( &vlm_mutex );
 
     return p_vlm;
 }
@@ -193,15 +191,12 @@ vlm_t *__vlm_New ( vlc_object_t *p_this )
  *****************************************************************************/
 void vlm_Delete( vlm_t *p_vlm )
 {
-    vlc_value_t lockval;
-
     /* vlm_Delete() is serialized against itself, and against vlm_New().
      * This way, vlm_Destructor () (called from vlc_objet_release() above)
      * is serialized against setting libvlc_priv->p_vlm from vlm_New(). */
-    var_Get( p_vlm->p_libvlc, "vlm_mutex", &lockval );
-    vlc_mutex_lock( lockval.p_address );
+    vlc_mutex_lock( &vlm_mutex );
     vlc_object_release( p_vlm );
-    vlc_mutex_unlock( lockval.p_address );
+    vlc_mutex_unlock( &vlm_mutex );
 }
 
 /*****************************************************************************
@@ -732,8 +727,10 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
 
     vlc_gc_decref( p_media->vod.p_item );
 
-    TAB_REMOVE( p_vlm->i_media, p_vlm->media, p_media );
+    if( p_media->vod.p_media )
+        p_vlm->p_vod->pf_media_del( p_vlm->p_vod, p_media->vod.p_media );
 
+    TAB_REMOVE( p_vlm->i_media, p_vlm->media, p_media );
     free( p_media );
 
     /* Check if we need to unload the VOD server */
