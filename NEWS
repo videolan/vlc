@@ -6,7 +6,8 @@ Access:
  * Support for the sftp protocol
  * Support for CDDB servers for Audio-CD on Windows version
  * Port of the dc1394 module from libdc1394 to libdc1394 v2.0
- * New memory input module to feed VLC from data in memory
+ * New memory input (imem) module to feed VLC from data in memory
+ * New avio module to use libavformat capabilities for network streams
 
 Decoders:
  * Support for Atrac1
@@ -48,7 +49,7 @@ Video Output:
  * Rewrite of the video output core and most video outputs
  * Added desktop mode to the Direct3D output module. It differs from DirectX
    desktop mode, because it hides the desktop icons, but reacts to mouse clicks.
- * New x11 and xv modules based on XCB
+ * New x11, glx and xv modules based on XCB
  * New deinterlacing modes based on yadif and yadif(x2)
  * New audio/video filter to show audio level on the video output
 
