@@ -39,6 +39,10 @@
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
 
+#ifdef HAVE_POLL
+#include <poll.h>       /* poll structures and defines */
+#endif
+
 #include "../vlc.h"
 #include "../libs.h"
 
@@ -121,7 +125,36 @@ static int vlclua_net_accept( lua_State *L )
 {
     vlc_object_t *p_this = vlclua_get_this( L );
     int **ppi_fd = (int**)luaL_checkudata( L, 1, "net_listen" );
-    int i_fd = net_Accept( p_this, *ppi_fd );
+    int *pi_fd = *ppi_fd;
+    int i_timeout = luaL_optint( L, 2, -1 ); /* block is default */
+
+    /* Implement net_Accept with timeout */
+    int i_fd = -1;
+
+    unsigned int i_count = 1;
+    while( pi_fd[0][i_count] != -1 )
+        i_count++;
+
+    struct pollfd ufd[i_count+1];
+    unsigned int i;
+    for( i = 0; i < i_count; i++ )
+    {
+        ufd[i].fd = pi_fd[i];
+        ufd[i].events = POLLIN;
+    }
+
+    if( poll( ufd, i_count, i_timeout ) > 0 )
+    {
+        for( i = 0; i < i_count; i++ )
+        {
+            if( !ufd[i].revents ) continue;
+            i_fd = net_AcceptSingle( p_this, ufd[i].fd );
+            if( i_fd == -1 ) continue;
+            memmove( pi_fd + i, pi_fd + i + 1, i_count - (i + 1) );
+            pi_fd[i_count - 1] = ufd[i].fd;
+        }
+    }
+
     lua_pushinteger( L, i_fd );
     return 1;
 }
