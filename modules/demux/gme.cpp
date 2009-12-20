@@ -309,7 +309,7 @@ static int Open( vlc_object_t *p_this )
     }
 
    /* init time */
-    p_sys->i_time  = 1;
+    p_sys->i_time  = 0;
     p_sys->i_length = 314 * (int64_t)1000;
 
     msg_Dbg( p_demux, "GME loaded type=%s title=%s tracks=%i", type_str[p_sys->i_type],
@@ -377,13 +377,13 @@ static int Demux( demux_t *p_demux )
     for (int i = 0; i<i_buf; i++) p_frame->p_buffer[i] = ((uint8_t *)p_emubuf)[i];
 
     /* Set PCR */
-    es_out_Control( p_demux->out, ES_OUT_SET_PCR, (int64_t)p_sys->i_time );
+    es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_time );
+    p_frame->i_dts = p_frame->i_pts = VLC_TS_0 + p_sys->i_time;
 
     /* We should use p_frame->i_buffer */
     p_sys->i_time += (int64_t)1000000 * p_frame->i_buffer / i_bk / p_sys->fmt.audio.i_rate;
 
     /* Send data */
-    p_frame->i_dts = p_frame->i_pts = p_sys->i_time;
     es_out_Send( p_demux->out, p_sys->es, p_frame );
 
     return 1;
@@ -426,7 +426,7 @@ switch( i_query )
             if( i64 >= 0 && i64 <= p_sys->i_length )
             {
                 ModPlug_Seek( p_sys->f, i64 / 1000 );
-                p_sys->i_time = i64 + 1;
+                p_sys->i_time = i64;
 
                 return VLC_SUCCESS;
             }
@@ -448,7 +448,7 @@ switch( i_query )
             if( i64 >= 0 && i64 <= p_sys->i_length )
             {
                 ModPlug_Seek( p_sys->f, i64 / 1000 );
-                p_sys->i_time = i64 + 1;
+                p_sys->i_time = i64;
 
                 return VLC_SUCCESS;
             }
