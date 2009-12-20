@@ -11,7 +11,7 @@ PKGDIR="vlc"
 AC_SUBST(PKGDIR)
 
 CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
-CODENAME="Yellow Bastard"
+CODENAME="The Luggage"
 COPYRIGHT_YEARS="1996-2009"
 
 AC_PREREQ(2.59c)
