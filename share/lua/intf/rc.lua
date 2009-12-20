@@ -350,10 +350,9 @@ function stats(name,client)
 end
 
 function playlist_status(name,client)
-    local a,b,c = vlc.playlist.status()
-    client:append( "( new input: " .. tostring(a) .. " )" )
-    client:append( "( audio volume: " .. tostring(b) .. " )")
-    client:append( "( state " .. tostring(c) .. " )")
+    client:append( "( new input: " .. "FIXME" .. " )" )
+    client:append( "( audio volume: " .. tostring(vlc.volume.get()) .. " )")
+    client:append( "( state " .. vlc.playlist.status() .. " )")
 end
 
 function is_playing(name,client)

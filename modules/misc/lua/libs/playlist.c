@@ -378,45 +378,26 @@ static int vlclua_playlist_sort( lua_State *L )
     return vlclua_push_ret( L, i_ret );
 }
 
-/* FIXME: split this in 3 different functions? */
 static int vlclua_playlist_status( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
-    /*
-    int i_count = 0;
-    lua_settop( L, 0 );*/
-    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
-    if( p_input )
+    PL_LOCK;
+    switch( playlist_Status( p_playlist ) )
     {
-        /*char *psz_uri =
-            input_item_GetURI( input_GetItem( p_playlist->p_input ) );
-        lua_pushstring( L, psz_uri );
-        free( psz_uri );
-        lua_pushnumber( L, config_GetInt( p_intf, "volume" ) );*/
-        PL_LOCK;
-        switch( playlist_Status( p_playlist ) )
-        {
-            case PLAYLIST_STOPPED:
-                lua_pushstring( L, "stopped" );
-                break;
-            case PLAYLIST_RUNNING:
-                lua_pushstring( L, "playing" );
-                break;
-            case PLAYLIST_PAUSED:
-                lua_pushstring( L, "paused" );
-                break;
-            default:
-                lua_pushstring( L, "unknown" );
-                break;
-        }
-        PL_UNLOCK;
-        /*i_count += 3;*/
-        vlc_object_release( p_input );
+        case PLAYLIST_STOPPED:
+            lua_pushstring( L, "stopped" );
+            break;
+        case PLAYLIST_RUNNING:
+            lua_pushstring( L, "playing" );
+            break;
+        case PLAYLIST_PAUSED:
+            lua_pushstring( L, "paused" );
+            break;
+        default:
+            lua_pushstring( L, "unknown" );
+            break;
     }
-    else
-    {
-        lua_pushstring( L, "stopped" );
-    }
+    PL_UNLOCK;
     vlclua_release_playlist_internal( p_playlist );
     return 1;
 }
