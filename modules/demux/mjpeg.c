@@ -278,7 +278,7 @@ static int SendBlock( demux_t *p_demux, int i )
     }
     else
     {
-        p_block->i_dts = p_block->i_pts = p_sys->i_time;
+        p_block->i_dts = p_block->i_pts = VLC_TS_0 + p_sys->i_time;
         p_sys->i_time += p_sys->i_frame_length;
     }
 
