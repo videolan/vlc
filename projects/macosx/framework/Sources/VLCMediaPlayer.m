@@ -260,7 +260,10 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)setVideoAspectRatio:(char *)value
 {
-    libvlc_video_set_aspect_ratio( instance, value, NULL );
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_video_set_aspect_ratio( instance, value, &ex );
+    catch_exception( &ex );
 }
 
 - (char *)videoAspectRatio
@@ -274,7 +277,10 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)setVideoSubTitles:(int)value
 {
-    libvlc_video_set_spu( instance, value, NULL );
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_video_set_spu( instance, value, &ex );
+    catch_exception( &ex );
 }
 
 - (int)videoSubTitles
@@ -288,7 +294,10 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)setVideoCropGeometry:(char *)value
 {
-    libvlc_video_set_crop_geometry( instance, value, NULL );
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_video_set_crop_geometry( instance, value, &ex );
+    catch_exception( &ex );
 }
 
 - (char *)videoCropGeometry
@@ -302,7 +311,10 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)setVideoTeleText:(int)value
 {
-    libvlc_video_set_teletext( instance, value, NULL );
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_video_set_teletext( instance, value, &ex );
+    catch_exception( &ex );
 }
 
 - (int)videoTeleText
@@ -332,7 +344,10 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)setRate:(float)value
 {
-    libvlc_media_player_set_rate( instance, value, NULL );
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_media_player_set_rate( instance, value, &ex );
+    catch_exception( &ex );
 }
 
 - (float)rate
@@ -480,7 +495,10 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)setAudioTrack:(int)value
 {
-    libvlc_audio_set_track( instance, value, NULL );
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_audio_set_track( instance, value, &ex );
+    catch_exception( &ex );
 }
 
 - (int)audioTrack
@@ -503,7 +521,10 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 
 - (void)setAudioChannel:(int)value
 {
-    libvlc_audio_set_channel( instance, value, NULL );
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_audio_set_channel( instance, value, &ex );
+    catch_exception( &ex );
 }
 
 - (int)audioChannel
