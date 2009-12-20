@@ -373,9 +373,6 @@ static int Open( vlc_object_t *p_this )
 {
     decoder_t *p_dec = (decoder_t*)p_this;
 
-    /* create a mutex */
-    var_Create( p_this->p_libvlc, "rm_mutex", VLC_VAR_MUTEX );
-
     switch ( p_dec->fmt_in.i_codec )
     {
     case VLC_CODEC_RV10: 
