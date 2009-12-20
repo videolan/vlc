@@ -33,7 +33,7 @@
 
 #include "browser_open.h"
 
-
+#if 0
 int browser_Open( const char *psz_url )
 {
 #ifdef __APPLE__
@@ -85,4 +85,11 @@ int browser_Open( const char *psz_url )
     return i_ret;
 #endif
 }
+#else
+int browser_Open( const char *psz_url )
+{
+    (void)psz_url;
+    return -1;
+}
+#endif
 
