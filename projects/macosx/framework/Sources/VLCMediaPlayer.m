@@ -287,7 +287,7 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int result = libvlc_video_get_spu( instance, &ex );
+    int result = libvlc_video_get_spu_count( instance, &ex );
     catch_exception( &ex );
     return result;
 }
@@ -307,6 +307,15 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
         libvlc_exception_clear(&ex);
         return result;
     }
+}
+
+- (BOOL)openVideoSubTitlesFromFile:(NSString *)path
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    BOOL result = libvlc_video_set_subtitle_file( instance, [path UTF8String], &ex );
+    catch_exception( &ex );
+    return result;
 }
 
 - (void)setVideoCropGeometry:(char *)value

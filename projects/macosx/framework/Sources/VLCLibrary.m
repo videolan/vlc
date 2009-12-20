@@ -76,12 +76,12 @@ void __catch_exception( void * e, const char * function, const char * file, int 
             [defaultParams addObject:@"--ignore-config"];                           // Don't read and write VLC config files
             [defaultParams addObject:@"--opengl-provider=minimal_macosx"];          // Use minimal_macosx
             [defaultParams addObject:@"--vout=minimal_macosx"];
+            [defaultParams addObject:@"--text-renderer=quartztext"];                // our CoreText-based renderer
             [defaultParams addObject:@"--verbose=2"];                               // Don't polute the log
-            [defaultParams addObject:@"--vout=minimal_macosx"];
             [defaultParams addObject:@"--no-color"];
             vlcParams = defaultParams;
         }
-    
+
         int paramNum = 0;
         const char *lib_vlc_params[[vlcParams count]];
         while (paramNum < [vlcParams count]) {
@@ -92,7 +92,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
         instance = (void *)libvlc_new( sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]), lib_vlc_params, &ex );
         catch_exception( &ex );
         NSAssert(instance, @"libvlc failed to initialize");
-        
+
         // Assignment unneeded, as the audio unit will do it for us
         /*audio = */ [[VLCAudio alloc] initWithLibrary:self];
     }

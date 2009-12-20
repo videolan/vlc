@@ -108,6 +108,7 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (void)setVideoSubTitles:(int)value;
 - (int)countOfVideoSubTitles;
 - (int)currentVideoSubTitles;
+- (BOOL)openVideoSubTitlesFromFile:(NSString *)path;
 
 - (void)setVideoCropGeometry:(char *)value;
 - (char *)videoCropGeometry;
