@@ -22,7 +22,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
 #import "VLCMediaList.h"
 
 @class VLCMediaList;

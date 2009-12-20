@@ -1,12 +1,14 @@
 /*****************************************************************************
  * VLCMediaPlayer.m: VLCKit.framework VLCMediaPlayer implementation
  *****************************************************************************
- * Copyright (C) 2007 Pierre d'Herbemont
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2009 Pierre d'Herbemont
+ * Copyright (C) 2007-2009 the VideoLAN team
+ * Partial Copyright (C) 2009 Felix Paul Kühne
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
  *          Faustion Osuna <enrique.osuna # gmail.com>
+ *          Felix Paul Kühne <fkuehne # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -399,9 +401,21 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     return [VLCTime timeWithNumber:[NSNumber numberWithDouble:-remaining]];
 }
 
+- (int)fps
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    int result = libvlc_media_player_get_fps( instance, &ex );
+    catch_exception( &ex );
+    return result;
+}
+
 - (void)setChapter:(int)value;
 {
-    libvlc_media_player_set_chapter( instance, value, NULL );
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_media_player_set_chapter( instance, value, &ex );
+    catch_exception( &ex );
 }
 
 - (int)chapter
@@ -418,6 +432,48 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     int result = libvlc_media_player_get_chapter_count( instance, &ex );
+    catch_exception( &ex );
+    return result;
+}
+
+- (void)nextChapter
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_media_player_next_chapter( instance, &ex );
+    catch_exception( &ex );
+}
+
+- (void)previousChapter
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_media_player_previous_chapter( instance, &ex );
+    catch_exception( &ex );
+}
+
+- (void)setTitle:(int)value
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_media_player_set_title( instance, value, &ex );
+    catch_exception( &ex );
+}
+
+- (int)title
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    int result = libvlc_media_player_get_title( instance, &ex );
+    catch_exception( &ex );
+    return result;
+}
+
+- (int)countOfTitles
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    int result = libvlc_media_player_get_title_count( instance, &ex );
     catch_exception( &ex );
     return result;
 }

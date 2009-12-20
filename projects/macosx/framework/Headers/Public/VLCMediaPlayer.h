@@ -1,11 +1,13 @@
 /*****************************************************************************
  * VLCMediaPlayer.h: VLCKit.framework VLCMediaPlayer header
  *****************************************************************************
- * Copyright (C) 2007 Pierre d'Herbemont
- * Copyright (C) 2007 the VideoLAN team
+ * Copyright (C) 2007-2009 Pierre d'Herbemont
+ * Copyright (C) 2007-2009 the VideoLAN team
+ * Partial Copyright (C) 2009 Felix Paul Kühne
  * $Id$
  *
  * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
+ *          Felix Paul Kühne <fkuehne # videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +24,6 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#import <Cocoa/Cocoa.h>
 #import "VLCMedia.h"
 #import "VLCVideoView.h"
 #import "VLCVideoLayer.h"
@@ -155,10 +156,15 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (VLCTime *)time;
 
 @property (readonly) VLCTime *remainingTime;
+@property (readonly) int fps;
 
 - (void)setChapter:(int)value;
 - (int)chapter;
 - (int)countOfChapters;
+
+- (void)setTitle:(int)value;
+- (int)title;
+- (int)countOfTitles;
 
 /* Audio Options */
 - (void)setAudioTrack:(int)value;

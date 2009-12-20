@@ -1,10 +1,28 @@
-//
-//  VLCMediaListPlayer.h
-//  VLCKit
-//
-//  Created by Pierre d'Herbemont on 8/24/09.
-//  Copyright 2009 __MyCompanyName__. All rights reserved.
-//
+/*****************************************************************************
+ * VLCMediaListPlayer.m: VLCKit.framework VLCMediaListPlayer implementation
+ *****************************************************************************
+ * Copyright (C) 2009 Pierre d'Herbemont
+ * Partial Copyright (C) 2009 Felix Paul Kühne
+ * Copyright (C) 2009 the VideoLAN team
+ * $Id$
+ *
+ * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
+ *          Felix Paul Kühne <fkuehne # videolan.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
 @class VLCMedia, VLCMediaPlayer, VLCMediaList;
 
@@ -32,6 +50,13 @@
  */
 - (void)play;
 - (void)stop;
+
+/**
+ * Playmode selection (don't repeat anything, repeat one, repeat all)
+ */
+- (void)doNotRepeatAnyItem;
+- (void)repeatCurrentItem;
+- (void)repeatAllItems;
 
 /**
  * media must be in the current media list.

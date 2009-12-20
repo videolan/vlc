@@ -1,10 +1,28 @@
-//
-//  VLCMediaListPlayer.m
-//  VLCKit
-//
-//  Created by Pierre d'Herbemont on 8/24/09.
-//  Copyright 2009 __MyCompanyName__. All rights reserved.
-//
+/*****************************************************************************
+ * VLCMediaListPlayer.m: VLCKit.framework VLCMediaListPlayer implementation
+ *****************************************************************************
+ * Copyright (C) 2009 Pierre d'Herbemont
+ * Partial Copyright (C) 2009 Felix Paul Kühne
+ * Copyright (C) 2009 the VideoLAN team
+ * $Id$
+ *
+ * Authors: Pierre d'Herbemont <pdherbemont # videolan.org>
+ *          Felix Paul Kühne <fkuehne # videolan.org
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
 #import "VLCMediaListPlayer.h"
 #import "VLCMedia.h"
@@ -94,7 +112,7 @@
     libvlc_exception_t ex;
     libvlc_exception_init(&ex);
     libvlc_media_list_player_play_item(instance, [media libVLCMediaDescriptor], &ex);
-    catch_exception(&ex);    
+    catch_exception(&ex);
 }
 
 - (void)play
@@ -102,7 +120,7 @@
     libvlc_exception_t ex;
     libvlc_exception_init(&ex);
     libvlc_media_list_player_play(instance, &ex);
-    catch_exception(&ex);    
+    catch_exception(&ex);
 }
 
 - (void)stop
@@ -110,6 +128,30 @@
     libvlc_exception_t ex;
     libvlc_exception_init(&ex);
     libvlc_media_list_player_stop(instance, &ex);
-    catch_exception(&ex);        
+    catch_exception(&ex);
+}
+
+- (void)doNotRepeatAnyItem;
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+    libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_default, &ex);
+    catch_exception(&ex);
+}
+
+- (void)repeatCurrentItem
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+    libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_repeat, &ex);
+    catch_exception(&ex);
+}
+
+- (void)repeatAllItems
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+    libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_loop, &ex);
+    catch_exception(&ex);
 }
 @end
