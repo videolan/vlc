@@ -201,7 +201,7 @@ static int Open( vlc_object_t * p_this )
 
     /* initialize timing */
     date_Init( &p_sys->pts, p_sys->fmt.audio.i_rate, 1 );
-    date_Set( &p_sys->pts, 1 );
+    date_Set( &p_sys->pts, 0 );
 
     /* calculate 50ms frame size/time */
     p_sys->i_frame_samples = __MAX( p_sys->fmt.audio.i_rate / 20, 1 );
@@ -242,10 +242,13 @@ static int Demux( demux_t *p_demux )
     }
 
     p_block->i_dts =
-    p_block->i_pts = date_Increment( &p_sys->pts, p_sys->i_frame_samples );
+    p_block->i_pts = VLC_TS_0 + date_Get( &p_sys->pts );
 
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_block->i_pts );
     es_out_Send( p_demux->out, p_sys->p_es, p_block );
+
+    date_Increment( &p_sys->pts, p_sys->i_frame_samples );
+
     return 1;
 }
 
