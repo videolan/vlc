@@ -235,7 +235,7 @@ static int Open( vlc_object_t *p_this )
 
     /* init time */
     date_Init( &p_sys->pts, settings.mFrequency, 1 );
-    date_Set( &p_sys->pts, 1 );
+    date_Set( &p_sys->pts, 0 );
     p_sys->i_length = ModPlug_GetLength( p_sys->f ) * INT64_C(1000);
 
     msg_Dbg( p_demux, "MOD loaded name=%s lenght=%"PRId64"ms",
@@ -292,13 +292,15 @@ static int Demux( demux_t *p_demux )
     }
     p_frame->i_buffer = i_read;
     p_frame->i_dts =
-    p_frame->i_pts = date_Increment( &p_sys->pts, p_frame->i_buffer / i_bk );
+    p_frame->i_pts = VLC_TS_0 + date_Get( &p_sys->pts );
 
     /* Set PCR */
     es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_frame->i_pts );
 
     /* Send data */
     es_out_Send( p_demux->out, p_sys->es, p_frame );
+
+    date_Increment( &p_sys->pts, i_read / i_bk );
 
     return 1;
 }
@@ -332,7 +334,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( i64 >= 0 && i64 <= p_sys->i_length )
         {
             ModPlug_Seek( p_sys->f, i64 / 1000 );
-            date_Set( &p_sys->pts, i64 + 1 );
+            date_Set( &p_sys->pts, i64 );
 
             return VLC_SUCCESS;
         }
@@ -354,7 +356,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
         if( i64 >= 0 && i64 <= p_sys->i_length )
         {
             ModPlug_Seek( p_sys->f, i64 / 1000 );
-            date_Set( &p_sys->pts, i64 + 1 );
+            date_Set( &p_sys->pts, i64 );
 
             return VLC_SUCCESS;
         }
