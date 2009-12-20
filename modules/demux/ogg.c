@@ -408,7 +408,7 @@ static int Demux( demux_t * p_demux )
                     else
                     {
                         es_out_Control( p_demux->out, ES_OUT_SET_PCR,
-                                        p_stream->i_pcr );
+                                        VLC_TS_0 + p_stream->i_pcr );
                     }
                     continue;
                 }
@@ -439,7 +439,7 @@ static int Demux( demux_t * p_demux )
     }
 
     if( p_sys->i_pcr >= 0 )
-        es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_sys->i_pcr );
+        es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_sys->i_pcr );
 
     return 1;
 }
@@ -736,7 +736,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
 
                 /* Call the pace control */
                 es_out_Control( p_demux->out, ES_OUT_SET_PCR,
-                                p_stream->i_pcr );
+                                VLC_TS_0 + p_stream->i_pcr );
             }
 
             p_stream->i_previous_pcr = p_stream->i_pcr;
@@ -763,7 +763,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
                 es_out_Control( p_demux->out, ES_OUT_RESET_PCR );
 
                 /* Call the pace control */
-                es_out_Control( p_demux->out, ES_OUT_SET_PCR, p_stream->i_pcr );
+                es_out_Control( p_demux->out, ES_OUT_SET_PCR, VLC_TS_0 + p_stream->i_pcr );
             }
         }
     }
@@ -792,9 +792,9 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     if( !( p_block = block_New( p_demux, p_oggpacket->bytes ) ) ) return;
 
     /* Normalize PTS */
-    if( i_pts == 0 ) i_pts = 1;
-    else if( i_pts == -1 && i_interpolated_pts == 0 ) i_pts = 1;
-    else if( i_pts == -1 ) i_pts = 0;
+    if( i_pts == 0 ) i_pts = VLC_TS_0;
+    else if( i_pts == -1 && i_interpolated_pts == 0 ) i_pts = VLC_TS_0;
+    else if( i_pts == -1 ) i_pts = VLC_TS_INVALID;
 
     if( p_stream->fmt.i_cat == AUDIO_ES )
         p_block->i_dts = p_block->i_pts = i_pts;
@@ -819,7 +819,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
         uint64_t u_pnum = dts + delay;
 
         p_block->i_dts = p_stream->i_pcr;
-        p_block->i_pts = 0;
+        p_block->i_pts = VLC_TS_INVALID;
         /* NB, OggDirac granulepos values are in units of 2*picturerate */
         if( -1 != p_oggpacket->granulepos )
             p_block->i_pts = u_pnum * INT64_C(1000000) / p_stream->f_rate / 2;
@@ -827,7 +827,7 @@ static void Ogg_DecodePacket( demux_t *p_demux,
     else
     {
         p_block->i_dts = i_pts;
-        p_block->i_pts = 0;
+        p_block->i_pts = VLC_TS_INVALID;
     }
 
     if( p_stream->fmt.i_codec != VLC_CODEC_VORBIS &&
