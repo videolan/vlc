@@ -108,6 +108,7 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
 int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input );
 int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
                     aout_buffer_t * p_buffer, int i_input_rate );
+void aout_InputCheckAndRestart( aout_instance_t * p_aout, aout_input_t * p_input );
 
 /* From filters.c : */
 int aout_FiltersCreatePipeline ( aout_instance_t * p_aout, filter_t ** pp_filters, int * pi_nb_filters, const audio_sample_format_t * p_input_format, const audio_sample_format_t * p_output_format );

@@ -305,11 +305,14 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
     p_buffer->i_length = (mtime_t)p_buffer->i_nb_samples * 1000000
                                 / p_input->input.i_rate;
 
+    aout_lock_mixer( p_aout );
     aout_lock_input( p_aout, p_input );
 
     if( p_input->b_error )
     {
         aout_unlock_input( p_aout, p_input );
+        aout_unlock_mixer( p_aout );
+
         aout_BufferFree( p_buffer );
         return -1;
     }
@@ -332,6 +335,9 @@ int aout_DecPlay( aout_instance_t * p_aout, aout_input_t * p_input,
         p_buffer = p_new_buffer;
         p_input->b_changed = false;
     }
+
+    aout_InputCheckAndRestart( p_aout, p_input );
+    aout_unlock_mixer( p_aout );
 
     int i_ret = aout_InputPlay( p_aout, p_input, p_buffer, i_input_rate );
 

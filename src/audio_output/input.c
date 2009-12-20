@@ -456,7 +456,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
 
     /* Success */
     p_input->b_error = false;
-    p_input->b_restart = false;
     p_input->i_last_input_rate = INPUT_RATE_DEFAULT;
 
     return 0;
@@ -493,6 +492,42 @@ int aout_InputDelete( aout_instance_t * p_aout, aout_input_t * p_input )
 }
 
 /*****************************************************************************
+ * aout_InputCheckAndRestart : restart an input
+ *****************************************************************************
+ * This function must be entered with the input and mixer lock.
+ *****************************************************************************/
+void aout_InputCheckAndRestart( aout_instance_t * p_aout, aout_input_t * p_input )
+{
+    AOUT_ASSERT_MIXER_LOCKED;
+    AOUT_ASSERT_INPUT_LOCKED;
+
+    if( !p_input->b_restart )
+        return;
+
+    aout_lock_input_fifos( p_aout );
+
+    /* A little trick to avoid loosing our input fifo and properties */
+
+    uint8_t *p_first_byte_to_mix = p_input->mixer.begin;
+    aout_fifo_t fifo = p_input->mixer.fifo;
+    bool b_paused = p_input->b_paused;
+    mtime_t i_pause_date = p_input->i_pause_date;
+
+    aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->mixer_format.i_rate );
+
+    aout_InputDelete( p_aout, p_input );
+
+    aout_InputNew( p_aout, p_input, &p_input->request_vout );
+    p_input->mixer.begin = p_first_byte_to_mix;
+    p_input->mixer.fifo = fifo;
+    p_input->b_paused = b_paused;
+    p_input->i_pause_date = i_pause_date;
+
+    p_input->b_restart = false;
+
+    aout_unlock_input_fifos( p_aout );
+}
+/*****************************************************************************
  * aout_InputPlay : play a buffer
  *****************************************************************************
  * This function must be entered with the input lock.
@@ -504,37 +539,6 @@ int aout_InputPlay( aout_instance_t * p_aout, aout_input_t * p_input,
 {
     mtime_t start_date;
     AOUT_ASSERT_INPUT_LOCKED;
-
-    if( p_input->b_restart )
-    {
-        aout_fifo_t fifo;
-        uint8_t     *p_first_byte_to_mix;
-        bool        b_paused;
-        mtime_t     i_pause_date;
-
-        aout_lock_mixer( p_aout );
-        aout_lock_input_fifos( p_aout );
-
-        /* A little trick to avoid loosing our input fifo and properties */
-
-        p_first_byte_to_mix = p_input->mixer.begin;
-        fifo = p_input->mixer.fifo;
-        b_paused = p_input->b_paused;
-        i_pause_date = p_input->i_pause_date;
-
-        aout_FifoInit( p_aout, &p_input->mixer.fifo, p_aout->mixer_format.i_rate );
-
-        aout_InputDelete( p_aout, p_input );
-
-        aout_InputNew( p_aout, p_input, &p_input->request_vout );
-        p_input->mixer.begin = p_first_byte_to_mix;
-        p_input->mixer.fifo = fifo;
-        p_input->b_paused = b_paused;
-        p_input->i_pause_date = i_pause_date;
-
-        aout_unlock_input_fifos( p_aout );
-        aout_unlock_mixer( p_aout );
-    }
 
     if( i_input_rate != INPUT_RATE_DEFAULT && p_input->p_playback_rate_filter == NULL )
     {
