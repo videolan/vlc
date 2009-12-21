@@ -258,7 +258,7 @@ do
     package.path = http_dir.."/?.lua"
     local ok, err = pcall(require,"custom")
     if not ok then
-        vlc.msg.warn("Couldn't load "..http_dir.."/custom.lua")
+        vlc.msg.warn("Couldn't load "..http_dir.."/custom.lua",err)
     else
         vlc.msg.dbg("Loaded "..http_dir.."/custom.lua")
     end

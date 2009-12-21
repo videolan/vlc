@@ -1,25 +1,17 @@
 local _G = _G
 module("custom",package.seeall)
 
-local dialogs_cache = {}
+local dialogs = setmetatable({}, {
+__index = function(self, name)
+    -- Cache the dialogs
+    return rawget(self, name) or
+           rawget(rawset(self, name, process(http_dir.."/dialogs/"..name)), name)
+end})
 
-function dialog_preload(name)
-    if not dialogs_cache[name] then
-        -- Cache the dialogs
-        dialogs_cache[name] = process(http_dir.."/dialogs/"..name)
+_G.dialogs = function(...)
+    for i=1, select("#",...) do
+        dialogs[(select(i,...))]()
     end
 end
 
-function dialog(name)
-    dialog_preload(name)
-    dialogs_cache[name]()
-end
-
-function dialogs(...)
-    for i=1,select("#",...) do
-        dialog(select(i,...))
-    end
-end
-
-_G.dialogs = dialogs
 _G.vlm = vlc.vlm()
