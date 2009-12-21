@@ -200,7 +200,7 @@ static int AddStream( sout_mux_t *p_mux, sout_input_t *p_input )
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     AVCodecContext *codec;
     AVStream *stream;
-    int i_codec_id, i_aspect_num, i_aspect_den;
+    int i_codec_id;
 
     msg_Dbg( p_mux, "adding input" );
 
