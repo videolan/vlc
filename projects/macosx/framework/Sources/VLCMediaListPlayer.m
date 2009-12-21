@@ -131,27 +131,29 @@
     catch_exception(&ex);
 }
 
-- (void)doNotRepeatAnyItem;
+- (void)setRepeatMode:(VLCRepeatMode)repeatMode
 {
     libvlc_exception_t ex;
     libvlc_exception_init(&ex);
-    libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_default, &ex);
+    switch (repeatMode) {
+        case VLCRepeatAllItems:
+            libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_default, &ex);
+            break;
+        case VLCDoNotRepeat:
+            libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_default, &ex);
+            break;
+        case VLCRepeatCurrentItem:
+            libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_repeat, &ex);
+            break;
+        default:
+            break;
+    }
     catch_exception(&ex);
+    _repeatMode = repeatMode;
 }
 
-- (void)repeatCurrentItem
+- (VLCRepeatMode)repeatMode
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_repeat, &ex);
-    catch_exception(&ex);
-}
-
-- (void)repeatAllItems
-{
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_loop, &ex);
-    catch_exception(&ex);
+    return _repeatMode;
 }
 @end

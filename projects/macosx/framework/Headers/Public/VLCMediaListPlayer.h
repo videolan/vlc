@@ -26,11 +26,23 @@
 
 @class VLCMedia, VLCMediaPlayer, VLCMediaList;
 
+/**
+ * VLCRepeatMode
+ * (don't repeat anything, repeat one, repeat all)
+ */
+enum VLCRepeatMode {
+    VLCDoNotRepeat,
+    VLCRepeatCurrentItem,
+    VLCRepeatAllItems
+};
+typedef int VLCRepeatMode;
+
 @interface VLCMediaListPlayer : NSObject {
     void *instance;
     VLCMedia *_rootMedia;
     VLCMediaPlayer *_mediaPlayer;
     VLCMediaList *_mediaList;
+    VLCRepeatMode _repeatMode;
 }
 
 @property (readwrite, retain) VLCMediaList *mediaList;
@@ -53,10 +65,10 @@
 
 /**
  * Playmode selection (don't repeat anything, repeat one, repeat all)
+ * See VLCRepeatMode.
  */
-- (void)doNotRepeatAnyItem;
-- (void)repeatCurrentItem;
-- (void)repeatAllItems;
+
+@property (readwrite) VLCRepeatMode repeatMode;
 
 /**
  * media must be in the current media list.
