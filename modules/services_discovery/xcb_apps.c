@@ -37,6 +37,7 @@ typedef xcb_atom_t Atom;
 
 static int  Open (vlc_object_t *);
 static void Close (vlc_object_t *);
+static int vlc_sd_probe_Open (vlc_object_t *);
 
 /*
  * Module descriptor
@@ -50,6 +51,8 @@ vlc_module_begin ()
     set_callbacks (Open, Close)
 
     add_shortcut ("apps")
+
+    VLC_SD_PROBE_SUBMODULE
 vlc_module_end ()
 
 struct services_discovery_sys_t
@@ -65,6 +68,19 @@ struct services_discovery_sys_t
 static void *Run (void *);
 static void Update (services_discovery_t *);
 static void DelItem (void *);
+
+static int vlc_sd_probe_Open (vlc_object_t *obj)
+{
+    vlc_probe_t *probe = (vlc_probe_t *)obj;
+
+    char *display = var_CreateGetNonEmptyString (obj, "x11-display");
+    xcb_connection_t *conn = xcb_connect (display, NULL);
+    free (display);
+    if (xcb_connection_has_error (conn))
+        return VLC_EGENERIC;
+    xcb_disconnect (conn);
+    return vlc_sd_probe_Add (probe, "xcb_apps", N_("Screen capture"));
+}
 
 /**
  * Probes and initializes.
