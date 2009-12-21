@@ -89,7 +89,7 @@ elseif command == "fullscreen" then
 elseif command == "snapshot" then
   common.snapshot()
 elseif command == "volume" then
-  vlc.volume.set(tonumber(val))
+  common.volume(val)
 elseif command == "seek" then
   common.seek(val)
 elseif command == "key" then

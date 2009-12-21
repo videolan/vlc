@@ -85,3 +85,11 @@ function seek(value)
         vlc.var.set(input,"time",tonumber(value))
     end
 end
+
+function volume(value)
+    if type(value)=="string" and string.sub(value,1,1) == "+" or string.sub(value,1,1) == "-" then
+        vlc.volume.set(vlc.volume.get()+tonumber(value))
+    else
+        vlc.volume.set(tostring(value))
+    end
+end

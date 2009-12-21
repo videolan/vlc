@@ -397,7 +397,7 @@ end
 
 function volume(name,client,value)
     if value then
-        vlc.volume.set(value)
+        common.volume(value)
     else
         client:append(tostring(vlc.volume.get()))
     end
