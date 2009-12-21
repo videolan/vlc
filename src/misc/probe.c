@@ -42,7 +42,10 @@ void *vlc_probe (vlc_object_t *obj,
 
     module_t *mod = module_need (probe, capability, NULL, false);
     if (mod != NULL)
+    {
+        msg_Warn (probe, "probing halted");
         module_unneed (probe, mod);
+    }
 
     void *ret = probe->list;
     *pcount = probe->count;
