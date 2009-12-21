@@ -58,6 +58,8 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+VLC_SD_PROBE_HELPER("podcast", N_("Podcasts"))
+
 #define URLS_TEXT N_("Podcast URLs list")
 #define URLS_LONGTEXT N_("Enter the list of podcasts to retrieve, " \
                          "separated by '|' (pipe)." )
@@ -74,6 +76,8 @@ vlc_module_begin ()
 
     set_capability( "services_discovery", 0 )
     set_callbacks( Open, Close )
+
+    VLC_SD_PROBE_SUBMODULE
 
 vlc_module_end ()
 
