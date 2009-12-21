@@ -44,6 +44,8 @@
 static int Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
+VLC_SD_PROBE_HELPER("mtp", N_("MTP devices"))
+
 vlc_module_begin()
     set_shortname( "MTP" )
     set_description( N_( "MTP devices" ) )
@@ -52,6 +54,8 @@ vlc_module_begin()
     set_capability( "services_discovery", 0 )
     set_callbacks( Open, Close )
     linked_with_a_crap_library_which_uses_atexit()
+
+    VLC_SD_PROBE_SUBMODULE
 vlc_module_end()
 
 
