@@ -157,12 +157,18 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 @property (readonly) int fps;
 
 /**
- * Return the current video subtitle index, or
- * \return NSNotFound if none is set.
+ * Return the current video subtitle index
+ * \return 0 if none is set.
  *
- * To disable subtitle pass NSNotFound.
+ * Pass 0 to disable.
  */
 @property (readwrite) NSUInteger currentVideoSubTitleIndex;
+
+/**
+ * Return the video subtitle tracks
+ *
+ * It includes the disabled fake track at index 0.
+ */
 - (NSArray *)videoSubTitles;
 
 /**
@@ -196,7 +202,20 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (NSArray *)titles;
 
 /* Audio Options */
+
+/**
+ * Return the current audio track index
+ * \return 0 if none is set.
+ *
+ * Pass 0 to disable.
+ */
 @property (readwrite) NSUInteger currentAudioTrackIndex;
+
+/**
+ * Return the audio tracks
+ *
+ * It includes the "Disable" fake track at index 0.
+ */
 - (NSArray *)audioTracks;
 
 - (void)setAudioChannel:(int)value;
