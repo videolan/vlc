@@ -213,7 +213,7 @@ VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *, libvlc_e
  * - (void)leaveFullscreen;
  * 
  * - (BOOL)stretchesVideo;
- * - (void)setOnTop: (BOOL)ontop; /* Do we really want that in protocol? */
+ * - (void)setOnTop: (BOOL)ontop; // Do we really want that in protocol? 
  * @end
  * 
  * You can find a live example in VLCVideoView in VLCKit.framework.
