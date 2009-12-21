@@ -105,11 +105,6 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 
 - (void)setVideoAspectRatio:(char *)value;
 - (char *)videoAspectRatio;
-- (void)setVideoSubTitles:(int)value;
-- (int)countOfVideoSubTitles;
-- (BOOL)openVideoSubTitlesFromFile:(NSString *)path;
-- (int)currentVideoSubTitles;
-- (NSArray *)videoSubTitles;
 
 - (void)setVideoCropGeometry:(char *)value;
 - (char *)videoCropGeometry;
@@ -161,20 +156,47 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 @property (readonly) VLCTime *remainingTime;
 @property (readonly) int fps;
 
-- (void)setChapter:(int)value;
-- (int)currentChapter;
-- (int)countOfChapters;
-- (NSArray *)chaptersForTitle:(int)title;
+/**
+ * Return the current video subtitle index, or
+ * \return NSNotFound if none is set.
+ *
+ * To disable subtitle pass NSNotFound.
+ */
+@property (readwrite) NSUInteger currentVideoSubTitleIndex;
+- (NSArray *)videoSubTitles;
 
-- (void)setCurrentTitle:(int)value;
-- (int)currentTitle;
-- (int)countOfTitles;
+/**
+ * Load and set a specific video subtitle, from a file.
+ * \param path to a file
+ * \return if the call succeed..
+ */
+- (BOOL)openVideoSubTitlesFromFile:(NSString *)path;
+
+/**
+ * Chapter selection and enumeration, it is bound
+ * to a title option.
+ */
+
+/**
+ * Return the current video subtitle index, or
+ * \return NSNotFound if none is set.
+ *
+ * To disable subtitle pass NSNotFound.
+ */
+@property (readwrite) NSUInteger currentChapterIndex;
+- (void)previousChapter;
+- (void)nextChapter;
+- (NSArray *)chaptersForTitleIndex:(NSUInteger)titleIndex;
+
+/**
+ * Title selection and enumeration
+ * \return NSNotFound if none is set.
+ */
+@property (readwrite) NSUInteger currentTitleIndex;
 - (NSArray *)titles;
 
 /* Audio Options */
-- (void)setAudioTrack:(int)value;
-- (int)currentAudioTrack;
-- (int)countOfAudioTracks;
+@property (readwrite) NSUInteger currentAudioTrackIndex;
 - (NSArray *)audioTracks;
 
 - (void)setAudioChannel:(int)value;

@@ -258,45 +258,26 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     return [[VLCLibrary sharedLibrary] audio];
 }
 
-- (void)setVideoAspectRatio:(char *)value
+#pragma mark -
+#pragma mark Subtitles
+
+- (void)setCurrentVideoSubTitleIndex:(NSUInteger)index
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    libvlc_video_set_aspect_ratio( instance, value, &ex );
+    libvlc_video_set_spu( instance, (int)index, &ex );
     catch_exception( &ex );
 }
 
-- (char *)videoAspectRatio
+- (NSUInteger)currentVideoSubTitleIndex
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    char * result = libvlc_video_get_aspect_ratio( instance, &ex );
+    int count = libvlc_video_get_spu_count( instance, &ex );
     catch_exception( &ex );
-    return result;
-}
-
-- (void)setVideoSubTitles:(int)value
-{
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_video_set_spu( instance, value, &ex );
-    catch_exception( &ex );
-}
-
-- (int)countOfVideoSubTitles
-{
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    int result = libvlc_video_get_spu_count( instance, &ex );
-    catch_exception( &ex );
-    return result;
-}
-
-- (int)currentVideoSubTitles
-{
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    int result = libvlc_video_get_spu( instance, &ex );
+    if (count <= 0)
+        return NSNotFound;
+    NSUInteger result = libvlc_video_get_spu( instance, &ex );
     catch_exception( &ex );
     return result;
 }
@@ -314,16 +295,23 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
+    int count = libvlc_video_get_spu_count( instance, &ex );
+    catch_exception( &ex );
+
     libvlc_track_description_t *tracks = libvlc_video_get_spu_description( instance, &ex );
     NSMutableArray *tempArray = [NSMutableArray array];
     NSInteger i;
-    for (i = 0; i < [self countOfVideoSubTitles] ; i++)
+    for (i = 0; i < count; i++)
     {
         [tempArray addObject:[NSString stringWithUTF8String: tracks->psz_name]];
         tracks = tracks->p_next;
     }
     return [NSArray arrayWithArray: tempArray];
 }
+
+
+#pragma mark -
+#pragma mark Video Crop geometry
 
 - (void)setVideoCropGeometry:(char *)value
 {
@@ -338,6 +326,23 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     char * result = libvlc_video_get_crop_geometry( instance, &ex );
+    catch_exception( &ex );
+    return result;
+}
+
+- (void)setVideoAspectRatio:(char *)value
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    libvlc_video_set_aspect_ratio( instance, value, &ex );
+    catch_exception( &ex );
+}
+
+- (char *)videoAspectRatio
+{
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
+    char * result = libvlc_video_get_aspect_ratio( instance, &ex );
     catch_exception( &ex );
     return result;
 }
@@ -458,7 +463,9 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     return result;
 }
 
-- (void)setChapter:(int)value;
+#pragma mark -
+#pragma mark Chapters
+- (void)setCurrentChapterIndex:(NSUInteger)value;
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
@@ -466,20 +473,15 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     catch_exception( &ex );
 }
 
-- (int)currentChapter
+- (NSUInteger)currentChapterIndex
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int result = libvlc_media_player_get_chapter( instance, &ex );
+    int count = libvlc_media_player_get_chapter_count( instance, &ex );
     catch_exception( &ex );
-    return result;
-}
-
-- (int)countOfChapters
-{
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    int result = libvlc_media_player_get_chapter_count( instance, &ex );
+    if (count <= 0)
+        return NSNotFound;
+    NSUInteger result = libvlc_media_player_get_chapter( instance, &ex );
     catch_exception( &ex );
     return result;
 }
@@ -500,14 +502,18 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     catch_exception( &ex );
 }
 
-- (NSArray *)chaptersForTitle:(int)title
+- (NSArray *)chaptersForTitleIndex:(NSUInteger)title
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
+    int count = libvlc_media_player_get_chapter_count(instance, &ex);
+    if (count <= 0)
+        return [NSArray array];
+
     libvlc_track_description_t *tracks = libvlc_video_get_chapter_description( instance, title, &ex );
     NSMutableArray *tempArray = [NSMutableArray array];
     NSInteger i;
-    for (i = 0; i < [self countOfChapters] ; i++)
+    for (i = 0; i < count ; i++)
     {
         [tempArray addObject:[NSString stringWithUTF8String: tracks->psz_name]];
         tracks = tracks->p_next;
@@ -515,19 +521,28 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     return [NSArray arrayWithArray: tempArray];
 }
 
-- (void)setCurrentTitle:(int)value
+#pragma mark -
+#pragma mark Titles
+
+- (void)setCurrentTitleIndex:(NSUInteger)value
 {
     libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
+    libvlc_exception_init( &ex );    
     libvlc_media_player_set_title( instance, value, &ex );
     catch_exception( &ex );
 }
 
-- (int)currentTitle
+- (NSUInteger)currentTitleIndex
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int result = libvlc_media_player_get_title( instance, &ex );
+
+    int count = libvlc_media_player_get_title_count( instance, &ex );
+    catch_exception( &ex );
+    if (count <= 0)
+        return NSNotFound;
+    
+    NSUInteger result = libvlc_media_player_get_title( instance, &ex );
     catch_exception( &ex );
     return result;
 }
@@ -556,28 +571,26 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
     return [NSArray arrayWithArray: tempArray];
 }
 
-- (void)setAudioTrack:(int)value
+#pragma mark -
+#pragma mark Audio tracks
+- (void)setCurrentAudioTrackIndex:(NSUInteger)value
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    libvlc_audio_set_track( instance, value, &ex );
+    libvlc_audio_set_track( instance, (int)value, &ex );
     catch_exception( &ex );
 }
 
-- (int)currentAudioTrack
+- (NSUInteger)currentAudioTrackIndex
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int result = libvlc_audio_get_track( instance, &ex );
+    int count = libvlc_audio_get_track_count( instance, &ex );
     catch_exception( &ex );
-    return result;
-}
-
-- (int)countOfAudioTracks
-{
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    int result = libvlc_audio_get_track_count( instance, &ex );
+    if (count <= 0)
+        return NSNotFound;
+    
+    NSUInteger result = libvlc_audio_get_track( instance, &ex );
     catch_exception( &ex );
     return result;
 }
@@ -586,10 +599,15 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
+    int count = libvlc_audio_get_track_count( instance, &ex );
+    catch_exception( &ex );
+    if (count <= 0)
+        return [NSArray array];
+
     libvlc_track_description_t *tracks = libvlc_audio_get_track_description( instance, &ex );
     NSMutableArray *tempArray = [NSMutableArray array];
     NSInteger i;
-    for (i = 0; i < [self countOfAudioTracks] ; i++)
+    for (i = 0; i < count ; i++)
     {
         [tempArray addObject:[NSString stringWithUTF8String: tracks->psz_name]];
         tracks = tracks->p_next;
