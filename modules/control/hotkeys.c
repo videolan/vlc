@@ -719,31 +719,24 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             else if( i_action == ACTIONID_RATE_FASTER_FINE ||
                      i_action == ACTIONID_RATE_SLOWER_FINE )
             {
-                /* The playback rate is defined by INPUT_RATE_DEFAULT / "rate"
-                 * and we want to increase/decrease it by 0.1 while making sure
-                 * that the resulting playback rate is a multiple of 0.1
-                 */
-                int i_rate = 1. * INPUT_RATE_DEFAULT
-                             / var_GetFloat( p_input, "rate" );
-                if( i_rate < INPUT_RATE_MIN )
-                    i_rate = INPUT_RATE_MIN;
-                else if( i_rate > INPUT_RATE_MAX )
-                    i_rate = INPUT_RATE_MAX;
-                int i_sign = i_rate < 0 ? -1 : 1;
+                const double f_rate_min = (double)INPUT_RATE_DEFAULT / INPUT_RATE_MAX;
+                const double f_rate_max = (double)INPUT_RATE_DEFAULT / INPUT_RATE_MIN;
+                double f_rate = var_GetFloat( p_input, "rate" );
+
+                int i_sign = f_rate < 0 ? -1 : 1;
                 const int i_dir = i_action == ACTIONID_RATE_FASTER_FINE ? 1 : -1;
 
-                const double f_speed = floor( ( (double)INPUT_RATE_DEFAULT / abs(i_rate) + 0.05 ) / 0.1 + i_dir ) * 0.1;
-                if( f_speed <= (double)INPUT_RATE_DEFAULT / INPUT_RATE_MAX ) /* Needed to avoid infinity */
-                    i_rate = INPUT_RATE_MAX;
-                else
-                    i_rate = INPUT_RATE_DEFAULT / f_speed + 0.5;
+                f_rate = floor( fabs(f_rate) / 0.1 + i_dir ) * 0.1;
+                if( f_rate < f_rate_min )
+                    f_rate = f_rate_min;
+                else if( f_rate > f_rate_max )
+                    f_rate = f_rate_max;
+                f_rate *= i_sign;
 
-                i_rate = i_sign * __MIN( __MAX( i_rate, INPUT_RATE_MIN ), INPUT_RATE_MAX );
-
-                var_SetFloat( p_input, "rate", i_rate );
+                var_SetFloat( p_input, "rate", f_rate );
 
                 char psz_msg[7+1];
-                snprintf( psz_msg, sizeof(psz_msg), _("%.2fx"), (double)INPUT_RATE_DEFAULT / i_rate );
+                snprintf( psz_msg, sizeof(psz_msg), _("%.2fx"), f_rate );
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, "%s", psz_msg );
             }
             else if( i_action == ACTIONID_POSITION && b_seekable )
