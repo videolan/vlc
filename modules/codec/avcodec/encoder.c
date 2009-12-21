@@ -433,7 +433,10 @@ int OpenEncoder( vlc_object_t *p_this )
                    p_enc->fmt_in.video.i_sar_num,
                    p_enc->fmt_in.video.i_sar_den, 1 << 30 );
 
-        p_sys->i_buffer_out = p_context->height * p_context->width * 3;
+        p_sys->i_buffer_out = p_context->height * p_context->width
+            * 3     /* Assume 24bpp maximum */
+            + 200;  /* some room for potential headers (such as BMP) */
+
         if( p_sys->i_buffer_out < FF_MIN_BUFFER_SIZE )
             p_sys->i_buffer_out = FF_MIN_BUFFER_SIZE;
         p_sys->p_buffer_out = malloc( p_sys->i_buffer_out );
