@@ -515,23 +515,16 @@ static int Direct3DFillPresentationParameters(vout_display_t *vd)
     d3dpp->Flags                  = D3DPRESENTFLAG_VIDEO;
     d3dpp->Windowed               = TRUE;
     d3dpp->hDeviceWindow          = vd->sys->hvideownd;
-    d3dpp->BackBufferWidth        = d3ddm.Width;
-    d3dpp->BackBufferHeight       = d3ddm.Height;
+    d3dpp->BackBufferWidth        = __MAX(GetSystemMetrics(SM_CXVIRTUALSCREEN),
+                                          d3ddm.Width);
+    d3dpp->BackBufferHeight       = __MAX(GetSystemMetrics(SM_CYVIRTUALSCREEN),
+                                          d3ddm.Height);
     d3dpp->SwapEffect             = D3DSWAPEFFECT_COPY;
     d3dpp->MultiSampleType        = D3DMULTISAMPLE_NONE;
     d3dpp->PresentationInterval   = D3DPRESENT_INTERVAL_DEFAULT;
     d3dpp->BackBufferFormat       = d3ddm.Format;
     d3dpp->BackBufferCount        = 1;
     d3dpp->EnableAutoDepthStencil = FALSE;
-
-    const unsigned adapter_count = IDirect3D9_GetAdapterCount(sys->d3dobj);
-    for (unsigned i = 1; i < adapter_count; i++) {
-        hr = IDirect3D9_GetAdapterDisplayMode(sys->d3dobj, i, &d3ddm);
-        if (FAILED(hr))
-            continue;
-        d3dpp->BackBufferWidth  = __MAX(d3dpp->BackBufferWidth,  d3ddm.Width);
-        d3dpp->BackBufferHeight = __MAX(d3dpp->BackBufferHeight, d3ddm.Height);
-    }
 
     /* */
     RECT *display = &vd->sys->rect_display;
