@@ -35,6 +35,7 @@
 static int OpenV4L (vlc_object_t *);
 static int OpenDisc (vlc_object_t *);
 static void Close (vlc_object_t *);
+static int vlc_sd_probe_Open (vlc_object_t *);
 
 /*
  * Module descriptor
@@ -57,7 +58,28 @@ vlc_module_begin ()
     set_callbacks (OpenDisc, Close)
     add_shortcut ("disc")
 
+    VLC_SD_PROBE_SUBMODULE
+
 vlc_module_end ()
+
+static int vlc_sd_probe_Open (vlc_object_t *obj)
+{
+    vlc_probe_t *probe = (vlc_probe_t *)obj;
+
+    struct udev *udev = udev_new ();
+    if (udev == NULL)
+        return VLC_EGENERIC;
+
+    struct udev_monitor *mon = udev_monitor_new_from_netlink (udev, "udev");
+    if (mon != NULL)
+    {
+        vlc_sd_probe_Add (probe, "v4l", N_("Capture devices"));
+        vlc_sd_probe_Add (probe, "disc", N_("Discs"));
+        udev_monitor_unref (mon);
+    }
+    udev_unref (udev);
+    return VLC_PROBE_CONTINUE;
+}
 
 struct device
 {
