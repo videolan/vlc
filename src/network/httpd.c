@@ -577,8 +577,8 @@ httpd_HandlerCallBack( httpd_callback_sys_t *p_sys, httpd_client_t *cl,
         {
             /* Apache-style */
             i_status = strtol( (char *)&answer->p_body[8], &psz_headers, 0 );
-            if( *psz_headers ) psz_headers++;
-            if( *psz_headers ) psz_headers++;
+            if( *psz_headers == '\r' || *psz_headers == '\n' ) psz_headers++;
+            if( *psz_headers == '\n' ) psz_headers++;
             i_headers = answer->i_body - (psz_headers - (char *)answer->p_body);
         }
         else
