@@ -1,7 +1,7 @@
 --[==========================================================================[
  http.lua: HTTP interface module for VLC
 --[==========================================================================[
- Copyright (C) 2007 the VideoLAN team
+ Copyright (C) 2007-2009 the VideoLAN team
  $Id$
 
  Authors: Antoine Cellerier <dionoea at videolan dot org>
@@ -158,7 +158,8 @@ Content-Length: ]]..size..[[
 
     local ok, content = pcall(art, data, request)
     if not ok then
-        return [[Content-Type: text/plain
+        return [[Status: 404
+Content-Type: text/plain
 Content-Length: 5
 
 Error
