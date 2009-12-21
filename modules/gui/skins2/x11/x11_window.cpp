@@ -54,9 +54,13 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
         attr.event_mask = ExposureMask | StructureNotifyMask;
         attr.background_pixel = BlackPixel( XDISPLAY, i_screen );
         attr.backing_store = Always;
-        attr.override_redirect = True;
-        valuemask = CWBackingStore | CWOverrideRedirect |
-                    CWBackPixel | CWEventMask;
+        valuemask = CWBackingStore | CWBackPixel | CWEventMask;
+
+        if( NET_WM_STATE_FULLSCREEN == None )
+        {
+            attr.override_redirect = True;
+            valuemask = valuemask | CWOverrideRedirect;
+        }
 
         name_type = "Fullscreen";
     }
@@ -177,10 +181,10 @@ void X11Window::reparent( void* OSHandle, int x, int y, int w, int h )
     Window new_parent =
            OSHandle ? (Window) OSHandle : DefaultRootWindow( XDISPLAY );
 
+    XReparentWindow( XDISPLAY, m_wnd, new_parent, x, y);
     if( w && h )
         XResizeWindow( XDISPLAY, m_wnd, w, h );
 
-    XReparentWindow( XDISPLAY, m_wnd, new_parent, x, y);
     m_wnd_parent = new_parent;
 }
 
@@ -192,6 +196,12 @@ void X11Window::show() const
     {
        XLowerWindow( XDISPLAY, m_wnd );
        XMapWindow( XDISPLAY, m_wnd );
+    }
+    else if( m_type == GenericWindow::FullscreenWindow )
+    {
+        XMapRaised( XDISPLAY, m_wnd );
+        setFullscreen();
+        // toggleOnTop( true );
     }
     else
     {
@@ -205,7 +215,6 @@ void X11Window::hide() const
     // Unmap the window
     XUnmapWindow( XDISPLAY, m_wnd );
 }
-
 
 void X11Window::moveResize( int left, int top, int width, int height ) const
 {
@@ -224,96 +233,80 @@ void X11Window::raise() const
 
 void X11Window::setOpacity( uint8_t value ) const
 {
-    Atom opaq = XInternAtom(XDISPLAY, "_NET_WM_WINDOW_OPACITY", False);
+    if( NET_WM_WINDOW_OPACITY == None )
+        return;
+
     if( 255==value )
-        XDeleteProperty(XDISPLAY, m_wnd, opaq);
+        XDeleteProperty(XDISPLAY, m_wnd, NET_WM_WINDOW_OPACITY);
     else
     {
         uint32_t opacity = value * ((uint32_t)-1/255);
-        XChangeProperty(XDISPLAY, m_wnd, opaq, XA_CARDINAL, 32,
+        XChangeProperty(XDISPLAY, m_wnd, NET_WM_WINDOW_OPACITY, XA_CARDINAL, 32,
                         PropModeReplace, (unsigned char *) &opacity, 1L);
     }
     XSync( XDISPLAY, False );
 }
 
 
+void X11Window::setFullscreen( ) const
+{
+    if( NET_WM_STATE_FULLSCREEN != None )
+    {
+        XClientMessageEvent event;
+        memset( &event, 0, sizeof( XClientMessageEvent ) );
+
+        event.type = ClientMessage;
+        event.message_type = NET_WM_STATE;
+        event.display = XDISPLAY;
+        event.window = m_wnd;
+        event.format = 32;
+        event.data.l[ 0 ] = 1;
+        event.data.l[ 1 ] = NET_WM_STATE_FULLSCREEN;
+ 
+        XSendEvent( XDISPLAY,
+                    DefaultRootWindow( XDISPLAY ),
+                    False, SubstructureNotifyMask|SubstructureRedirectMask,
+                    (XEvent*)&event );
+    }
+}
+
+
 void X11Window::toggleOnTop( bool onTop ) const
 {
-    int i_ret, i_format;
-    unsigned long i, i_items, i_bytesafter;
-    Atom net_wm_supported, net_wm_state, net_wm_state_on_top,net_wm_state_above;
-    union { Atom *p_atom; unsigned char *p_char; } p_args;
-
-    p_args.p_atom = NULL;
-
-    net_wm_supported = XInternAtom( XDISPLAY, "_NET_SUPPORTED", False );
-
-    i_ret = XGetWindowProperty( XDISPLAY, DefaultRootWindow( XDISPLAY ),
-                                net_wm_supported,
-                                0, 16384, False, AnyPropertyType,
-                                &net_wm_supported,
-                                &i_format, &i_items, &i_bytesafter,
-                                (unsigned char **)&p_args );
-
-    if( i_ret != Success || i_items == 0 ) return; /* Not supported */
-
-    net_wm_state = XInternAtom( XDISPLAY, "_NET_WM_STATE", False );
-    net_wm_state_on_top = XInternAtom( XDISPLAY, "_NET_WM_STATE_STAYS_ON_TOP",
-                                       False );
-
-    for( i = 0; i < i_items; i++ )
+    if( NET_WM_STAYS_ON_TOP != None )
     {
-        if( p_args.p_atom[i] == net_wm_state_on_top ) break;
-    }
-
-    if( i == i_items )
-    { /* use _NET_WM_STATE_ABOVE if window manager
-       * doesn't handle _NET_WM_STATE_STAYS_ON_TOP */
-
-        net_wm_state_above = XInternAtom( XDISPLAY, "_NET_WM_STATE_ABOVE",
-                                          False);
-        for( i = 0; i < i_items; i++ )
-        {
-            if( p_args.p_atom[i] == net_wm_state_above ) break;
-        }
- 
-        XFree( p_args.p_atom );
-        if( i == i_items )
-            return; /* Not supported */
-
         /* Switch "on top" status */
         XClientMessageEvent event;
         memset( &event, 0, sizeof( XClientMessageEvent ) );
 
         event.type = ClientMessage;
-        event.message_type = net_wm_state;
+        event.message_type = NET_WM_STATE;
         event.display = XDISPLAY;
         event.window = m_wnd;
         event.format = 32;
         event.data.l[ 0 ] = onTop; /* set property */
-        event.data.l[ 1 ] = net_wm_state_above;
+        event.data.l[ 1 ] = NET_WM_STAYS_ON_TOP;
 
         XSendEvent( XDISPLAY, DefaultRootWindow( XDISPLAY ),
-                    False, SubstructureRedirectMask, (XEvent*)&event );
-        return;
+                    False, SubstructureNotifyMask|SubstructureRedirectMask, (XEvent*)&event );
     }
+    else if( NET_WM_STATE_ABOVE != None )
+    {
+        /* Switch "above" state */
+        XClientMessageEvent event;
+        memset( &event, 0, sizeof( XClientMessageEvent ) );
 
-    XFree( p_args.p_atom );
+        event.type = ClientMessage;
+        event.message_type = NET_WM_STATE;
+        event.display = XDISPLAY;
+        event.window = m_wnd;
+        event.format = 32;
+        event.data.l[ 0 ] = onTop; /* set property */
+        event.data.l[ 1 ] = NET_WM_STATE_ABOVE;
 
-    /* Switch "on top" status */
-    XClientMessageEvent event;
-    memset( &event, 0, sizeof( XClientMessageEvent ) );
-
-    event.type = ClientMessage;
-    event.message_type = net_wm_state;
-    event.display = XDISPLAY;
-    event.window = m_wnd;
-    event.format = 32;
-    event.data.l[ 0 ] = onTop; /* set property */
-    event.data.l[ 1 ] = net_wm_state_on_top;
-
-    XSendEvent( XDISPLAY, DefaultRootWindow( XDISPLAY ),
-                False, SubstructureRedirectMask, (XEvent*)&event );
+        XSendEvent( XDISPLAY, DefaultRootWindow( XDISPLAY ),
+                    False, SubstructureNotifyMask|SubstructureRedirectMask, (XEvent*)&event );
+    }
 }
 
 #endif

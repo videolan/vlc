@@ -26,7 +26,7 @@
 #define X11_DISPLAY_HPP
 
 #include <X11/Xlib.h>
-
+#include <X11/Xatom.h>
 #include "../src/skin_common.hpp"
 
 // Helper macros
@@ -34,6 +34,14 @@
 #define XVISUAL m_rDisplay.getVisual()
 #define XPIXELSIZE m_rDisplay.getPixelSize()
 #define XGC m_rDisplay.getGC()
+
+#define NET_WM_SUPPORTED          m_rDisplay.m_net_wm_supported
+#define NET_WM_STATE              m_rDisplay.m_net_wm_state
+#define NET_WM_STATE_FULLSCREEN   m_rDisplay.m_net_wm_state_fullscreen
+#define NET_WM_STATE_ABOVE        m_rDisplay.m_net_wm_state_above
+
+#define NET_WM_STAYS_ON_TOP       m_rDisplay.m_net_wm_stays_on_top
+#define NET_WM_WINDOW_OPACITY     m_rDisplay.m_net_wm_window_opacity
 
 
 /// Class for encapsulation of a X11 Display
@@ -75,7 +83,19 @@ public:
     Window getMainWindow() const { return m_mainWindow; }
 
     //XXX
-    Window m_voutWindow;
+    ///Window m_voutWindow;
+
+    /// EWMH spec
+    Atom m_net_wm_supported;
+    Atom m_net_wm_state;
+    Atom m_net_wm_state_above;
+    Atom m_net_wm_state_fullscreen;
+
+    Atom m_net_wm_stays_on_top;
+    Atom m_net_wm_window_opacity;
+
+    /// test EWMH capabilities
+    void testEWMH();
 
 private:
     /// Dummy parent window for the task bar
@@ -140,6 +160,7 @@ private:
     /// 24/32 bpp LSB first version of putPixel
     void putPixel32LSB( uint8_t *pPixel, uint8_t r, uint8_t g, uint8_t b,
                         uint8_t a ) const;
+
 };
 
 #endif

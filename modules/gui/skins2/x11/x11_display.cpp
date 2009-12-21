@@ -240,6 +240,9 @@ X11Display::X11Display( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
         // Move it outside the screen to avoid seeing it in workspace selector
         XMoveWindow( m_pDisplay, m_mainWindow, -10, -10 );
+
+        // test EWMH capabilities
+        testEWMH();
     }
 }
 
@@ -250,6 +253,59 @@ X11Display::~X11Display()
     if( m_gc )         XFreeGC( m_pDisplay, m_gc );
     if( m_colormap )   XFreeColormap( m_pDisplay, m_colormap );
     if( m_pDisplay )   XCloseDisplay( m_pDisplay );
+}
+
+
+void X11Display::testEWMH()
+{
+    int i_ret, i_format;
+    unsigned long i_items, i_bytesafter;
+    union { Atom *p_atom; unsigned char *p_char; } p_args;
+    p_args.p_atom = NULL;
+
+    m_net_wm_supported = XInternAtom( m_pDisplay, "_NET_SUPPORTED", False );
+    msg_Dbg( getIntf(), "EWMH: supported %d", m_net_wm_supported != None ? 1 : 0 );
+    if( m_net_wm_supported == None )
+        return;
+
+    i_ret = XGetWindowProperty( m_pDisplay, DefaultRootWindow( m_pDisplay ),
+                                m_net_wm_supported,
+                                0, 16384, False, AnyPropertyType,
+                                &m_net_wm_supported,
+                                &i_format, &i_items, &i_bytesafter,
+                                (unsigned char **)&p_args );
+
+    if( i_ret != Success || i_items == 0 )
+        return; /* Not supported */
+
+#define TEST_EWMH( name, value ) \
+{\
+    name = XInternAtom( m_pDisplay, value, False );\
+    int i;\
+    for( i = 0; i < i_items; i++ )\
+    {\
+        if( p_args.p_atom[i] == name ) break;\
+    }\
+    if( i == i_items )\
+    {\
+        msg_Dbg( getIntf(), "%s support: no", value );\
+        name = None;\
+    }\
+    else\
+        msg_Dbg( getIntf(), "%s support: yes", value );\
+}
+
+    TEST_EWMH( m_net_wm_state, "_NET_WM_STATE" )
+    TEST_EWMH( m_net_wm_state_fullscreen, "_NET_WM_STATE_FULLSCREEN" )
+    TEST_EWMH( m_net_wm_stays_on_top, "_NET_WM_STATE_STAYS_ON_TOP" )
+    TEST_EWMH( m_net_wm_state_above, "_NET_WM_STATE_ABOVE" )
+
+    TEST_EWMH( m_net_wm_window_opacity, "_NET_WM_WINDOW_OPACITY" )
+
+#undef TEST_EWMH
+
+    XFree( p_args.p_atom );
+
 }
 
 

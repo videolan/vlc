@@ -26,6 +26,7 @@
 #define X11_WINDOW_HPP
 
 #include <X11/Xlib.h>
+#include <X11/Xatom.h>
 
 #include "../src/generic_window.hpp"
 #include "../src/os_window.hpp"
@@ -74,6 +75,8 @@ public:
 
     /// reparent the window
     void reparent( void* OSHandle, int x, int y, int w, int h );
+
+    void setFullscreen() const;
 
 private:
     /// X11 display
