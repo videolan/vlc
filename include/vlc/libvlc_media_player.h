@@ -200,19 +200,35 @@ VLC_PUBLIC_API void libvlc_media_player_pause ( libvlc_media_player_t *, libvlc_
 VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
- * Set the agl handler where the media player should render its video output.
+ * Set the NSView handler where the media player should render its video output.
  *
+ * The object minimal_macosx expects is of kind NSObject and should
+ * respect the protocol:
+ * 
+ * @protocol VLCOpenGLVoutEmbedding
+ * - (void)addVoutSubview:(NSView *)view;
+ * - (void)removeVoutSubview:(NSView *)view;
+ * 
+ * - (void)enterFullscreen;
+ * - (void)leaveFullscreen;
+ * 
+ * - (BOOL)stretchesVideo;
+ * - (void)setOnTop: (BOOL)ontop; /* Do we really want that in protocol? */
+ * @end
+ * 
+ * You can find a live example in VLCVideoView in VLCKit.framework.
+ * 
  * \param p_mi the Media Player
- * \param drawable the agl handler
+ * \param drawable the NSView handler
  * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_mi, void * drawable, libvlc_exception_t *p_e );
 
 /**
- * Get the agl handler previously set with libvlc_media_player_set_agl().
+ * Get the NSView handler previously set with libvlc_media_player_set_nsobject().
  *
  * \param p_mi the Media Player
- * \return the agl handler or 0 if none where set
+ * \return the NSView handler or 0 if none where set
  */
 VLC_PUBLIC_API void * libvlc_media_player_get_nsobject ( libvlc_media_player_t *p_mi );
 	
