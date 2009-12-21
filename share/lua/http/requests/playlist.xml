@@ -30,14 +30,14 @@ vim:syntax=lua
 function print_playlist(item)
   if item.flags.disabled then return end
   if item.children then
-    local name = vlc.strings.convert_xml_special_chars(item.name)
+    local name = vlc.strings.convert_xml_special_chars(item.name or "")
     print("<node id=\""..tostring(item.id).."\" name=\""..name.."\" ro=\""..(item.flags.ro and "ro" or "rw").."\">")
     for _, c in ipairs(item.children) do
       print_playlist(c)
     end
     print("</node>")
   else
-    local name, path = vlc.strings.convert_xml_special_chars(item.name,item.path or "")
+    local name, path = vlc.strings.convert_xml_special_chars(item.name or "",item.path or "")
     print("<leaf id='"..tostring(item.id).."' uri='"..path.."' name='"..name.."' ro='"..(item.flags.ro and "ro" or "rw").."' duration='"..tostring(item.duration).."'/>")
   end
 end
