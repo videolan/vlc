@@ -302,7 +302,9 @@ noinst_HEADERS = \
 	util/qvlcframe.hpp \
 	util/qvlcapp.hpp \
 	util/qt_dirs.hpp \
-	util/registry.hpp
+	util/registry.hpp \
+	util/singleton.hpp
+
 
 EXTRA_DIST += \
 	vlc.qrc \
