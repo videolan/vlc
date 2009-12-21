@@ -25,29 +25,23 @@
 #define QVLC_ERRORS_DIALOG_H_ 1
 
 #include "util/qvlcframe.hpp"
+#include "util/singleton.hpp"
 
 class QPushButton;
 class QCheckBox;
 class QGridLayout;
 class QTextEdit;
 
-class ErrorsDialog : public QVLCDialog
+class ErrorsDialog : public QVLCDialog, public Singleton<ErrorsDialog>
 {
     Q_OBJECT;
 public:
-    static ErrorsDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance)
-            instance = new ErrorsDialog( (QWidget *)p_intf->p_sys->p_mi, p_intf );
-        return instance;
-    }
-    virtual ~ErrorsDialog() {};
 
     void addError( const QString&, const QString& );
     /*void addWarning( QString, QString );*/
 private:
-    ErrorsDialog( QWidget *parent, intf_thread_t * );
-    static ErrorsDialog *instance;
+    virtual ~ErrorsDialog() {};
+    ErrorsDialog( intf_thread_t * );
     void add( bool, const QString&, const QString& );
 
     QCheckBox *stopShowing;
@@ -56,6 +50,8 @@ private slots:
     void close();
     void clear();
     void dontShow();
+
+    friend class    Singleton<ErrorsDialog>;
 };
 
 #endif

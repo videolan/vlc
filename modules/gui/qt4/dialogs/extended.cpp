@@ -33,8 +33,6 @@
 #include <QTabWidget>
 #include <QGridLayout>
 
-ExtendedDialog *ExtendedDialog::instance = NULL;
-
 ExtendedDialog::ExtendedDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
     setWindowFlags( Qt::Tool );

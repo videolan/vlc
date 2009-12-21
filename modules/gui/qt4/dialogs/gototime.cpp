@@ -34,10 +34,8 @@
 #include <QGroupBox>
 #include <QDialogButtonBox>
 
-GotoTimeDialog *GotoTimeDialog::instance = NULL;
-
-GotoTimeDialog::GotoTimeDialog( QWidget *parent, intf_thread_t *_p_intf)
-               : QVLCDialog( parent, _p_intf )
+GotoTimeDialog::GotoTimeDialog( intf_thread_t *_p_intf)
+               : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
 {
     setWindowFlags( Qt::Tool );
     setWindowTitle( qtr( "Go to Time" ) );

@@ -47,8 +47,6 @@
 
 #include <assert.h>
 
-HelpDialog *HelpDialog::instance = NULL;
-
 HelpDialog::HelpDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 
 {
@@ -80,10 +78,8 @@ void HelpDialog::close()
     toggleVisible();
 }
 
-AboutDialog *AboutDialog::instance = NULL;
-
-AboutDialog::AboutDialog( QWidget *parent, intf_thread_t *_p_intf)
-            : QVLCDialog( parent, _p_intf )
+AboutDialog::AboutDialog( intf_thread_t *_p_intf)
+            : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
 {
     setWindowTitle( qtr( "About" ) );
     setWindowRole( "vlc-about" );
@@ -197,8 +193,6 @@ static void UpdateCallback( void *data, bool b_ret )
 
     QApplication::postEvent( UDialog, event );
 }
-
-UpdateDialog *UpdateDialog::instance = NULL;
 
 UpdateDialog::UpdateDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {

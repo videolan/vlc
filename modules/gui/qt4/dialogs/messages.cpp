@@ -41,8 +41,6 @@
 
 #include <assert.h>
 
-MessagesDialog *MessagesDialog::instance = NULL;
-
 enum {
     MsgEvent_Type = QEvent::User + MsgEventType + 1,
 };

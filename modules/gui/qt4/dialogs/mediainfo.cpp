@@ -34,8 +34,6 @@
 #include <QLineEdit>
 #include <QLabel>
 
-MediaInfoDialog *MediaInfoDialog::instance = NULL;
-
 /* This Dialog has two main modes:
     - General Mode that shows the current Played item, and the stats
     - Single mode that shows the info on ONE SINGLE Item on the playlist

@@ -53,6 +53,7 @@
 #include "dialogs/toolbar.hpp"
 #include "dialogs/plugins.hpp"
 #include "dialogs/external.hpp"
+#include "dialogs/errors.hpp"
 
 #include <QEvent>
 #include <QApplication>
@@ -452,8 +453,7 @@ void DialogsProvider::simpleMLAppendDialog()
  **/
 void DialogsProvider::openUrlDialog()
 {
-    OpenUrlDialog *oud = OpenUrlDialog::getInstance( p_intf->p_sys->p_mi,
-                                                     p_intf );
+    OpenUrlDialog *oud = OpenUrlDialog::getInstance( p_intf );
     if( oud->exec() == QDialog::Accepted )
     {
         QString url = oud->url();

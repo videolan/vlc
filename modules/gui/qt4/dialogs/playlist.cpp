@@ -33,8 +33,6 @@
 #include <QUrl>
 #include <QHBoxLayout>
 
-PlaylistDialog *PlaylistDialog::instance = NULL;
-
 PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
                 : QVLCMW( _p_intf )
 {

@@ -26,28 +26,23 @@
 
 #include "util/qvlcframe.hpp"
 #include "ui/podcast_configuration.h"
+#include "util/singleton.hpp"
 
-class PodcastConfigDialog : public QVLCDialog
+class PodcastConfigDialog : public QVLCDialog, public Singleton<PodcastConfigDialog>
 {
     Q_OBJECT;
-public:
-    static PodcastConfigDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance )
-            instance = new PodcastConfigDialog( (QWidget *)p_intf->p_sys->p_mi,
-                                                p_intf );
-        return instance;
-    }
-    virtual ~PodcastConfigDialog();
 
 private:
-    PodcastConfigDialog( QWidget *, intf_thread_t * );
-    static PodcastConfigDialog *instance;
+    PodcastConfigDialog( intf_thread_t * );
+    virtual ~PodcastConfigDialog();
+
     Ui::PodcastConfiguration ui;
 public slots:
     void accept();
     void add();
     void remove();
+
+    friend class    Singleton<PodcastConfigDialog>;
 };
 
 #endif

@@ -27,31 +27,19 @@
 #include "util/qvlcframe.hpp"
 
 #include "components/extended_panels.hpp"
+#include "util/singleton.hpp"
 
 class QTabWidget;
 
-class ExtendedDialog : public QVLCFrame
+class ExtendedDialog : public QVLCFrame, public Singleton<ExtendedDialog>
 {
     Q_OBJECT;
 public:
-    static ExtendedDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance)
-            instance = new ExtendedDialog( p_intf );
-        return instance;
-    }
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
     void showTab( int i );
     int currentTab();
 private:
     ExtendedDialog( intf_thread_t * );
     virtual ~ExtendedDialog();
-
-    static ExtendedDialog *instance;
 
     SyncControls *syncW;
     ExtVideo *videoEffect;
@@ -59,6 +47,8 @@ private:
     QTabWidget *mainTabW;
 private slots:
     void changedItem( int );
+
+    friend class    Singleton<ExtendedDialog>;
 };
 
 #endif

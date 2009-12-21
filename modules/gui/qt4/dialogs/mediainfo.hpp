@@ -27,27 +27,16 @@
 
 #include "util/qvlcframe.hpp"
 #include "components/info_panels.hpp"
+#include "util/singleton.hpp"
 
 class QTabWidget;
 
-class MediaInfoDialog : public QVLCFrame
+class MediaInfoDialog : public QVLCFrame, public Singleton<MediaInfoDialog>
 {
     Q_OBJECT;
 public:
     MediaInfoDialog( intf_thread_t *,
-                     input_item_t * );
-
-    static MediaInfoDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance) instance = new MediaInfoDialog( p_intf, NULL );
-        return instance;
-    }
-
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
+                     input_item_t * input = NULL );
 
     void showTab( int );
 #if 0
@@ -57,7 +46,6 @@ public:
 private:
     virtual ~MediaInfoDialog();
 
-    static MediaInfoDialog *instance;
     bool isMainInputInfo;
 
     QTabWidget *infoTabW;
@@ -77,6 +65,8 @@ private slots:
 
     void saveMeta();
     void updateButtons( int i_tab );
+
+    friend class    Singleton<MediaInfoDialog>;
 };
 
 #endif

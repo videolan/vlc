@@ -31,6 +31,7 @@
 #include "qt4.hpp"
 
 #include "util/qvlcframe.hpp"
+#include "util/singleton.hpp"
 
 class QPushButton;
 class QTextBrowser;
@@ -39,50 +40,32 @@ class QEvent;
 class QPushButton;
 class QTextEdit;
 
-class HelpDialog : public QVLCFrame
+class HelpDialog : public QVLCFrame, public Singleton<HelpDialog>
 {
     Q_OBJECT;
-public:
-    static HelpDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance)
-            instance = new HelpDialog( p_intf );
-        return instance;
-    }
-    static void killInstance()
-    { delete instance; instance = NULL;}
-
 private:
     HelpDialog( intf_thread_t * );
     virtual ~HelpDialog();
 
-    static HelpDialog *instance;
-
 public slots:
     void close();
+
+    friend class    Singleton<HelpDialog>;
 };
 
 
-class AboutDialog : public QVLCDialog
+class AboutDialog : public QVLCDialog, public Singleton<AboutDialog>
 {
     Q_OBJECT;
-public:
-    static AboutDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance)
-            instance = new AboutDialog( (QWidget *)p_intf->p_sys->p_mi,
-                                        p_intf );
-        return instance;
-    }
 
 private:
-    AboutDialog( QWidget *, intf_thread_t * );
+    AboutDialog( intf_thread_t * );
     virtual ~AboutDialog();
-
-    static AboutDialog *instance;
 
 public slots:
     void close();
+
+    friend class    Singleton<AboutDialog>;
 };
 
 #ifdef UPDATE_CHECK
@@ -90,26 +73,15 @@ public slots:
 static const int UDOkEvent = QEvent::User + DialogEventType + 21;
 static const int UDErrorEvent = QEvent::User + DialogEventType + 22;
 
-class UpdateDialog : public QVLCFrame
+class UpdateDialog : public QVLCFrame, public Singleton<UpdateDialog>
 {
     Q_OBJECT;
 public:
-    static UpdateDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance )
-            instance = new UpdateDialog( p_intf );
-        return instance;
-    }
-    static void killInstance()
-    { delete instance; instance = NULL;}
-
     void updateNotify( bool );
 
 private:
     UpdateDialog( intf_thread_t * );
     virtual ~UpdateDialog();
-
-    static UpdateDialog *instance;
 
     update_t *p_update;
     QPushButton *updateButton;
@@ -122,6 +94,8 @@ private:
 private slots:
     void close();
     void UpdateOrDownload();
+
+    friend class    Singleton<UpdateDialog>;
 };
 #endif
 

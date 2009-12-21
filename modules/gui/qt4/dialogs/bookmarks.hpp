@@ -29,27 +29,15 @@
 #include <QStandardItemModel>
 #include <QTreeView>
 #include <QTreeWidget>
+#include "util/singleton.hpp"
 
-class BookmarksDialog : public QVLCFrame
+class BookmarksDialog : public QVLCFrame, public Singleton<BookmarksDialog>
 {
     Q_OBJECT;
-public:
-    static BookmarksDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance )
-            instance = new BookmarksDialog( p_intf );
-        return instance;
-    }
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
 private:
     BookmarksDialog( intf_thread_t * );
     virtual ~BookmarksDialog();
 
-    static BookmarksDialog *instance;
     QTreeWidget *bookmarksList;
 
 private slots:
@@ -60,6 +48,8 @@ private slots:
     void edit( QTreeWidgetItem *item, int column );
     void extract();
     void activateItem( QModelIndex index );
+
+    friend class    Singleton<BookmarksDialog>;
 };
 
 #endif

@@ -25,6 +25,7 @@
 #define QVLC_MESSAGES_DIALOG_H_ 1
 
 #include "util/qvlcframe.hpp"
+#include "util/singleton.hpp"
 
 class QTabWidget;
 class QPushButton;
@@ -35,28 +36,13 @@ class QTextEdit;
 class QTreeWidget;
 class QTreeWidgetItem;
 
-class MessagesDialog : public QVLCFrame
+class MessagesDialog : public QVLCFrame, public Singleton<MessagesDialog>
 {
     Q_OBJECT;
-public:
-    static MessagesDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance)
-            instance = new MessagesDialog( p_intf );
-        return instance;
-    }
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
-
-
 private:
     MessagesDialog( intf_thread_t * );
     virtual ~MessagesDialog();
 
-    static MessagesDialog *instance;
     QTabWidget *mainTab;
     QSpinBox *verbosityBox;
     QLabel *verbosityLabel;
@@ -78,6 +64,8 @@ private:
     void clear();
     void updateTree();
     void buildTree( QTreeWidgetItem *, vlc_object_t * );
+
+    friend class    Singleton<MessagesDialog>;
 };
 
 #endif

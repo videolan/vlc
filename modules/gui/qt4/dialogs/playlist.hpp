@@ -26,6 +26,7 @@
 
 #include "util/qvlcframe.hpp"
 #include "../components/playlist/playlist.hpp"
+#include "util/singleton.hpp"
 
 #include <QModelIndex>
 
@@ -34,23 +35,12 @@ class PLSelector;
 class PLPanel;
 class QSettings;
 
-class PlaylistDialog : public QVLCMW
+class PlaylistDialog : public QVLCMW, public Singleton<PlaylistDialog>
 {
     Q_OBJECT;
 private:
     PlaylistWidget *playlistWidget;
 
-public:
-    static PlaylistDialog * getInstance( intf_thread_t *p_intf )
-    {
-        if( !instance) instance = new PlaylistDialog( p_intf );
-        return instance;
-    }
-    static void killInstance()
-    {
-        delete instance;
-        instance = NULL;
-    }
 private:
     PlaylistDialog( intf_thread_t * );
     virtual ~PlaylistDialog();
@@ -60,7 +50,7 @@ private:
     void dragMoveEvent( QDragMoveEvent * );
     void dragLeaveEvent( QDragLeaveEvent * );
 
-    static PlaylistDialog *instance;
+    friend class    Singleton<PlaylistDialog>;
 };
 
 

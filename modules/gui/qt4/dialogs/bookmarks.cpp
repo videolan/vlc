@@ -31,8 +31,6 @@
 #include <QSpacerItem>
 #include <QPushButton>
 
-BookmarksDialog *BookmarksDialog::instance = NULL;
-
 BookmarksDialog::BookmarksDialog( intf_thread_t *_p_intf ):QVLCFrame( _p_intf )
 {
     setWindowFlags( Qt::Tool );

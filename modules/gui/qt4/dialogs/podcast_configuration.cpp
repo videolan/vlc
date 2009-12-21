@@ -26,10 +26,8 @@
 
 #include "podcast_configuration.hpp"
 
-PodcastConfigDialog *PodcastConfigDialog::instance = NULL;
-
-PodcastConfigDialog::PodcastConfigDialog( QWidget *parent, intf_thread_t *_p_intf)
-                    : QVLCDialog( parent, _p_intf )
+PodcastConfigDialog::PodcastConfigDialog( intf_thread_t *_p_intf)
+                    : QVLCDialog( (QWidget*)_p_intf->p_sys->p_mi, _p_intf )
 
 {
     ui.setupUi( this );
