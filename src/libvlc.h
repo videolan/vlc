@@ -207,15 +207,15 @@ typedef struct libvlc_priv_t
     /* Messages */
     msg_bank_t         msg_bank;    ///< The message bank
     int                i_verbose;   ///< info messages
-    bool               b_color;     ///< color messages?
     vlc_dictionary_t   msg_enabled_objects; ///< Enabled objects
+    bool               b_color;     ///< color messages?
     bool               msg_all_objects_enabled; ///< Should we print all objects?
 
     /* Timer stats */
+    bool               b_stats;     ///< Whether to collect stats
     vlc_mutex_t        timer_lock;  ///< Lock to protect timers
     counter_t        **pp_timers;   ///< Array of all timers
     int                i_timers;    ///< Number of timers
-    bool               b_stats;     ///< Whether to collect stats
 
     /* Singleton objects */
     module_t          *p_memcpy_module;  ///< Fast memcpy plugin used
