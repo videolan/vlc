@@ -1245,7 +1245,7 @@ static inline int LoadMessages (void)
 #else
     char psz_path[1024];
     if (snprintf (psz_path, sizeof (psz_path), "%s" DIR_SEP "%s",
-                  config_GetDataDir(), "locale")
+                  config_GetDataDirDefault(), "locale")
                      >= (int)sizeof (psz_path))
         return -1;
 
