@@ -61,6 +61,8 @@ OPEN_MODULE( Picture )
 
 #undef OPEN_MODULE
 
+static int vlc_sd_probe_Open( vlc_object_t * );
+
 vlc_module_begin ()
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_SD )
@@ -85,6 +87,7 @@ vlc_module_begin ()
         set_callbacks( OpenPicture, Close )
         add_shortcut( "picture_dir" )
 
+    VLC_SD_PROBE_SUBMODULE
 vlc_module_end ()
 
 
@@ -346,4 +349,13 @@ enum type_e fileType( services_discovery_t *p_sd, const char* psz_file )
 
     free( psz_dir );
     return i_ret;
+}
+
+static int vlc_sd_probe_Open( vlc_object_t *obj )
+{
+    vlc_probe_t *probe = (vlc_probe_t *)obj;
+
+    vlc_sd_probe_Add( probe, "video_dir", N_("My Videos") );
+    vlc_sd_probe_Add( probe, "audio_dir", N_("My Music") );
+    return vlc_sd_probe_Add( probe, "picture_dir", N_("My Pictures") );
 }
