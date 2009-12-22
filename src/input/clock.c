@@ -144,10 +144,6 @@ struct input_clock_t
     /* */
     vlc_mutex_t lock;
 
-    /* Reference point */
-    bool          b_has_reference;
-    clock_point_t ref;
-
     /* Last point
      * It is used to detect unexpected stream discontinuities */
     clock_point_t last;
@@ -169,10 +165,14 @@ struct input_clock_t
         unsigned i_index;
     } late;
 
+    /* Reference point */
+    clock_point_t ref;
+    bool          b_has_reference;
+
     /* Current modifiers */
+    bool    b_paused;
     int     i_rate;
     mtime_t i_pts_delay;
-    bool    b_paused;
     mtime_t i_pause_date;
 };
 
