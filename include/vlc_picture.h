@@ -106,8 +106,8 @@ struct picture_t
      * @{
      */
     bool            b_progressive;          /**< is it a progressive frame ? */
-    unsigned int    i_nb_fields;                  /**< # of displayed fields */
     bool            b_top_field_first;             /**< which field is first */
+    unsigned int    i_nb_fields;                  /**< # of displayed fields */
     int8_t         *p_q;                           /**< quantification table */
     int             i_qstride;                    /**< quantification stride */
     int             i_qtype;                       /**< quantification style */

@@ -124,6 +124,8 @@ struct subpicture_t
     subpicture_t *  p_next;               /**< next subtitle to be displayed */
     /**@}*/
 
+    subpicture_region_t *p_region;  /**< region list composing this subtitle */
+
     /** \name Date properties */
     /**@{*/
     mtime_t         i_start;                  /**< beginning of display date */
@@ -133,17 +135,15 @@ struct subpicture_t
     bool            b_fade;                               /**< enable fading */
     /**@}*/
 
-    subpicture_region_t *p_region;  /**< region list composing this subtitle */
-
     /** \name Display properties
      * These properties are only indicative and may be
      * changed by the video output thread, or simply ignored depending of the
      * subtitle type. */
     /**@{*/
-    int          i_original_picture_width;  /**< original width of the movie */
-    int          i_original_picture_height;/**< original height of the movie */
     bool         b_subtitle;            /**< the picture is a movie subtitle */
     bool         b_absolute;                       /**< position is absolute */
+    int          i_original_picture_width;  /**< original width of the movie */
+    int          i_original_picture_height;/**< original height of the movie */
     int          i_alpha;                                  /**< transparency */
      /**@}*/
 
