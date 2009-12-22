@@ -77,7 +77,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
             [defaultParams addObject:@"--opengl-provider=minimal_macosx"];          // Use minimal_macosx
             [defaultParams addObject:@"--vout=minimal_macosx"];
             [defaultParams addObject:@"--text-renderer=quartztext"];                // our CoreText-based renderer
-            [defaultParams addObject:@"--verbose=2"];                               // Don't polute the log
+            [defaultParams addObject:@"--verbose=-1"];                               // Don't polute the log
             [defaultParams addObject:@"--no-color"];
             [defaultParams addObject:@"--no-media-library"];
             vlcParams = defaultParams;
