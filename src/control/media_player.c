@@ -393,6 +393,8 @@ libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
     /* Snapshot initialization */
     register_event(mp, SnapshotTaken);
 
+    register_event(mp, MediaChanged);
+
     /* Attach a var callback to the global object to provide the glue between
      * vout_thread that generates the event and media_player that re-emits it
      * with its own event manager
@@ -533,6 +535,13 @@ void libvlc_media_player_set_media(
     p_mi->p_libvlc_instance = p_md->p_libvlc_instance;
 
     unlock(p_mi);
+
+    /* Send an event for the newly available media */
+    libvlc_event_t event;
+    event.type = libvlc_MediaPlayerMediaChanged;
+    event.u.media_player_media_changed.new_media = p_md;
+    libvlc_event_send( p_mi->p_event_manager, &event );
+    
 }
 
 /**************************************************************************

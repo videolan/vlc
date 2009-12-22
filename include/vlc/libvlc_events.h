@@ -101,7 +101,9 @@ extern "C" {
     DEF( VlmMediaInstanceStatusPause ), \
     DEF( VlmMediaInstanceStatusEnd ), \
     DEF( VlmMediaInstanceStatusError ), \
-    /* New event types HERE */
+    \
+    DEF( MediaPlayerMediaChanged ), \
+/* New event types HERE */
 
 #ifdef __cplusplus
 enum libvlc_event_type_e {
@@ -248,6 +250,12 @@ struct libvlc_event_t
             const char * psz_media_name;
             const char * psz_instance_name;
         } vlm_media_event;
+
+        /* Extra MediaPlayer */
+        struct
+        {
+            libvlc_media_t * new_media;
+        } media_player_media_changed;
     } u;
 };
 
