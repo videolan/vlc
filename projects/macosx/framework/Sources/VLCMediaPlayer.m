@@ -223,6 +223,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     // Get rid of everything else
     [media release];
     [cachedTime release];
+    [cachedRemainingTime release];
     [drawable release];
 
     [super dealloc];
@@ -462,9 +463,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (VLCTime *)remainingTime
 {
-    double currentTime = [[cachedTime numberValue] doubleValue];
-    double remaining = currentTime / position * (1 - position);
-    return [VLCTime timeWithNumber:[NSNumber numberWithDouble:-remaining]];
+    return cachedRemainingTime;
 }
 
 - (int)fps
@@ -875,6 +874,7 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
         delegate = nil;
         media = nil;
         cachedTime = [[VLCTime nullTime] retain];
+        cachedRemainingTime = [[VLCTime nullTime] retain];
         position = 0.0f;
         cachedState = VLCMediaPlayerStateStopped;
 
@@ -929,7 +929,10 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     [self willChangeValueForKey:@"remainingTime"];
     [cachedTime release];
     cachedTime = [[VLCTime timeWithNumber:newTime] retain];
-
+    [cachedRemainingTime release];
+    double currentTime = [[cachedTime numberValue] doubleValue];
+    double remaining = currentTime / position * (1 - position);
+    cachedRemainingTime = [[VLCTime timeWithNumber:[NSNumber numberWithDouble:-remaining]] retain];
     [self didChangeValueForKey:@"remainingTime"];
     [self didChangeValueForKey:@"time"];
 }
