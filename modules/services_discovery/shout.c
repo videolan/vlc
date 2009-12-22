@@ -103,6 +103,8 @@ OPEN( FrenchTV )
 
 #undef OPEN
 
+static int vlc_sd_probe_Open( vlc_object_t * );
+
 vlc_module_begin ()
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_SD )
@@ -136,6 +138,7 @@ vlc_module_begin ()
         set_callbacks( OpenFreebox, Close )
         add_shortcut( "freebox" )
 
+    VLC_SD_PROBE_SUBMODULE
 vlc_module_end ()
 
 
@@ -273,4 +276,14 @@ static void Close( vlc_object_t *p_this )
 
     vlc_join (p_sys->thread, NULL);
     free (p_sys);
+}
+
+static int vlc_sd_probe_Open( vlc_object_t *obj )
+{
+    vlc_probe_t *probe = (vlc_probe_t *)obj;
+
+    vlc_sd_probe_Add( probe, "shoutcast", N_("Shoutcast Radio") );
+    vlc_sd_probe_Add( probe, "shoutcasttv", N_("Shoutcast TV") );
+    vlc_sd_probe_Add( probe, "frenchtv", N_("French TV") );
+    return VLC_PROBE_CONTINUE;
 }
