@@ -460,19 +460,19 @@ static inline int ps_pkt_parse_pes( block_t *p_pes, int i_skip_extra )
 
                 if(  header[i_skip]&0x20 )
                 {
-                     p_pes->i_pts = ((mtime_t)(header[i_skip]&0x0e ) << 29)|
-                                     (mtime_t)(header[i_skip+1] << 22)|
-                                    ((mtime_t)(header[i_skip+2]&0xfe) << 14)|
-                                     (mtime_t)(header[i_skip+3] << 7)|
-                                     (mtime_t)(header[i_skip+4] >> 1);
+                     i_pts = ((mtime_t)(header[i_skip]&0x0e ) << 29)|
+                              (mtime_t)(header[i_skip+1] << 22)|
+                             ((mtime_t)(header[i_skip+2]&0xfe) << 14)|
+                              (mtime_t)(header[i_skip+3] << 7)|
+                              (mtime_t)(header[i_skip+4] >> 1);
 
                     if( header[i_skip]&0x10 )    /* has dts */
                     {
-                         p_pes->i_dts = ((mtime_t)(header[i_skip+5]&0x0e ) << 29)|
-                                         (mtime_t)(header[i_skip+6] << 22)|
-                                        ((mtime_t)(header[i_skip+7]&0xfe) << 14)|
-                                         (mtime_t)(header[i_skip+8] << 7)|
-                                         (mtime_t)(header[i_skip+9] >> 1);
+                         i_dts = ((mtime_t)(header[i_skip+5]&0x0e ) << 29)|
+                                  (mtime_t)(header[i_skip+6] << 22)|
+                                 ((mtime_t)(header[i_skip+7]&0xfe) << 14)|
+                                  (mtime_t)(header[i_skip+8] << 7)|
+                                  (mtime_t)(header[i_skip+9] >> 1);
                          i_skip += 10;
                     }
                     else
