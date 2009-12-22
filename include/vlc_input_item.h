@@ -58,7 +58,6 @@ struct input_item_t
 
     char       *psz_name;            /**< text describing this item */
     char       *psz_uri;             /**< mrl of this item */
-    bool       b_fixed_name;        /**< Can the interface change the name ?*/
 
     int        i_options;            /**< Number of input options */
     char       **ppsz_options;       /**< Array of input options */
@@ -67,8 +66,6 @@ struct input_item_t
 
     mtime_t    i_duration;           /**< Duration in microseconds */
 
-    uint8_t    i_type;               /**< Type (file, disc, ... see input_item_type_e) */
-    bool b_prefers_tree;             /**< Do we prefer being displayed as tree*/
 
     int        i_categories;         /**< Number of info categories */
     info_category_t **pp_categories; /**< Pointer to the first info category */
@@ -79,8 +76,6 @@ struct input_item_t
     input_stats_t *p_stats;          /**< Statistics */
     int           i_nb_played;       /**< Number of times played */
 
-    bool          b_error_when_reading;       /**< Error When Reading */
-
     vlc_meta_t *p_meta;
 
     int         i_epg;               /**< Number of EPG entries */
@@ -89,6 +84,11 @@ struct input_item_t
     vlc_event_manager_t event_manager;
 
     vlc_mutex_t lock;                 /**< Lock for the item */
+
+    uint8_t     i_type;              /**< Type (file, disc, ... see input_item_type_e) */
+    bool        b_prefers_tree;      /**< Do we prefer being displayed as tree*/
+    bool        b_fixed_name;        /**< Can the interface change the name ?*/
+    bool        b_error_when_reading;/**< Error When Reading */
 };
 
 enum input_item_type_e
