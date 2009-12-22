@@ -210,7 +210,7 @@ void vlc_release (gc_object_t *p_gc)
     ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 static void SetLanguage   ( char const * );
 #endif
-static inline int LoadMessages ( libvlc_int_t * );
+static inline int LoadMessages (void);
 static int  GetFilenames  ( libvlc_int_t *, int, const char *[] );
 static void Help          ( libvlc_int_t *, char const *psz_help_name );
 static void Usage         ( libvlc_int_t *, char const *psz_search );
@@ -315,7 +315,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Support for gettext
      */
-    LoadMessages( p_libvlc );
+    LoadMessages ();
 
     /* Initialize the module bank and load the configuration of the
      * main module. We need to do this at this stage to be able to display
@@ -1235,7 +1235,7 @@ static void SetLanguage ( const char *psz_lang )
 #endif
 
 
-static inline int LoadMessages (libvlc_int_t *p_libvlc)
+static inline int LoadMessages (void)
 {
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
@@ -1243,16 +1243,11 @@ static inline int LoadMessages (libvlc_int_t *p_libvlc)
 #if !defined( __APPLE__ ) && !defined( WIN32 ) && !defined( SYS_BEOS )
     static const char psz_path[] = LOCALEDIR;
 #else
-    char *psz_datapath = config_GetDataDir (p_libvlc);
     char psz_path[1024];
     if (snprintf (psz_path, sizeof (psz_path), "%s" DIR_SEP "%s",
-                  psz_datapath, "locale")
+                  config_GetDataDir(), "locale")
                      >= (int)sizeof (psz_path))
-    {
-        free (psz_datapath);
         return -1;
-    }
-    free (psz_datapath);
 
 #endif
     if (bindtextdomain (PACKAGE_NAME, psz_path) == NULL)
