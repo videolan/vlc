@@ -591,9 +591,9 @@ vlc_module_begin ()
               SKINS2_SYSTRAY_LONG, false );
     add_bool( "skins2-taskbar", true, onTaskBarChange, SKINS2_TASKBAR,
               SKINS2_TASKBAR_LONG, false );
+#endif
     add_bool( "skins2-transparency", false, NULL, SKINS2_TRANSPARENCY,
               SKINS2_TRANSPARENCY_LONG, false );
-#endif
 
     add_bool( "skinned-playlist", true, NULL, SKINS2_PLAYLIST,
               SKINS2_PLAYLIST_LONG, false );

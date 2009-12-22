@@ -71,7 +71,6 @@ void WindowManager::startMove( TopWindow &rWindow )
     m_movingWindows.clear();
     buildDependSet( m_movingWindows, &rWindow );
 
-#ifdef WIN32
     if( config_GetInt( getIntf(), "skins2-transparency" ) )
     {
         // Change the opacity of the moving windows
@@ -89,7 +88,6 @@ void WindowManager::startMove( TopWindow &rWindow )
             (*it)->refresh( 0, 0, (*it)->getWidth(), (*it)->getHeight() );
         }
     }
-#endif
 }
 
 
@@ -98,7 +96,6 @@ void WindowManager::stopMove()
     WinSet_t::const_iterator itWin1, itWin2;
     AncList_t::const_iterator itAnc1, itAnc2;
 
-#ifdef WIN32
     if( config_GetInt( getIntf(), "skins2-transparency" ) )
     {
         // Restore the opacity of the moving windows
@@ -108,7 +105,6 @@ void WindowManager::stopMove()
             (*it)->setOpacity( m_alpha );
         }
     }
-#endif
 
     // Delete the dependencies
     m_dependencies.clear();
