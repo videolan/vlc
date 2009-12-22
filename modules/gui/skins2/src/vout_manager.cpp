@@ -358,7 +358,7 @@ int VoutManager::controlWindow( struct vout_window_t *pWnd,
                    AsyncQueue::instance( pThis->getIntf() );
                 pQueue->push( CmdGenericPtr( pCmd ) );
             }
-            return VLC_SUCCESS;
+            return VLC_EGENERIC;
         }
 
         case VOUT_WINDOW_SET_FULLSCREEN:

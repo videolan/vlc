@@ -890,7 +890,7 @@ int MainInterface::controlVideo( int i_query, va_list args )
         unsigned int i_height = va_arg( args, unsigned int );
         emit askVideoToResize( i_width, i_height );
         emit askUpdate();
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
     }
     case VOUT_WINDOW_SET_ON_TOP:
     {
