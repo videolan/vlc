@@ -68,8 +68,8 @@ struct module_cache_t
     bool b_junk;
 
     /* Optional extra data */
-    module_t *p_module;
     bool b_used;
+    module_t *p_module;
 };
 
 
