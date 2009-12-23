@@ -147,6 +147,8 @@ static vlc_fourcc_t ParseFormat (vout_display_t *vd,
               case 32:
                 if (f->depth == 24)
                     return VLC_CODEC_RGB32;
+                if (f->depth == 32)
+                    return 0; /* ARGB -> VLC cannot do that currently */
                 break;
               case 24:
                 if (f->depth == 24)
