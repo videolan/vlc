@@ -1171,6 +1171,7 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
                             "Use 'cvlc' to use vlc without interface.") );
         }
         free( psz_interface );
+        var_Destroy( p_libvlc, "intf" );
     }
 
     /* Try to create the interface */
@@ -1178,7 +1179,6 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
     if( ret )
         msg_Err( p_libvlc, "interface \"%s\" initialization failed",
                  psz_module ? psz_module : "default" );
-    var_Destroy( p_libvlc, "intf" );
     return ret;
 }
 
