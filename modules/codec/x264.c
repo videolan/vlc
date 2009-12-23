@@ -670,9 +670,6 @@ struct encoder_sys_t
     x264_t          *h;
     x264_param_t    param;
 
-    int             i_buffer;
-    uint8_t         *p_buffer;
-
     mtime_t         i_interpolated_dts;
 
     char *psz_stat_name;
@@ -712,7 +709,6 @@ static int  Open ( vlc_object_t *p_this )
         return VLC_ENOMEM;
     p_sys->i_interpolated_dts = 0;
     p_sys->psz_stat_name = NULL;
-    p_sys->p_buffer = NULL;
 
     x264_param_default( &p_sys->param );
     p_sys->param.i_width  = p_enc->fmt_in.video.i_width;
@@ -1159,16 +1155,6 @@ static int  Open ( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    /* alloc mem */
-    p_sys->i_buffer = 4 * p_enc->fmt_in.video.i_width *
-        p_enc->fmt_in.video.i_height + 1000;
-    p_sys->p_buffer = malloc( p_sys->i_buffer );
-    if( !p_sys->p_buffer )
-    {
-        Close( VLC_OBJECT(p_enc) );
-        return VLC_ENOMEM;
-    }
-
     /* get the globals headers */
     p_enc->fmt_out.i_extra = 0;
     p_enc->fmt_out.p_extra = NULL;
@@ -1224,7 +1210,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     p_block = block_New( p_enc, i_out );
     if( !p_block ) return NULL;
 
-    /* copy encoded data directly to block, instead taking via p_sys->p_buffer */
+    /* copy encoded data directly to block */
     for( i = 0, i_out = 0; i < i_nal; i++ )
     {
         memcpy( p_block->p_buffer + i_out, nal[i].p_payload, nal[i].i_payload );
@@ -1311,6 +1297,5 @@ static void Close( vlc_object_t *p_this )
     vlc_mutex_unlock( lock.p_address );
 #endif
 
-    free( p_sys->p_buffer );
     free( p_sys );
 }
