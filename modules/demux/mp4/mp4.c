@@ -1554,7 +1554,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             /* Work-around buggy muxed files */
             p_sample->data.p_sample_vide->i_width != p_track->i_width )
         {
-            p_track->fmt.video.i_sar_num = p_track->i_width  / p_track->fmt.video.i_height;
+            p_track->fmt.video.i_sar_num = p_track->i_width  * p_track->fmt.video.i_height;
             p_track->fmt.video.i_sar_den = p_track->i_height * p_track->fmt.video.i_width;
         }
 
