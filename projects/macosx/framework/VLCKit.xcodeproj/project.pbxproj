@@ -19,9 +19,9 @@
 			name = "core-framework";
 			productName = "core-framework";
 		};
-		633BD6D20D2ADE040012A314 /* vlc-contrib-core-framework */ = {
+		633BD6D20D2ADE040012A314 /* Build Everything */ = {
 			isa = PBXAggregateTarget;
-			buildConfigurationList = 633BD6D60D2ADE230012A314 /* Build configuration list for PBXAggregateTarget "vlc-contrib-core-framework" */;
+			buildConfigurationList = 633BD6D60D2ADE230012A314 /* Build configuration list for PBXAggregateTarget "Build Everything" */;
 			buildPhases = (
 			);
 			dependencies = (
@@ -30,7 +30,7 @@
 				633BD6F00D2AE0400012A314 /* PBXTargetDependency */,
 				633BD6F20D2AE0430012A314 /* PBXTargetDependency */,
 			);
-			name = "vlc-contrib-core-framework";
+			name = "Build Everything";
 			productName = "vlc-core-modules";
 		};
 		633BD6E40D2ADF030012A314 /* vlc-contrib */ = {
@@ -438,7 +438,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				633BD6D20D2ADE040012A314 /* vlc-contrib-core-framework */,
+				633BD6D20D2ADE040012A314 /* Build Everything */,
 				8DC2EF4F0486A6940098B216 /* VLCKit */,
 				633BD6E40D2ADF030012A314 /* vlc-contrib */,
 				633BD6DB0D2ADE4E0012A314 /* vlc-core */,
@@ -856,7 +856,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		633BD6D60D2ADE230012A314 /* Build configuration list for PBXAggregateTarget "vlc-contrib-core-framework" */ = {
+		633BD6D60D2ADE230012A314 /* Build configuration list for PBXAggregateTarget "Build Everything" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				633BD6D40D2ADE050012A314 /* Debug */,
