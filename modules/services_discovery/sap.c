@@ -124,7 +124,7 @@ VLC_SD_PROBE_HELPER("sap", N_("SAP Announcements"))
 
 vlc_module_begin ()
     set_shortname( N_("SAP"))
-    set_description( N_("Network Streams") )
+    set_description( N_("SAP Announcements") )
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_SD )
 
