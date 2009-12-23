@@ -1921,6 +1921,9 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
 #ifdef WIN32
     ShowConsole( true );
     b_color = false; // don't put color control codes in a .txt file
+#else
+    if( !isatty( 1 ) )
+        b_color = false;
 #endif
 
     /* List all modules */
