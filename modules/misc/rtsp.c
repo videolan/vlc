@@ -105,7 +105,6 @@ typedef struct media_es_t media_es_t;
 typedef struct
 {
     media_es_t *p_media_es;
-    char *psz_ip;
     int i_port;
 
 } rtsp_client_es_t;
@@ -917,7 +916,6 @@ static void RtspClientDel( vod_media_t *p_media, rtsp_client_t *p_rtsp )
     while( p_rtsp->i_es )
     {
         p_rtsp->i_es--;
-        free( p_rtsp->es[p_rtsp->i_es]->psz_ip );
         free( p_rtsp->es[p_rtsp->i_es] );
     }
     free( p_rtsp->es );
@@ -1400,7 +1398,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                     break;
                 }
                 p_rtsp_es->i_port = i_port;
-                p_rtsp_es->psz_ip = strdup( ip );
                 p_rtsp_es->p_media_es = p_es;
                 TAB_APPEND( p_rtsp->i_es, p_rtsp->es, p_rtsp_es );
 
@@ -1483,7 +1480,6 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
             {
                 if( p_rtsp->es[i]->p_media_es == p_es )
                 {
-                    free( p_rtsp->es[i]->psz_ip );
                     TAB_REMOVE( p_rtsp->i_es, p_rtsp->es, p_rtsp->es[i] );
                     break;
                 }
