@@ -1929,41 +1929,45 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
     /* Enumerate each module */
     for (size_t j = 0; (p_parser = list[j]) != NULL; j++)
     {
-        if( b_color )
-            utf8_fprintf( stdout, GREEN"  %-22s "WHITE"%s\n"GRAY,
-                          p_parser->psz_object_name,
-                          _( p_parser->psz_longname ) );
-        else
-            utf8_fprintf( stdout, "  %-22s %s\n",
-                          p_parser->psz_object_name,
-                          _( p_parser->psz_longname ) );
-
-        if( b_verbose )
+        if( !( p_parser->psz_capability &&
+            !strcmp( p_parser->psz_capability, "services probe" ) ) )
         {
-            char *const *pp_shortcut = p_parser->pp_shortcuts;
-            while( *pp_shortcut )
+            if( b_color )
+                utf8_fprintf( stdout, GREEN"  %-22s "WHITE"%s\n"GRAY,
+                              p_parser->psz_object_name,
+                              _( p_parser->psz_longname ) );
+            else
+                utf8_fprintf( stdout, "  %-22s %s\n",
+                              p_parser->psz_object_name,
+                              _( p_parser->psz_longname ) );
+
+            if( b_verbose )
             {
-                if( strcmp( *pp_shortcut, p_parser->psz_object_name ) )
+                char *const *pp_shortcut = p_parser->pp_shortcuts;
+                while( *pp_shortcut )
+                {
+                    if( strcmp( *pp_shortcut, p_parser->psz_object_name ) )
+                    {
+                        if( b_color )
+                            utf8_fprintf( stdout, CYAN"   s %s\n"GRAY,
+                                          *pp_shortcut );
+                        else
+                            utf8_fprintf( stdout, "   s %s\n",
+                                          *pp_shortcut );
+                    }
+                    pp_shortcut++;
+                }
+                if( p_parser->psz_capability )
                 {
                     if( b_color )
-                        utf8_fprintf( stdout, CYAN"   s %s\n"GRAY,
-                                      *pp_shortcut );
+                        utf8_fprintf( stdout, MAGENTA"   c %s (%d)\n"GRAY,
+                                      p_parser->psz_capability,
+                                      p_parser->i_score );
                     else
-                        utf8_fprintf( stdout, "   s %s\n",
-                                      *pp_shortcut );
+                        utf8_fprintf( stdout, "   c %s (%d)\n",
+                                      p_parser->psz_capability,
+                                      p_parser->i_score );
                 }
-                pp_shortcut++;
-            }
-            if( p_parser->psz_capability )
-            {
-                if( b_color )
-                    utf8_fprintf( stdout, MAGENTA"   c %s (%d)\n"GRAY,
-                                  p_parser->psz_capability,
-                                  p_parser->i_score );
-                else
-                    utf8_fprintf( stdout, "   c %s (%d)\n",
-                                  p_parser->psz_capability,
-                                  p_parser->i_score );
             }
         }
     }
