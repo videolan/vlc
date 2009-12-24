@@ -88,7 +88,7 @@ X11Window::X11Window( intf_thread_t *pIntf, GenericWindow &rWindow,
     }
 
     // Create the window
-    m_wnd = XCreateWindow( XDISPLAY, m_wnd_parent, -10, 0, 1, 1, 0, 0,
+    m_wnd = XCreateWindow( XDISPLAY, m_wnd_parent, -10, 0, 10, 10, 0, 0,
                            InputOutput, CopyFromParent, valuemask, &attr );
 
     // wait for X server to process the previous commands
