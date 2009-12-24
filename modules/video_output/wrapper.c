@@ -60,6 +60,7 @@ DECLARE_OPEN(vmem);
 DECLARE_OPEN(direct3d_xp);
 DECLARE_OPEN(direct3d_vista);
 DECLARE_OPEN(glwin32);
+DECLARE_OPEN(macosx);
 
 #undef DECLARE_OPEN
 
@@ -120,6 +121,9 @@ vlc_module_begin()
 
     add_submodule()
     DECLARE_MODULE(glwin32, 20)
+
+    add_submodule()
+    DECLARE_MODULE(macosx, 300)
 
 vlc_module_end()
 

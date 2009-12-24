@@ -20,6 +20,7 @@ SOURCES_directfb = directfb.c
 SOURCES_vmem = vmem.c
 SOURCES_yuv = yuv.c
 SOURCES_vout_wrapper = wrapper.c
+SOURCES_vout_macosx = macosx.m
 
 libxcb_x11_plugin_la_SOURCES = \
 	xcb/xcb_vlc.h \

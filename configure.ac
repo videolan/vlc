@@ -4409,21 +4409,17 @@ AC_ARG_ENABLE(macosx-minimal,
   [  --enable-macosx-minimal minimal Mac OS X support (default disabled)])
 if test "x${enable_macosx_minimal}" = "xyes"
 then
-  VLC_ADD_LDFLAGS([minimal_macosx opengllayer qtcapture],[-Wl,-framework,Cocoa])
-  VLC_ADD_LDFLAGS([minimal_macosx opengllayer],[-Wl,-framework,OpenGL])
-  VLC_ADD_LDFLAGS([minimal_macosx],            [-Wl,-framework,Carbon])
-  VLC_ADD_LDFLAGS([minimal_macosx],            [-Wl,-framework,CoreServices])
-  VLC_ADD_LDFLAGS([minimal_macosx],            [-Wl,-framework,AGL])
+  VLC_ADD_LDFLAGS([vout_macosx qtcapture],[-Wl,-framework,Cocoa])
+  VLC_ADD_LDFLAGS([vout_macosx],          [-Wl,-framework,OpenGL])
 
   VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,QTKit])
   VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreAudio])
-  VLC_ADD_LDFLAGS([opengllayer qtcapture],            [-Wl,-framework,QuartzCore])
+  VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,QuartzCore])
   VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreVideo])
-  VLC_ADD_OBJCFLAGS([minimal_macosx opengllayer], [-fobjc-exceptions] )
+  VLC_ADD_OBJCFLAGS([vout_macosx],                 [-fobjc-exceptions] )
 
   VLC_ADD_PLUGIN([qtcapture])
-  VLC_ADD_PLUGIN([minimal_macosx])
-  VLC_ADD_PLUGIN([opengllayer])
+  VLC_ADD_PLUGIN([vout_macosx])
 fi
 
 dnl
