@@ -205,17 +205,11 @@ VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *, libvlc_e
  * The object minimal_macosx expects is of kind NSObject and should
  * respect the protocol:
  * 
- * @protocol VLCOpenGLVoutEmbedding
+ * @protocol VLCOpenGLVideoViewEmbedding <NSObject>
  * - (void)addVoutSubview:(NSView *)view;
  * - (void)removeVoutSubview:(NSView *)view;
- * 
- * - (void)enterFullscreen;
- * - (void)leaveFullscreen;
- * 
- * - (BOOL)stretchesVideo;
- * - (void)setOnTop: (BOOL)ontop; // Do we really want that in protocol? 
  * @end
- * 
+ *
  * You can find a live example in VLCVideoView in VLCKit.framework.
  * 
  * \param p_mi the Media Player
