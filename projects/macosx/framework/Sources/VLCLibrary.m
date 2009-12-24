@@ -83,8 +83,9 @@ void __catch_exception( void * e, const char * function, const char * file, int 
         }
 
         int paramNum = 0;
-        const char *lib_vlc_params[[vlcParams count]];
-        while (paramNum < [vlcParams count]) {
+        NSUInteger count = [vlcParams count];
+        const char *lib_vlc_params[count];
+        while (paramNum < count) {
             NSString *vlcParam = [vlcParams objectAtIndex:paramNum];
             lib_vlc_params[paramNum] = [vlcParam cStringUsingEncoding:NSASCIIStringEncoding];
             paramNum++;
