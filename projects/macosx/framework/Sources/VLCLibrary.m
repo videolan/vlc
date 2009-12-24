@@ -74,8 +74,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
             [defaultParams addObject:@"--no-video-title-show"];                     // Don't show the title on overlay when starting to play
             [defaultParams addObject:@"--no-sout-keep"];
             [defaultParams addObject:@"--ignore-config"];                           // Don't read and write VLC config files
-            [defaultParams addObject:@"--opengl-provider=minimal_macosx"];          // Use minimal_macosx
-            [defaultParams addObject:@"--vout=minimal_macosx"];
+            [defaultParams addObject:@"--vout=macosx"];
             [defaultParams addObject:@"--text-renderer=quartztext"];                // our CoreText-based renderer
             [defaultParams addObject:@"--verbose=-1"];                               // Don't polute the log
             [defaultParams addObject:@"--no-color"];
