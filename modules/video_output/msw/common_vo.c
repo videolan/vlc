@@ -142,7 +142,7 @@ void CommonManage( vout_thread_t *p_vout )
 {
     /* If we do not control our window, we check for geometry changes
      * ourselves because the parent might not send us its events. */
-    if( p_vout->p_sys->hparent && !p_vout->b_fullscreen )
+    if( p_vout->p_sys->hparent )
     {
         RECT rect_parent;
         POINT point;
@@ -605,6 +605,13 @@ void Win32ToggleFullscreen( vout_thread_t *p_vout )
     WINDOWPLACEMENT window_placement = getWindowState( hwnd );
 
     p_vout->b_fullscreen = ! p_vout->b_fullscreen;
+
+    if( p_vout->p_sys->parent_window )
+    {
+        vout_window_SetFullScreen( p_vout->p_sys->parent_window,
+                                   p_vout->b_fullscreen );
+        return;
+    }
 
     /* We want to go to Fullscreen */
     if( p_vout->b_fullscreen )

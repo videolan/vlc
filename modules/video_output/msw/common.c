@@ -155,7 +155,7 @@ void CommonManage(vout_display_t *vd)
 
     /* If we do not control our window, we check for geometry changes
      * ourselves because the parent might not send us its events. */
-    if (sys->hparent && !vd->cfg->is_fullscreen) {
+    if (sys->hparent) {
         RECT rect_parent;
         POINT point;
 
