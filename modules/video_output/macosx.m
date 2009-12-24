@@ -340,7 +340,8 @@ static void OpenglSwap(vout_opengl_t *gl)
      Conceptual/OpenGL/chap5/chapter_5_section_44.html */
     GLint params[] = { 1 };
     CGLSetParameter([[self openGLContext] CGLContextObj], kCGLCPSwapInterval, params);
-    
+
+    return self;
 }
 
 /**
