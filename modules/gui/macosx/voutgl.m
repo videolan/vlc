@@ -503,6 +503,18 @@ static void Unlock( vout_thread_t * p_vout )
     Unlock( p_vout );
 }
 
+- (void) renewGState
+{
+    NSWindow *window = [self window];
+	
+	if ([window respondsToSelector:@selector(disableScreenUpdatesUntilFlush)])
+	{
+		[window disableScreenUpdatesUntilFlush];
+	}
+	
+    [super renewGState];
+}
+
 @end
 
 /*****************************************************************************
