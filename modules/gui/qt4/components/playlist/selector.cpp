@@ -122,6 +122,9 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
     createItems();
     CONNECT( this, itemActivated( QTreeWidgetItem *, int ),
              this, setSource( QTreeWidgetItem *) );
+    CONNECT( this, itemClicked( QTreeWidgetItem *, int ),
+             this, setSource( QTreeWidgetItem *) );
+
     /* I believe this is unnecessary, seeing
        QStyle::SH_ItemView_ActivateItemOnSingleClick
         CONNECT( view, itemClicked( QTreeWidgetItem *, int ),
