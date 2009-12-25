@@ -275,6 +275,8 @@
 {
 	if([splitView isVertical])
 		return proposedPosition;
+	else if ( splitView == o_vertical_split )
+		return proposedPosition ;
 	else {
 		float bottom = [splitView frame].size.height - [splitView dividerThickness];
 		if(proposedPosition > bottom - 50) {
