@@ -1123,7 +1123,6 @@
     
                 vlc_object_release( (vlc_object_t *)p_vout );
             }
-            vlc_object_release( p_input );
         }
         if( [[o_mi title] isEqualToString: _NS("Fullscreen")] )
         {
