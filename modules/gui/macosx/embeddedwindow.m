@@ -445,7 +445,7 @@
             if ([screen isMainScreen])
                 SetSystemUIMode( kUIModeAllHidden, kUIOptionAutoShowMenuBar);
  
-            [[self contentView] replaceSubview:o_view with:o_temp_view];
+            [[o_view superview] replaceSubview:o_view with:o_temp_view];
             [o_temp_view setFrame:[o_view frame]];
             [o_fullscreen_window setContentView:o_view];
 
@@ -467,7 +467,7 @@
  
         /* Make sure we don't see the o_view disappearing of the screen during this operation */
         NSDisableScreenUpdates();
-        [[self contentView] replaceSubview:o_view with:o_temp_view];
+        [[o_view superview] replaceSubview:o_view with:o_temp_view];
         [o_temp_view setFrame:[o_view frame]];
         [o_fullscreen_window setContentView:o_view];
         [o_fullscreen_window makeKeyAndOrderFront:self];
@@ -661,7 +661,7 @@
     NSDisableScreenUpdates();
     [o_view retain];
     [o_view removeFromSuperviewWithoutNeedingDisplay];
-    [[self contentView] replaceSubview:o_temp_view with:o_view];
+    [[o_temp_view superview] replaceSubview:o_temp_view with:o_view];
     [o_view release];
     [o_view setFrame:[o_temp_view frame]];
     [self makeFirstResponder: o_view];
