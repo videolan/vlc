@@ -969,7 +969,8 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
         if ([o_window isVisible] && (![o_window isFullscreen]))
             [o_window makeKeyAndOrderFront: self];
 
-        [self scaleWindowWithFactor: 1.0 animate: [o_window isVisible] && (![o_window isFullscreen])];
+        if ( [self window] != o_embeddedwindow )
+            [self scaleWindowWithFactor: 1.0 animate: [o_window isVisible] && (![o_window isFullscreen])];
 
         [o_embeddedwindow setVideoRatio:[self voutSizeForFactor:1.0]];
 
