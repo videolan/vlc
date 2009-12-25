@@ -312,7 +312,7 @@ void DialogsProvider::openFileGenericDialog( intf_dialog_args_t *p_arg )
         if(i == 0)
             p_intf->p_sys->filepath = QString::fromAscii("");
         else
-            p_intf->p_sys->filepath = qfu( p_arg->psz_results[i] );
+            p_intf->p_sys->filepath = qfu( p_arg->psz_results[i-1] );
     }
 
     /* Callback */
