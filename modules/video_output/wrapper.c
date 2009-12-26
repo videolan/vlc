@@ -61,6 +61,8 @@ DECLARE_OPEN(direct3d_xp);
 DECLARE_OPEN(direct3d_vista);
 DECLARE_OPEN(glwin32);
 DECLARE_OPEN(macosx);
+DECLARE_OPEN(wingdi);
+DECLARE_OPEN(wingapi);
 
 #undef DECLARE_OPEN
 
@@ -124,6 +126,12 @@ vlc_module_begin()
 
     add_submodule()
     DECLARE_MODULE(macosx, 300)
+
+    add_submodule()
+    DECLARE_MODULE(wingdi, 10)
+
+    add_submodule()
+    DECLARE_MODULE(wingapi, 20)
 
 vlc_module_end()
 
