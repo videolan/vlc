@@ -1029,7 +1029,6 @@ static block_t *asf_header_create( sout_mux_t *p_mux, bool b_broadcast )
     /* metadata object (part of header extension) */
     if( i_cm_size )
     {
-        int64_t i_num, i_den;
         unsigned int i_dst_num, i_dst_den;
         asf_track_t *tk;
         tk=NULL;
