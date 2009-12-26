@@ -31,6 +31,7 @@
 #include "../utils/position.hpp"
 #include "../commands/cmd_generic.hpp"
 #include "../controls/ctrl_video.hpp"
+#include "../events/evt_key.hpp"
 
 class VarBool;
 class GenericWindow;
@@ -65,6 +66,14 @@ public:
         move( -50, -50 );
     }
     virtual ~VoutMainWindow() { }
+
+    virtual void processEvent( EvtKey &rEvtKey )
+    {
+        // Only do the action when the key is down
+        if( rEvtKey.getKeyState() == EvtKey::kDown )
+            var_SetInteger( getIntf()->p_libvlc, "key-pressed",
+                             rEvtKey.getModKey() );
+    }
 };
 
 
