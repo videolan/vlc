@@ -71,6 +71,13 @@ Interfaces:
 Mac OS X Interface:
  * Completely reworked user interface (based upon works from GSoC 2008)
 
+Mac OS X Port:
+ * Vastly improved VLCKit framework
+ * A new dialog provider for libvlc-internal interaction without full interface
+ * Improved update detection and installation by using the Sparkle framework
+   by Andy Matuschak et al.
+ * New CoreText based text renderer replacing the former ATSUI renderer
+
 Windows port:
  * Integration in Windows 7 taskbar
 
