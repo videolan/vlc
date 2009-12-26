@@ -750,7 +750,9 @@ static void MainLoop( input_thread_t *p_input, bool b_interactive )
                 msg_Dbg( p_input, "waiting decoder fifos to empty" );
                 i_wakeup = mdate() + INPUT_IDLE_SLEEP;
             }
-            else if( b_pause_after_eof )
+            /* Pause after eof only if the input is pausable.
+             * This way we won't trigger timeshifting for nothing */
+            else if( b_pause_after_eof && p_input->p->b_can_pause )
             {
                 msg_Dbg( p_input, "pausing at EOF (pause after each)");
                 val.i_int = PAUSE_S;
