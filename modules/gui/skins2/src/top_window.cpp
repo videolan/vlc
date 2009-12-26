@@ -82,10 +82,10 @@ void TopWindow::processEvent( EvtRefresh &rEvtRefresh )
     }
     else
     {
-        m_pActiveLayout->refreshRect( rEvtRefresh.getXStart(),
-                                      rEvtRefresh.getYStart(),
-                                      rEvtRefresh.getWidth(),
-                                      rEvtRefresh.getHeight() );
+        m_pActiveLayout->computeRefresh( rEvtRefresh.getXStart(),
+                                         rEvtRefresh.getYStart(),
+                                         rEvtRefresh.getWidth(),
+                                         rEvtRefresh.getHeight() );
     }
 }
 

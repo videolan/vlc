@@ -234,17 +234,7 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
         if( y + height > m_rect.getHeight() )
             height = m_rect.getHeight() - y;
 
-        // Refresh the window... but do not paint on a visible video control!
-        if( !m_pVideoCtrlSet.size() )
-        {
-            // No video control, we can safely repaint the rectangle
-            pWindow->refresh( x, y, width, height );
-        }
-        else
-        {
-            // video control(s) present, we need more calculations
-            computeRefresh( x, y, width, height );
-        }
+        computeRefresh( x, y, width, height );
     }
 }
 
@@ -280,9 +270,23 @@ public:
 
 void GenericLayout::computeRefresh( int x, int y, int width, int height )
 {
+    TopWindow *pWindow = getWindow();
+
+#ifndef WIN32
+
+    pWindow->refresh( x, y, width, height );
+
+#else
+
+    if( !m_pVideoCtrlSet.size() )
+    {
+        // No video control, we can safely repaint the rectangle
+        pWindow->refresh( x, y, width, height );
+        return;
+    }
+
     int w = width;
     int h = height;
-    TopWindow *pWindow = getWindow();
 
     set<int> x_set;
     set<int> y_set;
@@ -355,6 +359,9 @@ void GenericLayout::computeRefresh( int x, int y, int width, int height )
                 pWindow->refresh( x0, y0, w0 ,h0 );
         }
     }
+
+#endif
+
 }
 
 
