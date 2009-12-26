@@ -435,11 +435,15 @@ static void transcode_video_encoder_init( sout_stream_t *p_stream,
     if( id->p_encoder->fmt_out.video.i_sar_num <= 0 ||
         id->p_encoder->fmt_out.video.i_sar_den <= 0 )
     {
-        id->p_encoder->fmt_out.video.i_sar_num =
-            f_aspect * id->p_encoder->fmt_out.video.i_height + 0.5;
-        id->p_encoder->fmt_out.video.i_sar_num =
-            VOUT_ASPECT_FACTOR * id->p_encoder->fmt_out.video.i_width;
+        id->p_encoder->fmt_out.video.i_sar_num = id->p_decoder->fmt_out.video.i_sar_num * i_src_width / i_dst_width;
+        id->p_encoder->fmt_out.video.i_sar_den = id->p_decoder->fmt_out.video.i_sar_den * i_src_height / i_dst_height;
     }
+    vlc_ureduce( &id->p_encoder->fmt_out.video.i_sar_num,
+                 &id->p_encoder->fmt_out.video.i_sar_den,
+                 id->p_encoder->fmt_out.video.i_sar_num,
+                 id->p_encoder->fmt_out.video.i_sar_den,
+                 0 );
+
     id->p_encoder->fmt_in.video.i_sar_num =
         id->p_encoder->fmt_out.video.i_sar_num;
     id->p_encoder->fmt_in.video.i_sar_den =
