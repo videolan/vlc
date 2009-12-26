@@ -184,7 +184,7 @@ static void CacheAtoms (vout_window_sys_t *p_sys)
 
     wm_state_ck = intern_string (conn, "_NET_WM_STATE");
     wm_state_above_ck = intern_string (conn, "_NET_WM_STATE_ABOVE");
-    wm_state_below_ck = intern_string (conn, "_NET_WM_STATE_ABOVE");
+    wm_state_below_ck = intern_string (conn, "_NET_WM_STATE_BELOW");
     wm_state_fs_ck = intern_string (conn, "_NET_WM_STATE_FULLSCREEN");
 #ifdef MATCHBOX_HACK
     xcb_intern_atom_cookie_t mb_current_app_window;
