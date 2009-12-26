@@ -101,7 +101,6 @@ typedef struct dialog_progress_bar_t
     const char *message;
     const char *cancel;
     /* Permanent parameters */
-    vlc_mutex_t lock;
     void (*pf_update) (void *, const char *, float);
     bool (*pf_check) (void *);
     void (*pf_destroy) (void *);
