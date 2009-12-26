@@ -4138,8 +4138,8 @@ dnl  CoreAudio plugin
 dnl
 AC_ARG_ENABLE(macosx-audio,
   [  --enable-macosx-audio   Mac OS X audio module (default enabled on MacOS X)])
-if test "${enable_macosx-audio}" != "no" &&
-  (test "${SYS}" = "darwin" || test "${enable_macosx-audio}" = "yes")
+if test "x${enable_macosx_audio}" != "xno" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx_audio}" = "yes")
 then
   AC_CHECK_HEADERS(CoreAudio/CoreAudio.h,
     [ VLC_ADD_PLUGIN([auhal])
