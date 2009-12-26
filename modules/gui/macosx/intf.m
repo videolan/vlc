@@ -113,7 +113,8 @@ void CloseIntf ( vlc_object_t *p_this )
 /*****************************************************************************
  * Run: main loop
  *****************************************************************************/
-jmp_buf jmpbuffer;
+static NSLock * o_appLock = nil;    // controls access to f_appExit
+static int f_appExit = 0;           // set to 1 when application termination signaled
 
 static void Run( intf_thread_t *p_intf )
 {
@@ -134,17 +135,15 @@ static void Run( intf_thread_t *p_intf )
 
     NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
 
-    /* Install a jmpbuffer to where we can go back before the NSApp exit
-     * see applicationWillTerminate: */
+    o_appLock = [[NSLock alloc] init];
+
     [VLCApplication sharedApplication];
 
     [[VLCMain sharedInstance] setIntf: p_intf];
     [NSBundle loadNibNamed: @"MainMenu" owner: NSApp];
 
-    /* Install a jmpbuffer to where we can go back before the NSApp exit
-     * see applicationWillTerminate: */
-    if(setjmp(jmpbuffer) == 0)
-        [NSApp run];
+    [NSApp run];
+    [[VLCMain sharedInstance] applicationWillTerminate:nil];
     
     [o_pool release];
 }
@@ -790,18 +789,26 @@ static VLCMain *_o_sharedMainInstance = nil;
     vout_thread_t * p_vout;
     int returnedValue = 0;
  
-    if( !p_intf ) return;
+    if( !p_intf )
+        return;
+
+    // don't allow a double termination call. If the user has
+    // already invoked the quit then simply return this time.
+    int isTerminating = false;
+
+    [o_appLock lock];
+    isTerminating = (f_appExit++ > 0 ? 1 : 0);
+    [o_appLock unlock];
+
+    if (isTerminating)
+        return;
 
     msg_Dbg( p_intf, "Terminating" );
 
-    /* Make sure the manage_thread won't call -terminate: again */
-    pthread_cancel( manage_thread );
+    pthread_join( manage_thread, NULL );
 
     /* Make sure the intf object is getting killed */
     vlc_object_kill( p_intf );
-
-    /* Make sure our manage_thread ends */
-    pthread_join( manage_thread, NULL );
 
     /* Make sure the interfaceTimer is destroyed */
     [interfaceTimer invalidate];
@@ -894,11 +901,6 @@ static VLCMain *_o_sharedMainInstance = nil;
     libvlc_Quit( p_intf->p_libvlc );
 
     [self setIntf:nil];
-
-    /* Go back to Run() and make libvlc exit properly */
-    if( jmpbuffer )
-        longjmp( jmpbuffer, 1 );
-    /* not reached */
 }
 
 #pragma mark -
@@ -1574,7 +1576,8 @@ static void manage_cleanup( void * args )
     struct manage_cleanup_stack stack = { p_intf, &p_input, p_playlist, self };
     pthread_cleanup_push(manage_cleanup, &stack);
 
-    while( true )
+    bool exitLoop = false;
+    while( !exitLoop )
     {
         NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
@@ -1609,14 +1612,15 @@ static void manage_cleanup( void * args )
         msleep( INTF_IDLE_SLEEP );
 
         [pool release];
+
+        [o_appLock lock];
+        exitLoop = (f_appExit != 0 ? true : false);
+        [o_appLock unlock];
     }
 
     pthread_cleanup_pop(1);
 
-    msg_Dbg( p_intf, "Killing the Mac OS X module" );
-
-    /* We are dead, terminate */
-    [NSApp performSelectorOnMainThread: @selector(terminate:) withObject:nil waitUntilDone:NO];
+    msg_Dbg( p_intf, "OS X Manage thread terminating" );
 }
 
 - (void)manageVolumeSlider

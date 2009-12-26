@@ -7880,7 +7880,7 @@ LCAuLi4</string>
 				</object>
 				<object class="IBConnectionRecord">
 					<object class="IBActionConnection" key="connection">
-						<string key="label">terminate:</string>
+						<string key="label">stop:</string>
 						<reference key="source" ref="987699396"/>
 						<reference key="destination" ref="845106587"/>
 					</object>
