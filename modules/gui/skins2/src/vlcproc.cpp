@@ -682,7 +682,7 @@ void VlcProc::on_volume_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 
     audio_volume_t volume;
     aout_VolumeGet( pPlaylist, &volume );
-    SET_VOLUME( m_cVarVolume, (double)volume * 2.0 / AOUT_VOLUME_MAX, false );
+    SET_VOLUME( m_cVarVolume, (double)volume / AOUT_VOLUME_MAX, false );
     SET_BOOL( m_cVarMute, volume == 0 );
 }
 
@@ -775,7 +775,7 @@ void VlcProc::init_variables()
 
     audio_volume_t volume;
     aout_VolumeGet( pPlaylist, &volume );
-    SET_VOLUME( m_cVarVolume, (double)volume * 2.0 / AOUT_VOLUME_MAX, false );
+    SET_VOLUME( m_cVarVolume, (double)volume / AOUT_VOLUME_MAX, false );
     SET_BOOL( m_cVarMute, volume == 0 );
 
     update_equalizer();

@@ -37,7 +37,7 @@ Volume::Volume( intf_thread_t *pIntf ): VarPercent( pIntf )
     audio_volume_t val;
 
     aout_VolumeGet( getIntf()->p_sys->p_playlist, &val );
-    VarPercent::set( val * 2.0 / AOUT_VOLUME_MAX );
+    VarPercent::set( val / AOUT_VOLUME_MAX );
 }
 
 
@@ -48,10 +48,9 @@ void Volume::set( float percentage, bool updateVLC )
         (int)(percentage * AOUT_VOLUME_MAX) )
     {
         VarPercent::set( percentage );
-
         if( updateVLC )
             aout_VolumeSet( getIntf()->p_sys->p_playlist,
-                            (int)(get() * AOUT_VOLUME_MAX / 2.0) );
+                            (int)(get() * AOUT_VOLUME_MAX) );
     }
 }
 
