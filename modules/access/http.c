@@ -1418,7 +1418,7 @@ static int Request( access_t *p_access, int64_t i_tell )
             int64_t i_ntell = i_tell;
             int64_t i_nend = (p_access->info.i_size > 0)?(p_access->info.i_size - 1):i_tell;
             int64_t i_nsize = p_access->info.i_size;
-            sscanf(p,"bytes %"PRId64"-%"PRId64"/%"PRId64,&i_ntell,&i_nend,&i_nsize);
+            sscanf(p,"bytes %"SCNd64"-%"SCNd64"/%"SCNd64,&i_ntell,&i_nend,&i_nsize);
             if(i_nend > i_ntell ) {
                 p_access->info.i_pos = i_ntell;
                 p_sys->i_remaining = i_nend+1-i_ntell;
