@@ -39,12 +39,12 @@ extern NSString * VLCMediaListItemDeleted;
 /**
  * TODO: Documentation - [VLCMediaListDelegate mediaList:mediaAdded:atIndex:]
  */
-- (void)mediaList:(VLCMediaList *)aMediaList mediaAdded:(VLCMedia *)media atIndex:(int)index;
+- (void)mediaList:(VLCMediaList *)aMediaList mediaAdded:(VLCMedia *)media atIndex:(NSInteger)index;
 
 /**
  * TODO: Documentation - [VLCMediaListDelegate mediaList:mediaRemovedAtIndex:]
  */
-- (void)mediaList:(VLCMediaList *)aMediaList mediaRemovedAtIndex:(int)index;
+- (void)mediaList:(VLCMediaList *)aMediaList mediaRemovedAtIndex:(NSInteger)index;
 @end
 
 /**
@@ -75,33 +75,33 @@ extern NSString * VLCMediaListItemDeleted;
 /**
  * TODO: Documentation - [VLCMediaList addMedia:]
  */
-- (int)addMedia:(VLCMedia *)media;
+- (NSInteger)addMedia:(VLCMedia *)media;
 
 /**
  * TODO: Documentation - [VLCMediaList insertMedia:atIndex:]
  */
-- (void)insertMedia:(VLCMedia *)media atIndex:(int)index;
+- (void)insertMedia:(VLCMedia *)media atIndex:(NSInteger)index;
 
 /**
  * TODO: Documentation - [VLCMediaList removeMediaAtIndex:]
  */
-- (void)removeMediaAtIndex:(int)index;
+- (void)removeMediaAtIndex:(NSInteger)index;
 
 /**
  * TODO: Documentation - [VLCMediaList mediaAtIndex:]
  */
-- (VLCMedia *)mediaAtIndex:(int)index;
+- (VLCMedia *)mediaAtIndex:(NSInteger)index;
 
 /**
  * TODO: Documentation - [VLCMediaList indexOfMedia:]
  */
-- (int)indexOfMedia:(VLCMedia *)media;
+- (NSInteger)indexOfMedia:(VLCMedia *)media;
 
 /* Properties */
 /**
  * TODO: Documentation VLCMediaList.count
  */
-@property (readonly) int count;
+@property (readonly) NSInteger count;
 
 /**
  * TODO: Documentation VLCMediaList.delegate

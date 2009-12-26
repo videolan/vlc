@@ -71,7 +71,7 @@ static void * EventDispatcherMainLoop(void * user_data)
         NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
         message_t * message, * message_newer = NULL;
         NSData * dataMessage;
-        int i;
+        NSInteger i;
 
         /* Sleep a bit not to flood the interface */
         usleep(300);

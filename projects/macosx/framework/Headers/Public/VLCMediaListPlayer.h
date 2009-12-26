@@ -35,7 +35,7 @@ enum VLCRepeatMode {
     VLCRepeatCurrentItem,
     VLCRepeatAllItems
 };
-typedef int VLCRepeatMode;
+typedef NSInteger VLCRepeatMode;
 
 @interface VLCMediaListPlayer : NSObject {
     void *instance;

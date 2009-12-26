@@ -62,7 +62,7 @@ NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
     return libvlc_audio_get_mute([library instance]);
 }
 
-- (void)setVolume:(int)value
+- (void)setVolume:(NSUInteger)value
 {
     if (value < VOLUME_MIN)
         value = VOLUME_MIN;
@@ -73,7 +73,7 @@ NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
 
 - (void)volumeUp
 {
-    int tempVolume = [self volume] + VOLUME_STEP;
+    NSUInteger tempVolume = [self volume] + VOLUME_STEP;
     if (tempVolume > VOLUME_MAX)
         tempVolume = VOLUME_MAX;
     else if (tempVolume < VOLUME_MIN)
@@ -83,7 +83,7 @@ NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
 
 - (void)volumeDown
 {
-    int tempVolume = [self volume] - VOLUME_STEP;
+    NSUInteger tempVolume = [self volume] - VOLUME_STEP;
     if (tempVolume > VOLUME_MAX)
         tempVolume = VOLUME_MAX;
     else if (tempVolume < VOLUME_MIN)
@@ -91,7 +91,7 @@ NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
     [self setVolume: tempVolume];
 }
 
-- (int)volume
+- (NSUInteger)volume
 {
     return libvlc_audio_get_volume([library instance]);
 }

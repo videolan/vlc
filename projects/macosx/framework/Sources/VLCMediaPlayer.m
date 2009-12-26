@@ -287,7 +287,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int count = libvlc_video_get_spu_count( instance, &ex );
+    NSInteger count = libvlc_video_get_spu_count( instance, &ex );
     catch_exception( &ex );
     if (count <= 0)
         return NSNotFound;
@@ -309,7 +309,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int count = libvlc_video_get_spu_count( instance, &ex );
+    NSInteger count = libvlc_video_get_spu_count( instance, &ex );
     catch_exception( &ex );
 
     libvlc_track_description_t *tracks = libvlc_video_get_spu_description( instance, &ex );
@@ -361,7 +361,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     return result;
 }
 
-- (void)setVideoTeleText:(int)value
+- (void)setVideoTeleText:(NSUInteger)value
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
@@ -369,11 +369,11 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     catch_exception( &ex );
 }
 
-- (int)videoTeleText
+- (NSUInteger)videoTeleText
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int result = libvlc_video_get_teletext( instance, &ex );
+    NSInteger result = libvlc_video_get_teletext( instance, &ex );
     catch_exception( &ex );
     return result;
 }
@@ -466,11 +466,11 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     return cachedRemainingTime;
 }
 
-- (int)fps
+- (NSUInteger)fps
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int result = libvlc_media_player_get_fps( instance, &ex );
+    NSUInteger result = libvlc_media_player_get_fps( instance, &ex );
     catch_exception( &ex );
     return result;
 }
@@ -489,7 +489,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int count = libvlc_media_player_get_chapter_count( instance, &ex );
+    NSInteger count = libvlc_media_player_get_chapter_count( instance, &ex );
     catch_exception( &ex );
     if (count <= 0)
         return NSNotFound;
@@ -518,7 +518,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int count = libvlc_media_player_get_chapter_count(instance, &ex);
+    NSInteger count = libvlc_media_player_get_chapter_count(instance, &ex);
     if (count <= 0)
         return [NSArray array];
 
@@ -549,7 +549,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
 
-    int count = libvlc_media_player_get_title_count( instance, &ex );
+    NSInteger count = libvlc_media_player_get_title_count( instance, &ex );
     catch_exception( &ex );
     if (count <= 0)
         return NSNotFound;
@@ -559,11 +559,11 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     return result;
 }
 
-- (int)countOfTitles
+- (NSUInteger)countOfTitles
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int result = libvlc_media_player_get_title_count( instance, &ex );
+    NSUInteger result = libvlc_media_player_get_title_count( instance, &ex );
     catch_exception( &ex );
     return result;
 }
@@ -597,7 +597,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int count = libvlc_audio_get_track_count( instance, &ex );
+    NSInteger count = libvlc_audio_get_track_count( instance, &ex );
     catch_exception( &ex );
     if (count <= 0)
         return NSNotFound;
@@ -611,14 +611,14 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int count = libvlc_audio_get_track_count( instance, &ex );
+    NSInteger count = libvlc_audio_get_track_count( instance, &ex );
     catch_exception( &ex );
     if (count <= 0)
         return [NSArray array];
 
     libvlc_track_description_t *tracks = libvlc_audio_get_track_description( instance, &ex );
     NSMutableArray *tempArray = [NSMutableArray array];
-    NSInteger i;
+    NSUInteger i;
     for (i = 0; i < count ; i++)
     {
         [tempArray addObject:[NSString stringWithUTF8String: tracks->psz_name]];
@@ -628,7 +628,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     return [NSArray arrayWithArray: tempArray];
 }
 
-- (void)setAudioChannel:(int)value
+- (void)setAudioChannel:(NSInteger)value
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
@@ -636,11 +636,11 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     catch_exception( &ex );
 }
 
-- (int)audioChannel
+- (NSInteger)audioChannel
 {
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
-    int result = libvlc_audio_get_channel( instance, &ex );
+    NSInteger result = libvlc_audio_get_channel( instance, &ex );
     catch_exception( &ex );
     return result;
 }

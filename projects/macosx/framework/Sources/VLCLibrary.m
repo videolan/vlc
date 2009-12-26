@@ -83,7 +83,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
             vlcParams = defaultParams;
         }
 
-        int paramNum = 0;
+        NSUInteger paramNum = 0;
         NSUInteger count = [vlcParams count];
         const char *lib_vlc_params[count];
         while (paramNum < count) {

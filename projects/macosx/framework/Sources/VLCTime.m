@@ -39,7 +39,7 @@
     return [[[VLCTime alloc] initWithNumber:aNumber] autorelease];
 }
 
-+ (VLCTime *)timeWithInt:(int)aInt
++ (VLCTime *)timeWithInt:(NSInteger)aInt
 {
     return [[[VLCTime alloc] initWithInt:aInt] autorelease];
 }

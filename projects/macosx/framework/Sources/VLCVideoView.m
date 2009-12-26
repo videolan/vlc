@@ -194,7 +194,7 @@
     if( [[self subviews] count] )
     {
         /* XXX: This is a hack until core gets fixed */
-        int i;
+        NSUInteger i;
         for( i = 0; i < [[self subviews] count]; i++ )
         {
             [[[self subviews] objectAtIndex:i] detachFromVout];

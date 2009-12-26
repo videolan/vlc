@@ -71,20 +71,20 @@
 
 @implementation VLCMediaListAspect (KeyValueCodingCompliance)
 /* For the @"media" key */
-- (int) countOfMedia
+- (NSInteger) countOfMedia
 {
     return [cachedNode count];
 }
-- (id) objectInMediaAtIndex:(int)i
+- (id) objectInMediaAtIndex:(NSInteger)i
 {
     return [[cachedNode objectAtIndex:i] media];
 }
 /* For the @"node" key */
-- (int) countOfNode
+- (NSInteger) countOfNode
 {
     return [cachedNode count];
 }
-- (id) objectInNodeAtIndex:(int)i
+- (id) objectInNodeAtIndex:(NSInteger)i
 {
     return [cachedNode objectAtIndex:i];
 }
@@ -145,7 +145,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 - (NSString *)description
 {
     NSMutableString * content = [NSMutableString string];
-    int i;
+    NSUInteger i;
     for( i = 0; i < [self count]; i++)
     {
         [content appendFormat:@"%@\n", [self mediaAtIndex: i]];
@@ -153,7 +153,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     return [NSString stringWithFormat:@"<%@ %p> {\n%@}", [self className], self, content];
 }
 
-- (VLCMedia *)mediaAtIndex:(int)index
+- (VLCMedia *)mediaAtIndex:(NSInteger)index
 {
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
@@ -165,7 +165,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     return [VLCMedia mediaWithLibVLCMediaDescriptor:p_md];
 }
 
-- (VLCMediaListAspect *)childrenAtIndex:(int)index
+- (VLCMediaListAspect *)childrenAtIndex:(NSInteger)index
 {
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
@@ -180,7 +180,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     return [VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_sub_mlv];
 }
 
-- (VLCMediaListAspectNode *)nodeAtIndex:(int)index
+- (VLCMediaListAspectNode *)nodeAtIndex:(NSInteger)index
 {
     VLCMediaListAspectNode * node = [[[VLCMediaListAspectNode alloc] init] autorelease];
     [node setMedia:[self mediaAtIndex: index]];
@@ -193,11 +193,11 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     return node;
 }
 
-- (int)count
+- (NSInteger)count
 {
     libvlc_exception_t p_e;
     libvlc_exception_init( &p_e );
-    int result = libvlc_media_list_view_count( p_mlv, &p_e );
+    NSInteger result = libvlc_media_list_view_count( p_mlv, &p_e );
     catch_exception( &p_e );
 
     return result;
@@ -245,7 +245,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
         libvlc_media_list_t * p_mlist;
         p_mlist = libvlc_media_list_view_parent_media_list( p_mlv, NULL );
         libvlc_media_list_lock( p_mlist );
-        int i, count = libvlc_media_list_view_count(p_mlv, NULL);
+        NSUInteger i, count = libvlc_media_list_view_count(p_mlv, NULL);
         for( i = 0; i < count; i++ )
         {
             libvlc_media_t * p_md = libvlc_media_list_view_item_at_index(p_mlv, i, NULL);
@@ -291,15 +291,15 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     NSAssert([NSThread isMainThread], @"We are not on main thread");
 
     /* We hope to receive index in a nide range, that could change one day */
-    int start = [[[arrayOfArgs objectAtIndex: 0] objectForKey:@"index"] intValue];
-    int end = [[[arrayOfArgs objectAtIndex: [arrayOfArgs count]-1] objectForKey:@"index"] intValue];
+    NSInteger start = [[[arrayOfArgs objectAtIndex: 0] objectForKey:@"index"] intValue];
+    NSInteger end = [[[arrayOfArgs objectAtIndex: [arrayOfArgs count]-1] objectForKey:@"index"] intValue];
     NSRange range = NSMakeRange(start, end-start);
 
     [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"media"];
     [self willChange:NSKeyValueChangeInsertion valuesAtIndexes:[NSIndexSet indexSetWithIndexesInRange:range] forKey:@"node"];
     for( NSDictionary * args in arrayOfArgs )
     {
-        int index = [[args objectForKey:@"index"] intValue];
+        NSInteger index = [[args objectForKey:@"index"] intValue];
         VLCMedia * media = [args objectForKey:@"media"];
         VLCMediaListAspectNode * node = [[[VLCMediaListAspectNode alloc] init] autorelease];
         [node setMedia:media];

@@ -110,8 +110,8 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (void)setVideoCropGeometry:(char *)value;
 - (char *)videoCropGeometry;
 
-- (void)setVideoTeleText:(int)value;
-- (int)videoTeleText;
+- (void)setVideoTeleText:(NSUInteger)value;
+- (NSUInteger)videoTeleText;
 
 /**
  * Take a snapshot of the current video.
@@ -155,7 +155,7 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (VLCTime *)time;
 
 @property (readonly) VLCTime *remainingTime;
-@property (readonly) int fps;
+@property (readonly) NSUInteger fps;
 
 /**
  * Return the current video subtitle index
@@ -219,8 +219,8 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
  */
 - (NSArray *)audioTracks;
 
-- (void)setAudioChannel:(int)value;
-- (int)audioChannel;
+- (void)setAudioChannel:(NSInteger)value;
+- (NSInteger)audioChannel;
 
 /* Media Options */
 - (void)setMedia:(VLCMedia *)value;

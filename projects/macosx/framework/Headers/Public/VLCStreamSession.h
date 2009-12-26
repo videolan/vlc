@@ -30,7 +30,7 @@
 @interface VLCStreamSession : VLCMediaPlayer {
     VLCStreamOutput * streamOutput;
     VLCMedia * originalMedia;
-    int reattemptedConnections;
+    NSUInteger reattemptedConnections;
     BOOL isComplete;
 }
 

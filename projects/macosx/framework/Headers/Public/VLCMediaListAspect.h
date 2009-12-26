@@ -44,9 +44,9 @@
     VLCMediaList * parentMediaList;
     BOOL ownHisMediaList;
 }
-- (VLCMedia *)mediaAtIndex:(int)index;
-- (VLCMediaListAspectNode *)nodeAtIndex:(int)index;
-- (int)count;
+- (VLCMedia *)mediaAtIndex:(NSInteger)index;
+- (VLCMediaListAspectNode *)nodeAtIndex:(NSInteger)index;
+- (NSInteger)count;
 
 - (VLCMediaList *)parentMediaList;
 @end
