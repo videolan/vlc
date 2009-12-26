@@ -35,6 +35,7 @@ class QLabel;
 class QTextEdit;
 class QTreeWidget;
 class QTreeWidgetItem;
+class QLineEdit;
 
 class MessagesDialog : public QVLCFrame, public Singleton<MessagesDialog>
 {
@@ -50,6 +51,8 @@ private:
     QTreeWidget *modulesTree;
     QPushButton *clearUpdateButton;
     QPushButton *saveLogButton;
+    QLineEdit *vbobjectsEdit;
+    QLabel *vbobjectsLabel;
     msg_subscription_t *sub;
     msg_cb_data_t *cbData;
     static void sinkMessage( msg_cb_data_t *, msg_item_t *, unsigned );
@@ -60,6 +63,7 @@ private slots:
     void updateTab( int );
     void clearOrUpdate();
     bool save();
+    void updateConfig();
 private:
     void clear();
     void updateTree();

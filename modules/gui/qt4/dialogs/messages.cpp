@@ -38,6 +38,7 @@
 #include <QTreeWidgetItem>
 #include <QHeaderView>
 #include <QMutex>
+#include <QLineEdit>
 
 #include <assert.h>
 
@@ -119,19 +120,28 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
     verbosityLabel = new QLabel( qtr( "Verbosity Level" ) );
 
+    vbobjectsEdit = new QLineEdit();
+
+    vbobjectsEdit->setMaximumWidth( 100 );
+    vbobjectsEdit->setText(config_GetPsz( p_intf, "verbose-objects"));
+    vbobjectsLabel =  new QLabel( qtr( "Message filter" ) );
+
     mainLayout->addWidget( mainTab, 0, 0, 1, 0 );
     mainLayout->addWidget( verbosityLabel, 1, 0, 1, 1 );
     mainLayout->addWidget( verbosityBox, 1, 1 );
-    mainLayout->setColumnStretch( 2, 10 );
-    mainLayout->addWidget( saveLogButton, 1, 3 );
-    mainLayout->addWidget( clearUpdateButton, 1, 4 );
-    mainLayout->addWidget( closeButton, 1, 5 );
+    mainLayout->addWidget( vbobjectsLabel, 1, 2, 1, 1 );
+    mainLayout->addWidget( vbobjectsEdit, 1, 3 );
+    mainLayout->setColumnStretch( 4, 10 );
+    mainLayout->addWidget( saveLogButton, 1, 5 );
+    mainLayout->addWidget( clearUpdateButton, 1, 6 );
+    mainLayout->addWidget( closeButton, 1, 7 );
 
     BUTTONACT( closeButton, hide() );
     BUTTONACT( clearUpdateButton, clearOrUpdate() );
     BUTTONACT( saveLogButton, save() );
     CONNECT( mainTab, currentChanged( int ),
              this, updateTab( int ) );
+    CONNECT(vbobjectsEdit, editingFinished(), this, updateConfig());
 
     /* General action */
     readSettings( "Messages", QSize( 600, 450 ) );
@@ -157,6 +167,8 @@ void MessagesDialog::updateTab( int index )
     {
         verbosityLabel->hide();
         verbosityBox->hide();
+        vbobjectsLabel->hide();
+        vbobjectsEdit->hide();
         clearUpdateButton->setText( qtr( "&Update" ) );
         saveLogButton->hide();
         updateTree();
@@ -166,8 +178,38 @@ void MessagesDialog::updateTab( int index )
     {
         verbosityLabel->show();
         verbosityBox->show();
+        vbobjectsLabel->show();
+        vbobjectsEdit->show();
         clearUpdateButton->setText( qtr( "&Clear" ) );
         saveLogButton->show();
+    }
+}
+
+void MessagesDialog::updateConfig()
+{
+    config_PutPsz(p_intf, "verbose-objects", qtu(vbobjectsEdit->text()));
+    //vbobjectsEdit->setText("vbEdit changed!");
+
+    char * psz_verbose_objects = strdup(qtu(vbobjectsEdit->text()));
+    msg_EnableObjectPrinting(p_intf, "all");
+    if( psz_verbose_objects )
+    {
+        char * psz_object, * iter =  psz_verbose_objects;
+        while( (psz_object = strsep( &iter, "," )) )
+        {
+            switch( psz_object[0] )
+            {
+                printf("%s\n", psz_object+1);
+                case '+': msg_EnableObjectPrinting(p_intf, psz_object+1); break;
+                case '-': msg_DisableObjectPrinting(p_intf, psz_object+1); break;
+                default:
+                    msg_Err( p_intf, "verbose-objects usage: \n"
+                            "--verbose-objects=+printthatobject,"
+                            "-dontprintthatone\n"
+                            "(keyword 'all' to applies to all objects)");
+            }
+        }
+        free( psz_verbose_objects );
     }
 }
 
