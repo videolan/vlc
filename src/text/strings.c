@@ -1053,6 +1053,8 @@ char *make_URI (const char *path)
 {
     if (path == NULL)
         return NULL;
+    if (!strcmp (path, "-"))
+        return strdup ("fd://0"); // standard input
     if (strstr (path, "://") != NULL)
         return strdup (path); /* Already an URI */
     /* Note: VLC cannot handle URI schemes without double slash after the
