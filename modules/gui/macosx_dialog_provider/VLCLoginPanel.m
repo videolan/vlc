@@ -39,19 +39,6 @@
                                 defer:YES];
 }
 
-#define addButton( theButton, ox, oy, title, action )           \
-s_rc.origin.x = ox;                                             \
-s_rc.origin.y = oy;                                             \
-s_rc.size.height = 32;                                          \
-s_rc.size.width = 108;                                          \
-theButton = [[NSButton alloc] initWithFrame:s_rc];              \
-[theButton setButtonType:NSMomentaryLightButton];               \
-[theButton setTitle:title];                                     \
-[theButton setBordered:NO];                                     \
-[theButton setTarget:self];                                     \
-[theButton setAction:@selector(action:)];                       \
-[ourContentView addSubview:theButton]
-
 - (void)createContentView
 {
     NSRect s_rc = [self frame];
