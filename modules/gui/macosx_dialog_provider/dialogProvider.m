@@ -94,6 +94,7 @@ int OpenIntf(vlc_object_t *p_this)
 
     memset(p_intf->p_sys,0,sizeof(*p_intf->p_sys));
 
+    p_intf->b_should_run_on_first_thread = true;
     p_intf->pf_run = Run;
 
     msg_Dbg(p_intf,"Opening Mac OS X dialog provider");
@@ -122,12 +123,10 @@ static void Run( intf_thread_t *p_intf )
 
     /* idle */
     while(vlc_object_alive(p_intf))
-    {
-        sleep( 100000 );
-    }
+        msleep(INTF_IDLE_SLEEP);
     
     /* unsubscribe from the interactive dialogues */
-    dialog_Unregister(p_intf );
+    dialog_Unregister(p_intf);
     var_DelCallback(p_intf,"dialog-error",DisplayError,p_intf);
     var_DelCallback(p_intf,"dialog-critical",DisplayCritical,p_intf);
     var_DelCallback(p_intf,"dialog-login",DisplayLogin,p_intf);
