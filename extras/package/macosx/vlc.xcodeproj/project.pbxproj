@@ -279,8 +279,6 @@
 		CC0FB34B0F8BED1100F057F7 /* English */ = {isa = PBXFileReference; lastKnownFileType = wrapper.nib; name = English; path = Resources/English.lproj/CoreDialogs.nib; sourceTree = "<group>"; };
 		CC1941240B9C1F8400635F6B /* QTKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = QTKit.framework; path = /System/Library/Frameworks/QTKit.framework; sourceTree = "<absolute>"; };
 		CC1C41D00D9BAD7F002728FA /* noart.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = noart.png; path = Resources/noart.png; sourceTree = "<group>"; };
-		CC26BF3109A7A08C00E94D62 /* update.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = update.h; path = ../../../modules/gui/macosx/update.h; sourceTree = SOURCE_ROOT; };
-		CC26BF3209A7A08C00E94D62 /* update.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = update.m; path = ../../../modules/gui/macosx/update.m; sourceTree = SOURCE_ROOT; };
 		CC33C2200D2572DE008C4683 /* pause_embedded_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = pause_embedded_graphite.png; path = Resources/pause_embedded_graphite.png; sourceTree = "<group>"; };
 		CC33C2210D2572DE008C4683 /* play_embedded_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = play_embedded_graphite.png; path = Resources/play_embedded_graphite.png; sourceTree = "<group>"; };
 		CC33C2400D2578F5008C4683 /* add_embedded_graphite.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_embedded_graphite.png; path = Resources/add_embedded_graphite.png; sourceTree = "<group>"; };
@@ -411,6 +409,10 @@
 		CCCB86D80ACFDFB300CF1E10 /* fs_stop_highlight.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_stop_highlight.png; path = Resources/fs_stop_highlight.png; sourceTree = "<group>"; };
 		CCCB86D90ACFDFB300CF1E10 /* fs_stop.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_stop.png; path = Resources/fs_stop.png; sourceTree = "<group>"; };
 		CCCB86DA0ACFDFB300CF1E10 /* fs_background.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = fs_background.png; path = Resources/fs_background.png; sourceTree = "<group>"; };
+		CCD590F010E5B73200D39094 /* dialogProvider.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = dialogProvider.h; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.h; sourceTree = SOURCE_ROOT; };
+		CCD590F110E5B73200D39094 /* dialogProvider.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = dialogProvider.m; path = ../../../modules/gui/macosx_dialog_provider/dialogProvider.m; sourceTree = SOURCE_ROOT; };
+		CCD590F210E5B76300D39094 /* VLCLoginPanel.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLoginPanel.h; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.h; sourceTree = SOURCE_ROOT; };
+		CCD590F310E5B76300D39094 /* VLCLoginPanel.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = VLCLoginPanel.m; path = ../../../modules/gui/macosx_dialog_provider/VLCLoginPanel.m; sourceTree = SOURCE_ROOT; };
 		CCD90F4B0E87C86D0034564A /* add_schedule.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_schedule.png; path = Resources/add_schedule.png; sourceTree = "<group>"; };
 		CCD90F4C0E87C86D0034564A /* add_vod.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_vod.png; path = Resources/add_vod.png; sourceTree = "<group>"; };
 		CCD90F4D0E87C86D0034564A /* add_broadcast.png */ = {isa = PBXFileReference; lastKnownFileType = image.png; name = add_broadcast.png; path = Resources/add_broadcast.png; sourceTree = "<group>"; };
@@ -455,6 +457,7 @@
 		089C166AFE841209C02AAC07 /* vlc */ = {
 			isa = PBXGroup;
 			children = (
+				CCD590EF10E5B71300D39094 /* Minimal Dialog Provider */,
 				CC6C01A40DDF3E7800C7D754 /* Minimal Mac OS X Classes */,
 				CCC8957F0D9A8A61005AE59C /* OSX-specific source files */,
 				08FB77AFFE84173DC02AAC07 /* Classes */,
@@ -533,8 +536,6 @@
 				DC7F46F108A187F60027DB24 /* extended.m */,
 				DCE7BD0708A5724D007B10AE /* bookmarks.h */,
 				DCE7BD0608A5724D007B10AE /* bookmarks.m */,
-				CC26BF3109A7A08C00E94D62 /* update.h */,
-				CC26BF3209A7A08C00E94D62 /* update.m */,
 				CC6D8D9C0A878DED006F2BBE /* AppleRemote.h */,
 				CC6D8D9D0A878DED006F2BBE /* AppleRemote.m */,
 				CCC593780AB4A9FB0004FF52 /* embeddedwindow.h */,
@@ -822,6 +823,17 @@
 				CCCB86DA0ACFDFB300CF1E10 /* fs_background.png */,
 			);
 			name = "Native FSPanel icons";
+			sourceTree = "<group>";
+		};
+		CCD590EF10E5B71300D39094 /* Minimal Dialog Provider */ = {
+			isa = PBXGroup;
+			children = (
+				CCD590F010E5B73200D39094 /* dialogProvider.h */,
+				CCD590F110E5B73200D39094 /* dialogProvider.m */,
+				CCD590F210E5B76300D39094 /* VLCLoginPanel.h */,
+				CCD590F310E5B76300D39094 /* VLCLoginPanel.m */,
+			);
+			name = "Minimal Dialog Provider";
 			sourceTree = "<group>";
 		};
 		CCD90F4A0E87C82D0034564A /* VLM */ = {

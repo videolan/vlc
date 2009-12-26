@@ -1,11 +1,11 @@
-DIST_SUBDIRS = beos macosx hildon minimal_macosx qnx qt4 skins2
+DIST_SUBDIRS = beos macosx hildon minimal_macosx qnx qt4 skins2 macosx_dialog_provider
 SUBDIRS =
 
 if HAVE_BEOS
 SUBDIRS += beos
 endif
 if HAVE_DARWIN
-SUBDIRS += macosx minimal_macosx
+SUBDIRS += macosx minimal_macosx macosx_dialog_provider 
 endif
 if BUILD_HILDON
 SUBDIRS += hildon
