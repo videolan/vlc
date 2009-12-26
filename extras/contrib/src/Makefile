@@ -399,7 +399,7 @@ else
 endif
 # Work around another non-sense of autoconf.
 ifdef HAVE_WIN32
-	(cd ../include; sed -i.orig '311 c #if 0' libintl.h)
+	(cd $(PREFIX)/include; sed -i.orig '311 c #if 0' libintl.h)
 endif
 	$(INSTALL_NAME)
 	touch $@
