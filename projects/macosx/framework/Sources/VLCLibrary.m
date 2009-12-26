@@ -70,7 +70,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
         NSArray *vlcParams = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"VLCParams"];
         if (!vlcParams) {
             NSMutableArray *defaultParams = [NSMutableArray array];
-            [defaultParams addObject:@"-I dummy"];                                  // No interface
+            [defaultParams addObject:@"-I macosx_dialog_provider"];                 // No actual interface, just dialogs and nagging
             [defaultParams addObject:@"--no-video-title-show"];                     // Don't show the title on overlay when starting to play
             [defaultParams addObject:@"--no-sout-keep"];
             [defaultParams addObject:@"--ignore-config"];                           // Don't read and write VLC config files
