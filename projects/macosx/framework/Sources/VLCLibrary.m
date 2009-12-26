@@ -79,6 +79,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
             [defaultParams addObject:@"--verbose=-1"];                               // Don't polute the log
             [defaultParams addObject:@"--no-color"];
             [defaultParams addObject:@"--no-media-library"];
+            [defaultParams addObject:@"--play-and-pause"];
             vlcParams = defaultParams;
         }
 
