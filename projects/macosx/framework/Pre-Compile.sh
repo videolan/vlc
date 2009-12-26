@@ -147,12 +147,6 @@ if test "${ACTION}" = "build"; then
         popd > /dev/null
     fi
 
-    # remove stuff we don't need
-    if [ "$FULL_PRODUCT_NAME" = "VLCKit.framework" ] ; then
-        echo "Removing module libmacosx_plugin.dylib"
-        rm ${target_modules}/libmacosx_plugin.dylib
-    fi
-
     ##########################
     # Build the library folder
     echo "Building library folder... ${linked_libs}"
