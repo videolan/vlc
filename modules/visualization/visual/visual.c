@@ -103,10 +103,6 @@
 #define COLOR1_LONGTEXT N_( \
         "YUV-Color cube shifting across the V-plane ( 0 - 127 )." )
 
-#define STARS_TEXT N_( "Number of stars" )
-#define STARS_LONGTEXT N_( \
-        "Number of stars to draw with random effect." )
-
 static int  Open         ( vlc_object_t * );
 static void Close        ( vlc_object_t * );
 
