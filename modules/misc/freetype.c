@@ -427,7 +427,8 @@ static int Create( vlc_object_t *p_this )
         goto error;
     }
 
-    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily, psz_fontfile );
+    msg_Dbg( p_filter, "Using %s as font from file %s", psz_fontfamily,
+             psz_fontfile ? psz_fontfile : "(null)" );
     p_sys->psz_fontfamily = strdup( psz_fontfamily );
 # ifdef WIN32
     if( p_dialog )
@@ -458,12 +459,14 @@ static int Create( vlc_object_t *p_this )
 
     if( i_error == FT_Err_Unknown_File_Format )
     {
-        msg_Err( p_filter, "file %s have unknown format", psz_fontfile );
+        msg_Err( p_filter, "file %s have unknown format",
+                 psz_fontfile ? psz_fontfile : "(null)" );
         goto error;
     }
     else if( i_error )
     {
-        msg_Err( p_filter, "failed to load font file %s", psz_fontfile );
+        msg_Err( p_filter, "failed to load font file %s",
+                 psz_fontfile ? psz_fontfile : "(null)" );
         goto error;
     }
 
