@@ -556,7 +556,7 @@ static int Control(vout_display_t *vd, int query, va_list args)
     }
 
     case VOUT_DISPLAY_CHANGE_SOURCE_CROP:
-    case VOUT_DISPLAY_CHANGE_ON_TOP:
+    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         /* I don't think it is possible to support with SDL:
          * - crop
          * - on top

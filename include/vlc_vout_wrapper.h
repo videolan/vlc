@@ -85,7 +85,7 @@ VLC_EXPORT(void, vout_ManageDisplay, (vout_display_t *, bool allow_reset_picture
 VLC_EXPORT(void, vout_SetDisplayFullscreen, (vout_display_t *, bool is_fullscreen));
 VLC_EXPORT(void, vout_SetDisplayFilled, (vout_display_t *, bool is_filled));
 VLC_EXPORT(void, vout_SetDisplayZoom, (vout_display_t *, int num, int den));
-VLC_EXPORT(void, vout_SetDisplayOnTop, (vout_display_t *, bool is_on_top));
+VLC_EXPORT(void, vout_SetWindowState, (vout_display_t *, unsigned state));
 VLC_EXPORT(void, vout_SetDisplayAspect, (vout_display_t *, unsigned sar_num, unsigned sar_den));
 VLC_EXPORT(void, vout_SetDisplayCrop, (vout_display_t *, unsigned crop_num, unsigned crop_den, unsigned x, unsigned y, unsigned width, unsigned height));
 VLC_EXPORT(vout_opengl_t *, vout_GetDisplayOpengl, (vout_display_t *));

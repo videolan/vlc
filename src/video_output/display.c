@@ -284,7 +284,7 @@ struct vout_display_owner_sys_t {
 
     /* */
     vout_display_cfg_t cfg;
-    bool     is_on_top_initial;
+    unsigned     wm_state_initial;
     struct {
         unsigned num;
         unsigned den;
@@ -309,8 +309,8 @@ struct vout_display_owner_sys_t {
         int  den;
     } zoom;
 
-    bool ch_on_top;
-    bool is_on_top;
+    bool ch_wm_state;
+    unsigned wm_state;
 
     bool ch_sar;
     struct {
@@ -582,15 +582,15 @@ static void VoutDisplayEvent(vout_display_t *vd, int event, va_list args)
         break;
     }
 
-    case VOUT_DISPLAY_EVENT_ON_TOP: {
-        const int is_on_top = (int)va_arg(args, int);
+    case VOUT_DISPLAY_EVENT_WINDOW_STATE: {
+        const unsigned state = va_arg(args, unsigned);
 
-        msg_Dbg(vd, "VoutDisplayEvent 'on top' %d", is_on_top);
+        msg_Dbg(vd, "VoutDisplayEvent 'window state' %u", state);
 
         vlc_mutex_lock(&osys->lock);
-        if (!is_on_top != !osys->is_on_top) {
-            osys->ch_on_top = true;
-            osys->is_on_top = is_on_top;
+        if (state != osys->wm_state) {
+            osys->ch_wm_state = true;
+            osys->wm_state = state;
         }
         vlc_mutex_unlock(&osys->lock);
         break;
@@ -685,9 +685,9 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
         bool is_fullscreen  = osys->is_fullscreen;
         osys->ch_fullscreen = false;
 
-        bool ch_on_top  = osys->ch_on_top;
-        bool is_on_top  = osys->is_on_top;
-        osys->ch_on_top = false;
+        bool ch_wm_state  = osys->ch_wm_state;
+        unsigned wm_state  = osys->wm_state;
+        osys->ch_wm_state = false;
 
         bool ch_display_size       = osys->ch_display_size;
         int  display_width         = osys->display_width;
@@ -711,7 +711,7 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             !reset_pictures &&
             !osys->ch_display_filled &&
             !osys->ch_zoom &&
-            !ch_on_top &&
+            !ch_wm_state &&
             !osys->ch_sar &&
             !osys->ch_crop)
             break;
@@ -813,15 +813,15 @@ void vout_ManageDisplay(vout_display_t *vd, bool allow_reset_pictures)
             vout_SendEventZoom(osys->vout, osys->cfg.zoom.num, osys->cfg.zoom.den);
         }
         /* */
-        if (ch_on_top) {
-            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_ON_TOP, is_on_top)) {
+        if (ch_wm_state) {
+            if (vout_display_Control(vd, VOUT_DISPLAY_CHANGE_WINDOW_STATE, wm_state)) {
                 msg_Err(vd, "Failed to set on top");
-                is_on_top = osys->is_on_top_initial;
+                wm_state = osys->wm_state;
             }
-            osys->is_on_top_initial = is_on_top;
+            osys->wm_state_initial = wm_state;
 
             /* */
-            vout_SendEventOnTop(osys->vout, osys->is_on_top_initial);
+            vout_SendEventOnTop(osys->vout, osys->wm_state_initial);
         }
         /* */
         if (osys->ch_sar) {
@@ -986,17 +986,19 @@ void vout_SetDisplayZoom(vout_display_t *vd, int num, int den)
         osys->zoom.den = den;
     }
 }
-void vout_SetDisplayOnTop(vout_display_t *vd, bool is_on_top)
+
+void vout_SetWindowState(vout_display_t *vd, unsigned state)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
     vlc_mutex_lock(&osys->lock);
-    if (!osys->is_on_top != !is_on_top) {
-        osys->ch_on_top = true;
-        osys->is_on_top = is_on_top;
+    if (osys->wm_state != state) {
+        osys->ch_wm_state = true;
+        osys->wm_state = state;
     }
     vlc_mutex_unlock(&osys->lock);
 }
+
 void vout_SetDisplayAspect(vout_display_t *vd, unsigned sar_num, unsigned sar_den)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
@@ -1048,7 +1050,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     vout_display_cfg_t *cfg = &osys->cfg;
 
     *cfg = state->cfg;
-    osys->is_on_top_initial = state->is_on_top;;
+    osys->wm_state_initial = state->is_on_top
+        ? VOUT_WINDOW_STATE_ABOVE : VOUT_WINDOW_STATE_NORMAL;
     osys->sar_initial.num = state->sar.num;
     osys->sar_initial.den = state->sar.den;
     vout_display_GetDefaultDisplaySize(&cfg->display.width, &cfg->display.height,
@@ -1121,8 +1124,8 @@ static vout_display_t *DisplayNew(vout_thread_t *vout,
     if (osys->sar.num != source_org->i_sar_num ||
         osys->sar.den != source_org->i_sar_den)
         osys->ch_sar = true;
-    if (osys->is_on_top)
-        osys->ch_on_top = true;
+    if (osys->wm_state != VOUT_WINDOW_STATE_NORMAL)
+        osys->ch_wm_state = true;
     if (osys->crop.x      != source_org->i_x_offset ||
         osys->crop.y      != source_org->i_y_offset ||
         osys->crop.width  != source_org->i_visible_width ||
@@ -1139,7 +1142,7 @@ void vout_DeleteDisplay(vout_display_t *vd, vout_display_state_t *state)
     if (state) {
         if (!osys->is_wrapper )
             state->cfg = osys->cfg;
-        state->is_on_top = osys->is_on_top_initial;
+        state->is_on_top = (osys->wm_state & VOUT_WINDOW_STATE_ABOVE) != 0;
         state->sar.num   = osys->sar_initial.num;
         state->sar.den   = osys->sar_initial.den;
     }

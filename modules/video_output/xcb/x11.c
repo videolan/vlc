@@ -466,9 +466,10 @@ static int Control (vout_display_t *vd, int query, va_list ap)
                               values);
         return VLC_SUCCESS;
     }
-    case VOUT_DISPLAY_CHANGE_ON_TOP:
+    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
     {
-        int b_on_top = (int)va_arg (ap, int);
+        unsigned state = va_arg (ap, unsigned);
+        bool b_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
         return vout_window_SetState (p_sys->embed, b_on_top);
     }
 

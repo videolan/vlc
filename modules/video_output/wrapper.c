@@ -279,7 +279,7 @@ static int Init(vout_thread_t *vout)
     }
 #endif
     if (vout->b_on_top)
-        vout_SetDisplayOnTop(vd, true);
+        vout_SetWindowState(vd, VOUT_WINDOW_STATE_ABOVE);
 
     /* XXX For non dr case, the current vout implementation force us to
      * create at most 1 direct picture (otherwise the buffers will be kept
@@ -415,7 +415,9 @@ static int Manage(vout_thread_t *vout)
             vout->i_changes &= ~VOUT_SCALE_CHANGE;
         }
         if (vout->i_changes & VOUT_ON_TOP_CHANGE) {
-            vout_SetDisplayOnTop(vd, vout->b_on_top);
+            vout_SetWindowState(vd, vout->b_on_top
+                ? VOUT_WINDOW_STATE_ABOVE
+                : VOUT_WINDOW_STATE_NORMAL);
 
             vout->i_changes &= ~VOUT_ON_TOP_CHANGE;
         }

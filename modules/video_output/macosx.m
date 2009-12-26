@@ -242,7 +242,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     switch (query)
     {
         case VOUT_DISPLAY_CHANGE_FULLSCREEN:            
-        case VOUT_DISPLAY_CHANGE_ON_TOP:            
+        case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
         case VOUT_DISPLAY_CHANGE_ZOOM:

@@ -606,8 +606,9 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
         UpdateRects(vd, cfg, source, is_forced);
         return VLC_SUCCESS;
     }
-    case VOUT_DISPLAY_CHANGE_ON_TOP: {       /* int b_on_top */
-        const bool is_on_top = va_arg(args, int);
+    case VOUT_DISPLAY_CHANGE_WINDOW_STATE: {       /* unsigned state */
+        const unsigned state = va_arg(args, unsigned);
+        const bool is_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
 #ifdef MODULE_NAME_IS_direct3d
         if (sys->use_desktop && is_on_top)
             return VLC_EGENERIC;

@@ -101,7 +101,7 @@ void vout_ManageDisplay(vout_display_t *, bool allow_reset_pictures);
 void vout_SetDisplayFullscreen(vout_display_t *, bool is_fullscreen);
 void vout_SetDisplayFilled(vout_display_t *, bool is_filled);
 void vout_SetDisplayZoom(vout_display_t *, int num, int den);
-void vout_SetDisplayOnTop(vout_display_t *, bool is_on_top);
+void vout_SetWindowState(vout_display_t *, unsigned state);
 void vout_SetDisplayAspect(vout_display_t *, unsigned sar_num, unsigned sar_den);
 void vout_SetDisplayCrop(vout_display_t *,
                          unsigned crop_num, unsigned crop_den,

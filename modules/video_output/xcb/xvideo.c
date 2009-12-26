@@ -736,10 +736,11 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         xcb_flush (p_sys->conn);
         return VLC_SUCCESS;
     }
-    case VOUT_DISPLAY_CHANGE_ON_TOP:
+    case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
     {
-        int on_top = (int)va_arg (ap, int);
-        return vout_window_SetState (p_sys->embed, on_top);
+        unsigned state = va_arg (ap, unsigned);
+        bool b_on_top = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
+        return vout_window_SetState (p_sys->embed, b_on_top);
     }
 
     /* Hide the mouse. It will be send when
