@@ -155,12 +155,6 @@ BOOL WINAPI DirectXEnumCallback2( GUID* p_guid, LPTSTR psz_desc,
     "window to open on. For example, \"\\\\.\\DISPLAY1\" or " \
     "\"\\\\.\\DISPLAY2\"." )
 
-#define WALLPAPER_TEXT N_("Enable wallpaper mode ")
-#define WALLPAPER_LONGTEXT N_( \
-    "The wallpaper mode allows you to display the video as the desktop " \
-    "background. Note that this feature only works in overlay mode and " \
-    "the desktop must not already have a wallpaper." )
-
 static const char *const ppsz_dev[] = { "" };
 static const char *const ppsz_dev_text[] = { N_("Default") };
 
@@ -179,9 +173,6 @@ vlc_module_begin ()
                 true )
         change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
-
-    add_bool( "directx-wallpaper", false, NULL, WALLPAPER_TEXT, WALLPAPER_LONGTEXT,
-              true )
 
     set_description( N_("DirectX (DirectDraw) video output") )
     set_capability( "video output", 100 )
@@ -270,11 +261,11 @@ static int OpenVideo( vlc_object_t *p_this )
 
     /* Variable to indicate if the window should be on top of others */
     /* Trigger a callback right now */
-    var_Create( p_vout, "directx-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    var_Create( p_vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
     val.psz_string = _("Wallpaper");
-    var_Change( p_vout, "directx-wallpaper", VLC_VAR_SETTEXT, &val, NULL );
-    var_AddCallback( p_vout, "directx-wallpaper", WallpaperCallback, NULL );
-    var_TriggerCallback( p_vout, "directx-wallpaper" );
+    var_Change( p_vout, "video-wallpaper", VLC_VAR_SETTEXT, &val, NULL );
+    var_AddCallback( p_vout, "video-wallpaper", WallpaperCallback, NULL );
+    var_TriggerCallback( p_vout, "video-wallpaper" );
 
     return VLC_SUCCESS;
 
@@ -425,7 +416,7 @@ static void CloseVideo( vlc_object_t *p_this )
     vout_thread_t * p_vout = (vout_thread_t *)p_this;
 
     /* Make sure the wallpaper is restored */
-    var_DelCallback( p_vout, "directx-wallpaper", WallpaperCallback, NULL );
+    var_DelCallback( p_vout, "video-wallpaper", WallpaperCallback, NULL );
     SwitchWallpaperMode( p_vout, false );
 
     CommonClean( p_vout );
@@ -1899,8 +1890,8 @@ static int WallpaperCallback( vlc_object_t *p_this, char const *psz_cmd,
         {
             /* Modify playlist as well because the vout might have to be
              * restarted */
-            var_Create( p_playlist, "directx-wallpaper", VLC_VAR_BOOL );
-            var_Set( p_playlist, "directx-wallpaper", newval );
+            var_Create( p_playlist, "video-wallpaper", VLC_VAR_BOOL );
+            var_Set( p_playlist, "video-wallpaper", newval );
             pl_Release( p_vout );
         }
 

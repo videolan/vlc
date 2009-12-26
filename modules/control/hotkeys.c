@@ -259,15 +259,13 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             }
             break;
 
-#ifdef WIN32
         case ACTIONID_WALLPAPER:
         {   /* FIXME: this is invalid if not using DirectX output!!! */
             vlc_object_t *obj = p_vout ? VLC_OBJECT(p_vout)
                                        : VLC_OBJECT(p_playlist);
-            var_ToggleBool( obj, "directx-wallpaper" );
+            var_ToggleBool( obj, "video-wallpaper" );
             break;
         }
-#endif
 
         /* Playlist actions */
         case ACTIONID_LOOP:

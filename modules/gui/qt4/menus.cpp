@@ -220,8 +220,8 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
     PUSH_INPUTVAR( "spu-es" );
     PUSH_VAR( "fullscreen" );
     PUSH_VAR( "video-on-top" );
+    PUSH_VAR( "video-wallpaper" );
 #ifdef WIN32
-    PUSH_VAR( "directx-wallpaper" );
     PUSH_VAR( "direct3d-desktop" );
 #endif
     PUSH_VAR( "video-snapshot" );
@@ -561,8 +561,8 @@ QMenu *QVLCMenu::VideoMenu( intf_thread_t *p_intf, QMenu *current )
 
         ACT_ADDCHECK( current, "fullscreen", qtr( "&Fullscreen" ) );
         ACT_ADDCHECK( current, "video-on-top", qtr( "Always &On Top" ) );
+        ACT_ADDCHECK( current, "video-wallpaper", qtr( "DirectX Wallpaper" ) );
 #ifdef WIN32
-        ACT_ADDCHECK( current, "directx-wallpaper", qtr( "DirectX Wallpaper" ) );
         ACT_ADDCHECK( current, "direct3d-desktop", qtr( "Direct3D Desktop mode" ) );
 #endif
         ACT_ADD( current, "video-snapshot", qtr( "Sna&pshot" ) );

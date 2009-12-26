@@ -199,8 +199,8 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "skip-frames" , Bool, NULL, skipFrames );
             CONFIG_GENERIC( "vout", Module, ui.voutLabel, outputModule );
 
+            CONFIG_GENERIC( "video-wallpaper" , Bool , NULL, wallpaperMode );
 #ifdef WIN32
-            CONFIG_GENERIC( "directx-wallpaper" , Bool , NULL, wallpaperMode );
             CONFIG_GENERIC( "directx-device", StringList, ui.dxDeviceLabel,
                             dXdisplayDevice );
             CONFIG_GENERIC( "directx-hw-yuv", Bool, NULL, hwYUVBox );

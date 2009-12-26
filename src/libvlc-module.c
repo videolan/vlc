@@ -439,6 +439,11 @@ static const char *const ppsz_align_descriptions[] =
 #define VIDEO_ON_TOP_LONGTEXT N_( \
     "Always place the video window on top of other windows." )
 
+#define WALLPAPER_TEXT N_("Enable wallpaper mode ")
+#define WALLPAPER_LONGTEXT N_( \
+    "The wallpaper mode allows you to display the video as the desktop " \
+    "background." )
+
 #define VIDEO_TITLE_SHOW_TEXT N_("Show media title on video")
 #define VIDEO_TITLE_SHOW_LONGTEXT N_( \
     "Display the title of the video on top of the movie.")
@@ -1485,8 +1490,7 @@ static const char *const ppsz_albumart_descriptions[] =
 
 #define WALLPAPER_KEY_TEXT N_("Toggle wallpaper mode in video output")
 #define WALLPAPER_KEY_LONGTEXT N_( \
-    "Toggle wallpaper mode in video output. Only works with the directx " \
-    "video output for the time being." )
+    "Toggle wallpaper mode in video output." )
 
 #define MENU_ON_KEY_TEXT N_("Display OSD menu on top of video output")
 #define MENU_ON_KEY_LONGTEXT N_("Display OSD menu on top of video output")
@@ -1657,6 +1661,11 @@ vlc_module_begin ()
 #endif
     add_bool( "video-on-top", 0, NULL, VIDEO_ON_TOP_TEXT,
               VIDEO_ON_TOP_LONGTEXT, false )
+    add_bool( "video-wallpaper", false, NULL, WALLPAPER_TEXT,
+              WALLPAPER_LONGTEXT, false )
+#ifdef WIN32
+        add_deprecated_alias( "directx-wallpaper" )
+#endif
     add_bool( "disable-screensaver", true, NULL, SS_TEXT, SS_LONGTEXT,
               true )
 
