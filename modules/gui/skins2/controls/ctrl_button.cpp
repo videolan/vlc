@@ -25,6 +25,7 @@
 #include "ctrl_button.hpp"
 #include "../events/evt_generic.hpp"
 #include "../src/generic_bitmap.hpp"
+#include "../src/generic_layout.hpp"
 #include "../src/os_factory.hpp"
 #include "../src/os_graphics.hpp"
 #include "../commands/cmd_generic.hpp"
@@ -78,6 +79,13 @@ CtrlButton::CtrlButton( intf_thread_t *pIntf, const GenericBitmap &rBmpUp,
 
 CtrlButton::~CtrlButton()
 {
+}
+
+void CtrlButton::setLayout( GenericLayout *pLayout,
+                           const Position &rPosition )
+{
+    CtrlGeneric::setLayout( pLayout, rPosition );
+    m_pLayout->getActiveVar().addObserver( this );
 }
 
 
@@ -192,5 +200,21 @@ void CtrlButton::CmdUpHidden::execute()
 void CtrlButton::CmdHiddenUp::execute()
 {
     m_pParent->setImage( &m_pParent->m_imgUp );
+}
+
+void CtrlButton::onUpdate( Subject<VarBool> &rVariable, void *arg  )
+{
+    // restart animation
+    if(     &rVariable == m_pVisible
+        ||  &rVariable == &m_pLayout->getActiveVar()
+      )
+    {
+        if( m_pImg )
+        {
+            m_pImg->stopAnim();
+            m_pImg->startAnim();
+        }
+    }
+    CtrlGeneric::onUpdate( rVariable, arg );
 }
 

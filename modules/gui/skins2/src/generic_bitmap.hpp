@@ -46,14 +46,19 @@ public:
     /// Get the number of frames per second (for animated bitmaps)
     int getFrameRate() const { return m_frameRate; }
 
+    /// Get the number of Loops (for animated bitmaps)
+    int getNbLoops() const { return m_nbLoops; }
+
 protected:
-    GenericBitmap( intf_thread_t *pIntf, int nbFrames = 1, int fps = 0);
+    GenericBitmap( intf_thread_t *pIntf, int nbFrames = 1, int fps = 0, int nbLoops = 0);
 
 private:
     /// Number of frames
     int m_nbFrames;
     /// Frame rate
     int m_frameRate;
+    /// Number of Loops
+    int m_nbLoops;
 };
 
 
@@ -63,7 +68,7 @@ class BitmapImpl: public GenericBitmap
 public:
     /// Create an empty bitmap of the given size
     BitmapImpl( intf_thread_t *pIntf, int width, int height,
-                int nbFrames = 1, int fps = 0 );
+                int nbFrames = 1, int fps = 0, int nbLoops = 0 );
     ~BitmapImpl();
 
     /// Get the width of the bitmap

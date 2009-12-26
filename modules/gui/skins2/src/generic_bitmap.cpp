@@ -24,15 +24,17 @@
 #include "generic_bitmap.hpp"
 
 
-GenericBitmap::GenericBitmap( intf_thread_t *pIntf, int nbFrames, int fps ):
-    SkinObject( pIntf ), m_nbFrames( nbFrames ), m_frameRate( fps )
+GenericBitmap::GenericBitmap( intf_thread_t *pIntf,
+                              int nbFrames, int fps, int nbLoops ):
+    SkinObject( pIntf ), m_nbFrames( nbFrames ),
+    m_frameRate( fps ), m_nbLoops( nbLoops )
 {
 }
 
 
 BitmapImpl::BitmapImpl( intf_thread_t *pIntf, int width, int height,
-                        int nbFrames, int fps ):
-    GenericBitmap( pIntf, nbFrames, fps ), m_width( width ),
+                        int nbFrames, int fps, int nbLoops ):
+    GenericBitmap( pIntf, nbFrames, fps, nbLoops ), m_width( width ),
     m_height( height ), m_pData( NULL )
 {
     m_pData = new uint8_t[width * height * 4];

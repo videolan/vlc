@@ -67,8 +67,12 @@ private:
     int m_nbFrames;
     /// Frame rate
     int m_frameRate;
+    /// Number of Loops
+    int m_nbLoops;
     /// Curent frame
     int m_curFrame;
+    /// Current loop
+    int m_curLoop;
      /// Timer for the animation
     OSTimer *m_pTimer;
 

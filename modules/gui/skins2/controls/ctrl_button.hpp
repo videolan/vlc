@@ -45,6 +45,10 @@ public:
 
     virtual ~CtrlButton();
 
+    /// Set the position and the associated layout of the control
+    virtual void setLayout( GenericLayout *pLayout,
+                            const Position &rPosition );
+
     /// Handle an event
     virtual void handleEvent( EvtGeneric &rEvent );
 
@@ -88,6 +92,10 @@ private:
 
     /// Method called when an animated bitmap changes
     virtual void onUpdate( Subject<AnimBitmap> &rBitmap, void* );
+
+    /// Method called when visibility or ActiveLayout is updated
+    virtual void onUpdate( Subject<VarBool> &rVariable , void* );
+
 };
 
 
