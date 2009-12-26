@@ -1100,28 +1100,16 @@ char *make_URI (const char *path)
     }
     else
     if (path[0] != DIR_SEP_CHAR)
-    {
-        if(path[0] == '-')
-        {
-            /*reading from stdin*/
-            if (asprintf (&buf, "-") == -1)
-                return NULL;
+    {   /* Relative path: prepend the current working directory */
+        char cwd[PATH_MAX];
 
-            return buf;
-        }
-        else
-        {
-            /* Relative path: prepend the current working directory */
-            char cwd[PATH_MAX];
-
-            if (getcwd (cwd, sizeof (cwd)) == NULL) /* FIXME: UTF8? */
-                return NULL;
-            if (asprintf (&buf, "%s/%s", cwd, path) == -1)
-                return NULL;
-            char *ret = make_URI (buf);
-            free (buf);
-            return ret;
-        }
+        if (getcwd (cwd, sizeof (cwd)) == NULL) /* FIXME: UTF8? */
+            return NULL;
+        if (asprintf (&buf, "%s/%s", cwd, path) == -1)
+            return NULL;
+        char *ret = make_URI (buf);
+        free (buf);
+        return ret;
     }
     else
         buf = strdup ("file://");
