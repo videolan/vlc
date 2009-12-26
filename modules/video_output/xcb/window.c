@@ -330,6 +330,12 @@ static int Open (vlc_object_t *obj)
     /* Make the window visible */
     xcb_map_window (conn, window);
 
+    if (var_CreateGetBool (obj, "video-wallpaper"))
+    {
+        vout_window_SetState (wnd, VOUT_WINDOW_STATE_BELOW);
+        vout_window_SetFullScreen (wnd, true);
+    }
+
     /* Create the event thread. It will dequeue all events, so any checked
      * request from this thread must be completed at this point. */
     if ((p_sys->keys != NULL)
@@ -494,8 +500,13 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
         }
 
         case VOUT_WINDOW_SET_FULLSCREEN:
-            set_wm_state (wnd, va_arg (ap, int), p_sys->wm_state_fullscreen);
+        {
+            bool fs = va_arg (ap, int);
+            if (!fs && var_GetBool (wnd, "video-wallpaper"))
+                return VLC_EGENERIC;
+            set_wm_state (wnd, fs, p_sys->wm_state_fullscreen);
             break;
+        }
 
         default:
             msg_Err (wnd, "request %d not implemented", cmd);
