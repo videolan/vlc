@@ -613,7 +613,7 @@ int CommonControl(vout_display_t *vd, int query, va_list args)
             return VLC_EGENERIC;
 #endif
         if (sys->parent_window) {
-            if (vout_window_SetOnTop(sys->parent_window, is_on_top))
+            if (vout_window_SetState(sys->parent_window, is_on_top))
                 return VLC_EGENERIC;
         } else {
             HMENU hMenu = GetSystemMenu(sys->hwnd, FALSE);

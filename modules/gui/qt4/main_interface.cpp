@@ -892,7 +892,7 @@ int MainInterface::controlVideo( int i_query, va_list args )
         emit askUpdate();
         return VLC_EGENERIC;
     }
-    case VOUT_WINDOW_SET_ON_TOP:
+    case VOUT_WINDOW_SET_STATE:
     {
         int i_arg = va_arg( args, int );
         QApplication::postEvent( this, new SetVideoOnTopQtEvent( i_arg ) );

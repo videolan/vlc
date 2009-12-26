@@ -478,7 +478,7 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
             break;
         }
 
-        case VOUT_WINDOW_SET_ON_TOP:
+        case VOUT_WINDOW_SET_STATE:
             set_wm_state (wnd, va_arg (ap, int), p_sys->wm_state_above);
             break;
 

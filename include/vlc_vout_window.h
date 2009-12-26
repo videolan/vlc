@@ -49,7 +49,7 @@ enum {
  * Control query for vout_window_t
  */
 enum {
-    VOUT_WINDOW_SET_ON_TOP, /* int b_on_top */
+    VOUT_WINDOW_SET_STATE, /* unsigned state */
     VOUT_WINDOW_SET_SIZE,   /* unsigned i_width, unsigned i_height */
     VOUT_WINDOW_SET_FULLSCREEN, /* int b_fullscreen */
 };
@@ -134,11 +134,11 @@ VLC_EXPORT( void, vout_window_Delete, (vout_window_t *) );
 VLC_EXPORT( int, vout_window_Control, (vout_window_t *, int query, ...) );
 
 /**
- * Configure the "On Top" properties of a windows.
+ * Configure the window management state of a windows.
  */
-static inline int vout_window_SetOnTop(vout_window_t *window, bool is_on_top)
+static inline int vout_window_SetState(vout_window_t *window, unsigned state)
 {
-    return vout_window_Control(window, VOUT_WINDOW_SET_ON_TOP, is_on_top);
+    return vout_window_Control(window, VOUT_WINDOW_SET_STATE, state);
 }
 
 /**

@@ -564,7 +564,7 @@ static int vaControlParentWindow( vout_thread_t *p_vout, int i_query,
     case VOUT_SET_STAY_ON_TOP:
     {
         const bool is_on_top = va_arg(args, int);
-        return vout_window_SetOnTop( p_vout->p_sys->parent_window, is_on_top );
+        return vout_window_SetState( p_vout->p_sys->parent_window, is_on_top );
     }
     default:
         return VLC_EGENERIC;

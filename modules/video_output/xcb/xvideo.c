@@ -739,7 +739,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     case VOUT_DISPLAY_CHANGE_ON_TOP:
     {
         int on_top = (int)va_arg (ap, int);
-        return vout_window_SetOnTop (p_sys->embed, on_top);
+        return vout_window_SetState (p_sys->embed, on_top);
     }
 
     /* Hide the mouse. It will be send when
