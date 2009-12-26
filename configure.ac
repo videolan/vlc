@@ -4374,11 +4374,10 @@ dnl
 dnl  MacOS X video output/gui modules
 dnl
 AC_ARG_ENABLE(macosx,
-  [  --enable-macosx         full Mac OS X support (default enabled on Mac OS X)])
+  [  --enable-macosx   Mac OS X gui support (default enabled on Mac OS X)])
 if test "x${enable_macosx}" = "xyes"
 then
-  VLC_ADD_LDFLAGS([access_eyetv],                     [-Wl,-framework,Foundation])
-  VLC_ADD_LDFLAGS([macosx minimal_macosx macosx_dialog_provider opengllayer qtcapture],[-Wl,-framework,Cocoa])
+  VLC_ADD_LDFLAGS([macosx minimal_macosx],[-Wl,-framework,Cocoa])
   VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,OpenGL])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,Carbon])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,CoreServices])
@@ -4388,42 +4387,61 @@ then
   VLC_ADD_OBJCFLAGS([macosx],                         [-F${CONTRIB_DIR}/Sparkle])
   dnl For bug report
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,AddressBook])
-  VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,QTKit])
-  VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreAudio])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
-  VLC_ADD_LDFLAGS([opengllayer qtcapture],            [-Wl,-framework,QuartzCore])
-  VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreVideo])
-  VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer growl], [-fobjc-exceptions] )
+  VLC_ADD_LDFLAGS([opengllayer],            [-Wl,-framework,QuartzCore])
+  VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer], [-fobjc-exceptions] )
 
-  VLC_ADD_PLUGIN([access_eyetv])
-  VLC_ADD_PLUGIN([qtcapture])
   VLC_ADD_PLUGIN([macosx])
   VLC_ADD_PLUGIN([minimal_macosx])
   VLC_ADD_PLUGIN([opengllayer])
-  VLC_ADD_PLUGIN([macosx_dialog_provider])
 fi
 
 dnl
-dnl  MacOS X video output/gui modules
+dnl  MacOS X related modules
 dnl
-AC_ARG_ENABLE(macosx-minimal,
-  [  --enable-macosx-minimal minimal Mac OS X support (default disabled)])
-if test "x${enable_macosx_minimal}" = "xyes"
+
+AC_ARG_ENABLE(macosx-vout,
+  [  --enable-macosx-vout   Mac OS X video output module (default enabled on Mac OS X)])
+if test "x${enable_macosx_vout}" != "xno" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx_vout}" = "yes")
 then
-  VLC_ADD_LDFLAGS([vout_macosx qtcapture macosx_dialog_provider],[-Wl,-framework,Cocoa])
-  VLC_ADD_LDFLAGS([vout_macosx],          [-Wl,-framework,OpenGL])
+  VLC_ADD_LDFLAGS([vout_macosx],[-Wl,-framework,Cocoa])
+  VLC_ADD_LDFLAGS([vout_macosx],[-Wl,-framework,OpenGL])
+  VLC_ADD_PLUGIN([vout_macosx])
+fi
 
-  VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,QTKit])
-  VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreAudio])
-  VLC_ADD_LDFLAGS([opengllayer qtcapture],            [-Wl,-framework,QuartzCore])
-  VLC_ADD_LDFLAGS([qtcapture],                        [-Wl,-framework,CoreVideo])
-  VLC_ADD_OBJCFLAGS([vout_macosx],                 [-fobjc-exceptions] )
-
-  VLC_ADD_PLUGIN([qtcapture])
-  VLC_ADD_PLUGIN([minimal_macosx])
-  VLC_ADD_PLUGIN([opengllayer])
+AC_ARG_ENABLE(macosx-dialog-provider,
+  [  --enable-macosx-dialog-provider   Mac OS X dialog module (default enabled on Mac OS X)])
+if test "x${enable_macosx_dialog_provider}" != "xno" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx_dialog_provider}" = "yes")
+then
+  VLC_ADD_LDFLAGS([macosx_dialog_provider],[-Wl,-framework,Cocoa])
   VLC_ADD_PLUGIN([macosx_dialog_provider])
 fi
+
+AC_ARG_ENABLE(macosx-qtcapture,
+  [  --enable-macosx-qtcapture   Mac OS X qtcapture (iSight) module (default enabled on Mac OS X)])
+if test "x${enable_macosx_qtcapture}" != "xno" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx_qtcapture}" = "yes")
+then
+  VLC_ADD_LDFLAGS([qtcapture], [-Wl,-framework,Cocoa])
+  VLC_ADD_LDFLAGS([qtcapture], [-Wl,-framework,QTKit])
+  VLC_ADD_LDFLAGS([qtcapture], [-Wl,-framework,CoreAudio])
+  VLC_ADD_LDFLAGS([qtcapture], [-Wl,-framework,QuartzCore])
+  VLC_ADD_LDFLAGS([qtcapture], [-Wl,-framework,CoreVideo])
+  VLC_ADD_PLUGIN([qtcapture])
+fi
+
+AC_ARG_ENABLE(macosx-eyetv,
+  [  --enable-macosx-eyetv   Mac OS X EyeTV (TNT Tuner) module (default enabled on Mac OS X)])
+if test "x${enable_macosx_eyetv}" != "xno" &&
+  (test "${SYS}" = "darwin" || test "${enable_macosx_eyetv}" = "yes")
+then
+  VLC_ADD_LDFLAGS([access_eyetv], [-Wl,-framework,Foundation])
+  VLC_ADD_PLUGIN([access_eyetv])
+fi
+
+
 
 dnl
 dnl  QNX RTOS module
