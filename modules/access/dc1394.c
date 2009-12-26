@@ -930,7 +930,7 @@ static int process_options( demux_t *p_demux )
         else if( strncmp( token, "uid=", strlen("uid=") ) == 0)
         {
             token += strlen("uid=");
-            sscanf( token, "0x %"SCNx64, &p_sys->selected_uid );
+            sscanf( token, "0x%"SCNx64, &p_sys->selected_uid );
         }
     }
 
