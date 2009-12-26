@@ -69,7 +69,7 @@
 
 #include <vlc_keys.h> /* Wheel event */
 #include <vlc_vout_window.h>
-#include <vlc_vout.h>
+#include <vlc_vout_display.h>
 
 // #define DEBUG_INTF
 /* Callback prototypes */
@@ -894,8 +894,9 @@ int MainInterface::controlVideo( int i_query, va_list args )
     }
     case VOUT_WINDOW_SET_STATE:
     {
-        int i_arg = va_arg( args, int );
-        QApplication::postEvent( this, new SetVideoOnTopQtEvent( i_arg ) );
+        unsigned i_arg = va_arg( args, unsigned );
+        unsigned on_top = i_arg & VOUT_WINDOW_STATE_ABOVE;
+        QApplication::postEvent( this, new SetVideoOnTopQtEvent( on_top ) );
         return VLC_SUCCESS;
     }
     case VOUT_WINDOW_SET_FULLSCREEN:
