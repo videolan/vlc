@@ -436,7 +436,7 @@
 
     i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
     aout_VolumeSet( p_playlist, i_volume * i_volume_step );
-    pl_Release( p_playlist );
+    pl_Release( p_intf );
     /* Manage volume status */
     [o_main manageVolumeSlider];
 }
