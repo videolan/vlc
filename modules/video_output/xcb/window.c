@@ -94,6 +94,7 @@ struct vout_window_sys_t
     xcb_window_t root;
     xcb_atom_t wm_state;
     xcb_atom_t wm_state_above;
+    xcb_atom_t wm_state_below;
     xcb_atom_t wm_state_fullscreen;
 #ifdef MATCHBOX_HACK
     xcb_atom_t mb_current_app_window;
@@ -178,10 +179,12 @@ xcb_atom_t get_atom (xcb_connection_t *conn, xcb_intern_atom_cookie_t ck)
 static void CacheAtoms (vout_window_sys_t *p_sys)
 {
     xcb_connection_t *conn = p_sys->conn;
-    xcb_intern_atom_cookie_t wm_state_ck, wm_state_above_ck, wm_state_fs_ck;
+    xcb_intern_atom_cookie_t wm_state_ck, wm_state_above_ck,
+                             wm_state_below_ck, wm_state_fs_ck;
 
     wm_state_ck = intern_string (conn, "_NET_WM_STATE");
     wm_state_above_ck = intern_string (conn, "_NET_WM_STATE_ABOVE");
+    wm_state_below_ck = intern_string (conn, "_NET_WM_STATE_ABOVE");
     wm_state_fs_ck = intern_string (conn, "_NET_WM_STATE_FULLSCREEN");
 #ifdef MATCHBOX_HACK
     xcb_intern_atom_cookie_t mb_current_app_window;
@@ -192,6 +195,7 @@ static void CacheAtoms (vout_window_sys_t *p_sys)
 
     p_sys->wm_state = get_atom (conn, wm_state_ck);
     p_sys->wm_state_above = get_atom (conn, wm_state_above_ck);
+    p_sys->wm_state_below = get_atom (conn, wm_state_below_ck);
     p_sys->wm_state_fullscreen = get_atom (conn, wm_state_fs_ck);
 #ifdef MATCHBOX_HACK
     p_sys->mb_current_app_window = get_atom (conn, mb_current_app_window);
@@ -479,8 +483,15 @@ static int Control (vout_window_t *wnd, int cmd, va_list ap)
         }
 
         case VOUT_WINDOW_SET_STATE:
-            set_wm_state (wnd, va_arg (ap, int), p_sys->wm_state_above);
+        {
+            unsigned state = va_arg (ap, unsigned);
+            bool above = (state & VOUT_WINDOW_STATE_ABOVE) != 0;
+            bool below = (state & VOUT_WINDOW_STATE_BELOW) != 0;
+
+            set_wm_state (wnd, above, p_sys->wm_state_above);
+            set_wm_state (wnd, below, p_sys->wm_state_below);
             break;
+        }
 
         case VOUT_WINDOW_SET_FULLSCREEN:
             set_wm_state (wnd, va_arg (ap, int), p_sys->wm_state_fullscreen);
