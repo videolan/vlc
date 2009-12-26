@@ -38,6 +38,7 @@
 
 #import <Cocoa/Cocoa.h>
 #import "VLCLoginPanel.h"
+#import "VLCProgressPanel.h"
 
 /*****************************************************************************
  * Prototypes
@@ -50,9 +51,16 @@ static int DisplayError(vlc_object_t *,const char *,vlc_value_t,vlc_value_t,void
 static int DisplayCritical(vlc_object_t *,const char *,vlc_value_t,vlc_value_t,void * );
 static int DisplayQuestion(vlc_object_t *,const char *,vlc_value_t,vlc_value_t,void * );
 static int DisplayLogin(vlc_object_t *,const char *,vlc_value_t,vlc_value_t,void * );
+static int DisplayProgressPanelAction(vlc_object_t *,const char *,vlc_value_t,vlc_value_t,void * );
+
+static void updateProgressPanel (void *, const char *, float);
+static bool checkProgressPanel (void *);
+static void destroyProgressPanel (void *);
 
 struct intf_sys_t
 {
+    VLCProgressPanel *currentProgressBarPanel;
+
     vlc_mutex_t lock;
     vlc_cond_t wait;
 };
@@ -106,8 +114,8 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback(p_intf,"dialog-login",DisplayLogin,p_intf);
     var_Create(p_intf,"dialog-question",VLC_VAR_ADDRESS);
     var_AddCallback(p_intf,"dialog-question",DisplayQuestion,p_intf);
-    //    var_Create(p_intf,"dialog-progress-bar",VLC_VAR_ADDRESS);
-    //    var_AddCallback(p_intf,"dialog-progress-bar",DisplayProgressPanelAction,p_intf);
+    var_Create(p_intf,"dialog-progress-bar",VLC_VAR_ADDRESS);
+    var_AddCallback(p_intf,"dialog-progress-bar",DisplayProgressPanelAction,p_intf);
     dialog_Register(p_intf);
 
     msg_Dbg(p_intf,"Mac OS X dialog provider initialised");
@@ -124,7 +132,7 @@ static void Run( intf_thread_t *p_intf )
     var_DelCallback(p_intf,"dialog-critical",DisplayCritical,p_intf);
     var_DelCallback(p_intf,"dialog-login",DisplayLogin,p_intf);
     var_DelCallback(p_intf,"dialog-question",DisplayQuestion,p_intf);
-    //    var_DelCallback(p_intf,"dialog-progress-bar",DisplayProgressPanelAction,p_intf);
+    var_DelCallback(p_intf,"dialog-progress-bar",DisplayProgressPanelAction,p_intf);
 }
 /*****************************************************************************
  * CloseIntf: destroy interface
@@ -149,6 +157,7 @@ static int DisplayError(vlc_object_t *p_this, const char *type, vlc_value_t prev
                             [NSString stringWithUTF8String:p_dialog->message],
                             @"OK", nil, nil);
     [o_pool release];
+    return VLC_SUCCESS;
 }
 
 static int DisplayCritical(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
@@ -159,6 +168,7 @@ static int DisplayCritical(vlc_object_t *p_this, const char *type, vlc_value_t p
                             [NSString stringWithUTF8String:p_dialog->message],
                             @"OK", nil, nil);
     [o_pool release];
+    return VLC_SUCCESS;
 }
 
 static int DisplayQuestion(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
@@ -191,6 +201,7 @@ static int DisplayQuestion(vlc_object_t *p_this, const char *type, vlc_value_t p
     if (i_returnValue == NSAlertOtherReturn)
         p_dialog->answer = 3;
     [o_pool release];
+    return VLC_SUCCESS;
 }
 
 static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
@@ -203,16 +214,81 @@ static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t prev
     [thePanel setDialogTitle:[NSString stringWithUTF8String:p_dialog->title]];
     [thePanel setDialogMessage:[NSString stringWithUTF8String:p_dialog->message]];
     [thePanel center];
-    i_returnValue = [NSApp runModalForWindow: thePanel];
+    i_returnValue = [NSApp runModalForWindow:thePanel];
     [thePanel close];
-    if( i_returnValue )
-    {
+    if (i_returnValue) {
         *p_dialog->username = strdup( [[thePanel userName] UTF8String] );
         *p_dialog->password = strdup( [[thePanel password] UTF8String] );
-    }
-    else
-    {
+    } else
         *p_dialog->username = *p_dialog->password = NULL;
-    }    
+    [o_pool release];
+    return VLC_SUCCESS;
+}
+
+static int DisplayProgressPanelAction(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
+{
+    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
+    dialog_progress_bar_t * p_dialog = (dialog_progress_bar_t *)value.p_address;
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
+    intf_sys_t *p_sys = p_intf->p_sys;
+
+    if(p_sys->currentProgressBarPanel)
+        [p_sys->currentProgressBarPanel release];
+
+    p_sys->currentProgressBarPanel = [[VLCProgressPanel alloc] init];
+    [p_sys->currentProgressBarPanel createContentView];
+    if (p_dialog->title)
+        [p_sys->currentProgressBarPanel setDialogTitle:[NSString stringWithUTF8String:p_dialog->title]];
+    if (p_dialog->message)
+        [p_sys->currentProgressBarPanel setDialogMessage:[NSString stringWithUTF8String:p_dialog->message]];
+    if (p_dialog->cancel)
+        [p_sys->currentProgressBarPanel setCancelButtonLabel:[NSString stringWithUTF8String:p_dialog->cancel]];
+    [p_sys->currentProgressBarPanel center];
+    [p_sys->currentProgressBarPanel makeKeyAndOrderFront:nil];
+
+    p_dialog->pf_update = updateProgressPanel;
+    p_dialog->pf_check = checkProgressPanel;
+    p_dialog->pf_destroy = destroyProgressPanel;
+    p_dialog->p_sys = p_intf->p_sys;
+
+    [o_pool release];
+    return VLC_SUCCESS;
+}
+
+void updateProgressPanel (void *priv, const char *text, float value)
+{
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+    intf_sys_t *p_sys = (intf_sys_t *)priv;
+
+    if (text)
+        [p_sys->currentProgressBarPanel setDialogMessage:[NSString stringWithUTF8String:text]];
+    else
+        [p_sys->currentProgressBarPanel setDialogMessage:@""];
+    [p_sys->currentProgressBarPanel setProgressAsDouble:(double)(value * 1000.)];
+
     [o_pool release];
 }
+
+void destroyProgressPanel (void *priv)
+{
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+    intf_sys_t *p_sys = (intf_sys_t *)priv;
+
+    [p_sys->currentProgressBarPanel close];
+    [p_sys->currentProgressBarPanel release];
+
+    [o_pool release];
+}
+
+bool checkProgressPanel (void *priv)
+{
+    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
+    intf_sys_t *p_sys = (intf_sys_t *)priv;
+    BOOL b_returned;
+
+    b_returned = [p_sys->currentProgressBarPanel isCancelled];
+
+    [o_pool release];
+    return b_returned;
+}
+
