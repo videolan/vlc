@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
+#include <vlc_charset.h>
 
 #include <windows.h>
 #include <mmsystem.h>
@@ -159,7 +160,7 @@ struct aout_sys_t
 {
     HINSTANCE           hdsound_dll;      /* handle of the opened dsound dll */
 
-    int                 i_device_id;                 /*  user defined device */
+    char *              psz_device;         /* user defined device name */
     LPGUID              p_device_guid;
 
     LPDIRECTSOUND       p_dsobject;              /* main Direct Sound object */
@@ -215,17 +216,20 @@ static void DestroyDSBuffer   ( aout_instance_t * );
 static void* DirectSoundThread( vlc_object_t * );
 static int  FillBuffer        ( aout_instance_t *, int, aout_buffer_t * );
 
+static int ReloadDirectXDevices( vlc_object_t *, char const *,
+                                vlc_value_t, vlc_value_t, void * );
+
 /* Speaker setup override options list */
 static const char *const speaker_list[] = { "Windows default", "Mono", "Stereo",
                                             "Quad", "5.1", "7.1" };
+static const char *const ppsz_adev[] = {"default",  };
+static const char *const ppsz_adev_text[] = {"default", };
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 #define DEVICE_TEXT N_("Output device")
-#define DEVICE_LONGTEXT N_( \
-    "DirectX device number: 0 default device, 1..N device by number" \
-    "(Note that the default device appears as 0 AND another number)." )
+#define DEVICE_LONGTEXT N_("Select your audio output device")
 #define FLOAT_TEXT N_("Use float32 output")
 #define FLOAT_LONGTEXT N_( \
     "The option allows you to enable or disable the high-quality float32 " \
@@ -241,14 +245,17 @@ vlc_module_begin ()
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AOUT )
     add_shortcut( "directx" )
-    add_integer( "directx-audio-device", 0, NULL, DEVICE_TEXT,
-                 DEVICE_LONGTEXT, true )
+    add_string( "directx-audio-device-name", "default", NULL,
+             DEVICE_TEXT, DEVICE_LONGTEXT, false )
+    change_string_list( ppsz_adev, ppsz_adev_text, ReloadDirectXDevices )
+    change_action_add( ReloadDirectXDevices, N_("Refresh list") )
     add_bool( "directx-audio-float32", false, NULL, FLOAT_TEXT,
               FLOAT_LONGTEXT, true )
     add_string( "directx-audio-speaker", "Windows default", NULL,
                  SPEAKER_TEXT, SPEAKER_LONGTEXT, true )
         change_string_list( speaker_list, 0, 0 )
         change_need_restart ()
+
     set_callbacks( OpenAudio, CloseAudio )
 vlc_module_end ()
 
@@ -306,8 +313,6 @@ static int OpenAudio( vlc_object_t *p_this )
     free( psz_speaker );
     p_aout->output.p_sys->i_speaker_setup = i;
 
-    p_aout->output.p_sys->i_device_id = var_CreateGetInteger( p_aout,
-                                               "directx-audio-device" );
     p_aout->output.p_sys->p_device_guid = 0;
 
     /* Initialise DirectSound */
@@ -754,14 +759,24 @@ static int CALLBACK CallBackDirectSoundEnum( LPGUID p_guid, LPCSTR psz_desc,
 
     msg_Dbg( p_aout, "found device: %s", psz_desc );
 
-    if( p_aout->output.p_sys->i_device_id == 0 && p_guid )
+    if( p_aout->output.p_sys->psz_device && !strcmp(p_aout->output.p_sys->psz_device, psz_desc) && p_guid )
     {
+        /* Use the device corresponding to psz_device */
         p_aout->output.p_sys->p_device_guid = malloc( sizeof( GUID ) );
         *p_aout->output.p_sys->p_device_guid = *p_guid;
         msg_Dbg( p_aout, "using device: %s", psz_desc );
     }
-
-    p_aout->output.p_sys->i_device_id--;
+    else
+    {
+        /* If no default device has been selected, chose the first one */
+        if( !p_aout->output.p_sys->psz_device && p_guid )
+        {
+            p_aout->output.p_sys->psz_device = strdup( psz_desc );
+            p_aout->output.p_sys->p_device_guid = malloc( sizeof( GUID ) );
+            *p_aout->output.p_sys->p_device_guid = *p_guid;
+            msg_Dbg( p_aout, "using device: %s", psz_desc );
+        }
+    }
     return 1;
 }
 
@@ -795,6 +810,7 @@ static int InitDirectSound( aout_instance_t *p_aout )
                        "DirectSoundEnumerateA" );
     if( OurDirectSoundEnumerate )
     {
+        p_aout->output.p_sys->psz_device = config_GetPsz(p_aout, "directx-audio-device-name");
         /* Attempt enumeration */
         if( FAILED( OurDirectSoundEnumerate( CallBackDirectSoundEnum,
                                              p_aout ) ) )
@@ -1214,3 +1230,88 @@ static void* DirectSoundThread( vlc_object_t *p_this )
     msg_Dbg( p_notif, "DirectSoundThread exiting" );
     return NULL;
 }
+
+/*****************************************************************************
+ * CallBackConfigNBEnum: callback to get the number of available devices
+ *****************************************************************************/
+static int CALLBACK CallBackConfigNBEnum( LPGUID p_guid, LPCSTR psz_desc,
+                                             LPCSTR psz_mod, LPVOID p_nb )
+{
+    VLC_UNUSED( psz_mod );
+    VLC_UNUSED( psz_desc );
+    VLC_UNUSED( p_guid );
+    int * a = (int *)p_nb;
+    *a = *a +1;
+    return 1;
+}
+
+/*****************************************************************************
+ * CallBackConfigEnum: callback to add available devices to the preferences list
+ *****************************************************************************/
+static int CALLBACK CallBackConfigEnum( LPGUID p_guid, LPCSTR psz_desc,
+                                             LPCSTR psz_mod, LPVOID _p_item )
+{
+    VLC_UNUSED( psz_mod );
+    VLC_UNUSED( p_guid );
+
+    module_config_t *p_item = (module_config_t *) _p_item;
+
+    p_item->ppsz_list[p_item->i_list] = FromLocaleDup(psz_desc);
+    p_item->ppsz_list_text[p_item->i_list] = FromLocaleDup(psz_desc);
+    p_item->i_list = p_item->i_list +1;
+    return 1;
+}
+
+/*****************************************************************************
+ * ReloadDirectXDevices: store the list of devices in preferences
+ *****************************************************************************/
+static int ReloadDirectXDevices( vlc_object_t *p_this, char const *psz_name,
+                                 vlc_value_t newval, vlc_value_t oldval, void *data )
+{
+    VLC_UNUSED( newval ); VLC_UNUSED( oldval ); VLC_UNUSED( data );
+    module_config_t *p_item = config_FindConfig( p_this, psz_name );
+    if( !p_item ) return VLC_SUCCESS;
+
+    /* Clear-up the current list */
+    if( p_item->i_list )
+    {
+        int i;
+        for( i = 0; i < p_item->i_list; i++ )
+        {
+            free((char *)(p_item->ppsz_list[i]) );
+            free((char *)(p_item->ppsz_list_text[i]) );
+        }
+    }
+
+    HRESULT (WINAPI *OurDirectSoundEnumerate)(LPDSENUMCALLBACK, LPVOID);
+
+    HANDLE hdsound_dll = LoadLibrary("DSOUND.DLL");
+    if( hdsound_dll == NULL )
+    {
+        msg_Warn( p_this, "cannot open DSOUND.DLL" );
+    }
+
+    /* Get DirectSoundEnumerate */
+    OurDirectSoundEnumerate = (void *)
+       GetProcAddress( hdsound_dll,
+                       "DirectSoundEnumerateA" );
+    int nb_devices = 0;
+    OurDirectSoundEnumerate(CallBackConfigNBEnum, &nb_devices);
+    msg_Dbg(p_this,"found %d devices", nb_devices);
+
+    p_item->ppsz_list = xrealloc( p_item->ppsz_list,
+                          nb_devices * sizeof(char *) );
+    p_item->ppsz_list_text = xrealloc( p_item->ppsz_list_text,
+                          nb_devices * sizeof(char *) );
+
+    p_item->i_list = 0;
+    OurDirectSoundEnumerate(CallBackConfigEnum, p_item);
+
+    FreeLibrary(hdsound_dll);
+
+    /* Signal change to the interface */
+    p_item->b_dirty = true;
+
+    return VLC_SUCCESS;
+}
+
