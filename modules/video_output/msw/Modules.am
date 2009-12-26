@@ -24,16 +24,16 @@ SOURCES_glwin32 = \
 
 SOURCES_wingdi = \
 	wingdi.c \
-	vout.h \
-	events_vo.h \
-	events_vo.c \
-	common_vo.c \
+	common.h \
+	events.h \
+	events.c \
+	common.c \
 	$(NULL)
 
 SOURCES_wingapi = \
 	wingdi.c \
 	vout.h \
-	events_vo.h \
-	events_vo.c \
-	common_vo.c \
+	events.h \
+	events.c \
+	common.c \
 	$(NULL)

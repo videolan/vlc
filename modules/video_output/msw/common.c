@@ -169,7 +169,7 @@ void CommonManage(vout_display_t *vd)
 
             /* FIXME I find such #ifdef quite weirds. Are they really needed ? */
 
-#if defined(MODULE_NAME_IS_direct3d)
+#if defined(MODULE_NAME_IS_direct3d) || defined(MODULE_NAME_IS_wingdi) || defined(MODULE_NAME_IS_wingapi)
             SetWindowPos(sys->hwnd, 0, 0, 0,
                          rect_parent.right - rect_parent.left,
                          rect_parent.bottom - rect_parent.top,
@@ -186,15 +186,6 @@ void CommonManage(vout_display_t *vd)
                          rect_parent.right - rect_parent.left,
                          rect_parent.bottom - rect_parent.top, 0);
 
-#if defined(MODULE_NAME_IS_wingdi) || defined(MODULE_NAME_IS_wingapi)
-            unsigned int i_x, i_y, i_width, i_height;
-            vout_PlacePicture(vd, rect_parent.right - rect_parent.left,
-                              rect_parent.bottom - rect_parent.top,
-                              &i_x, &i_y, &i_width, &i_height);
-
-            SetWindowPos(sys->hvideownd, HWND_TOP,
-                         i_x, i_y, i_width, i_height, 0);
-#endif
 #endif
         }
     }
@@ -271,7 +262,9 @@ void UpdateRects(vout_display_t *vd,
     EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
                                     point.x, point.y,
                                     rect.right, rect.bottom);
-    if (!is_forced && !has_moved && !is_resized)
+    if (is_resized)
+        vout_display_SendEventDisplaySize(vd, rect.right, rect.bottom, cfg->is_fullscreen);
+    if (!is_forced && !has_moved && !is_resized )
         return;
 
     /* Update the window position and size */
@@ -283,6 +276,10 @@ void UpdateRects(vout_display_t *vd,
     vout_display_PlacePicture(&place, source, &place_cfg, true);
 
     EventThreadUpdateSourceAndPlace(sys->event, source, &place);
+#if defined(MODULE_NAME_IS_wingapi)
+    if (place.width != fmt->i_width || place.height != fmt->i_height)
+        vout_display_SendEventPicturesInvalid(vd);
+#endif
 
     if (sys->hvideownd)
         SetWindowPos(sys->hvideownd, 0,

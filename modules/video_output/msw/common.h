@@ -187,39 +187,24 @@ struct vout_display_sys_t
     bool           desktop_requested;
 #endif
 
-#ifdef MODULE_NAME_IS_wingdi
-
+#if defined(MODULE_NAME_IS_wingdi) || defined(MODULE_NAME_IS_wingapi)
     int  i_depth;
 
     /* Our offscreen bitmap and its framebuffer */
     HDC        off_dc;
     HBITMAP    off_bitmap;
-    uint8_t *  p_pic_buffer;
-    int        i_pic_pitch;
-    int        i_pic_pixel_pitch;
 
-    BITMAPINFO bitmapinfo;
-    RGBQUAD    red;
-    RGBQUAD    green;
-    RGBQUAD    blue;
-#endif
+    picture_pool_t *pool;
 
-#ifdef MODULE_NAME_IS_wingapi
-    int        i_depth;
-    int        render_width;
-    int        render_height;
-	    /* Our offscreen bitmap and its framebuffer */
-    HDC        off_dc;
-    HBITMAP    off_bitmap;
-    uint8_t *  p_pic_buffer;
-    int        i_pic_pitch;
-    int        i_pic_pixel_pitch;
+    struct
+    {
+        BITMAPINFO bitmapinfo;
+        RGBQUAD    red;
+        RGBQUAD    green;
+        RGBQUAD    blue;
+    };
 
-    BITMAPINFO bitmapinfo;
-    RGBQUAD    red;
-    RGBQUAD    green;
-    RGBQUAD    blue;
-
+#   ifdef MODULE_NAME_IS_wingapi
     HINSTANCE  gapi_dll;                   /* handle of the opened gapi dll */
 
     /* GAPI functions */
@@ -230,6 +215,7 @@ struct vout_display_sys_t
     GXDisplayProperties (*GXGetDisplayProperties)();
     int (*GXSuspend)();
     int (*GXResume)();
+#   endif
 #endif
 };
 
