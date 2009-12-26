@@ -297,6 +297,9 @@ static int Open (vlc_object_t *obj)
 {
     vout_display_t *vd = (vout_display_t *)obj;
     vout_display_sys_t *p_sys = malloc (sizeof (*p_sys));
+
+    if (!var_CreateGetBool (obj, "overlay"))
+        return VLC_EGENERIC;
     if (p_sys == NULL)
         return VLC_ENOMEM;
 
