@@ -252,6 +252,12 @@ void UpdateRects(vout_display_t *vd,
     RECT  rect;
     POINT point;
 
+    /* */
+    if (!cfg)
+        cfg = vd->cfg;
+    if (!source)
+        source = &vd->source;
+
     /* Retrieve the window size */
     GetClientRect(sys->hwnd, &rect);
 
@@ -260,18 +266,13 @@ void UpdateRects(vout_display_t *vd,
     ClientToScreen(sys->hwnd, &point);
 
     /* If nothing changed, we can return */
-    bool has_changed;
-    EventThreadUpdateWindowPosition(sys->event, &has_changed,
+    bool has_moved;
+    bool is_resized;
+    EventThreadUpdateWindowPosition(sys->event, &has_moved, &is_resized,
                                     point.x, point.y,
                                     rect.right, rect.bottom);
-    if (!is_forced && !has_changed)
+    if (!is_forced && !has_moved && !is_resized)
         return;
-
-    /* */
-    if (!cfg)
-        cfg = vd->cfg;
-    if (!source)
-        source = &vd->source;
 
     /* Update the window position and size */
     vout_display_cfg_t place_cfg = *cfg;

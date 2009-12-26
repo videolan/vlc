@@ -53,7 +53,7 @@ void            EventThreadMouseAutoHide( event_thread_t * );
 void            EventThreadMouseShow( event_thread_t * );
 void            EventThreadUpdateTitle( event_thread_t *, const char *psz_fallback );
 int             EventThreadGetWindowStyle( event_thread_t * );
-void            EventThreadUpdateWindowPosition( event_thread_t *, bool *pb_changed,
+void            EventThreadUpdateWindowPosition( event_thread_t *, bool *pb_moved, bool *pb_resized,
                                                  int x, int y, int w, int h );
 void            EventThreadUpdateSourceAndPlace( event_thread_t *p_event,
                                                  const video_format_t *p_source,

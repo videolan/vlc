@@ -927,13 +927,14 @@ int EventThreadGetWindowStyle( event_thread_t *p_event )
     return p_event->i_window_style;
 }
 
-void EventThreadUpdateWindowPosition( event_thread_t *p_event, bool *pb_changed,
+void EventThreadUpdateWindowPosition( event_thread_t *p_event,
+                                      bool *pb_moved, bool *pb_resized,
                                       int x, int y, int w, int h )
 {
     vlc_mutex_lock( &p_event->lock );
-    *pb_changed = x != p_event->wnd_cfg.x ||
-                  y != p_event->wnd_cfg.y ||
-                  w != p_event->wnd_cfg.width ||
+    *pb_moved   = x != p_event->wnd_cfg.x ||
+                  y != p_event->wnd_cfg.y;
+    *pb_resized = w != p_event->wnd_cfg.width ||
                   h != p_event->wnd_cfg.height;
 
     p_event->wnd_cfg.x      = x;
