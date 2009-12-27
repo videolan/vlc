@@ -446,6 +446,14 @@ function menu(name,client,value)
     end
 end
 
+function hotkey(name, client, value)
+    if not value then
+        client:append("Please specify a hotkey (ie key-quit or quit)")
+    elseif not common.hotkey(value) and not common.hotkey("key-"..value) then
+        client:append("Unknown hotkey '"..value.."'")
+    end
+end
+
 function eval(client,val)
     client:append(tostring(loadstring("return "..val)()))
 end
@@ -507,7 +515,7 @@ commands_ordered = {
     { "vzoom"; { func = skip(listvalue("vout","zoom")); args = "[X]"; help = "set/get video zoom"; aliases = { "zoom" } } };
     { "snapshot"; { func = common.snapshot; help = "take video snapshot" } };
     { "strack"; { func = skip(listvalue("input","spu-es")); args = "[X]"; help = "set/get subtitles track" } };
-    { "hotkey"; { func = skip(common.hotkey); args = "[hotkey name]"; help = "simulate hotkey press"; adv = true; aliases = { "key" } } };
+    { "hotkey"; { func = hotkey; args = "[hotkey name]"; help = "simulate hotkey press"; adv = true; aliases = { "key" } } };
     { "menu"; { func = menu; args = "[on|off|up|down|left|right|select]"; help = "use menu"; adv = true } };
     { "" };
     { "set"; { func = set_env; args = "[var [value]]"; help = "set/get env var"; adv = true } };
