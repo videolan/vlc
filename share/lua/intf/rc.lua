@@ -28,18 +28,20 @@ description=
  This is a modules/control/rc.c look alike (with a bunch of new features)
 
  Use on local term:
-    vlc -I luarc
+    vlc -I rc
  Use on tcp connection:
-    vlc -I luarc --lua-config "rc={host='localhost:4212'}"
+    vlc -I rc --lua-config "rc={host='localhost:4212'}"
  Use on multiple hosts (term + 2 tcp ports):
-    vlc -I luarc --lua-config "rc={hosts={'*console','localhost:4212','localhost:5678'}}"
+    vlc -I rc --lua-config "rc={hosts={'*console','localhost:4212','localhost:5678'}}"
 
  Note:
-    -I luarc is an alias for -I lua --lua-intf rc
+    -I rc and -I luarc are aliases for -I lua --lua-intf rc
 
  Configuration options setable throught the --lua-config option are:
     * hosts: A list of hosts to listen on.
     * host: A host to listen on. (won't be used if `hosts' is set)
+    * eval: Add eval command to evaluate lua expressions. Set to any value to
+            enable.
  The following can be set using the --lua-config option or in the interface
  itself using the `set' command:
     * prompt: The prompt.
@@ -435,6 +437,15 @@ function listvalue(obj,var)
     end
 end
 
+function menu(name,client,value)
+    local map = { on='show', off='hide', up='up', down='down', left='prev', right='next', ['select']='activate' }
+    if map[value] and vlc.osd.menu[map[value]] then
+        vlc.osd.menu[map[value]]()
+    else
+        client:append("Unknown menu command '"..tostring(value).."'")
+    end
+end
+
 function eval(client,val)
     client:append(loadstring("return "..val)())
 end
@@ -497,12 +508,11 @@ commands_ordered = {
     { "snapshot"; { func = common.snapshot; help = "take video snapshot" } };
     { "strack"; { func = skip(listvalue("input","spu-es")); args = "[X]"; help = "set/get subtitles track" } };
     { "hotkey"; { func = skip(common.hotkey); args = "[hotkey name]"; help = "simulate hotkey press"; adv = true; aliases = { "key" } } };
-    { "menu"; { func = fixme; args = "[on|off|up|down|left|right|select]"; help = "use menu"; adv = true } };
+    { "menu"; { func = menu; args = "[on|off|up|down|left|right|select]"; help = "use menu"; adv = true } };
     { "" };
     { "set"; { func = set_env; args = "[var [value]]"; help = "set/get env var"; adv = true } };
     { "save_env"; { func = save_env; help = "save env vars (for future clients)"; adv = true } };
     { "alias"; { func = skip(alias); args = "[cmd]"; help = "set/get command aliases"; adv = true } };
-    { "eval"; { func = skip(eval); help = "eval some lua (*debug*)"; adv =true } }; -- FIXME: comment out if you're not debugging
     { "description"; { func = print_text("Description",description); help = "describe this module" } };
     { "license"; { func = print_text("License message",vlc.misc.license()); help = "print VLC's license message"; adv = true } };
     { "help"; { func = help; args = "[pattern]"; help = "a help message"; aliases = { "?" } } };
@@ -511,6 +521,11 @@ commands_ordered = {
     { "quit"; { func = quit; help = "quit VLC (or logout if in a socket connection)" } };
     { "shutdown"; { func = shutdown; help = "shutdown VLC" } };
     }
+
+if config.eval then
+    commands_ordered[#commands_ordered] = { "eval"; { func = skip(eval); help = "eval some lua (*debug*)"; adv =true } }
+end
+
 commands = {}
 for i, cmd in ipairs( commands_ordered ) do
     if #cmd == 2 then
