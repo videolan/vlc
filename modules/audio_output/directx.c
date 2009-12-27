@@ -66,7 +66,7 @@ struct aout_sys_t
 {
     HINSTANCE           hdsound_dll;      /* handle of the opened dsound dll */
 
-    char *              psz_device;         /* user defined device name */
+    char *              psz_device;              /* user defined device name */
     LPGUID              p_device_guid;
 
     LPDIRECTSOUND       p_dsobject;              /* main Direct Sound object */
@@ -76,14 +76,14 @@ struct aout_sys_t
 
     notification_thread_t *p_notif;                  /* DirectSoundThread id */
 
-    int b_playing;                                         /* playing status */
+    int      b_playing;                                    /* playing status */
 
-    int i_frame_size;                         /* Size in bytes of one frame */
+    int      i_frame_size;                     /* Size in bytes of one frame */
 
-    int i_speaker_setup;                 /* Speaker setup override */
+    int      i_speaker_setup;                      /* Speaker setup override */
 
-    bool b_chan_reorder;              /* do we need channel reordering */
-    int pi_chan_table[AOUT_CHAN_MAX];
+    bool     b_chan_reorder;                /* do we need channel reordering */
+    int      pi_chan_table[AOUT_CHAN_MAX];
     uint32_t i_channel_mask;
     uint32_t i_bits_per_sample;
     uint32_t i_channels;
@@ -191,8 +191,7 @@ static int OpenAudio( vlc_object_t *p_this )
 
     if ( *ppsz_compare == NULL )
     {
-        msg_Err( p_aout, "(%s) isn't valid speaker setup option",
-                 psz_speaker );
+        msg_Err( p_aout, "(%s) isn't valid speaker setup option", psz_speaker );
         msg_Err( p_aout, "Defaulting to Windows default speaker config");
         i = 0;
     }
@@ -693,7 +692,7 @@ static int InitDirectSound( aout_instance_t *p_aout )
     /* Get DirectSoundEnumerate */
     OurDirectSoundEnumerate = (void *)
        GetProcAddress( p_aout->output.p_sys->hdsound_dll,
-                       "DirectSoundEnumerateA" );
+                       "DirectSoundEnumerateW" );
     if( OurDirectSoundEnumerate )
     {
         p_aout->output.p_sys->psz_device = config_GetPsz(p_aout, "directx-audio-device-name");
@@ -1179,7 +1178,7 @@ static int ReloadDirectXDevices( vlc_object_t *p_this, char const *psz_name,
     /* Get DirectSoundEnumerate */
     OurDirectSoundEnumerate = (void *)
        GetProcAddress( hdsound_dll,
-                       "DirectSoundEnumerateA" );
+                       "DirectSoundEnumerateW" );
     int nb_devices = 0;
     OurDirectSoundEnumerate(CallBackConfigNBEnum, &nb_devices);
     msg_Dbg(p_this,"found %d devices", nb_devices);
