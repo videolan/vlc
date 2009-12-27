@@ -28,6 +28,7 @@
         alphacolor  CDATA   #REQUIRED
         nbframes    CDATA   "1"
         fps         CDATA   "0"
+        loop        CDATA   "0"
     >
 <!ELEMENT SubBitmap EMPTY>
     <!ATTLIST SubBitmap
@@ -38,6 +39,7 @@
         height      CDATA   #REQUIRED
         nbframes    CDATA   "1"
         fps         CDATA   "0"
+        loop        CDATA   "0"
     >
 <!ELEMENT Font EMPTY>
     <!ATTLIST Font
