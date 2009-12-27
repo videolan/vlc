@@ -130,6 +130,7 @@ typedef struct {
 } WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
 #endif
 
+
 DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_IEEE_FLOAT, WAVE_FORMAT_IEEE_FLOAT, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
 DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_PCM, WAVE_FORMAT_PCM, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
 DEFINE_GUID( _KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF, WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, 0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71 );
@@ -1128,14 +1129,11 @@ static void* DirectSoundThread( vlc_object_t *p_this )
 {
     notification_thread_t *p_notif = (notification_thread_t*)p_this;
     aout_instance_t *p_aout = p_notif->p_aout;
-    bool b_sleek;
     mtime_t last_time;
-    HRESULT dsresult;
-    long l_queued = 0;
     int canc = vlc_savecancel ();
 
     /* We don't want any resampling when using S/PDIF output */
-    b_sleek = p_aout->output.output.i_format == VLC_CODEC_SPDIFL;
+    bool b_sleek = (p_aout->output.output.i_format == VLC_CODEC_SPDIFL);
 
     msg_Dbg( p_notif, "DirectSoundThread ready" );
 
@@ -1144,6 +1142,7 @@ static void* DirectSoundThread( vlc_object_t *p_this )
 
     if( vlc_object_alive (p_notif) )
     {
+        HRESULT dsresult;
         mwait( p_notif->start_date - AOUT_PTS_TOLERANCE / 2 );
 
         /* start playing the buffer */
@@ -1170,7 +1169,7 @@ static void* DirectSoundThread( vlc_object_t *p_this )
     while( vlc_object_alive (p_notif) )
     {
         DWORD l_read;
-        long l_free_slots;
+        int l_queued = 0, l_free_slots;
         unsigned i_frame_siz = p_aout->output.i_nb_samples;
         mtime_t mtime = mdate();
         int i;
