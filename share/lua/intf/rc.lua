@@ -562,7 +562,7 @@ do
         end
     end
     list = list..")"
-    if count ~= 0 and env.welcome then
+    if count ~= 0 and env.welcome and env.welcome ~= "" then
         env.welcome = env.welcome .. "\r\nWarning: "..count.." functions are still unimplemented "..list.."."
     end
 end
@@ -623,7 +623,9 @@ h = host.host()
 -- No auth
 h.status_callbacks[host.status.password] = function(client)
     client.env = common.table_copy( env )
-    client:send( client.env.welcome .. "\r\n")
+    if client.env.welcome ~= "" then
+        client:send( client.env.welcome .. "\r\n")
+    end
     client:switch_status(host.status.read)
 end
 -- Print prompt when switching a client's status to `read'
