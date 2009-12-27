@@ -61,12 +61,15 @@ skip2 = function(foo) return skip(skip(foo)) end
 setarg = common.setarg
 strip = common.strip
 
+_ = vlc.gettext._
+N_ = vlc.gettext.N_
+
 --[[ Setup default environement ]]
 env = { prompt = "> ";
         width = 70;
         autocompletion = 1;
         autoalias = 1;
-        welcome = "Remote control interface initialized. Type `help' for help.";
+        welcome = _("Remote control interface initialized. Type `help' for help.");
         flatplaylist = 0;
       }
 

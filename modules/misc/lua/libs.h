@@ -42,5 +42,6 @@ void luaopen_variables( lua_State * );
 void luaopen_video( lua_State * );
 void luaopen_vlm( lua_State * );
 void luaopen_volume( lua_State * );
+void luaopen_gettext( lua_State * );
 
 #endif
