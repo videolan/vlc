@@ -405,9 +405,11 @@ function volume(name,client,value)
     end
 end
 
-function rate(name,client)
+function rate(name,client,value)
     local input = vlc.object.input()
-    if name == "normal" then
+    if name == "rate" then
+        vlc.var.set(input, "rate", tonumber(value))
+    elseif name == "normal" then
         vlc.var.set(input,"rate",1)
     else
         vlc.var.set(input,"rate-"..name,nil)
@@ -494,6 +496,7 @@ commands_ordered = {
     { "faster"; { func = rate; help = "faster playing of stream" } };
     { "slower"; { func = rate; help = "slower playing of stream" } };
     { "normal"; { func = rate; help = "normal playing of stream" } };
+    { "rate"; { func = rate; args = "[playback rate]"; help = "set playback rate to value" } };
     { "frame"; { func = frame; help = "play frame by frame" } };
     { "fullscreen"; { func = skip2(vlc.video.fullscreen); args = "[on|off]"; help = "toggle fullscreen"; aliases = { "f", "F" } } };
     { "info"; { func = input_info; help = "information about the current stream" } };
