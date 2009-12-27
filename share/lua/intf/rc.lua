@@ -87,7 +87,7 @@ function set_env(name,client,value)
     if value then
         local var,val = split_input(value)
         if val then
-            s = string.gsub(val,"\"(.*)\"","%1")
+            local s = string.gsub(val,"\"(.*)\"","%1")
             if type(client.env[var])==type(1) then
                 client.env[var] = tonumber(s)
             else

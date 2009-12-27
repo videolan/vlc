@@ -220,7 +220,7 @@ end
 
 function parse_url_request(request)
     if not request then return {} end
-    t = {}
+    local t = {}
     for k,v in string.gmatch(request,"([^=&]+)=?([^=&]*)") do
         local k_ = vlc.strings.decode_uri(k)
         local v_ = vlc.strings.decode_uri(v)
