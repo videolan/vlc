@@ -494,6 +494,7 @@ vlc_fourcc_GetYUVFallback
 vlc_fourcc_AreUVPlanesSwapped
 vlc_gai_strerror
 vlc_gc_init
+vlc_GetActionId
 vlc_getaddrinfo
 vlc_getnameinfo
 vlc_gettext

@@ -2,6 +2,7 @@
  * action.c: key to action mapping
  *****************************************************************************
  * Copyright © 2008 Rémi Denis-Courmont
+ *           © 2009 Antoine Cellerier
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -24,6 +25,7 @@
 
 #include <vlc_common.h>
 #include "../libvlc.h"
+#include <vlc_keys.h>
 
 int vlc_key_to_action (vlc_object_t *libvlc, const char *varname,
                        vlc_value_t prevkey, vlc_value_t curkey, void *priv)
@@ -42,5 +44,13 @@ int vlc_key_to_action (vlc_object_t *libvlc, const char *varname,
     }
 
     return var_SetInteger (libvlc, "key-action", key->i_action);
+}
+
+vlc_key_t vlc_GetActionId(const char *name)
+{
+    for (size_t i = 0; i < libvlc_actions_count; i++)
+        if (!strcmp(libvlc_actions[i].name, name))
+            return libvlc_actions[i].value;
+    return 0;
 }
 

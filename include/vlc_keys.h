@@ -205,4 +205,7 @@ typedef enum vlc_key {
     ACTIONID_RATE_FASTER_FINE,
 
 } vlc_key_t;
+
+VLC_EXPORT( vlc_key_t, vlc_GetActionId, (const char *psz_key) ) LIBVLC_USED;
+
 #endif

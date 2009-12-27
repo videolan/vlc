@@ -39,6 +39,7 @@
 #include <vlc_charset.h>
 #include <vlc_aout.h>
 #include <vlc_interface.h>
+#include <vlc_keys.h>
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
@@ -209,6 +210,15 @@ static int vlclua_intf_should_die( lua_State *L )
     return 1;
 }
 
+static int vlclua_action_id( lua_State *L )
+{
+    vlc_key_t i_key = vlc_GetActionId( luaL_checkstring( L, 1 ) );
+    if (i_key == 0)
+        return 0;
+    lua_pushnumber( L, i_key );
+    return 1;
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -223,6 +233,8 @@ static const luaL_Reg vlclua_misc_reg[] = {
     { "configdir", vlclua_configdir },
     { "cachedir", vlclua_cachedir },
     { "datadir_list", vlclua_datadir_list },
+
+    { "action_id", vlclua_action_id },
 
     { "mdate", vlclua_mdate },
     { "mwait", vlclua_mwait },

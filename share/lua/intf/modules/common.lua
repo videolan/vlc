@@ -23,7 +23,13 @@ end
 
 -- Trigger a hotkey
 function hotkey(arg)
-    vlc.var.set( vlc.object.libvlc(), "key-pressed", vlc.config.get( arg ) )
+    local id = vlc.misc.action_id( arg )
+    if id ~= nil then
+        vlc.var.set( vlc.object.libvlc(), "key-action", id )
+        return true
+    else
+        return false
+    end
 end
 
 -- Take a video snapshot

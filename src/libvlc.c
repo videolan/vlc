@@ -817,7 +817,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         struct hotkey *p_keys =
             malloc( (libvlc_actions_count + 1) * sizeof (*p_keys) );
 
-	/* Initialize from configuration */
+        /* Initialize from configuration */
         for( size_t i = 0; i < libvlc_actions_count; i++ )
         {
             p_keys[i].psz_action = libvlc_actions[i].name;

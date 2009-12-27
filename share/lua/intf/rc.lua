@@ -447,7 +447,7 @@ function menu(name,client,value)
 end
 
 function eval(client,val)
-    client:append(loadstring("return "..val)())
+    client:append(tostring(loadstring("return "..val)()))
 end
 
 --[[ Declare commands, register their callback functions and provide
