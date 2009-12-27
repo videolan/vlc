@@ -231,14 +231,14 @@
           <SliderBackground id="Unnamed SliderBackground #189" image="vol_anim.png" nbvert="59"/>
         </Slider>
         <Panel id="main.normal.display" width="0" height="0" rightbottom="righttop">
-          <Text text="$T / $D" font="defaultfont" alignment="right" color="#CCCCCC" id="time" x="325" y="7" width="100" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive"/>
-          <Text text="$N" font="defaultfont" color="#CCCCCC" id="songticker" x="26" y="7" width="300" rightbottom="righttop" visible="dvd.isActive"/>
-          <Text text="$T / $D" font="defaultfont" alignment="right" color="#CCCCCC" id="time" x="390" y="7" width="100" lefttop="rightbottom" rightbottom="rightbottom" visible="not dvd.isActive"/>
-          <Text text="$N" font="defaultfont" color="#CCCCCC" id="songticker" x="26" y="7" width="365" rightbottom="righttop" visible="not dvd.isActive"/>
-          <Button up="main.png.dbuttons.info.normal" down="main.png.dbuttons.info.down" over="main.png.dbuttons.info.hover" action="dialogs.fileInfo()" id="main.normal.dbuttons.info" x="9" y="7" tooltiptext="Show File Information"/>
+          <Text text="$T / $D" font="defaultfont" alignment="right" color="#CCCCCC" id="time1" x="325" y="7" width="100" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive"/>
+          <Text text="$N" font="defaultfont" color="#CCCCCC" id="songticker1" x="26" y="7" width="300" rightbottom="righttop" visible="dvd.isActive"/>
+          <Text text="$T / $D" font="defaultfont" alignment="right" color="#CCCCCC" id="time2" x="390" y="7" width="100" lefttop="rightbottom" rightbottom="rightbottom" visible="not dvd.isActive"/>
+          <Text text="$N" font="defaultfont" color="#CCCCCC" id="songticker2" x="26" y="7" width="365" rightbottom="righttop" visible="not dvd.isActive"/>
+          <Button up="main.png.dbuttons.info.normal" down="main.png.dbuttons.info.down" over="main.png.dbuttons.info.hover" action="dialogs.fileInfo()" id="main.normal.dbuttons.info1" x="9" y="7" tooltiptext="Show File Information"/>
           <Button up="main.png.dbuttons.ptitle.normal" down="main.png.dbuttons.ptitle.down" over="main.png.dbuttons.ptitle.hover" action="dvd.previousTitle()" id="main.normal.dbuttons.ptitle" x="431" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Play Previous Title on DVD"/>
           <Button up="main.png.dbuttons.pchap.normal" down="main.png.dbuttons.pchap.down" over="main.png.dbuttons.pchap.hover" action="dvd.previousChapter()" id="main.normal.dbuttons.pchap" x="443" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Go to Previous Chapter of Title"/>
-          <Button up="main.png.dbuttons.menu.normal" down="main.png.dbuttons.menu.down" over="main.png.dbuttons.menu.hover" action="dvd.rootMenu()" id="main.normal.dbuttons.info" x="455" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Go to the DVD Title Menu"/>
+          <Button up="main.png.dbuttons.menu.normal" down="main.png.dbuttons.menu.down" over="main.png.dbuttons.menu.hover" action="dvd.rootMenu()" id="main.normal.dbuttons.info2" x="455" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Go to the DVD Title Menu"/>
           <Button up="main.png.dbuttons.nchap.normal" down="main.png.dbuttons.nchap.down" over="main.png.dbuttons.nchap.hover" action="dvd.nextChapter()" id="main.normal.dbuttons.nchap" x="467" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Go to Next Chapter of Title"/>
           <Button up="main.png.dbuttons.ntitle.normal" down="main.png.dbuttons.ntitle.down" over="main.png.dbuttons.ntitle.hover" action="dvd.nextTitle()" id="main.normal.dbuttons.ntitle" x="479" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Play Next Title on DVD"/>
         </Panel>
@@ -262,8 +262,8 @@
       <Slider id="Unnamed Slider #69" x="261" y="36" points="(0,115),(0,5)" value="equalizer.band(7)" tooltiptext="12KHz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
       <Slider id="Unnamed Slider #70" x="281" y="36" points="(0,115),(0,5)" value="equalizer.band(8)" tooltiptext="14KHz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
       <Slider id="Unnamed Slider #71" x="301" y="36" points="(0,115),(0,5)" value="equalizer.band(9)" tooltiptext="16KHz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
-      <Checkbox state="equalizer.isEnabled" up1="eq.png.led.off" up2="eq.png.led.on" down1="none" down2="none" over1="none" over2="none" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable Equalizer" tooltiptext2="Disable Equalizer" id="eq.onoff.lef" x="29" y="72"/>
-      <Checkbox state="equalizer.isEnabled" up1="eq.png.knob.normal" up2="eq.png.knob.normal" down1="eq.png.knob.down" down2="eq.png.knob.down" over1="eq.png.knob.hover" over2="eq.png.knob.hover" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable Equalizer" tooltiptext2="Disable Equalizer" id="eq.onoff.lef" x="18" y="86"/>
+      <Checkbox state="equalizer.isEnabled" up1="eq.png.led.off" up2="eq.png.led.on" down1="none" down2="none" over1="none" over2="none" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable Equalizer" tooltiptext2="Disable Equalizer" id="eq.onoff.lef1" x="29" y="72"/>
+      <Checkbox state="equalizer.isEnabled" up1="eq.png.knob.normal" up2="eq.png.knob.normal" down1="eq.png.knob.down" down2="eq.png.knob.down" over1="eq.png.knob.hover" over2="eq.png.knob.hover" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable Equalizer" tooltiptext2="Disable Equalizer" id="eq.onoff.lef2" x="18" y="86"/>
     </Layout>
   </Window>
   <Window id="plwin" visible="false">
@@ -299,9 +299,116 @@
   </Window>
   <Window id="aboutwin" visible="false">
     <Layout id="aboutwinwin-main" width="330" height="171" minwidth="330" maxwidth="330" minheight="171" maxheight="171">
-      <Image id="about.normal.eq" image="about.png" action="move"/>
-      <Button up="sysbuttons.png.menu.normal" down="sysbuttons.png.menu.down" over="sysbuttons.png.menu.hover" action="dialogs.popup()" id="eqwin.normal.titlebar.menu" x="6" y="3" tooltiptext="VLC Menu"/>
-      <Button up="sysbuttons.png.close.normal" down="sysbuttons.png.close.down" over="sysbuttons.png.close.hover" action="aboutwin.hide()" id="eqwin.normal.titlebar.close" x="307" y="3" lefttop="righttop" rightbottom="righttop" tooltiptext="Close About Window"/>
+      <Image id="about.normal.eq" image="about.png" action="move" action2="aboutwin.hide()"/>
+    </Layout>
+  </Window>
+  <Window id="fullscreenController" x="30" y="30">
+    <Layout id="plwin-fsc-normal" width="500" height="350" minwidth="170" maxwidth="99999" minheight="200" maxheight="99999">
+      <Panel id="fsc.pl.normal.titlebar" width="0" height="24" rightbottom="righttop">
+        <Image id="fsc.pl.normal.titlebar.left" image="pl.png.titlebar.left" action="move"/>
+        <Image id="fsc.pl.normal.titlebar.right" x="480" image="pl.png.titlebar.right" action="move" lefttop="righttop" rightbottom="righttop"/>
+        <Image id="fsc.pl.normal.titlebar.center" x="140" image="main.png.titlebar.center" action="move" resize="scale" rightbottom="righttop"/>
+        <Button up="sysbuttons.png.menu.normal" down="sysbuttons.png.menu.down" over="sysbuttons.png.menu.hover" action="dialogs.popup()" id="fsc.plwin.normal.titlebar.menu" x="6" y="3" tooltiptext="VLC Menu"/>
+        <Button up="sysbuttons.png.close.normal" down="sysbuttons.png.close.down" over="sysbuttons.png.close.hover" action="fullscreenController.setLayout(fsc_normal)" id="fsc.plwin.normal.titlebar.close" x="477" y="3" lefttop="righttop" rightbottom="righttop" tooltiptext="Close Playlist Window"/>
+      </Panel>
+      <Panel id="fsc.pl.normal.component" y="24" width="0" height="0" rightbottom="rightbottom">
+        <Image id="fsc.pl.normal.component.background" image="pl.png.background" resize="scale" rightbottom="rightbottom"/>
+        <Playtree id="fsc.theplaytree" font="mainfont" fgcolor="#AAAAAA" selcolor="#333333" playcolor="#FFFFFF" bgimage="pl.png.background" itemimage="item" openimage="collapse" closedimage="expand" x="5" y="3" width="469" height="262" rightbottom="rightbottom">
+          <Slider id="fsc.Unnamed Slider #84" x="487" y="5" points="(0,258),(0,3)" tooltiptext="" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover" lefttop="righttop" rightbottom="rightbottom"/>
+        </Playtree>
+      </Panel>
+      <Panel id="fsc.pl.normal.controls" y="293" width="0" height="0" lefttop="leftbottom" rightbottom="rightbottom">
+        <Image id="fsc.pl.normal.controls.bg.left" image="pl.png.controls.bg.left" action="move"/>
+        <Image id="fsc.pl.normal.controls.bg.center" x="85" image="pl.png.controls.bg.center" action="move" rightbottom="righttop"/>
+        <Image id="fsc.pl.normal.controls.bg.right" x="415" image="pl.png.controls.bg.right" action="move" lefttop="righttop" rightbottom="righttop"/>
+        <Image id="fsc.pl.normal.controls.bg.resizeE" x="493" image="pl.png.controls.bg.resizeE" action="resizeE" lefttop="righttop" rightbottom="righttop"/>
+        <Image id="fsc.pl.normal.controls.bg.resizeS" y="50" image="pl.png.controls.bg.resizeS" action="resizeS" lefttop="righttop" rightbottom="righttop"/>
+        <Image id="fsc.pl.normal.controls.bg.resizeSE" x="482" y="42" image="pl.png.controls.bg.resizeSE" action="resizeSE" lefttop="righttop" rightbottom="righttop"/>
+        <Button up="pl.png.controls.add.normal" down="pl.png.controls.add.down" over="pl.png.controls.add.hover" action="playlist.add()" id="fsc.Unnamed Button #99" x="10" y="18" tooltiptext="Add Item to the Playlist"/>
+        <Button up="pl.png.controls.rem.normal" down="pl.png.controls.rem.down" over="pl.png.controls.rem.hover" action="playlist.del()" id="fsc.Unnamed Button #100" x="33" y="18" tooltiptext="Remove Item from the Playlist"/>
+        <Button up="pl.png.controls.sort.normal" down="pl.png.controls.sort.down" over="pl.png.controls.sort.hover" action="playlist.sort()" id="fsc.Unnamed Button #101" x="54" y="18" tooltiptext="Sort Playlist Alphabetically"/>
+        <Button up="pl.png.controls.load.normal" down="pl.png.controls.load.down" over="pl.png.controls.load.hover" action="playlist.load()" id="fsc.Unnamed Button #102" x="421" y="18" lefttop="righttop" rightbottom="righttop" tooltiptext="Load Playlist from File"/>
+        <Button up="pl.png.controls.save.normal" down="pl.png.controls.save.down" over="pl.png.controls.save.hover" action="playlist.save()" id="fsc.Unnamed Button #103" x="447" y="18" lefttop="righttop" rightbottom="righttop" tooltiptext="Save Current Playlist"/>
+        <Button up="pl.png.controls.skin.normal" down="pl.png.controls.skin.down" over="pl.png.controls.skin.hover" action="aboutwin.show()" id="fsc.Unnamed Button #104" x="469" y="18" lefttop="righttop" rightbottom="righttop" tooltiptext="About this Skin"/>
+      </Panel>
+    </Layout>
+    <Layout id="fsc.eqwin-main" width="330" height="171" minwidth="330" maxwidth="330" minheight="171" maxheight="171">
+      <Image id="fsc.eq.normal.eq" image="eq.png.bg" action="move"/>
+      <Button up="sysbuttons.png.menu.normal" down="sysbuttons.png.menu.down" over="sysbuttons.png.menu.hover" action="dialogs.popup()" id="fsc.eqwin.normal.titlebar.menu" x="6" y="3" tooltiptext="VLC Menu"/>
+      <Button up="sysbuttons.png.close.normal" down="sysbuttons.png.close.down" over="sysbuttons.png.close.hover" action="fullscreenController.setLayout(fsc_normal)" id="fsc.eqwin.normal.titlebar.close" x="307" y="3" lefttop="righttop" rightbottom="righttop" tooltiptext="Close Equalizer Window"/>
+      <Slider id="fsc.Unnamed Slider #61" x="81" y="36" points="(0,115),(0,5)" value="equalizer.preamp" tooltiptext="Pre Amplification(dB)" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
+      <Slider id="fsc.Unnamed Slider #62" x="121" y="36" points="(0,115),(0,5)" value="equalizer.band(0)" tooltiptext="60Hz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
+      <Slider id="fsc.Unnamed Slider #63" x="141" y="36" points="(0,115),(0,5)" value="equalizer.band(1)" tooltiptext="170Hz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
+      <Slider id="fsc.Unnamed Slider #64" x="161" y="36" points="(0,115),(0,5)" value="equalizer.band(2)" tooltiptext="310Hz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
+      <Slider id="fsc.Unnamed Slider #65" x="181" y="36" points="(0,115),(0,5)" value="equalizer.band(3)" tooltiptext="600Hz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
+      <Slider id="fsc.Unnamed Slider #66" x="201" y="36" points="(0,115),(0,5)" value="equalizer.band(4)" tooltiptext="1KHz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
+      <Slider id="fsc.Unnamed Slider #67" x="221" y="36" points="(0,115),(0,5)" value="equalizer.band(5)" tooltiptext="3KHz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
+      <Slider id="fsc.Unnamed Slider #68" x="241" y="36" points="(0,115),(0,5)" value="equalizer.band(6)" tooltiptext="6KHz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
+      <Slider id="fsc.Unnamed Slider #69" x="261" y="36" points="(0,115),(0,5)" value="equalizer.band(7)" tooltiptext="12KHz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
+      <Slider id="fsc.Unnamed Slider #70" x="281" y="36" points="(0,115),(0,5)" value="equalizer.band(8)" tooltiptext="14KHz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
+      <Slider id="fsc.Unnamed Slider #71" x="301" y="36" points="(0,115),(0,5)" value="equalizer.band(9)" tooltiptext="16KHz" up="eq.png.slider.normal" down="eq.png.slider.hover" over="eq.png.slider.hover"/>
+      <Checkbox state="equalizer.isEnabled" up1="eq.png.led.off" up2="eq.png.led.on" down1="none" down2="none" over1="none" over2="none" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable Equalizer" tooltiptext2="Disable Equalizer" id="fsc.eq.onoff.lef1" x="29" y="72"/>
+      <Checkbox state="equalizer.isEnabled" up1="eq.png.knob.normal" up2="eq.png.knob.normal" down1="eq.png.knob.down" down2="eq.png.knob.down" over1="eq.png.knob.hover" over2="eq.png.knob.hover" action1="equalizer.enable()" action2="equalizer.disable()" tooltiptext1="Enable Equalizer" tooltiptext2="Disable Equalizer" id="fsc.eq.onoff.lef2" x="18" y="86"/>
+    </Layout>
+    <Layout id="fsc_normal" width="500" height="500" minwidth="500" maxwidth="500" minheight="500" maxheight="500">
+      <Panel id="fsc.normal.titlebar" width="0" height="24" rightbottom="righttop">
+        <Image id="fsc.normal.titlebar.left" image="main.png.titlebar.left" action="move"/>
+        <Image id="fsc.normal.titlebar.right" x="480" image="main.png.titlebar.right" action="move" lefttop="righttop" rightbottom="righttop"/>
+        <Image id="fsc.normal.titlebar.center" x="140" image="main.png.titlebar.center" action="move" rightbottom="righttop"/>
+        <Button up="sysbuttons.png.close.normal" down="sysbuttons.png.close.down" over="sysbuttons.png.close.hover" action="fullscreenController.hide()" id="fsc.main.normal.titlebar.close" x="477" y="3" lefttop="righttop" rightbottom="righttop" tooltiptext="Close"/>
+      </Panel>
+      <Panel id="fsc.normal.controls" y="24" width="0" height="0" lefttop="leftbottom" rightbottom="rightbottom">
+        <Image id="fsc.normal.controls.bg.left" image="main.png.controls.bg.left" action="move"/>
+        <Image id="fsc.normal.controls.bg.left.stretch" x="66" image="main.png.controls.bg.left.stretch" action="move" rightbottom="righttop"/>
+        <Image id="fsc.normal.controls.bg.right" x="402" image="main.png.controls.bg.right" action="move" lefttop="righttop" rightbottom="righttop"/>
+        <Image id="fsc.normal.controls.bg.resizeE.right" x="493" image="main.png.controls.bg.resizeE.right" lefttop="righttop" rightbottom="righttop"/>
+        <Image id="fsc.normal.controls.bg.right.stretch" x="389" image="main.png.controls.bg.right.stretch" action="move" resize="scale" rightbottom="righttop"/>
+        <Image id="fsc.normal.controls.bg.resizeS.left" y="95" image="main.png.controls.bg.resizeS.left"/>
+        <Image id="fsc.normal.controls.bg.resizeS.left.stretch" x="66" y="95" image="main.png.controls.bg.resizeS.left.stretch" rightbottom="righttop"/>
+        <Image id="fsc.normal.controls.bg.resizeS.right" x="402" y="95" image="main.png.controls.bg.resizeS.right" lefttop="righttop" rightbottom="righttop"/>
+        <Image id="fsc.normal.controls.bg.resizeS.right.stretch" x="389" y="95" image="main.png.controls.bg.resizeS.right.stretch" resize="scale" rightbottom="righttop"/>
+        <Image id="fsc.normal.controls.bg.resizeSE" x="482" y="87" image="main.png.controls.bg.resizeSE" lefttop="righttop" rightbottom="righttop"/>
+        <Panel id="fsc.normal.controls.cbuttons" x="110" width="279" height="102" rightbottom="righttop">
+          <Panel id="fsc.normal.controls.cbuttons.centered" width="279" height="102" rightbottom="righttop" xkeepratio="true">
+            <Image id="fsc.normal.controls.bg.center" image="main.png.controls.bg.center" action="move"/>
+            <Image id="fsc.normal.controls.bg.resizeS.center" y="95" image="main.png.controls.bg.resizeS.center"/>
+            <Checkbox state="vlc.isPlaying" up1="main.png.cbuttons.play.normal" up2="main.png.cbuttons.pause.normal" down1="main.png.cbuttons.play.down" down2="main.png.cbuttons.pause.down" over1="main.png.cbuttons.play.hover" over2="main.png.cbuttons.pause.hover" action1="vlc.play()" action2="vlc.pause()" tooltiptext1="Start Playback" tooltiptext2="Stop Playback" id="fsc.normal.cbuttons.playpause" x="119" y="52"/>
+            <Button up="main.png.cbuttons.prev.normal" down="main.png.cbuttons.prev.down" over="main.png.cbuttons.prev.hover" action="playlist.previous()" id="fsc.normal.cbuttons.prev" x="65" y="63" tooltiptext="Play Previous Item in the Playlist"/>
+            <Button up="main.png.cbuttons.slower.normal" down="main.png.cbuttons.slower.down" over="main.png.cbuttons.slower.hover" action="vlc.slower()" id="fsc.normal.cbuttons.slower" x="91" y="63" tooltiptext="Play Slower"/>
+            <Button up="main.png.cbuttons.next.normal" down="main.png.cbuttons.next.down" over="main.png.cbuttons.next.hover" action="playlist.next()" id="fsc.normal.cbuttons.next" x="188" y="63" tooltiptext="Play Next Item in the Playlist"/>
+            <Button up="main.png.cbuttons.faster.normal" down="main.png.cbuttons.faster.down" over="main.png.cbuttons.faster.hover" action="vlc.faster()" id="fsc.normal.cbuttons.faster" x="160" y="63" tooltiptext="Play Faster"/>
+            <Button up="main.png.cbuttons.stop.normal" down="main.png.cbuttons.stop.down" over="main.png.cbuttons.stop.hover" action="vlc.stop()" id="fsc.normal.cbuttons.stop" x="223" y="63" tooltiptext="Stop Playing"/>
+            <Checkbox state="playlist.isLoop" up1="main.png.cbuttons.repeat0.normal" up2="main.png.cbuttons.repeat1.normal" down1="main.png.cbuttons.repeat0.down" down2="main.png.cbuttons.repeat1.down" over1="main.png.cbuttons.repeat0.hover" over2="main.png.cbuttons.repeat1.hover" action1="playlist.setLoop(true)" action2="playlist.setLoop(false);playlist.setRepeat(true)" tooltiptext1="Toggle Playlist/Song Repeating" tooltiptext2="Toggle Playlist/Song Repeating" id="fsc.normal.cbuttons.repeat.list" x="30" y="63"/>
+            <Checkbox state="playlist.isRepeat" up1="main.png.cbuttons.repeat.tp" up2="main.png.cbuttons.repeat2.normal" down1="main.png.cbuttons.repeat.tp" down2="main.png.cbuttons.repeat2.down" over1="main.png.cbuttons.repeat.tp" over2="main.png.cbuttons.repeat2.hover" action1="playlist.setRepeat(true)" action2="playlist.setRepeat(false);playlist.setLoop(false)" tooltiptext1="error" tooltiptext2="Toggle Playlist/Song Repeating" id="fsc.normal.cbuttons.repeat.track" x="30" y="63"/>
+            <Checkbox state="playlist.isRandom" up1="main.png.cbuttons.shuffle0.normal" up2="main.png.cbuttons.shuffle1.normal" down1="main.png.cbuttons.shuffle0.down" down2="main.png.cbuttons.shuffle1.down" over1="main.png.cbuttons.shuffle0.hover" over2="main.png.cbuttons.shuffle1.hover" action1="playlist.setRandom(true)" action2="playlist.setRandom(false)" tooltiptext1="Play the Playlist in Random Order" tooltiptext2="Play the Playlist in Sequential Order" id="fsc.normal.cbuttons.shuffle" y="63" lefttop="righttop" rightbottom="righttop"/>
+          </Panel>
+        </Panel>
+
+            <Button up="main.png.cbuttons.pledit1.normal" down="main.png.cbuttons.pledit1.down" over="main.png.cbuttons.pledit1.hover" action="fullscreenController.setLayout(plwin-fsc-normal)" id="fsc.normal.cbuttons.open1" x="10" y="63" tooltiptext="Show Playlist"/>
+
+            <Button up="main.png.cbuttons.eq1.normal" down="main.png.cbuttons.eq1.down" over="main.png.cbuttons.eq1.hover" action="fullscreenController.setLayout(fsc.eqwin-main)" id="fsc.normal.cbuttons.open2" x="38" y="63" tooltiptext="Show Equalizer"/>
+        <!--
+        <Checkbox state="plwin.isVisible" up1="main.png.cbuttons.pledit0.normal" up2="main.png.cbuttons.pledit1.normal" down1="main.png.cbuttons.pledit0.down" down2="main.png.cbuttons.pledit1.down" over1="main.png.cbuttons.pledit0.hover" over2="main.png.cbuttons.pledit1.hover" action1="plwin.show()" action2="plwin.hide()" tooltiptext1="Show Playlist Window" tooltiptext2="Hide Playlist Window" id="fsc.normal.cbuttons.pledit" x="10" y="63"/>
+        <Checkbox state="eqwin.isVisible" up1="main.png.cbuttons.eq0.normal" up2="main.png.cbuttons.eq1.normal" down1="main.png.cbuttons.eq0.down" down2="main.png.cbuttons.eq1.down" over1="main.png.cbuttons.eq0.hover" over2="main.png.cbuttons.eq1.hover" action1="eqwin.show()" action2="eqwin.hide()" tooltiptext1="Show Equalizer Window" tooltiptext2="Hide Equalizer Window" id="fsc.main.normal.cbuttons.eq" x="38" y="63"/>
+        -->
+
+        <Checkbox state="vlc.isMute" up1="main.png.cbuttons.mute0.normal" up2="main.png.cbuttons.mute1.normal" down1="main.png.cbuttons.mute0.down" down2="main.png.cbuttons.mute1.down" over1="main.png.cbuttons.mute0.hover" over2="main.png.cbuttons.mute1.hover" action1="vlc.mute()" action2="vlc.mute()" tooltiptext1="Mute Volume" tooltiptext2="Unmute Volume" id="fsc.normal.cbuttons.mute" x="402" y="63" lefttop="righttop" rightbottom="righttop"/>
+        <Slider id="fsc.volume.slider" x="423" y="67" points="(0,7),(57,7)" value="volume" tooltiptext="Volume: $V%" up="vol_slider.png" lefttop="righttop" rightbottom="righttop">
+          <SliderBackground id="fsc.Unnamed SliderBackground #189" image="vol_anim.png" nbvert="59"/>
+        </Slider>
+        <Panel id="fsc.normal.display" width="0" height="0" rightbottom="righttop">
+          <Text text="$T / $D" font="defaultfont" alignment="right" color="#CCCCCC" id="fsc.time1" x="325" y="7" width="100" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive"/>
+          <Text text="$N" font="defaultfont" color="#CCCCCC" id="fsc.songticker1" x="26" y="7" width="300" rightbottom="righttop" visible="dvd.isActive"/>
+          <Text text="$T / $D" font="defaultfont" alignment="right" color="#CCCCCC" id="fsc.time2" x="390" y="7" width="100" lefttop="rightbottom" rightbottom="rightbottom" visible="not dvd.isActive"/>
+          <Text text="$N" font="defaultfont" color="#CCCCCC" id="fsc.songticker2" x="26" y="7" width="365" rightbottom="righttop" visible="not dvd.isActive"/>
+          <Button up="main.png.dbuttons.ptitle.normal" down="main.png.dbuttons.ptitle.down" over="main.png.dbuttons.ptitle.hover" action="dvd.previousTitle()" id="fsc.normal.dbuttons.ptitle" x="431" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Play Previous Title on DVD"/>
+          <Button up="main.png.dbuttons.pchap.normal" down="main.png.dbuttons.pchap.down" over="main.png.dbuttons.pchap.hover" action="dvd.previousChapter()" id="fsc.normal.dbuttons.pchap" x="443" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Go to Previous Chapter of Title"/>
+          <Button up="main.png.dbuttons.menu.normal" down="main.png.dbuttons.menu.down" over="main.png.dbuttons.menu.hover" action="dvd.rootMenu()" id="fsc.normal.dbuttons.info" x="455" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Go to the DVD Title Menu"/>
+          <Button up="main.png.dbuttons.nchap.normal" down="main.png.dbuttons.nchap.down" over="main.png.dbuttons.nchap.hover" action="dvd.nextChapter()" id="fsc.normal.dbuttons.nchap" x="467" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Go to Next Chapter of Title"/>
+          <Button up="main.png.dbuttons.ntitle.normal" down="main.png.dbuttons.ntitle.down" over="main.png.dbuttons.ntitle.hover" action="dvd.nextTitle()" id="fsc.normal.dbuttons.ntitle" x="479" y="7" lefttop="rightbottom" rightbottom="rightbottom" visible="dvd.isActive" tooltiptext="Play Next Title on DVD"/>
+        </Panel>
+        <Slider id="fsc.seeker" x="20" y="40" points="(0,0),(460,0)" value="time" tooltiptext="" up="main.png.seek.normal" down="main.png.seek.hover" rightbottom="righttop" visible="not vlc.isStopped"/>
+      </Panel>
     </Layout>
   </Window>
 
