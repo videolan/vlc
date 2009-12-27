@@ -23,7 +23,8 @@
 /*****************************************************************************
  * Preamble
  *****************************************************************************/
-#include <queue>
+
+#include "bda.h"
 
 using namespace std;
 #ifndef _MSC_VER
@@ -43,13 +44,13 @@ using namespace std;
 /* Work-around a bug in w32api-2.5 */
 /* #   define QACONTAINERFLAGS QACONTAINERFLAGS_SOMETHINGELSE */
 #endif
+
 /* Needed to call CoInitializeEx */
 #define _WIN32_DCOM
 
 #include <dshow.h>
 #include <comcat.h>
 #include "bdadefs.h"
-#include "bda.h"
 
 class BDAOutput
 {
