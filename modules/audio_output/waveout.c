@@ -35,74 +35,9 @@
 #include <vlc_aout.h>
 #include <vlc_charset.h>
 
-#include <windows.h>
-#include <mmsystem.h>
+#include "windows_audio_common.h"
 
 #define FRAME_SIZE 4096              /* The size is in samples, not in bytes */
-#define FRAMES_NUM 8
-
-/*****************************************************************************
- * Useful macros
- *****************************************************************************/
-#ifdef UNDER_CE
-#   define DWORD_PTR DWORD
-#   ifdef waveOutGetDevCaps
-#       undef waveOutGetDevCaps
-        MMRESULT WINAPI waveOutGetDevCaps(UINT, LPWAVEOUTCAPS, UINT);
-#   endif
-#endif
-
-#ifndef WAVE_FORMAT_IEEE_FLOAT
-#   define WAVE_FORMAT_IEEE_FLOAT 0x0003
-#endif
-
-#ifndef WAVE_FORMAT_DOLBY_AC3_SPDIF
-#   define WAVE_FORMAT_DOLBY_AC3_SPDIF 0x0092
-#endif
-
-#ifndef WAVE_FORMAT_EXTENSIBLE
-#define  WAVE_FORMAT_EXTENSIBLE   0xFFFE
-#endif
-
-#ifndef SPEAKER_FRONT_LEFT
-#   define SPEAKER_FRONT_LEFT             0x1
-#   define SPEAKER_FRONT_RIGHT            0x2
-#   define SPEAKER_FRONT_CENTER           0x4
-#   define SPEAKER_LOW_FREQUENCY          0x8
-#   define SPEAKER_BACK_LEFT              0x10
-#   define SPEAKER_BACK_RIGHT             0x20
-#   define SPEAKER_FRONT_LEFT_OF_CENTER   0x40
-#   define SPEAKER_FRONT_RIGHT_OF_CENTER  0x80
-#   define SPEAKER_BACK_CENTER            0x100
-#   define SPEAKER_SIDE_LEFT              0x200
-#   define SPEAKER_SIDE_RIGHT             0x400
-#   define SPEAKER_TOP_CENTER             0x800
-#   define SPEAKER_TOP_FRONT_LEFT         0x1000
-#   define SPEAKER_TOP_FRONT_CENTER       0x2000
-#   define SPEAKER_TOP_FRONT_RIGHT        0x4000
-#   define SPEAKER_TOP_BACK_LEFT          0x8000
-#   define SPEAKER_TOP_BACK_CENTER        0x10000
-#   define SPEAKER_TOP_BACK_RIGHT         0x20000
-#   define SPEAKER_RESERVED               0x80000000
-#endif
-
-#ifndef _WAVEFORMATEXTENSIBLE_
-typedef struct {
-    WAVEFORMATEX    Format;
-    union {
-        WORD wValidBitsPerSample;       /* bits of precision  */
-        WORD wSamplesPerBlock;          /* valid if wBitsPerSample==0 */
-        WORD wReserved;                 /* If neither applies, set to zero. */
-    } Samples;
-    DWORD           dwChannelMask;      /* which channels are */
-                                        /* present in stream  */
-    GUID            SubFormat;
-} WAVEFORMATEXTENSIBLE, *PWAVEFORMATEXTENSIBLE;
-#endif
-
-static const GUID __KSDATAFORMAT_SUBTYPE_IEEE_FLOAT = {WAVE_FORMAT_IEEE_FLOAT, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
-static const GUID __KSDATAFORMAT_SUBTYPE_PCM = {WAVE_FORMAT_PCM, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
-static const GUID __KSDATAFORMAT_SUBTYPE_DOLBY_AC3_SPDIF = {WAVE_FORMAT_DOLBY_AC3_SPDIF, 0x0000, 0x0010, {0x80, 0x00, 0x00, 0xaa, 0x00, 0x38, 0x9b, 0x71}};
 
 /*****************************************************************************
  * Local prototypes
@@ -152,10 +87,6 @@ static const char *const ppsz_adev_text[] = { N_("Microsoft Soundmapper") };
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-#define FLOAT_TEXT N_("Use float32 output")
-#define FLOAT_LONGTEXT N_( \
-    "The option allows you to enable or disable the high-quality float32 " \
-    "audio output mode (which is not well supported by some soundcards)." )
 #define DEVICE_TEXT N_("Select Audio Device")
 #define DEVICE_LONG N_("Select special Audio device, or let windows "\
                        "decide (default), change needs VLC restart "\
@@ -214,23 +145,6 @@ struct aout_sys_t
     bool b_chan_reorder;              /* do we need channel reordering */
     int pi_chan_table[AOUT_CHAN_MAX];
 };
-
-static const uint32_t pi_channels_src[] =
-    { AOUT_CHAN_LEFT, AOUT_CHAN_RIGHT,
-      AOUT_CHAN_MIDDLELEFT, AOUT_CHAN_MIDDLERIGHT,
-      AOUT_CHAN_REARLEFT, AOUT_CHAN_REARRIGHT, AOUT_CHAN_REARCENTER,
-      AOUT_CHAN_CENTER, AOUT_CHAN_LFE, 0 };
-static const uint32_t pi_channels_in[] =
-    { SPEAKER_FRONT_LEFT, SPEAKER_FRONT_RIGHT,
-      SPEAKER_SIDE_LEFT, SPEAKER_SIDE_RIGHT,
-      SPEAKER_BACK_LEFT, SPEAKER_BACK_RIGHT, SPEAKER_BACK_CENTER,
-      SPEAKER_FRONT_CENTER, SPEAKER_LOW_FREQUENCY, 0 };
-static const uint32_t pi_channels_out[] =
-    { SPEAKER_FRONT_LEFT, SPEAKER_FRONT_RIGHT,
-      SPEAKER_FRONT_CENTER, SPEAKER_LOW_FREQUENCY,
-      SPEAKER_BACK_LEFT, SPEAKER_BACK_RIGHT,
-      SPEAKER_BACK_CENTER,
-      SPEAKER_SIDE_LEFT, SPEAKER_SIDE_RIGHT, 0 };
 
 /*****************************************************************************
  * Open: open the audio device

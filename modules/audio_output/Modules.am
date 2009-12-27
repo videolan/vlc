@@ -1,9 +1,9 @@
 SOURCES_alsa = alsa.c
-SOURCES_aout_directx = directx.c
+SOURCES_aout_directx = directx.c windows_audio_common.h
 SOURCES_aout_file = file.c
 SOURCES_oss = oss.c
 SOURCES_aout_sdl = sdl.c
-SOURCES_waveout = waveout.c
+SOURCES_waveout = waveout.c windows_audio_common.h
 SOURCES_hd1000a = hd1000a.cpp
 SOURCES_portaudio = portaudio.c
 SOURCES_auhal = auhal.c
