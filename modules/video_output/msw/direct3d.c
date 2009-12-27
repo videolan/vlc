@@ -350,13 +350,13 @@ static int ControlReopenDevice(vout_display_t *vd)
         if (sys->desktop_save.is_fullscreen)
             vout_display_SendEventFullscreen(vd, false);
         if (sys->desktop_save.is_on_top)
-            vout_display_SendEventOnTop(vd, false);
+            vout_display_SendWindowState(vd, VOUT_WINDOW_STATE_NORMAL);
     } else {
         /* Restore fullscreen/on_top */
         if (sys->desktop_save.is_fullscreen)
             vout_display_SendEventFullscreen(vd, true);
         if (sys->desktop_save.is_on_top)
-            vout_display_SendEventOnTop(vd, true);
+            vout_display_SendWindowState(vd, VOUT_WINDOW_STATE_ABOVE);
     }
     return VLC_SUCCESS;
 }

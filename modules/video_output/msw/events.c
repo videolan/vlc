@@ -749,7 +749,8 @@ static long FAR PASCAL DirectXEventProc( HWND hwnd, UINT message,
         {
             msg_Dbg(vd, "WinProc WM_SYSCOMMAND: IDM_TOGGLE_ON_TOP");
             HMENU hMenu = GetSystemMenu(vd->sys->hwnd, FALSE);
-            vout_display_SendEventOnTop(vd, (GetMenuState(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND) & MF_CHECKED) == 0);
+            vout_display_SendWindowState(vd, (GetMenuState(hMenu, IDM_TOGGLE_ON_TOP, MF_BYCOMMAND) & MF_CHECKED) ?
+                    VOUT_WINDOW_STATE_NORMAL : VOUT_WINDOW_STATE_ABOVE);
             return 0;
         }
         default:
