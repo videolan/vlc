@@ -1169,7 +1169,8 @@ static void* DirectSoundThread( vlc_object_t *p_this )
 
     while( vlc_object_alive (p_notif) )
     {
-        long l_read, l_free_slots;
+        DWORD l_read;
+        long l_free_slots;
         unsigned i_frame_siz = p_aout->output.i_nb_samples;
         mtime_t mtime = mdate();
         int i;
