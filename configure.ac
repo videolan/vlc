@@ -4377,7 +4377,7 @@ AC_ARG_ENABLE(macosx,
   [  --enable-macosx   Mac OS X gui support (default enabled on Mac OS X)])
 if test "x${enable_macosx}" = "xyes"
 then
-  VLC_ADD_LDFLAGS([macosx minimal_macosx],[-Wl,-framework,Cocoa])
+  VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,Cocoa])
   VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,OpenGL])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,Carbon])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,CoreServices])
