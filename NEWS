@@ -15,6 +15,7 @@ Decoders:
  * PGS subtitles for Blu-Ray
  * Invmem module improvements
  * Support for SSE3 and SSE4 capabilities
+ * Support for DxVA2 for H.264 on Windows Vista and 7
 
 Demuxers:
  * Support for ADPCM in .flv streams
@@ -84,6 +85,9 @@ Windows port:
 Maemo port:
  * Multiple improvements for N900 compliance and efficiency
 
+Misc:
+ * new sqlite module
+
 Removed modules:
  * csri
  * galaktos
@@ -96,6 +100,7 @@ Removed modules:
  * XvMC accelerated modules
  * WinCE interface
  * opie, qte and qte_main
+ * opengllayer
 
 
 Changes between 1.0.2 and 1.0.3:
