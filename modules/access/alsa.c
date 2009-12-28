@@ -79,6 +79,11 @@ static void DemuxClose( vlc_object_t * );
     "Caching value for Alsa captures. This " \
     "value should be set in milliseconds." )
 
+#define HELP_TEXT N_( \
+    "Use alsa:// to open the default audio input. If multiple audio " \
+    "inputs are available, they will be listed in the vlc debug output. " \
+    "To select hw:0,1 , use alsa://hw:0,1 ." )
+
 #define ALSA_DEFAULT "hw"
 #define CFG_PREFIX "alsa-"
 
@@ -87,6 +92,7 @@ vlc_module_begin()
     set_description( N_("Alsa audio capture input") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
+    set_help( HELP_TEXT )
 
     add_shortcut( "alsa" )
     set_capability( "access_demux", 10 )
