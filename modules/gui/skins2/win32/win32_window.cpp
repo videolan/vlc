@@ -125,6 +125,13 @@ Win32Window::~Win32Window()
 void Win32Window::reparent( void* OSHandle, int x, int y, int w, int h )
 {
     // Reparent the window
+
+    if( m_type == GenericWindow::TopWindow )
+    {
+       // fullscreen controller
+       SetWindowLongPtr( m_hWnd, GWL_STYLE, WS_CHILD );
+    }
+
     SetParent( m_hWnd, (HWND)OSHandle );
     MoveWindow( m_hWnd, x, y, w, h, true );
 }
