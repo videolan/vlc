@@ -50,11 +50,14 @@ $Id$
  * atmo: Ambilight-like video-output
  * au: AU file demuxer
  * audio_format: helper module for audio transcoding
+ * audiobargraph_a: audiobargraph audio plugin
+ * audiobargraph_v: audiobargraph video plugin
  * audioscrobbler: AudioScrobbler/Last.fm submission plugin
  * auhal: Audio output for MacOS X based on the AUHAL API
  * avcodec: FFmpeg audio/video decoder
  * avformat: FFmpeg demuxer
  * avi: AVI File stream demuxer
+ * ball: Augmented reality ball video filter module
  * bandlimited_resampler: Bandlimited interpolation audio resampler
  * bda: DVB support for Windows BDA drivers
  * beos: Audio output, video output and interface module for BeOS
@@ -70,11 +73,13 @@ $Id$
  * cdg: CD-G decoder
  * chain: Video filtering using a chain of video filter modules
  * chorus_flanger: variable delay audio filter
+ * chroma_neon: ARM NEONv1 chroma conversion module
  * clone: Clone video filter
  * cmml: Continuous Media Markup Language annotations/hyperlinks decoder
  * colorthres:  Theshold color based on similarity to reference color Video filter
  * converter_fixed: Fixed-point audio format conversions
  * converter_float: Floating-point audio format conversions
+ * converter_neon: NEON assembly optimized audio converter
  * crop: Crop video filter
  * croppadd: Crop/Padd image filter
  * cvdsub: CVD subtitles decoder
@@ -91,6 +96,7 @@ $Id$
  * directx: video output module using the DirectX API
  * dmo: a DirectMediaObject decoder that uses DirectMedia to decode video (WMV3)
  * dolby_surround_decoder: simple decoder for dolby surround encoded streams
+ * drawable: legacy LibVLC video window provider
  * dshow: DirectShow access plugin for encoding cards under Windows
  * dts: DTS basic parser/packetizer
  * dtstofloat32: DTS Audio converter
@@ -172,6 +178,7 @@ $Id$
  * lua: Lua scripting inteface
  * m4v: MPEG-4 Video Stream demuxer
  * macosx: Video output, and interface module for Mac OS X
+ * macosx_dialog_provider: Minimal Dialog Provider for Mac OS X
  * magnify: zoom video filter
  * marq: Overlays a marquee on the video
  * mash: OpenMash based decoder
@@ -219,14 +226,17 @@ $Id$
  * ntservice: run VLC as a NT service
  * nuv: NUV demuxer
  * ogg: input module for OGG decapsulation
+ * oldhttp: old HTTP remote control webinterface
+ * oldrc: old interface module using stdio
+ * oldtelnet: oled Telnet control interface
  * omapfb: omap framebuffer video output
  * opencv_example: OpenCV example (face identification)
  * opencv_wrapper: OpenCV wrapper video filter
  * opengl: a opengl video output that uses opengl provider modules
- * opengllayer: a simple openGL video output
  * osd_parser: OSD import module
  * osdmenu: video_filter for displaying and streaming a On Screen Display menu
  * oss: audio output module using the OSS /dev/dsp interface
+ * osso: Maemo screen unblanking module
  * packetizer_copy: Simple copy packetizer
  * packetizer_dirac: Dirac video packetizer
  * packetizer_h264: H264 video packetizer
@@ -266,6 +276,7 @@ $Id$
  * ripple: Ripple video effect
  * rotate: Video rotation filter
  * rss: Display a RSS feed on the video output
+ * rtp: rtp demux module
  * rv32: RV32 image format conversion module
  * sap: Interface module to read SAP/SDP announcments
  * scale: Images rescaler
@@ -302,6 +313,7 @@ $Id$
  * stream_out_mosaic_bridge: stream output module to make a mosaic. To be used with VLM
  * stream_out_raop: Remote Audio Output Protocol (AirTunes) stream out
  * stream_out_record: record stream output module
+ * stream_out_rtp: rtp stream output module
  * stream_out_smem: stream output module to a memory buffer
  * stream_out_standard: standard stream output module
  * stream_out_switcher: stream output module to display backgrounds
@@ -351,6 +363,7 @@ $Id$
  * voc: VOC demuxer
  * vod_rtsp: RTSP VoD module
  * vorbis: a vorbis audio decoder/packetizer using the libvorbis library
+ * vout_macosx: MacOS X OpenGL provider
  * vout_sdl: video output module using the SDL library
  * wall: image wall filter
  * wav: Wav demuxer
@@ -362,8 +375,10 @@ $Id$
  * wma_fixed: wma decoder using integer decoder from Rockbox
  * x264: H264 video decoder using X264
  * xa: XA demuxer
+ * xcb_apps: List the application windows using XCB
  * xcb_glx: a opengl provider using XCB OpenGL
- * xcb_screensaver: screensaver disabling module
+ * xcb_screen: input module that takes screenshots of the primary monitor
+ * xcb_window: XCB window provider
  * xcb_x11: a X11 video output using XCB
  * xcb_xv: a XVideo video output using XCB
  * xdg_screensaver: screensaver disabling module following XDG specifications
