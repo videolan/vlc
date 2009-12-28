@@ -351,9 +351,11 @@ static void Close( vlc_object_t *p_this )
      * Else we dead lock. */
     if( vlc_object_alive(p_this->p_libvlc))
     {
-        [p_sys->session stopRunning];
-        [p_sys->output release];
-        [p_sys->session release];
+        // Perform this on main thread, as the framework itself will sometimes try to synchronously
+        // work on main thread. And this will create a dead lock.
+        [p_sys->session performSelectorOnMainThread:@selector(stopRunning) withObject:nil waitUntilDone:NO];
+        [p_sys->output performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
+        [p_sys->session performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
     }
     free( p_sys );
 
