@@ -26,6 +26,7 @@
 #include <vlc_common.h>
 #include "../libvlc.h"
 #include <vlc_keys.h>
+#include <stdlib.h>
 
 int vlc_key_to_action (vlc_object_t *libvlc, const char *varname,
                        vlc_value_t prevkey, vlc_value_t curkey, void *priv)
@@ -46,11 +47,18 @@ int vlc_key_to_action (vlc_object_t *libvlc, const char *varname,
     return var_SetInteger (libvlc, "key-action", key->i_action);
 }
 
+static int actcmp(const void *key, const void *ent)
+{
+    const struct action *act = ent;
+    return strcmp(key, act->name);
+}
+
 vlc_key_t vlc_GetActionId(const char *name)
 {
-    for (size_t i = 0; i < libvlc_actions_count; i++)
-        if (!strcmp(libvlc_actions[i].name, name))
-            return libvlc_actions[i].value;
-    return 0;
+    const struct action *act;
+
+    act = bsearch(name, libvlc_actions, libvlc_actions_count, sizeof(*act),
+                  actcmp);
+    return (act != NULL) ? act->value : 0;
 }
 
