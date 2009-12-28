@@ -57,28 +57,62 @@ static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
 static void destroyProgressPanel (void *);
 
+@interface VLCDialogDisplayer : NSObject
+{
+    VLCProgressPanel *_currentProgressBarPanel;
+}
+
++ (NSDictionary *)dictionaryForDialog:(const char *)title :(const char *)message :(const char *)yes :(const char *)no :(const char *)cancel;
+
+- (void)displayError:(NSDictionary *)dialog;
+- (void)displayCritical:(NSDictionary *)dialog;
+- (NSNumber *)displayQuestion:(NSDictionary *)dialog;
+- (NSDictionary *)displayLogin:(NSDictionary *)dialog;
+
+- (void)displayProgressBar:(NSDictionary *)dict;
+- (void)updateProgressPanel:(NSDictionary *)dict;
+- (void)destroyProgressPanel;
+- (NSNumber *)checkProgressPanel;
+
+- (id)resultFromSelectorOnMainThread:(SEL)sel withObject:(id)object;
+@end
+
+static inline NSDictionary *DictFromDialogFatal(dialog_fatal_t *dialog) {
+    return [VLCDialogDisplayer dictionaryForDialog:dialog->title :dialog->message :NULL :NULL :NULL];
+}
+static inline NSDictionary *DictFromDialogLogin(dialog_login_t *dialog) {
+    return [VLCDialogDisplayer dictionaryForDialog:dialog->title :dialog->message :NULL :NULL :NULL];
+}
+static inline NSDictionary *DictFromDialogQuestion(dialog_question_t *dialog) {
+    return [VLCDialogDisplayer dictionaryForDialog:dialog->title :dialog->message :dialog->yes :dialog->no :dialog->cancel];
+}
+static inline NSDictionary *DictFromDialogProgressBar(dialog_progress_bar_t *dialog) {
+    return [VLCDialogDisplayer dictionaryForDialog:dialog->title :dialog->message :NULL :NULL :dialog->cancel];
+}
+
 struct intf_sys_t
 {
-    VLCProgressPanel *currentProgressBarPanel;
+    VLCDialogDisplayer *displayer;
 
     vlc_mutex_t lock;
     vlc_cond_t wait;
 };
+
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 
 vlc_module_begin()
-/* Minimal interface. see intf.m */
-set_shortname("Mac OS X Dialogs")
-add_shortcut("macosx_dialog_provider")
-add_shortcut("miosx")
-set_description("Minimal Mac OS X Dialog Provider")
-set_capability("interface", 50)
-set_callbacks(OpenIntf, CloseIntf)
-set_category(CAT_INTERFACE)
-set_subcategory(SUBCAT_INTERFACE_MAIN)
+    /* Minimal interface. see intf.m */
+    set_shortname("Mac OS X Dialogs")
+    add_shortcut("macosx_dialog_provider")
+    add_shortcut("miosx")
+    set_description("Minimal Mac OS X Dialog Provider")
+    set_capability("interface", 50)
+    set_callbacks(OpenIntf, CloseIntf)
+    set_category(CAT_INTERFACE)
+    set_subcategory(SUBCAT_INTERFACE_MAIN)
 vlc_module_end()
 
 /*****************************************************************************
@@ -94,18 +128,8 @@ int OpenIntf(vlc_object_t *p_this)
 
     memset(p_intf->p_sys,0,sizeof(*p_intf->p_sys));
 
-    p_intf->b_should_run_on_first_thread = true;
-    p_intf->pf_run = Run;
+    p_intf->p_sys->displayer = [[VLCDialogDisplayer alloc] init];
 
-    msg_Dbg(p_intf,"Opening Mac OS X dialog provider");
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * Run: waiting for the death
- *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
-{
     /* subscribe to various interactive dialogues */
     var_Create(p_intf,"dialog-error",VLC_VAR_ADDRESS);
     var_AddCallback(p_intf,"dialog-error",DisplayError,p_intf);
@@ -118,13 +142,19 @@ static void Run( intf_thread_t *p_intf )
     var_Create(p_intf,"dialog-progress-bar",VLC_VAR_ADDRESS);
     var_AddCallback(p_intf,"dialog-progress-bar",DisplayProgressPanelAction,p_intf);
     dialog_Register(p_intf);
-
-    msg_Dbg(p_intf,"Mac OS X dialog provider initialised");
-
-    /* idle */
-    while(vlc_object_alive(p_intf))
-        msleep(INTF_IDLE_SLEEP);
     
+    msg_Dbg(p_intf,"Mac OS X dialog provider initialised");
+    
+    return VLC_SUCCESS;
+}
+
+/*****************************************************************************
+ * CloseIntf: destroy interface
+ *****************************************************************************/
+void CloseIntf(vlc_object_t *p_this)
+{
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
+
     /* unsubscribe from the interactive dialogues */
     dialog_Unregister(p_intf);
     var_DelCallback(p_intf,"dialog-error",DisplayError,p_intf);
@@ -132,13 +162,8 @@ static void Run( intf_thread_t *p_intf )
     var_DelCallback(p_intf,"dialog-login",DisplayLogin,p_intf);
     var_DelCallback(p_intf,"dialog-question",DisplayQuestion,p_intf);
     var_DelCallback(p_intf,"dialog-progress-bar",DisplayProgressPanelAction,p_intf);
-}
-/*****************************************************************************
- * CloseIntf: destroy interface
- *****************************************************************************/
-void CloseIntf(vlc_object_t *p_this)
-{
-    intf_thread_t *p_intf = (intf_thread_t*) p_this;
+    
+    [p_intf->p_sys->displayer release];
 
     msg_Dbg(p_intf,"Mac OS X dialog provider closed");
     free(p_intf->p_sys);
@@ -150,144 +175,273 @@ void CloseIntf(vlc_object_t *p_this)
  *****************************************************************************/
 static int DisplayError(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    dialog_fatal_t *p_dialog = (dialog_fatal_t *)value.p_address;
-    NSRunInformationalAlertPanel([NSString stringWithUTF8String:p_dialog->title],
-                            [NSString stringWithUTF8String:p_dialog->message],
-                            @"OK", nil, nil);
-    [o_pool release];
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    dialog_fatal_t *dialog = value.p_address;
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
+    intf_sys_t *sys = p_intf->p_sys;
+    [sys->displayer performSelectorOnMainThread:@selector(displayError:) withObject:DictFromDialogFatal(dialog) waitUntilDone:NO];
+    [pool release];
     return VLC_SUCCESS;
 }
 
 static int DisplayCritical(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    dialog_fatal_t *p_dialog = (dialog_fatal_t *)value.p_address;
-    NSRunCriticalAlertPanel([NSString stringWithUTF8String:p_dialog->title],
-                            [NSString stringWithUTF8String:p_dialog->message],
-                            @"OK", nil, nil);
-    [o_pool release];
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    dialog_fatal_t *dialog = value.p_address;
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
+    intf_sys_t *sys = p_intf->p_sys;
+    [sys->displayer performSelectorOnMainThread:@selector(displayCritical:) withObject:DictFromDialogFatal(dialog) waitUntilDone:NO];
+    [pool release];
     return VLC_SUCCESS;
 }
 
 static int DisplayQuestion(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    dialog_question_t *p_dialog = (dialog_question_t *)value.p_address;
-    NSAlert *o_alert;
-    NSString *o_yes, *o_no, *o_cancel;
-    NSInteger i_returnValue = 0;
-
-    if (p_dialog->yes != NULL)
-        o_yes = [NSString stringWithUTF8String:p_dialog->yes];
-    if (p_dialog->no != NULL)
-        o_no = [NSString stringWithUTF8String:p_dialog->no];
-    if (p_dialog->cancel != NULL)
-        o_cancel = [NSString stringWithUTF8String:p_dialog->cancel];
-
-    o_alert = [NSAlert alertWithMessageText:[NSString stringWithUTF8String:p_dialog->title]
-                              defaultButton:o_yes
-                            alternateButton:o_no 
-                                otherButton:o_cancel
-                  informativeTextWithFormat:[NSString stringWithUTF8String:p_dialog->message]];
-    [o_alert setAlertStyle:NSInformationalAlertStyle];
-    i_returnValue = [o_alert runModal];
-
-    if (i_returnValue == NSAlertDefaultReturn)
-        p_dialog->answer = 1;
-    if (i_returnValue == NSAlertAlternateReturn)
-        p_dialog->answer = 2;
-    if (i_returnValue == NSAlertOtherReturn)
-        p_dialog->answer = 3;
-    [o_pool release];
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    dialog_question_t *dialog = value.p_address;
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
+    intf_sys_t *sys = p_intf->p_sys;
+    dialog->answer = [[sys->displayer resultFromSelectorOnMainThread:@selector(displayQuestion:) withObject:DictFromDialogQuestion(dialog)] intValue];
+    [pool release];
     return VLC_SUCCESS;
 }
 
 static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    dialog_login_t *p_dialog = (dialog_login_t *)value.p_address;
-    NSInteger i_returnValue = 0;
-    VLCLoginPanel *thePanel = [[VLCLoginPanel alloc] init];
-    [thePanel createContentView];
-    [thePanel setDialogTitle:[NSString stringWithUTF8String:p_dialog->title]];
-    [thePanel setDialogMessage:[NSString stringWithUTF8String:p_dialog->message]];
-    [thePanel center];
-    i_returnValue = [NSApp runModalForWindow:thePanel];
-    [thePanel close];
-    if (i_returnValue) {
-        *p_dialog->username = strdup( [[thePanel userName] UTF8String] );
-        *p_dialog->password = strdup( [[thePanel password] UTF8String] );
-    } else
-        *p_dialog->username = *p_dialog->password = NULL;
-    [o_pool release];
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    dialog_login_t *dialog = value.p_address;
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
+    intf_sys_t *sys = p_intf->p_sys;
+    NSDictionary *dict = [sys->displayer resultFromSelectorOnMainThread:@selector(displayCritical:) withObject:DictFromDialogLogin(dialog)];
+    if (dict) {
+        *dialog->username = strdup([[dict objectForKey:@"username"] UTF8String]);
+        *dialog->password = strdup([[dict objectForKey:@"password"] UTF8String]);
+    }
+    [pool release];
     return VLC_SUCCESS;
 }
 
 static int DisplayProgressPanelAction(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
 {
-    NSAutoreleasePool * o_pool = [[NSAutoreleasePool alloc] init];
-    dialog_progress_bar_t * p_dialog = (dialog_progress_bar_t *)value.p_address;
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    dialog_progress_bar_t *dialog = value.p_address;
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
-    intf_sys_t *p_sys = p_intf->p_sys;
+    intf_sys_t *sys = p_intf->p_sys;
 
-    if(p_sys->currentProgressBarPanel)
-        [p_sys->currentProgressBarPanel release];
+    [sys->displayer performSelectorOnMainThread:@selector(displayProgressBar) withObject:DictFromDialogProgressBar(dialog) waitUntilDone:YES];
 
-    p_sys->currentProgressBarPanel = [[VLCProgressPanel alloc] init];
-    [p_sys->currentProgressBarPanel createContentView];
-    if (p_dialog->title)
-        [p_sys->currentProgressBarPanel setDialogTitle:[NSString stringWithUTF8String:p_dialog->title]];
-    if (p_dialog->message)
-        [p_sys->currentProgressBarPanel setDialogMessage:[NSString stringWithUTF8String:p_dialog->message]];
-    if (p_dialog->cancel)
-        [p_sys->currentProgressBarPanel setCancelButtonLabel:[NSString stringWithUTF8String:p_dialog->cancel]];
-    [p_sys->currentProgressBarPanel center];
-    [p_sys->currentProgressBarPanel makeKeyAndOrderFront:nil];
+    dialog->pf_update = updateProgressPanel;
+    dialog->pf_check = checkProgressPanel;
+    dialog->pf_destroy = destroyProgressPanel;
+    dialog->p_sys = p_intf->p_sys;
 
-    p_dialog->pf_update = updateProgressPanel;
-    p_dialog->pf_check = checkProgressPanel;
-    p_dialog->pf_destroy = destroyProgressPanel;
-    p_dialog->p_sys = p_intf->p_sys;
-
-    [o_pool release];
+    [pool release];
     return VLC_SUCCESS;
 }
 
 void updateProgressPanel (void *priv, const char *text, float value)
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    intf_sys_t *p_sys = (intf_sys_t *)priv;
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    intf_sys_t *sys = (intf_sys_t *)priv;
 
-    if (text)
-        [p_sys->currentProgressBarPanel setDialogMessage:[NSString stringWithUTF8String:text]];
-    else
-        [p_sys->currentProgressBarPanel setDialogMessage:@""];
-    [p_sys->currentProgressBarPanel setProgressAsDouble:(double)(value * 1000.)];
+    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
+                          [NSNumber numberWithFloat:value], @"value",
+                          text ? [NSString stringWithUTF8String:text] : nil, @"text",
+                          nil];
+                          
+    [sys->displayer performSelectorOnMainThread:@selector(updateProgressPanel) withObject:dict waitUntilDone:YES];
 
-    [o_pool release];
+    [pool release];
 }
 
 void destroyProgressPanel (void *priv)
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    intf_sys_t *p_sys = (intf_sys_t *)priv;
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    intf_sys_t *sys = (intf_sys_t *)priv;
 
-    [p_sys->currentProgressBarPanel close];
-    [p_sys->currentProgressBarPanel release];
-
-    [o_pool release];
+    [sys->displayer performSelectorOnMainThread:@selector(destroyProgressPanel) withObject:nil waitUntilDone:YES];
+    
+    [pool release];
 }
 
 bool checkProgressPanel (void *priv)
 {
-    NSAutoreleasePool *o_pool = [[NSAutoreleasePool alloc] init];
-    intf_sys_t *p_sys = (intf_sys_t *)priv;
-    BOOL b_returned;
+    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+    intf_sys_t *sys = (intf_sys_t *)priv;
+    BOOL ret;
 
-    b_returned = [p_sys->currentProgressBarPanel isCancelled];
+    ret = [[sys->displayer resultFromSelectorOnMainThread:@selector(checkProgressPanel) withObject:nil] boolValue];
 
-    [o_pool release];
-    return b_returned;
+    [pool release];
+    return ret;
 }
+
+
+@implementation VLCDialogDisplayer
+- (void)dealloc
+{
+    assert(!_currentProgressBarPanel); // This has to be closed on main thread.
+    [super dealloc];
+}
+
++ (NSDictionary *)dictionaryForDialog:(const char *)title :(const char *)message :(const char *)yes :(const char *)no :(const char *)cancel
+{
+    NSMutableDictionary *dict = [NSMutableDictionary dictionary];
+    if (title)
+        [dict setObject:[NSString stringWithUTF8String:title] forKey:@"title"];
+    if (message)
+        [dict setObject:[NSString stringWithUTF8String:message] forKey:@"message"];
+    if (yes)
+        [dict setObject:[NSString stringWithUTF8String:yes] forKey:@"yes"];
+    if (no)
+        [dict setObject:[NSString stringWithUTF8String:no] forKey:@"no"];
+    if (cancel)
+        [dict setObject:[NSString stringWithUTF8String:cancel] forKey:@"cancel"];
+    
+    return dict;
+}
+#define VLCAssertIsMainThread() assert([NSThread isMainThread])
+
+- (void)displayError:(NSDictionary *)dialog
+{
+    VLCAssertIsMainThread();
+    
+    NSRunInformationalAlertPanel([dialog objectForKey:@"title"],
+                                 [dialog objectForKey:@"message"],
+                                 @"OK", nil, nil);
+}
+
+- (void)displayCritical:(NSDictionary *)dialog
+{
+    VLCAssertIsMainThread();
+    
+    NSRunCriticalAlertPanel([dialog objectForKey:@"title"],
+                                 [dialog objectForKey:@"message"],
+                                 @"OK", nil, nil);
+}
+
+- (NSNumber *)displayQuestion:(NSDictionary *)dialog
+{
+    VLCAssertIsMainThread();
+    
+    NSInteger alertRet = 0;
+    
+    NSAlert *alert = [NSAlert alertWithMessageText:[dialog objectForKey:@"title"]
+                              defaultButton:[dialog objectForKey:@"yes"]
+                            alternateButton:[dialog objectForKey:@"no"] 
+                                otherButton:[dialog objectForKey:@"cancel"]
+                  informativeTextWithFormat:[dialog objectForKey:@"message"]];
+    [alert setAlertStyle:NSInformationalAlertStyle];
+    alertRet = [alert runModal];
+
+    int ret;
+    switch (alertRet) {
+        case NSAlertDefaultReturn:
+            ret = 1;
+            break;
+        case NSAlertAlternateReturn:
+            ret = 2;
+            break;
+        case NSAlertOtherReturn:
+            ret = 3;
+            break;
+        default:
+            assert(0);
+            ret = 0;
+            break;
+    }
+
+    return [NSNumber numberWithInt:ret];
+}
+
+- (NSDictionary *)displayLogin:(NSDictionary *)dialog
+{
+    VLCAssertIsMainThread();
+
+    VLCLoginPanel *panel = [[VLCLoginPanel alloc] init];
+    [panel createContentView];
+    [panel setDialogTitle:[dialog objectForKey:@"title"]];
+    [panel setDialogMessage:[dialog objectForKey:@"message"]];
+    [panel center];
+    NSInteger ret = [NSApp runModalForWindow:panel];
+    [panel close];
+    
+    if (!ret)
+        return nil;
+    
+    return [NSDictionary dictionaryWithObjectsAndKeys:
+            [panel userName], @"username",
+            [panel password], @"password",
+            nil];
+}
+
+- (void)displayProgressBar:(NSDictionary *)dialog
+{
+    VLCAssertIsMainThread();
+
+    if(_currentProgressBarPanel)
+        [self destroyProgressPanel];
+
+    assert(!_currentProgressBarPanel);
+    _currentProgressBarPanel = [[VLCProgressPanel alloc] init];
+    [_currentProgressBarPanel createContentView];
+    [_currentProgressBarPanel setDialogTitle:[dialog objectForKey:@"title"]];
+    [_currentProgressBarPanel setDialogMessage:[dialog objectForKey:@"message"]];
+    [_currentProgressBarPanel setCancelButtonLabel:[dialog objectForKey:@"cancel"]];
+
+    [_currentProgressBarPanel center];
+    [_currentProgressBarPanel makeKeyAndOrderFront:nil];
+}
+
+- (void)updateProgressPanel:(NSDictionary *)dict
+{
+    VLCAssertIsMainThread();
+
+    assert(_currentProgressBarPanel);
+    [_currentProgressBarPanel setDialogMessage:[dict objectForKey:@"text"] ?: @""];
+    [_currentProgressBarPanel setProgressAsDouble:[[dict objectForKey:@"value"] doubleValue] * 1000.];
+}
+
+- (void)destroyProgressPanel
+{
+    VLCAssertIsMainThread();
+
+    [_currentProgressBarPanel close];
+    [_currentProgressBarPanel release];
+    _currentProgressBarPanel = nil;
+}
+
+- (NSNumber *)checkProgressPanel
+{
+    VLCAssertIsMainThread();
+    
+    return [NSNumber numberWithBool:[_currentProgressBarPanel isCancelled]];
+}
+
+
+/**
+ * Helper to execute a function on main thread and get its return value.
+ */
+- (void)execute:(NSDictionary *)dict
+{
+    SEL sel = [[dict objectForKey:@"sel"] pointerValue];
+    id * result = [[dict objectForKey:@"result"] pointerValue];
+    id object = [dict objectForKey:@"object"];
+    *result = [self performSelector:sel withObject:object];
+    [*result retain]; // Balanced in -resultFromSelectorOnMainThread
+}
+
+- (id)resultFromSelectorOnMainThread:(SEL)sel withObject:(id)object
+{
+    id result = nil;
+    [NSDictionary dictionaryWithObjectsAndKeys:
+     [NSValue valueWithPointer:sel], @"sel",
+     [NSValue valueWithPointer:&result], @"result",
+     object, @"object", nil];
+    [self performSelectorOnMainThread:@selector(execute:) withObject:object waitUntilDone:YES];
+    return [result autorelease];
+}
+@end
+                                  
+                                  
 
