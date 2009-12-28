@@ -54,6 +54,7 @@ void Theme::loadConfig()
     {
         // Show the windows as indicated by the XML file
         m_windowManager.showAll( true );
+        free( save );
         return;
     }
 
