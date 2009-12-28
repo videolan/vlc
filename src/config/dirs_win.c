@@ -68,7 +68,7 @@ const char *config_GetConfDir (void)
     BOOL WINAPI SHGetSpecialFolderPath(HWND,LPWSTR,int,BOOL);
     if( SHGetSpecialFolderPath( NULL, wdir, CSIDL_APPDATA, 1 ) )
 #else
-    /* Get the "Application Data" folder for the current user */
+    /* Get the "Application Data" folder for all users */
     if( S_OK == SHGetFolderPathW( NULL, CSIDL_COMMON_APPDATA
               | CSIDL_FLAG_CREATE, NULL, SHGFP_TYPE_CURRENT, wdir ) )
 #endif
