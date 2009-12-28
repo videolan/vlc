@@ -284,6 +284,7 @@ static void *EventThread( void *p_this )
             val.i_int |= 2;
             var_Set( p_event->p_vout, "mouse-button-down", val );
             DirectXPopupMenu( p_event, false );
+            var_ToggleBool( p_event->p_vout->p_libvlc, "intf-show" );
             break;
 
         case WM_MBUTTONUP:
