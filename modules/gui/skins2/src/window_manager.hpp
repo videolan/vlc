@@ -120,7 +120,8 @@ public:
     void raise( TopWindow &rWindow ) const { rWindow.raise(); }
 
     /// Show the given window
-    void show( TopWindow &rWindow ) const { rWindow.show(); }
+    void show( TopWindow &rWindow ) const
+        { rWindow.show(); rWindow.setOpacity( m_alpha); }
 
     /// Hide the given window
     void hide( TopWindow &rWindow ) const { rWindow.hide(); }

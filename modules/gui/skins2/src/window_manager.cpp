@@ -425,7 +425,6 @@ void WindowManager::showAll( bool firstTime ) const
         {
             (*it)->show();
         }
-        (*it)->setOpacity( m_alpha );
     }
 }
 
