@@ -35,6 +35,7 @@
 #include <vlc_plugin.h>
 #include <vlc_interface.h>
 #include <vlc_osd.h>
+#include <vlc_keys.h>
 
 #ifdef HAVE_POLL
 # include <poll.h>
@@ -179,8 +180,11 @@ static void Process( intf_thread_t *p_intf )
         {
             if( !strncmp( "key-", c, 4 ) )
             {
-                int i_keyval = config_GetInt( p_intf, c );
-                var_SetInteger( p_intf->p_libvlc, "key-pressed", i_keyval );
+                vlc_key_t i_key = vlc_GetActionId( c );
+                if( i_key )
+                    var_SetInteger( p_intf->p_libvlc, "key-action", i_key );
+                else
+                    msg_Err( p_intf, "Unknown hotkey '%s'.", c );
             }
             else if( !strncmp( "menu ", c, 5)  )
             {
