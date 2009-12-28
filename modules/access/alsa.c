@@ -116,13 +116,12 @@ static int Demux( demux_t * );
 
 static block_t* GrabAudio( demux_t *p_demux );
 
-static int OpenAudioDev( demux_t * );
-static bool ProbeAudioDevAlsa( demux_t *, const char *psz_device );
+static int OpenAudioDev( demux_t *, const char * );
+static bool ProbeAudioDevAlsa( demux_t *, const char * );
+static char *ListAvailableDevices( demux_t *, bool b_probe );
 
 struct demux_sys_t
 {
-    const char *psz_device;  /* Alsa device from MRL */
-
     /* Audio */
     int i_cache;
     unsigned int i_sample_rate;
@@ -139,16 +138,27 @@ struct demux_sys_t
     int64_t i_next_demux_date; /* Used to handle alsa:// as input-slave properly */
 };
 
-static int FindMainDevice( demux_t *p_demux )
+static int FindMainDevice( demux_t *p_demux, const char *psz_device )
 {
-    /* TODO: if using default device, loop through all alsa devices until
-     * one works. */
-    msg_Dbg( p_demux, "opening device '%s'", p_demux->p_sys->psz_device );
-    if( ProbeAudioDevAlsa( p_demux, p_demux->p_sys->psz_device ) )
+    if( psz_device )
     {
-        msg_Dbg( p_demux, "'%s' is an audio device",
-                 p_demux->p_sys->psz_device );
-        OpenAudioDev( p_demux );
+        msg_Dbg( p_demux, "opening device '%s'", psz_device );
+        if( ProbeAudioDevAlsa( p_demux, psz_device ) )
+        {
+            msg_Dbg( p_demux, "'%s' is an audio device", psz_device );
+            OpenAudioDev( p_demux, psz_device );
+        }
+    }
+    else if( ProbeAudioDevAlsa( p_demux, ALSA_DEFAULT ) )
+    {
+        msg_Dbg( p_demux, "'%s' is an audio device", ALSA_DEFAULT );
+        OpenAudioDev( p_demux, ALSA_DEFAULT );
+    }
+    else if( ( psz_device = ListAvailableDevices( p_demux, true ) ) )
+    {
+        msg_Dbg( p_demux, "'%s' is an audio device", psz_device );
+        OpenAudioDev( p_demux, psz_device );
+        free( (char *)psz_device );
     }
 
     if( p_demux->p_sys->p_alsa_pcm == NULL )
@@ -156,7 +166,7 @@ static int FindMainDevice( demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
-static void ListAvailableDevices( demux_t *p_demux )
+static char *ListAvailableDevices( demux_t *p_demux, bool b_probe )
 {
     snd_ctl_card_info_t *p_info = NULL;
     snd_ctl_card_info_alloca( &p_info );
@@ -164,7 +174,8 @@ static void ListAvailableDevices( demux_t *p_demux )
     snd_pcm_info_t *p_pcminfo = NULL;
     snd_pcm_info_alloca( &p_pcminfo );
 
-    msg_Dbg( p_demux, "Available alsa capture devices:" );
+    if( !b_probe )
+        msg_Dbg( p_demux, "Available alsa capture devices:" );
     int i_card = -1;
     while( !snd_card_next( &i_card ) && i_card >= 0 )
     {
@@ -175,9 +186,10 @@ static void ListAvailableDevices( demux_t *p_demux )
         if( snd_ctl_open( &p_ctl, psz_devname, 0 ) < 0 ) continue;
 
         snd_ctl_card_info( p_ctl, p_info );
-        msg_Dbg( p_demux, "  %s (%s)",
-                 snd_ctl_card_info_get_id( p_info ),
-                 snd_ctl_card_info_get_name( p_info ) );
+        if( !b_probe )
+            msg_Dbg( p_demux, "  %s (%s)",
+                     snd_ctl_card_info_get_id( p_info ),
+                     snd_ctl_card_info_get_name( p_info ) );
 
         int i_dev = -1;
         while( !snd_ctl_pcm_next_device( p_ctl, &i_dev ) && i_dev >= 0 )
@@ -187,13 +199,29 @@ static void ListAvailableDevices( demux_t *p_demux )
             snd_pcm_info_set_stream( p_pcminfo, SND_PCM_STREAM_CAPTURE );
             if( snd_ctl_pcm_info( p_ctl, p_pcminfo ) < 0 ) continue;
 
-            msg_Dbg( p_demux, "    hw:%d,%d : %s (%s)", i_card, i_dev,
-                     snd_pcm_info_get_id( p_pcminfo ),
-                     snd_pcm_info_get_name( p_pcminfo ) );
+            if( !b_probe )
+                msg_Dbg( p_demux, "    hw:%d,%d : %s (%s)", i_card, i_dev,
+                         snd_pcm_info_get_id( p_pcminfo ),
+                         snd_pcm_info_get_name( p_pcminfo ) );
+            else
+            {
+                char *psz_device;
+                if( asprintf( &psz_device, "hw:%d,%d", i_card, i_dev ) > 0 )
+                {
+                    if( ProbeAudioDevAlsa( p_demux, psz_device ) )
+                    {
+                        snd_ctl_close( p_ctl );
+                        return psz_device;
+                    }
+                    else
+                        free( psz_device );
+                }
+            }
         }
 
         snd_ctl_close( p_ctl );
     }
+    return NULL;
 }
 
 /*****************************************************************************
@@ -228,16 +256,16 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_sys->p_block = NULL;
     p_sys->i_next_demux_date = -1;
 
+    const char *psz_device = NULL;
     if( p_demux->psz_path && *p_demux->psz_path )
-        p_sys->psz_device = p_demux->psz_path;
+        psz_device = p_demux->psz_path;
     else
-    {
-        p_sys->psz_device = ALSA_DEFAULT;
-        ListAvailableDevices( p_demux );
-    }
+        ListAvailableDevices( p_demux, false );
 
-    if( FindMainDevice( p_demux ) != VLC_SUCCESS )
+    if( FindMainDevice( p_demux, psz_device ) != VLC_SUCCESS )
     {
+        if( p_demux->psz_path && *p_demux->psz_path )
+            ListAvailableDevices( p_demux, false );
         DemuxClose( p_this );
         return VLC_EGENERIC;
     }
@@ -443,10 +471,9 @@ static block_t* GrabAudio( demux_t *p_demux )
 /*****************************************************************************
  * OpenAudioDev: open and set up the audio device and probe for capabilities
  *****************************************************************************/
-static int OpenAudioDevAlsa( demux_t *p_demux )
+static int OpenAudioDevAlsa( demux_t *p_demux, const char *psz_device )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    const char *psz_device = p_sys->psz_device;
     p_sys->p_alsa_pcm = NULL;
     snd_pcm_hw_params_t *p_hw_params = NULL;
     snd_pcm_uframes_t buffer_size;
@@ -612,14 +639,14 @@ static int OpenAudioDevAlsa( demux_t *p_demux )
 
 }
 
-static int OpenAudioDev( demux_t *p_demux )
+static int OpenAudioDev( demux_t *p_demux, const char *psz_device )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    if( OpenAudioDevAlsa( p_demux ) != VLC_SUCCESS )
+    if( OpenAudioDevAlsa( p_demux, psz_device ) != VLC_SUCCESS )
         return VLC_EGENERIC;
 
     msg_Dbg( p_demux, "opened adev=`%s' %s %dHz",
-             p_sys->psz_device, p_sys->b_stereo ? "stereo" : "mono",
+             psz_device, p_sys->b_stereo ? "stereo" : "mono",
              p_sys->i_sample_rate );
 
     es_format_t fmt;
