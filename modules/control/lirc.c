@@ -80,7 +80,7 @@ struct intf_sys_t
  *****************************************************************************/
 static void Run( intf_thread_t * );
 
-static int  Process( intf_thread_t * );
+static void Process( intf_thread_t * );
 
 /*****************************************************************************
  * Open: initialize interface
@@ -162,29 +162,25 @@ static void Run( intf_thread_t *p_intf )
     }
 }
 
-static int Process( intf_thread_t *p_intf )
+static void Process( intf_thread_t *p_intf )
 {
     for( ;; )
     {
         char *code, *c;
-        int i_ret = lirc_nextcode( &code );
-
-        if( i_ret )
-            return i_ret;
+        if( lirc_nextcode( &code ) )
+            return;
 
         if( code == NULL )
-            return 0;
+            return;
 
         while( vlc_object_alive( p_intf )
                 && (lirc_code2char( p_intf->p_sys->config, code, &c ) == 0)
                 && (c != NULL) )
         {
-            vlc_value_t keyval;
-
             if( !strncmp( "key-", c, 4 ) )
             {
-                keyval.i_int = config_GetInt( p_intf, c );
-                var_Set( p_intf->p_libvlc, "key-pressed", keyval );
+                int i_keyval = config_GetInt( p_intf, c );
+                var_SetInteger( p_intf->p_libvlc, "key-pressed", i_keyval );
             }
             else if( !strncmp( "menu ", c, 5)  )
             {
@@ -213,7 +209,9 @@ static int Process( intf_thread_t *p_intf )
             }
             else
             {
-                msg_Err( p_intf, "this doesn't appear to be a valid keycombo lirc sent us. Please look at the doc/lirc/example.lirc file in VLC" );
+                msg_Err( p_intf, "this doesn't appear to be a valid keycombo "
+                                 "lirc sent us. Please look at the "
+                                 "doc/lirc/example.lirc file in VLC" );
                 break;
             }
         }
