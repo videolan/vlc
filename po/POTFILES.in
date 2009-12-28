@@ -363,6 +363,7 @@ modules/audio_output/portaudio.c
 modules/audio_output/pulse.c
 modules/audio_output/sdl.c
 modules/audio_output/waveout.c
+modules/audio_output/windows_audio_common.h
 modules/codec/a52.c
 modules/codec/adpcm.c
 modules/codec/aes3.c
@@ -1206,7 +1207,6 @@ modules/video_output/msw/vout.h
 modules/video_output/msw/wingdi.c
 modules/video_output/omapfb.c
 modules/video_output/opengl.c
-modules/video_output/opengllayer.m
 modules/video_output/sdl.c
 modules/video_output/snapshot.c
 modules/video_output/svgalib.c
