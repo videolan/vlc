@@ -824,6 +824,15 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             p_keys[i].i_key = config_GetInt( p_libvlc,
                                              libvlc_actions[i].name );
             p_keys[i].i_action = libvlc_actions[i].value;
+#ifndef NDEBUG
+            if (i > 0
+             && strcmp(libvlc_actions[i-1].name, libvlc_actions[i].name) >= 0)
+            {
+                msg_Err(p_libvlc, "%s and %s are not ordered properly",
+                        libvlc_actions[i-1].name, libvlc_actions[i].name);
+                abort();
+            }
+#endif
         }
         p_keys[libvlc_actions_count].psz_action = NULL;
         p_keys[libvlc_actions_count].i_key = 0;
