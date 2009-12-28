@@ -927,10 +927,9 @@ static void EsOutESVarUpdateGeneric( es_out_t *out, int i_id,
     {
         if( psz_language && *psz_language )
         {
-            text.psz_string = malloc( strlen( fmt->psz_description) +
-                                      strlen( psz_language ) + 10 );
-            sprintf( text.psz_string, "%s - [%s]", fmt->psz_description,
-                                                   psz_language );
+            if( asprintf( &text.psz_string, "%s - [%s]", fmt->psz_description,
+                          psz_language ) == -1 )
+                text.psz_string = NULL;
         }
         else text.psz_string = strdup( fmt->psz_description );
     }
