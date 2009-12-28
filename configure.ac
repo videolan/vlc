@@ -4377,8 +4377,8 @@ AC_ARG_ENABLE(macosx,
   [  --enable-macosx   Mac OS X gui support (default enabled on Mac OS X)])
 if test "x${enable_macosx}" = "xyes"
 then
-  VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,Cocoa])
-  VLC_ADD_LDFLAGS([macosx minimal_macosx opengllayer],[-Wl,-framework,OpenGL])
+  VLC_ADD_LDFLAGS([macosx minimal_macosx],[-Wl,-framework,Cocoa])
+  VLC_ADD_LDFLAGS([macosx minimal_macosx],[-Wl,-framework,OpenGL])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,Carbon])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,CoreServices])
   VLC_ADD_LDFLAGS([macosx minimal_macosx],            [-Wl,-framework,AGL])
@@ -4388,12 +4388,10 @@ then
   dnl For bug report
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,AddressBook])
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
-  VLC_ADD_LDFLAGS([opengllayer],            [-Wl,-framework,QuartzCore])
-  VLC_ADD_OBJCFLAGS([macosx minimal_macosx opengllayer], [-fobjc-exceptions] )
+  VLC_ADD_OBJCFLAGS([macosx minimal_macosx], [-fobjc-exceptions] )
 
   VLC_ADD_PLUGIN([macosx])
   VLC_ADD_PLUGIN([minimal_macosx])
-  VLC_ADD_PLUGIN([opengllayer])
 fi
 
 dnl

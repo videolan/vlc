@@ -15,7 +15,6 @@ SOURCES_mga = mga.c
 SOURCES_hd1000v = hd1000v.cpp
 SOURCES_snapshot = snapshot.c
 SOURCES_opengl = opengl.c opengl.h
-SOURCES_opengllayer = opengllayer.m
 SOURCES_directfb = directfb.c
 SOURCES_vmem = vmem.c
 SOURCES_yuv = yuv.c
