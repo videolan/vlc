@@ -1403,6 +1403,7 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
 static int InheritValue( vlc_object_t *p_this, const char *psz_name,
                          vlc_value_t *p_val, int i_type )
 {
+    i_type &= VLC_VAR_CLASS;
     for( vlc_object_t *obj = p_this; obj != NULL; obj = obj->p_parent )
         if( var_GetChecked( p_this, psz_name, i_type, p_val ) == VLC_SUCCESS )
             return VLC_SUCCESS;
