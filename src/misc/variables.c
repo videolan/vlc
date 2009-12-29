@@ -179,55 +179,11 @@ static int      TriggerCallback( vlc_object_t *, variable_t **, const char *,
  */
 int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 {
-    int i_new;
-    variable_t *p_var;
+    variable_t var, *p_var = &var;
     static vlc_list_t dummy_null_list = {0, NULL, NULL};
 
     assert( p_this );
 
-    vlc_object_internals_t *p_priv = vlc_internals( p_this );
-
-    vlc_mutex_lock( &p_priv->var_lock );
-
-    /* FIXME: if the variable already exists, we don't duplicate it. But we
-     * duplicate the lookups. It's not that serious, but if anyone finds some
-     * time to rework Insert() so that only one lookup has to be done, feel
-     * free to do so. */
-    i_new = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
-
-    if( i_new >= 0 )
-    {
-        /* If the types differ, variable creation failed. */
-        if( (i_type & VLC_VAR_CLASS) != (p_priv->p_vars[i_new].i_type & VLC_VAR_CLASS) )
-        {
-            msg_Err( p_this, "Variable '%s' (0x%04x) already exist but with a different type (0x%04x)",
-                     psz_name, p_priv->p_vars[i_new].i_type, i_type );
-            vlc_mutex_unlock( &p_priv->var_lock );
-            return VLC_EBADVAR;
-        }
-
-        p_priv->p_vars[i_new].i_usage++;
-        p_priv->p_vars[i_new].i_type |= ( i_type & VLC_VAR_ISCOMMAND );
-        p_priv->p_vars[i_new].i_type |= ( i_type & VLC_VAR_HASCHOICE );
-        vlc_mutex_unlock( &p_priv->var_lock );
-        return VLC_SUCCESS;
-    }
-
-    i_new = Insert( p_priv->p_vars, p_priv->i_vars, psz_name );
-
-    if( (p_priv->i_vars & 15) == 15 )
-    {
-        p_priv->p_vars = xrealloc( p_priv->p_vars,
-                                  (p_priv->i_vars+17) * sizeof(variable_t) );
-    }
-
-    memmove( p_priv->p_vars + i_new + 1,
-             p_priv->p_vars + i_new,
-             (p_priv->i_vars - i_new) * sizeof(variable_t) );
-
-    p_priv->i_vars++;
-
-    p_var = &p_priv->p_vars[i_new];
     memset( p_var, 0, sizeof(*p_var) );
 
     p_var->i_hash = HashString( psz_name );
@@ -291,36 +247,82 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             break;
     }
 
-    /* Duplicate the default data we stored. */
-    p_var->ops->pf_dup( &p_var->val );
-
     if( i_type & VLC_VAR_DOINHERIT )
     {
-        vlc_value_t val;
-
-        if( InheritValue( p_this, psz_name, &val, p_var->i_type )
-            == VLC_SUCCESS )
+        if( InheritValue( p_this, psz_name, &p_var->val, p_var->i_type ) )
+            msg_Err( p_this, "cannot inherit value for %s", psz_name );
+        else if( i_type & VLC_VAR_HASCHOICE )
         {
-            /* Free data if needed */
-            p_var->ops->pf_free( &p_var->val );
-            /* Set the variable */
-            p_var->val = val;
+            /* We must add the inherited value to our choice list */
+            p_var->i_default = 0;
 
-            if( i_type & VLC_VAR_HASCHOICE )
-            {
-                /* We must add the inherited value to our choice list */
-                p_var->i_default = 0;
-
-                INSERT_ELEM( p_var->choices.p_values, p_var->choices.i_count,
-                             0, val );
-                INSERT_ELEM( p_var->choices_text.p_values,
-                             p_var->choices_text.i_count, 0, val );
-                p_var->ops->pf_dup( &p_var->choices.p_values[0] );
-                p_var->choices_text.p_values[0].psz_string = NULL;
-            }
+            INSERT_ELEM( p_var->choices.p_values, p_var->choices.i_count,
+                         0, p_var->val );
+            INSERT_ELEM( p_var->choices_text.p_values,
+                         p_var->choices_text.i_count, 0, p_var->val );
+            p_var->ops->pf_dup( &p_var->choices.p_values[0] );
+            p_var->choices_text.p_values[0].psz_string = NULL;
         }
     }
 
+    vlc_object_internals_t *p_priv = vlc_internals( p_this );
+    int i_new;
+
+    vlc_mutex_lock( &p_priv->var_lock );
+
+    /* FIXME: if the variable already exists, we don't duplicate it. But we
+     * duplicate the lookups. It's not that serious, but if anyone finds some
+     * time to rework Insert() so that only one lookup has to be done, feel
+     * free to do so. */
+    i_new = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
+
+    if( i_new >= 0 )
+    {
+        /* If the types differ, variable creation failed. */
+        if( (i_type & VLC_VAR_CLASS) != (p_priv->p_vars[i_new].i_type & VLC_VAR_CLASS) )
+        {
+            msg_Err( p_this, "Variable '%s' (0x%04x) already exist but with a different type (0x%04x)",
+                     psz_name, p_priv->p_vars[i_new].i_type, i_type );
+            vlc_mutex_unlock( &p_priv->var_lock );
+            return VLC_EBADVAR;
+        }
+
+        p_priv->p_vars[i_new].i_usage++;
+        p_priv->p_vars[i_new].i_type |= ( i_type & VLC_VAR_ISCOMMAND );
+        p_priv->p_vars[i_new].i_type |= ( i_type & VLC_VAR_HASCHOICE );
+        vlc_mutex_unlock( &p_priv->var_lock );
+
+        /* We did not need to create a new variable, free everything... */
+        p_var->ops->pf_free( &p_var->val );
+        free( p_var->psz_name );
+        if( p_var->choices.i_count )
+        {
+            for( int i = 0 ; i < p_var->choices.i_count ; i++ )
+            {
+                p_var->ops->pf_free( &p_var->choices.p_values[i] );
+                free( p_var->choices_text.p_values[i].psz_string );
+            }
+            free( p_var->choices.p_values );
+            free( p_var->choices_text.p_values );
+        }
+        return VLC_SUCCESS;
+    }
+
+    i_new = Insert( p_priv->p_vars, p_priv->i_vars, psz_name );
+
+    if( (p_priv->i_vars & 15) == 15 )
+    {
+        p_priv->p_vars = xrealloc( p_priv->p_vars,
+                                  (p_priv->i_vars+17) * sizeof(variable_t) );
+    }
+
+    memmove( p_priv->p_vars + i_new + 1,
+             p_priv->p_vars + i_new,
+             (p_priv->i_vars - i_new) * sizeof(variable_t) );
+
+    p_priv->i_vars++;
+
+    p_priv->p_vars[i_new] = var;
     vlc_mutex_unlock( &p_priv->var_lock );
 
     return VLC_SUCCESS;
