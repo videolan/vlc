@@ -628,7 +628,7 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
              && ((psz_cwd == NULL) || (chdir (psz_cwd) == 0)))
                 execve (ppsz_argv[0], ppsz_argv, ppsz_env);
 
-            exit (EXIT_FAILURE);
+            _exit (EXIT_FAILURE);
         }
     }
 
