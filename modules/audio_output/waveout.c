@@ -155,7 +155,6 @@ static int Open( vlc_object_t *p_this )
 {
     aout_instance_t *p_aout = (aout_instance_t *)p_this;
     vlc_value_t val;
-    int i;
 
     /* Allocate structure */
     p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
@@ -353,7 +352,7 @@ static int Open( vlc_object_t *p_this )
 
     /* We need to kick off the playback in order to have the callback properly
      * working */
-    for( i = 0; i < FRAMES_NUM; i++ )
+    for( int i = 0; i < FRAMES_NUM; i++ )
     {
         p_aout->output.p_sys->waveheader[i].dwFlags = WHDR_DONE;
         p_aout->output.p_sys->waveheader[i].dwUser = 0;
