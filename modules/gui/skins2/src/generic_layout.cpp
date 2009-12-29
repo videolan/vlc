@@ -101,7 +101,8 @@ void GenericLayout::addControl( CtrlGeneric *pControl,
         pControl->setLayout( this, rPosition );
 
         // Draw the control
-        pControl->draw( *m_pImage, rPosition.getLeft(), rPosition.getTop() );
+        if( pControl->isVisible() )
+            pControl->draw( *m_pImage, rPosition.getLeft(), rPosition.getTop() );
 
         // Add the control in the list.
         // This list must remain sorted by layer order
