@@ -133,7 +133,9 @@ struct media_es_t
 
     es_format_t fmt;
     uint8_t     i_payload_type;
-    char        *psz_rtpmap;
+    const char  *psz_ptname;
+    unsigned    i_clock_rate;
+    unsigned    i_channels;
     char        *psz_fmtp;
 
 };
@@ -152,9 +154,6 @@ struct vod_media_t
     char         *psz_rtsp_path;
 
     int  i_payload_type;
-
-    int64_t i_sdp_id;
-    int     i_sdp_version;
 
     vlc_mutex_t lock;
 
@@ -413,7 +412,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
     msg_Dbg( p_vod, "created RTSP url: %s", p_media->psz_rtsp_path );
 
     if( asprintf( &p_media->psz_rtsp_control_v4,
-               "a=control:rtsp://%%s:%d%s/trackID=%%d\r\n",
+               "rtsp://%%s:%d%s/trackID=%%d",
                p_sys->i_port, p_media->psz_rtsp_path ) < 0 )
     {
         httpd_UrlDelete( p_media->p_rtsp_url );
@@ -422,7 +421,7 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
         return NULL;
     }
     if( asprintf( &p_media->psz_rtsp_control_v6,
-               "a=control:rtsp://[%%s]:%d%s/trackID=%%d\r\n",
+               "rtsp://[%%s]:%d%s/trackID=%%d",
               p_sys->i_port, p_media->psz_rtsp_path ) < 0 )
     {
         httpd_UrlDelete( p_media->p_rtsp_url );
@@ -450,8 +449,6 @@ static vod_media_t *MediaNew( vod_t *p_vod, const char *psz_name,
 
     p_media->i_payload_type = 96;
 
-    p_media->i_sdp_id = mdate();
-    p_media->i_sdp_version = 1;
     p_media->i_length = input_item_GetDuration( p_item );
 
     vlc_mutex_lock( &p_item->lock );
@@ -520,6 +517,9 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     }
     msg_Dbg( p_vod, "  - ES %4.4s (%s)", (char *)&p_fmt->i_codec, psz_urlc );
 
+    p_es->i_clock_rate = 90000;
+    p_es->i_channels = 1;
+
     switch( p_fmt->i_codec )
     {
         case VLC_CODEC_S16B:
@@ -536,36 +536,36 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             {
                 p_es->i_payload_type = p_media->i_payload_type++;
             }
-            if( asprintf( &p_es->psz_rtpmap, "L16/%d/%d", p_fmt->audio.i_rate,
-                          p_fmt->audio.i_channels ) == -1 )
-                p_es->psz_rtpmap = NULL;
+            p_es->psz_ptname = "L16";
+            p_es->i_clock_rate = p_fmt->audio.i_rate;
+            p_es->i_channels = p_fmt->audio.i_channels;
             break;
         case VLC_CODEC_U8:
             p_es->i_payload_type = p_media->i_payload_type++;
-            if( asprintf( &p_es->psz_rtpmap, "L8/%d/%d", p_fmt->audio.i_rate,
-                          p_fmt->audio.i_channels ) == -1 )
-                p_es->psz_rtpmap = NULL;
+            p_es->psz_ptname = "L8";
+            p_es->i_clock_rate = p_fmt->audio.i_rate;
+            p_es->i_channels = p_fmt->audio.i_channels;
             break;
         case VLC_CODEC_MPGA:
             p_es->i_payload_type = 14;
-            p_es->psz_rtpmap = strdup( "MPA/90000" );
+            p_es->psz_ptname = "MPA";
             break;
         case VLC_CODEC_MPGV:
             p_es->i_payload_type = 32;
-            p_es->psz_rtpmap = strdup( "MPV/90000" );
+            p_es->psz_ptname = "MPV";
             break;
         case VLC_CODEC_A52:
             p_es->i_payload_type = p_media->i_payload_type++;
-            if( asprintf( &p_es->psz_rtpmap, "ac3/%d", p_fmt->audio.i_rate ) == -1 )
-                p_es->psz_rtpmap = NULL;
+            p_es->psz_ptname = "ac3";
+            p_es->i_clock_rate = p_fmt->audio.i_rate;
             break;
         case VLC_CODEC_H263:
             p_es->i_payload_type = p_media->i_payload_type++;
-            p_es->psz_rtpmap = strdup( "H263-1998/90000" );
+            p_es->psz_ptname = "H263-1998";
             break;
         case VLC_CODEC_H264:
             p_es->i_payload_type = p_media->i_payload_type++;
-            p_es->psz_rtpmap = strdup( "H264/90000" );
+            p_es->psz_ptname = "H264";
             p_es->psz_fmtp = NULL;
             /* FIXME AAAAAAAAAAAARRRRRRRRGGGG copied from stream_out/rtp.c */
             if( p_fmt->i_extra > 0 )
@@ -631,7 +631,7 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             break;
         case VLC_CODEC_MP4V:
             p_es->i_payload_type = p_media->i_payload_type++;
-            p_es->psz_rtpmap = strdup( "MP4V-ES/90000" );
+            p_es->psz_ptname = "MP4V-ES";
             if( p_fmt->i_extra > 0 )
             {
                 char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
@@ -644,8 +644,8 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             break;
         case VLC_CODEC_MP4A:
             p_es->i_payload_type = p_media->i_payload_type++;
-            if( asprintf( &p_es->psz_rtpmap, "mpeg4-generic/%d", p_fmt->audio.i_rate ) == -1 )
-                p_es->psz_rtpmap = NULL;
+            p_es->psz_ptname = "mpeg4-generic";
+            p_es->i_clock_rate = p_fmt->audio.i_rate;
             if( p_fmt->i_extra > 0 )
             {
                 char *p_hexa = malloc( 2 * p_fmt->i_extra + 1 );
@@ -661,23 +661,27 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
         case VLC_FOURCC( 'm', 'p', '2', 't' ):
             p_media->psz_mux = strdup("ts");
             p_es->i_payload_type = 33;
-            p_es->psz_rtpmap = strdup( "MP2T/90000" );
+            p_es->psz_ptname = "MP2T";
             break;
         case VLC_FOURCC( 'm', 'p', '2', 'p' ):
             p_media->psz_mux = strdup("ps");
             p_es->i_payload_type = p_media->i_payload_type++;
-            p_es->psz_rtpmap = strdup( "MP2P/90000" );
+            p_es->psz_ptname = "MP2P";
             break;
         case VLC_CODEC_AMR_NB:
             p_es->i_payload_type = p_media->i_payload_type++;
-            p_es->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
-                                    "AMR/8000/2" : "AMR/8000" );
+            p_es->psz_ptname = "AMR";
+            p_es->i_clock_rate = 8000;
+            if(p_fmt->audio.i_channels == 2 )
+                p_es->i_channels = 2;
             p_es->psz_fmtp = strdup( "octet-align=1" );
             break;
         case VLC_CODEC_AMR_WB:
             p_es->i_payload_type = p_media->i_payload_type++;
-            p_es->psz_rtpmap = strdup( p_fmt->audio.i_channels == 2 ?
-                                    "AMR-WB/16000/2" : "AMR-WB/16000" );
+            p_es->psz_ptname = "AMR-WB";
+            p_es->i_clock_rate = 16000;
+            if(p_fmt->audio.i_channels == 2 )
+                p_es->i_channels = 2;
             p_es->psz_fmtp = strdup( "octet-align=1" );
             break;
 
@@ -719,8 +723,6 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     TAB_APPEND( p_media->i_es, p_media->es, p_es );
     vlc_mutex_unlock( &p_media->lock );
 
-    p_media->i_sdp_version++;
-
     return VLC_SUCCESS;
 }
 
@@ -747,9 +749,7 @@ static void MediaDelES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt)
     TAB_REMOVE( p_media->i_es, p_media->es, p_es );
     vlc_mutex_unlock( &p_media->lock );
 
-    free( p_es->psz_rtpmap );
     free( p_es->psz_fmtp );
-    p_media->i_sdp_version++;
 
     if( p_es->p_rtsp_url ) httpd_UrlDelete( p_es->p_rtsp_url );
     es_format_Clean( &p_es->fmt );
@@ -1538,94 +1538,65 @@ static int RtspCallbackES( httpd_callback_sys_t *p_args, httpd_client_t *cl,
  *****************************************************************************/
 static char *SDPGenerate( const vod_media_t *p_media, httpd_client_t *cl )
 {
-    int i, i_size;
-    char *p, *psz_sdp, ip[NI_MAXNUMERICHOST], ipv;
+    char *psz_sdp, ip[NI_MAXNUMERICHOST];
     const char *psz_control;
 
     if( httpd_ServerIP( cl, ip ) == NULL )
         return NULL;
 
-    p = strchr( ip, '%' );
-    if( p != NULL )
-        *p = '\0'; /* remove scope if present */
+    bool ipv6 = ( strchr( ip, ':' ) != NULL );
 
-    ipv = ( strchr( ip, ':' ) != NULL ) ? '6' : '4';
+    psz_control = ipv6 ? p_media->psz_rtsp_control_v6
+                       : p_media->psz_rtsp_control_v4;
 
-    /* Calculate size */
-    i_size = sizeof( "v=0\r\n" ) +
-        sizeof( "o=- * * IN IP4 \r\n" ) + 10 + NI_MAXNUMERICHOST +
-        sizeof( "c=IN IP4 0.0.0.0\r\n" ) + 20 + 10 +
-        sizeof( "t=0 0\r\n" ) + /* FIXME */
-        sizeof( "a=tool:"PACKAGE_STRING"\r\n" ) +
-        sizeof( "a=range:npt=0-1000000000.000\r\n" );
+    /* Dummy destination address for RTSP */
+    struct sockaddr_storage dst;
+    socklen_t dstlen = ipv6 ? sizeof( struct sockaddr_in6 )
+                            : sizeof( struct sockaddr_in );
+    memset (&dst, 0, dstlen);
+    dst.ss_family = ipv6 ? AF_INET6 : AF_INET;
+#ifdef HAVE_SA_LEN
+    dst.ss_len = dstlen;
+#endif
 
-    psz_control = (ipv == '6') ? p_media->psz_rtsp_control_v6
-                               : p_media->psz_rtsp_control_v4;
-    for( i = 0; i < p_media->i_es; i++ )
-    {
-        media_es_t *p_es = p_media->es[i];
-
-        i_size += sizeof( "m=**d*o * RTP/AVP *\r\n" ) + 19;
-        if( p_es->psz_rtpmap )
-        {
-            i_size += sizeof( "a=rtpmap:* *\r\n" ) +
-                strlen( p_es->psz_rtpmap ) + 9;
-        }
-        if( p_es->psz_fmtp )
-        {
-            i_size += sizeof( "a=fmtp:* *\r\n" ) +
-                strlen( p_es->psz_fmtp ) + 9;
-        }
-    }
-    i_size += (strlen( psz_control ) + strlen( ip ) + 9) * p_media->i_es;
-
-    p = psz_sdp = malloc( i_size );
-    p += sprintf( p, "v=0\r\n" );
-    p += sprintf( p, "o=- %"PRId64" %d IN IP%c %s\r\n",
-                  p_media->i_sdp_id, p_media->i_sdp_version, ipv, ip );
-
-    p += sprintf( p, "c=IN IP%c %s\r\n", ipv, ipv == '6' ? "::" : "0.0.0.0" );
-    p += sprintf( p, "t=0 0\r\n" ); /* FIXME */
-    p += sprintf( p, "a=tool:"PACKAGE_STRING"\r\n" );
+    psz_sdp = vlc_sdp_Start( VLC_OBJECT( p_media->p_vod ), "sout-rtp-",
+                             NULL, 0, (struct sockaddr *)&dst, dstlen );
+    if( psz_sdp == NULL )
+        return NULL;
 
     if( p_media->i_length > 0 )
     {
         lldiv_t d = lldiv( p_media->i_length / 1000, 1000 );
-        p += sprintf( p, "a=range:npt=0-%lld.%03u\r\n", d.quot,
-                      (unsigned)d.rem );
+        sdp_AddAttribute( &psz_sdp, "range"," npt=0-%lld.%03u", d.quot,
+                          (unsigned)d.rem );
     }
 
-    for( i = 0; i < p_media->i_es; i++ )
+    for( int i = 0; i < p_media->i_es; i++ )
     {
         media_es_t *p_es = p_media->es[i];
+        const char *mime_major; /* major MIME type */
 
-        if( p_es->fmt.i_cat == AUDIO_ES )
+        switch( p_es->fmt.i_cat )
         {
-            p += sprintf( p, "m=audio %d RTP/AVP %d\r\n",
-                          0 /* p_es->i_port */, p_es->i_payload_type );
-        }
-        else if( p_es->fmt.i_cat == VIDEO_ES )
-        {
-            p += sprintf( p, "m=video %d RTP/AVP %d\r\n",
-                          0 /* p_es->i_port */, p_es->i_payload_type );
-        }
-        else
-        {
-            continue;
-        }
-
-        if( p_es->psz_rtpmap )
-        {
-            p += sprintf( p, "a=rtpmap:%d %s\r\n", p_es->i_payload_type,
-                          p_es->psz_rtpmap );
-        }
-        if( p_es->psz_fmtp )
-        {
-            p += sprintf( p, "a=fmtp:%d %s\r\n", p_es->i_payload_type,
-                          p_es->psz_fmtp );
+            case VIDEO_ES:
+                mime_major = "video";
+                break;
+            case AUDIO_ES:
+                mime_major = "audio";
+                break;
+            case SPU_ES:
+                mime_major = "text";
+                break;
+            default:
+                continue;
         }
 
-        p += sprintf( p, psz_control, ip, i );
+        sdp_AddMedia( &psz_sdp, mime_major, "RTP/AVP", 0 /* p_es->i_port */,
+                      p_es->i_payload_type, false, 0,
+                      p_es->psz_ptname, p_es->i_clock_rate, p_es->i_channels,
+                      p_es->psz_fmtp );
+
+        sdp_AddAttribute( &psz_sdp, "control", psz_control, ip, i );
     }
 
     return psz_sdp;
