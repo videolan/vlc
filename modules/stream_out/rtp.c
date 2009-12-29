@@ -1237,12 +1237,11 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
 
         case VLC_CODEC_MP4V:
         {
-            char hexa[2*p_fmt->i_extra +1];
-
             id->psz_enc = "MP4V-ES";
             id->pf_packetize = rtp_packetize_split;
             if( p_fmt->i_extra > 0 )
             {
+                char hexa[2*p_fmt->i_extra +1];
                 sprintf_hexa( hexa, p_fmt->p_extra, p_fmt->i_extra );
                 if( asprintf( &id->psz_fmtp,
                               "profile-level-id=3; config=%s;", hexa ) == -1 )
