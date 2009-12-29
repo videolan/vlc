@@ -549,10 +549,10 @@ CoverArtLabel::CoverArtLabel( QWidget *parent, intf_thread_t *_p_i )
     setContextMenuPolicy( Qt::ActionsContextMenu );
     CONNECT( this, updateRequested(), this, askForUpdate() );
 
-    /*setMinimumHeight( 128 );
+    setMinimumHeight( 128 );
     setMinimumWidth( 128 );
     setMaximumHeight( 128 );
-    setMaximumWidth( 128 );*/
+    setMaximumWidth( 128 );
     setScaledContents( false );
     setAlignment( Qt::AlignCenter );
 
