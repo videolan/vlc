@@ -624,9 +624,7 @@ int __vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
             /* NOTE:
              * Like it or not, close can fail (and not only with EBADF)
              */
-            if ((close (0) == 0) && (close (1) == 0) && (close (2) == 0)
-             && (dup (fds[1]) == 0) && (dup (fds[1]) == 1)
-             && (open ("/dev/null", O_RDONLY) == 2)
+            if ((dup2 (fds[1], 0) == 0) && (dup2 (fds[1], 1) == 1)
              && ((psz_cwd == NULL) || (chdir (psz_cwd) == 0)))
                 execve (ppsz_argv[0], ppsz_argv, ppsz_env);
 
