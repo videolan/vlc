@@ -381,6 +381,10 @@ QWidget *AbstractController::createWidget( buttonType_e button, int options )
         widget = loopButton;
         }
         break;
+    case INFO_BUTTON: {
+        NORMAL_BUTTON( INFO );
+        }
+        break;
     default:
         msg_Warn( p_intf, "This should not happen %i", button );
         break;

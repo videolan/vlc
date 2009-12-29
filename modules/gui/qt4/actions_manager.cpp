@@ -91,6 +91,8 @@ void ActionsManager::doAction( int id_action )
             THEDP->quit();  break;
         case RANDOM_ACTION:
             THEMIM->toggleRandom(); break;
+        case INFO_ACTION:
+            THEDP->mediaInfoDialog(); break;
         default:
             msg_Dbg( p_intf, "Action: %i", id_action );
             break;
