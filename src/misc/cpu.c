@@ -119,7 +119,7 @@ uint32_t CPUCapabilities( void )
         if( pid == 0 )                         \
         {                                      \
             __asm__ __volatile__ ( code : : ); \
-            exit(0);                           \
+            _exit(0);                           \
         }                                      \
         if( check_OS_capability((name), pid )) \
             i_capabilities |= (flag);          \
@@ -273,7 +273,7 @@ out:
                       "vand %%v0, %%v0, %%v0"
                       :
                       : "r" (-1));
-        exit(0);
+        _exit(0);
     }
 
     if( check_OS_capability( "Altivec", pid ) )
