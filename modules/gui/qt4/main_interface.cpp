@@ -100,7 +100,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     i_bg_height          = 0;
 
     /* Ask for Privacy */
-    new FirstRun( this, p_intf );
+    FirstRun::CheckAndRun( this, p_intf );
 
     /**
      *  Configuration and settings

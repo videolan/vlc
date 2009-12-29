@@ -29,25 +29,13 @@
 #include <QGroupBox>
 #include <QSettings>
 
-FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf )
+FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf  )
          : QWidget( _p ), p_intf( _p_intf )
 {
 #ifndef HAVE_MAEMO
-    /**
-     * Ask for the network policy on FIRST STARTUP
-     **/
-    if( getSettings()->value( "IsFirstRun", 1 ).toInt() )
-    {
-        if( config_GetInt( p_intf, "qt-privacy-ask") )
-        {
-            buildPrivDialog();
-            setVisible( true );
-        }
-        else
-            close();
-
-        getSettings()->setValue( "IsFirstRun", 0 );
-    }
+    msg_Dbg( p_intf, "Boring first Run Wizard" );
+    buildPrivDialog();
+    setVisible( true );
 #endif
 }
 

@@ -24,11 +24,24 @@
 #include "qt4.hpp"
 
 #include <QWidget>
+#include <QSettings>
+
 class ConfigControl;
 class FirstRun : public QWidget
 {
     Q_OBJECT
     public:
+        static void CheckAndRun( QWidget *_p, intf_thread_t *p_intf )
+        {
+            if( getSettings()->value( "IsFirstRun", 1 ).toInt() )
+            {
+                if( config_GetInt( p_intf, "qt-privacy-ask") )
+                {
+                    new FirstRun( _p, p_intf );
+                }
+                getSettings()->setValue( "IsFirstRun", 0 );
+            }
+        }
         FirstRun( QWidget *, intf_thread_t * );
     private:
         QList<ConfigControl *> controlsList;

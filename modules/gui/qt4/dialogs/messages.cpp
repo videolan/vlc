@@ -189,6 +189,7 @@ void MessagesDialog::updateConfig()
 {
     config_PutPsz(p_intf, "verbose-objects", qtu(vbobjectsEdit->text()));
     //vbobjectsEdit->setText("vbEdit changed!");
+    msg_Dbg( p_intf, "Here" );
 
     char * psz_verbose_objects = strdup(qtu(vbobjectsEdit->text()));
     msg_EnableObjectPrinting(p_intf, "all");
