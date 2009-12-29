@@ -159,7 +159,7 @@ static int OpenAudio( vlc_object_t *p_this )
 
     const char * const * ppsz_compare = speaker_list;
 
-    msg_Dbg( p_aout, "OpenAudio" );
+    msg_Dbg( p_aout, "Opening DirectSound Audio Output" );
 
    /* Allocate structure */
     p_aout->output.p_sys = malloc( sizeof( aout_sys_t ) );
@@ -1121,11 +1121,10 @@ static void* DirectSoundThread( vlc_object_t *p_this )
 static int CALLBACK CallBackConfigNBEnum( LPGUID p_guid, LPCSTR psz_desc,
                                              LPCSTR psz_mod, LPVOID p_nb )
 {
-    VLC_UNUSED( psz_mod );
-    VLC_UNUSED( psz_desc );
-    VLC_UNUSED( p_guid );
+    VLC_UNUSED( psz_mod ); VLC_UNUSED( psz_desc ); VLC_UNUSED( p_guid );
+
     int * a = (int *)p_nb;
-    *a = *a +1;
+    (*a)++;
     return 1;
 }
 
