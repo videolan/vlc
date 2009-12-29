@@ -172,7 +172,7 @@ void VLCMediaObject::seekInternal(qint64 milliseconds)
 
 QString VLCMediaObject::errorString() const
 {
-    return libvlc_exception_get_message(vlc_exception);
+    return libvlc_errmsg();
 }
 
 bool VLCMediaObject::hasVideo() const
@@ -210,7 +210,7 @@ void VLCMediaObject::connectToAllVLCEvents()
 
 
     // Get event manager from media descriptor object
-    p_vlc_media_event_manager = libvlc_media_event_manager(p_vlc_media, vlc_exception);
+    p_vlc_media_event_manager = libvlc_media_event_manager(p_vlc_media);
     libvlc_event_type_t eventsMedia[] = {
         libvlc_MediaMetaChanged,
         libvlc_MediaSubItemAdded,
@@ -379,40 +379,40 @@ void VLCMediaObject::updateMetaData()
     QMultiMap<QString, QString> metaDataMap;
 
     metaDataMap.insert(QLatin1String("ARTIST"),
-                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Artist, vlc_exception)));
+                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Artist)));
     vlcExceptionRaised();
     metaDataMap.insert(QLatin1String("ALBUM"),
-                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Album, vlc_exception)));
+                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Album)));
     vlcExceptionRaised();
     metaDataMap.insert(QLatin1String("TITLE"),
-                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Title, vlc_exception)));
+                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Title)));
     vlcExceptionRaised();
     metaDataMap.insert(QLatin1String("DATE"),
-                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Date, vlc_exception)));
+                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Date)));
     vlcExceptionRaised();
     metaDataMap.insert(QLatin1String("GENRE"),
-                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Genre, vlc_exception)));
+                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Genre)));
     vlcExceptionRaised();
     metaDataMap.insert(QLatin1String("TRACKNUMBER"),
-                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_TrackNumber, vlc_exception)));
+                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_TrackNumber)));
     vlcExceptionRaised();
     metaDataMap.insert(QLatin1String("DESCRIPTION"),
-                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Description, vlc_exception)));
+                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_Description)));
     vlcExceptionRaised();
     metaDataMap.insert(QLatin1String("COPYRIGHT"),
-                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_TrackNumber, vlc_exception)));
+                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_TrackNumber)));
     vlcExceptionRaised();
     metaDataMap.insert(QLatin1String("URL"),
-                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_URL, vlc_exception)));
+                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_URL)));
     vlcExceptionRaised();
     metaDataMap.insert(QLatin1String("ENCODEDBY"),
-                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_EncodedBy, vlc_exception)));
+                       QString::fromUtf8(libvlc_media_get_meta(p_vlc_media, libvlc_meta_EncodedBy)));
 
     qDebug() << "updateMetaData(): artist:"
-    << libvlc_media_get_meta(p_vlc_media, libvlc_meta_Artist, vlc_exception);
+    << libvlc_media_get_meta(p_vlc_media, libvlc_meta_Artist);
     vlcExceptionRaised();
     qDebug() << "updateMetaData(): title:"
-    << libvlc_media_get_meta(p_vlc_media, libvlc_meta_Title, vlc_exception);
+    << libvlc_media_get_meta(p_vlc_media, libvlc_meta_Title);
     vlcExceptionRaised();
 
     emit metaDataChanged(metaDataMap);

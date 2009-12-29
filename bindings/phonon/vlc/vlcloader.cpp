@@ -93,7 +93,7 @@ void vlcRelease()
 void vlcExceptionRaised()
 {
     if (libvlc_exception_raised(vlc_exception)) {
-        qDebug() << "libvlc exception:" << libvlc_exception_get_message(vlc_exception);
+        qDebug() << "libvlc exception:" << libvlc_errmsg();
         libvlc_exception_clear(vlc_exception);
     }
 }

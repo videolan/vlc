@@ -44,7 +44,6 @@ vlc_install_dir/*
 # Ignore CMake Stuff
 cmake
 CMakeFiles
-CMakeLists.txt
 CTestTestfile.cmake
 cmake_install.cmake
 cmake_uninstall.cmake
