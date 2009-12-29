@@ -89,7 +89,7 @@ SoutDialog::SoutDialog( QWidget *parent, intf_thread_t *_p_intf, const QString& 
 
     /* Misc */
     CB( soutAll );  CS( ttl ); CT( sapName ); CT( sapGroup );
-    CB( localOutput );
+    CB( localOutput ); CB( transcodeBox );
     CONNECT( ui.profileSelect, optionsChanged(), this, updateMRL() );
 
     okButton = new QPushButton( qtr( "&Stream" ) );
