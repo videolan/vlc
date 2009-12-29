@@ -1403,35 +1403,11 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
 static int InheritValue( vlc_object_t *p_this, const char *psz_name,
                          vlc_value_t *p_val, int i_type )
 {
-    int i_var;
-    variable_t *p_var;
-
-    if( p_this->p_parent )
-    {
-        vlc_object_internals_t *p_priv = vlc_internals( p_this->p_parent );
-
-        i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
-        if( i_var >= 0 )
-        {
-            /* We found it! */
-            p_var = &p_priv->p_vars[i_var];
-
-            /* Really get the variable */
-            *p_val = p_var->val;
-
-            /* Duplicate value if needed */
-            p_var->ops->pf_dup( p_val );
-
-            /*msg_Dbg( p_this, "Inherited value for var %s from object %s",
-                     psz_name ? psz_name : "(null)",
-                     p_this->psz_object_name
-                         ? p_this->psz_object_name : "(Unknown)" );*/
+    for( vlc_object_t *obj = p_this; obj != NULL; obj = obj->p_parent )
+        if( var_GetChecked( p_this, psz_name, i_type, p_val ) == VLC_SUCCESS )
             return VLC_SUCCESS;
-        }
-        return InheritValue( p_this->p_parent, psz_name, p_val, i_type );
-    }
-    /* else take value from config */
 
+    /* else take value from config */
     switch( i_type & VLC_VAR_CLASS )
     {
         case VLC_VAR_STRING:
