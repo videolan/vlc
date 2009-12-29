@@ -1423,8 +1423,8 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
 }
 
 /*****************************************************************************
- * InheritValue: try to inherit the value of this variable from the same one
- * in our closest parent, libvlc or ultimately from the configuration.
+ * InheritValue: try to inherit the value of this variable from the closest
+ * ancestor objects or ultimately from the configuration.
  * The function should always be entered with the object var_lock locked.
  *****************************************************************************/
 static int InheritValue( vlc_object_t *p_this, const char *psz_name,
@@ -1433,17 +1433,11 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
     int i_var;
     variable_t *p_var;
 
-    if( p_this->p_parent || ( p_this->p_libvlc && p_this != (vlc_object_t*) p_this->p_libvlc ) )
+    if( p_this->p_parent )
     {
-        vlc_object_internals_t *p_priv;
-
-        if( p_this->p_parent )
-            p_priv = vlc_internals( p_this->p_parent );
-        else
-            p_priv = vlc_internals( p_this->p_libvlc );
+        vlc_object_internals_t *p_priv = vlc_internals( p_this->p_parent );
 
         i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
-
         if( i_var >= 0 )
         {
             /* We found it! */
@@ -1461,12 +1455,9 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
                          ? p_this->psz_object_name : "(Unknown)" );*/
             return VLC_SUCCESS;
         }
-        else if ( p_this->p_parent ) /* We are still not there */
-            return InheritValue( p_this->p_parent, psz_name, p_val, i_type );
-
-        /* else take value from config */
+        return InheritValue( p_this->p_parent, psz_name, p_val, i_type );
     }
-
+    /* else take value from config */
 
     switch( i_type & VLC_VAR_CLASS )
     {
