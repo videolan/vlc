@@ -138,13 +138,13 @@ HTTPDestBox::HTTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
         this );
     layout->addWidget(httpOutput, 0, 0, 1, -1);
 
-    QLabel *HTTPLabel = new QLabel( qtr("Address"), this );
+    QLabel *HTTPLabel = new QLabel( qtr("Path"), this );
     QLabel *HTTPPortLabel = new QLabel( qtr("Port"), this );
-    layout->addWidget(HTTPLabel, 1, 0, 1, 1);
-    layout->addWidget(HTTPPortLabel, 2, 0, 1, 1);
+    layout->addWidget(HTTPLabel, 2, 0, 1, 1);
+    layout->addWidget(HTTPPortLabel, 1, 0, 1, 1);
 
     HTTPEdit = new QLineEdit(this);
-    HTTPEdit->setText( "0.0.0.0" );
+    HTTPEdit->setText( "/" );
 
     HTTPPort = new QSpinBox(this);
     HTTPPort->setMaximumSize(QSize(90, 16777215));
@@ -153,8 +153,8 @@ HTTPDestBox::HTTPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
     HTTPPort->setMaximum(65535);
     HTTPPort->setValue(8080);
 
-    layout->addWidget(HTTPEdit, 1, 1, 1, 1);
-    layout->addWidget(HTTPPort, 2, 1, 1, 1);
+    layout->addWidget(HTTPEdit, 2, 1, 1, 1);
+    layout->addWidget(HTTPPort, 1, 1, 1, 1);
     CS( HTTPPort );
     CT( HTTPEdit );
 }
@@ -163,12 +163,19 @@ QString HTTPDestBox::getMRL( const QString& mux )
 {
     if( HTTPEdit->text().isEmpty() ) return "";
 
+    QString path = HTTPEdit->text();
+    if( path[0] != '/' )
+        path.prepend( qfu("/") );
+    QString port;
+    port.setNum( HTTPPort->value() );
+    QString dst = ":" + port + path;
+
     SoutMrl m;
     m.begin( "std" );
     m.option(  "access", "http" );
     if( !mux.isEmpty() )
         m.option( "mux", mux );
-    m.option( "dst", HTTPEdit->text(), HTTPPort->value() );
+    m.option( "dst", dst );
     m.end();
 
     return m.getMrl();
