@@ -17,8 +17,8 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * along with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 /*****************************************************************************
@@ -580,7 +580,6 @@ static void Play( aout_instance_t *p_aout )
     if( !p_aout->output.p_sys->b_playing )
     {
         aout_buffer_t *p_buffer;
-        int i;
 
         p_aout->output.p_sys->b_playing = 1;
 
@@ -589,7 +588,7 @@ static void Play( aout_instance_t *p_aout )
             aout_FifoFirstDate( p_aout, &p_aout->output.fifo );
 
         /* fill in the first samples */
-        for( i = 0; i < FRAMES_NUM; i++ )
+        for( int i = 0; i < FRAMES_NUM; i++ )
         {
             p_buffer = aout_FifoPop( p_aout, &p_aout->output.fifo );
             if( !p_buffer ) break;
@@ -649,7 +648,8 @@ static int CALLBACK CallBackDirectSoundEnum( LPGUID p_guid, LPCWSTR psz_desc,
     char *psz_device = FromWide( psz_desc );
     msg_Dbg( p_aout, "found device: %s", psz_device );
 
-    if( p_aout->output.p_sys->psz_device && !strcmp(p_aout->output.p_sys->psz_device, psz_device) && p_guid )
+    if( p_aout->output.p_sys->psz_device &&
+        !strcmp(p_aout->output.p_sys->psz_device, psz_device) && p_guid )
     {
         /* Use the device corresponding to psz_device */
         p_aout->output.p_sys->p_device_guid = malloc( sizeof( GUID ) );
@@ -669,7 +669,7 @@ static int CALLBACK CallBackDirectSoundEnum( LPGUID p_guid, LPCWSTR psz_desc,
     }
 
     free( psz_device );
-    return 1;
+    return true;
 }
 
 /*****************************************************************************
@@ -1132,7 +1132,7 @@ static int CALLBACK CallBackConfigNBEnum( LPGUID p_guid, LPCWSTR psz_desc,
 
     int * a = (int *)p_nb;
     (*a)++;
-    return 1;
+    return true;
 }
 
 /*****************************************************************************
@@ -1147,8 +1147,8 @@ static int CALLBACK CallBackConfigEnum( LPGUID p_guid, LPCWSTR psz_desc,
 
     p_item->ppsz_list[p_item->i_list] = FromWide( psz_desc );
     p_item->ppsz_list_text[p_item->i_list] = FromWide( psz_desc );
-    p_item->i_list = p_item->i_list +1;
-    return 1;
+    p_item->i_list++;
+    return true;
 }
 
 /*****************************************************************************
@@ -1178,27 +1178,33 @@ static int ReloadDirectXDevices( vlc_object_t *p_this, char const *psz_name,
     if( hdsound_dll == NULL )
     {
         msg_Warn( p_this, "cannot open DSOUND.DLL" );
+        return VLC_SUCCESS;
     }
 
     /* Get DirectSoundEnumerate */
     OurDirectSoundEnumerate = (void *)
                     GetProcAddress( hdsound_dll, "DirectSoundEnumerateW" );
+
+    if( OurDirectSoundEnumerate == NULL )
+        goto error;
+
     int nb_devices = 0;
     OurDirectSoundEnumerate(CallBackConfigNBEnum, &nb_devices);
     msg_Dbg(p_this,"found %d devices", nb_devices);
 
     p_item->ppsz_list = xrealloc( p_item->ppsz_list,
-                          nb_devices * sizeof(char *) );
+                                  nb_devices * sizeof(char *) );
     p_item->ppsz_list_text = xrealloc( p_item->ppsz_list_text,
-                          nb_devices * sizeof(char *) );
+                                  nb_devices * sizeof(char *) );
 
     p_item->i_list = 0;
     OurDirectSoundEnumerate(CallBackConfigEnum, p_item);
 
-    FreeLibrary(hdsound_dll);
-
     /* Signal change to the interface */
     p_item->b_dirty = true;
+
+error:
+    FreeLibrary(hdsound_dll);
 
     return VLC_SUCCESS;
 }
