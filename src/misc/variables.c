@@ -627,35 +627,6 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             p_val->psz_string = p_var->psz_text ? strdup( p_var->psz_text )
                                                 : NULL;
             break;
-        case VLC_VAR_INHERITVALUE:
-            {
-                vlc_value_t val;
-
-                if( InheritValue( p_this,
-                                  p_val2 ? p_val2->psz_string :  psz_name,
-                                  &val, p_var->i_type )
-                    == VLC_SUCCESS )
-                {
-                    /* Duplicate already done */
-
-                    /* Backup needed stuff */
-                    oldval = p_var->val;
-                    /* Check boundaries and list */
-                    CheckValue( p_var, &val );
-                    /* Set the variable */
-                    p_var->val = val;
-                    /* Free data if needed */
-                    p_var->ops->pf_free( &oldval );
-                }
-
-                if( p_val )
-                {
-                    *p_val = p_var->val;
-                    p_var->ops->pf_dup( p_val );
-                }
-            }
-            break;
-
         case VLC_VAR_SETISCOMMAND:
             p_var->i_type |= VLC_VAR_ISCOMMAND;
             break;

@@ -110,8 +110,6 @@
 #define VLC_VAR_GETLIST             0x0025
 #define VLC_VAR_CHOICESCOUNT        0x0026
 
-#define VLC_VAR_INHERITVALUE        0x0030
-
 #define VLC_VAR_SETISCOMMAND        0x0040
 /**@}*/
 
