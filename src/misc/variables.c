@@ -165,6 +165,25 @@ static int      InheritValue( vlc_object_t *, const char *, vlc_value_t *,
 static int      TriggerCallback( vlc_object_t *, variable_t *, const char *,
                                  vlc_value_t );
 
+static void Destroy( variable_t *p_var )
+{
+    p_var->ops->pf_free( &p_var->val );
+    if( p_var->choices.i_count )
+    {
+        for( int i = 0 ; i < p_var->choices.i_count ; i++ )
+        {
+            p_var->ops->pf_free( &p_var->choices.p_values[i] );
+            free( p_var->choices_text.p_values[i].psz_string );
+        }
+        free( p_var->choices.p_values );
+        free( p_var->choices_text.p_values );
+    }
+    free( p_var->psz_name );
+    free( p_var->psz_text );
+    free( p_var->p_entries );
+    free( p_var );
+}
+
 /**
  * Initialize a vlc variable
  *
@@ -293,19 +312,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
         vlc_mutex_unlock( &p_priv->var_lock );
 
         /* We did not need to create a new variable, free everything... */
-        p_var->ops->pf_free( &p_var->val );
-        free( p_var->psz_name );
-        if( p_var->choices.i_count )
-        {
-            for( int i = 0 ; i < p_var->choices.i_count ; i++ )
-            {
-                p_var->ops->pf_free( &p_var->choices.p_values[i] );
-                free( p_var->choices_text.p_values[i].psz_string );
-            }
-            free( p_var->choices.p_values );
-            free( p_var->choices_text.p_values );
-        }
-        free( p_var );
+        Destroy( p_var );
         return VLC_SUCCESS;
     }
 
@@ -363,27 +370,6 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
         return VLC_SUCCESS;
     }
 
-    /* Free value if needed */
-    p_var->ops->pf_free( &p_var->val );
-
-    /* Free choice list if needed */
-    if( p_var->choices.i_count )
-    {
-        for( i = 0 ; i < p_var->choices.i_count ; i++ )
-        {
-            p_var->ops->pf_free( &p_var->choices.p_values[i] );
-            free( p_var->choices_text.p_values[i].psz_string );
-        }
-        free( p_var->choices.p_values );
-        free( p_var->choices_text.p_values );
-    }
-
-    /* Free callbacks if needed */
-    free( p_var->p_entries );
-
-    free( p_var->psz_name );
-    free( p_var->psz_text );
-
     p_priv->i_vars--;
     memmove( p_priv->pp_vars + i_var,
              p_priv->pp_vars + i_var + 1,
@@ -405,7 +391,7 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
-    free( p_var );
+    Destroy( p_var );
     return VLC_SUCCESS;
 }
 
