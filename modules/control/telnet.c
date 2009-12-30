@@ -171,9 +171,8 @@ static int Open( vlc_object_t *p_this )
 
     msg_Info( p_intf, "using the VLM interface plugin..." );
 
-    i_telnetport = config_GetInt( p_intf, "telnet-port" );
-    psz_address  = config_GetPsz( p_intf, "telnet-host" );
-
+    i_telnetport = var_InheritInteger( p_intf, "telnet-port" );
+    psz_address  = var_InheritString( p_intf, "telnet-host" );
     vlc_UrlParse(&url, psz_address, 0);
     free( psz_address );
 
@@ -247,7 +246,7 @@ static void Run( intf_thread_t *p_intf )
         nlisten++; /* How many listening sockets do we have? */
 
     /* FIXME: make sure config_* is cancel-safe */
-    psz_password = config_GetPsz( p_intf, "telnet-password" );
+    psz_password = var_InheritString( p_intf, "telnet-password" );
     vlc_cleanup_push( free, psz_password );
 
     for( ;; )
