@@ -130,6 +130,10 @@ static const char *const mode_list_text[] = { N_("Text"), "HTML"
   "will be forwarded. Available choices are \"user\" (default), \"daemon\", " \
   "and \"local0\" through \"local7\".")
 
+#define LOGVERBOSE_TEXT N_("Verbosity")
+#define LOGVERBOSE_LONGTEXT N_("Select the verbosity to use for log or -1 to " \
+"use the same verbosity given by --verbose.")
+
 /* First in list is the default facility used. */
 #define DEFINE_SYSLOG_FACILITY \
   DEF( "user",   LOG_USER ), \
@@ -171,7 +175,9 @@ vlc_module_begin ()
                 SYSLOG_FACILITY_LONGTEXT, true )
         change_string_list( fac_name, fac_name, 0 )
 #endif
-
+    add_integer( "log-verbose", -1, NULL, LOGVERBOSE_TEXT, LOGVERBOSE_LONGTEXT,
+           false )
+    
     add_obsolete_string( "rrd-file" )
 
     set_capability( "interface", 0 )
@@ -363,7 +369,9 @@ static void Close( vlc_object_t *p_this )
 static void Overflow (msg_cb_data_t *p_sys, msg_item_t *p_item, unsigned overruns)
 {
     VLC_UNUSED(overruns);
-    int verbosity = var_CreateGetInteger( p_sys->p_intf, "verbose" );
+    int verbosity = var_CreateGetInteger( p_sys->p_intf, "log-verbose" );
+    if (verbosity == -1)
+        verbosity = var_CreateGetInteger( p_sys->p_intf, "verbose" );
     int priority = 0;
 
     switch( p_item->i_type )
