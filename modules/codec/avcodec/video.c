@@ -216,13 +216,13 @@ int InitVideoDec( decoder_t *p_dec, AVCodecContext *p_context,
 
     /*  ***** Get configuration of ffmpeg plugin ***** */
     p_sys->p_context->workaround_bugs =
-        config_GetInt( p_dec, "ffmpeg-workaround-bugs" );
+        var_InheritInteger( p_dec, "ffmpeg-workaround-bugs" );
 #if LIBAVCODEC_VERSION_INT < AV_VERSION_INT( 52, 0, 0 )
     p_sys->p_context->error_resilience =
-        config_GetInt( p_dec, "ffmpeg-error-resilience" );
+        var_InheritInteger( p_dec, "ffmpeg-error-resilience" );
 #else
     p_sys->p_context->error_recognition =
-        config_GetInt( p_dec, "ffmpeg-error-resilience" );
+        var_InheritInteger( p_dec, "ffmpeg-error-resilience" );
 #endif
 
     if( var_CreateGetBool( p_dec, "grayscale" ) )
