@@ -473,7 +473,7 @@ static int OpenFilter( vlc_object_t *p_this )
     }
     if( p_filter->fmt_in.audio.i_physical_channels == (AOUT_CHAN_LEFT|AOUT_CHAN_RIGHT)
           && ( p_filter->fmt_in.audio.i_original_channels & AOUT_CHAN_DOLBYSTEREO )
-          && !config_GetInt( p_filter, "headphone-dolby" ) )
+          && !var_InheritInteger( p_filter, "headphone-dolby" ) )
     {
         b_fit = false;
         p_filter->fmt_in.audio.i_physical_channels = AOUT_CHAN_LEFT | AOUT_CHAN_RIGHT |
