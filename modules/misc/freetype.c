@@ -218,7 +218,7 @@ struct line_desc_t
     uint8_t        *p_fg_bg_ratio; /* 0x00=100% FG --> 0x7F=100% BG */
     bool      b_new_color_mode;
     /** underline information -- only supplied if text should be underlined */
-    uint16_t       *pi_underline_offset;
+    int            *pi_underline_offset;
     uint16_t       *pi_underline_thickness;
 
     int             i_height;
@@ -238,6 +238,7 @@ typedef struct
     bool  b_italic;
     bool  b_bold;
     bool  b_underline;
+    bool  b_through;
     char       *psz_fontname;
 } ft_style_t;
 
@@ -779,8 +780,9 @@ static void UnderlineGlyphYUVA( int i_line_thickness, int i_line_offset, bool b_
             bool b_ok = true;
 
             /* break the underline around the tails of any glyphs which cross it */
+            /* Strikethrough doesn't get broken */
             for( z = x - i_line_thickness;
-                 z < x + i_line_thickness && b_ok;
+                 z < x + i_line_thickness && b_ok && (i_line_offset >= 0);
                  z++ )
             {
                 if( p_next_glyph && ( z >= i_extra ) )
@@ -1165,7 +1167,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         /* Do bidi conversion line-by-line */
         while( pos < i_string_length )
         {
-            while( pos < i_string_length ) 
+            while( pos < i_string_length )
             {
                 i_char = psz_unicode[pos];
                 if (i_char != '\r' && i_char != '\n')
@@ -1364,7 +1366,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
 #ifdef HAVE_FONTCONFIG
 static ft_style_t *CreateStyle( char *psz_fontname, int i_font_size,
         uint32_t i_font_color, uint32_t i_karaoke_bg_color, bool b_bold,
-        bool b_italic, bool b_uline )
+        bool b_italic, bool b_uline, bool b_through )
 {
     ft_style_t  *p_style = malloc( sizeof( ft_style_t ));
 
@@ -1376,6 +1378,7 @@ static ft_style_t *CreateStyle( char *psz_fontname, int i_font_size,
         p_style->b_italic           = b_italic;
         p_style->b_bold             = b_bold;
         p_style->b_underline        = b_uline;
+        p_style->b_through          = b_through;
 
         p_style->psz_fontname = strdup( psz_fontname );
     }
@@ -1401,6 +1404,7 @@ static bool StyleEquals( ft_style_t *s1, ft_style_t *s2 )
     if(( s1->i_font_size  == s2->i_font_size ) &&
        ( s1->i_font_color == s2->i_font_color ) &&
        ( s1->b_italic     == s2->b_italic ) &&
+       ( s1->b_through    == s2->b_through ) &&
        ( s1->b_bold       == s2->b_bold ) &&
        ( s1->b_underline  == s2->b_underline ) &&
        ( !strcmp( s1->psz_fontname, s2->psz_fontname )))
@@ -1467,7 +1471,7 @@ static void IconvText( filter_t *p_filter, const char *psz_string,
 
 static ft_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
         font_stack_t **p_fonts, bool b_bold, bool b_italic,
-        bool b_uline )
+        bool b_uline, bool b_through )
 {
     ft_style_t   *p_style = NULL;
 
@@ -1480,13 +1484,13 @@ static ft_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
                                  &i_font_color, &i_karaoke_bg_color ))
     {
         p_style = CreateStyle( psz_fontname, i_font_size, i_font_color,
-                i_karaoke_bg_color, b_bold, b_italic, b_uline );
+                i_karaoke_bg_color, b_bold, b_italic, b_uline, b_through );
     }
     return p_style;
 }
 
 static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
-                      bool b_uline, int i_karaoke_bgcolor,
+                      bool b_uline, bool b_through, int i_karaoke_bgcolor,
                       line_desc_t *p_line, uint32_t *psz_unicode,
                       int *pi_pen_x, int i_pen_y, int *pi_start,
                       FT_Vector *p_result )
@@ -1563,7 +1567,7 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
             FT_Done_Glyph( tmp_glyph );
             continue;
         }
-        if( b_uline )
+        if( b_uline || b_through )
         {
             float aOffset = FT_FLOOR(FT_MulFix(p_face->underline_position,
                                                p_face->size->metrics.y_scale));
@@ -1574,7 +1578,19 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
                                        ( aOffset < 0 ) ? -aOffset : aOffset;
             p_line->pi_underline_thickness[ i ] =
                                        ( aSize < 0 ) ? -aSize   : aSize;
+            if (b_through)
+            {
+                /* Move the baseline to make it strikethrough instead of
+                 * underline. That means that strikethrough takes precedence
+                 */
+                float aDescent = FT_FLOOR(FT_MulFix(p_face->descender*2,
+                                                    p_face->size->metrics.y_scale));
+
+                p_line->pi_underline_offset[ i ]  -=
+                                       ( aDescent < 0 ) ? -aDescent : aDescent;
+            }
         }
+
         p_line->pp_glyphs[ i ] = (FT_BitmapGlyph)tmp_glyph;
         p_line->p_fg_rgb[ i ] = i_font_color & 0x00ffffff;
         p_line->p_bg_rgb[ i ] = i_karaoke_bgcolor & 0x00ffffff;
@@ -2094,6 +2110,7 @@ static int ProcessLines( filter_t *p_filter,
 
                 if( RenderTag( p_filter, p_face ? p_face : p_sys->p_face,
                                p_style->i_font_color, p_style->b_underline,
+                               p_style->b_through,
                                p_style->i_karaoke_bg_color,
                                p_line, psz_unicode, &i_pen_x, i_pen_y, &i_posn,
                                &tmp_result ) != VLC_SUCCESS )
@@ -2392,13 +2409,14 @@ static void SetupLine( filter_t *p_filter, const char *psz_text_in,
 
 static ft_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
         font_stack_t **p_fonts, bool b_bold, bool b_italic,
-        bool b_uline )
+        bool b_uline, bool b_through )
 {
         VLC_UNUSED(p_sys);
         VLC_UNUSED(p_fonts);
         VLC_UNUSED(b_bold);
         VLC_UNUSED(b_italic);
         VLC_UNUSED(b_uline);
+        VLC_UNUSED(b_through);
         return NULL;
 }
 #endif
@@ -2447,7 +2465,7 @@ static line_desc_t *NewLine( int i_count )
     p_line->p_fg_rgb = malloc( sizeof( uint32_t ) * ( i_count + 1 ) );
     p_line->p_bg_rgb = malloc( sizeof( uint32_t ) * ( i_count + 1 ) );
     p_line->p_fg_bg_ratio = calloc( i_count + 1, sizeof( uint8_t ) );
-    p_line->pi_underline_offset = calloc( i_count + 1, sizeof( uint16_t ) );
+    p_line->pi_underline_offset = calloc( i_count + 1, sizeof( int ) );
     p_line->pi_underline_thickness = calloc( i_count + 1, sizeof( uint16_t ) );
     if( ( p_line->pp_glyphs == NULL ) ||
         ( p_line->p_glyph_pos == NULL ) ||
