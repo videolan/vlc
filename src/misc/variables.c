@@ -1444,7 +1444,6 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
             msg_Warn( p_this, "Could not inherit value for var %s "
                               "from config. Invalid Type", psz_name );
             return VLC_ENOOBJ;
-            break;
     }
     /*msg_Dbg( p_this, "Inherited value for var %s from config", psz_name );*/
     return VLC_SUCCESS;
