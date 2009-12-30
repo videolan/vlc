@@ -98,7 +98,6 @@ static const struct
     const char *psz_shortcut;
     const char *psz_name;
 } pp_shortcuts[] = {
-    { "", "rc" },
     { "luarc", "rc" },
     { "rc", "rc" },
     { "luahotkeys", "hotkeys" },
@@ -151,10 +150,16 @@ int Open_LuaIntf( vlc_object_t *p_this )
     lua_State *L;
 
     config_ChainParse( p_intf, "lua-", ppsz_intf_options, p_intf->p_cfg );
-    char *psz_name = GetModuleName( p_intf );
+    char *psz_name = NULL;
+
+    if( !p_intf->b_force )
+        psz_name = strdup( "rc" );
+    else
+        psz_name = GetModuleName( p_intf );
+        if( !psz_name ) psz_name = strdup( "dummy" );
+
     char *psz_config;
     bool b_config_set = false;
-    if( !psz_name ) psz_name = strdup( "dummy" );
 
     p_intf->p_sys = (intf_sys_t*)malloc( sizeof(intf_sys_t) );
     if( !p_intf->p_sys )
