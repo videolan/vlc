@@ -718,6 +718,55 @@ static inline int __var_ToggleBool( vlc_object_t *p_obj, const char *psz_name )
  * __var_ToggleBool() with automatic casting
  */
 #define var_ToggleBool(a,b) __var_ToggleBool( VLC_OBJECT(a),b )
+
+LIBVLC_USED
+static inline int var_InheritInteger( vlc_object_t *obj, const char *name )
+{
+    vlc_value_t val;
+
+    if( var_Inherit( obj, name, VLC_VAR_INTEGER, &val ) )
+        val.i_int = 0;
+    return val.i_int;
+}
+#define var_InheritInteger(o, n) var_InheritInteger(VLC_OBJECT(o), n)
+
+LIBVLC_USED
+static inline float var_InheritFloat( vlc_object_t *obj, const char *name )
+{
+    vlc_value_t val;
+
+    if( var_Inherit( obj, name, VLC_VAR_FLOAT, &val ) )
+        val.f_float = 0.;
+    return val.f_float;
+}
+#define var_InheritFloat(o, n) var_InheritFloat(VLC_OBJECT(o), n)
+
+LIBVLC_USED LIBVLC_MALLOC
+static inline char *var_InheritString( vlc_object_t *obj, const char *name )
+{
+    vlc_value_t val;
+
+    if( var_Inherit( obj, name, VLC_VAR_STRING, &val ) )
+        val.psz_string = NULL;
+    else if( val.psz_string && !*val.psz_string )
+    {
+        free( val.psz_string );
+        val.psz_string = NULL;
+    }
+    return val.psz_string;
+}
+#define var_InheritString(o, n) var_InheritString(VLC_OBJECT(o), n)
+
+static inline mtime_t var_InheritTime( vlc_object_t *obj, const char *name )
+{
+    vlc_value_t val;
+
+    if( var_Inherit( obj, name, VLC_VAR_TIME, &val ) )
+        val.i_time = 0;
+    return val.i_time;
+}
+#define var_InheritTime(o, n) var_InheritTime(VLC_OBJECT(o), n)
+
 /**
  * @}
  */
