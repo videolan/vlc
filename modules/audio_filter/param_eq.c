@@ -138,22 +138,22 @@ static int Open( vlc_object_t *p_this )
 
     p_filter->pf_audio_filter = DoWork;
 
-    p_sys->f_lowf = config_GetFloat( p_this, "param-eq-lowf");
-    p_sys->f_lowgain = config_GetFloat( p_this, "param-eq-lowgain");
-    p_sys->f_highf = config_GetFloat( p_this, "param-eq-highf");
-    p_sys->f_highgain = config_GetFloat( p_this, "param-eq-highgain");
+    p_sys->f_lowf = var_InheritFloat( p_this, "param-eq-lowf");
+    p_sys->f_lowgain = var_InheritFloat( p_this, "param-eq-lowgain");
+    p_sys->f_highf = var_InheritFloat( p_this, "param-eq-highf");
+    p_sys->f_highgain = var_InheritFloat( p_this, "param-eq-highgain");
  
-    p_sys->f_f1 = config_GetFloat( p_this, "param-eq-f1");
-    p_sys->f_Q1 = config_GetFloat( p_this, "param-eq-q1");
-    p_sys->f_gain1 = config_GetFloat( p_this, "param-eq-gain1");
+    p_sys->f_f1 = var_InheritFloat( p_this, "param-eq-f1");
+    p_sys->f_Q1 = var_InheritFloat( p_this, "param-eq-q1");
+    p_sys->f_gain1 = var_InheritFloat( p_this, "param-eq-gain1");
  
-    p_sys->f_f2 = config_GetFloat( p_this, "param-eq-f2");
-    p_sys->f_Q2 = config_GetFloat( p_this, "param-eq-q2");
-    p_sys->f_gain2 = config_GetFloat( p_this, "param-eq-gain2");
+    p_sys->f_f2 = var_InheritFloat( p_this, "param-eq-f2");
+    p_sys->f_Q2 = var_InheritFloat( p_this, "param-eq-q2");
+    p_sys->f_gain2 = var_InheritFloat( p_this, "param-eq-gain2");
 
-    p_sys->f_f3 = config_GetFloat( p_this, "param-eq-f3");
-    p_sys->f_Q3 = config_GetFloat( p_this, "param-eq-q3");
-    p_sys->f_gain3 = config_GetFloat( p_this, "param-eq-gain3");
+    p_sys->f_f3 = var_InheritFloat( p_this, "param-eq-f3");
+    p_sys->f_Q3 = var_InheritFloat( p_this, "param-eq-q3");
+    p_sys->f_gain3 = var_InheritFloat( p_this, "param-eq-gain3");
  
 
     i_samplerate = p_filter->fmt_in.audio.i_rate;
