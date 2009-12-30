@@ -949,6 +949,12 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
             /* Hide {\stupidity} */
             psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
         }
+        else if( psz_subtitle[0] == '{' && psz_subtitle[1] == 'Y'
+                && psz_subtitle[2] == ':' && strchr( psz_subtitle, '}' ) )
+        {
+            /* Hide {Y:stupidity} */
+            psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
+        }
         else
         {
             *psz_html = *psz_subtitle;
