@@ -113,14 +113,14 @@ int HTTPOpen( access_t *p_access )
         return VLC_SUCCESS;
 
     /* determine SSL configuration */
-    psz_cert = var_GetNonEmptyString( p_access, "dvb-http-intf-cert" );
+    psz_cert = var_InheritString( p_access, "dvb-http-intf-cert" );
     if ( psz_cert != NULL )
     {
         msg_Dbg( p_access, "enabling TLS for HTTP interface (cert file: %s)",
                  psz_cert );
-        psz_key = config_GetPsz( p_access, "dvb-http-intf-key" );
-        psz_ca = config_GetPsz( p_access, "dvb-http-intf-ca" );
-        psz_crl = config_GetPsz( p_access, "dvb-http-intf-crl" );
+        psz_key = var_InheritString( p_access, "dvb-http-intf-key" );
+        psz_ca = var_InheritString( p_access, "dvb-http-intf-ca" );
+        psz_crl = var_InheritString( p_access, "dvb-http-intf-crl" );
 
         if ( i_port <= 0 )
             i_port = 8443;
