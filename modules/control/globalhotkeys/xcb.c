@@ -78,7 +78,7 @@ struct intf_sys_t
     hotkey_mapping_t *p_map;
 };
 
-static void Mapping( intf_thread_t *p_intf );
+static bool Mapping( intf_thread_t *p_intf );
 static void Register( intf_thread_t *p_intf );
 static void Unregister( intf_thread_t *p_intf );
 static void *Thread( void *p_data );
@@ -90,6 +90,7 @@ static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys;
+    int ret = VLC_EGENERIC;
 
     p_intf->p_sys = p_sys = calloc( 1, sizeof(*p_sys) );
     if( !p_sys )
@@ -124,7 +125,12 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys->p_symbols )
         goto error;
 
-    Mapping( p_intf );
+    if( !Mapping( p_intf ) )
+    {
+        ret = VLC_SUCCESS;
+        p_intf->p_sys = NULL; /* for Close() */
+        goto error;
+    }
     Register( p_intf );
 
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
@@ -144,7 +150,7 @@ error:
         xcb_key_symbols_free( p_sys->p_symbols );
     xcb_disconnect( p_sys->p_connection );
     free( p_sys );
-    return VLC_EGENERIC;
+    return ret;
 }
 
 /*****************************************************************************
@@ -154,6 +160,9 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
+
+    if( !p_sys )
+        return; /* if we were running disabled */
 
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
@@ -314,7 +323,7 @@ static xcb_keysym_t GetX11Key( unsigned i_vlc )
     return XK_VoidSymbol;
 }
 
-static void Mapping( intf_thread_t *p_intf )
+static bool Mapping( intf_thread_t *p_intf )
 {
     static const xcb_keysym_t p_x11_modifier_ignored[] = {
         0,
@@ -324,6 +333,7 @@ static void Mapping( intf_thread_t *p_intf )
     };
 
     intf_sys_t *p_sys = p_intf->p_sys;
+    bool active = false;
 
     p_sys->i_map = 0;
     p_sys->p_map = NULL;
@@ -381,8 +391,10 @@ static void Mapping( intf_thread_t *p_intf )
 #endif
             p_map->i_modifier = i_modifier|i_ignored;
             p_map->i_action = i_vlc_action;
+            active = true;
         }
     }
+    return active;
 }
 
 static void Register( intf_thread_t *p_intf )
