@@ -634,7 +634,7 @@ static char *StripTags( char *psz_subtitle )
  * to be carrying style information. Over time people have used them that way.
  * In the absence of specifications from which to work, the tags supported
  * have been restricted to the simple set permitted by the USF DTD, ie. :
- *  Basic: <br>, <i>, <b>, <u>
+ *  Basic: <br>, <i>, <b>, <u>, <s>
  *  Extended: <font>
  *    Attributes: face
  *                family
@@ -728,6 +728,11 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                 HtmlCopy( &psz_html, &psz_subtitle, "<u>" );
                 strcat( psz_tag, "u" );
             }
+            else if( !strncasecmp( psz_subtitle, "<s>", 3 ) )
+            {
+                HtmlCopy( &psz_html, &psz_subtitle, "<s>" );
+                strcat( psz_tag, "s" );
+            }
             else if( !strncasecmp( psz_subtitle, "<font ", 6 ))
             {
                 const char *psz_attribs[] = { "face=", "family=", "size=",
@@ -811,6 +816,10 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                         break;
                     case 'u':
                         b_match = !strncasecmp( psz_subtitle, "</u>", 4 );
+                        i_len   = 4;
+                        break;
+                    case 's':
+                        b_match = !strncasecmp( psz_subtitle, "</s>", 4 );
                         i_len   = 4;
                         break;
                     case 'f':
@@ -999,6 +1008,9 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
                     break;
                 case 'u':
                     HtmlPut( &psz_html, "</u>" );
+                    break;
+                case 's':
+                    HtmlPut( &psz_html, "</s>" );
                     break;
                 case 'f':
                     HtmlPut( &psz_html, "/font>" );
