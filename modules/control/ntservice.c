@@ -188,7 +188,7 @@ static int NTServiceInstall( intf_thread_t *p_intf )
         strcat( psz_path, " --ntservice-extraintf " );
         strcat( psz_path, psz_extra );
         free( psz_extra );
-    }
+    }
 
     psz_extra = var_InheritString( p_intf, "ntservice-options" );
     if( psz_extra && *psz_extra )
