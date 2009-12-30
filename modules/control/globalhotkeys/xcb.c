@@ -80,7 +80,6 @@ struct intf_sys_t
 
 static bool Mapping( intf_thread_t *p_intf );
 static void Register( intf_thread_t *p_intf );
-static void Unregister( intf_thread_t *p_intf );
 static void *Thread( void *p_data );
 
 /*****************************************************************************
@@ -135,7 +134,6 @@ static int Open( vlc_object_t *p_this )
 
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
-        Unregister( p_intf );
 #ifndef XCB_KEYSYM_OLD_API /* as seen in Debian Lenny */
         if( p_sys->p_map )
             free( p_sys->p_map->p_keys );
@@ -167,7 +165,6 @@ static void Close( vlc_object_t *p_this )
     vlc_cancel( p_sys->thread );
     vlc_join( p_sys->thread, NULL );
 
-    Unregister( p_intf );
 #ifndef XCB_KEYSYM_OLD_API /* as seen in Debian Lenny */
     if( p_sys->p_map )
         free( p_sys->p_map->p_keys );
@@ -415,23 +412,6 @@ static void Register( intf_thread_t *p_intf )
                           p_map->i_modifier, p_map->p_keys[j],
                           XCB_GRAB_MODE_ASYNC, XCB_GRAB_MODE_ASYNC );
         }
-#endif
-    }
-}
-static void Unregister( intf_thread_t *p_intf )
-{
-    intf_sys_t *p_sys = p_intf->p_sys;
-
-    for( int i = 0; i < p_sys->i_map; i++ )
-    {
-        const hotkey_mapping_t *p_map = &p_sys->p_map[i];
-#ifdef XCB_KEYSYM_OLD_API /* as seen in Debian Lenny */
-        xcb_ungrab_key( p_sys->p_connection, p_map->i_x11, p_sys->root,
-                p_map->i_modifier );
-#else
-        for( int j = 0; p_map->p_keys[j] != XCB_NO_SYMBOL; j++ )
-            xcb_ungrab_key( p_sys->p_connection, p_map->p_keys[j], p_sys->root,
-                    p_map->i_modifier );
 #endif
     }
 }
