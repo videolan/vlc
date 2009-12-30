@@ -539,7 +539,7 @@ static int OpenBlending( intf_thread_t *p_intf )
             p_intf->p_sys->fmt_out.i_sar_den;
     p_intf->p_sys->p_blend->fmt_out.video.i_chroma =
             p_intf->p_sys->fmt_out.i_chroma;
-    if( config_GetInt( p_intf, "freetype-yuvp" ) )
+    if( var_InheritInteger( p_intf, "freetype-yuvp" ) )
         p_intf->p_sys->p_blend->fmt_in.video.i_chroma =
                 VLC_CODEC_YUVP;
     else
@@ -1056,7 +1056,7 @@ static int OpenDisplay( intf_thread_t *p_intf )
     struct fb_fix_screeninfo    fix_info;     /* framebuffer fix information */
 
     /* Open framebuffer device */
-    if( !(psz_device = config_GetPsz( p_intf, "fbosd-dev" )) )
+    if( !(psz_device = var_InheritString( p_intf, "fbosd-dev" )) )
     {
         msg_Err( p_intf, "don't know which fb osd/overlay device to open" );
         return VLC_EGENERIC;
