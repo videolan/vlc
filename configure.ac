@@ -1303,7 +1303,6 @@ dnl
 dnl Some plugins aren't useful on some platforms
 dnl
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-    VLC_ADD_PLUGIN([screensaver])
     VLC_ADD_PLUGIN([motion])
     VLC_ADD_PLUGIN([dynamicoverlay])
     VLC_ADD_PLUGIN([signals])
@@ -3630,6 +3629,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
   dnl libxcb
   PKG_CHECK_MODULES(XCB, [xcb])
   PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
+  VLC_ADD_PLUGIN([screensaver])
   VLC_ADD_PLUGIN([xcb_x11])
   VLC_ADD_PLUGIN([xcb_screen])
   VLC_ADD_PLUGIN([xcb_apps])
