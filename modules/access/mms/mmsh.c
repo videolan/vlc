@@ -110,19 +110,19 @@ int MMSHOpen( access_t *p_access )
     {
         p_sys->b_proxy = true;
         vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
+        free( psz_proxy );
     }
 #ifdef HAVE_GETENV
     else
     {
-        char *psz_proxy = getenv( "http_proxy" );
-        if( psz_proxy && *psz_proxy )
+        const char *http_proxy = getenv( "http_proxy" );
+        if( http_proxy )
         {
             p_sys->b_proxy = true;
-            vlc_UrlParse( &p_sys->proxy, psz_proxy, 0 );
+            vlc_UrlParse( &p_sys->proxy, http_proxy, 0 );
         }
     }
 #endif
-    free( psz_proxy );
 
     if( p_sys->b_proxy )
     {
