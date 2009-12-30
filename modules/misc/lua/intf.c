@@ -98,6 +98,7 @@ static const struct
     const char *psz_shortcut;
     const char *psz_name;
 } pp_shortcuts[] = {
+    { "", "rc" },
     { "luarc", "rc" },
     { "rc", "rc" },
     { "luahotkeys", "hotkeys" },
