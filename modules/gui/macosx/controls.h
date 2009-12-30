@@ -66,6 +66,7 @@
 - (IBAction)stop:(id)sender;
 - (IBAction)faster:(id)sender;
 - (IBAction)slower:(id)sender;
+- (IBAction)normalSpeed:(id)sender;
 
 - (IBAction)prev:(id)sender;
 - (IBAction)next:(id)sender;

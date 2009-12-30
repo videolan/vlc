@@ -184,6 +184,12 @@
     var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_SLOWER );
 }
 
+- (IBAction)normalSpeed:(id)sender
+{
+    intf_thread_t * p_intf = VLCIntf;
+    var_SetInteger( p_intf->p_libvlc, "key-action", ACTIONID_RATE_NORMAL );
+}
+
 - (IBAction)prev:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
@@ -1016,7 +1022,8 @@
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
     if( [[o_mi title] isEqualToString: _NS("Faster")] ||
-        [[o_mi title] isEqualToString: _NS("Slower")] )
+        [[o_mi title] isEqualToString: _NS("Slower")] ||
+        [[o_mi title] isEqualToString: _NS("Normal rate")] )
     {
         if( p_input != NULL )
         {

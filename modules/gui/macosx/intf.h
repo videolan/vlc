@@ -213,6 +213,7 @@ struct intf_sys_t
     IBOutlet NSMenuItem * o_mi_stop;
     IBOutlet NSMenuItem * o_mi_faster;
     IBOutlet NSMenuItem * o_mi_slower;
+    IBOutlet NSMenuItem * o_mi_normalSpeed;
     IBOutlet NSMenuItem * o_mi_previous;
     IBOutlet NSMenuItem * o_mi_next;
     IBOutlet NSMenuItem * o_mi_random;
