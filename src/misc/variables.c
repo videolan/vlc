@@ -154,15 +154,15 @@ time_ops   = { CmpTime,    DupDummy,  FreeDummy,  };
  *****************************************************************************/
 static int      GetUnused   ( vlc_object_t *, const char * );
 static uint32_t HashString  ( const char * );
-static int      Insert      ( variable_t *, int, const char * );
-static int      InsertInner ( variable_t *, int, uint32_t );
-static int      Lookup      ( variable_t *, size_t, const char * );
+static int      Insert      ( variable_t **, int, const char * );
+static int      InsertInner ( variable_t **, int, uint32_t );
+static int      Lookup      ( variable_t **, size_t, const char * );
 
 static void     CheckValue  ( variable_t *, vlc_value_t * );
 
 static int      InheritValue( vlc_object_t *, const char *, vlc_value_t *,
                               int );
-static int      TriggerCallback( vlc_object_t *, variable_t **, const char *,
+static int      TriggerCallback( vlc_object_t *, variable_t *, const char *,
                                  vlc_value_t );
 
 /**
@@ -179,12 +179,12 @@ static int      TriggerCallback( vlc_object_t *, variable_t **, const char *,
  */
 int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 {
-    variable_t var, *p_var = &var;
     static vlc_list_t dummy_null_list = {0, NULL, NULL};
-
     assert( p_this );
 
-    memset( p_var, 0, sizeof(*p_var) );
+    variable_t *p_var = calloc( 1, sizeof( *p_var ) );
+    if( p_var == NULL )
+        return VLC_ENOMEM;
 
     p_var->i_hash = HashString( psz_name );
     p_var->psz_name = strdup( psz_name );
@@ -274,22 +274,22 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
      * duplicate the lookups. It's not that serious, but if anyone finds some
      * time to rework Insert() so that only one lookup has to be done, feel
      * free to do so. */
-    i_new = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
+    i_new = Lookup( p_priv->pp_vars, p_priv->i_vars, psz_name );
 
     if( i_new >= 0 )
     {
         /* If the types differ, variable creation failed. */
-        if( (i_type & VLC_VAR_CLASS) != (p_priv->p_vars[i_new].i_type & VLC_VAR_CLASS) )
+        if( (i_type & VLC_VAR_CLASS) != (p_priv->pp_vars[i_new]->i_type & VLC_VAR_CLASS) )
         {
             msg_Err( p_this, "Variable '%s' (0x%04x) already exist but with a different type (0x%04x)",
-                     psz_name, p_priv->p_vars[i_new].i_type, i_type );
+                     psz_name, p_priv->pp_vars[i_new]->i_type, i_type );
             vlc_mutex_unlock( &p_priv->var_lock );
             return VLC_EBADVAR;
         }
 
-        p_priv->p_vars[i_new].i_usage++;
-        p_priv->p_vars[i_new].i_type |= ( i_type & VLC_VAR_ISCOMMAND );
-        p_priv->p_vars[i_new].i_type |= ( i_type & VLC_VAR_HASCHOICE );
+        p_priv->pp_vars[i_new]->i_usage++;
+        p_priv->pp_vars[i_new]->i_type |= ( i_type & VLC_VAR_ISCOMMAND );
+        p_priv->pp_vars[i_new]->i_type |= ( i_type & VLC_VAR_HASCHOICE );
         vlc_mutex_unlock( &p_priv->var_lock );
 
         /* We did not need to create a new variable, free everything... */
@@ -305,24 +305,23 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
             free( p_var->choices.p_values );
             free( p_var->choices_text.p_values );
         }
+        free( p_var );
         return VLC_SUCCESS;
     }
 
-    i_new = Insert( p_priv->p_vars, p_priv->i_vars, psz_name );
+    i_new = Insert( p_priv->pp_vars, p_priv->i_vars, psz_name );
 
-    if( (p_priv->i_vars & 15) == 15 )
-    {
-        p_priv->p_vars = xrealloc( p_priv->p_vars,
-                                  (p_priv->i_vars+17) * sizeof(variable_t) );
-    }
+    if( (p_priv->i_vars & 15) == 0 )
+        p_priv->pp_vars = xrealloc( p_priv->pp_vars,
+                                 (p_priv->i_vars+16) * sizeof(variable_t *) );
 
-    memmove( p_priv->p_vars + i_new + 1,
-             p_priv->p_vars + i_new,
-             (p_priv->i_vars - i_new) * sizeof(variable_t) );
+    memmove( p_priv->pp_vars + i_new + 1,
+             p_priv->pp_vars + i_new,
+             (p_priv->i_vars - i_new) * sizeof(variable_t *) );
 
     p_priv->i_vars++;
 
-    p_priv->p_vars[i_new] = var;
+    p_priv->pp_vars[i_new] = p_var;
     vlc_mutex_unlock( &p_priv->var_lock );
 
     return VLC_SUCCESS;
@@ -355,7 +354,7 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
         return i_var;
     }
 
-    p_var = &p_priv->p_vars[i_var];
+    p_var = p_priv->pp_vars[i_var];
 
     if( p_var->i_usage > 1 )
     {
@@ -385,22 +384,28 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
     free( p_var->psz_name );
     free( p_var->psz_text );
 
-    memmove( p_priv->p_vars + i_var,
-             p_priv->p_vars + i_var + 1,
-             (p_priv->i_vars - i_var - 1) * sizeof(variable_t) );
+    p_priv->i_vars--;
+    memmove( p_priv->pp_vars + i_var,
+             p_priv->pp_vars + i_var + 1,
+             (p_priv->i_vars - i_var) * sizeof(variable_t *) );
 
+    if( p_priv->i_vars == 0 )
+    {
+        free( p_priv->pp_vars );
+        p_priv->pp_vars = NULL;
+    }
+    else
     if( (p_priv->i_vars & 15) == 0 )
     {
-        variable_t *p_vars = realloc( p_priv->p_vars,
-                                    (p_priv->i_vars) * sizeof( variable_t ) );
-        if( p_vars )
-            p_priv->p_vars = p_vars;
+        variable_t **pp_vars = realloc( p_priv->pp_vars,
+                                    (p_priv->i_vars) * sizeof(variable_t *) );
+        if( pp_vars != NULL )
+            p_priv->pp_vars = pp_vars;
     }
-
-    p_priv->i_vars--;
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
+    free( p_var );
     return VLC_SUCCESS;
 }
 
@@ -426,7 +431,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
+    i_var = Lookup( p_priv->pp_vars, p_priv->i_vars, psz_name );
 
     if( i_var < 0 )
     {
@@ -434,7 +439,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
         return VLC_ENOVAR;
     }
 
-    p_var = &p_priv->p_vars[i_var];
+    p_var = p_priv->pp_vars[i_var];
 
     switch( i_action )
     {
@@ -672,7 +677,7 @@ int __var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
         return i_var;
     }
 
-    p_var = &p_priv->p_vars[i_var];
+    p_var = p_priv->pp_vars[i_var];
 
     /* Duplicated data if needed */
     //p_var->ops->pf_dup( &val );
@@ -701,7 +706,7 @@ int __var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
 
     /* Deal with callbacks.*/
     if( p_var->i_entries )
-        i_ret = TriggerCallback( p_this, &p_var, psz_name, oldval );
+        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval );
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
@@ -726,7 +731,7 @@ int __var_Type( vlc_object_t *p_this, const char *psz_name )
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
+    i_var = Lookup( p_priv->pp_vars, p_priv->i_vars, psz_name );
 
     if( i_var < 0 )
     {
@@ -734,7 +739,7 @@ int __var_Type( vlc_object_t *p_this, const char *psz_name )
         return 0;
     }
 
-    i_type = p_priv->p_vars[i_var].i_type;
+    i_type = p_priv->pp_vars[i_var]->i_type;
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
@@ -762,7 +767,7 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
         return i_var;
     }
 
-    p_var = &p_priv->p_vars[i_var];
+    p_var = p_priv->pp_vars[i_var];
     assert( expected_type == 0 ||
             (p_var->i_type & VLC_VAR_CLASS) == expected_type );
 
@@ -780,7 +785,7 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
 
     /* Deal with callbacks */
     if( p_var->i_entries )
-        i_ret = TriggerCallback( p_this, &p_var, psz_name, oldval );
+        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval );
 
     /* Free data if needed */
     p_var->ops->pf_free( &oldval );
@@ -813,10 +818,10 @@ int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
+    i_var = Lookup( p_priv->pp_vars, p_priv->i_vars, psz_name );
     if( i_var >= 0 )
     {
-        variable_t *p_var = &p_priv->p_vars[i_var];
+        variable_t *p_var = p_priv->pp_vars[i_var];
 
         assert( expected_type == 0 ||
                 (p_var->i_type & VLC_VAR_CLASS) == expected_type );
@@ -896,7 +901,7 @@ int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
         return i_var;
     }
 
-    p_var = &p_priv->p_vars[i_var];
+    p_var = p_priv->pp_vars[i_var];
 
     INSERT_ELEM( p_var->p_entries,
                  p_var->i_entries,
@@ -936,7 +941,7 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
         return i_var;
     }
 
-    p_var = &p_priv->p_vars[i_var];
+    p_var = p_priv->pp_vars[i_var];
 
     for( i_entry = p_var->i_entries ; i_entry-- ; )
     {
@@ -995,12 +1000,12 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
         return i_var;
     }
 
-    p_var = &p_priv->p_vars[i_var];
+    p_var = p_priv->pp_vars[i_var];
 
     /* Deal with callbacks. Tell we're in a callback, release the lock,
      * call stored functions, retake the lock. */
     if( p_var->i_entries )
-        i_ret = TriggerCallback( p_this, &p_var, psz_name, p_var->val );
+        i_ret = TriggerCallback( p_this, p_var, psz_name, p_var->val );
 
     vlc_mutex_unlock( &p_priv->var_lock );
     return i_ret;
@@ -1171,13 +1176,13 @@ static int GetUnused( vlc_object_t *p_this, const char *psz_name )
     {
         int i_var;
 
-        i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
+        i_var = Lookup( p_priv->pp_vars, p_priv->i_vars, psz_name );
         if( i_var < 0 )
         {
             return VLC_ENOVAR;
         }
 
-        if( ! p_priv->p_vars[i_var].b_incallback )
+        if( ! p_priv->pp_vars[i_var]->b_incallback )
         {
             return i_var;
         }
@@ -1217,26 +1222,26 @@ static uint32_t HashString( const char *psz_string )
  * to see how we handle them.
  * XXX: does this really need to be written recursively?
  *****************************************************************************/
-static int Insert( variable_t *p_vars, int i_count, const char *psz_name )
+static int Insert( variable_t **pp_vars, int i_count, const char *psz_name )
 {
     if( i_count == 0 )
     {
         return 0;
     }
 
-    return InsertInner( p_vars, i_count, HashString( psz_name ) );
+    return InsertInner( pp_vars, i_count, HashString( psz_name ) );
 }
 
-static int InsertInner( variable_t *p_vars, int i_count, uint32_t i_hash )
+static int InsertInner( variable_t **pp_vars, int i_count, uint32_t i_hash )
 {
     int i_middle;
 
-    if( i_hash <= p_vars[0].i_hash )
+    if( i_hash <= pp_vars[0]->i_hash )
     {
         return 0;
     }
 
-    if( i_hash >= p_vars[i_count - 1].i_hash )
+    if( i_hash >= pp_vars[i_count - 1]->i_hash )
     {
         return i_count;
     }
@@ -1244,15 +1249,15 @@ static int InsertInner( variable_t *p_vars, int i_count, uint32_t i_hash )
     i_middle = i_count / 2;
 
     /* We know that 0 < i_middle */
-    if( i_hash < p_vars[i_middle].i_hash )
+    if( i_hash < pp_vars[i_middle]->i_hash )
     {
-        return InsertInner( p_vars, i_middle, i_hash );
+        return InsertInner( pp_vars, i_middle, i_hash );
     }
 
     /* We know that i_middle + 1 < i_count */
-    if( i_hash > p_vars[i_middle + 1].i_hash )
+    if( i_hash > pp_vars[i_middle + 1]->i_hash )
     {
-        return i_middle + 1 + InsertInner( p_vars + i_middle + 1,
+        return i_middle + 1 + InsertInner( pp_vars + i_middle + 1,
                                            i_count - i_middle - 1,
                                            i_hash );
     }
@@ -1262,12 +1267,12 @@ static int InsertInner( variable_t *p_vars, int i_count, uint32_t i_hash )
 
 static int u32cmp( const void *key, const void *data )
 {
-    const variable_t *p_var = data;
+    const variable_t *const *pp_var = data;
     uint32_t hash = *(const uint32_t *)key ;
 
-    if( hash > p_var->i_hash )
+    if( hash > (*pp_var)->i_hash )
         return 1;
-    if( hash < p_var->i_hash )
+    if( hash < (*pp_var)->i_hash )
         return -1;
     return 0;
 }
@@ -1278,35 +1283,35 @@ static int u32cmp( const void *key, const void *data )
  * We use a recursive inner function indexed on the hash. Care is taken of
  * possible hash collisions.
  *****************************************************************************/
-static int Lookup( variable_t *p_vars, size_t i_count, const char *psz_name )
+static int Lookup( variable_t **pp_vars, size_t i_count, const char *psz_name )
 {
-    variable_t *p_var;
+    variable_t **pp_var;
     uint32_t i_hash;
 
     i_hash = HashString( psz_name );
-    p_var = bsearch( &i_hash, p_vars, i_count, sizeof( *p_var ), u32cmp );
+    pp_var = bsearch( &i_hash, pp_vars, i_count, sizeof( *pp_var ), u32cmp );
 
     /* Hash not found */
-    if( p_var == NULL )
+    if( pp_var == NULL )
         return -1;
 
     assert( i_count > 0 );
 
     /* Find the first entry with the right hash */
-    while( (p_var > p_vars) && (i_hash == p_var[-1].i_hash) )
-        p_var--;
+    while( (pp_var > pp_vars) && (i_hash == pp_var[-1]->i_hash) )
+        pp_var--;
 
-    assert( p_var->i_hash == i_hash );
+    assert( (*pp_var)->i_hash == i_hash );
 
     /* Hash collision should be very unlikely, but we cannot guarantee
      * it will never happen. So we do an exhaustive search amongst all
      * entries with the same hash. Typically, there is only one anyway. */
-    for( variable_t *p_end = p_vars + i_count;
-         (p_var < p_end) && (i_hash == p_var->i_hash);
-         p_var++ )
+    for( variable_t **p_end = pp_vars + i_count;
+         (pp_var < p_end) && (i_hash == (*pp_var)->i_hash);
+         pp_var++ )
     {
-        if( !strcmp( psz_name, p_var->psz_name ) )
-            return p_var - p_vars;
+        if( !strcmp( psz_name, (*pp_var)->psz_name ) )
+            return pp_var - pp_vars;
     }
 
     /* Hash found, but entry not found */
@@ -1469,41 +1474,31 @@ static int InheritValue( vlc_object_t *p_this, const char *psz_name,
  * Tell we're in a callback, release the lock, call stored functions,
  * retake the lock.
  **********************************************************************/
-static int TriggerCallback( vlc_object_t *p_this, variable_t **pp_var,
+static int TriggerCallback( vlc_object_t *p_this, variable_t *p_var,
                             const char *psz_name, vlc_value_t oldval )
 {
-    int i_var;
-    int i_entries = (*pp_var)->i_entries;
-    callback_entry_t *p_entries = (*pp_var)->p_entries;
+    int i_entries = p_var->i_entries;
+    callback_entry_t *p_entries = p_var->p_entries;
 
     assert( p_this );
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
-    (*pp_var)->b_incallback = true;
+    p_var->b_incallback = true;
     vlc_mutex_unlock( &p_priv->var_lock );
 
     /* The real calls */
     for( ; i_entries-- ; )
     {
-        p_entries[i_entries].pf_callback( p_this, psz_name, oldval, (*pp_var)->val,
+        p_entries[i_entries].pf_callback( p_this, psz_name, oldval, p_var->val,
                                           p_entries[i_entries].p_data );
     }
 
     vlc_mutex_lock( &p_priv->var_lock );
+    p_var->b_incallback = false;
+    vlc_cond_broadcast( &p_priv->var_wait );
 
-    i_var = Lookup( p_priv->p_vars, p_priv->i_vars, psz_name );
-    if( i_var < 0 )
-    {
-        msg_Err( p_this, "variable %s has disappeared", psz_name );
-        return VLC_ENOVAR;
-     }
-
-     *pp_var = &p_priv->p_vars[i_var];
-     (*pp_var)->b_incallback = false;
-     vlc_cond_broadcast( &p_priv->var_wait );
-
-     return VLC_SUCCESS;
+    return VLC_SUCCESS;
 }
 
 

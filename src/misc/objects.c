@@ -131,13 +131,7 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_new->i_flags = p_this->i_flags
             & (OBJECT_FLAGS_NODBG|OBJECT_FLAGS_QUIET|OBJECT_FLAGS_NOINTERACT);
 
-    p_priv->p_vars = calloc( 16, sizeof( variable_t ) );
-
-    if( !p_priv->p_vars )
-    {
-        free( p_priv );
-        return NULL;
-    }
+    p_priv->pp_vars = NULL;
 
     if( p_this == NULL )
     {
@@ -291,10 +285,9 @@ static void vlc_object_destroy( vlc_object_t *p_this )
      * no memmove calls have to be done. */
     while( p_priv->i_vars )
     {
-        var_Destroy( p_this, p_priv->p_vars[p_priv->i_vars - 1].psz_name );
+        var_Destroy( p_this, p_priv->pp_vars[p_priv->i_vars - 1]->psz_name );
     }
 
-    free( p_priv->p_vars );
     vlc_cond_destroy( &p_priv->var_wait );
     vlc_mutex_destroy( &p_priv->var_lock );
 
@@ -822,7 +815,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
             printf( " `-o No variables\n" );
         for( i = 0; i < vlc_internals( p_object )->i_vars; i++ )
         {
-            variable_t *p_var = vlc_internals( p_object )->p_vars + i;
+            const variable_t *p_var = vlc_internals( p_object )->pp_vars[i];
             const char *psz_type = "unknown";
 
             switch( p_var->i_type & VLC_VAR_TYPE )
