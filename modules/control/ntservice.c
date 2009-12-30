@@ -134,17 +134,17 @@ static void Run( intf_thread_t *p_intf )
     int canc = vlc_savecancel();
     p_global_intf = p_intf;
     p_intf->p_sys = &sys;
-    p_intf->p_sys->psz_service = config_GetPsz( p_intf, "ntservice-name" );
+    p_intf->p_sys->psz_service = var_InheritString( p_intf, "ntservice-name" );
     p_intf->p_sys->psz_service = p_intf->p_sys->psz_service ?
         p_intf->p_sys->psz_service : strdup(VLCSERVICENAME);
 
-    if( config_GetInt( p_intf, "ntservice-install" ) )
+    if( var_InheritInteger( p_intf, "ntservice-install" ) )
     {
         NTServiceInstall( p_intf );
         return;
     }
 
-    if( config_GetInt( p_intf, "ntservice-uninstall" ) )
+    if( var_InheritInteger( p_intf, "ntservice-uninstall" ) )
     {
         NTServiceUninstall( p_intf );
         return;
@@ -182,21 +182,21 @@ static int NTServiceInstall( intf_thread_t *p_intf )
     GetModuleFileName( NULL, psz_pathtmp, MAX_PATH );
     sprintf( psz_path, "\"%s\" -I "MODULE_STRING, psz_pathtmp );
 
-    psz_extra = config_GetPsz( p_intf, "ntservice-extraintf" );
-    if( psz_extra && *psz_extra )
+    psz_extra = var_InheritString( p_intf, "ntservice-extraintf" );
+    if( psz_extra )
     {
         strcat( psz_path, " --ntservice-extraintf " );
         strcat( psz_path, psz_extra );
-    }
-    free( psz_extra );
+        free( psz_extra );
+    }
 
-    psz_extra = config_GetPsz( p_intf, "ntservice-options" );
+    psz_extra = var_InheritString( p_intf, "ntservice-options" );
     if( psz_extra && *psz_extra )
     {
         strcat( psz_path, " " );
         strcat( psz_path, psz_extra );
+        free( psz_extra );
     }
-    free( psz_extra );
 
     SC_HANDLE service =
         CreateService( handle, p_sys->psz_service, p_sys->psz_service,
@@ -293,7 +293,7 @@ static void WINAPI ServiceDispatch( DWORD numArgs, char **args )
     /*
      * Load background interfaces
      */
-    psz_modules = config_GetPsz( p_intf, "ntservice-extraintf" );
+    psz_modules = var_InheritString( p_intf, "ntservice-extraintf" );
     psz_parser = psz_modules;
     while( psz_parser && *psz_parser )
     {
