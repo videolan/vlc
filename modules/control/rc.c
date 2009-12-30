@@ -739,8 +739,8 @@ static void Run( intf_thread_t *p_intf )
         }
         else if( !strcmp( psz_cmd, "key" ) || !strcmp( psz_cmd, "hotkey" ) )
         {
-            var_SetInteger( p_intf->p_libvlc, "key-pressed",
-                            config_GetInt( p_intf, psz_arg ) );
+            var_SetInteger( p_intf->p_libvlc, "key-action",
+                            vlc_GetActionId( psz_arg ) );
         }
         else switch( psz_cmd[0] )
         {
