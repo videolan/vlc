@@ -251,7 +251,7 @@ static void Probe( aout_instance_t * p_aout,
             text.psz_string = (char*)N_("A/52 over S/PDIF");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
-            if( config_GetInt( p_aout, "spdif" ) )
+            if( var_InheritInteger( p_aout, "spdif" ) )
                 var_Set( p_aout, "audio-device", val );
 
             snd_pcm_close( p_sys->p_snd_pcm );
@@ -330,7 +330,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Get device name */
-    if( (psz_device = config_GetPsz( p_aout, "alsa-audio-device" )) == NULL )
+    if( (psz_device = var_InheritString( p_aout, "alsa-audio-device" )) == NULL )
     {
         msg_Err( p_aout, "no audio device given (maybe \"default\" ?)" );
         dialog_Fatal( p_aout, _("No Audio Device"), "%s",
