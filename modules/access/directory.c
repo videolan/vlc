@@ -238,6 +238,7 @@ static bool has_inode_loop (const directory_t *dir)
         if ((dir->st.st_dev == dev) && (dir->st.st_ino == inode))
             return true;
 #else
+# undef fstat
 # define fstat( fd, st ) (0)
     VLC_UNUSED( dir );
 #endif
