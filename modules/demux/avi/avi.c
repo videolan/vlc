@@ -267,7 +267,8 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_demux = Demux_Seekable;
 
     /* For unseekable stream, automaticaly use Demux_UnSeekable */
-    if( !p_sys->b_seekable || config_GetInt( p_demux, "avi-interleaved" ) )
+    if( !p_sys->b_seekable
+     || var_InheritInteger( p_demux, "avi-interleaved" ) )
     {
         p_demux->pf_demux = Demux_UnSeekable;
     }
@@ -654,7 +655,7 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    i_do_index =  config_GetInt( p_demux, "avi-index" );
+    i_do_index = var_InheritInteger( p_demux, "avi-index" );
     if( i_do_index == 1 ) /* Always fix */
     {
 aviindex:
