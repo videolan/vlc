@@ -96,9 +96,14 @@ struct intf_sys_t
 
     vlc_mutex_t lock;
     vlc_cond_t wait;
+    bool is_hidding_noaction_dialogs;
 };
 
 
+#define T_HIDE_NOACTION N_("Hide no user action dialogs")
+#define LT_HIDE_NOACTION N_("Don't display dialogs that don't require user action (Critical and error panel).")
+
+#define prefix "macosx-dialog-provider"
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -110,6 +115,13 @@ vlc_module_begin()
     add_shortcut("miosx")
     set_description("Minimal Mac OS X Dialog Provider")
     set_capability("interface", 0)
+
+    /* This setting is interesting, because when used with a libvlc app
+     * it's almost certain that the client program will display error by
+     * itself. Moreover certain action might end up in an error, but 
+     * the client wants to ignored them completely. */
+    add_bool(prefix "hide-no-user-action-dialogs", true, NULL, T_HIDE_NOACTION, LT_HIDE_NOACTION, false)
+
     set_callbacks(OpenIntf, CloseIntf)
     set_category(CAT_INTERFACE)
     set_subcategory(SUBCAT_INTERFACE_MAIN)
@@ -130,11 +142,18 @@ int OpenIntf(vlc_object_t *p_this)
 
     p_intf->p_sys->displayer = [[VLCDialogDisplayer alloc] init];
 
+    bool hide = var_CreateGetBool(p_intf, prefix "hide-no-user-action-dialogs");
+    p_intf->p_sys->is_hidding_noaction_dialogs = hide;
+
     /* subscribe to various interactive dialogues */
-    var_Create(p_intf,"dialog-error",VLC_VAR_ADDRESS);
-    var_AddCallback(p_intf,"dialog-error",DisplayError,p_intf);
-    var_Create(p_intf,"dialog-critical",VLC_VAR_ADDRESS);
-    var_AddCallback(p_intf,"dialog-critical",DisplayCritical,p_intf);
+    
+    if (!hide)
+    {
+        var_Create(p_intf,"dialog-error",VLC_VAR_ADDRESS);
+        var_AddCallback(p_intf,"dialog-error",DisplayError,p_intf);
+        var_Create(p_intf,"dialog-critical",VLC_VAR_ADDRESS);
+        var_AddCallback(p_intf,"dialog-critical",DisplayCritical,p_intf);        
+    }
     var_Create(p_intf,"dialog-login",VLC_VAR_ADDRESS);
     var_AddCallback(p_intf,"dialog-login",DisplayLogin,p_intf);
     var_Create(p_intf,"dialog-question",VLC_VAR_ADDRESS);
@@ -142,7 +161,7 @@ int OpenIntf(vlc_object_t *p_this)
     var_Create(p_intf,"dialog-progress-bar",VLC_VAR_ADDRESS);
     var_AddCallback(p_intf,"dialog-progress-bar",DisplayProgressPanelAction,p_intf);
     dialog_Register(p_intf);
-    
+
     msg_Dbg(p_intf,"Mac OS X dialog provider initialised");
     
     return VLC_SUCCESS;
@@ -157,8 +176,12 @@ void CloseIntf(vlc_object_t *p_this)
 
     /* unsubscribe from the interactive dialogues */
     dialog_Unregister(p_intf);
-    var_DelCallback(p_intf,"dialog-error",DisplayError,p_intf);
-    var_DelCallback(p_intf,"dialog-critical",DisplayCritical,p_intf);
+    
+    if (!p_intf->p_sys->is_hidding_noaction_dialogs)
+    {
+        var_DelCallback(p_intf,"dialog-error",DisplayError,p_intf);
+        var_DelCallback(p_intf,"dialog-critical",DisplayCritical,p_intf);
+    }
     var_DelCallback(p_intf,"dialog-login",DisplayLogin,p_intf);
     var_DelCallback(p_intf,"dialog-question",DisplayQuestion,p_intf);
     var_DelCallback(p_intf,"dialog-progress-bar",DisplayProgressPanelAction,p_intf);
