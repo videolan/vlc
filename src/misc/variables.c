@@ -345,7 +345,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
  */
 int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 {
-    int i_var, i;
+    int i_var;
     variable_t *p_var;
 
     assert( p_this );
