@@ -143,6 +143,8 @@ if test "${ACTION}" = "build"; then
         ln -sf Versions/Current/${include} .
         ln -sf Versions/Current/${share} .
         ln -sf Versions/Current/bin .
+        ln -sf ../modules Versions/Current/bin
+        ln -sf ../share Versions/Current/bin
 
         popd > /dev/null
     fi
