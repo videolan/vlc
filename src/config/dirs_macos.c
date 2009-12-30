@@ -22,6 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <CoreFoundation/CoreFoundation.h>
+
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
@@ -31,6 +33,7 @@
 #include "../libvlc.h"
 #include <vlc_charset.h>
 #include <vlc_configuration.h>
+#include "configuration.h"
 
 static char *configdir = NULL;
 static char *datadir = NULL;
@@ -65,21 +68,50 @@ static char *config_GetHomeDir (void)
     return FromLocaleDup (home);
 }
 
-char *config_GetUserDir (vlc_userdir_t type)
+static char *getAppDependentDir(vlc_userdir_t type)
 {
-    char *psz_dir;
-    char *psz_parent = config_GetHomeDir ();
     const char *psz_path;
-
     switch (type)
     {
         case VLC_CONFIG_DIR:
-            psz_path = "%s/Library/Preferences/VLC";
+            psz_path = "%s/Library/Preferences/%s";
             break;
         case VLC_TEMPLATES_DIR:
         case VLC_DATA_DIR:
-            psz_path = "%s/Library/Application Support/VLC";
+            psz_path = "%s/Library/Application Support/%s";
             break;
+        case VLC_CACHE_DIR:
+            psz_path = "%s/Library/Caches/%s";
+            break;
+        default:
+            assert(0);
+            break;
+    }
+
+    CFBundleRef mainBundle = CFBundleGetMainBundle();
+    CFStringRef identifierAsNS = CFBundleGetIdentifier(mainBundle);
+    const char *identifier = CFStringGetCStringPtr(identifierAsNS, kCFStringEncodingUTF8);
+    
+    char *psz_parent = config_GetHomeDir ();
+    char *psz_dir;
+    if( asprintf( &psz_dir, psz_path, psz_parent, identifier) == -1 )
+        psz_dir = NULL;
+    free(psz_parent);
+
+    return psz_dir;    
+}
+
+char *config_GetUserDir (vlc_userdir_t type)
+{
+    const char *psz_path;
+    switch (type)
+    {
+        case VLC_CONFIG_DIR:
+        case VLC_TEMPLATES_DIR:
+        case VLC_DATA_DIR:
+        case VLC_CACHE_DIR:
+            return getAppDependentDir(type);
+
         case VLC_DESKTOP_DIR:
             psz_path = "%s/Desktop";
             break;
@@ -101,13 +133,12 @@ char *config_GetUserDir (vlc_userdir_t type)
         case VLC_PUBLICSHARE_DIR:
             psz_path = "%s/Public";
             break;
-        case VLC_CACHE_DIR:
-            psz_path = "%s/Library/Caches/org.videolan.vlc";
-            break;
         case VLC_HOME_DIR:
         default:
             psz_path = "%s";
     }
+    char *psz_parent = config_GetHomeDir ();
+    char *psz_dir;
     if( asprintf( &psz_dir, psz_path, psz_parent ) == -1 )
         psz_dir = NULL;
     free(psz_parent);
