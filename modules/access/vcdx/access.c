@@ -546,7 +546,7 @@ VCDParse( access_t * p_access, /*out*/ vcdinfo_itemid_t * p_itemid,
     char        *psz_source;
     char        *psz_next;
 
-    if( config_GetInt( p_access, MODULE_STRING "-PBC" ) ) {
+    if( var_InheritInteger( p_access, MODULE_STRING "-PBC" ) ) {
       p_itemid->type = VCDINFO_ITEM_TYPE_LID;
       p_itemid->num = 1;
       *play_single_item = false;
@@ -628,11 +628,10 @@ VCDParse( access_t * p_access, /*out*/ vcdinfo_itemid_t * p_itemid,
         /* No source specified, so figure it out. */
         if( !p_access->psz_access ) return NULL;
 
-        psz_source = config_GetPsz( p_access, "vcd" );
+        psz_source = var_InheritString( p_access, "vcd" );
 
-        if( !psz_source || 0==strlen(psz_source) )
+        if( !psz_source )
         {
-            free( psz_source );
             /* Scan for a CD-ROM drive with a VCD in it. */
             char **cd_drives = cdio_get_devices_with_cap(NULL,
                                        (CDIO_FS_ANAL_SVCD|CDIO_FS_ANAL_CVD
@@ -868,7 +867,7 @@ VCDOpen ( vlc_object_t *p_this )
     if( p_vcdplayer == NULL )
         return VLC_ENOMEM;
 
-    p_vcdplayer->i_debug = config_GetInt( p_this, MODULE_STRING "-debug" );
+    p_vcdplayer->i_debug = var_InheritInteger( p_this, MODULE_STRING "-debug" );
     p_access->p_sys = (access_sys_t *) p_vcdplayer;
 
     /* Set where to log errors messages from libcdio. */
@@ -888,9 +887,9 @@ VCDOpen ( vlc_object_t *p_this )
                psz_source, p_access->psz_path );
 
     p_vcdplayer->psz_source        = strdup(psz_source);
-    p_vcdplayer->i_blocks_per_read = config_GetInt( p_this, MODULE_STRING
+    p_vcdplayer->i_blocks_per_read = var_InheritInteger( p_this, MODULE_STRING
                                                     "-blocks-per-read" );
-    p_vcdplayer->b_track_length    = config_GetInt( p_this, MODULE_STRING
+    p_vcdplayer->b_track_length    = var_InheritInteger( p_this, MODULE_STRING
                                                     "-track-length" );
     p_vcdplayer->in_still          = false;
     p_vcdplayer->play_item.type    = VCDINFO_ITEM_TYPE_NOTFOUND;

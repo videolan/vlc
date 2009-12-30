@@ -139,7 +139,7 @@ VCDMetaInfo( access_t *p_access, /*const*/ char *psz_mrl )
 
   if ( CDIO_INVALID_TRACK != i_track )
   {
-    char *psz_tfmt = config_GetPsz( p_access, MODULE_STRING "-title-format" );
+    char *psz_tfmt = var_InheritString( p_access, MODULE_STRING "-title-format" );
     char *psz_name = VCDFormatStr( p_vcdplayer, psz_tfmt, psz_mrl,
                                                   &(p_vcdplayer->play_item) );
     free( psz_tfmt );
@@ -309,15 +309,18 @@ VCDUpdateTitle( access_t *p_access )
     if( psz_mrl )
     {
         char *psz_name;
-        char *psz_tfmt = config_GetPsz( p_access, MODULE_STRING "-title-format" );
+        char *psz_tfmt = var_InheritString( p_access, MODULE_STRING "-title-format" );
         snprintf( psz_mrl, psz_mrl_max, "%s%s",
                   VCD_MRL_PREFIX, p_vcdplayer->psz_source );
-        psz_name = VCDFormatStr( p_vcdplayer, psz_tfmt, psz_mrl,
-                                 &(p_vcdplayer->play_item) );
-        free(psz_tfmt);
+        if( psz_tfmt )
+        {
+            psz_name = VCDFormatStr( p_vcdplayer, psz_tfmt, psz_mrl,
+                                     &(p_vcdplayer->play_item) );
+            free(psz_tfmt);
+            input_Control( p_vcdplayer->p_input, INPUT_SET_NAME, psz_name );
+            free(psz_name);
+        }
         free(psz_mrl);
-        input_Control( p_vcdplayer->p_input, INPUT_SET_NAME, psz_name );
-        free(psz_name);
     }
 }
 
