@@ -426,7 +426,7 @@ static int Open( vlc_object_t *p_this )
              "fl32" );
 
     p_sys->ms_stride       = var_InheritInteger( p_this, "scaletempo-stride" );
-    p_sys->percent_overlap = var_InheritInteger( p_this, "scaletempo-overlap" );
+    p_sys->percent_overlap = var_InheritFloat( p_this, "scaletempo-overlap" );
     p_sys->ms_search       = var_InheritInteger( p_this, "scaletempo-search" );
 
     msg_Dbg( p_this, "params: %i stride, %.3f overlap, %i search",
