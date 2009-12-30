@@ -43,7 +43,9 @@ static pthread_once_t once = PTHREAD_ONCE_INIT;
 static void init_dirs( void )
 {
     configdir = config_GetUserDir(VLC_CONFIG_DIR);
-    datadir = config_GetUserDir(VLC_DATA_DIR);
+    int ret = asprintf(&datadir, "%s/share", psz_vlcpath);
+    if (ret == -1)
+        datadir = NULL;
 }
 
 const char *config_GetConfDir( void )
