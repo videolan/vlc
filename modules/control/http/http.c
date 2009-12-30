@@ -140,8 +140,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_handlers = 0;
     p_sys->pp_handlers = NULL;
 #if defined( HAVE_FORK ) || defined( WIN32 )
-    psz_src = config_GetPsz( p_intf, "http-handlers" );
-    if( psz_src != NULL && *psz_src )
+    psz_src = var_InheritString( p_intf, "http-handlers" );
+    if( psz_src != NULL )
     {
         char *p = psz_src;
         while( p != NULL )
@@ -175,19 +175,19 @@ static int Open( vlc_object_t *p_this )
 
             TAB_APPEND( p_sys->i_handlers, p_sys->pp_handlers, p_handler );
         }
+        free( psz_src );
     }
-    free( psz_src );
 #endif
 
     /* determine SSL configuration */
-    psz_cert = config_GetPsz( p_intf, "http-intf-cert" );
+    psz_cert = var_InheritString( p_intf, "http-intf-cert" );
     if ( psz_cert != NULL )
     {
         msg_Dbg( p_intf, "enabling TLS for HTTP interface (cert file: %s)",
                  psz_cert );
-        psz_key = var_GetNonEmptyString( p_intf, "http-intf-key" );
-        psz_ca = var_GetNonEmptyString( p_intf, "http-intf-ca" );
-        psz_crl = var_GetNonEmptyString( p_intf, "http-intf-crl" );
+        psz_key = var_InheritString( p_intf, "http-intf-key" );
+        psz_ca = var_InheritString( p_intf, "http-intf-ca" );
+        psz_crl = var_InheritString( p_intf, "http-intf-crl" );
 
         if( i_port <= 0 )
             i_port = 8443;
@@ -229,8 +229,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_files  = 0;
     p_sys->pp_files = NULL;
 
-    psz_src = config_GetPsz( p_intf, "http-src" );
-    if( ( psz_src == NULL ) || ( *psz_src == '\0' ) )
+    psz_src = var_InheritString( p_intf, "http-src" );
+    if( psz_src == NULL )
     {
         char *data_path = config_GetDataDir( p_intf );
         if( asprintf( &psz_src, "%s" DIR_SEP "http", data_path ) == -1 )
@@ -238,7 +238,7 @@ static int Open( vlc_object_t *p_this )
         free( data_path );
     }
 
-    if( !psz_src || *psz_src == '\0' )
+    if( psz_src == NULL )
     {
         msg_Err( p_intf, "invalid web interface source directory" );
         goto failed;
@@ -260,7 +260,7 @@ static int Open( vlc_object_t *p_this )
 
     free( psz_src );
 
-    if( config_GetInt( p_intf, "http-album-art" ) )
+    if( var_InheritInteger( p_intf, "http-album-art" ) )
     {
         /* FIXME: we're leaking h */
         httpd_handler_sys_t *h = malloc( sizeof( httpd_handler_sys_t ) );
