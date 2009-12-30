@@ -186,10 +186,10 @@ static int Open( vlc_object_t *p_this )
     }
 
     /* Auto connect ports if we were asked to */
-    if( config_GetInt( p_aout, AUTO_CONNECT_OPTION ) )
+    if( var_InheritInteger( p_aout, AUTO_CONNECT_OPTION ) )
     {
         unsigned int i_in_ports;
-        char *psz_regex = config_GetPsz( p_aout, CONNECT_REGEX_OPTION );
+        char *psz_regex = var_InheritString( p_aout, CONNECT_REGEX_OPTION );
         const char **pp_in_ports = jack_get_ports( p_sys->p_jack_client,
                                                    psz_regex, NULL,
                                                    JackPortIsInput );
