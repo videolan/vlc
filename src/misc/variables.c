@@ -160,8 +160,6 @@ static int      Lookup      ( variable_t **, size_t, const char * );
 
 static void     CheckValue  ( variable_t *, vlc_value_t * );
 
-static int      InheritValue( vlc_object_t *, const char *, vlc_value_t *,
-                              int );
 static int      TriggerCallback( vlc_object_t *, variable_t *, const char *,
                                  vlc_value_t );
 
@@ -268,7 +266,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
 
     if( i_type & VLC_VAR_DOINHERIT )
     {
-        if( InheritValue( p_this, psz_name, &p_var->val, p_var->i_type ) )
+        if( var_Inherit( p_this, psz_name, i_type, &p_var->val ) )
             msg_Err( p_this, "cannot inherit value for %s", psz_name );
         else if( i_type & VLC_VAR_HASCHOICE )
         {
@@ -1382,16 +1380,17 @@ static void CheckValue ( variable_t *p_var, vlc_value_t *p_val )
     }
 }
 
-/*****************************************************************************
- * InheritValue: try to inherit the value of this variable from the closest
- * ancestor objects or ultimately from the configuration.
- * The function should always be entered with the object var_lock locked.
- *****************************************************************************/
-static int InheritValue( vlc_object_t *p_this, const char *psz_name,
-                         vlc_value_t *p_val, int i_type )
+/**
+ * Finds the value of a variable. If the specified object does not hold a
+ * variable with the specified name, try the parent object, and iterate until
+ * the top of the tree. If no match is found, the value is read from the
+ * configuration.
+ */
+int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
+                 vlc_value_t *p_val )
 {
     i_type &= VLC_VAR_CLASS;
-    for( vlc_object_t *obj = p_this->p_parent; obj != NULL; obj = obj->p_parent )
+    for( vlc_object_t *obj = p_this; obj != NULL; obj = obj->p_parent )
         if( var_GetChecked( obj, psz_name, i_type, p_val ) == VLC_SUCCESS )
             return VLC_SUCCESS;
 
