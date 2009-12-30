@@ -100,9 +100,9 @@ static int Activate( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     int fd;
 
-    if( config_GetInt( p_intf, "netsync-master" ) <= 0 )
+    if( !var_InheritInteger( p_intf, "netsync-master" ) )
     {
-        char *psz_master = config_GetPsz( p_intf, "netsync-master-ip" );
+        char *psz_master = var_InheritString( p_intf, "netsync-master-ip" );
         if( psz_master == NULL )
         {
             msg_Err( p_intf, "master address not specified" );
