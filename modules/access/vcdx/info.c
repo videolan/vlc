@@ -312,9 +312,9 @@ VCDUpdateTitle( access_t *p_access )
         char *psz_tfmt = config_GetPsz( p_access, MODULE_STRING "-title-format" );
         snprintf( psz_mrl, psz_mrl_max, "%s%s",
                   VCD_MRL_PREFIX, p_vcdplayer->psz_source );
-        free(psz_tfmt);
         psz_name = VCDFormatStr( p_vcdplayer, psz_tfmt, psz_mrl,
                                  &(p_vcdplayer->play_item) );
+        free(psz_tfmt);
         free(psz_mrl);
         input_Control( p_vcdplayer->p_input, INPUT_SET_NAME, psz_name );
         free(psz_name);
