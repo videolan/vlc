@@ -142,7 +142,13 @@ static int Open(vlc_object_t *object)
         goto error;
     }
 
-    sys->dp = caca_create_display(sys->cv);
+    const char *driver = NULL;
+#ifdef __APPLE__
+    // Make sure we don't try to open a window.
+    driver = "ncurses";
+#endif
+
+    sys->dp = caca_create_display_with_driver(sys->cv, driver);
     if (!sys->dp) {
         msg_Err(vd, "cannot initialize libcaca");
         goto error;
