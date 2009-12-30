@@ -107,14 +107,14 @@ vlc_module_end ()
 static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
                  audio_format_t input, audio_format_t output )
 {
-    p_sys->b_dynrng = config_GetInt( p_this, "a52-dynrng" );
+    p_sys->b_dynrng = var_InheritInteger( p_this, "a52-dynrng" );
     p_sys->b_dontwarn = 0;
 
     /* No upmixing: it's not necessary and some other filters may want to do
      * it themselves. */
     if ( aout_FormatNbChannels( &output ) > aout_FormatNbChannels( &input ) )
     {
-        if ( ! config_GetInt( p_this, "a52-upmix" ) )
+        if ( ! var_InheritInteger( p_this, "a52-upmix" ) )
         {
             return VLC_EGENERIC;
         }
