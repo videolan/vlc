@@ -141,6 +141,7 @@ DWORD WaitForMultipleObjectsEx (DWORD nCount, const HANDLE *lpHandles,
 #endif
 
 static vlc_mutex_t super_mutex;
+static vlc_cond_t  super_variable;
 
 BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
 {
@@ -151,11 +152,13 @@ BOOL WINAPI DllMain (HINSTANCE hinstDll, DWORD fdwReason, LPVOID lpvReserved)
     {
         case DLL_PROCESS_ATTACH:
             vlc_mutex_init (&super_mutex);
+            vlc_cond_init (&super_variable);
             vlc_threadvar_create (&cancel_key, free);
             break;
 
         case DLL_PROCESS_DETACH:
             vlc_threadvar_delete( &cancel_key );
+            vlc_cond_destroy (&super_variable);
             vlc_mutex_destroy (&super_mutex);
             break;
     }
@@ -168,57 +171,73 @@ void vlc_mutex_init( vlc_mutex_t *p_mutex )
     /* This creates a recursive mutex. This is OK as fast mutexes have
      * no defined behavior in case of recursive locking. */
     InitializeCriticalSection (&p_mutex->mutex);
-    p_mutex->initialized = 1;
+    p_mutex->dynamic = true;
 }
 
 void vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 {
     InitializeCriticalSection( &p_mutex->mutex );
-    p_mutex->initialized = 1;
+    p_mutex->dynamic = true;
 }
 
 
 void vlc_mutex_destroy (vlc_mutex_t *p_mutex)
 {
-    assert (InterlockedExchange (&p_mutex->initialized, -1) == 1);
+    assert (p_mutex->dynamic);
     DeleteCriticalSection (&p_mutex->mutex);
 }
 
 void vlc_mutex_lock (vlc_mutex_t *p_mutex)
 {
-    if (InterlockedCompareExchange (&p_mutex->initialized, 0, 0) == 0)
-    { /* ^^ We could also lock super_mutex all the time... sluggish */
+    if (!p_mutex->dynamic)
+    {   /* static mutexes */
         assert (p_mutex != &super_mutex); /* this one cannot be static */
 
         vlc_mutex_lock (&super_mutex);
-        if (InterlockedCompareExchange (&p_mutex->initialized, 0, 0) == 0)
-            vlc_mutex_init (p_mutex);
-        /* FIXME: destroy the mutex some time... */
+        while (p_mutex->locked)
+            vlc_cond_wait (&super_mutex, &super_variable);
+        p_mutex->locked = true;
         vlc_mutex_unlock (&super_mutex);
+        return;
     }
-    assert (InterlockedExchange (&p_mutex->initialized, 1) == 1);
+
     EnterCriticalSection (&p_mutex->mutex);
 }
 
 int vlc_mutex_trylock (vlc_mutex_t *p_mutex)
 {
-    if (InterlockedCompareExchange (&p_mutex->initialized, 0, 0) == 0)
-    { /* ^^ We could also lock super_mutex all the time... sluggish */
-        assert (p_mutex != &super_mutex); /* this one cannot be static */
+    if (!p_mutex->dynamic)
+    {   /* static mutexes */
+        int ret = EBUSY;
 
+        assert (p_mutex != &super_mutex); /* this one cannot be static */
         vlc_mutex_lock (&super_mutex);
-        if (InterlockedCompareExchange (&p_mutex->initialized, 0, 0) == 0)
-            vlc_mutex_init (p_mutex);
-        /* FIXME: destroy the mutex some time... */
+        if (!p_mutex->locked)
+        {
+            p_mutex->locked = true;
+            ret = 0;
+        }
         vlc_mutex_unlock (&super_mutex);
+        return ret;
     }
-    assert (InterlockedExchange (&p_mutex->initialized, 1) == 1);
+
     return TryEnterCriticalSection (&p_mutex->mutex) ? 0 : EBUSY;
 }
 
 void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 {
-    assert (InterlockedExchange (&p_mutex->initialized, 1) == 1);
+    if (!p_mutex->dynamic)
+    {   /* static mutexes */
+        assert (p_mutex != &super_mutex); /* this one cannot be static */
+
+        vlc_mutex_lock (&super_mutex);
+        assert (p_mutex->locked);
+        p_mutex->locked = false;
+        vlc_cond_signal (&super_variable);
+        vlc_mutex_unlock (&super_mutex);
+        return;
+    }
+
     LeaveCriticalSection (&p_mutex->mutex);
 }
 

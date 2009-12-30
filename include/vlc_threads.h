@@ -124,10 +124,14 @@ typedef struct
 
 typedef struct
 {
-    LONG initialized;
-    CRITICAL_SECTION mutex;
+    bool dynamic;
+    union
+    {
+        bool locked;
+        CRITICAL_SECTION mutex;
+    };
 } vlc_mutex_t;
-#define VLC_STATIC_MUTEX { 0, }
+#define VLC_STATIC_MUTEX { false, { false } }
 
 typedef HANDLE  vlc_cond_t;
 typedef HANDLE  vlc_sem_t;
