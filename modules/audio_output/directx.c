@@ -553,7 +553,7 @@ static void Probe( aout_instance_t * p_aout )
             text.psz_string = _("A/52 over S/PDIF");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
-            if( config_GetInt( p_aout, "spdif" ) )
+            if( var_InheritInteger( p_aout, "spdif" ) )
                 var_Set( p_aout, "audio-device", val );
         }
     }
@@ -702,7 +702,7 @@ static int InitDirectSound( aout_instance_t *p_aout )
                        "DirectSoundEnumerateW" );
     if( OurDirectSoundEnumerate )
     {
-        p_aout->output.p_sys->psz_device = config_GetPsz(p_aout, "directx-audio-device-name");
+        p_aout->output.p_sys->psz_device = var_InheritString(p_aout, "directx-audio-device-name");
         /* Attempt enumeration */
         if( FAILED( OurDirectSoundEnumerate( CallBackDirectSoundEnum,
                                              p_aout ) ) )
