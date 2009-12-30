@@ -612,11 +612,14 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
     }
 
     /* */
-    char *psz_tmp = config_GetPsz( p_access, "cddb-server" );
-    cddb_set_server_name( p_cddb, psz_tmp );
-    free( psz_tmp );
+    char *psz_tmp = var_InheritString( p_access, "cddb-server" );
+    if( psz_tmp )
+    {
+        cddb_set_server_name( p_cddb, psz_tmp );
+        free( psz_tmp );
+    }
 
-    cddb_set_server_port( p_cddb, config_GetInt( p_access, "cddb-port" ) );
+    cddb_set_server_port( p_cddb, var_InheritInteger( p_access, "cddb-port" ) );
 
     cddb_set_email_address( p_cddb, "vlc@videolan.org" );
 
@@ -624,7 +627,7 @@ static cddb_disc_t *GetCDDBInfo( access_t *p_access, int i_titles, int *p_sector
     cddb_cache_disable( p_cddb );
 
 //    cddb_cache_set_dir( p_cddb,
-//                     config_GetPsz( p_access,
+//                     var_InheritString( p_access,
 //                                    MODULE_STRING "-cddb-cachedir") );
 
     cddb_set_timeout( p_cddb, 10 );

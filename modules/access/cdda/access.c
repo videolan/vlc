@@ -641,16 +641,16 @@ int CDDAOpen( vlc_object_t *p_this )
     cddb_log_set_handler ( cddb_log_handler );
     p_cdda->cddb.disc = NULL;
     p_cdda->b_cddb_enabled =
-        var_CreateGetInteger( p_access, "album-art" ) != ALBUM_ART_WHEN_ASKED &&
-        config_GetInt( p_access, MODULE_STRING "-cddb-enabled" );
+        var_CreateGetInteger( p_access, "album-art" ) != ALBUM_ART_WHEN_ASKED
+     && var_InheritInteger( p_access, MODULE_STRING "-cddb-enabled" );
 #endif
     p_cdda->b_cdtext =
-        config_GetInt( p_access, MODULE_STRING "-cdtext-enabled" );
+        var_InheritInteger( p_access, MODULE_STRING "-cdtext-enabled" );
     p_cdda->b_cdtext_prefer =
-        config_GetInt( p_access, MODULE_STRING "-cdtext-prefer" );
+        var_InheritInteger( p_access, MODULE_STRING "-cdtext-prefer" );
 #if LIBCDIO_VERSION_NUM >= 73
     p_cdda->b_audio_ctl =
-        config_GetInt( p_access, MODULE_STRING "-analog-output" );
+        var_InheritInteger( p_access, MODULE_STRING "-analog-output" );
 #endif
 
     p_cdda->psz_source = strdup( psz_source );
@@ -658,10 +658,11 @@ int CDDAOpen( vlc_object_t *p_this )
     p_cdda->p_cdio     = p_cdio;
     p_cdda->i_tracks   = 0;
     p_cdda->i_titles   = 0;
-    p_cdda->i_debug    = config_GetInt( p_this, MODULE_STRING "-debug" );
-    p_cdda->b_nav_mode = config_GetInt(p_this, MODULE_STRING "-navigation-mode" );
+    p_cdda->i_debug    = var_InheritInteger( p_this, MODULE_STRING "-debug" );
+    p_cdda->b_nav_mode =
+            var_InheritInteger(p_this, MODULE_STRING "-navigation-mode" );
     p_cdda->i_blocks_per_read =
-            config_GetInt( p_this, MODULE_STRING "-blocks-per-read" );
+            var_InheritInteger( p_this, MODULE_STRING "-blocks-per-read" );
     p_cdda->last_disc_frame =
             cdio_get_track_lsn( p_cdio, CDIO_CDROM_LEADOUT_TRACK );
     p_cdda->p_input = access_GetParentInput( p_access );
@@ -729,11 +730,11 @@ int CDDAOpen( vlc_object_t *p_this )
 
 #if LIBCDIO_VERSION_NUM >= 72
     {
-        char *psz_paranoia = config_GetPsz( p_access,
+        char *psz_paranoia = var_InheritString( p_access,
                                 MODULE_STRING "-paranoia" );
 
         p_cdda->e_paranoia = PARANOIA_MODE_DISABLE;
-        if( psz_paranoia && *psz_paranoia )
+        if( psz_paranoia )
         {
             if( !strncmp( psz_paranoia, "full", strlen("full") ) )
                 p_cdda->e_paranoia = PARANOIA_MODE_FULL;

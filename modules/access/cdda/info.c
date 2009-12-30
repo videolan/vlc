@@ -69,38 +69,44 @@ GetCDDBInfo( access_t *p_access, cdda_data_t *p_cdda )
         goto cddb_destroy;
     }
 
-    char* psz_email = config_GetPsz( p_access, MODULE_STRING "-cddb-email");
-    char* psz_srv_name = config_GetPsz( p_access, MODULE_STRING "-cddb-server");
-    cddb_set_email_address( conn, psz_email );
-    cddb_set_server_name( conn, psz_srv_name );
+    char* psz_email = var_InheritString( p_access, MODULE_STRING "-cddb-email");
+    if( psz_email )
+    {
+        cddb_set_email_address( conn, psz_email );
+        free( psz_email );
+    }
+
+    char* psz_srv_name = var_InheritString( p_access, MODULE_STRING "-cddb-server");
+    if( psz_srv_name )
+    {
+        cddb_set_server_name( conn, psz_srv_name );
+        free( psz_srv_name );
+    }
     cddb_set_server_port(conn,
-                         config_GetInt( p_access,
+                         var_InheritInteger( p_access,
                                         MODULE_STRING "-cddb-port") );
-    free( psz_email );
-    free( psz_srv_name );
 
   /* Set the location of the local CDDB cache directory.
      The default location of this directory is */
 
-    if (!config_GetInt( p_access, MODULE_STRING "-cddb-enable-cache" ))
+    if (!var_InheritInteger( p_access, MODULE_STRING "-cddb-enable-cache" ))
         cddb_cache_disable(conn);
 
-    char* psz_cache = config_GetPsz( p_access, MODULE_STRING "-cddb-cachedir");
-    cddb_cache_set_dir(conn, psz_cache );
-    free( psz_cache );
+    char* psz_cache = var_InheritString( p_access, MODULE_STRING "-cddb-cachedir");
+    if( psz_cache )
+    {
+        cddb_cache_set_dir(conn, psz_cache );
+        free( psz_cache );
+    }
 
     cddb_set_timeout(conn,
-                   config_GetInt( p_access, MODULE_STRING "-cddb-timeout") );
+               var_InheritInteger( p_access, MODULE_STRING "-cddb-timeout") );
 
 
-    if (config_GetInt( p_access, MODULE_STRING "-cddb-httpd" ) )
-    {
+    if (var_InheritInteger( p_access, MODULE_STRING "-cddb-httpd" ) )
         cddb_http_enable(conn);
-    }
     else
-    {
         cddb_http_disable(conn);
-    }
 
     p_cdda->cddb.disc = cddb_disc_new();
 
@@ -794,10 +800,13 @@ CDDAFormatTitle( const access_t *p_access, track_t i_track )
             config_varname = MODULE_STRING "-cddb-title-format";
         }
 #endif /*HAVE_LIBCDDB*/
-        char* psz_config_varname = config_GetPsz( p_access, config_varname );
-        psz_name = CDDAFormatStr( p_access, p_cdda, psz_config_varname,
-                                  psz_mrl, i_track );
-        free( psz_config_varname );
+        char* psz_config_varname = var_InheritString( p_access, config_varname );
+        if( psz_config_varname )
+        {
+            psz_name = CDDAFormatStr( p_access, p_cdda, psz_config_varname,
+                                      psz_mrl, i_track );
+            free( psz_config_varname );
+        }
         free( psz_mrl );
         return psz_name;
     }
@@ -817,7 +826,7 @@ CDDAFixupPlaylist( access_t *p_access, cdda_data_t *p_cdda,
 
 #ifdef HAVE_LIBCDDB
     p_cdda->b_cddb_enabled =
-        config_GetInt( p_access, MODULE_STRING "-cddb-enabled" );
+        var_InheritInteger( p_access, MODULE_STRING "-cddb-enabled" );
     if( b_single_track && !p_cdda->b_cddb_enabled )
         return VLC_SUCCESS;
 #else
