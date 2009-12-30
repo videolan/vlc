@@ -149,9 +149,9 @@ static int DecoderOpen( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_sys->i_debug       = config_GetInt( p_this, MODULE_STRING "-debug" );
+    p_sys->i_debug = var_InheritInteger( p_this, MODULE_STRING "-debug" );
 
-    p_sys->i_image       = -1;
+    p_sys->i_image = -1;
 
     p_sys->i_state = SUBTITLE_BLOCK_EMPTY;
     p_sys->p_spu   = NULL;
