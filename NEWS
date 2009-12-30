@@ -16,6 +16,7 @@ Decoders:
  * Invmem module improvements
  * Support for SSE3 and SSE4 capabilities
  * Support for DxVA2 for H.264 on Windows Vista and 7
+ * Multiple improvements for subtitles styles, especially on Windows
 
 Demuxers:
  * Support for ADPCM in .flv streams
