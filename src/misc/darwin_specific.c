@@ -108,6 +108,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
         p_char++;
     }
 
+#ifdef ENABLE_NLS
     /* Check if $LANG is set. */
     if( NULL == getenv("LANG") )
     {
@@ -135,6 +136,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
         }
         CFRelease( all_locales );
     }
+#endif
 }
 
 /*****************************************************************************
