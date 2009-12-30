@@ -421,7 +421,7 @@ static int OpenFilter( vlc_object_t *p_this )
     }
 
 #if !defined( SYS_DARWIN )
-    if( !config_GetInt( p_this, "hq-resampling" ) )
+    if( !var_InheritInteger( p_this, "hq-resampling" ) )
     {
         return VLC_EGENERIC;
     }
