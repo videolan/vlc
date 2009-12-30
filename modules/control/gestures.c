@@ -130,13 +130,13 @@ int Open ( vlc_object_t *p_this )
     p_sys->p_vout = NULL;
     p_sys->b_got_gesture = false;
     p_sys->b_button_pressed = false;
-    p_sys->i_threshold = config_GetInt( p_intf, "gestures-threshold" );
+    p_sys->i_threshold = var_InheritInteger( p_intf, "gestures-threshold" );
 
     // Choose the tight button to use
-    char *psz_button = config_GetPsz( p_intf, "gestures-button" );
-    if( !strcmp( psz_button, "left" ) )
+    char *psz_button = var_InheritString( p_intf, "gestures-button" );
+    if( psz_button && !strcmp( psz_button, "left" ) )
         p_sys->i_button_mask = 1;
-    else if( !strcmp( psz_button, "middle" ) )
+    else if( psz_button && !strcmp( psz_button, "middle" ) )
         p_sys->i_button_mask = 2;
     else // psz_button == "right"
         p_sys->i_button_mask = 4;
@@ -211,7 +211,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 p_input = playlist_CurrentInput( p_playlist );
                 if( p_input )
                 {
-                    i_interval = config_GetInt( p_intf , "short-jump-size" );
+                    i_interval = var_InheritInteger( p_intf , "short-jump-size" );
                     if ( i_interval > 0 )
                     {
                         mtime_t i_time = ( (mtime_t)( -i_interval ) * 1000000L);
@@ -226,7 +226,7 @@ static void RunIntf( intf_thread_t *p_intf )
                 p_input = playlist_CurrentInput( p_playlist );
                 if( p_input )
                 {
-                    i_interval = config_GetInt( p_intf , "short-jump-size" );
+                    i_interval = var_InheritInteger( p_intf , "short-jump-size" );
                     if ( i_interval > 0 )
                     {
                         mtime_t i_time = ( (mtime_t)( i_interval ) * 1000000L);
