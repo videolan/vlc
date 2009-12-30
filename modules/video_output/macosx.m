@@ -132,8 +132,8 @@ static int Open(vlc_object_t *this)
 
     /* Get our main view*/
     nsPool = [[NSAutoreleasePool alloc] init];
-    sys->glView = [[VLCOpenGLVideoView alloc] init];
-
+    
+    [VLCOpenGLVideoView performSelectorOnMainThread:@selector(getNewView:) withObject:[NSValue valueWithPointer:&sys->glView] waitUntilDone:YES];
     if (!sys->glView)
         goto error;
 
@@ -306,12 +306,19 @@ static void OpenglSwap(vout_opengl_t *gl)
 
 #define VLCAssertMainThread() assert([[NSThread currentThread] isMainThread])
 
++ (void)getNewView:(NSValue *)value
+{
+    id *ret = [value pointerValue];
+    *ret = [[self alloc] init];
+}
+
 /**
  * Gets called by the Open() method.
- * (Non main thread).
  */
 - (id)init
 {
+    VLCAssertMainThread();
+
     /* Warning - this may be called on non main thread */
 
     NSOpenGLPixelFormatAttribute attribs[] =
@@ -326,7 +333,7 @@ static void OpenglSwap(vout_opengl_t *gl)
         0
     };
     
-    NSOpenGLPixelFormat *fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes: attribs];
+    NSOpenGLPixelFormat *fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
     
     if (!fmt)
         return nil;
