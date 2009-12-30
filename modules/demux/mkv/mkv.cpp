@@ -137,7 +137,7 @@ static int Open( vlc_object_t * p_this )
         goto error;
     }
 
-    if (config_GetInt( p_demux, "mkv-preload-local-dir" ))
+    if (var_InheritInteger( p_demux, "mkv-preload-local-dir" ))
     {
         /* get the files from the same dir from the same family (based on p_demux->psz_path) */
         if (p_demux->psz_path[0] != '\0' && !strcmp(p_demux->psz_access, ""))
@@ -419,7 +419,7 @@ static void Seek( demux_t *p_demux, mtime_t i_date, double f_percent, chapter_it
     }
 
     /* seek without index or without date */
-    if( f_percent >= 0 && (config_GetInt( p_demux, "mkv-seek-percent" ) || !p_segment->b_cues || i_date < 0 ))
+    if( f_percent >= 0 && (var_InheritInteger( p_demux, "mkv-seek-percent" ) || !p_segment->b_cues || i_date < 0 ))
     {
         if( p_sys->f_duration >= 0 && p_segment->b_cues )
         {

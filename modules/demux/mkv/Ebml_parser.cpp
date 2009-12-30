@@ -43,7 +43,7 @@ EbmlParser::EbmlParser( EbmlStream *es, EbmlElement *el_start, demux_t *p_demux 
     mi_level = 1;
     mi_user_level = 1;
     mb_keep = false;
-    mb_dummy = config_GetInt( p_demux, "mkv-use-dummy" );
+    mb_dummy = var_InheritInteger( p_demux, "mkv-use-dummy" );
 }
 
 EbmlParser::~EbmlParser( void )
@@ -127,7 +127,7 @@ void EbmlParser::Reset( demux_t *p_demux )
     mi_user_level = mi_level = 1;
     // a little faster and cleaner
     m_es->I_O().setFilePointer( static_cast<KaxSegment*>(m_el[0])->GetGlobalPosition(0) );
-    mb_dummy = config_GetInt( p_demux, "mkv-use-dummy" );
+    mb_dummy = var_InheritInteger( p_demux, "mkv-use-dummy" );
 }
 
 
