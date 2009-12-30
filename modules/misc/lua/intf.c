@@ -108,7 +108,7 @@ static const struct
     { "http", "http" },
     { NULL, NULL } };
 
-static bool WordInList( const char *psz_list, const char *psz_word )
+static const char *WordInList( const char *psz_list, const char *psz_word )
 {
     const char *psz_str = strstr( psz_list, psz_word );
     int i_len = strlen( psz_word );
@@ -118,10 +118,10 @@ static bool WordInList( const char *psz_list, const char *psz_word )
          /* it doesn't start in middle of a word */
          /* it doest end in middle of a word */
          && ( psz_str[i_len] == '\0' || psz_str[i_len] == ',' ) )
-            return true;
+            return psz_str;
         psz_str = strstr( psz_str, psz_word );
     }
-    return false;
+    return NULL;
 }
 
 static char *GetModuleName( intf_thread_t *p_intf )
@@ -132,11 +132,24 @@ static char *GetModuleName( intf_thread_t *p_intf )
         psz_intf = var_GetString( p_intf, p_intf->psz_intf+1 );
     else*/
         psz_intf = p_intf->psz_intf;
+
+    int i_candidate = -1;
+    const char *psz_candidate = NULL;
     for( i = 0; pp_shortcuts[i].psz_name; i++ )
     {
-        if( WordInList( psz_intf, pp_shortcuts[i].psz_shortcut ) )
-            return strdup( pp_shortcuts[i].psz_name );
+        const char *psz_match;
+        if( ( psz_match = WordInList( psz_intf, pp_shortcuts[i].psz_shortcut ) ) )
+        {
+            if( !psz_candidate || psz_match < psz_candidate )
+            {
+                psz_candidate = psz_match;
+                i_candidate = i;
+            }
+        }
     }
+
+    if( i_candidate >= 0 )
+        return strdup( pp_shortcuts[i_candidate].psz_name );
 
     return var_CreateGetString( p_intf, "lua-intf" );
 }
