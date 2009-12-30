@@ -223,8 +223,8 @@ static int Open( vlc_object_t *p_this )
 #endif
 
     /* Override environment variable DVDCSS_METHOD with config option */
-    psz_dvdcss_env = config_GetPsz( p_demux, "dvdread-css-method" );
-    if( psz_dvdcss_env && *psz_dvdcss_env )
+    psz_dvdcss_env = var_InheritString( p_demux, "dvdread-css-method" );
+    if( psz_dvdcss_env )
 #ifdef HAVE_SETENV
         setenv( "DVDCSS_METHOD", psz_dvdcss_env, 1 );
 #else
