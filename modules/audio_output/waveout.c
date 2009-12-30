@@ -462,7 +462,7 @@ static void Probe( aout_instance_t * p_aout )
             text.psz_string = (char *)_("A/52 over S/PDIF");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
-            if( config_GetInt( p_aout, "spdif" ) )
+            if( var_InheritInteger( p_aout, "spdif" ) )
                 var_Set( p_aout, "audio-device", val );
         }
     }
