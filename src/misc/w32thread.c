@@ -195,7 +195,11 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
 
         vlc_mutex_lock (&super_mutex);
         while (p_mutex->locked)
-            vlc_cond_wait (&super_mutex, &super_variable);
+        {
+            p_mutex->contention++;
+            vlc_cond_wait (&super_variable, &super_mutex);
+            p_mutex->contention--;
+        }
         p_mutex->locked = true;
         vlc_mutex_unlock (&super_mutex);
         return;
@@ -233,7 +237,8 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
         vlc_mutex_lock (&super_mutex);
         assert (p_mutex->locked);
         p_mutex->locked = false;
-        vlc_cond_signal (&super_variable);
+        if (p_mutex->contention)
+            vlc_cond_broadcast (&super_variable);
         vlc_mutex_unlock (&super_mutex);
         return;
     }

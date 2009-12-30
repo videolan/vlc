@@ -127,11 +127,15 @@ typedef struct
     bool dynamic;
     union
     {
-        bool locked;
+        struct
+        {
+            bool locked;
+            unsigned long contention;
+        };
         CRITICAL_SECTION mutex;
     };
 } vlc_mutex_t;
-#define VLC_STATIC_MUTEX { false, { false } }
+#define VLC_STATIC_MUTEX { false, { { false, 0 } } }
 
 typedef HANDLE  vlc_cond_t;
 typedef HANDLE  vlc_sem_t;
