@@ -205,7 +205,7 @@ static int Init( vlc_object_t *p_this, struct filter_sys_t * p_data,
                  unsigned int i_nb_channels, uint32_t i_physical_channels,
                  unsigned int i_rate )
 {
-    double d_x = config_GetInt( p_this, "headphone-dim" );
+    double d_x = var_InheritInteger( p_this, "headphone-dim" );
     double d_z = d_x;
     double d_z_rear = -d_x/3;
     double d_min = 0;
@@ -213,7 +213,7 @@ static int Init( vlc_object_t *p_this, struct filter_sys_t * p_data,
     int i_source_channel_offset;
     unsigned int i;
 
-    if( config_GetInt( p_this, "headphone-compensate" ) )
+    if( var_InheritInteger( p_this, "headphone-compensate" ) )
     {
         /* minimal distance to any speaker */
         if( i_physical_channels & AOUT_CHAN_REARCENTER )
