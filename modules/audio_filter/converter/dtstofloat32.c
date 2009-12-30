@@ -96,7 +96,7 @@ vlc_module_end ()
 static int Open( vlc_object_t *p_this, filter_sys_t *p_sys,
                  audio_format_t input, audio_format_t output )
 {
-    p_sys->b_dynrng = config_GetInt( p_this, "dts-dynrng" );
+    p_sys->b_dynrng = var_InheritInteger( p_this, "dts-dynrng" );
     p_sys->b_dontwarn = 0;
 
     /* We'll do our own downmixing, thanks. */
