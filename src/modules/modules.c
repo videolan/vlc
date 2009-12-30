@@ -437,16 +437,13 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
         }
 
         i_shortcuts++;
-        psz_shortcuts = psz_last_shortcut = strdup( psz_name );
+        psz_parser = psz_shortcuts = psz_last_shortcut = strdup( psz_name );
 
-        for( psz_parser = psz_shortcuts; *psz_parser; psz_parser++ )
+        while( ( psz_parser = strchr( psz_parser, ',' ) ) )
         {
-            if( *psz_parser == ',' )
-            {
-                 *psz_parser = '\0';
-                 i_shortcuts++;
-                 psz_last_shortcut = psz_parser + 1;
-            }
+             *psz_parser = '\0';
+             i_shortcuts++;
+             psz_last_shortcut = ++psz_parser;
         }
 
         /* Check if the user wants to override the "strict" mode */
