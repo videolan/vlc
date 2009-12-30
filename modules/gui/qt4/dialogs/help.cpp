@@ -85,6 +85,7 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
     setWindowRole( "vlc-about" );
     resize( 600, 500 );
     setMinimumSize( 600, 500 );
+    setWindowModality( Qt::WindowModal );
 
     QGridLayout *layout = new QGridLayout( this );
     QTabWidget *tab = new QTabWidget( this );

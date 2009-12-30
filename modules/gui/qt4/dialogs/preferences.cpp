@@ -45,6 +45,7 @@ PrefsDialog::PrefsDialog( QWidget *parent, intf_thread_t *_p_intf )
     QGridLayout *main_layout = new QGridLayout( this );
     setWindowTitle( qtr( "Preferences" ) );
     setWindowRole( "vlc-preferences" );
+    setWindowModality( Qt::WindowModal );
 
     /* Whether we want it or not, we need to destroy on close to get
        consistency when reset */
