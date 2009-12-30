@@ -80,6 +80,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
             [defaultParams addObject:@"--no-color"];
             [defaultParams addObject:@"--no-media-library"];
             [defaultParams addObject:@"--play-and-pause"];
+            [defaultParams addObject:@"--extraintf=macosx_dialog_provider"];
             vlcParams = defaultParams;
         }
 
