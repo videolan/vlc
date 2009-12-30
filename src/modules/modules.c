@@ -475,7 +475,7 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
     count = 0;
     for (size_t i = 0; (p_module = p_all[i]) != NULL; i++)
     {
-        bool b_shortcut_bonus = false;
+        int i_shortcut_bonus = 0;
 
         /* Test that this module can do what we need */
         if( !module_provides( p_module, psz_capability ) )
@@ -502,7 +502,7 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
                         /* Found it */
                         if( c && c[1] )
                             psz_alias = c+1;
-                        b_shortcut_bonus = true;
+                        i_shortcut_bonus = i_short * 10000;
                         goto found_shortcut;
                     }
                 }
@@ -525,10 +525,8 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
 found_shortcut:
         /* Store this new module */
         p_list[count].p_module = module_hold (p_module);
-        p_list[count].i_score = p_module->i_score;
-        if( b_shortcut_bonus )
-            p_list[count].i_score += 10000;
-        p_list[count].b_force = b_shortcut_bonus && b_strict;
+        p_list[count].i_score = p_module->i_score + i_shortcut_bonus;
+        p_list[count].b_force = i_shortcut_bonus && b_strict;
         count++;
     }
 
