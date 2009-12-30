@@ -121,7 +121,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->p_last_vout = NULL;
     p_intf->p_sys->i_mousewheel_mode =
-        config_GetInt( p_intf, "hotkeys-mousewheel-mode" );
+        var_InheritInteger( p_intf, "hotkeys-mousewheel-mode" );
 
     var_AddCallback( p_intf->p_libvlc, "key-pressed", SpecialKeyEvent, p_intf );
     var_AddCallback( p_intf->p_libvlc, "key-action", ActionEvent, p_intf );
@@ -385,7 +385,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                      && b_seekable )
             {
 #define SET_TIME( a, b ) \
-    i_interval = config_GetInt( p_input, a "-jump-size" ); \
+    i_interval = var_InheritInteger( p_input, a "-jump-size" ); \
     if( i_interval > 0 ) { \
         mtime_t i_time = (mtime_t)(i_interval * b) * 1000000L; \
         var_SetTime( p_input, "time-offset", i_time ); \
