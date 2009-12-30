@@ -388,7 +388,6 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
         if( pp_vars != NULL )
             p_priv->pp_vars = pp_vars;
     }
-
     vlc_mutex_unlock( &p_priv->var_lock );
 
     Destroy( p_var );
@@ -1148,9 +1147,6 @@ cleanup:
 
 /*****************************************************************************
  * GetUnused: find an unused (not in callback) variable from its name
- *****************************************************************************
- * We do i_tries tries before giving up, just in case the variable is being
- * modified and called from a callback.
  *****************************************************************************/
 static int GetUnused( vlc_object_t *p_this, const char *psz_name )
 {
