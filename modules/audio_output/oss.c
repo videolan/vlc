@@ -247,10 +247,10 @@ static void Probe( aout_instance_t * p_aout )
             text.psz_string = _("A/52 over S/PDIF");
             var_Change( p_aout, "audio-device",
                         VLC_VAR_ADDCHOICE, &val, &text );
-            if( config_GetInt( p_aout, "spdif" ) )
+            if( var_InheritInteger( p_aout, "spdif" ) )
                 var_Set( p_aout, "audio-device", val );
         }
-        else if( config_GetInt( p_aout, "spdif" ) )
+        else if( var_InheritInteger( p_aout, "spdif" ) )
         {
             msg_Warn( p_aout, "S/PDIF not supported by card" );
         }
@@ -279,7 +279,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Get device name */
-    if( (psz_device = config_GetPsz( p_aout, "oss-audio-device" )) == NULL )
+    if( (psz_device = var_InheritString( p_aout, "oss-audio-device" )) == NULL )
     {
         msg_Err( p_aout, "no audio device specified (maybe /dev/dsp?)" );
         free( p_sys );
@@ -510,7 +510,7 @@ static int Open( vlc_object_t *p_this )
     }
 
     p_aout->output.p_sys->b_workaround_buggy_driver =
-        config_GetInt( p_aout, "oss-buggy" );
+        var_InheritInteger( p_aout, "oss-buggy" );
 
     /* Create OSS thread and wait for its readiness. */
     if( vlc_thread_create( p_aout, "aout", OSSThread,
