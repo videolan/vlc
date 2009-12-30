@@ -1040,7 +1040,8 @@ static void Probe( aout_instance_t * p_aout )
             {
                 var_Change( p_aout, "audio-device", VLC_VAR_ADDCHOICE, &val, &text );
                 free( text.psz_string );
-                if( p_sys->i_default_dev == p_devices[i] && config_GetInt( p_aout, "spdif" ) )
+                if( p_sys->i_default_dev == p_devices[i]
+                 && var_InheritInteger( p_aout, "spdif" ) )
                 {
                     /* We selected to prefer SPDIF output if available
                      * then this "dummy" entry should be selected */
