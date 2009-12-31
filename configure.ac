@@ -125,11 +125,15 @@ AC_ARG_WITH(contrib,
       if test "`echo \"$topdir\" | cut -c 1`" != "/"; then
          topdir="`pwd`/$topdir"
       fi
-      CONTRIB_DIR=${topdir}/extras/contrib/hosts/${host}
+      CONTRIB_DIR=${topdir}/extras/contrib/hosts/fat
       if ! test -d "$CONTRIB_DIR"
       then
-        gccmachine=`$CC -dumpmachine`
-        CONTRIB_DIR=${topdir}/extras/contrib/hosts/${gccmachine}
+          CONTRIB_DIR=${topdir}/extras/contrib/hosts/${host}
+          if ! test -d "$CONTRIB_DIR"
+          then
+            gccmachine=`$CC -dumpmachine`
+            CONTRIB_DIR=${topdir}/extras/contrib/hosts/${gccmachine}
+          fi
       fi
     fi
     AC_MSG_CHECKING([for libs in ${CONTRIB_DIR}])
