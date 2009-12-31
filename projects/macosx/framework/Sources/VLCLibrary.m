@@ -70,19 +70,18 @@ void __catch_exception( void * e, const char * function, const char * file, int 
         NSArray *vlcParams = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"VLCParams"];
         if (!vlcParams) {
             NSMutableArray *defaultParams = [NSMutableArray array];
-            [defaultParams addObject:@"-I macosx_dialog_provider"];                 // No actual interface, just dialogs and nagging
             [defaultParams addObject:@"--no-video-title-show"];                     // Don't show the title on overlay when starting to play
             [defaultParams addObject:@"--no-sout-keep"];
             [defaultParams addObject:@"--ignore-config"];                           // Don't read and write VLC config files
-            [defaultParams addObject:@"--vout=macosx"];
+            [defaultParams addObject:@"--vout=macosx"];                             // Select Mac OS X video output
             [defaultParams addObject:@"--text-renderer=quartztext"];                // our CoreText-based renderer
             [defaultParams addObject:@"--verbose=-1"];                              // Don't polute the stdio log
             [defaultParams addObject:@"--syslog"];                                  // log to syslog
             [defaultParams addObject:@"--log-verbose=4"];                           // log everything
-            [defaultParams addObject:@"--no-color"];
-            [defaultParams addObject:@"--no-media-library"];
-            [defaultParams addObject:@"--play-and-pause"];
-            [defaultParams addObject:@"--extraintf=macosx_dialog_provider"];
+            [defaultParams addObject:@"--no-color"];                                // Don't use color in output (Xcode doesn't show it)
+            [defaultParams addObject:@"--no-media-library"];                        // We don't need the media library
+            [defaultParams addObject:@"--play-and-pause"];                          // We want every movie to pause instead of stopping at eof
+            [defaultParams addObject:@"--extraintf=macosx_dialog_provider"];        // Some extra dialog (login, progress) may come up from here
             vlcParams = defaultParams;
         }
 
