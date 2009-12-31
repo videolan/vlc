@@ -7,18 +7,6 @@
 	objects = {
 
 /* Begin PBXAggregateTarget section */
-		630F6D6E1045DE4000B03EE4 /* Make VLC and VLCKit */ = {
-			isa = PBXAggregateTarget;
-			buildConfigurationList = 630F6D801045DE6300B03EE4 /* Build configuration list for PBXAggregateTarget "Make VLC and VLCKit" */;
-			buildPhases = (
-			);
-			dependencies = (
-				633754B110ED0BB50072A0D9 /* PBXTargetDependency */,
-				630F6D741045DE4900B03EE4 /* PBXTargetDependency */,
-			);
-			name = "Make VLC and VLCKit";
-			productName = "core-framework";
-		};
 		6337547910ED090A0072A0D9 /* Make VLC */ = {
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 6337548110ED093B0072A0D9 /* Build configuration list for PBXAggregateTarget "Make VLC" */;
@@ -39,6 +27,7 @@
 			dependencies = (
 				633BD6EE0D2AE03E0012A314 /* PBXTargetDependency */,
 				63FFDBD30D2AE3070092FC96 /* PBXTargetDependency */,
+				633754FA10ED103B0072A0D9 /* PBXTargetDependency */,
 				633BD6F20D2AE0430012A314 /* PBXTargetDependency */,
 			);
 			name = "Build Everything";
@@ -110,19 +99,12 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		630F6D731045DE4900B03EE4 /* PBXContainerItemProxy */ = {
+		633754F910ED103B0072A0D9 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 8DC2EF4F0486A6940098B216;
-			remoteInfo = VLCKit;
-		};
-		633754B010ED0BB50072A0D9 /* PBXContainerItemProxy */ = {
-			isa = PBXContainerItemProxy;
-			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
-			proxyType = 1;
-			remoteGlobalIDString = 6337547910ED090A0072A0D9 /* Make VLC 2 */;
-			remoteInfo = "Make VLC 2";
+			remoteGlobalIDString = 6337547910ED090A0072A0D9 /* Make VLC */;
+			remoteInfo = "Make VLC";
 		};
 		633BD6ED0D2AE03E0012A314 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
@@ -428,11 +410,10 @@
 			projectRoot = "";
 			targets = (
 				633BD6D20D2ADE040012A314 /* Build Everything */,
-				8DC2EF4F0486A6940098B216 /* VLCKit */,
 				633BD6E40D2ADF030012A314 /* Setup VLC contribs */,
 				63FFDBCE0D2AE2AE0092FC96 /* Run VLC configure */,
 				6337547910ED090A0072A0D9 /* Make VLC */,
-				630F6D6E1045DE4000B03EE4 /* Make VLC and VLCKit */,
+				8DC2EF4F0486A6940098B216 /* VLCKit */,
 			);
 		};
 /* End PBXProject section */
@@ -538,9 +519,11 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/../../../configure",
 			);
 			name = configure;
 			outputPaths = (
+				"$(SYMROOT)/vlc_build_dir/Makefile",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -589,15 +572,10 @@
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		630F6D741045DE4900B03EE4 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = 8DC2EF4F0486A6940098B216 /* VLCKit */;
-			targetProxy = 630F6D731045DE4900B03EE4 /* PBXContainerItemProxy */;
-		};
-		633754B110ED0BB50072A0D9 /* PBXTargetDependency */ = {
+		633754FA10ED103B0072A0D9 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
 			target = 6337547910ED090A0072A0D9 /* Make VLC */;
-			targetProxy = 633754B010ED0BB50072A0D9 /* PBXContainerItemProxy */;
+			targetProxy = 633754F910ED103B0072A0D9 /* PBXContainerItemProxy */;
 		};
 		633BD6EE0D2AE03E0012A314 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
@@ -731,30 +709,24 @@
 			};
 			name = Release;
 		};
-		630F6D6F1045DE4000B03EE4 /* Debug */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = NO;
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				PRODUCT_NAME = "core-framework";
-			};
-			name = Debug;
-		};
-		630F6D701045DE4000B03EE4 /* Release */ = {
-			isa = XCBuildConfiguration;
-			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				PRODUCT_NAME = "core-framework";
-				ZERO_LINK = NO;
-			};
-			name = Release;
-		};
 		6337547C10ED090B0072A0D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
+				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
+				CC = "/Developer/usr/bin/llvm-gcc-4.2";
+				COPY_PHASE_STRIP = NO;
+				CXX = "/Developer/usr/bin/llvm-g++-4.2";
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_ENABLE_OBJC_GC = supported;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_VERSION = 4.2;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				OBJC = "/Developer/usr/bin/llvm-gcc-4.2";
+				ONLY_ACTIVE_ARCH = YES;
+				PREBINDING = NO;
+				PRODUCT_NAME = "vlc-make";
+				SDKROOT = macosx10.5;
 			};
 			name = Debug;
 		};
@@ -857,15 +829,6 @@
 			buildConfigurations = (
 				1DEB91B208733DA50010E9CD /* Debug */,
 				1DEB91B308733DA50010E9CD /* Release */,
-			);
-			defaultConfigurationIsVisible = 0;
-			defaultConfigurationName = Debug;
-		};
-		630F6D801045DE6300B03EE4 /* Build configuration list for PBXAggregateTarget "Make VLC and VLCKit" */ = {
-			isa = XCConfigurationList;
-			buildConfigurations = (
-				630F6D6F1045DE4000B03EE4 /* Debug */,
-				630F6D701045DE4000B03EE4 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
