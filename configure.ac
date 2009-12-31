@@ -4439,6 +4439,10 @@ then
   VLC_ADD_PLUGIN([access_eyetv])
 fi
 
+AC_ARG_ENABLE(macosx-vlc-app,
+  [  --enable-macosx-vlc-app            build the VLC media player (default enabled on Mac OS X)])
+AM_CONDITIONAL(BUILD_MACOSX_VLC_APP, [test "${enable_macosx_vlc_app}" != "no" &&
+    (test "${SYS}" = "darwin" || test "${enable_macosx_vlc_app}" = "yes") ])
 
 
 dnl

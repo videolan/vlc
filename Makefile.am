@@ -410,7 +410,7 @@ vlc$(EXEEXT):
 	ln -sf bin/vlc-static$(EXEEXT) vlc$(EXEEXT)
 
 if HAVE_DARWIN
-if BUILD_VLC
+if BUILD_MACOSX_VLC_APP
 # Create the MacOS X app
 noinst_DATA = VLC.app
 endif
