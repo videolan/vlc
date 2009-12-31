@@ -52,7 +52,7 @@ CONTRIBREV=22
 contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2:
 	$(WGET) http://downloads.videolan.org/pub/videolan/testing/contrib/$@
 
-using-bin: contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
+hosts/$(HOST)/.$(CONTRIBREV): contrib-macosx-$(ARCH)-$(CONTRIBREV).tar.bz2
 	@if test -d tmp; then \
 		echo "Move away ./tmp, it's in the way" ; \
 		exit 1 ; \
@@ -70,6 +70,10 @@ ifdef HAVE_DARWIN_10
 	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%g' -i.orig *.la && rm -f *.la.orig)
 	(cd src && $(MAKE) .iconv)
 endif
+	touch hosts/$(HOST)/.$(CONTRIBREV)
+
+using-bin: hosts/$(HOST)/.$(CONTRIBREV) 
+
 endif
 
 clean-src:
