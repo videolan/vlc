@@ -519,6 +519,7 @@
 			files = (
 			);
 			inputPaths = (
+				"$(SRCROOT)/Configure.sh",
 				"$(SRCROOT)/../../../configure",
 			);
 			name = configure;
