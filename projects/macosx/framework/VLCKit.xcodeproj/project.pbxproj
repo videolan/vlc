@@ -157,6 +157,7 @@
 		632A0E840D3835C400AFC99B /* VLCStreamSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCStreamSession.m; sourceTree = "<group>"; };
 		632A0EC10D38392E00AFC99B /* VLCStreamOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCStreamOutput.h; path = Public/VLCStreamOutput.h; sourceTree = "<group>"; };
 		632A0EC20D38392E00AFC99B /* VLCStreamOutput.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCStreamOutput.m; sourceTree = "<group>"; };
+		633753FF10ECE1C60072A0D9 /* Configure.sh */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.script.sh; path = Configure.sh; sourceTree = "<group>"; };
 		6341FCAE0D2C0929002A97B7 /* VLCVideoLayer.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCVideoLayer.h; path = Public/VLCVideoLayer.h; sourceTree = "<group>"; };
 		6341FCB00D2C0936002A97B7 /* VLCVideoLayer.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCVideoLayer.m; sourceTree = "<group>"; };
 		637CFB930D2D280800A041B6 /* VLCLibrary.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCLibrary.h; path = Public/VLCLibrary.h; sourceTree = "<group>"; };
@@ -237,6 +238,7 @@
 			isa = PBXGroup;
 			children = (
 				EF78BD350CAEEFB000354E6E /* Pre-Compile.sh */,
+				633753FF10ECE1C60072A0D9 /* Configure.sh */,
 				63030CC70CCA652C0088ECD1 /* Info.plist */,
 			);
 			name = Resources;
@@ -521,8 +523,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test \"$ACTION\" = \"clean\"; then\n    rm -Rf $SYMROOT/vlc_build_dir\n    exit 0\nfi\n\ntop_srcdir=`pwd`/../../..\n\nmkdir -p $SYMROOT/vlc_build_dir\ncd $SYMROOT/vlc_build_dir\n\necho \"Building for $ARCHS with sdk=\\\"$SDKROOT\\\"\"\nargs=\"--disable-nls $args\"\nargs=\"--disable-macosx $args\"\nargs=\"--disable-macosx-defaults $args\"\nargs=\"--enable-faad $args\"\nargs=\"--enable-flac $args\"\nargs=\"--enable-theora $args\"\nargs=\"--enable-shout $args\"\nargs=\"--enable-cddax $args\"\nargs=\"--enable-caca $args\"\nargs=\"--enable-vcdx $args\"\nargs=\"--disable-ncurses $args\"\nargs=\"--disable-httpd $args\"\nargs=\"--disable-vlm $args\"\nargs=\"--enable-twolame $args\"\nargs=\"--enable-realrtsp $args\"\nargs=\"--enable-libass $args\"\nargs=\"--enable-asademux $args\"\nargs=\"--disable-skins2 $args\"\nargs=\"--disable-x11 $args\"\nargs=\"--disable-glx $args\"\nargs=\"--disable-xvideo $args\"\nargs=\"--disable-xcb $args\"\nargs=\"--disable-sdl $args\"\nargs=\"--disable-sdl-image $args\"\nargs=\"--disable-visual $args\"\nargs=\"--with-macosx-version-min=10.5 $args\"\nif test \"x$SDKROOT\" != \"x\"\nthen\n\targs=\"--with-macosx-sdk=$SDKROOT $args\"\nfi\n\nif test \"$CONFIGURATION\" = \"Debug\"; then\n\targs=\"--enable-debug $args\"\nelse\n\targs=\"--enable-release $args\"\nfi\n\nargs=\"--prefix=$SYMROOT/vlc_build_dir/vlc_install_dir $args\"\n\nif test $ARCHS = \"x86_64\"\nthen\n\targs=\"--build=x86_64-apple-darwin10 $args\"\nfi\n\necho \"Running configure $args\"\nCFLAGS=\"-arch $ARCHS\" CXXFLAGS=\"-arch $ARCHS\" CPPFLAGS=\"-arch $ARCHS\" OBJCFLAGS=\"-arch $ARCHS\" exec $top_srcdir/configure $args";
-			showEnvVarsInLog = 0;
+			shellScript = "sh $SOURCE_ROOT/Configure.sh";
 		};
 		EF78BD2E0CAEEF9500354E6E /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
