@@ -93,6 +93,74 @@ vlc_module_begin ()
     set_callbacks( OpenFilter, CloseFilter )
 vlc_module_end ()
 
+static void Resample_helper( filter_t *p_filter, float *p_in, float **pp_out,
+                              int d_factor, int i_nb_channels,
+                              block_t *p_out_buf, int *pi_out )
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    while( p_sys->i_remainder < p_filter->fmt_out.audio.i_rate )
+    {
+        if( d_factor >= 1 )
+        {
+            /* FilterFloatUP() is faster if we can use it */
+
+            /* Perform left-wing inner product */
+            FilterFloatUP( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
+                           SMALL_FILTER_NWING, p_in, *pp_out,
+                           p_sys->i_remainder,
+                           p_filter->fmt_out.audio.i_rate,
+                           -1, i_nb_channels );
+
+            /* Perform right-wing inner product */
+            FilterFloatUP( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
+                           SMALL_FILTER_NWING, p_in + i_nb_channels, *pp_out,
+                           p_filter->fmt_out.audio.i_rate -
+                           p_sys->i_remainder,
+                           p_filter->fmt_out.audio.i_rate,
+                           1, i_nb_channels );
+
+#if 0
+            /* Normalize for unity filter gain */
+            for( int i = 0; i < i_nb_channels; i++ )
+            {
+                *(p_out+i) *= d_old_scale_factor;
+            }
+#endif
+            /* Sanity check */
+            if( p_out_buf->i_buffer/p_filter->fmt_in.audio.i_bytes_per_frame
+                <= (unsigned int)*pi_out+1 )
+            {
+                *pp_out += i_nb_channels;
+                (*pi_out)++;
+                p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
+                break;
+            }
+        }
+        else
+        {
+            /* Perform left-wing inner product */
+            FilterFloatUD( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
+                           SMALL_FILTER_NWING, p_in, *pp_out,
+                           p_sys->i_remainder,
+                           p_filter->fmt_out.audio.i_rate, p_filter->fmt_in.audio.i_rate,
+                           -1, i_nb_channels );
+            /* Perform right-wing inner product */
+            FilterFloatUD( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
+                           SMALL_FILTER_NWING, p_in + i_nb_channels, *pp_out,
+                           p_filter->fmt_out.audio.i_rate -
+                           p_sys->i_remainder,
+                           p_filter->fmt_out.audio.i_rate, p_filter->fmt_in.audio.i_rate,
+                           1, i_nb_channels );
+        }
+
+        *pp_out += i_nb_channels;
+        (*pi_out)++;
+
+        p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
+    }
+}
+
 /*****************************************************************************
  * Resample: convert a buffer
  *****************************************************************************/
@@ -220,67 +288,8 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
             continue;
         }
 
-        while( p_sys->i_remainder < p_filter->fmt_out.audio.i_rate )
-        {
-
-            if( p_sys->d_old_factor >= 1 )
-            {
-                /* FilterFloatUP() is faster if we can use it */
-
-                /* Perform left-wing inner product */
-                FilterFloatUP( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
-                               SMALL_FILTER_NWING, p_in, p_out,
-                               p_sys->i_remainder,
-                               p_filter->fmt_out.audio.i_rate,
-                               -1, i_nb_channels );
-                /* Perform right-wing inner product */
-                FilterFloatUP( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
-                               SMALL_FILTER_NWING, p_in + i_nb_channels, p_out,
-                               p_filter->fmt_out.audio.i_rate -
-                               p_sys->i_remainder,
-                               p_filter->fmt_out.audio.i_rate,
-                               1, i_nb_channels );
-
-#if 0
-                /* Normalize for unity filter gain */
-                for( i = 0; i < i_nb_channels; i++ )
-                {
-                    *(p_out+i) *= d_old_scale_factor;
-                }
-#endif
-
-                /* Sanity check */
-                if( p_out_buf->i_buffer/p_filter->fmt_in.audio.i_bytes_per_frame
-                    <= (unsigned int)i_out+1 )
-                {
-                    p_out += i_nb_channels;
-                    i_out++;
-                    p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
-                    break;
-                }
-            }
-            else
-            {
-                /* Perform left-wing inner product */
-                FilterFloatUD( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
-                               SMALL_FILTER_NWING, p_in, p_out,
-                               p_sys->i_remainder,
-                               p_filter->fmt_out.audio.i_rate, p_filter->fmt_in.audio.i_rate,
-                               -1, i_nb_channels );
-                /* Perform right-wing inner product */
-                FilterFloatUD( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
-                               SMALL_FILTER_NWING, p_in + i_nb_channels, p_out,
-                               p_filter->fmt_out.audio.i_rate -
-                               p_sys->i_remainder,
-                               p_filter->fmt_out.audio.i_rate, p_filter->fmt_in.audio.i_rate,
-                               1, i_nb_channels );
-            }
-
-            p_out += i_nb_channels;
-            i_out++;
-
-            p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
-        }
+        Resample_helper( p_filter, p_in, &p_out, p_sys->d_old_factor,
+                          i_nb_channels, p_out_buf, &i_out );
 
         p_in += i_nb_channels;
         p_sys->i_remainder -= p_filter->fmt_out.audio.i_rate;
@@ -294,67 +303,8 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
     }
     for( ; i_in < i_in_nb - i_filter_wing; i_in++ )
     {
-        while( p_sys->i_remainder < p_filter->fmt_out.audio.i_rate )
-        {
-
-            if( d_factor >= 1 )
-            {
-                /* FilterFloatUP() is faster if we can use it */
-
-                /* Perform left-wing inner product */
-                FilterFloatUP( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
-                               SMALL_FILTER_NWING, p_in, p_out,
-                               p_sys->i_remainder,
-                               p_filter->fmt_out.audio.i_rate,
-                               -1, i_nb_channels );
-
-                /* Perform right-wing inner product */
-                FilterFloatUP( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
-                               SMALL_FILTER_NWING, p_in + i_nb_channels, p_out,
-                               p_filter->fmt_out.audio.i_rate -
-                               p_sys->i_remainder,
-                               p_filter->fmt_out.audio.i_rate,
-                               1, i_nb_channels );
-
-#if 0
-                /* Normalize for unity filter gain */
-                for( int i = 0; i < i_nb_channels; i++ )
-                {
-                    *(p_out+i) *= d_old_scale_factor;
-                }
-#endif
-                /* Sanity check */
-                if( p_out_buf->i_buffer/p_filter->fmt_in.audio.i_bytes_per_frame
-                    <= (unsigned int)i_out+1 )
-                {
-                    p_out += i_nb_channels;
-                    i_out++;
-                    p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
-                    break;
-                }
-            }
-            else
-            {
-                /* Perform left-wing inner product */
-                FilterFloatUD( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
-                               SMALL_FILTER_NWING, p_in, p_out,
-                               p_sys->i_remainder,
-                               p_filter->fmt_out.audio.i_rate, p_filter->fmt_in.audio.i_rate,
-                               -1, i_nb_channels );
-                /* Perform right-wing inner product */
-                FilterFloatUD( SMALL_FILTER_FLOAT_IMP, SMALL_FILTER_FLOAT_IMPD,
-                               SMALL_FILTER_NWING, p_in + i_nb_channels, p_out,
-                               p_filter->fmt_out.audio.i_rate -
-                               p_sys->i_remainder,
-                               p_filter->fmt_out.audio.i_rate, p_filter->fmt_in.audio.i_rate,
-                               1, i_nb_channels );
-            }
-
-            p_out += i_nb_channels;
-            i_out++;
-
-            p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
-        }
+        Resample_helper( p_filter, p_in, &p_out, d_factor,
+                          i_nb_channels, p_out_buf, &i_out );
 
         p_in += i_nb_channels;
         p_sys->i_remainder -= p_filter->fmt_out.audio.i_rate;
