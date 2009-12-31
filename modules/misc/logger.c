@@ -130,10 +130,6 @@ static const char *const mode_list_text[] = { N_("Text"), "HTML"
   "will be forwarded. Available choices are \"user\" (default), \"daemon\", " \
   "and \"local0\" through \"local7\".")
 
-#define LOGVERBOSE_TEXT N_("Verbosity")
-#define LOGVERBOSE_LONGTEXT N_("Select the verbosity to use for log or -1 to " \
-"use the same verbosity given by --verbose.")
-
 /* First in list is the default facility used. */
 #define DEFINE_SYSLOG_FACILITY \
   DEF( "user",   LOG_USER ), \
@@ -157,6 +153,10 @@ enum                   { fac_entries = sizeof(fac_name)/sizeof(fac_name[0]) };
 #undef  DEFINE_SYSLOG_FACILITY
 
 #endif
+
+#define LOGVERBOSE_TEXT N_("Verbosity")
+#define LOGVERBOSE_LONGTEXT N_("Select the verbosity to use for log or -1 to " \
+"use the same verbosity given by --verbose.")
 
 vlc_module_begin ()
     set_shortname( N_( "Logging" ) )
