@@ -29,7 +29,7 @@ include ./config.mak
 BUILDDIRS = hosts build
 
 ifdef HAVE_DARWIN_OS
-TARGETALL=using-bin
+TARGETALL=fat-bin
 else
 TARGETALL=using-src
 endif
@@ -70,9 +70,28 @@ ifdef HAVE_DARWIN_10
 	(cd $(PREFIX)/lib && sed -e 's%/usr/lib/libiconv.la%$(PREFIX)/lib/libiconv.la%g' -i.orig *.la && rm -f *.la.orig)
 	(cd src && $(MAKE) .iconv)
 endif
-	touch hosts/$(HOST)/.$(CONTRIBREV)
+	touch $@
 
 using-bin: hosts/$(HOST)/.$(CONTRIBREV) 
+
+hosts/fat/.$(CONTRIBREV)-from-archs:
+	@if test -d tmp; then \
+		echo "Move away ./tmp, it's in the way" ; \
+		exit 1 ; \
+	fi
+	# FIXME - Doing this without rerunning bootstrap & make would be nicer
+	./bootstrap i686-apple-darwin10 && make && \
+	./bootstrap x86_64-apple-darwin10 && make && \
+	mkdir tmp;
+	cp -R hosts/x86_64-apple-darwin10/ tmp;
+	(cd tmp/lib && find . -name "*.dylib" -or -name "*.a") | while read lib; do rm tmp/lib/$$lib \
+	   lipo -create hosts/x86_64-apple-darwin10/lib/$$lib hosts/i686-apple-darwin10/lib/$$lib -output tmp/lib/$$lib; \
+	done;
+	rm -Rf hosts/fat && \
+	mv tmp hosts/fat && \
+	touch $@
+        
+fat-bin: hosts/fat/.$(CONTRIBREV)-from-archs
 
 endif
 
