@@ -48,7 +48,6 @@ args="--disable-ncurses $args"
 args="--disable-httpd $args"
 args="--disable-vlm $args"
 args="--disable-skins2 $args"
-args="--disable-x11 $args"
 args="--disable-glx $args"
 args="--disable-xvideo $args"
 args="--disable-xcb $args"
@@ -71,12 +70,28 @@ else
 	args="--enable-release $args"
 fi
 
+archcount=0
+
 # 64 bits switches
-if test $ARCHS = "x86_64"
-then
-	args="--build=x86_64-apple-darwin10 $args"
+for a in $ARCHS; do
+	archs_args="-arch $a $archs_args"
+    let archcount=archcount+1
+done
+
+if test $archcount -ge 2; then
+    echo "****"
+    echo "WARNING: You are building a VLC with --disable-dependency-tracking"
+    echo "         because FAT architecture are not compatible with "
+    echo "         disable-dependency-tracking."
+    echo ""
+    echo "         You will have to do a clean build manually."
+    echo ""
+    echo "To disable this message, build only one architecture."
+    echo ""
+    echo "****"
+    args="--disable-dependency-tracking $args"
 fi
 
-echo "Running configure $args"
+echo "Running [$archs_args] configure $args"
 top_srcdir="$SRCROOT/../../.."
-CFLAGS="-arch $ARCHS" CXXFLAGS="-arch $ARCHS" CPPFLAGS="-arch $ARCHS" OBJCFLAGS="-arch $ARCHS" exec $top_srcdir/configure $args
+CFLAGS="$archs_args" CXXFLAGS="$archs_args" OBJCFLAGS="$archs_args" exec $top_srcdir/configure $args
