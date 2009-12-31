@@ -480,4 +480,9 @@ static void OpenglSwap(vout_opengl_t *gl)
 {
     return YES;
 }
+
+- (BOOL)isOpaque
+{
+    return YES;
+}
 @end
