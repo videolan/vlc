@@ -901,6 +901,8 @@ package-win-common-strip: package-win32-base-debug
 	  echo "OK."; mkdir -p "$(win32_debugdir)"; \
 	fi
 	for i in "" $(win32_destdir)/*$(LIBEXT) \
+	            $(win32_destdir)/activex/*$(LIBEXT) \
+	            $(win32_destdir)/mozilla/*$(LIBEXT) \
 	            $(win32_destdir)/plugins/*$(LIBEXT) \
 	; do \
 	  if test -n "$$i" ; then \
