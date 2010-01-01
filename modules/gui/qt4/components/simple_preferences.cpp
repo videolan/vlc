@@ -676,7 +676,7 @@ void SPrefsPanel::updateAudioOptions( int number)
     QString value = qobject_cast<QComboBox *>(optionWidgets[audioOutCoB])
                                             ->itemData( number ).toString();
 #ifdef WIN32
-    optionWidgets[directxW]->setVisible( ( value == "directx" ) );
+    optionWidgets[directxW]->setVisible( ( value == "aout_directx" ) );
 #else
     /* optionWidgets[ossW] can be NULL */
     if( optionWidgets[ossW] )
@@ -686,8 +686,8 @@ void SPrefsPanel::updateAudioOptions( int number)
         optionWidgets[alsaW]->setVisible( ( value == "alsa" ) );
 #endif
     optionWidgets[fileW]->setVisible( ( value == "aout_file" ) );
-    optionWidgets[spdifChB]->setVisible( ( value != "aout_file"
-                                           && value != "dummy" ) );
+    optionWidgets[spdifChB]->setVisible( ( value == "alsa" || value == "oss" || value == "auhal" ||
+                                           value == "aout_directx" || value == "waveout" ) );
 }
 
 
