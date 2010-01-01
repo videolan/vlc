@@ -70,6 +70,8 @@ static void FilterHough   ( filter_t *, picture_t *, picture_t * );
 #define CARTOON_LONGTEXT N_("Apply cartoon effect. It is only used by " \
     "\"gradient\" and \"edge\".")
 
+#define GRADIENT_HELP N_("Apply color gradient or edge detection effects")
+
 static const char *const mode_list[] = { "gradient", "edge", "hough" };
 static const char *const mode_list_text[] = { N_("Gradient"), N_("Edge"), N_("Hough") };
 
@@ -78,6 +80,7 @@ static const char *const mode_list_text[] = { N_("Gradient"), N_("Edge"), N_("Ho
 vlc_module_begin ()
     set_description( N_("Gradient video filter") )
     set_shortname( N_( "Gradient" ))
+    set_help(GRADIENT_HELP)
     set_capability( "video filter2", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )

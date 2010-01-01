@@ -68,12 +68,16 @@
 
 #define CFG_PREFIX "panoramix-"
 
+#define PANORAMIX_HELP N_("Split the video in multiple windows to " \
+    "display on a wall of screens")
+
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
 vlc_module_begin()
     set_description( N_("Panoramix: wall with overlap video filter") )
     set_shortname( N_("Panoramix" ))
+    set_help(PANORAMIX_HELP)
     set_capability( "video splitter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )

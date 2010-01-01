@@ -45,12 +45,14 @@ static picture_t *Filter( filter_t *, picture_t * );
 
 #define FILTER_PREFIX "grain-"
 
+#define NOISE_HELP N_("add grain to image")
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("Grain video filter") )
     set_shortname( N_( "Grain" ))
+    set_help(NOISE_HELP)
     set_capability( "video filter2", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )

@@ -44,6 +44,8 @@
 #define VOUTLIST_LONGTEXT N_("You can use specific video output modules " \
         "for the clones. Use a comma-separated list of modules." )
 
+#define CLONE_HELP N_("Duplicate your video to multiple windows " \
+        "and/or video output modules")
 #define CFG_PREFIX "clone-"
 
 static int  Open ( vlc_object_t * );
@@ -53,6 +55,7 @@ vlc_module_begin ()
     set_description( N_("Clone video filter") )
     set_capability( "video splitter", 0 )
     set_shortname( N_("Clone" ))
+    set_help(CLONE_HELP)
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 

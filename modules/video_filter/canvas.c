@@ -94,6 +94,7 @@ static int alloc_init( filter_t *, void * );
 #define PADD_LONGTEXT N_( \
     "If enabled, video will be padded to fit in canvas after scaling. " \
     "Otherwise, video will be cropped to fix in canvas after scaling." )
+#define CANVAS_HELP N_( "Automatically resize and pad a video" )
 
 #define CFG_PREFIX "canvas-"
 
@@ -102,8 +103,9 @@ static int alloc_init( filter_t *, void * );
  *****************************************************************************/
 vlc_module_begin ()
     set_shortname( N_("Canvas") )
-    set_description( N_("Automatically resize and pad a video") )
+    set_description( N_("Canvas video filter") )
     set_capability( "video filter2", 0 )
+    set_help( CANVAS_HELP )
     set_callbacks( Activate, Destroy )
 
     set_category( CAT_VIDEO )

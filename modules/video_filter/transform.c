@@ -70,11 +70,13 @@ static const char *const type_list_text[] = { N_("Rotate by 90 degrees"),
   N_("Rotate by 180 degrees"), N_("Rotate by 270 degrees"),
   N_("Flip horizontally"), N_("Flip vertically") };
 
+#define TRANSFORM_HELP N_("Rotate or flip the video")
 #define CFG_PREFIX "transform-"
 
 vlc_module_begin ()
     set_description( N_("Video transformation filter") )
     set_shortname( N_("Transformation"))
+    set_help(TRANSFORM_HELP)
     set_capability( "video filter", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )

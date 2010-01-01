@@ -58,14 +58,17 @@ static void Close(vlc_object_t *);
 #define DESKTOP_LONGTEXT N_(\
     "The desktop mode allows you to display the video on the desktop.")
 
+#define D3D_HELP N_("Recommended video output for Windows Vista and later versions")
+
 vlc_module_begin ()
     set_shortname("Direct3D")
+    set_description(N_("Direct3D video output"))
+    set_help(D3D_HELP)
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 
     add_bool("direct3d-desktop", false, NULL, DESKTOP_TEXT, DESKTOP_LONGTEXT, true)
 
-    set_description(N_("DirectX 3D video output"))
     set_capability("vout display", 70)
     add_shortcut("direct3d_xp")
     set_callbacks(OpenVideoXP, Close)

@@ -139,12 +139,16 @@ static const char *const ppsz_pos_descriptions[] =
 
 #define CFG_PREFIX "marq-"
 
+#define MARQUEE_HELP N_("Display text above the video")
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
     set_capability( "sub filter", 0 )
     set_shortname( N_("Marquee" ))
+    set_description( N_("Marquee display") )
+    set_help(MARQUEE_HELP)
     set_callbacks( CreateFilter, DestroyFilter )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
@@ -173,7 +177,6 @@ vlc_module_begin ()
     add_integer( CFG_PREFIX "refresh", 1000, NULL, REFRESH_TEXT,
                  REFRESH_LONGTEXT, false )
 
-    set_description( N_("Marquee display") )
     add_shortcut( "time" )
     add_obsolete_string( "time-format" )
     add_obsolete_string( "time-x" )

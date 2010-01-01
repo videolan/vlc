@@ -76,6 +76,8 @@ static int FilterCallback ( vlc_object_t *, char const *,
 #define AUTOCROP_TEXT N_("Automatic cropping")
 #define AUTOCROP_LONGTEXT N_("Automatically detect black borders and crop them.")
 
+#define CROP_HELP N_("Remove borders of the video and replace them by black borders")
+
 #ifdef BEST_AUTOCROP
 #define RATIOMAX_TEXT N_("Ratio max (x 1000)")
 #define RATIOMAX_LONGTEXT N_("Maximum image ratio. The crop plugin will never automatically crop to a higher ratio (ie, to a more \"flat\" image). The value is x1000: 1333 means 4/3.")
@@ -103,6 +105,7 @@ static int FilterCallback ( vlc_object_t *, char const *,
 vlc_module_begin ()
     set_description( N_("Crop video filter") )
     set_shortname( N_("Crop" ))
+    set_help(CROP_HELP)
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_capability( "video filter", 0 )

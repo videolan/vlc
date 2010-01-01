@@ -1,5 +1,5 @@
 /*****************************************************************************
- * colorthres.c: Theshold color based on similarity to reference color
+ * colorthres.c: Threshold color based on similarity to reference color
  *****************************************************************************
  * Copyright (C) 2000-2009 the VideoLAN team
  * $Id$
@@ -55,6 +55,7 @@ static picture_t *Filter( filter_t *, picture_t * );
     "grayscaled. This must be an hexadecimal (like HTML colors). The first two "\
     "chars are for red, then green, then blue. #000000 = black, #FF0000 = red,"\
     " #00FF00 = green, #FFFF00 = yellow (red + green), #FFFFFF = white" )
+#define COLOR_HELP N_("Select one color in the video")
 static const int pi_color_values[] = {
   0x00FF0000, 0x00FF00FF, 0x00FFFF00, 0x0000FF00, 0x000000FF, 0x0000FFFF };
 
@@ -66,6 +67,7 @@ static const char *const ppsz_color_descriptions[] = {
 vlc_module_begin ()
     set_description( N_("Color threshold filter") )
     set_shortname( N_("Color threshold" ))
+    set_help(COLOR_HELP)
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
     set_capability( "video filter2", 0 )

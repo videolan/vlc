@@ -72,7 +72,7 @@ struct filter_sys_t
                 "increase the response time of the filter to a spike " \
                 "but will make it less sensitive to short variations." )
 
-#define LEVEL_TEXT N_("Max level" )
+#define LEVEL_TEXT N_("Maximal volume level" )
 #define LEVEL_LONGTEXT N_("If the average power over the last N buffers " \
                "is higher than this value, the volume will be normalized. " \
                "This value is a positive floating point number. A value " \

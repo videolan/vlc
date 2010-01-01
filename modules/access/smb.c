@@ -72,9 +72,11 @@ static void Close( vlc_object_t * );
 #define DOMAIN_LONGTEXT N_("Domain/Workgroup that " \
     "will be used for the connection.")
 
+#define SMB_HELP N_("Samba (Windows network shares) input")
 vlc_module_begin ()
     set_shortname( "SMB" )
     set_description( N_("SMB input") )
+    set_help(SMB_HELP)
     set_capability( "access", 0 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )

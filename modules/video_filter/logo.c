@@ -70,6 +70,8 @@
   "(0=center, 1=left, 2=right, 4=top, 8=bottom, you can " \
   "also use combinations of these values, eg 6 = top-right).")
 
+#define LOGO_HELP N_("Use a local picture as logo on the video")
+
 #define CFG_PREFIX "logo-"
 
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
@@ -84,7 +86,7 @@ static void Close    ( vlc_object_t * );
 vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )
-
+    set_help(LOGO_HELP)
     set_capability( "sub filter", 0 )
     set_callbacks( OpenSub, Close )
     set_description( N_("Logo sub filter") )

@@ -85,11 +85,13 @@ static void SavePicture( filter_t *, picture_t * );
                             "creating one file per image. In this case, " \
                              "the number is not appended to the filename." )
 
+#define SCENE_HELP N_("Send your video to picture files")
 #define CFG_PREFIX "scene-"
 
 vlc_module_begin ()
     set_shortname( N_( "Scene filter" ) )
     set_description( N_( "Scene video filter" ) )
+    set_help(SCENE_HELP)
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
     set_capability( "video filter2", 0 )

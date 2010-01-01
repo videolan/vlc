@@ -167,6 +167,8 @@ struct filter_sys_t
 #define TITLE_TEXT N_("Title display mode")
 #define TITLE_LONGTEXT N_("Title display mode. Default is 0 (hidden) if the feed has an image and feed images are enabled, 1 otherwise.")
 
+#define RSS_HELP N_("Display a RSS or ATOM Feed on your video")
+
 static const int pi_pos_values[] = { 0, 1, 2, 4, 8, 5, 6, 9, 10 };
 static const char *const ppsz_pos_descriptions[] =
      { N_("Center"), N_("Left"), N_("Right"), N_("Top"), N_("Bottom"),
@@ -190,6 +192,7 @@ static const char *const ppsz_title_modes[] =
 vlc_module_begin ()
     set_capability( "sub filter", 1 )
     set_shortname( "RSS / Atom" )
+    set_help(RSS_HELP)
     set_callbacks( CreateFilter, DestroyFilter )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_SUBPIC )

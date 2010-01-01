@@ -155,11 +155,16 @@ BOOL WINAPI DirectXEnumCallback2( GUID* p_guid, LPTSTR psz_desc,
     "window to open on. For example, \"\\\\.\\DISPLAY1\" or " \
     "\"\\\\.\\DISPLAY2\"." )
 
+#define DX_HELP N_("Recommended video output for Windows XP. " \
+    "Incompatible with Vista's Aero interface" )
+
 static const char *const ppsz_dev[] = { "" };
 static const char *const ppsz_dev_text[] = { N_("Default") };
 
 vlc_module_begin ()
     set_shortname( "DirectX" )
+    set_description( N_("DirectX (DirectDraw) video output") )
+    set_help(DX_HELP)
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VOUT )
     add_bool( "directx-hw-yuv", true, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
@@ -174,7 +179,6 @@ vlc_module_begin ()
         change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback )
         change_action_add( FindDevicesCallback, N_("Refresh list") )
 
-    set_description( N_("DirectX (DirectDraw) video output") )
     set_capability( "video output", 100 )
     add_shortcut( "directx" )
     set_callbacks( OpenVideo, CloseVideo )

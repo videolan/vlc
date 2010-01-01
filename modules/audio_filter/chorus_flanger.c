@@ -75,7 +75,8 @@ struct filter_sys_t
 
 vlc_module_begin ()
     set_description( N_("Sound Delay") )
-    set_shortname( N_("delay") )
+    set_shortname( N_("Delay") )
+    set_help( N_("Add a delay effect to the sound") )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_AFILTER )
     add_shortcut( "delay" )

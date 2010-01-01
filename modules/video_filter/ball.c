@@ -123,6 +123,8 @@ static int getBallColor( vlc_object_t *p_this, char const *psz_newval );
 #define GRAD_THRESH_TEXT N_("Gradient threshold")
 #define GRAD_THRESH_LONGTEXT N_("Set gradient threshold for edge computation.")
 
+#define BALL_HELP N_("Augmented reality ball game")
+
 #define FILTER_PREFIX "ball-"
 
 static const char *const mode_list[] = { "red", "green", "blue", "white" };
@@ -132,6 +134,7 @@ static const char *const mode_list_text[] = { N_("Red"), N_("Green"),
 vlc_module_begin ()
     set_description( N_("Ball video filter") )
     set_shortname( N_( "Ball" ))
+    set_help(BALL_HELP)
     set_capability( "video filter2", 0 )
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )

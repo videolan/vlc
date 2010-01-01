@@ -61,7 +61,7 @@ static void Close( vlc_object_t * );
 
 vlc_module_begin ()
     set_shortname( N_("Fake") )
-    set_description( N_("Fake input") )
+    set_description( N_("Fake video input") )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_ACCESS )
 
