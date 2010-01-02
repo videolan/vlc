@@ -407,6 +407,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
     int i_var, i;
     variable_t *p_var;
     vlc_value_t oldval;
+    vlc_value_t newval;
 
     assert( p_this );
 
@@ -562,13 +563,14 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
             break;
         case VLC_VAR_SETVALUE:
             /* Duplicate data if needed */
-            p_var->ops->pf_dup( p_val );
+            newval = *p_val;
+            p_var->ops->pf_dup( &newval );
             /* Backup needed stuff */
             oldval = p_var->val;
             /* Check boundaries and list */
-            CheckValue( p_var, p_val );
+            CheckValue( p_var, &newval );
             /* Set the variable */
-            p_var->val = *p_val;
+            p_var->val = newval;
             /* Free data if needed */
             p_var->ops->pf_free( &oldval );
             break;
