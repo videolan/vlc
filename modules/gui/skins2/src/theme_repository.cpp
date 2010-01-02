@@ -73,6 +73,55 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
         parseDirectory( *it );
     }
 
+    // retrieve skins for skins directories and locate default skins
+    map<string,string>::const_iterator itmap, itdefault;
+    for( itmap = m_skinsMap.begin(); itmap != m_skinsMap.end(); itmap++ )
+    {
+        string path = itmap->first;
+        string name = itmap->second;
+        val.psz_string = strdup( path.c_str() );
+        text.psz_string = strdup( name.c_str() );
+        var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
+                    &text );
+        free( val.psz_string );
+        free( text.psz_string );
+
+        if( name == "default" )
+            itdefault = itmap;
+    }
+
+    // retrieve the current skin
+    char* psz_current = config_GetPsz( getIntf(), "skins2-last" );
+    string current = string( psz_current ? psz_current : "" );
+
+    // set the default skins if no skins provided
+    if( current.size() == 0 )
+    {
+        current = itdefault->first;
+        config_PutPsz( getIntf(), "skins2-last", current.c_str() );
+    }
+
+    // add an extra item if needed and set the current skins to 'checked'
+    itmap = m_skinsMap.find( current );
+    if( itmap == m_skinsMap.end() )
+    {
+        val.psz_string = strdup( current.c_str() );
+        text.psz_string = strdup( current.c_str() );
+        var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
+                    &text );
+        var_Change( getIntf(), "intf-skins", VLC_VAR_SETVALUE, &val, NULL );
+        free( val.psz_string );
+        free( text.psz_string );
+    }
+    else
+    {
+        val.psz_string = strdup( current.c_str() );
+        var_Change( getIntf(), "intf-skins", VLC_VAR_SETVALUE, &val, NULL );
+        free( val.psz_string );
+    }
+    free( psz_current );
+    m_skinsMap.clear();
+
     // Set the callback
     var_AddCallback( pIntf, "intf-skins", changeSkin, this );
 
@@ -131,16 +180,10 @@ void ThemeRepository::parseDirectory( const string &rDir_locale )
         if( extension == ".vlt" || extension == ".wsz" )
         {
             string path = rDir + sep + name;
-            msg_Dbg( getIntf(), "found skin %s", path.c_str() );
-
-            // Add the theme in the popup menu
             string shortname = name.substr( 0, name.size() - 4 );
-            val.psz_string = strdup( path.c_str() );
-            text.psz_string = strdup( shortname.c_str() );
-            var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
-                        &text );
-            free( val.psz_string );
-            free( text.psz_string );
+            m_skinsMap[path] = shortname;
+
+            msg_Dbg( getIntf(), "found skin %s", path.c_str() );
         }
 
         free( pszDirContent );

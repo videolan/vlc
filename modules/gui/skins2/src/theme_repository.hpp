@@ -25,6 +25,7 @@
 #define THEME_REPOSITORY_HPP
 
 #include "skin_common.hpp"
+#include <map>
 
 
 /// Singleton object handling the list of available themes
@@ -51,6 +52,9 @@ private:
     static int changeSkin( vlc_object_t *pThis, char const *pVariable,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *pData );
+
+    /// list of skins available
+    map<string,string> m_skinsMap;
 };
 
 
