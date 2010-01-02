@@ -200,7 +200,6 @@ typedef struct sap_handler_t sap_handler_t;
 typedef struct libvlc_priv_t
 {
     libvlc_int_t       public_data;
-    vlc_cond_t         exiting; ///< signaled when VLC wants to exit
 
     int                i_last_input_id ; ///< Last id of input item
 
