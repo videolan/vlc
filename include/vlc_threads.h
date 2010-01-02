@@ -106,6 +106,7 @@ typedef pthread_t       vlc_thread_t;
 typedef pthread_mutex_t vlc_mutex_t;
 #define VLC_STATIC_MUTEX PTHREAD_MUTEX_INITIALIZER
 typedef pthread_cond_t  vlc_cond_t;
+#define VLC_STATIC_COND  PTHREAD_COND_INITIALIZER
 typedef sem_t           vlc_sem_t;
 typedef pthread_rwlock_t vlc_rwlock_t;
 typedef pthread_key_t   vlc_threadvar_t;

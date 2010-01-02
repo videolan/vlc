@@ -1182,7 +1182,15 @@ int libvlc_InternalAddIntf( libvlc_int_t *p_libvlc, char const *psz_module )
     return ret;
 }
 
+#ifndef WIN32
 static vlc_mutex_t exit_lock = VLC_STATIC_MUTEX;
+static vlc_cond_t  exiting = VLC_STATIC_COND;
+#else
+extern vlc_mutex_t super_mutex;
+extern vlc_cond_t  super_variable;
+# define exit_lock super_mutex
+# define exiting   super_variable
+#endif
 
 /**
  * Waits until the LibVLC instance gets an exit signal. Normally, this happens
@@ -1190,11 +1198,9 @@ static vlc_mutex_t exit_lock = VLC_STATIC_MUTEX;
  */
 void libvlc_InternalWait( libvlc_int_t *p_libvlc )
 {
-    libvlc_priv_t *priv = libvlc_priv( p_libvlc );
-
     vlc_mutex_lock( &exit_lock );
     while( vlc_object_alive( p_libvlc ) )
-        vlc_cond_wait( &priv->exiting, &exit_lock );
+        vlc_cond_wait( &exiting, &exit_lock );
     vlc_mutex_unlock( &exit_lock );
 }
 
@@ -1204,11 +1210,9 @@ void libvlc_InternalWait( libvlc_int_t *p_libvlc )
  */
 void libvlc_Quit( libvlc_int_t *p_libvlc )
 {
-    libvlc_priv_t *priv = libvlc_priv( p_libvlc );
-
     vlc_mutex_lock( &exit_lock );
     vlc_object_kill( p_libvlc );
-    vlc_cond_broadcast( &priv->exiting );
+    vlc_cond_broadcast( &exiting );
     vlc_mutex_unlock( &exit_lock );
 }
 
