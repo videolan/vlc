@@ -1208,7 +1208,7 @@ void libvlc_Quit( libvlc_int_t *p_libvlc )
 
     vlc_mutex_lock( &exit_lock );
     vlc_object_kill( p_libvlc );
-    vlc_cond_signal( &priv->exiting );
+    vlc_cond_broadcast( &priv->exiting );
     vlc_mutex_unlock( &exit_lock );
 }
 
