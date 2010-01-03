@@ -27,6 +27,17 @@
 #include "../libvlc.h"
 #include <vlc_keys.h>
 #include <stdlib.h>
+#include <limits.h>
+
+static int keycmp (const void *a, const void *b)
+{
+    const struct hotkey *ka = a, *kb = b;
+#if (INT_MAX >= 0x7fffffff)
+    return ka->i_key - kb->i_key;
+#else
+    return (ka->i_key < kb->i_key) ? -1 : (ka->i_key > kb->i_key) ? +1 : 0;
+#endif
+}
 
 /**
  * Get the action associated with a VLC key code, if any.
@@ -34,15 +45,12 @@
 static
 vlc_key_t vlc_TranslateKey (const vlc_object_t *obj, uint_fast32_t keycode)
 {
-    /* TODO: search should be O(log n), not O(n) */
-    for (const struct hotkey *key = obj->p_libvlc->p_hotkeys;
-         key->psz_action != NULL;
-         key++)
-    {
-        if (key->i_key == keycode)
-            return key->i_action;
-    }
-    return ACTIONID_NONE;
+    struct hotkey k = { .psz_action = NULL, .i_key = keycode, .i_action = 0 };
+    const struct hotkey *key;
+
+    key = bsearch (&k, obj->p_libvlc->p_hotkeys, libvlc_actions_count,
+                   sizeof (*key), keycmp);
+    return (key != NULL) ? key->i_action : ACTIONID_NONE;
 }
 
 static int vlc_key_to_action (vlc_object_t *libvlc, const char *varname,
@@ -89,6 +97,8 @@ int vlc_InitActions (libvlc_int_t *libvlc)
         }
 #endif
     }
+    qsort (keys, libvlc_actions_count, sizeof (*keys), keycmp);
+
     keys[libvlc_actions_count].psz_action = NULL;
     keys[libvlc_actions_count].i_key = 0;
     keys[libvlc_actions_count].i_action = 0;
