@@ -63,6 +63,7 @@ DECLARE_OPEN(glwin32);
 DECLARE_OPEN(macosx);
 DECLARE_OPEN(wingdi);
 DECLARE_OPEN(wingapi);
+DECLARE_OPEN(directx);
 
 #undef DECLARE_OPEN
 
@@ -132,6 +133,9 @@ vlc_module_begin()
 
     add_submodule()
     DECLARE_MODULE(wingapi, 20)
+
+    add_submodule()
+    DECLARE_MODULE(directx, 100)
 
 vlc_module_end()
 
@@ -213,6 +217,9 @@ static int Open(vlc_object_t *object, const char *module)
     if (!strcmp(sys->name, "direct3d_xp") || !strcmp(sys->name, "direct3d_vista")) {
         var_Create(vout, "direct3d-desktop", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
         var_AddCallback(vout, "direct3d-desktop", Forward, NULL);
+    } else if (!strcmp(sys->name, "directx")) {
+        var_Create(vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT);
+        var_AddCallback(vout, "video-wallpaper", Forward, NULL);
     }
 
     /* */
@@ -238,6 +245,8 @@ static void Close(vlc_object_t *object)
     /* */
     if (!strcmp(sys->name, "direct3d_xp") || !strcmp(sys->name, "direct3d_vista")) {
         var_DelCallback(vout, "direct3d-desktop", Forward, NULL);
+    } else if (!strcmp(sys->name, "directx")) {
+        var_DelCallback(vout, "video-wallpaper", Forward, NULL);
     }
 
     vout_DeleteDisplay(sys->vd, NULL);
