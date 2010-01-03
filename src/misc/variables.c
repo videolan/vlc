@@ -156,7 +156,7 @@ static int      GetUnused   ( vlc_object_t *, const char * );
 static uint32_t HashString  ( const char * );
 static int      Insert      ( variable_t **, int, const char * );
 static int      InsertInner ( variable_t **, int, uint32_t );
-static int      Lookup      ( variable_t *const *, size_t, const char * );
+static int      Lookup      ( vlc_object_t *, const char * );
 
 static void     CheckValue  ( variable_t *, vlc_value_t * );
 
@@ -291,7 +291,7 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
      * duplicate the lookups. It's not that serious, but if anyone finds some
      * time to rework Insert() so that only one lookup has to be done, feel
      * free to do so. */
-    i_new = Lookup( p_priv->pp_vars, p_priv->i_vars, psz_name );
+    i_new = Lookup( p_this, psz_name );
 
     if( i_new >= 0 )
     {
@@ -414,7 +414,7 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_priv->pp_vars, p_priv->i_vars, psz_name );
+    i_var = Lookup( p_this, psz_name );
 
     if( i_var < 0 )
     {
@@ -713,7 +713,7 @@ int __var_Type( vlc_object_t *p_this, const char *psz_name )
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_priv->pp_vars, p_priv->i_vars, psz_name );
+    i_var = Lookup( p_this, psz_name );
 
     if( i_var < 0 )
     {
@@ -799,7 +799,7 @@ int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_priv->pp_vars, p_priv->i_vars, psz_name );
+    i_var = Lookup( p_this, psz_name );
     if( i_var >= 0 )
     {
         variable_t *p_var = p_priv->pp_vars[i_var];
@@ -1153,7 +1153,7 @@ static int GetUnused( vlc_object_t *p_this, const char *psz_name )
     {
         int i_var;
 
-        i_var = Lookup( p_priv->pp_vars, p_priv->i_vars, psz_name );
+        i_var = Lookup( p_this, psz_name );
         if( i_var < 0 )
         {
             return VLC_ENOVAR;
@@ -1260,20 +1260,21 @@ static int u32cmp( const void *key, const void *data )
  * We use a recursive inner function indexed on the hash. Care is taken of
  * possible hash collisions.
  *****************************************************************************/
-static int Lookup( variable_t *const *pp_vars, size_t i_count,
-                   const char *psz_name )
+static int Lookup( vlc_object_t *obj, const char *psz_name )
 {
+    vlc_object_internals_t *priv = vlc_internals( obj );
+    variable_t **pp_vars = priv->pp_vars;
+    size_t i_vars = priv->i_vars;
     variable_t **pp_var;
-    uint32_t i_hash;
+    uint32_t i_hash = HashString( psz_name );
 
-    i_hash = HashString( psz_name );
-    pp_var = bsearch( &i_hash, pp_vars, i_count, sizeof( *pp_var ), u32cmp );
+    pp_var = bsearch( &i_hash, pp_vars, i_vars, sizeof( *pp_var ), u32cmp );
 
     /* Hash not found */
     if( pp_var == NULL )
         return -1;
 
-    assert( i_count > 0 );
+    assert( i_vars > 0 );
 
     /* Find the first entry with the right hash */
     while( (pp_var > pp_vars) && (i_hash == pp_var[-1]->i_hash) )
@@ -1284,7 +1285,7 @@ static int Lookup( variable_t *const *pp_vars, size_t i_count,
     /* Hash collision should be very unlikely, but we cannot guarantee
      * it will never happen. So we do an exhaustive search amongst all
      * entries with the same hash. Typically, there is only one anyway. */
-    for( variable_t *const *p_end = pp_vars + i_count;
+    for( variable_t *const *p_end = pp_vars + i_vars;
          (pp_var < p_end) && (i_hash == (*pp_var)->i_hash);
          pp_var++ )
     {
