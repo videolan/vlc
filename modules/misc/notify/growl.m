@@ -198,7 +198,11 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     else if( psz_artist )
         i_ret = asprintf( &psz_tmp, "%s\n%s", psz_title, psz_artist );
     else
-        i_ret = asprintf( &psz_tmp, "%s", psz_title );
+    {
+        psz_tmp = strdup( psz_title );
+        if( psz_tmp == NULL )
+           i_ret = -1;
+    }
 
     if( i_ret == -1 )
     {

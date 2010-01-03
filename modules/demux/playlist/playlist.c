@@ -192,7 +192,8 @@ char *FindPrefix( demux_t *p_demux )
     }
     else
     {
-        if( asprintf( &psz_path,"%s", p_demux->psz_path ) == -1 )
+        psz_path = strdup( p_demux->psz_path );
+        if( psz_path == NULL )
             return NULL;
     }
 

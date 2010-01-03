@@ -257,7 +257,7 @@ void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 )
             list = list.append( "'" );
             ++range.first;
         }
-        asprintf( &psz_arguments, "%s", list.c_str() );
+        psz_arguments = strdup( list.c_str() );
     }
     break;
 
