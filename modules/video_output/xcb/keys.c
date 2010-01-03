@@ -26,7 +26,6 @@
 
 #include <stdlib.h>
 #include <inttypes.h>
-#include <ctype.h>
 #include <assert.h>
 
 #include <xcb/xcb.h>
@@ -176,8 +175,8 @@ static uint_fast32_t ConvertKeySym (xcb_keysym_t sym)
         { XF86XK_Reload,           KEY_BROWSER_REFRESH, },
     };
 
-    /* X11 and VLC both use the ASCII code for printable ASCII characters. */
-    if (isascii(sym))
+    /* X11 Latin-1 range */
+    if (sym <= 0xff)
         return sym;
 
     /* Special keys */
