@@ -178,6 +178,9 @@ static uint_fast32_t ConvertKeySym (xcb_keysym_t sym)
     /* X11 Latin-1 range */
     if (sym <= 0xff)
         return sym;
+    /* X11 Unicode range */
+    if (sym >= 0x1000100 && sym <= 0x110ffff)
+        return sym - 0x1000000;
 
     /* Special keys */
     res = bsearch (&sym, tab, sizeof (tab) / sizeof (tab[0]), sizeof (tab[0]),
