@@ -414,20 +414,6 @@ StringListConfigControl::StringListConfigControl( vlc_object_t *_p_this,
     combo->setSizePolicy( QSizePolicy::MinimumExpanding, QSizePolicy::Preferred );
 
     module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
-    if(p_module_config && p_module_config->pf_update_list)
-    {
-       vlc_value_t val;
-       val.psz_string = strdup(p_module_config->value.psz);
-
-       p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
-
-       // assume in any case that dirty was set to true
-       // because lazy programmes will use the same callback for
-       // this, like the one behind the refresh push button?
-       p_module_config->b_dirty = false;
-
-       free( val.psz_string );
-    }
 
     finish( p_module_config, bycat );
     if( !l )
@@ -499,6 +485,21 @@ void StringListConfigControl::finish(module_config_t *p_module_config, bool byca
     combo->setEditable( false );
 
     if(!p_module_config) return;
+
+    if( p_module_config->pf_update_list )
+    {
+       vlc_value_t val;
+       val.psz_string = strdup(p_module_config->value.psz);
+
+       p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
+
+       // assume in any case that dirty was set to true
+       // because lazy programmes will use the same callback for
+       // this, like the one behind the refresh push button?
+       p_module_config->b_dirty = false;
+
+       free( val.psz_string );
+    }
 
     for( int i_index = 0; i_index < p_module_config->i_list; i_index++ )
     {
@@ -914,19 +915,6 @@ IntegerListConfigControl::IntegerListConfigControl( vlc_object_t *_p_this,
     combo->setMinimumWidth( MINWIDTH_BOX );
 
     module_config_t *p_module_config = config_FindConfig( p_this, p_item->psz_name );
-    if(p_module_config && p_module_config->pf_update_list)
-    {
-       vlc_value_t val;
-       val.i_int = p_module_config->value.i;
-
-       p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
-
-       // assume in any case that dirty was set to true
-       // because lazy programmes will use the same callback for
-       // this, like the one behind the refresh push button?
-       p_module_config->b_dirty = false;
-    }
-
 
     finish( p_module_config, bycat );
     if( !l )
@@ -977,6 +965,19 @@ void IntegerListConfigControl::finish(module_config_t *p_module_config, bool byc
     combo->setEditable( false );
 
     if(!p_module_config) return;
+
+    if( p_module_config->pf_update_list )
+    {
+       vlc_value_t val;
+       val.i_int = p_module_config->value.i;
+
+       p_module_config->pf_update_list(p_this, p_item->psz_name, val, val, NULL);
+
+       // assume in any case that dirty was set to true
+       // because lazy programmes will use the same callback for
+       // this, like the one behind the refresh push button?
+       p_module_config->b_dirty = false;
+    }
 
     for( int i_index = 0; i_index < p_module_config->i_list; i_index++ )
     {
