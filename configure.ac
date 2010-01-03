@@ -3706,21 +3706,10 @@ dnl
 AC_ARG_ENABLE(opengl,
   [  --enable-opengl         OpenGL support (default enabled)])
 if test "${enable_opengl}" != "no" &&
-   test "${SYS}" != "beos" -a "${SYS}" != "mingwce"; then
-  if test "${SYS}" != "darwin"; then
-    AC_CHECK_HEADERS(GL/gl.h GL/glu.h, [
-      VLC_ADD_PLUGIN([opengl])
-      if test "${SYS}" != "mingw32"; then
-        VLC_ADD_LIBS([opengl],[${X_LIBS} -lGL -lGLU])
-      else
-        VLC_ADD_LIBS([opengl],[-lopengl32 -lglu32])
-      fi
-    ])
-  else
+   test "${SYS}" = "darwin"; then
     dnl OS X special case (no GL/gl.h but OpenGL/gl.h)
     VLC_ADD_PLUGIN([opengl])
     VLC_ADD_LIBS([opengl],[-Wl,-framework,OpenGL])
-  fi
 fi
 
 dnl
