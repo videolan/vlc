@@ -154,8 +154,7 @@ time_ops   = { CmpTime,    DupDummy,  FreeDummy,  };
  *****************************************************************************/
 static void     WaitUnused  ( vlc_object_t *, variable_t * );
 static uint32_t HashString  ( const char * );
-static int      Insert      ( variable_t **, int, const char * );
-static int      InsertInner ( variable_t **, int, uint32_t );
+static size_t   Insert      ( variable_t **, size_t, const char * );
 static int      Lookup      ( vlc_object_t *, const char * );
 
 static void     CheckValue  ( variable_t *, vlc_value_t * );
@@ -1182,54 +1181,35 @@ static uint32_t HashString( const char *psz_string )
 }
 
 /*****************************************************************************
- * Insert: find an empty slot to insert a new variable
- *****************************************************************************
- * We use a recursive inner function indexed on the hash. This function does
- * nothing in the rare cases where a collision may occur, see Lookup()
- * to see how we handle them.
- * XXX: does this really need to be written recursively?
+ * Insert: find the slot where to insert a variable
  *****************************************************************************/
-static int Insert( variable_t **pp_vars, int i_count, const char *psz_name )
+static size_t Insert( variable_t **pp_vars, size_t n, const char *psz_name )
 {
-    if( i_count == 0 )
-    {
+    size_t offset = 0;
+    uint32_t hash = HashString( psz_name );
+
+    if( n == 0 )
         return 0;
-    }
 
-    return InsertInner( pp_vars, i_count, HashString( psz_name ) );
-}
-
-static int InsertInner( variable_t **pp_vars, int i_count, uint32_t i_hash )
-{
-    int i_middle;
-
-    if( i_hash <= pp_vars[0]->i_hash )
+    while( n > 1 )
     {
-        return 0;
+        size_t middle = n / 2;
+
+        if( hash < pp_vars[middle]->i_hash )
+        {
+            n = middle;
+        }
+        else
+        {
+            pp_vars += middle;
+            offset += middle;
+            n -= middle;
+        }
     }
 
-    if( i_hash >= pp_vars[i_count - 1]->i_hash )
-    {
-        return i_count;
-    }
-
-    i_middle = i_count / 2;
-
-    /* We know that 0 < i_middle */
-    if( i_hash < pp_vars[i_middle]->i_hash )
-    {
-        return InsertInner( pp_vars, i_middle, i_hash );
-    }
-
-    /* We know that i_middle + 1 < i_count */
-    if( i_hash > pp_vars[i_middle + 1]->i_hash )
-    {
-        return i_middle + 1 + InsertInner( pp_vars + i_middle + 1,
-                                           i_count - i_middle - 1,
-                                           i_hash );
-    }
-
-    return i_middle + 1;
+    if( hash >= pp_vars[0]->i_hash )
+        offset++;
+    return offset;
 }
 
 static int u32cmp( const void *key, const void *data )
