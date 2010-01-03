@@ -156,7 +156,7 @@ static int      GetUnused   ( vlc_object_t *, const char * );
 static uint32_t HashString  ( const char * );
 static int      Insert      ( variable_t **, int, const char * );
 static int      InsertInner ( variable_t **, int, uint32_t );
-static int      Lookup      ( variable_t **, size_t, const char * );
+static int      Lookup      ( variable_t *const *, size_t, const char * );
 
 static void     CheckValue  ( variable_t *, vlc_value_t * );
 
@@ -1263,7 +1263,8 @@ static int u32cmp( const void *key, const void *data )
  * We use a recursive inner function indexed on the hash. Care is taken of
  * possible hash collisions.
  *****************************************************************************/
-static int Lookup( variable_t **pp_vars, size_t i_count, const char *psz_name )
+static int Lookup( variable_t *const *pp_vars, size_t i_count,
+                   const char *psz_name )
 {
     variable_t **pp_var;
     uint32_t i_hash;
@@ -1286,7 +1287,7 @@ static int Lookup( variable_t **pp_vars, size_t i_count, const char *psz_name )
     /* Hash collision should be very unlikely, but we cannot guarantee
      * it will never happen. So we do an exhaustive search amongst all
      * entries with the same hash. Typically, there is only one anyway. */
-    for( variable_t **p_end = pp_vars + i_count;
+    for( variable_t *const *p_end = pp_vars + i_count;
          (pp_var < p_end) && (i_hash == (*pp_var)->i_hash);
          pp_var++ )
     {
