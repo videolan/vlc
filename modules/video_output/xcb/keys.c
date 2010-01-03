@@ -173,6 +173,8 @@ static uint_fast32_t ConvertKeySym (xcb_keysym_t sym)
         { XF86XK_Favorites,        KEY_BROWSER_FAVORITES, },
         { XF86XK_AudioPause,       KEY_MEDIA_PLAY_PAUSE, },
         { XF86XK_Reload,           KEY_BROWSER_REFRESH, },
+    }, old[] = {
+#include "keysym.h"
     };
 
     /* X11 Latin-1 range */
@@ -184,6 +186,11 @@ static uint_fast32_t ConvertKeySym (xcb_keysym_t sym)
 
     /* Special keys */
     res = bsearch (&sym, tab, sizeof (tab) / sizeof (tab[0]), sizeof (tab[0]),
+                   keysymcmp);
+    if (res != NULL)
+        return res->vlc;
+    /* Legacy X11 symbols outside the Unicode range */
+    res = bsearch (&sym, old, sizeof (old) / sizeof (old[0]), sizeof (old[0]),
                    keysymcmp);
     if (res != NULL)
         return res->vlc;

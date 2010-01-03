@@ -53,7 +53,7 @@ libxcb_glx_plugin_la_LIBADD = $(AM_LIBADD) \
 	$(XLIB_XCB_LIBS) $(GL_LIBS)
 libxcb_glx_plugin_la_DEPENDENCIES =
 
-libxcb_window_plugin_la_SOURCES = xcb/window.c xcb/keys.c
+libxcb_window_plugin_la_SOURCES = xcb/window.c xcb/keys.c xcb/keysym.h
 libxcb_window_plugin_la_CFLAGS = $(AM_CFLAGS) \
 	$(XPROTO_CFLAGS) \
 	$(XCB_CFLAGS) \
