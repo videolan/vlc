@@ -28,6 +28,8 @@
 
 TYPEDEF_ARRAY(input_item_t*, input_item_array_t);
 
+struct hotkey;
+
 /*****************************************************************************
  * libvlc_internal_instance_t
  *****************************************************************************
@@ -38,11 +40,6 @@ struct libvlc_int_t
     VLC_COMMON_MEMBERS
 
     /* Structure storing the action name / key associations */
-    const struct hotkey
-    {
-        const char *psz_action;
-        int i_action;
-        int i_key;
-    } *p_hotkeys;
+    const struct hotkey *p_hotkeys;
 };
 

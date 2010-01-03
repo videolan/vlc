@@ -209,4 +209,11 @@ typedef enum vlc_key {
 
 VLC_EXPORT( vlc_key_t, vlc_GetActionId, (const char *psz_key) ) LIBVLC_USED;
 
+struct hotkey
+{
+    const char *psz_action;
+    vlc_key_t i_action;
+    uint_fast32_t i_key;
+};
+
 #endif

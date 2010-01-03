@@ -84,6 +84,7 @@
 #include <vlc_charset.h>
 #include <vlc_cpu.h>
 #include <vlc_url.h>
+#include <vlc_keys.h>
 
 #include "libvlc.h"
 
