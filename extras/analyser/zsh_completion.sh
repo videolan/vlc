@@ -58,7 +58,7 @@ if ! find_libvlccore; then
     /bin/echo -n "libvlccore not found ! Linking will fail !"
 fi
 
-LD_LIBRARY_PATH=$BUILDDIR/src/.libs
+export LD_LIBRARY_PATH=$BUILDDIR/src/.libs
 
 if test -e ../../extras/contrib/config.mak -a ! "`grep HOST ../../extras/contrib/config.mak 2>/dev/null|awk '{print $3}'`" != "$HOST"; then
     echo "contribs found !"
