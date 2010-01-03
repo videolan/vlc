@@ -512,8 +512,15 @@ static void Display(vout_thread_t *vout, picture_t *picture)
 
      vout_display_Display(vd, direct);
 
-     if (!sys->use_dr)
+     if (sys->use_dr) {
+         for (int i = 0; i < picture->i_planes; i++) {
+             picture->p[i].p_pixels = direct->p[i].p_pixels;
+             picture->p[i].i_pitch  = direct->p[i].i_pitch;
+             picture->p[i].i_lines  = direct->p[i].i_lines;
+         }
+     } else {
          picture->p_sys->direct = NULL;
+     }
 }
 
 static void VoutGetDisplayCfg(vout_thread_t *vout, vout_display_cfg_t *cfg, const char *title)
