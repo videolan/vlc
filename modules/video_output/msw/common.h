@@ -80,13 +80,6 @@ struct vout_display_sys_t
     HWND                 hparent;             /* Handle of the parent window */
     HWND                 hfswnd;          /* Handle of the fullscreen window */
 
-    /* Multi-monitor support
-     * TODO move to directx only */
-    HMONITOR             hmonitor;          /* handle of the current monitor */
-    GUID                 *display_driver;
-    HMONITOR             (WINAPI* MonitorFromWindow)(HWND, DWORD);
-    BOOL                 (WINAPI* GetMonitorInfo)(HMONITOR, LPMONITORINFO);
-
     /* size of the display */
     RECT         rect_display;
     int          display_depth;
@@ -118,6 +111,12 @@ struct vout_display_sys_t
     picture_pool_t *pool;
 
 #ifdef MODULE_NAME_IS_directx
+    /* Multi-monitor support */
+    HMONITOR             hmonitor;          /* handle of the current monitor */
+    GUID                 *display_driver;
+    HMONITOR             (WINAPI* MonitorFromWindow)(HWND, DWORD);
+    BOOL                 (WINAPI* GetMonitorInfo)(HMONITOR, LPMONITORINFO);
+
     /* Overlay alignment restrictions */
     int          i_align_src_boundary;
     int          i_align_src_size;

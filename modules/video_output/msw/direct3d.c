@@ -594,7 +594,6 @@ static void Direct3DClose(vout_display_t *vd)
        IDirect3DDevice9_Release(sys->d3ddev);
 
     sys->d3ddev = NULL;
-    sys->hmonitor = NULL;
 }
 
 /**
