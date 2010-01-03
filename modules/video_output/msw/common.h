@@ -80,9 +80,10 @@ struct vout_display_sys_t
     HWND                 hparent;             /* Handle of the parent window */
     HWND                 hfswnd;          /* Handle of the fullscreen window */
 
-    /* Multi-monitor support */
+    /* Multi-monitor support
+     * TODO move to directx only */
     HMONITOR             hmonitor;          /* handle of the current monitor */
-    GUID                 *p_display_driver;
+    GUID                 *display_driver;
     HMONITOR             (WINAPI* MonitorFromWindow)(HWND, DWORD);
     BOOL                 (WINAPI* GetMonitorInfo)(HMONITOR, LPMONITORINFO);
 
@@ -114,8 +115,7 @@ struct vout_display_sys_t
     RECT         rect_dest;
     RECT         rect_dest_clipped;
 
-    bool   allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
-
+    picture_pool_t *pool;
 
 #ifdef MODULE_NAME_IS_directx
     /* Overlay alignment restrictions */
@@ -124,27 +124,30 @@ struct vout_display_sys_t
     int          i_align_dest_boundary;
     int          i_align_dest_size;
 
-    bool      b_wallpaper;    /* show as desktop wallpaper ? */
+    bool   use_wallpaper;   /* show as desktop wallpaper ? */
 
-    bool   b_using_overlay;         /* Are we using an overlay surface */
-    bool   b_use_sysmem;   /* Should we use system memory for surfaces */
-    bool   b_3buf_overlay;   /* Should we use triple buffered overlays */
+    bool   use_overlay;     /* Are we using an overlay surface */
 
     /* DDraw capabilities */
-    int          b_caps_overlay_clipping;
+    bool            can_blit_fourcc;
 
-    unsigned int    i_rgb_colorkey;      /* colorkey in RGB used by the overlay */
-    unsigned int    i_colorkey;                 /* colorkey used by the overlay */
+    uint32_t        i_rgb_colorkey;      /* colorkey in RGB used by the overlay */
+    uint32_t        i_colorkey;                 /* colorkey used by the overlay */
 
     COLORREF        color_bkg;
     COLORREF        color_bkgtxt;
 
-    LPDIRECTDRAW2        p_ddobject;                    /* DirectDraw object */
-    LPDIRECTDRAWSURFACE2 p_display;                        /* Display device */
-    LPDIRECTDRAWSURFACE2 p_current_surface;   /* surface currently displayed */
-    LPDIRECTDRAWCLIPPER  p_clipper;             /* clipper used for blitting */
+    LPDIRECTDRAW2        ddobject;                    /* DirectDraw object */
+    LPDIRECTDRAWSURFACE2 display;                        /* Display device */
+    LPDIRECTDRAWCLIPPER  clipper;             /* clipper used for blitting */
     HINSTANCE            hddraw_dll;       /* handle of the opened ddraw dll */
+
+    picture_resource_t   resource;
+
+    /* It protects the following variables */
     vlc_mutex_t    lock;
+    bool           ch_wallpaper;
+    bool           wallpaper_requested;
 #endif
 
 #ifdef MODULE_NAME_IS_glwin32
@@ -152,10 +155,10 @@ struct vout_display_sys_t
     HGLRC                 hGLRC;
     vout_opengl_t         gl;
     vout_display_opengl_t vgl;
-    picture_pool_t        *pool;
 #endif
 
 #ifdef MODULE_NAME_IS_direct3d
+    bool allow_hw_yuv;    /* Should we use hardware YUV->RGB conversions */
     /* show video on desktop window ? */
     bool use_desktop;
     struct {
@@ -175,7 +178,6 @@ struct vout_display_sys_t
     LPDIRECT3DVERTEXBUFFER9 d3dvtc;
 
     picture_resource_t      resource;
-    picture_pool_t          *pool;
 
     /* */
     bool                    reset_device;
@@ -193,8 +195,6 @@ struct vout_display_sys_t
     /* Our offscreen bitmap and its framebuffer */
     HDC        off_dc;
     HBITMAP    off_bitmap;
-
-    picture_pool_t *pool;
 
     struct
     {
@@ -228,11 +228,6 @@ struct vout_display_sys_t
 #   define GXSuspend p_vout->p_sys->GXSuspend
 #   define GXResume p_vout->p_sys->GXResume
 #endif
-
-/*****************************************************************************
- * Prototypes from directx.c
- *****************************************************************************/
-int DirectDrawUpdateOverlay(vout_display_t *);
 
 /*****************************************************************************
  * Prototypes from common.c

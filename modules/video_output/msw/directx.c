@@ -37,10 +37,11 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_vout.h>
+#include <vlc_vout_display.h>
 #include <vlc_playlist.h>   /* needed for wallpaper */
 
 #include <ddraw.h>
@@ -55,19 +56,84 @@
 #   define MONITOR_DEFAULTTONEAREST 2
 #endif
 
-#include "vout.h"
+#include "common.h"
 
 /*****************************************************************************
- * picture_sys_t: direct buffer method descriptor
- *****************************************************************************
- * This structure is part of the picture descriptor, it describes the
- * DirectX specific properties of a direct buffer.
+ * Module descriptor
  *****************************************************************************/
-struct picture_sys_t
-{
-    LPDIRECTDRAWSURFACE2 p_surface;
-    LPDIRECTDRAWSURFACE2 p_front_surface;
-    DDSURFACEDESC        ddsd;
+#define HW_YUV_TEXT N_("Use hardware YUV->RGB conversions")
+#define HW_YUV_LONGTEXT N_(\
+    "Try to use hardware acceleration for YUV->RGB conversions. " \
+    "This option doesn't have any effect when using overlays.")
+
+#define SYSMEM_TEXT N_("Use video buffers in system memory")
+#define SYSMEM_LONGTEXT N_(\
+    "Create video buffers in system memory instead of video memory. This " \
+    "isn't recommended as usually using video memory allows to benefit from " \
+    "more hardware acceleration (like rescaling or YUV->RGB conversions). " \
+    "This option doesn't have any effect when using overlays.")
+
+#define TRIPLEBUF_TEXT N_("Use triple buffering for overlays")
+#define TRIPLEBUF_LONGTEXT N_(\
+    "Try to use triple buffering when using YUV overlays. That results in " \
+    "much better video quality (no flickering).")
+
+#define DEVICE_TEXT N_("Name of desired display device")
+#define DEVICE_LONGTEXT N_("In a multiple monitor configuration, you can " \
+    "specify the Windows device name of the display that you want the video " \
+    "window to open on. For example, \"\\\\.\\DISPLAY1\" or " \
+    "\"\\\\.\\DISPLAY2\".")
+
+#define DX_HELP N_("Recommended video output for Windows XP. " \
+    "Incompatible with Vista's Aero interface" )
+
+static const char * const device[] = { "" };
+static const char * const device_text[] = { N_("Default") };
+
+static int  Open (vlc_object_t *);
+static void Close(vlc_object_t *);
+
+static int  FindDevicesCallback(vlc_object_t *, char const *,
+                                vlc_value_t, vlc_value_t, void *);
+vlc_module_begin()
+    set_shortname("DirectX")
+    set_description(N_("DirectX (DirectDraw) video output"))
+    set_help(DX_HELP)
+    set_category(CAT_VIDEO)
+    set_subcategory(SUBCAT_VIDEO_VOUT)
+    add_bool("directx-hw-yuv", true, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
+              true)
+    add_bool("directx-use-sysmem", false, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT,
+              true)
+    add_bool("directx-3buffering", true, NULL, TRIPLEBUF_TEXT,
+              TRIPLEBUF_LONGTEXT, true)
+    add_string("directx-device", "", NULL, DEVICE_TEXT, DEVICE_LONGTEXT, true)
+        change_string_list(device, device_text, FindDevicesCallback)
+        change_action_add(FindDevicesCallback, N_("Refresh list"))
+
+    set_capability("vout display", 100)
+    add_shortcut("directx")
+    set_callbacks(Open, Close)
+
+    /* FIXME: Hack to avoid unregistering our window class */
+    linked_with_a_crap_library_which_uses_atexit()
+vlc_module_end()
+
+#if 0 /* FIXME */
+    /* check if we registered a window class because we need to
+     * unregister it */
+    WNDCLASS wndclass;
+    if (GetClassInfo(GetModuleHandle(NULL), "VLC DirectX", &wndclass))
+        UnregisterClass("VLC DirectX", GetModuleHandle(NULL));
+#endif
+
+/*****************************************************************************
+ * Local prototypes.
+ *****************************************************************************/
+
+struct picture_sys_t {
+    LPDIRECTDRAWSURFACE2 surface;
+    LPDIRECTDRAWSURFACE2 front_surface;
 };
 
 /*****************************************************************************
@@ -78,921 +144,764 @@ struct picture_sys_t
 #include <initguid.h>
 #undef GUID_EXT
 #define GUID_EXT
-DEFINE_GUID( IID_IDirectDraw2, 0xB3A6F3E0,0x2B43,0x11CF,0xA2,0xDE,0x00,0xAA,0x00,0xB9,0x33,0x56 );
-DEFINE_GUID( IID_IDirectDrawSurface2, 0x57805885,0x6eec,0x11cf,0x94,0x41,0xa8,0x23,0x03,0xc1,0x0e,0x27 );
+DEFINE_GUID(IID_IDirectDraw2, 0xB3A6F3E0,0x2B43,0x11CF,0xA2,0xDE,0x00,0xAA,0x00,0xB9,0x33,0x56);
+DEFINE_GUID(IID_IDirectDrawSurface2, 0x57805885,0x6eec,0x11cf,0x94,0x41,0xa8,0x23,0x03,0xc1,0x0e,0x27);
 
-/*****************************************************************************
- * Local prototypes.
- *****************************************************************************/
-static int  OpenVideo  ( vlc_object_t * );
-static void CloseVideo ( vlc_object_t * );
+static picture_pool_t *Pool  (vout_display_t *, unsigned);
+static void           Display(vout_display_t *, picture_t *);
+static int            Control(vout_display_t *, int, va_list);
+static void           Manage (vout_display_t *);
 
-static int  Init      ( vout_thread_t * );
-static void End       ( vout_thread_t * );
-static int  Manage    ( vout_thread_t * );
-static void Display   ( vout_thread_t *, picture_t * );
-static void FirstDisplay( vout_thread_t *, picture_t * );
-static void SetPalette( vout_thread_t *, uint16_t *, uint16_t *, uint16_t * );
+/* */
+static int WallpaperCallback(vlc_object_t *, char const *,
+                             vlc_value_t, vlc_value_t, void *);
 
-static int  NewPictureVec  ( vout_thread_t *, picture_t * );
-static void FreePictureVec ( vout_thread_t *, picture_t *, int );
-static int  UpdatePictureStruct( vout_thread_t *, picture_t * );
+static int  DirectXOpen(vout_display_t *, video_format_t *fmt);
+static void DirectXClose(vout_display_t *);
 
-static int  DirectXInitDDraw      ( vout_thread_t *p_vout );
-static void DirectXCloseDDraw     ( vout_thread_t *p_vout );
-static int  DirectXCreateDisplay  ( vout_thread_t *p_vout );
-static void DirectXCloseDisplay   ( vout_thread_t *p_vout );
-static int  DirectXCreateSurface  ( vout_thread_t *p_vout,
-                                    LPDIRECTDRAWSURFACE2 *, int, int, int );
-static void DirectXCloseSurface   ( vout_thread_t *p_vout,
-                                    LPDIRECTDRAWSURFACE2 );
-static int  DirectXCreateClipper  ( vout_thread_t *p_vout );
-static void DirectXGetDDrawCaps   ( vout_thread_t *p_vout );
-static int  DirectXLockSurface    ( vout_thread_t *p_vout, picture_t *p_pic );
-static int  DirectXUnlockSurface  ( vout_thread_t *p_vout, picture_t *p_pic );
+static int  DirectXLock(picture_t *);
+static void DirectXUnlock(picture_t *);
 
-static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t *i_color );
+static int DirectXUpdateOverlay(vout_display_t *, LPDIRECTDRAWSURFACE2 surface);
 
-void SwitchWallpaperMode( vout_thread_t *, bool );
+static void WallpaperChange(vout_display_t *vd, bool use_wallpaper);
 
-/* Object variables callbacks */
-static int FindDevicesCallback( vlc_object_t *, char const *,
-                                vlc_value_t, vlc_value_t, void * );
-static int WallpaperCallback( vlc_object_t *, char const *,
-                              vlc_value_t, vlc_value_t, void * );
-
-BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
-                                 LPTSTR psz_drivername, VOID* p_context,
-                                 HMONITOR hmon );
-                                 
-BOOL WINAPI DirectXEnumCallback2( GUID* p_guid, LPTSTR psz_desc,
-                                  LPTSTR psz_drivername, VOID* p_context,
-                                  HMONITOR hmon );
-                                  
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-#define HW_YUV_TEXT N_("Use hardware YUV->RGB conversions")
-#define HW_YUV_LONGTEXT N_( \
-    "Try to use hardware acceleration for YUV->RGB conversions. " \
-    "This option doesn't have any effect when using overlays." )
-
-#define SYSMEM_TEXT N_("Use video buffers in system memory")
-#define SYSMEM_LONGTEXT N_( \
-    "Create video buffers in system memory instead of video memory. This " \
-    "isn't recommended as usually using video memory allows to benefit from " \
-    "more hardware acceleration (like rescaling or YUV->RGB conversions). " \
-    "This option doesn't have any effect when using overlays." )
-
-#define TRIPLEBUF_TEXT N_("Use triple buffering for overlays")
-#define TRIPLEBUF_LONGTEXT N_( \
-    "Try to use triple buffering when using YUV overlays. That results in " \
-    "much better video quality (no flickering)." )
-
-#define DEVICE_TEXT N_("Name of desired display device")
-#define DEVICE_LONGTEXT N_("In a multiple monitor configuration, you can " \
-    "specify the Windows device name of the display that you want the video " \
-    "window to open on. For example, \"\\\\.\\DISPLAY1\" or " \
-    "\"\\\\.\\DISPLAY2\"." )
-
-#define DX_HELP N_("Recommended video output for Windows XP. " \
-    "Incompatible with Vista's Aero interface" )
-
-static const char *const ppsz_dev[] = { "" };
-static const char *const ppsz_dev_text[] = { N_("Default") };
-
-vlc_module_begin ()
-    set_shortname( "DirectX" )
-    set_description( N_("DirectX (DirectDraw) video output") )
-    set_help(DX_HELP)
-    set_category( CAT_VIDEO )
-    set_subcategory( SUBCAT_VIDEO_VOUT )
-    add_bool( "directx-hw-yuv", true, NULL, HW_YUV_TEXT, HW_YUV_LONGTEXT,
-              true )
-    add_bool( "directx-use-sysmem", false, NULL, SYSMEM_TEXT, SYSMEM_LONGTEXT,
-              true )
-    add_bool( "directx-3buffering", true, NULL, TRIPLEBUF_TEXT,
-              TRIPLEBUF_LONGTEXT, true )
-
-    add_string( "directx-device", "", NULL, DEVICE_TEXT, DEVICE_LONGTEXT,
-                true )
-        change_string_list( ppsz_dev, ppsz_dev_text, FindDevicesCallback )
-        change_action_add( FindDevicesCallback, N_("Refresh list") )
-
-    set_capability( "video output", 100 )
-    add_shortcut( "directx" )
-    set_callbacks( OpenVideo, CloseVideo )
-
-    /* FIXME: Hack to avoid unregistering our window class */
-    linked_with_a_crap_library_which_uses_atexit ()
-vlc_module_end ()
-
-#if 0 /* FIXME */
-    /* check if we registered a window class because we need to
-     * unregister it */
-    WNDCLASS wndclass;
-    if( GetClassInfo( GetModuleHandle(NULL), "VLC DirectX", &wndclass ) )
-        UnregisterClass( "VLC DirectX", GetModuleHandle(NULL) );
-#endif
-
-/*****************************************************************************
- * OpenVideo: allocate DirectX video thread output method
- *****************************************************************************
- * This function allocates and initialize the DirectX vout method.
- *****************************************************************************/
-static int OpenVideo( vlc_object_t *p_this )
+/** This function allocates and initialize the DirectX vout display.
+ */
+static int Open(vlc_object_t *object)
 {
-    vout_thread_t * p_vout = (vout_thread_t *)p_this;
-    vlc_value_t val;
-    HMODULE huser32;
+    vout_display_t *vd = (vout_display_t *)object;
+    vout_display_sys_t *sys;
 
     /* Allocate structure */
-    p_vout->p_sys = calloc( 1, sizeof( vout_sys_t ) );
-    if( p_vout->p_sys == NULL )
+    vd->sys = sys = calloc(1, sizeof(*sys));
+    if (!sys)
         return VLC_ENOMEM;
-    vlc_mutex_init( &p_vout->p_sys->lock );
 
-    /* Initialisations */
-    p_vout->pf_init = Init;
-    p_vout->pf_end = End;
-    p_vout->pf_manage = Manage;
-    p_vout->pf_render = NULL;
-    p_vout->pf_display = FirstDisplay;
-    p_vout->pf_control = Control;
+    /* Load direct draw DLL */
+    sys->hddraw_dll = LoadLibrary(_T("DDRAW.DLL"));
+    if (!sys->hddraw_dll) {
+        msg_Warn(vd, "DirectXInitDDraw failed loading ddraw.dll");
+        free(sys);
+        return VLC_EGENERIC;
+    }
 
-    if( CommonInit( p_vout ) )
+    /* */
+    HMODULE huser32 = GetModuleHandle(_T("USER32"));
+    if (huser32) {
+        sys->MonitorFromWindow = (void*)GetProcAddress(huser32, _T("MonitorFromWindow"));
+        sys->GetMonitorInfo = (void*)GetProcAddress(huser32, _T("GetMonitorInfoW"));
+    } else {
+        sys->MonitorFromWindow = NULL;
+        sys->GetMonitorInfo = NULL;
+    }
+
+    /* */
+    sys->use_wallpaper = var_CreateGetBool(vd, "video-wallpaper");
+    /* FIXME */
+    sys->use_overlay = false;//var_CreateGetBool(vd, "overlay"); /* FIXME */
+    var_Create(vd, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+
+    /* Initialisation */
+    if (CommonInit(vd))
         goto error;
 
     /* */
-    p_vout->p_sys->p_ddobject = NULL;
-    p_vout->p_sys->p_display = NULL;
-    p_vout->p_sys->p_current_surface = NULL;
-    p_vout->p_sys->p_clipper = NULL;
-    p_vout->p_sys->b_wallpaper = 0;
+    video_format_t fmt = vd->fmt;
 
-    /* Multimonitor stuff */
-    p_vout->p_sys->hmonitor = NULL;
-    p_vout->p_sys->p_display_driver = NULL;
-    p_vout->p_sys->MonitorFromWindow = NULL;
-    p_vout->p_sys->GetMonitorInfo = NULL;
-    if( (huser32 = GetModuleHandle( _T("USER32") ) ) )
-    {
-        p_vout->p_sys->MonitorFromWindow = (HMONITOR (WINAPI *)( HWND, DWORD ))
-            GetProcAddress( huser32, _T("MonitorFromWindow") );
-        p_vout->p_sys->GetMonitorInfo =
-            GetProcAddress( huser32, _T("GetMonitorInfoW") );
-    }
-
-    var_Create( p_vout, "overlay", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "directx-use-sysmem", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "directx-hw-yuv", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "directx-3buffering", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
-    var_Create( p_vout, "directx-device", VLC_VAR_STRING | VLC_VAR_DOINHERIT );
-
-    /* Initialise DirectDraw */
-    if( DirectXInitDDraw( p_vout ) )
-    {
-        msg_Err( p_vout, "cannot initialize DirectX DirectDraw" );
+    if (DirectXOpen(vd, &fmt))
         goto error;
-    }
 
-    /* Create the directx display */
-    if( DirectXCreateDisplay( p_vout ) )
-    {
-        msg_Err( p_vout, "cannot initialize DirectX DirectDraw" );
-        goto error;
-    }
+    /* */
+    vout_display_info_t info = vd->info;
+    info.is_slow = true;
+    info.has_double_click = true;
+    info.has_hide_mouse = true;
+    info.has_pictures_invalid = true;
 
-    /* Variable to indicate if the window should be on top of others */
-    /* Trigger a callback right now */
-    var_Create( p_vout, "video-wallpaper", VLC_VAR_BOOL|VLC_VAR_DOINHERIT );
+    /* Interaction TODO support starting with wallpaper mode */
+    vlc_mutex_init(&sys->lock);
+    sys->ch_wallpaper = sys->use_wallpaper;
+    sys->wallpaper_requested = sys->use_wallpaper;
+    sys->use_wallpaper = false;
+
+    vlc_value_t val;
     val.psz_string = _("Wallpaper");
-    var_Change( p_vout, "video-wallpaper", VLC_VAR_SETTEXT, &val, NULL );
-    var_AddCallback( p_vout, "video-wallpaper", WallpaperCallback, NULL );
-    var_TriggerCallback( p_vout, "video-wallpaper" );
+    var_Change(vd, "video-wallpaper", VLC_VAR_SETTEXT, &val, NULL);
+    var_AddCallback(vd, "video-wallpaper", WallpaperCallback, NULL);
 
+    /* Setup vout_display now that everything is fine */
+    vd->fmt     = fmt;
+    vd->info    = info;
+
+    vd->pool    = Pool;
+    vd->prepare = NULL;
+    vd->display = Display;
+    vd->control = Control;
+    vd->manage  = Manage;
     return VLC_SUCCESS;
 
- error:
-    CloseVideo( VLC_OBJECT(p_vout) );
+error:
+    Close(VLC_OBJECT(vd));
     return VLC_EGENERIC;
 }
 
-/*****************************************************************************
- * Init: initialize DirectX video thread output method
- *****************************************************************************
- * This function create the directx surfaces needed by the output thread.
- * It is called at the beginning of the thread.
- *****************************************************************************/
-static int Init( vout_thread_t *p_vout )
+/** Terminate a vout display created by Open.
+ */
+static void Close(vlc_object_t *object)
 {
-    int i_chroma_backup;
+    vout_display_t *vd = (vout_display_t *)object;
+    vout_display_sys_t *sys = vd->sys;
 
-    /* Get a few default parameters */
-    p_vout->p_sys->b_using_overlay = var_GetBool( p_vout, "overlay" );
-    p_vout->p_sys->b_use_sysmem = var_GetBool( p_vout, "directx-use-sysmem" );
-    p_vout->p_sys->b_hw_yuv = var_GetBool( p_vout, "directx-hw-yuv" );
-    p_vout->p_sys->b_3buf_overlay = var_GetBool( p_vout, "directx-3buffering" );
+    var_DelCallback(vd, "video-wallpaper", WallpaperCallback, NULL);
+    vlc_mutex_destroy(&sys->lock);
 
-    /* Initialise DirectDraw if not already done.
-     * We do this here because on multi-monitor systems we may have to
-     * re-create the directdraw surfaces. */
-    if( !p_vout->p_sys->p_ddobject &&
-        DirectXInitDDraw( p_vout ) != VLC_SUCCESS )
-    {
-        msg_Err( p_vout, "cannot initialize DirectDraw" );
+    /* Make sure the wallpaper is restored */
+    WallpaperChange(vd, false);
+
+    DirectXClose(vd);
+
+    CommonClean(vd);
+
+    if (sys->hddraw_dll)
+        FreeLibrary(sys->hddraw_dll);
+    free(sys);
+}
+
+static picture_pool_t *Pool(vout_display_t *vd, unsigned count)
+{
+    VLC_UNUSED(count);
+    return vd->sys->pool;
+}
+static void Display(vout_display_t *vd, picture_t *picture)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    assert(sys->display);
+
+    /* Our surface can be lost so be sure to check this
+     * and restore it if need be */
+    if (IDirectDrawSurface2_IsLost(sys->display) == DDERR_SURFACELOST) {
+        if (IDirectDrawSurface2_Restore(sys->display) == DD_OK) {
+            if (sys->use_overlay)
+                DirectXUpdateOverlay(vd, NULL);
+        }
+    }
+
+    /* */
+    DirectXUnlock(picture);
+
+    if (sys->use_overlay) {
+        /* Flip the overlay buffers if we are using back buffers */
+        if (picture->p_sys->surface != picture->p_sys->front_surface) {
+            HRESULT hr = IDirectDrawSurface2_Flip(picture->p_sys->front_surface,
+                                                  NULL, DDFLIP_WAIT);
+            if (hr != DD_OK)
+                msg_Warn(vd, "could not flip overlay (error %li)", hr);
+        }
+    } else {
+        /* Blit video surface to display with the NOTEARING option */
+        DDBLTFX  ddbltfx;
+        ZeroMemory(&ddbltfx, sizeof(ddbltfx));
+        ddbltfx.dwSize = sizeof(ddbltfx);
+        ddbltfx.dwDDFX = DDBLTFX_NOTEARING;
+
+        HRESULT hr = IDirectDrawSurface2_Blt(sys->display,
+                                             &sys->rect_dest_clipped,
+                                             picture->p_sys->surface,
+                                             &sys->rect_src_clipped,
+                                             DDBLT_ASYNC, &ddbltfx);
+        if (hr != DD_OK)
+            msg_Warn(vd, "could not blit surface (error %li)", hr);
+    }
+    DirectXLock(picture);
+
+    if (sys->is_first_display) {
+        IDirectDraw_WaitForVerticalBlank(sys->ddobject,
+                                         DDWAITVB_BLOCKBEGIN, NULL);
+        if (sys->use_overlay) {
+            HBRUSH brush = CreateSolidBrush(sys->i_rgb_colorkey);
+            /* set the colorkey as the backgound brush for the video window */
+            SetClassLongPtr(sys->hvideownd, GCLP_HBRBACKGROUND, (LONG_PTR)brush);
+        }
+    }
+    CommonDisplay(vd);
+
+    picture_Release(picture);
+}
+static int Control(vout_display_t *vd, int query, va_list args)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    switch (query) {
+    case VOUT_DISPLAY_RESET_PICTURES:
+        DirectXClose(vd);
+        /* Make sure the wallpaper is restored */
+        if (sys->use_wallpaper) {
+            vlc_mutex_lock(&sys->lock);
+            if (!sys->ch_wallpaper) {
+                sys->ch_wallpaper = true;
+                sys->wallpaper_requested = true;
+            }
+            vlc_mutex_unlock(&sys->lock);
+
+            WallpaperChange(vd, false);
+        }
+        return DirectXOpen(vd, &vd->fmt);
+    default:
+        return CommonControl(vd, query, args);
+    }
+}
+static void Manage(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    CommonManage(vd);
+
+    if (sys->changes & DX_POSITION_CHANGE) {
+        /* Update overlay */
+        if (sys->use_overlay)
+            DirectXUpdateOverlay(vd, NULL);
+
+        /* Check if we are still on the same monitor */
+        if (sys->MonitorFromWindow &&
+            sys->hmonitor != sys->MonitorFromWindow(sys->hwnd, MONITOR_DEFAULTTONEAREST)) {
+            vout_display_SendEventPicturesInvalid(vd);
+        }
+        /* */
+        sys->changes &= ~DX_POSITION_CHANGE;
+    }
+
+    /* Wallpaper mode change */
+    vlc_mutex_lock(&sys->lock);
+    const bool ch_wallpaper = sys->ch_wallpaper;
+    const bool wallpaper_requested = sys->wallpaper_requested;
+    sys->ch_wallpaper = false;
+    vlc_mutex_unlock(&sys->lock);
+
+    if (ch_wallpaper)
+        WallpaperChange(vd, wallpaper_requested);
+}
+
+/* */
+static int  DirectXOpenDDraw(vout_display_t *);
+static void DirectXCloseDDraw(vout_display_t *);
+
+static int  DirectXOpenDisplay(vout_display_t *vd);
+static void DirectXCloseDisplay(vout_display_t *vd);
+
+static int  DirectXCreatePool(vout_display_t *, bool *, video_format_t *);
+static void DirectXDestroyPool(vout_display_t *);
+
+static int DirectXOpen(vout_display_t *vd, video_format_t *fmt)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    assert(!sys->ddobject);
+    assert(!sys->display);
+    assert(!sys->clipper);
+
+    /* Initialise DirectDraw */
+    if (DirectXOpenDDraw(vd)) {
+        msg_Err(vd, "cannot initialize DirectX DirectDraw");
         return VLC_EGENERIC;
     }
 
     /* Create the directx display */
-    if( !p_vout->p_sys->p_display &&
-        DirectXCreateDisplay( p_vout ) != VLC_SUCCESS )
-    {
-        msg_Err( p_vout, "cannot initialize DirectDraw" );
+    if (DirectXOpenDisplay(vd)) {
+        msg_Err(vd, "cannot initialize DirectX DirectDraw");
+        return VLC_EGENERIC;
+    }
+    UpdateRects(vd, NULL, NULL, true);
+
+    /* Create the picture pool */
+    if (DirectXCreatePool(vd, &sys->use_overlay, fmt)) {
+        msg_Err(vd, "cannot create any DirectX surface");
         return VLC_EGENERIC;
     }
 
-    /* Initialize the output structure.
-     * Since DirectDraw can do rescaling for us, stick to the default
-     * coordinates and aspect. */
-    p_vout->output.i_width  = p_vout->render.i_width;
-    p_vout->output.i_height = p_vout->render.i_height;
-    p_vout->output.i_aspect = p_vout->render.i_aspect;
-    p_vout->fmt_out = p_vout->fmt_in;
-    UpdateRects( p_vout, true );
-
-#define MAX_DIRECTBUFFERS 1
-    /* Right now we use only 1 directbuffer because we don't want the
-     * video decoder to decode directly into direct buffers as they are
-     * created into video memory and video memory is _really_ slow */
-
-    /* Choose the chroma we will try first. */
-    switch( p_vout->render.i_chroma )
-    {
-        case VLC_CODEC_YUYV:
-            p_vout->output.i_chroma = VLC_CODEC_YUYV;
-            break;
-        case VLC_CODEC_UYVY:
-            p_vout->output.i_chroma = VLC_CODEC_UYVY;
-            break;
-        case VLC_CODEC_YVYU:
-            p_vout->output.i_chroma = VLC_CODEC_YVYU;
-            break;
-        case VLC_CODEC_I420:
-            p_vout->output.i_chroma = VLC_CODEC_I420;
-            break;
-        default:
-            msg_Dbg( p_vout, "use default chroma YV12 for render " \
-                             "chroma (%4.4s)",
-                             (char *)&p_vout->render.i_chroma);
-            p_vout->output.i_chroma = VLC_CODEC_YV12;
-            break;
-    }
-
-    NewPictureVec( p_vout, p_vout->p_picture );
-
-    i_chroma_backup = p_vout->output.i_chroma;
-
-    if( !I_OUTPUTPICTURES )
-    {
-        /* hmmm, it didn't work! Let's try commonly supported chromas */
-        if( p_vout->output.i_chroma != VLC_CODEC_I420 )
-        {
-            p_vout->output.i_chroma = VLC_CODEC_YV12;
-            NewPictureVec( p_vout, p_vout->p_picture );
-        }
-        if( !I_OUTPUTPICTURES )
-        {
-            /* hmmm, it still didn't work! Let's try another one */
-            p_vout->output.i_chroma = VLC_CODEC_YUYV;
-            NewPictureVec( p_vout, p_vout->p_picture );
-        }
-    }
-
-    if( !I_OUTPUTPICTURES )
-    {
-        /* If it still didn't work then don't try to use an overlay */
-        p_vout->output.i_chroma = i_chroma_backup;
-        p_vout->p_sys->b_using_overlay = false;
-        msg_Warn( p_vout, "Could not initialize directx overlay" ) ;
-        NewPictureVec( p_vout, p_vout->p_picture );
-    }
-
-    p_vout->fmt_out.i_chroma = p_vout->output.i_chroma;
+    /* */
+    if (sys->use_overlay)
+        DirectXUpdateOverlay(vd, NULL);
+    EventThreadUseOverlay(sys->event, sys->use_overlay);
 
     /* Change the window title bar text */
-    const char *psz_fallback;
-    if( p_vout->p_sys->b_using_overlay )
-        psz_fallback = VOUT_TITLE " (hardware YUV overlay DirectX output)";
-    else if( p_vout->p_sys->b_hw_yuv )
-        psz_fallback = VOUT_TITLE " (hardware YUV DirectX output)";
+    const char *fallback;
+    if (sys->use_overlay)
+        fallback = VOUT_TITLE " (hardware YUV overlay DirectX output)";
+    else if (vlc_fourcc_IsYUV(fmt->i_chroma))
+        fallback = VOUT_TITLE " (hardware YUV DirectX output)";
     else
-        psz_fallback = VOUT_TITLE " (software RGB DirectX output)";
-    EventThreadUpdateTitle( p_vout->p_sys->p_event, psz_fallback );
-    EventThreadUseOverlay( p_vout->p_sys->p_event, p_vout->p_sys->b_using_overlay );
+        fallback = VOUT_TITLE " (software RGB DirectX output)";
+    EventThreadUpdateTitle(sys->event, fallback);
 
     return VLC_SUCCESS;
 }
-
-/*****************************************************************************
- * End: terminate Sys video thread output method
- *****************************************************************************
- * Terminate an output method created by Create.
- * It is called at the end of the thread.
- *****************************************************************************/
-static void End( vout_thread_t *p_vout )
+static void DirectXClose(vout_display_t *vd)
 {
-    FreePictureVec( p_vout, p_vout->p_picture, I_OUTPUTPICTURES );
-
-    DirectXCloseDisplay( p_vout );
-    DirectXCloseDDraw( p_vout );
-
-    return;
+    DirectXDestroyPool(vd);
+    DirectXCloseDisplay(vd);
+    DirectXCloseDDraw(vd);
 }
 
-/*****************************************************************************
- * CloseVideo: destroy Sys video thread output method
- *****************************************************************************
- * Terminate an output method created by Create
- *****************************************************************************/
-static void CloseVideo( vlc_object_t *p_this )
+/* */
+static BOOL WINAPI DirectXOpenDDrawCallback(GUID *guid, LPTSTR desc,
+                                            LPTSTR drivername, VOID *context,
+                                            HMONITOR hmon)
 {
-    vout_thread_t * p_vout = (vout_thread_t *)p_this;
+    vout_display_t *vd = context;
+    vout_display_sys_t *sys = vd->sys;
 
-    /* Make sure the wallpaper is restored */
-    var_DelCallback( p_vout, "video-wallpaper", WallpaperCallback, NULL );
-    SwitchWallpaperMode( p_vout, false );
-
-    CommonClean( p_vout );
-
-    vlc_mutex_destroy( &p_vout->p_sys->lock );
-    free( p_vout->p_sys );
-}
-
-/*****************************************************************************
- * Manage: handle Sys events
- *****************************************************************************
- * This function should be called regularly by the video output thread.
- * It returns a non null value if an error occurred.
- *****************************************************************************/
-static int Manage( vout_thread_t *p_vout )
-{
-    CommonManage( p_vout );
-
-    /*
-     * Position Change
+    /* This callback function is called by DirectDraw once for each
+     * available DirectDraw device.
+     *
+     * Returning TRUE keeps enumerating.
      */
-    if( p_vout->p_sys->i_changes & DX_POSITION_CHANGE )
-    {
-        p_vout->p_sys->i_changes &= ~DX_POSITION_CHANGE;
+    if (!hmon)
+        return TRUE;
 
-        /* Check if we are still on the same monitor */
-        if( p_vout->p_sys->MonitorFromWindow &&
-            p_vout->p_sys->hmonitor !=
-                p_vout->p_sys->MonitorFromWindow( p_vout->p_sys->hwnd,
-                                                  MONITOR_DEFAULTTONEAREST ) )
-        {
-            /* This will force the vout core to recreate the picture buffers */
-            p_vout->i_changes |= VOUT_PICTURE_BUFFERS_CHANGE;
+    msg_Dbg(vd, "DirectXEnumCallback: %s, %s", desc, drivername);
+
+    char *device = var_GetString(vd, "directx-device");
+
+    /* Check for forced device */
+    if (device && *device && !strcmp(drivername, device)) {
+        MONITORINFO monitor_info;
+        monitor_info.cbSize = sizeof(MONITORINFO);
+
+        if (sys->GetMonitorInfo(hmon, &monitor_info)) {
+            RECT rect;
+
+            /* Move window to the right screen */
+            GetWindowRect(sys->hwnd, &rect);
+            if (!IntersectRect(&rect, &rect, &monitor_info.rcWork)) {
+                rect.left = monitor_info.rcWork.left;
+                rect.top = monitor_info.rcWork.top;
+                msg_Dbg(vd, "DirectXEnumCallback: setting window "
+                            "position to %ld,%ld", rect.left, rect.top);
+                SetWindowPos(sys->hwnd, NULL,
+                             rect.left, rect.top, 0, 0,
+                             SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE);
+            }
         }
+        sys->hmonitor = hmon;
+    }
+    free(device);
+
+    if (hmon == sys->hmonitor) {
+        msg_Dbg(vd, "selecting %s, %s", desc, drivername);
+
+        free(sys->display_driver);
+        sys->display_driver = malloc(sizeof(*guid));
+        if (sys->display_driver)
+            *sys->display_driver = *guid;
     }
 
-    if( p_vout->p_sys->i_changes & DX_WALLPAPER_CHANGE )
-    {
-        SwitchWallpaperMode( p_vout, !p_vout->p_sys->b_wallpaper );
-        p_vout->p_sys->i_changes &= ~DX_WALLPAPER_CHANGE;
-        DirectDrawUpdateOverlay( p_vout );
-    }
-
-    return VLC_SUCCESS;
+    return TRUE;
 }
-
-/*****************************************************************************
- * Display: displays previously rendered output
- *****************************************************************************
- * This function sends the currently rendered image to the display, wait until
- * it is displayed and switch the two rendering buffers, preparing next frame.
- *****************************************************************************/
-static void Display( vout_thread_t *p_vout, picture_t *p_pic )
+/**
+ * Probe the capabilities of the hardware
+ *
+ * It is nice to know which features are supported by the hardware so we can
+ * find ways to optimize our rendering.
+ */
+static void DirectXGetDDrawCaps(vout_display_t *vd)
 {
-    HRESULT dxresult;
+    vout_display_sys_t *sys = vd->sys;
 
-    if( (p_vout->p_sys->p_display == NULL) )
-    {
-        msg_Warn( p_vout, "no display!" );
+    /* This is just an indication of whether or not we'll support overlay,
+     * but with this test we don't know if we support YUV overlay */
+    DDCAPS ddcaps;
+    ZeroMemory(&ddcaps, sizeof(ddcaps));
+    ddcaps.dwSize = sizeof(ddcaps);
+    HRESULT hr = IDirectDraw2_GetCaps(sys->ddobject, &ddcaps, NULL);
+    if (hr != DD_OK) {
+        msg_Warn(vd, "cannot get caps");
         return;
     }
 
-    /* Our surface can be lost so be sure to check this
-     * and restore it if need be */
-    if( IDirectDrawSurface2_IsLost( p_vout->p_sys->p_display )
-        == DDERR_SURFACELOST )
-    {
-        if( IDirectDrawSurface2_Restore( p_vout->p_sys->p_display ) == DD_OK &&
-            p_vout->p_sys->b_using_overlay )
-            DirectDrawUpdateOverlay( p_vout );
-    }
+    /* Determine if the hardware supports overlay surfaces */
+    const bool has_overlay = ddcaps.dwCaps & DDCAPS_OVERLAY;
+    /* Determine if the hardware supports overlay surfaces */
+    const bool has_overlay_fourcc = ddcaps.dwCaps & DDCAPS_OVERLAYFOURCC;
+    /* Determine if the hardware supports overlay deinterlacing */
+    const bool can_deinterlace = ddcaps.dwCaps & DDCAPS2_CANFLIPODDEVEN;
+    /* Determine if the hardware supports colorkeying */
+    const bool has_color_key = ddcaps.dwCaps & DDCAPS_COLORKEY;
+    /* Determine if the hardware supports scaling of the overlay surface */
+    const bool can_stretch = ddcaps.dwCaps & DDCAPS_OVERLAYSTRETCH;
+    /* Determine if the hardware supports color conversion during a blit */
+    sys->can_blit_fourcc = ddcaps.dwCaps & DDCAPS_BLTFOURCC;
+    /* Determine overlay source boundary alignment */
+    const bool align_boundary_src  = ddcaps.dwCaps & DDCAPS_ALIGNBOUNDARYSRC;
+    /* Determine overlay destination boundary alignment */
+    const bool align_boundary_dest = ddcaps.dwCaps & DDCAPS_ALIGNBOUNDARYDEST;
+    /* Determine overlay destination size alignment */
+    const bool align_size_src  = ddcaps.dwCaps & DDCAPS_ALIGNSIZESRC;
+    /* Determine overlay destination size alignment */
+    const bool align_size_dest = ddcaps.dwCaps & DDCAPS_ALIGNSIZEDEST;
 
-    if( !p_vout->p_sys->b_using_overlay )
-    {
-        DDBLTFX  ddbltfx;
+    msg_Dbg(vd, "DirectDraw Capabilities: overlay=%i yuvoverlay=%i "
+                "can_deinterlace_overlay=%i colorkey=%i stretch=%i "
+                "bltfourcc=%i",
+                has_overlay, has_overlay_fourcc, can_deinterlace,
+                has_color_key, can_stretch, sys->can_blit_fourcc);
 
-        /* We ask for the "NOTEARING" option */
-        memset( &ddbltfx, 0, sizeof(DDBLTFX) );
-        ddbltfx.dwSize = sizeof(DDBLTFX);
-        ddbltfx.dwDDFX = DDBLTFX_NOTEARING;
+    if (align_boundary_src || align_boundary_dest || align_size_src || align_size_dest) {
+        if (align_boundary_src)
+            vd->sys->i_align_src_boundary = ddcaps.dwAlignBoundarySrc;
+        if (align_boundary_dest)
+            vd->sys->i_align_dest_boundary = ddcaps.dwAlignBoundaryDest;
+        if (align_size_src)
+            vd->sys->i_align_src_size = ddcaps.dwAlignSizeSrc;
+        if (align_size_dest)
+            vd->sys->i_align_dest_size = ddcaps.dwAlignSizeDest;
 
-        /* Blit video surface to display */
-        dxresult = IDirectDrawSurface2_Blt( p_vout->p_sys->p_display,
-                                            &p_vout->p_sys->rect_dest_clipped,
-                                            p_pic->p_sys->p_surface,
-                                            &p_vout->p_sys->rect_src_clipped,
-                                            DDBLT_ASYNC, &ddbltfx );
-        if( dxresult != DD_OK )
-        {
-            msg_Warn( p_vout, "could not blit surface (error %li)", dxresult );
-            return;
-        }
-    }
-    else /* using overlay */
-    {
-        /* Flip the overlay buffers if we are using back buffers */
-        if( p_pic->p_sys->p_front_surface == p_pic->p_sys->p_surface )
-        {
-            return;
-        }
-
-        dxresult = IDirectDrawSurface2_Flip( p_pic->p_sys->p_front_surface,
-                                             NULL, DDFLIP_WAIT );
-        if( dxresult != DD_OK )
-        {
-            msg_Warn( p_vout, "could not flip overlay (error %li)", dxresult );
-        }
-
-        /* set currently displayed pic */
-        p_vout->p_sys->p_current_surface = p_pic->p_sys->p_front_surface;
-
-        /* Lock surface to get all the required info */
-        if( DirectXLockSurface( p_vout, p_pic ) )
-        {
-            /* AAARRGG */
-            msg_Warn( p_vout, "cannot lock surface" );
-            return;
-        }
-        DirectXUnlockSurface( p_vout, p_pic );
+        msg_Dbg(vd,
+                "align_boundary_src=%i,%i align_boundary_dest=%i,%i "
+                "align_size_src=%i,%i align_size_dest=%i,%i",
+                align_boundary_src,  vd->sys->i_align_src_boundary,
+                align_boundary_dest, vd->sys->i_align_dest_boundary,
+                align_size_src,  vd->sys->i_align_src_size,
+                align_size_dest, vd->sys->i_align_dest_size);
     }
 }
 
-/*
-** this function is only used once when the first picture is received
-** this function will show the video window once video is ready for
-** display.
-*/
 
-static void FirstDisplay( vout_thread_t *p_vout, picture_t *p_pic )
+
+/* */
+static int DirectXOpenDDraw(vout_display_t *vd)
 {
-    /* get initial picture rendered on overlay surface */
-    Display(p_vout, p_pic);
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
 
-    IDirectDraw_WaitForVerticalBlank(p_vout->p_sys->p_ddobject,
-            DDWAITVB_BLOCKBEGIN, NULL);
-
-    if( p_vout->p_sys->b_using_overlay )
-    {
-        HBRUSH brush = CreateSolidBrush( p_vout->p_sys->i_rgb_colorkey );
-        /* set the colorkey as the backgound brush for the video window */
-        SetClassLongPtr( p_vout->p_sys->hvideownd, GCLP_HBRBACKGROUND, (LONG_PTR)brush );
+    /* */
+    HRESULT (WINAPI *OurDirectDrawCreate)(GUID *,LPDIRECTDRAW *,IUnknown *);
+    OurDirectDrawCreate =
+        (void *)GetProcAddress(sys->hddraw_dll, _T("DirectDrawCreate"));
+    if (!OurDirectDrawCreate) {
+        msg_Err(vd, "DirectXInitDDraw failed GetProcAddress");
+        return VLC_EGENERIC;
     }
-    /*
-    ** Video window is initially hidden, show it now since we got a
-    ** picture to show.
-    */
-    SetWindowPos( p_vout->p_sys->hvideownd, NULL, 0, 0, 0, 0,
-        SWP_ASYNCWINDOWPOS|
-        SWP_FRAMECHANGED|
-        SWP_SHOWWINDOW|
-        SWP_NOMOVE|
-        SWP_NOSIZE|
-        SWP_NOZORDER );
 
-    /* use and restores proper display function for further pictures */
-    p_vout->pf_display = Display;
-}
+    /* */
+    if (sys->MonitorFromWindow) {
+        HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEXA, LPVOID, DWORD);
+        OurDirectDrawEnumerateEx =
+          (void *)GetProcAddress(sys->hddraw_dll, _T("DirectDrawEnumerateExW"));
 
-/* following functions are local */
-
-/*****************************************************************************
- * DirectXEnumCallback: Device enumeration
- *****************************************************************************
- * This callback function is called by DirectDraw once for each
- * available DirectDraw device.
- *****************************************************************************/
-BOOL WINAPI DirectXEnumCallback( GUID* p_guid, LPTSTR psz_desc,
-                                 LPTSTR psz_drivername, VOID* p_context,
-                                 HMONITOR hmon )
-{
-    vout_thread_t *p_vout = (vout_thread_t *)p_context;
-    char *psz_device;
-
-    msg_Dbg( p_vout, "DirectXEnumCallback: %s, %s", psz_desc, psz_drivername );
-
-    if( hmon )
-    {
-        psz_device = var_GetString( p_vout, "directx-device" );
-
-        if( ( !psz_device || !*psz_device ) &&
-            hmon == p_vout->p_sys->hmonitor )
-        {
-            free( psz_device );
-        }
-        else if( strcmp( psz_drivername, psz_device ) == 0 )
-        {
-            MONITORINFO monitor_info;
-            monitor_info.cbSize = sizeof( MONITORINFO );
-
-            if( p_vout->p_sys->GetMonitorInfo( hmon, &monitor_info ) )
-            {
-                RECT rect;
-
-                /* Move window to the right screen */
-                GetWindowRect( p_vout->p_sys->hwnd, &rect );
-                if( !IntersectRect( &rect, &rect, &monitor_info.rcWork ) )
-                {
-                    rect.left = monitor_info.rcWork.left;
-                    rect.top = monitor_info.rcWork.top;
-                    msg_Dbg( p_vout, "DirectXEnumCallback: setting window "
-                             "position to %ld,%ld", rect.left, rect.top );
-                    SetWindowPos( p_vout->p_sys->hwnd, NULL,
-                                  rect.left, rect.top, 0, 0,
-                                  SWP_NOSIZE | SWP_NOZORDER | SWP_NOACTIVATE );
-                }
+        if (OurDirectDrawEnumerateEx) {
+            char *device = var_GetString(vd, "directx-device");
+            if (device) {
+                msg_Dbg(vd, "directx-device: %s", device);
+                free(device);
             }
 
-            p_vout->p_sys->hmonitor = hmon;
-            free( psz_device );
+            sys->hmonitor = sys->MonitorFromWindow(sys->hwnd, MONITOR_DEFAULTTONEAREST);
+
+            /* Enumerate displays */
+            OurDirectDrawEnumerateEx(DirectXOpenDDrawCallback,
+                                     vd, DDENUM_ATTACHEDSECONDARYDEVICES);
         }
-        else
-        {
-            free( psz_device );
-            return TRUE; /* Keep enumerating */
-        }
-
-        msg_Dbg( p_vout, "selecting %s, %s", psz_desc, psz_drivername );
-        p_vout->p_sys->p_display_driver = malloc( sizeof(GUID) );
-        if( p_vout->p_sys->p_display_driver )
-            memcpy( p_vout->p_sys->p_display_driver, p_guid, sizeof(GUID) );
-    }
-
-    return TRUE; /* Keep enumerating */
-}
-
-/*****************************************************************************
- * DirectXInitDDraw: Takes care of all the DirectDraw initialisations
- *****************************************************************************
- * This function initialise and allocate resources for DirectDraw.
- *****************************************************************************/
-static int DirectXInitDDraw( vout_thread_t *p_vout )
-{
-    HRESULT dxresult;
-    HRESULT (WINAPI *OurDirectDrawCreate)(GUID *,LPDIRECTDRAW *,IUnknown *);
-    HRESULT (WINAPI *OurDirectDrawEnumerateEx)( LPDDENUMCALLBACKEXA, LPVOID,
-                                                DWORD );
-    LPDIRECTDRAW p_ddobject;
-
-    msg_Dbg( p_vout, "DirectXInitDDraw" );
-
-    /* Load direct draw DLL */
-    p_vout->p_sys->hddraw_dll = LoadLibrary(_T("DDRAW.DLL"));
-    if( p_vout->p_sys->hddraw_dll == NULL )
-    {
-        msg_Warn( p_vout, "DirectXInitDDraw failed loading ddraw.dll" );
-        goto error;
-    }
-
-    OurDirectDrawCreate =
-      (void *)GetProcAddress( p_vout->p_sys->hddraw_dll,
-                              _T("DirectDrawCreate") );
-    if( OurDirectDrawCreate == NULL )
-    {
-        msg_Err( p_vout, "DirectXInitDDraw failed GetProcAddress" );
-        goto error;
-    }
-
-    OurDirectDrawEnumerateEx =
-      (void *)GetProcAddress( p_vout->p_sys->hddraw_dll,
-                              _T("DirectDrawEnumerateExW") );
-
-    if( OurDirectDrawEnumerateEx && p_vout->p_sys->MonitorFromWindow )
-    {
-        char *psz_device;
-
-        psz_device = var_GetString( p_vout, "directx-device" );
-        if( psz_device )
-        {
-            msg_Dbg( p_vout, "directx-device: %s", psz_device );
-            free( psz_device );
-        }
-
-        p_vout->p_sys->hmonitor =
-            p_vout->p_sys->MonitorFromWindow( p_vout->p_sys->hwnd,
-                                              MONITOR_DEFAULTTONEAREST );
-
-        /* Enumerate displays */
-        OurDirectDrawEnumerateEx( DirectXEnumCallback, p_vout,
-                                  DDENUM_ATTACHEDSECONDARYDEVICES );
     }
 
     /* Initialize DirectDraw now */
-    dxresult = OurDirectDrawCreate( p_vout->p_sys->p_display_driver,
-                                    &p_ddobject, NULL );
-    if( dxresult != DD_OK )
-    {
-        msg_Err( p_vout, "DirectXInitDDraw cannot initialize DDraw" );
-        goto error;
+    LPDIRECTDRAW ddobject;
+    hr = OurDirectDrawCreate(sys->display_driver, &ddobject, NULL);
+    if (hr != DD_OK) {
+        msg_Err(vd, "DirectXInitDDraw cannot initialize DDraw");
+        return VLC_EGENERIC;
     }
 
     /* Get the IDirectDraw2 interface */
-    dxresult = IDirectDraw_QueryInterface( p_ddobject, &IID_IDirectDraw2,
-                                        &p_vout->p_sys->p_ddobject );
+    hr = IDirectDraw_QueryInterface(ddobject, &IID_IDirectDraw2,
+                                    &sys->ddobject);
     /* Release the unused interface */
-    IDirectDraw_Release( p_ddobject );
-    if( dxresult != DD_OK )
-    {
-        msg_Err( p_vout, "cannot get IDirectDraw2 interface" );
-        goto error;
+    IDirectDraw_Release(ddobject);
+
+    if (hr != DD_OK) {
+        msg_Err(vd, "cannot get IDirectDraw2 interface");
+        sys->ddobject = NULL;
+        return VLC_EGENERIC;
     }
 
     /* Set DirectDraw Cooperative level, ie what control we want over Windows
      * display */
-    dxresult = IDirectDraw2_SetCooperativeLevel( p_vout->p_sys->p_ddobject,
-                                                 NULL, DDSCL_NORMAL );
-    if( dxresult != DD_OK )
-    {
-        msg_Err( p_vout, "cannot set direct draw cooperative level" );
-        goto error;
+    hr = IDirectDraw2_SetCooperativeLevel(sys->ddobject, NULL, DDSCL_NORMAL);
+    if (hr != DD_OK) {
+        msg_Err(vd, "cannot set direct draw cooperative level");
+        return VLC_EGENERIC;
     }
 
     /* Get the size of the current display device */
-    if( p_vout->p_sys->hmonitor && p_vout->p_sys->GetMonitorInfo )
-    {
+    if (sys->hmonitor && sys->GetMonitorInfo) {
         MONITORINFO monitor_info;
-        monitor_info.cbSize = sizeof( MONITORINFO );
-        p_vout->p_sys->GetMonitorInfo( p_vout->p_sys->hmonitor,
-                                       &monitor_info );
-        p_vout->p_sys->rect_display = monitor_info.rcMonitor;
-    }
-    else
-    {
-        p_vout->p_sys->rect_display.left = 0;
-        p_vout->p_sys->rect_display.top = 0;
-        p_vout->p_sys->rect_display.right  = GetSystemMetrics(SM_CXSCREEN);
-        p_vout->p_sys->rect_display.bottom = GetSystemMetrics(SM_CYSCREEN);
+        monitor_info.cbSize = sizeof(MONITORINFO);
+        sys->GetMonitorInfo(vd->sys->hmonitor, &monitor_info);
+        sys->rect_display = monitor_info.rcMonitor;
+    } else {
+        sys->rect_display.left   = 0;
+        sys->rect_display.top    = 0;
+        sys->rect_display.right  = GetSystemMetrics(SM_CXSCREEN);
+        sys->rect_display.bottom = GetSystemMetrics(SM_CYSCREEN);
     }
 
-    msg_Dbg( p_vout, "screen dimensions (%lix%li,%lix%li)",
-             p_vout->p_sys->rect_display.left,
-             p_vout->p_sys->rect_display.top,
-             p_vout->p_sys->rect_display.right,
-             p_vout->p_sys->rect_display.bottom );
+    msg_Dbg(vd, "screen dimensions (%lix%li,%lix%li)",
+            sys->rect_display.left,
+            sys->rect_display.top,
+            sys->rect_display.right,
+            sys->rect_display.bottom);
 
     /* Probe the capabilities of the hardware */
-    DirectXGetDDrawCaps( p_vout );
+    DirectXGetDDrawCaps(vd);
 
-    msg_Dbg( p_vout, "End DirectXInitDDraw" );
     return VLC_SUCCESS;
-
- error:
-    if( p_vout->p_sys->p_ddobject )
-        IDirectDraw2_Release( p_vout->p_sys->p_ddobject );
-    if( p_vout->p_sys->hddraw_dll )
-        FreeLibrary( p_vout->p_sys->hddraw_dll );
-    p_vout->p_sys->hddraw_dll = NULL;
-    p_vout->p_sys->p_ddobject = NULL;
-    return VLC_EGENERIC;
 }
 
-/*****************************************************************************
- * DirectXCreateDisplay: create the DirectDraw display.
- *****************************************************************************
- * Create and initialize display according to preferences specified in the vout
- * thread fields.
- *****************************************************************************/
-static int DirectXCreateDisplay( vout_thread_t *p_vout )
+static void DirectXCloseDDraw(vout_display_t *vd)
 {
-    HRESULT              dxresult;
-    DDSURFACEDESC        ddsd;
-    LPDIRECTDRAWSURFACE  p_display;
+    vout_display_sys_t *sys = vd->sys;
+    if (sys->ddobject)
+        IDirectDraw2_Release(sys->ddobject);
 
-    msg_Dbg( p_vout, "DirectXCreateDisplay" );
+    sys->ddobject = NULL;
 
-    /* Now get the primary surface. This surface is what you actually see
-     * on your screen */
-    memset( &ddsd, 0, sizeof( DDSURFACEDESC ));
-    ddsd.dwSize = sizeof(DDSURFACEDESC);
-    ddsd.dwFlags = DDSD_CAPS;
-    ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
+    free(sys->display_driver);
+    sys->display_driver = NULL;
 
-    dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
-                                           &ddsd, &p_display, NULL );
-    if( dxresult != DD_OK )
-    {
-        msg_Err( p_vout, "cannot get primary surface (error %li)", dxresult );
-        return VLC_EGENERIC;
-    }
-
-    dxresult = IDirectDrawSurface_QueryInterface( p_display,
-                                         &IID_IDirectDrawSurface2,
-                                         &p_vout->p_sys->p_display );
-    /* Release the old interface */
-    IDirectDrawSurface_Release( p_display );
-    if ( dxresult != DD_OK )
-    {
-        msg_Err( p_vout, "cannot query IDirectDrawSurface2 interface "
-                         "(error %li)", dxresult );
-        return VLC_EGENERIC;
-    }
-
-    /* The clipper will be used only in non-overlay mode */
-    DirectXCreateClipper( p_vout );
-
-    /* Make sure the colorkey will be painted */
-    p_vout->p_sys->i_colorkey = 1;
-    p_vout->p_sys->i_rgb_colorkey =
-        DirectXFindColorkey( p_vout, &p_vout->p_sys->i_colorkey );
-
-    UpdateRects( p_vout, true );
-
-    return VLC_SUCCESS;
+    sys->hmonitor = NULL;
 }
 
-/*****************************************************************************
- * DirectXCreateClipper: Create a clipper that will be used when blitting the
- *                       RGB surface to the main display.
- *****************************************************************************
+/**
+ * Create a clipper that will be used when blitting the RGB surface to the main display.
+ *
  * This clipper prevents us to modify by mistake anything on the screen
  * which doesn't belong to our window. For example when a part of our video
  * window is hidden by another window.
- *****************************************************************************/
-static int DirectXCreateClipper( vout_thread_t *p_vout )
+ */
+static void DirectXCreateClipper(vout_display_t *vd)
 {
-    HRESULT dxresult;
-
-    msg_Dbg( p_vout, "DirectXCreateClipper" );
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
 
     /* Create the clipper */
-    dxresult = IDirectDraw2_CreateClipper( p_vout->p_sys->p_ddobject, 0,
-                                           &p_vout->p_sys->p_clipper, NULL );
-    if( dxresult != DD_OK )
-    {
-        msg_Warn( p_vout, "cannot create clipper (error %li)", dxresult );
+    hr = IDirectDraw2_CreateClipper(sys->ddobject, 0, &sys->clipper, NULL);
+    if (hr != DD_OK) {
+        msg_Warn(vd, "cannot create clipper (error %li)", hr);
         goto error;
     }
 
     /* Associate the clipper to the window */
-    dxresult = IDirectDrawClipper_SetHWnd( p_vout->p_sys->p_clipper, 0,
-                                           p_vout->p_sys->hvideownd );
-    if( dxresult != DD_OK )
-    {
-        msg_Warn( p_vout, "cannot attach clipper to window (error %li)",
-                          dxresult );
+    hr = IDirectDrawClipper_SetHWnd(sys->clipper, 0, sys->hvideownd);
+    if (hr != DD_OK) {
+        msg_Warn(vd, "cannot attach clipper to window (error %li)", hr);
         goto error;
     }
 
     /* associate the clipper with the surface */
-    dxresult = IDirectDrawSurface_SetClipper(p_vout->p_sys->p_display,
-                                             p_vout->p_sys->p_clipper);
-    if( dxresult != DD_OK )
+    hr = IDirectDrawSurface_SetClipper(sys->display, sys->clipper);
+    if (hr != DD_OK)
     {
-        msg_Warn( p_vout, "cannot attach clipper to surface (error %li)",
-                          dxresult );
+        msg_Warn(vd, "cannot attach clipper to surface (error %li)", hr);
         goto error;
     }
 
-    return VLC_SUCCESS;
+    return;
 
- error:
-    if( p_vout->p_sys->p_clipper )
-    {
-        IDirectDrawClipper_Release( p_vout->p_sys->p_clipper );
-    }
-    p_vout->p_sys->p_clipper = NULL;
-    return VLC_EGENERIC;
+error:
+    if (sys->clipper)
+        IDirectDrawClipper_Release(sys->clipper);
+    sys->clipper = NULL;
 }
 
-/*****************************************************************************
- * DirectXCreateSurface: create an YUV overlay or RGB surface for the video.
- *****************************************************************************
+/**
+ * It finds out the 32bits RGB pixel value of the colorkey.
+ */
+static uint32_t DirectXFindColorkey(vout_display_t *vd, uint32_t *color)
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+
+    /* */
+    DDSURFACEDESC ddsd;
+    ddsd.dwSize = sizeof(ddsd);
+    hr = IDirectDrawSurface2_Lock(sys->display, NULL, &ddsd, DDLOCK_WAIT, NULL);
+    if (hr != DD_OK)
+        return 0;
+
+    uint32_t backup = *(uint32_t *)ddsd.lpSurface;
+
+    switch (ddsd.ddpfPixelFormat.dwRGBBitCount) {
+    case 4:
+        *(uint8_t *)ddsd.lpSurface = *color | (*color << 4);
+        break;
+    case 8:
+        *(uint8_t *)ddsd.lpSurface = *color;
+        break;
+    case 15:
+    case 16:
+        *(uint16_t *)ddsd.lpSurface = *color;
+        break;
+    case 24:
+        /* Seems to be problematic so we'll just put black as the colorkey */
+        *color = 0;
+    default:
+        *(uint32_t *)ddsd.lpSurface = *color;
+        break;
+    }
+    IDirectDrawSurface2_Unlock(sys->display, NULL);
+
+    /* */
+    HDC hdc;
+    COLORREF rgb;
+    if (IDirectDrawSurface2_GetDC(sys->display, &hdc) == DD_OK) {
+        rgb = GetPixel(hdc, 0, 0);
+        IDirectDrawSurface2_ReleaseDC(sys->display, hdc);
+    } else {
+        rgb = 0;
+    }
+
+    /* Restore the pixel value */
+    ddsd.dwSize = sizeof(ddsd);
+    if (IDirectDrawSurface2_Lock(sys->display, NULL, &ddsd, DDLOCK_WAIT, NULL) == DD_OK) {
+        *(uint32_t *)ddsd.lpSurface = backup;
+        IDirectDrawSurface2_Unlock(sys->display, NULL);
+    }
+
+    return rgb;
+}
+
+/**
+ * Create and initialize display according to preferences specified in the vout
+ * thread fields.
+ */
+static int DirectXOpenDisplay(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+    HRESULT hr;
+
+    /* Now get the primary surface. This surface is what you actually see
+     * on your screen */
+    DDSURFACEDESC ddsd;
+    ZeroMemory(&ddsd, sizeof(ddsd));
+    ddsd.dwSize = sizeof(ddsd);
+    ddsd.dwFlags = DDSD_CAPS;
+    ddsd.ddsCaps.dwCaps = DDSCAPS_PRIMARYSURFACE;
+
+    LPDIRECTDRAWSURFACE display;
+    hr = IDirectDraw2_CreateSurface(sys->ddobject, &ddsd, &display, NULL);
+    if (hr != DD_OK) {
+        msg_Err(vd, "cannot get primary surface (error %li)", hr);
+        return VLC_EGENERIC;
+    }
+
+    hr = IDirectDrawSurface_QueryInterface(display, &IID_IDirectDrawSurface2,
+                                           &sys->display);
+    /* Release the old interface */
+    IDirectDrawSurface_Release(display);
+
+    if (hr != DD_OK) {
+        msg_Err(vd, "cannot query IDirectDrawSurface2 interface (error %li)", hr);
+        sys->display = NULL;
+        return VLC_EGENERIC;
+    }
+
+    /* The clipper will be used only in non-overlay mode */
+    DirectXCreateClipper(vd);
+
+    /* Make sure the colorkey will be painted */
+    sys->i_colorkey = 1;
+    sys->i_rgb_colorkey = DirectXFindColorkey(vd, &sys->i_colorkey);
+
+    return VLC_SUCCESS;
+}
+static void DirectXCloseDisplay(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    if (sys->clipper != NULL)
+        IDirectDrawClipper_Release(sys->clipper);
+
+    if (sys->display != NULL)
+        IDirectDrawSurface2_Release(sys->display);
+
+    sys->clipper = NULL;
+    sys->display = NULL;
+}
+
+/**
+ * Create an YUV overlay or RGB surface for the video.
+ *
  * The best method of display is with an YUV overlay because the YUV->RGB
  * conversion is done in hardware.
  * You can also create a plain RGB surface.
- * ( Maybe we could also try an RGB overlay surface, which could have hardware
+ * (Maybe we could also try an RGB overlay surface, which could have hardware
  * scaling and which would also be faster in window mode because you don't
  * need to do any blitting to the main display...)
- *****************************************************************************/
-static int DirectXCreateSurface( vout_thread_t *p_vout,
-                                 LPDIRECTDRAWSURFACE2 *pp_surface_final,
-                                 int i_chroma, int b_overlay,
-                                 int i_backbuffers )
+ */
+static int DirectXCreateSurface(vout_display_t *vd,
+                                LPDIRECTDRAWSURFACE2 *surface,
+                                const video_format_t *fmt,
+                                DWORD fourcc,
+                                bool use_overlay,
+                                bool use_sysmem,
+                                int backbuffer_count)
 {
-    HRESULT dxresult;
-    LPDIRECTDRAWSURFACE p_surface;
+    vout_display_sys_t *sys = vd->sys;
+
     DDSURFACEDESC ddsd;
 
-    /* Create the video surface */
-    if( b_overlay )
-    {
-        /* Now try to create the YUV overlay surface.
-         * This overlay will be displayed on top of the primary surface.
-         * A color key is used to determine whether or not the overlay will be
-         * displayed, ie the overlay will be displayed in place of the primary
-         * surface wherever the primary surface will have this color.
-         * The video window has been created with a background of this color so
-         * the overlay will be only displayed on top of this window */
-
-        memset( &ddsd, 0, sizeof( DDSURFACEDESC ));
-        ddsd.dwSize = sizeof(DDSURFACEDESC);
-        ddsd.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
+    ZeroMemory(&ddsd, sizeof(ddsd));
+    ddsd.dwSize   = sizeof(ddsd);
+    ddsd.ddpfPixelFormat.dwSize = sizeof(ddsd.ddpfPixelFormat);
+    ddsd.dwFlags  = DDSD_HEIGHT | DDSD_WIDTH;
+    ddsd.dwWidth  = fmt->i_width;
+    ddsd.dwHeight = fmt->i_height;
+    if (fourcc) {
+        ddsd.dwFlags |= DDSD_PIXELFORMAT;
         ddsd.ddpfPixelFormat.dwFlags = DDPF_FOURCC;
-        ddsd.ddpfPixelFormat.dwFourCC = i_chroma;
-        ddsd.dwFlags = DDSD_CAPS | DDSD_HEIGHT | DDSD_WIDTH | DDSD_PIXELFORMAT;
-        ddsd.dwFlags |= (i_backbuffers ? DDSD_BACKBUFFERCOUNT : 0);
-        ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY | DDSCAPS_VIDEOMEMORY;
-        ddsd.ddsCaps.dwCaps |= (i_backbuffers ? DDSCAPS_COMPLEX | DDSCAPS_FLIP
-                                : 0 );
-        ddsd.dwHeight = p_vout->render.i_height;
-        ddsd.dwWidth = p_vout->render.i_width;
-        ddsd.dwBackBufferCount = i_backbuffers;
-
-        dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
-                                               &ddsd, &p_surface, NULL );
-        if( dxresult != DD_OK )
-        {
-            *pp_surface_final = NULL;
-            return VLC_EGENERIC;
-        }
+        ddsd.ddpfPixelFormat.dwFourCC = fourcc;
     }
+    if (use_overlay) {
+        ddsd.dwFlags |= DDSD_CAPS;
+        ddsd.ddsCaps.dwCaps = DDSCAPS_OVERLAY | DDSCAPS_VIDEOMEMORY;
+        if (backbuffer_count > 0)
+            ddsd.ddsCaps.dwCaps |= DDSCAPS_COMPLEX | DDSCAPS_FLIP;
 
-    if( !b_overlay )
-    {
-        bool b_rgb_surface =
-            ( i_chroma == VLC_CODEC_RGB8 )
-          || ( i_chroma == VLC_CODEC_RGB15 )
-           || ( i_chroma == VLC_CODEC_RGB16 )
-            || ( i_chroma == VLC_CODEC_RGB24 )
-             || ( i_chroma == VLC_CODEC_RGB32 );
-
-        memset( &ddsd, 0, sizeof( DDSURFACEDESC ) );
-        ddsd.dwSize = sizeof(DDSURFACEDESC);
-        ddsd.ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
-        ddsd.dwFlags = DDSD_HEIGHT | DDSD_WIDTH | DDSD_CAPS;
+        if (backbuffer_count > 0) {
+            ddsd.dwFlags |= DDSD_BACKBUFFERCOUNT;
+            ddsd.dwBackBufferCount = backbuffer_count;
+        }
+    } else {
+        ddsd.dwFlags |= DDSD_CAPS;
         ddsd.ddsCaps.dwCaps = DDSCAPS_OFFSCREENPLAIN;
-        ddsd.dwHeight = p_vout->render.i_height;
-        ddsd.dwWidth = p_vout->render.i_width;
-
-        if( p_vout->p_sys->b_use_sysmem )
+        if (use_sysmem)
             ddsd.ddsCaps.dwCaps |= DDSCAPS_SYSTEMMEMORY;
         else
             ddsd.ddsCaps.dwCaps |= DDSCAPS_VIDEOMEMORY;
-
-        if( !b_rgb_surface )
-        {
-            ddsd.dwFlags |= DDSD_PIXELFORMAT;
-            ddsd.ddpfPixelFormat.dwFlags = DDPF_FOURCC;
-            ddsd.ddpfPixelFormat.dwFourCC = i_chroma;
-        }
-
-        dxresult = IDirectDraw2_CreateSurface( p_vout->p_sys->p_ddobject,
-                                               &ddsd, &p_surface, NULL );
-        if( dxresult != DD_OK )
-        {
-            *pp_surface_final = NULL;
-            return VLC_EGENERIC;
-        }
     }
+
+    /* Create the video surface */
+    LPDIRECTDRAWSURFACE surface_v1;
+    if (IDirectDraw2_CreateSurface(sys->ddobject, &ddsd, &surface_v1, NULL) != DD_OK)
+        return VLC_EGENERIC;
 
     /* Now that the surface is created, try to get a newer DirectX interface */
-    dxresult = IDirectDrawSurface_QueryInterface( p_surface,
-                                     &IID_IDirectDrawSurface2,
-                                     (LPVOID *)pp_surface_final );
-    IDirectDrawSurface_Release( p_surface );    /* Release the old interface */
-    if ( dxresult != DD_OK )
-    {
-        msg_Err( p_vout, "cannot query IDirectDrawSurface2 interface "
-                         "(error %li)", dxresult );
-        *pp_surface_final = NULL;
+    HRESULT hr = IDirectDrawSurface_QueryInterface(surface_v1,
+                                                   &IID_IDirectDrawSurface2,
+                                                   (LPVOID *)surface);
+    IDirectDrawSurface_Release(surface_v1);
+    if (hr != DD_OK) {
+        msg_Err(vd, "cannot query IDirectDrawSurface2 interface (error %li)", hr);
         return VLC_EGENERIC;
     }
 
-    if( b_overlay )
-    {
+    if (use_overlay) {
         /* Check the overlay is useable as some graphics cards allow creating
          * several overlays but only one can be used at one time. */
-        p_vout->p_sys->p_current_surface = *pp_surface_final;
-        if( DirectDrawUpdateOverlay( p_vout ) != VLC_SUCCESS )
-        {
-            IDirectDrawSurface2_Release( *pp_surface_final );
-            *pp_surface_final = NULL;
-            msg_Err( p_vout, "overlay unuseable (might already be in use)" );
+        if (DirectXUpdateOverlay(vd, *surface)) {
+            IDirectDrawSurface2_Release(*surface);
+            msg_Err(vd, "overlay unuseable (might already be in use)");
             return VLC_EGENERIC;
         }
     }
@@ -1000,237 +909,147 @@ static int DirectXCreateSurface( vout_thread_t *p_vout,
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * DirectDrawUpdateOverlay: Move or resize overlay surface on video display.
- *****************************************************************************
- * This function is used to move or resize an overlay surface on the screen.
- * Ususally the overlay is moved by the user and thus, by a move or resize
- * event (in Manage).
- *****************************************************************************/
-int DirectDrawUpdateOverlay( vout_thread_t *p_vout )
+static void DirectXDestroySurface(LPDIRECTDRAWSURFACE2 surface)
 {
-    DDOVERLAYFX     ddofx;
-    DWORD           dwFlags;
-    HRESULT         dxresult;
-    RECT            rect_src = p_vout->p_sys->rect_src_clipped;
-    RECT            rect_dest = p_vout->p_sys->rect_dest_clipped;
+    IDirectDrawSurface2_Release(surface);
+}
+/**
+ * This function locks a surface and get the surface descriptor.
+ */
+static int DirectXLockSurface(LPDIRECTDRAWSURFACE2 front_surface,
+                              LPDIRECTDRAWSURFACE2 surface,
+                              DDSURFACEDESC *ddsd)
+{
+    HRESULT hr;
 
-    if( !p_vout->p_sys->b_using_overlay ) return VLC_EGENERIC;
+    DDSURFACEDESC ddsd_dummy;
+    if (!ddsd)
+        ddsd = &ddsd_dummy;
 
-    if( p_vout->p_sys->b_wallpaper )
-    {
-        unsigned i_x, i_y, i_width, i_height;
+    ZeroMemory(ddsd, sizeof(*ddsd));
+    ddsd->dwSize = sizeof(*ddsd);
+    hr = IDirectDrawSurface2_Lock(surface, NULL, ddsd, DDLOCK_NOSYSLOCK | DDLOCK_WAIT, NULL);
+    if (hr != DD_OK) {
+        if (hr == DDERR_INVALIDPARAMS) {
+            /* DirectX 3 doesn't support the DDLOCK_NOSYSLOCK flag, resulting
+             * in an invalid params error */
+            hr = IDirectDrawSurface2_Lock(surface, NULL, ddsd, DDLOCK_WAIT, NULL);
+        }
+        if (hr == DDERR_SURFACELOST) {
+            /* Your surface can be lost so be sure
+             * to check this and restore it if needed */
 
-        rect_src.left = p_vout->fmt_out.i_x_offset;
-        rect_src.top = p_vout->fmt_out.i_y_offset;
-        rect_src.right = rect_src.left + p_vout->fmt_out.i_visible_width;
-        rect_src.bottom = rect_src.top + p_vout->fmt_out.i_visible_height;
+            /* When using overlays with back-buffers, we need to restore
+             * the front buffer so the back-buffers get restored as well. */
+            if (front_surface != surface)
+                IDirectDrawSurface2_Restore(front_surface);
+            else
+                IDirectDrawSurface2_Restore(surface);
 
-        rect_dest = p_vout->p_sys->rect_display;
-        vout_PlacePicture( p_vout, rect_dest.right, rect_dest.bottom,
-                           &i_x, &i_y, &i_width, &i_height );
-
-        rect_dest.left += i_x;
-        rect_dest.right = rect_dest.left + i_width;
-        rect_dest.top += i_y;
-        rect_dest.bottom = rect_dest.top + i_height;
+            hr = IDirectDrawSurface2_Lock(surface, NULL, ddsd, DDLOCK_WAIT, NULL);
+        }
+        if (hr != DD_OK)
+            return VLC_EGENERIC;
     }
-
-    vlc_mutex_lock( &p_vout->p_sys->lock );
-    if( p_vout->p_sys->p_current_surface == NULL )
-    {
-        vlc_mutex_unlock( &p_vout->p_sys->lock );
+    return VLC_SUCCESS;
+}
+static void DirectXUnlockSurface(LPDIRECTDRAWSURFACE2 front_surface,
+                                 LPDIRECTDRAWSURFACE2 surface)
+{
+    IDirectDrawSurface2_Unlock(surface, NULL);
+}
+static int DirectXCheckLockingSurface(LPDIRECTDRAWSURFACE2 front_surface,
+                                      LPDIRECTDRAWSURFACE2 surface)
+{
+    if (DirectXLockSurface(front_surface, surface, NULL))
         return VLC_EGENERIC;
-    }
 
-    /* The new window dimensions should already have been computed by the
-     * caller of this function */
-
-    /* Position and show the overlay */
-    memset(&ddofx, 0, sizeof(DDOVERLAYFX));
-    ddofx.dwSize = sizeof(DDOVERLAYFX);
-    ddofx.dckDestColorkey.dwColorSpaceLowValue = p_vout->p_sys->i_colorkey;
-    ddofx.dckDestColorkey.dwColorSpaceHighValue = p_vout->p_sys->i_colorkey;
-
-    dwFlags = DDOVER_SHOW | DDOVER_KEYDESTOVERRIDE;
-
-    dxresult = IDirectDrawSurface2_UpdateOverlay(
-                   p_vout->p_sys->p_current_surface,
-                   &rect_src, p_vout->p_sys->p_display, &rect_dest,
-                   dwFlags, &ddofx );
-
-    vlc_mutex_unlock( &p_vout->p_sys->lock );
-
-    if(dxresult != DD_OK)
-    {
-        msg_Warn( p_vout, "DirectDrawUpdateOverlay cannot move/resize overlay" );
-        return VLC_EGENERIC;
-    }
-
+    DirectXUnlockSurface(front_surface, surface);
     return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * DirectXCloseDDraw: Release the DDraw object allocated by DirectXInitDDraw
- *****************************************************************************
- * This function returns all resources allocated by DirectXInitDDraw.
- *****************************************************************************/
-static void DirectXCloseDDraw( vout_thread_t *p_vout )
+
+
+typedef struct {
+    vlc_fourcc_t codec;
+    DWORD        fourcc;
+} dx_format_t;
+
+static DWORD DirectXGetFourcc(vlc_fourcc_t codec)
 {
-    msg_Dbg( p_vout, "DirectXCloseDDraw" );
-    if( p_vout->p_sys->p_ddobject != NULL )
-    {
-        IDirectDraw2_Release(p_vout->p_sys->p_ddobject);
-        p_vout->p_sys->p_ddobject = NULL;
+    static const dx_format_t dx_formats[] = {
+        { VLC_CODEC_YUYV, MAKEFOURCC('Y','U','Y','2') },
+        { VLC_CODEC_UYVY, MAKEFOURCC('U','Y','V','Y') },
+        { VLC_CODEC_YVYU, MAKEFOURCC('Y','V','Y','U') },
+        { VLC_CODEC_YV12, MAKEFOURCC('Y','V','1','2') },
+        { VLC_CODEC_I420, MAKEFOURCC('Y','V','1','2') },
+        { VLC_CODEC_J420, MAKEFOURCC('Y','V','1','2') },
+        { 0, 0 }
+    };
+
+    for (unsigned i = 0; dx_formats[i].codec != 0; i++) {
+        if (dx_formats[i].codec == codec)
+            return dx_formats[i].fourcc;
     }
-
-    if( p_vout->p_sys->hddraw_dll != NULL )
-    {
-        FreeLibrary( p_vout->p_sys->hddraw_dll );
-        p_vout->p_sys->hddraw_dll = NULL;
-    }
-
-    free( p_vout->p_sys->p_display_driver );
-    p_vout->p_sys->p_display_driver = NULL;
-
-    p_vout->p_sys->hmonitor = NULL;
+    return 0;
 }
 
-/*****************************************************************************
- * DirectXCloseDisplay: close and reset the DirectX display device
- *****************************************************************************
- * This function returns all resources allocated by DirectXCreateDisplay.
- *****************************************************************************/
-static void DirectXCloseDisplay( vout_thread_t *p_vout )
+static int DirectXCreatePictureResourceYuvOverlay(vout_display_t *vd,
+                                                  const video_format_t *fmt,
+                                                  DWORD fourcc)
 {
-    msg_Dbg( p_vout, "DirectXCloseDisplay" );
+    vout_display_sys_t *sys = vd->sys;
 
-    if( p_vout->p_sys->p_clipper != NULL )
-    {
-        msg_Dbg( p_vout, "DirectXCloseDisplay clipper" );
-        IDirectDrawClipper_Release( p_vout->p_sys->p_clipper );
-        p_vout->p_sys->p_clipper = NULL;
-    }
+    bool allow_3buf    = var_InheritBool(vd, "directx-3buffering");
 
-    if( p_vout->p_sys->p_display != NULL )
-    {
-        msg_Dbg( p_vout, "DirectXCloseDisplay display" );
-        IDirectDrawSurface2_Release( p_vout->p_sys->p_display );
-        p_vout->p_sys->p_display = NULL;
-    }
-}
-
-/*****************************************************************************
- * DirectXCloseSurface: close the YUV overlay or RGB surface.
- *****************************************************************************
- * This function returns all resources allocated for the surface.
- *****************************************************************************/
-static void DirectXCloseSurface( vout_thread_t *p_vout,
-                                 LPDIRECTDRAWSURFACE2 p_surface )
-{
-    msg_Dbg( p_vout, "DirectXCloseSurface" );
-    if( p_surface != NULL )
-    {
-        IDirectDrawSurface2_Release( p_surface );
-    }
-}
-
-/*****************************************************************************
- * NewPictureVec: allocate a picture
- * FIXME? make it work for i_num_pic pictures...
- *****************************************************************************
- * Returns 0 on success, -1 otherwise
- *****************************************************************************/
-static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    int i;
-    int i_ret = VLC_SUCCESS;
-    LPDIRECTDRAWSURFACE2 p_surface;
-
-    msg_Dbg( p_vout, "NewPictureVec overlay:%s chroma:%.4s",
-             p_vout->p_sys->b_using_overlay ? "yes" : "no",
-             (char *)&p_vout->output.i_chroma );
-
-    I_OUTPUTPICTURES = 0;
-
-    /* First we try to use an YUV overlay surface.
-     * The overlay surface that we create won't be used to decode directly
+    /* The overlay surface that we create won't be used to decode directly
      * into it because accessing video memory directly is way to slow (remember
      * that pictures are decoded macroblock per macroblock). Instead the video
      * will be decoded in picture buffers in system memory which will then be
      * memcpy() to the overlay surface. */
-    if( p_vout->p_sys->b_using_overlay )
-    {
+    LPDIRECTDRAWSURFACE2 front_surface;
+    int ret = VLC_EGENERIC;
+    if (allow_3buf) {
         /* Triple buffering rocks! it doesn't have any processing overhead
          * (you don't have to wait for the vsync) and provides for a very nice
          * video quality (no tearing). */
-        if( p_vout->p_sys->b_3buf_overlay )
-            i_ret = DirectXCreateSurface( p_vout, &p_surface,
-                                          p_vout->output.i_chroma,
-                                          p_vout->p_sys->b_using_overlay,
-                                          2 /* number of backbuffers */ );
-
-        if( !p_vout->p_sys->b_3buf_overlay || i_ret != VLC_SUCCESS )
-        {
-            /* Try to reduce the number of backbuffers */
-            i_ret = DirectXCreateSurface( p_vout, &p_surface,
-                                          p_vout->output.i_chroma,
-                                          p_vout->p_sys->b_using_overlay,
-                                          0 /* number of backbuffers */ );
-        }
-
-        if( i_ret == VLC_SUCCESS )
-        {
-            DDSCAPS dds_caps;
-            picture_t front_pic;
-            picture_sys_t front_pic_sys;
-            front_pic.p_sys = &front_pic_sys;
-
-            /* Allocate internal structure */
-            p_pic[0].p_sys = malloc( sizeof( picture_sys_t ) );
-            if( p_pic[0].p_sys == NULL )
-            {
-                DirectXCloseSurface( p_vout, p_surface );
-                return VLC_ENOMEM;
-            }
-
-            /* set front buffer */
-            p_pic[0].p_sys->p_front_surface = p_surface;
-
-            /* Get the back buffer */
-            memset( &dds_caps, 0, sizeof( DDSCAPS ) );
-            dds_caps.dwCaps = DDSCAPS_BACKBUFFER;
-            if( DD_OK != IDirectDrawSurface2_GetAttachedSurface(
-                                                p_surface, &dds_caps,
-                                                &p_pic[0].p_sys->p_surface ) )
-            {
-                msg_Warn( p_vout, "NewPictureVec could not get back buffer" );
-                /* front buffer is the same as back buffer */
-                p_pic[0].p_sys->p_surface = p_surface;
-            }
-
-
-            p_vout->p_sys->p_current_surface = front_pic.p_sys->p_surface =
-                p_pic[0].p_sys->p_front_surface;
-
-            /* Reset the front buffer memory */
-            if( DirectXLockSurface( p_vout, &front_pic ) == VLC_SUCCESS )
-            {
-                int i,j;
-                for( i = 0; i < front_pic.i_planes; i++ )
-                    for( j = 0; j < front_pic.p[i].i_visible_lines; j++)
-                        memset( front_pic.p[i].p_pixels + j *
-                                front_pic.p[i].i_pitch, 127,
-                                front_pic.p[i].i_visible_pitch );
-
-                DirectXUnlockSurface( p_vout, &front_pic );
-            }
-
-            DirectDrawUpdateOverlay( p_vout );
-            I_OUTPUTPICTURES = 1;
-            msg_Dbg( p_vout, "YUV overlay created successfully" );
-        }
+        ret = DirectXCreateSurface(vd, &front_surface, fmt, fourcc, true, false, 2);
     }
+    if (ret)
+        ret = DirectXCreateSurface(vd, &front_surface, fmt, fourcc, true, false, 0);
+    if (ret)
+        return VLC_EGENERIC;
+    msg_Dbg(vd, "YUV overlay surface created successfully");
+
+    /* Get the back buffer */
+    LPDIRECTDRAWSURFACE2 surface;
+    DDSCAPS dds_caps;
+    ZeroMemory(&dds_caps, sizeof(dds_caps));
+    dds_caps.dwCaps = DDSCAPS_BACKBUFFER;
+    if (IDirectDrawSurface2_GetAttachedSurface(front_surface, &dds_caps, &surface) != DD_OK) {
+        msg_Warn(vd, "Failed to get surface back buffer");
+        /* front buffer is the same as back buffer */
+        surface = front_surface;
+    }
+
+    if (DirectXCheckLockingSurface(front_surface, surface)) {
+        DirectXDestroySurface(front_surface);
+        return VLC_EGENERIC;
+    }
+
+    /* */
+    picture_resource_t *rsc = &sys->resource;
+    rsc->p_sys->front_surface = front_surface;
+    rsc->p_sys->surface       = surface;
+    return VLC_SUCCESS;
+}
+static int DirectXCreatePictureResourceYuv(vout_display_t *vd,
+                                           const video_format_t *fmt,
+                                           DWORD fourcc)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    bool allow_sysmem  = var_InheritBool(vd, "directx-use-sysmem");
 
     /* As we can't have an overlay, we'll try to create a plain offscreen
      * surface. This surface will reside in video memory because there's a
@@ -1238,679 +1057,449 @@ static int NewPictureVec( vout_thread_t *p_vout, picture_t *p_pic )
      * acceleration like rescaling, blitting or YUV->RGB conversions.
      * We then only need to blit this surface onto the main display when we
      * want to display it */
-    if( !p_vout->p_sys->b_using_overlay )
-    {
-        if( p_vout->p_sys->b_hw_yuv )
-        {
-            DWORD i_codes;
-            DWORD *pi_codes;
-            bool b_result = false;
 
-            /* Check if the chroma is supported first. This is required
-             * because a few buggy drivers don't mind creating the surface
-             * even if they don't know about the chroma. */
-            if( IDirectDraw2_GetFourCCCodes( p_vout->p_sys->p_ddobject,
-                                             &i_codes, NULL ) == DD_OK )
-            {
-                pi_codes = malloc( i_codes * sizeof(DWORD) );
-                if( pi_codes && IDirectDraw2_GetFourCCCodes(
-                    p_vout->p_sys->p_ddobject, &i_codes, pi_codes ) == DD_OK )
-                {
-                    for( i = 0; i < (int)i_codes; i++ )
-                    {
-                        if( p_vout->output.i_chroma == pi_codes[i] )
-                        {
-                            b_result = true;
-                            break;
-                        }
-                    }
-                }
-                free( pi_codes );
-            }
+    /* Check if the chroma is supported first. This is required
+     * because a few buggy drivers don't mind creating the surface
+     * even if they don't know about the chroma. */
+    DWORD count;
+    if (IDirectDraw2_GetFourCCCodes(sys->ddobject, &count, NULL) != DD_OK)
+        return VLC_EGENERIC;
 
-            if( b_result )
-                i_ret = DirectXCreateSurface( p_vout, &p_surface,
-                                              p_vout->output.i_chroma,
-                                              0 /* no overlay */,
-                                              0 /* no back buffers */ );
-            else
-                p_vout->p_sys->b_hw_yuv = false;
-        }
-
-        if( i_ret || !p_vout->p_sys->b_hw_yuv )
-        {
-            /* Our last choice is to use a plain RGB surface */
-            DDPIXELFORMAT ddpfPixelFormat;
-
-            ddpfPixelFormat.dwSize = sizeof(DDPIXELFORMAT);
-            IDirectDrawSurface2_GetPixelFormat( p_vout->p_sys->p_display,
-                                                &ddpfPixelFormat );
-
-            if( ddpfPixelFormat.dwFlags & DDPF_RGB )
-            {
-                switch( ddpfPixelFormat.dwRGBBitCount )
-                {
-                case 8:
-                    p_vout->output.i_chroma = VLC_CODEC_RGB8;
-                    p_vout->output.pf_setpalette = SetPalette;
-                    break;
-                case 15:
-                    p_vout->output.i_chroma = VLC_CODEC_RGB15;
-                    break;
-                case 16:
-                    p_vout->output.i_chroma = VLC_CODEC_RGB16;
-                    break;
-                case 24:
-                    p_vout->output.i_chroma = VLC_CODEC_RGB24;
-                    break;
-                case 32:
-                    p_vout->output.i_chroma = VLC_CODEC_RGB32;
-                    break;
-                default:
-                    msg_Err( p_vout, "unknown screen depth" );
-                    return VLC_EGENERIC;
-                }
-                p_vout->output.i_rmask = ddpfPixelFormat.dwRBitMask;
-                p_vout->output.i_gmask = ddpfPixelFormat.dwGBitMask;
-                p_vout->output.i_bmask = ddpfPixelFormat.dwBBitMask;
-            }
-
-            p_vout->p_sys->b_hw_yuv = 0;
-
-            i_ret = DirectXCreateSurface( p_vout, &p_surface,
-                                          p_vout->output.i_chroma,
-                                          0 /* no overlay */,
-                                          0 /* no back buffers */ );
-
-            if( i_ret && !p_vout->p_sys->b_use_sysmem )
-            {
-                /* Give it a last try with b_use_sysmem enabled */
-                p_vout->p_sys->b_use_sysmem = 1;
-
-                i_ret = DirectXCreateSurface( p_vout, &p_surface,
-                                              p_vout->output.i_chroma,
-                                              0 /* no overlay */,
-                                              0 /* no back buffers */ );
-            }
-        }
-
-        if( i_ret == VLC_SUCCESS )
-        {
-            /* Allocate internal structure */
-            p_pic[0].p_sys = malloc( sizeof( picture_sys_t ) );
-            if( p_pic[0].p_sys == NULL )
-            {
-                DirectXCloseSurface( p_vout, p_surface );
-                return VLC_ENOMEM;
-            }
-
-            p_pic[0].p_sys->p_surface = p_pic[0].p_sys->p_front_surface
-                = p_surface;
-
-            I_OUTPUTPICTURES = 1;
-
-            msg_Dbg( p_vout, "created plain surface of chroma:%.4s",
-                     (char *)&p_vout->output.i_chroma );
-        }
-    }
-
-
-    /* Now that we've got all our direct-buffers, we can finish filling in the
-     * picture_t structures */
-    for( i = 0; i < I_OUTPUTPICTURES; i++ )
-    {
-        p_pic[i].i_status = DESTROYED_PICTURE;
-        p_pic[i].i_type   = DIRECT_PICTURE;
-        p_pic[i].b_slow   = true;
-        p_pic[i].pf_lock  = DirectXLockSurface;
-        p_pic[i].pf_unlock = DirectXUnlockSurface;
-        PP_OUTPUTPICTURE[i] = &p_pic[i];
-
-        if( DirectXLockSurface( p_vout, &p_pic[i] ) != VLC_SUCCESS )
-        {
-            /* AAARRGG */
-            FreePictureVec( p_vout, p_pic, I_OUTPUTPICTURES );
-            I_OUTPUTPICTURES = 0;
-            msg_Err( p_vout, "cannot lock surface" );
-            return VLC_EGENERIC;
-        }
-        DirectXUnlockSurface( p_vout, &p_pic[i] );
-    }
-
-    msg_Dbg( p_vout, "End NewPictureVec (%s)",
-             I_OUTPUTPICTURES ? "succeeded" : "failed" );
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * FreePicture: destroy a picture vector allocated with NewPictureVec
- *****************************************************************************
- *
- *****************************************************************************/
-static void FreePictureVec( vout_thread_t *p_vout, picture_t *p_pic,
-                            int i_num_pics )
-{
-    int i;
-
-    vlc_mutex_lock( &p_vout->p_sys->lock );
-    p_vout->p_sys->p_current_surface = 0;
-    vlc_mutex_unlock( &p_vout->p_sys->lock );
-
-    for( i = 0; i < i_num_pics; i++ )
-    {
-        DirectXCloseSurface( p_vout, p_pic[i].p_sys->p_front_surface );
-
-        for( i = 0; i < i_num_pics; i++ )
-        {
-            free( p_pic[i].p_sys );
-        }
-    }
-}
-
-/*****************************************************************************
- * UpdatePictureStruct: updates the internal data in the picture_t structure
- *****************************************************************************
- * This will setup stuff for use by the video_output thread
- *****************************************************************************/
-static int UpdatePictureStruct( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    switch( p_vout->output.i_chroma )
-    {
-        case VLC_CODEC_RGB8:
-        case VLC_CODEC_RGB15:
-        case VLC_CODEC_RGB16:
-        case VLC_CODEC_RGB24:
-        case VLC_CODEC_RGB32:
-            p_pic->p->p_pixels = p_pic->p_sys->ddsd.lpSurface;
-            p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_visible_lines = p_vout->output.i_height;
-            p_pic->p->i_pitch = p_pic->p_sys->ddsd.lPitch;
-            switch( p_vout->output.i_chroma )
-            {
-                case VLC_CODEC_RGB8:
-                    p_pic->p->i_pixel_pitch = 1;
-                    break;
-                case VLC_CODEC_RGB15:
-                case VLC_CODEC_RGB16:
-                    p_pic->p->i_pixel_pitch = 2;
-                    break;
-                case VLC_CODEC_RGB24:
-                    p_pic->p->i_pixel_pitch = 3;
-                    break;
-                case VLC_CODEC_RGB32:
-                    p_pic->p->i_pixel_pitch = 4;
-                    break;
-                default:
-                    return VLC_EGENERIC;
-            }
-            p_pic->p->i_visible_pitch = p_vout->output.i_width *
-              p_pic->p->i_pixel_pitch;
-            p_pic->i_planes = 1;
-            break;
-
-        case VLC_CODEC_YV12:
-
-            /* U and V inverted compared to I420
-             * Fixme: this should be handled by the vout core */
-            /* could this be right? */
-            p_vout->output.i_chroma = VLC_CODEC_I420;
-
-            p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
-            p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
-            p_pic->p[Y_PLANE].i_visible_lines = p_vout->output.i_height;
-            p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->ddsd.lPitch;
-            p_pic->p[Y_PLANE].i_pixel_pitch = 1;
-            p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width *
-              p_pic->p[Y_PLANE].i_pixel_pitch;
-
-            p_pic->V_PIXELS =  p_pic->Y_PIXELS
-              + p_pic->p[Y_PLANE].i_lines * p_pic->p[Y_PLANE].i_pitch;
-            p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
-            p_pic->p[V_PLANE].i_visible_lines = p_vout->output.i_height / 2;
-            p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
-            p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
-              p_pic->p[V_PLANE].i_pixel_pitch;
-
-            p_pic->U_PIXELS = p_pic->V_PIXELS
-              + p_pic->p[V_PLANE].i_lines * p_pic->p[V_PLANE].i_pitch;
-            p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
-            p_pic->p[U_PLANE].i_visible_lines = p_vout->output.i_height / 2;
-            p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
-            p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
-              p_pic->p[U_PLANE].i_pixel_pitch;
-
-            p_pic->i_planes = 3;
-            break;
-
-        case VLC_CODEC_I420:
-
-            p_pic->Y_PIXELS = p_pic->p_sys->ddsd.lpSurface;
-            p_pic->p[Y_PLANE].i_lines = p_vout->output.i_height;
-            p_pic->p[Y_PLANE].i_visible_lines = p_vout->output.i_height;
-            p_pic->p[Y_PLANE].i_pitch = p_pic->p_sys->ddsd.lPitch;
-            p_pic->p[Y_PLANE].i_pixel_pitch = 1;
-            p_pic->p[Y_PLANE].i_visible_pitch = p_vout->output.i_width *
-              p_pic->p[Y_PLANE].i_pixel_pitch;
-
-            p_pic->U_PIXELS = p_pic->Y_PIXELS
-              + p_pic->p[Y_PLANE].i_lines * p_pic->p[Y_PLANE].i_pitch;
-            p_pic->p[U_PLANE].i_lines = p_vout->output.i_height / 2;
-            p_pic->p[U_PLANE].i_visible_lines = p_vout->output.i_height / 2;
-            p_pic->p[U_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
-            p_pic->p[U_PLANE].i_pixel_pitch = 1;
-            p_pic->p[U_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
-              p_pic->p[U_PLANE].i_pixel_pitch;
-
-            p_pic->V_PIXELS =  p_pic->U_PIXELS
-              + p_pic->p[U_PLANE].i_lines * p_pic->p[U_PLANE].i_pitch;
-            p_pic->p[V_PLANE].i_lines = p_vout->output.i_height / 2;
-            p_pic->p[V_PLANE].i_visible_lines = p_vout->output.i_height / 2;
-            p_pic->p[V_PLANE].i_pitch = p_pic->p[Y_PLANE].i_pitch / 2;
-            p_pic->p[V_PLANE].i_pixel_pitch = 1;
-            p_pic->p[V_PLANE].i_visible_pitch = p_vout->output.i_width / 2 *
-              p_pic->p[V_PLANE].i_pixel_pitch;
-
-            p_pic->i_planes = 3;
-            break;
-
-        case VLC_CODEC_UYVY:
-        case VLC_CODEC_YUYV:
-
-            p_pic->p->p_pixels = p_pic->p_sys->ddsd.lpSurface;
-            p_pic->p->i_lines = p_vout->output.i_height;
-            p_pic->p->i_visible_lines = p_vout->output.i_height;
-            p_pic->p->i_pitch = p_pic->p_sys->ddsd.lPitch;
-            p_pic->p->i_pixel_pitch = 2;
-            p_pic->p->i_visible_pitch = p_vout->output.i_width *
-              p_pic->p->i_pixel_pitch;
-
-            p_pic->i_planes = 1;
-            break;
-
-        default:
-            /* Unknown chroma, tell the guy to get lost */
-            msg_Err( p_vout, "never heard of chroma 0x%.8x (%4.4s)",
-                     p_vout->output.i_chroma,
-                     (char*)&p_vout->output.i_chroma );
-            return VLC_EGENERIC;
-    }
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * DirectXGetDDrawCaps: Probe the capabilities of the hardware
- *****************************************************************************
- * It is nice to know which features are supported by the hardware so we can
- * find ways to optimize our rendering.
- *****************************************************************************/
-static void DirectXGetDDrawCaps( vout_thread_t *p_vout )
-{
-    DDCAPS ddcaps;
-    HRESULT dxresult;
-
-    /* This is just an indication of whether or not we'll support overlay,
-     * but with this test we don't know if we support YUV overlay */
-    memset( &ddcaps, 0, sizeof( DDCAPS ));
-    ddcaps.dwSize = sizeof(DDCAPS);
-    dxresult = IDirectDraw2_GetCaps( p_vout->p_sys->p_ddobject,
-                                     &ddcaps, NULL );
-    if(dxresult != DD_OK )
-    {
-        msg_Warn( p_vout, "cannot get caps" );
-    }
-    else
-    {
-        bool bHasOverlay, bHasOverlayFourCC, bCanDeinterlace,
-             bHasColorKey, bCanStretch, bCanBltFourcc,
-             bAlignBoundarySrc, bAlignBoundaryDest,
-             bAlignSizeSrc, bAlignSizeDest;
-
-        /* Determine if the hardware supports overlay surfaces */
-        bHasOverlay = (ddcaps.dwCaps & DDCAPS_OVERLAY) ? 1 : 0;
-        /* Determine if the hardware supports overlay surfaces */
-        bHasOverlayFourCC = (ddcaps.dwCaps & DDCAPS_OVERLAYFOURCC) ? 1 : 0;
-        /* Determine if the hardware supports overlay deinterlacing */
-        bCanDeinterlace = (ddcaps.dwCaps & DDCAPS2_CANFLIPODDEVEN) ? 1 : 0;
-        /* Determine if the hardware supports colorkeying */
-        bHasColorKey = (ddcaps.dwCaps & DDCAPS_COLORKEY) ? 1 : 0;
-        /* Determine if the hardware supports scaling of the overlay surface */
-        bCanStretch = (ddcaps.dwCaps & DDCAPS_OVERLAYSTRETCH) ? 1 : 0;
-        /* Determine if the hardware supports color conversion during a blit */
-        bCanBltFourcc = (ddcaps.dwCaps & DDCAPS_BLTFOURCC) ? 1 : 0;
-        /* Determine overlay source boundary alignment */
-        bAlignBoundarySrc = (ddcaps.dwCaps & DDCAPS_ALIGNBOUNDARYSRC) ? 1 : 0;
-        /* Determine overlay destination boundary alignment */
-        bAlignBoundaryDest = (ddcaps.dwCaps & DDCAPS_ALIGNBOUNDARYDEST) ? 1:0;
-        /* Determine overlay destination size alignment */
-        bAlignSizeSrc = (ddcaps.dwCaps & DDCAPS_ALIGNSIZESRC) ? 1 : 0;
-        /* Determine overlay destination size alignment */
-        bAlignSizeDest = (ddcaps.dwCaps & DDCAPS_ALIGNSIZEDEST) ? 1 : 0;
-
-        msg_Dbg( p_vout, "DirectDraw Capabilities: overlay=%i yuvoverlay=%i "
-                         "can_deinterlace_overlay=%i colorkey=%i stretch=%i "
-                         "bltfourcc=%i",
-                         bHasOverlay, bHasOverlayFourCC, bCanDeinterlace,
-                         bHasColorKey, bCanStretch, bCanBltFourcc );
-
-        if( bAlignBoundarySrc || bAlignBoundaryDest ||
-            bAlignSizeSrc || bAlignSizeDest )
-        {
-            if( bAlignBoundarySrc ) p_vout->p_sys->i_align_src_boundary =
-                ddcaps.dwAlignBoundarySrc;
-            if( bAlignBoundaryDest ) p_vout->p_sys->i_align_dest_boundary =
-                ddcaps.dwAlignBoundaryDest;
-            if( bAlignSizeDest ) p_vout->p_sys->i_align_src_size =
-                ddcaps.dwAlignSizeSrc;
-            if( bAlignSizeDest ) p_vout->p_sys->i_align_dest_size =
-                ddcaps.dwAlignSizeDest;
-
-            msg_Dbg( p_vout, "align_boundary_src=%i,%i "
-                     "align_boundary_dest=%i,%i "
-                     "align_size_src=%i,%i align_size_dest=%i,%i",
-                     bAlignBoundarySrc, p_vout->p_sys->i_align_src_boundary,
-                     bAlignBoundaryDest, p_vout->p_sys->i_align_dest_boundary,
-                     bAlignSizeSrc, p_vout->p_sys->i_align_src_size,
-                     bAlignSizeDest, p_vout->p_sys->i_align_dest_size );
-        }
-
-        /* Don't ask for troubles */
-        if( !bCanBltFourcc ) p_vout->p_sys->b_hw_yuv = FALSE;
-    }
-}
-
-/*****************************************************************************
- * DirectXLockSurface: Lock surface and get picture data pointer
- *****************************************************************************
- * This function locks a surface and get the surface descriptor which amongst
- * other things has the pointer to the picture data.
- *****************************************************************************/
-static int DirectXLockSurface( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    HRESULT dxresult;
-
-    /* Lock the surface to get a valid pointer to the picture buffer */
-    memset( &p_pic->p_sys->ddsd, 0, sizeof( DDSURFACEDESC ));
-    p_pic->p_sys->ddsd.dwSize = sizeof(DDSURFACEDESC);
-    dxresult = IDirectDrawSurface2_Lock( p_pic->p_sys->p_surface,
-                                         NULL, &p_pic->p_sys->ddsd,
-                                         DDLOCK_NOSYSLOCK | DDLOCK_WAIT,
-                                         NULL );
-    if( dxresult != DD_OK )
-    {
-        if( dxresult == DDERR_INVALIDPARAMS )
-        {
-            /* DirectX 3 doesn't support the DDLOCK_NOSYSLOCK flag, resulting
-             * in an invalid params error */
-            dxresult = IDirectDrawSurface2_Lock( p_pic->p_sys->p_surface, NULL,
-                                             &p_pic->p_sys->ddsd,
-                                             DDLOCK_WAIT, NULL);
-        }
-        if( dxresult == DDERR_SURFACELOST )
-        {
-            /* Your surface can be lost so be sure
-             * to check this and restore it if needed */
-
-            /* When using overlays with back-buffers, we need to restore
-             * the front buffer so the back-buffers get restored as well. */
-            if( p_vout->p_sys->b_using_overlay  )
-                IDirectDrawSurface2_Restore( p_pic->p_sys->p_front_surface );
-            else
-                IDirectDrawSurface2_Restore( p_pic->p_sys->p_surface );
-
-            dxresult = IDirectDrawSurface2_Lock( p_pic->p_sys->p_surface, NULL,
-                                                 &p_pic->p_sys->ddsd,
-                                                 DDLOCK_WAIT, NULL);
-#ifndef NDEBUG
-            if( dxresult == DDERR_SURFACELOST )
-                msg_Dbg( p_vout, "DirectXLockSurface: DDERR_SURFACELOST" );
-#endif
-        }
-        if( dxresult != DD_OK )
-        {
-            return VLC_EGENERIC;
-        }
-    }
-
-    /* Now we have a pointer to the surface memory, we can update our picture
-     * structure. */
-    if( UpdatePictureStruct( p_vout, p_pic )
-        != VLC_SUCCESS )
-    {
-        DirectXUnlockSurface( p_vout, p_pic );
+    DWORD *list = calloc(count, sizeof(*list));
+    if (!list)
+        return VLC_ENOMEM;
+    if (IDirectDraw2_GetFourCCCodes(sys->ddobject, &count, list) != DD_OK) {
+        free(list);
         return VLC_EGENERIC;
     }
-    else
-        return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * DirectXUnlockSurface: Unlock a surface locked by DirectXLockSurface().
- *****************************************************************************/
-static int DirectXUnlockSurface( vout_thread_t *p_vout, picture_t *p_pic )
-{
-    VLC_UNUSED( p_vout );
-
-    /* Unlock the Surface */
-    if( IDirectDrawSurface2_Unlock( p_pic->p_sys->p_surface, NULL ) == DD_OK )
-        return VLC_SUCCESS;
-    else
+    unsigned index;
+    for (index = 0; index < count; index++) {
+        if (list[index] == fourcc)
+            break;
+    }
+    free(list);
+    if (index >= count)
         return VLC_EGENERIC;
+
+    /* */
+    LPDIRECTDRAWSURFACE2 surface;
+    if (DirectXCreateSurface(vd, &surface, fmt, fourcc, false, allow_sysmem, 0))
+        return VLC_EGENERIC;
+    msg_Dbg(vd, "YUV plain surface created successfully");
+
+    if (DirectXCheckLockingSurface(surface, surface)) {
+        DirectXDestroySurface(surface);
+        return VLC_EGENERIC;
+    }
+
+    /* */
+    picture_resource_t *rsc = &sys->resource;
+    rsc->p_sys->front_surface = surface;
+    rsc->p_sys->surface       = surface;
+    return VLC_SUCCESS;
 }
-
-/*****************************************************************************
- * DirectXFindColorkey: Finds out the 32bits RGB pixel value of the colorkey
- *****************************************************************************/
-static DWORD DirectXFindColorkey( vout_thread_t *p_vout, uint32_t *pi_color )
+static int DirectXCreatePictureResourceRgb(vout_display_t *vd,
+                                           video_format_t *fmt)
 {
-    DDSURFACEDESC ddsd;
-    HRESULT dxresult;
-    COLORREF i_rgb = 0;
-    uint32_t i_pixel_backup;
-    HDC hdc;
+    vout_display_sys_t *sys = vd->sys;
+    bool allow_sysmem  = var_InheritBool(vd, "directx-use-sysmem");
 
-    ddsd.dwSize = sizeof(ddsd);
-    dxresult = IDirectDrawSurface2_Lock( p_vout->p_sys->p_display, NULL,
-                                         &ddsd, DDLOCK_WAIT, NULL );
-    if( dxresult != DD_OK ) return 0;
+    /* Our last choice is to use a plain RGB surface */
+    DDPIXELFORMAT ddpfPixelFormat;
+    ZeroMemory(&ddpfPixelFormat, sizeof(ddpfPixelFormat));
+    ddpfPixelFormat.dwSize = sizeof(ddpfPixelFormat);
 
-    i_pixel_backup = *(uint32_t *)ddsd.lpSurface;
+    IDirectDrawSurface2_GetPixelFormat(sys->display, &ddpfPixelFormat);
+    if ((ddpfPixelFormat.dwFlags & DDPF_RGB) == 0)
+        return VLC_EGENERIC;
 
-    switch( ddsd.ddpfPixelFormat.dwRGBBitCount )
-    {
-    case 4:
-        *(uint8_t *)ddsd.lpSurface = *pi_color | (*pi_color << 4);
-        break;
+    switch (ddpfPixelFormat.dwRGBBitCount) {
     case 8:
-        *(uint8_t *)ddsd.lpSurface = *pi_color;
+        fmt->i_chroma = VLC_CODEC_RGB8;
         break;
     case 15:
+        fmt->i_chroma = VLC_CODEC_RGB15;
+        break;
     case 16:
-        *(uint16_t *)ddsd.lpSurface = *pi_color;
+        fmt->i_chroma = VLC_CODEC_RGB16;
         break;
     case 24:
-        /* Seems to be problematic so we'll just put black as the colorkey */
-        *pi_color = 0;
-    default:
-        *(uint32_t *)ddsd.lpSurface = *pi_color;
+        fmt->i_chroma = VLC_CODEC_RGB24;
         break;
+    case 32:
+        fmt->i_chroma = VLC_CODEC_RGB32;
+        break;
+    default:
+        msg_Err(vd, "unknown screen depth");
+        return VLC_EGENERIC;
+    }
+    fmt->i_rmask = ddpfPixelFormat.dwRBitMask;
+    fmt->i_gmask = ddpfPixelFormat.dwGBitMask;
+    fmt->i_bmask = ddpfPixelFormat.dwBBitMask;
+
+    /* */
+    LPDIRECTDRAWSURFACE2 surface;
+    int ret = DirectXCreateSurface(vd, &surface, fmt, 0, false, allow_sysmem, 0);
+    if (ret && !allow_sysmem)
+        ret = DirectXCreateSurface(vd, &surface, fmt, 0, false, true, 0);
+    if (ret)
+        return VLC_EGENERIC;
+    msg_Dbg(vd, "RGB plain surface created successfully");
+
+    if (DirectXCheckLockingSurface(surface, surface)) {
+        DirectXDestroySurface(surface);
+        return VLC_EGENERIC;
     }
 
-    IDirectDrawSurface2_Unlock( p_vout->p_sys->p_display, NULL );
-
-    if( IDirectDrawSurface2_GetDC( p_vout->p_sys->p_display, &hdc ) == DD_OK )
-    {
-        i_rgb = GetPixel( hdc, 0, 0 );
-        IDirectDrawSurface2_ReleaseDC( p_vout->p_sys->p_display, hdc );
-    }
-
-    ddsd.dwSize = sizeof(ddsd);
-    dxresult = IDirectDrawSurface2_Lock( p_vout->p_sys->p_display, NULL,
-                                         &ddsd, DDLOCK_WAIT, NULL );
-    if( dxresult != DD_OK ) return i_rgb;
-
-    *(uint32_t *)ddsd.lpSurface = i_pixel_backup;
-
-    IDirectDrawSurface2_Unlock( p_vout->p_sys->p_display, NULL );
-
-    return i_rgb;
+    /* */
+    picture_resource_t *rsc = &sys->resource;
+    rsc->p_sys->front_surface = surface;
+    rsc->p_sys->surface       = surface;
+    return VLC_SUCCESS;
 }
 
-/*****************************************************************************
- * A few toolbox functions
- *****************************************************************************/
-void SwitchWallpaperMode( vout_thread_t *p_vout, bool b_on )
+static int DirectXCreatePictureResource(vout_display_t *vd,
+                                        bool *use_overlay,
+                                        video_format_t *fmt)
 {
-    HWND hwnd;
+    vout_display_sys_t *sys = vd->sys;
 
-    if( p_vout->p_sys->b_wallpaper == b_on ) return; /* Nothing to do */
+    /* */
+    picture_resource_t *rsc = &sys->resource;
+    rsc->p_sys = calloc(1, sizeof(*rsc->p_sys));
+    if (!rsc->p_sys)
+        return VLC_ENOMEM;
 
-    hwnd = FindWindow( _T("Progman"), NULL );
-    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SHELLDLL_DefView"), NULL );
-    if( hwnd ) hwnd = FindWindowEx( hwnd, NULL, _T("SysListView32"), NULL );
-    if( !hwnd )
-    {
-        msg_Warn( p_vout, "couldn't find \"SysListView32\" window, "
-                  "wallpaper mode not supported" );
+    /* */
+    bool allow_hw_yuv  = sys->can_blit_fourcc &&
+                         vlc_fourcc_IsYUV(fmt->i_chroma) &&
+                         var_InheritBool(vd, "directx-hw-yuv");
+    bool allow_overlay = var_InheritBool(vd, "overlay");
+
+    /* Try to use an yuv surface */
+    if (allow_hw_yuv) {
+        const vlc_fourcc_t *list = vlc_fourcc_GetYUVFallback(fmt->i_chroma);
+        /*  Try with overlay first */
+        for (unsigned pass = allow_overlay ? 0 : 1; pass < 2; pass++) {
+            for (unsigned i = 0; list[i] != 0; i++) {
+                const DWORD fourcc = DirectXGetFourcc(list[i]);
+                if (!fourcc)
+                    continue;
+
+                if (pass == 0) {
+                    if (DirectXCreatePictureResourceYuvOverlay(vd, fmt, fourcc))
+                        continue;
+                } else {
+                    if (DirectXCreatePictureResourceYuv(vd, fmt, fourcc))
+                        continue;
+                }
+                /* */
+                *use_overlay = pass == 0;
+                fmt->i_chroma = list[i];
+                return VLC_SUCCESS;
+            }
+        }
+    }
+
+    /* Try plain RGB */
+    return DirectXCreatePictureResourceRgb(vd, fmt);
+}
+static void DirectXDestroyPictureResource(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    DirectXDestroySurface(sys->resource.p_sys->front_surface);
+}
+
+static int DirectXLock(picture_t *picture)
+{
+    DDSURFACEDESC ddsd;
+    if (DirectXLockSurface(picture->p_sys->front_surface,
+                           picture->p_sys->surface, &ddsd))
+        return VLC_EGENERIC;
+
+    /* fill in buffer info in first plane */
+    picture->p->p_pixels = ddsd.lpSurface;
+    picture->p->i_pitch  = ddsd.lPitch;
+    picture->p->i_lines  = picture->format.i_height;
+
+    /*  Fill chroma planes for planar YUV */
+    if (picture->format.i_chroma == VLC_CODEC_I420 ||
+        picture->format.i_chroma == VLC_CODEC_J420 ||
+        picture->format.i_chroma == VLC_CODEC_YV12) {
+
+        for (int n = 1; n < picture->i_planes; n++) {
+            const plane_t *o = &picture->p[n-1];
+            plane_t *p = &picture->p[n];
+
+            p->p_pixels = o->p_pixels + o->i_lines * o->i_pitch;
+            p->i_pitch  = ddsd.lPitch / 2;
+            p->i_lines  = picture->format.i_height / 2;
+        }
+        /* The dx buffer is always allocated as YV12 */
+        if (vlc_fourcc_AreUVPlanesSwapped(picture->format.i_chroma, VLC_CODEC_YV12)) {
+            uint8_t *p_tmp = picture->p[1].p_pixels;
+            picture->p[1].p_pixels = picture->p[2].p_pixels;
+            picture->p[2].p_pixels = p_tmp;
+        }
+    }
+    return VLC_SUCCESS;
+}
+static void DirectXUnlock(picture_t *picture)
+{
+    DirectXUnlockSurface(picture->p_sys->front_surface,
+                         picture->p_sys->surface);
+}
+
+static int DirectXCreatePool(vout_display_t *vd,
+                             bool *use_overlay, video_format_t *fmt)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    /* */
+    *fmt = vd->source;
+
+    if (DirectXCreatePictureResource(vd, use_overlay, fmt))
+        return VLC_EGENERIC;
+
+    /* Create the associated picture */
+    picture_resource_t *rsc = &sys->resource;
+    for (int i = 0; i < PICTURE_PLANE_MAX; i++) {
+        rsc->p[i].p_pixels = NULL;
+        rsc->p[i].i_pitch  = 0;
+        rsc->p[i].i_lines  = 0;
+    }
+    picture_t *picture = picture_NewFromResource(fmt, rsc);
+    if (!picture) {
+        DirectXDestroyPictureResource(vd);
+        free(rsc->p_sys);
+        return VLC_ENOMEM;
+    }
+
+    /* Wrap it into a picture pool */
+    picture_pool_configuration_t cfg;
+    memset(&cfg, 0, sizeof(cfg));
+    cfg.picture_count = 1;
+    cfg.picture       = &picture;
+    cfg.lock          = DirectXLock;
+    cfg.unlock        = DirectXUnlock;
+
+    sys->pool = picture_pool_NewExtended(&cfg);
+    if (!sys->pool) {
+        picture_Release(picture);
+        DirectXDestroyPictureResource(vd);
+        return VLC_ENOMEM;
+    }
+    return VLC_SUCCESS;
+}
+static void DirectXDestroyPool(vout_display_t *vd)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    if (sys->pool) {
+        DirectXDestroyPictureResource(vd);
+        picture_pool_Delete(sys->pool);
+    }
+    sys->pool = NULL;
+}
+
+/**
+ * Move or resize overlay surface on video display.
+ *
+ * This function is used to move or resize an overlay surface on the screen.
+ * Ususally the overlay is moved by the user and thus, by a move or resize
+ * event.
+ */
+static int DirectXUpdateOverlay(vout_display_t *vd, LPDIRECTDRAWSURFACE2 surface)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    RECT src = sys->rect_src_clipped;
+    RECT dst = sys->rect_dest_clipped;
+
+    if (sys->use_wallpaper) {
+        src.left   = vd->source.i_x_offset;
+        src.top    = vd->source.i_y_offset;
+        src.right  = vd->source.i_x_offset + vd->source.i_visible_width;
+        src.bottom = vd->source.i_y_offset + vd->source.i_visible_height;
+        AlignRect(&src, sys->i_align_src_boundary, sys->i_align_src_size);
+
+        vout_display_cfg_t cfg = *vd->cfg;
+        cfg.display.width  = sys->rect_display.right;
+        cfg.display.height = sys->rect_display.bottom;
+
+        vout_display_place_t place;
+        vout_display_PlacePicture(&place, &vd->source, &cfg, true);
+
+        dst.left   = sys->rect_display.left + place.x;
+        dst.top    = sys->rect_display.top  + place.y;
+        dst.right  = dst.left + place.width;
+        dst.bottom = dst.top  + place.height;
+        AlignRect(&dst, sys->i_align_dest_boundary, sys->i_align_dest_size);
+    }
+
+    if (!surface) {
+        if (!sys->pool)
+            return VLC_EGENERIC;
+        surface = sys->resource.p_sys->front_surface;
+    }
+
+    /* The new window dimensions should already have been computed by the
+     * caller of this function */
+
+    /* Position and show the overlay */
+    DDOVERLAYFX ddofx;
+    ZeroMemory(&ddofx, sizeof(ddofx));
+    ddofx.dwSize = sizeof(ddofx);
+    ddofx.dckDestColorkey.dwColorSpaceLowValue = sys->i_colorkey;
+    ddofx.dckDestColorkey.dwColorSpaceHighValue = sys->i_colorkey;
+
+    HRESULT hr = IDirectDrawSurface2_UpdateOverlay(surface,
+                                                   &src, sys->display, &dst,
+                                                   DDOVER_SHOW | DDOVER_KEYDESTOVERRIDE, &ddofx);
+    if (hr != DD_OK) {
+        msg_Warn(vd, "DirectDrawUpdateOverlay cannot move/resize overlay");
+        return VLC_EGENERIC;
+    }
+    return VLC_SUCCESS;
+}
+
+/* */
+static void WallpaperChange(vout_display_t *vd, bool use_wallpaper)
+{
+    vout_display_sys_t *sys = vd->sys;
+
+    if (!sys->use_wallpaper == !use_wallpaper)
+        return;
+
+    HWND hwnd = FindWindow(_T("Progman"), NULL);
+    if (hwnd)
+        hwnd = FindWindowEx(hwnd, NULL, _T("SHELLDLL_DefView"), NULL);
+    if (hwnd)
+        hwnd = FindWindowEx(hwnd, NULL, _T("SysListView32"), NULL);
+    if (!hwnd) {
+        msg_Warn(vd, "couldn't find \"SysListView32\" window, "
+                     "wallpaper mode not supported");
         return;
     }
 
-    p_vout->p_sys->b_wallpaper = b_on;
+    msg_Dbg(vd, "wallpaper mode %s", use_wallpaper ? "enabled" : "disabled");
+    sys->use_wallpaper = use_wallpaper;
 
-    msg_Dbg( p_vout, "wallpaper mode %s", b_on ? "enabled" : "disabled" );
+    if (sys->use_wallpaper) {
+        sys->color_bkg    = ListView_GetBkColor(hwnd);
+        sys->color_bkgtxt = ListView_GetTextBkColor(hwnd);
 
-    if( p_vout->p_sys->b_wallpaper )
-    {
-        p_vout->p_sys->color_bkg = ListView_GetBkColor( hwnd );
-        p_vout->p_sys->color_bkgtxt = ListView_GetTextBkColor( hwnd );
-
-        ListView_SetBkColor( hwnd, p_vout->p_sys->i_rgb_colorkey );
-        ListView_SetTextBkColor( hwnd, p_vout->p_sys->i_rgb_colorkey );
-    }
-    else if( hwnd )
-    {
-        ListView_SetBkColor( hwnd, p_vout->p_sys->color_bkg );
-        ListView_SetTextBkColor( hwnd, p_vout->p_sys->color_bkgtxt );
+        ListView_SetBkColor(hwnd,     sys->i_rgb_colorkey);
+        ListView_SetTextBkColor(hwnd, sys->i_rgb_colorkey);
+    } else {
+        ListView_SetBkColor(hwnd,     sys->color_bkg);
+        ListView_SetTextBkColor(hwnd, sys->color_bkgtxt);
     }
 
     /* Update desktop */
-    InvalidateRect( hwnd, NULL, TRUE );
-    UpdateWindow( hwnd );
+    InvalidateRect(hwnd, NULL, TRUE);
+    UpdateWindow(hwnd);
+
+    if (sys->use_overlay)
+      DirectXUpdateOverlay(vd, NULL);
+}
+
+/* */
+static int WallpaperCallback(vlc_object_t *object, char const *cmd,
+                             vlc_value_t oldval, vlc_value_t newval, void *data)
+{
+    vout_display_t *vd = (vout_display_t *)object;
+    vout_display_sys_t *sys = vd->sys;
+    VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(data);
+
+    vlc_mutex_lock(&sys->lock);
+    const bool ch_wallpaper = !sys->wallpaper_requested != !newval.b_bool;
+    sys->ch_wallpaper |= ch_wallpaper;
+    sys->wallpaper_requested = newval.b_bool;
+    vlc_mutex_unlock(&sys->lock);
+
+    /* FIXME we should have a way to export variable to be saved */
+    if (ch_wallpaper) {
+        playlist_t *p_playlist = pl_Hold(vd);
+        if (p_playlist) {
+            /* Modify playlist as well because the vout might have to be
+             * restarted */
+            var_Create(p_playlist, "video-wallpaper", VLC_VAR_BOOL);
+            var_SetBool(p_playlist, "video-wallpaper", newval.b_bool);
+            pl_Release(vd);
+        }
+    }
+    return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * config variable callback
  *****************************************************************************/
-BOOL WINAPI DirectXEnumCallback2( GUID* p_guid, LPTSTR psz_desc,
-                                  LPTSTR psz_drivername, VOID* p_context,
-                                  HMONITOR hmon )
+static BOOL WINAPI DirectXEnumCallback2(GUID *guid, LPTSTR desc,
+                                        LPTSTR drivername, VOID *context,
+                                        HMONITOR hmon)
 {
-    VLC_UNUSED( p_guid ); VLC_UNUSED( psz_desc ); VLC_UNUSED( hmon );
+    VLC_UNUSED(guid); VLC_UNUSED(desc); VLC_UNUSED(hmon);
 
-    module_config_t *p_item = (module_config_t *)p_context;
+    module_config_t *item = context;
 
-    p_item->ppsz_list = xrealloc( p_item->ppsz_list,
-                          (p_item->i_list+2) * sizeof(char *) );
-    p_item->ppsz_list_text = xrealloc( p_item->ppsz_list_text,
-                          (p_item->i_list+2) * sizeof(char *) );
+    item->ppsz_list = xrealloc(item->ppsz_list,
+                               (item->i_list+2) * sizeof(char *));
+    item->ppsz_list_text = xrealloc(item->ppsz_list_text,
+                                    (item->i_list+2) * sizeof(char *));
 
-    p_item->ppsz_list[p_item->i_list] = strdup( psz_drivername );
-    p_item->ppsz_list_text[p_item->i_list] = NULL;
-    p_item->i_list++;
-    p_item->ppsz_list[p_item->i_list] = NULL;
-    p_item->ppsz_list_text[p_item->i_list] = NULL;
+    item->ppsz_list[item->i_list] = strdup(drivername);
+    item->ppsz_list_text[item->i_list] = NULL;
+    item->i_list++;
+    item->ppsz_list[item->i_list] = NULL;
+    item->ppsz_list_text[item->i_list] = NULL;
 
     return TRUE; /* Keep enumerating */
 }
 
-static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
-                               vlc_value_t newval, vlc_value_t oldval, void *d)
+static int FindDevicesCallback(vlc_object_t *object, char const *name,
+                               vlc_value_t newval, vlc_value_t oldval, void *data)
 {
-    VLC_UNUSED( newval ); VLC_UNUSED( oldval ); VLC_UNUSED( d );
+    VLC_UNUSED(newval); VLC_UNUSED(oldval); VLC_UNUSED(data);
 
-    HRESULT (WINAPI *OurDirectDrawEnumerateEx)( LPDDENUMCALLBACKEXA, LPVOID,
-                                                DWORD );
-    HINSTANCE hddraw_dll;
-
-    module_config_t *p_item;
-    int i;
-
-    p_item = config_FindConfig( p_this, psz_name );
-    if( !p_item ) return VLC_SUCCESS;
+    module_config_t *item = config_FindConfig(object, name);
+    if (!item)
+        return VLC_SUCCESS;
 
     /* Clear-up the current list */
-    if( p_item->i_list )
-    {
+    if (item->i_list > 0) {
+        int i;
         /* Keep the first entry */
-        for( i = 1; i < p_item->i_list; i++ )
-        {
-            free( p_item->ppsz_list[i] );
-            free( p_item->ppsz_list_text[i] );
+        for (i = 1; i < item->i_list; i++) {
+            free(item->ppsz_list[i]);
+            free(item->ppsz_list_text[i]);
         }
         /* TODO: Remove when no more needed */
-        p_item->ppsz_list[i] = NULL;
-        p_item->ppsz_list_text[i] = NULL;
+        item->ppsz_list[i] = NULL;
+        item->ppsz_list_text[i] = NULL;
     }
-    p_item->i_list = 1;
+    item->i_list = 1;
 
     /* Load direct draw DLL */
-    hddraw_dll = LoadLibrary(_T("DDRAW.DLL"));
-    if( hddraw_dll == NULL ) return VLC_SUCCESS;
+    HINSTANCE hddraw_dll = LoadLibrary(_T("DDRAW.DLL"));
+    if (!hddraw_dll)
+        return VLC_SUCCESS;
 
-    OurDirectDrawEnumerateEx =
-      (void *)GetProcAddress( hddraw_dll, _T("DirectDrawEnumerateExW") );
+    /* Enumerate displays */
+    HRESULT (WINAPI *OurDirectDrawEnumerateEx)(LPDDENUMCALLBACKEXA,
+                                               LPVOID, DWORD) =
+        (void *)GetProcAddress(hddraw_dll, _T("DirectDrawEnumerateExW"));
+    if (OurDirectDrawEnumerateEx)
+        OurDirectDrawEnumerateEx(DirectXEnumCallback2, item,
+                                 DDENUM_ATTACHEDSECONDARYDEVICES);
 
-    if( OurDirectDrawEnumerateEx )
-    {
-        /* Enumerate displays */
-        OurDirectDrawEnumerateEx( DirectXEnumCallback2, p_item,
-                                  DDENUM_ATTACHEDSECONDARYDEVICES );
-    }
-
-    FreeLibrary( hddraw_dll );
+    FreeLibrary(hddraw_dll);
 
     /* Signal change to the interface */
-    p_item->b_dirty = true;
+    item->b_dirty = true;
 
     return VLC_SUCCESS;
 }
 
-static int WallpaperCallback( vlc_object_t *p_this, char const *psz_cmd,
-                              vlc_value_t oldval, vlc_value_t newval,
-                              void *p_data )
-{
-    VLC_UNUSED( psz_cmd ); VLC_UNUSED( oldval ); VLC_UNUSED( p_data );
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
 
-    if( (newval.b_bool && !p_vout->p_sys->b_wallpaper) ||
-        (!newval.b_bool && p_vout->p_sys->b_wallpaper) )
-    {
-        playlist_t *p_playlist = pl_Hold( p_vout );
-
-        if( p_playlist )
-        {
-            /* Modify playlist as well because the vout might have to be
-             * restarted */
-            var_Create( p_playlist, "video-wallpaper", VLC_VAR_BOOL );
-            var_Set( p_playlist, "video-wallpaper", newval );
-            pl_Release( p_vout );
-        }
-
-        p_vout->p_sys->i_changes |= DX_WALLPAPER_CHANGE;
-    }
-
-    return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * SetPalette: sets an 8 bpp palette
- *****************************************************************************/
-static void SetPalette( vout_thread_t *p_vout,
-                        uint16_t *red, uint16_t *green, uint16_t *blue )
-{
-    VLC_UNUSED( red ); VLC_UNUSED( green );VLC_UNUSED( blue );
-    msg_Err( p_vout, "FIXME: SetPalette unimplemented" );
-}

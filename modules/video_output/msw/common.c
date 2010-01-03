@@ -97,7 +97,7 @@ int CommonInit(vout_display_t *vd)
     cfg.use_desktop = sys->use_desktop;
 #endif
 #ifdef MODULE_NAME_IS_directx
-    cfg.use_overlay = sys->b_using_overlay;
+    cfg.use_overlay = sys->use_overlay;
 #endif
     cfg.win.type   = VOUT_WINDOW_TYPE_HWND;
     cfg.win.x      = 0;
@@ -300,7 +300,7 @@ void UpdateRects(vout_display_t *vd,
 
 #ifdef MODULE_NAME_IS_directx
     /* Apply overlay hardware constraints */
-    if (sys->b_using_overlay) {
+    if (sys->use_overlay) {
         if (sys->i_align_dest_boundary)
             rect_dest.left = (rect_dest.left +
                               sys->i_align_dest_boundary / 2) &
@@ -373,7 +373,7 @@ void UpdateRects(vout_display_t *vd,
 
 #ifdef MODULE_NAME_IS_directx
     /* Apply overlay hardware constraints */
-    if (sys->b_using_overlay) {
+    if (sys->use_overlay) {
         if (sys->i_align_src_boundary)
             rect_src_clipped.left =
                 (rect_src_clipped.left +
@@ -408,9 +408,6 @@ void UpdateRects(vout_display_t *vd,
     rect_dest_clipped.right -= sys->rect_display.left;
     rect_dest_clipped.top -= sys->rect_display.top;
     rect_dest_clipped.bottom -= sys->rect_display.top;
-
-    if (sys->b_using_overlay)
-        DirectDrawUpdateOverlay(vd);
 #endif
 
 #ifndef UNDER_CE
