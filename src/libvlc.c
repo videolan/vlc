@@ -84,7 +84,6 @@
 #include <vlc_charset.h>
 #include <vlc_cpu.h>
 #include <vlc_url.h>
-#include <vlc_keys.h>
 
 #include "libvlc.h"
 
@@ -811,36 +810,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Initialize hotkey handling
      */
-    var_Create( p_libvlc, "key-pressed", VLC_VAR_INTEGER );
-    var_Create( p_libvlc, "key-action", VLC_VAR_INTEGER );
-    {
-        struct hotkey *p_keys =
-            malloc( (libvlc_actions_count + 1) * sizeof (*p_keys) );
-
-        /* Initialize from configuration */
-        for( size_t i = 0; i < libvlc_actions_count; i++ )
-        {
-            p_keys[i].psz_action = libvlc_actions[i].name;
-            p_keys[i].i_key = config_GetInt( p_libvlc,
-                                             libvlc_actions[i].name );
-            p_keys[i].i_action = libvlc_actions[i].value;
-#ifndef NDEBUG
-            if (i > 0
-             && strcmp(libvlc_actions[i-1].name, libvlc_actions[i].name) >= 0)
-            {
-                msg_Err(p_libvlc, "%s and %s are not ordered properly",
-                        libvlc_actions[i-1].name, libvlc_actions[i].name);
-                abort();
-            }
-#endif
-        }
-        p_keys[libvlc_actions_count].psz_action = NULL;
-        p_keys[libvlc_actions_count].i_key = 0;
-        p_keys[libvlc_actions_count].i_action = 0;
-        p_libvlc->p_hotkeys = p_keys;
-        var_AddCallback( p_libvlc, "key-pressed", vlc_key_to_action,
-                         p_keys );
-    }
+    vlc_InitActions( p_libvlc );
 
     /* variables for signalling creation of new files */
     var_Create( p_libvlc, "snapshot-file", VLC_VAR_STRING );
@@ -1104,9 +1074,7 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     /* Free module bank. It is refcounted, so we call this each time  */
     module_EndBank( p_libvlc, true );
 
-    var_DelCallback( p_libvlc, "key-pressed", vlc_key_to_action,
-                     (void *)p_libvlc->p_hotkeys );
-    free( (void *)p_libvlc->p_hotkeys );
+    vlc_DeinitActions( p_libvlc );
 }
 
 /**

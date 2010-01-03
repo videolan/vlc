@@ -35,8 +35,8 @@ typedef struct action
 } action_t;
 extern const struct action libvlc_actions[];
 extern const size_t libvlc_actions_count;
-extern int vlc_key_to_action (vlc_object_t *, const char *,
-                              vlc_value_t, vlc_value_t, void *);
+extern int vlc_InitActions (libvlc_int_t *);
+extern void vlc_DeinitActions (libvlc_int_t *);
 
 /*
  * OS-specific initialization
