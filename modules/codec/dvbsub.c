@@ -1488,6 +1488,7 @@ static subpicture_t *render( decoder_t *p_dec )
     p_spu->b_ephemer = true;
     //p_spu->b_fade = true;
     //p_spu->i_stop = p_spu->i_start + (mtime_t) (i_timeout * 1000000);
+    p_spu->b_subtitle = true;
 
     /* Correct positioning of SPU */
     i_base_x = p_sys->i_spu_x;
