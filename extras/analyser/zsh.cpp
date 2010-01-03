@@ -154,6 +154,7 @@ void ParseModules( mumap &mods, mcmap &mods2 )
         while( i_items++ < p_module->i_config_items && p_item++ );
 
     }
+    module_list_free( p_list );
 }
 
 void PrintModuleList( mumap &mods, mcmap &mods2 )
@@ -428,10 +429,12 @@ void PrintOption( char *psz_option, char i_short, char *psz_exclusive,
         strchr( psz_longtext, '(' ) ) psz_longtext = psz_text;
     if( i_short )
     {
-        if( !psz_exclusive ) psz_exclusive = strdup( "" );
-        else asprintf( &psz_exclusive, " %s", psz_exclusive );
-        printf( "  \"(-%c%s)--%s%s[%s]", i_short, psz_exclusive,
-                psz_option, psz_args?"=":"", psz_text );
+        if( !psz_exclusive )
+            printf( "  \"(-%c)--%s%s[%s]", i_short,
+                    psz_option, psz_args?"=":"", psz_text );
+        else
+            printf( "  \"(-%c%s)--%s%s[%s]", i_short, psz_exclusive,
+                    psz_option, psz_args?"=":"", psz_text );
         if( psz_args )
             printf( ":%s:%s\"\\\n", psz_longtext, psz_args );
         else
@@ -456,7 +459,6 @@ void PrintOption( char *psz_option, char i_short, char *psz_exclusive,
             printf( ":%s:%s\"\\\n", psz_longtext, psz_args );
         else
             printf( "\"\\\n" );
-
     }
 }
 
