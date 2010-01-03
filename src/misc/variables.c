@@ -644,7 +644,7 @@ int __var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
                      vlc_value_t val )
 {
     int i_var;
-    int i_ret = VLC_SUCCESS;
+    int i_ret;
     variable_t *p_var;
     vlc_value_t oldval;
 
@@ -688,8 +688,7 @@ int __var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
     CheckValue( p_var, &p_var->val );
 
     /* Deal with callbacks.*/
-    if( p_var->i_entries )
-        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval );
+    i_ret = TriggerCallback( p_this, p_var, psz_name, oldval );
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
@@ -767,8 +766,7 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
     p_var->val = val;
 
     /* Deal with callbacks */
-    if( p_var->i_entries )
-        i_ret = TriggerCallback( p_this, p_var, psz_name, oldval );
+    i_ret = TriggerCallback( p_this, p_var, psz_name, oldval );
 
     /* Free data if needed */
     p_var->ops->pf_free( &oldval );
@@ -967,7 +965,7 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
 int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
 {
     int i_var;
-    int i_ret = VLC_SUCCESS;
+    int i_ret;
     variable_t *p_var;
 
     assert( p_this );
@@ -987,8 +985,7 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
 
     /* Deal with callbacks. Tell we're in a callback, release the lock,
      * call stored functions, retake the lock. */
-    if( p_var->i_entries )
-        i_ret = TriggerCallback( p_this, p_var, psz_name, p_var->val );
+    i_ret = TriggerCallback( p_this, p_var, psz_name, p_var->val );
 
     vlc_mutex_unlock( &p_priv->var_lock );
     return i_ret;
@@ -1458,11 +1455,13 @@ int var_Inherit( vlc_object_t *p_this, const char *psz_name, int i_type,
 static int TriggerCallback( vlc_object_t *p_this, variable_t *p_var,
                             const char *psz_name, vlc_value_t oldval )
 {
-    int i_entries = p_var->i_entries;
-    callback_entry_t *p_entries = p_var->p_entries;
-
     assert( p_this );
 
+    int i_entries = p_var->i_entries;
+    if( i_entries == 0 )
+        return VLC_SUCCESS;
+
+    callback_entry_t *p_entries = p_var->p_entries;
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
     p_var->b_incallback = true;
