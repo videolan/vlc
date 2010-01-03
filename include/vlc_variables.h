@@ -719,6 +719,18 @@ static inline int __var_ToggleBool( vlc_object_t *p_obj, const char *psz_name )
  */
 #define var_ToggleBool(a,b) __var_ToggleBool( VLC_OBJECT(a),b )
 
+
+LIBVLC_USED
+static inline bool var_InheritBool( vlc_object_t *obj, const char *name )
+{
+    vlc_value_t val;
+
+    if( var_Inherit( obj, name, VLC_VAR_BOOL, &val ) )
+        val.b_bool = false;
+    return val.b_bool;
+}
+#define var_InheritBool(o, n) var_InheritBool(VLC_OBJECT(o), n)
+
 LIBVLC_USED
 static inline int var_InheritInteger( vlc_object_t *obj, const char *name )
 {
