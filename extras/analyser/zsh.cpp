@@ -198,6 +198,7 @@ void PrintModuleList( mumap &mods, mcmap &mods2 )
 
     }
     printf( "\"\n\n" );
+    module_list_free( p_list );
     return;
 }
 
