@@ -60,8 +60,11 @@ int main( int i_argc, const char **ppsz_argv )
     libvlc_exception_t ex;
     libvlc_exception_init(&ex);
 
-    const char * const argv[] = { "vlc" };
-    libvlc_instance_t *p_libvlc_instance = libvlc_new(1, argv, &ex);
+    const char *argv[i_argc + 1];
+    argv[0] = "vlc";
+    for( int i = 0; i < i_argc; i++ )
+        argv[i+1] = ppsz_argv[i];
+    libvlc_instance_t *p_libvlc_instance = libvlc_new(i_argc+1, argv, &ex);
 
     if( !p_libvlc_instance || libvlc_exception_raised(&ex) )
     {
