@@ -235,7 +235,7 @@ static int DisplayLogin(vlc_object_t *p_this, const char *type, vlc_value_t prev
     dialog_login_t *dialog = value.p_address;
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
     intf_sys_t *sys = p_intf->p_sys;
-    NSDictionary *dict = [sys->displayer resultFromSelectorOnMainThread:@selector(displayCritical:) withObject:DictFromDialogLogin(dialog)];
+    NSDictionary *dict = [sys->displayer resultFromSelectorOnMainThread:@selector(displayLogin:) withObject:DictFromDialogLogin(dialog)];
     if (dict) {
         *dialog->username = strdup([[dict objectForKey:@"username"] UTF8String]);
         *dialog->password = strdup([[dict objectForKey:@"password"] UTF8String]);
@@ -251,7 +251,7 @@ static int DisplayProgressPanelAction(vlc_object_t *p_this, const char *type, vl
     intf_thread_t *p_intf = (intf_thread_t*) p_this;
     intf_sys_t *sys = p_intf->p_sys;
 
-    [sys->displayer performSelectorOnMainThread:@selector(displayProgressBar) withObject:DictFromDialogProgressBar(dialog) waitUntilDone:YES];
+    [sys->displayer performSelectorOnMainThread:@selector(displayProgressBar:) withObject:DictFromDialogProgressBar(dialog) waitUntilDone:YES];
 
     dialog->pf_update = updateProgressPanel;
     dialog->pf_check = checkProgressPanel;
@@ -272,7 +272,7 @@ void updateProgressPanel (void *priv, const char *text, float value)
                           text ? [NSString stringWithUTF8String:text] : nil, @"text",
                           nil];
                           
-    [sys->displayer performSelectorOnMainThread:@selector(updateProgressPanel) withObject:dict waitUntilDone:YES];
+    [sys->displayer performSelectorOnMainThread:@selector(updateProgressPanel:) withObject:dict waitUntilDone:YES];
 
     [pool release];
 }
@@ -409,7 +409,7 @@ bool checkProgressPanel (void *priv)
     _currentProgressBarPanel = [[VLCProgressPanel alloc] init];
     [_currentProgressBarPanel createContentView];
     [_currentProgressBarPanel setDialogTitle:[dialog objectForKey:@"title"]];
-    [_currentProgressBarPanel setDialogMessage:[dialog objectForKey:@"message"]];
+    [_currentProgressBarPanel setDialogMessage:[dialog objectForKey:@"message"] ?: @""];
     [_currentProgressBarPanel setCancelButtonLabel:[dialog objectForKey:@"cancel"]];
 
     [_currentProgressBarPanel center];
@@ -448,8 +448,12 @@ bool checkProgressPanel (void *priv)
 - (void)execute:(NSDictionary *)dict
 {
     SEL sel = [[dict objectForKey:@"sel"] pointerValue];
-    id * result = [[dict objectForKey:@"result"] pointerValue];
+    id *result = [[dict objectForKey:@"result"] pointerValue];
     id object = [dict objectForKey:@"object"];
+
+    NSAssert(sel, @"Try to execute a NULL selector");
+    NSAssert(object, @"Try to execute from a nil object");
+
     *result = [self performSelector:sel withObject:object];
     [*result retain]; // Balanced in -resultFromSelectorOnMainThread
 }
@@ -457,11 +461,13 @@ bool checkProgressPanel (void *priv)
 - (id)resultFromSelectorOnMainThread:(SEL)sel withObject:(id)object
 {
     id result = nil;
-    [NSDictionary dictionaryWithObjectsAndKeys:
+    NSAssert(sel, @"Try to execute a NULL selector");
+    NSAssert(sel, @"Try to execute from a nil object");
+    NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
      [NSValue valueWithPointer:sel], @"sel",
      [NSValue valueWithPointer:&result], @"result",
      object, @"object", nil];
-    [self performSelectorOnMainThread:@selector(execute:) withObject:object waitUntilDone:YES];
+    [self performSelectorOnMainThread:@selector(execute:) withObject:dict waitUntilDone:YES];
     return [result autorelease];
 }
 @end
