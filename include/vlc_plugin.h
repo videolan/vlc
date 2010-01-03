@@ -347,17 +347,11 @@ enum vlc_module_properties
     add_int_inner( CONFIG_ITEM_INTEGER, name, text, longtext, advc, \
                    p_callback, value )
 
-#if !defined(WIN32) && !defined(SYS_LINUX)
-#define add_key( name, value, p_callback, text, longtext, advc ) \
-    add_int_inner( CONFIG_ITEM_KEY, name, text, longtext, advc, p_callback, \
-                   value )
-#else
 #define add_key( name, value, p_callback, text, longtext, advc ) \
     add_int_inner( CONFIG_ITEM_KEY, name, text, longtext, advc, \
                    p_callback, value ) \
     add_int_inner( CONFIG_ITEM_KEY, "global-" name, text, longtext, advc, \
                    p_callback, KEY_UNSET )
-#endif
 
 #define add_integer_with_range( name, value, i_min, i_max, p_callback, text, longtext, advc ) \
     add_integer( name, value, p_callback, text, longtext, advc ) \
