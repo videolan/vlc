@@ -59,6 +59,6 @@ vlc_key_t vlc_GetActionId(const char *name)
 
     act = bsearch(name, libvlc_actions, libvlc_actions_count, sizeof(*act),
                   actcmp);
-    return (act != NULL) ? act->value : 0;
+    return (act != NULL) ? act->value : ACTIONID_NONE;
 }
 
