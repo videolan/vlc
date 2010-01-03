@@ -80,11 +80,11 @@ hosts/fat/.$(CONTRIBREV)-from-archs:
 		exit 1 ; \
 	fi
 	# FIXME - Doing this without rerunning bootstrap & make would be nicer
-	./bootstrap i686-apple-darwin10 && make && \
-	./bootstrap x86_64-apple-darwin10 && make && \
+	./bootstrap i686-apple-darwin10 && make using-bin && \
+	./bootstrap x86_64-apple-darwin10 && make using-bin && \
 	mkdir tmp;
 	cp -R hosts/x86_64-apple-darwin10/ tmp;
-	(cd tmp/lib && find . -name "*.dylib" -or -name "*.a") | while read lib; do rm tmp/lib/$$lib \
+	(cd tmp/lib && find . -name "*.dylib" -or -name "*.a") | while read lib; do rm tmp/lib/$$lib; \
 	   lipo -create hosts/x86_64-apple-darwin10/lib/$$lib hosts/i686-apple-darwin10/lib/$$lib -output tmp/lib/$$lib; \
 	done;
 	rm -Rf hosts/fat && \
