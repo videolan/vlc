@@ -224,14 +224,15 @@ void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 )
     {
         std::pair<mumap::iterator, mumap::iterator> range = mods.equal_range( p_item->psz_type );
         std::string list = (*range.first).second;
-        ++range.first;
-        while( range.first != range.second )
+        if( range.first != range.second )
         {
-            list = list.append( " " );
-            list = list.append( range.first->second );
-            ++range.first;
+            while( range.first++ != range.second )
+            {
+                list = list.append( " " );
+                list = list.append( range.first->second );
+            }
+            asprintf( &psz_arguments, "(%s)", list.c_str() );
         }
-        asprintf( &psz_arguments, "(%s)", list.c_str() );
     }
     break;
     case CONFIG_ITEM_MODULE_CAT:
@@ -239,14 +240,15 @@ void ParseOption( module_config_t *p_item, mumap &mods, mcmap &mods2 )
         std::pair<mcmap::iterator, mcmap::iterator> range =
             mods2.equal_range( p_item->min.i );
         std::string list = (*range.first).second;
-        ++range.first;
-        while( range.first != range.second )
+        if( range.first != range.second )
         {
-            list = list.append( " " );
-            list = list.append( range.first->second );
-            ++range.first;
+            while( range.first++ != range.second )
+            {
+                list = list.append( " " );
+                list = list.append( range.first->second );
+            }
+            asprintf( &psz_arguments, "(%s)", list.c_str() );
         }
-        asprintf( &psz_arguments, "(%s)", list.c_str() );
     }
     break;
     case CONFIG_ITEM_MODULE_LIST_CAT:
