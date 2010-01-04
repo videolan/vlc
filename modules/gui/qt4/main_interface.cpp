@@ -560,7 +560,7 @@ void MainInterface::createTaskBarButtons()
             // image list and also provide tooltips.
             DWORD dwMask = THB_BITMAP | THB_FLAGS;
 
-            THUMBBUTTON thbButtons[2];
+            THUMBBUTTON thbButtons[3];
             thbButtons[0].dwMask = dwMask;
             thbButtons[0].iId = 0;
             thbButtons[0].iBitmap = 0;
