@@ -2531,6 +2531,9 @@ AC_ARG_ENABLE(cdda,
 AC_ARG_ENABLE(vcd,
   [  --enable-vcd            built-in VCD (default enabled)])
 
+AC_ARG_ENABLE(libcddb,
+  [  --enable-libcddb        CDDB support for libcdio audio CD (default enabled)])
+
 if test "${enable_vcd}" != "no"
 then
   AC_MSG_CHECKING(for cdrom_msf0 in linux/cdrom.h)
