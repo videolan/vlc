@@ -476,6 +476,17 @@ static void OpenglSwap(vout_opengl_t *gl)
     [self unlockgl];
 }
 
+- (void)renewGState
+{
+    NSWindow *window = [self window];
+
+    // Remove flashes with splitter view.
+	if ([window respondsToSelector:@selector(disableScreenUpdatesUntilFlush)])
+		[window disableScreenUpdatesUntilFlush];
+
+    [super renewGState];
+}
+
 - (BOOL)mouseDownCanMoveWindow
 {
     return YES;
