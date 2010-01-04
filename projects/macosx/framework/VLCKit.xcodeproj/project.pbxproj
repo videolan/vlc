@@ -495,7 +495,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n    cd ../../../extras/contrib && make clean\n    exit 0\nfi\n\ncd ../../../extras/contrib && ./bootstrap";
+			shellScript = "if test $ACTION = \"clean\"\nthen\n    cd ../../../extras/contrib && make clean\n    exit 0\nfi\nif test $ARCHS = \"x86_64\"\nthen\n    cd ../../../extras/contrib && ./bootstrap x86_64-apple-darwin10\nelse\n    cd ../../../extras/contrib && ./bootstrap\nfi";
 			showEnvVarsInLog = 0;
 		};
 		633BD6EB0D2ADF280012A314 /* make bin */ = {
