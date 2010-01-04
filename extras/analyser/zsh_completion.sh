@@ -114,5 +114,6 @@ read i
 echo "Installing completion ..."
 sudo sh -c "chown 0:0 _vlc && chmod 0644 _vlc && mv _vlc $ZSH_FPATH" || exit 1
 
-echo "zsh completion for VLC successfully installed :)
-Restart running zsh instances, or run \"compinit\" to start using it."
+echo "zsh completion for VLC successfully installed :)"
+echo "Restart running zsh instances after removing ~/.zcompdump, or"
+echo "run \"compinit\" to start using it."
