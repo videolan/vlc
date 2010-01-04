@@ -159,17 +159,12 @@ int main( int i_argc, const char *ppsz_argv[] )
 
     if (vlc != NULL)
     {
-        libvlc_add_intf (vlc, "signals", &ex);
-        if (libvlc_exception_raised (&ex))
-        {
-            libvlc_exception_clear (&ex);
+        if (libvlc_add_intf (vlc, "signals"))
             pthread_sigmask (SIG_UNBLOCK, &set, NULL);
-        }
 #if !defined (HAVE_MAEMO)
-        libvlc_add_intf (vlc, "globalhotkeys,none", &ex);
+        libvlc_add_intf (vlc, "globalhotkeys,none");
 #endif
-        libvlc_exception_clear (&ex);
-        libvlc_add_intf (vlc, NULL, &ex);
+        libvlc_add_intf (vlc, NULL);
         libvlc_playlist_play (vlc, -1, 0, NULL, &dummy);
         libvlc_wait (vlc);
 
