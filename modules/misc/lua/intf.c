@@ -244,7 +244,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     *psz_char = '\0';
     /* FIXME: don't use luaL_dostring */
     if( asprintf( &psz_command,
-                  "package.path = \"%s"DIR_SEP"modules"DIR_SEP"?.lua;\"..package.path",
+                  "package.path = [[%s"DIR_SEP"modules"DIR_SEP"?.lua;]]..package.path",
                   p_sys->psz_filename ) < 0 )
     {
         free( p_sys->psz_filename );
