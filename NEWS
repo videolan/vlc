@@ -103,6 +103,7 @@ Removed modules:
  * opie, qte and qte_main
  * opengllayer
  * cddax. Use cdda instead
+ * cmml.
 
 
 Changes between 1.0.2 and 1.0.3:

@@ -3501,16 +3501,6 @@ AS_IF( [test "${enable_asademux}" = "yes"], [
   ])
 
 dnl
-dnl  CMML plugin
-dnl
-AC_ARG_ENABLE(cmml,
-  [  --enable-cmml           CMML support (default enabled)])
-if test "${enable_cmml}" != "no"
-then
-  VLC_ADD_PLUGIN([cmml])
-fi
-
-dnl
 dnl  kate decoder plugin
 dnl
 AC_ARG_ENABLE(kate,
@@ -5132,7 +5122,6 @@ AC_CONFIG_FILES([
   modules/audio_output/Makefile
   modules/codec/Makefile
   modules/codec/avcodec/Makefile
-  modules/codec/cmml/Makefile
   modules/codec/dmo/Makefile
   modules/codec/shine/Makefile
   modules/codec/subtitles/Makefile

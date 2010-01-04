@@ -74,7 +74,6 @@ $Id$
  * chorus_flanger: variable delay audio filter
  * chroma_neon: ARM NEONv1 chroma conversion module
  * clone: Clone video filter
- * cmml: Continuous Media Markup Language annotations/hyperlinks decoder
  * colorthres:  Theshold color based on similarity to reference color Video filter
  * converter_fixed: Fixed-point audio format conversions
  * converter_float: Floating-point audio format conversions
