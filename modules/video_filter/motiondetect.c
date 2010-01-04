@@ -103,7 +103,7 @@ static int Create( vlc_object_t *p_this )
             break;
 
         default:
-            msg_Err( p_filter, "Unsupported input chroma (%4s)",
+            msg_Err( p_filter, "Unsupported input chroma (%4.4s)",
                      (char*)&(p_fmt->i_chroma) );
             return VLC_EGENERIC;
     }
@@ -291,7 +291,7 @@ static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_inpic )
     if( GetPackedYuvOffsets( p_fmt->i_chroma,
                              &i_y_offset, &i_u_offset, &i_v_offset ) )
     {
-        msg_Warn( p_filter, "Unsupported input chroma (%4s)",
+        msg_Warn( p_filter, "Unsupported input chroma (%4.4s)",
                   (char*)&p_fmt->i_chroma );
         return p_inpic;
     }

@@ -135,7 +135,7 @@ static int Create( vlc_object_t *p_this )
       )
     {
         /* We only want planar YUV 4:2:0 or 4:2:2 */
-        msg_Err( p_filter, "Unsupported input chroma (%4s)",
+        msg_Err( p_filter, "Unsupported input chroma (%4.4s)",
                  (char*)&(p_filter->fmt_in.video.i_chroma) );
         return VLC_EGENERIC;
     }

@@ -2219,7 +2219,7 @@ static int OpenVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys, bool b_demux )
         char psz_fourcc[5];
         memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
         vlc_fourcc_to_char( p_sys->i_fourcc, &psz_fourcc );
-        msg_Dbg( p_obj, "supported frame intervals for %4s, %dx%d:",
+        msg_Dbg( p_obj, "supported frame intervals for %4.4s, %dx%d:",
                  psz_fourcc, frmival.width, frmival.height );
         switch( frmival.type )
         {
@@ -2671,7 +2671,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
                     memset( &psz_fourcc, 0, sizeof( psz_fourcc ) );
                     vlc_fourcc_to_char( v4l2chroma_to_fourcc[i].i_fourcc,
                                         &psz_fourcc );
-                    msg_Dbg( p_obj, "device supports chroma %4s [%s, %s]",
+                    msg_Dbg( p_obj, "device supports chroma %4.4s [%s, %s]",
                                 psz_fourcc,
                                 p_sys->p_codecs[i_index].description,
                                 psz_fourcc_v4l2 );
@@ -2721,7 +2721,7 @@ static bool ProbeVideoDev( vlc_object_t *p_obj, demux_sys_t *p_sys,
             if( !b_codec_supported )
             {
                     msg_Dbg( p_obj,
-                         "device codec %4s (%s) not supported",
+                         "device codec %4.4s (%s) not supported",
                          psz_fourcc_v4l2,
                          p_sys->p_codecs[i_index].description );
             }

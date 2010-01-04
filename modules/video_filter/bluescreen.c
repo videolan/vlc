@@ -114,7 +114,7 @@ static int Create( vlc_object_t *p_this )
     if( p_filter->fmt_in.video.i_chroma != VLC_CODEC_YUVA )
     {
         msg_Err( p_filter,
-                 "Unsupported input chroma \"%4s\". "
+                 "Unsupported input chroma \"%4.4s\". "
                  "Bluescreen can only use \"YUVA\".",
                  (char*)&p_filter->fmt_in.video.i_chroma );
         return VLC_EGENERIC;
@@ -179,7 +179,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     if( p_pic->format.i_chroma != VLC_CODEC_YUVA )
     {
         msg_Err( p_filter,
-                 "Unsupported input chroma \"%4s\". "
+                 "Unsupported input chroma \"%4.4s\". "
                  "Bluescreen can only use \"YUVA\".",
                  (char*)&p_pic->format.i_chroma );
         return NULL;
