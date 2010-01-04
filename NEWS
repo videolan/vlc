@@ -94,7 +94,7 @@ Removed modules:
  * galaktos. Use new projectM module instead.
  * showintf. Useless in qt and mac os X
  * transrate
- * Xlib x11, Xlib xvideo. Use new XCB modules instead.
+ * Xlib x11, Xlib xvideo, Xlib glx. Use new XCB modules instead.
  * HAL. Use libudev instead.
  * gtk_main, gtk_main2, gnome_main, gnome_main2 and pda interfaces
  * WinCE and qnx interfaces
