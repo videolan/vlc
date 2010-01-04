@@ -1,4 +1,4 @@
-Changes between 1.0.3 and 1.1.0-git:
+Changes between 1.0.5 and 1.1.0-git:
 ------------------------------------
 
 Access:
@@ -104,6 +104,42 @@ Removed modules:
  * opengllayer
  * cddax. Use cdda instead
  * cmml.
+
+Changes between 1.0.4 and 1.0.5 (not yet released):
+---------------------------------------------------
+Mac OS X Interface:
+ * Improved support for the 2009 Apple Remote
+
+
+Changes between 1.0.3 and 1.0.4:
+--------------------------------
+
+Audio outputs:
+ * Fix deadlocks in the audio output core
+ * Make PulseAudio the default output if available
+
+Video outputs:
+ * Fix fullscreen mode with KDE 4.3.3 and other window managers
+ * Fix incompatibility with cairo-dock and compositing
+
+Input:
+ * Fix DVB scanning regression from VLC 1.0.3
+ * Support for XZ-compressed byte stream (LZMA algorithm)
+
+Playlist:
+ * Support for .m3u8 playlist files (UTF-8 M3U)
+
+Unix:
+ * Support for xcb-keysyms version 0.3.4 or higher
+ * Fix globalhotkeys on FreeBSD
+
+Qt4 interface:
+ * Fix opening V4L version 1 devices
+ * Fix default destination ports in the streaming wizard
+
+Translations:
+  * New Walloon translation
+  * Swedish, Ukrainian an French translation update
 
 
 Changes between 1.0.2 and 1.0.3:
