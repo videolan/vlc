@@ -1,7 +1,7 @@
 # Contrib configuration for TI Davinci based SoC
 
 all: \
-	.a52 .mad .ogg .theora \
+	.a52 .mad .ogg \
 	.flac .faad .ffmpeg \
 	.live .png .dvbpsi .tremor
 
