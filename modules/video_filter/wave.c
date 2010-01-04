@@ -145,6 +145,13 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         i_num_lines = p_pic->p[i_index].i_visible_lines;
         i_visible_pitch = p_pic->p[i_index].i_visible_pitch;
         i_pixel_pitch = p_pic->p[i_index].i_pixel_pitch;
+        switch( p_filter->fmt_in.video.i_chroma )
+        {
+            CASE_PACKED_YUV_422
+                // Quick hack to fix u/v inversion occuring with 2 byte pixel pitch
+                i_pixel_pitch *= 2;
+                break;
+        }
         i_visible_pixels = i_visible_pitch/i_pixel_pitch;
 
         black_pixel = ( p_pic->i_planes > 1 && i_index == Y_PLANE ) ? 0x00

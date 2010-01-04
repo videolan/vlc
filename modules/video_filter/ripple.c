@@ -143,7 +143,15 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
 
         i_num_lines = p_pic->p[i_index].i_visible_lines;
         i_pixel_pitch = p_pic->p[i_index].i_pixel_pitch;
-        i_visible_pixels = p_pic->p[i_index].i_visible_pitch/p_pic->p[i_index].i_pixel_pitch;
+        switch( p_filter->fmt_in.video.i_chroma )
+        {
+            CASE_PACKED_YUV_422
+                // Quick hack to fix u/v inversion occuring with 2 byte pixel pitch
+                i_pixel_pitch *= 2;
+                break;
+        }
+
+        i_visible_pixels = p_pic->p[i_index].i_visible_pitch/i_pixel_pitch;
 
         i_first_line = i_num_lines * 4 / 5;
 
@@ -167,7 +175,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
                                                             - i_first_line) )
                          * (double)(i_line - i_first_line)
                          / (double)i_num_lines
-                         / 8.0 )*p_pic->p[i_index].i_pixel_pitch;
+                         / 8.0 )*i_pixel_pitch;
 
             if( i_offset )
             {
