@@ -4622,6 +4622,12 @@ dnl
 AC_ARG_ENABLE(gnutls,
   [  --enable-gnutls         gnutls TLS/SSL support (default enabled)])
 
+AS_IF([test "${have_libgcrypt}" != "yes"], [
+  AS_IF([test "${enable_gnutls}" = "yes"], [
+    AC_MSG_ERROR([--enable-gnutls and --disable-libgcrypt are mutually exclusive.])
+  ])
+  enable_gnutls="no"
+])
 AS_IF([test "${enable_gnutls}" != "no"], [
   PKG_CHECK_MODULES(GNUTLS, [gnutls >= 1.7.4], [
     VLC_ADD_PLUGIN([gnutls])
