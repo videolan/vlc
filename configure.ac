@@ -2639,7 +2639,7 @@ if test "${enable_screen}" != "no"; then
 fi
 
 dnl
-dnl  ipv6 plugin - not for QNX yet
+dnl  ipv6 plugin
 dnl
 have_ipv6=no
 AC_CHECK_FUNCS(inet_pton,[have_ipv6=yes],[
@@ -4397,19 +4397,6 @@ AM_CONDITIONAL(BUILD_MACOSX_VLC_APP, [test "${enable_macosx_vlc_app}" != "no" &&
 
 
 dnl
-dnl  QNX RTOS module
-dnl
-AC_ARG_ENABLE(qnx,
-  [  --enable-qnx            QNX RTOS support (default enabled on QNX RTOS)])
-    if test "${enable_qnx}" != "no"
-    then
-      AC_CHECK_HEADERS(Ph.h, [
-        VLC_ADD_PLUGIN([qnx])
-        VLC_ADD_LIBS([qnx],[-lasound -lph])
-      ])
-    fi
-
-dnl
 dnl  ncurses module
 dnl
 AC_ARG_ENABLE(ncurses,
@@ -5168,7 +5155,6 @@ AC_CONFIG_FILES([
   modules/gui/hildon/Makefile
   modules/gui/minimal_macosx/Makefile
   modules/gui/macosx_dialog_provider/Makefile
-  modules/gui/qnx/Makefile
   modules/gui/qt4/Makefile
   modules/gui/skins2/Makefile
   modules/meta_engine/Makefile

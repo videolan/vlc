@@ -1,4 +1,0 @@
-SOURCES_qnx = \
-	qnx.c \
-	aout.c \
-	vout.c

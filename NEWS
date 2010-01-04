@@ -99,7 +99,7 @@ Removed modules:
  * gtk_main, gtk_main2, gnome_main, gnome_main2 and pda interfaces
  * linear_resampler and trivial_resampler are removed. Use the ugly one.
  * XvMC accelerated modules
- * WinCE interface
+ * WinCE and qnx interfaces
  * opie, qte and qte_main
  * opengllayer
  * cddax. Use cdda instead

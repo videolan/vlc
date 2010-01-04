@@ -258,7 +258,6 @@ $Id$
  * puzzle: puzzle video filter
  * pva: PVA demuxer
  * pvr: input module to read from a PVR card
- * qnx: QNX RTOS plugin
  * qt4: interface module using the cross-platform Qt4 library
  * qtcapture: Quicktime Capture
  * quartztext: Text renderer using native Mac OS X API

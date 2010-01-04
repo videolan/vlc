@@ -631,9 +631,6 @@ modules/gui/minimal_macosx/voutagl.m
 modules/gui/minimal_macosx/voutgl.h
 modules/gui/minimal_macosx/voutgl.m
 modules/gui/ncurses.c
-modules/gui/qnx/aout.c
-modules/gui/qnx/qnx.c
-modules/gui/qnx/vout.c
 modules/gui/qt4/components/complete_preferences.cpp
 modules/gui/qt4/components/complete_preferences.hpp
 modules/gui/qt4/components/controller.cpp
