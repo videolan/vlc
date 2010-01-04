@@ -90,17 +90,17 @@ Misc:
  * new sqlite module
 
 Removed modules:
- * csri
- * galaktos
- * showintf
+ * csri codec. Use libass module instead.
+ * galaktos. Use new projectM module instead.
+ * showintf. Useless in qt and mac os X
  * transrate
- * Xlib x11, Xlib xvideo (use XCB instead)
- * HAL (use libudev instead)
+ * Xlib x11, Xlib xvideo. Use new XCB modules instead.
+ * HAL. Use libudev instead.
  * gtk_main, gtk_main2, gnome_main, gnome_main2 and pda interfaces
- * linear_resampler and trivial_resampler are removed. Use the ugly one.
- * XvMC accelerated modules
  * WinCE and qnx interfaces
  * opie, qte and qte_main
+ * linear_resampler and trivial_resampler are removed. Use the ugly one.
+ * XvMC accelerated modules. Use VAAPI instead.
  * opengllayer
  * cddax. Use cdda instead
  * cmml.
