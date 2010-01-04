@@ -452,7 +452,6 @@ bool checkProgressPanel (void *priv)
     id object = [dict objectForKey:@"object"];
 
     NSAssert(sel, @"Try to execute a NULL selector");
-    NSAssert(object, @"Try to execute from a nil object");
 
     *result = [self performSelector:sel withObject:object];
     [*result retain]; // Balanced in -resultFromSelectorOnMainThread
@@ -462,7 +461,6 @@ bool checkProgressPanel (void *priv)
 {
     id result = nil;
     NSAssert(sel, @"Try to execute a NULL selector");
-    NSAssert(sel, @"Try to execute from a nil object");
     NSDictionary *dict = [NSDictionary dictionaryWithObjectsAndKeys:
      [NSValue valueWithPointer:sel], @"sel",
      [NSValue valueWithPointer:&result], @"result",
