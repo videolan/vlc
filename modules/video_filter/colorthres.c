@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Sigmund Augdal <dnumgis@videolan.org>
+ *          Antoine Cellerier <dionoea at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -46,6 +47,7 @@ static int  Create    ( vlc_object_t * );
 static void Destroy   ( vlc_object_t * );
 
 static picture_t *Filter( filter_t *, picture_t * );
+static picture_t *FilterPacked( filter_t *, picture_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -116,6 +118,11 @@ static int Create( vlc_object_t *p_this )
     switch( p_filter->fmt_in.video.i_chroma )
     {
         CASE_PLANAR_YUV
+            p_filter->pf_video_filter = Filter;
+            break;
+
+        CASE_PACKED_YUV_422
+            p_filter->pf_video_filter = FilterPacked;
             break;
 
         default:
@@ -148,8 +155,6 @@ static int Create( vlc_object_t *p_this )
     var_AddCallback( p_filter, CFG_PREFIX "color", FilterCallback, NULL );
     var_AddCallback( p_filter, CFG_PREFIX "similaritythres", FilterCallback, NULL );
     var_AddCallback( p_filter, CFG_PREFIX "saturationthres", FilterCallback, NULL );
-
-    p_filter->pf_video_filter = Filter;
 
     return VLC_SUCCESS;
 }
@@ -253,6 +258,90 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
         p_in_v++;
         p_out_u++;
         p_out_v++;
+    }
+
+    return CopyInfoAndRelease( p_outpic, p_pic );
+}
+
+static picture_t *FilterPacked( filter_t *p_filter, picture_t *p_pic )
+{
+    picture_t *p_outpic;
+    filter_sys_t *p_sys = p_filter->p_sys;
+    uint8_t *p_in_y, *p_in_u, *p_in_v, *p_in_end_u;
+    uint8_t *p_out_y, *p_out_u, *p_out_v;
+
+    vlc_mutex_lock( &p_sys->lock );
+    int i_simthres = p_sys->i_simthres;
+    int i_satthres = p_sys->i_satthres;
+    int i_color = p_sys->i_color;
+    vlc_mutex_unlock( &p_sys->lock );
+
+    if( !p_pic ) return NULL;
+
+    p_outpic = filter_NewPicture( p_filter );
+    if( !p_outpic )
+    {
+        picture_Release( p_pic );
+        return NULL;
+    }
+
+    int i_y_offset, i_u_offset, i_v_offset;
+    GetPackedYuvOffsets( p_filter->fmt_in.video.i_chroma,
+                         &i_y_offset, &i_u_offset, &i_v_offset );
+    p_in_y = p_pic->p->p_pixels+i_y_offset;
+    p_in_u = p_pic->p->p_pixels+i_u_offset;
+    p_in_v = p_pic->p->p_pixels+i_v_offset;
+    p_in_end_u = p_in_u + p_pic->p->i_visible_lines
+                        * p_pic->p->i_pitch - 8;
+
+    p_out_y = p_outpic->p->p_pixels+i_y_offset;
+    p_out_u = p_outpic->p->p_pixels+i_u_offset;
+    p_out_v = p_outpic->p->p_pixels+i_v_offset;
+
+    /* Create grayscale version of input */
+    vlc_memcpy( p_outpic->p->p_pixels, p_pic->p->p_pixels,
+                p_pic->p->i_visible_lines * p_pic->p->i_pitch - 8 );
+
+    /*
+     * Do the U and V planes
+     */
+    int i_red = ( i_color & 0xFF0000 ) >> 16;
+    int i_green = ( i_color & 0xFF00 ) >> 8;
+    int i_blue = i_color & 0xFF;
+    int i_u = (int8_t)(( -38 * i_red - 74 * i_green +
+                     112 * i_blue + 128) >> 8) + 128;
+    int i_v = (int8_t)(( 112 * i_red  -  94 * i_green -
+                      18 * i_blue + 128) >> 8) + 128;
+    int refu = i_u - 0x80;         /*bright red*/
+    int refv = i_v - 0x80;
+    int reflength = sqrt(refu*refu+refv*refv);
+
+    while( p_in_u < p_in_end_u ) {
+        /* Length of color vector */
+        int inu = (*p_in_u) - 0x80;
+        int inv = (*p_in_v) - 0x80;
+        int length = sqrt(inu*inu+inv*inv);
+
+        int diffu = refu * length - inu *reflength;
+        int diffv = refv * length - inv *reflength;
+        long long int difflen2=diffu*diffu;
+        difflen2 +=diffv*diffv;
+        long long int thres = length*reflength;
+        thres *= thres;
+        if( length > i_satthres && (difflen2*i_simthres< thres ) ) {
+            *p_out_u = *p_in_u;
+            *p_out_v = *p_in_v;
+//        fprintf(stderr,"keeping color %d %d\n", length, difflen2);
+        }
+        else
+        {
+            *p_out_u = 0x80;
+            *p_out_v = 0x80;
+        }
+        p_in_u+=4;
+        p_in_v+=4;
+        p_out_u+=4;
+        p_out_v+=4;
     }
 
     return CopyInfoAndRelease( p_outpic, p_pic );
