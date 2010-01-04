@@ -134,6 +134,8 @@
 - (IBAction)cancelDialog:(id)sender
 {
     _isCancelled = YES;
+    [_progressBar setIndeterminate:YES];
+    [_progressBar startAnimation:self];
 }
 
 @end
