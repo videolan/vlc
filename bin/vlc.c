@@ -167,9 +167,6 @@ int main( int i_argc, const char *ppsz_argv[] )
         libvlc_add_intf (vlc, NULL);
         libvlc_playlist_play (vlc, -1, 0, NULL, &dummy);
         libvlc_wait (vlc);
-
-        if (libvlc_exception_raised (&ex))
-            fprintf( stderr, "%s\n", libvlc_errmsg() );
         libvlc_release (vlc);
     }
 
