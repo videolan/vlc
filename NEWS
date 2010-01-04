@@ -82,6 +82,7 @@ Mac OS X Port:
 
 Windows port:
  * Integration in Windows 7 taskbar
+ * Playback of .Midi files is supported through fluidsynth's module
 
 Maemo port:
  * Multiple improvements for N900 compliance and efficiency
