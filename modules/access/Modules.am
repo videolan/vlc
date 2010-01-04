@@ -3,7 +3,7 @@
 # obviously does not. Here is a fix for that.
 LIBTOOL=@LIBTOOL@ --tag=CC
 
-BASE_SUBDIRS = dvb mms cdda rtp rtsp vcd vcdx screen bd zip
+BASE_SUBDIRS = dvb mms rtp rtsp vcd vcdx screen bd zip
 EXTRA_SUBDIRS = bda dshow
 SUBDIRS = $(BASE_SUBDIRS)
 DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)

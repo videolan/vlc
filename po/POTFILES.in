@@ -219,14 +219,6 @@ modules/access/bda/bdadefs.h
 modules/access/bda/bdagraph.cpp
 modules/access/bda/bdagraph.h
 modules/access/cdda.c
-modules/access/cdda/access.c
-modules/access/cdda/access.h
-modules/access/cdda/callback.c
-modules/access/cdda/callback.h
-modules/access/cdda/cdda.c
-modules/access/cdda/cdda.h
-modules/access/cdda/info.c
-modules/access/cdda/info.h
 modules/access/dc1394.c
 modules/access/directory.c
 modules/access/dshow/common.h

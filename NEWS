@@ -102,6 +102,7 @@ Removed modules:
  * WinCE interface
  * opie, qte and qte_main
  * opengllayer
+ * cddax. Use cdda instead
 
 
 Changes between 1.0.2 and 1.0.3:

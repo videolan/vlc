@@ -189,7 +189,7 @@ case "${host_os}" in
   bsdi*)
     SYS=bsdi
     CFLAGS_save="${CFLAGS_save} -pthread"; CFLAGS="${CFLAGS_save}"
-    VLC_ADD_LIBS([dvd dvdcss vcd cdda vcdx cddax],[-ldvd])
+    VLC_ADD_LIBS([dvd dvdcss vcd cdda vcdx],[-ldvd])
     ;;
   *bsd*)
     SYS="${host_os}"
@@ -246,8 +246,6 @@ case "${host_os}" in
         echo "  Assuming --enable-theora"
         enable_shout="yes"
         echo "  Assuming --enable-shout"
-        enable_cddax="yes"
-        echo "  Assuming --enable-cddax"
         enable_vcdx="yes"
         echo "  Assuming --enable-vcdx"
         enable_caca="yes"
@@ -348,7 +346,7 @@ case "${host_os}" in
         VLC_ADD_LIBS([libvlccore],[-lws2_32 -lnetapi32 -lwinmm])
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
         VLC_ADD_LIBS([activex mozilla],[-lgdi32])
-        VLC_ADD_LIBS([cdda vcdx cddax sdl_image aout_sdl vout_sdl],[-lwinmm])
+        VLC_ADD_LIBS([cdda vcdx sdl_image aout_sdl vout_sdl],[-lwinmm])
         VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap slp oldhttp stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldtelnet oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a],[-lws2_32])
         VLC_ADD_LIBS([access_file], [-lshlwapi])
         dnl
@@ -604,7 +602,7 @@ fi
 SOCKET_LIBS=""
 AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,[
-    VLC_ADD_LIBS([libvlccore cdda cddax],-lsocket)
+    VLC_ADD_LIBS([libvlccore cdda],-lsocket)
     SOCKET_LIBS="-lsocket"
   ])
 ])
@@ -2489,44 +2487,8 @@ then
 fi
 
 dnl
-dnl  VCDX and CDDAX modules
+dnl  VCDX modules
 dnl
-AC_ARG_ENABLE(cddax,
-  AS_HELP_STRING([--enable-cddax],[audio CD plugin with CD Text and CD paranoia
-		  via libcdio (default disabled)]))
-
-AC_ARG_ENABLE(libcddb,
-  [  --enable-libcddb        CDDB support for libcdio audio CD (default enabled)])
-
-if test "${enable_cddax}" = "yes"
-then
-  if test "$have_libcdio" = "yes"
-  then
-    AC_DEFINE(HAVE_CDDAX, 1, [Define for the audio CD plugin using libcdio])
-    VLC_ADD_LIBS([cddax],[$LIBCDIO_LIBS])
-    VLC_ADD_CFLAGS([cddax],[$LIBCDIO_CFLAGS])
-    VLC_ADD_PLUGIN([cddax])
-    PKG_CHECK_MODULES(LIBCDIO_PARANOIA, libcdio_paranoia >= 0.72, [
-    VLC_ADD_LIBS([cddax],[$LIBCDIO_CDDA_LIBS $LIBCDIO_CDDA_LIBS $LIBCDIO_PARANOIA_LIBS])],
-    AC_MSG_WARN([CD Paranoia support disabled because no libcdio >= 0.72 found]))
-  else
-    AC_MSG_WARN([cddax plugin disabled because ok libcdio library not found or disabled])
-    HAVE_CDDAX=no
-  fi
-
-  if test "$enable_libcddb" != "no"; then
-    PKG_CHECK_MODULES(LIBCDDB, libcddb >= 0.9.5, [
-      HAVE_LIBCDDB=yes
-      AC_DEFINE(HAVE_LIBCDDB, 1, [Define this if you have libcddb installed])
-      VLC_ADD_LIBS([cddax],[$LIBCDDB_LIBS])
-      VLC_ADD_CFLAGS([cddax],[$LIBCDDB_CFLAGS])
-      ],
-      [AC_MSG_WARN(new enough libcddb not found. CDDB access disabled)
-      HAVE_LIBCDDB=no])
-  fi
-
-fi
-
 AC_ARG_ENABLE(vcdx,
   [  --enable-vcdx           VCD with navigation via libvcdinfo (default disabled)])
 
@@ -2610,8 +2572,8 @@ then
   then
     VLC_ADD_PLUGIN([vcd])
     VLC_ADD_PLUGIN([cdda])
-    VLC_ADD_LDFLAGS([vcd vcdx cdda cddax],[-Wl,-framework,IOKit,-framework,CoreFoundation])
-    VLC_ADD_LIBS([vcdx cddax cdda],[-liconv])
+    VLC_ADD_LDFLAGS([vcd vcdx cdda],[-Wl,-framework,IOKit,-framework,CoreFoundation])
+    VLC_ADD_LIBS([vcdx cdda],[-liconv])
   fi
 
   if test "$enable_libcddb" != "no"; then
@@ -5167,7 +5129,6 @@ AC_CONFIG_FILES([
   modules/access/dshow/Makefile
   modules/access/dvb/Makefile
   modules/access/mms/Makefile
-  modules/access/cdda/Makefile
   modules/access/rtp/Makefile
   modules/access/rtsp/Makefile
   modules/access/vcd/Makefile

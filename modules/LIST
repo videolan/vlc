@@ -69,7 +69,6 @@ $Id$
  * canvas: Automatically resize and padd a video
  * cc: CC 608/708 subtitles decoder
  * cdda: input module to read audio CDs
- * cddax: input module to read audio CDs via libcdio
  * cdg: CD-G decoder
  * chain: Video filtering using a chain of video filter modules
  * chorus_flanger: variable delay audio filter
