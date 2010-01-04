@@ -788,6 +788,8 @@ if BUILD_LUA
 	unix2dos $(win32_lua_destdir)/http/*.css
 	cp $(srcdir)/share/lua/http/js/*.js $(win32_lua_destdir)/http/js/
 	unix2dos $(win32_lua_destdir)/http/js/*.js
+	cp $(srcdir)/share/lua/http/*.lua $(win32_lua_destdir)/http/
+	unix2dos $(win32_lua_destdir)/http/*.lua
 	cp $(srcdir)/share/lua/http/dialogs/* $(win32_lua_destdir)/http/dialogs/
 	unix2dos $(win32_lua_destdir)/http/dialogs/*
 	cp $(srcdir)/share/lua/http/dialogs/.hosts $(win32_lua_destdir)/http/dialogs/
