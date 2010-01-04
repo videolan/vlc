@@ -19,7 +19,7 @@
       --enable-dvdread --with-dvdnav-config-path=/usr/win32/bin \
       --enable-shout \
       --enable-goom \
-      --enable-caca --with-caca-config-path=/usr/win32/bin \
+      --enable-caca \
       --enable-portaudio \
       --enable-sdl --with-sdl-config-path=/usr/win32/bin \
       --enable-qt4 \
@@ -28,6 +28,6 @@
       --enable-sse --enable-mmx \
       --enable-libcddb \
       --enable-zvbi --disable-telx \
-      --disable-cddax --disable-vcdx --disable-libcdio --disable-vcdinfo \
+      --disable-vcdx --disable-libcdio --disable-vcdinfo \
       --disable-dvb \
       --enable-peflags
