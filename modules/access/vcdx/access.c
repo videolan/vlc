@@ -286,7 +286,7 @@ VCDSeek( access_t * p_access, int64_t i_pos )
         }
 
         dbg_print( (INPUT_DBG_CALL|INPUT_DBG_EXT|INPUT_DBG_SEEK),
-                   "orig %lu, cur: %lu, offset: %lld, entry %d",
+                   "orig %lu, cur: %lu, offset: %"PRIi64", entry %d",
                    (long unsigned int) p_vcdplayer->origin_lsn,
                    (long unsigned int) p_vcdplayer->i_lsn, i_pos,
                    i_entry );
@@ -462,7 +462,7 @@ VCDTitles( access_t * p_access )
                                  i ) * M2F2_SECTOR_SIZE / CDIO_CD_FRAMESIZE ;
             t->psz_name  = strdup(psz_track);
 
-            dbg_print( INPUT_DBG_MRL, "track[%d] i_size: %lld", i, t->i_size );
+            dbg_print( INPUT_DBG_MRL, "track[%d] i_size: %"PRIi64, i, t->i_size );
 
             p_vcdplayer->i_titles++;
         }
@@ -685,7 +685,7 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
                  vcdinfo_get_entry_sect_count(p_vcdplayer->vcd,p_itemid->num);
             p_access->info.i_pos = 0;
         }
-        dbg_print( (INPUT_DBG_LSN|INPUT_DBG_PBC), "size: %llu, pos: %llu",
+        dbg_print( (INPUT_DBG_LSN|INPUT_DBG_PBC), "size: %"PRIu64", pos: %"PRIu64,
                    p_access->info.i_size, p_access->info.i_pos );
         p_access->info.i_seekpoint = p_itemid->num;
         break;
