@@ -101,7 +101,7 @@ int OpenAvio(vlc_object_t *object)
         goto error;
     }
     const int64_t size = url_filesize(sys->context);
-    msg_Dbg(access, "is_streamed=%d size=%lld", sys->context->is_streamed, size);
+    msg_Dbg(access, "is_streamed=%d size=%"PRIi64, sys->context->is_streamed, size);
 
     /* */
     access_InitFields(access);
@@ -154,7 +154,7 @@ static int Seek(access_t *access, int64_t position)
     access_sys_t *sys = access->p_sys;
 
     if (url_seek(sys->context, position, SEEK_SET) < 0) {
-        msg_Err(access, "Seek to %lld failed\n", position);
+        msg_Err(access, "Seek to %"PRIi64" failed\n", position);
         if (access->info.i_size <= 0 || position != access->info.i_size)
             return VLC_EGENERIC;
     }
