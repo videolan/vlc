@@ -256,7 +256,7 @@ void AlignRect(RECT *, int align_boundary, int align_size);
  *****************************************************************************/
 #ifdef UNDER_CE
 
-#define AdjustWindowRect(a,b,c)
+#define AdjustWindowRect(a,b,c) AdjustWindowRectEx(a,b,c,0)
 
 #ifndef GCL_HBRBACKGROUND
 #   define GCL_HBRBACKGROUND (-10)
