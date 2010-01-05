@@ -255,7 +255,7 @@ static int Lock(picture_t *picture)
     /* */
     GXDisplayProperties gxdisplayprop = GXGetDisplayProperties();
     uint8_t *p_pic_buffer = GXBeginDraw();
-    if (!sys->p_pic_buffer) {
+    if (!p_pic_buffer) {
         msg_Err(vd, "GXBeginDraw error %d ", GetLastError());
         return VLC_EGENERIC;
     }
@@ -270,6 +270,8 @@ static int Lock(picture_t *picture)
 }
 static void Unlock(picture_t *picture)
 {
+    vout_display_t *vd = picture->p_sys->vd;
+
     GXEndDraw();
 }
 #endif
@@ -411,7 +413,7 @@ static int Init(vout_display_t *vd,
         cfg.picture = &picture;
 #ifdef MODULE_NAME_IS_wingapi
         cfg.lock    = Lock;
-        cfg.unlock  = Unkock;
+        cfg.unlock  = Unlock;
 #endif
         sys->pool = picture_pool_NewExtended(&cfg);
     } else {
