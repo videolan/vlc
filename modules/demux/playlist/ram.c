@@ -282,7 +282,7 @@ static int Demux( demux_t *p_demux )
                            &psz_cdnum, &psz_comments ); /* clipinfo has various sub parameters, which is parsed by this function */
                     }
                     else if( !strcmp( psz_param, "author" ) )
-                        psz_author = decode_URI(psz_value);
+                        psz_author = decode_URI_duplicate(psz_value);
                     else if( !strcmp( psz_param, "start" ) )
                     {
                         i_start = ParseTime( psz_value, strlen( psz_value ) );
@@ -304,9 +304,9 @@ static int Demux( demux_t *p_demux )
                         }
                     }
                     else if( !strcmp( psz_param, "title" ) )
-                        psz_title = decode_URI(psz_value);
+                        psz_title = decode_URI_duplicate(psz_value);
                     else if( !strcmp( psz_param, "copyright" ) )
-                        psz_copyright = decode_URI(psz_value);
+                        psz_copyright = decode_URI_duplicate(psz_value);
                     else
                     {   /* TODO: insert option anyway? Currently ignores*/
                         /* INSERT_ELEM( ppsz_options, i_options, i_options, psz_option ); */
@@ -433,19 +433,19 @@ static void ParseClipInfo( const char *psz_clipinfo, char **ppsz_artist, char **
             break;
         /* Put into args */
         if( !strcmp( psz_param, "artist name" ) )
-            *ppsz_artist = decode_URI( psz_value );
+            *ppsz_artist = decode_URI_duplicate( psz_value );
         else if( !strcmp( psz_param, "title" ) )
-            *ppsz_title = decode_URI( psz_value );
+            *ppsz_title = decode_URI_duplicate( psz_value );
         else if( !strcmp( psz_param, "album name" ) )
-            *ppsz_album = decode_URI( psz_value );
+            *ppsz_album = decode_URI_duplicate( psz_value );
         else if( !strcmp( psz_param, "genre" ) )
-            *ppsz_genre = decode_URI( psz_value );
+            *ppsz_genre = decode_URI_duplicate( psz_value );
         else if( !strcmp( psz_param, "year" ) )
-            *ppsz_year = decode_URI( psz_value );
+            *ppsz_year = decode_URI_duplicate( psz_value );
         else if( !strcmp( psz_param, "cdnum" ) )
-            *ppsz_cdnum = decode_URI( psz_value );
+            *ppsz_cdnum = decode_URI_duplicate( psz_value );
         else if( !strcmp( psz_param, "comments" ) )
-            *ppsz_comments = decode_URI( psz_value );
+            *ppsz_comments = decode_URI_duplicate( psz_value );
 
         free( psz_suboption );
         psz_option_next++;
