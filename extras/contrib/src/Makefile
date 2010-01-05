@@ -2293,7 +2293,7 @@ DISTCLEAN_PKG += libtiger-$(TIGER_VERSION).tar.gz
 # **************************************************************************
 
 .aclocal:
-	cp -R $(PREFIX)/share/aclocal/* $(PREFIX)/../../m4/
+	cp -R $(PREFIX)/share/aclocal/* ../../../m4/
 	touch $@
 
 CLEAN_FILE += .aclocal
