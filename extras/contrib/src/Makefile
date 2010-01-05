@@ -1937,8 +1937,8 @@ gecko-sdk: gecko-sdk-ppc-macosx10.2-1.7.5.tar.gz
 	$(EXTRACT_GZ)
 
 .gecko: gecko-sdk
-	rm -rf ../gecko-sdk
-	mv gecko-sdk ..
+	rm -rf $(PREFIX)/gecko-sdk
+	mv gecko-sdk $(PREFIX)
 	mkdir gecko-sdk #creating an empty dir is faster than copying the whole dir
 	(cd $<)
 	touch $@
@@ -1962,11 +1962,11 @@ glib-19990228.zip:
 
 .gecko-win32: gecko-sdk-i586-pc-msvc-1.8b1.zip libIDL-0.6.3-win32-bin.zip glib-19990228.zip
 	unzip gecko-sdk-i586-pc-msvc-1.8b1.zip
-	rm -rf ../gecko-sdk
-	mv gecko-sdk ..
-	unzip -j libIDL-0.6.3-win32-bin.zip libIDL-0.6.3-win32-bin/libIDL-0.6.dll -d ../gecko-sdk/bin
-	unzip glib-19990228.zip glib-1.2.dll -d ../gecko-sdk/bin
-	chmod a+x ../gecko-sdk/bin/*
+	rm -rf $(PREFIX)/gecko-sdk
+	mv gecko-sdk $(PREFIX)
+	unzip -j libIDL-0.6.3-win32-bin.zip libIDL-0.6.3-win32-bin/libIDL-0.6.dll -d $(PREFIX)/gecko-sdk/bin
+	unzip glib-19990228.zip glib-1.2.dll -d $(PREFIX)/gecko-sdk/bin
+	chmod a+x $(PREFIX)/gecko-sdk/bin/*
 	touch $@
 
 CLEAN_FILE += .gecko-win32
