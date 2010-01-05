@@ -219,13 +219,13 @@ struct vout_display_sys_t
 };
 
 #ifdef MODULE_NAME_IS_wingapi
-#   define GXOpenDisplay p_vout->p_sys->GXOpenDisplay
-#   define GXCloseDisplay p_vout->p_sys->GXCloseDisplay
-#   define GXBeginDraw p_vout->p_sys->GXBeginDraw
-#   define GXEndDraw p_vout->p_sys->GXEndDraw
-#   define GXGetDisplayProperties p_vout->p_sys->GXGetDisplayProperties
-#   define GXSuspend p_vout->p_sys->GXSuspend
-#   define GXResume p_vout->p_sys->GXResume
+#   define GXOpenDisplay          vd->GXOpenDisplay
+#   define GXCloseDisplay         vd->GXCloseDisplay
+#   define GXBeginDraw            vd->GXBeginDraw
+#   define GXEndDraw              vd->GXEndDraw
+#   define GXGetDisplayProperties vd->GXGetDisplayProperties
+#   define GXSuspend              vd->GXSuspend
+#   define GXResume               vd->GXResume
 #endif
 
 /*****************************************************************************
