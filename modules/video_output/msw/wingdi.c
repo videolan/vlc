@@ -245,6 +245,7 @@ struct picture_sys_t {
 static int Lock(picture_t *picture)
 {
     vout_display_t *vd = picture->p_sys->vd;
+    vout_display_sys_t *sys = vd->sys;
 
     /* */
     if (sys->rect_dest_clipped.right  - sys->rect_dest_clipped.left != vd->fmt.i_width ||
