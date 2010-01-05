@@ -133,7 +133,7 @@ void msg_Create (libvlc_int_t *p_libvlc)
 static void const * kObjectPrintingEnabled = &kObjectPrintingEnabled;
 static void const * kObjectPrintingDisabled = &kObjectPrintingDisabled;
 
-void __msg_EnableObjectPrinting (vlc_object_t *p_this, char * psz_object)
+void __msg_EnableObjectPrinting (vlc_object_t *p_this, const char * psz_object)
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     vlc_rwlock_wrlock( &QUEUE.lock );
@@ -144,7 +144,7 @@ void __msg_EnableObjectPrinting (vlc_object_t *p_this, char * psz_object)
     vlc_rwlock_unlock( &QUEUE.lock );
 }
 
-void __msg_DisableObjectPrinting (vlc_object_t *p_this, char * psz_object)
+void __msg_DisableObjectPrinting (vlc_object_t *p_this, const char * psz_object)
 {
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
     vlc_rwlock_wrlock( &QUEUE.lock );
