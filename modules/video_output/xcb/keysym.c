@@ -48,7 +48,7 @@ static int cmpkey (const void *va, const void *vb)
 
 static void printkey (const void *node, const VISIT which, const int depth)
 {
-    if (which != postorder)
+    if (which != postorder && which != leaf)
         return;
 
     const struct keysym *const *psym = node, *sym = *psym;
