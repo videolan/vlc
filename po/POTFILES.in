@@ -1177,7 +1177,6 @@ modules/video_output/msw/direct3d.c
 modules/video_output/msw/directx.c
 modules/video_output/msw/events.c
 modules/video_output/msw/glwin32.c
-modules/video_output/msw/vout.h
 modules/video_output/msw/wingdi.c
 modules/video_output/omapfb.c
 modules/video_output/opengl.c
