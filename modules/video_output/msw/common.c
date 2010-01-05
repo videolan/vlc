@@ -285,7 +285,7 @@ void UpdateRects(vout_display_t *vd,
 
     EventThreadUpdateSourceAndPlace(sys->event, source, &place);
 #if defined(MODULE_NAME_IS_wingapi)
-    if (place.width != fmt->i_width || place.height != fmt->i_height)
+    if (place.width != vd->fmt.i_width || place.height != vd->fmt.i_height)
         vout_display_SendEventPicturesInvalid(vd);
 #endif
 
