@@ -160,7 +160,7 @@ function quit(name,client)
 end
 
 function add(name,client,arg)
-    -- TODO: par single and double quotes properly
+    -- TODO: parse single and double quotes properly
     local f
     if name == "enqueue" then
         f = vlc.playlist.enqueue
