@@ -114,6 +114,7 @@ typedef enum VLCMediaState
     id                    delegate;          //< Delegate object
     BOOL                  isArtFetched;      //< Value used to determine of the artwork has been preparsed
     BOOL                  areOthersMetaFetched; //< Value used to determine of the other meta has been preparsed
+    BOOL                  isArtURLFetched;   //< Value used to determine of the other meta has been preparsed
     VLCMediaState         state;             //< Current state of the media
 }
 

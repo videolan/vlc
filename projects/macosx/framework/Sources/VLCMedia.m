@@ -466,12 +466,12 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
     if ( newValue != oldValue && !(oldValue && newValue && [oldValue compare:newValue] == NSOrderedSame) )
     {
-        if ([metaType isEqualToString:VLCMetaInformationArtworkURL])
+        // Only fetch the art if needed. (ie, create the NSImage, if it was requested before)
+        if (isArtFetched && [metaType isEqualToString:VLCMetaInformationArtworkURL])
         {
             [NSThread detachNewThreadSelector:@selector(fetchMetaInformationForArtWorkWithURL:) 
                                          toTarget:self
                                        withObject:newValue];
-            return;
         }
 
         [metaDictionary setValue:newValue forKeyPath:metaType];
@@ -550,7 +550,14 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
          * And all the other meta will be added through the libvlc event system */
         [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationTitle];
     }
-
+    else if( !isArtURLFetched && [keyPath hasPrefix:@"metaDictionary.artworkURL"])
+    {
+        isArtURLFetched = YES;
+        /* Force isArtURLFetched, that will trigger artwork download eventually
+         * And all the other meta will be added through the libvlc event system */
+        [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationArtworkURL];
+    }
+    
     return [super valueForKeyPath:keyPath];
 }
 @end
