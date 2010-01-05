@@ -12,7 +12,7 @@ AC_SUBST(PKGDIR)
 
 CONFIGURE_LINE="`echo "$0 $ac_configure_args" | sed -e 's/\\\/\\\\\\\/g'`"
 CODENAME="The Luggage"
-COPYRIGHT_YEARS="1996-201O"
+COPYRIGHT_YEARS="1996-2010"
 
 AC_PREREQ(2.59c)
 AC_CONFIG_SRCDIR(src/libvlc.c)
