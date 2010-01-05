@@ -2162,7 +2162,7 @@ DISTCLEAN_PKG += dirac-$(DIRAC_VERSION).tar.gz
 win32-dx7headers.tgz:
 	$(WGET) $(DX_HEADERS_URL)
 .dx_headers: win32-dx7headers.tgz
-	(cd ../include ; tar xzf ../src/$<)
+	tar xzf $< -C $(PREFIX)/include
 	touch $@
 CLEAN_FILE += .dx_headers
 DISTCLEAN_PKG += win32-dx7headers.tgz
@@ -2177,8 +2177,8 @@ dxva2api.h:
 	$(WGET) $(DXVA2_URL)
 
 .dshow_headers: dshow-headers.tgz dxva2api.h
-	(cd ../include ; tar xzf ../src/$<)
-	(cp dxva2api.h ../include)
+	tar xzf $< -C $(PREFIX)/include
+	cp dxva2api.h $(PREFIX)/include
 	touch $@
 
 CLEAN_FILE += .dshow_headers
