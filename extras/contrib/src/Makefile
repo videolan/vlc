@@ -2553,7 +2553,7 @@ endif
 
 CLEAN_FILE += .libprojectM
 CLEAN_PKG += libprojectM
-DISTCLEAN_PKG += libprojectM-$(LIBPROJECTM_VERSION).tar.bz2
+DISTCLEAN_PKG += libprojectM-$(LIBPROJECTM_VERSION)-Source.tar.gz
 
 # ***************************************************************************
 # X11 C Bindings
