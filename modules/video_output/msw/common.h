@@ -241,6 +241,7 @@ void UpdateRects (vout_display_t *,
                   const vout_display_cfg_t *,
                   const video_format_t *,
                   bool is_forced);
+void AlignRect(RECT *, int align_boundary, int align_size);
 
 /*****************************************************************************
  * Constants

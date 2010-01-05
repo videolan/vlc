@@ -222,6 +222,14 @@ void CommonDisplay(vout_display_t *vd)
     sys->is_first_display = false;
 }
 
+void AlignRect(RECT *r, int align_boundary, int align_size)
+{
+    if (align_boundary)
+        r->left = (r->left + align_boundary/2) & ~align_boundary;
+    if (align_size)
+        r->right = ((r->right - r->left + align_size/2) & ~align_size) + r->left;
+}
+
 /*****************************************************************************
  * UpdateRects: update clipping rectangles
  *****************************************************************************
@@ -300,18 +308,8 @@ void UpdateRects(vout_display_t *vd,
 
 #ifdef MODULE_NAME_IS_directx
     /* Apply overlay hardware constraints */
-    if (sys->use_overlay) {
-        if (sys->i_align_dest_boundary)
-            rect_dest.left = (rect_dest.left +
-                              sys->i_align_dest_boundary / 2) &
-                                        ~sys->i_align_dest_boundary;
-
-        if (sys->i_align_dest_size)
-            rect_dest.right = ((rect_dest.right -
-                                rect_dest.left +
-                                sys->i_align_dest_size / 2) &
-                                    ~sys->i_align_dest_size) + rect_dest.left;
-    }
+    if (sys->use_overlay)
+        AlignRect(&rect_dest, sys->i_align_dest_boundary, sys->i_align_dest_size);
 #endif
 
 #endif
@@ -373,19 +371,8 @@ void UpdateRects(vout_display_t *vd,
 
 #ifdef MODULE_NAME_IS_directx
     /* Apply overlay hardware constraints */
-    if (sys->use_overlay) {
-        if (sys->i_align_src_boundary)
-            rect_src_clipped.left =
-                (rect_src_clipped.left +
-                 sys->i_align_src_boundary / 2) &
-                            ~sys->i_align_src_boundary;
-
-        if (sys->i_align_src_size)
-            rect_src_clipped.right =
-                ((rect_src_clipped.right - rect_src_clipped.left +
-                  sys->i_align_src_size / 2) &
-                            ~sys->i_align_src_size) + rect_src_clipped.left;
-    }
+    if (sys->use_overlay)
+        AlignRect(&rect_src_clipped, sys->i_align_src_boundary, sys->i_align_src_size);
 #elif defined(MODULE_NAME_IS_direct3d)
     /* Needed at least with YUV content */
     rect_src_clipped.left &= ~1;
