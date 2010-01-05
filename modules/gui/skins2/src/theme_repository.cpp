@@ -73,18 +73,16 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
         parseDirectory( *it );
     }
 
-    // retrieve skins for skins directories and locate default skins
+    // retrieve skins from skins directories and locate default skins
     map<string,string>::const_iterator itmap, itdefault;
     for( itmap = m_skinsMap.begin(); itmap != m_skinsMap.end(); itmap++ )
     {
         string path = itmap->first;
         string name = itmap->second;
-        val.psz_string = strdup( path.c_str() );
-        text.psz_string = strdup( name.c_str() );
+        val.psz_string = (char*) path.c_str();
+        text.psz_string = (char*) name.c_str();
         var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
                     &text );
-        free( val.psz_string );
-        free( text.psz_string );
 
         if( name == "default" )
             itdefault = itmap;
@@ -105,19 +103,16 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
     itmap = m_skinsMap.find( current );
     if( itmap == m_skinsMap.end() )
     {
-        val.psz_string = strdup( current.c_str() );
-        text.psz_string = strdup( current.c_str() );
+        val.psz_string = (char*) current.c_str();
+        text.psz_string = (char*) current.c_str();
         var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
                     &text );
         var_Change( getIntf(), "intf-skins", VLC_VAR_SETVALUE, &val, NULL );
-        free( val.psz_string );
-        free( text.psz_string );
     }
     else
     {
-        val.psz_string = strdup( current.c_str() );
+        val.psz_string = (char*) current.c_str();
         var_Change( getIntf(), "intf-skins", VLC_VAR_SETVALUE, &val, NULL );
-        free( val.psz_string );
     }
     free( psz_current );
     m_skinsMap.clear();
