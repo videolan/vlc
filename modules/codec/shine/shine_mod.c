@@ -40,8 +40,8 @@
 
 /* shine.c uses a lot of static variables, so we include the C file to keep
  * the scope.
- * Note that it makes this decoder non reentrant, this is why we set
- * b_reentrant to VLC_FALSE in the module initialisation */
+ * Note that it makes this decoder non reentrant, this is why we have the
+ * struct entrant below */
 #include "shine.c"
 
 struct encoder_sys_t
@@ -67,6 +67,12 @@ vlc_module_begin();
     set_capability( "encoder", 50 );
     set_callbacks( OpenEncoder, CloseEncoder );
 vlc_module_end();
+
+static struct
+{
+    bool busy;
+    vlc_mutex_t lock;
+} entrant = { false, VLC_STATIC_MUTEX, };
 
 static int OpenEncoder( vlc_object_t *p_this )
 {
@@ -96,14 +102,24 @@ static int OpenEncoder( vlc_object_t *p_this )
              p_enc->fmt_out.i_bitrate, p_enc->fmt_out.audio.i_rate,
              p_enc->fmt_out.audio.i_channels );
 
+    vlc_mutex_lock( &entrant.lock );
+    if( entrant.busy )
+    {
+        msg_Err( p_enc, "encoder already in progress" );
+        vlc_mutex_unlock( &entrant.lock );
+        return VLC_EGENERIC;
+    }
+    entrant.busy = true;
+    vlc_mutex_unlock( &entrant.lock );
+
     p_enc->p_sys = p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )
-        return VLC_ENOMEM;
+        goto enomem;
 
     if( !( p_sys->p_fifo = block_FifoNew() ) )
     {
         free( p_sys );
-        return VLC_ENOMEM;
+        goto enomem;
     }
 
     init_mp3_encoder_engine( p_enc->fmt_out.audio.i_rate,
@@ -113,6 +129,12 @@ static int OpenEncoder( vlc_object_t *p_this )
     p_enc->fmt_out.i_cat = AUDIO_ES;
 
     return VLC_SUCCESS;
+
+enomem:
+    vlc_mutex_lock( &entrant.lock );
+    entrant.busy = false;
+    vlc_mutex_unlock( &entrant.lock );
+    return VLC_ENOMEM;
 }
 
 /* We split/pack PCM blocks to a fixed size: pcm_chunk_size bytes */
@@ -228,6 +250,10 @@ static block_t *EncodeFrame( encoder_t *p_enc, aout_buffer_t *p_block )
 static void CloseEncoder( vlc_object_t *p_this )
 {
     encoder_sys_t *p_sys = ((encoder_t*)p_this)->p_sys;
+
+    vlc_mutex_lock( &entrant.lock );
+    entrant.busy = false;
+    vlc_mutex_unlock( &entrant.lock );
 
     /* TODO: we should send the last PCM block padded with 0
      * But we don't know if other blocks will come before it's too late */
