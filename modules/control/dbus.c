@@ -52,6 +52,7 @@
 #include <vlc_aout.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
+#include <vlc_meta.h>
 
 #include <math.h>
 
@@ -1192,7 +1193,10 @@ static int GetInputMeta( input_item_t* p_input,
 
     vlc_mutex_lock( &p_input->lock );
     if( p_input->p_meta )
-        ADD_META( 17, DBUS_TYPE_INT32, p_input->p_meta->i_status );
+    {
+        int i_status = vlc_meta_GetStatus( p_input->p_meta );
+        ADD_META( 17, DBUS_TYPE_INT32, i_status );
+    }
     vlc_mutex_unlock( &p_input->lock );
 
     ADD_VLC_META_STRING( 18, URI );

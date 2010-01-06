@@ -33,6 +33,7 @@
 
 #include <assert.h>
 #include <vlc_url.h>
+#include <vlc_meta.h>
 
 #include <QTreeWidget>
 #include <QHeaderView>
@@ -362,13 +363,11 @@ void ExtraMetaPanel::update( input_item_t *p_item )
         return;
     }
 
-    vlc_dictionary_t * p_dict = &p_meta->extra_tags;
-    char ** ppsz_allkey = vlc_dictionary_all_keys( p_dict );
+    char ** ppsz_allkey = vlc_meta_CopyExtraNames( p_meta);
 
     for( int i = 0; ppsz_allkey[i] ; i++ )
     {
-        const char * psz_value = (const char *)vlc_dictionary_value_for_key(
-                p_dict, ppsz_allkey[i] );
+        const char * psz_value = vlc_meta_GetExtra( p_meta, ppsz_allkey[i] );
         QStringList tempItem;
         tempItem.append( qfu( ppsz_allkey[i] ) + " : ");
         tempItem.append( qfu( psz_value ) );
