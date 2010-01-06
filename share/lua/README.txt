@@ -112,8 +112,9 @@ net.url_parse( url, [option delimiter] ): Parse URL. Returns a table with
   fields "protocol", "username", "password", "host", "port", path" and
   "option".
 net.listen_tcp( host, port ): Listen to TCP connections. This returns an
-  object with an accept method. This method takes an optional timeout
-  argument (in milliseconds). For example:
+  object with an accept and an fds method. The accept takes an optional timeout
+  argument (in milliseconds). The fds method returns a list of fds you can call
+  select on before using the accept method. For example:
 local l = vlc.net.listen_tcp( "localhost", 1234 )
 while true do
   local fd = l:accept( 500 )

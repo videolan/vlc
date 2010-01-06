@@ -83,9 +83,11 @@ static int vlclua_url_parse( lua_State *L )
  *****************************************************************************/
 static int vlclua_net_listen_close( lua_State * );
 static int vlclua_net_accept( lua_State * );
+static int vlclua_net_fds( lua_State * );
 
 static const luaL_Reg vlclua_net_listen_reg[] = {
     { "accept", vlclua_net_accept },
+    { "fds", vlclua_net_fds },
     { NULL, NULL }
 };
 
@@ -119,6 +121,19 @@ static int vlclua_net_listen_close( lua_State *L )
     int **ppi_fd = (int**)luaL_checkudata( L, 1, "net_listen" );
     net_ListenClose( *ppi_fd );
     return 0;
+}
+
+static int vlclua_net_fds( lua_State *L )
+{
+    vlc_object_t *p_this = vlclua_get_this( L );
+    int **ppi_fd = (int**)luaL_checkudata( L, 1, "net_listen" );
+    int *pi_fd = *ppi_fd;
+
+    int i_count = 0;
+    while( pi_fd[i_count] != -1 )
+        lua_pushinteger( L, pi_fd[i_count++] );
+
+    return i_count;
 }
 
 static int vlclua_net_accept( lua_State *L )
@@ -206,12 +221,14 @@ static int vlclua_net_select( lua_State *L )
     if( i_nfds > FD_SETSIZE )
         i_nfds = FD_SETSIZE;
 #endif
-    timeout.tv_sec = (int)f_timeout;
-    timeout.tv_usec = (int)(1e6*(f_timeout-(double)((int)f_timeout)));
-    i_ret = select( i_nfds, fds_read, fds_write, 0, &timeout );
+    if( f_timeout >= 0. )
+    {
+        timeout.tv_sec = (int)f_timeout;
+        timeout.tv_usec = (int)(1e6*(f_timeout-(double)((int)f_timeout)));
+    }
+    i_ret = select( i_nfds, fds_read, fds_write, 0, f_timeout >= 0. ? &timeout : NULL );
     lua_pushinteger( L, i_ret );
-    lua_pushinteger( L, (double)timeout.tv_sec+((double)timeout.tv_usec)/1e-6 );
-    return 2;
+    return 1;
 }
 
 /*****************************************************************************

@@ -172,8 +172,7 @@ end
 
 --[[ The main loop ]]
 while not vlc.misc.should_die() do
-    h:accept()
-    local w, r = h:select( 0.1 )
+    local w, r = h:accept_and_select()
 
     -- Handle writes
     for _, client in pairs(w) do

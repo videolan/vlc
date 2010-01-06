@@ -39,11 +39,8 @@ Example use:
 
     -- The main loop
     while not vlc.misc.should_die() do
-        -- accept new connections
-        h:accept()
-
-        -- select active clients
-        local write, read = h:select( 0.1 ) -- 0.1 is a timeout in seconds
+        -- accept new connections and select active clients
+        local write, read = h:accept_and_select()
 
         -- handle clients in write mode
         for _, client in pairs(write) do
@@ -80,7 +77,7 @@ function host()
     local fds_write = vlc.net.fd_set_new()
 
     -- private methods
-    local function client_accept( clients, listen )
+    --[[local function client_accept( clients, listen )
         local wait
         if #clients == 0 then
             wait = -1
@@ -88,7 +85,7 @@ function host()
             wait = 0
         end
         return listen:accept( wait )
-    end
+    end]]
 
     local function fd_client( client )
         if client.status == status.read then
@@ -250,26 +247,22 @@ function host()
         end
     end
 
-    local function _accept( h )
-        if listeners.tcp then
-            local wait
-            if #clients == 0 and not listeners.stdio and #listeners.tcp.list == 1 then
-                wait = -1 -- blocking
-            else
-                wait = 0
-            end
-            for _, listener in pairs(listeners.tcp.list) do
-                local fd = listener:accept( wait )
-                new_client( h, fd, fd, client_type.net )
-            end
-        end
-    end
-
-    local function _select( h, timeout )
+    local function _accept_and_select( h, timeout )
         local nfds = math.max( filter_client( fds_read, status.read, status.password ),
                                filter_client( fds_write, status.write ) ) + 1
+        if listeners.tcp then
+            for _, listener in pairs(listeners.tcp.list) do
+                for _, fd in pairs({listener:fds()}) do
+                    fds_read:set(fd)
+                    if fd >= nfds then
+                        nfds = fd + 1
+                    end
+                end
+            end
+        end
+
         local ret = vlc.net.select( nfds, fds_read, fds_write,
-                                    timeout or 0.5 )
+                                    timeout or -1 )
         local wclients = {}
         local rclients = {}
         if ret > 0 then
@@ -279,6 +272,17 @@ function host()
                 end
                 if fds_read:isset( client:fd() ) then
                     table.insert(rclients,client)
+                end
+            end
+            if listeners.tcp then
+                for _, listener in pairs(listeners.tcp.list) do
+                    for _, fd in pairs({listener:fds()}) do
+                        if fds_read:isset(fd) then
+                            local afd = listener:accept(0)
+                            new_client( h, afd, afd, client_type.net )
+                            break
+                        end
+                    end
                 end
             end
         end
@@ -311,8 +315,7 @@ function host()
                 listen = _listen,
                 listen_tcp = _listen_tcp,
                 listen_stdio = _listen_stdio,
-                accept = _accept,
-                select = _select,
+                accept_and_select = _accept_and_select,
                 broadcast = _broadcast,
               }
 

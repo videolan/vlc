@@ -651,8 +651,7 @@ h:listen( config.hosts or config.host or "*console" )
 
 --[[ The main loop ]]
 while not vlc.misc.should_die() do
-    h:accept()
-    local write, read = h:select(0.1)
+    local write, read = h:accept_and_select()
 
     for _, client in pairs(write) do
         local len = client:send()
