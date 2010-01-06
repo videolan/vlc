@@ -64,6 +64,12 @@ vlc_module_begin ()
         set_callbacks( FindArt, NULL )
 
     add_submodule ()
+        set_shortname( N_( "Lua Decrapifier" ) )
+        set_description( N_("Remove crappy part of the movie name") )
+        set_capability( "movie name decrapifier", 10 )
+        set_callbacks( Decrapify, NULL )
+
+    add_submodule ()
         add_shortcut( "luaplaylist" )
         set_category( CAT_INPUT )
         set_subcategory( SUBCAT_INPUT_DEMUX )

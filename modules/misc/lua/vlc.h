@@ -48,6 +48,8 @@
 /*****************************************************************************
  * Module entry points
  *****************************************************************************/
+int Decrapify( vlc_object_t * );
+
 int FindArt( vlc_object_t * );
 
 int Import_LuaPlaylist( vlc_object_t * );
