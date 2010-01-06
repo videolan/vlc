@@ -353,7 +353,7 @@ case "${host_os}" in
         dnl DEP and ASLR options
         dnl
         AC_ARG_ENABLE(peflags,
-          [  --enable-peflags          peflags use (default enabled)])
+          [  --enable-peflags        peflags use (default enabled)])
         if test "${enable_peflags}" != "no"
         then
           AC_CHECK_TOOL(PEFLAGS, peflags, :)
@@ -2375,7 +2375,7 @@ dnl
 dnl libv4l1 support for video4linux.
 dnl
 AC_ARG_ENABLE( libv4l,
-  [  --enable-libv4l        Libv4l Video4Linux support (default enabled)])
+  [  --enable-libv4l         Libv4l Video4Linux support (default enabled)])
 if test "${enable_libv4l}" != "no" -a "${enable_v4l}" != "no"
 then
     PKG_CHECK_MODULES( LIBV4L, libv4l1, [
@@ -2394,7 +2394,7 @@ AC_ARG_ENABLE(v4l2,
 if test "${enable_v4l2}" != "no"
 then
   AC_ARG_WITH(v4l2,
-    [    --with-v4l2=PATH       path to a v4l2-enabled kernel tree],[],[])
+    [    --with-v4l2=PATH      path to a v4l2-enabled kernel tree],[],[])
   if test "${with_v4l2}" != "no" -a -n "${with_v4l2}"
   then
     VLC_ADD_CPPFLAGS([v4l2],[-I${with_v4l2}/include])
@@ -2465,8 +2465,8 @@ dnl Need to test libcdio and libvcdinfo for a number of things. Do it now.
 AC_ARG_ENABLE(libcdio,
   [  --enable-libcdio        CD input and control library support (default enabled)])
 
-AC_ARG_ENABLE(vcdinfo,
-  [  --enable-vcdinfo        VCD information library support (default enabled)])
+AC_ARG_ENABLE(libvcdinfo,
+  [  --enable-libvcdinfo     VCD information library support (default enabled)])
 
 have_libcdio=no
 have_libvcdinfo=no
@@ -2480,7 +2480,7 @@ then
 
   if test "${enable_vcdinfo}" != "no"
   then
-    PKG_CHECK_MODULES(VCDINFO, libvcdinfo >= 0.7.22,
+    PKG_CHECK_MODULES(LIBVCDINFO, libvcdinfo >= 0.7.22,
        [have_libvcdinfo=yes],
        [AC_MSG_WARN(VCD information library not found)])
   fi
@@ -2732,7 +2732,7 @@ AC_ARG_ENABLE(mod,
 if test "${enable_mod}" != "no"
 then
   AC_ARG_WITH(mod-tree,
-  [    --with-mod-tree=PATH mod tree for static linking])
+  [    --with-mod-tree=PATH  mod tree for static linking])
   if test -n "${with_mod_tree}"
   then
     AC_MSG_CHECKING(for libmodplug.a in ${with_mod_tree})
@@ -2787,7 +2787,7 @@ if test "${enable_gme}" != "no" -a "${CXX}" != "";
 then
   AC_LANG_PUSH(C++)
   AC_ARG_WITH(gme-tree,
-  [    --with-gme-tree=PATH gme tree for static linking])
+  [    --with-gme-tree=PATH  gme tree for static linking])
   if test -n "${with_gme_tree}"
   then
     AC_MSG_CHECKING(for libgme.a in ${with_mod_tree})
@@ -2858,7 +2858,7 @@ then
   fi
 
   AC_ARG_WITH(mad-tree,
-    [    --with-mad-tree=PATH   mad tree for static linking],[],[])
+    [    --with-mad-tree=PATH  mad tree for static linking],[],[])
   if test "${with_mad_tree}" != "no" -a -n "${with_mad_tree}"
   then
     real_mad_tree="`cd ${with_mad_tree} 2>/dev/null && pwd`"
@@ -2915,7 +2915,7 @@ AS_IF([test "${enable_id3tag}" = "yes"], [
 ])
 
 AC_ARG_ENABLE(merge-ffmpeg,
-[  --enable-merge-ffmpeg  merge FFmpeg-based plugins (default disabled)],, [
+[  --enable-merge-ffmpeg   merge FFmpeg-based plugins (default disabled)],, [
   enable_merge_ffmpeg="no"
 ])
 AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
@@ -2954,7 +2954,7 @@ dnl
 dnl libva needs avcodec
 dnl
 AC_ARG_ENABLE(libva,
-  [  --enable-libva         libva VAAPI support (default disabled)])
+  [  --enable-libva          libva VAAPI support (default disabled)])
 AS_IF([test "${enable_libva}" = "yes"], [
   AS_IF([test "x${have_avcodec}" = "xyes"], [
     PKG_CHECK_MODULES(LIBVA, [libva libva-x11],
@@ -3725,7 +3725,7 @@ AC_ARG_ENABLE(freetype,
 AC_ARG_ENABLE(fribidi,
   [  --enable-fribidi        fribidi support (default enabled)])
 AC_ARG_ENABLE(fontconfig,
-  [  --enable-fontconfig,    fontconfig support (default enabled)])
+  [  --enable-fontconfig     fontconfig support (default enabled)])
 if test "${enable_freetype}" != "no"
 then
    PKG_CHECK_MODULES(FREETYPE, freetype2,[
@@ -4277,7 +4277,7 @@ dnl
 dnl QT 4
 dnl
 AC_ARG_ENABLE(qt4,
-  [  --enable-qt4            QT 4 support (default enabled) ],, [
+  [  --enable-qt4            Qt 4 support (default enabled) ],, [
   AS_IF([test "${SYS}" = "darwin"], [enable_qt4=no])
 ])
 AS_IF([test "${enable_qt4}" != "no"], [
@@ -4318,7 +4318,7 @@ dnl
 dnl  MacOS X video output/gui modules
 dnl
 AC_ARG_ENABLE(macosx,
-  [  --enable-macosx   Mac OS X gui support (default enabled on Mac OS X)])
+  [  --enable-macosx         Mac OS X gui support (default enabled on Mac OS X)])
 if test "x${enable_macosx}" = "xyes"
 then
   VLC_ADD_LDFLAGS([macosx minimal_macosx],[-Wl,-framework,Cocoa])
@@ -4343,7 +4343,7 @@ dnl  MacOS X related modules
 dnl
 
 AC_ARG_ENABLE(macosx-vout,
-  [  --enable-macosx-vout   Mac OS X video output module (default enabled on Mac OS X)])
+  [  --enable-macosx-vout    Mac OS X video output module (default enabled on Mac OS X)])
 if test "x${enable_macosx_vout}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_vout}" = "yes")
 then
@@ -4531,7 +4531,7 @@ dnl
 dnl libgcrypt
 dnl
 AC_ARG_ENABLE(libgcrypt,
-  [  --disable-libgcrypt      gcrypt support (default enabled)])
+  [  --disable-libgcrypt     gcrypt support (default enabled)])
 AS_IF([test "${enable_libgcrypt}" != "no"], [
   AC_CHECK_DECL([GCRYCTL_SET_THREAD_CBS], [
     libgcrypt-config --version >/dev/null || \
