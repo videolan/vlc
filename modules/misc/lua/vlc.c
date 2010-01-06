@@ -76,7 +76,7 @@ vlc_module_begin ()
         set_description( N_("Lua Interface Module (shortcuts)") )
         add_shortcut( "luarc" )
         add_shortcut( "rc" )
-        set_capability( "interface", 25 )
+        set_capability( "interface", 15 )
         set_callbacks( Open_LuaIntf, Close_LuaIntf )
 
     add_submodule ()
