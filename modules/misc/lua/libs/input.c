@@ -119,6 +119,11 @@ static int vlclua_input_metas_internal( lua_State *L, input_item_t *p_item )
     lua_newtable( L );
     char *psz_meta;
 
+    psz_meta = input_item_GetName( p_item );
+    lua_pushstring( L, psz_meta );
+    lua_setfield( L, -2, "filename" );
+    free( psz_meta );
+    
 #define PUSH_META( n, m ) \
     psz_meta = input_item_GetMeta( p_item, vlc_meta_ ## n ); \
     lua_pushstring( L, psz_meta ); \
@@ -239,19 +244,9 @@ static int vlclua_input_item_delete( lua_State *L )
     return 1;
 }
 
-static int vlclua_input_item_get_current( lua_State *L )
+static int vlclua_input_item_get( lua_State *L, input_item_t *p_item )
 {
-    input_thread_t *p_input = vlclua_get_input_internal( L );
-    input_item_t *p_item = ( p_input && p_input->p ) ? input_GetItem( p_input ) : NULL;
-    if( !p_item )
-    {
-        lua_pushnil( L );
-        if( p_input ) vlc_object_release( p_input );
-        return 1;
-    }
-
     vlc_gc_incref( p_item );
-
     input_item_t **pp = lua_newuserdata( L, sizeof( void* ) );
     *pp = p_item;
 
@@ -264,7 +259,23 @@ static int vlclua_input_item_get_current( lua_State *L )
         lua_setfield( L, -2, "__gc" );
     }
 
-    lua_setmetatable( L, -2 );
+    lua_setmetatable(L, -2);
+    
+    return 1;
+}
+
+static int vlclua_input_item_get_current( lua_State *L )
+{
+    input_thread_t *p_input = vlclua_get_input_internal( L );
+    input_item_t *p_item = ( p_input && p_input->p ) ? input_GetItem( p_input ) : NULL;
+    if( !p_item )
+    {
+        lua_pushnil( L );
+        if( p_input ) vlc_object_release( p_input );
+        return 1;
+    }
+
+    vlclua_input_item_get( L, p_item );
 
     if( p_input ) vlc_object_release( p_input );
     return 1;
@@ -320,11 +331,12 @@ static int vlclua_input_item_set_meta( lua_State *L )
         }
     }
 
-    if( !ok )
-        return luaL_error( L, "unknown meta type '%s'", psz_name );
+    if( !ok ) {
+        vlc_meta_AddExtra( p_item->p_meta, psz_name, psz_value );
+        return 1;
+    }
 
     input_item_SetMeta( p_item, type, psz_value );
-
     return 1;
 }
 
@@ -354,3 +366,10 @@ static const luaL_Reg vlclua_input_item_reg[] = {
     { "set_meta", vlclua_input_item_set_meta },
     { NULL, NULL }
 };
+
+
+void luaopen_input_item( lua_State *L, input_item_t *item )
+{
+    vlclua_input_item_get( L, item );
+    lua_setfield( L, -2, "item" );
+}
