@@ -515,9 +515,11 @@ vlc_meta_Delete
 vlc_meta_Get
 vlc_meta_GetExtra
 vlc_meta_GetExtraCount
+vlc_meta_GetStatus
 vlc_meta_Merge
 vlc_meta_New
 vlc_meta_Set
+vlc_meta_SetStatus
 vlc_meta_TypeToLocalizedString
 vlc_mutex_destroy
 vlc_mutex_init
