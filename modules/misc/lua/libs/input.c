@@ -40,6 +40,7 @@
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
+#include <assert.h>
 
 #include "input.h"
 #include "playlist.h"
@@ -370,6 +371,7 @@ static const luaL_Reg vlclua_input_item_reg[] = {
 
 void luaopen_input_item( lua_State *L, input_item_t *item )
 {
+    assert(item);
     vlclua_input_item_get( L, item );
     lua_setfield( L, -2, "item" );
 }
