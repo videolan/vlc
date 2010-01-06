@@ -32,7 +32,7 @@ SOURCES_wingdi = \
 
 SOURCES_wingapi = \
 	wingdi.c \
-	vout.h \
+	common.h \
 	events.h \
 	events.c \
 	common.c \
