@@ -90,13 +90,25 @@ static char *getAppDependentDir(vlc_userdir_t type)
             break;
     }
 
+    // Default fallback
+    const char *name = "org.videolan.vlc";
+
     CFBundleRef mainBundle = CFBundleGetMainBundle();
-    CFStringRef identifierAsNS = CFBundleGetIdentifier(mainBundle);
-    const char *identifier = CFStringGetCStringPtr(identifierAsNS, kCFStringEncodingUTF8);
-    
+    if (mainBundle)
+    {
+        CFStringRef identifierAsNS = CFBundleGetIdentifier(mainBundle);
+        if (identifierAsNS)
+        {
+            char identifier[256];
+            Boolean ret = CFStringGetCString(identifierAsNS, identifier, sizeof(identifier), kCFStringEncodingUTF8);
+            if (ret)
+                name = identifier;            
+        }
+    }
+
     char *psz_parent = config_GetHomeDir ();
     char *psz_dir;
-    if( asprintf( &psz_dir, psz_path, psz_parent, identifier) == -1 )
+    if( asprintf( &psz_dir, psz_path, psz_parent, name) == -1 )
         psz_dir = NULL;
     free(psz_parent);
 
