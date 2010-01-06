@@ -190,7 +190,6 @@ DIST_osdmenu_default = \
 
 DIST_lua= \
 	lua/README.txt \
-	lua/decrapifier/standard.lua \
 	lua/meta/README.txt \
 	lua/meta/01_musicbrainz.lua \
 	lua/meta/10_googleimage.lua \

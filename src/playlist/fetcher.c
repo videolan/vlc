@@ -33,7 +33,6 @@
 #include <limits.h>
 #include <vlc_art_finder.h>
 #include <vlc_memory.h>
-#include <vlc_decrapifier.h>
 
 #include "art.h"
 #include "fetcher.h"
@@ -123,36 +122,10 @@ void playlist_fetcher_Delete( playlist_fetcher_t *p_fetcher )
     free( p_fetcher );
 }
 
+
 /*****************************************************************************
  * Privates functions
  *****************************************************************************/
-
-/**
- * This function's job is to call the movie name decrapifier
- * Those plugins goal are to fill in information from the file itself.
- * Without network connection.
- */
-
-static void Decrapify( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
-{
-    vlc_object_t *p_parent = VLC_OBJECT(p_fetcher->p_playlist);
-
-    decrapifier_t *p_decrapifier =
-    vlc_custom_create( p_parent, sizeof(*p_decrapifier), VLC_OBJECT_GENERIC,
-                      "movie name decrapifier" );
-    if(!p_decrapifier)
-        return;
-
-    vlc_object_attach( p_decrapifier, p_parent );
-    p_decrapifier->p_item = p_item;
-    
-    module_t *p_module = module_need( p_decrapifier,
-                                     "movie name decrapifier", NULL, false );
-    if( p_module )
-        module_unneed( p_decrapifier, p_module );
-    vlc_object_release( p_decrapifier );
-}
-
 /**
  * This function locates the art associated to an input item.
  * Return codes:
@@ -437,8 +410,6 @@ static void *Thread( void *p_data )
 
         /* Wait that the input item is preparsed if it is being played */
         WaitPreparsed( p_fetcher, p_item );
-
-        Decrapify( p_fetcher, p_item );
 
         /* Find art, and download it if needed */
         int i_ret = FindArt( p_fetcher, p_item );

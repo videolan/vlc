@@ -1,7 +1,6 @@
 SOURCES_lua = \
 	intf.c \
 	meta.c \
-	decrapifier.c \
 	demux.c \
 	vlc.c \
 	vlc.h \
