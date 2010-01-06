@@ -234,4 +234,8 @@ struct pollfd
 # define poll(a, b, c) vlc_poll(a, b, c)
 #endif
 
+#ifndef HAVE_TDESTROY
+# define tdestroy vlc_tdestroy
+#endif
+
 #endif /* !LIBVLC_FIXUPS_H */

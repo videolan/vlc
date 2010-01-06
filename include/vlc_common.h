@@ -818,6 +818,8 @@ VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char *const
 /* dir wrappers (defined in src/extras/libc.c) */
 VLC_EXPORT(int, vlc_wclosedir, ( void *_p_dir ));
 
+VLC_EXPORT( void, vlc_tdestroy, ( void *, void (*)(void *) ) );
+
 /* Fast large memory copy and memory set */
 VLC_EXPORT( void *, vlc_memcpy, ( void *, const void *, size_t ) );
 VLC_EXPORT( void *, vlc_memset, ( void *, int, size_t ) );

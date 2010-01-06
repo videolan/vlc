@@ -528,6 +528,7 @@ __vlc_object_set_destructor
 vlc_object_get_name
 vlc_plugin_set
 vlc_poll
+vlc_tdestroy
 vlc_rand_bytes
 vlc_release
 vlc_restorecancel
