@@ -29,12 +29,22 @@
 #include <vlc_common.h>
 #include <vlc_playlist.h>
 #include <vlc_url.h>
+#include <vlc_arrays.h>
 
 #include "input_internal.h"
 #include "../playlist/art.h"
 
+struct vlc_meta_t
+{
+    char * ppsz_meta[VLC_META_TYPE_COUNT];
+    
+    vlc_dictionary_t extra_tags;
+    
+    int i_status;
+};
+
 /* FIXME bad name convention */
-const char * input_MetaTypeToLocalizedString( vlc_meta_type_t meta_type )
+const char * vlc_meta_TypeToLocalizedString( vlc_meta_type_t meta_type )
 {
     switch( meta_type )
     {
@@ -59,6 +69,128 @@ const char * input_MetaTypeToLocalizedString( vlc_meta_type_t meta_type )
     default: abort();
     }
 };
+
+
+/**
+ * vlc_meta contructor.
+ * vlc_meta_Delete() will free the returned pointer.
+ */ 
+vlc_meta_t *vlc_meta_New( void )
+{
+    vlc_meta_t *m = (vlc_meta_t*)malloc( sizeof(*m) );
+    if( !m )
+        return NULL;
+    memset( m->ppsz_meta, 0, sizeof(m->ppsz_meta) );
+    m->i_status = 0;
+    vlc_dictionary_init( &m->extra_tags, 0 );
+    return m;
+}
+
+/* Free a dictonary key allocated by strdup() in vlc_meta_AddExtra() */
+static void vlc_meta_FreeExtraKey( void *p_data, void *p_obj )
+{
+    VLC_UNUSED( p_obj );
+    free( p_data );
+}
+
+void vlc_meta_Delete( vlc_meta_t *m )
+{
+    int i;
+    for( i = 0; i < VLC_META_TYPE_COUNT ; i++ )
+        free( m->ppsz_meta[i] );
+    vlc_dictionary_clear( &m->extra_tags, vlc_meta_FreeExtraKey, NULL );
+    free( m );
+}
+
+/**
+ * vlc_meta has two kinds of meta, the one in a table, and the one in a
+ * dictionary.
+ * FIXME - Why don't we merge those two?
+ */ 
+
+void vlc_meta_Set( vlc_meta_t *p_meta, vlc_meta_type_t meta_type, const char *psz_val )
+{
+    free( p_meta->ppsz_meta[meta_type] );
+    p_meta->ppsz_meta[meta_type] = psz_val ? strdup( psz_val ) : NULL;
+}
+
+const char *vlc_meta_Get( const vlc_meta_t *p_meta, vlc_meta_type_t meta_type )
+{
+    return p_meta->ppsz_meta[meta_type];
+}
+
+void vlc_meta_AddExtra( vlc_meta_t *m, const char *psz_name, const char *psz_value )
+{
+    char *psz_oldvalue = (char *)vlc_dictionary_value_for_key( &m->extra_tags, psz_name );
+    if( psz_oldvalue != kVLCDictionaryNotFound )
+        vlc_dictionary_remove_value_for_key( &m->extra_tags, psz_name,
+                                            vlc_meta_FreeExtraKey, NULL );
+    vlc_dictionary_insert( &m->extra_tags, psz_name, strdup(psz_value) );
+}
+
+const char * vlc_meta_GetExtra( const vlc_meta_t *m, const char *psz_name )
+{
+    return (char *)vlc_dictionary_value_for_key(&m->extra_tags, psz_name);
+}
+
+unsigned vlc_meta_GetExtraCount( const vlc_meta_t *m )
+{
+    return vlc_dictionary_keys_count(&m->extra_tags);
+}
+
+char** vlc_meta_CopyExtraNames( const vlc_meta_t *m )
+{
+    return vlc_dictionary_all_keys(&m->extra_tags);
+}
+
+/**
+ * vlc_meta status (see vlc_meta_status_e)
+ */
+vlc_meta_status_e vlc_meta_GetStatus( vlc_meta_t *m )
+{
+    return m->i_status;
+}
+
+void vlc_meta_SetStatus( vlc_meta_t *m, vlc_meta_status_e status )
+{
+    m->i_status = status;
+}
+
+
+/**
+ * Merging meta
+ */
+void vlc_meta_Merge( vlc_meta_t *dst, const vlc_meta_t *src )
+{
+    char **ppsz_all_keys;
+    int i;
+    
+    if( !dst || !src )
+        return;
+    
+    for( i = 0; i < VLC_META_TYPE_COUNT; i++ )
+    {
+        if( src->ppsz_meta[i] )
+        {
+            free( dst->ppsz_meta[i] );
+            dst->ppsz_meta[i] = strdup( src->ppsz_meta[i] );
+        }
+    }
+    
+    /* XXX: If speed up are needed, it is possible */
+    ppsz_all_keys = vlc_dictionary_all_keys( &src->extra_tags );
+    for( i = 0; ppsz_all_keys && ppsz_all_keys[i]; i++ )
+    {
+        /* Always try to remove the previous value */
+        vlc_dictionary_remove_value_for_key( &dst->extra_tags, ppsz_all_keys[i], vlc_meta_FreeExtraKey, NULL );
+        
+        void *p_value = vlc_dictionary_value_for_key( &src->extra_tags, ppsz_all_keys[i] );
+        vlc_dictionary_insert( &dst->extra_tags, ppsz_all_keys[i], strdup( (const char*)p_value ) );
+        free( ppsz_all_keys[i] );
+    }
+    free( ppsz_all_keys );
+}
+
 
 void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
 {

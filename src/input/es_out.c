@@ -1169,7 +1169,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
     if( !vlc_meta_Get( p_meta, vlc_meta_Title) &&
         !vlc_meta_Get( p_meta, vlc_meta_NowPlaying) &&
         !vlc_meta_Get( p_meta, vlc_meta_Publisher) &&
-        vlc_dictionary_keys_count( &p_meta->extra_tags ) <= 0 )
+        vlc_meta_GetExtraCount( p_meta ) <= 0 )
     {
         return;
     }
@@ -1227,15 +1227,14 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
             input_item_SetPublisher( p_input->p->p_item, psz_provider );
             input_SendEventMeta( p_input );
         }
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat, input_MetaTypeToLocalizedString(vlc_meta_Publisher), psz_provider );
+        input_Control( p_input, INPUT_ADD_INFO, psz_cat, vlc_meta_TypeToLocalizedString(vlc_meta_Publisher), psz_provider );
     }
-    char ** ppsz_all_keys = vlc_dictionary_all_keys( &p_meta->extra_tags );
+    char ** ppsz_all_keys = vlc_meta_CopyExtraNames(p_meta );
     for( i = 0; ppsz_all_keys[i]; i++ )
     {
         input_Control( p_input, INPUT_ADD_INFO, psz_cat,
                        vlc_gettext(ppsz_all_keys[i]),
-                       vlc_dictionary_value_for_key( &p_meta->extra_tags,
-                       ppsz_all_keys[i] ) );
+                       vlc_meta_GetExtra( &p_meta, ppsz_all_keys[i] ) );
         free( ppsz_all_keys[i] );
     }
     free( ppsz_all_keys );
@@ -1296,13 +1295,13 @@ static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg 
     if( p_pgrm->psz_now_playing )
     {
         input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-            input_MetaTypeToLocalizedString(vlc_meta_NowPlaying),
+            vlc_meta_TypeToLocalizedString(vlc_meta_NowPlaying),
             p_pgrm->psz_now_playing );
     }
     else
     {
         input_Control( p_input, INPUT_DEL_INFO, psz_cat,
-            input_MetaTypeToLocalizedString(vlc_meta_NowPlaying) );
+            vlc_meta_TypeToLocalizedString(vlc_meta_NowPlaying) );
     }
 
     free( psz_cat );
@@ -2871,11 +2870,11 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     /* Append generic meta */
     if( p_meta )
     {
-        char **ppsz_all_keys = vlc_dictionary_all_keys( &p_meta->extra_tags );
+        char **ppsz_all_keys = vlc_meta_CopyExtraNames( p_meta );
         for( int i = 0; ppsz_all_keys && ppsz_all_keys[i]; i++ )
         {
             char *psz_key = ppsz_all_keys[i];
-            char *psz_value = vlc_dictionary_value_for_key( &p_meta->extra_tags, psz_key );
+            char *psz_value = vlc_meta_GetExtra( p_meta, psz_key );
 
             if( psz_value )
                 input_Control( p_input, INPUT_ADD_INFO, psz_cat,

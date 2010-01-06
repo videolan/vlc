@@ -45,30 +45,30 @@
 static inline void vlc_audio_replay_gain_MergeFromMeta( audio_replay_gain_t *p_dst,
                                                         const vlc_meta_t *p_meta )
 {
-    char * psz_value;
+    const char * psz_value;
 
     if( !p_meta )
         return;
 
-    if( (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "REPLAYGAIN_TRACK_GAIN" )) ||
-        (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "RG_RADIO" )) )
+    if( (psz_value = vlc_meta_GetExtra(p_meta, "REPLAYGAIN_TRACK_GAIN")) ||
+        (psz_value = vlc_meta_GetExtra(p_meta, "RG_RADIO")) )
     {
         p_dst->pb_gain[AUDIO_REPLAY_GAIN_TRACK] = true;
         p_dst->pf_gain[AUDIO_REPLAY_GAIN_TRACK] = atof( psz_value );
     }
-    else if( (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "REPLAYGAIN_TRACK_PEAK" )) ||
-             (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "RG_PEAK" )) )
+    else if( (psz_value = vlc_meta_GetExtra(p_meta, "REPLAYGAIN_TRACK_PEAK" )) ||
+             (psz_value = vlc_meta_GetExtra(p_meta, "RG_PEAK" )) )
     {
         p_dst->pb_peak[AUDIO_REPLAY_GAIN_TRACK] = true;
         p_dst->pf_peak[AUDIO_REPLAY_GAIN_TRACK] = atof( psz_value );
     }
-    else if( (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "REPLAYGAIN_ALBUM_GAIN" )) ||
-             (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "RG_AUDIOPHILE" )) )
+    else if( (psz_value = vlc_meta_GetExtra(p_meta, "REPLAYGAIN_ALBUM_GAIN" )) ||
+             (psz_value = vlc_meta_GetExtra(p_meta, "RG_AUDIOPHILE" )) )
     {
         p_dst->pb_gain[AUDIO_REPLAY_GAIN_ALBUM] = true;
         p_dst->pf_gain[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );
     }
-    else if( (psz_value = (char *)vlc_dictionary_value_for_key( &p_meta->extra_tags, "REPLAYGAIN_ALBUM_PEAK" )) )
+    else if( (psz_value = vlc_meta_GetExtra(p_meta, "REPLAYGAIN_ALBUM_PEAK" )) )
     {
         p_dst->pb_peak[AUDIO_REPLAY_GAIN_ALBUM] = true;
         p_dst->pf_peak[AUDIO_REPLAY_GAIN_ALBUM] = atof( psz_value );

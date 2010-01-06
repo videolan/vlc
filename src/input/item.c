@@ -151,14 +151,15 @@ void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed )
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
 
-    int i_new_status;
+    int status = vlc_meta_GetStatus(p_i->p_meta);
+    int new_status;
     if( b_preparsed )
-        i_new_status = p_i->p_meta->i_status | ITEM_PREPARSED;
+        new_status = status | ITEM_PREPARSED;
     else
-        i_new_status = p_i->p_meta->i_status & ~ITEM_PREPARSED;
-    if( p_i->p_meta->i_status != i_new_status )
+        new_status = status & ~ITEM_PREPARSED;
+    if( status != new_status )
     {
-        p_i->p_meta->i_status = i_new_status;
+        vlc_meta_SetStatus(p_i->p_meta, new_status);
         b_send_event = true;
     }
 
@@ -168,10 +169,11 @@ void input_item_SetPreparsed( input_item_t *p_i, bool b_preparsed )
     {
         vlc_event_t event;
         event.type = vlc_InputItemPreparsedChanged;
-        event.u.input_item_preparsed_changed.new_status = i_new_status;
+        event.u.input_item_preparsed_changed.new_status = new_status;
         vlc_event_send( &p_i->event_manager, &event );
     }
 }
+
 void input_item_SetArtNotFound( input_item_t *p_i, bool b_not_found )
 {
     vlc_mutex_lock( &p_i->lock );
@@ -179,13 +181,18 @@ void input_item_SetArtNotFound( input_item_t *p_i, bool b_not_found )
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
 
+    int status = vlc_meta_GetStatus(p_i->p_meta);
+    
     if( b_not_found )
-        p_i->p_meta->i_status |= ITEM_ART_NOTFOUND;
+        status |= ITEM_ART_NOTFOUND;
     else
-        p_i->p_meta->i_status &= ~ITEM_ART_NOTFOUND;
-
+        status &= ~ITEM_ART_NOTFOUND;
+    
+    vlc_meta_SetStatus(p_i->p_meta, status);
+    
     vlc_mutex_unlock( &p_i->lock );
 }
+
 void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched )
 {
     vlc_mutex_lock( &p_i->lock );
@@ -193,10 +200,14 @@ void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched )
     if( !p_i->p_meta )
         p_i->p_meta = vlc_meta_New();
 
+    int status = vlc_meta_GetStatus(p_i->p_meta);
+    
     if( b_art_fetched )
-        p_i->p_meta->i_status |= ITEM_ART_FETCHED;
+        status |= ITEM_ART_FETCHED;
     else
-        p_i->p_meta->i_status &= ~ITEM_ART_FETCHED;
+        status &= ~ITEM_ART_FETCHED;
+
+    vlc_meta_SetStatus(p_i->p_meta, status);
 
     vlc_mutex_unlock( &p_i->lock );
 }
@@ -454,7 +465,7 @@ void input_item_SetDuration( input_item_t *p_i, mtime_t i_duration )
 bool input_item_IsPreparsed( input_item_t *p_item )
 {
     vlc_mutex_lock( &p_item->lock );
-    bool b_preparsed = p_item->p_meta ? ( p_item->p_meta->i_status & ITEM_PREPARSED ) != 0 : false;
+    bool b_preparsed = p_item->p_meta ? ( vlc_meta_GetStatus(p_item->p_meta) & ITEM_PREPARSED ) != 0 : false;
     vlc_mutex_unlock( &p_item->lock );
 
     return b_preparsed;
@@ -463,7 +474,7 @@ bool input_item_IsPreparsed( input_item_t *p_item )
 bool input_item_IsArtFetched( input_item_t *p_item )
 {
     vlc_mutex_lock( &p_item->lock );
-    bool b_fetched = p_item->p_meta ? ( p_item->p_meta->i_status & ITEM_ART_FETCHED ) != 0 : false;
+    bool b_fetched = p_item->p_meta ? ( vlc_meta_GetStatus(p_item->p_meta) & ITEM_ART_FETCHED ) != 0 : false;
     vlc_mutex_unlock( &p_item->lock );
 
     return b_fetched;
