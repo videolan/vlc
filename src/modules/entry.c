@@ -67,7 +67,6 @@ module_t *vlc_module_create (vlc_object_t *obj)
     module->i_score = 1;
     module->i_cpu = 0;
     module->b_unloadable = true;
-    module->b_reentrant = true;
     module->b_submodule = false;
     module->pf_activate = NULL;
     module->pf_deactivate = NULL;

@@ -119,7 +119,6 @@ struct module_t
     uint32_t i_cpu;                           /**< Required CPU capabilities */
 
     bool b_unloadable;                        /**< Can we be dlclosed? */
-    bool b_reentrant;                           /**< Are we reentrant? */
     bool b_submodule;                        /**< Is this a submodule? */
 
     /* Callbacks */
