@@ -53,11 +53,10 @@ typedef enum vlc_meta_type_t
 
 #define VLC_META_TYPE_COUNT 17
 
-typedef int vlc_meta_status_e;
-#deinf ITEM_PREPARSED       1
-#deinf ITEM_ARTURL_FETCHED  2
-#deinf ITEM_PREPARSED       4
-#deinf ITEM_PREPARSED       8
+#define ITEM_PREPARSED       1
+#define ITEM_ARTURL_FETCHED  2
+#define ITEM_PREPARSED       4
+#define ITEM_PREPARSED       8
 
 /**
  * Basic function to deal with meta
@@ -81,8 +80,8 @@ VLC_EXPORT(char **,      vlc_meta_CopyExtraNames, ( const vlc_meta_t *m ));
 
 VLC_EXPORT(void,         vlc_meta_Merge, ( vlc_meta_t *dst, const vlc_meta_t *src ));
 
-VLC_EXPORT(vlc_meta_status_e, vlc_meta_GetStatus, ( vlc_meta_t *m ));
-VLC_EXPORT(void,              vlc_meta_SetStatus, ( vlc_meta_t *m, vlc_meta_status_e status ));
+VLC_EXPORT(int,  vlc_meta_GetStatus, ( vlc_meta_t *m ));
+VLC_EXPORT(void, vlc_meta_SetStatus, ( vlc_meta_t *m, int status ));
 
 /**
  * Returns a localizes string describing the meta
