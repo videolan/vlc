@@ -55,8 +55,8 @@ typedef enum vlc_meta_type_t
 
 #define ITEM_PREPARSED       1
 #define ITEM_ARTURL_FETCHED  2
-#define ITEM_PREPARSED       4
-#define ITEM_PREPARSED       8
+#define ITEM_ART_FETCHED     4
+#define ITEM_ART_NOTFOUND    8
 
 /**
  * Basic function to deal with meta
