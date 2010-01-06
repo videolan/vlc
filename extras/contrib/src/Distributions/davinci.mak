@@ -5,4 +5,4 @@ all: \
 	.flac .faad .ffmpeg \
 	.live .png .dvbpsi .tremor
 
-FFMPEGCONF += --arch=arm --disable-neon --disable-armv6 --disable-armv6t2 --disable-armvfp --disable-iwmmxt
+FFMPEGCONF += --arch=arm --cpu=arm9tdmi --disable-armvfp
