@@ -34,6 +34,7 @@
 
 #include "libvlc.h"
 
+#include <search.h>
 #include <assert.h>
 
 /*****************************************************************************
@@ -153,14 +154,30 @@ time_ops   = { CmpTime,    DupDummy,  FreeDummy,  };
  * Local prototypes
  *****************************************************************************/
 static void     WaitUnused  ( vlc_object_t *, variable_t * );
-static uint32_t HashString  ( const char * );
-static size_t   Insert      ( variable_t **, size_t, const char * );
-static int      Lookup      ( vlc_object_t *, const char * );
 
 static void     CheckValue  ( variable_t *, vlc_value_t * );
 
 static int      TriggerCallback( vlc_object_t *, variable_t *, const char *,
                                  vlc_value_t );
+
+static int varcmp( const void *a, const void *b )
+{
+    const variable_t *va = a, *vb = b;
+
+    /* psz_name must be first */
+    assert( va == (const void *)&va->psz_name );
+    return strcmp( va->psz_name, vb->psz_name );
+}
+
+static variable_t *Lookup( vlc_object_t *obj, const char *psz_name )
+{
+    vlc_object_internals_t *priv = vlc_internals( obj );
+    variable_t **pp_var;
+
+    vlc_assert_locked( &priv->var_lock );
+    pp_var = tfind( &psz_name, &priv->var_root, varcmp );
+    return (pp_var != NULL) ? *pp_var : NULL;
+}
 
 static void Destroy( variable_t *p_var )
 {
@@ -202,7 +219,6 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     if( p_var == NULL )
         return VLC_ENOMEM;
 
-    p_var->i_hash = HashString( psz_name );
     p_var->psz_name = strdup( psz_name );
     p_var->psz_text = NULL;
 
@@ -282,53 +298,34 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
     }
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-    int i_new;
+    variable_t **pp_var, *p_oldvar;
+    int ret = VLC_SUCCESS;
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    /* FIXME: if the variable already exists, we don't duplicate it. But we
-     * duplicate the lookups. It's not that serious, but if anyone finds some
-     * time to rework Insert() so that only one lookup has to be done, feel
-     * free to do so. */
-    i_new = Lookup( p_this, psz_name );
-
-    if( i_new >= 0 )
-    {
-        /* If the types differ, variable creation failed. */
-        if( (i_type & VLC_VAR_CLASS) != (p_priv->pp_vars[i_new]->i_type & VLC_VAR_CLASS) )
-        {
-            msg_Err( p_this, "Variable '%s' (0x%04x) already exist but with a different type (0x%04x)",
-                     psz_name, p_priv->pp_vars[i_new]->i_type, i_type );
-            vlc_mutex_unlock( &p_priv->var_lock );
-            return VLC_EBADVAR;
-        }
-
-        p_priv->pp_vars[i_new]->i_usage++;
-        p_priv->pp_vars[i_new]->i_type |= ( i_type & VLC_VAR_ISCOMMAND );
-        p_priv->pp_vars[i_new]->i_type |= ( i_type & VLC_VAR_HASCHOICE );
-        vlc_mutex_unlock( &p_priv->var_lock );
-
-        /* We did not need to create a new variable, free everything... */
-        Destroy( p_var );
-        return VLC_SUCCESS;
+    pp_var = tsearch( p_var, &p_priv->var_root, varcmp );
+    if( unlikely(pp_var == NULL) )
+        ret = VLC_ENOMEM;
+    else if( (p_oldvar = *pp_var) == p_var )
+        p_var = NULL;
+    else if( unlikely((i_type ^ p_oldvar->i_type) & VLC_VAR_CLASS) )
+    {    /* If the types differ, variable creation failed. */
+         msg_Err( p_this, "Variable '%s' (0x%04x) already exist "
+                  "but with a different type (0x%04x)",
+                  psz_name, p_oldvar->i_type, i_type );
+         ret = VLC_EBADVAR;
     }
-
-    i_new = Insert( p_priv->pp_vars, p_priv->i_vars, psz_name );
-
-    if( (p_priv->i_vars & 15) == 0 )
-        p_priv->pp_vars = xrealloc( p_priv->pp_vars,
-                                 (p_priv->i_vars+16) * sizeof(variable_t *) );
-
-    memmove( p_priv->pp_vars + i_new + 1,
-             p_priv->pp_vars + i_new,
-             (p_priv->i_vars - i_new) * sizeof(variable_t *) );
-
-    p_priv->i_vars++;
-
-    p_priv->pp_vars[i_new] = p_var;
+    else
+    {
+        p_oldvar->i_usage++;
+        p_oldvar->i_type |= i_type & (VLC_VAR_ISCOMMAND|VLC_VAR_HASCHOICE);
+    }
     vlc_mutex_unlock( &p_priv->var_lock );
 
-    return VLC_SUCCESS;
+    /* If we did not need to create a new variable, free everything... */
+    if( p_var != NULL )
+        Destroy( p_var );
+    return ret;
 }
 
 /**
@@ -342,7 +339,6 @@ int __var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
  */
 int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 {
-    int i_var;
     variable_t *p_var;
 
     assert( p_this );
@@ -351,45 +347,36 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_this, psz_name );
-    if( i_var < 0 )
+    p_var = Lookup( p_this, psz_name );
+    if( p_var == NULL )
     {
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_ENOVAR;
     }
 
-    p_var = p_priv->pp_vars[i_var];
     WaitUnused( p_this, p_var );
 
-    if( p_var->i_usage > 1 )
-    {
-        p_var->i_usage--;
-        vlc_mutex_unlock( &p_priv->var_lock );
-        return VLC_SUCCESS;
-    }
-
-    p_priv->i_vars--;
-    memmove( p_priv->pp_vars + i_var,
-             p_priv->pp_vars + i_var + 1,
-             (p_priv->i_vars - i_var) * sizeof(variable_t *) );
-
-    if( p_priv->i_vars == 0 )
-    {
-        free( p_priv->pp_vars );
-        p_priv->pp_vars = NULL;
-    }
+    if( --p_var->i_usage == 0 )
+        tdelete( p_var, &p_priv->var_root, varcmp );
     else
-    if( (p_priv->i_vars & 15) == 0 )
-    {
-        variable_t **pp_vars = realloc( p_priv->pp_vars,
-                                    (p_priv->i_vars) * sizeof(variable_t *) );
-        if( pp_vars != NULL )
-            p_priv->pp_vars = pp_vars;
-    }
+        p_var = NULL;
     vlc_mutex_unlock( &p_priv->var_lock );
 
-    Destroy( p_var );
+    if( p_var != NULL )
+        Destroy( p_var );
     return VLC_SUCCESS;
+}
+
+static void CleanupVar( void *var )
+{
+    Destroy( var );
+}
+
+void var_DestroyAll( vlc_object_t *obj )
+{
+    vlc_object_internals_t *priv = vlc_internals( obj );
+
+    tdestroy( priv->var_root, CleanupVar );
 }
 
 /**
@@ -404,7 +391,7 @@ int __var_Destroy( vlc_object_t *p_this, const char *psz_name )
 int __var_Change( vlc_object_t *p_this, const char *psz_name,
                   int i_action, vlc_value_t *p_val, vlc_value_t *p_val2 )
 {
-    int i_var, i;
+    int i;
     variable_t *p_var;
     vlc_value_t oldval;
     vlc_value_t newval;
@@ -415,15 +402,12 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_this, psz_name );
-
-    if( i_var < 0 )
+    p_var = Lookup( p_this, psz_name );
+    if( p_var == NULL )
     {
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_ENOVAR;
     }
-
-    p_var = p_priv->pp_vars[i_var];
 
     switch( i_action )
     {
@@ -645,7 +629,6 @@ int __var_Change( vlc_object_t *p_this, const char *psz_name,
 int __var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
                      vlc_value_t val )
 {
-    int i_var;
     int i_ret;
     variable_t *p_var;
     vlc_value_t oldval;
@@ -655,14 +638,13 @@ int __var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
     vlc_mutex_lock( &p_priv->var_lock );
-    i_var = Lookup( p_this, psz_name );
-    if( i_var < 0 )
+    p_var = Lookup( p_this, psz_name );
+    if( p_var == NULL )
     {
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_ENOVAR;
     }
 
-    p_var = p_priv->pp_vars[i_var];
     WaitUnused( p_this, p_var );
 
     /* Duplicated data if needed */
@@ -708,7 +690,8 @@ int __var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
  */
 int __var_Type( vlc_object_t *p_this, const char *psz_name )
 {
-    int i_var, i_type;
+    variable_t *p_var;
+    int i_type = 0;
 
     assert( p_this );
 
@@ -716,15 +699,9 @@ int __var_Type( vlc_object_t *p_this, const char *psz_name )
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_this, psz_name );
-
-    if( i_var < 0 )
-    {
-        vlc_mutex_unlock( &p_priv->var_lock );
-        return 0;
-    }
-
-    i_type = p_priv->pp_vars[i_var]->i_type;
+    p_var = Lookup( p_this, psz_name );
+    if( p_var != NULL )
+        i_type = p_var->i_type;
 
     vlc_mutex_unlock( &p_priv->var_lock );
 
@@ -734,7 +711,6 @@ int __var_Type( vlc_object_t *p_this, const char *psz_name )
 int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
                     int expected_type, vlc_value_t val )
 {
-    int i_var;
     int i_ret = VLC_SUCCESS;
     variable_t *p_var;
     vlc_value_t oldval;
@@ -745,14 +721,13 @@ int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_this, psz_name );
-    if( i_var < 0 )
+    p_var = Lookup( p_this, psz_name );
+    if( p_var == NULL )
     {
         vlc_mutex_unlock( &p_priv->var_lock );
-        return i_var;
+        return VLC_ENOVAR;
     }
 
-    p_var = p_priv->pp_vars[i_var];
     assert( expected_type == 0 ||
             (p_var->i_type & VLC_VAR_CLASS) == expected_type );
 
@@ -800,15 +775,14 @@ int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
     assert( p_this );
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
-    int i_var, err = VLC_SUCCESS;
+    variable_t *p_var;
+    int err = VLC_SUCCESS;
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_this, psz_name );
-    if( i_var >= 0 )
+    p_var = Lookup( p_this, psz_name );
+    if( p_var != NULL )
     {
-        variable_t *p_var = p_priv->pp_vars[i_var];
-
         assert( expected_type == 0 ||
                 (p_var->i_type & VLC_VAR_CLASS) == expected_type );
 
@@ -863,7 +837,6 @@ int __var_Get( vlc_object_t *p_this, const char *psz_name, vlc_value_t *p_val )
 int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
                        vlc_callback_t pf_callback, void *p_data )
 {
-    int i_var;
     variable_t *p_var;
     callback_entry_t entry;
 
@@ -876,8 +849,8 @@ int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_this, psz_name );
-    if( i_var < 0 )
+    p_var = Lookup( p_this, psz_name );
+    if( p_var == NULL )
     {
 #ifndef NDEBUG
         msg_Warn( p_this, "Failed to add a callback to the non-existing "
@@ -886,8 +859,6 @@ int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_ENOVAR;
     }
-
-    p_var = p_priv->pp_vars[i_var];
 
     WaitUnused( p_this, p_var );
     INSERT_ELEM( p_var->p_entries,
@@ -909,7 +880,7 @@ int __var_AddCallback( vlc_object_t *p_this, const char *psz_name,
 int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
                        vlc_callback_t pf_callback, void *p_data )
 {
-    int i_entry, i_var;
+    int i_entry;
     variable_t *p_var;
 #ifndef NDEBUG
     bool b_found_similar = false;
@@ -921,14 +892,13 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_this, psz_name );
-    if( i_var < 0 )
+    p_var = Lookup( p_this, psz_name );
+    if( p_var == NULL )
     {
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_ENOVAR;
     }
 
-    p_var = p_priv->pp_vars[i_var];
     WaitUnused( p_this, p_var );
 
     for( i_entry = p_var->i_entries ; i_entry-- ; )
@@ -971,7 +941,6 @@ int __var_DelCallback( vlc_object_t *p_this, const char *psz_name,
  */
 int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
 {
-    int i_var;
     int i_ret;
     variable_t *p_var;
 
@@ -981,14 +950,13 @@ int __var_TriggerCallback( vlc_object_t *p_this, const char *psz_name )
 
     vlc_mutex_lock( &p_priv->var_lock );
 
-    i_var = Lookup( p_this, psz_name );
-    if( i_var < 0 )
+    p_var = Lookup( p_this, psz_name );
+    if( p_var == NULL )
     {
         vlc_mutex_unlock( &p_priv->var_lock );
         return VLC_ENOVAR;
     }
 
-    p_var = p_priv->pp_vars[i_var];
     WaitUnused( p_this, p_var );
 
     /* Deal with callbacks. Tell we're in a callback, release the lock,
@@ -1159,114 +1127,6 @@ static void WaitUnused( vlc_object_t *p_this, variable_t *p_var )
     while( p_var->b_incallback )
         vlc_cond_wait( &p_priv->var_wait, &p_priv->var_lock );
     vlc_cleanup_pop( );
-}
-
-/*****************************************************************************
- * HashString: our cool hash function
- *****************************************************************************
- * This function is not intended to be crypto-secure, we only want it to be
- * fast and not suck too much. This one is pretty fast and did 0 collisions
- * in wenglish's dictionary.
- *****************************************************************************/
-static uint32_t HashString( const char *psz_string )
-{
-    uint32_t i_hash = 0;
-
-    while( *psz_string )
-    {
-        i_hash += *psz_string++;
-        i_hash += i_hash << 10;
-        i_hash ^= i_hash >> 8;
-    }
-
-    return i_hash;
-}
-
-/*****************************************************************************
- * Insert: find the slot where to insert a variable
- *****************************************************************************/
-static size_t Insert( variable_t **pp_vars, size_t n, const char *psz_name )
-{
-    size_t offset = 0;
-    uint32_t hash = HashString( psz_name );
-
-    if( n == 0 )
-        return 0;
-
-    while( n > 1 )
-    {
-        size_t middle = n / 2;
-
-        if( hash < pp_vars[middle]->i_hash )
-        {
-            n = middle;
-        }
-        else
-        {
-            pp_vars += middle;
-            offset += middle;
-            n -= middle;
-        }
-    }
-
-    if( hash >= pp_vars[0]->i_hash )
-        offset++;
-    return offset;
-}
-
-static int u32cmp( const void *key, const void *data )
-{
-    const variable_t *const *pp_var = data;
-    uint32_t hash = *(const uint32_t *)key ;
-
-    if( hash > (*pp_var)->i_hash )
-        return 1;
-    if( hash < (*pp_var)->i_hash )
-        return -1;
-    return 0;
-}
-
-/*****************************************************************************
- * Lookup: find an existing variable given its name
- *****************************************************************************
- * We use a recursive inner function indexed on the hash. Care is taken of
- * possible hash collisions.
- *****************************************************************************/
-static int Lookup( vlc_object_t *obj, const char *psz_name )
-{
-    vlc_object_internals_t *priv = vlc_internals( obj );
-    variable_t *const *pp_vars = priv->pp_vars;
-    size_t i_vars = priv->i_vars;
-    variable_t *const *pp_var;
-    uint32_t i_hash = HashString( psz_name );
-
-    pp_var = bsearch( &i_hash, pp_vars, i_vars, sizeof( *pp_var ), u32cmp );
-
-    /* Hash not found */
-    if( pp_var == NULL )
-        return -1;
-
-    assert( i_vars > 0 );
-
-    /* Find the first entry with the right hash */
-    while( (pp_var > pp_vars) && (i_hash == pp_var[-1]->i_hash) )
-        pp_var--;
-
-    assert( (*pp_var)->i_hash == i_hash );
-
-    /* Hash collision should be very unlikely, but we cannot guarantee
-     * it will never happen. So we do an exhaustive search amongst all
-     * entries with the same hash. Typically, there is only one anyway. */
-    for( variable_t *const *p_end = pp_vars + i_vars;
-         (pp_var < p_end) && (i_hash == (*pp_var)->i_hash);
-         pp_var++ )
-    {
-        if( !strcmp( psz_name, (*pp_var)->psz_name ) )
-            return pp_var - pp_vars;
-    }
-
-    /* Hash found, but entry not found */
-    return -1;
 }
 
 /*****************************************************************************

@@ -54,6 +54,7 @@
 # include <errno.h> /* ENOSYS */
 #endif
 
+#include <search.h>
 #include <limits.h>
 #include <assert.h>
 
@@ -131,7 +132,7 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
         p_new->i_flags = p_this->i_flags
             & (OBJECT_FLAGS_NODBG|OBJECT_FLAGS_QUIET|OBJECT_FLAGS_NOINTERACT);
 
-    p_priv->pp_vars = NULL;
+    p_priv->var_root = NULL;
 
     if( p_this == NULL )
     {
@@ -281,12 +282,8 @@ static void vlc_object_destroy( vlc_object_t *p_this )
     /* Any thread must have been cleaned up at this point. */
     assert( !p_priv->b_thread );
 
-    /* Destroy the associated variables, starting from the end so that
-     * no memmove calls have to be done. */
-    while( p_priv->i_vars )
-    {
-        var_Destroy( p_this, p_priv->pp_vars[p_priv->i_vars - 1]->psz_name );
-    }
+    /* Destroy the associated variables. */
+    var_DestroyAll( p_this );
 
     vlc_cond_destroy( &p_priv->var_wait );
     vlc_mutex_destroy( &p_priv->var_lock );
@@ -766,6 +763,77 @@ vlc_list_t *__vlc_list_children( vlc_object_t *obj )
     return l;
 }
 
+static void DumpVariable (const void *data, const VISIT which, const int depth)
+{
+    if (which != postorder && which != leaf)
+        return;
+    (void) depth;
+
+    const variable_t *p_var = *(const variable_t **)data;
+    const char *psz_type = "unknown";
+
+    switch( p_var->i_type & VLC_VAR_TYPE )
+    {
+#define MYCASE( type, nice )    \
+        case VLC_VAR_ ## type:  \
+            psz_type = nice;    \
+            break;
+        MYCASE( VOID, "void" );
+        MYCASE( BOOL, "bool" );
+        MYCASE( INTEGER, "integer" );
+        MYCASE( HOTKEY, "hotkey" );
+        MYCASE( STRING, "string" );
+        MYCASE( MODULE, "module" );
+        MYCASE( FILE, "file" );
+        MYCASE( DIRECTORY, "directory" );
+        MYCASE( VARIABLE, "variable" );
+        MYCASE( FLOAT, "float" );
+        MYCASE( TIME, "time" );
+        MYCASE( ADDRESS, "address" );
+        MYCASE( MUTEX, "mutex" );
+        MYCASE( LIST, "list" );
+#undef MYCASE
+    }
+    printf( " *-o \"%s\" (%s", p_var->psz_name, psz_type );
+    if( p_var->psz_text )
+        printf( ", %s", p_var->psz_text );
+    printf( ")" );
+    if( p_var->i_type & VLC_VAR_HASCHOICE )
+        printf( ", has choices" );
+    if( p_var->i_type & VLC_VAR_ISCOMMAND )
+        printf( ", command" );
+    if( p_var->i_entries )
+        printf( ", %d callbacks", p_var->i_entries );
+    switch( p_var->i_type & VLC_VAR_CLASS )
+    {
+        case VLC_VAR_VOID:
+        case VLC_VAR_MUTEX:
+            break;
+        case VLC_VAR_BOOL:
+            printf( ": %s", p_var->val.b_bool ? "true" : "false" );
+            break;
+        case VLC_VAR_INTEGER:
+            printf( ": %d", p_var->val.i_int );
+            break;
+        case VLC_VAR_STRING:
+            printf( ": \"%s\"", p_var->val.psz_string );
+            break;
+        case VLC_VAR_FLOAT:
+            printf( ": %f", p_var->val.f_float );
+            break;
+        case VLC_VAR_TIME:
+            printf( ": %"PRIi64, (int64_t)p_var->val.i_time );
+            break;
+        case VLC_VAR_ADDRESS:
+            printf( ": %p", p_var->val.p_address );
+            break;
+        case VLC_VAR_LIST:
+            printf( ": TODO" );
+            break;
+    }
+    printf( "\n" );
+}
+
 /*****************************************************************************
  * DumpCommand: print the current vlc structure
  *****************************************************************************
@@ -803,84 +871,15 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
     }
     else if( *psz_cmd == 'v' )
     {
-        int i;
-
         if( !p_object )
             p_object = p_this->p_libvlc ? VLC_OBJECT(p_this->p_libvlc) : p_this;
 
         PrintObject( p_object, "" );
-
         vlc_mutex_lock( &vlc_internals( p_object )->var_lock );
-        if( !vlc_internals( p_object )->i_vars )
+        if( vlc_internals( p_object )->var_root == NULL )
             printf( " `-o No variables\n" );
-        for( i = 0; i < vlc_internals( p_object )->i_vars; i++ )
-        {
-            const variable_t *p_var = vlc_internals( p_object )->pp_vars[i];
-            const char *psz_type = "unknown";
-
-            switch( p_var->i_type & VLC_VAR_TYPE )
-            {
-#define MYCASE( type, nice )                \
-                case VLC_VAR_ ## type:  \
-                    psz_type = nice;    \
-                    break;
-                MYCASE( VOID, "void" );
-                MYCASE( BOOL, "bool" );
-                MYCASE( INTEGER, "integer" );
-                MYCASE( HOTKEY, "hotkey" );
-                MYCASE( STRING, "string" );
-                MYCASE( MODULE, "module" );
-                MYCASE( FILE, "file" );
-                MYCASE( DIRECTORY, "directory" );
-                MYCASE( VARIABLE, "variable" );
-                MYCASE( FLOAT, "float" );
-                MYCASE( TIME, "time" );
-                MYCASE( ADDRESS, "address" );
-                MYCASE( MUTEX, "mutex" );
-                MYCASE( LIST, "list" );
-#undef MYCASE
-            }
-            printf( " %c-o \"%s\" (%s",
-                    i + 1 == vlc_internals( p_object )->i_vars ? '`' : '|',
-                    p_var->psz_name, psz_type );
-            if( p_var->psz_text )
-                printf( ", %s", p_var->psz_text );
-            printf( ")" );
-            if( p_var->i_type & VLC_VAR_HASCHOICE )
-                printf( ", has choices" );
-            if( p_var->i_type & VLC_VAR_ISCOMMAND )
-                printf( ", command" );
-            if( p_var->i_entries )
-                printf( ", %d callbacks", p_var->i_entries );
-            switch( p_var->i_type & VLC_VAR_CLASS )
-            {
-                case VLC_VAR_VOID:
-                case VLC_VAR_MUTEX:
-                    break;
-                case VLC_VAR_BOOL:
-                    printf( ": %s", p_var->val.b_bool ? "true" : "false" );
-                    break;
-                case VLC_VAR_INTEGER:
-                    printf( ": %d", p_var->val.i_int );
-                    break;
-                case VLC_VAR_STRING:
-                    printf( ": \"%s\"", p_var->val.psz_string );
-                    break;
-                case VLC_VAR_FLOAT:
-                    printf( ": %f", p_var->val.f_float );
-                    break;
-                case VLC_VAR_TIME:
-                    printf( ": %"PRIi64, (int64_t)p_var->val.i_time );
-                    break;
-                case VLC_VAR_ADDRESS:
-                    printf( ": %p", p_var->val.p_address );
-                    break;
-                case VLC_VAR_LIST:
-                    printf( ": TODO" );
-                    break;
-            }
-            printf( "\n" );
-        }
+        else
+            twalk( vlc_internals( p_object )->var_root, DumpVariable );
         vlc_mutex_unlock( &vlc_internals( p_object )->var_lock );
     }
     libvlc_unlock (p_this->p_libvlc);

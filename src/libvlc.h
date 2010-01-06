@@ -162,10 +162,9 @@ typedef struct vlc_object_internals_t
     char           *psz_name; /* given name */
 
     /* Object variables */
-    variable_t    **pp_vars;
+    void           *var_root;
     vlc_mutex_t     var_lock;
     vlc_cond_t      var_wait;
-    int             i_vars;
 
     /* Thread properties, if any */
     vlc_thread_t    thread_id;
