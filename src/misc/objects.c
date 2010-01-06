@@ -797,11 +797,11 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
     printf( " *-o \"%s\" (%s", p_var->psz_name, psz_type );
     if( p_var->psz_text )
         printf( ", %s", p_var->psz_text );
-    printf( ")" );
+    fputc( ')', stdout );
     if( p_var->i_type & VLC_VAR_HASCHOICE )
-        printf( ", has choices" );
+        fputs( ", has choices", stdout );
     if( p_var->i_type & VLC_VAR_ISCOMMAND )
-        printf( ", command" );
+        fputs( ", command", stdout );
     if( p_var->i_entries )
         printf( ", %d callbacks", p_var->i_entries );
     switch( p_var->i_type & VLC_VAR_CLASS )
@@ -828,10 +828,10 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
             printf( ": %p", p_var->val.p_address );
             break;
         case VLC_VAR_LIST:
-            printf( ": TODO" );
+            fputs( ": TODO", stdout );
             break;
     }
-    printf( "\n" );
+    fputc( '\n', stdout );
 }
 
 /*****************************************************************************
@@ -877,7 +877,7 @@ static int DumpCommand( vlc_object_t *p_this, char const *psz_cmd,
         PrintObject( p_object, "" );
         vlc_mutex_lock( &vlc_internals( p_object )->var_lock );
         if( vlc_internals( p_object )->var_root == NULL )
-            printf( " `-o No variables\n" );
+            puts( " `-o No variables" );
         else
             twalk( vlc_internals( p_object )->var_root, DumpVariable );
         vlc_mutex_unlock( &vlc_internals( p_object )->var_lock );
