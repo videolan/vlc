@@ -99,10 +99,6 @@ protected:
 
     qint64 currentTimeInternal() const;
 
-private slots:
-
-    void loadMediaInternal();
-
 private:
 
     /**

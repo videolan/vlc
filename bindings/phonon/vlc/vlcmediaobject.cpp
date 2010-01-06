@@ -32,10 +32,6 @@ namespace Phonon
 {
 namespace VLC {
 
-// VLC returns a strange position
-// We have to multiply by VLC_POSITION_RESOLUTION
-static const int vlcPositionResolution = 1000;
-
 VLCMediaObject::VLCMediaObject(QObject * parent)
         : MediaObject(parent), VLCMediaController()
 {
@@ -96,10 +92,6 @@ void VLCMediaObject::loadMediaInternal(const QString & filename)
 
     b_play_request_reached = false;
 
-    // Optimization: wait to see if play() is run just after loadMedia()
-    //               100 milliseconds should be fine
-    QTimer::singleShot(100, this, SLOT(loadMediaInternal()));
-
     // Get meta data (artist, title, etc...)
     updateMetaData();
 
@@ -109,10 +101,10 @@ void VLCMediaObject::loadMediaInternal(const QString & filename)
     // so let's send our own events...
     // This will reset the GUI
     clearMediaController();
-}
 
-void VLCMediaObject::loadMediaInternal()
-{
+    // We need to do this, otherwise we never get any events with the real length
+    libvlc_media_get_duration(p_vlc_media, vlc_exception);
+
     if (b_play_request_reached) {
         // The media is playing, no need to load it
         return;
@@ -198,7 +190,7 @@ void VLCMediaObject::connectToAllVLCEvents()
         libvlc_MediaPlayerTimeChanged,
         libvlc_MediaPlayerTitleChanged,
         libvlc_MediaPlayerPositionChanged,
-        libvlc_MediaPlayerSeekableChanged,
+        //libvlc_MediaPlayerSeekableChanged, //FIXME: doesn't work anymore? it asserts
         libvlc_MediaPlayerPausableChanged,
     };
     int i_nbEvents = sizeof(eventsMediaPlayer) / sizeof(*eventsMediaPlayer);
@@ -362,7 +354,6 @@ void VLCMediaObject::libvlc_callback(const libvlc_event_t *p_event, void *p_user
         // Get duration of media descriptor object item
         libvlc_time_t totalTime = libvlc_media_get_duration(p_vlc_mediaObject->p_vlc_media, vlc_exception);
         vlcExceptionRaised();
-        totalTime = totalTime / vlcPositionResolution;
 
         if (totalTime != p_vlc_mediaObject->i_total_time) {
             p_vlc_mediaObject->i_total_time = totalTime;
