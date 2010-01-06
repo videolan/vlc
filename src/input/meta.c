@@ -146,12 +146,12 @@ char** vlc_meta_CopyExtraNames( const vlc_meta_t *m )
 /**
  * vlc_meta status (see vlc_meta_status_e)
  */
-vlc_meta_status_e vlc_meta_GetStatus( vlc_meta_t *m )
+int vlc_meta_GetStatus( vlc_meta_t *m )
 {
     return m->i_status;
 }
 
-void vlc_meta_SetStatus( vlc_meta_t *m, vlc_meta_status_e status )
+void vlc_meta_SetStatus( vlc_meta_t *m, int status )
 {
     m->i_status = status;
 }
