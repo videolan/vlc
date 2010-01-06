@@ -1234,7 +1234,7 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
     {
         input_Control( p_input, INPUT_ADD_INFO, psz_cat,
                        vlc_gettext(ppsz_all_keys[i]),
-                       vlc_meta_GetExtra( &p_meta, ppsz_all_keys[i] ) );
+                       vlc_meta_GetExtra( p_meta, ppsz_all_keys[i] ) );
         free( ppsz_all_keys[i] );
     }
     free( ppsz_all_keys );
