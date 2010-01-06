@@ -77,16 +77,6 @@ function host()
     local fds_write = vlc.net.fd_set_new()
 
     -- private methods
-    --[[local function client_accept( clients, listen )
-        local wait
-        if #clients == 0 then
-            wait = -1
-        else
-            wait = 0
-        end
-        return listen:accept( wait )
-    end]]
-
     local function fd_client( client )
         if client.status == status.read then
             return client.rfd
