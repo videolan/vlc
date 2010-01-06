@@ -279,7 +279,7 @@ case "${host_os}" in
         LD="${LD} -syslibroot ${with_macosx_sdk}"
     fi
     AC_ARG_WITH(macosx-version-min,
-       [  --with-macosx-version-min=VERSION  compile for MacOSX VERSION and above])
+       [  --with-macosx-version-min=VERSION compile for MacOSX VERSION and above])
     if test "${with_macosx_version_min}" != "" ; then
         CPP="${CPP} -mmacosx-version-min=${with_macosx_version_min}"
         CC="${CC} -mmacosx-version-min=${with_macosx_version_min}"
@@ -1396,8 +1396,8 @@ dnl  Check for fully workin SSE2 intrinsics
 dnl  We need support for -mmmx, we need <emmintrin.h>, and we also need a
 dnl  working compiler (http://gcc.gnu.org/bugzilla/show_bug.cgi?id=23963)
 AC_ARG_ENABLE(sse,
-[  --disable-sse           disable SSE (1, 2, 3 and 4) optimizations (default auto)]
-,, [
+[  --disable-sse           disable SSE (1, 2, 3 and 4) optimizations (default auto)],
+, [
   case "${host_cpu}" in
     i686|x86_64)
       enable_sse=yes
@@ -1519,7 +1519,7 @@ AS_IF([test "${ac_cv_3dnow_inline}" != "no"], [
 
 
 AC_ARG_ENABLE(neon,
-[ --disable-neon           disable NEON optimizations (default auto)],, [
+[  --disable-neon          disable NEON optimizations (default auto)],, [
   AS_IF([test "${host_cpu}" = "arm"], [enable_neon="yes"] ,[enable_neon="no"])
 ])
 AS_IF([test "${enable_neon}" != "no"], [
@@ -1908,7 +1908,7 @@ AC_ARG_ENABLE(live555,
 [  --enable-live555        live555 RTSP input plugin (default enabled)])
 if test "${enable_live555}" != "no"; then
   AC_ARG_WITH(live555-tree,
-    [    --with-live555-tree=PATH live.com tree for static linking])
+    [  --with-live555-tree=PATH live.com tree for static linking])
 
   dnl
   dnl test for --with-live555-tree
@@ -2042,9 +2042,9 @@ AC_ARG_ENABLE(dvdread,
 if test "${enable_dvdread}" != "no"
 then
   AC_ARG_WITH(dvdread,
-  [    --with-dvdread=PATH   libdvdread headers and libraries])
+  [  --with-dvdread=PATH     libdvdread headers and libraries])
   AC_ARG_WITH(dvdread-tree,
-  [    --with-dvdread-tree=PATH libdvdread tree for static linking])
+  [  --with-dvdread-tree=PATH libdvdread tree for static linking])
 
   dnl Temporary hack (yeah, sure ;)
   if test "${SYS}" = "mingw32" || test "${SYS}" = "darwin" || test "${SYS}" = "beos" ; then
@@ -2122,7 +2122,7 @@ then
 
   DVDNAV_PATH="${PATH}"
   AC_ARG_WITH(dvdnav-config-path,
-    [    --with-dvdnav-config-path=PATH dvdnav-config path (default search in \$PATH)],
+    [  --with-dvdnav-config-path=PATH dvdnav-config path (default search in \$PATH)],
     [ if test "${with_dvdnav_config_path}" != "no"
       then
         DVDNAV_PATH="${with_dvdnav_config_path}:${PATH}"
@@ -2180,7 +2180,7 @@ AC_ARG_ENABLE(opencv,
 if test "${enable_opencv}" = "yes" -a "${CXX}" != "";
 then
   AC_ARG_WITH(opencv-tree,
-  [    --with-opencv-tree=PATH opencv tree for linking])
+  [  --with-opencv-tree=PATH opencv tree for linking])
     if test "${SYS}" = "mingw32"
     then
       test -z "${with_opencv_tree}" && AC_MSG_ERROR([You have to specify --with-opencv-tree])
@@ -2253,9 +2253,9 @@ have_dvbpsi=no
 if test "${enable_dvbpsi}" != "no"
 then
   AC_ARG_WITH(dvbpsi,
-  [    --with-dvbpsi=PATH    libdvbpsi headers and libraries])
+  [  --with-dvbpsi=PATH      libdvbpsi headers and libraries])
   AC_ARG_WITH(dvbpsi,
-  [    --with-dvbpsi-tree=PATH libdvbpsi tree for static linking])
+  [  --with-dvbpsi-tree=PATH libdvbpsi tree for static linking])
   case "${with_dvbpsi}" in
   ""|yes)
     if test -z "${with_dvbpsi_tree}"
@@ -2358,7 +2358,7 @@ AC_ARG_ENABLE(v4l,
 if test "${enable_v4l}" = "yes"
 then
   AC_ARG_WITH(v4l,
-    [    --with-v4l=PATH       path to a v4l-enabled kernel tree],[],[])
+    [  --with-v4l=PATH         path to a v4l-enabled kernel tree],[],[])
   if test "${with_v4l}" != "no" -a -n "${with_v4l}"
   then
     VLC_ADD_CPPFLAGS([v4l],[-I${with_v4l}/include])
@@ -2394,7 +2394,7 @@ AC_ARG_ENABLE(v4l2,
 if test "${enable_v4l2}" != "no"
 then
   AC_ARG_WITH(v4l2,
-    [    --with-v4l2=PATH      path to a v4l2-enabled kernel tree],[],[])
+    [  --with-v4l2=PATH        path to a v4l2-enabled kernel tree],[],[])
   if test "${with_v4l2}" != "no" -a -n "${with_v4l2}"
   then
     VLC_ADD_CPPFLAGS([v4l2],[-I${with_v4l2}/include])
@@ -2601,7 +2601,7 @@ if test "${enable_dvb}" != "no"
 then
     AS_IF([test "${have_dvbpsi}" = "yes" ],[
     AC_ARG_WITH(dvb,
-     [    --with-dvb=PATH       path to a dvb- and v4l2-enabled kernel tree],[],[])
+     [  --with-dvb=PATH         path to a dvb- and v4l2-enabled kernel tree],[],[])
      if test "${with_dvb}" != "no" -a -n "${with_dvb}"
      then
        VLC_ADD_CFLAGS([dvb],[-I${with_dvb}/include])
@@ -2732,7 +2732,7 @@ AC_ARG_ENABLE(mod,
 if test "${enable_mod}" != "no"
 then
   AC_ARG_WITH(mod-tree,
-  [    --with-mod-tree=PATH  mod tree for static linking])
+  [  --with-mod-tree=PATH    mod tree for static linking])
   if test -n "${with_mod_tree}"
   then
     AC_MSG_CHECKING(for libmodplug.a in ${with_mod_tree})
@@ -2787,7 +2787,7 @@ if test "${enable_gme}" != "no" -a "${CXX}" != "";
 then
   AC_LANG_PUSH(C++)
   AC_ARG_WITH(gme-tree,
-  [    --with-gme-tree=PATH  gme tree for static linking])
+  [  --with-gme-tree=PATH    gme tree for static linking])
   if test -n "${with_gme_tree}"
   then
     AC_MSG_CHECKING(for libgme.a in ${with_mod_tree})
@@ -2850,7 +2850,7 @@ AC_ARG_ENABLE(mad,
 if test "${enable_mad}" != "no"
 then
   AC_ARG_WITH(mad,
-    [    --with-mad=PATH       path to libmad],[],[])
+    [  --with-mad=PATH         path to libmad],[],[])
   if test "${with_mad}" != "no" -a -n "${with_mad}"
   then
     VLC_ADD_CPPFLAGS([mpgatofixed32],[-I${with_mad}/include])
@@ -2858,7 +2858,7 @@ then
   fi
 
   AC_ARG_WITH(mad-tree,
-    [    --with-mad-tree=PATH  mad tree for static linking],[],[])
+    [  --with-mad-tree=PATH    mad tree for static linking],[],[])
   if test "${with_mad_tree}" != "no" -a -n "${with_mad_tree}"
   then
     real_mad_tree="`cd ${with_mad_tree} 2>/dev/null && pwd`"
@@ -3073,7 +3073,7 @@ AC_ARG_ENABLE(faad,
 if test "${enable_faad}" = "yes"
 then
   AC_ARG_WITH(faad-tree,
-  [    --with-faad-tree=PATH faad tree for static linking])
+  [  --with-faad-tree=PATH   faad tree for static linking])
   if test -n "${with_faad_tree}"
   then
     AC_MSG_CHECKING(for libfaad.a in ${with_faad_tree})
@@ -3182,9 +3182,9 @@ AC_ARG_ENABLE(a52,
 if test "${enable_a52}" != "no"
 then
   AC_ARG_WITH(a52,
-    [    --with-a52=PATH       a52 headers and libraries])
+    [  --with-a52=PATH         a52 headers and libraries])
   AC_ARG_WITH(a52-tree,
-    [    --with-a52-tree=PATH  a52dec tree for static linking ],[],[])
+    [  --with-a52-tree=PATH    a52dec tree for static linking ],[],[])
   if test "${with_a52_tree}" != "no" -a -n "${with_a52_tree}"
   then
     real_a52_tree="`cd ${with_a52_tree} 2>/dev/null && pwd`"
@@ -3247,7 +3247,7 @@ then
 fi
 
 AC_ARG_WITH(a52-fixed,
-      [    --with-a52-fixed      specify if liba52 has been compiled with fixed point support],
+      [  --with-a52-fixed        specify if liba52 has been compiled with fixed point support],
       [
         VLC_ADD_CPPFLAGS([a52tofloat32],[-DLIBA52_FIXED]) ])
 
@@ -3300,7 +3300,7 @@ AC_ARG_ENABLE(tarkin,
 if test "${enable_tarkin}" = "yes"
 then
   AC_ARG_WITH(tarkin-tree,
-  [    --with-tarkin-tree=PATH tarkin tree for static linking])
+  [  --with-tarkin-tree=PATH tarkin tree for static linking])
   if test -n "${with_tarkin_tree}"
   then
     AC_MSG_CHECKING(for tarkin.o in ${with_tarkin_tree})
@@ -3361,7 +3361,7 @@ AC_ARG_ENABLE(x264,
   [  --enable-x264           H264 encoding support with libx264 (default enabled)])
 if test "${enable_x264}" != "no"; then
   AC_ARG_WITH(x264-tree,
-    [    --with-x264-tree=PATH x264 tree for static linking ],[],[])
+    [  --with-x264-tree=PATH   x264 tree for static linking ],[],[])
   if test "${with_x264_tree}" != "no" -a -n "${with_x264_tree}"
   then
     real_x264_tree="`cd ${with_x264_tree} 2>/dev/null && pwd`"
@@ -3674,7 +3674,7 @@ if test "${enable_sdl}" != "no"
 then
   SDL_PATH="${PATH}"
   AC_ARG_WITH(sdl-config-path,
-    [    --with-sdl-config-path=PATH sdl-config path (default search in \$PATH)],
+    [  --with-sdl-config-path=PATH sdl-config path (default search in \$PATH)],
     [ if test "${with_sdl_config_path}" != "no"
       then
         SDL_PATH="${with_sdl_config_path}:${PATH}"
@@ -3918,7 +3918,7 @@ dnl
 AC_ARG_ENABLE(directfb,
   [  --enable-directfb       DirectFB support (default disabled)])
 AC_ARG_WITH(directfb,
-  [    --with-directfb=PATH  path to DirectFB headers and libraries])
+  [  --with-directfb=PATH    path to DirectFB headers and libraries])
 
 if test "${enable_directfb}" = "yes"; then
     have_directfb="false"
@@ -3991,7 +3991,7 @@ then
     VLC_ADD_PLUGIN([ggi])
     VLC_ADD_LIBS([ggi],[-lggi])
     AC_ARG_WITH(ggi,
-      [    --with-ggi=PATH       path to libggi],
+      [  --with-ggi=PATH         path to libggi],
       [ if test "${with_ggi}" != "no" -a -n "${with_ggi}"
         then
           VLC_ADD_CPPFLAGS([ggi],[-I${with_ggi}/include])
@@ -4121,7 +4121,7 @@ AC_ARG_ENABLE(cyberlink,
   [  --enable-cyberlink      CyberLink for C++ UPnP stack (default disabled)])
   AS_IF([test "${enable_cyberlink}" = "yes" ], [
   AC_ARG_WITH(cyberlink-tree,
-    [    --with-cyberlink-tree=PATH CyberLink for C++ tree for static linking])
+    [  --with-cyberlink-tree=PATH CyberLink for C++ tree for static linking])
 
   dnl
   dnl test for --with-cyberlink-tree
@@ -4353,7 +4353,7 @@ then
 fi
 
 AC_ARG_ENABLE(macosx-dialog-provider,
-  [  --enable-macosx-dialog-provider   Mac OS X dialog module (default enabled on Mac OS X)])
+  [  --enable-macosx-dialog-provider Mac OS X dialog module (default enabled on Mac OS X)])
 if test "x${enable_macosx_dialog_provider}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_dialog_provider}" = "yes")
 then
@@ -4362,7 +4362,7 @@ then
 fi
 
 AC_ARG_ENABLE(macosx-qtcapture,
-  [  --enable-macosx-qtcapture   Mac OS X qtcapture (iSight) module (default enabled on Mac OS X)])
+  [  --enable-macosx-qtcapture Mac OS X qtcapture (iSight) module (default enabled on Mac OS X)])
 if test "x${enable_macosx_qtcapture}" != "xno" &&
   (test "${SYS}" = "darwin" || test "${enable_macosx_qtcapture}" = "yes")
 then
@@ -4384,7 +4384,7 @@ then
 fi
 
 AC_ARG_ENABLE(macosx-vlc-app,
-  [  --enable-macosx-vlc-app            build the VLC media player (default enabled on Mac OS X)])
+  [  --enable-macosx-vlc-app build the VLC media player (default enabled on Mac OS X)])
 AM_CONDITIONAL(BUILD_MACOSX_VLC_APP, [test "${enable_macosx_vlc_app}" != "no" &&
     (test "${SYS}" = "darwin" || test "${enable_macosx_vlc_app}" = "yes") ])
 
@@ -4733,7 +4733,7 @@ AC_ARG_ENABLE(activex,
   AS_HELP_STRING([--enable-activex],[build a vlc-based ActiveX control
 		  (default enabled on Win32)]))
 AC_ARG_WITH(wine-sdk-path,
-  [    --with-wine-sdk-path=PATH path to wine sdk])
+  [  --with-wine-sdk-path=PATH path to wine sdk])
 if test "${enable_activex}" != "no"
 then
   if test "${SYS}" = "mingw32"
@@ -4784,9 +4784,9 @@ AC_ARG_ENABLE(mozilla,
   AS_HELP_STRING([--enable-mozilla],[build a vlc-based Firefox/Mozilla plugin
 		  (default disabled)]))
 AC_ARG_WITH(mozilla-sdk-path,
-  [    --with-mozilla-sdk-path=PATH path to mozilla sdk])
+  [  --with-mozilla-sdk-path=PATH path to mozilla sdk])
 AC_ARG_WITH(mozilla-pkg,
-  [    --with-mozilla-pkg=PKG  look for PKG.pc to build the mozilla plugin.])
+  [  --with-mozilla-pkg=PKG  look for PKG.pc to build the mozilla plugin.])
 AC_LANG_PUSH(C++)
 if test "${enable_mozilla}" = "yes"
 then
