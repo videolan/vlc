@@ -53,12 +53,11 @@ typedef enum vlc_meta_type_t
 
 #define VLC_META_TYPE_COUNT 17
 
-typedef enum vlc_meta_status_e {
-    ITEM_PREPARSED      = 1,
-    ITEM_ARTURL_FETCHED = 2,
-    ITEM_ART_FETCHED    = 4,
-    ITEM_ART_NOTFOUND   = 8
-} vlc_meta_status_e;
+typedef int vlc_meta_status_e;
+#deinf ITEM_PREPARSED       1
+#deinf ITEM_ARTURL_FETCHED  2
+#deinf ITEM_PREPARSED       4
+#deinf ITEM_PREPARSED       8
 
 /**
  * Basic function to deal with meta
