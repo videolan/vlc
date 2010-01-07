@@ -88,8 +88,8 @@ private:
     bool                b_is_muted;
 
 protected slots:
-    void updateVolume( int );
-    void updateVolume( void );
+    void userUpdateVolume( int );
+    void libUpdateVolume( void );
     void updateMuteStatus( void );
     void refreshLabels( void );
     void showVolumeMenu( QPoint pos );

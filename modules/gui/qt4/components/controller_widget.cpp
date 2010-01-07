@@ -115,12 +115,12 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
                               VOLUME_MAX / (AOUT_VOLUME_MAX/2) ) );
 
     /* Force the update at build time in order to have a muted icon if needed */
-    updateVolume( volumeSlider->value() );
+    userUpdateVolume( volumeSlider->value() );
 
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, refreshLabels( void ) );
-    CONNECT( volumeSlider, sliderMoved( int ), this, updateVolume( int ) );
-    CONNECT( THEMIM, volumeChanged( void ), this, updateVolume( void ) );
+    CONNECT( volumeSlider, sliderMoved( int ), this, userUpdateVolume( int ) );
+    CONNECT( THEMIM, volumeChanged( void ), this, libUpdateVolume( void ) );
     CONNECT( THEMIM, soundMuteChanged( void ), this, updateMuteStatus( void ) );
 }
 
@@ -150,7 +150,7 @@ void SoundWidget::refreshLabels()
 }
 
 /* volumeSlider changed value event slot */
-void SoundWidget::updateVolume( int i_sliderVolume )
+void SoundWidget::userUpdateVolume( int i_sliderVolume )
 {
     /* Only if volume is set by user action on slider */
     setMuted( false );
@@ -161,7 +161,7 @@ void SoundWidget::updateVolume( int i_sliderVolume )
 }
 
 /* libvlc changed value event slot */
-void SoundWidget::updateVolume()
+void SoundWidget::libUpdateVolume()
 {
     /* Audio part */
     audio_volume_t i_volume;
