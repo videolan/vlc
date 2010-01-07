@@ -111,11 +111,9 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
         layout->addWidget( volumeSlider, 0, Qt::AlignBottom  );
 
     /* Set the volume from the config */
-    volumeSlider->setValue( qRound( ( (qreal)config_GetInt( p_intf, "volume" ) ) *
-                              VOLUME_MAX / (AOUT_VOLUME_MAX/2) ) );
-
+    libUpdateVolume();
     /* Force the update at build time in order to have a muted icon if needed */
-    userUpdateVolume( volumeSlider->value() );
+    updateMuteStatus();
 
     /* Volume control connection */
     CONNECT( volumeSlider, valueChanged( int ), this, refreshLabels( void ) );
