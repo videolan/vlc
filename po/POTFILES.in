@@ -408,7 +408,6 @@ modules/codec/subtitles/subsdec.h
 modules/codec/subtitles/subsusf.c
 modules/codec/subtitles/t140.c
 modules/codec/svcdsub.c
-modules/codec/tarkin.c
 modules/codec/telx.c
 modules/codec/theora.c
 modules/codec/twolame.c

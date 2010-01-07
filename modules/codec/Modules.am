@@ -5,7 +5,6 @@ SOURCES_flac = flac.c
 SOURCES_lpcm = lpcm.c
 SOURCES_araw = araw.c
 SOURCES_vorbis = vorbis.c
-SOURCES_tarkin = tarkin.c
 SOURCES_theora = theora.c
 SOURCES_tremor = vorbis.c
 SOURCES_speex = speex.c

@@ -104,7 +104,7 @@ Removed modules:
  * XvMC accelerated modules. Use VAAPI instead.
  * opengllayer
  * cddax. Use cdda instead
- * cmml.
+ * cmml and tarkin codecs are removed because they are dead codecs.
 
 Changes between 1.0.4 and 1.0.5 (not yet released):
 ---------------------------------------------------

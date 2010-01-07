@@ -325,7 +325,6 @@ $Id$
  * swscale_omap: Video scaling filter for maemo/omap platform
  * t140: T.140 text encoder
  * taglib: Taglib tags parser and writer
- * tarkin: a tarkin video decoder using libtarkin
  * telepathy: Telepathy Presence information using MissionControl notification
  * telnet: Telnet control interface for VideoLAN Media Manager
  * telx: teletext subtitles decoder

@@ -3293,34 +3293,6 @@ dnl
 PKG_ENABLE_MODULES_VLC([SPEEX], [], [ogg speex >= 1.0.5], [Speex decoder support], [auto])
 
 dnl
-dnl  tarkin decoder plugin
-dnl
-AC_ARG_ENABLE(tarkin,
-[  --enable-tarkin         experimental tarkin codec (default disabled)])
-if test "${enable_tarkin}" = "yes"
-then
-  AC_ARG_WITH(tarkin-tree,
-  [  --with-tarkin-tree=PATH tarkin tree for static linking])
-  if test -n "${with_tarkin_tree}"
-  then
-    AC_MSG_CHECKING(for tarkin.o in ${with_tarkin_tree})
-    real_tarkin_tree="`cd ${with_tarkin_tree} 2>/dev/null && pwd`"
-    if test -f "${real_tarkin_tree}/tarkin.o"
-    then
-      VLC_ADD_PLUGIN([tarkin])
-      VLC_ADD_CPPFLAGS([tarkin],[-I${real_tarkin_tree}])
-      VLC_ADD_LIBS([tarkin],[${real_tarkin_tree}/mem.o ${real_tarkin_tree}/pnm.o ${real_tarkin_tree}/wavelet.o ${real_tarkin_tree}/wavelet_xform.o ${real_tarkin_tree}/wavelet_coeff.o ${real_tarkin_tree}/yuv.o ${real_tarkin_tree}/tarkin.o ${real_tarkin_tree}/info.o -logg])
-      AC_MSG_RESULT(yes)
-    else
-      dnl  The given tarkin tree wasn't built
-      AC_MSG_RESULT(no)
-      AC_MSG_ERROR([cannot find ${real_tarkin_tree}/tarkin.o,
-                    make sure you compiled tarkin in ${with_tarkin_tree}])
-    fi
-  fi
-fi
-
-dnl
 dnl  theora decoder plugin
 dnl
 PKG_ENABLE_MODULES_VLC([THEORA], [], [ogg theora >= 1.0], [experimental theora codec], [auto])
