@@ -81,8 +81,8 @@ static inline void vlc_assert_locked(vlc_mutex_t *mutex)
  */
 
 static void set_relative_playlist_position_and_play(
-                                            libvlc_media_list_player_t * p_mlp, 
-                                            int i_relative_position, 
+                                            libvlc_media_list_player_t * p_mlp,
+                                            int i_relative_position,
                                             libvlc_exception_t * p_e);
 static void stop(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e);
 
@@ -97,7 +97,7 @@ static inline void lock(libvlc_media_list_player_t * p_mlp)
 {
     // Obtain an access to this structure
     vlc_mutex_lock(&p_mlp->object_lock);
-    
+
     // Make sure no callback will occurs at the same time
     vlc_mutex_lock(&p_mlp->mp_callback_lock);
 }
@@ -128,7 +128,7 @@ static inline libvlc_event_manager_t * mplayer_em(libvlc_media_list_player_t * p
 /**************************************************************************
  *       get_next_path (private)
  *
- *  Returns the path to the next item in the list.  
+ *  Returns the path to the next item in the list.
  *  If looping is specified and the current item is the last list item in
  *  the list it will return the first item in the list.
  **************************************************************************/
@@ -148,11 +148,11 @@ get_next_path(libvlc_media_list_player_t * p_mlp, bool b_loop)
             return NULL;
         return libvlc_media_list_path_with_root_index(0);
     }
-    
+
     p_sublist_of_playing_item = libvlc_media_list_sublist_at_path(
                             p_mlp->p_mlist,
                             p_mlp->current_playing_item_path);
- 
+
     /* If item just gained a sublist just play it */
     if (p_sublist_of_playing_item)
     {
@@ -207,7 +207,7 @@ get_next_path(libvlc_media_list_player_t * p_mlp, bool b_loop)
  *  Returns the path of the last descendant of a given item path.
  *  Note: Due to the recursive nature of the function and the need to free
  *        media list paths, paths passed in may be freed if they are replaced.
-          Recommended usage is to set return value to the same path that was 
+          Recommended usage is to set return value to the same path that was
           passed to the function (i.e. item = find_last_item(list, item); )
  **************************************************************************/
 static libvlc_media_list_path_t
@@ -229,7 +229,7 @@ find_last_item( libvlc_media_list_t * p_mlist, libvlc_media_list_path_t current_
         }
 
         libvlc_media_list_release(p_sublist);
-    }    
+    }
 
     return last_item_path;
 }
@@ -237,7 +237,7 @@ find_last_item( libvlc_media_list_t * p_mlist, libvlc_media_list_path_t current_
 /**************************************************************************
  *       get_previous_path (private)
  *
- *  Returns the path to the preceding item in the list.  
+ *  Returns the path to the preceding item in the list.
  *  If looping is specified and the current item is the first list item in
  *  the list it will return the last descendant of the last item in the list.
  **************************************************************************/
@@ -256,7 +256,7 @@ get_previous_path(libvlc_media_list_player_t * p_mlp, bool b_loop)
             return NULL;
         return libvlc_media_list_path_with_root_index(0);
     }
-    
+
     /* Try to catch parent element */
     p_parent_of_playing_item = libvlc_media_list_parentlist_at_path(
                                             p_mlp->p_mlist,
@@ -445,7 +445,7 @@ set_current_playing_item(libvlc_media_list_player_t * p_mlp, libvlc_media_list_p
     p_md = libvlc_media_list_item_at_path(p_mlp->p_mlist, path);
     if (!p_md)
         return;
-    
+
     /* Make sure media_player_reached_end() won't get called */
     uninstall_media_player_observer(p_mlp);
 
@@ -512,7 +512,7 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
     {
         uninstall_media_player_observer(p_mlp);
         libvlc_media_player_release(p_mlp->p_mi);
-    }    
+    }
     if (p_mlp->p_mlist)
     {
         uninstall_playlist_observer(p_mlp);
@@ -524,7 +524,7 @@ void libvlc_media_list_player_release(libvlc_media_list_player_t * p_mlp)
     vlc_mutex_destroy(&p_mlp->mp_callback_lock);
 
     libvlc_event_manager_release(p_mlp->p_event_manager);
-    
+
     free(p_mlp->current_playing_item_path);
     libvlc_release(p_mlp->p_libvlc_instance);
     free(p_mlp);
@@ -577,7 +577,7 @@ void libvlc_media_list_player_set_media_list(libvlc_media_list_player_t * p_mlp,
     }
     libvlc_media_list_retain(p_mlist);
     p_mlp->p_mlist = p_mlist;
- 
+
     install_playlist_observer(p_mlp);
 
     unlock(p_mlp);
@@ -669,7 +669,7 @@ void libvlc_media_list_player_play_item(libvlc_media_list_player_t * p_mlp, libv
         unlock(p_mlp);
         return;
     }
-    
+
     set_current_playing_item(p_mlp, path);
     libvlc_media_player_play(p_mlp->p_mi, p_e);
     unlock(p_mlp);
@@ -699,7 +699,7 @@ static void stop(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
 /**************************************************************************
  *       Stop (Public)
  **************************************************************************/
-void libvlc_media_list_player_stop(libvlc_media_list_player_t * p_mlp, 
+void libvlc_media_list_player_stop(libvlc_media_list_player_t * p_mlp,
                                    libvlc_exception_t * p_e)
 {
     lock(p_mlp);
@@ -710,13 +710,13 @@ void libvlc_media_list_player_stop(libvlc_media_list_player_t * p_mlp,
 /**************************************************************************
  *       Set relative playlist position and play (Private)
  *
- * Sets the currently played item to the given relative play item position 
+ * Sets the currently played item to the given relative play item position
  * (based on the currently playing item) and then begins the new item playback.
- * Lock must be held.  
+ * Lock must be held.
  **************************************************************************/
 static void set_relative_playlist_position_and_play(
-                                      libvlc_media_list_player_t * p_mlp, 
-                                      int i_relative_position, 
+                                      libvlc_media_list_player_t * p_mlp,
+                                      int i_relative_position,
                                       libvlc_exception_t * p_e)
 {
     assert_locked(p_mlp);
@@ -735,7 +735,7 @@ static void set_relative_playlist_position_and_play(
     if(p_mlp->e_playback_mode != libvlc_playback_mode_repeat)
     {
         bool b_loop = (p_mlp->e_playback_mode == libvlc_playback_mode_loop);
-        
+
         if(i_relative_position > 0)
         {
             do
@@ -748,12 +748,12 @@ static void set_relative_playlist_position_and_play(
         }
         else if(i_relative_position < 0)
         {
-            do 
+            do
             {
                 path = get_previous_path(p_mlp, b_loop);
                 set_current_playing_item(p_mlp, path);
                 ++i_relative_position;
-            } 
+            }
             while (i_relative_position < 0);
         }
     }
@@ -790,7 +790,7 @@ static void set_relative_playlist_position_and_play(
 /**************************************************************************
  *       Next (Public)
  **************************************************************************/
-void libvlc_media_list_player_next(libvlc_media_list_player_t * p_mlp, 
+void libvlc_media_list_player_next(libvlc_media_list_player_t * p_mlp,
                                    libvlc_exception_t * p_e)
 {
     lock(p_mlp);
@@ -801,7 +801,7 @@ void libvlc_media_list_player_next(libvlc_media_list_player_t * p_mlp,
 /**************************************************************************
  *       Previous (Public)
  **************************************************************************/
-void libvlc_media_list_player_previous(libvlc_media_list_player_t * p_mlp, 
+void libvlc_media_list_player_previous(libvlc_media_list_player_t * p_mlp,
                                        libvlc_exception_t * p_e)
 {
     lock(p_mlp);
@@ -812,7 +812,7 @@ void libvlc_media_list_player_previous(libvlc_media_list_player_t * p_mlp,
 /**************************************************************************
  *       Set Playback Mode (Public)
  **************************************************************************/
-void libvlc_media_list_player_set_playback_mode( 
+void libvlc_media_list_player_set_playback_mode(
                                             libvlc_media_list_player_t * p_mlp,
                                             libvlc_playback_mode_t e_mode,
                                             libvlc_exception_t * p_e )
