@@ -39,6 +39,9 @@ public:
     /// Delete the instance of ThemeRepository
     static void destroy( intf_thread_t *pIntf );
 
+    /// Update repository
+    void updateRepository();
+
 protected:
     // Protected because it is a singleton
     ThemeRepository( intf_thread_t *pIntf );

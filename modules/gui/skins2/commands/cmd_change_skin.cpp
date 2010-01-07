@@ -28,6 +28,7 @@
 #include "../src/os_loop.hpp"
 #include "../src/theme.hpp"
 #include "../src/theme_loader.hpp"
+#include "../src/theme_repository.hpp"
 #include "../src/window_manager.hpp"
 #include "../src/vout_manager.hpp"
 #include "../src/vlcproc.hpp"
@@ -72,5 +73,8 @@ void CmdChangeSkin::execute()
         CmdQuit cmd( getIntf() );
         cmd.execute();
     }
+
+   // update the repository
+   ThemeRepository::instance( getIntf() )->updateRepository();
 }
 

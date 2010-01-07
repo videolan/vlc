@@ -88,7 +88,7 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
             itdefault = itmap;
     }
 
-    // retrieve the current skin
+    // retrieve last skins stored or skins requested by user
     char* psz_current = config_GetPsz( getIntf(), "skins2-last" );
     string current = string( psz_current ? psz_current : "" );
 
@@ -99,27 +99,13 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
         config_PutPsz( getIntf(), "skins2-last", current.c_str() );
     }
 
-    // add an extra item if needed and set the current skins to 'checked'
-    itmap = m_skinsMap.find( current );
-    if( itmap == m_skinsMap.end() )
-    {
-        val.psz_string = (char*) current.c_str();
-        text.psz_string = (char*) current.c_str();
-        var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
-                    &text );
-        var_Change( getIntf(), "intf-skins", VLC_VAR_SETVALUE, &val, NULL );
-    }
-    else
-    {
-        val.psz_string = (char*) current.c_str();
-        var_Change( getIntf(), "intf-skins", VLC_VAR_SETVALUE, &val, NULL );
-    }
     free( psz_current );
-    m_skinsMap.clear();
+
+    // Update repository
+    updateRepository();
 
     // Set the callback
     var_AddCallback( pIntf, "intf-skins", changeSkin, this );
-
 
     // variable for opening a dialog box to change skins
     var_Create( pIntf, "intf-skins-interactive", VLC_VAR_VOID |
@@ -135,6 +121,8 @@ ThemeRepository::ThemeRepository( intf_thread_t *pIntf ): SkinObject( pIntf )
 
 ThemeRepository::~ThemeRepository()
 {
+    m_skinsMap.clear();
+
     var_DelCallback( getIntf(), "intf-skins", changeSkin, this );
     var_DelCallback( getIntf(), "intf-skins-interactive", changeSkin, this );
 
@@ -210,5 +198,32 @@ int ThemeRepository::changeSkin( vlc_object_t *pIntf, char const *pVariable,
     }
 
     return VLC_SUCCESS;
+}
+
+
+void ThemeRepository::updateRepository()
+{
+    vlc_value_t val, text;
+
+    // retrieve the current skin
+    char* psz_current = config_GetPsz( getIntf(), "skins2-last" );
+    if( !psz_current )
+        return;
+
+    val.psz_string = psz_current;
+    text.psz_string = psz_current;
+
+    // add this new skins if not yet present in repository
+    string current( psz_current );
+    if( m_skinsMap.find( current ) == m_skinsMap.end() )
+    {
+        var_Change( getIntf(), "intf-skins", VLC_VAR_ADDCHOICE, &val,
+                    &text );
+    }
+
+    // mark this current skins as 'checked' in list
+    var_Change( getIntf(), "intf-skins", VLC_VAR_SETVALUE, &val, NULL );
+
+    free( psz_current );
 }
 
