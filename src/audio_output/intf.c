@@ -132,6 +132,7 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
                    audio_volume_t * pi_volume )
 {
+    aout_SetMute( p_object, pi_volume, false );
     const int i_volume_step = config_GetInt( p_object->p_libvlc, "volume-step" );
 
     int i_volume = config_GetInt( p_object, "volume" ) +
