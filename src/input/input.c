@@ -2747,18 +2747,22 @@ static void InputSourceMeta( input_thread_t *p_input,
     /* XXX Remember that checking against p_item->p_meta->i_status & ITEM_PREPARSED
      * is a bad idea */
 
+    bool has_meta;
+
     /* Read access meta */
     if( p_access )
-        access_Control( p_access, ACCESS_GET_META, p_meta );
+        has_meta = !access_Control( p_access, ACCESS_GET_META, p_meta );
 
     /* Read demux meta */
-    demux_Control( p_demux, DEMUX_GET_META, p_meta );
+    has_meta = (!demux_Control( p_demux, DEMUX_GET_META, p_meta )) || has_meta;
 
-    /* If the demux report unsupported meta data, try an external "meta reader" */
-    bool b_bool;
-    if( demux_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &b_bool ) )
-        return;
-    if( !b_bool )
+    bool has_unsupported;
+    if( demux_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &has_unsupported ) )
+        has_unsupported = true;
+
+    /* If the demux report unsupported meta data, or if we don't have meta data
+     * try an external "meta reader" */
+    if( has_meta && !has_unsupported )
         return;
 
     demux_meta_t *p_demux_meta =
