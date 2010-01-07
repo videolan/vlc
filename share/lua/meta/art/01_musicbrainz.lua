@@ -22,8 +22,9 @@
 -- Return the artwork
 function fetch_art()
     local query
-    if vlc.artist and vlc.album then
-        query = "http://musicbrainz.org/ws/1/release/?type=xml&artist="..vlc.strings.encode_uri_component(vlc.artist).."&title="..vlc.strings.encode_uri_component(vlc.album)
+    local meta = vlc.item.metas(vlc.item)
+    if meta["artist"] and meta["album"] then
+        query = "http://musicbrainz.org/ws/1/release/?type=xml&artist="..vlc.strings.encode_uri_component(meta["artist"]).."&title="..vlc.strings.encode_uri_component(meta["album"])
     else
         return nil
     end

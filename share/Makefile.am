@@ -190,9 +190,11 @@ DIST_osdmenu_default = \
 
 DIST_lua= \
 	lua/README.txt \
-	lua/meta/README.txt \
-	lua/meta/01_musicbrainz.lua \
-	lua/meta/10_googleimage.lua \
+	lua/meta/art/README.txt \
+	lua/meta/art/01_musicbrainz.lua \
+	lua/meta/art/10_googleimage.lua \
+	lua/meta/reader/README.txt \
+	lua/meta/reader/filename.lua \
 	lua/playlist/README.txt \
 	lua/playlist/anevia_streams.lua \
 	lua/playlist/appletrailers.lua \

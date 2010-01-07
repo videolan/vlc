@@ -64,6 +64,12 @@ vlc_module_begin ()
         set_callbacks( FindArt, NULL )
 
     add_submodule ()
+        set_shortname( N_( "Lua Meta Reader" ) )
+        set_description( N_("Fetch meta data using lua scripts") )
+        set_capability( "meta reader", 10 )
+        set_callbacks( ReadMeta, NULL )
+
+    add_submodule ()
         add_shortcut( "luaplaylist" )
         set_category( CAT_INPUT )
         set_subcategory( SUBCAT_INPUT_DEMUX )

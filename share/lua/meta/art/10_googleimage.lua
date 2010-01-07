@@ -29,15 +29,17 @@ end
 
 -- Return the artwork
 function fetch_art()
-    if vlc.artist and vlc.album then
-        title = vlc.artist.." "..vlc.album
-    elseif vlc.title and vlc.artist then
-        title = vlc.artist.." "..vlc.title
-    elseif vlc.title then
-        title = vlc.title
-    elseif vlc.name then
-        title = vlc.name
+    local meta = vlc.item.metas(vlc.item)
+    if meta["artist"] and meta["album"] then
+        title = meta["artist"].." "..meta["album"]
+    elseif meta["title"] and meta["artist"] then
+        title = meta["artist"].." "..meta["title"]
+    elseif meta["title"] then
+        title = meta["title"]
+    elseif meta["filename"] then
+        title = meta["filename"]
     else
+        vlc.msg.err("No filename")
         return nil
     end
     fd = vlc.stream( "http://images.google.com/images?q=" .. get_query( title ) )
