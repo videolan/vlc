@@ -43,7 +43,7 @@
 SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
                           bool b_shiny, bool b_special )
                          : QWidget( _parent ), p_intf( _p_intf),
-                           b_my_volume( false ), b_is_muted( false )
+                           b_is_muted( false )
 {
     /* We need a layout for this widget */
     QHBoxLayout *layout = new QHBoxLayout( this );
@@ -118,7 +118,8 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     updateVolume( volumeSlider->value() );
 
     /* Volume control connection */
-    CONNECT( volumeSlider, valueChanged( int ), this, updateVolume( int ) );
+    CONNECT( volumeSlider, valueChanged( int ), this, refreshLabels( void ) );
+    CONNECT( volumeSlider, sliderMoved( int ), this, updateVolume( int ) );
     CONNECT( THEMIM, volumeChanged( void ), this, updateVolume( void ) );
     CONNECT( THEMIM, soundMuteChanged( void ), this, updateMuteStatus( void ) );
 }
@@ -151,15 +152,12 @@ void SoundWidget::refreshLabels()
 /* volumeSlider changed value event slot */
 void SoundWidget::updateVolume( int i_sliderVolume )
 {
-    if( !b_my_volume ) /* Only if volume is set by user action on slider */
-    {
-        setMuted( false );
-        playlist_t *p_playlist = pl_Hold( p_intf );
-        int i_res = i_sliderVolume  * (AOUT_VOLUME_MAX / 2) / VOLUME_MAX;
-        aout_VolumeSet( p_playlist, i_res );
-        pl_Release( p_intf );
-    }
-    refreshLabels();
+    /* Only if volume is set by user action on slider */
+    setMuted( false );
+    playlist_t *p_playlist = pl_Hold( p_intf );
+    int i_res = i_sliderVolume  * (AOUT_VOLUME_MAX / 2) / VOLUME_MAX;
+    aout_VolumeSet( p_playlist, i_res );
+    pl_Release( p_intf );
 }
 
 /* libvlc changed value event slot */
@@ -173,14 +171,11 @@ void SoundWidget::updateVolume()
     pl_Release( p_intf );
     i_volume = ( ( i_volume + 1 ) *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
     int i_gauge = volumeSlider->value();
-    b_my_volume = false;
     if ( !b_is_muted && /* do not show mute effect on volume (set to 0) */
         ( i_volume - i_gauge > 1 || i_gauge - i_volume > 1 )
     )
     {
-        b_my_volume = true;
         volumeSlider->setValue( i_volume );
-        b_my_volume = false;
     }
 }
 

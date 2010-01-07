@@ -235,6 +235,7 @@ void SoundSlider::wheelEvent( QWheelEvent *event )
     setValue( __MIN( __MAX( minimum(), newvalue ), maximum() ) );
 
     emit sliderReleased();
+    emit sliderMoved( value() );
 }
 
 void SoundSlider::mousePressEvent( QMouseEvent *event )
@@ -246,6 +247,7 @@ void SoundSlider::mousePressEvent( QMouseEvent *event )
         i_oldvalue = value();
         emit sliderPressed();
         changeValue( event->x() - paddingL );
+        emit sliderMoved( value() );
     }
 }
 
@@ -257,6 +259,7 @@ void SoundSlider::mouseReleaseEvent( QMouseEvent *event )
         {
             emit sliderReleased();
             setValue( value() );
+            emit sliderMoved( value() );
         }
         b_isSliding = false;
         b_mouseOutside = false;

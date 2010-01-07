@@ -83,7 +83,6 @@ private:
     QLabel              *volMuteLabel;
     QAbstractSlider     *volumeSlider;
     QFrame              *volumeControlWidget;
-    bool                 b_my_volume;
     QMenu               *volumeMenu;
     virtual bool eventFilter( QObject *obj, QEvent *e );
     bool                b_is_muted;
