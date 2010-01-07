@@ -5,4 +5,4 @@ all: \
 	.flac .faad .ffmpeg \
 	.live .png .dvbpsi .tremor
 
-FFMPEGCONF += --arch=arm --cpu=arm9tdmi --disable-armvfp
+FFMPEGCONF += --arch=arm --cpu=arm926ej-s --disable-armvfp
