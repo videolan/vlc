@@ -2750,11 +2750,10 @@ static void InputSourceMeta( input_thread_t *p_input,
     bool has_meta;
 
     /* Read access meta */
-    if( p_access )
-        has_meta = !access_Control( p_access, ACCESS_GET_META, p_meta );
+    has_meta = p_access && !access_Control( p_access, ACCESS_GET_META, p_meta );
 
     /* Read demux meta */
-    has_meta = (!demux_Control( p_demux, DEMUX_GET_META, p_meta )) || has_meta;
+    has_meta |= !demux_Control( p_demux, DEMUX_GET_META, p_meta );
 
     bool has_unsupported;
     if( demux_Control( p_demux, DEMUX_HAS_UNSUPPORTED_META, &has_unsupported ) )
