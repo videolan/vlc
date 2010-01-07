@@ -45,6 +45,8 @@ static int PLItemRemoved( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int VolumeChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
+static int SoundMuteChanged( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
 
 static int RandomChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
@@ -901,6 +903,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     var_AddCallback( THEPL, "loop", LoopChanged, this );
 
     var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
+    var_AddCallback( p_intf->p_libvlc, "volume-muted", SoundMuteChanged, this );
 
     /* Warn our embedded IM about input changes */
     CONNECT( this, inputChanged( input_thread_t * ),
@@ -931,6 +934,7 @@ MainInputManager::~MainInputManager()
     }
 
     var_DelCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
+    var_DelCallback( p_intf->p_libvlc, "volume-muted", SoundMuteChanged, this );
 
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
     var_DelCallback( THEPL, "item-change", ItemChanged, im );
@@ -965,6 +969,9 @@ void MainInputManager::customEvent( QEvent *event )
     {
     case VolumeChanged_Type:
         emit volumeChanged();
+        return;
+    case SoundMuteChanged_Type:
+        emit soundMuteChanged();
         return;
     case PLItemAppended_Type:
         plEv = static_cast<PLEvent*>( event );
@@ -1103,6 +1110,16 @@ static int VolumeChanged( vlc_object_t *p_this, const char *psz_var,
     MainInputManager *mim = (MainInputManager*)param;
 
     IMEvent *event = new IMEvent( VolumeChanged_Type );
+    QApplication::postEvent( mim, event );
+    return VLC_SUCCESS;
+}
+
+static int SoundMuteChanged( vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    MainInputManager *mim = (MainInputManager*)param;
+
+    IMEvent *event = new IMEvent( SoundMuteChanged_Type );
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }

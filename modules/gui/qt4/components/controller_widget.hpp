@@ -76,6 +76,7 @@ public:
     SoundWidget( QWidget *parent, intf_thread_t  *_p_i, bool,
                  bool b_special = false );
     virtual ~SoundWidget();
+    void setMuted( bool );
 
 private:
     intf_thread_t       *p_intf;
@@ -85,9 +86,13 @@ private:
     bool                 b_my_volume;
     QMenu               *volumeMenu;
     virtual bool eventFilter( QObject *obj, QEvent *e );
+    bool                b_is_muted;
+
 protected slots:
     void updateVolume( int );
     void updateVolume( void );
+    void updateMuteStatus( void );
+    void refreshLabels( void );
     void showVolumeMenu( QPoint pos );
 };
 

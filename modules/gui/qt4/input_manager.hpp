@@ -44,6 +44,7 @@ enum {
     ItemTitleChanged_Type,
     ItemRateChanged_Type,
     VolumeChanged_Type,
+    SoundMuteChanged_Type,
     ItemEsChanged_Type,
     ItemTeletextChanged_Type,
     InterfaceVoutUpdate_Type,
@@ -278,6 +279,7 @@ public slots:
 signals:
     void inputChanged( input_thread_t * );
     void volumeChanged();
+    void soundMuteChanged();
     void playlistItemAppended( int itemId, int parentId );
     void playlistItemRemoved( int itemId );
     void randomChanged( bool );

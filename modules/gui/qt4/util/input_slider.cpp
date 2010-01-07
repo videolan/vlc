@@ -166,6 +166,7 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     setMouseTracking( true );
     b_isSliding = false;
     b_mouseOutside = true;
+    b_isMuted = false;
 
     pixOutside = QPixmap( ":/toolbar/volslide-outside" );
 
@@ -175,9 +176,11 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     setMinimumSize( pixOutside.size() );
 
     pixGradient = QPixmap( mask.size() );
+    pixGradient2 = QPixmap( mask.size() );
 
     /* Gradient building from the preferences */
     QLinearGradient gradient( paddingL, 2, WLENGTH + paddingL , 2 );
+    QLinearGradient gradient2( paddingL, 2, WLENGTH + paddingL , 2 );
 
     QStringList colorList = qfu( psz_colors ).split( ";" );
     free( psz_colors );
@@ -187,11 +190,28 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
         for( int i = colorList.size(); i < 12; i++)
             colorList.append( "255" );
 
+    /* Regular colors */
 #define c(i) colorList.at(i).toInt()
-    gradient.setColorAt( 0.0, QColor( c(0), c(1), c(2) ) );
-    gradient.setColorAt( 0.22, QColor( c(3), c(4), c(5) ) );
-    gradient.setColorAt( 0.5, QColor( c(6), c(7), c(8) ) );
-    gradient.setColorAt( 1.0, QColor( c(9), c(10), c(11) ) );
+#define add_color(gradient, range, c1, c2, c3) \
+    gradient.setColorAt( range, QColor( c(c1), c(c2), c(c3) ) );
+
+    /* Desaturated colors */
+#define desaturate(c) c->setHsvF( c->hueF(), 0.2 , 0.5, 1.0 )
+#define add_desaturated_color(gradient, range, c1, c2, c3) \
+    foo = new QColor( c(c1), c(c2), c(c3) );\
+    desaturate( foo ); gradient.setColorAt( range, *foo );\
+    delete foo;
+
+    /* combine the two helpers */
+#define add_colors( gradient1, gradient2, range, c1, c2, c3 )\
+    add_color( gradient1, range, c1, c2, c3 ); \
+    add_desaturated_color( gradient2, range, c1, c2, c3 );
+
+    QColor * foo;
+    add_colors( gradient, gradient2, 0.0, 0, 1, 2 );
+    add_colors( gradient, gradient2, 0.22, 3, 4, 5 );
+    add_colors( gradient, gradient2, 0.5, 6, 7, 8 );
+    add_colors( gradient, gradient2, 1.0, 9, 10, 11 );
 
     QPainter painter( &pixGradient );
     painter.setPen( Qt::NoPen );
@@ -199,7 +219,14 @@ SoundSlider::SoundSlider( QWidget *_parent, int _i_step, bool b_hard,
     painter.drawRect( pixGradient.rect() );
     painter.end();
 
+    painter.begin( &pixGradient2 );
+    painter.setPen( Qt::NoPen );
+    painter.setBrush( gradient2 );
+    painter.drawRect( pixGradient2.rect() );
+    painter.end();
+
     pixGradient.setMask( mask );
+    pixGradient2.setMask( mask );
 }
 
 void SoundSlider::wheelEvent( QWheelEvent *event )
@@ -268,13 +295,25 @@ void SoundSlider::changeValue( int x )
     setValue( (x * maximum() + 40 ) / WLENGTH );
 }
 
+void SoundSlider::setMuted( bool m )
+{
+    b_isMuted = m;
+    update();
+}
+
 void SoundSlider::paintEvent( QPaintEvent *e )
 {
     QPainter painter( this );
+    QPixmap *pixGradient;
+    if (b_isMuted)
+        pixGradient = &this->pixGradient2;
+    else
+        pixGradient = &this->pixGradient;
+
     const int offset = int( ( WLENGTH * value() + 100 ) / maximum() ) + paddingL;
 
-    const QRectF boundsG( 0, 0, offset , pixGradient.height() );
-    painter.drawPixmap( boundsG, pixGradient, boundsG );
+    const QRectF boundsG( 0, 0, offset , pixGradient->height() );
+    painter.drawPixmap( boundsG, *pixGradient, boundsG );
 
     const QRectF boundsO( 0, 0, pixOutside.width(), pixOutside.height() );
     painter.drawPixmap( boundsO, pixOutside, boundsO );

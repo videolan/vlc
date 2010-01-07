@@ -73,6 +73,7 @@ class SoundSlider : public QAbstractSlider
 public:
     SoundSlider( QWidget *_parent, int _i_step, bool b_softamp, char * );
     virtual ~SoundSlider() {};
+    void setMuted( bool ); /* Set Mute status */
 
 protected:
     const static int paddingL = 3;
@@ -89,8 +90,10 @@ private:
     bool b_mouseOutside; /* Whether the mouse is outside or inside the Widget */
     int i_oldvalue; /* Store the old Value before changing */
     float f_step; /* How much do we increase each time we wheel */
+    bool b_isMuted;
 
     QPixmap pixGradient; /* Gradient pix storage */
+    QPixmap pixGradient2; /* Muted Gradient pix storage */
     QPixmap pixOutside; /* OutLine pix storage */
 
     void changeValue( int x ); /* Function to modify the value from pixel x() */
