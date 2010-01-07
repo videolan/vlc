@@ -192,6 +192,7 @@ DIST_lua= \
 	lua/README.txt \
 	lua/meta/art/README.txt \
 	lua/meta/art/01_musicbrainz.lua \
+	lua/meta/art/02_frenchtv.lua \
 	lua/meta/art/10_googleimage.lua \
 	lua/meta/reader/README.txt \
 	lua/meta/reader/filename.lua \
