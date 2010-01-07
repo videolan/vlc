@@ -291,6 +291,9 @@ static void test_media_list_player_next(const char** argv, int argc)
     libvlc_media_list_player_next (mlp, &ex);
     catch ();
 
+    libvlc_media_list_player_stop (mlp, &ex);
+    catch ();
+
     libvlc_media_list_player_release (mlp);
     catch ();
 
@@ -548,6 +551,9 @@ static void test_media_list_player_playback_options (const char** argv, int argc
     catch ();
 
     msleep(500000);
+
+    libvlc_media_list_player_stop (mlp, &ex);
+    catch ();
 
     libvlc_media_list_player_release (mlp);
     catch ();
