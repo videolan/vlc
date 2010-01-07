@@ -2767,6 +2767,7 @@ static void InputSourceMeta( input_thread_t *p_input,
     if( !p_demux_meta )
         return;
     p_demux_meta->p_demux = p_demux;
+    p_demux_meta->p_item = p_input->p->p_item;
 
     module_t *p_id3 = module_need( p_demux_meta, "meta reader", NULL, false );
     if( p_id3 )

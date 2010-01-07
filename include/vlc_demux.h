@@ -82,6 +82,8 @@ typedef struct demux_meta_t
 {
     VLC_COMMON_MEMBERS
     demux_t *p_demux; /** FIXME: use stream_t instead? */
+    input_item_t *p_item; /***< the input item that is being read */
+
     vlc_meta_t *p_meta;                 /**< meta data */
 
     int i_attachments;                  /**< number of attachments */
