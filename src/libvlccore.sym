@@ -25,6 +25,8 @@ aout_OutputNextBuffer
 __aout_VolumeDown
 __aout_VolumeGet
 __aout_ToggleMute
+aout_IsMuted
+aout_SetMute
 aout_VolumeNoneInit
 __aout_VolumeSet
 aout_VolumeSoftInit

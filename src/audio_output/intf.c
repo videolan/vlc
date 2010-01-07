@@ -132,7 +132,6 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
                    audio_volume_t * pi_volume )
 {
-
     const int i_volume_step = config_GetInt( p_object->p_libvlc, "volume-step" );
 
     int i_volume = config_GetInt( p_object, "volume" ) +
@@ -167,11 +166,33 @@ int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
  *****************************************************************************/
 int __aout_ToggleMute( vlc_object_t * p_object, audio_volume_t * pi_volume )
 {
+    return aout_SetMute( p_object, pi_volume, !aout_IsMuted( p_object ) );
+}
+
+/*****************************************************************************
+ * aout_IsMuted : Get the output volume mute status
+ *****************************************************************************/
+bool aout_IsMuted( vlc_object_t * p_object )
+{
+    return (bool)var_GetBool( p_object->p_libvlc, "volume-muted");
+}
+
+/*****************************************************************************
+ * aout_SetMute : Sets mute status
+ *****************************************************************************
+ * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
+ * function (muted => 0).
+ *****************************************************************************/
+int aout_SetMute( vlc_object_t * p_object, audio_volume_t * pi_volume,
+                  bool b_mute )
+{
     int i_result;
     audio_volume_t i_volume;
 
+    var_SetBool( p_object->p_libvlc, "volume-muted", (bool)b_mute );
     i_volume = (audio_volume_t)config_GetInt( p_object, "volume" );
-    if ( i_volume != 0 )
+
+    if ( b_mute )
     {
         /* Mute */
         i_result = aout_VolumeSet( p_object, AOUT_VOLUME_MIN );
@@ -188,7 +209,6 @@ int __aout_ToggleMute( vlc_object_t * p_object, audio_volume_t * pi_volume )
         i_result = aout_VolumeSet( p_object, i_volume );
         if ( pi_volume != NULL ) *pi_volume = i_volume;
     }
-
     return i_result;
 }
 
