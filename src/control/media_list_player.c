@@ -347,6 +347,7 @@ static void
 mlist_item_deleted(const libvlc_event_t * p_event, void * p_user_data)
 {
     // Nothing to do. For now.
+    (void)p_event; (void)p_user_data;
 }
 
 
