@@ -40,7 +40,8 @@ public:
     virtual ~OSGraphics() { }
 
     /// Clear the graphics
-    virtual void clear() = 0;
+    virtual void clear( int xDest = 0, int yDest = 0,
+                        int width = -1, int height = -1) = 0;
 
     /// Draw another graphics on this one
     virtual void drawGraphics( const OSGraphics &rGraphics, int xSrc = 0,

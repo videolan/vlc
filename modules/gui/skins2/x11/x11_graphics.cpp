@@ -73,11 +73,27 @@ X11Graphics::~X11Graphics()
 }
 
 
-void X11Graphics::clear()
+void X11Graphics::clear( int xDest, int yDest, int width, int height )
 {
-    // Clear the transparency mask
-    XDestroyRegion( m_mask );
-    m_mask = XCreateRegion();
+    if( width <= 0 || height <= 0 )
+    {
+        // Clear the transparency mask completely
+        XDestroyRegion( m_mask );
+        m_mask = XCreateRegion();
+    }
+    else
+    {
+        // remove this area from the mask
+        XRectangle rect;
+        rect.x = xDest;
+        rect.y = yDest;
+        rect.width = width;
+        rect.height = height;
+        Region regMask = XCreateRegion();
+        XUnionRectWithRegion( &rect, regMask, regMask );
+        XSubtractRegion( m_mask, regMask, m_mask );
+        XDestroyRegion( regMask );
+    }
 }
 
 

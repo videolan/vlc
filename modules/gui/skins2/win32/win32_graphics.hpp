@@ -39,7 +39,8 @@ public:
     virtual ~Win32Graphics();
 
     /// Clear the graphics
-    virtual void clear();
+    virtual void clear( int xDest = 0, int yDest = 0,
+                        int width = -1, int height = -1 );
 
     /// Render a bitmap on this graphics
     virtual void drawBitmap( const GenericBitmap &rBitmap, int xSrc = 0,

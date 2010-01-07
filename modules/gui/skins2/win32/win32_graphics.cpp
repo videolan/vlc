@@ -59,11 +59,20 @@ Win32Graphics::~Win32Graphics()
 }
 
 
-void Win32Graphics::clear()
+void Win32Graphics::clear( int xDest, int yDest, int width, int height )
 {
-    // Clear the transparency mask
-    DeleteObject( m_mask );
-    m_mask = CreateRectRgn( 0, 0, 0, 0 );
+    if( width <= 0 || height <= 0 )
+    {
+        // Clear the transparency mask
+        DeleteObject( m_mask );
+        m_mask = CreateRectRgn( 0, 0, 0, 0 );
+    }
+    else
+    {
+        HRGN mask = CreateRectRgn( xDest, yDest,
+                                   xDest + width, yDest + height );
+        CombineRgn( m_mask, m_mask, mask, RGN_DIFF );
+    }
 }
 
 

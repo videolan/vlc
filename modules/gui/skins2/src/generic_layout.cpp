@@ -205,6 +205,9 @@ void GenericLayout::refreshRect( int x, int y, int width, int height )
     if( !m_visible )
         return;
 
+    // update the transparency global mask
+    m_pImage->clear( x, y, width, height );
+
     // Draw all the controls of the layout
     list<LayeredControl>::const_iterator iter;
     list<LayeredControl>::const_iterator iterVideo = m_controlList.end();
