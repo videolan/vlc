@@ -90,7 +90,7 @@ vlc_module_end ()
 }
 - (void)setVoutDisplay:(vout_display_t *)vd;
 @end
- 
+
 
 struct vout_display_sys_t
 {
@@ -99,7 +99,7 @@ struct vout_display_sys_t
 
     vout_opengl_t gl;
     vout_display_opengl_t vgl;
-    
+
     picture_pool_t *pool;
     picture_t *current;
     bool has_first_frame;
@@ -117,7 +117,7 @@ static int Open(vlc_object_t *this)
     vd->sys = sys;
     sys->pool = NULL;
     sys->gl.sys = NULL;
-    
+
     /* Get the drawable object */
     id container = var_CreateGetAddress(vd, "drawable-nsobject");
     if (!container)
@@ -132,7 +132,7 @@ static int Open(vlc_object_t *this)
 
     /* Get our main view*/
     nsPool = [[NSAutoreleasePool alloc] init];
-    
+
     [VLCOpenGLVideoView performSelectorOnMainThread:@selector(getNewView:) withObject:[NSValue valueWithPointer:&sys->glView] waitUntilDone:YES];
     if (!sys->glView)
         goto error;
@@ -151,7 +151,7 @@ static int Open(vlc_object_t *this)
     sys->gl.unlock = OpenglUnlock;
     sys->gl.swap = OpenglSwap;
     sys->gl.sys = sys;
-    
+
     if (vout_display_opengl_Init(&sys->vgl, &vd->fmt, &sys->gl))
     {
         sys->gl.sys = NULL;
@@ -161,10 +161,10 @@ static int Open(vlc_object_t *this)
     /* */
     vout_display_info_t info = vd->info;
     info.has_pictures_invalid = false;
-    
+
     /* Setup vout_display_t once everything is fine */
     vd->info = info;
-    
+
     vd->pool = Pool;
     vd->prepare = PictureRender;
     vd->display = PictureDisplay;
@@ -195,7 +195,7 @@ void Close(vlc_object_t *this)
     /* release on main thread as explained in Open() */
     [(id)sys->container performSelectorOnMainThread:@selector(release) withObject:nil waitUntilDone:NO];
     [sys->glView performSelectorOnMainThread:@selector(removeFromSuperview) withObject:nil waitUntilDone:NO];
-    
+
     [sys->glView release];
 
     if (sys->gl.sys != NULL)
@@ -223,7 +223,7 @@ static void PictureRender(vout_display_t *vd, picture_t *pic)
 {
 
     vout_display_sys_t *sys = vd->sys;
-    
+
     vout_display_opengl_Prepare( &sys->vgl, pic );
 }
 
@@ -238,10 +238,10 @@ static void PictureDisplay(vout_display_t *vd, picture_t *pic)
 static int Control (vout_display_t *vd, int query, va_list ap)
 {
     vout_display_sys_t *sys = vd->sys;
-    
+
     switch (query)
     {
-        case VOUT_DISPLAY_CHANGE_FULLSCREEN:            
+        case VOUT_DISPLAY_CHANGE_FULLSCREEN:
         case VOUT_DISPLAY_CHANGE_WINDOW_STATE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_SIZE:
         case VOUT_DISPLAY_CHANGE_DISPLAY_FILLED:
@@ -254,21 +254,20 @@ static int Control (vout_display_t *vd, int query, va_list ap)
         }
         case VOUT_DISPLAY_HIDE_MOUSE:
             return VLC_SUCCESS;
-            
+
         case VOUT_DISPLAY_GET_OPENGL:
         {
             vout_opengl_t **gl = va_arg (ap, vout_opengl_t **);
             *gl = &sys->gl;
             return VLC_SUCCESS;
         }
-            
+
         case VOUT_DISPLAY_RESET_PICTURES:
             assert (0);
         default:
             msg_Err (vd, "Unknown request in Mac OS X vout display");
             return VLC_EGENERIC;
     }
-    printf("query %d\n", query);
 }
 
 /*****************************************************************************
@@ -284,7 +283,7 @@ static int OpenglLock(vout_opengl_t *gl)
         [context makeCurrentContext];
         return 0;
     }
-    return 1;    
+    return 1;
 }
 
 static void OpenglUnlock(vout_opengl_t *gl)
@@ -332,9 +331,9 @@ static void OpenglSwap(vout_opengl_t *gl)
         NSOpenGLPFAWindow,
         0
     };
-    
+
     NSOpenGLPixelFormat *fmt = [[NSOpenGLPixelFormat alloc] initWithAttributes:attribs];
-    
+
     if (!fmt)
         return nil;
 
@@ -398,8 +397,8 @@ static void OpenglSwap(vout_opengl_t *gl)
         else {
             glClear(GL_COLOR_BUFFER_BIT);
         }
-        
-    }    
+
+    }
 }
 
 /**
@@ -408,7 +407,7 @@ static void OpenglSwap(vout_opengl_t *gl)
 - (void)reshape
 {
     VLCAssertMainThread();
-    
+
     NSRect bounds = [self bounds];
 
     CGFloat height = bounds.size.height;
@@ -420,10 +419,10 @@ static void OpenglSwap(vout_opengl_t *gl)
         if (vd) {
             CGFloat videoHeight = vd->source.i_visible_height;
             CGFloat videoWidth = vd->source.i_visible_width;
-            
+
             GLint sarNum = vd->source.i_sar_num;
             GLint sarDen = vd->source.i_sar_den;
-            
+
             if (height * videoWidth * sarNum < width * videoHeight * sarDen)
             {
                 x = (height * videoWidth * sarNum) / (videoHeight * sarDen);
@@ -433,10 +432,10 @@ static void OpenglSwap(vout_opengl_t *gl)
             {
                 x = width;
                 y = (width * videoHeight * sarDen) / (videoWidth * sarNum);
-            }            
+            }
         }
     }
-    
+
     [self lockgl];
     glClearColor(0, 0, 0, 1);
     glViewport((width - x) / 2, (height - y) / 2, x, y);
