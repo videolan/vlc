@@ -221,6 +221,9 @@ static void test_media_list_player_previous(const char** argv, int argc)
     libvlc_media_list_player_previous (mlp, &ex);
     catch ();
 
+    libvlc_media_list_player_stop (mlp, &ex);
+    catch ();
+
     libvlc_media_list_player_release (mlp);
     catch ();
 
