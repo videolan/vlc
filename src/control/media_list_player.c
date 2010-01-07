@@ -346,21 +346,7 @@ media_player_reached_end(const libvlc_event_t * p_event, void * p_user_data)
 static void
 mlist_item_deleted(const libvlc_event_t * p_event, void * p_user_data)
 {
-    libvlc_media_list_player_t * p_mlp = p_user_data;
-    libvlc_media_list_t * p_emitting_mlist = p_event->p_obj;
-    libvlc_media_t * p_current_md = NULL;
-
-    lock(p_mlp);
-    if (p_mlp->current_playing_item_path)
-        p_current_md = libvlc_media_list_item_at_path(p_mlp->p_mlist, p_mlp->current_playing_item_path);
-
-    if (p_event->u.media_list_item_deleted.item == p_current_md &&
-        p_emitting_mlist == p_mlp->p_mlist)
-    {
-        /* We are playing this item, let's stop */
-        stop(p_mlp, NULL);
-    }
-    unlock(p_mlp);
+    // Nothing to do. For now.
 }
 
 
@@ -770,7 +756,6 @@ static void set_relative_playlist_position_and_play(
     if (!path)
     {
         libvlc_media_list_unlock(p_mlp->p_mlist);
-        stop(p_mlp, p_e);
         return;
     }
 
