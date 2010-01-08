@@ -87,8 +87,10 @@ vlc_module_end ()
 @interface VLCOpenGLVideoView : NSOpenGLView
 {
     vout_display_t *vd;
+    BOOL _hasPendingReshape;
 }
 - (void)setVoutDisplay:(vout_display_t *)vd;
+- (void)setVoutFlushing:(BOOL)flushing;
 @end
 
 
@@ -230,7 +232,9 @@ static void PictureRender(vout_display_t *vd, picture_t *pic)
 static void PictureDisplay(vout_display_t *vd, picture_t *pic)
 {
     vout_display_sys_t *sys = vd->sys;
+    [sys->glView setVoutFlushing:YES];
     vout_display_opengl_Display(&sys->vgl, &vd->fmt );
+    [sys->glView setVoutFlushing:NO];
     picture_Release (pic);
     sys->has_first_frame = true;
 }
@@ -361,6 +365,34 @@ static void OpenglSwap(vout_opengl_t *gl)
     }
 }
 
+
+/**
+ * Gets called when the vout will aquire the lock and flush.
+ * (Non main thread).
+ */
+- (void)setVoutFlushing:(BOOL)flushing
+{
+    if (!flushing)
+        return;
+    @synchronized(self) {
+        _hasPendingReshape = NO;
+    }
+}
+
+/**
+ * Can -drawRect skip rendering?.
+ */
+- (BOOL)canSkipRendering
+{
+    VLCAssertMainThread();
+
+    @synchronized(self) {
+        BOOL hasFirstFrame = vd && vd->sys->has_first_frame;
+        return !_hasPendingReshape && hasFirstFrame;
+    }
+}
+
+
 /**
  * Local method that locks the gl context.
  */
@@ -388,17 +420,22 @@ static void OpenglSwap(vout_opengl_t *gl)
 {
     VLCAssertMainThread();
 
-    @synchronized(self) { // vd can be accessed from multiple threads
-        if (vd && vd->sys->has_first_frame)
-        {
-            // This will lock gl.
-            vout_display_opengl_Display( &vd->sys->vgl, &vd->source );
-        }
-        else {
-            glClear(GL_COLOR_BUFFER_BIT);
-        }
+    // We may have taken some times to take the opengl Lock.
+    // Check here to see if we can just skip the frame as well.
+    if ([self canSkipRendering])
+        return;
 
+    BOOL hasFirstFrame;
+    @synchronized(self) { // vd can be accessed from multiple threads
+        hasFirstFrame = vd && vd->sys->has_first_frame;
     }
+
+    if (hasFirstFrame) {
+        // This will lock gl.
+        vout_display_opengl_Display( &vd->sys->vgl, &vd->source );
+    }
+    else
+        glClear(GL_COLOR_BUFFER_BIT);
 }
 
 /**
@@ -437,8 +474,17 @@ static void OpenglSwap(vout_opengl_t *gl)
     }
 
     [self lockgl];
-    glClearColor(0, 0, 0, 1);
+
     glViewport((width - x) / 2, (height - y) / 2, x, y);
+
+    @synchronized(self) {
+        // This may be cleared before -drawRect is being called,
+        // in this case we'll skip the rendering.
+        // This will save us for rendering two frames (or more) for nothing
+        // (one by the vout, one (or more) by drawRect)
+        _hasPendingReshape = YES;
+    }
+
     [self unlockgl];
 
     [super reshape];
@@ -466,6 +512,10 @@ static void OpenglSwap(vout_opengl_t *gl)
 - (void)drawRect:(NSRect) rect
 {
     VLCAssertMainThread();
+
+    if ([self canSkipRendering])
+        return;
+
     BOOL success = [self lockgl];
     if (!success)
         return;
