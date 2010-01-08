@@ -42,11 +42,7 @@
 
 #ifdef HAVE_AVCODEC_VAAPI
 
-#if defined( HAVE_LIBAVCODEC_AVCODEC_H )
-#    include <libavcodec/vaapi.h>
-#else
-#    error "Missing VAAPI header"
-#endif
+#include <libavcodec/vaapi.h>
 
 #include <X11/Xlib.h>
 #include <va/va_x11.h>
