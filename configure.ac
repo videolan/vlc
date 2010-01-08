@@ -2321,7 +2321,8 @@ then
     AC_CHECK_HEADERS([dvbpsi/dr.h],[
       VLC_ADD_PLUGIN([ts])
       if test "${enable_sout}" != "no"; then
-        VLC_ADD_PLUGIN([mux_ts])
+        AC_CHECK_LIB(dvbpsi, dvbpsi_SDTServiceAddDescriptor,
+           [VLC_ADD_PLUGIN([mux_ts])], [], [${LDFLAGS_test} -ldvbpsi])
       fi
       VLC_ADD_CPPFLAGS([mux_ts ts dvb],[${CPPFLAGS_test}])
       VLC_ADD_LIBS([mux_ts ts dvb],[${LDFLAGS_test} -ldvbpsi])
@@ -2329,7 +2330,7 @@ then
     ],[
       if test -n "${enable_dvbpsi}"
       then
-        AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.1])
+        AC_MSG_ERROR([Could not find libdvbpsi on your system: you may get it from www.videolan.org, you'll need at least version 0.1.6])
       fi
     ],
     [#if defined( HAVE_STDINT_H )
