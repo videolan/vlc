@@ -2756,10 +2756,11 @@ then
       AC_MSG_ERROR([cannot find ${real_mod_tree}/src/.libs/libmodplug.a, make sure you compiled mod in ${with_mod_tree}])
     fi
   else
-    AC_CHECK_HEADERS(libmodplug/modplug.h, [
-      VLC_ADD_PLUGIN([mod])
-      VLC_ADD_CXXFLAGS([mod],[])
-      VLC_ADD_LIBS([mod],[-lmodplug -lstdc++])])
+    PKG_CHECK_MODULES(LIBMODPLUG, libmodplug >= 0.8,
+        [ VLC_ADD_PLUGIN([mod])
+          VLC_ADD_CXXFLAGS([mod],[$LIBMODPLUG_CFLAGS])
+          VLC_ADD_LIBS([mod],[$LIBMODPLUG_LIBS])
+        ],[AC_MSG_WARN([libmodplug not found!])])
   fi
 fi
 
