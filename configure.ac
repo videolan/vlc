@@ -2983,6 +2983,38 @@ AS_IF([test "${enable_libva}" != "no"], [
 ])
 
 dnl
+dnl dxva2 needs avcodec
+dnl
+AC_ARG_ENABLE(dxva2,
+  [  --enable-dxva2          DxVA2  support (default auto)])
+
+AS_IF([test "${enable_dxva2}" != "no"], [
+  if test "${SYS}" = "mingw32"; then
+  AS_IF([test "x${have_avcodec}" = "xyes"], [
+    AC_CHECK_HEADERS(dxva2api.h, 
+      [
+        AC_CHECK_HEADERS(libavcodec/dxva2.h, [
+           VLC_ADD_LIBS([avcodec],[-lole32 -lshlwapi -luuid])
+           AC_DEFINE(HAVE_AVCODEC_DXVA2, 1, [Define if avcodec has to be built with DxVA2 support.])
+           echo "DxVA2 acceleration activated"
+        ],[
+	AS_IF([test "${enable_dxva2}" == "yes"],
+	      [AC_MSG_ERROR([dxva2 is present but libavcodec/dxva2.h is missing])],
+              [AC_MSG_WARN([dxva2 is present but libavcodec/dxva2.h is missing ])])
+        ])
+      ],[
+	AS_IF([test "${enable_dxva2}" == "yes"],
+              [AC_MSG_ERROR([Could not find required dxva2api.h])],
+              [AC_MSG_WARN([dxva2api.h not found])])
+      ])
+  ],[
+    AC_MSG_ERROR([dxva2 support depends on libavcodec. You cannot use --disable-avcodec.])
+  ])
+  fi
+])
+
+
+dnl
 dnl stream_out switcher needs libavcodec
 dnl
 AC_ARG_ENABLE(switcher,
