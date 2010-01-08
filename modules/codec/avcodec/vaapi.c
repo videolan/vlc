@@ -31,9 +31,6 @@
 
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
 #   include <libavcodec/avcodec.h>
-#   ifdef HAVE_AVCODEC_VAAPI
-#       include <libavcodec/vaapi.h>
-#   endif
 #elif defined(HAVE_FFMPEG_AVCODEC_H)
 #   include <ffmpeg/avcodec.h>
 #else
@@ -45,9 +42,14 @@
 
 #ifdef HAVE_AVCODEC_VAAPI
 
+#if defined( HAVE_LIBAVCODEC_AVCODEC_H )
+#    include <libavcodec/vaapi.h>
+#else
+#    error "Missing VAAPI header"
+#endif
+
 #include <X11/Xlib.h>
 #include <va/va_x11.h>
-
 
 typedef struct
 {
