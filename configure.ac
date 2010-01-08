@@ -4640,7 +4640,7 @@ dnl
 AC_ARG_WITH(sqlite,
   [  --with-sqlite=PATH      sqlite path linking])
 if test "${SYS}" != "darwin"; then
-  PKG_ENABLE_MODULES_VLC([SQLITE], [], [sqlite3], [sqlite3], [auto])
+  PKG_ENABLE_MODULES_VLC([SQLITE], [], [sqlite3 >= 3.6.0], [sqlite3], [auto])
 else
   if test "${enable_sqlite}" != "no"
   then
