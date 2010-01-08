@@ -3423,7 +3423,7 @@ AC_ARG_ENABLE(telx,
 
 AS_IF( [test "${enable_zvbi}" != "no"],[
     PKG_CHECK_MODULES(ZVBI,
-        zvbi-0.2 >= 0.2.25,
+        zvbi-0.2 >= 0.2.28,
         [
           VLC_ADD_LIBS([zvbi],[$ZVBI_LIBS])
           if test "${SYS}" = "mingw32"; then
