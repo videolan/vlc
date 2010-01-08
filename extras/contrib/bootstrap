@@ -215,7 +215,7 @@ case $HOST in
     *mingw32*)
         echo "HAVE_WIN32 = 1" >> config.mak
         echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
-        EXTRA_CFLAGS="-O3"
+        EXTRA_CFLAGS=" -O3 -mtune=pentium2"
         DISTRO=win32
     ;;
     i686-pc-cygwin)
