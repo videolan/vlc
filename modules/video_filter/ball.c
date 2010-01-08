@@ -152,7 +152,7 @@ vlc_module_begin ()
     add_integer_with_range( FILTER_PREFIX "gradient-threshold", 40, 1, 200, NULL,
                             GRAD_THRESH_TEXT, GRAD_THRESH_LONGTEXT, false )
 
-    add_bool( FILTER_PREFIX "edge-visible", 1, NULL,
+    add_bool( FILTER_PREFIX "edge-visible", true, NULL,
               EDGE_VISIBLE_TEXT, EDGE_VISIBLE_LONGTEXT, true )
 
     add_shortcut( "ball" )
@@ -324,6 +324,15 @@ static void Destroy( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
+
+    var_DelCallback( p_filter, FILTER_PREFIX "ball-color",
+                     ballCallback, p_sys );
+    var_DelCallback( p_filter, FILTER_PREFIX "ball-size",
+                     ballCallback, p_sys );
+    var_DelCallback( p_filter, FILTER_PREFIX "ball-speed",
+                     ballCallback, p_sys );
+    var_DelCallback( p_filter, FILTER_PREFIX "edge-visible",
+                     ballCallback, p_sys );
 
     vlc_mutex_destroy( &p_sys->lock );
 
@@ -838,7 +847,7 @@ static int ballCallback( vlc_object_t *p_this, char const *psz_var,
 
 
 /*****************************************************************************
- * ballCallback
+ * getBallColor
  *****************************************************************************
  * Get and assign the ball color value
  *****************************************************************************/
