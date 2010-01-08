@@ -2954,19 +2954,29 @@ dnl
 dnl libva needs avcodec
 dnl
 AC_ARG_ENABLE(libva,
-  [  --enable-libva          libva VAAPI support (default disabled)])
-AS_IF([test "${enable_libva}" = "yes"], [
+  [  --enable-libva          libva VAAPI support (default auto)])
+
+AS_IF([test "${enable_libva}" != "no"], [
   AS_IF([test "x${have_avcodec}" = "xyes"], [
     PKG_CHECK_MODULES(LIBVA, [libva libva-x11],
       [
-        VLC_ADD_LIBS([avcodec],[$LIBVA_LIBS])
-        VLC_ADD_CFLAGS([avcodec],[$LIBVA_CFLAGS])
-        AC_DEFINE(HAVE_AVCODEC_VAAPI, 1, [Define if avcodec has to be built with VAAPI support.])
+        AC_CHECK_HEADERS(libavcodec/vaapi.h, [
+           VLC_ADD_LIBS([avcodec],[$LIBVA_LIBS])
+           VLC_ADD_CFLAGS([avcodec],[$LIBVA_CFLAGS])
+           AC_DEFINE(HAVE_AVCODEC_VAAPI, 1, [Define if avcodec has to be built with VAAPI support.])
+           echo "VAAPI acceleration activated"
+        ],[
+	AS_IF([test "${enable_libva}" == "yes"],
+	      [AC_MSG_ERROR([libva is present but libavcodec/vaapi.h is missing])],
+              [AC_MSG_WARN([libva is present but libavcodec/vaapi.h is missing ])])
+        ])
       ],[
-        AC_MSG_ERROR([Could not find libva.])
-    ])
+	AS_IF([test "${enable_libva}" == "yes"],
+              [AC_MSG_ERROR([Could not find required libva.])],
+              [AC_MSG_WARN([libva not found  ])])
+      ])
   ],[
-    AC_MSG_ERROR([libva VAAPI support depends on libavcodec.])
+    AC_MSG_ERROR([libva VAAPI support depends on libavcodec. You cannot use --disable-avcodec.])
   ])
 ])
 
