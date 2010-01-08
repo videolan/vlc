@@ -1023,7 +1023,11 @@ DISTCLEAN_PKG += amrwb-$(LIBAMR_WB_VERSION).tar.bz2
 # ***************************************************************************
 
 ifdef SVN
-ffmpeg:
+ifdef HAVE_WIN32
+ffmpeg: .dshow_headers
+else
+ffmpeg: 
+endif
 	$(SVN) co $(FFMPEG_SVN) ffmpeg
 ifdef HAVE_ISA_THUMB
 	patch -p0 < Patches/ffmpeg-avcodec-no-thumb.patch
