@@ -4003,7 +4003,7 @@ fi
 dnl
 dnl  libcaca plugin
 dnl
-PKG_ENABLE_MODULES_VLC([CACA], [], [caca >= 0.99.beta1], [libcaca output],[auto])
+PKG_ENABLE_MODULES_VLC([CACA], [], [caca >= 0.99.beta14], [libcaca output],[auto])
 
 dnl
 dnl  Audio plugins
