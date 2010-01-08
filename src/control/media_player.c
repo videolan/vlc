@@ -383,6 +383,7 @@ libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
     register_event(mp, Backward);
     register_event(mp, EndReached);
     register_event(mp, EncounteredError);
+    register_event(mp, SeekableChanged);
 
     register_event(mp, PositionChanged);
     register_event(mp, TimeChanged);
