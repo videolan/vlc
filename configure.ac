@@ -3010,7 +3010,9 @@ AS_IF([test "${enable_dxva2}" != "no"], [
               [AC_MSG_WARN([dxva2api.h not found])])
       ])
   ],[
-    AC_MSG_ERROR([dxva2 support depends on libavcodec. You cannot use --disable-avcodec.])
+    AS_IF([test "x${enable_dxva2}" != "x"], [
+      AC_MSG_ERROR([--enable-dxva2 and --disable-avcodec options are mutually exclusive.])
+    ])
   ])
   fi
 ])
