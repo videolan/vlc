@@ -1141,7 +1141,7 @@ DISTCLEAN_PKG += libdvdcss-$(LIBDVDCSS_VERSION).tar.gz
 # ***************************************************************************
 libdvdread:
 	$(SVN) co $(LIBDVDREAD_SVN)  libdvdread
-	(cd $@; patch  -p 0 < ../Patches/libdvdread.patch)
+	(cd $@; patch  -p 0 < ../Patches/libdvdread-dvdcss-static.patch)
 ifdef HAVE_WIN32
 	(cd $@; patch  -p 0 < ../Patches/libdvdread-win32.patch)
 endif
