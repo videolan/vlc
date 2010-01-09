@@ -174,3 +174,28 @@ diff -ruN libprojectM.new/Renderer/Renderer.cpp libprojectM/Renderer/Renderer.cp
  	draw_title_to_screen(false);
  	if (this->showhelp % 2)
  		draw_help();
+diff -ruN libprojectM/RandomNumberGenerators.hpp libprojectM.new/RandomNumberGenerators.hpp
+--- libprojectM/RandomNumberGenerators.hpp	2009-12-01 07:38:42.000000000 +0100
++++ libprojectM.new/RandomNumberGenerators.hpp	2010-01-09 01:09:38.000000000 +0100
+@@ -4,6 +4,7 @@
+ #include <vector>
+ #include <cassert>
+ #include <iostream>
++#include <stdlib.h>
+ 
+ #define WEIGHTED_RANDOM_DEBUG 0
+ 
+diff -ruN libprojectM/Renderer/TextureManager.cpp libprojectM.new/Renderer/TextureManager.cpp
+--- libprojectM/Renderer/TextureManager.cpp	2010-01-09 01:16:11.000000000 +0100
++++ libprojectM.new/Renderer/TextureManager.cpp	2010-01-09 01:03:59.000000000 +0100
+@@ -30,6 +30,10 @@
+ #include "IdleTextures.hpp"
+ 
+ 
++#include <stdio.h>
++#include <stdlib.h>
++#include <time.h>
++
+ 
+ TextureManager::TextureManager(const std::string _presetURL): presetURL(_presetURL)
+ {
