@@ -68,7 +68,8 @@ VLC_EXPORT( void,    mwait,    ( mtime_t date ) );
 VLC_EXPORT( void,    msleep,   ( mtime_t delay ) );
 VLC_EXPORT( char *,  secstotimestr, ( char *psz_buffer, int secs ) );
 
-#if (defined (__GNUC__) && defined (__linux__)) || defined (__FreeBSD__) || defined (__OpenBSD__)
+#if defined (__GNUC__) \
+ && ((__GNUC__ > 4) || (__GNUC__ == 4 && __GNUC_MINOR__ >= 3))
 /* Linux has 100, 250, 300 or 1000Hz
  *
  * HZ=100 by default on FreeBSD, but some architectures use a 1000Hz timer
