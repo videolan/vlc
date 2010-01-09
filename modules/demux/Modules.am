@@ -12,7 +12,7 @@ SOURCES_nsv = nsv.c
 SOURCES_real = real.c
 SOURCES_ts = ts.c ../mux/mpeg/csa.c
 SOURCES_ps = ps.c ps.h
-SOURCES_mod = mod.c
+SOURCES_mod = mod.c dummy.cpp
 SOURCES_pva = pva.c
 SOURCES_aiff = aiff.c
 SOURCES_mjpeg = mjpeg.c
@@ -59,3 +59,8 @@ libvlc_LTLIBRARIES += \
 	libwav_plugin.la \
 	libxa_plugin.la \
 	$(NULL)
+
+BUILT_SOURCES += dummy.cpp
+
+dummy.cpp:
+	touch dummy.cpp
