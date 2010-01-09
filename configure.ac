@@ -2978,7 +2978,9 @@ AS_IF([test "${enable_libva}" != "no"], [
               [AC_MSG_WARN([libva not found  ])])
       ])
   ],[
-    AC_MSG_ERROR([libva VAAPI support depends on libavcodec. You cannot use --disable-avcodec.])
+    AS_IF([test "x${enable_libva}" != "x"], [
+      AC_MSG_ERROR([--enable-libva and --disable-avcodec options are mutually exclusive.])
+    ])
   ])
 ])
 
