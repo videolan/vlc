@@ -705,7 +705,7 @@ static int DxFindVideoServiceConversion(vlc_va_dxva2_t *va, GUID *input, D3DFORM
         if (mode) {
             msg_Dbg(va->log, "- '%s' is supported by hardware", mode->name);
         } else {
-            msg_Warn(va->log, "- Unknown GUID = %08X-%04x-%04x-XXXX\n",
+            msg_Warn(va->log, "- Unknown GUID = %08X-%04x-%04x-XXXX",
                      (unsigned)g->Data1, g->Data2, g->Data3);
         }
     }
