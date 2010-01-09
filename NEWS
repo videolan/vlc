@@ -106,6 +106,7 @@ Removed modules:
  * cddax. Use cdda instead
  * cmml and tarkin codecs are removed because they are dead codecs.
 
+
 Changes between 1.0.4 and 1.0.5 (not yet released):
 ---------------------------------------------------
 Mac OS X Interface:
@@ -140,7 +141,7 @@ Qt4 interface:
 
 Translations:
   * New Walloon translation
-  * Swedish, Ukrainian an French translation update
+  * Swedish, Ukrainian and French translation updates
 
 
 Changes between 1.0.2 and 1.0.3:
@@ -228,6 +229,12 @@ Playlist:
 Unix builds:
  * Various fixes to enable 1.0 to build on Solaris and OpenBSD
 
+Translations:
+ * New Kazakh and Croatian translations
+ * Lithunanian translation is available on Windows
+ * Galician, Korean, Nepali, Vietnamese, Ukrainian, Portuguese Brazilian,
+   Arabic and French translation updates
+
 
 Changes between 1.0.0 and 1.0.1:
 --------------------------------
@@ -270,7 +277,7 @@ Windows port:
 Translations updates for Brazillian, French, German, Korean, Norwegian Nynorsk, Lithuanian
 
 
-Changes between 0.9.9a and 1.0.0:
+Changes between 0.9.10 and 1.0.0:
 ---------------------------------
 
 Important notes:
@@ -376,6 +383,7 @@ Windows CE Port:
  EXPERIMENTAL work for the winCE port has been done.
 
 Mac OS X Port:
+ * EXPERIMENTAL 64bit support
  * Speed improvements by using llvm-gcc
  * New document icons by Dominic Spitaler
  * Support for latest iSight models
@@ -397,7 +405,37 @@ Miscellaneous:
  * Invmem, a fake codec to display images from external applications
 
 New Localization:
+ * Khmer
  * Mongolian
+ * Sorani
+
+
+Changes between 0.9.9a and 0.9.10:
+--------------------------------------
+
+HTTP Interface:
+ * Fixed default ACL
+
+Mac OS X:
+ * Fixed crashes on multi-screen setups
+ * Corrected volume and subtitle encoding options in the Preferences
+ * Improved Information panel behavior, when playlist is not displayed
+ * Fixed QTCapture input support for the latest iSight models
+ * Added a menu-item to unlock the video window's aspect ratio
+ * Fixed redraw issues when autosizing the video window
+ * Updated libpng, libgpg-error, libgcrypt, fribidi
+
+Various fixes to the following modules:
+ * access:
+   - HTTP, SMB
+   - updated and additional access scripts (BBC radio, dailymotion, ...)
+   - Prevent integer underflow in Real pseudo-RTSP module, discovered by tixxDZ,
+     DZCORE Labs, Algeria
+ * stream out:
+   - RTP, RTSP VoD, Mosaic Bridge
+ * decoder:
+   - TSCC
+
 
 Changes between 0.9.9 and 0.9.9a:
 ---------------------------------
@@ -437,6 +475,7 @@ Various bugfixes:
  * Correct Fullscreen behaviour on Multi-Screen setups on Windows
  * Telnet fixes on Windows
  * Resampling fixes when transcoding
+
 
 Changes between 0.9.6 and 0.9.8a:
 ---------------------------------
