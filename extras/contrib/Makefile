@@ -76,16 +76,17 @@ using-bin: hosts/$(HOST)/.$(CONTRIBREV)
 
 endif
 
-clean-src:
+clean:
 	rm -rf $(BUILDDIRS)
-	$(MAKE) -C src clean-src
+	$(MAKE) -C src clean
 
 clean-bin:
 	rm -rf $(BUILDDIRS)
 	$(MAKE) -C src clean-dots
 
-clean:
-	$(MAKE) clean-src
+distclean:
+	$(MAKE) clean
+	$(MAKE) -C src clean-src
 	rm -rf config.mak distro.mak
 
 bin: using-bin
