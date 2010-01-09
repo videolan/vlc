@@ -258,7 +258,7 @@ function host()
                 for _, listener in pairs(listeners.tcp.list) do
                     for _, fd in pairs({listener:fds()}) do
                         if pollfds[fd] == vlc.net.POLLIN then
-                            local afd = listener:accept(0)
+                            local afd = listener:accept()
                             new_client( h, afd, afd, client_type.net )
                             break
                         end
