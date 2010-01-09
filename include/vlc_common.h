@@ -74,7 +74,7 @@
 
 /* Format string sanity checks */
 #ifdef __GNUC__
-#   if defined( _WIN32 ) && __GNUC__ >= 4 && __GNUC_MINOR__ >= 4
+#   if defined( _WIN32 ) && (__GNUC__ > 4 || ( __GNUC__ == 4 && __GNUC_MINOR__ >= 4 ) )
 #     define LIBVLC_FORMAT(x,y) __attribute__ ((format(gnu_printf,x,y)))
 #   else
 #     define LIBVLC_FORMAT(x,y) __attribute__ ((format(printf,x,y)))
