@@ -1769,6 +1769,7 @@ vlc_module_begin ()
     set_section( N_("Subtitles") , NULL )
     add_file( "sub-file", NULL, NULL, SUB_FILE_TEXT,
               SUB_FILE_LONGTEXT, false )
+        change_safe()
     add_bool( "sub-autodetect-file", true, NULL,
                  SUB_AUTO_TEXT, SUB_AUTO_LONGTEXT, false )
     add_integer( "sub-autodetect-fuzzy", 3, NULL,
