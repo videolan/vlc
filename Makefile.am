@@ -812,9 +812,13 @@ if BUILD_LUA
 	for i in $(srcdir)/share/lua/playlist/*.* ; do \
 	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/playlist/`basename $${i}` ; \
 	done
-	$(INSTALL) -d $(win32_lua_destdir)/meta
-	for i in $(srcdir)/share/lua/meta/*.* ; do \
-	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/`basename $${i}` ; \
+	$(INSTALL) -d $(win32_lua_destdir)/meta/art
+	for i in $(srcdir)/share/lua/meta/art/*.lua ; do \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/art/`basename $${i}` ; \
+	done
+	$(INSTALL) -d $(win32_lua_destdir)/meta/reader
+	for i in $(srcdir)/share/lua/meta/reader/*.lua ; do \
+	  $(INSTALL) -m 644 -- "$${i}" $(win32_lua_destdir)/meta/reader/`basename $${i}` ; \
 	done
 	$(INSTALL) -d $(win32_lua_destdir)/intf
 	for i in $(srcdir)/share/lua/intf/*.* ; do \
