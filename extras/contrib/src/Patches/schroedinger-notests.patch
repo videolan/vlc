@@ -1,0 +1,10 @@
+--- schroedinger/Makefile.am	2009-09-29 07:08:51.000000000 +0200
++++ schroedinger.new/Makefile.am	2010-01-09 02:18:41.000000000 +0100
+@@ -1,6 +1,6 @@
+ AUTOMAKE_OPTIONS = foreign
+ 
+-SUBDIRS = schroedinger doc tools testsuite
++SUBDIRS = schroedinger doc tools 
+ 
+ DISTCHECK_CONFIGURE_FLAGS=--enable-gtk-doc
+ 
