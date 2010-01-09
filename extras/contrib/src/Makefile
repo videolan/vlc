@@ -2421,6 +2421,7 @@ schroedinger-$(SCHROED_VERSION).tar.gz:
 schroedinger: schroedinger-$(SCHROED_VERSION).tar.gz
 	$(EXTRACT_GZ)
 	patch -p0 < Patches/schroedinger-notests.patch
+	(cd $@; autoreconf -iv)
 
 .schroedinger: schroedinger .liboil
 	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --with-thread=none --disable-gtk-doc --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
