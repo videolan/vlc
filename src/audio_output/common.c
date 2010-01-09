@@ -116,11 +116,12 @@ static void aout_Destructor( vlc_object_t * p_this )
 
 /* Lock ordering rules:
  *
- *            Mixer Input IFIFO OFIFO (< Inner lock)
- * Mixer       No!   Yes   Yes   Yes
- * Input       No!   No!   Yes   Yes
- * In FIFOs    No!   No!   No!   Yes
- * Out FIFOs   No!   No!   No!   No!
+ *            Vars Mixer Input IFIFO OFIFO (< Inner lock)
+ * Vars        No!   Yes   Yes   Yes   Yes
+ * Mixer       No!   No!   Yes   Yes   Yes
+ * Input       No!   No!   No!   Yes   Yes
+ * In FIFOs    No!   No!   No!   No!   Yes
+ * Out FIFOs   No!   No!   No!   No!   No!
  * (^ Outer lock)
  */
 #ifdef AOUT_DEBUG
@@ -132,17 +133,20 @@ void aout_lock (unsigned i)
     unsigned allowed;
     switch (i)
     {
-        case MIXER_LOCK:
+        case VOLUME_VARS_LOCK:
             allowed = 0;
             break;
+        case MIXER_LOCK:
+            allowed = VOLUME_VARS_LOCK;
+            break;
         case INPUT_LOCK:
-            allowed = MIXER_LOCK;
+            allowed = VOLUME_VARS_LOCK|MIXER_LOCK;
             break;
         case INPUT_FIFO_LOCK:
-            allowed = MIXER_LOCK|INPUT_LOCK;
+            allowed = VOLUME_VARS_LOCK|MIXER_LOCK|INPUT_LOCK;
             break;
         case OUTPUT_FIFO_LOCK:
-            allowed = MIXER_LOCK|INPUT_LOCK|INPUT_FIFO_LOCK;
+            allowed = VOLUME_VARS_LOCK|MIXER_LOCK|INPUT_LOCK|INPUT_FIFO_LOCK;
             break;
         default:
             abort ();

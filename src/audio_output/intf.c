@@ -61,6 +61,110 @@
  * a very low volume and users may complain.
  */
 
+enum {
+    SET_MUTE=1,
+    SET_VOLUME=2,
+    INCREMENT_VOLUME=4,
+    TOGGLE_MUTE=8
+};
+/*****************************************************************************
+ * doVolumeChanges : handle all volume changes. Internal use only to ease
+ *                   variables locking.
+ *****************************************************************************/
+int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
+                audio_volume_t i_volume, audio_volume_t * i_return_volume,
+                bool b_mute )
+{
+    int i_result = VLC_SUCCESS;
+    int i_volume_step = 1;
+    bool b_var_mute = false;
+    aout_instance_t *p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
+                                               FIND_ANYWHERE );
+
+    if ( p_aout ) aout_lock_volume( p_aout );
+
+    b_var_mute = (bool)var_GetBool( p_object->p_libvlc, "volume-muted");
+
+    const bool b_unmute_condition = ( /* Also unmute on increments */
+                    ( action == INCREMENT_VOLUME )
+                    || /* On explicit unmute */
+                    ( ( action == SET_MUTE ) && ( b_var_mute && !b_mute ) )
+                    || /* On toggle from muted */
+                    ( ( action == TOGGLE_MUTE ) && b_var_mute ) );
+
+    const bool b_mute_condition = ( !b_var_mute
+                    && ( /* explicit */
+                        ( ( action == SET_MUTE ) && b_mute )
+                        || /* or toggle */
+                        ( action == TOGGLE_MUTE )
+                    ));
+
+    /* On UnMute */
+    if ( b_unmute_condition )
+    {
+        /* Restore saved volume */
+        var_Create( p_object->p_libvlc, "saved-volume", VLC_VAR_INTEGER );
+        i_volume = (audio_volume_t)var_GetInteger( p_object->p_libvlc,
+                                                   "saved-volume" );
+        var_SetBool( p_object->p_libvlc, "volume-muted", false );
+    }
+    else if ( b_mute_condition )
+    {
+        /* We need an initial value to backup later */
+        i_volume = config_GetInt( p_object, "volume" );
+    }
+
+    if ( action == INCREMENT_VOLUME )
+    {
+        i_volume_step = config_GetInt( p_object->p_libvlc, "volume-step" );
+
+        i_volume = config_GetInt( p_object, "volume" )
+                   + i_volume_step * i_nb_steps;
+
+        if ( i_volume > AOUT_VOLUME_MAX )
+            i_volume = AOUT_VOLUME_MAX;
+        else if ( i_volume < AOUT_VOLUME_MIN )
+            i_volume = AOUT_VOLUME_MIN;
+        if ( i_return_volume != NULL )
+            *i_return_volume = i_volume;
+    }
+
+    var_Create( p_object->p_libvlc, "saved-volume", VLC_VAR_INTEGER );
+    var_SetInteger( p_object->p_libvlc, "saved-volume" , i_volume );
+
+    /* On Mute */
+    if ( b_mute_condition )
+    {
+        i_volume = AOUT_VOLUME_MIN;
+        var_SetBool( p_object->p_libvlc, "volume-muted", true );
+    }
+
+    /* Commit volume changes */
+    config_PutInt( p_object, "volume", i_volume );
+
+    if ( p_aout )
+    {
+        aout_lock_mixer( p_aout );
+        aout_lock_input_fifos( p_aout );
+            if ( p_aout->p_mixer )
+                i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
+        aout_unlock_input_fifos( p_aout );
+        aout_unlock_mixer( p_aout );
+    }
+
+    /* trigger callbacks */
+    var_SetBool( p_object->p_libvlc, "volume-change", true );
+    if ( p_aout ) var_SetBool( p_aout, "intf-change", true );
+
+    if ( p_aout )
+    {
+        aout_unlock_volume( p_aout );
+        vlc_object_release( p_aout );
+    }
+
+    return i_result;
+}
+
 /*****************************************************************************
  * aout_VolumeGet : get the volume of the output device
  *****************************************************************************/
@@ -78,6 +182,7 @@ int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
         return 0;
     }
 
+    aout_lock_volume( p_aout );
     aout_lock_mixer( p_aout );
     if ( p_aout->p_mixer )
     {
@@ -88,6 +193,7 @@ int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
         *pi_volume = (audio_volume_t)config_GetInt( p_object, "volume" );
     }
     aout_unlock_mixer( p_aout );
+    aout_unlock_volume( p_aout );
 
     vlc_object_release( p_aout );
     return i_result;
@@ -98,29 +204,7 @@ int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
  *****************************************************************************/
 int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 {
-    config_PutInt( p_object, "volume", i_volume );
-    var_SetBool( p_object->p_libvlc, "volume-change", true );
-
-    var_Create( p_object->p_libvlc, "saved-volume", VLC_VAR_INTEGER );
-    var_SetInteger( p_object->p_libvlc, "saved-volume" , i_volume );
-
-    aout_instance_t *p_aout = vlc_object_find( p_object,
-                                               VLC_OBJECT_AOUT, FIND_ANYWHERE );
-    if ( p_aout == NULL )
-        return VLC_SUCCESS;
-
-    int i_result = VLC_SUCCESS;
-
-    aout_lock_mixer( p_aout );
-    aout_lock_input_fifos( p_aout );
-    if ( p_aout->p_mixer )
-        i_result = p_aout->output.pf_volume_set( p_aout, i_volume );
-    aout_unlock_input_fifos( p_aout );
-    aout_unlock_mixer( p_aout );
-
-    var_SetBool( p_aout, "intf-change", true );
-    vlc_object_release( p_aout );
-    return i_result;
+    return doVolumeChanges( SET_VOLUME, p_object, 1, i_volume, NULL, true );
 }
 
 /*****************************************************************************
@@ -132,19 +216,7 @@ int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
                    audio_volume_t * pi_volume )
 {
-    aout_SetMute( p_object, pi_volume, false );
-    const int i_volume_step = config_GetInt( p_object->p_libvlc, "volume-step" );
-
-    int i_volume = config_GetInt( p_object, "volume" ) +
-                   i_volume_step * i_nb_steps;
-    if ( i_volume > AOUT_VOLUME_MAX )
-        i_volume = AOUT_VOLUME_MAX;
-    else if ( i_volume < AOUT_VOLUME_MIN )
-        i_volume = AOUT_VOLUME_MIN;
-    if ( pi_volume != NULL )
-        *pi_volume = i_volume;
-
-    return __aout_VolumeSet( p_object, i_volume );
+    return doVolumeChanges( INCREMENT_VOLUME, p_object, i_nb_steps, 0, pi_volume, true );
 }
 
 /*****************************************************************************
@@ -167,7 +239,7 @@ int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
  *****************************************************************************/
 int __aout_ToggleMute( vlc_object_t * p_object, audio_volume_t * pi_volume )
 {
-    return aout_SetMute( p_object, pi_volume, !aout_IsMuted( p_object ) );
+    return doVolumeChanges( TOGGLE_MUTE, p_object, 1, 0, pi_volume, true );
 }
 
 /*****************************************************************************
@@ -175,7 +247,13 @@ int __aout_ToggleMute( vlc_object_t * p_object, audio_volume_t * pi_volume )
  *****************************************************************************/
 bool aout_IsMuted( vlc_object_t * p_object )
 {
-    return (bool)var_GetBool( p_object->p_libvlc, "volume-muted");
+    bool b_return_val;
+    aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
+                                                FIND_ANYWHERE );
+    if ( p_aout ) aout_lock_volume( p_aout );
+    b_return_val = var_GetBool( p_object->p_libvlc, "volume-muted");
+    if ( p_aout ) aout_unlock_volume( p_aout );
+    return b_return_val;
 }
 
 /*****************************************************************************
@@ -187,30 +265,7 @@ bool aout_IsMuted( vlc_object_t * p_object )
 int aout_SetMute( vlc_object_t * p_object, audio_volume_t * pi_volume,
                   bool b_mute )
 {
-    int i_result;
-    audio_volume_t i_volume;
-
-    var_SetBool( p_object->p_libvlc, "volume-muted", (bool)b_mute );
-    i_volume = (audio_volume_t)config_GetInt( p_object, "volume" );
-
-    if ( b_mute )
-    {
-        /* Mute */
-        i_result = aout_VolumeSet( p_object, AOUT_VOLUME_MIN );
-        var_Create( p_object->p_libvlc, "saved-volume", VLC_VAR_INTEGER );
-        var_SetInteger( p_object->p_libvlc, "saved-volume", (int)i_volume );
-        if ( pi_volume != NULL ) *pi_volume = AOUT_VOLUME_MIN;
-    }
-    else
-    {
-        /* Un-mute */
-        var_Create( p_object->p_libvlc, "saved-volume", VLC_VAR_INTEGER );
-        i_volume = (audio_volume_t)var_GetInteger( p_object->p_libvlc,
-                                                   "saved-volume" );
-        i_result = aout_VolumeSet( p_object, i_volume );
-        if ( pi_volume != NULL ) *pi_volume = i_volume;
-    }
-    return i_result;
+    return doVolumeChanges( SET_MUTE, p_object, 1, 0, pi_volume, b_mute );
 }
 
 /*

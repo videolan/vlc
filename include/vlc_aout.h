@@ -229,6 +229,8 @@ struct aout_instance_t
     /* When output_fifo_lock is taken, the p_aout->output.fifo structure
      * cannot be read or written  by a third-party thread. */
     vlc_mutex_t             output_fifo_lock;
+    /* volume_vars_lock is taken */
+    vlc_mutex_t             volume_vars_lock;
 
     /* Input streams & pre-filters */
     aout_input_t *          pp_inputs[AOUT_MAX_INPUTS];

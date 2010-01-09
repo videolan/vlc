@@ -151,6 +151,9 @@ int aout_VolumeSoftInfos( aout_instance_t *, audio_volume_t * );
 int aout_VolumeNoneGet( aout_instance_t *, audio_volume_t * );
 int aout_VolumeNoneSet( aout_instance_t *, audio_volume_t );
 int aout_VolumeNoneInfos( aout_instance_t *, audio_volume_t * );
+int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
+                    audio_volume_t i_volume, audio_volume_t * i_return_volume,
+                    bool b_mute );
 
 /* From dec.c */
 #define aout_DecNew(a, b, c, d, e) __aout_DecNew(VLC_OBJECT(a), b, c, d, e)
@@ -179,6 +182,7 @@ enum
     INPUT_LOCK=2,
     INPUT_FIFO_LOCK=4,
     OUTPUT_FIFO_LOCK=8,
+    VOLUME_VARS_LOCK=16
 };
 
 void aout_lock (unsigned);
@@ -239,6 +243,17 @@ static inline void aout_unlock_input( aout_instance_t *p_aout, aout_input_t * p_
     vlc_mutex_unlock( &p_input->lock );
 }
 
+static inline void aout_lock_volume( aout_instance_t *p_aout )
+{
+    aout_lock( VOLUME_VARS_LOCK );
+    vlc_mutex_lock( &p_aout->volume_vars_lock );
+}
+
+static inline void aout_unlock_volume( aout_instance_t *p_aout )
+{
+    aout_unlock( VOLUME_VARS_LOCK );
+    vlc_mutex_unlock( &p_aout->volume_vars_lock );
+}
 
 /* Helpers */
 
