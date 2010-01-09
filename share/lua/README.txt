@@ -126,9 +126,12 @@ end
 net.close( fd ): Close file descriptor.
 net.send( fd, string, [length] ): Send data on fd.
 net.recv( fd, [max length] ): Receive data from fd.
+net.poll( { fd = events }, [timeout in seconds] ): Implement poll function.
+  Retruns the numbers of file descriptors with a non 0 revent. The function
+  modifies the input table to { fd = revents }. See "man poll".
+net.POLLIN/POLLPRI/POLLOUT/POLLRDHUP/POLLERR/POLLHUP/POLLNVAL: poll event flags
 net.select( nfds, fds_read, fds_write, timeout ): Monitor a bunch of file
-  descriptors. Returns number of fds to handle and the amount of time not
-  slept. See "man select".
+  descriptors. Returns number of fds to handle. See "man select".
 net.fd_set_new(): Create a new fd_set.
 local fds = vlc.net.fd_set_new()
 fds:clr( fd ) -- remove fd from set

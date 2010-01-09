@@ -125,7 +125,6 @@ static int vlclua_net_listen_close( lua_State *L )
 
 static int vlclua_net_fds( lua_State *L )
 {
-    vlc_object_t *p_this = vlclua_get_this( L );
     int **ppi_fd = (int**)luaL_checkudata( L, 1, "net_listen" );
     int *pi_fd = *ppi_fd;
 
@@ -208,6 +207,43 @@ static int vlclua_net_recv( lua_State *L )
 /*****************************************************************************
  *
  *****************************************************************************/
+/* Takes a { fd : events } table as first arg and modifies it to { fd : revents } */
+static int vlclua_net_poll( lua_State *L )
+{
+    luaL_checktype( L, 1, LUA_TTABLE );
+    double f_timeout = luaL_optnumber( L, 2, -1. );
+
+    int i_fds = 0;
+    lua_pushnil( L );
+    while( lua_next( L, 1 ) )
+    {
+        i_fds++;
+        lua_pop( L, 1 );
+    }
+    struct pollfd *p_fds = malloc( i_fds * sizeof( struct pollfd ) );
+    lua_pushnil( L );
+    int i = 0;
+    while( lua_next( L, 1 ) )
+    {
+        p_fds[i].fd = luaL_checkinteger( L, -2 );
+        p_fds[i].events = luaL_checkinteger( L, -1 );
+        p_fds[i].revents = 0;
+        lua_pop( L, 1 );
+        i++;
+    }
+
+    int i_ret = poll( p_fds, i_fds, f_timeout < 0. ? -1 : (int)(f_timeout*1000) );
+    for( i = 0; i < i_fds; i++ )
+    {
+        lua_pushinteger( L, p_fds[i].fd );
+        lua_pushinteger( L, p_fds[i].revents );
+        lua_settable( L, 1 );
+    }
+    free( p_fds );
+    lua_pushinteger( L, i_ret );
+    return 1;
+}
+
 static int vlclua_net_select( lua_State *L )
 {
     int i_ret;
@@ -423,6 +459,7 @@ static const luaL_Reg vlclua_net_reg[] = {
     { "close", vlclua_net_close },
     { "send", vlclua_net_send },
     { "recv", vlclua_net_recv },
+    { "poll", vlclua_net_poll },
     { "select", vlclua_net_select },
     { "fd_set_new", vlclua_fd_set_new },
     { "read", vlclua_fd_read },
@@ -436,5 +473,15 @@ void luaopen_net( lua_State *L )
 {
     lua_newtable( L );
     luaL_register( L, NULL, vlclua_net_reg );
+#define ADD_CONSTANT( name, value )    \
+    lua_pushinteger( L, value ); \
+    lua_setfield( L, -2, name );
+    ADD_CONSTANT( "POLLIN", POLLIN )
+    ADD_CONSTANT( "POLLPRI", POLLPRI )
+    ADD_CONSTANT( "POLLOUT", POLLOUT )
+    ADD_CONSTANT( "POLLRDHUP", POLLRDHUP )
+    ADD_CONSTANT( "POLLERR", POLLERR )
+    ADD_CONSTANT( "POLLHUP", POLLHUP )
+    ADD_CONSTANT( "POLLNVAL", POLLNVAL )
     lua_setfield( L, -2, "net" );
 }
