@@ -114,7 +114,7 @@ net.url_parse( url, [option delimiter] ): Parse URL. Returns a table with
 net.listen_tcp( host, port ): Listen to TCP connections. This returns an
   object with an accept and an fds method. accept is blocking (Poll on the
   fds with the net.POLLIN flag if you want to be non blockin).
-  The fds method returns a list of fds you can call select on before using
+  The fds method returns a list of fds you can call poll on before using
   the accept method. For example:
 local l = vlc.net.listen_tcp( "localhost", 1234 )
 while true do
@@ -131,14 +131,6 @@ net.poll( { fd = events }, [timeout in seconds] ): Implement poll function.
   Retruns the numbers of file descriptors with a non 0 revent. The function
   modifies the input table to { fd = revents }. See "man poll".
 net.POLLIN/POLLPRI/POLLOUT/POLLRDHUP/POLLERR/POLLHUP/POLLNVAL: poll event flags
-net.select( nfds, fds_read, fds_write, timeout ): Monitor a bunch of file
-  descriptors. Returns number of fds to handle. See "man select".
-net.fd_set_new(): Create a new fd_set.
-local fds = vlc.net.fd_set_new()
-fds:clr( fd ) -- remove fd from set
-fds:isset( fd ) -- check if fd is set
-fds:set( fd ) -- add fd to set
-fds:zero() -- clear the set
 net.fd_read( fd, [max length] ): Read data from fd.
 net.fd_write( fd, string, [length] ): Write data to fd.
 net.stat( path ): Stat a file. Returns a table with the following fields:

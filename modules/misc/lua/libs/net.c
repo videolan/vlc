@@ -216,98 +216,6 @@ static int vlclua_net_poll( lua_State *L )
     return 1;
 }
 
-static int vlclua_net_select( lua_State *L )
-{
-    int i_ret;
-    size_t i_nfds = luaL_checkint( L, 1 );
-    fd_set *fds_read = (fd_set*)luaL_checkudata( L, 2, "fd_set" );
-    fd_set *fds_write = (fd_set*)luaL_checkudata( L, 3, "fd_set" );
-    double f_timeout = luaL_checknumber( L, 4 );
-    struct timeval timeout;
-
-#ifndef WIN32
-    if( i_nfds > FD_SETSIZE )
-        i_nfds = FD_SETSIZE;
-#endif
-    if( f_timeout >= 0. )
-    {
-        timeout.tv_sec = (int)f_timeout;
-        timeout.tv_usec = (int)(1e6*(f_timeout-(double)((int)f_timeout)));
-    }
-    i_ret = select( i_nfds, fds_read, fds_write, 0, f_timeout >= 0. ? &timeout : NULL );
-    lua_pushinteger( L, i_ret );
-    return 1;
-}
-
-/*****************************************************************************
- *
- *****************************************************************************/
-static int vlclua_fd_clr( lua_State * );
-static int vlclua_fd_isset( lua_State * );
-static int vlclua_fd_set( lua_State * );
-static int vlclua_fd_zero( lua_State * );
-
-static const luaL_Reg vlclua_fd_set_reg[] = {
-    { "clr", vlclua_fd_clr },
-    { "isset", vlclua_fd_isset },
-    { "set", vlclua_fd_set },
-    { "zero", vlclua_fd_zero },
-    { NULL, NULL }
-};
-
-static int vlclua_fd_set_new( lua_State *L )
-{
-    fd_set *fds = (fd_set*)lua_newuserdata( L, sizeof( fd_set ) );
-    FD_ZERO( fds );
-
-    if( luaL_newmetatable( L, "fd_set" ) )
-    {
-        lua_newtable( L );
-        luaL_register( L, NULL, vlclua_fd_set_reg );
-        lua_setfield( L, -2, "__index" );
-    }
-
-    lua_setmetatable( L, -2 );
-    return 1;
-}
-
-static int vlclua_fd_clr( lua_State *L )
-{
-    fd_set *fds = (fd_set*)luaL_checkudata( L, 1, "fd_set" );
-    int i_fd = luaL_checkint( L, 2 );
-    FD_CLR( i_fd, fds );
-    return 0;
-}
-
-static int vlclua_fd_isset( lua_State *L )
-{
-    fd_set *fds = (fd_set*)luaL_checkudata( L, 1, "fd_set" );
-    int i_fd = luaL_checkint( L, 2 );
-    lua_pushboolean( L, FD_ISSET( i_fd, fds ) );
-    return 1;
-}
-
-static int vlclua_fd_set( lua_State *L )
-{
-    fd_set *fds = (fd_set*)luaL_checkudata( L, 1, "fd_set" );
-    size_t i_fd = luaL_checkint( L, 2 );
-    /* FIXME: we should really use poll() instead here, but that breaks the
-     * VLC/LUA API. On Windows, overflow protection is built-in FD_SET, not
-     * on POSIX. In both cases, run-time behavior will however be wrong. */
-#ifndef WIN32
-    if( i_fd < FD_SETSIZE )
-#endif
-        FD_SET( i_fd, fds );
-    return 0;
-}
-
-static int vlclua_fd_zero( lua_State *L )
-{
-    fd_set *fds = (fd_set*)luaL_checkudata( L, 1, "fd_set" );
-    FD_ZERO( fds );
-    return 0;
-}
-
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -432,8 +340,6 @@ static const luaL_Reg vlclua_net_reg[] = {
     { "send", vlclua_net_send },
     { "recv", vlclua_net_recv },
     { "poll", vlclua_net_poll },
-    { "select", vlclua_net_select },
-    { "fd_set_new", vlclua_fd_set_new },
     { "read", vlclua_fd_read },
     { "write", vlclua_fd_write },
     { "stat", vlclua_stat }, /* Not really "net" */
