@@ -2129,13 +2129,10 @@ dirac: dirac-$(DIRAC_VERSION).tar.gz
 	$(EXTRACT_GZ)
 ifdef HAVE_CYGWIN
 	# incorrect compile warning with cygwin compiler 3.4.4
-	patch -p0 <Patches/dirac-cygwin.patch
+	patch -p0 < Patches/dirac-cygwin.patch
 endif
-ifndef HAVE_DARWIN_OS
-	(cd $@; aclocal -I m4 && autoconf && automake)
-else
+	patch -p0 < Patches/dirac-noutils.patch
 	(cd $@; ./bootstrap)
-endif
 
 DIRAC_SUBDIRS = libdirac_byteio libdirac_common libdirac_motionest libdirac_encoder libdirac_decoder
 
