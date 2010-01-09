@@ -353,7 +353,7 @@ case "${host_os}" in
         dnl DEP and ASLR options
         dnl
         AC_ARG_ENABLE(peflags,
-          [  --enable-peflags        peflags use (default enabled)])
+          [  --enable-peflags        peflags use (default enabled on Windows)])
         if test "${enable_peflags}" != "no"
         then
           AC_CHECK_TOOL(PEFLAGS, peflags, :)
