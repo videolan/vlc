@@ -1038,7 +1038,6 @@ ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-libavformat.patch
 endif
 ifdef HAVE_WIN32
-	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-win32.patch)
 	(cd $@; patch -p0 < ../Patches/ffmpeg-dxva2.patch)
 endif
 ifdef NO_TEXT_RELOCATION
