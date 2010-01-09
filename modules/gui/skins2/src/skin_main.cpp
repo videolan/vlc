@@ -398,8 +398,7 @@ static int DemuxOpen( vlc_object_t *p_this )
     p_demux->pf_control = DemuxControl;
 
     // Test that we have a valid .vlt or .wsz file, based on the extension
-    // TODO: an actual check of the contents would be better...
-    if( ( ext = strchr( p_demux->psz_path, '.' ) ) == NULL ||
+    if( ( ext = strrchr( p_demux->psz_path, '.' ) ) == NULL ||
         ( strcasecmp( ext, ".vlt" ) && strcasecmp( ext, ".wsz" ) ) )
     {
         return VLC_EGENERIC;
@@ -414,9 +413,13 @@ static int DemuxOpen( vlc_object_t *p_this )
     if( p_intf != NULL )
     {
         playlist_t *p_playlist = pl_Hold( p_this );
+
+        PL_LOCK;
         // Make sure the item is deleted afterwards
         /// \bug does not always work
         playlist_CurrentPlayingItem( p_playlist )->i_flags |= PLAYLIST_REMOVE_FLAG;
+        PL_UNLOCK;
+
         pl_Release( p_this );
 
         var_SetString( p_intf, "skin-to-load", p_demux->psz_path );
@@ -446,7 +449,18 @@ static int Demux( demux_t *p_demux )
 //---------------------------------------------------------------------------
 static int DemuxControl( demux_t *p_demux, int i_query, va_list args )
 {
-    return demux_vaControlHelper( p_demux->s, 0, 0, 0, 1, i_query, args );
+    switch( i_query )
+    {
+    case DEMUX_GET_PTS_DELAY:
+    {
+        int64_t *pi_pts_delay = va_arg( args, int64_t * );
+        *pi_pts_delay = 10;
+        return VLC_SUCCESS;
+    }
+    default:
+        return VLC_EGENERIC;
+    }
+
 }
 
 
@@ -586,7 +600,7 @@ vlc_module_begin ()
 
     add_submodule ()
         set_description( N_("Skins loader demux") )
-        set_capability( "demux", 5 )
+        set_capability( "access_demux", 5 )
         set_callbacks( DemuxOpen, NULL )
         add_shortcut( "skins" )
 
