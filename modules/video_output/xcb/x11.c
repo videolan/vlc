@@ -54,6 +54,8 @@ vlc_module_begin ()
     set_subcategory (SUBCAT_VIDEO_VOUT)
     set_capability ("vout display", 75)
     set_callbacks (Open, Close)
+    add_shortcut ("xcb-x11")
+    add_shortcut ("x11")
 
     add_bool ("x11-shm", true, NULL, SHM_TEXT, SHM_LONGTEXT, true)
 vlc_module_end ()
