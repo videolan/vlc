@@ -689,8 +689,6 @@ static const entry_t p_list_video[] = {
 
     B(VLC_CODEC_Y211, "Packed YUV 2:1:1, Y:U:Y:V "),
         A("Y211"),
-    B(VLC_CODEC_YMGA, "Planar Y, packed UV, from Matrox"),
-        A("YMGA"),
     B(VLC_CODEC_CYUV, "Creative Packed YUV 4:2:2, U:Y:V:Y, reverted"),
         A("cyuv"),
         A("CYUV"),

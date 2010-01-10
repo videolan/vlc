@@ -1253,7 +1253,6 @@ if test "${SYS}" != "mingwce"; then
   VLC_ADD_PLUGIN([gaussianblur])
   VLC_ADD_PLUGIN([i420_yuy2])
   VLC_ADD_PLUGIN([i422_yuy2])
-  VLC_ADD_PLUGIN([i420_ymga])
   VLC_ADD_PLUGIN([i422_i420])
   VLC_ADD_PLUGIN([yuy2_i422])
   VLC_ADD_PLUGIN([yuy2_i420])
@@ -1291,7 +1290,6 @@ if test "${SYS}" = "mingwce"; then
   VLC_ADD_PLUGIN([dtstospdif])
   VLC_ADD_PLUGIN([i420_yuy2])
   VLC_ADD_PLUGIN([i422_yuy2])
-  VLC_ADD_PLUGIN([i420_ymga])
   VLC_ADD_PLUGIN([i422_i420])
   VLC_ADD_PLUGIN([yuy2_i422])
   VLC_ADD_PLUGIN([yuy2_i420])
@@ -1364,7 +1362,7 @@ AS_IF([test "${enable_mmx}" != "no"], [
   AS_IF([test "${ac_cv_c_mmx_intrinsics}" != "no"], [
     AC_DEFINE(HAVE_MMX_INTRINSICS, 1,
               [Define to 1 if MMX intrinsics are available.])
-    VLC_ADD_CFLAGS([memcpymmx i420_rgb_mmx i420_yuy2_mmx i422_yuy2_mmx i420_ymga_mmx],[-mmmx])
+    VLC_ADD_CFLAGS([memcpymmx i420_rgb_mmx i420_yuy2_mmx i422_yuy2_mmx],[-mmmx])
   ])
 
   AC_CACHE_CHECK([if $CC groks MMX inline assembly],
@@ -1379,7 +1377,6 @@ AS_IF([test "${enable_mmx}" != "no"], [
     VLC_ADD_PLUGIN([i420_rgb_mmx])
     VLC_ADD_PLUGIN([i420_yuy2_mmx])
     VLC_ADD_PLUGIN([i422_yuy2_mmx])
-    VLC_ADD_PLUGIN([i420_ymga_mmx])
   ])
 
   AC_CACHE_CHECK([if $CC groks MMX EXT inline assembly],

@@ -166,8 +166,6 @@
 #define VLC_CODEC_YVYU      VLC_FOURCC('Y','V','Y','U')
 /* Packed YUV 2:1:1, Y:U:Y:V */
 #define VLC_CODEC_Y211      VLC_FOURCC('Y','2','1','1')
-/* Planar Y, packed UV, from Matrox */
-#define VLC_CODEC_YMGA      VLC_FOURCC('Y','M','G','A')
 /* Packed YUV 4:2:2, U:Y:V:Y, reverted */
 #define VLC_CODEC_CYUV      VLC_FOURCC('c','y','u','v')
 /* 10-bit 4:2:2 Component YCbCr */
