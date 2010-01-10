@@ -1,3 +1,5 @@
+AM_CFLAGS += $(MMX_CFLAGS)
+
 libmemcpymmx_plugin_la_SOURCES = memcpy.c fastmemcpy.h
 libmemcpymmx_plugin_la_CFLAGS = $(AM_CFLAGS)
 libmemcpymmx_plugin_la_LIBADD = $(AM_LIBADD)

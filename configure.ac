@@ -1362,7 +1362,8 @@ AS_IF([test "${enable_mmx}" != "no"], [
   AS_IF([test "${ac_cv_c_mmx_intrinsics}" != "no"], [
     AC_DEFINE(HAVE_MMX_INTRINSICS, 1,
               [Define to 1 if MMX intrinsics are available.])
-    VLC_ADD_CFLAGS([memcpymmx i420_rgb_mmx i420_yuy2_mmx i422_yuy2_mmx],[-mmmx])
+    MMX_CFLAGS="-mmmx"
+    VLC_ADD_CFLAGS([i420_rgb_mmx i420_yuy2_mmx i422_yuy2_mmx],[-mmmx])
   ])
 
   AC_CACHE_CHECK([if $CC groks MMX inline assembly],
@@ -1390,6 +1391,7 @@ AS_IF([test "${enable_mmx}" != "no"], [
     have_mmxext="yes"
   ])
 ])
+AC_SUBST(MMX_CFLAGS)
 AM_CONDITIONAL([HAVE_MMX], [test "${have_mmx}" = "yes"])
 AM_CONDITIONAL([HAVE_MMXEXT], [test "${have_mmxext}" = "yes"])
 
@@ -1431,6 +1433,7 @@ AS_IF([test "${enable_sse}" != "no"], [
   AS_IF([test "${ac_cv_c_sse2_intrinsics}" != "no"], [
     AC_DEFINE(HAVE_SSE2_INTRINSICS, 1,
               [Define to 1 if SSE2 intrinsics are available.])
+    SSE2_CFLAGS="-msse2"
     VLC_ADD_CFLAGS([i420_rgb_sse2 i420_yuy2_sse2 i422_yuy2_sse2],[-msse2])
   ])
 
@@ -1506,6 +1509,7 @@ AS_IF([test "${enable_sse}" != "no"], [
     AC_DEFINE(CAN_COMPILE_SSE4A, 1,
               [Define to 1 if SSE4A inline assembly is available.]) ])
 ])
+AC_SUBST(SSE2_CFLAGS)
 
 have_3dnow="no"
 AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly],
