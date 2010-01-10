@@ -1,5 +1,5 @@
 /*****************************************************************************
- * arm_neon.c: NEON assembly optimized audio conversions
+ * audio_format.c: NEON assembly optimized audio conversions
  *****************************************************************************
  * Copyright (C) 2009 Rémi Denis-Courmont
  *
@@ -26,7 +26,6 @@
 #include <vlc_plugin.h>
 #include <vlc_aout.h>
 #include <vlc_filter.h>
-#include <vlc_cpu.h>
 
 #include <assert.h>
 
@@ -36,7 +35,6 @@ vlc_module_begin ()
     set_description (N_("ARM NEON audio format conversions") )
     set_capability ("audio filter", 20)
     set_callbacks (Open, NULL)
-    add_requirement (NEON)
 vlc_module_end ()
 
 static block_t *Do_F32_S32 (filter_t *, block_t *);

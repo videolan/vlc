@@ -1526,16 +1526,22 @@ AC_ARG_ENABLE(neon,
 ])
 AS_IF([test "${enable_neon}" != "no"], [
   AC_CACHE_CHECK([if $CC groks NEON inline assembly], [ac_cv_neon_inline], [
+    CFLAGS="${CFLAGS_save} -mfpu=neon"
     AC_COMPILE_IFELSE([
       AC_LANG_PROGRAM(,[[asm volatile("vqmovun.s64 d0, q1":::"d0");]])
     ], [
-      ac_cv_neon_inline="yes"
+      ac_cv_neon_inline="-mfpu=neon"
     ], [
       ac_cv_neon_inline="no"
     ])
   ])
+  ARM_NEON_CFLAGS="$ac_cv_neon_inline"
+], [
+  ac_cv_neon_inline="no"
 ])
-AM_CONDITIONAL(HAVE_NEON, [test "${ac_cv_neon_inline}" = "yes"])
+AC_SUBST(ARM_NEON_CFLAGS)
+AM_CONDITIONAL(HAVE_ARM_NEON, [test "${ac_cv_neon_inline}" != "no"])
+
 
 AC_ARG_ENABLE(altivec,
 [  --disable-altivec       disable AltiVec optimizations (default auto)],, [
@@ -5190,6 +5196,7 @@ AC_CONFIG_FILES([
   modules/3dnow/Makefile
   modules/sse2/Makefile
   modules/altivec/Makefile
+  modules/arm_neon/Makefile
 ])
 
 dnl Generate makefiles

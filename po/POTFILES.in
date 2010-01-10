@@ -311,6 +311,8 @@ modules/access_output/rtmp.c
 modules/access_output/shout.c
 modules/access_output/udp.c
 modules/altivec/memcpy.c
+modules/arm_neon/audio_format.c
+modules/arm_neon/i420_yuy2.c
 modules/audio_filter/channel_mixer/dolby.c
 modules/audio_filter/channel_mixer/headphone.c
 modules/audio_filter/channel_mixer/mono.c
@@ -325,7 +327,6 @@ modules/audio_filter/converter/fixed.c
 modules/audio_filter/converter/float.c
 modules/audio_filter/converter/format.c
 modules/audio_filter/converter/mpgatofixed32.c
-modules/audio_filter/converter/neon.c
 modules/audio_filter/equalizer.c
 modules/audio_filter/equalizer_presets.h
 modules/audio_filter/normvol.c
@@ -1076,7 +1077,6 @@ modules/video_chroma/i420_yuy2.h
 modules/video_chroma/i422_i420.c
 modules/video_chroma/i422_yuy2.c
 modules/video_chroma/i422_yuy2.h
-modules/video_chroma/neon.c
 modules/video_chroma/yuy2_i420.c
 modules/video_chroma/yuy2_i422.c
 modules/video_filter/adjust.c

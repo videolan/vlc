@@ -1,5 +1,5 @@
 /*****************************************************************************
- * neon.c : ARM NEONv1 chroma conversion module for VLC
+ * i420_yuy2.c : ARM NEONv1 YUV 4:2:0 to YUV :2:2 chroma conversion for VLC
  *****************************************************************************
  * Copyright (C) 2009 Rémi Denis-Courmont
  *

@@ -26,6 +26,7 @@ EXTRA_SUBDIRS = \
 	sse2 \
 	3dnow \
 	altivec \
+	arm_neon \
 	$(NULL)
 
 SUBDIRS = $(BASE_SUBDIRS)
@@ -47,6 +48,9 @@ SUBDIRS += 3dnow
 endif
 if HAVE_ALTIVEC
 SUBDIRS += altivec
+endif
+if HAVE_ARM_NEON
+SUBDIRS += arm_neon
 endif
 
 dist_noinst_SCRIPTS = genmf list.sh
