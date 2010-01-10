@@ -148,8 +148,6 @@ $Id$
  * i420_rgb: planar YUV to packed RGB conversion functions
  * i420_rgb_mmx: MMX accelerated version of i420_rgb
  * i420_rgb_sse2: sse2 accelerated version of i420_rgb
- * i420_ymga: YUV to YUC conversion functions
- * i420_ymga_mmx: MMX accelerated version of i420_ymga
  * i420_yuy2: planar 4:2:0 YUV to packed YUV conversion functions
  * i420_yuy2_altivec: AltiVec accelerated version of i420_yuy2
  * i420_yuy2_mmx: MMX accelerated version of i420_yuy2
