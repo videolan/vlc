@@ -1,4 +1,4 @@
-BASE_SUBDIRS = dummy memcpy notify testsuite playlist stats osd xml
+BASE_SUBDIRS = dummy notify testsuite playlist stats osd xml
 EXTRA_SUBDIRS = lua
 
 SUBDIRS = $(BASE_SUBDIRS)

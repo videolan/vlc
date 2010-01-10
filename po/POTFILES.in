@@ -310,6 +310,7 @@ modules/access_output/http.c
 modules/access_output/rtmp.c
 modules/access_output/shout.c
 modules/access_output/udp.c
+modules/altivec/memcpy.c
 modules/audio_filter/channel_mixer/dolby.c
 modules/audio_filter/channel_mixer/headphone.c
 modules/audio_filter/channel_mixer/mono.c
@@ -976,7 +977,6 @@ modules/misc/lua/libs/volume.c
 modules/misc/lua/meta.c
 modules/misc/lua/vlc.c
 modules/misc/lua/vlc.h
-modules/misc/memcpy/memcpyaltivec.c
 modules/misc/notify/growl.m
 modules/misc/notify/growl_udp.c
 modules/misc/notify/msn.c

@@ -1,5 +1,5 @@
 /*****************************************************************************
- * memcpyaltivec.c : AltiVec memcpy module
+ * memcpy.c : AltiVec memcpy module
  *****************************************************************************
  * Copyright (C) 2001 the VideoLAN team
  * $Id$
@@ -61,7 +61,6 @@ vlc_module_begin ()
     set_description( N_("AltiVec memcpy") )
     set_category( CAT_ADVANCED )
     set_subcategory( SUBCAT_ADVANCED_MISC )
-    add_requirement( ALTIVEC )
     set_capability( "memcpy", 100 )
     set_callbacks( Activate, NULL )
     add_shortcut( "altivec" )

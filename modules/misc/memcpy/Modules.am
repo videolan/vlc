@@ -1,3 +1,0 @@
-SOURCES_memcpyaltivec = \
-	memcpyaltivec.c \
-	$(NULL)

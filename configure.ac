@@ -1546,6 +1546,7 @@ AC_ARG_ENABLE(altivec,
   AS_IF([test "${host_cpu}" = "powerpc"],
         [enable_altivec=yes], [enable_altivec=no])
 ])
+have_altivec="no"
 AS_IF([test "${enable_altivec}" = "yes"], [
   ARCH="${ARCH} altivec";
   AC_CACHE_CHECK([if $CC groks AltiVec inline assembly],
@@ -1568,7 +1569,7 @@ AS_IF([test "${enable_altivec}" = "yes"], [
       VLC_ADD_CFLAGS([i420_yuy2_altivec],[${ac_cv_altivec_inline}])
       VLC_ADD_CFLAGS([libvlccore],[${ac_cv_altivec_inline}])
     ])
-    VLC_ADD_PLUGIN([memcpyaltivec])
+    have_altivec="yes"
     VLC_ADD_PLUGIN([i420_yuy2_altivec])
   ])
 
@@ -1631,7 +1632,7 @@ dnl - Others: test should fail
     VLC_ADD_CFLAGS([libvlccore],[${ac_cv_c_altivec}])
     VLC_ADD_CFLAGS([idctaltivec motionaltivec],[${ac_cv_c_altivec}])
     VLC_ADD_CFLAGS([i420_yuy2_altivec memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
-    VLC_ADD_PLUGIN([memcpyaltivec])
+    have_altivec="yes"
     VLC_ADD_PLUGIN([i420_yuy2_altivec])
   ])
 
@@ -1645,6 +1646,7 @@ dnl - Others: test should fail
     VLC_ADD_LDFLAGS([libvlccore idctaltivec motionaltivec memcpyaltivec],[-Wl,-framework,vecLib])
   ])
 ])
+AM_CONDITIONAL([HAVE_ALTIVEC], [test "$have_altivec" = "yes"])
 
 dnl
 dnl  Special arch tuning
@@ -5179,7 +5181,6 @@ AC_CONFIG_FILES([
   modules/misc/Makefile
   modules/misc/dummy/Makefile
   modules/misc/lua/Makefile
-  modules/misc/memcpy/Makefile
   modules/misc/notify/Makefile
   modules/misc/testsuite/Makefile
   modules/misc/playlist/Makefile
@@ -5203,6 +5204,7 @@ AC_CONFIG_FILES([
   modules/mmx/Makefile
   modules/mmxext/Makefile
   modules/3dnow/Makefile
+  modules/altivec/Makefile
 ])
 
 dnl Generate makefiles

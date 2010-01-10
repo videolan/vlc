@@ -1,0 +1,8 @@
+libmemcpyaltivec_plugin_la_SOURCES = memcpy.c
+libmemcpyaltivec_plugin_la_CFLAGS = $(AM_CFLAGS)
+libmemcpyaltivec_plugin_la_LIBADD = $(AM_LIBADD)
+libmemcpyaltivec_plugin_la_DEPENDENCIES =
+
+libvlc_LTLIBRARIES += \
+	libmemcpyaltivec_plugin.la \
+	$(NULL)

@@ -40,6 +40,9 @@ endif
 if HAVE_3DNOW
 SUBDIRS += 3dnow
 endif
+if HAVE_ALTIVEC
+SUBDIRS += altivec
+endif
 
 dist_noinst_SCRIPTS = genmf list.sh
 dist_noinst_DATA = LIST
