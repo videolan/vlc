@@ -1406,6 +1406,7 @@ AC_ARG_ENABLE(sse,
       ;;
   esac
 ])
+have_sse2="no"
 AS_IF([test "${enable_sse}" != "no"], [
   ARCH="${ARCH} sse sse2"
 
@@ -1430,7 +1431,6 @@ AS_IF([test "${enable_sse}" != "no"], [
     AC_DEFINE(HAVE_SSE2_INTRINSICS, 1,
               [Define to 1 if SSE2 intrinsics are available.])
     SSE2_CFLAGS="-msse2"
-    VLC_ADD_CFLAGS([i420_rgb_sse2 i420_yuy2_sse2 i422_yuy2_sse2],[-msse2])
   ])
 
   AC_CACHE_CHECK([if $CC groks SSE inline assembly],
@@ -1451,9 +1451,7 @@ AS_IF([test "${enable_sse}" != "no"], [
   AS_IF([test "${ac_cv_sse2_inline}" != "no" -a "${SYS}" != "solaris"], [
     AC_DEFINE(CAN_COMPILE_SSE2, 1,
               [Define to 1 if SSE2 inline assembly is available.])
-    VLC_ADD_PLUGIN([i420_rgb_sse2])
-    VLC_ADD_PLUGIN([i420_yuy2_sse2])
-    VLC_ADD_PLUGIN([i422_yuy2_sse2])
+    have_sse2="yes"
   ])
 
   # SSE3
@@ -1506,6 +1504,7 @@ AS_IF([test "${enable_sse}" != "no"], [
               [Define to 1 if SSE4A inline assembly is available.]) ])
 ])
 AC_SUBST(SSE2_CFLAGS)
+AM_CONDITIONAL([HAVE_SSE2], [test "$have_sse2" = "yes"])
 
 have_3dnow="no"
 AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly],
@@ -5191,6 +5190,7 @@ AC_CONFIG_FILES([
   modules/mmx/Makefile
   modules/mmxext/Makefile
   modules/3dnow/Makefile
+  modules/sse2/Makefile
   modules/altivec/Makefile
 ])
 

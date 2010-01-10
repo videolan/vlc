@@ -35,7 +35,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
-#include <vlc_cpu.h>
 
 #include "i420_rgb.h"
 #if defined (MODULE_NAME_IS_i420_rgb)
@@ -92,7 +91,6 @@ vlc_module_begin ()
     set_description( N_( "SSE2 I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") )
     set_capability( "video filter2", 120 )
-    add_requirement( SSE2 )
 #endif
     set_callbacks( Activate, Deactivate )
 vlc_module_end ()

@@ -33,7 +33,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
-#include <vlc_cpu.h>
 
 #include "i422_yuy2.h"
 
@@ -77,7 +76,6 @@ vlc_module_begin ()
 #elif defined (MODULE_NAME_IS_i422_yuy2_sse2)
     set_description( N_("SSE2 conversions from " SRC_FOURCC " to " DEST_FOURCC) )
     set_capability( "video filter2", 120 )
-    add_requirement( SSE2 )
 #endif
     set_callbacks( Activate, NULL )
 vlc_module_end ()
