@@ -1,0 +1,8 @@
+libmemcpy3dn_plugin_la_SOURCES = memcpy.c ../mmx/fastmemcpy.h
+libmemcpy3dn_plugin_la_CFLAGS = $(AM_CFLAGS)
+libmemcpy3dn_plugin_la_LIBADD = $(AM_LIBADD)
+libmemcpy3dn_plugin_la_DEPENDENCIES =
+
+libvlc_LTLIBRARIES += \
+	libmemcpy3dn_plugin.la \
+	$(NULL)

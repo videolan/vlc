@@ -1,0 +1,8 @@
+libmemcpymmxext_plugin_la_SOURCES = memcpy.c ../mmx/fastmemcpy.h
+libmemcpymmxext_plugin_la_CFLAGS = $(AM_CFLAGS)
+libmemcpymmxext_plugin_la_LIBADD = $(AM_LIBADD)
+libmemcpymmxext_plugin_la_DEPENDENCIES =
+
+libvlc_LTLIBRARIES += \
+	libmemcpymmxext_plugin.la \
+	$(NULL)

@@ -1339,6 +1339,8 @@ AC_ARG_ENABLE(mmx,
       ;;
   esac
 ])
+have_mmx="no"
+have_mmxext="no"
 AS_IF([test "${enable_mmx}" != "no"], [
   ARCH="${ARCH} mmx"
 
@@ -1373,7 +1375,7 @@ AS_IF([test "${enable_mmx}" != "no"], [
   AS_IF([test "${ac_cv_mmx_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_MMX, 1,
               [Define to 1 inline MMX assembly is available.])
-    VLC_ADD_PLUGIN([memcpymmx])
+    have_mmx="yes"
     VLC_ADD_PLUGIN([i420_rgb_mmx])
     VLC_ADD_PLUGIN([i420_yuy2_mmx])
     VLC_ADD_PLUGIN([i422_yuy2_mmx])
@@ -1388,9 +1390,11 @@ AS_IF([test "${enable_mmx}" != "no"], [
   AS_IF([test "${ac_cv_mmxext_inline}" != "no"], [
     AC_DEFINE(CAN_COMPILE_MMXEXT, 1,
               [Define to 1 if MMX EXT inline assembly is available.])
-    VLC_ADD_PLUGIN([memcpymmxext])
+    have_mmxext="yes"
   ])
 ])
+AM_CONDITIONAL([HAVE_MMX], [test "${have_mmx}" = "yes"])
+AM_CONDITIONAL([HAVE_MMXEXT], [test "${have_mmxext}" = "yes"])
 
 dnl  Check for fully workin SSE2 intrinsics
 dnl  We need support for -mmmx, we need <emmintrin.h>, and we also need a
@@ -1506,6 +1510,7 @@ AS_IF([test "${enable_sse}" != "no"], [
               [Define to 1 if SSE4A inline assembly is available.]) ])
 ])
 
+have_3dnow="no"
 AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly],
     [ac_cv_3dnow_inline],
     [CFLAGS="${CFLAGS_save}"
@@ -1514,8 +1519,9 @@ AC_CACHE_CHECK([if $CC groks 3D Now! inline assembly],
 AS_IF([test "${ac_cv_3dnow_inline}" != "no"], [
   AC_DEFINE(CAN_COMPILE_3DNOW, 1,
             [Define to 1 if 3D Now! inline assembly is available.])
-  VLC_ADD_PLUGIN([memcpy3dn])
+  have_3dnow="yes"
 ])
+AM_CONDITIONAL([HAVE_3DNOW], [test "$have_3dnow" = "yes"])
 
 
 AC_ARG_ENABLE(neon,
@@ -5194,6 +5200,9 @@ AC_CONFIG_FILES([
   modules/video_output/msw/Makefile
   modules/visualization/Makefile
   modules/visualization/visual/Makefile
+  modules/mmx/Makefile
+  modules/mmxext/Makefile
+  modules/3dnow/Makefile
 ])
 
 dnl Generate makefiles

@@ -211,6 +211,7 @@ src/video_output/vout_pictures.h
 src/video_output/vout_subpictures.c
 
 # modules
+modules/3dnow/memcpy.c
 modules/access/alsa.c
 modules/access/bd/bd.c
 modules/access/bda/bda.c
@@ -975,8 +976,6 @@ modules/misc/lua/libs/volume.c
 modules/misc/lua/meta.c
 modules/misc/lua/vlc.c
 modules/misc/lua/vlc.h
-modules/misc/memcpy/fastmemcpy.h
-modules/misc/memcpy/memcpy.c
 modules/misc/memcpy/memcpyaltivec.c
 modules/misc/notify/growl.m
 modules/misc/notify/growl_udp.c
@@ -1011,6 +1010,8 @@ modules/misc/text_renderer.h
 modules/misc/win32text.c
 modules/misc/xml/libxml.c
 modules/misc/xml/xtag.c
+modules/mmx/memcpy.c
+modules/mmxext/memcpy.c
 modules/mux/asf.c
 modules/mux/avi.c
 modules/mux/dummy.c
