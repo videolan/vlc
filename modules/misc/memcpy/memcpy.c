@@ -49,17 +49,13 @@
 #elif defined( MODULE_NAME_IS_memcpymmxext )
 #   define PRIORITY 200
 #   define HAVE_MMX2
-#else
-#   define PRIORITY 50
 #endif
 
 /*****************************************************************************
  * Extern prototype
  *****************************************************************************/
-#ifndef MODULE_NAME_IS_memcpy
-#   define fast_memcpy fast_memcpy
-#   include "fastmemcpy.h"
-#endif
+#define fast_memcpy fast_memcpy
+#include "fastmemcpy.h"
 
 /*****************************************************************************
  * Module initializer
@@ -67,9 +63,7 @@
 static int Activate ( vlc_object_t *p_this )
 {
     VLC_UNUSED(p_this);
-#ifndef MODULE_NAME_IS_memcpy
     vlc_fastmem_register( fast_memcpy, NULL );
-#endif
 
     return VLC_SUCCESS;
 }
@@ -80,11 +74,7 @@ static int Activate ( vlc_object_t *p_this )
 vlc_module_begin ()
     set_category( CAT_ADVANCED )
     set_subcategory( SUBCAT_ADVANCED_MISC )
-#ifdef MODULE_NAME_IS_memcpy
-    set_description( N_("libc memcpy") )
-    add_shortcut( "c" )
-    add_shortcut( "libc" )
-#elif defined( MODULE_NAME_IS_memcpy3dn )
+#if defined( MODULE_NAME_IS_memcpy3dn )
     set_description( N_("3D Now! memcpy") )
     add_requirement( 3DNOW )
     add_shortcut( "3dn" )

@@ -34,6 +34,8 @@
 
 #include "dummy.h"
 
+static int OpenDummy(vlc_object_t *);
+
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
@@ -113,5 +115,16 @@ vlc_module_begin ()
         set_description( N_("Dummy font renderer function") )
         set_capability( "text renderer", 1 )
         set_callbacks( OpenRenderer, NULL )
+    add_submodule ()
+        set_description( N_("libc memcpy") )
+        set_capability( "memcpy", 50 )
+        set_callbacks( OpenDummy, NULL )
+        add_shortcut( "c" )
+        add_shortcut( "libc" )
 vlc_module_end ()
 
+static int OpenDummy( vlc_object_t *obj )
+{
+    (void) obj;
+    return VLC_SUCCESS;
+}

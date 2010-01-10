@@ -1,7 +1,3 @@
-SOURCES_memcpy = \
-	memcpy.c \
-	$(NULL)
-
 SOURCES_memcpymmx = \
 	memcpy.c \
 	fastmemcpy.h \
@@ -20,5 +16,3 @@ SOURCES_memcpy3dn = \
 SOURCES_memcpyaltivec = \
 	memcpyaltivec.c \
 	$(NULL)
-
-libvlc_LTLIBRARIES += libmemcpy_plugin.la
