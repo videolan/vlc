@@ -468,7 +468,7 @@ vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     /* Choose the video output module */
     if( !p_vout->p->psz_filter_chain || !*p_vout->p->psz_filter_chain )
     {
-        psz_parser = var_CreateGetString( p_vout, "vout" );
+        psz_parser = NULL;
     }
     else
     {
