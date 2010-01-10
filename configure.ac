@@ -3903,16 +3903,6 @@ AC_ARG_ENABLE(fb,
     fi
 
 dnl
-dnl  Linux MGA module
-dnl
-AC_ARG_ENABLE(mga,
-  [  --enable-mga            Linux kernel Matrox support (default disabled)],
-  [ if test "${enable_mga}" = "yes"
-    then
-      VLC_ADD_PLUGIN([mga])
-    fi ])
-
-dnl
 dnl  OMAP Framebuffer module
 dnl
 AC_ARG_ENABLE(omapfb,

@@ -102,6 +102,7 @@ Removed modules:
  * opie, qte and qte_main
  * linear_resampler and trivial_resampler are removed. Use the ugly one.
  * XvMC accelerated modules. Use VAAPI instead.
+ * MGA (Matroska) for Linux. Use Linux Framebuffer (or X) instead.
  * opengllayer
  * cddax. Use cdda instead
  * cmml and tarkin codecs are removed because they are dead codecs.

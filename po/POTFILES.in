@@ -1172,7 +1172,6 @@ modules/video_output/drawable.c
 modules/video_output/fb.c
 modules/video_output/ggi.c
 modules/video_output/hd1000v.cpp
-modules/video_output/mga.c
 modules/video_output/msw/direct3d.c
 modules/video_output/msw/directx.c
 modules/video_output/msw/events.c

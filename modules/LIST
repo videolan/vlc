@@ -185,7 +185,6 @@ $Id$
  * memcpyaltivec: Altivec accelerated version of memcpy
  * memcpymmx: MMX accelerated version of memcpy
  * memcpymmxext: MMX EXT accelerated version of memcpy
- * mga: video output module for Matrox cards using the Linux mga kernel driver
  * minimal_macosx: a minimal Mac OS X GUI, using the FrameWork
  * mirror: mirror video filter
  * mjpeg: a demuxer for multipart and concatenated JPEG data

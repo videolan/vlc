@@ -11,7 +11,6 @@ SOURCES_omapfb = omapfb.c
 SOURCES_ggi = ggi.c
 SOURCES_vout_sdl = sdl.c
 SOURCES_svgalib = svgalib.c
-SOURCES_mga = mga.c
 SOURCES_hd1000v = hd1000v.cpp
 SOURCES_snapshot = snapshot.c
 SOURCES_opengl = opengl.c opengl.h
