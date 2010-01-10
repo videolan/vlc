@@ -1566,7 +1566,6 @@ AS_IF([test "${enable_altivec}" = "yes"], [
       VLC_ADD_CFLAGS([libvlccore],[${ac_cv_altivec_inline}])
     ])
     have_altivec="yes"
-    VLC_ADD_PLUGIN([i420_yuy2_altivec])
   ])
 
 dnl The AltiVec C extensions
@@ -1629,7 +1628,6 @@ dnl - Others: test should fail
     VLC_ADD_CFLAGS([idctaltivec motionaltivec],[${ac_cv_c_altivec}])
     VLC_ADD_CFLAGS([i420_yuy2_altivec memcpyaltivec deinterlace],[${ac_cv_c_altivec} ${ac_cv_c_altivec_abi}])
     have_altivec="yes"
-    VLC_ADD_PLUGIN([i420_yuy2_altivec])
   ])
 
   AC_CACHE_CHECK([if linker needs -framework vecLib],

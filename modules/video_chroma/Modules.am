@@ -11,11 +11,6 @@ SOURCES_i420_yuy2 = \
 	i420_yuy2.h \
 	$(NULL)
 
-SOURCES_i420_yuy2_altivec = \
-	i420_yuy2.c \
-	i420_yuy2.h \
-	$(NULL)
-
 SOURCES_i422_yuy2 = \
 	i422_yuy2.c \
 	i422_yuy2.h \

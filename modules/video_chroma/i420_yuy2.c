@@ -33,7 +33,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_filter.h>
-#include <vlc_cpu.h>
 
 #if defined (MODULE_NAME_IS_i420_yuy2_altivec) && defined(HAVE_ALTIVEC_H)
 #   include <altivec.h>
@@ -98,7 +97,6 @@ vlc_module_begin ()
     set_description(
             _("AltiVec conversions from " SRC_FOURCC " to " DEST_FOURCC) );
     set_capability( "video filter2", 250 )
-    add_requirement( ALTIVEC )
 #endif
     set_callbacks( Activate, NULL )
 vlc_module_end ()
