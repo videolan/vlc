@@ -182,7 +182,6 @@ $Id$
  * mash: OpenMash based decoder
  * mediadirs: Picture/Music/Video user directories as service discoveries
  * memcpy3dn: 3D Now! accelerated version of memcpy
- * memcpy: memory chunk copying module
  * memcpyaltivec: Altivec accelerated version of memcpy
  * memcpymmx: MMX accelerated version of memcpy
  * memcpymmxext: MMX EXT accelerated version of memcpy
