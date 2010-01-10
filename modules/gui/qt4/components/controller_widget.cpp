@@ -183,7 +183,10 @@ void SoundWidget::updateMuteStatus()
     playlist_t *p_playlist = pl_Hold( p_intf );
     b_is_muted = aout_IsMuted( VLC_OBJECT(p_playlist) );
     pl_Release( p_intf );
-    (qobject_cast<SoundSlider *>(volumeSlider))->setMuted( b_is_muted );
+
+    SoundSlider *soundSlider = qobject_cast<SoundSlider *>(volumeSlider);
+    if( soundSlider )
+        soundSlider->setMuted( b_is_muted );
     refreshLabels();
 }
 
