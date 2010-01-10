@@ -35,6 +35,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */
 #include <vlc_plugin.h>
+#include <vlc_cpu.h>
 
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
@@ -88,10 +89,10 @@ static int    CacheSaveConfig  ( module_t *, FILE * );
 
 /* Format string for the cache filename */
 #define CACHENAME_FORMAT \
-    "plugins-%.2zx%.2zx%.2"PRIx8".dat"
+    "plugins-%.2zx%.2zx%.2"PRIx8"-%x.dat"
 /* Magic for the cache filename */
 #define CACHENAME_VALUES \
-    sizeof(int), sizeof(void *), *(uint8_t *)&(uint16_t){ 0xbe1e }
+    sizeof(int), sizeof(void *), *(uint8_t *)&(uint16_t){ 0xbe1e }, vlc_CPU()
 
 
 /*****************************************************************************
