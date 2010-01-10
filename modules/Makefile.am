@@ -24,6 +24,7 @@ EXTRA_SUBDIRS = \
 	mmx \
 	mmxext \
 	3dnow \
+	altivec \
 	$(NULL)
 
 SUBDIRS = $(BASE_SUBDIRS)
