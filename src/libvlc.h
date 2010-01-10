@@ -79,6 +79,7 @@ void vlc_assert_locked (vlc_mutex_t *);
  */
 extern uint32_t cpu_flags;
 uint32_t CPUCapabilities( void );
+bool vlc_CPU_CheckPluginDir (const char *name);
 
 /*
  * Message/logging stuff

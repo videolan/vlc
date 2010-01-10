@@ -906,7 +906,9 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
             break;
 
         /* Skip ".", ".." */
-        if (!strcmp (file, ".") || !strcmp (file, ".."))
+        if (!strcmp (file, ".") || !strcmp (file, "..")
+        /* Skip directories for unsupported optimizations */
+         || !vlc_CPU_CheckPluginDir (file))
         {
             free (file);
             continue;
