@@ -88,7 +88,6 @@ vlc_module_begin ()
     set_description( N_( "MMX I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") )
     set_capability( "video filter2", 100 )
-    add_requirement( MMX )
 #elif defined (MODULE_NAME_IS_i420_rgb_sse2)
     set_description( N_( "SSE2 I420,IYUV,YV12 to "
                         "RV15,RV16,RV24,RV32 conversions") )

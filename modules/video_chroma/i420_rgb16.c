@@ -37,9 +37,9 @@
 #if defined (MODULE_NAME_IS_i420_rgb)
 #   include "i420_rgb_c.h"
 #elif defined (MODULE_NAME_IS_i420_rgb_mmx)
-#   include "i420_rgb_mmx.h"
+#   include "../mmx/i420_rgb_mmx.h"
 #elif defined (MODULE_NAME_IS_i420_rgb_sse2)
-#   include "i420_rgb_mmx.h"
+#   include "../mmx/i420_rgb_mmx.h"
 #endif
 
 static void SetOffset( int, int, int, int, bool *,

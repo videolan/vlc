@@ -6,13 +6,6 @@ SOURCES_i420_rgb = \
 	i420_rgb_c.h \
 	$(NULL)
 
-SOURCES_i420_rgb_mmx = \
-	i420_rgb.c \
-	i420_rgb.h \
-	i420_rgb16.c \
-	i420_rgb_mmx.h \
-	$(NULL)
-
 SOURCES_i420_rgb_sse2 = \
 	i420_rgb.c \
 	i420_rgb.h \
@@ -21,11 +14,6 @@ SOURCES_i420_rgb_sse2 = \
 	$(NULL)
 
 SOURCES_i420_yuy2 = \
-	i420_yuy2.c \
-	i420_yuy2.h \
-	$(NULL)
-
-SOURCES_i420_yuy2_mmx = \
 	i420_yuy2.c \
 	i420_yuy2.h \
 	$(NULL)
@@ -41,11 +29,6 @@ SOURCES_i420_yuy2_altivec = \
 	$(NULL)
 
 SOURCES_i422_yuy2 = \
-	i422_yuy2.c \
-	i422_yuy2.h \
-	$(NULL)
-
-SOURCES_i422_yuy2_mmx = \
 	i422_yuy2.c \
 	i422_yuy2.h \
 	$(NULL)
