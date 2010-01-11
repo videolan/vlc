@@ -31,7 +31,6 @@
 
 #include <vlc_common.h>
 
-#include <ctype.h>
 #include <limits.h>
 #include <assert.h>
 #include <errno.h>

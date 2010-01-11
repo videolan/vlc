@@ -40,8 +40,6 @@
 #include <vlc_network.h>
 #include <vlc_charset.h>
 
-#include <ctype.h>
-
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
 #endif

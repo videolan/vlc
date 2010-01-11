@@ -31,9 +31,6 @@
 
 #include <vlc_common.h>
 
-#include <ctype.h>
-
-
 #undef iconv_t
 #undef iconv_open
 #undef iconv

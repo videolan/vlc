@@ -38,7 +38,6 @@
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 
-#include <ctype.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <sys/ioctl.h>

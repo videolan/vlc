@@ -51,8 +51,6 @@ http://service.real.com/help/library/guides/realone/IntroGuide/HTML/htmfiles/ram
 #include <vlc_demux.h>
 #include <vlc_url.h>
 
-#include <ctype.h>
-
 #include "playlist.h"
 
 struct demux_sys_t

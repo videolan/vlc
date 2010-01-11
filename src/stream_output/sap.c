@@ -35,7 +35,6 @@
 #include <stdlib.h>                                                /* free() */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>
-#include <ctype.h>                                  /* tolower(), isxdigit() */
 #include <assert.h>
 
 #include <vlc_sout.h>

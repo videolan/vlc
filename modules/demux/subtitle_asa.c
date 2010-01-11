@@ -38,7 +38,6 @@
 #ifdef HAVE_SYS_TYPES_H
 #   include <sys/types.h>
 #endif
-#include <ctype.h>
 
 #include <vlc_demux.h>
 #include <vlc_charset.h>

@@ -32,7 +32,6 @@
 #include <vlc_common.h>
 #include <stdlib.h>
 #include <strings.h>
-#include <ctype.h>
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 

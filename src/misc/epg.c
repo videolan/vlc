@@ -29,8 +29,6 @@
 # include "config.h"
 #endif
 
-#include <ctype.h>
-
 #include <vlc_common.h>
 #include <vlc_epg.h>
 

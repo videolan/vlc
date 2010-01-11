@@ -34,7 +34,6 @@
 #include <vlc_plugin.h>
 
 #include <errno.h>                                                 /* ENOMEM */
-#include <ctype.h>
 #include <signal.h>
 #include <assert.h>
 

@@ -33,7 +33,6 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 
-#include <ctype.h>
 #include <assert.h>
 
 #include <vlc_access.h> /* DVB-specific things */
