@@ -955,6 +955,25 @@ static char *CreateHtmlSubtitle( int *pi_align, char *psz_subtitle )
             /* Hide {Y:stupidity} */
             psz_subtitle = strchr( psz_subtitle, '}' ) + 1;
         }
+        else if( psz_subtitle[0] == '\\' && psz_subtitle[1] )
+        {
+            if( psz_subtitle[1] == 'N' || psz_subtitle[1] == 'n' )
+            {
+                HtmlPut( &psz_html, "<br/>" );
+                psz_subtitle += 2;
+            }
+            else if( psz_subtitle[1] == 'h' )
+            {
+                /* Non breakable space */
+                HtmlPut( &psz_html, NO_BREAKING_SPACE );
+                psz_subtitle += 2;
+            }
+            else
+            {
+                HtmlPut( &psz_html, "\\" );
+                psz_subtitle++;
+            }
+        }
         else
         {
             *psz_html = *psz_subtitle;
