@@ -1,0 +1,48 @@
+diff -urNp fontconfig.orig/fc-arch/Makefile.am fontconfig/fc-arch/Makefile.am
+--- fontconfig.orig/fc-arch/Makefile.am	2009-03-18 22:02:20.000000000 +0100
++++ fontconfig/fc-arch/Makefile.am	2010-01-11 17:58:51.000000000 +0100
+@@ -22,6 +22,8 @@
+ # PERFORMANCE OF THIS SOFTWARE.
+ #
+ 
++CPPFLAGS =
++CFLAGS =
+ CC = @CC_FOR_BUILD@
+ EXEEXT = @EXEEXT_FOR_BUILD@
+ LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+diff -urNp fontconfig.orig/fc-case/Makefile.am fontconfig/fc-case/Makefile.am
+--- fontconfig.orig/fc-case/Makefile.am	2009-03-18 22:02:20.000000000 +0100
++++ fontconfig/fc-case/Makefile.am	2010-01-11 17:56:39.000000000 +0100
+@@ -22,6 +22,8 @@
+ # PERFORMANCE OF THIS SOFTWARE.
+ #
+ 
++CPPFLAGS =
++CFLAGS =
+ CC = @CC_FOR_BUILD@
+ EXEEXT = @EXEEXT_FOR_BUILD@
+ LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+diff -urNp fontconfig.orig/fc-glyphname/Makefile.am fontconfig/fc-glyphname/Makefile.am
+--- fontconfig.orig/fc-glyphname/Makefile.am	2009-03-18 22:02:20.000000000 +0100
++++ fontconfig/fc-glyphname/Makefile.am	2010-01-11 17:57:29.000000000 +0100
+@@ -22,6 +22,8 @@
+ # PERFORMANCE OF THIS SOFTWARE.
+ #
+ 
++CPPFLAGS =
++CFLAGS =
+ CC = @CC_FOR_BUILD@
+ EXEEXT = @EXEEXT_FOR_BUILD@
+ LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@
+diff -urNp fontconfig.orig/fc-lang/Makefile.am fontconfig/fc-lang/Makefile.am
+--- fontconfig.orig/fc-lang/Makefile.am	2009-06-24 19:52:10.000000000 +0200
++++ fontconfig/fc-lang/Makefile.am	2010-01-11 17:56:56.000000000 +0100
+@@ -22,6 +22,8 @@
+ # PERFORMANCE OF THIS SOFTWARE.
+ #
+ 
++CPPFLAGS =
++CFLAGS =
+ CC = @CC_FOR_BUILD@
+ EXEEXT = @EXEEXT_FOR_BUILD@
+ LINK = $(CCLD) $(AM_CFLAGS) $(CFLAGS) $(AM_LDFLAGS) $(LDFLAGS) -o $@

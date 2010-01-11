@@ -460,6 +460,7 @@ fontconfig-$(FONTCONFIG_VERSION).tar.gz:
 
 fontconfig: fontconfig-$(FONTCONFIG_VERSION).tar.gz Patches/fontconfig.patch
 	$(EXTRACT_GZ)
+	patch -p0 < Patches/fontconfig-march.patch
 	patch -p0 < Patches/fontconfig-nodocs.patch
 ifdef HAVE_WIN32
 	patch -p0 < Patches/fontconfig.patch
