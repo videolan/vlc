@@ -37,6 +37,8 @@
 #ifndef WIN32
 #include <unistd.h>
 #include <sys/wait.h>
+#else
+#include <errno.h>
 #endif
 
 #include "libvlc.h"

@@ -36,6 +36,7 @@
 #include <stdarg.h>
 #include <assert.h>
 #include <limits.h>
+#include <errno.h>
 #ifdef UNDER_CE
 # include <mmsystem.h>
 #endif

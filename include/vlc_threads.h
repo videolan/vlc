@@ -35,21 +35,17 @@
  */
 
 #if defined( UNDER_CE )
-#   include <errno.h>                                           /* WinCE API */
 #elif defined( WIN32 )
 #   include <process.h>                                         /* Win32 API */
-#   include <errno.h>
 
 #else                                         /* pthreads (like Linux & BSD) */
 #   define LIBVLC_USE_PTHREAD 1
 #   define LIBVLC_USE_PTHREAD_CANCEL 1
 #   define _APPLE_C_SOURCE    1 /* Proper pthread semantics on OSX */
 
-#   include <stdlib.h> /* lldiv_t definition (only in C99) */
 #   include <unistd.h> /* _POSIX_SPIN_LOCKS */
 #   include <pthread.h>
 #   include <semaphore.h>
-#   include <time.h>
 
 #endif
 
