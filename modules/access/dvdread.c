@@ -48,7 +48,6 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
-#include <sys/stat.h>
 
 #ifdef HAVE_DVDREAD_DVD_READER_H
   #include <dvdread/dvd_reader.h>

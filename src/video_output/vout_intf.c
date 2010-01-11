@@ -33,7 +33,6 @@
 #include <stdio.h>
 #include <stdlib.h>                                                /* free() */
 #include <sys/types.h>                                          /* opendir() */
-#include <sys/stat.h>
 #include <dirent.h>                                             /* opendir() */
 #include <assert.h>
 #include <time.h>                                           /* strftime */

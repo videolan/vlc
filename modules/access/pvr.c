@@ -35,7 +35,6 @@
 #include <vlc_charset.h>
 
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
 #include <linux/types.h>

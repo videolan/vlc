@@ -31,10 +31,6 @@
 #include <vlc_interface.h>
 #include <vlc_services_discovery.h>
 
-#ifdef HAVE_SYS_STAT_H
-#include <sys/stat.h>
-#endif
-
 #include "libmtp.h"
 
 /*****************************************************************************

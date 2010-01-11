@@ -15,8 +15,6 @@
 #include <stdio.h>
 #include <fcntl.h>
 
-#include <sys/stat.h>
-
 #if !defined(WIN32)
 #include <termios.h>
 #include <unistd.h>
@@ -24,7 +22,6 @@
 
 /*
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <string.h>
 #include <termios.h>

@@ -36,10 +36,6 @@
 #include <vlc_strings.h>
 #include <vlc_charset.h>
 
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
-
 #include "vlc.h"
 #include "libs.h"
 #include "libs/playlist.h"

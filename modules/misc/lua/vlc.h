@@ -37,10 +37,6 @@
 #include <vlc_stream.h>
 #include <vlc_charset.h>
 
-#ifdef HAVE_SYS_STAT_H
-#   include <sys/stat.h>
-#endif
-
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
 #include <lualib.h>     /* Lua libs */

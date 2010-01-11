@@ -34,12 +34,10 @@
 #include <errno.h>
 
 #include <sys/types.h>
-#include <sys/stat.h>
 #include <fcntl.h>
 #include <time.h>
 #include <unistd.h>
-#include <sys/stat.h>
-#include <sys/poll.h>
+#include <poll.h>
 #include <vlc_charset.h>
 
 /* DVB Card Drivers */

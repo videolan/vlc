@@ -42,6 +42,7 @@
 #ifdef HAVE_POLL
 #include <poll.h>       /* poll structures and defines */
 #endif
+#include <sys/stat.h>
 
 #include "../vlc.h"
 #include "../libs.h"

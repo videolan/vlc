@@ -50,7 +50,6 @@
 #   include <sys/types.h>
 #   include <unistd.h>
 #   include <fcntl.h>
-#   include <sys/stat.h>
 #endif
 #ifdef HAVE_ARPA_INET_H
 #   include <arpa/inet.h>
