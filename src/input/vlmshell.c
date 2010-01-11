@@ -40,10 +40,6 @@
 
 #ifdef ENABLE_VLM
 
-#ifndef WIN32
-#   include <sys/time.h>                                   /* gettimeofday() */
-#endif
-
 #include <time.h>                                                 /* ctime() */
 
 #include <vlc_input.h>
