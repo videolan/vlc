@@ -162,7 +162,7 @@ static QStringList findAllLibVlc()
         paths << vlcInstallDir + QLatin1Char('\\') + "libvlc.dll";
         return paths;
     } else {
-        return QString();
+        return QStringList();
     }
 #endif
 }
