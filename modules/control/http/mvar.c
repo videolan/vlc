@@ -30,6 +30,7 @@
 #include <limits.h>
 #include <errno.h>
 #include <ctype.h>
+#include <fcntl.h>
 
 /* Utility function for scandir */
 static int Filter( const char *foo )

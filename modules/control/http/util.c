@@ -31,6 +31,7 @@
 #include "http.h"
 #include <vlc_strings.h>
 #include <errno.h>
+#include <fcntl.h>
 
 /****************************************************************************
  * File and directory functions

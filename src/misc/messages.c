@@ -36,10 +36,6 @@
 
 #include <stdarg.h>                                       /* va_list for BSD */
 
-#ifdef HAVE_FCNTL_H
-#   include <fcntl.h>                  /* O_CREAT, O_TRUNC, O_WRONLY, O_SYNC */
-#endif
-
 #include <errno.h>                                                  /* errno */
 
 #ifdef WIN32

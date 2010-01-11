@@ -50,7 +50,6 @@
 # include <unistd.h>
 #else
 # include <io.h>
-# include <fcntl.h>
 #endif
 
 #include <search.h>

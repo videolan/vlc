@@ -33,7 +33,6 @@
 #include <errno.h>
 
 #include <sys/types.h>
-#include <fcntl.h>
 #include <time.h>
 #include <unistd.h>
 #include <poll.h>

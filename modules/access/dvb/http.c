@@ -35,7 +35,6 @@
 #   include <unistd.h>
 #endif
 
-#include <fcntl.h>
 #include <sys/types.h>
 
 /* Include dvbpsi headers */

@@ -49,7 +49,6 @@
 #ifdef HAVE_UNISTD_H
 #   include <sys/types.h>
 #   include <unistd.h>
-#   include <fcntl.h>
 #endif
 #ifdef HAVE_ARPA_INET_H
 #   include <arpa/inet.h>

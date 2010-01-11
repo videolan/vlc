@@ -36,7 +36,6 @@
 #   include <unistd.h>
 #endif
 
-#include <fcntl.h>
 #include <sys/types.h>
 #include <poll.h>
 

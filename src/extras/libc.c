@@ -50,7 +50,6 @@
 #   include <unistd.h>
 #   include <errno.h>
 #   include <sys/wait.h>
-#   include <fcntl.h>
 #   include <sys/socket.h>
 #   include <sys/poll.h>
 #   ifndef PF_LOCAL

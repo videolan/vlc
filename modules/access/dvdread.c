@@ -46,7 +46,6 @@
 #   include <unistd.h>
 #endif
 
-#include <fcntl.h>
 #include <sys/types.h>
 
 #ifdef HAVE_DVDREAD_DVD_READER_H

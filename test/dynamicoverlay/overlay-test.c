@@ -31,7 +31,6 @@
 #include <string.h>
 #include <math.h>
 
-#include <sys/fcntl.h>
 #include <sys/ipc.h>
 #include <sys/shm.h>
 #include <unistd.h>

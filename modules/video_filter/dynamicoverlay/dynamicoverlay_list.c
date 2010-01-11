@@ -30,7 +30,6 @@
 #include <vlc_osd.h>
 #include <vlc_memory.h>
 
-#include <fcntl.h>
 #include "dynamicoverlay.h"
 
 /*****************************************************************************

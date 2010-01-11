@@ -44,10 +44,6 @@
 #include <vlc_acl.h>
 #include <vlc_charset.h>
 
-#ifdef HAVE_FCNTL_H
-#   include <fcntl.h>
-#endif
-
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )

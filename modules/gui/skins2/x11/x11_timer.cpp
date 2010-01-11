@@ -25,7 +25,6 @@
 #ifdef X11_SKINS
 
 #include <unistd.h>
-#include <fcntl.h>
 #include <poll.h>
 
 #include "x11_timer.hpp"

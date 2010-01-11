@@ -33,7 +33,6 @@
 #include <vlc_plugin.h>
 
 #include <sys/types.h>
-#include <fcntl.h>
 #include <assert.h>
 
 #include <vlc_sout.h>
