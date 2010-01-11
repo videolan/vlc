@@ -38,11 +38,6 @@
 #include <stdlib.h>                                                /* free() */
 #include <string.h>
 
-
-#ifdef HAVE_SYS_TIMES_H
-#   include <sys/times.h>
-#endif
-
 #include <vlc_vout.h>
 
 #include <vlc_filter.h>
@@ -1446,16 +1441,6 @@ static void CleanThread( vout_thread_t *p_vout )
  *****************************************************************************/
 static void EndThread( vout_thread_t *p_vout )
 {
-#ifdef STATS
-    {
-        struct tms cpu_usage;
-        times( &cpu_usage );
-
-        msg_Dbg( p_vout, "cpu usage (user: %d, system: %d)",
-                 cpu_usage.tms_utime, cpu_usage.tms_stime );
-    }
-#endif
-
     /* FIXME does that function *really* need to be called inside the thread ? */
 
     /* Detach subpicture unit from both input and vout */
