@@ -37,7 +37,6 @@
 #include <vlc_charset.h>
 #include <vlc_stream.h>
 #include <vlc_xml.h>
-#include <errno.h>
 #include <string.h>
 
 

@@ -51,7 +51,6 @@
 #else
 # include <io.h>
 # include <fcntl.h>
-# include <errno.h> /* ENOSYS */
 #endif
 
 #include <search.h>

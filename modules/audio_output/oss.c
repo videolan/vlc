@@ -31,7 +31,6 @@
 # include "config.h"
 #endif
 
-#include <errno.h>                                                 /* ENOMEM */
 #include <fcntl.h>                                       /* open(), O_WRONLY */
 #include <sys/ioctl.h>                                            /* ioctl() */
 #include <unistd.h>                                      /* write(), close() */

@@ -48,7 +48,6 @@
 #include <jack/jack.h>
 #include <jack/ringbuffer.h>
 
-#include <errno.h>
 #include <sys/types.h>
 #include <unistd.h>
 

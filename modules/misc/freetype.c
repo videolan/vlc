@@ -43,7 +43,6 @@
 #include <vlc_memory.h>
 
 #include <math.h>
-#include <errno.h>
 
 #include <ft2build.h>
 #include FT_FREETYPE_H

@@ -27,7 +27,6 @@
 #include <vlc_common.h>
 #include <vlc_playlist.h>
 #include <vlc_plugin.h>
-#include <errno.h>
 #include <vlc_charset.h>
 #include <vlc_interface.h>
 #include <vlc_services_discovery.h>

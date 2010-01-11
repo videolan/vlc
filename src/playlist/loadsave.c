@@ -35,7 +35,6 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <unistd.h>
-#include <errno.h>
 
 int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
                      playlist_item_t *p_export_root, const char *psz_type )

@@ -27,7 +27,6 @@
 #include <vlc_plugin.h>
 
 #include <assert.h>
-#include <errno.h>
 
 #include <vlc_access.h>
 

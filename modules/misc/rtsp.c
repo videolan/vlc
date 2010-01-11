@@ -43,8 +43,6 @@
 #include <vlc_charset.h>
 #include <vlc_strings.h>
 
-#include <errno.h>
-
 #ifndef WIN32
 # include <locale.h>
 #endif

@@ -36,11 +36,7 @@
 # include "config.h"
 #endif
 
-#include <errno.h>                                                 /* ENOMEM */
-#include <ctype.h>
-
 #include <math.h>
-
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>

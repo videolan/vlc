@@ -38,8 +38,6 @@
 #include <fcntl.h>
 #include <sys/types.h>
 
-#include <errno.h>
-
 /* Include dvbpsi headers */
 #ifdef HAVE_DVBPSI_DR_H
 #   include <dvbpsi/dvbpsi.h>

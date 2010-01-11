@@ -27,7 +27,6 @@
 # include "config.h"
 #endif
 
-#include <errno.h>                                                 /* ENOMEM */
 #include <fcntl.h>                                                 /* open() */
 #include <unistd.h>                                               /* close() */
 

@@ -33,7 +33,6 @@
 #include <vlc_plugin.h>
 #include <vlc_charset.h>
 
-#include <errno.h>
 #include <stdlib.h>                                                /* free() */
 #include <string.h>                                            /* strerror() */
 #include <fcntl.h>                                                 /* open() */

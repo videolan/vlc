@@ -43,7 +43,6 @@
 #include "modules/modules.h"
 #include "config/configuration.h"
 
-#include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>
 #include <stdlib.h>                                                /* free() */

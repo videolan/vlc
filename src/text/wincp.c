@@ -35,7 +35,6 @@
 #endif
 
 #ifdef __APPLE__
-#   include <errno.h>
 #   include <string.h>
 #endif
 

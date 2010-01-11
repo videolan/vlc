@@ -30,7 +30,6 @@
 # include "config.h"
 #endif
 
-#include <errno.h>                                                 /* ENOMEM */
 #include <signal.h>                                      /* SIGUSR1, SIGUSR2 */
 #include <fcntl.h>                                                 /* open() */
 #include <unistd.h>                                               /* close() */

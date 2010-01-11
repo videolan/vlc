@@ -35,7 +35,6 @@
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
 #include <vlc_network.h>
-#include <errno.h>
 #include <vlc_md5.h>
 
 /*****************************************************************************

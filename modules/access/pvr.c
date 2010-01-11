@@ -38,7 +38,6 @@
 #include <sys/stat.h>
 #include <fcntl.h>
 #include <unistd.h>
-#include <errno.h>
 #include <linux/types.h>
 #include <sys/ioctl.h>
 #include <sys/poll.h>

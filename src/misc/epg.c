@@ -30,7 +30,6 @@
 #endif
 
 #include <ctype.h>
-#include <errno.h>
 
 #include <vlc_common.h>
 #include <vlc_epg.h>

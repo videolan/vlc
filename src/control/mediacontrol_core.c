@@ -41,7 +41,6 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 
-#include <errno.h>                                                 /* ENOMEM */
 #include <stdio.h>
 #include <ctype.h>
 

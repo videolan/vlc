@@ -30,7 +30,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <errno.h>
 #include <assert.h>
 #if defined (WIN32) && !defined (UNDER_CE)
 #  include <direct.h>

@@ -38,9 +38,7 @@
 
 #include <fcntl.h>
 #include <sys/types.h>
-#include <sys/poll.h>
-
-#include <errno.h>
+#include <poll.h>
 
 /* Include dvbpsi headers */
 #ifdef HAVE_DVBPSI_DR_H
