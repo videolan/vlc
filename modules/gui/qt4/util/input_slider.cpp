@@ -34,7 +34,7 @@
 
 InputSlider::InputSlider( QWidget *_parent ) : QSlider( _parent )
 {
-    InputSlider::InputSlider( Qt::Horizontal, _parent );
+    InputSlider( Qt::Horizontal, _parent );
 }
 
 InputSlider::InputSlider( Qt::Orientation q, QWidget *_parent ) :
