@@ -1534,6 +1534,7 @@ AS_IF([test "${enable_neon}" != "no"], [
     ], [
       ac_cv_neon_inline="no"
     ])
+    CFLAGS="${CFLAGS_save}"
   ])
   ARM_NEON_CFLAGS="$ac_cv_neon_inline"
 ], [
