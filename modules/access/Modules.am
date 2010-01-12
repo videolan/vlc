@@ -44,6 +44,7 @@ SOURCES_access_mtp = mtp.c
 SOURCES_access_sftp = sftp.c
 SOURCES_access_imem = imem.c
 SOURCES_access_avio = avio.c avio.h
+SOURCES_access_attachment = attachment.c
 
 libaccess_rtmp_plugin_la_SOURCES = \
         rtmp/access.c \
@@ -65,6 +66,7 @@ libvlc_LTLIBRARIES += \
 	libaccess_fake_plugin.la \
 	libaccess_rtmp_plugin.la \
 	libaccess_imem_plugin.la \
+	libaccess_attachment_plugin.la \
 	$(NULL)
 
 libxcb_screen_plugin_la_SOURCES = screen/xcb.c
