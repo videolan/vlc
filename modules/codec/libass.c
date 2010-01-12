@@ -449,7 +449,8 @@ static int BuildRegions( spu_t *p_spu, rectangle_t *p_region, int i_max_region, 
 #endif
 
     for( p_tmp = p_img_list, i_count = 0; p_tmp != NULL; p_tmp = p_tmp->next )
-        i_count++;
+        if( p_tmp->w > 0 && p_tmp->h > 0 )
+            i_count++;
     if( i_count <= 0 )
         return 0;
 
@@ -457,8 +458,9 @@ static int BuildRegions( spu_t *p_spu, rectangle_t *p_region, int i_max_region, 
     if( !pp_img )
         return 0;
 
-    for( p_tmp = p_img_list, i_count = 0; p_tmp != NULL; p_tmp = p_tmp->next, i_count++ )
-        pp_img[i_count] = p_tmp;
+    for( p_tmp = p_img_list, i_count = 0; p_tmp != NULL; p_tmp = p_tmp->next )
+        if( p_tmp->w > 0 && p_tmp->h > 0 )
+            pp_img[i_count++] = p_tmp;
 
     /* */
     const int i_w_inc = __MAX( ( i_width + 49 ) / 50, 32 );
