@@ -70,7 +70,7 @@ static bool check_OS_capability( const char *psz_capability, pid_t pid )
     return false;
 }
 
-#  define check_capability(name, flag, code)  \
+#  define check_capability(name, flag, code)   \
      do {                                      \
         pid_t pid = fork();                    \
         if( pid == 0 )                         \
@@ -84,7 +84,10 @@ static bool check_OS_capability( const char *psz_capability, pid_t pid )
      } while(0)
 
 # else /* WIN32 */
-# define check_capability(name, flag, code) (void)0
+#  define check_capability(name, flag, code)   \
+     do {                                      \
+        i_capabilities |= (flag);              \
+     } while(0)
 # endif
 #endif
 
