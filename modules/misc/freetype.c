@@ -45,6 +45,7 @@
 #include <math.h>
 
 #include <ft2build.h>
+#include <freetype/ftsynth.h>
 #include FT_FREETYPE_H
 #include FT_GLYPH_H
 #define FT_FLOOR(X)     ((X & -64) >> 6)
@@ -1489,7 +1490,8 @@ static ft_style_t *GetStyleFromFontStack( filter_sys_t *p_sys,
 }
 
 static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
-                      bool b_uline, bool b_through, int i_karaoke_bgcolor,
+                      bool b_uline, bool b_through, bool b_bold,
+                      bool b_italic, int i_karaoke_bgcolor,
                       line_desc_t *p_line, uint32_t *psz_unicode,
                       int *pi_pen_x, int i_pen_y, int *pi_start,
                       FT_Vector *p_result )
@@ -1551,6 +1553,16 @@ static int RenderTag( filter_t *p_filter, FT_Face p_face, int i_font_color,
             p_line->pp_glyphs[ i ] = NULL;
             return VLC_EGENERIC;
         }
+
+        /* Do synthetic styling now that Freetype supports it;
+         * ie. if the font we have loaded is NOT already in the
+         * style that the tags want, then switch it on; if they
+         * are then don't. */
+        if (b_bold && !( p_face->style_flags & FT_STYLE_FLAG_BOLD ))
+            FT_GlyphSlot_Embolden( p_face->glyph );
+        if (b_italic && !( p_face->style_flags & FT_STYLE_FLAG_ITALIC ))
+            FT_GlyphSlot_Oblique( p_face->glyph );
+
         i_error = FT_Get_Glyph( p_face->glyph, &tmp_glyph );
         if( i_error )
         {
@@ -2110,6 +2122,8 @@ static int ProcessLines( filter_t *p_filter,
                 if( RenderTag( p_filter, p_face ? p_face : p_sys->p_face,
                                p_style->i_font_color, p_style->b_underline,
                                p_style->b_through,
+                               p_style->b_bold,
+                               p_style->b_italic,
                                p_style->i_karaoke_bg_color,
                                p_line, psz_unicode, &i_pen_x, i_pen_y, &i_posn,
                                &tmp_result ) != VLC_SUCCESS )
