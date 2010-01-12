@@ -270,6 +270,7 @@ out:
     pid_t pid = fork();
     if( pid == 0 )
     {
+        signal(SIGILL, SIG_DFL);
         asm volatile ("mtspr 256, %0\n\t"
                       "vand %%v0, %%v0, %%v0"
                       :
