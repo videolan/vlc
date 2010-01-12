@@ -2488,7 +2488,7 @@ then
      [Define if you have libcdio 0.78.2 or greater installed]),
      [AC_MSG_WARN(CD Reading and information library not found)])
 
-  if test "${enable_vcdinfo}" != "no"
+  if test "${enable_libvcdinfo}" != "no"
   then
     PKG_CHECK_MODULES(LIBVCDINFO, libvcdinfo >= 0.7.22,
        [have_libvcdinfo=yes],
@@ -2506,8 +2506,8 @@ if test "${enable_vcdx}" = "yes"
 then
   if test "${have_libvcdinfo}" = "yes"
   then
-    VLC_ADD_LIBS([vcdx],[$VCDINFO_LIBS])
-    VLC_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])
+    VLC_ADD_LIBS([vcdx],[$LIBVCDINFO_LIBS])
+    VLC_ADD_CFLAGS([vcdx],[$LIBVCDINFO_CFLAGS])
   else
     AC_MSG_WARN([vcdx plugin disabled because ok libvcdinfo library not found or disabled])
     HAVE_VCDX=no
@@ -2523,8 +2523,8 @@ then
   then
     AC_DEFINE(HAVE_VCDX, 1,
     [Define for the VCD plugin using libcdio/libvcdinfo])
-    VLC_ADD_LIBS([vcdx],[$VCDINFO_LIBS])
-    VLC_ADD_CFLAGS([vcdx],[$VCDINFO_CFLAGS])
+    VLC_ADD_LIBS([vcdx],[$LIBVCDINFO_LIBS])
+    VLC_ADD_CFLAGS([vcdx],[$LIBVCDINFO_CFLAGS])
     VLC_ADD_PLUGIN([vcdx])
   else
     AC_MSG_WARN([vcdx plugin disabled because ok libvcdinfo library not found])
