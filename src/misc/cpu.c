@@ -37,6 +37,7 @@
 #ifndef WIN32
 #include <unistd.h>
 #include <sys/wait.h>
+#include <signal.h>
 #else
 #include <errno.h>
 #endif
@@ -120,8 +121,9 @@ uint32_t CPUCapabilities( void )
         pid_t pid = fork();                    \
         if( pid == 0 )                         \
         {                                      \
+            signal(SIGILL, SIG_DFL);           \
             __asm__ __volatile__ ( code : : ); \
-            _exit(0);                           \
+            _exit(0);                          \
         }                                      \
         if( check_OS_capability((name), pid )) \
             i_capabilities |= (flag);          \
