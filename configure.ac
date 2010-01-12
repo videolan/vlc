@@ -22,7 +22,7 @@ AC_CONFIG_LIBOBJ_DIR(compat)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
 
-AM_INIT_AUTOMAKE(tar-ustar color-tests)
+AM_INIT_AUTOMAKE(tar-ustar)
 AM_CONFIG_HEADER(config.h)
 
 # Disable with "./configure --disable-silent-rules" or "make V=1"
