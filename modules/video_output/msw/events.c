@@ -60,6 +60,9 @@
 UINT GetMenuState(HMENU hMenu, UINT id, UINT flags)
 {
     MENUITEMINFO info;
+    memset(&info, 0, sizeof(info));
+    info.cbSize = sizeof(info);
+    info.fMask = MIIM_STATE;
     if (!GetMenuItemInfo(hMenu, id, (flags & MF_BYPOSITION) != 0, &info))
         return -1;
     /* XXX Submenu handling is missing... */
