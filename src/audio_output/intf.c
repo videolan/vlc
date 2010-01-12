@@ -118,8 +118,9 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
     {
         i_volume_step = config_GetInt( p_object->p_libvlc, "volume-step" );
 
-        i_volume = config_GetInt( p_object, "volume" )
-                   + i_volume_step * i_nb_steps;
+        if ( !b_unmute_condition )
+            i_volume = config_GetInt( p_object, "volume" );
+        i_volume += i_volume_step * i_nb_steps;
 
         if ( i_volume > AOUT_VOLUME_MAX )
             i_volume = AOUT_VOLUME_MAX;
