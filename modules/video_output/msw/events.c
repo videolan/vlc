@@ -56,6 +56,15 @@
 #ifdef UNDER_CE
 #include <aygshell.h>
     //WINSHELLAPI BOOL WINAPI SHFullScreen(HWND hwndRequester, DWORD dwState);
+
+UINT GetMenuState(HMENU hMenu, UINT id, UINT flags)
+{
+    MENUITEMINFO info;
+    if (!GetMenuItemInfo(hMenu, id, (flags & MF_BYPOSITION) != 0, &info))
+        return -1;
+    /* XXX Submenu handling is missing... */
+    return info.fState;
+}
 #endif
 
 /*#if defined(UNDER_CE) && !defined(__PLUGIN__) --FIXME*/
