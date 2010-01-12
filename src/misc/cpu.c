@@ -50,9 +50,9 @@
 
 #if defined( __i386__ ) || defined( __x86_64__ ) || defined( __powerpc__ ) \
  || defined( __ppc__ ) || defined( __ppc64__ ) || defined( __powerpc64__ )
+# ifndef WIN32
 static bool check_OS_capability( const char *psz_capability, pid_t pid )
 {
-#ifndef WIN32
     int status;
 
     if( pid == -1 )
@@ -68,14 +68,24 @@ static bool check_OS_capability( const char *psz_capability, pid_t pid )
     fprintf( stderr, "         some optimizations will be disabled unless "
                      "you upgrade your OS\n" );
     return false;
-#else
-# warning FIXME!
-# define fork() (errno = ENOSYS, -1)
-    (void)pid;
-    (void)psz_capability;
-    return true;
-#endif
 }
+
+#  define check_capability(name, flag, code)  \
+     do {                                      \
+        pid_t pid = fork();                    \
+        if( pid == 0 )                         \
+        {                                      \
+            signal(SIGILL, SIG_DFL);           \
+            __asm__ __volatile__ ( code : : ); \
+            _exit(0);                          \
+        }                                      \
+        if( check_OS_capability((name), pid )) \
+            i_capabilities |= (flag);          \
+     } while(0)
+
+# else /* WIN32 */
+# define check_capability(name, flag, code) (void)0
+# endif
 #endif
 
 /*****************************************************************************
@@ -116,19 +126,6 @@ uint32_t CPUCapabilities( void )
                          : "cc" );
 #   endif
      /* Check if the OS really supports the requested instructions */
-#   define check_capability(name, flag, code)  \
-     do {                                      \
-        pid_t pid = fork();                    \
-        if( pid == 0 )                         \
-        {                                      \
-            signal(SIGILL, SIG_DFL);           \
-            __asm__ __volatile__ ( code : : ); \
-            _exit(0);                          \
-        }                                      \
-        if( check_OS_capability((name), pid )) \
-            i_capabilities |= (flag);          \
-     } while(0)
-
 # if defined (__i386__) && !defined (__i486__) && !defined (__i586__) \
   && !defined (__i686__) && !defined (__pentium4__) \
   && !defined (__k6__) && !defined (__athlon__) && !defined (__k8__)
