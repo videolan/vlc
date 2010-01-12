@@ -212,7 +212,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Flavor for SIPR codecs */
     p_sys->i_codec_flavor = -1;
-    if( p_dec->fmt_in.i_codec == VLC_FOURCC('s','i','p','r') )
+    if( p_dec->fmt_in.i_codec == VLC_FOURCC_SIPR )
     {
         p_sys->i_codec_flavor = p_dec->fmt_in.audio.i_flavor;
         msg_Dbg( p_dec, "Got sipr flavor %d", p_sys->i_codec_flavor );
