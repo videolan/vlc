@@ -1003,11 +1003,14 @@ static void LoadSubtitles( input_thread_t *p_input )
         var_SetTime( p_input, "spu-delay", (mtime_t)i_delay * 100000 );
 
     /* Look for and add subtitle files */
+    bool b_forced = true;
+
     char *psz_subtitle = var_GetNonEmptyString( p_input, "sub-file" );
     if( psz_subtitle != NULL )
     {
         msg_Dbg( p_input, "forced subtitle: %s", psz_subtitle );
-        SubtitleAdd( p_input, psz_subtitle, true );
+        SubtitleAdd( p_input, psz_subtitle, b_forced );
+        b_forced = false;
     }
 
     if( var_GetBool( p_input, "sub-autodetect-file" ) )
@@ -1019,18 +1022,45 @@ static void LoadSubtitles( input_thread_t *p_input )
 
         for( int i = 0; ppsz_subs && ppsz_subs[i]; i++ )
         {
-            /* Try to autoselect the first autodetected subtitles file
-             * if no subtitles file was specified */
-            bool b_forced = i == 0 && !psz_subtitle;
-
             if( !psz_subtitle || strcmp( psz_subtitle, ppsz_subs[i] ) )
+            {
                 SubtitleAdd( p_input, ppsz_subs[i], b_forced );
+                b_forced = false;
+            }
 
             free( ppsz_subs[i] );
         }
         free( ppsz_subs );
     }
     free( psz_subtitle );
+
+    /* Load subtitles from attachments */
+    int i_attachment = 0;
+    char **ppsz_attachment = NULL;
+
+    vlc_mutex_lock( &p_input->p->p_item->lock );
+    for( int i = 0; i < p_input->p->i_attachment; i++ )
+    {
+        const input_attachment_t *a = p_input->p->attachment[i];
+        if( !strcmp( a->psz_mime, "application/x-srt" ) )
+            TAB_APPEND( i_attachment, ppsz_attachment,
+                        strdup( a->psz_name ) );
+    }
+    vlc_mutex_unlock( &p_input->p->p_item->lock );
+
+    for( int i = 0; i < i_attachment; i++ )
+    {
+        char *psz_mrl;
+        if( ppsz_attachment[i] &&
+            asprintf( &psz_mrl, "attachment://%s", ppsz_attachment[i] ) >= 0 )
+        {
+            SubtitleAdd( p_input, psz_mrl, b_forced );
+            b_forced = false;
+            free( psz_mrl );
+        }
+        free( ppsz_attachment[i] );
+    }
+    free( ppsz_attachment );
 }
 
 static void LoadSlaves( input_thread_t *p_input )
