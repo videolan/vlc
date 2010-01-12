@@ -838,6 +838,9 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_RA_288, "RealAudio 2.0"),
         A("28_8"),
 
+    B(VLC_CODEC_SIPR, "RealAudio Sipr"),
+        A("sipr"),
+
     /* MPEG Audio layer 1/2/3 */
     B(VLC_CODEC_MPGA, "MPEG Audio layer 1/2/3"),
         A("mpga"),

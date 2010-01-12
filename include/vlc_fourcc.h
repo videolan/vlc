@@ -229,6 +229,7 @@
 #define VLC_CODEC_ALAC      VLC_FOURCC('a','l','a','c')
 #define VLC_CODEC_QDM2      VLC_FOURCC('Q','D','M','2')
 #define VLC_CODEC_COOK      VLC_FOURCC('c','o','o','k')
+#define VLC_CODEC_SIPR      VLC_FOURCC('s','i','p','r')
 #define VLC_CODEC_TTA       VLC_FOURCC('T','T','A','1')
 #define VLC_CODEC_SHORTEN   VLC_FOURCC('s','h','n',' ')
 #define VLC_CODEC_WAVPACK   VLC_FOURCC('W','V','P','K')
