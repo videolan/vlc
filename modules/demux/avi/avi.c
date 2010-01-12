@@ -31,6 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_demux.h>
+#include <vlc_input.h>
 
 #include <vlc_dialog.h>
 
@@ -165,6 +166,9 @@ struct demux_sys_t
 
     /* meta */
     vlc_meta_t  *meta;
+
+    unsigned int       i_attachment;
+    input_attachment_t **attachment;
 };
 
 static inline off_t __EVEN( off_t i )
@@ -195,6 +199,8 @@ static int AVI_PacketSearch   ( demux_t * );
 static void AVI_IndexLoad    ( demux_t * );
 static void AVI_IndexCreate  ( demux_t * );
 static void AVI_IndexAddEntry( demux_sys_t *, int, avi_entry_t * );
+
+static void AVI_ExtractSubtitle( demux_t *, avi_chunk_list_t *, avi_chunk_STRING_t * );
 
 static mtime_t  AVI_MovieGetLength( demux_t * );
 
@@ -260,6 +266,7 @@ static int Open( vlc_object_t * p_this )
     p_sys->i_track  = 0;
     p_sys->track    = NULL;
     p_sys->meta     = NULL;
+    TAB_INIT(p_sys->i_attachment, p_sys->attachment);
 
     stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &p_sys->b_seekable );
 
@@ -610,11 +617,10 @@ static int Open( vlc_object_t * p_this )
                 break;
 
             case( AVIFOURCC_txts):
-                tk->i_cat   = SPU_ES;
-                tk->i_codec = VLC_CODEC_SUBT;
-                msg_Dbg( p_demux, "stream[%d] subtitles", i );
-                es_format_Init( &fmt, SPU_ES, tk->i_codec );
-                break;
+                msg_Dbg( p_demux, "stream[%d] subtitle attachment", i );
+                AVI_ExtractSubtitle( p_demux, p_strl, p_strn );
+                free( tk );
+                continue;
 
             case( AVIFOURCC_iavs):
             case( AVIFOURCC_ivas):
@@ -774,10 +780,13 @@ aviindex:
     return VLC_SUCCESS;
 
 error:
+    for( unsigned i = 0; i < p_sys->i_attachment; i++)
+        vlc_input_attachment_Delete(p_sys->attachment[i]);
+    free(p_sys->attachment);
+
     if( p_sys->meta )
-    {
         vlc_meta_Delete( p_sys->meta );
-    }
+
     AVI_ChunkFreeRoot( p_demux->s, &p_sys->ck_root );
     free( p_sys );
     return vlc_object_alive( p_demux ) ? VLC_EGENERIC : VLC_ETIMEOUT;
@@ -806,6 +815,9 @@ static void Close ( vlc_object_t * p_this )
     free( p_sys->track );
     AVI_ChunkFreeRoot( p_demux->s, &p_sys->ck_root );
     vlc_meta_Delete( p_sys->meta );
+    for( unsigned i = 0; i < p_sys->i_attachment; i++)
+        vlc_input_attachment_Delete(p_sys->attachment[i]);
+    free(p_sys->attachment);
 
     free( p_sys );
 }
@@ -1518,10 +1530,26 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
                 }
             }
             return VLC_SUCCESS;
+
         case DEMUX_GET_META:
             p_meta = (vlc_meta_t*)va_arg( args, vlc_meta_t* );
             vlc_meta_Merge( p_meta,  p_sys->meta );
             return VLC_SUCCESS;
+
+        case DEMUX_GET_ATTACHMENTS:
+        {
+            if( p_sys->i_attachment <= 0 )
+                return VLC_EGENERIC;
+
+            input_attachment_t ***ppp_attach = va_arg( args, input_attachment_t*** );
+            int *pi_int = va_arg( args, int * );
+
+            *pi_int     = p_sys->i_attachment;
+            *ppp_attach = calloc( p_sys->i_attachment, sizeof(*ppp_attach));
+            for( unsigned i = 0; i < p_sys->i_attachment && *ppp_attach; i++ )
+                (*ppp_attach)[i] = vlc_input_attachment_Duplicate( p_sys->attachment[i] );
+            return VLC_SUCCESS;
+        }
 
         default:
             return VLC_EGENERIC;
@@ -2462,6 +2490,97 @@ print_stat:
     }
 }
 
+/*****************************************************************************
+ * Subtitles
+ *****************************************************************************/
+static void AVI_ExtractSubtitle( demux_t *p_demux,
+                                 avi_chunk_list_t *p_strl,
+                                 avi_chunk_STRING_t *p_strn )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+    block_t *p_block = NULL;
+    input_attachment_t *p_attachment = NULL;
+
+    if( !p_sys->b_seekable )
+        goto exit;
+
+    avi_chunk_indx_t *p_indx = AVI_ChunkFind( p_strl, AVIFOURCC_indx, 0 );
+    if( !p_indx )
+        goto exit;
+
+    avi_chunk_t ck;
+    if( p_indx->i_indextype == AVI_INDEX_OF_INDEXES &&
+        p_indx->i_entriesinuse > 0 )
+    {
+        if( stream_Seek( p_demux->s, p_indx->idx.super[0].i_offset )||
+            AVI_ChunkRead( p_demux->s, &ck, NULL  ) )
+            goto exit;
+        p_indx = &ck.indx;
+    }
+
+    if( p_indx->i_indextype != AVI_INDEX_OF_CHUNKS ||
+        p_indx->i_entriesinuse != 1 ||
+        p_indx->i_indexsubtype != 0 )
+        goto exit;
+
+    /* */
+    int64_t i_position  = p_indx->i_baseoffset +
+                          p_indx->idx.std[0].i_offset - 8;
+    unsigned i_size     = (p_indx->idx.std[0].i_size & 0x7fffffff) + 8;
+    if( i_size > 1000000 )
+        goto exit;
+
+    if( stream_Seek( p_demux->s, i_position ) )
+        goto exit;
+    p_block = stream_Block( p_demux->s, i_size );
+    if( !p_block )
+        goto exit;
+
+    /* Parse packet header */
+    const uint8_t *p = p_block->p_buffer;
+    if( i_size < 8 || p[2] != 't' || p[3] != 'x' )
+        goto exit;
+    p += 8;
+    i_size -= 8;
+
+    /* Parse subtitle chunk header */
+    if( i_size < 11 || memcmp( p, "GAB2", 4 ) ||
+        p[4] != 0x00 || GetWLE( &p[5] ) != 0x2 )
+        goto exit;
+    const unsigned i_name = GetDWLE( &p[7] );
+    if( 11 + i_size <= i_name )
+        goto exit;
+    p += 11 + i_name;
+    i_size -= 11 + i_name;
+    if( i_size < 6 || GetWLE( &p[0] ) != 0x04 )
+        goto exit;
+    const unsigned i_payload = GetDWLE( &p[2] );
+    if( i_size < 6 + i_payload || i_payload <= 0 )
+        goto exit;
+    p += 6;
+    i_size -= 6;
+
+    char *psz_description = p_strn ? FromLatin1( p_strn->p_str ) : NULL;
+    char *psz_name;
+    if( asprintf( &psz_name, "subtitle%d.srt", p_sys->i_attachment ) <= 0 )
+        psz_name = NULL;
+    p_attachment = vlc_input_attachment_New( psz_name,
+                                             "application/x-srt",
+                                             psz_description,
+                                             p, i_payload );
+    if( p_attachment )
+        TAB_APPEND( p_sys->i_attachment, p_sys->attachment, p_attachment );
+    free( psz_description );
+
+exit:
+    if( p_block )
+        block_Release( p_block );
+
+    if( p_attachment )
+        msg_Dbg( p_demux, "Loaded an embed subtitle" );
+    else
+        msg_Warn( p_demux, "Failed to load an embed subtitle" );
+}
 /*****************************************************************************
  * Stream management
  *****************************************************************************/
