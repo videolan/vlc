@@ -240,6 +240,8 @@ void MediaObject::setSource(const MediaSource & source)
         << source.type();
         break;
     }
+
+    emit currentSourceChanged(mediaSource);
 }
 
 void MediaObject::setNextSource(const MediaSource & source)
