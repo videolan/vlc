@@ -39,11 +39,11 @@
 /**
  * Determines the shared data directory
  *
- * @return a string (always succeeds).
+ * @return a nul-terminated string or NULL. Use free() to release it.
  */
-const char *config_GetDataDirDefault( void )
+char *config_GetDataDirDefault (void)
 {
-    return DATA_PATH;
+    return strdup (DATA_PATH);
 }
 
 /**

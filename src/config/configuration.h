@@ -45,7 +45,7 @@ void config_UnsetCallbacks( module_config_t *, size_t );
 int __config_LoadCmdLine   ( vlc_object_t *, int *, const char *[], bool );
 int __config_LoadConfigFile( vlc_object_t *, const char * );
 
-const char *config_GetDataDirDefault( void );
+char *config_GetDataDirDefault( void );
 
 int IsConfigStringType( int type );
 int IsConfigIntegerType (int type);

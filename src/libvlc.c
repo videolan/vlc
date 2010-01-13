@@ -1224,11 +1224,16 @@ static inline int LoadMessages (void)
     static const char psz_path[] = LOCALEDIR;
 #else
     char psz_path[1024];
-    if (snprintf (psz_path, sizeof (psz_path), "%s" DIR_SEP "%s",
-                  config_GetDataDirDefault(), "locale")
-                     >= (int)sizeof (psz_path))
-        return -1;
+    char *datadir = config_GetDataDirDefault();
+    int ret;
 
+    if (unlikely(datadir == NULL))
+        return -1;
+    ret = snprintf (psz_path, sizeof (psz_path), "%s" DIR_SEP "locale",
+                    datadir);
+    free (datadir);
+    if (ret >= (int)sizeof (psz_path))
+        return -1;
 #endif
     if (bindtextdomain (PACKAGE_NAME, psz_path) == NULL)
     {

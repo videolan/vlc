@@ -33,7 +33,7 @@
 /**
  * Determines the shared data directory
  *
- * @return a string (always succeeds). Needs to be freed.
+ * @return a string or NULL. Use free() to release.
  */
 char *__config_GetDataDir( vlc_object_t *p_obj )
 {
@@ -41,6 +41,6 @@ char *__config_GetDataDir( vlc_object_t *p_obj )
     if( psz_path && *psz_path )
         return psz_path;
     free( psz_path );
-    return strdup( config_GetDataDirDefault() );
+    return config_GetDataDirDefault();
 }
 

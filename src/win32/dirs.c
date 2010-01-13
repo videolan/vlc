@@ -44,14 +44,9 @@
 #include <assert.h>
 #include <limits.h>
 
-const char *config_GetDataDirDefault( void )
+char *config_GetDataDirDefault( void )
 {
-    static char path[PATH_MAX] = "";
-#warning FIXME: thread-safety!
-
-    if( *path == '\0' )
-        strlcpy (path, psz_vlcpath, sizeof (path));
-    return path;
+    return strdup (psz_vlcpath);
 }
 
 const char *config_GetConfDir (void)

@@ -36,16 +36,12 @@
 #include "configuration.h"
 
 static char *configdir = NULL;
-static char *datadir = NULL;
 
 static pthread_once_t once = PTHREAD_ONCE_INIT;
 
 static void init_dirs( void )
 {
     configdir = config_GetUserDir(VLC_CONFIG_DIR);
-    int ret = asprintf(&datadir, "%s/share", psz_vlcpath);
-    if (ret == -1)
-        datadir = NULL;
 }
 
 const char *config_GetConfDir( void )
@@ -54,9 +50,12 @@ const char *config_GetConfDir( void )
     return configdir;
 }
 
-const char *config_GetDataDirDefault (void)
+char *config_GetDataDirDefault (void)
 {
-    pthread_once(&once, init_dirs);
+    char *datadir;
+
+    if (asprintf (&datadir, "%s/share", psz_vlcpath) == -1)
+        return NULL;
     return datadir;
 }
 
