@@ -180,11 +180,6 @@ private:
     /// Update the stream name variable
     void updateStreamName();
 
-    /// Callback for intf-change variable
-    static int onIntfChange( vlc_object_t *pObj, const char *pVariable,
-                             vlc_value_t oldVal, vlc_value_t newVal,
-                             void *pParam );
-
     /// Callback for intf-show variable
     static int onIntfShow( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldVal, vlc_value_t newVal,

@@ -158,9 +158,6 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
 
 #undef ADD_CALLBACK
 
-    // Called when the playlist changes
-    var_AddCallback( pIntf->p_sys->p_playlist, "intf-change",
-                     onIntfChange, this );
     // Called when a playlist item is added
     var_AddCallback( pIntf->p_sys->p_playlist, "playlist-item-append",
                      onItemAppend, this );
@@ -219,8 +216,6 @@ VlcProc::~VlcProc()
     var_DelCallback( getIntf()->p_sys->p_playlist, "repeat",
                      onGenericCallback, this );
 
-    var_DelCallback( getIntf()->p_sys->p_playlist, "intf-change",
-                     onIntfChange, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-item-append",
                      onItemAppend, this );
     var_DelCallback( getIntf()->p_sys->p_playlist, "playlist-item-deleted",
@@ -253,27 +248,6 @@ void VlcProc::CmdManage::execute()
     // Just forward to VlcProc
     m_pParent->manage();
 }
-
-
-int VlcProc::onIntfChange( vlc_object_t *pObj, const char *pVariable,
-                           vlc_value_t oldVal, vlc_value_t newVal,
-                           void *pParam )
-{
-    VlcProc *pThis = (VlcProc*)pParam;
-
-    // Update the stream variable
-    pThis->updateStreamName();
-
-    // Create a playtree notify command (for new style playtree)
-    CmdPlaytreeChanged *pCmdTree = new CmdPlaytreeChanged( pThis->getIntf() );
-
-    // Push the command in the asynchronous command queue
-    AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
-    pQueue->push( CmdGenericPtr( pCmdTree ) );
-
-    return VLC_SUCCESS;
-}
-
 
 
 int VlcProc::onInputNew( vlc_object_t *pObj, const char *pVariable,
