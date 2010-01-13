@@ -8,7 +8,7 @@ libaudio_format_neon_plugin_la_LIBADD = $(AM_LIBADD)
 libaudio_format_neon_plugin_la_DEPENDENCIES =
 
 libi420_yuy2_neon_plugin_la_SOURCES = \
-	i420_yuy2.S \
+	i420_yuyv.S \
 	i420_yuy2.c
 libi420_yuy2_neon_plugin_la_CFLAGS = $(AM_CFLAGS)
 libi420_yuy2_neon_plugin_la_LIBADD = $(AM_LIBADD)
