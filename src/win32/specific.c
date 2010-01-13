@@ -1,8 +1,7 @@
 /*****************************************************************************
- * win32_specific.c: Win32 specific features
+ * specific.c: Win32 specific initilization
  *****************************************************************************
  * Copyright (C) 2001-2004 the VideoLAN team
- * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
  *          Gildas Bazin <gbazin@videolan.org>

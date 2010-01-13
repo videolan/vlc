@@ -279,10 +279,10 @@ SOURCES_libvlc_linux = \
 	$(NULL)
 
 SOURCES_libvlc_win32 = \
-	config/dirs_win.c \
-	misc/w32thread.c \
-	misc/win32_specific.c \
-	network/winsock.c \
+	win32/dirs.c \
+	win32/specific.c \
+	win32/thread.c \
+	win32/winsock.c \
 	$(NULL)
 
 SOURCES_libvlc_other = \

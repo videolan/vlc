@@ -79,7 +79,6 @@ src/config/cmdline.c
 src/config/configuration.h
 src/config/core.c
 src/config/dirs_macos.c
-src/config/dirs_win.c
 src/config/dirs_xdg.c
 src/config/file.c
 src/config/intf.c
@@ -163,7 +162,6 @@ src/misc/update.c
 src/misc/update.h
 src/misc/variables.c
 src/misc/variables.h
-src/misc/win32_specific.c
 src/misc/xml.c
 src/missing.c
 src/modules/cache.c
@@ -180,7 +178,6 @@ src/network/rootbind.c
 src/network/tcp.c
 src/network/tls.c
 src/network/udp.c
-src/network/winsock.c
 src/osd/osd.c
 src/osd/osd_text.c
 src/osd/osd_widgets.c

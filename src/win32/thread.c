@@ -1,8 +1,7 @@
 /*****************************************************************************
- * w32thread.c : Win32 back-end for LibVLC
+ * thread.c : Win32 back-end for LibVLC
  *****************************************************************************
  * Copyright (C) 1999-2009 the VideoLAN team
- * $Id$
  *
  * Authors: Jean-Marc Dressler <polux@via.ecp.fr>
  *          Samuel Hocevar <sam@zoy.org>
