@@ -461,7 +461,7 @@ static int Reset( access_t *p_access )
 
     asf_StreamSelect( &p_sys->asfh,
                        var_CreateGetInteger( p_access, "mms-maxbitrate" ),
-                       var_CreateGetInteger( p_access, "mms-all" ),
+                       var_CreateGetBool( p_access, "mms-all" ),
                        var_CreateGetInteger( p_access, "audio" ),
                        var_CreateGetInteger( p_access, "video" ) );
 
@@ -698,7 +698,7 @@ static int Describe( access_t  *p_access, char **ppsz_location )
 
     asf_StreamSelect( &p_sys->asfh,
                        var_CreateGetInteger( p_access, "mms-maxbitrate" ),
-                       var_CreateGetInteger( p_access, "mms-all" ),
+                       var_CreateGetBool( p_access, "mms-all" ),
                        var_CreateGetInteger( p_access, "audio" ),
                        var_CreateGetInteger( p_access, "video" ) );
     return VLC_SUCCESS;
