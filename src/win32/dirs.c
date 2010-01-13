@@ -39,6 +39,7 @@
 #include "../libvlc.h"
 #include <vlc_charset.h>
 #include <vlc_configuration.h>
+#include "config/configuration.h"
 
 #include <assert.h>
 #include <limits.h>

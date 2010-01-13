@@ -29,6 +29,7 @@
 
 #include "../libvlc.h"
 #include <vlc_charset.h>
+#include "config/configuration.h"
 
 #include <unistd.h>
 #include <pwd.h>
