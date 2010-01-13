@@ -28,7 +28,9 @@ function get_query( title )
 end
 
 -- Return the artwork
-function fetch_art()
+-- This is disabled because we have too much false positive by the inherent
+-- nature of this script.
+function fetch_art_disabled()
     local meta = vlc.item.metas(vlc.item)
     if meta["artist"] and meta["album"] then
         title = meta["artist"].." "..meta["album"]
