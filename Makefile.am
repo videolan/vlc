@@ -492,9 +492,9 @@ VLC-release.app: vlc
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
 	$(AM_V_GEN)cd $(top_builddir)/tmp/extras/package/macosx && \
-        xcodebuild -target vlc $(silentstd) && \
+        xcodebuild -target vlc SYMROOT=../../../build $(silentstd) && \
 	cd ../../../../ && \
-	cp -R $(top_builddir)/tmp/extras/package/macosx/build/Default/VLC.bundle $(top_builddir)/VLC-release.app; \
+	cp -R $(top_builddir)/tmp/build/Default/VLC.bundle $(top_builddir)/VLC-release.app; \
 	rm -Rf $(top_builddir)/tmp
 	$(INSTALL) -d $(top_builddir)/VLC-release.app/Contents/MacOS
 	PRODUCT="VLC-release.app" ACTION="release-makefile" src_dir=$(srcdir) build_dir=$(top_builddir) sh $(srcdir)/projects/macosx/framework/Pre-Compile.sh
@@ -645,9 +645,9 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
              $(top_builddir)/tmp/modules/gui/macosx; \
 	done
 	$(AM_V_GEN)cd $(top_builddir)/tmp/extras/package/macosx && \
-	xcodebuild -target vlc $(silentstd) && \
+	xcodebuild -target vlc SYMROOT=../../../build $(silentstd) && \
 	cd ../../../../ && \
-	cp -R $(top_builddir)/tmp/extras/package/macosx/build/Default/VLC.bundle $(top_builddir)/VLC.app
+	cp -R $(top_builddir)/tmp/build/Default/VLC.bundle $(top_builddir)/VLC.app
 	$(INSTALL) -d $(top_builddir)/VLC.app/Contents/MacOS
 	touch $(top_builddir)/VLC.app/Contents/MacOS/VLC
 	chmod +x $(top_builddir)/VLC.app/Contents/MacOS/VLC
