@@ -33,6 +33,7 @@
 #include <limits.h>
 #include <vlc_art_finder.h>
 #include <vlc_memory.h>
+#include <vlc_demux.h>
 
 #include "art.h"
 #include "fetcher.h"
@@ -324,6 +325,27 @@ error:
     return VLC_EGENERIC;
 }
 
+/**
+ * FetchMeta, run the "meta fetcher". They are going to do network
+ * connections, and gather information upon the playing media.
+ * (even artwork).
+ */
+static void FetchMeta( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
+{
+    demux_meta_t *p_demux_meta = vlc_custom_create(p_fetcher->p_playlist,
+                                       sizeof(*p_demux_meta),
+                                       VLC_OBJECT_GENERIC, "demux meta" );
+    if( !p_demux_meta )
+        return;
+
+    p_demux_meta->p_demux = NULL;
+    p_demux_meta->p_item = p_item;
+
+    module_t *p_meta_fetcher = module_need( p_demux_meta, "meta fetcher", NULL, false );
+    if( p_meta_fetcher )
+        module_unneed( p_demux_meta, p_meta_fetcher );
+    vlc_object_release( p_demux_meta );
+}
 
 static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
@@ -410,6 +432,12 @@ static void *Thread( void *p_data )
 
         /* Wait that the input item is preparsed if it is being played */
         WaitPreparsed( p_fetcher, p_item );
+
+        /* Triggers "meta fetcher", eventually fetch meta on the network.
+         * They are identical to "meta reader" expect that may actually
+         * takes time. That's why they are running here.
+         * The result of this fetch is not cached. */
+        FetchMeta( p_fetcher, p_item );
 
         /* Find art, and download it if needed */
         int i_ret = FindArt( p_fetcher, p_item );
