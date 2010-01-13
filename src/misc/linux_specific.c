@@ -31,6 +31,7 @@
 #if 0
 #include <assert.h>
 #include <pthread.h>
+#include <limits.h>
 
 static void set_libvlc_path (void)
 {
@@ -45,29 +46,34 @@ static void set_libvlc_path (void)
     if (maps == NULL)
         return;
 
+    char *line = NULL;
+    size_t linelen = 0;
+    uintptr_t needle = (uintptr_t)set_libvlc_path;
+
     for (;;)
     {
-        char buf[5000], *dir, *end;
-
-        if (fgets (buf, sizeof (buf), maps) == NULL)
+        ssize_t len = getline (&line, &linelen, maps);
+        if (len == -1)
             break;
 
-        dir = strchr (buf, '/');
+        void *start, *end;
+        if (sscanf (line, "%p-%p", &start, &end) < 2)
+            continue;
+        if (needle < (uintptr_t)start || (uintptr_t)end <= needle)
+            continue;
+        char *dir = strchr (line, '/');
         if (dir == NULL)
             continue;
-        end = strrchr (dir, '/');
+        char *file = strrchr (line, '/');
         if (end == NULL)
             continue;
-        if (strncmp (end + 1, "libvlc.so.", 10))
-            continue;
-
-        *end = '\0';
+        *file = '\0';
         printf ("libvlc at %s\n", dir);
         if (strlen (dir) < sizeof (libvlc_path))
             strcpy (libvlc_path, dir);
         break;
     }
-
+    free (line);
     fclose (maps);
 }
 #endif
