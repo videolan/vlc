@@ -32,6 +32,7 @@
 #include <vlc_strings.h>
 #include <errno.h>
 #include <fcntl.h>
+#include <sys/stat.h>
 
 /****************************************************************************
  * File and directory functions

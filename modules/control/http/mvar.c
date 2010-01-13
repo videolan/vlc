@@ -31,6 +31,9 @@
 #include <errno.h>
 #include <ctype.h>
 #include <fcntl.h>
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>
+#endif
 
 /* Utility function for scandir */
 static int Filter( const char *foo )
