@@ -88,6 +88,7 @@ aout_instance_t * __aout_New( vlc_object_t * p_parent )
     /* Initialize members. */
     vlc_mutex_init( &p_aout->input_fifos_lock );
     vlc_mutex_init( &p_aout->mixer_lock );
+    vlc_mutex_init( &p_aout->volume_vars_lock );
     vlc_mutex_init( &p_aout->output_fifo_lock );
     p_aout->i_nb_inputs = 0;
     p_aout->mixer_multiplier = 1.0;
@@ -111,6 +112,7 @@ static void aout_Destructor( vlc_object_t * p_this )
     aout_instance_t * p_aout = (aout_instance_t *)p_this;
     vlc_mutex_destroy( &p_aout->input_fifos_lock );
     vlc_mutex_destroy( &p_aout->mixer_lock );
+    vlc_mutex_destroy( &p_aout->volume_vars_lock );
     vlc_mutex_destroy( &p_aout->output_fifo_lock );
 }
 
