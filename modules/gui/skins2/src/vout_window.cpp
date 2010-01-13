@@ -33,19 +33,13 @@
 #include <vlc_keys.h>
 
 
-
-int VoutWindow::count = 0;
-
 VoutWindow::VoutWindow( intf_thread_t *pIntf, vout_window_t* pWnd,
                         int width, int height, GenericWindow* pParent ) :
       GenericWindow( pIntf, 0, 0, false, false, pParent,
                      GenericWindow::VoutWindow ),
       m_pWnd( pWnd ), original_width( width ), original_height( height ),
-      m_pParentWindow( pParent ), m_pCtrlVideo( NULL ), m_bFullscreen( false )
+      m_pParentWindow( pParent ), m_pCtrlVideo( NULL )
 {
-    // counter for debug
-    count++;
-
     if( m_pWnd )
         vlc_object_hold( m_pWnd );
 }
@@ -55,9 +49,6 @@ VoutWindow::~VoutWindow()
 {
     if( m_pWnd )
         vlc_object_release( m_pWnd );
-
-    count--;
-    msg_Dbg( getIntf(), "VoutWindow count = %d", count );
 }
 
 
@@ -91,12 +82,6 @@ void VoutWindow::setCtrlVideo( CtrlVideo* pCtrlVideo )
     }
 
     m_pCtrlVideo = pCtrlVideo;
-}
-
-
-void VoutWindow::setFullscreen( bool b_fullscreen )
-{
-    /*TODO: fullscreen implementation */
 }
 
 

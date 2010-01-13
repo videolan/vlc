@@ -40,9 +40,6 @@ public:
                 int width, int height, GenericWindow* pParent = NULL );
     virtual ~VoutWindow();
 
-    // counter used for debugging purpose
-    static int count;
-
     /// Make some functions public
     //@{
     using GenericWindow::show;
@@ -62,10 +59,6 @@ public:
     virtual void setCtrlVideo( CtrlVideo* pCtrlVideo );
     virtual CtrlVideo* getCtrlVideo( ) { return m_pCtrlVideo; }
 
-    /// toggle fullscreen mode
-    virtual void setFullscreen( bool b_fullscreen );
-    virtual bool isFullscreen() { return m_bFullscreen; }
-
     /// get original size of vout
     virtual int getOriginalWidth( ) { return original_width; }
     virtual int getOriginalHeight( ) { return original_height; }
@@ -84,9 +77,6 @@ private:
     /// original width and height
     int original_width;
     int original_height;
-
-    /// fulscreen mode indicator
-    bool m_bFullscreen;
 
     /// VideoControl attached to it
     CtrlVideo* m_pCtrlVideo;
