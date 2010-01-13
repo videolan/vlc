@@ -103,7 +103,7 @@
 			isa = PBXContainerItemProxy;
 			containerPortal = 0867D690FE84028FC02AAC07 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = 6337547910ED090A0072A0D9 /* Make VLC */;
+			remoteGlobalIDString = 6337547910ED090A0072A0D9;
 			remoteInfo = "Make VLC";
 		};
 		633BD6ED0D2AE03E0012A314 /* PBXContainerItemProxy */ = {
