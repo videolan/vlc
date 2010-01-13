@@ -42,6 +42,9 @@ static bool RuntimeNPClassInvokeDefault(NPObject *npobj,
 class RuntimeNPObject : public NPObject
 {
 public:
+    // Lazy child object cration helper. Doing this avoids
+    // ownership problems with firefox.
+    template<class T> void InstantObj( NPObject *&obj );
 
     /*
     ** utility functions
@@ -173,6 +176,13 @@ private:
     NPIdentifier *propertyIdentifiers;
     NPIdentifier *methodIdentifiers;
 };
+
+template<class T>
+inline void RuntimeNPObject::InstantObj( NPObject *&obj )
+{
+    if( !obj )
+        obj = NPN_CreateObject(_instance, RuntimeNPClass<T>::getClass());
+}
 
 template<class T>
 static NPObject *RuntimeNPClassAllocate(NPP instance, NPClass *aClass)
