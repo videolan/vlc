@@ -124,7 +124,7 @@ static int vlclua_input_metas_internal( lua_State *L, input_item_t *p_item )
     lua_pushstring( L, psz_meta );
     lua_setfield( L, -2, "filename" );
     free( psz_meta );
-    
+
 #define PUSH_META( n, m ) \
     psz_meta = input_item_GetMeta( p_item, vlc_meta_ ## n ); \
     lua_pushstring( L, psz_meta ); \
@@ -150,6 +150,21 @@ static int vlclua_input_metas_internal( lua_State *L, input_item_t *p_item )
     PUSH_META( TrackID, "track_id" );
 
 #undef PUSH_META
+
+    vlc_mutex_lock(&p_item->lock);
+    if (p_item->p_meta) {
+        char ** names = vlc_meta_CopyExtraNames(p_item->p_meta);
+        for(int i = 0; names[i]; i++)
+        {
+            const char *meta = vlc_meta_GetExtra(p_item->p_meta, names[i]);
+            lua_pushstring( L, meta );
+            lua_setfield( L, -2, names[i] );
+            printf("setting %s=%s\n", names[i], meta);
+            free(names[i]);
+        }
+        free(names);
+    }
+    vlc_mutex_unlock(&p_item->lock);
 
     return 1;
 }
@@ -261,7 +276,7 @@ static int vlclua_input_item_get( lua_State *L, input_item_t *p_item )
     }
 
     lua_setmetatable(L, -2);
-    
+
     return 1;
 }
 
