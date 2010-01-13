@@ -64,8 +64,14 @@ vlc_module_begin ()
         set_callbacks( FindArt, NULL )
 
     add_submodule ()
-        set_shortname( N_( "Lua Meta Reader" ) )
+        set_shortname( N_( "Lua Meta Fetcher" ) )
         set_description( N_("Fetch meta data using lua scripts") )
+        set_capability( "meta fetcher", 10 )
+        set_callbacks( FetchMeta, NULL )
+
+    add_submodule ()
+        set_shortname( N_( "Lua Meta Reader" ) )
+        set_description( N_("Read meta data using lua scripts") )
         set_capability( "meta reader", 10 )
         set_callbacks( ReadMeta, NULL )
 
@@ -465,7 +471,7 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                     else /* Play or Enqueue (preparse) */
                         /* FIXME: playlist_AddInput() can fail */
                         playlist_AddInput( p_playlist, p_input,
-                               PLAYLIST_APPEND | 
+                               PLAYLIST_APPEND |
                                ( b_play ? PLAYLIST_GO : PLAYLIST_PREPARSE ),
                                PLAYLIST_END, true, false );
                     i_count ++; /* increment counter */

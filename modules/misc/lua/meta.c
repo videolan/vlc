@@ -181,6 +181,19 @@ static int read_meta( vlc_object_t *p_this, const char * psz_filename,
     return 1;
 }
 
+
+/*****************************************************************************
+ * Called through lua_scripts_batch_execute to call 'fetch_meta' on the script
+ * pointed by psz_filename.
+ *****************************************************************************/
+static int fetch_meta( vlc_object_t *p_this, const char * psz_filename,
+                     lua_State * L, void * user_data )
+{
+    VLC_UNUSED(user_data);
+
+    return run(p_this, psz_filename, L, "fetch_meta");
+}
+
 /*****************************************************************************
  * Read meta.
  *****************************************************************************/
@@ -196,6 +209,24 @@ int ReadMeta( vlc_object_t *p_this )
 
     return i_ret;
 }
+
+
+/*****************************************************************************
+ * Read meta.
+ *****************************************************************************/
+
+int FetchMeta( vlc_object_t *p_this )
+{
+    demux_meta_t *p_demux_meta = (demux_meta_t *)p_this;
+    input_item_t *p_item = p_demux_meta->p_item;
+
+    lua_State *L = init( p_this, p_item );
+    int i_ret = vlclua_scripts_batch_execute( p_this, "meta/fetcher", &fetch_meta, L, NULL );
+    lua_close( L );
+
+    return i_ret;
+}
+
 
 /*****************************************************************************
  * Module entry point for art.
