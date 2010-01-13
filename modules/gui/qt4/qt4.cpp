@@ -55,9 +55,10 @@
 /*****************************************************************************
  * Local prototypes.
  *****************************************************************************/
-static int  Open         ( vlc_object_t * );
-static void Close        ( vlc_object_t * );
+static int  OpenIntf     ( vlc_object_t * );
 static int  OpenDialogs  ( vlc_object_t * );
+static int  Open         ( vlc_object_t *, bool );
+static void Close        ( vlc_object_t * );
 static int  WindowOpen   ( vlc_object_t * );
 static void WindowClose  ( vlc_object_t * );
 static void *Thread      ( void * );
@@ -174,7 +175,7 @@ vlc_module_begin ()
     set_category( CAT_INTERFACE )
     set_subcategory( SUBCAT_INTERFACE_MAIN )
     set_capability( "interface", 151 )
-    set_callbacks( Open, Close )
+    set_callbacks( OpenIntf, Close )
 
     add_shortcut("qt")
     add_integer( "qt-display-mode", QT_NORMAL_MODE, NULL,
@@ -268,7 +269,7 @@ static char *x11_display = NULL;
  *****************************************************************************/
 
 /* Open Interface */
-static int Open( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this, bool isDialogProvider )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
@@ -286,7 +287,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Allocations of p_sys */
     intf_sys_t *p_sys = p_intf->p_sys = new intf_sys_t;
-    p_sys->b_isDialogProvider = false;
+    p_intf->p_sys->b_isDialogProvider = isDialogProvider;
     p_sys->p_popup_menu = NULL;
     p_sys->p_mi = NULL;
     p_sys->p_playlist = pl_Hold( p_intf );
@@ -314,17 +315,16 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 }
 
+/* Open qt4 interface */
+static int OpenIntf( vlc_object_t *p_this )
+{
+    return Open( p_this, false );
+}
+
 /* Open Dialog Provider */
 static int OpenDialogs( vlc_object_t *p_this )
 {
-    intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    p_intf->pf_show_dialog = ShowDialog;
-
-    int val = Open( p_this );
-    if( val )
-        return val;
-
-    return VLC_SUCCESS;
+    return Open( p_this, true );
 }
 
 static void Close( vlc_object_t *p_this )
@@ -411,18 +411,17 @@ static void *Thread( void *obj )
 #endif
 
     /* Create the normal interface in non-DP mode */
-    if( !p_intf->pf_show_dialog )
+    if( !p_intf->p_sys->b_isDialogProvider )
         p_mi = new MainInterface( p_intf );
     else
         p_mi = NULL;
 
+    /* Explain how to show a dialog :D */
+    p_intf->pf_show_dialog = ShowDialog;
+
     /* */
     p_intf->p_sys->p_mi = p_mi;
-    p_intf->p_sys->b_isDialogProvider = p_mi == NULL;
     vlc_sem_post (&ready);
-
-    /* Explain to the core how to show a dialog :D */
-    p_intf->pf_show_dialog = ShowDialog;
 
     /* Last settings */
     app.setQuitOnLastWindowClosed( false );
