@@ -82,10 +82,14 @@ i420_uyvy_neon:
 1:
 	mov		END_O1,	O2
 2:
+	pld		[U, #64]
 	vld1.u8		{d0},		[U,:64]!
+	pld		[V, #64]
 	vld1.u8		{d1},		[V,:64]!
+	pld		[Y1, #64]
 	vzip.u8		d0,	d1
 	vld1.u8		{q1},		[Y1,:128]!
+	pld		[Y2, #64]
 	vmov		q2,	q0
 	vzip.u8		q0,	q1
 	vld1.u8		{q3},		[Y2,:128]!
