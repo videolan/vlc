@@ -10,13 +10,14 @@ Access:
  * New avio module to use libavformat capabilities for network streams
 
 Decoders:
- * Support for Atrac1
  * HD dvb subtitles - Display Definition Segment support
  * PGS subtitles for Blu-Ray
  * Invmem module improvements
+ * Support for Atrac1 codec
  * Support for SSE3 and SSE4 capabilities
- * Support for DxVA2 for H.264 on Windows Vista and 7
- * Multiple improvements for subtitles styles, especially on Windows
+ * Support for DxVA2 for H.264 decoding on GPU on Windows Vista and 7
+ * Support for VAAPI for H.264 decoding on GPU on GNU/Linux
+ * Multiple improvements for subtitles styles .SRT and .SSA
 
 Demuxers:
  * Support for ADPCM in .flv streams
@@ -24,6 +25,7 @@ Demuxers:
    (Full disc support is NOT present yet)
  * Support for TwinVQ (.vqf) and AMV (.amv) files
  * Various EGP improvements
+ * Support for embedded subtitles in .avi ODML files
 
 Playlist:
  * WPL playlist support
