@@ -806,8 +806,8 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
      asf_StreamSelect( &p_sys->asfh,
                            var_CreateGetInteger( p_access, "mms-maxbitrate" ),
                            var_CreateGetBool( p_access, "mms-all" ),
-                           var_CreateGetInteger( p_access, "audio" ),
-                           var_CreateGetInteger( p_access, "video" ) );
+                           var_InheritBool( p_access, "audio" ),
+                           var_InheritBool( p_access, "video" ) );
 
     /* *** now select stream we want to receive *** */
     /* TODO take care of stream bitrate TODO */
