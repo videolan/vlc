@@ -219,6 +219,7 @@ FunctionEnd
   !insertmacro ${_action} ".oma"
   !insertmacro ${_action} ".oga"
   !insertmacro ${_action} ".spx"
+  !insertmacro ${_action} ".tta"
   !insertmacro ${_action} ".wav"
   !insertmacro ${_action} ".wma"
   !insertmacro ${_action} ".wv"

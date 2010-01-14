@@ -193,6 +193,7 @@ typedef enum vlc_dialog {
     "*.rmi;" \
     "*.s3m;" \
     "*.spx;" \
+    "*.tta;" \
     "*.voc;" \
     "*.vqf;" \
     "*.w64;" \
