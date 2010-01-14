@@ -1163,15 +1163,17 @@ static int GetInputMeta( input_item_t* p_input,
                         DBusMessageIter *args )
 {
     DBusMessageIter dict, dict_entry, variant;
-    /* We need the track length to be expressed in milli-seconds
-     * instead of µ-seconds */
-    dbus_int64_t i_length = ( input_item_GetDuration( p_input ) / 1000 );
+    /** The duration of the track can be expressed in second, milli-seconds and
+        µ-seconds */
+    dbus_int64_t i_mtime = input_item_GetDuration( p_input );
+    dbus_uint32_t i_time = i_mtime / 1000000;
+    dbus_int64_t i_length = i_mtime / 1000;
 
     const char* ppsz_meta_items[] =
     {
     /* Official MPRIS metas */
-    "location", "title", "artist", "album", "tracknumber", "genre",
-    "rating", "date", "arturl",
+    "location", "title", "artist", "album", "tracknumber", "time", "mtime",
+    "genre", "rating", "date", "arturl",
     "audio-bitrate", "audio-samplerate", "video-bitrate",
     /* VLC specifics metas */
     "audio-codec", "copyright", "description", "encodedby", "language", "length",
@@ -1186,27 +1188,29 @@ static int GetInputMeta( input_item_t* p_input,
     ADD_VLC_META_STRING( 2,  Artist );
     ADD_VLC_META_STRING( 3,  Album );
     ADD_VLC_META_STRING( 4,  TrackNum );
-    ADD_VLC_META_STRING( 5,  Genre );
-    ADD_VLC_META_STRING( 6,  Rating );
-    ADD_VLC_META_STRING( 7,  Date );
-    ADD_VLC_META_STRING( 8,  ArtURL );
+    ADD_META( 5, DBUS_TYPE_UINT32, i_time );
+    ADD_META( 6, DBUS_TYPE_UINT32, i_mtime );
+    ADD_VLC_META_STRING( 7,  Genre );
+    ADD_VLC_META_STRING( 8,  Rating );
+    ADD_VLC_META_STRING( 9,  Date );
+    ADD_VLC_META_STRING( 10, ArtURL );
 
-    ADD_VLC_META_STRING( 13, Copyright );
-    ADD_VLC_META_STRING( 14, Description );
-    ADD_VLC_META_STRING( 15, EncodedBy );
-    ADD_VLC_META_STRING( 16, Language );
-    ADD_META( 17, DBUS_TYPE_INT64, i_length );
-    ADD_VLC_META_STRING( 18, NowPlaying );
-    ADD_VLC_META_STRING( 19, Publisher );
-    ADD_VLC_META_STRING( 20, Setting );
-    ADD_VLC_META_STRING( 22, TrackID );
-    ADD_VLC_META_STRING( 23, URL );
+    ADD_VLC_META_STRING( 15, Copyright );
+    ADD_VLC_META_STRING( 16, Description );
+    ADD_VLC_META_STRING( 17, EncodedBy );
+    ADD_VLC_META_STRING( 18, Language );
+    ADD_META( 19, DBUS_TYPE_INT64, i_length );
+    ADD_VLC_META_STRING( 20, NowPlaying );
+    ADD_VLC_META_STRING( 21, Publisher );
+    ADD_VLC_META_STRING( 22, Setting );
+    ADD_VLC_META_STRING( 24, TrackID );
+    ADD_VLC_META_STRING( 25, URL );
 
     vlc_mutex_lock( &p_input->lock );
     if( p_input->p_meta )
     {
         int i_status = vlc_meta_GetStatus( p_input->p_meta );
-        ADD_META( 21, DBUS_TYPE_INT32, i_status );
+        ADD_META( 23, DBUS_TYPE_INT32, i_status );
     }
     vlc_mutex_unlock( &p_input->lock );
 
