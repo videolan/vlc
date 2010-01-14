@@ -36,6 +36,7 @@
 #ifdef HAVE_LIBAVCODEC_AVCODEC_H
 #   include <libavcodec/avcodec.h>
 #   ifdef HAVE_AVCODEC_DXVA2
+#       define DXVA2API_USE_BITFIELDS
 #       include <libavcodec/dxva2.h>
 #   endif
 #elif defined(HAVE_FFMPEG_AVCODEC_H)
@@ -224,17 +225,17 @@ typedef struct
 
     /* Device manager */
     UINT                     token;
-    LPDIRECT3DDEVICEMANAGER9 devmng;
+    IDirect3DDeviceManager9  *devmng;
     HANDLE                   device;
 
     /* Video service */
-    LPDIRECTXVIDEODECODERSERVICE vs;
+    IDirectXVideoDecoderService  *vs;
     GUID                         input;
     D3DFORMAT                    render;
 
     /* Video decoder */
     DXVA2_ConfigPictureDecode    cfg;
-    LPDIRECTXVIDEODECODER        decoder;
+    IDirectXVideoDecoder         *decoder;
 
     /* Option conversion */
     D3DFORMAT                    output;
@@ -610,7 +611,7 @@ static int D3dCreateDeviceManager(vlc_va_dxva2_t *va)
     msg_Dbg(va->log, "OurDirect3DCreateDeviceManager9 Success!");
 
     UINT token;
-    LPDIRECT3DDEVICEMANAGER9 devmng;
+    IDirect3DDeviceManager9 *devmng;
     if (FAILED(CreateDeviceManager9(&token, &devmng))) {
         msg_Err(va->log, " OurDirect3DCreateDeviceManager9 failed");
         return VLC_EGENERIC;
@@ -663,7 +664,7 @@ static int DxCreateVideoService(vlc_va_dxva2_t *va)
     }
     va->device = device;
 
-    LPDIRECTXVIDEODECODERSERVICE vs;
+    IDirectXVideoDecoderService *vs;
     hr = IDirect3DDeviceManager9_GetVideoService(va->devmng, device,
                                                  &IID_IDirectXVideoDecoderService,
                                                  &vs);
@@ -879,7 +880,7 @@ static int DxCreateVideoDecoder(vlc_va_dxva2_t *va,
     }
 
     /* Create the decoder */
-    LPDIRECTXVIDEODECODER decoder;
+    IDirectXVideoDecoder *decoder;
     if (FAILED(IDirectXVideoDecoderService_CreateVideoDecoder(va->vs,
                                                               &va->input,
                                                               &dsc,
