@@ -5032,12 +5032,7 @@ AC_SUBST(VERSION_REVISION)
 AC_SUBST(VERSION_EXTRA)
 AC_SUBST(COPYRIGHT_YEARS)
 AC_DEFINE_UNQUOTED(VLC_COMPILE_BY, "`whoami`", [user who ran configure])
-if test "${build_os}" = "cygwin"
-then
-    AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname`", [host which ran configure])
-else
-    AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname -s`", [host which ran configure])
-fi
+AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname -s 2>/dev/null || hostname`", [host which ran configure])
 AC_DEFINE_UNQUOTED(VLC_COMPILE_DOMAIN, "`dnsdomainname 2>/dev/null || domainname 2>/dev/null || echo unknown`", [domain of the host which ran configure])
 AC_DEFINE_UNQUOTED(VLC_COMPILER, "`$CC -v 2>&1 | tail -n 1`", [compiler])
 dnl Win32 need s a numerical version_extra.
