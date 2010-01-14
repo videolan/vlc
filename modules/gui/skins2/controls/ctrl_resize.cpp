@@ -89,6 +89,13 @@ void CtrlResize::setLayout( GenericLayout *pLayout, const Position &rPosition )
 }
 
 
+void CtrlResize::unsetLayout()
+{
+    m_rCtrl.unsetLayout();
+    CtrlGeneric::unsetLayout();
+}
+
+
 const Position *CtrlResize::getPosition() const
 {
     return m_rCtrl.getPosition();

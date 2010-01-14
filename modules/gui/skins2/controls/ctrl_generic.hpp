@@ -58,6 +58,7 @@ public:
     /// Set the position and the associated layout of the control
     virtual void setLayout( GenericLayout *pLayout,
                             const Position &rPosition );
+    virtual void unsetLayout();
 
     /// Get the position of the control in the layout, if any
     virtual const Position *getPosition() const { return m_pPosition; }

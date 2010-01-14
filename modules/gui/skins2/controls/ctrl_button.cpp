@@ -89,6 +89,12 @@ void CtrlButton::setLayout( GenericLayout *pLayout,
 }
 
 
+void CtrlButton::unsetLayout()
+{
+    m_pLayout->getActiveVar().delObserver( this );
+    CtrlGeneric::unsetLayout();
+}
+
 void CtrlButton::handleEvent( EvtGeneric &rEvent )
 {
     m_fsm.handleTransition( rEvent.getAsString() );

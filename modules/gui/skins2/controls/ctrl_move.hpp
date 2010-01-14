@@ -54,6 +54,7 @@ public:
     /// Set the position and the associated layout of the decorated control
     virtual void setLayout( GenericLayout *pLayout,
                             const Position &rPosition );
+    virtual void unsetLayout( );
 
     /// Get the position of the decorated control in the layout, if any
     virtual const Position *getPosition() const;

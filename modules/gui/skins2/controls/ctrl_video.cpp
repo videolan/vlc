@@ -48,8 +48,6 @@ CtrlVideo::~CtrlVideo()
 {
     VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
     rFullscreen.delObserver( this );
-
-    //m_pLayout->getActiveVar().delObserver( this );
 }
 
 
@@ -108,6 +106,13 @@ void CtrlVideo::setLayout( GenericLayout *pLayout,
 
     msg_Dbg( getIntf(),"New VideoControl detected(%p), useability=%s",
                            this, m_bIsUseable ? "true" : "false" );
+}
+
+
+void CtrlVideo::unsetLayout()
+{
+    m_pLayout->getActiveVar().delObserver( this );
+    CtrlGeneric::unsetLayout();
 }
 
 

@@ -48,6 +48,7 @@ public:
     /// Set the position and the associated layout of the control
     virtual void setLayout( GenericLayout *pLayout,
                             const Position &rPosition );
+    virtual void unsetLayout();
 
     /// Handle an event
     virtual void handleEvent( EvtGeneric &rEvent );

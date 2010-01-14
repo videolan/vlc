@@ -56,11 +56,20 @@ GenericLayout::GenericLayout( intf_thread_t *pIntf, int width, int height,
 GenericLayout::~GenericLayout()
 {
     delete m_pImage;
+
     list<Anchor*>::const_iterator it;
     for( it = m_anchorList.begin(); it != m_anchorList.end(); it++ )
     {
         delete *it;
     }
+
+    list<LayeredControl>::const_iterator iter;
+    for( iter = m_controlList.begin(); iter != m_controlList.end(); iter++ )
+    {
+        CtrlGeneric *pCtrl = (*iter).m_pControl;
+        pCtrl->unsetLayout();
+    }
+
 }
 
 

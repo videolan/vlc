@@ -80,6 +80,13 @@ void CtrlMove::setLayout( GenericLayout *pLayout, const Position &rPosition )
 }
 
 
+void CtrlMove::unsetLayout( )
+{
+    m_rCtrl.unsetLayout();
+    CtrlGeneric::unsetLayout();
+}
+
+
 const Position *CtrlMove::getPosition() const
 {
     return m_rCtrl.getPosition();

@@ -78,6 +78,7 @@ public:
     /// Set the position and the associated layout of the control
     virtual void setLayout( GenericLayout *pLayout,
                             const Position &rPosition );
+    virtual void unsetLayout();
 
     // resize the video Control
     virtual void resizeControl( int width, int height );
