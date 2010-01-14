@@ -97,6 +97,8 @@ static void* ALSAThread   ( void * );
 static void  ALSAFill     ( aout_instance_t * );
 static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
                                 vlc_value_t newval, vlc_value_t oldval, void *p_unused );
+static void GetDevicesForCard( vlc_object_t *, module_config_t *, int card );
+static void GetDevices( vlc_object_t *, module_config_t * );
 
 /*****************************************************************************
  * Module descriptor
@@ -283,6 +285,7 @@ static void Probe( aout_instance_t * p_aout,
         /* Probe() has failed. */
         msg_Dbg( p_aout, "failed to find a usable ALSA configuration" );
         var_Destroy( p_aout, "audio-device" );
+        GetDevices( VLC_OBJECT(p_aout), NULL );
         return;
     }
 
@@ -908,9 +911,6 @@ error:
     msleep(p_sys->i_period_time / 2);
 }
 
-static void GetDevicesForCard( vlc_object_t *, module_config_t *, int card );
-static void GetDevices( vlc_object_t *, module_config_t * );
-
 /*****************************************************************************
  * config variable callback
  *****************************************************************************/
@@ -1000,15 +1000,25 @@ static void GetDevicesForCard( vlc_object_t *obj, module_config_t *p_item,
             break;
         }
 
-        p_item->ppsz_list = xrealloc( p_item->ppsz_list,
-                              (p_item->i_list + 2) * sizeof(char *) );
-        p_item->ppsz_list_text = xrealloc( p_item->ppsz_list_text,
-                              (p_item->i_list + 2) * sizeof(char *) );
-        p_item->ppsz_list[ p_item->i_list ] = psz_device;
-        p_item->ppsz_list_text[ p_item->i_list ] = psz_descr;
-        p_item->i_list++;
-        p_item->ppsz_list[ p_item->i_list ] = NULL;
-        p_item->ppsz_list_text[ p_item->i_list ] = NULL;
+        msg_Dbg( obj, "  %s", psz_descr );
+
+        if( p_item )
+        {
+            p_item->ppsz_list = xrealloc( p_item->ppsz_list,
+                                  (p_item->i_list + 2) * sizeof(char *) );
+            p_item->ppsz_list_text = xrealloc( p_item->ppsz_list_text,
+                                  (p_item->i_list + 2) * sizeof(char *) );
+            p_item->ppsz_list[ p_item->i_list ] = psz_device;
+            p_item->ppsz_list_text[ p_item->i_list ] = psz_descr;
+            p_item->i_list++;
+            p_item->ppsz_list[ p_item->i_list ] = NULL;
+            p_item->ppsz_list_text[ p_item->i_list ] = NULL;
+        }
+        else
+        {
+            free( psz_device );
+            free( psz_descr );
+        }
     }
 
     snd_ctl_close( p_ctl );
@@ -1020,6 +1030,7 @@ static void GetDevices( vlc_object_t *obj, module_config_t *p_item )
     int i_card = -1;
     int i_err;
 
+    msg_Dbg( obj, "Available alsa output devices:" );
     while( (i_err = snd_card_next( &i_card )) == 0 && i_card > -1 )
         GetDevicesForCard( obj, p_item, i_card );
 
