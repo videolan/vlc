@@ -85,7 +85,7 @@ static int    CacheSaveConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 6
+#define CACHE_SUBVERSION_NUM 7
 
 /* Format string for the cache filename */
 #define CACHENAME_FORMAT \
@@ -285,7 +285,6 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
         }
         LOAD_STRING( pp_cache[i]->p_module->psz_capability );
         LOAD_IMMEDIATE( pp_cache[i]->p_module->i_score );
-        LOAD_IMMEDIATE( pp_cache[i]->p_module->i_cpu );
         LOAD_IMMEDIATE( pp_cache[i]->p_module->b_unloadable );
         LOAD_IMMEDIATE( pp_cache[i]->p_module->b_submodule );
 
@@ -311,7 +310,6 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
             }
             LOAD_STRING( p_module->psz_capability );
             LOAD_IMMEDIATE( p_module->i_score );
-            LOAD_IMMEDIATE( p_module->i_cpu );
             LOAD_IMMEDIATE( p_module->b_unloadable );
         }
     }
@@ -563,7 +561,6 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
         }
         SAVE_STRING( pp_cache[i]->p_module->psz_capability );
         SAVE_IMMEDIATE( pp_cache[i]->p_module->i_score );
-        SAVE_IMMEDIATE( pp_cache[i]->p_module->i_cpu );
         SAVE_IMMEDIATE( pp_cache[i]->p_module->b_unloadable );
         SAVE_IMMEDIATE( pp_cache[i]->p_module->b_submodule );
 
@@ -622,7 +619,6 @@ static int CacheSaveSubmodule( FILE *file, module_t *p_module )
 
     SAVE_STRING( p_module->psz_capability );
     SAVE_IMMEDIATE( p_module->i_score );
-    SAVE_IMMEDIATE( p_module->i_cpu );
     SAVE_IMMEDIATE( p_module->b_unloadable );
     return 0;
 

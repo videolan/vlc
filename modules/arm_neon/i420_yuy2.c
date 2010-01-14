@@ -33,7 +33,6 @@ vlc_module_begin ()
     set_description (N_("ARM NEON video chroma conversions"))
     set_capability ("video filter2", 250)
     set_callbacks (Open, NULL)
-    add_requirement (NEON)
 vlc_module_end ()
 
 void i420_yuyv_neon (uint8_t *out, const uint8_t **in,

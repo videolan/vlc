@@ -65,7 +65,6 @@ module_t *vlc_module_create (vlc_object_t *obj)
         module->pp_shortcuts[i] = NULL;
     module->psz_capability = (char*)"";
     module->i_score = 1;
-    module->i_cpu = 0;
     module->b_unloadable = true;
     module->b_submodule = false;
     module->pf_activate = NULL;
@@ -116,7 +115,6 @@ module_t *vlc_submodule_create (module_t *module)
     submodule->psz_longname = module->psz_longname;
     submodule->psz_capability = module->psz_capability;
     submodule->i_score = module->i_score;
-    submodule->i_cpu = module->i_cpu;
     submodule->b_submodule = true;
     return submodule;
 }
@@ -177,11 +175,6 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
                 ret = -1;
             break;
         }
-
-        case VLC_MODULE_CPU_REQUIREMENT:
-            assert (!module->b_submodule);
-            module->i_cpu |= va_arg (ap, int);
-            break;
 
         case VLC_MODULE_SHORTCUT:
         {

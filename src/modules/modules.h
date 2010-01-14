@@ -116,7 +116,6 @@ struct module_t
 
     char    *psz_capability;                                 /**< Capability */
     int      i_score;                          /**< Score for the capability */
-    uint32_t i_cpu;                           /**< Required CPU capabilities */
 
     bool b_unloadable;                        /**< Can we be dlclosed? */
     bool b_submodule;                        /**< Is this a submodule? */

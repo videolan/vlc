@@ -81,7 +81,6 @@
 
 #include "vlc_charset.h"
 #include "vlc_arrays.h"
-#include <vlc_cpu.h>
 
 #include "modules/modules.h"
 
@@ -466,7 +465,6 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
     size_t count;
     module_t **p_all = module_list_get (&count);
     p_list = malloc( count * sizeof( module_list_t ) );
-    unsigned i_cpu = vlc_CPU();
 
     /* Parse the module list for capabilities and probe each of them */
     count = 0;
@@ -476,9 +474,6 @@ module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
 
         /* Test that this module can do what we need */
         if( !module_provides( p_module, psz_capability ) )
-            continue;
-        /* Test if we have the required CPU */
-        if( (p_module->i_cpu & i_cpu) != p_module->i_cpu )
             continue;
 
         /* If we required a shortcut, check this plugin provides it. */

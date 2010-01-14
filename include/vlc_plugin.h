@@ -195,11 +195,6 @@ enum vlc_module_properties
     if (vlc_plugin_set (p_module, NULL, VLC_SUBMODULE_CREATE, &p_submodule)) \
         goto error;
 
-#define add_requirement( cap ) \
-    if (vlc_module_set (p_module, VLC_MODULE_CPU_REQUIREMENT, \
-                        (int)(CPU_CAPABILITY_##cap))) \
-        goto error;
-
 #define add_shortcut( shortcut ) \
     if (vlc_module_set (p_submodule, VLC_MODULE_SHORTCUT, \
         (const char *)(shortcut))) \
