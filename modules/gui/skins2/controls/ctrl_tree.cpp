@@ -244,13 +244,11 @@ void CtrlTree::onResize()
     // Redraw the control if the position has changed
     m_firstPos = it;
     makeImage();
-    notifyLayout();
 }
 
 void CtrlTree::onPositionChange()
 {
     makeImage();
-    notifyLayout();
 }
 
 void CtrlTree::handleEvent( EvtGeneric &rEvent )

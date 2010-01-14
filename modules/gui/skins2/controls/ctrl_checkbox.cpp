@@ -276,7 +276,5 @@ void CtrlCheckbox::changeButton()
 
     // Notify the window the tooltip has changed
     notifyTooltipChange();
-    // Refresh
-    notifyLayout();
 }
 

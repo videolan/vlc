@@ -78,9 +78,8 @@ void CtrlList::onUpdate( Subject<VarPercent> &rPercent, void *arg  )
     // Get the size of the control
     const Position *pPos = getPosition();
     if( !pPos )
-    {
         return;
-    }
+
     int height = pPos->getHeight();
 
     // How many lines can be displayed ?
@@ -114,9 +113,8 @@ void CtrlList::onResize()
     // Get the size of the control
     const Position *pPos = getPosition();
     if( !pPos )
-    {
         return;
-    }
+
     int height = pPos->getHeight();
 
     // How many lines can be displayed ?
@@ -142,14 +140,12 @@ void CtrlList::onResize()
     }
 
     makeImage();
-    notifyLayout();
 }
 
 
 void CtrlList::onPositionChange()
 {
     makeImage();
-    notifyLayout();
 }
 
 
