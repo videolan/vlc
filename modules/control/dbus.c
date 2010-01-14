@@ -419,8 +419,11 @@ DBUS_METHOD( GetCurrentTrack )
     REPLY_INIT;
     OUT_ARGUMENTS;
 
-    /* XXX: how about locking?! */
+    playlist_t *p_playlist = PL;
+
+    PL_LOCK;
     dbus_int32_t i_position = PL->i_current_index;
+    PL_UNLOCK;
 
     ADD_INT32( &i_position );
     REPLY_SEND;
@@ -462,9 +465,11 @@ DBUS_METHOD( GetLength )
 {
     REPLY_INIT;
     OUT_ARGUMENTS;
+    playlist_t *p_playlist = PL;
 
-    /* XXX: how about locking */
+    PL_LOCK;
     dbus_int32_t i_elements = PL->current.i_size;
+    PL_UNLOCK;
 
     ADD_INT32( &i_elements );
     REPLY_SEND;
