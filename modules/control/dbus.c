@@ -1169,7 +1169,7 @@ static int GetInputMeta( input_item_t* p_input,
 
     const char* ppsz_meta_items[] =
     {
-    "title", "artist", "genre", "copyright", "album", "tracknum",
+    "title", "artist", "genre", "copyright", "album", "tracknumber",
     "description", "rating", "date", "setting", "url", "language",
     "nowplaying", "publisher", "encodedby", "arturl", "trackid",
     "status", "location", "length", "video-codec", "audio-codec",
