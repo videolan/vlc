@@ -81,9 +81,6 @@ public:
     VarText &getStreamSampleRateVar()
         { return *((VarText*)(m_cVarStreamSampleRate.get())); }
 
-    /// Getter for the vout size variable
-    VarBox &getVoutSizeVar() { return m_varVoutSize; }
-
     /// Getter/Setter for the fullscreen variable
     VarBool &getFullscreenVar() { return *((VarBool*)(m_cVarFullscreen.get())); }
     void setFullscreenVar( bool );
@@ -142,7 +139,6 @@ private:
     VariablePtr m_cVarRecording;
     /// Variables related to the vout
     VariablePtr m_cVarFullscreen;
-    VarBox m_varVoutSize;
     VariablePtr m_cVarHasVout;
     /// Variables related to audio
     VariablePtr m_cVarHasAudio;

@@ -31,7 +31,7 @@
 
 
 /// Control video
-class CtrlVideo: public CtrlGeneric, public Observer<VarBox>
+class CtrlVideo: public CtrlGeneric
 {
 public:
     CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
@@ -55,9 +55,6 @@ public:
 
     /// Get the type of control (custom RTTI)
     virtual string getType() const { return "video"; }
-
-    /// Method called when the vout size is updated
-    virtual void onUpdate( Subject<VarBox> &rVoutSize, void* );
 
     /// Method called when visibility or ActiveLayout is updated
     virtual void onUpdate( Subject<VarBool> &rVariable , void* );

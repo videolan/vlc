@@ -39,13 +39,6 @@ CtrlVideo::CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
     m_xShift( 0 ), m_yShift( 0 ), m_bAutoResize( autoResize ),
     m_pVoutWindow( NULL ), m_bIsUseable( false )
 {
-    // Observe the vout size variable if the control is auto-resizable
-    if( m_bAutoResize )
-    {
-        VarBox &rVoutSize = VlcProc::instance( pIntf )->getVoutSizeVar();
-        rVoutSize.addObserver( this );
-    }
-
     VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
     rFullscreen.addObserver( this );
 }
@@ -53,9 +46,6 @@ CtrlVideo::CtrlVideo( intf_thread_t *pIntf, GenericLayout &rLayout,
 
 CtrlVideo::~CtrlVideo()
 {
-    VarBox &rVoutSize = VlcProc::instance( getIntf() )->getVoutSizeVar();
-    rVoutSize.delObserver( this );
-
     VarBool &rFullscreen = VlcProc::instance( getIntf() )->getFullscreenVar();
     rFullscreen.delObserver( this );
 
@@ -145,15 +135,6 @@ void CtrlVideo::resizeControl( int width, int height )
             m_pVoutWindow->move( pPos->getLeft(), pPos->getTop() );
         }
     }
-}
-
-
-void CtrlVideo::onUpdate( Subject<VarBox> &rVoutSize, void *arg )
-{
-    int newWidth = ((VarBox&)rVoutSize).getWidth() + m_xShift;
-    int newHeight = ((VarBox&)rVoutSize).getHeight() + m_yShift;
-
-    resizeControl( newWidth, newHeight );
 }
 
 
