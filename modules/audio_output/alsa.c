@@ -908,8 +908,8 @@ error:
     msleep(p_sys->i_period_time / 2);
 }
 
-static void GetDevicesForCard( module_config_t *p_item, int i_card );
-static void GetDevices( module_config_t *p_item );
+static void GetDevicesForCard( vlc_object_t *, module_config_t *, int card );
+static void GetDevices( vlc_object_t *, module_config_t * );
 
 /*****************************************************************************
  * config variable callback
@@ -918,7 +918,6 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
                                vlc_value_t newval, vlc_value_t oldval, void *p_unused )
 {
     module_config_t *p_item;
-    int i;
     (void)newval;
     (void)oldval;
     (void)p_unused;
@@ -929,6 +928,8 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     /* Clear-up the current list */
     if( p_item->i_list )
     {
+        int i;
+
         /* Keep the first entrie */
         for( i = 1; i < p_item->i_list; i++ )
         {
@@ -941,7 +942,7 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
     }
     p_item->i_list = 1;
 
-    GetDevices( p_item );
+    GetDevices( p_this, p_item );
 
     /* Signal change to the interface */
     p_item->b_dirty = true;
@@ -950,7 +951,8 @@ static int FindDevicesCallback( vlc_object_t *p_this, char const *psz_name,
 }
 
 
-static void GetDevicesForCard( module_config_t *p_item, int i_card )
+static void GetDevicesForCard( vlc_object_t *obj, module_config_t *p_item,
+                               int i_card )
 {
     int i_pcm_device = -1;
     int i_err = 0;
@@ -984,12 +986,8 @@ static void GetDevicesForCard( module_config_t *p_item, int i_card )
         if( ( i_err = snd_ctl_pcm_info( p_ctl, p_pcm_info ) ) < 0 )
         {
             if( i_err != -ENOENT )
-            {
-                /*printf( "get_devices_for_card(): "
-                         "snd_ctl_pcm_info() "
-                         "failed (%d:%d): %s.\n", i_card,
-                         i_pcm_device, snd_strerror( -i_err ) );*/
-            }
+                msg_Err( obj, "cannot get PCM device %d:%d infos: %s", i_card,
+                         i_pcm_device, snd_strerror( -i_err ) );
             continue;
         }
 
@@ -1017,25 +1015,14 @@ static void GetDevicesForCard( module_config_t *p_item, int i_card )
 }
 
 
-
-static void GetDevices( module_config_t *p_item )
+static void GetDevices( vlc_object_t *obj, module_config_t *p_item )
 {
     int i_card = -1;
-    int i_err = 0;
+    int i_err;
 
-    if( ( i_err = snd_card_next( &i_card ) ) != 0 )
-    {
-        /*printf( "snd_card_next() failed: %s", snd_strerror( -i_err ) );*/
-        return;
-    }
+    while( (i_err = snd_card_next( &i_card )) == 0 && i_card > -1 )
+        GetDevicesForCard( obj, p_item, i_card );
 
-    while( i_card > -1 )
-    {
-        GetDevicesForCard( p_item, i_card );
-        if( ( i_err = snd_card_next( &i_card ) ) != 0 )
-        {
-            /*printf( "snd_card_next() failed: %s", snd_strerror( -i_err ) );*/
-            break;
-        }
-    }
+    if( i_err )
+        msg_Err( obj, "cannot enumerate cards: %s", snd_strerror( -i_err ) );
 }
