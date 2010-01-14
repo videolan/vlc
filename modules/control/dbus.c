@@ -916,7 +916,7 @@ static int AllCallback( vlc_object_t *p_this, const char *psz_var,
  *****************************************************************************/
 DBUS_SIGNAL( CapsChangeSignal )
 {
-    SIGNAL_INIT( "CapsChange" );
+    SIGNAL_INIT( MPRIS_DBUS_PLAYER_PATH, "CapsChange" );
     OUT_ARGUMENTS;
 
     ADD_INT32( &((intf_thread_t*)p_data)->p_sys->i_caps );
@@ -928,7 +928,7 @@ DBUS_SIGNAL( CapsChangeSignal )
  *****************************************************************************/
 DBUS_SIGNAL( TrackListChangeSignal )
 { /* emit the new tracklist lengh */
-    SIGNAL_INIT("TrackListChange");
+    SIGNAL_INIT( MPRIS_DBUS_TRACKLIST_PATH, "TrackListChange");
     OUT_ARGUMENTS;
 
     /* XXX: locking */
@@ -975,7 +975,7 @@ static int TrackListChangeEmit( intf_thread_t *p_intf, int signal, int i_node )
 
 DBUS_SIGNAL( TrackChangeSignal )
 { /* emit the metadata of the new item */
-    SIGNAL_INIT( "TrackChange" );
+    SIGNAL_INIT( MPRIS_DBUS_PLAYER_PATH, "TrackChange" );
     OUT_ARGUMENTS;
 
     input_item_t *p_item = (input_item_t*) p_data;
@@ -990,7 +990,7 @@ DBUS_SIGNAL( TrackChangeSignal )
 
 DBUS_SIGNAL( StatusChangeSignal )
 { /* send the updated status info on the bus */
-    SIGNAL_INIT( "StatusChange" );
+    SIGNAL_INIT( MPRIS_DBUS_PLAYER_PATH, "StatusChange" );
     OUT_ARGUMENTS;
 
     /* we're called from a callback of input_thread_t, so it can not be

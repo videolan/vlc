@@ -56,8 +56,8 @@
     dbus_message_unref( p_msg ); \
     return DBUS_HANDLER_RESULT_HANDLED
 
-#define SIGNAL_INIT( signal ) \
-    DBusMessage *p_msg = dbus_message_new_signal( MPRIS_DBUS_PLAYER_PATH, \
+#define SIGNAL_INIT( path, signal ) \
+    DBusMessage *p_msg = dbus_message_new_signal( path, \
         MPRIS_DBUS_INTERFACE, signal ); \
     if( !p_msg ) return DBUS_HANDLER_RESULT_NEED_MEMORY; \
 
