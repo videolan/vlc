@@ -1477,12 +1477,14 @@ static int Request( access_t *p_access, int64_t i_tell )
         else if( !strcasecmp( psz, "Content-Encoding" ) )
         {
             msg_Dbg( p_access, "Content-Encoding: %s", p );
-            if( strcasecmp( p, "identity" ) )
+            if( !strcasecmp( p, "identity" ) )
+                ;
 #ifdef HAVE_ZLIB_H
+            else if( !strcasecmp( p, "gzip" ) || !strcasecmp( p, "deflate" ) )
                 p_sys->b_compressed = true;
-#else
-                msg_Warn( p_access, "Compressed content not supported. Rebuild with zlib support." );
 #endif
+            else
+                msg_Warn( p_access, "Unknown content coding: %s", p );
         }
         else if( !strcasecmp( psz, "Pragma" ) )
         {
