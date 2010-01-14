@@ -55,7 +55,9 @@ VLCMediaObject::VLCMediaObject(QObject * parent)
 
 VLCMediaObject::~VLCMediaObject()
 {
-//    unloadMedia();
+    unloadMedia();
+
+    libvlc_media_player_stop(p_vlc_media_player, vlc_exception); // ensure that we are stopped
     libvlc_media_player_release(p_vlc_media_player);
 }
 
