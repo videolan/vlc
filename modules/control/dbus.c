@@ -1169,43 +1169,46 @@ static int GetInputMeta( input_item_t* p_input,
 
     const char* ppsz_meta_items[] =
     {
-    "title", "artist", "genre", "copyright", "album", "tracknumber",
-    "description", "rating", "date", "setting", "url", "language",
-    "nowplaying", "publisher", "encodedby", "arturl", "trackid",
-    "status", "location", "length", "video-codec", "audio-codec",
-    "video-bitrate", "audio-bitrate", "audio-samplerate"
+    /* Official MPRIS metas */
+    "location", "title", "artist", "album", "tracknumber", "genre",
+    "rating", "date", "arturl",
+    "audio-bitrate", "audio-samplerate", "video-bitrate",
+    /* VLC specifics metas */
+    "audio-codec", "copyright", "description", "encodedby", "language", "length",
+    "nowplaying", "publisher", "setting", "status", "trackid", "url",
+    "video-codec"
     };
 
     dbus_message_iter_open_container( args, DBUS_TYPE_ARRAY, "{sv}", &dict );
 
-    ADD_VLC_META_STRING( 0,  Title );
-    ADD_VLC_META_STRING( 1,  Artist );
-    ADD_VLC_META_STRING( 2,  Genre );
-    ADD_VLC_META_STRING( 3,  Copyright );
-    ADD_VLC_META_STRING( 4,  Album );
-    ADD_VLC_META_STRING( 5,  TrackNum );
-    ADD_VLC_META_STRING( 6,  Description );
-    ADD_VLC_META_STRING( 7,  Rating );
-    ADD_VLC_META_STRING( 8,  Date );
-    ADD_VLC_META_STRING( 9,  Setting );
-    ADD_VLC_META_STRING( 10, URL );
-    ADD_VLC_META_STRING( 11, Language );
-    ADD_VLC_META_STRING( 12, NowPlaying );
-    ADD_VLC_META_STRING( 13, Publisher );
-    ADD_VLC_META_STRING( 14, EncodedBy );
-    ADD_VLC_META_STRING( 15, ArtURL );
-    ADD_VLC_META_STRING( 16, TrackID );
+    ADD_VLC_META_STRING( 0,  URI );
+    ADD_VLC_META_STRING( 1,  Title );
+    ADD_VLC_META_STRING( 2,  Artist );
+    ADD_VLC_META_STRING( 3,  Album );
+    ADD_VLC_META_STRING( 4,  TrackNum );
+    ADD_VLC_META_STRING( 5,  Genre );
+    ADD_VLC_META_STRING( 6,  Rating );
+    ADD_VLC_META_STRING( 7,  Date );
+    ADD_VLC_META_STRING( 8,  ArtURL );
+
+    ADD_VLC_META_STRING( 13, Copyright );
+    ADD_VLC_META_STRING( 14, Description );
+    ADD_VLC_META_STRING( 15, EncodedBy );
+    ADD_VLC_META_STRING( 16, Language );
+    ADD_META( 17, DBUS_TYPE_INT64, i_length );
+    ADD_VLC_META_STRING( 18, NowPlaying );
+    ADD_VLC_META_STRING( 19, Publisher );
+    ADD_VLC_META_STRING( 20, Setting );
+    ADD_VLC_META_STRING( 22, TrackID );
+    ADD_VLC_META_STRING( 23, URL );
 
     vlc_mutex_lock( &p_input->lock );
     if( p_input->p_meta )
     {
         int i_status = vlc_meta_GetStatus( p_input->p_meta );
-        ADD_META( 17, DBUS_TYPE_INT32, i_status );
+        ADD_META( 21, DBUS_TYPE_INT32, i_status );
     }
     vlc_mutex_unlock( &p_input->lock );
-
-    ADD_VLC_META_STRING( 18, URI );
-    ADD_META( 19, DBUS_TYPE_INT64, i_length );
 
     dbus_message_iter_close_container( args, &dict );
     return VLC_SUCCESS;
