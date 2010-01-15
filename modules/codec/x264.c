@@ -670,7 +670,11 @@ struct encoder_sys_t
     x264_t          *h;
     x264_param_t    param;
 
+#if X264_BUILD >= 83
+    int  i_initial_delay;
+#else
     mtime_t         i_interpolated_dts;
+#endif
 
     char *psz_stat_name;
 };
@@ -712,7 +716,11 @@ static int  Open ( vlc_object_t *p_this )
     p_enc->p_sys = p_sys = malloc( sizeof( encoder_sys_t ) );
     if( !p_sys )
         return VLC_ENOMEM;
+#if X264_BUILD >= 83
+    p_sys->i_initial_delay = 0;
+#else
     p_sys->i_interpolated_dts = 0;
+#endif
     p_sys->psz_stat_name = NULL;
 
     x264_param_default( &p_sys->param );
@@ -1213,17 +1221,46 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
         i_out += nal[i].i_payload;
     }
 
-    if( pic.i_type == X264_TYPE_IDR || pic.i_type == X264_TYPE_I )
+#if X264_BUILD >= 83
+    if( pic.b_keyframe )
         p_block->i_flags |= BLOCK_FLAG_TYPE_I;
-    else if( pic.i_type == X264_TYPE_P )
+#else
+     /* We only set IDR-frames as type_i as packetizer
+      * places sps/pps on keyframes and we don't want it
+      * to place sps/pps stuff with normal I-frames.
+      * FIXME: This is a workaround and should be fixed when
+      * there is some nice way to tell packetizer what is
+      * keyframe.
+      */
+    if( pic.i_type == X264_TYPE_IDR )
+        p_block->i_flags |= BLOCK_FLAG_TYPE_I;
+#endif
+    else if( pic.i_type == X264_TYPE_P || pic.i_type == X264_TYPE_I )
         p_block->i_flags |= BLOCK_FLAG_TYPE_P;
     else if( pic.i_type == X264_TYPE_B )
         p_block->i_flags |= BLOCK_FLAG_TYPE_B;
+    else
+        p_block->i_flags |= BLOCK_FLAG_TYPE_PB;
 
     /* This isn't really valid for streams with B-frames */
     p_block->i_length = INT64_C(1000000) *
         p_enc->fmt_in.video.i_frame_rate_base /
             p_enc->fmt_in.video.i_frame_rate;
+
+#if X264_BUILD >= 83
+    /* libx264 gives pts/dts values from >= 83 onward,
+     * also pts starts from 0 so dts can be negative,
+     * but vlc doesn't handle if dts is < VLC_TS_0 so we
+     * use that offset to get it right for vlc.
+     */
+    if( p_sys->i_initial_delay == 0 && pic.i_dts < VLC_TS_0 )
+    {
+        p_sys->i_initial_delay = -1* pic.i_dts;
+        msg_Dbg( p_enc, "Initial delay is set to %d", p_sys->i_initial_delay );
+    }
+    p_block->i_pts = pic.i_pts + p_sys->i_initial_delay;
+    p_block->i_dts = pic.i_dts + p_sys->i_initial_delay;
+#else
 
     p_block->i_pts = pic.i_pts;
 
@@ -1257,6 +1294,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pict )
     {
         p_block->i_dts = p_block->i_pts;
     }
+#endif
 
     return p_block;
 }
@@ -1270,6 +1308,8 @@ static void Close( vlc_object_t *p_this )
     encoder_sys_t *p_sys = p_enc->p_sys;
 
     free( p_sys->psz_stat_name );
+
+    msg_Dbg( p_enc, "framecount still in libx264 buffer: %d", x264_encoder_delayed_frames( p_sys->h ) );
 
     if( p_sys->h )
         x264_encoder_close( p_sys->h );
