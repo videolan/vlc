@@ -249,7 +249,7 @@ VLC_PUBLIC_API char * libvlc_media_get_meta( libvlc_media_t *p_md,
  * libvlc_media_save_meta in order to save the meta)
  *
  * \param p_md the media descriptor
- * \param e_meta the meta to read
+ * \param e_meta the meta to write
  * \param the media's meta
  */
 VLC_PUBLIC_API void libvlc_media_set_meta( libvlc_media_t *p_md,
@@ -261,7 +261,7 @@ VLC_PUBLIC_API void libvlc_media_set_meta( libvlc_media_t *p_md,
  * Save the meta previously set
  *
  * \param p_md the media desriptor
- * \return true if the werite was successfull
+ * \return true if the write operation was successfull
  */
 VLC_PUBLIC_API int libvlc_media_save_meta( libvlc_media_t *p_md );
 
