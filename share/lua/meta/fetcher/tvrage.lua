@@ -2,7 +2,7 @@
  Gets metas for tv episode using tvrage.
 
  $Id$
- Copyright © 2007 the VideoLAN team
+ Copyright © 2010 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
