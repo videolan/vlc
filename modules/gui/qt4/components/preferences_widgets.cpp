@@ -99,9 +99,6 @@ ConfigControl *ConfigControl::createControl( vlc_object_t *p_this,
     case CONFIG_ITEM_MODULE_LIST_CAT:
         p_control = new ModuleListConfigControl( p_this, p_item, parent, true,
                                              l, line );
-        /* Special Hack for a bug in video-filter */
-        if( qobject_cast<ModuleListConfigControl *>( p_control )->groupBox == NULL )
-            return NULL;
         break;
     case CONFIG_ITEM_STRING:
         if( !p_item->i_list )
