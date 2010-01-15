@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>687</width>
-    <height>548</height>
+    <width>680</width>
+    <height>537</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -50,6 +50,91 @@
          </widget>
         </item>
        </layout>
+      </item>
+     </layout>
+    </widget>
+   </item>
+   <item>
+    <widget class="QGroupBox" name="groupBox_3">
+     <property name="title">
+      <string>Codecs</string>
+     </property>
+     <layout class="QGridLayout" name="gridLayout">
+      <item row="7" column="0">
+       <widget class="QLabel" name="filterLabel">
+        <property name="text">
+         <string>Skip H.264 in-loop deblocking filter</string>
+        </property>
+        <property name="buddy">
+         <cstring>loopFilterBox</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="7" column="1">
+       <widget class="QComboBox" name="loopFilterBox"/>
+      </item>
+      <item row="2" column="1">
+       <layout class="QHBoxLayout" name="horizontalLayout_2">
+        <item>
+         <widget class="QSpinBox" name="PostProcLevel">
+          <property name="alignment">
+           <set>Qt::AlignRight</set>
+          </property>
+          <property name="minimum">
+           <number>1</number>
+          </property>
+          <property name="maximum">
+           <number>26</number>
+          </property>
+          <property name="value">
+           <number>6</number>
+          </property>
+         </widget>
+        </item>
+        <item>
+         <spacer name="horizontalSpacer">
+          <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+          </property>
+          <property name="sizeHint" stdset="0">
+           <size>
+            <width>40</width>
+            <height>20</height>
+           </size>
+          </property>
+         </spacer>
+        </item>
+       </layout>
+      </item>
+      <item row="2" column="0">
+       <widget class="QLabel" name="ppLabel">
+        <property name="minimumSize">
+         <size>
+          <width>250</width>
+          <height>0</height>
+         </size>
+        </property>
+        <property name="text">
+         <string>Video quality post-processing level</string>
+        </property>
+        <property name="buddy">
+         <cstring>PostProcLevel</cstring>
+        </property>
+       </widget>
+      </item>
+      <item row="3" column="0">
+       <widget class="QCheckBox" name="hwAccelBox">
+        <property name="text">
+         <string>Use GPU acceleration (experimental)</string>
+        </property>
+       </widget>
+      </item>
+      <item row="8" column="0">
+       <widget class="QCheckBox" name="systemCodecBox">
+        <property name="text">
+         <string>Use system codecs if available (better quality, but dangerous)</string>
+        </property>
+       </widget>
       </item>
      </layout>
     </widget>
@@ -221,91 +306,6 @@
      </layout>
     </widget>
    </item>
-   <item>
-    <widget class="QGroupBox" name="groupBox_3">
-     <property name="title">
-      <string>Codecs</string>
-     </property>
-     <layout class="QGridLayout" name="gridLayout">
-      <item row="7" column="0">
-       <widget class="QLabel" name="filterLabel">
-        <property name="text">
-         <string>H.264 in-loop deblocking filter</string>
-        </property>
-        <property name="buddy">
-         <cstring>loopFilterBox</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="7" column="1">
-       <widget class="QComboBox" name="loopFilterBox"/>
-      </item>
-      <item row="2" column="1">
-       <layout class="QHBoxLayout" name="horizontalLayout_2">
-        <item>
-         <widget class="QSpinBox" name="PostProcLevel">
-          <property name="alignment">
-           <set>Qt::AlignRight</set>
-          </property>
-          <property name="minimum">
-           <number>1</number>
-          </property>
-          <property name="maximum">
-           <number>26</number>
-          </property>
-          <property name="value">
-           <number>6</number>
-          </property>
-         </widget>
-        </item>
-        <item>
-         <spacer name="horizontalSpacer">
-          <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-          </property>
-          <property name="sizeHint" stdset="0">
-           <size>
-            <width>40</width>
-            <height>20</height>
-           </size>
-          </property>
-         </spacer>
-        </item>
-       </layout>
-      </item>
-      <item row="2" column="0">
-       <widget class="QLabel" name="ppLabel">
-        <property name="minimumSize">
-         <size>
-          <width>250</width>
-          <height>0</height>
-         </size>
-        </property>
-        <property name="text">
-         <string>Video quality post-processing level</string>
-        </property>
-        <property name="buddy">
-         <cstring>PostProcLevel</cstring>
-        </property>
-       </widget>
-      </item>
-      <item row="3" column="0">
-       <widget class="QCheckBox" name="hwAccelBox">
-        <property name="text">
-         <string>Use GPU acceleration (experimental)</string>
-        </property>
-       </widget>
-      </item>
-      <item row="4" column="0" colspan="2">
-       <widget class="QCheckBox" name="systemCodecBox">
-        <property name="text">
-         <string>Use system codecs if available (better quality, but dangerous)</string>
-        </property>
-       </widget>
-      </item>
-     </layout>
-    </widget>
-   </item>
   </layout>
  </widget>
  <tabstops>
@@ -321,7 +321,6 @@
   <tabstop>cachingCombo</tabstop>
   <tabstop>PostProcLevel</tabstop>
   <tabstop>hwAccelBox</tabstop>
-  <tabstop>systemCodecBox</tabstop>
   <tabstop>loopFilterBox</tabstop>
  </tabstops>
  <resources/>
