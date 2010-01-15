@@ -58,7 +58,11 @@
        </widget>
       </item>
       <item row="5" column="1" colspan="2">
-       <widget class="QComboBox" name="outputModule"/>
+       <widget class="QComboBox" name="outputModule">
+        <property name="maxVisibleItems">
+         <number>15</number>
+        </property>
+       </widget>
       </item>
       <item row="5" column="0">
        <widget class="QLabel" name="voutLabel">
