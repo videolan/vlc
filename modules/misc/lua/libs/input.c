@@ -310,49 +310,44 @@ static int vlclua_input_item_set_meta( lua_State *L )
     const char *psz_name = luaL_checkstring( L, 2 ),
                *psz_value = luaL_checkstring( L, 3 );
 
-#define META_TYPE( n ) { #n, vlc_meta_ ## n }
+#define META_TYPE( n, s ) { s, vlc_meta_ ## n },
     static const struct
     {
         const char *psz_name;
         vlc_meta_type_t type;
     } pp_meta_types[] = {
-        META_TYPE( Title ),
-        META_TYPE( Artist ),
-        META_TYPE( Genre ),
-        META_TYPE( Copyright ),
-        META_TYPE( Album ),
-        META_TYPE( TrackNumber ),
-        META_TYPE( Description ),
-        META_TYPE( Rating ),
-        META_TYPE( Date ),
-        META_TYPE( Setting ),
-        META_TYPE( URL ),
-        META_TYPE( Language ),
-        META_TYPE( NowPlaying ),
-        META_TYPE( Publisher ),
-        META_TYPE( EncodedBy ),
-        META_TYPE( ArtworkURL ),
-        META_TYPE( TrackID ),
+        META_TYPE( Title, "title" )
+        META_TYPE( Artist, "artist" )
+        META_TYPE( Genre, "genre" )
+        META_TYPE( Copyright, "copyright" )
+        META_TYPE( Album, "album" )
+        META_TYPE( TrackNumber, "track_number" )
+        META_TYPE( Description, "description" )
+        META_TYPE( Rating, "rating" )
+        META_TYPE( Date, "date" )
+        META_TYPE( Setting, "setting" )
+        META_TYPE( URL, "url" )
+        META_TYPE( Language, "language" )
+        META_TYPE( NowPlaying, "now_playing" )
+        META_TYPE( Publisher, "publisher" )
+        META_TYPE( EncodedBy, "encoded_by" )
+        META_TYPE( ArtworkURL, "artwork_url" )
+        META_TYPE( TrackID, "track_id" )
     };
 #undef META_TYPE
 
     vlc_meta_type_t type = vlc_meta_Title;
-    bool ok = false;
     for( unsigned i = 0; i < VLC_META_TYPE_COUNT; i++ )
     {
         if( !strcasecmp( pp_meta_types[i].psz_name, psz_name ) )
         {
             type = pp_meta_types[i].type;
-            ok = true;
+            input_item_SetMeta( p_item, type, psz_value );
+            return 1;
         }
     }
 
-    if( !ok ) {
-        vlc_meta_AddExtra( p_item->p_meta, psz_name, psz_value );
-        return 1;
-    }
-
-    input_item_SetMeta( p_item, type, psz_value );
+    vlc_meta_AddExtra( p_item->p_meta, psz_name, psz_value );
     return 1;
 }
 
