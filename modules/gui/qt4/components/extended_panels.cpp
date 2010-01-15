@@ -261,6 +261,7 @@ void ExtVideo::ChangeVFiltersString( const char *psz_name, bool b_add )
         !strcmp( psz_name, "puzzle" ) ||
         !strcmp( psz_name, "logo" ) ||
         !strcmp( psz_name, "wall" ) ||
+        !strcmp( psz_name, "panoramix" ) ||
         !strcmp( psz_name, "clone" ) )
         psz_module_name = "video_filter_wrapper";
 
