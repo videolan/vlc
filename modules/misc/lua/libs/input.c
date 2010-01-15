@@ -159,7 +159,6 @@ static int vlclua_input_metas_internal( lua_State *L, input_item_t *p_item )
             const char *meta = vlc_meta_GetExtra(p_item->p_meta, names[i]);
             lua_pushstring( L, meta );
             lua_setfield( L, -2, names[i] );
-            printf("setting %s=%s\n", names[i], meta);
             free(names[i]);
         }
         free(names);
