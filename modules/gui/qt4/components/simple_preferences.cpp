@@ -552,6 +552,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             CONFIG_GENERIC( "embedded-video", Bool, NULL, embedVideo );
             CONFIG_GENERIC( "qt-fs-controller", Bool, NULL, fsController );
             CONFIG_GENERIC( "qt-system-tray", Bool, NULL, systrayBox );
+            CONFIG_GENERIC( "qt-notification", Bool, NULL, sysPop );
             CONFIG_GENERIC_FILE( "skins2-last", File, ui.skinFileLabel,
                                  ui.fileSkin, ui.skinBrowse );
             CONFIG_GENERIC( "qt-video-autoresize", Bool, NULL, resizingBox );

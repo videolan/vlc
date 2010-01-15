@@ -7,7 +7,7 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>745</width>
+    <width>802</width>
     <height>651</height>
    </rect>
   </property>
@@ -332,6 +332,12 @@
       </item>
       <item row="0" column="2" rowspan="3" colspan="2">
        <widget class="QWidget" name="native_zone" native="true">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
+          <horstretch>10</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <layout class="QGridLayout" name="gridLayout_4">
          <property name="margin">
           <number>0</number>
@@ -343,13 +349,6 @@
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="1">
-          <widget class="QCheckBox" name="fsController">
-           <property name="text">
-            <string>Show controls in full screen mode</string>
            </property>
           </widget>
          </item>
@@ -372,24 +371,10 @@
            </property>
           </widget>
          </item>
-         <item row="4" column="1">
-          <widget class="QCheckBox" name="systrayBox">
-           <property name="text">
-            <string>Show systray icon</string>
-           </property>
-          </widget>
-         </item>
          <item row="4" column="0">
           <widget class="QCheckBox" name="resizingBox">
            <property name="text">
             <string>Resize interface to video size</string>
-           </property>
-          </widget>
-         </item>
-         <item row="7" column="0">
-          <widget class="QCheckBox" name="embedVideo">
-           <property name="text">
-            <string>Embed video in interface</string>
            </property>
           </widget>
          </item>
@@ -403,6 +388,34 @@
            </property>
            <property name="buddy">
             <cstring>stylesCombo</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QCheckBox" name="systrayBox">
+           <property name="text">
+            <string>Show systray icon</string>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1">
+          <widget class="QCheckBox" name="embedVideo">
+           <property name="text">
+            <string>Embed video in interface</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0">
+          <widget class="QCheckBox" name="fsController">
+           <property name="text">
+            <string>Show controls in full screen mode</string>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="1">
+          <widget class="QCheckBox" name="sysPop">
+           <property name="text">
+            <string> Systray popup when minimized</string>
            </property>
           </widget>
          </item>
