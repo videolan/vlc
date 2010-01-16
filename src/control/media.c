@@ -252,7 +252,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
         return NULL;
     }
 
-    p_md = malloc( sizeof(libvlc_media_t) );
+    p_md = calloc( sizeof(libvlc_media_t), 1 );
     if( !p_md )
     {
         libvlc_exception_raise( p_e );
@@ -262,9 +262,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
 
     p_md->p_libvlc_instance = p_instance;
     p_md->p_input_item      = p_input_item;
-    p_md->b_preparsed       = false;
     p_md->i_refcount        = 1;
-    p_md->p_user_data       = NULL;
 
     p_md->state = libvlc_NothingSpecial;
 
@@ -453,8 +451,9 @@ char *libvlc_media_get_meta( libvlc_media_t *p_md, libvlc_meta_t e_meta )
     psz_meta = input_item_GetMeta( p_md->p_input_item,
                                    libvlc_to_vlc_meta[e_meta] );
 
-    if( e_meta == libvlc_meta_ArtworkURL && !psz_meta )
+    if( e_meta == libvlc_meta_ArtworkURL && !psz_meta && !p_md->has_asked_art )
     {
+        p_md->has_asked_art = true;
         playlist_AskForArtEnqueue(
                 libvlc_priv(p_md->p_libvlc_instance->p_libvlc_int)->p_playlist,
                 p_md->p_input_item, pl_Unlocked );
