@@ -80,12 +80,6 @@ static inline void unlock(libvlc_media_player_t *mp)
     vlc_mutex_unlock(&mp->object_lock);
 }
 
-static inline void clear_if_needed(libvlc_exception_t *e)
-{
-    if (libvlc_exception_raised(e))
-        libvlc_exception_clear(e);
-}
-
 /*
  * Release the associated input thread.
  *
@@ -287,14 +281,14 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         /* */
         event.type = libvlc_MediaPlayerTimeChanged;
         event.u.media_player_time_changed.new_time =
-                                               var_GetTime( p_input, "time" );
+           from_mtime(var_GetTime( p_input, "time" ));
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_LENGTH )
     {
         event.type = libvlc_MediaPlayerLengthChanged;
         event.u.media_player_length_changed.new_length =
-                                               var_GetTime( p_input, "length" );
+           from_mtime(var_GetTime( p_input, "length" ));
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
 
@@ -803,10 +797,10 @@ libvlc_time_t libvlc_media_player_get_length(
     if( !p_input_thread )
         return -1;
 
-    i_time = var_GetTime( p_input_thread, "length" );
+    i_time = from_mtime(var_GetTime( p_input_thread, "length" ));
     vlc_object_release( p_input_thread );
 
-    return (i_time+500LL)/1000LL;
+    return i_time;
 }
 
 libvlc_time_t libvlc_media_player_get_time(
@@ -820,9 +814,9 @@ libvlc_time_t libvlc_media_player_get_time(
     if( !p_input_thread )
         return -1;
 
-    i_time = var_GetTime( p_input_thread , "time" );
+    i_time = from_mtime(var_GetTime( p_input_thread , "time" ));
     vlc_object_release( p_input_thread );
-    return (i_time+500LL)/1000LL;
+    return i_time;
 }
 
 void libvlc_media_player_set_time(
@@ -836,7 +830,7 @@ void libvlc_media_player_set_time(
     if( !p_input_thread )
         return;
 
-    var_SetTime( p_input_thread, "time", i_time*1000LL );
+    var_SetTime( p_input_thread, "time", to_mtime(i_time) );
     vlc_object_release( p_input_thread );
 }
 

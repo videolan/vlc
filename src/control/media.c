@@ -147,8 +147,8 @@ static void input_item_duration_changed( const vlc_event_t *p_event,
 
     /* Construct the event */
     event.type = libvlc_MediaDurationChanged;
-    event.u.media_duration_changed.new_duration = 
-        p_event->u.input_item_duration_changed.new_duration;
+    event.u.media_duration_changed.new_duration =
+        from_mtime(p_event->u.input_item_duration_changed.new_duration);
 
     /* Send the event */
     libvlc_event_send( p_md->p_event_manager, &event );
@@ -597,7 +597,7 @@ libvlc_media_get_duration( libvlc_media_t * p_md, libvlc_exception_t *p_e )
     if (!input_item_IsPreparsed( p_md->p_input_item ))
         return -1;
 
-    return input_item_GetDuration( p_md->p_input_item ) / 1000;
+    return from_mtime(input_item_GetDuration( p_md->p_input_item ));
 }
 
 /**************************************************************************

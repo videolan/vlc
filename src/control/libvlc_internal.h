@@ -111,4 +111,20 @@ void libvlc_event_attach_async( libvlc_event_manager_t * p_event_manager,
                            libvlc_exception_raise( p_e ); \
                            return 0; }
 
+static inline void clear_if_needed(libvlc_exception_t *e)
+{
+    if (libvlc_exception_raised(e))
+        libvlc_exception_clear(e);
+}
+
+static inline libvlc_time_t from_mtime(mtime_t time)
+{
+    return (time + 500ULL)/ 1000ULL;
+}
+
+static inline mtime_t to_mtime(libvlc_time_t time)
+{
+    return time * 1000ULL;
+}
+
 #endif
