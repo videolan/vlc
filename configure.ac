@@ -348,7 +348,7 @@ case "${host_os}" in
         VLC_ADD_LIBS([activex mozilla],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx sdl_image aout_sdl vout_sdl],[-lwinmm])
         VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap slp oldhttp stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldtelnet oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a],[-lws2_32])
-        VLC_ADD_LIBS([access_file], [-lshlwapi])
+        VLC_ADD_LIBS([filesystem], [-lshlwapi])
         dnl
         dnl DEP and ASLR options
         dnl
@@ -382,13 +382,13 @@ case "${host_os}" in
     VLC_ADD_LIBS([vlc libvlccore logger],[-lbe])
     VLC_ADD_LIBS([beos],[-lbe -lmedia -ltranslation -ltracker -lgame])
     VLC_ADD_LIBS([dvdnav dvdread],[-ldl])
-    VLC_ADD_LIBS([access_file],[-lpoll])
+    VLC_ADD_LIBS([filesystem],[-lpoll])
     LDFLAGS_save="${LDFLAGS_save} -lintl"; LDFLAGS="${LDFLAGS_save}"
     dnl Check for BONE
     if test -f /boot/beos/system/lib/libbind.so; then
-        VLC_ADD_LIBS([access_file access_ftp access_mms access_output_udp oldtelnet netsync sap libvlccore growl_udp],[-lbind -lsocket])
+        VLC_ADD_LIBS([filesystem access_ftp access_mms access_output_udp oldtelnet netsync sap libvlccore growl_udp],[-lbind -lsocket])
     else
-        VLC_ADD_LIBS([access_file access_ftp access_mms access_output_udp oldtelnet netsync sap libvlccore growl_udp],[-lnet])
+        VLC_ADD_LIBS([filesystem access_ftp access_mms access_output_udp oldtelnet netsync sap libvlccore growl_udp],[-lnet])
     fi
 
     dnl Ugly check for Zeta
