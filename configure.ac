@@ -581,22 +581,6 @@ AH_BOTTOM([#include <vlc_fixups.h>])
 
 AC_CHECK_FUNCS(mmap, [VLC_ADD_PLUGIN([access_mmap])])
 
-dnl Check for setlocal and langinfo
-AC_CHECK_FUNCS(setlocale)
-AC_CHECK_HEADERS(langinfo.h)
-AC_CHECK_FUNCS(nl_langinfo)
-
-AC_CACHE_CHECK([for nl_langinfo and CODESET], ac_cv_langinfo_codeset,
-  [AC_TRY_LINK([#include <langinfo.h>],
-    [char* cs = nl_langinfo(CODESET);],
-    ac_cv_langinfo_codeset=yes,
-    ac_cv_langinfo_codeset=no)
-  ])
-if test ${ac_cv_langinfo_codeset} = yes; then
-  AC_DEFINE(HAVE_LANGINFO_CODESET, 1,
-    [Define if you have <langinfo.h> and nl_langinfo(CODESET).])
-fi
-
 SOCKET_LIBS=""
 AC_CHECK_FUNCS(connect,,[
   AC_CHECK_LIB(socket,connect,[
