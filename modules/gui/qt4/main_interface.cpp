@@ -587,6 +587,10 @@ void MainInterface::createTaskBarButtons()
             CONNECT( this, playPauseSignal(), THEMIM, togglePlayPause() );
             CONNECT( this, prevSignal(), THEMIM, prev() );
             CONNECT( this, nextSignal(), THEMIM, next() );
+            CONNECT( this, play(),  ActionsManager::getInstance( p_intf ), play() );
+            CONNECT( this, mute(),  ActionsManager::getInstance( p_intf ), toggleMuteAudio() );
+            CONNECT( this, volumeUp(),  ActionsManager::getInstance( p_intf ), AudioUp() );
+            CONNECT( this, volumeDown(),  ActionsManager::getInstance( p_intf ), AudioDown() );
         }
     }
     else
@@ -603,6 +607,8 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
         //We received the taskbarbuttoncreated, now we can really create th buttons
         createTaskBarButtons();
     }
+
+    short cmd;
     switch( msg->message )
     {
         case WM_COMMAND:
@@ -620,6 +626,43 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
                         emit nextSignal();
                         break;
                 }
+            }
+            break;
+        case WM_APPCOMMAND:
+            cmd = GET_APPCOMMAND_LPARAM(msg->lParam);
+            msg_Err( p_intf, "button pressed = %d", cmd);
+            switch(cmd)
+            {
+                case APPCOMMAND_MEDIA_PLAY_PAUSE:
+                    emit playPauseSignal();
+                    break;
+                case APPCOMMAND_MEDIA_PLAY:
+                    emit play();
+                    break;
+                case APPCOMMAND_MEDIA_PAUSE:
+                    emit pause();
+                    break;
+                case APPCOMMAND_MEDIA_PREVIOUSTRACK:
+                    emit prevSignal();
+                    break;
+                case APPCOMMAND_MEDIA_NEXTTRACK:
+                    emit nextSignal();
+                    break;
+                case APPCOMMAND_MEDIA_STOP:
+                    emit stop();
+                    break;
+                case APPCOMMAND_VOLUME_DOWN:
+                    emit volumeDown();
+                    break;
+                case APPCOMMAND_VOLUME_UP:
+                    emit volumeUp();
+                    break;
+                case APPCOMMAND_VOLUME_MUTE:
+                    emit mute();
+                    break;
+                default:
+                     msg_Dbg( p_intf, "unknown APPCOMMAND = %d", cmd);
+                     break;
             }
             break;
     }

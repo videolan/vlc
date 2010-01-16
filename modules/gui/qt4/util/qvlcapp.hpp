@@ -61,23 +61,6 @@ public:
      }
 #endif
 
-#if defined(Q_WS_WIN)
-#define THBN_CLICKED        0x1800
-protected:
-    virtual bool winEventFilter( MSG *msg, long *result )
-    {
-        switch( msg->message )
-        {
-            case 0x0319: /* WM_APPCOMMAND 0x0319 */
-                DefWindowProc( msg->hwnd, msg->message,
-                               msg->wParam, msg->lParam );
-                break;
-        }
-        return false;
-    }
-#endif
-
-
 signals:
     void quitSignal();
 
