@@ -96,7 +96,7 @@
 {
     if (value)
     {
-        long long duration = [value longLongValue] / 1000000;
+        long long duration = [value longLongValue] / 1000;
         long long positiveDuration = llabs(duration);
         if( positiveDuration > 3600 )
             return [NSString stringWithFormat:@"%s%01d:%02d:%02d",
@@ -121,7 +121,7 @@
 {
     if (value)
     {
-        long long duration = [value longLongValue] / 1000000;
+        long long duration = [value longLongValue] / 1000;
         long long positiveDuration = llabs(duration);
         long hours = positiveDuration / 3600;
         long mins = (positiveDuration / 60) % 60;

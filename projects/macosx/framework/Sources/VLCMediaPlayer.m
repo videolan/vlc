@@ -450,8 +450,8 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     libvlc_exception_init( &ex );
     // Time is managed in seconds, while duration is managed in microseconds
     // TODO: Redo VLCTime to provide value numberAsMilliseconds, numberAsMicroseconds, numberAsSeconds, numberAsMinutes, numberAsHours
-    libvlc_media_player_set_time( (libvlc_media_player_t *)instance, 
-                                    (value ? [[value numberValue] longLongValue] / 1000 : 0),
+    libvlc_media_player_set_time( (libvlc_media_player_t *)instance,
+                                    (value ? [[value numberValue] longLongValue] : 0),
                                     &ex );
     catch_exception( &ex );
 }
@@ -733,7 +733,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 {
     if( [self isSeekable] )
     {
-        interval = interval * 1000000;
+        interval = interval * 1000;
         [self setTime: [VLCTime timeWithInt: ([[self time] intValue] - interval)]];
     }
 }
@@ -742,7 +742,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 {
     if( [self isSeekable] )
     {
-        interval = interval * 1000000;
+        interval = interval * 1000;
         [self setTime: [VLCTime timeWithInt: ([[self time] intValue] + interval)]];
     }
 }
