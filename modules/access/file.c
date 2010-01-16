@@ -121,8 +121,6 @@ static int  NoSeek( access_t *, int64_t );
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static int  Control( access_t *, int, va_list );
 
-static int  open_file( access_t *, const char * );
-
 struct access_sys_t
 {
     unsigned int i_nb_reads;
@@ -180,8 +178,8 @@ static int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys;
+    const char   *path = p_access->psz_path;
 #ifdef WIN32
-    wchar_t wpath[MAX_PATH+1];
     bool is_remote = false;
 #endif
 
@@ -193,15 +191,23 @@ static int Open( vlc_object_t *p_this )
     int fd = -1;
 
     if (!strcasecmp (p_access->psz_access, "fd"))
-        fd = dup (atoi (p_access->psz_path));
-    else if (!strcmp (p_access->psz_path, "-"))
+        fd = dup (atoi (path));
+    else if (!strcmp (path, "-"))
         fd = dup (0);
     else
     {
-        msg_Dbg (p_access, "opening file `%s'", p_access->psz_path);
-        fd = open_file (p_access, p_access->psz_path);
+        msg_Dbg (p_access, "opening file `%s'", path);
+        fd = utf8_open (path, O_RDONLY | O_NONBLOCK);
+        if (fd == -1)
+        {
+            msg_Err (p_access, "cannot open file %s (%m)", path);
+            dialog_Fatal (p_access, _("File reading failed"),
+                          _("VLC could not open the file \"%s\"."), path);
+        }
+
 #ifdef WIN32
-        if (MultiByteToWideChar (CP_UTF8, 0, p_access->psz_path, -1,
+        wchar_t wpath[MAX_PATH+1];
+        if (MultiByteToWideChar (CP_UTF8, 0, path, -1,
                                  wpath, MAX_PATH)
          && PathIsNetworkPathW (wpath))
             is_remote = true;
@@ -410,21 +416,4 @@ static int Control( access_t *p_access, int i_query, va_list args )
 
     }
     return VLC_SUCCESS;
-}
-
-/*****************************************************************************
- * open_file: Opens a specific file
- *****************************************************************************/
-static int open_file (access_t *p_access, const char *path)
-{
-    int fd = utf8_open (path, O_RDONLY | O_NONBLOCK);
-    if (fd == -1)
-    {
-        msg_Err (p_access, "cannot open file %s (%m)", path);
-        dialog_Fatal (p_access, _("File reading failed"),
-                      _("VLC could not open the file \"%s\"."), path);
-        return -1;
-    }
-
-    return fd;
 }
