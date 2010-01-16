@@ -86,6 +86,7 @@ struct intf_sys_t
 
 #define THEDP DialogsProvider::getInstance()
 #define THEMIM MainInputManager::getInstance( p_intf )
+#define THEAM ActionsManager::getInstance( p_intf )
 
 #define qfu( i ) QString::fromUtf8( i )
 #define qtr( i ) QString::fromUtf8( vlc_gettext(i) )

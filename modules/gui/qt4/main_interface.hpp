@@ -226,15 +226,7 @@ signals:
     void askUpdate();
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
-    void playPauseSignal();
-    void play();
-    void pause();
-    void stop();
-    void volumeUp();
-    void volumeDown();
-    void mute();
-    void prevSignal();
-    void nextSignal();
+
 };
 
 #ifdef WIN32

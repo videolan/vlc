@@ -584,14 +584,6 @@ void MainInterface::createTaskBarButtons()
                     msg_Err( p_intf, "ThumbBarAddButtons failed with error %08x", hr );
             }
             CONNECT( THEMIM->getIM(), statusChanged( int ), this, changeThumbbarButtons( int ) );
-            CONNECT( this, playPauseSignal(), THEMIM, togglePlayPause() );
-            CONNECT( this, prevSignal(), THEMIM, prev() );
-            CONNECT( this, nextSignal(), THEMIM, next() );
-            CONNECT( this, play(),  THEMIM, play() );
-            CONNECT( this, pause(),  THEMIM, pause() );
-            CONNECT( this, mute(),  ActionsManager::getInstance( p_intf ), toggleMuteAudio() );
-            CONNECT( this, volumeUp(),  ActionsManager::getInstance( p_intf ), AudioUp() );
-            CONNECT( this, volumeDown(),  ActionsManager::getInstance( p_intf ), AudioDown() );
         }
     }
     else
@@ -618,13 +610,13 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
                 switch(LOWORD(msg->wParam))
                 {
                     case 0:
-                        emit prevSignal();
+                        THEMIM->prev();
                         break;
                     case 1:
-                        emit playPauseSignal();
+                        THEMIM->togglePlayPause();
                         break;
                     case 2:
-                        emit nextSignal();
+                        THEMIM->next();
                         break;
                 }
             }
@@ -634,31 +626,31 @@ bool MainInterface::winEvent ( MSG * msg, long * result )
             switch(cmd)
             {
                 case APPCOMMAND_MEDIA_PLAY_PAUSE:
-                    emit playPauseSignal();
+                    THEMIM->togglePlayPause();
                     break;
                 case APPCOMMAND_MEDIA_PLAY:
-                    emit play();
+                    THEMIM->play();
                     break;
                 case APPCOMMAND_MEDIA_PAUSE:
-                    emit pause();
+                    THEMIM->pause();
                     break;
                 case APPCOMMAND_MEDIA_PREVIOUSTRACK:
-                    emit prevSignal();
+                    THEMIM->prev();
                     break;
                 case APPCOMMAND_MEDIA_NEXTTRACK:
-                    emit nextSignal();
+                    THEMIM->next();
                     break;
                 case APPCOMMAND_MEDIA_STOP:
-                    emit stop();
+                    THEMIM->stop();
                     break;
                 case APPCOMMAND_VOLUME_DOWN:
-                    emit volumeDown();
+                    THEAM->AudioDown();
                     break;
                 case APPCOMMAND_VOLUME_UP:
-                    emit volumeUp();
+                    THEAM->AudioUp();
                     break;
                 case APPCOMMAND_VOLUME_MUTE:
-                    emit mute();
+                    THEAM->toggleMuteAudio();
                     break;
                 default:
                      msg_Dbg( p_intf, "unknown APPCOMMAND = %d", cmd);
