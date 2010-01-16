@@ -70,4 +70,33 @@ SOURCES_video_filter_wrapper = wrapper.c
 noinst_HEADERS = filter_common.h filter_picture.h
 
 libvlc_LTLIBRARIES += \
-    libvideo_filter_wrapper_plugin.la
+	libadjust_plugin.la \
+	libaudiobargraph_v_plugin.la \
+	libball_plugin.la \
+	libblend_plugin.la \
+	libblendbench_plugin.la \
+	libcanvas_plugin.la \
+	libcolorthres_plugin.la \
+	libcroppadd_plugin.la \
+	libdeinterlace_plugin.la \
+	libextract_plugin.la \
+	libgradient_plugin.la \
+	libgrain_plugin.la \
+	libinvert_plugin.la \
+	liblogo_plugin.la \
+	libmagnify_plugin.la \
+	libmirror_plugin.la \
+	libmotionblur_plugin.la \
+	libnoise_plugin.la \
+	libpsychedelic_plugin.la \
+	libpuzzle_plugin.la \
+	libripple_plugin.la \
+	librotate_plugin.la \
+	librv32_plugin.la \
+	libscale_plugin.la \
+	libscene_plugin.la \
+	libsharpen_plugin.la \
+	libtransform_plugin.la \
+	libwave_plugin.la \
+	libyuvp_plugin.la \
+	libvideo_filter_wrapper_plugin.la

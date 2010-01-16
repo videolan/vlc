@@ -1167,37 +1167,7 @@ test "${enable_cprof}" != "yes" && enable_cprof="no"
 dnl
 dnl  default modules
 dnl
-dnl Video filters:
-VLC_ADD_PLUGIN([deinterlace])
-VLC_ADD_PLUGIN([yuvp])
-VLC_ADD_PLUGIN([invert])
-VLC_ADD_PLUGIN([mirror])
-VLC_ADD_PLUGIN([adjust])
-VLC_ADD_PLUGIN([transform])
-VLC_ADD_PLUGIN([wave])
-VLC_ADD_PLUGIN([ripple])
-VLC_ADD_PLUGIN([psychedelic])
-VLC_ADD_PLUGIN([gradient])
-VLC_ADD_PLUGIN([ball])
-VLC_ADD_PLUGIN([motionblur])
-VLC_ADD_PLUGIN([rv32])
-VLC_ADD_PLUGIN([rotate])
-VLC_ADD_PLUGIN([noise])
-VLC_ADD_PLUGIN([grain])
-VLC_ADD_PLUGIN([extract])
-VLC_ADD_PLUGIN([sharpen])
-VLC_ADD_PLUGIN([croppadd])
-VLC_ADD_PLUGIN([canvas])
-VLC_ADD_PLUGIN([blendbench])
-VLC_ADD_PLUGIN([blend])
-VLC_ADD_PLUGIN([scale])
 VLC_ADD_PLUGIN([vmem])
-VLC_ADD_PLUGIN([logo])
-VLC_ADD_PLUGIN([audiobargraph_v])
-VLC_ADD_PLUGIN([magnify])
-VLC_ADD_PLUGIN([puzzle])
-VLC_ADD_PLUGIN([colorthres])
-VLC_ADD_PLUGIN([scene])
 VLC_ADD_PLUGIN([yuv])
 
 ALIASES="${ALIASES} cvlc"
