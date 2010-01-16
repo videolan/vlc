@@ -142,6 +142,15 @@ static void Close( vlc_object_t * );
 #define INTERLACED_TEXT N_("Interlaced mode")
 #define INTERLACED_LONGTEXT N_( "Pure-interlaced mode.")
 
+
+#define SLICE_COUNT N_("Force number of slices per frame")
+#define SLICE_COUNT_LONGTEXT N_("Force rectangular slices and is overridden by other slicing optinos")
+
+#define SLICE_MAX_SIZE N_("Limit the size of each slice in bytes")
+#define SLICE_MAX_SIZE_LONGTEXT N_("Sets a maximum slice size in bytes, Includes NAL overhead in size")
+
+#define SLICE_MAX_MBS N_("Limit the size of each slice in macroblocks")
+#define SLICE_MAX_MBS_LONGTEXT N_("Sets a maximum number of macroblocks per slice")
 /* Ratecontrol */
 
 #define QP_TEXT N_("Set QP")
@@ -460,6 +469,11 @@ vlc_module_begin ()
 
     add_bool( SOUT_CFG_PREFIX "interlaced", false, NULL, INTERLACED_TEXT, INTERLACED_LONGTEXT,
               false )
+
+    add_integer( SOUT_CFG_PREFIX "slices", 0, NULL, SLICE_COUNT, SLICE_COUNT_LONGTEXT, false )
+    add_integer( SOUT_CFG_PREFIX "slice-max-size", 0, NULL, SLICE_MAX_SIZE, SLICE_MAX_SIZE_LONGTEXT, false )
+    add_integer( SOUT_CFG_PREFIX "slice-max-mbs", 0, NULL, SLICE_MAX_MBS, SLICE_MAX_MBS_LONGTEXT, false )
+
 
 /* Ratecontrol */
 
@@ -1043,6 +1057,18 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.i_fps_num = p_enc->fmt_in.video.i_frame_rate;
         p_sys->param.i_fps_den = p_enc->fmt_in.video.i_frame_rate_base;
     }
+
+    /* Check slice-options */
+    i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "slices" );
+    if( i_val > 0 )
+        p_sys->param.i_slice_count = i_val;
+    i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "slice-max-size" );
+    if( i_val > 0 )
+        p_sys->param.i_slice_max_size = i_val;
+    i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "slice-max-mbs" );
+    if( i_val > 0 )
+        p_sys->param.i_slice_max_mbs = i_val;
+
 
     /* x264 vbv-bufsize = 0 (default). if not provided set period
        in seconds for local maximum bitrate (cache/bufsize) based
