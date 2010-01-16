@@ -93,13 +93,8 @@ static int Open (vlc_object_t *p_this)
 
     STANDARD_BLOCK_ACCESS_INIT;
 
-    if (!strcmp (p_access->psz_path, "-"))
-        fd = dup (0);
-    else
-    {
-        msg_Dbg (p_access, "opening file %s", path);
-        fd = utf8_open (path, O_RDONLY | O_NOCTTY);
-    }
+    msg_Dbg (p_access, "opening file %s", path);
+    fd = utf8_open (path, O_RDONLY | O_NOCTTY);
 
     if (fd == -1)
     {

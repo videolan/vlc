@@ -140,8 +140,6 @@ int Open( vlc_object_t *p_this )
 
     if (!strcasecmp (p_access->psz_access, "fd"))
         fd = dup (atoi (path));
-    else if (!strcmp (path, "-"))
-        fd = dup (0);
     else
     {
         msg_Dbg (p_access, "opening file `%s'", path);
