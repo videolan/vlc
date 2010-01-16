@@ -23,15 +23,12 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-/*****************************************************************************
- * Preamble
- *****************************************************************************/
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 #include <vlc_common.h>
-#include <vlc_plugin.h>
+#include "fs.h"
 #include <vlc_input.h>
 #include <vlc_access.h>
 #include <vlc_dialog.h>
@@ -78,48 +75,6 @@
 #endif
 
 #include <vlc_charset.h>
-
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
-
-#define CACHING_TEXT N_("Caching value (ms)")
-#define CACHING_LONGTEXT N_( \
-    "Caching value for files, in milliseconds." )
-
-#define NETWORK_CACHING_TEXT N_("Extra network caching value (ms)")
-#define NETWORK_CACHING_LONGTEXT N_( \
-    "Supplementary caching value for remote files, in milliseconds." )
-
-vlc_module_begin ()
-    set_description( N_("File input") )
-    set_shortname( N_("File") )
-    set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_ACCESS )
-    add_integer( "file-caching", DEFAULT_PTS_DELAY / 1000, NULL,
-                 CACHING_TEXT, CACHING_LONGTEXT, true )
-        change_safe()
-    add_integer( "network-caching", 3 * DEFAULT_PTS_DELAY / 1000, NULL,
-                 NETWORK_CACHING_TEXT, NETWORK_CACHING_LONGTEXT, true )
-        change_safe()
-    add_obsolete_string( "file-cat" )
-    set_capability( "access", 50 )
-    add_shortcut( "file" )
-    add_shortcut( "fd" )
-    add_shortcut( "stream" )
-    set_callbacks( Open, Close )
-vlc_module_end ()
-
-
-/*****************************************************************************
- * Exported prototypes
- *****************************************************************************/
-static int  Seek( access_t *, int64_t );
-static int  NoSeek( access_t *, int64_t );
-static ssize_t Read( access_t *, uint8_t *, size_t );
-static int  Control( access_t *, int, va_list );
 
 struct access_sys_t
 {
@@ -174,16 +129,24 @@ static bool IsRemote (int fd)
 /*****************************************************************************
  * Open: open the file
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
-    access_sys_t *p_sys;
+    access_sys_t *p_sys = malloc (sizeof (*p_sys));
     const char   *path = p_access->psz_path;
 #ifdef WIN32
     bool is_remote = false;
 #endif
 
-    STANDARD_READ_ACCESS_INIT;
+    if (unlikely(p_sys == NULL))
+        return VLC_ENOMEM;
+
+    access_InitFields (p_access);
+    p_access->pf_read = FileRead;
+    p_access->pf_block = NULL;
+    p_access->pf_control = FileControl;
+    p_access->pf_seek = FileSeek;
+    p_access->p_sys = p_sys;
     p_sys->i_nb_reads = 0;
     p_sys->b_pace_control = true;
 
@@ -278,7 +241,7 @@ error:
 /*****************************************************************************
  * Close: close the target
  *****************************************************************************/
-static void Close (vlc_object_t * p_this)
+void Close (vlc_object_t * p_this)
 {
     access_t     *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
@@ -293,7 +256,7 @@ static void Close (vlc_object_t * p_this)
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
+ssize_t FileRead( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int fd = p_sys->fd;
@@ -350,7 +313,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-static int Seek (access_t *p_access, int64_t i_pos)
+int FileSeek (access_t *p_access, int64_t i_pos)
 {
     p_access->info.i_pos = i_pos;
     p_access->info.b_eof = false;
@@ -359,7 +322,7 @@ static int Seek (access_t *p_access, int64_t i_pos)
     return VLC_SUCCESS;
 }
 
-static int NoSeek (access_t *p_access, int64_t i_pos)
+int NoSeek (access_t *p_access, int64_t i_pos)
 {
     /* assert(0); ?? */
     (void) p_access; (void) i_pos;
@@ -369,7 +332,7 @@ static int NoSeek (access_t *p_access, int64_t i_pos)
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( access_t *p_access, int i_query, va_list args )
+int FileControl( access_t *p_access, int i_query, va_list args )
 {
     access_sys_t *p_sys = p_access->p_sys;
     bool    *pb_bool;

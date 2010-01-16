@@ -12,7 +12,15 @@ if HAVE_WIN32
 SUBDIRS += bda dshow
 endif
 
-SOURCES_access_file = file.c
+libfilesystem_plugin_la_SOURCES = \
+	fs.h \
+	file.c \
+	directory.c \
+	fs.c
+libfilesystem_plugin_la_CFLAGS = $(AM_CFLAGS)
+libfilesystem_plugin_la_LIBADD = $(AM_LIBADD)
+libfilesystem_plugin_la_DEPENDENCIES =
+
 SOURCES_access_mmap = mmap.c
 SOURCES_access_directory = directory.c
 SOURCES_access_dv = dv.c
@@ -57,8 +65,7 @@ libaccess_rtmp_plugin_la_LIBADD = $(AM_LIBADD)
 libaccess_rtmp_plugin_la_DEPENDENCIES =
 
 libvlc_LTLIBRARIES += \
-	libaccess_file_plugin.la \
-	libaccess_directory_plugin.la \
+	libfilesystem_plugin.la \
 	libaccess_udp_plugin.la \
 	libaccess_tcp_plugin.la \
 	libaccess_http_plugin.la \

@@ -31,7 +31,7 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_plugin.h>
+#include "fs.h"
 #include <vlc_access.h>
 
 #ifdef HAVE_SYS_TYPES_H
@@ -61,57 +61,11 @@ static inline int dirfd (DIR *dir)
 #include <vlc_url.h>
 #include <vlc_strings.h>
 
-/*****************************************************************************
- * Module descriptor
- *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
-
-#define RECURSIVE_TEXT N_("Subdirectory behavior")
-#define RECURSIVE_LONGTEXT N_( \
-        "Select whether subdirectories must be expanded.\n" \
-        "none: subdirectories do not appear in the playlist.\n" \
-        "collapse: subdirectories appear but are expanded on first play.\n" \
-        "expand: all subdirectories are expanded.\n" )
-
-static const char *const psz_recursive_list[] = { "none", "collapse", "expand" };
-static const char *const psz_recursive_list_text[] = {
-    N_("none"), N_("collapse"), N_("expand") };
-
-#define IGNORE_TEXT N_("Ignored extensions")
-#define IGNORE_LONGTEXT N_( \
-        "Files with these extensions will not be added to playlist when " \
-        "opening a directory.\n" \
-        "This is useful if you add directories that contain playlist files " \
-        "for instance. Use a comma-separated list of extensions." )
-
-vlc_module_begin ()
-    set_category( CAT_INPUT )
-    set_shortname( N_("Directory" ) )
-    set_subcategory( SUBCAT_INPUT_ACCESS )
-    set_description( N_("Standard filesystem directory input") )
-    set_capability( "access", 55 )
-    add_shortcut( "directory" )
-    add_shortcut( "dir" )
-    add_shortcut( "file" )
-    add_string( "recursive", "expand" , NULL, RECURSIVE_TEXT,
-                RECURSIVE_LONGTEXT, false )
-      change_string_list( psz_recursive_list, psz_recursive_list_text, 0 )
-    add_string( "ignore-filetypes", "m3u,db,nfo,ini,jpg,jpeg,ljpg,gif,png,pgm,pgmyuv,pbm,pam,tga,bmp,pnm,xpm,xcf,pcx,tif,tiff,lbm,sfv,txt,sub,idx,srt,cue,ssa",
-                NULL, IGNORE_TEXT, IGNORE_LONGTEXT, false )
-    set_callbacks( Open, Close )
-vlc_module_end ()
-
-
-/*****************************************************************************
- * Local prototypes, constants, structures
- *****************************************************************************/
-
 enum
 {
-    MODE_EXPAND,
+    MODE_NONE,
     MODE_COLLAPSE,
-    MODE_NONE
+    MODE_EXPAND,
 };
 
 typedef struct directory_t directory_t;
@@ -136,16 +90,12 @@ struct access_sys_t
     char *psz_xspf_extension;
 };
 
-static block_t *Block( access_t * );
-static int Control( access_t *, int, va_list );
-
 /*****************************************************************************
  * Open: open the directory
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+int DirOpen( vlc_object_t *p_this )
 {
     access_t *p_access = (access_t*)p_this;
-    access_sys_t *p_sys;
 
     if( !p_access->psz_path )
         return VLC_EGENERIC;
@@ -169,7 +119,12 @@ static int Open( vlc_object_t *p_this )
     if (handle == NULL)
         return VLC_EGENERIC;
 
-    p_sys = malloc (sizeof (*p_sys));
+    return DirInit (p_access, handle);
+}
+
+int DirInit (access_t *p_access, DIR *handle)
+{
+    access_sys_t *p_sys = malloc (sizeof (*p_sys));
     if (!p_sys)
     {
         closedir( handle );
@@ -193,10 +148,11 @@ static int Open( vlc_object_t *p_this )
         p_sys->mode = MODE_EXPAND;
     free( psz );
 
+    access_InitFields(p_access);
     p_access->pf_read  = NULL;
-    p_access->pf_block = Block;
+    p_access->pf_block = DirBlock;
     p_access->pf_seek  = NULL;
-    p_access->pf_control= Control;
+    p_access->pf_control= DirControl;
     free (p_access->psz_demux);
     p_access->psz_demux = strdup ("xspf-open");
 
@@ -206,7 +162,7 @@ static int Open( vlc_object_t *p_this )
 /*****************************************************************************
  * Close: close the target
  *****************************************************************************/
-static void Close( vlc_object_t * p_this )
+void DirClose( vlc_object_t * p_this )
 {
     access_t *p_access = (access_t*)p_this;
     access_sys_t *p_sys = p_access->p_sys;
@@ -245,7 +201,7 @@ static bool has_inode_loop (const directory_t *dir)
     return false;
 }
 
-static block_t *Block (access_t *p_access)
+block_t *DirBlock (access_t *p_access)
 {
     access_sys_t *p_sys = p_access->p_sys;
     directory_t *current = p_sys->current;
@@ -473,7 +429,7 @@ fatal:
 /*****************************************************************************
  * Control:
  *****************************************************************************/
-static int Control( access_t *p_access, int i_query, va_list args )
+int DirControl( access_t *p_access, int i_query, va_list args )
 {
     switch( i_query )
     {
