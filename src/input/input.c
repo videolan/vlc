@@ -3117,8 +3117,8 @@ void input_SplitMRL( const char **ppsz_access, const char **ppsz_demux, char **p
     {
         psz_path = psz_dup;
     }
-    *ppsz_access = psz_access ? psz_access : (char*)"";
-    *ppsz_demux = psz_demux ? psz_demux : (char*)"";
+    *ppsz_access = psz_access ? psz_access : "";
+    *ppsz_demux = psz_demux ? psz_demux : "";
     *ppsz_path = psz_path;
 }
 
