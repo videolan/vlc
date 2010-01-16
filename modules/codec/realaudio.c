@@ -190,7 +190,7 @@ static int Open( vlc_object_t *p_this )
     {
     case VLC_CODEC_COOK:
     case VLC_CODEC_ATRAC3:
-    case VLC_FOURCC('s','i','p','r'):
+    case VLC_CODEC_SIPR:
         break;
 
     default:
