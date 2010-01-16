@@ -73,6 +73,7 @@
 #endif
 
 #include <vlc_charset.h>
+#include <vlc_url.h>
 
 struct access_sys_t
 {
@@ -139,7 +140,25 @@ int Open( vlc_object_t *p_this )
     int fd = -1;
 
     if (!strcasecmp (p_access->psz_access, "fd"))
-        fd = dup (atoi (path));
+    {
+        char *end;
+        int oldfd = strtol (path, &end, 10);
+
+        if (*end == '\0')
+            fd = dup (oldfd);
+#ifdef HAVE_FDOPENDIR
+        else if (*end == '/' && end > path)
+        {
+            char *name = decode_URI_duplicate (end - 1);
+            if (name != NULL) /* TODO: ToLocale(), FD_CLOEXEC */
+            {
+                name[0] = '.';
+                fd = openat (oldfd, name, O_RDONLY | O_NONBLOCK);
+                free (name);
+            }
+        }
+#endif
+    }
     else
     {
         msg_Dbg (p_access, "opening file `%s'", path);
