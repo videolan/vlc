@@ -855,8 +855,6 @@ AC_CHECK_HEADERS([linux/version.h linux/dccp.h scsi/scsi.h linux/magic.h])
 AC_CHECK_HEADERS(syslog.h)
 fi # end "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"
 
-AC_HEADER_TIME
-
 dnl LP64 adn LLP64 architectures had better define ssize_t by themselves...
 AH_TEMPLATE(ssize_t, [Define to `int' if <stddef.h> does not define.])
 AC_CHECK_TYPE(ssize_t,, [
