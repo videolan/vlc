@@ -2377,7 +2377,7 @@ static int InputSourceInit( input_thread_t *p_input,
     input_SplitMRL( &psz_access, &psz_demux, &psz_path, psz_dup );
 
     /* FIXME: file:// handling plugins do not support URIs properly...
-     * So we pre-decoded the URI to a path for them. Note that we do not do it
+     * So we pre-decode the URI to a path for them. Note that we do not do it
      * for non-standard VLC-specific schemes. */
     if( !strcmp( psz_access, "file" ) )
     {
