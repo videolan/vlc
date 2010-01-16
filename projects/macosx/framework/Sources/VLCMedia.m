@@ -118,21 +118,21 @@ static void HandleMediaMetaChanged(const libvlc_event_t * event, void * self)
     [pool release];
 }
 
-//static void HandleMediaDurationChanged(const libvlc_event_t * event, void * self)
-//{
-//    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-//    
-//    [[VLCEventManager sharedManager] callOnMainThreadObject:self
-//                                                 withMethod:@selector(setLength:)
-//                                       withArgumentAsObject:[VLCTime timeWithNumber:
-//                                           [NSNumber numberWithLongLong:event->u.media_duration_changed.new_duration]]];
-//    [pool release];
-//}
+static void HandleMediaDurationChanged(const libvlc_event_t * event, void * self)
+{
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self
+                                                 withMethod:@selector(setLength:)
+                                       withArgumentAsObject:[VLCTime timeWithNumber:
+                                           [NSNumber numberWithLongLong:event->u.media_duration_changed.new_duration]]];
+    [pool release];
+}
 
 static void HandleMediaStateChanged(const libvlc_event_t * event, void * self)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
+
     [[VLCEventManager sharedManager] callOnMainThreadObject:self
                                                  withMethod:@selector(setStateAsNumber:)
                                        withArgumentAsObject:[NSNumber numberWithInt:
@@ -232,7 +232,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
              * Before libvlc_event_detach. So this can't happen in dealloc */
             libvlc_event_manager_t * p_em = libvlc_media_event_manager(p_md);
             libvlc_event_detach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self, NULL);
-//            libvlc_event_detach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self, NULL);
             libvlc_event_detach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self, NULL);
             libvlc_event_detach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self, NULL);
         }
@@ -295,11 +295,15 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
     if (!length)
     {
+        // Force preparsing of this item.
+        [self length];
+
+        // wait until we are preparsed
         while (!length && ![self isPreparsed] && [aDate timeIntervalSinceNow] > 0)
         {
             usleep( thread_sleep );
         }
-        
+
         // So we're done waiting, but sometimes we trap the fact that the parsing
         // was done before the length gets assigned, so lets go ahead and assign
         // it ourselves.
@@ -440,10 +444,10 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
     libvlc_event_manager_t * p_em = libvlc_media_event_manager( p_md );
     libvlc_event_attach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self, &ex);
-//    libvlc_event_attach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self, &ex);
     libvlc_event_attach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self, &ex);
     libvlc_event_attach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self, &ex);
-    
+
     libvlc_media_list_t * p_mlist = libvlc_media_subitems( p_md );
 
     if (!p_mlist)
