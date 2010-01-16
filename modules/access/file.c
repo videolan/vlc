@@ -177,8 +177,15 @@ int Open( vlc_object_t *p_this )
      * how to parse the data. The directory plugin will do it. */
     if (S_ISDIR (st.st_mode))
     {
+#ifdef HAVE_FDOPENDIR
+        DIR *handle = fdopendir (fd);
+        if (handle == NULL)
+            goto error; /* Uh? */
+        return DirInit (p_access, handle);
+#else
         msg_Dbg (p_access, "ignoring directory");
         goto error;
+#endif
     }
 
     access_sys_t *p_sys = malloc (sizeof (*p_sys));
@@ -235,6 +242,13 @@ error:
 void Close (vlc_object_t * p_this)
 {
     access_t     *p_access = (access_t*)p_this;
+
+    if (p_access->pf_read == NULL)
+    {
+        DirClose (p_this);
+        return;
+    }
+
     access_sys_t *p_sys = p_access->p_sys;
 
     close (p_sys->fd);
