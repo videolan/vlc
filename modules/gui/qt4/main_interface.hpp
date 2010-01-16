@@ -97,6 +97,9 @@ public:
 
 protected:
     void dropEventPlay( QDropEvent *, bool);
+#ifdef WIN32
+    bool winEvent( MSG *, long * );
+#endif
     virtual void dropEvent( QDropEvent *);
     virtual void dragEnterEvent( QDragEnterEvent * );
     virtual void dragMoveEvent( QDragMoveEvent * );
@@ -171,6 +174,7 @@ private:
 #ifdef WIN32
     HIMAGELIST himl;
     LPTASKBARLIST3 p_taskbl;
+    UINT taskbar_wmsg;
     void createTaskBarButtons();
 #endif
     void createPlaylist( bool );
@@ -222,6 +226,9 @@ signals:
     void askUpdate();
     void minimalViewToggled( bool );
     void fullscreenInterfaceToggled( bool );
+    void playPauseSignal();
+    void prevSignal();
+    void nextSignal();
 };
 
 #endif

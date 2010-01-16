@@ -41,20 +41,10 @@ class QVLCApp : public QApplication
     Q_OBJECT
 
 public:
-#ifdef WIN32
-    QVLCApp( intf_thread_t *p_intf, int & argc, char ** argv ) : QApplication( argc, argv, true )
-    {
-        connect( this, SIGNAL(quitSignal()), this, SLOT(quit()) );
-        CONNECT( this, playPauseSignal(), THEMIM, togglePlayPause() );
-        CONNECT( this, prevSignal(), THEMIM, prev() );
-        CONNECT( this, nextSignal(), THEMIM, next() );
-    }
-#else
     QVLCApp( int & argc, char ** argv ) : QApplication( argc, argv, true )
     {
         connect( this, SIGNAL(quitSignal()), this, SLOT(quit()) );
     }
-#endif
 
     static void triggerQuit()
     {
@@ -82,25 +72,6 @@ protected:
                 DefWindowProc( msg->hwnd, msg->message,
                                msg->wParam, msg->lParam );
                 break;
-            case 0xC0C2: /* TaskbarButtonCreated */
-                break;
-            case WM_COMMAND:
-                if (HIWORD(msg->wParam) == THBN_CLICKED)
-                {
-                    switch(LOWORD(msg->wParam))
-                    {
-                        case 0:
-                            emit prevSignal();
-                            break;
-                        case 1:
-                            emit playPauseSignal();
-                            break;
-                        case 2:
-                            emit nextSignal();
-                            break;
-                    }
-                }
-                break;
         }
         return false;
     }
@@ -109,9 +80,6 @@ protected:
 
 signals:
     void quitSignal();
-    void playPauseSignal();
-    void prevSignal();
-    void nextSignal();
 
 };
 

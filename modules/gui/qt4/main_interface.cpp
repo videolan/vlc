@@ -168,7 +168,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     MainInputManager::getInstance( p_intf );
 
 #ifdef WIN32
-    createTaskBarButtons();
+    taskbar_wmsg = RegisterWindowMessage("TaskbarButtonCreated");
 #endif
 
     /************************************************************
@@ -510,6 +510,7 @@ inline void MainInterface::createStatusBar()
 #ifdef WIN32
 void MainInterface::createTaskBarButtons()
 {
+    taskbar_wmsg = WM_NULL;
     /*Here is the code for the taskbar thumb buttons
     FIXME:We need pretty buttons in 16x16 px that are handled correctly by masks in Qt
     FIXME:the play button's picture doesn't changed to pause when clicked
@@ -553,9 +554,6 @@ void MainInterface::createTaskBarButtons()
         {
             p_taskbl->vt->HrInit(p_taskbl);
 
-            int msg_value = RegisterWindowMessage("TaskbarButtonCreated");
-            //msg_Info( p_intf, "msg value: %04x", msg_value );
-
             // Define an array of two buttons. These buttons provide images through an
             // image list and also provide tooltips.
             DWORD dwMask = THB_BITMAP | THB_FLAGS;
@@ -576,13 +574,19 @@ void MainInterface::createTaskBarButtons()
             thbButtons[2].iBitmap = 3;
             thbButtons[2].dwFlags = THBF_HIDDEN;
 
-            HRESULT hr = p_taskbl->vt->ThumbBarSetImageList(p_taskbl, GetForegroundWindow(), himl );
+            HRESULT hr = p_taskbl->vt->ThumbBarSetImageList(p_taskbl, winId(), himl );
             if(S_OK != hr)
                 msg_Err( p_intf, "ThumbBarSetImageList failed with error %08x", hr );
-            if(S_OK != p_taskbl->vt->ThumbBarAddButtons(p_taskbl, GetForegroundWindow(), 3, thbButtons))
-                msg_Err( p_intf, "ThumbBarAddButtons failed with error %08x", GetLastError() );
-
+            else
+            {
+                hr = p_taskbl->vt->ThumbBarAddButtons(p_taskbl, winId(), 3, thbButtons);
+                if(S_OK != hr)
+                    msg_Err( p_intf, "ThumbBarAddButtons failed with error %08x", hr );
+            }
             CONNECT( THEMIM->getIM(), statusChanged( int ), this, changeThumbbarButtons( int ) );
+            CONNECT( this, playPauseSignal(), THEMIM, togglePlayPause() );
+            CONNECT( this, prevSignal(), THEMIM, prev() );
+            CONNECT( this, nextSignal(), THEMIM, next() );
         }
     }
     else
@@ -591,10 +595,37 @@ void MainInterface::createTaskBarButtons()
         p_taskbl = NULL;
     }
 }
+
+bool MainInterface::winEvent ( MSG * msg, long * result )
+{
+    if (msg->message == taskbar_wmsg)
+    {
+        //We received the taskbarbuttoncreated, now we can really create th buttons
+        createTaskBarButtons();
+    }
+    switch( msg->message )
+    {
+        case WM_COMMAND:
+            if (HIWORD(msg->wParam) == THBN_CLICKED)
+            {
+                switch(LOWORD(msg->wParam))
+                {
+                    case 0:
+                        emit prevSignal();
+                        break;
+                    case 1:
+                        emit playPauseSignal();
+                        break;
+                    case 2:
+                        emit nextSignal();
+                        break;
+                }
+            }
+            break;
+    }
+    return false;
+}
 #endif
-
-
-
 
 /**********************************************************************
  * Handling of sizing of the components
@@ -1420,7 +1451,7 @@ void MainInterface::toggleFullScreen( void )
 void MainInterface::changeThumbbarButtons( int i_status)
 {
 #ifdef WIN32
-    // Define an array of two buttons. These buttons provide images through an
+    // Define an array of three buttons. These buttons provide images through an
     // image list and also provide tooltips.
     DWORD dwMask = THB_BITMAP | THB_FLAGS;
 
@@ -1441,14 +1472,6 @@ void MainInterface::changeThumbbarButtons( int i_status)
 
     switch( i_status )
     {
-        case  0:
-        case  END_S:
-            {
-                thbButtons[0].dwFlags = THBF_HIDDEN;
-                thbButtons[1].dwFlags = THBF_HIDDEN;
-                thbButtons[2].dwFlags = THBF_HIDDEN;
-                break;
-            }
         case PLAYING_S:
             {
                 thbButtons[0].dwFlags = THBF_ENABLED;
@@ -1459,15 +1482,16 @@ void MainInterface::changeThumbbarButtons( int i_status)
             }
         case PAUSE_S:
             {
-                //thbButtons[0].dwFlags = THBF_ENABLED;
-                //thbButtons[1].dwFlags = THBF_ENABLED;
-                //thbButtons[2].dwFlags = THBF_ENABLED;
+                thbButtons[0].dwFlags = THBF_ENABLED;
+                thbButtons[1].dwFlags = THBF_ENABLED;
+                thbButtons[2].dwFlags = THBF_ENABLED;
                 thbButtons[1].iBitmap = 2;
                 break;
             }
+        default:
+            return;
     }
-
-    HRESULT hr =  p_taskbl->vt->ThumbBarUpdateButtons(p_taskbl, GetForegroundWindow(), 3, thbButtons);
+    HRESULT hr =  p_taskbl->vt->ThumbBarUpdateButtons(p_taskbl, this->winId(), 3, thbButtons);
     if(S_OK != hr)
         msg_Err( p_intf, "ThumbBarUpdateButtons failed with error %08x", hr );
 #else
