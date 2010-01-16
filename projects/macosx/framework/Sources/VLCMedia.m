@@ -174,20 +174,20 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 }
 
 - (id)initWithURL:(NSURL *)anURL
-{        
+{
     if (self = [super init])
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
-        
+
         p_md = libvlc_media_new([VLCLibrary sharedInstance],
                                            [[anURL absoluteString] UTF8String],
                                            &ex);
         catch_exception(&ex);
-        
+
         delegate = nil;
         metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
-        
+
         // This value is set whenever the demuxer figures out what the length is.
         // TODO: Easy way to tell the length of the movie without having to instiate the demuxer.  Maybe cached info?
         length = nil;
@@ -198,12 +198,12 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 }
 
 - (id)initAsNodeWithName:(NSString *)aName
-{        
+{
     if (self = [super init])
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
-        
+
         p_md = libvlc_media_new_as_node([VLCLibrary sharedInstance],
                                                    [aName UTF8String],
                                                    &ex);
@@ -211,11 +211,11 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
         delegate = nil;
         metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
-        
+
         // This value is set whenever the demuxer figures out what the length is.
         // TODO: Easy way to tell the length of the movie without having to instiate the demuxer.  Maybe cached info?
         length = nil;
-        
+
         [self initInternalMediaDescriptor];
     }
     return self;
@@ -275,11 +275,11 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
 - (VLCTime *)length
 {
-    if (!length) 
+    if (!length)
     {
         // Try figuring out what the length is
         long long duration = libvlc_media_get_duration( p_md, NULL );
-        if (duration > -1) 
+        if (duration > -1)
         {
             [self setLength:[VLCTime timeWithNumber:[NSNumber numberWithLongLong:duration]]];
             return [[length retain] autorelease];
@@ -342,14 +342,14 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     {
         libvlc_media_retain( md );
         p_md = md;
-        
+
         metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
         [self initInternalMediaDescriptor];
     }
     return self;
 }
 
-- (void *)libVLCMediaDescriptor 
+- (void *)libVLCMediaDescriptor
 {
     return p_md;
 }
@@ -473,7 +473,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         // Only fetch the art if needed. (ie, create the NSImage, if it was requested before)
         if (isArtFetched && [metaType isEqualToString:VLCMetaInformationArtworkURL])
         {
-            [NSThread detachNewThreadSelector:@selector(fetchMetaInformationForArtWorkWithURL:) 
+            [NSThread detachNewThreadSelector:@selector(fetchMetaInformationForArtWorkWithURL:)
                                          toTarget:self
                                        withObject:newValue];
         }
@@ -494,7 +494,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
         // Don't attempt to fetch artwork from remote. Core will do that alone
         if ([artUrl isFileURL])
-            art  = [[[NSImage alloc] initWithContentsOfURL:artUrl] autorelease]; 
+            art  = [[[NSImage alloc] initWithContentsOfURL:artUrl] autorelease];
     }
 
     // If anything was found, lets save it to the meta data dictionary
@@ -553,6 +553,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         /* Force VLCMetaInformationTitle, that will trigger preparsing
          * And all the other meta will be added through the libvlc event system */
         [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationTitle];
+
     }
     else if( !isArtURLFetched && [keyPath hasPrefix:@"metaDictionary.artworkURL"])
     {
@@ -561,7 +562,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
          * And all the other meta will be added through the libvlc event system */
         [self fetchMetaInformationFromLibVLCWithType: VLCMetaInformationArtworkURL];
     }
-    
+
     return [super valueForKeyPath:keyPath];
 }
 @end
@@ -576,8 +577,8 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 {
     if (length && value && [length compare:value] == NSOrderedSame)
         return;
-        
-    [length release];       
+
+    [length release];
     length = value ? [value retain] : nil;
 }
 
