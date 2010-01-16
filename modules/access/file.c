@@ -407,15 +407,6 @@ static int Control( access_t *p_access, int i_query, va_list args )
  *****************************************************************************/
 static int open_file (access_t *p_access, const char *path)
 {
-#if defined(WIN32)
-    if (!strcasecmp (p_access->psz_access, "file")
-      && ('/' == path[0]) && isalpha (path[1])
-      && (':' == path[2]) && ('/' == path[3]))
-        /* Explorer can open path such as file:/C:/ or file:///C:/
-         * hence remove leading / if found */
-        path++;
-#endif
-
     int fd = utf8_open (path, O_RDONLY | O_NONBLOCK);
     if (fd == -1)
     {
