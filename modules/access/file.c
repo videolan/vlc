@@ -132,23 +132,10 @@ static bool IsRemote (int fd)
 int Open( vlc_object_t *p_this )
 {
     access_t     *p_access = (access_t*)p_this;
-    access_sys_t *p_sys = malloc (sizeof (*p_sys));
     const char   *path = p_access->psz_path;
 #ifdef WIN32
     bool is_remote = false;
 #endif
-
-    if (unlikely(p_sys == NULL))
-        return VLC_ENOMEM;
-
-    access_InitFields (p_access);
-    p_access->pf_read = FileRead;
-    p_access->pf_block = NULL;
-    p_access->pf_control = FileControl;
-    p_access->pf_seek = FileSeek;
-    p_access->p_sys = p_sys;
-    p_sys->i_nb_reads = 0;
-    p_sys->b_pace_control = true;
 
     /* Open file */
     int fd = -1;
@@ -178,11 +165,9 @@ int Open( vlc_object_t *p_this )
 #endif
     }
     if (fd == -1)
-        goto error;
+        return VLC_EGENERIC;
 
-#ifdef HAVE_SYS_STAT_H
     struct stat st;
-
     if (fstat (fd, &st))
     {
         msg_Err (p_access, "failed to read (%m)");
@@ -195,6 +180,23 @@ int Open( vlc_object_t *p_this )
         msg_Dbg (p_access, "ignoring directory");
         goto error;
     }
+
+    access_sys_t *p_sys = malloc (sizeof (*p_sys));
+    if (unlikely(p_sys == NULL))
+        goto error;
+    access_InitFields (p_access);
+    p_access->pf_read = FileRead;
+    p_access->pf_block = NULL;
+    p_access->pf_control = FileControl;
+    p_access->pf_seek = FileSeek;
+    p_access->p_sys = p_sys;
+    p_sys->i_nb_reads = 0;
+    p_sys->fd = fd;
+    p_sys->caching = var_CreateGetInteger (p_access, "file-caching");
+    if (IsRemote(fd))
+        p_sys->caching += var_CreateGetInteger (p_access, "network-caching");
+    p_sys->b_pace_control = true;
+
     if (S_ISREG (st.st_mode))
         p_access->info.i_size = st.st_size;
     else if (!S_ISBLK (st.st_mode))
@@ -202,15 +204,6 @@ int Open( vlc_object_t *p_this )
         p_access->pf_seek = NoSeek;
         p_sys->b_pace_control = strcasecmp (p_access->psz_access, "stream");
     }
-#else
-# warning File size not known!
-#endif
-
-    p_sys->caching = var_CreateGetInteger (p_access, "file-caching");
-    if (IsRemote(fd))
-        p_sys->caching += var_CreateGetInteger (p_access, "network-caching");
-
-    p_sys->fd = fd;
 
     if (p_access->pf_seek != NoSeek)
     {
@@ -232,9 +225,7 @@ int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
-    if (fd != -1)
-        close (fd);
-    free (p_sys);
+    close (fd);
     return VLC_EGENERIC;
 }
 
