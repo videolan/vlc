@@ -674,7 +674,8 @@ static const char *const ppsz_sout_options[] = {
     "qpmin", "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut",
     "sps-id", "ssim", "stats", "subme", "subpel", "tolerance", "trellis",
     "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp", "aq-mode",
-    "aq-strength", "psy-rd", "profile", "lookahead", NULL
+    "aq-strength", "psy-rd", "profile", "lookahead", "slices", "slice-max-size",
+    "slice-max-mbs", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
