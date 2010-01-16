@@ -592,6 +592,11 @@ libvlc_media_get_duration( libvlc_media_t * p_md, libvlc_exception_t *p_e )
         return -1;
     }
 
+    preparse_if_needed( p_md );
+
+    if (!input_item_IsPreparsed( p_md->p_input_item ))
+        return -1;
+
     return input_item_GetDuration( p_md->p_input_item ) / 1000;
 }
 
