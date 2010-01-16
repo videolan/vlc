@@ -100,22 +100,7 @@ int DirOpen( vlc_object_t *p_this )
     if( !p_access->psz_path )
         return VLC_EGENERIC;
 
-    DIR *handle;
-    if (strcmp (p_access->psz_path, "-"))
-        handle = utf8_opendir (p_access->psz_path);
-    else
-    {
-#if 0   /* This won't work yet, it generates paths like "-/music.ogg".
-         * We'd need to use openat() here and in the file access... */
-        int fd = dup (0);
-        handle = fdopendir (fd);
-        if (handle == NULL)
-            close (fd);
-#else
-        return VLC_EGENERIC;
-#endif
-    }
-
+    DIR *handle = utf8_opendir (p_access->psz_path);
     if (handle == NULL)
         return VLC_EGENERIC;
 
