@@ -145,7 +145,11 @@ int Open( vlc_object_t *p_this )
         int oldfd = strtol (path, &end, 10);
 
         if (*end == '\0')
+        {
             fd = dup (oldfd);
+            if (fd != -1)
+                lseek (fd, 0, SEEK_SET);
+        }
 #ifdef HAVE_FDOPENDIR
         else if (*end == '/' && end > path)
         {
