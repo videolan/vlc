@@ -41,6 +41,12 @@ function fetch_art()
         channel = meta["filename"]
     end
 
+    -- Replace "France 2 HD" by "France 2"
+    channel = string.gsub(channel, "^(.-)%sHD%s*$", "%1")
+
+    -- Replace "France 2 (bas débit)" by "France 2"
+    channel = string.gsub(channel, "^(.-)%s%(bas débit%)%s*$", "%1")
+
     -- trim
     channel = string.gsub(channel, "^%s*(.-)%s*$", "%1")
 
