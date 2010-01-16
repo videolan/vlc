@@ -825,7 +825,6 @@ static int ffmpeg_OpenCodec( decoder_t *p_dec )
 
     p_sys->b_delayed_open = false;
 
-    msg_Info( p_dec, "Here" );
     if( p_sys->p_va && p_sys->p_va->description )
         msg_Info( p_dec, "Using %s for hardware decoding.", p_sys->p_va->description );
 
