@@ -40,6 +40,9 @@
 #include <signal.h>
 #else
 #include <errno.h>
+#include <windows.h>
+#include <winbase.h>
+#define PF_SSE3_INSTRUCTIONS_AVAILABLE 13
 #endif
 
 #include "libvlc.h"
@@ -169,12 +172,12 @@ uint32_t CPUCapabilities( void )
 
     /* test for the MMX flag */
     cpuid( 0x00000001 );
+
 # if !defined (__MMX__)
     if( ! (i_edx & 0x00800000) )
         goto out;
 # endif
     i_capabilities |= CPU_CAPABILITY_MMX;
-
 # if defined (__SSE__)
     i_capabilities |= CPU_CAPABILITY_MMXEXT | CPU_CAPABILITY_SSE;
 # else
@@ -183,8 +186,13 @@ uint32_t CPUCapabilities( void )
         i_capabilities |= CPU_CAPABILITY_MMXEXT;
 
 #   ifdef CAN_COMPILE_SSE
+#   ifdef WIN32
+        if( IsProcessorFeaturePresent( PF_XMMI_INSTRUCTIONS_AVAILABLE ) )
+            i_capabilities |= CPU_CAPABILITY_SSE;
+#   else
         check_capability( "SSE", CPU_CAPABILITY_SSE,
                           "xorps %%xmm0,%%xmm0\n" );
+#   endif
 #   endif
     }
 # endif
@@ -193,40 +201,66 @@ uint32_t CPUCapabilities( void )
     i_capabilities |= CPU_CAPABILITY_SSE2;
 # elif defined (CAN_COMPILE_SSE2)
     if( i_edx & 0x04000000 )
+    {
+#   ifdef WIN32
+        if( IsProcessorFeaturePresent( PF_XMMI64_INSTRUCTIONS_AVAILABLE ) )
+            i_capabilities |= CPU_CAPABILITY_SSE2;
+#   else
         check_capability( "SSE2", CPU_CAPABILITY_SSE2,
                           "movupd %%xmm0, %%xmm0\n" );
+#   endif
+    }
 # endif
 
 # if defined (__SSE3__)
     i_capabilities |= CPU_CAPABILITY_SSE3;
 # elif defined (CAN_COMPILE_SSE3)
     if( i_ecx & 0x00000001 )
+    {
+#   ifdef WIN32
+        if( IsProcessorFeaturePresent( PF_SSE3_INSTRUCTIONS_AVAILABLE ) )
+            i_capabilities |= CPU_CAPABILITY_SSE3;
+#   else
         check_capability( "SSE3", CPU_CAPABILITY_SSE3,
                           "movsldup %%xmm1, %%xmm0\n" );
+#   endif
+    }
 # endif
 
 # if defined (__SSSE3__)
     i_capabilities |= CPU_CAPABILITY_SSSE3;
 # elif defined (CAN_COMPILE_SSSE3)
+#   ifdef WIN32
+    /* FIXME: IsProcessorFeaturePresent can't check for SSSE3 */
+#   else
     if( i_ecx & 0x00000200 )
         check_capability( "SSSE3", CPU_CAPABILITY_SSSE3,
                           "pabsw %%xmm1, %%xmm0\n" );
+#   endif
 # endif
 
 # if defined (__SSE4_1__)
     i_capabilities |= CPU_CAPABILITY_SSE4_1;
 # elif defined (CAN_COMPILE_SSE4_1)
+#   ifdef WIN32
+    /* FIXME: IsProcessorFeaturePresent can't check for SSE4.1 */
+#   else
     if( i_ecx & 0x00080000 )
         check_capability( "SSE4.1", CPU_CAPABILITY_SSE4_1,
                           "pmaxsb %%xmm1, %%xmm0\n" );
+#   endif
 # endif
 
 # if defined (__SSE4_2__)
     i_capabilities |= CPU_CAPABILITY_SSE4_2;
 # elif defined (CAN_COMPILE_SSE4_2)
+#   ifdef WIN32
+    /* FIXME: IsProcessorFeaturePresent can't check for SSE4.2 */
+#   else
     if( i_ecx & 0x00100000 )
         check_capability( "SSE4.2", CPU_CAPABILITY_SSE4_2,
                           "pcmpgtq %%xmm1, %%xmm0\n" );
+#   endif
 # endif
 
     /* test for additional capabilities */
@@ -241,9 +275,17 @@ uint32_t CPUCapabilities( void )
 # if defined (__3dNOW__)
     i_capabilities |= CPU_CAPABILITY_3DNOW;
 # elif defined (CAN_COMPILE_3DNOW)
+
     if( i_edx & 0x80000000 )
+    {
+#   ifdef WIN32
+        if( IsProcessorFeaturePresent( PF_3DNOW_INSTRUCTIONS_AVAILABLE ) )
+            i_capabilities |= CPU_CAPABILITY_3DNOW;
+#   else
         check_capability( "3D Now!", CPU_CAPABILITY_3DNOW,
                           "pfadd %%mm0,%%mm0\n" "femms\n" );
+#   endif
+    }
 # endif
 
     if( b_amd && ( i_edx & 0x00400000 ) )
