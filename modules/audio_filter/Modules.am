@@ -7,5 +7,10 @@ SOURCES_scaletempo = scaletempo.c
 SOURCES_chorus_flanger = chorus_flanger.c
 
 libvlc_LTLIBRARIES += \
+	libaudiobargraph_a_plugin.la \
 	libchorus_flanger_plugin.la \
+	libequalizer_plugin.la \
+	libnormvol_plugin.la \
+	libparam_eq_plugin.la \
+	libscaletempo_plugin.la \
 	$(NULL)

@@ -2,4 +2,7 @@ SOURCES_trivial_mixer = trivial.c
 SOURCES_float32_mixer = float32.c
 SOURCES_spdif_mixer = spdif.c
 
-libvlc_LTLIBRARIES += libtrivial_mixer_plugin.la
+libvlc_LTLIBRARIES += \
+	libfloat32_mixer_plugin.la \
+	libspdif_mixer_plugin.la \
+	libtrivial_mixer_plugin.la

@@ -9,3 +9,5 @@ SOURCES_portaudio = portaudio.c
 SOURCES_auhal = auhal.c
 SOURCES_jack = jack.c
 SOURCES_pulse = pulse.c
+
+libvlc_LTLIBRARIES += libaout_file_plugin.la

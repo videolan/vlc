@@ -8,7 +8,9 @@ SOURCES_mpgatofixed32 = mpgatofixed32.c
 SOURCES_audio_format = format.c
 
 libvlc_LTLIBRARIES += \
+	liba52tospdif_plugin.la \
 	libaudio_format_plugin.la \
 	libconverter_fixed_plugin.la \
 	libconverter_float_plugin.la \
+	libdtstospdif_plugin.la \
 	$(NULL)

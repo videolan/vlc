@@ -83,4 +83,7 @@ if HAVE_WIN32
 libvlc_LTLIBRARIES += libdrawable_plugin.la
 endif
 
-libvlc_LTLIBRARIES += libvout_wrapper_plugin.la
+libvlc_LTLIBRARIES += \
+	libvmem_plugin.la \
+	libyuv_plugin.la \
+	libvout_wrapper_plugin.la

@@ -5,6 +5,9 @@ SOURCES_dolby_surround_decoder = dolby.c
 SOURCES_mono = mono.c
 
 libvlc_LTLIBRARIES += \
+	libdolby_surround_decoder_plugin.la \
+	libheadphone_channel_mixer_plugin.la \
 	libmono_plugin.la \
+	libsimple_channel_mixer_plugin.la \
 	libtrivial_channel_mixer_plugin.la \
 	$(NULL)

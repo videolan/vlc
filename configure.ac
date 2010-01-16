@@ -1167,66 +1167,13 @@ test "${enable_cprof}" != "yes" && enable_cprof="no"
 dnl
 dnl  default modules
 dnl
-VLC_ADD_PLUGIN([vmem])
-VLC_ADD_PLUGIN([yuv])
-
 ALIASES="${ALIASES} cvlc"
 
-dnl
-dnl default modules that need g++
-dnl
-AC_LANG_PUSH(C++)
-VLC_ADD_PLUGIN([spatializer])
-AC_LANG_POP(C++)
-
 if test "${SYS}" != "mingwce"; then
-  VLC_ADD_PLUGIN([gestures])
   VLC_ADD_PLUGIN([oldrc])
-  VLC_ADD_PLUGIN([hotkeys])
-  VLC_ADD_PLUGIN([showintf])
-  VLC_ADD_PLUGIN([marq])
-  VLC_ADD_PLUGIN([podcast])
-  VLC_ADD_PLUGIN([shout])
-  VLC_ADD_PLUGIN([sap])
   VLC_ADD_PLUGIN([mediadirs])
-  VLC_ADD_PLUGIN([fake])
-  VLC_ADD_PLUGIN([folder])
-  VLC_ADD_PLUGIN([rss])
-  VLC_ADD_PLUGIN([mosaic])
-  VLC_ADD_PLUGIN([wall])
-  VLC_ADD_PLUGIN([motiondetect])
-  VLC_ADD_PLUGIN([clone])
-  VLC_ADD_PLUGIN([crop])
-  VLC_ADD_PLUGIN([erase])
-  VLC_ADD_PLUGIN([bluescreen])
-  VLC_ADD_PLUGIN([alphamask])
-  VLC_ADD_PLUGIN([gaussianblur])
-  VLC_ADD_PLUGIN([dolby_surround_decoder])
-  VLC_ADD_PLUGIN([equalizer])
-  VLC_ADD_PLUGIN([param_eq])
-  VLC_ADD_PLUGIN([scaletempo])
-  VLC_ADD_PLUGIN([a52tospdif])
-  VLC_ADD_PLUGIN([dtstospdif])
   ALIASES="${ALIASES} rvlc"
 fi
-
-VLC_ADD_PLUGIN([chain])
-VLC_ADD_PLUGIN([aout_file])
-VLC_ADD_PLUGIN([linear_resampler])
-VLC_ADD_PLUGIN([bandlimited_resampler])
-VLC_ADD_PLUGIN([float32_mixer])
-VLC_ADD_PLUGIN([spdif_mixer])
-VLC_ADD_PLUGIN([simple_channel_mixer])
-VLC_ADD_PLUGIN([headphone_channel_mixer])
-VLC_ADD_PLUGIN([normvol])
-VLC_ADD_PLUGIN([audiobargraph_a])
-VLC_ADD_PLUGIN([a52tospdif])
-VLC_ADD_PLUGIN([dtstospdif])
-VLC_ADD_PLUGIN([i420_yuy2])
-VLC_ADD_PLUGIN([i422_yuy2])
-VLC_ADD_PLUGIN([i422_i420])
-VLC_ADD_PLUGIN([yuy2_i422])
-VLC_ADD_PLUGIN([yuy2_i420])
 
 dnl
 dnl Some plugins aren't useful on some platforms

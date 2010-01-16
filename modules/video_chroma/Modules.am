@@ -34,5 +34,10 @@ SOURCES_yuy2_i420 = \
 
 libvlc_LTLIBRARIES += \
 	libi420_rgb_plugin.la \
+	libi420_yuy2_plugin.la \
+	libi422_i420_plugin.la \
+	libi422_yuy2_plugin.la \
 	libgrey_yuv_plugin.la \
+	libyuy2_i420_plugin.la \
+	libyuy2_i422_plugin.la \
 	$(NULL)

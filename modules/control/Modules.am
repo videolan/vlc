@@ -17,3 +17,7 @@ SOURCES_motion = \
         motion.c \
         $(motion_extra) \
         $(NULL)
+
+libvlc_LTLIBRARIES += \
+	libgestures_plugin.la \
+	libhotkeys_plugin.la
