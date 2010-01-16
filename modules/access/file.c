@@ -35,9 +35,7 @@
 
 #include <assert.h>
 #include <errno.h>
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>
-#endif
+#include <sys/types.h>
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif

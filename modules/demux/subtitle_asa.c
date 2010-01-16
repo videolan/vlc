@@ -35,10 +35,6 @@
 #include <vlc_input.h>
 #include <vlc_memory.h>
 
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>
-#endif
-
 #include <vlc_demux.h>
 #include <vlc_charset.h>
 

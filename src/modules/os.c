@@ -38,9 +38,7 @@
 #include <stdio.h>                                              /* sprintf() */
 #include <string.h>                                              /* strdup() */
 
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>
-#endif
+#include <sys/types.h>
 
 #if !defined(HAVE_DYNAMIC_PLUGINS)
     /* no support for plugins */

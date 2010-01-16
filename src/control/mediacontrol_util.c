@@ -40,9 +40,7 @@
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
 #endif
-#ifdef HAVE_SYS_TYPES_H
-#    include <sys/types.h>
-#endif
+#include <sys/types.h>
 
 libvlc_time_t private_mediacontrol_unit_convert( libvlc_media_player_t *p_media_player,
                                                  mediacontrol_PositionKey from,

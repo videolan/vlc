@@ -32,13 +32,11 @@
 #include <vlc_codec.h>
 #include <vlc_charset.h>
 
+#include <sys/types.h>
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h> /* write(), close() */
 #elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
-#endif
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h> /* open() */
 #endif
 #ifdef HAVE_FCNTL_H
 #   include <fcntl.h>

@@ -44,9 +44,7 @@
 #ifdef HAVE_UNISTD_H
 #    include <unistd.h>
 #endif
-#ifdef HAVE_SYS_TYPES_H
-#    include <sys/types.h>
-#endif
+#include <sys/types.h>
 
 mediacontrol_RGBPicture *
 mediacontrol_snapshot( mediacontrol_Instance *self,

@@ -33,9 +33,7 @@
 #include <vlc_access.h>
 
 #include <errno.h>
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>
-#endif
+#include <sys/types.h>
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )

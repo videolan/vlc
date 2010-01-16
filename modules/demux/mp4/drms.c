@@ -51,9 +51,7 @@
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
 #endif
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>
-#endif
+#include <sys/types.h>
 
 /* In Solaris (and perhaps others) PATH_MAX is in limits.h. */
 #include <limits.h>

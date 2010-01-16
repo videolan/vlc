@@ -37,9 +37,7 @@
 #include <vlc_plugin.h>
 #include <vlc_cpu.h>
 
-#ifdef HAVE_SYS_TYPES_H
-#   include <sys/types.h>
-#endif
+#include <sys/types.h>
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
