@@ -1058,6 +1058,28 @@ void MainInputManager::togglePlayPause()
         getIM()->togglePlayPause();
 }
 
+void MainInputManager::play()
+{
+    /* No input, play */
+    if( !p_input )
+        playlist_Play( THEPL );
+    else
+    {
+        if( PLAYING_S != var_GetInteger( p_input, "state" ) )
+        {
+            getIM()->togglePlayPause();
+        }
+    }
+}
+
+void MainInputManager::pause()
+{
+    if(p_input && PLAYING_S == var_GetInteger( p_input, "state" ) )
+    {
+        getIM()->togglePlayPause();
+    }
+}
+
 void MainInputManager::toggleRandom()
 {
     var_ToggleBool( THEPL, "random" );

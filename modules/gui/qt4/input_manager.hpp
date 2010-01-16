@@ -268,6 +268,8 @@ private:
     void notifyRepeatLoop();
 public slots:
     void togglePlayPause();
+    void play();
+    void pause();
     void toggleRandom();
     void stop();
     void next();
