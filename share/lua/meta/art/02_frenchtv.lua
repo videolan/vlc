@@ -23,15 +23,22 @@
 function fetch_art()
     local urlsForChannel = {
     -- on http://cyril.bourreau.free.fr/Vectoriel/
-        ["TF1"] = "TF1-2006.png",
-        ["France 2"] = "FR2-DSK-couleur.png",
-        ["France 3"] = "FR3-DSK-couleur.png",
-        ["France 4"] = "FR4-DSK-couleur.png",
-        ["France 5"] = "FR5-DSK-couleur.png",
-        ["Direct 8"] = "Direct8-2009.png",
-        ["NRJ 12"] = "NRJ12-2009.png",
-        ["iTele"] = "iTELE-2008.png",
-        ["W9"] = "W9.png"
+        ["TF1"] = "http://cyril.bourreau.free.fr/Vectoriel/TF1-2006.png",
+        ["France 2"] = "http://cyril.bourreau.free.fr/Vectoriel/FR2-DSK-couleur.png",
+        ["France 3"] = "http://cyril.bourreau.free.fr/Vectoriel/FR3-DSK-couleur.png",
+        ["France 4"] = "http://cyril.bourreau.free.fr/Vectoriel/FR4-DSK-couleur.png",
+        ["France 5"] = "http://cyril.bourreau.free.fr/Vectoriel/FR5-DSK-couleur.png",
+        ["Direct 8"] = "http://cyril.bourreau.free.fr/Vectoriel/Direct8-2009.png",
+        ["NRJ 12"] = "http://cyril.bourreau.free.fr/Vectoriel/NRJ12-2009.png",
+        ["iTele"] = "http://cyril.bourreau.free.fr/Vectoriel/iTELE-2008.png",
+        ["W9"] = "http://cyril.bourreau.free.fr/Vectoriel/W9.png",
+
+        ["Arte"] = "http://www.artepro.com/fr_fichiers/upload/10594.jpg",
+        ["TMC"] = "http://upload.wikimedia.org/wikipedia/fr/4/4b/Logo_de_TMC.gif",
+        ["i> TELE"] = "http://upload.wikimedia.org/wikipedia/fr/5/56/Logo_I_tele.png",
+        ["BFM TV"] = "http://upload.wikimedia.org/wikipedia/fr/3/30/Bfm_tv.jpg",
+        ["Virgin 17"] = "http://upload.wikimedia.org/wikipedia/fr/3/39/Virgin17logo.png",
+        ["La Chaîne Parlementaire"] = "http://upload.wikimedia.org/wikipedia/fr/9/98/Public-Senat-LCP-An_logo_2010.png"
     }
     local meta = vlc.item.metas(vlc.item);
     local channel
@@ -50,11 +57,5 @@ function fetch_art()
     -- trim
     channel = string.gsub(channel, "^%s*(.-)%s*$", "%1")
 
-    local url = urlsForChannel[channel];
-
-    if url then
-        return "http://cyril.bourreau.free.fr/Vectoriel/"..url
-    else
-        return nil
-    end
+    return urlsForChannel[channel]
 end
