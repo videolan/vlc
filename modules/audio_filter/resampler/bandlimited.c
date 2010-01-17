@@ -43,6 +43,8 @@
 #include <vlc_filter.h>
 #include <vlc_block.h>
 
+#include <assert.h>
+
 #include "bandlimited.h"
 
 /*****************************************************************************
@@ -161,10 +163,10 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
         p_sys->b_first = false;
     }
 
-    int i_in_nb = p_in_buf->i_nb_samples;
-    int i_in, i_out = 0;
+    size_t i_in_nb = p_in_buf->i_nb_samples;
+    size_t i_in, i_out = 0;
     double d_factor, d_scale_factor, d_old_scale_factor;
-    int i_filter_wing;
+    size_t i_filter_wing;
 
 #if 0
     msg_Err( p_filter, "old rate: %i, old factor: %f, old wing: %i, i_in: %i",
@@ -172,23 +174,25 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
              p_sys->i_old_wing, i_in_nb );
 #endif
 
+    /* Same format in and out... */
+    assert( p_filter->fmt_in.audio.i_bytes_per_frame == i_bytes_per_frame );
+
     /* Prepare the source buffer */
-    i_in_nb += (p_sys->i_old_wing * 2);
-
-    float p_in_orig[i_in_nb * p_filter->fmt_in.audio.i_bytes_per_frame / 4],
-         *p_in = p_in_orig;
-
-    /* Copy all our samples in p_in */
     if( p_sys->i_old_wing )
-    {
-        vlc_memcpy( p_in, p_sys->p_buf,
-                    p_sys->i_old_wing * 2 *
-                      p_filter->fmt_in.audio.i_bytes_per_frame );
+    {   /* Copy all our samples in p_in_buf */
+        /* Normally, there should be enough room for the old wing in the
+         * buffer head room. Otherwise, we need to copy memory anyway. */
+        p_in_buf = block_Realloc( p_in_buf,
+                                  p_sys->i_old_wing * 2 * i_bytes_per_frame,
+                                  p_in_buf->i_buffer );
+        if( unlikely(p_in_buf == NULL) )
+            return NULL;
+        memcpy( p_in_buf->p_buffer, p_sys->p_buf,
+                p_sys->i_old_wing * 2 * i_bytes_per_frame );
     }
-    vlc_memcpy( p_in + p_sys->i_old_wing * 2 * i_nb_channels,
-                p_in_buf->p_buffer,
-                p_in_buf->i_nb_samples * p_filter->fmt_in.audio.i_bytes_per_frame );
-    block_Release( p_in_buf );
+    i_in_nb += (p_sys->i_old_wing * 2);
+    float *p_in = (float *)p_in_buf->p_buffer;
+    const float *p_in_orig = p_in;
 
     /* Make sure the output buffer is reset */
     memset( p_out, 0, p_out_buf->i_buffer );
@@ -211,8 +215,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
         if( p_sys->d_old_factor == 1 )
         {
             /* Just copy the samples */
-            memcpy( p_out, p_in,
-                    p_filter->fmt_in.audio.i_bytes_per_frame );
+            memcpy( p_out, p_in, i_bytes_per_frame );
             p_in += i_nb_channels;
             p_out += i_nb_channels;
             i_out++;
@@ -249,8 +252,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
 #endif
 
                 /* Sanity check */
-                if( p_out_buf->i_buffer/p_filter->fmt_in.audio.i_bytes_per_frame
-                    <= (unsigned int)i_out+1 )
+                if( p_out_buf->i_buffer/i_bytes_per_frame <= i_out+1 )
                 {
                     p_out += i_nb_channels;
                     i_out++;
@@ -323,8 +325,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
                 }
 #endif
                 /* Sanity check */
-                if( p_out_buf->i_buffer/p_filter->fmt_in.audio.i_bytes_per_frame
-                    <= (unsigned int)i_out+1 )
+                if( p_out_buf->i_buffer/i_bytes_per_frame <= i_out+1 )
                 {
                     p_out += i_nb_channels;
                     i_out++;
@@ -371,8 +372,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
     /* Buffer i_filter_wing * 2 samples for next time */
     if( p_sys->i_old_wing )
     {
-        size_t newsize = p_sys->i_old_wing * 2
-                         * p_filter->fmt_in.audio.i_bytes_per_frame;
+        size_t newsize = p_sys->i_old_wing * 2 * i_bytes_per_frame;
         if( newsize > p_sys->i_buf_size )
         {
             free( p_sys->p_buf );
