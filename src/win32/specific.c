@@ -140,7 +140,7 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
 #ifndef ABOVE_NORMAL_PRIORITY_CLASS
 #   define ABOVE_NORMAL_PRIORITY_CLASS 0x00008000
 #endif
-    if( config_GetInt( p_this, "high-priority" ) )
+    if( var_InheritBool( p_this, "high-priority" ) )
     {
         if( SetPriorityClass( GetCurrentProcess(), ABOVE_NORMAL_PRIORITY_CLASS )
              || SetPriorityClass( GetCurrentProcess(), HIGH_PRIORITY_CLASS ) )
@@ -153,9 +153,9 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
         }
     }
 
-    if( config_GetInt( p_this, "one-instance" )
-        || ( config_GetInt( p_this, "one-instance-when-started-from-file" )
-             && config_GetInt( p_this, "started-from-file" ) ) )
+    if( varInheritBool( p_this, "one-instance" )
+     || ( var_InheritBool( p_this, "one-instance-when-started-from-file" )
+       && var_InheritBool( p_this, "started-from-file" ) ) )
     {
         HANDLE hmutex;
 
@@ -235,7 +235,7 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
 
                 p_data = malloc( i_data );
                 p_data->argc = *pi_argc - optind;
-                p_data->enqueue = config_GetInt( p_this, "playlist-enqueue" );
+                p_data->enqueue = var_InheritBool( p_this, "playlist-enqueue" );
                 i_data = 0;
                 for( i_opt = optind; i_opt < *pi_argc; i_opt++ )
                 {
