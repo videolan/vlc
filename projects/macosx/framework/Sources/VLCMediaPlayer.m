@@ -288,12 +288,21 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     NSInteger count = libvlc_video_get_spu_count( instance, &ex );
-    catch_exception( &ex );
+    if (libvlc_exception_raised( &ex ))
+    {
+        libvlc_exception_clear( &ex );
+        return NSNotFound;
+    }
     if (count <= 0)
         return NSNotFound;
     NSUInteger result = libvlc_video_get_spu( instance, &ex );
-    catch_exception( &ex );
-    return result;
+    if (libvlc_exception_raised( &ex ))
+    {
+        libvlc_exception_clear( &ex );
+        return NSNotFound;
+    }
+    else
+        return result;
 }
 
 - (BOOL)openVideoSubTitlesFromFile:(NSString *)path
