@@ -739,7 +739,7 @@ void vout_DisplayTitle( vout_thread_t *p_vout, const char *psz_title )
 {
     assert( psz_title );
 
-    if( !config_GetInt( p_vout, "osd" ) )
+    if( !var_InheritBool( p_vout, "osd" ) )
         return;
 
     vlc_mutex_lock( &p_vout->change_lock );

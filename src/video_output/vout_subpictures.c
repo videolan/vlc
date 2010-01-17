@@ -214,7 +214,7 @@ spu_t *__spu_Create( vlc_object_t *p_this )
     p_sys->p_scale = NULL;
     p_sys->p_scale_yuvp = NULL;
 
-    p_sys->i_margin = config_GetInt( p_spu, "sub-margin" );
+    p_sys->i_margin = var_InheritInteger( p_spu, "sub-margin" );
 
     /* Register the default subpicture channel */
     p_sys->i_channel = 2;

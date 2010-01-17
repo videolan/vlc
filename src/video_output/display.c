@@ -1472,7 +1472,7 @@ vout_window_t * vout_NewDisplayWindow(vout_thread_t *vout, vout_display_t *vd, c
     VLC_UNUSED(vd);
     vout_window_cfg_t cfg_override = *cfg;
 
-    if( !config_GetInt( vout, "embedded-video" ) )
+    if( !var_InheritBool( vout, "embedded-video" ) )
         cfg_override.is_standalone = true;
 
     return vout_window_New(VLC_OBJECT(vout), NULL, &cfg_override);

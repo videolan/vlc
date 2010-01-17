@@ -130,7 +130,7 @@ void __vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
     char *psz_string = NULL;
     va_list args;
 
-    if( !config_GetInt( p_caller, "osd" ) ) return;
+    if( !var_InheritBool( p_caller, "osd" ) ) return;
 
     p_vout = vlc_object_find( p_caller, VLC_OBJECT_VOUT, FIND_ANYWHERE );
     if( p_vout )
