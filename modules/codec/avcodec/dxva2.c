@@ -587,11 +587,30 @@ static void D3dDestroyDevice(vlc_va_dxva2_t *va)
  */
 static char *DxDescribe(vlc_va_dxva2_t *va)
 {
+    static const struct {
+        unsigned id;
+        char     name[32];
+    } vendors [] = {
+        { 0x1002, "ATI" },
+        { 0x10DE, "NVIDIA" },
+        { 0x8086, "Intel" },
+        { 0x5333, "S3 Graphics" },
+        { 0, "" }
+    };
     D3DADAPTER_IDENTIFIER9 *id = &va->d3dai;
+
+    const char *vendor = "Unknown";
+    for (int i = 0; vendors[i].id != 0; i++) {
+        if (vendors[i].id == id->VendorId) {
+            vendor = vendors[i].name;
+            break;
+        }
+    }
+
     char *description;
-    if (asprintf(&description, "DXVA2 (%.*s, vendor %d, device %d, revision %d)",
+    if (asprintf(&description, "DXVA2 (%.*s, vendor %d(%s), device %d, revision %d)",
                  sizeof(id->Description), id->Description,
-                 id->VendorId, id->DeviceId, id->Revision) < 0)
+                 id->VendorId, vendor, id->DeviceId, id->Revision) < 0)
         return NULL;
     return description;
 }
