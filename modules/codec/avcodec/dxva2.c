@@ -161,7 +161,8 @@ static const dxva2_mode_t dxva2_modes[] = {
     {  "Windows Media Video 9 MoComp",          &DXVA2_ModeWMV9_B, 0 },
     {  "Windows Media Video 9 post processing", &DXVA2_ModeWMV9_A, 0 },
 
-    { "VC-1 VLD",             &DXVA2_ModeVC1_D, 0 },
+    { "VC-1 VLD",             &DXVA2_ModeVC1_D, CODEC_ID_VC1 },
+    { "VC-1 VLD",             &DXVA2_ModeVC1_D, CODEC_ID_WMV3 },
     { "VC-1 IDCT",            &DXVA2_ModeVC1_C, 0 },
     { "VC-1 MoComp",          &DXVA2_ModeVC1_B, 0 },
     { "VC-1 post processing", &DXVA2_ModeVC1_A, 0 },
@@ -333,8 +334,7 @@ static int Setup(vlc_va_t *external, void **hw, vlc_fourcc_t *chroma,
         return VLC_EGENERIC;
     /* */
     va->hw.decoder = va->decoder;
-    if (va->codec_id == CODEC_ID_H264)
-        va->hw.cfg = &va->cfg;
+    va->hw.cfg = &va->cfg;
     va->hw.surface_count = va->surface_count;
     va->hw.surface = va->hw_surface;
     for (unsigned i = 0; i < va->surface_count; i++)
