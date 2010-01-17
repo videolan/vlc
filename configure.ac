@@ -5090,7 +5090,10 @@ dnl Do we have to use make or gmake ?
 USE_MAKE_OR_GMAKE=`case "${SYS}" in openbsd*) echo "gmake";; *) echo "make";; esac`
 dnl Shortcut to nice compile message
 rm -f compile
-echo '#! /bin/sh' >compile
+if test -n $SHELL; then
+  SHELL=${CONFIG_SHELL-/bin/sh}
+fi
+echo '#! '$SHELL >compile
 echo rm -f .error\$\$ >>compile
 echo ERROR=0 >>compile
 echo export PATH=$PATH LANG=C >>compile
