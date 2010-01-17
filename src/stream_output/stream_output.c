@@ -124,8 +124,8 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, const char *psz_des
         return p_sout;
     }
 
-    free( psz_chain );
     msg_Err( p_sout, "stream chain failed for `%s'", psz_chain );
+    free( psz_chain );
 
     FREENULL( p_sout->psz_sout );
 
@@ -859,6 +859,10 @@ static sout_stream_t *sout_StreamNew( sout_instance_t *p_sout, char *psz_name,
 
     if( !p_stream->p_module )
     {
+        /* those must be freed by the caller if creation failed */
+        p_stream->psz_name = NULL;
+        p_stream->p_cfg = NULL;
+
         sout_StreamDelete( p_stream );
         return NULL;
     }
