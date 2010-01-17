@@ -614,8 +614,13 @@ void InputManager::UpdateArt()
         url = url.replace( "attachment://", "" );
     }
 
+    /* the art hasn't changed, no need to update */
+    if(artUrl == url)
+        return;
+
     /* Update Art meta */
-    emit artChanged( url );
+    artUrl = url;
+    emit artChanged( artUrl );
 }
 
 inline void InputManager::UpdateStats()
