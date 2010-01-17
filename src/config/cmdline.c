@@ -217,7 +217,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
         if( i_cmd == 0 )
         {
             module_config_t *p_conf;
-            char *psz_name = (char *)p_longopts[i_index].name;
+            const char *psz_name = p_longopts[i_index].name;
 
             /* Check if we deal with a --nofoo or --no-foo long option */
             if( flag ) psz_name += psz_name[2] == '-' ? 3 : 2;
@@ -273,19 +273,26 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
                     case CONFIG_ITEM_MODULE_LIST:
                     case CONFIG_ITEM_MODULE_LIST_CAT:
                     case CONFIG_ITEM_MODULE_CAT:
-                        config_PutPsz( p_this, psz_name, optarg );
+                        var_Create( p_this, psz_name, VLC_VAR_STRING );
+                        var_SetString( p_this, psz_name, optarg );
                         break;
                     case CONFIG_ITEM_INTEGER:
-                        config_PutInt( p_this, psz_name, strtol(optarg, 0, 0));
+                        var_Create( p_this, psz_name, VLC_VAR_INTEGER );
+                        var_SetInteger( p_this, psz_name,
+                                        strtol(optarg, NULL, 0));
                         break;
                     case CONFIG_ITEM_FLOAT:
-                        config_PutFloat( p_this, psz_name, us_atof(optarg) );
+                        var_Create( p_this, psz_name, VLC_VAR_FLOAT );
+                        var_SetFloat( p_this, psz_name, us_atof(optarg) );
                         break;
                     case CONFIG_ITEM_KEY:
-                        config_PutInt( p_this, psz_name, ConfigStringToKey( optarg ) );
+                        var_Create( p_this, psz_name, VLC_VAR_INTEGER );
+                        var_SetInteger( p_this, psz_name,
+                                        ConfigStringToKey( optarg ) );
                         break;
                     case CONFIG_ITEM_BOOL:
-                        config_PutInt( p_this, psz_name, !flag );
+                        var_Create( p_this, psz_name, VLC_VAR_BOOL );
+                        var_SetBool( p_this, psz_name, !flag );
                         break;
                 }
                 continue;
@@ -295,6 +302,7 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
         /* A short option has been recognized */
         if( pp_shortopts[i_cmd] != NULL )
         {
+            const char *name = pp_shortopts[i_cmd]->psz_name;
             switch( pp_shortopts[i_cmd]->i_type )
             {
                 case CONFIG_ITEM_STRING:
@@ -305,9 +313,11 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
                 case CONFIG_ITEM_MODULE_CAT:
                 case CONFIG_ITEM_MODULE_LIST:
                 case CONFIG_ITEM_MODULE_LIST_CAT:
-                    config_PutPsz( p_this, pp_shortopts[i_cmd]->psz_name, optarg );
+                    var_Create( p_this, name, VLC_VAR_STRING );
+                    var_SetString( p_this, name, optarg );
                     break;
                 case CONFIG_ITEM_INTEGER:
+                    var_Create( p_this, name, VLC_VAR_INTEGER );
                     if( i_cmd == 'v' )
                     {
                         if( optarg )
@@ -330,17 +340,17 @@ int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
                         {
                             i_verbose++; /* -v */
                         }
-                        config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
-                                               i_verbose );
+                        var_SetInteger( p_this, name, i_verbose );
                     }
                     else
                     {
-                        config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name,
-                                               strtol(optarg, 0, 0) );
+                        var_SetInteger( p_this, name,
+                                        strtol(optarg, NULL, 0) );
                     }
                     break;
                 case CONFIG_ITEM_BOOL:
-                    config_PutInt( p_this, pp_shortopts[i_cmd]->psz_name, 1 );
+                    var_Create( p_this, name, VLC_VAR_BOOL );
+                    var_SetBool( p_this, name, true );
                     break;
             }
 
