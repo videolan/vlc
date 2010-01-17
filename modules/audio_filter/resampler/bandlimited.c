@@ -185,7 +185,6 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
                     p_sys->i_old_wing * 2 *
                       p_filter->fmt_in.audio.i_bytes_per_frame );
     }
-    /* XXX: why i_nb_channels instead of i_bytes_per_frame??? */
     vlc_memcpy( p_in + p_sys->i_old_wing * 2 * i_nb_channels,
                 p_in_buf->p_buffer,
                 p_in_buf->i_nb_samples * p_filter->fmt_in.audio.i_bytes_per_frame );
