@@ -66,6 +66,8 @@ Service discovery:
 
 Stream output:
  * New smem module, streaming to memory
+ * Allow duplicate outputs to be merged, like:
+   --sout "#duplicate{dst=transcode{vcodec=mp2v},select=es=0,dst=transcode,select=es=1}:std{...}"
 
 Interfaces:
  * Renamed the legacy rc, telnet and http interfaces to oldrc, oldtelnet
