@@ -165,7 +165,7 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
     assert (p_bank != NULL);
 
     /* Save the configuration */
-    if( !config_GetInt( p_this, "ignore-config" ) )
+    if( !var_InheritBool( p_this, "ignore-config" ) )
         config_AutoSaveConfigFile( p_this );
 
     /* If plugins were _not_ loaded, then the caller still has the bank lock
@@ -230,7 +230,7 @@ void module_LoadPlugins( vlc_object_t * p_this, bool b_cache_delete )
     if( p_bank->i_usage == 1 )
     {
         msg_Dbg( p_this, "checking plugin modules" );
-        p_module_bank->b_cache = config_GetInt( p_this, "plugins-cache" ) > 0;
+        p_module_bank->b_cache = var_InheritBool( p_this, "plugins-cache" );
 
         if( p_module_bank->b_cache || b_cache_delete )
             CacheLoad( p_this, p_module_bank, b_cache_delete );
@@ -847,7 +847,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
 #endif
 
     /* If the user provided a plugin path, we add it to the list */
-    char *userpaths = config_GetPsz( p_this, "plugin-path" );
+    char *userpaths = var_InheritString( p_this, "plugin-path" );
     char *paths_iter;
 
     for( paths_iter = userpaths; paths_iter; )
