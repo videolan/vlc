@@ -219,9 +219,10 @@ typedef struct
     HINSTANCE             hdxva2_dll;
 
     /* Direct3D */
-	D3DPRESENT_PARAMETERS d3dpp;
-	LPDIRECT3D9           d3dobj;
-	LPDIRECT3DDEVICE9     d3ddev;
+    D3DPRESENT_PARAMETERS  d3dpp;
+    LPDIRECT3D9            d3dobj;
+    D3DADAPTER_IDENTIFIER9 d3dai;
+    LPDIRECT3DDEVICE9      d3ddev;
 
     /* Device manager */
     UINT                     token;
@@ -533,6 +534,14 @@ static int D3dCreateDevice(vlc_va_dxva2_t *va)
     va->d3dobj = d3dobj;
 
     /* */
+    D3DADAPTER_IDENTIFIER9 *d3dai = &va->d3dai;
+    if (FAILED(IDirect3D9_GetAdapterIdentifier(va->d3dobj,
+                                               D3DADAPTER_DEFAULT, 0, d3dai))) {
+        msg_Warn(va->log, "IDirect3D9_GetAdapterIdentifier failed");
+        ZeroMemory(d3dai, sizeof(*d3dai));
+    }
+
+    /* */
     D3DPRESENT_PARAMETERS *d3dpp = &va->d3dpp;
     ZeroMemory(d3dpp, sizeof(*d3dpp));
     d3dpp->Flags                  = D3DPRESENTFLAG_VIDEO;
@@ -578,17 +587,11 @@ static void D3dDestroyDevice(vlc_va_dxva2_t *va)
  */
 static char *DxDescribe(vlc_va_dxva2_t *va)
 {
-    D3DADAPTER_IDENTIFIER9 id;
-    ZeroMemory(&id, sizeof(id));
-
-    if (FAILED(IDirect3D9_GetAdapterIdentifier(va->d3dobj,
-                                               D3DADAPTER_DEFAULT, 0, &id)))
-        return strdup("DXVA2 (unknown)");
-
+    D3DADAPTER_IDENTIFIER9 *id = &va->d3dai;
     char *description;
     if (asprintf(&description, "DXVA2 (%.*s, vendor %d, device %d, revision %d)",
-                 sizeof(id.Description), id.Description,
-                 id.VendorId, id.DeviceId, id.Revision) < 0)
+                 sizeof(id->Description), id->Description,
+                 id->VendorId, id->DeviceId, id->Revision) < 0)
         return NULL;
     return description;
 }
