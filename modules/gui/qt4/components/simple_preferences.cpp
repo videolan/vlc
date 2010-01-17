@@ -575,8 +575,10 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
             /* ONE INSTANCE options */
 #if defined( WIN32 ) || defined( HAVE_DBUS ) || defined(__APPLE__)
             CONFIG_GENERIC( "one-instance", Bool, NULL, OneInterfaceMode );
+#if 0
             CONFIG_GENERIC( "playlist-enqueue", Bool, NULL,
                     EnqueueOneInterfaceMode );
+#endif
             ui.EnqueueOneInterfaceMode->setEnabled( ui.OneInterfaceMode->isChecked() );
             CONNECT( ui.OneInterfaceMode, toggled( bool ),
                      ui.EnqueueOneInterfaceMode, setEnabled( bool ) );
