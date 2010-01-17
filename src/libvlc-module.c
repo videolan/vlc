@@ -2087,7 +2087,6 @@ vlc_module_begin ()
               ONEINSTANCEWHENSTARTEDFROMFILE_LONGTEXT, true )
     add_bool( "playlist-enqueue", 0, NULL, PLAYLISTENQUEUE_TEXT,
               PLAYLISTENQUEUE_LONGTEXT, true )
-        change_unsaveable ()
 #endif
 
 #if defined(WIN32)
