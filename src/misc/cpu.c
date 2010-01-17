@@ -313,7 +313,7 @@ const struct
     { CPU_CAPABILITY_SSE,     "sse" },
 #endif
 #if defined (__ppc__) || defined (__ppc64__) || defined (__powerpc__)
-    { CPU_CAPABILITY_ALTIVEC, "altivec" },
+    { CPU_CAPABILITY_ALTIVEC, "altivec" },
 #endif
 #if defined (__arm__)
     { CPU_CAPABILITY_NEON,    "arm_neon" },
