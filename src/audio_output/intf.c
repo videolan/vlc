@@ -76,7 +76,7 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
                 bool b_mute )
 {
     int i_result = VLC_SUCCESS;
-    int i_volume_step = 1;
+    int i_volume_step = 1, i_new_volume = 0;
     bool b_var_mute = false;
     aout_instance_t *p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
                                                FIND_ANYWHERE );
@@ -120,12 +120,16 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
 
         if ( !b_unmute_condition )
             i_volume = config_GetInt( p_object, "volume" );
-        i_volume += i_volume_step * i_nb_steps;
 
-        if ( i_volume > AOUT_VOLUME_MAX )
+        i_new_volume = (int) i_volume + i_volume_step * i_nb_steps;
+
+        if ( i_new_volume > AOUT_VOLUME_MAX )
             i_volume = AOUT_VOLUME_MAX;
-        else if ( i_volume < AOUT_VOLUME_MIN )
+        else if ( i_new_volume < AOUT_VOLUME_MIN )
             i_volume = AOUT_VOLUME_MIN;
+        else
+            i_volume = i_new_volume;
+
         if ( i_return_volume != NULL )
             *i_return_volume = i_volume;
     }
