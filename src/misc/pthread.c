@@ -143,7 +143,7 @@ void vlc_mutex_init( vlc_mutex_t *p_mutex )
 {
     pthread_mutexattr_t attr;
 
-    if( pthread_mutexattr_init( &attr ) )
+    if (unlikely(pthread_mutexattr_init (&attr)))
         abort();
 #ifdef NDEBUG
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_NORMAL );
@@ -155,7 +155,7 @@ void vlc_mutex_init( vlc_mutex_t *p_mutex )
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_ERRORCHECK );
 # endif
 #endif
-    if( pthread_mutex_init( p_mutex, &attr ) )
+    if (unlikely(pthread_mutex_init (p_mutex, &attr)))
         abort();
     pthread_mutexattr_destroy( &attr );
 }
@@ -167,13 +167,14 @@ void vlc_mutex_init_recursive( vlc_mutex_t *p_mutex )
 {
     pthread_mutexattr_t attr;
 
-    pthread_mutexattr_init( &attr );
+    if (unlikely(pthread_mutexattr_init (&attr)))
+        abort();
 #if defined (__GLIBC__) && (__GLIBC__ == 2) && (__GLIBC_MINOR__ < 6)
     pthread_mutexattr_setkind_np( &attr, PTHREAD_MUTEX_RECURSIVE_NP );
 #else
     pthread_mutexattr_settype( &attr, PTHREAD_MUTEX_RECURSIVE );
 #endif
-    if( pthread_mutex_init( p_mutex, &attr ) )
+    if (unlikely(pthread_mutex_init (p_mutex, &attr)))
         abort();
     pthread_mutexattr_destroy( &attr );
 }
@@ -262,7 +263,7 @@ void vlc_cond_init( vlc_cond_t *p_condvar )
 {
     pthread_condattr_t attr;
 
-    if (pthread_condattr_init (&attr))
+    if (unlikely(pthread_condattr_init (&attr)))
         abort ();
 #if !defined (_POSIX_CLOCK_SELECTION)
    /* Fairly outdated POSIX support (that was defined in 2001) */
@@ -273,7 +274,7 @@ void vlc_cond_init( vlc_cond_t *p_condvar )
     pthread_condattr_setclock (&attr, CLOCK_MONOTONIC);
 #endif
 
-    if (pthread_cond_init (p_condvar, &attr))
+    if (unlikely(pthread_cond_init (p_condvar, &attr)))
         abort ();
     pthread_condattr_destroy (&attr);
 }
@@ -386,7 +387,7 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
  */
 void vlc_sem_init (vlc_sem_t *sem, unsigned value)
 {
-    if (sem_init (sem, 0, value))
+    if (unlikely(sem_init (sem, 0, value)))
         abort ();
 }
 
@@ -428,7 +429,7 @@ void vlc_sem_wait (vlc_sem_t *sem)
  */
 void vlc_rwlock_init (vlc_rwlock_t *lock)
 {
-    if (pthread_rwlock_init (lock, NULL))
+    if (unlikely(pthread_rwlock_init (lock, NULL)))
         abort ();
 }
 
@@ -801,7 +802,7 @@ int vlc_timer_create (vlc_timer_t *id, void (*func) (void *), void *data)
 {
     struct vlc_timer *timer = malloc (sizeof (*timer));
 
-    if (timer == NULL)
+    if (unlikely(timer == NULL))
         return ENOMEM;
     vlc_mutex_init (&timer->lock);
     vlc_cond_init (&timer->wait);
