@@ -91,7 +91,6 @@ int main( int i_argc, const char **ppsz_argv )
     printf( "  \"(-H)--longhelp[print detailed help]\"\\\n" );
     printf( "  \"(--list)-l[print a list of available modules]\"\\\n" );
     printf( "  \"(-l)--list[print a list of available modules]\"\\\n" );
-    printf( "  \"--save-config[save the current command line options in the config file]\"\\\n" );
     printf( "  \"--reset-config[reset the current config to the default values]\"\\\n" );
     printf( "  \"--config[use alternate config file]\"\\\n" );
     printf( "  \"--reset-plugins-cache[resets the current plugins cache]\"\\\n" );
