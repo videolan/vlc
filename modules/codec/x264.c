@@ -142,6 +142,11 @@ static void Close( vlc_object_t * );
 #define INTERLACED_TEXT N_("Interlaced mode")
 #define INTERLACED_LONGTEXT N_( "Pure-interlaced mode.")
 
+#define INTRAREFRESH_TEXT N_("Use Periodic Intra Refresh")
+#define INTRAREFRESH_LONGTEXT N_("Use Periodic Intra Refresh instead of IDR frames")
+
+#define MBTREE_TEXT N_("Use mb-tree ratecontrol")
+#define MBTREE_LONGTEXT N_("You can disable use of Macroblock-tree on ratecontrol")
 
 #define SLICE_COUNT N_("Force number of slices per frame")
 #define SLICE_COUNT_LONGTEXT N_("Force rectangular slices and is overridden by other slicing optinos")
@@ -324,6 +329,9 @@ static void Close( vlc_object_t * );
 #define DCT_DECIMATE_LONGTEXT N_( "Coefficient thresholding on P-frames." \
     "Eliminate dct blocks containing only a small single coefficient.")
 
+#define PSY_TEXT N_("Use Psy-optimizations")
+#define PSY_LONGTEXT N_("Use all visual optimizations that can worsen both PSNR and SSIM")
+
 /* Noise reduction 1 is too weak to measure, suggest at least 10 */
 #define NR_TEXT N_("Noise reduction")
 #define NR_LONGTEXT N_( "Dct-domain noise reduction. Adaptive pseudo-deadzone. " \
@@ -459,6 +467,8 @@ vlc_module_begin ()
 
     add_string( SOUT_CFG_PREFIX "psy-rd", "1.0:0.0", NULL, PSY_RD_TEXT,
                 PSY_RD_LONGTEXT, false )
+
+    add_bool( SOUT_CFG_PREFIX "psy", true, NULL, PSY_TEXT, PSY_LONGTEXT, false )
 
     add_string( SOUT_CFG_PREFIX "level", "5.1", NULL, LEVEL_TEXT,
                LEVEL_LONGTEXT, false )
@@ -608,6 +618,11 @@ vlc_module_begin ()
                  LOOKAHEAD_LONGTEXT, false )
         change_integer_range( 0, 60 )
 
+    add_bool( SOUT_CFG_PREFIX "intra-refresh", false, NULL, INTRAREFRESH_TEXT,
+              INTRAREFRESH_LONGTEXT, false )
+
+    add_bool( SOUT_CFG_PREFIX "mbtree", true, NULL, MBTREE_TEXT, MBTREE_LONGTEXT, false )
+
     add_bool( SOUT_CFG_PREFIX "fast-pskip", true, NULL, FAST_PSKIP_TEXT,
               FAST_PSKIP_LONGTEXT, false )
 
@@ -673,9 +688,9 @@ static const char *const ppsz_sout_options[] = {
     "pre-scenecut", "psnr", "qblur", "qp", "qcomp", "qpstep", "qpmax",
     "qpmin", "qp-max", "qp-min", "quiet", "ratetol", "ref", "scenecut",
     "sps-id", "ssim", "stats", "subme", "subpel", "tolerance", "trellis",
-    "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp", "aq-mode",
-    "aq-strength", "psy-rd", "profile", "lookahead", "slices", "slice-max-size",
-    "slice-max-mbs", NULL
+    "verbose", "vbv-bufsize", "vbv-init", "vbv-maxrate", "weightb", "weightp",
+    "aq-mode", "aq-strength", "psy-rd", "psy", "profile", "lookahead", "slices",
+    "slice-max-size", "slice-max-mbs", "intra-refresh", "mbtree", NULL
 };
 
 static block_t *Encode( encoder_t *, picture_t * );
@@ -830,6 +845,8 @@ static int  Open ( vlc_object_t *p_this )
         free( psz_val );
     }
 
+    p_sys->param.analyse.b_psy = var_GetBool( p_enc, SOUT_CFG_PREFIX "psy" );
+
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "level" );
     if( psz_val )
     {
@@ -870,6 +887,10 @@ static int  Open ( vlc_object_t *p_this )
     i_val = var_GetInteger( p_enc, SOUT_CFG_PREFIX "bframes" );
     if( i_val >= 0 && i_val <= 16 )
         p_sys->param.i_bframe = i_val;
+
+#if X264_BUILD >= 82
+    p_sys->param.b_intra_refresh = var_GetBool( p_enc, SOUT_CFG_PREFIX "intra-refresh" );
+#endif
 
 #if X264_BUILD >= 78
     psz_val = var_GetString( p_enc, SOUT_CFG_PREFIX "bpyramid" );
@@ -1149,6 +1170,8 @@ static int  Open ( vlc_object_t *p_this )
         p_sys->param.rc.b_stat_write = i_val & 1;
         p_sys->param.rc.b_stat_read = i_val & 2;
     }
+
+    p_sys->param.rc.b_mb_tree = var_GetBool( p_enc, SOUT_CFG_PREFIX "mbtree" );
 
     /* We need to initialize pthreadw32 before we open the encoder,
        but only once for the whole application. Since pthreadw32
