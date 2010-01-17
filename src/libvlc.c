@@ -450,7 +450,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( !var_InheritBool( p_libvlc, "ignore-config" ) )
             config_LoadConfigFile( p_libvlc, "main" );
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
-        priv->i_verbose = var_InherhitInteger( p_libvlc, "verbose" );
+        priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
     }
     free( psz_language );
 # endif
