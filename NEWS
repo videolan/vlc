@@ -93,6 +93,7 @@ Maemo port:
 
 Misc:
  * new sqlite module
+ * --save-config command line option not supported anymore.
 
 Removed modules:
  * csri codec. Use libass module instead.

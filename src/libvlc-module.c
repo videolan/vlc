@@ -2738,8 +2738,6 @@ vlc_module_begin ()
        "matches.")
 #define IGNORE_CONFIG_TEXT \
     N_("no configuration option will be loaded nor saved to config file")
-#define SAVE_CONFIG_TEXT \
-    N_("save the current command line options in the config")
 #define RESET_CONFIG_TEXT \
     N_("reset the current config to the default values")
 #define CONFIG_TEXT \
@@ -2779,10 +2777,7 @@ vlc_module_begin ()
     add_bool( "ignore-config", true, NULL, IGNORE_CONFIG_TEXT, "", false )
         change_internal ()
         change_unsaveable ()
-    add_bool( "save-config", false, NULL, SAVE_CONFIG_TEXT, "",
-              false )
-        change_internal ()
-        change_unsaveable ()
+    add_obsolete_bool( "save-config" )
     add_bool( "reset-config", false, NULL, RESET_CONFIG_TEXT, "", false )
         change_internal ()
         change_unsaveable ()

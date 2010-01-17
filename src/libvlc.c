@@ -520,12 +520,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
             config_SaveConfigFile( p_libvlc, NULL );
         }
-        if( var_InheritBool( p_libvlc, "save-config" ) )
-        {
-            config_LoadConfigFile( p_libvlc, NULL );
-            config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
-            config_SaveConfigFile( p_libvlc, NULL );
-        }
     }
 
     if( module_count <= 1)
