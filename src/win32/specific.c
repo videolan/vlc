@@ -153,7 +153,7 @@ void system_Configure( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv
         }
     }
 
-    if( varInheritBool( p_this, "one-instance" )
+    if( var_InheritBool( p_this, "one-instance" )
      || ( var_InheritBool( p_this, "one-instance-when-started-from-file" )
        && var_InheritBool( p_this, "started-from-file" ) ) )
     {
