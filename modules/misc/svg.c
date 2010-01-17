@@ -403,7 +403,7 @@ static void svg_RenderPicture( filter_t *p_filter,
 
     if( !p_handle )
     {
-        msg_Err( p_filter, "Error creating SVG reader: %s", error->message );
+        msg_Err( p_filter, "Error creating SVG reader" );
         return;
     }
 
