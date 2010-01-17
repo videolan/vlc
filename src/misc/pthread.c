@@ -125,7 +125,8 @@ vlc_thread_fatal (const char *action, int error,
 }
 
 # define VLC_THREAD_ASSERT( action ) \
-    if (val) vlc_thread_fatal (action, val, __func__, __FILE__, __LINE__)
+    if (unlikely(val)) \
+        vlc_thread_fatal (action, val, __func__, __FILE__, __LINE__)
 #else
 # define VLC_THREAD_ASSERT( action ) ((void)val)
 #endif
@@ -700,7 +701,7 @@ void vlc_restorecancel (int state)
     /* This should fail if an invalid value for given for state */
     VLC_THREAD_ASSERT ("restoring cancellation");
 
-    if (oldstate != PTHREAD_CANCEL_DISABLE)
+    if (unlikely(oldstate != PTHREAD_CANCEL_DISABLE))
          vlc_thread_fatal ("restoring cancellation while not disabled", EINVAL,
                            __func__, __FILE__, __LINE__);
 #else
