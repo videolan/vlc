@@ -206,6 +206,9 @@ static int Open( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     int i;
 
+    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
+        return VLC_EGENERIC;
+
     for( i = 0; ConvertTable[i].pf_convert != NULL; i++ )
     {
         if( ConvertTable[i].i_src == p_filter->fmt_in.i_codec &&
