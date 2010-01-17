@@ -327,7 +327,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         return VLC_EGENERIC;
     }
 
-    priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
+    priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
     /* Announce who we are - Do it only for first instance ? */
     msg_Dbg( p_libvlc, "%s", COPYRIGHT_MESSAGE );
     msg_Dbg( p_libvlc, "libvlc was configured with %s", CONFIGURE_LINE );
@@ -335,14 +335,14 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     msg_Dbg( p_libvlc, "translation test: code is \"%s\"", _("C") );
 
     /* Check for short help option */
-    if( config_GetInt( p_libvlc, "help" ) > 0 )
+    if( var_InheritBool( p_libvlc, "help" ) )
     {
         Help( p_libvlc, "help" );
         b_exit = true;
         i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for version option */
-    else if( config_GetInt( p_libvlc, "version" ) > 0 )
+    else if( var_InheritBool( p_libvlc, "version" ) )
     {
         Version();
         b_exit = true;
@@ -350,11 +350,11 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     /* Check for plugins cache options */
-    bool b_cache_delete = config_GetInt( p_libvlc, "reset-plugins-cache" ) > 0;
+    bool b_cache_delete = var_InheritBool( p_libvlc, "reset-plugins-cache" );
 
     /* Check for daemon mode */
 #ifndef WIN32
-    if( config_GetInt( p_libvlc, "daemon" ) > 0 )
+    if( var_InheritBool( p_libvlc, "daemon" ) )
     {
 #ifdef HAVE_DAEMON
         char *psz_pidfile = NULL;
@@ -430,10 +430,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* This ain't really nice to have to reload the config here but it seems
      * the only way to do it. */
 
-    if( !config_GetInt( p_libvlc, "ignore-config" ) )
+    if( !var_InheritBool( p_libvlc, "ignore-config" ) )
         config_LoadConfigFile( p_libvlc, "main" );
     config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
-    priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
+    priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
 
     /* Check if the user specified a custom language */
     psz_language = var_CreateGetNonEmptyString( p_libvlc, "language" );
@@ -447,10 +447,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
         module_EndBank( p_libvlc, false );
         module_InitBank( p_libvlc );
-        if( !config_GetInt( p_libvlc, "ignore-config" ) )
+        if( !var_InheritBool( p_libvlc, "ignore-config" ) )
             config_LoadConfigFile( p_libvlc, "main" );
         config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
-        priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
+        priv->i_verbose = var_InherhitInteger( p_libvlc, "verbose" );
     }
     free( psz_language );
 # endif
@@ -474,7 +474,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     msg_Dbg( p_libvlc, "module bank initialized (%zu modules)", module_count );
 
     /* Check for help on modules */
-    if( (p_tmp = var_CreateGetNonEmptyString( p_libvlc, "module" )) )
+    if( (p_tmp = var_InheritString( p_libvlc, "module" )) )
     {
         Help( p_libvlc, p_tmp );
         free( p_tmp );
@@ -482,7 +482,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for full help option */
-    else if( config_GetInt( p_libvlc, "full-help" ) > 0 )
+    else if( var_InheritBool( p_libvlc, "full-help" ) )
     {
         config_PutInt( p_libvlc, "advanced", 1);
         config_PutInt( p_libvlc, "help-verbose", 1);
@@ -491,20 +491,20 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for long help option */
-    else if( config_GetInt( p_libvlc, "longhelp" ) > 0 )
+    else if( var_InheritBool( p_libvlc, "longhelp" ) )
     {
         Help( p_libvlc, "longhelp" );
         b_exit = true;
         i_ret = VLC_EEXITSUCCESS;
     }
     /* Check for module list option */
-    else if( config_GetInt( p_libvlc, "list" ) > 0 )
+    else if( var_InheritBool( p_libvlc, "list" ) )
     {
         ListModules( p_libvlc, false );
         b_exit = true;
         i_ret = VLC_EEXITSUCCESS;
     }
-    else if( config_GetInt( p_libvlc, "list-verbose" ) > 0 )
+    else if( var_InheritBool( p_libvlc, "list-verbose" ) )
     {
         ListModules( p_libvlc, true );
         b_exit = true;
@@ -512,15 +512,15 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 
     /* Check for config file options */
-    if( !config_GetInt( p_libvlc, "ignore-config" ) )
+    if( !var_InheritBool( p_libvlc, "ignore-config" ) )
     {
-        if( config_GetInt( p_libvlc, "reset-config" ) > 0 )
+        if( var_InheritBool( p_libvlc, "reset-config" ) )
         {
             config_ResetAll( p_libvlc );
             config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
             config_SaveConfigFile( p_libvlc, NULL );
         }
-        if( config_GetInt( p_libvlc, "save-config" ) > 0 )
+        if( var_InheritBool( p_libvlc, "save-config" ) )
         {
             config_LoadConfigFile( p_libvlc, NULL );
             config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
@@ -545,7 +545,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Override default configuration with config file settings
      */
-    if( !config_GetInt( p_libvlc, "ignore-config" ) )
+    if( !var_InheritBool( p_libvlc, "ignore-config" ) )
         config_LoadConfigFile( p_libvlc, NULL );
 
     /*
@@ -563,7 +563,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank( p_libvlc, true );
         return VLC_EGENERIC;
     }
-    priv->i_verbose = config_GetInt( p_libvlc, "verbose" );
+    priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
 
     /*
      * System specific configuration
@@ -574,9 +574,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_DBUS
     dbus_threads_init_default();
 
-    if( config_GetInt( p_libvlc, "one-instance" ) > 0
-        || ( config_GetInt( p_libvlc, "one-instance-when-started-from-file" )
-             && config_GetInt( p_libvlc, "started-from-file" ) ) )
+    if( var_InheritBool( p_libvlc, "one-instance" )
+    || ( var_InheritBool( p_libvlc, "one-instance-when-started-from-file" )
+      && var_InheritBool( p_libvlc, "started-from-file" ) ) )
     {
         /* Initialise D-Bus interface, check for other instances */
         DBusConnection  *p_conn = NULL;
@@ -649,7 +649,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
                         exit( 1 );
                     }
                     b_play = TRUE;
-                    if( config_GetInt( p_libvlc, "playlist-enqueue" ) > 0 )
+                    if( var_InheritBool( p_libvlc, "playlist-enqueue" ) )
                         b_play = FALSE;
                     if ( !dbus_message_iter_append_basic( &dbus_args,
                                 DBUS_TYPE_BOOLEAN, &b_play ) )
@@ -723,7 +723,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Last chance to set the verbosity. Once we start interfaces and other
      * threads, verbosity becomes read-only. */
     var_Create( p_libvlc, "verbose", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
-    if( config_GetInt( p_libvlc, "quiet" ) > 0 )
+    if( var_InheritBool( p_libvlc, "quiet" ) )
     {
         var_SetInteger( p_libvlc, "verbose", -1 );
         priv->i_verbose = -1;
@@ -731,7 +731,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     vlc_threads_setup( p_libvlc );
 
     if( priv->b_color )
-        priv->b_color = config_GetInt( p_libvlc, "color" ) > 0;
+        priv->b_color = var_InheritBool( p_libvlc, "color" );
 
     char p_capabilities[200];
 #define PRINT_CAPABILITY( capability, string )                              \
@@ -744,23 +744,23 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     p_capabilities[0] = '\0';
 
 #if defined( __i386__ ) || defined( __x86_64__ )
-    if( !config_GetInt( p_libvlc, "mmx" ) )
+    if( !var_InheritBool( p_libvlc, "mmx" ) )
         cpu_flags &= ~CPU_CAPABILITY_MMX;
-    if( !config_GetInt( p_libvlc, "3dn" ) )
+    if( !var_InheritBool( p_libvlc, "3dn" ) )
         cpu_flags &= ~CPU_CAPABILITY_3DNOW;
-    if( !config_GetInt( p_libvlc, "mmxext" ) )
+    if( !var_InheritBool( p_libvlc, "mmxext" ) )
         cpu_flags &= ~CPU_CAPABILITY_MMXEXT;
-    if( !config_GetInt( p_libvlc, "sse" ) )
+    if( !var_InheritBool( p_libvlc, "sse" ) )
         cpu_flags &= ~CPU_CAPABILITY_SSE;
-    if( !config_GetInt( p_libvlc, "sse2" ) )
+    if( !var_InheritBool( p_libvlc, "sse2" ) )
         cpu_flags &= ~CPU_CAPABILITY_SSE2;
-    if( !config_GetInt( p_libvlc, "sse3" ) )
+    if( !var_InheritBool( p_libvlc, "sse3" ) )
         cpu_flags &= ~CPU_CAPABILITY_SSE3;
-    if( !config_GetInt( p_libvlc, "ssse3" ) )
+    if( !var_InheritBool( p_libvlc, "ssse3" ) )
         cpu_flags &= ~CPU_CAPABILITY_SSSE3;
-    if( !config_GetInt( p_libvlc, "sse41" ) )
+    if( !var_InheritBool( p_libvlc, "sse41" ) )
         cpu_flags &= ~CPU_CAPABILITY_SSE4_1;
-    if( !config_GetInt( p_libvlc, "sse42" ) )
+    if( !var_InheritBool( p_libvlc, "sse42" ) )
         cpu_flags &= ~CPU_CAPABILITY_SSE4_2;
 
     PRINT_CAPABILITY( CPU_CAPABILITY_MMX, "MMX" );
@@ -775,7 +775,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     PRINT_CAPABILITY( CPU_CAPABILITY_SSE4A,  "SSE4A" );
 
 #elif defined( __powerpc__ ) || defined( __ppc__ ) || defined( __ppc64__ )
-    if( !config_GetInt( p_libvlc, "altivec" ) )
+    if( !var_InheritBool( p_libvlc, "altivec" ) )
         cpu_flags &= ~CPU_CAPABILITY_ALTIVEC;
 
     PRINT_CAPABILITY( CPU_CAPABILITY_ALTIVEC, "AltiVec" );
@@ -800,7 +800,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Avoid being called "memcpy":*/
     vlc_object_set_name( p_libvlc, "main" );
 
-    priv->b_stats = config_GetInt( p_libvlc, "stats" ) > 0;
+    priv->b_stats = var_InheritBool( p_libvlc, "stats" );
     priv->i_timers = 0;
     priv->pp_timers = NULL;
 
@@ -906,26 +906,26 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef HAVE_DBUS
     /* loads dbus control interface if in one-instance mode
      * we do it only when playlist exists, because dbus module needs it */
-    if( config_GetInt( p_libvlc, "one-instance" ) > 0
-        || ( config_GetInt( p_libvlc, "one-instance-when-started-from-file" )
-             && config_GetInt( p_libvlc, "started-from-file" ) ) )
+    if( var_InheritBool( p_libvlc, "one-instance" )
+     || ( var_InheritBool( p_libvlc, "one-instance-when-started-from-file" )
+       && var_InheritBool( p_libvlc, "started-from-file" ) ) )
         intf_Create( p_libvlc, "dbus,none" );
 
 # if !defined (HAVE_MAEMO)
     /* Prevents the power management daemon from suspending the system
      * when VLC is active */
-    if( config_GetInt( p_libvlc, "inhibit" ) > 0 )
+    if( var_InheritBool( p_libvlc, "inhibit" ) > 0 )
         intf_Create( p_libvlc, "inhibit,none" );
 # endif
 #endif
 
-    if( (config_GetInt( p_libvlc, "file-logging" ) > 0) &&
-        !config_GetInt( p_libvlc, "syslog" ) )
+    if( var_InheritBool( p_libvlc, "file-logging" ) &&
+        !var_InheritBool( p_libvlc, "syslog" ) )
     {
         intf_Create( p_libvlc, "logger,none" );
     }
 #ifdef HAVE_SYSLOG_H
-    if( config_GetInt( p_libvlc, "syslog" ) > 0 )
+    if( var_InheritBool( p_libvlc, "syslog" ) )
     {
         char *logmode = var_CreateGetNonEmptyString( p_libvlc, "logmode" );
         var_SetString( p_libvlc, "logmode", "syslog" );
@@ -940,13 +940,13 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     }
 #endif
 
-    if( config_GetInt( p_libvlc, "network-synchronisation") > 0 )
+    if( var_InheritBool( p_libvlc, "network-synchronisation") )
     {
         intf_Create( p_libvlc, "netsync,none" );
     }
 
 #ifdef WIN32
-    if( config_GetInt( p_libvlc, "prefer-system-codecs") > 0 )
+    if( var_InheritBool( p_libvlc, "prefer-system-codecs") )
     {
         char *psz_codecs = var_CreateGetNonEmptyString( p_playlist, "codec" );
         if( psz_codecs )
@@ -1445,10 +1445,10 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
     char psz_short[4];
     int i_width = ConsoleWidth() - (PADDING_SPACES+LINE_START+1);
     int i_width_description = i_width + PADDING_SPACES - 1;
-    bool b_advanced    = config_GetInt( p_this, "advanced" ) > 0;
-    bool b_description = config_GetInt( p_this, "help-verbose" ) > 0;
+    bool b_advanced    = var_InheritBool( p_this, "advanced" );
+    bool b_description = var_InheritBool( p_this, "help-verbose" );
     bool b_description_hack;
-    bool b_color       = config_GetInt( p_this, "color" ) > 0;
+    bool b_color       = var_InheritBool( p_this, "color" );
     bool b_has_advanced = false;
     bool b_found       = false;
     int  i_only_advanced = 0; /* Number of modules ignored because they
@@ -1901,7 +1901,7 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
 {
     module_t *p_parser;
 
-    bool b_color = config_GetInt( p_this, "color" ) > 0;
+    bool b_color = var_InheritBool( p_this, "color" );
 
 #ifdef WIN32
     ShowConsole( true );
