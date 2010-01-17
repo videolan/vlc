@@ -94,6 +94,15 @@ static const GUID DXVA2_ModeH264_E = {
 static const GUID DXVA2_ModeH264_F = {
     0x1b81be69, 0xa0c7,0x11d3, {0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5}
 };
+static const GUID DXVADDI_Intel_ModeH264_A = {
+    0x604F8E64, 0x4951,0x4c54, {0x88,0xFE,0xAB,0xD2,0x5C,0x15,0xB3,0xD6}
+};
+static const GUID DXVADDI_Intel_ModeH264_C = {
+    0x604F8E66,0x4951, 0x4c54, {0x88,0xFE,0xAB,0xD2,0x5C,0x15,0xB3,0xD6}
+};
+static const GUID DXVADDI_Intel_ModeH264_E = {
+    0x604F8E68,0x4951, 0x4c54, {0x88,0xFE,0xAB,0xD2,0x5C,0x15,0xB3,0xD6}
+};
 static const GUID DXVA2_ModeWMV8_A = {
     0x1b81be80, 0xa0c7,0x11d3, {0xb9,0x84,0x00,0xc0,0x4f,0x2e,0x73,0xc5}
 };
@@ -135,12 +144,15 @@ static const dxva2_mode_t dxva2_modes[] = {
     { "DXVA2_ModeMPEG2_MoComp", &DXVA2_ModeMPEG2_MoComp,  0 },
     { "DXVA2_ModeMPEG2_IDCT",   &DXVA2_ModeMPEG2_IDCT,    0 },
 
-    { "H.264 variable-length decoder (VLD), FGT",               &DXVA2_ModeH264_F, CODEC_ID_H264 },
-    { "H.264 VLD, no FGT",                                      &DXVA2_ModeH264_E, CODEC_ID_H264 },
-    { "H.264 IDCT, FGT",                                        &DXVA2_ModeH264_D, 0,            },
-    { "H.264 inverse discrete cosine transform (IDCT), no FGT", &DXVA2_ModeH264_C, 0,            },
-    { "H.264 MoComp, FGT",                                      &DXVA2_ModeH264_B, 0,            },
-    { "H.264 motion compensation (MoComp), no FGT",             &DXVA2_ModeH264_A, 0,            },
+    { "H.264 variable-length decoder (VLD), FGT",               &DXVA2_ModeH264_F,         CODEC_ID_H264 },
+    { "H.264 VLD, no FGT",                                      &DXVA2_ModeH264_E,         CODEC_ID_H264 },
+    { "H.264 VLD, no FGT (Intel)",                              &DXVADDI_Intel_ModeH264_E, CODEC_ID_H264 },
+    { "H.264 IDCT, FGT",                                        &DXVA2_ModeH264_D,         0             },
+    { "H.264 inverse discrete cosine transform (IDCT), no FGT", &DXVA2_ModeH264_C,         0             },
+    { "H.264 inverse discrete cosine transform (IDCT), no FGT (Intel)", &DXVADDI_Intel_ModeH264_C, 0     },
+    { "H.264 MoComp, FGT",                                      &DXVA2_ModeH264_B,         0             },
+    { "H.264 motion compensation (MoComp), no FGT",             &DXVA2_ModeH264_A,         0             },
+    { "H.264 motion compensation (MoComp), no FGT (Intel)",     &DXVADDI_Intel_ModeH264_A, 0             },
 
     { "Windows Media Video 8 MoComp",           &DXVA2_ModeWMV8_B, 0 },
     { "Windows Media Video 8 post processing",  &DXVA2_ModeWMV8_A, 0 },
