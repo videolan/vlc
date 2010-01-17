@@ -85,9 +85,7 @@ static bool check_OS_capability( const char *psz_capability, pid_t pid )
 
 # else /* WIN32 */
 #  define check_capability(name, flag, code)   \
-     do {                                      \
-        i_capabilities |= (flag);              \
-     } while(0)
+        i_capabilities |= (flag);
 # endif
 #endif
 
