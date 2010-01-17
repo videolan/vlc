@@ -19,7 +19,6 @@ struct sout_stream_sys_t
 {
     VLC_COMMON_MEMBERS
 
-    sout_stream_t   *p_out;
     sout_stream_id_t *id_video;
     block_t         *p_buffers;
     vlc_mutex_t     lock_out;

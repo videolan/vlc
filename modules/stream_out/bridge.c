@@ -363,7 +363,6 @@ static int SendOut( sout_stream_t *p_stream, sout_stream_id_t *id,
 
 typedef struct in_sout_stream_sys_t
 {
-    sout_stream_t *p_out;
     vlc_mutex_t *p_lock;
     int i_id_offset;
     mtime_t i_delay;
@@ -395,8 +394,7 @@ static int OpenIn( vlc_object_t *p_this )
     if( unlikely( !p_sys ) )
         return VLC_ENOMEM;
 
-    p_sys->p_out = sout_StreamNew( p_stream->p_sout, p_stream->psz_next );
-    if( !p_sys->p_out )
+    if( !p_stream->p_next )
     {
         msg_Err( p_stream, "cannot create chain" );
         free( p_sys );
@@ -461,7 +459,6 @@ static void CloseIn( vlc_object_t * p_this )
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     in_sout_stream_sys_t *p_sys = (in_sout_stream_sys_t *)p_stream->p_sys;
 
-    sout_StreamDelete( p_sys->p_out );
     p_stream->p_sout->i_out_pace_nocontrol--;
 
     free( p_sys->psz_name );
@@ -481,7 +478,7 @@ static sout_stream_id_t * AddIn( sout_stream_t *p_stream, es_format_t *p_fmt )
     sout_stream_id_t *id = malloc( sizeof( sout_stream_id_t ) );
     if( !id ) return NULL;
 
-    id->id = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
+    id->id = p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
     if( !id->id )
     {
         free( id );
@@ -516,7 +513,7 @@ static int DelIn( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( id == p_sys->id_video ) p_sys->id_video = NULL;
     if( id == p_sys->id_audio ) p_sys->id_audio = NULL;
 
-    int ret = p_sys->p_out->pf_del( p_sys->p_out, id->id );
+    int ret = p_stream->p_next->pf_del( p_stream->p_next, id->id );
 
     free( id );
     return ret;
@@ -533,7 +530,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     /* First forward the packet for our own ES */
     if( !p_sys->b_placeholder )
-        p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
+        p_stream->p_next->pf_send( p_stream->p_next, id->id, p_buffer );
 
     /* Then check all bridged streams */
     vlc_mutex_lock( p_sys->p_lock );
@@ -570,7 +567,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
         {
             if ( p_bridge->pp_es[i]->b_empty && p_bridge->pp_es[i]->id != NULL )
             {
-                p_sys->p_out->pf_del( p_sys->p_out, p_bridge->pp_es[i]->id );
+                p_stream->p_next->pf_del( p_stream->p_next, p_bridge->pp_es[i]->id );
             }
             else
             {
@@ -584,8 +581,8 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                 p_bridge->pp_es[i]->fmt.i_id += p_sys->i_id_offset;
                 if( !p_sys->b_placeholder )
                 {
-                    p_bridge->pp_es[i]->id = p_sys->p_out->pf_add(
-                                p_sys->p_out, &p_bridge->pp_es[i]->fmt );
+                    p_bridge->pp_es[i]->id = p_stream->p_next->pf_add(
+                                p_stream->p_next, &p_bridge->pp_es[i]->fmt );
                     if ( p_bridge->pp_es[i]->id == NULL )
                     {
                         msg_Warn( p_stream, "couldn't create chain for id %d",
@@ -608,7 +605,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                   && p_bridge->pp_es[i]->i_last < i_date )
             {
                 if( !p_sys->b_placeholder )
-                    p_sys->p_out->pf_del( p_sys->p_out,
+                    p_stream->p_next->pf_del( p_stream->p_next,
                                           p_bridge->pp_es[i]->id );
                 p_bridge->pp_es[i]->fmt.i_id -= p_sys->i_id_offset;
                 p_bridge->pp_es[i]->b_changed = true;
@@ -642,7 +639,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                             ( p_bridge->pp_es[i]->fmt.i_cat == VIDEO_ES &&
                               p_bridge->pp_es[i]->p_block->i_flags & BLOCK_FLAG_TYPE_I ) )
                         {
-                            p_sys->p_out->pf_send( p_sys->p_out,
+                            p_stream->p_next->pf_send( p_stream->p_next,
                                        newid,
                                        p_bridge->pp_es[i]->p_block );
                             p_sys->i_state = placeholder_off;
@@ -654,14 +651,14 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                             break;
                         p_sys->i_last_audio = i_date;
                     default:
-                        p_sys->p_out->pf_send( p_sys->p_out,
+                        p_stream->p_next->pf_send( p_stream->p_next,
                                    newid?newid:p_bridge->pp_es[i]->id,
                                    p_bridge->pp_es[i]->p_block );
                         break;
                 }
             }
             else /* !b_placeholder */
-                p_sys->p_out->pf_send( p_sys->p_out,
+                p_stream->p_next->pf_send( p_stream->p_next,
                                        p_bridge->pp_es[i]->id,
                                        p_bridge->pp_es[i]->p_block );
         }
@@ -694,7 +691,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
                        || p_buffer->i_flags & BLOCK_FLAG_TYPE_I ) )
                   || p_sys->i_state == placeholder_on )
                 {
-                    p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
+                    p_stream->p_next->pf_send( p_stream->p_next, id->id, p_buffer );
                     p_sys->i_state = placeholder_on;
                 }
                 else
@@ -703,7 +700,7 @@ static int SendIn( sout_stream_t *p_stream, sout_stream_id_t *id,
 
             case AUDIO_ES:
                 if( p_sys->i_last_audio + p_sys->i_placeholder_delay < i_date )
-                    p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
+                    p_stream->p_next->pf_send( p_stream->p_next, id->id, p_buffer );
                 else
                     block_Release( p_buffer );
                 break;

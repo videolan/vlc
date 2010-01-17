@@ -367,8 +367,8 @@ sout_MuxGetStream
 sout_MuxNew
 sout_MuxSendBuffer
 sout_SAPMethod
-sout_StreamDelete
-sout_StreamNew
+sout_StreamChainDelete
+sout_StreamChainNew
 sout_UpdateStatistic
 __spu_Create
 spu_Destroy

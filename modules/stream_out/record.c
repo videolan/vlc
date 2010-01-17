@@ -170,7 +170,7 @@ static void Close( vlc_object_t * p_this )
     sout_stream_sys_t *p_sys = p_stream->p_sys;
 
     if( p_sys->p_out )
-        sout_StreamDelete( p_sys->p_out );
+        sout_StreamChainDelete( p_sys->p_out, p_sys->p_out );
 
     TAB_CLEAN( p_sys->i_id, p_sys->id );
     free( p_sys->psz_prefix );
@@ -327,7 +327,7 @@ static int OutputNew( sout_stream_t *p_stream,
     /* Create the output */
     msg_Dbg( p_stream, "Using record output `%s'", psz_output );
 
-    p_sys->p_out = sout_StreamNew( p_stream->p_sout, psz_output );
+    p_sys->p_out = sout_StreamChainNew( p_stream->p_sout, psz_output, NULL, NULL );
 
     if( !p_sys->p_out )
         goto error;
@@ -460,7 +460,7 @@ static void OutputStart( sout_stream_t *p_stream )
                 id->id = NULL;
             }
             if( p_sys->p_out )
-                sout_StreamDelete( p_sys->p_out );
+                sout_StreamChainDelete( p_sys->p_out, p_sys->p_out );
             p_sys->p_out = NULL;
 
             if( i_es > i_best_es )

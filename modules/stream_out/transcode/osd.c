@@ -68,7 +68,7 @@ int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
         }
 
         /* open output stream */
-        id->id = sout_StreamIdAdd( p_sys->p_out, &id->p_encoder->fmt_out );
+        id->id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
         id->b_transcode = true;
 
         if( !id->id ) goto error;
@@ -77,7 +77,7 @@ int transcode_osd_new( sout_stream_t *p_stream, sout_stream_id_t *id )
     {
         msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
                  (char*)&id->p_decoder->fmt_out.i_codec );
-        id->id = sout_StreamIdAdd( p_sys->p_out, &id->p_decoder->fmt_out );
+        id->id = sout_StreamIdAdd( p_stream->p_next, &id->p_decoder->fmt_out );
         id->b_transcode = false;
 
         if( !id->id ) goto error;

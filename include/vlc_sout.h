@@ -45,7 +45,6 @@ struct sout_instance_t
     VLC_COMMON_MEMBERS
 
     char *psz_sout;
-    char *psz_chain;
 
     /* meta data (Read only) XXX it won't be set before the first packet received */
     vlc_meta_t          *p_meta;
@@ -208,7 +207,7 @@ struct sout_stream_t
 
     char              *psz_name;
     config_chain_t        *p_cfg;
-    char              *psz_next;
+    sout_stream_t     *p_next;
 
     /* Subpicture unit */
     spu_t             *p_spu;
@@ -223,8 +222,9 @@ struct sout_stream_t
     sout_stream_sys_t *p_sys;
 };
 
-VLC_EXPORT( sout_stream_t *, sout_StreamNew, ( sout_instance_t *, char *psz_chain ) );
-VLC_EXPORT( void,            sout_StreamDelete, ( sout_stream_t * ) );
+VLC_EXPORT( void, sout_StreamChainDelete, (sout_stream_t *p_first, sout_stream_t *p_last ) );
+VLC_EXPORT( sout_stream_t *, sout_StreamChainNew, (sout_instance_t *p_sout,
+        char *psz_chain, sout_stream_t *p_next, sout_stream_t **p_last) );
 
 static inline sout_stream_id_t *sout_StreamIdAdd( sout_stream_t *s, es_format_t *fmt )
 {

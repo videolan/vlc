@@ -173,7 +173,7 @@ bool transcode_spu_add( sout_stream_t *p_stream, es_format_t *p_fmt,
         }
 
         /* open output stream */
-        id->id = sout_StreamIdAdd( p_sys->p_out, &id->p_encoder->fmt_out );
+        id->id = sout_StreamIdAdd( p_stream->p_next, &id->p_encoder->fmt_out );
         id->b_transcode = true;
 
         if( !id->id )

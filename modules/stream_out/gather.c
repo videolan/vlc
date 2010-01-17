@@ -64,8 +64,6 @@ struct sout_stream_id_t
 
 struct sout_stream_sys_t
 {
-    sout_stream_t   *p_out;
-
     int              i_id;
     sout_stream_id_t **id;
 };
@@ -82,8 +80,7 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_EGENERIC;
 
-    p_sys->p_out    = sout_StreamNew( p_stream->p_sout, p_stream->psz_next );
-    if( p_sys->p_out == NULL )
+    if( !p_stream->p_next )
     {
         free( p_sys );
         return VLC_EGENERIC;
@@ -110,13 +107,12 @@ static void Close( vlc_object_t * p_this )
     {
         sout_stream_id_t *id = p_sys->id[i];
 
-        sout_StreamIdDel( p_sys->p_out, id->id );
+        sout_StreamIdDel( p_stream->p_next, id->id );
         es_format_Clean( &id->fmt );
         free( id );
     }
     TAB_CLEAN( p_sys->i_id, p_sys->id );
 
-    sout_StreamDelete( p_sys->p_out );
     free( p_sys );
 }
 
@@ -168,7 +164,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         if( !id->b_used && id->fmt.i_cat == p_fmt->i_cat )
         {
             TAB_REMOVE( p_sys->i_id, p_sys->id, id );
-            sout_StreamIdDel( p_sys->p_out, id->id );
+            sout_StreamIdDel( p_stream->p_next, id->id );
             es_format_Clean( &id->fmt );
             free( id );
 
@@ -183,7 +179,7 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         return NULL;
     es_format_Copy( &id->fmt, p_fmt );
     id->b_used           = true;
-    id->id               = sout_StreamIdAdd( p_sys->p_out, &id->fmt );
+    id->id               = sout_StreamIdAdd( p_stream->p_next, &id->fmt );
     if( id->id == NULL )
     {
         free( id );
@@ -210,7 +206,5 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 static int Send( sout_stream_t *p_stream,
                  sout_stream_id_t *id, block_t *p_buffer )
 {
-    sout_stream_sys_t *p_sys = p_stream->p_sys;
-
-    return sout_StreamIdSend( p_sys->p_out, id->id, p_buffer );
+    return sout_StreamIdSend( p_stream->p_next, id->id, p_buffer );
 }

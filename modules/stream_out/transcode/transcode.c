@@ -258,8 +258,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys = vlc_object_create( p_this, sizeof( sout_stream_sys_t ) );
 
-    p_sys->p_out = sout_StreamNew( p_stream->p_sout, p_stream->psz_next );
-    if( !p_sys->p_out )
+    if( !p_stream->p_next )
     {
         msg_Err( p_stream, "cannot create chain" );
         vlc_object_release( p_sys );
@@ -515,8 +514,6 @@ static void Close( vlc_object_t * p_this )
     sout_stream_t       *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
 
-    sout_StreamDelete( p_sys->p_out );
-
     free( p_sys->psz_af );
 
     config_ChainDestroy( p_sys->p_audio_cfg );
@@ -596,7 +593,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     {
         msg_Dbg( p_stream, "not transcoding a stream (fcc=`%4.4s')",
                  (char*)&p_fmt->i_codec );
-        id->id = sout_StreamIdAdd( p_sys->p_out, p_fmt );
+        id->id = sout_StreamIdAdd( p_stream->p_next, p_fmt );
         id->b_transcode = false;
 
         success = id->id;
@@ -653,7 +650,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         }
     }
 
-    if( id->id ) sout_StreamIdDel( p_sys->p_out, id->id );
+    if( id->id ) sout_StreamIdDel( p_stream->p_next, id->id );
 
     if( id->p_decoder )
     {
@@ -683,7 +680,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     if( !id->b_transcode )
     {
         if( id->id )
-            return sout_StreamIdSend( p_sys->p_out, id->id, p_buffer );
+            return sout_StreamIdSend( p_stream->p_next, id->id, p_buffer );
 
         block_Release( p_buffer );
         return VLC_EGENERIC;
@@ -727,6 +724,6 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
     }
 
     if( p_out )
-        return sout_StreamIdSend( p_sys->p_out, id->id, p_out );
+        return sout_StreamIdSend( p_stream->p_next, id->id, p_out );
     return VLC_SUCCESS;
 }

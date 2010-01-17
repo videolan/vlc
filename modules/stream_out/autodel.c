@@ -68,7 +68,6 @@ struct sout_stream_id_t
 
 struct sout_stream_sys_t
 {
-    sout_stream_t   *p_out;
     sout_stream_id_t **pp_es;
     int i_es_num;
 };
@@ -83,8 +82,7 @@ static int Open( vlc_object_t *p_this )
 
     p_sys          = malloc( sizeof( sout_stream_sys_t ) );
 
-    p_sys->p_out = sout_StreamNew( p_stream->p_sout, p_stream->psz_next );
-    if( !p_sys->p_out )
+    if( !p_stream->p_next )
     {
         msg_Err( p_stream, "cannot create chain" );
         free( p_sys );
@@ -113,7 +111,6 @@ static void Close( vlc_object_t * p_this )
     sout_stream_t     *p_stream = (sout_stream_t*)p_this;
     sout_stream_sys_t *p_sys = (sout_stream_sys_t *)p_stream->p_sys;
 
-    sout_StreamDelete( p_sys->p_out );
     p_stream->p_sout->i_out_pace_nocontrol--;
 
     free( p_sys );
@@ -142,7 +139,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *p_es )
     free( p_es );
 
     if ( id != NULL )
-        return p_sys->p_out->pf_del( p_sys->p_out, id );
+        return p_stream->p_next->pf_del( p_stream->p_next, id );
     else
         return VLC_SUCCESS;
 }
@@ -157,7 +154,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *p_es,
     p_es->i_last = p_buffer->i_dts;
     if ( p_es->id == NULL && p_es->b_error != true )
     {
-        p_es->id = p_sys->p_out->pf_add( p_sys->p_out, &p_es->fmt );
+        p_es->id = p_stream->p_next->pf_add( p_stream->p_next, &p_es->fmt );
         if ( p_es->id == NULL )
         {
             p_es->b_error = true;
@@ -167,7 +164,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *p_es,
     }
 
     if ( p_es->b_error != true )
-        p_sys->p_out->pf_send( p_sys->p_out, p_es->id, p_buffer );
+        p_stream->p_next->pf_send( p_stream->p_next, p_es->id, p_buffer );
     else
         block_ChainRelease( p_buffer );
 
@@ -178,7 +175,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *p_es,
                    || p_sys->pp_es[i]->fmt.i_cat == AUDIO_ES)
               && p_sys->pp_es[i]->i_last < i_current )
         {
-            p_sys->p_out->pf_del( p_sys->p_out, p_sys->pp_es[i]->id );
+            p_stream->p_next->pf_del( p_stream->p_next, p_sys->pp_es[i]->id );
             p_sys->pp_es[i]->id = NULL;
         }
     }

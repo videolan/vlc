@@ -143,7 +143,6 @@ static const char *const ppsz_sout_options[] = {
 
 struct sout_stream_sys_t
 {
-    sout_stream_t   *p_out;
     int             i_gop;
     int             i_qscale;
     int             i_aspect;
@@ -191,8 +190,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_sys )
         return VLC_ENOMEM;
 
-    p_sys->p_out = sout_StreamNew( p_stream->p_sout, p_stream->psz_next );
-    if( !p_sys->p_out )
+    if( !p_stream->p_next )
     {
         msg_Err( p_stream, "cannot create chain" );
         free( p_sys );
@@ -305,8 +303,6 @@ static void Close( vlc_object_t * p_this )
 {
     sout_stream_t       *p_stream = (sout_stream_t *)p_this;
     sout_stream_sys_t   *p_sys = p_stream->p_sys;
-
-    sout_StreamDelete( p_sys->p_out );
 
     free( p_sys );
 }
@@ -427,7 +423,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     memcpy( &id->f_src, p_fmt, sizeof( es_format_t ) );
 
     /* open output stream */
-    id->id = p_sys->p_out->pf_add( p_sys->p_out, p_fmt );
+    id->id = p_stream->p_next->pf_add( p_stream->p_next, p_fmt );
 
     if( id->id != NULL )
         return id;
@@ -475,7 +471,7 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if ( id->id )
     {
-        p_sys->p_out->pf_del( p_sys->p_out, id->id );
+        p_stream->p_next->pf_del( p_stream->p_next, id->id );
     }
     free( id );
 
@@ -498,7 +494,7 @@ static int Send( sout_stream_t *p_stream, sout_stream_id_t *id,
 
     if ( !id->b_switcher_video && !id->b_switcher_audio )
     {
-        return p_sys->p_out->pf_send( p_sys->p_out, id->id, p_buffer );
+        return p_stream->p_next->pf_send( p_stream->p_next, id->id, p_buffer );
     }
 
     block_ChainAppend( &id->p_queued, p_buffer );
@@ -557,7 +553,7 @@ static mtime_t Process( sout_stream_t *p_stream, sout_stream_id_t *id,
     {
         /* Full forward */
         if ( p_blocks != NULL )
-            p_sys->p_out->pf_send( p_sys->p_out, id->id, p_blocks );
+            p_stream->p_next->pf_send( p_stream->p_next, id->id, p_blocks );
         return i_dts;
     }
 
@@ -594,7 +590,7 @@ static mtime_t Process( sout_stream_t *p_stream, sout_stream_id_t *id,
     }
 
     if ( p_blocks_out != NULL )
-        p_sys->p_out->pf_send( p_sys->p_out, id->id, p_blocks_out );
+        p_stream->p_next->pf_send( p_stream->p_next, id->id, p_blocks_out );
     return i_dts;
 }
 
