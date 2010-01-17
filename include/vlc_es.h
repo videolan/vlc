@@ -24,9 +24,6 @@
 #ifndef VLC_ES_H
 #define VLC_ES_H 1
 
-/* FIXME: i'm not too sure about this include but it fixes compilation of
- * video chromas -- dionoea */
-#include "vlc_common.h"
 #include <vlc_fourcc.h>
 
 /**
