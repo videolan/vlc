@@ -396,17 +396,24 @@ void vlc_sem_init (vlc_sem_t *sem, unsigned value)
  */
 void vlc_sem_destroy (vlc_sem_t *sem)
 {
-    int val = sem_destroy (sem);
+    if (likely(sem_destroy (sem) == 0))
+        return;
+
+    int val = errno;
     VLC_THREAD_ASSERT ("destroying semaphore");
 }
 
 /**
  * Increments the value of a semaphore.
+ * @return 0 on success, EOVERFLOW in case of integer overflow
  */
 int vlc_sem_post (vlc_sem_t *sem)
 {
-    int val = sem_post (sem);
-    if (val != EOVERFLOW)
+    if (likely(sem_post (sem) == 0))
+        return 0;
+
+    int val = errno;
+    if (unlikely(val != EOVERFLOW))
         VLC_THREAD_ASSERT ("unlocking semaphore");
     return val;
 }
@@ -418,9 +425,12 @@ int vlc_sem_post (vlc_sem_t *sem)
 void vlc_sem_wait (vlc_sem_t *sem)
 {
     int val;
+
     do
-        val = sem_wait (sem);
-    while (val == EINTR);
+        if (likely(sem_wait (sem) == 0))
+            return;
+    while ((val = errno) == EINTR);
+
     VLC_THREAD_ASSERT ("locking semaphore");
 }
 
