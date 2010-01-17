@@ -42,6 +42,7 @@
 #include <QLabel>
 #include <QMenu>
 #include <QSignalMapper>
+#include <QWheelEvent>
 
 #include <assert.h>
 
@@ -353,4 +354,10 @@ bool StandardPLPanel::eventFilter( QObject *obj, QEvent *event )
             return false;
     }
     return true;
+}
+
+void StandardPLPanel::wheelEvent( QWheelEvent *e )
+{
+    // Accept this event in order to prevent unwanted volume up/down changes
+    e->accept();
 }

@@ -43,6 +43,7 @@ class QListView;
 class PLModel;
 class QPushButton;
 class QKeyEvent;
+class QWheelEvent;
 
 class StandardPLPanel: public QWidget
 {
@@ -56,6 +57,7 @@ protected:
     friend class PlaylistWidget;
 
     virtual void keyPressEvent( QKeyEvent *e );
+    virtual void wheelEvent( QWheelEvent *e );
 
     bool eventFilter(QObject *obj, QEvent *event);
 
