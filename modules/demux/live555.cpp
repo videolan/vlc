@@ -597,7 +597,7 @@ describe:
         if( b_firstpass )
         {   /* describeURL always returns an "RTSP/1.0 401 Unauthorized" the
              * first time. This is a workaround to avoid asking for a
-             * user/passwd the first time the code passess here. */
+             * user/passwd the first time the code passes here. */
             i_code = 0;
             b_firstpass = false;
         }
