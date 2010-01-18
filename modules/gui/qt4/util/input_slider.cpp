@@ -62,7 +62,7 @@ InputSlider::InputSlider( Qt::Orientation q, QWidget *_parent ) :
     CONNECT( timer, timeout(), this, seekTick() );
 }
 
-void InputSlider::setPosition( float pos, int a, int b )
+void InputSlider::setPosition( float pos, int64_t a, int b )
 {
     if( pos == -1.0 )
     {

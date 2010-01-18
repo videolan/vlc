@@ -601,11 +601,11 @@ TimeLabel::TimeLabel( intf_thread_t *_p_intf  ) :QLabel(), p_intf( _p_intf )
 
    CONNECT( THEMIM->getIM(), cachingChanged( float ),
             this, setCaching( float ) );
-   CONNECT( THEMIM->getIM(), positionUpdated( float, int, int ),
-             this, setDisplayPosition( float, int, int ) );
+   CONNECT( THEMIM->getIM(), positionUpdated( float, int64_t, int ),
+             this, setDisplayPosition( float, int64_t, int ) );
 }
 
-void TimeLabel::setDisplayPosition( float pos, int time, int length )
+void TimeLabel::setDisplayPosition( float pos, int64_t t, int length )
 {
     if( pos == -1.f )
     {
@@ -613,6 +613,7 @@ void TimeLabel::setDisplayPosition( float pos, int time, int length )
         return;
     }
 
+    int time = t / 1000000;
     char psz_length[MSTRTIME_MAX_SIZE], psz_time[MSTRTIME_MAX_SIZE];
     secstotimestr( psz_length, length );
     secstotimestr( psz_time, ( b_remainingTime && length ) ? length - time

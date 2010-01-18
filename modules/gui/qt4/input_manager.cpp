@@ -373,10 +373,11 @@ static int VbiEvent( vlc_object_t *, const char *,
 void InputManager::UpdatePosition()
 {
     /* Update position */
-    int i_length, i_time; /* Int is enough, since we store seconds */
+    int i_length;
+    int64_t i_time;
     float f_pos;
     i_length = var_GetTime(  p_input , "length" ) / 1000000;
-    i_time = var_GetTime(  p_input , "time") / 1000000;
+    i_time = var_GetTime(  p_input , "time");
     f_pos = var_GetFloat(  p_input , "position" );
     emit positionUpdated( f_pos, i_time, i_length );
 }
@@ -861,26 +862,25 @@ void InputManager::setAtoB()
     {
         timeB = var_GetTime( THEMIM->getInput(), "time"  );
         var_SetTime( THEMIM->getInput(), "time" , timeA );
-        CONNECT( this, positionUpdated( float, int, int ),
-                 this, AtoBLoop( float, int, int ) );
+        CONNECT( this, positionUpdated( float, int64_t, int ),
+                 this, AtoBLoop( float, int64_t, int ) );
     }
     else
     {
         timeA = 0;
         timeB = 0;
-        disconnect( this, SIGNAL( positionUpdated( float, int, int ) ),
-                    this, SLOT( AtoBLoop( float, int, int ) ) );
+        disconnect( this, SIGNAL( positionUpdated( float, int64_t, int ) ),
+                    this, SLOT( AtoBLoop( float, int64_t, int ) ) );
     }
     emit AtoBchanged( (timeA != 0 ), (timeB != 0 ) );
 }
 
 /* Function called regularly when in an AtoB loop */
-void InputManager::AtoBLoop( float, int i_time, int )
+void InputManager::AtoBLoop( float, int64_t i_time, int )
 {
     if( timeB )
     {
-        if( ( i_time >= (int)( timeB/1000000 ) )
-            || ( i_time < (int)( timeA/1000000 ) ) )
+        if( i_time >= timeB || i_time < timeA )
             var_SetTime( THEMIM->getInput(), "time" , timeA );
     }
 }

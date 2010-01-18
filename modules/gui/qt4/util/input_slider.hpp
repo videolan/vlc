@@ -54,7 +54,7 @@ private:
     QTimer *timer;
 
 public slots:
-    void setPosition( float, int, int );
+    void setPosition( float, int64_t, int );
 private slots:
     void userDrag( int );
     void seekTick();

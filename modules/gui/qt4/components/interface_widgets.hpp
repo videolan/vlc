@@ -144,7 +144,7 @@ private:
 signals:
     void timeLabelDoubleClicked();
 private slots:
-    void setDisplayPosition( float pos, int time, int length );
+    void setDisplayPosition( float pos, int64_t time, int length );
     void setCaching( float );
 };
 

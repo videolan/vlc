@@ -194,11 +194,11 @@ public slots:
 
 private slots:
     void togglePlayPause();
-    void AtoBLoop( float, int, int );
+    void AtoBLoop( float, int64_t, int );
 
 signals:
     /// Send new position, new time and new length
-    void positionUpdated( float , int, int );
+    void positionUpdated( float , int64_t, int );
     void rateChanged( int );
     void nameChanged( const QString& );
     /// Used to signal whether we should show navigation buttons
