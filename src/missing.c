@@ -313,12 +313,14 @@ announce_method_t *sout_SAPMethod (void)
     return NULL;
 }
 
-void sout_StreamDelete (sout_stream_t *stream)
+void sout_StreamChainDelete (sout_stream_t *p_first, sout_stream_t *p_last)
 {
     assert (0);
 }
 
-sout_stream_t *sout_StreamNew (sout_instance_t *instance, char *chain)
+sout_stream_t *sout_StreamChainNew (sout_instance_t *p_sout, char *psz_chain,
+                                    sout_stream_t *p_next,
+                                    sout_stream_t **pp_last)
 {
     assert (0);
 }
