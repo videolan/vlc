@@ -785,7 +785,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     p_capabilities[sizeof(p_capabilities) - 1] = '\0';
 #endif
 
-    msg_Dbg( p_libvlc, "CPU has capabilities %s", p_capabilities );
+    if (p_capabilities[0])
+        msg_Dbg( p_libvlc, "CPU has capabilities %s", p_capabilities );
 
     /*
      * Choose the best memcpy module
