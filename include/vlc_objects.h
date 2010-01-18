@@ -45,8 +45,6 @@
 #define FIND_CHILD          0x0002
 #define FIND_ANYWHERE       0x0003
 
-#define FIND_STRICT         0x0010
-
 /* Object flags */
 #define OBJECT_FLAGS_NODBG       0x0001
 #define OBJECT_FLAGS_QUIET       0x0002

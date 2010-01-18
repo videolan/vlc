@@ -442,17 +442,15 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     vlc_object_t *p_found;
 
     /* If we are of the requested type ourselves, don't look further */
-    if( !(i_mode & FIND_STRICT)
-     && vlc_internals (p_this)->i_object_type == i_type )
+    if( vlc_internals (p_this)->i_object_type == i_type )
     {
         vlc_object_hold( p_this );
         return p_this;
     }
 
     /* Otherwise, recursively look for the object */
-    if ((i_mode & 0x000f) == FIND_ANYWHERE)
-        return vlc_object_find (p_this->p_libvlc, i_type,
-                                (i_mode & ~0x000f)|FIND_CHILD);
+    if (i_mode == FIND_ANYWHERE)
+        return vlc_object_find (p_this->p_libvlc, i_type, FIND_CHILD);
 
     libvlc_lock (p_this->p_libvlc);
     p_found = FindObject( p_this, i_type, i_mode );
@@ -498,7 +496,7 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
      * Use a libvlc address variable instead for that sort of things! */
     msg_Warn( p_this, "%s(%s) is not safe!", __func__, psz_name );
     /* If have the requested name ourselves, don't look further */
-    if( !(i_mode & FIND_STRICT) && !objnamecmp(p_this, psz_name) )
+    if( !objnamecmp(p_this, psz_name) )
     {
         vlc_object_hold( p_this );
         return p_this;
@@ -507,7 +505,7 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
     libvlc_lock (p_this->p_libvlc);
 
     /* Otherwise, recursively look for the object */
-    if( (i_mode & 0x000f) == FIND_ANYWHERE )
+    if( i_mode == FIND_ANYWHERE )
     {
         vlc_object_t *p_root = p_this;
 
@@ -518,12 +516,11 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
             p_root = p_root->p_parent;
         }
 
-        p_found = FindObjectName( p_root, psz_name,
-                                 (i_mode & ~0x000f)|FIND_CHILD );
+        p_found = FindObjectName( p_root, psz_name, FIND_CHILD );
         if( p_found == NULL && p_root != VLC_OBJECT( p_this->p_libvlc ) )
         {
             p_found = FindObjectName( VLC_OBJECT( p_this->p_libvlc ),
-                                      psz_name, (i_mode & ~0x000f)|FIND_CHILD );
+                                      psz_name, FIND_CHILD );
         }
     }
     else
@@ -708,7 +705,7 @@ vlc_list_t * vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
     int i_count = 0;
 
     /* Look for the objects */
-    switch( i_mode & 0x000f )
+    switch( i_mode )
     {
     case FIND_ANYWHERE:
         return vlc_list_find (VLC_OBJECT(p_this->p_libvlc), i_type, FIND_CHILD);
@@ -915,7 +912,7 @@ static vlc_object_t * FindObject( vlc_object_t *p_this, int i_type, int i_mode )
     int i;
     vlc_object_t *p_tmp;
 
-    switch( i_mode & 0x000f )
+    switch( i_mode )
     {
     case FIND_PARENT:
         p_tmp = p_this->p_parent;
@@ -968,7 +965,7 @@ static vlc_object_t * FindObjectName( vlc_object_t *p_this,
     int i;
     vlc_object_t *p_tmp;
 
-    switch( i_mode & 0x000f )
+    switch( i_mode )
     {
     case FIND_PARENT:
         p_tmp = p_this->p_parent;
