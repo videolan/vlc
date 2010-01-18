@@ -154,14 +154,17 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_player_t *p_mi,
  *
  * Function will lock the media_player.
  */
-static void set_state( libvlc_media_player_t *p_mi, libvlc_state_t state )
-{    
-    lock(p_mi);
+static void set_state( libvlc_media_player_t *p_mi, libvlc_state_t state,
+    bool b_locked )
+{
+    if(!b_locked)
+        lock(p_mi);
     p_mi->state = state;
     libvlc_media_t *media = p_mi->p_md;
     if (media)
         libvlc_media_retain(media);
-    unlock(p_mi);
+    if(!b_locked)
+        unlock(p_mi);
 
 
     if (media) {
@@ -256,7 +259,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
                 return VLC_SUCCESS;
         }
         
-        set_state( p_mi, libvlc_state );
+        set_state( p_mi, libvlc_state, false );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_ABORT )
@@ -264,7 +267,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
         libvlc_state_t libvlc_state = libvlc_Stopped;
         event.type = libvlc_MediaPlayerStopped;
 
-        set_state( p_mi, libvlc_state );
+        set_state( p_mi, libvlc_state, false );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
     else if( newval.i_int == INPUT_EVENT_POSITION )
@@ -507,11 +510,8 @@ void libvlc_media_player_set_media(
                           p_mi->p_input_thread &&
                           !p_mi->p_input_thread->b_eof &&
                           !p_mi->p_input_thread->b_error );
-    unlock(p_mi);
 
-    set_state( p_mi, libvlc_NothingSpecial );
-
-    lock(p_mi);
+    set_state( p_mi, libvlc_NothingSpecial, true );
 
     libvlc_media_release( p_mi->p_md );
 
@@ -698,7 +698,7 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
      * state. */
     if( state != libvlc_Stopped )
     {
-        set_state( p_mi, libvlc_Stopped );
+        set_state( p_mi, libvlc_Stopped, false );
 
         /* Construct and send the event */
         libvlc_event_t event;
