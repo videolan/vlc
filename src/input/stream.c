@@ -960,16 +960,17 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
     {
         do
         {
-            /* Read and skip enough data */
-            if( AStreamRefillBlock( s ) )
-                return VLC_EGENERIC;
-
             while( p_sys->block.p_current &&
-                   p_sys->i_pos + p_sys->block.p_current->i_buffer - p_sys->block.i_offset < i_pos )
+                   p_sys->i_pos + p_sys->block.p_current->i_buffer - p_sys->block.i_offset <= i_pos )
             {
                 p_sys->i_pos += p_sys->block.p_current->i_buffer - p_sys->block.i_offset;
                 p_sys->block.p_current = p_sys->block.p_current->p_next;
                 p_sys->block.i_offset = 0;
+            }
+            if( !p_sys->block.p_current && AStreamRefillBlock( s ) )
+            {
+                if( p_sys->i_pos != i_pos )
+                    return VLC_EGENERIC;
             }
         }
         while( p_sys->block.i_start + p_sys->block.i_size < i_pos );
