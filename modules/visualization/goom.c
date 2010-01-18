@@ -408,35 +408,30 @@ static void Close( vlc_object_t *p_this )
 
 static char *TitleGet( vlc_object_t *p_this )
 {
-    char *psz_title = NULL;
-    input_thread_t *p_input =
-        vlc_object_find( p_this, VLC_OBJECT_INPUT, FIND_ANYWHERE );
+    playlist_t *pl = pl_Hold( p_this );
+    if( !pl )
+        return NULL;
 
-    if( p_input )
+    input_thread_t *p_input = playlist_CurrentInput( pl );
+    pl_Release( p_this );
+    if( !p_input )
+        return NULL;
+
+    char *psz_title = input_item_GetTitle( input_GetItem( p_input ) );
+    if( EMPTY_STR( psz_title ) )
     {
-        psz_title = input_item_GetTitle( input_GetItem( p_input ) );
-        if( EMPTY_STR( psz_title ) )
+        free( psz_title );
+
+        char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
+        const char *psz = strrchr( psz_orig, '/' );
+        if( psz )
         {
-            free( psz_title );
-            char *psz_orig = input_item_GetURI( input_GetItem( p_input ) );
-            char *psz = strrchr( psz_orig, '/' );
-
-            if( psz )
-            {
-                psz++;
-            }
-            else
-            {
-                psz = psz_orig;
-            }
-            if( psz && *psz )
-            {
-                psz_title = strdup( psz );
-            }
-            free( psz_orig );
+            psz_title = strdup( psz + 1 );
+            free( psz_uri );
         }
-        vlc_object_release( p_input );
+        else
+            psz_title = psz_uri;
     }
-
+    vlc_object_release( p_input );
     return psz_title;
 }
