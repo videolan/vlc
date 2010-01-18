@@ -36,6 +36,7 @@
 #include <vlc_block.h>
 #include <vlc_input.h>
 #include <vlc_filter.h>
+#include <vlc_playlist.h>
 
 #ifdef USE_GOOM_TREE
 #   ifdef OLD_GOOM
@@ -423,7 +424,7 @@ static char *TitleGet( vlc_object_t *p_this )
         free( psz_title );
 
         char *psz_uri = input_item_GetURI( input_GetItem( p_input ) );
-        const char *psz = strrchr( psz_orig, '/' );
+        const char *psz = strrchr( psz_uri, '/' );
         if( psz )
         {
             psz_title = strdup( psz + 1 );
