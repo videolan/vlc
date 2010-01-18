@@ -291,6 +291,10 @@ static int Demux( demux_t *p_demux )
 
         psz_parse = strcasestr( psz_parse, ">" );
 
+        /* counter for single ad item */
+        input_item_t *uniq_entry_ad_backup = NULL;
+        int i_inserted_entries = 0;
+
         while( psz_parse && ( psz_parse = strcasestr( psz_parse, "<" ) ) )
         {
             if( !strncasecmp( psz_parse, "<!--", 4 ) )
@@ -500,11 +504,10 @@ static int Demux( demux_t *p_demux )
                     msg_Err( p_demux, "entry without href?" );
                     continue;
                 }
-
-                if( p_sys->b_skip_ads && b_skip_entry )
+                /* An skip entry is an ad only if other entries exist without skip */
+                if( p_sys->b_skip_ads && b_skip_entry && i_inserted_entries != 0 )
                 {
                     char *psz_current_input_name = input_item_GetName( p_current_input );
-
                     msg_Dbg( p_demux, "skipped entry %d %s (%s)",
                              i_entry_count,
                              ( psz_title_entry ? psz_title_entry : psz_current_input_name ), psz_href );
@@ -552,8 +555,23 @@ static int Demux( demux_t *p_demux )
                         if( psz_copyright_entry ) input_item_SetCopyright( p_entry, psz_copyright_entry );
                         if( psz_moreinfo_entry ) input_item_SetURL( p_entry, psz_moreinfo_entry );
                         if( psz_abstract_entry ) input_item_SetDescription( p_entry, psz_abstract_entry );
-                        input_item_AddSubItem( p_current_input, p_entry );
-                        vlc_gc_decref( p_entry );
+
+                        i_inserted_entries++;
+                        if( p_sys->b_skip_ads && b_skip_entry )
+                        {
+                            // We put the entry as a backup for unique ad case
+                            uniq_entry_ad_backup = p_entry;
+                        }
+                        else
+                        {
+                            if( uniq_entry_ad_backup != NULL )
+                            {
+                                uniq_entry_ad_backup = NULL;
+                                vlc_gc_decref( uniq_entry_ad_backup );
+                            }
+                            input_item_AddSubItem( p_current_input, p_entry );
+                            vlc_gc_decref( p_entry );
+                        }
                     }
                     free( psz_current_input_name );
                 }
@@ -726,6 +744,13 @@ static int Demux( demux_t *p_demux )
                 psz_parse++;
             }
             else psz_parse++;
+        }
+        if ( uniq_entry_ad_backup != NULL )
+        {
+            msg_Dbg( p_demux, "added unique entry even if ad");
+            /* If ASX contains a unique entry, we add it, it is probably not an ad */
+            input_item_AddSubItem( p_current_input, uniq_entry_ad_backup );
+            vlc_gc_decref( uniq_entry_ad_backup);
         }
 #if 0
 /* FIXME Unsupported elements */
