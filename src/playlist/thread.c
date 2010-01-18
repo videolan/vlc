@@ -109,8 +109,8 @@ void playlist_Deactivate( playlist_t *p_playlist )
         input_resource_Delete( p_sys->p_input_resource );
     p_sys->p_input_resource = NULL;
 
-    /* */
-    playlist_MLDump( p_playlist );
+    if( var_InheritBool( p_playlist, "media-library" ) )
+        playlist_MLDump( p_playlist );
 
     PL_LOCK;
 

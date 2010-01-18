@@ -97,12 +97,12 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->b_reset_currently_playing = true;
     pl_priv(p_playlist)->last_rebuild_date = 0;
 
-    pl_priv(p_playlist)->b_tree = var_CreateGetBool( p_playlist, "playlist-tree" );
+    pl_priv(p_playlist)->b_tree = var_InheritBool( p_parent, "playlist-tree" );
 
     pl_priv(p_playlist)->b_doing_ml = false;
 
-    const bool b_auto_preparse = var_CreateGetBool( p_playlist, "auto-preparse" );
-    pl_priv(p_playlist)->b_auto_preparse = b_auto_preparse;
+    pl_priv(p_playlist)->b_auto_preparse =
+        var_InheritBool( p_parent, "auto-preparse" );
 
     PL_LOCK; /* playlist_NodeCreate will check for it */
     p_playlist->p_root_category = playlist_NodeCreate( p_playlist, NULL, NULL,
@@ -129,7 +129,8 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         !p_playlist->p_local_onelevel->p_input )
         return NULL;
 
-    if( config_GetInt( p_playlist, "media-library") )
+    const bool b_ml = var_InheritBool( p_parent, "media-library");
+    if( b_ml )
     {
         PL_LOCK; /* playlist_NodesPairCreate will check for it */
         playlist_NodesPairCreate( p_playlist, _( "Media Library" ),
@@ -154,9 +155,13 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->request.b_request = false;
     pl_priv(p_playlist)->status.i_status = PLAYLIST_STOPPED;
 
-    pl_priv(p_playlist)->b_auto_preparse = false;
-    playlist_MLLoad( p_playlist );
-    pl_priv(p_playlist)->b_auto_preparse = b_auto_preparse;
+    if(b_ml)
+    {
+        const bool b_auto_preparse = pl_priv(p_playlist)->b_auto_preparse;
+        pl_priv(p_playlist)->b_auto_preparse = false;
+        playlist_MLLoad( p_playlist );
+        pl_priv(p_playlist)->b_auto_preparse = b_auto_preparse;
+    }
 
     vlc_object_set_destructor( p_playlist, playlist_Destructor );
 
