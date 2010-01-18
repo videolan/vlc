@@ -312,6 +312,8 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     if( p_input == NULL )
         return NULL;
 
+    vlc_object_attach( p_input, p_parent );
+
     /* Construct a nice name for the input timer */
     char psz_timer_name[255];
     char * psz_name = input_item_GetName( p_item );
@@ -477,9 +479,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
 
     /* Set the destructor when we are sure we are initialized */
     vlc_object_set_destructor( p_input, (vlc_destructor_t)Destructor );
-
-    /* Attach only once we are ready */
-    vlc_object_attach( p_input, p_parent );
 
     return p_input;
 }
