@@ -198,28 +198,34 @@ static void test_media_list_player_previous(const char** argv, int argc)
     libvlc_media_list_player_play_item (mlp, md, &ex);
     catch ();
 
-    libvlc_media_release (md);
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
-    msleep(100000);
+    libvlc_media_release (md);
 
     libvlc_media_list_player_previous (mlp, &ex);
     catch ();
+
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
     libvlc_media_list_player_pause (mlp, &ex);
     catch();
 
-    msleep(100000);
-
     libvlc_media_list_player_previous (mlp, &ex);
     catch ();
+
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
     libvlc_media_list_player_stop (mlp, &ex);
     catch ();
 
-    msleep(100000);
-
     libvlc_media_list_player_previous (mlp, &ex);
     catch ();
+
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
     libvlc_media_list_player_stop (mlp, &ex);
     catch ();
@@ -270,26 +276,32 @@ static void test_media_list_player_next(const char** argv, int argc)
 
     libvlc_media_release (md);
 
-    msleep(100000);
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
     libvlc_media_list_player_next (mlp, &ex);
     catch ();
+
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
     libvlc_media_list_player_pause (mlp, &ex);
     catch();
 
-    msleep(100000);
-
     libvlc_media_list_player_next (mlp, &ex);
     catch ();
+
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
     libvlc_media_list_player_stop (mlp, &ex);
     catch ();
 
-    msleep(100000);
-
     libvlc_media_list_player_next (mlp, &ex);
     catch ();
+
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
     libvlc_media_list_player_stop (mlp, &ex);
     catch ();
@@ -331,6 +343,9 @@ static void test_media_list_player_pause_stop(const char** argv, int argc)
 
     libvlc_media_list_player_play_item( mlp, md, &ex );
     catch ();
+
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
     libvlc_media_list_player_pause (mlp, &ex);
     catch();
@@ -380,6 +395,9 @@ static void test_media_list_player_play_item_at_index(const char** argv, int arg
 
     libvlc_media_list_player_play_item_at_index( mlp, 0, &ex );
     catch ();
+
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
     libvlc_media_list_player_stop (mlp, &ex);
     catch ();
@@ -513,6 +531,9 @@ static void test_media_list_player_playback_options (const char** argv, int argc
     libvlc_media_list_player_play_item (mlp, md, &ex);
     catch ();
 
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
+
     libvlc_media_release (md);
     catch ();
     libvlc_media_release (md2);
@@ -523,8 +544,6 @@ static void test_media_list_player_playback_options (const char** argv, int argc
     catch ();
     libvlc_media_release (md5);
     catch ();
-
-    msleep(500000);
 
     libvlc_media_list_player_stop (mlp, &ex);
     catch ();
@@ -537,7 +556,8 @@ static void test_media_list_player_playback_options (const char** argv, int argc
     libvlc_media_list_player_play_item (mlp, md, &ex);
     catch ();
 
-    msleep(500000);
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
     libvlc_media_list_player_stop (mlp, &ex);
     catch ();
@@ -550,7 +570,8 @@ static void test_media_list_player_playback_options (const char** argv, int argc
     libvlc_media_list_player_play_item (mlp, md, &ex);
     catch ();
 
-    msleep(500000);
+    while (!libvlc_media_list_player_is_playing (mlp, &ex))
+        catch() ;
 
     libvlc_media_list_player_stop (mlp, &ex);
     catch ();
