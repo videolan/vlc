@@ -2174,7 +2174,7 @@ static aout_buffer_t *aout_new_buffer( decoder_t *p_dec, int i_samples )
 
     if( p_owner->p_aout_input == NULL )
     {
-        const int i_force_dolby = config_GetInt( p_dec, "force-dolby-surround" );
+        const int i_force_dolby = var_InheritInteger( p_dec, "force-dolby-surround" );
         audio_sample_format_t format;
         aout_input_t *p_aout_input;
         aout_instance_t *p_aout;

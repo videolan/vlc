@@ -117,7 +117,7 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 
 #if defined( LIBVLC_USE_PTHREAD )
 # ifndef __APPLE__
-    if( config_GetInt( p_this, "rt-priority" ) > 0 )
+    if( var_InheritBool( p_this, "rt-priority" ) )
 # endif
     {
         int i_error, i_policy;
@@ -125,7 +125,7 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
 
         memset( &param, 0, sizeof(struct sched_param) );
         if( config_GetType( p_this, "rt-offset" ) )
-            i_priority += config_GetInt( p_this, "rt-offset" );
+            i_priority += var_InheritInteger( p_this, "rt-offset" );
         if( i_priority <= 0 )
         {
             param.sched_priority = (-1) * i_priority;

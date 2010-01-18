@@ -166,8 +166,8 @@ decoder_synchro_t * decoder_SynchroInit( decoder_t *p_dec, int i_frame_rate )
         return NULL;
 
     p_synchro->p_dec = p_dec;
-    p_synchro->b_no_skip = !config_GetInt( p_dec, "skip-frames" );
-    p_synchro->b_quiet = config_GetInt( p_dec, "quiet-synchro" );
+    p_synchro->b_no_skip = !var_InheritBool( p_dec, "skip-frames" );
+    p_synchro->b_quiet = var_InheritBool( p_dec, "quiet-synchro" );
 
     /* We use a fake stream pattern, which is often right. */
     p_synchro->i_n_p = p_synchro->i_eta_p = DEFAULT_NB_P;

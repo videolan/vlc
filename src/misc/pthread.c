@@ -534,10 +534,10 @@ void vlc_threads_setup (libvlc_int_t *p_libvlc)
     if (!initialized)
     {
 #ifndef __APPLE__
-        if (config_GetInt (p_libvlc, "rt-priority"))
+        if (var_InheritBool (p_libvlc, "rt-priority"))
 #endif
         {
-            rt_offset = config_GetInt (p_libvlc, "rt-offset");
+            rt_offset = var_InheritInteger (p_libvlc, "rt-offset");
             rt_priorities = true;
         }
         initialized = true;

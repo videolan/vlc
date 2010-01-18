@@ -90,7 +90,7 @@ sout_instance_t *__sout_NewInstance( vlc_object_t *p_parent, const char *psz_des
     else
     {
         psz_chain = sout_stream_url_to_chain(
-            config_GetInt(p_parent, "sout-display") > 0, psz_dest );
+            var_InheritBool(p_parent, "sout-display"), psz_dest );
     }
     if(!psz_chain)
         return NULL;

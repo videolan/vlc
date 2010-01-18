@@ -390,9 +390,12 @@ void __osd_MenuActivate( vlc_object_t *p_this )
                 p_button->p_current_state->p_pic );
         osd_SetMenuUpdate( p_osd, true );
         osd_SetMenuVisible( p_osd, true );
-        osd_SetKeyPressed( VLC_OBJECT(p_osd->p_libvlc), config_GetInt( p_osd, p_button->psz_action ) );
+        osd_SetKeyPressed( VLC_OBJECT(p_osd->p_libvlc),
+                           var_InheritInteger( p_osd, p_button->psz_action ) );
 #if defined(OSD_MENU_DEBUG)
-        msg_Dbg( p_osd, "select (%d, %s)", config_GetInt( p_osd, p_button->psz_action ), p_button->psz_action );
+        msg_Dbg( p_osd, "select (%d, %s)",
+                 var_InheritInteger( p_osd, p_button->psz_action ),
+                 p_button->psz_action );
 #endif
     }
     vlc_mutex_unlock( p_lock );
@@ -536,7 +539,8 @@ void __osd_MenuUp( vlc_object_t *p_this )
             */
         if( p_button->b_range )
         {
-            osd_SetKeyPressed( VLC_OBJECT(p_osd->p_libvlc), config_GetInt(p_osd, p_button->psz_action) );
+            osd_SetKeyPressed( VLC_OBJECT(p_osd->p_libvlc),
+                               var_InheritInteger(p_osd, p_button->psz_action) );
 #if defined(OSD_MENU_DEBUG)
             msg_Dbg( p_osd, "select (%d, %s)", val.i_int, p_button->psz_action );
 #endif
@@ -601,7 +605,8 @@ void __osd_MenuDown( vlc_object_t *p_this )
          */
         if( p_button->b_range )
         {
-            osd_SetKeyPressed( VLC_OBJECT(p_osd->p_libvlc), config_GetInt(p_osd, p_button->psz_action_down) );
+            osd_SetKeyPressed( VLC_OBJECT(p_osd->p_libvlc),
+                               var_InheritInteger(p_osd, p_button->psz_action_down) );
 #if defined(OSD_MENU_DEBUG)
             msg_Dbg( p_osd, "select (%d, %s)", val.i_int, p_button->psz_action_down );
 #endif

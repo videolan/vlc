@@ -85,7 +85,7 @@ int vlc_InitActions (libvlc_int_t *libvlc)
     for (size_t i = 0; i < libvlc_actions_count; i++)
     {
         keys[i].psz_action = libvlc_actions[i].name;
-        keys[i].i_key = config_GetInt (libvlc, libvlc_actions[i].name );
+        keys[i].i_key = var_InheritInteger (libvlc, libvlc_actions[i].name );
         keys[i].i_action = libvlc_actions[i].value;
 #ifndef NDEBUG
         if (i > 0

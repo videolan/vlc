@@ -43,7 +43,7 @@ int aout_OutputNew( aout_instance_t * p_aout,
                     audio_sample_format_t * p_format )
 {
     /* Retrieve user defaults. */
-    int i_rate = config_GetInt( p_aout, "aout-rate" );
+    int i_rate = var_InheritInteger( p_aout, "aout-rate" );
     vlc_value_t val, text;
     /* kludge to avoid a fpu error when rate is 0... */
     if( i_rate == 0 ) i_rate = -1;
