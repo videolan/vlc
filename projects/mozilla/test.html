@@ -1,4 +1,4 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+F<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <TITLE>VLC Plugin test page</TITLE>
 <STYLE>
@@ -211,7 +211,7 @@ Insert Slider widget
 </TD>
 </TR>
 <TR>
-<TD>Marquee:
+<TD>Marquee video filter:
     <INPUT type=button value="Enable" onClick='getVLC("vlc").video.marquee.enable();'>
     <INPUT type=button value="Disable" onClick='getVLC("vlc").video.marquee.disable();'>
     <INPUT size=4 value="" id="marqueeIntValue">
@@ -228,6 +228,24 @@ Insert Slider widget
     </SELECT>
 </TD>
 </TR>
+<TR>
+<TD>Logo video filter:
+    <INPUT type=button value="Enable" onClick='getVLC("vlc").video.logo.enable();'>
+    <INPUT type=button value="Disable" onClick='getVLC("vlc").video.logo.disable();'>
+    <INPUT size=4 value="" id="logoIntValue">
+    <SELECT readonly onClick="doLogoOption(this.value,document.getElementById('logoIntValue').value);">
+        <OPTION value=1>File</OPTION>
+        <OPTION value=2>Transparency</OPTION>
+        <OPTION value=3>Position</OPTION>
+        <OPTION value=4>Repeat</OPTION>
+        <OPTION value=5>Delay</OPTION>
+        <OPTION value=6>X</OPTION>
+        <OPTION value=7>Y</OPTION>
+        <OPTION value=8>Width</OPTION>
+        <OPTION value=9>Height</OPTION>
+    </SELECT>
+</TD>
+</TR>
 <TR>
 <TD>
     <INPUT type=button id="telx" value="Teletext off" onClick='doToggleTeletext();'>
@@ -762,6 +780,33 @@ function doMarqueeOption(option, value)
             vlc.video.marquee.x(val);
         if (option == 9)
             vlc.video.marquee.y(val);
+    }
+}
+
+function doLogoOption(option, value)
+{
+    var vlc = getVLC("vlc");
+    val = parseInt(value);
+    if( vlc )
+    {
+        if (option == 1)
+            vlc.video.logo.file(val);
+        if (option == 2)
+            vlc.video.logo.transparency(val);
+        if (option == 3)
+            vlc.video.logo.position(val);
+        if (option == 4)
+            vlc.video.logo.repeat(val);
+        if (option == 5)
+            vlc.video.logo.delay(val);
+        if (option == 6)
+            vlc.video.logo.x(val);
+        if (option == 7)
+            vlc.video.logo.y(val);
+        if (option == 8)
+            vlc.video.logo.width(val);
+        if (option == 9)
+            vlc.video.logo.height(val);
     }
 }
 
