@@ -452,6 +452,21 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
     if (i_mode == FIND_ANYWHERE)
         return vlc_object_find (p_this->p_libvlc, i_type, FIND_CHILD);
 
+    switch (i_type)
+    {
+        case VLC_OBJECT_VOUT:
+        case VLC_OBJECT_AOUT:
+            break;
+        case VLC_OBJECT_INPUT:
+            /* input can only be accessed like this from children,
+             * otherwise we could not promise that it is initialized */
+            if (i_mode != FIND_PARENT)
+                return NULL;
+            break;
+        default:
+            return NULL;
+    }
+
     libvlc_lock (p_this->p_libvlc);
     p_found = FindObject( p_this, i_type, i_mode );
     libvlc_unlock (p_this->p_libvlc);
