@@ -154,7 +154,7 @@ static inline int video_format_Copy( video_format_t *p_dst, const video_format_t
         memcpy( p_dst->p_palette, p_src->p_palette, sizeof( *p_dst->p_palette ) );
     }
     return VLC_SUCCESS;
-};
+}
 
 /**
  * Cleanup and free palette of this video_format_t
