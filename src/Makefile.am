@@ -109,7 +109,6 @@ pluginsinclude_HEADERS = \
 	$(NULL)
 
 noinst_HEADERS = \
-	../include/mmx.h \
 	../include/vlc_codec_synchro.h \
 	../include/vlc_codecs.h \
 	../include/vlc_fixups.h \

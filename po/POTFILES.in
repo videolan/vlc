@@ -1,5 +1,4 @@
 # main sources
-include/mmx.h
 include/vlc_access.h
 include/vlc_acl.h
 include/vlc_aout.h
@@ -1133,6 +1132,7 @@ modules/video_filter/logo.c
 modules/video_filter/magnify.c
 modules/video_filter/marq.c
 modules/video_filter/mirror.c
+modules/video_filter/mmx.h
 modules/video_filter/mosaic.c
 modules/video_filter/mosaic.h
 modules/video_filter/motionblur.c
