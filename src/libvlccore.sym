@@ -102,6 +102,7 @@ demux_GetParentInput
 demux_PacketizerDestroy
 demux_PacketizerNew
 demux_vaControlHelper
+dialog_ExtensionUpdate
 dialog_Login
 dialog_ProgressCancelled
 dialog_ProgressCreate
