@@ -825,9 +825,6 @@ static int ffmpeg_OpenCodec( decoder_t *p_dec )
 
     p_sys->b_delayed_open = false;
 
-    if( p_sys->p_va && p_sys->p_va->description )
-        msg_Info( p_dec, "Using %s for hardware decoding.", p_sys->p_va->description );
-
     return VLC_SUCCESS;
 }
 /*****************************************************************************
@@ -1155,6 +1152,9 @@ static enum PixelFormat ffmpeg_GetFormat( AVCodecContext *p_codec,
 
         if( p_sys->p_va )
         {
+            if( p_sys->p_va->description )
+                msg_Info( p_dec, "Using %s for hardware decoding.", p_sys->p_va->description );
+
             /* FIXME this will disabled direct rendering
              * even if a new pixel format is renegociated
              */
