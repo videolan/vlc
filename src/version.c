@@ -41,7 +41,7 @@ char const * VLC_Version( void )
 }
 
 /*****************************************************************************
- * VLC_CompileBy, VLC_CompileHost, VLC_CompileDomain,
+ * VLC_CompileBy, VLC_CompileHost
  * VLC_Compiler, VLC_Changeset
  *****************************************************************************/
 #define DECLARE_VLC_VERSION( func, var )                                    \
@@ -52,5 +52,4 @@ const char * VLC_##func ( void )                                            \
 
 DECLARE_VLC_VERSION( CompileBy, COMPILE_BY )
 DECLARE_VLC_VERSION( CompileHost, COMPILE_HOST )
-DECLARE_VLC_VERSION( CompileDomain, COMPILE_DOMAIN )
 DECLARE_VLC_VERSION( Compiler, COMPILER )

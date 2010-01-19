@@ -461,7 +461,6 @@ vlc_b64_encode_binary
 vlc_cancel
 vlc_clone
 VLC_CompileBy
-VLC_CompileDomain
 VLC_CompileHost
 VLC_Compiler
 vlc_cond_broadcast

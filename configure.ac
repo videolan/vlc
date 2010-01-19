@@ -4912,8 +4912,7 @@ AC_SUBST(VERSION_REVISION)
 AC_SUBST(VERSION_EXTRA)
 AC_SUBST(COPYRIGHT_YEARS)
 AC_DEFINE_UNQUOTED(VLC_COMPILE_BY, "`whoami`", [user who ran configure])
-AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname -s 2>/dev/null || hostname`", [host which ran configure])
-AC_DEFINE_UNQUOTED(VLC_COMPILE_DOMAIN, "`dnsdomainname 2>/dev/null || domainname 2>/dev/null || echo unknown`", [domain of the host which ran configure])
+AC_DEFINE_UNQUOTED(VLC_COMPILE_HOST, "`hostname -f 2>/dev/null || hostname`", [host which ran configure])
 AC_DEFINE_UNQUOTED(VLC_COMPILER, "`$CC -v 2>&1 | tail -n 1`", [compiler])
 dnl Win32 need s a numerical version_extra.
 case $( echo ${VERSION_EXTRA}|wc -m ) in
