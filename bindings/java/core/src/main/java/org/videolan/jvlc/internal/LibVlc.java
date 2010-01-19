@@ -692,16 +692,16 @@ public interface LibVlc extends Library
 
     void libvlc_video_set_deinterlace(LibVlcMediaPlayer p_mi, int b_enable, String psz_mode, libvlc_exception_t p_e);
 
-    int libvlc_video_get_marquee_option_as_int(LibVlcMediaPlayer p_mi, VideoMarqueeIntOption option,
+    int libvlc_video_get_marquee_int(LibVlcMediaPlayer p_mi, VideoMarqueeIntOption option,
         libvlc_exception_t p_e);
 
-    String libvlc_video_get_marquee_option_as_string(LibVlcMediaPlayer p_mi, VideoMarqueeStringOption option,
+    String libvlc_video_get_marquee_string(LibVlcMediaPlayer p_mi, VideoMarqueeStringOption option,
         libvlc_exception_t p_e);
 
-    void libvlc_video_set_marquee_option_as_int(LibVlcMediaPlayer p_mi, VideoMarqueeIntOption option, int i_val,
+    void libvlc_video_set_marquee_int(LibVlcMediaPlayer p_mi, VideoMarqueeIntOption option, int i_val,
         libvlc_exception_t p_e);
 
-    void libvlc_video_set_marquee_option_as_string(LibVlcMediaPlayer p_mi, VideoMarqueeStringOption option,
+    void libvlc_video_set_marquee_string(LibVlcMediaPlayer p_mi, VideoMarqueeStringOption option,
         String psz_text, libvlc_exception_t p_e);
 
     LibVlcAudioOutput libvlc_audio_output_list_get(LibVlcInstance p_instance, libvlc_exception_t p_e);
