@@ -116,7 +116,8 @@ AboutDialog::AboutDialog( intf_thread_t *_p_intf)
                 "VLC uses its internal codecs and works on essentially every "
                 "popular platform.\n\n" )
             + qtr( "This version of VLC was compiled by:\n " )
-            + qfu( VLC_CompileBy() )+ "@" + qfu( VLC_CompileHost() ) + ".\n"
+            + qfu( VLC_CompileBy() )+ " on " + qfu( VLC_CompileHost() ) +
+            + " ("__DATE__" "__TIME__").\n"
             + qtr( "Compiler: " ) + qfu( VLC_Compiler() ) + ".\n"
             + qtr( "You are using the Qt4 Interface.\n\n" )
             + qtr( "Copyright (C) " ) + COPYRIGHT_YEARS
