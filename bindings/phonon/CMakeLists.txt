@@ -30,6 +30,7 @@ find_package(Automoc4 REQUIRED)
 include (CheckCXXCompilerFlag)
 include (MacroEnsureVersion)
 
+find_package(VLC REQUIRED)
 if (NOT AUTOMOC4_VERSION)
    set(AUTOMOC4_VERSION "0.9.83")
 endif (NOT AUTOMOC4_VERSION)

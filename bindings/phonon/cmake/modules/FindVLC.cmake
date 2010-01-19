@@ -25,6 +25,7 @@ if(NOT WIN32)
   find_package(PkgConfig)
   pkg_check_modules(VLC libvlc>=1.0.0)
   set(VLC_DEFINITIONS ${VLC_CFLAGS})
+  set(VLC_LIBRARIES ${VLC_LDFLAGS})
 endif(NOT WIN32)
 
 # TODO add argument support to pass version on find_package
