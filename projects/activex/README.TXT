@@ -35,8 +35,7 @@ the WINE project (http://www.winehq.com). At leat wine-dev-0.9.57 works,
 the comand line to compile IDL should looks like the following :
 
 widl -I/usr/include/wine/windows/ \
-     -h -H axvlc_idl.h -t -T axvlc.tlb -u -U axvlc_idl.c \
-     axvlc.idl
+	-h -H axvlc_idl.h -t -T axvlc.tlb -u -U axvlc_idl.c axvlc.idl
 
 NOTE: widl breaks compatibility with Visual Basic. If that is important
 to you then you must use midl.
