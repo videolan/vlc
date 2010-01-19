@@ -519,16 +519,22 @@ void MainInterface::createTaskBarButtons()
     FIXME:We need pretty buttons in 16x16 px that are handled correctly by masks in Qt
     FIXME:the play button's picture doesn't changed to pause when clicked
     */
-    OSVERSIONINFO winVer;
-    winVer.dwOSVersionInfoSize = sizeof(OSVERSIONINFO);
-    if( GetVersionEx(&winVer) && winVer.dwMajorVersion > 5 )
+
+    CoInitialize( 0 );
+
+    if( S_OK == CoCreateInstance( &clsid_ITaskbarList,
+                NULL, CLSCTX_INPROC_SERVER,
+                &IID_ITaskbarList3,
+                (void **)&p_taskbl) )
     {
+        p_taskbl->vt->HrInit(p_taskbl);
+
         if(himl = ImageList_Create( 15, //cx
-                                    18, //cy
-                                    ILC_COLOR,//flags
-                                    4,//initial nb of images
-                                    0//nb of images that can be added
-                                    ))
+                        18, //cy
+                        ILC_COLOR,//flags
+                        4,//initial nb of images
+                        0//nb of images that can be added
+                        ))
         {
             QPixmap img   = QPixmap(":/toolbar/previous_b");
             QPixmap img2  = QPixmap(":/toolbar/pause_b");
@@ -549,52 +555,43 @@ void MainInterface::createTaskBarButtons()
                 msg_Err( p_intf, "ImageList_Add failed" );
         }
 
-        CoInitialize( 0 );
+        // Define an array of two buttons. These buttons provide images through an
+        // image list and also provide tooltips.
+        DWORD dwMask = THB_BITMAP | THB_FLAGS;
 
-        if( S_OK == CoCreateInstance( &clsid_ITaskbarList,
-                    NULL, CLSCTX_INPROC_SERVER,
-                    &IID_ITaskbarList3,
-                    (void **)&p_taskbl) )
+        THUMBBUTTON thbButtons[3];
+        thbButtons[0].dwMask = dwMask;
+        thbButtons[0].iId = 0;
+        thbButtons[0].iBitmap = 0;
+        thbButtons[0].dwFlags = THBF_HIDDEN;
+
+        thbButtons[1].dwMask = dwMask;
+        thbButtons[1].iId = 1;
+        thbButtons[1].iBitmap = 2;
+        thbButtons[1].dwFlags = THBF_HIDDEN;
+
+        thbButtons[2].dwMask = dwMask;
+        thbButtons[2].iId = 2;
+        thbButtons[2].iBitmap = 3;
+        thbButtons[2].dwFlags = THBF_HIDDEN;
+
+        HRESULT hr = p_taskbl->vt->ThumbBarSetImageList(p_taskbl, winId(), himl );
+        if(S_OK != hr)
+            msg_Err( p_intf, "ThumbBarSetImageList failed with error %08x", hr );
+        else
         {
-            p_taskbl->vt->HrInit(p_taskbl);
-
-            // Define an array of two buttons. These buttons provide images through an
-            // image list and also provide tooltips.
-            DWORD dwMask = THB_BITMAP | THB_FLAGS;
-
-            THUMBBUTTON thbButtons[3];
-            thbButtons[0].dwMask = dwMask;
-            thbButtons[0].iId = 0;
-            thbButtons[0].iBitmap = 0;
-            thbButtons[0].dwFlags = THBF_HIDDEN;
-
-            thbButtons[1].dwMask = dwMask;
-            thbButtons[1].iId = 1;
-            thbButtons[1].iBitmap = 2;
-            thbButtons[1].dwFlags = THBF_HIDDEN;
-
-            thbButtons[2].dwMask = dwMask;
-            thbButtons[2].iId = 2;
-            thbButtons[2].iBitmap = 3;
-            thbButtons[2].dwFlags = THBF_HIDDEN;
-
-            HRESULT hr = p_taskbl->vt->ThumbBarSetImageList(p_taskbl, winId(), himl );
+            hr = p_taskbl->vt->ThumbBarAddButtons(p_taskbl, winId(), 3, thbButtons);
             if(S_OK != hr)
-                msg_Err( p_intf, "ThumbBarSetImageList failed with error %08x", hr );
-            else
-            {
-                hr = p_taskbl->vt->ThumbBarAddButtons(p_taskbl, winId(), 3, thbButtons);
-                if(S_OK != hr)
-                    msg_Err( p_intf, "ThumbBarAddButtons failed with error %08x", hr );
-            }
-            CONNECT( THEMIM->getIM(), statusChanged( int ), this, changeThumbbarButtons( int ) );
+                msg_Err( p_intf, "ThumbBarAddButtons failed with error %08x", hr );
         }
+        CONNECT( THEMIM->getIM(), statusChanged( int ), this, changeThumbbarButtons( int ) );
     }
     else
     {
         himl = NULL;
         p_taskbl = NULL;
     }
+
 }
 
 bool MainInterface::winEvent ( MSG * msg, long * result )
