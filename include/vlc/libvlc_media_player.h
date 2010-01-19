@@ -875,6 +875,53 @@ VLC_PUBLIC_API void libvlc_video_set_marquee_option_as_string( libvlc_media_play
                                                             const char *,
                                                             libvlc_exception_t * );
 
+enum libvlc_video_logo_option_t {
+    libvlc_logo_enable,
+    libvlc_logo_file,           /**< string argument, "file,d,t;file,d,t;..." */
+    libvlc_logo_x,
+    libvlc_logo_y,
+    libvlc_logo_delay,
+    libvlc_logo_repeat,
+    libvlc_logo_opacity,
+    libvlc_logo_position,
+};
+
+/**
+ * Get integer logo option.
+ *
+ * \param p_mi libvlc media player instance
+ * \param option logo option to get, values of libvlc_video_logo_option_t
+ * \param p_e an pointer to an initialized exception object
+ */
+VLC_PUBLIC_API int libvlc_video_get_logo_int( libvlc_media_player_t *p_mi,
+                                 unsigned option, libvlc_exception_t *p_e );
+
+/**
+ * Set logo option as integer. Options that take a different type value
+ * cause an invalid argument exception.
+ * Passing libvlc_logo_enable as option value has the side effect of
+ * starting (arg !0) or stopping (arg 0) the logo filter.
+ *
+ * \param p_mi libvlc media player instance
+ * \param option logo option to set, values of libvlc_video_logo_option_t
+ * \param value logo option value
+ * \param p_e an pointer to an initialized exception object
+ */
+VLC_PUBLIC_API void libvlc_video_set_logo_int( libvlc_media_player_t *p_mi,
+                        unsigned option, int value, libvlc_exception_t *p_e );
+
+/**
+ * Set logo option as string. Options that take a different type value
+ * cause an invalid argument exception.
+ *
+ * \param p_mi libvlc media player instance
+ * \param option logo option to set, values of libvlc_video_logo_option_t
+ * \param psz_value logo option value
+ * \param p_e an pointer to an initialized exception object
+ */
+VLC_PUBLIC_API void libvlc_video_set_logo_string( libvlc_media_player_t *p_mi,
+            unsigned option, const char *psz_value, libvlc_exception_t *p_e );
+
 /** @} video */
 
 /** \defgroup libvlc_audio libvlc_audio

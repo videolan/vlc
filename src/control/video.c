@@ -1,7 +1,7 @@
 /*****************************************************************************
  * video.c: libvlc new API video functions
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2010 the VideoLAN team
  *
  * $Id$
  *
@@ -709,8 +709,8 @@ static vlc_object_t *get_marquee_object( libvlc_media_player_t * p_mi )
  * libvlc_video_get_marquee_option_as_int : get a marq option value
  *****************************************************************************/
 int libvlc_video_get_marquee_option_as_int( libvlc_media_player_t *p_mi,
-                                            libvlc_video_marquee_int_option_t option,
-                                            libvlc_exception_t *p_e )
+                               libvlc_video_marquee_int_option_t option,
+                                                libvlc_exception_t *p_e )
 {
     const char * identifier = get_marquee_int_option_identifier(option);
     if(!identifier)
@@ -746,7 +746,7 @@ int libvlc_video_get_marquee_option_as_int( libvlc_media_player_t *p_mi,
  * libvlc_video_get_marquee_option_as_string : get a marq option value
  *****************************************************************************/
 char * libvlc_video_get_marquee_option_as_string( libvlc_media_player_t *p_mi,
-                                                  libvlc_video_marquee_string_option_t option,
+                                  libvlc_video_marquee_string_option_t option,
                                                   libvlc_exception_t *p_e )
 {
     const char * identifier = get_marquee_string_option_identifier(option);
@@ -773,8 +773,8 @@ char * libvlc_video_get_marquee_option_as_string( libvlc_media_player_t *p_mi,
  * libvlc_video_set_marquee_option_as_int: enable, disable or set an int option
  *****************************************************************************/
 void libvlc_video_set_marquee_option_as_int( libvlc_media_player_t *p_mi,
-                                          libvlc_video_marquee_int_option_t option,
-                                          int value, libvlc_exception_t *p_e )
+                                libvlc_video_marquee_int_option_t option,
+                                      int value, libvlc_exception_t *p_e )
 {
     const char * identifier = get_marquee_int_option_identifier(option);
     if(!identifier)
@@ -814,9 +814,8 @@ void libvlc_video_set_marquee_option_as_int( libvlc_media_player_t *p_mi,
  * libvlc_video_set_marquee_option_as_string: set a string option
  *****************************************************************************/
 void libvlc_video_set_marquee_option_as_string( libvlc_media_player_t *p_mi,
-                                             libvlc_video_marquee_string_option_t option,
-                                             const char * value,
-                                             libvlc_exception_t *p_e )
+                                libvlc_video_marquee_string_option_t option,
+                                const char * value, libvlc_exception_t *p_e )
 {
     const char * identifier = get_marquee_string_option_identifier(option);
     if(!identifier)
@@ -834,4 +833,153 @@ void libvlc_video_set_marquee_option_as_string( libvlc_media_player_t *p_mi,
     }
     var_SetString(marquee, identifier, value);
     vlc_object_release(marquee);
+}
+
+
+/* logo module support */
+
+static vlc_object_t *get_logo_object( libvlc_media_player_t * p_mi,
+                                      libvlc_exception_t *p_e )
+{
+    vlc_object_t *object = NULL;
+    vout_thread_t  *vout = GetVout( p_mi, p_e );
+    libvlc_exception_clear( p_e );
+    if( vout )
+    {
+        object = vlc_object_find_name( vout, "logo", FIND_CHILD );
+        vlc_object_release(vout);
+    }
+    if( !object )
+    {
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Logo not enabled" );
+    }
+    return object;
+}
+
+
+typedef const struct vlogo_opt {
+    const char name[16];
+    unsigned type; 
+} vlogo_opt_t;
+
+
+static vlogo_opt_t *
+logo_option_bynumber( unsigned option, libvlc_exception_t *p_e )
+{
+#   define CFG_PREFIX "logo-"
+    vlogo_opt_t vlogo_optlist[] = /* depends on libvlc_video_logo_option_t */
+    {
+        { "logo",          0 },
+        { "logo-file",     VLC_VAR_STRING },
+        { "logo-x",        VLC_VAR_INTEGER },
+        { "logo-y",        VLC_VAR_INTEGER },
+        { "logo-delay",    VLC_VAR_INTEGER },
+        { "logo-repeat",   VLC_VAR_INTEGER },
+        { "logo-opacity",  VLC_VAR_INTEGER },
+        { "logo-position", VLC_VAR_INTEGER },
+    };
+#   undef  CFG_PREFIX
+    enum { num_vlogo_opts = sizeof(vlogo_optlist) / sizeof(*vlogo_optlist) };
+
+    vlogo_opt_t *r = option < num_vlogo_opts ? vlogo_optlist+option : NULL;
+    if( !r )
+    {
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Unknown marquee option" );
+    }
+    return r;
+}
+
+
+void libvlc_video_set_logo_string( libvlc_media_player_t *p_mi,
+                                   unsigned option, const char *psz_value,
+                                   libvlc_exception_t *p_e )
+{
+    vlogo_opt_t *opt = logo_option_bynumber( option, p_e );
+    printf("logo set string  (%u)%s = %s.\n", option,
+            (opt?(opt->name):"<unkn>"),(psz_value?psz_value:"<null>"));
+    if( !opt ) return;
+    vlc_object_t *logo = get_logo_object( p_mi, p_e );
+    if( !logo ) return;
+
+    switch( opt->type )
+    {
+    case VLC_VAR_STRING:
+        var_SetString( logo, opt->name, psz_value );
+        break;
+    default:
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Invalid argument" );
+        break;
+    }
+    vlc_object_release(logo);
+}
+
+
+void libvlc_video_set_logo_int( libvlc_media_player_t *p_mi,
+                                unsigned option, int value,
+                                libvlc_exception_t *p_e )
+{
+    vlogo_opt_t *opt = logo_option_bynumber( option, p_e );
+    printf("logo set integer (%u)%s = %i.\n",
+            option, (opt?(opt->name):"<unkn>"),value);
+    if( !opt ) return;
+
+    if( !opt->type ) /* libvlc_logo_enable */
+    {
+        vout_thread_t *vout = GetVout( p_mi, p_e );
+        libvlc_exception_clear( p_e );
+        if (vout)
+        {
+            vout_EnableFilter(vout, opt->name, value, false);
+            vlc_object_release(vout);
+        }
+        return;
+    }
+
+    vlc_object_t *logo = get_logo_object( p_mi, p_e );
+    if( !logo ) return;
+
+    switch( opt->type )
+    {
+    case VLC_VAR_INTEGER:
+        var_SetInteger(logo, opt->name, value);
+        break;
+    default:
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Invalid argument" );
+        break;
+    }
+    vlc_object_release(logo);
+}
+
+
+int libvlc_video_get_logo_int( libvlc_media_player_t *p_mi,
+                               unsigned option, libvlc_exception_t *p_e )
+{
+    vlogo_opt_t *opt = logo_option_bynumber( option, p_e );
+    printf("logo get integer (%u)%s.\n", option, opt?opt->name:"<unkn>");
+    if( !opt ) return 0;
+
+    vlc_object_t *logo = get_logo_object( p_mi, p_e );
+    if( !logo ) return 0;
+
+    int ret;
+    switch( opt->type )
+    {
+    case 0: /* libvlc_logo_enable */
+        ret = NULL != logo;
+        break;
+    case VLC_VAR_INTEGER:
+        ret = var_GetInteger(logo, opt->name);
+        break;
+    default:
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Invalid argument" );
+        ret = 0;
+        break;
+    }
+    vlc_object_release(logo);
+    return ret;
 }

@@ -61,8 +61,8 @@
 #define POSY_TEXT N_("Y coordinate")
 #define POSY_LONGTEXT N_("Y coordinate of the logo. You can move the logo " \
                 "by left-clicking it." )
-#define TRANS_TEXT N_("Transparency of the logo")
-#define TRANS_LONGTEXT N_("Logo transparency value " \
+#define OPACITY_TEXT N_("Opacity of the logo")
+#define OPACITY_LONGTEXT N_("Logo opacity value " \
   "(from 0 for full transparency to 255 for full opacity)." )
 #define POS_TEXT N_("Logo position")
 #define POS_LONGTEXT N_( \
@@ -99,8 +99,8 @@ vlc_module_begin ()
     /* default to 1000 ms per image, continuously cycle through them */
     add_integer( CFG_PREFIX "delay", 1000, NULL, DELAY_TEXT, DELAY_LONGTEXT, true )
     add_integer( CFG_PREFIX "repeat", -1, NULL, REPEAT_TEXT, REPEAT_LONGTEXT, true )
-    add_integer_with_range( CFG_PREFIX "transparency", 255, 0, 255, NULL,
-        TRANS_TEXT, TRANS_LONGTEXT, false )
+    add_integer_with_range( CFG_PREFIX "opacity", 255, 0, 255, NULL,
+        OPACITY_TEXT, OPACITY_LONGTEXT, false )
     add_integer( CFG_PREFIX "position", -1, NULL, POS_TEXT, POS_LONGTEXT, false )
         change_integer_list( pi_pos_values, ppsz_pos_descriptions, NULL )
 
@@ -171,7 +171,7 @@ struct filter_sys_t
 };
 
 static const char *const ppsz_filter_options[] = {
-    "file", "x", "y", "delay", "repeat", "transparency", "position", NULL
+    "file", "x", "y", "delay", "repeat", "opacity", "position", NULL
 };
 
 static const char *const ppsz_filter_callbacks[] = {
@@ -179,7 +179,7 @@ static const char *const ppsz_filter_callbacks[] = {
     "logo-x",
     "logo-y",
     "logo-position",
-    "logo-transparency",
+    "logo-opacity",
     "logo-repeat",
     NULL
 };
@@ -269,13 +269,10 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     if( *psz_filename == '\0' )
         msg_Warn( p_this, "no logo file specified" );
 
-    p_list->i_alpha = var_CreateGetIntegerCommand( p_filter,
-                                                        "logo-transparency");
+    p_list->i_alpha = var_CreateGetIntegerCommand( p_filter, "logo-opacity");
     p_list->i_alpha = __MAX( __MIN( p_list->i_alpha, 255 ), 0 );
-    p_list->i_delay =
-        var_CreateGetIntegerCommand( p_filter, "logo-delay" );
-    p_list->i_repeat =
-        var_CreateGetIntegerCommand( p_filter, "logo-repeat" );
+    p_list->i_delay = var_CreateGetIntegerCommand( p_filter, "logo-delay" );
+    p_list->i_repeat = var_CreateGetIntegerCommand( p_filter, "logo-repeat" );
 
     p_sys->i_pos = var_CreateGetIntegerCommand( p_filter, "logo-position" );
     p_sys->i_pos_x = var_CreateGetIntegerCommand( p_filter, "logo-x" );
@@ -579,7 +576,7 @@ static int LogoCallback( vlc_object_t *p_this, char const *psz_var,
     {
         p_sys->i_pos = newval.i_int;
     }
-    else if ( !strcmp( psz_var, "logo-transparency" ) )
+    else if ( !strcmp( psz_var, "logo-opacity" ) )
     {
         p_list->i_alpha = __MAX( __MIN( newval.i_int, 255 ), 0 );
     }
@@ -620,10 +617,10 @@ static picture_t *LoadImage( vlc_object_t *p_this, const char *psz_filename )
 /**
  * It loads the logo images into memory.
  *
- * Read the logo-file input switch, obtaining a list of images and associated
- * durations and transparencies.  Store the image(s), and times.  An image
- * without a stated time or transparency will use the logo-delay and
- * logo-transparency values.
+ * Read the logo-file input switch, obtaining a list of images and
+ * associated durations and transparencies. Store the image(s), and
+ * times. An image without a stated time or opacity will use the
+ * logo-delay and logo-opacity values.
  */
 static void LogoListLoad( vlc_object_t *p_this, logo_list_t *p_logo_list,
                           const char *psz_filename )
