@@ -45,7 +45,7 @@ char const * VLC_Version( void )
  * VLC_Compiler, VLC_Changeset
  *****************************************************************************/
 #define DECLARE_VLC_VERSION( func, var )                                    \
-char const * VLC_##func ( void )                                            \
+const char * VLC_##func ( void )                                            \
 {                                                                           \
     return VLC_##var ;                                                      \
 }
