@@ -32,6 +32,7 @@
 #include "vlccontrol2.h"
 #include "vlccontrol.h"
 
+#include "position.h"
 
 static inline
 HRESULT _exception_bridge(VLCPlugin *p,REFIID riid, libvlc_exception_t *ex)
@@ -810,6 +811,37 @@ STDMETHODIMP VLCMarquee::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
     return E_NOTIMPL;
 };
 
+HRESULT VLCMarquee::do_put_int(unsigned idx, LONG val)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+        libvlc_video_set_marquee_int(p_md, idx, val, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+}
+
+HRESULT VLCMarquee::do_get_int(unsigned idx, LONG *val)
+{
+    if( NULL == val )
+        return E_POINTER;
+
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+        *val = libvlc_video_get_marquee_int(p_md, idx, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+}
+
 STDMETHODIMP VLCMarquee::Invoke(DISPID dispIdMember, REFIID riid,
         LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
         VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
@@ -822,8 +854,42 @@ STDMETHODIMP VLCMarquee::Invoke(DISPID dispIdMember, REFIID riid,
     return E_NOTIMPL;
 };
 
-STDMETHODIMP VLCMarquee::enable()
+STDMETHODIMP VLCMarquee::get_position(BSTR* val)
 {
+    if( NULL == val )
+        return E_POINTER;
+
+    LONG i;
+    HRESULT hr = do_get_int(libvlc_marquee_Position, &i);
+
+    if(SUCCEEDED(hr))
+        *val = BSTRFromCStr(CP_UTF8, position_bynumber(i));
+
+    return hr;
+}
+
+STDMETHODIMP VLCMarquee::put_position(BSTR val)
+{
+    char *n = CStrFromBSTR(CP_UTF8, val);
+    if( !n ) return E_OUTOFMEMORY;
+
+    size_t i;
+    HRESULT hr;
+    if( position_byname( n, i ) )
+        hr = do_put_int(libvlc_marquee_Position,i);
+    else
+        hr = E_INVALIDARG;
+
+    CoTaskMemFree(n);
+    return hr;
+}
+
+STDMETHODIMP VLCMarquee::get_text(BSTR *val)
+{
+    char *psz;
+    if( NULL == val )
+        return E_POINTER;
+
     libvlc_media_player_t *p_md;
     HRESULT hr = _p_instance->getMD(&p_md);
     if( SUCCEEDED(hr) )
@@ -831,13 +897,16 @@ STDMETHODIMP VLCMarquee::enable()
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Enabled, true, &ex);
+        psz = libvlc_video_get_marquee_string(p_md, libvlc_marquee_Text, &ex);
+
         hr = exception_bridge(&ex);
+        if(SUCCEEDED(hr))
+            *val = BSTRFromCStr(CP_UTF8, psz);
     }
     return hr;
-};
+}
 
-STDMETHODIMP VLCMarquee::disable()
+STDMETHODIMP VLCMarquee::put_text(BSTR val)
 {
     libvlc_media_player_t *p_md;
     HRESULT hr = _p_instance->getMD(&p_md);
@@ -846,148 +915,14 @@ STDMETHODIMP VLCMarquee::disable()
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Enabled, false, &ex);
-        hr = exception_bridge(&ex);
-    }
-    return hr;
-};
-
-STDMETHODIMP VLCMarquee::color(long val)
-{
-    libvlc_media_player_t *p_md;
-    HRESULT hr = _p_instance->getMD(&p_md);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Color, val, &ex);
-        hr = exception_bridge(&ex);
-    }
-    return hr;
-};
-
-STDMETHODIMP VLCMarquee::opacity(long val)
-{
-    libvlc_media_player_t *p_md;
-    HRESULT hr = _p_instance->getMD(&p_md);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Opacity, val, &ex);
-        hr = exception_bridge(&ex);
-    }
-    return hr;
-};
-
-STDMETHODIMP VLCMarquee::position(long val)
-{
-    libvlc_media_player_t *p_md;
-    HRESULT hr = _p_instance->getMD(&p_md);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Position, val, &ex);
-        hr = exception_bridge(&ex);
-    }
-    return hr;
-};
-
-STDMETHODIMP VLCMarquee::refresh(long val)
-{
-    libvlc_media_player_t *p_md;
-    HRESULT hr = _p_instance->getMD(&p_md);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Refresh, val, &ex);
-        hr = exception_bridge(&ex);
-    }
-    return hr;
-};
-
-STDMETHODIMP VLCMarquee::size(long val)
-{
-    libvlc_media_player_t *p_md;
-    HRESULT hr = _p_instance->getMD(&p_md);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Size, val, &ex);
-        hr = exception_bridge(&ex);
-    }
-    return hr;
-};
-
-STDMETHODIMP VLCMarquee::text(BSTR text)
-{
-    libvlc_media_player_t *p_md;
-    HRESULT hr = _p_instance->getMD(&p_md);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        char *psz_text = CStrFromBSTR(CP_UTF8, text);
-        libvlc_video_set_marquee_option_as_string(p_md, libvlc_marquee_Text, psz_text, &ex);
+        char *psz_text = CStrFromBSTR(CP_UTF8, val);
+        libvlc_video_set_marquee_string(p_md, libvlc_marquee_Text,
+                                        psz_text, &ex);
         hr = exception_bridge(&ex);
         CoTaskMemFree(psz_text);
     }
     return hr;
-};
-
-STDMETHODIMP VLCMarquee::timeout(long val)
-{
-    libvlc_media_player_t *p_md;
-    HRESULT hr = _p_instance->getMD(&p_md);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Timeout, val, &ex);
-        hr = exception_bridge(&ex);
-    }
-    return hr;
-};
-
-STDMETHODIMP VLCMarquee::x(long val)
-{
-    libvlc_media_player_t *p_md;
-    HRESULT hr = _p_instance->getMD(&p_md);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_X, val, &ex);
-        hr = exception_bridge(&ex);
-    }
-    return hr;
-};
-
-STDMETHODIMP VLCMarquee::y(long val)
-{
-    libvlc_media_player_t *p_md;
-    HRESULT hr = _p_instance->getMD(&p_md);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Y, val, &ex);
-        hr = exception_bridge(&ex);
-    }
-    return hr;
-};
+}
 
 /****************************************************************************/
 
@@ -2704,6 +2639,7 @@ HRESULT VLCLogo::do_get_int(unsigned idx, LONG *val)
     }
     return hr;
 }
+
 STDMETHODIMP VLCLogo::file(BSTR fname)
 {
     libvlc_media_player_t *p_md;
@@ -2724,19 +2660,6 @@ STDMETHODIMP VLCLogo::file(BSTR fname)
     return hr;
 }
 
-struct posidx_s { const char *n; size_t i; };
-static const posidx_s posidx[] = {
-    { "center",        0 },
-    { "left",          1 },
-    { "right",         2 },
-    { "top",           4 },
-    { "bottom",        8 },
-    { "top-left",      5 },
-    { "top-right",     6 },
-    { "bottom-left",   9 },
-    { "bottom-right", 10 },
-};
-enum { num_posidx = sizeof(posidx)/sizeof(*posidx) };
 STDMETHODIMP VLCLogo::get_position(BSTR* val)
 {
     if( NULL == val )
@@ -2746,35 +2669,21 @@ STDMETHODIMP VLCLogo::get_position(BSTR* val)
     HRESULT hr = do_get_int(libvlc_logo_position, &i);
 
     if(SUCCEEDED(hr))
-    {
-        const char *n="undefined";
+        *val = BSTRFromCStr(CP_UTF8, position_bynumber(i));
 
-        for( const posidx_s *h=posidx; h<posidx+num_posidx; ++h )
-            if( i == h->i )
-            {
-                n=h->n;
-                break;
-            }
-        *val = BSTRFromCStr(CP_UTF8, n);
-    }
     return hr;
 }
+
 STDMETHODIMP VLCLogo::put_position(BSTR val)
 {
     char *n = CStrFromBSTR(CP_UTF8, val);
     if( !n ) return E_OUTOFMEMORY;
 
-    HRESULT hr = E_NOTIMPL;
-
-    const posidx_s *h;
-    for( h=posidx; h<posidx+num_posidx; ++h )
-        if( !strcasecmp( n, h->n ) )
-        {
-            hr = do_put_int(libvlc_logo_position,h->i);
-            break;
-        }
-
-    if( h == posidx+num_posidx )
+    size_t i;
+    HRESULT hr;
+    if( position_byname( n, i ) )
+        hr = do_put_int(libvlc_logo_position,i);
+    else
         hr = E_INVALIDARG;
 
     CoTaskMemFree(n);

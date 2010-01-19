@@ -441,29 +441,46 @@ library AXVLC
     {
         [helpstring("enable Marquee Filter.")]
         HRESULT enable();
-
         [helpstring("disable Marquee Filter.")]
         HRESULT disable();
 
-        [helpstring("set text to Marquee Filter.")]
-        HRESULT text([in] BSTR text);
+        [propget, helpstring("Retrieve marquee text.")]
+        HRESULT text([out, retval] BSTR* val);
+        [propput, helpstring("Change marquee text.")]
+        HRESULT text([in] BSTR val);
 
-        [helpstring("change text color.")]
-        HRESULT color ([in] long val);
-        [helpstring("change  text opacity.")]
-        HRESULT opacity ([in] long val);
-        [helpstring("change text position.")]
-        HRESULT position ([in] long val);
-        [helpstring("change refresh time.")]
-        HRESULT refresh ([in] long val);
-        [helpstring("change text size.")]
-        HRESULT size ([in] long val);
-        [helpstring("change timeout.")]
-        HRESULT timeout ([in] long val);
-        [helpstring("change text abcissa.")]
-        HRESULT x ([in] long val);
-        [helpstring("change text ordinate.")]
-        HRESULT y ([in] long val);
+        [propget, helpstring("Retrieve text color.")]
+        HRESULT color([out, retval] LONG* val);
+        [propput, helpstring("Change text color.")]
+        HRESULT color([in] LONG val);
+        [propget, helpstring("Retrieve text opacity.")]
+        HRESULT opacity([out, retval] LONG* val);
+        [propput, helpstring("Set text opacity (0=transparent, 255=opaque).")]
+        HRESULT opacity([in] LONG val);
+        [propget, helpstring("Retrieve text position.")]
+        HRESULT position([out, retval] BSTR* val);
+        [propput, helpstring("Text positioning relative to: center, left, right, top, bottom, top-left, top-right, bottom-left, bottom-right.")]
+        HRESULT position([in] BSTR val);
+        [propget, helpstring("Retrieve text refresh time.")]
+        HRESULT refresh([out, retval] LONG* val);
+        [propput, helpstring("Set text refresh time.")]
+        HRESULT refresh([in] LONG val);
+        [propget, helpstring("Retrieve text size.")]
+        HRESULT size([out, retval] LONG* val);
+        [propput, helpstring("Set text size.")]
+        HRESULT size([in] LONG val);
+        [propget, helpstring("Retrieve timeout.")]
+        HRESULT timeout([out, retval] LONG* val);
+        [propput, helpstring("Change timeout.")]
+        HRESULT timeout([in] LONG val);
+        [propget, helpstring("Retrieve text abcissa.")]
+        HRESULT x([out, retval] LONG* val);
+        [propput, helpstring("Change text abcissa.")]
+        HRESULT x([in] LONG val);
+        [propget, helpstring("Retrieve text ordinate.")]
+        HRESULT y([out, retval] LONG* val);
+        [propput, helpstring("Change text ordinate.")]
+        HRESULT y([in] LONG val);
     };
 
     [

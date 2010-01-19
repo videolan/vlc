@@ -2528,31 +2528,58 @@ interface IVLCMarquee : public IDispatch
     virtual HRESULT STDMETHODCALLTYPE disable(
         ) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE text(
-        BSTR text) = 0;
+    virtual HRESULT STDMETHODCALLTYPE get_text(
+        BSTR *val) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE color(
+    virtual HRESULT STDMETHODCALLTYPE put_text(
+        BSTR val) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_color(
+        LONG *val) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_color(
         LONG val) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE opacity(
+    virtual HRESULT STDMETHODCALLTYPE get_opacity(
+        LONG *val) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_opacity(
         LONG val) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE position(
+    virtual HRESULT STDMETHODCALLTYPE get_position(
+        BSTR *val) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_position(
+        BSTR val) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE get_refresh(
+        LONG *val) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_refresh(
         LONG val) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE refresh(
+    virtual HRESULT STDMETHODCALLTYPE get_size(
+        LONG *val) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_size(
         LONG val) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE size(
+    virtual HRESULT STDMETHODCALLTYPE get_timeout(
+        LONG *val) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_timeout(
         LONG val) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE timeout(
+    virtual HRESULT STDMETHODCALLTYPE get_x(
+        LONG *val) = 0;
+
+    virtual HRESULT STDMETHODCALLTYPE put_x(
         LONG val) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE x(
-        LONG val) = 0;
+    virtual HRESULT STDMETHODCALLTYPE get_y(
+        LONG *val) = 0;
 
-    virtual HRESULT STDMETHODCALLTYPE y(
+    virtual HRESULT STDMETHODCALLTYPE put_y(
         LONG val) = 0;
 
 };
@@ -2609,39 +2636,75 @@ typedef struct IVLCMarqueeVtbl {
     HRESULT (STDMETHODCALLTYPE *disable)(
         IVLCMarquee* This);
 
-    HRESULT (STDMETHODCALLTYPE *text)(
+    HRESULT (STDMETHODCALLTYPE *get_text)(
         IVLCMarquee* This,
-        BSTR text);
+        BSTR *val);
 
-    HRESULT (STDMETHODCALLTYPE *color)(
+    HRESULT (STDMETHODCALLTYPE *put_text)(
         IVLCMarquee* This,
-        LONG val);
+        BSTR val);
 
-    HRESULT (STDMETHODCALLTYPE *opacity)(
+    HRESULT (STDMETHODCALLTYPE *get_color)(
         IVLCMarquee* This,
-        LONG val);
+        LONG *val);
 
-    HRESULT (STDMETHODCALLTYPE *position)(
-        IVLCMarquee* This,
-        LONG val);
-
-    HRESULT (STDMETHODCALLTYPE *refresh)(
+    HRESULT (STDMETHODCALLTYPE *put_color)(
         IVLCMarquee* This,
         LONG val);
 
-    HRESULT (STDMETHODCALLTYPE *size)(
+    HRESULT (STDMETHODCALLTYPE *get_opacity)(
+        IVLCMarquee* This,
+        LONG *val);
+
+    HRESULT (STDMETHODCALLTYPE *put_opacity)(
         IVLCMarquee* This,
         LONG val);
 
-    HRESULT (STDMETHODCALLTYPE *timeout)(
+    HRESULT (STDMETHODCALLTYPE *get_position)(
+        IVLCMarquee* This,
+        BSTR *val);
+
+    HRESULT (STDMETHODCALLTYPE *put_position)(
+        IVLCMarquee* This,
+        BSTR val);
+
+    HRESULT (STDMETHODCALLTYPE *get_refresh)(
+        IVLCMarquee* This,
+        LONG *val);
+
+    HRESULT (STDMETHODCALLTYPE *put_refresh)(
         IVLCMarquee* This,
         LONG val);
 
-    HRESULT (STDMETHODCALLTYPE *x)(
+    HRESULT (STDMETHODCALLTYPE *get_size)(
+        IVLCMarquee* This,
+        LONG *val);
+
+    HRESULT (STDMETHODCALLTYPE *put_size)(
         IVLCMarquee* This,
         LONG val);
 
-    HRESULT (STDMETHODCALLTYPE *y)(
+    HRESULT (STDMETHODCALLTYPE *get_timeout)(
+        IVLCMarquee* This,
+        LONG *val);
+
+    HRESULT (STDMETHODCALLTYPE *put_timeout)(
+        IVLCMarquee* This,
+        LONG val);
+
+    HRESULT (STDMETHODCALLTYPE *get_x)(
+        IVLCMarquee* This,
+        LONG *val);
+
+    HRESULT (STDMETHODCALLTYPE *put_x)(
+        IVLCMarquee* This,
+        LONG val);
+
+    HRESULT (STDMETHODCALLTYPE *get_y)(
+        IVLCMarquee* This,
+        LONG *val);
+
+    HRESULT (STDMETHODCALLTYPE *put_y)(
         IVLCMarquee* This,
         LONG val);
 
@@ -2664,15 +2727,24 @@ interface IVLCMarquee {
 /*** IVLCMarquee methods ***/
 #define IVLCMarquee_enable(This) (This)->lpVtbl->enable(This)
 #define IVLCMarquee_disable(This) (This)->lpVtbl->disable(This)
-#define IVLCMarquee_text(This,text) (This)->lpVtbl->text(This,text)
-#define IVLCMarquee_color(This,val) (This)->lpVtbl->color(This,val)
-#define IVLCMarquee_opacity(This,val) (This)->lpVtbl->opacity(This,val)
-#define IVLCMarquee_position(This,val) (This)->lpVtbl->position(This,val)
-#define IVLCMarquee_refresh(This,val) (This)->lpVtbl->refresh(This,val)
-#define IVLCMarquee_size(This,val) (This)->lpVtbl->size(This,val)
-#define IVLCMarquee_timeout(This,val) (This)->lpVtbl->timeout(This,val)
-#define IVLCMarquee_x(This,val) (This)->lpVtbl->x(This,val)
-#define IVLCMarquee_y(This,val) (This)->lpVtbl->y(This,val)
+#define IVLCMarquee_get_text(This,val) (This)->lpVtbl->get_text(This,val)
+#define IVLCMarquee_put_text(This,val) (This)->lpVtbl->put_text(This,val)
+#define IVLCMarquee_get_color(This,val) (This)->lpVtbl->get_color(This,val)
+#define IVLCMarquee_put_color(This,val) (This)->lpVtbl->put_color(This,val)
+#define IVLCMarquee_get_opacity(This,val) (This)->lpVtbl->get_opacity(This,val)
+#define IVLCMarquee_put_opacity(This,val) (This)->lpVtbl->put_opacity(This,val)
+#define IVLCMarquee_get_position(This,val) (This)->lpVtbl->get_position(This,val)
+#define IVLCMarquee_put_position(This,val) (This)->lpVtbl->put_position(This,val)
+#define IVLCMarquee_get_refresh(This,val) (This)->lpVtbl->get_refresh(This,val)
+#define IVLCMarquee_put_refresh(This,val) (This)->lpVtbl->put_refresh(This,val)
+#define IVLCMarquee_get_size(This,val) (This)->lpVtbl->get_size(This,val)
+#define IVLCMarquee_put_size(This,val) (This)->lpVtbl->put_size(This,val)
+#define IVLCMarquee_get_timeout(This,val) (This)->lpVtbl->get_timeout(This,val)
+#define IVLCMarquee_put_timeout(This,val) (This)->lpVtbl->put_timeout(This,val)
+#define IVLCMarquee_get_x(This,val) (This)->lpVtbl->get_x(This,val)
+#define IVLCMarquee_put_x(This,val) (This)->lpVtbl->put_x(This,val)
+#define IVLCMarquee_get_y(This,val) (This)->lpVtbl->get_y(This,val)
+#define IVLCMarquee_put_y(This,val) (This)->lpVtbl->put_y(This,val)
 #endif
 
 #endif
@@ -2691,74 +2763,146 @@ void __RPC_STUB IVLCMarquee_disable_Stub(
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,
     DWORD* pdwStubPhase);
-HRESULT STDMETHODCALLTYPE IVLCMarquee_text_Proxy(
+HRESULT STDMETHODCALLTYPE IVLCMarquee_get_text_Proxy(
     IVLCMarquee* This,
-    BSTR text);
-void __RPC_STUB IVLCMarquee_text_Stub(
+    BSTR *val);
+void __RPC_STUB IVLCMarquee_get_text_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,
     DWORD* pdwStubPhase);
-HRESULT STDMETHODCALLTYPE IVLCMarquee_color_Proxy(
+HRESULT STDMETHODCALLTYPE IVLCMarquee_put_text_Proxy(
     IVLCMarquee* This,
-    LONG val);
-void __RPC_STUB IVLCMarquee_color_Stub(
+    BSTR val);
+void __RPC_STUB IVLCMarquee_put_text_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,
     DWORD* pdwStubPhase);
-HRESULT STDMETHODCALLTYPE IVLCMarquee_opacity_Proxy(
+HRESULT STDMETHODCALLTYPE IVLCMarquee_get_color_Proxy(
     IVLCMarquee* This,
-    LONG val);
-void __RPC_STUB IVLCMarquee_opacity_Stub(
+    LONG *val);
+void __RPC_STUB IVLCMarquee_get_color_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,
     DWORD* pdwStubPhase);
-HRESULT STDMETHODCALLTYPE IVLCMarquee_position_Proxy(
+HRESULT STDMETHODCALLTYPE IVLCMarquee_put_color_Proxy(
     IVLCMarquee* This,
     LONG val);
-void __RPC_STUB IVLCMarquee_position_Stub(
+void __RPC_STUB IVLCMarquee_put_color_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,
     DWORD* pdwStubPhase);
-HRESULT STDMETHODCALLTYPE IVLCMarquee_refresh_Proxy(
+HRESULT STDMETHODCALLTYPE IVLCMarquee_get_opacity_Proxy(
     IVLCMarquee* This,
-    LONG val);
-void __RPC_STUB IVLCMarquee_refresh_Stub(
+    LONG *val);
+void __RPC_STUB IVLCMarquee_get_opacity_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,
     DWORD* pdwStubPhase);
-HRESULT STDMETHODCALLTYPE IVLCMarquee_size_Proxy(
+HRESULT STDMETHODCALLTYPE IVLCMarquee_put_opacity_Proxy(
     IVLCMarquee* This,
     LONG val);
-void __RPC_STUB IVLCMarquee_size_Stub(
+void __RPC_STUB IVLCMarquee_put_opacity_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,
     DWORD* pdwStubPhase);
-HRESULT STDMETHODCALLTYPE IVLCMarquee_timeout_Proxy(
+HRESULT STDMETHODCALLTYPE IVLCMarquee_get_position_Proxy(
     IVLCMarquee* This,
-    LONG val);
-void __RPC_STUB IVLCMarquee_timeout_Stub(
+    BSTR *val);
+void __RPC_STUB IVLCMarquee_get_position_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,
     DWORD* pdwStubPhase);
-HRESULT STDMETHODCALLTYPE IVLCMarquee_x_Proxy(
+HRESULT STDMETHODCALLTYPE IVLCMarquee_put_position_Proxy(
     IVLCMarquee* This,
-    LONG val);
-void __RPC_STUB IVLCMarquee_x_Stub(
+    BSTR val);
+void __RPC_STUB IVLCMarquee_put_position_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,
     DWORD* pdwStubPhase);
-HRESULT STDMETHODCALLTYPE IVLCMarquee_y_Proxy(
+HRESULT STDMETHODCALLTYPE IVLCMarquee_get_refresh_Proxy(
+    IVLCMarquee* This,
+    LONG *val);
+void __RPC_STUB IVLCMarquee_get_refresh_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IVLCMarquee_put_refresh_Proxy(
     IVLCMarquee* This,
     LONG val);
-void __RPC_STUB IVLCMarquee_y_Stub(
+void __RPC_STUB IVLCMarquee_put_refresh_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IVLCMarquee_get_size_Proxy(
+    IVLCMarquee* This,
+    LONG *val);
+void __RPC_STUB IVLCMarquee_get_size_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IVLCMarquee_put_size_Proxy(
+    IVLCMarquee* This,
+    LONG val);
+void __RPC_STUB IVLCMarquee_put_size_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IVLCMarquee_get_timeout_Proxy(
+    IVLCMarquee* This,
+    LONG *val);
+void __RPC_STUB IVLCMarquee_get_timeout_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IVLCMarquee_put_timeout_Proxy(
+    IVLCMarquee* This,
+    LONG val);
+void __RPC_STUB IVLCMarquee_put_timeout_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IVLCMarquee_get_x_Proxy(
+    IVLCMarquee* This,
+    LONG *val);
+void __RPC_STUB IVLCMarquee_get_x_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IVLCMarquee_put_x_Proxy(
+    IVLCMarquee* This,
+    LONG val);
+void __RPC_STUB IVLCMarquee_put_x_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IVLCMarquee_get_y_Proxy(
+    IVLCMarquee* This,
+    LONG *val);
+void __RPC_STUB IVLCMarquee_get_y_Stub(
+    IRpcStubBuffer* This,
+    IRpcChannelBuffer* pRpcChannelBuffer,
+    PRPC_MESSAGE pRpcMessage,
+    DWORD* pdwStubPhase);
+HRESULT STDMETHODCALLTYPE IVLCMarquee_put_y_Proxy(
+    IVLCMarquee* This,
+    LONG val);
+void __RPC_STUB IVLCMarquee_put_y_Stub(
     IRpcStubBuffer* This,
     IRpcChannelBuffer* pRpcChannelBuffer,
     PRPC_MESSAGE pRpcMessage,

@@ -415,26 +415,37 @@ public:
     STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
 
     // IVLCMarquee methods
-    STDMETHODIMP enable();
-    STDMETHODIMP disable();
-    STDMETHODIMP text(BSTR);
-    STDMETHODIMP color(long);
-    STDMETHODIMP opacity(long);
-    STDMETHODIMP position(long);
-    STDMETHODIMP refresh(long);
-    STDMETHODIMP size(long);
-    STDMETHODIMP timeout(long);
-    STDMETHODIMP x(long);
-    STDMETHODIMP y(long);
+    STDMETHODIMP enable()  { return do_put_int(libvlc_marquee_Enable, true); }
+    STDMETHODIMP disable() { return do_put_int(libvlc_marquee_Enable, false); }
+
+    STDMETHODIMP get_text(BSTR *);
+    STDMETHODIMP put_text(BSTR);
+    STDMETHODIMP get_position(BSTR *);
+    STDMETHODIMP put_position(BSTR);
+
+#define PROP_INT( a, b ) \
+        STDMETHODIMP get_##a(LONG *val) { return do_get_int(b,val); } \
+        STDMETHODIMP put_##a(LONG val)  { return do_put_int(b,val); }
+
+    PROP_INT( color,    libvlc_marquee_Color )
+    PROP_INT( opacity,  libvlc_marquee_Opacity )
+    PROP_INT( refresh,  libvlc_marquee_Refresh )
+    PROP_INT( size,     libvlc_marquee_Size )
+    PROP_INT( timeout,  libvlc_marquee_Timeout )
+    PROP_INT( x,        libvlc_marquee_X )
+    PROP_INT( y,        libvlc_marquee_Y )
+
+#undef  PROP_INT
 
 protected:
     HRESULT loadTypeInfo();
     HRESULT exception_bridge(libvlc_exception_t *ex);
-
 private:
     VLCPlugin*      _p_instance;
     ITypeInfo*      _p_typeinfo;
 
+    HRESULT do_put_int(unsigned idx, LONG val);
+    HRESULT do_get_int(unsigned idx, LONG *val);
 };
 
 
