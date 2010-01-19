@@ -2,9 +2,10 @@
  * npolibvlc.cpp: official Javascript APIs
  *****************************************************************************
  * Copyright (C) 2002-2009 the VideoLAN team
+ * Copyright (C) 2010 M2X BV
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
- *          JP Dinger <jpd@m2x.nl>
+ *          JP Dinger <jpd@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -16,9 +17,9 @@
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
  * GNU General Public License for more details.
  *
- * You should have received a copy of the GNU General Public License
- * along with this program; if not, write to the Free Software
- * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ * You should have received a copy of the GNU General Public License along
+ * with this program; if not, write to the Free Software Foundation, Inc.,
+ * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
 #include "config.h"
@@ -1266,7 +1267,8 @@ const NPUTF8 * const LibvlcVideoNPObject::propertyNames[] =
     "subtitle",
     "crop",
     "teletext",
-    "marquee"
+    "marquee",
+    "logo"
 };
 
 enum LibvlcVideoNPObjectPropertyIds
@@ -1278,7 +1280,8 @@ enum LibvlcVideoNPObjectPropertyIds
     ID_video_subtitle,
     ID_video_crop,
     ID_video_teletext,
-    ID_video_marquee
+    ID_video_marquee,
+    ID_video_logo
 };
 COUNTNAMES(LibvlcVideoNPObject,propertyCount,propertyNames);
 
@@ -1356,6 +1359,12 @@ LibvlcVideoNPObject::getProperty(int index, NPVariant &result)
             {
                 InstantObj<LibvlcMarqueeNPObject>( marqueeObj );
                 OBJECT_TO_NPVARIANT(NPN_RetainObject(marqueeObj), result);
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_video_logo:
+            {
+                InstantObj<LibvlcLogoNPObject>( logoObj );
+                OBJECT_TO_NPVARIANT(NPN_RetainObject(logoObj), result);
                 return INVOKERESULT_NO_ERROR;
             }
         }
@@ -1810,3 +1819,219 @@ LibvlcMarqueeNPObject::invoke(int index, const NPVariant *args,
     }
     return INVOKERESULT_GENERIC_ERROR;
 }
+
+const NPUTF8 * const LibvlcLogoNPObject::propertyNames[] = {
+    "delay",
+    "repeat",
+    "opacity",
+    "position",
+    "x",
+    "y",
+};
+enum LibvlcLogoNPObjectPropertyIds {
+    ID_logo_delay,
+    ID_logo_repeat,
+    ID_logo_opacity,
+    ID_logo_position,
+    ID_logo_x,
+    ID_logo_y,
+};
+COUNTNAMES(LibvlcLogoNPObject,propertyCount,propertyNames);
+static const unsigned char logo_idx[] = {
+    libvlc_logo_delay,
+    libvlc_logo_repeat,
+    libvlc_logo_opacity,
+    0,
+    libvlc_logo_x,
+    libvlc_logo_y,
+};
+
+struct posidx_s { const char *n; size_t i; };
+static const posidx_s posidx[] = {
+    { "center",        0 },
+    { "left",          1 },
+    { "right",         2 },
+    { "top",           4 },
+    { "bottom",        8 },
+    { "top-left",      5 },
+    { "top-right",     6 },
+    { "bottom-left",   9 },
+    { "bottom-right", 10 },
+};
+enum { num_posidx = sizeof(posidx)/sizeof(*posidx) };
+
+static inline const char *logo_numtopos( size_t i )
+{
+    for( const posidx_s *h=posidx; h<posidx+num_posidx; ++h )
+        if( h->i == i )
+            return h->n;
+    return "undefined";
+}
+
+static inline bool logo_postonum( const char *n, size_t &i )
+{
+    for( const posidx_s *h=posidx; h<posidx+num_posidx; ++h )
+        if( !strcasecmp( n, h->n ) )
+            { i=h->i; return true; }
+    return false;
+}
+
+RuntimeNPObject::InvokeResult
+LibvlcLogoNPObject::getProperty(int index, NPVariant &result)
+{
+    if( !isPluginRunning() )
+        return INVOKERESULT_GENERIC_ERROR;
+
+    VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+    libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+    RETURN_ON_EXCEPTION(this,ex);
+
+    switch( index )
+    {
+    case ID_logo_delay:
+    case ID_logo_repeat:
+    case ID_logo_opacity:
+    case ID_logo_x:
+    case ID_logo_y:
+
+        INT32_TO_NPVARIANT(
+            libvlc_video_get_logo_int(p_md, logo_idx[index], &ex), result);
+
+        RETURN_ON_EXCEPTION(this,ex);
+        break;
+
+    case ID_logo_position:
+        STRINGZ_TO_NPVARIANT( logo_numtopos(
+            libvlc_video_get_logo_int(p_md, libvlc_logo_position, &ex) ),
+            result );
+
+        RETURN_ON_EXCEPTION(this,ex);
+        break;
+    default:
+        return INVOKERESULT_GENERIC_ERROR;
+    }
+    return INVOKERESULT_NO_ERROR;
+}
+
+RuntimeNPObject::InvokeResult
+LibvlcLogoNPObject::setProperty(int index, const NPVariant &value)
+{
+    size_t i;
+
+    if( !isPluginRunning() )
+        return INVOKERESULT_GENERIC_ERROR;
+
+    VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+
+    libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+    RETURN_ON_EXCEPTION(this,ex);
+
+    switch( index )
+    {
+    case ID_logo_delay:
+    case ID_logo_repeat:
+    case ID_logo_opacity:
+    case ID_logo_x:
+    case ID_logo_y:
+        if( !NPVARIANT_IS_INT32(value) )
+            return INVOKERESULT_INVALID_VALUE;
+
+        libvlc_video_set_logo_int(p_md, logo_idx[index],
+                                  NPVARIANT_TO_INT32( value ), &ex);
+
+        RETURN_ON_EXCEPTION(this,ex);
+        break;
+
+    case ID_logo_position:
+        if( !NPVARIANT_IS_STRING(value) ||
+            !logo_postonum( NPVARIANT_TO_STRING(value).utf8characters, i ) )
+            return INVOKERESULT_INVALID_VALUE;
+
+        libvlc_video_set_logo_int(p_md, libvlc_logo_position, i, &ex);
+
+        RETURN_ON_EXCEPTION(this,ex);
+        break;
+    default:
+        return INVOKERESULT_GENERIC_ERROR;
+    }
+    return INVOKERESULT_NO_ERROR;
+}
+
+
+const NPUTF8 * const LibvlcLogoNPObject::methodNames[] = {
+    "enable",
+    "disable",
+    "file",
+};
+enum LibvlcLogoNPObjectMethodIds {
+    ID_logo_enable,
+    ID_logo_disable,
+    ID_logo_file,
+};
+COUNTNAMES(LibvlcLogoNPObject,methodCount,methodNames);
+
+RuntimeNPObject::InvokeResult
+LibvlcLogoNPObject::invoke(int index, const NPVariant *args,
+                           uint32_t argCount, NPVariant &result)
+{
+    char *buf, *h;
+    size_t i, len;
+
+    if( !isPluginRunning() )
+        return INVOKERESULT_GENERIC_ERROR;
+
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+    libvlc_media_player_t *p_md = getPrivate<VlcPlugin>()->getMD(&ex);
+    RETURN_ON_EXCEPTION(this,ex);
+
+    switch( index )
+    {
+    case ID_logo_enable:
+    case ID_logo_disable:
+        if( argCount != 0 )
+            return INVOKERESULT_GENERIC_ERROR;
+
+        libvlc_video_set_logo_int(p_md, libvlc_logo_enable,
+                                  index != ID_logo_disable, &ex);
+        RETURN_ON_EXCEPTION(this,ex);
+        VOID_TO_NPVARIANT(result);
+        break;
+
+    case ID_logo_file:
+        if( argCount == 0 )
+            return INVOKERESULT_GENERIC_ERROR;
+
+        for( len=0,i=0;i<argCount;++i )
+        {
+            if( !NPVARIANT_IS_STRING(args[i]) )
+                return INVOKERESULT_INVALID_VALUE;
+            len+=NPVARIANT_TO_STRING(args[i]).utf8length+1;
+        }
+
+        buf = (char *)malloc( len+1 );
+        if( !buf )
+            return INVOKERESULT_OUT_OF_MEMORY;
+
+        for( h=buf,i=0;i<argCount;++i )
+        {
+            if(i) *h++=';';
+            len=NPVARIANT_TO_STRING(args[i]).utf8length;
+            memcpy(h,NPVARIANT_TO_STRING(args[i]).utf8characters,len);
+            h+=len;
+        }
+        *h='\0';
+
+        libvlc_video_set_logo_string(p_md, libvlc_logo_file, buf, &ex);
+        free( buf );
+        RETURN_ON_EXCEPTION(this,ex);
+        VOID_TO_NPVARIANT(result);
+        break;
+    }
+    return INVOKERESULT_NO_ERROR;
+}
+
