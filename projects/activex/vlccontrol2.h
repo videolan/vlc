@@ -29,38 +29,116 @@
 #include <vlc/libvlc.h>
 #include <ole2.h>
 
-class VLCAudio : public IVLCAudio
-{
+class VLCInterfaceBase {
 public:
-    VLCAudio(VLCPlugin *p_instance) :
-        _p_instance(p_instance), _p_typeinfo(NULL) {};
-    virtual ~VLCAudio();
+    VLCInterfaceBase(VLCPlugin *p): _plug(p), _ti(NULL) { }
+    virtual ~VLCInterfaceBase() { if( _ti ) _ti->Release(); }
 
-    // IUnknown methods
+    VLCPlugin *Instance() const { return _plug; }
+    HRESULT getVLC(libvlc_instance_t **pp) const { return _plug->getVLC(pp); }
+    HRESULT getMD(libvlc_media_player_t **pp) const { return _plug->getMD(pp); }
+
+protected:
+    HRESULT report_exception(REFIID riid, libvlc_exception_t *ex);
+    HRESULT loadTypeInfo(REFIID riid);
+    ITypeInfo *TypeInfo() const { return _ti; }
+
+    STDMETHODIMP_(ULONG) AddRef(void) { return _plug->pUnkOuter->AddRef(); };
+    STDMETHODIMP_(ULONG) Release(void) { return _plug->pUnkOuter->Release(); };
+private:
+    VLCPlugin *_plug;
+    ITypeInfo *_ti;
+};
+
+template<class T,class I>
+class VLCInterface: public I, private VLCInterfaceBase
+{
+private:
+    typedef VLCInterfaceBase Base;
+          T *This()       { return static_cast<      T *>(this); }
+    const T *This() const { return static_cast<const T *>(this); }
+
+    HRESULT loadTypeInfo()
+    {
+        return TypeInfo() ? NOERROR : Base::loadTypeInfo(_riid);
+    }
+
+public:
+    VLCInterface(VLCPlugin *p): Base(p) { }
+    VLCPlugin *Instance() const { return Base::Instance(); }
+
+    HRESULT getVLC(libvlc_instance_t **pp) const { return Base::getVLC(pp); }
+    HRESULT getMD(libvlc_media_player_t **pp) const { return Base::getMD(pp); }
+
+    HRESULT exception_bridge(libvlc_exception_t *ex)
+    {
+        return libvlc_exception_raised(ex) ?
+            Base::report_exception(_riid,ex) : NOERROR;
+    }
+
     STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
     {
-        if( NULL == ppv )
-          return E_POINTER;
+        if( NULL == ppv ) return E_POINTER;
+
         if( (IID_IUnknown == riid)
          || (IID_IDispatch == riid)
-         || (IID_IVLCAudio == riid) )
+         || (_riid == riid) )
         {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
+            This()->AddRef();
+            *ppv = reinterpret_cast<LPVOID>(This());
             return NOERROR;
         }
         // behaves as a standalone object
         return E_NOINTERFACE;
-    };
+    }
 
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
+    STDMETHODIMP GetTypeInfoCount(UINT* pctInfo)
+    {
+        if( NULL == pctInfo )
+            return E_INVALIDARG;
+        *pctInfo = SUCCEEDED(loadTypeInfo()) ? 1 : 0;
+        return NOERROR;
+    }
+    STDMETHODIMP GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
+    {
+        if( NULL == ppTInfo )
+            return E_INVALIDARG;
 
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+        if( SUCCEEDED(loadTypeInfo()) )
+        {
+            (*ppTInfo = TypeInfo())->AddRef();
+            return NOERROR;
+        }
+        *ppTInfo = NULL;
+        return E_NOTIMPL;
+    }
+
+    STDMETHODIMP GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
+            UINT cNames, LCID lcid, DISPID* rgDispID)
+    {
+        return FAILED(loadTypeInfo()) ? E_NOTIMPL :
+            DispGetIDsOfNames(TypeInfo(), rgszNames, cNames, rgDispID);
+    }
+
+    STDMETHODIMP Invoke(DISPID dispIdMember, REFIID riid,
+        LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
+        VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+    {
+        return FAILED(loadTypeInfo()) ? E_NOTIMPL :
+            DispInvoke(This(), TypeInfo(), dispIdMember, wFlags,
+                       pDispParams, pVarResult, pExcepInfo, puArgErr);
+    }
+
+    STDMETHODIMP_(ULONG) AddRef(void)  { return Base::AddRef(); };
+    STDMETHODIMP_(ULONG) Release(void) { return Base::Release(); };
+private:
+    static REFIID _riid;
+};
+
+class VLCAudio : public VLCInterface<VLCAudio,IVLCAudio>
+{
+public:
+    VLCAudio(VLCPlugin *p): VLCInterface<VLCAudio,IVLCAudio>(p) { }
 
     // IVLCAudio methods
     STDMETHODIMP get_mute(VARIANT_BOOL*);
@@ -74,50 +152,12 @@ public:
     STDMETHODIMP put_channel(long);
     STDMETHODIMP toggleMute();
     STDMETHODIMP description(long, BSTR*);
-
-protected:
-    HRESULT loadTypeInfo();
-    HRESULT exception_bridge(libvlc_exception_t *ex);
-
-private:
-    VLCPlugin*      _p_instance;
-    ITypeInfo*      _p_typeinfo;
-
 };
 
-class VLCInput : public IVLCInput
+class VLCInput: public VLCInterface<VLCInput,IVLCInput>
 {
 public:
-
-    VLCInput(VLCPlugin *p_instance) :
-        _p_instance(p_instance), _p_typeinfo(NULL) {};
-    virtual ~VLCInput();
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-    {
-        if( NULL == ppv )
-          return E_POINTER;
-        if( (IID_IUnknown == riid)
-         || (IID_IDispatch == riid)
-         || (IID_IVLCInput == riid) )
-        {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
-            return NOERROR;
-        }
-        // behaves as a standalone object
-        return E_NOINTERFACE;
-    };
-
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
-
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+    VLCInput(VLCPlugin *p): VLCInterface<VLCInput,IVLCInput>(p) { }
 
     // IVLCInput methods
     STDMETHODIMP get_length(double*);
@@ -130,46 +170,19 @@ public:
     STDMETHODIMP put_rate(double);
     STDMETHODIMP get_fps(double*);
     STDMETHODIMP get_hasVout(VARIANT_BOOL*);
-
-protected:
-    HRESULT loadTypeInfo();
-    HRESULT exception_bridge(libvlc_exception_t *ex);
-
-private:
-    VLCPlugin*      _p_instance;
-    ITypeInfo*      _p_typeinfo;
-
 };
 
-class VLCMessage: public IVLCMessage
+class VLCMessage: public VLCInterface<VLCMessage,IVLCMessage>
 {
 public:
-
-    VLCMessage(VLCPlugin *p_instance, struct libvlc_log_message_t &msg) :
-        _p_instance(p_instance),
-        _p_typeinfo(NULL),
+    VLCMessage(VLCPlugin *p, struct libvlc_log_message_t &msg):
+        VLCInterface<VLCMessage,IVLCMessage>(p),
         _refcount(1),
-        _msg(msg) {};
-    virtual ~VLCMessage();
+        _msg(msg) { }
 
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-    {
-        if( NULL == ppv )
-          return E_POINTER;
-        if( (IID_IUnknown == riid)
-         || (IID_IDispatch == riid)
-         || (IID_IVLCMessage == riid) )
-        {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
-            return NOERROR;
-        }
-        // behaves as a standalone object
-        return E_NOINTERFACE;
-    };
+    STDMETHODIMP_(ULONG) AddRef(void)
+        { return InterlockedIncrement(&_refcount); }
 
-    STDMETHODIMP_(ULONG) AddRef(void) { return InterlockedIncrement(&_refcount); };
     STDMETHODIMP_(ULONG) Release(void)
     {
         ULONG refcount = InterlockedDecrement(&_refcount);
@@ -180,12 +193,6 @@ public:
         }
         return refcount;
     };
-
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
 
     // IVLCMessage methods
     STDMETHODIMP get__Value(VARIANT *);
@@ -195,12 +202,7 @@ public:
     STDMETHODIMP get_header(BSTR *);
     STDMETHODIMP get_message(BSTR *);
 
-protected:
-    HRESULT loadTypeInfo();
-
 private:
-    VLCPlugin*      _p_instance;
-    ITypeInfo*      _p_typeinfo;
     LONG            _refcount;
 
     struct libvlc_log_message_t _msg;
@@ -208,31 +210,15 @@ private:
 
 class VLCLog;
 
-class VLCMessageIterator : public IVLCMessageIterator
+class VLCMessageIterator: public
+    VLCInterface<VLCMessageIterator,IVLCMessageIterator>
 {
 public:
+    VLCMessageIterator(VLCPlugin *p, VLCLog *p_vlclog );
+    ~VLCMessageIterator() { if( _p_iter ) libvlc_log_iterator_free(_p_iter); }
 
-    VLCMessageIterator(VLCPlugin *p_instance, VLCLog* p_vlclog);
-    virtual ~VLCMessageIterator();
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-    {
-        if( NULL == ppv )
-          return E_POINTER;
-        if( (IID_IUnknown == riid)
-         || (IID_IDispatch == riid)
-         || (IID_IVLCMessageIterator == riid) )
-        {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
-            return NOERROR;
-        }
-        // behaves as a standalone object
-        return E_NOINTERFACE;
-    };
-
-    STDMETHODIMP_(ULONG) AddRef(void) { return InterlockedIncrement(&_refcount); };
+    STDMETHODIMP_(ULONG) AddRef(void)
+        { return InterlockedIncrement(&_refcount); };
     STDMETHODIMP_(ULONG) Release(void)
     {
         ULONG refcount = InterlockedDecrement(&_refcount);
@@ -242,66 +228,26 @@ public:
             return 0;
         }
         return refcount;
-    };
-
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+    }
 
     // IVLCMessageIterator methods
     STDMETHODIMP get_hasNext(VARIANT_BOOL*);
     STDMETHODIMP next(IVLCMessage**);
  
-protected:
-    HRESULT loadTypeInfo();
-    HRESULT exception_bridge(libvlc_exception_t *ex);
-
 private:
-    VLCPlugin*      _p_instance;
-    ITypeInfo*      _p_typeinfo;
     LONG            _refcount;
 
     VLCLog*                 _p_vlclog;
     libvlc_log_iterator_t*  _p_iter;
 };
 
-class VLCMessages : public IVLCMessages
+class VLCMessages: public VLCInterface<VLCMessages,IVLCMessages>
 {
 public:
 
-    VLCMessages(VLCPlugin *p_instance, VLCLog *p_vlclog) :
-        _p_vlclog(p_vlclog),
-        _p_instance(p_instance),
-        _p_typeinfo(NULL) {}
-    virtual ~VLCMessages();
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-    {
-        if( NULL == ppv )
-          return E_POINTER;
-        if( (IID_IUnknown == riid)
-         || (IID_IDispatch == riid)
-         || (IID_IVLCMessages == riid) )
-        {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
-            return NOERROR;
-        }
-        // behaves as a standalone object
-        return E_NOINTERFACE;
-    };
-
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
-
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+    VLCMessages(VLCPlugin *p, VLCLog *p_vlclog):
+        VLCInterface<VLCMessages,IVLCMessages>(p),
+        _p_vlclog(p_vlclog) { }
 
     // IVLCMessages methods
     STDMETHODIMP get__NewEnum(LPUNKNOWN*);
@@ -310,58 +256,19 @@ public:
     STDMETHODIMP iterator(IVLCMessageIterator**);
 
 protected:
-    HRESULT loadTypeInfo();
-    HRESULT exception_bridge(libvlc_exception_t *ex);
-
     VLCLog*     _p_vlclog;
-
-private:
-    VLCPlugin*  _p_instance;
-    ITypeInfo*  _p_typeinfo;
 };
  
-class VLCLog : public IVLCLog
+class VLCLog: public VLCInterface<VLCLog,IVLCLog>
 {
 public:
 
     friend class VLCMessages;
     friend class VLCMessageIterator;
 
-    VLCLog(VLCPlugin *p_instance) :
-        _p_log(NULL),
-        _p_instance(p_instance),
-        _p_typeinfo(NULL),
-        _p_vlcmessages(NULL)
-    {
-        _p_vlcmessages = new VLCMessages(p_instance, this);
-    };
+    VLCLog(VLCPlugin *p): VLCInterface<VLCLog,IVLCLog>(p), _p_log(NULL),
+                          _p_vlcmessages(new VLCMessages(p, this)) { }
     virtual ~VLCLog();
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-    {
-        if( NULL == ppv )
-          return E_POINTER;
-        if( (IID_IUnknown == riid)
-         || (IID_IDispatch == riid)
-         || (IID_IVLCLog == riid) )
-        {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
-            return NOERROR;
-        }
-        // behaves as a standalone object
-        return E_NOINTERFACE;
-    };
-
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
-
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
 
     // IVLCLog methods
     STDMETHODIMP get_messages(IVLCMessages**);
@@ -369,50 +276,14 @@ public:
     STDMETHODIMP put_verbosity(long);
 
 protected:
-    HRESULT loadTypeInfo();
-    HRESULT exception_bridge(libvlc_exception_t *ex);
-
     libvlc_log_t    *_p_log;
-
-private:
-    VLCPlugin*      _p_instance;
-    ITypeInfo*      _p_typeinfo;
-
     VLCMessages*    _p_vlcmessages;
 };
 
-class VLCMarquee : public IVLCMarquee
+class VLCMarquee: public VLCInterface<VLCMarquee,IVLCMarquee>
 {
 public:
-    VLCMarquee(VLCPlugin *p_instance) :
-        _p_instance(p_instance), _p_typeinfo(NULL) {};
-    virtual ~VLCMarquee();
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-    {
-        if( NULL == ppv )
-          return E_POINTER;
-        if( (IID_IUnknown == riid)
-         || (IID_IDispatch == riid)
-         || (IID_IVLCMarquee == riid) )
-        {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
-           return NOERROR;
-        }
-        // behaves as a standalone object
-        return E_NOINTERFACE;
-    };
-
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
-
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+    VLCMarquee(VLCPlugin *p): VLCInterface<VLCMarquee,IVLCMarquee>(p) { }
 
     // IVLCMarquee methods
     STDMETHODIMP enable()  { return do_put_int(libvlc_marquee_Enable, true); }
@@ -437,49 +308,16 @@ public:
 
 #undef  PROP_INT
 
-protected:
-    HRESULT loadTypeInfo();
-    HRESULT exception_bridge(libvlc_exception_t *ex);
 private:
-    VLCPlugin*      _p_instance;
-    ITypeInfo*      _p_typeinfo;
-
     HRESULT do_put_int(unsigned idx, LONG val);
     HRESULT do_get_int(unsigned idx, LONG *val);
 };
 
 
-class VLCLogo : public IVLCLogo
+class VLCLogo: public VLCInterface<VLCLogo,IVLCLogo>
 {
 public:
-    VLCLogo(VLCPlugin *p): _p_instance(p), _p_typeinfo(NULL) { }
-    virtual ~VLCLogo() { if( _p_typeinfo ) _p_typeinfo->Release(); }
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-    {
-        if( NULL == ppv )
-          return E_POINTER;
-        if( (IID_IUnknown == riid)
-         || (IID_IDispatch == riid)
-         || (IID_IVLCLogo == riid) )
-        {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
-            return NOERROR;
-        }
-        // behaves as a standalone object
-        return E_NOINTERFACE;
-    };
-
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); }
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); }
-
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+    VLCLogo(VLCPlugin *p): VLCInterface<VLCLogo,IVLCLogo>(p) { }
 
     STDMETHODIMP enable()  { return do_put_int(libvlc_logo_enable, true); }
     STDMETHODIMP disable() { return do_put_int(libvlc_logo_enable, false); }
@@ -503,103 +341,30 @@ public:
     STDMETHODIMP get_position(BSTR* val);
     STDMETHODIMP put_position(BSTR val);
 
-protected:
-    HRESULT loadTypeInfo();
-    HRESULT exception_bridge(libvlc_exception_t *ex);
-
 private:
-    VLCPlugin*      _p_instance;
-    ITypeInfo*      _p_typeinfo;
-
     HRESULT do_put_int(unsigned idx, LONG val);
     HRESULT do_get_int(unsigned idx, LONG *val);
 };
 
-class VLCPlaylistItems : public IVLCPlaylistItems
+class VLCPlaylistItems: public VLCInterface<VLCPlaylistItems,IVLCPlaylistItems>
 {
 public:
-    VLCPlaylistItems(VLCPlugin *p_instance) :
-        _p_instance(p_instance), _p_typeinfo(NULL) {};
-    virtual ~VLCPlaylistItems();
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-    {
-        if( NULL == ppv )
-          return E_POINTER;
-        if( (IID_IUnknown == riid)
-         || (IID_IDispatch == riid)
-         || (IID_IVLCPlaylistItems == riid) )
-        {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
-            return NOERROR;
-        }
-        // behaves as a standalone object
-        return E_NOINTERFACE;
-    };
-
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
-
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+    VLCPlaylistItems(VLCPlugin *p):
+        VLCInterface<VLCPlaylistItems,IVLCPlaylistItems>(p) { }
 
     // IVLCPlaylistItems methods
     STDMETHODIMP get_count(long*);
     STDMETHODIMP clear();
     STDMETHODIMP remove(long);
-
-protected:
-    HRESULT loadTypeInfo();
-    HRESULT exception_bridge(libvlc_exception_t *ex);
-
-private:
-    VLCPlugin*  _p_instance;
-    ITypeInfo*  _p_typeinfo;
-
 };
 
-class VLCPlaylist : public IVLCPlaylist
+class VLCPlaylist: public VLCInterface<VLCPlaylist,IVLCPlaylist>
 {
 public:
-    VLCPlaylist(VLCPlugin *p_instance) :
-        _p_instance(p_instance),
-        _p_typeinfo(NULL),
-        _p_vlcplaylistitems(NULL)
-    {
-        _p_vlcplaylistitems = new VLCPlaylistItems(p_instance);
-    };
-    virtual ~VLCPlaylist();
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-    {
-        if( NULL == ppv )
-          return E_POINTER;
-        if( (IID_IUnknown == riid)
-         || (IID_IDispatch == riid)
-         || (IID_IVLCPlaylist == riid) )
-        {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
-            return NOERROR;
-        }
-        // behaves as a standalone object
-        return E_NOINTERFACE;
-    };
-
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
-
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+    VLCPlaylist(VLCPlugin *p):
+        VLCInterface<VLCPlaylist,IVLCPlaylist>(p),
+        _p_vlcplaylistitems(new VLCPlaylistItems(p)) { }
+    virtual ~VLCPlaylist() { delete _p_vlcplaylistitems; }
 
     // IVLCPlaylist methods
     STDMETHODIMP get_itemCount(long*);
@@ -615,101 +380,28 @@ public:
     STDMETHODIMP removeItem(long);
     STDMETHODIMP get_items(IVLCPlaylistItems**);
 
-protected:
-    HRESULT loadTypeInfo();
-    HRESULT exception_bridge(libvlc_exception_t *ex);
-
 private:
-    VLCPlugin*  _p_instance;
-    ITypeInfo*  _p_typeinfo;
-
     VLCPlaylistItems*    _p_vlcplaylistitems;
 };
 
-class VLCSubtitle : public IVLCSubtitle
+class VLCSubtitle: public VLCInterface<VLCSubtitle,IVLCSubtitle>
 {
 public:
-    VLCSubtitle(VLCPlugin *p_instance) :
-        _p_instance(p_instance), _p_typeinfo(NULL) {};
-    virtual ~VLCSubtitle();
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-    {
-        if( NULL == ppv )
-          return E_POINTER;
-        if( (IID_IUnknown == riid)
-         || (IID_IDispatch == riid)
-         || (IID_IVLCSubtitle == riid) )
-        {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
-            return NOERROR;
-        }
-        // behaves as a standalone object
-        return E_NOINTERFACE;
-    };
-
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
-
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+    VLCSubtitle(VLCPlugin *p): VLCInterface<VLCSubtitle,IVLCSubtitle>(p) { }
 
     // IVLCSubtitle methods
     STDMETHODIMP get_track(long*);
     STDMETHODIMP put_track(long);
     STDMETHODIMP get_count(long*);
     STDMETHODIMP description(long, BSTR*);
-
-protected:
-    HRESULT loadTypeInfo();
-    HRESULT exception_bridge(libvlc_exception_t *ex);
-
-private:
-    VLCPlugin*      _p_instance;
-    ITypeInfo*      _p_typeinfo;
-
 };
 
-class VLCVideo : public IVLCVideo
+class VLCVideo: public VLCInterface<VLCVideo,IVLCVideo>
 {
 public:
-    VLCVideo(VLCPlugin *p_instance) :
-        _p_instance(p_instance),
-        _p_typeinfo(NULL),
-        _p_vlcmarquee(new VLCMarquee(p_instance)),
-        _p_vlclogo(new VLCLogo(p_instance)) { }
-    virtual ~VLCVideo();
-
-    // IUnknown methods
-    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
-    {
-        if( NULL == ppv )
-          return E_POINTER;
-        if( (IID_IUnknown == riid)
-         || (IID_IDispatch == riid)
-         || (IID_IVLCVideo == riid) )
-        {
-            AddRef();
-            *ppv = reinterpret_cast<LPVOID>(this);
-            return NOERROR;
-        }
-        // behaves as a standalone object
-        return E_NOINTERFACE;
-    };
-
-    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); };
-    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); };
-
-    // IDispatch methods
-    STDMETHODIMP GetTypeInfoCount(UINT*);
-    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
-    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
-    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+    VLCVideo(VLCPlugin *p): VLCInterface<VLCVideo,IVLCVideo>(p),
+        _p_vlcmarquee(new VLCMarquee(p)), _p_vlclogo(new VLCLogo(p)) { }
+    virtual ~VLCVideo() { delete _p_vlcmarquee; delete _p_vlclogo; }
 
     // IVLCVideo methods
     STDMETHODIMP get_fullscreen(VARIANT_BOOL*);
@@ -732,13 +424,7 @@ public:
     STDMETHODIMP toggleFullscreen();
     STDMETHODIMP toggleTeletext();
 
-protected:
-    HRESULT loadTypeInfo();
-    HRESULT exception_bridge(libvlc_exception_t *ex);
-
 private:
-    VLCPlugin*      _p_instance;
-    ITypeInfo*      _p_typeinfo;
     VLCMarquee*     _p_vlcmarquee;
     VLCLogo*        _p_vlclogo;
 };
