@@ -27,6 +27,7 @@
 #include "axvlc_idl.h"
 
 #include <vlc/libvlc.h>
+#include <ole2.h>
 
 class VLCAudio : public IVLCAudio
 {
@@ -436,6 +437,73 @@ private:
 
 };
 
+
+class VLCLogo : public IVLCLogo
+{
+public:
+    VLCLogo(VLCPlugin *p): _p_instance(p), _p_typeinfo(NULL) { }
+    virtual ~VLCLogo() { if( _p_typeinfo ) _p_typeinfo->Release(); }
+
+    // IUnknown methods
+    STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
+    {
+        if( NULL == ppv )
+          return E_POINTER;
+        if( (IID_IUnknown == riid)
+         || (IID_IDispatch == riid)
+         || (IID_IVLCLogo == riid) )
+        {
+            AddRef();
+            *ppv = reinterpret_cast<LPVOID>(this);
+            return NOERROR;
+        }
+        // behaves as a standalone object
+        return E_NOINTERFACE;
+    };
+
+    STDMETHODIMP_(ULONG) AddRef(void) { return _p_instance->pUnkOuter->AddRef(); }
+    STDMETHODIMP_(ULONG) Release(void) { return _p_instance->pUnkOuter->Release(); }
+
+    // IDispatch methods
+    STDMETHODIMP GetTypeInfoCount(UINT*);
+    STDMETHODIMP GetTypeInfo(UINT, LCID, LPTYPEINFO*);
+    STDMETHODIMP GetIDsOfNames(REFIID,LPOLESTR*,UINT,LCID,DISPID*);
+    STDMETHODIMP Invoke(DISPID,REFIID,LCID,WORD,DISPPARAMS*,VARIANT*,EXCEPINFO*,UINT*);
+
+    STDMETHODIMP enable()  { return do_put_int(libvlc_logo_enable, true); }
+    STDMETHODIMP disable() { return do_put_int(libvlc_logo_enable, false); }
+
+    STDMETHODIMP file(BSTR fname);
+
+#define PROP_INT( a ) \
+        STDMETHODIMP get_##a(LONG *val) \
+            { return do_get_int(libvlc_logo_##a,val); } \
+        STDMETHODIMP put_##a(LONG val) \
+            { return do_put_int(libvlc_logo_##a,val); }
+
+    PROP_INT( delay )
+    PROP_INT( repeat )
+    PROP_INT( opacity )
+    PROP_INT( x )
+    PROP_INT( y )
+
+#undef  PROP_INT
+
+    STDMETHODIMP get_position(BSTR* val);
+    STDMETHODIMP put_position(BSTR val);
+
+protected:
+    HRESULT loadTypeInfo();
+    HRESULT exception_bridge(libvlc_exception_t *ex);
+
+private:
+    VLCPlugin*      _p_instance;
+    ITypeInfo*      _p_typeinfo;
+
+    HRESULT do_put_int(unsigned idx, LONG val);
+    HRESULT do_get_int(unsigned idx, LONG *val);
+};
+
 class VLCPlaylistItems : public IVLCPlaylistItems
 {
 public:
@@ -602,10 +670,8 @@ public:
     VLCVideo(VLCPlugin *p_instance) :
         _p_instance(p_instance),
         _p_typeinfo(NULL),
-        _p_vlcmarquee(NULL)
-    {
-        _p_vlcmarquee = new VLCMarquee(p_instance);
-    };
+        _p_vlcmarquee(new VLCMarquee(p_instance)),
+        _p_vlclogo(new VLCLogo(p_instance)) { }
     virtual ~VLCVideo();
 
     // IUnknown methods
@@ -648,6 +714,7 @@ public:
     STDMETHODIMP get_teletext(long*);
     STDMETHODIMP put_teletext(long);
     STDMETHODIMP get_marquee(IVLCMarquee**);
+    STDMETHODIMP get_logo(IVLCLogo**);
     STDMETHODIMP deinterlaceDisable();
     STDMETHODIMP deinterlaceEnable(BSTR);
     STDMETHODIMP takeSnapshot(LPPICTUREDISP*);
@@ -662,7 +729,7 @@ private:
     VLCPlugin*      _p_instance;
     ITypeInfo*      _p_typeinfo;
     VLCMarquee*     _p_vlcmarquee;
-
+    VLCLogo*        _p_vlclogo;
 };
 
 class VLCControl2 : public IVLCControl2

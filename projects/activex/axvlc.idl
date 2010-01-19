@@ -2,6 +2,7 @@
  * axvlc.idl: ActiveX control for VLC
  *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2010 M2X BV
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
@@ -21,8 +22,10 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-//comments terminated by [t] are by tonsofpcs, regarding the string review.  April 02, 2006. [t]
-//Possibly change all instances of "the current playlist" to "the playlist" and "current playlist" to "the playlist" [t]
+// comments terminated by [t] are by tonsofpcs, regarding the string
+// review. April 02, 2006. [t]
+// Possibly change all instances of "the current playlist" to "the
+// playlist" and "current playlist" to "the playlist" [t]
 
 import "ocidl.idl";
 
@@ -129,13 +132,13 @@ library AXVLC
         HRESULT setVariable([in] BSTR name, [in] VARIANT value);
         [helpstring("Returns the value of a VLC variable.")]
         HRESULT getVariable([in] BSTR name, [out, retval] VARIANT *value);
-        [helpstring("Add an item to the playlist.")]
 
 /*
 ** use VARIANT rather than a SAFEARRAY as argument type
 ** for compatibility with some scripting language (JScript)
 */
 
+        [helpstring("Add an item to the playlist.")]
         HRESULT addTarget([in] BSTR uri, [in] VARIANT options, [in] enum VLCPlaylistMode mode, [in] int position);
         [propget, helpstring("Returns index of current item in playlist.")]
         HRESULT PlaylistIndex([out, retval] int* index);
@@ -465,6 +468,54 @@ library AXVLC
 
     [
       odl,
+      uuid(8a4a20c2-93f3-44e8-8644-beb2e3487e84),
+      helpstring("VLC Logo Filter"),
+      dual,
+      oleautomation
+    ]
+    interface IVLCLogo : IDispatch
+    {
+        [helpstring("Enable the logo filter.")]
+        HRESULT enable();
+        [helpstring("Disable the logo filter.")]
+        HRESULT disable();
+
+        [helpstring("specify input file[[,delay],alpha].")]
+        HRESULT file([in] BSTR fname);
+
+        [propget, helpstring("")]
+        HRESULT delay([out, retval] long* val);
+        [propput, helpstring("Set delay-to-next-picture in miliseconds.")]
+        HRESULT delay([in] long val);
+
+        [propget, helpstring("")]
+        HRESULT repeat([out, retval] long* val);
+        [propput, helpstring("Repeat: -1 continuous (default), 0 no repeat, ....")]
+        HRESULT repeat([in] long val);
+
+        [propget, helpstring("Returns the `global' alpha value.")]
+        HRESULT opacity([out, retval] long* val);
+        [propput, helpstring("Alpha value: 0 opaque to 255 fully transparent")]
+        HRESULT opacity([in] long val);
+
+        [propget, helpstring("Retrieve picture position.")]
+        HRESULT position([out, retval] BSTR* val);
+        [propput, helpstring("Picture positioning relative to: center, left, right, top, bottom, top-left, top-right, bottom-left, bottom-right.")]
+        HRESULT position([in] BSTR val);
+
+        [propget, helpstring("Picture x offset.")]
+        HRESULT x([out, retval] long* val);
+        [propput, helpstring("Picture x offset.")]
+        HRESULT x([in] long val);
+        [propget, helpstring("Picture y offset.")]
+        HRESULT y([out, retval] long* val);
+        [propput, helpstring("Picture y offset.")]
+        HRESULT y([in] long val);
+
+    };
+
+    [
+      odl,
       uuid(0AAEDF0B-D333-4B27-A0C6-BBF31413A42E),
       helpstring("VLC Video APIs"),
       dual,
@@ -520,6 +571,9 @@ library AXVLC
 
         [propget, helpstring("Returns the marquee object.")]
         HRESULT marquee([out, retval] IVLCMarquee** obj);
+
+        [propget, helpstring("Returns the logo object.")]
+        HRESULT logo([out, retval] IVLCLogo** obj);
     };
 
     [

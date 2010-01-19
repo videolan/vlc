@@ -2,6 +2,7 @@
  * vlccontrol2.cpp: ActiveX control for VLC
  *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2010 M2X BV
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
@@ -21,16 +22,15 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include "plugin.h"
-#include "vlccontrol2.h"
-#include "vlccontrol.h"
-
-#include "utils.h"
-
 #include <stdio.h>
 #include <shlwapi.h>
 #include <wininet.h>
 #include <tchar.h>
+
+#include "utils.h"
+#include "plugin.h"
+#include "vlccontrol2.h"
+#include "vlccontrol.h"
 
 
 static inline
@@ -55,6 +55,7 @@ EMIT_EXCEPTION_BRIDGE( VLCMarquee )
 EMIT_EXCEPTION_BRIDGE( VLCMessageIterator )
 EMIT_EXCEPTION_BRIDGE( VLCMessages )
 EMIT_EXCEPTION_BRIDGE( VLCLog )
+EMIT_EXCEPTION_BRIDGE( VLCLogo )
 EMIT_EXCEPTION_BRIDGE( VLCPlaylistItems )
 EMIT_EXCEPTION_BRIDGE( VLCPlaylist )
 EMIT_EXCEPTION_BRIDGE( VLCVideo )
@@ -335,7 +336,7 @@ STDMETHODIMP VLCAudio::toggleMute()
     return hr;
 };
 
-/*******************************************************************************/
+/****************************************************************************/
 
 VLCInput::~VLCInput()
 {
@@ -594,7 +595,7 @@ STDMETHODIMP VLCInput::get_hasVout(VARIANT_BOOL* hasVout)
     return hr;
 };
 
-/*******************************************************************************/
+/****************************************************************************/
 
 VLCLog::~VLCLog()
 {
@@ -742,7 +743,7 @@ STDMETHODIMP VLCLog::put_verbosity(long verbosity)
     return hr;
 };
 
-/*******************************************************************************/
+/****************************************************************************/
 
 VLCMarquee::~VLCMarquee()
 {
@@ -988,7 +989,7 @@ STDMETHODIMP VLCMarquee::y(long val)
     return hr;
 };
 
-/*******************************************************************************/
+/****************************************************************************/
 
 /* STL forward iterator used by VLCEnumIterator class to implement IEnumVARIANT */
 
@@ -1196,7 +1197,7 @@ STDMETHODIMP VLCMessages::iterator(IVLCMessageIterator** iter)
     return *iter ? S_OK : E_OUTOFMEMORY;
 };
 
-/*******************************************************************************/
+/****************************************************************************/
 
 VLCMessageIterator::VLCMessageIterator(VLCPlugin *p_instance, VLCLog* p_vlclog ) :
     _p_instance(p_instance),
@@ -1333,7 +1334,7 @@ STDMETHODIMP VLCMessageIterator::next(IVLCMessage** message)
     return hr;
 };
 
-/*******************************************************************************/
+/****************************************************************************/
 
 VLCMessage::~VLCMessage()
 {
@@ -1493,7 +1494,7 @@ STDMETHODIMP VLCMessage::get_message(BSTR* message)
     return NOERROR;
 };
 
-/*******************************************************************************/
+/****************************************************************************/
 
 VLCPlaylistItems::~VLCPlaylistItems()
 {
@@ -1608,7 +1609,7 @@ STDMETHODIMP VLCPlaylistItems::remove(long item)
     return hr;
 };
 
-/*******************************************************************************/
+/****************************************************************************/
 
 VLCPlaylist::~VLCPlaylist()
 {
@@ -1902,7 +1903,7 @@ STDMETHODIMP VLCPlaylist::get_items(IVLCPlaylistItems** obj)
     return E_OUTOFMEMORY;
 };
 
-/*******************************************************************************/
+/****************************************************************************/
 
 VLCSubtitle::~VLCSubtitle()
 {
@@ -2085,11 +2086,12 @@ STDMETHODIMP VLCSubtitle::description(long nameID, BSTR* name)
     return hr;
 };
 
-/*******************************************************************************/
+/****************************************************************************/
 
 VLCVideo::~VLCVideo()
 {
     delete _p_vlcmarquee;
+    delete _p_vlclogo;
     if( _p_typeinfo )
         _p_typeinfo->Release();
 };
@@ -2585,24 +2587,213 @@ STDMETHODIMP VLCVideo::get_marquee(IVLCMarquee** obj)
     return E_OUTOFMEMORY;
 };
 
-/*******************************************************************************/
+STDMETHODIMP VLCVideo::get_logo(IVLCLogo** obj)
+{
+    if( NULL == obj )
+        return E_POINTER;
+
+    *obj = _p_vlclogo;
+    if( NULL != _p_vlclogo )
+    {
+        _p_vlclogo->AddRef();
+        return NOERROR;
+    }
+    return E_OUTOFMEMORY;
+}
+
+
+/****************************************************************************/
+
+HRESULT VLCLogo::loadTypeInfo(void)
+{
+    HRESULT hr = NOERROR;
+    if( NULL == _p_typeinfo )
+    {
+        ITypeLib *p_typelib;
+
+        hr = _p_instance->getTypeLib(LOCALE_USER_DEFAULT, &p_typelib);
+        if( SUCCEEDED(hr) )
+        {
+            hr = p_typelib->GetTypeInfoOfGuid(IID_IVLCLogo, &_p_typeinfo);
+            if( FAILED(hr) )
+            {
+                _p_typeinfo = NULL;
+            }
+            p_typelib->Release();
+        }
+    }
+    return hr;
+}
+
+STDMETHODIMP VLCLogo::GetTypeInfoCount(UINT* pctInfo)
+{
+    if( NULL == pctInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+        *pctInfo = 1;
+    else
+        *pctInfo = 0;
+
+    return NOERROR;
+}
+
+STDMETHODIMP VLCLogo::GetTypeInfo(UINT iTInfo, LCID lcid, LPTYPEINFO* ppTInfo)
+{
+    if( NULL == ppTInfo )
+        return E_INVALIDARG;
+
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        _p_typeinfo->AddRef();
+        *ppTInfo = _p_typeinfo;
+        return NOERROR;
+    }
+    *ppTInfo = NULL;
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP VLCLogo::GetIDsOfNames(REFIID riid, LPOLESTR* rgszNames,
+        UINT cNames, LCID lcid, DISPID* rgDispID)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+        return DispGetIDsOfNames(_p_typeinfo, rgszNames, cNames, rgDispID);
+    return E_NOTIMPL;
+}
+
+STDMETHODIMP VLCLogo::Invoke(DISPID dispIdMember, REFIID riid,
+        LCID lcid, WORD wFlags, DISPPARAMS* pDispParams,
+        VARIANT* pVarResult, EXCEPINFO* pExcepInfo, UINT* puArgErr)
+{
+    if( SUCCEEDED(loadTypeInfo()) )
+    {
+        return DispInvoke(this, _p_typeinfo, dispIdMember, wFlags,
+                          pDispParams, pVarResult, pExcepInfo, puArgErr);
+    }
+    return E_NOTIMPL;
+}
+
+
+HRESULT VLCLogo::do_put_int(unsigned idx, LONG val)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+        libvlc_video_set_logo_int(p_md, idx, val, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+}
+
+HRESULT VLCLogo::do_get_int(unsigned idx, LONG *val)
+{
+    if( NULL == val )
+        return E_POINTER;
+
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+        *val = libvlc_video_get_logo_int(p_md, idx, &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+}
+STDMETHODIMP VLCLogo::file(BSTR fname)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = _p_instance->getMD(&p_md);
+
+    char *n = CStrFromBSTR(CP_UTF8, fname);
+    if( !n ) hr = E_OUTOFMEMORY;
+
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+        libvlc_video_set_logo_string(p_md, libvlc_logo_file, n, &ex);
+        hr = exception_bridge(&ex);
+    }
+
+    CoTaskMemFree(n);
+    return hr;
+}
+
+struct posidx_s { const char *n; size_t i; };
+static const posidx_s posidx[] = {
+    { "center",        0 },
+    { "left",          1 },
+    { "right",         2 },
+    { "top",           4 },
+    { "bottom",        8 },
+    { "top-left",      5 },
+    { "top-right",     6 },
+    { "bottom-left",   9 },
+    { "bottom-right", 10 },
+};
+enum { num_posidx = sizeof(posidx)/sizeof(*posidx) };
+STDMETHODIMP VLCLogo::get_position(BSTR* val)
+{
+    if( NULL == val )
+        return E_POINTER;
+
+    LONG i;
+    HRESULT hr = do_get_int(libvlc_logo_position, &i);
+
+    if(SUCCEEDED(hr))
+    {
+        const char *n="undefined";
+
+        for( const posidx_s *h=posidx; h<posidx+num_posidx; ++h )
+            if( i == h->i )
+            {
+                n=h->n;
+                break;
+            }
+        *val = BSTRFromCStr(CP_UTF8, n);
+    }
+    return hr;
+}
+STDMETHODIMP VLCLogo::put_position(BSTR val)
+{
+    char *n = CStrFromBSTR(CP_UTF8, val);
+    if( !n ) return E_OUTOFMEMORY;
+
+    HRESULT hr = E_NOTIMPL;
+
+    const posidx_s *h;
+    for( h=posidx; h<posidx+num_posidx; ++h )
+        if( !strcasecmp( n, h->n ) )
+        {
+            hr = do_put_int(libvlc_logo_position,h->i);
+            break;
+        }
+
+    if( h == posidx+num_posidx )
+        hr = E_INVALIDARG;
+
+    CoTaskMemFree(n);
+    return hr;
+}
+
+/****************************************************************************/
 
 VLCControl2::VLCControl2(VLCPlugin *p_instance) :
     _p_instance(p_instance),
     _p_typeinfo(NULL),
-    _p_vlcaudio(NULL),
-    _p_vlcinput(NULL),
-    _p_vlcplaylist(NULL),
-    _p_vlcsubtitle(NULL),
-    _p_vlcvideo(NULL)
+    _p_vlcaudio(new VLCAudio(p_instance)),
+    _p_vlcinput(new VLCInput(p_instance)),
+    _p_vlclog(new VLCLog(p_instance)),
+    _p_vlcplaylist(new VLCPlaylist(p_instance)),
+    _p_vlcsubtitle(new VLCSubtitle(p_instance)),
+    _p_vlcvideo(new VLCVideo(p_instance))
 {
-    _p_vlcaudio     = new VLCAudio(p_instance);
-    _p_vlcinput     = new VLCInput(p_instance);
-    _p_vlclog       = new VLCLog(p_instance);
-    _p_vlcplaylist  = new VLCPlaylist(p_instance);
-    _p_vlcsubtitle  = new VLCSubtitle(p_instance);
-    _p_vlcvideo     = new VLCVideo(p_instance);
-};
+}
 
 VLCControl2::~VLCControl2()
 {
