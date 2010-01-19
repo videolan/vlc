@@ -36,6 +36,8 @@
 #include "vlcplugin.h"
 #include "npolibvlc.h"
 
+#include "position.h"
+
 /*
 ** Local helper macros and function
 */
@@ -1562,57 +1564,6 @@ LibvlcVideoNPObject::invoke(int index, const NPVariant *args,
 
 const NPUTF8 * const LibvlcMarqueeNPObject::propertyNames[] =
 {
-};
-
-enum LibvlcMarqueeNPObjectPropertyIds
-{
-};
-COUNTNAMES(LibvlcMarqueeNPObject,propertyCount,propertyNames);
-
-RuntimeNPObject::InvokeResult
-LibvlcMarqueeNPObject::getProperty(int index, NPVariant &result)
-{
-    /* is plugin still running */
-    if( isPluginRunning() )
-    {
-        VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
-        RETURN_ON_EXCEPTION(this,ex);
-
-        switch( index )
-        {
-        }
-    }
-    return INVOKERESULT_GENERIC_ERROR;
-}
-
-RuntimeNPObject::InvokeResult
-LibvlcMarqueeNPObject::setProperty(int index, const NPVariant &value)
-{
-    /* is plugin still running */
-    if( isPluginRunning() )
-    {
-        VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
-        RETURN_ON_EXCEPTION(this,ex);
-
-        switch( index )
-        {
-        }
-    }
-    return INVOKERESULT_GENERIC_ERROR;
-}
-
-const NPUTF8 * const LibvlcMarqueeNPObject::methodNames[] =
-{
-    "enable",
-    "disable",
     "color",
     "opacity",
     "position",
@@ -1621,14 +1572,11 @@ const NPUTF8 * const LibvlcMarqueeNPObject::methodNames[] =
     "text",
     "timeout",
     "x",
-    "y"
+    "y",
 };
-COUNTNAMES(LibvlcMarqueeNPObject,methodCount,methodNames);
 
-enum LibvlcMarqueeNPObjectMethodIds
+enum LibvlcMarqueeNPObjectPropertyIds
 {
-    ID_marquee_enable,
-    ID_marquee_disable,
     ID_marquee_color,
     ID_marquee_opacity,
     ID_marquee_position,
@@ -1637,187 +1585,166 @@ enum LibvlcMarqueeNPObjectMethodIds
     ID_marquee_text,
     ID_marquee_timeout,
     ID_marquee_x,
-    ID_marquee_y
+    ID_marquee_y,
+};
+
+COUNTNAMES(LibvlcMarqueeNPObject,propertyCount,propertyNames);
+
+static const unsigned char marquee_idx[] = {
+    libvlc_marquee_Color,
+    libvlc_marquee_Opacity,
+    libvlc_marquee_Position,
+    libvlc_marquee_Refresh,
+    libvlc_marquee_Size,
+    0,
+    libvlc_marquee_Timeout,
+    libvlc_marquee_X,
+    libvlc_marquee_Y,
+};
+
+RuntimeNPObject::InvokeResult
+LibvlcMarqueeNPObject::getProperty(int index, NPVariant &result)
+{
+    char *psz;
+
+    if( !isPluginRunning() )
+        return INVOKERESULT_GENERIC_ERROR;
+
+    VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+
+    libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+    RETURN_ON_EXCEPTION(this,ex);
+
+    switch( index )
+    {
+    case ID_marquee_color:
+    case ID_marquee_opacity:
+    case ID_marquee_refresh:
+    case ID_marquee_timeout:
+    case ID_marquee_size:
+    case ID_marquee_x:
+    case ID_marquee_y:
+        INT32_TO_NPVARIANT(
+            libvlc_video_get_marquee_int(p_md, marquee_idx[index], &ex),
+            result );
+        RETURN_ON_EXCEPTION(this,ex);
+        return INVOKERESULT_NO_ERROR;
+
+    case ID_marquee_position:
+        STRINGZ_TO_NPVARIANT( position_bynumber(
+            libvlc_video_get_marquee_int(p_md, libvlc_marquee_Position, &ex) ),
+            result );
+
+        RETURN_ON_EXCEPTION(this,ex);
+        break;
+
+    case ID_marquee_text:
+        psz = libvlc_video_get_marquee_string(p_md, libvlc_marquee_Text, &ex);
+        if( psz )
+        {
+            STRINGZ_TO_NPVARIANT(psz, result);
+            return INVOKERESULT_NO_ERROR;
+        }
+        break;
+    }
+    return INVOKERESULT_GENERIC_ERROR;
+}
+
+RuntimeNPObject::InvokeResult
+LibvlcMarqueeNPObject::setProperty(int index, const NPVariant &value)
+{
+    size_t i;
+
+    if( !isPluginRunning() )
+        return INVOKERESULT_GENERIC_ERROR;
+
+    VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+    libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+    RETURN_ON_EXCEPTION(this,ex);
+
+    switch( index )
+    {
+    case ID_marquee_color:
+    case ID_marquee_opacity:
+    case ID_marquee_refresh:
+    case ID_marquee_timeout:
+    case ID_marquee_x:
+    case ID_marquee_y:
+        if( NPVARIANT_IS_INT32( value ) )
+        {
+            libvlc_video_set_marquee_int(p_md, marquee_idx[index],
+                                         NPVARIANT_TO_INT32( value ), &ex);
+            RETURN_ON_EXCEPTION(this,ex);
+            return INVOKERESULT_NO_ERROR;
+        }
+        break;
+
+    case ID_marquee_position:
+        if( !NPVARIANT_IS_STRING(value) ||
+            !position_byname( NPVARIANT_TO_STRING(value).utf8characters, i ) )
+            return INVOKERESULT_INVALID_VALUE;
+
+        libvlc_video_set_marquee_int(p_md, libvlc_marquee_Position, i, &ex);
+        RETURN_ON_EXCEPTION(this,ex);
+        return INVOKERESULT_NO_ERROR;
+
+    case ID_marquee_text:
+        if( NPVARIANT_IS_STRING( value ) )
+        {
+            char *psz_text = stringValue( NPVARIANT_TO_STRING( value ) );
+            libvlc_video_set_marquee_string(p_md, libvlc_marquee_Text,
+                                            psz_text, &ex);
+            free(psz_text);
+            RETURN_ON_EXCEPTION(this,ex);
+            return INVOKERESULT_NO_ERROR;
+        }
+        break;
+    }
+    return INVOKERESULT_NO_SUCH_METHOD;
+}
+
+const NPUTF8 * const LibvlcMarqueeNPObject::methodNames[] =
+{
+    "enable",
+    "disable",
+};
+COUNTNAMES(LibvlcMarqueeNPObject,methodCount,methodNames);
+
+enum LibvlcMarqueeNPObjectMethodIds
+{
+    ID_marquee_enable,
+    ID_marquee_disable,
 };
 
 RuntimeNPObject::InvokeResult
 LibvlcMarqueeNPObject::invoke(int index, const NPVariant *args,
                             uint32_t argCount, NPVariant &result)
 {
-    /* is plugin still running */
-    if( isPluginRunning() )
+    if( !isPluginRunning() )
+        return INVOKERESULT_GENERIC_ERROR;
+
+    VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+
+    libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+    RETURN_ON_EXCEPTION(this,ex);
+
+    switch( index )
     {
-        VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+    case ID_marquee_enable:
+    case ID_marquee_disable:
+        libvlc_video_set_marquee_int(p_md, libvlc_marquee_Enable,
+                                     index!=ID_marquee_disable, &ex);
         RETURN_ON_EXCEPTION(this,ex);
-
-        switch( index )
-        {
-            case ID_marquee_enable:
-            {
-                libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Enabled, true, &ex);
-                    RETURN_ON_EXCEPTION(this,ex);
-                return INVOKERESULT_NO_ERROR;
-            }
-            case ID_marquee_disable:
-            {
-                libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Enabled, false, &ex);
-                    RETURN_ON_EXCEPTION(this,ex);
-                return INVOKERESULT_NO_ERROR;
-            }
-            case ID_marquee_color:
-            {
-                if( argCount == 1)
-                {
-                    if( NPVARIANT_IS_INT32( args[0] ) )
-                    {
-                        int i_color = NPVARIANT_TO_INT32( args[0] );
-                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Color, i_color, &ex);
-                            RETURN_ON_EXCEPTION(this,ex);
-                        return INVOKERESULT_NO_ERROR;
-                    }
-                    else
-                        return INVOKERESULT_GENERIC_ERROR;
-                }
-                return INVOKERESULT_NO_SUCH_METHOD;
-            }
-            case ID_marquee_opacity:
-            {
-                if( argCount == 1)
-                {
-                    if( NPVARIANT_IS_INT32( args[0] ) )
-                    {
-                        int i_opacity = NPVARIANT_TO_INT32( args[0] );
-                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Opacity, i_opacity, &ex);
-                            RETURN_ON_EXCEPTION(this,ex);
-                        return INVOKERESULT_NO_ERROR;
-                    }
-                    else
-                        return INVOKERESULT_GENERIC_ERROR;
-                }
-                return INVOKERESULT_NO_SUCH_METHOD;
-            }
-            case ID_marquee_position:
-            {
-                if( argCount == 1)
-                {
-                    if( NPVARIANT_IS_INT32( args[0] ) )
-                    {
-                        int i_position = NPVARIANT_TO_INT32( args[0] );
-                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Position, i_position, &ex);
-                            RETURN_ON_EXCEPTION(this,ex);
-                        return INVOKERESULT_NO_ERROR;
-                    }
-                    else
-                        return INVOKERESULT_GENERIC_ERROR;
-                }
-                return INVOKERESULT_NO_SUCH_METHOD;
-            }
-            case ID_marquee_refresh:
-            {
-                if( argCount == 1)
-                {
-                    if( NPVARIANT_IS_INT32( args[0] ) )
-                    {
-                        int i_refresh = NPVARIANT_TO_INT32( args[0] );
-                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Refresh, i_refresh, &ex);
-                            RETURN_ON_EXCEPTION(this,ex);
-                        return INVOKERESULT_NO_ERROR;
-                    }
-                    else
-                        return INVOKERESULT_GENERIC_ERROR;
-                }
-                return INVOKERESULT_NO_SUCH_METHOD;
-            }
-            case ID_marquee_size:
-            {
-                if( argCount == 1)
-                {
-                    if( NPVARIANT_IS_INT32( args[0] ) )
-                    {
-                        int i_size = NPVARIANT_TO_INT32( args[0] );
-                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Size, i_size, &ex);
-                            RETURN_ON_EXCEPTION(this,ex);
-                        return INVOKERESULT_NO_ERROR;
-                    }
-                    else
-                        return INVOKERESULT_GENERIC_ERROR;
-                }
-                return INVOKERESULT_NO_SUCH_METHOD;
-            }
-            case ID_marquee_text:
-            {
-                if( argCount == 1)
-                {
-                    if( NPVARIANT_IS_STRING( args[0] ) )
-                    {
-                        char *psz_text = stringValue( NPVARIANT_TO_STRING( args[0] ) );
-                        libvlc_video_set_marquee_option_as_string(p_md, libvlc_marquee_Text, psz_text, &ex);
-                            RETURN_ON_EXCEPTION(this,ex);
-                        free(psz_text);
-                        return INVOKERESULT_NO_ERROR;
-                    }
-                    else
-                        return INVOKERESULT_GENERIC_ERROR;
-                }
-                return INVOKERESULT_NO_SUCH_METHOD;
-            }
-            case ID_marquee_timeout:
-            {
-                if( argCount == 1)
-                {
-                    if( NPVARIANT_IS_INT32( args[0] ) )
-                    {
-                        int i_timeout = NPVARIANT_TO_INT32( args[0] );
-                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Timeout, i_timeout, &ex);
-                            RETURN_ON_EXCEPTION(this,ex);
-                        return INVOKERESULT_NO_ERROR;
-                    }
-                    else
-                        return INVOKERESULT_GENERIC_ERROR;
-                }
-                return INVOKERESULT_NO_SUCH_METHOD;
-            }
-            case ID_marquee_x:
-            {
-                if( argCount == 1)
-                {
-                    if( NPVARIANT_IS_INT32( args[0] ) )
-                    {
-                        int i_x = NPVARIANT_TO_INT32( args[0] );
-                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_X, i_x, &ex);
-                            RETURN_ON_EXCEPTION(this,ex);
-                        return INVOKERESULT_NO_ERROR;
-                    }
-                    else
-                        return INVOKERESULT_GENERIC_ERROR;
-                }
-                return INVOKERESULT_NO_SUCH_METHOD;
-            }
-            case ID_marquee_y:
-            {
-                if( argCount == 1)
-                {
-                    if( NPVARIANT_IS_INT32( args[0] ) )
-                    {
-                        int i_y = NPVARIANT_TO_INT32( args[0] );
-                        libvlc_video_set_marquee_option_as_int(p_md, libvlc_marquee_Y, i_y, &ex);
-                            RETURN_ON_EXCEPTION(this,ex);
-                        return INVOKERESULT_NO_ERROR;
-                    }
-                    else
-                        return INVOKERESULT_GENERIC_ERROR;
-                }
-                return INVOKERESULT_NO_SUCH_METHOD;
-            }
-            default:
-                return INVOKERESULT_NO_SUCH_METHOD;
-        }
+        VOID_TO_NPVARIANT(result);
+        return INVOKERESULT_NO_ERROR;
     }
-    return INVOKERESULT_GENERIC_ERROR;
+    return INVOKERESULT_NO_SUCH_METHOD;
 }
 
 const NPUTF8 * const LibvlcLogoNPObject::propertyNames[] = {
@@ -1846,36 +1773,6 @@ static const unsigned char logo_idx[] = {
     libvlc_logo_y,
 };
 
-struct posidx_s { const char *n; size_t i; };
-static const posidx_s posidx[] = {
-    { "center",        0 },
-    { "left",          1 },
-    { "right",         2 },
-    { "top",           4 },
-    { "bottom",        8 },
-    { "top-left",      5 },
-    { "top-right",     6 },
-    { "bottom-left",   9 },
-    { "bottom-right", 10 },
-};
-enum { num_posidx = sizeof(posidx)/sizeof(*posidx) };
-
-static inline const char *logo_numtopos( size_t i )
-{
-    for( const posidx_s *h=posidx; h<posidx+num_posidx; ++h )
-        if( h->i == i )
-            return h->n;
-    return "undefined";
-}
-
-static inline bool logo_postonum( const char *n, size_t &i )
-{
-    for( const posidx_s *h=posidx; h<posidx+num_posidx; ++h )
-        if( !strcasecmp( n, h->n ) )
-            { i=h->i; return true; }
-    return false;
-}
-
 RuntimeNPObject::InvokeResult
 LibvlcLogoNPObject::getProperty(int index, NPVariant &result)
 {
@@ -1903,7 +1800,7 @@ LibvlcLogoNPObject::getProperty(int index, NPVariant &result)
         break;
 
     case ID_logo_position:
-        STRINGZ_TO_NPVARIANT( logo_numtopos(
+        STRINGZ_TO_NPVARIANT( position_bynumber(
             libvlc_video_get_logo_int(p_md, libvlc_logo_position, &ex) ),
             result );
 
@@ -1948,7 +1845,7 @@ LibvlcLogoNPObject::setProperty(int index, const NPVariant &value)
 
     case ID_logo_position:
         if( !NPVARIANT_IS_STRING(value) ||
-            !logo_postonum( NPVARIANT_TO_STRING(value).utf8characters, i ) )
+            !position_byname( NPVARIANT_TO_STRING(value).utf8characters, i ) )
             return INVOKERESULT_INVALID_VALUE;
 
         libvlc_video_set_logo_int(p_md, libvlc_logo_position, i, &ex);
