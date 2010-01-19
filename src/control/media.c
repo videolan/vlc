@@ -252,7 +252,7 @@ libvlc_media_t * libvlc_media_new_from_input_item(
         return NULL;
     }
 
-    p_md = calloc( sizeof(libvlc_media_t), 1 );
+    p_md = calloc( 1, sizeof(libvlc_media_t) );
     if( !p_md )
     {
         libvlc_exception_raise( p_e );
