@@ -263,7 +263,7 @@ static int Open( vlc_object_t *p_this )
     char *psz_url = NULL;
     vlc_url_t url;
 
-    psz_url = config_GetPsz( p_vod, "rtsp-host" );
+    psz_url = var_InheritString( p_vod, "rtsp-host" );
     vlc_UrlParse( &url, psz_url, 0 );
     free( psz_url );
 
