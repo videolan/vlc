@@ -1833,6 +1833,7 @@ static int ASeek( stream_t *s, int64_t i_pos )
 {
     stream_sys_t *p_sys = s->p_sys;
     access_t *p_access = p_sys->p_access;
+    assert( i_pos >= 0 );
 
     /* Check which stream we need to access */
     if( p_sys->i_list )
