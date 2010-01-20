@@ -498,38 +498,6 @@ void config_Free( module_t *p_module )
 }
 
 /*****************************************************************************
- * config_SetCallbacks: sets callback functions in the duplicate p_config.
- *****************************************************************************
- * Unfortunatly we cannot work directly with the module's config data as
- * this module might be unloaded from memory at any time (remember HideModule).
- * This is why we need to duplicate callbacks each time we reload the module.
- *****************************************************************************/
-void config_SetCallbacks( module_config_t *p_new, module_config_t *p_orig,
-                          size_t n )
-{
-    for (size_t i = 0; i < n; i++)
-    {
-        p_new->pf_callback = p_orig->pf_callback;
-        p_new++;
-        p_orig++;
-    }
-}
-
-/*****************************************************************************
- * config_UnsetCallbacks: unsets callback functions in the duplicate p_config.
- *****************************************************************************
- * We simply undo what we did in config_SetCallbacks.
- *****************************************************************************/
-void config_UnsetCallbacks( module_config_t *p_new, size_t n )
-{
-    for (size_t i = 0; i < n; i++)
-    {
-        p_new->pf_callback = NULL;
-        p_new++;
-    }
-}
-
-/*****************************************************************************
  * config_ResetAll: reset the configuration data for all the modules.
  *****************************************************************************/
 void __config_ResetAll( vlc_object_t *p_this )
