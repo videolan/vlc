@@ -519,7 +519,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
     char *psz_device;                             /* framebuffer device path */
 
     /* Open framebuffer device */
-    if (!(psz_device = config_GetPsz(vd, FB_DEV_VAR))) {
+    if (!(psz_device = var_InheritString(vd, FB_DEV_VAR))) {
         msg_Err(vd, "don't know which fb device to open");
         return VLC_EGENERIC;
     }
