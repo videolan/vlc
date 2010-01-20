@@ -41,6 +41,7 @@
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
+#include <assert.h>
 
 #if !defined(HAVE_DYNAMIC_PLUGINS)
     /* no support for plugins */
@@ -83,7 +84,7 @@ static int    CacheSaveConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 7
+#define CACHE_SUBVERSION_NUM 8
 
 /* Format string for the cache filename */
 #define CACHENAME_FORMAT \
@@ -327,6 +328,16 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
 }
 
 
+/* This function should never be called.
+ * It is only used as a non-NULL vlc_callback_t value for comparison. */
+static int dummy_callback (vlc_object_t *obj, const char *name,
+                           vlc_value_t oldval, vlc_value_t newval, void *data)
+{
+    (void) obj; (void)name; (void)oldval; (void)newval; (void)data;
+    assert (0);
+}
+
+
 static int CacheLoadConfig( module_t *p_module, FILE *file )
 {
     uint32_t i_lines;
@@ -435,7 +446,10 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
             }
         }
 
-        LOAD_IMMEDIATE( p_module->p_config[i].pf_callback );
+        bool has_callback;
+        LOAD_IMMEDIATE( has_callback );
+        if (has_callback)
+            p_module->p_config[i].pf_callback = dummy_callback;
     }
 
     return VLC_SUCCESS;
@@ -670,7 +684,8 @@ static int CacheSaveConfig( module_t *p_module, FILE *file )
         for (int j = 0; j < p_module->p_config[i].i_action; j++)
             SAVE_STRING( p_module->p_config[i].ppsz_action_text[j] );
 
-        SAVE_IMMEDIATE( p_module->p_config[i].pf_callback );
+        bool has_callback = p_module->p_config[i].pf_callback != NULL;
+        SAVE_IMMEDIATE( has_callback );
     }
     return 0;
 
