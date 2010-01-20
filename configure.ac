@@ -2851,6 +2851,9 @@ AS_IF([test "${enable_libva}" != "no"], [
   AS_IF([test "x${have_avcodec}" = "xyes"], [
     PKG_CHECK_MODULES(LIBVA, [libva libva-x11],
       [
+        VLC_SAVE_FLAGS
+        CPPFLAGS="${CPPFLAGS} ${AVCODEC_CFLAGS}"
+        CFLAGS="${CFLAGS} ${AVCODEC_CFLAGS}"
         AC_CHECK_HEADERS(libavcodec/vaapi.h, [
            VLC_ADD_LIBS([avcodec],[$LIBVA_LIBS])
            VLC_ADD_CFLAGS([avcodec],[$LIBVA_CFLAGS])
@@ -2861,6 +2864,7 @@ AS_IF([test "${enable_libva}" != "no"], [
 	      [AC_MSG_ERROR([libva is present but libavcodec/vaapi.h is missing])],
               [AC_MSG_WARN([libva is present but libavcodec/vaapi.h is missing ])])
         ])
+        VLC_RESTORE_FLAGS
       ],[
 	AS_IF([test "${enable_libva}" == "yes"],
               [AC_MSG_ERROR([Could not find required libva.])],
