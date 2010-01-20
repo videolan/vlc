@@ -158,7 +158,7 @@ struct vod_media_t
     /* ES list */
     int        i_es;
     media_es_t **es;
-    char       *psz_mux;
+    const char *psz_mux;
     bool  b_raw;
 
     /* RTSP client */
@@ -492,7 +492,6 @@ static void MediaDel( vod_t *p_vod, vod_media_t *p_media )
 
     vlc_mutex_destroy( &p_media->lock );
 
-    free( p_media->psz_mux );
     free( p_media );
 }
 
@@ -503,7 +502,6 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
     if( !p_es )
         return VLC_ENOMEM;
 
-    free( p_media->psz_mux );
     p_media->psz_mux = NULL;
 
     /* TODO: update SDP, etc... */
@@ -657,12 +655,12 @@ static int MediaAddES( vod_t *p_vod, vod_media_t *p_media, es_format_t *p_fmt )
             }
             break;
         case VLC_FOURCC( 'm', 'p', '2', 't' ):
-            p_media->psz_mux = strdup("ts");
+            p_media->psz_mux = "ts";
             p_es->i_payload_type = 33;
             p_es->psz_ptname = "MP2T";
             break;
         case VLC_FOURCC( 'm', 'p', '2', 'p' ):
-            p_media->psz_mux = strdup("ps");
+            p_media->psz_mux = "ps";
             p_es->i_payload_type = p_media->i_payload_type++;
             p_es->psz_ptname = "MP2P";
             break;
@@ -994,9 +992,7 @@ static int RtspCallback( httpd_callback_sys_t *p_args, httpd_client_t *cl,
                 if( strstr( psz_transport, "MP2T/H2221/UDP" ) ||
                     strstr( psz_transport, "RAW/RAW/UDP" ) )
                 {
-                    free( p_media->psz_mux );
-                    p_media->psz_mux = NULL;
-                    p_media->psz_mux = strdup( p_vod->p_sys->psz_raw_mux );
+                    p_media->psz_mux = p_vod->p_sys->psz_raw_mux;
                     p_media->b_raw = true;
                 }
 
