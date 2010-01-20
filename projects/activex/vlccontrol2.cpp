@@ -76,6 +76,21 @@ BIND_INTERFACE( VLCSubtitle )
 
 #undef  BIND_INTERFACE
 
+template<class I> static inline
+HRESULT object_get(I **dst, I *src)
+{
+    if( NULL == dst )
+        return E_POINTER;
+
+    *dst = src;
+    if( NULL != src )
+    {
+        src->AddRef();
+        return NOERROR;
+    }
+    return E_OUTOFMEMORY;
+}
+
 // ---------
 
 
@@ -1663,30 +1678,12 @@ STDMETHODIMP VLCVideo::toggleTeletext()
 
 STDMETHODIMP VLCVideo::get_marquee(IVLCMarquee** obj)
 {
-    if( NULL == obj )
-        return E_POINTER;
-
-    *obj = _p_vlcmarquee;
-    if( NULL != _p_vlcmarquee )
-    {
-        _p_vlcmarquee->AddRef();
-        return NOERROR;
-    }
-    return E_OUTOFMEMORY;
-};
+    return object_get(obj,_p_vlcmarquee);
+}
 
 STDMETHODIMP VLCVideo::get_logo(IVLCLogo** obj)
 {
-    if( NULL == obj )
-        return E_POINTER;
-
-    *obj = _p_vlclogo;
-    if( NULL != _p_vlclogo )
-    {
-        _p_vlclogo->AddRef();
-        return NOERROR;
-    }
-    return E_OUTOFMEMORY;
+    return object_get(obj,_p_vlclogo);
 }
 
 
@@ -2048,84 +2045,30 @@ STDMETHODIMP VLCControl2::put_BackColor(OLE_COLOR backcolor)
 
 STDMETHODIMP VLCControl2::get_audio(IVLCAudio** obj)
 {
-    if( NULL == obj )
-        return E_POINTER;
-
-    *obj = _p_vlcaudio;
-    if( NULL != _p_vlcaudio )
-    {
-        _p_vlcaudio->AddRef();
-        return NOERROR;
-    }
-    return E_OUTOFMEMORY;
-};
+    return object_get(obj,_p_vlcaudio);
+}
 
 STDMETHODIMP VLCControl2::get_input(IVLCInput** obj)
 {
-    if( NULL == obj )
-        return E_POINTER;
-
-    *obj = _p_vlcinput;
-    if( NULL != _p_vlcinput )
-    {
-        _p_vlcinput->AddRef();
-        return NOERROR;
-    }
-    return E_OUTOFMEMORY;
-};
+    return object_get(obj,_p_vlcinput);
+}
 
 STDMETHODIMP VLCControl2::get_log(IVLCLog** obj)
 {
-    if( NULL == obj )
-        return E_POINTER;
-
-    *obj = _p_vlclog;
-    if( NULL != _p_vlclog )
-    {
-        _p_vlclog->AddRef();
-        return NOERROR;
-    }
-    return E_OUTOFMEMORY;
-};
+    return object_get(obj,_p_vlclog);
+}
 
 STDMETHODIMP VLCControl2::get_playlist(IVLCPlaylist** obj)
 {
-    if( NULL == obj )
-        return E_POINTER;
-
-    *obj = _p_vlcplaylist;
-    if( NULL != _p_vlcplaylist )
-    {
-        _p_vlcplaylist->AddRef();
-        return NOERROR;
-    }
-    return E_OUTOFMEMORY;
-};
+    return object_get(obj,_p_vlcplaylist);
+}
 
 STDMETHODIMP VLCControl2::get_subtitle(IVLCSubtitle** obj)
 {
-    if( NULL == obj )
-        return E_POINTER;
-
-    *obj = _p_vlcsubtitle;
-    if( NULL != _p_vlcsubtitle )
-    {
-        _p_vlcsubtitle->AddRef();
-        return NOERROR;
-    }
-    return E_OUTOFMEMORY;
-};
+    return object_get(obj,_p_vlcsubtitle);
+}
 
 STDMETHODIMP VLCControl2::get_video(IVLCVideo** obj)
 {
-    if( NULL == obj )
-        return E_POINTER;
-
-    *obj = _p_vlcvideo;
-    if( NULL != _p_vlcvideo )
-    {
-        _p_vlcvideo->AddRef();
-        return NOERROR;
-    }
-    return E_OUTOFMEMORY;
-};
+    return object_get(obj,_p_vlcvideo);
+}

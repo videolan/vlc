@@ -276,8 +276,8 @@ public:
     STDMETHODIMP put_verbosity(long);
 
 protected:
-    libvlc_log_t    *_p_log;
-    VLCMessages*    _p_vlcmessages;
+    libvlc_log_t *_p_log;
+    IVLCMessages *_p_vlcmessages;
 };
 
 class VLCMarquee: public VLCInterface<VLCMarquee,IVLCMarquee>
@@ -425,8 +425,8 @@ public:
     STDMETHODIMP toggleTeletext();
 
 private:
-    VLCMarquee*     _p_vlcmarquee;
-    VLCLogo*        _p_vlclogo;
+    IVLCMarquee *_p_vlcmarquee;
+    IVLCLogo    *_p_vlclogo;
 };
 
 class VLCControl2 : public IVLCControl2
@@ -493,15 +493,15 @@ protected:
     HRESULT loadTypeInfo();
 
 private:
-    VLCPlugin*      _p_instance;
-    ITypeInfo*      _p_typeinfo;
+    VLCPlugin    *_p_instance;
+    ITypeInfo    *_p_typeinfo;
 
-    VLCAudio*       _p_vlcaudio;
-    VLCInput*       _p_vlcinput;
-    VLCLog  *       _p_vlclog;
-    VLCPlaylist*    _p_vlcplaylist;
-    VLCSubtitle*    _p_vlcsubtitle;
-    VLCVideo*       _p_vlcvideo;
+    IVLCAudio    *_p_vlcaudio;
+    IVLCInput    *_p_vlcinput;
+    IVLCLog      *_p_vlclog;
+    IVLCPlaylist *_p_vlcplaylist;
+    IVLCSubtitle *_p_vlcsubtitle;
+    IVLCVideo    *_p_vlcvideo;
 };
 
 #endif
