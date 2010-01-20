@@ -468,7 +468,6 @@ static int Connect( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
     Authenticator authenticator;
-    bool b_firstpass  = true;
     char *psz_user    = NULL;
     char *psz_pwd     = NULL;
     char *psz_url     = NULL;
@@ -593,14 +592,6 @@ describe:
                 i_code = 0;
         }
         msg_Dbg( p_demux, "DESCRIBE failed with %d: %s", i_code, psz_error );
-
-        if( b_firstpass )
-        {   /* describeURL always returns an "RTSP/1.0 401 Unauthorized" the
-             * first time. This is a workaround to avoid asking for a
-             * user/passwd the first time the code passes here. */
-            i_code = 0;
-            b_firstpass = false;
-        }
 
         if( i_code == 401 )
         {
