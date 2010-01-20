@@ -181,6 +181,8 @@ ifdef HAVE_ISA_THUMB
 NOTHUMB ?= -mno-thumb
 endif
 
+X264CONF+= --disable-avs-input --disable-lavf-input --disable-ffms-input --disable-mp4-output
+
 DATE=`date +%Y-%m-%d`
 
 # ***************************************************************************
