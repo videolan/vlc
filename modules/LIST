@@ -60,7 +60,6 @@ $Id$
  * ball: Augmented reality ball video filter module
  * bandlimited_resampler: Bandlimited interpolation audio resampler
  * bda: DVB support for Windows BDA drivers
- * beos: Audio output, video output and interface module for BeOS
  * blend: a picture filter that blends two pictures
  * blendbench: a picture filter that test performance of blending routines
  * bluescreen: Bluescreen (weather channel like) video filter

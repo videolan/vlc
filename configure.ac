@@ -380,7 +380,6 @@ case "${host_os}" in
     CXXFLAGS_save="${CXXFLAGS_save} -Wno-multichar"; CXXFLAGS="${CXXFLAGS_save}"
     VLC_ADD_CXXFLAGS([beos],[])
     VLC_ADD_LIBS([vlc libvlccore logger],[-lbe])
-    VLC_ADD_LIBS([beos],[-lbe -lmedia -ltranslation -ltracker -lgame])
     VLC_ADD_LIBS([dvdnav dvdread],[-ldl])
     VLC_ADD_LIBS([filesystem],[-lpoll])
     LDFLAGS_save="${LDFLAGS_save} -lintl"; LDFLAGS="${LDFLAGS_save}"
@@ -389,11 +388,6 @@ case "${host_os}" in
         VLC_ADD_LIBS([filesystem access_ftp access_mms access_output_udp oldtelnet netsync sap libvlccore growl_udp],[-lbind -lsocket])
     else
         VLC_ADD_LIBS([filesystem access_ftp access_mms access_output_udp oldtelnet netsync sap libvlccore growl_udp],[-lnet])
-    fi
-
-    dnl Ugly check for Zeta
-    if test -f /boot/beos/system/lib/libzeta.so; then
-        VLC_ADD_LIBS([beos],[-lzeta])
     fi
     ;;
   *)
@@ -4101,12 +4095,6 @@ dnl
 
 AC_ARG_WITH(,[Interface plugins:])
 
-dnl special case for BeOS
-if test "${SYS}" = "beos"
-then
-    VLC_ADD_PLUGIN([beos])
-fi
-
 dnl
 dnl Skins2 module
 dnl
@@ -5039,7 +5027,6 @@ AC_CONFIG_FILES([
   modules/demux/mpeg/Makefile
   modules/demux/playlist/Makefile
   modules/gui/Makefile
-  modules/gui/beos/Makefile
   modules/gui/macosx/Makefile
   modules/gui/hildon/Makefile
   modules/gui/minimal_macosx/Makefile
