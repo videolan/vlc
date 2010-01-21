@@ -2344,32 +2344,6 @@ dnl  gnomeVFS access module
 dnl
 PKG_ENABLE_MODULES_VLC([GNOMEVFS], [access_gnomevfs], [gnome-vfs-2.0], [GnomeVFS access module], [auto])
 
-
-dnl Need to test libcdio and libvcdinfo for a number of things. Do it now.
-AC_ARG_ENABLE(libcdio,
-  [  --enable-libcdio        CD input and control library support (default enabled)])
-
-AC_ARG_ENABLE(libvcdinfo,
-  [  --enable-libvcdinfo     VCD information library support (default enabled)])
-
-have_libcdio=no
-have_libvcdinfo=no
-if test "${enable_libcdio}" != "no"
-then
-  PKG_CHECK_MODULES(LIBCDIO, libcdio >= 0.78.2,
-     have_libcdio=yes
-     AC_DEFINE(HAVE_LIBCDIO, 1,
-     [Define if you have libcdio 0.78.2 or greater installed]),
-     [AC_MSG_WARN(CD Reading and information library not found)])
-
-  if test "${enable_libvcdinfo}" != "no"
-  then
-    PKG_CHECK_MODULES(LIBVCDINFO, libvcdinfo >= 0.7.22,
-       [have_libvcdinfo=yes],
-       [AC_MSG_WARN(VCD information library not found)])
-  fi
-fi
-
 dnl
 dnl  VCDX modules
 dnl
@@ -2378,32 +2352,14 @@ AC_ARG_ENABLE(vcdx,
 
 if test "${enable_vcdx}" = "yes"
 then
-  if test "${have_libvcdinfo}" = "yes"
-  then
-    VLC_ADD_LIBS([vcdx],[$LIBVCDINFO_LIBS])
-    VLC_ADD_CFLAGS([vcdx],[$LIBVCDINFO_CFLAGS])
-  else
-    AC_MSG_WARN([vcdx plugin disabled because ok libvcdinfo library not found or disabled])
-    HAVE_VCDX=no
-  fi
-
-  PKG_CHECK_MODULES(LIBCDIO, libiso9660 >= 0.72,
-   [VLC_ADD_LIBS([vcdx],[$LIBISO9660_LIBS])
-    VLC_ADD_CFLAGS([vcdx],[$LIBISO9660_CFLAGS])],
-    [AC_MSG_WARN([vcdx plugin disabled because ok libiso9660 library not found])
-    HAVE_VCDX=no])
-
-  if test "$have_libvcdinfo" = "yes"
-  then
-    AC_DEFINE(HAVE_VCDX, 1,
-    [Define for the VCD plugin using libcdio/libvcdinfo])
-    VLC_ADD_LIBS([vcdx],[$LIBVCDINFO_LIBS])
-    VLC_ADD_CFLAGS([vcdx],[$LIBVCDINFO_CFLAGS])
-    VLC_ADD_PLUGIN([vcdx])
-  else
-    AC_MSG_WARN([vcdx plugin disabled because ok libvcdinfo library not found])
-    HAVE_VCDX=no
-  fi
+	PKG_CHECK_MODULES(LIBCDIO, [libcdio >= 0.78.2 libiso9660 >= 0.72],
+	  [VLC_ADD_LIBS([vcdx],[$LIBCDIO_LIBS])
+		 VLC_ADD_CFLAGS([vcdx],[$LIBCDIO_CFLAGS])],
+		[AC_MSG_ERROR([vcdx plugin requires libcdio >= 0.78.2 and libiso9660 >= 0.72])])
+	PKG_CHECK_MODULES(LIBVCDINFO, libvcdinfo >= 0.7.22,
+		[VLC_ADD_LIBS([vcdx],[$LIBVCDINFO_LIBS])
+		 VLC_ADD_CFLAGS([vcdx],[$LIBVCDINFO_CFLAGS])],
+	  [AC_MSG_ERROR([vcdx plugin requires libvcdinfo library >= 0.7.22])])
 fi
 
 dnl
