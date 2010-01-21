@@ -174,7 +174,7 @@ void CloseMux( vlc_object_t *p_this )
     sout_mux_sys_t *p_sys = p_mux->p_sys;
     unsigned int i;
 
-    if( av_write_trailer( p_sys->oc ) < 0 )
+    if( !p_sys->b_write_header && av_write_trailer( p_sys->oc ) < 0 )
     {
         msg_Err( p_mux, "could not write trailer" );
     }
