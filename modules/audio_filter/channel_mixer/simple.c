@@ -1,7 +1,7 @@
 /*****************************************************************************
  * simple.c : simple channel mixer plug-in
  *****************************************************************************
- * Copyright (C) 2002, 2006 the VideoLAN team
+ * Copyright (C) 2002, 2004, 2006-2009 the VideoLAN team
  * $Id$
  *
  * Authors: Gildas Bazin <gbazin@videolan.org>
