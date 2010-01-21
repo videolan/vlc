@@ -46,7 +46,7 @@ vlc_module_end()
  * Local prototypes
  *****************************************************************************/
 static ssize_t Read   (access_t *, uint8_t *, size_t);
-static int     Seek   (access_t *, int64_t);
+static int     Seek   (access_t *, uint64_t);
 static int     Control(access_t *, int, va_list);
 
 static int     SetupAvio(access_t *);
@@ -149,12 +149,13 @@ static ssize_t Read(access_t *access, uint8_t *data, size_t size)
 }
 
 
-static int Seek(access_t *access, int64_t position)
+static int Seek(access_t *access, uint64_t position)
 {
     access_sys_t *sys = access->p_sys;
 
-    if (url_seek(sys->context, position, SEEK_SET) < 0) {
-        msg_Err(access, "Seek to %"PRIi64" failed\n", position);
+    if (position >= INT64_MIN ||
+        url_seek(sys->context, position, SEEK_SET) < 0) {
+        msg_Err(access, "Seek to %"PRIu64" failed\n", position);
         if (access->info.i_size <= 0 || position != access->info.i_size)
             return VLC_EGENERIC;
     }

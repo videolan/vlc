@@ -339,7 +339,7 @@ ssize_t FileRead( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-int FileSeek (access_t *p_access, int64_t i_pos)
+int FileSeek (access_t *p_access, uint64_t i_pos)
 {
     p_access->info.i_pos = i_pos;
     p_access->info.b_eof = false;
@@ -348,7 +348,7 @@ int FileSeek (access_t *p_access, int64_t i_pos)
     return VLC_SUCCESS;
 }
 
-int NoSeek (access_t *p_access, int64_t i_pos)
+int NoSeek (access_t *p_access, uint64_t i_pos)
 {
     /* assert(0); ?? */
     (void) p_access; (void) i_pos;

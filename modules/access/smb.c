@@ -97,7 +97,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static ssize_t Read( access_t *, uint8_t *, size_t );
-static int Seek( access_t *, int64_t );
+static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
 
 struct access_sys_t
@@ -272,12 +272,13 @@ static void Close( vlc_object_t *p_this )
 /*****************************************************************************
  * Seek: try to go at the right place
  *****************************************************************************/
-static int Seek( access_t *p_access, int64_t i_pos )
+static int Seek( access_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int64_t      i_ret;
 
-    if( i_pos < 0 ) return VLC_EGENERIC;
+    if( i_pos >= INT64_MAX )
+        return VLC_EGENERIC;
 
     msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
 

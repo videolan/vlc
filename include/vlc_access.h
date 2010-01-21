@@ -95,7 +95,7 @@ struct access_t
 
     /* Called for each seek.
      * XXX can be null */
-    int         (*pf_seek) ( access_t *, int64_t );         /* can be null if can't seek */
+    int         (*pf_seek) ( access_t *, uint64_t );         /* can be null if can't seek */
 
     /* Used to retreive and configure the access
      * XXX mandatory. look at access_query_e to know what query you *have to* support */
@@ -107,8 +107,8 @@ struct access_t
         unsigned int i_update;  /* Access sets them on change,
                                    Input removes them once take into account*/
 
-        int64_t      i_size;    /* Write only for access, read only for input */
-        int64_t      i_pos;     /* idem */
+        uint64_t     i_size;    /* Write only for access, read only for input */
+        uint64_t     i_pos;     /* idem */
         bool         b_eof;     /* idem */
 
         int          i_title;    /* idem, start from 0 (could be menu) */

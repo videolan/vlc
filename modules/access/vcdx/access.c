@@ -239,7 +239,7 @@ VCDReadBlock( access_t * p_access )
  * VCDSeek
  ****************************************************************************/
 int
-VCDSeek( access_t * p_access, int64_t i_pos )
+VCDSeek( access_t * p_access, uint64_t i_pos )
 {
     if (!p_access || !p_access->p_sys) return VLC_EGENERIC;
     {
@@ -250,7 +250,7 @@ VCDSeek( access_t * p_access, int64_t i_pos )
 
         /* Next sector to read */
         p_access->info.i_pos = i_pos;
-        p_vcdplayer->i_lsn = (i_pos / (int64_t) M2F2_SECTOR_SIZE) +
+        p_vcdplayer->i_lsn = (i_pos / (uint64_t) M2F2_SECTOR_SIZE) +
                              p_vcdplayer->origin_lsn;
 
         switch (p_vcdplayer->play_item.type)
@@ -678,7 +678,7 @@ VCDSetOrigin( access_t *p_access, lsn_t i_lsn, track_t i_track,
         if (p_vcdplayer->b_track_length)
         {
             p_access->info.i_size = p_vcdplayer->p_title[i_track-1]->i_size;
-            p_access->info.i_pos  = (int64_t) M2F2_SECTOR_SIZE *
+            p_access->info.i_pos  = (uint64_t) M2F2_SECTOR_SIZE *
                      (vcdinfo_get_track_lsn(p_vcdplayer->vcd, i_track)-i_lsn);
         } else {
             p_access->info.i_size = M2F2_SECTOR_SIZE * (int64_t)

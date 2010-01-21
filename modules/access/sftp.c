@@ -274,7 +274,7 @@ static block_t* Block( access_t* p_access )
 }
 
 
-static int Seek( access_t* p_access, int64_t i_pos )
+static int Seek( access_t* p_access, uint64_t i_pos )
 {
     p_access->info.i_pos = i_pos;
     p_access->info.b_eof = false;

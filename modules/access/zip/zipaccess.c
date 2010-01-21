@@ -49,8 +49,8 @@ struct access_sys_t
 
 static int AccessControl( access_t *p_access, int i_query, va_list args );
 static ssize_t AccessRead( access_t *, uint8_t *, size_t );
-static int AccessSeek( access_t *, int64_t );
-static int OpenFileInZip( access_t *p_access, int i_pos );
+static int AccessSeek( access_t *, uint64_t );
+static int OpenFileInZip( access_t *p_access, uint64_t i_pos );
 static char *unescapeXml( const char *psz_text );
 
 /** **************************************************************************
@@ -287,7 +287,7 @@ static ssize_t AccessRead( access_t *p_access, uint8_t *p_buffer, size_t sz )
 /** **************************************************************************
  * \brief Seek inside zip file
  *****************************************************************************/
-static int AccessSeek( access_t *p_access, int64_t seek_len )
+static int AccessSeek( access_t *p_access, uint64_t seek_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
     assert( p_sys );
@@ -305,7 +305,7 @@ static int AccessSeek( access_t *p_access, int64_t seek_len )
     }
 
     /* Read seek_len data and drop it */
-    int i_seek = 0;
+    unsigned i_seek = 0;
     int i_read = 1;
     char *p_buffer = ( char* ) calloc( 1, ZIP_BUFFER_LEN );
     while( ( i_seek < seek_len ) && ( i_read > 0 ) )
@@ -333,7 +333,7 @@ static int AccessSeek( access_t *p_access, int64_t seek_len )
 /** **************************************************************************
  * \brief Open file in zip
  *****************************************************************************/
-static int OpenFileInZip( access_t *p_access, int i_pos )
+static int OpenFileInZip( access_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     unzFile file = p_sys->zipFile;
@@ -342,7 +342,6 @@ static int OpenFileInZip( access_t *p_access, int i_pos )
         return VLC_EGENERIC;
     }
 
-    i_pos = __MIN( i_pos, 0 );
     p_access->info.i_pos = 0;
 
     unzCloseCurrentFile( file ); /* returns UNZ_PARAMERROR if file not opened */
@@ -435,6 +434,8 @@ static long ZCALLBACK ZipIO_Seek( void* opaque, void* stream,
         default:
             return -1;
     }
+    if( pos < 0 )
+        return -1;
     //msg_Dbg( p_access, "seek (%d,%d): %" PRIu64, offset, origin, pos );
     stream_Seek( (stream_t*) stream, pos );
     /* Note: in unzip.c, unzlocal_SearchCentralDir seeks to the end of

@@ -54,11 +54,11 @@ void MMSHClose ( access_t * );
 
 static block_t *Block( access_t *p_access );
 static ssize_t ReadRedirect( access_t *, uint8_t *, size_t );
-static int  Seek( access_t *, int64_t );
+static int  Seek( access_t *, uint64_t );
 static int  Control( access_t *, int, va_list );
 
 static int  Describe( access_t  *, char **ppsz_location );
-static int  Start( access_t *, int64_t );
+static int  Start( access_t *, uint64_t );
 static void Stop( access_t * );
 
 static int  GetPacket( access_t *, chunk_t * );
@@ -287,12 +287,12 @@ static int Control( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * Seek: try to go at the right place
  *****************************************************************************/
-static int Seek( access_t *p_access, int64_t i_pos )
+static int Seek( access_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     chunk_t      ck;
-    off_t        i_offset;
-    off_t        i_packet;
+    uint64_t     i_offset;
+    uint64_t     i_packet;
 
     msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
 
@@ -741,7 +741,7 @@ static void GetHeader( access_t *p_access )
 /*****************************************************************************
  * Start stream
  ****************************************************************************/
-static int Start( access_t *p_access, int64_t i_pos )
+static int Start( access_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int  i_streams = 0;

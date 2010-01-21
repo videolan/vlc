@@ -67,7 +67,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 static block_t *Block (access_t *);
-static int Seek (access_t *, int64_t);
+static int Seek (access_t *, uint64_t);
 static int Control (access_t *, int, va_list);
 
 struct access_sys_t
@@ -184,7 +184,7 @@ static block_t *Block (access_t *p_access)
         p_access->info.i_update |= INPUT_UPDATE_SIZE;
     }
 
-    if ((uint64_t)p_access->info.i_pos >= (uint64_t)p_access->info.i_size)
+    if (p_access->info.i_pos >= p_access->info.i_size)
     {
         /* We are at end of file */
         p_access->info.b_eof = true;
@@ -193,7 +193,7 @@ static block_t *Block (access_t *p_access)
     }
 
 #ifdef MMAP_DEBUG
-    int64_t dbgpos = lseek (p_sys->fd, 0, SEEK_CUR);
+    uint64_t dbgpos = lseek (p_sys->fd, 0, SEEK_CUR);
     if (dbgpos != p_access->info.i_pos)
         msg_Err (p_access, "position: 0x%016"PRIx64" instead of 0x%016"PRIx64,
                  p_access->info.i_pos, dbgpos);
@@ -265,7 +265,7 @@ fatal:
 }
 
 
-static int Seek (access_t *p_access, int64_t i_pos)
+static int Seek (access_t *p_access, uint64_t i_pos)
 {
 #ifdef MMAP_DEBUG
     lseek (p_access->p_sys->fd, i_pos, SEEK_SET);

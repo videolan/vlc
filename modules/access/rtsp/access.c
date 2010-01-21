@@ -68,7 +68,7 @@ vlc_module_end ()
  * Exported prototypes
  *****************************************************************************/
 static block_t *BlockRead( access_t * );
-static int     Seek( access_t *, int64_t );
+static int     Seek( access_t *, uint64_t );
 static int     Control( access_t *, int, va_list );
 
 struct access_sys_t
@@ -307,7 +307,7 @@ static block_t *BlockRead( access_t *p_access )
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-static int Seek( access_t *p_access, int64_t i_pos )
+static int Seek( access_t *p_access, uint64_t i_pos )
 {
     VLC_UNUSED(p_access);
     VLC_UNUSED(i_pos);

@@ -59,7 +59,7 @@ struct access_sys_t {
 };
 
 static ssize_t Read(access_t *, uint8_t *, size_t);
-static int     Seek(access_t *, int64_t);
+static int     Seek(access_t *, uint64_t);
 static int     Control(access_t *, int, va_list);
 
 /* */
@@ -127,7 +127,7 @@ static ssize_t Read(access_t *access, uint8_t *buffer, size_t size)
 }
 
 /* */
-static int Seek(access_t *access, int64_t position)
+static int Seek(access_t *access, uint64_t position)
 {
     access->info.i_pos = position;
     access->info.b_eof = false;

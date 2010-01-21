@@ -65,9 +65,9 @@ vlc_module_end ()
 /*****************************************************************************
  * Exported prototypes
  *****************************************************************************/
-static int  Seek( access_t *, int64_t );
-static int  Read( access_t *, uint8_t *, size_t );
-static int  Control( access_t *, int, va_list );
+static int     Seek( access_t *, uint64_t );
+static ssize_t Read( access_t *, uint8_t *, size_t );
+static int     Control( access_t *, int, va_list );
 
 struct access_sys_t
 {
@@ -286,7 +286,7 @@ static void Close( vlc_object_t * p_this )
 /*****************************************************************************
  * Read: standard read on a file descriptor.
  *****************************************************************************/
-static int Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
+static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 {
     access_sys_t *p_sys = p_access->p_sys;
     GnomeVFSFileSize i_read_len;
@@ -339,7 +339,7 @@ static int Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-static int Seek( access_t *p_access, int64_t i_pos )
+static int Seek( access_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     int i_ret;

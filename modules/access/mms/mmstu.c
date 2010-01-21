@@ -66,7 +66,7 @@ void  MMSTUClose  ( access_t * );
 
 
 static block_t *Block( access_t * );
-static int Seek( access_t *, int64_t );
+static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
 
 static int  MMSOpen ( access_t *, vlc_url_t *, int );
@@ -328,19 +328,15 @@ static int Control( access_t *p_access, int i_query, va_list args )
 /*****************************************************************************
  * Seek: try to go at the right place
  *****************************************************************************/
-static int Seek( access_t * p_access, int64_t i_pos )
+static int Seek( access_t * p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     uint32_t    i_packet;
     uint32_t    i_offset;
     var_buffer_t buffer;
 
-    if( i_pos < 0 )
-        return VLC_EGENERIC;
-
     if( i_pos < p_sys->i_header)
     {
-
         if( p_access->info.i_pos < p_sys->i_header )
         {
             /* no need to restart stream, it was already one
@@ -362,7 +358,7 @@ static int Seek( access_t * p_access, int64_t i_pos )
     if( p_sys->b_seekable && i_packet >= p_sys->i_packet_count )
         return VLC_EGENERIC;
 
-    msg_Dbg( p_access, "seeking to %"PRId64 " (packet:%d)", i_pos, i_packet );
+    msg_Dbg( p_access, "seeking to %"PRIu64 " (packet:%u)", i_pos, i_packet );
 
     MMSStop( p_access );
     msg_Dbg( p_access, "stream stopped (seek)" );

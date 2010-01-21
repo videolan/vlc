@@ -85,7 +85,7 @@ struct access_sys_t
 };
 
 static block_t *Block( access_t * );
-static int      Seek( access_t *, int64_t );
+static int      Seek( access_t *, uint64_t );
 static int      Control( access_t *, int, va_list );
 static int      EntryPoints( access_t * );
 
@@ -305,7 +305,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
                 p_sys->i_sector = p_sys->p_sectors[1+p_access->info.i_title] +
                     t->seekpoint[i]->i_byte_offset / VCD_DATA_SIZE;
 
-                p_access->info.i_pos = (int64_t)(p_sys->i_sector -
+                p_access->info.i_pos = (uint64_t)(p_sys->i_sector -
                     p_sys->p_sectors[1+p_access->info.i_title]) *VCD_DATA_SIZE;
             }
             return VLC_SUCCESS;
@@ -408,7 +408,7 @@ static block_t *Block( access_t *p_access )
 /*****************************************************************************
  * Seek:
  *****************************************************************************/
-static int Seek( access_t *p_access, int64_t i_pos )
+static int Seek( access_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
     input_title_t *t = p_sys->title[p_access->info.i_title];

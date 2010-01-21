@@ -81,7 +81,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static ssize_t  Read( access_t *, uint8_t *, size_t );
-static int Seek( access_t *, int64_t );
+static int Seek( access_t *, uint64_t );
 static int Control( access_t *, int, va_list );
 
 static void* ThreadControl( void * );
@@ -446,7 +446,7 @@ error:
 /*****************************************************************************
  * Seek: seek to a specific location in a file
  *****************************************************************************/
-static int Seek( access_t *p_access, int64_t i_pos )
+static int Seek( access_t *p_access, uint64_t i_pos )
 {
     VLC_UNUSED( p_access );
     VLC_UNUSED( i_pos );

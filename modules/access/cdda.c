@@ -35,6 +35,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -119,7 +120,7 @@ struct access_sys_t
 };
 
 static block_t *Block( access_t * );
-static int      Seek( access_t *, int64_t );
+static int      Seek( access_t *, uint64_t );
 static int      Control( access_t *, int, va_list );
 
 static int GetTracks( access_t *p_access, input_item_t *p_current );
@@ -321,12 +322,13 @@ static block_t *Block( access_t *p_access )
 /****************************************************************************
  * Seek
  ****************************************************************************/
-static int Seek( access_t *p_access, int64_t i_pos )
+static int Seek( access_t *p_access, uint64_t i_pos )
 {
     access_sys_t *p_sys = p_access->p_sys;
 
     /* Next sector to read */
     p_sys->i_sector = p_sys->i_first_sector + i_pos / CDDA_DATA_SIZE;
+    assert( p_sys->i_sector >= 0 );
     p_access->info.i_pos = i_pos;
 
     return VLC_SUCCESS;

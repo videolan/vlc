@@ -101,7 +101,7 @@ vlc_module_end ()
  *****************************************************************************/
 static ssize_t Read( access_t *, uint8_t *, size_t );
 static ssize_t Write( sout_access_out_t *, block_t * );
-static int Seek( access_t *, int64_t );
+static int Seek( access_t *, uint64_t );
 static int OutSeek( sout_access_out_t *, off_t );
 static int Control( access_t *, int, va_list );
 
@@ -121,7 +121,7 @@ struct access_sys_t
 
 static int ftp_SendCommand( vlc_object_t *, access_sys_t *, const char *, ... );
 static int ftp_ReadCommand( vlc_object_t *, access_sys_t *, int *, char ** );
-static int ftp_StartStream( vlc_object_t *, access_sys_t *, int64_t );
+static int ftp_StartStream( vlc_object_t *, access_sys_t *, uint64_t );
 static int ftp_StopStream ( vlc_object_t *, access_sys_t * );
 
 static int Login( vlc_object_t *p_access, access_sys_t *p_sys )
@@ -362,7 +362,7 @@ static int InOpen( vlc_object_t *p_this )
     {
         p_access->info.i_size = atoll( &psz_arg[4] );
         free( psz_arg );
-        msg_Dbg( p_access, "file size: %"PRId64, p_access->info.i_size );
+        msg_Dbg( p_access, "file size: %"PRIu64, p_access->info.i_size );
     }
 
     /* Start the 'stream' */
@@ -460,12 +460,9 @@ static void OutClose( vlc_object_t *p_this )
 /*****************************************************************************
  * Seek: try to go at the right place
  *****************************************************************************/
-static int _Seek( vlc_object_t *p_access, access_sys_t *p_sys, int64_t i_pos )
+static int _Seek( vlc_object_t *p_access, access_sys_t *p_sys, uint64_t i_pos )
 {
-    if( i_pos < 0 )
-        return VLC_EGENERIC;
-
-    msg_Dbg( p_access, "seeking to %"PRId64, i_pos );
+    msg_Dbg( p_access, "seeking to %"PRIu64, i_pos );
 
     ftp_StopStream( (vlc_object_t *)p_access, p_sys );
     if( ftp_StartStream( (vlc_object_t *)p_access, p_sys, i_pos ) < 0 )
@@ -474,7 +471,7 @@ static int _Seek( vlc_object_t *p_access, access_sys_t *p_sys, int64_t i_pos )
     return VLC_SUCCESS;
 }
 
-static int Seek( access_t *p_access, int64_t i_pos )
+static int Seek( access_t *p_access, uint64_t i_pos )
 {
     int val = _Seek( (vlc_object_t *)p_access, p_access->p_sys, i_pos );
     if( val )
@@ -711,7 +708,7 @@ static int ftp_ReadCommand( vlc_object_t *p_access, access_sys_t *p_sys,
 }
 
 static int ftp_StartStream( vlc_object_t *p_access, access_sys_t *p_sys,
-                            int64_t i_start )
+                            uint64_t i_start )
 {
     char psz_ipv4[16], *psz_ip = p_sys->sz_epsv_ip;
     int  i_answer;
