@@ -441,7 +441,7 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
 
             for (int j = 0; j < p_module->p_config[i].i_action; j++)
             {
-                p_module->p_config[i].ppf_action[j] = 0;
+                p_module->p_config[i].ppf_action[j] = NULL;
                 LOAD_STRING( p_module->p_config[i].ppsz_action_text[j] );
             }
         }
