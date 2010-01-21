@@ -1231,6 +1231,7 @@ ifdef HAVE_WIN32
 	(cd $<;./genMakefiles mingw && make $(HOSTCC))
 else
 ifdef HAVE_WINCE
+	(cd $<; sed -e 's/-lws2_32/-lws2/g' -i.orig config.mingw)
 	(cd $<;./genMakefiles mingw && make $(HOSTCC))
 else
 ifdef HAVE_DARWIN_OS
