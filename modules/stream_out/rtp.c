@@ -460,7 +460,7 @@ static int Open( vlc_object_t *p_this )
          * but we have to know it to build our SDP properly, which is why
          * we ask the core. FIXME: broken when neither sout-rtp-ttl nor
          * ttl are set. */
-        p_sys->i_ttl = config_GetInt( p_stream, "ttl" );
+        p_sys->i_ttl = var_InheritInteger( p_stream, "ttl" );
     }
 
     p_sys->b_latm = var_GetBool( p_stream, SOUT_CFG_PREFIX "mp4a-latm" );
@@ -977,7 +977,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
         id->i_bitrate = 0;
     }
 
-    id->i_mtu = config_GetInt( p_stream, "mtu" );
+    id->i_mtu = var_InheritInteger( p_stream, "mtu" );
     if( id->i_mtu <= 12 + 16 )
         id->i_mtu = 576 - 20 - 8; /* pessimistic */
     msg_Dbg( p_stream, "maximum RTP packet size: %d bytes", id->i_mtu );
