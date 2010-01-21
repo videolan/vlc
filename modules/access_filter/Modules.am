@@ -1,7 +1,0 @@
-SOURCES_access_filter_dump = dump.c
-SOURCES_access_filter_bandwidth = bandwidth.c
-
-libvlc_LTLIBRARIES += \
-	libaccess_filter_dump_plugin.la \
-	libaccess_filter_bandwidth_plugin.la \
-	$(NULL)
