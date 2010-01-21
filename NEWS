@@ -103,7 +103,7 @@ Removed modules:
  * Xlib x11, Xlib xvideo, Xlib glx. Use new XCB modules instead.
  * HAL. Use libudev instead.
  * gtk_main, gtk_main2, gnome_main, gnome_main2 and pda interfaces
- * WinCE and qnx interfaces
+ * WinCE, BeOS and qnx interfaces
  * opie, qte and qte_main
  * linear_resampler and trivial_resampler are removed. Use the ugly one.
  * XvMC accelerated modules. Use VAAPI instead.
