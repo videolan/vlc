@@ -31,6 +31,10 @@
 #ifndef VLC_LIBVLC_MEDIA_DISCOVERER_H
 #define VLC_LIBVLC_MEDIA_DISCOVERER_H 1
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 /*****************************************************************************
  * Services/Media Discovery
  *****************************************************************************/
@@ -98,5 +102,9 @@ VLC_PUBLIC_API int
         libvlc_media_discoverer_is_running( libvlc_media_discoverer_t * p_mdis );
 
 /**@} */
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif /* <vlc/libvlc.h> */

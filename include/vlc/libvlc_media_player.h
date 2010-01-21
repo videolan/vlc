@@ -31,6 +31,10 @@
 #ifndef VLC_LIBVLC_MEDIA_PLAYER_H
 #define VLC_LIBVLC_MEDIA_PLAYER_H 1
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 /*****************************************************************************
  * Media Player
  *****************************************************************************/
@@ -1159,5 +1163,9 @@ VLC_PUBLIC_API void libvlc_audio_set_channel( libvlc_instance_t *,
 /** @} audio */
 
 /** @} media_player */
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif /* VLC_LIBVLC_MEDIA_PLAYER_H */

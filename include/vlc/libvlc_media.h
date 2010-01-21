@@ -31,6 +31,10 @@
 #ifndef VLC_LIBVLC_MEDIA_H
 #define VLC_LIBVLC_MEDIA_H 1
 
+# ifdef __cplusplus
+extern "C" {
+# endif
+
 /*****************************************************************************
  * media
  *****************************************************************************/
@@ -360,5 +364,9 @@ VLC_PUBLIC_API void *
     libvlc_media_get_user_data( libvlc_media_t * p_md );
 
 /** @}*/
+
+# ifdef __cplusplus
+}
+# endif
 
 #endif /* VLC_LIBVLC_MEDIA_H */
