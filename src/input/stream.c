@@ -101,8 +101,8 @@ typedef struct
 {
     int64_t i_date;
 
-    int64_t i_start;
-    int64_t i_end;
+    uint64_t i_start;
+    uint64_t i_end;
 
     uint8_t *p_buffer;
 
@@ -111,7 +111,7 @@ typedef struct
 typedef struct
 {
     char     *psz_path;
-    int64_t  i_size;
+    uint64_t  i_size;
 
 } access_entry_t;
 
@@ -127,16 +127,16 @@ struct stream_sys_t
 
     stream_read_method_t   method;    /* method to use */
 
-    int64_t     i_pos;      /* Current reading offset */
+    uint64_t     i_pos;      /* Current reading offset */
 
     /* Method 1: pf_block */
     struct
     {
-        int64_t i_start;        /* Offset of block for p_first */
-        int64_t i_offset;       /* Offset for data in p_current */
+        uint64_t i_start;        /* Offset of block for p_first */
+        uint64_t i_offset;       /* Offset for data in p_current */
         block_t *p_current;     /* Current block */
 
-        int     i_size;         /* Total amount of data in the list */
+        uint64_t i_size;         /* Total amount of data in the list */
         block_t *p_first;
         block_t **pp_last;
 
@@ -145,16 +145,16 @@ struct stream_sys_t
     /* Method 2: for pf_read */
     struct
     {
-        int i_offset;   /* Buffer offset in the current track */
-        int i_tk;       /* Current track */
+        unsigned i_offset;   /* Buffer offset in the current track */
+        int      i_tk;       /* Current track */
         stream_track_t tk[STREAM_CACHE_TRACK];
 
         /* Global buffer */
         uint8_t *p_buffer;
 
         /* */
-        int i_used; /* Used since last read */
-        int i_read_size;
+        unsigned i_used; /* Used since last read */
+        unsigned i_read_size;
 
     } stream;
 
@@ -168,13 +168,13 @@ struct stream_sys_t
         bool b_fastseek;  /* From access */
 
         /* Stat about reading data */
-        int64_t i_read_count;
-        int64_t i_bytes;
-        int64_t i_read_time;
+        uint64_t i_read_count;
+        uint64_t i_bytes;
+        uint64_t i_read_time;
 
         /* Stat about seek */
-        int     i_seek_count;
-        int64_t i_seek_time;
+        unsigned i_seek_count;
+        uint64_t i_seek_time;
 
     } stat;
 
@@ -188,14 +188,14 @@ struct stream_sys_t
 /* Method 1: */
 static int  AStreamReadBlock( stream_t *s, void *p_read, unsigned int i_read );
 static int  AStreamPeekBlock( stream_t *s, const uint8_t **p_peek, unsigned int i_read );
-static int  AStreamSeekBlock( stream_t *s, int64_t i_pos );
+static int  AStreamSeekBlock( stream_t *s, uint64_t i_pos );
 static void AStreamPrebufferBlock( stream_t *s );
 static block_t *AReadBlock( stream_t *s, bool *pb_eof );
 
 /* Method 2 */
 static int  AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read );
 static int  AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, unsigned int i_read );
-static int  AStreamSeekStream( stream_t *s, int64_t i_pos );
+static int  AStreamSeekStream( stream_t *s, uint64_t i_pos );
 static void AStreamPrebufferStream( stream_t *s );
 static int  AReadStream( stream_t *s, void *p_read, unsigned int i_read );
 
@@ -203,7 +203,7 @@ static int  AReadStream( stream_t *s, void *p_read, unsigned int i_read );
 static int AStreamControl( stream_t *s, int i_query, va_list );
 static void AStreamDestroy( stream_t *s );
 static void UStreamDestroy( stream_t *s );
-static int  ASeek( stream_t *s, int64_t i_pos );
+static int  ASeek( stream_t *s, uint64_t i_pos );
 
 /****************************************************************************
  * stream_CommonNew: create an empty stream structure
@@ -578,14 +578,14 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
     stream_sys_t *p_sys = s->p_sys;
     access_t     *p_access = p_sys->p_access;
 
-    bool    *p_bool;
-    int64_t *pi_64, i_64;
-    int     i_int;
+    bool     *p_bool;
+    uint64_t *pi_64, i_64;
+    int      i_int;
 
     switch( i_query )
     {
         case STREAM_GET_SIZE:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            pi_64 = va_arg( args, uint64_t * );
             if( s->p_sys->i_list )
             {
                 int i;
@@ -608,12 +608,12 @@ static int AStreamControl( stream_t *s, int i_query, va_list args )
             break;
 
         case STREAM_GET_POSITION:
-            pi_64 = (int64_t*)va_arg( args, int64_t * );
+            pi_64 = va_arg( args, uint64_t * );
             *pi_64 = p_sys->i_pos;
             break;
 
         case STREAM_SET_POSITION:
-            i_64 = (int64_t)va_arg( args, int64_t );
+            i_64 = va_arg( args, uint64_t );
             switch( p_sys->method )
             {
             case STREAM_METHOD_BLOCK:
@@ -853,7 +853,7 @@ static int AStreamPeekBlock( stream_t *s, const uint8_t **pp_peek, unsigned int 
     return i_data;
 }
 
-static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
+static int AStreamSeekBlock( stream_t *s, uint64_t i_pos )
 {
     stream_sys_t *p_sys = s->p_sys;
     access_t   *p_access = p_sys->p_access;
@@ -861,12 +861,12 @@ static int AStreamSeekBlock( stream_t *s, int64_t i_pos )
     bool b_seek;
 
     /* We already have thoses data, just update p_current/i_offset */
-    if( i_offset >= 0 && i_offset < p_sys->block.i_size )
+    if( i_offset >= 0 && (uint64_t)i_offset < p_sys->block.i_size )
     {
         block_t *b = p_sys->block.p_first;
         int i_current = 0;
 
-        while( i_current + b->i_buffer < i_offset )
+        while( i_current + b->i_buffer < (uint64_t)i_offset )
         {
             i_current += b->i_buffer;
             b = b->p_next;
@@ -1059,7 +1059,7 @@ static int AStreamReadStream( stream_t *s, void *p_read, unsigned int i_read )
 
     if( !p_read )
     {
-        const int64_t i_pos_wanted = p_sys->i_pos + i_read;
+        const uint64_t i_pos_wanted = p_sys->i_pos + i_read;
 
         if( AStreamSeekStream( s, i_pos_wanted ) )
         {
@@ -1075,7 +1075,7 @@ static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, unsigned int
 {
     stream_sys_t *p_sys = s->p_sys;
     stream_track_t *tk = &p_sys->stream.tk[p_sys->stream.i_tk];
-    int64_t i_off;
+    uint64_t i_off;
 
     if( tk->i_start >= tk->i_end ) return 0; /* EOF */
 
@@ -1090,19 +1090,21 @@ static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, unsigned int
     if( i_read > STREAM_CACHE_TRACK_SIZE / 2 )
         i_read = STREAM_CACHE_TRACK_SIZE / 2;
 
-    while( tk->i_end - tk->i_start - p_sys->stream.i_offset < i_read )
+    while( tk->i_end < tk->i_start + p_sys->stream.i_offset + i_read )
     {
         if( p_sys->stream.i_used <= 1 )
         {
             /* Be sure we will read something */
-            p_sys->stream.i_used += i_read -
-                (tk->i_end - tk->i_start - p_sys->stream.i_offset);
+            p_sys->stream.i_used += tk->i_start + p_sys->stream.i_offset + i_read - tk->i_end;
         }
         if( AStreamRefillStream( s ) ) break;
     }
 
-    if( tk->i_end - tk->i_start - p_sys->stream.i_offset < i_read )
+    if( tk->i_end < tk->i_start + p_sys->stream.i_offset + i_read )
+    {
         i_read = tk->i_end - tk->i_start - p_sys->stream.i_offset;
+    }
+
 
     /* Now, direct pointer or a copy ? */
     i_off = (tk->i_start + p_sys->stream.i_offset) % STREAM_CACHE_TRACK_SIZE;
@@ -1132,7 +1134,7 @@ static int AStreamPeekStream( stream_t *s, const uint8_t **pp_peek, unsigned int
     return i_read;
 }
 
-static int AStreamSeekStream( stream_t *s, int64_t i_pos )
+static int AStreamSeekStream( stream_t *s, uint64_t i_pos )
 {
     stream_sys_t *p_sys = s->p_sys;
 
@@ -1163,7 +1165,7 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
     access_Control( p_access, ACCESS_CAN_FASTSEEK, &b_afastseek );
 
     /* FIXME compute seek cost (instead of static 'stupid' value) */
-    int64_t i_skip_threshold;
+    uint64_t i_skip_threshold;
     if( b_aseek )
         i_skip_threshold = b_afastseek ? 128 : 3*p_sys->stream.i_read_size;
     else
@@ -1177,7 +1179,7 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
     int i_tk_idx = -1;
 
     /* Prefer the current track */
-    if( p_current->i_start <= i_pos && i_pos - p_current->i_end <= i_skip_threshold )
+    if( p_current->i_start <= i_pos && i_pos <= p_current->i_end + i_skip_threshold )
     {
         tk = p_current;
         i_tk_idx = p_sys->stream.i_tk;
@@ -1217,7 +1219,7 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
 
     if( tk != p_current )
         i_skip_threshold = 0;
-    if( tk->i_start <= i_pos && i_pos - tk->i_end <= i_skip_threshold )
+    if( tk->i_start <= i_pos && i_pos <= tk->i_end + i_skip_threshold )
     {
 #ifdef STREAM_DEBUG
         msg_Err( s, "AStreamSeekStream: reusing %d start=%"PRId64
@@ -1235,9 +1237,9 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
             if( ASeek( s, tk->i_end ) )
                 return VLC_EGENERIC;
         }
-        else
+        else if( i_pos > tk->i_end )
         {
-            int64_t i_skip = i_pos - tk->i_end;
+            uint64_t i_skip = i_pos - tk->i_end;
             while( i_skip > 0 )
             {
                 const int i_read_max = __MIN( 10 * STREAM_READ_ATONCE, i_skip );
@@ -1268,7 +1270,7 @@ static int AStreamSeekStream( stream_t *s, int64_t i_pos )
      *    - refilling threshold
      *    - how much to refill
      */
-    if( (tk->i_end - tk->i_start) - p_sys->stream.i_offset < p_sys->stream.i_read_size )
+    if( tk->i_end < tk->i_start + p_sys->stream.i_offset + p_sys->stream.i_read_size )
     {
         if( p_sys->stream.i_used < STREAM_READ_ATONCE / 2 )
             p_sys->stream.i_used = STREAM_READ_ATONCE / 2;
@@ -1299,11 +1301,10 @@ static int AStreamReadNoSeekStream( stream_t *s, void *p_read, unsigned int i_re
 
     while( i_data < i_read )
     {
-        int i_off = (tk->i_start + p_sys->stream.i_offset) %
-                    STREAM_CACHE_TRACK_SIZE;
+        unsigned i_off = (tk->i_start + p_sys->stream.i_offset) % STREAM_CACHE_TRACK_SIZE;
         unsigned int i_current =
-            __MAX(0,__MIN( tk->i_end - tk->i_start - p_sys->stream.i_offset,
-                   STREAM_CACHE_TRACK_SIZE - i_off ));
+            __MIN( tk->i_end - tk->i_start - p_sys->stream.i_offset,
+                   STREAM_CACHE_TRACK_SIZE - i_off );
         int i_copy = __MIN( i_current, i_read - i_data );
 
         if( i_copy <= 0 ) break; /* EOF */
@@ -1324,11 +1325,11 @@ static int AStreamReadNoSeekStream( stream_t *s, void *p_read, unsigned int i_re
         /* */
         p_sys->stream.i_used += i_copy;
 
-        if( tk->i_end - tk->i_start - p_sys->stream.i_offset <= i_read -i_data )
+        if( tk->i_end + i_data <= tk->i_start + p_sys->stream.i_offset + i_read )
         {
-            const int i_read_requested = __MAX( __MIN( i_read - i_data,
-                                                       STREAM_READ_ATONCE * 10 ),
-                                                STREAM_READ_ATONCE / 2 );
+            const unsigned i_read_requested = __MAX( __MIN( i_read - i_data,
+                                                            STREAM_READ_ATONCE * 10 ),
+                                                     STREAM_READ_ATONCE / 2 );
 
             if( p_sys->stream.i_used < i_read_requested )
                 p_sys->stream.i_used = i_read_requested;
@@ -1393,9 +1394,9 @@ static int AStreamRefillStream( stream_t *s )
         tk->i_end += i_read;
 
         /* Windows of STREAM_CACHE_TRACK_SIZE */
-        if( tk->i_end - tk->i_start > STREAM_CACHE_TRACK_SIZE )
+        if( tk->i_start + STREAM_CACHE_TRACK_SIZE < tk->i_end )
         {
-            int i_invalid = tk->i_end - tk->i_start - STREAM_CACHE_TRACK_SIZE;
+            unsigned i_invalid = tk->i_end - tk->i_start - STREAM_CACHE_TRACK_SIZE;
 
             tk->i_start += i_invalid;
             p_sys->stream.i_offset -= i_invalid;
@@ -1451,7 +1452,7 @@ static void AStreamPrebufferStream( stream_t *s )
 
         /* */
         i_read = STREAM_CACHE_TRACK_SIZE - i_buffered;
-        i_read = __MIN( p_sys->stream.i_read_size, i_read );
+        i_read = __MIN( (int)p_sys->stream.i_read_size, i_read );
         i_read = AReadStream( s, &tk->p_buffer[i_buffered], i_read );
         if( i_read <  0 )
             continue;
@@ -1829,11 +1830,10 @@ static block_t *AReadBlock( stream_t *s, bool *pb_eof )
     return p_block;
 }
 
-static int ASeek( stream_t *s, int64_t i_pos )
+static int ASeek( stream_t *s, uint64_t i_pos )
 {
     stream_sys_t *p_sys = s->p_sys;
     access_t *p_access = p_sys->p_access;
-    assert( i_pos >= 0 );
 
     /* Check which stream we need to access */
     if( p_sys->i_list )

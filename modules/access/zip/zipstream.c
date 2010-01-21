@@ -305,7 +305,7 @@ static int Control( stream_t *s, int i_query, va_list args )
     {
         case STREAM_SET_POSITION:
         {
-            int64_t i_position = (int64_t)va_arg( args, int64_t );
+            uint64_t i_position = va_arg( args, uint64_t );
             if( i_position >= p_sys->i_len )
                 return VLC_EGENERIC;
             else
@@ -317,15 +317,15 @@ static int Control( stream_t *s, int i_query, va_list args )
 
         case STREAM_GET_POSITION:
         {
-            int64_t *pi_position = (int64_t*)va_arg( args, int64_t* );
+            uint64_t *pi_position = va_arg( args, uint64_t* );
             *pi_position = p_sys->i_pos;
             return VLC_SUCCESS;
         }
 
         case STREAM_GET_SIZE:
         {
-            int64_t *pi_size = (int64_t*)va_arg( args, int64_t* );
-            *pi_size = (int64_t) p_sys->i_len;
+            uint64_t *pi_size = va_arg( args, uint64_t* );
+            *pi_size = p_sys->i_len;
             return VLC_SUCCESS;
         }
 

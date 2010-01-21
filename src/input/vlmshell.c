@@ -561,7 +561,7 @@ error:
 static int ExecuteLoad( vlm_t *p_vlm, const char *psz_url, vlm_message_t **pp_status )
 {
     stream_t *p_stream = stream_UrlNew( p_vlm, psz_url );
-    int64_t i_size;
+    uint64_t i_size;
     char *psz_buffer;
 
     if( !p_stream )
@@ -580,6 +580,8 @@ static int ExecuteLoad( vlm_t *p_vlm, const char *psz_url, vlm_message_t **pp_st
     }
 
     i_size = stream_Size( p_stream );
+    if( i_size > SIZE_MAX - 1 )
+        i_size = SIZE_MAX - 1;
 
     psz_buffer = malloc( i_size + 1 );
     if( !psz_buffer )

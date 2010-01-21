@@ -2186,7 +2186,7 @@ static bool Control( input_thread_t *p_input,
             else if( bookmark.i_byte_offset >= 0 &&
                      p_input->p->input.p_stream )
             {
-                const int64_t i_size = stream_Size( p_input->p->input.p_stream );
+                const uint64_t i_size = stream_Size( p_input->p->input.p_stream );
                 if( i_size > 0 && bookmark.i_byte_offset <= i_size )
                 {
                     val.f_float = (double)bookmark.i_byte_offset / i_size;

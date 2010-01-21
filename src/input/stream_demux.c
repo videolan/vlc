@@ -24,6 +24,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <limits.h>
 
 #include "demux.h"
 #include <libvlc.h>
@@ -38,7 +39,7 @@ struct stream_sys_t
     block_fifo_t *p_fifo;
     block_t      *p_block;
 
-    int64_t     i_pos;
+    uint64_t    i_pos;
 
     /* Demuxer */
     char        *psz_name;
@@ -223,13 +224,13 @@ static int DStreamPeek( stream_t *s, const uint8_t **pp_peek, unsigned int i_pee
 static int DStreamControl( stream_t *s, int i_query, va_list args )
 {
     stream_sys_t *p_sys = s->p_sys;
-    int64_t    *p_i64;
+    uint64_t    *p_i64;
     bool *p_b;
 
     switch( i_query )
     {
         case STREAM_GET_SIZE:
-            p_i64 = (int64_t*) va_arg( args, int64_t * );
+            p_i64 = va_arg( args, uint64_t * );
             *p_i64 = 0;
             return VLC_SUCCESS;
 
@@ -244,21 +245,22 @@ static int DStreamControl( stream_t *s, int i_query, va_list args )
             return VLC_SUCCESS;
 
         case STREAM_GET_POSITION:
-            p_i64 = (int64_t*) va_arg( args, int64_t * );
+            p_i64 = va_arg( args, uint64_t * );
             *p_i64 = p_sys->i_pos;
             return VLC_SUCCESS;
 
         case STREAM_SET_POSITION:
         {
-            int64_t i64 = (int64_t)va_arg( args, int64_t );
-            int i_skip;
-            if( i64 < p_sys->i_pos ) return VLC_EGENERIC;
-            i_skip = i64 - p_sys->i_pos;
+            uint64_t i64 = va_arg( args, uint64_t );
+            if( i64 < p_sys->i_pos )
+                return VLC_EGENERIC;
 
+            uint64_t i_skip = i64 - p_sys->i_pos;
             while( i_skip > 0 )
             {
-                int i_read = DStreamRead( s, NULL, (long)i_skip );
-                if( i_read <= 0 ) return VLC_EGENERIC;
+                int i_read = DStreamRead( s, NULL, __MIN(i_skip, INT_MAX) );
+                if( i_read <= 0 )
+                    return VLC_EGENERIC;
                 i_skip -= i_read;
             }
             return VLC_SUCCESS;

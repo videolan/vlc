@@ -90,10 +90,10 @@ enum stream_query_e
     STREAM_CAN_FASTSEEK,        /**< arg1= bool *   res=cannot fail*/
 
     /* */
-    STREAM_SET_POSITION,        /**< arg1= int64_t        res=can fail  */
-    STREAM_GET_POSITION,        /**< arg1= int64_t *      res=cannot fail*/
+    STREAM_SET_POSITION,        /**< arg1= uint64_t       res=can fail  */
+    STREAM_GET_POSITION,        /**< arg1= uint64_t *     res=cannot fail*/
 
-    STREAM_GET_SIZE,            /**< arg1= int64_t *      res=cannot fail (0 if no sense)*/
+    STREAM_GET_SIZE,            /**< arg1= uint64_t *     res=cannot fail (0 if no sense)*/
 
     /* Special for direct access control from demuxer.
      * XXX: avoid using it by all means */
@@ -124,8 +124,10 @@ VLC_EXPORT( char *, stream_ReadLine, ( stream_t * ) );
  */
 static inline int64_t stream_Tell( stream_t *s )
 {
-    int64_t i_pos;
+    uint64_t i_pos;
     stream_Control( s, STREAM_GET_POSITION, &i_pos );
+    if( i_pos >> 62 )
+        return (int64_t)1 << 62;
     return i_pos;
 }
 
@@ -134,12 +136,14 @@ static inline int64_t stream_Tell( stream_t *s )
  */
 static inline int64_t stream_Size( stream_t *s )
 {
-    int64_t i_pos;
+    uint64_t i_pos;
     stream_Control( s, STREAM_GET_SIZE, &i_pos );
+    if( i_pos >> 62 )
+        return (int64_t)1 << 62;
     return i_pos;
 }
 
-static inline int stream_Seek( stream_t *s, int64_t i_pos )
+static inline int stream_Seek( stream_t *s, uint64_t i_pos )
 {
     return stream_Control( s, STREAM_SET_POSITION, i_pos );
 }
@@ -172,7 +176,7 @@ VLC_EXPORT( void,      stream_DemuxSend,  ( stream_t *s, block_t *p_block ) );
  * You must delete it using stream_Delete.
  */
 #define stream_MemoryNew( a, b, c, d ) __stream_MemoryNew( VLC_OBJECT(a), b, c, d )
-VLC_EXPORT( stream_t *,__stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buffer, int64_t i_size, bool b_preserve_memory ) );
+VLC_EXPORT( stream_t *,__stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buffer, uint64_t i_size, bool b_preserve_memory ) );
 
 /**
  * Create a stream_t reading from an URL.

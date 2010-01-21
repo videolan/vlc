@@ -59,19 +59,19 @@ static const int i_rar_marker = sizeof(p_rar_marker);
 
 typedef struct
 {
-    int64_t i_offset;
-    int64_t i_size;
-    int64_t i_cummulated_size;
+    uint64_t i_offset;
+    uint64_t i_size;
+    uint64_t i_cummulated_size;
 } rar_file_chunk_t;
 typedef struct
 {
     char     *psz_name;
-    int64_t  i_size;
+    uint64_t i_size;
     bool     b_complete;
 
     int              i_chunk;
     rar_file_chunk_t **pp_chunk;
-    int64_t          i_real_size;  /* Gathered size */
+    uint64_t         i_real_size;  /* Gathered size */
 } rar_file_t;
 
 static void RarFileDelete( rar_file_t * );
@@ -81,7 +81,7 @@ struct stream_sys_t
     rar_file_t *p_file;
     const rar_file_chunk_t *p_chunk;
 
-    int64_t i_position;
+    uint64_t i_position;
 
     uint8_t *p_peek_alloc;
     uint8_t *p_peek;
@@ -97,7 +97,7 @@ static int  Peek   ( stream_t *, const uint8_t **pp_peek, unsigned int i_peek );
 static int  Control( stream_t *, int i_query, va_list );
 
 static int  Parse  ( stream_t * );
-static int  Seek   ( stream_t *s, int64_t i_position );
+static int  Seek   ( stream_t *s, uint64_t i_position );
 
 /****************************************************************************
  * Open
@@ -192,7 +192,7 @@ static int Read( stream_t *s, void *p_read, unsigned int i_read )
 
     while( i_total < i_read )
     {
-        const int64_t i_chunk_end = p_sys->p_chunk->i_cummulated_size + p_sys->p_chunk->i_size;
+        const uint64_t i_chunk_end = p_sys->p_chunk->i_cummulated_size + p_sys->p_chunk->i_size;
 
         int i_max = __MIN( i_read - i_total, i_chunk_end - p_sys->i_position );
         if( i_max <= 0 )
@@ -257,20 +257,20 @@ static int Control( stream_t *s, int i_query, va_list args )
     /* */
     case STREAM_SET_POSITION:
     {
-        int64_t i_position = (int64_t)va_arg( args, int64_t );
+        uint64_t i_position = va_arg( args, uint64_t );
         return Seek( s, i_position );
     }
 
     case STREAM_GET_POSITION:
     {
-        int64_t *pi_position = (int64_t*)va_arg( args, int64_t* );
+        uint64_t *pi_position = va_arg( args, uint64_t* );
         *pi_position = p_sys->i_position - p_sys->i_peek;
         return VLC_SUCCESS;
     }
 
     case STREAM_GET_SIZE:
     {
-        int64_t *pi_size = (int64_t*)va_arg( args, int64_t* );
+        uint64_t *pi_size = (uint64_t*)va_arg( args, uint64_t* );
         *pi_size = p_sys->p_file->i_real_size;
         return VLC_SUCCESS;
     }
@@ -293,13 +293,11 @@ static int Control( stream_t *s, int i_query, va_list args )
 /****************************************************************************
  * Helpers
  ****************************************************************************/
-static int Seek( stream_t *s, int64_t i_position )
+static int Seek( stream_t *s, uint64_t i_position )
 {
     stream_sys_t *p_sys = s->p_sys;
 
-    if( i_position < 0 )
-        i_position = 0;
-    else if( i_position > p_sys->p_file->i_real_size )
+    if( i_position > p_sys->p_file->i_real_size )
         i_position = p_sys->p_file->i_real_size;
 
     /* Search the chunk */
@@ -313,8 +311,8 @@ static int Seek( stream_t *s, int64_t i_position )
     p_sys->i_position = i_position;
     p_sys->i_peek     = 0;
 
-    const int64_t i_seek = p_sys->p_chunk->i_offset +
-                           ( i_position - p_sys->p_chunk->i_cummulated_size );
+    const uint64_t i_seek = p_sys->p_chunk->i_offset +
+                            ( i_position - p_sys->p_chunk->i_cummulated_size );
     return stream_Seek( s->p_source, i_seek );
 }
 
@@ -380,9 +378,8 @@ static int PeekBlock( stream_t *s, rar_block_t *p_hdr )
 }
 static int SkipBlock( stream_t *s, const rar_block_t *p_hdr )
 {
-    int64_t i_size = (int64_t)p_hdr->i_size + p_hdr->i_add_size;
+    uint64_t i_size = (uint64_t)p_hdr->i_size + p_hdr->i_add_size;
 
-    assert( i_size >= 0 );
     while( i_size > 0 )
     {
         int i_skip = __MIN( i_size, INT_MAX );
@@ -444,7 +441,7 @@ static int SkipFile( stream_t *s,const rar_block_t *p_hdr )
     int i_min_size = 7+21;
     if( p_hdr->i_flags & RAR_BLOCK_FILE_HAS_HIGH )
         i_min_size += 8;
-    if( p_hdr->i_size < i_min_size )
+    if( p_hdr->i_size < (unsigned)i_min_size )
         return VLC_EGENERIC;
 
     if( stream_Peek( s->p_source, &p_peek, i_min_size ) < i_min_size )
@@ -481,7 +478,7 @@ static int SkipFile( stream_t *s,const rar_block_t *p_hdr )
     }
 
     /* Ignore smaller files */
-    const int64_t i_file_size = ((int64_t)i_file_size_high << 32) | i_file_size_low;
+    const uint64_t i_file_size = ((uint64_t)i_file_size_high << 32) | i_file_size_low;
     if( p_sys->p_file &&
         p_sys->p_file->i_size < i_file_size )
     {

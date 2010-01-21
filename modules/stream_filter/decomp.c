@@ -243,10 +243,10 @@ static int Control (stream_t *stream, int query, va_list args)
             *(va_arg (args, bool *)) = false;
             break;
         case STREAM_GET_POSITION:
-            *(va_arg (args, int64_t *)) = p_sys->offset;
+            *(va_arg (args, uint64_t *)) = p_sys->offset;
             break;
         case STREAM_GET_SIZE:
-            *(va_arg (args, int64_t *)) = 0;
+            *(va_arg (args, uint64_t *)) = 0;
             break;
         default:
             return VLC_EGENERIC;
