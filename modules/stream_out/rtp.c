@@ -457,9 +457,9 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->i_ttl == -1 )
     {
         /* Normally, we should let the default hop limit up to the core,
-         * but we have to know it to build our SDP properly, which is why
-         * we ask the core. FIXME: broken when neither sout-rtp-ttl nor
-         * ttl are set. */
+         * but we have to know it to write our RTSP headers properly,
+         * which is why we ask the core. FIXME: broken when neither
+         * sout-rtp-ttl nor ttl are set. */
         p_sys->i_ttl = var_InheritInteger( p_stream, "ttl" );
     }
 
