@@ -27,7 +27,7 @@ vlc_wrapper_LDADD = $(SOCKET_LIBS)
 
 vlc_DEPENDENCIES = ../src/libvlc.sym
 vlc_LDFLAGS = `$(VLC_CONFIG) --ldflags vlc`
-vlc_LDADD = ../src/libvlc.la `$(VLC_CONFIG) -libs vlc`
+vlc_LDADD = ../src/libvlc.la ../src/libvlccore.la `$(VLC_CONFIG) -libs vlc`
 
 vlc_static_SOURCES = $(vlc_SOURCES)
 vlc_static_CFLAGS = $(AM_CFLAGS) \
