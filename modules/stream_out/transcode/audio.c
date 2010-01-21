@@ -138,6 +138,7 @@ static int transcode_audio_filter_chain_build( sout_stream_t *p_stream, filter_c
         /* First step, convert to fl32 */
         current.i_codec =
         current.audio.i_format = VLC_CODEC_FL32;
+        aout_FormatPrepare( &current.audio );
 
         if( !filter_chain_AppendFilter( p_chain, NULL, NULL, NULL, &current ) )
         {
@@ -151,6 +152,7 @@ static int transcode_audio_filter_chain_build( sout_stream_t *p_stream, filter_c
     if( current.audio.i_rate != p_dst->audio.i_rate )
     {
         current.audio.i_rate = p_dst->audio.i_rate;
+        aout_FormatPrepare( &current.audio );
         if( !filter_chain_AppendFilter( p_chain, NULL, NULL, NULL, &current ) )
         {
             msg_Err( p_stream, "Failed to find conversion filter for resampling" );
@@ -171,6 +173,7 @@ static int transcode_audio_filter_chain_build( sout_stream_t *p_stream, filter_c
             current.audio.i_physical_channels =
             current.audio.i_original_channels = pi_channels_maps[current.audio.i_channels];
 
+        aout_FormatPrepare( &current.audio );
         if( !filter_chain_AppendFilter( p_chain, NULL, NULL, NULL, &current ) )
         {
             msg_Err( p_stream, "Failed to find conversion filter for channel mixing" );
@@ -182,6 +185,7 @@ static int transcode_audio_filter_chain_build( sout_stream_t *p_stream, filter_c
     if( current.i_codec != p_dst->i_codec )
     {
         current.i_codec = p_dst->i_codec;
+        aout_FormatPrepare( &current.audio );
         if( !filter_chain_AppendFilter( p_chain, NULL, NULL, NULL, &current ) )
         {
             msg_Err( p_stream, "Failed to find conversion filter to %4.4s",
