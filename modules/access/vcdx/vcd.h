@@ -53,4 +53,4 @@ typedef struct {
 } vcd_data_t;
 
 int  VCDSetArea      ( access_t * );
-int  VCDSeek         ( access_t *, off_t );
+int  VCDSeek         ( access_t *, uint64_t );
