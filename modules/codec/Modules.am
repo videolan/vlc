@@ -25,7 +25,6 @@ SOURCES_svcdsub = svcdsub.c
 SOURCES_cvdsub = cvdsub.c
 SOURCES_fake = fake.c
 SOURCES_invmem = invmem.c
-SOURCES_realaudio = realaudio.c
 SOURCES_realvideo = realvideo.c
 SOURCES_sdl_image = sdl_image.c
 SOURCES_zvbi = zvbi.c

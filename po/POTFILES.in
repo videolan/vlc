@@ -392,7 +392,6 @@ modules/codec/mpeg_audio.c
 modules/codec/png.c
 modules/codec/quicktime.c
 modules/codec/rawvideo.c
-modules/codec/realaudio.c
 modules/codec/realvideo.c
 modules/codec/schroedinger.c
 modules/codec/sdl_image.c

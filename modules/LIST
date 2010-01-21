@@ -262,7 +262,6 @@ $Id$
  * rawvideo: Pseudo audio-decoder for raw video
  * rc: interface module using stdio
  * real: partial Real audio/video demuxer
- * realaudio: Real audio decoder
  * realvideo: Real video decoder
  * remoteosd: Remote-OSD over VNC
  * ripple: Ripple video effect

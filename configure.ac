@@ -700,7 +700,7 @@ AC_CHECK_LIB(m,cos,[
   VLC_ADD_LIBS([adjust wave ripple psychedelic gradient a52tofloat32 dtstofloat32 x264 goom visual panoramix rotate noise grain scene kate flac lua chorus_flanger],[-lm])
 ])
 AC_CHECK_LIB(m,pow,[
-  VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc ffmpegaltivec i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realaudio realvideo opengl],[-lm])
+  VLC_ADD_LIBS([avcodec avformat access_avio swscale postproc ffmpegaltivec i420_rgb faad twolame equalizer spatializer param_eq libvlccore freetype mod mpc dmo quicktime realvideo opengl],[-lm])
 ])
 AC_CHECK_LIB(m,sqrt,[
   VLC_ADD_LIBS([headphone_channel_mixer normvol audiobargraph_a speex mono colorthres extract ball],[-lm])
@@ -776,7 +776,7 @@ if test "${ac_cv_have_plugins}" = "no" -o "${SYS}" = "darwin"; then
     ac_cv_my_have_dlopen=yes,
     AC_CHECK_LIB(dl, dlopen,
       ac_cv_my_have_dlopen=yes
-      VLC_ADD_LIBS([libvlccore realaudio realvideo lua],[-ldl]),
+      VLC_ADD_LIBS([libvlccore realvideo lua],[-ldl]),
       AC_CHECK_LIB(svld, dlopen,
         ac_cv_my_have_dlopen=yes
         VLC_ADD_LIBS([libvlccore],[-lsvld]))))
@@ -3075,7 +3075,6 @@ dnl
 AC_ARG_ENABLE(real,
   [  --enable-real           Real media module (default disabled)])
 if test "${enable_real}" = "yes"; then
-  VLC_ADD_PLUGIN([realaudio])
   VLC_ADD_PLUGIN([realvideo])
 fi
 
@@ -4601,8 +4600,6 @@ AS_IF([test "${enable_loader}" = "yes"],
     VLC_ADD_LIBS([dmo],[\\\${top_builddir}/libs/loader/libloader.la -lpthread])
     VLC_ADD_CPPFLAGS([quicktime],[-I\\\${top_srcdir}/libs/loader])
     VLC_ADD_LIBS([quicktime],[\\\${top_builddir}/libs/loader/libloader.la -lpthread])
-    VLC_ADD_CPPFLAGS([realaudio],[-I\\\${top_srcdir}/libs/loader -DLOADER])
-    VLC_ADD_LIBS([realaudio],[\\\${top_builddir}/libs/loader/libloader.la])
     VLC_ADD_CPPFLAGS([realvideo],[-I\\\${top_srcdir}/libs/loader -DLOADER])
     VLC_ADD_LIBS([realvideo],[\\\${top_builddir}/libs/loader/libloader.la])
   ])
