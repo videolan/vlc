@@ -206,6 +206,7 @@ struct access_sys_t
     bool b_continuous;
     bool b_pace_control;
     bool b_persist;
+    bool b_has_size;
 
     vlc_array_t * cookies;
 };
@@ -307,7 +308,8 @@ static int OpenWithCookies( vlc_object_t *p_this, const char *psz_access,
     p_sys->psz_icy_title = NULL;
     p_sys->i_remaining = 0;
     p_sys->b_persist = false;
-    p_access->info.i_size = -1;
+    p_sys->b_has_size = false;
+    p_access->info.i_size = 0;
     p_access->info.i_pos  = 0;
     p_access->info.b_eof  = false;
 
@@ -758,7 +760,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
         return 0;
     }
 
-    if( p_access->info.i_size >= 0 &&
+    if( p_sys->b_has_size &&
         i_len + p_access->info.i_pos > p_access->info.i_size )
     {
         if( ( i_len = p_access->info.i_size - p_access->info.i_pos ) == 0 )
@@ -802,7 +804,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             i_len = p_sys->i_chunk;
         }
     }
-    else if( p_access->info.i_size != -1 && (int64_t)i_len > p_sys->i_remaining) {
+    else if( p_sys->b_has_size && (int64_t)i_len > p_sys->i_remaining) {
         /* Only ask for the remaining length */
         i_len = (size_t)p_sys->i_remaining;
         if(i_len == 0) {
@@ -883,7 +885,7 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
             p_access->b_error = true;
     }
 
-    if( p_access->info.i_size != -1 )
+    if( p_sys->b_has_size )
     {
         p_sys->i_remaining -= i_read;
     }
@@ -1129,8 +1131,8 @@ static int Connect( access_t *p_access, int64_t i_tell )
     p_sys->psz_icy_title = NULL;
     p_sys->i_remaining = 0;
     p_sys->b_persist = false;
-
-    p_access->info.i_size = -1;
+    p_sys->b_has_size = false;
+    p_access->info.i_size = 0;
     p_access->info.i_pos  = i_tell;
     p_access->info.b_eof  = false;
 
@@ -1410,6 +1412,7 @@ static int Request( access_t *p_access, int64_t i_tell )
         {
             int64_t i_size = i_tell + (p_sys->i_remaining = atoll( p ));
             if(i_size > p_access->info.i_size) {
+                p_sys->b_has_size = true;
                 p_access->info.i_size = i_size;
             }
             msg_Dbg( p_access, "this frame size=%"PRId64, p_sys->i_remaining );
@@ -1424,6 +1427,7 @@ static int Request( access_t *p_access, int64_t i_tell )
                 p_sys->i_remaining = i_nend+1-i_ntell;
                 int64_t i_size = (i_nsize > i_nend) ? i_nsize : (i_nend + 1);
                 if(i_size > p_access->info.i_size) {
+                    p_sys->b_has_size = true;
                     p_access->info.i_size = i_size;
                 }
                 msg_Dbg( p_access, "stream size=%"PRId64",pos=%"PRId64",remaining=%"PRId64,i_nsize,i_ntell,p_sys->i_remaining);
@@ -1603,7 +1607,7 @@ static int Request( access_t *p_access, int64_t i_tell )
     /* We close the stream for zero length data, unless of course the
      * server has already promised to do this for us.
      */
-    if( p_access->info.i_size != -1 && p_sys->i_remaining == 0 && p_sys->b_persist ) {
+    if( p_sys->b_has_size && p_sys->i_remaining == 0 && p_sys->b_persist ) {
         Disconnect( p_access );
     }
     return VLC_SUCCESS;
