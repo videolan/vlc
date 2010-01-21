@@ -216,15 +216,11 @@ static int Open( vlc_object_t* p_this )
     vlc_UrlClean( &url );
     return VLC_SUCCESS;
 
-
 error:
     free( psz_password );
     free( psz_username );
-    if( p_sys )
-    {
-        vlc_UrlClean( &url );
-        free( p_sys );
-    }
+    vlc_UrlClean( &url );
+    free( p_sys );
     return VLC_EGENERIC;
 }
 
