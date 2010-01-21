@@ -803,7 +803,7 @@ if test "${THREAD_LIB}" = "error"; then
   THREAD_LIB=""
 fi
 
-VLC_ADD_LIBS([libvlccore libvlc plugin],[${THREAD_LIB}])
+VLC_ADD_LIBS([libvlccore libvlc vlc plugin],[${THREAD_LIB}])
 
 AC_CHECK_LIB(rt, clock_nanosleep, [
   VLC_ADD_LIBS([libvlccore],[-lrt])
