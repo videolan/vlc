@@ -52,7 +52,6 @@ struct rtsp_stream_t
     httpd_host_t   *host;
     httpd_url_t    *url;
     char           *psz_path;
-    const char     *track_sep;
     unsigned        track_id;
     unsigned        port;
 
@@ -92,10 +91,6 @@ rtsp_stream_t *RtspSetup( sout_stream_t *p_stream, const vlc_url_t *url )
     rtsp->psz_path = strdup( ( url->psz_path != NULL ) ? url->psz_path : "/" );
     if( rtsp->psz_path == NULL )
         goto error;
-
-    assert( strlen( rtsp->psz_path ) > 0 );
-    rtsp->track_sep = rtsp->psz_path[strlen( rtsp->psz_path ) - 1] == '/' ?
-                      "" : "/";
 
     msg_Dbg( p_stream, "RTSP stream: host %s port %d at %s",
              url->psz_host, rtsp->port, rtsp->psz_path );
@@ -181,12 +176,11 @@ struct rtsp_strack_t
 
 char *RtspAppendTrackPath( rtsp_stream_id_t *id, const char *base )
 {
-    assert( ( strlen( base ) > 0 && base[strlen( base ) - 1] == '/' )
-            ^ ( id->stream->track_sep[0] == '/' ) );
-
+    const char *sep = strlen( base ) > 0 && base[strlen( base ) - 1] == '/' ?
+                      "" : "/";
     char *url;
-    if( asprintf( &url, "%s%strackID=%u", base, id->stream->track_sep,
-                  id->track_id ) == -1 )
+
+    if( asprintf( &url, "%s%strackID=%u", base, sep, id->track_id ) == -1 )
         url = NULL;
     return url;
 }
@@ -198,7 +192,7 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
                              const char *dst, int ttl,
                              unsigned loport, unsigned hiport )
 {
-    char urlbuf[sizeof( "/trackID=123" ) + strlen( rtsp->psz_path )];
+    char *urlbuf;
     rtsp_stream_id_t *id = malloc( sizeof( *id ) );
     httpd_url_t *url;
 
@@ -218,10 +212,16 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
         id->hiport = hiport;
     }
 
-    snprintf( urlbuf, sizeof( urlbuf ), "%s%strackID=%u", rtsp->psz_path,
-              rtsp->track_sep, id->track_id );
+    urlbuf = RtspAppendTrackPath( id, rtsp->psz_path );
+    if( urlbuf == NULL )
+    {
+        free( id );
+        return NULL;
+    }
+
     msg_Dbg( rtsp->owner, "RTSP: adding %s", urlbuf );
     url = id->url = httpd_UrlNewUnique( rtsp->host, urlbuf, NULL, NULL, NULL );
+    free( urlbuf );
 
     if( url == NULL )
     {
@@ -652,6 +652,8 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
             ses = RtspClientGet( rtsp, psz_session );
             if( ses != NULL )
             {
+                /* The "trackID" part must match what is done in
+                 * RtspAppendTrackPath() */
                 /* FIXME: we really need to limit the number of tracks... */
                 char info[ses->trackc * ( strlen( control )
                               + sizeof("url=/trackID=123;seq=65535;"
@@ -673,11 +675,12 @@ static int RtspHandler( rtsp_stream_t *rtsp, rtsp_stream_id_t *id,
                         }
                         else
                             seq = rtp_get_seq( tr->id->sout_id );
+                        char *url = RtspAppendTrackPath( tr->id, control );
                         infolen += sprintf( info + infolen,
-                                    "url=%s%strackID=%u;seq=%u;rtptime=%u, ",
-                                    control, rtsp->track_sep,
-                                    tr->id->track_id, seq,
+                                    "url=%s;seq=%u;rtptime=%u, ",
+                                    url != NULL ? url : "", seq,
                                     rtp_compute_ts( tr->id->sout_id, ts ) );
+                        free( url );
                     }
                 }
                 if( infolen > 0 )
