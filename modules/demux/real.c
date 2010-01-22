@@ -622,9 +622,9 @@ static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
         p_sys->b_seek = false;
     }
 
-    if( tk->fmt.i_codec == VLC_FOURCC( 'c', 'o', 'o', 'k' ) ||
-        tk->fmt.i_codec == VLC_FOURCC( 'a', 't', 'r', 'c' ) ||
-        tk->fmt.i_codec == VLC_FOURCC( 's', 'i', 'p', 'r' ) )
+    if( tk->fmt.i_codec == VLC_CODEC_COOK ||
+        tk->fmt.i_codec == VLC_CODEC_ATRAC3 ||
+        tk->fmt.i_codec == VLC_CODEC_SIPR )
     {
         const int i_num = tk->i_frame_size / tk->i_subpacket_size;
         const int y = tk->i_subpacket / ( tk->i_frame_size / tk->i_subpacket_size );
@@ -661,7 +661,7 @@ static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
     else
     {
         const int y = tk->i_subpacket / (tk->i_subpacket_h / 2);
-        assert( tk->fmt.i_codec == VLC_FOURCC( '2', '8', '_', '8' ) );
+        assert( tk->fmt.i_codec == VLC_CODEC_288 );
 
         for( int i = 0; i < tk->i_subpacket_h / 2; i++ )
         {
@@ -766,7 +766,7 @@ static void DemuxAudioMethod3( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
     if( !p_block )
         return;
 
-    if( tk->fmt.i_codec == VLC_FOURCC( 'a', '5', '2', ' ' ) )
+    if( tk->fmt.i_codec == VLC_CODEC_A52 )
     {
         uint8_t *p_src = p_sys->buffer;
         uint8_t *p_dst = p_block->p_buffer;
@@ -795,13 +795,13 @@ static void DemuxAudio( demux_t *p_demux, real_track_t *tk, mtime_t i_pts, unsig
 {
     switch( tk->fmt.i_codec )
     {
-    case VLC_FOURCC( 'c', 'o', 'o', 'k' ):
-    case VLC_FOURCC( 'a', 't', 'r', 'c' ):
-    case VLC_FOURCC( 's', 'i', 'p', 'r' ):
-    case VLC_FOURCC( '2', '8', '_', '8' ):
+    case VLC_CODEC_COOK:
+    case VLC_CODEC_ATRAC3:
+    case VLC_CODEC_SIPR:
+    case VLC_CODEC_RA_288:
         DemuxAudioMethod1( p_demux, tk, i_pts, i_flags );
         break;
-    case VLC_FOURCC( 'm','p','4','a' ):
+    case VLC_CODEC_MP4A:
         DemuxAudioMethod2( p_demux, tk, i_pts );
         break;
     default:
@@ -1311,19 +1311,19 @@ static int CodecVideoParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
     {
     case 0x10003000:
     case 0x10003001:
-        fmt.i_codec = VLC_FOURCC( 'R','V','1','3' );
+        fmt.i_codec = VLC_CODEC_RV13;
         break;
     case 0x20001000:
     case 0x20100001:
     case 0x20200002:
     case 0x20201002:
-        fmt.i_codec = VLC_FOURCC( 'R','V','2','0' );
+        fmt.i_codec = VLC_CODEC_RV20;
         break;
     case 0x30202002:
-        fmt.i_codec = VLC_FOURCC( 'R','V','3','0' );
+        fmt.i_codec = VLC_CODEC_RV30;
         break;
     case 0x40000000:
-        fmt.i_codec = VLC_FOURCC( 'R','V','4','0' );
+        fmt.i_codec = VLC_CODEC_RV40;
         break;
     }
     msg_Dbg( p_demux, "    - video %4.4s %dx%d - %8.8x",
@@ -1450,22 +1450,24 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
     switch( fmt.i_codec )
     {
     case VLC_FOURCC('l','p','c','J'):
-        fmt.i_codec = VLC_FOURCC( '1','4','_','4' );
     case VLC_FOURCC('1','4','_','4'):
+        fmt.i_codec = VLC_CODEC_RA_144;
         fmt.audio.i_blockalign = 0x14 ;
         break;
 
     case VLC_FOURCC('2','8','_','8'):
+        fmt.i_codec = VLC_CODEC_RA_288;
         fmt.audio.i_blockalign = i_coded_frame_size;
         break;
 
+    case VLC_FOURCC( 'a','5','2',' ' ):
     case VLC_FOURCC( 'd','n','e','t' ):
-        fmt.i_codec = VLC_FOURCC( 'a','5','2',' ' );
+        fmt.i_codec = VLC_CODEC_A52;
         break;
 
     case VLC_FOURCC( 'r','a','a','c' ):
     case VLC_FOURCC( 'r','a','c','p' ):
-        fmt.i_codec = VLC_FOURCC( 'm','p','4','a' );
+        fmt.i_codec = VLC_CODEC_MP4A;
 
         if( i_extra_codec > 0 )
         {
@@ -1483,12 +1485,12 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         }
         break;
 
-    case VLC_FOURCC('s','i','p','r'):
+    case VLC_FOURCC( 's','i','p','r' ):
+        fmt.i_codec = VLC_CODEC_SIPR;
         fmt.audio.i_flavor = i_flavor;
-    case VLC_FOURCC('c','o','o','k'):
-    case VLC_FOURCC('a','t','r','c'):
-        if( i_subpacket_size <= 0 ||
-            i_frame_size / i_subpacket_size <= 0 )
+    case VLC_FOURCC( 'c','o','o','k' ):
+    case VLC_FOURCC( 'a','t','r','c' ):
+        if( i_subpacket_size <= 0 || i_frame_size / i_subpacket_size <= 0 )
         {
             es_format_Clean( &fmt );
             return VLC_EGENERIC;
@@ -1497,6 +1499,11 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
             fmt.audio.i_blockalign = i_subpacket_size;
         else
             fmt.audio.i_blockalign = i_coded_frame_size;
+
+        if( fmt.i_codec == VLC_FOURCC( 'c','o','o','k' ) )
+            fmt.i_codec = VLC_CODEC_COOK;
+        else if( fmt.i_codec == VLC_FOURCC( 'a','t','r','c' ) )
+            fmt.i_codec = VLC_CODEC_ATRAC3;
 
         if( i_extra_codec > 0 )
         {
@@ -1544,9 +1551,9 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
     tk->i_subpackets = 0;
     tk->p_subpackets = NULL;
     tk->p_subpackets_timecode = NULL;
-    if( fmt.i_codec == VLC_FOURCC('c','o','o','k') ||
-        fmt.i_codec == VLC_FOURCC('a','t','r','c') ||
-        fmt.i_codec == VLC_FOURCC('s','i','p','r') )
+    if( fmt.i_codec == VLC_CODEC_COOK ||
+        fmt.i_codec == VLC_CODEC_ATRAC3 ||
+        fmt.i_codec == VLC_CODEC_SIPR )
     {
         tk->i_subpackets =
             i_subpacket_h * i_frame_size / tk->i_subpacket_size;
@@ -1555,7 +1562,7 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
         tk->p_subpackets_timecode =
             calloc( tk->i_subpackets , sizeof( int64_t ) );
     }
-    else if( fmt.i_codec == VLC_FOURCC('2','8','_','8') )
+    else if( fmt.i_codec == VLC_CODEC_RA_288 )
     {
         tk->i_subpackets =
             i_subpacket_h * i_frame_size / tk->i_coded_frame_size;
