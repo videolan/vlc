@@ -145,6 +145,8 @@ struct demux_sys_t
     real_index_t *p_index;
 };
 
+static const unsigned char i_subpacket_size_sipr[4] = { 29, 19, 37, 20 };
+
 static int Demux( demux_t * );
 static int Control( demux_t *, int i_query, va_list args );
 
@@ -722,6 +724,7 @@ static void DemuxAudioMethod1( demux_t *p_demux, real_track_t *tk, mtime_t i_pts
         tk->i_out_subpacket = 0;
     }
 }
+
 static void DemuxAudioMethod2( demux_t *p_demux, real_track_t *tk, mtime_t i_pts )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
@@ -1488,6 +1491,12 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
     case VLC_FOURCC( 's','i','p','r' ):
         fmt.i_codec = VLC_CODEC_SIPR;
         fmt.audio.i_flavor = i_flavor;
+        if( i_flavor > 3 )
+            return VLC_EGENERIC;
+
+        i_subpacket_size = i_subpacket_size_sipr[i_flavor];
+        msg_Dbg( p_demux, "    - sipr flavor=%i", i_flavor );
+
     case VLC_FOURCC( 'c','o','o','k' ):
     case VLC_FOURCC( 'a','t','r','c' ):
         if( i_subpacket_size <= 0 || i_frame_size / i_subpacket_size <= 0 )
