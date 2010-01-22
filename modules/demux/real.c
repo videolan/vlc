@@ -33,7 +33,7 @@
  *               - dnet is twisted "The byte order of the data is reversed
  *                                  from standard AC3" but ok
  *               - 28_8 is ok.
- *               - sipr should be fine, but our decoder suxx :)
+ *               - sipr doesn't work
  *               - ralf is unsupported, but hardly any sample exist.
  *               - mp3 is unsupported, one sample exists...
  *
@@ -1358,7 +1358,7 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
 
     if( i_data < 6 )
         return VLC_EGENERIC;
-    
+
     int i_flavor = 0;
     int i_coded_frame_size = 0;
     int i_subpacket_h = 0;
