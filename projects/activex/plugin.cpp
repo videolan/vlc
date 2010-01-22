@@ -656,14 +656,6 @@ HRESULT VLCPlugin::onClose(DWORD dwSaveOption)
     {
         libvlc_instance_t* p_libvlc = _p_libvlc;
 
-        IVLCLog *p_log;
-        if( SUCCEEDED(vlcControl2->get_log(&p_log)) )
-        {
-            // make sure the log is disabled
-            p_log->put_verbosity(-1);
-            p_log->Release();
-        }
-
         _p_libvlc = NULL;
         vlcDataObject->onClose();
 

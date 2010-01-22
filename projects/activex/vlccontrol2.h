@@ -2,6 +2,7 @@
  * vlccontrol.h: ActiveX control for VLC
  *****************************************************************************
  * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2010 M2X BV
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *          Jean-Paul Saman <jpsaman _at_ m2x _dot_ nl>
@@ -170,114 +171,6 @@ public:
     STDMETHODIMP put_rate(double);
     STDMETHODIMP get_fps(double*);
     STDMETHODIMP get_hasVout(VARIANT_BOOL*);
-};
-
-class VLCMessage: public VLCInterface<VLCMessage,IVLCMessage>
-{
-public:
-    VLCMessage(VLCPlugin *p, struct libvlc_log_message_t &msg):
-        VLCInterface<VLCMessage,IVLCMessage>(p),
-        _refcount(1),
-        _msg(msg) { }
-
-    STDMETHODIMP_(ULONG) AddRef(void)
-        { return InterlockedIncrement(&_refcount); }
-
-    STDMETHODIMP_(ULONG) Release(void)
-    {
-        ULONG refcount = InterlockedDecrement(&_refcount);
-        if( 0 == refcount )
-        {
-            delete this;
-            return 0;
-        }
-        return refcount;
-    };
-
-    // IVLCMessage methods
-    STDMETHODIMP get__Value(VARIANT *);
-    STDMETHODIMP get_severity(long *);
-    STDMETHODIMP get_type(BSTR *);
-    STDMETHODIMP get_name(BSTR *);
-    STDMETHODIMP get_header(BSTR *);
-    STDMETHODIMP get_message(BSTR *);
-
-private:
-    LONG            _refcount;
-
-    struct libvlc_log_message_t _msg;
-};
-
-class VLCLog;
-
-class VLCMessageIterator: public
-    VLCInterface<VLCMessageIterator,IVLCMessageIterator>
-{
-public:
-    VLCMessageIterator(VLCPlugin *p, VLCLog *p_vlclog );
-    ~VLCMessageIterator() { if( _p_iter ) libvlc_log_iterator_free(_p_iter); }
-
-    STDMETHODIMP_(ULONG) AddRef(void)
-        { return InterlockedIncrement(&_refcount); };
-    STDMETHODIMP_(ULONG) Release(void)
-    {
-        ULONG refcount = InterlockedDecrement(&_refcount);
-        if( 0 == refcount )
-        {
-            delete this;
-            return 0;
-        }
-        return refcount;
-    }
-
-    // IVLCMessageIterator methods
-    STDMETHODIMP get_hasNext(VARIANT_BOOL*);
-    STDMETHODIMP next(IVLCMessage**);
- 
-private:
-    LONG            _refcount;
-
-    VLCLog*                 _p_vlclog;
-    libvlc_log_iterator_t*  _p_iter;
-};
-
-class VLCMessages: public VLCInterface<VLCMessages,IVLCMessages>
-{
-public:
-
-    VLCMessages(VLCPlugin *p, VLCLog *p_vlclog):
-        VLCInterface<VLCMessages,IVLCMessages>(p),
-        _p_vlclog(p_vlclog) { }
-
-    // IVLCMessages methods
-    STDMETHODIMP get__NewEnum(LPUNKNOWN*);
-    STDMETHODIMP clear();
-    STDMETHODIMP get_count(long*);
-    STDMETHODIMP iterator(IVLCMessageIterator**);
-
-protected:
-    VLCLog*     _p_vlclog;
-};
- 
-class VLCLog: public VLCInterface<VLCLog,IVLCLog>
-{
-public:
-
-    friend class VLCMessages;
-    friend class VLCMessageIterator;
-
-    VLCLog(VLCPlugin *p): VLCInterface<VLCLog,IVLCLog>(p), _p_log(NULL),
-                          _p_vlcmessages(new VLCMessages(p, this)) { }
-    virtual ~VLCLog();
-
-    // IVLCLog methods
-    STDMETHODIMP get_messages(IVLCMessages**);
-    STDMETHODIMP get_verbosity(long *);
-    STDMETHODIMP put_verbosity(long);
-
-protected:
-    libvlc_log_t *_p_log;
-    IVLCMessages *_p_vlcmessages;
 };
 
 class VLCMarquee: public VLCInterface<VLCMarquee,IVLCMarquee>
@@ -484,7 +377,6 @@ public:
 
     STDMETHODIMP get_audio(IVLCAudio**);
     STDMETHODIMP get_input(IVLCInput**);
-    STDMETHODIMP get_log(IVLCLog**);
     STDMETHODIMP get_playlist(IVLCPlaylist**);
     STDMETHODIMP get_subtitle(IVLCSubtitle**);
     STDMETHODIMP get_video(IVLCVideo**);
@@ -498,7 +390,6 @@ private:
 
     IVLCAudio    *_p_vlcaudio;
     IVLCInput    *_p_vlcinput;
-    IVLCLog      *_p_vlclog;
     IVLCPlaylist *_p_vlcplaylist;
     IVLCSubtitle *_p_vlcsubtitle;
     IVLCVideo    *_p_vlcvideo;

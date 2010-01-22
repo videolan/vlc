@@ -63,10 +63,6 @@ HRESULT VLCInterfaceBase::loadTypeInfo(REFIID riid)
 
 BIND_INTERFACE( VLCAudio )
 BIND_INTERFACE( VLCInput )
-BIND_INTERFACE( VLCMessage )
-BIND_INTERFACE( VLCMessages )
-BIND_INTERFACE( VLCMessageIterator )
-BIND_INTERFACE( VLCLog )
 BIND_INTERFACE( VLCMarquee )
 BIND_INTERFACE( VLCLogo )
 BIND_INTERFACE( VLCPlaylistItems )
@@ -473,80 +469,6 @@ STDMETHODIMP VLCInput::get_hasVout(VARIANT_BOOL* hasVout)
 
 /****************************************************************************/
 
-VLCLog::~VLCLog()
-{
-    delete _p_vlcmessages;
-    if( _p_log )
-        libvlc_log_close(_p_log);
-}
-
-STDMETHODIMP VLCLog::get_messages(IVLCMessages** obj)
-{
-    if( NULL == obj )
-        return E_POINTER;
-
-    *obj = _p_vlcmessages;
-    if( NULL != _p_vlcmessages )
-    {
-        _p_vlcmessages->AddRef();
-        return NOERROR;
-    }
-    return E_OUTOFMEMORY;
-};
-
-STDMETHODIMP VLCLog::get_verbosity(long* level)
-{
-    if( NULL == level )
-        return E_POINTER;
-
-    if( _p_log )
-    {
-        libvlc_instance_t* p_libvlc;
-        HRESULT hr = getVLC(&p_libvlc);
-        if( SUCCEEDED(hr) )
-            *level = libvlc_get_log_verbosity(p_libvlc);
-        return hr;
-    }
-    else
-    {
-        /* log is not enabled, return -1 */
-        *level = -1;
-        return NOERROR;
-    }
-};
-
-STDMETHODIMP VLCLog::put_verbosity(long verbosity)
-{
-    libvlc_instance_t* p_libvlc;
-    HRESULT hr = getVLC(&p_libvlc);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        if( verbosity >= 0 )
-        {
-            if( ! _p_log )
-            {
-                _p_log = libvlc_log_open(p_libvlc, &ex);
-                hr = exception_bridge(&ex);
-            }
-            if( SUCCEEDED(hr) )
-                libvlc_set_log_verbosity(p_libvlc, (unsigned)verbosity);
-        }
-        else if( _p_log )
-        {
-            /* close log  when verbosity is set to -1 */
-            libvlc_log_close(_p_log);
-            _p_log = NULL;
-        }
-        hr = exception_bridge(&ex);
-    }
-    return hr;
-};
-
-/****************************************************************************/
-
 HRESULT VLCMarquee::do_put_int(unsigned idx, LONG val)
 {
     libvlc_media_player_t *p_md;
@@ -647,266 +569,6 @@ STDMETHODIMP VLCMarquee::put_text(BSTR val)
     }
     return hr;
 }
-
-/****************************************************************************/
-
-/* STL forward iterator used by VLCEnumIterator class to implement IEnumVARIANT */
-
-class VLCMessageSTLIterator
-{
-
-public:
-
-    VLCMessageSTLIterator(IVLCMessageIterator* iter) : iter(iter), msg(NULL)
-    {
-        // get first message
-        operator++();
-    };
-
-    VLCMessageSTLIterator(const VLCMessageSTLIterator& other)
-    {
-        iter = other.iter;
-        if( iter )
-            iter->AddRef();
-        msg = other.msg;
-        if( msg )
-            msg->AddRef();
-    };
-
-    virtual ~VLCMessageSTLIterator()
-    {
-        if( msg )
-            msg->Release();
-
-        if( iter )
-            iter->Release();
-    };
-
-    // we only need prefix ++ operator
-    VLCMessageSTLIterator& operator++()
-    {
-        VARIANT_BOOL hasNext = VARIANT_FALSE;
-        if( iter )
-        {
-            iter->get_hasNext(&hasNext);
-
-            if( msg )
-            {
-                msg->Release();
-                msg = NULL;
-            }
-            if( VARIANT_TRUE == hasNext ) {
-                iter->next(&msg);
-            }
-        }
-        return *this;
-    };
-
-    VARIANT operator*() const
-    {
-        VARIANT v;
-        VariantInit(&v);
-        if( msg )
-        {
-            if( SUCCEEDED(msg->QueryInterface(IID_IDispatch,
-                          (LPVOID*)&V_DISPATCH(&v))) )
-            {
-                V_VT(&v) = VT_DISPATCH;
-            }
-        }
-        return v;
-    };
-
-    bool operator==(const VLCMessageSTLIterator& other) const
-    {
-        return msg == other.msg;
-    };
-
-    bool operator!=(const VLCMessageSTLIterator& other) const
-    {
-        return msg != other.msg;
-    };
-
-private:
-    IVLCMessageIterator* iter;
-    IVLCMessage*         msg;
-};
-
-//////////////////////////////////////////////////////////////////////////////
-
-STDMETHODIMP VLCMessages::get__NewEnum(LPUNKNOWN* _NewEnum)
-{
-    if( NULL == _NewEnum )
-        return E_POINTER;
-
-    IVLCMessageIterator* iter = NULL;
-    iterator(&iter);
-
-    *_NewEnum= new VLCEnumIterator<IID_IEnumVARIANT,
-                       IEnumVARIANT,
-                       VARIANT,
-                       VLCMessageSTLIterator>
-                       (VLCMessageSTLIterator(iter), VLCMessageSTLIterator(NULL));
-
-    return *_NewEnum ? S_OK : E_OUTOFMEMORY;
-};
-
-STDMETHODIMP VLCMessages::clear()
-{
-    libvlc_log_t *p_log = _p_vlclog->_p_log;
-    if( p_log )
-        libvlc_log_clear(p_log);
-    return NOERROR;
-};
-
-STDMETHODIMP VLCMessages::get_count(long* count)
-{
-    if( NULL == count )
-        return E_POINTER;
-
-    libvlc_log_t *p_log = _p_vlclog->_p_log;
-    *count = libvlc_log_count(p_log);
-    return S_OK;
-};
-
-STDMETHODIMP VLCMessages::iterator(IVLCMessageIterator** iter)
-{
-    if( NULL == iter )
-        return E_POINTER;
-
-    *iter = new VLCMessageIterator(Instance(), _p_vlclog);
-
-    return *iter ? S_OK : E_OUTOFMEMORY;
-};
-
-/****************************************************************************/
-
-VLCMessageIterator::VLCMessageIterator(VLCPlugin *p, VLCLog* p_vlclog ):
-        VLCInterface<VLCMessageIterator,IVLCMessageIterator>(p),
-        _refcount(1),
-        _p_vlclog(p_vlclog),
-        _p_iter(_p_vlclog && _p_vlclog->_p_log ?
-                libvlc_log_get_iterator(_p_vlclog->_p_log, NULL) : NULL)
-{
-}
-
-STDMETHODIMP VLCMessageIterator::get_hasNext(VARIANT_BOOL* hasNext)
-{
-    if( NULL == hasNext )
-        return E_POINTER;
-
-    *hasNext = (_p_iter && _p_vlclog->_p_log &&
-                libvlc_log_iterator_has_next(_p_iter)) ?
-                VARIANT_TRUE : VARIANT_FALSE;
-    return S_OK;
-};
-
-STDMETHODIMP VLCMessageIterator::next(IVLCMessage** message)
-{
-    HRESULT hr = S_OK;
-
-    if( NULL == message )
-        return E_POINTER;
-
-    if( _p_iter &&  _p_vlclog->_p_log )
-    {
-        struct libvlc_log_message_t buffer;
-
-        buffer.sizeof_msg = sizeof(buffer);
-
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_log_iterator_next(_p_iter, &buffer, &ex);
-        *message = new VLCMessage(Instance(), buffer);
-        if( !message )
-            hr = E_OUTOFMEMORY;
-    }
-    return hr;
-};
-
-/****************************************************************************/
-
-inline const char *msgSeverity(int sev)
-{
-    switch( sev )
-    {
-        case 0:
-            return "info";
-        case 1:
-            return "error";
-        case 2:
-            return "warning";
-        default:
-            return "debug";
-    }
-};
-
-STDMETHODIMP VLCMessage::get__Value(VARIANT* _Value)
-{
-    if( NULL == _Value )
-        return E_POINTER;
-
-    char buffer[256];
-
-    snprintf(buffer, sizeof(buffer), "%s %s %s: %s",
-        _msg.psz_type, _msg.psz_name, msgSeverity(_msg.i_severity), _msg.psz_message);
-
-    V_VT(_Value) = VT_BSTR;
-    V_BSTR(_Value) = BSTRFromCStr(CP_UTF8, buffer);
-
-    return S_OK;
-};
-
-STDMETHODIMP VLCMessage::get_severity(long* level)
-{
-    if( NULL == level )
-        return E_POINTER;
-
-    *level = _msg.i_severity;
-
-    return S_OK;
-};
-
-STDMETHODIMP VLCMessage::get_type(BSTR* type)
-{
-    if( NULL == type )
-        return E_POINTER;
-
-    *type = BSTRFromCStr(CP_UTF8, _msg.psz_type);
-
-    return NOERROR;
-};
-
-STDMETHODIMP VLCMessage::get_name(BSTR* name)
-{
-    if( NULL == name )
-        return E_POINTER;
-
-    *name = BSTRFromCStr(CP_UTF8, _msg.psz_name);
-
-    return NOERROR;
-};
-
-STDMETHODIMP VLCMessage::get_header(BSTR* header)
-{
-    if( NULL == header )
-        return E_POINTER;
-
-    *header = BSTRFromCStr(CP_UTF8, _msg.psz_header);
-
-    return NOERROR;
-};
-
-STDMETHODIMP VLCMessage::get_message(BSTR* message)
-{
-    if( NULL == message )
-        return E_POINTER;
-
-    *message = BSTRFromCStr(CP_UTF8, _msg.psz_message);
-
-    return NOERROR;
-};
 
 /****************************************************************************/
 
@@ -1782,7 +1444,6 @@ VLCControl2::VLCControl2(VLCPlugin *p_instance) :
     _p_typeinfo(NULL),
     _p_vlcaudio(new VLCAudio(p_instance)),
     _p_vlcinput(new VLCInput(p_instance)),
-    _p_vlclog(new VLCLog(p_instance)),
     _p_vlcplaylist(new VLCPlaylist(p_instance)),
     _p_vlcsubtitle(new VLCSubtitle(p_instance)),
     _p_vlcvideo(new VLCVideo(p_instance))
@@ -1794,7 +1455,6 @@ VLCControl2::~VLCControl2()
     delete _p_vlcvideo;
     delete _p_vlcsubtitle;
     delete _p_vlcplaylist;
-    delete _p_vlclog;
     delete _p_vlcinput;
     delete _p_vlcaudio;
     if( _p_typeinfo )
@@ -2056,11 +1716,6 @@ STDMETHODIMP VLCControl2::get_audio(IVLCAudio** obj)
 STDMETHODIMP VLCControl2::get_input(IVLCInput** obj)
 {
     return object_get(obj,_p_vlcinput);
-}
-
-STDMETHODIMP VLCControl2::get_log(IVLCLog** obj)
-{
-    return object_get(obj,_p_vlclog);
 }
 
 STDMETHODIMP VLCControl2::get_playlist(IVLCPlaylist** obj)

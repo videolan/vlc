@@ -40,11 +40,8 @@ library AXVLC
     interface IVLCControl;
     interface IVLCAudio;
     interface IVLCInput;
-    interface IVLCLog;
+    interface IVLCLogo;
     interface IVLCMarquee;
-    interface IVLCMessage;
-    interface IVLCMessageIterator;
-    interface IVLCMessages;
     interface IVLCPlaylist;
     interface IVLCSubtitle;
     interface IVLCVideo;
@@ -259,90 +256,6 @@ library AXVLC
 
         [propget, helpstring("Returns whether current playback displays video.")]
         HRESULT hasVout([out, retval] VARIANT_BOOL* hasVout);
-    };
-
-    [
-      odl,
-      uuid(9ED00AFA-7BCD-4FFF-8D48-7DD4DB2C800D),
-      helpstring("VLC Log Message"),
-      dual,
-      oleautomation
-    ]
-    interface IVLCMessage: IDispatch
-    {
-        [id(DISPID_VALUE), propget]
-        HRESULT _Value([out, retval] VARIANT* message);
-
-        [propget, helpstring("Returns message severity.")]
-        HRESULT severity([out, retval] long* level);
-
-        [propget, helpstring("Returns message issuer type.")]
-        HRESULT type([out, retval] BSTR* type);
-
-        [propget, helpstring("Returns message issuer name.")]
-        HRESULT name([out, retval] BSTR* name);
-
-        [propget, helpstring("Returns message header.")]
-        HRESULT header([out, retval] BSTR* header);
-
-        [propget, helpstring("Returns message content.")]
-        HRESULT message([out, retval] BSTR* message);
-    };
-
-    [
-      odl,
-      uuid(15179CD8-CC12-4242-A58E-E412217FF343),
-      helpstring("VLC Log iterator"),
-      dual,
-      oleautomation
-    ]
-    interface IVLCMessageIterator : IDispatch
-    {
-        [propget, helpstring("Returns whether a message is available.")]
-        HRESULT hasNext([out, retval] VARIANT_BOOL* hasNext);
-
-        [helpstring("Returns next message.")]
-        HRESULT next([out, retval] IVLCMessage** msg);
-    };
-
-    [
-      odl,
-      uuid(6C5CE55D-2D6C-4AAD-8299-C62D2371F106),
-      helpstring("VLC Log Messages Collection."),
-      dual,
-      oleautomation
-    ]
-    interface IVLCMessages : IDispatch
-    {
-        [id(DISPID_NEWENUM), propget]
-        HRESULT _NewEnum([out, retval] IUnknown** _NewEnum);
-
-        [helpstring("Clear all messages from log.")]
-        HRESULT clear();
-
-        [propget, helpstring("Returns the number of messages.")]
-        HRESULT count([out, retval] long* count);
-
-        [helpstring("Returns an iterator for messages in log")]
-        HRESULT iterator([out, retval] IVLCMessageIterator** iter);
-    };
-
-    [
-      odl,
-      uuid(8E3BC3D9-62E9-48FB-8A6D-993F9ABC4A0A),
-      helpstring("VLC Log APIs"),
-      dual,
-      oleautomation
-    ]
-    interface IVLCLog : IDispatch
-    {
-        [propget, helpstring("Returns messages in log")]
-        HRESULT messages([out, retval] IVLCMessages** iter);
-
-        [propget, helpstring("Returns/Sets the log versbosity level.")]
-        HRESULT verbosity([out, retval] long* level);
-        [propput, helpstring("Returns/Sets the log versbosity level.")]
-        HRESULT verbosity([in] long level);
     };
 
     [
@@ -660,9 +573,6 @@ library AXVLC
 
         [propget, helpstring("Returns the audio object.")]
         HRESULT input([out, retval] IVLCInput** obj);
-
-        [propget, helpstring("Returns the log object.")]
-        HRESULT log([out, retval] IVLCLog** obj);
 
         [propget, helpstring("Returns the playlist object.")]
         HRESULT playlist([out, retval] IVLCPlaylist** obj);
