@@ -241,6 +241,7 @@ void es_format_Init( es_format_t *fmt,
     fmt->i_cat                  = i_cat;
     fmt->i_codec                = i_codec;
     fmt->i_original_fourcc      = 0;
+    fmt->i_profile              = -1;
     fmt->i_id                   = -1;
     fmt->i_group                = 0;
     fmt->i_priority             = 0;
