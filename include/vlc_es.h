@@ -93,7 +93,6 @@ struct audio_format_t
     unsigned     i_bitspersample;
     unsigned     i_blockalign;
     uint8_t      i_channels; /* must be <=32 */
-    uint8_t      i_flavor;
 };
 
 /**
@@ -256,6 +255,7 @@ struct es_format_t
     subs_format_t  subs;      /**< description of subtitle format */
 
     unsigned int   i_bitrate; /**< bitrate of this ES */
+    int      i_profile;       /**< codec specific information (like real audio flavor, mpeg audio layer, h264 profile ...) */
 
     bool     b_packetized;  /**< wether the data is packetized (ie. not truncated) */
     int     i_extra;        /**< length in bytes of extra data pointer */
