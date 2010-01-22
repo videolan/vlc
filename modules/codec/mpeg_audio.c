@@ -285,6 +285,8 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                                             &p_sys->i_max_frame_size,
                                             &p_sys->i_layer );
 
+            p_dec->fmt_in.i_profile = p_sys->i_layer;
+
             if( p_sys->i_frame_size == -1 )
             {
                 msg_Dbg( p_dec, "emulated startcode" );
