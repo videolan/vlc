@@ -256,6 +256,7 @@ struct es_format_t
 
     unsigned int   i_bitrate; /**< bitrate of this ES */
     int      i_profile;       /**< codec specific information (like real audio flavor, mpeg audio layer, h264 profile ...) */
+    int      i_level;         /**< codec specific information: indicates maximum restrictions on the stream (resolution, bitrate, codec features ...) */
 
     bool     b_packetized;  /**< wether the data is packetized (ie. not truncated) */
     int     i_extra;        /**< length in bytes of extra data pointer */
