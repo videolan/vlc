@@ -79,7 +79,7 @@ vlc_module_end ()
  * Local prototypes
  *****************************************************************************/
 static block_t* Block( access_t * );
-static int      Seek( access_t *, int64_t );
+static int      Seek( access_t *, uint64_t );
 static int      Control( access_t *, int, va_list );
 
 
