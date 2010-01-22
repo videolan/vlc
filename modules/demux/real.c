@@ -1536,7 +1536,7 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
                  (char*)&fmt.i_codec );
         break;
     }
-    msg_Dbg( p_demux, "        - extra data=%d", fmt.i_extra );
+    msg_Dbg( p_demux, "    - extra data=%d", fmt.i_extra );
 
     /* */
     real_track_t *tk = malloc( sizeof( *tk ) );
