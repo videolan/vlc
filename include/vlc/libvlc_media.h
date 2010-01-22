@@ -103,6 +103,13 @@ typedef enum libvlc_media_option_t
     libvlc_media_option_unique = 0x100
 } libvlc_media_option_t;
 
+typedef enum libvlc_es_type_t
+{
+    libvlc_es_unknown   = -1,
+    libvlc_es_audio     = 0,
+    libvlc_es_video     = 1,
+    libvlc_es_text      = 2,
+} libvlc_es_type_t;
 
 /** defgroup libvlc_media_stats_t libvlc_media_stats_t
  * \ingroup libvlc_media
@@ -139,6 +146,26 @@ typedef struct libvlc_media_stats_t
     float       f_send_bitrate;
 } libvlc_media_stats_t;
 /** @}*/
+
+typedef struct libvlc_media_es_t
+{
+    /* Codec fourcc */
+    uint32_t    i_codec;
+    libvlc_es_type_t i_type;
+
+    /* Codec specific */
+    int         i_profile;
+    int         i_level;
+
+    /* Audio specific */
+    unsigned    i_channels;
+    unsigned    i_rate;
+
+    /* Video specific */
+    unsigned    i_height;
+    unsigned    i_width;
+
+} libvlc_media_es_t;
 
 
 /**
@@ -362,6 +389,21 @@ VLC_PUBLIC_API void
  */
 VLC_PUBLIC_API void *
     libvlc_media_get_user_data( libvlc_media_t * p_md );
+
+/**
+ * Get media descriptor's elementary streams description
+ *
+ * Note, you need to play the media _one_ time with --sout="#description"
+ * Not doing this will result in an empty array, and doing it more than once
+ * will duplicate the entries in the array each time.
+ *
+ * \param p_md media descriptor object
+ * \param p_es adress to store an allocated array of Elementary Streams descriptions (must be freed by the caller)
+ *
+ * return the number of Elementary Streams
+ */
+VLC_PUBLIC_API int
+    libvlc_media_get_es( libvlc_media_t * p_md, libvlc_media_es_t ** pp_es );
 
 /** @}*/
 

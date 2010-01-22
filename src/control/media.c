@@ -636,3 +636,64 @@ libvlc_media_get_user_data( libvlc_media_t * p_md )
     assert( p_md );
     return p_md->p_user_data;
 }
+
+/**************************************************************************
+ * Get media descriptor's elementary streams description
+ **************************************************************************/
+int
+libvlc_media_get_es( libvlc_media_t *p_md, libvlc_media_es_t ** pp_es )
+{
+    assert( p_md );
+
+    input_item_t *p_input_item = p_md->p_input_item;
+    vlc_mutex_lock( &p_input_item->lock );
+
+    const int i_es = p_input_item->i_es;
+    *pp_es = (i_es > 0) ? malloc( i_es * sizeof(libvlc_media_es_t) ) : NULL;
+
+    if( !pp_es ) /* no ES, or OOM */
+    {
+        vlc_mutex_unlock( &p_input_item->lock );
+        return 0;
+    }
+
+    /* Fill array */
+    for( int i = 0; i < i_es; i++ )
+    {
+        libvlc_media_es_t *p_mes = *pp_es+i;
+        const es_format_t *p_es = p_input_item->es[i];
+
+        p_mes->i_channels = p_mes->i_rate = 0;
+        p_mes->i_width = p_mes->i_height = 0;
+
+
+        p_mes->i_codec = p_es->i_codec;
+
+        p_mes->i_profile = p_es->i_profile;
+        p_mes->i_level = p_es->i_level;
+
+        switch(p_es->i_cat)
+        {
+        case UNKNOWN_ES:
+        default:
+            p_mes->i_type = libvlc_es_unknown;
+            break;
+        case VIDEO_ES:
+            p_mes->i_type = libvlc_es_video;
+            p_mes->i_height = p_es->video.i_height;
+            p_mes->i_width = p_es->video.i_width;
+            break;
+        case AUDIO_ES:
+            p_mes->i_type = libvlc_es_audio;
+            p_mes->i_channels = p_es->audio.i_channels;
+            p_mes->i_rate = p_es->audio.i_rate;
+            break;
+        case SPU_ES:
+            p_mes->i_type = libvlc_es_text;
+            break;
+        }
+    }
+
+    vlc_mutex_unlock( &p_input_item->lock );
+    return i_es;
+}
