@@ -179,6 +179,19 @@ struct rtsp_strack_t
 };
 
 
+char *RtspAppendTrackPath( rtsp_stream_id_t *id, const char *base )
+{
+    assert( ( strlen( base ) > 0 && base[strlen( base ) - 1] == '/' )
+            ^ ( id->stream->track_sep[0] == '/' ) );
+
+    char *url;
+    if( asprintf( &url, "%s%strackID=%u", base, id->stream->track_sep,
+                  id->track_id ) == -1 )
+        url = NULL;
+    return url;
+}
+
+
 rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
                              uint32_t ssrc,
                              /* Multicast stuff - TODO: cleanup */

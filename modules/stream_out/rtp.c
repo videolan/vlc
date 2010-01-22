@@ -833,11 +833,12 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
 
         if( rtsp_url != NULL )
         {
-            assert( strlen( rtsp_url ) > 0 );
-            bool addslash = ( rtsp_url[strlen( rtsp_url ) - 1] != '/' );
-            sdp_AddAttribute ( &psz_sdp, "control",
-                               addslash ? "%s/trackID=%u" : "%strackID=%u",
-                               rtsp_url, i );
+            char *track_url = RtspAppendTrackPath( id->rtsp_id, rtsp_url );
+            if( track_url != NULL )
+            {
+                sdp_AddAttribute ( &psz_sdp, "control", "%s", track_url );
+                free( track_url );
+            }
         }
         else
         {

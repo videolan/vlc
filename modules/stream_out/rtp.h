@@ -34,6 +34,8 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
                              unsigned loport, unsigned hiport );
 void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t * );
 
+char *RtspAppendTrackPath( rtsp_stream_id_t *id, const char *base );
+
 char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url );
 
 uint32_t rtp_compute_ts( const sout_stream_id_t *id, int64_t i_pts );
