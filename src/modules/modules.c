@@ -239,7 +239,6 @@ void module_LoadPlugins( vlc_object_t * p_this, bool b_cache_delete )
         AllocateAllPlugins( p_this, p_module_bank );
     }
 #endif
-    p_module_bank->b_plugins = true;
     vlc_mutex_unlock( &module_lock );
 }
 

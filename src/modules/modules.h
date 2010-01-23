@@ -41,8 +41,6 @@ struct module_bank_t
 {
     unsigned         i_usage;
 
-    bool             b_plugins;
-
     /* Plugins cache */
     bool             b_cache;
     bool             b_cache_dirty;
