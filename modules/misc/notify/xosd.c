@@ -122,8 +122,8 @@ static int Open( vlc_object_t *p_this )
         return VLC_ENOMEM;
 
     /* Initialize library */
-    psz_font = config_GetPsz( p_intf, "xosd-font" );
-    psz_colour = config_GetPsz( p_intf, "xosd-colour" );
+    psz_font = var_InheritString( p_intf, "xosd-font" );
+    psz_colour = var_InheritString( p_intf, "xosd-colour" );
 
     p_osd = xosd_create( 1 );
     if( p_osd == NULL )
@@ -141,14 +141,14 @@ static int Open( vlc_object_t *p_this )
     xosd_set_font( p_osd, psz_font );
     xosd_set_colour( p_osd, psz_colour );
     xosd_set_timeout( p_osd, 3 );
-    xosd_set_pos( p_osd, config_GetInt( p_intf, "xosd-position" ) ?
+    xosd_set_pos( p_osd, var_InheritInteger( p_intf, "xosd-position" ) ?
                                         XOSD_bottom: XOSD_top );
     xosd_set_horizontal_offset( p_osd,
-                    config_GetInt( p_intf, "xosd-text-offset" ) );
+                    var_InheritInteger( p_intf, "xosd-text-offset" ) );
     xosd_set_vertical_offset( p_osd,
-                    config_GetInt( p_intf, "xosd-text-offset" ) );
+                    var_InheritInteger( p_intf, "xosd-text-offset" ) );
     xosd_set_shadow_offset( p_osd,
-                    config_GetInt( p_intf, "xosd-shadow-offset" ));
+                    var_InheritInteger( p_intf, "xosd-shadow-offset" ));
 
     /* Initialize to NULL */
     xosd_display( p_osd, 0, XOSD_string, "XOSD interface initialized" );

@@ -112,7 +112,7 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_intf->p_sys->psz_format = config_GetPsz( p_intf, "telepathy-format" );
+    p_intf->p_sys->psz_format = var_InheritString( p_intf, "telepathy-format" );
     if( !p_intf->p_sys->psz_format )
     {
         msg_Dbg( p_intf, "no format provided" );

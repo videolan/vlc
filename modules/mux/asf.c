@@ -220,8 +220,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_tracks     = vlc_array_new();
 
     p_sys->b_write_header = true;
-    p_sys->i_packet_size = config_GetInt( p_mux, "sout-asf-packet-size" );
-    p_sys->i_bitrate_override = config_GetInt( p_mux, "sout-asf-bitrate-override" );
+    p_sys->i_packet_size = var_InheritInteger( p_mux, "sout-asf-packet-size" );
+    p_sys->i_bitrate_override = var_InheritInteger( p_mux, "sout-asf-bitrate-override" );
     msg_Dbg( p_mux, "Packet size %d", p_sys->i_packet_size);
     if (p_sys->i_bitrate_override)
         msg_Dbg( p_mux, "Bitrate override %"PRId64, p_sys->i_bitrate_override);

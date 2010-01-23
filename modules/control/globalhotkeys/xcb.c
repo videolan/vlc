@@ -344,7 +344,7 @@ static bool Mapping( intf_thread_t *p_intf )
             break;
 
         const int i_vlc_action = p_hotkey->i_action;
-        const int i_vlc_key = config_GetInt( p_intf, psz_hotkey );
+        const int i_vlc_key = var_InheritInteger( p_intf, psz_hotkey );
         free( psz_hotkey );
 
         if( !i_vlc_key )

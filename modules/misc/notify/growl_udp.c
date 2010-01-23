@@ -260,9 +260,9 @@ static int CheckAndSend( vlc_object_t *p_this, uint8_t* p_data, int i_offset )
     int i, i_handle;
     struct md5_s md5;
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    char *psz_password = config_GetPsz( p_intf, "growl-password" );
-    char *psz_server = config_GetPsz( p_intf, "growl-server" );
-    int i_port = config_GetInt( p_intf, "growl-port" );
+    char *psz_password = var_InheritString( p_intf, "growl-password" );
+    char *psz_server = var_InheritString( p_intf, "growl-server" );
+    int i_port = var_InheritInteger( p_intf, "growl-port" );
     strcpy( (char*)(p_data+i_offset), psz_password );
     i = i_offset + strlen(psz_password);
 

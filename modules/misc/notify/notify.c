@@ -307,7 +307,7 @@ static int Notify( vlc_object_t *p_this, const char *psz_temp, GdkPixbuf *pix,
     notification = notify_notification_new( _("Now Playing"),
                                             psz_temp, NULL, NULL );
     notify_notification_set_timeout( notification,
-                                     config_GetInt(p_this, "notify-timeout") );
+                                var_InheritInteger(p_this, "notify-timeout") );
     notify_notification_set_urgency( notification, NOTIFY_URGENCY_LOW );
     if( pix )
     {

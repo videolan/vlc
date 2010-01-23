@@ -731,11 +731,11 @@ static int Handshake( intf_thread_t *p_this )
     intf_thread_t       *p_intf                 = ( intf_thread_t* ) p_this;
     intf_sys_t          *p_sys                  = p_this->p_sys;
 
-    psz_username = config_GetPsz( p_this, "lastfm-username" );
+    psz_username = var_InheritString( p_this, "lastfm-username" );
     if( !psz_username )
         return VLC_ENOMEM;
 
-    psz_password = config_GetPsz( p_this, "lastfm-password" );
+    psz_password = var_InheritString( p_this, "lastfm-password" );
     if( !psz_password )
     {
         free( psz_username );
@@ -788,7 +788,7 @@ static int Handshake( intf_thread_t *p_this )
     strncpy( p_sys->psz_auth_token, psz_auth_token, 33 );
     free( psz_auth_token );
 
-    psz_scrobbler_url = config_GetPsz( p_this, "scrobbler-url" );
+    psz_scrobbler_url = var_InheritString( p_this, "scrobbler-url" );
     if( !psz_scrobbler_url )
     {
         free( psz_username );

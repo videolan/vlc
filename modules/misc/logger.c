@@ -232,7 +232,7 @@ static int Open( vlc_object_t *p_this )
 
     if( p_sys->msg.i_mode != MODE_SYSLOG )
     {
-        char *psz_file = config_GetPsz( p_intf, "logfile" );
+        char *psz_file = var_InheritString( p_intf, "logfile" );
         if( !psz_file )
         {
 #ifdef __APPLE__

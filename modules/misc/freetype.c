@@ -1348,7 +1348,7 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
     p_region_out->i_x = p_region_in->i_x;
     p_region_out->i_y = p_region_in->i_y;
 
-    if( config_GetInt( p_filter, "freetype-yuvp" ) )
+    if( var_InheritBool( p_filter, "freetype-yuvp" ) )
         Render( p_filter, p_region_out, p_lines, result.x, result.y );
     else
         RenderYUVA( p_filter, p_region_out, p_lines, result.x, result.y );
@@ -2320,7 +2320,7 @@ static int RenderHtml( filter_t *p_filter, subpicture_region_t *p_region_out,
                      */
                     if(( rv == VLC_SUCCESS ) && ( i_len > 0 ))
                     {
-                        if( config_GetInt( p_filter, "freetype-yuvp" ) )
+                        if( var_InheritBool( p_filter, "freetype-yuvp" ) )
                         {
                             Render( p_filter, p_region_out, p_lines,
                                     result.x, result.y );

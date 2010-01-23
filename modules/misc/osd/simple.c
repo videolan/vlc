@@ -75,7 +75,7 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
         result = fscanf(fd, "%24s %255s", action, path );
 
         /* override images path ? */
-        psz_path = config_GetPsz( p_this, "osdmenu-file-path" );
+        psz_path = var_InheritString( p_this, "osdmenu-file-path" );
         if( psz_path )
         {
             /* psz_path is not null and therefor path cannot be NULL

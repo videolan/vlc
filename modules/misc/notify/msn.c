@@ -93,7 +93,7 @@ static int Open( vlc_object_t *p_this )
     if( !p_intf->p_sys )
         return VLC_ENOMEM;
 
-    p_intf->p_sys->psz_format = config_GetPsz( p_intf, "msn-format" );
+    p_intf->p_sys->psz_format = var_InheritString( p_intf, "msn-format" );
     if( !p_intf->p_sys->psz_format )
     {
         msg_Dbg( p_intf, "no format provided" );

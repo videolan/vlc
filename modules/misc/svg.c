@@ -158,7 +158,7 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
     char *psz_template;
     FILE *file;
 
-    psz_filename = config_GetPsz( p_filter, "svg-template-file" );
+    psz_filename = var_InheritString( p_filter, "svg-template-file" );
     if( !psz_filename || (psz_filename[0] == 0) )
     {
         /* No filename. Use a default value. */

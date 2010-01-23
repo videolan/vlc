@@ -113,7 +113,7 @@ static int FindMeta( vlc_object_t *p_this )
     {
         if( i == -1 ) /* higher priority : configured filename */
         {
-            char *psz_userfile = config_GetPsz( p_this, "album-art-filename" );
+            char *psz_userfile = var_InheritString( p_this, "album-art-filename" );
             if( !psz_userfile )
                 continue;
             snprintf( psz_filename, MAX_PATH, "%s%s", psz_path, psz_userfile );

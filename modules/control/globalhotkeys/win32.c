@@ -175,7 +175,7 @@ static void *Thread( void *p_data )
         if( asprintf( &psz_hotkey, "global-%s", p_hotkey->psz_action ) < 0 )
             break;
 
-        i_key = config_GetInt( p_intf, psz_hotkey );
+        i_key = var_InheritInteger( p_intf, psz_hotkey );
 
         free( psz_hotkey );
 

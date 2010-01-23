@@ -447,7 +447,7 @@ static void Close( vlc_object_t *p_this )
     FREENULL( p_sys->pi_fd );
 
 #if 0
-    if( config_GetInt( p_sd, "sap-cache" ) )
+    if( var_InheritBool( p_sd, "sap-cache" ) )
     {
         CacheSave( p_sd );
     }
