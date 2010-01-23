@@ -843,14 +843,8 @@ static const char *const ppsz_clock_descriptions[] =
 #endif
 
 #define VCD_DEV_TEXT N_("VCD device")
-#ifdef HAVE_VCDX
-#define VCD_DEV_LONGTEXT N_( \
-    "This is the default VCD device to use. " \
-    "If you don't specify anything, we'll scan for a suitable CD-ROM device." )
-#else
 #define VCD_DEV_LONGTEXT N_( \
     "This is the default VCD device to use." )
-#endif
 
 #define CDAUDIO_DEV_TEXT N_("Audio CD device")
 #define CDAUDIO_DEV_LONGTEXT N_( \

@@ -2360,6 +2360,7 @@ then
 		[VLC_ADD_LIBS([vcdx],[$LIBVCDINFO_LIBS])
 		 VLC_ADD_CFLAGS([vcdx],[$LIBVCDINFO_CFLAGS])],
 	  [AC_MSG_ERROR([vcdx plugin requires libvcdinfo library >= 0.7.22])])
+        VLC_ADD_PLUGIN([vcdx])
 fi
 
 dnl
