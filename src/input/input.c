@@ -1035,31 +1035,42 @@ static void LoadSubtitles( input_thread_t *p_input )
 
     /* Load subtitles from attachments */
     int i_attachment = 0;
-    char **ppsz_attachment = NULL;
+    input_attachment_t **pp_attachment = NULL;
 
     vlc_mutex_lock( &p_input->p->p_item->lock );
     for( int i = 0; i < p_input->p->i_attachment; i++ )
     {
         const input_attachment_t *a = p_input->p->attachment[i];
         if( !strcmp( a->psz_mime, "application/x-srt" ) )
-            TAB_APPEND( i_attachment, ppsz_attachment,
-                        strdup( a->psz_name ) );
+            TAB_APPEND( i_attachment, pp_attachment,
+                        vlc_input_attachment_New( a->psz_name, NULL,
+                                                  a->psz_description, NULL, 0 ) );
     }
     vlc_mutex_unlock( &p_input->p->p_item->lock );
 
+    if( i_attachment > 0 )
+        var_Create( p_input, "sub-description", VLC_VAR_STRING );
     for( int i = 0; i < i_attachment; i++ )
     {
+        input_attachment_t *a = pp_attachment[i];
+        if( !a )
+            continue;
         char *psz_mrl;
-        if( ppsz_attachment[i] &&
-            asprintf( &psz_mrl, "attachment://%s", ppsz_attachment[i] ) >= 0 )
+        if( a->psz_name[i] &&
+            asprintf( &psz_mrl, "attachment://%s", a->psz_name ) >= 0 )
         {
+            var_SetString( p_input, "sub-description", a->psz_description ? a->psz_description : "");
+
             SubtitleAdd( p_input, psz_mrl, b_forced );
+
             b_forced = false;
             free( psz_mrl );
         }
-        free( ppsz_attachment[i] );
+        vlc_input_attachment_Delete( a );
     }
-    free( ppsz_attachment );
+    free( pp_attachment );
+    if( i_attachment > 0 )
+        var_Destroy( p_input, "sub-description" );
 }
 
 static void LoadSlaves( input_thread_t *p_input )
