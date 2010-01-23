@@ -474,8 +474,10 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /* Check for full help option */
     else if( var_InheritBool( p_libvlc, "full-help" ) )
     {
-        config_PutInt( p_libvlc, "advanced", 1);
-        config_PutInt( p_libvlc, "help-verbose", 1);
+        var_Create( p_libvlc, "advanced", VLC_VAR_BOOL );
+        var_SetBool( p_libvlc, "advanced", true );
+        var_Create( p_libvlc, "help-verbose", VLC_VAR_BOOL );
+        var_SetBool( p_libvlc, "help-verbose", true );
         Help( p_libvlc, "full-help" );
         b_exit = true;
         i_ret = VLC_EEXITSUCCESS;
