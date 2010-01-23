@@ -784,12 +784,29 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
     if( rtsp_url != NULL )
         sdp_AddAttribute ( &psz_sdp, "control", "%s", rtsp_url );
 
+    const char *proto = "RTP/AVP"; /* protocol */
+    if( rtsp_url == NULL )
+    {
+        switch( p_sys->proto )
+        {
+            case IPPROTO_UDP:
+                break;
+            case IPPROTO_TCP:
+                proto = "TCP/RTP/AVP";
+                break;
+            case IPPROTO_DCCP:
+                proto = "DCCP/RTP/AVP";
+                break;
+            case IPPROTO_UDPLITE:
+                return psz_sdp;
+        }
+    }
+
     /* FIXME: locking?! */
     for( i = 0; i < p_sys->i_es; i++ )
     {
         sout_stream_id_t *id = p_sys->es[i];
         const char *mime_major; /* major MIME type */
-        const char *proto = "RTP/AVP"; /* protocol */
 
         switch( id->i_cat )
         {
@@ -804,23 +821,6 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
                 break;
             default:
                 continue;
-        }
-
-        if( rtsp_url == NULL )
-        {
-            switch( p_sys->proto )
-            {
-                case IPPROTO_UDP:
-                    break;
-                case IPPROTO_TCP:
-                    proto = "TCP/RTP/AVP";
-                    break;
-                case IPPROTO_DCCP:
-                    proto = "DCCP/RTP/AVP";
-                    break;
-                case IPPROTO_UDPLITE:
-                    continue;
-            }
         }
 
         sdp_AddMedia( &psz_sdp, mime_major, proto, inclport * id->i_port,
