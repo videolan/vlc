@@ -25,7 +25,8 @@
 
 struct decoder_sys_t
 {
-    int b_packetizer;
+    bool b_packetizer;
+    bool b_disabletrans;
 
     mtime_t i_pts;
     unsigned int i_spu_size;

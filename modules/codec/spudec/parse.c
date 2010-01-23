@@ -293,11 +293,14 @@ static int ParseControlSeq( decoder_t *p_dec, subpicture_t *p_spu,
                 return VLC_EGENERIC;
             }
 
-            b_cmd_alpha = true;
-            spu_data_cmd.pi_alpha[3] = (p_sys->buffer[i_index+1]>>4)&0x0f;
-            spu_data_cmd.pi_alpha[2] = (p_sys->buffer[i_index+1])&0x0f;
-            spu_data_cmd.pi_alpha[1] = (p_sys->buffer[i_index+2]>>4)&0x0f;
-            spu_data_cmd.pi_alpha[0] = (p_sys->buffer[i_index+2])&0x0f;
+            if(!p_sys->b_disabletrans)
+            { /* If we want to use original transparency values */
+                b_cmd_alpha = true;
+                spu_data_cmd.pi_alpha[3] = (p_sys->buffer[i_index+1]>>4)&0x0f;
+                spu_data_cmd.pi_alpha[2] = (p_sys->buffer[i_index+1])&0x0f;
+                spu_data_cmd.pi_alpha[1] = (p_sys->buffer[i_index+2]>>4)&0x0f;
+                spu_data_cmd.pi_alpha[0] = (p_sys->buffer[i_index+2])&0x0f;
+            }
 
             i_index += 3;
             break;
@@ -464,7 +467,7 @@ static int ParseRLE( decoder_t *p_dec,
     bool b_empty_top = true;
     unsigned int i_skipped_top = 0, i_skipped_bottom = 0;
     unsigned int i_transparent_code = 0;
- 
+
     /* Colormap statistics */
     int i_border = -1;
     int stats[4]; stats[0] = stats[1] = stats[2] = stats[3] = 0;
@@ -613,7 +616,7 @@ static int ParseRLE( decoder_t *p_dec,
                  p_spu->i_width, i_height, p_spu->i_x, i_y );
 #endif
     }
- 
+
     /* Handle color if no palette was found */
     if( !p_spu_data->b_palette )
     {
