@@ -267,13 +267,13 @@ int filter_chain_MouseFilter( filter_chain_t *p_chain, vlc_mouse_t *p_dst, const
         filter_t *p_filter = &f->filter;
         vlc_mouse_t *p_mouse = f->mouse;
 
-        if( p_filter->pf_mouse && p_mouse )
+        if( p_filter->pf_video_mouse && p_mouse )
         {
             vlc_mouse_t old = *p_mouse;
             vlc_mouse_t filtered;
 
             *p_mouse = current;
-            if( p_filter->pf_mouse( p_filter, &filtered, &old, &current ) )
+            if( p_filter->pf_video_mouse( p_filter, &filtered, &old, &current ) )
                 return VLC_EGENERIC;
             current = filtered;
         }
@@ -518,20 +518,20 @@ static int InternalVideoInit( filter_t *p_filter, void *p_data )
 {
     VLC_UNUSED(p_data);
 
-    p_filter->pf_vout_buffer_new = VideoBufferNew;
-    p_filter->pf_vout_buffer_del = VideoBufferDelete;
+    p_filter->pf_video_buffer_new = VideoBufferNew;
+    p_filter->pf_video_buffer_del = VideoBufferDelete;
 
     return VLC_SUCCESS;
 }
 static void InternalVideoClean( filter_t *p_filter )
 {
-    p_filter->pf_vout_buffer_new = NULL;
-    p_filter->pf_vout_buffer_del = NULL;
+    p_filter->pf_video_buffer_new = NULL;
+    p_filter->pf_video_buffer_del = NULL;
 }
 
 static bool IsInternalVideoAllocator( chained_filter_t *p_filter )
 {
-    return p_filter->filter.pf_vout_buffer_new == VideoBufferNew;
+    return p_filter->filter.pf_video_buffer_new == VideoBufferNew;
 }
 
 /* */

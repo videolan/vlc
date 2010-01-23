@@ -139,8 +139,8 @@ static void video_del_buffer_filter( filter_t *p_filter, picture_t *p_pic )
 
 static int video_filter_buffer_allocation_init( filter_t *p_filter, void *p_data )
 {
-    p_filter->pf_vout_buffer_new = video_new_buffer_filter;
-    p_filter->pf_vout_buffer_del = video_del_buffer_filter;
+    p_filter->pf_video_buffer_new = video_new_buffer_filter;
+    p_filter->pf_video_buffer_del = video_del_buffer_filter;
     p_filter->p_owner = p_data; /* p_vout */
     return VLC_SUCCESS;
 }
@@ -1493,7 +1493,7 @@ static int ChromaCreate( vout_thread_t *p_vout )
 
         return VLC_EGENERIC;
     }
-    p_chroma->pf_vout_buffer_new = ChromaGetPicture;
+    p_chroma->pf_video_buffer_new = ChromaGetPicture;
     return VLC_SUCCESS;
 }
 

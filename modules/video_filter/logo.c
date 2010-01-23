@@ -299,7 +299,7 @@ static int OpenCommon( vlc_object_t *p_this, bool b_sub )
     else
     {
         p_filter->pf_video_filter = FilterVideo;
-        p_filter->pf_mouse = Mouse;
+        p_filter->pf_video_mouse = Mouse;
     }
 
     free( psz_filename );

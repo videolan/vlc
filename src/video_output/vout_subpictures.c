@@ -1026,8 +1026,8 @@ static filter_t *CreateAndLoadScale( vlc_object_t *p_obj,
     p_scale->fmt_out.video.i_width =
     p_scale->fmt_out.video.i_height = b_resize ? 16 : 32;
 
-    p_scale->pf_vout_buffer_new = spu_new_video_buffer;
-    p_scale->pf_vout_buffer_del = spu_del_video_buffer;
+    p_scale->pf_video_buffer_new = spu_new_video_buffer;
+    p_scale->pf_video_buffer_del = spu_del_video_buffer;
 
     vlc_object_attach( p_scale, p_obj );
     p_scale->p_module = module_need( p_scale, "video filter2", NULL, false );

@@ -255,8 +255,8 @@ static void BufferDel( filter_t *p_filter, picture_t *p_pic )
 }
 static int BufferAllocationInit ( filter_t *p_filter, void *p_data )
 {
-    p_filter->pf_vout_buffer_new = BufferNew;
-    p_filter->pf_vout_buffer_del = BufferDel;
+    p_filter->pf_video_buffer_new = BufferNew;
+    p_filter->pf_video_buffer_del = BufferDel;
     p_filter->p_owner = p_data;
     return VLC_SUCCESS;
 }

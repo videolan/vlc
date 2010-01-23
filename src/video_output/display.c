@@ -71,17 +71,17 @@ static void VideoBufferDelete(filter_t *filter, picture_t *picture)
 
 static int  FilterAllocationInit(filter_t *filter, void *vd)
 {
-    filter->pf_vout_buffer_new = VideoBufferNew;
-    filter->pf_vout_buffer_del = VideoBufferDelete;
-    filter->p_owner            = vd;
+    filter->pf_video_buffer_new = VideoBufferNew;
+    filter->pf_video_buffer_del = VideoBufferDelete;
+    filter->p_owner             = vd;
 
     return VLC_SUCCESS;
 }
 static void FilterAllocationClean(filter_t *filter)
 {
-    filter->pf_vout_buffer_new = NULL;
-    filter->pf_vout_buffer_del = NULL;
-    filter->p_owner            = NULL;
+    filter->pf_video_buffer_new = NULL;
+    filter->pf_video_buffer_del = NULL;
+    filter->p_owner             = NULL;
 }
 
 /*****************************************************************************

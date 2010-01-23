@@ -341,7 +341,7 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
 
         p_block = p_image->p_enc->pf_encode_video( p_image->p_enc, p_tmp_pic );
 
-        p_image->p_filter->pf_vout_buffer_del( p_image->p_filter, p_tmp_pic );
+        p_image->p_filter->pf_video_buffer_del( p_image->p_filter, p_tmp_pic );
     }
     else
     {
@@ -473,7 +473,7 @@ static picture_t *ImageConvert( image_handler_t *p_image, picture_t *p_pic,
     {
         /* Duplicate image */
         picture_Release( p_pif ); /* XXX: Better fix must be possible */
-        p_pif = p_image->p_filter->pf_vout_buffer_new( p_image->p_filter );
+        p_pif = p_image->p_filter->pf_video_buffer_new( p_image->p_filter );
         if( p_pif )
             picture_Copy( p_pif, p_pic );
     }
@@ -787,9 +787,9 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
                                   VLC_OBJECT_GENERIC, typename );
     vlc_object_attach( p_filter, p_this );
 
-    p_filter->pf_vout_buffer_new =
+    p_filter->pf_video_buffer_new =
         (picture_t *(*)(filter_t *))video_new_buffer;
-    p_filter->pf_vout_buffer_del =
+    p_filter->pf_video_buffer_del =
         (void (*)(filter_t *, picture_t *))video_del_buffer;
 
     p_filter->fmt_in = *p_fmt_in;

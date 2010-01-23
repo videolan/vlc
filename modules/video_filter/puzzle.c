@@ -164,7 +164,7 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_filter, CFG_PREFIX "black-slot", PuzzleCallback, p_sys );
 
     p_filter->pf_video_filter = Filter;
-    p_filter->pf_mouse = Mouse;
+    p_filter->pf_video_mouse = Mouse;
 
     return VLC_SUCCESS;
 }

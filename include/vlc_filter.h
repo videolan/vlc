@@ -62,48 +62,64 @@ struct filter_t
 
     union
     {
-        picture_t *     (*pf_video_filter) ( filter_t *, picture_t * );
-        block_t *       (*pf_audio_filter) ( filter_t *, block_t * );
-        void            (*pf_video_blend)  ( filter_t *,
-                                             picture_t *, const picture_t *,
-                                             int, int, int );
-
-        subpicture_t *  (*pf_sub_filter) ( filter_t *, mtime_t );
-        int             (*pf_render_text) ( filter_t *, subpicture_region_t *,
-                                            subpicture_region_t * );
-    };
-    union
-    {
-        /* Filter mouse state.
-         *
-         * If non-NULL, you must convert from output format to input format:
-         * - If VLC_SUCCESS is returned, the mouse state is then propagated.
-         * - Otherwise, the mouse change is not propagated.
-         * If NULL, the mouse state is considered unchanged and will be
-         * propagated.
-         */
-        int             (*pf_mouse)( filter_t *, vlc_mouse_t *,
+        struct
+        {
+            picture_t * (*pf_filter) ( filter_t *, picture_t * );
+            picture_t * (*pf_buffer_new) ( filter_t * );
+            void        (*pf_buffer_del) ( filter_t *, picture_t * );
+            /* Filter mouse state.
+             *
+             * If non-NULL, you must convert from output to input formats:
+             * - If VLC_SUCCESS is returned, the mouse state is propagated.
+             * - Otherwise, the mouse change is not propagated.
+             * If NULL, the mouse state is considered unchanged and will be
+             * propagated.
+             */
+            int         (*pf_mouse)( filter_t *, vlc_mouse_t *,
                                      const vlc_mouse_t *p_old,
                                      const vlc_mouse_t *p_new );
-        int             (*pf_render_html) ( filter_t *, subpicture_region_t *,
-                                            subpicture_region_t * );
-    };
+        } video;
+#define pf_video_filter     u.video.pf_filter
+#define pf_video_mouse      u.video.pf_mouse
+#define pf_video_buffer_new u.video.pf_buffer_new
+#define pf_video_buffer_del u.video.pf_buffer_del
 
-    /*
-     * Buffers allocation
-     */
-    union
-    {
-        block_t *      (*pf_audio_buffer_new) ( filter_t *, int );
-        picture_t *    (*pf_vout_buffer_new) ( filter_t * );
-        subpicture_t * (*pf_sub_buffer_new) ( filter_t * );
-    };
-    union
-    {
-        void           (*pf_vout_buffer_del) ( filter_t *, picture_t * );
-        void           (*pf_sub_buffer_del) ( filter_t *, subpicture_t * );
-    };
+        struct
+        {
+            block_t *   (*pf_filter) ( filter_t *, block_t * );
+            block_t *   (*pf_buffer_new) ( filter_t *, int );
+        } audio;
+#define pf_audio_filter     u.audio.pf_filter
+#define pf_audio_buffer_new u.audio.pf_buffer_new
 
+        struct
+        {
+            void        (*pf_blend) ( filter_t *,  picture_t *,
+                                      const picture_t *, int, int, int );
+        } blend;
+#define pf_video_blend     u.blend.pf_blend
+
+        struct
+        {
+            subpicture_t * (*pf_filter) ( filter_t *, mtime_t );
+            subpicture_t * (*pf_buffer_new) ( filter_t * );
+            void        (*pf_buffer_del) ( filter_t *, subpicture_t * );
+        } sub;
+#define pf_sub_filter      u.sub.pf_filter
+#define pf_sub_buffer_new  u.sub.pf_buffer_new
+#define pf_sub_buffer_del  u.sub.pf_buffer_del
+
+        struct
+        {
+            int         (*pf_text) ( filter_t *, subpicture_region_t *,
+                                     subpicture_region_t * );
+            int         (*pf_html) ( filter_t *, subpicture_region_t *,
+                                     subpicture_region_t * );
+        } render;
+#define pf_render_text     u.render.pf_text
+#define pf_render_html     u.render.pf_html
+
+    } u;
     /* Private structure for the owner of the decoder */
     filter_owner_sys_t *p_owner;
 };
@@ -119,7 +135,7 @@ struct filter_t
  */
 static inline picture_t *filter_NewPicture( filter_t *p_filter )
 {
-    picture_t *p_picture = p_filter->pf_vout_buffer_new( p_filter );
+    picture_t *p_picture = p_filter->pf_video_buffer_new( p_filter );
     if( !p_picture )
         msg_Warn( p_filter, "can't get output picture" );
     return p_picture;
@@ -134,7 +150,7 @@ static inline picture_t *filter_NewPicture( filter_t *p_filter )
  */
 static inline void filter_DeletePicture( filter_t *p_filter, picture_t *p_picture )
 {
-    p_filter->pf_vout_buffer_del( p_filter, p_picture );
+    p_filter->pf_video_buffer_del( p_filter, p_picture );
 }
 
 /**

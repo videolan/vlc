@@ -129,7 +129,7 @@ static int Create( vlc_object_t *p_this )
 
     /* */
     p_filter->pf_video_filter = Filter;
-    p_filter->pf_mouse = Mouse;
+    p_filter->pf_video_mouse = Mouse;
     return VLC_SUCCESS;
 }
 
