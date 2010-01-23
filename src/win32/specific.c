@@ -48,18 +48,23 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
 {
     VLC_UNUSED( p_this ); VLC_UNUSED( pi_argc ); VLC_UNUSED( ppsz_argv );
     WSADATA Data;
+    MEMORY_BASIC_INFORMATION mbi;
 
     /* Get our full path */
     char psz_path[MAX_PATH];
     char *psz_vlc;
 
     wchar_t psz_wpath[MAX_PATH];
-    if( GetModuleFileName( NULL, psz_wpath, MAX_PATH ) )
+    if( VirtualQuery(system_Init, &mbi, sizeof(mbi) ) )
     {
-        WideCharToMultiByte( CP_UTF8, 0, psz_wpath, -1,
-                             psz_path, MAX_PATH, NULL, NULL );
+        HMODULE hMod = (HMODULE) mbi.AllocationBase;
+        if( GetModuleFileName( hMod, psz_wpath, MAX_PATH ) )
+        {
+            WideCharToMultiByte( CP_UTF8, 0, psz_wpath, -1,
+                                psz_path, MAX_PATH, NULL, NULL );
+        }
+        else psz_path[0] = '\0';
     }
-    else psz_path[0] = '\0';
 
     if( (psz_vlc = strrchr( psz_path, '\\' )) ) *psz_vlc = '\0';
 

@@ -30,7 +30,8 @@
 #include <vlc_common.h>
 #include "../libvlc.h"
 #include <dirent.h>                                                /* *dir() */
-
+#include <libgen.h>
+#include <dlfcn.h>
 #include <CoreFoundation/CoreFoundation.h>
 #include <mach-o/dyld.h>
 
@@ -79,7 +80,14 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
                 p_char = NULL;
         }
     }
-
+    if ( !p_char )
+    {
+        /* We are not linked to the VLC.framework, let's use dladdr to figure
+         * libvlc path */
+        Dl_info info;
+        if( dladdr(system_Init, &info) )
+            p_char = strdup(dirname( info.dli_fname ));
+    }
     if( !p_char )
     {
         char path[MAXPATHLEN+1];
