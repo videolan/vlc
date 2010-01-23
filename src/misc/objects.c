@@ -884,7 +884,8 @@ static vlc_object_t *FindParentName (vlc_object_t *p_this, const char *name)
          parent != NULL;
          parent = parent->p_parent)
     {
-        if (!strcmp (vlc_internals (parent)->psz_name, name))
+        const char *objname = vlc_internals (parent)->psz_name;
+        if (objname && !strcmp (objname, name))
             return vlc_object_hold (parent);
     }
     return NULL;
@@ -909,7 +910,7 @@ static vlc_object_t *FindChildName (vlc_object_internals_t *priv,
 {
     for (priv = priv->first; priv != NULL; priv = priv->next)
     {
-        if (!strcmp (priv->psz_name, name))
+        if (priv->psz_name && !strcmp (priv->psz_name, name))
             return vlc_object_hold (vlc_externals (priv));
 
         vlc_object_t *found = FindChildName (priv, name);
