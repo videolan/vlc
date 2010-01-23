@@ -400,50 +400,97 @@ void __config_PutFloat( vlc_object_t *p_this,
     }
 }
 
+static int confcmp (const void *a, const void *b)
+{
+    const module_config_t *const *ca = a, *const *cb = b;
+
+    return strcmp ((*ca)->psz_name, (*cb)->psz_name);
+}
+
+static int confnamecmp (const void *key, const void *elem)
+{
+    const module_config_t *const *conf = elem;
+
+    return strcmp (key, (*conf)->psz_name);
+}
+
+static struct
+{
+    module_config_t **list;
+    size_t count;
+} config = { NULL, 0 };
+
+/**
+ * Index the configuration items by name for faster lookups.
+ */
+int config_SortConfig (void)
+{
+    size_t nmod;
+    module_t **mlist = module_list_get (&nmod);
+    if (unlikely(mlist == NULL))
+        return VLC_ENOMEM;
+
+    size_t nconf = 0;
+    for (size_t i = 0; i < nmod; i++)
+         nconf  += mlist[i]->confsize;
+
+    module_config_t **clist = malloc (sizeof (*clist) * nconf);
+    if (unlikely(clist == NULL))
+    {
+        module_list_free (mlist);
+        return VLC_ENOMEM;
+    }
+
+    nconf = 0;
+    for (size_t i = 0; i < nmod; i++)
+    {
+        module_t *parser = mlist[i];
+        module_config_t *item, *end;
+
+        for (item = parser->p_config, end = item + parser->confsize;
+             item < end;
+             item++)
+        {
+            if (item->i_type & CONFIG_HINT)
+                continue; /* ignore hints */
+            clist[nconf++] = item;
+        }
+    }
+    module_list_free (mlist);
+
+    qsort (clist, nconf, sizeof (*clist), confcmp);
+
+    config.list = clist;
+    config.count = nconf;
+    return VLC_SUCCESS;
+}
+
+void config_UnsortConfig (void)
+{
+    module_config_t **clist;
+
+    clist = config.list;
+    config.list = NULL;
+    config.count = 0;
+
+    free (config.list);
+}
+
 /*****************************************************************************
  * config_FindConfig: find the config structure associated with an option.
  *****************************************************************************
- * FIXME: This function really needs to be optimized.
- * FIXME: And now even more.
  * FIXME: remove p_this pointer parameter (or use it)
  *****************************************************************************/
-module_config_t *config_FindConfig( vlc_object_t *p_this, const char *psz_name )
+module_config_t *config_FindConfig (vlc_object_t *p_this, const char *name)
 {
     VLC_UNUSED(p_this);
-    module_t *p_parser;
 
-    if( !psz_name ) return NULL;
-
-    module_t **list = module_list_get (NULL);
-    if (list == NULL)
+    if (unlikely(name == NULL))
         return NULL;
 
-    for (size_t i = 0; (p_parser = list[i]) != NULL; i++)
-    {
-        module_config_t *p_item, *p_end;
-
-        if( !p_parser->i_config_items )
-            continue;
-
-        for( p_item = p_parser->p_config, p_end = p_item + p_parser->confsize;
-             p_item < p_end;
-             p_item++ )
-        {
-            if( p_item->i_type & CONFIG_HINT )
-                /* ignore hints */
-                continue;
-            if( !strcmp( psz_name, p_item->psz_name )
-             || ( p_item->psz_oldname
-              && !strcmp( psz_name, p_item->psz_oldname ) ) )
-            {
-                module_list_free (list);
-                return p_item;
-            }
-        }
-    }
-
-    module_list_free (list);
-    return NULL;
+    module_config_t *const *p;
+    p = bsearch (name, config.list, config.count, sizeof (*p), confnamecmp);
+    return p ? *p : NULL;
 }
 
 /*****************************************************************************

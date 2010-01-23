@@ -41,6 +41,8 @@ void config_Free( module_t * );
 
 int __config_LoadCmdLine   ( vlc_object_t *, int *, const char *[], bool );
 int __config_LoadConfigFile( vlc_object_t *, const char * );
+int config_SortConfig (void);
+void config_UnsortConfig (void);
 
 char *config_GetDataDirDefault( void );
 

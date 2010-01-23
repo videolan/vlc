@@ -138,6 +138,7 @@ void __module_InitBank( vlc_object_t *p_this )
          * as for every other module. */
         AllocateBuiltinModule( p_this, vlc_entry__main );
         vlc_rwlock_init (&config_lock);
+        config_SortConfig ();
     }
     else
         p_module_bank->i_usage++;
@@ -181,6 +182,8 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
         vlc_mutex_unlock( &module_lock );
         return;
     }
+
+    config_UnsortConfig ();
     vlc_rwlock_destroy (&config_lock);
     p_module_bank = NULL;
     vlc_mutex_unlock( &module_lock );
@@ -237,6 +240,8 @@ void module_LoadPlugins( vlc_object_t * p_this, bool b_cache_delete )
         if( p_module_bank->b_cache || b_cache_delete )
             CacheLoad( p_this, p_module_bank, b_cache_delete );
         AllocateAllPlugins( p_this, p_module_bank );
+        config_UnsortConfig ();
+        config_SortConfig ();
     }
 #endif
     vlc_mutex_unlock( &module_lock );
