@@ -2343,11 +2343,8 @@ fi
 dnl
 dnl  Built-in CD-DA and VCD module
 dnl
-AC_ARG_ENABLE(cdda,
-  [  --enable-cdda           audio CD via built-in VCD (default enabled)])
-
 AC_ARG_ENABLE(vcd,
-  [  --enable-vcd            built-in VCD (default enabled)])
+  [  --enable-vcd            built-in VCD and CD-DA (default enabled)])
 
 AC_ARG_ENABLE(libcddb,
   [  --enable-libcddb        CDDB support for libcdio audio CD (default enabled)])
