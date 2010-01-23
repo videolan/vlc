@@ -40,9 +40,6 @@ static vlc_fourcc_t GetFOURCC( const uint8_t *p_buff )
     return VLC_FOURCC( p_buff[0], p_buff[1], p_buff[2], p_buff[3] );
 }
 
-#define AVI_ChunkFree( a, b ) _AVI_ChunkFree( (a), (avi_chunk_t*)(b) )
-void    _AVI_ChunkFree( stream_t *, avi_chunk_t *p_chk );
-
 /****************************************************************************
  *
  * Basics functions to manipulates chunks

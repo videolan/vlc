@@ -216,6 +216,7 @@ typedef union avi_chunk_u
 int     _AVI_ChunkRead( stream_t *,
                         avi_chunk_t *p_chk,
                         avi_chunk_t *p_father );
+void    _AVI_ChunkFree( stream_t *, avi_chunk_t * );
 
 int     _AVI_ChunkCount( avi_chunk_t *, vlc_fourcc_t );
 void   *_AVI_ChunkFind ( avi_chunk_t *, vlc_fourcc_t, int );
@@ -229,6 +230,8 @@ void    AVI_ChunkFreeRoot( stream_t *, avi_chunk_t  *p_chk );
     _AVI_ChunkCount( (avi_chunk_t*)p_chk, i_fourcc )
 #define AVI_ChunkFind( p_chk, i_fourcc, i_number ) \
     _AVI_ChunkFind( (avi_chunk_t*)p_chk, i_fourcc, i_number )
+#define AVI_ChunkFree( a, b ) \
+    _AVI_ChunkFree( (a), (avi_chunk_t*)(b) )
 
 
     /* *** avi stuff *** */
