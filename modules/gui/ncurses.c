@@ -67,12 +67,6 @@
 #   include <dirent.h>
 #endif
 
-#ifdef HAVE_VCDX
-#define VCD_MRL "vcdx://"
-#else
-#define VCD_MRL "vcd://"
-#endif
-
 #define SEARCH_CHAIN_SIZE 20
 #define OPEN_CHAIN_SIZE 50
 
@@ -2405,17 +2399,17 @@ static void Eject( intf_thread_t *p_intf )
                 break;
             }
         }
-        else if( !strncmp(psz_name, VCD_MRL, strlen(VCD_MRL)) )
+        else if( !strncmp(psz_name, "vcd://", 6) )
         {
-            switch( psz_name[strlen(VCD_MRL)] )
+            switch( psz_name[6] )
             {
             case '\0':
             case '@':
-                psz_device = config_GetPsz( p_intf, VCD_MRL );
+                psz_device = config_GetPsz( p_intf, "vcd" );
                 break;
             default:
                 /* Omit the beginning MRL-selector characters */
-                psz_device = strdup( psz_name + strlen(VCD_MRL) );
+                psz_device = strdup( psz_name + 6 );
                 break;
             }
         }
