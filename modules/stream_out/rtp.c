@@ -763,13 +763,18 @@ char *SDPGenerate( const sout_stream_t *p_stream, const char *rtsp_url )
     {
         inclport = 0;
 
+        /* Check against URL format rtsp://[<ipv6>]:<port>/<path> */
+        bool ipv6 = rtsp_url != NULL && strlen( rtsp_url ) > 7
+                    && rtsp_url[7] == '[';
+
         /* Dummy destination address for RTSP */
-        memset (&dst, 0, sizeof( struct sockaddr_in ) );
-        dst.ss_family = AF_INET;
+        dstlen = ipv6 ? sizeof( struct sockaddr_in6 )
+                      : sizeof( struct sockaddr_in );
+        memset (&dst, 0, dstlen);
+        dst.ss_family = ipv6 ? AF_INET6 : AF_INET;
 #ifdef HAVE_SA_LEN
-        dst.ss_len =
+        dst.ss_len = dstlen;
 #endif
-        dstlen = sizeof( struct sockaddr_in );
     }
 
     psz_sdp = vlc_sdp_Start( VLC_OBJECT( p_stream ), SOUT_CFG_PREFIX,
