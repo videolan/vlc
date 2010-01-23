@@ -218,7 +218,7 @@ static int Open(vlc_object_t *object)
     if (!sys->pool) {
         picture_Release(picture);
         free(sys);
-        return VLC_SUCCESS;
+        return VLC_EGENERIC;
     }
 
     /* */
