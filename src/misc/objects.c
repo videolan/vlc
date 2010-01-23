@@ -526,31 +526,15 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
         return p_this;
     }
 
+    /* Otherwise, recursively look for the object */
+    if (i_mode == FIND_ANYWHERE)
+        return vlc_object_find_name (VLC_OBJECT(p_this->p_libvlc), psz_name,
+                                     FIND_CHILD);
+
     libvlc_lock (p_this->p_libvlc);
 
     /* Otherwise, recursively look for the object */
-    if( i_mode == FIND_ANYWHERE )
-    {
-        vlc_object_t *p_root = p_this;
-
-        /* Find the root */
-        while( p_root->p_parent != NULL &&
-               p_root != VLC_OBJECT( p_this->p_libvlc ) )
-        {
-            p_root = p_root->p_parent;
-        }
-
-        p_found = FindObjectName( p_root, psz_name, FIND_CHILD );
-        if( p_found == NULL && p_root != VLC_OBJECT( p_this->p_libvlc ) )
-        {
-            p_found = FindObjectName( VLC_OBJECT( p_this->p_libvlc ),
-                                      psz_name, FIND_CHILD );
-        }
-    }
-    else
-    {
-        p_found = FindObjectName( p_this, psz_name, i_mode );
-    }
+    p_found = FindObjectName( p_this, psz_name, i_mode );
 
     libvlc_unlock (p_this->p_libvlc);
     return p_found;
