@@ -153,7 +153,7 @@ static int Seek(access_t *access, uint64_t position)
 {
     access_sys_t *sys = access->p_sys;
 
-    if (position >= INT64_MIN ||
+    if (position > INT64_MAX ||
         url_seek(sys->context, position, SEEK_SET) < 0) {
         msg_Err(access, "Seek to %"PRIu64" failed\n", position);
         if (access->info.i_size <= 0 || position != access->info.i_size)
