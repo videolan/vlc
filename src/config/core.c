@@ -35,6 +35,8 @@
 #include "configuration.h"
 #include "modules/modules.h"
 
+vlc_rwlock_t config_lock;
+
 static inline char *strdupnull (const char *src)
 {
     return src ? strdup (src) : NULL;
@@ -220,9 +222,9 @@ char * __config_GetPsz( vlc_object_t *p_this, const char *psz_name )
     }
 
     /* return a copy of the string */
-    vlc_mutex_lock( p_config->p_lock );
+    vlc_rwlock_rdlock (&config_lock);
     char *psz_value = strdupnull (p_config->value.psz);
-    vlc_mutex_unlock( p_config->p_lock );
+    vlc_rwlock_unlock (&config_lock);
 
     return psz_value;
 }
@@ -256,7 +258,7 @@ void __config_PutPsz( vlc_object_t *p_this,
         return;
     }
 
-    vlc_mutex_lock( p_config->p_lock );
+    vlc_rwlock_wrlock (&config_lock);
 
     /* backup old value */
     oldval.psz_string = (char *)p_config->value.psz;
@@ -270,7 +272,7 @@ void __config_PutPsz( vlc_object_t *p_this,
 
     val.psz_string = (char *)p_config->value.psz;
 
-    vlc_mutex_unlock( p_config->p_lock );
+    vlc_rwlock_unlock (&config_lock);
 
     if( p_config->pf_callback )
     {
@@ -506,6 +508,7 @@ void __config_ResetAll( vlc_object_t *p_this )
     module_t *p_module;
     module_t **list = module_list_get (NULL);
 
+    vlc_rwlock_wrlock (&config_lock);
     for (size_t j = 0; (p_module = list[j]) != NULL; j++)
     {
         if( p_module->b_submodule ) continue;
@@ -514,7 +517,6 @@ void __config_ResetAll( vlc_object_t *p_this )
         {
             module_config_t *p_config = p_module->p_config + i;
 
-            vlc_mutex_lock (p_config->p_lock);
             if (IsConfigIntegerType (p_config->i_type))
                 p_config->value.i = p_config->orig.i;
             else
@@ -527,9 +529,9 @@ void __config_ResetAll( vlc_object_t *p_this )
                 p_config->value.psz =
                         strdupnull (p_config->orig.psz);
             }
-            vlc_mutex_unlock (p_config->p_lock);
         }
     }
+    vlc_rwlock_unlock (&config_lock);
 
     module_list_free (list);
 }

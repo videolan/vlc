@@ -189,6 +189,7 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t baseloc = uselocale (loc);
 
+    vlc_rwlock_wrlock (&config_lock);
     while (fgets (line, 1024, file) != NULL)
     {
         /* Ignore comments and empty lines */
@@ -263,7 +264,6 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
             /* We found it */
             errno = 0;
 
-            vlc_mutex_lock( p_item->p_lock );
             switch( p_item->i_type )
             {
                 case CONFIG_ITEM_BOOL:
@@ -301,10 +301,10 @@ int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
                     p_item->saved.psz = strdupnull (p_item->value.psz);
                     break;
             }
-            vlc_mutex_unlock( p_item->p_lock );
             break;
         }
     }
+    vlc_rwlock_unlock (&config_lock);
 
     if (ferror (file))
     {
@@ -532,6 +532,9 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
         goto error;
     }
 
+    /* Configuration lock must be taken before vlcrc serializer below. */
+    vlc_rwlock_rdlock (&config_lock);
+
     /* The temporary configuration file is per-PID. Therefore SaveConfigFile()
      * should be serialized against itself within a given process. */
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
@@ -540,6 +543,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     int fd = utf8_open (temporary, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR);
     if (fd == -1)
     {
+        vlc_rwlock_unlock (&config_lock);
         vlc_mutex_unlock (&lock);
         module_list_free (list);
         goto error;
@@ -547,6 +551,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     file = fdopen (fd, "wt");
     if (file == NULL)
     {
+        vlc_rwlock_unlock (&config_lock);
         close (fd);
         vlc_mutex_unlock (&lock);
         module_list_free (list);
@@ -559,6 +564,10 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     /* Ensure consistent number formatting... */
     locale_t loc = newlocale (LC_NUMERIC_MASK, "C", NULL);
     locale_t baseloc = uselocale (loc);
+
+    /* We would take the config lock here. But this would cause a lock
+     * inversion with the serializer above and config_AutoSaveConfigFile().
+    vlc_rwlock_rdlock (&config_lock);*/
 
     /* Look for the selected module, if NULL then save everything */
     for( i_index = 0; (p_parser = list[i_index]) != NULL; i_index++ )
@@ -590,8 +599,6 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
              || p_item->b_removed              /* ignore deprecated option */
              || p_item->b_unsaveable)          /* ignore volatile option */
                 continue;
-
-            vlc_mutex_lock (p_item->p_lock);
 
             /* Do not save the new value in the configuration file
              * if doing an autosave, and the item is not an "autosaved" one. */
@@ -663,9 +670,9 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
 
             if (!b_retain)
                 p_item->b_dirty = false;
-            vlc_mutex_unlock (p_item->p_lock);
         }
     }
+    vlc_rwlock_unlock (&config_lock);
 
     module_list_free (list);
     if (loc != (locale_t)0)
@@ -721,14 +728,15 @@ error:
 
 int config_AutoSaveConfigFile( vlc_object_t *p_this )
 {
-    size_t i_index;
+    int ret = VLC_SUCCESS;
     bool save = false;
 
     assert( p_this );
 
     /* Check if there's anything to save */
     module_t **list = module_list_get (NULL);
-    for( i_index = 0; list[i_index] && !save; i_index++ )
+    vlc_rwlock_rdlock (&config_lock);
+    for (size_t i_index = 0; list[i_index] && !save; i_index++)
     {
         module_t *p_parser = list[i_index];
         module_config_t *p_item, *p_end;
@@ -739,14 +747,17 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
              p_item < p_end && !save;
              p_item++ )
         {
-            vlc_mutex_lock (p_item->p_lock);
             save = p_item->b_autosave && p_item->b_dirty;
-            vlc_mutex_unlock (p_item->p_lock);
         }
     }
-    module_list_free (list);
 
-    return save ? VLC_SUCCESS : SaveConfigFile( p_this, NULL, true );
+    if (save)
+        /* Note: this will get the read lock recursively. Ok. */
+        ret = SaveConfigFile (p_this, NULL, true);
+    vlc_rwlock_unlock (&config_lock);
+
+    module_list_free (list);
+    return ret;
 }
 
 int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )

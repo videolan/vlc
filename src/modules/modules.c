@@ -137,6 +137,7 @@ void __module_InitBank( vlc_object_t *p_this )
          * options of main will be available in the module bank structure just
          * as for every other module. */
         AllocateBuiltinModule( p_this, vlc_entry__main );
+        vlc_rwlock_init (&config_lock);
     }
     else
         p_module_bank->i_usage++;
@@ -180,6 +181,7 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
         vlc_mutex_unlock( &module_lock );
         return;
     }
+    vlc_rwlock_destroy (&config_lock);
     p_module_bank = NULL;
     vlc_mutex_unlock( &module_lock );
 

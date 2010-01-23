@@ -54,6 +54,8 @@ static inline int IsConfigFloatType (int type)
 uint_fast32_t ConfigStringToKey( const char * );
 char *ConfigKeyToString( uint_fast32_t );
 
+extern vlc_rwlock_t config_lock;
+
 /* The configuration file */
 #define CONFIG_FILE                     "vlcrc"
 
