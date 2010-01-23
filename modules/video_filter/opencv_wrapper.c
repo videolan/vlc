@@ -254,7 +254,7 @@ static int Create( vlc_object_t *p_this )
     free( psz_output);
 
     psz_verbosity = var_InheritString( p_vout, "opencv-verbosity" );
-    iff( psz_verbosity == NULL )
+    if( psz_verbosity == NULL )
     {
         msg_Err( p_vout, "configuration variable %s empty, using 'input'",
                          "opencv-verbosity" );
