@@ -159,9 +159,97 @@ int MediaPlayer::chapterCount()
     return libvlc_media_player_get_chapter_count( m_player, &ex.ex );
 }
 
+int MediaPlayer::chapterCount( int title )
+{
+    Exception ex;
+    return libvlc_media_player_get_chapter_count_for_title( m_player, title, &ex.ex );
+}
+
+void MediaPlayer::setChapter( int title )
+{
+    Exception ex;
+    libvlc_media_player_set_chapter( m_player, title, &ex.ex );
+}
+
 int MediaPlayer::willPlay()
 {
     Exception ex;
     return libvlc_media_player_will_play( m_player, &ex.ex );
 }
 
+int MediaPlayer::title()
+{
+    Exception ex;
+    return libvlc_media_player_get_title( m_player, &ex.ex );
+}
+
+int MediaPlayer::titleCount()
+{
+    Exception ex;
+    return libvlc_media_player_get_title_count( m_player, &ex.ex );
+}
+
+void MediaPlayer::setTitle( int title )
+{
+    Exception ex;
+    libvlc_media_player_set_title( m_player, title, &ex.ex );
+}
+
+void MediaPlayer::previousChapter()
+{
+    Exception ex;
+    libvlc_media_player_previous_chapter( m_player, &ex.ex );
+}
+
+void MediaPlayer::nextChapter()
+{
+    Exception ex;
+    libvlc_media_player_next_chapter( m_player, &ex.ex );
+}
+
+float MediaPlayer::rate()
+{
+    Exception ex;
+    return libvlc_media_player_get_rate( m_player, &ex.ex );
+}
+
+void MediaPlayer::setRate( float rate )
+{
+    Exception ex;
+    libvlc_media_player_set_rate( m_player, rate, &ex.ex );
+}
+
+libvlc_state_t MediaPlayer::state()
+{
+    Exception ex;
+    return libvlc_media_player_get_state( m_player, &ex.ex );
+}
+
+float MediaPlayer::fps()
+{
+    Exception ex;
+    return libvlc_media_player_get_fps( m_player, &ex.ex );
+}
+
+int MediaPlayer::hasVout()
+{
+    Exception ex;
+    return libvlc_media_player_has_vout( m_player, &ex.ex );
+}
+
+int MediaPlayer::isSeekable()
+{
+    Exception ex;
+    return libvlc_media_player_is_seekable( m_player, &ex.ex );
+}
+int MediaPlayer::canPause()
+{
+    Exception ex;
+    return libvlc_media_player_can_pause( m_player, &ex.ex );
+}
+
+void MediaPlayer::nextFrame()
+{
+    Exception ex;
+    libvlc_media_player_next_frame( m_player, &ex.ex );
+}

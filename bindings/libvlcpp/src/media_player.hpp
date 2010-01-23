@@ -187,10 +187,100 @@ public:
     int chapterCount();
 
     /**
+     * Get the number of chapter in the given title
+     * @param title: the title
+     * @return the number of chapter in title
+     */
+    int chapterCount( int title );
+
+    /**
+     * Set the movie chapter
+     * @param chapter: the chapter to play
+     */
+    void setChapter( int chapter );
+
+    /**
      * Is the player going to play the media (not dead or dying)
      * @return true if the player will play
      */
     int willPlay();
+
+    /**
+     * Get the current title
+     * @return the title
+     */
+    int title();
+
+    /**
+     * Get the title count
+     * @return the number of title
+     */
+    int titleCount();
+
+    /**
+     * Set the title
+     * @param title: the title
+     */
+    void setTitle( int title );
+
+
+    /**
+     * Move to the previous chapter
+     */
+    void previousChapter();
+
+    /**
+     * Move to the next chapter
+     */
+    void nextChapter();
+
+    /**
+     * Get the movie play rate
+     * @return the play rate
+     */
+    float rate();
+
+    /**
+     * Set the movie rate
+     * @param rate: the rate
+     */
+    void setRate( float rate );
+
+    /**
+     * Get the movie state
+     * @return the state
+     */
+    libvlc_state_t state();
+
+    /**
+     * Get the movie fps
+     * @return the movie fps
+     */
+    float fps();
+
+
+    /**
+     * Does the media player have a video output
+     * @return true if the media player has a video output
+     */
+    int hasVout();
+
+    /**
+     * Is the media player able to seek ?
+     * @return true if the media player can seek
+     */
+    int isSeekable();
+
+    /**
+     * Can this media player be paused ?
+     * @return true if the media player can pause
+     */
+    int canPause();
+
+    /**
+     * Display the next frame
+     */
+    void nextFrame();
 
 protected:
     libvlc_media_player_t *m_player;
