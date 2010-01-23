@@ -707,52 +707,6 @@ void __vlc_object_detach( vlc_object_t *p_this )
         vlc_object_release (p_parent);
 }
 
-
-/**
- ****************************************************************************
- * find a list typed objects and increment their refcount
- *****************************************************************************
- * This function recursively looks for a given object type. i_mode can be one
- * of FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
- *****************************************************************************/
-vlc_list_t * vlc_list_find( vlc_object_t *p_this, int i_type, int i_mode )
-{
-    vlc_list_t *p_list;
-    int i_count = 0;
-
-    /* Look for the objects */
-    switch( i_mode )
-    {
-    case FIND_ANYWHERE:
-        return vlc_list_find (VLC_OBJECT(p_this->p_libvlc), i_type, FIND_CHILD);
-
-    case FIND_CHILD:
-        libvlc_lock (p_this->p_libvlc);
-        i_count = CountChildren( p_this, i_type );
-        p_list = NewList( i_count );
-
-        /* Check allocation was successful */
-        if( p_list->i_count != i_count )
-        {
-            libvlc_unlock (p_this->p_libvlc);
-            p_list->i_count = 0;
-            break;
-        }
-
-        p_list->i_count = 0;
-        ListChildren( p_list, p_this, i_type );
-        libvlc_unlock (p_this->p_libvlc);
-        break;
-
-    default:
-        msg_Err( p_this, "unimplemented!" );
-        p_list = NewList( 0 );
-        break;
-    }
-
-    return p_list;
-}
-
 /**
  * Gets the list of children of an objects, and increment their reference
  * count.
