@@ -102,7 +102,6 @@ struct module_t
     module_t   *parent;
     unsigned    submodule_count;
     gc_object_t vlc_gc_data;
-    vlc_mutex_t lock;
 
     /*
      * Variables set by the module to identify itself

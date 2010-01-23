@@ -37,7 +37,6 @@ static void vlc_module_destruct (gc_object_t *obj)
 {
     module_t *module = vlc_priv (obj, module_t);
 
-    vlc_mutex_destroy (&module->lock);
     free (module->psz_object_name);
     free (module);
 }
@@ -56,7 +55,6 @@ module_t *vlc_module_create (vlc_object_t *obj)
     module->parent = NULL;
     module->submodule_count = 0;
     vlc_gc_init (module, vlc_module_destruct);
-    vlc_mutex_init (&module->lock);
 
     module->psz_shortname = NULL;
     module->psz_longname = (char*)default_name;
@@ -135,7 +133,6 @@ static module_config_t *vlc_config_create (module_t *module, int type)
 
     memset (tab + confsize, 0, sizeof (tab[confsize]));
     tab[confsize].i_type = type;
-    tab[confsize].p_lock = &module->lock;
 
     if (type & CONFIG_ITEM)
     {
