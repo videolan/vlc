@@ -49,26 +49,26 @@ public:
      * Get the version of libVLC
      * @return the version
      */
-    const char *getVersion();
+    const char *version();
 
     /**
      * Get the compiler use for this binari
      * @return the compiler used
      */
-    const char *getCompiler();
+    const char *compiler();
 
     /**
      * Get the chanset of libvlc
      * @return thje changeset
      */
-    const char *getChanset();
+    const char *chanset();
 
 private:
     /**
      * Get the instance of libvlc that cannot be modified
      * @return the instance of libvlc
      */
-    libvlc_instance_t *getInstance();
+    libvlc_instance_t *instance();
 
     /** The instance of libvlc */
     libvlc_instance_t *m_instance;

@@ -64,13 +64,13 @@ public:
      * Get the media associated with the player
      * @return the media
      */
-    ///@todo getMedia();
+    ///@todo media();
 
     /**
      * Get the event manager associated to the media player
      * @return the event manager
      */
-    ///@todo getEventManager()
+    ///@todo eventManager()
 
     /**
      * Is the player playing
@@ -104,7 +104,7 @@ public:
      * Get the NSView handler associated with the media player
      * @return the NSView handler
      */
-    void* getNSObject();
+    void* nsobject();
 
     /**
      * Set the agl handler where the media player shoud render the video
@@ -116,7 +116,7 @@ public:
      * Get the agl handler associated with the media player
      * @return the agl handler
      */
-    uint32_t getAgl();
+    uint32_t agl();
 
     /**
      * Set the X Window drawable where the media player shoud render the video
@@ -128,7 +128,7 @@ public:
      * Get the X Window drawable associated with the media player
      * @return the X Window drawable
      */
-    uint32_t getXWindow();
+    uint32_t xwindow();
 
     /**
      * Set the Win32/Win64 API window handle where the media player shoud
@@ -141,20 +141,20 @@ public:
      * Get the  Win32/Win64 API window handle associated with the media player
      * @return the windows handle
      */
-    void *getHwnd();
+    void *hwnd();
 
 
     /**
      * Get the movie lenght (in ms)
      * @return the movie length
      */
-    int64_t getLenght();
+    int64_t lenght();
 
     /**
      * Get the current movie time (in ms)
      * @return the current movie time
      */
-    int64_t getTime();
+    int64_t time();
 
     /**
       * Set the movie time (in ms)
@@ -166,7 +166,7 @@ public:
       * Get the movie position (in percent)
       * @return the movie position
       */
-    float getPosition();
+    float position();
 
     /**
       * Set the movie position (in percent)
@@ -178,13 +178,13 @@ public:
      * Get the current movie chapter
      * @return the current chapter
      */
-    int getChapter();
+    int chapter();
 
     /**
      * Get the movie chapter count
      * @return the movie chapter count
      */
-    int getChapterCount();
+    int chapterCount();
 
     /**
      * Is the player going to play the media (not dead or dying)

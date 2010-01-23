@@ -73,7 +73,7 @@ public:
      * Get the duration of the media
      * @return the duration
      */
-    int64_t getDuration();
+    int64_t duration();
 
     /**
      * Get preparsed status of the media
@@ -85,14 +85,14 @@ public:
      * Get the MRL of the media
      * @return the MRL of the media
      */
-    char *getMrl();
+    char *mrl();
 
     /**
      * Get the requiered meta
      * @param e_meta: type of the meta
      * @return the requiered meta
      */
-    char *getMeta( libvlc_meta_t e_meta );
+    char *meta( libvlc_meta_t e_meta );
 
     /**
      * Set the given meta
@@ -111,16 +111,16 @@ public:
      * Get the state of the media
      * @return the state of the media
      */
-    libvlc_state_t getState();
+    libvlc_state_t state();
 
     /**
      * Get some statistics about this media
      * @return the statistics
      */
-    libvlc_media_stats_t *getStats();
+    libvlc_media_stats_t *stats();
 
-    /**\todo: getSubItems */
-    /**\todo: getEventManager */
+    /**\todo: subItems */
+    /**\todo: eventManager */
 
     /**
      * Set media descriptor's user data
@@ -132,14 +132,14 @@ public:
      * Retrive user data specified by a call to setUserData
      * @return the user data pointer
      */
-    void *getUserData();
+    void *userData();
 
 private:
     /**
      * Get the instance of the libvlc_media_t
      * @return the pointer to libvlc_media_t
      */
-    libvlc_media_t *getInstance();
+    libvlc_media_t *instance();
 
     /** The media */
     libvlc_media_t *m_media;

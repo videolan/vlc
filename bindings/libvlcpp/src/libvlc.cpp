@@ -37,22 +37,22 @@ libVLC::~libVLC()
     libvlc_release( m_instance );
 }
 
-libvlc_instance_t *libVLC::getInstance()
+libvlc_instance_t *libVLC::instance()
 {
     return m_instance;
 }
 
-const char *libVLC::getVersion()
+const char *libVLC::version()
 {
     return libvlc_get_version();
 }
 
-const char *libVLC::getCompiler()
+const char *libVLC::compiler()
 {
     return libvlc_get_compiler();
 }
 
-const char *libVLC::getChanset()
+const char *libVLC::chanset()
 {
     return libvlc_get_changeset();
 }
