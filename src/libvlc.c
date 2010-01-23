@@ -429,7 +429,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 # if defined (WIN32) || defined (__APPLE__)
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )
         config_LoadConfigFile( p_libvlc, "main" );
-    config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
     priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
 
     /* Check if the user specified a custom language */
@@ -509,7 +508,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         if( var_InheritBool( p_libvlc, "reset-config" ) )
         {
             config_ResetAll( p_libvlc );
-            config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
             config_SaveConfigFile( p_libvlc, NULL );
         }
     }
