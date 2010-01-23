@@ -83,10 +83,6 @@ static void           PrintObject   ( vlc_object_t *, const char * );
 static void           DumpStructure ( vlc_object_t *, int, char * );
 
 static vlc_list_t   * NewList       ( int );
-static void           ListReplace   ( vlc_list_t *, vlc_object_t *, int );
-/*static void           ListAppend    ( vlc_list_t *, vlc_object_t * );*/
-static int            CountChildren ( vlc_object_t *, int );
-static void           ListChildren  ( vlc_list_t *, vlc_object_t *, int );
 
 static void vlc_object_destroy( vlc_object_t *p_this );
 static void vlc_object_detach_unlocked (vlc_object_t *p_this);
@@ -1049,77 +1045,4 @@ static vlc_list_t * NewList( int i_count )
     }
 
     return p_list;
-}
-
-static void ListReplace( vlc_list_t *p_list, vlc_object_t *p_object,
-                         int i_index )
-{
-    if( p_list == NULL || i_index >= p_list->i_count )
-    {
-        return;
-    }
-
-    vlc_object_hold( p_object );
-
-    p_list->p_values[i_index].p_object = p_object;
-
-    return;
-}
-
-/*static void ListAppend( vlc_list_t *p_list, vlc_object_t *p_object )
-{
-    if( p_list == NULL )
-    {
-        return;
-    }
-
-    p_list->p_values = realloc_or_free( p_list->p_values,
-                              (p_list->i_count + 1) * sizeof( vlc_value_t ) );
-    if( p_list->p_values == NULL )
-    {
-        p_list->i_count = 0;
-        return;
-    }
-
-    vlc_object_hold( p_object );
-
-    p_list->p_values[p_list->i_count].p_object = p_object;
-    p_list->i_count++;
-
-    return;
-}*/
-
-static int CountChildren( vlc_object_t *p_this, int i_type )
-{
-    vlc_object_t *p_tmp;
-    int i, i_count = 0;
-
-    for( i = 0; i < vlc_internals( p_this )->i_children; i++ )
-    {
-        p_tmp = vlc_internals( p_this )->pp_children[i];
-
-        if( vlc_internals( p_tmp )->i_object_type == i_type )
-        {
-            i_count++;
-        }
-        i_count += CountChildren( p_tmp, i_type );
-    }
-
-    return i_count;
-}
-
-static void ListChildren( vlc_list_t *p_list, vlc_object_t *p_this, int i_type )
-{
-    vlc_object_t *p_tmp;
-    int i;
-
-    for( i = 0; i < vlc_internals( p_this )->i_children; i++ )
-    {
-        p_tmp = vlc_internals( p_this )->pp_children[i];
-
-        if( vlc_internals( p_tmp )->i_object_type == i_type )
-            ListReplace( p_list, p_tmp, p_list->i_count++ );
-
-        ListChildren( p_list, p_tmp, i_type );
-    }
 }
