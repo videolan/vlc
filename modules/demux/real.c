@@ -1490,7 +1490,6 @@ static int CodecAudioParse( demux_t *p_demux, int i_tk_id, const uint8_t *p_data
 
     case VLC_FOURCC( 's','i','p','r' ):
         fmt.i_codec = VLC_CODEC_SIPR;
-        fmt.i_profile = i_flavor;
         if( i_flavor > 3 )
             return VLC_EGENERIC;
 
