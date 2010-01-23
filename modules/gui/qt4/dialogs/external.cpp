@@ -81,7 +81,7 @@ int DialogHandler::error (vlc_object_t *obj, const char *,
     const dialog_fatal_t *dialog = (const dialog_fatal_t *)value.p_address;
     DialogHandler *self = static_cast<DialogHandler *>(data);
 
-    if (config_GetInt (obj, "qt-error-dialogs"))
+    if (var_InheritBool (obj, "qt-error-dialogs"))
         emit self->error (qfu(dialog->title), qfu(dialog->message));
     return VLC_SUCCESS;
 }

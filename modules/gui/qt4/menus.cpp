@@ -325,7 +325,7 @@ QMenu *QVLCMenu::FileMenu( intf_thread_t *p_intf, QWidget *parent )
     addDPStaticEntry( menu, qtr( "Open &Location from clipboard" ),
                       NULL, SLOT( openUrlDialog() ), "Ctrl+V" );
 
-    if( config_GetInt( p_intf, "qt-recentplay" ) )
+    if( var_InheritBool( p_intf, "qt-recentplay" ) )
     {
         recentsMenu = new QMenu( qtr( "&Recent Media" ), menu );
         updateRecents( p_intf );

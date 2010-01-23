@@ -87,15 +87,15 @@ SoundWidget::SoundWidget( QWidget *_parent, intf_thread_t * _p_intf,
     {
         volumeSlider = new SoundSlider( this,
             config_GetInt( p_intf, "volume-step" ),
-            config_GetInt( p_intf, "qt-volume-complete" ),
-            config_GetPsz( p_intf, "qt-slider-colours" ) );
+            var_InheritInteger( p_intf, "qt-volume-complete" ),
+            var_InheritString( p_intf, "qt-slider-colours" ) );
     }
     else
     {
         volumeSlider = new QSlider( NULL );
         volumeSlider->setOrientation( b_special ? Qt::Vertical
                                                 : Qt::Horizontal );
-        volumeSlider->setMaximum( config_GetInt( p_intf, "qt-volume-complete" )
+        volumeSlider->setMaximum( var_InheritBool( p_intf, "qt-volume-complete" )
                                   ? 400 : 200 );
     }
     if( volumeSlider->orientation() ==  Qt::Horizontal )

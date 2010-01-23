@@ -688,7 +688,7 @@ FullscreenControllerWidget::FullscreenControllerWidget( intf_thread_t *_p_i, QWi
     /* First Move */
     QRect rect1 = getSettings()->value( "FullScreen/screen" ).toRect();
     QPoint pos1 = getSettings()->value( "FullScreen/pos" ).toPoint();
-    int number =  config_GetInt( p_intf, "qt-fullscreen-screennumber" );
+    int number =  var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
     if( number == -1 || number > QApplication::desktop()->numScreens() )
         number = QApplication::desktop()->screenNumber( p_intf->p_sys->p_mi );
 
@@ -746,7 +746,7 @@ void FullscreenControllerWidget::showFSC()
     }
 
 #if HAVE_TRANSPARENCY
-    setWindowOpacity( config_GetFloat( p_intf, "qt-fs-opacity" )  );
+    setWindowOpacity( var_InheritFloat( p_intf, "qt-fs-opacity" )  );
 #endif
 
     show();

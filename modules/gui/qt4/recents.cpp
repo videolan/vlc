@@ -49,7 +49,7 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
             playMRL( const QString & ) );
 
     /* Load the filter psz */
-    char* psz_tmp = config_GetPsz( p_intf, "qt-recentplay-filter" );
+    char* psz_tmp = var_InheritString( p_intf, "qt-recentplay-filter" );
     if( psz_tmp && *psz_tmp )
         filter = new QRegExp( psz_tmp, Qt::CaseInsensitive );
     else
@@ -57,7 +57,7 @@ RecentsMRL::RecentsMRL( intf_thread_t *_p_intf ) : p_intf( _p_intf )
     free( psz_tmp );
 
     load();
-    isActive = config_GetInt( p_intf, "qt-recentplay" );
+    isActive = var_InheritBool( p_intf, "qt-recentplay" );
     if( !isActive ) clear();
 }
 

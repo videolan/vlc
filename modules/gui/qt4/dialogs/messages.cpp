@@ -114,7 +114,7 @@ MessagesDialog::MessagesDialog( intf_thread_t *_p_intf)
 
     verbosityBox = new QSpinBox();
     verbosityBox->setRange( 0, 2 );
-    verbosityBox->setValue( config_GetInt( p_intf, "verbose" ) );
+    verbosityBox->setValue( var_InheritInteger( p_intf, "verbose" ) );
     verbosityBox->setWrapping( true );
     verbosityBox->setMaximumWidth( 50 );
 

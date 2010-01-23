@@ -394,10 +394,10 @@ static void *Thread( void *obj )
 
 #ifdef UPDATE_CHECK
     /* Checking for VLC updates */
-    if( config_GetInt( p_intf, "qt-updates-notif" ) &&
-        !config_GetInt( p_intf, "qt-privacy-ask" ) )
+    if( var_InheritBool( p_intf, "qt-updates-notif" ) &&
+        !var_InheritBool( p_intf, "qt-privacy-ask" ) )
     {
-        int interval = config_GetInt( p_intf, "qt-updates-days" );
+        int interval = var_InheritInteger( p_intf, "qt-updates-days" );
         if( QDate::currentDate() >
              getSettings()->value( "updatedate" ).toDate().addDays( interval ) )
         {

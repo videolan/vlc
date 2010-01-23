@@ -111,19 +111,19 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     setAcceptDrops( true );
     setWindowRole( "vlc-main" );
     setWindowIcon( QApplication::windowIcon() );
-    setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
+    setWindowOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );
 
     /* Set The Video In emebedded Mode or not */
-    videoEmbeddedFlag = config_GetInt( p_intf, "embedded-video" );
+    videoEmbeddedFlag = var_InheritBool( p_intf, "embedded-video" );
 
     /* Does the interface resize to video size or the opposite */
-    b_keep_size = !config_GetInt( p_intf, "qt-video-autoresize" );
+    b_keep_size = !var_InheritBool( p_intf, "qt-video-autoresize" );
 
     /* Are we in the enhanced always-video mode or not ? */
-    i_visualmode = config_GetInt( p_intf, "qt-display-mode" );
+    i_visualmode = var_InheritInteger( p_intf, "qt-display-mode" );
 
     /* Do we want anoying popups or not */
-    notificationEnabled = (bool)config_GetInt( p_intf, "qt-notification" );
+    notificationEnabled = (bool)var_InheritBool( p_intf, "qt-notification" );
 
     /* Set the other interface settings */
     settings = getSettings();
@@ -190,7 +190,7 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     }
 #endif
     /* and title of the Main Interface*/
-    if( config_GetInt( p_intf, "qt-name-in-title" ) )
+    if( var_InheritBool( p_intf, "qt-name-in-title" ) )
     {
         CONNECT( THEMIM->getIM(), nameChanged( const QString& ),
                  this, setVLCWindowsTitle( const QString& ) );
@@ -443,7 +443,7 @@ void MainInterface::createMainWidget( QSettings *settings )
     if ( depth() > 8 )
 #endif
     /* Create the FULLSCREEN CONTROLS Widget */
-    if( config_GetInt( p_intf, "qt-fs-controller" ) )
+    if( var_InheritBool( p_intf, "qt-fs-controller" ) )
     {
         fullscreenControls = new FullscreenControllerWidget( p_intf, this );
         CONNECT( fullscreenControls, keyPressed( QKeyEvent * ),
@@ -455,9 +455,9 @@ inline void MainInterface::initSystray()
 {
 #ifndef HAVE_MAEMO
     bool b_systrayAvailable = QSystemTrayIcon::isSystemTrayAvailable();
-    bool b_systrayWanted = config_GetInt( p_intf, "qt-system-tray" );
+    bool b_systrayWanted = var_InheritBool( p_intf, "qt-system-tray" );
 
-    if( config_GetInt( p_intf, "qt-start-minimized") > 0 )
+    if( var_InheritBool( p_intf, "qt-start-minimized") )
     {
         if( b_systrayAvailable )
         {

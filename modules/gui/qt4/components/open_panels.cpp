@@ -76,7 +76,7 @@ FileOpenPanel::FileOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     QCompleter *fileCompleter = new QCompleter( fileCompleteList, this );
     fileCompleter->setModel( new QDirModel( fileCompleter ) );
     lineFileEdit->setCompleter( fileCompleter );*/
-    if( config_GetInt( p_intf, "qt-embedded-open" ) )
+    if( var_InheritBool( p_intf, "qt-embedded-open" ) )
     {
         ui.tempWidget->hide();
         BuildOldPanel();
@@ -274,9 +274,9 @@ DiscOpenPanel::DiscOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     ui.setupUi( this );
 
     /* Get the default configuration path for the devices */
-    psz_dvddiscpath = config_GetPsz( p_intf, "dvd" );
-    psz_vcddiscpath = config_GetPsz( p_intf, "vcd" );
-    psz_cddadiscpath = config_GetPsz( p_intf, "cd-audio" );
+    psz_dvddiscpath = var_InheritString( p_intf, "dvd" );
+    psz_vcddiscpath = var_InheritString( p_intf, "vcd" );
+    psz_cddadiscpath = var_InheritString( p_intf, "cd-audio" );
 
     /* State to avoid overwritting the users changes with the configuration */
     b_firstdvd = true;
@@ -494,7 +494,7 @@ NetOpenPanel::NetOpenPanel( QWidget *_parent, intf_thread_t *_p_intf ) :
     /* CONNECTs */
     CONNECT( ui.urlText, textChanged( const QString& ), this, updateMRL());
 
-    if( config_GetInt( p_intf, "qt-recentplay" ) )
+    if( var_InheritBool( p_intf, "qt-recentplay" ) )
     {
         mrlList = new QStringListModel(
                 getSettings()->value( "Open/netMRL" ).toStringList() );

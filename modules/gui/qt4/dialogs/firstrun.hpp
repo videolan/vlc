@@ -35,7 +35,7 @@ class FirstRun : public QWidget
         {
             if( getSettings()->value( "IsFirstRun", 1 ).toInt() )
             {
-                if( config_GetInt( p_intf, "qt-privacy-ask") )
+                if( var_InheritBool( p_intf, "qt-privacy-ask") )
                 {
                     new FirstRun( _p, p_intf );
                 }

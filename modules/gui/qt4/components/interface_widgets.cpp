@@ -202,7 +202,7 @@ void VideoWidget::SetFullScreen( bool b_fs )
 
     if( b_fs )
     {   /* Go full-screen */
-        int numscreen =  config_GetInt( p_intf, "qt-fullscreen-screennumber" );
+        int numscreen = var_InheritInteger( p_intf, "qt-fullscreen-screennumber" );
         /* if user hasn't defined screennumber, or screennumber that is bigger
          * than current number of screens, take screennumber where current interface
          * is

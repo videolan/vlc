@@ -40,7 +40,7 @@ PlaylistDialog::PlaylistDialog( intf_thread_t *_p_intf )
     setCentralWidget( main );
     setWindowTitle( qtr( "Playlist" ) );
     setWindowRole( "vlc-playlist" );
-    setWindowOpacity( config_GetFloat( p_intf, "qt-opacity" ) );
+    setWindowOpacity( var_InheritFloat( p_intf, "qt-opacity" ) );
 
     QHBoxLayout *l = new QHBoxLayout( centralWidget() );
 

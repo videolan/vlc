@@ -834,7 +834,7 @@ void InputManager::setRate( int new_rate )
 
 void InputManager::jumpFwd()
 {
-    int i_interval = config_GetInt( p_input, "short-jump-size" );
+    int i_interval = var_InheritInteger( p_input, "short-jump-size" );
     if( i_interval > 0 )
     {
         mtime_t val = (mtime_t)(i_interval) * 1000000L;
@@ -844,7 +844,7 @@ void InputManager::jumpFwd()
 
 void InputManager::jumpBwd()
 {
-    int i_interval = config_GetInt( p_input, "short-jump-size" );
+    int i_interval = var_InheritInteger( p_input, "short-jump-size" );
     if( i_interval > 0 )
     {
         mtime_t val = -1 *(mtime_t)(i_interval) * 1000000L;

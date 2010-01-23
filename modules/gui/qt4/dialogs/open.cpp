@@ -167,7 +167,7 @@ OpenDialog::OpenDialog( QWidget *parent,
     BUTTONACT( cancelButton, cancel() );
 
     /* Hide the advancedPanel */
-    if( !config_GetInt( p_intf, "qt-adv-options" ) )
+    if( !var_InheritBool( p_intf, "qt-adv-options" ) )
         ui.advancedFrame->hide();
     else
         ui.advancedCheckBox->setChecked( true );
@@ -406,11 +406,8 @@ void OpenDialog::updateMRL() {
     if( ui.slaveCheckbox->isChecked() ) {
         mrl += " :input-slave=" + ui.slaveText->text();
     }
-    int i_cache = config_GetInt( p_intf, qtu( storedMethod ) );
-    if( i_cache != ui.cacheSpinBox->value() ) {
-        mrl += QString( " :%1=%2" ).arg( storedMethod ).
-                                  arg( ui.cacheSpinBox->value() );
-    }
+    mrl += QString( " :%1=%2" ).arg( storedMethod ).
+                                arg( ui.cacheSpinBox->value() );
     if( ui.startTimeDoubleSpinBox->value() ) {
         mrl += " :start-time=" + QString::number( ui.startTimeDoubleSpinBox->value() );
     }
@@ -422,7 +419,7 @@ void OpenDialog::newCachingMethod( const QString& method )
 {
     if( method != storedMethod ) {
         storedMethod = method;
-        int i_value = config_GetInt( p_intf, qtu( storedMethod ) );
+        int i_value = var_InheritInteger( p_intf, qtu( storedMethod ) );
         ui.cacheSpinBox->setValue( i_value );
     }
 }
