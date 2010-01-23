@@ -853,14 +853,8 @@ static const char *const ppsz_clock_descriptions[] =
 #endif
 
 #define CDAUDIO_DEV_TEXT N_("Audio CD device")
-#ifdef HAVE_CDDAX
-#define CDAUDIO_DEV_LONGTEXT N_( \
-    "This is the default Audio CD device to use. " \
-    "If you don't specify anything, we'll scan for a suitable CD-ROM device." )
-#else
 #define CDAUDIO_DEV_LONGTEXT N_( \
     "This is the default Audio CD device to use." )
-#endif
 
 #define IPV6_TEXT N_("Force IPv6")
 #define IPV6_LONGTEXT N_( \

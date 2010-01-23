@@ -67,12 +67,6 @@
 #   include <dirent.h>
 #endif
 
-#ifdef HAVE_CDDAX
-#define CDDA_MRL "cddax://"
-#else
-#define CDDA_MRL "cdda://"
-#endif
-
 #ifdef HAVE_VCDX
 #define VCD_MRL "vcdx://"
 #else
@@ -2425,9 +2419,9 @@ static void Eject( intf_thread_t *p_intf )
                 break;
             }
         }
-        else if( !strncmp(psz_name, CDDA_MRL, strlen(CDDA_MRL) ) )
+        else if( !strncmp(psz_name, "cdda://", 7 ) )
         {
-            switch( psz_name[strlen(CDDA_MRL)] )
+            switch( psz_name[7] )
             {
             case '\0':
             case '@':
@@ -2435,7 +2429,7 @@ static void Eject( intf_thread_t *p_intf )
                 break;
             default:
                 /* Omit the beginning MRL-selector characters */
-                psz_device = strdup( psz_name + strlen(CDDA_MRL) );
+                psz_device = strdup( psz_name + 7 );
                 break;
             }
         }
