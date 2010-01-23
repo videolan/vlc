@@ -2397,9 +2397,9 @@ static void Eject( intf_thread_t *p_intf )
 
     if( psz_name )
     {
-        if( !strncmp(psz_name, "dvd://", 4) )
+        if( !strncmp(psz_name, "dvd://", 6) )
         {
-            switch( psz_name[strlen("dvd://")] )
+            switch( psz_name[6] )
             {
             case '\0':
             case '@':
