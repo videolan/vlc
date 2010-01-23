@@ -58,6 +58,8 @@ static void Close( vlc_object_t *p_this );
     "\"sami\", \"dvdsubtitle\", \"mpl2\", \"aqt\", \"pjs\", "\
     "\"mpsub\", \"jacosub\", \"psb\", \"realtext\", \"dks\", \"subviewer1\", " \
     " and \"auto\" (meaning autodetection, this should always work).")
+#define SUB_DESCRIPTION_LONGTEXT \
+    N_("Override the default track description.")
 
 static const char *const ppsz_sub_type[] =
 {
@@ -82,6 +84,8 @@ vlc_module_begin ()
     add_string( "sub-type", "auto", NULL, N_("Subtitles format"),
                 SUB_TYPE_LONGTEXT, true )
         change_string_list( ppsz_sub_type, NULL, NULL )
+    add_string( "sub-description", NULL, NULL, N_("Subtitles description"),
+                SUB_DESCRIPTION_LONGTEXT, true )
     set_callbacks( Open, Close )
 
     add_shortcut( "subtitle" )
@@ -520,12 +524,18 @@ static int Open ( vlc_object_t *p_this )
     {
         es_format_Init( &fmt, SPU_ES, VLC_CODEC_SUBT );
     }
+    char *psz_description = var_InheritString( p_demux, "sub-description" );
+    if( psz_description && *psz_description )
+        fmt.psz_description = psz_description;
+    else
+        free( psz_description );
     if( p_sys->psz_header != NULL )
     {
         fmt.i_extra = strlen( p_sys->psz_header ) + 1;
         fmt.p_extra = strdup( p_sys->psz_header );
     }
     p_sys->es = es_out_Add( p_demux->out, &fmt );
+    es_format_Clean( &fmt );
 
     return VLC_SUCCESS;
 }
