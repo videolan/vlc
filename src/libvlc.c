@@ -427,9 +427,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #if defined( ENABLE_NLS ) \
      && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
 # if defined (WIN32) || defined (__APPLE__)
-    /* This ain't really nice to have to reload the config here but it seems
-     * the only way to do it. */
-
     if( !var_InheritBool( p_libvlc, "ignore-config" ) )
         config_LoadConfigFile( p_libvlc, "main" );
     config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
@@ -444,13 +441,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 
         /* Translate "C" to the language code: "fr", "en_GB", "nl", "ru"... */
         msg_Dbg( p_libvlc, "translation test: code is \"%s\"", _("C") );
-
-        module_EndBank( p_libvlc, false );
-        module_InitBank( p_libvlc );
-        if( !var_InheritBool( p_libvlc, "ignore-config" ) )
-            config_LoadConfigFile( p_libvlc, "main" );
-        config_LoadCmdLine( p_libvlc, &i_argc, ppsz_argv, true );
-        priv->i_verbose = var_InheritInteger( p_libvlc, "verbose" );
     }
     free( psz_language );
 # endif
