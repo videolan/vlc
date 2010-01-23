@@ -37,10 +37,7 @@
  */
 char *__config_GetDataDir( vlc_object_t *p_obj )
 {
-    char *psz_path = config_GetPsz( p_obj, "data-path" );
-    if( psz_path && *psz_path )
-        return psz_path;
-    free( psz_path );
-    return config_GetDataDirDefault();
+    char *psz_path = var_InheritString( p_obj, "data-path" );
+    return psz_path ? psz_path : config_GetDataDirDefault();
 }
 
