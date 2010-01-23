@@ -124,7 +124,7 @@ static int Open(vlc_object_t *object)
     if (!sys)
         return VLC_ENOMEM;
 
-    char *chroma_fmt = config_GetPsz(vd, "vout-snapshot-chroma");
+    char *chroma_fmt = var_InheritString(vd, "vout-snapshot-chroma");
     const vlc_fourcc_t chroma = vlc_fourcc_GetCodecFromString(VIDEO_ES, chroma_fmt);
     free(chroma_fmt);
 
@@ -134,8 +134,8 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
-    const int width  = config_GetInt(vd, "vout-snapshot-width");
-    const int height = config_GetInt(vd, "vout-snapshot-height");
+    const int width  = var_InheritInteger(vd, "vout-snapshot-width");
+    const int height = var_InheritInteger(vd, "vout-snapshot-height");
     if (width <= 0 || height <= 0) {
         msg_Err(vd, "snapshot-width/height are invalid");
         free(sys);
@@ -172,7 +172,7 @@ static int Open(vlc_object_t *object)
     }
 
     sys->index = 0;
-    sys->count = config_GetInt(vd, "vout-snapshot-cache-size");
+    sys->count = var_InheritInteger(vd, "vout-snapshot-cache-size");
 
     /* FIXME following code leaks in case of error */
 

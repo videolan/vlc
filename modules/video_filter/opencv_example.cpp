@@ -111,7 +111,7 @@ static int OpenFilter( vlc_object_t *p_this )
         msg_Err( p_filter, "Could not set %s", VIDEO_FILTER_EVENT_VARIABLE);
 
     //OpenCV init specific to this example
-    char* filename = config_GetPsz( p_filter, "opencv-haarcascade-file" );
+    char* filename = var_InheritString( p_filter, "opencv-haarcascade-file" );
     p_filter->p_sys->p_cascade = (CvHaarClassifierCascade*)cvLoad( filename, 0, 0, 0 );
     p_filter->p_sys->p_storage = cvCreateMemStorage(0);
     free( filename );

@@ -200,8 +200,8 @@ static int Open( vlc_object_t *p_this )
     if( p_sys == NULL )
         return VLC_EGENERIC;
 
-    p_sys->i_height = config_GetInt( p_filter , "effect-height");
-    p_sys->i_width  = config_GetInt( p_filter , "effect-width");
+    p_sys->i_height = var_InheritInteger( p_filter , "effect-height");
+    p_sys->i_width  = var_InheritInteger( p_filter , "effect-width");
 
     if( p_sys->i_height < 400 ) p_sys->i_height = 400;
     if( p_sys->i_width  < 532 ) p_sys->i_width  = 532;

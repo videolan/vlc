@@ -207,7 +207,8 @@ static int Create( vlc_object_t *p_this )
     p_vout->pf_control = Control;
 
     /* Retrieve and apply config */
-    if( !(psz_chroma = config_GetPsz( p_vout, "opencv-chroma" )) )
+    psz_chroma = var_InheritString( p_vout, "opencv-chroma" );
+    if( psz_chroma == NULL )
     {
         msg_Err( p_vout, "configuration variable %s empty, using 'grey'",
                          "opencv-chroma" );
@@ -229,7 +230,8 @@ static int Create( vlc_object_t *p_this )
     }
     free( psz_chroma);
 
-    if( !(psz_output = config_GetPsz( p_vout, "opencv-output" )) )
+    psz_output = var_InheritString( p_vout, "opencv-output" );
+    if( psz_output == NULL )
     {
         msg_Err( p_vout, "configuration variable %s empty, using 'input'",
                          "opencv-output" );
@@ -251,7 +253,8 @@ static int Create( vlc_object_t *p_this )
     }
     free( psz_output);
 
-    if( !(psz_verbosity = config_GetPsz( p_vout, "opencv-verbosity" )) )
+    psz_verbosity = var_InheritString( p_vout, "opencv-verbosity" );
+    iff( psz_verbosity == NULL )
     {
         msg_Err( p_vout, "configuration variable %s empty, using 'input'",
                          "opencv-verbosity" );
@@ -273,10 +276,10 @@ static int Create( vlc_object_t *p_this )
     }
     free( psz_verbosity);
 
-    p_vout->p_sys->psz_inner_name = config_GetPsz( p_vout, "opencv-filter-name" );
-
+    p_vout->p_sys->psz_inner_name =
+        var_InheritString( p_vout, "opencv-filter-name" );
     p_vout->p_sys->f_scale =
-        config_GetFloat( p_vout, "opencv-scale" );
+        var_InheritFloat( p_vout, "opencv-scale" );
 
     if (p_vout->p_sys->i_verbosity > VERB_WARN)
         msg_Info(p_vout, "Configuration: opencv-scale: %f, opencv-chroma: %d, "

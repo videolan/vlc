@@ -221,24 +221,27 @@ static int Init( vout_thread_t *p_vout )
     p_vout->fmt_out = p_vout->fmt_in;
 
     /* Shall we use autocrop ? */
-    p_vout->p_sys->b_autocrop = config_GetInt( p_vout, "autocrop" );
+    p_vout->p_sys->b_autocrop = var_InheritBool( p_vout, "autocrop" );
 #ifdef BEST_AUTOCROP
-    p_vout->p_sys->i_ratio_max = config_GetInt( p_vout, "autocrop-ratio-max" );
+    p_vout->p_sys->i_ratio_max =
+        var_InheritInteger( p_vout, "autocrop-ratio-max" );
     p_vout->p_sys->i_threshold =
-                    config_GetInt( p_vout, "autocrop-luminance-threshold" );
+        var_InheritInteger( p_vout, "autocrop-luminance-threshold" );
     p_vout->p_sys->i_skipPercent =
-                    config_GetInt( p_vout, "autocrop-skip-percent" );
+        var_InheritInteger( p_vout, "autocrop-skip-percent" );
     p_vout->p_sys->i_nonBlackPixel =
-                    config_GetInt( p_vout, "autocrop-non-black-pixels" );
-    p_vout->p_sys->i_diff = config_GetInt( p_vout, "autocrop-diff" );
-    p_vout->p_sys->i_time = config_GetInt( p_vout, "autocrop-time" );
+        var_InheritInteger( p_vout, "autocrop-non-black-pixels" );
+    p_vout->p_sys->i_diff =
+        var_InheritInteger( p_vout, "autocrop-diff" );
+    p_vout->p_sys->i_time =
+        var_InheritInteger( p_vout, "autocrop-time" );
     var_SetString( p_vout, "ratio-crop", "0" );
 
     if (p_vout->p_sys->b_autocrop)
         p_vout->p_sys->i_ratio = 0;
     else
     {
-        p_vout->p_sys->i_ratio = config_GetInt( p_vout, "crop-ratio" );
+        p_vout->p_sys->i_ratio = var_InheritInteger( p_vout, "crop-ratio" );
         // ratio < width / height => ratio = 0 (unchange ratio)
         if (p_vout->p_sys->i_ratio < (p_vout->output.i_width * 1000) / p_vout->output.i_height)
             p_vout->p_sys->i_ratio = 0;
@@ -247,7 +250,7 @@ static int Init( vout_thread_t *p_vout )
 
 
     /* Get geometry value from the user */
-    psz_var = config_GetPsz( p_vout, "crop-geometry" );
+    psz_var = var_InheritString( p_vout, "crop-geometry" );
     if( psz_var )
     {
         char *psz_parser, *psz_tmp;

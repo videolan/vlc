@@ -377,7 +377,7 @@ static int OpenDisplay( vout_thread_t *p_vout )
     }
 
     /* Open display */
-    psz_display = config_GetPsz( p_vout, "ggi-display" );
+    psz_display = var_InheritString( p_vout, "ggi-display" );
 
     p_vout->p_sys->p_display = ggiOpen( psz_display, NULL );
     free( psz_display );
@@ -391,8 +391,8 @@ static int OpenDisplay( vout_thread_t *p_vout )
 
     /* Find most appropriate mode */
     p_vout->p_sys->mode.frames =    2;                          /* 2 buffers */
-    p_vout->p_sys->mode.visible.x = config_GetInt( p_vout, "width" );
-    p_vout->p_sys->mode.visible.y = config_GetInt( p_vout, "height" );
+    p_vout->p_sys->mode.visible.x = var_InheritInteger( p_vout, "width" );
+    p_vout->p_sys->mode.visible.y = var_InheritInteger( p_vout, "height" );
     p_vout->p_sys->mode.virt.x =    GGI_AUTO;
     p_vout->p_sys->mode.virt.y =    GGI_AUTO;
     p_vout->p_sys->mode.size.x =    GGI_AUTO;

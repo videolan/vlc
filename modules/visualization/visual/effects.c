@@ -129,8 +129,8 @@ int spectrum_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     }
     p_buffs = p_s16_buff = p_data->p_prev_s16_buff;
 
-    i_80_bands = config_GetInt ( p_aout, "visual-80-bands" );
-    i_peak     = config_GetInt ( p_aout, "visual-peaks" );
+    i_80_bands = var_InheritInteger( p_aout, "visual-80-bands" );
+    i_peak     = var_InheritInteger( p_aout, "visual-peaks" );
 
     if( i_80_bands != 0)
     {
@@ -428,18 +428,18 @@ int spectrometer_Run(visual_effect_t * p_effect, vlc_object_t *p_aout,
     }
     p_buffs = p_s16_buff = p_data->p_prev_s16_buff;
 
-    i_original     = config_GetInt ( p_aout, "spect-show-original" );
-    i_80_bands     = config_GetInt ( p_aout, "spect-80-bands" );
-    i_separ        = config_GetInt ( p_aout, "spect-separ" );
-    i_amp          = config_GetInt ( p_aout, "spect-amp" );
-    i_peak         = config_GetInt ( p_aout, "spect-show-peaks" );
-    i_show_base    = config_GetInt ( p_aout, "spect-show-base" );
-    i_show_bands   = config_GetInt ( p_aout, "spect-show-bands" );
-    i_rad          = config_GetInt ( p_aout, "spect-radius" );
-    i_sections     = config_GetInt ( p_aout, "spect-sections" );
-    i_extra_width  = config_GetInt ( p_aout, "spect-peak-width" );
-    i_peak_height  = config_GetInt ( p_aout, "spect-peak-height" );
-    color1         = config_GetInt ( p_aout, "spect-color" );
+    i_original     = var_InheritInteger( p_aout, "spect-show-original" );
+    i_80_bands     = var_InheritInteger( p_aout, "spect-80-bands" );
+    i_separ        = var_InheritInteger( p_aout, "spect-separ" );
+    i_amp          = var_InheritInteger( p_aout, "spect-amp" );
+    i_peak         = var_InheritInteger( p_aout, "spect-show-peaks" );
+    i_show_base    = var_InheritInteger( p_aout, "spect-show-base" );
+    i_show_bands   = var_InheritInteger( p_aout, "spect-show-bands" );
+    i_rad          = var_InheritInteger( p_aout, "spect-radius" );
+    i_sections     = var_InheritInteger( p_aout, "spect-sections" );
+    i_extra_width  = var_InheritInteger( p_aout, "spect-peak-width" );
+    i_peak_height  = var_InheritInteger( p_aout, "spect-peak-height" );
+    color1         = var_InheritInteger( p_aout, "spect-color" );
 
     if( i_80_bands != 0)
     {
