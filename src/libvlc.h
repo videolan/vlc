@@ -155,7 +155,9 @@ module_t *module_find_by_shortcut (const char *psz_shortcut);
 /**
  * Private LibVLC data for each object.
  */
-typedef struct vlc_object_internals_t
+typedef struct vlc_object_internals vlc_object_internals_t;
+
+struct vlc_object_internals
 {
     int             i_object_type; /* Object type, deprecated */
     char           *psz_name; /* given name */
@@ -178,9 +180,10 @@ typedef struct vlc_object_internals_t
     vlc_destructor_t pf_destructor;
 
     /* Objects tree structure */
-    vlc_object_t   **pp_children;
-    int              i_children;
-} vlc_object_internals_t;
+    vlc_object_internals_t *next;  /* next sibling */
+    vlc_object_internals_t *prev;  /* previous sibling */
+    vlc_object_internals_t *first; /* first child */
+};
 
 #define ZOOM_SECTION N_("Zoom")
 #define ZOOM_QUARTER_KEY_TEXT N_("1:4 Quarter")
@@ -189,6 +192,7 @@ typedef struct vlc_object_internals_t
 #define ZOOM_DOUBLE_KEY_TEXT N_("2:1 Double")
 
 #define vlc_internals( obj ) (((vlc_object_internals_t*)(VLC_OBJECT(obj)))-1)
+#define vlc_externals( priv ) ((vlc_object_t *)((priv) + 1))
 
 typedef struct sap_handler_t sap_handler_t;
 
