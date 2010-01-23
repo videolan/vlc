@@ -160,7 +160,12 @@ int __config_GetInt( vlc_object_t *p_this, const char *psz_name )
         return -1;
     }
 
-    return p_config->value.i;
+    int val;
+
+    vlc_rwlock_rdlock (&config_lock);
+    val = p_config->value.i;
+    vlc_rwlock_unlock (&config_lock);
+    return val;
 }
 
 /*****************************************************************************
@@ -188,7 +193,12 @@ float __config_GetFloat( vlc_object_t *p_this, const char *psz_name )
         return -1;
     }
 
-    return p_config->value.f;
+    float val;
+
+    vlc_rwlock_rdlock (&config_lock);
+    val = p_config->value.f;
+    vlc_rwlock_unlock (&config_lock);
+    return val;
 }
 
 /*****************************************************************************
@@ -294,7 +304,7 @@ void __config_PutPsz( vlc_object_t *p_this,
 void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
 {
     module_config_t *p_config;
-    vlc_value_t oldval, val;
+    vlc_value_t oldval;
 
     p_config = config_FindConfig( p_this, psz_name );
 
@@ -311,33 +321,27 @@ void __config_PutInt( vlc_object_t *p_this, const char *psz_name, int i_value )
         return;
     }
 
+    /* if i_min == i_max == 0, then do not use them */
+    if ((p_config->min.i == 0) && (p_config->max.i == 0))
+        ;
+    else if (i_value < p_config->min.i)
+        i_value = p_config->min.i;
+    else if (i_value > p_config->max.i)
+        i_value = p_config->max.i;
+
+    vlc_rwlock_wrlock (&config_lock);
     /* backup old value */
     oldval.i_int = p_config->value.i;
 
-    /* if i_min == i_max == 0, then do not use them */
-    if ((p_config->min.i == 0) && (p_config->max.i == 0))
-    {
-        p_config->value.i = i_value;
-    }
-    else if (i_value < p_config->min.i)
-    {
-        p_config->value.i = p_config->min.i;
-    }
-    else if (i_value > p_config->max.i)
-    {
-        p_config->value.i = p_config->max.i;
-    }
-    else
-    {
-        p_config->value.i = i_value;
-    }
-
+    p_config->value.i = i_value;
     p_config->b_dirty = true;
-
-    val.i_int = p_config->value.i;
+    vlc_rwlock_unlock (&config_lock);
 
     if( p_config->pf_callback )
     {
+        vlc_value_t val;
+
+        val.i_int = i_value;
         p_config->pf_callback( p_this, psz_name, oldval, val,
                                p_config->p_callback_data );
     }
@@ -353,7 +357,7 @@ void __config_PutFloat( vlc_object_t *p_this,
                         const char *psz_name, float f_value )
 {
     module_config_t *p_config;
-    vlc_value_t oldval, val;
+    vlc_value_t oldval;
 
     p_config = config_FindConfig( p_this, psz_name );
 
@@ -370,33 +374,27 @@ void __config_PutFloat( vlc_object_t *p_this,
         return;
     }
 
+    /* if f_min == f_max == 0, then do not use them */
+    if ((p_config->min.f == 0) && (p_config->max.f == 0))
+        ;
+    else if (f_value < p_config->min.f)
+        f_value = p_config->min.f;
+    else if (f_value > p_config->max.f)
+        f_value = p_config->max.f;
+
+    vlc_rwlock_wrlock (&config_lock);
     /* backup old value */
     oldval.f_float = p_config->value.f;
 
-    /* if f_min == f_max == 0, then do not use them */
-    if ((p_config->min.f == 0) && (p_config->max.f == 0))
-    {
-        p_config->value.f = f_value;
-    }
-    else if (f_value < p_config->min.f)
-    {
-        p_config->value.f = p_config->min.f;
-    }
-    else if (f_value > p_config->max.f)
-    {
-        p_config->value.f = p_config->max.f;
-    }
-    else
-    {
-        p_config->value.f = f_value;
-    }
-
+    p_config->value.f = f_value;
     p_config->b_dirty = true;
-
-    val.f_float = p_config->value.f;
+    vlc_rwlock_unlock (&config_lock);
 
     if( p_config->pf_callback )
     {
+        vlc_value_t val;
+
+        val.f_float = f_value;
         p_config->pf_callback( p_this, psz_name, oldval, val,
                                p_config->p_callback_data );
     }
