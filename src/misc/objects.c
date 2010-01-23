@@ -77,7 +77,8 @@ static int  DumpCommand( vlc_object_t *, char const *,
 
 static vlc_object_t * FindParent    ( vlc_object_t *, int );
 static vlc_object_t * FindChild     ( vlc_object_t *, int );
-static vlc_object_t * FindObjectName( vlc_object_t *, const char *, int );
+static vlc_object_t * FindParentName( vlc_object_t *, const char * );
+static vlc_object_t * FindChildName ( vlc_object_t *, const char * );
 static void           PrintObject   ( vlc_object_t *, const char * );
 static void           DumpStructure ( vlc_object_t *, int, char * );
 
@@ -532,10 +533,17 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
                                      FIND_CHILD);
 
     libvlc_lock (p_this->p_libvlc);
-
-    /* Otherwise, recursively look for the object */
-    p_found = FindObjectName( p_this, psz_name, i_mode );
-
+    switch (i_mode)
+    {
+        case FIND_PARENT:
+            p_found = FindParentName (p_this, psz_name);
+            break;
+        case FIND_CHILD:
+            p_found = FindChildName (p_this, psz_name);
+            break;
+        default:
+            assert (0);
+    }
     libvlc_unlock (p_this->p_libvlc);
     return p_found;
 }
@@ -927,6 +935,18 @@ static vlc_object_t *FindParent (vlc_object_t *p_this, int i_type)
     return NULL;
 }
 
+static vlc_object_t *FindParentName (vlc_object_t *p_this, const char *name)
+{
+    for (vlc_object_t *parent = p_this->p_parent;
+         parent != NULL;
+         parent = parent->p_parent)
+    {
+        if (!objnamecmp (parent, name))
+            return vlc_object_hold (parent);
+    }
+    return NULL;
+}
+
 static vlc_object_t *FindChild (vlc_object_t *p_this, int i_type)
 {
     for (int i = vlc_internals( p_this )->i_children; i--; )
@@ -942,60 +962,20 @@ static vlc_object_t *FindChild (vlc_object_t *p_this, int i_type)
     return NULL;
 }
 
-
-static vlc_object_t * FindObjectName( vlc_object_t *p_this,
-                                      const char *psz_name,
-                                      int i_mode )
+static vlc_object_t *FindChildName (vlc_object_t *p_this, const char *name)
 {
-    int i;
-    vlc_object_t *p_tmp;
-
-    switch( i_mode )
+    for (int i = vlc_internals( p_this )->i_children; i--; )
     {
-    case FIND_PARENT:
-        p_tmp = p_this->p_parent;
-        if( p_tmp )
-        {
-            if( !objnamecmp(p_tmp, psz_name) )
-            {
-                vlc_object_hold( p_tmp );
-                return p_tmp;
-            }
-            else
-            {
-                return FindObjectName( p_tmp, psz_name, i_mode );
-            }
-        }
-        break;
+        vlc_object_t *child = vlc_internals (p_this)->pp_children[i];
+        if (!objnamecmp (child, name))
+            return vlc_object_hold (child);
 
-    case FIND_CHILD:
-        for( i = vlc_internals( p_this )->i_children; i--; )
-        {
-            p_tmp = vlc_internals( p_this )->pp_children[i];
-            if( !objnamecmp(p_tmp, psz_name ) )
-            {
-                vlc_object_hold( p_tmp );
-                return p_tmp;
-            }
-            else if( vlc_internals( p_tmp )->i_children )
-            {
-                p_tmp = FindObjectName( p_tmp, psz_name, i_mode );
-                if( p_tmp )
-                {
-                    return p_tmp;
-                }
-            }
-        }
-        break;
-
-    case FIND_ANYWHERE:
-        /* Handled in vlc_object_find */
-        break;
+        child = FindChildName (child, name);
+        if (child != NULL)
+            return child;
     }
-
     return NULL;
 }
-
 
 static void PrintObject( vlc_object_t *p_this, const char *psz_prefix )
 {
