@@ -160,7 +160,7 @@ STDMETHODIMP VLCControl::stop(void)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_stop(p_md, &ex);
+        libvlc_media_player_stop(p_md);
         result = exception_bridge(&ex);
         if( SUCCEEDED(result) )
             _p_instance->fireOnStopEvent();
@@ -177,7 +177,7 @@ STDMETHODIMP VLCControl::get_Playing(VARIANT_BOOL *isPlaying)
     HRESULT result = _p_instance->getMD(&p_md);
     if( SUCCEEDED(result) )
     {
-        *isPlaying = libvlc_media_player_is_playing(p_md, NULL) ?
+        *isPlaying = libvlc_media_player_is_playing(p_md) ?
                      VARIANT_TRUE : VARIANT_FALSE;
     } else *isPlaying = VARIANT_FALSE;
     return result;
@@ -266,7 +266,7 @@ STDMETHODIMP VLCControl::fullscreen(void)
     HRESULT result = _p_instance->getMD(&p_md);
     if( SUCCEEDED(result) )
     {
-        if( libvlc_media_player_is_playing(p_md, NULL) )
+        if( libvlc_media_player_is_playing(p_md) )
         {
             libvlc_toggle_fullscreen(p_md, NULL);
         }

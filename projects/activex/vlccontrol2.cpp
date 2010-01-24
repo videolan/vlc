@@ -389,7 +389,7 @@ STDMETHODIMP VLCInput::get_state(long* state)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        *state = libvlc_media_player_get_state(p_md, &ex);
+        *state = libvlc_media_player_get_state(p_md);
         if( libvlc_exception_raised(&ex) )
         {
             // don't fail, just return the idle state
@@ -973,7 +973,7 @@ STDMETHODIMP VLCPlaylist::get_isPlaying(VARIANT_BOOL* isPlaying)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        *isPlaying = libvlc_media_player_is_playing(p_md, &ex) ?
+        *isPlaying = libvlc_media_player_is_playing(p_md) ?
                      VARIANT_TRUE: VARIANT_FALSE;
         libvlc_exception_clear(&ex);
     }
@@ -1100,7 +1100,7 @@ STDMETHODIMP VLCPlaylist::stop()
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_media_player_stop(p_md, &ex);
+        libvlc_media_player_stop(p_md);
         hr = exception_bridge(&ex);;
     }
     return hr;
@@ -1486,29 +1486,34 @@ STDMETHODIMP VLCVideo::get_teletext(long* page)
 
     libvlc_media_player_t *p_md;
     HRESULT hr = getMD(&p_md);
+#if 0
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        *page = libvlc_video_get_teletext(p_md, &ex);
+        *page = libvlc_video_get_teletext(p_md);
         hr = exception_bridge(&ex);
     }
+#endif
     return hr;
 };
 
 STDMETHODIMP VLCVideo::put_teletext(long page)
 {
+#warning Broken
     libvlc_media_player_t *p_md;
     HRESULT hr = getMD(&p_md);
+#if 0
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_video_set_teletext(p_md, page, &ex);
+        libvlc_video_set_teletext(p_md, page);
         hr = exception_bridge(&ex);
     }
+#endif
     return hr;
 };
 

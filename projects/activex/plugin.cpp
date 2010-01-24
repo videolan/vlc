@@ -1023,7 +1023,7 @@ bool VLCPlugin::playlist_select( int idx, libvlc_exception_t *ex )
 
     libvlc_media_list_lock(_p_mlist);
 
-    int count = libvlc_media_list_count(_p_mlist,ex);
+    int count = libvlc_media_list_count(_p_mlist);
     if( libvlc_exception_raised(ex) )
         goto bad_unlock;
 
@@ -1059,7 +1059,7 @@ bad_unlock:
 void VLCPlugin::set_player_window(libvlc_exception_t *ex)
 {
     // XXX FIXME no idea if this is correct or not
-    libvlc_media_player_set_hwnd(_p_mplayer,getInPlaceWindow(),ex);
+    libvlc_media_player_set_hwnd(_p_mplayer,getInPlaceWindow());
 }
 
 int  VLCPlugin::playlist_add_extended_untrusted(const char *mrl, int optc, const char **optv, libvlc_exception_t *ex)
@@ -1075,7 +1075,7 @@ int  VLCPlugin::playlist_add_extended_untrusted(const char *mrl, int optc, const
     libvlc_media_list_lock(_p_mlist);
     libvlc_media_list_add_media(_p_mlist,p_m,ex);
     if( !libvlc_exception_raised(ex) )
-        item = libvlc_media_list_count(_p_mlist,ex)-1;
+        item = libvlc_media_list_count(_p_mlist)-1;
     libvlc_media_list_unlock(_p_mlist);
     libvlc_media_release(p_m);
 

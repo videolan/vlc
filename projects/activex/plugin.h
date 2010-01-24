@@ -245,7 +245,7 @@ public:
     */
     bool isPlaying(libvlc_exception_t *ex)
     {
-        return _p_mplayer && libvlc_media_player_is_playing(_p_mplayer,ex);
+        return _p_mplayer && libvlc_media_player_is_playing(_p_mplayer);
     }
     int  playlist_get_current_index(libvlc_exception_t *) { return _i_midx; }
     int  playlist_add_extended_untrusted(const char *, int, const char **, libvlc_exception_t *);
@@ -268,7 +268,7 @@ public:
          if( !_p_mlist )
              return 0;
          libvlc_media_list_lock(_p_mlist);
-         r = libvlc_media_list_count(_p_mlist,ex);
+         r = libvlc_media_list_count(_p_mlist);
          libvlc_media_list_unlock(_p_mlist);
          return r;
     }
@@ -294,7 +294,7 @@ public:
     void playlist_stop(libvlc_exception_t *ex)
     {
         if( _p_mplayer )
-            libvlc_media_player_stop(_p_mplayer,ex);
+            libvlc_media_player_stop(_p_mplayer);
     }
     void playlist_next(libvlc_exception_t *ex)
     {
