@@ -1,4 +1,4 @@
-* Python ctypes-based bindings
+* Python ctypes-based and java bindings
 
 The bindings use ctypes to directly call the libvlc dynamic lib, and
 the code is generated from the include files defining the public API.
@@ -16,8 +16,8 @@ The module offers two ways of accessing the API - a raw access to all
 exported methods, and more convenient wrapper classes :
 
 - Raw access: methods are available as attributes of the vlc
-  module. Use their docstring (introspective shells like ipython are
-  your friends) to explore them.
+  module. Use their docstring (any introspective shell like ipython is
+  your friends) to explore them. 
 
 - Wrapper classes: most major structures of the libvlc API (Instance,
   Media, MediaPlayer, etc) are wrapped as classes, with shorter method
