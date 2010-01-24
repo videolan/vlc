@@ -388,9 +388,9 @@ void ExtensionDialog::SyncInput( QObject *object )
             || p_widget->type == EXTENSION_WIDGET_PASSWORD );
     /* Synchronize psz_text with the new value */
     QLineEdit *widget = static_cast< QLineEdit* >( p_widget->p_sys_intf );
-    char *psz_text = qstrdup( qtu( widget->text() ) );
+    char *psz_text = widget->text().isNull() ? NULL : strdup( qtu( widget->text() ) );
     free( p_widget->psz_text );
-    p_widget->psz_text = psz_text;
+    p_widget->psz_text =  psz_text;
 
     if( lockedHere )
     {
