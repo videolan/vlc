@@ -72,8 +72,8 @@ static void HandleMediaInstanceVolumeChanged(const libvlc_event_t * event, void 
 static void HandleMediaTimeChanged(const libvlc_event_t * event, void * self)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
-                                                 withMethod:@selector(mediaPlayerTimeChanged:) 
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self
+                                                 withMethod:@selector(mediaPlayerTimeChanged:)
                                        withArgumentAsObject:[NSNumber numberWithLongLong:event->u.media_player_time_changed.new_time]];
 
     [[VLCEventManager sharedManager] callOnMainThreadDelegateOfObject:self
@@ -86,8 +86,8 @@ static void HandleMediaPositionChanged(const libvlc_event_t * event, void * self
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
 
-    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
-                                                 withMethod:@selector(mediaPlayerPositionChanged:) 
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self
+                                                 withMethod:@selector(mediaPlayerPositionChanged:)
                                        withArgumentAsObject:[NSNumber numberWithFloat:event->u.media_player_position_changed.new_position]];
     [pool release];
 }
@@ -95,7 +95,7 @@ static void HandleMediaPositionChanged(const libvlc_event_t * event, void * self
 static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void * self)
 {
     VLCMediaPlayerState newState;
-    
+
     if( event->type == libvlc_MediaPlayerPlaying )
         newState = VLCMediaPlayerStatePlaying;
     else if( event->type == libvlc_MediaPlayerPaused )
@@ -109,31 +109,31 @@ static void HandleMediaInstanceStateChanged(const libvlc_event_t * event, void *
         NSLog(@"%s: Unknown event", __FUNCTION__);
         return;
     }
-    
+
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
-    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
-                                                 withMethod:@selector(mediaPlayerStateChanged:) 
+
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self
+                                                 withMethod:@selector(mediaPlayerStateChanged:)
                                        withArgumentAsObject:[NSNumber numberWithInt:newState]];
-    
+
     [[VLCEventManager sharedManager] callOnMainThreadDelegateOfObject:self
                                                    withDelegateMethod:@selector(mediaPlayerStateChanged:)
                                                  withNotificationName:VLCMediaPlayerStateChanged];
-    
+
     [pool release];
-    
+
 }
 
 static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * self)
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
-    
-    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
-                                                 withMethod:@selector(mediaPlayerMediaChanged:) 
+
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self
+                                                 withMethod:@selector(mediaPlayerMediaChanged:)
                                        withArgumentAsObject:[VLCMedia mediaWithLibVLCMediaDescriptor:event->u.media_player_media_changed.new_media]];
-        
+
     [pool release];
-    
+
 }
 
 
@@ -219,7 +219,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     libvlc_media_player_set_nsobject(instance, nil, NULL);
 
     libvlc_media_player_release(instance);
-    
+
     // Get rid of everything else
     [media release];
     [cachedTime release];
@@ -240,7 +240,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 }
 
 - (void)setVideoView:(VLCVideoView *)aVideoView
-{    
+{
     [self setDrawable: aVideoView];
 }
 
@@ -544,7 +544,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 - (void)setCurrentTitleIndex:(NSUInteger)value
 {
     libvlc_exception_t ex;
-    libvlc_exception_init( &ex );    
+    libvlc_exception_init( &ex );
     libvlc_media_player_set_title( instance, value, &ex );
     catch_exception( &ex );
 }
@@ -558,7 +558,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     catch_exception( &ex );
     if (count <= 0)
         return NSNotFound;
-    
+
     NSUInteger result = libvlc_media_player_get_title( instance, &ex );
     catch_exception( &ex );
     return result;
@@ -606,7 +606,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     catch_exception( &ex );
     if (count <= 0)
         return NSNotFound;
-    
+
     NSUInteger result = libvlc_audio_get_track( instance, &ex );
     catch_exception( &ex );
     return result;
@@ -656,7 +656,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     {
         if (media && [media compare:value] == NSOrderedSame)
             return;
-        
+
         [media release];
         media = [value retain];
 
@@ -673,7 +673,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 }
 
 - (BOOL)play
-{    
+{
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     libvlc_media_player_play( (libvlc_media_player_t *)instance, &ex );
@@ -687,7 +687,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     {
         /* Hack because we create a dead lock here, when the vout is stopped
          * and tries to recontact us on the main thread */
-        /* FIXME: to do this properly we need to do some locking. We may want 
+        /* FIXME: to do this properly we need to do some locking. We may want
          * to move that to libvlc */
         [self performSelectorInBackground:@selector(pause) withObject:nil];
         return;
@@ -890,9 +890,9 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
         libvlc_exception_init( &ex );
         instance = (void *)libvlc_media_player_new([VLCLibrary sharedInstance], &ex);
         catch_exception( &ex );
-        
+
         [self registerObservers];
-        
+
         [self setDrawable:aDrawable];
     }
     return self;
