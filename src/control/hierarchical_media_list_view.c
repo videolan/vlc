@@ -145,16 +145,16 @@ hierarch_media_list_view_release( libvlc_media_list_view_t * p_mlv )
 {
     libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
                          libvlc_MediaListItemAdded,
-                         media_list_item_added, p_mlv, NULL );
+                         media_list_item_added, p_mlv );
     libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
                          libvlc_MediaListWillAddItem,
-                         media_list_will_add_item, p_mlv, NULL );
+                         media_list_will_add_item, p_mlv );
     libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
                          libvlc_MediaListItemDeleted,
-                         media_list_item_deleted, p_mlv, NULL );
+                         media_list_item_deleted, p_mlv );
     libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
                          libvlc_MediaListWillDeleteItem,
-                         media_list_will_delete_item, p_mlv, NULL );
+                         media_list_will_delete_item, p_mlv );
 }
 
 /**************************************************************************

@@ -355,10 +355,8 @@ void libvlc_event_attach_async( libvlc_event_manager_t * p_event_manager,
 void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
                                      libvlc_event_type_t event_type,
                                      libvlc_callback_t pf_callback,
-                                     void *p_user_data,
-                                     libvlc_exception_t *p_e )
+                                     void *p_user_data )
 {
-    VLC_UNUSED( p_e );
     libvlc_event_listeners_group_t * listeners_group;
     libvlc_event_listener_t * listener;
     int i, j;

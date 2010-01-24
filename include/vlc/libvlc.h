@@ -309,13 +309,11 @@ VLC_PUBLIC_API void libvlc_event_attach( libvlc_event_manager_t *p_event_manager
  * \param i_event_type the desired event to which we want to unregister
  * \param f_callback the function to call when i_event_type occurs
  * \param p_user_data user provided data to carry with the event
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_event_detach( libvlc_event_manager_t *p_event_manager,
                                          libvlc_event_type_t i_event_type,
                                          libvlc_callback_t f_callback,
-                                         void *p_user_data,
-                                         libvlc_exception_t *p_e );
+                                         void *p_user_data );
 
 /**
  * Get an event's type name.

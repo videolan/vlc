@@ -103,22 +103,18 @@ uninstall_md_listener( libvlc_media_list_view_t * p_mlv,
                        libvlc_media_t * p_md)
 {
     libvlc_media_list_t * p_mlist;
-    libvlc_exception_t ignored_exception;
-    libvlc_exception_init( &ignored_exception );
     libvlc_event_detach( p_md->p_event_manager,
                          libvlc_MediaSubItemAdded,
-                         media_list_subitem_added, p_mlv, &ignored_exception );
-    if( libvlc_exception_raised( &ignored_exception ) )
-        libvlc_exception_clear( &ignored_exception ); /* We don't care if we encounter an exception */
+                         media_list_subitem_added, p_mlv );
     if((p_mlist = libvlc_media_subitems( p_md )))
     {
         libvlc_media_list_lock( p_mlist );
         libvlc_event_detach( p_mlist->p_event_manager,
                              libvlc_MediaListItemAdded,
-                             media_list_item_added, p_mlv, NULL );
+                             media_list_item_added, p_mlv );
         libvlc_event_detach( p_mlist->p_event_manager,
                              libvlc_MediaListItemDeleted,
-                             media_list_item_removed, p_mlv, NULL );
+                             media_list_item_removed, p_mlv );
 
         int i, count = libvlc_media_list_count( p_mlist, NULL );
         for( i = 0; i < count; i++)
@@ -166,7 +162,7 @@ media_list_subitem_added( const libvlc_event_t * p_event, void * p_user_data )
          * thus, no need to wait for SubItemAdded events */
         libvlc_event_detach( p_md->p_event_manager,
                              libvlc_MediaSubItemAdded,
-                             media_list_subitem_added, p_mlv, NULL );
+                             media_list_subitem_added, p_mlv );
         libvlc_media_list_lock( p_mlist );
 
         libvlc_event_attach( p_mlist->p_event_manager,
@@ -383,13 +379,13 @@ libvlc_media_list_view_release( libvlc_media_list_view_t * p_mlv )
     {
         libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
                             libvlc_MediaListItemAdded,
-                            media_list_item_added, p_mlv, NULL );
+                            media_list_item_added, p_mlv );
     }
     if( p_mlv->pf_ml_item_removed )
     {
         libvlc_event_detach( p_mlv->p_mlist->p_event_manager,
                             libvlc_MediaListItemDeleted,
-                            media_list_item_removed, p_mlv, NULL );
+                            media_list_item_removed, p_mlv );
     }
     int i, count = libvlc_media_list_count( p_mlv->p_mlist, NULL );
     for( i = 0; i < count; i++)

@@ -369,7 +369,7 @@ uninstall_playlist_observer(libvlc_media_list_player_t * p_mlp)
 {
     assert_locked(p_mlp);
     if (!p_mlp->p_mlist) return;
-    libvlc_event_detach(mlist_em(p_mlp), libvlc_MediaListItemDeleted, mlist_item_deleted, p_mlp, NULL);
+    libvlc_event_detach(mlist_em(p_mlp), libvlc_MediaListItemDeleted, mlist_item_deleted, p_mlp);
 }
 
 /**************************************************************************
@@ -398,7 +398,7 @@ uninstall_media_player_observer(libvlc_media_list_player_t * p_mlp)
     // Allow callbacks to run, because detach() will wait until all callbacks are processed.
     // This is safe because only callbacks are allowed, and there execution will be cancelled.
     vlc_mutex_unlock(&p_mlp->mp_callback_lock);
-    libvlc_event_detach(mplayer_em(p_mlp), libvlc_MediaPlayerEndReached, media_player_reached_end, p_mlp, NULL);
+    libvlc_event_detach(mplayer_em(p_mlp), libvlc_MediaPlayerEndReached, media_player_reached_end, p_mlp);
 
     // Now, lock back the callback lock. No more callback will be present from this point.
     vlc_mutex_lock(&p_mlp->mp_callback_lock);
