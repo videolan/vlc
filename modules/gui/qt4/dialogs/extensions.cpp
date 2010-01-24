@@ -314,7 +314,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             return list;
 
         default:
-            msg_Err( p_intf, "Widget type %d unknown" );
+            msg_Err( p_intf, "Widget type %d unknown", p_widget->type );
             return NULL;
     }
 }
@@ -624,7 +624,7 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
             return list;
 
         default:
-            msg_Err( p_intf, "Widget type %d unknown" );
+            msg_Err( p_intf, "Widget type %d unknown", p_widget->type );
             return NULL;
     }
 }
