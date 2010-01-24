@@ -49,7 +49,7 @@ static int ScanExtensions( extensions_manager_t *p_this );
 static int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
                             lua_State *L, void *pb_continue );
 static int Control( extensions_manager_t *, int, va_list );
-static int GetMenu( extensions_manager_t *p_mgr, extension_t *p_ext,
+static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
                     char ***pppsz_titles, uint16_t **ppi_ids );
 static lua_State* GetLuaState( extensions_manager_t *p_mgr,
                                extension_t *p_ext );
@@ -388,7 +388,7 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
             p_ext = ( extension_t* ) va_arg( args, extension_t* );
             pppsz = ( char*** ) va_arg( args, char*** );
             ppus = ( uint16_t** ) va_arg( args, uint16_t** );
-            return GetMenu( p_mgr, p_ext, pppsz, ppus );
+            return GetMenuEntries( p_mgr, p_ext, pppsz, ppus );
 
         case EXTENSION_TRIGGER_ONLY:
             p_ext = ( extension_t* ) va_arg( args, extension_t* );
@@ -458,7 +458,7 @@ int lua_ExtensionWidgetClick( extensions_manager_t *p_mgr,
  *       that it MUST respond very fast.
  * @todo Remove the menu() hook and provide a new function vlc.set_menu()
  **/
-static int GetMenu( extensions_manager_t *p_mgr, extension_t *p_ext,
+static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
                     char ***pppsz_titles, uint16_t **ppi_ids )
 {
     assert( *pppsz_titles == NULL );
