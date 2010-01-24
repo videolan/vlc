@@ -88,7 +88,7 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
 
             /* Insert the md into the root list */
             libvlc_media_list_lock( p_mdis->p_mlist );
-            _libvlc_media_list_add_media( p_mdis->p_mlist, p_catmd, NULL );
+            _libvlc_media_list_add_media( p_mdis->p_mlist, p_catmd );
             libvlc_media_list_unlock( p_mdis->p_mlist );
 
             /* We don't release the mlist cause the dictionary
@@ -98,7 +98,7 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
     }
 
     libvlc_media_list_lock( p_mlist );
-    _libvlc_media_list_add_media( p_mlist, p_md, NULL );
+    _libvlc_media_list_add_media( p_mlist, p_md );
     libvlc_media_list_unlock( p_mlist );
 
     libvlc_media_release( p_md );
@@ -115,7 +115,7 @@ static void services_discovery_item_removed( const vlc_event_t * p_event,
     libvlc_media_t * p_md;
     libvlc_media_discoverer_t * p_mdis = user_data;
 
-    int i, count = libvlc_media_list_count( p_mdis->p_mlist, NULL );
+    int i, count = libvlc_media_list_count( p_mdis->p_mlist );
     libvlc_media_list_lock( p_mdis->p_mlist );
     for( i = 0; i < count; i++ )
     {

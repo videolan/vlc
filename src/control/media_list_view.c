@@ -64,7 +64,7 @@ install_md_listener( libvlc_media_list_view_t * p_mlv,
     if((p_mlist = libvlc_media_subitems( p_md )))
     {
         libvlc_media_list_lock( p_mlist );
-        int i, count = libvlc_media_list_count( p_mlist, NULL );
+        int i, count = libvlc_media_list_count( p_mlist );
         for( i = 0; i < count; i++)
         {
             libvlc_event_t added_event;
@@ -116,7 +116,7 @@ uninstall_md_listener( libvlc_media_list_view_t * p_mlv,
                              libvlc_MediaListItemDeleted,
                              media_list_item_removed, p_mlv );
 
-        int i, count = libvlc_media_list_count( p_mlist, NULL );
+        int i, count = libvlc_media_list_count( p_mlist );
         for( i = 0; i < count; i++)
         {
             libvlc_media_t * p_submd;
@@ -203,7 +203,7 @@ libvlc_media_list_view_set_ml_notification_callback(
     libvlc_event_attach( p_mlv->p_mlist->p_event_manager,
                          libvlc_MediaListItemDeleted,
                          media_list_item_removed, p_mlv, NULL );
-    int i, count = libvlc_media_list_count( p_mlv->p_mlist, NULL );
+    int i, count = libvlc_media_list_count( p_mlv->p_mlist );
     for( i = 0; i < count; i++)
     {
         libvlc_media_t * p_md;
@@ -387,7 +387,7 @@ libvlc_media_list_view_release( libvlc_media_list_view_t * p_mlv )
                             libvlc_MediaListItemDeleted,
                             media_list_item_removed, p_mlv );
     }
-    int i, count = libvlc_media_list_count( p_mlv->p_mlist, NULL );
+    int i, count = libvlc_media_list_count( p_mlv->p_mlist );
     for( i = 0; i < count; i++)
     {
         libvlc_media_t * p_md;

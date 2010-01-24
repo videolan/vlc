@@ -148,7 +148,7 @@ import_mlist_rec( libvlc_media_list_view_t * p_mlv,
                   libvlc_exception_t * p_e )
 {
     int i, count;
-    count = libvlc_media_list_count( p_mlist, p_e );
+    count = libvlc_media_list_count( p_mlist );
     for( i = 0; i < count; i++ )
     {
         libvlc_media_t * p_md;

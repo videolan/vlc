@@ -58,13 +58,11 @@ struct libvlc_media_list_t
 /* Media List */
 void _libvlc_media_list_add_media(
         libvlc_media_list_t * p_mlist,
-        libvlc_media_t * p_md,
-        libvlc_exception_t * p_e );
+        libvlc_media_t * p_md );
 
 void _libvlc_media_list_insert_media(
         libvlc_media_list_t * p_mlist,
-        libvlc_media_t * p_md, int index,
-        libvlc_exception_t * p_e );
+        libvlc_media_t * p_md, int index );
 
 void _libvlc_media_list_remove_index(
         libvlc_media_list_t * p_mlist, int index,

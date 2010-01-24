@@ -59,7 +59,7 @@ hierarch_node_media_list_view_count( libvlc_media_list_view_t * p_mlv,
                                 libvlc_exception_t * p_e )
 {
     /* FIXME: we may want to cache that */
-    int i, ret, count = libvlc_media_list_count( p_mlv->p_mlist, p_e );
+    int i, ret, count = libvlc_media_list_count( p_mlv->p_mlist );
     libvlc_media_t * p_md;
     libvlc_media_list_t * p_submlist;
     ret = 0;
@@ -90,7 +90,7 @@ hierarch_node_media_list_view_item_at_index( libvlc_media_list_view_t * p_mlv,
     libvlc_media_t * p_md;
     libvlc_media_list_t * p_submlist;
     trace("%d\n", index);
-    int i, current_index, count = libvlc_media_list_count( p_mlv->p_mlist, p_e );
+    int i, current_index, count = libvlc_media_list_count( p_mlv->p_mlist );
     current_index = -1;
     for( i = 0; i < count; i++ )
     {
@@ -140,7 +140,7 @@ index_of_item( libvlc_media_list_view_t * p_mlv, libvlc_media_t * p_md )
     libvlc_media_t * p_iter_md;
     libvlc_media_list_t * p_submlist;
 
-    int i, current_index, count = libvlc_media_list_count( p_mlv->p_mlist, NULL );
+    int i, current_index, count = libvlc_media_list_count( p_mlv->p_mlist );
     current_index = -1;
     for( i = 0; i < count; i++ )
     {
@@ -164,7 +164,7 @@ item_is_already_added( libvlc_media_t * p_md )
 
     p_submlist = libvlc_media_subitems( p_md );
     if( !p_submlist ) return false;
-    int count = libvlc_media_list_count( p_submlist, NULL );
+    int count = libvlc_media_list_count( p_submlist );
     libvlc_media_list_release( p_submlist );
     return count > 1;
 }

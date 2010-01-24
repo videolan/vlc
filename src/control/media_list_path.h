@@ -119,7 +119,7 @@ static libvlc_media_list_path_t
 get_path_rec( const libvlc_media_list_path_t path, libvlc_media_list_t * p_current_mlist, libvlc_media_t * p_searched_md )
 {
     int i, count;
-    count = libvlc_media_list_count( p_current_mlist, NULL );
+    count = libvlc_media_list_count( p_current_mlist );
     for( i = 0; i < count; i++ )
     {
         libvlc_media_t * p_md = libvlc_media_list_item_at_index( p_current_mlist, i, NULL );

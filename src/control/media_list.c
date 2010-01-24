@@ -288,11 +288,9 @@ libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
  *       set_media (Public)
  **************************************************************************/
 void libvlc_media_list_set_media( libvlc_media_list_t * p_mlist,
-                                             libvlc_media_t * p_md,
-                                             libvlc_exception_t * p_e)
+                                  libvlc_media_t * p_md )
 
 {
-    VLC_UNUSED(p_e);
     vlc_mutex_lock( &p_mlist->object_lock );
     libvlc_media_release( p_mlist->p_md );
     libvlc_media_retain( p_md );
@@ -310,11 +308,9 @@ void libvlc_media_list_set_media( libvlc_media_list_t * p_mlist,
  * media.
  **************************************************************************/
 libvlc_media_t *
-libvlc_media_list_media( libvlc_media_list_t * p_mlist,
-                                    libvlc_exception_t * p_e)
+libvlc_media_list_media( libvlc_media_list_t * p_mlist )
 {
     libvlc_media_t *p_md;
-    VLC_UNUSED(p_e);
 
     vlc_mutex_lock( &p_mlist->object_lock );
     p_md = p_mlist->p_md;
@@ -328,12 +324,10 @@ libvlc_media_list_media( libvlc_media_list_t * p_mlist,
 /**************************************************************************
  *       libvlc_media_list_count (Public)
  *
- * Lock should be hold when entering.
+ * Lock should be held when entering.
  **************************************************************************/
-int libvlc_media_list_count( libvlc_media_list_t * p_mlist,
-                             libvlc_exception_t * p_e )
+int libvlc_media_list_count( libvlc_media_list_t * p_mlist )
 {
-    VLC_UNUSED(p_e);
     return vlc_array_count( &p_mlist->items );
 }
 
@@ -348,16 +342,13 @@ void libvlc_media_list_add_media(
                                    libvlc_exception_t * p_e )
 {
     if( mlist_is_writable(p_mlist,p_e) )
-        _libvlc_media_list_add_media( p_mlist, p_md, p_e );
+        _libvlc_media_list_add_media( p_mlist, p_md );
 }
 
 /* LibVLC internal version */
-void _libvlc_media_list_add_media(
-                                   libvlc_media_list_t * p_mlist,
-                                   libvlc_media_t * p_md,
-                                   libvlc_exception_t * p_e )
+void _libvlc_media_list_add_media( libvlc_media_list_t * p_mlist,
+                                   libvlc_media_t * p_md )
 {
-    VLC_UNUSED(p_e);
     libvlc_media_retain( p_md );
 
     notify_item_addition( p_mlist, p_md, vlc_array_count( &p_mlist->items ),
@@ -379,17 +370,15 @@ void libvlc_media_list_insert_media(
                                    libvlc_exception_t * p_e )
 {
     if( mlist_is_writable(p_mlist,p_e) )
-        _libvlc_media_list_insert_media( p_mlist, p_md, index, p_e );
+        _libvlc_media_list_insert_media( p_mlist, p_md, index );
 }
 
 /* LibVLC internal version */
 void _libvlc_media_list_insert_media(
                                    libvlc_media_list_t * p_mlist,
                                    libvlc_media_t * p_md,
-                                   int index,
-                                   libvlc_exception_t * p_e )
+                                   int index )
 {
-    VLC_UNUSED(p_e);
     libvlc_media_retain( p_md );
 
     notify_item_addition( p_mlist, p_md, index, EventWillHappen );
@@ -464,11 +453,8 @@ libvlc_media_list_item_at_index( libvlc_media_list_t * p_mlist,
  * Warning: this function returns the first matching item.
  **************************************************************************/
 int libvlc_media_list_index_of_item( libvlc_media_list_t * p_mlist,
-                                     libvlc_media_t * p_searched_md,
-                                     libvlc_exception_t * p_e )
+                                     libvlc_media_t * p_searched_md )
 {
-    VLC_UNUSED(p_e);
-
     libvlc_media_t * p_md;
     int i;
     for ( i = 0; i < vlc_array_count( &p_mlist->items ); i++ )
@@ -519,9 +505,7 @@ void libvlc_media_list_unlock( libvlc_media_list_t * p_mlist )
  * The p_event_manager is immutable, so you don't have to hold the lock
  **************************************************************************/
 libvlc_event_manager_t *
-libvlc_media_list_event_manager( libvlc_media_list_t * p_mlist,
-                                    libvlc_exception_t * p_e )
+libvlc_media_list_event_manager( libvlc_media_list_t * p_mlist )
 {
-    VLC_UNUSED(p_e);
     return p_mlist->p_event_manager;
 }

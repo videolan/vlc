@@ -53,7 +53,8 @@ static int
 hierarch_media_list_view_count( libvlc_media_list_view_t * p_mlv,
                                 libvlc_exception_t * p_e )
 {
-    return libvlc_media_list_count( p_mlv->p_mlist, p_e );
+    VLC_UNUSED(p_e);
+    return libvlc_media_list_count( p_mlv->p_mlist );
 }
 
 /**************************************************************************

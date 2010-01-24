@@ -83,12 +83,9 @@ VLC_DEPRECATED_API void
  *
  * \param p_ml a media list instance
  * \param p_mi media instance to add
- * \param p_e initialized exception object
  */
 VLC_PUBLIC_API void
-    libvlc_media_list_set_media( libvlc_media_list_t *,
-                                            libvlc_media_t *,
-                                            libvlc_exception_t *);
+libvlc_media_list_set_media( libvlc_media_list_t *p_ml, libvlc_media_t *p_md );
 
 /**
  * Get media instance from this media list instance. This action will increase
@@ -96,12 +93,10 @@ VLC_PUBLIC_API void
  * The libvlc_media_list_lock should NOT be held upon entering this function.
  *
  * \param p_ml a media list instance
- * \param p_e initialized exception object
  * \return media instance
  */
 VLC_PUBLIC_API libvlc_media_t *
-    libvlc_media_list_media( libvlc_media_list_t *,
-                                        libvlc_exception_t *);
+    libvlc_media_list_media( libvlc_media_list_t *p_ml );
 
 /**
  * Add media instance to media list
@@ -147,12 +142,10 @@ VLC_PUBLIC_API void
  * The libvlc_media_list_lock should be held upon entering this function.
  *
  * \param p_ml a media list instance
- * \param p_e initialized exception object
  * \return number of items in media list
  */
 VLC_PUBLIC_API int
-    libvlc_media_list_count( libvlc_media_list_t * p_mlist,
-                             libvlc_exception_t * p_e );
+    libvlc_media_list_count( libvlc_media_list_t *p_ml );
 
 /**
  * List media instance in media list at a position
@@ -173,13 +166,11 @@ VLC_PUBLIC_API libvlc_media_t *
  *
  * \param p_ml a media list instance
  * \param p_mi media list instance
- * \param p_e initialized exception object
  * \return position of media instance
  */
 VLC_PUBLIC_API int
-    libvlc_media_list_index_of_item( libvlc_media_list_t *,
-                                     libvlc_media_t *,
-                                     libvlc_exception_t * );
+    libvlc_media_list_index_of_item( libvlc_media_list_t *p_ml,
+                                     libvlc_media_t *p_mi );
 
 /**
  * This indicates if this media list is read-only from a user point of view
@@ -238,12 +229,10 @@ VLC_PUBLIC_API libvlc_media_list_view_t *
  * The p_event_manager is immutable, so you don't have to hold the lock
  *
  * \param p_ml a media list instance
- * \param p_ex an excpetion instance
  * \return libvlc_event_manager
  */
 VLC_PUBLIC_API libvlc_event_manager_t *
-    libvlc_media_list_event_manager( libvlc_media_list_t *,
-                                     libvlc_exception_t * );
+    libvlc_media_list_event_manager( libvlc_media_list_t *p_ml );
 
 /** @} media_list */
 

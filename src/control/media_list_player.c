@@ -116,7 +116,7 @@ static inline void assert_locked(libvlc_media_list_player_t * p_mlp)
 static inline libvlc_event_manager_t * mlist_em(libvlc_media_list_player_t * p_mlp)
 {
     assert_locked(p_mlp);
-    return libvlc_media_list_event_manager(p_mlp->p_mlist, NULL);
+    return libvlc_media_list_event_manager(p_mlp->p_mlist);
 }
 
 static inline libvlc_event_manager_t * mplayer_em(libvlc_media_list_player_t * p_mlp)
@@ -144,7 +144,7 @@ get_next_path(libvlc_media_list_player_t * p_mlp, bool b_loop)
 
     if (!p_mlp->current_playing_item_path)
     {
-        if (!libvlc_media_list_count(p_mlp->p_mlist, NULL))
+        if (!libvlc_media_list_count(p_mlp->p_mlist))
             return NULL;
         return libvlc_media_list_path_with_root_index(0);
     }
@@ -172,7 +172,7 @@ get_next_path(libvlc_media_list_player_t * p_mlp, bool b_loop)
     ret[depth - 1]++; /* set to next element */
 
     /* If this goes beyond the end of the list */
-    while(ret[depth-1] >= libvlc_media_list_count(p_parent_of_playing_item, NULL))
+    while(ret[depth-1] >= libvlc_media_list_count(p_parent_of_playing_item))
     {
         depth--;
         if (depth <= 0)
@@ -218,7 +218,7 @@ find_last_item( libvlc_media_list_t * p_mlist, libvlc_media_list_path_t current_
 
     if(p_sublist)
     {
-        int i_count = libvlc_media_list_count(p_sublist, NULL);
+        int i_count = libvlc_media_list_count(p_sublist);
         if(i_count > 0)
         {
             /* Add the last sublist item to the path. */
@@ -252,7 +252,7 @@ get_previous_path(libvlc_media_list_player_t * p_mlp, bool b_loop)
 
     if (!p_mlp->current_playing_item_path)
     {
-        if (!libvlc_media_list_count(p_mlp->p_mlist, NULL))
+        if (!libvlc_media_list_count(p_mlp->p_mlist))
             return NULL;
         return libvlc_media_list_path_with_root_index(0);
     }
@@ -285,7 +285,7 @@ get_previous_path(libvlc_media_list_player_t * p_mlp, bool b_loop)
             // Is looping enabled?
             if(b_loop)
             {
-                int i_count = libvlc_media_list_count(p_parent_of_playing_item, NULL);
+                int i_count = libvlc_media_list_count(p_parent_of_playing_item);
 
                 /* Set current play item to the last element in the list */
                 ret[0] = i_count - 1;
