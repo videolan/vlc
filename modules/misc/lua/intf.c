@@ -184,9 +184,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     {
         msg_Err( p_intf, "Couldn't find lua interface script \"%s\".",
                  psz_name );
-        free( psz_name );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
     msg_Dbg( p_intf, "Found lua interface script: %s", p_sys->psz_filename );
 
@@ -194,10 +192,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     if( !L )
     {
         msg_Err( p_intf, "Could not create new Lua State" );
-        free( p_sys->psz_filename );
-        free( psz_name );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
 
     luaL_openlibs( L );
@@ -244,19 +239,13 @@ int Open_LuaIntf( vlc_object_t *p_this )
                   "package.path = [[%s"DIR_SEP"modules"DIR_SEP"?.lua;]]..package.path",
                   p_sys->psz_filename ) < 0 )
     {
-        free( p_sys->psz_filename );
-        free( psz_name );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
     *psz_char = DIR_SEP_CHAR;
     if( luaL_dostring( L, psz_command ) )
     {
         free( psz_command );
-        free( p_sys->psz_filename );
-        free( psz_name );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
     free( psz_command );
     }
@@ -303,12 +292,19 @@ int Open_LuaIntf( vlc_object_t *p_this )
 
     if( vlc_clone( &p_sys->thread, Run, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
-        p_sys->exiting = true;
-        Close_LuaIntf( p_this );
-        return VLC_ENOMEM;
+        p_intf->psz_header = NULL;
+        vlc_cond_destroy( &p_sys->wait );
+        vlc_mutex_destroy( &p_sys->lock );
+        lua_close( p_sys->L );
+        goto error;
     }
 
     return VLC_SUCCESS;
+error:
+    free( p_sys->psz_filename );
+    free( p_sys );
+    free( psz_name );
+    return VLC_EGENERIC;
 }
 
 void Close_LuaIntf( vlc_object_t *p_this )
@@ -316,16 +312,11 @@ void Close_LuaIntf( vlc_object_t *p_this )
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     intf_sys_t *p_sys = p_intf->p_sys;
 
-    vlc_cancel( p_sys->thread );
-
-    if( !p_sys->exiting ) /* <- Read-only here and in thread: no locking */
-    {
-        vlc_mutex_lock( &p_sys->lock );
-        p_sys->exiting = true;
-        vlc_cond_signal( &p_sys->wait );
-        vlc_mutex_unlock( &p_sys->lock );
-        vlc_join( p_sys->thread, NULL );
-    }
+    vlc_mutex_lock( &p_sys->lock );
+    p_sys->exiting = true;
+    vlc_cond_signal( &p_sys->wait );
+    vlc_mutex_unlock( &p_sys->lock );
+    vlc_join( p_sys->thread, NULL );
     vlc_cond_destroy( &p_sys->wait );
     vlc_mutex_destroy( &p_sys->lock );
 
