@@ -41,8 +41,7 @@
         libvlc_exception_init(&ex);
         instance = libvlc_media_list_player_new([VLCLibrary sharedInstance], &ex);
         catch_exception(&ex);
-        libvlc_media_list_player_set_media_player(instance, [_mediaPlayer libVLCMediaPlayer], &ex);
-        catch_exception(&ex);
+        libvlc_media_list_player_set_media_player(instance, [_mediaPlayer libVLCMediaPlayer]);
     }
     return self;
 }
@@ -66,11 +65,8 @@
         return;
     [_mediaList release];
     _mediaList = [mediaList retain];
-    
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    libvlc_media_list_player_set_media_list(instance, [mediaList libVLCMediaList], &ex);
-    catch_exception(&ex);
+
+    libvlc_media_list_player_set_media_list(instance, [mediaList libVLCMediaList]);
     [self willChangeValueForKey:@"rootMedia"];
     [_rootMedia release];
     _rootMedia = nil;
@@ -125,30 +121,28 @@
 
 - (void)stop
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    libvlc_media_list_player_stop(instance, &ex);
-    catch_exception(&ex);
+    libvlc_media_list_player_stop(instance);
 }
 
 - (void)setRepeatMode:(VLCRepeatMode)repeatMode
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
+    libvlc_playback_mode_t mode;
     switch (repeatMode) {
         case VLCRepeatAllItems:
-            libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_default, &ex);
+            mode = libvlc_playback_mode_loop;
             break;
         case VLCDoNotRepeat:
-            libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_default, &ex);
+            mode = libvlc_playback_mode_default;
             break;
         case VLCRepeatCurrentItem:
-            libvlc_media_list_player_set_playback_mode(instance, libvlc_playback_mode_repeat, &ex);
+            mode = libvlc_playback_mode_repeat;
             break;
         default:
+            NSAssert(0, @"Should not be reached");
             break;
     }
-    catch_exception(&ex);
+    libvlc_media_list_player_set_playback_mode(instance, mode);
+
     _repeatMode = repeatMode;
 }
 

@@ -62,21 +62,21 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 @protocol VLCMediaPlayerDelegate
 /**
  * Sent by the default notification center whenever the player's time has changed.
- * \details Discussion The value of aNotification is always an VLCMediaPlayerTimeChanged notification. You can retrieve 
+ * \details Discussion The value of aNotification is always an VLCMediaPlayerTimeChanged notification. You can retrieve
  * the VLCMediaPlayer object in question by sending object to aNotification.
  */
 - (void)mediaPlayerTimeChanged:(NSNotification *)aNotification;
 
 /**
  * Sent by the default notification center whenever the player's state has changed.
- * \details Discussion The value of aNotification is always an VLCMediaPlayerStateChanged notification. You can retrieve 
+ * \details Discussion The value of aNotification is always an VLCMediaPlayerStateChanged notification. You can retrieve
  * the VLCMediaPlayer object in question by sending object to aNotification.
  */
 - (void)mediaPlayerStateChanged:(NSNotification *)aNotification;
 @end
 
 // TODO: Should we use medialist_player or our own flavor of media player?
-@interface VLCMediaPlayer : NSObject 
+@interface VLCMediaPlayer : NSObject
 {
     id delegate;                        //< Object delegate
     void * instance;                    //  Internal
@@ -109,9 +109,6 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 
 - (void)setVideoCropGeometry:(char *)value;
 - (char *)videoCropGeometry;
-
-- (void)setVideoTeleText:(NSUInteger)value;
-- (NSUInteger)videoTeleText;
 
 /**
  * Take a snapshot of the current video.
@@ -148,7 +145,7 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
  */
 - (void)setTime:(VLCTime *)value;
 
-/** 
+/**
  * Returns the current position (or time) of the feed.
  * \return VLCTIme object with current time.
  */
@@ -228,8 +225,8 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 
 /* Playback Operations */
 /**
- * Plays a media resource using the currently selected media controller (or 
- * default controller.  If feed was paused then the feed resumes at the position 
+ * Plays a media resource using the currently selected media controller (or
+ * default controller.  If feed was paused then the feed resumes at the position
  * it was paused in.
  * \return A Boolean determining whether the stream was played or not.
  */
@@ -339,7 +336,7 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 - (VLCMediaPlayerState)state;
 
 /**
- * Returns the receiver's position in the reading. 
+ * Returns the receiver's position in the reading.
  * \return A number between 0 and 1. indicating the position
  */
 - (float)position;

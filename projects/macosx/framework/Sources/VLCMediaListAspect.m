@@ -48,7 +48,7 @@
     if(self = [super init])
     {
         media = nil;
-        children = nil;        
+        children = nil;
     }
     return self;
 }
@@ -95,8 +95,8 @@ static void HandleMediaListViewItemAdded(const libvlc_event_t * event, void * us
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
-    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
-                                                 withMethod:@selector(mediaListViewItemAdded:) 
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self
+                                                 withMethod:@selector(mediaListViewItemAdded:)
                                        withArgumentAsObject:[NSArray arrayWithObject:[NSDictionary dictionaryWithObjectsAndKeys:
                                                           [VLCMedia mediaWithLibVLCMediaDescriptor:event->u.media_list_item_added.item], @"media",
                                                           [NSNumber numberWithInt:event->u.media_list_item_added.index], @"index",
@@ -108,8 +108,8 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
-    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
-                                                 withMethod:@selector(mediaListViewItemRemoved:) 
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self
+                                                 withMethod:@selector(mediaListViewItemRemoved:)
                                        withArgumentAsObject:[NSNumber numberWithInt:event->u.media_list_item_deleted.index]];
     [pool release];
 }
@@ -135,8 +135,8 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
              * We also may receive a -retain in some event callback that may occcur
              * Before libvlc_event_detach. So this can't happen in dealloc */
             libvlc_event_manager_t * p_em = libvlc_media_list_view_event_manager(p_mlv);
-            libvlc_event_detach(p_em, libvlc_MediaListViewItemDeleted, HandleMediaListViewItemDeleted, self, NULL);
-            libvlc_event_detach(p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaListViewItemDeleted, HandleMediaListViewItemDeleted, self);
+            libvlc_event_detach(p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self);
         }
         [super release];
     }
@@ -159,8 +159,8 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     libvlc_exception_init( &p_e );
     libvlc_media_t * p_md = libvlc_media_list_view_item_at_index( p_mlv, index, &p_e );
     catch_exception( &p_e );
-    
-    // Returns local object for media descriptor, searchs for user data first.  If not found it creates a 
+
+    // Returns local object for media descriptor, searchs for user data first.  If not found it creates a
     // new cocoa object representation of the media descriptor.
     return [VLCMedia mediaWithLibVLCMediaDescriptor:p_md];
 }
@@ -175,7 +175,7 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
     if( !p_sub_mlv )
         return nil;
 
-    // Returns local object for media descriptor, searchs for user data first.  If not found it creates a 
+    // Returns local object for media descriptor, searchs for user data first.  If not found it creates a
     // new cocoa object representation of the media descriptor.
     return [VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_sub_mlv];
 }
@@ -276,14 +276,14 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 - (void)initInternalMediaListView
 {
     libvlc_exception_t e;
-    libvlc_exception_init( &e );
+    libvlc_exception_init(&e);
 
-    libvlc_event_manager_t * p_em = libvlc_media_list_event_manager( p_mlv, &e );
+    libvlc_event_manager_t * p_em = libvlc_media_list_event_manager(p_mlv);
 
     /* Add internal callback */
-    libvlc_event_attach( p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self, &e );
-    libvlc_event_attach( p_em, libvlc_MediaListViewItemDeleted, HandleMediaListViewItemDeleted, self, &e );
-    catch_exception( &e );
+    libvlc_event_attach(p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self, &e);
+    libvlc_event_attach(p_em, libvlc_MediaListViewItemDeleted, HandleMediaListViewItemDeleted, self, &e);
+    catch_exception(&e);
 }
 
 - (void)mediaListViewItemAdded:(NSArray *)arrayOfArgs

@@ -231,10 +231,10 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
              * We also may receive a -retain in some event callback that may occcur
              * Before libvlc_event_detach. So this can't happen in dealloc */
             libvlc_event_manager_t * p_em = libvlc_media_event_manager(p_md);
-            libvlc_event_detach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self, NULL);
-            libvlc_event_detach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self, NULL);
-            libvlc_event_detach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self, NULL);
-            libvlc_event_detach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self, NULL);
+            libvlc_event_detach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self);
+            libvlc_event_detach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self);
+            libvlc_event_detach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self);
+            libvlc_event_detach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self);
         }
         [super release];
     }

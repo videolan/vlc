@@ -52,8 +52,8 @@ static void HandleMediaDiscovererStarted(const libvlc_event_t * event, void * us
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
-    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
-                                                 withMethod:@selector(mediaDiscovererStarted) 
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self
+                                                 withMethod:@selector(mediaDiscovererStarted)
                                        withArgumentAsObject:nil];
     [pool release];
 }
@@ -62,13 +62,13 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
 {
     NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
     id self = user_data;
-    [[VLCEventManager sharedManager] callOnMainThreadObject:self 
-                                                 withMethod:@selector(mediaDiscovererEnded) 
+    [[VLCEventManager sharedManager] callOnMainThreadObject:self
+                                                 withMethod:@selector(mediaDiscovererEnded)
                                        withArgumentAsObject:nil];
     [pool release];
 }
 
- 
+
 @implementation VLCMediaDiscoverer
 + (NSArray *)availableMediaDiscoverer
 {
@@ -90,17 +90,19 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
     if (self = [super init])
     {
         libvlc_exception_t ex;
-        libvlc_exception_init( &ex );
+        libvlc_exception_init(&ex);
         localizedName = nil;
         discoveredMedia = nil;
-        mdis = libvlc_media_discoverer_new_from_name( [VLCLibrary sharedInstance],
-                                                      [aServiceName UTF8String],
-                                                      &ex );
-        catch_exception( &ex );       
+        mdis = libvlc_media_discoverer_new_from_name([VLCLibrary sharedInstance],
+                                                     [aServiceName UTF8String],
+                                                     &ex);
+        catch_exception(&ex);
 
         libvlc_event_manager_t * p_em = libvlc_media_discoverer_event_manager(mdis);
-        libvlc_event_attach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self, NULL);
-        libvlc_event_attach(p_em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self, NULL);
+        libvlc_event_attach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self, &ex);
+        libvlc_event_attach(p_em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self, &ex);
+        catch_exception( &ex );
+
         running = libvlc_media_discoverer_is_running(mdis);
     }
     return self;
@@ -115,9 +117,9 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
             /* We must make sure we won't receive new event after an upcoming dealloc
              * We also may receive a -retain in some event callback that may occcur
              * Before libvlc_event_detach. So this can't happen in dealloc */
-            libvlc_event_manager_t * p_em = libvlc_media_list_event_manager(mdis, NULL);
-            libvlc_event_detach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self, NULL);
-            libvlc_event_detach(p_em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self, NULL);
+            libvlc_event_manager_t * p_em = libvlc_media_list_event_manager(mdis);
+            libvlc_event_detach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self);
+            libvlc_event_detach(p_em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self);
         }
         [super release];
     }
@@ -148,7 +150,7 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
 {
     if ( localizedName )
         return localizedName;
-    
+
     char * name = libvlc_media_discoverer_localized_name( mdis );
     if (name)
     {

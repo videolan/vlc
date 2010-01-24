@@ -207,7 +207,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (void)dealloc
 {
-    NSAssert(libvlc_media_player_get_state(instance, NULL) == libvlc_Stopped, @"You released the media player before ensuring that it is stopped");
+    NSAssert(libvlc_media_player_get_state(instance) == libvlc_Stopped, @"You released the media player before ensuring that it is stopped");
 
     // Always get rid of the delegate first so we can stop sending messages to it
     // TODO: Should we tell the delegate that we're shutting down?
@@ -216,7 +216,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     // Clear our drawable as we are going to release it, we don't
     // want the core to use it from this point. This won't happen as
     // the media player must be stopped.
-    libvlc_media_player_set_nsobject(instance, nil, NULL);
+    libvlc_media_player_set_nsobject(instance, nil);
 
     libvlc_media_player_release(instance);
 
@@ -252,10 +252,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 - (void)setDrawable:(id)aDrawable
 {
     // Make sure that this instance has been associated with the drawing canvas.
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_media_player_set_nsobject(instance, aDrawable, &ex);
-    catch_exception( &ex );
+    libvlc_media_player_set_nsobject(instance, aDrawable);
 }
 
 - (id)drawable
@@ -316,7 +313,11 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (NSArray *)videoSubTitles
 {
+    libvlc_exception_t ex;
+    libvlc_exception_init( &ex );
     libvlc_track_description_t *currentTrack = libvlc_video_get_spu_description( instance, &ex );
+    catch_exception( &ex );
+
     NSMutableArray *tempArray = [NSMutableArray array];
     while (currentTrack) {
         [tempArray addObject:[NSString stringWithUTF8String:currentTrack->psz_name]];
@@ -362,23 +363,6 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     char * result = libvlc_video_get_aspect_ratio( instance, &ex );
-    catch_exception( &ex );
-    return result;
-}
-
-- (void)setVideoTeleText:(NSUInteger)value
-{
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_video_set_teletext( instance, value, &ex );
-    catch_exception( &ex );
-}
-
-- (NSUInteger)videoTeleText
-{
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    NSInteger result = libvlc_video_get_teletext( instance, &ex );
     catch_exception( &ex );
     return result;
 }
@@ -660,10 +644,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
         [media release];
         media = [value retain];
 
-        libvlc_exception_t ex;
-        libvlc_exception_init( &ex );
-        libvlc_media_player_set_media( instance, [media libVLCMediaDescriptor], &ex );
-        catch_exception( &ex );
+        libvlc_media_player_set_media(instance, [media libVLCMediaDescriptor]);
     }
 }
 
@@ -695,8 +676,8 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
     // Pause the stream
     libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_media_player_pause( (libvlc_media_player_t *)instance, &ex );
+    libvlc_exception_init(&ex);
+    libvlc_media_player_pause(instance, &ex);
 
     // fail gracefully
     // in most cases, it's just EOF so let's stop
@@ -708,10 +689,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (void)stop
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_media_player_stop((libvlc_media_player_t *)instance, &ex);
-    catch_exception( &ex );
+    libvlc_media_player_stop(instance);
 }
 
 - (void)fastForward
@@ -904,28 +882,28 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
     libvlc_exception_init( &ex );
 
     // Attach event observers into the media instance
-    libvlc_event_manager_t * p_em = libvlc_media_player_event_manager( instance, &ex );
-    libvlc_event_attach( p_em, libvlc_MediaPlayerPlaying,          HandleMediaInstanceStateChanged, self, &ex );
-    libvlc_event_attach( p_em, libvlc_MediaPlayerPaused,           HandleMediaInstanceStateChanged, self, &ex );
-    libvlc_event_attach( p_em, libvlc_MediaPlayerEncounteredError, HandleMediaInstanceStateChanged, self, &ex );
-    libvlc_event_attach( p_em, libvlc_MediaPlayerEndReached,       HandleMediaInstanceStateChanged, self, &ex );
+    libvlc_event_manager_t * p_em = libvlc_media_player_event_manager(instance);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerPlaying,          HandleMediaInstanceStateChanged, self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerPaused,           HandleMediaInstanceStateChanged, self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerEncounteredError, HandleMediaInstanceStateChanged, self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerEndReached,       HandleMediaInstanceStateChanged, self, &ex);
     /* FIXME: We may want to turn that off when none is interested by that */
-    libvlc_event_attach( p_em, libvlc_MediaPlayerPositionChanged, HandleMediaPositionChanged,      self, &ex );
-    libvlc_event_attach( p_em, libvlc_MediaPlayerTimeChanged,     HandleMediaTimeChanged,          self, &ex );
-    libvlc_event_attach( p_em, libvlc_MediaPlayerMediaChanged,     HandleMediaPlayerMediaChanged,  self, &ex );
-    catch_exception( &ex );
+    libvlc_event_attach(p_em, libvlc_MediaPlayerPositionChanged, HandleMediaPositionChanged,      self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerTimeChanged,     HandleMediaTimeChanged,          self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerMediaChanged,    HandleMediaPlayerMediaChanged,  self, &ex);
+    catch_exception(&ex);
 }
 
 - (void)unregisterObservers
 {
-    libvlc_event_manager_t * p_em = libvlc_media_player_event_manager( instance, NULL );
-    libvlc_event_detach( p_em, libvlc_MediaPlayerPlaying,          HandleMediaInstanceStateChanged, self, NULL );
-    libvlc_event_detach( p_em, libvlc_MediaPlayerPaused,           HandleMediaInstanceStateChanged, self, NULL );
-    libvlc_event_detach( p_em, libvlc_MediaPlayerEncounteredError, HandleMediaInstanceStateChanged, self, NULL );
-    libvlc_event_detach( p_em, libvlc_MediaPlayerEndReached,       HandleMediaInstanceStateChanged, self, NULL );
-    libvlc_event_detach( p_em, libvlc_MediaPlayerPositionChanged,  HandleMediaPositionChanged,      self, NULL );
-    libvlc_event_detach( p_em, libvlc_MediaPlayerTimeChanged,      HandleMediaTimeChanged,          self, NULL );
-    libvlc_event_attach( p_em, libvlc_MediaPlayerMediaChanged,     HandleMediaPlayerMediaChanged,   self, NULL );
+    libvlc_event_manager_t * p_em = libvlc_media_player_event_manager(instance);
+    libvlc_event_detach(p_em, libvlc_MediaPlayerPlaying,          HandleMediaInstanceStateChanged, self);
+    libvlc_event_detach(p_em, libvlc_MediaPlayerPaused,           HandleMediaInstanceStateChanged, self);
+    libvlc_event_detach(p_em, libvlc_MediaPlayerEncounteredError, HandleMediaInstanceStateChanged, self);
+    libvlc_event_detach(p_em, libvlc_MediaPlayerEndReached,       HandleMediaInstanceStateChanged, self);
+    libvlc_event_detach(p_em, libvlc_MediaPlayerPositionChanged,  HandleMediaPositionChanged,      self);
+    libvlc_event_detach(p_em, libvlc_MediaPlayerTimeChanged,      HandleMediaTimeChanged,          self);
+    libvlc_event_detach(p_em, libvlc_MediaPlayerMediaChanged,     HandleMediaPlayerMediaChanged,   self);
 }
 
 - (void)mediaPlayerTimeChanged:(NSNumber *)newTime
