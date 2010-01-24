@@ -316,18 +316,14 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (NSArray *)videoSubTitles
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    NSInteger count = libvlc_video_get_spu_count( instance, &ex );
-    catch_exception( &ex );
-
-    libvlc_track_description_t *tracks = libvlc_video_get_spu_description( instance, &ex );
+    libvlc_track_description_t *currentTrack = libvlc_video_get_spu_description( instance, &ex );
     NSMutableArray *tempArray = [NSMutableArray array];
-    NSInteger i;
-    for (i = 0; i < count; i++)
-    {
-        [tempArray addObject:[NSString stringWithUTF8String: tracks->psz_name]];
-        tracks = tracks->p_next;
+    while (currentTrack) {
+        [tempArray addObject:[NSString stringWithUTF8String:currentTrack->psz_name]];
+        free(currentTrack->psz_name);
+        libvlc_track_description_t *tofree = currentTrack;
+        currentTrack = currentTrack->p_next;
+        free(tofree);
     }
     return [NSArray arrayWithArray: tempArray];
 }
