@@ -63,10 +63,9 @@ extern "C" {
  *        played
  * \param i_options the number of options to add to the item
  * \param ppsz_options the options to add to the item
- * \param p_e an initialized exception pointer
  */
 VLC_DEPRECATED_API void libvlc_playlist_play( libvlc_instance_t*, int, int,
-                                          char **, libvlc_exception_t * );
+                                          char ** );
 
 /** @}*/
 

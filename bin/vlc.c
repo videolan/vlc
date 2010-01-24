@@ -150,9 +150,8 @@ int main( int i_argc, const char *ppsz_argv[] )
             return 1; // BOOM!
     argv[argc] = NULL;
 
-    libvlc_exception_t ex, dummy;
+    libvlc_exception_t ex;
     libvlc_exception_init (&ex);
-    libvlc_exception_init (&dummy);
 
     /* Initialize libvlc */
     libvlc_instance_t *vlc = libvlc_new (argc, argv, &ex);
@@ -166,7 +165,7 @@ int main( int i_argc, const char *ppsz_argv[] )
 #endif
         if (libvlc_add_intf (vlc, NULL) == 0)
         {
-            libvlc_playlist_play (vlc, -1, 0, NULL, &dummy);
+            libvlc_playlist_play (vlc, -1, 0, NULL);
             libvlc_wait (vlc);
         }
         libvlc_release (vlc);

@@ -162,9 +162,8 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     argc = parse_cmdline (psz_cmdline, &argv);
 #endif
 
-    libvlc_exception_t ex, dummy;
+    libvlc_exception_t ex;
     libvlc_exception_init (&ex);
-    libvlc_exception_init (&dummy);
 
     /* Initialize libvlc */
     libvlc_instance_t *vlc;
@@ -173,14 +172,13 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     {
         libvlc_add_intf (vlc, "globalhotkeys,none");
         libvlc_add_intf (vlc, NULL);
-        libvlc_playlist_play (vlc, -1, 0, NULL, &dummy);
+        libvlc_playlist_play (vlc, -1, 0, NULL);
         libvlc_wait (vlc);
         libvlc_release (vlc);
     }
 
     ret = libvlc_exception_raised (&ex);
     libvlc_exception_clear (&ex);
-    libvlc_exception_clear (&dummy);
 
     for (int i = 0; i < argc; i++)
         free (argv[i]);
