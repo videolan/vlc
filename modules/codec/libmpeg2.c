@@ -126,7 +126,7 @@ static int DpbDisplayPicture( decoder_t *, picture_t * );
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("MPEG I/II video decoder (using libmpeg2)") )
-    set_capability( "decoder", 150 )
+    set_capability( "decoder", 50 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_VCODEC )
     set_callbacks( OpenDecoder, CloseDecoder )
