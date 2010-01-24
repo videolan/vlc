@@ -50,24 +50,6 @@ vlclibdir="\${libdir}/\${PKGDIR}"
 AC_SUBST(vlclibdir)
 
 dnl
-dnl  Deprecated options
-dnl  to notify packagers that stuff has changed
-dnl
-AC_ARG_ENABLE(python-bindings,
-  [  --enable-python-bindings Always fails for historical reasons)],,
-  [enable_python_bindings="no"])
-AS_IF([test "${enable_python_bindings}" != "no"], [
-  AC_MSG_ERROR([Python bindings are now built from a separate source package])
-])
-
-AC_ARG_ENABLE(java-bindings,
-  [  --enable-java-bindings  Always fails for historical reasons],,
-  [enable_java_bindings="no"])
-AS_IF([test "${enable_java_bindings}" != "no"], [
-  AC_MSG_ERROR([Java bindings are now built from a separate source package])
-])
-
-dnl
 dnl  Save *FLAGS
 dnl
 VLC_SAVE_FLAGS
@@ -1755,15 +1737,6 @@ AC_ARG_WITH(,[Input plugins:])
 
 dnl  live555 input
 dnl
-if test "${enable_livedotcom}"
-then
-  AC_MSG_WARN(--{en|dis}able-livedotcom is deprecated. Use --{en|dis}able-live555 instead.)
-fi
-if test "${enable_livedotcom}" = "no"
-then
-  enable_live555="no"
-fi
-
 AC_ARG_ENABLE(live555,
 [  --enable-live555        live555 RTSP input plugin (default enabled)])
 if test "${enable_live555}" != "no"; then
@@ -1773,12 +1746,6 @@ if test "${enable_live555}" != "no"; then
   dnl
   dnl test for --with-live555-tree
   dnl
-  if test "${with_livedotcom_tree}"
-  then
-    AC_MSG_WARN(--with-livedotcom-tree is deprecated. Use --with-live555-tree instead.)
-  with_live555_tree="${with_livedotcom_tree}"
-  fi
-
   if test -z "${with_live555_tree}" -a "${CXX}" != ""; then
     AC_LANG_PUSH(C++)
     CPPFLAGS_save="${CPPFLAGS}"
@@ -2739,12 +2706,6 @@ AM_CONDITIONAL([MERGE_FFMPEG], [test "$enable_merge_ffmpeg" != "no"])
 dnl
 dnl  avcodec decoder/encoder plugin
 dnl
-
-if test "${with_ffmpeg_tree}"
-then
-  AC_MSG_WARN([--with-ffmpeg-tree is deprecated. Use PKG_CONFIG_PATH instead.])
-fi
-
 AC_ARG_ENABLE(avcodec,
 [  --enable-avcodec        libavcodec codec (default enabled)])
 if test "${enable_avcodec}" != "no"
@@ -3119,9 +3080,6 @@ AC_ARG_WITH(a52-fixed,
 dnl
 dnl DTS Coherent Acoustics decoder plugin
 dnl
-AS_IF([test "x${enable_dts}" != "x"], [
-  AC_MSG_ERROR([--enable-dts is obsolete. Please use libdca and --enable-dca.])
-])
 PKG_ENABLE_MODULES_VLC([DCA], [dtstofloat32], [libdca >= 0.0.5], [DTS Coherent Acoustics support with libdca], [auto])
 
 dnl
