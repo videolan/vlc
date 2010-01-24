@@ -80,7 +80,8 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
             else
                 p_char = NULL;
         }
-        else {
+        else
+        {
             size_t len = strlen(psz_img_name);
             /* Do we end by "VLC"? If so we are the legacy VLC.app that doesn't
              * link to VLCKit. */
