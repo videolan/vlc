@@ -142,10 +142,10 @@ AC_ARG_WITH(contrib,
        with_cyberlink_tree=${CONTRIB_DIR}/src/clinkcc
     fi
 
-    if test ".`uname -s`" = ".Darwin"; then
+    if test "${SYS}" = "darwin"; then
       export LD_LIBRARY_PATH=${CONTRIB_DIR}/lib:$LD_LIBRARY_PATH
       export DYLD_LIBRARY_PATH=${CONTRIB_DIR}/lib:$DYLD_LIBRARY_PATH
-    elif test ".`uname -s`" = ".BeOS"; then
+    elif test "${SYS}" = "beos"; then
       export LIBRARY_PATH=${CONTRIB_DIR}/lib:$LIBRARY_PATH
       export BELIBRARIES=${CONTRIB_DIR}/lib:$BELIBRARIES
     fi
@@ -273,7 +273,7 @@ case "${host_os}" in
     fi
     ;;
   darwin9*)
-    if (test ".`uname -p`" = ".i386"); then
+    if test "${host_cpu}" = "i386"; then
         dnl Due to a ld(64) bug in 10.5 we cannot use our mmx code
         dnl without hacking it a lot, we disable mmx and sse.
         dnl (that bug is about ld being unable to handle
