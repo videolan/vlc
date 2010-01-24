@@ -95,6 +95,8 @@ public:
     void removeItem( int );
     void rebuild(); void rebuild( playlist_item_t *, bool b_first = false );
 
+    static inline PLItem *getItem( QModelIndex index );
+
 private:
 
     /* General */
@@ -128,7 +130,7 @@ private:
     PLItem *findById( PLItem *, int );
     PLItem *findByInput( PLItem *, int );
     PLItem *findInner( PLItem *, int , bool );
-    static inline PLItem *getItem( QModelIndex index );
+
     int columnFromMeta( int meta_column ) const;
     int columnToMeta( int column ) const;
     bool canEdit() const;
