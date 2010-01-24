@@ -203,6 +203,11 @@ static int AVI_ChunkRead_list( stream_t *s, avi_chunk_t *p_container )
 
 #define AVI_READCHUNK_ENTER \
     int64_t i_read = __EVEN(p_chk->common.i_chunk_size ) + 8; \
+    if( i_read > 100000000 ) \
+    { \
+        msg_Err( s, "Big chunk ignored" ); \
+        return VLC_EGENERIC; \
+    } \
     uint8_t  *p_read, *p_buff;    \
     if( !( p_read = p_buff = malloc(i_read ) ) ) \
     { \
