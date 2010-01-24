@@ -110,16 +110,13 @@ static const struct
 
 static const char *WordInList( const char *psz_list, const char *psz_word )
 {
-    const char *psz_str = strstr( psz_list, psz_word );
-    int i_len = strlen( psz_word );
-    while( psz_str )
+    size_t i_len = strlen( psz_word );
+
+    for( const char *s = psz_list; s; s = strchr( s, ',' ) )
     {
-        if( (psz_str == psz_list || *(psz_str-1) == ',' )
-         /* it doesn't start in middle of a word */
-         /* it doest end in middle of a word */
-         && ( psz_str[i_len] == '\0' || psz_str[i_len] == ',' ) )
-            return psz_str;
-        psz_str = strstr( psz_str, psz_word );
+        if( !strncmp( s, psz_word, i_len )
+         && memchr( ",", s[i_len], 2 ) )
+            return s;
     }
     return NULL;
 }
