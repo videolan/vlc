@@ -224,6 +224,8 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
 
         while( p_sys->i_remainder < p_filter->fmt_out.audio.i_rate )
         {
+            if( p_out_buf->i_buffer/i_bytes_per_frame <= i_out )
+                break;
 
             if( p_sys->d_old_factor >= 1 )
             {
@@ -250,15 +252,6 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
                     *(p_out+i) *= d_old_scale_factor;
                 }
 #endif
-
-                /* Sanity check */
-                if( p_out_buf->i_buffer/i_bytes_per_frame <= i_out+1 )
-                {
-                    p_out += i_nb_channels;
-                    i_out++;
-                    p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
-                    break;
-                }
             }
             else
             {
@@ -297,7 +290,10 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
     {
         while( p_sys->i_remainder < p_filter->fmt_out.audio.i_rate )
         {
+            if( p_out_buf->i_buffer/i_bytes_per_frame <= i_out )
+                break;
 
+            assert( i_out < p_out_buf->i_buffer/i_bytes_per_frame );
             if( d_factor >= 1 )
             {
                 /* FilterFloatUP() is faster if we can use it */
@@ -324,14 +320,6 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
                     *(p_out+i) *= d_old_scale_factor;
                 }
 #endif
-                /* Sanity check */
-                if( p_out_buf->i_buffer/i_bytes_per_frame <= i_out+1 )
-                {
-                    p_out += i_nb_channels;
-                    i_out++;
-                    p_sys->i_remainder += p_filter->fmt_in.audio.i_rate;
-                    break;
-                }
             }
             else
             {
