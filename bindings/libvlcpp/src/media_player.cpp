@@ -45,14 +45,12 @@ MediaPlayer::~MediaPlayer()
 
 void MediaPlayer::setMedia( Media &media )
 {
-    Exception ex;
-    libvlc_media_player_set_media( m_player, media.instance(), &ex.ex );
+    libvlc_media_player_set_media( m_player, media.instance() );
 }
 
 int MediaPlayer::isPlaying()
 {
-    Exception ex;
-    return libvlc_media_player_is_playing( m_player, &ex.ex );
+    return libvlc_media_player_is_playing( m_player );
 }
 
 void MediaPlayer::play()
@@ -69,14 +67,12 @@ void MediaPlayer::pause()
 
 void MediaPlayer::stop()
 {
-    Exception ex;
-    libvlc_media_player_stop( m_player, &ex.ex );
+    libvlc_media_player_stop( m_player );
 }
 
 void MediaPlayer::setNSObject( void *drawable )
 {
-    Exception ex;
-    libvlc_media_player_set_nsobject( m_player, drawable, &ex.ex );
+    libvlc_media_player_set_nsobject( m_player, drawable );
 }
 
 void* MediaPlayer::nsobject()
@@ -86,8 +82,7 @@ void* MediaPlayer::nsobject()
 
 void MediaPlayer::setAgl( uint32_t drawable )
 {
-    Exception ex;
-    libvlc_media_player_set_agl( m_player, drawable, &ex.ex );
+    libvlc_media_player_set_agl( m_player, drawable );
 }
 
 uint32_t MediaPlayer::agl()
@@ -97,8 +92,7 @@ uint32_t MediaPlayer::agl()
 
 void MediaPlayer::setXWindow( uint32_t drawable )
 {
-    Exception ex;
-    libvlc_media_player_set_xwindow( m_player, drawable, &ex.ex );
+    libvlc_media_player_set_xwindow( m_player, drawable );
 }
 
 uint32_t MediaPlayer::xwindow()
@@ -108,8 +102,7 @@ uint32_t MediaPlayer::xwindow()
 
 void MediaPlayer::setHwnd( void *drawable )
 {
-    Exception ex;
-    libvlc_media_player_set_hwnd( m_player, drawable, &ex.ex );
+    libvlc_media_player_set_hwnd( m_player, drawable );
 }
 
 void *MediaPlayer::hwnd()
@@ -221,8 +214,7 @@ void MediaPlayer::setRate( float rate )
 
 libvlc_state_t MediaPlayer::state()
 {
-    Exception ex;
-    return libvlc_media_player_get_state( m_player, &ex.ex );
+    return libvlc_media_player_get_state( m_player );
 }
 
 float MediaPlayer::fps()
