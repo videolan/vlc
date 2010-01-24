@@ -1,3 +1,4 @@
+
 /*****************************************************************************
  * darwin_specific.m: Darwin specific features
  *****************************************************************************
@@ -69,7 +70,7 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
             p_char += 26; /* p_char += strlen(" VLCKit.framework/Versions/" ) */
             while( *p_char != '\0' && *p_char != '/')
                 p_char++;
-            
+
             /* If the string ends with VLC then we've found a winner */
             if ( !strcmp( p_char, "/VLCKit" ) )
             {
@@ -78,6 +79,16 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
             }
             else
                 p_char = NULL;
+        }
+        else {
+            size_t len = strlen(psz_img_name);
+            /* Do we end by "VLC"? If so we are the legacy VLC.app that doesn't
+             * link to VLCKit. */
+            if( !strcmp( psz_img_name + len - 3, "VLC") )
+            {
+                p_char = strdup( psz_img_name );
+                break;
+            }
         }
     }
     if ( !p_char )
