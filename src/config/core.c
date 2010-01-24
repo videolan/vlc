@@ -473,7 +473,7 @@ void config_UnsortConfig (void)
     config.list = NULL;
     config.count = 0;
 
-    free (config.list);
+    free (clist);
 }
 
 /*****************************************************************************
