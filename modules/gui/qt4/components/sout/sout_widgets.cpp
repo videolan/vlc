@@ -226,6 +226,57 @@ QString MMSHDestBox::getMRL( const QString& mux )
 }
 
 
+RTSPDestBox::RTSPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
+{
+    QGridLayout *layout = new QGridLayout( this );
+
+    QLabel *rtspOutput = new QLabel(
+        qtr( "This module outputs the transcoded stream to a network via "
+             "RTSP." ), this );
+    layout->addWidget( rtspOutput, 0, 0, 1, -1 );
+
+    QLabel *RTSPLabel = new QLabel( qtr("Path"), this );
+    QLabel *RTSPPortLabel = new QLabel( qtr("Port"), this );
+    layout->addWidget( RTSPLabel, 2, 0, 1, 1 );
+    layout->addWidget( RTSPPortLabel, 1, 0, 1, 1 );
+
+    RTSPEdit = new QLineEdit( this );
+    RTSPEdit->setText( "/" );
+
+    RTSPPort = new QSpinBox( this );
+    RTSPPort->setMaximumSize( QSize( 90, 16777215 ) );
+    RTSPPort->setAlignment( Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter );
+    RTSPPort->setMinimum( 1 );
+    RTSPPort->setMaximum( 65535 );
+    RTSPPort->setValue( 5544 );
+
+    layout->addWidget( RTSPEdit, 2, 1, 1, 1 );
+    layout->addWidget( RTSPPort, 1, 1, 1, 1 );
+    CS( RTSPPort );
+    CT( RTSPEdit );
+}
+
+QString RTSPDestBox::getMRL( const QString& mux )
+{
+    if( RTSPEdit->text().isEmpty() ) return "";
+
+    QString path = RTSPEdit->text();
+    if( path[0] != '/' )
+        path.prepend( qfu("/") );
+    QString port;
+    port.setNum( RTSPPort->value() );
+    QString sdp = "rtsp://:" + port + path;
+
+    SoutMrl m;
+    m.begin( "rtp" );
+    m.option( "sdp", sdp );
+    m.option( "mux", "ts" );
+    m.end();
+
+    return m.getMrl();
+}
+
+
 UDPDestBox::UDPDestBox( QWidget *_parent ) : VirtualDestBox( _parent )
 {
     QGridLayout *layout = new QGridLayout( this );

@@ -90,6 +90,17 @@ class MMSHDestBox: public VirtualDestBox
         QSpinBox *MMSHPort;
 };
 
+class RTSPDestBox: public VirtualDestBox
+{
+    Q_OBJECT;
+    public:
+        RTSPDestBox( QWidget *_parent = NULL );
+        virtual QString getMRL( const QString& );
+    private:
+        QLineEdit *RTSPEdit;
+        QSpinBox *RTSPPort;
+};
+
 class UDPDestBox: public VirtualDestBox
 {
     Q_OBJECT;
