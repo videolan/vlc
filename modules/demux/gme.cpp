@@ -115,7 +115,7 @@ static int Open( vlc_object_t *p_this )
     demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
     char        *ext;
-    int         i;
+    int         i = 0;
     vlc_value_t val;
  
     /* We accept file based on extention match */
