@@ -25,7 +25,7 @@ diff -urN libpng-1.2.41/scripts/makefile.darwin libpng/scripts/makefile.darwin
  RM_F=/bin/rm -f
 
  # CFLAGS=-I$(ZLIBINC) -W -Wall -O3 -funroll-loops -DPNG_NO_MMX_CODE
--CFLAGS=-DPNG_CONFIGURE_LIBPNG -I$(ZLIBINC) -W -Wall -O -funroll-loops
+-CFLAGS=-I$(ZLIBINC) -W -Wall -O -funroll-loops
 -LDFLAGS=-L. -L$(ZLIBLIB) -lpng12 -lz
 +CFLAGS=-DPNG_CONFIGURE_LIBPNG ??EXTRA_CFLAGS?? -I$(ZLIBINC) -W -Wall -O -funroll-loops
 +LDFLAGS=??EXTRA_LDFLAGS?? -L. -L$(ZLIBLIB) -lpng12 -lz
