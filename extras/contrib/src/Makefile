@@ -1040,9 +1040,6 @@ ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
 	patch -p0 < Patches/ffmpeg-svn-libavformat.patch
 endif
-ifdef HAVE_WIN32
-	(cd $@; patch -p0 < ../Patches/ffmpeg-svn-win32.patch)
-endif
 ifdef NO_TEXT_RELOCATION
 	echo "Broken LD. Fix your tools."
 	exit -1
