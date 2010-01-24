@@ -501,8 +501,6 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
  **/
 QMenu *QVLCMenu::ExtensionsMenu( intf_thread_t *p_intf, QMenu *current )
 {
-    QMenu *extMenu = NULL;
-
     QAction *extAction = NULL;
     foreach( QAction *action, current->actions() )
     {
@@ -515,7 +513,7 @@ QMenu *QVLCMenu::ExtensionsMenu( intf_thread_t *p_intf, QMenu *current )
 
     ExtensionsManager *extMgr = ExtensionsManager::getInstance( p_intf );
 
-    extMenu = new QMenu( qtr( "&Extensions" ) );
+    QMenu *extMenu = new QMenu( qtr( "&Extensions" ), current );
     if( extMgr->isLoaded() )
     {
         /* Let the ExtensionsManager build itself the menu */
@@ -531,6 +529,8 @@ QMenu *QVLCMenu::ExtensionsMenu( intf_thread_t *p_intf, QMenu *current )
         extAction->setMenu( extMenu );
     else
         current->addMenu( extMenu );
+
+    return extMenu;
 }
 
 /**
