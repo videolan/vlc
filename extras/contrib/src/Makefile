@@ -1064,6 +1064,7 @@ FFMPEGCONF += \
 	--disable-ffplay \
 	--disable-devices \
 	--disable-protocols \
+	--disable-filters \
 	--disable-network
 ifdef HAVE_WIN32
 FFMPEGCONF += --disable-bzlib --disable-decoder=dca --disable-encoder=vorbis --enable-libmp3lame --enable-w32threads --enable-dxva2 --disable-bsfs
