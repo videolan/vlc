@@ -199,7 +199,7 @@ private:
     intf_thread_t *p_intf;
 
 public slots:
-    void requestUpdate() { emit updateRequested(); };
+    void requestUpdate() { emit updateRequested(); }
     void update( )
     {
         requestUpdate();

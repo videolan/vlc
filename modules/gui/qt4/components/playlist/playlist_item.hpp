@@ -50,10 +50,10 @@ public:
     void removeChildren();
     void takeChildAt( int );
 
-    PLItem *child( int row ) { return children.value( row ); };
-    int childCount() const { return children.count(); };
+    PLItem *child( int row ) { return children.value( row ); }
+    int childCount() const { return children.count(); }
 
-    PLItem *parent() { return parentItem; };
+    PLItem *parent() { return parentItem; }
     input_item_t *inputItem() { return p_input; }
 
 protected:
