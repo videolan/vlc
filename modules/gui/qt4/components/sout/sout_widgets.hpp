@@ -1,5 +1,5 @@
 /*****************************************************************************
- * profile_selector.hpp : A small profile selector and editor
+ * sout_widgets.hpp : Widgets for stream output destination boxes
  ****************************************************************************
  * Copyright (C) 2009 the VideoLAN team
  * $Id$
