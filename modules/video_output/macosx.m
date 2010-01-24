@@ -342,6 +342,8 @@ static void OpenglSwap(vout_opengl_t *gl)
         return nil;
 
     self = [super initWithFrame:NSMakeRect(0,0,10,10) pixelFormat:fmt];
+    [fmt release];
+
     if (!self)
         return nil;
 
