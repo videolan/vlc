@@ -147,37 +147,33 @@ VLC_PUBLIC_API void libvlc_media_player_retain( libvlc_media_player_t * );
  * \param p_mi the Media Player
  * \param p_md the Media. Afterwards the p_md can be safely
  *        destroyed.
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_set_media( libvlc_media_player_t *, libvlc_media_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_media_player_set_media( libvlc_media_player_t *, libvlc_media_t * );
 
 /**
  * Get the media used by the media_player.
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
  * \return the media associated with p_mi, or NULL if no
  *         media is associated
  */
-VLC_PUBLIC_API libvlc_media_t * libvlc_media_player_get_media( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API libvlc_media_t * libvlc_media_player_get_media( libvlc_media_player_t * );
 
 /**
  * Get the Event Manager from which the media player send event.
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
  * \return the event manager associated with p_mi
  */
-VLC_PUBLIC_API libvlc_event_manager_t * libvlc_media_player_event_manager ( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API libvlc_event_manager_t * libvlc_media_player_event_manager ( libvlc_media_player_t * );
 
 /**
  * is_playing
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
  * \return 1 if the media player is playing, 0 otherwise
  */
-VLC_PUBLIC_API int libvlc_media_player_is_playing ( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_media_player_is_playing ( libvlc_media_player_t * );
 
 /**
  * Play
@@ -201,7 +197,7 @@ VLC_PUBLIC_API void libvlc_media_player_pause ( libvlc_media_player_t *, libvlc_
  * \param p_mi the Media Player
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t * );
 
 /**
  * Set the NSView handler where the media player should render its video output.
@@ -218,9 +214,8 @@ VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t *, libvlc_e
  * 
  * \param p_mi the Media Player
  * \param drawable the NSView handler
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_mi, void * drawable, libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_mi, void * drawable );
 
 /**
  * Get the NSView handler previously set with libvlc_media_player_set_nsobject().
@@ -237,7 +232,7 @@ VLC_PUBLIC_API void * libvlc_media_player_get_nsobject ( libvlc_media_player_t *
  * \param drawable the agl handler
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_set_agl ( libvlc_media_player_t *p_mi, uint32_t drawable, libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_media_player_set_agl ( libvlc_media_player_t *p_mi, uint32_t drawable );
 
 /**
  * Get the agl handler previously set with libvlc_media_player_set_agl().
@@ -262,9 +257,8 @@ VLC_PUBLIC_API uint32_t libvlc_media_player_get_agl ( libvlc_media_player_t *p_m
  *
  * \param p_mi the Media Player
  * \param drawable the ID of the X window
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_set_xwindow ( libvlc_media_player_t *p_mi, uint32_t drawable, libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_media_player_set_xwindow ( libvlc_media_player_t *p_mi, uint32_t drawable );
 
 /**
  * Get the X Window System window identifier previously set with
@@ -284,9 +278,8 @@ VLC_PUBLIC_API uint32_t libvlc_media_player_get_xwindow ( libvlc_media_player_t 
  *
  * \param p_mi the Media Player
  * \param drawable windows handle of the drawable
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_set_hwnd ( libvlc_media_player_t *p_mi, void *drawable, libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_media_player_set_hwnd ( libvlc_media_player_t *p_mi, void *drawable );
 
 /**
  * Get the Windows API window handle (HWND) previously set with
@@ -460,9 +453,8 @@ VLC_PUBLIC_API void libvlc_media_player_set_rate( libvlc_media_player_t *, float
  *
  * \param p_mi the Media Player
  * \param p_e an initialized exception pointer
- * \return current movie state as libvlc_state_t
  */
-VLC_PUBLIC_API libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *);
 
 /**
  * Get movie fps rate

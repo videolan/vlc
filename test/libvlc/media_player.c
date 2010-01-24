@@ -50,22 +50,16 @@ static void test_media_player_play_stop(const char** argv, int argc)
     /* Wait a correct state */
     libvlc_state_t state;
     do {
-        state = libvlc_media_player_get_state (mi, &ex);
-        catch ();
+        state = libvlc_media_player_get_state (mi);
     } while( state != libvlc_Playing &&
              state != libvlc_Error &&
              state != libvlc_Ended );
 
     assert( state == libvlc_Playing || state == libvlc_Ended );
 
-    libvlc_media_player_stop (mi, &ex);
-    catch ();
-
+    libvlc_media_player_stop (mi);
     libvlc_media_player_release (mi);
-    catch ();
-
     libvlc_release (vlc);
-    catch ();
 }
 
 static void test_media_player_pause_stop(const char** argv, int argc)
@@ -97,7 +91,7 @@ static void test_media_player_pause_stop(const char** argv, int argc)
     /* Wait a correct state */
     libvlc_state_t state;
     do {
-        state = libvlc_media_player_get_state (mi, &ex);
+        state = libvlc_media_player_get_state (mi);
         catch ();
     } while( state != libvlc_Playing &&
              state != libvlc_Error &&
@@ -115,24 +109,17 @@ static void test_media_player_pause_stop(const char** argv, int argc)
 
     /* Wait a correct state */
     do {
-        state = libvlc_media_player_get_state (mi, &ex);
-        catch ();
+        state = libvlc_media_player_get_state (mi);
     } while( state != libvlc_Paused &&
             state != libvlc_Error &&
             state != libvlc_Ended );
 
     assert( state == libvlc_Paused || state == libvlc_Ended );
-    catch();
 #endif
     
-    libvlc_media_player_stop (mi, &ex);
-    catch ();
-
+    libvlc_media_player_stop (mi);
     libvlc_media_player_release (mi);
-    catch ();
-
     libvlc_release (vlc);
-    catch ();
 }
 
 

@@ -92,14 +92,12 @@ VLC_PUBLIC_API libvlc_event_manager_t *
 VLC_PUBLIC_API void
     libvlc_media_list_player_set_media_player(
                                      libvlc_media_list_player_t * p_mlp,
-                                     libvlc_media_player_t * p_mi,
-                                     libvlc_exception_t * p_e );
+                                     libvlc_media_player_t * p_mi );
 
 VLC_PUBLIC_API void
     libvlc_media_list_player_set_media_list(
                                      libvlc_media_list_player_t * p_mlp,
-                                     libvlc_media_list_t * p_mlist,
-                                     libvlc_exception_t * p_e );
+                                     libvlc_media_list_t * p_mlist );
 
 /**
  * Play media list
@@ -129,19 +127,16 @@ VLC_PUBLIC_API void
  * \return true for playing and false for not playing
  */
 VLC_PUBLIC_API int
-    libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp,
-                                         libvlc_exception_t * p_e );
+    libvlc_media_list_player_is_playing( libvlc_media_list_player_t * p_mlp );
 
 /**
  * Get current libvlc_state of media list player
  *
  * \param p_mlp media list player instance
- * \param p_e initialized exception instance
  * \return libvlc_state_t for media list player
  */
 VLC_PUBLIC_API libvlc_state_t
-    libvlc_media_list_player_get_state( libvlc_media_list_player_t * p_mlp,
-                                        libvlc_exception_t * p_e );
+    libvlc_media_list_player_get_state( libvlc_media_list_player_t * p_mlp );
 
 /**
  * Play media list item at position index
@@ -166,11 +161,9 @@ VLC_PUBLIC_API void
  * Stop playing media list
  *
  * \param p_mlp media list player instance
- * \param p_e initialized exception instance
  */
 VLC_PUBLIC_API void
-    libvlc_media_list_player_stop( libvlc_media_list_player_t * p_mlp,
-                                   libvlc_exception_t * p_e );
+    libvlc_media_list_player_stop( libvlc_media_list_player_t * p_mlp );
 
 /**
  * Play next item from media list
@@ -199,13 +192,11 @@ VLC_PUBLIC_API void
  *
  * \param p_mlp media list player instance
  * \param e_mode playback mode specification
- * \param p_e initialized exception instance
  */
 VLC_PUBLIC_API void
     libvlc_media_list_player_set_playback_mode( 
                                         libvlc_media_list_player_t * p_mlp,
-                                        libvlc_playback_mode_t e_mode,
-                                        libvlc_exception_t * p_e );
+                                        libvlc_playback_mode_t e_mode );
 
 /** @} media_list_player */
 

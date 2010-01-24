@@ -497,11 +497,8 @@ void libvlc_media_player_retain( libvlc_media_player_t *p_mi )
  **************************************************************************/
 void libvlc_media_player_set_media(
                             libvlc_media_player_t *p_mi,
-                            libvlc_media_t *p_md,
-                            libvlc_exception_t *p_e )
+                            libvlc_media_t *p_md )
 {
-    VLC_UNUSED(p_e);
-
     lock(p_mi);
 
     /* FIXME I am not sure if it is a user request or on die(eof/error)
@@ -543,12 +540,9 @@ void libvlc_media_player_set_media(
  * Get the Media descriptor associated with the instance.
  **************************************************************************/
 libvlc_media_t *
-libvlc_media_player_get_media(
-                            libvlc_media_player_t *p_mi,
-                            libvlc_exception_t *p_e )
+libvlc_media_player_get_media( libvlc_media_player_t *p_mi )
 {
     libvlc_media_t *p_m;
-    VLC_UNUSED(p_e);
 
     lock(p_mi);
     p_m = p_mi->p_md;
@@ -562,12 +556,8 @@ libvlc_media_player_get_media(
  * Get the event Manager.
  **************************************************************************/
 libvlc_event_manager_t *
-libvlc_media_player_event_manager(
-                            libvlc_media_player_t *p_mi,
-                            libvlc_exception_t *p_e )
+libvlc_media_player_event_manager( libvlc_media_player_t *p_mi )
 {
-    VLC_UNUSED(p_e);
-
     return p_mi->p_event_manager;
 }
 
@@ -656,13 +646,13 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
     if( !p_input_thread )
         return;
 
-    libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
+    libvlc_state_t state = libvlc_media_player_get_state( p_mi );
     if( state == libvlc_Playing || state == libvlc_Buffering )
     {
         if( libvlc_media_player_can_pause( p_mi, p_e ) )
             input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
         else
-            libvlc_media_player_stop( p_mi, p_e );
+            libvlc_media_player_stop( p_mi );
     }
     else
         input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
@@ -675,20 +665,18 @@ void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
  *
  * Enter with lock held.
  **************************************************************************/
-int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi,
-                                     libvlc_exception_t *p_e )
+int libvlc_media_player_is_playing( libvlc_media_player_t *p_mi )
 {
-    libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
+    libvlc_state_t state = libvlc_media_player_get_state( p_mi );
     return (libvlc_Playing == state) || (libvlc_Buffering == state);
 }
 
 /**************************************************************************
  * Stop playing.
  **************************************************************************/
-void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e )
+void libvlc_media_player_stop( libvlc_media_player_t *p_mi )
 {
-    libvlc_state_t state = libvlc_media_player_get_state( p_mi, p_e );
+    libvlc_state_t state = libvlc_media_player_get_state( p_mi );
 
     lock(p_mi);
     release_input_thread( p_mi, true ); /* This will stop the input thread */
@@ -711,10 +699,8 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi,
  * set_nsobject
  **************************************************************************/
 void libvlc_media_player_set_nsobject( libvlc_media_player_t *p_mi,
-                                        void * drawable,
-                                        libvlc_exception_t *p_e )
+                                        void * drawable )
 {
-    (void) p_e;
     p_mi->drawable.nsobject = drawable;
 }
 
@@ -730,10 +716,8 @@ void * libvlc_media_player_get_nsobject( libvlc_media_player_t *p_mi )
  * set_agl
  **************************************************************************/
 void libvlc_media_player_set_agl( libvlc_media_player_t *p_mi,
-                                      uint32_t drawable,
-                                      libvlc_exception_t *p_e )
+                                  uint32_t drawable )
 {
-    (void) p_e;
     p_mi->drawable.agl = drawable;
 }
 
@@ -749,10 +733,8 @@ uint32_t libvlc_media_player_get_agl( libvlc_media_player_t *p_mi )
  * set_xwindow
  **************************************************************************/
 void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
-                                      uint32_t drawable,
-                                      libvlc_exception_t *p_e )
+                                      uint32_t drawable )
 {
-    (void) p_e;
     p_mi->drawable.xid = drawable;
 }
 
@@ -768,10 +750,8 @@ uint32_t libvlc_media_player_get_xwindow( libvlc_media_player_t *p_mi )
  * set_hwnd
  **************************************************************************/
 void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
-                                   void *drawable,
-                                   libvlc_exception_t *p_e )
+                                   void *drawable )
 {
-    (void) p_e;
     p_mi->drawable.hwnd = drawable;
 }
 
@@ -1110,9 +1090,8 @@ float libvlc_media_player_get_rate(
     return f_rate;
 }
 
-libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e )
+libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *p_mi )
 {
-    VLC_UNUSED(p_e);
     lock(p_mi);
     libvlc_state_t state = p_mi->state;
     unlock(p_mi);

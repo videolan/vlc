@@ -84,7 +84,7 @@ static void set_relative_playlist_position_and_play(
                                             libvlc_media_list_player_t * p_mlp,
                                             int i_relative_position,
                                             libvlc_exception_t * p_e);
-static void stop(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e);
+static void stop(libvlc_media_list_player_t * p_mlp);
 
 /*
  * Private functions
@@ -122,7 +122,7 @@ static inline libvlc_event_manager_t * mlist_em(libvlc_media_list_player_t * p_m
 static inline libvlc_event_manager_t * mplayer_em(libvlc_media_list_player_t * p_mlp)
 {
     assert_locked(p_mlp);
-    return libvlc_media_player_event_manager(p_mlp->p_mi, NULL);
+    return libvlc_media_player_event_manager(p_mlp->p_mi);
 }
 
 /**************************************************************************
@@ -440,7 +440,7 @@ set_current_playing_item(libvlc_media_list_player_t * p_mlp, libvlc_media_list_p
     if (!p_mlp->p_mi)
         p_mlp->p_mi = libvlc_media_player_new_from_media(p_md, NULL);
 
-    libvlc_media_player_set_media(p_mlp->p_mi, p_md, NULL);
+    libvlc_media_player_set_media(p_mlp->p_mi, p_md);
 
     install_media_player_observer(p_mlp);
     libvlc_media_release(p_md); /* for libvlc_media_list_item_at_index */
@@ -529,10 +529,8 @@ libvlc_media_list_player_event_manager(libvlc_media_list_player_t * p_mlp)
 /**************************************************************************
  *        set_media_player (Public)
  **************************************************************************/
-void libvlc_media_list_player_set_media_player(libvlc_media_list_player_t * p_mlp, libvlc_media_player_t * p_mi, libvlc_exception_t * p_e)
+void libvlc_media_list_player_set_media_player(libvlc_media_list_player_t * p_mlp, libvlc_media_player_t * p_mi)
 {
-    VLC_UNUSED(p_e);
-
     lock(p_mlp);
 
     if (p_mlp->p_mi)
@@ -551,9 +549,8 @@ void libvlc_media_list_player_set_media_player(libvlc_media_list_player_t * p_ml
 /**************************************************************************
  *       set_media_list (Public)
  **************************************************************************/
-void libvlc_media_list_player_set_media_list(libvlc_media_list_player_t * p_mlp, libvlc_media_list_t * p_mlist, libvlc_exception_t * p_e)
+void libvlc_media_list_player_set_media_list(libvlc_media_list_player_t * p_mlp, libvlc_media_list_t * p_mlist)
 {
-    VLC_UNUSED( p_e );
     assert (p_mlist);
 
     lock(p_mlp);
@@ -606,9 +603,9 @@ void libvlc_media_list_player_pause(libvlc_media_list_player_t * p_mlp, libvlc_e
  *        is_playing (Public)
  **************************************************************************/
 int
-libvlc_media_list_player_is_playing(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
+libvlc_media_list_player_is_playing(libvlc_media_list_player_t * p_mlp)
 {
-    libvlc_state_t state = libvlc_media_player_get_state(p_mlp->p_mi, p_e);
+    libvlc_state_t state = libvlc_media_player_get_state(p_mlp->p_mi);
     return (state == libvlc_Opening) || (state == libvlc_Buffering) ||
            (state == libvlc_Playing);
 }
@@ -617,20 +614,18 @@ libvlc_media_list_player_is_playing(libvlc_media_list_player_t * p_mlp, libvlc_e
  *        State (Public)
  **************************************************************************/
 libvlc_state_t
-libvlc_media_list_player_get_state(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
+libvlc_media_list_player_get_state(libvlc_media_list_player_t * p_mlp)
 {
     if (!p_mlp->p_mi)
         return libvlc_Ended;
-    return libvlc_media_player_get_state(p_mlp->p_mi, p_e);
+    return libvlc_media_player_get_state(p_mlp->p_mi);
 }
 
 /**************************************************************************
  *        Play item at index (Public)
  **************************************************************************/
-void libvlc_media_list_player_play_item_at_index(libvlc_media_list_player_t * p_mlp, int i_index, libvlc_exception_t * p_e)
+void libvlc_media_list_player_play_item_at_index(libvlc_media_list_player_t * p_mlp, int i_index, libvlc_exception_t *p_e)
 {
-    VLC_UNUSED(p_e);
-
     lock(p_mlp);
     set_current_playing_item(p_mlp, libvlc_media_list_path_with_root_index(i_index));
     libvlc_media_player_play(p_mlp->p_mi, p_e);
@@ -667,7 +662,7 @@ void libvlc_media_list_player_play_item(libvlc_media_list_player_t * p_mlp, libv
  *
  * Lock must be held.
  **************************************************************************/
-static void stop(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
+static void stop(libvlc_media_list_player_t * p_mlp)
 {
     assert_locked(p_mlp);
 
@@ -675,7 +670,7 @@ static void stop(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
     {
         /* We are not interested in getting media stop event now */
         uninstall_media_player_observer(p_mlp);
-        libvlc_media_player_stop(p_mlp->p_mi, p_e);
+        libvlc_media_player_stop(p_mlp->p_mi);
         install_media_player_observer(p_mlp);
     }
 
@@ -686,11 +681,10 @@ static void stop(libvlc_media_list_player_t * p_mlp, libvlc_exception_t * p_e)
 /**************************************************************************
  *       Stop (Public)
  **************************************************************************/
-void libvlc_media_list_player_stop(libvlc_media_list_player_t * p_mlp,
-                                   libvlc_exception_t * p_e)
+void libvlc_media_list_player_stop(libvlc_media_list_player_t * p_mlp)
 {
     lock(p_mlp);
-    stop(p_mlp, p_e);
+    stop(p_mlp);
     unlock(p_mlp);
 }
 
@@ -800,11 +794,8 @@ void libvlc_media_list_player_previous(libvlc_media_list_player_t * p_mlp,
  **************************************************************************/
 void libvlc_media_list_player_set_playback_mode(
                                             libvlc_media_list_player_t * p_mlp,
-                                            libvlc_playback_mode_t e_mode,
-                                            libvlc_exception_t * p_e )
+                                            libvlc_playback_mode_t e_mode )
 {
-    VLC_UNUSED(p_e);
-
     lock(p_mlp);
     p_mlp->e_playback_mode = e_mode;
     unlock(p_mlp);

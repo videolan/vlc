@@ -40,8 +40,7 @@ static void test_events_callback_and_detach( const libvlc_event_t * event, void 
     bool * callback_was_called = user_data;
     libvlc_event_manager_t *em;
 
-    em = libvlc_media_player_event_manager (event->p_obj, &ex);
-    catch();
+    em = libvlc_media_player_event_manager (event->p_obj);
 
     libvlc_event_detach (em, event->type, test_events_callback_and_detach, user_data, &ex);
     *callback_was_called = true;
@@ -82,7 +81,7 @@ static void test_events (const char ** argv, int argc)
     mi = libvlc_media_player_new (vlc, &ex);
     catch ();
 
-    em = libvlc_media_player_event_manager (mi, &ex);
+    em = libvlc_media_player_event_manager (mi);
 
     log ("+ Testing attaching to Media Instance\n");
 
