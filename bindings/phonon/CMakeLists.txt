@@ -30,6 +30,7 @@ find_package(Automoc4 REQUIRED)
 include (CheckCXXCompilerFlag)
 include (MacroEnsureVersion)
 
+find_package(Phonon REQUIRED)
 find_package(VLC REQUIRED)
 if (NOT AUTOMOC4_VERSION)
    set(AUTOMOC4_VERSION "0.9.83")
@@ -161,7 +162,7 @@ if(MSVC)
 endif(MSVC)
 
 # for including config.h and for includes like <kparts/foo.h>
-include_directories(${QT_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/includes ${CMAKE_CURRENT_SOURCE_DIR}/phonon ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/phonon)
+include_directories(${QT_INCLUDES} ${PHONON_INCLUDES} ${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_SOURCE_DIR}/includes ${CMAKE_CURRENT_SOURCE_DIR}/phonon ${CMAKE_CURRENT_BINARY_DIR} ${CMAKE_CURRENT_BINARY_DIR}/phonon)
 
 macro(_SET_FANCY _var _value _comment)
    if (KDESupport_SOURCE_DIR)
@@ -222,7 +223,7 @@ if (CMAKE_SYSTEM_NAME MATCHES Linux)
    endif (CMAKE_C_COMPILER MATCHES "icc")
 endif (CMAKE_SYSTEM_NAME MATCHES Linux)
 
-set(PHONON_LIBS phonon ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
+list(APPEND PHONON_LIBS phonon ${QT_QTCORE_LIBRARY} ${QT_QTGUI_LIBRARY})
 if(QT_QTDBUS_FOUND)
     list(APPEND PHONON_LIBS phonon ${QT_QTDBUS_LIBRARY})
 endif(QT_QTDBUS_FOUND)
