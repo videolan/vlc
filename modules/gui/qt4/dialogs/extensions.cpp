@@ -55,7 +55,7 @@ ExtensionsDialogProvider::ExtensionsDialogProvider( intf_thread_t *_p_intf,
     var_AddCallback( p_intf, "dialog-extension", DialogCallback, NULL );
 
     CONNECT( this, SignalDialog( extension_dialog_t* ),
-             this, UpdateDialog( extension_dialog_t* ) );
+             this, UpdateExtDialog( extension_dialog_t* ) );
 }
 
 ExtensionsDialogProvider::~ExtensionsDialogProvider()
@@ -65,20 +65,21 @@ ExtensionsDialogProvider::~ExtensionsDialogProvider()
 
 /** Create a dialog
  * Note: Lock on p_dialog->lock must be held. */
-ExtensionDialog* ExtensionsDialogProvider::CreateDialog( extension_dialog_t *p_dialog )
+ExtensionDialog* ExtensionsDialogProvider::CreateExtDialog(
+        extension_dialog_t *p_dialog )
 {
     ExtensionDialog *dialog = new ExtensionDialog( p_intf,
                                                    p_extensions_manager,
                                                    p_dialog );
     p_dialog->p_sys_intf = (void*) dialog;
     CONNECT( dialog, destroyDialog( extension_dialog_t* ),
-             this, DestroyDialog( extension_dialog_t* ) );
+             this, DestroyExtDialog( extension_dialog_t* ) );
     return dialog;
 }
 
 /** Destroy a dialog
  * Note: Lock on p_dialog->lock must be held. */
-int ExtensionsDialogProvider::DestroyDialog( extension_dialog_t *p_dialog )
+int ExtensionsDialogProvider::DestroyExtDialog( extension_dialog_t *p_dialog )
 {
     assert( p_dialog );
     ExtensionDialog *dialog = ( ExtensionDialog* ) p_dialog->p_sys_intf;
@@ -92,7 +93,8 @@ int ExtensionsDialogProvider::DestroyDialog( extension_dialog_t *p_dialog )
 /**
  * Update/Create/Destroy a dialog
  **/
-ExtensionDialog* ExtensionsDialogProvider::UpdateDialog( extension_dialog_t *p_dialog )
+ExtensionDialog* ExtensionsDialogProvider::UpdateExtDialog(
+        extension_dialog_t *p_dialog )
 {
     assert( p_dialog );
 
@@ -107,7 +109,7 @@ ExtensionDialog* ExtensionsDialogProvider::UpdateDialog( extension_dialog_t *p_d
     vlc_mutex_lock( &p_dialog->lock );
     if( !p_dialog->b_kill && !dialog )
     {
-        dialog = CreateDialog( p_dialog );
+        dialog = CreateExtDialog( p_dialog );
         dialog->setVisible( !p_dialog->b_hide );
     }
     else if( !p_dialog->b_kill && dialog )
@@ -119,7 +121,7 @@ ExtensionDialog* ExtensionsDialogProvider::UpdateDialog( extension_dialog_t *p_d
     }
     else if( p_dialog->b_kill )
     {
-        DestroyDialog( p_dialog );
+        DestroyExtDialog( p_dialog );
     }
     vlc_cond_signal( &p_dialog->cond );
     vlc_mutex_unlock( &p_dialog->lock );
@@ -137,7 +139,7 @@ void ExtensionsDialogProvider::ManageDialog( extension_dialog_t *p_dialog )
     if( !extMgr->isUnloading() )
         emit SignalDialog( p_dialog ); // Safe because we signal Qt thread
     else
-        UpdateDialog( p_dialog ); // This is safe, we're already in Qt thread
+        UpdateExtDialog( p_dialog ); // This is safe, we're already in Qt thread
 }
 
 /**

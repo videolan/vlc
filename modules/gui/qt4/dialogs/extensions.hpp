@@ -54,9 +54,9 @@ private:
     extensions_manager_t *p_extensions_manager;
 
 private slots:
-    ExtensionDialog* CreateDialog( extension_dialog_t *p_dialog );
-    int DestroyDialog( extension_dialog_t *p_dialog );
-    ExtensionDialog* UpdateDialog( extension_dialog_t *p_dialog );
+    ExtensionDialog* CreateExtDialog( extension_dialog_t *p_dialog );
+    int DestroyExtDialog( extension_dialog_t *p_dialog );
+    ExtensionDialog* UpdateExtDialog( extension_dialog_t *p_dialog );
 
 public:
     ExtensionsDialogProvider( intf_thread_t *p_intf,
