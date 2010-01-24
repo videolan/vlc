@@ -201,7 +201,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
             {
                 bool hasVout = false;
 
-                if( p_plugin->playlist_isplaying(&ex) )
+                if( p_plugin->playlist_isplaying() )
                 {
                     hasVout = p_plugin->player_has_vout(NULL);
                     if( hasVout )
