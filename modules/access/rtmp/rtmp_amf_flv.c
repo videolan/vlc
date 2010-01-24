@@ -391,7 +391,7 @@ write_rtmp( rtmp_control_thread_t *p_thread, uint8_t *buf,
     free( buf );
     if( ret != enclen )
     {
-        msg_Err( p_thread, errmsg );
+        msg_Err( p_thread, "%s", errmsg );
         return 0;
     }
     return 1;
