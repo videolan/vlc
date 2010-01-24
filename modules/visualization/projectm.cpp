@@ -240,6 +240,7 @@ static int VoutCallback( vlc_object_t *p_vout, char const *psz_name,
     {
         vout_SetDisplayFullscreen( p_vd, newv.b_bool );
     }
+    return VLC_SUCCESS;
 }
 
 /**
