@@ -414,61 +414,6 @@ void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi,
     }
 }
 
-int libvlc_video_get_teletext( libvlc_media_player_t *p_mi,
-                               libvlc_exception_t *p_e )
-{
-#if 0
-    vout_thread_t *p_vout = GetVout( p_mi, p_e );
-    vlc_object_t *p_vbi;
-    int i_ret = -1;
-
-    if( !p_vout ) return i_ret;
-
-    p_vbi = (vlc_object_t *) vlc_object_find_name( p_vout, "zvbi",
-                                                   FIND_CHILD );
-    if( p_vbi )
-    {
-        i_ret = var_GetInteger( p_vbi, "vbi-page" );
-        vlc_object_release( p_vbi );
-    }
-
-    vlc_object_release( p_vout );
-    return i_ret;
-#else
-    VLC_UNUSED( p_mi );
-    VLC_UNUSED( p_e );
-    return -1;
-#endif
-}
-
-void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
-                                libvlc_exception_t *p_e )
-{
-#if 0
-    vout_thread_t *p_vout = GetVout( p_mi, p_e );
-    vlc_object_t *p_vbi;
-    int i_ret = -1;
-
-    if( !p_vout ) return;
-
-    p_vbi = (vlc_object_t *) vlc_object_find_name( p_vout, "zvbi",
-                                                   FIND_CHILD );
-    if( p_vbi )
-    {
-        i_ret = var_SetInteger( p_vbi, "vbi-page", i_page );
-        vlc_object_release( p_vbi );
-        if( i_ret )
-            libvlc_exception_raise( p_e,
-                            "Unexpected error while setting teletext page" );
-    }
-    vlc_object_release( p_vout );
-#else
-    VLC_UNUSED( p_mi );
-    VLC_UNUSED( p_e );
-    VLC_UNUSED( i_page );
-#endif
-}
-
 void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
                              libvlc_exception_t *p_e )
 {
@@ -483,35 +428,6 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
         return;
     }
     const bool b_selected = var_GetInteger( p_input_thread, "teletext-es" ) >= 0;
-#if 0
-    int i_ret;
-    vlc_object_t *p_vbi;
-    p_vbi = (vlc_object_t *)vlc_object_find_name( p_input_thread, "zvbi",
-                                                  FIND_CHILD );
-    if( p_vbi )
-    {
-        if( b_selected )
-        {
-            /* FIXME Gni, why that ? */
-            i_ret = var_SetInteger( p_vbi, "vbi-page",
-                                    var_GetInteger( p_vbi, "vbi-page" ) );
-            if( i_ret )
-                libvlc_exception_raise( p_e,
-                                "Unexpected error while setting teletext page" );
-        }
-        else
-        {
-            /* FIXME Gni^2 */
-            i_ret = var_SetBool( p_vbi, "vbi-opaque",
-                                 !var_GetBool( p_vbi, "vbi-opaque" ) );
-            if( i_ret )
-                libvlc_exception_raise( p_e,
-                                "Unexpected error while setting teletext transparency" );
-        }
-        vlc_object_release( p_vbi );
-    }
-    else
-#endif
     if( b_selected )
     {
         var_SetInteger( p_input_thread, "spu-es", -1 );

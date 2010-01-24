@@ -60,7 +60,6 @@ libvlc_media_library_t *
 libvlc_media_library_new( libvlc_instance_t * p_inst,
                           libvlc_exception_t * p_e )
 {
-    (void)p_e;
     libvlc_media_library_t * p_mlib;
 
     p_mlib = malloc(sizeof(libvlc_media_library_t));
@@ -134,18 +133,6 @@ libvlc_media_library_load( libvlc_media_library_t * p_mlib,
     libvlc_media_list_add_file_content( p_mlib->p_mlist, psz_uri, p_e );
     free( psz_uri );
     return;
-}
-
-/**************************************************************************
- *       save (Public)
- **************************************************************************/
-void
-libvlc_media_library_save( libvlc_media_library_t * p_mlib,
-                           libvlc_exception_t * p_e )
-{
-    (void)p_mlib;
-    libvlc_exception_raise( p_e );
-    libvlc_printerr( "Function not implemented" );
 }
 
 /**************************************************************************

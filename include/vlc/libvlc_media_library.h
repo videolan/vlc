@@ -87,16 +87,6 @@ VLC_PUBLIC_API void
                                libvlc_exception_t * p_e );
 
 /**
- * Save media library.
- *
- * \param p_mlib media library object
- * \param p_e an initialized exception object.
- */
-VLC_PUBLIC_API void
-    libvlc_media_library_save( libvlc_media_library_t * p_mlib,
-                               libvlc_exception_t * p_e );
-
-/**
  * Get media library subitems.
  *
  * \param p_mlib media library object
