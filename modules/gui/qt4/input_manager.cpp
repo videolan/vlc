@@ -594,26 +594,33 @@ void InputManager::requestArtUpdate()
     }
 }
 
+const QString InputManager::decodeArtURL( input_item_t *p_item )
+{
+    assert( p_item );
+
+    char *psz_art = input_item_GetArtURL( p_item );
+    QString url;
+    if( psz_art && !strncmp( psz_art, "file://", 7 ) &&
+            decode_URI( psz_art + 7 ) )
+#ifdef WIN32
+        url = qfu( psz_art + 8 ); // Remove extra / starting on Win32.
+#else
+        url = qfu( psz_art + 7 );
+#endif
+    free( psz_art );
+
+    url = url.replace( "file://", "" );
+    /* Taglib seems to define a attachment://, It won't work yet */
+    url = url.replace( "attachment://", "" );
+    return url;
+}
+
 void InputManager::UpdateArt()
 {
     QString url;
 
     if( hasInput() )
-    {
-        char *psz_art = input_item_GetArtURL( input_GetItem( p_input ) );
-        if( psz_art && !strncmp( psz_art, "file://", 7 ) &&
-                decode_URI( psz_art + 7 ) )
-#ifdef WIN32
-            url = qfu( psz_art + 8 ); // Remove extra / starting on Win32.
-#else
-            url = qfu( psz_art + 7 );
-#endif
-        free( psz_art );
-
-        url = url.replace( "file://", "" );
-        /* Taglib seems to define a attachment://, It won't work yet */
-        url = url.replace( "attachment://", "" );
-    }
+        url = decodeArtURL( input_GetItem( p_input ) );
 
     /* the art hasn't changed, no need to update */
     if(artUrl == url)

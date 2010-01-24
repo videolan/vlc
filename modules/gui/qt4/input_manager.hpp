@@ -132,6 +132,7 @@ public:
     void requestArtUpdate();
 
     QString getName() { return oldName; }
+    static const QString decodeArtURL( input_item_t *p_item );
 
 private:
     intf_thread_t  *p_intf;
