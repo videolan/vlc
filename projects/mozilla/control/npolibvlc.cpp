@@ -465,7 +465,7 @@ LibvlcInputNPObject::getProperty(int index, NPVariant &result)
             }
             case ID_input_state:
             {
-                int val = libvlc_media_player_get_state(p_md, &ex);
+                int val = libvlc_media_player_get_state(p_md);
                 RETURN_ON_EXCEPTION(this,ex);
                 INT32_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
@@ -616,15 +616,12 @@ LibvlcPlaylistItemsNPObject::getProperty(int index, NPVariant &result)
     if( isPluginRunning() )
     {
         VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
 
         switch( index )
         {
             case ID_playlistitems_count:
             {
-                int val = p_plugin->playlist_count(&ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int val = p_plugin->playlist_count();
                 INT32_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
@@ -719,22 +716,18 @@ LibvlcPlaylistNPObject::getProperty(int index, NPVariant &result)
     if( isPluginRunning() )
     {
         VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
 
         switch( index )
         {
             case ID_playlist_itemcount: /* deprecated */
             {
-                int val = p_plugin->playlist_count(&ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int val = p_plugin->playlist_count();
                 INT32_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_playlist_isplaying:
             {
-                int val = p_plugin->playlist_isplaying(&ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int val = p_plugin->playlist_isplaying();
                 BOOLEAN_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
@@ -907,8 +900,7 @@ LibvlcPlaylistNPObject::invoke(int index, const NPVariant *args,
             case ID_playlist_stop:
                 if( argCount == 0 )
                 {
-                    p_plugin->playlist_stop(&ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    p_plugin->playlist_stop();
                     VOID_TO_NPVARIANT(result);
                     return INVOKERESULT_NO_ERROR;
                 }
@@ -1352,10 +1344,12 @@ LibvlcVideoNPObject::getProperty(int index, NPVariant &result)
             }
             case ID_video_teletext:
             {
-                int i_page = libvlc_video_get_teletext(p_md, &ex);
+/*                int i_page = libvlc_video_get_teletext(p_md, &ex);
                 RETURN_ON_EXCEPTION(this,ex);
                 INT32_TO_NPVARIANT(i_page, result);
                 return INVOKERESULT_NO_ERROR;
+*/
+                return INVOKERESULT_NO_SUCH_METHOD;
             }
             case ID_video_marquee:
             {
@@ -1458,10 +1452,13 @@ LibvlcVideoNPObject::setProperty(int index, const NPVariant &value)
             {
                 if( isNumberValue(value) )
                 {
+/*
                     libvlc_video_set_teletext(p_md, numberValue(value), &ex);
                     RETURN_ON_EXCEPTION(this,ex);
 
                     return INVOKERESULT_NO_ERROR;
+*/
+                    return INVOKERESULT_NO_SUCH_METHOD;
                 }
                 return INVOKERESULT_INVALID_VALUE;
             }

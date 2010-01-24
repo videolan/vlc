@@ -340,15 +340,8 @@ NPError NPP_Destroy( NPP instance, NPSavedData** save )
     }
 #endif
 
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-    int val = p_plugin->playlist_isplaying(&ex);
-    libvlc_exception_clear(&ex);
-    if(val)
-    {
-        p_plugin->playlist_stop(&ex);
-        libvlc_exception_clear(&ex);
-    }
+    if( p_plugin->playlist_isplaying() )
+        p_plugin->playlist_stop();
 
     delete p_plugin;
 
@@ -819,8 +812,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
         libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
         libvlc_exception_clear( &ex );
 
-        i_playing = p_plugin->playlist_isplaying( &ex );
-        libvlc_exception_clear( &ex );
+        i_playing = p_plugin->playlist_isplaying();
 
         vlc_toolbar_clicked_t clicked;
         clicked = p_plugin->getToolbarButtonClicked( i_xPos, i_yPos );
@@ -840,8 +832,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
 
             case clicked_Stop:
             {
-                p_plugin->playlist_stop(&ex);
-                libvlc_exception_clear( &ex );
+                p_plugin->playlist_stop();
             }
             break;
 

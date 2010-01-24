@@ -284,20 +284,18 @@ VlcPlugin::~VlcPlugin()
 /*****************************************************************************
  * VlcPlugin playlist replacement methods
  *****************************************************************************/
-void VlcPlugin::set_player_window( libvlc_exception_t *ex )
+void VlcPlugin::set_player_window()
 {
 #ifdef XP_UNIX
     libvlc_media_player_set_xwindow(libvlc_media_player,
-                                    (libvlc_drawable_t)getVideoWindow(),
-                                    ex);
+                                    (libvlc_drawable_t)getVideoWindow());
 #endif
 #ifdef XP_MACOSX
     // XXX FIXME insert appropriate call here
 #endif
 #ifdef XP_WIN
     libvlc_media_player_set_hwnd(libvlc_media_player,
-                                 getWindow().window,
-                                 ex);
+                                 getWindow().window);
 #endif
 }
 
@@ -311,7 +309,7 @@ int VlcPlugin::playlist_add( const char *mrl, libvlc_exception_t *ex )
     libvlc_media_list_lock(libvlc_media_list);
     libvlc_media_list_add_media(libvlc_media_list,p_m,ex);
     if( !libvlc_exception_raised(ex) )
-        item = libvlc_media_list_count(libvlc_media_list,ex)-1;
+        item = libvlc_media_list_count(libvlc_media_list)-1;
     libvlc_media_list_unlock(libvlc_media_list);
 
     libvlc_media_release(p_m);
@@ -333,7 +331,7 @@ int VlcPlugin::playlist_add_extended_untrusted( const char *mrl, const char *nam
     libvlc_media_list_lock(libvlc_media_list);
     libvlc_media_list_add_media(libvlc_media_list,p_m,ex);
     if( !libvlc_exception_raised(ex) )
-        item = libvlc_media_list_count(libvlc_media_list,ex)-1;
+        item = libvlc_media_list_count(libvlc_media_list)-1;
     libvlc_media_list_unlock(libvlc_media_list);
     libvlc_media_release(p_m);
 
@@ -346,9 +344,7 @@ bool VlcPlugin::playlist_select( int idx, libvlc_exception_t *ex )
 
     libvlc_media_list_lock(libvlc_media_list);
 
-    int count = libvlc_media_list_count(libvlc_media_list,ex);
-    if( libvlc_exception_raised(ex) )
-        goto bad_unlock;
+    int count = libvlc_media_list_count(libvlc_media_list);
 
     if( idx<0||idx>=count )
         goto bad_unlock;
@@ -369,7 +365,7 @@ bool VlcPlugin::playlist_select( int idx, libvlc_exception_t *ex )
 
     libvlc_media_player = libvlc_media_player_new_from_media(p_m,ex);
     if( libvlc_media_player )
-        set_player_window(ex);
+        set_player_window();
 
     libvlc_media_release( p_m );
     return !libvlc_exception_raised(ex);
@@ -393,29 +389,29 @@ void VlcPlugin::playlist_clear( libvlc_exception_t *ex )
     libvlc_media_list = libvlc_media_list_new(getVLC(),ex);
 }
 
-int VlcPlugin::playlist_count( libvlc_exception_t *ex )
+int VlcPlugin::playlist_count()
 {
     int items_count = 0;
     libvlc_media_list_lock(libvlc_media_list);
-    items_count = libvlc_media_list_count(libvlc_media_list,ex);
+    items_count = libvlc_media_list_count(libvlc_media_list);
     libvlc_media_list_unlock(libvlc_media_list);
     return items_count;
 }
 
 void VlcPlugin::toggle_fullscreen( libvlc_exception_t *ex )
 {
-    if( playlist_isplaying(ex) )
+    if( playlist_isplaying() )
         libvlc_toggle_fullscreen(libvlc_media_player,ex);
 }
 void VlcPlugin::set_fullscreen( int yes, libvlc_exception_t *ex )
 {
-    if( playlist_isplaying(ex) )
+    if( playlist_isplaying() )
         libvlc_set_fullscreen(libvlc_media_player,yes,ex);
 }
 int  VlcPlugin::get_fullscreen( libvlc_exception_t *ex )
 {
     int r = 0;
-    if( playlist_isplaying(ex) )
+    if( playlist_isplaying() )
         r = libvlc_get_fullscreen(libvlc_media_player,ex);
     return r;
 }
@@ -423,7 +419,7 @@ int  VlcPlugin::get_fullscreen( libvlc_exception_t *ex )
 bool  VlcPlugin::player_has_vout( libvlc_exception_t *ex )
 {
     bool r = false;
-    if( playlist_isplaying(ex) )
+    if( playlist_isplaying() )
         r = libvlc_media_player_has_vout(libvlc_media_player, ex);
     return r;
 }
@@ -727,7 +723,6 @@ void VlcPlugin::hideToolbar()
 
 void VlcPlugin::redrawToolbar()
 {
-    libvlc_exception_t ex;
     int is_playing = 0;
     bool b_mute = false;
     unsigned int dst_x, dst_y;
@@ -745,7 +740,6 @@ void VlcPlugin::redrawToolbar()
 
     getToolbarSize( &i_tb_width, &i_tb_height );
 
-    libvlc_exception_init( &ex );
 
     /* get mute info */
     b_mute = libvlc_audio_get_mute( getVLC() );
@@ -814,12 +808,14 @@ void VlcPlugin::redrawToolbar()
                    (window.width-(dst_x+BTN_SPACE)), p_timeline->height );
 
     /* get movie position in % */
-    if( playlist_isplaying(&ex) )
+    if( playlist_isplaying() )
     {
+        libvlc_exception_t ex;
+        libvlc_exception_init( &ex );
         i_last_position = (int)((window.width-(dst_x+BTN_SPACE))*
                    libvlc_media_player_get_position(libvlc_media_player,&ex));
+        libvlc_exception_clear( &ex );
     }
-    libvlc_exception_clear( &ex );
 
     if( p_btnTime )
         XPutImage( p_display, control, gc, p_btnTime,
@@ -835,7 +831,6 @@ vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos
     unsigned int i_dest = BTN_SPACE;
     int is_playing = 0;
     bool b_mute = false;
-    libvlc_exception_t ex;
 
 #ifndef NDEBUG
     fprintf( stderr, "ToolbarButtonClicked:: "
@@ -851,9 +846,7 @@ vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos
      */
 
     /* get isplaying */
-    libvlc_exception_init( &ex );
-    is_playing = playlist_isplaying( &ex );
-    libvlc_exception_clear( &ex );
+    is_playing = playlist_isplaying();
 
     /* get mute info */
     b_mute = libvlc_audio_get_mute( getVLC() );
