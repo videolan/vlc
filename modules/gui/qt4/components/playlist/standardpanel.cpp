@@ -31,6 +31,7 @@
 
 #include "components/playlist/playlist_model.hpp"
 #include "components/playlist/standardpanel.hpp"
+#include "components/playlist/icon_view.hpp"
 #include "util/customwidgets.hpp"
 
 #include <vlc_intf_strings.h>
@@ -101,7 +102,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     getSettings()->endGroup();
 
     /* Connections for the TreeView */
-    CONNECT( view, activated( const QModelIndex& ) ,
+    CONNECT( view, activated( const QModelIndex& ),
              model,activateItem( const QModelIndex& ) );
     CONNECT( view->header(), customContextMenuRequested( const QPoint & ),
              this, popupSelectColumn( QPoint ) );
@@ -299,10 +300,7 @@ void StandardPLPanel::toggleView()
     {
         if( view2 == NULL )
         {
-            view2 = new QListView;
-            view2->setModel( model );
-            view2->setViewMode( QListView::IconMode );
-            view2->setMovement( QListView::Snap );
+            view2 = new PlIconView( model, this );
             layout->addWidget( view2, 1, 0, 1, -1 );
             installEventFilter( view2 );
         }

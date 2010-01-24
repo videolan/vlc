@@ -44,6 +44,7 @@ class PLModel;
 class QPushButton;
 class QKeyEvent;
 class QWheelEvent;
+class PlIconView;
 
 class StandardPLPanel: public QWidget
 {
@@ -71,7 +72,7 @@ private:
     QGridLayout *layout;
 
     QTreeView   *view;
-    QListView   *view2;
+    PlIconView  *view2;
 
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
