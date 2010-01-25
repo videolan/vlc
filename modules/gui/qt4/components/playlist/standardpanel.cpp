@@ -83,9 +83,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     treeView->setDropIndicatorShown( true );
     treeView->setContextMenuPolicy( Qt::CustomContextMenu );
 
-    //treeView->installEventFilter( this );
-    //<jleben> I guess we don't need that
-
     /* Saved Settings */
     getSettings()->beginGroup("Playlist");
     if( getSettings()->contains( "headerStateV2" ) )
@@ -240,13 +237,6 @@ void StandardPLPanel::search( const QString& searchText )
     model->search( searchText );
 }
 
-void StandardPLPanel::doPopup( QModelIndex index, QPoint point )
-{
-    QItemSelectionModel *selection = treeView->selectionModel();
-    QModelIndexList list = selection->selectedIndexes();
-    model->popup( index, point, list );
-}
-
 /* Set the root of the new Playlist */
 /* This activated by the selector selection */
 void StandardPLPanel::setRoot( playlist_item_t *p_item )
@@ -320,7 +310,6 @@ void StandardPLPanel::toggleView()
         {
             iconView = new PlIconView( model, this );
             layout->addWidget( iconView, 1, 0, 1, -1 );
-            //iconView->installEventFilter( this );
             iconView->setContextMenuPolicy( Qt::CustomContextMenu );
             CONNECT( iconView, customContextMenuRequested( const QPoint & ),
                      this, playlistPopup( const QPoint & ) );
@@ -333,46 +322,6 @@ void StandardPLPanel::toggleView()
         iconView->hide();
         treeView->show();
     }
-}
-
-bool StandardPLPanel::eventFilter( QObject *obj, QEvent *event )
-{
-    QAbstractItemView *aView = qobject_cast<QAbstractItemView *>(obj);
-    if( !aView ) return false;
-
-    switch( event->type() )
-    {
-        case QEvent::MouseButtonPress:
-            {
-                QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
-                if( mouseEvent->button() & Qt::RightButton )
-                {
-                    QModelIndex index = aView->indexAt(
-                            QPoint( mouseEvent->x(), mouseEvent->y() ) );
-                    doPopup( index, QCursor::pos() );
-                    return true;
-                }
-                else if( mouseEvent->button() & Qt::LeftButton )
-                {
-                    if( !aView->indexAt( QPoint( mouseEvent->x(),
-                                                mouseEvent->y() ) ).isValid() )
-                        aView->clearSelection();
-                }
-                // aView->mousePressEvent( mouseEvent );
-            }
-            return true;
-        case QEvent::MouseButtonRelease:
-            {
-                QMouseEvent *mouseEvent2 = static_cast<QMouseEvent *>(event);
-                if( mouseEvent2->button() & Qt::RightButton )
-                    return false; /* Do NOT forward to QTreeView!! */
-                // aView->mouseReleaseEvent( mouseEvent );
-                return true;
-            }
-        default:
-            return false;
-    }
-    return true;
 }
 
 void StandardPLPanel::wheelEvent( QWheelEvent *e )
