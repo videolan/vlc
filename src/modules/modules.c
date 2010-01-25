@@ -898,10 +898,11 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
             AllocatePluginDir (p_this, p_bank, path, i_maxdepth - 1);
         else
         if (S_ISREG (st.st_mode)
-         && ((size_t)pathlen >= strlen (LIBEXT))
-         && !strncasecmp (path + pathlen - strlen (LIBEXT), LIBEXT,
-                          strlen (LIBEXT)))
-            /* ^^ We only load files ending with LIBEXT */
+         && strncmp (path, "lib", 3)
+         && ((size_t)pathlen >= sizeof ("_plugin"LIBEXT))
+         && !strncasecmp (path + pathlen - strlen ("_plugin"LIBEXT),
+                          "_plugin"LIBEXT, strlen ("_plugni"LIBEXT)))
+            /* ^^ We only load files matching "lib*_plugin"LIBEXT */
             AllocatePluginFile (p_this, p_bank, path, st.st_mtime, st.st_size);
 
         free (path);
