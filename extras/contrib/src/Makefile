@@ -1038,10 +1038,6 @@ ifdef HAVE_UCLIBC
 	patch -p0 < Patches/ffmpeg-svn-internal-define.patch
 	patch -p0 < Patches/ffmpeg-svn-libavformat.patch
 endif
-ifdef NO_TEXT_RELOCATION
-	echo "Broken LD. Fix your tools."
-	exit -1
-endif
 	(cd $@; patch -p1 < ../Patches/eac3_spectral.patch)
 else
 ffmpeg-$(FFMPEG_VERSION).tar.gz:
