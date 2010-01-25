@@ -80,7 +80,6 @@
  *****************************************************************************/
 #ifdef HAVE_DYNAMIC_PLUGINS
 static int    CacheLoadConfig  ( module_t *, FILE * );
-static int    CacheSaveConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
@@ -457,7 +456,7 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
     return VLC_EGENERIC;
 }
 
-static int CacheSaveSubmodule( FILE *file, module_t *p_module );
+static int CacheSaveBank( FILE *file, module_bank_t *p_bank );
 
 /*****************************************************************************
  * SavePluginsCache: saves the plugins cache to a file
@@ -465,11 +464,6 @@ static int CacheSaveSubmodule( FILE *file, module_t *p_module );
 void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
 {
     char *psz_cachedir = config_GetUserDir(VLC_CACHE_DIR);
-    FILE *file;
-    int i, j, i_cache;
-    module_cache_t **pp_cache;
-    uint32_t i_file_size = 0;
-
     if( !psz_cachedir ) /* XXX: this should never happen */
     {
         msg_Err( p_this, "unable to get cache directory" );
@@ -483,14 +477,44 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
               "%s"DIR_SEP CACHENAME_FORMAT, psz_cachedir,
               CACHENAME_VALUES );
     free( psz_cachedir );
-    msg_Dbg( p_this, "writing plugins cache %s", psz_filename );
 
     char psz_tmpname[sizeof (psz_filename) + 12];
     snprintf (psz_tmpname, sizeof (psz_tmpname), "%s.%"PRIu32, psz_filename,
               (uint32_t)getpid ());
-    file = utf8_fopen( psz_tmpname, "wb" );
+    FILE *file = utf8_fopen( psz_tmpname, "wb" );
     if (file == NULL)
         goto error;
+
+    msg_Dbg (p_this, "writing plugins cache %s", psz_filename);
+    if (CacheSaveBank (file, p_bank))
+        goto error;
+
+#ifndef WIN32
+    utf8_rename (psz_tmpname, psz_filename); /* atomically replace old cache */
+    fclose (file);
+#else
+    utf8_unlink (psz_filename);
+    fclose (file);
+    utf8_rename (psz_tmpname, psz_filename);
+#endif
+    return; /* success! */
+
+error:
+    msg_Warn (p_this, "could not write plugins cache %s (%m)",
+              psz_filename);
+    if (file != NULL)
+    {
+        clearerr (file);
+        fclose (file);
+    }
+}
+
+static int CacheSaveConfig (FILE *, module_t *);
+static int CacheSaveSubmodule (FILE *, module_t *);
+
+static int CacheSaveBank (FILE *file, module_bank_t *p_bank)
+{
+    uint32_t i_file_size = 0;
 
     /* Empty space for file size */
     if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1)
@@ -515,8 +539,8 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
     if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1)
         goto error;
 
-    i_cache = p_bank->i_cache;
-    pp_cache = p_bank->pp_cache;
+    module_cache_t **pp_cache = p_bank->pp_cache;
+    uint32_t i_cache = p_bank->i_cache;
 
     if (fwrite( &i_cache, sizeof (i_cache), 1, file) != 1)
         goto error;
@@ -532,7 +556,7 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
             goto error; \
     } while(0)
 
-    for( i = 0; i < i_cache; i++ )
+    for (unsigned i = 0; i < i_cache; i++)
     {
         uint32_t i_submodule;
 
@@ -549,7 +573,7 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
         SAVE_STRING( pp_cache[i]->p_module->psz_shortname );
         SAVE_STRING( pp_cache[i]->p_module->psz_longname );
         SAVE_STRING( pp_cache[i]->p_module->psz_help );
-        for( j = 0; j < MODULE_SHORTCUT_MAX; j++ )
+        for (unsigned j = 0; j < MODULE_SHORTCUT_MAX; j++)
         {
             SAVE_STRING( pp_cache[i]->p_module->pp_shortcuts[j] ); // FIX
         }
@@ -559,7 +583,7 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
         SAVE_IMMEDIATE( pp_cache[i]->p_module->b_submodule );
 
         /* Config stuff */
-        if (CacheSaveConfig (pp_cache[i]->p_module, file))
+        if (CacheSaveConfig (file, pp_cache[i]->p_module))
             goto error;
 
         SAVE_STRING( pp_cache[i]->p_module->psz_filename );
@@ -576,25 +600,10 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
     if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1
      || fflush (file)) /* flush libc buffers */
         goto error;
-
-#ifndef WIN32
-    utf8_rename (psz_tmpname, psz_filename); /* atomically replace old cache */
-    fclose (file);
-#else
-    utf8_unlink (psz_filename);
-    fclose (file);
-    utf8_rename (psz_tmpname, psz_filename);
-#endif
-    return; /* success! */
+    return 0; /* success! */
 
 error:
-    msg_Warn (p_this, "could not write plugins cache %s (%m)",
-              psz_filename);
-    if (file != NULL)
-    {
-        clearerr (file);
-        fclose (file);
-    }
+    return -1;
 }
 
 static int CacheSaveSubmodule( FILE *file, module_t *p_module )
@@ -621,7 +630,7 @@ error:
 }
 
 
-static int CacheSaveConfig( module_t *p_module, FILE *file )
+static int CacheSaveConfig (FILE *file, module_t *p_module)
 {
     uint32_t i_lines = p_module->confsize;
 
