@@ -32,9 +32,10 @@
 
 #include "assert.h"
 
-#define RECT_SIZE 100
-#define ART_SIZE  64
-#define OFFSET    (100-64)/2
+#define RECT_SIZE       100
+#define ART_SIZE        64
+#define OFFSET          (100-64)/2
+#define ITEMS_SPACING   10
 
 void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
@@ -89,6 +90,7 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     setMovement( QListView::Static );
     setResizeMode( QListView::Adjust );
     setGridSize( QSize( 100, 100 ) );
+    setSpacing( ITEMS_SPACING );
     setWrapping( true );
 
     PlListViewItemDelegate *pl = new PlListViewItemDelegate();
