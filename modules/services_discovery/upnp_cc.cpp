@@ -58,11 +58,11 @@ using namespace CyberLink;
     static int  Open ( vlc_object_t * );
     static void Close( vlc_object_t * );
 
-VLC_SD_PROBE_HELPER("upnp", N_("Universal Plug'n'Play discovery"))
+VLC_SD_PROBE_HELPER("upnp", N_("Universal Plug'n'Play"))
 
 vlc_module_begin ()
     set_shortname( "UPnP")
-    set_description( N_("Universal Plug'n'Play discovery") )
+    set_description( N_("Universal Plug'n'Play") )
     set_category( CAT_PLAYLIST )
     set_subcategory( SUBCAT_PLAYLIST_SD )
 
