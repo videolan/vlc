@@ -32,10 +32,11 @@
 
 #include "assert.h"
 
-#define RECT_SIZE       100
-#define ART_SIZE        64
-#define OFFSET          (100-64)/2
-#define ITEMS_SPACING   10
+#define RECT_SIZE           100
+#define ART_SIZE            64
+#define OFFSET              (100-64)/2
+#define ITEMS_SPACING       10
+#define ART_RADIUS          7
 
 void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
@@ -62,8 +63,16 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     QRect artRect = option.rect.adjusted( OFFSET - 1, 0, - OFFSET, - OFFSET *2 );
     QPainterPath artRectPath;
-    artRectPath.addRoundedRect( artRect, 7, 7 );
+    artRectPath.addRoundedRect( artRect, ART_RADIUS, ART_RADIUS );
 
+    // Draw the drop shadow
+    painter->save();
+    painter->setOpacity( 0.7 );
+    painter->setBrush( QBrush( Qt::gray ) );
+    painter->drawRoundedRect( artRect.adjusted( 2, 2, 2, 2 ), ART_RADIUS, ART_RADIUS );
+    painter->restore();
+
+    // Draw the art pixmap
     painter->drawPixmap( artRect, pix );
     painter->setClipPath( artRectPath );
     painter->drawPixmap( artRect, pix );
