@@ -197,6 +197,7 @@ set(INSTALL_TARGETS_DEFAULT_ARGS  RUNTIME DESTINATION "${BIN_INSTALL_DIR}"
                                   LIBRARY DESTINATION "${LIB_INSTALL_DIR}"
                                   ARCHIVE DESTINATION "${LIB_INSTALL_DIR}" COMPONENT Devel )
 
+add_definitions(-DPHONON_LIB_INSTALL_DIR="${LIB_INSTALL_DIR}")
 # on the Mac support an extra install directory for application bundles
 if(APPLE)
    set(INSTALL_TARGETS_DEFAULT_ARGS  ${INSTALL_TARGETS_DEFAULT_ARGS}
