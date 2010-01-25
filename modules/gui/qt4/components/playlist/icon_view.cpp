@@ -28,6 +28,7 @@
 #include <QPainter>
 #include <QRect>
 #include <QStyleOptionViewItem>
+#include <QApplication>
 
 #include "assert.h"
 
@@ -39,8 +40,9 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 {
     painter->setRenderHint( QPainter::Antialiasing );
 
-    if( option.state & QStyle::State_Selected )
-         painter->fillRect(option.rect, option.palette.highlight());
+    /*if( option.state & QStyle::State_Selected )
+         painter->fillRect(option.rect, option.palette.highlight());*/
+    QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem, &option, painter );
 
     PLItem *currentItem = static_cast<PLItem*>( index.internalPointer() );
     assert( currentItem );
