@@ -90,6 +90,7 @@ private slots:
     void popupSelectColumn( QPoint );
     void toggleColumnShown( int );
     void toggleView();
+    void treeViewPopup( const QPoint & );
 };
 
 #endif

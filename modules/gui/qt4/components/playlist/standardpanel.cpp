@@ -81,8 +81,11 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     treeView->setDragEnabled( true );
     treeView->setAcceptDrops( true );
     treeView->setDropIndicatorShown( true );
+    treeView->setContextMenuPolicy( Qt::CustomContextMenu );
 
-    installEventFilter( treeView );
+    //treeView->installEventFilter( this );
+    //<jleben> I guess we don't need that
+
     /* Saved Settings */
     getSettings()->beginGroup("Playlist");
     if( getSettings()->contains( "headerStateV2" ) )
@@ -106,6 +109,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
              model,activateItem( const QModelIndex& ) );
     CONNECT( treeView->header(), customContextMenuRequested( const QPoint & ),
              this, popupSelectColumn( QPoint ) );
+    CONNECT( treeView, customContextMenuRequested( const QPoint & ),
+             this, treeViewPopup( const QPoint & ) );
     CONNECT( model, currentChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
 
@@ -209,6 +214,15 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
         CONNECT( option, triggered(), selectColumnsSigMapper, map() );
     }
     menu.exec( QCursor::pos() );
+}
+
+void StandardPLPanel::treeViewPopup( const QPoint &point )
+{
+    QModelIndex index = treeView->indexAt( point );
+    QPoint globalPoint = treeView->viewport()->mapToGlobal( point );
+    QItemSelectionModel *selection = treeView->selectionModel();
+    QModelIndexList list = selection->selectedIndexes();
+    model->popup( index, globalPoint, list );
 }
 
 void StandardPLPanel::toggleColumnShown( int i )
