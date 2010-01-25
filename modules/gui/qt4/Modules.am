@@ -98,6 +98,7 @@ DEPS_res = \
 	pixmaps/menus/stream_16px.png \
 	pixmaps/next.png \
 	pixmaps/next_16px.png \
+	pixmaps/noart-64.png \
 	pixmaps/noart.png \
 	pixmaps/pause.png \
 	pixmaps/pause_16px.png \
