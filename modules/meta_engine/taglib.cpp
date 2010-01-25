@@ -539,12 +539,9 @@ static int WriteMeta( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    char *export_file = strdup(p_export->psz_file);
-    if( decode_URI( export_file ) == NULL )
-    {
-        free( export_file );
+    char *export_file = decode_URI_duplicate(p_export->psz_file);
+    if( export_file == NULL )
         return VLC_EGENERIC;
-    }
 
 #if defined(WIN32) || defined (UNDER_CE)
     wchar_t wpath[MAX_PATH + 1];
