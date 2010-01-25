@@ -1,5 +1,6 @@
 SOURCES_lua = \
 	extension.c \
+	extension.h \
 	extension_thread.c \
 	intf.c \
 	meta.c \

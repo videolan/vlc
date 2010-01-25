@@ -111,6 +111,7 @@ pluginsinclude_HEADERS = \
 noinst_HEADERS = \
 	../include/vlc_codec_synchro.h \
 	../include/vlc_codecs.h \
+	../include/vlc_extensions.h \
 	../include/vlc_fixups.h \
 	../include/vlc_interface.h \
 	../include/vlc_intf_strings.h \
