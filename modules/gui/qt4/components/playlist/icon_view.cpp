@@ -23,17 +23,55 @@
 
 #include "components/playlist/icon_view.hpp"
 #include "components/playlist/playlist_model.hpp"
+#include "input_manager.hpp"
 
 #include <QPainter>
+#include <QRect>
+#include <QStyleOptionViewItem>
+
+#include "assert.h"
+
+#define RECT_SIZE 100
+#define ART_SIZE  64
+#define OFFSET    (100-64)/2
 
 void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    QStyledItemDelegate::paint( painter, option, index );
+    painter->setRenderHint( QPainter::Antialiasing );
+
+    if( option.state & QStyle::State_Selected )
+         painter->fillRect(option.rect, option.palette.highlight());
+
+    PLItem *currentItem = static_cast<PLItem*>( index.internalPointer() );
+    assert( currentItem );
+
+    QPixmap pix;
+    QString url = InputManager::decodeArtURL( currentItem->inputItem() );
+
+    if( !url.isEmpty() && pix.load( url ) )
+    {
+        pix = pix.scaled( ART_SIZE, ART_SIZE, Qt::KeepAspectRatioByExpanding );
+    }
+    else
+    {
+        pix = QPixmap( ":/noart.png" );
+    }
+
+    QRect art_rect = option.rect.adjusted( OFFSET - 1, 0, - OFFSET, - OFFSET *2 );
+
+    painter->drawPixmap( art_rect, pix );
+
+    painter->setFont( QFont( "Verdana", 7 ) );
+
+    QRect textRect = option.rect.adjusted( 1, ART_SIZE + 2, -1, -1 );
+    painter->drawText( textRect, qfu( input_item_GetTitle( currentItem->inputItem() ) ),
+                       QTextOption( Qt::AlignCenter ) );
+
 }
 
 QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    return QSize(100, 100);
+    return QSize( RECT_SIZE, RECT_SIZE);
 }
 
 
@@ -46,4 +84,3 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     PlListViewItemDelegate *pl = new PlListViewItemDelegate();
     setItemDelegate( pl );
 }
-
