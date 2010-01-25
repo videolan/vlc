@@ -38,7 +38,7 @@
 
 void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    painter->setRenderHint( QPainter::Antialiasing );
+    painter->setRenderHints( QPainter::Antialiasing | QPainter::SmoothPixmapTransform );
 
     /*if( option.state & QStyle::State_Selected )
          painter->fillRect(option.rect, option.palette.highlight());*/
@@ -59,9 +59,14 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
         pix = QPixmap( ":/noart64" );
     }
 
-    QRect art_rect = option.rect.adjusted( OFFSET - 1, 0, - OFFSET, - OFFSET *2 );
+    QRect artRect = option.rect.adjusted( OFFSET - 1, 0, - OFFSET, - OFFSET *2 );
+    QPainterPath artRectPath;
+    artRectPath.addRoundedRect( artRect, 7, 7 );
 
-    painter->drawPixmap( art_rect, pix );
+    painter->drawPixmap( artRect, pix );
+    painter->setClipPath( artRectPath );
+    painter->drawPixmap( artRect, pix );
+    painter->setClipping( false );
 
     painter->setFont( QFont( "Verdana", 7 ) );
 
