@@ -50,31 +50,6 @@
 #   include <unistd.h>
 #endif
 
-#if !defined(HAVE_DYNAMIC_PLUGINS)
-    /* no support for plugins */
-#elif defined(HAVE_DL_DYLD)
-#   if defined(HAVE_MACH_O_DYLD_H)
-#       include <mach-o/dyld.h>
-#   endif
-#elif defined(HAVE_DL_BEOS)
-#   if defined(HAVE_IMAGE_H)
-#       include <image.h>
-#   endif
-#elif defined(HAVE_DL_WINDOWS)
-#   include <windows.h>
-#elif defined(HAVE_DL_DLOPEN)
-#   if defined(HAVE_DLFCN_H) /* Linux, BSD, Hurd */
-#       include <dlfcn.h>
-#   endif
-#   if defined(HAVE_SYS_DL_H)
-#       include <sys/dl.h>
-#   endif
-#elif defined(HAVE_DL_SHL_LOAD)
-#   if defined(HAVE_DL_H)
-#       include <dl.h>
-#   endif
-#endif
-
 #include "config/configuration.h"
 
 #include "vlc_charset.h"
