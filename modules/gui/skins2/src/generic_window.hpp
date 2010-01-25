@@ -96,7 +96,8 @@ public:
     void* getOSHandle() const;
 
     /// reparent
-    void setParent( GenericWindow* pParent, int x, int y, int w, int h );
+    void setParent( GenericWindow* pParent,
+                    int x = 0, int y = 0, int w = -1, int h = -1 );
 
 protected:
     /// Get the OS window

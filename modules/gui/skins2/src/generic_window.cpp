@@ -170,10 +170,12 @@ void* GenericWindow::getOSHandle() const
 
 void GenericWindow::setParent( GenericWindow* pParent, int x, int y, int w, int h )
 {
-    // Update the window size
-    m_width = w;
-    m_height = h;
+    // Update the window size and position
+    m_left = x;
+    m_top = y;
+    m_width  = ( w > 0 ) ? w : m_width;
+    m_height = ( h > 0 ) ? h : m_height;
 
     void* handle = pParent ? pParent->getOSHandle() : NULL;
-    m_pOsWindow->reparent( handle, x, y, w, h );
+    m_pOsWindow->reparent( handle, m_left, m_top, m_width, m_height );
 }
