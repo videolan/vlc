@@ -54,7 +54,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     }
     else
     {
-        pix = QPixmap( ":/noart.png" );
+        pix = QPixmap( ":/noart64" );
     }
 
     QRect art_rect = option.rect.adjusted( OFFSET - 1, 0, - OFFSET, - OFFSET *2 );
