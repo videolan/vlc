@@ -102,14 +102,8 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
 
     if( b_delete )
     {
-#if !defined( UNDER_CE )
-        unlink( psz_filename );
-#else
-        wchar_t psz_wf[MAX_PATH];
-        MultiByteToWideChar( CP_ACP, 0, psz_filename, -1, psz_wf, MAX_PATH );
-        DeleteFile( psz_wf );
-#endif
         msg_Dbg( p_this, "removing plugins cache file %s", psz_filename );
+        utf8_unlink( psz_filename );
         free( psz_filename );
         return;
     }
