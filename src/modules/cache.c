@@ -454,7 +454,7 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
     if (file == NULL)
         goto error;
 
-    msg_Dbg (p_this, "writing plugins cache %s", psz_filename);
+    msg_Dbg (p_this, "saving plugins cache %s", psz_filename);
     if (CacheSaveBank (file, p_bank))
         goto error;
 
