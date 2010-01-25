@@ -57,7 +57,7 @@ VLCMediaObject::~VLCMediaObject()
 {
     unloadMedia();
 
-    libvlc_media_player_stop(p_vlc_media_player, vlc_exception); // ensure that we are stopped
+    libvlc_media_player_stop(p_vlc_media_player); // ensure that we are stopped
     libvlc_media_player_release(p_vlc_media_player);
 }
 
@@ -83,8 +83,7 @@ void VLCMediaObject::loadMediaInternal(const QString & filename)
     vlcExceptionRaised();
 
     // Set the media that will be used by the media player
-    libvlc_media_player_set_media(p_vlc_media_player, p_vlc_media, vlc_exception);
-    vlcExceptionRaised();
+    libvlc_media_player_set_media(p_vlc_media_player, p_vlc_media);
 
     // No need to keep the media now
 //    libvlc_media_release(p_vlc_media);
@@ -119,13 +118,12 @@ void VLCMediaObject::setVLCWidgetId()
 {
     // Get our media player to use our window
 #if defined(Q_OS_UNIX)
-    libvlc_media_player_set_xwindow(p_vlc_media_player, i_video_widget_id, vlc_exception);
+    libvlc_media_player_set_xwindow(p_vlc_media_player, i_video_widget_id);
 #elif defined(Q_OS_WIN)
-    libvlc_media_player_set_hwnd(p_vlc_media_player, i_video_widget_id, vlc_exception);
+    libvlc_media_player_set_hwnd(p_vlc_media_player, i_video_widget_id);
 #elif defined(Q_OS_MAC)
-    libvlc_media_player_set_agl(p_vlc_media_player, i_video_widget_id, vlc_exception);
+    libvlc_media_player_set_agl(p_vlc_media_player, i_video_widget_id);
 #endif
-    vlcExceptionRaised();
 }
 
 void VLCMediaObject::playInternal()
@@ -152,8 +150,7 @@ void VLCMediaObject::pause()
 
 void VLCMediaObject::stop()
 {
-    libvlc_media_player_stop(p_vlc_media_player, vlc_exception);
-    vlcExceptionRaised();
+    libvlc_media_player_stop(p_vlc_media_player);
 //    unloadMedia();
 }
 
@@ -182,7 +179,7 @@ bool VLCMediaObject::isSeekable() const
 void VLCMediaObject::connectToAllVLCEvents()
 {
     // Get the event manager from which the media player send event
-    p_vlc_media_player_event_manager = libvlc_media_player_event_manager(p_vlc_media_player, vlc_exception);
+    p_vlc_media_player_event_manager = libvlc_media_player_event_manager(p_vlc_media_player);
     libvlc_event_type_t eventsMediaPlayer[] = {
         libvlc_MediaPlayerPlaying,
         libvlc_MediaPlayerPaused,
