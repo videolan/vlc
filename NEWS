@@ -4,7 +4,7 @@ Changes between 1.0.5 and 1.1.0-git:
 Access:
  * Port of the screen module from Xlib to XCB
  * Support for the sftp protocol
- * Support for CDDB servers for Audio-CD on Windows version
+ * Support for CDDB servers for Audio-CD on the Windows port
  * Port of the dc1394 module from libdc1394 to libdc1394 v2.0
  * New memory input (imem) module to feed VLC from data in memory
  * New avio module to use libavformat capabilities for network streams
@@ -34,21 +34,6 @@ Playlist:
  * New Play-And-Pause function to stop playback on latest video image
  * Podcast images are now displayed
 
-Audio filters:
- * Chorus/Flanger audio filter
- * 3F1R to stereo downmix filter
- * Dolby mixer, parameterized equalizer, trivial mixer, scaletempo, bandlimited resampler,
-   linear resampler, ugly resampler, converter_float, converter_fixed, DTS to SPDIF and
- * NEON assembly audio converter module
-
-Encoders:
- * x264, add psy-rd parameter and change default settings
- * x264, add profile-limitter sameway as x264.eve has, for example
-    #transcode{vcodec=h264,venc=x264{profile=baseline,level=1.2},vb=384,width=320,height=176}
- * x264, defaults to crf=23 as x264.exe-does, if bitrate is given,
-   uses ABR and if qp-value is set uses CQP
- * libx264-version 0.76 or higher is required
-
 Video Output:
  * Rewrite of the video output core and most video outputs
  * Added desktop mode to the Direct3D output module. It differs from DirectX
@@ -57,12 +42,31 @@ Video Output:
  * New deinterlacing modes based on yadif and yadif(x2)
  * New audio/video filter to show audio level on the video output
 
+Extensions:
+ * new content extensions lua framework
+ * imdb extension
+
+Audio filters:
+ * Chorus/Flanger audio filter
+ * 3F1R to stereo downmix filter
+ * Dolby mixer, parameterized equalizer, trivial mixer, scaletempo, bandlimited resampler,
+   linear resampler, ugly resampler, converter_float, converter_fixed, DTS to SPDIF and
+ * NEON assembly audio converter module
+
 Visualisation:
  * Support of .milk visualisation files using projectM libraries
 
 Service discovery:
  * Service discovery for Picture/Music/Video user directories
  * Service discovery based on libudev
+
+Encoders:
+ * x264, add psy-rd parameter and change default settings
+ * x264, add profile-limitter sameway as x264.eve has, for example
+    #transcode{vcodec=h264,venc=x264{profile=baseline,level=1.2},vb=384,width=320,height=176}
+ * x264, defaults to crf=23 as x264.exe-does, if bitrate is given,
+   uses ABR and if qp-value is set uses CQP
+ * libx264-version 0.76 or higher is required
 
 Stream output:
  * New smem module, streaming to memory
@@ -94,6 +98,9 @@ Maemo port:
 Misc:
  * new sqlite module
  * --save-config command line option not supported anymore.
+
+Bindings:
+ * new C++ wrapper around libVLC: libVLCpp
 
 Removed modules:
  * csri codec. Use libass module instead.
