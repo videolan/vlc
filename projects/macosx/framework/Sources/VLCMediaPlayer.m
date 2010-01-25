@@ -878,20 +878,16 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
 
 - (void)registerObservers
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-
     // Attach event observers into the media instance
     libvlc_event_manager_t * p_em = libvlc_media_player_event_manager(instance);
-    libvlc_event_attach(p_em, libvlc_MediaPlayerPlaying,          HandleMediaInstanceStateChanged, self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaPlayerPaused,           HandleMediaInstanceStateChanged, self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaPlayerEncounteredError, HandleMediaInstanceStateChanged, self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaPlayerEndReached,       HandleMediaInstanceStateChanged, self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerPlaying,          HandleMediaInstanceStateChanged, self);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerPaused,           HandleMediaInstanceStateChanged, self);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerEncounteredError, HandleMediaInstanceStateChanged, self);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerEndReached,       HandleMediaInstanceStateChanged, self);
     /* FIXME: We may want to turn that off when none is interested by that */
-    libvlc_event_attach(p_em, libvlc_MediaPlayerPositionChanged, HandleMediaPositionChanged,      self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaPlayerTimeChanged,     HandleMediaTimeChanged,          self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaPlayerMediaChanged,    HandleMediaPlayerMediaChanged,  self, &ex);
-    catch_exception(&ex);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerPositionChanged, HandleMediaPositionChanged,      self);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerTimeChanged,     HandleMediaTimeChanged,          self);
+    libvlc_event_attach(p_em, libvlc_MediaPlayerMediaChanged,    HandleMediaPlayerMediaChanged,  self);
 }
 
 - (void)unregisterObservers

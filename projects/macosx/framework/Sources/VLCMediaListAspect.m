@@ -275,15 +275,11 @@ static void HandleMediaListViewItemDeleted( const libvlc_event_t * event, void *
 @implementation VLCMediaListAspect (Private)
 - (void)initInternalMediaListView
 {
-    libvlc_exception_t e;
-    libvlc_exception_init(&e);
-
     libvlc_event_manager_t * p_em = libvlc_media_list_event_manager(p_mlv);
 
     /* Add internal callback */
-    libvlc_event_attach(p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self, &e);
-    libvlc_event_attach(p_em, libvlc_MediaListViewItemDeleted, HandleMediaListViewItemDeleted, self, &e);
-    catch_exception(&e);
+    libvlc_event_attach(p_em, libvlc_MediaListViewItemAdded,   HandleMediaListViewItemAdded,   self);
+    libvlc_event_attach(p_em, libvlc_MediaListViewItemDeleted, HandleMediaListViewItemDeleted, self);
 }
 
 - (void)mediaListViewItemAdded:(NSArray *)arrayOfArgs

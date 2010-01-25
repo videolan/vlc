@@ -430,9 +430,6 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 
 - (void)initInternalMediaDescriptor
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-
     char * p_url = libvlc_media_get_mrl( p_md );
 
     url = [[NSURL URLWithString:[NSString stringWithUTF8String:p_url]] retain];
@@ -443,10 +440,10 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     libvlc_media_set_user_data( p_md, (void*)self );
 
     libvlc_event_manager_t * p_em = libvlc_media_event_manager( p_md );
-    libvlc_event_attach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self, &ex);
-    libvlc_event_attach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self, &ex);
+    libvlc_event_attach(p_em, libvlc_MediaMetaChanged,     HandleMediaMetaChanged,     self);
+    libvlc_event_attach(p_em, libvlc_MediaDurationChanged, HandleMediaDurationChanged, self);
+    libvlc_event_attach(p_em, libvlc_MediaStateChanged,    HandleMediaStateChanged,    self);
+    libvlc_event_attach(p_em, libvlc_MediaSubItemAdded,    HandleMediaSubItemAdded,    self);
 
     libvlc_media_list_t * p_mlist = libvlc_media_subitems( p_md );
 

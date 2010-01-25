@@ -99,9 +99,8 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
         catch_exception(&ex);
 
         libvlc_event_manager_t * p_em = libvlc_media_discoverer_event_manager(mdis);
-        libvlc_event_attach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self, &ex);
-        libvlc_event_attach(p_em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self, &ex);
-        catch_exception( &ex );
+        libvlc_event_attach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self);
+        libvlc_event_attach(p_em, libvlc_MediaDiscovererEnded,   HandleMediaDiscovererEnded,   self);
 
         running = libvlc_media_discoverer_is_running(mdis);
     }

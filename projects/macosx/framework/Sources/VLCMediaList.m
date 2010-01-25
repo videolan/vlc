@@ -293,14 +293,9 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 - (void)initInternalMediaList
 {
     // Add event callbacks
-    libvlc_exception_t p_e;
-    libvlc_exception_init( &p_e );
-
     libvlc_event_manager_t * p_em = libvlc_media_list_event_manager(p_mlist);
-    libvlc_event_attach( p_em, libvlc_MediaListItemAdded,   HandleMediaListItemAdded,   self, &p_e );
-    libvlc_event_attach( p_em, libvlc_MediaListItemDeleted, HandleMediaListItemDeleted, self, &p_e );
-
-    catch_exception( &p_e );
+    libvlc_event_attach( p_em, libvlc_MediaListItemAdded,   HandleMediaListItemAdded,   self);
+    libvlc_event_attach( p_em, libvlc_MediaListItemDeleted, HandleMediaListItemDeleted, self);
 }
 
 - (void)mediaListItemAdded:(NSArray *)arrayOfArgs
