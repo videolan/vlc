@@ -103,4 +103,18 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
 
     PlListViewItemDelegate *pl = new PlListViewItemDelegate();
     setItemDelegate( pl );
+
+    CONNECT( this, activated( const QModelIndex & ), this, activate( const QModelIndex & ) );
+}
+
+void PlIconView::activate( const QModelIndex & index )
+{
+    if( model()->hasChildren( index ) )
+        setRootIndex( index );
+    else
+    {
+        PLModel *plModel = qobject_cast<PLModel*>( model() );
+        if( !plModel ) return;
+        plModel->activateItem( index );
+    }
 }
