@@ -187,7 +187,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     return [self count];
 }
 
-- (id)objectInMediaAtIndex:(NSInteger)i
+- (id)objectInMediaAtIndex:(NSUInteger)i
 {
     return [self mediaAtIndex:i];
 }
@@ -195,6 +195,16 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 - (NSInteger)count
 {
     return [cachedMedia count];
+}
+
+- (void)insertObject:(id)object inMediaAtIndex:(NSUInteger)i
+{
+    [self insertMedia:object atIndex:i];
+}
+
+- (void)removeObjectFromMediaAtIndex:(NSUInteger)i
+{
+    [self removeMediaAtIndex:i];
 }
 
 @synthesize delegate;
