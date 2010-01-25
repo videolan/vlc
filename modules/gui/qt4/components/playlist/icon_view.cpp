@@ -73,7 +73,6 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     painter->restore();
 
     // Draw the art pixmap
-    painter->drawPixmap( artRect, pix );
     painter->setClipPath( artRectPath );
     painter->drawPixmap( artRect, pix );
     painter->setClipping( false );
