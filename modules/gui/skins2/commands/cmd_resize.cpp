@@ -44,17 +44,6 @@ void CmdResize::execute()
 
 
 
-CmdResizeInnerVout::CmdResizeInnerVout( intf_thread_t *pIntf,
-                    CtrlVideo* pCtrlVideo )
-    : CmdGeneric( pIntf ), m_pCtrlVideo( pCtrlVideo ) { }
-
-
-void CmdResizeInnerVout::execute()
-{
-    m_pCtrlVideo->resizeInnerVout();
-}
-
-
 CmdResizeVout::CmdResizeVout( intf_thread_t *pIntf, vout_window_t* pWnd,
                               int width, int height )
     : CmdGeneric( pIntf ), m_pWnd( pWnd ), m_width( width ),

@@ -51,21 +51,6 @@ private:
 };
 
 
-/// Command to resize the inner vout window
-class CmdResizeInnerVout: public CmdGeneric
-{
-public:
-    /// Resize the given layout
-    CmdResizeInnerVout( intf_thread_t *pIntf, CtrlVideo* pCtrlVideo );
-    virtual ~CmdResizeInnerVout() { }
-    virtual void execute();
-    virtual string getType() const { return "resize inner vout"; }
-
-private:
-    CtrlVideo* m_pCtrlVideo;
-};
-
-
 /// Command to resize the vout window
 class CmdResizeVout: public CmdGeneric
 {

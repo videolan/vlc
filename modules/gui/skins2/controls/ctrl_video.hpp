@@ -66,9 +66,6 @@ public:
     // Detach a voutWindow from a Video Control
     void detachVoutWindow( );
 
-    // Update the inner part of the Video Control
-    void resizeInnerVout( );
-
     // Get TopWindow associated with the video control
     virtual TopWindow* getWindow() { return CtrlGeneric::getWindow(); }
 

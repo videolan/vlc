@@ -212,19 +212,3 @@ void CtrlVideo::detachVoutWindow( )
     m_pVoutWindow = NULL;
 }
 
-
-void CtrlVideo::resizeInnerVout( )
-{
-    if( m_pVoutWindow )
-    {
-        WindowManager &rWindowManager =
-             getIntf()->p_sys->p_theme->getWindowManager();
-        TopWindow* pWin = getWindow();
-
-        const Position *pPos = getPosition();
-
-        m_pVoutWindow->resize( pPos->getWidth(), pPos->getHeight() );
-        m_pVoutWindow->move( pPos->getLeft(), pPos->getTop() );
-    }
-}
-
