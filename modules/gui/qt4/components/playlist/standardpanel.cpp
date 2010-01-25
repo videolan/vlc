@@ -26,7 +26,6 @@
 # include "config.h"
 #endif
 
-#include "qt4.hpp"
 #include "dialogs_provider.hpp"
 
 #include "components/playlist/playlist_model.hpp"
@@ -61,55 +60,19 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     model = new PLModel( p_playlist, p_intf, p_root, this );
 
-    /* Create and configure the QTreeView */
-    treeView = new QTreeView;
-    treeView->setModel( model );
     iconView = NULL;
-
-    treeView->setIconSize( QSize( 20, 20 ) );
-    treeView->setAlternatingRowColors( true );
-    treeView->setAnimated( true );
-    treeView->setUniformRowHeights( true );
-    treeView->setSortingEnabled( true );
-    treeView->header()->setSortIndicator( -1 , Qt::AscendingOrder );
-    treeView->header()->setSortIndicatorShown( true );
-    treeView->header()->setClickable( true );
-    treeView->header()->setContextMenuPolicy( Qt::CustomContextMenu );
-
-    treeView->setSelectionBehavior( QAbstractItemView::SelectRows );
-    treeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
-    treeView->setDragEnabled( true );
-    treeView->setAcceptDrops( true );
-    treeView->setDropIndicatorShown( true );
-    treeView->setContextMenuPolicy( Qt::CustomContextMenu );
+    treeView = NULL;
 
     /* Saved Settings */
     getSettings()->beginGroup("Playlist");
-    if( getSettings()->contains( "headerStateV2" ) )
-    {
-        treeView->header()->restoreState(
-                getSettings()->value( "headerStateV2" ).toByteArray() );
-    }
-    else
-    {
-        for( int m = 1, c = 0; m != COLUMN_END; m <<= 1, c++ )
-        {
-            treeView->setColumnHidden( c, !( m & COLUMN_DEFAULT ) );
-            if( m == COLUMN_TITLE ) treeView->header()->resizeSection( c, 200 );
-            else if( m == COLUMN_DURATION ) treeView->header()->resizeSection( c, 80 );
-        }
-    }
-    getSettings()->endGroup();
 
-    /* Connections for the TreeView */
-    CONNECT( treeView, activated( const QModelIndex& ),
-             model,activateItem( const QModelIndex& ) );
-    CONNECT( treeView->header(), customContextMenuRequested( const QPoint & ),
-             this, popupSelectColumn( QPoint ) );
-    CONNECT( treeView, customContextMenuRequested( const QPoint & ),
-             this, popupPlView( const QPoint & ) );
-    CONNECT( model, currentChanged( const QModelIndex& ),
-             this, handleExpansion( const QModelIndex& ) );
+    int i_viewMode = getSettings()->value( "view-mode", TREE_VIEW ).toInt();
+    if( i_viewMode == ICON_VIEW )
+        iconView = new PlIconView( model, this );
+    else
+        createTreeView();
+
+    getSettings()->endGroup();
 
     currentRootId = -1;
 
@@ -142,30 +105,26 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     viewButton->setIcon( QIcon( ":/buttons/playlist/playlist_add" ) );
     layout->addWidget( viewButton, 0, 2 );
     BUTTONACT( viewButton, toggleView() );
-
-    /* Finish the layout */
-    layout->addWidget( treeView, 1, 0, 1, -1 );
-
-    selectColumnsSigMapper = new QSignalMapper( this );
-    CONNECT( selectColumnsSigMapper, mapped( int ),
-             this, toggleColumnShown( int ) );
 }
 
 StandardPLPanel::~StandardPLPanel()
 {
     getSettings()->beginGroup("Playlist");
-    getSettings()->setValue( "headerStateV2", treeView->header()->saveState() );
+    if( treeView )
+        getSettings()->setValue( "headerStateV2", treeView->header()->saveState() );
     getSettings()->endGroup();
 }
 
 /* Unused anymore, but might be useful, like in right-click menu */
 void StandardPLPanel::gotoPlayingItem()
 {
-    treeView->scrollTo( model->currentIndex() );
+    if( treeView )
+        treeView->scrollTo( model->currentIndex() );
 }
 
 void StandardPLPanel::handleExpansion( const QModelIndex& index )
 {
+    assert( treeView );
     treeView->scrollTo( index );
 }
 
@@ -197,6 +156,7 @@ void StandardPLPanel::popupAdd()
 void StandardPLPanel::popupSelectColumn( QPoint pos )
 {
     QMenu menu;
+    assert( treeView );
 
     /* We do not offer the option to hide index 0 column, or
     * QTreeView will behave weird */
@@ -216,8 +176,9 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
 void StandardPLPanel::popupPlView( const QPoint &point )
 {
     QAbstractItemView *aView;
-    if ( treeView->isVisible() ) aView = treeView;
-    else aView = iconView;
+    if ( treeView && treeView->isVisible() ) aView = treeView;
+    else if( iconView && iconView->isVisible() ) aView = iconView;
+    else return;
 
     QModelIndex index = aView->indexAt( point );
     QPoint globalPoint = aView->viewport()->mapToGlobal( point );
@@ -297,9 +258,78 @@ void StandardPLPanel::keyPressEvent( QKeyEvent *e )
 
 void StandardPLPanel::deleteSelection()
 {
+    //FIXME
+    if( !treeView ) return;
     QItemSelectionModel *selection = treeView->selectionModel();
     QModelIndexList list = selection->selectedIndexes();
     model->doDelete( list );
+}
+
+void StandardPLPanel::createIconView()
+{
+    iconView = new PlIconView( model, this );
+    iconView->setContextMenuPolicy( Qt::CustomContextMenu );
+    CONNECT( iconView, customContextMenuRequested( const QPoint & ),
+             this, popupPlView( const QPoint & ) );
+
+    layout->addWidget( iconView, 1, 0, 1, -1 );
+}
+
+void StandardPLPanel::createTreeView()
+{
+    /* Create and configure the QTreeView */
+    treeView = new QTreeView;
+    treeView->setModel( model );
+
+    treeView->setIconSize( QSize( 20, 20 ) );
+    treeView->setAlternatingRowColors( true );
+    treeView->setAnimated( true );
+    treeView->setUniformRowHeights( true );
+    treeView->setSortingEnabled( true );
+    treeView->header()->setSortIndicator( -1 , Qt::AscendingOrder );
+    treeView->header()->setSortIndicatorShown( true );
+    treeView->header()->setClickable( true );
+    treeView->header()->setContextMenuPolicy( Qt::CustomContextMenu );
+
+    treeView->setSelectionBehavior( QAbstractItemView::SelectRows );
+    treeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
+    treeView->setDragEnabled( true );
+    treeView->setAcceptDrops( true );
+    treeView->setDropIndicatorShown( true );
+    treeView->setContextMenuPolicy( Qt::CustomContextMenu );
+
+    if( getSettings()->contains( "headerStateV2" ) )
+    {
+        treeView->header()->restoreState(
+                getSettings()->value( "headerStateV2" ).toByteArray() );
+    }
+    else
+    {
+        for( int m = 1, c = 0; m != COLUMN_END; m <<= 1, c++ )
+        {
+            treeView->setClumnHidden( c, !( m & COLUMN_DEFAULT ) );
+            if( m == COLUMN_TITLE ) treeView->header()->resizeSection( c, 200 );
+            else if( m == COLUMN_DURATION ) treeView->header()->resizeSection( c, 80 );
+        }
+    }
+
+    /* Connections for the TreeView */
+    CONNECT( treeView, activated( const QModelIndex& ),
+             model,activateItem( const QModelIndex& ) );
+    CONNECT( treeView->header(), customContextMenuRequested( const QPoint & ),
+             this, popupSelectColumn( QPoint ) );
+    CONNECT( treeView, customContextMenuRequested( const QPoint & ),
+             this, popupPlView( const QPoint & ) );
+    CONNECT( model, currentChanged( const QModelIndex& ),
+             this, handleExpansion( const QModelIndex& ) );
+
+    /* SignalMapper for columns */
+    selectColumnsSigMapper = new QSignalMapper( this );
+    CONNECT( selectColumnsSigMapper, mapped( int ),
+             this, toggleColumnShown( int ) );
+
+    /* Finish the layout */
+    layout->addWidget( treeView, 1, 0, 1, -1 );
 }
 
 void StandardPLPanel::toggleView()
@@ -307,13 +337,8 @@ void StandardPLPanel::toggleView()
     if( treeView && treeView->isVisible() )
     {
         if( iconView == NULL )
-        {
-            iconView = new PlIconView( model, this );
-            layout->addWidget( iconView, 1, 0, 1, -1 );
-            iconView->setContextMenuPolicy( Qt::CustomContextMenu );
-            CONNECT( iconView, customContextMenuRequested( const QPoint & ),
-                     this, popupPlView( const QPoint & ) );
-        }
+            createIconView();
+
         treeView->hide();
         iconView->show();
     }

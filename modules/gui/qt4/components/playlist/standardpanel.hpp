@@ -75,6 +75,15 @@ private:
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
 
+    enum {
+      TREE_VIEW = 0,
+      ICON_VIEW,
+      COVER_VIEW,
+    };
+
+    void createTreeView();
+    void createIconView();
+
 public slots:
     void removeItem( int );
     virtual void setRoot( playlist_item_t * );
