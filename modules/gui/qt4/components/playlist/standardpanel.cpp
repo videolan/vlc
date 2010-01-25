@@ -107,7 +107,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     CONNECT( treeView->header(), customContextMenuRequested( const QPoint & ),
              this, popupSelectColumn( QPoint ) );
     CONNECT( treeView, customContextMenuRequested( const QPoint & ),
-             this, playlistPopup( const QPoint & ) );
+             this, popupPlView( const QPoint & ) );
     CONNECT( model, currentChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
 
@@ -213,7 +213,7 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
     menu.exec( QCursor::pos() );
 }
 
-void StandardPLPanel::playlistPopup( const QPoint &point )
+void StandardPLPanel::popupPlView( const QPoint &point )
 {
     QAbstractItemView *aView;
     if ( treeView->isVisible() ) aView = treeView;
@@ -312,7 +312,7 @@ void StandardPLPanel::toggleView()
             layout->addWidget( iconView, 1, 0, 1, -1 );
             iconView->setContextMenuPolicy( Qt::CustomContextMenu );
             CONNECT( iconView, customContextMenuRequested( const QPoint & ),
-                     this, playlistPopup( const QPoint & ) );
+                     this, popupPlView( const QPoint & ) );
         }
         treeView->hide();
         iconView->show();

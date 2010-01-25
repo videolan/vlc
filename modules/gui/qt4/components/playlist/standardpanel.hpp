@@ -85,9 +85,9 @@ private slots:
     void search( const QString& searchText );
     void popupAdd();
     void popupSelectColumn( QPoint );
+    void popupPlView( const QPoint & );
     void toggleColumnShown( int );
     void toggleView();
-    void playlistPopup( const QPoint & );
 };
 
 #endif
