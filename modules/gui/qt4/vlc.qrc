@@ -84,6 +84,7 @@
         <file alias="down_arrow" >pixmaps/arrow_down_dark.png</file>
         <file alias="update" >pixmaps/update.png</file>
         <file alias="noart.png" >pixmaps/noart.png</file>
+        <file alias="noart64" >pixmaps/noart-64.png</file>
         <file>pixmaps/go-next.png</file>
         <file alias="new.png" >pixmaps/profile_new.png</file>
         <file alias="lock" >pixmaps/lock.png</file>
