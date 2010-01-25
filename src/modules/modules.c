@@ -164,8 +164,6 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
     vlc_mutex_unlock( &module_lock );
 
 #ifdef HAVE_DYNAMIC_PLUGINS
-    if( p_bank->b_cache )
-        CacheSave( p_this, p_bank );
     while( p_bank->i_loaded_cache-- )
     {
         if( p_bank->pp_loaded_cache[p_bank->i_loaded_cache] )
@@ -215,6 +213,8 @@ void module_LoadPlugins( vlc_object_t * p_this, bool b_cache_delete )
         if( p_module_bank->b_cache || b_cache_delete )
             CacheLoad( p_this, p_module_bank, b_cache_delete );
         AllocateAllPlugins( p_this, p_module_bank );
+        if( p_module_bank->b_cache )
+            CacheSave( p_this, p_bank );
         config_UnsortConfig ();
         config_SortConfig ();
     }
