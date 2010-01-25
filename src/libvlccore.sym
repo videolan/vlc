@@ -139,6 +139,7 @@ filter_DeleteBlend
 filter_NewBlend
 FromLocale
 FromLocaleDup
+FromCharset
 GetFallbackEncoding
 GetLang_1
 GetLang_2B

@@ -373,7 +373,7 @@ const char *IsUTF8( const char *str )
  * @return a nul-terminated utf-8 string, or null in case of error.
  * The result must be freed using free().
  */
-static char *FromCharset(const char *charset, const void *data, size_t data_size)
+char *FromCharset(const char *charset, const void *data, size_t data_size)
 {
     vlc_iconv_t handle = vlc_iconv_open ("UTF-8", charset);
     if (handle == (vlc_iconv_t)(-1))
