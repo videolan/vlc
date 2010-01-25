@@ -48,6 +48,7 @@ static void Close         ( vlc_object_t * );
 
 vlc_module_begin ()
     set_description( N_("DVD subtitles decoder") )
+    set_shortname( N_("DVD subtitles") )
     set_capability( "decoder", 50 )
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_SCODEC )
