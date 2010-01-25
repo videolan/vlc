@@ -270,7 +270,6 @@ QString RTSPDestBox::getMRL( const QString& mux )
     SoutMrl m;
     m.begin( "rtp" );
     m.option( "sdp", sdp );
-    m.option( "mux", "ts" );
     m.end();
 
     return m.getMrl();
