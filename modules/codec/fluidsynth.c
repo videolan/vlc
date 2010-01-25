@@ -29,6 +29,7 @@
 #include <vlc_codec.h>
 #include <vlc_cpu.h>
 #include <vlc_dialog.h>
+#include <vlc_charset.h>
 
 /* On Win32, we link statically */
 #ifdef WIN32
@@ -99,7 +100,9 @@ static int Open (vlc_object_t *p_this)
     p_sys->settings = new_fluid_settings ();
     p_sys->synth = new_fluid_synth (p_sys->settings);
     /* FIXME: I bet this is not thread-safe */
+    const char *lpath = ToLocale (font_path);
     p_sys->soundfont = fluid_synth_sfload (p_sys->synth, font_path, 1);
+    LocaleFree (lpath);
     if (p_sys->soundfont == -1)
     {
         msg_Err (p_this, "cannot load sound fonts file %s", font_path);
