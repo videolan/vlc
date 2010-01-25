@@ -847,6 +847,9 @@ void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
                                             ORDER_NORMAL : ORDER_REVERSE );
         }
     }
+
+    i_cached_id = i_cached_input_id = -1;
+
     if( count )
     {
         beginInsertRows( qIndex, 0, count - 1 );
