@@ -82,6 +82,9 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     setModel( model );
     setViewMode( QListView::IconMode );
     setMovement( QListView::Static );
+    setResizeMode( QListView::Adjust );
+    setGridSize( QSize( 100, 100 ) );
+    setWrapping( true );
 
     PlListViewItemDelegate *pl = new PlListViewItemDelegate();
     setItemDelegate( pl );
