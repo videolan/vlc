@@ -464,12 +464,6 @@ static int CacheSaveSubmodule( FILE *file, module_t *p_module );
  *****************************************************************************/
 void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
 {
-    static char const psz_tag[] =
-        "Signature: 8a477f597d28d172789f06886806bc55\r\n"
-        "# This file is a cache directory tag created by VLC.\r\n"
-        "# For information about cache directory tags, see:\r\n"
-        "#   http://www.brynosaurus.com/cachedir/\r\n";
-
     char *psz_cachedir = config_GetUserDir(VLC_CACHE_DIR);
     FILE *file;
     int i, j, i_cache;
@@ -484,16 +478,6 @@ void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
 
     char psz_filename[sizeof(DIR_SEP) + 32 + strlen(psz_cachedir)];
     config_CreateDir( p_this, psz_cachedir );
-
-    snprintf( psz_filename, sizeof( psz_filename ),
-              "%s"DIR_SEP"CACHEDIR.TAG", psz_cachedir );
-    file = utf8_fopen( psz_filename, "wb" );
-    if (file != NULL)
-    {
-        if (fwrite (psz_tag, 1, sizeof (psz_tag) - 1, file) != 1)
-            clearerr (file); /* what else can we do? */
-        fclose( file );
-    }
 
     snprintf( psz_filename, sizeof( psz_filename ),
               "%s"DIR_SEP CACHENAME_FORMAT, psz_cachedir,
