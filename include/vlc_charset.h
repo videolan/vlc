@@ -109,6 +109,8 @@ static inline char *FromLatin1 (const char *latin)
     return utf8 ? utf8 : str;
 }
 
+VLC_EXPORT( char *, FromCharset, ( const char *charset, const void *data, size_t data_size ) LIBVLC_USED );
+
 VLC_EXPORT( const char *, GetFallbackEncoding, ( void ) LIBVLC_USED );
 
 VLC_EXPORT( double, us_strtod, ( const char *, char ** ) LIBVLC_USED );

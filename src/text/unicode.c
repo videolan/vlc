@@ -40,6 +40,7 @@
 #ifdef UNDER_CE
 #  include <tchar.h>
 #endif
+#include <errno.h>
 
 #if defined (__APPLE__) || defined (HAVE_MAEMO)
 /* Define this if the OS always use UTF-8 internally */
@@ -365,3 +366,40 @@ const char *IsUTF8( const char *str )
 {
     return CheckUTF8( (char *)str, 0 );
 }
+
+/**
+ * Converts a string from the given character encoding to utf-8.
+ *
+ * @return a nul-terminated utf-8 string, or null in case of error.
+ * The result must be freed using free().
+ */
+static char *FromCharset(const char *charset, const void *data, size_t data_size)
+{
+    vlc_iconv_t handle = vlc_iconv_open ("UTF-8", charset);
+    if (handle == (vlc_iconv_t)(-1))
+        return NULL;
+
+    char *out = NULL;
+    for(unsigned mul = 4; mul < 8; mul++ )
+    {
+        size_t in_size = data_size;
+        const char *in = data;
+        size_t out_max = mul * data_size;
+        char *tmp = out = malloc (1 + out_max);
+        if (!out)
+            break;
+
+        if (vlc_iconv (handle, &in, &in_size, &tmp, &out_max) != (size_t)(-1)) {
+            *tmp = '\0';
+            break;
+        }
+        free(out);
+        out = NULL;
+
+        if (errno != E2BIG)
+            break;
+    }
+    vlc_iconv_close(handle);
+    return out;
+}
+
