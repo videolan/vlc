@@ -341,6 +341,7 @@ class PythonGenerator(object):
         'libvlc_track_description_t*': 'TrackDescription',
         'libvlc_audio_output_t*': 'AudioOutput',
         'libvlc_media_stats_t*': 'ctypes.POINTER(MediaStats)',
+        'libvlc_media_es_t**': 'ctypes.POINTER(ctypes.POINTER(MediaES))',
 
         'mediacontrol_Instance*': 'MediaControl',
         'mediacontrol_Exception*': 'MediaControlException',
