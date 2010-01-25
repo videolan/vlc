@@ -638,6 +638,7 @@ static int Render( filter_t *p_filter, subpicture_region_t *p_region,
     p_region->p_picture = picture_NewFromFormat( &fmt );
     if( !p_region->p_picture )
         return VLC_EGENERIC;
+    fmt.p_palette = p_region->fmt.p_palette ? p_region->fmt.p_palette : malloc(sizeof(*fmt.p_palette));
     p_region->fmt = fmt;
 
     /* Calculate text color components */
