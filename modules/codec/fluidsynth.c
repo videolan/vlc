@@ -28,6 +28,7 @@
 #include <vlc_aout.h>
 #include <vlc_codec.h>
 #include <vlc_cpu.h>
+#include <vlc_dialog.h>
 
 /* On Win32, we link statically */
 #ifdef WIN32
@@ -76,10 +77,14 @@ static int Open (vlc_object_t *p_this)
     if (p_dec->fmt_in.i_codec != VLC_CODEC_MIDI)
         return VLC_EGENERIC;
 
-    char *font_path = var_CreateGetNonEmptyString (p_this, "soundfont");
+    char *font_path = var_InheritString (p_this, "soundfont");
     if (font_path == NULL)
     {
-        msg_Err (p_this, "sound fonts file required for synthesis");
+        msg_Err (p_this, "sound font file required for synthesis");
+        dialog_Fatal (p_this, _("MIDI synthesis not set up"),
+            _("A sound font file (.SF2) is required for MIDI synthesis.\n"
+              "Please install a sound font and configure it "
+              "from the VLC preferences (Codecs / Audio / FluidSynth).\n"));
         return VLC_EGENERIC;
     }
 
@@ -95,13 +100,19 @@ static int Open (vlc_object_t *p_this)
     p_sys->synth = new_fluid_synth (p_sys->settings);
     /* FIXME: I bet this is not thread-safe */
     p_sys->soundfont = fluid_synth_sfload (p_sys->synth, font_path, 1);
-    free (font_path);
     if (p_sys->soundfont == -1)
     {
-        msg_Err (p_this, "cannot load sound fonts file");
+        msg_Err (p_this, "cannot load sound fonts file %s", font_path);
         Close (p_this);
+        dialog_Fatal (p_this, _("MIDI synthesis not set up"),
+            _("The specified sound font file (%s) is incorrect.\n"
+              "Please install a valid sound font and reconfigure it "
+              "from the VLC preferences (Codecs / Audio / FluidSynth).\n"),
+              font_path);
+        free (font_path);
         return VLC_EGENERIC;
     }
+    free (font_path);
 
     p_dec->fmt_out.i_cat = AUDIO_ES;
     p_dec->fmt_out.audio.i_rate = 44100;
