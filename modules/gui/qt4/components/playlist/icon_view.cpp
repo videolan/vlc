@@ -80,7 +80,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     painter->setFont( QFont( "Verdana", 7 ) );
 
     QRect textRect = option.rect.adjusted( 1, ART_SIZE + 2, -1, -1 );
-    painter->drawText( textRect, qfu( input_item_GetTitle( currentItem->inputItem() ) ),
+    painter->drawText( textRect, qfu( input_item_GetTitleFbName( currentItem->inputItem() ) ),
                        QTextOption( Qt::AlignCenter ) );
 
 }
