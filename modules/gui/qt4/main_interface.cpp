@@ -169,6 +169,8 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     MainInputManager::getInstance( p_intf );
 
 #ifdef WIN32
+    himl = NULL;
+    p_taskbl = NULL;
     taskbar_wmsg = RegisterWindowMessage("TaskbarButtonCreated");
 #endif
 
