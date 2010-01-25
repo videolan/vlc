@@ -142,8 +142,9 @@ static void test_media_list_player_items_queue(const char** argv, int argc)
     libvlc_media_list_player_set_media_list (mlp, ml);
 
     libvlc_event_manager_t * em = libvlc_media_list_player_event_manager(mlp);
-    libvlc_event_attach(em, libvlc_MediaListPlayerNextItemSet, check_items_order_callback, &check, &ex);
-    catch ();
+    int val = libvlc_event_attach(em, libvlc_MediaListPlayerNextItemSet,
+                                  check_items_order_callback, &check);
+    assert(val == 0);
 
     libvlc_media_list_player_play(mlp, &ex);
     catch ();

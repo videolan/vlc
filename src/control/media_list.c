@@ -157,31 +157,32 @@ libvlc_media_list_new( libvlc_instance_t * p_inst,
     libvlc_media_list_t * p_mlist;
 
     p_mlist = malloc(sizeof(libvlc_media_list_t));
-    if( !p_mlist )
+    if( unlikely(p_mlist == NULL) )
+    {
+        libvlc_printerr( "Not enough memory" );
         return NULL;
+    }
 
     p_mlist->p_libvlc_instance = p_inst;
-    p_mlist->p_event_manager = libvlc_event_manager_new( p_mlist, p_inst, p_e );
+    p_mlist->p_event_manager = libvlc_event_manager_new( p_mlist, p_inst );
+    if( unlikely(p_mlist->p_event_manager == NULL) )
+    {
+        free(p_mlist);
+        return NULL;
+    }
 
     /* Code for that one should be handled in flat_media_list.c */
     p_mlist->p_flat_mlist = NULL;
     p_mlist->b_read_only = false;
 
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
-            libvlc_MediaListItemAdded, p_e );
+            libvlc_MediaListItemAdded );
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
-            libvlc_MediaListWillAddItem, p_e );
+            libvlc_MediaListWillAddItem );
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
-            libvlc_MediaListItemDeleted, p_e );
+            libvlc_MediaListItemDeleted );
     libvlc_event_manager_register_event_type( p_mlist->p_event_manager,
-            libvlc_MediaListWillDeleteItem, p_e );
-
-    if( libvlc_exception_raised( p_e ) )
-    {
-        libvlc_event_manager_release( p_mlist->p_event_manager );
-        free( p_mlist );
-        return NULL;
-    }
+            libvlc_MediaListWillDeleteItem );
 
     vlc_mutex_init( &p_mlist->object_lock );
     vlc_mutex_init( &p_mlist->refcount_lock ); // FIXME: spinlock?

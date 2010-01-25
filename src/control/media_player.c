@@ -67,7 +67,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi );
 #define register_event(a, b) __register_event(a, libvlc_MediaPlayer ## b)
 static inline void __register_event(libvlc_media_player_t *mp, libvlc_event_type_t type)
 {
-    libvlc_event_manager_register_event_type(mp->p_event_manager, type, NULL);
+    libvlc_event_manager_register_event_type(mp->p_event_manager, type);
 }
 
 static inline void lock(libvlc_media_player_t *mp)
@@ -361,14 +361,13 @@ libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
     mp->p_input_thread = NULL;
     mp->p_input_resource = NULL;
     mp->i_refcount = 1;
-    vlc_mutex_init(&mp->object_lock);
-    mp->p_event_manager = libvlc_event_manager_new(mp, instance, e);
-    if (libvlc_exception_raised(e))
+    mp->p_event_manager = libvlc_event_manager_new(mp, instance);
+    if (unlikely(mp->p_event_manager == NULL))
     {
-        vlc_mutex_destroy(&mp->object_lock);
         free(mp);
         return NULL;
     }
+    vlc_mutex_init(&mp->object_lock);
 
     register_event(mp, NothingSpecial);
     register_event(mp, Opening);

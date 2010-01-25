@@ -358,7 +358,7 @@ static void
 install_playlist_observer(libvlc_media_list_player_t * p_mlp)
 {
     assert_locked(p_mlp);
-    libvlc_event_attach(mlist_em(p_mlp), libvlc_MediaListItemDeleted, mlist_item_deleted, p_mlp, NULL);
+    libvlc_event_attach(mlist_em(p_mlp), libvlc_MediaListItemDeleted, mlist_item_deleted, p_mlp);
 }
 
 /**************************************************************************
@@ -379,7 +379,7 @@ static void
 install_media_player_observer(libvlc_media_list_player_t * p_mlp)
 {
     assert_locked(p_mlp);
-    libvlc_event_attach_async(mplayer_em(p_mlp), libvlc_MediaPlayerEndReached, media_player_reached_end, p_mlp, NULL);
+    libvlc_event_attach_async(mplayer_em(p_mlp), libvlc_MediaPlayerEndReached, media_player_reached_end, p_mlp);
 }
 
 
@@ -459,16 +459,25 @@ libvlc_media_list_player_new(libvlc_instance_t * p_instance, libvlc_exception_t 
     (void)p_e;
     libvlc_media_list_player_t * p_mlp;
     p_mlp = calloc( 1, sizeof(libvlc_media_list_player_t) );
-    if (!p_mlp)
+    if (unlikely(p_mlp == NULL))
+    {
+        libvlc_printerr("Not enough memory");
         return NULL;
+    }
+
+    p_mlp->p_event_manager = libvlc_event_manager_new(p_mlp, p_instance);
+    if (unlikely(p_mlp->p_event_manager == NULL))
+    {
+        free (p_mlp);
+        return NULL;
+    }
 
     libvlc_retain(p_instance);
     p_mlp->p_libvlc_instance = p_instance;
     p_mlp->i_refcount = 1;
     vlc_mutex_init(&p_mlp->object_lock);
     vlc_mutex_init(&p_mlp->mp_callback_lock);
-    p_mlp->p_event_manager = libvlc_event_manager_new(p_mlp, p_instance, p_e);
-    libvlc_event_manager_register_event_type(p_mlp->p_event_manager, libvlc_MediaListPlayerNextItemSet, p_e);
+    libvlc_event_manager_register_event_type(p_mlp->p_event_manager, libvlc_MediaListPlayerNextItemSet);
     p_mlp->e_playback_mode = libvlc_playback_mode_default;
 
     return p_mlp;

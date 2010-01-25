@@ -70,7 +70,7 @@ static void test_events (const char ** argv, int argc)
         libvlc_MediaPlayerTimeChanged,
         libvlc_MediaPlayerPositionChanged,
     };
-    int i, mi_events_len = sizeof(mi_events)/sizeof(*mi_events);
+    int mi_events_len = sizeof(mi_events)/sizeof(*mi_events);
 
     log ("Testing events\n");
 
@@ -85,14 +85,18 @@ static void test_events (const char ** argv, int argc)
 
     log ("+ Testing attaching to Media Instance\n");
 
-    for (i = 0; i < mi_events_len; i++) {
-        libvlc_event_attach (em, mi_events[i], test_events_dummy_callback, &callback_was_called, &ex);
-        catch ();
+    for (int i = 0; i < mi_events_len; i++) {
+        int ret;
+
+        ret = libvlc_event_attach (em, mi_events[i],
+                                   test_events_dummy_callback,
+                                   &callback_was_called);
+        assert(ret == 0);
     }
 
     log ("+ Testing event reception\n");
 
-    for (i = 0; i < mi_events_len; i++)
+    for (int i = 0; i < mi_events_len; i++)
         test_event_type_reception (em, mi_events[i], &callback_was_called);
 
     log ("+ Testing event detaching while in the event callback\n");
@@ -103,8 +107,10 @@ static void test_events (const char ** argv, int argc)
 
     libvlc_event_detach (em, mi_events[mi_events_len-1], test_events_dummy_callback, &callback_was_called);
 
-    libvlc_event_attach (em, mi_events[mi_events_len-1], test_events_callback_and_detach, &callback_was_called, &ex);
-    catch ();
+    int val = libvlc_event_attach (em, mi_events[mi_events_len-1],
+                                   test_events_callback_and_detach,
+                                   &callback_was_called);
+    assert (val == 0);
 
     libvlc_event_send (em, &event);
     assert( callback_was_called );
@@ -115,7 +121,7 @@ static void test_events (const char ** argv, int argc)
 
     log ("+ Testing regular detach()\n");
 
-    for (i = 0; i < mi_events_len - 1; i++)
+    for (int i = 0; i < mi_events_len - 1; i++)
         libvlc_event_detach (em, mi_events[i], test_events_dummy_callback, &callback_was_called);
 
     libvlc_media_player_release (mi);

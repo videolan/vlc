@@ -270,17 +270,22 @@ libvlc_media_t * libvlc_media_new_from_input_item(
      * It can give a bunch of item to read. */
     p_md->p_subitems        = NULL;
 
-    p_md->p_event_manager = libvlc_event_manager_new( p_md, p_instance, p_e );
+    p_md->p_event_manager = libvlc_event_manager_new( p_md, p_instance );
+    if( unlikely(p_md->p_event_manager == NULL) )
+    {
+        free(p_md);
+        return NULL;
+    }
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaMetaChanged, p_e );
+        libvlc_MediaMetaChanged );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaSubItemAdded, p_e );
+        libvlc_MediaSubItemAdded );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaFreed, p_e );
+        libvlc_MediaFreed );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaDurationChanged, p_e );
+        libvlc_MediaDurationChanged );
     libvlc_event_manager_register_event_type( p_md->p_event_manager,
-        libvlc_MediaStateChanged, p_e );
+        libvlc_MediaStateChanged );
 
     vlc_gc_incref( p_md->p_input_item );
 

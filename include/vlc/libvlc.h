@@ -294,13 +294,12 @@ typedef void ( *libvlc_callback_t )( const libvlc_event_t *, void * );
  * \param i_event_type the desired event to which we want to listen
  * \param f_callback the function to call when i_event_type occurs
  * \param user_data user provided data to carry with the event
- * \param p_e an initialized exception pointer
+ * \return 0 on success, ENOMEM on error
  */
-VLC_PUBLIC_API void libvlc_event_attach( libvlc_event_manager_t *p_event_manager,
-                                         libvlc_event_type_t i_event_type,
-                                         libvlc_callback_t f_callback,
-                                         void *user_data,
-                                         libvlc_exception_t *p_e );
+VLC_PUBLIC_API int libvlc_event_attach( libvlc_event_manager_t *p_event_manager,
+                                        libvlc_event_type_t i_event_type,
+                                        libvlc_callback_t f_callback,
+                                        void *user_data );
 
 /**
  * Unregister an event notification.

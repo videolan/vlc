@@ -190,13 +190,17 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
 
     vlc_dictionary_init( &p_mdis->catname_to_submedialist, 0 );
 
-    p_mdis->p_event_manager = libvlc_event_manager_new( p_mdis,
-            p_inst, NULL );
+    p_mdis->p_event_manager = libvlc_event_manager_new( p_mdis, p_inst );
+    if( unlikely(p_mdis->p_event_manager == NULL) )
+    {
+        free( p_mdis );
+        return NULL;
+    }
 
     libvlc_event_manager_register_event_type( p_mdis->p_event_manager,
-            libvlc_MediaDiscovererStarted, NULL );
+            libvlc_MediaDiscovererStarted );
     libvlc_event_manager_register_event_type( p_mdis->p_event_manager,
-            libvlc_MediaDiscovererEnded, NULL );
+            libvlc_MediaDiscovererEnded );
 
     p_mdis->p_sd = vlc_sd_Create( (vlc_object_t*)p_inst->p_libvlc_int );
 
