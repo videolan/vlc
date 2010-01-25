@@ -179,7 +179,7 @@ ExtensionDialog::ExtensionDialog( intf_thread_t *_p_intf,
     this->setWindowFlags( Qt::WindowMinMaxButtonsHint
                         | Qt::WindowCloseButtonHint );
 #else
-    this->setWindowFlags( Qt::WindowMinMaxButtonsHint
+    this->setWindowFlags( Qt::WindowMinMaxButtonsHint );
 #endif
 
     this->setWindowTitle( qfu( p_dialog->psz_title ) );
