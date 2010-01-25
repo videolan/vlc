@@ -110,7 +110,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     CONNECT( treeView->header(), customContextMenuRequested( const QPoint & ),
              this, popupSelectColumn( QPoint ) );
     CONNECT( treeView, customContextMenuRequested( const QPoint & ),
-             this, treeViewPopup( const QPoint & ) );
+             this, playlistPopup( const QPoint & ) );
     CONNECT( model, currentChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
 
@@ -216,11 +216,15 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
     menu.exec( QCursor::pos() );
 }
 
-void StandardPLPanel::treeViewPopup( const QPoint &point )
+void StandardPLPanel::playlistPopup( const QPoint &point )
 {
-    QModelIndex index = treeView->indexAt( point );
-    QPoint globalPoint = treeView->viewport()->mapToGlobal( point );
-    QItemSelectionModel *selection = treeView->selectionModel();
+    QAbstractItemView *aView;
+    if ( treeView->isVisible() ) aView = treeView;
+    else aView = iconView;
+
+    QModelIndex index = aView->indexAt( point );
+    QPoint globalPoint = aView->viewport()->mapToGlobal( point );
+    QItemSelectionModel *selection = aView->selectionModel();
     QModelIndexList list = selection->selectedIndexes();
     model->popup( index, globalPoint, list );
 }
@@ -316,7 +320,10 @@ void StandardPLPanel::toggleView()
         {
             iconView = new PlIconView( model, this );
             layout->addWidget( iconView, 1, 0, 1, -1 );
-            installEventFilter( iconView );
+            //iconView->installEventFilter( this );
+            iconView->setContextMenuPolicy( Qt::CustomContextMenu );
+            CONNECT( iconView, customContextMenuRequested( const QPoint & ),
+                     this, playlistPopup( const QPoint & ) );
         }
         treeView->hide();
         iconView->show();
