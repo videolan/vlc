@@ -103,7 +103,7 @@ vlc_module_begin ()
     set_capability( "decoder", 1 )
     set_callbacks( DecoderOpen, DecoderClose )
     set_category( CAT_INPUT )
-    set_subcategory( SUBCAT_INPUT_SCODEC )
+    set_subcategory( SUBCAT_INPUT_VCODEC )
 
 #   define ENC_CFG_PREFIX "sout-dmo-"
     add_submodule ()
