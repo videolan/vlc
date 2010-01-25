@@ -875,7 +875,7 @@ void PLModel::search( const QString& search_text )
 }
 
 /*********** Popup *********/
-void PLModel::popup( QModelIndex & index, QPoint &point, QModelIndexList list )
+void PLModel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list )
 {
     int i_id = index.isValid() ? itemId( index ) : rootItem->i_id;
 

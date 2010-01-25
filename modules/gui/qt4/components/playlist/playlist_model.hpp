@@ -87,7 +87,7 @@ public:
     int itemId( const QModelIndex &index ) const;
 
     /* Actions */
-    void popup( QModelIndex & index, QPoint &point, QModelIndexList list );
+    void popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
     void doDelete( QModelIndexList selected );
     void search( const QString& search_text );
     void sort( int column, Qt::SortOrder order );
