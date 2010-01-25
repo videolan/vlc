@@ -30,7 +30,7 @@ EXTRA_SUBDIRS = \
 	$(NULL)
 
 SUBDIRS = $(BASE_SUBDIRS)
-DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS)
+DIST_SUBDIRS = $(BASE_SUBDIRS) $(EXTRA_SUBDIRS) .
 if ENABLE_SOUT
 SUBDIRS += access_output mux stream_out
 endif
@@ -52,6 +52,26 @@ endif
 if HAVE_ARM_NEON
 SUBDIRS += arm_neon
 endif
+SUBDIRS += .
 
 dist_noinst_SCRIPTS = genmf list.sh
 dist_noinst_DATA = LIST
+noinst_DATA = stamp-cache
+MOSTLYCLEANFILES = stamp-cache plugins-*-*.dat
+
+.PHONY: stamp-cache
+
+stamp-cache:
+	$(AM_V_GEN)if test "$(build)" = "$(host)"; then \
+		../bin/vlc-cache-gen$(EXEEXT) . ; \
+	else \
+		echo "Cross-compilation: cache generation skipped!" ; \
+	fi
+	$(AM_V_at)touch stamp-cache
+
+install-exec-hook:
+	if test -z "$(DESTDIR)"; then \
+		cd "$(vlclibdir)" && ./vlc-cache-gen . ; \
+	else \
+		echo "Staged installation: cache generation skipped!" ; \
+	fi
