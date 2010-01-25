@@ -36,7 +36,7 @@
 #define ART_SIZE            64
 #define OFFSET              (100-64)/2
 #define ITEMS_SPACING       10
-#define ART_RADIUS          7
+#define ART_RADIUS          5
 
 void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
