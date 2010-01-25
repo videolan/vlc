@@ -42,6 +42,8 @@
 # error Please update Qt version to 4.5.1. 4.5.0 is too buggy
 #endif
 
+#define HAS_QT45 ( QT_VERSION >= 0x040500 )
+
 enum {
     QT_NORMAL_MODE = 0,
     QT_ALWAYS_VIDEO_MODE,
