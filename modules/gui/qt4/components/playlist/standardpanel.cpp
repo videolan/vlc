@@ -62,49 +62,49 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     model = new PLModel( p_playlist, p_intf, p_root, this );
 
     /* Create and configure the QTreeView */
-    view = new QTreeView;
-    view->setModel( model );
-    view2 = NULL;
+    treeView = new QTreeView;
+    treeView->setModel( model );
+    iconView = NULL;
 
-    view->setIconSize( QSize( 20, 20 ) );
-    view->setAlternatingRowColors( true );
-    view->setAnimated( true );
-    view->setUniformRowHeights( true );
-    view->setSortingEnabled( true );
-    view->header()->setSortIndicator( -1 , Qt::AscendingOrder );
-    view->header()->setSortIndicatorShown( true );
-    view->header()->setClickable( true );
-    view->header()->setContextMenuPolicy( Qt::CustomContextMenu );
+    treeView->setIconSize( QSize( 20, 20 ) );
+    treeView->setAlternatingRowColors( true );
+    treeView->setAnimated( true );
+    treeView->setUniformRowHeights( true );
+    treeView->setSortingEnabled( true );
+    treeView->header()->setSortIndicator( -1 , Qt::AscendingOrder );
+    treeView->header()->setSortIndicatorShown( true );
+    treeView->header()->setClickable( true );
+    treeView->header()->setContextMenuPolicy( Qt::CustomContextMenu );
 
-    view->setSelectionBehavior( QAbstractItemView::SelectRows );
-    view->setSelectionMode( QAbstractItemView::ExtendedSelection );
-    view->setDragEnabled( true );
-    view->setAcceptDrops( true );
-    view->setDropIndicatorShown( true );
+    treeView->setSelectionBehavior( QAbstractItemView::SelectRows );
+    treeView->setSelectionMode( QAbstractItemView::ExtendedSelection );
+    treeView->setDragEnabled( true );
+    treeView->setAcceptDrops( true );
+    treeView->setDropIndicatorShown( true );
 
-    installEventFilter( view );
+    installEventFilter( treeView );
     /* Saved Settings */
     getSettings()->beginGroup("Playlist");
     if( getSettings()->contains( "headerStateV2" ) )
     {
-        view->header()->restoreState(
+        treeView->header()->restoreState(
                 getSettings()->value( "headerStateV2" ).toByteArray() );
     }
     else
     {
         for( int m = 1, c = 0; m != COLUMN_END; m <<= 1, c++ )
         {
-            view->setColumnHidden( c, !( m & COLUMN_DEFAULT ) );
-            if( m == COLUMN_TITLE ) view->header()->resizeSection( c, 200 );
-            else if( m == COLUMN_DURATION ) view->header()->resizeSection( c, 80 );
+            treeView->setColumnHidden( c, !( m & COLUMN_DEFAULT ) );
+            if( m == COLUMN_TITLE ) treeView->header()->resizeSection( c, 200 );
+            else if( m == COLUMN_DURATION ) treeView->header()->resizeSection( c, 80 );
         }
     }
     getSettings()->endGroup();
 
     /* Connections for the TreeView */
-    CONNECT( view, activated( const QModelIndex& ),
+    CONNECT( treeView, activated( const QModelIndex& ),
              model,activateItem( const QModelIndex& ) );
-    CONNECT( view->header(), customContextMenuRequested( const QPoint & ),
+    CONNECT( treeView->header(), customContextMenuRequested( const QPoint & ),
              this, popupSelectColumn( QPoint ) );
     CONNECT( model, currentChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
@@ -142,7 +142,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     BUTTONACT( viewButton, toggleView() );
 
     /* Finish the layout */
-    layout->addWidget( view, 1, 0, 1, -1 );
+    layout->addWidget( treeView, 1, 0, 1, -1 );
 
     selectColumnsSigMapper = new QSignalMapper( this );
     CONNECT( selectColumnsSigMapper, mapped( int ),
@@ -152,19 +152,19 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 StandardPLPanel::~StandardPLPanel()
 {
     getSettings()->beginGroup("Playlist");
-    getSettings()->setValue( "headerStateV2", view->header()->saveState() );
+    getSettings()->setValue( "headerStateV2", treeView->header()->saveState() );
     getSettings()->endGroup();
 }
 
 /* Unused anymore, but might be useful, like in right-click menu */
 void StandardPLPanel::gotoPlayingItem()
 {
-    view->scrollTo( model->currentIndex() );
+    treeView->scrollTo( model->currentIndex() );
 }
 
 void StandardPLPanel::handleExpansion( const QModelIndex& index )
 {
-    view->scrollTo( index );
+    treeView->scrollTo( index );
 }
 
 /* PopupAdd Menu for the Add Menu */
@@ -204,7 +204,7 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
         QAction* option = menu.addAction(
             qfu( psz_column_title( i ) ) );
         option->setCheckable( true );
-        option->setChecked( !view->isColumnHidden( j ) );
+        option->setChecked( !treeView->isColumnHidden( j ) );
         selectColumnsSigMapper->setMapping( option, j );
         CONNECT( option, triggered(), selectColumnsSigMapper, map() );
     }
@@ -213,7 +213,7 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
 
 void StandardPLPanel::toggleColumnShown( int i )
 {
-    view->setColumnHidden( i, !view->isColumnHidden( i ) );
+    treeView->setColumnHidden( i, !treeView->isColumnHidden( i ) );
 }
 
 /* Search in the playlist */
@@ -224,7 +224,7 @@ void StandardPLPanel::search( const QString& searchText )
 
 void StandardPLPanel::doPopup( QModelIndex index, QPoint point )
 {
-    QItemSelectionModel *selection = view->selectionModel();
+    QItemSelectionModel *selection = treeView->selectionModel();
     QModelIndexList list = selection->selectedIndexes();
     model->popup( index, point, list );
 }
@@ -289,35 +289,35 @@ void StandardPLPanel::keyPressEvent( QKeyEvent *e )
 
 void StandardPLPanel::deleteSelection()
 {
-    QItemSelectionModel *selection = view->selectionModel();
+    QItemSelectionModel *selection = treeView->selectionModel();
     QModelIndexList list = selection->selectedIndexes();
     model->doDelete( list );
 }
 
 void StandardPLPanel::toggleView()
 {
-    if( view && view->isVisible() )
+    if( treeView && treeView->isVisible() )
     {
-        if( view2 == NULL )
+        if( iconView == NULL )
         {
-            view2 = new PlIconView( model, this );
-            layout->addWidget( view2, 1, 0, 1, -1 );
-            installEventFilter( view2 );
+            iconView = new PlIconView( model, this );
+            layout->addWidget( iconView, 1, 0, 1, -1 );
+            installEventFilter( iconView );
         }
-        view->hide();
-        view2->show();
+        treeView->hide();
+        iconView->show();
     }
     else
     {
-        view2->hide();
-        view->show();
+        iconView->hide();
+        treeView->show();
     }
 }
 
 bool StandardPLPanel::eventFilter( QObject *obj, QEvent *event )
 {
-    QAbstractItemView *view = qobject_cast<QAbstractItemView *>(obj);
-    if( !view ) return false;
+    QAbstractItemView *aView = qobject_cast<QAbstractItemView *>(obj);
+    if( !aView ) return false;
 
     switch( event->type() )
     {
@@ -326,18 +326,18 @@ bool StandardPLPanel::eventFilter( QObject *obj, QEvent *event )
                 QMouseEvent *mouseEvent = static_cast<QMouseEvent *>(event);
                 if( mouseEvent->button() & Qt::RightButton )
                 {
-                    QModelIndex index = view->indexAt(
+                    QModelIndex index = aView->indexAt(
                             QPoint( mouseEvent->x(), mouseEvent->y() ) );
                     doPopup( index, QCursor::pos() );
                     return true;
                 }
                 else if( mouseEvent->button() & Qt::LeftButton )
                 {
-                    if( !view->indexAt( QPoint( mouseEvent->x(),
+                    if( !aView->indexAt( QPoint( mouseEvent->x(),
                                                 mouseEvent->y() ) ).isValid() )
-                        view->clearSelection();
+                        aView->clearSelection();
                 }
-                // view->mousePressEvent( mouseEvent );
+                // aView->mousePressEvent( mouseEvent );
             }
             return true;
         case QEvent::MouseButtonRelease:
@@ -345,7 +345,7 @@ bool StandardPLPanel::eventFilter( QObject *obj, QEvent *event )
                 QMouseEvent *mouseEvent2 = static_cast<QMouseEvent *>(event);
                 if( mouseEvent2->button() & Qt::RightButton )
                     return false; /* Do NOT forward to QTreeView!! */
-                // view->mouseReleaseEvent( mouseEvent );
+                // aView->mouseReleaseEvent( mouseEvent );
                 return true;
             }
         default:

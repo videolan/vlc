@@ -71,8 +71,8 @@ private:
     QPushButton *addButton;
     QGridLayout *layout;
 
-    QTreeView   *view;
-    PlIconView  *view2;
+    QTreeView   *treeView;
+    PlIconView  *iconView;
 
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
