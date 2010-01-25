@@ -2,6 +2,7 @@
 #
 bin_PROGRAMS = vlc
 noinst_PROGRAMS = vlc-static
+vlclib_PROGRAMS = vlc-cache-gen
 EXTRA_PROGRAMS = vlc-wrapper
 
 AM_CFLAGS = `$(VLC_CONFIG) --cflags vlc`
@@ -46,3 +47,7 @@ endif
 vlc_win32_rc.$(OBJEXT): $(top_builddir)/share/vlc_win32_rc.rc
 	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
 
+vlc_cache_gen_SOURCES = cachegen.c
+vlc_cache_gen_LDADD = \
+	../compat/libcompat.la \
+	../src/libvlc.la ../src/libvlccore.la
