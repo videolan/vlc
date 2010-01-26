@@ -25,16 +25,17 @@
 #include "components/playlist/playlist_model.hpp"
 #include "input_manager.hpp"
 
+#include <QApplication>
 #include <QPainter>
 #include <QRect>
 #include <QStyleOptionViewItem>
-#include <QApplication>
+#include <QFontMetrics>
 
 #include "assert.h"
 
 #define RECT_SIZE           100
 #define ART_SIZE            64
-#define OFFSET              (100-64)/2
+#define OFFSET              (RECT_SIZE-64)/2
 #define ITEMS_SPACING       10
 #define ART_RADIUS          5
 
@@ -77,12 +78,26 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     painter->drawPixmap( artRect, pix );
     painter->setClipping( false );
 
-    painter->setFont( QFont( "Verdana", 7 ) );
+    QColor text = qApp->palette().text().color();
+    QString title = qfu( input_item_GetTitleFbName( currentItem->inputItem() ) );
+    QString artist = qfu( input_item_GetArtist( currentItem->inputItem() ) );
 
-    QRect textRect = option.rect.adjusted( 1, ART_SIZE + 2, -1, -1 );
-    painter->drawText( textRect, qfu( input_item_GetTitleFbName( currentItem->inputItem() ) ),
+    painter->setPen( text );
+    painter->setFont( QFont( "Verdana", 7, QFont::Bold ) );
+    QFontMetrics fm = painter->fontMetrics();
+    QRect titleRect = option.rect.adjusted( 1, ART_SIZE + 4, 0, -1 );
+    titleRect.setHeight( fm.height() + 2 );
+
+    painter->drawText( titleRect, fm.elidedText( title, Qt::ElideRight, titleRect.width() ),
                        QTextOption( Qt::AlignCenter ) );
 
+    painter->setPen( text.lighter( 240 ) );
+    painter->setFont( QFont( "Verdana", 7 ) );
+    fm = painter->fontMetrics();
+    QRect artistRect = option.rect.adjusted( 1, ART_SIZE + 4 + titleRect.height(), -1, -1 );
+
+    painter->drawText( artistRect, fm.elidedText( artist, Qt::ElideRight, artistRect.width() ),
+                       QTextOption( Qt::AlignCenter ) );
 }
 
 QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
