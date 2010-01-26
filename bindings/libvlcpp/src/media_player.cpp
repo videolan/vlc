@@ -245,3 +245,27 @@ void MediaPlayer::nextFrame()
     Exception ex;
     libvlc_media_player_next_frame( m_player, &ex.ex );
 }
+
+void MediaPlayer::toggleFullscreen()
+{
+    Exception ex;
+    libvlc_toggle_fullscreen( m_player, &ex.ex );
+}
+
+void MediaPlayer::enableFullscreen()
+{
+    Exception ex;
+    libvlc_set_fullscreen( m_player, 1, &ex.ex );
+}
+
+void MediaPlayer::disableFullscreen()
+{
+    Exception ex;
+    libvlc_set_fullscreen( m_player, 0, &ex.ex );
+}
+
+int MediaPlayer::fullscreen()
+{
+    Exception ex;
+    return libvlc_get_fullscreen( m_player, &ex.ex );
+}

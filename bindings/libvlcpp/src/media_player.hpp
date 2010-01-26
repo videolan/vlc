@@ -158,7 +158,7 @@ public:
 
     /**
       * Set the movie time (in ms)
-      * @param the movie time (in ms)
+      * @param new_time the movie time (in ms)
       */
     void setTime( int64_t new_time );
 
@@ -170,7 +170,7 @@ public:
 
     /**
       * Set the movie position (in percent)
-      * @param the movie position
+      * @param position the movie position
       */
     void setPosition( float position );
 
@@ -282,7 +282,30 @@ public:
      */
     void nextFrame();
 
-protected:
+
+    /**
+     * Toggle fullscreen status on a non-embedded video output
+     */
+    void toggleFullscreen();
+
+    /**
+     * Enable fullscreen on a non-embedded video output
+     */
+    void enableFullscreen();
+
+    /**
+     * Disable fullscreen on a non-embedded video output
+     */
+    void disableFullscreen();
+
+    /**
+     * Get the fullscreen status
+     * @return true if the fullscreen is enable, false overwise
+     */
+    int fullscreen();
+
+private:
+    /** The media player instance of libvlc */
     libvlc_media_player_t *m_player;
 };
 
