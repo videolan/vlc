@@ -76,6 +76,7 @@ InputManager::InputManager( QObject *parent, intf_thread_t *_p_intf) :
     oldName      = "";
     artUrl       = "";
     p_input      = NULL;
+    p_input_vbi  = NULL;
     i_rate       = 0;
     p_item       = NULL;
     b_video      = false;
@@ -113,6 +114,7 @@ void InputManager::setInput( input_thread_t *_p_input )
     {
         p_input = NULL;
         p_item = NULL;
+        assert( !p_input_vbi );
         emit rateChanged( INPUT_RATE_DEFAULT );
     }
 }
@@ -133,6 +135,12 @@ void InputManager::delInput()
     b_video              = false;
     timeA                = 0;
     timeB                = 0;
+
+    if( p_input_vbi )
+    {
+        vlc_object_release( p_input_vbi );
+        p_input_vbi = NULL;
+    }
 
     vlc_object_release( p_input );
     p_input = NULL;
@@ -501,21 +509,22 @@ void InputManager::UpdateTeletext()
             int i_page = 100;
             bool b_transparent = false;
 
-            vlc_object_t *p_vbi = (vlc_object_t *)
+            if( p_input_vbi )
+            {
+                var_DelCallback( p_input_vbi, "vbi-page", VbiEvent, this );
+                vlc_object_release( p_input_vbi );
+            }
+            p_input_vbi = (vlc_object_t *)
                 vlc_object_find_name( p_input, "zvbi", FIND_CHILD );
 
-            if( p_vbi )
+            if( p_input_vbi )
             {
-                /* We deleted it (if not here, it does not harm), because
-                 * var_AddCallback will silently add a duplicated one */
-                var_DelCallback( p_vbi, "vbi-page", VbiEvent, this );
                 /* This callback is not remove explicitly, but interfaces
                  * are guaranted to outlive input */
-                var_AddCallback( p_vbi, "vbi-page", VbiEvent, this );
+                var_AddCallback( p_input_vbi, "vbi-page", VbiEvent, this );
 
-                i_page = var_GetInteger( p_vbi, "vbi-page" );
-                b_transparent = !var_GetBool( p_vbi, "vbi-opaque" );
-                vlc_object_release( p_vbi );
+                i_page = var_GetInteger( p_input_vbi, "vbi-page" );
+                b_transparent = !var_GetBool( p_input_vbi, "vbi-opaque" );
             }
             emit newTelexPageSet( i_page );
             emit teletextTransparencyActivated( b_transparent );
@@ -736,20 +745,14 @@ void InputManager::sectionMenu()
 /* Set a new Teletext Page */
 void InputManager::telexSetPage( int page )
 {
-    if( hasInput() )
+    if( hasInput() && p_input_vbi )
     {
         const int i_teletext_es = var_GetInteger( p_input, "teletext-es" );
 
         if( i_teletext_es >= 0 )
         {
-            vlc_object_t *p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
-                        "zvbi", FIND_CHILD );
-            if( p_vbi )
-            {
-                var_SetInteger( p_vbi, "vbi-page", page );
-                vlc_object_release( p_vbi );
-                emit newTelexPageSet( page );
-            }
+            var_SetInteger( p_input_vbi, "vbi-page", page );
+            emit newTelexPageSet( page );
         }
     }
 }
@@ -757,16 +760,10 @@ void InputManager::telexSetPage( int page )
 /* Set the transparency on teletext */
 void InputManager::telexSetTransparency( bool b_transparentTelextext )
 {
-    if( hasInput() )
+    if( hasInput() && p_input_vbi )
     {
-        vlc_object_t *p_vbi = (vlc_object_t *) vlc_object_find_name( p_input,
-                    "zvbi", FIND_CHILD );
-        if( p_vbi )
-        {
-            var_SetBool( p_vbi, "vbi-opaque", !b_transparentTelextext );
-            vlc_object_release( p_vbi );
-            emit teletextTransparencyActivated( b_transparentTelextext );
-        }
+        var_SetBool( p_input_vbi, "vbi-opaque", !b_transparentTelextext );
+        emit teletextTransparencyActivated( b_transparentTelextext );
     }
 }
 

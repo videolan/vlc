@@ -137,6 +137,7 @@ public:
 private:
     intf_thread_t  *p_intf;
     input_thread_t *p_input;
+    vlc_object_t   *p_input_vbi;
     input_item_t   *p_item;
     int             i_old_playing_status;
     QString         oldName;
