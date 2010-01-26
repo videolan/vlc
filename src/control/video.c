@@ -809,8 +809,6 @@ void libvlc_video_set_logo_string( libvlc_media_player_t *p_mi,
                                    libvlc_exception_t *p_e )
 {
     vlogo_opt_t *opt = logo_option_bynumber( option, p_e );
-    printf("logo set string  (%u)%s = %s.\n", option,
-            (opt?(opt->name):"<unkn>"),(psz_value?psz_value:"<null>"));
     if( !opt ) return;
     vlc_object_t *logo = get_logo_object( p_mi, p_e );
     if( !logo ) return;
@@ -834,8 +832,6 @@ void libvlc_video_set_logo_int( libvlc_media_player_t *p_mi,
                                 libvlc_exception_t *p_e )
 {
     vlogo_opt_t *opt = logo_option_bynumber( option, p_e );
-    printf("logo set integer (%u)%s = %i.\n",
-            option, (opt?(opt->name):"<unkn>"),value);
     if( !opt ) return;
 
     if( !opt->type ) /* libvlc_logo_enable */
@@ -871,7 +867,6 @@ int libvlc_video_get_logo_int( libvlc_media_player_t *p_mi,
                                unsigned option, libvlc_exception_t *p_e )
 {
     vlogo_opt_t *opt = logo_option_bynumber( option, p_e );
-    printf("logo get integer (%u)%s.\n", option, opt?opt->name:"<unkn>");
     if( !opt ) return 0;
 
     vlc_object_t *logo = get_logo_object( p_mi, p_e );
