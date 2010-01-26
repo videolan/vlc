@@ -87,8 +87,10 @@ HRESULT object_get(I **dst, I *src)
     return E_OUTOFMEMORY;
 }
 
-// ---------
+static inline
+VARIANT_BOOL varbool(bool b) { return b ? VARIANT_TRUE : VARIANT_FALSE; }
 
+// ---------
 
 STDMETHODIMP VLCAudio::get_mute(VARIANT_BOOL* mute)
 {
@@ -98,8 +100,7 @@ STDMETHODIMP VLCAudio::get_mute(VARIANT_BOOL* mute)
     libvlc_instance_t* p_libvlc;
     HRESULT hr = getVLC(&p_libvlc);
     if( SUCCEEDED(hr) )
-        *mute = libvlc_audio_get_mute(p_libvlc) ?
-                        VARIANT_TRUE : VARIANT_FALSE;
+        *mute = varbool( libvlc_audio_get_mute(p_libvlc) );
     return hr;
 };
 
@@ -460,8 +461,7 @@ STDMETHODIMP VLCInput::get_hasVout(VARIANT_BOOL* hasVout)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        *hasVout = libvlc_media_player_has_vout(p_md, &ex) ?
-                                VARIANT_TRUE : VARIANT_FALSE;
+        *hasVout = varbool( libvlc_media_player_has_vout(p_md, &ex) );
         hr = exception_bridge(&ex);
     }
     return hr;
@@ -635,8 +635,7 @@ STDMETHODIMP VLCPlaylist::get_isPlaying(VARIANT_BOOL* isPlaying)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        *isPlaying = libvlc_media_player_is_playing(p_md) ?
-                     VARIANT_TRUE: VARIANT_FALSE;
+        *isPlaying = varbool( libvlc_media_player_is_playing(p_md) );
         libvlc_exception_clear(&ex);
     }
     return hr;
@@ -944,8 +943,7 @@ STDMETHODIMP VLCVideo::get_fullscreen(VARIANT_BOOL* fullscreen)
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        *fullscreen = libvlc_get_fullscreen(p_md, &ex) ?
-                      VARIANT_TRUE : VARIANT_FALSE;
+        *fullscreen = varbool( libvlc_get_fullscreen(p_md, &ex) );
         hr = exception_bridge(&ex);
     }
     return hr;
@@ -1537,7 +1535,7 @@ STDMETHODIMP VLCControl2::get_AutoLoop(VARIANT_BOOL *autoloop)
     if( NULL == autoloop )
         return E_POINTER;
 
-    *autoloop = _p_instance->getAutoLoop() ? VARIANT_TRUE: VARIANT_FALSE;
+    *autoloop = varbool( _p_instance->getAutoLoop() );
     return S_OK;
 };
 
@@ -1552,7 +1550,7 @@ STDMETHODIMP VLCControl2::get_AutoPlay(VARIANT_BOOL *autoplay)
     if( NULL == autoplay )
         return E_POINTER;
 
-    *autoplay = _p_instance->getAutoPlay() ? VARIANT_TRUE: VARIANT_FALSE;
+    *autoplay = varbool( _p_instance->getAutoPlay() );
     return S_OK;
 };
 
@@ -1614,7 +1612,7 @@ STDMETHODIMP VLCControl2::get_Toolbar(VARIANT_BOOL *visible)
      */
 
     /* DISABLED for now */
-    //  *visible = _p_instance->getShowToolbar() ? VARIANT_TRUE: VARIANT_FALSE;
+    //  *visible = varbool( _p_instance->getShowToolbar() );
 
     *visible = VARIANT_FALSE;
 
@@ -1666,7 +1664,7 @@ STDMETHODIMP VLCControl2::get_Visible(VARIANT_BOOL *isVisible)
     if( NULL == isVisible )
         return E_POINTER;
 
-    *isVisible = _p_instance->getVisible() ? VARIANT_TRUE : VARIANT_FALSE;
+    *isVisible = varbool( _p_instance->getVisible() );
 
     return NOERROR;
 };
