@@ -68,9 +68,15 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     int i_viewMode = getSettings()->value( "view-mode", TREE_VIEW ).toInt();
     if( i_viewMode == ICON_VIEW )
-        iconView = new PlIconView( model, this );
+    {
+        createIconView();
+        currentView = iconView;
+    }
     else
+    {
         createTreeView();
+        currentView = treeView;
+    }
 
     getSettings()->endGroup();
 
