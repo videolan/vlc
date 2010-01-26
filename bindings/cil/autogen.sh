@@ -23,7 +23,7 @@ set -xe
 cd "$(dirname "$0")"
 
 test -f src/exception.cs || {
-	echo "You must run this script from your miredo SVN directory.">&2
+	echo "You must run this script from your cil directory.">&2
 	exit 1
 }
 
