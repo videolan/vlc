@@ -147,7 +147,10 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
             + p_filter->p_sys->i_buf_size;
     block_t *p_out_buf = filter_NewAudioBuffer( p_filter, i_out_size );
     if( !p_out_buf )
+    {
+        block_Release( p_in_buf );
         return NULL;
+    }
     float *p_out = (float *)p_out_buf->p_buffer;
 
     if( (p_in_buf->i_flags & BLOCK_FLAG_DISCONTINUITY) || p_sys->b_first )
@@ -370,6 +373,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
             else
             {
                 p_sys->i_buf_size = p_sys->i_old_wing = 0; /* oops! */
+                block_Release( p_in_buf );
                 return p_out_buf;
             }
         }
@@ -384,6 +388,7 @@ static block_t *Resample( filter_t * p_filter, block_t * p_in_buf )
              i_out * p_filter->fmt_in.audio.i_bytes_per_frame );
 #endif
 
+    block_Release( p_in_buf );
     return p_out_buf;
 }
 
