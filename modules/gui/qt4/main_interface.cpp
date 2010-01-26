@@ -270,10 +270,13 @@ MainInterface::MainInterface( intf_thread_t *_p_intf ) : QVLCMW( _p_intf )
     }
 
     msg_Dbg( p_intf, "%i", stackCentralOldState );
+
     /* Playlist */
-    if( settings->value( "playlist-visible", 0 ).toInt() )
-        togglePlaylist();
+    int i_plVis = settings->value( "playlist-visible", 0 ).toInt();
+
     settings->endGroup();
+
+    if( i_plVis ) togglePlaylist();
 
     /* Final sizing and showing */
     setVisible( !b_hideAfterCreation );
