@@ -88,11 +88,11 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->setColumnStretch( 1, 10 );
 
     SearchLineEdit *search = new SearchLineEdit( this );
-    search->setMaximumWidth( 200 );
+    search->setMaximumWidth( 300 );
     layout->addWidget( search, 0, 4 );
     CONNECT( search, textChanged( const QString& ),
              this, search( const QString& ) );
-    layout->setColumnStretch( 4, 1 );
+    layout->setColumnStretch( 4, 2 );
 
     /* Add item to the playlist button */
     addButton = new QPushButton;
@@ -112,14 +112,14 @@ StandardPLPanel::~StandardPLPanel()
     getSettings()->beginGroup("Playlist");
     if( treeView )
         getSettings()->setValue( "headerStateV2", treeView->header()->saveState() );
+    getSettings()->setValue( "view-mode", ( currentView == iconView ) ? ICON_VIEW : TREE_VIEW );
     getSettings()->endGroup();
 }
 
 /* Unused anymore, but might be useful, like in right-click menu */
 void StandardPLPanel::gotoPlayingItem()
 {
-    if( treeView )
-        treeView->scrollTo( model->currentIndex() );
+    currentView->scrollTo( model->currentIndex() );
 }
 
 void StandardPLPanel::handleExpansion( const QModelIndex& index )
@@ -153,6 +153,15 @@ void StandardPLPanel::popupAdd()
                         + QPoint( 0, addButton->height() ) );
 }
 
+void StandardPLPanel::popupPlView( const QPoint &point )
+{
+    QModelIndex index = currentView->indexAt( point );
+    QPoint globalPoint = currentView->viewport()->mapToGlobal( point );
+    QItemSelectionModel *selection = currentView->selectionModel();
+    QModelIndexList list = selection->selectedIndexes();
+    model->popup( index, globalPoint, list );
+}
+
 void StandardPLPanel::popupSelectColumn( QPoint pos )
 {
     QMenu menu;
@@ -171,15 +180,6 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
         CONNECT( option, triggered(), selectColumnsSigMapper, map() );
     }
     menu.exec( QCursor::pos() );
-}
-
-void StandardPLPanel::popupPlView( const QPoint &point )
-{
-    QModelIndex index = currentView->indexAt( point );
-    QPoint globalPoint = currentView->viewport()->mapToGlobal( point );
-    QItemSelectionModel *selection = currentView->selectionModel();
-    QModelIndexList list = selection->selectedIndexes();
-    model->popup( index, globalPoint, list );
 }
 
 void StandardPLPanel::toggleColumnShown( int i )
