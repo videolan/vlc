@@ -572,54 +572,183 @@ void libvlc_video_set_deinterlace( libvlc_media_player_t *p_mi, int b_enable,
     vlc_object_release( p_vout );
 }
 
+
+/* ************** */
+/* module helpers */
+/* ************** */
+
+
+static vlc_object_t *get_object( libvlc_media_player_t * p_mi,
+                                 const char *name, libvlc_exception_t *p_e )
+{
+    vlc_object_t *object = NULL;
+    vout_thread_t  *vout = GetVout( p_mi, p_e );
+    libvlc_exception_clear( p_e );
+    if( vout )
+    {
+        object = vlc_object_find_name( vout, name, FIND_CHILD );
+        vlc_object_release(vout);
+    }
+    if( !object )
+    {
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "%s not enabled", name );
+    }
+    return object;
+}
+
+
+typedef const struct {
+    const char name[20]; /* probably will become a const char * sometime */
+    unsigned type; 
+} opt_t;
+
+
+static void
+set_int( libvlc_media_player_t *p_mi, const char *name,
+         const opt_t *opt, int value, libvlc_exception_t *p_e )
+{
+    if( !opt ) return;
+
+    if( !opt->type ) /* the enabler */
+    {
+        vout_thread_t *vout = GetVout( p_mi, p_e );
+        libvlc_exception_clear( p_e );
+        if (vout)
+        {
+            vout_EnableFilter( vout, opt->name, value, false );
+            vlc_object_release( vout );
+        }
+        return;
+    }
+
+    vlc_object_t *object = get_object( p_mi, name, p_e );
+    if( !object ) return;
+
+    switch( opt->type )
+    {
+    case VLC_VAR_INTEGER:
+        var_SetInteger(object, opt->name, value);
+        break;
+    default:
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Invalid argument for %s in %s", name, "set int" );
+        break;
+    }
+    vlc_object_release( object );
+}
+
+
+static int
+get_int( libvlc_media_player_t *p_mi, const char *name,
+        const opt_t *opt, libvlc_exception_t *p_e )
+{
+    if( !opt ) return 0;
+
+    vlc_object_t *object = get_object( p_mi, name, p_e );
+    if( !object ) return 0;
+
+    int ret;
+    switch( opt->type )
+    {
+    case 0: /* the enabler */
+        ret = NULL != object;
+        break;
+    case VLC_VAR_INTEGER:
+        ret = var_GetInteger(object, opt->name);
+        break;
+    default:
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Invalid argument for %s in %s", name, "get int" );
+        ret = 0;
+        break;
+    }
+    vlc_object_release( object );
+    return ret;
+}
+
+
+static void
+set_string( libvlc_media_player_t *p_mi, const char *name, const opt_t *opt,
+            const char *psz_value, libvlc_exception_t *p_e )
+{
+    if( !opt ) return;
+    vlc_object_t *object = get_object( p_mi, name, p_e );
+    if( !object ) return;
+
+    switch( opt->type )
+    {
+    case VLC_VAR_STRING:
+        var_SetString( object, opt->name, psz_value );
+        break;
+    default:
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Invalid argument for %s in %s", name, "set string" );
+        break;
+    }
+    vlc_object_release( object );
+}
+
+
+static char *
+get_string( libvlc_media_player_t *p_mi, const char *name,
+            const opt_t *opt, libvlc_exception_t *p_e )
+{
+    if( !opt ) return NULL;
+    vlc_object_t *object = get_object( p_mi, name, p_e );
+    if( !object ) return NULL;
+
+    char *ret;
+    switch( opt->type )
+    {
+    case VLC_VAR_STRING:
+        ret = var_GetString( object, opt->name );
+        break;
+    default:
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Invalid argument for %s in %s", name, "get string" );
+        ret = NULL;
+        break;
+    }
+    vlc_object_release( object );
+    return ret;
+}
+
+
 /*****************************************************************************
  * Marquee: FIXME: That implementation has no persistent state and requires
  * a vout
  *****************************************************************************/
 
-static const char *get_marquee_int_option_identifier(unsigned option)
+static const opt_t *
+marq_option_bynumber(unsigned option, libvlc_exception_t *p_e)
 {
-    static const char tab[][16] =
+    opt_t optlist[] =
     {
-        "marq",
-        "marq-color",
-        "marq-opacity",
-        "marq-position",
-        "marq-refresh",
-        "marq-size",
-        "marq-timeout",
-        "marq-x",
-        "marq-y",
+        { "marq",          0 },
+        { "marq-marquee",  VLC_VAR_STRING },
+        { "marq-color",    VLC_VAR_INTEGER },
+        { "marq-opacity",  VLC_VAR_INTEGER },
+        { "marq-position", VLC_VAR_INTEGER },
+        { "marq-refresh",  VLC_VAR_INTEGER },
+        { "marq-size",     VLC_VAR_INTEGER },
+        { "marq-timeout",  VLC_VAR_INTEGER },
+        { "marq-x",        VLC_VAR_INTEGER },
+        { "marq-y",        VLC_VAR_INTEGER },
     };
-    if( option >= sizeof( tab ) / sizeof( tab[0] ) )
-        return NULL;
-    return tab[option];
-}
+    enum { num_opts = sizeof(optlist) / sizeof(*optlist) };
 
-static const char *get_marquee_string_option_identifier(unsigned option)
-{
-    static const char tab[][16] =
+    opt_t *r = option < num_opts ? optlist+option : NULL;
+    if( !r )
     {
-        "marq-marquee",
-    };
-    if( option >= sizeof( tab ) / sizeof( tab[0] ) )
-        return NULL;
-    return tab[option];
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "Unknown marquee option" );
+    }
+    return r;
 }
 
-
-static vlc_object_t *get_marquee_object( libvlc_media_player_t * p_mi )
-{
-    libvlc_exception_t e;
-    libvlc_exception_init(&e);
-    vout_thread_t * vout = GetVout( p_mi, &e );
-    libvlc_exception_clear(&e);
-    if( !vout )
-        return NULL;
-    vlc_object_t * object = vlc_object_find_name( vout, "marq", FIND_CHILD );
-    vlc_object_release(vout);
-    return object;
-}
+static vlc_object_t *get_object( libvlc_media_player_t *,
+                                 const char *, libvlc_exception_t *);
 
 /*****************************************************************************
  * libvlc_video_get_marquee_int : get a marq option value
@@ -627,34 +756,7 @@ static vlc_object_t *get_marquee_object( libvlc_media_player_t * p_mi )
 int libvlc_video_get_marquee_int( libvlc_media_player_t *p_mi,
                                   unsigned option, libvlc_exception_t *p_e )
 {
-    const char * identifier = get_marquee_int_option_identifier(option);
-    if(!identifier)
-    {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Unknown marquee option" );
-        return 0;
-    }
-    vlc_object_t * marquee = get_marquee_object(p_mi);
-
-    /* Handle the libvlc_marquee_Enable separately */
-    if(option == libvlc_marquee_Enable)
-    {
-        bool isEnabled = marquee != NULL;
-        vlc_object_release(marquee);
-        return isEnabled;
-    }
-
-    /* Generic case */
-    if(!identifier)
-    {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Marquee not enabled" );
-        return 0;
-    }
-#warning This and the next function may crash due to type checking!
-    int ret = var_GetInteger(marquee, identifier);
-    vlc_object_release(marquee);
-    return ret;
+    return get_int( p_mi, "marq", marq_option_bynumber(option,p_e), p_e );
 }
 
 /*****************************************************************************
@@ -663,24 +765,7 @@ int libvlc_video_get_marquee_int( libvlc_media_player_t *p_mi,
 char * libvlc_video_get_marquee_string( libvlc_media_player_t *p_mi,
                                     unsigned option, libvlc_exception_t *p_e )
 {
-    const char * identifier = get_marquee_string_option_identifier(option);
-    if(!identifier)
-    {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Unknown marquee option" );
-        return NULL;
-    }
-
-    vlc_object_t * marquee = get_marquee_object(p_mi);
-    if(!marquee)
-    {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Marquee not enabled" );
-        return NULL;
-    }
-    char *ret = var_GetString(marquee, identifier);
-    vlc_object_release(marquee);
-    return ret;
+    return get_string( p_mi, "marq", marq_option_bynumber(option,p_e), p_e );
 }
 
 /*****************************************************************************
@@ -689,38 +774,7 @@ char * libvlc_video_get_marquee_string( libvlc_media_player_t *p_mi,
 void libvlc_video_set_marquee_int( libvlc_media_player_t *p_mi,
                          unsigned option, int value, libvlc_exception_t *p_e )
 {
-    const char * identifier = get_marquee_int_option_identifier(option);
-    if(!identifier)
-    {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Unknown marquee option" );
-        return;
-    }
-
-    /* Handle the libvlc_marquee_Enable separately */
-    if(option == libvlc_marquee_Enable)
-    {
-        libvlc_exception_t e;
-        libvlc_exception_init(&e);
-        vout_thread_t * vout = GetVout( p_mi, &e );
-        libvlc_exception_clear(&e);
-        if (vout)
-        {
-            vout_EnableFilter(vout, identifier, value, false);
-            vlc_object_release(vout);
-        }
-        return;
-    }
-
-    vlc_object_t * marquee = get_marquee_object(p_mi);
-    if(!marquee)
-    {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Marquee not enabled" );
-        return;
-    }
-    var_SetInteger(marquee, identifier, value);
-    vlc_object_release(marquee);
+    set_int( p_mi, "marq", marq_option_bynumber(option,p_e), value, p_e );
 }
 
 /*****************************************************************************
@@ -729,58 +783,17 @@ void libvlc_video_set_marquee_int( libvlc_media_player_t *p_mi,
 void libvlc_video_set_marquee_string( libvlc_media_player_t *p_mi,
                 unsigned option, const char * value, libvlc_exception_t *p_e )
 {
-    const char * identifier = get_marquee_string_option_identifier(option);
-    if(!identifier)
-    {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Unknown marquee option" );
-        return;
-    }
-    vlc_object_t * marquee = get_marquee_object(p_mi);
-    if(!marquee)
-    {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Marquee not enabled" );
-        return;
-    }
-    var_SetString(marquee, identifier, value);
-    vlc_object_release(marquee);
+    set_string( p_mi, "marq", marq_option_bynumber(option,p_e), value, p_e );
 }
 
 
 /* logo module support */
 
-static vlc_object_t *get_logo_object( libvlc_media_player_t * p_mi,
-                                      libvlc_exception_t *p_e )
-{
-    vlc_object_t *object = NULL;
-    vout_thread_t  *vout = GetVout( p_mi, p_e );
-    libvlc_exception_clear( p_e );
-    if( vout )
-    {
-        object = vlc_object_find_name( vout, "logo", FIND_CHILD );
-        vlc_object_release(vout);
-    }
-    if( !object )
-    {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Logo not enabled" );
-    }
-    return object;
-}
 
-
-typedef const struct vlogo_opt {
-    const char name[16];
-    unsigned type; 
-} vlogo_opt_t;
-
-
-static vlogo_opt_t *
+static opt_t *
 logo_option_bynumber( unsigned option, libvlc_exception_t *p_e )
 {
-#   define CFG_PREFIX "logo-"
-    vlogo_opt_t vlogo_optlist[] = /* depends on libvlc_video_logo_option_t */
+    opt_t vlogo_optlist[] = /* depends on libvlc_video_logo_option_t */
     {
         { "logo",          0 },
         { "logo-file",     VLC_VAR_STRING },
@@ -791,14 +804,13 @@ logo_option_bynumber( unsigned option, libvlc_exception_t *p_e )
         { "logo-opacity",  VLC_VAR_INTEGER },
         { "logo-position", VLC_VAR_INTEGER },
     };
-#   undef  CFG_PREFIX
     enum { num_vlogo_opts = sizeof(vlogo_optlist) / sizeof(*vlogo_optlist) };
 
-    vlogo_opt_t *r = option < num_vlogo_opts ? vlogo_optlist+option : NULL;
+    opt_t *r = option < num_vlogo_opts ? vlogo_optlist+option : NULL;
     if( !r )
     {
         libvlc_exception_raise( p_e );
-        libvlc_printerr( "Unknown marquee option" );
+        libvlc_printerr( "Unknown logo option" );
     }
     return r;
 }
@@ -808,22 +820,7 @@ void libvlc_video_set_logo_string( libvlc_media_player_t *p_mi,
                                    unsigned option, const char *psz_value,
                                    libvlc_exception_t *p_e )
 {
-    vlogo_opt_t *opt = logo_option_bynumber( option, p_e );
-    if( !opt ) return;
-    vlc_object_t *logo = get_logo_object( p_mi, p_e );
-    if( !logo ) return;
-
-    switch( opt->type )
-    {
-    case VLC_VAR_STRING:
-        var_SetString( logo, opt->name, psz_value );
-        break;
-    default:
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Invalid argument" );
-        break;
-    }
-    vlc_object_release(logo);
+    set_string( p_mi,"logo",logo_option_bynumber(option,p_e),psz_value,p_e );
 }
 
 
@@ -831,62 +828,14 @@ void libvlc_video_set_logo_int( libvlc_media_player_t *p_mi,
                                 unsigned option, int value,
                                 libvlc_exception_t *p_e )
 {
-    vlogo_opt_t *opt = logo_option_bynumber( option, p_e );
-    if( !opt ) return;
-
-    if( !opt->type ) /* libvlc_logo_enable */
-    {
-        vout_thread_t *vout = GetVout( p_mi, p_e );
-        libvlc_exception_clear( p_e );
-        if (vout)
-        {
-            vout_EnableFilter(vout, opt->name, value, false);
-            vlc_object_release(vout);
-        }
-        return;
-    }
-
-    vlc_object_t *logo = get_logo_object( p_mi, p_e );
-    if( !logo ) return;
-
-    switch( opt->type )
-    {
-    case VLC_VAR_INTEGER:
-        var_SetInteger(logo, opt->name, value);
-        break;
-    default:
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Invalid argument" );
-        break;
-    }
-    vlc_object_release(logo);
+    set_int( p_mi, "logo", logo_option_bynumber(option, p_e), value, p_e );
 }
 
 
 int libvlc_video_get_logo_int( libvlc_media_player_t *p_mi,
                                unsigned option, libvlc_exception_t *p_e )
 {
-    vlogo_opt_t *opt = logo_option_bynumber( option, p_e );
-    if( !opt ) return 0;
-
-    vlc_object_t *logo = get_logo_object( p_mi, p_e );
-    if( !logo ) return 0;
-
-    int ret;
-    switch( opt->type )
-    {
-    case 0: /* libvlc_logo_enable */
-        ret = NULL != logo;
-        break;
-    case VLC_VAR_INTEGER:
-        ret = var_GetInteger(logo, opt->name);
-        break;
-    default:
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "Invalid argument" );
-        ret = 0;
-        break;
-    }
-    vlc_object_release(logo);
-    return ret;
+    return get_int( p_mi, "logo", logo_option_bynumber(option,p_e), p_e );
 }
+
+

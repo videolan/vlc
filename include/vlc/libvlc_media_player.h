@@ -81,10 +81,11 @@ typedef struct libvlc_rectangle_t
 } libvlc_rectangle_t;
 
 /**
- * Marq int options definition
+ * Marq options definition
  */
-typedef enum libvlc_video_marquee_int_option_t {
+typedef enum libvlc_video_marquee_option_t {
     libvlc_marquee_Enable = 0,
+    libvlc_marquee_Text,		/** string argument */
     libvlc_marquee_Color,
     libvlc_marquee_Opacity,
     libvlc_marquee_Position,
@@ -93,15 +94,7 @@ typedef enum libvlc_video_marquee_int_option_t {
     libvlc_marquee_Timeout,
     libvlc_marquee_X,
     libvlc_marquee_Y
-} libvlc_video_marquee_int_option_t;
-
-/**
- * Marq string options definition
- */
-typedef enum libvlc_video_marquee_string_option_t {
-    libvlc_marquee_Text = 0
-} libvlc_video_marquee_string_option_t;
-
+} libvlc_video_marquee_option_t;
 
 /**
  * Create an empty Media Player object
@@ -807,7 +800,7 @@ VLC_PUBLIC_API void libvlc_video_set_deinterlace( libvlc_media_player_t *,
                                                   libvlc_exception_t *);
 
 /**
- * Get an integer option value
+ * Get an integer marquee option value
  *
  * \param p_mi libvlc media player
  * \param option marq option to get \see libvlc_video_marquee_int_option_t
@@ -817,7 +810,7 @@ VLC_PUBLIC_API int libvlc_video_get_marquee_int( libvlc_media_player_t *,
                                              unsigned, libvlc_exception_t * );
 
 /**
- * Get a string option value
+ * Get a string marquee option value
  *
  * \param p_mi libvlc media player
  * \param option marq option to get \see libvlc_video_marquee_string_option_t
@@ -827,7 +820,7 @@ VLC_PUBLIC_API char *libvlc_video_get_marquee_string( libvlc_media_player_t *,
                                              unsigned, libvlc_exception_t * );
 
 /**
- * Enable, disable or set an integer marq option
+ * Enable, disable or set an integer marquee option
  *
  * Setting libvlc_marquee_Enable has the side effect of enabling (arg !0)
  * or disabling (arg 0) the marq filter.
@@ -841,7 +834,7 @@ VLC_PUBLIC_API void libvlc_video_set_marquee_int( libvlc_media_player_t *,
                                         unsigned, int, libvlc_exception_t * );
 
 /**
- * Set a marq string option
+ * Set a marquee string option
  *
  * \param p_mi libvlc media player
  * \param option marq option to set \see libvlc_video_marquee_string_option_t
@@ -851,6 +844,7 @@ VLC_PUBLIC_API void libvlc_video_set_marquee_int( libvlc_media_player_t *,
 VLC_PUBLIC_API void libvlc_video_set_marquee_string( libvlc_media_player_t *,
                                unsigned, const char *, libvlc_exception_t * );
 
+/** option values for libvlc_video_{get,set}_logo_{int,string} */
 enum libvlc_video_logo_option_t {
     libvlc_logo_enable,
     libvlc_logo_file,           /**< string argument, "file,d,t;file,d,t;..." */
@@ -897,6 +891,7 @@ VLC_PUBLIC_API void libvlc_video_set_logo_int( libvlc_media_player_t *p_mi,
  */
 VLC_PUBLIC_API void libvlc_video_set_logo_string( libvlc_media_player_t *p_mi,
             unsigned option, const char *psz_value, libvlc_exception_t *p_e );
+
 
 /** @} video */
 
