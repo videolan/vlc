@@ -54,17 +54,17 @@ CAtmoColorCalculator::CAtmoColorCalculator(CAtmoConfig *pAtmoConfig)
 
 CAtmoColorCalculator::~CAtmoColorCalculator(void)
 {
-  delete m_Weight;
-  delete m_hue_hist;
-  delete m_windowed_hue_hist;
-  delete m_most_used_hue_last;
-  delete m_most_used_hue;
-  delete m_sat_hist;
-  delete m_windowed_sat_hist;
-  delete m_most_used_sat;
-  delete m_Zone_Weights;
-  delete m_average_v;
-  delete m_average_counter;
+  delete[] m_Weight;
+  delete[] m_hue_hist;
+  delete[] m_windowed_hue_hist;
+  delete[] m_most_used_hue_last;
+  delete[] m_most_used_hue;
+  delete[] m_sat_hist;
+  delete[] m_windowed_sat_hist;
+  delete[] m_most_used_sat;
+  delete[] m_Zone_Weights;
+  delete[] m_average_v;
+  delete[] m_average_counter;
 }
 
 void CAtmoColorCalculator::UpdateParameters()
@@ -114,17 +114,17 @@ pColorPacket CAtmoColorCalculator::AnalyzeHSV(tHSVColor *HSV_Img)
 
   if(AtmoSetup_NumZones != m_LastNumZones)
   {
-     delete m_Weight;
-     delete m_hue_hist;
-     delete m_windowed_hue_hist;
-     delete m_most_used_hue_last;
-     delete m_most_used_hue;
-     delete m_sat_hist;
-     delete m_windowed_sat_hist;
-     delete m_most_used_sat;
-     delete m_Zone_Weights;
-     delete m_average_v;
-     delete m_average_counter;
+     delete[] m_Weight;
+     delete[] m_hue_hist;
+     delete[] m_windowed_hue_hist;
+     delete[] m_most_used_hue_last;
+     delete[] m_most_used_hue;
+     delete[] m_sat_hist;
+     delete[] m_windowed_sat_hist;
+     delete[] m_most_used_sat;
+     delete[] m_Zone_Weights;
+     delete[] m_average_v;
+     delete[] m_average_counter;
 
      m_Weight              = new int[AtmoSetup_NumZones * IMAGE_SIZE];
      m_Zone_Weights        = new int*[AtmoSetup_NumZones];
