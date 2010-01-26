@@ -175,14 +175,9 @@ void StandardPLPanel::popupSelectColumn( QPoint pos )
 
 void StandardPLPanel::popupPlView( const QPoint &point )
 {
-    QAbstractItemView *aView;
-    if ( treeView && treeView->isVisible() ) aView = treeView;
-    else if( iconView && iconView->isVisible() ) aView = iconView;
-    else return;
-
-    QModelIndex index = aView->indexAt( point );
-    QPoint globalPoint = aView->viewport()->mapToGlobal( point );
-    QItemSelectionModel *selection = aView->selectionModel();
+    QModelIndex index = currentView->indexAt( point );
+    QPoint globalPoint = currentView->viewport()->mapToGlobal( point );
+    QItemSelectionModel *selection = currentView->selectionModel();
     QModelIndexList list = selection->selectedIndexes();
     model->popup( index, globalPoint, list );
 }
@@ -258,9 +253,7 @@ void StandardPLPanel::keyPressEvent( QKeyEvent *e )
 
 void StandardPLPanel::deleteSelection()
 {
-    //FIXME
-    if( !treeView ) return;
-    QItemSelectionModel *selection = treeView->selectionModel();
+    QItemSelectionModel *selection = currentView->selectionModel();
     QModelIndexList list = selection->selectedIndexes();
     model->doDelete( list );
 }
@@ -307,7 +300,7 @@ void StandardPLPanel::createTreeView()
     {
         for( int m = 1, c = 0; m != COLUMN_END; m <<= 1, c++ )
         {
-            treeView->setClumnHidden( c, !( m & COLUMN_DEFAULT ) );
+            treeView->setColumnHidden( c, !( m & COLUMN_DEFAULT ) );
             if( m == COLUMN_TITLE ) treeView->header()->resizeSection( c, 200 );
             else if( m == COLUMN_DURATION ) treeView->header()->resizeSection( c, 80 );
         }
@@ -341,11 +334,16 @@ void StandardPLPanel::toggleView()
 
         treeView->hide();
         iconView->show();
+        currentView = iconView;
     }
     else
     {
+        if( treeView == NULL )
+            createTreeView();
+
         iconView->hide();
         treeView->show();
+        currentView = treeView;
     }
 }
 

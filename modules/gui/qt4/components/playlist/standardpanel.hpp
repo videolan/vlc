@@ -71,6 +71,7 @@ private:
 
     QTreeView   *treeView;
     PlIconView  *iconView;
+    QAbstractItemView *currentView;
 
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
