@@ -355,7 +355,7 @@ static int Create( vlc_object_t *p_this )
     dialog_progress_bar_t *p_dialog = dialog_ProgressCreate( p_filter,
             _("Building font cache"),
             _("Please wait while your font cache is rebuilt.\n"
-                "This should take less than few minutes."), NULL );
+                "This should take less than a few minutes."), NULL );
     char *path = xmalloc( PATH_MAX + 1 );
     /* Fontconfig doesnt seem to know where windows fonts are with
      * current contribs. So just tell default windows font directory
@@ -436,6 +436,7 @@ static int Create( vlc_object_t *p_this )
     {
         dialog_ProgressSet( p_dialog, NULL, 1.0 );
         dialog_ProgressDestroy( p_dialog );
+        p_dialog = NULL;
     }
 # endif
 
@@ -505,6 +506,12 @@ error:
     if( fontmatch ) FcPatternDestroy( fontmatch );
     if( fontpattern ) FcPatternDestroy( fontpattern );
 #endif
+
+#ifdef WIN32
+    if( p_dialog )
+        dialog_ProgressDestroy( p_dialog );
+#endif
+
     if( p_sys->p_face ) FT_Done_Face( p_sys->p_face );
     if( p_sys->p_library ) FT_Done_FreeType( p_sys->p_library );
     free( psz_fontfamily );
