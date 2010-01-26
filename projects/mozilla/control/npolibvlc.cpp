@@ -1252,6 +1252,16 @@ LibvlcSubtitleNPObject::invoke(int index, const NPVariant *args,
 ** implementation of libvlc video object
 */
 
+LibvlcVideoNPObject::~LibvlcVideoNPObject()
+{
+    if( isValid() )
+    {
+        if( marqueeObj ) NPN_ReleaseObject(marqueeObj);
+        if( logoObj    ) NPN_ReleaseObject(logoObj);
+        if( deintObj   ) NPN_ReleaseObject(deintObj);
+    }
+}
+
 const NPUTF8 * const LibvlcVideoNPObject::propertyNames[] =
 {
     "fullscreen",
@@ -1262,7 +1272,8 @@ const NPUTF8 * const LibvlcVideoNPObject::propertyNames[] =
     "crop",
     "teletext",
     "marquee",
-    "logo"
+    "logo",
+    "deinterlace",
 };
 
 enum LibvlcVideoNPObjectPropertyIds
@@ -1275,7 +1286,8 @@ enum LibvlcVideoNPObjectPropertyIds
     ID_video_crop,
     ID_video_teletext,
     ID_video_marquee,
-    ID_video_logo
+    ID_video_logo,
+    ID_video_deinterlace,
 };
 COUNTNAMES(LibvlcVideoNPObject,propertyCount,propertyNames);
 
@@ -1361,6 +1373,12 @@ LibvlcVideoNPObject::getProperty(int index, NPVariant &result)
             {
                 InstantObj<LibvlcLogoNPObject>( logoObj );
                 OBJECT_TO_NPVARIANT(NPN_RetainObject(logoObj), result);
+                return INVOKERESULT_NO_ERROR;
+            }
+            case ID_video_deinterlace:
+            {
+                InstantObj<LibvlcDeinterlaceNPObject>( deintObj );
+                OBJECT_TO_NPVARIANT(NPN_RetainObject(deintObj), result);
                 return INVOKERESULT_NO_ERROR;
             }
         }
@@ -1471,8 +1489,6 @@ const NPUTF8 * const LibvlcVideoNPObject::methodNames[] =
 {
     "toggleFullscreen",
     "toggleTeletext",
-    "deinterlaceEnable",
-    "deinterlaceDisable"
 };
 COUNTNAMES(LibvlcVideoNPObject,methodCount,methodNames);
 
@@ -1480,8 +1496,6 @@ enum LibvlcVideoNPObjectMethodIds
 {
     ID_video_togglefullscreen,
     ID_video_toggleteletext,
-    ID_video_deinterlaceenable,
-    ID_video_deinterlacedisable
 };
 
 RuntimeNPObject::InvokeResult
@@ -1521,32 +1535,6 @@ LibvlcVideoNPObject::invoke(int index, const NPVariant *args,
                     return INVOKERESULT_NO_ERROR;
                 }
                 return INVOKERESULT_NO_SUCH_METHOD;
-            }
-            case ID_video_deinterlacedisable:
-            {
-                libvlc_video_set_deinterlace(p_md, 0, "", &ex);
-                RETURN_ON_EXCEPTION(this,ex);
-                return INVOKERESULT_NO_ERROR;
-            }
-            case ID_video_deinterlaceenable:
-            {
-                if(argCount == 1)
-                {
-                    if( NPVARIANT_IS_STRING( args[0] ) )
-                    {
-                        /* get deinterlace mode from the user */
-                        char *psz_mode = stringValue( NPVARIANT_TO_STRING( args[0] ) );
-                        /* enable deinterlace filter if possible */
-                        libvlc_video_set_deinterlace(p_md, 1, psz_mode, &ex);
-                        free(psz_mode);
-                        RETURN_ON_EXCEPTION(this,ex);
-                        return INVOKERESULT_NO_ERROR;
-                    }
-                    else
-                    {
-                        return INVOKERESULT_INVALID_VALUE;
-                    }
-                }
             }
             default:
                 return INVOKERESULT_NO_SUCH_METHOD;
@@ -1925,6 +1913,75 @@ LibvlcLogoNPObject::invoke(int index, const NPVariant *args,
         RETURN_ON_EXCEPTION(this,ex);
         VOID_TO_NPVARIANT(result);
         break;
+    default:
+        return INVOKERESULT_NO_SUCH_METHOD;
+    }
+    return INVOKERESULT_NO_ERROR;
+}
+
+
+const NPUTF8 * const LibvlcDeinterlaceNPObject::propertyNames[] = {
+};
+enum LibvlcDeinterlaceNPObjectPropertyIds {
+};
+COUNTNAMES(LibvlcDeinterlaceNPObject,propertyCount,propertyNames);
+
+RuntimeNPObject::InvokeResult
+LibvlcDeinterlaceNPObject::getProperty(int index, NPVariant &result)
+{
+    return INVOKERESULT_GENERIC_ERROR;
+}
+
+RuntimeNPObject::InvokeResult
+LibvlcDeinterlaceNPObject::setProperty(int index, const NPVariant &value)
+{
+    return INVOKERESULT_GENERIC_ERROR;
+}
+
+
+const NPUTF8 * const LibvlcDeinterlaceNPObject::methodNames[] = {
+    "enable",
+    "disable",
+};
+enum LibvlcDeinterlaceNPObjectMethodIds {
+    ID_deint_enable,
+    ID_deint_disable,
+};
+COUNTNAMES(LibvlcDeinterlaceNPObject,methodCount,methodNames);
+
+RuntimeNPObject::InvokeResult
+LibvlcDeinterlaceNPObject::invoke(int index, const NPVariant *args,
+                           uint32_t argCount, NPVariant &result)
+{
+    char *psz;
+
+    if( !isPluginRunning() )
+        return INVOKERESULT_GENERIC_ERROR;
+
+    libvlc_exception_t ex;
+    libvlc_exception_init(&ex);
+    libvlc_media_player_t *p_md = getPrivate<VlcPlugin>()->getMD(&ex);
+    RETURN_ON_EXCEPTION(this,ex);
+
+    switch( index )
+    {
+    case ID_deint_disable:
+        libvlc_video_set_deinterlace(p_md, 0, "", &ex);
+        RETURN_ON_EXCEPTION(this,ex);
+        break;
+
+    case ID_deint_enable:
+        if( argCount != 1 || !NPVARIANT_IS_STRING( args[0] ) )
+            return INVOKERESULT_INVALID_VALUE;
+
+        psz = stringValue( NPVARIANT_TO_STRING( args[0] ) );
+        libvlc_video_set_deinterlace(p_md, 1, psz, &ex);
+        free(psz);
+        RETURN_ON_EXCEPTION(this,ex);
+        break;
+
+    default:
+        return INVOKERESULT_NO_SUCH_METHOD;
     }
     return INVOKERESULT_NO_ERROR;
 }
