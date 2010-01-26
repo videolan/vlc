@@ -23,6 +23,11 @@
 
 /* We trust this public key, and by extension, also keys signed by it. */
 
+/* NOTE:
+ * We need a 1024 bits DSA key.
+ * Don't forget to upload the key to http://download.videolan.org/pub/keys/
+ */
+
 /*
  * VideoLAN Release Signing Key (2009)
  * expirates on 2010-01-01
