@@ -655,16 +655,10 @@ void PLModel::rebuild( playlist_item_t *p_root, bool b_first )
     assert( rootItem );
     /* Recreate from root */
     updateChildren( rootItem );
-    if( (p_item = playlist_CurrentPlayingItem(p_playlist)) )
-        currentItem = findByInput( rootItem, p_item->p_input->i_id );
-    else
-        currentItem = NULL;
     PL_UNLOCK;
 
     /* And signal the view */
     reset();
-
-    emit currentChanged( index( currentItem, 0 ) );
 }
 
 void PLModel::takeItem( PLItem *item )
@@ -724,7 +718,10 @@ void PLModel::removeItem( PLItem *item )
 void PLModel::updateChildren( PLItem *root )
 {
     playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id );
+    PLItem *oldCurrent = currentItem;
     updateChildren( p_node, root );
+    if( currentItem != oldCurrent );
+    emit currentChanged( index( currentItem, 0 ) );
 }
 
 /* This function must be entered WITH the playlist lock */
@@ -739,7 +736,6 @@ void PLModel::updateChildren( playlist_item_t *p_node, PLItem *root )
         if( p_item && newItem->p_input == p_item->p_input )
         {
             currentItem = newItem;
-            emit currentChanged( index( currentItem, 0 ) );
         }
         if( p_node->pp_children[i]->i_children != -1 )
             updateChildren( p_node->pp_children[i], newItem );
