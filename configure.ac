@@ -1859,7 +1859,7 @@ dnl
 dnl dvdread module: check for libdvdread
 dnl
 AC_ARG_ENABLE(dvdread,
-[  --enable-dvdread        dvdread input module (default disabled)])
+[  --enable-dvdread        dvdread input module (default enabled)])
 if test "${enable_dvdread}" != "no"
 then
   AC_ARG_WITH(dvdread,
@@ -4142,7 +4142,7 @@ dnl
 dnl  ncurses module
 dnl
 AC_ARG_ENABLE(ncurses,
-  [  --disable-ncurses       ncurses interface support (default enabled)],
+  [  --disable-ncurses       ncurses interface support (default disabled)],
   [if test "${enable_ncurses}" != "no"; then
     AC_CHECK_HEADER(ncurses.h,
       [AC_CHECK_LIB(ncursesw, mvprintw,
