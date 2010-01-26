@@ -980,7 +980,8 @@ void vout_SetDisplayZoom(vout_display_t *vd, int num, int den)
 {
     vout_display_owner_sys_t *osys = vd->owner.sys;
 
-    if (osys->zoom.num != num || osys->zoom.den != den) {
+    if (osys->is_display_filled ||
+        osys->zoom.num != num || osys->zoom.den != den) {
         osys->ch_zoom = true;
         osys->zoom.num = num;
         osys->zoom.den = den;
