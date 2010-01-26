@@ -46,7 +46,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     setContentsMargins( 3, 3, 3, 3 );
 
     /* Left Part and design */
-    QSplitter *leftW = new QSplitter( Qt::Vertical, this );
+    leftSplitter = new QSplitter( Qt::Vertical, this );
 
     /* Source Selector */
     selector = new PLSelector( this, p_intf );
@@ -55,7 +55,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     selBox->addWidget( selector );
     QGroupBox *selGroup = new QGroupBox( qtr( "Media Browser") );
     selGroup->setLayout( selBox );
-    leftW->addWidget( selGroup );
+    leftSplitter->addWidget( selGroup );
 
     /* Create a Container for the Art Label
        in order to have a beautiful resizing for the selector above it */
@@ -74,7 +74,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
 
     artContLay->addWidget( art, 1 );
 
-    leftW->addWidget( artContainer );
+    leftSplitter->addWidget( artContainer );
 
     /* Initialisation of the playlist */
     playlist_t * p_playlist = THEPL;
@@ -92,7 +92,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     rightPanel->setRoot( p_root );
 
     /* Add the two sides of the QSplitter */
-    addWidget( leftW );
+    addWidget( leftSplitter );
     addWidget( rightPanel );
 
     QList<int> sizeList;
@@ -101,7 +101,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     //setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Expanding );
     setStretchFactor( 0, 0 );
     setStretchFactor( 1, 3 );
-    leftW->setMaximumWidth( 250 );
+    leftSplitter->setMaximumWidth( 250 );
     setCollapsible( 1, false );
 
     /* In case we want to keep the splitter informations */
@@ -110,6 +110,7 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     // getSettings()->beginGroup( "playlist" );
     getSettings()->beginGroup("Playlist");
     restoreState( getSettings()->value("splitterSizes").toByteArray());
+    leftSplitter->restoreState( getSettings()->value("leftSplitterGeometry").toByteArray() );
     getSettings()->endGroup();
 
     setAcceptDrops( true );
@@ -122,6 +123,7 @@ PlaylistWidget::~PlaylistWidget()
 {
     getSettings()->beginGroup("Playlist");
     getSettings()->setValue( "splitterSizes", saveState() );
+    getSettings()->setValue( "leftSplitterGeometry", leftSplitter->saveState() );
     getSettings()->endGroup();
     msg_Dbg( p_intf, "Playlist Destroyed" );
 }

@@ -66,6 +66,7 @@ private:
     ArtLabel        *art;
     StandardPLPanel *rightPanel;
     QPushButton     *addButton;
+    QSplitter       *leftSplitter;
 protected:
     intf_thread_t *p_intf;
     virtual void dropEvent( QDropEvent *);
