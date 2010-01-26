@@ -24,5 +24,5 @@ AC_PATH_PROG([DOXYGEN], [doxygen], [false])
 
 AM_INIT_AUTOMAKE
 
-AC_CONFIG_FILES([Makefile src/Makefile Doxyfile])
+AC_CONFIG_FILES([Makefile src/Makefile src/libvlcpp.pc Doxyfile])
 AC_OUTPUT

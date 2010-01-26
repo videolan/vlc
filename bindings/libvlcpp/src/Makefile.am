@@ -14,3 +14,6 @@ libvlcpp_la_CXXFLAGS = @libvlc_CFLAGS@
 libvlcpp_la_LDFLAGS = @libvlc_LIBS@
 library_includedir=$(includedir)/libvlcpp
 library_include_HEADERS = exception.hpp libvlc.hpp media.hpp media_player.hpp
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libvlcpp.pc
