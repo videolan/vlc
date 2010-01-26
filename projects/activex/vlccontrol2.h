@@ -239,6 +239,18 @@ private:
     HRESULT do_get_int(unsigned idx, LONG *val);
 };
 
+
+class VLCDeinterlace: public VLCInterface<VLCDeinterlace,IVLCDeinterlace>
+{
+public:
+    VLCDeinterlace(VLCPlugin *p):
+        VLCInterface<VLCDeinterlace,IVLCDeinterlace>(p) { }
+
+    STDMETHODIMP enable(BSTR val);
+    STDMETHODIMP disable();
+};
+
+
 class VLCPlaylistItems: public VLCInterface<VLCPlaylistItems,IVLCPlaylistItems>
 {
 public:
@@ -293,8 +305,13 @@ class VLCVideo: public VLCInterface<VLCVideo,IVLCVideo>
 {
 public:
     VLCVideo(VLCPlugin *p): VLCInterface<VLCVideo,IVLCVideo>(p),
-        _p_vlcmarquee(new VLCMarquee(p)), _p_vlclogo(new VLCLogo(p)) { }
-    virtual ~VLCVideo() { delete _p_vlcmarquee; delete _p_vlclogo; }
+        _p_vlcmarquee(new VLCMarquee(p)), _p_vlclogo(new VLCLogo(p)),
+        _p_vlcdeint(new VLCDeinterlace(p)) { }
+    virtual ~VLCVideo() {
+        delete _p_vlcmarquee;
+        delete _p_vlclogo;
+        delete _p_vlcdeint;
+    }
 
     // IVLCVideo methods
     STDMETHODIMP get_fullscreen(VARIANT_BOOL*);
@@ -311,15 +328,15 @@ public:
     STDMETHODIMP put_teletext(long);
     STDMETHODIMP get_marquee(IVLCMarquee**);
     STDMETHODIMP get_logo(IVLCLogo**);
-    STDMETHODIMP deinterlaceDisable();
-    STDMETHODIMP deinterlaceEnable(BSTR);
+    STDMETHODIMP get_deinterlace(IVLCDeinterlace**);
     STDMETHODIMP takeSnapshot(LPPICTUREDISP*);
     STDMETHODIMP toggleFullscreen();
     STDMETHODIMP toggleTeletext();
 
 private:
-    IVLCMarquee *_p_vlcmarquee;
-    IVLCLogo    *_p_vlclogo;
+    IVLCMarquee     *_p_vlcmarquee;
+    IVLCLogo        *_p_vlclogo;
+    IVLCDeinterlace *_p_vlcdeint;
 };
 
 class VLCControl2 : public IVLCControl2

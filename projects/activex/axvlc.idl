@@ -41,6 +41,7 @@ library AXVLC
     interface IVLCAudio;
     interface IVLCInput;
     interface IVLCLogo;
+    interface IVLCDeinterlace;
     interface IVLCMarquee;
     interface IVLCPlaylist;
     interface IVLCSubtitle;
@@ -443,6 +444,21 @@ library AXVLC
         HRESULT y([in] long val);
 
     };
+    [
+      odl,
+      uuid(bc97469f-cb11-4037-8dce-5fc9f5f85307),
+      helpstring("VLC Deinterlace Filter"),
+      dual,
+      oleautomation
+    ]
+    interface IVLCDeinterlace : IDispatch
+    {
+        [helpstring("Enable deinterlace filter and set method.")]
+        HRESULT enable([in] BSTR mode);
+        [helpstring("Disable deinterlace filter.")]
+        HRESULT disable();
+
+    };
 
     [
       odl,
@@ -485,11 +501,6 @@ library AXVLC
         [propput, helpstring("Sets teletext page to use.")]
         HRESULT teletext([in] long page);
 
-        [helpstring("Enable deinterlace filter.")]
-        HRESULT deinterlaceEnable([in] BSTR mode);
-        [helpstring("Disable deinterlace filter.")]
-        HRESULT deinterlaceDisable();
-
         [helpstring("toggle fullscreen/windowed state.")]
         HRESULT toggleFullscreen();
 
@@ -504,6 +515,9 @@ library AXVLC
 
         [propget, helpstring("Returns the logo object.")]
         HRESULT logo([out, retval] IVLCLogo** obj);
+
+        [propget, helpstring("Returns the logo object.")]
+        HRESULT deinterlace([out, retval] IVLCDeinterlace** obj);
     };
 
     [

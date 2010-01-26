@@ -65,6 +65,7 @@ BIND_INTERFACE( VLCAudio )
 BIND_INTERFACE( VLCInput )
 BIND_INTERFACE( VLCMarquee )
 BIND_INTERFACE( VLCLogo )
+BIND_INTERFACE( VLCDeinterlace )
 BIND_INTERFACE( VLCPlaylistItems )
 BIND_INTERFACE( VLCPlaylist )
 BIND_INTERFACE( VLCVideo )
@@ -285,6 +286,39 @@ STDMETHODIMP VLCAudio::toggleMute()
         libvlc_audio_toggle_mute(p_libvlc);
     return hr;
 };
+
+/****************************************************************************/
+
+STDMETHODIMP VLCDeinterlace::disable()
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        libvlc_video_set_deinterlace(p_md, 0, "", &ex);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+}
+
+STDMETHODIMP VLCDeinterlace::enable(BSTR mode)
+{
+    libvlc_media_player_t *p_md;
+    HRESULT hr = getMD(&p_md);
+    if( SUCCEEDED(hr) )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+        char *psz_mode = CStrFromBSTR(CP_UTF8, mode);
+        libvlc_video_set_deinterlace(p_md, 1, psz_mode, &ex);
+        CoTaskMemFree(psz_mode);
+        hr = exception_bridge(&ex);
+    }
+    return hr;
+}
 
 /****************************************************************************/
 
@@ -1177,39 +1211,6 @@ STDMETHODIMP VLCVideo::put_teletext(long page)
     return hr;
 };
 
-STDMETHODIMP VLCVideo::deinterlaceDisable()
-{
-    libvlc_media_player_t *p_md;
-    HRESULT hr = getMD(&p_md);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
-        libvlc_video_set_deinterlace(p_md, 0, "", &ex);
-        hr = exception_bridge(&ex);
-    }
-    return hr;
-};
-
-STDMETHODIMP VLCVideo::deinterlaceEnable(BSTR mode)
-{
-    libvlc_media_player_t *p_md;
-    HRESULT hr = getMD(&p_md);
-    if( SUCCEEDED(hr) )
-    {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-        /* get deinterlace mode from the user */
-        char *psz_mode = CStrFromBSTR(CP_UTF8, mode);
-        /* enable deinterlace filter if possible */
-        libvlc_video_set_deinterlace(p_md, 1, psz_mode, &ex);
-        hr = exception_bridge(&ex);
-        CoTaskMemFree(psz_mode);
-    }
-    return hr;
-};
-
 STDMETHODIMP VLCVideo::takeSnapshot(LPPICTUREDISP* picture)
 {
     if( NULL == picture )
@@ -1349,6 +1350,11 @@ STDMETHODIMP VLCVideo::get_marquee(IVLCMarquee** obj)
 STDMETHODIMP VLCVideo::get_logo(IVLCLogo** obj)
 {
     return object_get(obj,_p_vlclogo);
+}
+
+STDMETHODIMP VLCVideo::get_deinterlace(IVLCDeinterlace** obj)
+{
+    return object_get(obj,_p_vlcdeint);
 }
 
 
