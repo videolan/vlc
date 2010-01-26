@@ -718,9 +718,8 @@ void PLModel::removeItem( PLItem *item )
 void PLModel::updateChildren( PLItem *root )
 {
     playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id );
-    PLItem *oldCurrent = currentItem;
+    currentItem = NULL;
     updateChildren( p_node, root );
-    if( currentItem != oldCurrent );
     emit currentChanged( index( currentItem, 0 ) );
 }
 
