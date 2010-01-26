@@ -25,7 +25,7 @@ elif test "${ACTION}" = "release-makefile"; then
     RELEASE_MAKEFILE="yes"
 fi
 
-if test "${ACTION}" = "build"; then    
+if test "${ACTION}" = "build"; then
     lib="lib"
     modules="modules"
     share="share"
@@ -36,14 +36,14 @@ if test "${ACTION}" = "build"; then
     target_share="${target}/${share}"    # Should we consider using a different well-known folder like shared resources?
     target_include="${target}/${include}"    # Should we consider using a different well-known folder like shared resources?
     linked_libs=""
-    
+
     ##########################
     # @function install_library(src_lib, dest_dir, type, lib_install_prefix, destination_name)
     # @description Installs the specified library into the destination folder, automatically changes the references to dependencies
     # @param src_lib     source library to copy to the destination directory
     # @param dest_dir    destination directory where the src_lib should be copied to
-    install_library() { 
-   
+    install_library() {
+
         if [ ${3} = "library" ]; then
             local install_name="@loader_path/lib"
         elif [ ${3} = "module" ]; then
@@ -62,7 +62,7 @@ if test "${ACTION}" = "build"; then
         fi
 
         if test -e ${1} && ((! test -e ${lib_dest}) || test ${1} -nt ${lib_dest} ); then
-            
+
             mkdir -p ${2}
 
             # Lets copy the library from the source folder to our new destination folder
@@ -71,7 +71,7 @@ if test "${ACTION}" = "build"; then
             else
                 install -m 755 ${1} ${lib_dest}
             fi
-            
+
             # Update the dynamic library so it will know where to look for the other libraries
             echo "Installing ${3} `basename ${lib_dest}`"
 
@@ -79,7 +79,7 @@ if test "${ACTION}" = "build"; then
                 # Change the reference of libvlc.1 stored in the usr directory to libvlc.dylib in the framework's library directory
                 install_name_tool -id "${install_name}/`basename ${lib_dest}`" ${lib_dest} > /dev/null
             fi
-    
+
             # Iterate through each installed library and modify the references to other dynamic libraries to match the framework's library directory
             for linked_lib in `otool -L ${lib_dest}  | grep '(' | sed 's/\((.*)\)//'`; do
                 local name=`basename ${linked_lib}`
@@ -162,7 +162,13 @@ if test "${ACTION}" = "build"; then
         esac
     done
 
-    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.dylib" "${target_lib}" "library"
+    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlc.5.dylib" "${target_lib}" "library"
+    install_library "${VLC_BUILD_DIR}/src/${prefix}libvlccore.4.dylib" "${target_lib}" "library"
+    pushd `pwd` > /dev/null
+    cd ${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}/lib
+    ln -sf libvlc.5.dylib libvlc.dylib
+    ln -sf libvlccore.4.dylib libvlccore.dylib
+    popd > /dev/null
 
     ##########################
     # Build the share folder
@@ -170,7 +176,7 @@ if test "${ACTION}" = "build"; then
     pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -resolve-src-symlinks"
     mkdir -p ${target_share}
     $pbxcp ${VLC_SRC_DIR}/share/lua ${target_share}
-    
+
 
     ##########################
     # Exporting headers
