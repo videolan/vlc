@@ -1,7 +1,7 @@
 dnl configure.ac - Configure script for libvlcpp
 
 AC_COPYRIGHT([Copyright (C) 2010 Rémi Duraffort])
-AC_INIT(libvlcpp, 0.1.0, vlc-devel@no-spam@videolan.org)
+AC_INIT(libvlcpp, 1.0.0, vlc-devel@no-spam@videolan.org)
 AC_PREREQ([2.65])
 
 AC_CONFIG_SRCDIR([configure.ac])

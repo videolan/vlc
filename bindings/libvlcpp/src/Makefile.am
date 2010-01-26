@@ -11,7 +11,7 @@ libvlcpp_la_SOURCES =   \
     media_player.hpp
 
 libvlcpp_la_CXXFLAGS = @libvlc_CFLAGS@
-libvlcpp_la_LDFLAGS = @libvlc_LIBS@
+libvlcpp_la_LDFLAGS = @libvlc_LIBS@ -version-info 1:0:0
 library_includedir=$(includedir)/libvlcpp
 library_include_HEADERS = exception.hpp libvlc.hpp media.hpp media_player.hpp
 
