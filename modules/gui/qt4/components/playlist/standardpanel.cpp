@@ -130,6 +130,7 @@ void StandardPLPanel::gotoPlayingItem()
 
 void StandardPLPanel::handleExpansion( const QModelIndex& index )
 {
+    assert( currentView );
     currentView->scrollTo( index );
 }
 
