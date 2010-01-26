@@ -135,12 +135,6 @@ public:
     void *userData();
 
 private:
-    /**
-     * Get the instance of the libvlc_media_t
-     * @return the pointer to libvlc_media_t
-     */
-    libvlc_media_t *instance();
-
     /** The media */
     libvlc_media_t *m_media;
 

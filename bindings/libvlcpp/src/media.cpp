@@ -29,7 +29,7 @@ using namespace libvlc;
 Media::Media( libVLC &libvlcInstance, const char *psz_mrl )
 {
     Exception ex;
-    m_media = libvlc_media_new( libvlcInstance.instance(), psz_mrl, &ex.ex );
+    m_media = libvlc_media_new( libvlcInstance.m_instance, psz_mrl, &ex.ex );
 }
 
 Media::Media( const Media& original )
@@ -98,7 +98,3 @@ void *Media::userData()
     return libvlc_media_get_user_data( m_media );
 }
 
-libvlc_media_t *Media::instance()
-{
-    return m_media;
-}

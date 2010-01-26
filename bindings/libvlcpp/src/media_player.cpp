@@ -29,13 +29,13 @@ using namespace libvlc;
 MediaPlayer::MediaPlayer( libVLC &libvlcInstance )
 {
     Exception ex;
-    m_player = libvlc_media_player_new( libvlcInstance.instance(), &ex.ex );
+    m_player = libvlc_media_player_new( libvlcInstance.m_instance, &ex.ex );
 }
 
 MediaPlayer::MediaPlayer( Media &media )
 {
     Exception ex;
-    m_player = libvlc_media_player_new_from_media( media.instance(), &ex.ex );
+    m_player = libvlc_media_player_new_from_media( media.m_media, &ex.ex );
 }
 
 MediaPlayer::~MediaPlayer()
@@ -45,7 +45,7 @@ MediaPlayer::~MediaPlayer()
 
 void MediaPlayer::setMedia( Media &media )
 {
-    libvlc_media_player_set_media( m_player, media.instance() );
+    libvlc_media_player_set_media( m_player, media.m_media );
 }
 
 int MediaPlayer::isPlaying()

@@ -64,12 +64,6 @@ public:
     const char *chanset();
 
 private:
-    /**
-     * Get the instance of libvlc that cannot be modified
-     * @return the instance of libvlc
-     */
-    libvlc_instance_t *instance();
-
     /** The instance of libvlc */
     libvlc_instance_t *m_instance;
 

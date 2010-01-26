@@ -37,11 +37,6 @@ libVLC::~libVLC()
     libvlc_release( m_instance );
 }
 
-libvlc_instance_t *libVLC::instance()
-{
-    return m_instance;
-}
-
 const char *libVLC::version()
 {
     return libvlc_get_version();
