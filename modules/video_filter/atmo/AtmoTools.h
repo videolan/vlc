@@ -26,11 +26,13 @@ private:
     ~CAtmoTools(void);
 public:
     static EffectMode SwitchEffect(CAtmoDynData *pDynData, EffectMode newEffectMode);
+    static LivePictureSource SwitchLiveSource(CAtmoDynData *pDynData, LivePictureSource newLiveSource);
+
     static void ShowShutdownColor(CAtmoDynData *pDynData);
     static ATMO_BOOL RecreateConnection(CAtmoDynData *pDynData);
 
-    static tColorPacket WhiteCalibration(CAtmoConfig *pAtmoConfig, tColorPacket ColorPacket);
-    static tColorPacket ApplyGamma(CAtmoConfig *pAtmoConfig, tColorPacket ColorPacket);
+    static pColorPacket WhiteCalibration(CAtmoConfig *pAtmoConfig, pColorPacket ColorPacket);
+    static pColorPacket ApplyGamma(CAtmoConfig *pAtmoConfig, pColorPacket ColorPacket);
 
     static int SetChannelAssignment(CAtmoDynData *pDynData, int index);
 

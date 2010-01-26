@@ -27,12 +27,14 @@
 #include <stdlib.h>                                      /* malloc(), free() */
 #include <string.h>
 #include <math.h>                                            /* sin(), cos() */
+#include <assert.h>
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
 
 // #define __ATMO_DEBUG__
+
 // [:Zs]+$
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -48,7 +50,7 @@
 #include "AtmoExternalCaptureInput.h"
 #include "AtmoConfig.h"
 #include "AtmoConnection.h"
-#include "AtmoSerialConnection.h"
+#include "AtmoClassicConnection.h"
 
 
 /*****************************************************************************
@@ -112,6 +114,8 @@ void SaveBitmap(filter_sys_t *p_sys, uint8_t *p_pixels, char *psz_filename);
 #define lvsGDI           0
 #define lvsExternal      1
 
+#define CLASSIC_ATMO_NUM_ZONES  5
+
 
 /*
 strings for settings menus and hints
@@ -121,14 +125,54 @@ strings for settings menus and hints
  "connected to your computer.\n"\
  "AtmoLight is the homegrown version of what Philips calls AmbiLight.\n"\
  "If you need further information feel free to visit us at\n\n"\
- "http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin\n "\
+ "http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin\n"\
  "http://www.vdr-wiki.de/wiki/index.php/AtmoWin\n\n"\
  "You can find there detailed descriptions on how to build it for yourself "\
  "and where to get the required parts.\n" \
  "You can also have a look at pictures and some movies showing such a device " \
  "in live action.")
 
+#define DRIVER_TEXT            N_("Devicetype")
+#define DRIVER_LONGTEXT        N_("Choose your prefered hardware from " \
+                                  "the list, or choose AtmoWin Software " \
+                                  "to delegate processing to the external " \
+                                  "process - with more options")
 
+static const int pi_device_type_values[] = {
+#if defined( WIN32 )
+     0, /* use AtmoWinA.exe userspace driver */
+#endif
+     1, /* AtmoLight classic */
+     2, /* Quattro AtmoLight */
+     3, /* DMX Device */
+     4  /* MoMoLight device */
+};
+static const char *const ppsz_device_type_descriptions[] = {
+#if defined( WIN32 )
+        N_("AtmoWin Software"),
+#endif
+        N_("Classic AtmoLight"),
+        N_("Quattro AtmoLight"),
+        N_("DMX"),
+        N_("MoMoLight")
+};
+
+#define DMX_CHANNELS_TEXT      N_("Count of AtmoLight channels")
+#define DMX_CHANNELS_LONGTEXT  N_("How many AtmoLight channels, should be " \
+                                  "emulated with that DMX device")
+#define DMX_CHBASE_TEXT        N_("DMX address for each channel")
+#define DMX_CHBASE_LONGTEXT    N_("Define here the DMX base address for each " \
+                                  "channel use , or ; to seperate the values")
+
+#define MOMO_CHANNELS_TEXT      N_("Count of channels")
+#define MOMO_CHANNELS_LONGTEXT  N_("Depending on your MoMoLight hardware " \
+                                   "choose 3 or 4 channels")
+
+#if defined( WIN32 )
+#  define DEFAULT_DEVICE   0
+#else
+#  define DEFAULT_DEVICE   1
+#endif
 
 #if defined( __ATMO_DEBUG__ )
 #   define SAVEFRAMES_TEXT     N_("Save Debug Frames")
@@ -145,6 +189,10 @@ strings for settings menus and hints
 #define HEIGHT_TEXT            N_("Extracted Image Height")
 #define HEIGHT_LONGTEXT        N_("The height of the mini image for " \
                                   "further processing (48 is default)")
+
+#define SHOW_DOTS_TEXT         N_("Mark analyzed pixels")
+#define SHOW_DOTS_LONGTEXT     N_("makes the sample grid visible on screen as "\
+                                  "white pixels")
 
 #define PCOLOR_TEXT            N_("Color when paused")
 #define PCOLOR_LONGTEXT        N_("Set the color to show if the user " \
@@ -170,6 +218,19 @@ strings for settings menus and hints
 #define EFADESTEPS_LONGTEXT  N_("Number of steps to change current color to " \
                              "end color for dimming up the light in cinema " \
                              "style... (each step takes 40ms)")
+
+#define ZONE_TOP_TEXT          N_("Number of zones on top")
+#define ZONE_TOP_LONGTEXT      N_("Number of zones on the top of the screen")
+#define ZONE_BOTTOM_TEXT       N_("Number of zones on bottom")
+#define ZONE_BOTTOM_LONGTEXT   N_("Number of zones on the bottom of the screen")
+#define ZONE_LR_TEXT           N_("Zones on left / right side")
+#define ZONE_LR_LONGTEXT       N_("left and right side having allways the " \
+                                  "same number of zones")
+#define ZONE_SUMMARY_TEXT      N_("Calculate a average zone")
+#define ZONE_SUMMARY_LONGTEXT  N_("it contains the average of all pixels " \
+                                  "in the sample image (only useful for " \
+                                  "single channel AtmoLight)")
+
 
 #define USEWHITEADJ_TEXT       N_("Use Software White adjust")
 #define USEWHITEADJ_LONGTEXT   N_("Should the buildin driver do a white " \
@@ -213,10 +274,10 @@ strings for settings menus and hints
 #define MEANPERCENTNEW_TEXT     N_("Filter Smoothness (in %)")
 #define MEANPERCENTNEW_LONGTEXT N_("Filter Smoothness")
 
-/* FIXME: WTF?!! feepk, July 6 '08 */
-#define FILTERMODE_TEXT        N_("Filter mode")
-#define FILTERMODE_LONGTEXT    N_("kind of filtering which should be use to "\
-                                  "calcuate the color output")
+#define FILTERMODE_TEXT        N_("Output Color filter mode")
+#define FILTERMODE_LONGTEXT    N_("defines the how the output color should " \
+                                  "be calculated based on previous color")
+
 static const int pi_filtermode_values[] = {
        (int)afmNoFilter,
        (int)afmCombined,
@@ -228,54 +289,65 @@ static const char *const ppsz_filtermode_descriptions[] = {
         N_("Percent")
 };
 
-#define FRAMEDELAY_TEXT       N_("Frame delay")
+#define FRAMEDELAY_TEXT       N_("Frame delay (ms)")
 #define FRAMEDELAY_LONGTEXT   N_("Helps to get the video output and the light "\
                                  "effects in sync. Values around 20ms should " \
                                  "do the trick.")
 
 
-#define CHANNEL_0_ASSIGN_TEXT N_("Channel summary")
-#define CHANNEL_1_ASSIGN_TEXT N_("Channel left")
-#define CHANNEL_2_ASSIGN_TEXT N_("Channel right")
-#define CHANNEL_3_ASSIGN_TEXT N_("Channel top")
-#define CHANNEL_4_ASSIGN_TEXT N_("Channel bottom")
+#define CHANNEL_0_ASSIGN_TEXT N_("Channel 0: summary")
+#define CHANNEL_1_ASSIGN_TEXT N_("Channel 1: left")
+#define CHANNEL_2_ASSIGN_TEXT N_("Channel 2: right")
+#define CHANNEL_3_ASSIGN_TEXT N_("Channel 3: top")
+#define CHANNEL_4_ASSIGN_TEXT N_("Channel 4: bottom")
 
 #define CHANNELASSIGN_LONGTEXT N_("Maps the hardware channel X to logical "\
-                                  "channel Y to fix wrong wiring :-)")
-static const int pi_channel_assignment_values[] = {
+                                  "zone Y to fix wrong wiring :-)")
+static const int pi_zone_assignment_values[] = {
     -1,
-     0,
-     1,
-     2,
+     4,
      3,
-     4
+     1,
+     0,
+     2
 };
-static const char *const ppsz_channel_assignment_descriptions[] = {
+static const char *const ppsz_zone_assignment_descriptions[] = {
         N_("disabled"),
-        N_("summary"),
-        N_("left"),
-        N_("right"),
-        N_("top"),
-        N_("bottom")
+        N_("Zone 4:summary"),
+        N_("Zone 3:left"),
+        N_("Zone 1:right"),
+        N_("Zone 0:top"),
+        N_("Zone 2:bottom")
 };
+#define CHANNELS_ASSIGN_TEXT        N_("Channel / Zone Assignment")
+#define CHANNELS_ASSIGN_LONGTEXT N_("for devices with more than five " \
+                  "channels / zones write down here for each channel " \
+                  "the zone number to show and seperate the values with " \
+                  ", or ; and use -1 to not use some channels. For the " \
+                  "classic AtmoLight the sequence 4,3,1,0,2 would set the " \
+                  "default channel/zone mapping. " \
+                  "Having only two zones on top, and one zone on left and " \
+                  "right and no summary zone the mapping for classic " \
+                  "AtmoLight would be -1,3,2,1,0")
 
-#define ZONE_0_GRADIENT_TEXT N_("Summary gradient")
-#define ZONE_1_GRADIENT_TEXT N_("Left gradient")
-#define ZONE_2_GRADIENT_TEXT N_("Right gradient")
-#define ZONE_3_GRADIENT_TEXT N_("Top gradient")
-#define ZONE_4_GRADIENT_TEXT N_("Bottom gradient")
+#define ZONE_0_GRADIENT_TEXT N_("Zone 0: Top gradient")
+#define ZONE_1_GRADIENT_TEXT N_("Zone 1: Right gradient")
+#define ZONE_2_GRADIENT_TEXT N_("Zone 2: Bottom gradient")
+#define ZONE_3_GRADIENT_TEXT N_("Zone 3: Left gradient")
+#define ZONE_4_GRADIENT_TEXT N_("Zone 4: Summary gradient")
 #define ZONE_X_GRADIENT_LONG_TEXT N_("Defines a small bitmap with 64x48 "\
                                      "pixels, containing a grayscale gradient")
 
+#define GRADIENT_PATH_TEXT      N_("Gradient bitmap searchpath")
+#define GRADIENT_PATH_LONGTEXT  N_("Now prefered option to assign gradient "\
+    "bitmaps, put them as zone_0.bmp, zone_1.bmp etc. into one folder and "\
+    "set the foldername here")
+
 #if defined( WIN32 )
-#   define ATMOWINEXE_TEXT      N_("Filename of AtmoWinA.exe")
+#   define ATMOWINEXE_TEXT      N_("Filename of AtmoWin*.exe")
 #   define ATMOWINEXE_LONGTEXT  N_("if you want the AtmoLight control "\
                                    "software to be launched by VLC, enter the "\
                                    "complete path of AtmoWinA.exe here.")
-#   define USEBUILDIN_TEXT      N_("Use built-in AtmoLight")
-#   define USEBUILDIN_LONGTEXT N_("VLC will directly use your AtmoLight "\
-                                  "hardware without running the external "\
-                                  "AtmoWinA.exe Userspace driver.")
 #endif
 
 #define CFG_PREFIX "atmo-"
@@ -287,24 +359,22 @@ vlc_module_begin ()
 set_description( N_("AtmoLight Filter") )
 set_help( MODULE_DESCRIPTION )
 set_shortname( N_( "AtmoLight" ))
-set_capability( "video filter2", 0 )
-
 set_category( CAT_VIDEO )
 set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-#if defined(WIN32)
-set_section( N_("Choose between the built-in AtmoLight "\
-                 "driver or the external" ), 0 )
+set_capability( "video filter2", 0 )
 
-/*
-    only on win32 exists the option to use the buildin driver or
-    the more flexible external driver application
-*/
-add_bool(CFG_PREFIX "usebuildin", true, NULL,
-         USEBUILDIN_TEXT, USEBUILDIN_LONGTEXT, false)
+
+set_section( N_("Choose Devicetype and Connection" ), 0 )
+
+add_integer( CFG_PREFIX "device", DEFAULT_DEVICE, NULL,
+            DRIVER_TEXT, DRIVER_LONGTEXT, false )
+change_integer_list( pi_device_type_values,
+                     ppsz_device_type_descriptions, 0 )
+
+#if defined(WIN32)
 add_string(CFG_PREFIX "serialdev", "COM1", NULL,
            SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false )
-
 /*
     on win32 the executeable external driver application
     for automatic start if needed
@@ -312,7 +382,6 @@ add_string(CFG_PREFIX "serialdev", "COM1", NULL,
 add_file(CFG_PREFIX "atmowinexe", NULL, NULL,
          ATMOWINEXE_TEXT, ATMOWINEXE_LONGTEXT, false )
 #else
-set_section( N_("Enter the connection of your AtmoLight hardware" ), 0 )
 add_string(CFG_PREFIX "serialdev", "/dev/ttyS01", NULL,
            SERIALDEV_TEXT, SERIALDEV_LONGTEXT, false )
 #endif
@@ -347,6 +416,65 @@ add_integer_with_range(CFG_PREFIX "ecolor-blue",  192, 0, 255, NULL,
 add_integer_with_range(CFG_PREFIX "efadesteps",    50, 1, 250, NULL,
                        EFADESTEPS_TEXT,   EFADESTEPS_LONGTEXT,    false)
 
+
+set_section( N_("DMX options" ), 0 )
+add_integer_with_range(CFG_PREFIX "dmx-channels",   5, 1, 64, NULL,
+                       DMX_CHANNELS_TEXT, DMX_CHANNELS_LONGTEXT, false)
+add_string(CFG_PREFIX "dmx-chbase", "0,3,6,9,12", NULL,
+                       DMX_CHBASE_TEXT, DMX_CHBASE_LONGTEXT, false )
+
+set_section( N_("MoMoLight options" ), 0 )
+add_integer_with_range(CFG_PREFIX "momo-channels",   3, 3, 4, NULL,
+                       MOMO_CHANNELS_TEXT, MOMO_CHANNELS_LONGTEXT, false)
+
+
+
+/*
+  instead of redefining the original AtmoLight zones with gradient
+  bitmaps, we can now define the layout of the zones useing these
+  parameters - the function with the gradient bitmaps would still
+  work (but for most cases its no longer required)
+
+  short description whats this means - f.e. the classic atmo would
+  have this layout
+  zones-top    = 1  - zone 0
+  zones-lr     = 1  - zone 1 und zone 3
+  zones-bottom = 1  - zone 2
+  zone-summary = true - zone 4
+         Z0
+   ,------------,
+   |            |
+ Z3|     Z4     | Z1
+   |____________|
+         Z2
+
+  the zone numbers will be counted clockwise starting at top / left
+  if you want to split the light at the top, without having a bottom zone
+  (which is my private config)
+
+  zones-top    = 2  - zone 0, zone 1
+  zones-lr     = 1  - zone 2 und zone 3
+  zones-bottom = 0
+  zone-summary = false
+
+      Z0    Z1
+   ,------------,
+   |            |
+ Z3|            | Z2
+   |____________|
+
+*/
+
+set_section( N_("Zone Layout for the build-in Atmo" ), 0 )
+add_integer_with_range(CFG_PREFIX "zones-top",   1, 0, 16, NULL,
+                       ZONE_TOP_TEXT, ZONE_TOP_LONGTEXT, false)
+add_integer_with_range(CFG_PREFIX "zones-bottom",   1, 0, 16, NULL,
+                       ZONE_BOTTOM_TEXT, ZONE_BOTTOM_LONGTEXT, false)
+add_integer_with_range(CFG_PREFIX "zones-lr",   1, 0, 16, NULL,
+                       ZONE_LR_TEXT, ZONE_LR_LONGTEXT, false)
+add_bool(CFG_PREFIX "zone-summary", false, NULL,
+         ZONE_SUMMARY_TEXT, ZONE_SUMMARY_LONGTEXT, false)
+
 /*
  settings only for the buildin driver (if external driver app is used
  these parameters are ignored.)
@@ -355,19 +483,19 @@ add_integer_with_range(CFG_PREFIX "efadesteps",    50, 1, 250, NULL,
 */
 set_section( N_("Settings for the built-in Live Video Processor only" ), 0 )
 
-add_integer_with_range(CFG_PREFIX "EdgeWeightning",   8, 1, 30, NULL,
+add_integer_with_range(CFG_PREFIX "edgeweightning",   3, 1, 30, NULL,
                        EDGE_TEXT, EDGE_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "Brightness",   100, 50, 300, NULL,
+add_integer_with_range(CFG_PREFIX "brightness",   100, 50, 300, NULL,
                        BRIGHTNESS_TEXT, BRIGHTNESS_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "DarknessLimit",   5, 0, 10, NULL,
+add_integer_with_range(CFG_PREFIX "darknesslimit",   3, 0, 10, NULL,
                        DARKNESS_TEXT, DARKNESS_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "HueWinSize",   3, 0, 5, NULL,
+add_integer_with_range(CFG_PREFIX "huewinsize",   3, 0, 5, NULL,
                        HUEWINSIZE_TEXT, HUEWINSIZE_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "SatWinSize",   3, 0, 5, NULL,
+add_integer_with_range(CFG_PREFIX "satwinsize",   3, 0, 5, NULL,
                        SATWINSIZE_TEXT, SATWINSIZE_LONGTEXT, false)
 
 add_integer(CFG_PREFIX "filtermode", (int)afmCombined, NULL,
@@ -375,46 +503,50 @@ add_integer(CFG_PREFIX "filtermode", (int)afmCombined, NULL,
 
 change_integer_list(pi_filtermode_values, ppsz_filtermode_descriptions, NULL )
 
-add_integer_with_range(CFG_PREFIX "MeanLength",    300, 300, 5000, NULL,
+add_integer_with_range(CFG_PREFIX "meanlength",    300, 300, 5000, NULL,
                        MEANLENGTH_TEXT, MEANLENGTH_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "MeanThreshold",  40, 1, 100, NULL,
+add_integer_with_range(CFG_PREFIX "meanthreshold",  40, 1, 100, NULL,
                        MEANTHRESHOLD_TEXT, MEANTHRESHOLD_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "PercentNew", 50, 1, 100, NULL,
+add_integer_with_range(CFG_PREFIX "percentnew", 50, 1, 100, NULL,
                       MEANPERCENTNEW_TEXT, MEANPERCENTNEW_LONGTEXT, false)
 
-add_integer_with_range(CFG_PREFIX "FrameDelay", 18, 0, 35, NULL,
+add_integer_with_range(CFG_PREFIX "framedelay", 18, 0, 200, NULL,
                        FRAMEDELAY_TEXT, FRAMEDELAY_LONGTEXT, false)
 
 /*
   output channel reordering
 */
 set_section( N_("Change channel assignment (fixes wrong wiring)" ), 0 )
-add_integer( CFG_PREFIX "channel_0", 0, NULL,
+add_integer( CFG_PREFIX "channel_0", 4, NULL,
             CHANNEL_0_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
-change_integer_list( pi_channel_assignment_values,
-                     ppsz_channel_assignment_descriptions, 0 )
+change_integer_list( pi_zone_assignment_values,
+                     ppsz_zone_assignment_descriptions, 0 )
 
-add_integer( CFG_PREFIX "channel_1", 1, NULL,
+add_integer( CFG_PREFIX "channel_1", 3, NULL,
             CHANNEL_1_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
-change_integer_list( pi_channel_assignment_values,
-                     ppsz_channel_assignment_descriptions, 0 )
+change_integer_list( pi_zone_assignment_values,
+                     ppsz_zone_assignment_descriptions, 0 )
 
-add_integer( CFG_PREFIX "channel_2", 2, NULL,
+add_integer( CFG_PREFIX "channel_2", 1, NULL,
             CHANNEL_2_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
-change_integer_list( pi_channel_assignment_values,
-                     ppsz_channel_assignment_descriptions, 0 )
+change_integer_list( pi_zone_assignment_values,
+                     ppsz_zone_assignment_descriptions, 0 )
 
-add_integer( CFG_PREFIX "channel_3", 3, NULL,
+add_integer( CFG_PREFIX "channel_3", 0, NULL,
             CHANNEL_3_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
-change_integer_list( pi_channel_assignment_values,
-                     ppsz_channel_assignment_descriptions, 0 )
+change_integer_list( pi_zone_assignment_values,
+                     ppsz_zone_assignment_descriptions, 0 )
 
-add_integer( CFG_PREFIX "channel_4", 4, NULL,
+add_integer( CFG_PREFIX "channel_4", 2, NULL,
             CHANNEL_4_ASSIGN_TEXT, CHANNELASSIGN_LONGTEXT, false )
-change_integer_list( pi_channel_assignment_values,
-                     ppsz_channel_assignment_descriptions, 0 )
+change_integer_list( pi_zone_assignment_values,
+                     ppsz_zone_assignment_descriptions, 0 )
+
+add_string(CFG_PREFIX "channels", NULL, NULL,
+           CHANNELS_ASSIGN_TEXT, CHANNELS_ASSIGN_LONGTEXT, false )
+
 
 /*
   LED color white calibration
@@ -452,7 +584,8 @@ add_file(CFG_PREFIX "gradient_zone_3", NULL, NULL,
          ZONE_3_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
 add_file(CFG_PREFIX "gradient_zone_4", NULL, NULL,
          ZONE_4_GRADIENT_TEXT, ZONE_X_GRADIENT_LONG_TEXT, true )
-
+add_directory(CFG_PREFIX "gradient_path", NULL, NULL,
+           GRADIENT_PATH_TEXT, GRADIENT_PATH_LONGTEXT, false )
 
 #if defined(__ATMO_DEBUG__)
 add_bool(CFG_PREFIX "saveframes", false, NULL,
@@ -468,37 +601,43 @@ add_integer_with_range(CFG_PREFIX "width",  64, 64, 512, NULL,
                        WIDTH_TEXT,  WIDTH_LONGTEXT, true)
 add_integer_with_range(CFG_PREFIX "height", 48, 48, 384, NULL,
                        HEIGHT_TEXT,  HEIGHT_LONGTEXT, true)
-
+add_bool(CFG_PREFIX "showdots", false, NULL,
+                   SHOW_DOTS_TEXT, SHOW_DOTS_LONGTEXT, false)
 add_shortcut( "atmo" )
 set_callbacks( CreateFilter, DestroyFilter  )
 vlc_module_end ()
 
 
 static const char *const ppsz_filter_options[] = {
-#if defined(WIN32)
-        "usebuildin",
-#endif
+        "device",
+
         "serialdev",
 
 
-        "EdgeWeightning",
-        "Brightness",
-        "DarknessLimit",
-        "HueWinSize",
-        "SatWinSize",
+        "edgeweightning",
+        "brightness",
+        "darknesslimit",
+        "huewinsize",
+        "satwinsize",
 
         "filtermode",
 
-        "MeanLength",
-        "MeanThreshold",
-        "PercentNew",
-        "FrameDelay",
+        "meanlength",
+        "meanthreshold",
+        "percentnew",
+        "framedelay",
+
+        "zones-top",
+        "zones-bottom",
+        "zones-lr",
+        "zone-summary",
 
         "channel_0",
         "channel_1",
         "channel_2",
         "channel_3",
         "channel_4",
+        "channels",
 
         "whiteadj",
         "white-red",
@@ -516,9 +655,11 @@ static const char *const ppsz_filter_options[] = {
         "ecolor-blue",
         "efadesteps",
 
+        "dmx-channels",
+        "dmx-chbase",
+        "momo-channels",
 
 #if defined(WIN32 )
-        "usebuildin",
         "atmowinexe",
 #endif
 #if defined(__ATMO_DEBUG__)
@@ -527,11 +668,13 @@ static const char *const ppsz_filter_options[] = {
 #endif
         "width",
         "height",
+        "showdots",
         "gradient_zone_0",
         "gradient_zone_1",
         "gradient_zone_2",
         "gradient_zone_3",
         "gradient_zone_4",
+        "gradient_path",
         NULL
 };
 
@@ -574,13 +717,21 @@ struct filter_sys_t
     bool b_enabled;
     int32_t i_AtmoOldEffect;
     bool b_pause_live;
+    bool b_show_dots;
+    int32_t i_device_type;
 
     int32_t i_atmo_width;
     int32_t i_atmo_height;
+    /* used to disable fadeout if less than 50 frames are processed
+       used to avoid long time waiting when switch quickly between
+       deinterlaceing modes, where the output filter chains is rebuild
+       on each switch
+    */
+    int32_t i_frames_processed;
 
 #if defined(__ATMO_DEBUG__)
     bool  b_saveframes;
-    int i_framecounter;
+    uint32_t ui_frame_counter;
     char sz_framepath[MAX_PATH];
 #endif
 
@@ -635,6 +786,7 @@ struct filter_sys_t
                                                   int32_t , int32_t);
     uint8_t* (*pf_ctrl_atmo_lock_transfer_buffer) (void);
     void (*pf_ctrl_atmo_send_pixel_data) (void);
+    void (*pf_ctrl_atmo_get_image_size)(int32_t *,int32_t *);
 #endif
 };
 
@@ -656,18 +808,14 @@ static int32_t AtmoInitialize(filter_t *p_filter, bool b_for_thread)
         {
             /* open com port */
             /* setup Output Threads ... */
-            msg_Dbg( p_filter, "open serial connection %s",
-                p_sys->p_atmo_config->getSerialDevice());
-
-            if(CAtmoTools::RecreateConnection(p_sys->p_atmo_dyndata) == ATMO_TRUE)
+            msg_Dbg( p_filter, "open atmo device...");
+            if(CAtmoTools::RecreateConnection(p_sys->p_atmo_dyndata)
+               == ATMO_TRUE)
             {
-                msg_Dbg( p_filter, "start live view thread ...");
-                CAtmoTools::SwitchEffect(p_sys->p_atmo_dyndata, emLivePicture);
-                msg_Dbg( p_filter, "live view thread launched...");
                 return 1;
-
             } else {
-                msg_Err( p_filter,"failed to open serial device? some other software/driver may use it?");
+                msg_Err( p_filter,"failed to open atmo device, "\
+                                  "some other software/driver may use it?");
             }
         }
 #if defined(WIN32)
@@ -697,6 +845,15 @@ static void AtmoFinalize(filter_t *p_filter, int32_t what)
             {
                 p_atmo_dyndata->LockCriticalSection();
 
+                CAtmoInput *p_input = p_atmo_dyndata->getLiveInput();
+                p_atmo_dyndata->setLiveInput( NULL );
+                if(p_input != NULL)
+                {
+                    p_input->Terminate();
+                    delete p_input;
+                    msg_Dbg( p_filter, "input thread died peacefully");
+                }
+
                 CThread *p_effect_thread = p_atmo_dyndata->getEffectThread();
                 p_atmo_dyndata->setEffectThread(NULL);
                 if(p_effect_thread != NULL)
@@ -708,6 +865,15 @@ static void AtmoFinalize(filter_t *p_filter, int32_t what)
                     p_effect_thread->Terminate();
                     delete p_effect_thread;
                     msg_Dbg( p_filter, "effect thread died peacefully");
+                }
+
+                CAtmoPacketQueue *p_queue =
+                                           p_atmo_dyndata->getLivePacketQueue();
+                p_atmo_dyndata->setLivePacketQueue( NULL );
+                if(p_queue != NULL)
+                {
+                   delete p_queue;
+                   msg_Dbg( p_filter, "packetqueue removed");
                 }
 
                 /*
@@ -734,27 +900,22 @@ static void AtmoFinalize(filter_t *p_filter, int32_t what)
 }
 
 /*
-switch the current light effect - does only something on win32, with the
-external  libraries - if the buildin effects are used nothing happens
+  switch the current light effect to LiveView
 */
 static int32_t AtmoSwitchEffect(filter_t *p_filter, int32_t newMode)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
+
+    msg_Dbg( p_filter, "AtmoSwitchEffect %d", newMode );
+
     if(p_sys->p_atmo_config)
     {
-        /*
-        buildin driver
-
-        doesnt know different modes for effects so this
-        function call would just do nothing special
-        in this case
-        */
-
+       return CAtmoTools::SwitchEffect(p_sys->p_atmo_dyndata, emLivePicture);
 #if defined(WIN32)
     } else if(p_sys->pf_ctrl_atmo_switch_effect)
     {
         /* on win32 with active ctrl dll */
-        return p_sys->pf_ctrl_atmo_switch_effect(newMode);
+        return p_sys->pf_ctrl_atmo_switch_effect( newMode );
 #endif
     }
     return emDisabled;
@@ -768,6 +929,9 @@ happens...
 static int32_t AtmoSetLiveSource(filter_t *p_filter, int32_t newSource)
 {
     filter_sys_t *p_sys = p_filter->p_sys;
+
+    msg_Dbg( p_filter, "AtmoSetLiveSource %d", newSource );
+
     if(p_sys->p_atmo_config)
     {
         /*
@@ -865,33 +1029,28 @@ static void AtmoSendPixelData(filter_t *p_filter)
     if(p_sys->p_atmo_config && p_sys->p_atmo_transfer_buffer)
     {
         CAtmoDynData *p_atmo_dyndata = p_sys->p_atmo_dyndata;
-        if(p_atmo_dyndata)
+        if(p_atmo_dyndata &&
+          (p_atmo_dyndata->getLivePictureSource() == lpsExtern))
         {
             /*
             the cast will go Ok because we are inside videolan there is only
             this kind of effect thread implemented!
             */
+            CAtmoExternalCaptureInput *p_atmo_external_capture_input_thread =
+                (CAtmoExternalCaptureInput *)p_atmo_dyndata->getLiveInput();
 
-            CAtmoLiveView *p_atmo_live_view_thread =
-                (CAtmoLiveView *)p_atmo_dyndata->getEffectThread();
-            if(p_atmo_live_view_thread)
+            if(p_atmo_external_capture_input_thread)
             {
                 /*
                 the same as above inside videolan only this single kind of
                 input exists so we can cast without further tests!
+
+                this call will do a 1:1 copy of this buffer, and wakeup
+                the thread from normal sleeping
                 */
-                CAtmoExternalCaptureInput *p_atmo_external_capture_input_thread =
-                    (CAtmoExternalCaptureInput *)p_atmo_live_view_thread->getAtmoInput();
-                if(p_atmo_external_capture_input_thread)
-                {
-                    /*
-                    this call will do a 1:1 copy of this buffer, and wakeup
-                    the thread from normal sleeping
-                    */
-                    p_atmo_external_capture_input_thread->
-                        DeliverNewSourceDataPaket(&p_sys->mini_image_format,
-                        p_sys->p_atmo_transfer_buffer);
-                }
+                p_atmo_external_capture_input_thread->
+                     DeliverNewSourceDataPaket(&p_sys->mini_image_format,
+                                               p_sys->p_atmo_transfer_buffer);
             }
         }
 #if defined(WIN32)
@@ -900,6 +1059,9 @@ static void AtmoSendPixelData(filter_t *p_filter)
         /* on win32 with active ctrl dll */
         p_sys->pf_ctrl_atmo_send_pixel_data();
 #endif
+    } else
+    {
+       msg_Warn( p_filter, "AtmoSendPixelData no method");
     }
 }
 
@@ -914,60 +1076,70 @@ static void Atmo_Shutdown(filter_t *p_filter)
 
     if(p_sys->b_enabled == true)
     {
+        msg_Dbg( p_filter, "shut down atmo!");
         /*
         if there is a still running show pause color thread kill him!
         */
         CheckAndStopFadeThread(p_filter);
 
-        if(p_sys->p_atmo_config || (p_sys->i_AtmoOldEffect == emStaticColor))
+        // perpare spawn fadeing thread
+        vlc_mutex_lock( &p_sys->filter_lock );
+
+        /*
+        fade to end color (in case of external AtmoWin Software
+        assume that the static color will equal to this
+        one to get a soft change and no flash!
+        */
+        p_sys->b_pause_live = true;
+
+
+        p_sys->p_fadethread = (fadethread_t *)vlc_object_create( p_filter,
+                                                    sizeof(fadethread_t) );
+
+        p_sys->p_fadethread->p_filter = p_filter;
+        p_sys->p_fadethread->ui_red   = p_sys->ui_endcolor_red;
+        p_sys->p_fadethread->ui_green = p_sys->ui_endcolor_green;
+        p_sys->p_fadethread->ui_blue  = p_sys->ui_endcolor_blue;
+        if(p_sys->i_frames_processed < 50)
+          p_sys->p_fadethread->i_steps  = 1;
+        else
+          p_sys->p_fadethread->i_steps  = p_sys->i_endfadesteps;
+
+        if( vlc_thread_create( p_sys->p_fadethread,
+            "AtmoLight fadeing",
+            FadeToColorThread,
+            VLC_THREAD_PRIORITY_LOW ) )
         {
-            /*
-            fade to end color (in case of external AtmoWin Software
-            assume that the static color will equal to this
-            one to get a soft change and no flash!
-            */
-            p_sys->b_pause_live = true;
+            msg_Err( p_filter, "cannot create FadeToColorThread" );
+            vlc_object_release( p_sys->p_fadethread );
+            p_sys->p_fadethread = NULL;
+            vlc_mutex_unlock( &p_sys->filter_lock );
 
-            // perpare spawn fadeing thread
-            vlc_mutex_lock( &p_sys->filter_lock );
+        } else {
 
-            p_sys->p_fadethread = (fadethread_t *)vlc_object_create( p_filter,
-                                                        sizeof(fadethread_t) );
+            vlc_mutex_unlock( &p_sys->filter_lock );
 
-            p_sys->p_fadethread->p_filter = p_filter;
-            p_sys->p_fadethread->ui_red   = p_sys->ui_endcolor_red;
-            p_sys->p_fadethread->ui_green = p_sys->ui_endcolor_green;
-            p_sys->p_fadethread->ui_blue  = p_sys->ui_endcolor_blue;
-            p_sys->p_fadethread->i_steps  = p_sys->i_endfadesteps;
+            /* wait for the thread... */
+            vlc_thread_join(p_sys->p_fadethread);
 
-            if( vlc_thread_create( p_sys->p_fadethread,
-                "AtmoLight fadeing",
-                FadeToColorThread,
-                VLC_THREAD_PRIORITY_LOW ) )
-            {
-                msg_Err( p_filter, "cannot create FadeToColorThread" );
-                vlc_object_release( p_sys->p_fadethread );
-                p_sys->p_fadethread = NULL;
-                vlc_mutex_unlock( &p_sys->filter_lock );
+            vlc_object_release(p_sys->p_fadethread);
 
-            } else {
-
-                vlc_mutex_unlock( &p_sys->filter_lock );
-
-                /* wait for the thread... */
-                vlc_thread_join(p_sys->p_fadethread);
-
-                vlc_object_release(p_sys->p_fadethread);
-
-                p_sys->p_fadethread = NULL;
-            }
+            p_sys->p_fadethread = NULL;
         }
 
-        if(p_sys->i_AtmoOldEffect != emLivePicture)
-            AtmoSwitchEffect(p_filter, p_sys->i_AtmoOldEffect);
-        else
-            AtmoSetLiveSource(p_filter, lvsGDI);
+        /*
+           the following happens only useing the
+           external AtmoWin Device Software
+        */
+        if( !p_sys->p_atmo_config )
+        {
+           if(p_sys->i_AtmoOldEffect != emLivePicture)
+              AtmoSwitchEffect( p_filter, p_sys->i_AtmoOldEffect);
+           else
+              AtmoSetLiveSource( p_filter, lvsGDI );
+        }
 
+        /* close device connection etc. */
         AtmoFinalize(p_filter, 1);
 
         /* disable filter method .. */
@@ -976,13 +1148,397 @@ static void Atmo_Shutdown(filter_t *p_filter)
 }
 
 /*
+depending on mode setup imagesize to 64x48(classic), or defined
+resolution of external atmowin.exe on windows
+*/
+static void Atmo_SetupImageSize(filter_t *p_filter)
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+    /*
+       size of extracted image by default 64x48 (other imagesizes are
+       currently ignored by AtmoWin)
+    */
+    p_sys->i_atmo_width  = var_CreateGetIntegerCommand( p_filter,
+        CFG_PREFIX "width");
+    p_sys->i_atmo_height = var_CreateGetIntegerCommand( p_filter,
+        CFG_PREFIX "height");
+
+    if(p_sys->p_atmo_config)
+    {
+#if defined(WIN32)
+    } else if(p_sys->pf_ctrl_atmo_get_image_size)
+    {
+        /* on win32 with active ctrl dll */
+        p_sys->pf_ctrl_atmo_get_image_size( &p_sys->i_atmo_width,
+                                            &p_sys->i_atmo_height );
+#endif
+    }
+
+    msg_Dbg(p_filter,"sample image size %d * %d pixels", p_sys->i_atmo_width,
+        p_sys->i_atmo_height);
+}
+
+/*
+initialize the zone and channel mapping for the buildin atmolight adapter
+*/
+static void Atmo_SetupBuildZones(filter_t *p_filter)
+{
+    filter_sys_t *p_sys = p_filter->p_sys;
+
+    p_sys->p_atmo_dyndata->LockCriticalSection();
+
+    CAtmoConfig *p_atmo_config = p_sys->p_atmo_config;
+
+
+    CAtmoChannelAssignment *p_channel_assignment =
+                            p_atmo_config->getChannelAssignment(0);
+
+    // channel 0 - zone 4
+    p_channel_assignment->setZoneIndex( 0, var_CreateGetIntegerCommand(
+                                        p_filter, CFG_PREFIX "channel_0")
+                                        );
+
+    // channel 1 - zone 3
+    p_channel_assignment->setZoneIndex( 1, var_CreateGetIntegerCommand(
+                                        p_filter, CFG_PREFIX "channel_1")
+                                        );
+
+    // channel 2 - zone 1
+    p_channel_assignment->setZoneIndex( 2, var_CreateGetIntegerCommand(
+                                        p_filter, CFG_PREFIX "channel_2")
+                                        );
+
+    // channel 3 - zone 0
+    p_channel_assignment->setZoneIndex( 3, var_CreateGetIntegerCommand(
+                                        p_filter, CFG_PREFIX "channel_3")
+                                        );
+
+    // channel 4 - zone 2
+    p_channel_assignment->setZoneIndex( 4, var_CreateGetIntegerCommand(
+                                        p_filter, CFG_PREFIX "channel_4")
+                                        );
+
+    char *psz_channels = var_CreateGetStringCommand(
+              p_filter,
+              CFG_PREFIX "channels"
+            );
+    if( psz_channels && strlen(psz_channels) > 0 )
+    {
+        msg_Dbg( p_filter, "deal with new zone mapping %s", psz_channels );
+        int channel = 0;
+        char *psz_temp = psz_channels;
+        char *psz_start = psz_temp;
+        while( *psz_temp )
+        {
+            if(*psz_temp == ',' || *psz_temp == ';')
+            {
+                *psz_temp = 0;
+                if(*psz_start)
+                {
+                    int zone = atoi( psz_start );
+                    if( zone < -1 ||
+                        zone >= p_channel_assignment->getSize()) {
+                         msg_Warn( p_filter, "Zone %d out of range -1..%d",
+                                zone, p_channel_assignment->getSize()-1 );
+                    } else {
+                        p_channel_assignment->setZoneIndex( channel, zone );
+                        channel++;
+                    }
+                }
+                psz_start = psz_temp;
+                psz_start++;
+            }
+
+            psz_temp++;
+        }
+
+        /*
+          process the rest of the string
+        */
+        if( *psz_start && !*psz_temp )
+        {
+            int zone = atoi( psz_start );
+            if( zone < -1 ||
+                zone >= p_channel_assignment->getSize()) {
+                msg_Warn( p_filter, "Zone %d out of range -1..%d",
+                            zone, p_channel_assignment->getSize()-1 );
+            } else {
+                p_channel_assignment->setZoneIndex( channel, zone );
+            }
+        }
+    }
+    free( psz_channels );
+
+    for(int i=0;i< p_channel_assignment->getSize() ;i++)
+        msg_Info( p_filter, "map zone %d to hardware channel %d",
+        p_channel_assignment->getZoneIndex( i ),
+        i
+        );
+    p_sys->p_atmo_dyndata->getAtmoConnection()
+         ->SetChannelAssignment( p_channel_assignment );
+
+
+
+
+
+    /*
+      calculate the default gradients for each zone!
+      depending on the zone layout set before, this now
+      supports also multiple gradients on each side
+      (older versions could do this only with external
+      gradient bitmaps)
+    */
+    p_sys->p_atmo_dyndata->CalculateDefaultZones();
+
+
+    /*
+      first try to load the old style defined gradient bitmaps
+      this could only be done for the first five zones
+      - should be deprecated -
+    */
+    CAtmoZoneDefinition *p_zone;
+    char psz_gradient_var_name[30];
+    char *psz_gradient_file;
+    for(int i=0;i<CLASSIC_ATMO_NUM_ZONES;i++)
+    {
+        sprintf(psz_gradient_var_name, CFG_PREFIX "gradient_zone_%d", i);
+        psz_gradient_file = var_CreateGetStringCommand(
+            p_filter,
+            psz_gradient_var_name
+            );
+        if(psz_gradient_file && strlen(psz_gradient_file)>0)
+        {
+            msg_Dbg( p_filter, "loading gradientfile %s for "\
+                                "zone %d", psz_gradient_file, i);
+
+            p_zone = p_atmo_config->getZoneDefinition(i);
+            if( p_zone )
+            {
+                int i_res = p_zone->LoadGradientFromBitmap(psz_gradient_file);
+
+                if(i_res != ATMO_LOAD_GRADIENT_OK)
+                {
+                    msg_Err( p_filter,"failed to load gradient '%s' with "\
+                                    "error %d",psz_gradient_file,i_res);
+                }
+            }
+        }
+        free( psz_gradient_file );
+    }
+
+
+    /*
+      the new approach try to load a gradient bitmap for each zone
+      from a previously defined folder containing
+      zone_0.bmp
+      zone_1.bmp
+      zone_2.bmp etc.
+    */
+    char *psz_gradient_path = var_CreateGetStringCommand(
+              p_filter,
+              CFG_PREFIX "gradient_path"
+            );
+    if( psz_gradient_path && strlen(psz_gradient_path) > 0 )
+    {
+        char *psz_file_name = (char *)malloc( strlen(psz_gradient_path) + 16 );
+        assert( psz_file_name );
+
+        for(int i=0; i < p_atmo_config->getZoneCount(); i++ )
+        {
+            p_zone = p_atmo_config->getZoneDefinition(i);
+
+            if( p_zone )
+            {
+                sprintf(psz_file_name, "%s%szone_%d.bmp",
+                                            psz_gradient_path, DIR_SEP, i );
+
+                int i_res = p_zone->LoadGradientFromBitmap( psz_file_name );
+
+                if( i_res == ATMO_LOAD_GRADIENT_OK )
+                {
+                msg_Dbg( p_filter, "loaded gradientfile %s for "\
+                                   "zone %d", psz_file_name, i);
+                }
+
+                if( (i_res != ATMO_LOAD_GRADIENT_OK) &&
+                    (i_res != ATMO_LOAD_GRADIENT_FILENOTFOND) )
+                {
+                    msg_Err( p_filter,"failed to load gradient '%s' with "\
+                                    "error %d",psz_file_name,i_res);
+                }
+            }
+        }
+
+        free( psz_file_name );
+    }
+    free( psz_gradient_path );
+
+
+    p_sys->p_atmo_dyndata->UnLockCriticalSection();
+
+}
+
+static void Atmo_SetupConfig(filter_t *p_filter, CAtmoConfig *p_atmo_config)
+{
+    /*
+       figuring out the device ports (com-ports, ttys)
+    */
+    char *psz_serialdev = var_CreateGetStringCommand( p_filter,
+                                                      CFG_PREFIX "serialdev" );
+    char *psz_temp = psz_serialdev;
+
+    if( psz_temp && strlen(psz_temp) > 0 )
+    {
+        char *psz_token;
+        int i_port = 0;
+        int i;
+        int j;
+
+        msg_Dbg( p_filter, "use port(s) %s",psz_serialdev);
+
+        /*
+          psz_serialdev - may contain up to 4 COM ports for the quattro device
+          the quattro device is just hack of useing 4 classic devices as one
+          logical device - thanks that usb-com-ports exists :)
+          as Seperator I defined , or ; with the hope that these
+          characters are never part of a device name
+        */
+        while( (psz_token = strsep(&psz_temp, ",;")) != NULL && i_port < 4 )
+        {
+            /*
+              psz_token may contain spaces we have to trim away
+            */
+            i = 0;
+            j = 0;
+            /*
+              find first none space in string
+            */
+            while( psz_token[i] == 32 ) i++;
+            /*
+              contains string only spaces or is empty? skip it
+            */
+            if( !psz_token[i] )
+                continue;
+
+            /*
+              trim
+            */
+            while( psz_token[i] && psz_token[i] != 32 )
+                psz_token[ j++ ] = psz_token[ i++ ];
+            psz_token[j++] = 0;
+
+            msg_Dbg( p_filter, "Serial Device [%d]: %s", i_port, psz_token );
+
+            p_atmo_config->setSerialDevice( i_port, psz_token );
+
+            i_port++;
+        }
+    }
+    else
+    {
+       msg_Err(p_filter,"no serial devicename(s) set");
+    }
+    free( psz_serialdev );
+
+    /*
+      configuration of light source layout arround the display
+    */
+    p_atmo_config->setZonesTopCount(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "zones-top")
+        );
+    p_atmo_config->setZonesBottomCount(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "zones-bottom")
+        );
+    p_atmo_config->setZonesLRCount(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "zones-lr")
+        );
+    p_atmo_config->setZoneSummary(
+        var_CreateGetBoolCommand( p_filter, CFG_PREFIX "zone-summary")
+        );
+
+
+    p_atmo_config->setLiveViewFilterMode(
+        (AtmoFilterMode)var_CreateGetIntegerCommand( p_filter,
+                                                CFG_PREFIX "filtermode")
+        );
+
+    p_atmo_config->setLiveViewFilter_PercentNew(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "percentnew")
+        );
+    p_atmo_config->setLiveViewFilter_MeanLength(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "meanlength")
+        );
+    p_atmo_config->setLiveViewFilter_MeanThreshold(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "meanthreshold")
+        );
+
+    p_atmo_config->setLiveView_EdgeWeighting(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "edgeweightning")
+        );
+    p_atmo_config->setLiveView_BrightCorrect(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "brightness")
+        );
+    p_atmo_config->setLiveView_DarknessLimit(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "darknesslimit")
+        );
+    p_atmo_config->setLiveView_HueWinSize(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "huewinsize")
+        );
+    p_atmo_config->setLiveView_SatWinSize(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "satwinsize")
+        );
+
+    /* currently not required inside vlc */
+    p_atmo_config->setLiveView_WidescreenMode( 0 );
+
+    p_atmo_config->setLiveView_FrameDelay(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "framedelay")
+        );
+
+
+    p_atmo_config->setUseSoftwareWhiteAdj(
+        var_CreateGetBoolCommand( p_filter, CFG_PREFIX "whiteadj")
+        );
+    p_atmo_config->setWhiteAdjustment_Red(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "white-red")
+        );
+    p_atmo_config->setWhiteAdjustment_Green(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "white-green")
+        );
+    p_atmo_config->setWhiteAdjustment_Blue(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "white-blue")
+        );
+
+    /*
+      settings for DMX device only
+    */
+    p_atmo_config->setDMX_RGB_Channels(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "dmx-channels")
+        );
+
+    char *psz_chbase = var_CreateGetStringCommand( p_filter,
+                                                   CFG_PREFIX "dmx-chbase" );
+    if( psz_chbase && strlen(psz_chbase) > 0 )
+        p_atmo_config->setDMX_BaseChannels( psz_chbase );
+
+    free( psz_chbase );
+
+    /*
+      momolight options
+    */
+    p_atmo_config->setMoMo_Channels(
+        var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "momo-channels")
+       );
+}
+
+
+/*
 initialize the filter_sys_t structure with the data from the settings
 variables - if the external filter on win32 is enabled try loading the DLL,
 if this fails fallback to the buildin software
 */
 static void Atmo_SetupParameters(filter_t *p_filter)
 {
-    bool b_use_buildin_driver = true;
     char *psz_path;
     filter_sys_t *p_sys =  p_filter->p_sys;
 
@@ -994,8 +1550,16 @@ static void Atmo_SetupParameters(filter_t *p_filter)
     p_sys->i_atmo_width          = 64;
     p_sys->i_atmo_height         = 48;
 
+    p_sys->i_device_type = var_CreateGetIntegerCommand( p_filter,
+                                                        CFG_PREFIX "device");
 
-    vlc_mutex_init( &p_sys->filter_lock );
+    /*
+      i_device_type
+       0 => use AtmoWin Software (only win32)
+       1 => use AtmoClassicConnection (direct)
+       2 => use AtmoMultiConnection (direct up to four serial ports required)
+       3 => use AtmoDmxConnection (simple serial DMX Device up to 255 channels)
+    */
 
 
 #if defined(WIN32)
@@ -1003,16 +1567,45 @@ static void Atmo_SetupParameters(filter_t *p_filter)
     only on WIN32 the user has the choice between
     internal driver and external
     */
-    b_use_buildin_driver = var_CreateGetBoolCommand( p_filter,
-        CFG_PREFIX "usebuildin" );
 
-    if(b_use_buildin_driver == false) {
+    if(p_sys->i_device_type == 0) {
 
         /* Load the Com Wrapper Library (source available) */
         p_sys->h_AtmoCtrl = LoadLibraryA("AtmoCtrlLib.dll");
+        if(p_sys->h_AtmoCtrl == NULL)
+        {
+            /*
+              be clever if the location of atmowina.exe is set
+              try to load the dll from the same folder :-)
+            */
+            char *psz_path = var_CreateGetStringCommand( p_filter,
+                                               CFG_PREFIX "atmowinexe" );
+            if( psz_path && strlen(psz_path) > 0 )
+            {
+                char *psz_bs = strrchr( psz_path , '\\');
+                if( psz_bs )
+                {
+                    *psz_bs = 0;
+                    /*
+                      now format a new dll filename with complete path
+                    */
+                    char *psz_dllname = NULL;
+                    asprintf( &psz_dllname, "%s\\AtmoCtrlLib.dll", psz_path );
+                    if( psz_dllname )
+                    {
+                        msg_Dbg( p_filter, "Try Loading '%s'", psz_dllname );
+                        p_sys->h_AtmoCtrl = LoadLibraryA( psz_dllname );
+                    }
+                    free( psz_dllname );
+                }
+            }
+            free( psz_path );
+        }
+
+
         if(p_sys->h_AtmoCtrl != NULL)
         {
-            msg_Dbg( p_filter, "LoadLibrary('AtmoCtrlLib.dll'); Success");
+            msg_Dbg( p_filter, "Load Library ok!");
 
             /* importing all required functions I hope*/
             p_sys->pf_ctrl_atmo_initialize =
@@ -1049,155 +1642,71 @@ static void Atmo_SetupParameters(filter_t *p_filter)
                 (void (*)(void))GetProcAddress(p_sys->h_AtmoCtrl,"AtmoSendPixelData");
             if(!p_sys->pf_ctrl_atmo_send_pixel_data)
                 msg_Err( p_filter, "export AtmoSendPixelData missing.");
+
+            p_sys->pf_ctrl_atmo_get_image_size =
+                (void (*)(int32_t*,int32_t*))GetProcAddress(p_sys->h_AtmoCtrl,"AtmoWinGetImageSize");
+            if(!p_sys->pf_ctrl_atmo_get_image_size)
+                msg_Err( p_filter, "export AtmoWinGetImageSize missing.");
+
         } else {
             /* the DLL is missing try internal filter ...*/
-            msg_Warn( p_filter, "AtmoCtrlLib.dll missing fallback to internal driver");
-            b_use_buildin_driver = true;
+            msg_Warn( p_filter, "AtmoCtrlLib.dll missing fallback to internal atmo classic driver");
+            p_sys->i_device_type = 1;
         }
     }
 #endif
 
-
-    if(b_use_buildin_driver == true) {
-        msg_Dbg( p_filter, "use buildin driver");
+    if(p_sys->i_device_type >= 1) {
+        msg_Dbg( p_filter, "try use buildin driver %d ", p_sys->i_device_type );
         /*
         now we have to read a lof of options from the config dialog
         most important the serial device if not set ... we can skip
         the rest and disable the filter...
         */
-        char *psz_serialdev = var_CreateGetStringCommand( p_filter,
-                                                      CFG_PREFIX "serialdev" );
-        if(psz_serialdev && (strlen(psz_serialdev)>0)) {
-            msg_Dbg( p_filter, "use buildin driver on port %s",psz_serialdev);
 
-            p_sys->p_atmo_config = new CAtmoConfig();
+        p_sys->p_atmo_config = new CAtmoConfig();
 
-            p_sys->p_atmo_config->setSerialDevice(psz_serialdev);
+        p_sys->p_atmo_dyndata = new CAtmoDynData(
+                   (vlc_object_t *)p_filter,
+                   p_sys->p_atmo_config
+        );
 
-            p_sys->p_atmo_config->setLiveViewFilterMode(
-                (AtmoFilterMode)var_CreateGetIntegerCommand( p_filter,
-                                                       CFG_PREFIX "filtermode")
-                );
+        Atmo_SetupConfig( p_filter, p_sys->p_atmo_config );
+        switch(p_sys->i_device_type)
+        {
+            case 1:
+                p_sys->p_atmo_config->setConnectionType( actClassicAtmo );
+                break;
 
-            p_sys->p_atmo_config->setLiveViewFilter_PercentNew(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "PercentNew")
-                );
-            p_sys->p_atmo_config->setLiveViewFilter_MeanLength(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "MeanLength")
-                );
-            p_sys->p_atmo_config->setLiveViewFilter_MeanThreshold(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "MeanThreshold")
-                );
+            case 2:
+                p_sys->p_atmo_config->setConnectionType( actMultiAtmo );
+                break;
 
-            p_sys->p_atmo_config->setLiveView_EdgeWeighting(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "EdgeWeightning")
-                );
-            p_sys->p_atmo_config->setLiveView_BrightCorrect(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "Brightness")
-                );
-            p_sys->p_atmo_config->setLiveView_DarknessLimit(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "DarknessLimit")
-                );
-            p_sys->p_atmo_config->setLiveView_HueWinSize(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "HueWinSize")
-                );
-            p_sys->p_atmo_config->setLiveView_SatWinSize(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "SatWinSize")
-                );
+            case 3:
+                p_sys->p_atmo_config->setConnectionType( actDMX );
+                break;
 
-            /* currently not required inside vlc */
-            p_sys->p_atmo_config->setLiveView_WidescreenMode( 0 );
+            case 4:
+                p_sys->p_atmo_config->setConnectionType( actMoMoLight );
+                break;
 
-            p_sys->p_atmo_config->setLiveView_FrameDelay(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "FrameDelay")
-                );
-
-
-            p_sys->p_atmo_config->setUseSoftwareWhiteAdj(
-                var_CreateGetBoolCommand( p_filter, CFG_PREFIX "whiteadj")
-                );
-            p_sys->p_atmo_config->setWhiteAdjustment_Red(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "white-red")
-                );
-            p_sys->p_atmo_config->setWhiteAdjustment_Green(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "white-green")
-                );
-            p_sys->p_atmo_config->setWhiteAdjustment_Blue(
-                var_CreateGetIntegerCommand( p_filter, CFG_PREFIX "white-blue")
-                );
-
-            tChannelAssignment *p_channel_assignment =
-                                 p_sys->p_atmo_config->getChannelAssignment(0);
-
-            p_channel_assignment->mappings[0] = var_CreateGetIntegerCommand(
-                                             p_filter, CFG_PREFIX "channel_0");
-
-            p_channel_assignment->mappings[1] = var_CreateGetIntegerCommand(
-                                             p_filter, CFG_PREFIX "channel_1");
-
-            p_channel_assignment->mappings[2] = var_CreateGetIntegerCommand(
-                                             p_filter, CFG_PREFIX "channel_2");
-
-            p_channel_assignment->mappings[3] = var_CreateGetIntegerCommand(
-                                             p_filter, CFG_PREFIX "channel_3");
-
-            p_channel_assignment->mappings[4] = var_CreateGetIntegerCommand(
-                                             p_filter, CFG_PREFIX "channel_4");
-
-            for(int i=0;i<ATMO_NUM_CHANNELS;i++)
-                msg_Dbg( p_filter, "map software channel %d to hardware channel %d",
-                p_channel_assignment->mappings[i],
-                i
-                );
-
-            // gradient_zone_0
-            char psz_gradient_var_name[30];
-            char *psz_gradient_file;
-            for(int i=0;i<ATMO_NUM_CHANNELS;i++)
-            {
-                sprintf(psz_gradient_var_name, CFG_PREFIX "gradient_zone_%d", i);
-                psz_gradient_file = var_CreateGetStringCommand(
-                    p_filter,
-                    psz_gradient_var_name
-                    );
-                if(psz_gradient_file && strlen(psz_gradient_file)>0)
-                {
-                    msg_Dbg( p_filter, "loading gradientfile %s for "\
-                                       "zone %d", psz_gradient_file, i);
-
-                    int i_res = p_sys->p_atmo_config->getZoneDefinition(i)->
-                                LoadGradientFromBitmap(psz_gradient_file);
-
-                    if(i_res != ATMO_LOAD_GRADIENT_OK)
-                    {
-                        msg_Err( p_filter,"failed to load gradient '%s' with "\
-                                          "error %d",psz_gradient_file,i_res);
-                    }
-                }
-                free( psz_gradient_file );
-            }
-
-            p_sys->p_atmo_dyndata = new CAtmoDynData((vlc_object_t *)p_filter,
-                p_sys->p_atmo_config
-                );
-
-            msg_Dbg( p_filter, "buildin driver initialized");
-
-            free(psz_serialdev);
-        } else {
-            msg_Err(p_filter,"no serial devicename set");
+            default:
+                msg_Warn( p_filter, "invalid device type %d found",
+                                    p_sys->i_device_type );
         }
+
+        msg_Dbg( p_filter, "buildin driver config set");
+
     }
 
     switch( p_filter->fmt_in.video.i_chroma )
     {
     case VLC_CODEC_I420:
     case VLC_CODEC_YV12:
-        // simple enough? Dionoea?
         p_sys->pf_extract_mini_image = ExtractMiniImage_YUV;
         break;
     default:
-        msg_Dbg( p_filter, "InitFilter-unsupported chroma: %4.4s",
+        msg_Warn( p_filter, "InitFilter-unsupported chroma: %4.4s",
                             (char *)&p_filter->fmt_in.video.i_chroma);
         p_sys->pf_extract_mini_image = NULL;
     }
@@ -1212,6 +1721,13 @@ static void Atmo_SetupParameters(filter_t *p_filter)
         p_sys->i_crop_width,
         p_sys->i_crop_height );
 
+    /*
+    for debugging purpose show the samplinggrid on each frame as
+    white dots
+    */
+    p_sys->b_show_dots = var_CreateGetBoolCommand( p_filter,
+        CFG_PREFIX "showdots"
+        );
 
 #if defined(__ATMO_DEBUG__)
     /* save debug images to a folder as Bitmap files ? */
@@ -1240,16 +1756,6 @@ static void Atmo_SetupParameters(filter_t *p_filter)
     msg_Dbg(p_filter,"saveframesfolder %s",p_sys->sz_framepath);
 #endif
 
-    /*
-       size of extracted image by default 64x48 (other imagesizes are
-       currently ignored by AtmoWin)
-    */
-    p_sys->i_atmo_width  = var_CreateGetIntegerCommand( p_filter,
-        CFG_PREFIX "width");
-    p_sys->i_atmo_height = var_CreateGetIntegerCommand( p_filter,
-        CFG_PREFIX "height");
-    msg_Dbg(p_filter,"mini image size %d * %d pixels", p_sys->i_atmo_width,
-        p_sys->i_atmo_height);
 
     /*
     because atmowin could also be used for lighten up the room - I think if you
@@ -1296,15 +1802,20 @@ static void Atmo_SetupParameters(filter_t *p_filter)
         p_sys->ui_endcolor_blue,
         p_sys->i_endfadesteps);
 
-    /* if the external DLL was loaded successfully call AtmoInitialize -
-    (must be done for each thread where you wan't to use AtmoLight!
+
+
+    /*
+      if the external DLL was loaded successfully call AtmoInitialize -
+      (must be done for each thread where you want to use AtmoLight!)
     */
     int i = AtmoInitialize(p_filter, false);
+
 #if defined( WIN32 )
-    if((i != 1) && !b_use_buildin_driver)
+    if((i != 1) && (p_sys->i_device_type == 0))
     {
-        /* COM Server for AtmoLight not running ?
-        if the exe path is configured try to start the "userspace" driver
+        /*
+          COM Server for AtmoLight not running ?
+          if the exe path is configured try to start the "userspace" driver
         */
         psz_path = var_CreateGetStringCommand( p_filter,
                                                CFG_PREFIX "atmowinexe" );
@@ -1320,8 +1831,8 @@ static void Atmo_SetupParameters(filter_t *p_filter)
                 msg_Dbg(p_filter,"launched AtmoWin from %s",psz_path);
                 WaitForInputIdle(pinfo.hProcess, 5000);
                 /*
-                retry to initialize the library COM ... functionality
-                after the server was launched
+                  retry to initialize the library COM ... functionality
+                  after the server was launched
                 */
                 i = AtmoInitialize(p_filter, false);
             } else {
@@ -1335,6 +1846,24 @@ static void Atmo_SetupParameters(filter_t *p_filter)
     if(i == 1) /* Init Atmolight success... */
     {
         msg_Dbg( p_filter, "AtmoInitialize Ok!");
+        /*
+        configure
+           p_sys->i_atmo_width and p_sys->i_atmo_height
+           if the external AtmoWinA.exe is used, it may require
+           a other sample image size than 64 x 48
+           (this overrides the settings of the filter)
+        */
+        Atmo_SetupImageSize( p_filter );
+
+
+        if( p_sys->i_device_type >= 1 )
+        {
+           /*
+             AtmoConnection class initialized now we can initialize
+             the default zone and channel mappings
+           */
+           Atmo_SetupBuildZones( p_filter );
+        }
 
         /* Setup Transferbuffers for 64 x 48 , RGB with 32bit Per Pixel */
         AtmoCreateTransferBuffers(p_filter, BI_RGB, 4,
@@ -1344,6 +1873,7 @@ static void Atmo_SetupParameters(filter_t *p_filter)
 
         /* say the userspace driver that a live mode should be activated
         the functions returns the old mode for later restore!
+        - the buildin driver launches the live view thread in that case
         */
         p_sys->i_AtmoOldEffect = AtmoSwitchEffect(p_filter, emLivePicture);
 
@@ -1356,6 +1886,8 @@ static void Atmo_SetupParameters(filter_t *p_filter)
 
         /* enable other parts only if everything is fine */
         p_sys->b_enabled = true;
+
+        msg_Dbg( p_filter, "Atmo Filter Enabled Ok!");
     }
 
 }
@@ -1378,6 +1910,9 @@ static int CreateFilter( vlc_object_t *p_this )
         return VLC_ENOMEM;
     /* set all entries to zero */
     memset(p_sys, 0, sizeof( filter_sys_t ));
+    vlc_mutex_init( &p_sys->filter_lock );
+
+    msg_Dbg( p_filter, "Create Atmo Filter");
 
     /* further Setup Function pointers for videolan for calling my filter */
     p_filter->pf_video_filter = Filter;
@@ -1409,6 +1944,8 @@ static void DestroyFilter( vlc_object_t *p_this )
 {
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys =  p_filter->p_sys;
+
+    msg_Dbg( p_filter, "Destroy Atmo Filter");
 
     DelStateVariableCallback(p_filter);
     DelCropVariableCallback(p_filter);
@@ -1574,7 +2111,33 @@ static void ExtractMiniImage_YUV(filter_sys_t *p_sys,
             p_rgb_dst_line_green += 4;
             p_rgb_dst_line_blue  += 4;
         }
-    }
+   }
+
+   if(p_sys->b_show_dots)
+   {
+       for(i_row = 1; i_row < i_row_count; i_row++)
+       {
+           i_pixel_row = (i_row * p_sys->i_crop_height) / i_row_count
+                   + p_sys->i_crop_y_offset;
+
+           i_y_row = (i_pixel_row * p_inpic->p[Y_PLANE].i_visible_lines) /
+                   p_inpic->format.i_visible_height;
+
+           p_src_y = p_inpic->p[Y_PLANE].p_pixels +
+                   p_inpic->p[Y_PLANE].i_pitch * i_y_row;
+
+           for(i_col = 1; i_col < i_col_count; i_col++)
+           {
+              i_pixel_col = (i_col * p_sys->i_crop_width) / i_col_count +
+                            p_sys->i_crop_x_offset;
+              i_xpos_y = (i_pixel_col * p_inpic->p[Y_PLANE].i_visible_pitch) /
+                         p_inpic->format.i_visible_width;
+
+              p_src_y[i_xpos_y] = 255;
+           }
+       }
+   }
+
 }
 
 
@@ -1610,7 +2173,7 @@ void SaveBitmap(filter_sys_t *p_sys, uint8_t *p_pixels, char *psz_filename)
     bmp_fileheader.bfSize = sizeof(BITMAPFILEHEADER) +
                             sizeof(BITMAPINFOHEADER) +
                             bmp_info.bmiHeader.biSizeImage;
-    bmp_fileheader.bfType = VLC_TWOCC('M','B');
+    bmp_fileheader.bfType = VLC_TWOCC('B','M');
     bmp_fileheader.bfOffBits = sizeof(BITMAPFILEHEADER) +
                                sizeof(BITMAPINFOHEADER);
 
@@ -1638,7 +2201,7 @@ static void CreateMiniImage( filter_t *p_filter, picture_t *p_inpic)
     pointer to RGB Buffer created in external libary as safe array which
     is locked inside AtmoLockTransferBuffer
     */
-    uint8_t *p_transfer = NULL;
+    uint8_t *p_transfer;
 #if defined( __ATMO_DEBUG__ )
     /* for debug out only used*/
     char sz_filename[MAX_PATH];
@@ -1672,20 +2235,25 @@ static void CreateMiniImage( filter_t *p_filter, picture_t *p_inpic)
     if((p_sys->b_saveframes == true) && (p_sys->sz_framepath[0] != 0 ))
     {
 
-        if((p_sys->i_framecounter & 127) == 0)
+        if((p_sys->ui_frame_counter & 127) == 0)
         {
-            sprintf(sz_filename,"%satmo_dbg_%06d.bmp",p_sys->sz_framepath,
-                p_sys->i_framecounter);
+            sprintf(sz_filename,"%satmo_dbg_%06u.bmp",p_sys->sz_framepath,
+                p_sys->ui_frame_counter);
             msg_Dbg(p_filter, "SaveFrame %s",sz_filename);
 
             SaveBitmap(p_sys, p_transfer, sz_filename);
         }
-        p_sys->i_framecounter++;
     }
+
+    msg_Dbg( p_filter, "AtmoFrame %u Time: %d ms", p_sys->ui_frame_counter, mdate() / 1000);
+    p_sys->ui_frame_counter++;
 #endif
 
+    p_sys->i_frames_processed++;
+
+
     /* show the colors on the wall */
-    AtmoSendPixelData(p_filter);
+    AtmoSendPixelData( p_filter );
 }
 
 
@@ -1702,12 +2270,18 @@ static picture_t * Filter( filter_t *p_filter, picture_t *p_pic )
     filter_sys_t *p_sys = p_filter->p_sys;
     if( !p_pic ) return NULL;
 
+    vlc_mutex_lock( &p_sys->filter_lock );
+
     if((p_sys->b_enabled == true) &&
         (p_sys->pf_extract_mini_image != NULL) &&
         (p_sys->b_pause_live == false))
     {
         CreateMiniImage(p_filter, p_pic);
     }
+
+    vlc_mutex_unlock( &p_sys->filter_lock );
+
+
 
     return p_pic;
 }
@@ -1802,14 +2376,7 @@ static void *FadeToColorThread(vlc_object_t *obj)
                 the VLC libaries? inside native win32 I would use an Event
                 (CreateEvent) and here an WaitForSingleObject?
                 */
-                if(!vlc_object_alive (p_fadethread)) break;
-                msleep(10000);
-                if(!vlc_object_alive (p_fadethread)) break;
-                msleep(10000);
-                if(!vlc_object_alive (p_fadethread)) break;
-                msleep(10000);
-                if(!vlc_object_alive (p_fadethread)) break;
-                msleep(10000);
+                msleep(40000);
             }
             free(p_source);
         } else {
@@ -1869,8 +2436,8 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
                controller */
             p_sys->b_pause_live = true;
 
-            // ggf. alten Thread abräumen should not happen....
-            CheckAndStopFadeThread(p_filter);
+            // clean up old thread - should not happen....
+            CheckAndStopFadeThread( p_filter );
 
             // perpare spawn fadeing thread
             vlc_mutex_lock( &p_sys->filter_lock );
@@ -1906,7 +2473,7 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
         if((newval.i_int == PLAYING_S) && (oldval.i_int == PAUSE_S))
         {
             /* playback continues check thread state */
-            CheckAndStopFadeThread(p_filter);
+            CheckAndStopFadeThread( p_filter );
             /* reactivate the Render function... to do its normal work */
             p_sys->b_pause_live = false;
         }
@@ -1920,7 +2487,7 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
 *****************************************************************************
 * Add Callback function to the "state" variable of the input thread..
 * first find the PlayList and get the input thread from there to attach
-* my callback? is vlc_object_find the right way for this??
+* my callback?
 *****************************************************************************/
 static void AddStateVariableCallback(filter_t *p_filter)
 {
@@ -2029,6 +2596,13 @@ static int AtmoSettingsCallback( vlc_object_t *p_this, char const *psz_var,
     filter_t *p_filter = (filter_t *)p_data;
     filter_sys_t *p_sys = (filter_sys_t *)p_filter->p_sys;
 
+    vlc_mutex_lock( &p_sys->filter_lock );
+
+    if( !strcmp( psz_var, CFG_PREFIX "showdots" ))
+    {
+        p_sys->b_show_dots = newval.b_bool;
+    }
+
     CAtmoConfig *p_atmo_config = p_sys->p_atmo_config;
     if(p_atmo_config)
     {
@@ -2042,31 +2616,31 @@ static int AtmoSettingsCallback( vlc_object_t *p_this, char const *psz_var,
         if( !strcmp( psz_var, CFG_PREFIX "filtermode" ))
             p_atmo_config->setLiveViewFilterMode( (AtmoFilterMode)newval.i_int);
 
-        else if( !strcmp( psz_var, CFG_PREFIX "PercentNew" ))
+        else if( !strcmp( psz_var, CFG_PREFIX "percentnew" ))
                  p_atmo_config->setLiveViewFilter_PercentNew( newval.i_int );
 
-        else if( !strcmp( psz_var, CFG_PREFIX "MeanLength" ))
+        else if( !strcmp( psz_var, CFG_PREFIX "meanlength" ))
                  p_atmo_config->setLiveViewFilter_MeanLength( newval.i_int );
 
-        else if( !strcmp( psz_var, CFG_PREFIX "MeanThreshold" ))
+        else if( !strcmp( psz_var, CFG_PREFIX "meanthreshold" ))
                  p_atmo_config->setLiveViewFilter_MeanThreshold( newval.i_int );
 
-        else if( !strcmp( psz_var, CFG_PREFIX "EdgeWeightning" ))
+        else if( !strcmp( psz_var, CFG_PREFIX "edgeweightning" ))
                  p_atmo_config->setLiveView_EdgeWeighting( newval.i_int );
 
-        else if( !strcmp( psz_var, CFG_PREFIX "Brightness" ))
+        else if( !strcmp( psz_var, CFG_PREFIX "brightness" ))
                  p_atmo_config->setLiveView_BrightCorrect( newval.i_int );
 
-        else if( !strcmp( psz_var, CFG_PREFIX "DarknessLimit" ))
+        else if( !strcmp( psz_var, CFG_PREFIX "darknesslimit" ))
                  p_atmo_config->setLiveView_DarknessLimit( newval.i_int );
 
-        else if( !strcmp( psz_var, CFG_PREFIX "HueWinSize" ))
+        else if( !strcmp( psz_var, CFG_PREFIX "huewinsize" ))
                  p_atmo_config->setLiveView_HueWinSize( newval.i_int );
 
-        else if( !strcmp( psz_var, CFG_PREFIX "SatWinSize" ))
+        else if( !strcmp( psz_var, CFG_PREFIX "satwinsize" ))
                  p_atmo_config->setLiveView_SatWinSize( newval.i_int );
 
-        else if( !strcmp( psz_var, CFG_PREFIX "FrameDelay" ))
+        else if( !strcmp( psz_var, CFG_PREFIX "framedelay" ))
                  p_atmo_config->setLiveView_FrameDelay( newval.i_int );
 
         else if( !strcmp( psz_var, CFG_PREFIX "whiteadj" ))
@@ -2082,6 +2656,9 @@ static int AtmoSettingsCallback( vlc_object_t *p_this, char const *psz_var,
                  p_atmo_config->setWhiteAdjustment_Blue( newval.i_int );
 
     }
+
+    vlc_mutex_unlock( &p_sys->filter_lock );
+
     return VLC_SUCCESS;
 }
 
@@ -2089,27 +2666,27 @@ static void AddAtmoSettingsVariablesCallbacks(filter_t *p_filter)
 {
    var_AddCallback( p_filter, CFG_PREFIX "filtermode",
                     AtmoSettingsCallback, p_filter );
-   var_AddCallback( p_filter, CFG_PREFIX "PercentNew",
+   var_AddCallback( p_filter, CFG_PREFIX "percentnew",
                     AtmoSettingsCallback, p_filter );
 
 
-   var_AddCallback( p_filter, CFG_PREFIX "MeanLength",
+   var_AddCallback( p_filter, CFG_PREFIX "meanlength",
                     AtmoSettingsCallback, p_filter );
-   var_AddCallback( p_filter, CFG_PREFIX "MeanThreshold",
-                    AtmoSettingsCallback, p_filter );
-
-   var_AddCallback( p_filter, CFG_PREFIX "EdgeWeightning",
-                    AtmoSettingsCallback, p_filter );
-   var_AddCallback( p_filter, CFG_PREFIX "Brightness",
-                    AtmoSettingsCallback, p_filter );
-   var_AddCallback( p_filter, CFG_PREFIX "DarknessLimit",
+   var_AddCallback( p_filter, CFG_PREFIX "meanthreshold",
                     AtmoSettingsCallback, p_filter );
 
-   var_AddCallback( p_filter, CFG_PREFIX "HueWinSize",
+   var_AddCallback( p_filter, CFG_PREFIX "edgeweightning",
                     AtmoSettingsCallback, p_filter );
-   var_AddCallback( p_filter, CFG_PREFIX "SatWinSize",
+   var_AddCallback( p_filter, CFG_PREFIX "brightness",
                     AtmoSettingsCallback, p_filter );
-   var_AddCallback( p_filter, CFG_PREFIX "FrameDelay",
+   var_AddCallback( p_filter, CFG_PREFIX "darknesslimit",
+                    AtmoSettingsCallback, p_filter );
+
+   var_AddCallback( p_filter, CFG_PREFIX "huewinsize",
+                    AtmoSettingsCallback, p_filter );
+   var_AddCallback( p_filter, CFG_PREFIX "satwinsize",
+                    AtmoSettingsCallback, p_filter );
+   var_AddCallback( p_filter, CFG_PREFIX "framedelay",
                     AtmoSettingsCallback, p_filter );
 
 
@@ -2121,6 +2698,10 @@ static void AddAtmoSettingsVariablesCallbacks(filter_t *p_filter)
                     AtmoSettingsCallback, p_filter );
    var_AddCallback( p_filter, CFG_PREFIX "white-blue",
                     AtmoSettingsCallback, p_filter );
+
+   var_AddCallback( p_filter, CFG_PREFIX "showdots",
+                    AtmoSettingsCallback, p_filter );
+
 }
 
 static void DelAtmoSettingsVariablesCallbacks( filter_t *p_filter )
@@ -2129,25 +2710,25 @@ static void DelAtmoSettingsVariablesCallbacks( filter_t *p_filter )
    var_DelCallback( p_filter, CFG_PREFIX "filtermode",
                     AtmoSettingsCallback, p_filter );
 
-   var_DelCallback( p_filter, CFG_PREFIX "PercentNew",
+   var_DelCallback( p_filter, CFG_PREFIX "percentnew",
                     AtmoSettingsCallback, p_filter );
-   var_DelCallback( p_filter, CFG_PREFIX "MeanLength",
+   var_DelCallback( p_filter, CFG_PREFIX "meanlength",
                     AtmoSettingsCallback, p_filter );
-   var_DelCallback( p_filter, CFG_PREFIX "MeanThreshold",
-                    AtmoSettingsCallback, p_filter );
-
-   var_DelCallback( p_filter, CFG_PREFIX "EdgeWeightning",
-                    AtmoSettingsCallback, p_filter );
-   var_DelCallback( p_filter, CFG_PREFIX "Brightness",
-                    AtmoSettingsCallback, p_filter );
-   var_DelCallback( p_filter, CFG_PREFIX "DarknessLimit",
+   var_DelCallback( p_filter, CFG_PREFIX "meanthreshold",
                     AtmoSettingsCallback, p_filter );
 
-   var_DelCallback( p_filter, CFG_PREFIX "HueWinSize",
+   var_DelCallback( p_filter, CFG_PREFIX "edgeweightning",
                     AtmoSettingsCallback, p_filter );
-   var_DelCallback( p_filter, CFG_PREFIX "SatWinSize",
+   var_DelCallback( p_filter, CFG_PREFIX "brightness",
                     AtmoSettingsCallback, p_filter );
-   var_DelCallback( p_filter, CFG_PREFIX "FrameDelay",
+   var_DelCallback( p_filter, CFG_PREFIX "darknesslimit",
+                    AtmoSettingsCallback, p_filter );
+
+   var_DelCallback( p_filter, CFG_PREFIX "huewinsize",
+                    AtmoSettingsCallback, p_filter );
+   var_DelCallback( p_filter, CFG_PREFIX "satwinsize",
+                    AtmoSettingsCallback, p_filter );
+   var_DelCallback( p_filter, CFG_PREFIX "framedelay",
                     AtmoSettingsCallback, p_filter );
 
 
@@ -2158,6 +2739,9 @@ static void DelAtmoSettingsVariablesCallbacks( filter_t *p_filter )
    var_DelCallback( p_filter, CFG_PREFIX "white-green",
                     AtmoSettingsCallback, p_filter );
    var_DelCallback( p_filter, CFG_PREFIX "white-blue",
+                    AtmoSettingsCallback, p_filter );
+
+   var_DelCallback( p_filter, CFG_PREFIX "showdots",
                     AtmoSettingsCallback, p_filter );
 
 }

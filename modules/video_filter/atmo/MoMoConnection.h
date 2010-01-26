@@ -1,13 +1,13 @@
 /*
- * AtmoCom.h: Class for communication with the serial hardware of Atmo Light,
- * opens and configures the serial port
+ * MoMoConnection.h: class to access a MoMoLight Hardware - the description could be found
+ * here: http://lx.divxstation.com/article.asp?aId=151
  *
  * See the README.txt file for copyright information and how to reach the author(s).
  *
  * $Id$
  */
-#ifndef _AtmoSerialConnection_h_
-#define _AtmoSerialConnection_h_
+#ifndef _MoMoConnection_h_
+#define _MoMoConnection_h_
 
 #include "AtmoDefs.h"
 #include "AtmoConnection.h"
@@ -18,7 +18,7 @@
 #endif
 
 
-class CAtmoSerialConnection : public CAtmoConnection {
+class CMoMoConnection : public CAtmoConnection {
     private:
         HANDLE m_hComport;
 
@@ -29,21 +29,16 @@ class CAtmoSerialConnection : public CAtmoConnection {
 #endif
 
     public:
-       CAtmoSerialConnection(CAtmoConfig *cfg);
-       virtual ~CAtmoSerialConnection(void);
+       CMoMoConnection (CAtmoConfig *cfg);
+       virtual ~CMoMoConnection (void);
 
-  	   virtual ATMO_BOOL OpenConnection();
+       virtual ATMO_BOOL OpenConnection();
 
        virtual void CloseConnection();
 
        virtual ATMO_BOOL isOpen(void);
 
-       virtual ATMO_BOOL SendData(unsigned char numChannels,
-                                  int red[],
-                                  int green[],
-                                  int blue[]);
-
-       virtual ATMO_BOOL SendData(tColorPacket data);
+       virtual ATMO_BOOL SendData(pColorPacket data);
 
        virtual ATMO_BOOL HardwareWhiteAdjust(int global_gamma,
                                              int global_contrast,
@@ -54,6 +49,18 @@ class CAtmoSerialConnection : public CAtmoConnection {
                                              int gamma_green,
                                              int gamma_blue,
                                              ATMO_BOOL storeToEeprom);
+
+       virtual int getNumChannels();
+
+
+       virtual const char *getDevicePath() { return "momo"; }
+
+#if !defined(_ATMO_VLC_PLUGIN_)
+       virtual char *getChannelName(int ch);
+       virtual ATMO_BOOL ShowConfigDialog(HINSTANCE hInst, HWND parent, CAtmoConfig *cfg);
+#endif
+
+       virtual ATMO_BOOL CreateDefaultMapping(CAtmoChannelAssignment *ca);
 };
 
 #endif

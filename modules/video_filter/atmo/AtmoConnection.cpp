@@ -6,31 +6,68 @@
  *
  * $Id$
  */
+#include <string.h>
 #include "AtmoConnection.h"
+
 
 CAtmoConnection::CAtmoConnection(CAtmoConfig *cfg)
 {
-	this->m_pAtmoConfig = cfg;	
-    if(cfg->getNumChannelAssignments()>0) {
-        tChannelAssignment *ca = cfg->getChannelAssignment(0);
-        for(int i=0;i<ATMO_NUM_CHANNELS;i++) {
-            m_ChannelAssignment[i] = ca->mappings[i];
-        }
-    } else {
-        for(int i=0;i<ATMO_NUM_CHANNELS;i++) {
-            m_ChannelAssignment[i] = i;
-        }
-    }
-}
+	 this->m_pAtmoConfig = cfg;	
+     m_ChannelAssignment = NULL;
+     m_NumAssignedChannels = 0;
 
-void CAtmoConnection::SetChannelAssignment(tChannelAssignment *ca) {
-     for(int i=0;i<ATMO_NUM_CHANNELS;i++) {
-         m_ChannelAssignment[i] = ca->mappings[i];
-     }
+#if defined(_ATMO_VLC_PLUGIN_)
+     vlc_mutex_init( &m_AccessConnection );
+#else
+     InitializeCriticalSection( &m_AccessConnection );
+#endif
 }
 
 CAtmoConnection::~CAtmoConnection(void)
 {
   if(isOpen())
      CloseConnection();
+
+#if defined(_ATMO_VLC_PLUGIN_)
+     vlc_mutex_destroy( &m_AccessConnection );
+#else
+     DeleteCriticalSection( &m_AccessConnection );
+#endif
+}
+
+void CAtmoConnection::SetChannelAssignment(CAtmoChannelAssignment *ca)
+{
+  if(ca)
+  {
+      Lock();
+      delete m_ChannelAssignment;
+      m_ChannelAssignment = ca->getMapArrayClone(m_NumAssignedChannels);
+      Unlock();
+  }
+}
+
+#if !defined(_ATMO_VLC_PLUGIN_)
+ATMO_BOOL CAtmoConnection::ShowConfigDialog(HINSTANCE hInst, HWND parent, CAtmoConfig *cfg)
+{
+    MessageBox(parent, "This device doesn't have a special config dialog", "Info", 0);
+    return ATMO_FALSE;
+}
+#endif
+
+
+void CAtmoConnection::Lock()
+{
+#if defined(_ATMO_VLC_PLUGIN_)
+    vlc_mutex_lock( &m_AccessConnection );
+#else
+    EnterCriticalSection( &m_AccessConnection );
+#endif
+}
+void CAtmoConnection::Unlock()
+{
+#if defined(_ATMO_VLC_PLUGIN_)
+    vlc_mutex_unlock( &m_AccessConnection );
+#else
+    LeaveCriticalSection( &m_AccessConnection );
+#endif
 }

@@ -13,8 +13,6 @@
 #include "AtmoDefs.h"
 
 #if !defined(_ATMO_VLC_PLUGIN_)
-#   include <comdef.h>		
-#   include "AtmoWin_h.h"
 #   include <windows.h>
 #endif
 
@@ -28,32 +26,12 @@ class CAtmoLiveView :  public CThread
 protected:
 	virtual DWORD Execute(void);
 
-#if !defined(_ATMO_VLC_PLUGIN_)
-public:
-    STDMETHODIMP setLiveViewSource(enum ComLiveViewSource dwModus);
-    STDMETHODIMP getCurrentLiveViewSource(enum ComLiveViewSource *modus);
-#endif
-
 protected:
     CAtmoDynData *m_pAtmoDynData;
-    CAtmoInput *m_pAtmoInput;
-
-#if !defined(_ATMO_VLC_PLUGIN_)
-    ComLiveViewSource m_LiveViewSource;
-    ComLiveViewSource m_CurrentLiveViewSource;
-    CRITICAL_SECTION m_InputChangeCriticalSection;
-    HANDLE m_InputChangedEvent;
-#endif
 
 public:
     CAtmoLiveView(CAtmoDynData *pAtmoDynData);
     virtual ~CAtmoLiveView(void);
-
-    CAtmoInput *getAtmoInput() { return m_pAtmoInput; }
-
-#if !defined(_ATMO_VLC_PLUGIN_)
-    ComLiveViewSource getLiveViewSource() { return m_CurrentLiveViewSource; }
-#endif
 };
 
 #endif

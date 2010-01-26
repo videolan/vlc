@@ -11,6 +11,7 @@
 
 CThread::CThread(vlc_object_t *pOwner)
 {
+    m_bTerminated  = ATMO_FALSE;
     m_pAtmoThread = (atmo_thread_t *)vlc_object_create( pOwner,
                                                         sizeof(atmo_thread_t) );
     if(m_pAtmoThread)
@@ -29,9 +30,12 @@ CThread::CThread(vlc_object_t *pOwner)
 
 CThread::CThread(void)
 {
+  m_bTerminated  = ATMO_FALSE;
+
   m_hThread = CreateThread(NULL, 0, CThread::ThreadProc ,
                            this, CREATE_SUSPENDED, &m_dwThreadID);
-  m_hTerminateEvent = CreateEvent(NULL,ATMO_FALSE,ATMO_FALSE,NULL);
+
+  m_hTerminateEvent = CreateEvent(NULL,0,0,NULL);
 }
 
 #endif
@@ -81,9 +85,9 @@ void *CThread::ThreadProc(vlc_object_t *obj)
 
 DWORD WINAPI CThread::ThreadProc(LPVOID lpParameter)
 {
-	   CThread *aThread = (CThread *)lpParameter;
-	   if(aThread)
-	      return aThread->Execute();
+	   CThread *pThread = (CThread *)lpParameter;
+	   if(pThread)
+	      return pThread->Execute();
 	   else
 		  return (DWORD)-1;
 }
@@ -107,19 +111,20 @@ void CThread::Terminate(void)
 {
    // Set Termination Flag and EventObject!
    // and wait for Termination
-   m_bTerminated = ATMO_TRUE;
 
 #if defined(_ATMO_VLC_PLUGIN_)
    if(m_pAtmoThread)
    {
       vlc_mutex_lock( &m_TerminateLock );
+      m_bTerminated = ATMO_TRUE;
       vlc_cond_signal( &m_TerminateCond  );
       vlc_mutex_unlock( &m_TerminateLock );
-      vlc_object_kill( m_pAtmoThread );
 
+      vlc_object_kill( m_pAtmoThread );
       vlc_thread_join( m_pAtmoThread );
    }
 #else
+   m_bTerminated = ATMO_TRUE;
    SetEvent(m_hTerminateEvent);
    WaitForSingleObject(m_hThread,INFINITE);
 #endif
@@ -154,12 +159,14 @@ void CThread::Run()
 ATMO_BOOL CThread::ThreadSleep(DWORD millisekunden)
 {
 #if defined(_ATMO_VLC_PLUGIN_)
+     ATMO_BOOL temp;
      vlc_mutex_lock( &m_TerminateLock );
-     int value = vlc_cond_timedwait(&m_TerminateCond,
-                                    &m_TerminateLock,
-                                    mdate() + (mtime_t)(millisekunden * 1000));
+     vlc_cond_timedwait(&m_TerminateCond,
+                        &m_TerminateLock,
+                        mdate() + (mtime_t)(millisekunden * 1000));
+     temp = m_bTerminated;
      vlc_mutex_unlock( &m_TerminateLock );
-     return (value != 0);
+     return !temp;
 
 #else
      DWORD res = WaitForSingleObject(m_hTerminateEvent,millisekunden);

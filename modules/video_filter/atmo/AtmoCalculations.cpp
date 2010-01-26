@@ -7,9 +7,14 @@
  */
 #include <stdlib.h>
 #include <string.h>
-
+#include <stdio.h>
 
 #include "AtmoDefs.h"
+
+#if defined(WIN32)
+#   include <windows.h>
+#endif
+
 #include "AtmoCalculations.h"
 #include "AtmoConfig.h"
 #include "AtmoZoneDefinition.h"
@@ -20,104 +25,212 @@
 #define s_MAX   255
 #define v_MAX   255
 
-// macros
-#define MIN(X, Y)  ((X) < (Y) ? (X) : (Y))
-#define MAX(X, Y)  ((X) > (Y) ? (X) : (Y))
+// macro
 #define POS_DIV(a, b)  ( (a)/(b) + ( ((a)%(b) >= (b)/2 ) ? 1 : 0) )
 
-tColorPacket CalcColorsAnalyzeHSV(CAtmoConfig *pAtmoConfig, tHSVColor *HSV_Img)
+
+CAtmoColorCalculator::CAtmoColorCalculator(CAtmoConfig *pAtmoConfig)
+{
+  m_pAtmoConfig = pAtmoConfig;
+  m_Weight                = NULL;
+  m_hue_hist              = NULL;
+  m_windowed_hue_hist     = NULL;
+  m_most_used_hue_last    = NULL;
+  m_most_used_hue         = NULL;
+  m_sat_hist              = NULL;
+  m_windowed_sat_hist     = NULL;
+  m_most_used_sat         = NULL;
+  m_Zone_Weights          = NULL;
+  m_average_v             = NULL;
+  m_average_counter       = NULL;
+
+  m_LastEdgeWeighting      = -1;
+  m_LastWidescreenMode     = -1;
+  m_LastLayout_TopCount    = -1;
+  m_LastLayout_BottomCount = -1;
+  m_LastLayout_LRCount     = -1;
+  m_LastNumZones           = -1;
+}
+
+CAtmoColorCalculator::~CAtmoColorCalculator(void)
+{
+  delete m_Weight;
+  delete m_hue_hist;
+  delete m_windowed_hue_hist;
+  delete m_most_used_hue_last;
+  delete m_most_used_hue;
+  delete m_sat_hist;
+  delete m_windowed_sat_hist;
+  delete m_most_used_sat;
+  delete m_Zone_Weights;
+  delete m_average_v;
+  delete m_average_counter;
+}
+
+void CAtmoColorCalculator::UpdateParameters()
+{
+  // Zonen Definition neu laden
+  // diverse Vorberechnungen neu ausführen
+  // Speicherbuffer neu allokieren!
+}
+
+void CAtmoColorCalculator::FindMostUsed(int AtmoSetup_NumZones,int *most_used,long int *windowed_hist)
+{
+  memset(most_used, 0, sizeof(int) * AtmoSetup_NumZones);
+
+
+  for (int zone = 0; zone < AtmoSetup_NumZones; zone++)
+  {
+    int value = 0;
+    // walk trough histogram
+    for (int i = 0; i < s_MAX+1; i++) // assume s_MAX = h_MAX = v_Max
+    {
+      // if new value bigger then old one
+      int tmp = *windowed_hist;  // windowed_hist[zone * (s_MAX+1) + i];
+      // if (w_sat_hist[channel][i] > value)
+      if (tmp > value)
+      {
+        // remember index
+        most_used[zone] = i;
+        // and value
+        value = tmp;
+      }
+      windowed_hist++;
+    }
+  }
+}
+
+pColorPacket CAtmoColorCalculator::AnalyzeHSV(tHSVColor *HSV_Img)
 {
   int i; // counter
 
-  // static tWeightPacket Weight[IMAGE_SIZE];
-  // Flip instead having a array with (64x48) entries of values for each channel
-  // I have x arrays of 64x48 so each channel has its own array...
-  // (or gradient which is use to judge about the pixels)
-  static int Weight[ATMO_NUM_CHANNELS][IMAGE_SIZE];
+  int AtmoSetup_EdgeWeighting  = m_pAtmoConfig->getLiveView_EdgeWeighting();
+  int AtmoSetup_WidescreenMode = m_pAtmoConfig->getLiveView_WidescreenMode();
+  int AtmoSetup_DarknessLimit  = m_pAtmoConfig->getLiveView_DarknessLimit();
+  int AtmoSetup_BrightCorrect  = m_pAtmoConfig->getLiveView_BrightCorrect();
+  int AtmoSetup_SatWinSize     = m_pAtmoConfig->getLiveView_SatWinSize();
+  int AtmoSetup_NumZones       = m_pAtmoConfig->getZoneCount();
+  tHSVColor *temp_Img;
 
-  /***************************************************************************/
-  /* Weight                                                                  */
-  /***************************************************************************/
-  static int LastEdgeWeighting = -1;
-  static int LastWidescreenMode = -1;
+  if(AtmoSetup_NumZones != m_LastNumZones)
+  {
+     delete m_Weight;
+     delete m_hue_hist;
+     delete m_windowed_hue_hist;
+     delete m_most_used_hue_last;
+     delete m_most_used_hue;
+     delete m_sat_hist;
+     delete m_windowed_sat_hist;
+     delete m_most_used_sat;
+     delete m_Zone_Weights;
+     delete m_average_v;
+     delete m_average_counter;
 
-  int AtmoSetup_EdgeWeighting  = pAtmoConfig->getLiveView_EdgeWeighting();
-  int AtmoSetup_WidescreenMode = pAtmoConfig->getLiveView_WidescreenMode();
-  int AtmoSetup_DarknessLimit  = pAtmoConfig->getLiveView_DarknessLimit();
-  int AtmoSetup_BrightCorrect  = pAtmoConfig->getLiveView_BrightCorrect();
-  int AtmoSetup_SatWinSize     = pAtmoConfig->getLiveView_SatWinSize();
+     m_Weight              = new int[AtmoSetup_NumZones * IMAGE_SIZE];
+     m_Zone_Weights        = new int*[AtmoSetup_NumZones];
+     for(int i = 0; i < AtmoSetup_NumZones; i++)
+         m_Zone_Weights[i] = &m_Weight[i * IMAGE_SIZE];
+
+     m_hue_hist            = new long int[(h_MAX+1) * AtmoSetup_NumZones];
+     m_windowed_hue_hist   = new long int[(h_MAX+1) * AtmoSetup_NumZones];
+
+     m_most_used_hue_last  = new int[AtmoSetup_NumZones];
+     m_most_used_hue       = new int[AtmoSetup_NumZones];
+     memset( m_most_used_hue_last, 0, sizeof(int) * AtmoSetup_NumZones);
+
+     m_sat_hist           = new long int[(s_MAX+1) * AtmoSetup_NumZones];
+     m_windowed_sat_hist  = new long int[(s_MAX+1) * AtmoSetup_NumZones];
+     m_most_used_sat      = new int[AtmoSetup_NumZones];
+
+     m_average_v         = new long int[AtmoSetup_NumZones];
+     m_average_counter   = new int[AtmoSetup_NumZones];
+
+     m_LastNumZones = AtmoSetup_NumZones;
+  }
 
 
   // calculate only if setup has changed
-  if ((AtmoSetup_EdgeWeighting != LastEdgeWeighting) ||
-      (AtmoSetup_WidescreenMode != LastWidescreenMode))
+  if ((AtmoSetup_EdgeWeighting != m_LastEdgeWeighting) ||
+      (AtmoSetup_WidescreenMode != m_LastWidescreenMode) ||
+      (m_pAtmoConfig->getZonesTopCount() != m_LastLayout_TopCount) ||
+      (m_pAtmoConfig->getZonesBottomCount() != m_LastLayout_BottomCount) ||
+      (m_pAtmoConfig->getZonesLRCount() !=  m_LastLayout_LRCount) ||
+      (m_pAtmoConfig->m_UpdateEdgeWeightningFlag != 0)
+     )
   {
-     for(i =0 ;i < ATMO_NUM_CHANNELS; i++)
-         pAtmoConfig->getZoneDefinition(i)->UpdateWeighting(&Weight[i][0],
-                                                            AtmoSetup_WidescreenMode,
-                                                            AtmoSetup_EdgeWeighting);
-    /*
 
-    original code from VDR sources... my one is just more flexible?*g*
+      for(i = 0 ;i < AtmoSetup_NumZones; i++) {
+          CAtmoZoneDefinition *pZoneDef = m_pAtmoConfig->getZoneDefinition(i);
+          if(pZoneDef)
+          {
+             pZoneDef->UpdateWeighting(m_Zone_Weights[i],
+                                                              AtmoSetup_WidescreenMode,
+                                                              AtmoSetup_EdgeWeighting);
+#ifdef _debug_zone_weight_
+             char filename[128];
+             sprintf(filename, "zone_%d_gradient_debug.bmp",i);
+             pZoneDef->SaveZoneBitmap( filename );
+             sprintf(filename, "zone_%d_weight_%d_debug.bmp",i,AtmoSetup_EdgeWeighting);
+             pZoneDef->SaveWeightBitmap(filename, m_Zone_Weights[i] );
+#endif
+          }
 
- 	i = 0;
-    for (int row = 0; row < CAP_HEIGHT; row++)
-    {
-	  float row_norm = (float)row / ((float)CAP_HEIGHT - 1.0f);       // [0;Height] -> [0;1]
-	  float weight_3 = pow(1.0f - row_norm, AtmoSetup_EdgeWeighting); // top
-	  float weight_4 = pow(row_norm, AtmoSetup_EdgeWeighting);       // bottom
+     }
+     m_pAtmoConfig->m_UpdateEdgeWeightningFlag = 0;
 
-      for (int column = 0; column < CAP_WIDTH; column++)
-      {
-        // if widescreen mode, top and bottom of the picture are not
-        if ((AtmoSetup_WidescreenMode == 1) && ((row <= CAP_HEIGHT/8) || (row >= (7*CAP_HEIGHT)/8)))
-        {
-          Weight[i].channel[0] = Weight[i].channel[1] = Weight[i].channel[2] = Weight[i].channel[3] = Weight[i].channel[4] = 0;
-        }
-        else
-        {
-          float column_norm = (float)column / ((float)CAP_WIDTH - 1.0f); // [0;Width] -> [0;1]
-		  Weight[i].channel[0] = 255;
-		  Weight[i].channel[1] = (int)(255.0 * (float)pow((1.0 - column_norm), AtmoSetup_EdgeWeighting));
-		  Weight[i].channel[2] = (int)(255.0 * (float)pow(column_norm, AtmoSetup_EdgeWeighting));
-          Weight[i].channel[3] = (int)(255.0 * (float)weight_3);
-          Weight[i].channel[4] = (int)(255.0 * (float)weight_4);
-        }
-        i++;
-      }
-    }
-    */
-	LastEdgeWeighting = AtmoSetup_EdgeWeighting;
-    LastWidescreenMode = AtmoSetup_WidescreenMode;
+     m_LastEdgeWeighting      = AtmoSetup_EdgeWeighting;
+     m_LastWidescreenMode     = AtmoSetup_WidescreenMode;
+     m_LastLayout_TopCount    = m_pAtmoConfig->getZonesTopCount();
+     m_LastLayout_BottomCount = m_pAtmoConfig->getZonesBottomCount();
+     m_LastLayout_LRCount     = m_pAtmoConfig->getZonesLRCount();
   }
+
+  AtmoSetup_DarknessLimit = AtmoSetup_DarknessLimit * 10;
+
 
   /***************************************************************************/
   /* Hue                                                                     */
   /***************************************************************************/
-
   /*----------------------------*/
   /* hue histogram builtup      */
   /*----------------------------*/
   // HSV histogram
-  long int hue_hist[ATMO_NUM_CHANNELS][h_MAX+1];
-  // clean histogram
-  memset(&hue_hist, 0, sizeof(hue_hist));
+  // long int hue_hist[CAP_MAX_NUM_ZONES][h_MAX+1];
 
+  // average brightness (value)
+  // m_average_v m_average_counter
+
+  // clean histogram --> calloc
+  memset(m_hue_hist, 0, sizeof(long int) * (h_MAX+1) * AtmoSetup_NumZones);
+  memset(m_average_v, 0, sizeof(long int) * AtmoSetup_NumZones);
+  memset(m_average_counter, 0, sizeof(int) * AtmoSetup_NumZones);
+
+  temp_Img = HSV_Img;
   i = 0;
   for (int row = 0; row < CAP_HEIGHT; row++)
   {
     for (int column = 0; column < CAP_WIDTH; column++)
     {
       // forget black bars: perform calculations only if pixel has some luminosity
-	  if (HSV_Img[i].v > 10*AtmoSetup_DarknessLimit)
+	  if ((*temp_Img).v > AtmoSetup_DarknessLimit)
       {
-        // builtup histogram for the 5 channels
-        for (int channel = 0; channel < ATMO_NUM_CHANNELS; channel++)
+        // builtup histogram for the x Zones of the Display
+        for (int zone = 0; zone < AtmoSetup_NumZones; zone++)
         {
           // Add weight to channel
-          hue_hist[channel][HSV_Img[i].h] += Weight[channel][i] * HSV_Img[i].v;
+         // Weight(zone, pixel_nummer) m_Weight[((zone) * (IMAGE_SIZE)) + (pixel_nummer)]
+         // m_hue_hist[zone*(h_MAX+1) + HSV_Img[i].h] += m_Zone_Weights[zone][i] * HSV_Img[i].v;
+            m_hue_hist[zone*(h_MAX+1) + (*temp_Img).h] += m_Zone_Weights[zone][i] * temp_Img->v;
+
+            if(m_Zone_Weights[zone][i] > 0) {
+               m_average_v[zone] += temp_Img->v;
+               m_average_counter[zone]++;
+            }
+
         }
+        // calculate brightness average
       }
+      temp_Img++;
       i++;
     }
   }
@@ -126,11 +239,11 @@ tColorPacket CalcColorsAnalyzeHSV(CAtmoConfig *pAtmoConfig, tHSVColor *HSV_Img)
   /* hue histogram windowing    */
   /*----------------------------*/
   // windowed HSV histogram
-  long int w_hue_hist[ATMO_NUM_CHANNELS][h_MAX+1];
+  // long int w_hue_hist[CAP_MAX_NUM_ZONES][h_MAX+1]; -> m_windowed_hue_hist
   // clean windowed histogram
-  memset(&w_hue_hist, 0, sizeof(w_hue_hist));
+  memset(m_windowed_hue_hist, 0, sizeof(long int) * (h_MAX+1) * AtmoSetup_NumZones);
   // steps in each direction; eg. 2 => -2 -1 0 1 2 windowing
-  int hue_windowsize = pAtmoConfig->getLiveView_HueWinSize();
+  int hue_windowsize = m_pAtmoConfig->getLiveView_HueWinSize();
 
   for (i = 0; i < h_MAX+1; i++) // walk through histogram [0;h_MAX]
   {
@@ -146,11 +259,11 @@ tColorPacket CalcColorsAnalyzeHSV(CAtmoConfig *pAtmoConfig, tHSVColor *HSV_Img)
       // handle end of windowing -> roll forward
       if (myidx > h_MAX) { myidx = myidx - h_MAX - 1; }
 
-      // Apply windowing to all 5 channels
-      for (int channel = 0; channel < ATMO_NUM_CHANNELS; channel++)
+      // Apply windowing to all x zones
+      for (int zone = 0; zone < AtmoSetup_NumZones; zone++)
       {
         // apply lite triangular window design with gradient of 10% per discrete step
-        w_hue_hist[channel][i] += hue_hist[channel][myidx] * ((hue_windowsize+1)-abs(mywin)); // apply window
+        m_windowed_hue_hist[(zone * (h_MAX+1)) + i] += m_hue_hist[(zone * (h_MAX+1)) + myidx] * ((hue_windowsize+1)-abs(mywin)); // apply window
       }
     }
   }
@@ -159,71 +272,89 @@ tColorPacket CalcColorsAnalyzeHSV(CAtmoConfig *pAtmoConfig, tHSVColor *HSV_Img)
   /* analyze histogram for most used hue  */
   /*--------------------------------------*/
   // index of last maximum
-  static int most_used_hue_last[ATMO_NUM_CHANNELS] = {0, 0, 0, 0, 0};
+  // static int most_used_hue_last[CAP_MAX_NUM_ZONES] = {0, 0, 0, 0, 0}; --> m_most_used_hue_last
 
   // resulting hue for each channel
-  int most_used_hue[ATMO_NUM_CHANNELS];
-  memset(&most_used_hue, 0, sizeof(most_used_hue));
+  //int most_used_hue[CAP_MAX_NUM_ZONES]; --> m_most_used_hue
 
-  for (int channel = 0; channel < ATMO_NUM_CHANNELS; channel++)
+  FindMostUsed(AtmoSetup_NumZones, m_most_used_hue, m_windowed_hue_hist);
+  for (int zone = 0; zone < AtmoSetup_NumZones; zone++)
   {
-    int value = 0;
+    float percent = (float)m_windowed_hue_hist[zone * (h_MAX+1) + m_most_used_hue_last[zone]] / (float)m_windowed_hue_hist[zone * (h_MAX+1) + m_most_used_hue[zone]];
+    if (percent > 0.93f) // less than 7% difference?
+        m_most_used_hue[zone] = m_most_used_hue_last[zone]; // use last index
+     else
+        m_most_used_hue_last[zone] = m_most_used_hue[zone];
+  }
+
+  /*
+  memset(m_most_used_hue, 0, sizeof(int) * AtmoSetup_NumZones);
+
+  for (int zone = 0; zone < AtmoSetup_NumZones; zone++)
+  {
+    long int value = 0;
     for (i = 0; i < h_MAX+1; i++) // walk through histogram
     {
-      if (w_hue_hist[channel][i] > value) // if new value bigger then old one
+      long int tmp = m_windowed_hue_hist[ (zone * (h_MAX+1)) + i ];
+      if (tmp > value) // if new value bigger then old one
       {
-        most_used_hue[channel] = i;     // remember index
-        value = w_hue_hist[channel][i]; // and value
+        m_most_used_hue[zone] = i;     // remember index
+        value = tmp; // w_hue_hist[zone][i]; // and value
       }
     }
 
-    float percent = (float)w_hue_hist[channel][most_used_hue_last[channel]] / (float)value;
+    float percent = (float)m_windowed_hue_hist[zone * (h_MAX+1) + m_most_used_hue_last[zone]] / (float)value;
     if (percent > 0.93f) // less than 7% difference?
     {
-      most_used_hue[channel] = most_used_hue_last[channel]; // use last index
+      m_most_used_hue[zone] = m_most_used_hue_last[zone]; // use last index
     }
-    most_used_hue_last[channel] = most_used_hue[channel]; // save current index of most used hue
+
+    m_most_used_hue_last[zone] = m_most_used_hue[zone]; // save current index of most used hue
   }
+  */
 
   /***************************************************************************/
   /* saturation                                                              */
   /***************************************************************************/
   // sat histogram
-  long int sat_hist[ATMO_NUM_CHANNELS][s_MAX+1];
+  // long int sat_hist[CAP_MAX_NUM_ZONES][s_MAX+1];  -> m_sat_hist
   // hue of the pixel we are working at
   int pixel_hue = 0;
   // clean histogram
-  memset(&sat_hist, 0, sizeof(sat_hist));
+  memset(m_sat_hist, 0, sizeof(long int) * (s_MAX+1) * AtmoSetup_NumZones);
 
   /*--------------------------------------*/
   /* saturation histogram builtup         */
   /*--------------------------------------*/
   i = 0;
+  temp_Img = HSV_Img;
   for (int row = 0; row < CAP_HEIGHT; row++)
   {
     for (int column = 0; column < CAP_WIDTH; column++)
     {
       // forget black bars: perform calculations only if pixel has some luminosity
-	  if (HSV_Img[i].v > 10*AtmoSetup_DarknessLimit)
+	  if ((*temp_Img).v > AtmoSetup_DarknessLimit)
       {
         // find histogram position for pixel
-        pixel_hue = HSV_Img[i].h;
+        pixel_hue = (*temp_Img).h;
 
         // TODO:   brightness calculation(if we require it some time)
 
-        for (int channel = 0; channel < ATMO_NUM_CHANNELS; channel++)
+        for (int zone = 0; zone < AtmoSetup_NumZones; zone++)
         {
           // only use pixel for histogram if hue is near most_used_hue
-          if ((pixel_hue > most_used_hue[channel] - hue_windowsize) &&
-              (pixel_hue < most_used_hue[channel] + hue_windowsize))
+          if ((pixel_hue > m_most_used_hue[zone] - hue_windowsize) &&
+              (pixel_hue < m_most_used_hue[zone] + hue_windowsize))
           {
             // build histogram
             // sat_hist[channel][HSV_Img[i].s] += Weight[i].channel[channel] * HSV_Img[i].v;
-            sat_hist[channel][HSV_Img[i].s] += Weight[channel][i] * HSV_Img[i].v;
+            m_sat_hist[zone * (s_MAX+1) + (*temp_Img).s ] += m_Zone_Weights[zone][i] * (*temp_Img).v;
+
           }
         }
       }
       i++;
+      temp_Img++;
     }
   }
 
@@ -231,9 +362,9 @@ tColorPacket CalcColorsAnalyzeHSV(CAtmoConfig *pAtmoConfig, tHSVColor *HSV_Img)
   /* saturation histogram windowing       */
   /*--------------------------------------*/
    // windowed HSV histogram
-   long int w_sat_hist[ATMO_NUM_CHANNELS][s_MAX+1];
+   // long int w_sat_hist[CAP_MAX_NUM_ZONES][s_MAX+1]; --> m_windowed_sat_hist
    // clean windowed histogram
-   memset(&w_sat_hist, 0, sizeof(w_sat_hist));
+   memset(m_windowed_sat_hist, 0, sizeof(long int) * (s_MAX+1) * AtmoSetup_NumZones);
    // steps in each direction; eg. 2 => -2 -1 0 1 2 windowing
    int sat_windowsize = AtmoSetup_SatWinSize;
 
@@ -252,13 +383,17 @@ tColorPacket CalcColorsAnalyzeHSV(CAtmoConfig *pAtmoConfig, tHSVColor *HSV_Img)
        // handle end of windowing -> roll forward
        if (myidx > h_MAX) { myidx = myidx - s_MAX - 1; }
 
-       for (int channel = 0; channel < ATMO_NUM_CHANNELS; channel++)
+       for (int zone = 0; zone < AtmoSetup_NumZones; zone++)
        {
          /*
             apply lite triangular window design with
             gradient of 10% per discrete step
          */
+         /*
          w_sat_hist[channel][i] += sat_hist[channel][myidx] *
+                                  ((sat_windowsize+1)-abs(mywin)); // apply window
+         */
+         m_windowed_sat_hist[zone * (s_MAX+1) + i] += m_sat_hist[zone* (h_MAX+1) + myidx] *
                                   ((sat_windowsize+1)-abs(mywin)); // apply window
        }
      }
@@ -268,43 +403,48 @@ tColorPacket CalcColorsAnalyzeHSV(CAtmoConfig *pAtmoConfig, tHSVColor *HSV_Img)
   /* analyze histogram for most used sat  */
   /*--------------------------------------*/
    // resulting sat (most_used_hue) for each channel
-  int most_used_sat[ATMO_NUM_CHANNELS];
-  memset(&most_used_sat, 0, sizeof(most_used_sat));
+  // int most_used_sat[CAP_MAX_NUM_ZONES];->m_most_used_sat
 
-  for (int channel = 0; channel < ATMO_NUM_CHANNELS; channel++)
+  FindMostUsed(AtmoSetup_NumZones, m_most_used_sat, m_windowed_sat_hist);
+  /*
+  memset(m_most_used_sat, 0, sizeof(int) * AtmoSetup_NumZones);
+
+  for (int zone = 0; zone < AtmoSetup_NumZones; zone++)
   {
     int value = 0;
     // walk trough histogram
     for (i = 0; i < s_MAX+1; i++)
     {
       // if new value bigger then old one
-      if (w_sat_hist[channel][i] > value)
+      int tmp = m_windowed_sat_hist[zone * (s_MAX+1) + i];
+      // if (w_sat_hist[channel][i] > value)
+      if (tmp > value)
       {
         // remember index
-        most_used_sat[channel] = i;
+        m_most_used_sat[zone] = i;
         // and value
-        value = w_sat_hist[channel][i];
+        value = tmp;
       }
     }
   }
+  */
+
 
   /*----------------------------------------------------------*/
   /* calculate average brightness within HSV image            */
   /* uniform Brightness for all channels is calculated        */
   /*----------------------------------------------------------*/
+  /* code integrated into "hue histogram builtup" to save some looping time!
   int l_counter = 0;
   // average brightness (value)
   long int value_avg = 0;
-
-  // TODO: extract into a function? in sat-histo-built
-
   i = 0;
   for (int row = 0; row < CAP_HEIGHT; row++)
   {
     for (int column = 0; column < CAP_WIDTH; column++)
     {
       // find average value: only use bright pixels for luminance average
-	  if (HSV_Img[i].v > 10*AtmoSetup_DarknessLimit)
+	  if (HSV_Img[i].v > AtmoSetup_DarknessLimit)
       {
         // build brightness average
         value_avg += HSV_Img[i].v;
@@ -313,33 +453,56 @@ tColorPacket CalcColorsAnalyzeHSV(CAtmoConfig *pAtmoConfig, tHSVColor *HSV_Img)
       i++;
     }
   }
-
   // calculate brightness average
   if (l_counter > 0) { value_avg = value_avg / l_counter; }
-    else { value_avg = 10 * AtmoSetup_DarknessLimit; }
+    else { value_avg = AtmoSetup_DarknessLimit; }
+
+  */
+
 
   /*----------------------------*/
   /* adjust and copy results    */
   /*----------------------------*/
   tHSVColor hsv_pixel;
   // storage container for resulting RGB values
-  tColorPacket ColorChannels;
+  pColorPacket output_colors;
+  AllocColorPacket(output_colors, AtmoSetup_NumZones);
 
-  for (int channel = 0; channel < ATMO_NUM_CHANNELS; channel++)
+  // adjust brightness
+//  int new_value = (int) ((float)value_avg * ((float)AtmoSetup_BrightCorrect / 100.0));
+//  if (new_value > 255) new_value = 255;  // ensure brightness isn't set too high
+//  hsv_pixel.v = (unsigned char)new_value;
+
+  /*
+  // calculate brightness average
+  for(int zone = 0; zone < AtmoSetup_NumZones; zone++) {
+      if(m_average_counter[zone] > 0)
+          m_average_v[zone] = m_average_v[zone] / m_average_counter[zone]
+      else
+          m_average_v[zone] = AtmoSetup_DarknessLimit;
+  }
+
+  */
+
+  for (int zone = 0; zone < AtmoSetup_NumZones; zone++)
   {
-    // copy values
-    hsv_pixel.h = most_used_hue[channel];
-    hsv_pixel.s = most_used_sat[channel];
+    if(m_average_counter[zone] > 0)
+       m_average_v[zone] = m_average_v[zone] / m_average_counter[zone];
+    else
+       m_average_v[zone] = AtmoSetup_DarknessLimit;
 
-    // adjust brightness
-    int new_value = (int) ((float)value_avg * ((float)AtmoSetup_BrightCorrect / 100.0));
-    if (new_value > 255) { new_value = 255; } // ensure brightness isn't set too high
-    hsv_pixel.v = (unsigned char)new_value;
+    m_average_v[zone] = (int)((float)m_average_v[zone] * ((float)AtmoSetup_BrightCorrect / 100.0));
+
+    hsv_pixel.v = (unsigned char)ATMO_MAX(ATMO_MIN(m_average_v[zone],255),0);
+    hsv_pixel.h = m_most_used_hue[zone];
+    hsv_pixel.s = m_most_used_sat[zone];
 
     // convert back to rgb
-    ColorChannels.channel[channel] = HSV2RGB(hsv_pixel);
+    output_colors->zone[zone] = HSV2RGB(hsv_pixel);
   }
-  return ColorChannels;
+
+
+  return output_colors;
 }
 
 tHSVColor RGB2HSV(tRGBColor color)
@@ -353,8 +516,8 @@ tHSVColor RGB2HSV(tRGBColor color)
  g = color.g;
  b = color.b;
 
- min = MIN(MIN(r, g), b);
- max = MAX(MAX(r, g), b);
+ min = ATMO_MIN(ATMO_MIN(r, g), b);
+ max = ATMO_MAX(ATMO_MAX(r, g), b);
 
  delta = max - min;
 

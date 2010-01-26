@@ -25,12 +25,14 @@ void CAtmoZoneDefinition::Fill(unsigned char value)
       m_BasicWeight[i] = value;
 }
 
+
 // max weight to left
-void CAtmoZoneDefinition::FillGradientFromLeft()
+void CAtmoZoneDefinition::FillGradientFromLeft(int start_row,int end_row)
 {
-   int index = 0;
+   int index;
    unsigned char col_norm;
-   for(int row=0; row < CAP_HEIGHT; row++) {
+   index = start_row * CAP_WIDTH;
+   for(int row=start_row; row < end_row; row++) {
        for(int col=0; col < CAP_WIDTH; col++) {
            // should be a value between 0 .. 255?
            col_norm = (255 * (CAP_WIDTH-col-1)) / (CAP_WIDTH-1);
@@ -40,11 +42,12 @@ void CAtmoZoneDefinition::FillGradientFromLeft()
 }
 
 // max weight to right
-void CAtmoZoneDefinition::FillGradientFromRight()
+void CAtmoZoneDefinition::FillGradientFromRight(int start_row,int end_row)
 {
-   int index = 0;
+   int index;
    unsigned char col_norm;
-   for(int row=0; row < CAP_HEIGHT; row++) {
+   index = start_row * CAP_WIDTH;
+   for(int row=start_row; row < end_row; row++) {
       for(int col=0; col < CAP_WIDTH; col++) {
           col_norm = (255 * col) / (CAP_WIDTH-1); // should be a value between 0 .. 255?
           m_BasicWeight[index++] = col_norm;
@@ -53,30 +56,130 @@ void CAtmoZoneDefinition::FillGradientFromRight()
 }
 
 // max weight from top
-void CAtmoZoneDefinition::FillGradientFromTop()
+void CAtmoZoneDefinition::FillGradientFromTop(int start_col,int end_col)
 {
-   int index = 0;
+   int index;
    unsigned char row_norm;
+
    for(int row=0; row < CAP_HEIGHT; row++) {
+       index = row * CAP_WIDTH + start_col;
+
        row_norm = (255 * (CAP_HEIGHT-row-1)) / (CAP_HEIGHT-1); // should be a value between 0 .. 255?
-       for(int col=0; col < CAP_WIDTH; col++) {
+       for(int col=start_col; col < end_col; col++) {
            m_BasicWeight[index++] = row_norm;
        }
    }
 }
 
 // max weight from bottom
-void CAtmoZoneDefinition::FillGradientFromBottom()
+void CAtmoZoneDefinition::FillGradientFromBottom(int start_col,int end_col)
 {
-   int index = 0;
+   int index;
    unsigned char row_norm;
    for(int row=0; row < CAP_HEIGHT; row++) {
+       index = row * CAP_WIDTH + start_col;
        row_norm = (255 * row) / (CAP_HEIGHT-1); // should be a value between 0 .. 255?
-       for(int col=0; col < CAP_WIDTH; col++) {
+       for(int col=start_col; col < end_col; col++) {
            m_BasicWeight[index++] = row_norm;
        }
    }
 }
+
+#if !defined(_ATMO_VLC_PLUGIN_)
+
+void CAtmoZoneDefinition::SaveZoneBitmap(char *fileName)
+{
+     if(!fileName) return;
+
+     BITMAPINFO bmpInfo;
+     // BITMAPINFOHEADER
+     BITMAPFILEHEADER  bmpFileHeader;
+     ZeroMemory(&bmpInfo, sizeof(BITMAPINFO));
+     bmpInfo.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
+
+
+     bmpInfo.bmiHeader.biHeight = -CAP_HEIGHT;
+     bmpInfo.bmiHeader.biWidth  = CAP_WIDTH;
+     bmpInfo.bmiHeader.biSizeImage = abs(bmpInfo.bmiHeader.biHeight) * bmpInfo.bmiHeader.biWidth * 3;
+
+     unsigned char *pBuf = (unsigned char *)malloc(bmpInfo.bmiHeader.biSizeImage);
+     for(int y=0; y < CAP_HEIGHT; y++ )
+     {
+         for(int x=0; x < CAP_WIDTH; x++)
+         {
+             pBuf[y * CAP_WIDTH * 3 + x * 3 ] = 0;
+             pBuf[y * CAP_WIDTH * 3 + x * 3 + 1 ] = m_BasicWeight[y * CAP_WIDTH + x];
+             pBuf[y * CAP_WIDTH * 3 + x * 3 + 2] = 0;
+         }
+     }
+
+     bmpInfo.bmiHeader.biCompression = BI_RGB;
+     bmpInfo.bmiHeader.biPlanes = 1;
+     bmpInfo.bmiHeader.biBitCount = 24;
+
+     bmpFileHeader.bfReserved1=0;
+     bmpFileHeader.bfReserved2=0;
+     bmpFileHeader.bfSize=sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER)+bmpInfo.bmiHeader.biSizeImage;
+     bmpFileHeader.bfType = MakeIntelWord('M','B');
+     bmpFileHeader.bfOffBits=sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER);
+
+
+     FILE *fp = NULL;
+     fp = fopen(fileName,"wb");
+     fwrite(&bmpFileHeader,sizeof(BITMAPFILEHEADER),1,fp);
+     fwrite(&bmpInfo.bmiHeader,sizeof(BITMAPINFOHEADER),1,fp);
+     fwrite(pBuf,bmpInfo.bmiHeader.biSizeImage,1,fp);
+     fclose(fp);
+}
+
+void CAtmoZoneDefinition::SaveWeightBitmap(char *fileName,int *weight)
+{
+     if(!fileName || !weight) return;
+
+     BITMAPINFO bmpInfo;
+     // BITMAPINFOHEADER
+     BITMAPFILEHEADER  bmpFileHeader;
+     ZeroMemory(&bmpInfo, sizeof(BITMAPINFO));
+     bmpInfo.bmiHeader.biSize=sizeof(BITMAPINFOHEADER);
+
+
+     bmpInfo.bmiHeader.biHeight = -CAP_HEIGHT;
+     bmpInfo.bmiHeader.biWidth  = CAP_WIDTH;
+     bmpInfo.bmiHeader.biSizeImage = abs(bmpInfo.bmiHeader.biHeight) * bmpInfo.bmiHeader.biWidth * 3;
+
+     unsigned char *pBuf = (unsigned char *)malloc(bmpInfo.bmiHeader.biSizeImage);
+     for(int y=0; y < CAP_HEIGHT; y++ )
+     {
+         for(int x=0; x < CAP_WIDTH; x++)
+         {
+             pBuf[y * CAP_WIDTH * 3 + x * 3 ] = 0;
+             pBuf[y * CAP_WIDTH * 3 + x * 3 + 1 ] = (unsigned char)weight[y * CAP_WIDTH + x];
+             pBuf[y * CAP_WIDTH * 3 + x * 3 + 2] = 0;
+         }
+     }
+
+     bmpInfo.bmiHeader.biCompression = BI_RGB;
+     bmpInfo.bmiHeader.biPlanes = 1;
+     bmpInfo.bmiHeader.biBitCount = 24;
+
+     bmpFileHeader.bfReserved1=0;
+     bmpFileHeader.bfReserved2=0;
+     bmpFileHeader.bfSize=sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER)+bmpInfo.bmiHeader.biSizeImage;
+     bmpFileHeader.bfType = MakeIntelWord('M','B');
+     bmpFileHeader.bfOffBits=sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER);
+
+
+     FILE *fp = NULL;
+     fp = fopen(fileName,"wb");
+     fwrite(&bmpFileHeader,sizeof(BITMAPFILEHEADER),1,fp);
+     fwrite(&bmpInfo.bmiHeader,sizeof(BITMAPINFOHEADER),1,fp);
+     fwrite(pBuf,bmpInfo.bmiHeader.biSizeImage,1,fp);
+     fclose(fp);
+}
+
+
+#endif
+
 
 
 int CAtmoZoneDefinition::LoadGradientFromBitmap(char *pszBitmap)
@@ -88,6 +191,7 @@ int CAtmoZoneDefinition::LoadGradientFromBitmap(char *pszBitmap)
   BITMAPFILEHEADER  bmpFileHeader;
 
   /*
+  ATMO_LOAD_GRADIENT_FILENOTFOND
 #define ATMO_LOAD_GRADIENT_OK  0
 #define ATMO_LOAD_GRADIENT_FAILED_SIZE    1
 #define ATMO_LOAD_GRADIENT_FAILED_HEADER  2
@@ -96,18 +200,15 @@ int CAtmoZoneDefinition::LoadGradientFromBitmap(char *pszBitmap)
 
    FILE *bmp = fopen(pszBitmap, "rb");
    if(!bmp)
-     return ATMO_LOAD_GRADIENT_FILENOTFOND;
+    return ATMO_LOAD_GRADIENT_FILENOTFOND;
 
     if(fread(&bmpFileHeader, sizeof(BITMAPFILEHEADER), 1, bmp) != 1)
     {
         fclose(bmp);
         return ATMO_LOAD_GRADIENT_FAILED_SIZE;
     }
-#ifdef _ATMO_VLC_PLUGIN_
-    if(bmpFileHeader.bfType != VLC_TWOCC('M','B'))
-#else
-    if(bmpFileHeader.bfType != MakeWord('M','B'))
-#endif
+
+    if(bmpFileHeader.bfType != MakeIntelWord('M','B'))
     {
         fclose(bmp);
         return ATMO_LOAD_GRADIENT_FAILED_HEADER;

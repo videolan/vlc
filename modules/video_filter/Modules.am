@@ -62,10 +62,16 @@ SOURCES_atmo = atmo/atmo.cpp \
 	atmo/AtmoInput.cpp atmo/AtmoInput.h \
 	atmo/AtmoLiveView.cpp atmo/AtmoLiveView.h \
 	atmo/AtmoOutputFilter.cpp atmo/AtmoOutputFilter.h \
-	atmo/AtmoSerialConnection.cpp atmo/AtmoSerialConnection.h \
 	atmo/AtmoThread.cpp atmo/AtmoThread.h \
 	atmo/AtmoTools.cpp atmo/AtmoTools.h \
-	atmo/AtmoZoneDefinition.cpp atmo/AtmoZoneDefinition.h
+	atmo/AtmoZoneDefinition.cpp atmo/AtmoZoneDefinition.h \
+	atmo/AtmoChannelAssignment.cpp atmo/AtmoChannelAssignment.h \
+	atmo/AtmoClassicConnection.cpp atmo/AtmoClassicConnection.h \
+	atmo/AtmoDmxSerialConnection.cpp atmo/AtmoDmxSerialConnection.h \
+	atmo/DmxTools.cpp atmo/DmxTools.h \
+	atmo/AtmoMultiConnection.cpp atmo/AtmoMultiConnection.h \
+	atmo/MoMoConnection.cpp atmo/MoMoConnection.h \
+	atmo/AtmoPacketQueue.cpp atmo/AtmoPacketQueue.h
 SOURCES_video_filter_wrapper = wrapper.c
 noinst_HEADERS = filter_common.h filter_picture.h
 

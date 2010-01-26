@@ -7,14 +7,24 @@
  */
 
 #include "AtmoTools.h"
+#include "AtmoDynData.h"
 #include "AtmoLiveView.h"
-#include "AtmoSerialConnection.h"
+#include "AtmoClassicConnection.h"
+#include "AtmoDmxSerialConnection.h"
+#include "AtmoMultiConnection.h"
+#include "MoMoConnection.h"
+#include "AtmoExternalCaptureInput.h"
+#include <math.h>
 
 #if !defined(_ATMO_VLC_PLUGIN_)
 #   include "AtmoColorChanger.h"
 #   include "AtmoLeftRightColorChanger.h"
+
 #   include "AtmoDummyConnection.h"
-#   include "AtmoDmxSerialConnection.h"
+#   include "AtmoNulConnection.h"
+#   include "MondolightConnection.h"
+
+#   include "AtmoGdiDisplayCaptureInput.h"
 #endif
 
 
@@ -30,22 +40,31 @@ void CAtmoTools::ShowShutdownColor(CAtmoDynData *pDynData)
 {
     pDynData->LockCriticalSection();
 
+
     CAtmoConnection *atmoConnection = pDynData->getAtmoConnection();
     CAtmoConfig *atmoConfig = pDynData->getAtmoConfig();
-    if((atmoConnection != NULL) && (atmoConfig!=NULL)) {
-       int r[ATMO_NUM_CHANNELS],g[ATMO_NUM_CHANNELS],b[ATMO_NUM_CHANNELS],i;
+    if((atmoConnection != NULL) && (atmoConfig!=NULL) && atmoConfig->isSetShutdownColor()) {
+       int i;
+       pColorPacket packet;
+       AllocColorPacket(packet, atmoConfig->getZoneCount());
+
        // set a special color? on shutdown of the software? mostly may use black or so ...
        // if this function ist disabled ... atmo will continuing to show the last color...
-       if(atmoConnection->isOpen() == ATMO_TRUE) {
-	        if(atmoConfig->isSetShutdownColor() == 1) {
-		        for(i=0;i<ATMO_NUM_CHANNELS;i++) {
-			        r[i] = atmoConfig->getShutdownColor_Red();
-			        g[i] = atmoConfig->getShutdownColor_Green();
-			        b[i] = atmoConfig->getShutdownColor_Blue();
-		        }
-                atmoConnection->SendData(ATMO_NUM_CHANNELS,r,g,b);
-	        }
+       for(i = 0; i < packet->numColors; i++) {
+           packet->zone[i].r = atmoConfig->getShutdownColor_Red();
+           packet->zone[i].g = atmoConfig->getShutdownColor_Green();
+           packet->zone[i].b = atmoConfig->getShutdownColor_Blue();
        }
+
+       packet = CAtmoTools::ApplyGamma(atmoConfig, packet);
+
+       if(atmoConfig->isUseSoftwareWhiteAdj())
+          packet = CAtmoTools::WhiteCalibration(atmoConfig, packet);
+
+       atmoConnection->SendData(packet);
+
+       delete (char *)packet;
+
 	}
 
     pDynData->UnLockCriticalSection();
@@ -68,13 +87,38 @@ EffectMode CAtmoTools::SwitchEffect(CAtmoDynData *pDynData, EffectMode newEffect
 
     EffectMode oldEffectMode = atmoConfig->getEffectMode();
     CThread *currentEffect = pDynData->getEffectThread();
+    CAtmoInput *currentInput = pDynData->getLiveInput();
+    CAtmoPacketQueue *currentPacketQueue = pDynData->getLivePacketQueue();
+
+
+    if(oldEffectMode == emLivePicture) {
+        /* in case of disabling the live mode
+           first we have to stop the input
+           then the effect thread!
+        */
+        if(currentInput != NULL) {
+           pDynData->setLiveInput( NULL );
+           currentInput->Close();
+           delete currentInput;
+           currentInput = NULL;
+        }
+    }
 
     // stop and delete/cleanup current Effect Thread...
-    pDynData->setEffectThread(NULL);
-    if(currentEffect!=NULL) {
+    pDynData->setEffectThread( NULL );
+    if(currentEffect != NULL) {
        currentEffect->Terminate();
        delete currentEffect;
        currentEffect = NULL;
+    }
+
+    if(oldEffectMode == emLivePicture) {
+       /*
+         and last we kill the PacketQueue used for communication between the threads
+       */
+       pDynData->setLivePacketQueue( NULL );
+       delete currentPacketQueue;
+       currentPacketQueue = NULL;
     }
 
     if((atmoConnection!=NULL) && (atmoConnection->isOpen()==ATMO_TRUE)) {
@@ -84,28 +128,54 @@ EffectMode CAtmoTools::SwitchEffect(CAtmoDynData *pDynData, EffectMode newEffect
             case emDisabled:
                 break;
 
-            case emStaticColor:
-                    // get values from config - and put them to all channels?
-                    int r[ATMO_NUM_CHANNELS],g[ATMO_NUM_CHANNELS],b[ATMO_NUM_CHANNELS];
-                    for(int i=0;i<ATMO_NUM_CHANNELS;i++) {
-                        r[i] = (atmoConfig->getStaticColor_Red()   * atmoConfig->getWhiteAdjustment_Red())/255;
-                        g[i] = (atmoConfig->getStaticColor_Green() * atmoConfig->getWhiteAdjustment_Green())/255;
-                        b[i] = (atmoConfig->getStaticColor_Blue()  * atmoConfig->getWhiteAdjustment_Blue())/255;
-                    }
-                    atmoConnection->SendData(ATMO_NUM_CHANNELS,r,g,b);
-                break;
+            case emStaticColor: {
+                 // get values from config - and put them to all channels?
+                 pColorPacket packet;
+                 AllocColorPacket(packet, atmoConfig->getZoneCount());
+                 for(int i=0; i < packet->numColors; i++){
+                     packet->zone[i].r = atmoConfig->getStaticColor_Red();
+                     packet->zone[i].g = atmoConfig->getStaticColor_Green();
+                     packet->zone[i].b = atmoConfig->getStaticColor_Blue();
+                 }
 
-            case emLivePicture:
+                 packet = CAtmoTools::ApplyGamma( atmoConfig, packet );
+
+                 if(atmoConfig->isUseSoftwareWhiteAdj())
+                    packet = CAtmoTools::WhiteCalibration(atmoConfig, packet);
+
+                 atmoConnection->SendData( packet );
+
+                 delete (char *)packet;
+
+                 break;
+             }
+
+            case emLivePicture: {
                 currentEffect = new CAtmoLiveView(pDynData);
+
+#if !defined(_ATMO_VLC_PLUGIN_)
+                CAtmoPacketQueueStatus *packetMon = NULL;
+                if(atmoConfig->getShow_statistics()) {
+                   packetMon = new CAtmoPacketQueueStatus(pDynData->getHinstance(), (HWND)NULL);
+                   packetMon->createWindow();
+                   packetMon->showWindow(SW_SHOW);
+                }
+                currentPacketQueue = new CAtmoPacketQueue(packetMon);
+                pDynData->setLivePictureSource(lpsScreenCapture);
+                currentInput = new CAtmoGdiDisplayCaptureInput( pDynData );
+#else
+                currentPacketQueue = new CAtmoPacketQueue();
+                pDynData->setLivePictureSource(lpsExtern);
+                currentInput = new CAtmoExternalCaptureInput( pDynData );
+#endif
                 break;
+            }
 
 #if !defined(_ATMO_VLC_PLUGIN_)
             case emColorChange:
                 currentEffect = new CAtmoColorChanger(atmoConnection, atmoConfig);
                 break;
-#endif
 
-#if !defined(_ATMO_VLC_PLUGIN_)
             case emLrColorChange:
                 currentEffect = new CAtmoLeftRightColorChanger(atmoConnection, atmoConfig);
                 break;
@@ -114,15 +184,59 @@ EffectMode CAtmoTools::SwitchEffect(CAtmoDynData *pDynData, EffectMode newEffect
 
     }
 
-    atmoConfig->setEffectMode(newEffectMode);
+    atmoConfig->setEffectMode( newEffectMode );
 
-    pDynData->setEffectThread(currentEffect);
+    pDynData->setLivePacketQueue( currentPacketQueue );
+    pDynData->setEffectThread( currentEffect );
+    pDynData->setLiveInput( currentInput );
 
-    if(currentEffect!=NULL)
+    if(currentEffect != NULL)
        currentEffect->Run();
+    if(currentInput != NULL)
+       currentInput->Open();
 
     pDynData->UnLockCriticalSection();
     return oldEffectMode;
+}
+
+LivePictureSource CAtmoTools::SwitchLiveSource(CAtmoDynData *pDynData, LivePictureSource newLiveSource)
+{
+    LivePictureSource oldSource;
+    pDynData->LockCriticalSection();
+
+    oldSource = pDynData->getLivePictureSource();
+    pDynData->setLivePictureSource( newLiveSource );
+
+    if ((pDynData->getAtmoConfig()->getEffectMode() == emLivePicture) &&
+        (pDynData->getEffectThread() != NULL) &&
+        (pDynData->getLivePacketQueue() != NULL))
+    {
+        CAtmoInput *input = pDynData->getLiveInput();
+        pDynData->setLiveInput( NULL );
+        if(input != NULL) {
+            input->Close();
+            delete input;
+            input = NULL;
+        }
+
+        switch(pDynData->getLivePictureSource()) {
+#if !defined(_ATMO_VLC_PLUGIN_)
+               case lpsScreenCapture:
+                    input = new CAtmoGdiDisplayCaptureInput( pDynData );
+               break;
+#endif
+               case lpsExtern:
+                    input = new CAtmoExternalCaptureInput( pDynData );
+               break;
+        }
+
+        pDynData->setLiveInput( input );
+        if(input != NULL)
+           input->Open();
+    }
+
+    pDynData->UnLockCriticalSection();
+    return oldSource;
 }
 
 ATMO_BOOL CAtmoTools::RecreateConnection(CAtmoDynData *pDynData)
@@ -130,7 +244,8 @@ ATMO_BOOL CAtmoTools::RecreateConnection(CAtmoDynData *pDynData)
     pDynData->LockCriticalSection();
 
     CAtmoConnection *current = pDynData->getAtmoConnection();
-    AtmoConnectionType act = pDynData->getAtmoConfig()->getConnectionType();
+    CAtmoConfig *atmoConfig = pDynData->getAtmoConfig();
+    AtmoConnectionType act = atmoConfig->getConnectionType();
     pDynData->setAtmoConnection(NULL);
     if(current != NULL) {
        current->CloseConnection();
@@ -138,67 +253,155 @@ ATMO_BOOL CAtmoTools::RecreateConnection(CAtmoDynData *pDynData)
     }
 
     switch(act) {
-           case actSerialPort: {
-               CAtmoSerialConnection *tempConnection = new CAtmoSerialConnection(pDynData->getAtmoConfig());
+           case actClassicAtmo: {
+               CAtmoClassicConnection *tempConnection = new CAtmoClassicConnection( atmoConfig );
                if(tempConnection->OpenConnection() == ATMO_FALSE) {
 #if !defined(_ATMO_VLC_PLUGIN_)
-                  char errorMsgBuf[200];
-                  sprintf(errorMsgBuf,"Failed to open serial port com%d with errorcode: %d (0x%x)",
-                            pDynData->getAtmoConfig()->getComport(),
-                            tempConnection->getLastError(),
-                            tempConnection->getLastError()
-                        );
-                  MessageBox(0,errorMsgBuf,"Error",MB_ICONERROR | MB_OK);
+                  if(atmoConfig->getIgnoreConnectionErrorOnStartup() == ATMO_FALSE)
+                  {
+                        char errorMsgBuf[200];
+                        sprintf(errorMsgBuf,"Failed to open serial port com%d with errorcode: %d (0x%x)",
+                                    pDynData->getAtmoConfig()->getComport(),
+                                    tempConnection->getLastError(),
+                                    tempConnection->getLastError()
+                                );
+                        MessageBox(0,errorMsgBuf,"Error",MB_ICONERROR | MB_OK);
+                  }
 #endif
-                  delete tempConnection;
+                  pDynData->setAtmoConnection(tempConnection);
 
                   pDynData->UnLockCriticalSection();
                   return ATMO_FALSE;
                }
                pDynData->setAtmoConnection(tempConnection);
+               pDynData->ReloadZoneDefinitionBitmaps();
+
+               tempConnection->CreateDefaultMapping(atmoConfig->getChannelAssignment(0));
 
                CAtmoTools::SetChannelAssignment(pDynData,
-                           pDynData->getAtmoConfig()->getCurrentChannelAssignment());
+                                                atmoConfig->getCurrentChannelAssignment());
 
                pDynData->UnLockCriticalSection();
                return ATMO_TRUE;
            }
 
 #if !defined(_ATMO_VLC_PLUGIN_)
-           case actDummy: {
+           case actDummy:
+           {
+               // actDummy8,actDummy12,actDummy16
                CAtmoDummyConnection *tempConnection = new CAtmoDummyConnection(pDynData->getHinstance(),
-                                                                               pDynData->getAtmoConfig());
+                                                                               atmoConfig);
                if(tempConnection->OpenConnection() == ATMO_FALSE) {
-                  delete tempConnection;
-
+                  pDynData->setAtmoConnection(tempConnection);
                   pDynData->UnLockCriticalSection();
                   return ATMO_FALSE;
                }
                pDynData->setAtmoConnection(tempConnection);
+               pDynData->ReloadZoneDefinitionBitmaps();
+
+               tempConnection->CreateDefaultMapping(atmoConfig->getChannelAssignment(0));
 
                CAtmoTools::SetChannelAssignment(pDynData, pDynData->getAtmoConfig()->getCurrentChannelAssignment());
 
                pDynData->UnLockCriticalSection();
                return ATMO_TRUE;
            }
+#endif
 
            case actDMX: {
                // create here your DMX connections... instead of the dummy....
-               CAtmoDmxSerialConnection *tempConnection = new CAtmoDmxSerialConnection(pDynData->getAtmoConfig());
+               CAtmoDmxSerialConnection *tempConnection = new CAtmoDmxSerialConnection( atmoConfig );
                if(tempConnection->OpenConnection() == ATMO_FALSE) {
-                  delete tempConnection;
+                  pDynData->setAtmoConnection(tempConnection);
 
                   pDynData->UnLockCriticalSection();
                   return ATMO_FALSE;
                }
                pDynData->setAtmoConnection(tempConnection);
+               pDynData->ReloadZoneDefinitionBitmaps();
 
-               CAtmoTools::SetChannelAssignment(pDynData, pDynData->getAtmoConfig()->getCurrentChannelAssignment());
+               tempConnection->CreateDefaultMapping(atmoConfig->getChannelAssignment(0));
+
+               CAtmoTools::SetChannelAssignment(pDynData, atmoConfig->getCurrentChannelAssignment());
+
+               pDynData->UnLockCriticalSection();
+               return ATMO_TRUE;
+           }
+
+#if !defined(_ATMO_VLC_PLUGIN_)
+           case actNUL: {
+               CAtmoNulConnection *tempConnection = new CAtmoNulConnection( atmoConfig );
+               if(tempConnection->OpenConnection() == ATMO_FALSE) {
+                  pDynData->setAtmoConnection(tempConnection);
+                  pDynData->UnLockCriticalSection();
+                  return ATMO_FALSE;
+               }
+               pDynData->setAtmoConnection(tempConnection);
+               pDynData->ReloadZoneDefinitionBitmaps();
+
+               tempConnection->CreateDefaultMapping(atmoConfig->getChannelAssignment(0));
+
+               CAtmoTools::SetChannelAssignment(pDynData, atmoConfig->getCurrentChannelAssignment());
 
                pDynData->UnLockCriticalSection();
                return ATMO_TRUE;
            }
 #endif
+
+           case actMultiAtmo: {
+               CAtmoMultiConnection *tempConnection = new CAtmoMultiConnection( atmoConfig );
+               if(tempConnection->OpenConnection() == ATMO_FALSE) {
+                  pDynData->setAtmoConnection(tempConnection);
+                  pDynData->UnLockCriticalSection();
+                  return ATMO_FALSE;
+               }
+               pDynData->setAtmoConnection(tempConnection);
+               pDynData->ReloadZoneDefinitionBitmaps();
+
+               tempConnection->CreateDefaultMapping(atmoConfig->getChannelAssignment(0));
+
+               CAtmoTools::SetChannelAssignment(pDynData, atmoConfig->getCurrentChannelAssignment());
+
+               pDynData->UnLockCriticalSection();
+               return ATMO_TRUE;
+           }
+
+#if !defined(_ATMO_VLC_PLUGIN_)
+           case actMondolight: {
+               CMondolightConnection *tempConnection = new CMondolightConnection( atmoConfig );
+               if(tempConnection->OpenConnection() == ATMO_FALSE) {
+                  pDynData->setAtmoConnection(tempConnection);
+                  pDynData->UnLockCriticalSection();
+                  return ATMO_FALSE;
+               }
+               pDynData->setAtmoConnection(tempConnection);
+               pDynData->ReloadZoneDefinitionBitmaps();
+
+               tempConnection->CreateDefaultMapping(atmoConfig->getChannelAssignment(0));
+
+               CAtmoTools::SetChannelAssignment(pDynData, atmoConfig->getCurrentChannelAssignment());
+
+               pDynData->UnLockCriticalSection();
+               return ATMO_TRUE;
+           }
+#endif
+           case actMoMoLight: {
+               CMoMoConnection *tempConnection = new CMoMoConnection( atmoConfig );
+               if(tempConnection->OpenConnection() == ATMO_FALSE) {
+                  pDynData->setAtmoConnection(tempConnection);
+                  pDynData->UnLockCriticalSection();
+                  return ATMO_FALSE;
+               }
+               pDynData->setAtmoConnection(tempConnection);
+               pDynData->ReloadZoneDefinitionBitmaps();
+
+               tempConnection->CreateDefaultMapping( atmoConfig->getChannelAssignment(0) );
+
+               CAtmoTools::SetChannelAssignment(pDynData, atmoConfig->getCurrentChannelAssignment() );
+
+               pDynData->UnLockCriticalSection();
+               return ATMO_TRUE;
+           }
 
            default: {
                pDynData->UnLockCriticalSection();
@@ -207,22 +410,64 @@ ATMO_BOOL CAtmoTools::RecreateConnection(CAtmoDynData *pDynData)
     }
 }
 
-tColorPacket CAtmoTools::WhiteCalibration(CAtmoConfig *pAtmoConfig, tColorPacket ColorPacket)
+pColorPacket CAtmoTools::WhiteCalibration(CAtmoConfig *pAtmoConfig, pColorPacket ColorPacket)
 {
     int w_adj_red   = pAtmoConfig->getWhiteAdjustment_Red();
     int w_adj_green = pAtmoConfig->getWhiteAdjustment_Green();
     int w_adj_blue  = pAtmoConfig->getWhiteAdjustment_Blue();
 
-    for (int i = 0; i < ATMO_NUM_CHANNELS; i++)  {
-        ColorPacket.channel[i].r = (unsigned char)(((int)w_adj_red   * (int)ColorPacket.channel[i].r)   / 255);
-        ColorPacket.channel[i].g = (unsigned char)(((int)w_adj_green * (int)ColorPacket.channel[i].g) / 255);
-        ColorPacket.channel[i].b = (unsigned char)(((int)w_adj_blue  * (int)ColorPacket.channel[i].b)  / 255);
+    for (int i = 0; i < ColorPacket->numColors; i++)  {
+        ColorPacket->zone[i].r = (unsigned char)(((int)w_adj_red   * (int)ColorPacket->zone[i].r) / 255);
+        ColorPacket->zone[i].g = (unsigned char)(((int)w_adj_green * (int)ColorPacket->zone[i].g) / 255);
+        ColorPacket->zone[i].b = (unsigned char)(((int)w_adj_blue  * (int)ColorPacket->zone[i].b) / 255);
     }
     return ColorPacket;
 }
 
-tColorPacket CAtmoTools::ApplyGamma(CAtmoConfig *pAtmoConfig, tColorPacket ColorPacket)
+pColorPacket CAtmoTools::ApplyGamma(CAtmoConfig *pAtmoConfig, pColorPacket ColorPacket)
 {
+  double v;
+  switch(pAtmoConfig->getSoftware_gamma_mode()) {
+    case agcNone: break;
+    case agcPerColor: {
+        double GammaRed   = 10.0 / ((double)pAtmoConfig->getSoftware_gamma_red());
+        double GammaGreen = 10.0 / ((double)pAtmoConfig->getSoftware_gamma_green());
+        double GammaBlue  = 10.0 / ((double)pAtmoConfig->getSoftware_gamma_blue());
+        for (int i = 0; i < ColorPacket->numColors; i++)
+        {
+          v = ColorPacket->zone[i].r;
+          v = (pow( v / 255.0f, GammaRed ) * 255.0f);
+          ColorPacket->zone[i].r = ATMO_MIN((int)v, 255);
+
+          v = ColorPacket->zone[i].g;
+          v = (pow( v / 255.0f, GammaGreen ) * 255.0f);
+          ColorPacket->zone[i].g = ATMO_MIN((int)v, 255);
+
+          v = ColorPacket->zone[i].b;
+          v = (pow( v / 255.0f, GammaBlue ) * 255.0f);
+          ColorPacket->zone[i].b = ATMO_MIN((int)v, 255);
+        }
+        break;
+    }
+    case agcGlobal:   {
+        double Gamma   = 10.0 / ((double)pAtmoConfig->getSoftware_gamma_global());
+        for (int i = 0; i < ColorPacket->numColors; i++)
+        {
+          v = ColorPacket->zone[i].r;
+          v = (pow( v / 255.0f, Gamma ) * 255.0f);
+          ColorPacket->zone[i].r = ATMO_MIN((int)v, 255);
+
+          v = ColorPacket->zone[i].g;
+          v = (pow( v / 255.0f, Gamma ) * 255.0f);
+          ColorPacket->zone[i].g = ATMO_MIN((int)v, 255);
+
+          v = ColorPacket->zone[i].b;
+          v = (pow( v / 255.0f, Gamma ) * 255.0f);
+          ColorPacket->zone[i].b = ATMO_MIN((int)v, 255);
+        }
+        break;
+    }
+  }
   return ColorPacket;
 }
 
@@ -232,7 +477,7 @@ int CAtmoTools::SetChannelAssignment(CAtmoDynData *pDynData, int index)
     CAtmoConnection *pAtmoConnection = pDynData->getAtmoConnection();
     int oldIndex = pAtmoConfig->getCurrentChannelAssignment();
 
-    tChannelAssignment *ca = pAtmoConfig->getChannelAssignment(index);
+    CAtmoChannelAssignment *ca = pAtmoConfig->getChannelAssignment(index);
     if((ca!=NULL) && (pAtmoConnection!=NULL)) {
         pAtmoConnection->SetChannelAssignment(ca);
         pAtmoConfig->setCurrentChannelAssignment(index);
@@ -261,11 +506,7 @@ void CAtmoTools::SaveBitmap(HDC hdc,HBITMAP hBmp,char *fileName) {
      bmpFileHeader.bfReserved1=0;
      bmpFileHeader.bfReserved2=0;
      bmpFileHeader.bfSize=sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER)+bmpInfo.bmiHeader.biSizeImage;
-#ifdef _ATMO_VLC_PLUGIN_
-     bmpFileHeader.bfType = VLC_TWOCC('M','B');
-#else
-     bmpFileHeader.bfType = MakeWord('M','B');
-#endif
+     bmpFileHeader.bfType = MakeIntelWord('M','B');
      bmpFileHeader.bfOffBits=sizeof(BITMAPFILEHEADER)+sizeof(BITMAPINFOHEADER);
 
 
@@ -276,6 +517,8 @@ void CAtmoTools::SaveBitmap(HDC hdc,HBITMAP hBmp,char *fileName) {
      fwrite(pBuf,bmpInfo.bmiHeader.biSizeImage,1,fp);
      fclose(fp);
 }
+
+
 
 #endif
 

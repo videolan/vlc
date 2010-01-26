@@ -14,95 +14,146 @@
 
 
 
-CAtmoOutputFilter::CAtmoOutputFilter(CAtmoConfig *atmoConfig)
+CAtmoOutputFilter::CAtmoOutputFilter(CAtmoConfig *atmoConfig )
 {
    this->m_pAtmoConfig = atmoConfig;
+   this->m_percent_filter_output_old = NULL;
+   this->m_mean_filter_output_old = NULL;
+   this->m_mean_values = NULL;
+   this->m_mean_sums = NULL;
    ResetFilter();
 }
 
 CAtmoOutputFilter::~CAtmoOutputFilter(void)
 {
+  if(m_percent_filter_output_old)
+     delete (char *)m_percent_filter_output_old;
+
+  if(m_mean_filter_output_old)
+     delete (char *)m_mean_filter_output_old;
+
+  if(m_mean_values)
+     delete (char *)m_mean_values;
+
+  if(m_mean_sums)
+     delete (char *)m_mean_sums;
 }
 
 void CAtmoOutputFilter::ResetFilter(void)
 {
   // reset filter values
-  MeanFilter(true);
-  PercentFilter(true);
+  MeanFilter(NULL, true);
+  PercentFilter(NULL, true);
 }
 
-tColorPacket CAtmoOutputFilter::Filtering(tColorPacket ColorPacket)
+pColorPacket CAtmoOutputFilter::Filtering(pColorPacket ColorPacket)
 {
-  filter_input = ColorPacket;
-
   switch (m_pAtmoConfig->getLiveViewFilterMode())
   {
     case afmNoFilter:
-         filter_output = filter_input;
+         return ColorPacket;
     break;
 
     case afmCombined:
-         MeanFilter(false);
+         return MeanFilter(ColorPacket, false);
     break;
 
     case afmPercent:
-         PercentFilter(false);
-    break;
-
-    default:
-         filter_output = filter_input;
+         return PercentFilter(ColorPacket, false);
     break;
   }
 
-  return filter_output;
+  return ColorPacket;
 }
 
-void CAtmoOutputFilter::PercentFilter(ATMO_BOOL init)
+pColorPacket CAtmoOutputFilter::PercentFilter(pColorPacket filter_input, ATMO_BOOL init)
 {
   // last values needed for the percentage filter
-  static tColorPacket filter_output_old;
-
   if (init) // Initialization
   {
-    memset(&filter_output_old, 0, sizeof(filter_output_old));
-    return;
+    if(m_percent_filter_output_old)
+       delete (char *)m_percent_filter_output_old;
+    m_percent_filter_output_old = NULL;
+    return(NULL);
+  }
+
+  if(!m_percent_filter_output_old || (m_percent_filter_output_old->numColors!=filter_input->numColors)) {
+     delete m_percent_filter_output_old;
+     AllocColorPacket(m_percent_filter_output_old, filter_input->numColors);
+     ZeroColorPacket(m_percent_filter_output_old);
   }
 
   int percentNew = this->m_pAtmoConfig->getLiveViewFilter_PercentNew();
 
-  for (int ch = 0; ch < ATMO_NUM_CHANNELS; ch++)
-  {
-	filter_output.channel[ch].r = (filter_input.channel[ch].r *
-         (100-percentNew) + filter_output_old.channel[ch].r * percentNew) / 100;
-	
-    filter_output.channel[ch].g = (filter_input.channel[ch].g *
-         (100-percentNew) + filter_output_old.channel[ch].g * percentNew) / 100;
+  pColorPacket filter_output;
+  AllocColorPacket(filter_output, filter_input->numColors);
 
-	filter_output.channel[ch].b = (filter_input.channel[ch].b *
-         (100-percentNew) + filter_output_old.channel[ch].b * percentNew) / 100;
+  for (int zone = 0; zone < filter_input->numColors; zone++)
+  {
+	filter_output->zone[zone].r = (filter_input->zone[zone].r *
+         (100-percentNew) + m_percent_filter_output_old->zone[zone].r * percentNew) / 100;
+	
+    filter_output->zone[zone].g = (filter_input->zone[zone].g *
+         (100-percentNew) + m_percent_filter_output_old->zone[zone].g * percentNew) / 100;
+
+	filter_output->zone[zone].b = (filter_input->zone[zone].b *
+         (100-percentNew) + m_percent_filter_output_old->zone[zone].b * percentNew) / 100;
   }
 
-  filter_output_old = filter_output;
+  CopyColorPacket( filter_output, m_percent_filter_output_old );
+
+  delete (char *)filter_input;
+
+  return filter_output;
 }
 
-void CAtmoOutputFilter::MeanFilter(ATMO_BOOL init)
+pColorPacket CAtmoOutputFilter::MeanFilter(pColorPacket filter_input, ATMO_BOOL init)
 {
   // needed vor the running mean value filter
-  static tColorPacketLongInt mean_sums;
-  static tColorPacket mean_values;
+
   // needed for the percentage filter
-  static tColorPacket filter_output_old;
   static int filter_length_old;
   char reinitialize = 0;
   long int tmp;
+  pColorPacket filter_output;
 
   if (init) // Initialization
   {
-    memset(&filter_output_old, 0, sizeof(filter_output_old));
-    memset(&mean_sums, 0, sizeof(mean_sums));
-    memset(&mean_values, 0, sizeof(mean_values));
-    return;
+    if(m_mean_filter_output_old)
+       delete (char *)m_mean_filter_output_old;
+    m_mean_filter_output_old = NULL;
+
+    if(m_mean_values)
+       delete (char *)m_mean_values;
+    m_mean_values = NULL;
+
+    if(m_mean_sums)
+       delete (char *)m_mean_sums;
+    m_mean_sums = NULL;
+    return (NULL);
   }
+
+  if(!m_mean_filter_output_old || (m_mean_filter_output_old->numColors!=filter_input->numColors)) {
+        delete m_mean_filter_output_old;
+        AllocColorPacket(m_mean_filter_output_old, filter_input->numColors);
+        ZeroColorPacket(m_mean_filter_output_old);
+  }
+
+  if(!m_mean_values || (m_mean_values->numColors!=filter_input->numColors)) {
+        delete m_mean_values;
+        AllocColorPacket(m_mean_values, filter_input->numColors);
+        ZeroColorPacket(m_mean_values);
+  }
+
+  if(!m_mean_sums || (m_mean_sums->numColors!=filter_input->numColors)) {
+        delete m_mean_sums;
+        AllocLongColorPacket(m_mean_sums, filter_input->numColors);
+        ZeroLongColorPacket(m_mean_sums);
+  }
+
+  AllocColorPacket(filter_output, filter_input->numColors);
+
+
   int AtmoSetup_Filter_MeanLength = m_pAtmoConfig->getLiveViewFilter_MeanLength();
   int AtmoSetup_Filter_PercentNew = m_pAtmoConfig->getLiveViewFilter_PercentNew();
   int AtmoSetup_Filter_MeanThreshold = m_pAtmoConfig->getLiveViewFilter_MeanThreshold();
@@ -117,36 +168,36 @@ void CAtmoOutputFilter::MeanFilter(ATMO_BOOL init)
 
   if (filter_length_old < 20) filter_length_old = 20; // avoid division by 0
 
-  for (int ch = 0; ch < ATMO_NUM_CHANNELS; ch++)
+  for (int zone = 0; zone < filter_input->numColors; zone++)
   {
     // calculate the mean-value filters
-    mean_sums.channel[ch].r +=
-         (long int)(filter_input.channel[ch].r - mean_values.channel[ch].r); // red
-    tmp = mean_sums.channel[ch].r / ((long int)filter_length_old / 20);
+      m_mean_sums->longZone[zone].r +=
+        (long int)(filter_input->zone[zone].r - m_mean_values->zone[zone].r); // red
+    tmp = m_mean_sums->longZone[zone].r / ((long int)filter_length_old / 20);
     if(tmp<0) tmp = 0; else { if(tmp>255) tmp = 255; }
-    mean_values.channel[ch].r = (unsigned char)tmp;
+    m_mean_values->zone[zone].r = (unsigned char)tmp;
 
-    mean_sums.channel[ch].g +=
-        (long int)(filter_input.channel[ch].g - mean_values.channel[ch].g); // green
-    tmp = mean_sums.channel[ch].g / ((long int)filter_length_old / 20);
+    m_mean_sums->longZone[zone].g +=
+        (long int)(filter_input->zone[zone].g - m_mean_values->zone[zone].g); // green
+    tmp = m_mean_sums->longZone[zone].g / ((long int)filter_length_old / 20);
     if(tmp<0) tmp = 0; else { if(tmp>255) tmp = 255; }
-    mean_values.channel[ch].g = (unsigned char)tmp;
+    m_mean_values->zone[zone].g = (unsigned char)tmp;
 
-    mean_sums.channel[ch].b +=
-        (long int)(filter_input.channel[ch].b - mean_values.channel[ch].b); // blue
-    tmp = mean_sums.channel[ch].b / ((long int)filter_length_old / 20);
+    m_mean_sums->longZone[zone].b +=
+        (long int)(filter_input->zone[zone].b - m_mean_values->zone[zone].b); // blue
+    tmp = m_mean_sums->longZone[zone].b / ((long int)filter_length_old / 20);
     if(tmp<0) tmp = 0; else { if(tmp>255) tmp = 255; }
-    mean_values.channel[ch].b = (unsigned char)tmp;
+    m_mean_values->zone[zone].b = (unsigned char)tmp;
 
     // check, if there is a jump -> check if differences between actual values and filter values are too big
 
     long int dist; // distance between the two colors in the 3D RGB space
-    dist = (mean_values.channel[ch].r - filter_input.channel[ch].r) *
-           (mean_values.channel[ch].r - filter_input.channel[ch].r) +
-           (mean_values.channel[ch].g - filter_input.channel[ch].g) *
-           (mean_values.channel[ch].g - filter_input.channel[ch].g) +
-           (mean_values.channel[ch].b - filter_input.channel[ch].b) *
-           (mean_values.channel[ch].b - filter_input.channel[ch].b);
+    dist = (m_mean_values->zone[zone].r - filter_input->zone[zone].r) *
+           (m_mean_values->zone[zone].r - filter_input->zone[zone].r) +
+           (m_mean_values->zone[zone].g - filter_input->zone[zone].g) *
+           (m_mean_values->zone[zone].g - filter_input->zone[zone].g) +
+           (m_mean_values->zone[zone].b - filter_input->zone[zone].b) *
+           (m_mean_values->zone[zone].b - filter_input->zone[zone].b);
 
     /*
        if (dist > 0) { dist = (long int)sqrt((double)dist); }
@@ -164,31 +215,36 @@ void CAtmoOutputFilter::MeanFilter(ATMO_BOOL init)
 	if ((dist > distMean) || ( reinitialize == 1))
     {
       // filter jump detected -> set the long filters to the result of the short filters
-      filter_output.channel[ch] = mean_values.channel[ch] = filter_input.channel[ch];
+      filter_output->zone[zone] = m_mean_values->zone[zone] = filter_input->zone[zone];
 
-      mean_sums.channel[ch].r = filter_input.channel[ch].r *
+      m_mean_sums->longZone[zone].r = filter_input->zone[zone].r *
                                 (filter_length_old / 20);
-      mean_sums.channel[ch].g = filter_input.channel[ch].g *
+      m_mean_sums->longZone[zone].g = filter_input->zone[zone].g *
                                 (filter_length_old / 20);
-      mean_sums.channel[ch].b = filter_input.channel[ch].b *
+      m_mean_sums->longZone[zone].b = filter_input->zone[zone].b *
                                 (filter_length_old / 20);
     }
     else
     {
       // apply an additional percent filter and return calculated values
 
-	  filter_output.channel[ch].r = (mean_values.channel[ch].r *
+	  filter_output->zone[zone].r = (m_mean_values->zone[zone].r *
           (100-AtmoSetup_Filter_PercentNew) +
-          filter_output_old.channel[ch].r * AtmoSetup_Filter_PercentNew) / 100;
+          m_mean_filter_output_old->zone[zone].r * AtmoSetup_Filter_PercentNew) / 100;
 
-	  filter_output.channel[ch].g = (mean_values.channel[ch].g *
+	  filter_output->zone[zone].g = (m_mean_values->zone[zone].g *
           (100-AtmoSetup_Filter_PercentNew) +
-          filter_output_old.channel[ch].g * AtmoSetup_Filter_PercentNew) / 100;
+          m_mean_filter_output_old->zone[zone].g * AtmoSetup_Filter_PercentNew) / 100;
 
-	  filter_output.channel[ch].b = (mean_values.channel[ch].b *
+	  filter_output->zone[zone].b = (m_mean_values->zone[zone].b *
           (100-AtmoSetup_Filter_PercentNew) +
-          filter_output_old.channel[ch].b * AtmoSetup_Filter_PercentNew) / 100;
+          m_mean_filter_output_old->zone[zone].b * AtmoSetup_Filter_PercentNew) / 100;
     }
   }
-  filter_output_old = filter_output;
+
+  CopyColorPacket(filter_output, m_mean_filter_output_old);
+
+  delete (char *)filter_input;
+
+  return(filter_output);
 }

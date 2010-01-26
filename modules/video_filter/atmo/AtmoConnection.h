@@ -9,14 +9,36 @@
 #ifndef _AtmoConnection_h_
 #define _AtmoConnection_h_
 
+#include <stdlib.h>
+
 #include "AtmoDefs.h"
 #include "AtmoConfig.h"
+#include "AtmoChannelAssignment.h"
+
+#if defined(_ATMO_VLC_PLUGIN_)
+#   include <vlc_common.h>
+#   include <vlc_threads.h>
+#else
+#   include <windows.h>
+#endif
 
 class CAtmoConnection
 {
 protected:
 	CAtmoConfig *m_pAtmoConfig;
-    int m_ChannelAssignment[ATMO_NUM_CHANNELS];
+
+#if defined(_ATMO_VLC_PLUGIN_)
+    vlc_mutex_t m_AccessConnection;
+#else
+    CRITICAL_SECTION m_AccessConnection;
+#endif
+
+    int *m_ChannelAssignment;
+    int m_NumAssignedChannels;
+
+protected:
+    void Lock();
+    void Unlock();
 
 public:
 	CAtmoConnection(CAtmoConfig *cfg);
@@ -25,12 +47,7 @@ public:
 	virtual void CloseConnection() {};
 	virtual ATMO_BOOL isOpen(void) { return false; }
 
-    virtual ATMO_BOOL SendData(unsigned char numChannels,
-                               int red[],
-                               int green[],
-                               int blue[]) { return false; }
-
-    virtual ATMO_BOOL SendData(tColorPacket data) { return false; }
+    virtual ATMO_BOOL SendData(pColorPacket data) { return false; }
 
     virtual ATMO_BOOL setChannelColor(int channel, tRGBColor color) { return false; }
     virtual ATMO_BOOL setChannelValues(int numValues,unsigned char *channel_values) { return false; }
@@ -45,7 +62,18 @@ public:
                                           int gamma_blue,
                                           ATMO_BOOL storeToEeprom) { return false; }
 
-    virtual void SetChannelAssignment(tChannelAssignment *ca);
+#if !defined(_ATMO_VLC_PLUGIN_)
+    virtual ATMO_BOOL ShowConfigDialog(HINSTANCE hInst, HWND parent, CAtmoConfig *cfg);
+#endif
+
+    virtual void SetChannelAssignment(CAtmoChannelAssignment *ca);
+
+    virtual int getNumChannels() { return 0; }
+    virtual char *getChannelName(int ch) { return NULL; }
+
+    virtual const char *getDevicePath() { return "none"; }
+
+    virtual ATMO_BOOL CreateDefaultMapping(CAtmoChannelAssignment *ca) { return false; }
 
 };
 

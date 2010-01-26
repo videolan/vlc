@@ -9,8 +9,11 @@
 
 
 #include "AtmoDefs.h"
-#include "AtmoSerialConnection.h"
+#include "AtmoClassicConnection.h"
 
+#if !defined(_ATMO_VLC_PLUGIN_)
+# include "AtmoClassicConfigDialog.h"
+#endif
 
 #include <stdio.h>
 #include <fcntl.h>
@@ -20,25 +23,15 @@
 #include <unistd.h>
 #endif
 
-/*
-#include <sys/types.h>
-#include <fcntl.h>
-#include <string.h>
-#include <termios.h>
-#include <unistd.h>
-#include <vdr/tools.h>
-*/
 
-
-CAtmoSerialConnection::CAtmoSerialConnection(CAtmoConfig *cfg) : CAtmoConnection(cfg) {
+CAtmoClassicConnection::CAtmoClassicConnection(CAtmoConfig *cfg) : CAtmoConnection(cfg) {
     m_hComport = INVALID_HANDLE_VALUE;
 }
 
-CAtmoSerialConnection::~CAtmoSerialConnection() {
-   CloseConnection();
+CAtmoClassicConnection::~CAtmoClassicConnection() {
 }
 
-ATMO_BOOL CAtmoSerialConnection::OpenConnection() {
+ATMO_BOOL CAtmoClassicConnection::OpenConnection() {
 #if defined(_ATMO_VLC_PLUGIN_)
      char *serdevice = m_pAtmoConfig->getSerialDevice();
      if(!serdevice)
@@ -52,24 +45,20 @@ ATMO_BOOL CAtmoSerialConnection::OpenConnection() {
 	 CloseConnection();
 
 #if !defined(_ATMO_VLC_PLUGIN_)
-     char comport[16];  // com4294967295
-     sprintf(comport,"com%d",portNummer);
+     char serdevice[16];  // com4294967295
+     sprintf(serdevice,"com%d",portNummer);
 #endif
 
 #if defined(WIN32)
 
-#  if defined(_ATMO_VLC_PLUGIN_)
      m_hComport = CreateFile(serdevice, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-#  else
-     m_hComport = CreateFile(comport, GENERIC_WRITE, 0, NULL, OPEN_EXISTING, 0, NULL);
-#  endif
      if(m_hComport == INVALID_HANDLE_VALUE) {
 //      we have a problem here can't open com port... somebody else may use it?
 //	    m_dwLastWin32Error = GetLastError();
 	    return ATMO_FALSE;
      }
      /* change serial settings (Speed, stopbits etc.) */
-     DCB dcb; // fÃ¼r comport-parameter
+     DCB dcb; // für comport-parameter
      dcb.DCBlength = sizeof(DCB);
      GetCommState (m_hComport, &dcb); // ger current serialport settings
      dcb.BaudRate  = 38400;        // set speed
@@ -81,11 +70,7 @@ ATMO_BOOL CAtmoSerialConnection::OpenConnection() {
 #else
 
      int bconst = B38400;
-#  if defined(_ATMO_VLC_PLUGIN_)
      m_hComport = open(serdevice,O_RDWR |O_NOCTTY);
-#  else
-     m_hComport = open(comport,O_RDWR | O_NOCTTY);
-#  endif
      if(m_hComport < 0) {
 	    return ATMO_FALSE;
      }
@@ -110,7 +95,7 @@ ATMO_BOOL CAtmoSerialConnection::OpenConnection() {
      return true;
 }
 
-void CAtmoSerialConnection::CloseConnection() {
+void CAtmoClassicConnection::CloseConnection() {
   if(m_hComport!=INVALID_HANDLE_VALUE) {
 #if defined(WIN32)
      CloseHandle(m_hComport);
@@ -121,11 +106,11 @@ void CAtmoSerialConnection::CloseConnection() {
   }
 }
 
-ATMO_BOOL CAtmoSerialConnection::isOpen(void) {
+ATMO_BOOL CAtmoClassicConnection::isOpen(void) {
 	 return (m_hComport != INVALID_HANDLE_VALUE);
 }
 
-ATMO_BOOL CAtmoSerialConnection::HardwareWhiteAdjust(int global_gamma,
+ATMO_BOOL CAtmoClassicConnection::HardwareWhiteAdjust(int global_gamma,
                                                      int global_contrast,
                                                      int contrast_red,
                                                      int contrast_green,
@@ -193,7 +178,7 @@ ATMO_BOOL CAtmoSerialConnection::HardwareWhiteAdjust(int global_gamma,
 }
 
 
-ATMO_BOOL CAtmoSerialConnection::SendData(tColorPacket data) {
+ATMO_BOOL CAtmoClassicConnection::SendData(pColorPacket data) {
    if(m_hComport == INVALID_HANDLE_VALUE)
 	  return ATMO_FALSE;
 
@@ -205,11 +190,19 @@ ATMO_BOOL CAtmoSerialConnection::SendData(tColorPacket data) {
    buffer[2] = 0x00;  // Start channel 0
    buffer[3] = 15; //
    int iBuffer = 4;
-   for(int i=0;i<5;i++) {
-       if(m_ChannelAssignment[i]>=0) {
-          buffer[iBuffer++] = data.channel[m_ChannelAssignment[i]].r;
-          buffer[iBuffer++] = data.channel[m_ChannelAssignment[i]].g;
-          buffer[iBuffer++] = data.channel[m_ChannelAssignment[i]].b;
+   int idx;
+
+   Lock();
+
+   for(int i=0; i < 5 ; i++) {
+       if(m_ChannelAssignment && (i < m_NumAssignedChannels))
+          idx = m_ChannelAssignment[i];
+       else
+          idx = -1;
+       if((idx>=0) && (idx<data->numColors)) {
+          buffer[iBuffer++] = data->zone[idx].r;
+          buffer[iBuffer++] = data->zone[idx].g;
+          buffer[iBuffer++] = data->zone[idx].b;
        } else {
           buffer[iBuffer++] = 0;
           buffer[iBuffer++] = 0;
@@ -224,47 +217,67 @@ ATMO_BOOL CAtmoSerialConnection::SendData(tColorPacket data) {
    tcdrain(m_hComport);
 #endif
 
+   Unlock();
+
    return (iBytesWritten == 19) ? ATMO_TRUE : ATMO_FALSE;
 }
 
-ATMO_BOOL CAtmoSerialConnection::SendData(unsigned char numChannels,
-                                          int red[],
-                                          int green[],
-                                          int blue[])
+
+ATMO_BOOL CAtmoClassicConnection::CreateDefaultMapping(CAtmoChannelAssignment *ca)
 {
-   if(m_hComport == INVALID_HANDLE_VALUE)
-	  return ATMO_FALSE;
-
-   DWORD bufSize = 4 + numChannels*3;
-   unsigned char *buffer = new unsigned char[bufSize];
-   DWORD iBytesWritten;
-
-   buffer[0] = 0xFF;  // Start Byte
-   buffer[1] = 0x00;  // Start Kanal 0
-   buffer[2] = 0x00;  // Start Kanal 0
-   buffer[3] = numChannels * 3; //
-   int iBuffer = 4;
-   for(int i=0;i<numChannels;i++) {
-       if(m_ChannelAssignment[i]>=0) {
-          buffer[iBuffer++] = red[m_ChannelAssignment[i]] & 255;
-          buffer[iBuffer++] = green[m_ChannelAssignment[i]] & 255;
-          buffer[iBuffer++] = blue[m_ChannelAssignment[i]] & 255;
-       } else {
-          buffer[iBuffer++] = 0;
-          buffer[iBuffer++] = 0;
-          buffer[iBuffer++] = 0;
-       }
-   }
-
-#if defined(WIN32)
-   WriteFile(m_hComport, buffer, bufSize, &iBytesWritten, NULL);
-#else
-   iBytesWritten = write(m_hComport, buffer, bufSize);
-   tcdrain(m_hComport);
-#endif
-
-   delete[] buffer;
-
-   return (iBytesWritten == bufSize) ? ATMO_TRUE : ATMO_FALSE;
+   if(!ca) return ATMO_FALSE;
+   ca->setSize(5);
+   ca->setZoneIndex(0, 4); // Zone 5
+   ca->setZoneIndex(1, 3);
+   ca->setZoneIndex(2, 1);
+   ca->setZoneIndex(3, 0);
+   ca->setZoneIndex(4, 2);
+   return ATMO_TRUE;
 }
 
+#if !defined(_ATMO_VLC_PLUGIN_)
+
+char *CAtmoClassicConnection::getChannelName(int ch)
+{
+  if(ch < 0) return NULL;
+  char buf[30];
+
+  switch(ch) {
+      case 0:
+          sprintf(buf,"Summen Kanal [%d]",ch);
+          break;
+      case 1:
+          sprintf(buf,"Linker Kanal [%d]",ch);
+          break;
+      case 2:
+          sprintf(buf,"Rechter Kanal [%d]",ch);
+          break;
+      case 3:
+          sprintf(buf,"Oberer Kanal [%d]",ch);
+          break;
+      case 4:
+          sprintf(buf,"Unterer Kanal [%d]",ch);
+          break;
+      default:
+          sprintf(buf,"Kanal [%d]",ch);
+          break;
+  }
+
+  return strdup(buf);
+}
+
+ATMO_BOOL CAtmoClassicConnection::ShowConfigDialog(HINSTANCE hInst, HWND parent, CAtmoConfig *cfg)
+{
+    CAtmoClassicConfigDialog *dlg = new CAtmoClassicConfigDialog(hInst, parent, cfg);
+
+    INT_PTR result = dlg->ShowModal();
+
+    delete dlg;
+
+    if(result == IDOK)
+      return ATMO_TRUE;
+    else
+      return ATMO_FALSE;
+}
+
+#endif

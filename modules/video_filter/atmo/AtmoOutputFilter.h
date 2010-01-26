@@ -17,11 +17,16 @@
 class CAtmoOutputFilter
 {
 private:
-  tColorPacket filter_input;  // input of the filter
-  tColorPacket filter_output; // output of the filter
+  //tColorPacket filter_input;  // input of the filter wozu?
+  //tColorPacket filter_output; // output of the filter
+  pColorPacket  m_percent_filter_output_old;
 
-  void PercentFilter(ATMO_BOOL init);
-  void MeanFilter(ATMO_BOOL init);
+  pColorPacket  m_mean_filter_output_old;
+  pColorPacket  m_mean_values;
+  pColorPacketLongInt m_mean_sums;
+
+  pColorPacket PercentFilter(pColorPacket filter_input, ATMO_BOOL init);
+  pColorPacket MeanFilter(pColorPacket filter_input, ATMO_BOOL init);
 
   CAtmoConfig *m_pAtmoConfig;
 public:
@@ -30,7 +35,7 @@ public:
     CAtmoOutputFilter(CAtmoConfig *atmoConfig);
     virtual ~CAtmoOutputFilter(void);
     void ResetFilter(void);
-    tColorPacket Filtering(tColorPacket ColorPacket);
+    pColorPacket Filtering(pColorPacket ColorPacket);
 };
 
 #endif

@@ -12,9 +12,9 @@
 #   endif
 #endif
 
-#if !defined(_ATMO_VLC_PLUGIN_)
-#  include <comdef.h>		
-#  include "AtmoWin_h.h"
+#if defined(_ATMO_VLC_PLUGIN_)
+#  include <vlc_common.h>
+#  include <vlc_threads.h>
 #endif
 
 #include "AtmoInput.h"
@@ -24,9 +24,7 @@
 #include "AtmoCalculations.h"
 
 
-class CAtmoExternalCaptureInput :
-      public CAtmoInput,
-      public CThread
+class CAtmoExternalCaptureInput :  public CAtmoInput
 {
 protected:
 #if defined(_ATMO_VLC_PLUGIN_)
@@ -34,6 +32,7 @@ protected:
     vlc_mutex_t  m_WakeupLock;
 #else
     HANDLE m_hWakeupEvent;
+    CRITICAL_SECTION m_BufferLock;
 #endif
 
     BITMAPINFOHEADER m_CurrentFrameHeader;
@@ -67,17 +66,6 @@ public:
     */
     virtual ATMO_BOOL Close(void);
 
-    /*
-      this method is called from the AtmoLiveView thread - to get the
-      new color packet (a packet is an RGB triple for each channel)
-    */
-    virtual tColorPacket GetColorPacket(void);
-
-    /*
-      this method is also called from the AtmoLiveView thread - to
-      resync on a frame
-    */
-    virtual void WaitForNextFrame(DWORD timeout);
 };
 
 #endif

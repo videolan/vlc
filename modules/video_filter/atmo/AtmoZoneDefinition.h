@@ -21,12 +21,16 @@ public:
     ~CAtmoZoneDefinition(void);
 
     void Fill(unsigned char value);
-    void FillGradientFromLeft();
-    void FillGradientFromRight();
-    void FillGradientFromTop();
-    void FillGradientFromBottom();
+    void FillGradientFromLeft(int start_row,int end_row);
+    void FillGradientFromRight(int start_row,int end_row);
+    void FillGradientFromTop(int start_col,int end_col);
+    void FillGradientFromBottom(int start_col,int end_col);
 
     int LoadGradientFromBitmap(char *pszBitmap);
+#if !defined(_ATMO_VLC_PLUGIN_)
+    void SaveZoneBitmap(char *);
+    void SaveWeightBitmap(char *fileName,int *weight);
+#endif
 
     void UpdateWeighting(int *destWeight,
                          int WidescreenMode,
