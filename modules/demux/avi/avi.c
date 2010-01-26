@@ -2498,11 +2498,13 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
     demux_sys_t *p_sys = p_demux->p_sys;
     block_t *p_block = NULL;
     input_attachment_t *p_attachment = NULL;
+    char *psz_description = NULL;
+    avi_chunk_indx_t *p_indx = NULL;
 
     if( !p_sys->b_seekable )
         goto exit;
 
-    avi_chunk_indx_t *p_indx = AVI_ChunkFind( p_strl, AVIFOURCC_indx, 0 );
+    p_indx = AVI_ChunkFind( p_strl, AVIFOURCC_indx, 0 );
     if( !p_indx )
         goto exit;
 
@@ -2548,6 +2550,8 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
     const unsigned i_name = GetDWLE( &p[7] );
     if( 11 + i_size <= i_name )
         goto exit;
+    if( i_name > 0 )
+        psz_description = FromCharset( "UTF-16LE", &p[11], i_name );
     p += 11 + i_name;
     i_size -= 11 + i_name;
     if( i_size < 6 || GetWLE( &p[0] ) != 0x04 )
@@ -2558,7 +2562,8 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
     p += 6;
     i_size -= 6;
 
-    char *psz_description = p_strn ? FromLatin1( p_strn->p_str ) : NULL;
+    if( !psz_description )
+        psz_description = p_strn ? FromLatin1( p_strn->p_str ) : NULL;
     char *psz_name;
     if( asprintf( &psz_name, "subtitle%d.srt", p_sys->i_attachment ) <= 0 )
         psz_name = NULL;
@@ -2569,9 +2574,10 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
     if( p_attachment )
         TAB_APPEND( p_sys->i_attachment, p_sys->attachment, p_attachment );
     free( psz_name );
-    free( psz_description );
 
 exit:
+    free( psz_description );
+
     if( p_block )
         block_Release( p_block );
 
