@@ -238,6 +238,7 @@ unsigned int aout_BitsPerSample( vlc_fourcc_t i_format )
  *****************************************************************************/
 void aout_FormatPrepare( audio_sample_format_t * p_format )
 {
+    p_format->i_channels = aout_FormatNbChannels( p_format );
     p_format->i_bitspersample = aout_BitsPerSample( p_format->i_format );
     if( p_format->i_bitspersample > 0 )
     {
