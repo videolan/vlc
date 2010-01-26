@@ -2874,7 +2874,7 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
         for( int i = 0; ppsz_all_keys && ppsz_all_keys[i]; i++ )
         {
             char *psz_key = ppsz_all_keys[i];
-            char *psz_value = vlc_meta_GetExtra( p_meta, psz_key );
+            const char *psz_value = vlc_meta_GetExtra( p_meta, psz_key );
 
             if( psz_value )
                 input_Control( p_input, INPUT_ADD_INFO, psz_cat,
