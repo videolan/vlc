@@ -222,7 +222,12 @@ int PushCommand( extension_t *p_ext,
         case CMD_TRIGGERMENU:
             {
                 int *pi = malloc( sizeof( int ) );
-                if( !pi ) return VLC_ENOMEM;
+                if( !pi )
+                {
+                    free( cmd );
+                    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+                    return VLC_ENOMEM;
+                }
                 *pi = va_arg( args, int );
                 cmd->data[0] = pi;
             }

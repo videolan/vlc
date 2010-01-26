@@ -163,7 +163,10 @@ static int vlclua_dialog_create( lua_State *L )
     lua_getglobal( L, "vlc" );
     lua_getfield( L, -1, "__dialog" );
     if( lua_topointer( L, lua_gettop( L ) ) != NULL )
+    {
+        free( p_dlg );
         return luaL_error( L, "Only one dialog allowed per extension!" );
+    }
 
     p_dlg->p_object = p_this;
     p_dlg->psz_title = strdup( psz_title );
