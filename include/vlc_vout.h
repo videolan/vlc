@@ -342,8 +342,7 @@ static inline int vout_Control( vout_thread_t *p_vout, int i_query, ... )
 
 enum output_query_e
 {
-    VOUT_SET_SIZE,         /* arg1= unsigned int, arg2= unsigned int, res= */
-    VOUT_SET_STAY_ON_TOP,  /* arg1= bool       res=    */
+    VOUT_SET_STAY_ON_TOP=1, /* arg1= bool       res=    */
     VOUT_SET_VIEWPORT,      /* arg1= view rect, arg2=clip rect, res= */
     VOUT_REDRAW_RECT,       /* arg1= area rect, res= */
 };
