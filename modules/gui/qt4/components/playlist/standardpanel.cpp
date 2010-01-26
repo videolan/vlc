@@ -130,8 +130,7 @@ void StandardPLPanel::gotoPlayingItem()
 
 void StandardPLPanel::handleExpansion( const QModelIndex& index )
 {
-    assert( treeView );
-    treeView->scrollTo( index );
+    currentView->scrollTo( index );
 }
 
 /* PopupAdd Menu for the Add Menu */
@@ -319,8 +318,6 @@ void StandardPLPanel::createTreeView()
              this, popupSelectColumn( QPoint ) );
     CONNECT( treeView, customContextMenuRequested( const QPoint & ),
              this, popupPlView( const QPoint & ) );
-    CONNECT( model, currentChanged( const QModelIndex& ),
-             this, handleExpansion( const QModelIndex& ) );
 
     /* SignalMapper for columns */
     selectColumnsSigMapper = new QSignalMapper( this );
@@ -351,6 +348,8 @@ void StandardPLPanel::toggleView()
         treeView->show();
         currentView = treeView;
     }
+    CONNECT( model, currentChanged( const QModelIndex& ),
+             this, handleExpansion( const QModelIndex& ) );
 }
 
 void StandardPLPanel::wheelEvent( QWheelEvent *e )
