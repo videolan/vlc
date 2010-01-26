@@ -25,7 +25,10 @@
 #include <vlc/vlc.h>
 #include <stdio.h>
 #include <stdlib.h>
-#include <locale.h>
+
+#ifdef HAVE_SETLOCALE
+# include <locale.h>
+#endif
 
 #ifdef HAVE_GETOPT_H
 # include <getopt.h>
@@ -56,7 +59,9 @@ int main (int argc, char *argv[])
         { NULL,         no_argument,       NULL, '\0'}
     };
 
+#ifdef HAVE_SETLOCALE
     setlocale (LC_CTYPE, ""); /* needed by FromLocale() */
+#endif
 
     int c;
     while ((c = getopt_long (argc, argv, "hV", opts, NULL)) != -1)
