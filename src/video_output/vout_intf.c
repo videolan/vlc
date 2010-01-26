@@ -699,13 +699,7 @@ static void InitWindowSize( vout_thread_t *p_vout, unsigned *pi_width,
 static int ZoomCallback( vlc_object_t *p_this, char const *psz_cmd,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    vout_thread_t *p_vout = (vout_thread_t *)p_this;
-    (void)psz_cmd; (void)oldval; (void)newval; (void)p_data;
-    InitWindowSize( p_vout, &p_vout->i_window_width,
-                    &p_vout->i_window_height );
-    vout_Control( p_vout, VOUT_SET_SIZE, p_vout->i_window_width,
-                  p_vout->i_window_height );
-    return VLC_SUCCESS;
+    return var_SetFloat( p_this, "scale", newval.f_float );
 }
 
 static int CropCallback( vlc_object_t *p_this, char const *psz_cmd,
