@@ -1214,7 +1214,8 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
         {
             input_SendEventProgramDel( p_input, i_group );
             input_SendEventProgramAdd( p_input, i_group, psz_text );
-
+            if( p_sys->p_pgrm == p_pgrm )
+                input_SendEventProgramSelect( p_input, i_group );
             free( psz_text );
         }
     }
