@@ -648,7 +648,8 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
 {
     decoder_t *p_dec;
 
-    p_dec = vlc_object_create( p_this, VLC_OBJECT_DECODER );
+    p_dec = vlc_custom_create( p_this, sizeof( *p_dec ), VLC_OBJECT_GENERIC,
+                               "image decoder" );
     if( p_dec == NULL )
         return NULL;
 

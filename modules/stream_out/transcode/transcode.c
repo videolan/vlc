@@ -553,7 +553,7 @@ static sout_stream_id_t *Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     id->p_encoder = NULL;
 
     /* Create decoder object */
-    id->p_decoder = vlc_object_create( p_stream, VLC_OBJECT_DECODER );
+    id->p_decoder = vlc_object_create( p_stream, sizeof( decoder_t ) );
     if( !id->p_decoder )
         goto error;
     vlc_object_attach( id->p_decoder, p_stream );
