@@ -244,6 +244,8 @@ rtsp_stream_id_t *RtspAddId( rtsp_stream_t *rtsp, sout_stream_id_t *sid,
 
 void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t *id )
 {
+    httpd_UrlDelete( id->url );
+
     vlc_mutex_lock( &rtsp->lock );
     for( int i = 0; i < rtsp->sessionc; i++ )
     {
@@ -261,7 +263,6 @@ void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t *id )
     }
 
     vlc_mutex_unlock( &rtsp->lock );
-    httpd_UrlDelete( id->url );
     free( id );
 }
 
