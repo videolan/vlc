@@ -33,7 +33,7 @@ typedef struct extensions_manager_t extensions_manager_t;
 typedef struct extension_sys_t extension_sys_t;
 
 /** Extension descriptor */
-typedef struct {
+typedef struct extension_t {
     char *psz_title;          /**< Display title (ro) */
     char *psz_name;           /**< Real name of the extension (ro) */
     extension_sys_t *p_sys;   /**< Reserved for the manager module */
