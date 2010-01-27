@@ -90,10 +90,8 @@ static int vlc_object_type_from_string( const char *psz_name )
         const char *psz_name;
     } pp_objects[] =
         { { VLC_OBJECT_INPUT, "input" },
-          { VLC_OBJECT_DECODER, "decoder" },
           { VLC_OBJECT_VOUT, "vout" },
           { VLC_OBJECT_AOUT, "aout" },
-          { VLC_OBJECT_GENERIC, "generic" },
           { 0, "" } };
     int i;
     for( i = 0; pp_objects[i].i_type; i++ )
