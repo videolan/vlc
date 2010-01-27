@@ -98,6 +98,7 @@ private slots:
     void popupPlView( const QPoint & );
     void toggleColumnShown( int );
     void toggleView();
+    void activate( const QModelIndex & );
 };
 
 #endif

@@ -47,8 +47,6 @@ class PlIconView : public QListView
 
 public:
     PlIconView( PLModel *model, QWidget *parent = 0 );
-public slots:
-    void activate( const QModelIndex & index );
 };
 
 #endif

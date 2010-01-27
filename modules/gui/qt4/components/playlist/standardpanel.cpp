@@ -65,23 +65,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     iconView = NULL;
     treeView = NULL;
 
-    /* Saved Settings */
-    getSettings()->beginGroup("Playlist");
-
-    int i_viewMode = getSettings()->value( "view-mode", TREE_VIEW ).toInt();
-    if( i_viewMode == ICON_VIEW )
-    {
-        createIconView();
-        currentView = iconView;
-    }
-    else
-    {
-        createTreeView();
-        currentView = treeView;
-    }
-
-    getSettings()->endGroup();
-
     currentRootId = -1;
 
     /* Title label */
@@ -113,6 +96,23 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     viewButton->setIcon( QIcon( ":/buttons/playlist/playlist_add" ) );
     layout->addWidget( viewButton, 0, 2 );
     BUTTONACT( viewButton, toggleView() );
+
+    /* Saved Settings */
+    getSettings()->beginGroup("Playlist");
+
+    int i_viewMode = getSettings()->value( "view-mode", TREE_VIEW ).toInt();
+    if( i_viewMode == ICON_VIEW )
+    {
+        createIconView();
+        currentView = iconView;
+    }
+    else
+    {
+        createTreeView();
+        currentView = treeView;
+    }
+
+    getSettings()->endGroup();
 }
 
 StandardPLPanel::~StandardPLPanel()
@@ -272,6 +272,8 @@ void StandardPLPanel::createIconView()
     iconView->setContextMenuPolicy( Qt::CustomContextMenu );
     CONNECT( iconView, customContextMenuRequested( const QPoint & ),
              this, popupPlView( const QPoint & ) );
+    CONNECT( iconView, activated( const QModelIndex & ),
+             this, activate( const QModelIndex & ) );
 
     layout->addWidget( iconView, 1, 0, 1, -1 );
 }
@@ -316,7 +318,7 @@ void StandardPLPanel::createTreeView()
 
     /* Connections for the TreeView */
     CONNECT( treeView, activated( const QModelIndex& ),
-             model,activateItem( const QModelIndex& ) );
+             this, activate( const QModelIndex& ) );
     CONNECT( treeView->header(), customContextMenuRequested( const QPoint & ),
              this, popupSelectColumn( QPoint ) );
     CONNECT( treeView, customContextMenuRequested( const QPoint & ),
@@ -357,4 +359,17 @@ void StandardPLPanel::wheelEvent( QWheelEvent *e )
 {
     // Accept this event in order to prevent unwanted volume up/down changes
     e->accept();
+}
+
+void StandardPLPanel::activate( const QModelIndex &index )
+{
+    if( model->hasChildren( index ) && currentView == iconView )
+    {
+        iconView->setRootIndex( index );
+        title->setText( index.data().toString() );
+    }
+    else
+    {
+        model->activateItem( index );
+    }
 }
