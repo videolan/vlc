@@ -41,6 +41,11 @@ Video Output:
  * New x11, glx and xv modules based on XCB
  * New deinterlacing modes based on yadif and yadif(x2)
  * New audio/video filter to show audio level on the video output
+ * Enhanced AtmoLight filter with hardware support for
+     Classic AtmoLight (http://www.vdr-wiki.de/wiki/index.php/Atmo-plugin)
+     Quattro AtmoLight (use just 4 Classic AtmoLights as one)
+     MoMoLight (http://www.ambilight4pc.com/momolight/momolight.html)
+     Simple serial DMX controller (http://www.ulrichradig.de/ search for DMX)
 
 Extensions:
  * new content extensions lua framework
