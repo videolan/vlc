@@ -310,7 +310,11 @@ static unsigned __stdcall IPCHelperThread( void *data )
 LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
                                 LPARAM lParam )
 {
-    if( uMsg == WM_COPYDATA )
+    if( uMsg == WM_QUIT  )
+    {
+        PostQuitMessage( 0 );
+    }
+    else if( uMsg == WM_COPYDATA )
     {
         COPYDATASTRUCT *pwm_data = (COPYDATASTRUCT*)lParam;
         vlc_object_t *p_this;
@@ -382,13 +386,16 @@ void system_End( libvlc_int_t *p_this )
         psz_vlcpath = NULL;
     }
 
-    if( ( ipcwindow = FindWindow( 0, L"VLC ipc "VERSION ) ) != 0 )
-    {
-        SendMessage( ipcwindow, WM_QUIT, 0, 0 );
-    }
-
     if (p_helper && p_helper->p_parent == VLC_OBJECT(p_this) )
     {
+        /* this is the first instance (in a one-instance system)
+         * it is the owner of the helper thread
+         */
+        if( ( ipcwindow = FindWindow( 0, L"VLC ipc "VERSION ) ) != 0 )
+        {
+            SendMessage( ipcwindow, WM_QUIT, 0, 0 );
+        }
+
         /* FIXME: thread-safety... */
         vlc_object_detach (p_helper);
         vlc_object_release (p_helper);
