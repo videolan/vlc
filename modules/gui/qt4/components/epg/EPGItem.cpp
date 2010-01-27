@@ -25,6 +25,7 @@
 #include <QFont>
 #include <QFontMetrics>
 #include <QDebug>
+#include <QDateTime>
 
 #include "EPGItem.hpp"
 #include "EPGView.hpp"

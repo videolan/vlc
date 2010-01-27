@@ -21,9 +21,11 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <QMatrix>
 #include "EPGView.hpp"
 #include "EPGItem.hpp"
+
+#include <QDateTime>
+#include <QMatrix>
 #include <QtDebug>
 
 EPGView::EPGView( QWidget *parent ) : QGraphicsView( parent )

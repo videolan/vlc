@@ -21,11 +21,12 @@
  * 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include "EPGWidget.hpp"
+
 #include <QGridLayout>
 #include <QScrollBar>
 #include <QDebug>
-
-#include "EPGWidget.hpp"
+#include <QLabel>
 
 ChannelsWidget::ChannelsWidget( QWidget *parent ) : QWidget( parent )
 {

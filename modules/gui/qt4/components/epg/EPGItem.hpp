@@ -26,9 +26,10 @@
 
 #include <QObject>
 #include <QGraphicsItem>
-#include <QPainter>
-#include <QString>
-#include <QDateTime>
+
+class QPainter;
+class QString;
+class QDateTime;
 
 class EPGView;
 

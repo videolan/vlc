@@ -27,6 +27,7 @@
 #include <QFont>
 #include <QPaintEvent>
 #include <QtDebug>
+#include <QDateTime>
 
 EPGRuler::EPGRuler( QWidget* parent )
     : QWidget( parent )

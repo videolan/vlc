@@ -24,7 +24,7 @@
 #ifndef EPGEVENT_H
 #define EPGEVENT_H
 
-#include <QString>
+class QString;
 #include <QDateTime>
 
 class EPGEvent

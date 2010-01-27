@@ -24,14 +24,14 @@
 #ifndef EPGVIEW_H
 #define EPGVIEW_H
 
-#include <QGraphicsView>
-#include <QVBoxLayout>
-#include <QList>
-
 #include "EPGEvent.hpp"
+
+#include <QGraphicsView>
+#include <QList>
 
 #define TRACKS_HEIGHT 75
 
+class QDateTime;
 class EPGView : public QGraphicsView
 {
 Q_OBJECT

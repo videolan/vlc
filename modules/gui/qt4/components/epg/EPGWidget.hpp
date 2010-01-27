@@ -24,12 +24,6 @@
 #ifndef EPGWIDGET_H
 #define EPGWIDGET_H
 
-#include <QWidget>
-#include <QMap>
-#include <QMultiMap>
-#include <QDateTime>
-#include <QLabel>
-
 #include "EPGView.hpp"
 #include "EPGEvent.hpp"
 #include "EPGRuler.hpp"
@@ -37,16 +31,22 @@
 #include <vlc_common.h>
 #include <vlc_epg.h>
 
+#include <QWidget>
+#include <QMultiMap>
+
+class QDateTime;
+class QLabel;
+
 class ChannelsWidget : public QWidget
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     explicit ChannelsWidget( QWidget* parent = 0 );
 };
 
 class EPGWidget : public QWidget
 {
-Q_OBJECT
+    Q_OBJECT
 public:
     explicit EPGWidget( QWidget* parent = 0 );
 
