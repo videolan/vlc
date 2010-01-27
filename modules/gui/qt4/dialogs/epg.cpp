@@ -29,15 +29,39 @@
 #include "components/epg/EPGWidget.hpp"
 
 #include <QHBoxLayout>
+#include <QSplitter>
+#include <QLabel>
+#include <QGroupBox>
 
 EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
-    setTitle( "Program Guide" );
+    setWindowTitle( "Program Guide" );
 
     QHBoxLayout *layout = new QHBoxLayout( this );
+    QSplitter *splitter = new QSplitter( this );
     EPGWidget *epg = new EPGWidget( this );
+    splitter->addWidget( epg );
+    splitter->setOrientation(Qt::Vertical);
 
-    layout->addWidget( epg );
+    QGroupBox *descBox = new QGroupBox( qtr( "Description" ), this );
+
+    QHBoxLayout *boxLayout = new QHBoxLayout( descBox );
+
+    description = new QLabel( this );
+    description->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel );
+    description->setAutoFillBackground( true );
+
+    QPalette palette;
+    palette.setBrush(QPalette::Active, QPalette::Window, palette.brush( QPalette::Base ) );
+    description->setPalette( palette );
+
+    boxLayout->addWidget( description );
+
+    splitter->addWidget( epg );
+    splitter->addWidget( descBox );
+    layout->addWidget( splitter );
+
+    CONNECT( epg, descriptionChanged( const QString & ), description, setText( const QString & ) );
 }
 
 EpgDialog::~EpgDialog()

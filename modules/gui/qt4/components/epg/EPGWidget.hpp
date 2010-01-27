@@ -35,7 +35,6 @@
 #include <QMultiMap>
 
 class QDateTime;
-class QLabel;
 
 class ChannelsWidget : public QWidget
 {
@@ -58,9 +57,11 @@ private:
     ChannelsWidget* m_channelsWidget;
     EPGRuler* m_rulerWidget;
     EPGView* m_epgView;
-    QLabel* m_description;
 
     QMultiMap<QString, EPGEvent*> m_events;
+
+signals:
+    void descriptionChanged( const QString& );
 };
 
 #endif // EPGWIDGET_H

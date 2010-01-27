@@ -41,11 +41,8 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
     m_rulerWidget = new EPGRuler( this );
     m_channelsWidget = new ChannelsWidget( this );
     m_epgView = new EPGView( this );
-    m_description = new QLabel( "<b>Hello world</b><br/>blablabla" );
 
     m_channelsWidget->setMinimumWidth( 40 );
-    m_description->setAlignment( Qt::AlignTop | Qt::AlignLeft );
-    m_description->setMinimumHeight( 70 );
 
     m_epgView->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Expanding );
     setZoom( 1 );
@@ -53,7 +50,6 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
     layout->addWidget( m_rulerWidget,       0, 1 );
     layout->addWidget( m_channelsWidget,    1, 0 );
     layout->addWidget( m_epgView,           1, 1 );
-    layout->addWidget( m_description,       2, 1 );
     layout->setSpacing( 0 );
     setLayout( layout );
 

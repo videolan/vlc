@@ -375,6 +375,9 @@ QMenu *QVLCMenu::ToolsMenu( QMenu *menu )
         "Ctrl+W" );
 #endif
 
+    addDPStaticEntry( menu, qtr( "Program Guide" ), "", SLOT( epgDialog() ),
+        "" );
+
     addDPStaticEntry( menu, qtr( I_MENU_MSG ),
         ":/menu/messages", SLOT( messagesDialog() ),
         "Ctrl+M" );
