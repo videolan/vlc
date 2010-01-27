@@ -4331,11 +4331,11 @@ dnl
 PKG_ENABLE_MODULES_VLC([PROJECTM], [], [libprojectM], [projectM visualization plugin], [auto])
 
 dnl
-dnl  AtmoLight (homebrew AmbiLight)
+dnl  AtmoLight (homemade Philips Ambilight clone)
 dnl
 AC_ARG_ENABLE(atmo,
-AS_HELP_STRING([--disable-atmo],[AtmoLight (homebrew Philips ambilight)
-                (broken, default disabled)]),, [enable_atmo="no"])
+AS_HELP_STRING([--disable-atmo],[AtmoLight (homemade Philips Ambilight clone)
+                (default enabled)]),, [enable_atmo="yes"])
 AS_IF([test "${enable_atmo}" != no], [
   AS_IF([test "${SYS}" = "mingw32" -o "${SYS}" = "linux"], [
     AC_LANG_PUSH(C++)
