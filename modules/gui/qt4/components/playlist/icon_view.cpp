@@ -83,7 +83,11 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QString artist = qfu( input_item_GetArtist( currentItem->inputItem() ) );
 
     painter->setPen( text );
-    painter->setFont( QFont( "Verdana", 7, QFont::Bold ) );
+    QFont font;
+    font.setPointSize( 7 );
+    font.setItalic(true);
+    font.setBold( index.data( Qt::FontRole ).value<QFont>().bold() );
+    painter->setFont( font );
     QFontMetrics fm = painter->fontMetrics();
     QRect titleRect = option.rect.adjusted( 1, ART_SIZE + 4, 0, -1 );
     titleRect.setHeight( fm.height() + 2 );
@@ -92,7 +96,8 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
                        QTextOption( Qt::AlignCenter ) );
 
     painter->setPen( text.lighter( 240 ) );
-    painter->setFont( QFont( "Verdana", 7 ) );
+    font.setItalic( false );
+    painter->setFont( font );
     fm = painter->fontMetrics();
     QRect artistRect = option.rect.adjusted( 1, ART_SIZE + 4 + titleRect.height(), -1, -1 );
 
