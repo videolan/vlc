@@ -158,6 +158,7 @@ public slots:
     void podcastConfigureDialog();
     void toolbarDialog();
     void pluginDialog();
+    void epgDialog();
 
     void openFileGenericDialog( intf_dialog_args_t * );
 

@@ -54,6 +54,7 @@
 #include "dialogs/plugins.hpp"
 #include "dialogs/external.hpp"
 #include "dialogs/errors.hpp"
+#include "dialogs/epg.hpp"
 
 #include <QEvent>
 #include <QApplication>
@@ -261,6 +262,11 @@ void DialogsProvider::toolbarDialog()
 void DialogsProvider::pluginDialog()
 {
     PluginDialog::getInstance( p_intf )->toggleVisible();
+}
+
+void DialogsProvider::epgDialog()
+{
+    EpgDialog::getInstance( p_intf )->toggleVisible();
 }
 
 /* Generic open file */
