@@ -53,7 +53,6 @@ nodist_SOURCES_qt4 = \
 		components/interface_widgets.moc.cpp \
 		components/controller.moc.cpp \
 		components/controller_widget.moc.cpp \
-		components/epg/EPGItem.moc.cpp \
 		components/epg/EPGRuler.moc.cpp \
 		components/epg/EPGView.moc.cpp \
 		components/epg/EPGWidget.moc.cpp \

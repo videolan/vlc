@@ -24,7 +24,6 @@
 #ifndef EPGITEM_H
 #define EPGITEM_H
 
-#include <QObject>
 #include <QGraphicsItem>
 
 class QPainter;
@@ -33,7 +32,7 @@ class QDateTime;
 
 class EPGView;
 
-class EPGItem : public QObject, public QGraphicsItem
+class EPGItem : public QGraphicsItem
 {
 public:
     EPGItem( EPGView *view );
