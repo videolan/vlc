@@ -59,6 +59,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     setMinimumWidth( 300 );
 
     model = new PLModel( p_playlist, p_intf, p_root, this );
+    CONNECT( model, currentChanged( const QModelIndex& ),
+             this, handleExpansion( const QModelIndex& ) );
 
     iconView = NULL;
     treeView = NULL;
@@ -349,8 +351,6 @@ void StandardPLPanel::toggleView()
         treeView->show();
         currentView = treeView;
     }
-    CONNECT( model, currentChanged( const QModelIndex& ),
-             this, handleExpansion( const QModelIndex& ) );
 }
 
 void StandardPLPanel::wheelEvent( QWheelEvent *e )
