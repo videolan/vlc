@@ -35,6 +35,7 @@
 #import <vlc_plugin.h>
 #import <vlc_dialog.h>
 #import <vlc_interface.h>
+#import <vlc_extensions.h>
 
 #import <Cocoa/Cocoa.h>
 #import "VLCLoginPanel.h"
@@ -52,6 +53,7 @@ static int DisplayCritical(vlc_object_t *,const char *,vlc_value_t,vlc_value_t,v
 static int DisplayQuestion(vlc_object_t *,const char *,vlc_value_t,vlc_value_t,void * );
 static int DisplayLogin(vlc_object_t *,const char *,vlc_value_t,vlc_value_t,void * );
 static int DisplayProgressPanelAction(vlc_object_t *,const char *,vlc_value_t,vlc_value_t,void * );
+static int DisplayExtension(vlc_object_t *,const char *,vlc_value_t,vlc_value_t,void * );
 
 static void updateProgressPanel (void *, const char *, float);
 static bool checkProgressPanel (void *);
@@ -74,8 +76,170 @@ static void destroyProgressPanel (void *);
 - (void)destroyProgressPanel;
 - (NSNumber *)checkProgressPanel;
 
+- (void)updateExtensionDialog:(NSValue *)extensionDialog;
+
 - (id)resultFromSelectorOnMainThread:(SEL)sel withObject:(id)object;
 @end
+
+@interface VLCDialogButton : NSButton
+{
+    extension_widget_t *widget;
+}
+@property (readwrite) extension_widget_t *widget;
+@end
+
+@implementation VLCDialogButton
+@synthesize widget;
+@end
+
+@interface VLCDialogTextField : NSTextField
+{
+    extension_widget_t *widget;
+}
+@property (readwrite) extension_widget_t *widget;
+@end
+
+@implementation VLCDialogTextField
+@synthesize widget;
+@end
+
+@interface VLCDialogList : NSTableView
+{
+    extension_widget_t *widget;
+    NSMutableArray *contentArray;
+}
+@property (readwrite) extension_widget_t *widget;
+@property (readwrite, retain) NSMutableArray *contentArray;
+@end
+
+@implementation VLCDialogList
+@synthesize widget;
+@synthesize contentArray;
+
+- (NSInteger)numberOfRowsInTableView:(NSTableView *)aTableView
+{
+    return [contentArray count];
+}
+
+- (id)tableView:(NSTableView *)aTableView objectValueForTableColumn:(NSTableColumn *)aTableColumn row:(NSInteger)rowIndex
+{
+    return [[contentArray objectAtIndex:rowIndex] objectForKey:@"text"];
+}
+@end
+
+@interface VLCDialogGridView : NSView {
+    NSUInteger _rowCount, _colCount;
+    NSMutableArray *_gridedViews;
+}
+
+- (void)removeSubview:(NSView *)view;
+@end
+
+
+// Move this to separate file
+@implementation VLCDialogGridView
+- (void)dealloc
+{
+    [_gridedViews release];
+    [super dealloc];
+}
+
+- (void)recomputeCount
+{
+    _colCount = 0;
+    _rowCount = 0;
+    for (NSDictionary *obj in _gridedViews)
+    {
+        NSUInteger row = [[obj objectForKey:@"row"] intValue];
+        NSUInteger col = [[obj objectForKey:@"col"] intValue];
+        NSUInteger rowSpan = [[obj objectForKey:@"rowSpan"] intValue];
+        NSUInteger colSpan = [[obj objectForKey:@"colSpan"] intValue];
+        if (col + colSpan > _colCount)
+            _colCount = col + colSpan;
+        if (row + rowSpan > _rowCount)
+            _rowCount = row + rowSpan;
+    }
+}
+
+- (NSMutableDictionary *)objectForView:(NSView *)view
+{
+    for (NSMutableDictionary *dict in _gridedViews)
+    {
+        if ([dict objectForKey:@"view"] == view)
+            return dict;
+    }
+    return nil;
+}
+
+- (void)relayout
+{
+    NSSize size = [self frame].size;
+    CGFloat rsize = size.height / _rowCount;
+    CGFloat csize = size.width / _colCount;
+
+    for(NSDictionary *obj in _gridedViews) {
+        NSUInteger row = [[obj objectForKey:@"row"] intValue];
+        NSUInteger col = [[obj objectForKey:@"col"] intValue];
+        NSUInteger rowSpan = [[obj objectForKey:@"rowSpan"] intValue];
+        NSUInteger colSpan = [[obj objectForKey:@"colSpan"] intValue];
+        NSRect rect;
+        rect = NSMakeRect(col * csize, (_rowCount - row) * rsize - rowSpan * rsize, colSpan * csize, rowSpan * rsize);
+        NSView *view = [obj objectForKey:@"view"];
+        if (colSpan == 0)
+            rect.size.width = view.frame.size.width;
+        if (rowSpan == 0)
+            rect.size.height = view.frame.size.height;
+
+        [[obj objectForKey:@"view"] setFrame:rect];
+    }
+}
+
+
+- (void)addSubview:(NSView *)view atRow:(NSUInteger)row column:(NSUInteger)column rowSpan:(NSUInteger)rowSpan colSpan:(NSUInteger)colSpan
+{
+    if (row + rowSpan > _rowCount)
+        _rowCount = row + rowSpan;
+    if (column + colSpan > _colCount)
+        _colCount = column + colSpan;
+
+    if (!_gridedViews)
+        _gridedViews = [[NSMutableArray alloc] init];
+
+    NSMutableDictionary *dict = [self objectForView:view];
+    if (!dict) {
+        dict = [NSMutableDictionary dictionary];
+        [dict setObject:view forKey:@"view"];
+        [_gridedViews addObject:dict];
+    }
+    [dict setObject:[NSNumber numberWithInt:rowSpan] forKey:@"rowSpan"];
+    [dict setObject:[NSNumber numberWithInt:colSpan] forKey:@"colSpan"];
+    [dict setObject:[NSNumber numberWithInt:row] forKey:@"row"];
+    [dict setObject:[NSNumber numberWithInt:column] forKey:@"col"];
+
+    [self addSubview:view];
+    [self relayout];
+}
+
+
+- (void)removeSubview:(NSView *)view
+{
+    NSDictionary *dict = [self objectForView:view];
+    if (dict)
+        [_gridedViews removeObject:dict];
+    [view removeFromSuperview];
+
+    [self recomputeCount];
+    [self relayout];
+}
+
+- (void)setFrame:(NSRect)frameRect
+{
+    [super setFrame:frameRect];
+    [self relayout];
+}
+
+@end
+
 
 static inline NSDictionary *DictFromDialogFatal(dialog_fatal_t *dialog) {
     return [VLCDialogDisplayer dictionaryForDialog:dialog->title :dialog->message :NULL :NULL :NULL];
@@ -118,7 +282,7 @@ vlc_module_begin()
 
     /* This setting is interesting, because when used with a libvlc app
      * it's almost certain that the client program will display error by
-     * itself. Moreover certain action might end up in an error, but 
+     * itself. Moreover certain action might end up in an error, but
      * the client wants to ignored them completely. */
     add_bool(prefix "hide-no-user-action-dialogs", true, NULL, T_HIDE_NOACTION, LT_HIDE_NOACTION, false)
 
@@ -146,13 +310,13 @@ int OpenIntf(vlc_object_t *p_this)
     p_intf->p_sys->is_hidding_noaction_dialogs = hide;
 
     /* subscribe to various interactive dialogues */
-    
+
     if (!hide)
     {
         var_Create(p_intf,"dialog-error",VLC_VAR_ADDRESS);
         var_AddCallback(p_intf,"dialog-error",DisplayError,p_intf);
         var_Create(p_intf,"dialog-critical",VLC_VAR_ADDRESS);
-        var_AddCallback(p_intf,"dialog-critical",DisplayCritical,p_intf);        
+        var_AddCallback(p_intf,"dialog-critical",DisplayCritical,p_intf);
     }
     var_Create(p_intf,"dialog-login",VLC_VAR_ADDRESS);
     var_AddCallback(p_intf,"dialog-login",DisplayLogin,p_intf);
@@ -160,10 +324,12 @@ int OpenIntf(vlc_object_t *p_this)
     var_AddCallback(p_intf,"dialog-question",DisplayQuestion,p_intf);
     var_Create(p_intf,"dialog-progress-bar",VLC_VAR_ADDRESS);
     var_AddCallback(p_intf,"dialog-progress-bar",DisplayProgressPanelAction,p_intf);
+    var_Create(p_intf,"dialog-extension",VLC_VAR_ADDRESS);
+    var_AddCallback(p_intf,"dialog-extension",DisplayExtension,p_intf);
     dialog_Register(p_intf);
 
     msg_Dbg(p_intf,"Mac OS X dialog provider initialised");
-    
+
     return VLC_SUCCESS;
 }
 
@@ -176,7 +342,7 @@ void CloseIntf(vlc_object_t *p_this)
 
     /* unsubscribe from the interactive dialogues */
     dialog_Unregister(p_intf);
-    
+
     if (!p_intf->p_sys->is_hidding_noaction_dialogs)
     {
         var_DelCallback(p_intf,"dialog-error",DisplayError,p_intf);
@@ -185,7 +351,8 @@ void CloseIntf(vlc_object_t *p_this)
     var_DelCallback(p_intf,"dialog-login",DisplayLogin,p_intf);
     var_DelCallback(p_intf,"dialog-question",DisplayQuestion,p_intf);
     var_DelCallback(p_intf,"dialog-progress-bar",DisplayProgressPanelAction,p_intf);
-    
+    var_DelCallback(p_intf,"dialog-extension",DisplayExtension,p_intf);
+
     [p_intf->p_sys->displayer release];
 
     msg_Dbg(p_intf,"Mac OS X dialog provider closed");
@@ -262,6 +429,20 @@ static int DisplayProgressPanelAction(vlc_object_t *p_this, const char *type, vl
     return VLC_SUCCESS;
 }
 
+static int DisplayExtension(vlc_object_t *p_this, const char *type, vlc_value_t previous, vlc_value_t value, void *data)
+{
+    NSAutoreleasePool * pool = [[NSAutoreleasePool alloc] init];
+    intf_thread_t *p_intf = (intf_thread_t*) p_this;
+    intf_sys_t *sys = p_intf->p_sys;
+    extension_dialog_t *dialog = value.p_address;
+
+    // -updateExtensionDialog: Open its own runloop, so be sure to run on DefaultRunLoop.
+    [sys->displayer performSelectorOnMainThread:@selector(updateExtensionDialog:) withObject:[NSValue valueWithPointer:dialog] waitUntilDone:YES];
+    [pool release];
+    return VLC_SUCCESS;
+}
+
+
 void updateProgressPanel (void *priv, const char *text, float value)
 {
     NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
@@ -271,7 +452,7 @@ void updateProgressPanel (void *priv, const char *text, float value)
                           [NSNumber numberWithFloat:value], @"value",
                           text ? [NSString stringWithUTF8String:text] : nil, @"text",
                           nil];
-                          
+
     [sys->displayer performSelectorOnMainThread:@selector(updateProgressPanel:) withObject:dict waitUntilDone:YES];
 
     [pool release];
@@ -283,7 +464,7 @@ void destroyProgressPanel (void *priv)
     intf_sys_t *sys = (intf_sys_t *)priv;
 
     [sys->displayer performSelectorOnMainThread:@selector(destroyProgressPanel) withObject:nil waitUntilDone:YES];
-    
+
     [pool release];
 }
 
@@ -303,6 +484,8 @@ bool checkProgressPanel (void *priv)
 @implementation VLCDialogDisplayer
 - (void)dealloc
 {
+    [controlToWidget release];
+
     assert(!_currentProgressBarPanel); // This has to be closed on main thread.
     [super dealloc];
 }
@@ -320,7 +503,7 @@ bool checkProgressPanel (void *priv)
         [dict setObject:[NSString stringWithUTF8String:no] forKey:@"no"];
     if (cancel)
         [dict setObject:[NSString stringWithUTF8String:cancel] forKey:@"cancel"];
-    
+
     return dict;
 }
 #define VLCAssertIsMainThread() assert([NSThread isMainThread])
@@ -328,7 +511,7 @@ bool checkProgressPanel (void *priv)
 - (void)displayError:(NSDictionary *)dialog
 {
     VLCAssertIsMainThread();
-    
+
     NSRunInformationalAlertPanel([dialog objectForKey:@"title"],
                                  [dialog objectForKey:@"message"],
                                  @"OK", nil, nil);
@@ -337,7 +520,7 @@ bool checkProgressPanel (void *priv)
 - (void)displayCritical:(NSDictionary *)dialog
 {
     VLCAssertIsMainThread();
-    
+
     NSRunCriticalAlertPanel([dialog objectForKey:@"title"],
                                  [dialog objectForKey:@"message"],
                                  @"OK", nil, nil);
@@ -346,12 +529,12 @@ bool checkProgressPanel (void *priv)
 - (NSNumber *)displayQuestion:(NSDictionary *)dialog
 {
     VLCAssertIsMainThread();
-    
+
     NSInteger alertRet = 0;
-    
+
     NSAlert *alert = [NSAlert alertWithMessageText:[dialog objectForKey:@"title"]
                               defaultButton:[dialog objectForKey:@"yes"]
-                            alternateButton:[dialog objectForKey:@"no"] 
+                            alternateButton:[dialog objectForKey:@"no"]
                                 otherButton:[dialog objectForKey:@"cancel"]
                   informativeTextWithFormat:[dialog objectForKey:@"message"]];
     [alert setAlertStyle:NSInformationalAlertStyle];
@@ -388,10 +571,10 @@ bool checkProgressPanel (void *priv)
     [panel center];
     NSInteger ret = [NSApp runModalForWindow:panel];
     [panel close];
-    
+
     if (!ret)
         return nil;
-    
+
     return [NSDictionary dictionaryWithObjectsAndKeys:
             [panel userName], @"username",
             [panel password], @"password",
@@ -437,8 +620,301 @@ bool checkProgressPanel (void *priv)
 - (NSNumber *)checkProgressPanel
 {
     VLCAssertIsMainThread();
-    
+
     return [NSNumber numberWithBool:[_currentProgressBarPanel isCancelled]];
+}
+
+#pragma mark -
+#pragma mark Extensions Dialog
+
+- (void)triggerClick:(id)sender
+{
+    assert([sender isKindOfClass:[VLCDialogButton class]]);
+    VLCDialogButton *button = sender;
+    extension_widget_t *widget = [button widget];
+
+    NSLog(@"(triggerClick)");
+    vlc_mutex_lock(&widget->p_dialog->lock);
+    extension_WidgetClicked(widget->p_dialog, widget);
+    vlc_mutex_unlock(&widget->p_dialog->lock);
+}
+
+- (void)syncTextField:(NSNotification *)notifcation
+{
+    id sender = [notifcation object];
+    assert([sender isKindOfClass:[VLCDialogTextField class]]);
+    VLCDialogTextField *field = sender;
+    extension_widget_t *widget = [field widget];
+
+    vlc_mutex_lock(&widget->p_dialog->lock);
+    free(widget->psz_text);
+    widget->psz_text = strdup([[field stringValue] UTF8String]);
+    vlc_mutex_unlock(&widget->p_dialog->lock);
+}
+
+- (void)tableViewSelectionDidChange:(NSNotification *)notifcation
+{
+    id sender = [notifcation object];
+    assert(sender && [sender isKindOfClass:[VLCDialogList class]]);
+    VLCDialogList *list = sender;
+
+    struct extension_widget_value_t *value;
+    unsigned i = 0;
+    for(value = [list widget]->p_values; value != NULL; value = value->p_next, i++)
+        value->b_selected = (i == [list selectedRow]);
+}
+
+static NSView *createControlFromWidget(extension_widget_t *widget, id self)
+{
+    assert(!widget->p_sys_intf);
+
+    switch (widget->type)
+    {
+        case EXTENSION_WIDGET_HTML:
+        {
+            NSScrollView *scrollView = [[NSScrollView alloc] init];
+            [scrollView setHasVerticalScroller:YES];
+            NSTextView *field = [[NSTextView alloc] init];
+            [scrollView setDocumentView:field];
+            [scrollView setAutoresizesSubviews:YES];
+            [field release];
+            return scrollView;
+        }
+        case EXTENSION_WIDGET_LABEL:
+        {
+            NSTextField *field = [[NSTextField alloc] init];
+            [field setEditable:NO];
+            [field setBordered:NO];
+            [field setDrawsBackground:NO];
+            return field;
+        }
+        case EXTENSION_WIDGET_TEXT_FIELD:
+        {
+            VLCDialogTextField *field = [[VLCDialogTextField alloc] init];
+            [field setWidget:widget];
+            [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(syncTextField:)  name:NSControlTextDidChangeNotification object:field];
+            return field;
+        }
+        case EXTENSION_WIDGET_BUTTON:
+        {
+            VLCDialogButton *button = [[VLCDialogButton alloc] init];
+            [button setBezelStyle:NSRoundedBezelStyle];
+            [button setWidget:widget];
+            [button setAction:@selector(triggerClick:)];
+            [button setTarget:self];
+            return button;
+        }
+        case EXTENSION_WIDGET_DROPDOWN:
+        case EXTENSION_WIDGET_LIST:
+        {
+            NSScrollView *scrollView = [[NSScrollView alloc] init];
+            [scrollView setHasVerticalScroller:YES];
+            VLCDialogList *list = [[VLCDialogList alloc] init];
+            [list setUsesAlternatingRowBackgroundColors:YES];
+            [list setHeaderView:nil];
+            [scrollView setDocumentView:list];
+
+            NSTableColumn *column = [[NSTableColumn alloc] init];
+            [list addTableColumn:column];
+            [column release];
+            [list setDataSource:list];
+            [list setDelegate:self];
+            [list setWidget:widget];
+            [list release];
+            return scrollView;
+        }
+        case EXTENSION_WIDGET_IMAGE:
+        {
+            return [[NSImageView alloc] init];
+        }
+        default:
+            assert(0);
+            return nil;
+    }
+
+}
+
+static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
+{
+    switch (widget->type)
+    {
+        case EXTENSION_WIDGET_HTML:
+        {
+            // Get the scroll view
+            assert([control isKindOfClass:[NSScrollView class]]);
+            NSScrollView *scrollView = (NSScrollView *)control;
+            control = [scrollView documentView];
+
+            assert([control isKindOfClass:[NSTextView class]]);
+            NSTextView *textView = (NSTextView *)control;
+            NSString *string = [NSString stringWithUTF8String:widget->psz_text];
+            NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding:NSUTF8StringEncoding] documentAttributes:NULL];
+            [[textView textStorage] setAttributedString:[[NSAttributedString alloc] initWithString:@"Hello"]];
+            NSLog(@"%@", string);
+            [textView setNeedsDisplay:YES];
+            [textView scrollRangeToVisible:NSMakeRange(0, 0)];
+            [attrString release];
+            break;
+
+        }
+        case EXTENSION_WIDGET_LABEL:
+        case EXTENSION_WIDGET_PASSWORD:
+        case EXTENSION_WIDGET_TEXT_FIELD:
+        {
+            if (!widget->psz_text)
+                break;
+            assert([control isKindOfClass:[NSControl class]]);
+            NSControl *field = (NSControl *)control;
+            NSString *string = [NSString stringWithUTF8String:widget->psz_text];
+            NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding:NSUTF8StringEncoding] documentAttributes:NULL];
+            [field setAttributedStringValue:attrString];
+            [attrString release];
+            break;
+        }
+        case EXTENSION_WIDGET_BUTTON:
+        {
+            assert([control isKindOfClass:[NSButton class]]);
+            NSButton *button = (NSButton *)control;
+            if (!widget->psz_text)
+                break;
+            [button setTitle:[NSString stringWithUTF8String:widget->psz_text]];
+            break;
+        }
+        case EXTENSION_WIDGET_DROPDOWN:
+        case EXTENSION_WIDGET_LIST:
+        {
+            assert([control isKindOfClass:[NSScrollView class]]);
+            NSScrollView *scrollView = (NSScrollView *)control;
+            assert([[scrollView documentView] isKindOfClass:[VLCDialogList class]]);
+            VLCDialogList *list = (VLCDialogList *)[scrollView documentView];
+
+            NSMutableArray *contentArray = [NSMutableArray array];
+            struct extension_widget_value_t *value;
+            for(value = widget->p_values; value != NULL; value = value->p_next)
+            {
+                NSDictionary *entry = [NSDictionary dictionaryWithObjectsAndKeys:
+                                       [NSNumber numberWithInt:value->i_id], @"id",
+                                       [NSString stringWithUTF8String:value->psz_text], @"text",
+                                       nil];
+                [contentArray addObject:entry];
+            }
+            list.contentArray = contentArray;
+            [list reloadData];
+            break;
+        }
+        case EXTENSION_WIDGET_IMAGE:
+        {
+            assert([control isKindOfClass:[NSImageView class]]);
+            NSImageView *imageView = (NSImageView *)control;
+            NSString *string = widget->psz_text ? [NSString stringWithUTF8String:widget->psz_text] : nil;
+            NSImage *image = nil;
+            NSLog(@"Setting image to %@", string);
+            if (string)
+                image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:string]];
+            [imageView setImage:image];
+            [image release];
+            break;
+        }
+    }
+
+}
+
+- (void)updateWidgets:(extension_dialog_t *)dialog
+{
+    extension_widget_t *widget;
+    NSWindow *window = dialog->p_sys_intf;
+    FOREACH_ARRAY(widget, dialog->widgets)
+    {
+        if (!widget)
+            continue; /* Some widgets may be NULL at this point */
+
+        BOOL shouldDestroy = widget->b_kill;
+        NSView *control = widget->p_sys_intf;
+        BOOL update = widget->b_update;
+
+
+        if (!control && !shouldDestroy)
+        {
+            control = createControlFromWidget(widget, self);
+            updateControlFromWidget(control, widget);
+            widget->p_sys_intf = control;
+            update = YES; // Force update and repositionning
+            [control setHidden:widget->b_hide];
+        }
+
+        if (update && !shouldDestroy)
+        {
+            updateControlFromWidget(control, widget);
+            [control setHidden:widget->b_hide];
+
+            int row = widget->i_row - 1;
+            int col = widget->i_column - 1;
+            int hsp = __MAX( 1, widget->i_horiz_span );
+            int vsp = __MAX( 1, widget->i_vert_span );
+            if( row < 0 )
+            {
+                row = 4;
+                col = 0;
+            }
+
+            VLCDialogGridView *gridView = (VLCDialogGridView *)[window contentView];
+            [gridView addSubview:control atRow:row column:col rowSpan:widget->i_height ? 0 : vsp colSpan:widget->i_width ? 0 : hsp];
+
+            //this->resize( sizeHint() );
+            widget->b_update = false;
+        }
+
+        if (shouldDestroy)
+        {
+            VLCDialogGridView *gridView = (VLCDialogGridView *)[window contentView];
+            [gridView removeSubview:control];
+            [control release];
+            widget->p_sys_intf = NULL;
+        }
+    }
+    FOREACH_END()
+}
+
+- (void)updateExtensionDialog:(NSValue *)extensionDialog
+{
+    extension_dialog_t *dialog = [extensionDialog pointerValue];
+
+    vlc_mutex_lock(&dialog->lock);
+
+    NSSize size = NSMakeSize(dialog->i_width, dialog->i_height);
+
+    BOOL shouldDestroy = dialog->b_kill;
+
+    if (!dialog->i_width || !dialog->i_height)
+        size = NSMakeSize(640, 480);
+
+    NSWindow *window = dialog->p_sys_intf;
+    if (!window && !shouldDestroy)
+    {
+        NSRect content = NSMakeRect(0, 0, size.width, size.height);
+        window = [[NSWindow alloc] initWithContentRect:content styleMask:NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask backing:NSBackingStoreBuffered defer:NO];
+        [window setTitle:[NSString stringWithUTF8String:dialog->psz_title]];
+        VLCDialogGridView *gridView = [[VLCDialogGridView alloc] init];
+        [gridView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+        [window setContentView:gridView];
+        [gridView release];
+        [window center];
+        dialog->p_sys_intf = window;
+    }
+
+    if (!dialog->b_hide && ![window isVisible])
+        [window makeKeyAndOrderFront:self];
+
+    [self updateWidgets:dialog];
+
+    if (shouldDestroy)
+    {
+        [window close];
+        dialog->p_sys_intf = NULL;
+    }
+    [window setContentSize:size];
+    vlc_cond_signal(&dialog->cond);
+    vlc_mutex_unlock(&dialog->lock);
 }
 
 
@@ -469,6 +945,6 @@ bool checkProgressPanel (void *priv)
     return [result autorelease];
 }
 @end
-                                  
-                                  
+
+
 
