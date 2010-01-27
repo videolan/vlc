@@ -254,7 +254,7 @@ void RtspDelId( rtsp_stream_t *rtsp, rtsp_stream_id_t *id )
             if( ses->trackv[j].id == id )
             {
                 rtsp_strack_t *tr = ses->trackv + j;
-                net_Close( tr->fd );
+                rtp_del_sink( tr->id->sout_id, tr->fd );
                 REMOVE_ELEM( ses->trackv, ses->trackc, j );
             }
         }
