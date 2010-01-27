@@ -673,6 +673,7 @@ libvlc_media_get_es( libvlc_media_t *p_md, libvlc_media_es_t ** pp_es )
 
 
         p_mes->i_codec = p_es->i_codec;
+        p_mes->i_id = p_es->i_id;
 
         p_mes->i_profile = p_es->i_profile;
         p_mes->i_level = p_es->i_level;

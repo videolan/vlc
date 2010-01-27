@@ -151,6 +151,7 @@ typedef struct libvlc_media_es_t
 {
     /* Codec fourcc */
     uint32_t    i_codec;
+    int         i_id;
     libvlc_es_type_t i_type;
 
     /* Codec specific */
