@@ -30,7 +30,7 @@
 #define VOLUME_MIN                 0
 
 /* Notification Messages */
-NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged"; 
+NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
 
 /* libvlc event callback */
 // TODO: Callbacks
