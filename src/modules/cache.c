@@ -58,7 +58,7 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 8
+#define CACHE_SUBVERSION_NUM 9
 
 /* Format string for the cache filename */
 #define CACHENAME_FORMAT \
@@ -233,10 +233,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
         LOAD_STRING( pp_cache[i]->psz_file );
         LOAD_IMMEDIATE( pp_cache[i]->i_time );
         LOAD_IMMEDIATE( pp_cache[i]->i_size );
-        LOAD_IMMEDIATE( pp_cache[i]->b_junk );
         pp_cache[i]->b_used = false;
-
-        if( pp_cache[i]->b_junk ) continue;
 
         pp_cache[i]->p_module = vlc_module_create( p_this );
 
@@ -533,9 +530,6 @@ static int CacheSaveBank (FILE *file, module_bank_t *p_bank)
         SAVE_STRING( pp_cache[i]->psz_file );
         SAVE_IMMEDIATE( pp_cache[i]->i_time );
         SAVE_IMMEDIATE( pp_cache[i]->i_size );
-        SAVE_IMMEDIATE( pp_cache[i]->b_junk );
-
-        if( pp_cache[i]->b_junk ) continue;
 
         /* Save additional infos */
         SAVE_STRING( pp_cache[i]->p_module->psz_object_name );

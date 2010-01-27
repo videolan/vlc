@@ -63,7 +63,6 @@ struct module_cache_t
     char       *psz_file;
     int64_t    i_time;
     int64_t    i_size;
-    bool b_junk;
 
     /* Optional extra data */
     bool b_used;

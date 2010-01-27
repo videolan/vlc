@@ -933,10 +933,6 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
         p_module = AllocatePlugin( p_this, psz_file );
     }
     else
-    /* If junk dll, don't try to load it */
-    if( p_cache_entry->b_junk )
-        return -1;
-    else
     {
         module_config_t *p_item = NULL, *p_end = NULL;
 
@@ -986,7 +982,6 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
     pp_cache[p_bank->i_cache]->psz_file = strdup( psz_file );
     pp_cache[p_bank->i_cache]->i_time = i_file_time;
     pp_cache[p_bank->i_cache]->i_size = i_file_size;
-    pp_cache[p_bank->i_cache]->b_junk = p_module ? 0 : 1;
     pp_cache[p_bank->i_cache]->b_used = true;
     pp_cache[p_bank->i_cache]->p_module = p_module;
     p_bank->pp_cache = pp_cache;
