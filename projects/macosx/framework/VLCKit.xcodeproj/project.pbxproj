@@ -64,6 +64,10 @@
 		63014B7E1042E64A00534090 /* VLCMediaListPlayer.h in Headers */ = {isa = PBXBuildFile; fileRef = 63014B7D1042E64A00534090 /* VLCMediaListPlayer.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		6303C43A0CF45CAE0000ECC8 /* VLCMediaListAspect.m in Sources */ = {isa = PBXBuildFile; fileRef = 6303C4390CF45CAE0000ECC8 /* VLCMediaListAspect.m */; };
 		6303C43C0CF45CC30000ECC8 /* VLCMediaListAspect.h in Headers */ = {isa = PBXBuildFile; fileRef = 6303C43B0CF45CC30000ECC8 /* VLCMediaListAspect.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		63098FDC110E7159005F46AE /* VLCExtensionsManager.m in Sources */ = {isa = PBXBuildFile; fileRef = 63098FDA110E7159005F46AE /* VLCExtensionsManager.m */; };
+		63099116110F0EC3005F46AE /* VLCExtension.m in Sources */ = {isa = PBXBuildFile; fileRef = 63099114110F0EC3005F46AE /* VLCExtension.m */; };
+		6309994B110FC791005F46AE /* VLCExtension.h in Headers */ = {isa = PBXBuildFile; fileRef = 63099949110FC791005F46AE /* VLCExtension.h */; settings = {ATTRIBUTES = (Public, ); }; };
+		6309994C110FC791005F46AE /* VLCExtensionsManager.h in Headers */ = {isa = PBXBuildFile; fileRef = 6309994A110FC791005F46AE /* VLCExtensionsManager.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		632A0E850D3835C400AFC99B /* VLCStreamSession.h in Headers */ = {isa = PBXBuildFile; fileRef = 632A0E830D3835C400AFC99B /* VLCStreamSession.h */; settings = {ATTRIBUTES = (Public, ); }; };
 		632A0E860D3835C400AFC99B /* VLCStreamSession.m in Sources */ = {isa = PBXBuildFile; fileRef = 632A0E840D3835C400AFC99B /* VLCStreamSession.m */; };
 		632A0EC30D38392E00AFC99B /* VLCStreamOutput.h in Headers */ = {isa = PBXBuildFile; fileRef = 632A0EC10D38392E00AFC99B /* VLCStreamOutput.h */; settings = {ATTRIBUTES = (Public, ); }; };
@@ -139,6 +143,10 @@
 		63030CC70CCA652C0088ECD1 /* Info.plist */ = {isa = PBXFileReference; fileEncoding = 30; lastKnownFileType = text.plist.xml; name = Info.plist; path = Resources/Info.plist; sourceTree = "<group>"; };
 		6303C4390CF45CAE0000ECC8 /* VLCMediaListAspect.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCMediaListAspect.m; sourceTree = "<group>"; };
 		6303C43B0CF45CC30000ECC8 /* VLCMediaListAspect.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCMediaListAspect.h; path = Public/VLCMediaListAspect.h; sourceTree = "<group>"; };
+		63098FDA110E7159005F46AE /* VLCExtensionsManager.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCExtensionsManager.m; sourceTree = "<group>"; };
+		63099114110F0EC3005F46AE /* VLCExtension.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCExtension.m; sourceTree = "<group>"; };
+		63099949110FC791005F46AE /* VLCExtension.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCExtension.h; path = Public/VLCExtension.h; sourceTree = "<group>"; };
+		6309994A110FC791005F46AE /* VLCExtensionsManager.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCExtensionsManager.h; path = Public/VLCExtensionsManager.h; sourceTree = "<group>"; };
 		632A0E830D3835C400AFC99B /* VLCStreamSession.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCStreamSession.h; path = Public/VLCStreamSession.h; sourceTree = "<group>"; };
 		632A0E840D3835C400AFC99B /* VLCStreamSession.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = VLCStreamSession.m; sourceTree = "<group>"; };
 		632A0EC10D38392E00AFC99B /* VLCStreamOutput.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = VLCStreamOutput.h; path = Public/VLCStreamOutput.h; sourceTree = "<group>"; };
@@ -247,6 +255,8 @@
 				EF78BD450CAEEFF600354E6E /* VLCVideoView.m */,
 				EF78BD440CAEEFF600354E6E /* VLCTime.m */,
 				EF73118F0CB5797B009473B4 /* VLCAudio.m */,
+				63098FDA110E7159005F46AE /* VLCExtensionsManager.m */,
+				63099114110F0EC3005F46AE /* VLCExtension.m */,
 				632A0F7B0D38F78500AFC99B /* Stream */,
 			);
 			path = Sources;
@@ -330,6 +340,8 @@
 				EF78BD1A0CAEEEE700354E6E /* VLCVideoView.h */,
 				EF78BD190CAEEEE700354E6E /* VLCTime.h */,
 				EF73118E0CB5797B009473B4 /* VLCAudio.h */,
+				63099949110FC791005F46AE /* VLCExtension.h */,
+				6309994A110FC791005F46AE /* VLCExtensionsManager.h */,
 				632A0F7C0D38F79200AFC99B /* Stream */,
 			);
 			name = Public;
@@ -369,6 +381,8 @@
 				632A0E850D3835C400AFC99B /* VLCStreamSession.h in Headers */,
 				632A0EC30D38392E00AFC99B /* VLCStreamOutput.h in Headers */,
 				63014B7E1042E64A00534090 /* VLCMediaListPlayer.h in Headers */,
+				6309994B110FC791005F46AE /* VLCExtension.h in Headers */,
+				6309994C110FC791005F46AE /* VLCExtensionsManager.h in Headers */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -567,6 +581,8 @@
 				632A0E860D3835C400AFC99B /* VLCStreamSession.m in Sources */,
 				632A0EC40D38392E00AFC99B /* VLCStreamOutput.m in Sources */,
 				63014A7A1042ACE100534090 /* VLCMediaListPlayer.m in Sources */,
+				63098FDC110E7159005F46AE /* VLCExtensionsManager.m in Sources */,
+				63099116110F0EC3005F46AE /* VLCExtension.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -624,6 +640,7 @@
 				LIBRARY_SEARCH_PATHS = "$(VLC_FRAMEWORK)/lib";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
+					"-lvlccore",
 					"-single_module",
 					"-read_only_relocs",
 					suppress,
