@@ -28,6 +28,7 @@
 #include "util/singleton.hpp"
 
 class QLabel;
+class EPGEvent;
 class EpgDialog : public QVLCFrame, public Singleton<EpgDialog>
 {
     Q_OBJECT;
@@ -38,6 +39,9 @@ private:
     QLabel *description;
 
     friend class    Singleton<EpgDialog>;
+
+private slots:
+    void showEvent( EPGEvent * );
 };
 
 #endif

@@ -61,10 +61,16 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     splitter->addWidget( descBox );
     layout->addWidget( splitter );
 
-    CONNECT( epg, descriptionChanged( const QString & ), description, setText( const QString & ) );
+    CONNECT( epg, descriptionChanged( EPGEvent *), this, showEvent( EPGEvent *) );
 }
 
 EpgDialog::~EpgDialog()
 {
 }
 
+void EpgDialog::showEvent( EPGEvent *event )
+{
+    if( !event ) return;
+
+    description->setText( event->description );
+}

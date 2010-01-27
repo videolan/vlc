@@ -61,7 +61,7 @@ private:
     QMultiMap<QString, EPGEvent*> m_events;
 
 signals:
-    void descriptionChanged( const QString& );
+    void itemSelectionChanged( EPGEvent * );
 };
 
 #endif // EPGWIDGET_H
