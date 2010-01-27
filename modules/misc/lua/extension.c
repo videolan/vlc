@@ -85,6 +85,7 @@ int Open_Extension( vlc_object_t *p_this )
     p_mgr->p_sys = p_sys;
     ARRAY_INIT( p_sys->activated_extensions );
     ARRAY_INIT( p_mgr->extensions );
+    vlc_mutex_init( &p_mgr->p_sys->lock );
 
     /* Initialise Lua state structure */
     lua_State *L = GetLuaState( p_mgr, NULL );
