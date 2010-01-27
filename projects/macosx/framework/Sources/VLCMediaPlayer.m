@@ -396,7 +396,11 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     float result = libvlc_media_player_get_rate( instance, &ex );
-    catch_exception( &ex );
+    if (libvlc_exception_raised(&ex))
+    {
+        result = 1;
+        libvlc_exception_clear(&ex);
+    }
     return result;
 }
 
@@ -690,6 +694,15 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 - (void)stop
 {
     libvlc_media_player_stop(instance);
+}
+
+- (void)gotoNextFrame
+{
+    libvlc_exception_t e;
+    libvlc_exception_init(&e);
+    libvlc_media_player_next_frame(instance, &e);
+    catch_exception(&e);
+
 }
 
 - (void)fastForward
