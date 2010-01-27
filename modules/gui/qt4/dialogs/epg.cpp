@@ -28,16 +28,18 @@
 
 #include "components/epg/EPGWidget.hpp"
 
-#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QSplitter>
 #include <QLabel>
 #include <QGroupBox>
+#include <QPushButton>
 
 EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
     setWindowTitle( "Program Guide" );
 
-    QHBoxLayout *layout = new QHBoxLayout( this );
+    QVBoxLayout *layout = new QVBoxLayout( this );
+    layout->setMargin( 0 );
     QSplitter *splitter = new QSplitter( this );
     EPGWidget *epg = new EPGWidget( this );
     splitter->addWidget( epg );
@@ -45,7 +47,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 
     QGroupBox *descBox = new QGroupBox( qtr( "Description" ), this );
 
-    QHBoxLayout *boxLayout = new QHBoxLayout( descBox );
+    QVBoxLayout *boxLayout = new QVBoxLayout( descBox );
 
     description = new QLabel( this );
     description->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel );
@@ -55,13 +57,22 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     palette.setBrush(QPalette::Active, QPalette::Window, palette.brush( QPalette::Base ) );
     description->setPalette( palette );
 
-    boxLayout->addWidget( description );
+    title = new QLabel( qtr( "Title" ), this );
+
+    boxLayout->addWidget( title );
+    boxLayout->addWidget( description, 10 );
 
     splitter->addWidget( epg );
     splitter->addWidget( descBox );
     layout->addWidget( splitter );
 
-    CONNECT( epg, descriptionChanged( EPGEvent *), this, showEvent( EPGEvent *) );
+    CONNECT( epg, itemSelectionChanged( EPGEvent *), this, showEvent( EPGEvent *) );
+
+    QPushButton *close = new QPushButton( qtr( "&Close" ) );
+    layout->addWidget( close, 0, Qt::AlignRight );
+    BUTTONACT( close, close() );
+
+    resize( 650, 400 );
 }
 
 EpgDialog::~EpgDialog()
@@ -72,5 +83,7 @@ void EpgDialog::showEvent( EPGEvent *event )
 {
     if( !event ) return;
 
+    title->setText( event->name );
     description->setText( event->description );
 }
+

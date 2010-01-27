@@ -37,6 +37,7 @@ private:
     virtual ~EpgDialog();
 
     QLabel *description;
+    QLabel *title;
 
     friend class    Singleton<EpgDialog>;
 
