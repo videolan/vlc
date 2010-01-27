@@ -65,7 +65,6 @@ struct module_cache_t
     int64_t    i_size;
 
     /* Optional extra data */
-    bool b_used;
     module_t *p_module;
 };
 
