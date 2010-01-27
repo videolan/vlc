@@ -174,39 +174,17 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     return p_new;
 }
 
-
+#undef vlc_object_create
 /**
  * Allocates and initializes a vlc object.
  *
- * @param i_type known object type (all of them are negative integer values),
- *               or object byte size (always positive).
+ * @param i_size object byte size
  *
  * @return the new object, or NULL on error.
  */
-void * __vlc_object_create( vlc_object_t *p_this, int i_type )
+void *vlc_object_create( vlc_object_t *p_this, size_t i_size )
 {
-    const char   * psz_type;
-    size_t         i_size;
-
-    switch( i_type )
-    {
-        case VLC_OBJECT_DECODER:
-            i_size = sizeof(decoder_t);
-            psz_type = "decoder";
-            break;
-        case VLC_OBJECT_AOUT:
-            i_size = sizeof(aout_instance_t);
-            psz_type = "audio output";
-            break;
-        default:
-            assert( i_type > 0 ); /* unknown type?! */
-            i_size = i_type;
-            i_type = VLC_OBJECT_GENERIC;
-            psz_type = "generic";
-            break;
-    }
-
-    return vlc_custom_create( p_this, i_size, i_type, psz_type );
+    return vlc_custom_create( p_this, i_size, VLC_OBJECT_GENERIC, "generic" );
 }
 
 

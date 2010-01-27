@@ -531,7 +531,7 @@ vlc_mutex_lock
 vlc_mutex_trylock
 vlc_mutex_unlock
 __vlc_object_attach
-__vlc_object_create
+vlc_object_create
 __vlc_object_detach
 __vlc_object_find
 vlc_object_find_name
