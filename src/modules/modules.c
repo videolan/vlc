@@ -939,6 +939,10 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
         p_module = p_cache_entry->p_module;
         p_module->b_loaded = false;
 
+        /* If plugin-path contains duplicate entries... */
+        if( p_module->next != NULL )
+            return 0; /* already taken care of that one */
+
         /* For now we force loading if the module's config contains
          * callbacks or actions.
          * Could be optimized by adding an API call.*/
@@ -956,6 +960,9 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
     if( p_module == NULL )
         return -1;
 
+    /* We have not already scanned and inserted this module */
+    assert( p_module->next == NULL );
+
     /* Everything worked fine !
      * The module is ready to be added to the list. */
     p_module->b_builtin = false;
@@ -964,6 +971,7 @@ static int AllocatePluginFile( vlc_object_t * p_this, module_bank_t *p_bank,
                 p_module->psz_object_name, p_module->psz_longname ); */
     p_module->next = p_bank->head;
     p_bank->head = p_module;
+    assert( p_module->next != NULL ); /* Insertion done */
 
     if( !p_module_bank->b_cache )
         return 0;
