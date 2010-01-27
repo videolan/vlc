@@ -484,8 +484,6 @@ bool checkProgressPanel (void *priv)
 @implementation VLCDialogDisplayer
 - (void)dealloc
 {
-    [controlToWidget release];
-
     assert(!_currentProgressBarPanel); // This has to be closed on main thread.
     [super dealloc];
 }
