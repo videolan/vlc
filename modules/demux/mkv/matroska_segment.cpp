@@ -1154,6 +1154,10 @@ bool matroska_segment_c::Select( mtime_t i_start_time )
                 }
             }
         }
+        else if( !strcmp( tracks[i_track]->psz_codec, "S_HDMV/PGS" ) )
+        {
+            tracks[i_track]->fmt.i_codec = VLC_CODEC_BD_PG;
+        }
         else if( !strcmp( tracks[i_track]->psz_codec, "B_VOBBTN" ) )
         {
             tracks[i_track]->fmt.i_cat = NAV_ES;
