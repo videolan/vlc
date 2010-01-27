@@ -14,21 +14,6 @@
 
 #define _instance ((extensions_manager_t *)instance)
 
-static int DialogCallback( vlc_object_t *p_this, const char *psz_variable,
-                          vlc_value_t old_val, vlc_value_t new_val,
-                          void *param )
-{
-
-    VLCExtensionsManager *self = param;
-    assert(self);
-    assert(new_val.p_address);
-
-    extension_dialog_t *dialog = new_val.p_address;
-
-    NSLog(@"dialog callback");
-    return VLC_SUCCESS;
-}
-
 @implementation VLCExtensionsManager
 static VLCExtensionsManager *sharedManager = nil;
 
@@ -45,9 +30,7 @@ static VLCExtensionsManager *sharedManager = nil;
 - (void)dealloc
 {
     vlc_object_t *libvlc = libvlc_get_vlc_instance([VLCLibrary sharedInstance]);
-    var_DelCallback(libvlc, "dialog-extension", DialogCallback, NULL);
     vlc_object_release(libvlc);
-
     module_unneed(_instance, _instance->p_module);
     vlc_object_release(_instance);
 
@@ -70,8 +53,6 @@ static VLCExtensionsManager *sharedManager = nil;
         _instance->p_module = module_need(_instance, "extension", NULL, false);
         NSAssert(_instance->p_module, @"Unable to load extensions module");
 
-        var_Create(libvlc, "dialog-extension", VLC_VAR_ADDRESS);
-        var_AddCallback(libvlc, "dialog-extension", DialogCallback, self);
         vlc_object_release(libvlc);
     }
 
