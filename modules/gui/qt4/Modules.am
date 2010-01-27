@@ -52,6 +52,10 @@ nodist_SOURCES_qt4 = \
 		components/interface_widgets.moc.cpp \
 		components/controller.moc.cpp \
 		components/controller_widget.moc.cpp \
+		components/epg/EPGItem.moc.cpp \
+		components/epg/EPGRuler.moc.cpp \
+		components/epg/EPGView.moc.cpp \
+		components/epg/EPGWidget.moc.cpp \
 		components/playlist/icon_view.moc.cpp \
 		components/playlist/playlist_model.moc.cpp \
 		components/playlist/playlist.moc.cpp \
@@ -246,6 +250,10 @@ SOURCES_qt4 = 	qt4.cpp \
 		components/interface_widgets.cpp \
 		components/controller.cpp \
 		components/controller_widget.cpp \
+		components/epg/EPGItem.cpp \
+		components/epg/EPGRuler.cpp \
+		components/epg/EPGView.cpp \
+		components/epg/EPGWidget.cpp \
 		components/playlist/icon_view.cpp \
 		components/playlist/playlist_model.cpp \
 		components/playlist/playlist_item.cpp \
@@ -297,6 +305,11 @@ noinst_HEADERS = \
 	components/interface_widgets.hpp \
 	components/controller.hpp \
 	components/controller_widget.hpp \
+	components/epg/EPGEvent.hpp \
+	components/epg/EPGItem.hpp \
+	components/epg/EPGRuler.hpp \
+	components/epg/EPGView.hpp \
+	components/epg/EPGWidget.hpp \
 	components/playlist/icon_view.hpp \
 	components/playlist/playlist_model.hpp \
 	components/playlist/playlist_item.hpp \
