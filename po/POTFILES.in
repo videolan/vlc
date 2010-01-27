@@ -1070,8 +1070,6 @@ modules/video_filter/atmo/AtmoLiveView.cpp
 modules/video_filter/atmo/AtmoLiveView.h
 modules/video_filter/atmo/AtmoOutputFilter.cpp
 modules/video_filter/atmo/AtmoOutputFilter.h
-modules/video_filter/atmo/AtmoSerialConnection.cpp
-modules/video_filter/atmo/AtmoSerialConnection.h
 modules/video_filter/atmo/AtmoThread.cpp
 modules/video_filter/atmo/AtmoThread.h
 modules/video_filter/atmo/AtmoTools.cpp
