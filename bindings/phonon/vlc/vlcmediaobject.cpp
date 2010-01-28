@@ -195,8 +195,7 @@ void VLCMediaObject::connectToAllVLCEvents()
     int i_nbEvents = sizeof(eventsMediaPlayer) / sizeof(*eventsMediaPlayer);
     for (int i = 0; i < i_nbEvents; i++) {
         libvlc_event_attach(p_vlc_media_player_event_manager, eventsMediaPlayer[i],
-                            libvlc_callback, this, vlc_exception);
-        vlcExceptionRaised();
+                            libvlc_callback, this);
     }
 
 
@@ -213,8 +212,7 @@ void VLCMediaObject::connectToAllVLCEvents()
     };
     i_nbEvents = sizeof(eventsMedia) / sizeof(*eventsMedia);
     for (int i = 0; i < i_nbEvents; i++) {
-        libvlc_event_attach(p_vlc_media_event_manager, eventsMedia[i], libvlc_callback, this, vlc_exception);
-        vlcExceptionRaised();
+        libvlc_event_attach(p_vlc_media_event_manager, eventsMedia[i], libvlc_callback, this);
     }
 
     // Get event manager from media service discoverer object
