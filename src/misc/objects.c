@@ -628,8 +628,7 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 
 static void vlc_object_detach_unlocked (vlc_object_t *p_this)
 {
-    if (p_this->p_parent == NULL)
-        return;
+    assert (p_this->p_parent != NULL);
 
     vlc_object_internals_t *pap = vlc_internals (p_this->p_parent);
     vlc_object_internals_t *priv = vlc_internals (p_this);
