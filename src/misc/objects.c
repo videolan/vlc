@@ -611,6 +611,7 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 
     vlc_object_internals_t *pap = vlc_internals (p_parent);
     vlc_object_internals_t *priv = vlc_internals (p_this);
+    vlc_object_t *p_old_parent;
 
     priv->prev = NULL;
     vlc_object_hold (p_parent);
@@ -630,8 +631,11 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
                   priv->old_parent, p_parent);
 #endif
 
+    p_old_parent = p_this->p_parent;
+    if (p_old_parent)
+        vlc_object_detach_unlocked (p_this);
+
     /* Attach the parent to its child */
-    assert (!p_this->p_parent);
     p_this->p_parent = p_parent;
 
     /* Attach the child to its parent */
@@ -640,6 +644,9 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
         priv->next->prev = priv;
     pap->first = priv;
     libvlc_unlock (p_this->p_libvlc);
+
+    if (p_old_parent)
+        vlc_object_release (p_old_parent);
 }
 
 
