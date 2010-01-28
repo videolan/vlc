@@ -55,6 +55,7 @@ public:
 
     PLItem *parent() { return parentItem; }
     input_item_t *inputItem() { return p_input; }
+    int id() { return i_id; }
 
 protected:
     QList<PLItem*> children;

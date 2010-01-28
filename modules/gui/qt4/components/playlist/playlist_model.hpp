@@ -96,7 +96,12 @@ public:
     void removeItem( int );
     void rebuild(); void rebuild( playlist_item_t *, bool b_first = false );
 
-    static inline PLItem *getItem( QModelIndex index );
+    inline PLItem *getItem( QModelIndex index ) const
+    {
+        if( index.isValid() )
+            return static_cast<PLItem*>( index.internalPointer() );
+        else return rootItem;
+    }
 
 private:
 

@@ -529,12 +529,6 @@ PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_input )
 #undef CACHE
 #undef ICACHE
 
-PLItem *PLModel::getItem( QModelIndex index )
-{
-    assert( index.isValid() );
-    return static_cast<PLItem*>( index.internalPointer() );
-}
-
 int PLModel::columnToMeta( int _column ) const
 {
     int meta = 1;
