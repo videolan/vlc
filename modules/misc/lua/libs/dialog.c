@@ -241,8 +241,7 @@ static int vlclua_dialog_delete( lua_State *L )
     vlc_mutex_lock( &p_dlg->lock );
     while( p_dlg->p_sys_intf != NULL )
     {
-        mtime_t abstime = mdate() + 1000000; // Waiting 1 second at a time
-        vlc_cond_timedwait( &p_dlg->cond, &p_dlg->lock, abstime );
+        vlc_cond_wait( &p_dlg->cond, &p_dlg->lock );
     }
     vlc_mutex_unlock( &p_dlg->lock );
 
@@ -833,29 +832,21 @@ static int vlclua_dialog_delete_widget( lua_State *L )
     vlc_mutex_lock( &p_dlg->lock );
 
     /* Same remarks as for dialog delete */
-    mtime_t abstime = mdate() + 2000000;
-    if( p_widget->p_sys_intf != NULL )
-        vlc_cond_timedwait( &p_dlg->cond, &p_dlg->lock, abstime );
-
-    if( p_widget->p_sys_intf == NULL )
+    while( p_widget->p_sys_intf != NULL )
     {
-        i_ret = DeleteWidget( p_dlg, p_widget );
+        vlc_cond_wait( &p_dlg->cond, &p_dlg->lock );
+    }
 
-        if( i_ret != VLC_SUCCESS )
-        {
-            vlc_mutex_unlock( &p_dlg->lock );
-            return luaL_error( L, "Could not remove widget from list" );
-        }
-    }
-    else
-    {
-        msg_Warn( p_mgr, "Could not delete a widget. Leaking its descriptor." );
-        i_ret = VLC_EGENERIC;
-    }
+    i_ret = DeleteWidget( p_dlg, p_widget );
 
     vlc_mutex_unlock( &p_dlg->lock );
 
-    return ( i_ret == VLC_SUCCESS ) ? 1 : 0;
+    if( i_ret != VLC_SUCCESS )
+    {
+        return luaL_error( L, "Could not remove widget from list" );
+    }
+
+    return 1;
 }
 
 
