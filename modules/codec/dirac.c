@@ -800,7 +800,6 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
         if( !p_sys->p_dirac )
         {
             msg_Err( p_enc, "Failed to initialize dirac encoder" );
-            p_enc->b_error = 1;
             return NULL;
         }
         date_Init( &date, p_enc->fmt_in.video.i_frame_rate, p_enc->fmt_in.video.i_frame_rate_base );
@@ -859,10 +858,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
      * coded order */
     p_block = block_New( p_enc, 1 );
     if( !p_block )
-    {
-        p_enc->b_error = 1;
         return NULL;
-    }
     p_block->i_dts = p_pic->date - p_sys->i_pts_offset;
     block_FifoPut( p_sys->p_dts_fifo, p_block );
     p_block = NULL;
@@ -877,10 +873,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
 
         p_block = block_New( p_enc, 1 );
         if( !p_block )
-        {
-            p_enc->b_error = 1;
             return NULL;
-        }
         p_block->i_dts = p_pic->date - p_sys->i_pts_offset + p_sys->i_field_time;
         block_FifoPut( p_sys->p_dts_fifo, p_block );
         p_block = NULL;
@@ -901,10 +894,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
             /* extract data from encoder temporary buffer. */
             p_block = block_New( p_enc, p_sys->p_dirac->enc_buf.size );
             if( !p_block )
-            {
-                p_enc->b_error = 1;
                 return NULL;
-            }
             memcpy( p_block->p_buffer, p_sys->p_dirac->enc_buf.buffer,
                     p_sys->p_dirac->enc_buf.size );
 
@@ -933,10 +923,7 @@ static block_t *Encode( encoder_t *p_enc, picture_t *p_pic )
                     /* XXX, should this be done using the packetizer ? */
                     p_enc->fmt_out.p_extra = malloc( len + sizeof(eos) );
                     if( !p_enc->fmt_out.p_extra )
-                    {
-                        p_enc->b_error = 1;
                         return NULL;
-                    }
                     memcpy( p_enc->fmt_out.p_extra, p_block->p_buffer, len);
                     memcpy( (uint8_t*)p_enc->fmt_out.p_extra + len, eos, sizeof(eos) );
                     SetDWBE( (uint8_t*)p_enc->fmt_out.p_extra + len + 10, len );
