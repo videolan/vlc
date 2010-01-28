@@ -154,6 +154,7 @@ static void DestroyVout( input_resource_t *p_resource )
 }
 static vout_thread_t *DetachVout( input_resource_t *p_resource )
 {
+    vlc_assert_locked( &p_resource->lock );
     assert( p_resource->i_vout == 0 );
     vout_thread_t *p_vout = p_resource->p_vout_free;
     p_resource->p_vout_free = NULL;
@@ -207,6 +208,8 @@ static vout_thread_t *RequestVout( input_resource_t *p_resource,
                                    vout_thread_t *p_vout, video_format_t *p_fmt,
                                    bool b_recycle )
 {
+    vlc_assert_locked( &p_resource->lock );
+
     if( !p_vout && !p_fmt )
     {
         if( p_resource->p_vout_free )
@@ -330,6 +333,7 @@ static void DestroyAout( input_resource_t *p_resource )
 }
 static aout_instance_t *DetachAout( input_resource_t *p_resource )
 {
+    vlc_assert_locked( &p_resource->lock );
     vlc_mutex_lock( &p_resource->lock_hold );
 
     aout_instance_t *p_aout = p_resource->p_aout;
@@ -342,6 +346,7 @@ static aout_instance_t *DetachAout( input_resource_t *p_resource )
 
 static aout_instance_t *RequestAout( input_resource_t *p_resource, aout_instance_t *p_aout )
 {
+    vlc_assert_locked( &p_resource->lock );
     assert( p_resource->p_input );
 
     if( p_aout )
