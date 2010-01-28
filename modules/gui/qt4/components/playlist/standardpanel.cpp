@@ -122,8 +122,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     last_activated_id = -1;
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
              this, handleInputChange( input_thread_t * ) );
-    CONNECT( locationBar, invoked( const QModelIndex & ),
-             iconView, setRootIndex( const QModelIndex & ) );
 }
 
 StandardPLPanel::~StandardPLPanel()
@@ -287,6 +285,8 @@ void StandardPLPanel::createIconView()
              this, popupPlView( const QPoint & ) );
     CONNECT( iconView, activated( const QModelIndex & ),
              this, activate( const QModelIndex & ) );
+    CONNECT( locationBar, invoked( const QModelIndex & ),
+             iconView, setRootIndex( const QModelIndex & ) );
 
     layout->addWidget( iconView, 1, 0, 1, -1 );
 }
