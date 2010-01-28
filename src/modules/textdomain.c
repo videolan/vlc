@@ -35,7 +35,7 @@ int vlc_bindtextdomain (const char *domain)
 
 #if defined (ENABLE_NLS)
     /* Specify where to find the locales for current domain */
-# if !defined (__APPLE__) && !defined ( IN32)
+# if !defined (__APPLE__) && !defined (WIN32)
     static const char path[] = LOCALEDIR;
 # else
     char *datadir = config_GetDataDirDefault();
