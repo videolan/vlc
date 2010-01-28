@@ -1400,14 +1400,16 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if( id->rtsp_id )
         RtspDelId( p_sys->rtsp, id->rtsp_id );
-    if( id->sinkc > 0 )
-        rtp_del_sink( id, id->sinkv[0].rtp_fd ); /* sink for explicit dst= */
     if( id->listen.fd != NULL )
     {
         vlc_cancel( id->listen.thread );
         vlc_join( id->listen.thread, NULL );
         net_ListenClose( id->listen.fd );
     }
+    /* Delete remaining sinks (incoming connections or explicit
+     * outgoing dst=) */
+    while( id->sinkc > 0 )
+        rtp_del_sink( id, id->sinkv[0].rtp_fd );
 #ifdef HAVE_SRTP
     if( id->srtp != NULL )
         srtp_destroy( id->srtp );
