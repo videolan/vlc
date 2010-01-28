@@ -32,7 +32,7 @@
 #include <QLabel>
 #include <QPixmap>
 #include <QLineEdit>
-#include <QTextEdit>
+#include <QTextBrowser>
 #include <QCheckBox>
 #include <QListWidget>
 #include <QComboBox>
@@ -205,7 +205,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
 {
     QLabel *label = NULL;
     QPushButton *button = NULL;
-    QTextEdit *textArea = NULL;
+    QTextBrowser *textArea = NULL;
     QLineEdit *textInput = NULL;
     QCheckBox *checkBox = NULL;
     QComboBox *comboBox = NULL;
@@ -242,9 +242,8 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
             return label;
 
         case EXTENSION_WIDGET_HTML:
-            textArea = new QTextEdit( this );
-            textArea->setAcceptRichText( true );
-            textArea->setReadOnly( true );
+            textArea = new QTextBrowser( this );
+            textArea->setOpenExternalLinks( true );
             textArea->setHtml( qfu( p_widget->psz_text ) );
             p_widget->p_sys_intf = textArea;
             return textArea;
@@ -547,7 +546,7 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
 {
     QLabel *label = NULL;
     QPushButton *button = NULL;
-    QTextEdit *textArea = NULL;
+    QTextBrowser *textArea = NULL;
     QLineEdit *textInput = NULL;
     QCheckBox *checkBox = NULL;
     QComboBox *comboBox = NULL;
@@ -578,7 +577,7 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
             return label;
 
         case EXTENSION_WIDGET_HTML:
-            textArea = static_cast< QTextEdit* >( p_widget->p_sys_intf );
+            textArea = static_cast< QTextBrowser* >( p_widget->p_sys_intf );
             textArea->setHtml( qfu( p_widget->psz_text ) );
             return textArea;
 
