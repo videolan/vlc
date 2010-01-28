@@ -154,6 +154,9 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_priv->b_thread = false;
     p_new->p_parent = NULL;
     p_priv->first = NULL;
+#ifndef NDEBUG
+    p_priv->old_parent = NULL;
+#endif
 
     /* Initialize mutexes and condvars */
     vlc_mutex_init( &p_priv->var_lock );
@@ -612,6 +615,20 @@ void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
     priv->prev = NULL;
     vlc_object_hold (p_parent);
     libvlc_lock (p_this->p_libvlc);
+#ifndef NDEBUG
+    /* Reparenting an object carries a risk of invalid access to the parent,
+     * from another thread. This can happen when inheriting a variable, or
+     * through any direct access to vlc_object_t.p_parent. Also, reparenting
+     * brings a functional bug, whereby the reparented object uses incorrect
+     * old values for inherited variables (as the new parent may have different
+     * variable values, especially if it is an input).
+     * Note that the old parent may be already destroyed.
+     * So its pointer must not be dereferenced.
+     */
+    if (priv->old_parent)
+        msg_Info (p_this, "Reparenting an object is dangerous (%p -> %p)!",
+                  priv->old_parent, p_parent);
+#endif
 
     /* Attach the parent to its child */
     assert (!p_this->p_parent);
@@ -642,6 +659,9 @@ static void vlc_object_detach_unlocked (vlc_object_t *p_this)
         priv->next->prev = priv->prev;
 
     /* Remove p_this's parent */
+#ifndef NDEBUG
+    priv->old_parent = p_this->p_parent;
+#endif
     p_this->p_parent = NULL;
 }
 

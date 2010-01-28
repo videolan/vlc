@@ -183,6 +183,7 @@ struct vlc_object_internals
     vlc_object_internals_t *next;  /* next sibling */
     vlc_object_internals_t *prev;  /* previous sibling */
     vlc_object_internals_t *first; /* first child */
+    vlc_object_t   *old_parent;
 };
 
 #define ZOOM_SECTION N_("Zoom")
