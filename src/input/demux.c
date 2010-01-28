@@ -167,15 +167,13 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
 
         p_demux->p_module =
             module_need( p_demux, "demux", psz_module,
-                         !strcmp( psz_module, p_demux->psz_demux ) ?
-                         true : false );
+                         !strcmp( psz_module, p_demux->psz_demux ) );
     }
     else
     {
         p_demux->p_module =
             module_need( p_demux, "access_demux", psz_module,
-                         !strcmp( psz_module, p_demux->psz_access ) ?
-                         true : false );
+                         !strcmp( psz_module, p_demux->psz_access ) );
     }
 
     if( p_demux->p_module == NULL )
