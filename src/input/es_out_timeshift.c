@@ -681,6 +681,16 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
         mtime_t *pi_system = (mtime_t*)va_arg( args, mtime_t * );
         return es_out_ControlGetPcrSystem( p_sys->p_out, pi_system );
     }
+    case ES_OUT_MODIFY_PCR_SYSTEM:
+    {
+        const bool    b_absolute = va_arg( args, int );
+        const mtime_t i_system   = va_arg( args, mtime_t );
+
+        if( b_absolute && p_sys->b_delayed )
+            return VLC_EGENERIC;
+
+        return es_out_ControlModifyPcrSystem( p_sys->p_out, b_absolute, i_system );
+    }
     default:
         msg_Err( p_sys->p_input, "Unknown es_out_Control query !" );
         assert(0);

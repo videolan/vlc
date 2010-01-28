@@ -90,11 +90,12 @@ void    input_clock_ChangePause( input_clock_t *, bool b_paused, mtime_t i_date 
 mtime_t input_clock_GetSystemOrigin( input_clock_t * );
 
 /**
- * This function allows to rebase the original system value date.
- * It can be called only imediatly after a input_clock_Update call.
- * FIXME ugly
+ * This function allows to rebase the original system value date (a valid
+ * reference point must have been set).
+ * When using the absolute mode, it will create a discontinuity unless
+ * called imediatly after a input_clock_Update.
  */
-void    input_clock_ChangeSystemOrigin( input_clock_t *, mtime_t i_system );
+void    input_clock_ChangeSystemOrigin( input_clock_t *, bool b_absolute, mtime_t i_system );
 
 /**
  * This function converts a pair of timestamp from stream clock to system clock.

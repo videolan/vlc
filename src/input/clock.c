@@ -169,6 +169,10 @@ struct input_clock_t
     clock_point_t ref;
     bool          b_has_reference;
 
+    /* External clock drift */
+    mtime_t       i_external_clock;
+    bool          b_has_external_clock;
+
     /* Current modifiers */
     bool    b_paused;
     int     i_rate;
@@ -193,6 +197,7 @@ input_clock_t *input_clock_New( int i_rate )
     vlc_mutex_init( &cl->lock );
     cl->b_has_reference = false;
     cl->ref = clock_point_Create( VLC_TS_INVALID, VLC_TS_INVALID );
+    cl->b_has_external_clock = false;
 
     cl->last = clock_point_Create( VLC_TS_INVALID, VLC_TS_INVALID );
 
@@ -272,6 +277,7 @@ void input_clock_Update( input_clock_t *cl, vlc_object_t *p_log,
         cl->b_has_reference = true;
         cl->ref = clock_point_Create( i_ck_stream,
                                       __MAX( cl->i_ts_max + CR_MEAN_PTS_GAP, i_ck_system ) );
+        cl->b_has_external_clock = false;
     }
 
     /* Compute the drift between the stream clock and the system clock
@@ -329,6 +335,7 @@ void input_clock_Reset( input_clock_t *cl )
 
     cl->b_has_reference = false;
     cl->ref = clock_point_Create( VLC_TS_INVALID, VLC_TS_INVALID );
+    cl->b_has_external_clock = false;
     cl->i_ts_max = VLC_TS_INVALID;
 
     vlc_mutex_unlock( &cl->lock );
@@ -482,12 +489,25 @@ int input_clock_GetState( input_clock_t *cl,
     return VLC_SUCCESS;
 }
 
-void input_clock_ChangeSystemOrigin( input_clock_t *cl, mtime_t i_system )
+void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, mtime_t i_system )
 {
     vlc_mutex_lock( &cl->lock );
 
     assert( cl->b_has_reference );
-    const mtime_t i_offset = i_system - cl->ref.i_system - ClockGetTsOffset( cl );
+    mtime_t i_offset;
+    if( b_absolute )
+    {
+        i_offset = i_system - cl->ref.i_system - ClockGetTsOffset( cl );
+    }
+    else
+    {
+        if( !cl->b_has_external_clock )
+        {
+            cl->b_has_external_clock = true;
+            cl->i_external_clock     = i_system;
+        }
+        i_offset = i_system - cl->i_external_clock;
+    }
 
     cl->ref.i_system += i_offset;
     cl->last.i_system += i_offset;

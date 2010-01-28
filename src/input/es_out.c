@@ -679,7 +679,8 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced )
     const mtime_t i_wakeup_delay = 10*1000; /* FIXME CLEANUP thread wake up time*/
     const mtime_t i_current_date = p_sys->b_paused ? p_sys->i_pause_date : mdate();
 
-    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_clock, i_current_date + i_wakeup_delay - i_buffering_duration );
+    input_clock_ChangeSystemOrigin( p_sys->p_pgrm->p_clock, true,
+                                    i_current_date + i_wakeup_delay - i_buffering_duration );
 
     for( int i = 0; i < p_sys->i_es; i++ )
     {
@@ -2577,6 +2578,21 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
             mtime_t *pi_system = va_arg( args, mtime_t *);
             *pi_system = input_clock_GetSystemOrigin( p_pgrm->p_clock );
+            return VLC_SUCCESS;
+        }
+
+        case ES_OUT_MODIFY_PCR_SYSTEM:
+        {
+            if( p_sys->b_buffering )
+                return VLC_EGENERIC;
+
+            es_out_pgrm_t *p_pgrm = p_sys->p_pgrm;
+            if( !p_pgrm )
+                return VLC_EGENERIC;
+
+            const bool    b_absolute = va_arg( args, int );
+            const mtime_t i_system   = va_arg( args, mtime_t );
+            input_clock_ChangeSystemOrigin( p_pgrm->p_clock, b_absolute, i_system );
             return VLC_SUCCESS;
         }
 
