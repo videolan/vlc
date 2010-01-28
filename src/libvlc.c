@@ -1320,21 +1320,26 @@ static void Help( libvlc_int_t *p_this, char const *psz_help_name )
 #   define CYAN    COL(36)
 #   define WHITE   COL(0)
 #   define GRAY    "\033[0m"
-static void print_help_section( module_config_t *p_item, bool b_color, bool b_description )
+static void
+print_help_section( const module_t *m, const module_config_t *p_item,
+                    bool b_color, bool b_description )
 {
     if( !p_item ) return;
     if( b_color )
     {
-        utf8_fprintf( stdout, RED"   %s:\n"GRAY, _( p_item->psz_text ) );
+        utf8_fprintf( stdout, RED"   %s:\n"GRAY,
+                      module_gettext( m, p_item->psz_text ) );
         if( b_description && p_item->psz_longtext && *p_item->psz_longtext )
             utf8_fprintf( stdout, MAGENTA"   %s\n"GRAY,
-                          _( p_item->psz_longtext ) );
+                          module_gettext( m, p_item->psz_longtext ) );
     }
     else
     {
-        utf8_fprintf( stdout, "   %s:\n", _( p_item->psz_text ) );
+        utf8_fprintf( stdout, "   %s:\n",
+                      module_gettext( m, p_item->psz_text ) );
         if( b_description && p_item->psz_longtext && *p_item->psz_longtext )
-            utf8_fprintf( stdout, "   %s\n", _( p_item->psz_longtext ) );
+            utf8_fprintf( stdout, "   %s\n",
+                          module_gettext(m, p_item->psz_longtext ) );
     }
 }
 
@@ -1474,18 +1479,20 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
         {
             if( b_color )
                 utf8_fprintf( stdout, "\n " GREEN "%s" GRAY " (%s)\n",
-                              _( p_parser->psz_longname ),
+                              module_gettext( p_parser, p_parser->psz_longname ),
                               p_parser->psz_object_name );
             else
-                utf8_fprintf( stdout, "\n %s\n", _( p_parser->psz_longname ) );
+                utf8_fprintf( stdout, "\n %s\n",
+                              module_gettext(p_parser, p_parser->psz_longname ) );
         }
         if( p_parser->psz_help )
         {
             if( b_color )
                 utf8_fprintf( stdout, CYAN" %s\n"GRAY,
-                              _( p_parser->psz_help ) );
+                              module_gettext( p_parser, p_parser->psz_help ) );
             else
-                utf8_fprintf( stdout, " %s\n",  _( p_parser->psz_help ) );
+                utf8_fprintf( stdout, " %s\n",
+                              module_gettext( p_parser, p_parser->psz_help ) );
         }
 
         /* Print module options */
@@ -1519,20 +1526,20 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 {
                     if( b_color )
                         utf8_fprintf( stdout, GREEN "\n %s\n" GRAY,
-                                      _( p_item->psz_text ) );
+                                      module_gettext( p_parser, p_item->psz_text ) );
                     else
                         utf8_fprintf( stdout, "\n %s\n",
-                                      _( p_item->psz_text ) );
+                                      module_gettext( p_parser, p_item->psz_text ) );
                 }
                 if( b_description && p_item->psz_longtext
                  && *p_item->psz_longtext )
                 {
                     if( b_color )
                         utf8_fprintf( stdout, CYAN " %s\n" GRAY,
-                                      _( p_item->psz_longtext ) );
+                                      module_gettext( p_parser, p_item->psz_longtext ) );
                     else
                         utf8_fprintf( stdout, " %s\n",
-                                      _( p_item->psz_longtext ) );
+                                      module_gettext( p_parser, p_item->psz_longtext ) );
                 }
                 break;
 
@@ -1552,7 +1559,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
             case CONFIG_ITEM_MODULE_LIST_CAT:
             case CONFIG_ITEM_FONT:
             case CONFIG_ITEM_PASSWORD:
-                print_help_section( p_section, b_color, b_description );
+                print_help_section( p_parser, p_section, b_color,
+                                    b_description );
                 p_section = NULL;
                 psz_bra = OPTION_VALUE_SEP "<";
                 psz_type = _("string");
@@ -1573,7 +1581,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 break;
             case CONFIG_ITEM_INTEGER:
             case CONFIG_ITEM_KEY: /* FIXME: do something a bit more clever */
-                print_help_section( p_section, b_color, b_description );
+                print_help_section( p_parser, p_section, b_color,
+                                    b_description );
                 p_section = NULL;
                 psz_bra = OPTION_VALUE_SEP "<";
                 psz_type = _("integer");
@@ -1596,13 +1605,14 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                         if( i ) strcat( psz_buffer, ", " );
                         sprintf( psz_buffer + strlen(psz_buffer), "%i (%s)",
                                  p_item->pi_list[i],
-                                 _( p_item->ppsz_list_text[i] ) );
+                                 module_gettext( p_parser, p_item->ppsz_list_text[i] ) );
                     }
                     psz_ket = "}";
                 }
                 break;
             case CONFIG_ITEM_FLOAT:
-                print_help_section( p_section, b_color, b_description );
+                print_help_section( p_parser, p_section, b_color,
+                                    b_description );
                 p_section = NULL;
                 psz_bra = OPTION_VALUE_SEP "<";
                 psz_type = _("float");
@@ -1615,7 +1625,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
                 }
                 break;
             case CONFIG_ITEM_BOOL:
-                print_help_section( p_section, b_color, b_description );
+                print_help_section( p_parser, p_section, b_color,
+                                    b_description );
                 p_section = NULL;
                 psz_bra = ""; psz_type = ""; psz_ket = "";
                 if( !b_help_module )
@@ -1676,7 +1687,7 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
             psz_spaces[i] = ' ';
 
             /* We wrap the rest of the output */
-            sprintf( psz_buffer, "%s%s", _( p_item->psz_text ),
+            sprintf( psz_buffer, "%s%s", module_gettext( p_parser, p_item->psz_text ),
                      psz_suf );
             b_description_hack = b_description;
 
@@ -1770,7 +1781,8 @@ static void Usage( libvlc_int_t *p_this, char const *psz_search )
             if( b_description_hack && p_item->psz_longtext
              && *p_item->psz_longtext )
             {
-                sprintf( psz_buffer, "%s%s", _( p_item->psz_longtext ),
+                sprintf( psz_buffer, "%s%s",
+                         module_gettext( p_parser, p_item->psz_longtext ),
                          psz_suf );
                 b_description_hack = false;
                 psz_spaces = psz_spaces_longtext;
@@ -1848,11 +1860,11 @@ static void ListModules( libvlc_int_t *p_this, bool b_verbose )
         if( b_color )
             utf8_fprintf( stdout, GREEN"  %-22s "WHITE"%s\n"GRAY,
                           p_parser->psz_object_name,
-                          _( p_parser->psz_longname ) );
+                          module_gettext( p_parser, p_parser->psz_longname ) );
         else
             utf8_fprintf( stdout, "  %-22s %s\n",
                           p_parser->psz_object_name,
-                          _( p_parser->psz_longname ) );
+                          module_gettext( p_parser, p_parser->psz_longname ) );
 
         if( b_verbose )
         {
