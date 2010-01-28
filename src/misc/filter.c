@@ -111,7 +111,6 @@ void filter_DeleteBlend( filter_t *p_blend )
     if( p_blend->p_module )
         module_unneed( p_blend, p_blend->p_module );
 
-    vlc_object_detach( p_blend );
     vlc_object_release( p_blend );
 }
 
@@ -149,7 +148,6 @@ void video_splitter_Delete( video_splitter_t *p_splitter )
 
     video_format_Clean( &p_splitter->fmt );
 
-    vlc_object_detach( p_splitter );
     vlc_object_release( p_splitter );
 }
 

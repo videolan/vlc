@@ -178,7 +178,6 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
 
     if( p_demux->p_module == NULL )
     {
-        vlc_object_detach( p_demux );
         free( p_demux->psz_path );
         free( p_demux->psz_demux );
         free( p_demux->psz_access );
@@ -195,7 +194,6 @@ demux_t *__demux_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
 void demux_Delete( demux_t *p_demux )
 {
     module_unneed( p_demux, p_demux->p_module );
-    vlc_object_detach( p_demux );
 
     free( p_demux->psz_path );
     free( p_demux->psz_demux );

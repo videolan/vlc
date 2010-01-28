@@ -907,7 +907,6 @@ gnutls_SessionClose (tls_server_t *p_server, tls_session_t *p_session)
         gnutls_bye( p_sys->session, GNUTLS_SHUT_WR );
     gnutls_deinit( p_sys->session );
 
-    vlc_object_detach( p_session );
     vlc_object_release( p_session );
 
     free( p_sys );
@@ -988,7 +987,6 @@ gnutls_ServerSessionPrepare( tls_server_t *p_server )
 
 error:
     free( p_session->p_sys );
-    vlc_object_detach( p_session );
     vlc_object_release( p_session );
     return NULL;
 }

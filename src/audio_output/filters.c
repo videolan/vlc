@@ -71,7 +71,6 @@ static filter_t * FindFilter( aout_instance_t * p_aout,
     p_filter->p_module = module_need( p_filter, "audio filter", NULL, false );
     if ( p_filter->p_module == NULL )
     {
-        vlc_object_detach( p_filter );
         vlc_object_release( p_filter );
         return NULL;
     }
@@ -134,7 +133,6 @@ static int SplitConversion( const audio_sample_format_t * p_input_format,
 static void ReleaseFilter( filter_t * p_filter )
 {
     module_unneed( p_filter, p_filter->p_module );
-    vlc_object_detach( p_filter );
     vlc_object_release( p_filter );
 }
 
@@ -288,7 +286,6 @@ void aout_FiltersDestroyPipeline( aout_instance_t * p_aout,
 
         module_unneed( p_filter, p_filter->p_module );
         free( p_filter->p_owner );
-        vlc_object_detach( p_filter );
         vlc_object_release( p_filter );
     }
 }

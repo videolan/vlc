@@ -93,7 +93,6 @@ void tls_ServerDelete (tls_server_t *srv)
         return;
 
     module_unneed (srv, srv->p_module);
-    vlc_object_detach (srv);
     vlc_object_release (srv);
 }
 
@@ -223,6 +222,5 @@ void tls_ClientDelete (tls_session_t *cl)
         return;
 
     module_unneed (cl, cl->p_module);
-    vlc_object_detach (cl);
     vlc_object_release (cl);
 }

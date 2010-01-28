@@ -50,7 +50,6 @@ CThread::~CThread(void)
   {
       vlc_mutex_destroy( &m_TerminateLock );
       vlc_cond_destroy( &m_TerminateCond );
-      vlc_object_detach(m_pAtmoThread);
       vlc_object_release(m_pAtmoThread);
   }
 }

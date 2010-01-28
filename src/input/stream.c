@@ -461,7 +461,6 @@ error:
         free( p_sys->list[--(p_sys->i_list)] );
     free( p_sys->list );
     free( s->p_sys );
-    vlc_object_detach( s );
     stream_CommonDelete( s );
     return NULL;
 }
@@ -472,8 +471,6 @@ error:
 static void AStreamDestroy( stream_t *s )
 {
     stream_sys_t *p_sys = s->p_sys;
-
-    vlc_object_detach( s );
 
     if( p_sys->method == STREAM_METHOD_BLOCK )
         block_ChainRelease( p_sys->block.p_first );

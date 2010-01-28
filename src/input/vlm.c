@@ -666,7 +666,6 @@ static int vlm_ControlMediaAdd( vlm_t *p_vlm, vlm_media_t *p_cfg, int64_t *p_id 
         if( !p_vlm->p_vod->p_module )
         {
             msg_Err( p_vlm, "cannot find vod server" );
-            vlc_object_detach( p_vlm->p_vod );
             vlc_object_release( p_vlm->p_vod );
             p_vlm->p_vod = NULL;
             return VLC_EGENERIC;
@@ -737,7 +736,6 @@ static int vlm_ControlMediaDel( vlm_t *p_vlm, int64_t id )
     if( p_vlm->p_vod && p_vlm->i_vod <= 0 )
     {
         module_unneed( p_vlm->p_vod, p_vlm->p_vod->p_module );
-        vlc_object_detach( p_vlm->p_vod );
         vlc_object_release( p_vlm->p_vod );
         p_vlm->p_vod = NULL;
     }

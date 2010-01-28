@@ -343,7 +343,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
                          psz_parser );
 
                 free( p_filter->p_owner );
-                vlc_object_detach( p_filter );
                 vlc_object_release( p_filter );
 
                 psz_parser = psz_next;
@@ -364,7 +363,6 @@ int aout_InputNew( aout_instance_t * p_aout, aout_input_t * p_input, const aout_
 
                     module_unneed( p_filter, p_filter->p_module );
                     free( p_filter->p_owner );
-                    vlc_object_detach( p_filter );
                     vlc_object_release( p_filter );
 
                     psz_parser = psz_next;

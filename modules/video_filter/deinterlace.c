@@ -2061,7 +2061,6 @@ static int OpenFilter( vlc_object_t *p_this )
 
     if( Create( VLC_OBJECT(p_vout) ) != VLC_SUCCESS )
     {
-        vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
         return VLC_EGENERIC;
     }
@@ -2093,7 +2092,6 @@ static void CloseFilter( vlc_object_t *p_this )
     vout_thread_t *p_vout = (vout_thread_t *)p_filter->p_sys;
 
     Destroy( VLC_OBJECT(p_vout) );
-    vlc_object_detach( p_vout );
     vlc_object_release( p_vout );
 }
 

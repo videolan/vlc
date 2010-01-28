@@ -113,8 +113,6 @@ Dialogs::~Dialogs()
     if( m_pProvider && m_pModule )
     {
         // Detach the dialogs provider from its parent interface
-        vlc_object_detach( m_pProvider );
-
         module_unneed( m_pProvider, m_pModule );
         vlc_object_release( m_pProvider );
     }

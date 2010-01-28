@@ -397,7 +397,6 @@ void system_End( libvlc_int_t *p_this )
         }
 
         /* FIXME: thread-safety... */
-        vlc_object_detach (p_helper);
         vlc_object_release (p_helper);
         p_helper = NULL;
     }

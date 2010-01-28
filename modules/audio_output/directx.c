@@ -613,7 +613,6 @@ static void CloseAudio( vlc_object_t *p_this )
     /* kill the position notification thread, if any */
     if( p_sys->p_notif )
     {
-        vlc_object_detach( p_sys->p_notif );
         vlc_object_kill( p_sys->p_notif );
         /* wake up the audio thread if needed */
         if( !p_sys->b_playing ) SetEvent( p_sys->p_notif->event );

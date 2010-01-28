@@ -74,7 +74,6 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
 
     w->module = module_need(window, type, module, module && *module != '\0');
     if (!w->module) {
-        vlc_object_detach(window);
         vlc_object_release(window);
         return NULL;
     }
@@ -100,7 +99,6 @@ void vout_window_Delete(vout_window_t *window)
     window_t *w = (window_t *)window;
     if (w->inhibit)
         vlc_inhibit_Destroy (w->inhibit);
-    vlc_object_detach(window);
 
     module_unneed(window, w->module);
 

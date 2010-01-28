@@ -172,7 +172,6 @@ static int Open( vlc_object_t *p_this )
     if( p_thread->p_vout == NULL )
     {
         msg_Err( p_filter, "no suitable vout module" );
-        vlc_object_detach( p_thread );
         vlc_object_release( p_thread );
         free( p_sys );
         return VLC_EGENERIC;
@@ -195,7 +194,6 @@ static int Open( vlc_object_t *p_this )
         vlc_mutex_destroy( &p_thread->lock );
         vlc_cond_destroy( &p_thread->wait );
         free( p_thread->psz_title );
-        vlc_object_detach( p_thread );
         vlc_object_release( p_thread );
         free( p_sys );
         return VLC_EGENERIC;
@@ -395,7 +393,6 @@ static void Close( vlc_object_t *p_this )
     aout_filter_RequestVout( p_filter, p_sys->p_thread->p_vout, 0 );
     vlc_mutex_destroy( &p_sys->p_thread->lock );
     vlc_cond_destroy( &p_sys->p_thread->wait );
-    vlc_object_detach( p_sys->p_thread );
 
     while( p_sys->p_thread->i_blocks-- )
     {

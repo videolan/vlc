@@ -784,7 +784,6 @@ static decoder_t * CreateDecoder( input_thread_t *p_input,
             if( !p_dec->p_owner->p_packetizer->p_module )
             {
                 es_format_Clean( &p_dec->p_owner->p_packetizer->fmt_in );
-                vlc_object_detach( p_dec->p_owner->p_packetizer );
                 vlc_object_release( p_dec->p_owner->p_packetizer );
             }
         }
@@ -2096,7 +2095,6 @@ static void DeleteDecoder( decoder_t * p_dec )
         es_format_Clean( &p_owner->p_packetizer->fmt_out );
         if( p_owner->p_packetizer->p_description )
             vlc_meta_Delete( p_owner->p_packetizer->p_description );
-        vlc_object_detach( p_owner->p_packetizer );
         vlc_object_release( p_owner->p_packetizer );
     }
 
@@ -2104,7 +2102,6 @@ static void DeleteDecoder( decoder_t * p_dec )
     vlc_cond_destroy( &p_owner->wait_request );
     vlc_mutex_destroy( &p_owner->lock );
 
-    vlc_object_detach( p_dec );
     vlc_object_release( p_dec );
 
     free( p_owner );

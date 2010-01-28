@@ -320,7 +320,6 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
     p_sys->p_decoder->p_owner = malloc( sizeof(decoder_owner_sys_t) );
     if( !p_sys->p_decoder->p_owner )
     {
-        vlc_object_detach( p_sys->p_decoder );
         vlc_object_release( p_sys->p_decoder );
         return NULL;
     }
@@ -343,7 +342,6 @@ static sout_stream_id_t * Add( sout_stream_t *p_stream, es_format_t *p_fmt )
             msg_Err( p_stream, "cannot find decoder" );
         }
         free( p_sys->p_decoder->p_owner );
-        vlc_object_detach( p_sys->p_decoder );
         vlc_object_release( p_sys->p_decoder );
         return NULL;
     }
@@ -451,7 +449,6 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
         if( p_sys->p_decoder->p_description )
             vlc_meta_Delete( p_sys->p_decoder->p_description );
 
-        vlc_object_detach( p_sys->p_decoder );
         vlc_object_release( p_sys->p_decoder );
 
         free( p_owner );

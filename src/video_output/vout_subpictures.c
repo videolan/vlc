@@ -956,7 +956,6 @@ static void FilterRelease( filter_t *p_filter )
     if( p_filter->p_module )
         module_unneed( p_filter, p_filter->p_module );
 
-    vlc_object_detach( p_filter );
     vlc_object_release( p_filter );
 }
 

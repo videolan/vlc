@@ -66,7 +66,6 @@ access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
 
     if( p_access->p_module == NULL )
     {
-        vlc_object_detach( p_access );
         free( p_access->psz_access );
         free( p_access->psz_path );
         free( p_access->psz_demux );
@@ -83,7 +82,6 @@ access_t *__access_New( vlc_object_t *p_obj, input_thread_t *p_parent_input,
 void access_Delete( access_t *p_access )
 {
     module_unneed( p_access, p_access->p_module );
-    vlc_object_detach( p_access );
 
     free( p_access->psz_access );
     free( p_access->psz_path );

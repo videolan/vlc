@@ -1122,7 +1122,6 @@ error:
     if( httpd->i_host <= 0 )
     {
         libvlc_priv (httpd->p_libvlc)->p_httpd = NULL;
-        vlc_object_detach( httpd );
         vlc_object_release( httpd );
     }
     vlc_mutex_unlock( &httpd_mutex );
@@ -1202,7 +1201,6 @@ void httpd_HostDelete( httpd_host_t *host )
         msg_Dbg( httpd, "no hosts left, stopping httpd" );
 
         libvlc_priv (httpd->p_libvlc)->p_httpd = NULL;
-        vlc_object_detach( httpd );
         vlc_object_release( httpd );
     }
     vlc_mutex_unlock( &httpd_mutex );

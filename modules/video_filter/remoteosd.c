@@ -332,7 +332,6 @@ static int CreateFilter ( vlc_object_t *p_this )
     if( vlc_thread_create( p_sys->p_worker_thread, "vnc worker thread",
                            vnc_worker_thread, VLC_THREAD_PRIORITY_LOW ) )
     {
-        vlc_object_detach( p_sys->p_worker_thread );
         vlc_object_release( p_sys->p_worker_thread );
         msg_Err( p_filter, "cannot spawn vnc message reader thread" );
         goto error;
@@ -407,7 +406,6 @@ static void stop_osdvnc ( filter_t *p_filter )
         msg_Dbg( p_filter, "joining worker_thread" );
         vlc_object_kill( p_sys->p_worker_thread );
         vlc_thread_join( p_sys->p_worker_thread );
-        vlc_object_detach( p_sys->p_worker_thread );
         vlc_object_release( p_sys->p_worker_thread );
         msg_Dbg( p_filter, "released worker_thread" );
     }
@@ -713,7 +711,6 @@ static void* vnc_worker_thread( vlc_object_t *p_thread_obj )
                            "vnc update request thread",
                            update_request_thread, VLC_THREAD_PRIORITY_LOW ) )
     {
-        vlc_object_detach( p_update_request_thread );
         vlc_object_release( p_update_request_thread );
         msg_Err( p_filter, "cannot spawn vnc update request thread" );
         goto exit;
@@ -774,7 +771,6 @@ static void* vnc_worker_thread( vlc_object_t *p_thread_obj )
     msg_Dbg( p_filter, "joining update_request_thread" );
     vlc_object_kill( p_update_request_thread );
     vlc_thread_join( p_update_request_thread );
-    vlc_object_detach( p_update_request_thread );
     vlc_object_release( p_update_request_thread );
     msg_Dbg( p_filter, "released update_request_thread" );
 

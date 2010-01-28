@@ -252,7 +252,6 @@ error2:
         net_Close( p_sys->p_thread->fd );
 error:
     vlc_UrlClean( &p_sys->p_thread->url );
-    vlc_object_detach( p_sys->p_thread );
     vlc_object_release( p_sys->p_thread );
     free( p_sys );
 
@@ -288,7 +287,6 @@ static void Close( vlc_object_t * p_this )
 
     net_Close( p_sys->p_thread->fd );
 
-    vlc_object_detach( p_sys->p_thread );
     vlc_object_release( p_sys->p_thread );
 
     vlc_UrlClean( &p_sys->p_thread->url );

@@ -683,8 +683,6 @@ static decoder_t *CreateDecoder( vlc_object_t *p_this, video_format_t *fmt )
 
 static void DeleteDecoder( decoder_t * p_dec )
 {
-    vlc_object_detach( p_dec );
-
     if( p_dec->p_module ) module_unneed( p_dec, p_dec->p_module );
 
     es_format_Clean( &p_dec->fmt_in );
@@ -766,8 +764,6 @@ static encoder_t *CreateEncoder( vlc_object_t *p_this, video_format_t *fmt_in,
 
 static void DeleteEncoder( encoder_t * p_enc )
 {
-    vlc_object_detach( p_enc );
-
     if( p_enc->p_module ) module_unneed( p_enc, p_enc->p_module );
 
     es_format_Clean( &p_enc->fmt_in );
@@ -812,8 +808,6 @@ static filter_t *CreateFilter( vlc_object_t *p_this, es_format_t *p_fmt_in,
 
 static void DeleteFilter( filter_t * p_filter )
 {
-    vlc_object_detach( p_filter );
-
     if( p_filter->p_module ) module_unneed( p_filter, p_filter->p_module );
 
     es_format_Clean( &p_filter->fmt_in );

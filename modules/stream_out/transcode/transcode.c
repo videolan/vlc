@@ -609,14 +609,12 @@ error:
     {
         if( id->p_decoder )
         {
-            vlc_object_detach( id->p_decoder );
             vlc_object_release( id->p_decoder );
             id->p_decoder = NULL;
         }
 
         if( id->p_encoder )
         {
-            vlc_object_detach( id->p_encoder );
             es_format_Clean( &id->p_encoder->fmt_out );
             vlc_object_release( id->p_encoder );
             id->p_encoder = NULL;
@@ -654,14 +652,12 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
 
     if( id->p_decoder )
     {
-        vlc_object_detach( id->p_decoder );
         vlc_object_release( id->p_decoder );
         id->p_decoder = NULL;
     }
 
     if( id->p_encoder )
     {
-        vlc_object_detach( id->p_encoder );
         es_format_Clean( &id->p_encoder->fmt_out );
         vlc_object_release( id->p_encoder );
         id->p_encoder = NULL;

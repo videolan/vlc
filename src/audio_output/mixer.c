@@ -65,7 +65,6 @@ int aout_MixerNew( aout_instance_t * p_aout )
     if( !p_mixer->module )
     {
         msg_Err( p_aout, "no suitable audio mixer" );
-        vlc_object_detach( p_mixer );
         free( p_mixer->input );
         vlc_object_release( p_mixer );
         return VLC_EGENERIC;
@@ -85,8 +84,6 @@ void aout_MixerDelete( aout_instance_t * p_aout )
 {
     if( !p_aout->p_mixer )
         return;
-
-    vlc_object_detach( p_aout->p_mixer );
 
     module_unneed( p_aout->p_mixer, p_aout->p_mixer->module );
 

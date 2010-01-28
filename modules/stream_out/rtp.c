@@ -1419,7 +1419,6 @@ static int Del( sout_stream_t *p_stream, sout_stream_id_t *id )
     if( p_sys->b_export_sap && !p_sys->p_mux ) SapSetup( p_stream );
     if( p_sys->psz_sdp_file != NULL ) FileSetup( p_stream );
 
-    vlc_object_detach( id );
     vlc_object_release( id );
     return VLC_SUCCESS;
 }

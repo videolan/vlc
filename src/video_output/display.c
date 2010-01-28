@@ -128,7 +128,6 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
     if (load_module) {
         vd->module = module_need(vd, "vout display", module, module && *module != '\0');
         if (!vd->module) {
-            vlc_object_detach(vd);
             vlc_object_release(vd);
             return NULL;
         }
@@ -143,8 +142,6 @@ static vout_display_t *vout_display_New(vlc_object_t *obj,
  */
 static void vout_display_Delete(vout_display_t *vd)
 {
-    vlc_object_detach(vd);
-
     if (vd->module)
         module_unneed(vd, vd->module);
 

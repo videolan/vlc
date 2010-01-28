@@ -294,7 +294,6 @@ void cocoaglvoutviewUnlock( vout_thread_t * p_vout )
     [objectLock lock];
     if( p_vout )
     {
-        vlc_object_detach( p_vout );
         vlc_object_release( p_vout );
         vlc_object_release( p_vout );
     }

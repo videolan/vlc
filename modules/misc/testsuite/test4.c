@@ -184,7 +184,6 @@ static int Callback( vlc_object_t *p_this, char const *psz_cmd,
     {
         vlc_object_kill( pp_objects[i] );
         vlc_thread_join( pp_objects[i] );
-        vlc_object_detach( pp_objects[i] );
         vlc_object_release( pp_objects[i] );
     }
 
