@@ -672,14 +672,14 @@ static void vlc_object_detach_unlocked (vlc_object_t *p_this)
     p_this->p_parent = NULL;
 }
 
-
+#undef vlc_object_detach
 /**
  ****************************************************************************
  * detach object from its parent
  *****************************************************************************
  * This function removes all links between an object and its parent.
  *****************************************************************************/
-void __vlc_object_detach( vlc_object_t *p_this )
+void vlc_object_detach( vlc_object_t *p_this )
 {
     vlc_object_t *p_parent;
     if( !p_this ) return;

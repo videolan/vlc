@@ -48,7 +48,8 @@ void system_End       ( libvlc_int_t * );
 /*
  * Legacy object stuff that is still used within libvlccore (only)
  */
-#define vlc_object_signal_unlocked( obj )
+void vlc_object_detach (vlc_object_t *);
+#define vlc_object_detach( o ) vlc_object_detach(VLC_OBJECT(o))
 
 /*
  * Threads subsystem
