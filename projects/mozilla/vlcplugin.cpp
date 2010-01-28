@@ -209,12 +209,7 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
         return NPERR_GENERIC_ERROR;
     }
 
-    libvlc_media_list = libvlc_media_list_new(libvlc_instance,&ex);
-    if( libvlc_exception_raised(&ex) )
-    {
-        libvlc_exception_clear(&ex);
-        return NPERR_GENERIC_ERROR;
-    }
+    libvlc_media_list = libvlc_media_list_new(libvlc_instance);
 
     /*
     ** fetch plugin base URL, which is the URL of the page containing the plugin
@@ -386,7 +381,7 @@ void VlcPlugin::playlist_clear( libvlc_exception_t *ex )
 {
     if( libvlc_media_list )
         libvlc_media_list_release(libvlc_media_list);
-    libvlc_media_list = libvlc_media_list_new(getVLC(),ex);
+    libvlc_media_list = libvlc_media_list_new(getVLC());
 }
 
 int VlcPlugin::playlist_count()
