@@ -42,10 +42,13 @@ struct extensions_manager_sys_t
     /* List of activated extensions */
     DECL_ARRAY( extension_t* ) activated_extensions;
 
+    /* Lock for this list */
+    vlc_mutex_t lock;
+
     /* Lua specific */
     lua_State *L;
 
-    vlc_mutex_t lock;
+    /* Flag indicating that the module is about to be unloaded */
     bool b_killed;
 };
 

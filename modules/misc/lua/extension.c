@@ -85,6 +85,7 @@ int Open_Extension( vlc_object_t *p_this )
     p_mgr->p_sys = p_sys;
     ARRAY_INIT( p_sys->activated_extensions );
     ARRAY_INIT( p_mgr->extensions );
+    vlc_mutex_init( &p_mgr->lock );
     vlc_mutex_init( &p_mgr->p_sys->lock );
 
     /* Initialise Lua state structure */
@@ -106,8 +107,6 @@ int Open_Extension( vlc_object_t *p_this )
     lua_close( L );
     p_sys->L = NULL;
 
-    vlc_mutex_init( &p_sys->lock );
-
     // Create the dialog-event variable
     var_Create( p_this, "dialog-event", VLC_VAR_ADDRESS );
     var_AddCallback( p_this, "dialog-event",
@@ -124,9 +123,11 @@ void Close_Extension( vlc_object_t *p_this )
     extensions_manager_t *p_mgr = ( extensions_manager_t* ) p_this;
     msg_Dbg( p_mgr, "Deactivating all loaded extensions" );
 
-    vlc_mutex_lock( &p_mgr->p_sys->lock );
+    vlc_mutex_lock( &p_mgr->lock );
     p_mgr->p_sys->b_killed = true;
-    vlc_mutex_unlock( &p_mgr->p_sys->lock );
+    vlc_mutex_unlock( &p_mgr->lock );
+
+    var_Destroy( p_mgr, "dialog-event" );
 
     extension_t *p_ext = NULL;
     FOREACH_ARRAY( p_ext, p_mgr->p_sys->activated_extensions )
@@ -143,6 +144,7 @@ void Close_Extension( vlc_object_t *p_this )
     if( p_mgr->p_sys && p_mgr->p_sys->L )
         lua_close( p_mgr->p_sys->L );
 
+    vlc_mutex_destroy( &p_mgr->lock );
     vlc_mutex_destroy( &p_mgr->p_sys->lock );
     free( p_mgr->p_sys );
     p_mgr->p_sys = NULL;
@@ -167,8 +169,6 @@ void Close_Extension( vlc_object_t *p_this )
     FOREACH_END()
 
     ARRAY_RESET( p_mgr->extensions );
-
-    var_Destroy( p_mgr, "dialog-event" );
 }
 
 /**
@@ -205,13 +205,13 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
 
     msg_Dbg( p_mgr, "Scanning Lua script %s", psz_script );
 
-    vlc_mutex_lock( &p_mgr->p_sys->lock );
+    vlc_mutex_lock( &p_mgr->lock );
 
     /* Create new script descriptor */
     extension_t *p_ext = ( extension_t* ) calloc( 1, sizeof( extension_t ) );
     if( !p_ext )
     {
-        vlc_mutex_unlock( &p_mgr->p_sys->lock );
+        vlc_mutex_unlock( &p_mgr->lock );
         return 0;
     }
 
@@ -222,7 +222,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
         free( p_ext->psz_name );
         free( p_ext->p_sys );
         free( p_ext );
-        vlc_mutex_unlock( &p_mgr->p_sys->lock );
+        vlc_mutex_unlock( &p_mgr->lock );
         return 0;
     }
     p_ext->p_sys->p_mgr = p_mgr;
@@ -350,7 +350,7 @@ exit:
         ARRAY_APPEND( p_mgr->extensions, p_ext );
     }
 
-    vlc_mutex_unlock( &p_mgr->p_sys->lock );
+    vlc_mutex_unlock( &p_mgr->lock );
     /* Continue batch execution */
     return pb_continue ? ( (* (bool*)pb_continue) ? -1 : 0 ) : -1;
 }

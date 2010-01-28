@@ -60,7 +60,9 @@ int Activate( extensions_manager_t *p_mgr, extension_t *p_ext )
     }
 
     /* Add this script to the activated extensions list */
+    vlc_mutex_lock( &p_mgr->p_sys->lock );
     ARRAY_APPEND( p_mgr->p_sys->activated_extensions, p_ext );
+    vlc_mutex_unlock( &p_mgr->p_sys->lock );
 
     /* Prepare first command */
     p_sys->command = calloc( 1, sizeof( struct command_t ) );
