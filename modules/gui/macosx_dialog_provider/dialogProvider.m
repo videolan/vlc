@@ -175,6 +175,8 @@ static void destroyProgressPanel (void *);
 
 - (void)recomputeWindowSize
 {
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(recomputeWindowSize) object:nil];
+
     NSWindow *window = [self window];
     NSRect frame = [window frame];
     NSRect contentRect = [window contentRectForFrameRect:frame];
@@ -183,7 +185,6 @@ static void destroyProgressPanel (void *);
     newFrame.origin.y -= newFrame.size.height - frame.size.height;
     newFrame.origin.x -= (newFrame.size.width - frame.size.width) / 2;
     [window setFrame:newFrame display:YES animate:YES];
-
 }
 
 - (NSSize)objectSizeToFit:(NSView *)view
@@ -401,8 +402,11 @@ static void destroyProgressPanel (void *);
 
 
     [self addSubview:view];
-    [self recomputeWindowSize];
     [self relayout];
+
+    // Recompute the size of the window after making sure we won't see anymore update
+    [NSObject cancelPreviousPerformRequestsWithTarget:self selector:@selector(recomputeWindowSize) object:nil];
+    [self performSelector:@selector(recomputeWindowSize) withObject:nil afterDelay:0.1];
 }
 
 - (void)removeSubview:(NSView *)view
