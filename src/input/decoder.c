@@ -286,7 +286,6 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         DecoderUnsupportedCodec( p_dec, fmt->i_codec );
 
         DeleteDecoder( p_dec );
-        vlc_object_release( p_dec );
         return NULL;
     }
 
@@ -304,7 +303,6 @@ decoder_t *input_DecoderNew( input_thread_t *p_input,
         msg_Err( p_dec, "cannot spawn decoder thread" );
         module_unneed( p_dec, p_dec->p_module );
         DeleteDecoder( p_dec );
-        vlc_object_release( p_dec );
         return NULL;
     }
 
@@ -346,11 +344,8 @@ void input_DecoderDelete( decoder_t *p_dec )
             input_DecoderSetCcState( p_dec, false, i );
     }
 
-    /* Delete decoder configuration */
+    /* Delete decoder */
     DeleteDecoder( p_dec );
-
-    /* Delete the decoder */
-    vlc_object_release( p_dec );
 }
 
 /**
@@ -440,7 +435,6 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
         {
             DecoderUnsupportedCodec( p_dec, fcc[i_channel] );
             DeleteDecoder( p_cc );
-            vlc_object_release( p_cc );
             return VLC_EGENERIC;
         }
         p_cc->p_owner->p_clock = p_owner->p_clock;
@@ -463,7 +457,6 @@ int input_DecoderSetCcState( decoder_t *p_dec, bool b_decode, int i_channel )
             vlc_object_kill( p_cc );
             module_unneed( p_cc, p_cc->p_module );
             DeleteDecoder( p_cc );
-            vlc_object_release( p_cc );
         }
     }
     return VLC_SUCCESS;
@@ -2112,6 +2105,7 @@ static void DeleteDecoder( decoder_t * p_dec )
     vlc_mutex_destroy( &p_owner->lock );
 
     vlc_object_detach( p_dec );
+    vlc_object_release( p_dec );
 
     free( p_owner );
 }
