@@ -813,7 +813,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         return VLC_EGENERIC;
     }
     playlist_Activate( p_playlist );
-    vlc_object_attach( p_playlist, p_libvlc );
 
     /* Add service discovery modules */
     psz_modules = var_CreateGetNonEmptyString( p_playlist, "services-discovery" );

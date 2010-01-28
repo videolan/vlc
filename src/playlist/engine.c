@@ -76,6 +76,7 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
 
     assert( offsetof( playlist_private_t, public_data ) == 0 );
     p_playlist = &p->public_data;
+    vlc_object_attach( p_playlist, p_parent );
     TAB_INIT( pl_priv(p_playlist)->i_sds, pl_priv(p_playlist)->pp_sds );
 
     libvlc_priv(p_parent->p_libvlc)->p_playlist = p_playlist;
