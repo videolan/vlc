@@ -30,6 +30,7 @@
 #include <QRect>
 #include <QStyleOptionViewItem>
 #include <QFontMetrics>
+#include <QPixmapCache>
 
 #include "assert.h"
 
@@ -38,6 +39,22 @@
 #define OFFSET              (RECT_SIZE-64)/2
 #define ITEMS_SPACING       10
 #define ART_RADIUS          5
+
+static QPixmap find_art_pixmap( const QString& url )
+{
+    QPixmap pix;
+
+    if( QPixmapCache::find( url, pix ) )    /* great, we found it */
+        return pix;
+
+    if( url.isEmpty() || !pix.load( url ) )
+        pix = QPixmap( ":/noart64" );
+    else
+        pix = pix.scaled( ART_SIZE, ART_SIZE, Qt::KeepAspectRatioByExpanding );
+
+    QPixmapCache::insert( url, pix );       /* save it for next time */
+    return pix;
+}
 
 void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
@@ -50,19 +67,25 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     PLItem *currentItem = static_cast<PLItem*>( index.internalPointer() );
     assert( currentItem );
 
-    QPixmap pix;
+    QPixmap artpix;
     QString url = InputManager::decodeArtURL( currentItem->inputItem() );
 
-    if( !url.isEmpty() && pix.load( url ) )
+    /* look up through all children and use the first picture found */
+    if( url.isEmpty() )
     {
-        pix = pix.scaled( ART_SIZE, ART_SIZE, Qt::KeepAspectRatioByExpanding );
-    }
-    else
-    {
-        pix = QPixmap( ":/noart64" );
+        int children = currentItem->childCount();
+        for( int i = 0; i < children; i++ )
+        {
+            PLItem *child = currentItem->child( i );
+            url = InputManager::decodeArtURL( child->inputItem() );
+            if( !url.isEmpty() )
+                break;
+        }
     }
 
     QRect artRect = option.rect.adjusted( OFFSET - 1, 0, - OFFSET, - OFFSET *2 );
+    artpix = find_art_pixmap( url ); /* look in the QPixmapCache for art */
+
     QPainterPath artRectPath;
     artRectPath.addRoundedRect( artRect, ART_RADIUS, ART_RADIUS );
 
@@ -75,7 +98,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     // Draw the art pixmap
     painter->setClipPath( artRectPath );
-    painter->drawPixmap( artRect, pix );
+    painter->drawPixmap( artRect, artpix );
     painter->setClipping( false );
 
     QColor text = qApp->palette().text().color();
