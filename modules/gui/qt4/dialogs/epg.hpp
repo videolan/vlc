@@ -45,7 +45,7 @@ private:
 
 private slots:
     void showEvent( EPGEvent * );
-    void update();
+    void updateInfos();
 };
 
 #endif

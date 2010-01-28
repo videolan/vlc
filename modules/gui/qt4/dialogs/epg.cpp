@@ -55,6 +55,8 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     description = new QLabel( this );
     description->setFrameStyle( QFrame::Sunken | QFrame::StyledPanel );
     description->setAutoFillBackground( true );
+    description->setWordWrap( true );
+    description->setAlignment( Qt::AlignLeft | Qt::AlignTop );
 
     QPalette palette;
     palette.setBrush(QPalette::Active, QPalette::Window, palette.brush( QPalette::Base ) );
@@ -73,18 +75,19 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 
     QPushButton *update = new QPushButton( "Update" ); //Temporary to test
     layout->addWidget( update, 0, Qt::AlignRight );
-    BUTTONACT( update, update() );
+    BUTTONACT( update, updateInfos() );
 
     QPushButton *close = new QPushButton( qtr( "&Close" ) );
     layout->addWidget( close, 0, Qt::AlignRight );
     BUTTONACT( close, close() );
 
-
-    resize( 650, 400 );
+    updateInfos();
+    readSettings( "EPGDialog", QSize( 650, 450 ) );
 }
 
 EpgDialog::~EpgDialog()
 {
+    writeSettings( "EPGDialog" );
 }
 
 void EpgDialog::showEvent( EPGEvent *event )
@@ -98,7 +101,7 @@ void EpgDialog::showEvent( EPGEvent *event )
         description->setText( event->shortDescription );
 }
 
-void EpgDialog::update()
+void EpgDialog::updateInfos()
 {
     if( !THEMIM->getInput() ) return;
 
