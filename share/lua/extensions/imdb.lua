@@ -23,7 +23,16 @@
 dlg = nil
 txt = nil
 function descriptor()
-    return { title = "IMDb" ; capabilities = {} }
+    return { title = "IMDb - The Internet Movie Database" ;
+             version = "0.1" ;
+             author = "Jean-Philippe André" ;
+             url = 'http://www.imdb.org/';
+             description = "<center><b>The Internet Movie Database</b></center>\n"
+                        .. "Get information about movies from the Internet "
+                        .. "Movie Database (IMDb).\nThis Extension will show "
+                        .. "you the cast, a short plot summary and a link to "
+                        .. "the web page on imdb.org." ;
+             capabilities = {} }
 end
 
 -- Update title text field. Removes file extensions.
@@ -114,7 +123,7 @@ function click_okay()
             if (not table) then break end
             pos = 0
             while (pos ~= nil) do
-                _, _, link = string.find(table, "<a href=\"([^\"]+)\"", pos)
+                _, _, link = string.find(table, "<a href=\"([^\"]+title[^\"]+)\"", pos)
                 if (not link) then break end -- this would not be normal behavior...
                 _, pos, title = string.find(table, "<a href=\"" .. link .. "\"[^>]*>([^<]+)</a>", pos)
                 if (not title) then break end -- this would not be normal behavior...
