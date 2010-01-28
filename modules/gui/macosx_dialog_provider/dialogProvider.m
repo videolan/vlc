@@ -92,6 +92,18 @@ static void destroyProgressPanel (void *);
 @synthesize widget;
 @end
 
+@interface VLCDialogPopUpButton : NSPopUpButton
+{
+    extension_widget_t *widget;
+}
+@property (readwrite) extension_widget_t *widget;
+@end
+
+@implementation VLCDialogPopUpButton
+@synthesize widget;
+@end
+
+
 @interface VLCDialogTextField : NSTextField
 {
     extension_widget_t *widget;
@@ -132,12 +144,14 @@ static void destroyProgressPanel (void *);
     NSMutableArray *_gridedViews;
 }
 
+- (NSSize)flexSize:(NSSize)size;
 - (void)removeSubview:(NSView *)view;
 @end
 
 
 // Move this to separate file
 @implementation VLCDialogGridView
+
 - (void)dealloc
 {
     [_gridedViews release];
@@ -152,12 +166,205 @@ static void destroyProgressPanel (void *);
     {
         NSUInteger row = [[obj objectForKey:@"row"] intValue];
         NSUInteger col = [[obj objectForKey:@"col"] intValue];
+        if (col + 1 > _colCount)
+            _colCount = col + 1;
+        if (row + 1 > _rowCount)
+            _rowCount = row + 1;
+    }
+}
+
+- (void)recomputeWindowSize
+{
+    NSWindow *window = [self window];
+    NSRect frame = [window frame];
+    NSRect contentRect = [window contentRectForFrameRect:frame];
+    contentRect.size = [self flexSize:frame.size];
+    NSRect newFrame = [window frameRectForContentRect:contentRect];
+    newFrame.origin.y -= newFrame.size.height - frame.size.height;
+    newFrame.origin.x -= (newFrame.size.width - frame.size.width) / 2;
+    [window setFrame:newFrame display:YES animate:YES];
+
+}
+
+- (NSSize)objectSizeToFit:(NSView *)view
+{
+    if ([view isKindOfClass:[NSControl class]]) {
+        NSControl *control = (NSControl *)view;
+        return [[control cell] cellSize];
+    }
+    return [view frame].size;
+}
+
+- (CGFloat)marginX
+{
+    return 16;
+}
+- (CGFloat)marginY
+{
+    return 8;
+}
+
+- (CGFloat)constrainedHeightOfRow:(NSUInteger)targetRow
+{
+    CGFloat height = 0;
+    for(NSDictionary *obj in _gridedViews) {
+        NSUInteger row = [[obj objectForKey:@"row"] intValue];
+        if (row != targetRow)
+            continue;
+        NSUInteger rowSpan = [[obj objectForKey:@"rowSpan"] intValue];
+        if (rowSpan != 1)
+            continue;
+        NSView *view = [obj objectForKey:@"view"];
+        if ([view autoresizingMask] & NSViewHeightSizable)
+            continue;
+        NSSize sizeToFit = [self objectSizeToFit:view];
+        if (height < sizeToFit.height)
+            height = sizeToFit.height;
+    }
+    return height;
+}
+
+- (CGFloat)remainingRowsHeight
+{
+    NSUInteger height = [self marginY];
+    if (!_rowCount)
+        return 0;
+    NSUInteger autosizedRows = 0;
+    for (NSUInteger i = 0; i < _rowCount; i++) {
+        CGFloat constrainedHeight = [self constrainedHeightOfRow:i];
+        if (!constrainedHeight)
+            autosizedRows++;
+        height += constrainedHeight + [self marginY];
+    }
+    CGFloat remaining = 0;
+    if (height < self.bounds.size.height && autosizedRows)
+        remaining = (self.bounds.size.height - height) / autosizedRows;
+    if (remaining < 0)
+        remaining = 0;
+
+    return remaining;
+}
+
+- (CGFloat)heightOfRow:(NSUInteger)targetRow
+{
+    NSAssert(targetRow < _rowCount, @"accessing a non existing row");
+    CGFloat height = [self constrainedHeightOfRow:targetRow];
+    if (!height)
+        height = [self remainingRowsHeight];
+    return height;
+}
+
+
+- (CGFloat)topOfRow:(NSUInteger)targetRow
+{
+    CGFloat top = [self marginY];
+    for (NSUInteger i = 1; i < _rowCount - targetRow; i++)
+    {
+        top += [self heightOfRow:_rowCount - i] + [self marginY];
+    }
+    return top;
+}
+
+- (CGFloat)constrainedWidthOfColumn:(NSUInteger)targetColumn
+{
+    CGFloat width = 0;
+    for(NSDictionary *obj in _gridedViews) {
+        NSUInteger col = [[obj objectForKey:@"col"] intValue];
+        if (col != targetColumn)
+            continue;
+        NSUInteger colSpan = [[obj objectForKey:@"colSpan"] intValue];
+        if (colSpan != 1)
+            continue;
+        NSView *view = [obj objectForKey:@"view"];
+        if ([view autoresizingMask] & NSViewWidthSizable)
+            return 0;
+        NSSize sizeToFit = [self objectSizeToFit:view];
+        if (width < sizeToFit.width)
+            width = sizeToFit.width;
+    }
+    return width;
+}
+
+- (CGFloat)remainingColumnWidth
+{
+    NSUInteger width = [self marginX];
+    if (!_colCount)
+        return 0;
+    NSUInteger autosizedCol = 0;
+    for (NSUInteger i = 0; i < _colCount; i++) {
+        CGFloat constrainedWidth = [self constrainedWidthOfColumn:i];
+        if (!constrainedWidth)
+            autosizedCol++;
+        width += constrainedWidth + [self marginX];
+
+    }
+    CGFloat remaining = 0;
+    if (width < self.bounds.size.width && autosizedCol)
+        remaining = (self.bounds.size.width - width) / autosizedCol;
+    if (remaining < 0)
+        remaining = 0;
+    return remaining;
+}
+
+- (CGFloat)widthOfColumn:(NSUInteger)targetColumn
+{
+    CGFloat width = [self constrainedWidthOfColumn:targetColumn];
+    if (!width)
+        width = [self remainingColumnWidth];
+    return width;
+}
+
+
+- (CGFloat)leftOfColumn:(NSUInteger)targetColumn
+{
+    CGFloat left = [self marginX];
+    for (NSUInteger i = 0; i < targetColumn; i++)
+    {
+        left += [self widthOfColumn:i] + [self marginX];
+
+    }
+    return left;
+}
+
+- (void)relayout
+{
+    for(NSDictionary *obj in _gridedViews) {
+        NSUInteger row = [[obj objectForKey:@"row"] intValue];
+        NSUInteger col = [[obj objectForKey:@"col"] intValue];
         NSUInteger rowSpan = [[obj objectForKey:@"rowSpan"] intValue];
         NSUInteger colSpan = [[obj objectForKey:@"colSpan"] intValue];
-        if (col + colSpan > _colCount)
-            _colCount = col + colSpan;
-        if (row + rowSpan > _rowCount)
-            _rowCount = row + rowSpan;
+        NSView *view = [obj objectForKey:@"view"];
+        NSRect rect;
+
+        // Get the height
+        if ([view autoresizingMask] & NSViewHeightSizable || rowSpan > 1) {
+            CGFloat height = 0;
+            for (NSUInteger r = 0; r < rowSpan; r++) {
+                if (row + r >= _rowCount)
+                    break;
+                height += [self heightOfRow:row + r] + [self marginY];
+            }
+            rect.size.height = height - [self marginY];
+        }
+        else
+            rect.size.height = [self objectSizeToFit:view].height;
+
+        // Get the width
+        if ([view autoresizingMask] & NSViewWidthSizable) {
+            CGFloat width = 0;
+            for (NSUInteger c = 0; c < colSpan; c++)
+                width += [self widthOfColumn:col + c] + [self marginX];
+            rect.size.width = width - [self marginX];
+        }
+        else
+            rect.size.width = [self objectSizeToFit:view].width;
+
+        // Top corner
+        rect.origin.y = [self topOfRow:row] + ([self heightOfRow:row] - rect.size.height) / 2;
+        rect.origin.x = [self leftOfColumn:col];
+
+        [view setFrame:rect];
+        [view setNeedsDisplay:YES];
     }
 }
 
@@ -171,36 +378,12 @@ static void destroyProgressPanel (void *);
     return nil;
 }
 
-- (void)relayout
-{
-    NSSize size = [self frame].size;
-    CGFloat rsize = size.height / _rowCount;
-    CGFloat csize = size.width / _colCount;
-
-    for(NSDictionary *obj in _gridedViews) {
-        NSUInteger row = [[obj objectForKey:@"row"] intValue];
-        NSUInteger col = [[obj objectForKey:@"col"] intValue];
-        NSUInteger rowSpan = [[obj objectForKey:@"rowSpan"] intValue];
-        NSUInteger colSpan = [[obj objectForKey:@"colSpan"] intValue];
-        NSRect rect;
-        rect = NSMakeRect(col * csize, (_rowCount - row) * rsize - rowSpan * rsize, colSpan * csize, rowSpan * rsize);
-        NSView *view = [obj objectForKey:@"view"];
-        if (colSpan == 0)
-            rect.size.width = view.frame.size.width;
-        if (rowSpan == 0)
-            rect.size.height = view.frame.size.height;
-
-        [[obj objectForKey:@"view"] setFrame:rect];
-    }
-}
-
-
 - (void)addSubview:(NSView *)view atRow:(NSUInteger)row column:(NSUInteger)column rowSpan:(NSUInteger)rowSpan colSpan:(NSUInteger)colSpan
 {
-    if (row + rowSpan > _rowCount)
-        _rowCount = row + rowSpan;
-    if (column + colSpan > _colCount)
-        _colCount = column + colSpan;
+    if (row + 1 > _rowCount)
+        _rowCount = row + 1;
+    if (column + 1 > _colCount)
+        _colCount = column + 1;
 
     if (!_gridedViews)
         _gridedViews = [[NSMutableArray alloc] init];
@@ -216,10 +399,11 @@ static void destroyProgressPanel (void *);
     [dict setObject:[NSNumber numberWithInt:row] forKey:@"row"];
     [dict setObject:[NSNumber numberWithInt:column] forKey:@"col"];
 
+
     [self addSubview:view];
+    [self recomputeWindowSize];
     [self relayout];
 }
-
 
 - (void)removeSubview:(NSView *)view
 {
@@ -229,13 +413,63 @@ static void destroyProgressPanel (void *);
     [view removeFromSuperview];
 
     [self recomputeCount];
+    [self recomputeWindowSize];
+
     [self relayout];
+    [self setNeedsDisplay:YES];
 }
 
 - (void)setFrame:(NSRect)frameRect
 {
     [super setFrame:frameRect];
     [self relayout];
+}
+
+- (NSSize)flexSize:(NSSize)size
+{
+    if (!_rowCount || !_colCount)
+        return size;
+
+    CGFloat minHeight = [self marginY];
+    BOOL canFlexHeight = NO;
+    for (NSUInteger i = 0; i < _rowCount; i++) {
+        CGFloat constrained = [self constrainedHeightOfRow:i];
+        if (!constrained) {
+            canFlexHeight = YES;
+            constrained = 128;
+        }
+        minHeight += constrained + [self marginY];
+    }
+
+    CGFloat minWidth = [self marginX];
+    BOOL canFlexWidth = NO;
+    for (NSUInteger i = 0; i < _colCount; i++) {
+        CGFloat constrained = [self constrainedWidthOfColumn:i];
+        if (!constrained) {
+            canFlexWidth = YES;
+            constrained = 128;
+        }
+        minWidth += constrained + [self marginX];
+    }
+    if (size.width < minWidth)
+        size.width = minWidth;
+    if (size.height < minHeight)
+        size.height = minHeight;
+    if (!canFlexHeight)
+        size.height = minHeight;
+    if (!canFlexWidth)
+        size.width = minWidth;
+    return size;
+}
+
+- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
+{
+    NSRect rect = NSMakeRect(0, 0, 0, 0);
+    rect.size = frameSize;
+    rect = [sender contentRectForFrameRect:rect];
+    rect.size = [self flexSize:rect.size];
+    rect = [sender frameRectForContentRect:rect];
+    return rect.size;
 }
 
 @end
@@ -662,6 +896,17 @@ bool checkProgressPanel (void *priv)
         value->b_selected = (i == [list selectedRow]);
 }
 
+- (void)popUpSelectionChanged:(id)sender
+{
+    assert([sender isKindOfClass:[VLCDialogPopUpButton class]]);
+    VLCDialogPopUpButton *popup = sender;
+    struct extension_widget_value_t *value;
+    unsigned i = 0;
+    for(value = [popup widget]->p_values; value != NULL; value = value->p_next, i++)
+        value->b_selected = (i == [popup indexOfSelectedItem]);
+
+}
+
 static NSView *createControlFromWidget(extension_widget_t *widget, id self)
 {
     assert(!widget->p_sys_intf);
@@ -670,13 +915,18 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
     {
         case EXTENSION_WIDGET_HTML:
         {
-            NSScrollView *scrollView = [[NSScrollView alloc] init];
-            [scrollView setHasVerticalScroller:YES];
+//            NSScrollView *scrollView = [[NSScrollView alloc] init];
+//            [scrollView setHasVerticalScroller:YES];
+//            NSTextView *field = [[NSTextView alloc] init];
+//            [scrollView setDocumentView:field];
+//            [scrollView setAutoresizesSubviews:YES];
+//            [scrollView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+//            [field release];
+//            return scrollView;
             NSTextView *field = [[NSTextView alloc] init];
-            [scrollView setDocumentView:field];
-            [scrollView setAutoresizesSubviews:YES];
-            [field release];
-            return scrollView;
+            [field setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+            [field setDrawsBackground:NO];
+            return field;
         }
         case EXTENSION_WIDGET_LABEL:
         {
@@ -684,12 +934,16 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
             [field setEditable:NO];
             [field setBordered:NO];
             [field setDrawsBackground:NO];
+            [[field cell] setControlSize:NSRegularControlSize];
+            [field setAutoresizingMask:NSViewNotSizable];
             return field;
         }
         case EXTENSION_WIDGET_TEXT_FIELD:
         {
             VLCDialogTextField *field = [[VLCDialogTextField alloc] init];
             [field setWidget:widget];
+            [field setAutoresizingMask:NSViewWidthSizable];
+            [[field cell] setControlSize:NSRegularControlSize];
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(syncTextField:)  name:NSControlTextDidChangeNotification object:field];
             return field;
         }
@@ -700,9 +954,18 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
             [button setWidget:widget];
             [button setAction:@selector(triggerClick:)];
             [button setTarget:self];
+            [[button cell] setControlSize:NSRegularControlSize];
+            [button setAutoresizingMask:NSViewNotSizable];
             return button;
         }
         case EXTENSION_WIDGET_DROPDOWN:
+        {
+            VLCDialogPopUpButton *popup = [[VLCDialogPopUpButton alloc] init];
+            [popup setAction:@selector(popUpSelectionChanged:)];
+            [popup setTarget:self];
+            [popup setWidget:widget];
+            return popup;
+        }
         case EXTENSION_WIDGET_LIST:
         {
             NSScrollView *scrollView = [[NSScrollView alloc] init];
@@ -711,6 +974,7 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
             [list setUsesAlternatingRowBackgroundColors:YES];
             [list setHeaderView:nil];
             [scrollView setDocumentView:list];
+            [scrollView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
 
             NSTableColumn *column = [[NSTableColumn alloc] init];
             [list addTableColumn:column];
@@ -723,7 +987,11 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
         }
         case EXTENSION_WIDGET_IMAGE:
         {
-            return [[NSImageView alloc] init];
+            NSImageView *imageView = [[NSImageView alloc] init];
+            [imageView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
+            [imageView setImageFrameStyle:NSImageFramePhoto];
+            [imageView setImageScaling:NSImageScaleProportionallyUpOrDown];
+            return imageView;
         }
         default:
             assert(0);
@@ -737,18 +1005,30 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
     switch (widget->type)
     {
         case EXTENSION_WIDGET_HTML:
+//        {
+//            // Get the scroll view
+//            assert([control isKindOfClass:[NSScrollView class]]);
+//            NSScrollView *scrollView = (NSScrollView *)control;
+//            control = [scrollView documentView];
+//
+//            assert([control isKindOfClass:[NSTextView class]]);
+//            NSTextView *textView = (NSTextView *)control;
+//            NSString *string = [NSString stringWithUTF8String:widget->psz_text];
+//            NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding:NSUTF8StringEncoding] documentAttributes:NULL];
+//            [[textView textStorage] setAttributedString:[[NSAttributedString alloc] initWithString:@"Hello"]];
+//            NSLog(@"%@", string);
+//            [textView setNeedsDisplay:YES];
+//            [textView scrollRangeToVisible:NSMakeRange(0, 0)];
+//            [attrString release];
+//            break;
+//
+//        }
         {
-            // Get the scroll view
-            assert([control isKindOfClass:[NSScrollView class]]);
-            NSScrollView *scrollView = (NSScrollView *)control;
-            control = [scrollView documentView];
-
             assert([control isKindOfClass:[NSTextView class]]);
             NSTextView *textView = (NSTextView *)control;
             NSString *string = [NSString stringWithUTF8String:widget->psz_text];
             NSAttributedString *attrString = [[NSAttributedString alloc] initWithHTML:[string dataUsingEncoding:NSUTF8StringEncoding] documentAttributes:NULL];
-            [[textView textStorage] setAttributedString:[[NSAttributedString alloc] initWithString:@"Hello"]];
-            NSLog(@"%@", string);
+            [[textView textStorage] setAttributedString:attrString];
             [textView setNeedsDisplay:YES];
             [textView scrollRangeToVisible:NSMakeRange(0, 0)];
             [attrString release];
@@ -779,6 +1059,19 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
             break;
         }
         case EXTENSION_WIDGET_DROPDOWN:
+        {
+            assert([control isKindOfClass:[NSPopUpButton class]]);
+            NSPopUpButton *popup = (NSPopUpButton *)control;
+            [popup removeAllItems];
+            struct extension_widget_value_t *value;
+            for(value = widget->p_values; value != NULL; value = value->p_next)
+            {
+                [popup addItemWithTitle:[NSString stringWithUTF8String:value->psz_text]];
+            }
+            [popup synchronizeTitleAndSelectedItem];
+            break;
+        }
+
         case EXTENSION_WIDGET_LIST:
         {
             assert([control isKindOfClass:[NSScrollView class]]);
@@ -808,7 +1101,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
             NSImage *image = nil;
             NSLog(@"Setting image to %@", string);
             if (string)
-                image = [[NSImage alloc] initWithContentsOfURL:[NSURL URLWithString:string]];
+                image = [[NSImage alloc] initWithContentsOfURL:[NSURL fileURLWithPath:string]];
             [imageView setImage:image];
             [image release];
             break;
@@ -856,7 +1149,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
             }
 
             VLCDialogGridView *gridView = (VLCDialogGridView *)[window contentView];
-            [gridView addSubview:control atRow:row column:col rowSpan:widget->i_height ? 0 : vsp colSpan:widget->i_width ? 0 : hsp];
+            [gridView addSubview:control atRow:row column:col rowSpan:vsp colSpan:hsp];
 
             //this->resize( sizeHint() );
             widget->b_update = false;
@@ -889,28 +1182,31 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
     NSWindow *window = dialog->p_sys_intf;
     if (!window && !shouldDestroy)
     {
-        NSRect content = NSMakeRect(0, 0, size.width, size.height);
+        NSRect content = NSMakeRect(0, 0, 1, 1);
         window = [[NSWindow alloc] initWithContentRect:content styleMask:NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask backing:NSBackingStoreBuffered defer:NO];
         [window setTitle:[NSString stringWithUTF8String:dialog->psz_title]];
         VLCDialogGridView *gridView = [[VLCDialogGridView alloc] init];
         [gridView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
         [window setContentView:gridView];
+        [window setDelegate:gridView];
         [gridView release];
-        [window center];
         dialog->p_sys_intf = window;
     }
-
-    if (!dialog->b_hide && ![window isVisible])
-        [window makeKeyAndOrderFront:self];
 
     [self updateWidgets:dialog];
 
     if (shouldDestroy)
     {
+        [window setDelegate:nil];
         [window close];
         dialog->p_sys_intf = NULL;
     }
-    [window setContentSize:size];
+
+    if (!dialog->b_hide && ![window isVisible]) {
+        [window center];
+        [window makeKeyAndOrderFront:self];
+    }
+
     vlc_cond_signal(&dialog->cond);
     vlc_mutex_unlock(&dialog->lock);
 }
