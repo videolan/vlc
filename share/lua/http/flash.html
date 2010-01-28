@@ -13,7 +13,7 @@
 <script type="text/javascript">
 // <![CDATA[
 host = document.location.toString().replace( /http:\/\//, '' ).replace( /[:/].*/, '' );
-input_options.push( ":sout=#transcode{vcodec=FLV1,acodec=mp3,channels=2,samplerate=44100}:std{access=http,mux=ffmpeg{mux=flv},dst=0.0.0.0:8081/stream.flv}" );
+input_options.push( ":sout=#transcode{vcodec=h264,acodec=mp3,channels=2,samplerate=44100}:std{access=http,dst=0.0.0.0:8081/stream.flv}" );
 input_options.push( ":no-sout-keep" );
 // ]]>
 </script>
