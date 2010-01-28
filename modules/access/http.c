@@ -156,6 +156,7 @@ vlc_module_end ()
 struct access_sys_t
 {
     int fd;
+    bool b_error;
     tls_session_t *p_tls;
     v_socket_t    *p_vs;
 
@@ -881,8 +882,8 @@ static ssize_t Read( access_t *p_access, uint8_t *p_buffer, size_t i_len )
 
         if( i_read == 0 )
             p_access->info.b_eof = true;
-        else if( i_read < 0 )
-            p_access->b_error = true;
+        if( i_read < 0 )
+            p_sys->b_error = true;
     }
 
     if( p_sys->b_has_size )
@@ -1202,7 +1203,7 @@ static int Connect( access_t *p_access, uint64_t i_tell )
 
                 free( psz );
 
-                if( !vlc_object_alive (p_access) || p_access->b_error )
+                if( !vlc_object_alive (p_access) || p_sys->b_error )
                 {
                     Disconnect( p_access );
                     return -1;
@@ -1387,7 +1388,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
             goto error;
         }
 
-        if( !vlc_object_alive (p_access) || p_access->b_error )
+        if( !vlc_object_alive (p_access) || p_sys->b_error )
         {
             free( psz );
             goto error;
