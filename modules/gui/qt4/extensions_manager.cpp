@@ -119,6 +119,8 @@ void ExtensionsManager::menu( QMenu *current )
     action->setEnabled( false );
     current->addSeparator();
 
+    vlc_mutex_lock( &p_extensions_manager->lock );
+
     extension_t *p_ext = NULL;
     int i_ext = 0;
     FOREACH_ARRAY( p_ext, p_extensions_manager->extensions )
@@ -183,6 +185,8 @@ void ExtensionsManager::menu( QMenu *current )
     }
     FOREACH_END()
 
+    vlc_mutex_unlock( &p_extensions_manager->lock );
+
     /* Possibility to unload the module */
     current->addSeparator();
     current->addAction( QIcon( ":/menu/quit" ), qtr( "Unload extensions" ),
@@ -194,6 +198,8 @@ void ExtensionsManager::triggerMenu( int id )
     uint16_t i_ext = MENU_GET_EXTENSION( id );
     uint16_t i_action = MENU_GET_ACTION( id );
 
+    vlc_mutex_lock( &p_extensions_manager->lock );
+
     if( (int) i_ext > p_extensions_manager->extensions.i_size )
     {
         msg_Dbg( p_intf, "can't trigger extension with wrong id %d",
@@ -203,6 +209,8 @@ void ExtensionsManager::triggerMenu( int id )
 
     extension_t *p_ext = ARRAY_VAL( p_extensions_manager->extensions, i_ext );
     assert( p_ext != NULL);
+
+    vlc_mutex_unlock( &p_extensions_manager->lock );
 
     if( i_action == 0 )
     {
