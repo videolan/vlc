@@ -142,7 +142,8 @@ static int Open( vlc_object_t *p_this )
     if( !p_access->psz_path || !*p_access->psz_path )
     {
         /* Only when selected */
-        if( !p_this->b_force ) return VLC_EGENERIC;
+        if( !p_access->psz_access || !*p_access->psz_access )
+            return VLC_EGENERIC;
 
         psz_name = var_CreateGetString( p_this, "cd-audio" );
         if( !psz_name || !*psz_name )
