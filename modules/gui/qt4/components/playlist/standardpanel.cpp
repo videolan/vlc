@@ -355,6 +355,7 @@ void StandardPLPanel::toggleView()
         if( iconView == NULL )
             createIconView();
 
+        locationBar->setIndex( iconView->rootIndex() );
         treeView->hide();
         iconView->show();
         currentView = iconView;
@@ -364,6 +365,7 @@ void StandardPLPanel::toggleView()
         if( treeView == NULL )
             createTreeView();
 
+        locationBar->setIndex( treeView->rootIndex() );
         iconView->hide();
         treeView->show();
         currentView = treeView;
@@ -395,6 +397,8 @@ void StandardPLPanel::activate( const QModelIndex &index )
 
 void StandardPLPanel::handleInputChange( input_thread_t *p_input_thread )
 {
+    if( currentView != iconView ) return;
+
     input_item_t *p_input_item = input_GetItem( p_input_thread );
     if( !p_input_item ) return;
 
