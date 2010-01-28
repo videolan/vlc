@@ -106,10 +106,11 @@ private:
     static QMenu *ToolsMenu( QMenu * );
     static QMenu *ToolsMenu( QWidget * );
 
-    static QMenu *ViewMenu( intf_thread_t *, MainInterface *,
-                            bool with = true );
+    static QMenu *ViewMenu( intf_thread_t *, QWidget *parent );
+    static QMenu *ViewMenu( intf_thread_t *, QMenu *, bool with_intf );
+
     static QMenu *InterfacesMenu( intf_thread_t *p_intf, QMenu * );
-    static QMenu *ExtensionsMenu( intf_thread_t *p_intf, QMenu * );
+    static void ExtensionsMenu( intf_thread_t *p_intf, QMenu * );
 
     static QMenu *NavigMenu( intf_thread_t *, QMenu * );
     static QMenu *NavigMenu( intf_thread_t *, QWidget * );
@@ -163,8 +164,7 @@ public:
             case 1: QVLCMenu::AudioMenu( p_intf, menu ); break;
             case 2: QVLCMenu::VideoMenu( p_intf, menu ); break;
             case 3: QVLCMenu::RebuildNavigMenu( p_intf, menu ); break;
-            case 4: QVLCMenu::InterfacesMenu( p_intf, menu ); break;
-            case 5: QVLCMenu::ExtensionsMenu( p_intf, menu ); break;
+            case 4: QVLCMenu::ViewMenu( p_intf, menu, true ); break;
         }
     }
 private:

@@ -294,7 +294,7 @@ void QVLCMenu::createMenuBar( MainInterface *mi,
     BAR_DADD( VideoMenu( p_intf, bar ), qtr( "&Video" ), 2 );
 
     BAR_ADD( ToolsMenu( bar ), qtr( "&Tools" ) );
-    BAR_ADD( ViewMenu( p_intf, mi ), qtr( "V&iew" ) );
+    BAR_ADD( ViewMenu( p_intf, bar ), qtr( "V&iew" ) );
     BAR_ADD( HelpMenu( bar ), qtr( "&Help" ) );
 }
 #undef BAR_ADD
@@ -398,18 +398,39 @@ QMenu *QVLCMenu::ToolsMenu( QWidget *parent )
 }
 
 /**
+ * Dynamic View Menu
+ * Connect signal "aboutToShow" to the creation of the View Menu
+ **/
+QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf, QWidget* parent )
+{
+    QMenu *viewMenu = new QMenu( parent );
+    MenuFunc *f = new MenuFunc( viewMenu, 4 );
+    CONNECT( viewMenu, aboutToShow(), THEDP->menusUpdateMapper, map() );
+    THEDP->menusUpdateMapper->setMapping( viewMenu, f );
+    return viewMenu;
+}
+
+/**
  * View Menu
- * Interface Modification
+ * Interface modification, load other interfaces, activate Extensions
  **/
 QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
-                            MainInterface *mi,
-                            bool with_intf )
+                           QMenu *current,
+                           bool with_intf )
 {
     QAction *action;
 
-    assert( mi );
+    QMenu *menu;
+    if( !with_intf )
+        menu = new QMenu( qtr( "&View" ), current );
+    else
+    {
+        menu = current;
+        menu->clear();
+    }
 
-    QMenu *menu = new QMenu( qtr( "V&iew" ), mi );
+    MainInterface *mi = p_intf->p_sys->p_mi;
+    assert( mi );
 
     menu->addAction( QIcon( ":/menu/playlist_menu" ),
             qtr( "Play&list" ), mi,
@@ -424,9 +445,6 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
     if( with_intf )
     {
         QMenu *intfmenu = InterfacesMenu( p_intf, menu );
-        MenuFunc *f = new MenuFunc( intfmenu, 4 );
-        CONNECT( intfmenu, aboutToShow(), THEDP->menusUpdateMapper, map() );
-        THEDP->menusUpdateMapper->setMapping( intfmenu, f );
         menu->addSeparator();
     }
 
@@ -473,14 +491,11 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
     menu->addSeparator();
     addDPStaticEntry( menu, qtr( "Customi&ze Interface..." ),
         ":/menu/preferences", SLOT( toolbarDialog() ) );
-    menu->addSeparator();
 
     /* Extensions */
+    /// @todo Check configuration variable "auto load extensions"
     menu->addSeparator();
-    QMenu *extmenu = ExtensionsMenu( p_intf, menu );
-    MenuFunc *f = new MenuFunc( menu, 5 );
-    CONNECT( menu, aboutToShow(), THEDP->menusUpdateMapper, map() );
-    THEDP->menusUpdateMapper->setMapping( menu, f );
+    ExtensionsMenu( p_intf, menu );
 
     return menu;
 }
@@ -499,41 +514,19 @@ QMenu *QVLCMenu::InterfacesMenu( intf_thread_t *p_intf, QMenu *current )
 }
 
 /**
- * Extensions Sub-Menu
- * EXPERIMENTAL
+ * Extensions menu: populate the current menu with extensions
  **/
-QMenu *QVLCMenu::ExtensionsMenu( intf_thread_t *p_intf, QMenu *current )
+void QVLCMenu::ExtensionsMenu( intf_thread_t *p_intf, QMenu *extMenu )
 {
-    QAction *extAction = NULL;
-    foreach( QAction *action, current->actions() )
-    {
-        if( action->text() == qtr( "&Extensions" ) )
-        {
-            extAction = action;
-            break;
-        }
-    }
-
+    /* Get ExtensionsManager and load extensions if needed */
     ExtensionsManager *extMgr = ExtensionsManager::getInstance( p_intf );
-
-    QMenu *extMenu = new QMenu( qtr( "&Extensions" ), current );
-    if( extMgr->isLoaded() )
+    if( !extMgr->isLoaded() && !extMgr->cannotLoad() )
     {
-        /* Let the ExtensionsManager build itself the menu */
-        extMgr->menu( extMenu );
-    }
-    else
-    {
-        extMenu->addAction( qtr( "&Load extensions" ),
-                            extMgr, SLOT( loadExtensions() ) );
+        extMgr->loadExtensions();
     }
 
-    if( extAction )
-        extAction->setMenu( extMenu );
-    else
-        current->addMenu( extMenu );
-
-    return extMenu;
+    /* Let the ExtensionsManager build itself the menu */
+    extMgr->menu( extMenu );
 }
 
 /**
@@ -1035,7 +1028,7 @@ void QVLCMenu::PopupMenu( intf_thread_t *p_intf, bool show )
                 msg_Warn( p_intf, "could not find parent interface" );
         }
         else
-            menu->addMenu( ViewMenu( p_intf, mi, false ));
+            menu->addMenu( ViewMenu( p_intf, menu, false ));
 
         menu->addMenu( submenu );
     }
