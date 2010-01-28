@@ -57,6 +57,7 @@ typedef struct pa_thread_t
     vlc_cond_t  signal;
     vlc_mutex_t lock_signal;
     bool  b_signal;
+    bool  b_error;
 
 } pa_thread_t;
 
