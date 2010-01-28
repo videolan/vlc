@@ -82,7 +82,8 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     // picture where all the rendering happens and which will be cached
     QPixmap pix;
 
-    QString key = title + artist + artUrl;
+    QString key = title + artist + artUrl
+                  + QString( index.data( PLModel::IsCurrentRole ).toInt() );
     if(QPixmapCache::find( key, pix ))
     {
         // cool, we found it in the cache

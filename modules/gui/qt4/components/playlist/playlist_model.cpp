@@ -346,6 +346,7 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
             QFont f; f.setBold( true ); return QVariant( f );
         }
     }
+    else if( role == IsCurrentRole ) return QVariant( isCurrent( index ) );
     return QVariant();
 }
 

@@ -54,6 +54,10 @@ class PLModel : public QAbstractItemModel
 friend class PLItem;
 
 public:
+    enum {
+      IsCurrentRole = Qt::UserRole
+    };
+
     PLModel( playlist_t *, intf_thread_t *,
              playlist_item_t *, QObject *parent = 0 );
     ~PLModel();
