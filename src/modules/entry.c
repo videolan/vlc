@@ -73,6 +73,7 @@ module_t *vlc_module_create (vlc_object_t *obj)
     module->i_bool_items = 0;
     /*module->handle = garbage */
     module->psz_filename = NULL;
+    module->domain = NULL;
     module->b_builtin = false;
     module->b_loaded = false;
 
@@ -114,6 +115,7 @@ module_t *vlc_submodule_create (module_t *module)
     submodule->psz_capability = module->psz_capability;
     submodule->i_score = module->i_score;
     submodule->b_submodule = true;
+    submodule->domain = module->domain;
     return submodule;
 }
 
@@ -228,8 +230,7 @@ int vlc_plugin_set (module_t *module, module_config_t *item, int propid, ...)
             break;
 
         case VLC_MODULE_TEXTDOMAIN:
-            (void) va_arg (ap, const char *);
-            /* FIXME: not implemented */
+            module->domain = va_arg (ap, char *);
             break;
 
         case VLC_CONFIG_NAME:

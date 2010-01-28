@@ -133,6 +133,7 @@ struct module_t
     /* Plugin-specific stuff */
     module_handle_t     handle;                             /* Unique handle */
     char *              psz_filename;                     /* Module filename */
+    char *              domain;                            /* gettext domain */
 
     bool          b_builtin;  /* Set to true if the module is built in */
     bool          b_loaded;        /* Set to true if the dll is loaded */

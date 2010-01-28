@@ -1063,6 +1063,7 @@ static void DupModule( module_t *p_module )
     p_module->psz_longname = strdup( p_module->psz_longname );
     p_module->psz_help = p_module->psz_help ? strdup( p_module->psz_help )
                                             : NULL;
+    p_module->domain = p_module->domain ? strdup( p_module->domain ) : NULL;
 
     for (module_t *subm = p_module->submodule; subm; subm = subm->next)
         DupModule (subm);
@@ -1089,6 +1090,7 @@ static void UndupModule( module_t *p_module )
     FREENULL( p_module->psz_shortname );
     free( p_module->psz_longname );
     FREENULL( p_module->psz_help );
+    free( p_module->domain );
 }
 
 #endif /* HAVE_DYNAMIC_PLUGINS */
