@@ -1102,7 +1102,7 @@ static int NetFillBuffer( access_t *p_access )
             return -1;
         }
 
-        if( !vlc_object_alive (p_access) || p_access->b_error )
+        if( !vlc_object_alive (p_access) )
             return -1;
 
         //msg_Dbg( p_access, "NetFillBuffer: trying again (select)" );
