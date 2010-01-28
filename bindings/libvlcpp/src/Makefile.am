@@ -1,6 +1,8 @@
 lib_LTLIBRARIES = libvlcpp.la
 
 libvlcpp_la_SOURCES =   \
+    audio.cpp           \
+    audio.hpp           \
     exception.cpp       \
     exception.hpp       \
     libvlc.cpp          \

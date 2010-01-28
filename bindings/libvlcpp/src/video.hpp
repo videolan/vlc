@@ -1,5 +1,5 @@
 /*****************************************************************************
- * video.hpp: video part of an media player
+ * video.hpp: video part of the media player
  *****************************************************************************
  * Copyright (C) 2010 the VideoLAN team
  * $Id$
