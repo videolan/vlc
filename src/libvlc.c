@@ -65,10 +65,6 @@
 #   include <locale.h>
 #endif
 
-#ifdef ENABLE_NLS
-# include <libintl.h> /* bindtextdomain */
-#endif
-
 #ifdef HAVE_DBUS
 /* used for one-instance mode */
 #   include <dbus/dbus.h>
@@ -205,11 +201,6 @@ void vlc_release (gc_object_t *p_gc)
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-#if defined( ENABLE_NLS ) && (defined (__APPLE__) || defined (WIN32)) && \
-    ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
-static void SetLanguage   ( char const * );
-#endif
-static inline int LoadMessages (void);
 static int  GetFilenames  ( libvlc_int_t *, int, const char *[] );
 static void Help          ( libvlc_int_t *, char const *psz_help_name );
 static void Usage         ( libvlc_int_t *, char const *psz_search );
@@ -313,7 +304,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Support for gettext
      */
-    LoadMessages ();
+    vlc_bindtextdomain (PACKAGE_NAME);
 
     /* Initialize the module bank and load the configuration of the
      * main module. We need to do this at this stage to be able to display
@@ -1197,55 +1188,6 @@ static void SetLanguage ( const char *psz_lang )
     setlocale( LC_ALL, psz_lang );
 }
 #endif
-
-
-static inline int LoadMessages (void)
-{
-#if defined( ENABLE_NLS ) \
-     && ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
-    /* Specify where to find the locales for current domain */
-#if !defined( __APPLE__ ) && !defined( WIN32 ) && !defined( SYS_BEOS )
-    static const char psz_path[] = LOCALEDIR;
-#else
-    char psz_path[1024];
-    char *datadir = config_GetDataDirDefault();
-    int ret;
-
-    if (unlikely(datadir == NULL))
-        return -1;
-    ret = snprintf (psz_path, sizeof (psz_path), "%s" DIR_SEP "locale",
-                    datadir);
-    free (datadir);
-    if (ret >= (int)sizeof (psz_path))
-        return -1;
-#endif
-    if (bindtextdomain (PACKAGE_NAME, psz_path) == NULL)
-    {
-        fprintf (stderr, "Warning: cannot bind text domain "PACKAGE_NAME
-                         " to directory %s\n", psz_path);
-        return -1;
-    }
-
-    /* LibVLC wants all messages in UTF-8.
-     * Unfortunately, we cannot ask UTF-8 for strerror_r(), strsignal_r()
-     * and other functions that are not part of our text domain.
-     */
-    if (bind_textdomain_codeset (PACKAGE_NAME, "UTF-8") == NULL)
-    {
-        fprintf (stderr, "Error: cannot set Unicode encoding for text domain "
-                         PACKAGE_NAME"\n");
-        // Unbinds the text domain to avoid broken encoding
-        bindtextdomain (PACKAGE_NAME, "DOES_NOT_EXIST");
-        return -1;
-    }
-
-    /* LibVLC does NOT set the default textdomain, since it is a library.
-     * This could otherwise break programs using LibVLC (other than VLC).
-     * textdomain (PACKAGE_NAME);
-     */
-#endif
-    return 0;
-}
 
 /*****************************************************************************
  * GetFilenames: parse command line options which are not flags

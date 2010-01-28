@@ -416,6 +416,7 @@ SOURCES_libvlc_common = \
 	modules/cache.c \
 	modules/entry.c \
 	modules/os.c \
+	modules/textdomain.c \
 	misc/threads.c \
 	misc/stats.c \
 	misc/cpu.c \

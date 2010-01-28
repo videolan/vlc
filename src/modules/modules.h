@@ -148,6 +148,8 @@ void module_LoadPlugins( vlc_object_t *, bool );
 void module_EndBank( vlc_object_t *, bool );
 #define module_EndBank(a,b) module_EndBank(VLC_OBJECT(a), b)
 
+int vlc_bindtextdomain (const char *);
+
 /* Low-level OS-dependent handler */
 int  module_Load   (vlc_object_t *, const char *, module_handle_t *);
 int  module_Call   (vlc_object_t *obj, module_t *);
