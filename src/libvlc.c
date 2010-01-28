@@ -201,6 +201,10 @@ void vlc_release (gc_object_t *p_gc)
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
+#if defined( ENABLE_NLS ) && (defined (__APPLE__) || defined (WIN32)) && \
+    ( defined( HAVE_GETTEXT ) || defined( HAVE_INCLUDED_GETTEXT ) )
+static void SetLanguage   ( char const * );
+#endif
 static int  GetFilenames  ( libvlc_int_t *, int, const char *[] );
 static void Help          ( libvlc_int_t *, char const *psz_help_name );
 static void Usage         ( libvlc_int_t *, char const *psz_search );
