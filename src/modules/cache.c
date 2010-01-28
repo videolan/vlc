@@ -257,6 +257,8 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
 
         LOAD_STRING( pp_cache[i]->p_module->psz_filename );
         LOAD_STRING( pp_cache[i]->p_module->domain );
+        if( pp_cache[i]->p_module->domain != NULL )
+            vlc_bindtextdomain( pp_cache[i]->p_module->domain );
 
         LOAD_IMMEDIATE( i_submodules );
 
