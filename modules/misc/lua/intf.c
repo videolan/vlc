@@ -162,7 +162,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
     config_ChainParse( p_intf, "lua-", ppsz_intf_options, p_intf->p_cfg );
     char *psz_name = NULL;
 
-    if( !p_intf->b_force )
+    if( !p_intf->psz_intf || !*p_intf->psz_intf )
         psz_name = strdup( "rc" );
     else
         psz_name = GetModuleName( p_intf );
