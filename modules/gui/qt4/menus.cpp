@@ -493,8 +493,6 @@ QMenu *QVLCMenu::ViewMenu( intf_thread_t *p_intf,
         ":/menu/preferences", SLOT( toolbarDialog() ) );
 
     /* Extensions */
-    /// @todo Check configuration variable "auto load extensions"
-    menu->addSeparator();
     ExtensionsMenu( p_intf, menu );
 
     return menu;
@@ -520,12 +518,20 @@ void QVLCMenu::ExtensionsMenu( intf_thread_t *p_intf, QMenu *extMenu )
 {
     /* Get ExtensionsManager and load extensions if needed */
     ExtensionsManager *extMgr = ExtensionsManager::getInstance( p_intf );
+
+    if( !var_InheritBool( p_intf, "qt-autoload-extensions")
+        && !extMgr->isLoaded() )
+    {
+        return;
+    }
+
     if( !extMgr->isLoaded() && !extMgr->cannotLoad() )
     {
         extMgr->loadExtensions();
     }
 
     /* Let the ExtensionsManager build itself the menu */
+    extMenu->addSeparator();
     extMgr->menu( extMenu );
 }
 
