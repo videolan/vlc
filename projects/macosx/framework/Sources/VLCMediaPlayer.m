@@ -61,6 +61,14 @@ NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state)
     return stateToStrings[state];
 }
 
+static inline libvlc_track_description_t *freeAndGetNextTrack(libvlc_track_description_t *track)
+{
+    libvlc_track_description_t *next = track->p_next;
+    free(track->psz_name);
+    free(track);
+    return next;
+}
+
 /* libvlc event callback */
 static void HandleMediaInstanceVolumeChanged(const libvlc_event_t * event, void * self)
 {
@@ -321,10 +329,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     NSMutableArray *tempArray = [NSMutableArray array];
     while (currentTrack) {
         [tempArray addObject:[NSString stringWithUTF8String:currentTrack->psz_name]];
-        free(currentTrack->psz_name);
-        libvlc_track_description_t *tofree = currentTrack;
-        currentTrack = currentTrack->p_next;
-        free(tofree);
+        currentTrack = freeAndGetNextTrack(currentTrack);
     }
     return [NSArray arrayWithArray: tempArray];
 }
@@ -521,7 +526,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     for (i = 0; i < count ; i++)
     {
         [tempArray addObject:[NSString stringWithUTF8String: tracks->psz_name]];
-        tracks = tracks->p_next;
+        tracks = freeAndGetNextTrack(tracks);
     }
     return [NSArray arrayWithArray: tempArray];
 }
@@ -571,7 +576,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     for (i = 0; i < [self countOfTitles] ; i++)
     {
         [tempArray addObject:[NSString stringWithUTF8String: tracks->psz_name]];
-        tracks = tracks->p_next;
+        tracks = freeAndGetNextTrack(tracks);
     }
     return [NSArray arrayWithArray: tempArray];
 }
@@ -615,7 +620,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     for (i = 0; i < count ; i++)
     {
         [tempArray addObject:[NSString stringWithUTF8String: tracks->psz_name]];
-        tracks = tracks->p_next;
+        tracks = freeAndGetNextTrack(tracks);
     }
 
     return [NSArray arrayWithArray: tempArray];
