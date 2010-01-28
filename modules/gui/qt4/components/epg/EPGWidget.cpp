@@ -32,6 +32,7 @@ ChannelsWidget::ChannelsWidget( QWidget *parent ) : QWidget( parent )
 {
     setContentsMargins( 0, 0, 0, 0 );
     setMaximumWidth( 50 );
+    setFocusPolicy( Qt::ClickFocus );
 }
 
 EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
@@ -59,6 +60,8 @@ EPGWidget::EPGWidget( QWidget *parent ) : QWidget( parent )
              m_rulerWidget, SLOT( setDuration(int) ) );
     connect( m_epgView->horizontalScrollBar(), SIGNAL( valueChanged(int) ),
              m_rulerWidget, SLOT( setOffset(int) ) );
+    connect( m_epgView, SIGNAL( eventFocusedChanged(EPGEvent*)),
+             this, SIGNAL(itemSelectionChanged(EPGEvent*)) );
 }
 
 void EPGWidget::setZoom( int level )

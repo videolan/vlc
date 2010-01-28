@@ -26,9 +26,12 @@
 #include <QFontMetrics>
 #include <QDebug>
 #include <QDateTime>
+#include <QFocusEvent>
+#include <QGraphicsScene>
 
 #include "EPGItem.hpp"
 #include "EPGView.hpp"
+#include "EPGEvent.hpp"
 
 EPGItem::EPGItem( EPGView *view )
     : m_view( view )
@@ -36,6 +39,7 @@ EPGItem::EPGItem( EPGView *view )
     m_current = false;
 
     m_boundingRect.setHeight( TRACKS_HEIGHT );
+    setFlags( QGraphicsItem::ItemIsSelectable | QGraphicsItem::ItemIsFocusable);
 }
 
 QRectF EPGItem::boundingRect() const
@@ -141,4 +145,12 @@ void EPGItem::setShortDescription( const QString& shortDescription )
 void EPGItem::setCurrent( bool current )
 {
     m_current = current;
+}
+
+void EPGItem::focusInEvent( QFocusEvent * event )
+{
+    EPGEvent *evEPG = new EPGEvent( m_name );
+    evEPG->description = m_description;
+    evEPG->shortDescription = m_shortDescription;
+    m_view->eventFocused( evEPG );
 }

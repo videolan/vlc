@@ -52,7 +52,7 @@ public:
 signals:
     void            startTimeChanged( const QDateTime& startTime );
     void            durationChanged( int seconds );
-
+    void            eventFocusedChanged( EPGEvent * );
 protected:
     virtual void    drawBackground( QPainter *painter, const QRectF &rect );
 
@@ -60,6 +60,9 @@ protected:
     QDateTime       m_startTime;
     int             m_scaleFactor;
     int             m_duration;
+
+public slots:
+    void eventFocused( EPGEvent * );
 };
 
 #endif // EPGVIEW_H

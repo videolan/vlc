@@ -53,6 +53,9 @@ public:
     void setShortDescription( const QString& shortDescription );
     void setCurrent( bool current );
 
+protected:
+    virtual void focusInEvent( QFocusEvent * event );
+
 private:
     EPGView     *m_view;
     QRectF      m_boundingRect;

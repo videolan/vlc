@@ -135,3 +135,8 @@ void EPGView::updateDuration()
     m_duration = m_startTime.secsTo( lastItem );
     emit durationChanged( m_duration );
 }
+
+void EPGView::eventFocused( EPGEvent *ev )
+{
+    emit eventFocusedChanged( ev );
+}

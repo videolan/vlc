@@ -92,7 +92,10 @@ void EpgDialog::showEvent( EPGEvent *event )
     if( !event ) return;
 
     title->setText( event->name );
-    description->setText( event->description );
+    if( !event->description.isEmpty() )
+        description->setText( event->description );
+    else
+        description->setText( event->shortDescription );
 }
 
 void EpgDialog::update()
