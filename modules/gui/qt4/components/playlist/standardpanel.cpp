@@ -433,20 +433,24 @@ void LocationBar::setIndex( const QModelIndex &index )
   QModelIndex i = index;
   QFont font;
   QFontMetrics metrics( font );
+  font.setBold( true );
   while( true )
   {
-      QToolButton *btn = new QToolButton;
       PLItem *item = model->getItem( i );
+
+      QToolButton *btn = new QToolButton;
       char *fb_name = input_item_GetTitleFbName( item->inputItem() );
       QString text = qfu(fb_name);
       free(fb_name);
       text = QString("/ ") + metrics.elidedText( text, Qt::ElideRight, 150 );
       btn->setText( text );
-      btn->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+      btn->setFont( font );
       prev = insertWidget( prev, btn );
 
       mapper->setMapping( btn, item->id() );
       CONNECT( btn, clicked( ), mapper, map( ) );
+
+      font = QFont();
 
       if( i.isValid() ) i = i.parent();
       else break;
@@ -456,5 +460,6 @@ void LocationBar::setIndex( const QModelIndex &index )
 void LocationBar::invoke( int i_id )
 {
   QModelIndex index = model->index( i_id, 0 );
+  setIndex( index );
   emit invoked ( index );
 }
