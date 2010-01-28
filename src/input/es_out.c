@@ -2566,6 +2566,20 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             return VLC_SUCCESS;
         }
 
+        case ES_OUT_GET_PCR_SYSTEM:
+        {
+            if( p_sys->b_buffering )
+                return VLC_EGENERIC;
+
+            es_out_pgrm_t *p_pgrm = p_sys->p_pgrm;
+            if( !p_pgrm )
+                return VLC_EGENERIC;
+
+            mtime_t *pi_system = va_arg( args, mtime_t *);
+            *pi_system = input_clock_GetSystemOrigin( p_pgrm->p_clock );
+            return VLC_SUCCESS;
+        }
+
         default:
             msg_Err( p_sys->p_input, "unknown query in es_out_Control" );
             return VLC_EGENERIC;

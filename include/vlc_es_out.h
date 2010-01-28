@@ -85,6 +85,9 @@ enum es_out_query_e
     /* Set global meta data (The vlc_meta_t is not modified nor released) */
     ES_OUT_SET_META, /* arg1=const vlc_meta_t * */
 
+    /* PCR system clock manipulation for external clock synchronization */
+    ES_OUT_GET_PCR_SYSTEM, /* arg1=mtime_t * res=can fail */
+
     /* First value usable for private control */
     ES_OUT_PRIVATE_START = 0x10000,
 };
@@ -143,6 +146,11 @@ static inline void es_out_Delete( es_out_t *p_out )
 static inline int es_out_ControlSetMeta( es_out_t *out, const vlc_meta_t *p_meta )
 {
     return es_out_Control( out, ES_OUT_SET_META, p_meta );
+}
+
+static inline int es_out_ControlGetPcrSystem( es_out_t *out, mtime_t *pi_system )
+{
+    return es_out_Control( out, ES_OUT_GET_PCR_SYSTEM, pi_system );
 }
 
 /**

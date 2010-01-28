@@ -673,7 +673,14 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
     {
         return ControlLockedSetFrameNext( p_out );
     }
+    case ES_OUT_GET_PCR_SYSTEM:
+    {
+        if( p_sys->b_delayed )
+            return VLC_EGENERIC;
 
+        mtime_t *pi_system = (mtime_t*)va_arg( args, mtime_t * );
+        return es_out_ControlGetPcrSystem( p_sys->p_out, pi_system );
+    }
     default:
         msg_Err( p_sys->p_input, "Unknown es_out_Control query !" );
         assert(0);

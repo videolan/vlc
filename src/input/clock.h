@@ -84,6 +84,12 @@ void    input_clock_ChangeRate( input_clock_t *, int i_rate );
 void    input_clock_ChangePause( input_clock_t *, bool b_paused, mtime_t i_date );
 
 /**
+ * This function returns the original system value date for the current
+ * reference point (a valid reference point must have been set).
+ */
+mtime_t input_clock_GetSystemOrigin( input_clock_t * );
+
+/**
  * This function allows to rebase the original system value date.
  * It can be called only imediatly after a input_clock_Update call.
  * FIXME ugly

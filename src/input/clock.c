@@ -495,6 +495,19 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, mtime_t i_system )
     vlc_mutex_unlock( &cl->lock );
 }
 
+mtime_t input_clock_GetSystemOrigin( input_clock_t *cl )
+{
+    vlc_mutex_lock( &cl->lock );
+
+    assert( cl->b_has_reference );
+
+    const mtime_t i_system = cl->ref.i_system;
+
+    vlc_mutex_unlock( &cl->lock );
+
+    return i_system;
+}
+
 #warning "input_clock_SetJitter needs more work"
 void input_clock_SetJitter( input_clock_t *cl,
                             mtime_t i_pts_delay, int i_cr_average )
