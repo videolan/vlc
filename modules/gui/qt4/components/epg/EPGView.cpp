@@ -94,12 +94,12 @@ void EPGView::addEvent( EPGEvent* event )
 
 void EPGView::updateEvent( EPGEvent* event )
 {
-    qDebug() << "Update event: " << event->name;
+    //qDebug() << "Update event: " << event->name;
 }
 
 void EPGView::delEvent( EPGEvent* event )
 {
-    qDebug() << "Del event: " << event->name;
+    //qDebug() << "Del event: " << event->name;
 }
 
 void EPGView::drawBackground( QPainter *painter, const QRectF &rect )

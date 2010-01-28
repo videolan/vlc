@@ -109,7 +109,7 @@ int EPGItem::duration() const
 
 void EPGItem::setChannel( int channelNb )
 {
-    qDebug() << "Channel" << channelNb;
+    //qDebug() << "Channel" << channelNb;
     m_channelNb = channelNb;
     setPos( pos().x(), m_channelNb * TRACKS_HEIGHT );
 }
