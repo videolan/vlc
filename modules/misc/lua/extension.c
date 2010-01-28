@@ -389,6 +389,10 @@ exit:
     {
         free( p_ext->psz_name );
         free( p_ext->psz_title );
+        free( p_ext->psz_url );
+        free( p_ext->psz_author );
+        free( p_ext->psz_description );
+        free( p_ext->psz_version );
         vlc_mutex_destroy( &p_ext->p_sys->command_lock );
         vlc_mutex_destroy( &p_ext->p_sys->running_lock );
         vlc_cond_destroy( &p_ext->p_sys->wait );
