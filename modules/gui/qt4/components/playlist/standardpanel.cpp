@@ -295,7 +295,6 @@ void StandardPLPanel::createTreeView()
 {
     /* Create and configure the QTreeView */
     treeView = new QTreeView;
-    treeView->setModel( model );
 
     treeView->setIconSize( QSize( 20, 20 ) );
     treeView->setAlternatingRowColors( true );
@@ -313,6 +312,9 @@ void StandardPLPanel::createTreeView()
     treeView->setAcceptDrops( true );
     treeView->setDropIndicatorShown( true );
     treeView->setContextMenuPolicy( Qt::CustomContextMenu );
+
+    /* setModel after setSortingEnabled(true), or the model will sort immediately! */
+    treeView->setModel( model );
 
     if( getSettings()->contains( "headerStateV2" ) )
     {

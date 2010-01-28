@@ -815,6 +815,8 @@ void PLModel::sort( int column, Qt::SortOrder order )
 
 void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
 {
+    msg_Dbg( p_intf, "Sorting by column %i, order %i", column, order );
+
     int meta = columnToMeta( column );
     if( meta == COLUMN_END ) return;
 
