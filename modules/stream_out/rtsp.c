@@ -122,11 +122,11 @@ error:
 
 void RtspUnsetup( rtsp_stream_t *rtsp )
 {
-    while( rtsp->sessionc > 0 )
-        RtspClientDel( rtsp, rtsp->sessionv[0] );
-
     if( rtsp->url )
         httpd_UrlDelete( rtsp->url );
+
+    while( rtsp->sessionc > 0 )
+        RtspClientDel( rtsp, rtsp->sessionv[0] );
 
     if( rtsp->host )
         httpd_HostDelete( rtsp->host );
