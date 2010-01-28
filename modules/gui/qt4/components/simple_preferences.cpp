@@ -616,7 +616,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
 
         case SPrefsHotkeys:
         {
-            p_config = config_FindConfig( VLC_OBJECT(p_intf), "key-fullscreen" );
+            p_config = config_FindConfig( VLC_OBJECT(p_intf), "key-play" );
 
             QGridLayout *gLayout = new QGridLayout;
             panel->setLayout( gLayout );
