@@ -338,6 +338,7 @@ static void FetchMeta( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
     if( !p_demux_meta )
         return;
 
+    vlc_object_attach( p_demux_meta, p_fetcher->p_playlist );
     p_demux_meta->p_demux = NULL;
     p_demux_meta->p_item = p_item;
 

@@ -2808,6 +2808,7 @@ static void InputSourceMeta( input_thread_t *p_input,
                            VLC_OBJECT_GENERIC, "demux meta" );
     if( !p_demux_meta )
         return;
+    vlc_object_attach( p_demux_meta, p_demux );
     p_demux_meta->p_demux = p_demux;
     p_demux_meta->p_item = p_input->p->p_item;
 
