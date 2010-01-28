@@ -208,7 +208,7 @@ function click_open()
         summary = "(Unknown)"
     end
     text = text .. "<p>" .. summary .. "</p>"
-    text = text .. "<p><h2>Source IMDb</h2><a href=\"url\">" .. url .. "</a></p>"
+    text = text .. "<p><h2>Source IMDb</h2><a href=\"" .. url .. "\">" .. url .. "</a></p>"
 
     html:set_text(text)
 end
