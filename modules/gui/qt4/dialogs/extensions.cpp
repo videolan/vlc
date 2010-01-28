@@ -305,7 +305,7 @@ QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
 
         case EXTENSION_WIDGET_LIST:
             list = new QListWidget( this );
-            list->setSelectionMode( QAbstractItemView::MultiSelection );
+            list->setSelectionMode( QAbstractItemView::ExtendedSelection );
             for( p_value = p_widget->p_values;
                  p_value != NULL;
                  p_value = p_value->p_next )
