@@ -43,6 +43,8 @@
 #include <QMenu>
 #include <QSignalMapper>
 #include <QWheelEvent>
+#include <QToolButton>
+#include <QFontMetrics>
 
 #include <assert.h>
 
@@ -68,12 +70,15 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     currentRootId = -1;
 
     /* Title label */
-    title = new QLabel;
+    /*title = new QLabel;
     QFont titleFont;
     titleFont.setPointSize( titleFont.pointSize() + 6 );
     titleFont.setFamily( "Verdana" );
     title->setFont( titleFont );
-    layout->addWidget( title, 0, 0 );
+    layout->addWidget( title, 0, 0 );*/
+
+    locationBar = new LocationBar( model );
+    layout->addWidget( locationBar, 0, 0 );
 
     /* A Spacer and the search possibilities */
     layout->setColumnStretch( 1, 10 );
@@ -117,6 +122,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     last_activated_id = -1;
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
              this, handleInputChange( input_thread_t * ) );
+    CONNECT( locationBar, invoked( const QModelIndex & ),
+             iconView, setRootIndex( const QModelIndex & ) );
 }
 
 StandardPLPanel::~StandardPLPanel()
@@ -219,14 +226,16 @@ void StandardPLPanel::setRoot( playlist_item_t *p_item )
     currentRootId = p_item->i_id;
 
     /* cosmetics, ..still need playlist locking.. */
-    char *psz_title = input_item_GetName( p_item->p_input );
+    /*char *psz_title = input_item_GetName( p_item->p_input );
     title->setText( qfu(psz_title) );
-    free( psz_title );
+    free( psz_title );*/
 
     QPL_UNLOCK;
 
     /* do THE job */
     model->rebuild( p_item );
+
+    locationBar->setIndex( QModelIndex() );
 
     /* enable/disable adding */
     if( p_item == THEPL->p_local_category ||
@@ -372,7 +381,8 @@ void StandardPLPanel::activate( const QModelIndex &index )
     {
         if( currentView == iconView ) {
             iconView->setRootIndex( index );
-            title->setText( index.data().toString() );
+            //title->setText( index.data().toString() );
+            locationBar->setIndex( index );
         }
     }
     else
@@ -395,9 +405,48 @@ void StandardPLPanel::handleInputChange( input_thread_t *p_input_thread )
     {
         QModelIndex index = model->index( p_item->p_parent->i_id, 0 );
         iconView->setRootIndex( index );
-        title->setText( index.data().toString() );
+        //title->setText( index.data().toString() );
+        locationBar->setIndex( index );
         last_activated_id = p_item->i_id;
     }
 
     playlist_Unlock( THEPL );
+}
+
+LocationBar::LocationBar( PLModel *m )
+{
+  model = m;
+  mapper = new QSignalMapper;
+  CONNECT( mapper, mapped( int ), this, invoke( int ) );
+}
+
+void LocationBar::setIndex( const QModelIndex &index )
+{
+  clear();
+  QAction *prev = NULL;
+  QModelIndex i = index;
+  QFont font;
+  QFontMetrics metrics( font );
+  while( true )
+  {
+      QToolButton *btn = new QToolButton;
+      PLItem *item = model->getItem( i );
+      QString text = input_item_GetTitleFbName( item->inputItem() );
+      text = QString("/ ") + metrics.elidedText( text, Qt::ElideRight, 150 );
+      btn->setText( text );
+      btn->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
+      prev = insertWidget( prev, btn );
+
+      mapper->setMapping( btn, item->id() );
+      CONNECT( btn, clicked( ), mapper, map( ) );
+
+      if( i.isValid() ) i = i.parent();
+      else break;
+  }
+}
+
+void LocationBar::invoke( int i_id )
+{
+  QModelIndex index = model->index( i_id, 0 );
+  emit invoked ( index );
 }

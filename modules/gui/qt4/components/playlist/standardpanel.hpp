@@ -34,6 +34,7 @@
 #include <QModelIndex>
 #include <QWidget>
 #include <QString>
+#include <QToolBar>
 
 #include <vlc_playlist.h>
 
@@ -45,6 +46,7 @@ class QPushButton;
 class QKeyEvent;
 class QWheelEvent;
 class PlIconView;
+class LocationBar;
 
 class StandardPLPanel: public QWidget
 {
@@ -68,6 +70,7 @@ private:
     QLabel      *title;
     QPushButton *addButton;
     QGridLayout *layout;
+    LocationBar *locationBar;
 
     QTreeView   *treeView;
     PlIconView  *iconView;
@@ -102,6 +105,21 @@ private slots:
     void toggleView();
     void activate( const QModelIndex & );
     void handleInputChange( input_thread_t * );
+};
+
+class LocationBar : public QToolBar
+{
+    Q_OBJECT;
+public:
+    LocationBar( PLModel * );
+    void setIndex( const QModelIndex & );
+signals:
+    void invoked( const QModelIndex & );
+private slots:
+    void invoke( int i_item_id );
+private:
+    PLModel *model;
+    QSignalMapper *mapper;
 };
 
 #endif
