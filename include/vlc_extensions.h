@@ -32,10 +32,17 @@ typedef struct extensions_manager_sys_t extensions_manager_sys_t;
 typedef struct extensions_manager_t extensions_manager_t;
 typedef struct extension_sys_t extension_sys_t;
 
-/** Extension descriptor */
+/** Extension descriptor: name, title, author, ... */
 typedef struct extension_t {
-    char *psz_title;          /**< Display title (ro) */
+    /* Below, (ro) means read-only for the GUI */
     char *psz_name;           /**< Real name of the extension (ro) */
+
+    char *psz_title;          /**< Display title (ro) */
+    char *psz_author;         /**< Author of the extension (ro) */
+    char *psz_version;        /**< Version (ro) */
+    char *psz_url;            /**< A URL to the official page (ro) */
+    char *psz_description;    /**< Full description (ro) */
+
     extension_sys_t *p_sys;   /**< Reserved for the manager module */
 } extension_t;
 
