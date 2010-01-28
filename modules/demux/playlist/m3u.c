@@ -170,6 +170,8 @@ static int Demux( demux_t *p_demux )
             {
                 /* Extended info */
                 psz_parse += sizeof("EXTINF:") - 1;
+                free(psz_name);
+                free(psz_artist);
                 parseEXTINF( psz_parse, &psz_artist, &psz_name, &i_parsed_duration );
                 if( i_parsed_duration >= 0 )
                     i_duration = i_parsed_duration * INT64_C(1000000);
@@ -208,7 +210,11 @@ static int Demux( demux_t *p_demux )
             psz_mrl = ProcessMRL( psz_parse, p_demux->p_sys->psz_prefix );
 
             b_cleanup = true;
-            if( !psz_mrl ) goto error;
+            if( !psz_mrl )
+            {
+                LocaleFree( psz_parse );
+                goto error;
+            }
 
             p_input = input_item_NewExt( p_demux, psz_mrl, psz_name,
                                         i_options, ppsz_options, 0, i_duration );
