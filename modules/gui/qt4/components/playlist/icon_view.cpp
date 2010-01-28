@@ -40,92 +40,123 @@
 #define ITEMS_SPACING       10
 #define ART_RADIUS          5
 
-static QPixmap find_art_pixmap( const QString& url )
-{
-    QPixmap pix;
 
-    if( QPixmapCache::find( url, pix ) )    /* great, we found it */
-        return pix;
-
-    if( url.isEmpty() || !pix.load( url ) )
-        pix = QPixmap( ":/noart64" );
-    else
-        pix = pix.scaled( ART_SIZE, ART_SIZE, Qt::KeepAspectRatioByExpanding );
-
-    QPixmapCache::insert( url, pix );       /* save it for next time */
-    return pix;
-}
+static const QRect drawRect = QRect( 0, 0, RECT_SIZE, RECT_SIZE );
+static const QRect artRect = drawRect.adjusted( OFFSET - 1, 0, - OFFSET, - OFFSET *2 );
 
 void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    painter->setRenderHints( QPainter::Antialiasing | QPainter::SmoothPixmapTransform );
-
-    /*if( option.state & QStyle::State_Selected )
-         painter->fillRect(option.rect, option.palette.highlight());*/
-    QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem, &option, painter );
-
     PLItem *currentItem = static_cast<PLItem*>( index.internalPointer() );
     assert( currentItem );
 
-    QPixmap artpix;
-    QString url = InputManager::decodeArtURL( currentItem->inputItem() );
+    char *meta;
 
-    /* look up through all children and use the first picture found */
-    if( url.isEmpty() )
+    meta = input_item_GetTitleFbName( currentItem->inputItem() );
+    QString title = qfu( meta );
+    free( meta );
+
+    meta = input_item_GetArtist( currentItem->inputItem() );
+    QString artist = qfu( meta );
+    free( meta );
+
+    QString artUrl = InputManager::decodeArtURL( currentItem->inputItem() );
+
+    // look up through all children and use the first picture found
+    if( artUrl.isEmpty() )
     {
         int children = currentItem->childCount();
         for( int i = 0; i < children; i++ )
         {
             PLItem *child = currentItem->child( i );
-            url = InputManager::decodeArtURL( child->inputItem() );
-            if( !url.isEmpty() )
+            artUrl = InputManager::decodeArtURL( child->inputItem() );
+            if( !artUrl.isEmpty() )
                 break;
         }
     }
 
-    QRect artRect = option.rect.adjusted( OFFSET - 1, 0, - OFFSET, - OFFSET *2 );
-    artpix = find_art_pixmap( url ); /* look in the QPixmapCache for art */
+    /*if( option.state & QStyle::State_Selected )
+         painter->fillRect(option.rect, option.palette.highlight());*/
+    QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem, &option,
+                                          painter );
 
-    QPainterPath artRectPath;
-    artRectPath.addRoundedRect( artRect, ART_RADIUS, ART_RADIUS );
+    // picture where all the rendering happens and which will be cached
+    QPixmap pix;
+
+    QString key = title + artist + artUrl;
+    if(QPixmapCache::find( key, pix ))
+    {
+        // cool, we found it in the cache
+        painter->drawPixmap( option.rect, pix );
+        return;
+    }
+
+    // load album art
+    QPixmap artPix;
+    if( artUrl.isEmpty() || !artPix.load( artUrl ) )
+        artPix = QPixmap( ":/noart64" );
+    else
+        artPix = artPix.scaled( ART_SIZE, ART_SIZE,
+                Qt::KeepAspectRatioByExpanding );
+
+    pix = QPixmap( RECT_SIZE, RECT_SIZE );
+    pix.fill( Qt::transparent );
+
+    QPainter *pixpainter = new QPainter( &pix );
+
+    pixpainter->setRenderHints(
+            QPainter::Antialiasing | QPainter::SmoothPixmapTransform );
 
     // Draw the drop shadow
-    painter->save();
-    painter->setOpacity( 0.7 );
-    painter->setBrush( QBrush( Qt::gray ) );
-    painter->drawRoundedRect( artRect.adjusted( 2, 2, 2, 2 ), ART_RADIUS, ART_RADIUS );
-    painter->restore();
+    pixpainter->save();
+    pixpainter->setOpacity( 0.7 );
+    pixpainter->setBrush( QBrush( Qt::gray ) );
+    pixpainter->drawRoundedRect( artRect.adjusted( 2, 2, 2, 2 ), ART_RADIUS, ART_RADIUS );
+    pixpainter->restore();
 
-    // Draw the art pixmap
-    painter->setClipPath( artRectPath );
-    painter->drawPixmap( artRect, artpix );
-    painter->setClipping( false );
+    // Draw the art pix
+    QPainterPath artRectPath;
+    artRectPath.addRoundedRect( artRect, ART_RADIUS, ART_RADIUS );
+    pixpainter->setClipPath( artRectPath );
+    pixpainter->drawPixmap( artRect, artPix );
+    pixpainter->setClipping( false );
 
     QColor text = qApp->palette().text().color();
-    QString title = qfu( input_item_GetTitleFbName( currentItem->inputItem() ) );
-    QString artist = qfu( input_item_GetArtist( currentItem->inputItem() ) );
 
-    painter->setPen( text );
+    // Draw title
+    pixpainter->setPen( text );
     QFont font;
     font.setPointSize( 7 );
     font.setItalic(true);
     font.setBold( index.data( Qt::FontRole ).value<QFont>().bold() );
-    painter->setFont( font );
-    QFontMetrics fm = painter->fontMetrics();
-    QRect titleRect = option.rect.adjusted( 1, ART_SIZE + 4, 0, -1 );
-    titleRect.setHeight( fm.height() + 2 );
+    pixpainter->setFont( font );
+    QFontMetrics fm = pixpainter->fontMetrics();
+    QRect textRect = drawRect.adjusted( 1, ART_SIZE + 4, 0, -1 );
+    textRect.setHeight( fm.height() + 2 );
 
-    painter->drawText( titleRect, fm.elidedText( title, Qt::ElideRight, titleRect.width() ),
-                       QTextOption( Qt::AlignCenter ) );
+    pixpainter->drawText( textRect,
+                      fm.elidedText( title, Qt::ElideRight, textRect.width() ),
+                      QTextOption( Qt::AlignCenter ) );
 
-    painter->setPen( text.lighter( 240 ) );
+    // Draw artist
+    pixpainter->setPen( text.lighter( 240 ) );
     font.setItalic( false );
-    painter->setFont( font );
-    fm = painter->fontMetrics();
-    QRect artistRect = option.rect.adjusted( 1, ART_SIZE + 4 + titleRect.height(), -1, -1 );
+    pixpainter->setFont( font );
+    fm = pixpainter->fontMetrics();
 
-    painter->drawText( artistRect, fm.elidedText( artist, Qt::ElideRight, artistRect.width() ),
-                       QTextOption( Qt::AlignCenter ) );
+
+    textRect = textRect.adjusted( 0, textRect.height(),
+                                    0, textRect.height() );
+    pixpainter->drawText(  textRect,
+                    fm.elidedText( artist, Qt::ElideRight, textRect.width() ),
+                    QTextOption( Qt::AlignCenter ) );
+
+    delete pixpainter; // Ensure all paint operations have finished
+
+    // Here real drawing happens
+    painter->drawPixmap( option.rect, pix );
+
+    // Cache the rendering
+    QPixmapCache::insert( key, pix );
 }
 
 QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
