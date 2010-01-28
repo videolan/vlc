@@ -191,7 +191,7 @@ static const char *const ppsz_title_modes[] =
  *****************************************************************************/
 vlc_module_begin ()
     set_capability( "sub filter", 1 )
-    set_shortname( "RSS / Atom" )
+    set_shortname( N_("RSS / Atom") )
     set_help(RSS_HELP)
     set_callbacks( CreateFilter, DestroyFilter )
     set_category( CAT_VIDEO )

@@ -55,11 +55,11 @@ vlc_module_begin ()
     set_category(CAT_VIDEO)
     set_subcategory(SUBCAT_VIDEO_VOUT)
 #ifdef MODULE_NAME_IS_wingapi
-    set_shortname("Windows GAPI")
+    set_shortname("GAPI")
     set_description(N_("Windows GAPI video output"))
     set_capability("vout display", 20)
 #else
-    set_shortname("Windows GDI")
+    set_shortname("GDI")
     set_description(N_("Windows GDI video output"))
     set_capability("vout display", 10)
 #endif

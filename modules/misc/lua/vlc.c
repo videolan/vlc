@@ -108,7 +108,7 @@ vlc_module_begin ()
         set_callbacks( Open_LuaIntf, Close_LuaIntf )
 
     add_submodule ()
-        set_shortname( "Lua Extension" )
+        set_shortname( N_("Lua Extension") )
         add_shortcut( "luaextension" )
         set_capability( "extension", 1 )
         set_callbacks( Open_Extension, Close_Extension )
