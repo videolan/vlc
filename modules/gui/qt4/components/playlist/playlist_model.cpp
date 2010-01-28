@@ -385,6 +385,11 @@ QModelIndex PLModel::index( int row, int column, const QModelIndex &parent )
         return QModelIndex();
 }
 
+QModelIndex PLModel::index( int i_id, int c )
+{
+  return index( findById( rootItem, i_id ), c );
+}
+
 /* Return the index of a given item */
 QModelIndex PLModel::index( PLItem *item, int column ) const
 {

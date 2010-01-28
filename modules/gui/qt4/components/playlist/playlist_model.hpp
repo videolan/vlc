@@ -82,6 +82,7 @@ public:
     /* Lookups */
     QStringList selectedURIs();
     QModelIndex index( PLItem *, int c ) const;
+    QModelIndex index( int i_id, int c );
     QModelIndex currentIndex( ) { return index( currentItem, 0 ); };
     bool isCurrent( const QModelIndex &index ) const;
     int itemId( const QModelIndex &index ) const;
