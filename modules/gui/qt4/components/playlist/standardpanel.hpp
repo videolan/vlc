@@ -78,6 +78,7 @@ private:
 
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
+    QSignalMapper *viewSelectionMapper;
 
     int last_activated_id;
 
@@ -102,7 +103,7 @@ private slots:
     void popupSelectColumn( QPoint );
     void popupPlView( const QPoint & );
     void toggleColumnShown( int );
-    void toggleView();
+    void showView( int );
     void activate( const QModelIndex & );
     void handleInputChange( input_thread_t * );
 };

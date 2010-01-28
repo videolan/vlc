@@ -97,25 +97,37 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     BUTTONACT( addButton, popupAdd() );
     layout->addWidget( addButton, 0, 3 );
 
+    /* Button to switch views */
     QPushButton *viewButton = new QPushButton( this );
-    viewButton->setIcon( QIcon( ":/buttons/playlist/playlist_add" ) );
+    viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogContentsView ) );
     layout->addWidget( viewButton, 0, 2 );
-    BUTTONACT( viewButton, toggleView() );
+
+    /* View selection menu */
+    viewSelectionMapper = new QSignalMapper;
+    CONNECT( viewSelectionMapper, mapped( int ), this, showView( int ) );
+
+    QActionGroup *actionGroup = new QActionGroup( this );
+
+    QAction *action = actionGroup->addAction( "Detailed view" );
+    action->setCheckable( true );
+    viewSelectionMapper->setMapping( action, TREE_VIEW );
+    CONNECT( action, triggered(), viewSelectionMapper, map() );
+
+    action = actionGroup->addAction( "Icon view" );
+    action->setCheckable( true );
+    viewSelectionMapper->setMapping( action, ICON_VIEW );
+    CONNECT( action, triggered(), viewSelectionMapper, map() );
+
+    QMenu *viewMenu = new QMenu( this );
+    viewMenu->addActions( actionGroup->actions() );
+
+    viewButton->setMenu( viewMenu );
 
     /* Saved Settings */
     getSettings()->beginGroup("Playlist");
 
     int i_viewMode = getSettings()->value( "view-mode", TREE_VIEW ).toInt();
-    if( i_viewMode == ICON_VIEW )
-    {
-        createIconView();
-        currentView = iconView;
-    }
-    else
-    {
-        createTreeView();
-        currentView = treeView;
-    }
+    showView( i_viewMode );
 
     getSettings()->endGroup();
 
@@ -348,27 +360,32 @@ void StandardPLPanel::createTreeView()
     layout->addWidget( treeView, 1, 0, 1, -1 );
 }
 
-void StandardPLPanel::toggleView()
+void StandardPLPanel::showView( int i_view )
 {
-    if( treeView && treeView->isVisible() )
+    switch( i_view )
+    {
+    case TREE_VIEW:
+    {
+        if( treeView == NULL )
+            createTreeView();
+        locationBar->setIndex( treeView->rootIndex() );
+        if( iconView ) iconView->hide();
+        treeView->show();
+        currentView = treeView;
+        break;
+    }
+    case ICON_VIEW:
     {
         if( iconView == NULL )
             createIconView();
 
         locationBar->setIndex( iconView->rootIndex() );
-        treeView->hide();
+        if( treeView ) treeView->hide();
         iconView->show();
         currentView = iconView;
+        break;
     }
-    else
-    {
-        if( treeView == NULL )
-            createTreeView();
-
-        locationBar->setIndex( treeView->rootIndex() );
-        iconView->hide();
-        treeView->show();
-        currentView = treeView;
+    default:;
     }
 }
 
