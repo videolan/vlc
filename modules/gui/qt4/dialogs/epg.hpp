@@ -29,6 +29,7 @@
 
 class QLabel;
 class EPGEvent;
+class EPGWidget;
 class EpgDialog : public QVLCFrame, public Singleton<EpgDialog>
 {
     Q_OBJECT;
@@ -36,6 +37,7 @@ private:
     EpgDialog( intf_thread_t * );
     virtual ~EpgDialog();
 
+    EPGWidget *epg;
     QLabel *description;
     QLabel *title;
 
@@ -43,6 +45,7 @@ private:
 
 private slots:
     void showEvent( EPGEvent * );
+    void update();
 };
 
 #endif

@@ -34,6 +34,9 @@
 #include <QGroupBox>
 #include <QPushButton>
 
+#include "qt4.hpp"
+#include "input_manager.hpp"
+
 EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 {
     setWindowTitle( "Program Guide" );
@@ -41,7 +44,7 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
     QVBoxLayout *layout = new QVBoxLayout( this );
     layout->setMargin( 0 );
     QSplitter *splitter = new QSplitter( this );
-    EPGWidget *epg = new EPGWidget( this );
+    epg = new EPGWidget( this );
     splitter->addWidget( epg );
     splitter->setOrientation(Qt::Vertical);
 
@@ -68,9 +71,14 @@ EpgDialog::EpgDialog( intf_thread_t *_p_intf ): QVLCFrame( _p_intf )
 
     CONNECT( epg, itemSelectionChanged( EPGEvent *), this, showEvent( EPGEvent *) );
 
+    QPushButton *update = new QPushButton( "Update" ); //Temporary to test
+    layout->addWidget( update, 0, Qt::AlignRight );
+    BUTTONACT( update, update() );
+
     QPushButton *close = new QPushButton( qtr( "&Close" ) );
     layout->addWidget( close, 0, Qt::AlignRight );
     BUTTONACT( close, close() );
+
 
     resize( 650, 400 );
 }
@@ -87,3 +95,11 @@ void EpgDialog::showEvent( EPGEvent *event )
     description->setText( event->description );
 }
 
+void EpgDialog::update()
+{
+    if( !THEMIM->getInput() ) return;
+
+    msg_Dbg( p_intf, "Found %i EPG items", input_GetItem( THEMIM->getInput())->i_epg);
+    epg->updateEPG( input_GetItem( THEMIM->getInput())->pp_epg, input_GetItem( THEMIM->getInput())->i_epg );
+
+}
