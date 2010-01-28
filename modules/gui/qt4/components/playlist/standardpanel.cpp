@@ -113,6 +113,10 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     }
 
     getSettings()->endGroup();
+
+    last_activated_id = -1;
+    CONNECT( THEMIM, inputChanged( input_thread_t * ),
+             this, handleInputChange( input_thread_t * ) );
 }
 
 StandardPLPanel::~StandardPLPanel()
@@ -363,13 +367,37 @@ void StandardPLPanel::wheelEvent( QWheelEvent *e )
 
 void StandardPLPanel::activate( const QModelIndex &index )
 {
-    if( model->hasChildren( index ) && currentView == iconView )
+    last_activated_id = model->itemId( index );
+    if( model->hasChildren( index ) )
     {
-        iconView->setRootIndex( index );
-        title->setText( index.data().toString() );
+        if( currentView == iconView ) {
+            iconView->setRootIndex( index );
+            title->setText( index.data().toString() );
+        }
     }
     else
     {
         model->activateItem( index );
     }
+}
+
+void StandardPLPanel::handleInputChange( input_thread_t *p_input_thread )
+{
+    input_item_t *p_input_item = input_GetItem( p_input_thread );
+    if( !p_input_item ) return;
+
+    playlist_Lock( THEPL );
+
+    playlist_item_t *p_item = playlist_ItemGetByInput( THEPL, p_input_item );
+
+    if( p_item  && p_item->p_parent &&
+        p_item->p_parent->i_id == last_activated_id )
+    {
+        QModelIndex index = model->index( p_item->p_parent->i_id, 0 );
+        iconView->setRootIndex( index );
+        title->setText( index.data().toString() );
+        last_activated_id = p_item->i_id;
+    }
+
+    playlist_Unlock( THEPL );
 }

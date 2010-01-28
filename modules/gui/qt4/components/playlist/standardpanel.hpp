@@ -76,6 +76,8 @@ private:
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
 
+    int last_activated_id;
+
     enum {
       TREE_VIEW = 0,
       ICON_VIEW,
@@ -99,6 +101,7 @@ private slots:
     void toggleColumnShown( int );
     void toggleView();
     void activate( const QModelIndex & );
+    void handleInputChange( input_thread_t * );
 };
 
 #endif
