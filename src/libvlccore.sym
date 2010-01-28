@@ -237,6 +237,7 @@ module_get_help
 module_get_name
 module_get_object
 module_get_score
+module_gettext
 module_hold
 module_list_free
 module_list_get

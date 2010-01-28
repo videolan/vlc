@@ -49,6 +49,9 @@
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
 #endif
+#ifdef ENABLE_NLS
+# include <libintl.h>
+#endif
 
 #include "config/configuration.h"
 
@@ -291,6 +294,24 @@ const char *module_get_capability( const module_t *m )
 int module_get_score( const module_t *m )
 {
     return m->i_score;
+}
+
+/**
+ * Translate a string using the module's text domain
+ *
+ * \param m the module
+ * \param str the American English ASCII string to localize
+ * \return the gettext-translated string
+ */
+const char *module_gettext (const module_t *m, const char *str)
+{
+#ifdef ENABLE_NLS
+    const char *domain = m->domain ? m->domain : PACKAGE_NAME;
+    return dgettext (domain, str);
+#else
+    (void)m;
+    return str;
+#endif
 }
 
 module_t *module_hold (module_t *m)
