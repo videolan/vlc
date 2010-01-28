@@ -437,7 +437,9 @@ void LocationBar::setIndex( const QModelIndex &index )
   {
       QToolButton *btn = new QToolButton;
       PLItem *item = model->getItem( i );
-      QString text = qfu(input_item_GetTitleFbName( item->inputItem() ));
+      char *fb_name = input_item_GetTitleFbName( item->inputItem() );
+      QString text = qfu(fb_name);
+      free(fb_name);
       text = QString("/ ") + metrics.elidedText( text, Qt::ElideRight, 150 );
       btn->setText( text );
       btn->setToolButtonStyle( Qt::ToolButtonTextBesideIcon );
