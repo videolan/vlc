@@ -224,6 +224,7 @@ struct demux_sys_t
 
     bool             b_get_param;   /* Does the server support GET_PARAMETER */
     bool             b_paused;      /* Are we paused? */
+    bool             b_error;
 
     float            f_seek_request;/* In case we receive a seek request while paused*/
 };
@@ -306,6 +307,7 @@ static int  Open ( vlc_object_t *p_this )
     p_sys->b_get_param = false;
     p_sys->b_paused = false;
     p_sys->f_seek_request = -1;
+    p_sys->b_error = false;
 
     /* parse URL for rtsp://[user:[passwd]@]serverip:port/options */
     vlc_UrlParse( &p_sys->url, p_sys->psz_path, 0 );
@@ -345,7 +347,7 @@ static int  Open ( vlc_object_t *p_this )
             int i_read = stream_Read( p_demux->s, &p_sdp[i_sdp],
                                       i_sdp_max - i_sdp - 1 );
 
-            if( !vlc_object_alive (p_demux) || p_demux->b_error )
+            if( !vlc_object_alive (p_demux) )
             {
                 free( p_sdp );
                 goto error;
@@ -503,7 +505,7 @@ static int Connect( demux_t *p_demux )
     }
 
 createnew:
-    if( !vlc_object_alive (p_demux) || p_demux->b_error )
+    if( !vlc_object_alive (p_demux) )
     {
         i_ret = VLC_EGENERIC;
         goto bailout;
@@ -674,7 +676,7 @@ static int SessionsSetup( demux_t *p_demux )
         Boolean bInit;
         live_track_t *tk;
 
-        if( !vlc_object_alive (p_demux) || p_demux->b_error )
+        if( !vlc_object_alive (p_demux) )
         {
             delete iter;
             return VLC_EGENERIC;
@@ -1227,7 +1229,7 @@ static int Demux( demux_t *p_demux )
         msg_Warn( p_demux, "no data received in 10s, eof ?" );
         return 0;
     }
-    return p_demux->b_error ? 0 : 1;
+    return p_sys->b_error ? 0 : 1;
 }
 
 /*****************************************************************************
@@ -1778,7 +1780,7 @@ static void StreamClose( void *p_private )
     msg_Dbg( p_demux, "StreamClose" );
 
     p_sys->event = 0xff;
-    p_demux->b_error = true;
+    p_sys->b_error = true;
 }
 
 
