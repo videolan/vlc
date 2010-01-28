@@ -100,6 +100,16 @@ NPN_Version(int* plugin_major, int* plugin_minor,
     *netscape_minor = gNetscapeFuncs.version & 0xFF;
 }
 
+void
+NPN_PluginThreadAsyncCall(NPP plugin,
+                          void (*func)(void *),
+                          void *userData)
+{
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) >= 20)
+    return (*gNetscapeFuncs.pluginthreadasynccall)(plugin, func, userData);
+#endif
+}
+
 NPError
 NPN_GetValue(NPP instance, NPNVariable variable, void *r_value)
 {
@@ -846,6 +856,10 @@ NP_Initialize(NPNetscapeFuncs* nsTable, NPPluginFuncs* pluginFuncs)
         gNetscapeFuncs.memfree       = nsTable->memfree;
         gNetscapeFuncs.memflush      = nsTable->memflush;
         gNetscapeFuncs.reloadplugins = nsTable->reloadplugins;
+#if (((NP_VERSION_MAJOR << 8) + NP_VERSION_MINOR) >= 20)
+        gNetscapeFuncs.pluginthreadasynccall =
+            nsTable->pluginthreadasynccall;
+#endif
 #ifdef OJI
         if( minor >= NPVERS_HAS_LIVECONNECT )
         {

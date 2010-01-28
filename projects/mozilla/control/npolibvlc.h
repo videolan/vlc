@@ -38,7 +38,8 @@ protected:
     inputObj(NULL),
     playlistObj(NULL),
     subtitleObj(NULL),
-    videoObj(NULL) {};
+    videoObj(NULL),
+    eventObj(NULL) {};
 
     virtual ~LibvlcRootNPObject();
 
@@ -58,6 +59,7 @@ private:
     NPObject *playlistObj;
     NPObject *subtitleObj;
     NPObject *videoObj;
+    NPObject *eventObj;
 };
 
 class LibvlcAudioNPObject: public RuntimeNPObject
@@ -261,4 +263,25 @@ protected:
     static const NPUTF8 * const methodNames[];
 
     InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
+};
+
+class LibvlcEventNPObject: public RuntimeNPObject
+{
+protected:
+    friend class RuntimeNPClass<LibvlcEventNPObject>;
+
+    LibvlcEventNPObject(NPP instance, const NPClass *aClass) :
+        RuntimeNPObject(instance, aClass) {};
+    virtual ~LibvlcEventNPObject() {};
+
+    static const int propertyCount;
+    static const NPUTF8 * const propertyNames[];
+
+    static const int methodCount;
+    static const NPUTF8 * const methodNames[];
+
+    InvokeResult invoke(int index, const NPVariant *args, uint32_t argCount, NPVariant &result);
+
+    bool parseArgs(const NPVariant *args, uint32_t argCount,
+                   eventtypes_bitmap_t &eventToGet);
 };

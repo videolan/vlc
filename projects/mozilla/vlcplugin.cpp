@@ -36,6 +36,7 @@
 #include "control/npolibvlc.h"
 
 #include <ctype.h>
+#include <string>
 
 /*****************************************************************************
  * VlcPlugin constructor and destructor
@@ -84,6 +85,48 @@ static bool boolValue(const char *value) {
     return ( !strcmp(value, "1") ||
              !strcasecmp(value, "true") ||
              !strcasecmp(value, "yes") );
+}
+
+void eventAsync(void *param)
+{
+    VlcPlugin *plugin = (VlcPlugin*)param;
+    NPVariant result;
+    NPVariant params[2];
+
+    pthread_mutex_lock(&plugin->mutex);
+
+    for (int i = 0; i < plugin->eventList.size(); i++)
+    {
+        for (int j = 0; j < plugin->eventListeners.size(); j++)
+        {
+            libvlc_event_type_t event = plugin->eventList[i];
+
+            if (plugin->eventListeners[j]->eventMap.have_event(event))
+            {
+                STRINGZ_TO_NPVARIANT(libvlc_event_type_name(event), params[0]);
+                params[1] = plugin->eventListeners[j]->id;
+                NPN_InvokeDefault(plugin->getBrowser(), plugin->eventListeners[j]->listener, params, 2, &result);
+                NPN_ReleaseVariantValue(&result);
+            }
+        }
+    }
+    plugin->eventList.clear();
+
+    pthread_mutex_unlock(&plugin->mutex);
+}
+
+void event_callback(const libvlc_event_t* event, void *param)
+{
+    VlcPlugin *plugin = (VlcPlugin*)param;
+
+    pthread_mutex_lock(&plugin->mutex);
+
+    if (plugin->eventToCatch.have_event(event->type))
+        plugin->eventList.push_back(event->type);
+
+    pthread_mutex_unlock(&plugin->mutex);
+
+    NPN_PluginThreadAsyncCall(plugin->getBrowser(), eventAsync, plugin);
 }
 
 NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
@@ -259,6 +302,9 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     /* new APIs */
     p_scriptClass = RuntimeNPClass<LibvlcRootNPObject>::getClass();
 
+    if (pthread_mutex_init(&mutex, NULL) != 0)
+        return NPERR_GENERIC_ERROR;
+
     return NPERR_NO_ERROR;
 }
 
@@ -274,6 +320,15 @@ VlcPlugin::~VlcPlugin()
         libvlc_media_list_release( libvlc_media_list );
     if( libvlc_instance )
         libvlc_release(libvlc_instance);
+    
+    for (int i = 0; i < eventListeners.size(); i++)
+    {
+        NPN_ReleaseObject(eventListeners[i]->listener);
+        NPN_ReleaseVariantValue(&(eventListeners[i]->id));
+        delete eventListeners[i];
+    }
+
+    pthread_mutex_destroy(&mutex);
 }
 
 /*****************************************************************************
@@ -336,6 +391,7 @@ int VlcPlugin::playlist_add_extended_untrusted( const char *mrl, const char *nam
 bool VlcPlugin::playlist_select( int idx, libvlc_exception_t *ex )
 {
     libvlc_media_t *p_m = NULL;
+    libvlc_event_manager_t *eventManager = NULL;
 
     libvlc_media_list_lock(libvlc_media_list);
 
@@ -360,7 +416,28 @@ bool VlcPlugin::playlist_select( int idx, libvlc_exception_t *ex )
 
     libvlc_media_player = libvlc_media_player_new_from_media(p_m,ex);
     if( libvlc_media_player )
+    {
         set_player_window();
+
+        // Registers the events we're interested in.
+        eventManager = libvlc_media_player_event_manager(libvlc_media_player, ex);
+
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerOpening, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerBuffering, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerPlaying, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerStopped, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerPaused, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerEndReached, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerForward, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerBackward, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerEndReached, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerEncounteredError, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerTimeChanged, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerPositionChanged, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerTitleChanged, event_callback, this, ex);
+        libvlc_event_attach(eventManager, libvlc_MediaPlayerSnapshotTaken, event_callback, this, ex);
+
+    }
 
     libvlc_media_release( p_m );
     return !libvlc_exception_raised(ex);
@@ -899,3 +976,20 @@ vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos
 }
 #undef BTN_SPACE
 #endif
+
+// Verifies the version of the NPAPI.
+// The eventListeners use a NPAPI function available
+// since Gecko 1.9.
+bool VlcPlugin::canUseEventListener()
+{
+    int plugin_major, plugin_minor;
+    int browser_major, browser_minor;
+
+    NPN_Version(&plugin_major, &plugin_minor,
+                &browser_major, &browser_minor);
+
+    if (browser_minor >= 19 || browser_major > 0)
+        return true;
+    return false;
+}
+

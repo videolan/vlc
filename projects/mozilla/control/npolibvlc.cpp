@@ -50,6 +50,71 @@
         return INVOKERESULT_GENERIC_ERROR; \
     } } while(false)
 
+#define ERROR_EVENT_NOT_FOUND "ERROR: One or more events could not be found."
+#define ERROR_API_VERSION "ERROR: NPAPI version not high enough. (Gecko >= 1.9 needed)"
+
+// Make a copy of an NPVariant.
+NPVariant copyNPVariant(const NPVariant& original)
+{
+    NPVariant res;
+
+    if (NPVARIANT_IS_STRING(original))
+        STRINGZ_TO_NPVARIANT(strdup(NPVARIANT_TO_STRING(original).utf8characters), res);
+    else if (NPVARIANT_IS_INT32(original))
+        INT32_TO_NPVARIANT(NPVARIANT_TO_INT32(original), res);
+    else if (NPVARIANT_IS_DOUBLE(original))
+        DOUBLE_TO_NPVARIANT(NPVARIANT_TO_DOUBLE(original), res);
+    else if (NPVARIANT_IS_OBJECT(original))
+    {
+        NPObject *obj = NPVARIANT_TO_OBJECT(original);
+        NPN_RetainObject(obj);
+        OBJECT_TO_NPVARIANT(obj, res);
+    }
+    else if (NPVARIANT_IS_BOOLEAN(original))
+        BOOLEAN_TO_NPVARIANT(NPVARIANT_TO_BOOLEAN(original), res);
+
+    return res;
+}
+
+// Parse an event Array given as a NPObject by JS.
+// This function is similar to LibvlcPlaylistNPObject::parseOptions,
+// but we don't use it because it's not clearly accessible and the FIXME flags
+// implie that it might be modified.
+bool parseEventArray(NPObject *obj, eventtypes_bitmap_t &eventToGet, NPP instance)
+{
+    NPIdentifier propId = NPN_GetStringIdentifier("length");
+    NPVariant value;
+
+    if (!NPN_GetProperty(instance, obj, propId, &value))
+        return false;
+
+    int count = NPVARIANT_TO_INT32(value);
+    NPN_ReleaseVariantValue(&value);
+    if (count == 0)
+        return false;
+
+    int nOptions = 0;
+    while (nOptions < count)
+    {
+        propId = NPN_GetIntIdentifier(nOptions);
+        // if there is no other string in the array.
+        if( ! NPN_GetProperty(instance, obj, propId, &value) )
+            break;
+
+        // if the element is not a string.
+        if( ! NPVARIANT_IS_STRING(value) )
+        {
+            NPN_ReleaseVariantValue(&value);
+            break;
+        }
+
+        if (!eventToGet.add_event(NPVARIANT_TO_STRING(value).utf8characters))
+            return false;
+        nOptions++;
+    }
+    return true;
+}
+
 /*
 ** implementation of libvlc root object
 */
@@ -80,6 +145,7 @@ const NPUTF8 * const LibvlcRootNPObject::propertyNames[] =
     "playlist",
     "subtitle",
     "video",
+    "events",
     "VersionInfo",
 };
 COUNTNAMES(LibvlcRootNPObject,propertyCount,propertyNames);
@@ -91,6 +157,7 @@ enum LibvlcRootNPObjectPropertyIds
     ID_root_playlist,
     ID_root_subtitle,
     ID_root_video,
+    ID_root_events,
     ID_root_VersionInfo,
 };
 
@@ -121,6 +188,14 @@ LibvlcRootNPObject::getProperty(int index, NPVariant &result)
             case ID_root_video:
                 InstantObj<LibvlcVideoNPObject>( videoObj );
                 OBJECT_TO_NPVARIANT(NPN_RetainObject(videoObj), result);
+                return INVOKERESULT_NO_ERROR;
+            case ID_root_events:
+                // create child object in lazyman fashion to avoid
+                // ownership problem with firefox
+                if( ! eventObj )
+                    eventObj = NPN_CreateObject(_instance,
+                             RuntimeNPClass<LibvlcEventNPObject>::getClass());
+                OBJECT_TO_NPVARIANT(NPN_RetainObject(eventObj), result);
                 return INVOKERESULT_NO_ERROR;
             case ID_root_VersionInfo:
                 return invokeResultString(libvlc_get_version(),result);
@@ -1986,3 +2061,125 @@ LibvlcDeinterlaceNPObject::invoke(int index, const NPVariant *args,
     return INVOKERESULT_NO_ERROR;
 }
 
+
+
+/*
+** implementation of libvlc event object
+*/
+
+const NPUTF8 * const LibvlcEventNPObject::propertyNames[] =
+{
+};
+
+enum LibvlcEventNPObjectPropertyIds
+{
+};
+COUNTNAMES(LibvlcEventNPObject,propertyCount,propertyNames);
+
+const NPUTF8 * const LibvlcEventNPObject::methodNames[] =
+{
+    "addListener",
+    "removeListeners",
+};
+COUNTNAMES(LibvlcEventNPObject,methodCount,methodNames);
+
+enum LibvlcEventNPObjectMethodIds
+{
+    ID_event_addListener,
+    ID_event_removeListeners,
+};
+
+bool LibvlcEventNPObject::parseArgs(const NPVariant *args, uint32_t argCount,
+                                    eventtypes_bitmap_t &eventToGet)
+{
+    if (argCount > 2)
+        eventToGet.clear();
+
+    for (int argIndex = 2; argIndex < argCount; argIndex++)
+    {
+        if (NPVARIANT_IS_STRING(args[argIndex]))
+        {
+            if (!eventToGet.add_event(NPVARIANT_TO_STRING(args[argIndex]).utf8characters))
+                return false;
+        }
+        else if (NPVARIANT_IS_OBJECT(args[argIndex]))
+        {
+            if (!parseEventArray(NPVARIANT_TO_OBJECT(args[argIndex]), eventToGet, _instance))
+                return false;
+        }
+        else
+            return false;
+    }
+    return true;
+}
+
+RuntimeNPObject::InvokeResult
+LibvlcEventNPObject::invoke(int index, const NPVariant *args,
+                            uint32_t argCount, NPVariant &result)
+{
+    /* is plugin still running */
+    if( isPluginRunning() )
+    {
+        libvlc_exception_t ex;
+        libvlc_exception_init(&ex);
+
+        switch( index )
+        {
+            case ID_event_addListener:
+                if (argCount >= 2)
+                {
+                    // Checks if the first argument is a NPObject
+                    if (!NPVARIANT_IS_OBJECT(args[0]))
+                        return INVOKERESULT_NO_SUCH_METHOD;
+
+                    // Checks if the browser has the NPAPI version 0.19 at least.
+                    if (!VlcPlugin::canUseEventListener())
+                    {
+                      NPN_SetException(this, strdup(ERROR_API_VERSION));
+                      return INVOKERESULT_GENERIC_ERROR;
+                    }
+
+                    VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+
+                    // Gets the binary field corresponding to the events the
+                    // listener must listen to if specified.
+                    // Else, listen to all events.
+                    eventtypes_bitmap_t eventToGet;
+                    eventToGet.set_all_events();
+
+                    if (!parseArgs(args, argCount, eventToGet))
+                    {
+                        NPN_SetException(this, strdup(ERROR_EVENT_NOT_FOUND));
+                        return INVOKERESULT_GENERIC_ERROR;
+                    }
+
+                    NPObject *listener = NPVARIANT_TO_OBJECT(args[0]);
+                    NPN_RetainObject(listener);
+
+                    EventListener *eventListener = new EventListener();
+                    eventListener->listener = listener;
+                    eventListener->id = copyNPVariant(args[1]);
+                    eventListener->eventMap = eventToGet;
+
+                    p_plugin->eventToCatch.add_event(eventToGet);
+
+                    p_plugin->eventListeners.push_back(eventListener);
+
+                    return INVOKERESULT_NO_ERROR;
+                }
+                return INVOKERESULT_NO_SUCH_METHOD;
+          case ID_event_removeListeners:
+              if (argCount == 0)
+              {
+                  VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
+                  p_plugin->eventListeners.clear();
+                  p_plugin->eventToCatch.clear();
+                  return INVOKERESULT_NO_ERROR;
+              }
+              return INVOKERESULT_NO_SUCH_METHOD;
+          default:
+              ;
+        }
+    }
+    return INVOKERESULT_GENERIC_ERROR;
+}

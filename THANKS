@@ -22,6 +22,7 @@ Alexey Salmin <alexey dot salmin at gmail dot com> - Russian localisation
 Alexis Ballier <aballlier at gentoo dot org> - Additional options in configure
 Alexis de Lattre <alexis at videolan dot org> - Documentation, packaging, IGMPv3 support and various fixes
 Amanpreet Singh Alam <aalam at users dot sf dot net> - Punjabi translation
+Amir Gouini <a.gouini at qiplay dot com> - VLC mozilla plugin event listerners.
 Andrea Guzzo <xant at xant dot net> - dc1394 firewire support
 André de Barros Martins Ribeiro <andrerib at ajato.com.br> - Brazilian portuguese localization
 Andre Pang <adre.pang at csiro dot au> - Annodex support
@@ -316,6 +317,7 @@ William Hawkins - Speex RTP payload format
 Xavier Maillard <zedek at fxgsproject.org> - audio converters
 Xavier Marchesini <xav at alarue.net> - Win32 fixes
 Xènia Albà Cantero <xenia_alba at hotmail.com> - Catalan translation
+Yannick Bréhon <y.brehon at qiplay dot com> - VLC mozilla plugin event listerners.
 Ye zhang <yzhang90003 _at_ gmail dot com> - Fix for VLM RTSP concurent LEAVE make VLC crash
 Yuehua Zhao <zhao908@hotmail.com> - real video codec
 Yuksel Yildirim <xleopar at yahoo d0t com> - Turkish localisation
