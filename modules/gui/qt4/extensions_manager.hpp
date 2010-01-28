@@ -41,16 +41,6 @@ class ExtensionsDialogProvider;
 class ExtensionsManager : public QObject
 {
     Q_OBJECT
-
-private:
-    static ExtensionsManager* instance;
-    intf_thread_t *p_intf;
-    extensions_manager_t *p_extensions_manager;
-    ExtensionsDialogProvider *p_edp;
-
-    QSignalMapper *menuMapper;
-    bool b_unloading;  ///< Work around threads + emit issues, see isUnloading
-
 public:
     static ExtensionsManager *getInstance( intf_thread_t *_p_intf,
                                            QObject *_parent = 0 )
@@ -69,15 +59,27 @@ public:
     virtual ~ExtensionsManager();
 
     inline bool isLoaded() { return p_extensions_manager != NULL; }
+    inline bool cannotLoad() { return b_unloading || b_failed; }
     inline bool isUnloading() { return b_unloading; }
     void menu( QMenu *current );
 
 public slots:
-    void loadExtensions();
+    bool loadExtensions();
     void unloadExtensions();
+    void reloadExtensions();
 
 private slots:
     void triggerMenu( int id );
+
+private:
+    static ExtensionsManager* instance;
+    intf_thread_t *p_intf;
+    extensions_manager_t *p_extensions_manager;
+    ExtensionsDialogProvider *p_edp;
+
+    QSignalMapper *menuMapper;
+    bool b_unloading;  ///< Work around threads + emit issues, see isUnloading
+    bool b_failed; ///< Flag set to true if we could not load the module
 };
 
 #endif // EXTENSIONS_MANAGER_HPP

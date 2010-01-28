@@ -47,6 +47,7 @@ ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
     menuMapper = new QSignalMapper( this );
     CONNECT( menuMapper, mapped( int ), this, triggerMenu( int ) );
     b_unloading = false;
+    b_failed = false;
 }
 
 ExtensionsManager::~ExtensionsManager()
@@ -58,14 +59,17 @@ ExtensionsManager::~ExtensionsManager()
     }
 }
 
-void ExtensionsManager::loadExtensions()
+bool ExtensionsManager::loadExtensions()
 {
     if( !p_extensions_manager )
     {
         p_extensions_manager = ( extensions_manager_t* )
                     vlc_object_create( p_intf, sizeof( extensions_manager_t ) );
         if( !p_extensions_manager )
-            return;
+        {
+            b_failed = true;
+            return false;
+        }
         vlc_object_attach( p_extensions_manager, p_intf );
 
         p_extensions_manager->p_module =
@@ -74,7 +78,10 @@ void ExtensionsManager::loadExtensions()
         if( !p_extensions_manager->p_module )
         {
             msg_Err( p_intf, "Unable to load extensions module" );
-            return;
+            vlc_object_release( p_extensions_manager );
+            p_extensions_manager = NULL;
+            b_failed = true;
+            return false;
         }
 
         /* Initialize dialog provider */
@@ -83,10 +90,17 @@ void ExtensionsManager::loadExtensions()
         if( !p_edp )
         {
             msg_Err( p_intf, "Unable to create dialogs provider for extensions" );
-            return;
+            module_unneed( p_extensions_manager,
+                           p_extensions_manager->p_module );
+            vlc_object_release( p_extensions_manager );
+            p_extensions_manager = NULL;
+            b_failed = true;
+            return false;
         }
         b_unloading = false;
     }
+    b_failed = false;
+    return true;
 }
 
 void ExtensionsManager::unloadExtensions()
@@ -100,27 +114,24 @@ void ExtensionsManager::unloadExtensions()
     ExtensionsDialogProvider::killInstance();
 }
 
+void ExtensionsManager::reloadExtensions()
+{
+    unloadExtensions();
+    loadExtensions();
+}
+
 void ExtensionsManager::menu( QMenu *current )
 {
-    QAction *action;
     assert( current != NULL );
     if( !isLoaded() )
     {
-        // This case should not happen
-        action = current->addAction( qtr( "Extensions not loaded" ) );
-        action->setEnabled( false );
+        // This case can happen: do nothing
         return;
     }
 
-    /* Some useless message */
-    action = current->addAction( p_extensions_manager->extensions.i_size
-                                 ? qtr( "Extensions found:" )
-                                 : qtr( "No extensions found" ) );
-    action->setEnabled( false );
-    current->addSeparator();
-
     vlc_mutex_lock( &p_extensions_manager->lock );
 
+    QAction *action;
     extension_t *p_ext = NULL;
     int i_ext = 0;
     FOREACH_ARRAY( p_ext, p_extensions_manager->extensions )
@@ -186,11 +197,6 @@ void ExtensionsManager::menu( QMenu *current )
     FOREACH_END()
 
     vlc_mutex_unlock( &p_extensions_manager->lock );
-
-    /* Possibility to unload the module */
-    current->addSeparator();
-    current->addAction( QIcon( ":/menu/quit" ), qtr( "Unload extensions" ),
-                        this, SLOT( unloadExtensions() ) );
 }
 
 void ExtensionsManager::triggerMenu( int id )
