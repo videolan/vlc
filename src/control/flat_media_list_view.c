@@ -186,8 +186,7 @@ libvlc_media_list_flat_view( libvlc_media_list_t * p_mlist,
                                         flat_media_list_view_children_at_index,
                                         libvlc_media_list_flat_view,
                                         flat_media_list_view_release,
-                                        p_this_view_data,
-                                        p_e );
+                                        p_this_view_data );
     libvlc_media_list_lock( p_mlist );
     import_mlist_rec( p_mlv, p_mlist, p_e );
     libvlc_media_list_view_set_ml_notification_callback( p_mlv,

@@ -101,7 +101,7 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
     /* Add this to our media list */
     if( !p_md->p_subitems )
     {
-        p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance, NULL );
+        p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance );
         libvlc_media_list_set_media( p_md->p_subitems, p_md );
     }
     if( p_md->p_subitems )
@@ -346,7 +346,7 @@ libvlc_media_t * libvlc_media_new_as_node(
     p_md = libvlc_media_new_from_input_item( p_instance,
                 p_input_item, p_e );
 
-    p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance, NULL );
+    p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance );
 
     return p_md;
 }

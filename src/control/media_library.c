@@ -57,8 +57,7 @@ struct libvlc_media_library_t
  *       new (Public)
  **************************************************************************/
 libvlc_media_library_t *
-libvlc_media_library_new( libvlc_instance_t * p_inst,
-                          libvlc_exception_t * p_e )
+libvlc_media_library_new( libvlc_instance_t * p_inst )
 {
     libvlc_media_library_t * p_mlib;
 
@@ -131,9 +130,7 @@ libvlc_media_library_load( libvlc_media_library_t * p_mlib,
     if( p_mlib->p_mlist )
         libvlc_media_list_release( p_mlib->p_mlist );
 
-    p_mlib->p_mlist = libvlc_media_list_new(
-                        p_mlib->p_libvlc_instance,
-                        p_e );
+    p_mlib->p_mlist = libvlc_media_list_new( p_mlib->p_libvlc_instance );
 
     libvlc_media_list_add_file_content( p_mlib->p_mlist, psz_uri, p_e );
     free( psz_uri );

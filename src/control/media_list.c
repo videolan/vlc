@@ -151,8 +151,7 @@ int mlist_is_writable( libvlc_media_list_t *p_mlist, libvlc_exception_t *p_e )
  * Init an object.
  **************************************************************************/
 libvlc_media_list_t *
-libvlc_media_list_new( libvlc_instance_t * p_inst,
-                       libvlc_exception_t * p_e )
+libvlc_media_list_new( libvlc_instance_t * p_inst )
 {
     libvlc_media_list_t * p_mlist;
 

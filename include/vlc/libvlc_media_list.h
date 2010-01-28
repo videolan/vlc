@@ -49,11 +49,10 @@ typedef struct libvlc_media_list_view_t libvlc_media_list_view_t;
  * Create an empty media list.
  *
  * \param p_libvlc libvlc instance
- * \param p_e an initialized exception pointer
- * \return empty media list
+ * \return empty media list, or NULL on error
  */
 VLC_PUBLIC_API libvlc_media_list_t *
-    libvlc_media_list_new( libvlc_instance_t *, libvlc_exception_t * );
+    libvlc_media_list_new( libvlc_instance_t * );
 
 /**
  * Release media list created with libvlc_media_list_new().
@@ -213,16 +212,13 @@ VLC_PUBLIC_API libvlc_media_list_view_t *
  * Get a hierarchical media list view of media list items
  *
  * \param p_ml a media list instance
- * \param p_ex an exception instance
  * \return hierarchical media list view instance
  */
 VLC_PUBLIC_API libvlc_media_list_view_t *
-    libvlc_media_list_hierarchical_view( libvlc_media_list_t *,
-                                         libvlc_exception_t * );
+    libvlc_media_list_hierarchical_view( libvlc_media_list_t * );
 
 VLC_PUBLIC_API libvlc_media_list_view_t *
-    libvlc_media_list_hierarchical_node_view( libvlc_media_list_t * p_ml,
-                                              libvlc_exception_t * p_ex);
+    libvlc_media_list_hierarchical_node_view( libvlc_media_list_t * p_ml );
 
 /**
  * Get libvlc_event_manager from this media list instance.

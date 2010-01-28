@@ -107,8 +107,8 @@ static void test_media_list_player_items_queue(const char** argv, int argc)
     md = libvlc_media_new (vlc, file, &ex);
     catch ();
 
-    ml = libvlc_media_list_new (vlc, &ex);
-    catch ();
+    ml = libvlc_media_list_new (vlc);
+    assert (ml != NULL);
 
     mlp = libvlc_media_list_player_new (vlc, &ex);
     catch ();
@@ -178,8 +178,8 @@ static void test_media_list_player_previous(const char** argv, int argc)
     md = libvlc_media_new (vlc, file, &ex);
     catch ();
 
-    ml = libvlc_media_list_new (vlc, &ex);
-    catch ();
+    ml = libvlc_media_list_new (vlc);
+    assert (ml != NULL);
 
     mlp = libvlc_media_list_player_new (vlc, &ex);
     catch ();
@@ -255,8 +255,8 @@ static void test_media_list_player_next(const char** argv, int argc)
     md = libvlc_media_new (vlc, file, &ex);
     catch ();
 
-    ml = libvlc_media_list_new (vlc, &ex);
-    catch ();
+    ml = libvlc_media_list_new (vlc);
+    assert (ml != NULL);
 
     mlp = libvlc_media_list_player_new (vlc, &ex);
     catch ();
@@ -331,8 +331,8 @@ static void test_media_list_player_pause_stop(const char** argv, int argc)
     md = libvlc_media_new (vlc, file, &ex);
     catch ();
 
-    ml = libvlc_media_list_new (vlc, &ex);
-    catch ();
+    ml = libvlc_media_list_new (vlc);
+    assert (ml != NULL);
 
     mlp = libvlc_media_list_player_new (vlc, &ex);
 
@@ -378,8 +378,8 @@ static void test_media_list_player_play_item_at_index(const char** argv, int arg
     md = libvlc_media_new (vlc, file, &ex);
     catch ();
 
-    ml = libvlc_media_list_new (vlc, &ex);
-    catch ();
+    ml = libvlc_media_list_new (vlc);
+    assert (ml != NULL);
 
     mlp = libvlc_media_list_player_new (vlc, &ex);
 
@@ -458,23 +458,23 @@ static void test_media_list_player_playback_options (const char** argv, int argc
     md5 = libvlc_media_new (vlc, file, &ex);
     catch ();
 
-    ml = libvlc_media_list_new (vlc, &ex);
-    catch ();
+    ml = libvlc_media_list_new (vlc);
+    assert (ml != NULL);
 
-    ml2 = libvlc_media_list_new (vlc, &ex);
-    catch ();
+    ml2 = libvlc_media_list_new (vlc);
+    assert (ml2 != NULL);
 
-    ml3 = libvlc_media_list_new (vlc, &ex);
-    catch ();
+    ml3 = libvlc_media_list_new (vlc);
+    assert (ml3 != NULL);
 
-    ml4 = libvlc_media_list_new (vlc, &ex);
-    catch ();
+    ml4 = libvlc_media_list_new (vlc);
+    assert (ml4 != NULL);
 
-    ml5 = libvlc_media_list_new (vlc, &ex);
-    catch ();
+    ml5 = libvlc_media_list_new (vlc);
+    assert (ml5 != NULL);
 
-    ml6 = libvlc_media_list_new (vlc, &ex);
-    catch ();
+    ml6 = libvlc_media_list_new (vlc);
+    assert (ml6 != NULL);
 
     media_list_add_file_path (vlc, ml2, file);
     media_list_add_file_path (vlc, ml2, file);

@@ -184,7 +184,7 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
     }
 
     p_mdis->p_libvlc_instance = p_inst;
-    p_mdis->p_mlist = libvlc_media_list_new( p_inst, NULL );
+    p_mdis->p_mlist = libvlc_media_list_new( p_inst );
     p_mdis->p_mlist->b_read_only = true;
     p_mdis->running = false;
 

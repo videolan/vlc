@@ -303,8 +303,7 @@ libvlc_media_list_view_new( libvlc_media_list_t * p_mlist,
                             libvlc_media_list_view_children_at_index_func_t pf_children_at_index,
                             libvlc_media_list_view_constructor_func_t pf_constructor,
                             libvlc_media_list_view_release_func_t pf_release,
-                            void * this_view_data,
-                            libvlc_exception_t * p_e )
+                            void * this_view_data )
 {
     libvlc_media_list_view_t * p_mlv;
     p_mlv = calloc( 1, sizeof(libvlc_media_list_view_t) );

@@ -86,7 +86,7 @@ hierarch_media_list_view_children_at_index( libvlc_media_list_view_t * p_mlv,
     p_submlist = libvlc_media_subitems( p_md );
     libvlc_media_release( p_md );
     if( !p_submlist ) return NULL;
-    p_ret = libvlc_media_list_hierarchical_view( p_submlist, p_e );
+    p_ret = libvlc_media_list_hierarchical_view( p_submlist );
     libvlc_media_list_release( p_submlist );
 
     return p_ret;
@@ -162,8 +162,7 @@ hierarch_media_list_view_release( libvlc_media_list_view_t * p_mlv )
  *       libvlc_media_list_flat_view (Public)
  **************************************************************************/
 libvlc_media_list_view_t *
-libvlc_media_list_hierarchical_view( libvlc_media_list_t * p_mlist,
-                                     libvlc_exception_t * p_e )
+libvlc_media_list_hierarchical_view( libvlc_media_list_t * p_mlist )
 {
     trace("\n");
     libvlc_media_list_view_t * p_mlv;
@@ -173,8 +172,7 @@ libvlc_media_list_hierarchical_view( libvlc_media_list_t * p_mlist,
                                         hierarch_media_list_view_children_at_index,
                                         libvlc_media_list_hierarchical_view,
                                         hierarch_media_list_view_release,
-                                        NULL,
-                                        p_e );
+                                        NULL );
     libvlc_media_list_lock( p_mlist );
     libvlc_event_attach( p_mlv->p_mlist->p_event_manager,
                          libvlc_MediaListItemAdded,
