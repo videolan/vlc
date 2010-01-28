@@ -108,6 +108,7 @@ typedef struct vout_thread_sys_t vout_thread_sys_t;
 struct vout_thread_t
 {
     VLC_COMMON_MEMBERS
+    bool                b_error;
 
     /** \name Thread properties and locks */
     /**@{*/

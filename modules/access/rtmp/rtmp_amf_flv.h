@@ -53,6 +53,7 @@ struct rtmp_control_thread_t
     VLC_COMMON_MEMBERS
 
     int fd;
+    bool b_error;
 
     vlc_url_t url;
     char *psz_application;

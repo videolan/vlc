@@ -128,7 +128,6 @@ void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
     p_priv->psz_name = NULL;
 
     p_new->b_die = false;
-    p_new->b_error = false;
     p_new->b_force = false;
 
     p_new->psz_header = NULL;

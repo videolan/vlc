@@ -267,6 +267,7 @@ struct input_thread_t
 {
     VLC_COMMON_MEMBERS
 
+    bool b_error;
     bool b_eof;
     bool b_preparsing;
     bool b_dead;

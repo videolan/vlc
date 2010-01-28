@@ -25,6 +25,7 @@ struct sout_stream_sys_t
     vlc_cond_t      cond;
     picture_t *     pp_pics[PICTURE_RING_SIZE];
     int             i_first_pic, i_last_pic;
+    bool            b_error;
 
     /* Audio */
     vlc_fourcc_t    i_acodec;   /* codec audio (0 if not transcode) */
