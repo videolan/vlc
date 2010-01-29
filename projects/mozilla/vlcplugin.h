@@ -30,8 +30,10 @@
 #define __VLCPLUGIN_H__
 
 #include <vlc/vlc.h>
+#include <pthread.h>
 #include <npapi.h>
 #include <vector>
+
 #include "control/nporuntime.h"
 
 #if !defined(XP_MACOSX) && !defined(XP_UNIX) && !defined(XP_WIN)
@@ -90,11 +92,7 @@ private:
     enum { bmax=M, bpu=1<<shift, mask=bpu-1, units=(bmax+bpu-1)/bpu };
     bitu_t bits[units];
 public:
-    bool get(size_t idx) const
-    {
-        return bits[idx>>shift]&(1<<(idx&mask));
-    }
-
+    bool get(size_t idx) const { return bits[idx>>shift]&(1<<(idx&mask)); }
     void set(size_t idx)       { bits[idx>>shift]|=  1<<(idx&mask);  }
     void reset(size_t idx)     { bits[idx>>shift]&=~(1<<(idx&mask)); }
     void toggle(size_t idx)    { bits[idx>>shift]^=  1<<(idx&mask);  }
@@ -102,86 +100,63 @@ public:
     void clear()               { memset(bits,0,sizeof(bits)); }
     bitmap() { clear(); }
     ~bitmap() { }
+    bool empty() const { // naive invert() will break this
+        for(size_t i=0;i<units;++i)
+            if(bits[i]) return false;
+        return true;
+    }
 };
 
-typedef bitmap<libvlc_num_event_types> parent;
+typedef bitmap<libvlc_num_event_types> eventtypes_bitmap_t;
 
-class eventtypes_bitmap_t: private bitmap<libvlc_num_event_types> {
+
+class EventObj: private eventtypes_bitmap_t
+{
 private:
     typedef libvlc_event_type_t event_t;
-    event_t find_event(const char *s) const
-    {
-        event_t i;
-        for(i=0;i<maxbit();++i)
-            if(!strcmp(s,libvlc_event_type_name(i)))
-                break;
-        return i;
-    }
-public:
-    bool add_event(const eventtypes_bitmap_t &eventBitmap)
-    {
-        event_t i;
-        for(i=0;i<maxbit();++i)
-            if (eventBitmap.have_event(i))
-                set(i);
-    }
-    bool add_event(const char *s)
-    {
-        if (!strcmp(s, "all"))
-        {
-            set_all_events();
-            return true;
-        }
-        if (!strcmp(s, "none"))
-        {
-            clear();
-            return true;
-        }
+    bool have_event(event_t e) const { return e<maxbit()?get(e):false; }
 
-        event_t event = find_event(s);
-        bool b = event<maxbit();
-        if(b) set(event);
-        return b;
-    }
-    bool del_event(const char *s)
+    class Listener: public eventtypes_bitmap_t
     {
-        event_t event=find_event(s);
-        bool b=event<maxbit();
-        if(b) reset(event);
-        return b;
-    }
-    bool have_event(libvlc_event_type_t event) const
-    {
-        return event<maxbit()?get(event):false;
-    }
-    void clear()
-    {
-        parent::clear();
-    }
-    void set_all_events()
-    {
-        event_t i;
-        for(i=0;i<maxbit();++i)
-            set(i);
-    }
+    public:
+        Listener(event_t e,NPObject *o,bool b): _l(o), _b(b)
+            { NPN_RetainObject(o); set(e); }
+        Listener(): _l(NULL), _b(false) { }
+        ~Listener() { if(_l) NPN_ReleaseObject(_l); }
+        NPObject *listener() const { return _l; }
+        bool bubble() const { return _b; }
+    private:
+        NPObject *_l;
+        bool _b;
+    };
+
+    libvlc_event_manager_t *_em;
+    libvlc_callback_t _cb;
+    void *_ud;
+public:
+    EventObj(): _em(NULL)  { /* deferred to init() */ }
+    bool init() { return pthread_mutex_init(&mutex, NULL) == 0; }
+    ~EventObj() { pthread_mutex_destroy(&mutex); }
+
+    void deliver(NPP browser);
+    void callback(const libvlc_event_t*);
+    bool insert(const NPString &, NPObject *, bool);
+    bool remove(const NPString &, NPObject *, bool);
+    void unhook_manager();
+    void hook_manager(libvlc_event_manager_t *,libvlc_callback_t, void *);
+private:
+    event_t find_event(const char *s) const;
+    typedef std::vector<Listener> lr_l;
+    typedef std::vector<libvlc_event_type_t> ev_l;
+    lr_l _llist;
+    ev_l _elist;
+
+    pthread_mutex_t mutex;
+
+    bool ask_for_event(event_t e);
+    void unask_for_event(event_t e);
 };
 
-
-// Structure used to represent an EventListener.
-// It contains the listener object that will be invoked,
-// An Id given by the addEventListener function and sent
-// when invoking the listener. Can be anything or nothing.
-// The profile associated with the listener used to invoke
-// the listener only to some events.
-typedef struct s_EventListener
-{
-    NPObject *listener;
-    NPVariant id;
-    eventtypes_bitmap_t eventMap;
-    
-} EventListener;
-
-void event_callback(const libvlc_event_t* event, void *param);
 
 class VlcPlugin
 {
@@ -302,14 +277,9 @@ public:
     bool  player_has_vout( libvlc_exception_t * );
 
 
-    // Events related members
-    std::vector<EventListener*> eventListeners; // List of registered listerners.
-    std::vector<libvlc_event_type_t> eventList; // List of event sent by VLC that must be returned to JS.
-    eventtypes_bitmap_t eventToCatch;
-    pthread_mutex_t mutex;
-
     static bool canUseEventListener();
 
+    EventObj events;
 private:
     bool playlist_select(int,libvlc_exception_t *);
     void set_player_window();
@@ -346,6 +316,9 @@ private:
 
     int i_last_position;
 #endif
+
+    static void eventAsync(void *);
+    static void event_callback(const libvlc_event_t *, void *);
 };
 
 /*******************************************************************************
