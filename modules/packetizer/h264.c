@@ -1129,7 +1129,7 @@ static void ParseSei( decoder_t *p_dec, block_t *p_frag )
             if( i_t35 >= 5 &&
                 !memcmp( p_t35, p_dvb1_data_start_code, sizeof(p_dvb1_data_start_code) ) )
             {
-                cc_Extract( &p_sys->cc_next, &p_t35[3], i_t35 - 3 );
+                cc_Extract( &p_sys->cc_next, true, &p_t35[3], i_t35 - 3 );
             }
         }
         i_used += i_size;

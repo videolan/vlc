@@ -453,17 +453,21 @@ static picture_t *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                              & PIC_MASK_CODING_TYPE) == PIC_FLAG_CODING_TYPE_B )
                     p_sys->i_cc_flags = BLOCK_FLAG_TYPE_B;
                 else p_sys->i_cc_flags = BLOCK_FLAG_TYPE_I;
+                bool b_top_field_first = p_sys->p_info->current_picture->flags
+                                           & PIC_FLAG_TOP_FIELD_FIRST;
 
                 if( p_sys->i_gop_user_data > 2 )
                 {
                     /* We now have picture info for any cached user_data out of the gop */
-                    cc_Extract( &p_sys->cc, &p_sys->p_gop_user_data[0], p_sys->i_gop_user_data );
+                    cc_Extract( &p_sys->cc, b_top_field_first,
+                                &p_sys->p_gop_user_data[0], p_sys->i_gop_user_data );
                     p_sys->i_gop_user_data = 0;
                 }
 
                 /* Extract the CC from the user_data of the picture */
                 if( p_info->user_data_len > 2 )
-                    cc_Extract( &p_sys->cc, &p_info->user_data[0], p_info->user_data_len );
+                    cc_Extract( &p_sys->cc, b_top_field_first,
+                                &p_info->user_data[0], p_info->user_data_len );
             }
         }
         break;

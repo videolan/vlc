@@ -630,7 +630,8 @@ static block_t *ParseMPEGBlock( decoder_t *p_dec, block_t *p_frag )
     }
     else if( p_frag->p_buffer[3] == 0xb2 && p_frag->i_buffer > 4 )
     {
-        cc_Extract( &p_sys->cc, &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
+        cc_Extract( &p_sys->cc, p_sys->i_top_field_first,
+                    &p_frag->p_buffer[4], p_frag->i_buffer - 4 );
     }
     else if( p_frag->p_buffer[3] == 0x00 )
     {

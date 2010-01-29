@@ -77,7 +77,7 @@ static inline void cc_AppendData( cc_data_t *c, int i_field, const uint8_t cc[2]
     c->p_data[c->i_data++] = cc[1];
 }
 
-static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
+static inline void cc_Extract( cc_data_t *c, bool b_top_field_first, const uint8_t *p_src, int i_src )
 {
     static const uint8_t p_cc_ga94[4] = { 0x47, 0x41, 0x39, 0x34 };
     static const uint8_t p_cc_dvd[4] = { 0x43, 0x43, 0x01, 0xf8 };
@@ -212,12 +212,15 @@ static inline void cc_Extract( cc_data_t *c, const uint8_t *p_src, int i_src )
             }
             bs_skip( &s, 1 );
 
-            if( i_field_idx != 1 && i_field_idx != 2 )
+            if( i_field_idx == 0 )
                 continue;
             if( c->i_data + 2*3 > CC_MAX_DATA_SIZE )
                 continue;
 
-            const int i_field = i_field_idx - 1;
+            /* 1,2,3 -> 0,1,0. I.E. repeated field 3 is merged with field 1 */
+            int i_field = ((i_field_idx - 1) & 1);
+            if (!b_top_field_first)
+                i_field ^= 1;
 
             cc_AppendData( c, i_field, &cc[0] );
         }
