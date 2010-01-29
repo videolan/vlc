@@ -197,7 +197,7 @@ static void AVI_IndexLoad    ( demux_t * );
 static void AVI_IndexCreate  ( demux_t * );
 static void AVI_IndexAddEntry( demux_sys_t *, int, avi_entry_t * );
 
-static void AVI_ExtractSubtitle( demux_t *, avi_chunk_list_t *, avi_chunk_STRING_t * );
+static void AVI_ExtractSubtitle( demux_t *, int i_stream, avi_chunk_list_t *, avi_chunk_STRING_t * );
 
 static mtime_t  AVI_MovieGetLength( demux_t * );
 
@@ -615,7 +615,7 @@ static int Open( vlc_object_t * p_this )
 
             case( AVIFOURCC_txts):
                 msg_Dbg( p_demux, "stream[%d] subtitle attachment", i );
-                AVI_ExtractSubtitle( p_demux, p_strl, p_strn );
+                AVI_ExtractSubtitle( p_demux, i, p_strl, p_strn );
                 free( tk );
                 continue;
 
@@ -1981,6 +1981,9 @@ static void AVI_ParseStreamHeader( vlc_fourcc_t i_id,
             case AVITWOCC_AC:
                 SET_PTR( pi_type, VIDEO_ES );
                 break;
+            case AVITWOCC_tx:
+                SET_PTR( pi_type, SPU_ES );
+                break;
             default:
                 SET_PTR( pi_type, UNKNOWN_ES );
                 break;
@@ -2497,6 +2500,7 @@ print_stat:
  * Subtitles
  *****************************************************************************/
 static void AVI_ExtractSubtitle( demux_t *p_demux,
+                                 int i_stream,
                                  avi_chunk_list_t *p_strl,
                                  avi_chunk_STRING_t *p_strn )
 {
@@ -2510,28 +2514,57 @@ static void AVI_ExtractSubtitle( demux_t *p_demux,
         goto exit;
 
     p_indx = AVI_ChunkFind( p_strl, AVIFOURCC_indx, 0 );
-    if( !p_indx )
-        goto exit;
-
     avi_chunk_t ck;
-    if( p_indx->i_indextype == AVI_INDEX_OF_INDEXES &&
-        p_indx->i_entriesinuse > 0 )
+    int64_t  i_position;
+    unsigned i_size;
+    if( p_indx )
     {
-        if( stream_Seek( p_demux->s, p_indx->idx.super[0].i_offset )||
-            AVI_ChunkRead( p_demux->s, &ck, NULL  ) )
+        if( p_indx->i_indextype == AVI_INDEX_OF_INDEXES &&
+            p_indx->i_entriesinuse > 0 )
+        {
+            if( stream_Seek( p_demux->s, p_indx->idx.super[0].i_offset )||
+                AVI_ChunkRead( p_demux->s, &ck, NULL  ) )
+                goto exit;
+            p_indx = &ck.indx;
+        }
+
+        if( p_indx->i_indextype != AVI_INDEX_OF_CHUNKS ||
+            p_indx->i_entriesinuse != 1 ||
+            p_indx->i_indexsubtype != 0 )
             goto exit;
-        p_indx = &ck.indx;
+
+        i_position  = p_indx->i_baseoffset +
+                      p_indx->idx.std[0].i_offset - 8;
+        i_size      = (p_indx->idx.std[0].i_size & 0x7fffffff) + 8;
+    }
+    else
+    {
+        avi_chunk_idx1_t *p_idx1;
+        uint64_t         i_offset;
+
+        if( AVI_IndexFind_idx1( p_demux, &p_idx1, &i_offset ) )
+            goto exit;
+
+        i_size = 0;
+        for( unsigned i = 0; i < p_idx1->i_entry_count; i++ )
+        {
+            const idx1_entry_t *e = &p_idx1->entry[i];
+            unsigned i_cat;
+            unsigned i_stream_idx;
+
+            AVI_ParseStreamHeader( e->i_fourcc, &i_stream_idx, &i_cat );
+            if( i_cat == SPU_ES && i_stream_idx == i_stream )
+            {
+                i_position = e->i_pos + i_offset;
+                i_size     = e->i_length + 8;
+                break;
+            }
+        }
+        if( i_size <= 0 )
+            goto exit;
     }
 
-    if( p_indx->i_indextype != AVI_INDEX_OF_CHUNKS ||
-        p_indx->i_entriesinuse != 1 ||
-        p_indx->i_indexsubtype != 0 )
-        goto exit;
-
     /* */
-    int64_t i_position  = p_indx->i_baseoffset +
-                          p_indx->idx.std[0].i_offset - 8;
-    unsigned i_size     = (p_indx->idx.std[0].i_size & 0x7fffffff) + 8;
     if( i_size > 1000000 )
         goto exit;
 
