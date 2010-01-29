@@ -61,13 +61,6 @@ NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state)
     return stateToStrings[state];
 }
 
-static inline libvlc_track_description_t *freeAndGetNextTrack(libvlc_track_description_t *track)
-{
-    libvlc_track_description_t *next = track->p_next;
-    libvlc_track_description_release(track);
-    return next;
-}
-
 /* libvlc event callback */
 static void HandleMediaInstanceVolumeChanged(const libvlc_event_t * event, void * self)
 {
@@ -328,8 +321,9 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     NSMutableArray *tempArray = [NSMutableArray array];
     while (currentTrack) {
         [tempArray addObject:[NSString stringWithUTF8String:currentTrack->psz_name]];
-        currentTrack = freeAndGetNextTrack(currentTrack);
+        currentTrack = currentTrack->p_next;
     }
+    libvlc_track_description_release(currentTrack);
     return [NSArray arrayWithArray: tempArray];
 }
 
@@ -525,8 +519,9 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     for (i = 0; i < count ; i++)
     {
         [tempArray addObject:[NSString stringWithUTF8String: tracks->psz_name]];
-        tracks = freeAndGetNextTrack(tracks);
+        tracks = tracks->p_next;
     }
+    libvlc_track_description_release(tracks);
     return [NSArray arrayWithArray: tempArray];
 }
 
@@ -575,8 +570,9 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     for (i = 0; i < [self countOfTitles] ; i++)
     {
         [tempArray addObject:[NSString stringWithUTF8String: tracks->psz_name]];
-        tracks = freeAndGetNextTrack(tracks);
+        tracks = tracks->p_next;
     }
+    libvlc_track_description_release(tracks);
     return [NSArray arrayWithArray: tempArray];
 }
 
@@ -619,8 +615,9 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     for (i = 0; i < count ; i++)
     {
         [tempArray addObject:[NSString stringWithUTF8String: tracks->psz_name]];
-        tracks = freeAndGetNextTrack(tracks);
+        tracks = tracks->p_next;
     }
+    libvlc_track_description_release(tracks);
 
     return [NSArray arrayWithArray: tempArray];
 }
