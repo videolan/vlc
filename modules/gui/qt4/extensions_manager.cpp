@@ -22,6 +22,7 @@
  *****************************************************************************/
 
 #include "extensions_manager.hpp"
+#include "input_manager.hpp"
 #include "dialogs/extensions.hpp"
 
 #include "assert.h"
@@ -46,6 +47,8 @@ ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
 
     menuMapper = new QSignalMapper( this );
     CONNECT( menuMapper, mapped( int ), this, triggerMenu( int ) );
+    CONNECT( THEMIM, inputChanged( input_thread_t* ),
+             this, inputChanged( input_thread_t* ) );
     b_unloading = false;
     b_failed = false;
 }
@@ -242,4 +245,25 @@ void ExtensionsManager::triggerMenu( int id )
 
         extension_TriggerMenu( p_extensions_manager, p_ext, i_action );
     }
+}
+
+void ExtensionsManager::inputChanged( input_thread_t* p_input )
+{
+    if( p_input )
+        vlc_object_hold( p_input );
+    vlc_mutex_lock( &p_extensions_manager->lock );
+
+    extension_t *p_ext;
+    FOREACH_ARRAY( p_ext, p_extensions_manager->extensions )
+    {
+        if( extension_IsActivated( p_extensions_manager, p_ext ) )
+        {
+            extension_SetInput( p_extensions_manager, p_ext, p_input );
+        }
+    }
+    FOREACH_END()
+
+    vlc_mutex_unlock( &p_extensions_manager->lock );
+    if( p_input )
+        vlc_object_release( p_input );
 }

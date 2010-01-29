@@ -78,6 +78,7 @@ public slots:
 
 private slots:
     void triggerMenu( int id );
+    void inputChanged( input_thread_t *p_input );
 
 private:
     static ExtensionsManager* instance;
