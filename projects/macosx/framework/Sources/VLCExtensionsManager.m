@@ -64,11 +64,13 @@ static VLCExtensionsManager *sharedManager = nil;
         return _extensions;
     _extensions = [[NSMutableArray alloc] init];
     extension_t *ext;
+    vlc_mutex_lock(&_instance->lock);
     FOREACH_ARRAY(ext, _instance->extensions)
         VLCExtension *extension = [[VLCExtension alloc] initWithInstance:ext];
         [_extensions addObject:extension];
         [extension release];
     FOREACH_END()
+    vlc_mutex_unlock(&_instance->lock);
     return _extensions;
 }
 
