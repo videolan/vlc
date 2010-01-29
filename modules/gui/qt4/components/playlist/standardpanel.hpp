@@ -76,6 +76,7 @@ private:
     PlIconView  *iconView;
     QAbstractItemView *currentView;
 
+    QAction *iconViewAction, *treeViewAction;
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
     QSignalMapper *viewSelectionMapper;
@@ -104,6 +105,7 @@ private slots:
     void popupPlView( const QPoint & );
     void toggleColumnShown( int );
     void showView( int );
+    void cycleViews();
     void activate( const QModelIndex & );
     void handleInputChange( input_thread_t * );
 };

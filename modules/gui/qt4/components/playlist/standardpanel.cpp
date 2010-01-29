@@ -108,16 +108,17 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     QActionGroup *actionGroup = new QActionGroup( this );
 
-    QAction *action = actionGroup->addAction( "Detailed view" );
-    action->setCheckable( true );
-    viewSelectionMapper->setMapping( action, TREE_VIEW );
-    CONNECT( action, triggered(), viewSelectionMapper, map() );
+    treeViewAction = actionGroup->addAction( "Detailed view" );
+    treeViewAction->setCheckable( true );
+    viewSelectionMapper->setMapping( treeViewAction, TREE_VIEW );
+    CONNECT( treeViewAction, triggered(), viewSelectionMapper, map() );
 
-    action = actionGroup->addAction( "Icon view" );
-    action->setCheckable( true );
-    viewSelectionMapper->setMapping( action, ICON_VIEW );
-    CONNECT( action, triggered(), viewSelectionMapper, map() );
+    iconViewAction = actionGroup->addAction( "Icon view" );
+    iconViewAction->setCheckable( true );
+    viewSelectionMapper->setMapping( iconViewAction, ICON_VIEW );
+    CONNECT( iconViewAction, triggered(), viewSelectionMapper, map() );
 
+    BUTTONACT( viewButton, cycleViews() );
     QMenu *viewMenu = new QMenu( this );
     viewMenu->addActions( actionGroup->actions() );
 
@@ -372,6 +373,7 @@ void StandardPLPanel::showView( int i_view )
         if( iconView ) iconView->hide();
         treeView->show();
         currentView = treeView;
+        treeViewAction->setChecked( true );
         break;
     }
     case ICON_VIEW:
@@ -383,10 +385,21 @@ void StandardPLPanel::showView( int i_view )
         if( treeView ) treeView->hide();
         iconView->show();
         currentView = iconView;
+        iconViewAction->setChecked( true );
         break;
     }
     default:;
     }
+}
+
+void StandardPLPanel::cycleViews()
+{
+    if( currentView == iconView )
+        showView( TREE_VIEW );
+    else if( currentView == treeView )
+        showView( ICON_VIEW );
+    else
+        assert( 0 );
 }
 
 void StandardPLPanel::wheelEvent( QWheelEvent *e )
