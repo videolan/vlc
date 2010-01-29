@@ -472,8 +472,10 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
             bool ok = LockExtension(p_ext);
             if (!ok)
                 return VLC_EGENERIC;
-            vlc_object_release(p_ext->p_sys->p_input);
-            p_ext->p_sys->p_input = vlc_object_hold(p_input);
+            input_thread_t *old = p_ext->p_sys->p_input;
+            if (old)
+                vlc_object_release(old);
+            p_ext->p_sys->p_input = p_input ? vlc_object_hold(p_input) : p_input;
             UnlockExtension(p_ext);
 
             return VLC_SUCCESS;
