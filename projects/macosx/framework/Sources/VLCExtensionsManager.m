@@ -13,6 +13,31 @@
 #import <vlc_extensions.h>
 #import <vlc_input.h>
 
+// Here comes the nasty hack.
+#import "../../../../src/control/media_player_internal.h"
+#import "../../../../src/control/libvlc_internal.h"
+
+static input_thread_t *libvlc_media_player_get_input_thread(libvlc_media_player_t *player)
+{
+    vlc_mutex_lock(&player->object_lock);
+    input_thread_t *input = player->p_input_thread;
+    if(input)
+        vlc_object_hold(input);
+    vlc_mutex_unlock(&player->object_lock);
+    return input;
+}
+
+static vlc_object_t *libvlc_get_vlc_instance(libvlc_instance_t *instance)
+{
+    vlc_mutex_lock(&instance->instance_lock);
+    libvlc_int_t *libvlc = instance->p_libvlc_int;
+    if(libvlc)
+        vlc_object_hold(libvlc);
+    vlc_mutex_unlock(&instance->instance_lock);
+    return VLC_OBJECT(libvlc);
+}
+
+
 #define _instance ((extensions_manager_t *)instance)
 
 @implementation VLCExtensionsManager
@@ -30,8 +55,6 @@ static VLCExtensionsManager *sharedManager = nil;
 
 - (void)dealloc
 {
-    vlc_object_t *libvlc = libvlc_get_vlc_instance([VLCLibrary sharedInstance]);
-    vlc_object_release(libvlc);
     module_unneed(_instance, _instance->p_module);
     vlc_object_release(_instance);
 
