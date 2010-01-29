@@ -83,7 +83,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QPixmap pix;
 
     QString key = title + artist + artUrl
-                  + QString( index.data( PLModel::IsCurrentRole ).toInt() );
+                  + QString( index.data( PLModel::IsCurrentRole ).toBool() );
     if(QPixmapCache::find( key, pix ))
     {
         // cool, we found it in the cache
@@ -108,7 +108,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
             QPainter::Antialiasing | QPainter::SmoothPixmapTransform |
             QPainter::TextAntialiasing );
 
-    if( index.data( PLModel::IsCurrentRole ).toInt() > 0 )
+    if( index.data( PLModel::IsCurrentRole ).toBool() )
     {
        pixpainter->save();
        pixpainter->setOpacity( 0.2 );
