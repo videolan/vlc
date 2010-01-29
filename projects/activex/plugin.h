@@ -260,7 +260,7 @@ public:
             return;
         if( _p_mlist )
             libvlc_media_list_release(_p_mlist);
-        _p_mlist = libvlc_media_list_new(_p_libvlc,ex);
+        _p_mlist = libvlc_media_list_new(_p_libvlc);
     }
     int  playlist_count(libvlc_exception_t *ex)
     {

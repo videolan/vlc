@@ -493,12 +493,7 @@ void VLCPlugin::initVLC()
     if( libvlc_exception_raised(&ex) )
         return;
 
-    _p_mlist = libvlc_media_list_new(_p_libvlc, &ex);
-    if( libvlc_exception_raised(&ex) )
-    {
-        libvlc_release(_p_libvlc);
-        return;
-    }
+    _p_mlist = libvlc_media_list_new(_p_libvlc);
 
     // initial volume setting
     libvlc_audio_set_volume(_p_libvlc, _i_volume, NULL);
