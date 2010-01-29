@@ -40,10 +40,12 @@ static const luaL_Reg p_reg[] =
  */
 #define EXT_HAS_MENU          (1 << 0)
 #define EXT_TRIGGER_ONLY      (1 << 1)
+#define EXT_INPUT_LISTENER    (1 << 2)
 
 const char* const ppsz_capabilities[] = {
     "menu",
     "trigger",
+    "input-listener",
     NULL
 };
 
@@ -469,17 +471,24 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
             p_ext = ( extension_t* ) va_arg( args, extension_t* );
             input_thread_t *p_input = va_arg( args, struct input_thread_t * );
 
-            bool ok = LockExtension(p_ext);
-            if (!ok)
+            if( !LockExtension( p_ext ) )
                 return VLC_EGENERIC;
-            input_thread_t *old = p_ext->p_sys->p_input;
-            if (old)
-                vlc_object_release(old);
-            p_ext->p_sys->p_input = p_input ? vlc_object_hold(p_input) : p_input;
-            UnlockExtension(p_ext);
 
-            return VLC_SUCCESS;
+            // Change input
+            input_thread_t *old = p_ext->p_sys->p_input;
+            if( old )
+                vlc_object_release( old );
+            p_ext->p_sys->p_input = p_input ? vlc_object_hold( p_input )
+                                            : p_input;
+
+            // Tell the script the input changed
+            if( p_ext->p_sys->i_capabilities & EXT_INPUT_LISTENER )
+                PushCommand( p_ext, CMD_SET_INPUT );
+
+            UnlockExtension( p_ext );
+            break;
         }
+
         default:
             msg_Err( p_mgr, "Control '%d' not yet implemented in Extension",
                      i_control );

@@ -342,6 +342,12 @@ static void* Run( void *data )
                         break;
                     }
 
+                    case CMD_SET_INPUT:
+                    {
+                        lua_ExecuteFunction( p_mgr, p_ext, "input_changed" );
+                        break;
+                    }
+
                     default:
                     {
                         msg_Dbg( p_mgr, "Unknown command in extension command queue: %d",

@@ -36,6 +36,7 @@ TYPEDEF_ARRAY( extension_t, array_extension_t );
 #define CMD_TRIGGERMENU 3    /* Arg1 = int*, pointing to id to trigger. free */
 #define CMD_CLICK       4    /* Arg1 = extension_widget_t* */
 #define CMD_CLOSE       5
+#define CMD_SET_INPUT   6    /* No arg. Just signal current input changed */
 
 struct extensions_manager_sys_t
 {
