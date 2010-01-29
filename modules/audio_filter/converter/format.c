@@ -320,8 +320,7 @@ static block_t *S24toFloat32( filter_t *p_filter, block_t *p_block )
     float *p_out;
     int i;
 
-    p_block_out =
-        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer * 4 / 3 );
+    p_block_out = filter_NewAudioBuffer( p_filter, p_block->i_buffer * 4 / 3 );
     if( !p_block_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
@@ -385,8 +384,7 @@ static block_t *S16toFloat32( filter_t *p_filter, block_t *p_block )
     float *p_out;
     int i;
 
-    p_block_out =
-        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer*2 );
+    p_block_out = filter_NewAudioBuffer( p_filter, p_block->i_buffer*2 );
     if( !p_block_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
@@ -430,8 +428,7 @@ static block_t *U16toFloat32( filter_t *p_filter, block_t *p_block )
     float *p_out;
     int i;
 
-    p_block_out =
-        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer*2 );
+    p_block_out = filter_NewAudioBuffer( p_filter, p_block->i_buffer*2 );
     if( !p_block_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
@@ -462,8 +459,7 @@ static block_t *S16toS24( filter_t *p_filter, block_t *p_block )
     uint8_t *p_in, *p_out;
     int i;
 
-    p_block_out =
-        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer*3/2 );
+    p_block_out = filter_NewAudioBuffer( p_filter, p_block->i_buffer*3/2 );
     if( !p_block_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
@@ -608,7 +604,7 @@ static block_t *S8toU16( filter_t *p_filter, block_t *p_block )
     int i;
 
     p_block_out =
-        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer*2 );
+        filter_NewAudioBuffer( p_filter, p_block->i_buffer*2 );
     if( !p_block_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
@@ -638,8 +634,7 @@ static block_t *U8toS16( filter_t *p_filter, block_t *p_block )
     int16_t *p_out;
     int i;
 
-    p_block_out =
-        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer*2 );
+    p_block_out = filter_NewAudioBuffer( p_filter, p_block->i_buffer*2 );
     if( !p_block_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
@@ -670,8 +665,7 @@ static block_t *S8toS16( filter_t *p_filter, block_t *p_block )
     int16_t *p_out;
     int i;
 
-    p_block_out =
-        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer*2 );
+    p_block_out = filter_NewAudioBuffer( p_filter, p_block->i_buffer*2 );
     if( !p_block_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
@@ -701,8 +695,7 @@ static block_t *U8toU16( filter_t *p_filter, block_t *p_block )
     uint16_t *p_out;
     int i;
 
-    p_block_out =
-        p_filter->pf_audio_buffer_new( p_filter, p_block->i_buffer*2 );
+    p_block_out = filter_NewAudioBuffer( p_filter, p_block->i_buffer*2 );
     if( !p_block_out )
     {
         msg_Warn( p_filter, "can't get output buffer" );
