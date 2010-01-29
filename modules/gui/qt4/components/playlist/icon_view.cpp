@@ -105,7 +105,17 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QPainter *pixpainter = new QPainter( &pix );
 
     pixpainter->setRenderHints(
-            QPainter::Antialiasing | QPainter::SmoothPixmapTransform );
+            QPainter::Antialiasing | QPainter::SmoothPixmapTransform |
+            QPainter::TextAntialiasing );
+
+    if( index.data( PLModel::IsCurrentRole ).toInt() > 0 )
+    {
+       pixpainter->save();
+       pixpainter->setOpacity( 0.2 );
+       pixpainter->setBrush( QBrush( Qt::gray ) );
+       pixpainter->drawRoundedRect( 0, -1, RECT_SIZE, RECT_SIZE+1, ART_RADIUS, ART_RADIUS );
+       pixpainter->restore();
+    }
 
     // Draw the drop shadow
     pixpainter->save();
