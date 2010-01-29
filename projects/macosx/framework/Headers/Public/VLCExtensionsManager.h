@@ -15,8 +15,11 @@
     void *instance;
     NSMutableArray *_extensions;
     VLCMediaPlayer *_player;
+    void *_previousInput;
 }
 + (VLCExtensionsManager *)sharedManager;
 - (NSArray *)extensions;
 - (void)runExtension:(VLCExtension *)extension;
+
+@property (readwrite, retain) VLCMediaPlayer *mediaPlayer;
 @end

@@ -88,6 +88,12 @@ static VLCExtensionsManager *sharedManager = nil;
 - (void)mediaPlayerLikelyChangedInput
 {
     input_thread_t *input = _player ? libvlc_media_player_get_input_thread([_player libVLCMediaPlayer]) : NULL;
+
+    // Don't send more than appropriate
+    if (_previousInput == input)
+        return;
+    _previousInput = input;
+
     for(VLCExtension *extension in _extensions)
         extension_SetInput(_instance, [extension instance], input);
     if (input)
@@ -109,5 +115,10 @@ static VLCExtensionsManager *sharedManager = nil;
 
     if (player)
         [center addObserver:self selector:@selector(mediaPlayerLikelyChangedInput) name:VLCMediaPlayerStateChanged object:_player];
+}
+
+- (VLCMediaPlayer *)mediaPlayer
+{
+    return _player;
 }
 @end
