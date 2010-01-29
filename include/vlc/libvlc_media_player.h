@@ -502,15 +502,6 @@ VLC_PUBLIC_API void    libvlc_media_player_next_frame( libvlc_media_player_t *p_
                                                        libvlc_exception_t *p_e );
 
 
-/**
- * Access to libvlc core internal structure.
- *
- * This enables nasty hack. Use of this method is discouraged.
- *
- * \param player the libvlc_media_player_t instance
- * \return a libvlccore input_thread_t or NULL. The actual behaviour is not specified.
- */
-VLC_PUBLIC_API struct input_thread_t *libvlc_media_player_get_input_thread( libvlc_media_player_t *player );
 
 /**
  * Release (free) libvlc_track_description_t
