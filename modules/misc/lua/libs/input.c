@@ -57,10 +57,9 @@ input_thread_t * vlclua_get_input_internal( lua_State *L )
     if( p_extension )
     {
         input_thread_t *p_input = p_extension->p_sys->p_input;
-        if (p_input)
+        if( p_input )
         {
             vlc_object_hold(p_input);
-            UnlockExtension(p_extension);
             return p_input;
         }
     }
