@@ -56,7 +56,7 @@ typedef struct libvlc_track_description_t
     int   i_id;
     char *psz_name;
     struct libvlc_track_description_t *p_next;
-    
+
 } libvlc_track_description_t;
 
 /**
@@ -68,7 +68,7 @@ typedef struct libvlc_audio_output_t
     char *psz_name;
     char *psz_description;
     struct libvlc_audio_output_t *p_next;
-    
+
 } libvlc_audio_output_t;
 
 /**
@@ -204,14 +204,14 @@ VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t * );
  *
  * The object minimal_macosx expects is of kind NSObject and should
  * respect the protocol:
- * 
+ *
  * @protocol VLCOpenGLVideoViewEmbedding <NSObject>
  * - (void)addVoutSubview:(NSView *)view;
  * - (void)removeVoutSubview:(NSView *)view;
  * @end
  *
  * You can find a live example in VLCVideoView in VLCKit.framework.
- * 
+ *
  * \param p_mi the Media Player
  * \param drawable the NSView handler
  */
@@ -224,7 +224,7 @@ VLC_PUBLIC_API void libvlc_media_player_set_nsobject ( libvlc_media_player_t *p_
  * \return the NSView handler or 0 if none where set
  */
 VLC_PUBLIC_API void * libvlc_media_player_get_nsobject ( libvlc_media_player_t *p_mi );
-	
+
 /**
  * Set the agl handler where the media player should render its video output.
  *
