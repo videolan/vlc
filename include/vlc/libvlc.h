@@ -235,20 +235,6 @@ VLC_PUBLIC_API const char * libvlc_get_changeset(void);
 struct vlc_object_t;
 
 /**
- * Get the internal main VLC object.
- * Use of this function is usually a hack and should be avoided.
- * @note
- * You will need to link with libvlccore to make any use of the underlying VLC
- * object. The libvlccore programming and binary interfaces are not stable.
- * @warning
- * Remember to release the object with vlc_object_release().
- *
- * \param p_instance the libvlc instance
- * @return a VLC object of type "libvlc"
- */
-VLC_PUBLIC_API struct vlc_object_t *libvlc_get_vlc_instance(libvlc_instance_t *p_instance);
-
-/**
  * Frees an heap allocation (char *) returned by a LibVLC API.
  * If you know you're using the same underlying C run-time as the LibVLC
  * implementation, then you can call ANSI C free() directly instead.
