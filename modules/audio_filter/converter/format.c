@@ -596,43 +596,10 @@ static block_t *U8toS8( filter_t *p_filter, block_t *p_block )
 }
 
 /* */
-static block_t *S8toU16( filter_t *p_filter, block_t *p_block )
+static inline block_t *X8toX16( filter_t *p_filter, block_t *p_block,
+                                bool b_signed_src, bool b_signed_dst )
 {
     block_t *p_block_out;
-    int8_t *p_in;
-    uint16_t *p_out;
-    int i;
-
-    p_block_out =
-        filter_NewAudioBuffer( p_filter, p_block->i_buffer*2 );
-    if( !p_block_out )
-    {
-        msg_Warn( p_filter, "can't get output buffer" );
-        return NULL;
-    }
-
-    p_in = (int8_t *)p_block->p_buffer;
-    p_out = (uint16_t *)p_block_out->p_buffer;
-
-    for( i = p_block->i_buffer; i--; )
-        *p_out++ = ((*p_in++) + 128) << 8;
-
-    p_block_out->i_nb_samples = p_block->i_nb_samples;
-    p_block_out->i_dts = p_block->i_dts;
-    p_block_out->i_pts = p_block->i_pts;
-    p_block_out->i_length = p_block->i_length;
-    p_block_out->i_rate = p_block->i_rate;
-
-    block_Release( p_block );
-    return p_block_out;
-}
-
-static block_t *U8toS16( filter_t *p_filter, block_t *p_block )
-{
-    block_t *p_block_out;
-    uint8_t *p_in;
-    int16_t *p_out;
-    int i;
 
     p_block_out = filter_NewAudioBuffer( p_filter, p_block->i_buffer*2 );
     if( !p_block_out )
@@ -641,11 +608,30 @@ static block_t *U8toS16( filter_t *p_filter, block_t *p_block )
         return NULL;
     }
 
-    p_in = (uint8_t *)p_block->p_buffer;
-    p_out = (int16_t *)p_block_out->p_buffer;
-
-    for( i = p_block->i_buffer; i--; )
-        *p_out++ = ((*p_in++) - 128) << 8;
+    if( b_signed_src == b_signed_dst )
+    {
+        /* U8->U16 or S8->S16 */
+        uint8_t  *p_in  = (uint8_t *)p_block->p_buffer;
+        uint16_t *p_out = (uint16_t *)p_block_out->p_buffer;
+        for( int i = p_block->i_buffer; i--; )
+            *p_out++ = (*p_in++) << 8;
+    }
+    else if( b_signed_src )
+    {
+        /* S8->U16 */
+        int8_t   *p_in  = (int8_t *)p_block->p_buffer;
+        uint16_t *p_out = (uint16_t *)p_block_out->p_buffer;
+        for( int i = p_block->i_buffer; i--; )
+            *p_out++ = ((*p_in++) + 128) << 8;
+    }
+    else
+    {
+        /* U8->S16 */
+        uint8_t *p_in  = (uint8_t *)p_block->p_buffer;
+        int16_t *p_out = (int16_t *)p_block_out->p_buffer;
+        for( int i = p_block->i_buffer; i--; )
+            *p_out++ = ((*p_in++) - 128) << 8;
+    }
 
     p_block_out->i_nb_samples = p_block->i_nb_samples;
     p_block_out->i_dts = p_block->i_dts;
@@ -656,67 +642,24 @@ static block_t *U8toS16( filter_t *p_filter, block_t *p_block )
     block_Release( p_block );
     return p_block_out;
 }
-
-
 static block_t *S8toS16( filter_t *p_filter, block_t *p_block )
 {
-    block_t *p_block_out;
-    int8_t *p_in;
-    int16_t *p_out;
-    int i;
-
-    p_block_out = filter_NewAudioBuffer( p_filter, p_block->i_buffer*2 );
-    if( !p_block_out )
-    {
-        msg_Warn( p_filter, "can't get output buffer" );
-        return NULL;
-    }
-
-    p_in = (int8_t *)p_block->p_buffer;
-    p_out = (int16_t *)p_block_out->p_buffer;
-
-    for( i = p_block->i_buffer; i--; )
-        *p_out++ = (*p_in++) << 8;
-
-    p_block_out->i_nb_samples = p_block->i_nb_samples;
-    p_block_out->i_dts = p_block->i_dts;
-    p_block_out->i_pts = p_block->i_pts;
-    p_block_out->i_length = p_block->i_length;
-    p_block_out->i_rate = p_block->i_rate;
-
-    block_Release( p_block );
-    return p_block_out;
+    return X8toX16( p_filter, p_block, true, true );
 }
-
 static block_t *U8toU16( filter_t *p_filter, block_t *p_block )
 {
-    block_t *p_block_out;
-    uint8_t *p_in;
-    uint16_t *p_out;
-    int i;
-
-    p_block_out = filter_NewAudioBuffer( p_filter, p_block->i_buffer*2 );
-    if( !p_block_out )
-    {
-        msg_Warn( p_filter, "can't get output buffer" );
-        return NULL;
-    }
-
-    p_in = (uint8_t *)p_block->p_buffer;
-    p_out = (uint16_t *)p_block_out->p_buffer;
-
-    for( i = p_block->i_buffer; i--; )
-        *p_out++ = (*p_in++) << 8;
-
-    p_block_out->i_nb_samples = p_block->i_nb_samples;
-    p_block_out->i_dts = p_block->i_dts;
-    p_block_out->i_pts = p_block->i_pts;
-    p_block_out->i_length = p_block->i_length;
-    p_block_out->i_rate = p_block->i_rate;
-
-    block_Release( p_block );
-    return p_block_out;
+    return X8toX16( p_filter, p_block, true, true );
 }
+static block_t *S8toU16( filter_t *p_filter, block_t *p_block )
+{
+    return X8toX16( p_filter, p_block, true, false );
+}
+static block_t *U8toS16( filter_t *p_filter, block_t *p_block )
+{
+    return X8toX16( p_filter, p_block, false, true );
+}
+
+
 
 /*****************************************************************************
  * Swap a buffer of words
