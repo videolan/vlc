@@ -2157,51 +2157,56 @@ static void AVI_IndexAddEntry( demux_sys_t *p_sys,
     tk->p_index[tk->i_idxnb++] = *p_index;
 }
 
-static int AVI_IndexLoad_idx1( demux_t *p_demux )
+static int AVI_IndexFind_idx1( demux_t *p_demux,
+                               avi_chunk_idx1_t **pp_idx1,
+                               uint64_t *pi_offset )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
 
-    avi_chunk_list_t    *p_riff;
-    avi_chunk_list_t    *p_movi;
-    avi_chunk_idx1_t    *p_idx1;
-
-    unsigned int i_stream;
-    unsigned int i_index;
-    off_t        i_offset;
-    unsigned int i;
-
-    bool b_keyset[100];
-
-    p_riff = AVI_ChunkFind( &p_sys->ck_root, AVIFOURCC_RIFF, 0);
-    p_idx1 = AVI_ChunkFind( p_riff, AVIFOURCC_idx1, 0);
-    p_movi = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0);
+    avi_chunk_list_t *p_riff = AVI_ChunkFind( &p_sys->ck_root, AVIFOURCC_RIFF, 0);
+    avi_chunk_idx1_t *p_idx1 = AVI_ChunkFind( p_riff, AVIFOURCC_idx1, 0);
 
     if( !p_idx1 )
     {
         msg_Warn( p_demux, "cannot find idx1 chunk, no index defined" );
         return VLC_EGENERIC;
     }
+    *pp_idx1 = p_idx1;
 
     /* *** calculate offset *** */
     /* Well, avi is __SHIT__ so test more than one entry
      * (needed for some avi files) */
-    i_offset = 0;
-    for( i = 0; i < __MIN( p_idx1->i_entry_count, 10 ); i++ )
+    avi_chunk_list_t *p_movi = AVI_ChunkFind( p_riff, AVIFOURCC_movi, 0);
+    *pi_offset = 0;
+    for( unsigned i = 0; i < __MIN( p_idx1->i_entry_count, 10 ); i++ )
     {
         if( p_idx1->entry[i].i_pos < p_movi->i_chunk_pos )
         {
-            i_offset = p_movi->i_chunk_pos + 8;
+            *pi_offset = p_movi->i_chunk_pos + 8;
             break;
         }
     }
+    return VLC_SUCCESS;
+}
 
-    /* Reset b_keyset */
-    for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
+static int AVI_IndexLoad_idx1( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    avi_chunk_idx1_t *p_idx1;
+    uint64_t         i_offset;
+    if( AVI_IndexFind_idx1( p_demux, &p_idx1, &i_offset ) )
+        return VLC_EGENERIC;
+
+    /* Init b_keyset */
+    bool b_keyset[100];
+    for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
         b_keyset[i_stream] = false;
 
-    for( i_index = 0; i_index < p_idx1->i_entry_count; i_index++ )
+    for( unsigned i_index = 0; i_index < p_idx1->i_entry_count; i_index++ )
     {
-        unsigned int i_cat;
+        unsigned i_cat;
+        unsigned i_stream;
 
         AVI_ParseStreamHeader( p_idx1->entry[i_index].i_fourcc,
                                &i_stream,
@@ -2222,14 +2227,14 @@ static int AVI_IndexLoad_idx1( demux_t *p_demux )
         }
     }
 
-    for( i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
+    for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {
         if( !b_keyset[i_stream] )
         {
             avi_track_t *tk = p_sys->track[i_stream];
 
             msg_Dbg( p_demux, "no key frame set for track %d", i_stream );
-            for( i_index = 0; i_index < tk->i_idxnb; i_index++ )
+            for( unsigned i_index = 0; i_index < tk->i_idxnb; i_index++ )
                 tk->p_index[i_index].i_flags |= AVIIF_KEYFRAME;
         }
     }
