@@ -64,8 +64,7 @@ NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state)
 static inline libvlc_track_description_t *freeAndGetNextTrack(libvlc_track_description_t *track)
 {
     libvlc_track_description_t *next = track->p_next;
-    free(track->psz_name);
-    free(track);
+    libvlc_track_description_release(track);
     return next;
 }
 
