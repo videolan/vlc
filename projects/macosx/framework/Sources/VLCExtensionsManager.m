@@ -104,6 +104,12 @@ static VLCExtensionsManager *sharedManager = nil;
 {
     if (_player == player)
         return;
+
+    // Don't set a NULL mediaPlayer.
+    // so that we always have an input around.
+    if (!player)
+        return;
+
     NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
     [center removeObserver:self name:VLCMediaPlayerStateChanged object:_player];
 
