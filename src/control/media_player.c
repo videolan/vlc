@@ -171,8 +171,8 @@ static void set_state( libvlc_media_player_t *p_mi, libvlc_state_t state,
         // Also set the state of the corresponding media
         // This is strictly for convenience.
         libvlc_media_set_state(media, state);
-        
-        libvlc_media_release(media);        
+
+        libvlc_media_release(media);
     }
 }
 
@@ -258,7 +258,7 @@ input_event_changed( vlc_object_t * p_this, char const * psz_cmd,
             default:
                 return VLC_SUCCESS;
         }
-        
+
         set_state( p_mi, libvlc_state, false );
         libvlc_event_send( p_mi->p_event_manager, &event );
     }
@@ -448,7 +448,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     if( p_mi->p_input_resource )
     {
         input_resource_Delete( p_mi->p_input_resource );
-        p_mi->p_input_resource = NULL;    
+        p_mi->p_input_resource = NULL;
     }
 
     libvlc_event_manager_release( p_mi->p_event_manager );
@@ -532,7 +532,7 @@ void libvlc_media_player_set_media(
     event.type = libvlc_MediaPlayerMediaChanged;
     event.u.media_player_media_changed.new_media = p_md;
     libvlc_event_send( p_mi->p_event_manager, &event );
-    
+
 }
 
 /**************************************************************************
