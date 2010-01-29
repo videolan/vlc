@@ -77,10 +77,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     if (self = [super init])
     {
         // Create a new libvlc media list instance
-        libvlc_exception_t p_e;
-        libvlc_exception_init( &p_e );
-        p_mlist = libvlc_media_list_new( [VLCLibrary sharedInstance], &p_e );
-        catch_exception( &p_e );
+        p_mlist = libvlc_media_list_new([VLCLibrary sharedInstance]);
 
         // Initialize internals to defaults
         cachedMedia = [[NSMutableArray alloc] init];
@@ -220,7 +217,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     if( hierarchicalAspect )
         return hierarchicalAspect;
 
-    libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_view( p_mlist, NULL );
+    libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_view(p_mlist);
     hierarchicalAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_mlv andMediaList:self] retain];
     libvlc_media_list_view_release( p_mlv );
     return hierarchicalAspect;
@@ -231,7 +228,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     if( hierarchicalNodeAspect )
         return hierarchicalNodeAspect;
 
-    libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_node_view( p_mlist, NULL );
+    libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_node_view(p_mlist);
     hierarchicalNodeAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_mlv andMediaList:self] retain];
     libvlc_media_list_view_release( p_mlv );
     return hierarchicalNodeAspect;
@@ -242,7 +239,7 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
     if( flatAspect )
         return flatAspect;
 
-    libvlc_media_list_view_t * p_mlv = libvlc_media_list_flat_view( p_mlist, NULL );
+    libvlc_media_list_view_t * p_mlv = libvlc_media_list_flat_view(p_mlist, NULL);
     flatAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_mlv andMediaList:self] retain];
     libvlc_media_list_view_release( p_mlv );
     return flatAspect;

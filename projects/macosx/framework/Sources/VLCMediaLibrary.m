@@ -44,14 +44,13 @@
 {
     if (self = [super init])
     {
+        mlib = libvlc_media_library_new( [VLCLibrary sharedInstance]);
+
         libvlc_exception_t p_e;
         libvlc_exception_init( &p_e );
-        mlib = libvlc_media_library_new( [VLCLibrary sharedInstance], &p_e );
-        catch_exception( &p_e );
-        
         libvlc_media_library_load( mlib, &p_e );
         catch_exception( &p_e );
-        
+
         allMedia = nil;
     }
     return self;
@@ -60,10 +59,10 @@
 - (void)dealloc
 {
     [allMedia release];
-    
+
     libvlc_media_library_release(mlib);
     mlib = nil;     // make sure that the pointer is dead
-    
+
     [super dealloc];
 }
 
