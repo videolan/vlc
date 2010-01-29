@@ -115,6 +115,18 @@ static void destroyProgressPanel (void *);
 @synthesize widget;
 @end
 
+@interface VLCDialogWindow : NSWindow
+{
+    extension_dialog_t *dialog;
+}
+@property (readwrite) extension_dialog_t *dialog;
+@end
+
+@implementation VLCDialogWindow
+@synthesize dialog;
+@end
+
+
 @interface VLCDialogList : NSTableView
 {
     extension_widget_t *widget;
@@ -464,16 +476,6 @@ static void destroyProgressPanel (void *);
     if (!canFlexWidth)
         size.width = minWidth;
     return size;
-}
-
-- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
-{
-    NSRect rect = NSMakeRect(0, 0, 0, 0);
-    rect.size = frameSize;
-    rect = [sender contentRectForFrameRect:rect];
-    rect.size = [self flexSize:rect.size];
-    rect = [sender frameRectForContentRect:rect];
-    return rect.size;
 }
 
 @end
@@ -911,6 +913,30 @@ bool checkProgressPanel (void *priv)
 
 }
 
+- (NSSize)windowWillResize:(NSWindow *)sender toSize:(NSSize)frameSize
+{
+    NSView *contentView = [sender contentView];
+    assert([contentView isKindOfClass:[VLCDialogGridView class]]);
+    VLCDialogGridView *gridView = contentView;
+
+    NSRect rect = NSMakeRect(0, 0, 0, 0);
+    rect.size = frameSize;
+    rect = [sender contentRectForFrameRect:rect];
+    rect.size = [gridView flexSize:rect.size];
+    rect = [sender frameRectForContentRect:rect];
+    return rect.size;
+}
+
+- (BOOL)windowShouldClose:(id)sender
+{
+    assert([sender isKindOfClass:[VLCDialogWindow class]]);
+    VLCDialogWindow *window = sender;
+    extension_dialog_t *dialog = [window dialog];
+    extension_DialogClosed(dialog);
+    dialog->p_sys_intf = NULL;
+    return YES;
+}
+
 static NSView *createControlFromWidget(extension_widget_t *widget, id self)
 {
     assert(!widget->p_sys_intf);
@@ -1183,16 +1209,17 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
     if (!dialog->i_width || !dialog->i_height)
         size = NSMakeSize(640, 480);
 
-    NSWindow *window = dialog->p_sys_intf;
+    VLCDialogWindow *window = dialog->p_sys_intf;
     if (!window && !shouldDestroy)
     {
         NSRect content = NSMakeRect(0, 0, 1, 1);
-        window = [[NSWindow alloc] initWithContentRect:content styleMask:NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask backing:NSBackingStoreBuffered defer:NO];
+        window = [[VLCDialogWindow alloc] initWithContentRect:content styleMask:NSTitledWindowMask | NSClosableWindowMask | NSResizableWindowMask backing:NSBackingStoreBuffered defer:NO];
+        [window setDelegate:self];
+        [window setDialog:dialog];
         [window setTitle:[NSString stringWithUTF8String:dialog->psz_title]];
         VLCDialogGridView *gridView = [[VLCDialogGridView alloc] init];
         [gridView setAutoresizingMask:NSViewHeightSizable | NSViewWidthSizable];
         [window setContentView:gridView];
-        [window setDelegate:gridView];
         [gridView release];
         dialog->p_sys_intf = window;
     }
@@ -1204,6 +1231,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
         [window setDelegate:nil];
         [window close];
         dialog->p_sys_intf = NULL;
+        window = nil;
     }
 
     if (!dialog->b_hide && ![window isVisible]) {
