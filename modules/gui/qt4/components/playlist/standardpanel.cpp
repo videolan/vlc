@@ -60,14 +60,12 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->setSpacing( 0 ); layout->setMargin( 0 );
     setMinimumWidth( 300 );
 
-    model = new PLModel( p_playlist, p_intf, p_root, this );
-    CONNECT( model, currentChanged( const QModelIndex& ),
-             this, handleExpansion( const QModelIndex& ) );
-
     iconView = NULL;
     treeView = NULL;
 
+    model = new PLModel( p_playlist, p_intf, p_root, this );
     currentRootId = -1;
+    last_activated_id = -1;
 
     /* Title label */
     /*title = new QLabel;
@@ -132,9 +130,11 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     getSettings()->endGroup();
 
-    last_activated_id = -1;
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
              this, handleInputChange( input_thread_t * ) );
+
+    CONNECT( model, currentChanged( const QModelIndex& ),
+             this, handleExpansion( const QModelIndex& ) );
 }
 
 StandardPLPanel::~StandardPLPanel()
