@@ -68,7 +68,6 @@ LRESULT CALLBACK Win32Proc( HWND hwnd, UINT uMsg, WPARAM wParam, LPARAM lParam )
             // If closing parent window
             if( wParam == SC_CLOSE )
             {
-                Win32Loop *pLoop = (Win32Loop*)Win32Loop::instance( p_intf );
                 libvlc_Quit( p_intf->p_libvlc );
                 return 0;
             }
