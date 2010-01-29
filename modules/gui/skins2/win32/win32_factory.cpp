@@ -190,7 +190,7 @@ bool Win32Factory::init()
     // We do it this way otherwise CreateWindowEx will fail
     // if WS_EX_LAYERED is not supported
     SetWindowLongPtr( m_hParentWindow, GWL_EXSTYLE,
-                      GetWindowLong( m_hParentWindow, GWL_EXSTYLE ) |
+                      GetWindowLongPtr( m_hParentWindow, GWL_EXSTYLE ) |
                       WS_EX_LAYERED );
 
     ShowWindow( m_hParentWindow, SW_SHOW );

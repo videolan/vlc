@@ -178,7 +178,7 @@ void Win32Window::setOpacity( uint8_t value ) const
         if( m_isLayered )
         {
             SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
-                GetWindowLong( m_hWnd, GWL_EXSTYLE ) & ~WS_EX_LAYERED );
+                GetWindowLongPtr( m_hWnd, GWL_EXSTYLE ) & ~WS_EX_LAYERED );
 
             // Redraw the window, otherwise we may end up with a grey rectangle
             // for some strange reason
@@ -197,7 +197,7 @@ void Win32Window::setOpacity( uint8_t value ) const
                 // (Re)Add the WS_EX_LAYERED attribute.
                 // Resizing will be very slow, now :)
                 SetWindowLongPtr( m_hWnd, GWL_EXSTYLE,
-                    GetWindowLong( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
+                    GetWindowLongPtr( m_hWnd, GWL_EXSTYLE ) | WS_EX_LAYERED );
 
                 // Redraw the window, otherwise we may end up with a grey
                 // rectangle for some strange reason
