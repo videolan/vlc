@@ -917,7 +917,7 @@ bool checkProgressPanel (void *priv)
 {
     NSView *contentView = [sender contentView];
     assert([contentView isKindOfClass:[VLCDialogGridView class]]);
-    VLCDialogGridView *gridView = contentView;
+    VLCDialogGridView *gridView = (VLCDialogGridView *)contentView;
 
     NSRect rect = NSMakeRect(0, 0, 0, 0);
     rect.size = frameSize;
@@ -1030,7 +1030,7 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
 
 }
 
-static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
+static void updateControlFromWidget(NSView *control, extension_widget_t *widget, id self)
 {
     switch (widget->type)
     {
@@ -1099,6 +1099,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
                 [popup addItemWithTitle:[NSString stringWithUTF8String:value->psz_text]];
             }
             [popup synchronizeTitleAndSelectedItem];
+            [self popUpSelectionChanged:popup];
             break;
         }
 
@@ -1157,7 +1158,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
         if (!control && !shouldDestroy)
         {
             control = createControlFromWidget(widget, self);
-            updateControlFromWidget(control, widget);
+            updateControlFromWidget(control, widget, self);
             widget->p_sys_intf = control;
             update = YES; // Force update and repositionning
             [control setHidden:widget->b_hide];
@@ -1165,7 +1166,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget)
 
         if (update && !shouldDestroy)
         {
-            updateControlFromWidget(control, widget);
+            updateControlFromWidget(control, widget, self);
             [control setHidden:widget->b_hide];
 
             int row = widget->i_row - 1;
