@@ -1223,3 +1223,15 @@ void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi, libvlc_excepti
         libvlc_printerr( "No active input" );
     }
 }
+
+/**************************************************************************
+ * get_input_thread (Public API version)
+ **************************************************************************/
+struct input_thread_t *libvlc_media_player_get_input_thread( libvlc_media_player_t *player )
+{
+    libvlc_exception_t e;
+    libvlc_exception_init(&e);
+    input_thread_t *input = libvlc_get_input_thread(player, &e);
+    clear_if_needed(&e);
+    return input;
+}
