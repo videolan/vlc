@@ -302,6 +302,7 @@ int event_attach( libvlc_event_manager_t * p_event_manager,
     fprintf( stderr, "This object event manager doesn't know about '%s' events",
              libvlc_event_type_name(event_type) );
     assert(0);
+    return -1;
 }
 
 /**************************************************************************
