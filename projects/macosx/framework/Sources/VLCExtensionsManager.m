@@ -11,6 +11,7 @@
 #import "VLCLibrary.h"
 #import "VLCLibVLCBridging.h"
 #import <vlc_extensions.h>
+#import <vlc_input.h>
 
 #define _instance ((extensions_manager_t *)instance)
 
@@ -34,6 +35,9 @@ static VLCExtensionsManager *sharedManager = nil;
     module_unneed(_instance, _instance->p_module);
     vlc_object_release(_instance);
 
+    [[NSNotificationCenter defaultCenter] removeObserver:self];
+
+    [_extensions release];
     [super dealloc];
 }
 
@@ -56,21 +60,21 @@ static VLCExtensionsManager *sharedManager = nil;
         vlc_object_release(libvlc);
     }
 
-    NSMutableArray *array = [NSMutableArray array];
+    if (_extensions)
+        return _extensions;
+    _extensions = [[NSMutableArray alloc] init];
     extension_t *ext;
     FOREACH_ARRAY(ext, _instance->extensions)
         VLCExtension *extension = [[VLCExtension alloc] initWithInstance:ext];
-        [array addObject:extension];
+        [_extensions addObject:extension];
         [extension release];
     FOREACH_END()
-    return array;
+    return _extensions;
 }
 
 - (void)runExtension:(VLCExtension *)extension
 {
     extension_t *ext = [extension instance];
-    NSLog(@"extension_TriggerOnly = %d", extension_TriggerOnly(_instance, ext));
-    NSLog(@"extension_IsActivated = %d", extension_IsActivated(_instance, ext));
 
     if(extension_TriggerOnly(_instance, ext))
         extension_Trigger(_instance, ext);
@@ -79,5 +83,31 @@ static VLCExtensionsManager *sharedManager = nil;
         if(!extension_IsActivated(_instance, ext))
             extension_Activate(_instance, ext);
     }
+}
+
+- (void)mediaPlayerLikelyChangedInput
+{
+    input_thread_t *input = _player ? libvlc_media_player_get_input_thread([_player libVLCMediaPlayer]) : NULL;
+    for(VLCExtension *extension in _extensions)
+        extension_SetInput(_instance, [extension instance], input);
+    if (input)
+        vlc_object_release(input);
+}
+
+- (void)setMediaPlayer:(VLCMediaPlayer *)player
+{
+    if (_player == player)
+        return;
+    NSNotificationCenter *center = [NSNotificationCenter defaultCenter];
+    [center removeObserver:self name:VLCMediaPlayerStateChanged object:_player];
+
+    [_player release];
+    _player = [player retain];
+
+    [self mediaPlayerLikelyChangedInput];
+
+
+    if (player)
+        [center addObserver:self selector:@selector(mediaPlayerLikelyChangedInput) name:VLCMediaPlayerStateChanged object:_player];
 }
 @end

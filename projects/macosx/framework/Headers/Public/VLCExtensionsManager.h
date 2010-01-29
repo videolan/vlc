@@ -9,9 +9,12 @@
 #import <Cocoa/Cocoa.h>
 
 @class VLCExtension;
+@class VLCMediaPlayer;
 
 @interface VLCExtensionsManager : NSObject {
     void *instance;
+    NSMutableArray *_extensions;
+    VLCMediaPlayer *_player;
 }
 + (VLCExtensionsManager *)sharedManager;
 - (NSArray *)extensions;

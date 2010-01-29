@@ -18,4 +18,5 @@
 
 - (NSString *)name;
 - (NSString *)title;
+
 @end

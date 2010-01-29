@@ -39,5 +39,4 @@
     return [NSString stringWithUTF8String:_instance->psz_title];
 }
 
-
 @end
