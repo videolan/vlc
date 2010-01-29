@@ -46,12 +46,24 @@
 #include "playlist.h"
 #include "../vlc.h"
 #include "../libs.h"
+#include "../extension.h"
 
 static const luaL_Reg vlclua_input_reg[];
 static const luaL_Reg vlclua_input_item_reg[];
 
 input_thread_t * vlclua_get_input_internal( lua_State *L )
 {
+    extension_t *p_extension = vlclua_extension_get( L );
+    if( p_extension )
+    {
+        input_thread_t *p_input = p_extension->p_sys->p_input;
+        if (p_input)
+        {
+            vlc_object_hold(p_input);
+            UnlockExtension(p_extension);
+            return p_input;
+        }
+    }
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     input_thread_t *p_input = playlist_CurrentInput( p_playlist );
     vlclua_release_playlist_internal( p_playlist );

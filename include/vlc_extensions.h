@@ -73,6 +73,7 @@ enum
     EXTENSION_TRIGGER_ONLY,   /**< arg1: extension_t*, arg2: bool* */
     EXTENSION_TRIGGER,        /**< arg1: extension_t* */
     EXTENSION_TRIGGER_MENU,   /**< arg1: extension_t*, int (uint16_t) */
+    EXTENSION_SET_INPUT,      /**< arg1: extension_t*, arg2 (input_thread_t) */
 };
 
 /**
@@ -141,6 +142,14 @@ static inline int extension_TriggerMenu( extensions_manager_t *p_mgr,
                                          uint16_t i )
 {
     return extension_Control( p_mgr, EXTENSION_TRIGGER_MENU, p_ext, i );
+}
+
+/** Trigger an entry of the extension menu */
+static inline int extension_SetInput( extensions_manager_t *p_mgr,
+                                        extension_t *p_ext,
+                                        struct input_thread_t *p_input )
+{
+    return extension_Control( p_mgr, EXTENSION_SET_INPUT, p_ext, p_input );
 }
 
 /** Can this extension only be triggered but not activated?

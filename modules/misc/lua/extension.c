@@ -26,6 +26,8 @@
 #include "extension.h"
 #include "assert.h"
 
+#include <vlc_input.h>
+
 /* Functions to register */
 static const luaL_Reg p_reg[] =
 {
@@ -462,6 +464,20 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
             i = ( int ) va_arg( args, int );
             return TriggerMenu( p_ext, i );
 
+        case EXTENSION_SET_INPUT:
+        {
+            p_ext = ( extension_t* ) va_arg( args, extension_t* );
+            input_thread_t *p_input = va_arg( args, struct input_thread_t * );
+
+            bool ok = LockExtension(p_ext);
+            if (!ok)
+                return VLC_EGENERIC;
+            vlc_object_release(p_ext->p_sys->p_input);
+            p_ext->p_sys->p_input = vlc_object_hold(p_input);
+            UnlockExtension(p_ext);
+
+            return VLC_SUCCESS;
+        }
         default:
             msg_Err( p_mgr, "Control '%d' not yet implemented in Extension",
                      i_control );

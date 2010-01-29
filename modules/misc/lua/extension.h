@@ -65,7 +65,11 @@ struct extension_sys_t
     vlc_mutex_t command_lock;
     vlc_mutex_t running_lock;
     vlc_cond_t wait;
-    bool b_exiting;
+
+    /* The input this extension should use for vlc.input
+     * or NULL if it should use playlist's current input */
+    struct input_thread_t *p_input;
+
     extensions_manager_t *p_mgr;     ///< Parent
     /* Queue of commands to execute */
     struct command_t
@@ -74,6 +78,8 @@ struct extension_sys_t
         void *data[10];         ///< Optional void* arguments
         struct command_t *next; ///< Next command
     } *command;
+
+    bool b_exiting;
 };
 
 /* Extensions: manager functions */
