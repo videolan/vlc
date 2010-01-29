@@ -321,7 +321,14 @@ static int OpenDecoder( vlc_object_t *p_this )
         i_result = VLC_EGENERIC;
     }
 
-    if( i_result == VLC_SUCCESS ) p_dec->p_sys->i_cat = i_cat;
+    if( i_result == VLC_SUCCESS )
+    {
+        p_dec->p_sys->i_cat = i_cat;
+        if( p_context->profile != FF_PROFILE_UNKNOWN)
+            p_dec->fmt_in.i_profile = p_context->profile;
+        if( p_context->level != FF_LEVEL_UNKNOWN)
+            p_dec->fmt_in.i_level = p_context->level;
+    }
 
     return i_result;
 }
