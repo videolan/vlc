@@ -98,7 +98,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->addWidget( addButton, 0, 3 );
 
     /* Button to switch views */
-    QPushButton *viewButton = new QPushButton( this );
+    QToolButton *viewButton = new QToolButton( this );
     viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogContentsView ) );
     layout->addWidget( viewButton, 0, 2 );
 
