@@ -356,7 +356,7 @@ int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
         }
     }
 
-    msg_Err( p_this, "could not create %s: %m", psz_dirname );
+    msg_Warn( p_this, "could not create %s: %m", psz_dirname );
     return -1;
 }
 
