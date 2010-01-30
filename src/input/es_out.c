@@ -243,7 +243,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     p_sys->p_input = p_input;
 
     p_sys->b_active = false;
-    p_sys->i_mode   = ES_OUT_MODE_AUTO;
+    p_sys->i_mode   = ES_OUT_MODE_NONE;
 
 
     TAB_INIT( p_sys->i_pgrm, p_sys->pgrm );

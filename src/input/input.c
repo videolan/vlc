@@ -1210,8 +1210,6 @@ static int Init( input_thread_t * p_input )
     /* Create es out */
     p_input->p->p_es_out_display = input_EsOutNew( p_input, p_input->p->i_rate );
     p_input->p->p_es_out         = input_EsOutTimeshiftNew( p_input, p_input->p->p_es_out_display, p_input->p->i_rate );
-    es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, false );
-    es_out_Control( p_input->p->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
 
     /* */
     input_ChangeState( p_input, OPENING_S );
