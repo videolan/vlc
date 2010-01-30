@@ -161,6 +161,7 @@ struct playlist_item_t
 #define PLAYLIST_RO_FLAG        0x0008    /**< Write-enabled ? */
 #define PLAYLIST_REMOVE_FLAG    0x0010    /**< Remove this item at the end */
 #define PLAYLIST_EXPANDED_FLAG  0x0020    /**< Expanded node */
+#define PLAYLIST_SUBITEM_STOP_FLAG 0x0040 /**< Must playlist stop if the item gets subitems ?*/
 
 /** Playlist status */
 typedef enum

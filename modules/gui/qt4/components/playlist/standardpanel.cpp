@@ -410,7 +410,6 @@ void StandardPLPanel::wheelEvent( QWheelEvent *e )
 
 void StandardPLPanel::activate( const QModelIndex &index )
 {
-    last_activated_id = model->getItem( index )->inputItem()->i_id;
     if( model->hasChildren( index ) )
     {
         if( currentView == iconView ) {
@@ -421,6 +420,11 @@ void StandardPLPanel::activate( const QModelIndex &index )
     }
     else
     {
+        playlist_Lock( THEPL );
+        playlist_item_t *p_item = playlist_ItemGetById( THEPL, model->itemId( index ) );
+        p_item->i_flags |= PLAYLIST_SUBITEM_STOP_FLAG;
+        last_activated_id = p_item->p_input->i_id;//model->getItem( index )->inputItem()->i_id;
+        playlist_Unlock( THEPL );
         model->activateItem( index );
     }
 }
@@ -435,12 +439,15 @@ void StandardPLPanel::browseInto( input_item_t *p_input )
     playlist_item_t *p_item = playlist_ItemGetByInput( THEPL, p_input );
     assert( p_item != NULL );
 
+    QModelIndex index = model->index( p_item->i_id, 0 );
     if( currentView == iconView ) {
-        QModelIndex index = model->index( p_item->i_id, 0 );
         iconView->setRootIndex( index );
         locationBar->setIndex( index );
     }
-    last_activated_id = p_item->pp_children[0]->p_input->i_id;
+    else
+        treeView->setExpanded( index, true );
+
+    last_activated_id = -1;
 
     playlist_Unlock( THEPL );
 }

@@ -82,8 +82,11 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
             return;
         }
 
+        bool b_stop = p_item_in_category->i_flags & PLAYLIST_SUBITEM_STOP_FLAG;
+
         b_play = b_play &&
-            p_item_in_category == get_current_status_item( p_playlist );
+            p_item_in_category == get_current_status_item( p_playlist ) &&
+            p_item_in_category->i_children == -1;
 
         /* If this item is already a node don't transform it */
         if( p_item_in_category->i_children == -1 )
@@ -100,6 +103,13 @@ static void input_item_subitem_added( const vlc_event_t * p_event,
 
         if( i_ret == VLC_SUCCESS && b_play )
         {
+            if( b_stop )
+            {
+                p_item_in_category->i_flags &= ~PLAYLIST_SUBITEM_STOP_FLAG;
+                PL_UNLOCK;
+                playlist_Stop( p_playlist );
+                return;
+            }
             playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                           pl_Locked, p_item_in_category, NULL );
         }
