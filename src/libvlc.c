@@ -804,7 +804,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         module_EndBank( p_libvlc, true );
         return VLC_EGENERIC;
     }
-    playlist_Activate( p_playlist );
 
     /* Add service discovery modules */
     psz_modules = var_InheritString( p_libvlc, "services-discovery" );
@@ -987,11 +986,11 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
 {
     libvlc_priv_t *priv = libvlc_priv (p_libvlc);
-    playlist_t    *p_playlist = priv->p_playlist;
+    playlist_t    *p_playlist = libvlc_priv (p_libvlc)->p_playlist;
 
     /* Deactivate the playlist */
     msg_Dbg( p_libvlc, "deactivating the playlist" );
-    playlist_Deactivate( p_playlist );
+    pl_Deactivate( p_libvlc );
 
     /* Remove all services discovery */
     msg_Dbg( p_libvlc, "removing all services discovery tasks" );
@@ -1010,13 +1009,8 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 #endif
 
-    /* Free playlist */
-    /* Any thread still running must not assume pl_Hold() succeeds. */
+    /* Free playlist now */
     msg_Dbg( p_libvlc, "removing playlist" );
-
-    libvlc_priv(p_libvlc)->p_playlist = NULL;
-    barrier();  /* FIXME is that correct ? */
-
     vlc_object_release( p_playlist );
 
     stats_TimersDumpAll( p_libvlc );

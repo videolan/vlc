@@ -255,11 +255,11 @@ enum pl_locked_state
 #define PL_UNLOCK playlist_Unlock( p_playlist )
 #define PL_ASSERT_LOCKED playlist_AssertLocked( p_playlist )
 
-VLC_EXPORT( playlist_t *, __pl_Hold, ( vlc_object_t * ) );
-#define pl_Hold( a ) __pl_Hold( VLC_OBJECT(a) )
+VLC_EXPORT( playlist_t *, pl_Hold, ( vlc_object_t * ) );
+#define pl_Hold( a ) pl_Hold( VLC_OBJECT(a) )
 
-VLC_EXPORT( void, __pl_Release, ( vlc_object_t * ) );
-#define pl_Release(a) __pl_Release( VLC_OBJECT(a) )
+VLC_EXPORT( void, pl_Release, ( vlc_object_t * ) );
+#define pl_Release(a) pl_Release( VLC_OBJECT(a) )
 
 /* Playlist control */
 #define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY, pl_Unlocked )
