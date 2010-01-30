@@ -674,9 +674,15 @@ static inline int ps_psm_fill( ps_psm_t *p_psm, block_t *p_pkt,
         if( ps_track_fill( &tk_tmp, p_psm, tk[i].i_id ) != VLC_SUCCESS )
             continue;
 
-        if( tk_tmp.fmt.i_codec == tk[i].fmt.i_codec ) continue;
+        if( tk_tmp.fmt.i_codec == tk[i].fmt.i_codec )
+        {
+            es_format_Clean( &tk_tmp.fmt );
+            continue;
+        }
 
         es_out_Del( out, tk[i].es );
+        es_format_Clean( &tk[i].fmt );
+
         tk[i] = tk_tmp;
         tk[i].b_seen = true;
         tk[i].es = es_out_Add( out, &tk[i].fmt );
