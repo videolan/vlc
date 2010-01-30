@@ -113,7 +113,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
     file = utf8_fopen( psz_filename, "rb" );
     if( !file )
     {
-        msg_Warn( p_this, "could not open plugins cache file %s for reading",
+        msg_Warn( p_this, "cannot read %s (%m)",
                   psz_filename );
         free( psz_filename );
         return;
