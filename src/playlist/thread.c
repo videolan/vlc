@@ -83,8 +83,8 @@ void playlist_Deactivate( playlist_t *p_playlist )
 
     msg_Dbg( p_playlist, "Deactivate" );
 
-    vlc_object_kill( p_playlist );
     PL_LOCK;
+    vlc_object_kill( p_playlist );
     vlc_cond_signal( &p_sys->signal );
     PL_UNLOCK;
 
