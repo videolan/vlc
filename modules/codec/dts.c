@@ -278,6 +278,14 @@ static void *DecodeBlock( decoder_t *p_dec, block_t **pp_block )
                 return NULL;
             }
 
+            if( p_sys->b_packetizer &&
+                p_header[0] == 0 && p_header[1] == 0 )
+            {
+                /* DTS wav files and audio CD's use stuffing */
+                p_sys->i_state = STATE_SEND_DATA;
+                break;
+            }
+
             if( SyncCode( p_header ) != VLC_SUCCESS )
             {
                 msg_Dbg( p_dec, "emulated sync word "
