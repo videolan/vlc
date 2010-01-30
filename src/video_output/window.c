@@ -61,6 +61,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
 #ifdef WIN32
     case VOUT_WINDOW_TYPE_HWND:
         type = "vout window hwnd";
+        window->handle.hwnd = NULL;
         break;
 #endif
     case VOUT_WINDOW_TYPE_XID:
