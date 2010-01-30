@@ -50,7 +50,7 @@
  *****************************************************************************/
 
 /* Base delay in micro second for interface sleeps */
-#define INTF_IDLE_SLEEP                 ((mtime_t)(0.050*CLOCK_FREQ))
+#define INTF_IDLE_SLEEP                 (CLOCK_FREQ/20)
 
 /* Step for changing gamma, and minimum and maximum values */
 #define INTF_GAMMA_STEP                 .1
@@ -64,7 +64,7 @@
 #define TRANSCODE_ACTIVITY 10
 
 /* Used in ErrorThread */
-#define INPUT_IDLE_SLEEP                ((mtime_t)(0.100*CLOCK_FREQ))
+#define INPUT_IDLE_SLEEP                (CLOCK_FREQ/10)
 
 /* Number of read() calls needed until we check the file size through
  * fstat() */
@@ -76,7 +76,7 @@
 
 /* Duration between the time we receive the data packet, and the time we will
  * mark it to be presented */
-#define DEFAULT_PTS_DELAY               (mtime_t)(.3*CLOCK_FREQ)
+#define DEFAULT_PTS_DELAY               (3*CLOCK_FREQ/10)
 
 /* DVD and VCD devices */
 #if !defined( WIN32 ) && !defined( UNDER_CE )
@@ -108,19 +108,19 @@
 
 /* Buffers which arrive in advance of more than AOUT_MAX_ADVANCE_TIME
  * will be considered as bogus and be trashed */
-#define AOUT_MAX_ADVANCE_TIME           (mtime_t)(DEFAULT_PTS_DELAY * 5)
+#define AOUT_MAX_ADVANCE_TIME           (DEFAULT_PTS_DELAY * 5)
 
 /* Buffers which arrive in advance of more than AOUT_MAX_PREPARE_TIME
  * will cause the calling thread to sleep */
-#define AOUT_MAX_PREPARE_TIME           (mtime_t)(.5*CLOCK_FREQ)
+#define AOUT_MAX_PREPARE_TIME           (CLOCK_FREQ/2)
 
 /* Buffers which arrive after pts - AOUT_MIN_PREPARE_TIME will be trashed
  * to avoid too heavy resampling */
-#define AOUT_MIN_PREPARE_TIME           (mtime_t)(.04*CLOCK_FREQ)
+#define AOUT_MIN_PREPARE_TIME           (CLOCK_FREQ/25)
 
 /* Max acceptable delay between the coded PTS and the actual presentation
  * time, without resampling */
-#define AOUT_PTS_TOLERANCE              (mtime_t)(.04*CLOCK_FREQ)
+#define AOUT_PTS_TOLERANCE              (CLOCK_FREQ/25)
 
 /* Max acceptable resampling (in %) */
 #define AOUT_MAX_RESAMPLING             10
@@ -131,7 +131,7 @@
 
 /* Buffer must avoid arriving more than SPU_MAX_PREPARE_TIME in advanced to
  * the SPU */
-#define SPU_MAX_PREPARE_TIME ((mtime_t)(0.5*CLOCK_FREQ))
+#define SPU_MAX_PREPARE_TIME            (CLOCK_FREQ/2)
 
 /*****************************************************************************
  * Video configuration
@@ -163,7 +163,7 @@
  * It should be approximately the time needed to perform a complete picture
  * loop. Since it only happens when the video heap is full, it does not need
  * to be too low, even if it blocks the decoder. */
-#define VOUT_OUTMEM_SLEEP               ((mtime_t)(0.020*CLOCK_FREQ))
+#define VOUT_OUTMEM_SLEEP               (CLOCK_FREQ/50)
 
 /* The default video output window title */
 #define VOUT_TITLE                      "VLC"
