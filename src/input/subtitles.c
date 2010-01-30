@@ -265,9 +265,18 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
     if( !strncmp( psz_name_org, "file://", 7 ) )
     {
         psz_name_org += 7;
+#if defined( WIN32 )
+        psz_name_org ++ ;
+#endif
         if( !strncmp( psz_name_org, "localhost", 9 ) )
             psz_name_org += 9;
     }
+
+#if (DIR_SEP_CHAR != '/')
+        /* Turn slashes into anti-slashes */
+        for( char *s = strchr( psz_name_org, '/' ); s; s = strchr( s + 1, '/' ) )
+            *s = DIR_SEP_CHAR;
+#endif
     char *psz_fname = decode_URI_duplicate( psz_name_org );
     if( !psz_fname )
         return NULL;
