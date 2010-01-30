@@ -454,45 +454,45 @@ void StandardPLPanel::browseInto( input_item_t *p_input )
 
 LocationBar::LocationBar( PLModel *m )
 {
-  model = m;
-  mapper = new QSignalMapper( this );
-  CONNECT( mapper, mapped( int ), this, invoke( int ) );
+    model = m;
+    mapper = new QSignalMapper( this );
+    CONNECT( mapper, mapped( int ), this, invoke( int ) );
 }
 
 void LocationBar::setIndex( const QModelIndex &index )
 {
-  clear();
-  QAction *prev = NULL;
-  QModelIndex i = index;
-  QFont font;
-  QFontMetrics metrics( font );
-  font.setBold( true );
-  while( true )
-  {
-      PLItem *item = model->getItem( i );
+    clear();
+    QAction *prev = NULL;
+    QModelIndex i = index;
+    QFont font;
+    QFontMetrics metrics( font );
+    font.setBold( true );
+    while( true )
+    {
+        PLItem *item = model->getItem( i );
 
-      QToolButton *btn = new QToolButton;
-      char *fb_name = input_item_GetTitleFbName( item->inputItem() );
-      QString text = qfu(fb_name);
-      free(fb_name);
-      text = QString("/ ") + metrics.elidedText( text, Qt::ElideRight, 150 );
-      btn->setText( text );
-      btn->setFont( font );
-      prev = insertWidget( prev, btn );
+        QToolButton *btn = new QToolButton;
+        char *fb_name = input_item_GetTitleFbName( item->inputItem() );
+        QString text = qfu(fb_name);
+        free(fb_name);
+        text = QString("/ ") + metrics.elidedText( text, Qt::ElideRight, 150 );
+        btn->setText( text );
+        btn->setFont( font );
+        prev = insertWidget( prev, btn );
 
-      mapper->setMapping( btn, item->id() );
-      CONNECT( btn, clicked( ), mapper, map( ) );
+        mapper->setMapping( btn, item->id() );
+        CONNECT( btn, clicked( ), mapper, map( ) );
 
-      font = QFont();
+        font = QFont();
 
-      if( i.isValid() ) i = i.parent();
-      else break;
-  }
+        if( i.isValid() ) i = i.parent();
+        else break;
+    }
 }
 
 void LocationBar::invoke( int i_id )
 {
-  QModelIndex index = model->index( i_id, 0 );
-  setIndex( index );
-  emit invoked ( index );
+    QModelIndex index = model->index( i_id, 0 );
+    setIndex( index );
+    emit invoked ( index );
 }
