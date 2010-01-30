@@ -624,6 +624,19 @@ size_t input_DecoderGetFifoSize( decoder_t *p_dec )
     return block_FifoSize( p_owner->p_fifo );
 }
 
+void input_DecoderGetObjects( decoder_t *p_dec,
+                              vout_thread_t **pp_vout, aout_instance_t **pp_aout )
+{
+    decoder_owner_sys_t *p_owner = p_dec->p_owner;
+
+    vlc_mutex_lock( &p_owner->lock );
+    if( pp_vout )
+        *pp_vout = vlc_object_hold( p_owner->p_vout );
+    if( pp_aout )
+        *pp_aout = vlc_object_hold( p_owner->p_aout );
+    vlc_mutex_unlock( &p_owner->lock );
+}
+
 /*****************************************************************************
  * Internal functions
  *****************************************************************************/

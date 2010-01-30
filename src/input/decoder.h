@@ -104,4 +104,11 @@ bool input_DecoderHasFormatChanged( decoder_t *p_dec, es_format_t *p_fmt, vlc_me
  */
 size_t input_DecoderGetFifoSize( decoder_t *p_dec );
 
+/**
+ * This function returns the objects associated to a decoder
+ *
+ * They must be released using vlc_object_release().
+ */
+void input_DecoderGetObjects( decoder_t *, vout_thread_t **, aout_instance_t ** );
+
 #endif

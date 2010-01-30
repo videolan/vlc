@@ -2459,6 +2459,32 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             return i_ret;
         }
 
+        case ES_OUT_GET_ES_OBJECTS_BY_ID:
+        {
+            const int i_id = va_arg( args, int );
+            es_out_id_t *p_es = EsOutGetFromID( out, i_id );
+            if( !p_es )
+                return VLC_EGENERIC;
+
+            vlc_object_t    **pp_decoder = va_arg( args, vlc_object_t ** );
+            vout_thread_t   **pp_vout    = va_arg( args, vout_thread_t ** );
+            aout_instance_t **pp_aout    = va_arg( args, aout_instance_t ** );
+            if( es->p_dec )
+            {
+                if( pp_decoder )
+                    *pp_decoder = vlc_object_hold( es->p_dec );
+                input_DecoderGetObjects( es->p_dec, pp_vout, pp_aout );
+            }
+            else
+            {
+                if( pp_vout )
+                    *pp_vout = NULL;
+                if( pp_aout )
+                    *pp_aout = NULL;
+            }
+            return VLC_SUCCESS;
+        }
+
         case ES_OUT_GET_BUFFERING:
             pb = (bool *)va_arg( args, bool* );
             *pb = p_sys->b_buffering;
