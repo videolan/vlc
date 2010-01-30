@@ -21,6 +21,10 @@
 //#include "widgetrenderer.h"
 #include "vlcloader.h"
 
+#ifdef PHONON_PULSESUPPORT
+#  include <phonon/pulsesupport.h>
+#endif
+
 /**
  * This class manages the list of currently active output devices.
  */
@@ -102,12 +106,29 @@ void DeviceManager::updateDeviceList()
     vlcExceptionRaised();
     libvlc_audio_output_t *p_start = p_ao_list;
 
+    bool checkpulse = false;
+#ifdef PHONON_PULSESUPPORT
+    PulseSupport *pulse = PulseSupport::getInstance();
+    checkpulse = pulse->isActive();
+#endif
+    bool haspulse = false;
     while (p_ao_list) {
+        if (checkpulse && 0 == strcmp(p_ao_list->psz_name, "pulse")) {
+            haspulse = true;
+            break;
+        }
         list.append(p_ao_list->psz_name);
         list_hw.append("");
         p_ao_list = p_ao_list->p_next;
     }
     libvlc_audio_output_list_release(p_start);
+
+
+#ifdef PHONON_PULSESUPPORT
+    if (haspulse)
+        return;
+    pulse->enable(false);
+#endif
 
     for (int i = 0 ; i < list.size() ; ++i) {
         QByteArray nameId = list.at(i);

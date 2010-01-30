@@ -28,6 +28,10 @@
 
 #include "vlcloader.h"
 
+#ifdef PHONON_PULSESUPPORT
+#  include <phonon/pulsesupport.h>
+#endif
+
 namespace Phonon
 {
 namespace VLC {
@@ -69,6 +73,15 @@ bool AudioOutput::setOutputDevice(int device)
 {
     if (i_device == device)
         return true;
+
+#ifdef PHONON_PULSESUPPORT
+    if (PulseSupport::getInstance()->isActive()) {
+        i_device = device;
+        libvlc_audio_output_set(vlc_instance, "pulse");
+        qDebug() << "set aout " << "pulse";
+        return true;
+    }
+#endif
 
     const QList<AudioDevice> deviceList = p_backend->deviceManager()->audioOutputDevices();
     if (device >= 0 && device < deviceList.size()) {

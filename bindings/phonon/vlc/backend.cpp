@@ -31,6 +31,10 @@
 #include "vlcloader.h"
 #include "vlcmediaobject.h"
 
+#ifdef PHONON_PULSESUPPORT
+#  include <phonon/pulsesupport.h>
+#endif
+
 #include <QtCore/QSet>
 #include <QtCore/QVariant>
 #include <QtCore/QtPlugin>
@@ -47,6 +51,13 @@ Backend::Backend(QObject *parent, const QVariantList &)
         , m_effectManager(NULL)
         , m_debugLevel(Debug)
 {
+#ifdef PHONON_PULSESUPPORT
+    // Initialise PulseAudio support
+    PulseSupport *pulse = PulseSupport::getInstance();
+    pulse->enable();
+    connect(pulse, SIGNAL(objectDescriptionChanged(ObjectDescriptionType)), SIGNAL(objectDescriptionChanged(ObjectDescriptionType)));
+#endif
+
     bool wasInit = vlcInit();
 
     setProperty("identifier",     QLatin1String("phonon_vlc"));
