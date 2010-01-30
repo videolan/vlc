@@ -109,7 +109,8 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
 
     while( i_out_nb )
     {
-        memcpy( p_out, p_in, i_sample_bytes );
+        if( p_out != p_in )
+            memcpy( p_out, p_in, i_sample_bytes );
         p_out += i_sample_bytes;
         i_out_nb--;
 
