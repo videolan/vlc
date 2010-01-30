@@ -189,6 +189,6 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     setSelectionMode( QAbstractItemView::ExtendedSelection );
     setAcceptDrops( true );
 
-    PlListViewItemDelegate *pl = new PlListViewItemDelegate();
+    PlListViewItemDelegate *pl = new PlListViewItemDelegate( this );
     setItemDelegate( pl );
 }
