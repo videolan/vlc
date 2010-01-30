@@ -149,7 +149,11 @@ endif
 ifdef HAVE_DARWIN_OS
 X264CONF=--host=$(HOST)
 X264CONF += --enable-pic
+ifdef HAVE_DARWIN_32
+FFMPEGCONF += --cc=gcc-4.0
+else
 FFMPEGCONF += --cc=$(CC)
+endif
 FFMPEGCONF += --arch=$(ARCH)
 ifdef HAVE_DARWIN_64
 FFMPEGCONF += --cpu=core2
