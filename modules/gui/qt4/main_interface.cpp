@@ -347,6 +347,8 @@ MainInterface::~MainInterface()
     QVLCTools::saveWidgetPosition(settings, this);
     settings->endGroup();
 
+    delete statusBar();
+
     /* Unregister callbacks */
     var_DelCallback( p_intf->p_libvlc, "intf-show", IntfShowCB, p_intf );
     var_DelCallback( p_intf->p_libvlc, "intf-popupmenu", PopupMenuCB, p_intf );
