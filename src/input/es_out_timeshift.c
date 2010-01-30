@@ -307,7 +307,6 @@ es_out_t *input_EsOutTimeshiftNew( input_thread_t *p_input, es_out_t *p_next_out
     p_out->pf_control = Control;
     p_out->pf_destroy = Destroy;
     p_out->p_sys      = p_sys;
-    p_out->b_sout     = p_input->p->p_sout != NULL;
 
     /* */
     p_sys->b_input_paused = false;

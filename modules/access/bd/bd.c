@@ -1343,7 +1343,6 @@ static es_out_t *EsOutNew( demux_t *p_demux )
     p_out->pf_del     = EsOutDel;
     p_out->pf_control = EsOutControl;
     p_out->pf_destroy = EsOutDestroy;
-    p_out->b_sout = false;
 
     p_out->p_sys = p_sys = malloc( sizeof(*p_sys) );
     if( !p_sys )

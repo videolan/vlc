@@ -237,8 +237,6 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
     out->pf_control = EsOutControl;
     out->pf_destroy = EsOutDelete;
     out->p_sys      = p_sys;
-    out->b_sout     = false; /* It has no meaning here, and p_input->p->p_sout is not yet valid */
-
 
     vlc_mutex_init_recursive( &p_sys->lock );
     p_sys->p_input = p_input;
