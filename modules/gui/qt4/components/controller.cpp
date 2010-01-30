@@ -474,7 +474,7 @@ QFrame *AbstractController::telexFrame()
     /**
      * Telextext QFrame
      **/
-    QFrame *telexFrame = new QFrame;
+    QFrame *telexFrame = new QFrame( this );
     QHBoxLayout *telexLayout = new QHBoxLayout( telexFrame );
     telexLayout->setSpacing( 0 ); telexLayout->setMargin( 0 );
     CONNECT( THEMIM->getIM(), teletextPossible( bool ),
