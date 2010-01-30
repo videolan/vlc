@@ -16,7 +16,6 @@ check_PROGRAMS = \
 	test_libvlc_core \
 	test_libvlc_events \
 	test_libvlc_media_list \
-	test_libvlc_media_list_player \
 	test_libvlc_media_player \
 	test_src_misc_variables \
         $(NULL)
