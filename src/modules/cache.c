@@ -83,7 +83,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
     int i, j, i_size, i_read;
     char p_cachestring[sizeof("cache " COPYRIGHT_MESSAGE)];
     int i_cache;
-    module_cache_t **pp_cache = 0;
+    module_cache_t **pp_cache = NULL;
     int32_t i_file_size, i_marker;
 
     if( !psz_cachedir ) /* XXX: this should never happen */
