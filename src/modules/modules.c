@@ -200,7 +200,7 @@ void module_EndBank( vlc_object_t *p_this, bool b_plugins )
  * \param p_this vlc object structure
  * \return nothing
  */
-void module_LoadPlugins( vlc_object_t * p_this, bool b_cache_delete )
+void module_LoadPlugins( vlc_object_t * p_this )
 {
     module_bank_t *p_bank = p_module_bank;
 
@@ -213,8 +213,6 @@ void module_LoadPlugins( vlc_object_t * p_this, bool b_cache_delete )
         msg_Dbg( p_this, "checking plugin modules" );
         p_module_bank->b_cache = var_InheritBool( p_this, "plugins-cache" );
 
-        if( p_module_bank->b_cache || b_cache_delete )
-            CacheLoad( p_this, p_module_bank, b_cache_delete );
         AllocateAllPlugins( p_this, p_module_bank );
         if( p_module_bank->b_cache )
             CacheSave( p_this, p_bank );
@@ -836,6 +834,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
     int count,i;
     char * path;
     vlc_array_t *arraypaths = vlc_array_new();
+    const bool b_reset = var_InheritBool( p_this, "reset-plugins-cache" );
 
     /* Contruct the special search path for system that have a relocatable
      * executable. Set it to <vlc path>/modules and <vlc path>/plugins. */
@@ -865,6 +864,11 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
         path = vlc_array_item_at_index( arraypaths, i );
         if( !path )
             continue;
+
+        if( b_reset )
+            CacheDelete( p_this, path );
+        else
+            CacheLoad( p_this, p_module_bank, path );
 
         msg_Dbg( p_this, "recursively browsing `%s'", path );
 

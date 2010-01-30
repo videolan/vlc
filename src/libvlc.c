@@ -344,9 +344,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         i_ret = VLC_EEXITSUCCESS;
     }
 
-    /* Check for plugins cache options */
-    bool b_cache_delete = var_InheritBool( p_libvlc, "reset-plugins-cache" );
-
     /* Check for daemon mode */
 #ifndef WIN32
     if( var_InheritBool( p_libvlc, "daemon" ) )
@@ -446,7 +443,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
      * list of configuration options exported by each module and loads their
      * default values.
      */
-    module_LoadPlugins( p_libvlc, b_cache_delete );
+    module_LoadPlugins( p_libvlc );
     if( p_libvlc->b_die )
     {
         b_exit = true;

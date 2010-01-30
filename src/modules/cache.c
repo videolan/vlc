@@ -68,6 +68,20 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
     sizeof(int), sizeof(void *), *(uint8_t *)&(uint16_t){ 0xbe1e }, vlc_CPU()
 
 
+void CacheDelete( vlc_object_t *obj, const char *dir )
+{
+    char *path;
+
+    assert( dir != NULL );
+
+    if( asprintf( &path, "%s"DIR_SEP CACHENAME_FORMAT,
+                  dir, CACHENAME_VALUES ) == -1 )
+        return;
+    msg_Dbg( obj, "removing plugins cache file %s", path );
+    utf8_unlink( path );
+    free( path );
+}
+
 /*****************************************************************************
  * LoadPluginsCache: loads the plugins cache file
  *****************************************************************************
@@ -76,9 +90,9 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
  * actually load the dynamically loadable module.
  * This allows us to only fully load plugins when they are actually used.
  *****************************************************************************/
-void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
+void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
 {
-    char *psz_filename, *psz_cachedir = config_GetUserDir(VLC_CACHE_DIR);
+    char *psz_filename;
     FILE *file;
     int j, i_size, i_read;
     char p_cachestring[sizeof("cache " COPYRIGHT_MESSAGE)];
@@ -86,27 +100,14 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, bool b_delete )
     module_cache_t **pp_cache = NULL;
     int32_t i_file_size, i_marker;
 
-    if( !psz_cachedir ) /* XXX: this should never happen */
-    {
-        msg_Err( p_this, "Unable to get cache directory" );
+    assert( dir != NULL );
+
+    if( !p_bank->b_cache )
         return;
-    }
 
     if( asprintf( &psz_filename, "%s"DIR_SEP CACHENAME_FORMAT,
-                  psz_cachedir, CACHENAME_VALUES ) == -1 )
-    {
-        free( psz_cachedir );
+                  dir, CACHENAME_VALUES ) == -1 )
         return;
-    }
-    free( psz_cachedir );
-
-    if( b_delete )
-    {
-        msg_Dbg( p_this, "removing plugins cache file %s", psz_filename );
-        utf8_unlink( psz_filename );
-        free( psz_filename );
-        return;
-    }
 
     msg_Dbg( p_this, "loading plugins cache file %s", psz_filename );
 
