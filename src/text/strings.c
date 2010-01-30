@@ -1047,7 +1047,11 @@ void path_sanitize( char *str )
 #include <vlc_url.h>
 
 /**
- * Convert a file path to an URI. If already an URI, do nothing.
+ * Convert a file path to an URI.
+ * If already an URI, return a copy of the string.
+ * @path path path to convert (or URI to copy)
+ * @return a nul-terminated URI string (use free() to release it),
+ * or NULL in case of error
  */
 char *make_URI (const char *path)
 {
