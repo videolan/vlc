@@ -37,6 +37,8 @@
 
 static int ItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
+static int LeafToParent( vlc_object_t *, const char *,
+                        vlc_value_t, vlc_value_t, void * );
 static int PLItemChanged( vlc_object_t *, const char *,
                         vlc_value_t, vlc_value_t, void * );
 static int PLItemAppended( vlc_object_t *, const char *,
@@ -905,6 +907,7 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     var_AddCallback( THEPL, "item-change", ItemChanged, im );
     var_AddCallback( THEPL, "item-current", PLItemChanged, this );
     var_AddCallback( THEPL, "activity", PLItemChanged, this );
+    var_AddCallback( THEPL, "leaf-to-parent", LeafToParent, this );
     var_AddCallback( THEPL, "playlist-item-append", PLItemAppended, this );
     var_AddCallback( THEPL, "playlist-item-deleted", PLItemRemoved, this );
     var_AddCallback( THEPL, "random", RandomChanged, this );
@@ -947,6 +950,7 @@ MainInputManager::~MainInputManager()
 
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
     var_DelCallback( THEPL, "item-change", ItemChanged, im );
+    var_DelCallback( THEPL, "leaf-to-parent", LeafToParent, this );
 
     var_DelCallback( THEPL, "item-current", PLItemChanged, this );
     var_DelCallback( THEPL, "playlist-item-append", PLItemAppended, this );
@@ -972,6 +976,7 @@ void MainInputManager::customEvent( QEvent *event )
     int type = event->type();
 
     PLEvent *plEv;
+    IMEvent *imEv;
 
     // msg_Dbg( p_intf, "New MainIM Event of type: %i", type );
     switch( type )
@@ -997,6 +1002,9 @@ void MainInputManager::customEvent( QEvent *event )
     case RepeatChanged_Type:
         notifyRepeatLoop();
         return;
+    case LeafToParent_Type:
+        imEv = static_cast<IMEvent*>( event );
+        emit leafBecameParent( imEv->p_item );
     default:
         if( type != ItemChanged_Type ) return;
     }
@@ -1131,6 +1139,17 @@ static int PLItemChanged( vlc_object_t *p_this, const char *psz_var,
     MainInputManager *mim = (MainInputManager*)param;
 
     IMEvent *event = new IMEvent( ItemChanged_Type );
+    QApplication::postEvent( mim, event );
+    return VLC_SUCCESS;
+}
+
+static int LeafToParent( vlc_object_t *p_this, const char *psz_var,
+                        vlc_value_t oldval, vlc_value_t newval, void *param )
+{
+    MainInputManager *mim = (MainInputManager*)param;
+
+    IMEvent *event = new IMEvent( LeafToParent_Type,
+                                  static_cast<input_item_t*>( newval.p_address ) );
     QApplication::postEvent( mim, event );
     return VLC_SUCCESS;
 }

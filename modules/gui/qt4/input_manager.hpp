@@ -61,6 +61,7 @@ enum {
     RandomChanged_Type,
     LoopChanged_Type,
     RepeatChanged_Type,
+    LeafToParent_Type,
 /*    SignalChanged_Type, */
 
     FullscreenControlToggle_Type = QEvent::User + IMEventType + 20,
@@ -77,6 +78,7 @@ enum { NORMAL,    /* loop: 0, repeat: 0 */
 class IMEvent : public QEvent
 {
 friend class InputManager;
+friend class MainInputManager;
     public:
     IMEvent( int type, input_item_t *p_input = NULL )
         : QEvent( (QEvent::Type)(type) )
@@ -288,6 +290,7 @@ signals:
     void playlistItemRemoved( int itemId );
     void randomChanged( bool );
     void repeatLoopChanged( int );
+    void leafBecameParent( input_item_t * );
 };
 
 #endif

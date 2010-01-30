@@ -279,6 +279,7 @@ static void VariablesInit( playlist_t *p_playlist )
     var_SetBool( p_playlist, "intf-change", true );
 
     var_Create( p_playlist, "item-change", VLC_VAR_ADDRESS );
+    var_Create( p_playlist, "leaf-to-parent", VLC_VAR_ADDRESS );
 
     var_Create( p_playlist, "playlist-item-deleted", VLC_VAR_INTEGER );
     var_SetInteger( p_playlist, "playlist-item-deleted", -1 );

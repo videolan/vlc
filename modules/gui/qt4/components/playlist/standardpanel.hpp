@@ -107,7 +107,7 @@ private slots:
     void showView( int );
     void cycleViews();
     void activate( const QModelIndex & );
-    void handleInputChange( input_thread_t * );
+    void browseInto( input_item_t * );
 };
 
 class LocationBar : public QToolBar

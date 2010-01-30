@@ -626,6 +626,7 @@ static playlist_item_t *ItemToNode( playlist_t *p_playlist,
         pl_priv(p_playlist)->b_reset_currently_playing = true;
         vlc_cond_signal( &pl_priv(p_playlist)->signal );
         var_SetAddress( p_playlist, "item-change", p_item_in_category->p_input );
+        var_SetAddress( p_playlist, "leaf-to-parent", p_item_in_category->p_input );
         PL_UNLOCK_IF( !b_locked );
         return p_item_in_category;
     }

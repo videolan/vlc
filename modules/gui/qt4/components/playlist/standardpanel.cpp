@@ -130,8 +130,8 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     getSettings()->endGroup();
 
-    CONNECT( THEMIM, inputChanged( input_thread_t * ),
-             this, handleInputChange( input_thread_t * ) );
+    CONNECT( THEMIM, leafBecameParent( input_item_t *),
+             this, browseInto( input_item_t * ) );
 
     CONNECT( model, currentChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
@@ -410,7 +410,7 @@ void StandardPLPanel::wheelEvent( QWheelEvent *e )
 
 void StandardPLPanel::activate( const QModelIndex &index )
 {
-    last_activated_id = model->itemId( index );
+    last_activated_id = model->getItem( index )->inputItem()->i_id;
     if( model->hasChildren( index ) )
     {
         if( currentView == iconView ) {
@@ -425,26 +425,22 @@ void StandardPLPanel::activate( const QModelIndex &index )
     }
 }
 
-void StandardPLPanel::handleInputChange( input_thread_t *p_input_thread )
+void StandardPLPanel::browseInto( input_item_t *p_input )
 {
-    if( currentView != iconView ) return;
 
-    input_item_t *p_input_item = input_GetItem( p_input_thread );
-    if( !p_input_item ) return;
+    if( p_input->i_id != last_activated_id ) return;
 
     playlist_Lock( THEPL );
 
-    playlist_item_t *p_item = playlist_ItemGetByInput( THEPL, p_input_item );
+    playlist_item_t *p_item = playlist_ItemGetByInput( THEPL, p_input );
+    assert( p_item != NULL );
 
-    if( p_item  && p_item->p_parent &&
-        p_item->p_parent->i_id == last_activated_id )
-    {
-        QModelIndex index = model->index( p_item->p_parent->i_id, 0 );
+    if( currentView == iconView ) {
+        QModelIndex index = model->index( p_item->i_id, 0 );
         iconView->setRootIndex( index );
-        //title->setText( index.data().toString() );
         locationBar->setIndex( index );
-        last_activated_id = p_item->i_id;
     }
+    last_activated_id = p_item->pp_children[0]->p_input->i_id;
 
     playlist_Unlock( THEPL );
 }
