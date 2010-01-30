@@ -43,16 +43,14 @@
  *****************************************************************************/
 static int  Create_F32ToFL32 ( vlc_object_t * );
 static block_t *Do_F32ToFL32( filter_t *, block_t * );
-static block_t *Do_FL32ToF32 ( filter_t *, block_t * );
 
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
 vlc_module_begin ()
     set_description( N_("Floating-point audio format conversions") )
-    add_submodule ()
-        set_capability( "audio filter", 10 )
-        set_callbacks( Create_F32ToFL32, NULL )
+    set_capability( "audio filter", 10 )
+    set_callbacks( Create_F32ToFL32, NULL )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -62,26 +60,19 @@ static int Create_F32ToFL32( vlc_object_t *p_this )
 {
     filter_t * p_filter = (filter_t *)p_this;
 
-    if( ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FI32
-           || p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32 )
-      && ( p_filter->fmt_in.audio.i_format != VLC_CODEC_FL32
-            || p_filter->fmt_out.audio.i_format != VLC_CODEC_FI32 ) )
-    {
+    if( p_filter->fmt_out.audio.i_format != VLC_CODEC_FL32
+     || !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio,
+                            &p_filter->fmt_out.audio ) )
         return VLC_EGENERIC;
-    }
 
-    if ( !AOUT_FMTS_SIMILAR( &p_filter->fmt_in.audio, &p_filter->fmt_out.audio ) )
+    switch( p_filter->fmt_in.audio.i_format )
     {
-        return VLC_EGENERIC;
-    }
+        case VLC_CODEC_FI32:
+            p_filter->pf_audio_filter = Do_F32ToFL32;
+            break;
 
-    if( p_filter->fmt_in.audio.i_format == VLC_CODEC_FI32 )
-    {
-        p_filter->pf_audio_filter = Do_F32ToFL32;
-    }
-    else
-    {
-        p_filter->pf_audio_filter = Do_FL32ToF32;
+        default:
+            return VLC_EGENERIC;
     }
 
     return VLC_SUCCESS;
@@ -101,16 +92,4 @@ static block_t *Do_F32ToFL32( filter_t * p_filter, block_t * p_in_buf )
     return p_in_buf;
 }
 
-static block_t *Do_FL32ToF32( filter_t * p_filter, block_t * p_in_buf )
-{
-    int i;
-    float * p_in = (float *)p_in_buf->p_buffer;
-    vlc_fixed_t * p_out = (vlc_fixed_t *)p_in_buf->p_buffer;
 
-    for ( i = p_in_buf->i_nb_samples
-               * aout_FormatNbChannels( &p_filter->fmt_in.audio ) ; i-- ; )
-    {
-        *p_out++ = (vlc_fixed_t)( *p_in++ * (float)FIXED32_ONE );
-    }
-    return p_in_buf;
-}

@@ -138,6 +138,7 @@ static block_t *Do_F32ToS16( filter_t * p_filter, block_t * p_in_buf )
 }
 
 /*** Conversions from decoders to FI32 */
+static block_t *Do_FL32ToF32( filter_t *, block_t * );
 static block_t *Do_S16ToF32( filter_t *, block_t * );
 static block_t *Do_U8ToF32( filter_t *, block_t * );
 
@@ -152,6 +153,10 @@ static int CreateTo( vlc_object_t *p_this )
 
     switch( p_filter->fmt_in.audio.i_format )
     {
+        case VLC_CODEC_FL32:
+            p_filter->pf_audio_filter = Do_FL32ToF32;
+            break;
+
         case VLC_CODEC_S16N:
             p_filter->pf_audio_filter = Do_S16ToF32;
             break;
@@ -222,4 +227,17 @@ static block_t *Do_U8ToF32( filter_t * p_filter, block_t * p_in_buf )
 out:
     block_Release( p_in_buf );
     return p_out_buf;
+}
+
+static block_t *Do_FL32ToF32( filter_t * p_filter, block_t * p_in_buf )
+{
+    const float * p_in = (float *)p_in_buf->p_buffer;
+    vlc_fixed_t * p_out = (vlc_fixed_t *)p_in_buf->p_buffer;
+
+    for ( unsigned i = p_in_buf->i_nb_samples
+               * aout_FormatNbChannels( &p_filter->fmt_in.audio ) ; i-- ; )
+    {
+        *p_out++ = (vlc_fixed_t)( *p_in++ * (float)FIXED32_ONE );
+    }
+    return p_in_buf;
 }
