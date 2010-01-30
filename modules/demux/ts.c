@@ -154,6 +154,11 @@ static void Close ( vlc_object_t * );
     "Tweak the buffer size for reading and writing an integer number of packets." \
     "Specify the size of the buffer here and not the number of packets." )
 
+#define SPLIT_ES_TEXT N_("Separate sub-streams")
+#define SPLIT_ES_LONGTEXT N_( \
+    "Separate teletex/dvbs pages into independant ES. " \
+    "It can be usefull to turn off this option when using stream output." )
+
 vlc_module_begin ()
     set_description( N_("MPEG Transport Stream demuxer") )
     set_shortname ( "MPEG-TS" )
@@ -174,6 +179,7 @@ vlc_module_begin ()
     add_bool( "ts-dump-append", false, NULL, APPEND_TEXT, APPEND_LONGTEXT, false )
     add_integer( "ts-dump-size", 16384, NULL, DUMPSIZE_TEXT,
                  DUMPSIZE_LONGTEXT, true )
+    add_bool( "ts-split-es", true, NULL, SPLIT_ES_TEXT, SPLIT_ES_LONGTEXT, false )
 
     set_capability( "demux", 10 )
     set_callbacks( Open, Close )
@@ -358,6 +364,7 @@ struct demux_sys_t
     csa_t       *csa;
     int         i_csa_pkt_size;
     bool        b_silent;
+    bool        b_split_es;
 
     bool        b_udp_out;
     int         fd; /* udp socket */
@@ -793,6 +800,7 @@ static int Open( vlc_object_t *p_this )
     free( psz_string );
 
     p_sys->b_silent = var_CreateGetBool( p_demux, "ts-silent" );
+    p_sys->b_split_es = var_InheritBool( p_demux, "ts-split-es" );
 
     return VLC_SUCCESS;
 }
@@ -3367,8 +3375,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
     /* */
     es_format_Init( p_fmt, SPU_ES, VLC_CODEC_TELETEXT );
 
-    /* In stream output mode, do not separate the stream by page */
-    if( p_demux->out->b_sout || i_page <= 0 )
+    if( !p_demux->p_sys->b_split_es || i_page <= 0 )
     {
         p_fmt->subs.teletext.i_magazine = -1;
         p_fmt->subs.teletext.i_page = 0;
@@ -3379,9 +3386,9 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
         if( !p_dr )
             p_dr = PMTEsFindDescriptor( p_es, 0x56 );
 
-        if( p_demux->out->b_sout && p_dr && p_dr->i_length > 0 )
+        if( !p_demux->p_sys->b_split_es && p_dr && p_dr->i_length > 0 )
         {
-            /* Descriptor pass-through for sout */
+            /* Descriptor pass-through */
             p_fmt->p_extra = malloc( p_dr->i_length );
             if( p_fmt->p_extra )
             {
@@ -3459,15 +3466,14 @@ static void PMTSetupEsDvbSubtitle( demux_t *p_demux, ts_pid_t *pid,
     }
 #endif
 
-    /* In stream output mode, do not separate the stream by page */
-    if( p_demux->out->b_sout  || i_page <= 0 )
+    if( !p_demux->p_sys->b_split_es  || i_page <= 0 )
     {
         p_fmt->subs.dvb.i_id = -1;
         p_fmt->psz_description = strdup( _("DVB subtitles") );
 
-        if( p_demux->out->b_sout && p_dr && p_dr->i_length > 0 )
+        if( !p_demux->p_sys->b_split_es && p_dr && p_dr->i_length > 0 )
         {
-            /* Descriptor pass-through for sout */
+            /* Descriptor pass-through */
             p_fmt->p_extra = malloc( p_dr->i_length );
             if( p_fmt->p_extra )
             {
