@@ -807,14 +807,16 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     playlist_Activate( p_playlist );
 
     /* Add service discovery modules */
-    psz_modules = var_CreateGetNonEmptyString( p_playlist, "services-discovery" );
+    psz_modules = var_InheritString( p_libvlc, "services-discovery" );
     if( psz_modules )
     {
         char *p = psz_modules, *m;
+        playlist_t *p_playlist = pl_Hold( p_libvlc );
         while( ( m = strsep( &p, " :," ) ) != NULL )
             playlist_ServicesDiscoveryAdd( p_playlist, m );
+        free( psz_modules );
+        pl_Release (p_playlist);
     }
-    free( psz_modules );
 
 #ifdef ENABLE_VLM
     /* Initialize VLM if vlm-conf is specified */
@@ -924,7 +926,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
 #ifdef WIN32
     if( var_InheritBool( p_libvlc, "prefer-system-codecs") )
     {
-        char *psz_codecs = var_CreateGetNonEmptyString( p_playlist, "codec" );
+        char *psz_codecs = var_CreateGetNonEmptyString( p_libvlc, "codec" );
         if( psz_codecs )
         {
             char *psz_morecodecs;
@@ -965,15 +967,15 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Get --open argument
      */
-    psz_val = var_CreateGetNonEmptyString( p_libvlc, "open" );
+    psz_val = var_InheritString( p_libvlc, "open" );
     if ( psz_val != NULL )
     {
         playlist_t *p_playlist = pl_Hold( p_libvlc );
         playlist_AddExt( p_playlist, psz_val, NULL, PLAYLIST_INSERT, 0,
                          -1, 0, NULL, 0, true, pl_Unlocked );
         pl_Release( p_libvlc );
+        free( psz_val );
     }
-    free( psz_val );
 
     return VLC_SUCCESS;
 }
