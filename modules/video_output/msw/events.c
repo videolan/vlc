@@ -432,7 +432,7 @@ static int DirectXCreateWindow( event_thread_t *p_event )
         /* If an external window was specified, we'll draw in it. */
         p_event->parent_window = vout_display_NewWindow(vd, &p_event->wnd_cfg );
         if( p_event->parent_window )
-            p_event->hparent = p_event->parent_window->hwnd;
+            p_event->hparent = p_event->parent_window->handle.hwnd;
         else
             p_event->hparent = NULL;
     #ifdef MODULE_NAME_IS_direct3d

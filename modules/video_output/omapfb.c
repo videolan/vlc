@@ -611,7 +611,7 @@ static void CreateWindow( vout_sys_t *p_sys )
     xwindow_attributes.event_mask = ExposureMask | StructureNotifyMask
                                   | VisibilityChangeMask;
     p_sys->window = XCreateWindow( p_sys->p_display,
-                                   p_sys->owner_window->xid,
+                                   p_sys->owner_window->handle.xid,
                                    0, 0,
                                    p_sys->main_window.i_width,
                                    p_sys->main_window.i_height,
@@ -621,7 +621,7 @@ static void CreateWindow( vout_sys_t *p_sys )
                                    &xwindow_attributes );
 
     XMapWindow( p_sys->p_display, p_sys->window );
-    XSelectInput( p_sys->p_display, p_sys->owner_window->xid,
+    XSelectInput( p_sys->p_display, p_sys->owner_window->handle.xid,
                   StructureNotifyMask );
 }
 

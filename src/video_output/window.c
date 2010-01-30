@@ -50,6 +50,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
     vout_window_t *window = &w->wnd;
 
     window->cfg = cfg;
+    memset(&window->handle, 0, sizeof(window->handle));
     window->control = NULL;
     window->sys = NULL;
 
@@ -60,12 +61,11 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
 #ifdef WIN32
     case VOUT_WINDOW_TYPE_HWND:
         type = "vout window hwnd";
-        window->hwnd = NULL;
         break;
 #endif
     case VOUT_WINDOW_TYPE_XID:
         type = "vout window xid";
-        window->xid = 0;
+        window->handle.xid = 0;
         window->x11_display = NULL;
         break;
     default:
@@ -81,7 +81,7 @@ vout_window_t *vout_window_New(vlc_object_t *obj,
     /* Hook for screensaver inhibition */
     if (cfg->type == VOUT_WINDOW_TYPE_XID) {
         w->inhibit = vlc_inhibit_Create (VLC_OBJECT (window),
-                                         window->xid);
+                                         window->handle.xid);
         if (w->inhibit != NULL)
             vlc_inhibit_Set (w->inhibit, true);
             /* FIXME: ^ wait for vout activation, pause */

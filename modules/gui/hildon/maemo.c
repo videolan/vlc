@@ -289,15 +289,15 @@ static int OpenWindow (vlc_object_t *obj)
     while ((intf = wnd_req.intf) == NULL)
         vlc_cond_wait (&wnd_req.wait, &wnd_req.lock);
 
-    wnd->xid = request_video( intf, vout );
+    wnd->handle.xid = request_video( intf, vout );
     vlc_mutex_unlock (&wnd_req.lock);
 
     vlc_object_release( vout );
 
-    if (!wnd->xid)
+    if (!wnd->handle.xid)
         return VLC_EGENERIC;
 
-    msg_Dbg( intf, "Using handle %"PRIu32, wnd->xid );
+    msg_Dbg( intf, "Using handle %"PRIu32, wnd->handle.xid );
 
     wnd->control = ControlWindow;
     wnd->sys = (vout_window_sys_t*)intf;

@@ -61,7 +61,7 @@ int CheckError (vout_display_t *vd, xcb_connection_t *conn,
 int GetWindowSize (struct vout_window_t *wnd, xcb_connection_t *conn,
                    unsigned *restrict width, unsigned *restrict height)
 {
-    xcb_get_geometry_cookie_t ck = xcb_get_geometry (conn, wnd->xid);
+    xcb_get_geometry_cookie_t ck = xcb_get_geometry (conn, wnd->handle.xid);
     xcb_get_geometry_reply_t *geo = xcb_get_geometry_reply (conn, ck, NULL);
 
     if (!geo)

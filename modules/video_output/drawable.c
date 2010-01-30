@@ -101,7 +101,7 @@ skip:
     if (val == NULL)
         return VLC_EGENERIC;
 
-    wnd->hwnd = val;
+    wnd->handle.hwnd = val;
     wnd->control = Control;
     wnd->sys = val;
     return VLC_SUCCESS;

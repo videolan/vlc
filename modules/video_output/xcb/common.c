@@ -140,14 +140,14 @@ vout_window_t *GetWindow (vout_display_t *vd,
         goto error;
     *pconn = conn;
 
-    *pscreen = FindWindow (VLC_OBJECT(vd), conn, wnd->xid, pdepth);
+    *pscreen = FindWindow (VLC_OBJECT(vd), conn, wnd->handle.xid, pdepth);
     if (*pscreen == NULL)
     {
         xcb_disconnect (conn);
         goto error;
     }
 
-    RegisterMouseEvents (VLC_OBJECT(vd), conn, wnd->xid);
+    RegisterMouseEvents (VLC_OBJECT(vd), conn, wnd->handle.xid);
     return wnd;
 
 error:

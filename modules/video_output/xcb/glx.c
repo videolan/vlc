@@ -108,7 +108,7 @@ FindWindow (vout_display_t *vd, xcb_connection_t *conn,
 
     xcb_get_geometry_reply_t *geo =
         xcb_get_geometry_reply (conn,
-            xcb_get_geometry (conn, sys->embed->xid), NULL);
+            xcb_get_geometry (conn, sys->embed->handle.xid), NULL);
     if (geo == NULL)
     {
         msg_Err (vd, "parent window not valid");
@@ -183,7 +183,7 @@ static int CreateWindow (vout_display_t *vd, xcb_connection_t *conn,
     xcb_void_cookie_t cc, cm;
 
     cc = xcb_create_window_checked (conn, depth, sys->window,
-                                    sys->embed->xid, 0, 0,
+                                    sys->embed->handle.xid, 0, 0,
                                     width, height, 0,
                                     XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                     vid, mask, values);
@@ -236,7 +236,7 @@ static int Open (vlc_object_t *obj)
 
     xcb_connection_t *conn = XGetXCBConnection (dpy);
     assert (conn);
-    RegisterMouseEvents (obj, conn, sys->embed->xid);
+    RegisterMouseEvents (obj, conn, sys->embed->handle.xid);
 
     /* Find window parameters */
     unsigned snum;
@@ -263,7 +263,8 @@ static int Open (vlc_object_t *obj)
 
         xcb_get_window_attributes_reply_t *wa =
             xcb_get_window_attributes_reply (conn,
-                xcb_get_window_attributes (conn, sys->embed->xid), NULL);
+                xcb_get_window_attributes (conn, sys->embed->handle.xid),
+                NULL);
         if (wa == NULL)
             goto error;
         xcb_visualid_t visual = wa->visual;
@@ -530,7 +531,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
      * vout_display_t::info.b_hide_mouse is false */
     case VOUT_DISPLAY_HIDE_MOUSE:
         xcb_change_window_attributes (XGetXCBConnection (sys->display),
-                                      sys->embed->xid,
+                                      sys->embed->handle.xid,
                                     XCB_CW_CURSOR, &(uint32_t){ sys->cursor });
         return VLC_SUCCESS;
 

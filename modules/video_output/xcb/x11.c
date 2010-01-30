@@ -256,7 +256,7 @@ static int Open (vlc_object_t *obj)
 
         c = xcb_create_window_checked (p_sys->conn, p_sys->depth,
                                        p_sys->window,
-                                       p_sys->embed->xid, 0, 0,
+                                       p_sys->embed->handle.xid, 0, 0,
                                        width, height, 0,
                                        XCB_WINDOW_CLASS_INPUT_OUTPUT,
                                        vid, mask, values);
@@ -502,7 +502,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     /* Hide the mouse. It will be send when
      * vout_display_t::info.b_hide_mouse is false */
     case VOUT_DISPLAY_HIDE_MOUSE:
-        xcb_change_window_attributes (p_sys->conn, p_sys->embed->xid,
+        xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid,
                                   XCB_CW_CURSOR, &(uint32_t){ p_sys->cursor });
         return VLC_SUCCESS;
 

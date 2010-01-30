@@ -331,7 +331,7 @@ static int Open (vlc_object_t *obj)
     /* Cache adaptors infos */
     xcb_xv_query_adaptors_reply_t *adaptors =
         xcb_xv_query_adaptors_reply (conn,
-            xcb_xv_query_adaptors (conn, p_sys->embed->xid), NULL);
+            xcb_xv_query_adaptors (conn, p_sys->embed->handle.xid), NULL);
     if (adaptors == NULL)
         goto error;
 
@@ -455,7 +455,7 @@ static int Open (vlc_object_t *obj)
             xcb_void_cookie_t c;
 
             c = xcb_create_window_checked (conn, f->depth, p_sys->window,
-                 p_sys->embed->xid, 0, 0, 1, 1, 0,
+                 p_sys->embed->handle.xid, 0, 0, 1, 1, 0,
                  XCB_WINDOW_CLASS_INPUT_OUTPUT, f->visual,
                  XCB_CW_EVENT_MASK, &mask);
 
@@ -748,7 +748,7 @@ static int Control (vout_display_t *vd, int query, va_list ap)
     /* Hide the mouse. It will be send when
      * vout_display_t::info.b_hide_mouse is false */
     case VOUT_DISPLAY_HIDE_MOUSE:
-        xcb_change_window_attributes (p_sys->conn, p_sys->embed->xid,
+        xcb_change_window_attributes (p_sys->conn, p_sys->embed->handle.xid,
                                   XCB_CW_CURSOR, &(uint32_t){ p_sys->cursor });
         return VLC_SUCCESS;
     case VOUT_DISPLAY_RESET_PICTURES:
