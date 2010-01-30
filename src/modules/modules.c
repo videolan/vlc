@@ -214,8 +214,6 @@ void module_LoadPlugins( vlc_object_t * p_this )
         p_module_bank->b_cache = var_InheritBool( p_this, "plugins-cache" );
 
         AllocateAllPlugins( p_this, p_module_bank );
-        if( p_module_bank->b_cache )
-            CacheSave( p_this, p_bank );
         config_UnsortConfig ();
         config_SortConfig ();
     }
@@ -865,6 +863,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
         if( !path )
             continue;
 
+        size_t offset = p_module_bank->i_loaded_cache;
         if( b_reset )
             CacheDelete( p_this, path );
         else
@@ -875,6 +874,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
         /* Don't go deeper than 5 subdirectories */
         AllocatePluginDir( p_this, p_bank, path, 5 );
 
+        CacheSave( p_this, path, p_module_bank->pp_loaded_cache + offset,
+                   p_module_bank->i_loaded_cache - offset );
         free( path );
     }
 

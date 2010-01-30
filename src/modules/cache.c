@@ -58,7 +58,7 @@ static int    CacheLoadConfig  ( module_t *, FILE * );
 
 /* Sub-version number
  * (only used to avoid breakage in dev version when cache structure changes) */
-#define CACHE_SUBVERSION_NUM 10
+#define CACHE_SUBVERSION_NUM 11
 
 /* Format string for the cache filename */
 #define CACHENAME_FORMAT \
@@ -96,7 +96,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
     FILE *file;
     int j, i_size, i_read;
     char p_cachestring[sizeof("cache " COPYRIGHT_MESSAGE)];
-    unsigned i_cache;
+    size_t i_cache;
     module_cache_t **pp_cache = NULL;
     int32_t i_file_size, i_marker;
 
@@ -197,7 +197,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
 
     if( i_cache )
     {
-        unsigned i_already = p_bank->i_loaded_cache;
+        size_t i_already = p_bank->i_loaded_cache;
         pp_cache = realloc( p_bank->pp_loaded_cache,
                             (i_already + i_cache) * sizeof(*pp_cache) );
         if( unlikely(pp_cache == NULL) )
@@ -231,7 +231,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
     } \
 }
 
-    for( unsigned i = 0; i < i_cache; i++ )
+    for( size_t i = 0; i < i_cache; i++ )
     {
         uint16_t i_size;
         int i_submodules;
@@ -433,52 +433,49 @@ static int CacheLoadConfig( module_t *p_module, FILE *file )
     return VLC_EGENERIC;
 }
 
-static int CacheSaveBank( FILE *file, module_bank_t *p_bank );
+static int CacheSaveBank( FILE *file, module_cache_t *const *, size_t );
 
 /*****************************************************************************
  * SavePluginsCache: saves the plugins cache to a file
  *****************************************************************************/
-void CacheSave( vlc_object_t *p_this, module_bank_t *p_bank )
+void CacheSave (vlc_object_t *p_this, const char *dir,
+                module_cache_t *const *pp_cache, size_t n)
 {
-    char *psz_cachedir = config_GetUserDir(VLC_CACHE_DIR);
-    if( !psz_cachedir ) /* XXX: this should never happen */
+    char *filename, *tmpname;
+
+    config_CreateDir( p_this, dir );
+    if (asprintf (&filename, "%s"DIR_SEP CACHENAME_FORMAT, dir,
+                  CACHENAME_VALUES ) == -1)
+        return;
+
+    if (asprintf (&tmpname, "%s.%"PRIu32, filename, (uint32_t)getpid ()) == -1)
     {
-        msg_Err( p_this, "unable to get cache directory" );
+        free (filename);
         return;
     }
 
-    char psz_filename[sizeof(DIR_SEP) + 32 + strlen(psz_cachedir)];
-    config_CreateDir( p_this, psz_cachedir );
-
-    snprintf( psz_filename, sizeof( psz_filename ),
-              "%s"DIR_SEP CACHENAME_FORMAT, psz_cachedir,
-              CACHENAME_VALUES );
-    free( psz_cachedir );
-
-    char psz_tmpname[sizeof (psz_filename) + 12];
-    snprintf (psz_tmpname, sizeof (psz_tmpname), "%s.%"PRIu32, psz_filename,
-              (uint32_t)getpid ());
-    FILE *file = utf8_fopen( psz_tmpname, "wb" );
+    FILE *file = utf8_fopen (tmpname, "wb");
     if (file == NULL)
         goto error;
 
-    msg_Dbg (p_this, "saving plugins cache %s", psz_filename);
-    if (CacheSaveBank (file, p_bank))
+    msg_Dbg (p_this, "saving plugins cache %s", tmpname);
+    if (CacheSaveBank (file, pp_cache, n))
         goto error;
 
 #ifndef WIN32
-    utf8_rename (psz_tmpname, psz_filename); /* atomically replace old cache */
+    utf8_rename (tmpname, filename); /* atomically replace old cache */
     fclose (file);
 #else
-    utf8_unlink (psz_filename);
+    utf8_unlink (filename);
     fclose (file);
-    utf8_rename (psz_tmpname, psz_filename);
+    utf8_rename (tmpname, filename);
 #endif
     return; /* success! */
 
 error:
-    msg_Warn (p_this, "could not write plugins cache %s (%m)",
-              psz_filename);
+    msg_Warn (p_this, "cannot write %s (%m)", tmpname);
+    free (filename);
+    free (tmpname);
     if (file != NULL)
     {
         clearerr (file);
@@ -489,7 +486,8 @@ error:
 static int CacheSaveConfig (FILE *, const module_t *);
 static int CacheSaveSubmodule (FILE *, const module_t *);
 
-static int CacheSaveBank (FILE *file, module_bank_t *p_bank)
+static int CacheSaveBank (FILE *file, module_cache_t *const *pp_cache,
+                          size_t i_cache)
 {
     uint32_t i_file_size = 0;
 
@@ -515,9 +513,6 @@ static int CacheSaveBank (FILE *file, module_bank_t *p_bank)
     i_file_size = ftell( file );
     if (fwrite (&i_file_size, sizeof (i_file_size), 1, file) != 1)
         goto error;
-
-    module_cache_t **pp_cache = p_bank->pp_cache;
-    uint32_t i_cache = p_bank->i_cache;
 
     if (fwrite( &i_cache, sizeof (i_cache), 1, file) != 1)
         goto error;
