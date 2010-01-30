@@ -455,7 +455,7 @@ void StandardPLPanel::browseInto( input_item_t *p_input )
 LocationBar::LocationBar( PLModel *m )
 {
   model = m;
-  mapper = new QSignalMapper;
+  mapper = new QSignalMapper( this );
   CONNECT( mapper, mapped( int ), this, invoke( int ) );
 }
 
