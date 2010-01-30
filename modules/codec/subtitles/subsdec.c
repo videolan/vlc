@@ -283,7 +283,19 @@ static int OpenDecoder( vlc_object_t *p_this )
     /* Third, try "local" encoding with optional UTF-8 autodetection */
     if (psz_charset == NULL)
     {
-        psz_charset = strdup (GetFallbackEncoding ());
+        /* xgettext:
+           The Windows ANSI code page most commonly used for this language.
+           VLC uses this as a guess of the subtitle files character set
+           (if UTF-8 and UTF-16 autodetection fails).
+           Western European languages normally use "CP1252", which is a
+           Microsoft-variant of ISO 8859-1. That suits the Latin alphabet.
+           Other scripts use other code pages.
+
+           This MUST be a valid iconv character set. If unsure, please refer
+           the VideoLAN translators mailing list. */
+        const char *acp = vlc_pgettext("GetACP", "CP1252");
+
+        psz_charset = strdup (acp);
         msg_Dbg (p_dec, "trying default character encoding: %s",
                  psz_charset ? psz_charset : "not specified");
 
