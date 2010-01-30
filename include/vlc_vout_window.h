@@ -94,8 +94,8 @@ struct vout_window_t {
 
     /* display server (mandatory) */
     union {
-        char     *x11_display; /* X11 display (NULL = use default) */
-    };
+        char     *x11; /* X11 display (NULL = use default) */
+    } display;
 
     /* Control on the module (mandatory)
      *

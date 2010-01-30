@@ -220,7 +220,7 @@ static int Open (vlc_object_t *obj)
     }
 
     /* Connect to X server */
-    Display *dpy = XOpenDisplay (sys->embed->x11_display);
+    Display *dpy = XOpenDisplay (sys->embed->display.x11);
     if (dpy == NULL)
     {
         vout_display_DeleteWindow (vd, sys->embed);

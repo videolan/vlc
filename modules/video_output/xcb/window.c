@@ -265,7 +265,7 @@ static int Open (vlc_object_t *obj)
     }
 
     wnd->handle.xid = window;
-    wnd->x11_display = display;
+    wnd->display.x11 = display;
     wnd->control = Control;
     wnd->sys = p_sys;
 
@@ -374,7 +374,7 @@ static void Close (vlc_object_t *obj)
         DestroyKeyHandler (p_sys->keys);
     }
     xcb_disconnect (conn);
-    free (wnd->x11_display);
+    free (wnd->display.x11);
     free (p_sys);
 }
 

@@ -540,7 +540,7 @@ static int WindowOpen( vlc_object_t *p_obj )
     p_wnd->handle.xid = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );
     if( !p_wnd->handle.xid )
         return VLC_EGENERIC;
-    p_wnd->x11_display = x11_display;
+    p_wnd->display.x11 = x11_display;
 
 #elif defined (Q_WS_WIN)
     p_wnd->handle.hwnd = p_mi->getVideo( &i_x, &i_y, &i_width, &i_height );

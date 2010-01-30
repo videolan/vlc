@@ -135,7 +135,7 @@ vout_window_t *GetWindow (vout_display_t *vd,
         return NULL;
     }
 
-    xcb_connection_t *conn = Connect (VLC_OBJECT(vd), wnd->x11_display);
+    xcb_connection_t *conn = Connect (VLC_OBJECT(vd), wnd->display.x11);
     if (conn == NULL)
         goto error;
     *pconn = conn;
