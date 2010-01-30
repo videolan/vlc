@@ -5,15 +5,13 @@ $Id$
  * a52tospdif: Audio converter module to encapsulate A/52 into S/PDIF
  * aa: Ascii art video output
  * access_alsa: Alsa access module
+ * access_attachment: Attachment accesss module
  * access_avio: Access module using FFmpeg libavformat network
  * access_bd: Blu-Ray Disc access
  * access_directory: Access module to read files in a directory
  * access_dv: Raw1394 Digital Video (Firewire/IEEE1394/I-Link) access module
  * access_eyetv: Access module to connect to our plugin running within EyeTV
  * access_fake: Fake access to use for mosaic and other special streaming setups
- * access_file: File access module
- * access_filter_bandwidth: Bandwidth limit module
- * access_filter_dump: Raw input Dump module
  * access_ftp: FTP Network access module
  * access_gnomevfs: GnomeVFS access
  * access_http: HTTP Network access module
@@ -50,6 +48,7 @@ $Id$
  * atmo: Ambilight-like video-output
  * au: AU file demuxer
  * audio_format: helper module for audio transcoding
+ * audio_format_neon: helper module for audio transcoding using NEON assembly
  * audiobargraph_a: audiobargraph audio plugin
  * audiobargraph_v: audiobargraph video plugin
  * audioscrobbler: AudioScrobbler/Last.fm submission plugin
@@ -71,12 +70,9 @@ $Id$
  * cdg: CD-G decoder
  * chain: Video filtering using a chain of video filter modules
  * chorus_flanger: variable delay audio filter
- * chroma_neon: ARM NEONv1 chroma conversion module
  * clone: Clone video filter
  * colorthres:  Theshold color based on similarity to reference color Video filter
  * converter_fixed: Fixed-point audio format conversions
- * converter_float: Floating-point audio format conversions
- * converter_neon: NEON assembly optimized audio converter
  * crop: Crop video filter
  * croppadd: Crop/Padd image filter
  * cvdsub: CVD subtitles decoder
@@ -115,6 +111,7 @@ $Id$
  * fake: fake codec to be used in advanced streaming setups
  * fb: video output module for the Linux framebuffer
  * fbosd: framebuffer osd plugin
+ * filesystem: Filesystem access module
  * flac: Flac decoder using libflac
  * flacsys: FLAC demuxer
  * float32_mixer: Precise float32 audio mixer
@@ -150,6 +147,7 @@ $Id$
  * i420_yuy2: planar 4:2:0 YUV to packed YUV conversion functions
  * i420_yuy2_altivec: AltiVec accelerated version of i420_yuy2
  * i420_yuy2_mmx: MMX accelerated version of i420_yuy2
+ * i420_yuy2_neon: ARM NEONv1 chroma conversion of i420_yuy2
  * i420_yuy2_sse2: sse2 accelerated version of i420_yuy2
  * i422_i420: 4:2:2 to 4:2:0 conversion functions
  * i422_yuy2: planar 4:2:2 YUV to packed YUV conversion functions

@@ -55,8 +55,10 @@ Audio filters:
  * Chorus/Flanger audio filter
  * 3F1R to stereo downmix filter
  * Dolby mixer, parameterized equalizer, trivial mixer, scaletempo, bandlimited resampler,
-   linear resampler, ugly resampler, converter_float, converter_fixed, DTS to SPDIF and
+   linear resampler, ugly resampler, converter_fixed, DTS to SPDIF and
+   A/52 to SPDIF filters have been upgraded to the "audio filter2" API
  * NEON assembly audio converter module
+ * Converter filters have been rewritten and extended to support s32 as input
 
 Visualisation:
  * Support of .milk visualisation files using projectM libraries
@@ -124,6 +126,7 @@ Removed modules:
  * cddax. Use cdda instead
  * cmml and tarkin codecs are removed because they are dead codecs.
  * realaudio codecs is remove in favour of avcodec
+ * access_file removed in favor of filesystem
 
 
 Changes between 1.0.4 and 1.0.5 (not yet released):
