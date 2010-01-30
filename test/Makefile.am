@@ -24,6 +24,7 @@ check_PROGRAMS = \
 # meta: No suitable test file
 EXTRA_PROGRAMS = \
 	test_libvlc_meta \
+	test_libvlc_media_list_player \
 	$(NULL)
 
 #check_DATA = samples/test.sample samples/meta.sample
