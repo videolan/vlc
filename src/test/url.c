@@ -37,12 +37,19 @@ static void test (conv_t f, const char *in, const char *out)
 {
     char *res;
 
-    printf ("\"%s\" -> \"%s\" ?\n", in, out);
+    if (out != NULL)
+       printf ("\"%s\" -> \"%s\" ?\n", in, out);
+    else
+       printf ("\"%s\" -> NULL ?\n", in);
     res = f (in);
     if (res == NULL)
-        exit (1);
-
-    if (strcmp (res, out))
+    {
+        if (out == NULL)
+            return; /* good: NULL -> NULL */
+        puts (" ERROR: got NULL");
+        exit (2);
+    }
+    if (out == NULL || strcmp (res, out))
     {
         printf (" ERROR: got \"%s\"\n", res);
         exit (2);
