@@ -132,7 +132,7 @@ typedef struct attribute_packed
             mtime_t i_pts_delay;
             int     i_cr_average;
         } jitter;
-    };
+    } u;
 } ts_cmd_control_t;
 
 typedef struct attribute_packed
@@ -145,7 +145,7 @@ typedef struct attribute_packed
         ts_cmd_del_t     del;
         ts_cmd_send_t    send;
         ts_cmd_control_t control;
-    };
+    } u;
 } ts_cmd_t;
 
 typedef struct ts_storage_t ts_storage_t;
@@ -1122,7 +1122,7 @@ static bool TsStorageIsFull( ts_storage_t *p_storage, const ts_cmd_t *p_cmd )
 {
     if( p_cmd && p_cmd->i_type == C_SEND && p_storage->i_cmd_w > 0 )
     {
-        size_t i_size = sizeof(*p_cmd->send.p_block) + p_cmd->send.p_block->i_buffer;
+        size_t i_size = sizeof(*p_cmd->u.send.p_block) + p_cmd->u.send.p_block->i_buffer;
 
         if( p_storage->i_file_size + i_size >= p_storage->i_file_max )
             return true;
@@ -1141,10 +1141,10 @@ static void TsStoragePushCmd( ts_storage_t *p_storage, const ts_cmd_t *p_cmd, bo
 
     if( cmd.i_type == C_SEND )
     {
-        block_t *p_block = cmd.send.p_block;
+        block_t *p_block = cmd.u.send.p_block;
 
-        cmd.send.p_block = NULL;
-        cmd.send.i_offset = ftell( p_storage->p_filew );
+        cmd.u.send.p_block = NULL;
+        cmd.u.send.i_offset = ftell( p_storage->p_filew );
 
         if( fwrite( p_block, sizeof(*p_block), 1, p_storage->p_filew ) != 1 )
         {
@@ -1178,7 +1178,7 @@ static void TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd, bool b_fl
         block_t block;
 
         if( !b_flush &&
-            !fseek( p_storage->p_filer, p_cmd->send.i_offset, SEEK_SET ) &&
+            !fseek( p_storage->p_filer, p_cmd->u.send.i_offset, SEEK_SET ) &&
             fread( &block, sizeof(block), 1, p_storage->p_filer ) == 1 )
         {
             block_t *p_block = block_Alloc( block.i_buffer );
@@ -1192,12 +1192,12 @@ static void TsStoragePopCmd( ts_storage_t *p_storage, ts_cmd_t *p_cmd, bool b_fl
                 p_block->i_nb_samples = block.i_nb_samples;
                 p_block->i_buffer = fread( p_block->p_buffer, 1, block.i_buffer, p_storage->p_filer );
             }
-            p_cmd->send.p_block = p_block;
+            p_cmd->u.send.p_block = p_block;
         }
         else
         {
             //fprintf( stderr, "TsStoragePopCmd: %m\n" );
-            p_cmd->send.p_block = block_Alloc( 1 );
+            p_cmd->u.send.p_block = block_Alloc( 1 );
         }
     }
 }
@@ -1230,103 +1230,103 @@ static int CmdInitAdd( ts_cmd_t *p_cmd, es_out_id_t *p_es, const es_format_t *p_
 {
     p_cmd->i_type = C_ADD;
     p_cmd->i_date = mdate();
-    p_cmd->add.p_es = p_es;
+    p_cmd->u.add.p_es = p_es;
     if( b_copy )
     {
-        p_cmd->add.p_fmt = malloc( sizeof(*p_fmt) );
-        if( !p_cmd->add.p_fmt )
+        p_cmd->u.add.p_fmt = malloc( sizeof(*p_fmt) );
+        if( !p_cmd->u.add.p_fmt )
             return VLC_EGENERIC;
-        es_format_Copy( p_cmd->add.p_fmt, p_fmt );
+        es_format_Copy( p_cmd->u.add.p_fmt, p_fmt );
     }
     else
     {
-        p_cmd->add.p_fmt = (es_format_t*)p_fmt;
+        p_cmd->u.add.p_fmt = (es_format_t*)p_fmt;
     }
     return VLC_SUCCESS;
 }
 static void CmdExecuteAdd( es_out_t *p_out, ts_cmd_t *p_cmd )
 {
-    p_cmd->add.p_es->p_es = es_out_Add( p_out, p_cmd->add.p_fmt );
+    p_cmd->u.add.p_es->p_es = es_out_Add( p_out, p_cmd->u.add.p_fmt );
 }
 static void CmdCleanAdd( ts_cmd_t *p_cmd )
 {
-    es_format_Clean( p_cmd->add.p_fmt );
-    free( p_cmd->add.p_fmt );
+    es_format_Clean( p_cmd->u.add.p_fmt );
+    free( p_cmd->u.add.p_fmt );
 }
 
 static void CmdInitSend( ts_cmd_t *p_cmd, es_out_id_t *p_es, block_t *p_block )
 {
     p_cmd->i_type = C_SEND;
     p_cmd->i_date = mdate();
-    p_cmd->send.p_es = p_es;
-    p_cmd->send.p_block = p_block;
+    p_cmd->u.send.p_es = p_es;
+    p_cmd->u.send.p_block = p_block;
 }
 static int CmdExecuteSend( es_out_t *p_out, ts_cmd_t *p_cmd )
 {
-    block_t *p_block = p_cmd->send.p_block;
+    block_t *p_block = p_cmd->u.send.p_block;
 
-    p_cmd->send.p_block = NULL;
+    p_cmd->u.send.p_block = NULL;
 
     if( p_block )
     {
-        if( p_cmd->send.p_es->p_es )
-            return es_out_Send( p_out, p_cmd->send.p_es->p_es, p_block );
+        if( p_cmd->u.send.p_es->p_es )
+            return es_out_Send( p_out, p_cmd->u.send.p_es->p_es, p_block );
         block_Release( p_block );
     }
     return VLC_EGENERIC;
 }
 static void CmdCleanSend( ts_cmd_t *p_cmd )
 {
-    if( p_cmd->send.p_block )
-        block_Release( p_cmd->send.p_block );
+    if( p_cmd->u.send.p_block )
+        block_Release( p_cmd->u.send.p_block );
 }
 
 static int CmdInitDel( ts_cmd_t *p_cmd, es_out_id_t *p_es )
 {
     p_cmd->i_type = C_DEL;
     p_cmd->i_date = mdate();
-    p_cmd->del.p_es = p_es;
+    p_cmd->u.del.p_es = p_es;
     return VLC_SUCCESS;
 }
 static void CmdExecuteDel( es_out_t *p_out, ts_cmd_t *p_cmd )
 {
-    if( p_cmd->del.p_es->p_es )
-        es_out_Del( p_out, p_cmd->del.p_es->p_es );
-    free( p_cmd->del.p_es );
+    if( p_cmd->u.del.p_es->p_es )
+        es_out_Del( p_out, p_cmd->u.del.p_es->p_es );
+    free( p_cmd->u.del.p_es );
 }
 
 static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_copy )
 {
     p_cmd->i_type = C_CONTROL;
     p_cmd->i_date = mdate();
-    p_cmd->control.i_query = i_query;
+    p_cmd->u.control.i_query = i_query;
 
     switch( i_query )
     {
     /* Pass-through control */
     case ES_OUT_SET_ACTIVE:  /* arg1= bool                     */
-        p_cmd->control.b_bool = (bool)va_arg( args, int );
+        p_cmd->u.control.u.b_bool = (bool)va_arg( args, int );
         break;
 
     case ES_OUT_SET_MODE:    /* arg1= int                            */
     case ES_OUT_SET_GROUP:   /* arg1= int                            */
     case ES_OUT_DEL_GROUP:   /* arg1=int i_group */
-        p_cmd->control.i_int = (int)va_arg( args, int );
+        p_cmd->u.control.u.i_int = (int)va_arg( args, int );
         break;
 
     case ES_OUT_SET_PCR:                /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
     case ES_OUT_SET_NEXT_DISPLAY_TIME:  /* arg1=int64_t i_pts(microsecond) */
-        p_cmd->control.i_i64 = (int64_t)va_arg( args, int64_t );
+        p_cmd->u.control.u.i_i64 = (int64_t)va_arg( args, int64_t );
         break;
 
     case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
-        p_cmd->control.int_i64.i_int = (int)va_arg( args, int );
-        p_cmd->control.int_i64.i_i64 = (int64_t)va_arg( args, int64_t );
+        p_cmd->u.control.u.int_i64.i_int = (int)va_arg( args, int );
+        p_cmd->u.control.u.int_i64.i_i64 = (int64_t)va_arg( args, int64_t );
         break;
 
     case ES_OUT_SET_ES_SCRAMBLED_STATE:
-        p_cmd->control.es_bool.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
-        p_cmd->control.es_bool.b_bool = (bool)va_arg( args, int );
+        p_cmd->u.control.u.es_bool.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        p_cmd->u.control.u.es_bool.b_bool = (bool)va_arg( args, int );
         break;
 
     case ES_OUT_RESET_PCR:           /* no arg */
@@ -1336,50 +1336,50 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=const vlc_meta_t* */
     {
         if( i_query == ES_OUT_SET_GROUP_META )
-            p_cmd->control.int_meta.i_int = (int)va_arg( args, int );
+            p_cmd->u.control.u.int_meta.i_int = (int)va_arg( args, int );
         const vlc_meta_t *p_meta = va_arg( args, const vlc_meta_t * );
 
         if( b_copy )
         {
-            p_cmd->control.int_meta.p_meta = vlc_meta_New();
-            if( !p_cmd->control.int_meta.p_meta )
+            p_cmd->u.control.u.int_meta.p_meta = vlc_meta_New();
+            if( !p_cmd->u.control.u.int_meta.p_meta )
                 return VLC_EGENERIC;
-            vlc_meta_Merge( p_cmd->control.int_meta.p_meta, p_meta );
+            vlc_meta_Merge( p_cmd->u.control.u.int_meta.p_meta, p_meta );
         }
         else
         {
             /* The cast is only needed to avoid warning */
-            p_cmd->control.int_meta.p_meta = (vlc_meta_t*)p_meta;
+            p_cmd->u.control.u.int_meta.p_meta = (vlc_meta_t*)p_meta;
         }
         break;
     }
 
     case ES_OUT_SET_GROUP_EPG:   /* arg1=int i_group arg2=const vlc_epg_t* */
     {
-        p_cmd->control.int_epg.i_int = (int)va_arg( args, int );
+        p_cmd->u.control.u.int_epg.i_int = (int)va_arg( args, int );
         const vlc_epg_t *p_epg = va_arg( args, const vlc_epg_t * );
 
         if( b_copy )
         {
-            p_cmd->control.int_epg.p_epg = vlc_epg_New( p_epg->psz_name );
-            if( !p_cmd->control.int_epg.p_epg )
+            p_cmd->u.control.u.int_epg.p_epg = vlc_epg_New( p_epg->psz_name );
+            if( !p_cmd->u.control.u.int_epg.p_epg )
                 return VLC_EGENERIC;
             for( int i = 0; i < p_epg->i_event; i++ )
             {
                 vlc_epg_event_t *p_evt = p_epg->pp_event[i];
 
-                vlc_epg_AddEvent( p_cmd->control.int_epg.p_epg,
+                vlc_epg_AddEvent( p_cmd->u.control.u.int_epg.p_epg,
                                   p_evt->i_start, p_evt->i_duration,
                                   p_evt->psz_name,
                                   p_evt->psz_short_description, p_evt->psz_description );
             }
-            vlc_epg_SetCurrent( p_cmd->control.int_epg.p_epg,
+            vlc_epg_SetCurrent( p_cmd->u.control.u.int_epg.p_epg,
                                 p_epg->p_current ? p_epg->p_current->i_start : -1 );
         }
         else
         {
             /* The cast is only needed to avoid warning */
-            p_cmd->control.int_epg.p_epg = (vlc_epg_t*)p_epg;
+            p_cmd->u.control.u.int_epg.p_epg = (vlc_epg_t*)p_epg;
         }
         break;
     }
@@ -1388,29 +1388,29 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     case ES_OUT_SET_ES:      /* arg1= es_out_id_t*                   */
     case ES_OUT_RESTART_ES:  /* arg1= es_out_id_t*                   */
     case ES_OUT_SET_ES_DEFAULT: /* arg1= es_out_id_t*                */
-        p_cmd->control.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        p_cmd->u.control.u.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
         break;
 
     case ES_OUT_SET_ES_STATE:/* arg1= es_out_id_t* arg2=bool   */
-        p_cmd->control.es_bool.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
-        p_cmd->control.es_bool.b_bool = (bool)va_arg( args, int );
+        p_cmd->u.control.u.es_bool.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        p_cmd->u.control.u.es_bool.b_bool = (bool)va_arg( args, int );
         break;
 
     case ES_OUT_SET_ES_FMT:     /* arg1= es_out_id_t* arg2=es_format_t* */
     {
-        p_cmd->control.es_fmt.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
+        p_cmd->u.control.u.es_fmt.p_es = (es_out_id_t*)va_arg( args, es_out_id_t * );
         es_format_t *p_fmt = (es_format_t*)va_arg( args, es_format_t * );
 
         if( b_copy )
         {
-            p_cmd->control.es_fmt.p_fmt = malloc( sizeof(*p_fmt) );
-            if( !p_cmd->control.es_fmt.p_fmt )
+            p_cmd->u.control.u.es_fmt.p_fmt = malloc( sizeof(*p_fmt) );
+            if( !p_cmd->u.control.u.es_fmt.p_fmt )
                 return VLC_EGENERIC;
-            es_format_Copy( p_cmd->control.es_fmt.p_fmt, p_fmt );
+            es_format_Copy( p_cmd->u.control.u.es_fmt.p_fmt, p_fmt );
         }
         else
         {
-            p_cmd->control.es_fmt.p_fmt = p_fmt;
+            p_cmd->u.control.u.es_fmt.p_fmt = p_fmt;
         }
         break;
     }
@@ -1420,9 +1420,9 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         mtime_t i_time = (mtime_t)va_arg( args, mtime_t );
         mtime_t i_length = (mtime_t)va_arg( args, mtime_t );
 
-        p_cmd->control.times.f_position = f_position;
-        p_cmd->control.times.i_time = i_time;
-        p_cmd->control.times.i_length = i_length;
+        p_cmd->u.control.u.times.f_position = f_position;
+        p_cmd->u.control.u.times.i_time = i_time;
+        p_cmd->u.control.u.times.i_length = i_length;
         break;
     }
     case ES_OUT_SET_JITTER:
@@ -1430,8 +1430,8 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
         mtime_t i_pts_delay = (mtime_t)va_arg( args, mtime_t );
         int     i_cr_average = (int)va_arg( args, int );
 
-        p_cmd->control.jitter.i_pts_delay = i_pts_delay;
-        p_cmd->control.jitter.i_cr_average = i_cr_average;
+        p_cmd->u.control.u.jitter.i_pts_delay = i_pts_delay;
+        p_cmd->u.control.u.jitter.i_cr_average = i_cr_average;
         break;
     }
 
@@ -1444,66 +1444,66 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
 }
 static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
 {
-    const int i_query = p_cmd->control.i_query;
+    const int i_query = p_cmd->u.control.i_query;
 
     switch( i_query )
     {
     /* Pass-through control */
     case ES_OUT_SET_ACTIVE:  /* arg1= bool                     */
-        return es_out_Control( p_out, i_query, p_cmd->control.b_bool );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.b_bool );
 
     case ES_OUT_SET_MODE:    /* arg1= int                            */
     case ES_OUT_SET_GROUP:   /* arg1= int                            */
     case ES_OUT_DEL_GROUP:   /* arg1=int i_group */
-        return es_out_Control( p_out, i_query, p_cmd->control.i_int );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.i_int );
 
     case ES_OUT_SET_PCR:                /* arg1=int64_t i_pcr(microsecond!) (using default group 0)*/
     case ES_OUT_SET_NEXT_DISPLAY_TIME:  /* arg1=int64_t i_pts(microsecond) */
-        return es_out_Control( p_out, i_query, p_cmd->control.i_i64 );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.i_i64 );
 
     case ES_OUT_SET_GROUP_PCR:          /* arg1= int i_group, arg2=int64_t i_pcr(microsecond!)*/
-        return es_out_Control( p_out, i_query, p_cmd->control.int_i64.i_int,
-                                               p_cmd->control.int_i64.i_i64 );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.int_i64.i_int,
+                                               p_cmd->u.control.u.int_i64.i_i64 );
 
     case ES_OUT_RESET_PCR:           /* no arg */
         return es_out_Control( p_out, i_query );
 
     case ES_OUT_SET_GROUP_META:  /* arg1=int i_group arg2=const vlc_meta_t* */
-        return es_out_Control( p_out, i_query, p_cmd->control.int_meta.i_int,
-                                               p_cmd->control.int_meta.p_meta );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.int_meta.i_int,
+                                               p_cmd->u.control.u.int_meta.p_meta );
 
     case ES_OUT_SET_GROUP_EPG:   /* arg1=int i_group arg2=const vlc_epg_t* */
-        return es_out_Control( p_out, i_query, p_cmd->control.int_epg.i_int,
-                                               p_cmd->control.int_epg.p_epg );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.int_epg.i_int,
+                                               p_cmd->u.control.u.int_epg.p_epg );
 
     case ES_OUT_SET_ES_SCRAMBLED_STATE: /* arg1=int es_out_id_t* arg2=bool */
-        return es_out_Control( p_out, i_query, p_cmd->control.es_bool.p_es->p_es,
-                                               p_cmd->control.es_bool.b_bool );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.es_bool.p_es->p_es,
+                                               p_cmd->u.control.u.es_bool.b_bool );
 
     case ES_OUT_SET_META:  /* arg1=const vlc_meta_t* */
-        return es_out_Control( p_out, i_query, p_cmd->control.int_meta.p_meta );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.int_meta.p_meta );
 
     /* Modified control */
     case ES_OUT_SET_ES:      /* arg1= es_out_id_t*                   */
     case ES_OUT_RESTART_ES:  /* arg1= es_out_id_t*                   */
     case ES_OUT_SET_ES_DEFAULT: /* arg1= es_out_id_t*                */
-        return es_out_Control( p_out, i_query, p_cmd->control.p_es->p_es );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.p_es->p_es );
 
     case ES_OUT_SET_ES_STATE:/* arg1= es_out_id_t* arg2=bool   */
-        return es_out_Control( p_out, i_query, p_cmd->control.es_bool.p_es->p_es,
-                                               p_cmd->control.es_bool.b_bool );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.es_bool.p_es->p_es,
+                                               p_cmd->u.control.u.es_bool.b_bool );
 
     case ES_OUT_SET_ES_FMT:     /* arg1= es_out_id_t* arg2=es_format_t* */
-        return es_out_Control( p_out, i_query, p_cmd->control.es_fmt.p_es->p_es,
-                                               p_cmd->control.es_fmt.p_fmt );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.es_fmt.p_es->p_es,
+                                               p_cmd->u.control.u.es_fmt.p_fmt );
 
     case ES_OUT_SET_TIMES:
-        return es_out_Control( p_out, i_query, p_cmd->control.times.f_position,
-                                               p_cmd->control.times.i_time,
-                                               p_cmd->control.times.i_length );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.times.f_position,
+                                               p_cmd->u.control.u.times.i_time,
+                                               p_cmd->u.control.u.times.i_length );
     case ES_OUT_SET_JITTER:
-        return es_out_Control( p_out, i_query, p_cmd->control.jitter.i_pts_delay,
-                                               p_cmd->control.jitter.i_cr_average );
+        return es_out_Control( p_out, i_query, p_cmd->u.control.u.jitter.i_pts_delay,
+                                               p_cmd->u.control.u.jitter.i_cr_average );
 
     default:
         assert(0);
@@ -1512,22 +1512,22 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
 }
 static void CmdCleanControl( ts_cmd_t *p_cmd )
 {
-    if( ( p_cmd->control.i_query == ES_OUT_SET_GROUP_META ||
-          p_cmd->control.i_query == ES_OUT_SET_META ) &&
-        p_cmd->control.int_meta.p_meta )
+    if( ( p_cmd->u.control.i_query == ES_OUT_SET_GROUP_META ||
+          p_cmd->u.control.i_query == ES_OUT_SET_META ) &&
+        p_cmd->u.control.u.int_meta.p_meta )
     {
-        vlc_meta_Delete( p_cmd->control.int_meta.p_meta );
+        vlc_meta_Delete( p_cmd->u.control.u.int_meta.p_meta );
     }
-    else if( p_cmd->control.i_query == ES_OUT_SET_GROUP_EPG &&
-             p_cmd->control.int_epg.p_epg )
+    else if( p_cmd->u.control.i_query == ES_OUT_SET_GROUP_EPG &&
+             p_cmd->u.control.u.int_epg.p_epg )
     {
-        vlc_epg_Delete( p_cmd->control.int_epg.p_epg );
+        vlc_epg_Delete( p_cmd->u.control.u.int_epg.p_epg );
     }
-    else if( p_cmd->control.i_query == ES_OUT_SET_ES_FMT &&
-             p_cmd->control.es_fmt.p_fmt )
+    else if( p_cmd->u.control.i_query == ES_OUT_SET_ES_FMT &&
+             p_cmd->u.control.u.es_fmt.p_fmt )
     {
-        es_format_Clean( p_cmd->control.es_fmt.p_fmt );
-        free( p_cmd->control.es_fmt.p_fmt );
+        es_format_Clean( p_cmd->u.control.u.es_fmt.p_fmt );
+        free( p_cmd->u.control.u.es_fmt.p_fmt );
     }
 }
 
