@@ -45,10 +45,6 @@
 
 #define CLOCK_FREQ INT64_C(1000000)
 
-/* When creating or destroying threads in blocking mode, delay to poll thread
- * status */
-#define THREAD_SLEEP                    ((mtime_t)(0.010*CLOCK_FREQ))
-
 /*****************************************************************************
  * Interface configuration
  *****************************************************************************/
@@ -69,9 +65,6 @@
 
 /* Used in ErrorThread */
 #define INPUT_IDLE_SLEEP                ((mtime_t)(0.100*CLOCK_FREQ))
-
-/* Time to wait in case of read error */
-#define INPUT_ERROR_SLEEP               ((mtime_t)(0.10*CLOCK_FREQ))
 
 /* Number of read() calls needed until we check the file size through
  * fstat() */
