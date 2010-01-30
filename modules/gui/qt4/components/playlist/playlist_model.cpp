@@ -577,7 +577,6 @@ bool PLModel::canEdit() const
 void PLModel::processInputItemUpdate( input_thread_t *p_input )
 {
     if( !p_input ) return;
-    processInputItemUpdate( input_GetItem( p_input ) );
     if( p_input && !( p_input->b_dead || !vlc_object_alive( p_input ) ) )
     {
         PLItem *item = findByInput( rootItem, input_GetItem( p_input )->i_id );
@@ -588,7 +587,9 @@ void PLModel::processInputItemUpdate( input_thread_t *p_input )
     {
         currentItem = NULL;
     }
+    processInputItemUpdate( input_GetItem( p_input ) );
 }
+
 void PLModel::processInputItemUpdate( input_item_t *p_item )
 {
     if( !p_item ||  p_item->i_id <= 0 ) return;
@@ -607,6 +608,7 @@ void PLModel::processItemAppend( int i_item, int i_parent )
 {
     playlist_item_t *p_item = NULL;
     PLItem *newItem = NULL;
+    input_thread_t *currentInputThread;
 
     PLItem *nodeItem = findById( rootItem, i_parent );
     if( !nodeItem ) return;
@@ -621,10 +623,18 @@ void PLModel::processItemAppend( int i_item, int i_parent )
     newItem = new PLItem( p_item, nodeItem );
     PL_UNLOCK;
 
+    currentInputThread = THEMIM->getInput();
+    if( currentInputThread &&
+        newItem->p_input == input_GetItem( currentInputThread ) )
+            currentItem = newItem;
+
     beginInsertRows( index( nodeItem, 0 ), nodeItem->childCount(), nodeItem->childCount() );
     nodeItem->appendChild( newItem );
     endInsertRows();
-    updateTreeItem( newItem );
+
+    if( currentItem == newItem )
+      emit currentChanged( index( newItem, 0 ) );
+
     return;
 end:
     PL_UNLOCK;
