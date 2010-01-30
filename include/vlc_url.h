@@ -49,6 +49,7 @@ VLC_EXPORT( char *, decode_URI_duplicate, ( const char *psz ) );
 VLC_EXPORT( char *, decode_URI, ( char *psz ) );
 VLC_EXPORT( char *, encode_URI_component, ( const char *psz ) );
 VLC_EXPORT( char *, make_URI, ( const char *path ) );
+VLC_EXPORT( char *, make_path, ( const char *url ) );
 
 /*****************************************************************************
  * vlc_UrlParse:
