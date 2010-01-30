@@ -356,8 +356,6 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     memset( &p_input->p->bookmark, 0, sizeof(p_input->p->bookmark) );
     TAB_INIT( p_input->p->i_bookmark, p_input->p->pp_bookmark );
     TAB_INIT( p_input->p->i_attachment, p_input->p->attachment );
-    p_input->p->p_es_out_display = NULL;
-    p_input->p->p_es_out = NULL;
     p_input->p->p_sout   = NULL;
     p_input->p->b_out_pace_control = false;
 
@@ -477,6 +475,9 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
     vlc_mutex_init( &p_input->p->counters.counters_lock );
 
+    p_input->p->p_es_out_display = input_EsOutNew( p_input, p_input->p->i_rate );
+    p_input->p->p_es_out = NULL;
+
     /* Set the destructor when we are sure we are initialized */
     vlc_object_set_destructor( p_input, (vlc_destructor_t)Destructor );
 
@@ -496,6 +497,9 @@ static void Destructor( input_thread_t * p_input )
 
     stats_TimerDump( p_input, STATS_TIMER_INPUT_LAUNCHING );
     stats_TimerClean( p_input, STATS_TIMER_INPUT_LAUNCHING );
+
+    if( p_input->p->p_es_out_display )
+        es_out_Delete( p_input->p->p_es_out_display );
 
     if( p_input->p->p_resource )
         input_resource_Delete( p_input->p->p_resource );
@@ -1207,8 +1211,7 @@ static int Init( input_thread_t * p_input )
 #endif
 
     /* Create es out */
-    p_input->p->p_es_out_display = input_EsOutNew( p_input, p_input->p->i_rate );
-    p_input->p->p_es_out         = input_EsOutTimeshiftNew( p_input, p_input->p->p_es_out_display, p_input->p->i_rate );
+    p_input->p->p_es_out = input_EsOutTimeshiftNew( p_input, p_input->p->p_es_out_display, p_input->p->i_rate );
 
     /* */
     input_ChangeState( p_input, OPENING_S );
@@ -1288,8 +1291,7 @@ error:
 
     if( p_input->p->p_es_out )
         es_out_Delete( p_input->p->p_es_out );
-    if( p_input->p->p_es_out_display )
-        es_out_Delete( p_input->p->p_es_out_display );
+    es_out_SetMode( p_input->p->p_es_out_display, ES_OUT_MODE_END );
     if( p_input->p->p_resource )
     {
         if( p_input->p->p_sout )
@@ -1335,7 +1337,6 @@ error_stats:
     p_input->p->input.p_stream = NULL;
     p_input->p->input.p_access = NULL;
     p_input->p->p_es_out = NULL;
-    p_input->p->p_es_out_display = NULL;
     p_input->p->p_sout = NULL;
 
     return VLC_EGENERIC;
@@ -1371,8 +1372,7 @@ static void End( input_thread_t * p_input )
     /* Unload all modules */
     if( p_input->p->p_es_out )
         es_out_Delete( p_input->p->p_es_out );
-    if( p_input->p->p_es_out_display )
-        es_out_Delete( p_input->p->p_es_out_display );
+    es_out_SetMode( p_input->p->p_es_out_display, ES_OUT_MODE_END );
 
     if( !p_input->b_preparsing )
     {

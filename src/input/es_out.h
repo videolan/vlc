@@ -36,7 +36,8 @@ enum es_out_mode_e
     ES_OUT_MODE_NONE,   /* don't select anything */
     ES_OUT_MODE_ALL,    /* eg for stream output */
     ES_OUT_MODE_AUTO,   /* best audio/video or for input follow audio-track, sub-track */
-    ES_OUT_MODE_PARTIAL /* select programs given after --programs */
+    ES_OUT_MODE_PARTIAL,/* select programs given after --programs */
+    ES_OUT_MODE_END     /* mark the es_out as dead */
 };
 
 enum es_out_query_private_e
