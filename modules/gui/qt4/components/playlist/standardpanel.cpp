@@ -101,7 +101,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->addWidget( viewButton, 0, 2 );
 
     /* View selection menu */
-    viewSelectionMapper = new QSignalMapper;
+    viewSelectionMapper = new QSignalMapper( this );
     CONNECT( viewSelectionMapper, mapped( int ), this, showView( int ) );
 
     QActionGroup *actionGroup = new QActionGroup( this );
