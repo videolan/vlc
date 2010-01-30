@@ -211,7 +211,9 @@ const char *GetFallbackEncoding( void )
     return FindFallbackEncoding (psz_lang);
 #else
     static char buf[16] = "";
+    static vlc_mutex_t lock = VLC_STATIC_MUTEX;
 
+    vlc_mutex_lock (&lock);
     if (buf[0] == 0)
     {
         int cp = GetACP ();
@@ -225,6 +227,7 @@ const char *GetFallbackEncoding( void )
                 snprintf (buf, sizeof (buf), "CP%u", cp);
         }
     }
+    vlc_mutex_unlock (&lock);
     return buf;
 #endif
 }
