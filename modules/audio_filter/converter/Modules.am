@@ -1,5 +1,4 @@
 SOURCES_converter_fixed = fixed.c
-SOURCES_converter_float = float.c
 SOURCES_a52tospdif = a52tospdif.c
 SOURCES_a52tofloat32 = a52tofloat32.c
 SOURCES_dtstospdif = dtstospdif.c
@@ -11,6 +10,5 @@ libvlc_LTLIBRARIES += \
 	liba52tospdif_plugin.la \
 	libaudio_format_plugin.la \
 	libconverter_fixed_plugin.la \
-	libconverter_float_plugin.la \
 	libdtstospdif_plugin.la \
 	$(NULL)
