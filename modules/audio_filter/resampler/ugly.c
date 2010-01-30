@@ -90,9 +90,12 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
                                     / p_filter->fmt_in.audio.i_rate;
     unsigned int i_sample_bytes = i_nb_channels * sizeof(int32_t);
 
-    block_t *p_out_buf = block_Alloc( i_out_nb * i_sample_bytes );
-    if( !p_out_buf )
-        goto out;
+    if( p_filter->fmt_out.audio.i_rate > p_filter->fmt_in.audio.i_rate )
+    {
+        p_out_buf = block_Alloc( i_out_nb * i_sample_bytes );
+        if( !p_out_buf )
+            goto out;
+    }
 
     int32_t *p_out = (int32_t*)p_out_buf->p_buffer;
     const int32_t *p_in = (int32_t*)p_in_buf->p_buffer;
@@ -120,7 +123,9 @@ static block_t *DoWork( filter_t * p_filter, block_t * p_in_buf )
     p_out_buf->i_pts = p_in_buf->i_pts;
     p_out_buf->i_length = p_out_buf->i_nb_samples *
         1000000 / p_filter->fmt_out.audio.i_rate;
+
+    if( p_in_buf != p_out_buf )
 out:
-    block_Release( p_in_buf );
+        block_Release( p_in_buf );
     return p_out_buf;
 }
