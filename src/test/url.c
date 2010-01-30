@@ -144,5 +144,19 @@ int main (void)
     /*val = fchdir (fd);
     assert (val != -1);*/
 
+    /* URI to path tests */
+#define test( a, b ) test (make_path, a, b)
+    test ("mailto:john@example.com", NULL);
+    test ("http://www.example.com/file.html#ref", NULL);
+    test ("file://", NULL);
+    test ("file:///", "/");
+    test ("file://localhost/home/john/music%2Eogg", "/home/john/music.ogg");
+    test ("file://localhost/home/john/text#ref", "/home/john/text");
+    test ("fd://0foobar", NULL);
+    test ("fd://0#ref", "/dev/stdin");
+    test ("fd://1", "/dev/stdout");
+    test ("fd://12345", "/dev/fd/12345");
+#undef test
+
     return 0;
 }
