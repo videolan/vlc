@@ -2111,10 +2111,13 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             *pb = EsIsSelected( es );
             return VLC_SUCCESS;
 
-        case ES_OUT_SET_ACTIVE:
+        case ES_OUT_SET_MODE:
         {
-            b = (bool) va_arg( args, int );
-            if( b && !p_sys->b_active && p_sys->i_es > 0 )
+            const int i_mode = va_arg( args, int );
+            assert( i_mode == ES_OUT_MODE_NONE || i_mode == ES_OUT_MODE_ALL ||
+                    i_mode == ES_OUT_MODE_AUTO || i_mode == ES_OUT_MODE_PARTIAL );
+
+            if( i_mode != ES_OUT_MODE_NONE && !p_sys->b_active && p_sys->i_es > 0 )
             {
                 /* XXX Terminate vout if there are tracks but no video one.
                  * This one is not mandatory but is he earliest place where it
@@ -2128,33 +2131,20 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 if( i >= p_sys->i_es )
                     input_resource_TerminateVout( p_sys->p_input->p->p_resource );
             }
-            p_sys->b_active = b;
+            p_sys->b_active = i_mode != ES_OUT_MODE_NONE;
+            p_sys->i_mode = i_mode;
+
+            /* Reapply policy mode */
+            for( i = 0; i < p_sys->i_es; i++ )
+            {
+                if( EsIsSelected( p_sys->es[i] ) )
+                    EsUnselect( out, p_sys->es[i],
+                                p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
+            }
+            for( i = 0; i < p_sys->i_es; i++ )
+                EsOutSelect( out, p_sys->es[i], false );
             return VLC_SUCCESS;
         }
-
-        case ES_OUT_SET_MODE:
-            i = (int) va_arg( args, int );
-            if( i == ES_OUT_MODE_NONE || i == ES_OUT_MODE_ALL ||
-                i == ES_OUT_MODE_AUTO || i == ES_OUT_MODE_PARTIAL )
-            {
-                p_sys->i_mode = i;
-
-                /* Reapply policy mode */
-                for( i = 0; i < p_sys->i_es; i++ )
-                {
-                    if( EsIsSelected( p_sys->es[i] ) )
-                    {
-                        EsUnselect( out, p_sys->es[i],
-                                    p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
-                    }
-                }
-                for( i = 0; i < p_sys->i_es; i++ )
-                {
-                    EsOutSelect( out, p_sys->es[i], false );
-                }
-                return VLC_SUCCESS;
-            }
-            return VLC_EGENERIC;
 
         case ES_OUT_SET_ES:
         case ES_OUT_RESTART_ES:

@@ -41,12 +41,8 @@ enum es_out_mode_e
 
 enum es_out_query_private_e
 {
-
-    /* activate application of mode */
-    ES_OUT_SET_ACTIVE = ES_OUT_PRIVATE_START,       /* arg1= bool                     */
-
     /* set/get mode */
-    ES_OUT_SET_MODE,                                /* arg1= int                            */
+    ES_OUT_SET_MODE = ES_OUT_PRIVATE_START,         /* arg1= int                            */
 
     /* Get date to wait before demuxing more data */
     ES_OUT_GET_WAKE_UP,                             /* arg1=mtime_t*            res=cannot fail */
@@ -85,6 +81,11 @@ enum es_out_query_private_e
     ES_OUT_SET_JITTER,                              /* arg1=mtime_t i_pts_delay arg2=int i_cr_average res=cannot fail */
 };
 
+static inline void es_out_SetMode( es_out_t *p_out, int i_mode )
+{
+    int i_ret = es_out_Control( p_out, ES_OUT_SET_MODE, i_mode );
+    assert( !i_ret );
+}
 static inline mtime_t es_out_GetWakeup( es_out_t *p_out )
 {
     mtime_t i_wu;

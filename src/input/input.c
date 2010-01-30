@@ -1140,7 +1140,6 @@ static void InitPrograms( input_thread_t * p_input )
     UpdatePtsDelay( p_input );
 
     /* Set up es_out */
-    es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, true );
     i_es_out_mode = ES_OUT_MODE_AUTO;
     if( p_input->p->p_sout )
     {
@@ -1162,7 +1161,7 @@ static void InitPrograms( input_thread_t * p_input )
             }
         }
     }
-    es_out_Control( p_input->p->p_es_out, ES_OUT_SET_MODE, i_es_out_mode );
+    es_out_SetMode( p_input->p->p_es_out, i_es_out_mode );
 
     /* Inform the demuxer about waited group (needed only for DVB) */
     if( i_es_out_mode == ES_OUT_MODE_ALL )
@@ -1356,8 +1355,7 @@ static void End( input_thread_t * p_input )
     input_ControlVarStop( p_input );
 
     /* Stop es out activity */
-    es_out_Control( p_input->p->p_es_out, ES_OUT_SET_ACTIVE, false );
-    es_out_Control( p_input->p->p_es_out, ES_OUT_SET_MODE, ES_OUT_MODE_NONE );
+    es_out_SetMode( p_input->p->p_es_out, ES_OUT_MODE_NONE );
 
     /* Clean up master */
     InputSourceClean( &p_input->p->input );

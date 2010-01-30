@@ -588,7 +588,6 @@ static int ControlLocked( es_out_t *p_out, int i_query, va_list args )
         return VLC_EGENERIC;
 
     /* Pass-through control */
-    case ES_OUT_SET_ACTIVE:
     case ES_OUT_SET_MODE:
     case ES_OUT_SET_GROUP:
     case ES_OUT_SET_PCR:
@@ -1305,10 +1304,6 @@ static int CmdInitControl( ts_cmd_t *p_cmd, int i_query, va_list args, bool b_co
     switch( i_query )
     {
     /* Pass-through control */
-    case ES_OUT_SET_ACTIVE:  /* arg1= bool                     */
-        p_cmd->u.control.u.b_bool = (bool)va_arg( args, int );
-        break;
-
     case ES_OUT_SET_MODE:    /* arg1= int                            */
     case ES_OUT_SET_GROUP:   /* arg1= int                            */
     case ES_OUT_DEL_GROUP:   /* arg1=int i_group */
@@ -1450,9 +1445,6 @@ static int CmdExecuteControl( es_out_t *p_out, ts_cmd_t *p_cmd )
     switch( i_query )
     {
     /* Pass-through control */
-    case ES_OUT_SET_ACTIVE:  /* arg1= bool                     */
-        return es_out_Control( p_out, i_query, p_cmd->u.control.u.b_bool );
-
     case ES_OUT_SET_MODE:    /* arg1= int                            */
     case ES_OUT_SET_GROUP:   /* arg1= int                            */
     case ES_OUT_DEL_GROUP:   /* arg1=int i_group */
