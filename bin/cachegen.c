@@ -90,14 +90,16 @@ int main (int argc, char *argv[])
         const char *const vlc_argv[] = {
             "--ignore-config",
             "--quiet",
+            "--no-media-library",
             arg,
             NULL,
         };
+        size_t vlc_argc = sizeof (vlc_argv) / sizeof (vlc_argv[0]) - 1;
 
         libvlc_exception_t ex;
         libvlc_exception_init (&ex);
 
-        libvlc_instance_t *vlc = libvlc_new (3, vlc_argv, &ex);
+        libvlc_instance_t *vlc = libvlc_new (vlc_argc, vlc_argv, &ex);
         if (vlc != NULL)
             libvlc_release (vlc);
         free (arg);
