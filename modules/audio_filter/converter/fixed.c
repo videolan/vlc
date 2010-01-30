@@ -76,6 +76,13 @@ static int CreateFrom( vlc_object_t *p_this )
     return VLC_SUCCESS;;
 }
 
+union dw
+{
+    float    f;
+    int32_t  s;
+    uint32_t u;
+};
+
 /*****************************************************************************
  * F32 to S16
  *****************************************************************************/
@@ -139,6 +146,7 @@ static block_t *Do_F32ToS16( filter_t * p_filter, block_t * p_in_buf )
 
 /*** Conversions from decoders to FI32 */
 static block_t *Do_FL32ToF32( filter_t *, block_t * );
+static block_t *Do_S32ToF32( filter_t *, block_t * );
 static block_t *Do_S16ToF32( filter_t *, block_t * );
 static block_t *Do_U8ToF32( filter_t *, block_t * );
 
@@ -155,6 +163,10 @@ static int CreateTo( vlc_object_t *p_this )
     {
         case VLC_CODEC_FL32:
             p_filter->pf_audio_filter = Do_FL32ToF32;
+            break;
+
+        case VLC_CODEC_S32N:
+            p_filter->pf_audio_filter = Do_S32ToF32;
             break;
 
         case VLC_CODEC_S16N:
@@ -231,13 +243,29 @@ out:
 
 static block_t *Do_FL32ToF32( filter_t * p_filter, block_t * p_in_buf )
 {
-    const float * p_in = (float *)p_in_buf->p_buffer;
-    vlc_fixed_t * p_out = (vlc_fixed_t *)p_in_buf->p_buffer;
+    unsigned count = p_in_buf->i_nb_samples
+                   * aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    union dw *restrict p = (union dw *)p_in_buf->p_buffer, *end = p + count;
+    const float one = FIXED32_ONE;
 
-    for ( unsigned i = p_in_buf->i_nb_samples
-               * aout_FormatNbChannels( &p_filter->fmt_in.audio ) ; i-- ; )
+    while (p < end)
     {
-        *p_out++ = (vlc_fixed_t)( *p_in++ * (float)FIXED32_ONE );
+        p->s = (one * p->f);
+        p++;
+    }
+    return p_in_buf;
+}
+
+static block_t *Do_S32ToF32( filter_t * p_filter, block_t * p_in_buf )
+{
+    unsigned count = p_in_buf->i_nb_samples
+                   * aout_FormatNbChannels( &p_filter->fmt_in.audio );
+    int32_t *restrict p = (int32_t *)p_in_buf->p_buffer, *end = p + count;
+
+    while (p < end)
+    {
+        *p = *p >> 3;
+        p++;
     }
     return p_in_buf;
 }
