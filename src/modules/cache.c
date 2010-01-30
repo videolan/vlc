@@ -486,8 +486,8 @@ error:
     }
 }
 
-static int CacheSaveConfig (FILE *, module_t *);
-static int CacheSaveSubmodule (FILE *, module_t *);
+static int CacheSaveConfig (FILE *, const module_t *);
+static int CacheSaveSubmodule (FILE *, const module_t *);
 
 static int CacheSaveBank (FILE *file, module_bank_t *p_bank)
 {
@@ -581,7 +581,7 @@ error:
     return -1;
 }
 
-static int CacheSaveSubmodule( FILE *file, module_t *p_module )
+static int CacheSaveSubmodule( FILE *file, const module_t *p_module )
 {
     if( !p_module )
         return 0;
@@ -606,7 +606,7 @@ error:
 }
 
 
-static int CacheSaveConfig (FILE *file, module_t *p_module)
+static int CacheSaveConfig (FILE *file, const module_t *p_module)
 {
     uint32_t i_lines = p_module->confsize;
 
