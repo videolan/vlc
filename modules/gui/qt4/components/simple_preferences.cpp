@@ -920,7 +920,7 @@ void SPrefsPanel::assoDialog()
     aTv( ".mpeg1" ); aTv( ".mpeg2" ); aTv( ".mpeg4" ); aTv( ".mpg" );
     aTv( ".mts" ); aTv( ".mxf" );
     aTv( ".ogg" ); aTv( ".ogm" ); aTv( ".ogx" ); aTv( ".ogv" );  aTv( ".ts" );
-    aTv( ".vob" ); aTv( ".wmv" );
+    aTv( ".vob" ); aTv( ".vro" ); aTv( ".wmv" );
     videoType->setCheckState( 0, ( i_temp > 0 ) ?
                               ( ( i_temp == audioType->childCount() ) ?
                                Qt::Checked : Qt::PartiallyChecked )

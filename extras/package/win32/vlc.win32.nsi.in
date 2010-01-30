@@ -255,6 +255,7 @@ FunctionEnd
   !insertmacro ${_action} ".rmvb"
   !insertmacro ${_action} ".ts"
   !insertmacro ${_action} ".vob"
+  !insertmacro ${_action} ".vro"
   !insertmacro ${_action} ".wmv"
 !macroend
 
