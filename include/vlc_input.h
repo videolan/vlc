@@ -511,6 +511,7 @@ enum input_query_e
      * XXX You must call vlc_object_release as soon as possible */
     INPUT_GET_AOUT,         /* arg1=aout_instance_t **              res=can fail */
     INPUT_GET_VOUTS,        /* arg1=vout_thread_t ***, int *        res=can fail */
+    INPUT_GET_ES_OBJECTS,   /* arg1=int id, vlc_object_t **dec, vout_thread_t **, aout_instance_t ** */
 };
 
 /** @}*/
@@ -596,6 +597,20 @@ static inline aout_instance_t *input_GetAout( input_thread_t *p_input )
 {
      aout_instance_t *p_aout;
      return input_Control( p_input, INPUT_GET_AOUT, &p_aout ) ? NULL : p_aout;
+}
+
+/**
+ * Returns the objects associated to an ES.
+ *
+ * You must release all non NULL object using vlc_object_release.
+ * You may set pointer of pointer to NULL to avoid retreiving it.
+ */
+static inline int input_GetEsObjects( input_thread_t *p_input, int i_id,
+                                      vlc_object_t **pp_decoder,
+                                      vout_thread_t **pp_vout, aout_instance_t **pp_aout )
+{
+    return input_Control( p_input, INPUT_GET_ES_OBJECTS, i_id,
+                          pp_decoder, pp_vout, pp_aout );
 }
 
 /* */

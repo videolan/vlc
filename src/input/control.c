@@ -29,10 +29,12 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <assert.h>
 
 #include "input_internal.h"
 #include "event.h"
 #include "resource.h"
+#include "es_out.h"
 
 
 static void UpdateBookmarksOption( input_thread_t * );
@@ -434,6 +436,17 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
             if( *pi_vout <= 0 )
                 return VLC_EGENERIC;
             return VLC_SUCCESS;
+        }
+
+        case INPUT_GET_ES_OBJECTS:
+        {
+            const int i_id = va_arg( args, int );
+            vlc_object_t    **pp_decoder = va_arg( args, vlc_object_t ** );
+            vout_thread_t   **pp_vout    = va_arg( args, vout_thread_t ** );
+            aout_instance_t **pp_aout    = va_arg( args, aout_instance_t ** );
+
+            return es_out_Control( p_input->p->p_es_out_display, ES_OUT_GET_ES_OBJECTS_BY_ID, i_id,
+                                   pp_decoder, pp_vout, pp_aout );
         }
 
         default:
