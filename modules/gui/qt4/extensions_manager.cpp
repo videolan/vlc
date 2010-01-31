@@ -71,6 +71,7 @@ bool ExtensionsManager::loadExtensions()
         if( !p_extensions_manager )
         {
             b_failed = true;
+            emit extensionsUpdated();
             return false;
         }
         vlc_object_attach( p_extensions_manager, p_intf );
@@ -84,6 +85,7 @@ bool ExtensionsManager::loadExtensions()
             vlc_object_release( p_extensions_manager );
             p_extensions_manager = NULL;
             b_failed = true;
+            emit extensionsUpdated();
             return false;
         }
 
@@ -98,11 +100,13 @@ bool ExtensionsManager::loadExtensions()
             vlc_object_release( p_extensions_manager );
             p_extensions_manager = NULL;
             b_failed = true;
+            emit extensionsUpdated();
             return false;
         }
         b_unloading = false;
     }
     b_failed = false;
+    emit extensionsUpdated();
     return true;
 }
 
@@ -114,6 +118,7 @@ void ExtensionsManager::unloadExtensions()
     module_unneed( p_extensions_manager, p_extensions_manager->p_module );
     vlc_object_release( p_extensions_manager );
     p_extensions_manager = NULL;
+    emit extensionsUpdated();
     ExtensionsDialogProvider::killInstance();
 }
 
@@ -121,6 +126,7 @@ void ExtensionsManager::reloadExtensions()
 {
     unloadExtensions();
     loadExtensions();
+    emit extensionsUpdated();
 }
 
 void ExtensionsManager::menu( QMenu *current )

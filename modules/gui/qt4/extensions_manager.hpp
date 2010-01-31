@@ -89,6 +89,9 @@ private:
     QSignalMapper *menuMapper;
     bool b_unloading;  ///< Work around threads + emit issues, see isUnloading
     bool b_failed; ///< Flag set to true if we could not load the module
+
+signals:
+    void extensionsUpdated();
 };
 
 #endif // EXTENSIONS_MANAGER_HPP
