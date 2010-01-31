@@ -13,7 +13,7 @@
 #include "AtmoPacketQueue.h"
 
 #if defined(_ATMO_VLC_PLUGIN_)
-# include <vlc/vlc.h>
+# include <vlc_common.h>
 #define MAX_PACKET_TOO_LATE  -30000
 #define MAX_PACKET_TOO_EARLY  30000
 #define MIN_SLEEP_TIME        15000

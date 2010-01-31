@@ -28,7 +28,6 @@
 #ifndef ZIP_ACCESSDEMUX_H
 #define ZIP_ACCESSDEMUX_H
 
-#include <vlc/vlc.h>
 #include <vlc_common.h>
 #include <vlc_url.h>
 #include <vlc_strings.h>

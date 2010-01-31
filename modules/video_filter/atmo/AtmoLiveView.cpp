@@ -13,7 +13,7 @@
 #include "AtmoTools.h"
 
 #if defined(_ATMO_VLC_PLUGIN_)
-#  include <vlc/vlc.h>
+#  include <vlc_common.h>
 #else
 #  include "AtmoGdiDisplayCaptureInput.h"
 #endif

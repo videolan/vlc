@@ -31,7 +31,6 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc/vlc.h>
 #include <vlc_sql.h>
 #include <vlc_plugin.h>
 

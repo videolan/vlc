@@ -28,7 +28,7 @@
 #include <assert.h>
 #include <errno.h>
 
-#include <vlc/vlc.h>
+#include <vlc_common.h>
 #include <vlc_demux.h>
 
 #include "rtp.h"
