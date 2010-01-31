@@ -84,9 +84,6 @@ src/config/intf.c
 src/control/audio.c
 src/control/core.c
 src/control/event.c
-src/control/flat_media_list_view.c
-src/control/hierarchical_media_list_view.c
-src/control/hierarchical_node_media_list_view.c
 src/control/libvlc_internal.h
 src/control/log.c
 src/control/media.c
@@ -99,7 +96,6 @@ src/control/media_library.c
 src/control/media_list.c
 src/control/media_list_path.h
 src/control/media_list_player.c
-src/control/media_list_view.c
 src/control/media_player.c
 src/control/playlist.c
 src/control/video.c

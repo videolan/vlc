@@ -34,7 +34,6 @@ pkginclude_HEADERS = \
 	../include/vlc/libvlc_media_library.h \
 	../include/vlc/libvlc_media_list.h \
 	../include/vlc/libvlc_media_list_player.h \
-	../include/vlc/libvlc_media_list_view.h \
 	../include/vlc/libvlc_media_player.h \
 	../include/vlc/libvlc_structures.h \
 	../include/vlc/libvlc_vlm.h \
@@ -492,7 +491,6 @@ SOURCES_libvlc_control = \
 	control/event_internal.h \
 	control/media_internal.h \
 	control/media_list_internal.h \
-	control/media_list_view_internal.h \
 	control/media_player_internal.h \
 	control/core.c \
 	control/error.c \
@@ -503,15 +501,11 @@ SOURCES_libvlc_control = \
 	control/audio.c \
 	control/event.c \
 	control/event_async.c \
-	control/flat_media_list_view.c \
-	control/hierarchical_media_list_view.c \
-	control/hierarchical_node_media_list_view.c \
 	control/media.c \
 	control/media_player.c \
 	control/media_list.c \
 	control/media_list_path.h \
 	control/media_list_player.c \
-	control/media_list_view.c \
 	control/media_library.c \
 	control/mediacontrol_internal.h \
 	control/mediacontrol_core.c \

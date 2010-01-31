@@ -204,28 +204,6 @@ struct libvlc_event_t
             int index;
         } media_list_will_delete_item;
 
-        /* media list view */
-        struct
-        {
-            libvlc_media_t * item;
-            int index;
-        } media_list_view_item_added;
-        struct
-        {
-            libvlc_media_t * item;
-            int index;
-        } media_list_view_will_add_item;
-        struct
-        {
-            libvlc_media_t * item;
-            int index;
-        } media_list_view_item_deleted;
-        struct
-        {
-            libvlc_media_t * item;
-            int index;
-        } media_list_view_will_delete_item;
-
         /* media list player */
         struct
         {

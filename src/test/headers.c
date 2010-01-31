@@ -42,7 +42,6 @@
 #include <vlc/libvlc_media_library.h>
 #include <vlc/libvlc_media_list.h>
 #include <vlc/libvlc_media_list_player.h>
-#include <vlc/libvlc_media_list_view.h>
 #include <vlc/libvlc_media_player.h>
 #include <vlc/libvlc_vlm.h>
 #include <vlc/mediacontrol.h>
