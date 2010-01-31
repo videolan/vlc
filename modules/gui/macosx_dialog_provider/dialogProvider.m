@@ -964,6 +964,7 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
             [field setEditable:NO];
             [field setBordered:NO];
             [field setDrawsBackground:NO];
+            [field setFont:[NSFont systemFontOfSize:0]];
             [[field cell] setControlSize:NSRegularControlSize];
             [field setAutoresizingMask:NSViewNotSizable];
             return field;
@@ -973,6 +974,7 @@ static NSView *createControlFromWidget(extension_widget_t *widget, id self)
             VLCDialogTextField *field = [[VLCDialogTextField alloc] init];
             [field setWidget:widget];
             [field setAutoresizingMask:NSViewWidthSizable];
+            [field setFont:[NSFont systemFontOfSize:0]];
             [[field cell] setControlSize:NSRegularControlSize];
             [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(syncTextField:)  name:NSControlTextDidChangeNotification object:field];
             return field;
