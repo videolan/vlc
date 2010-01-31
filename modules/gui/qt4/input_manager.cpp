@@ -516,8 +516,9 @@ void InputManager::UpdateTeletext()
                 var_DelCallback( p_input_vbi, "vbi-page", VbiEvent, this );
                 vlc_object_release( p_input_vbi );
             }
-            p_input_vbi = (vlc_object_t *)
-                vlc_object_find_name( p_input, "zvbi", FIND_CHILD );
+
+            if( input_GetEsObjects( p_input, i_teletext_es, &p_input_vbi, NULL, NULL ) )
+                p_input_vbi = NULL;
 
             if( p_input_vbi )
             {
