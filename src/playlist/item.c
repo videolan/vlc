@@ -171,7 +171,7 @@ static void uninstall_input_item_observer( playlist_item_t * p_item )
  * Playlist item creation
  *****************************************************************************/
 playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
-                                              input_item_t *p_input )
+                                              input_item_t *p_input, bool install_observer )
 {
     playlist_item_t* p_item = malloc( sizeof( playlist_item_t ) );
     if( !p_item )
@@ -189,8 +189,10 @@ playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
     p_item->pp_children = NULL;
     p_item->i_flags = 0;
     p_item->p_playlist = p_playlist;
+    p_item->b_input_item_observer = install_observer;
 
-    install_input_item_observer( p_item );
+    if( install_observer )
+        install_input_item_observer( p_item );
 
     return p_item;
 }
@@ -218,7 +220,8 @@ int playlist_ItemRelease( playlist_item_t *p_item )
      * Most of the modules does that.
      *
      * Who wants to add proper memory management? */
-    uninstall_input_item_observer( p_item );
+    if( p_item->b_input_item_observer )
+        uninstall_input_item_observer( p_item );
     ARRAY_APPEND( pl_priv(p_playlist)->items_to_delete, p_item);
     return VLC_SUCCESS;
 }
@@ -423,14 +426,14 @@ int playlist_AddInput( playlist_t* p_playlist, input_item_t *p_input,
     PL_LOCK_IF( !b_locked );
 
     /* Add to ONELEVEL */
-    p_item_one = playlist_ItemNewFromInput( p_playlist, p_input );
+    p_item_one = playlist_ItemNewFromInput( p_playlist, p_input, false );
     if( p_item_one == NULL ) return VLC_ENOMEM;
     AddItem( p_playlist, p_item_one,
              b_playlist ? p_playlist->p_local_onelevel :
                           p_playlist->p_ml_onelevel , i_mode, i_pos );
 
     /* Add to CATEGORY */
-    p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input );
+    p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input, true );
     if( p_item_cat == NULL ) return VLC_ENOMEM;
     AddItem( p_playlist, p_item_cat,
              b_playlist ? p_playlist->p_local_category :
@@ -475,13 +478,13 @@ int playlist_BothAddInput( playlist_t *p_playlist,
     PL_LOCK_IF( !b_locked );
 
     /* Add to category */
-    p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input );
+    p_item_cat = playlist_ItemNewFromInput( p_playlist, p_input, true );
     if( p_item_cat == NULL ) return VLC_ENOMEM;
     AddItem( p_playlist, p_item_cat, p_direct_parent, i_mode, i_pos );
 
     /* Add to onelevel */
     /** \todo make a faster case for ml import */
-    p_item_one = playlist_ItemNewFromInput( p_playlist, p_input );
+    p_item_one = playlist_ItemNewFromInput( p_playlist, p_input, false );
     if( p_item_one == NULL ) return VLC_ENOMEM;
 
     p_up = p_direct_parent;
@@ -536,7 +539,7 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
         return NULL;
     PL_LOCK_IF( !b_locked );
 
-    p_item = playlist_ItemNewFromInput( p_playlist, p_input );
+    p_item = playlist_ItemNewFromInput( p_playlist, p_input, true );
     if( p_item == NULL ) return NULL;
     AddItem( p_playlist, p_item, p_parent, i_mode, i_pos );
 

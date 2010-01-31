@@ -153,6 +153,7 @@ struct playlist_item_t
     int                    i_id;        /**< Playlist item specific id */
     uint8_t                i_flags;     /**< Flags */
     playlist_t            *p_playlist;  /**< Parent playlist */
+    bool                   b_input_item_observer;
 };
 
 #define PLAYLIST_SAVE_FLAG      0x0001    /**< Must it be saved */

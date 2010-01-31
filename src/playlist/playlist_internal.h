@@ -109,7 +109,8 @@ void pl_Deactivate (libvlc_int_t *);
 
 /* */
 playlist_item_t *playlist_ItemNewFromInput( playlist_t *p_playlist,
-                                              input_item_t *p_input );
+                                            input_item_t *p_input,
+                                            bool install_observer );
 
 /* Engine */
 playlist_item_t * get_current_status_item( playlist_t * p_playlist);
