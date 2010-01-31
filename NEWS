@@ -25,7 +25,7 @@ Demuxers:
    (Full disc support is NOT present yet)
  * Support for TwinVQ (.vqf) and AMV (.amv) files
  * Various EGP improvements
- * Support for embedded subtitles in .avi ODML files
+ * Support for embedded subtitles in OpenDML and legacy .avi files
 
 Playlist:
  * WPL playlist support
