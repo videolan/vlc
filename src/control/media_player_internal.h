@@ -46,15 +46,6 @@ struct libvlc_media_player_t
     libvlc_media_t * p_md; /* current media descriptor */
     libvlc_event_manager_t * p_event_manager;
     libvlc_state_t state;
-    struct
-    {
-        void *hwnd;
-        void *nsobject;
-        uint32_t xid;
-        uint32_t agl;
-    } drawable;
-    unsigned keyboard_events:1;
-    unsigned mouse_events:1;
 };
 
 /* Media player - audio, video */

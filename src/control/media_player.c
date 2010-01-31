@@ -111,10 +111,6 @@ static void release_input_thread( libvlc_media_player_t *p_mi, bool b_input_abor
     /* Store the input resource for future use. */
     p_mi->p_input_resource = input_DetachResource( p_input_thread );
 
-    var_Destroy( p_input_thread, "drawable-hwnd" );
-    var_Destroy( p_input_thread, "drawable-xid" );
-    var_Destroy( p_input_thread, "drawable-agl" );
-
     vlc_object_release( p_input_thread );
 
     p_mi->p_input_thread = NULL;
@@ -350,12 +346,23 @@ libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
         return NULL;
     }
     vlc_object_attach (mp, mp->p_libvlc);
+
+    /* Drawable */
+    var_Create (mp, "drawable-xid", VLC_VAR_INTEGER);
+#ifdef WIN32
+    var_Create (mp, "drawable-hwnd", VLC_VAR_ADDRESS);
+#endif
+#ifdef __APPLE__
+    var_Create (mp, "drawable-agl", VLC_VAR_INTEGER);
+    var_Create (mp, "drawable-nsobject", VLC_VAR_ADDRESS);
+#endif
+
+    /* Drawable input methods */
+    var_Create (mp, "keyboard-events", VLC_VAR_BOOL);
+    var_SetBool (mp, "keyboard-events", true);
+    var_Create (mp, "mouse-events", VLC_VAR_BOOL);
+
     mp->p_md = NULL;
-    mp->drawable.agl = 0;
-    mp->drawable.xid = 0;
-    mp->drawable.hwnd = NULL;
-    mp->drawable.nsobject = NULL;
-    mp->keyboard_events = mp->mouse_events = 1;
     mp->state = libvlc_NothingSpecial;
     mp->p_libvlc_instance = instance;
     mp->p_input_thread = NULL;
@@ -601,27 +608,6 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
     p_mi->p_input_resource = NULL;
     p_input_thread = p_mi->p_input_thread;
 
-    var_Create( p_input_thread, "drawable-agl", VLC_VAR_INTEGER );
-    if( p_mi->drawable.agl )
-        var_SetInteger( p_input_thread, "drawable-agl", p_mi->drawable.agl );
-
-    var_Create( p_input_thread, "drawable-xid", VLC_VAR_INTEGER );
-    if( p_mi->drawable.xid )
-        var_SetInteger( p_input_thread, "drawable-xid", p_mi->drawable.xid );
-
-    var_Create( p_input_thread, "drawable-hwnd", VLC_VAR_ADDRESS );
-    if( p_mi->drawable.hwnd != NULL )
-        var_SetAddress( p_input_thread, "drawable-hwnd", p_mi->drawable.hwnd );
-
-    var_Create( p_input_thread, "drawable-nsobject", VLC_VAR_ADDRESS );
-    if( p_mi->drawable.nsobject != NULL )
-        var_SetAddress( p_input_thread, "drawable-nsobject", p_mi->drawable.nsobject );
-
-    var_Create( p_input_thread, "keyboard-events", VLC_VAR_BOOL );
-    var_SetBool( p_input_thread, "keyboard-events", p_mi->keyboard_events );
-    var_Create( p_input_thread, "mouse-events", VLC_VAR_BOOL );
-    var_SetBool( p_input_thread, "mouse-events", p_mi->mouse_events );
-
     var_AddCallback( p_input_thread, "can-seek", input_seekable_changed, p_mi );
     var_AddCallback( p_input_thread, "can-pause", input_pausable_changed, p_mi );
     var_AddCallback( p_input_thread, "intf-event", input_event_changed, p_mi );
@@ -700,7 +686,12 @@ void libvlc_media_player_stop( libvlc_media_player_t *p_mi )
 void libvlc_media_player_set_nsobject( libvlc_media_player_t *p_mi,
                                         void * drawable )
 {
-    p_mi->drawable.nsobject = drawable;
+    assert (p_mi != NULL);
+#ifdef __APPLE__
+    var_SetAddress (p_mi, "drawable-nsobject", drawable);
+#else
+    (void) p_mi; (void)drawable;
+#endif
 }
 
 /**************************************************************************
@@ -708,7 +699,12 @@ void libvlc_media_player_set_nsobject( libvlc_media_player_t *p_mi,
  **************************************************************************/
 void * libvlc_media_player_get_nsobject( libvlc_media_player_t *p_mi )
 {
-    return p_mi->drawable.nsobject;
+    assert (p_mi != NULL);
+#ifdef __APPLE__
+    return var_GetAddress (p_mi, "drawable-nsobject");
+#else
+    return NULL;
+#endif
 }
 
 /**************************************************************************
@@ -717,7 +713,11 @@ void * libvlc_media_player_get_nsobject( libvlc_media_player_t *p_mi )
 void libvlc_media_player_set_agl( libvlc_media_player_t *p_mi,
                                   uint32_t drawable )
 {
-    p_mi->drawable.agl = drawable;
+#ifdef __APPLE__
+    var_SetInteger (p_mi, "drawable-agl", drawable);
+#else
+    (void) p_mi; (void)drawable;
+#endif
 }
 
 /**************************************************************************
@@ -725,7 +725,12 @@ void libvlc_media_player_set_agl( libvlc_media_player_t *p_mi,
  **************************************************************************/
 uint32_t libvlc_media_player_get_agl( libvlc_media_player_t *p_mi )
 {
-    return p_mi->drawable.agl;
+    assert (p_mi != NULL);
+#ifdef __APPLE__
+    return var_GetInteger (p_mi, "drawable-agl");
+#else
+    return 0;
+#endif
 }
 
 /**************************************************************************
@@ -734,7 +739,8 @@ uint32_t libvlc_media_player_get_agl( libvlc_media_player_t *p_mi )
 void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
                                       uint32_t drawable )
 {
-    p_mi->drawable.xid = drawable;
+    assert (p_mi != NULL);
+    var_SetInteger (p_mi, "drawable-xid", drawable);
 }
 
 /**************************************************************************
@@ -742,7 +748,7 @@ void libvlc_media_player_set_xwindow( libvlc_media_player_t *p_mi,
  **************************************************************************/
 uint32_t libvlc_media_player_get_xwindow( libvlc_media_player_t *p_mi )
 {
-    return p_mi->drawable.xid;
+    return var_GetInteger (p_mi, "drawable-xid");
 }
 
 /**************************************************************************
@@ -751,7 +757,12 @@ uint32_t libvlc_media_player_get_xwindow( libvlc_media_player_t *p_mi )
 void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
                                    void *drawable )
 {
-    p_mi->drawable.hwnd = drawable;
+    assert (p_mi != NULL);
+#ifdef WIN32
+    var_SetAddress (p_mi, "drawable-hwnd", drawable);
+#else
+    (void) p_mi; (void) drawable;
+#endif
 }
 
 /**************************************************************************
@@ -759,7 +770,12 @@ void libvlc_media_player_set_hwnd( libvlc_media_player_t *p_mi,
  **************************************************************************/
 void *libvlc_media_player_get_hwnd( libvlc_media_player_t *p_mi )
 {
-    return p_mi->drawable.hwnd;
+    assert (p_mi != NULL);
+#ifdef WIN32
+    return var_GetAddress (p_mi, "drawable-hwnd");
+#else
+    return NULL;
+#endif
 }
 
 /**************************************************************************
