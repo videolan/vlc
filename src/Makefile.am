@@ -154,7 +154,7 @@ pkgconfig_DATA = libvlc.pc vlc-plugin.pc
 CLEANFILES += $(pkgconfig_DATA)
 
 .pc.in.pc: $(top_builddir)/config.status
-	cd "$(top_builddir)" && \
+	$(AM_V_GEN)cd "$(top_builddir)" && \
 	$(SHELL) ./config.status --file="src/$@"
 
 ##############################################################################
