@@ -35,8 +35,6 @@ static void AddItem( playlist_t *p_playlist, playlist_item_t *p_item,
 static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
                            playlist_item_t *, playlist_item_t * );
 static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item );
-static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
-                        bool b_stop );
 
 static playlist_item_t *ItemToNode( playlist_t *, playlist_item_t *, bool );
 
@@ -239,24 +237,11 @@ int playlist_ItemRelease( playlist_item_t *p_item )
 static int DeleteFromInput( playlist_t *p_playlist, input_item_t *p_input,
                             playlist_item_t *p_root, bool b_do_stop )
 {
-    int i;
     PL_ASSERT_LOCKED;
-    for( i = 0 ; i< p_root->i_children ; i++ )
-    {
-        if( p_root->pp_children[i]->i_children == -1 &&
-            p_root->pp_children[i]->p_input == p_input )
-        {
-            DeleteInner( p_playlist, p_root->pp_children[i], b_do_stop );
-            return VLC_SUCCESS;
-        }
-        else if( p_root->pp_children[i]->i_children >= 0 )
-        {
-            int i_ret = DeleteFromInput( p_playlist, p_input,
-                                         p_root->pp_children[i], b_do_stop );
-            if( i_ret == VLC_SUCCESS ) return VLC_SUCCESS;
-        }
-    }
-    return VLC_EGENERIC;
+    playlist_item_t *p_item = playlist_ItemFindFromInputAndRoot(
+        p_playlist, p_input, p_root, false );
+    if( !p_item ) return VLC_EGENERIC;
+    return playlist_DeleteItem( p_playlist, p_item, b_do_stop );
 }
 
 /**
@@ -332,7 +317,7 @@ int playlist_DeleteFromItemId( playlist_t *p_playlist, int i_id )
     PL_ASSERT_LOCKED;
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
     if( !p_item ) return VLC_EGENERIC;
-    return DeleteInner( p_playlist, p_item, true );
+    return playlist_DeleteItem( p_playlist, p_item, true );
 }
 
 /***************************************************************************
@@ -880,7 +865,7 @@ static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item )
 }
 
 /* Do the actual removal */
-static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
+int playlist_DeleteItem( playlist_t * p_playlist, playlist_item_t *p_item,
                         bool b_stop )
 {
     int i;
@@ -891,6 +876,7 @@ static int DeleteInner( playlist_t * p_playlist, playlist_item_t *p_item,
     {
         return playlist_NodeDelete( p_playlist, p_item, true, false );
     }
+
     pl_priv(p_playlist)->b_reset_currently_playing = true;
     var_SetInteger( p_playlist, "playlist-item-deleted", i_id );
 

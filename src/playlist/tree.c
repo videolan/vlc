@@ -153,8 +153,7 @@ int playlist_NodeDelete( playlist_t *p_playlist, playlist_item_t *p_root,
         }
         else if( b_delete_items )
         {
-            playlist_DeleteFromItemId( p_playlist,
-                                       p_root->pp_children[i]->i_id );
+            playlist_DeleteItem( p_playlist, p_root->pp_children[i], true );
         }
     }
     /* Delete the node */
