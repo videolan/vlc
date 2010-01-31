@@ -1187,7 +1187,7 @@ static void InitPrograms( input_thread_t * p_input )
 static int Init( input_thread_t * p_input )
 {
     vlc_meta_t *p_meta;
-    int i, ret;
+    int i;
 
     for( i = 0; i < p_input->p->p_item->i_options; i++ )
     {
@@ -1205,8 +1205,7 @@ static int Init( input_thread_t * p_input )
 
     InitStatistics( p_input );
 #ifdef ENABLE_SOUT
-    ret = InitSout( p_input );
-    if( ret != VLC_SUCCESS )
+    if( InitSout( p_input ) )
         goto error_stats;
 #endif
 
