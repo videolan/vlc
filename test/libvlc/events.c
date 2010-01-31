@@ -75,8 +75,8 @@ static void test_events (const char ** argv, int argc)
     log ("Testing events\n");
 
     libvlc_exception_init (&ex);
-    vlc = libvlc_new (argc, argv, &ex);
-    catch ();
+    vlc = libvlc_new (argc, argv);
+    assert (vlc != NULL);
 
     mi = libvlc_media_player_new (vlc);
     assert (mi != NULL);

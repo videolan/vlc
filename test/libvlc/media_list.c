@@ -32,8 +32,8 @@ static void test_media_list (const char ** argv, int argc)
     log ("Testing media_list\n");
 
     libvlc_exception_init (&ex);
-    vlc = libvlc_new (argc, argv, &ex);
-    catch ();
+    vlc = libvlc_new (argc, argv);
+    assert (vlc != NULL);
 
     ml = libvlc_media_list_new (vlc);
     assert (ml != NULL);

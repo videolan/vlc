@@ -35,8 +35,8 @@ static void test_meta (const char ** argv, int argc)
     log ("Testing meta\n");
 
     libvlc_exception_init (&ex);
-    vlc = libvlc_new (argc, argv, &ex);
-    catch ();
+    vlc = libvlc_new (argc, argv);
+    assert (vlc != NULL);
 
     media = libvlc_media_new (vlc, "samples/meta.sample", &ex);
     catch ();

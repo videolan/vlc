@@ -123,7 +123,7 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
 #endif
                     int nCmdShow )
 {
-    int argc, ret;
+    int argc;
 #ifndef UNDER_CE
     HeapSetInformation(NULL, HeapEnableTerminationOnCorruption, NULL, 0);
     wchar_t **wargv = CommandLineToArgvW (GetCommandLine (), &argc);
@@ -169,12 +169,9 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
     argc = parse_cmdline (psz_cmdline, &argv);
 #endif
 
-    libvlc_exception_t ex;
-    libvlc_exception_init (&ex);
-
     /* Initialize libvlc */
     libvlc_instance_t *vlc;
-    vlc = libvlc_new (argc, (const char **)argv, &ex);
+    vlc = libvlc_new (argc, (const char **)argv);
     if (vlc != NULL)
     {
         libvlc_add_intf (vlc, "globalhotkeys,none");
@@ -184,14 +181,11 @@ int WINAPI WinMain( HINSTANCE hInstance, HINSTANCE hPrevInstance,
         libvlc_release (vlc);
     }
 
-    ret = libvlc_exception_raised (&ex);
-    libvlc_exception_clear (&ex);
-
     for (int i = 0; i < argc; i++)
         free (argv[i]);
 
     (void)hInstance; (void)hPrevInstance; (void)lpCmdLine; (void)nCmdShow;
-    return ret;
+    return 0;
 }
 
 #if !defined( UNDER_CE ) && !defined( _WIN64 )

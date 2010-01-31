@@ -150,11 +150,8 @@ int main( int i_argc, const char *ppsz_argv[] )
             return 1; // BOOM!
     argv[argc] = NULL;
 
-    libvlc_exception_t ex;
-    libvlc_exception_init (&ex);
-
     /* Initialize libvlc */
-    libvlc_instance_t *vlc = libvlc_new (argc, argv, &ex);
+    libvlc_instance_t *vlc = libvlc_new (argc, argv);
 
     if (vlc != NULL)
     {
@@ -174,5 +171,5 @@ int main( int i_argc, const char *ppsz_argv[] )
     for (int i = 1; i < argc; i++)
         LocaleFree (argv[i]);
 
-    return vlc == NULL || libvlc_exception_raised (&ex);
+    return 0;
 }

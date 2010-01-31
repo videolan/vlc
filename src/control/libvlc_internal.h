@@ -99,15 +99,6 @@ void libvlc_event_attach_async( libvlc_event_manager_t * p_event_manager,
                                libvlc_callback_t pf_callback,
                                void *p_user_data );
 
-/* Exception shorcuts */
-
-#define RAISENULL( ... ) { libvlc_printerr(__VA_ARGS__); \
-                           libvlc_exception_raise( p_e ); \
-                           return NULL; }
-#define RAISEZERO( ... ) { libvlc_printerr(__VA_ARGS__); \
-                           libvlc_exception_raise( p_e ); \
-                           return 0; }
-
 static inline libvlc_time_t from_mtime(mtime_t time)
 {
     return (time + 500ULL)/ 1000ULL;

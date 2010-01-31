@@ -446,9 +446,8 @@ int main( void )
     test_init();
 
     log( "Testing the core variables\n" );
-    libvlc_exception_init( &ex );
-    p_vlc = libvlc_new( test_defaults_nargs, test_defaults_args, &ex );
-    catch();
+    p_vlc = libvlc_new( test_defaults_nargs, test_defaults_args );
+    assert( p_vlc != NULL );
 
     test_variables( p_vlc );
 

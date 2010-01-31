@@ -96,10 +96,7 @@ int main (int argc, char *argv[])
         };
         size_t vlc_argc = sizeof (vlc_argv) / sizeof (vlc_argv[0]) - 1;
 
-        libvlc_exception_t ex;
-        libvlc_exception_init (&ex);
-
-        libvlc_instance_t *vlc = libvlc_new (vlc_argc, vlc_argv, &ex);
+        libvlc_instance_t *vlc = libvlc_new (vlc_argc, vlc_argv);
         if (vlc != NULL)
             libvlc_release (vlc);
         free (arg);

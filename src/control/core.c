@@ -78,49 +78,28 @@ void libvlc_exception_raise( libvlc_exception_t *p_exception )
     p_exception->b_raised = 1;
 }
 
-libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
-                                libvlc_exception_t *p_e )
+libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
 {
-    libvlc_instance_t *p_new;
-    int i_ret;
+    libvlc_instance_t *p_new = malloc (sizeof (*p_new));
+    if (unlikely(p_new == NULL))
+        return NULL;
 
     libvlc_init_threads ();
 
-    libvlc_int_t *p_libvlc_int = libvlc_InternalCreate();
-    if( !p_libvlc_int )
-    {
-        libvlc_deinit_threads ();
-        RAISENULL( "VLC initialization failed" );
-    }
-
-    p_new = malloc( sizeof( libvlc_instance_t ) );
-    if( !p_new )
-    {
-        libvlc_deinit_threads ();
-        RAISENULL( "Out of memory" );
-    }
-
     const char *my_argv[argc + 2];
-
     my_argv[0] = "libvlc"; /* dummy arg0, skipped by getopt() et al */
     for( int i = 0; i < argc; i++ )
          my_argv[i + 1] = argv[i];
     my_argv[argc + 1] = NULL; /* C calling conventions require a NULL */
 
-    /** \todo Look for interface settings. If we don't have any, add -I dummy */
-    /* Because we probably don't want a GUI by default */
+    libvlc_int_t *p_libvlc_int = libvlc_InternalCreate();
+    if (unlikely (p_libvlc_int == NULL))
+        goto error;
 
-    i_ret = libvlc_InternalInit( p_libvlc_int, argc + 1, my_argv );
-    if( i_ret )
+    if (libvlc_InternalInit( p_libvlc_int, argc + 1, my_argv ))
     {
         libvlc_InternalDestroy( p_libvlc_int );
-        free( p_new );
-        libvlc_deinit_threads ();
-
-        if( i_ret == VLC_EEXITSUCCESS )
-            return NULL;
-        else
-            RAISENULL( "VLC initialization failed" );
+        goto error;
     }
 
     p_new->p_libvlc_int = p_libvlc_int;
@@ -131,8 +110,12 @@ libvlc_instance_t * libvlc_new( int argc, const char *const *argv,
     p_new->verbosity = 1;
     p_new->p_callback_list = NULL;
     vlc_mutex_init(&p_new->instance_lock);
-
     return p_new;
+
+error:
+    libvlc_deinit_threads ();
+    free (p_new);
+    return NULL;
 }
 
 void libvlc_retain( libvlc_instance_t *p_instance )

@@ -162,13 +162,11 @@ const char *libvlc_printerr (const char *fmt, ...);
  * Create and initialize a libvlc instance.
  *
  * \param argc the number of arguments
- * \param argv command-line-type arguments. argv[0] must be the path of the
- *        calling program.
- * \param p_e an initialized exception pointer
- * \return the libvlc instance
+ * \param argv command-line-type arguments
+ * \return the libvlc instance or NULL in case of error
  */
 VLC_PUBLIC_API libvlc_instance_t *
-libvlc_new( int , const char *const *, libvlc_exception_t *);
+libvlc_new( int , const char *const * );
 
 /**
  * Decrement the reference count of a libvlc instance, and destroy it
