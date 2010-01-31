@@ -42,7 +42,7 @@
 
 
 static const QRect drawRect = QRect( 0, 0, RECT_SIZE, RECT_SIZE );
-static const QRect artRect = drawRect.adjusted( OFFSET - 1, 0, - OFFSET, - OFFSET *2 );
+static const QRect artRect = drawRect.adjusted( OFFSET - 1, 2, - OFFSET, - OFFSET *2 );
 
 void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
@@ -113,7 +113,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
        pixpainter->save();
        pixpainter->setOpacity( 0.2 );
        pixpainter->setBrush( QBrush( Qt::gray ) );
-       pixpainter->drawRoundedRect( 0, -1, RECT_SIZE, RECT_SIZE+1, ART_RADIUS, ART_RADIUS );
+       pixpainter->drawRoundedRect( 0, 0, RECT_SIZE, RECT_SIZE, ART_RADIUS, ART_RADIUS );
        pixpainter->restore();
     }
 
