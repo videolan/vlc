@@ -60,11 +60,10 @@ typedef enum libvlc_playback_mode_t
  *
  * \param p_instance libvlc instance
  * \param p_e initialized exception instance
- * \return media list player instance
+ * \return media list player instance or NULL on error
  */
 VLC_PUBLIC_API libvlc_media_list_player_t *
-    libvlc_media_list_player_new( libvlc_instance_t * p_instance,
-                                  libvlc_exception_t * p_e );
+    libvlc_media_list_player_new( libvlc_instance_t * p_instance );
 
 /**
  * Release media_list_player.

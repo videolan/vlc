@@ -101,18 +101,18 @@ typedef enum libvlc_video_marquee_option_t {
  *
  * \param p_libvlc_instance the libvlc instance in which the Media Player
  *        should be created.
- * \param p_e an initialized exception pointer
+ * \return a new media player object, or NULL on error.
  */
-VLC_PUBLIC_API libvlc_media_player_t * libvlc_media_player_new( libvlc_instance_t *, libvlc_exception_t * );
+VLC_PUBLIC_API libvlc_media_player_t * libvlc_media_player_new( libvlc_instance_t * );
 
 /**
  * Create a Media Player object from a Media
  *
  * \param p_md the media. Afterwards the p_md can be safely
  *        destroyed.
- * \param p_e an initialized exception pointer
+ * \return a new media player object, or NULL on error.
  */
-VLC_PUBLIC_API libvlc_media_player_t * libvlc_media_player_new_from_media( libvlc_media_t *, libvlc_exception_t * );
+VLC_PUBLIC_API libvlc_media_player_t * libvlc_media_player_new_from_media( libvlc_media_t * );
 
 /**
  * Release a media_player after use
@@ -172,23 +172,21 @@ VLC_PUBLIC_API int libvlc_media_player_is_playing ( libvlc_media_player_t * );
  * Play
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
+ * \return 0 if playback started (and was already started), or -1 on error.
  */
-VLC_PUBLIC_API void libvlc_media_player_play ( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_media_player_play ( libvlc_media_player_t * );
 
 /**
- * Pause
+ * Toggle pause (no effect if there is no media)
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_pause ( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_media_player_pause ( libvlc_media_player_t * );
 
 /**
- * Stop
+ * Stop (no effect if there is no media)
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_media_player_stop ( libvlc_media_player_t * );
 
@@ -292,160 +290,146 @@ VLC_PUBLIC_API void *libvlc_media_player_get_hwnd ( libvlc_media_player_t *p_mi 
  * Get the current movie length (in ms).
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
- * \return the movie length (in ms).
+ * \return the movie length (in ms), or -1 if there is no media.
  */
-VLC_PUBLIC_API libvlc_time_t libvlc_media_player_get_length( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_time_t libvlc_media_player_get_length( libvlc_media_player_t * );
 
 /**
  * Get the current movie time (in ms).
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
- * \return the movie time (in ms).
+ * \return the movie time (in ms), or -1 if there is no media.
  */
-VLC_PUBLIC_API libvlc_time_t libvlc_media_player_get_time( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_time_t libvlc_media_player_get_time( libvlc_media_player_t * );
 
 /**
- * Set the movie time (in ms).
+ * Set the movie time (in ms). This has no effect if no media is being played.
+ * Not all formats and protocols support this.
  *
  * \param p_mi the Media Player
  * \param the movie time (in ms).
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_set_time( libvlc_media_player_t *, libvlc_time_t, libvlc_exception_t *);
+VLC_PUBLIC_API void libvlc_media_player_set_time( libvlc_media_player_t *, libvlc_time_t );
 
 /**
  * Get movie position.
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
- * \return movie position
+ * \return movie position, or -1. in case of error
  */
-VLC_PUBLIC_API float libvlc_media_player_get_position( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API float libvlc_media_player_get_position( libvlc_media_player_t * );
 
 /**
- * Set movie position.
+ * Set movie position. This has no effect if playback is not enabled.
+ * This might not work depending on the underlying input format and protocol.
  *
  * \param p_mi the Media Player
  * \param f_pos the position
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_set_position( libvlc_media_player_t *, float, libvlc_exception_t *);
+VLC_PUBLIC_API void libvlc_media_player_set_position( libvlc_media_player_t *, float );
 
 /**
- * Set movie chapter
+ * Set movie chapter (if applicable).
  *
  * \param p_mi the Media Player
  * \param i_chapter chapter number to play
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_set_chapter( libvlc_media_player_t *, int, libvlc_exception_t *);
+VLC_PUBLIC_API void libvlc_media_player_set_chapter( libvlc_media_player_t *, int );
 
 /**
- * Get movie chapter
+ * Get movie chapter.
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
- * \return chapter number currently playing
+ * \return chapter number currently playing, or -1 if there is no media.
  */
-VLC_PUBLIC_API int libvlc_media_player_get_chapter( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_media_player_get_chapter( libvlc_media_player_t * );
 
 /**
  * Get movie chapter count
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
- * \return number of chapters in movie
+ * \return number of chapters in movie, or -1.
  */
-VLC_PUBLIC_API int libvlc_media_player_get_chapter_count( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int libvlc_media_player_get_chapter_count( libvlc_media_player_t * );
 
 /**
- * Will the player play
+ * Is the player able to play
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
  * \return boolean
  */
-VLC_PUBLIC_API int libvlc_media_player_will_play        ( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int libvlc_media_player_will_play( libvlc_media_player_t * );
 
 /**
  * Get title chapter count
  *
  * \param p_mi the Media Player
  * \param i_title title
- * \param p_e an initialized exception pointer
- * \return number of chapters in title
+ * \return number of chapters in title, or -1
  */
 VLC_PUBLIC_API int libvlc_media_player_get_chapter_count_for_title(
-                       libvlc_media_player_t *, int, libvlc_exception_t *);
+                       libvlc_media_player_t *, int );
 
 /**
  * Set movie title
  *
  * \param p_mi the Media Player
  * \param i_title title number to play
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_set_title( libvlc_media_player_t *, int, libvlc_exception_t *);
+VLC_PUBLIC_API void libvlc_media_player_set_title( libvlc_media_player_t *, int );
 
 /**
  * Get movie title
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
- * \return title number currently playing
+ * \return title number currently playing, or -1
  */
-VLC_PUBLIC_API int libvlc_media_player_get_title( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int libvlc_media_player_get_title( libvlc_media_player_t * );
 
 /**
  * Get movie title count
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
- * \return title number count
+ * \return title number count, or -1
  */
-VLC_PUBLIC_API int libvlc_media_player_get_title_count( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int libvlc_media_player_get_title_count( libvlc_media_player_t * );
 
 /**
- * Set previous chapter
+ * Set previous chapter (if applicable)
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_previous_chapter( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void libvlc_media_player_previous_chapter( libvlc_media_player_t * );
 
 /**
- * Set next chapter
+ * Set next chapter (if applicable)
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_media_player_next_chapter( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API void libvlc_media_player_next_chapter( libvlc_media_player_t * );
 
 /**
  * Get movie play rate
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
- * \return movie play rate
+ * \return movie play rate, or zero in case of error
  */
-VLC_PUBLIC_API float libvlc_media_player_get_rate( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API float libvlc_media_player_get_rate( libvlc_media_player_t * );
 
 /**
  * Set movie play rate
  *
  * \param p_mi the Media Player
  * \param movie play rate to set
- * \param p_e an initialized exception pointer
+ * \return -1 if an error was detected, 0 otherwise (but even then, it might
+ * not actually work depending on the underlying media protocol)
  */
-VLC_PUBLIC_API void libvlc_media_player_set_rate( libvlc_media_player_t *, float, libvlc_exception_t *);
+VLC_PUBLIC_API int libvlc_media_player_set_rate( libvlc_media_player_t *, float );
 
 /**
  * Get current movie state
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *);
 
@@ -453,10 +437,9 @@ VLC_PUBLIC_API libvlc_state_t libvlc_media_player_get_state( libvlc_media_player
  * Get movie fps rate
  *
  * \param p_mi the Media Player
- * \param p_e an initialized exception pointer
- * \return frames per second (fps) for this playing movie
+ * \return frames per second (fps) for this playing movie, or 0 if unspecified
  */
-VLC_PUBLIC_API float libvlc_media_player_get_fps( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API float libvlc_media_player_get_fps( libvlc_media_player_t * );
 
 /** end bug */
 
@@ -464,35 +447,30 @@ VLC_PUBLIC_API float libvlc_media_player_get_fps( libvlc_media_player_t *, libvl
  * Does this media player have a video output?
  *
  * \param p_md the media player
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API int  libvlc_media_player_has_vout( libvlc_media_player_t *, libvlc_exception_t *);
+VLC_PUBLIC_API int libvlc_media_player_has_vout( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
  * Is this media player seekable?
  *
  * \param p_input the input
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e );
+VLC_PUBLIC_API int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi );
 
 /**
  * Can this media player be paused?
  *
  * \param p_input the input
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e );
+VLC_PUBLIC_API int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi );
 
 
 /**
- * Display the next frame
+ * Display the next frame (if supported)
  *
  * \param p_input the libvlc_media_player_t instance
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void    libvlc_media_player_next_frame( libvlc_media_player_t *p_input,
-                                                       libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_media_player_next_frame( libvlc_media_player_t *p_input );
 
 
 
@@ -740,20 +718,19 @@ VLC_PUBLIC_API void libvlc_toggle_teletext( libvlc_media_player_t *, libvlc_exce
  * Get number of available video tracks.
  *
  * \param p_mi media player
- * \param p_e an initialized exception
  * \return the number of available video tracks (int)
  */
-VLC_PUBLIC_API int libvlc_video_get_track_count( libvlc_media_player_t *,  libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_get_track_count( libvlc_media_player_t *, libvlc_exceptio_t * );
 
 /**
  * Get the description of available video tracks.
  *
  * \param p_mi media player
  * \param p_e an initialized exception
- * \return list with description of available video tracks
+ * \return list with description of available video tracks, or NULL on error
  */
 VLC_PUBLIC_API libvlc_track_description_t *
-        libvlc_video_get_track_description( libvlc_media_player_t *,  libvlc_exception_t * );
+        libvlc_video_get_track_description( libvlc_media_player_t * );
 
 /**
  * Get current video track.

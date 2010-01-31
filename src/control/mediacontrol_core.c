@@ -62,8 +62,9 @@ mediacontrol_Instance* mediacontrol_new( int argc, char** argv, mediacontrol_Exc
 
     retval->p_instance = libvlc_new( argc, (const char**)argv, &ex );
     HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
-    retval->p_media_player = libvlc_media_player_new( retval->p_instance, &ex );
-    HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
+    retval->p_media_player = libvlc_media_player_new( retval->p_instance );
+    if( !retval->p_media_player )
+        RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
     return retval;
 }
 
@@ -90,9 +91,6 @@ mediacontrol_new_from_instance( libvlc_instance_t* p_instance,
                 mediacontrol_Exception *exception )
 {
     mediacontrol_Instance* retval;
-    libvlc_exception_t ex;
-
-    libvlc_exception_init( &ex );
 
     retval = ( mediacontrol_Instance* )malloc( sizeof( mediacontrol_Instance ) );
     if( ! retval )
@@ -100,8 +98,9 @@ mediacontrol_new_from_instance( libvlc_instance_t* p_instance,
         RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
     }
     retval->p_instance = p_instance;
-    retval->p_media_player = libvlc_media_player_new( retval->p_instance, &ex );
-    HANDLE_LIBVLC_EXCEPTION_NULL( &ex );
+    retval->p_media_player = libvlc_media_player_new( retval->p_instance );
+    if( ! retval->p_media_player )
+         RAISE_NULL( mediacontrol_InternalException, "Out of memory" );
     return retval;
 }
 

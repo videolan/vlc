@@ -333,7 +333,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t * );
  * - When attempting to destroy the object the lock is also held.
  **************************************************************************/
 libvlc_media_player_t *
-libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
+libvlc_media_player_new( libvlc_instance_t *instance )
 {
     libvlc_media_player_t * mp;
 
@@ -415,13 +415,11 @@ libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
  * Create a Media Instance object with a media descriptor.
  **************************************************************************/
 libvlc_media_player_t *
-libvlc_media_player_new_from_media(
-                                    libvlc_media_t * p_md,
-                                    libvlc_exception_t *p_e )
+libvlc_media_player_new_from_media( libvlc_media_t * p_md )
 {
     libvlc_media_player_t * p_mi;
 
-    p_mi = libvlc_media_player_new( p_md->p_libvlc_instance, p_e );
+    p_mi = libvlc_media_player_new( p_md->p_libvlc_instance );
     if( !p_mi )
         return NULL;
 
@@ -570,30 +568,26 @@ libvlc_media_player_event_manager( libvlc_media_player_t *p_mi )
 /**************************************************************************
  * Tell media player to start playing.
  **************************************************************************/
-void libvlc_media_player_play( libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e )
+int libvlc_media_player_play( libvlc_media_player_t *p_mi )
 {
     input_thread_t * p_input_thread;
 
-    if( (p_input_thread = libvlc_get_input_thread( p_mi, p_e )) )
+    if( (p_input_thread = libvlc_get_input_thread( p_mi, NULL )) )
     {
         /* A thread already exists, send it a play message */
         input_Control( p_input_thread, INPUT_SET_STATE, PLAYING_S );
         vlc_object_release( p_input_thread );
-        return;
+        return 0;
     }
 
     /* Ignore previous exception */
-    libvlc_exception_clear( p_e );
-
     lock(p_mi);
 
     if( !p_mi->p_md )
     {
         unlock(p_mi);
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "No associated media descriptor" );
-        return;
+        return -1;
     }
 
     p_mi->p_input_thread = input_Create( p_mi,
@@ -602,7 +596,8 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
     if( !p_mi->p_input_thread )
     {
         unlock(p_mi);
-        return;
+        libvlc_printerr( "Not enough memory" );
+        return -1;
     }
 
     p_mi->p_input_resource = NULL;
@@ -619,22 +614,22 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
     }
 
     unlock(p_mi);
+    return 0;
 }
 
 /**************************************************************************
  * Pause.
  **************************************************************************/
-void libvlc_media_player_pause( libvlc_media_player_t *p_mi,
-                                  libvlc_exception_t *p_e )
+void libvlc_media_player_pause( libvlc_media_player_t *p_mi )
 {
-    input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t * p_input_thread = libvlc_get_input_thread( p_mi, NULL );
     if( !p_input_thread )
         return;
 
     libvlc_state_t state = libvlc_media_player_get_state( p_mi );
     if( state == libvlc_Playing || state == libvlc_Buffering )
     {
-        if( libvlc_media_player_can_pause( p_mi, p_e ) )
+        if( libvlc_media_player_can_pause( p_mi ) )
             input_Control( p_input_thread, INPUT_SET_STATE, PAUSE_S );
         else
             libvlc_media_player_stop( p_mi );
@@ -782,13 +777,12 @@ void *libvlc_media_player_get_hwnd( libvlc_media_player_t *p_mi )
  * Getters for stream information
  **************************************************************************/
 libvlc_time_t libvlc_media_player_get_length(
-                             libvlc_media_player_t *p_mi,
-                             libvlc_exception_t *p_e )
+                             libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     libvlc_time_t i_time;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return -1;
 
@@ -798,14 +792,12 @@ libvlc_time_t libvlc_media_player_get_length(
     return i_time;
 }
 
-libvlc_time_t libvlc_media_player_get_time(
-                                   libvlc_media_player_t *p_mi,
-                                   libvlc_exception_t *p_e )
+libvlc_time_t libvlc_media_player_get_time( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     libvlc_time_t i_time;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return -1;
 
@@ -814,14 +806,12 @@ libvlc_time_t libvlc_media_player_get_time(
     return i_time;
 }
 
-void libvlc_media_player_set_time(
-                                 libvlc_media_player_t *p_mi,
-                                 libvlc_time_t i_time,
-                                 libvlc_exception_t *p_e )
+void libvlc_media_player_set_time( libvlc_media_player_t *p_mi,
+                                   libvlc_time_t i_time )
 {
     input_thread_t *p_input_thread;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return;
 
@@ -829,14 +819,12 @@ void libvlc_media_player_set_time(
     vlc_object_release( p_input_thread );
 }
 
-void libvlc_media_player_set_position(
-                                libvlc_media_player_t *p_mi,
-                                float position,
-                                libvlc_exception_t *p_e )
+void libvlc_media_player_set_position( libvlc_media_player_t *p_mi,
+                                       float position )
 {
     input_thread_t *p_input_thread;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return;
 
@@ -844,14 +832,12 @@ void libvlc_media_player_set_position(
     vlc_object_release( p_input_thread );
 }
 
-float libvlc_media_player_get_position(
-                                 libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e )
+float libvlc_media_player_get_position( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     float f_position;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return -1.0;
 
@@ -861,14 +847,12 @@ float libvlc_media_player_get_position(
     return f_position;
 }
 
-void libvlc_media_player_set_chapter(
-                                 libvlc_media_player_t *p_mi,
-                                 int chapter,
-                                 libvlc_exception_t *p_e )
+void libvlc_media_player_set_chapter( libvlc_media_player_t *p_mi,
+                                      int chapter )
 {
     input_thread_t *p_input_thread;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return;
 
@@ -876,14 +860,12 @@ void libvlc_media_player_set_chapter(
     vlc_object_release( p_input_thread );
 }
 
-int libvlc_media_player_get_chapter(
-                                 libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e )
+int libvlc_media_player_get_chapter( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     int i_chapter;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return -1;
 
@@ -893,14 +875,12 @@ int libvlc_media_player_get_chapter(
     return i_chapter;
 }
 
-int libvlc_media_player_get_chapter_count(
-                                 libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e )
+int libvlc_media_player_get_chapter_count( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     vlc_value_t val;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return -1;
 
@@ -912,13 +892,12 @@ int libvlc_media_player_get_chapter_count(
 
 int libvlc_media_player_get_chapter_count_for_title(
                                  libvlc_media_player_t *p_mi,
-                                 int i_title,
-                                 libvlc_exception_t *p_e )
+                                 int i_title )
 {
     input_thread_t *p_input_thread;
     vlc_value_t val;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return -1;
 
@@ -935,14 +914,12 @@ int libvlc_media_player_get_chapter_count_for_title(
     return val.i_int;
 }
 
-void libvlc_media_player_set_title(
-                                 libvlc_media_player_t *p_mi,
-                                 int i_title,
-                                 libvlc_exception_t *p_e )
+void libvlc_media_player_set_title( libvlc_media_player_t *p_mi,
+                                    int i_title )
 {
     input_thread_t *p_input_thread;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return;
 
@@ -956,14 +933,12 @@ void libvlc_media_player_set_title(
     libvlc_event_send( p_mi->p_event_manager, &event );
 }
 
-int libvlc_media_player_get_title(
-                                 libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e )
+int libvlc_media_player_get_title( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     int i_title;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return -1;
 
@@ -973,14 +948,12 @@ int libvlc_media_player_get_title(
     return i_title;
 }
 
-int libvlc_media_player_get_title_count(
-                                 libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e )
+int libvlc_media_player_get_title_count( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     vlc_value_t val;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return -1;
 
@@ -990,13 +963,11 @@ int libvlc_media_player_get_title_count(
     return val.i_int;
 }
 
-void libvlc_media_player_next_chapter(
-                                 libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e )
+void libvlc_media_player_next_chapter( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return;
 
@@ -1007,13 +978,11 @@ void libvlc_media_player_next_chapter(
     vlc_object_release( p_input_thread );
 }
 
-void libvlc_media_player_previous_chapter(
-                                 libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e )
+void libvlc_media_player_previous_chapter( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e);
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return;
 
@@ -1024,11 +993,9 @@ void libvlc_media_player_previous_chapter(
     vlc_object_release( p_input_thread );
 }
 
-float libvlc_media_player_get_fps(
-                                 libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e)
+float libvlc_media_player_get_fps( libvlc_media_player_t *p_mi )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     double f_fps = 0.0;
 
     if( p_input_thread )
@@ -1040,12 +1007,11 @@ float libvlc_media_player_get_fps(
     return f_fps;
 }
 
-int libvlc_media_player_will_play( libvlc_media_player_t *p_mi,
-                                     libvlc_exception_t *p_e)
+int libvlc_media_player_will_play( libvlc_media_player_t *p_mi )
 {
     bool b_will_play;
     input_thread_t *p_input_thread =
-                            libvlc_get_input_thread ( p_mi, p_e);
+                            libvlc_get_input_thread ( p_mi, NULL );
     if ( !p_input_thread )
         return false;
 
@@ -1055,40 +1021,35 @@ int libvlc_media_player_will_play( libvlc_media_player_t *p_mi,
     return b_will_play;
 }
 
-void libvlc_media_player_set_rate(
-                                 libvlc_media_player_t *p_mi,
-                                 float rate,
-                                 libvlc_exception_t *p_e )
+int libvlc_media_player_set_rate( libvlc_media_player_t *p_mi, float rate )
 {
     input_thread_t *p_input_thread;
     bool b_can_rewind;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
-        return;
+        return -1;
 
     b_can_rewind = var_GetBool( p_input_thread, "can-rewind" );
     if( (rate < 0.0) && !b_can_rewind )
     {
         vlc_object_release( p_input_thread );
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "Invalid playback rate" );
-        return;
+        return -1;
     }
 
     var_SetFloat( p_input_thread, "rate", rate );
     vlc_object_release( p_input_thread );
+    return 0;
 }
 
-float libvlc_media_player_get_rate(
-                                 libvlc_media_player_t *p_mi,
-                                 libvlc_exception_t *p_e )
+float libvlc_media_player_get_rate( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     float f_rate;
     bool b_can_rewind;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( !p_input_thread )
         return 0.0;  /* rate < 0 indicates rewind */
 
@@ -1113,19 +1074,14 @@ libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *p_mi )
     return state;
 }
 
-int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi,
-                                       libvlc_exception_t *p_e )
+int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     bool b_seekable;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if ( !p_input_thread )
-    {
-        /* We do return the right value, no need to throw an exception */
-        clear_if_needed(p_e);
         return false;
-    }
     b_seekable = var_GetBool( p_input_thread, "can-seek" );
     vlc_object_release( p_input_thread );
 
@@ -1135,10 +1091,9 @@ int libvlc_media_player_is_seekable( libvlc_media_player_t *p_mi,
 /* internal function, used by audio, video */
 libvlc_track_description_t *
         libvlc_get_track_description( libvlc_media_player_t *p_mi,
-                                      const char *psz_variable,
-                                      libvlc_exception_t *p_e )
+                                      const char *psz_variable )
 {
-    input_thread_t *p_input = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t *p_input = libvlc_get_input_thread( p_mi, NULL );
     libvlc_track_description_t *p_track_description = NULL,
                                *p_actual, *p_previous;
 
@@ -1156,7 +1111,6 @@ libvlc_track_description_t *
         malloc( sizeof( libvlc_track_description_t ) );
     if ( !p_track_description )
     {
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "Not enough memory" );
         goto end;
     }
@@ -1206,36 +1160,26 @@ void libvlc_track_description_release( libvlc_track_description_t *p_td )
     }
 }
 
-int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi,
-                                     libvlc_exception_t *p_e )
+int libvlc_media_player_can_pause( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
     bool b_can_pause;
 
-    p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if ( !p_input_thread )
-    {
-        /* We do return the right value, no need to throw an exception */
-        clear_if_needed(p_e);
         return false;
-    }
     b_can_pause = var_GetBool( p_input_thread, "can-pause" );
     vlc_object_release( p_input_thread );
 
     return b_can_pause;
 }
 
-void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi, libvlc_exception_t *p_e )
+void libvlc_media_player_next_frame( libvlc_media_player_t *p_mi )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi, NULL );
     if( p_input_thread != NULL )
     {
         var_TriggerCallback( p_input_thread, "frame-next" );
         vlc_object_release( p_input_thread );
-    }
-    else
-    {
-        libvlc_exception_raise( p_e );
-        libvlc_printerr( "No active input" );
     }
 }

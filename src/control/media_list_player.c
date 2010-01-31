@@ -438,7 +438,7 @@ set_current_playing_item(libvlc_media_list_player_t * p_mlp, libvlc_media_list_p
 
     /* Create a new media_player if there is none */
     if (!p_mlp->p_mi)
-        p_mlp->p_mi = libvlc_media_player_new_from_media(p_md, NULL);
+        p_mlp->p_mi = libvlc_media_player_new_from_media(p_md);
 
     libvlc_media_player_set_media(p_mlp->p_mi, p_md);
 
@@ -454,9 +454,8 @@ set_current_playing_item(libvlc_media_list_player_t * p_mlp, libvlc_media_list_p
  *         new (Public)
  **************************************************************************/
 libvlc_media_list_player_t *
-libvlc_media_list_player_new(libvlc_instance_t * p_instance, libvlc_exception_t * p_e)
+libvlc_media_list_player_new(libvlc_instance_t * p_instance)
 {
-    (void)p_e;
     libvlc_media_list_player_t * p_mlp;
     p_mlp = calloc( 1, sizeof(libvlc_media_list_player_t) );
     if (unlikely(p_mlp == NULL))
