@@ -343,13 +343,13 @@ libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
 
     assert(instance);
 
-    mp = malloc(sizeof(libvlc_media_player_t));
-    if (!mp)
+    mp = vlc_object_create (instance->p_libvlc_int, sizeof(*mp));
+    if (unlikely(mp == NULL))
     {
-        libvlc_exception_raise(e);
         libvlc_printerr("Not enough memory");
         return NULL;
     }
+    vlc_object_attach (mp, mp->p_libvlc);
     mp->p_md = NULL;
     mp->drawable.agl = 0;
     mp->drawable.xid = 0;
@@ -364,7 +364,7 @@ libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
     mp->p_event_manager = libvlc_event_manager_new(mp, instance);
     if (unlikely(mp->p_event_manager == NULL))
     {
-        free(mp);
+        vlc_object_release(mp);
         return NULL;
     }
     vlc_mutex_init(&mp->object_lock);
@@ -399,7 +399,7 @@ libvlc_media_player_new( libvlc_instance_t *instance, libvlc_exception_t *e )
      * FIXME: It's unclear why we want to put this in public API, and why we
      * want to expose it in such a limiting and ugly way.
      */
-    var_AddCallback(instance->p_libvlc_int, "snapshot-file", snapshot_was_taken, mp);
+    var_AddCallback(mp->p_libvlc, "snapshot-file", snapshot_was_taken, mp);
 
     return mp;
 }
@@ -434,7 +434,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     assert( p_mi );
 
     /* Detach Callback from the main libvlc object */
-    var_DelCallback( p_mi->p_libvlc_instance->p_libvlc_int,
+    var_DelCallback( p_mi->p_libvlc,
                      "snapshot-file", snapshot_was_taken, p_mi );
 
     /* If the input thread hasn't been already deleted it means
@@ -454,7 +454,7 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     libvlc_event_manager_release( p_mi->p_event_manager );
     libvlc_media_release( p_mi->p_md );
     vlc_mutex_destroy( &p_mi->object_lock );
-    free( p_mi );
+    vlc_object_release( p_mi );
 }
 
 /**************************************************************************
@@ -589,9 +589,9 @@ void libvlc_media_player_play( libvlc_media_player_t *p_mi,
         return;
     }
 
-    p_mi->p_input_thread = input_Create( p_mi->p_libvlc_instance->p_libvlc_int,
-                                         p_mi->p_md->p_input_item, NULL, p_mi->p_input_resource );
-
+    p_mi->p_input_thread = input_Create( p_mi,
+                                         p_mi->p_md->p_input_item, NULL,
+                                         p_mi->p_input_resource );
     if( !p_mi->p_input_thread )
     {
         unlock(p_mi);
