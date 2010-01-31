@@ -78,8 +78,8 @@ static void test_events (const char ** argv, int argc)
     vlc = libvlc_new (argc, argv, &ex);
     catch ();
 
-    mi = libvlc_media_player_new (vlc, &ex);
-    catch ();
+    mi = libvlc_media_player_new (vlc);
+    assert (mi != NULL);
 
     em = libvlc_media_player_event_manager (mi);
 

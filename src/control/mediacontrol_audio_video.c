@@ -60,7 +60,7 @@ mediacontrol_snapshot( mediacontrol_Instance *self,
     libvlc_exception_init( &ex );
     mediacontrol_exception_init( exception );
 
-    p_input = libvlc_get_input_thread( self->p_media_player, &ex );
+    p_input = libvlc_get_input_thread( self->p_media_player );
     if( ! p_input )
     {
         RAISE_NULL( mediacontrol_InternalException, "No input" );
@@ -140,7 +140,7 @@ mediacontrol_display_text( mediacontrol_Instance *self,
         RAISE_VOID( mediacontrol_InternalException, "Empty text" );
     }
 
-    p_input = libvlc_get_input_thread( self->p_media_player, &ex );
+    p_input = libvlc_get_input_thread( self->p_media_player );
     if( ! p_input )
     {
         RAISE_VOID( mediacontrol_InternalException, "No input" );
@@ -240,16 +240,12 @@ int
 mediacontrol_get_rate( mediacontrol_Instance *self,
                mediacontrol_Exception *exception )
 {
-    libvlc_exception_t ex;
     int i_ret;
 
     mediacontrol_exception_init( exception );
-    libvlc_exception_init( &ex );
+    i_ret = libvlc_media_player_get_rate( self->p_media_player );
 
-    i_ret = libvlc_media_player_get_rate( self->p_media_player, &ex );
-    HANDLE_LIBVLC_EXCEPTION_ZERO( &ex );
-
-    return i_ret / 10;
+    return (i_ret >= 0) ? (i_ret / 10) : -1;
 }
 
 void
@@ -257,13 +253,9 @@ mediacontrol_set_rate( mediacontrol_Instance *self,
                const int rate,
                mediacontrol_Exception *exception )
 {
-    libvlc_exception_t ex;
-
     mediacontrol_exception_init( exception );
-    libvlc_exception_init( &ex );
 
-    libvlc_media_player_set_rate( self->p_media_player, rate * 10, &ex );
-    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
+    libvlc_media_player_set_rate( self->p_media_player, rate * 10 );
 }
 
 int

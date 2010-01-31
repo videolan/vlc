@@ -66,10 +66,8 @@ libvlc_time_t private_mediacontrol_unit_convert( libvlc_media_player_t *p_media_
         if( to == mediacontrol_SampleCount )
         {
             double f_fps;
-            libvlc_exception_t ex;
-            libvlc_exception_init( &ex );
 
-            f_fps = libvlc_media_player_get_rate( p_media_player, &ex );
+            f_fps = libvlc_media_player_get_rate( p_media_player );
             if( f_fps < 0 )
                 return 0;
             else
@@ -82,10 +80,8 @@ libvlc_time_t private_mediacontrol_unit_convert( libvlc_media_player_t *p_media_
     case mediacontrol_SampleCount:
     {
         double f_fps;
-        libvlc_exception_t ex;
-        libvlc_exception_init( &ex );
 
-        f_fps = libvlc_media_player_get_rate( p_media_player, &ex );
+        f_fps = libvlc_media_player_get_rate( p_media_player );
         if( f_fps < 0 )
             return 0;
 
@@ -129,10 +125,8 @@ private_mediacontrol_position2microsecond( libvlc_media_player_t * p_media_playe
     {
         libvlc_time_t l_time = 0;
         libvlc_time_t l_pos = 0;
-        libvlc_exception_t ex;
-        libvlc_exception_init( &ex );
 
-        l_time = libvlc_media_player_get_time( p_media_player, &ex );
+        l_time = libvlc_media_player_get_time( p_media_player );
         /* Ignore exception, we will assume a 0 time value */
 
         l_pos = private_mediacontrol_unit_convert( p_media_player,
@@ -147,14 +141,12 @@ private_mediacontrol_position2microsecond( libvlc_media_player_t * p_media_playe
         libvlc_time_t l_time = 0;
         libvlc_time_t l_length = 0;
         libvlc_time_t l_pos = 0;
-        libvlc_exception_t ex;
-        libvlc_exception_init( &ex );
 
-        l_length = libvlc_media_player_get_length( p_media_player, &ex );
+        l_length = libvlc_media_player_get_length( p_media_player );
         if( l_length <= 0 )
             return 0;
 
-        l_time = libvlc_media_player_get_time( p_media_player, &ex );
+        l_time = libvlc_media_player_get_time( p_media_player );
         /* Ignore exception, we will assume a 0 time value */
 
         l_pos = private_mediacontrol_unit_convert( p_media_player,

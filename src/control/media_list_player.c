@@ -587,7 +587,7 @@ void libvlc_media_list_player_play(libvlc_media_list_player_t * p_mlp, libvlc_ex
         unlock(p_mlp);
         return; /* Will set to play */
     }
-    libvlc_media_player_play(p_mlp->p_mi, p_e);
+    libvlc_media_player_play(p_mlp->p_mi);
     unlock(p_mlp);
 }
 
@@ -603,7 +603,7 @@ void libvlc_media_list_player_pause(libvlc_media_list_player_t * p_mlp, libvlc_e
         unlock(p_mlp);
         return;
     }
-    libvlc_media_player_pause(p_mlp->p_mi, p_e);
+    libvlc_media_player_pause(p_mlp->p_mi);
     unlock(p_mlp);
 }
 
@@ -636,7 +636,7 @@ void libvlc_media_list_player_play_item_at_index(libvlc_media_list_player_t * p_
 {
     lock(p_mlp);
     set_current_playing_item(p_mlp, libvlc_media_list_path_with_root_index(i_index));
-    libvlc_media_player_play(p_mlp->p_mi, p_e);
+    libvlc_media_player_play(p_mlp->p_mi);
     unlock(p_mlp);
 
     /* Send the next item event */
@@ -661,7 +661,7 @@ void libvlc_media_list_player_play_item(libvlc_media_list_player_t * p_mlp, libv
     }
 
     set_current_playing_item(p_mlp, path);
-    libvlc_media_player_play(p_mlp->p_mi, p_e);
+    libvlc_media_player_play(p_mlp->p_mi);
     unlock(p_mlp);
 }
 
@@ -762,7 +762,7 @@ static void set_relative_playlist_position_and_play(
         return;
     }
 
-    libvlc_media_player_play(p_mlp->p_mi, p_e);
+    libvlc_media_player_play(p_mlp->p_mi);
 
     libvlc_media_list_unlock(p_mlp->p_mlist);
 

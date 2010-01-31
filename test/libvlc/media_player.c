@@ -39,13 +39,12 @@ static void test_media_player_play_stop(const char** argv, int argc)
     md = libvlc_media_new (vlc, file, &ex);
     catch ();
 
-    mi = libvlc_media_player_new_from_media (md, &ex);
-    catch ();
+    mi = libvlc_media_player_new_from_media (md);
+    assert (mi != NULL);
 
     libvlc_media_release (md);
 
-    libvlc_media_player_play (mi, &ex);
-    catch ();
+    libvlc_media_player_play (mi);
 
     /* Wait a correct state */
     libvlc_state_t state;
@@ -78,13 +77,12 @@ static void test_media_player_pause_stop(const char** argv, int argc)
     md = libvlc_media_new (vlc, file, &ex);
     catch ();
 
-    mi = libvlc_media_player_new_from_media (md, &ex);
-    catch ();
+    mi = libvlc_media_player_new_from_media (md);
+    assert (mi != NULL);
 
     libvlc_media_release (md);
 
-    libvlc_media_player_play (mi, &ex);
-    catch ();
+    libvlc_media_player_play (mi);
 
     log ("Waiting for playing\n");
 
@@ -102,8 +100,7 @@ static void test_media_player_pause_stop(const char** argv, int argc)
 #if 0
     /* This can't work because under some condition (short file, this is the case) this will be
      * equivalent to a play() */
-    libvlc_media_player_pause (mi, &ex);
-    catch();
+    libvlc_media_player_pause (mi);
 
     log ("Waiting for pause\n");
 

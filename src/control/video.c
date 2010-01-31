@@ -47,7 +47,7 @@
 static vout_thread_t *GetVout( libvlc_media_player_t *p_mi,
                                libvlc_exception_t *p_exception )
 {
-    input_thread_t *p_input = libvlc_get_input_thread( p_mi, p_exception );
+    input_thread_t *p_input = libvlc_get_input_thread( p_mi );
     vout_thread_t *p_vout = NULL;
 
     if( p_input )
@@ -59,6 +59,11 @@ static vout_thread_t *GetVout( libvlc_media_player_t *p_mi,
             libvlc_printerr( "No active video output" );
         }
         vlc_object_release( p_input );
+    }
+    else
+    {
+        libvlc_exception_raise( p_exception );
+        libvlc_printerr( "No active input" );
     }
     return p_vout;
 }
@@ -185,7 +190,7 @@ int libvlc_video_get_width( libvlc_media_player_t *p_mi,
 int libvlc_media_player_has_vout( libvlc_media_player_t *p_mi,
                                      libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread(p_mi, p_e);
+    input_thread_t *p_input_thread = libvlc_get_input_thread(p_mi);
     bool has_vout = false;
 
     if( p_input_thread )
@@ -263,14 +268,19 @@ void libvlc_video_set_aspect_ratio( libvlc_media_player_t *p_mi,
 int libvlc_video_get_spu( libvlc_media_player_t *p_mi,
                           libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     vlc_value_t val_list;
     vlc_value_t val;
     int i_spu = -1;
     int i_ret = -1;
     int i;
 
-    if( !p_input_thread ) return -1;
+    if( !p_input_thread )
+    {
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "No active input" );
+        return -1;
+    }
 
     i_ret = var_Get( p_input_thread, "spu-es", &val );
     if( i_ret < 0 )
@@ -298,11 +308,15 @@ int libvlc_video_get_spu( libvlc_media_player_t *p_mi,
 int libvlc_video_get_spu_count( libvlc_media_player_t *p_mi,
                                 libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     int i_spu_count;
 
     if( !p_input_thread )
+    {
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "No active input" );
         return -1;
+    }
 
     i_spu_count = var_CountChoices( p_input_thread, "spu-es" );
 
@@ -314,18 +328,23 @@ libvlc_track_description_t *
         libvlc_video_get_spu_description( libvlc_media_player_t *p_mi,
                                           libvlc_exception_t *p_e )
 {
-    return libvlc_get_track_description( p_mi, "spu-es", p_e);
+    return libvlc_get_track_description( p_mi, "spu-es" );
 }
 
 void libvlc_video_set_spu( libvlc_media_player_t *p_mi, int i_spu,
                            libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     vlc_value_t val_list;
     vlc_value_t newval;
     int i_ret = -1;
 
-    if( !p_input_thread ) return;
+    if( !p_input_thread )
+    {
+        libvlc_exception_raise( p_e );
+        libvlc_printerr( "No active input" );
+        return;
+    }
 
     var_Change( p_input_thread, "spu-es", VLC_VAR_GETCHOICES, &val_list, NULL );
 
@@ -354,7 +373,7 @@ int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi,
                                     const char *psz_subtitle,
                                     libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi );
     bool b_ret = false;
 
     if( p_input_thread )
@@ -370,7 +389,7 @@ libvlc_track_description_t *
         libvlc_video_get_title_description( libvlc_media_player_t *p_mi,
                                             libvlc_exception_t * p_e )
 {
-    return libvlc_get_track_description( p_mi, "title", p_e);
+    return libvlc_get_track_description( p_mi, "title" );
 }
 
 libvlc_track_description_t *
@@ -380,7 +399,7 @@ libvlc_track_description_t *
 {
     char psz_title[12];
     sprintf( psz_title,  "title %2i", i_title );
-    return libvlc_get_track_description( p_mi, psz_title, p_e);
+    return libvlc_get_track_description( p_mi, psz_title );
 }
 
 char *libvlc_video_get_crop_geometry( libvlc_media_player_t *p_mi,
@@ -419,7 +438,7 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
 {
     input_thread_t *p_input_thread;
 
-    p_input_thread = libvlc_get_input_thread(p_mi, p_e);
+    p_input_thread = libvlc_get_input_thread(p_mi);
     if( !p_input_thread ) return;
 
     if( var_CountChoices( p_input_thread, "teletext-es" ) <= 0 )
@@ -449,7 +468,7 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
 int libvlc_video_get_track_count( libvlc_media_player_t *p_mi,
                                   libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     int i_track_count;
 
     if( !p_input_thread )
@@ -465,13 +484,13 @@ libvlc_track_description_t *
         libvlc_video_get_track_description( libvlc_media_player_t *p_mi,
                                             libvlc_exception_t *p_e )
 {
-    return libvlc_get_track_description( p_mi, "video-es", p_e);
+    return libvlc_get_track_description( p_mi, "video-es" );
 }
 
 int libvlc_video_get_track( libvlc_media_player_t *p_mi,
                             libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     vlc_value_t val_list;
     vlc_value_t val;
     int i_track = -1;
@@ -487,7 +506,7 @@ int libvlc_video_get_track( libvlc_media_player_t *p_mi,
         libvlc_exception_raise( p_e );
         libvlc_printerr( "Video track information not found" );
         vlc_object_release( p_input_thread );
-        return i_ret;
+        return -1;
     }
 
     var_Change( p_input_thread, "video-es", VLC_VAR_GETCHOICES, &val_list, NULL );
@@ -507,7 +526,7 @@ int libvlc_video_get_track( libvlc_media_player_t *p_mi,
 void libvlc_video_set_track( libvlc_media_player_t *p_mi, int i_track,
                              libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     vlc_value_t val_list;
     int i_ret = -1;
     int i;

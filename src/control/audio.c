@@ -367,7 +367,7 @@ void libvlc_audio_set_volume( libvlc_instance_t *p_instance, int i_volume,
 int libvlc_audio_get_track_count( libvlc_media_player_t *p_mi,
                                   libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     int i_track_count;
 
     if( !p_input_thread )
@@ -386,7 +386,7 @@ libvlc_track_description_t *
         libvlc_audio_get_track_description( libvlc_media_player_t *p_mi,
                                             libvlc_exception_t *p_e )
 {
-    return libvlc_get_track_description( p_mi, "audio-es", p_e);
+    return libvlc_get_track_description( p_mi, "audio-es" );
 }
 
 /*****************************************************************************
@@ -395,7 +395,7 @@ libvlc_track_description_t *
 int libvlc_audio_get_track( libvlc_media_player_t *p_mi,
                             libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     vlc_value_t val_list;
     vlc_value_t val;
     int i_track = -1;
@@ -432,7 +432,7 @@ int libvlc_audio_get_track( libvlc_media_player_t *p_mi,
 void libvlc_audio_set_track( libvlc_media_player_t *p_mi, int i_track,
                              libvlc_exception_t *p_e )
 {
-    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi, p_e );
+    input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     vlc_value_t val_list;
     vlc_value_t newval;
     int i_ret = -1;

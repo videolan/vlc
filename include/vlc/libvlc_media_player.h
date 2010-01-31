@@ -720,7 +720,7 @@ VLC_PUBLIC_API void libvlc_toggle_teletext( libvlc_media_player_t *, libvlc_exce
  * \param p_mi media player
  * \return the number of available video tracks (int)
  */
-VLC_PUBLIC_API int libvlc_video_get_track_count( libvlc_media_player_t *, libvlc_exceptio_t * );
+VLC_PUBLIC_API int libvlc_video_get_track_count( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
  * Get the description of available video tracks.
@@ -730,7 +730,7 @@ VLC_PUBLIC_API int libvlc_video_get_track_count( libvlc_media_player_t *, libvlc
  * \return list with description of available video tracks, or NULL on error
  */
 VLC_PUBLIC_API libvlc_track_description_t *
-        libvlc_video_get_track_description( libvlc_media_player_t * );
+        libvlc_video_get_track_description( libvlc_media_player_t *, libvlc_exception_t * );
 
 /**
  * Get current video track.

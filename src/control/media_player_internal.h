@@ -49,12 +49,11 @@ struct libvlc_media_player_t
 };
 
 /* Media player - audio, video */
-input_thread_t *libvlc_get_input_thread(libvlc_media_player_t *, libvlc_exception_t * );
+input_thread_t *libvlc_get_input_thread(libvlc_media_player_t * );
 
 
 libvlc_track_description_t * libvlc_get_track_description(
         libvlc_media_player_t *p_mi,
-        const char *psz_variable,
-        libvlc_exception_t *p_e );
+        const char *psz_variable );
 
 #endif

@@ -114,11 +114,9 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
                                  mediacontrol_Exception *exception )
 {
     mediacontrol_Position* retval = NULL;
-    libvlc_exception_t ex;
     int64_t pos;
 
     mediacontrol_exception_init( exception );
-    libvlc_exception_init( &ex );
 
     retval = ( mediacontrol_Position* )malloc( sizeof( mediacontrol_Position ) );
     retval->origin = an_origin;
@@ -133,7 +131,7 @@ mediacontrol_get_media_position( mediacontrol_Instance *self,
     }
 
     /* We are asked for an AbsolutePosition. */
-    pos = libvlc_media_player_get_time( self->p_media_player, &ex );
+    pos = libvlc_media_player_get_time( self->p_media_player );
 
     if( a_key == mediacontrol_MediaTime )
     {
@@ -155,15 +153,12 @@ mediacontrol_set_media_position( mediacontrol_Instance *self,
                                  const mediacontrol_Position * a_position,
                                  mediacontrol_Exception *exception )
 {
-    libvlc_exception_t ex;
     int64_t i_pos;
 
-    libvlc_exception_init( &ex );
     mediacontrol_exception_init( exception );
 
     i_pos = private_mediacontrol_position2microsecond( self->p_media_player, a_position );
-    libvlc_media_player_set_time( self->p_media_player, i_pos / 1000, &ex );
-    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
+    libvlc_media_player_set_time( self->p_media_player, i_pos / 1000 );
 }
 
 /* Starts playing a stream */
@@ -221,8 +216,7 @@ mediacontrol_start( mediacontrol_Instance *self,
 
         libvlc_media_player_set_media( self->p_media_player, p_media );
 
-        libvlc_media_player_play( self->p_media_player, &ex );
-        HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
+        libvlc_media_player_play( self->p_media_player );
     }
 }
 
@@ -230,34 +224,23 @@ void
 mediacontrol_pause( mediacontrol_Instance *self,
                     mediacontrol_Exception *exception )
 {
-    libvlc_exception_t ex;
-
     mediacontrol_exception_init( exception );
-    libvlc_exception_init( &ex );
-    libvlc_media_player_pause( self->p_media_player, &ex );
-    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
+    libvlc_media_player_pause( self->p_media_player );
 }
 
 void
 mediacontrol_resume( mediacontrol_Instance *self,
                      mediacontrol_Exception *exception )
 {
-    libvlc_exception_t ex;
-
     mediacontrol_exception_init( exception );
-    libvlc_exception_init( &ex );
-    libvlc_media_player_pause( self->p_media_player, &ex );
-    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
+    libvlc_media_player_pause( self->p_media_player );
 }
 
 void
 mediacontrol_stop( mediacontrol_Instance *self,
                    mediacontrol_Exception *exception )
 {
-    libvlc_exception_t ex;
-
     mediacontrol_exception_init( exception );
-    libvlc_exception_init( &ex );
     libvlc_media_player_stop( self->p_media_player );
 }
 
@@ -379,20 +362,8 @@ mediacontrol_get_stream_information( mediacontrol_Instance *self,
 
         retval->url = libvlc_media_get_mrl( p_media );
 
-        retval->position = libvlc_media_player_get_time( self->p_media_player, &ex );
-        if( libvlc_exception_raised( &ex ) )
-        {
-            libvlc_exception_clear( &ex );
-            retval->position = 0;
-        }
-
-        retval->length = libvlc_media_player_get_length( self->p_media_player, &ex );
-        if( libvlc_exception_raised( &ex ) )
-        {
-            libvlc_exception_clear( &ex );
-            retval->length = 0;
-        }
-
+        retval->position = libvlc_media_player_get_time( self->p_media_player );
+        retval->length = libvlc_media_player_get_length( self->p_media_player );
     }
     return retval;
 }
