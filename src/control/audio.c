@@ -64,8 +64,7 @@ static aout_instance_t *GetAOut( libvlc_instance_t *p_instance,
  * Get the list of available audio outputs
  *****************************************/
 libvlc_audio_output_t *
-        libvlc_audio_output_list_get( libvlc_instance_t *p_instance,
-                                      libvlc_exception_t *p_e )
+        libvlc_audio_output_list_get( libvlc_instance_t *p_instance )
 {
     VLC_UNUSED( p_instance );
     libvlc_audio_output_t *p_list = NULL,
@@ -85,7 +84,6 @@ libvlc_audio_output_t *
                     malloc( sizeof( libvlc_audio_output_t ) );
                 if( p_actual == NULL )
                 {
-                    libvlc_exception_raise( p_e );
                     libvlc_printerr( "Not enough memory" );
                     libvlc_audio_output_list_release( p_list );
                     module_list_free( module_list );

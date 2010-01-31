@@ -933,13 +933,12 @@ typedef enum libvlc_audio_output_channel_t {
  * Get the list of available audio outputs
  *
  * \param p_instance libvlc instance
- * \param p_e an initialized exception pointer
- * \return list of available audio outputs, at the end free it with
-*          \see libvlc_audio_output_list_release \see libvlc_audio_output_t
+ * \return list of available audio outputs. It must be freed it with
+*          \see libvlc_audio_output_list_release \see libvlc_audio_output_t .
+ *         In case of error, NULL is returned.
  */
 VLC_PUBLIC_API libvlc_audio_output_t *
-        libvlc_audio_output_list_get( libvlc_instance_t *,
-                                      libvlc_exception_t * );
+        libvlc_audio_output_list_get( libvlc_instance_t * );
 
 /**
  * Free the list of available audio outputs
