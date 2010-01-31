@@ -28,14 +28,12 @@ using namespace libvlc;
 
 MediaPlayer::MediaPlayer( libVLC &libvlcInstance )
 {
-    Exception ex;
-    m_player = libvlc_media_player_new( libvlcInstance.m_instance, &ex.ex );
+    m_player = libvlc_media_player_new( libvlcInstance.m_instance );
 }
 
 MediaPlayer::MediaPlayer( Media &media )
 {
-    Exception ex;
-    m_player = libvlc_media_player_new_from_media( media.m_media, &ex.ex );
+    m_player = libvlc_media_player_new_from_media( media.m_media );
 }
 
 MediaPlayer::~MediaPlayer()
@@ -55,14 +53,12 @@ int MediaPlayer::isPlaying()
 
 void MediaPlayer::play()
 {
-    Exception ex;
-    libvlc_media_player_play( m_player, &ex.ex );
+    libvlc_media_player_play( m_player );
 }
 
 void MediaPlayer::pause()
 {
-    Exception ex;
-    libvlc_media_player_pause( m_player, &ex.ex );
+    libvlc_media_player_pause( m_player );
 }
 
 void MediaPlayer::stop()
@@ -112,104 +108,87 @@ void *MediaPlayer::hwnd()
 
 int64_t MediaPlayer::lenght()
 {
-    Exception ex;
-    return libvlc_media_player_get_length( m_player, &ex.ex );
+    return libvlc_media_player_get_length( m_player );
 }
 
 int64_t MediaPlayer::time()
 {
-    Exception ex;
-    return libvlc_media_player_get_time( m_player, &ex.ex );
+    return libvlc_media_player_get_time( m_player );
 }
 
 void MediaPlayer::setTime( int64_t new_time )
 {
-    Exception ex;
-    libvlc_media_player_set_time( m_player, new_time, &ex.ex );
+    libvlc_media_player_set_time( m_player, new_time );
 }
 
 float MediaPlayer::position()
 {
-    Exception ex;
-    return libvlc_media_player_get_position( m_player, &ex.ex );
+    return libvlc_media_player_get_position( m_player );
 }
 
 void MediaPlayer::setPosition( float position )
 {
-    Exception ex;
-    libvlc_media_player_set_position( m_player, position, &ex.ex );
+    libvlc_media_player_set_position( m_player, position );
 }
 
 int MediaPlayer::chapter()
 {
-    Exception ex;
-    return libvlc_media_player_get_chapter( m_player, &ex.ex );
+    return libvlc_media_player_get_chapter( m_player );
 }
 
 int MediaPlayer::chapterCount()
 {
-    Exception ex;
-    return libvlc_media_player_get_chapter_count( m_player, &ex.ex );
+    return libvlc_media_player_get_chapter_count( m_player );
 }
 
 int MediaPlayer::chapterCount( int title )
 {
-    Exception ex;
-    return libvlc_media_player_get_chapter_count_for_title( m_player, title, &ex.ex );
+    return libvlc_media_player_get_chapter_count_for_title( m_player, title );
 }
 
 void MediaPlayer::setChapter( int title )
 {
-    Exception ex;
-    libvlc_media_player_set_chapter( m_player, title, &ex.ex );
+    libvlc_media_player_set_chapter( m_player, title );
 }
 
 int MediaPlayer::willPlay()
 {
-    Exception ex;
-    return libvlc_media_player_will_play( m_player, &ex.ex );
+    return libvlc_media_player_will_play( m_player );
 }
 
 int MediaPlayer::title()
 {
-    Exception ex;
-    return libvlc_media_player_get_title( m_player, &ex.ex );
+    return libvlc_media_player_get_title( m_player );
 }
 
 int MediaPlayer::titleCount()
 {
-    Exception ex;
-    return libvlc_media_player_get_title_count( m_player, &ex.ex );
+    return libvlc_media_player_get_title_count( m_player );
 }
 
 void MediaPlayer::setTitle( int title )
 {
-    Exception ex;
-    libvlc_media_player_set_title( m_player, title, &ex.ex );
+    libvlc_media_player_set_title( m_player, title );
 }
 
 void MediaPlayer::previousChapter()
 {
-    Exception ex;
-    libvlc_media_player_previous_chapter( m_player, &ex.ex );
+    libvlc_media_player_previous_chapter( m_player );
 }
 
 void MediaPlayer::nextChapter()
 {
-    Exception ex;
-    libvlc_media_player_next_chapter( m_player, &ex.ex );
+    libvlc_media_player_next_chapter( m_player );
 }
 
 float MediaPlayer::rate()
 {
-    Exception ex;
-    return libvlc_media_player_get_rate( m_player, &ex.ex );
+    return libvlc_media_player_get_rate( m_player );
 }
 
 void MediaPlayer::setRate( float rate )
 {
-    Exception ex;
-    libvlc_media_player_set_rate( m_player, rate, &ex.ex );
+    libvlc_media_player_set_rate( m_player, rate );
 }
 
 libvlc_state_t MediaPlayer::state()
@@ -219,31 +198,26 @@ libvlc_state_t MediaPlayer::state()
 
 float MediaPlayer::fps()
 {
-    Exception ex;
-    return libvlc_media_player_get_fps( m_player, &ex.ex );
+    return libvlc_media_player_get_fps( m_player );
 }
 
 int MediaPlayer::hasVout()
 {
-    Exception ex;
-    return libvlc_media_player_has_vout( m_player, &ex.ex );
+    return libvlc_media_player_has_vout( m_player );
 }
 
 int MediaPlayer::isSeekable()
 {
-    Exception ex;
-    return libvlc_media_player_is_seekable( m_player, &ex.ex );
+    return libvlc_media_player_is_seekable( m_player );
 }
 int MediaPlayer::canPause()
 {
-    Exception ex;
-    return libvlc_media_player_can_pause( m_player, &ex.ex );
+    return libvlc_media_player_can_pause( m_player );
 }
 
 void MediaPlayer::nextFrame()
 {
-    Exception ex;
-    libvlc_media_player_next_frame( m_player, &ex.ex );
+    libvlc_media_player_next_frame( m_player );
 }
 
 void MediaPlayer::toggleFullscreen()

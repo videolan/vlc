@@ -22,16 +22,12 @@
  *****************************************************************************/
 
 #include "audio.hpp"
-#include "exception.hpp"
 
 
 using namespace libvlc;
 
-Audio::Audio( libvlc_instance_t *libvlcInstance, libvlc_media_player_t *player )
+Audio::Audio( libvlc_media_player_t *player )
 {
-    m_libvlcInstance = libvlcInstance;
-    libvlc_retain( m_libvlcInstance );
-
     m_player = player;
     libvlc_media_player_retain( m_player );
 }
@@ -39,50 +35,45 @@ Audio::Audio( libvlc_instance_t *libvlcInstance, libvlc_media_player_t *player )
 Audio::~Audio()
 {
     libvlc_media_player_release( m_player );
-    libvlc_release( m_libvlcInstance );
 }
 
 void Audio::toggleMute()
 {
-    libvlc_audio_toggle_mute( m_libvlcInstance );
+    libvlc_audio_toggle_mute( m_player );
 }
 
 int Audio::mute()
 {
-    return libvlc_audio_get_mute( m_libvlcInstance );
+    return libvlc_audio_get_mute( m_player );
 }
 
 void Audio::setMute( int mute )
 {
-    libvlc_audio_set_mute( m_libvlcInstance, mute );
+    libvlc_audio_set_mute( m_player, mute );
 }
 
 int Audio::volume()
 {
-    return libvlc_audio_get_volume( m_libvlcInstance );
+    return libvlc_audio_get_volume( m_player );
 }
 
 void Audio::setVolume( int volume )
 {
-    Exception ex;
-    libvlc_audio_set_volume( m_libvlcInstance, volume, &ex.ex );
+    libvlc_audio_set_volume( m_player, volume );
 }
 
 int Audio::track()
 {
-    Exception ex;
-    return libvlc_audio_get_track( m_player, &ex.ex );
+    return libvlc_audio_get_track( m_player );
 }
 
 int Audio::trackCount()
 {
-    Exception ex;
-    return libvlc_audio_get_track_count( m_player, &ex.ex );
+    return libvlc_audio_get_track_count( m_player );
 }
 
 void Audio::setTrack( int track )
 {
-    Exception ex;
-    libvlc_audio_set_track( m_player, track, &ex.ex );
+    libvlc_audio_set_track( m_player, track );
 }
 

@@ -76,8 +76,7 @@ void Video::setSpu( int spu )
 
 void Video::setSubtitleFile( const char *subtitle_file )
 {
-    Exception ex;
-    libvlc_video_set_subtitle_file( m_player, subtitle_file, &ex.ex );
+    libvlc_video_set_subtitle_file( m_player, subtitle_file );
 }
 
 char *Video::cropGeometry()
@@ -100,8 +99,7 @@ int Video::track()
 
 int Video::trackCount()
 {
-    Exception ex;
-    return libvlc_video_get_track_count( m_player, &ex.ex );
+    return libvlc_video_get_track_count( m_player );
 }
 
 void Video::setTrack( int track )

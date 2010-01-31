@@ -38,10 +38,9 @@ class Audio
 public:
     /**
      * Constructor
-     * @param libvlcInstance: the libvlc instance
      * @param player: the player handling the audio
      */
-    Audio( libvlc_instance_t *libvlcInstance, libvlc_media_player_t *player );
+    Audio( libvlc_media_player_t *player );
 
     /** Destructor */
     ~Audio();
@@ -111,9 +110,6 @@ public:
 private:
     /** The media player instance of libvlc */
     libvlc_media_player_t *m_player;
-
-    /** The instance of libvlc */
-    libvlc_instance_t *m_libvlcInstance;
 };
 
 };
