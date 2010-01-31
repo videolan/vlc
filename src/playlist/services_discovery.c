@@ -235,7 +235,7 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
 {
     input_item_t * p_input = p_event->u.services_discovery_item_added.p_new_item;
     const char * psz_cat = p_event->u.services_discovery_item_added.psz_category;
-    playlist_item_t *p_new_item, * p_parent = user_data;
+    playlist_item_t * p_parent = user_data;
     playlist_t * p_playlist = p_parent->p_playlist;
 
     msg_Dbg( p_playlist, "Adding %s in %s",
@@ -259,13 +259,9 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
         p_parent = p_cat;
     }
 
-    p_new_item = playlist_NodeAddInput( p_playlist, p_input, p_parent,
-                                        PLAYLIST_APPEND, PLAYLIST_END, pl_Locked );
-    if( p_new_item )
-    {
-        p_new_item->i_flags &= ~PLAYLIST_SKIP_FLAG;
-        p_new_item->i_flags &= ~PLAYLIST_SAVE_FLAG;
-    }
+    playlist_BothAddInput( p_playlist, p_input, p_parent,
+                                        PLAYLIST_APPEND, PLAYLIST_END,
+                                        NULL, NULL, pl_Locked );
     PL_UNLOCK;
 }
 
@@ -274,22 +270,7 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
 {
     input_item_t * p_input = p_event->u.services_discovery_item_removed.p_item;
     playlist_item_t * p_parent = user_data;
-    playlist_item_t * p_pl_item;
-
-    /* First make sure that if item is a node it will be deleted.
-     * XXX: Why don't we have a function to ensure that in the playlist code ? */
-    playlist_Lock( p_parent->p_playlist );
-    p_pl_item = playlist_ItemFindFromInputAndRoot( p_parent->p_playlist,
-            p_input, p_parent, false );
-
-    if( p_pl_item && p_pl_item->i_children > -1 )
-        playlist_NodeDelete( p_parent->p_playlist, p_pl_item, true, false );
-    else
-        /* Delete the non-node item normally */
-        playlist_DeleteFromInputInParent( p_parent->p_playlist, p_input,
-                                          p_parent, pl_Locked );
-
-    playlist_Unlock( p_parent->p_playlist );
+    playlist_DeleteFromInput( p_parent->p_playlist, p_input, false );
 }
 
 int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_module )
@@ -329,15 +310,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
 
     vlc_event_attach( services_discovery_EventManager( p_sd ),
                       vlc_ServicesDiscoveryItemAdded,
-                      playlist_sd_item_added, p_one );
-        
-    vlc_event_attach( services_discovery_EventManager( p_sd ),
-                      vlc_ServicesDiscoveryItemAdded,
                       playlist_sd_item_added, p_cat );
-
-    vlc_event_attach( services_discovery_EventManager( p_sd ),
-                      vlc_ServicesDiscoveryItemRemoved,
-                      playlist_sd_item_removed, p_one );
 
     vlc_event_attach( services_discovery_EventManager( p_sd ),
                       vlc_ServicesDiscoveryItemRemoved,
@@ -396,17 +369,7 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
     vlc_event_detach( services_discovery_EventManager( p_sd ),
                         vlc_ServicesDiscoveryItemAdded,
                         playlist_sd_item_added,
-                        p_sds->p_one );
-
-    vlc_event_detach( services_discovery_EventManager( p_sd ),
-                        vlc_ServicesDiscoveryItemAdded,
-                        playlist_sd_item_added,
                         p_sds->p_cat );
-
-    vlc_event_detach( services_discovery_EventManager( p_sd ),
-                        vlc_ServicesDiscoveryItemRemoved,
-                        playlist_sd_item_removed,
-                        p_sds->p_one );
 
     vlc_event_detach( services_discovery_EventManager( p_sd ),
                         vlc_ServicesDiscoveryItemRemoved,
