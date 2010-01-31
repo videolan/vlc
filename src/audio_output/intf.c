@@ -38,6 +38,24 @@
 #include <vlc_aout.h>
 #include "aout_internal.h"
 
+#include <vlc_playlist.h>
+
+static aout_instance_t *findAout (vlc_object_t *obj)
+{
+    playlist_t *pl = pl_Hold (obj->p_libvlc);
+    if (pl == NULL)
+        return NULL;
+
+    input_thread_t *p_input = playlist_CurrentInput (pl);
+    pl_Release (obj->p_libvlc);
+    if (p_input == NULL)
+       return NULL;
+
+    aout_instance_t *p_aout = input_GetAout (p_input);
+    vlc_object_release (p_input);
+    return p_aout;
+}
+
 /*
  * Volume management
  *
@@ -78,8 +96,7 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
     int i_result = VLC_SUCCESS;
     int i_volume_step = 1, i_new_volume = 0;
     bool b_var_mute = false;
-    aout_instance_t *p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
-                                               FIND_ANYWHERE );
+    aout_instance_t *p_aout = findAout( p_object );
 
     if ( p_aout ) aout_lock_volume( p_aout );
 
@@ -176,8 +193,7 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
 int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
 {
     int i_result = 0;
-    aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
-                                                FIND_ANYWHERE );
+    aout_instance_t * p_aout = findAout( p_object );
 
     if ( pi_volume == NULL ) return -1;
 
@@ -253,8 +269,7 @@ int __aout_ToggleMute( vlc_object_t * p_object, audio_volume_t * pi_volume )
 bool aout_IsMuted( vlc_object_t * p_object )
 {
     bool b_return_val;
-    aout_instance_t * p_aout = vlc_object_find( p_object, VLC_OBJECT_AOUT,
-                                                FIND_ANYWHERE );
+    aout_instance_t * p_aout = findAout( p_object );
     if ( p_aout ) aout_lock_volume( p_aout );
     b_return_val = var_GetBool( p_object->p_libvlc, "volume-muted");
     if ( p_aout )
@@ -435,8 +450,7 @@ static int aout_Restart( aout_instance_t * p_aout )
 int aout_FindAndRestart( vlc_object_t * p_this, const char *psz_name,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    aout_instance_t * p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT,
-                                                FIND_ANYWHERE );
+    aout_instance_t * p_aout = findAout( p_this );
 
     (void)psz_name; (void)oldval; (void)newval; (void)p_data;
     if ( p_aout == NULL ) return VLC_SUCCESS;
@@ -479,8 +493,7 @@ int aout_ChannelsRestart( vlc_object_t * p_this, const char * psz_variable,
 void aout_EnableFilter( vlc_object_t *p_this, const char *psz_name,
                         bool b_add )
 {
-    aout_instance_t *p_aout = vlc_object_find( p_this, VLC_OBJECT_AOUT,
-                                               FIND_ANYWHERE );
+    aout_instance_t *p_aout = findAout( p_this );
 
     if( AoutChangeFilterString( p_this, p_aout, "audio-filter", psz_name, b_add ) )
     {
