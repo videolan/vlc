@@ -2090,16 +2090,13 @@ static void EsOutDel( es_out_t *out, es_out_id_t *es )
 static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 {
     es_out_sys_t *p_sys = out->p_sys;
-    bool  b, *pb;
-    int         i;
-
-    es_out_id_t *es;
 
     switch( i_query )
     {
         case ES_OUT_SET_ES_STATE:
-            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
-            b = (bool) va_arg( args, int );
+        {
+            es_out_id_t *es = va_arg( args, es_out_id_t * );
+            bool b = va_arg( args, int );
             if( b && !EsIsSelected( es ) )
             {
                 EsSelect( out, es );
@@ -2111,13 +2108,16 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 return VLC_SUCCESS;
             }
             return VLC_SUCCESS;
+        }
 
         case ES_OUT_GET_ES_STATE:
-            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
-            pb = (bool*) va_arg( args, bool * );
+        {
+            es_out_id_t *es = va_arg( args, es_out_id_t * );
+            bool *pb = va_arg( args, bool * );
 
             *pb = EsIsSelected( es );
             return VLC_SUCCESS;
+        }
 
         case ES_OUT_SET_MODE:
         {
@@ -2131,6 +2131,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 /* XXX Terminate vout if there are tracks but no video one.
                  * This one is not mandatory but is he earliest place where it
                  * can be done */
+                int i;
                 for( i = 0; i < p_sys->i_es; i++ )
                 {
                     es_out_id_t *p_es = p_sys->es[i];
@@ -2144,13 +2145,13 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             p_sys->i_mode = i_mode;
 
             /* Reapply policy mode */
-            for( i = 0; i < p_sys->i_es; i++ )
+            for( int i = 0; i < p_sys->i_es; i++ )
             {
                 if( EsIsSelected( p_sys->es[i] ) )
                     EsUnselect( out, p_sys->es[i],
                                 p_sys->es[i]->p_pgrm == p_sys->p_pgrm );
             }
-            for( i = 0; i < p_sys->i_es; i++ )
+            for( int i = 0; i < p_sys->i_es; i++ )
                 EsOutSelect( out, p_sys->es[i], false );
             if( i_mode == ES_OUT_MODE_END )
                 EsOutTerminate( out );
@@ -2160,10 +2161,9 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         case ES_OUT_SET_ES:
         case ES_OUT_RESTART_ES:
         {
+            es_out_id_t *es = va_arg( args, es_out_id_t * );
+
             int i_cat;
-
-            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
-
             if( es == NULL )
                 i_cat = UNKNOWN_ES;
             else if( es == (es_out_id_t*)((uint8_t*)NULL+AUDIO_ES) )
@@ -2175,7 +2175,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             else
                 i_cat = -1;
 
-            for( i = 0; i < p_sys->i_es; i++ )
+            for( int i = 0; i < p_sys->i_es; i++ )
             {
                 if( i_cat == -1 )
                 {
@@ -2213,7 +2213,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
  
         case ES_OUT_SET_ES_DEFAULT:
         {
-            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
+            es_out_id_t *es = va_arg( args, es_out_id_t * );
 
             if( es == NULL )
             {
@@ -2323,9 +2323,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
         case ES_OUT_SET_GROUP:
         {
-            int j;
-            i = (int) va_arg( args, int );
-            for( j = 0; j < p_sys->i_pgrm; j++ )
+            int i = va_arg( args, int );
+            for( int j = 0; j < p_sys->i_pgrm; j++ )
             {
                 es_out_pgrm_t *p_pgrm = p_sys->pgrm[j];
                 if( p_pgrm->i_id == i )
@@ -2341,9 +2340,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         {
             /* This ain't pretty but is need by some demuxers (eg. Ogg )
              * to update the p_extra data */
-            es_format_t *p_fmt;
-            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
-            p_fmt = (es_format_t*) va_arg( args, es_format_t * );
+            es_out_id_t *es = va_arg( args, es_out_id_t * );
+            es_format_t *p_fmt = va_arg( args, es_format_t * );
             if( es == NULL )
                 return VLC_EGENERIC;
 
@@ -2373,7 +2371,7 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
 
         case ES_OUT_SET_ES_SCRAMBLED_STATE:
         {
-            es = (es_out_id_t*) va_arg( args, es_out_id_t * );
+            es_out_id_t *es = va_arg( args, es_out_id_t * );
             bool b_scrambled = (bool)va_arg( args, int );
 
             if( !es->b_scrambled != !b_scrambled )
@@ -2489,14 +2487,18 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         }
 
         case ES_OUT_GET_BUFFERING:
-            pb = (bool *)va_arg( args, bool* );
+        {
+            bool *pb = va_arg( args, bool* );
             *pb = p_sys->b_buffering;
             return VLC_SUCCESS;
+        }
 
         case ES_OUT_GET_EMPTY:
-            pb = (bool *)va_arg( args, bool* );
+        {
+            bool *pb = va_arg( args, bool* );
             *pb = EsOutDecodersIsEmpty( out );
             return VLC_SUCCESS;
+        }
 
         case ES_OUT_SET_DELAY:
         {
@@ -2507,8 +2509,10 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
         }
 
         case ES_OUT_SET_RECORD_STATE:
-            b = (bool) va_arg( args, int );
+        {
+            bool b = va_arg( args, int );
             return EsOutSetRecord( out, b );
+        }
 
         case ES_OUT_SET_PAUSE_STATE:
         {
