@@ -16,7 +16,7 @@ EXTRA_DIST = extras/COPYING \
 BUILT_SOURCES = ../include/vlc_about.h
 CLEANFILES = $(BUILT_SOURCES)
 
-SUFFIXES = .pc.in .pc
+SUFFIXES = .pc.in .pc .rc.in .rc
 
 ###############################################################################
 # Headers
@@ -157,6 +157,19 @@ CLEANFILES += $(pkgconfig_DATA)
 	cd "$(top_builddir)" && \
 	$(SHELL) ./config.status --file="src/$@"
 
+##############################################################################
+# Windows resource files
+##############################################################################
+
+if HAVE_WIN32
+noinst_DATA = libvlc_win32_rc.rc
+endif
+EXTRA_DIST += libvlc_win32_rc.rc.in
+
+.rc.in.rc: $(top_builddir)/config.status
+	cd "$(top_builddir)" && \
+	$(SHELL) ./config.status --file="src/$@"
+
 ###############################################################################
 # Building libvlc
 ###############################################################################
@@ -195,7 +208,7 @@ libvlccore_la_DEPENDENCIES += libvlc_win32_rc.$(OBJEXT)
 libvlccore_la_LDFLAGS += -Wl,libvlc_win32_rc.$(OBJEXT)
 endif
 
-libvlc_win32_rc.$(OBJEXT): $(top_builddir)/share/libvlc_win32_rc.rc
+libvlc_win32_rc.$(OBJEXT): libvlc_win32_rc.rc
 	$(WINDRES) --include-dir $(top_srcdir)/share -i $< -o $@
 
 libvlc_la_SOURCES = $(SOURCES_libvlc_control)

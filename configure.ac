@@ -4935,8 +4935,6 @@ AC_CONFIG_FILES([
   projects/mozilla/vlc.r
   projects/mozilla/install.js
   share/Makefile
-  share/vlc_win32_rc.rc
-  share/libvlc_win32_rc.rc
   compat/Makefile
   src/Makefile
   src/test/Makefile

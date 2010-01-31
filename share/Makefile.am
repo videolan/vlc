@@ -55,9 +55,7 @@ DIST_rsrc = \
 	newres.h \
 	resource.h \
 	vlc_wince_rc.rc \
-	vlc_beos.rsrc \
-	vlc_win32_rc.rc.in \
-	libvlc_win32_rc.rc.in
+	vlc_beos.rsrc
 
 DIST_icons = vlc.ico
 
