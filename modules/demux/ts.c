@@ -2830,9 +2830,22 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
 
                 if( p_sdt->i_network_id == 133 )
                     p_sys->b_broken_charset = true;  /* SKY DE & BetaDigital use ISO8859-1 */
-                else if( (pD->i_service_provider_name_length == 4) &&
-                     !strncmp(pD->i_service_provider_name, "CSAT", 4) )
-                    p_sys->b_broken_charset = true;  /* CanalSat FR uses ISO8859-1 */
+
+                /* List of providers using ISO8859-1 */
+                static const char ppsz_broken_providers[][8] = {
+                    "CSAT",     /* CanalSat FR */
+                    "GR1",      /* France televisions */
+                    "MULTI4",   /* NT1 */
+                    "MR5",      /* France 2/M6 HD */
+                    ""
+                };
+                for( int i = 0; *ppsz_broken_providers[i]; i++ )
+                {
+                    const size_t i_length = strlen(ppsz_broken_providers[i]);
+                    if( pD->i_service_provider_name_length == i_length &&
+                        !strncmp( pD->i_service_provider_name, ppsz_broken_providers[i], i_length ) )
+                        p_sys->b_broken_charset = true;
+                }
 
                 /* FIXME: Digital+ ES also uses ISO8859-1 */
 
