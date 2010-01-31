@@ -245,8 +245,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     // Testing to see if the pointer exists is not required, if the pointer is null
     // then the release message is not sent to it.
     delegate = nil;
-    [self setLength:nil];
-
+    [length release];
     [url release];
     [subitems release];
     [metaDictionary release];
@@ -281,7 +280,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
         long long duration = libvlc_media_get_duration( p_md, NULL );
         if (duration > -1)
         {
-            [self setLength:[VLCTime timeWithNumber:[NSNumber numberWithLongLong:duration]]];
+            length = [[VLCTime timeWithNumber:[NSNumber numberWithLongLong:duration]] retain];
             return [[length retain] autorelease];
         }
         return [VLCTime nullTime];
