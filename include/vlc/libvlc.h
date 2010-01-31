@@ -339,10 +339,9 @@ VLC_PUBLIC_API void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, uns
  * Open a VLC message log instance.
  *
  * \param p_instance libvlc instance
- * \param p_e an initialized exception pointer
- * \return log message instance
+ * \return log message instance or NULL on error
  */
-VLC_PUBLIC_API libvlc_log_t *libvlc_log_open( libvlc_instance_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_log_t *libvlc_log_open( libvlc_instance_t *);
 
 /**
  * Close a VLC message log instance.
@@ -373,10 +372,9 @@ VLC_PUBLIC_API void libvlc_log_clear( libvlc_log_t *p_log );
  * Allocate and returns a new iterator to messages in log.
  *
  * \param p_log libvlc log instance
- * \param p_e an initialized exception pointer
- * \return log iterator object
+ * \return log iterator object or NULL on error
  */
-VLC_PUBLIC_API libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *, libvlc_exception_t *);
+VLC_PUBLIC_API libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t * );
 
 /**
  * Release a previoulsy allocated iterator.
@@ -400,12 +398,10 @@ VLC_PUBLIC_API int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_
  *
  * \param p_iter libvlc log iterator or NULL
  * \param p_buffer log buffer
- * \param p_e an initialized exception pointer
- * \return log message object
+ * \return log message object or NULL if none left
  */
 VLC_PUBLIC_API libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
-                                                               libvlc_log_message_t *p_buffer,
-                                                               libvlc_exception_t *p_e );
+                                                               libvlc_log_message_t *p_buffer );
 
 /** @} */
 

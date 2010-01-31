@@ -89,12 +89,14 @@ void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, unsigned level )
     p_instance->verbosity = level;
 }
 
-libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance, libvlc_exception_t *p_e )
+libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance )
 {
-    struct libvlc_log_t *p_log =
-        (struct libvlc_log_t *)malloc(sizeof(struct libvlc_log_t));
-
-    if( !p_log ) RAISENULL( "Out of memory" );
+    struct libvlc_log_t *p_log = malloc(sizeof(*p_log));
+    if (unlikely(p_log == NULL))
+    {
+        libvlc_printerr ("Not enough memory");
+        return NULL;
+    }
 
     p_log->p_instance = p_instance;
     vlc_spin_init( &p_log->data.lock );
@@ -105,7 +107,8 @@ libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance, libvlc_exception_t
     if( !p_log->p_messages )
     {
         free( p_log );
-        RAISENULL( "Out of memory" );
+        libvlc_printerr ("Not enough memory");
+        return NULL;
     }
 
     libvlc_retain( p_instance );
@@ -156,27 +159,27 @@ void libvlc_log_clear( libvlc_log_t *p_log )
          msg_Release (tab[i]);
 }
 
-libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *p_log,
- libvlc_exception_t *p_e )
+libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *p_log )
 {
-    if( p_log )
+    if (p_log == NULL)
+        return NULL;
+
+    struct libvlc_log_iterator_t *p_iter = malloc (sizeof (*p_iter));
+    if (unlikely(p_iter == NULL))
     {
-        struct libvlc_log_iterator_t *p_iter =
-            (struct libvlc_log_iterator_t *)malloc(sizeof(struct libvlc_log_iterator_t));
-        /* FIXME: break constant pointer constraints */
-        msg_cb_data_t *data = &((libvlc_log_t *)p_log)->data;
-
-        if( !p_iter ) RAISENULL( "Out of memory" );
-
-        vlc_spin_lock (&data->lock);
-        p_iter->p_data  = data;
-        p_iter->i_pos   = 0;
-        p_iter->i_end   = data->count;
-        vlc_spin_unlock (&data->lock);
-
-        return p_iter;
+        libvlc_printerr ("Not enough memory");
+        return NULL;
     }
-    RAISENULL("Invalid log object!");
+
+    /* FIXME: break constant pointer constraints */
+    msg_cb_data_t *data = &((libvlc_log_t *)p_log)->data;
+
+    vlc_spin_lock (&data->lock);
+    p_iter->p_data  = data;
+    p_iter->i_pos   = 0;
+    p_iter->i_end   = data->count;
+    vlc_spin_unlock (&data->lock);
+    return p_iter;
 }
 
 void libvlc_log_iterator_free( libvlc_log_iterator_t *p_iter )
@@ -192,14 +195,13 @@ int libvlc_log_iterator_has_next( const libvlc_log_iterator_t *p_iter )
 }
 
 libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
-                                                libvlc_log_message_t *buffer,
-                                                libvlc_exception_t *p_e )
+                                                libvlc_log_message_t *buffer )
 {
     unsigned i_pos;
 
     if( !p_iter )
         return NULL;
-    assert( buffer );
+    assert (buffer != NULL);
 
     i_pos = p_iter->i_pos;
     if( i_pos != p_iter->i_end )
@@ -217,5 +219,5 @@ libvlc_log_message_t *libvlc_log_iterator_next( libvlc_log_iterator_t *p_iter,
 
         return buffer;
     }
-    RAISENULL("No more messages");
+    return NULL;
 }
