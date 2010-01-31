@@ -128,22 +128,21 @@ noinst_HEADERS = \
 	$(NULL)
 
 ../include/vlc_about.h: Makefile.am $(top_srcdir)/COPYING $(top_srcdir)/THANKS $(top_srcdir)/AUTHORS
-	rm -f -- "$@.tmp"
-	mkdir -p -- ../include
-	echo "/* Automatically generated file - DO NOT EDIT */" > "$@.tmp"
-	echo "static const char psz_license[] =" >> "$@.tmp"
-	sed 's/"/\\"/g;s/^.*$$/\"&\\n\"/' "$(top_srcdir)/COPYING" >> "$@.tmp"
-	echo ";" >> "$@.tmp"
-	echo "static const char psz_thanks[] =" >> "$@.tmp"
+	$(AM_V_at)rm -f -- "$@.tmp"
+	$(AM_V_at)mkdir -p -- ../include
+	$(AM_V_GEN)(echo "/* Automatically generated file - DO NOT EDIT */" && \
+	echo "static const char psz_license[] =" && \
+	sed 's/"/\\"/g;s/^.*$$/\"&\\n\"/' "$(top_srcdir)/COPYING" && \
+	echo ";" && \
+	echo "static const char psz_thanks[] =" && \
 	sed '/\$$Id:/d;s/"/\\"/g;s/<.*.> //;s/^.*$$/\"&\\n\"/' \
-		"$(top_srcdir)/THANKS" >> "$@.tmp"
-	echo ";" >> "$@.tmp"
-	echo "static const char psz_authors[] =" >> "$@.tmp"
+		"$(top_srcdir)/THANKS" && \
+	echo ";" && \
+	echo "static const char psz_authors[] =" && \
 	sed -n '/^N: /{;s///;s/"/\\"/g;s/^.*$$/\"&\\n\"/;p;}' \
-		"$(top_srcdir)/AUTHORS" >> "$@.tmp"
-	echo ";" >> "$@.tmp"
-
-	mv -f -- "$@.tmp" "$@"
+		"$(top_srcdir)/AUTHORS" && \
+	echo ";") >> "$@.tmp"
+	$(AM_V_at)mv -f -- "$@.tmp" "$@"
 
 ###############################################################################
 # pkg-config integration
