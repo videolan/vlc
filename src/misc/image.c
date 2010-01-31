@@ -339,9 +339,15 @@ static block_t *ImageWrite( image_handler_t *p_image, picture_t *p_pic,
         p_tmp_pic =
             p_image->p_filter->pf_video_filter( p_image->p_filter, p_pic );
 
-        p_block = p_image->p_enc->pf_encode_video( p_image->p_enc, p_tmp_pic );
-
-        p_image->p_filter->pf_video_buffer_del( p_image->p_filter, p_tmp_pic );
+        if( likely(p_tmp_pic != NULL) )
+        {
+            p_block = p_image->p_enc->pf_encode_video( p_image->p_enc,
+                                                       p_tmp_pic );
+            p_image->p_filter->pf_video_buffer_del( p_image->p_filter,
+                                                    p_tmp_pic );
+        }
+        else
+            p_block = NULL;
     }
     else
     {
