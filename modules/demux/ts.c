@@ -378,6 +378,7 @@ struct demux_sys_t
     int64_t     i_tdt_delta;
     int64_t     i_dvb_start;
     int64_t     i_dvb_length;
+    bool        b_broken_charset; /* True if broken encoding is used in EPG/SDT */
 
     /* */
     int         i_current_program;
@@ -392,8 +393,6 @@ struct demux_sys_t
     /* */
     bool        b_start_record;
 };
-
-static int i_broken_epg;
 
 static int Demux    ( demux_t *p_demux );
 static int DemuxFile( demux_t *p_demux );
@@ -645,6 +644,8 @@ static int Open( vlc_object_t *p_this )
     p_sys->i_tdt_delta = 0;
     p_sys->i_dvb_start = 0;
     p_sys->i_dvb_length = 0;
+
+    p_sys->b_broken_charset = false;
 
     for( i = 0; i < 8192; i++ )
     {
@@ -2613,7 +2614,8 @@ static void ValidateDVBMeta( demux_t *p_demux, int i_pid )
 #ifdef TS_USE_DVB_SI
 /* FIXME same than dvbsi_to_utf8 from dvb access */
 static char *EITConvertToUTF8( const unsigned char *psz_instring,
-                               size_t i_length )
+                               size_t i_length,
+                               bool b_broken )
 {
     const char *psz_encoding;
     char *psz_outstring;
@@ -2626,14 +2628,10 @@ static char *EITConvertToUTF8( const unsigned char *psz_instring,
     {
         /* According to ETSI EN 300 468 Annex A, this should be ISO6937,
          * but some broadcasters use different charset... */
-        if ( i_broken_epg == 1 )
-        {
+        if( b_broken )
            psz_encoding = "ISO_8859-1";
-        }
         else
-        {
            psz_encoding = "ISO_6937";
-        }
 
         offset = 0;
     }
@@ -2781,7 +2779,7 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
              p_sdt->i_ts_id, p_sdt->i_version, p_sdt->b_current_next,
              p_sdt->i_network_id );
 
-    i_broken_epg = 0;
+    p_sys->b_broken_charset = false;
 
     for( p_srv = p_sdt->p_first_service; p_srv; p_srv = p_srv->p_next )
     {
@@ -2830,19 +2828,20 @@ static void SDTCallBack( demux_t *p_demux, dvbpsi_sdt_t *p_sdt )
 
                 /* Workarounds for broadcasters with broken EPG */
 
-                if ( p_sdt->i_network_id == 133 )
-                   i_broken_epg = 1;  /* SKY DE & BetaDigital use ISO8859-1 */
-
-                if ( (pD->i_service_provider_name_length == 4) &&
+                if( p_sdt->i_network_id == 133 )
+                    p_sys->b_broken_charset = true;  /* SKY DE & BetaDigital use ISO8859-1 */
+                else if( (pD->i_service_provider_name_length == 4) &&
                      !strncmp(pD->i_service_provider_name, "CSAT", 4) )
-                   i_broken_epg = 1;  /* CanalSat FR uses ISO8859-1 */
+                    p_sys->b_broken_charset = true;  /* CanalSat FR uses ISO8859-1 */
 
                 /* FIXME: Digital+ ES also uses ISO8859-1 */
 
                 str1 = EITConvertToUTF8(pD->i_service_provider_name,
-                                        pD->i_service_provider_name_length);
+                                        pD->i_service_provider_name_length,
+                                        p_sys->b_broken_charset );
                 str2 = EITConvertToUTF8(pD->i_service_name,
-                                        pD->i_service_name_length);
+                                        pD->i_service_name_length,
+                                        p_sys->b_broken_charset );
 
                 msg_Dbg( p_demux, "    - type=%d provider=%s name=%s",
                          pD->i_service_type, str1, str2 );
@@ -3001,8 +3000,10 @@ static void EITCallBack( demux_t *p_demux,
 
                 if( pE )
                 {
-                    psz_name = EITConvertToUTF8( pE->i_event_name, pE->i_event_name_length);
-                    psz_text = EITConvertToUTF8( pE->i_text, pE->i_text_length );
+                    psz_name = EITConvertToUTF8( pE->i_event_name, pE->i_event_name_length,
+                                                 p_sys->b_broken_charset );
+                    psz_text = EITConvertToUTF8( pE->i_text, pE->i_text_length,
+                                                 p_sys->b_broken_charset );
                     msg_Dbg( p_demux, "    - short event lang=%3.3s '%s' : '%s'",
                              pE->i_iso_639_code, psz_name, psz_text );
                 }
@@ -3018,7 +3019,8 @@ static void EITCallBack( demux_t *p_demux,
 
                     if( pE->i_text_length > 0 )
                     {
-                        char *psz_text = EITConvertToUTF8( pE->i_text, pE->i_text_length );
+                        char *psz_text = EITConvertToUTF8( pE->i_text, pE->i_text_length,
+                                                           p_sys->b_broken_charset );
                         if( psz_text )
                         {
                             msg_Dbg( p_demux, "       - text='%s'", psz_text );
@@ -3033,8 +3035,10 @@ static void EITCallBack( demux_t *p_demux,
                     for( int i = 0; i < pE->i_entry_count; i++ )
                     {
                         char *psz_dsc = EITConvertToUTF8( pE->i_item_description[i],
-                                                          pE->i_item_description_length[i] );
-                        char *psz_itm = EITConvertToUTF8( pE->i_item[i], pE->i_item_length[i] );
+                                                          pE->i_item_description_length[i],
+                                                          p_sys->b_broken_charset );
+                        char *psz_itm = EITConvertToUTF8( pE->i_item[i], pE->i_item_length[i],
+                                                          p_sys->b_broken_charset );
 
                         if( psz_dsc && psz_itm )
                         {
