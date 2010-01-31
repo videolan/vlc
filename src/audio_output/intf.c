@@ -257,7 +257,11 @@ bool aout_IsMuted( vlc_object_t * p_object )
                                                 FIND_ANYWHERE );
     if ( p_aout ) aout_lock_volume( p_aout );
     b_return_val = var_GetBool( p_object->p_libvlc, "volume-muted");
-    if ( p_aout ) aout_unlock_volume( p_aout );
+    if ( p_aout )
+    {
+        aout_unlock_volume( p_aout );
+        vlc_object_release( p_aout );
+    }
     return b_return_val;
 }
 
