@@ -2470,14 +2470,16 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
             vlc_object_t    **pp_decoder = va_arg( args, vlc_object_t ** );
             vout_thread_t   **pp_vout    = va_arg( args, vout_thread_t ** );
             aout_instance_t **pp_aout    = va_arg( args, aout_instance_t ** );
-            if( es->p_dec )
+            if( p_es->p_dec )
             {
                 if( pp_decoder )
-                    *pp_decoder = vlc_object_hold( es->p_dec );
-                input_DecoderGetObjects( es->p_dec, pp_vout, pp_aout );
+                    *pp_decoder = vlc_object_hold( p_es->p_dec );
+                input_DecoderGetObjects( p_es->p_dec, pp_vout, pp_aout );
             }
             else
             {
+                if( pp_decoder )
+                    *pp_decoder = NULL;
                 if( pp_vout )
                     *pp_vout = NULL;
                 if( pp_aout )

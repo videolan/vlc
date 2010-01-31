@@ -631,9 +631,9 @@ void input_DecoderGetObjects( decoder_t *p_dec,
 
     vlc_mutex_lock( &p_owner->lock );
     if( pp_vout )
-        *pp_vout = vlc_object_hold( p_owner->p_vout );
+        *pp_vout = p_owner->p_vout ? vlc_object_hold( p_owner->p_vout ) : NULL;
     if( pp_aout )
-        *pp_aout = vlc_object_hold( p_owner->p_aout );
+        *pp_aout = p_owner->p_aout ? vlc_object_hold( p_owner->p_aout ) : NULL;
     vlc_mutex_unlock( &p_owner->lock );
 }
 
