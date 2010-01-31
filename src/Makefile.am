@@ -528,19 +528,19 @@ BUILT_SOURCES += stamp-revision
 CLEANFILES += revision.txt revision.c
 
 revision.c: revision.txt
-	rm -f -- revision.c
-	echo "const char psz_vlc_changeset[] = \"$$(cat revision.txt)\";" \
+	$(AM_V_at)rm -f -- revision.c
+	$(AM_V_GEN)echo "const char psz_vlc_changeset[] = \"$$(cat revision.txt)\";" \
 		> revision.c
 
 revision.txt: Makefile.am
-	$(MAKE) stamp-revision
-	touch revision.txt
+	$(AM_V_at)$(MAKE) stamp-revision
+	$(AM_V_GEN)touch revision.txt
 
 stamp-revision:
-	rm -f -- revision.tmp
-	(git --git-dir="$(top_srcdir)/.git/" describe --tags --long \
+	$(AM_V_at)rm -f -- revision.tmp
+	$(AM_V_GEN)(git --git-dir="$(top_srcdir)/.git/" describe --tags --long \
 		--match '?.*.*' --always || echo exported) > revision.tmp
-	if diff revision.tmp revision.txt >/dev/null; then \
+	$(AM_V_at)if diff revision.tmp revision.txt >/dev/null 2>&1; then \
 		rm -f -- revision.tmp; \
 	else \
 		mv -f -- revision.tmp revision.txt; \
