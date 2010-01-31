@@ -822,7 +822,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             case clicked_Pause:
             {
                 if( i_playing == 1 )
-                    p_plugin->playlist_pause( &ex );
+                    p_plugin->playlist_pause();
                 else
                     p_plugin->playlist_play( &ex );
 

@@ -249,7 +249,7 @@ public:
         if( playlist_select(playlist_index-1,ex) )
             libvlc_media_player_play(libvlc_media_player);
     }
-    void playlist_pause(libvlc_exception_t *ex)
+    void playlist_pause()
     {
         if( libvlc_media_player )
             libvlc_media_player_pause(libvlc_media_player);
