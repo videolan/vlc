@@ -132,6 +132,8 @@ input_thread_t *libvlc_get_input_thread( libvlc_media_player_t *p_mi )
     p_input_thread = p_mi->p_input_thread;
     if( p_input_thread )
         vlc_object_hold( p_input_thread );
+    else
+        libvlc_printerr( "No active input" );
     unlock(p_mi);
 
     return p_input_thread;
@@ -353,6 +355,9 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "keyboard-events", VLC_VAR_BOOL);
     var_SetBool (mp, "keyboard-events", true);
     var_Create (mp, "mouse-events", VLC_VAR_BOOL);
+
+    /* Audio */
+    var_Create (mp, "aout", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     mp->p_md = NULL;
     mp->state = libvlc_NothingSpecial;

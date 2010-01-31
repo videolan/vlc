@@ -928,12 +928,12 @@ VLC_PUBLIC_API void libvlc_audio_output_list_release( libvlc_audio_output_t * );
  * Set the audio output.
  * Change will be applied after stop and play.
  *
- * \param p_instance libvlc instance
+ * \param mp media player
  * \param psz_name name of audio output,
  *               use psz_name of \see libvlc_audio_output_t
  * \return true if function succeded
  */
-VLC_PUBLIC_API int libvlc_audio_output_set( libvlc_instance_t *,
+VLC_PUBLIC_API int libvlc_audio_output_set( libvlc_media_player_t *,
                                             const char * );
 
 /**
@@ -972,13 +972,13 @@ VLC_PUBLIC_API char * libvlc_audio_output_device_id( libvlc_instance_t *,
                                                      int );
 
 /**
- * Set device for using
+ * Set audio output device. Changes are only effective after stop and play.
  *
- * \param p_instance libvlc instance
+ * \param mp media player
  * \param psz_audio_output - name of audio output, \see libvlc_audio_output_t
  * \param psz_device_id device
  */
-VLC_PUBLIC_API void libvlc_audio_output_device_set( libvlc_instance_t *,
+VLC_PUBLIC_API void libvlc_audio_output_device_set( libvlc_media_player_t *,
                                                     const char *,
                                                     const char * );
 
@@ -986,124 +986,115 @@ VLC_PUBLIC_API void libvlc_audio_output_device_set( libvlc_instance_t *,
  * Get current audio device type. Device type describes something like
  * character of output sound - stereo sound, 2.1, 5.1 etc
  *
- * \param p_instance vlc instance
- * \param p_e an initialized exception pointer
+ * \param mp media player
  * \return the audio devices type \see libvlc_audio_output_device_types_t
  */
 VLC_PUBLIC_API int libvlc_audio_output_get_device_type(
-        libvlc_instance_t *, libvlc_exception_t * );
+        libvlc_media_player_t * );
 
 /**
  * Set current audio device type.
  *
- * \param p_instance vlc instance
+ * \param mp vlc instance
  * \param device_type the audio device type,
           according to \see libvlc_audio_output_device_types_t
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_audio_output_set_device_type( libvlc_instance_t *,
-                                                         int,
-                                                         libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_audio_output_set_device_type( libvlc_media_player_t *,
+                                                         int );
 
 
 /**
  * Toggle mute status.
  *
- * \param p_instance libvlc instance
+ * \param mp media player
  */
-VLC_PUBLIC_API void libvlc_audio_toggle_mute( libvlc_instance_t * );
+VLC_PUBLIC_API void libvlc_audio_toggle_mute( libvlc_media_player_t * );
 
 /**
  * Get current mute status.
  *
- * \param p_instance libvlc instance
+ * \param mp media player
  * \return the mute status (boolean)
  */
-VLC_PUBLIC_API int libvlc_audio_get_mute( libvlc_instance_t * );
+VLC_PUBLIC_API int libvlc_audio_get_mute( libvlc_media_player_t * );
 
 /**
  * Set mute status.
  *
- * \param p_instance libvlc instance
+ * \param mp media player
  * \param status If status is true then mute, otherwise unmute
  */
-VLC_PUBLIC_API void libvlc_audio_set_mute( libvlc_instance_t *, int );
+VLC_PUBLIC_API void libvlc_audio_set_mute( libvlc_media_player_t *, int );
 
 /**
  * Get current audio level.
  *
- * \param p_instance libvlc instance
+ * \param mp media player
  * \param p_e an initialized exception pointer
  * \return the audio level (int)
  */
-VLC_PUBLIC_API int libvlc_audio_get_volume( libvlc_instance_t * );
+VLC_PUBLIC_API int libvlc_audio_get_volume( libvlc_media_player_t * );
 
 /**
  * Set current audio level.
  *
- * \param p_instance libvlc instance
+ * \param mp media player
  * \param i_volume the volume (int)
- * \param p_e an initialized exception pointer
+ * \return 0 if the volume was set, -1 if it was out of range
  */
-VLC_PUBLIC_API void libvlc_audio_set_volume( libvlc_instance_t *, int, libvlc_exception_t *);
+VLC_PUBLIC_API int libvlc_audio_set_volume( libvlc_media_player_t *, int );
 
 /**
  * Get number of available audio tracks.
  *
  * \param p_mi media player
- * \param p_e an initialized exception
- * \return the number of available audio tracks (int)
+ * \return the number of available audio tracks (int), or -1 if unavailable
  */
-VLC_PUBLIC_API int libvlc_audio_get_track_count( libvlc_media_player_t *,  libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_audio_get_track_count( libvlc_media_player_t * );
 
 /**
  * Get the description of available audio tracks.
  *
  * \param p_mi media player
- * \param p_e an initialized exception
- * \return list with description of available audio tracks
+ * \return list with description of available audio tracks, or NULL
  */
 VLC_PUBLIC_API libvlc_track_description_t *
-        libvlc_audio_get_track_description( libvlc_media_player_t *,  libvlc_exception_t * );
+        libvlc_audio_get_track_description( libvlc_media_player_t * );
 
 /**
  * Get current audio track.
  *
  * \param p_mi media player
- * \param p_e an initialized exception pointer
- * \return the audio track (int)
+ * \return the audio track (int), or -1 if none.
  */
-VLC_PUBLIC_API int libvlc_audio_get_track( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_audio_get_track( libvlc_media_player_t * );
 
 /**
  * Set current audio track.
  *
  * \param p_mi media player
  * \param i_track the track (int)
- * \param p_e an initialized exception pointer
+ * \return 0 on success, -1 on error
  */
-VLC_PUBLIC_API void libvlc_audio_set_track( libvlc_media_player_t *, int, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_audio_set_track( libvlc_media_player_t *, int );
 
 /**
  * Get current audio channel.
  *
- * \param p_instance vlc instance
- * \param p_e an initialized exception pointer
+ * \param mp media player
  * \return the audio channel \see libvlc_audio_output_channel_t
  */
-VLC_PUBLIC_API int
-    libvlc_audio_get_channel( libvlc_instance_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_audio_get_channel( libvlc_media_player_t * );
 
 /**
  * Set current audio channel.
  *
- * \param p_instance vlc instance
+ * \param p_mi media player
  * \param channel the audio channel, \see libvlc_audio_output_channel_t
- * \param p_e an initialized exception pointer
+ * \return 0 on success, -1 on error
  */
-VLC_PUBLIC_API void libvlc_audio_set_channel( libvlc_instance_t *,
-                                              int,
-                                              libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_audio_set_channel( libvlc_media_player_t *, int );
 
 /** @} audio */
 

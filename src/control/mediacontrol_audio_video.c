@@ -203,7 +203,8 @@ mediacontrol_sound_get_volume( mediacontrol_Instance *self,
 
     mediacontrol_exception_init( exception );
 
-    i_ret = libvlc_audio_get_volume( self->p_instance );
+    //i_ret = libvlc_audio_get_volume( self->p_instance );
+#warning FIXME: unimplented
     /* FIXME: Normalize in [0..100] */
     return (unsigned short)i_ret;
 }
@@ -214,13 +215,10 @@ mediacontrol_sound_set_volume( mediacontrol_Instance *self,
                                mediacontrol_Exception *exception )
 {
     /* FIXME: Normalize in [0..100] */
-    libvlc_exception_t ex;
-
     mediacontrol_exception_init( exception );
-    libvlc_exception_init( &ex );
 
-    libvlc_audio_set_volume( self->p_instance, volume, &ex );
-    HANDLE_LIBVLC_EXCEPTION_VOID( &ex );
+    //libvlc_audio_set_volume( self->p_instance, volume );
+#warning FIXME: unimplented
 }
 
 int mediacontrol_set_visual( mediacontrol_Instance *self,
