@@ -1206,7 +1206,7 @@ static int Init( input_thread_t * p_input )
     InitStatistics( p_input );
 #ifdef ENABLE_SOUT
     if( InitSout( p_input ) )
-        goto error_stats;
+        goto error;
 #endif
 
     /* Create es out */
@@ -1299,9 +1299,6 @@ error:
         input_resource_SetInput( p_input->p->p_resource, NULL );
     }
 
-#ifdef ENABLE_SOUT
-error_stats:
-#endif
     if( !p_input->b_preparsing && libvlc_stats( p_input ) )
     {
 #define EXIT_COUNTER( c ) do { if( p_input->p->counters.p_##c ) \
