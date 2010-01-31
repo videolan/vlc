@@ -516,7 +516,7 @@ bool VlcPlugin::playlist_select( int idx, libvlc_exception_t *ex )
         libvlc_media_player = NULL;
     }
 
-    libvlc_media_player = libvlc_media_player_new_from_media(p_m,ex);
+    libvlc_media_player = libvlc_media_player_new_from_media(p_m);
     if( libvlc_media_player )
     {
         set_player_window();
@@ -526,7 +526,7 @@ bool VlcPlugin::playlist_select( int idx, libvlc_exception_t *ex )
     }
 
     libvlc_media_release( p_m );
-    return !libvlc_exception_raised(ex);
+    return true;
 
 bad_unlock:
     libvlc_media_list_unlock(libvlc_media_list);
@@ -578,7 +578,7 @@ bool  VlcPlugin::player_has_vout( libvlc_exception_t *ex )
 {
     bool r = false;
     if( playlist_isplaying() )
-        r = libvlc_media_player_has_vout(libvlc_media_player, ex);
+        r = libvlc_media_player_has_vout(libvlc_media_player);
     return r;
 }
 
@@ -900,7 +900,7 @@ void VlcPlugin::redrawToolbar()
 
 
     /* get mute info */
-    b_mute = libvlc_audio_get_mute( getVLC() );
+    b_mute = libvlc_audio_get_mute( libvlc_media_player );
 
     gcv.foreground = BlackPixel( p_display, 0 );
     gc = XCreateGC( p_display, control, GCForeground, &gcv );
@@ -968,11 +968,8 @@ void VlcPlugin::redrawToolbar()
     /* get movie position in % */
     if( playlist_isplaying() )
     {
-        libvlc_exception_t ex;
-        libvlc_exception_init( &ex );
         i_last_position = (int)((window.width-(dst_x+BTN_SPACE))*
-                   libvlc_media_player_get_position(libvlc_media_player,&ex));
-        libvlc_exception_clear( &ex );
+                   libvlc_media_player_get_position(libvlc_media_player));
     }
 
     if( p_btnTime )
@@ -1007,7 +1004,7 @@ vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos
     is_playing = playlist_isplaying();
 
     /* get mute info */
-    b_mute = libvlc_audio_get_mute( getVLC() );
+    b_mute = libvlc_audio_get_mute( libvlc_media_player );
 
     /* is Pause of Play button clicked */
     if( (is_playing != 1) &&

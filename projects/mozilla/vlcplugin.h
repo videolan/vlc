@@ -227,12 +227,12 @@ public:
     void playlist_play(libvlc_exception_t *ex)
     {
         if( libvlc_media_player||playlist_select(0,ex) )
-            libvlc_media_player_play(libvlc_media_player,ex);
+            libvlc_media_player_play(libvlc_media_player);
     }
     void playlist_play_item(int idx,libvlc_exception_t *ex)
     {
         if( playlist_select(idx,ex) )
-            libvlc_media_player_play(libvlc_media_player,ex);
+            libvlc_media_player_play(libvlc_media_player);
     }
     void playlist_stop()
     {
@@ -242,17 +242,17 @@ public:
     void playlist_next(libvlc_exception_t *ex)
     {
         if( playlist_select(playlist_index+1,ex) )
-            libvlc_media_player_play(libvlc_media_player,ex);
+            libvlc_media_player_play(libvlc_media_player);
     }
     void playlist_prev(libvlc_exception_t *ex)
     {
         if( playlist_select(playlist_index-1,ex) )
-            libvlc_media_player_play(libvlc_media_player,ex);
+            libvlc_media_player_play(libvlc_media_player);
     }
     void playlist_pause(libvlc_exception_t *ex)
     {
         if( libvlc_media_player )
-            libvlc_media_player_pause(libvlc_media_player,ex);
+            libvlc_media_player_pause(libvlc_media_player);
     }
     int playlist_isplaying()
     {

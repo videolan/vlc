@@ -846,7 +846,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             case clicked_Mute:
             case clicked_Unmute:
             {
-                libvlc_audio_toggle_mute( p_plugin->getVLC() );
+                libvlc_audio_toggle_mute( p_md );
             }
             break;
 
@@ -856,14 +856,12 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
                 if( p_md )
                 {
                     int64_t f_length;
-                    f_length = libvlc_media_player_get_length( p_md, &ex ) / 100;
-                    libvlc_exception_clear( &ex );
+                    f_length = libvlc_media_player_get_length( p_md ) / 100;
 
                     f_length = (float)f_length *
                             ( ((float)i_xPos-4.0 ) / ( ((float)i_width-8.0)/100) );
 
-                    libvlc_media_player_set_time( p_md, f_length, &ex );
-                    libvlc_exception_clear( &ex );
+                    libvlc_media_player_set_time( p_md, f_length );
                 }
             }
             break;

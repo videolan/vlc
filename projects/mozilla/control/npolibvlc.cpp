@@ -259,13 +259,17 @@ LibvlcAudioNPObject::getProperty(int index, NPVariant &result)
         {
             case ID_audio_mute:
             {
-                bool muted = libvlc_audio_get_mute(p_plugin->getVLC());
+                libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+                RETURN_ON_EXCEPTION(this,ex);
+                bool muted = libvlc_audio_get_mute(p_md);
                 BOOLEAN_TO_NPVARIANT(muted, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_audio_volume:
             {
-                int volume = libvlc_audio_get_volume(p_plugin->getVLC());
+                libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+                RETURN_ON_EXCEPTION(this,ex);
+                int volume = libvlc_audio_get_volume(p_md);
                 INT32_TO_NPVARIANT(volume, result);
                 return INVOKERESULT_NO_ERROR;
             }
@@ -273,8 +277,7 @@ LibvlcAudioNPObject::getProperty(int index, NPVariant &result)
             {
                 libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
                 RETURN_ON_EXCEPTION(this,ex);
-                int track = libvlc_audio_get_track(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int track = libvlc_audio_get_track(p_md);
                 INT32_TO_NPVARIANT(track, result);
                 return INVOKERESULT_NO_ERROR;
             }
@@ -283,16 +286,16 @@ LibvlcAudioNPObject::getProperty(int index, NPVariant &result)
                 libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
                 RETURN_ON_EXCEPTION(this,ex);
                 // get the number of audio track available
-                int i_track = libvlc_audio_get_track_count(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int i_track = libvlc_audio_get_track_count(p_md);
                 // return it
                 INT32_TO_NPVARIANT(i_track, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_audio_channel:
             {
-                int channel = libvlc_audio_get_channel(p_plugin->getVLC(), &ex);
+                libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
                 RETURN_ON_EXCEPTION(this,ex);
+                int channel = libvlc_audio_get_channel(p_md);
                 INT32_TO_NPVARIANT(channel, result);
                 return INVOKERESULT_NO_ERROR;
             }
@@ -318,7 +321,9 @@ LibvlcAudioNPObject::setProperty(int index, const NPVariant &value)
             case ID_audio_mute:
                 if( NPVARIANT_IS_BOOLEAN(value) )
                 {
-                    libvlc_audio_set_mute(p_plugin->getVLC(),
+                    libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+                    RETURN_ON_EXCEPTION(this,ex);
+                    libvlc_audio_set_mute(p_md,
                                           NPVARIANT_TO_BOOLEAN(value));
                     return INVOKERESULT_NO_ERROR;
                 }
@@ -326,9 +331,9 @@ LibvlcAudioNPObject::setProperty(int index, const NPVariant &value)
             case ID_audio_volume:
                 if( isNumberValue(value) )
                 {
-                    libvlc_audio_set_volume(p_plugin->getVLC(),
-                                            numberValue(value), &ex);
+                    libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
                     RETURN_ON_EXCEPTION(this,ex);
+                    libvlc_audio_set_volume(p_md, numberValue(value));
                     return INVOKERESULT_NO_ERROR;
                 }
                 return INVOKERESULT_INVALID_VALUE;
@@ -337,17 +342,16 @@ LibvlcAudioNPObject::setProperty(int index, const NPVariant &value)
                 {
                     libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
                     RETURN_ON_EXCEPTION(this,ex);
-                    libvlc_audio_set_track(p_md, numberValue(value), &ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    libvlc_audio_set_track(p_md, numberValue(value));
                     return INVOKERESULT_NO_ERROR;
                 }
                 return INVOKERESULT_INVALID_VALUE;
             case ID_audio_channel:
                 if( isNumberValue(value) )
                 {
-                    libvlc_audio_set_channel(p_plugin->getVLC(),
-                                             numberValue(value), &ex);
+                    libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
                     RETURN_ON_EXCEPTION(this,ex);
+                    libvlc_audio_set_channel(p_md, numberValue(value));
                     return INVOKERESULT_NO_ERROR;
                 }
                 return INVOKERESULT_INVALID_VALUE;
@@ -387,7 +391,9 @@ LibvlcAudioNPObject::invoke(int index, const NPVariant *args,
             case ID_audio_togglemute:
                 if( argCount == 0 )
                 {
-                    libvlc_audio_toggle_mute(p_plugin->getVLC());
+                    libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
+                    RETURN_ON_EXCEPTION(this,ex);
+                    libvlc_audio_toggle_mute(p_md);
                     VOID_TO_NPVARIANT(result);
                     return INVOKERESULT_NO_ERROR;
                 }
@@ -404,14 +410,12 @@ LibvlcAudioNPObject::invoke(int index, const NPVariant *args,
                     RETURN_ON_EXCEPTION(this,ex);
 
                     /* get tracks description */
-                    p_trackDesc = libvlc_audio_get_track_description(p_md, &ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    p_trackDesc = libvlc_audio_get_track_description(p_md);
                     if( !p_trackDesc )
                         return INVOKERESULT_GENERIC_ERROR;
 
                     /* get the number of track available */
-                    i_limit = libvlc_audio_get_track_count(p_md, &ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    i_limit = libvlc_audio_get_track_count(p_md);
 
                     /* check if a number is given by the user
                      * and get the track number */
@@ -502,22 +506,19 @@ LibvlcInputNPObject::getProperty(int index, NPVariant &result)
         {
             case ID_input_length:
             {
-                double val = (double)libvlc_media_player_get_length(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                double val = (double)libvlc_media_player_get_length(p_md);
                 DOUBLE_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_input_position:
             {
-                double val = libvlc_media_player_get_position(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                double val = libvlc_media_player_get_position(p_md);
                 DOUBLE_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_input_time:
             {
-                double val = (double)libvlc_media_player_get_time(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                double val = (double)libvlc_media_player_get_time(p_md);
                 DOUBLE_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
@@ -530,15 +531,13 @@ LibvlcInputNPObject::getProperty(int index, NPVariant &result)
             }
             case ID_input_rate:
             {
-                float val = libvlc_media_player_get_rate(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                float val = libvlc_media_player_get_rate(p_md);
                 DOUBLE_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_input_fps:
             {
-                double val = libvlc_media_player_get_fps(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                double val = libvlc_media_player_get_fps(p_md);
                 DOUBLE_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
@@ -579,8 +578,7 @@ LibvlcInputNPObject::setProperty(int index, const NPVariant &value)
                 }
 
                 float val = (float)NPVARIANT_TO_DOUBLE(value);
-                libvlc_media_player_set_position(p_md, val, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                libvlc_media_player_set_position(p_md, val);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_input_time:
@@ -595,8 +593,7 @@ LibvlcInputNPObject::setProperty(int index, const NPVariant &value)
                     return INVOKERESULT_INVALID_VALUE;
                 }
 
-                libvlc_media_player_set_time(p_md, val, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                libvlc_media_player_set_time(p_md, val);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_input_rate:
@@ -611,8 +608,7 @@ LibvlcInputNPObject::setProperty(int index, const NPVariant &value)
                     return INVOKERESULT_INVALID_VALUE;
                 }
 
-                libvlc_media_player_set_rate(p_md, val, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                libvlc_media_player_set_rate(p_md, val);
                 return INVOKERESULT_NO_ERROR;
             }
             default:
@@ -1267,8 +1263,7 @@ LibvlcSubtitleNPObject::invoke(int index, const NPVariant *args,
                     libvlc_track_description_t *p_spuDesc;
 
                     /* get subtitles description */
-                    p_spuDesc = libvlc_video_get_spu_description(p_md, &ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    p_spuDesc = libvlc_video_get_spu_description(p_md);
                     if( !p_spuDesc )
                         return INVOKERESULT_GENERIC_ERROR;
 
@@ -1587,8 +1582,7 @@ LibvlcVideoNPObject::invoke(int index, const NPVariant *args,
             {
                 if( argCount == 0 )
                 {
-                    libvlc_toggle_teletext(p_md, &ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    libvlc_toggle_teletext(p_md);
                     VOID_TO_NPVARIANT(result);
                     return INVOKERESULT_NO_ERROR;
                 }
