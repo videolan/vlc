@@ -129,10 +129,25 @@ Removed modules:
  * access_file removed in favor of filesystem
 
 
-Changes between 1.0.4 and 1.0.5 (not yet released):
----------------------------------------------------
+Changes between 1.0.4 and 1.0.5:
+--------------------------------
+
+Decoders:
+ * SubRip extra styles improvements
+ * Fix potential crashes in SSA and svg decoders
+
 Mac OS X Interface:
  * Improved support for the 2009 Apple Remote
+
+Windows port:
+ * Use of gcc 4.4.2 to compile instead of gcc 4.2. This might slightly
+   increase performance and fix x264 issues
+
+Translations:
+ * Portuguese Brazilian, Lithunanian, Romanian, Ukranian, Japanese, Bengali,
+   Walloon, Galician, Danish, Khmer, Polish, Slovenian, Vietnamese, Finnish
+   Russian, Slovak translation updates
+ * New Malayalam, Macedoninan, Nynorsk translations
 
 
 Changes between 1.0.3 and 1.0.4:
