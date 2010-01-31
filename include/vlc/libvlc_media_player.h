@@ -448,7 +448,7 @@ VLC_PUBLIC_API float libvlc_media_player_get_fps( libvlc_media_player_t * );
  *
  * \param p_md the media player
  */
-VLC_PUBLIC_API int libvlc_media_player_has_vout( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_media_player_has_vout( libvlc_media_player_t * );
 
 /**
  * Is this media player seekable?
@@ -646,7 +646,7 @@ VLC_PUBLIC_API int libvlc_video_get_spu_count( libvlc_media_player_t *, libvlc_e
  * \return list containing description of available video subtitles
  */
 VLC_PUBLIC_API libvlc_track_description_t *
-        libvlc_video_get_spu_description( libvlc_media_player_t *, libvlc_exception_t * );
+        libvlc_video_get_spu_description( libvlc_media_player_t * );
 
 /**
  * Set new video subtitle.
@@ -665,7 +665,7 @@ VLC_PUBLIC_API void libvlc_video_set_spu( libvlc_media_player_t *, int , libvlc_
  * \param p_e an initialized exception pointer
  * \return the success status (boolean)
  */
-VLC_PUBLIC_API int libvlc_video_set_subtitle_file( libvlc_media_player_t *, const char *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_set_subtitle_file( libvlc_media_player_t *, const char * );
 
 /**
  * Get the description of available titles.
@@ -675,7 +675,7 @@ VLC_PUBLIC_API int libvlc_video_set_subtitle_file( libvlc_media_player_t *, cons
  * \return list containing description of available titles
  */
 VLC_PUBLIC_API libvlc_track_description_t *
-        libvlc_video_get_title_description( libvlc_media_player_t *, libvlc_exception_t * );
+        libvlc_video_get_title_description( libvlc_media_player_t * );
 
 /**
  * Get the description of available chapters for specific title.
@@ -686,7 +686,7 @@ VLC_PUBLIC_API libvlc_track_description_t *
  * \return list containing description of available chapter for title i_title
  */
 VLC_PUBLIC_API libvlc_track_description_t *
-        libvlc_video_get_chapter_description( libvlc_media_player_t *, int, libvlc_exception_t * );
+        libvlc_video_get_chapter_description( libvlc_media_player_t *, int );
 
 /**
  * Get current crop filter geometry.
@@ -712,7 +712,7 @@ VLC_PUBLIC_API void libvlc_video_set_crop_geometry( libvlc_media_player_t *, con
  * \param p_mediaplayer the media player
  * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_toggle_teletext( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_toggle_teletext( libvlc_media_player_t * );
 
 /**
  * Get number of available video tracks.
@@ -720,7 +720,7 @@ VLC_PUBLIC_API void libvlc_toggle_teletext( libvlc_media_player_t *, libvlc_exce
  * \param p_mi media player
  * \return the number of available video tracks (int)
  */
-VLC_PUBLIC_API int libvlc_video_get_track_count( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_get_track_count( libvlc_media_player_t * );
 
 /**
  * Get the description of available video tracks.
@@ -730,7 +730,7 @@ VLC_PUBLIC_API int libvlc_video_get_track_count( libvlc_media_player_t *, libvlc
  * \return list with description of available video tracks, or NULL on error
  */
 VLC_PUBLIC_API libvlc_track_description_t *
-        libvlc_video_get_track_description( libvlc_media_player_t *, libvlc_exception_t * );
+        libvlc_video_get_track_description( libvlc_media_player_t * );
 
 /**
  * Get current video track.

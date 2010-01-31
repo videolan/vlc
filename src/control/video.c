@@ -187,8 +187,7 @@ int libvlc_video_get_width( libvlc_media_player_t *p_mi,
     return width;
 }
 
-int libvlc_media_player_has_vout( libvlc_media_player_t *p_mi,
-                                     libvlc_exception_t *p_e )
+int libvlc_media_player_has_vout( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread(p_mi);
     bool has_vout = false;
@@ -325,8 +324,7 @@ int libvlc_video_get_spu_count( libvlc_media_player_t *p_mi,
 }
 
 libvlc_track_description_t *
-        libvlc_video_get_spu_description( libvlc_media_player_t *p_mi,
-                                          libvlc_exception_t *p_e )
+        libvlc_video_get_spu_description( libvlc_media_player_t *p_mi )
 {
     return libvlc_get_track_description( p_mi, "spu-es" );
 }
@@ -370,8 +368,7 @@ end:
 }
 
 int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi,
-                                    const char *psz_subtitle,
-                                    libvlc_exception_t *p_e )
+                                    const char *psz_subtitle )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi );
     bool b_ret = false;
@@ -386,16 +383,14 @@ int libvlc_video_set_subtitle_file( libvlc_media_player_t *p_mi,
 }
 
 libvlc_track_description_t *
-        libvlc_video_get_title_description( libvlc_media_player_t *p_mi,
-                                            libvlc_exception_t * p_e )
+        libvlc_video_get_title_description( libvlc_media_player_t *p_mi )
 {
     return libvlc_get_track_description( p_mi, "title" );
 }
 
 libvlc_track_description_t *
         libvlc_video_get_chapter_description( libvlc_media_player_t *p_mi,
-                                              int i_title,
-                                              libvlc_exception_t *p_e )
+                                              int i_title )
 {
     char psz_title[12];
     sprintf( psz_title,  "title %2i", i_title );
@@ -433,8 +428,7 @@ void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi,
     }
 }
 
-void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
-                             libvlc_exception_t *p_e )
+void libvlc_toggle_teletext( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;
 
@@ -465,8 +459,7 @@ void libvlc_toggle_teletext( libvlc_media_player_t *p_mi,
     vlc_object_release( p_input_thread );
 }
 
-int libvlc_video_get_track_count( libvlc_media_player_t *p_mi,
-                                  libvlc_exception_t *p_e )
+int libvlc_video_get_track_count( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread = libvlc_get_input_thread( p_mi );
     int i_track_count;
@@ -481,8 +474,7 @@ int libvlc_video_get_track_count( libvlc_media_player_t *p_mi,
 }
 
 libvlc_track_description_t *
-        libvlc_video_get_track_description( libvlc_media_player_t *p_mi,
-                                            libvlc_exception_t *p_e )
+        libvlc_video_get_track_description( libvlc_media_player_t *p_mi )
 {
     return libvlc_get_track_description( p_mi, "video-es" );
 }
@@ -619,7 +611,7 @@ static vlc_object_t *get_object( libvlc_media_player_t * p_mi,
 
 typedef const struct {
     const char name[20]; /* probably will become a const char * sometime */
-    unsigned type; 
+    unsigned type;
 } opt_t;
 
 
