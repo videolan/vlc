@@ -31,6 +31,8 @@
 #include "util/customwidgets.hpp"
 #include "extensions_manager.hpp"
 
+#include <assert.h>
+
 //#include <vlc_modules.h>
 
 #include <QTreeWidget>
@@ -44,7 +46,13 @@
 #include <QComboBox>
 #include <QTextBrowser>
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QSpacerItem>
+#include <QListView>
+#include <QPainter>
+#include <QStyleOptionViewItem>
+#include <QKeyEvent>
+
 
 PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
 {
@@ -168,152 +176,248 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf )
         : QVLCFrame( p_intf )
 {
     // Layout
-    QGridLayout *layout = new QGridLayout( this );
+    QVBoxLayout *layout = new QVBoxLayout( this );
 
-    // Top: combo
-    extList = new QComboBox( this );
-    layout->addWidget( extList, 0, 0, 1, -1 );
+    // ListView
+    extList = new QListView( this );
+    layout->addWidget( extList );
 
-    // Center: Description
-    layout->addWidget( new QLabel( "<b>" + qtr( "Version" ) + "</b>" ),
-                       1, 0, 1, 1 );
-    layout->addWidget( new QLabel( "<b>" + qtr( "Author" ) + "</b>" ),
-                       2, 0, 1, 1 );
-    layout->addWidget( new QLabel( "<b>" + qtr( "Description" ) + "</b>" ),
-                       3, 0, 1, 1 );
-    layout->addWidget( new QLabel( "<b>" + qtr( "Website" ) + "</b>" ),
-                       6, 0, 1, 1 );
-    layout->addWidget( new QLabel( "<b>" + qtr( "File" ) + "</b>" ),
-                       7, 0, 1, 1 );
+    // List item delegate
+    ExtensionItemDelegate *itemDelegate = new ExtensionItemDelegate( p_intf,
+                                                                     extList );
+    extList->setItemDelegate( itemDelegate );
 
-    version = new QLabel( this );
-    layout->addWidget( version, 1, 1, 1, 1 );
-    author = new QLabel( this );
-    layout->addWidget( author, 2, 1, 1, 1 );
-    description = new QTextBrowser( this );
-    description->setOpenExternalLinks( true );
-    layout->addWidget( description, 4, 0, 1, -1 );
-    url = new QLabel( this );
-    url->setOpenExternalLinks( true );
-    url->setTextFormat( Qt::RichText );
-    layout->addWidget( url, 6, 1, 1, 1 );
-    name = new QLineEdit( this );
-    name->setReadOnly( true );
-    layout->addWidget( name, 7, 1, 1, 1 );
+    // Extension list look & feeling
+    extList->setAlternatingRowColors( true );
+    extList->setSelectionMode( QAbstractItemView::SingleSelection );
 
-    // Bottom: Configuration tools
+    // Model
+    ExtensionListModel *model = new ExtensionListModel( extList, p_intf );
+    extList->setModel( model );
+
+    // Buttons' layout
     QHBoxLayout *hbox = new QHBoxLayout;
+    hbox->addItem( new QSpacerItem( 1, 1, QSizePolicy::Expanding,
+                                    QSizePolicy::Fixed ) );
+
+    // More information button
+    butMoreInfo = new QPushButton( QIcon( ":/menu/info" ),
+                                   qtr( "More information..." ),
+                                   this );
+    CONNECT( butMoreInfo, clicked(),
+             this, moreInformation() );
+    hbox->addWidget( butMoreInfo );
+
+    // Reload button
+    ExtensionsManager *EM = ExtensionsManager::getInstance( p_intf );
     QPushButton *reload = new QPushButton( QIcon( ":/update" ),
                                            qtr( "Reload extensions" ),
                                            this );
-    QSpacerItem *spacer = new QSpacerItem( 1, 1, QSizePolicy::Expanding,
-                                           QSizePolicy::Expanding );
-    hbox->addItem( spacer );
+    CONNECT( reload, clicked(),
+             EM, reloadExtensions() );
     hbox->addWidget( reload );
-    BUTTONACT( reload, reloadExtensions() );
-    layout->addItem( hbox, 8, 0, 1, -1 );
 
-    // Layout: compact display
-    layout->setHorizontalSpacing( 15 );
-
-    fillList();
-
-    CONNECT( extList, currentIndexChanged( int ),
-             this, selectionChanged( int ) );
-    extList->setCurrentIndex( 0 );
-    selectionChanged( 0 );
-
-    // Connect to ExtensionsManager::extensionsUpdated()
-    ExtensionsManager* EM = ExtensionsManager::getInstance( p_intf );
-    CONNECT( EM, extensionsUpdated(), this, fillList() );
+    // Add buttons hbox
+    layout->addItem( hbox );
 }
 
 ExtensionTab::~ExtensionTab()
 {
 }
 
-void ExtensionTab::fillList()
+// Do not close on ESC or ENTER
+void ExtensionTab::keyPressEvent( QKeyEvent *keyEvent )
 {
+    keyEvent->ignore();
+}
+
+/* Safe copy of the extension_t struct */
+class ExtensionCopy
+{
+public:
+    ExtensionCopy( extension_t *p_ext )
+    {
+        name = qfu( p_ext->psz_name );
+        description = qfu( p_ext->psz_description );
+        title = qfu( p_ext->psz_title );
+        author = qfu( p_ext->psz_author );
+        version = qfu( p_ext->psz_version );
+        url = qfu( p_ext->psz_url );
+    }
+    ~ExtensionCopy() {}
+
+    QString name, title, description, author, version, url;
+};
+
+/* Extensions list model for the QListView */
+
+ExtensionListModel::ExtensionListModel( QListView *view, intf_thread_t *intf )
+        : QAbstractListModel( view ), p_intf( intf )
+{
+    // Connect to ExtensionsManager::extensionsUpdated()
     ExtensionsManager* EM = ExtensionsManager::getInstance( p_intf );
-    if( !EM->isLoaded() )
-        EM->loadExtensions();
-    extensions_manager_t* p_mgr = EM->getManager();
+    CONNECT( EM, extensionsUpdated(), this, updateList() );
+
+    // Load extensions now if not already loaded
+    EM->loadExtensions();
+}
+
+ExtensionListModel::~ExtensionListModel()
+{
+}
+
+void ExtensionListModel::updateList()
+{
+    ExtensionCopy *ext;
+
+    // Clear extensions list
+    while( !extensions.isEmpty() )
+    {
+        ext = extensions.takeLast();
+        delete ext;
+    }
+
+    // Find new extensions
+    ExtensionsManager *EM = ExtensionsManager::getInstance( p_intf );
+    extensions_manager_t *p_mgr = EM->getManager();
     if( !p_mgr )
         return;
 
-    // Disconnect signal: we don't want to call selectionChanged now
-    disconnect( extList, SIGNAL( currentIndexChanged( int ) ),
-                this, SLOT( selectionChanged( int ) ) );
-
-    extList->clear();
-
     vlc_mutex_lock( &p_mgr->lock );
-
     extension_t *p_ext;
     FOREACH_ARRAY( p_ext, p_mgr->extensions )
     {
-        extList->addItem( p_ext->psz_title, QString( p_ext->psz_name ) );
+        ext = new ExtensionCopy( p_ext );
+        extensions.push_back( ext );
     }
     FOREACH_END()
-
     vlc_mutex_unlock( &p_mgr->lock );
     vlc_object_release( p_mgr );
 
-    // Reconnect signal and update screen
-    connect( extList, SIGNAL( currentIndexChanged( int ) ),
-             this, SLOT( selectionChanged( int ) ) );
-    extList->setCurrentIndex( 0 );
-    selectionChanged( 0 );
+    emit dataChanged( index( 0 ), index( rowCount() - 1 ) );
 }
 
-void ExtensionTab::selectionChanged( int index )
+int ExtensionListModel::rowCount( const QModelIndex& parent ) const
 {
-    QString extName = extList->itemData( index ).toString();
-    if( extName.isEmpty() )
-        return;
-
-    ExtensionsManager* EM = ExtensionsManager::getInstance( p_intf );
-    extensions_manager_t* p_mgr = EM->getManager();
+    int count = 0;
+    ExtensionsManager *EM = ExtensionsManager::getInstance( p_intf );
+    extensions_manager_t *p_mgr = EM->getManager();
     if( !p_mgr )
-        return;
+        return 0;
 
     vlc_mutex_lock( &p_mgr->lock );
-
-    const char *psz_name = qtu( extName );
-
-    extension_t *p_ext;
-    FOREACH_ARRAY( p_ext, p_mgr->extensions )
-    {
-        if( !strcmp( p_ext->psz_name, psz_name ) )
-        {
-            char *psz_url;
-            if( p_ext->psz_url != NULL
-                && asprintf( &psz_url, "<a href=\"%s\">%s</a>", p_ext->psz_url,
-                             p_ext->psz_url ) != -1 )
-            {
-                url->setText( psz_url );
-                free( psz_url );
-            }
-            else
-            {
-                url->clear();
-            }
-            version->setText( qfu( p_ext->psz_version ) );
-            description->setHtml( qfu( p_ext->psz_description ) );
-            author->setText( qfu( p_ext->psz_author ) );
-            name->setText( qfu( p_ext->psz_name ) );
-            break;
-        }
-    }
-    FOREACH_END()
-
+    count = p_mgr->extensions.i_size;
     vlc_mutex_unlock( &p_mgr->lock );
     vlc_object_release( p_mgr );
+
+    return count;
 }
 
-void ExtensionTab::reloadExtensions()
+QVariant ExtensionListModel::data( const QModelIndex& index, int role ) const
 {
-    ExtensionsManager* EM = ExtensionsManager::getInstance( p_intf );
-    EM->reloadExtensions();
-    fillList();
+    if( !index.isValid() )
+        return QVariant();
+
+    switch( role )
+    {
+    default:
+        return QVariant();
+    }
+}
+
+QModelIndex ExtensionListModel::index( int row, int column,
+                                       const QModelIndex& parent ) const
+{
+    if( column != 0 )
+        return QModelIndex();
+    if( row < 0 || row >= extensions.size() )
+        return QModelIndex();
+
+    return createIndex( row, 0, extensions.at( row ) );
+}
+
+
+/* Extension List Widget Item */
+ExtensionItemDelegate::ExtensionItemDelegate( intf_thread_t *p_intf,
+                                              QListView *view )
+        : QStyledItemDelegate( view ), view( view ), p_intf( p_intf )
+{
+}
+
+ExtensionItemDelegate::~ExtensionItemDelegate()
+{
+}
+
+void ExtensionItemDelegate::paint( QPainter *painter,
+                                   const QStyleOptionViewItem &option,
+                                   const QModelIndex &index ) const
+{
+    ExtensionCopy *ext = ( ExtensionCopy* ) index.internalPointer();
+    assert( ext != NULL );
+
+    int width = option.rect.width();
+    int height = option.rect.height();
+
+    // Pixmap: buffer where to draw
+    QPixmap pix(option.rect.size());
+
+    // Draw background
+    pix.fill( Qt::transparent ); // FIXME
+
+    // ItemView primitive style
+    QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem,
+                                          &option,
+                                          painter );
+
+    // Painter on the pixmap
+    QPainter *pixpaint = new QPainter(&pix);
+
+    // Text font & pen
+    QFont font = painter->font();
+    QPen pen = painter->pen();
+    if( view->selectionModel()->selectedIndexes().contains( index ) )
+    {
+        pen.setBrush( option.palette.highlightedText() );
+    }
+    else
+    {
+        pen.setBrush( option.palette.text() );
+    }
+    pixpaint->setPen( pen );
+
+    // Title: bold
+    font.setBold( true );
+    pixpaint->setFont( font );
+    pixpaint->drawText( QRect( 10, 5, width - 70, 20 ),
+                        Qt::AlignLeft, ext->title );
+
+    // Short description: normal
+    font.setBold( false );
+    pixpaint->setFont( font );
+    pixpaint->drawText( QRect( 10, 30, width - 40, 20 ),
+                        Qt::AlignLeft, ext->description );
+
+    // Version: italic
+    font.setItalic( true );
+    pixpaint->setFont( font );
+    pixpaint->drawText( QRect( width - 50, 5, 20, 20 ),
+                        Qt::AlignLeft, ext->version );
+
+    // Flush paint operations
+    delete pixpaint;
+
+    // Draw it on the screen!
+    painter->drawPixmap( option.rect, pix );
+}
+
+QSize ExtensionItemDelegate::sizeHint( const QStyleOptionViewItem &option,
+                                       const QModelIndex &index ) const
+{
+    if (index.isValid() && index.column() == 0)
+    {
+        QFontMetrics metrics = option.fontMetrics;
+        return QSize( 200, 20 + 2 * metrics.height() );
+    }
+    else
+        return QSize();
 }

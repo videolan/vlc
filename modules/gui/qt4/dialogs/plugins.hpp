@@ -31,7 +31,8 @@
 
 #include <QStringList>
 #include <QTreeWidgetItem>
-#include <QListWidgetItem>
+#include <QAbstractListModel>
+#include <QStyledItemDelegate>
 
 class QLabel;
 class QTabWidget;
@@ -39,10 +40,16 @@ class QComboBox;
 class QTreeWidget;
 class QLineEdit;
 class QTextBrowser;
+class QListView;
+class QStyleOptionViewItem;
+class QPainter;
+class QKeyEvent;
 class PluginTab;
 class ExtensionTab;
 class ExtensionListItem;
 class SearchLineEdit;
+class ExtensionCopy;
+
 
 class PluginDialog : public QVLCFrame, public Singleton<PluginDialog>
 {
@@ -81,19 +88,15 @@ class ExtensionTab : public QVLCFrame
 {
     Q_OBJECT;
 
+protected:
+    virtual void keyPressEvent( QKeyEvent *keyEvent );
+
 private:
     ExtensionTab( intf_thread_t *p_intf );
     virtual ~ExtensionTab();
 
-    QComboBox *extList;
-    QLabel *author, *version, *url;
-    QTextBrowser *description;
-    QLineEdit *name;
-
-private slots:
-    void fillList();
-    void selectionChanged( int index );
-    void reloadExtensions();
+    QListView *extList;
+    QPushButton *butMoreInfo;
 
     friend class PluginDialog;
 };
@@ -106,6 +109,45 @@ public:
     virtual ~PluginTreeItem() {}
 
     virtual bool operator< ( const QTreeWidgetItem & other ) const;
+};
+
+class ExtensionListModel : public QAbstractListModel
+{
+
+    Q_OBJECT
+
+public:
+    ExtensionListModel( QListView *view, intf_thread_t *p_intf );
+    virtual ~ExtensionListModel();
+
+    virtual QVariant data( const QModelIndex& index, int role ) const;
+    virtual QModelIndex index( int row, int column = 0,
+                               const QModelIndex& = QModelIndex() ) const;
+    virtual int rowCount( const QModelIndex& = QModelIndex() ) const;
+
+private slots:
+    void updateList();
+
+private:
+    intf_thread_t *p_intf;
+    QList<ExtensionCopy*> extensions;
+};
+
+class ExtensionItemDelegate : public QStyledItemDelegate
+{
+public:
+    ExtensionItemDelegate( intf_thread_t *p_intf, QListView *view );
+    virtual ~ExtensionItemDelegate();
+
+    virtual void paint( QPainter *painter,
+                        const QStyleOptionViewItem &option,
+                        const QModelIndex &index ) const;
+    virtual QSize sizeHint( const QStyleOptionViewItem &option,
+                            const QModelIndex &index ) const;
+
+private:
+    QListView *view;
+    intf_thread_t *p_intf;
 };
 
 #endif
