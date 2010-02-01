@@ -142,6 +142,7 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
     memset (&hints, 0, sizeof( hints ));
     hints.ai_family = family;
     hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_protocol = protocol;
     hints.ai_flags = AI_PASSIVE;
 
     if (host && !*host)
@@ -163,7 +164,7 @@ static int net_ListenSingle (vlc_object_t *obj, const char *host, int port,
     for (const struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
         int fd = net_Socket (obj, ptr->ai_family, ptr->ai_socktype,
-                             protocol ? protocol : ptr->ai_protocol);
+                             ptr->ai_protocol);
         if (fd == -1)
         {
             msg_Dbg (obj, "socket error: %m");
@@ -660,6 +661,7 @@ int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
 
     memset( &hints, 0, sizeof( hints ) );
     hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_protocol = proto;
 
     msg_Dbg( p_this, "net: connecting to [%s]:%d", psz_host, i_port );
 
@@ -675,7 +677,7 @@ int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
     {
         char *str;
         int fd = net_Socket (p_this, ptr->ai_family, ptr->ai_socktype,
-                             proto ? proto : ptr->ai_protocol);
+                             ptr->ai_protocol);
         if (fd == -1)
             continue;
 
@@ -764,6 +766,7 @@ int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
     memset (&hints, 0, sizeof (hints));
     hints.ai_family = family;
     hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_protocol = protocol;
 
     val = vlc_getaddrinfo (obj, psz_server, i_server, &hints, &rem);
     if (val)
@@ -786,7 +789,7 @@ int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
     for (struct addrinfo *ptr = loc; ptr != NULL; ptr = ptr->ai_next)
     {
         int fd = net_Socket (obj, ptr->ai_family, ptr->ai_socktype,
-                             protocol ? protocol : ptr->ai_protocol);
+                             ptr->ai_protocol);
         if (fd == -1)
             continue; // usually, address family not supported
 

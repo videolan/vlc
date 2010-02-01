@@ -84,7 +84,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
         return -1;
 
     memset( &hints, 0, sizeof( hints ) );
-    hints.ai_socktype = SOCK_STREAM;
+    hints.ai_protocol = proto;
 
     psz_socks = var_CreateGetNonEmptyString( p_this, "socks" );
     if( psz_socks != NULL )
@@ -148,8 +148,7 @@ int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
     for( ptr = res; ptr != NULL; ptr = ptr->ai_next )
     {
         int fd = net_Socket( p_this, ptr->ai_family,
-                             type ? type : ptr->ai_socktype,
-                             proto ? proto : ptr->ai_protocol );
+                             ptr->ai_socktype, ptr->ai_protocol );
         if( fd == -1 )
         {
             msg_Dbg( p_this, "socket error: %m" );
@@ -464,6 +463,8 @@ static int SocksHandshakeTCP( vlc_object_t *p_obj,
         /* v4 only support ipv4 */
         memset (&hints, 0, sizeof (hints));
         hints.ai_family = AF_INET;
+        hints.ai_socktype = SOCK_STREAM;
+        hints.ai_protocol = IPPROTO_TCP;
         if( vlc_getaddrinfo( p_obj, psz_host, 0, &hints, &p_res ) )
             return VLC_EGENERIC;
 

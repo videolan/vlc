@@ -158,27 +158,9 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
                  int i_port, int protocol)
 {
     struct addrinfo hints, *res;
-    int socktype = SOCK_DGRAM;
-
-    switch( protocol )
-    {
-        case IPPROTO_TCP:
-            socktype = SOCK_STREAM;
-            break;
-        case 33: /* DCCP */
-#ifdef __linux__
-# ifndef SOCK_DCCP
-#  define SOCK_DCCP 6
-# endif
-            socktype = SOCK_DCCP;
-#endif
-            break;
-    }
 
     memset (&hints, 0, sizeof( hints ));
-    /* Since we use port numbers rather than service names, the socket type
-     * does not really matter. */
-    hints.ai_socktype = SOCK_DGRAM;
+    hints.ai_protocol = protocol;
     hints.ai_flags = AI_PASSIVE;
 
     msg_Dbg (p_this, "net: listening to %s port %d", psz_host, i_port);
@@ -196,7 +178,8 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
 
     for (struct addrinfo *ptr = res; ptr != NULL; ptr = ptr->ai_next)
     {
-        int fd = net_Socket (p_this, ptr->ai_family, socktype, protocol);
+        int fd = net_Socket (p_this, ptr->ai_family, ptr->ai_socktype,
+                             ptr->ai_protocol);
         if (fd == -1)
         {
             msg_Dbg (p_this, "socket error: %m");
@@ -229,8 +212,8 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
         {
             net_Close (fd);
 #if !defined(WIN32) && !defined(UNDER_CE)
-            fd = rootwrap_bind (ptr->ai_family, socktype,
-                                protocol ? protocol : ptr->ai_protocol,
+            fd = rootwrap_bind (ptr->ai_family, ptr->ai_socktype,
+                                ptr->ai_protocol,
                                 ptr->ai_addr, ptr->ai_addrlen);
             if (fd != -1)
             {
@@ -254,7 +237,7 @@ int *net_Listen (vlc_object_t *p_this, const char *psz_host,
         }
 
         /* Listen */
-        switch (socktype)
+        switch (ptr->ai_socktype)
         {
             case SOCK_STREAM:
             case SOCK_RDM:
