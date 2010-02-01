@@ -50,8 +50,8 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Activate( vlc_object_t * );
-static void Close   ( vlc_object_t * );
+static int  Open ( vlc_object_t * );
+static void Close( vlc_object_t * );
 
 #define NETSYNC_TEXT N_( "Network master clock" )
 #define NETSYNC_LONGTEXT N_( "When set then " \
@@ -80,7 +80,7 @@ vlc_module_begin ()
                  NETSYNC_TIMEOUT_TEXT, NETSYNC_TIMEOUT_LONGTEXT, true )
 
     set_capability( "interface", 0 )
-    set_callbacks( Activate, Close )
+    set_callbacks( Open, Close )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -91,7 +91,7 @@ static void Run( intf_thread_t *p_intf );
 /*****************************************************************************
  * Activate: initialize and create stuff
  *****************************************************************************/
-static int Activate( vlc_object_t *p_this )
+static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t*)p_this;
     int fd;
@@ -140,12 +140,13 @@ static void Run( intf_thread_t *p_intf )
     int canc = vlc_savecancel();
     input_thread_t *p_input = NULL;
     char p_data[MAX_MSG_LENGTH];
-    int i_socket;
+    int i_socket = (intptr_t)p_intf->p_sys;
 
     playlist_t *p_playlist = pl_Hold( p_intf );
-    int i_timeout = __MIN( 500, var_InheritInteger( p_intf, "netsync-timeout" ) );
+    int i_timeout = var_InheritInteger( p_intf, "netsync-timeout" );
+    if( i_timeout < 500 )
+        i_timeout = 500;
     bool b_master = var_InheritBool( p_intf, "netsync-master" );
-    i_socket = (intptr_t)p_intf->p_sys;
 
     /* High priority thread */
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_INPUT );
