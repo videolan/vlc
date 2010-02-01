@@ -37,8 +37,6 @@ pkginclude_HEADERS = \
 	../include/vlc/libvlc_media_player.h \
 	../include/vlc/libvlc_structures.h \
 	../include/vlc/libvlc_vlm.h \
-	../include/vlc/mediacontrol.h \
-	../include/vlc/mediacontrol_structures.h \
 	$(NULL)
 
 pluginsinclude_HEADERS = \
@@ -507,10 +505,6 @@ SOURCES_libvlc_control = \
 	control/media_list_path.h \
 	control/media_list_player.c \
 	control/media_library.c \
-	control/mediacontrol_internal.h \
-	control/mediacontrol_core.c \
-	control/mediacontrol_util.c \
-	control/mediacontrol_audio_video.c \
 	control/media_discoverer.c
 
 ###############################################################################
