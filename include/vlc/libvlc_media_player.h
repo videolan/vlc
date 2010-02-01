@@ -444,11 +444,12 @@ VLC_PUBLIC_API float libvlc_media_player_get_fps( libvlc_media_player_t * );
 /** end bug */
 
 /**
- * Does this media player have a video output?
+ * How many video outputs does this media player have?
  *
  * \param p_md the media player
+ * \return the number of video outputs
  */
-VLC_PUBLIC_API int libvlc_media_player_has_vout( libvlc_media_player_t * );
+VLC_PUBLIC_API unsigned libvlc_media_player_has_vout( libvlc_media_player_t * );
 
 /**
  * Is this media player seekable?
@@ -488,18 +489,17 @@ VLC_PUBLIC_API void libvlc_track_description_release( libvlc_track_description_t
  */
 
 /**
- * Toggle fullscreen status on a non-embedded video output.
+ * Toggle fullscreen status on non-embedded video outputs.
  *
  * @warning The same limitations applies to this function
  * as to libvlc_set_fullscreen().
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_toggle_fullscreen( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_toggle_fullscreen( libvlc_media_player_t * );
 
 /**
- * Enable or disable fullscreen on a non-embedded video output.
+ * Enable or disable fullscreen on non-embedded video outputs.
  *
  * @warning With most window managers, only a top-level windows can switch to
  * full-screen mode. Hence, this function will not operate properly if
@@ -511,18 +511,16 @@ VLC_PUBLIC_API void libvlc_toggle_fullscreen( libvlc_media_player_t *, libvlc_ex
  *
  * \param p_mediaplayer the media player
  * \param b_fullscreen boolean for fullscreen status
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_set_fullscreen( libvlc_media_player_t *, int, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_set_fullscreen( libvlc_media_player_t *, int );
 
 /**
  * Get current fullscreen status.
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
  * \return the fullscreen status (boolean)
  */
-VLC_PUBLIC_API int libvlc_get_fullscreen( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_get_fullscreen( libvlc_media_player_t * );
 
 /**
  * Enable or disable key press events handling, according to the LibVLC hotkeys
@@ -558,34 +556,47 @@ VLC_PUBLIC_API
 void libvlc_video_set_mouse_input( libvlc_media_player_t *mp, unsigned on );
 
 /**
+ * Get the pixel dimensions of a video.
+ *
+ * \param mp media player
+ * \param num number of the video (starting from, and most commonly 0)
+ * \param px pointer to get the pixel width [OUT]
+ * \param py pointer to get the pixel height [OUT]
+ * \return 0 on success, -1 if the specified video does not exist
+ */
+VLC_PUBLIC_API
+int libvlc_video_get_size( libvlc_media_player_t *mp, unsigned num,
+                           unsigned *px, unsigned *py );
+
+/**
  * Get current video height.
+ * You should use libvlc_video_get_size() instead.
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
- * \return the video height
+ * \return the video pixel height or 0 if not applicable
  */
-VLC_PUBLIC_API int libvlc_video_get_height( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_DEPRECATED_API
+int libvlc_video_get_height( libvlc_media_player_t * );
 
 /**
  * Get current video width.
+ * You should use libvlc_video_get_size() instead.
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
- * \return the video width
+ * \return the video pixel width or 0 if not applicable
  */
-VLC_PUBLIC_API int libvlc_video_get_width( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_DEPRECATED_API
+int libvlc_video_get_width( libvlc_media_player_t * );
 
 /**
  * Get the current video scaling factor.
  * See also libvlc_video_set_scale().
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
  * \return the currently configured zoom factor, or 0. if the video is set
  * to fit to the output window/drawable automatically.
  */
-VLC_PUBLIC_API float libvlc_video_get_scale( libvlc_media_player_t *,
-                                             libvlc_exception_t *p_e );
+VLC_PUBLIC_API float libvlc_video_get_scale( libvlc_media_player_t * );
 
 /**
  * Set the video scaling factor. That is the ratio of the number of pixels on
@@ -597,46 +608,42 @@ VLC_PUBLIC_API float libvlc_video_get_scale( libvlc_media_player_t *,
  *
  * \param p_mediaplayer the media player
  * \param i_factor the scaling factor, or zero
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_video_set_scale( libvlc_media_player_t *, float,
-                                            libvlc_exception_t *p_e );
+VLC_PUBLIC_API void libvlc_video_set_scale( libvlc_media_player_t *, float );
 
 /**
  * Get current video aspect ratio.
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
- * \return the video aspect ratio
+ * \return the video aspect ratio or NULL if unspecified
+ * (the result must be released with free() or libvlc_free()).
  */
-VLC_PUBLIC_API char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API char *libvlc_video_get_aspect_ratio( libvlc_media_player_t * );
 
 /**
  * Set new video aspect ratio.
  *
  * \param p_mediaplayer the media player
- * \param psz_aspect new video aspect-ratio
- * \param p_e an initialized exception pointer
+ * \param psz_aspect new video aspect-ratio or NULL to reset to default
+ * \note Invalid aspect ratios are ignored.
  */
-VLC_PUBLIC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *, const char *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_set_aspect_ratio( libvlc_media_player_t *, const char * );
 
 /**
  * Get current video subtitle.
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
- * \return the video subtitle selected
+ * \return the video subtitle selected, or -1 if none
  */
-VLC_PUBLIC_API int libvlc_video_get_spu( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_get_spu( libvlc_media_player_t * );
 
 /**
  * Get the number of available video subtitles.
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
  * \return the number of available video subtitles
  */
-VLC_PUBLIC_API int libvlc_video_get_spu_count( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_get_spu_count( libvlc_media_player_t * );
 
 /**
  * Get the description of available video subtitles.
@@ -653,9 +660,9 @@ VLC_PUBLIC_API libvlc_track_description_t *
  *
  * \param p_mediaplayer the media player
  * \param i_spu new video subtitle to select
- * \param p_e an initialized exception pointer
+ * \return 0 on success, -1 if out of range
  */
-VLC_PUBLIC_API void libvlc_video_set_spu( libvlc_media_player_t *, int , libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_set_spu( libvlc_media_player_t *, unsigned );
 
 /**
  * Set new video subtitle file.
@@ -692,19 +699,18 @@ VLC_PUBLIC_API libvlc_track_description_t *
  * Get current crop filter geometry.
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
- * \return the crop filter geometry
+ * \return the crop filter geometry or NULL if unset
  */
-VLC_PUBLIC_API char *libvlc_video_get_crop_geometry( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API char *libvlc_video_get_crop_geometry( libvlc_media_player_t * );
 
 /**
  * Set new crop filter geometry.
  *
  * \param p_mediaplayer the media player
- * \param psz_geometry new crop filter geometry
- * \param p_e an initialized exception pointer
+ * \param psz_geometry new crop filter geometry (NULL to unset)
  */
-VLC_PUBLIC_API void libvlc_video_set_crop_geometry( libvlc_media_player_t *, const char *, libvlc_exception_t * );
+VLC_PUBLIC_API
+void libvlc_video_set_crop_geometry( libvlc_media_player_t *, const char * );
 
 /**
  * Toggle teletext transparent status on video output.
@@ -726,7 +732,6 @@ VLC_PUBLIC_API int libvlc_video_get_track_count( libvlc_media_player_t * );
  * Get the description of available video tracks.
  *
  * \param p_mi media player
- * \param p_e an initialized exception
  * \return list with description of available video tracks, or NULL on error
  */
 VLC_PUBLIC_API libvlc_track_description_t *
@@ -736,19 +741,19 @@ VLC_PUBLIC_API libvlc_track_description_t *
  * Get current video track.
  *
  * \param p_mi media player
- * \param p_e an initialized exception pointer
- * \return the video track (int)
+ * \return the video track (int) or -1 if none
  */
-VLC_PUBLIC_API int libvlc_video_get_track( libvlc_media_player_t *, libvlc_exception_t * );
+VLC_PUBLIC_API int libvlc_video_get_track( libvlc_media_player_t * );
 
 /**
  * Set video track.
  *
  * \param p_mi media player
  * \param i_track the track (int)
- * \param p_e an initialized exception pointer
+ * \return 0 on success, -1 if out of range
  */
-VLC_PUBLIC_API void libvlc_video_set_track( libvlc_media_player_t *, int, libvlc_exception_t * );
+VLC_PUBLIC_API
+int libvlc_video_set_track( libvlc_media_player_t *, int );
 
 /**
  * Take a snapshot of the current video window.
@@ -757,24 +762,24 @@ VLC_PUBLIC_API void libvlc_video_set_track( libvlc_media_player_t *, int, libvlc
  * If i_width XOR i_height is 0, original aspect-ratio is preserved.
  *
  * \param p_mi media player instance
+ * \param num number of video output (typically 0 for the first/only one)
  * \param psz_filepath the path where to save the screenshot to
  * \param i_width the snapshot's width
  * \param i_height the snapshot's height
- * \param p_e an initialized exception pointer
+ * \return 0 on success, -1 if the video was not found
  */
-VLC_PUBLIC_API void libvlc_video_take_snapshot( libvlc_media_player_t *, const char *,unsigned int, unsigned int, libvlc_exception_t * );
+VLC_PUBLIC_API
+int libvlc_video_take_snapshot( libvlc_media_player_t *, unsigned num,
+                                const char *,unsigned int, unsigned int );
 
 /**
  * Enable or disable deinterlace filter
  *
  * \param p_mi libvlc media player
- * \param b_enable boolean to enable or disable deinterlace filter
- * \param psz_mode type of deinterlace filter to use
- * \param p_e an initialized exception pointer
+ * \param psz_mode type of deinterlace filter, NULL to disable
  */
 VLC_PUBLIC_API void libvlc_video_set_deinterlace( libvlc_media_player_t *,
-                                                  int , const char *,
-                                                  libvlc_exception_t *);
+                                                  const char * );
 
 /**
  * Get an integer marquee option value

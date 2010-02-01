@@ -356,7 +356,17 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "mouse-events", VLC_VAR_BOOL);
     var_SetBool (mp, "mouse-events", true);
 
-    /* Audio */
+    var_Create (mp, "fullscreen", VLC_VAR_BOOL);
+    var_Create (mp, "autoscale", VLC_VAR_BOOL);
+    var_SetBool (mp, "autoscale", true);
+    var_Create (mp, "scale", VLC_VAR_FLOAT);
+    var_SetFloat (mp, "scale", 1.);
+    var_Create (mp, "aspect-ratio", VLC_VAR_STRING);
+    var_Create (mp, "crop", VLC_VAR_STRING);
+    var_Create (mp, "deinterlace", VLC_VAR_INTEGER);
+    var_Create (mp, "deinterlace-mode", VLC_VAR_STRING);
+
+     /* Audio */
     var_Create (mp, "aout", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
 
     mp->p_md = NULL;
