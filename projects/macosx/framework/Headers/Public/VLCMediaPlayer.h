@@ -125,10 +125,9 @@ extern NSString * VLCMediaPlayerStateToString(VLCMediaPlayerState state);
 /**
  * Enable or disable deinterlace filter
  *
- * \param name of deinterlace filter to use (availability depends on underlying VLC version)
- * \param enable boolean to enable or disable deinterlace filter
+ * \param name of deinterlace filter to use (availability depends on underlying VLC version), NULL to disable.
  */
-- (void)setDeinterlaceFilter: (NSString *)name enabled: (BOOL)enabled;
+- (void)setDeinterlaceFilter: (NSString *)name;
 
 @property float rate;
 

@@ -270,32 +270,17 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (void)setCurrentVideoSubTitleIndex:(NSUInteger)index
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_video_set_spu( instance, (int)index, &ex );
-    catch_exception( &ex );
+    libvlc_video_set_spu( instance, (int)index );
 }
 
 - (NSUInteger)currentVideoSubTitleIndex
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    NSInteger count = libvlc_video_get_spu_count( instance, &ex );
-    if (libvlc_exception_raised( &ex ))
-    {
-        libvlc_exception_clear( &ex );
-        return NSNotFound;
-    }
+    NSInteger count = libvlc_video_get_spu_count(instance);
+
     if (count <= 0)
         return NSNotFound;
-    NSUInteger result = libvlc_video_get_spu( instance, &ex );
-    if (libvlc_exception_raised( &ex ))
-    {
-        libvlc_exception_clear( &ex );
-        return NSNotFound;
-    }
-    else
-        return result;
+
+	return libvlc_video_get_spu(instance);
 }
 
 - (BOOL)openVideoSubTitlesFromFile:(NSString *)path
@@ -322,52 +307,37 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (void)setVideoCropGeometry:(char *)value
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_video_set_crop_geometry( instance, value, &ex );
-    catch_exception( &ex );
+    libvlc_video_set_crop_geometry( instance, value );
 }
 
 - (char *)videoCropGeometry
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    char * result = libvlc_video_get_crop_geometry( instance, &ex );
-    catch_exception( &ex );
+    char * result = libvlc_video_get_crop_geometry( instance );
     return result;
 }
 
 - (void)setVideoAspectRatio:(char *)value
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_video_set_aspect_ratio( instance, value, &ex );
-    catch_exception( &ex );
+    libvlc_video_set_aspect_ratio( instance, value );
 }
 
 - (char *)videoAspectRatio
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    char * result = libvlc_video_get_aspect_ratio( instance, &ex );
-    catch_exception( &ex );
+    char * result = libvlc_video_get_aspect_ratio( instance );
     return result;
 }
 
 - (void)saveVideoSnapshotAt: (NSString *)path withWidth:(NSUInteger)width andHeight:(NSUInteger)height
 {
-    libvlc_exception_t ex;
+	libvlc_exception_t ex;
     libvlc_exception_init( &ex );
     libvlc_video_take_snapshot( instance, [path UTF8String], width, height, &ex );
-    catch_exception( &ex );
+	catch_exception( &ex );
 }
 
-- (void)setDeinterlaceFilter: (NSString *)name enabled: (BOOL)enabled
+- (void)setDeinterlaceFilter: (NSString *)name
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_video_set_deinterlace( instance, (int)enabled , [name UTF8String], &ex );
-    catch_exception( &ex );
+    libvlc_video_set_deinterlace( instance, [name UTF8String] );
 }
 
 - (void)setRate:(float)value
@@ -382,11 +352,8 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (NSSize)videoSize
 {
-    libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    NSSize result = NSMakeSize(libvlc_video_get_height((libvlc_media_player_t *)instance, &ex),
-                               libvlc_video_get_width((libvlc_media_player_t *)instance, &ex));
-    catch_exception( &ex );
+    NSSize result = NSMakeSize(libvlc_video_get_height((libvlc_media_player_t *)instance),
+                               libvlc_video_get_width((libvlc_media_player_t *)instance));
     return result;
 }
 
