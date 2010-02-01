@@ -7,8 +7,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>643</width>
-    <height>619</height>
+    <width>661</width>
+    <height>670</height>
    </rect>
   </property>
   <property name="sizePolicy">
@@ -20,7 +20,7 @@
   <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout">
+  <layout class="QVBoxLayout" name="verticalLayout_2">
    <item>
     <widget class="QCheckBox" name="enableAudio">
      <property name="text">
@@ -33,16 +33,7 @@
    </item>
    <item>
     <widget class="QWidget" name="SPrefsAudio_zone" native="true">
-     <layout class="QVBoxLayout" name="verticalLayout_2">
-      <property name="leftMargin">
-       <number>9</number>
-      </property>
-      <property name="topMargin">
-       <number>0</number>
-      </property>
-      <property name="bottomMargin">
-       <number>0</number>
-      </property>
+     <layout class="QVBoxLayout" name="verticalLayout">
       <item>
        <widget class="QGroupBox" name="audioBox">
         <property name="title">
@@ -256,51 +247,13 @@
          </sizepolicy>
         </property>
         <property name="title">
-         <string>Spatialization</string>
+         <string>Effects</string>
         </property>
         <property name="checkable">
          <bool>false</bool>
         </property>
         <layout class="QGridLayout" name="gridLayout_2">
-         <property name="leftMargin">
-          <number>9</number>
-         </property>
-         <property name="rightMargin">
-          <number>9</number>
-         </property>
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <property name="horizontalSpacing">
-          <number>6</number>
-         </property>
-         <item row="2" column="0" colspan="2">
-          <widget class="QCheckBox" name="headphoneEffect">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="text">
-            <string>Headphone surround effect</string>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="1">
-          <widget class="QComboBox" name="detectionDolby">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
-           <property name="currentIndex">
-            <number>-1</number>
-           </property>
-          </widget>
-         </item>
-         <item row="1" column="0">
+         <item row="0" column="0">
           <widget class="QLabel" name="dolbyLabel">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Preferred">
@@ -328,43 +281,66 @@
            </property>
           </widget>
          </item>
-        </layout>
-       </widget>
-      </item>
-      <item>
-       <widget class="QGroupBox" name="groupBox">
-        <property name="title">
-         <string>Processing</string>
-        </property>
-        <layout class="QGridLayout">
-         <property name="bottomMargin">
-          <number>0</number>
-         </property>
-         <item row="4" column="1" colspan="2">
-          <widget class="QComboBox" name="visualisation">
+         <item row="0" column="1">
+          <widget class="QComboBox" name="detectionDolby">
            <property name="sizePolicy">
             <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
              <horstretch>0</horstretch>
              <verstretch>0</verstretch>
             </sizepolicy>
            </property>
+           <property name="currentIndex">
+            <number>-1</number>
+           </property>
           </widget>
          </item>
-         <item row="4" column="0">
-          <widget class="QLabel" name="visuLabel">
+         <item row="2" column="0">
+          <widget class="QCheckBox" name="volNormBox">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
            <property name="minimumSize">
             <size>
              <width>250</width>
              <height>0</height>
             </size>
            </property>
-           <property name="text">
-            <string>Visualization:</string>
+           <property name="maximumSize">
+            <size>
+             <width>250</width>
+             <height>16777215</height>
+            </size>
            </property>
-           <property name="buddy">
-            <cstring>visualisation</cstring>
+           <property name="text">
+            <string>Normalize volume to:</string>
            </property>
           </widget>
+         </item>
+         <item row="2" column="1">
+          <widget class="QDoubleSpinBox" name="volNormSpin">
+           <property name="enabled">
+            <bool>true</bool>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignRight</set>
+           </property>
+          </widget>
+         </item>
+         <item row="2" column="2">
+          <spacer name="horizontalSpacer">
+           <property name="orientation">
+            <enum>Qt::Horizontal</enum>
+           </property>
+           <property name="sizeHint" stdset="0">
+            <size>
+             <width>268</width>
+             <height>20</height>
+            </size>
+           </property>
+          </spacer>
          </item>
          <item row="3" column="0">
           <widget class="QLabel" name="replayLabel">
@@ -392,60 +368,49 @@
            </property>
           </widget>
          </item>
-         <item row="2" column="1" colspan="2">
-          <widget class="QWidget" name="widget" native="true">
-           <layout class="QHBoxLayout" name="horizontalLayout_2">
-            <property name="margin">
-             <number>0</number>
-            </property>
-            <item>
-             <widget class="QDoubleSpinBox" name="volNormSpin">
-              <property name="enabled">
-               <bool>true</bool>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignRight</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <spacer name="horizontalSpacer">
-              <property name="orientation">
-               <enum>Qt::Horizontal</enum>
-              </property>
-              <property name="sizeHint" stdset="0">
-               <size>
-                <width>40</width>
-                <height>20</height>
-               </size>
-              </property>
-             </spacer>
-            </item>
-           </layout>
-          </widget>
-         </item>
-         <item row="2" column="0">
-          <widget class="QCheckBox" name="volNormBox">
-           <property name="sizePolicy">
-            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
-             <horstretch>0</horstretch>
-             <verstretch>0</verstretch>
-            </sizepolicy>
-           </property>
+         <item row="4" column="0">
+          <widget class="QLabel" name="visuLabel">
            <property name="minimumSize">
             <size>
              <width>250</width>
              <height>0</height>
             </size>
            </property>
-           <property name="maximumSize">
-            <size>
-             <width>250</width>
-             <height>16777215</height>
-            </size>
+           <property name="text">
+            <string>Visualization:</string>
+           </property>
+           <property name="buddy">
+            <cstring>visualisation</cstring>
+           </property>
+          </widget>
+         </item>
+         <item row="4" column="1" colspan="2">
+          <widget class="QComboBox" name="visualisation">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
+           </property>
+          </widget>
+         </item>
+         <item row="5" column="0">
+          <widget class="QCheckBox" name="headphoneEffect">
+           <property name="sizePolicy">
+            <sizepolicy hsizetype="Preferred" vsizetype="Fixed">
+             <horstretch>0</horstretch>
+             <verstretch>0</verstretch>
+            </sizepolicy>
            </property>
            <property name="text">
-            <string>Normalize volume to:</string>
+            <string>Headphone surround effect</string>
+           </property>
+          </widget>
+         </item>
+         <item row="6" column="0" colspan="2">
+          <widget class="QCheckBox" name="autoscaleBox">
+           <property name="text">
+            <string>Enable Time-Stretching audio</string>
            </property>
           </widget>
          </item>
@@ -573,7 +538,6 @@
   <tabstop>outputModule</tabstop>
   <tabstop>fileName</tabstop>
   <tabstop>fileBrowseButton</tabstop>
-  <tabstop>visualisation</tabstop>
  </tabstops>
  <resources/>
  <connections/>

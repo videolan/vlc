@@ -314,6 +314,7 @@ SPrefsPanel::SPrefsPanel( intf_thread_t *_p_intf, QWidget *_parent,
                             replayCombo );
             CONFIG_GENERIC( "audio-visual" , Module , ui.visuLabel,
                             visualisation);
+            CONFIG_GENERIC( "audio-time-stretch", Bool, NULL, autoscaleBox );
 
             /* Audio Output Specifics */
             CONFIG_GENERIC( "aout", Module, ui.outputLabel, outputModule );
