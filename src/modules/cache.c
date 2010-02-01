@@ -443,7 +443,6 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
 {
     char *filename, *tmpname;
 
-    config_CreateDir( p_this, dir );
     if (asprintf (&filename, "%s"DIR_SEP CACHENAME_FORMAT, dir,
                   CACHENAME_VALUES ) == -1)
         return;
