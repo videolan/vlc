@@ -341,7 +341,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     }
     vlc_object_attach (mp, mp->p_libvlc);
 
-    /* Drawable */
+    /* Video */
     var_Create (mp, "drawable-xid", VLC_VAR_INTEGER);
 #ifdef WIN32
     var_Create (mp, "drawable-hwnd", VLC_VAR_ADDRESS);
@@ -351,10 +351,10 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     var_Create (mp, "drawable-nsobject", VLC_VAR_ADDRESS);
 #endif
 
-    /* Drawable input methods */
     var_Create (mp, "keyboard-events", VLC_VAR_BOOL);
     var_SetBool (mp, "keyboard-events", true);
     var_Create (mp, "mouse-events", VLC_VAR_BOOL);
+    var_SetBool (mp, "mouse-events", true);
 
     /* Audio */
     var_Create (mp, "aout", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
