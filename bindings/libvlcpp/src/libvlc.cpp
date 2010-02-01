@@ -22,14 +22,14 @@
  *****************************************************************************/
 
 #include "libvlc.hpp"
-#include "exception.hpp"
 
 using namespace libvlc;
 
 libVLC::libVLC( int i_argc, const char *const *argv )
 {
-    Exception ex;
-    m_instance = libvlc_new( i_argc, argv, &ex.ex);
+    m_instance = libvlc_new( i_argc, argv);
+    if(!m_instance)
+        throw libvlc_errmsg();
 }
 
 libVLC::~libVLC()
