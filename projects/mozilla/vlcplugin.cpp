@@ -37,6 +37,7 @@
 
 #include <ctype.h>
 #include <pthread.h>
+#include <stdio.h>
 
 /*****************************************************************************
  * VlcPlugin constructor and destructor
@@ -136,11 +137,12 @@ void EventObj::callback(const libvlc_event_t* event)
 void VlcPlugin::event_callback(const libvlc_event_t* event, void *param)
 {
     VlcPlugin *plugin = (VlcPlugin*)param;
-    plugin->events.callback(event);
 #ifdef XP_UNIX
+    plugin->events.callback(event);
     NPN_PluginThreadAsyncCall(plugin->getBrowser(), eventAsync, plugin);
 #else
-    NPN_SetException(this, "NPN_PluginThreadAsyncCall not implemented yet.");
+#warning NPN_PluginThreadAsyncCall not implemented yet.
+    printf("%s","No NPN_PluginThreadAsyncCall(), doing nothing.");
 #endif
 }
 
