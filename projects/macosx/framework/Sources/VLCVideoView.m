@@ -185,26 +185,13 @@
     return stretchesVideo;
 }
 
-/* This is called by the libvlc module 'minimal_macosx' as soon as there is one 
+/* This is called by the libvlc module 'minimal_macosx' as soon as there is one
  * vout available
  */
 - (void)addVoutSubview:(NSView *)aView /* (Scheduled to deletion) */
 {
-    /* This is where the real video comes from */
-    if( [[self subviews] count] )
-    {
-        /* XXX: This is a hack until core gets fixed */
-        NSUInteger i;
-        for( i = 0; i < [[self subviews] count]; i++ )
-        {
-            [[[self subviews] objectAtIndex:i] detachFromVout];
-            [[[self subviews] objectAtIndex:i] retain];
-            [[[self subviews] objectAtIndex:i] removeFromSuperview];
-        }
-    }
-
     [aView setFrame:[self bounds]];
-    
+
     [self addSubview:aView];
 
     // TODO: Should we let the media player specify these values?
