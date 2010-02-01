@@ -30,7 +30,6 @@ extern NSString * VLCMediaListItemDeleted;
 
 @class VLCMedia;
 @class VLCMediaList;
-@class VLCMediaListAspect;
 
 /**
  * TODO: Documentation VLCMediaListDelegate
@@ -56,9 +55,6 @@ extern NSString * VLCMediaListItemDeleted;
     id <VLCMediaListDelegate,NSObject> delegate;    //< Delegate object
     /* We need that private copy because of Cocoa Bindings, that need to be working on first thread */
     NSMutableArray * cachedMedia;                   //< Private copy of media objects.
-    VLCMediaListAspect * flatAspect;                //< TODO: Documentation VLCMediaList.flatAspect
-    VLCMediaListAspect * hierarchicalAspect;        //< TODO: Documentation VLCMediaList.hierarchicalAspect
-    VLCMediaListAspect * hierarchicalNodeAspect;    //< TODO: Documentation VLCMediaList.hierarchicalNodeAspect
 }
 
 /* Operations */
@@ -113,19 +109,4 @@ extern NSString * VLCMediaListItemDeleted;
  */
 @property (readonly) BOOL isReadOnly;
 
-/* Media list aspect */
-/**
- * TODO: Documentation VLCMediaList.hierarchicalAspect
- */
-@property (readonly) VLCMediaListAspect * hierarchicalAspect;
-
-/**
- * TODO: Documentation VLCMediaList.hierarchicalNodeAspect
- */
-@property (readonly) VLCMediaListAspect * hierarchicalNodeAspect;
-
-/**
- * TODO: Documentation VLCMediaList.flatAspect
- */
-@property (readonly) VLCMediaListAspect * flatAspect;
 @end

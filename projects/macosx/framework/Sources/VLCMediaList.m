@@ -81,7 +81,6 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 
         // Initialize internals to defaults
         cachedMedia = [[NSMutableArray alloc] init];
-        delegate = flatAspect = hierarchicalAspect = hierarchicalNodeAspect = nil;
         [self initInternalMediaList];
     }
     return self;
@@ -111,9 +110,6 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 
     libvlc_media_list_release( p_mlist );
     [cachedMedia release];
-    [flatAspect release];
-    [hierarchicalAspect release];
-    [hierarchicalNodeAspect release];
     [super dealloc];
 }
 
@@ -209,40 +205,6 @@ static void HandleMediaListItemDeleted( const libvlc_event_t * event, void * use
 - (BOOL)isReadOnly
 {
     return libvlc_media_list_is_readonly( p_mlist );
-}
-
-/* Media list aspect */
-- (VLCMediaListAspect *)hierarchicalAspect
-{
-    if( hierarchicalAspect )
-        return hierarchicalAspect;
-
-    libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_view(p_mlist);
-    hierarchicalAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_mlv andMediaList:self] retain];
-    libvlc_media_list_view_release( p_mlv );
-    return hierarchicalAspect;
-}
-
-- (VLCMediaListAspect *)hierarchicalNodeAspect
-{
-    if( hierarchicalNodeAspect )
-        return hierarchicalNodeAspect;
-
-    libvlc_media_list_view_t * p_mlv = libvlc_media_list_hierarchical_node_view(p_mlist);
-    hierarchicalNodeAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_mlv andMediaList:self] retain];
-    libvlc_media_list_view_release( p_mlv );
-    return hierarchicalNodeAspect;
-}
-
-- (VLCMediaListAspect *)flatAspect
-{
-    if( flatAspect )
-        return flatAspect;
-
-    libvlc_media_list_view_t * p_mlv = libvlc_media_list_flat_view(p_mlist, NULL);
-    flatAspect = [[VLCMediaListAspect mediaListAspectWithLibVLCMediaListView:p_mlv andMediaList:self] retain];
-    libvlc_media_list_view_release( p_mlv );
-    return flatAspect;
 }
 
 @end

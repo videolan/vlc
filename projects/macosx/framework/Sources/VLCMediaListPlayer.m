@@ -37,10 +37,7 @@
     {
         _mediaPlayer = [[VLCMediaPlayer alloc] init];
 
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-        instance = libvlc_media_list_player_new([VLCLibrary sharedInstance], &ex);
-        catch_exception(&ex);
+        instance = libvlc_media_list_player_new([VLCLibrary sharedInstance]);
         libvlc_media_list_player_set_media_player(instance, [_mediaPlayer libVLCMediaPlayer]);
     }
     return self;

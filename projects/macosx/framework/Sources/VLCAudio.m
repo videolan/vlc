@@ -68,7 +68,7 @@ NSString * VLCMediaPlayerVolumeChanged = @"VLCMediaPlayerVolumeChanged";
         value = VOLUME_MIN;
     else if (value > VOLUME_MAX)
         value = VOLUME_MAX;
-    libvlc_audio_set_volume([library instance], value, NULL);
+    libvlc_audio_set_volume([library instance], value);
 }
 
 - (void)volumeUp

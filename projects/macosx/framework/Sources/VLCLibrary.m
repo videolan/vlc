@@ -41,7 +41,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
     {
         NSException* libvlcException = [NSException
             exceptionWithName:@"LibVLCException"
-            reason:[NSString stringWithFormat:@"libvlc has thrown us an error: %s (%s:%d %s)", 
+            reason:[NSString stringWithFormat:@"libvlc has thrown us an error: %s (%s:%d %s)",
                 libvlc_errmsg(), file, line_number, function]
             userInfo:nil];
         libvlc_exception_clear( ex );
@@ -52,7 +52,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
 @implementation VLCLibrary
 + (VLCLibrary *)sharedLibrary
 {
-    if (!sharedLibrary) 
+    if (!sharedLibrary)
     {
         /* Initialize a shared instance */
         sharedLibrary = [[self alloc] init];
@@ -60,13 +60,13 @@ void __catch_exception( void * e, const char * function, const char * file, int 
     return sharedLibrary;
 }
 
-- (id)init 
+- (id)init
 {
-    if (self = [super init]) 
+    if (self = [super init])
     {
         libvlc_exception_t ex;
         libvlc_exception_init( &ex );
-        
+
         NSArray *vlcParams = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"VLCParams"];
         if (!vlcParams) {
             NSMutableArray *defaultParams = [NSMutableArray array];
@@ -93,8 +93,7 @@ void __catch_exception( void * e, const char * function, const char * file, int 
             lib_vlc_params[paramNum] = [vlcParam cStringUsingEncoding:NSASCIIStringEncoding];
             paramNum++;
         }
-        instance = (void *)libvlc_new( sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]), lib_vlc_params, &ex );
-        catch_exception( &ex );
+        instance = (void *)libvlc_new( sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]), lib_vlc_params);
         NSAssert(instance, @"libvlc failed to initialize");
 
         // Assignment unneeded, as the audio unit will do it for us
@@ -103,24 +102,24 @@ void __catch_exception( void * e, const char * function, const char * file, int 
     return self;
 }
 
-- (NSString *)version 
+- (NSString *)version
 {
     return [NSString stringWithUTF8String:libvlc_get_version()];
 }
 
-- (NSString *)changeset 
+- (NSString *)changeset
 {
     return [NSString stringWithUTF8String:libvlc_get_changeset()];
 }
 
-- (void)dealloc 
+- (void)dealloc
 {
-    if( instance ) 
+    if( instance )
         libvlc_release( instance );
-    
-    if( self == sharedLibrary ) 
+
+    if( self == sharedLibrary )
         sharedLibrary = nil;
-    
+
     instance = nil;
     [audio release];
     [super dealloc];
