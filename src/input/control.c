@@ -449,6 +449,19 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                                    pp_decoder, pp_vout, pp_aout );
         }
 
+        case INPUT_GET_PCR_SYSTEM:
+        {
+            mtime_t *pi_system = va_arg( args, mtime_t * );
+            return es_out_ControlGetPcrSystem( p_input->p->p_es_out_display, pi_system );
+        }
+
+        case INPUT_MODIFY_PCR_SYSTEM:
+        {
+            bool b_absolute = va_arg( args, int );
+            mtime_t i_system = va_arg( args, mtime_t );
+            return es_out_ControlModifyPcrSystem( p_input->p->p_es_out_display, b_absolute, i_system );
+        }
+
         default:
             msg_Err( p_input, "unknown query in input_vaControl" );
             return VLC_EGENERIC;

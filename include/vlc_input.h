@@ -512,6 +512,10 @@ enum input_query_e
     INPUT_GET_AOUT,         /* arg1=aout_instance_t **              res=can fail */
     INPUT_GET_VOUTS,        /* arg1=vout_thread_t ***, int *        res=can fail */
     INPUT_GET_ES_OBJECTS,   /* arg1=int id, vlc_object_t **dec, vout_thread_t **, aout_instance_t ** */
+
+    /* External clock managments */
+    INPUT_GET_PCR_SYSTEM,   /* arg1=mtime_t *                       res=can fail */
+    INPUT_MODIFY_PCR_SYSTEM,/* arg1=int absolute, arg2=mtime_t      res=can fail */
 };
 
 /** @}*/
@@ -611,6 +615,21 @@ static inline int input_GetEsObjects( input_thread_t *p_input, int i_id,
 {
     return input_Control( p_input, INPUT_GET_ES_OBJECTS, i_id,
                           pp_decoder, pp_vout, pp_aout );
+}
+
+/**
+ * \see input_clock_GetSystemOrigin
+ */
+static inline int input_GetPcrSystem( input_thread_t *p_input, mtime_t *pi_system )
+{
+    return input_Control( p_input, INPUT_GET_PCR_SYSTEM, pi_system );
+}
+/**
+ * \see input_clock_ChangeSystemOrigin
+ */
+static inline int input_ModifyPcrSystem( input_thread_t *p_input, bool b_absolute, mtime_t i_system )
+{
+    return input_Control( p_input, INPUT_MODIFY_PCR_SYSTEM, b_absolute, i_system );
 }
 
 /* */
