@@ -353,6 +353,8 @@ NPError VlcPlugin::init(int argc, char* const argn[], char* const argv[])
     }
 
     libvlc_instance = libvlc_new(ppsz_argc, ppsz_argv);
+    if( !libvlc_instance )
+        return NPERR_GENERIC_ERROR;
     libvlc_media_list = libvlc_media_list_new(libvlc_instance);
 
     /*
