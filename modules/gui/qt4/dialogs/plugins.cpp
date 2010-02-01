@@ -231,6 +231,25 @@ void ExtensionTab::keyPressEvent( QKeyEvent *keyEvent )
     keyEvent->ignore();
 }
 
+// Show more information
+void ExtensionTab::moreInformation()
+{
+    if( !extList->selectionModel() ||
+        extList->selectionModel()->selectedIndexes().isEmpty() )
+
+    {
+        return;
+    }
+
+    QModelIndex index = extList->selectionModel()->selectedIndexes().first();
+    ExtensionCopy *ext = (ExtensionCopy*) index.internalPointer();
+    if( !ext )
+        return;
+
+    ExtensionInfoDialog dlg( *ext, p_intf, this );
+    dlg.exec();
+}
+
 /* Safe copy of the extension_t struct */
 class ExtensionCopy
 {
@@ -420,4 +439,81 @@ QSize ExtensionItemDelegate::sizeHint( const QStyleOptionViewItem &option,
     }
     else
         return QSize();
+}
+
+/* "More information" dialog */
+
+ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
+                                          intf_thread_t *p_intf,
+                                          QWidget *parent )
+       : QVLCDialog( parent, p_intf ),
+         extension( new ExtensionCopy( extension ) )
+{
+    // Let's be a modal dialog
+    setWindowModality( Qt::WindowModal );
+
+    // Layout
+    QGridLayout *layout = new QGridLayout( this );
+
+    // Icon
+    QLabel *icon = new QLabel( this );
+    QPixmap pix( ":/logo/vlc48.png" );
+    icon->setPixmap( pix );
+    layout->addWidget( icon, 1, 0, 2, 1, Qt::AlignLeft );
+
+    // Title
+    QLabel *label = new QLabel( extension.title, this );
+    QFont font = label->font();
+    font.setBold( true );
+    font.setPointSizeF( font.pointSizeF() * 1.3f );
+    label->setFont( font );
+    layout->addWidget( label, 0, 0, 1, -1, Qt::AlignLeft );
+
+    // Version
+    label = new QLabel( this );
+    QString txt = qtr( "Version:" );
+    txt += extension.version;
+    label->setText( txt );
+    layout->addWidget( label, 1, 1, 1, 1, Qt::AlignLeft | Qt::AlignBottom );
+
+    // Author
+    label = new QLabel( this );
+    txt = qtr( "Author(s):" );
+    txt += extension.author;
+    label->setText( txt );
+    layout->addWidget( label, 2, 1, 1, 1, Qt::AlignLeft | Qt::AlignTop );
+
+    // Description
+    // FIXME: if( !extension.full_description.isEmpty() ) ...
+    QTextBrowser *text = new QTextBrowser( this );
+    text->setHtml( extension.description );
+    layout->addWidget( text, 4, 0, 1, -1, Qt::AlignJustify );
+
+    // URL
+    label = new QLabel( qtr( "Website:" ), this );
+    font = label->font();
+    font.setBold( true );
+    label->setFont( font );
+    layout->addWidget( label, 5, 0, 1, 1, Qt::AlignLeft );
+    label = new QLabel( extension.url, this );
+    label->setTextInteractionFlags( Qt::TextBrowserInteraction );
+    layout->addWidget( label, 5, 1, 1, 1, Qt::AlignLeft );
+
+    // Script file
+    label = new QLabel( qtr( "File:" ), this );
+    label->setFont( font );
+    layout->addWidget( label, 6, 0, 1, 1, Qt::AlignLeft );
+    QLineEdit *line = new QLineEdit( extension.name, this );
+    layout->addWidget( line, 6, 1, 1, 1, Qt::AlignLeft );
+
+    // Close button
+    QDialogButtonBox *group = new QDialogButtonBox( QDialogButtonBox::Close,
+                                                    Qt::Horizontal, this );
+    layout->addWidget( group, 7, 0, 1, -1 );
+    connect( group, SIGNAL(accepted()), this, SLOT(close()) );
+}
+
+ExtensionInfoDialog::~ExtensionInfoDialog()
+{
+    delete extension;
 }

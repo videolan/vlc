@@ -95,6 +95,10 @@ private:
     ExtensionTab( intf_thread_t *p_intf );
     virtual ~ExtensionTab();
 
+private slots:
+    void moreInformation();
+
+private:
     QListView *extList;
     QPushButton *butMoreInfo;
 
@@ -148,6 +152,17 @@ public:
 private:
     QListView *view;
     intf_thread_t *p_intf;
+};
+
+class ExtensionInfoDialog : public QVLCDialog
+{
+public:
+    ExtensionInfoDialog( const ExtensionCopy& extension,
+                         intf_thread_t *p_intf, QWidget *parent );
+    virtual ~ExtensionInfoDialog();
+
+private:
+    ExtensionCopy *extension;
 };
 
 #endif
