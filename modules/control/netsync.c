@@ -50,124 +50,116 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static int  Open (vlc_object_t *);
+static void Close(vlc_object_t *);
 
-#define NETSYNC_TEXT N_( "Network master clock" )
-#define NETSYNC_LONGTEXT N_( "When set then " \
+#define NETSYNC_TEXT N_("Network master clock")
+#define NETSYNC_LONGTEXT N_("When set then " \
   "this vlc instance shall dictate its clock for synchronisation" \
-  "over clients listening on the masters network ip address" )
+  "over clients listening on the masters network ip address")
 
-#define MIP_TEXT N_( "Master server ip address" )
-#define MIP_LONGTEXT N_( "The IP address of " \
-  "the network master clock to use for clock synchronisation." )
+#define MIP_TEXT N_("Master server ip address")
+#define MIP_LONGTEXT N_("The IP address of " \
+  "the network master clock to use for clock synchronisation.")
 
-#define NETSYNC_TIMEOUT_TEXT N_( "UDP timeout (in ms)" )
+#define NETSYNC_TIMEOUT_TEXT N_("UDP timeout (in ms)")
 #define NETSYNC_TIMEOUT_LONGTEXT N_("Amount of time (in ms) " \
-  "to wait before aborting network reception of data." )
+  "to wait before aborting network reception of data.")
 
-vlc_module_begin ()
-    set_shortname( N_("Network Sync"))
-    set_description( N_("Network synchronisation") )
-    set_category( CAT_ADVANCED )
-    set_subcategory( SUBCAT_ADVANCED_MISC )
+vlc_module_begin()
+    set_shortname(N_("Network Sync"))
+    set_description(N_("Network synchronisation"))
+    set_category(CAT_ADVANCED)
+    set_subcategory(SUBCAT_ADVANCED_MISC)
 
-    add_bool( "netsync-master", false, NULL,
-              NETSYNC_TEXT, NETSYNC_LONGTEXT, true )
-    add_string( "netsync-master-ip", NULL, NULL, MIP_TEXT, MIP_LONGTEXT,
-                true )
-    add_integer( "netsync-timeout", 500, NULL,
-                 NETSYNC_TIMEOUT_TEXT, NETSYNC_TIMEOUT_LONGTEXT, true )
+    add_bool("netsync-master", false, NULL,
+              NETSYNC_TEXT, NETSYNC_LONGTEXT, true)
+    add_string("netsync-master-ip", NULL, NULL, MIP_TEXT, MIP_LONGTEXT,
+                true)
+    add_integer("netsync-timeout", 500, NULL,
+                 NETSYNC_TIMEOUT_TEXT, NETSYNC_TIMEOUT_LONGTEXT, true)
 
-    set_capability( "interface", 0 )
-    set_callbacks( Open, Close )
-vlc_module_end ()
+    set_capability("interface", 0)
+    set_callbacks(Open, Close)
+vlc_module_end()
 
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void Run( intf_thread_t *p_intf );
+static void Run(intf_thread_t *intf);
 
 /*****************************************************************************
  * Activate: initialize and create stuff
  *****************************************************************************/
-static int Open( vlc_object_t *p_this )
+static int Open(vlc_object_t *object)
 {
-    intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_thread_t *intf = (intf_thread_t*)object;
     int fd;
 
-    if( !var_InheritBool( p_intf, "netsync-master" ) )
-    {
-        char *psz_master = var_InheritString( p_intf, "netsync-master-ip" );
-        if( psz_master == NULL )
-        {
-            msg_Err( p_intf, "master address not specified" );
+    if (!var_InheritBool(intf, "netsync-master")) {
+        char *psz_master = var_InheritString(intf, "netsync-master-ip");
+        if (psz_master == NULL) {
+            msg_Err(intf, "master address not specified");
             return VLC_EGENERIC;
         }
-        fd = net_ConnectUDP( VLC_OBJECT(p_intf), psz_master, NETSYNC_PORT, -1 );
-        free( psz_master );
+        fd = net_ConnectUDP(VLC_OBJECT(intf), psz_master, NETSYNC_PORT, -1);
+        free(psz_master);
     }
     else
-        fd = net_ListenUDP1( VLC_OBJECT(p_intf), NULL, NETSYNC_PORT );
+        fd = net_ListenUDP1(VLC_OBJECT(intf), NULL, NETSYNC_PORT);
 
-    if( fd == -1 )
-    {
-        msg_Err( p_intf, "Netsync socket failure" );
+    if (fd == -1) {
+        msg_Err(intf, "Netsync socket failure");
         return VLC_EGENERIC;
     }
 
-    p_intf->p_sys = (void *)(intptr_t)fd;
-    p_intf->pf_run = Run;
+    intf->p_sys = (void *)(intptr_t)fd;
+    intf->pf_run = Run;
     return VLC_SUCCESS;
 }
 
 /*****************************************************************************
  * Close: destroy interface
  *****************************************************************************/
-void Close( vlc_object_t *p_this )
+void Close(vlc_object_t *object)
 {
-    intf_thread_t *p_intf = (intf_thread_t*)p_this;
+    intf_thread_t *intf = (intf_thread_t*)object;
 
-    net_Close( (intptr_t)p_intf->p_sys );
+    net_Close((intptr_t)intf->p_sys);
 }
 
 /*****************************************************************************
  * Run: interface thread
  *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
+static void Run(intf_thread_t *intf)
 {
 #define MAX_MSG_LENGTH (2 * sizeof(int64_t))
     int canc = vlc_savecancel();
-    input_thread_t *p_input = NULL;
-    char p_data[MAX_MSG_LENGTH];
-    int i_socket = (intptr_t)p_intf->p_sys;
+    input_thread_t *input = NULL;
+    char data[MAX_MSG_LENGTH];
+    int fd = (intptr_t)intf->p_sys;
 
-    playlist_t *p_playlist = pl_Hold( p_intf );
-    int i_timeout = var_InheritInteger( p_intf, "netsync-timeout" );
-    if( i_timeout < 500 )
-        i_timeout = 500;
-    bool b_master = var_InheritBool( p_intf, "netsync-master" );
+    playlist_t *playlist = pl_Hold(intf);
+    int timeout = var_InheritInteger(intf, "netsync-timeout");
+    if (timeout < 500)
+        timeout = 500;
+    bool is_master = var_InheritBool(intf, "netsync-master");
 
     /* High priority thread */
-    vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_INPUT );
+    vlc_thread_set_priority(intf, VLC_THREAD_PRIORITY_INPUT);
 
-    while( vlc_object_alive( p_intf ) )
-    {
+    while (vlc_object_alive(intf)) {
         /* Update the input */
-        if( p_input == NULL )
-        {
-            p_input = playlist_CurrentInput( p_playlist );
-        }
-        else if( p_input->b_dead || !vlc_object_alive( p_input ) )
-        {
-            vlc_object_release( p_input );
-            p_input = NULL;
+        if (input == NULL) {
+            input = playlist_CurrentInput(playlist);
+        } else if (input->b_dead || !vlc_object_alive(input)) {
+            vlc_object_release(input);
+            input = NULL;
         }
 
-        if( p_input == NULL )
-        {
+        if (input == NULL) {
             /* Wait a bit */
-            msleep( INTF_IDLE_SLEEP );
+            msleep(INTF_IDLE_SLEEP);
             continue;
         }
 
@@ -177,126 +169,121 @@ static void Run( intf_thread_t *p_intf )
 
         /* Initialize file descriptor set and timeout (0.5s) */
         /* FIXME: arbitrary tick */
-        struct pollfd ufd = { .fd = i_socket, .events = POLLIN, };
+        struct pollfd ufd = { .fd = fd, .events = POLLIN, };
 
-        if( b_master )
-        {
+        if (is_master) {
             struct sockaddr_storage from;
-            mtime_t i_master_system;
-            mtime_t i_client_system;
-            mtime_t i_date;
-            int i_struct_size, i_read, i_ret;
+            mtime_t master_system;
+            mtime_t client_system;
+            mtime_t date;
+            int struct_size, read_size, ret;
 
             /* Don't block */
-            i_ret = poll( &ufd, 1, i_timeout );
-            if( i_ret <= 0 ) continue;
+            ret = poll(&ufd, 1, timeout);
+            if (ret <= 0)
+                continue;
 
             /* We received something */
-            i_struct_size = sizeof( from );
-            i_read = recvfrom( i_socket, p_data, MAX_MSG_LENGTH, 0,
-                               (struct sockaddr*)&from,
-                               (unsigned int *)&i_struct_size );
+            struct_size = sizeof(from);
+            read_size = recvfrom(fd, data, MAX_MSG_LENGTH, 0,
+                                 (struct sockaddr*)&from,
+                                 (unsigned int *)&struct_size);
 
             /* not sure we need the client information to sync,
                since we are the master anyway */
-            i_client_system = ntoh64(*(int64_t *)p_data);
+            client_system = ntoh64(*(int64_t *)data);
 
-            i_date = mdate();
+            date = mdate();
 
-            if( input_GetPcrSystem( p_input, &i_master_system ) )
+            if (input_GetPcrSystem(input, &master_system))
                 continue;
 
-            *((int64_t *)p_data) = hton64( i_date );
-            *(((int64_t *)p_data)+1) = hton64( i_master_system );
+            *((int64_t *)data) = hton64(date);
+            *(((int64_t *)data)+1) = hton64(master_system);
 
             /* Reply to the sender */
-            sendto( i_socket, p_data, 2 * sizeof(int64_t), 0,
-                    (struct sockaddr *)&from, i_struct_size );
+            sendto(fd, data, 2 * sizeof(int64_t), 0,
+                    (struct sockaddr *)&from, struct_size);
 
 #if 0
-            msg_Dbg( p_intf, "Master clockref: %"PRId64" -> %"PRId64", from %s "
-                     "(date: %"PRId64")", i_client_system, i_master_system,
+            msg_Dbg(intf, "Master clockref: %"PRId64" -> %"PRId64", from %s "
+                     "(date: %"PRId64")", client_system, master_system,
                      (from.ss_family == AF_INET) ? inet_ntoa(((struct sockaddr_in *)&from)->sin_addr)
-                     : "non-IPv4", i_date );
+                     : "non-IPv4", date);
 #endif
         }
         else
         {
-            mtime_t i_master_system;
-            mtime_t i_client_system;
-            mtime_t i_system = 0;
-            mtime_t i_send_date, i_receive_date;
-            mtime_t i_diff_date, i_master_date;
-            int i_sent, i_read, i_ret;
+            mtime_t master_system;
+            mtime_t client_system;
+            mtime_t system = 0;
+            mtime_t send_date, receive_date;
+            mtime_t diff_date, master_date;
+            int sent, read_size, ret;
 
-            if( input_GetPcrSystem( p_input, &i_system ) )
-            {
-                msleep( INTF_IDLE_SLEEP );
+            if (input_GetPcrSystem(input, &system)) {
+                msleep(INTF_IDLE_SLEEP);
                 continue;
             }
 
             /* Send clock request to the master */
-            i_send_date = mdate();
-            *((int64_t *)p_data) = hton64( i_system );
+            send_date = mdate();
+            *((int64_t *)data) = hton64(system);
 
-            i_sent = send( i_socket, p_data, sizeof(int64_t), 0 );
-            if( i_sent <= 0 )
-            {
-                msleep( INTF_IDLE_SLEEP );
+            sent = send(fd, data, sizeof(int64_t), 0);
+            if (sent <= 0) {
+                msleep(INTF_IDLE_SLEEP);
                 continue;
             }
 
             /* Don't block */
-            i_ret = poll( &ufd, 1, i_timeout );
-            if( i_ret == 0 ) continue;
-            if( i_ret < 0 )
-            {
-                msleep( INTF_IDLE_SLEEP );
+            ret = poll(&ufd, 1, timeout);
+            if (ret == 0)
+                continue;
+            if (ret < 0) {
+                msleep(INTF_IDLE_SLEEP);
                 continue;
             }
 
-            i_receive_date = mdate();
-            i_read = recv( i_socket, p_data, MAX_MSG_LENGTH, 0 );
-            if( i_read <= 0 )
-            {
-                msleep( INTF_IDLE_SLEEP );
+            receive_date = mdate();
+            read_size = recv(fd, data, MAX_MSG_LENGTH, 0);
+            if (read_size <= 0) {
+                msleep(INTF_IDLE_SLEEP);
                 continue;
             }
 
-            i_master_date = ntoh64(*(int64_t *)p_data);
-            i_master_system = ntoh64(*(((int64_t *)p_data)+1)); /* system date */
+            master_date = ntoh64(*(int64_t *)data);
+            master_system = ntoh64(*(((int64_t *)data)+1)); /* system date */
 
-            i_diff_date = i_receive_date -
-                          ((i_receive_date - i_send_date) / 2 + i_master_date);
+            diff_date = receive_date -
+                          ((receive_date - send_date) / 2 + master_date);
 
-            if( p_input && i_master_system > 0 )
-            {
-                mtime_t i_diff_system;
+            if (input && master_system > 0) {
+                mtime_t diff_system;
 
-                if( input_GetPcrSystem( p_input, &i_client_system ) )
-                {
-                    msleep( INTF_IDLE_SLEEP );
+                if (input_GetPcrSystem(input, &client_system)) {
+                    msleep(INTF_IDLE_SLEEP);
                     continue;
                 }
 
-                i_diff_system = i_client_system - i_master_system - i_diff_date;
-                if( i_diff_system != 0 )
-                {
-                    input_ModifyPcrSystem( p_input, true, i_master_system - i_diff_date );
+                diff_system = client_system - master_system - diff_date;
+                if (diff_system != 0) {
+                    input_ModifyPcrSystem(input, true, master_system - diff_date);
 #if 0
-                    msg_Dbg( p_intf, "Slave clockref: %"PRId64" -> %"PRId64" -> %"PRId64","
+                    msg_Dbg(intf, "Slave clockref: %"PRId64" -> %"PRId64" -> %"PRId64","
                              " clock diff: %"PRId64", diff: %"PRId64"",
-                             i_system, i_master_system, i_client_system,
-                             i_diff_system, i_diff_date );
+                             system, master_system, client_system,
+                             diff_system, diff_date);
 #endif
                 }
             }
-            msleep( INTF_IDLE_SLEEP );
+            msleep(INTF_IDLE_SLEEP);
         }
     }
 
-    if( p_input ) vlc_object_release( p_input );
-    pl_Release( p_intf );
-    vlc_restorecancel( canc );
+    if (input)
+        vlc_object_release(input);
+    pl_Release(intf);
+    vlc_restorecancel(canc);
 }
 
