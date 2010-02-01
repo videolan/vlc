@@ -56,7 +56,6 @@ struct decoder_t
     /* Module properties */
     module_t *          p_module;
     decoder_sys_t *     p_sys;
-    bool                b_error;
 
     /* Input format ie from demuxer (XXX: a lot of field could be invalid) */
     es_format_t         fmt_in;
@@ -127,6 +126,8 @@ struct decoder_t
 
     /* Private structure for the owner of the decoder */
     decoder_owner_sys_t *p_owner;
+
+    bool                b_error;
 };
 
 /**
