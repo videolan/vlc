@@ -379,6 +379,7 @@ SOURCES_libvlc_common = \
 	video_output/vout_pictures.c \
 	video_output/vout_pictures.h \
 	video_output/video_text.c \
+	video_output/video_epg.c \
 	video_output/video_widgets.c \
 	video_output/vout_subpictures.c \
 	video_output/window.c \

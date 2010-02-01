@@ -606,6 +606,7 @@ vout_GetSpu
 vout_LinkPicture
 vout_OSDIcon
 __vout_OSDMessage
+vout_OSDEpg
 vout_OSDSlider
 vout_PlacePicture
 __vout_Request
