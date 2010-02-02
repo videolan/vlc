@@ -270,7 +270,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (void)setCurrentVideoSubTitleIndex:(NSUInteger)index
 {
-    libvlc_video_set_spu( instance, (int)index );
+    libvlc_video_set_spu(instance, (int)index);
 }
 
 - (NSUInteger)currentVideoSubTitleIndex
@@ -280,7 +280,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     if (count <= 0)
         return NSNotFound;
 
-	return libvlc_video_get_spu(instance);
+    return libvlc_video_get_spu(instance);
 }
 
 - (BOOL)openVideoSubTitlesFromFile:(NSString *)path
@@ -307,12 +307,12 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (void)setVideoCropGeometry:(char *)value
 {
-    libvlc_video_set_crop_geometry( instance, value );
+    libvlc_video_set_crop_geometry(instance, value);
 }
 
 - (char *)videoCropGeometry
 {
-    char * result = libvlc_video_get_crop_geometry( instance );
+    char * result = libvlc_video_get_crop_geometry(instance);
     return result;
 }
 
@@ -327,17 +327,16 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     return result;
 }
 
-- (void)saveVideoSnapshotAt: (NSString *)path withWidth:(NSUInteger)width andHeight:(NSUInteger)height
+- (void)saveVideoSnapshotAt:(NSString *)path withWidth:(NSUInteger)width andHeight:(NSUInteger)height
 {
-	libvlc_exception_t ex;
-    libvlc_exception_init( &ex );
-    libvlc_video_take_snapshot( instance, [path UTF8String], width, height, &ex );
-	catch_exception( &ex );
+    int failure = libvlc_video_take_snapshot(instance, 0, [path UTF8String], width, height);
+    if (failure)
+        [[NSException exceptionWithName:@"Can't take a video snapshot" reason:@"No video output" userInfo:nil] raise];
 }
 
-- (void)setDeinterlaceFilter: (NSString *)name
+- (void)setDeinterlaceFilter:(NSString *)name
 {
-    libvlc_video_set_deinterlace( instance, [name UTF8String] );
+    libvlc_video_set_deinterlace(instance, [name UTF8String]);
 }
 
 - (void)setRate:(float)value
@@ -352,9 +351,11 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (NSSize)videoSize
 {
-    NSSize result = NSMakeSize(libvlc_video_get_height((libvlc_media_player_t *)instance),
-                               libvlc_video_get_width((libvlc_media_player_t *)instance));
-    return result;
+    unsigned height = 0, width = 0;
+    int failure = libvlc_video_get_size(instance, 0, &width, &height);
+    if (failure)
+        [[NSException exceptionWithName:@"Can't get video size" reason:@"No video output" userInfo:nil] raise];
+    return NSMakeSize(width, height);
 }
 
 - (BOOL)hasVideoOut
