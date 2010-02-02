@@ -28,6 +28,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -91,9 +92,14 @@ struct intf_sys_t {
     int            timeout;
     bool           is_master;
     playlist_t     *playlist;
+
+    /* */
     input_thread_t *input;
+    vlc_thread_t   thread;
 };
-static void Run(intf_thread_t *intf);
+
+static int PlaylistEvent(vlc_object_t *, char const *cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *data);
 
 /*****************************************************************************
  * Activate: initialize and create stuff
@@ -121,12 +127,12 @@ static int Open(vlc_object_t *object)
         return VLC_EGENERIC;
     }
 
+    intf->pf_run = NULL;
     intf->p_sys = sys = malloc(sizeof(*sys));
     if (!sys) {
         net_Close(fd);
         return VLC_ENOMEM;
     }
-    intf->pf_run = Run;
 
     sys->fd = fd;
     sys->is_master = var_InheritBool(intf, "netsync-master");
@@ -136,6 +142,7 @@ static int Open(vlc_object_t *object)
     sys->playlist = pl_Hold(intf);
     sys->input = NULL;
 
+    var_AddCallback(sys->playlist, "input-current", PlaylistEvent, intf);
     return VLC_SUCCESS;
 }
 
@@ -147,141 +154,155 @@ void Close(vlc_object_t *object)
     intf_thread_t *intf = (intf_thread_t*)object;
     intf_sys_t *sys = intf->p_sys;
 
+    assert(sys->input == NULL);
+    var_DelCallback(sys->playlist, "input-current", PlaylistEvent, intf);
     pl_Release(intf);
     net_Close(sys->fd);
     free(sys);
 }
 
-static void Master(intf_thread_t *intf)
+static mtime_t GetPcrSystem(input_thread_t *input)
 {
-    intf_sys_t *sys = intf->p_sys;
-    struct pollfd ufd = { .fd = sys->fd, .events = POLLIN, };
-    uint64_t data[2];
+    int canc = vlc_savecancel();
+    mtime_t system;
+    if (input_GetPcrSystem(input, &system))
+        system = -1;
+    vlc_restorecancel(canc);
 
-    /* Don't block */
-    if (poll(&ufd, 1, sys->timeout) <= 0)
-        return;
-
-    /* We received something */
-    struct sockaddr_storage from;
-    unsigned struct_size = sizeof(from);
-    recvfrom(sys->fd, data, sizeof(data), 0,
-             (struct sockaddr*)&from, &struct_size);
-
-    mtime_t master_system;
-    if (input_GetPcrSystem(sys->input, &master_system))
-        return;
-
-    data[0] = hton64(mdate());
-    data[1] = hton64(master_system);
-
-    /* Reply to the sender */
-    sendto(sys->fd, data, sizeof(data), 0,
-           (struct sockaddr *)&from, struct_size);
-
-#if 0
-    /* not sure we need the client information to sync,
-       since we are the master anyway */
-    mtime_t client_system = ntoh64(data[0]);
-    msg_Dbg(intf, "Master clockref: %"PRId64" -> %"PRId64", from %s "
-             "(date: %"PRId64")", client_system, master_system,
-             (from.ss_family == AF_INET) ? inet_ntoa(((struct sockaddr_in *)&from)->sin_addr)
-             : "non-IPv4", date);
-#endif
+    return system;
 }
 
-static void Slave(intf_thread_t *intf)
+static void *Master(void *handle)
 {
+    intf_thread_t *intf = handle;
     intf_sys_t *sys = intf->p_sys;
-    struct pollfd ufd = { .fd = sys->fd, .events = POLLIN, };
-    uint64_t data[2];
+    for (;;) {
+        struct pollfd ufd = { .fd = sys->fd, .events = POLLIN, };
+        uint64_t data[2];
 
-    mtime_t system;
-    if (input_GetPcrSystem(sys->input, &system))
-        goto wait;
+        if (poll(&ufd, 1, -1) <= 0)
+            continue;
 
-    /* Send clock request to the master */
-    data[0] = hton64(system);
+        /* We received something */
+        struct sockaddr_storage from;
+        unsigned struct_size = sizeof(from);
+        recvfrom(sys->fd, data, sizeof(data), 0,
+                 (struct sockaddr*)&from, &struct_size);
 
-    const mtime_t send_date = mdate();
-    if (send(sys->fd, data, sizeof(data[0]), 0) <= 0)
-        goto wait;
+        mtime_t master_system = GetPcrSystem(sys->input);
+        if (master_system < 0)
+            continue;
 
-    /* Don't block */
-    int ret = poll(&ufd, 1, sys->timeout);
-    if (ret == 0)
-        return;
-    if (ret < 0)
-        goto wait;
+        data[0] = hton64(mdate());
+        data[1] = hton64(master_system);
 
-    const mtime_t receive_date = mdate();
-    if (recv(sys->fd, data, sizeof(data), 0) <= 0)
-        goto wait;
+        /* Reply to the sender */
+        sendto(sys->fd, data, sizeof(data), 0,
+               (struct sockaddr *)&from, struct_size);
+#if 0
+        /* not sure we need the client information to sync,
+           since we are the master anyway */
+        mtime_t client_system = ntoh64(data[0]);
+        msg_Dbg(intf, "Master clockref: %"PRId64" -> %"PRId64", from %s "
+                 "(date: %"PRId64")", client_system, master_system,
+                 (from.ss_family == AF_INET) ? inet_ntoa(((struct sockaddr_in *)&from)->sin_addr)
+                 : "non-IPv4", /*date*/ 0);
+#endif
+    }
+}
 
-    const mtime_t master_date   = ntoh64(data[0]);
-    const mtime_t master_system = ntoh64(data[1]);
-    const mtime_t diff_date = receive_date -
-                              ((receive_date - send_date) / 2 + master_date);
+static void *Slave(void *handle)
+{
+    intf_thread_t *intf = handle;
+    intf_sys_t *sys = intf->p_sys;
 
-    if (master_system > 0) {
-        mtime_t client_system;
-        if (input_GetPcrSystem(sys->input, &client_system))
+    for (;;) {
+        struct pollfd ufd = { .fd = sys->fd, .events = POLLIN, };
+        uint64_t data[2];
+
+        mtime_t system = GetPcrSystem(sys->input);
+        if (system < 0)
             goto wait;
 
-        const mtime_t diff_system = client_system - master_system - diff_date;
-        if (diff_system != 0) {
-            input_ModifyPcrSystem(sys->input, true, master_system - diff_date);
+        /* Send clock request to the master */
+        data[0] = hton64(system);
+
+        const mtime_t send_date = mdate();
+        if (send(sys->fd, data, sizeof(data[0]), 0) <= 0)
+            goto wait;
+
+        /* Don't block */
+        int ret = poll(&ufd, 1, sys->timeout);
+        if (ret == 0)
+            continue;
+        if (ret < 0)
+            goto wait;
+
+        const mtime_t receive_date = mdate();
+        if (recv(sys->fd, data, sizeof(data), 0) <= 0)
+            goto wait;
+
+        const mtime_t master_date   = ntoh64(data[0]);
+        const mtime_t master_system = ntoh64(data[1]);
+        const mtime_t diff_date = receive_date -
+                                  ((receive_date - send_date) / 2 + master_date);
+
+        if (master_system > 0) {
+            int canc = vlc_savecancel();
+
+            mtime_t client_system;
+            if (!input_GetPcrSystem(sys->input, &client_system)) {
+                const mtime_t diff_system = client_system - master_system - diff_date;
+                if (diff_system != 0) {
+                    input_ModifyPcrSystem(sys->input, true, master_system - diff_date);
 #if 0
-            msg_Dbg(intf, "Slave clockref: %"PRId64" -> %"PRId64" -> %"PRId64","
-                     " clock diff: %"PRId64", diff: %"PRId64"",
-                     system, master_system, client_system,
-                     diff_system, diff_date);
+                    msg_Dbg(intf, "Slave clockref: %"PRId64" -> %"PRId64" -> %"PRId64","
+                             " clock diff: %"PRId64", diff: %"PRId64"",
+                             system, master_system, client_system,
+                             diff_system, diff_date);
 #endif
+                }
+            }
+            vlc_restorecancel(canc);
         }
+    wait:
+        msleep(INTF_IDLE_SLEEP);
     }
-wait:
-    msleep(INTF_IDLE_SLEEP);
 }
 
-
-/*****************************************************************************
- * Run: interface thread
- *****************************************************************************/
-static void Run(intf_thread_t *intf)
+static int InputEvent(vlc_object_t *object, char const *cmd,
+                      vlc_value_t oldval, vlc_value_t newval, void *data)
 {
-    intf_sys_t *sys = intf->p_sys;
+    VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(object);
+    intf_thread_t  *intf = data;
+    intf_sys_t     *sys = intf->p_sys;
 
-    int canc = vlc_savecancel();
-
-    /* High priority thread */
-    vlc_thread_set_priority(intf, VLC_THREAD_PRIORITY_INPUT);
-
-    while (vlc_object_alive(intf)) {
-        /* Update the input */
-        if (sys->input == NULL) {
-            sys->input = playlist_CurrentInput(sys->playlist);
-        } else if (sys->input->b_dead || !vlc_object_alive(sys->input)) {
-            vlc_object_release(sys->input);
-            sys->input = NULL;
-        }
-
-        if (sys->input == NULL) {
-            /* Wait a bit */
-            msleep(INTF_IDLE_SLEEP);
-            continue;
-        }
-
-        /*
-         * We now have an input
-         */
-        if (sys->is_master)
-            Master(intf);
-        else
-            Slave(intf);
-    }
-
-    if (sys->input)
+    if (newval.i_int == INPUT_EVENT_DEAD && sys->input) {
+        msg_Err(intf, "InputEvent DEAD");
+        vlc_cancel(sys->thread);
+        vlc_join(sys->thread, NULL);
         vlc_object_release(sys->input);
-    vlc_restorecancel(canc);
+        sys->input = NULL;
+    }
+    return VLC_SUCCESS;
+}
+
+static int PlaylistEvent(vlc_object_t *object, char const *cmd,
+                         vlc_value_t oldval, vlc_value_t newval, void *data)
+{
+    VLC_UNUSED(cmd); VLC_UNUSED(oldval); VLC_UNUSED(object);
+    intf_thread_t  *intf = data;
+    intf_sys_t     *sys = intf->p_sys;
+
+    input_thread_t *input = newval.p_address;
+    assert(sys->input == NULL);
+    sys->input = vlc_object_hold(input);
+    if (vlc_clone(&sys->thread, sys->is_master ? Master : Slave, intf,
+                  VLC_THREAD_PRIORITY_INPUT)) {
+        vlc_object_release(input);
+        return VLC_SUCCESS;
+    }
+    var_AddCallback(input, "intf-event", InputEvent, intf);
+    return VLC_SUCCESS;
 }
 
