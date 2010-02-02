@@ -66,9 +66,8 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
     libvlc_media_discoverer_t * p_mdis = user_data;
     libvlc_media_list_t * p_mlist = p_mdis->p_mlist;
 
-    p_md = libvlc_media_new_from_input_item(
-            p_mdis->p_libvlc_instance,
-            p_item, NULL );
+    p_md = libvlc_media_new_from_input_item( p_mdis->p_libvlc_instance,
+                                             p_item );
 
     /* If we have a category, that mean we have to group the items having
      * that category in a media_list. */
@@ -79,7 +78,7 @@ static void services_discovery_item_added( const vlc_event_t * p_event,
         if( p_mlist == kVLCDictionaryNotFound )
         {
             libvlc_media_t * p_catmd;
-            p_catmd = libvlc_media_new_as_node( p_mdis->p_libvlc_instance, psz_cat, NULL );
+            p_catmd = libvlc_media_new_as_node( p_mdis->p_libvlc_instance, psz_cat );
             p_mlist = libvlc_media_subitems( p_catmd );
             p_mlist->b_read_only = true;
 

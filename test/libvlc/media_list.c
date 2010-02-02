@@ -38,12 +38,12 @@ static void test_media_list (const char ** argv, int argc)
     ml = libvlc_media_list_new (vlc);
     assert (ml != NULL);
 
-    md1 = libvlc_media_new (vlc, "/dev/null", &ex);
-    catch ();
-    md2 = libvlc_media_new (vlc, "/dev/null", &ex);
-    catch ();
-    md3 = libvlc_media_new (vlc, "/dev/null", &ex);
-    catch ();
+    md1 = libvlc_media_new (vlc, "/dev/null");
+    assert (md1 != NULL);
+    md2 = libvlc_media_new (vlc, "/dev/null");
+    assert (md2 != NULL);
+    md3 = libvlc_media_new (vlc, "/dev/null");
+    assert (md3 != NULL);
 
     libvlc_media_list_add_media (ml, md1, &ex);
     catch ();
@@ -105,8 +105,8 @@ static void test_media_list (const char ** argv, int argc)
     p_non_exist = libvlc_media_list_item_at_index (ml, -1, &ex);
     assert (have_exception ());
 
-    md4 = libvlc_media_new (vlc, "/dev/null", &ex);
-    catch ();
+    md4 = libvlc_media_new (vlc, "/dev/null");
+    assert (md4 != NULL);
 
     /* try to find non inserted item */
     int i_non_exist = 0;

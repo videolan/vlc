@@ -265,10 +265,8 @@ libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
         return;
     }
 
-    p_md = libvlc_media_new_from_input_item(
-            p_mlist->p_libvlc_instance,
-            p_input_item, p_e );
-
+    p_md = libvlc_media_new_from_input_item( p_mlist->p_libvlc_instance,
+                                             p_input_item );
     if( !p_md )
     {
         vlc_gc_decref( p_input_item );

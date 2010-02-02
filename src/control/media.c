@@ -96,7 +96,7 @@ static void input_item_subitem_added( const vlc_event_t *p_event,
 
     p_md_child = libvlc_media_new_from_input_item(
                 p_md->p_libvlc_instance,
-                p_event->u.input_item_subitem_added.p_new_child, NULL );
+                p_event->u.input_item_subitem_added.p_new_child );
 
     /* Add this to our media list */
     if( !p_md->p_subitems )
@@ -240,14 +240,12 @@ static void preparse_if_needed( libvlc_media_t *p_md )
  **************************************************************************/
 libvlc_media_t * libvlc_media_new_from_input_item(
                                    libvlc_instance_t *p_instance,
-                                   input_item_t *p_input_item,
-                                   libvlc_exception_t *p_e )
+                                   input_item_t *p_input_item )
 {
     libvlc_media_t * p_md;
 
     if (!p_input_item)
     {
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "No input item given" );
         return NULL;
     }
@@ -255,7 +253,6 @@ libvlc_media_t * libvlc_media_new_from_input_item(
     p_md = calloc( 1, sizeof(libvlc_media_t) );
     if( !p_md )
     {
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "Not enough memory" );
         return NULL;
     }
@@ -297,10 +294,8 @@ libvlc_media_t * libvlc_media_new_from_input_item(
 /**************************************************************************
  * Create a new media descriptor object
  **************************************************************************/
-libvlc_media_t * libvlc_media_new(
-                                   libvlc_instance_t *p_instance,
-                                   const char * psz_mrl,
-                                   libvlc_exception_t *p_e )
+libvlc_media_t * libvlc_media_new( libvlc_instance_t *p_instance,
+                                   const char * psz_mrl )
 {
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
@@ -309,13 +304,11 @@ libvlc_media_t * libvlc_media_new(
 
     if (!p_input_item)
     {
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "Not enough memory" );
         return NULL;
     }
 
-    p_md = libvlc_media_new_from_input_item( p_instance,
-                p_input_item, p_e );
+    p_md = libvlc_media_new_from_input_item( p_instance, p_input_item );
 
     /* The p_input_item is retained in libvlc_media_new_from_input_item */
     vlc_gc_decref( p_input_item );
@@ -326,10 +319,8 @@ libvlc_media_t * libvlc_media_new(
 /**************************************************************************
  * Create a new media descriptor object
  **************************************************************************/
-libvlc_media_t * libvlc_media_new_as_node(
-                                   libvlc_instance_t *p_instance,
-                                   const char * psz_name,
-                                   libvlc_exception_t *p_e )
+libvlc_media_t * libvlc_media_new_as_node( libvlc_instance_t *p_instance,
+                                           const char * psz_name )
 {
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
@@ -338,13 +329,11 @@ libvlc_media_t * libvlc_media_new_as_node(
 
     if (!p_input_item)
     {
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "Not enough memory" );
         return NULL;
     }
 
-    p_md = libvlc_media_new_from_input_item( p_instance,
-                p_input_item, p_e );
+    p_md = libvlc_media_new_from_input_item( p_instance, p_input_item );
 
     p_md->p_subitems = libvlc_media_list_new( p_md->p_libvlc_instance );
 
@@ -427,7 +416,7 @@ libvlc_media_t *
 libvlc_media_duplicate( libvlc_media_t *p_md_orig )
 {
     return libvlc_media_new_from_input_item(
-        p_md_orig->p_libvlc_instance, p_md_orig->p_input_item, NULL );
+        p_md_orig->p_libvlc_instance, p_md_orig->p_input_item );
 }
 
 /**************************************************************************
@@ -585,13 +574,12 @@ libvlc_media_event_manager( libvlc_media_t * p_md )
  * Get duration of media object (in ms)
  **************************************************************************/
 int64_t
-libvlc_media_get_duration( libvlc_media_t * p_md, libvlc_exception_t *p_e )
+libvlc_media_get_duration( libvlc_media_t * p_md )
 {
     assert( p_md );
 
     if( !p_md->p_input_item )
     {
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "No input item" );
         return -1;
     }

@@ -36,8 +36,8 @@ static void test_media_player_play_stop(const char** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    md = libvlc_media_new (vlc, file, &ex);
-    catch ();
+    md = libvlc_media_new (vlc, file);
+    assert (md != NULL);
 
     mi = libvlc_media_player_new_from_media (md);
     assert (mi != NULL);
@@ -74,8 +74,8 @@ static void test_media_player_pause_stop(const char** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    md = libvlc_media_new (vlc, file, &ex);
-    catch ();
+    md = libvlc_media_new (vlc, file);
+    assert (md != NULL);
 
     mi = libvlc_media_player_new_from_media (md);
     assert (mi != NULL);

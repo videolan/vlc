@@ -174,26 +174,22 @@ typedef struct libvlc_media_es_t
  *
  * \param p_instance the instance
  * \param psz_mrl the MRL to read
- * \param p_e an initialized exception pointer
- * \return the newly created media
+ * \return the newly created media or NULL on error
  */
 VLC_PUBLIC_API libvlc_media_t * libvlc_media_new(
                                    libvlc_instance_t *p_instance,
-                                   const char * psz_mrl,
-                                   libvlc_exception_t *p_e );
+                                   const char * psz_mrl );
 
 /**
- * Create a media as an empty node with the passed name.
+ * Create a media as an empty node with a given name.
  *
  * \param p_instance the instance
  * \param psz_name the name of the node
- * \param p_e an initialized exception pointer
- * \return the new empty media
+ * \return the new empty media or NULL on error
  */
 VLC_PUBLIC_API libvlc_media_t * libvlc_media_new_as_node(
                                    libvlc_instance_t *p_instance,
-                                   const char * psz_name,
-                                   libvlc_exception_t *p_e );
+                                   const char * psz_name );
 
 /**
  * Add an option to the media.
@@ -353,12 +349,10 @@ VLC_PUBLIC_API libvlc_event_manager_t *
  * Get duration (in ms) of media descriptor object item.
  *
  * \param p_md media descriptor object
- * \param p_e an initialized exception object
- * \return duration of media item
+ * \return duration of media item or -1 on error
  */
 VLC_PUBLIC_API libvlc_time_t
-   libvlc_media_get_duration( libvlc_media_t * p_md,
-                                         libvlc_exception_t * p_e );
+   libvlc_media_get_duration( libvlc_media_t * p_md );
 
 /**
  * Get preparsed status for media descriptor object.
