@@ -821,7 +821,7 @@ inline void MainInterface::showTab( int i_tab )
         doComponentsUpdate(); // resize the player
     }
     else
-        if( i_tab == HIDDEN_TAB ) i_tab == BACKG_TAB;
+        if( i_tab == HIDDEN_TAB ) i_tab = BACKG_TAB;
 
     stackCentralW->setCurrentIndex( i_tab );
 
