@@ -334,6 +334,7 @@ playlist_ItemGetById
 playlist_ItemGetByInput
 playlist_LiveSearchUpdate
 playlist_Lock
+playlist_NodeAddInput
 playlist_NodeAppend
 playlist_NodeCreate
 playlist_NodeDelete

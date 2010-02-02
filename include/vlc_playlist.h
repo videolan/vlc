@@ -350,6 +350,7 @@ VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, input_item_t *, bool
 VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, int, int, bool, bool ) );
 VLC_EXPORT( int,  playlist_AddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, int, const char *const *, unsigned, bool, bool ) );
 VLC_EXPORT( int, playlist_AddInput, ( playlist_t *, input_item_t *, int, int, bool, bool ) );
+VLC_EXPORT( playlist_item_t *, playlist_NodeAddInput, ( playlist_t *, input_item_t *, playlist_item_t *, int, int, bool ) );
 
 /********************************** Item search *************************/
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int ) );
