@@ -163,43 +163,40 @@ VLC_EXPORT( void,   input_item_SetDuration, ( input_item_t * p_i, mtime_t i_dura
 VLC_EXPORT( bool,   input_item_IsPreparsed, ( input_item_t *p_i ));
 VLC_EXPORT( bool,   input_item_IsArtFetched, ( input_item_t *p_i ));
 
+#define INPUT_META( name ) \
+static inline \
+void input_item_Set ## name (input_item_t *p_input, const char *val) \
+{ \
+    input_item_SetMeta (p_input, vlc_meta_ ## name, val); \
+} \
+static inline \
+char *input_item_Get ## name (input_item_t *p_input) \
+{ \
+    return input_item_GetMeta (p_input, vlc_meta_ ## name); \
+}
 
-#define input_item_SetTitle( item, b )       input_item_SetMeta( item, vlc_meta_Title, b )
-#define input_item_SetArtist( item, b )      input_item_SetMeta( item, vlc_meta_Artist, b )
-#define input_item_SetGenre( item, b )       input_item_SetMeta( item, vlc_meta_Genre, b )
-#define input_item_SetCopyright( item, b )   input_item_SetMeta( item, vlc_meta_Copyright, b )
-#define input_item_SetAlbum( item, b )       input_item_SetMeta( item, vlc_meta_Album, b )
-#define input_item_SetTrackNum( item, b )    input_item_SetMeta( item, vlc_meta_TrackNumber, b )
-#define input_item_SetDescription( item, b ) input_item_SetMeta( item, vlc_meta_Description, b )
-#define input_item_SetRating( item, b )      input_item_SetMeta( item, vlc_meta_Rating, b )
-#define input_item_SetDate( item, b )        input_item_SetMeta( item, vlc_meta_Date, b )
-#define input_item_SetSetting( item, b )     input_item_SetMeta( item, vlc_meta_Setting, b )
-#define input_item_SetURL( item, b )         input_item_SetMeta( item, vlc_meta_URL, b )
-#define input_item_SetLanguage( item, b )    input_item_SetMeta( item, vlc_meta_Language, b )
-#define input_item_SetNowPlaying( item, b )  input_item_SetMeta( item, vlc_meta_NowPlaying, b )
-#define input_item_SetPublisher( item, b )   input_item_SetMeta( item, vlc_meta_Publisher, b )
-#define input_item_SetEncodedBy( item, b )   input_item_SetMeta( item, vlc_meta_EncodedBy, b )
-#define input_item_SetArtURL( item, b )      input_item_SetMeta( item, vlc_meta_ArtworkURL, b )
-#define input_item_SetTrackID( item, b )     input_item_SetMeta( item, vlc_meta_TrackID, b )
+INPUT_META(Title)
+INPUT_META(Artist)
+INPUT_META(Genre)
+INPUT_META(Copyright)
+INPUT_META(Album)
+INPUT_META(TrackNumber)
+INPUT_META(Description)
+INPUT_META(Rating)
+INPUT_META(Date)
+INPUT_META(Setting)
+INPUT_META(URL)
+INPUT_META(Language)
+INPUT_META(NowPlaying)
+INPUT_META(Publisher)
+INPUT_META(EncodedBy)
+INPUT_META(ArtworkURL)
+INPUT_META(TrackID)
 
-#define input_item_GetTitle( item )          input_item_GetMeta( item, vlc_meta_Title )
-#define input_item_GetArtist( item )         input_item_GetMeta( item, vlc_meta_Artist )
-#define input_item_GetGenre( item )          input_item_GetMeta( item, vlc_meta_Genre )
-#define input_item_GetCopyright( item )      input_item_GetMeta( item, vlc_meta_Copyright )
-#define input_item_GetAlbum( item )          input_item_GetMeta( item, vlc_meta_Album )
-#define input_item_GetTrackNum( item )       input_item_GetMeta( item, vlc_meta_TrackNumber )
-#define input_item_GetDescription( item )    input_item_GetMeta( item, vlc_meta_Description )
-#define input_item_GetRating( item )         input_item_GetMeta( item, vlc_meta_Rating )
-#define input_item_GetDate( item )           input_item_GetMeta( item, vlc_meta_Date )
-#define input_item_GetGetting( item )        input_item_GetMeta( item, vlc_meta_Getting )
-#define input_item_GetURL( item )            input_item_GetMeta( item, vlc_meta_URL )
-#define input_item_GetLanguage( item )       input_item_GetMeta( item, vlc_meta_Language )
-#define input_item_GetNowPlaying( item )     input_item_GetMeta( item, vlc_meta_NowPlaying )
-#define input_item_GetPublisher( item )      input_item_GetMeta( item, vlc_meta_Publisher )
-#define input_item_GetEncodedBy( item )      input_item_GetMeta( item, vlc_meta_EncodedBy )
-#define input_item_GetArtURL( item )         input_item_GetMeta( item, vlc_meta_ArtworkURL )
-#define input_item_GetTrackID( item )        input_item_GetMeta( item, vlc_meta_TrackID )
-#define input_item_GetSetting( item )        input_item_GetMeta( item, vlc_meta_Setting )
+#define input_item_SetTrackNum input_item_SetTrackNumber
+#define input_item_GetTrackNum input_item_GetTrackNumber
+#define input_item_SetArtURL   input_item_SetArtworkURL
+#define input_item_GetArtURL   input_item_GetArtworkURL
 
 VLC_EXPORT( char *, input_item_GetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) );
 VLC_EXPORT( int, input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) LIBVLC_FORMAT( 4, 5 ) );
