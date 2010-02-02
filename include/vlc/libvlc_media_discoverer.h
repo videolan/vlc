@@ -51,13 +51,11 @@ typedef struct libvlc_media_discoverer_t libvlc_media_discoverer_t;
  *
  * \param p_inst libvlc instance
  * \param psz_name service name
- * \param p_e an initialized exception object
- * \return media discover object
+ * \return media discover object or NULL in case of error
  */
 VLC_PUBLIC_API libvlc_media_discoverer_t *
 libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
-                                       const char * psz_name,
-                                       libvlc_exception_t * p_e );
+                                       const char * psz_name );
 
 /**
  * Release media discover object. If the reference count reaches 0, then

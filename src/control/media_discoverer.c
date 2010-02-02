@@ -170,15 +170,13 @@ static void services_discovery_ended( const vlc_event_t * p_event,
  **************************************************************************/
 libvlc_media_discoverer_t *
 libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
-                                       const char * psz_name,
-                                       libvlc_exception_t * p_e )
+                                       const char * psz_name )
 {
     libvlc_media_discoverer_t * p_mdis;
 
     p_mdis = malloc(sizeof(libvlc_media_discoverer_t));
-    if( !p_mdis )
+    if( unlikely(!p_mdis) )
     {
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "Not enough memory" );
         return NULL;
     }
@@ -206,9 +204,9 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
 
     if( !p_mdis->p_sd )
     {
-        libvlc_media_list_release( p_mdis->p_mlist );
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "%s: no such discovery module found", psz_name );
+        libvlc_media_list_release( p_mdis->p_mlist );
+        libvlc_event_manager_release( p_mdis->p_event_manager );
         free( p_mdis );
         return NULL;
     }
@@ -233,9 +231,9 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
     /* Here we go */
     if( !vlc_sd_Start( p_mdis->p_sd, psz_name ) )
     {
-        libvlc_media_list_release( p_mdis->p_mlist );
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "%s: internal module error", psz_name );
+        libvlc_media_list_release( p_mdis->p_mlist );
+        libvlc_event_manager_release( p_mdis->p_event_manager );
         free( p_mdis );
         return NULL;
     }
