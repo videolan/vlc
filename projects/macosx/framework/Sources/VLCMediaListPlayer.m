@@ -104,7 +104,7 @@
 {
     libvlc_exception_t ex;
     libvlc_exception_init(&ex);
-    libvlc_media_list_player_play_item(instance, [media libVLCMediaDescriptor], &ex);
+    libvlc_media_list_player_play_item(instance, [media libVLCMediaDescriptor]);
     catch_exception(&ex);
 }
 
@@ -112,7 +112,7 @@
 {
     libvlc_exception_t ex;
     libvlc_exception_init(&ex);
-    libvlc_media_list_player_play(instance, &ex);
+    libvlc_media_list_player_play(instance);
     catch_exception(&ex);
 }
 
