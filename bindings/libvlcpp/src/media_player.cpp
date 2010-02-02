@@ -22,7 +22,6 @@
  *****************************************************************************/
 
 #include "media_player.hpp"
-#include "exception.hpp"
 
 using namespace libvlc;
 
@@ -222,24 +221,20 @@ void MediaPlayer::nextFrame()
 
 void MediaPlayer::toggleFullscreen()
 {
-    Exception ex;
-    libvlc_toggle_fullscreen( m_player, &ex.ex );
+    libvlc_toggle_fullscreen( m_player );
 }
 
 void MediaPlayer::enableFullscreen()
 {
-    Exception ex;
-    libvlc_set_fullscreen( m_player, 1, &ex.ex );
+    libvlc_set_fullscreen( m_player, 1 );
 }
 
 void MediaPlayer::disableFullscreen()
 {
-    Exception ex;
-    libvlc_set_fullscreen( m_player, 0, &ex.ex );
+    libvlc_set_fullscreen( m_player, 0 );
 }
 
 int MediaPlayer::fullscreen()
 {
-    Exception ex;
-    return libvlc_get_fullscreen( m_player, &ex.ex );
+    return libvlc_get_fullscreen( m_player );
 }

@@ -145,11 +145,13 @@ public:
 
     /**
      * Take a snapshot and save it to a file
+     * @param num: the video output id (0 for the first/only one)
      * @param filepath: path where to save the file
      * @param widht: widht of the snapshot
      * @param height: height of the snapshot
+     * @return 0 on success, -1 if the video output was not found
      */
-    void snapshot( const char *filepath, int widht, int height );
+    int snapshot( int num, const char *filepath, int widht, int height );
 
     /**
      * Enable or disable deinterlace filter and select the deinterlace filter to use
