@@ -234,23 +234,6 @@ int vout_OSDEpg( vout_thread_t *p_vout, input_item_t *p_input )
     subpicture_t *p_spu;
     mtime_t i_now = mdate();
 
-    int i_visible_width = p_vout->fmt_in.i_width;
-    int i_visible_height = p_vout->fmt_in.i_height;
-
-    if( !p_input )
-        return VLC_EGENERIC;
-
-    p_spu = subpicture_New();
-    if( !p_spu )
-        return VLC_EGENERIC;
-
-    p_spu->i_channel = DEFAULT_CHAN;
-    p_spu->i_start = i_now;
-    p_spu->i_stop = i_now + 3000 * INT64_C(1000);
-    p_spu->b_ephemer = true;
-    p_spu->b_absolute = true;
-    p_spu->b_fade = true;
-
     char *psz_now_playing = input_item_GetNowPlaying( p_input );
     vlc_epg_t *p_epg = NULL;
 
@@ -273,24 +256,30 @@ int vout_OSDEpg( vout_thread_t *p_vout, input_item_t *p_input )
 
     vlc_mutex_unlock( &p_input->lock );
 
-    if( p_epg != NULL )
+    /* If no EPG event has been found. */
+    if( p_epg == NULL )
+        return VLC_EGENERIC;
+
+    p_spu = subpicture_New();
+    if( !p_spu )
     {
-        /* Build the EPG event subpictures. */
-        p_spu->p_region = vout_BuildOSDEpg( p_vout, p_epg,
-                                            i_visible_width,
-                                            i_visible_height );
         vlc_epg_Delete( p_epg );
-    }
-    else
-    {
-        /* If no EPG event has been found, then display a warning message. */
-        p_spu->p_region = vout_OSDEpgText( p_vout, NO_EPG,
-                                           i_visible_width * EPG_LEFT,
-                                           i_visible_height * EPG_TOP,
-                                           i_visible_height * EPG_NAME_SIZE,
-                                           0x00ffffff );
+        return VLC_EGENERIC;
     }
 
+    p_spu->i_channel = DEFAULT_CHAN;
+    p_spu->i_start = i_now;
+    p_spu->i_stop = i_now + 3000 * INT64_C(1000);
+    p_spu->b_ephemer = true;
+    p_spu->b_absolute = true;
+    p_spu->b_fade = true;
+
+    /* Build the EPG event subpictures. */
+    p_spu->p_region = vout_BuildOSDEpg( p_vout, p_epg,
+                                        p_vout->fmt_in.i_width,
+                                        p_vout->fmt_in.i_height );
+
+    vlc_epg_Delete( p_epg );
     spu_DisplaySubpicture( p_vout->p_spu, p_spu );
 
     return VLC_SUCCESS;
