@@ -33,18 +33,11 @@
 namespace libvlc
 {
 
+class MediaPlayer;
+
 class Audio
 {
 public:
-    /**
-     * Constructor
-     * @param player: the player handling the audio
-     */
-    Audio( libvlc_media_player_t *player );
-
-    /** Destructor */
-    ~Audio();
-
     /**
      * Toggle mute status
      */
@@ -110,6 +103,23 @@ public:
 private:
     /** The media player instance of libvlc */
     libvlc_media_player_t *m_player;
+
+    /**
+     * The constructor is private so only the MediaPlayer can create an instance of this class
+     */
+    Audio();
+
+    /** Destructor only used by the MediaPlayer associated with this class */
+    ~Audio();
+
+    /**
+     * Set the media player. This function can only be used by the MediaPlayer class
+     * @param player: the media player
+     */
+    void setMediaPlayer( libvlc_media_player_t *player);
+
+    /** Friend class */
+    friend class MediaPlayer;
 };
 
 };

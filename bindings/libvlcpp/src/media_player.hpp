@@ -30,6 +30,7 @@
 
 #include "libvlc.hpp"
 #include "media.hpp"
+#include "audio.hpp"
 
 namespace libvlc
 {
@@ -47,7 +48,7 @@ public:
      * Create a media player with a media associated
      * @param media: the associated media (the media can be safely destroy afterward)
      */
-    MediaPlayer( Media &media);
+    MediaPlayer( Media &media );
 
     /**
      * Destructor
@@ -304,9 +305,18 @@ public:
      */
     int fullscreen();
 
+    /**
+     * Get the class that handle the Audio
+     * @return the instance of Audio associated with this MediaPlayer
+     */
+    Audio &audio();
+
 private:
     /** The media player instance of libvlc */
     libvlc_media_player_t *m_player;
+
+    /** The Audio part of the media player */
+    Audio m_audio;
 };
 
 };

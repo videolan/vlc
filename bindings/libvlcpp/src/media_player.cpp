@@ -28,11 +28,13 @@ using namespace libvlc;
 MediaPlayer::MediaPlayer( libVLC &libvlcInstance )
 {
     m_player = libvlc_media_player_new( libvlcInstance.m_instance );
+    m_audio.setMediaPlayer( m_player );
 }
 
 MediaPlayer::MediaPlayer( Media &media )
 {
     m_player = libvlc_media_player_new_from_media( media.m_media );
+    m_audio.setMediaPlayer( m_player );
 }
 
 MediaPlayer::~MediaPlayer()
@@ -237,4 +239,9 @@ void MediaPlayer::disableFullscreen()
 int MediaPlayer::fullscreen()
 {
     return libvlc_get_fullscreen( m_player );
+}
+
+Audio &MediaPlayer::audio()
+{
+    return m_audio;
 }

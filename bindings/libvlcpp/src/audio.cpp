@@ -26,10 +26,8 @@
 
 using namespace libvlc;
 
-Audio::Audio( libvlc_media_player_t *player )
+Audio::Audio()
 {
-    m_player = player;
-    libvlc_media_player_retain( m_player );
 }
 
 Audio::~Audio()
@@ -77,3 +75,8 @@ void Audio::setTrack( int track )
     libvlc_audio_set_track( m_player, track );
 }
 
+void Audio::setMediaPlayer( libvlc_media_player_t *player )
+{
+    libvlc_media_player_retain( player );
+    m_player = player;
+}
