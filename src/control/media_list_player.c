@@ -766,6 +766,7 @@ static int set_relative_playlist_position_and_play(
     event.u.media_list_player_next_item_set.item = p_md;
     libvlc_event_send(p_mlp->p_event_manager, &event);
     libvlc_media_release(p_md);
+    return 0;
 }
 
 /**************************************************************************
