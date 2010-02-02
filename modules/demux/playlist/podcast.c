@@ -90,6 +90,7 @@ static int Demux( demux_t *p_demux )
     char *psz_art_url = NULL;
     int i_type;
     input_item_t *p_input;
+    input_item_node_t *p_subitems = NULL;
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
@@ -127,6 +128,8 @@ static int Demux( demux_t *p_demux )
         goto error;
     }
     FREENULL( psz_elname );
+
+    p_subitems = input_item_node_Create( p_current_input );
 
     while( (i_ret = xml_ReaderRead( p_xml_reader )) == 1 )
     {
@@ -329,6 +332,7 @@ static int Demux( demux_t *p_demux )
                                                 psz_item_size );
                     }
                     input_item_AddSubItem( p_current_input, p_input );
+                    input_item_node_AppendItem( p_subitems, p_input );
                     vlc_gc_decref( p_input );
                     FREENULL( psz_item_name );
                     FREENULL( psz_item_mrl );
@@ -365,6 +369,8 @@ static int Demux( demux_t *p_demux )
     xml_ReaderDelete( p_xml, p_xml_reader );
     xml_Delete( p_xml );
 
+    input_item_AddSubItemTree( p_subitems );
+    input_item_node_Delete( p_subitems );
     vlc_gc_decref(p_current_input);
     return 0; /* Needed for correct operation of go back */
 
@@ -387,6 +393,11 @@ error:
         xml_ReaderDelete( p_xml, p_xml_reader );
     if( p_xml )
         xml_Delete( p_xml );
+    if( p_subitems )
+    {
+        input_item_AddSubItemTree( p_subitems );
+        input_item_node_Delete( p_subitems );
+    }
 
     vlc_gc_decref(p_current_input);
     return -1;

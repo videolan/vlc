@@ -80,6 +80,7 @@ static int Demux( demux_t *p_demux )
     input_item_t *p_input;
     char *psz_mrl = NULL, *psz_title = NULL, *psz_genre = NULL;
     char *psz_now = NULL, *psz_listeners = NULL, *psz_bitrate = NULL;
+    input_item_node_t *p_subitems = NULL;
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
@@ -160,6 +161,8 @@ static int Demux( demux_t *p_demux )
         free( psz_name );
         free( psz_value );
     }
+
+    p_subitems = input_item_node_Create( p_current_input );
 
     while( (i_ret = xml_ReaderRead( p_xml_reader )) == 1 )
     {
@@ -265,6 +268,7 @@ static int Demux( demux_t *p_demux )
                         msg_Err( p_demux, "Unsupported meta bitrate" );
 
                     input_item_AddSubItem( p_current_input, p_input );
+                    input_item_node_AppendItem( p_subitems, p_input );
                     vlc_gc_decref( p_input );
                     FREENULL( psz_title );
                     FREENULL( psz_mrl );
@@ -289,6 +293,12 @@ static int Demux( demux_t *p_demux )
 
 end:
     free( psz_elname );
+
+    if( p_subitems )
+    {
+        input_item_AddSubItemTree( p_subitems );
+        input_item_node_Delete( p_subitems );
+    }
 
     vlc_gc_decref( p_current_input );
     if( p_xml_reader )

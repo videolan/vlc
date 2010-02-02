@@ -480,6 +480,8 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
                                CDDA_DATA_SIZE * 1000000 / 44100 / 2 / 2;
     input_item_SetDuration( p_current, i_duration );
 
+    input_item_node_t *p_root = input_item_node_Create( p_current );
+
     /* Build title table */
     for( int i = 0; i < i_titles; i++ )
     {
@@ -576,12 +578,16 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         input_item_SetTrackNum( p_input_item, psz_num );
 
         input_item_AddSubItem( p_current, p_input_item );
+        input_item_node_AppendItem( p_root, p_input_item );
         vlc_gc_decref( p_input_item );
         free( psz_uri ); free( psz_opt ); free( psz_name );
         free( psz_first ); free( psz_last );
     }
 #undef ON_EMPTY
 #undef NONEMPTY
+
+    input_item_AddSubItemTree( p_root );
+    input_item_node_Delete( p_root );
 
     /* */
     for( int i = 0; i < i_cd_text; i++ )

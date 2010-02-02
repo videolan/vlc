@@ -93,6 +93,8 @@ static int Demux( demux_t *p_demux )
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
 
+    input_item_node_t *p_subitems = input_item_node_Create( p_current_input );
+
     while( ( psz_line = stream_ReadLine( p_demux->s ) ) )
     {
         if( !strncasecmp( psz_line, "[playlist]", sizeof("[playlist]")-1 ) ||
@@ -162,6 +164,7 @@ static int Demux( demux_t *p_demux )
                 p_input = input_item_New( p_demux, psz_mrl, psz_name );
                 input_item_CopyOptions( p_current_input, p_input );
                 input_item_AddSubItem( p_current_input, p_input );
+                input_item_node_AppendItem( p_subitems, p_input );
                 vlc_gc_decref( p_input );
             }
             else
@@ -217,6 +220,7 @@ static int Demux( demux_t *p_demux )
         p_input = input_item_New( p_demux, psz_mrl, psz_name );
         input_item_CopyOptions( p_current_input, p_input );
         input_item_AddSubItem( p_current_input, p_input );
+        input_item_node_AppendItem( p_subitems, p_input );
         vlc_gc_decref( p_input );
         free( psz_mrl_orig );
         psz_mrl = NULL;
@@ -227,6 +231,9 @@ static int Demux( demux_t *p_demux )
     }
     free( psz_name );
     psz_name = NULL;
+
+    input_item_AddSubItemTree( p_subitems );
+    input_item_node_Delete( p_subitems );
 
     vlc_gc_decref(p_current_input);
     return 0; /* Needed for correct operation of go back */

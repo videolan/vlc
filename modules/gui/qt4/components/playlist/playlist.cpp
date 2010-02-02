@@ -79,8 +79,8 @@ PlaylistWidget::PlaylistWidget( intf_thread_t *_p_i, QWidget *_par )
     /* Initialisation of the playlist */
     playlist_t * p_playlist = THEPL;
     PL_LOCK;
-    playlist_item_t *p_root =
-                  playlist_GetPreferredNode( THEPL, THEPL->p_local_category );
+    playlist_item_t *p_root = THEPL->p_playing;
+
     PL_UNLOCK;
 
     rightPanel = new StandardPLPanel( this, p_intf, THEPL, p_root );

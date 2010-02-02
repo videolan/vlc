@@ -48,9 +48,9 @@ static int Demux( demux_t *p_demux);
 static int Control( demux_t *p_demux, int i_query, va_list args );
 
 static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
-                       input_item_t *p_current_input );
+                       input_item_node_t *p_input_node );
 static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
-                         input_item_t *p_current_input, bool b_adult );
+                         input_item_node_t *p_input_node, bool b_adult );
 
 /*****************************************************************************
  * Import_Shoutcast: main import function
@@ -110,19 +110,23 @@ static int Demux( demux_t *p_demux )
         goto error;
     }
 
+    input_item_node_t *p_input_node = input_item_node_Create( p_current_input );
+
     if( !strcmp( psz_eltname, "genrelist" ) )
     {
         /* we're reading a genre list */
-        if( DemuxGenre( p_demux, p_xml_reader, p_current_input ) )
+        if( DemuxGenre( p_demux, p_xml_reader, p_input_node ) )
             goto error;
     }
     else
     {
         /* we're reading a station list */
-        if( DemuxStation( p_demux, p_xml_reader, p_current_input,
+        if( DemuxStation( p_demux, p_xml_reader, p_input_node,
                 var_CreateGetBool( p_demux, "shoutcast-show-adult" ) ) )
             goto error;
     }
+
+    input_item_AddSubItemTree( p_input_node );
 
     i_ret = 0; /* Needed for correct operation of go back */
 
@@ -132,6 +136,7 @@ error:
     if( p_xml )
         xml_Delete( p_xml );
     free( psz_eltname );
+    input_item_node_Delete( p_input_node );
     vlc_gc_decref(p_current_input);
     return i_ret;
 }
@@ -148,7 +153,7 @@ error:
  * </genrelist>
  **/
 static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
-                       input_item_t *p_current_input )
+                       input_item_node_t *p_input_node )
 {
     char *psz_name = NULL; /* genre name */
     int i_ret = -1;
@@ -219,9 +224,10 @@ static int DemuxGenre( demux_t *p_demux, xml_reader_t *p_xml_reader,
                     {
                         input_item_t *p_input;
                         p_input = input_item_New( p_demux, psz_mrl, psz_name );
-                        input_item_CopyOptions( p_current_input, p_input );
+                        input_item_CopyOptions( p_input_node->p_item, p_input );
                         free( psz_mrl );
-                        input_item_AddSubItem( p_current_input, p_input );
+                        input_item_AddSubItem( p_input_node->p_item, p_input );
+                        input_item_node_AppendItem( p_input_node, p_input );
                         vlc_gc_decref( p_input );
                     }
                     FREENULL( psz_name );
@@ -264,7 +270,7 @@ error:
  * </stationlist>
  **/
 static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
-                         input_item_t *p_current_input, bool b_adult )
+                         input_item_node_t *p_input_node, bool b_adult )
 {
     char *psz_base = NULL; /* */
 
@@ -395,7 +401,7 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                     /* Create the item */
                     input_item_t *p_input;
                     p_input = input_item_New( p_demux, psz_mrl, psz_name );
-                    input_item_CopyOptions( p_current_input, p_input );
+                    input_item_CopyOptions( p_input_node->p_item, p_input );
                     free( psz_mrl );
 
 #define SADD_INFO( type, field ) \
@@ -412,7 +418,8 @@ static int DemuxStation( demux_t *p_demux, xml_reader_t *p_xml_reader,
                         input_item_SetNowPlaying( p_input, psz_ct );
                     if( psz_rt )
                         input_item_SetRating( p_input, psz_rt );
-                    input_item_AddSubItem( p_current_input, p_input );
+                    input_item_AddSubItem( p_input_node->p_item, p_input );
+                    input_item_node_AppendItem( p_input_node, p_input );
                     vlc_gc_decref( p_input );
                     FREENULL( psz_base );
                     FREENULL( psz_name );

@@ -230,9 +230,6 @@ void StandardPLPanel::setRoot( playlist_item_t *p_item )
     QPL_LOCK;
     assert( p_item );
 
-    playlist_item_t *p_pref_item = playlist_GetPreferredNode( THEPL, p_item );
-    if( p_pref_item ) p_item = p_pref_item;
-
     /* needed for popupAdd() */
     currentRootId = p_item->i_id;
 
@@ -437,9 +434,16 @@ void StandardPLPanel::browseInto( input_item_t *p_input )
     playlist_Lock( THEPL );
 
     playlist_item_t *p_item = playlist_ItemGetByInput( THEPL, p_input );
-    assert( p_item != NULL );
+    if( !p_item )
+    {
+        playlist_Unlock( THEPL );
+        return;
+    }
 
     QModelIndex index = model->index( p_item->i_id, 0 );
+
+    playlist_Unlock( THEPL );
+
     if( currentView == iconView ) {
         iconView->setRootIndex( index );
         locationBar->setIndex( index );
@@ -449,7 +453,7 @@ void StandardPLPanel::browseInto( input_item_t *p_input )
 
     last_activated_id = -1;
 
-    playlist_Unlock( THEPL );
+
 }
 
 LocationBar::LocationBar( PLModel *m )

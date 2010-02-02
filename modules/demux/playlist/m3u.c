@@ -145,6 +145,7 @@ static int Demux( demux_t *p_demux )
     input_item_t *p_input;
 
     input_item_t *p_current_input = GetCurrentItem(p_demux);
+    input_item_node_t *p_subitems = input_item_node_Create( p_current_input );
 
     psz_line = stream_ReadLine( p_demux->s );
     while( psz_line )
@@ -227,6 +228,7 @@ static int Demux( demux_t *p_demux )
             if( psz_name ) input_item_SetTitle( p_input, psz_name );
 
             input_item_AddSubItem( p_current_input, p_input );
+            input_item_node_AppendItem( p_subitems, p_input );
             vlc_gc_decref( p_input );
         }
 
@@ -253,6 +255,8 @@ static int Demux( demux_t *p_demux )
             b_cleanup = false;
         }
     }
+    input_item_AddSubItemTree( p_subitems );
+    input_item_node_Delete( p_subitems );
     vlc_gc_decref(p_current_input);
     var_Destroy( p_demux, "m3u-extvlcopt" );
     return 0; /* Needed for correct operation of go back */

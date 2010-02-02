@@ -370,6 +370,8 @@ static int Open( vlc_object_t * p_this )
         input_thread_t *p_input = demux_GetParentInput( p_demux );
         input_item_t *p_current = input_GetItem( p_input );
 
+        input_item_node_t *p_subitems = input_item_node_Create( p_current );
+
         for( i = 0; i < i_count; i++ )
         {
             MP4_Box_t *p_rdrf = MP4_BoxGet( p_rmra, "rmda[%d]/rdrf", i );
@@ -422,6 +424,7 @@ static int Open( vlc_object_t * p_this )
                 input_item_t *p_input = input_item_New( p_demux, psz_ref, NULL );
                 input_item_CopyOptions( p_current, p_input );
                 input_item_AddSubItem( p_current, p_input );
+                input_item_node_AppendItem( p_subitems, p_input );
                 vlc_gc_decref( p_input );
             }
             else
@@ -431,6 +434,8 @@ static int Open( vlc_object_t * p_this )
             }
             free( psz_ref );
         }
+        input_item_AddSubItemTree( p_subitems );
+        input_item_node_Delete( p_subitems );
         vlc_object_release( p_input );
     }
 

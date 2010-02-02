@@ -1279,13 +1279,12 @@
         if( !p_input ) continue;
 
         /* Add the item */
-        /* FIXME: playlist_BothAddInput() can fail */
         PL_LOCK;
-        playlist_BothAddInput( p_playlist, p_input, p_node,
+        playlist_NodeAddInput( p_playlist, p_input, p_node,
                                       PLAYLIST_INSERT,
                                       i_position == -1 ?
                                       PLAYLIST_END : i_position + i_item,
-                                      NULL, NULL, pl_Locked );
+                                      pl_Locked );
 
 
         if( i_item == 0 && !b_enqueue )
