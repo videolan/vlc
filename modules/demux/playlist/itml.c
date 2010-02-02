@@ -101,10 +101,13 @@ int Demux( demux_t *p_demux )
         goto end;
     }
 
+    input_item_node_t *p_subitems = input_item_node_Create( p_current_input );
     xml_elem_hnd_t pl_elements[] =
         { {"dict",    COMPLEX_CONTENT, {.cmplx = parse_plist_dict} } };
-    parse_plist_node( p_demux, p_current_input, NULL, p_xml_reader, "plist",
+    parse_plist_node( p_demux, p_subitems, NULL, p_xml_reader, "plist",
                       pl_elements );
+    input_item_AddSubItemTree( p_subitems );
+    input_item_node_Delete( p_subitems );
 
     vlc_gc_decref(p_current_input);
 
@@ -129,7 +132,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
 /**
  * \brief parse the root node of the playlist
  */
-static bool parse_plist_node( demux_t *p_demux, input_item_t *p_input_item,
+static bool parse_plist_node( demux_t *p_demux, input_item_node_t *p_input_node,
                               track_elem_t *p_track, xml_reader_t *p_xml_reader,
                               const char *psz_element,
                               xml_elem_hnd_t *p_handlers )
@@ -170,7 +173,7 @@ static bool parse_plist_node( demux_t *p_demux, input_item_t *p_input_item,
     if( !b_version_found )
         msg_Warn( p_demux, "<plist> requires \"version\" attribute" );
 
-    return parse_dict( p_demux, p_input_item, NULL, p_xml_reader,
+    return parse_dict( p_demux, p_input_node, NULL, p_xml_reader,
                        "plist", p_handlers );
 }
 
@@ -178,7 +181,7 @@ static bool parse_plist_node( demux_t *p_demux, input_item_t *p_input_item,
  * \brief parse a <dict>
  * \param COMPLEX_INTERFACE
  */
-static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
+static bool parse_dict( demux_t *p_demux, input_item_node_t *p_input_node,
                         track_elem_t *p_track, xml_reader_t *p_xml_reader,
                         const char *psz_element, xml_elem_hnd_t *p_handlers )
 {
@@ -218,7 +221,7 @@ static bool parse_dict( demux_t *p_demux, input_item_t *p_input_item,
             /* complex content is parsed in a separate function */
             if( p_handler->type == COMPLEX_CONTENT )
             {
-                if( p_handler->pf_handler.cmplx( p_demux, p_input_item, NULL,
+                if( p_handler->pf_handler.cmplx( p_demux, p_input_node, NULL,
                                                  p_xml_reader, p_handler->name,
                                                  NULL ) )
                 {
@@ -294,7 +297,7 @@ end:
     return b_ret;
 }
 
-static bool parse_plist_dict( demux_t *p_demux, input_item_t *p_input_item,
+static bool parse_plist_dict( demux_t *p_demux, input_item_node_t *p_input_node,
                               track_elem_t *p_track, xml_reader_t *p_xml_reader,
                               const char *psz_element,
                               xml_elem_hnd_t *p_handlers )
@@ -312,11 +315,11 @@ static bool parse_plist_dict( demux_t *p_demux, input_item_t *p_input_item,
           {NULL,      UNKNOWN_CONTENT, {NULL} }
         };
 
-    return parse_dict( p_demux, p_input_item, NULL, p_xml_reader,
+    return parse_dict( p_demux, p_input_node, NULL, p_xml_reader,
                        "dict", pl_elements );
 }
 
-static bool parse_tracks_dict( demux_t *p_demux, input_item_t *p_input_item,
+static bool parse_tracks_dict( demux_t *p_demux, input_item_node_t *p_input_node,
                                track_elem_t *p_track, xml_reader_t *p_xml_reader,
                                const char *psz_element,
                                xml_elem_hnd_t *p_handlers )
@@ -328,7 +331,7 @@ static bool parse_tracks_dict( demux_t *p_demux, input_item_t *p_input_item,
           {NULL,      UNKNOWN_CONTENT, {NULL} }
         };
 
-    parse_dict( p_demux, p_input_item, NULL, p_xml_reader,
+    parse_dict( p_demux, p_input_node, NULL, p_xml_reader,
                 "dict", tracks_elements );
 
     msg_Info( p_demux, "added %i tracks successfully",
@@ -337,7 +340,7 @@ static bool parse_tracks_dict( demux_t *p_demux, input_item_t *p_input_item,
     return true;
 }
 
-static bool parse_track_dict( demux_t *p_demux, input_item_t *p_input_item,
+static bool parse_track_dict( demux_t *p_demux, input_item_node_t *p_input_node,
                               track_elem_t *p_track, xml_reader_t *p_xml_reader,
                               const char *psz_element,
                               xml_elem_hnd_t *p_handlers )
@@ -359,7 +362,7 @@ static bool parse_track_dict( demux_t *p_demux, input_item_t *p_input_item,
           {NULL,      UNKNOWN_CONTENT, {NULL} }
         };
 
-    i_ret = parse_dict( p_demux, p_input_item, p_track,
+    i_ret = parse_dict( p_demux, p_input_node, p_track,
                         p_xml_reader, "dict", track_elements );
 
     msg_Dbg( p_demux, "name: %s, artist: %s, album: %s, genre: %s, trackNum: %s, location: %s",
@@ -379,7 +382,8 @@ static bool parse_track_dict( demux_t *p_demux, input_item_t *p_input_item,
         msg_Info( p_demux, "Adding '%s'", psz_uri );
 
         p_new_input = input_item_New( p_demux, psz_uri, NULL );
-        input_item_AddSubItem( p_input_item, p_new_input );
+        input_item_AddSubItem( p_input_node->p_item, p_new_input );
+        input_item_node_AppendItem( p_input_node, p_new_input );
 
         /* add meta info */
         add_meta( p_new_input, p_track );
@@ -478,11 +482,11 @@ static bool add_meta( input_item_t *p_input_item, track_elem_t *p_track )
 /**
  * \brief skips complex element content that we can't manage
  */
-static bool skip_element( demux_t *p_demux, input_item_t *p_input_item,
+static bool skip_element( demux_t *p_demux, input_item_node_t *p_input_node,
                           track_elem_t *p_track, xml_reader_t *p_xml_reader,
                           const char *psz_element, xml_elem_hnd_t *p_handlers )
 {
-    VLC_UNUSED(p_demux); VLC_UNUSED(p_input_item);
+    VLC_UNUSED(p_demux); VLC_UNUSED(p_input_node);
     VLC_UNUSED(p_track); VLC_UNUSED(p_handlers);
     char *psz_endname;
 
