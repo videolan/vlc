@@ -95,9 +95,6 @@ void __catch_exception( void * e, const char * function, const char * file, int 
         }
         instance = (void *)libvlc_new( sizeof(lib_vlc_params)/sizeof(lib_vlc_params[0]), lib_vlc_params);
         NSAssert(instance, @"libvlc failed to initialize");
-
-        // Assignment unneeded, as the audio unit will do it for us
-        /*audio = */ [[VLCAudio alloc] initWithLibrary:self];
     }
     return self;
 }
@@ -121,11 +118,9 @@ void __catch_exception( void * e, const char * function, const char * file, int 
         sharedLibrary = nil;
 
     instance = nil;
-    [audio release];
     [super dealloc];
 }
 
-@synthesize audio;
 @end
 
 @implementation VLCLibrary (VLCLibVLCBridging)
@@ -140,10 +135,3 @@ void __catch_exception( void * e, const char * function, const char * file, int 
 }
 @end
 
-@implementation VLCLibrary (VLCAudioBridging)
-- (void)setAudio:(VLCAudio *)value
-{
-    if (!audio)
-        audio = value;
-}
-@end
