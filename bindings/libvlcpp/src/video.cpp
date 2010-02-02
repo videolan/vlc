@@ -28,10 +28,8 @@
 
 using namespace libvlc;
 
-Video::Video( libvlc_media_player_t *player )
+Video::Video()
 {
-    m_player = player;
-    libvlc_media_player_retain( m_player );
 }
 
 Video::~Video()
@@ -110,4 +108,10 @@ void Video::deinterlace( int enable, const char *mode )
         libvlc_video_set_deinterlace( m_player, mode );
     else
         libvlc_video_set_deinterlace( m_player, NULL );
+}
+
+void Video::setMediaPlayer( libvlc_media_player_t *player )
+{
+    libvlc_media_player_retain( player );
+    m_player = player;
 }

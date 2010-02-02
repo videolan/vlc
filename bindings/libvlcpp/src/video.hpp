@@ -37,15 +37,6 @@ class Video
 {
 public:
     /**
-     * Constructor
-     * @param player: the player handling the video
-     */
-    Video( libvlc_media_player_t *player );
-
-    /** Destructor */
-    ~Video();
-
-    /**
      * Get the height of the video
      * @return the height of the video
      */
@@ -163,6 +154,24 @@ public:
 private:
     /** The media player instance of libvlc */
     libvlc_media_player_t *m_player;
+
+    /**
+     * The constructor is private so only the MediaPlayer can create an
+     * instance of this class
+     */
+    Video();
+
+    /** Destructor only used by the MediaPlayer associated with this class */
+    ~Video();
+
+    /**
+     * Set the media player. This function can only be used by the MediaPlayer class
+     * @param player: the media player
+     */
+    void setMediaPlayer( libvlc_media_player_t *player);
+
+    /** Friend class */
+    friend class MediaPlayer;
 };
 
 };

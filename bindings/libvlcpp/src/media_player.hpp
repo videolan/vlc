@@ -31,6 +31,7 @@
 #include "libvlc.hpp"
 #include "media.hpp"
 #include "audio.hpp"
+#include "video.hpp"
 
 namespace libvlc
 {
@@ -311,12 +312,21 @@ public:
      */
     Audio &audio();
 
+    /**
+     * Get the class that handle the Video
+     * @return the instance of the Video associated with this MediaPlayer
+     */
+    Video &video();
+
 private:
     /** The media player instance of libvlc */
     libvlc_media_player_t *m_player;
 
     /** The Audio part of the media player */
     Audio m_audio;
+
+    /** The Video part of the media player */
+    Video m_video;
 };
 
 };

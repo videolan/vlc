@@ -29,6 +29,7 @@ MediaPlayer::MediaPlayer( libVLC &libvlcInstance )
 {
     m_player = libvlc_media_player_new( libvlcInstance.m_instance );
     m_audio.setMediaPlayer( m_player );
+    m_video.setMediaPlayer( m_player );
 }
 
 MediaPlayer::MediaPlayer( Media &media )
@@ -245,4 +246,9 @@ int MediaPlayer::fullscreen()
 Audio &MediaPlayer::audio()
 {
     return m_audio;
+}
+
+Video &MediaPlayer::video()
+{
+    return m_video;
 }
