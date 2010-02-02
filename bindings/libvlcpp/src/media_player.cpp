@@ -39,6 +39,7 @@ MediaPlayer::MediaPlayer( Media &media )
 
 MediaPlayer::~MediaPlayer()
 {
+    stop();
     libvlc_media_player_release( m_player );
 }
 
