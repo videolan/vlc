@@ -1103,6 +1103,12 @@ static NSString * VLCToolbarMediaControl     = @"VLCToolbarMediaControl";
 {
     switch( buttonIdentifier )
     {
+        case k2009RemoteButtonFullscreen:
+            [o_controls toogleFullscreen:self];
+            break;
+        case k2009RemoteButtonPlay:
+            [o_controls play:self];
+            break;
         case kRemoteButtonPlay:
             if(count >= 2) {
                 [o_controls toogleFullscreen:self];
