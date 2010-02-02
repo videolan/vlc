@@ -55,6 +55,8 @@ static subpicture_region_t * vout_OSDEpgSlider( vout_thread_t *p_vout,
     video_format_Init( &fmt, VLC_CODEC_YUVA );
     fmt.i_width = fmt.i_visible_width = i_width;
     fmt.i_height = fmt.i_visible_height = i_height;
+    fmt.i_sar_num = 0;
+    fmt.i_sar_den = 1;
 
     p_region = subpicture_region_New( &fmt );
     if( !p_region )
@@ -113,6 +115,8 @@ static subpicture_region_t * vout_OSDEpgText( vout_thread_t *p_vout,
 
     /* Create a new subpicture region */
     video_format_Init( &fmt, VLC_CODEC_TEXT );
+    fmt.i_sar_num = 0;
+    fmt.i_sar_den = 1;
 
     p_region = subpicture_region_New( &fmt );
     if( !p_region )
