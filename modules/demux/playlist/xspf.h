@@ -34,10 +34,10 @@ enum {
 #define SIMPLE_INTERFACE  (input_item_t    *p_input,\
                            const char      *psz_name,\
                            char            *psz_value)
-#define COMPLEX_INTERFACE (demux_t         *p_demux,\
-                           input_item_t    *p_input_item,\
-                           xml_reader_t    *p_xml_reader,\
-                           const char      *psz_element)
+#define COMPLEX_INTERFACE (demux_t            *p_demux,\
+                           input_item_node_t  *p_input_node,\
+                           xml_reader_t       *p_xml_reader,\
+                           const char         *psz_element)
 
 /* prototypes */
 static bool parse_playlist_node COMPLEX_INTERFACE;

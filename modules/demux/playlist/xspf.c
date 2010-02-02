@@ -118,7 +118,10 @@ int Demux( demux_t *p_demux )
     }
     free( psz_name );
 
-    i_ret = parse_playlist_node( p_demux, p_current_input,
+    input_item_node_t *p_subitems =
+        input_item_node_Create( p_current_input );
+
+    i_ret = parse_playlist_node( p_demux, p_subitems,
                                  p_xml_reader, "playlist" ) ? 0 : -1;
 
     for( int i = 0 ; i < p_demux->p_sys->i_tracklist_entries ; i++ )
@@ -127,8 +130,12 @@ int Demux( demux_t *p_demux )
         if( p_new_input )
         {
             input_item_AddSubItem( p_current_input, p_new_input );
+            input_item_node_AppendItem( p_subitems, p_new_input );
         }
     }
+
+    input_item_AddSubItemTree( p_subitems );
+    input_item_node_Delete( p_subitems );
 
 end:
     vlc_gc_decref(p_current_input);
@@ -155,6 +162,7 @@ static int Control( demux_t *p_demux, int i_query, va_list args )
  */
 static bool parse_playlist_node COMPLEX_INTERFACE
 {
+    input_item_t *p_input_item = p_input_node->p_item;
     char *psz_name = NULL;
     char *psz_value = NULL;
     bool b_version_found = false;
@@ -248,7 +256,7 @@ static bool parse_playlist_node COMPLEX_INTERFACE
                 {
                     FREE_VALUE();
                     if( p_handler->pf_handler.cmplx( p_demux,
-                                                     p_input_item,
+                                                     p_input_node,
                                                      p_xml_reader,
                                                      p_handler->name ) )
                     {
@@ -349,8 +357,8 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
             free( psz_eltname );
 
             /* parse the track data in a separate function */
-            if( parse_track_node( p_demux, p_input_item, p_xml_reader,
-                                  "track" ) )
+            if( parse_track_node( p_demux, p_input_node,
+                                  p_xml_reader, "track" ) )
                 i_ntracks++;
         }
         else if( i_node == XML_READER_ENDELEM )
@@ -382,6 +390,7 @@ static bool parse_tracklist_node COMPLEX_INTERFACE
  */
 static bool parse_track_node COMPLEX_INTERFACE
 {
+    input_item_t *p_input_item = p_input_node->p_item;
     char *psz_name = NULL;
     char *psz_value = NULL;
     xml_elem_hnd_t *p_handler = NULL;
@@ -406,6 +415,7 @@ static bool parse_track_node COMPLEX_INTERFACE
         };
 
     input_item_t *p_new_input = input_item_New( p_demux, NULL, NULL );
+    input_item_node_t *p_new_node = input_item_node_Create( p_new_input );
 
     if( !p_new_input )
     {
@@ -446,10 +456,12 @@ static bool parse_track_node COMPLEX_INTERFACE
                 if( p_handler->type == COMPLEX_CONTENT )
                 {
                     FREE_VALUE();
-                    if( p_handler->pf_handler.cmplx( p_demux,
-                                                     p_new_input,
-                                                     p_xml_reader,
-                                                     p_handler->name ) )
+
+                    bool b_res = p_handler->pf_handler.cmplx( p_demux,
+                                                        p_new_node,
+                                                        p_xml_reader,
+                                                        p_handler->name );
+                    if( b_res )
                     {
                         p_handler = NULL;
                     }
@@ -497,6 +509,7 @@ static bool parse_track_node COMPLEX_INTERFACE
                     if( p_sys->i_track_id < 0 )
                     {
                         input_item_AddSubItem( p_input_item, p_new_input );
+                        input_item_node_AppendNode( p_input_node, p_new_node );
                         vlc_gc_decref( p_new_input );
                         return true;
                     }
@@ -647,6 +660,7 @@ static bool set_option SIMPLE_INTERFACE
  */
 static bool parse_extension_node COMPLEX_INTERFACE
 {
+    input_item_t *p_input_item = p_input_node->p_item;
     char *psz_name = NULL;
     char *psz_value = NULL;
     char *psz_title = NULL;
@@ -711,6 +725,8 @@ static bool parse_extension_node COMPLEX_INTERFACE
         if( p_new_input )
         {
             input_item_AddSubItem( p_input_item, p_new_input );
+            p_input_node =
+                input_item_node_AppendItem( p_input_node, p_new_input );
             p_input_item = p_new_input;
             b_release_input_item = true;
         }
@@ -731,6 +747,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
         }
     }
     free( psz_application );
+
 
     /* parse the child elements */
     while( xml_ReaderRead( p_xml_reader ) == 1 )
@@ -766,7 +783,7 @@ static bool parse_extension_node COMPLEX_INTERFACE
                 if( p_handler->type == COMPLEX_CONTENT )
                 {
                     if( p_handler->pf_handler.cmplx( p_demux,
-                                                     p_input_item,
+                                                     p_input_node,
                                                      p_xml_reader,
                                                      p_handler->name ) )
                     {
@@ -900,7 +917,8 @@ static bool parse_extitem_node COMPLEX_INTERFACE
     p_new_input = p_demux->p_sys->pp_tracklist[ i_tid ];
     if( p_new_input )
     {
-        input_item_AddSubItem( p_input_item, p_new_input );
+        input_item_AddSubItem( p_input_node->p_item, p_new_input );
+        input_item_node_AppendItem( p_input_node, p_new_input );
         vlc_gc_decref( p_new_input );
         p_demux->p_sys->pp_tracklist[i_tid] = NULL;
     }
@@ -917,7 +935,7 @@ static bool parse_extitem_node COMPLEX_INTERFACE
  */
 static bool skip_element COMPLEX_INTERFACE
 {
-    VLC_UNUSED(p_demux); VLC_UNUSED(p_input_item);
+    VLC_UNUSED(p_demux); VLC_UNUSED(p_input_node);
 
     while( xml_ReaderRead( p_xml_reader ) == 1 )
     {
