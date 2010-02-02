@@ -69,7 +69,7 @@ playlist_item_t * playlist_NodeCreate( playlist_t *p_playlist,
         p_new_input = input_item_NewWithType( VLC_OBJECT(p_playlist), NULL,
                                         psz_name, 0, NULL, 0, -1, ITEM_TYPE_NODE );
     p_item = playlist_ItemNewFromInput( p_playlist,
-                                        p_input ? p_input : p_new_input, p_input == NULL );
+                                        p_input ? p_input : p_new_input );
     if( p_new_input )
         vlc_gc_decref( p_new_input );
 
@@ -261,69 +261,6 @@ playlist_item_t *playlist_ChildSearchName( playlist_item_t *p_node,
         if( !strcmp( p_node->pp_children[i]->p_input->psz_name, psz_search ) )
         {
             return p_node->pp_children[i];
-        }
-    }
-    return NULL;
-}
-
-/**
- * Create a pair of nodes in the category and onelevel trees.
- * They share the same input item.
- * \param p_playlist the playlist
- * \param psz_name the name of the nodes
- * \param pp_node_cat pointer to return the node in category tree
- * \param pp_node_one pointer to return the node in onelevel tree
- * \param b_for_sd For Services Discovery ? (make node read-only and unskipping)
- */
-void playlist_NodesPairCreate( playlist_t *p_playlist, const char *psz_name,
-                               playlist_item_t **pp_node_cat,
-                               playlist_item_t **pp_node_one,
-                               bool b_for_sd )
-{
-    PL_ASSERT_LOCKED;
-    *pp_node_cat = playlist_NodeCreate( p_playlist, psz_name,
-                                        p_playlist->p_root_category, 0, NULL );
-    *pp_node_one = playlist_NodeCreate( p_playlist, psz_name,
-                                        p_playlist->p_root_onelevel, 0,
-                                        (*pp_node_cat)->p_input );
-    if( b_for_sd )
-    {
-        (*pp_node_cat)->i_flags |= PLAYLIST_RO_FLAG;
-        (*pp_node_cat)->i_flags |= PLAYLIST_SKIP_FLAG;
-        (*pp_node_one)->i_flags |= PLAYLIST_RO_FLAG;
-        (*pp_node_one)->i_flags |= PLAYLIST_SKIP_FLAG;
-    }
-}
-
-/**
- * Get the node in the preferred tree from a node in one of category
- * or onelevel tree.
- */
-playlist_item_t * playlist_GetPreferredNode( playlist_t *p_playlist,
-                                             playlist_item_t *p_node )
-{
-    PL_ASSERT_LOCKED;
-    int i;
-    if( p_node->p_parent == p_playlist->p_root_category )
-    {
-        if( pl_priv(p_playlist)->b_tree || p_node->p_input->b_prefers_tree )
-            return p_node;
-        for( i = 0 ; i< p_playlist->p_root_onelevel->i_children; i++ )
-        {
-            if( p_playlist->p_root_onelevel->pp_children[i]->p_input ==
-                    p_node->p_input )
-                return p_playlist->p_root_onelevel->pp_children[i];
-        }
-    }
-    else if( p_node->p_parent == p_playlist->p_root_onelevel )
-    {
-        if( !pl_priv(p_playlist)->b_tree || !p_node->p_input->b_prefers_tree )
-            return p_node;
-        for( i = 0 ; i< p_playlist->p_root_category->i_children; i++ )
-        {
-            if( p_playlist->p_root_category->pp_children[i]->p_input ==
-                    p_node->p_input )
-                return p_playlist->p_root_category->pp_children[i];
         }
     }
     return NULL;

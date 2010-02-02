@@ -107,6 +107,14 @@ enum input_item_type_e
     ITEM_TYPE_NUMBER
 };
 
+struct input_item_node_t
+{
+    input_item_t *         p_item;
+    int                    i_children;
+    input_item_node_t      **pp_children;
+    input_item_node_t      *p_parent;
+};
+
 VLC_EXPORT( void, input_item_CopyOptions, ( input_item_t *p_parent, input_item_t *p_child ) );
 VLC_EXPORT( void, input_item_SetName, ( input_item_t *p_item, const char *psz_name ) );
 
@@ -115,6 +123,11 @@ VLC_EXPORT( void, input_item_SetName, ( input_item_t *p_item, const char *psz_na
  * It is not the input item's responsability to keep all the ref of
  * the input item children. */
 VLC_EXPORT( void, input_item_AddSubItem, ( input_item_t *p_parent, input_item_t *p_child ) );
+
+VLC_EXPORT( void, input_item_AddSubItemTree, ( input_item_node_t *p_root ) );
+
+/* Will send vlc_InputItemSubItemTreeAdded event, just as input_item_AddSubItemTree */
+VLC_EXPORT( void, input_item_AddSubItem2, ( input_item_t *p_parent, input_item_t *p_child ) );
 
 
 /**
@@ -214,6 +227,14 @@ VLC_EXPORT( input_item_t *, __input_item_NewExt, (vlc_object_t *, const char *ps
  * Provided for convenience.
  */
 #define input_item_New( a,b,c ) input_item_NewExt( a, b, c, 0, NULL, 0, -1 )
+
+VLC_EXPORT( input_item_node_t *, input_item_node_Create, ( input_item_t *p_input ) );
+
+VLC_EXPORT( void, input_item_node_Delete, ( input_item_node_t *p_node ) );
+
+VLC_EXPORT( input_item_node_t *, input_item_node_AppendItem, ( input_item_node_t *p_node, input_item_t *p_item ) );
+
+VLC_EXPORT( void, input_item_node_AppendNode, ( input_item_node_t *p_node, input_item_node_t *p_item ) );
 
 /******************
  * Input stats

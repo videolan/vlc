@@ -153,7 +153,6 @@ struct playlist_item_t
     int                    i_id;        /**< Playlist item specific id */
     uint8_t                i_flags;     /**< Flags */
     playlist_t            *p_playlist;  /**< Parent playlist */
-    bool                   b_input_item_observer;
 };
 
 #define PLAYLIST_SAVE_FLAG      0x0001    /**< Must it be saved */
@@ -180,6 +179,11 @@ struct playlist_t
     int                   i_current_index; /**< Index in current array */
 
     /* Predefined items */
+    playlist_item_t *     p_root;
+    playlist_item_t *     p_playing;
+    playlist_item_t *     p_media_library;
+
+    //Phony ones, point to those above;
     playlist_item_t *     p_root_category; /**< Root of category tree */
     playlist_item_t *     p_root_onelevel; /**< Root of onelevel tree */
     playlist_item_t *     p_local_category; /** < "Playlist" in CATEGORY view */
@@ -346,7 +350,6 @@ VLC_EXPORT( int,  playlist_DeleteFromInput, ( playlist_t *, input_item_t *, bool
 VLC_EXPORT( int,  playlist_Add,    ( playlist_t *, const char *, const char *, int, int, bool, bool ) );
 VLC_EXPORT( int,  playlist_AddExt, ( playlist_t *, const char *, const char *, int, int, mtime_t, int, const char *const *, unsigned, bool, bool ) );
 VLC_EXPORT( int, playlist_AddInput, ( playlist_t *, input_item_t *, int, int, bool, bool ) );
-VLC_EXPORT( int, playlist_BothAddInput, ( playlist_t *, input_item_t *,playlist_item_t *,int , int, int*, int*, bool ) );
 
 /********************************** Item search *************************/
 VLC_EXPORT( playlist_item_t *, playlist_ItemGetById, (playlist_t *, int ) );

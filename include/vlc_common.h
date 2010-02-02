@@ -212,6 +212,7 @@ typedef struct config_category_t config_category_t;
 typedef struct input_thread_t input_thread_t;
 typedef struct input_thread_sys_t input_thread_sys_t;
 typedef struct input_item_t input_item_t;
+typedef struct input_item_node_t input_item_node_t;
 typedef struct access_t access_t;
 typedef struct access_sys_t access_sys_t;
 typedef struct stream_t     stream_t;

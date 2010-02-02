@@ -90,8 +90,7 @@ char **vlc_sd_GetNames (vlc_object_t *obj, char ***pppsz_longnames)
 struct vlc_sd_internal_t
 {
     /* the playlist items for category and onelevel */
-    playlist_item_t      *p_cat;
-    playlist_item_t      *p_one;
+    playlist_item_t      *p_node;
     services_discovery_t *p_sd; /**< Loaded service discovery modules */
     char                 *psz_name;
 };
@@ -244,8 +243,7 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
 
     PL_LOCK;
     /* If p_parent is in root category (this is clearly a hack) and we have a cat */
-    if( !EMPTY_STR(psz_cat) &&
-        p_parent->p_parent == p_playlist->p_root_category )
+    if( !EMPTY_STR(psz_cat) )
     {
         /* */
         playlist_item_t * p_cat;
@@ -259,9 +257,9 @@ static void playlist_sd_item_added( const vlc_event_t * p_event, void * user_dat
         p_parent = p_cat;
     }
 
-    playlist_BothAddInput( p_playlist, p_input, p_parent,
-                                        PLAYLIST_APPEND, PLAYLIST_END,
-                                        NULL, NULL, pl_Locked );
+    playlist_NodeAddInput( p_playlist, p_input, p_parent,
+                           PLAYLIST_APPEND, PLAYLIST_END,
+                           pl_Locked );
     PL_UNLOCK;
 }
 
@@ -299,22 +297,21 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
         return VLC_ENOMEM;
     }
 
-    playlist_item_t * p_cat;
-    playlist_item_t * p_one;
+    playlist_item_t *p_node;
 
     PL_LOCK;
-    playlist_NodesPairCreate( p_playlist, module_get_name( m, true ),
-                              &p_cat, &p_one, false );
+    p_node = playlist_NodeCreate( p_playlist, module_get_name( m, true ),
+                                  p_playlist->p_root, 0, NULL );
     PL_UNLOCK;
     module_release( m );
 
     vlc_event_attach( services_discovery_EventManager( p_sd ),
                       vlc_ServicesDiscoveryItemAdded,
-                      playlist_sd_item_added, p_cat );
+                      playlist_sd_item_added, p_node );
 
     vlc_event_attach( services_discovery_EventManager( p_sd ),
                       vlc_ServicesDiscoveryItemRemoved,
-                      playlist_sd_item_removed, p_cat );
+                      playlist_sd_item_removed, p_node );
 
     if( !vlc_sd_Start( p_sd, psz_module ) )
     {
@@ -324,10 +321,9 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
     }
 
     /* We want tree-view for service directory */
-    p_one->p_input->b_prefers_tree = true;
+    p_node->p_input->b_prefers_tree = true;
     p_sds->p_sd = p_sd;
-    p_sds->p_one = p_one;
-    p_sds->p_cat = p_cat;
+    p_sds->p_node = p_node;
     p_sds->psz_name = strdup( psz_module );
 
     PL_LOCK;
@@ -369,21 +365,16 @@ int playlist_ServicesDiscoveryRemove( playlist_t * p_playlist,
     vlc_event_detach( services_discovery_EventManager( p_sd ),
                         vlc_ServicesDiscoveryItemAdded,
                         playlist_sd_item_added,
-                        p_sds->p_cat );
+                        p_sds->p_node );
 
     vlc_event_detach( services_discovery_EventManager( p_sd ),
                         vlc_ServicesDiscoveryItemRemoved,
                         playlist_sd_item_removed,
-                        p_sds->p_cat );
+                        p_sds->p_node );
 
     /* Remove the sd playlist node if it exists */
     PL_LOCK;
-    if( p_sds->p_cat != p_playlist->p_root_category &&
-        p_sds->p_one != p_playlist->p_root_onelevel )
-    {
-        playlist_NodeDelete( p_playlist, p_sds->p_cat, true, false );
-        playlist_NodeDelete( p_playlist, p_sds->p_one, true, false );
-    }
+    playlist_NodeDelete( p_playlist, p_sds->p_node, true, false );
     PL_UNLOCK;
 
     vlc_sd_Destroy( p_sd );

@@ -189,6 +189,8 @@ input_GetItem
 input_item_AddInfo
 input_item_AddOption
 input_item_AddSubItem
+input_item_AddSubItem2
+input_item_AddSubItemTree
 input_item_CopyOptions
 input_item_DelInfo
 input_item_GetDuration
@@ -203,6 +205,10 @@ input_item_IsPreparsed
 input_item_MetaMatch
 __input_item_NewExt
 input_item_NewWithType
+input_item_node_AppendItem
+input_item_node_AppendNode
+input_item_node_Create
+input_item_node_Delete
 input_item_SetDuration
 input_item_SetMeta
 input_item_SetName
@@ -313,7 +319,6 @@ playlist_AddExt
 playlist_AddInput
 playlist_AskForArtEnqueue
 playlist_AssertLocked
-playlist_BothAddInput
 playlist_ChildSearchName
 playlist_Clear
 playlist_Control

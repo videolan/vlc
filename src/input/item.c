@@ -60,6 +60,7 @@ static inline void input_item_Init( vlc_object_t *p_o, input_item_t *p_i )
     vlc_event_manager_init( p_em, p_i, p_o );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemMetaChanged );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemAdded );
+    vlc_event_manager_register_event_type( p_em, vlc_InputItemSubItemTreeAdded );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemDurationChanged );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemPreparsedChanged );
     vlc_event_manager_register_event_type( p_em, vlc_InputItemNameChanged );
@@ -266,6 +267,22 @@ void input_item_AddSubItem( input_item_t *p_parent, input_item_t *p_child )
     event.type = vlc_InputItemSubItemAdded;
     event.u.input_item_subitem_added.p_new_child = p_child;
     vlc_event_send( &p_parent->event_manager, &event );
+}
+
+void input_item_AddSubItemTree ( input_item_node_t *p_root )
+{
+    vlc_event_t event;
+    event.type = vlc_InputItemSubItemTreeAdded;
+    event.u.input_item_subitem_tree_added.p_root = p_root;
+    vlc_event_send( &p_root->p_item->event_manager, &event );
+}
+
+void input_item_AddSubItem2 ( input_item_t *p_parent, input_item_t *p_child )
+{
+    input_item_node_t *p_node = input_item_node_Create( p_parent );
+    input_item_node_AppendItem( p_node, p_child );
+    input_item_AddSubItemTree( p_node );
+    input_item_node_Delete( p_node );
 }
 
 bool input_item_HasErrorWhenReading( input_item_t *p_item )
@@ -961,4 +978,62 @@ static int GuessType( const input_item_t *p_item )
     e = bsearch( p_item->psz_uri, tab, sizeof( tab ) / sizeof( tab[0] ),
                  sizeof( tab[0] ), typecmp );
     return e ? e->i_type : ITEM_TYPE_FILE;
+}
+
+input_item_node_t *input_item_node_Create( input_item_t *p_input )
+{
+    input_item_node_t* p_node = malloc( sizeof( input_item_node_t ) );
+    if( !p_node )
+        return NULL;
+
+    assert( p_input );
+
+    p_node->p_item = p_input;
+    vlc_gc_incref( p_input );
+
+    p_node->p_parent = NULL;
+    p_node->i_children = 0;
+    p_node->pp_children = NULL;
+
+    return p_node;
+}
+
+void input_item_node_Delete( input_item_node_t *p_node )
+{
+  int i;
+  for( i = 0; i < p_node->i_children; i++ )
+      input_item_node_Delete( p_node->pp_children[i] );
+
+  if(  p_node->p_parent )
+  {
+      for( i = 0; i < p_node->p_parent->i_children; i++ )
+          if( p_node->p_parent->pp_children[i] == p_node )
+          {
+              REMOVE_ELEM( p_node->p_parent->pp_children,
+                           p_node->p_parent->i_children,
+                           i );
+              break;
+          }
+  }
+
+  vlc_gc_decref( p_node->p_item );
+  free( p_node );
+}
+
+input_item_node_t *input_item_node_AppendItem( input_item_node_t *p_node, input_item_t *p_item )
+{
+    input_item_node_t *p_new_child = input_item_node_Create( p_item );
+    if( !p_new_child ) return NULL;
+    input_item_node_AppendNode( p_node, p_new_child );
+    return p_new_child;
+}
+
+void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t *p_child )
+{
+    assert( p_parent && p_child && p_child->p_parent == NULL );
+    INSERT_ELEM( p_parent->pp_children,
+                 p_parent->i_children,
+                 p_parent->i_children,
+                 p_child );
+    p_child->p_parent = p_parent;
 }

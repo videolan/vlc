@@ -105,54 +105,50 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->b_auto_preparse =
         var_InheritBool( p_parent, "auto-preparse" );
 
-    PL_LOCK; /* playlist_NodeCreate will check for it */
-    p_playlist->p_root_category = playlist_NodeCreate( p_playlist, NULL, NULL,
+    /* Create the root node */
+    PL_LOCK;
+    p_playlist->p_root = playlist_NodeCreate( p_playlist, NULL, NULL,
                                     0, NULL );
-    p_playlist->p_root_onelevel = playlist_NodeCreate( p_playlist, NULL, NULL,
-                                    0, p_playlist->p_root_category->p_input );
+    PL_UNLOCK;
+    if( !p_playlist->p_root ) return NULL;
+
+    /* Create currently playing items node */
+    PL_LOCK;
+    p_playlist->p_playing = playlist_NodeCreate(
+        p_playlist, _( "Playlist" ), p_playlist->p_root,
+        PLAYLIST_RO_FLAG, NULL );
+
     PL_UNLOCK;
 
-    if( !p_playlist->p_root_category || !p_playlist->p_root_onelevel )
-        return NULL;
+    if( !p_playlist->p_playing ) return NULL;
 
-    /* Create playlist and media library */
-    PL_LOCK; /* playlist_NodesPairCreate will check for it */
-    playlist_NodesPairCreate( p_playlist, _( "Playlist" ),
-                            &p_playlist->p_local_category,
-                            &p_playlist->p_local_onelevel, false );
-    PL_UNLOCK;
-
-    p_playlist->p_local_category->i_flags |= PLAYLIST_RO_FLAG;
-    p_playlist->p_local_onelevel->i_flags |= PLAYLIST_RO_FLAG;
-
-    if( !p_playlist->p_local_category || !p_playlist->p_local_onelevel ||
-        !p_playlist->p_local_category->p_input ||
-        !p_playlist->p_local_onelevel->p_input )
-        return NULL;
-
+    /* Create media library node */
     const bool b_ml = var_InheritBool( p_parent, "media-library");
     if( b_ml )
     {
-        PL_LOCK; /* playlist_NodesPairCreate will check for it */
-        playlist_NodesPairCreate( p_playlist, _( "Media Library" ),
-                            &p_playlist->p_ml_category,
-                            &p_playlist->p_ml_onelevel, false );
+        PL_LOCK;
+        p_playlist->p_media_library = playlist_NodeCreate(
+            p_playlist, _( "Media Library" ), p_playlist->p_root,
+            PLAYLIST_RO_FLAG, NULL );
         PL_UNLOCK;
 
-        if(!p_playlist->p_ml_category || !p_playlist->p_ml_onelevel)
-            return NULL;
-
-        p_playlist->p_ml_category->i_flags |= PLAYLIST_RO_FLAG;
-        p_playlist->p_ml_onelevel->i_flags |= PLAYLIST_RO_FLAG;
+        if(!p_playlist->p_media_library ) return NULL;
     }
     else
     {
-        p_playlist->p_ml_category = p_playlist->p_ml_onelevel = NULL;
+        p_playlist->p_media_library = NULL;
     }
+
+    p_playlist->p_root_category = p_playlist->p_root;
+    p_playlist->p_root_onelevel = p_playlist->p_root;
+    p_playlist->p_local_category = p_playlist->p_playing;
+    p_playlist->p_local_onelevel = p_playlist->p_playing;
+    p_playlist->p_ml_category = p_playlist->p_media_library;
+    p_playlist->p_ml_onelevel = p_playlist->p_media_library;;
 
     /* Initial status */
     pl_priv(p_playlist)->status.p_item = NULL;
-    pl_priv(p_playlist)->status.p_node = p_playlist->p_local_onelevel;
+    pl_priv(p_playlist)->status.p_node = p_playlist->p_playing;
     pl_priv(p_playlist)->request.b_request = false;
     pl_priv(p_playlist)->status.i_status = PLAYLIST_STOPPED;
 

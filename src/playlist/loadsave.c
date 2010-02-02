@@ -103,16 +103,17 @@ int playlist_Import( playlist_t *p_playlist, const char *psz_file )
 /*****************************************************************************
  * A subitem has been added to the Media Library (Event Callback)
  *****************************************************************************/
-static void input_item_subitem_added( const vlc_event_t * p_event,
+static void input_item_subitem_tree_added( const vlc_event_t * p_event,
                                       void * user_data )
 {
     playlist_t *p_playlist = user_data;
-    input_item_t *p_item = p_event->u.input_item_subitem_added.p_new_child;
+    input_item_node_t *p_root =
+        p_event->u.input_item_subitem_tree_added.p_root;
 
-    /* playlist_AddInput() can fail, but we have no way to report that ..
-     * Any way when it has failed, either the playlist is dying, either OOM */
-    playlist_AddInput( p_playlist, p_item, PLAYLIST_APPEND, PLAYLIST_END,
-            false, pl_Unlocked );
+    PL_LOCK;
+    playlist_InsertInputItemTree ( p_playlist, p_playlist->p_media_library,
+                                   p_root, 0, !pl_priv(p_playlist)->b_tree );
+    PL_UNLOCK;
 }
 
 int playlist_MLLoad( playlist_t *p_playlist )
@@ -156,7 +157,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
         return VLC_ENOMEM;
 
     const char *const options[1] = { "meta-file", };
-    /* that option has to be cleaned in input_item_subitem_added() */
+    /* that option has to be cleaned in input_item_subitem_tree_added() */
     /* vlc_gc_decref() in the same function */
     p_input = input_item_NewExt( p_playlist, psz_uri, _("Media Library"),
                                  1, options, VLC_INPUT_OPTION_TRUSTED, -1 );
@@ -165,19 +166,13 @@ int playlist_MLLoad( playlist_t *p_playlist )
         return VLC_EGENERIC;
 
     PL_LOCK;
-    if( p_playlist->p_ml_onelevel->p_input )
-        vlc_gc_decref( p_playlist->p_ml_onelevel->p_input );
-    if( p_playlist->p_ml_category->p_input )
-        vlc_gc_decref( p_playlist->p_ml_category->p_input );
+    if( p_playlist->p_media_library->p_input )
+        vlc_gc_decref( p_playlist->p_media_library->p_input );
 
-    p_playlist->p_ml_onelevel->p_input =
-    p_playlist->p_ml_category->p_input = p_input;
-    /* We save the input at two different place, incref */
-    vlc_gc_incref( p_input );
-    vlc_gc_incref( p_input );
+    p_playlist->p_media_library->p_input = p_input;
 
-    vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemAdded,
-                        input_item_subitem_added, p_playlist );
+    vlc_event_attach( &p_input->event_manager, vlc_InputItemSubItemTreeAdded,
+                        input_item_subitem_tree_added, p_playlist );
 
     pl_priv(p_playlist)->b_doing_ml = true;
     PL_UNLOCK;
@@ -190,10 +185,9 @@ int playlist_MLLoad( playlist_t *p_playlist )
     pl_priv(p_playlist)->b_doing_ml = false;
     PL_UNLOCK;
 
-    vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemAdded,
-                        input_item_subitem_added, p_playlist );
+    vlc_event_detach( &p_input->event_manager, vlc_InputItemSubItemTreeAdded,
+                        input_item_subitem_tree_added, p_playlist );
 
-    vlc_gc_decref( p_input );
     return VLC_SUCCESS;
 }
 
@@ -220,7 +214,7 @@ int playlist_MLDump( playlist_t *p_playlist )
     strcat( psz_dirname, DIR_SEP "ml.xspf" );
 
     stats_TimerStart( p_playlist, "ML Dump", STATS_TIMER_ML_DUMP );
-    playlist_Export( p_playlist, psz_dirname, p_playlist->p_ml_category,
+    playlist_Export( p_playlist, psz_dirname, p_playlist->p_media_library,
                      "export-xspf" );
     stats_TimerStop( p_playlist, STATS_TIMER_ML_DUMP );
 
