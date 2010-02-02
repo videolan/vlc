@@ -565,7 +565,7 @@ void DialogsProvider::saveAPlaylist()
         if( selected == qfu( vlc_gettext( types[i].filter ) ) )
         {
             playlist_Export( THEPL, qtu( toNativeSeparators( file ) ),
-                             THEPL->p_local_category, types[i].module );
+                             THEPL->p_playing, types[i].module );
             break;
         }
 }

@@ -173,7 +173,7 @@ void PLSelector::setSource( QTreeWidgetItem *item )
 
     if( i_type == SD_TYPE )
     {
-        pl_item = playlist_ChildSearchName( THEPL->p_root_category, qtu( item->data(0, LONGNAME_ROLE ).toString() ) );
+        pl_item = playlist_ChildSearchName( THEPL->p_root, qtu( item->data(0, LONGNAME_ROLE ).toString() ) );
         if( item->data( 0, SPECIAL_ROLE ).toInt() == IS_PODCAST )
         {
             if( pl_item && !sd_loaded )
@@ -241,11 +241,11 @@ PLSelItem *PLSelector::addPodcastItem( playlist_item_t *p_item )
 void PLSelector::createItems()
 {
     PLSelItem *pl = putPLData( addItem( PL_ITEM_TYPE, qtr( "Playlist" ), true ),
-                              THEPL->p_local_category );
+                              THEPL->p_playing );
     pl->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PL ) );
 
     PLSelItem *ml = putPLData( addItem( PL_ITEM_TYPE, qtr( "Media Library" ), true ),
-                              THEPL->p_ml_category );
+                              THEPL->p_media_library );
     ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
 
     QTreeWidgetItem *msrc = addItem( CATEGORY_TYPE, qtr( "Media Sources" ),

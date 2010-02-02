@@ -57,8 +57,6 @@ QIcon PLModel::icons[ITEM_TYPE_NUMBER];
 PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
                   intf_thread_t *_p_intf,   /* main Qt p_intf */
                   playlist_item_t * p_root,
-                  /*playlist_GetPreferredNode( THEPL, THEPL->p_local_category );
-                    and THEPL->p_root_category for SelectPL */
                   QObject *parent )         /* Basic Qt parent */
                   : QAbstractItemModel( parent )
 {
@@ -178,13 +176,13 @@ bool PLModel::dropMimeData( const QMimeData *data, Qt::DropAction action,
         }
 
         bool copy = false;
-        playlist_item_t *p_pl = p_playlist->p_local_category;
-        playlist_item_t *p_ml = p_playlist->p_ml_category;
+        playlist_item_t *p_pl = p_playlist->p_playing;
+        playlist_item_t *p_ml = p_playlist->p_media_library;
         if
         (
             row == -1 && (
-            ( p_pl && p_parent->p_input == p_pl->p_input ) ||
-            ( p_ml && p_parent->p_input == p_ml->p_input ) )
+            ( p_pl && p_parent == p_pl ) ||
+            ( p_ml && p_parent == p_ml ) )
         )
             copy = true;
         PL_UNLOCK;
@@ -217,8 +215,7 @@ void PLModel::dropAppendCopy( QByteArray& data, PLItem *target )
             PLAYLIST_APPEND | PLAYLIST_SPREPARSE, PLAYLIST_END,
             p_input->i_duration,
             p_input->i_options, p_input->ppsz_options, p_input->optflagc,
-            ( p_parent == p_playlist->p_local_category ||
-            p_parent == p_playlist->p_local_onelevel ),
+            p_parent == p_playlist->p_playing,
             true );
     }
     PL_UNLOCK;
@@ -563,10 +560,10 @@ bool PLModel::canEdit() const
   return (
     rootItem != NULL &&
     (
-      rootItem->p_input == p_playlist->p_local_category->p_input ||
+      rootItem->p_input == p_playlist->p_playing->p_input ||
       (
-        p_playlist->p_ml_category &&
-        rootItem->p_input == p_playlist->p_ml_category->p_input
+        p_playlist->p_media_library &&
+        rootItem->p_input == p_playlist->p_media_library->p_input
       )
     )
   );
@@ -898,14 +895,9 @@ void PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
         ( p_item->p_parent ? p_item->p_parent->i_id : -1 ) :
         ( p_item->i_id );
     i_popup_column = index.column();
-    /* check whether we are in tree view */
-    bool tree = false;
-    playlist_item_t *p_up = p_item;
-    while( p_up )
-    {
-        if ( p_up == p_playlist->p_root_category ) tree = true;
-        p_up = p_up->p_parent;
-    }
+
+    bool tree = var_InheritBool( p_intf, "playlist-tree" );
+
     PL_UNLOCK;
 
     current_selection = list;

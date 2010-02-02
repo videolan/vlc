@@ -162,17 +162,14 @@ void StandardPLPanel::handleExpansion( const QModelIndex& index )
 void StandardPLPanel::popupAdd()
 {
     QMenu popup;
-    if( currentRootId == THEPL->p_local_category->i_id ||
-        currentRootId == THEPL->p_local_onelevel->i_id )
+    if( currentRootId == THEPL->p_playing->i_id )
     {
         popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT( simplePLAppendDialog()) );
         popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
         popup.addAction( qtr(I_OP_ADVOP), THEDP, SLOT( PLAppendDialog()) );
     }
-    else if( ( THEPL->p_ml_category &&
-                currentRootId == THEPL->p_ml_category->i_id ) ||
-             ( THEPL->p_ml_onelevel &&
-                currentRootId == THEPL->p_ml_onelevel->i_id ) )
+    else if( THEPL->p_media_library &&
+                currentRootId == THEPL->p_media_library->i_id )
     {
         popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT( simpleMLAppendDialog()) );
         popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
@@ -246,14 +243,12 @@ void StandardPLPanel::setRoot( playlist_item_t *p_item )
     locationBar->setIndex( QModelIndex() );
 
     /* enable/disable adding */
-    if( p_item == THEPL->p_local_category ||
-        p_item == THEPL->p_local_onelevel )
+    if( p_item == THEPL->p_playing )
     {
         addButton->setEnabled( true );
         addButton->setToolTip( qtr(I_PL_ADDPL) );
     }
-    else if( ( THEPL->p_ml_category && p_item == THEPL->p_ml_category) ||
-              ( THEPL->p_ml_onelevel && p_item == THEPL->p_ml_onelevel ) )
+    else if( THEPL->p_media_library && p_item == THEPL->p_media_library )
     {
         addButton->setEnabled( true );
         addButton->setToolTip( qtr(I_PL_ADDML) );
