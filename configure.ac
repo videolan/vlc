@@ -197,14 +197,11 @@ case "${host_os}" in
     CXXFLAGS_save="${CXXFLAGS_save} -D_INTL_REDIRECT_MACROS"; CXXFLAGS="${CXXFLAGS_save}"
     OBJCFLAGS_save="${OBJCFLAGS_save} -D_INTL_REDIRECT_MACROS -std=gnu99"; OBJCFLAGS="${OBJCFLAGS_save}"
     LDFLAGS_save="${LDFLAGS_save} -Wl,-headerpad_max_install_names"; LDFLAGS="${LDFLAGS_save}"
-    VLC_ADD_LDFLAGS([mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
-    VLC_ADD_LDFLAGS([mkv mp4], [-Wl,-framework,IOKit,-framework,CoreFoundation])
-    VLC_ADD_LDFLAGS([vlc],[-Wl,-undefined,dynamic_lookup])
-    VLC_ADD_LDFLAGS([libvlc],[-Wl,-undefined,dynamic_lookup])
+    VLC_ADD_LDFLAGS([mkv mp4 motion], [-Wl,-framework,IOKit,-framework,CoreFoundation])
+    VLC_ADD_LDFLAGS([libvlc vlc],[-Wl,-undefined,dynamic_lookup])
     VLC_ADD_LDFLAGS([avcodec avformat access_avio swscale postproc i420_rgb_mmx x264],[-Wl,-read_only_relocs,suppress])
     VLC_ADD_CFLAGS([motion],[-fconstant-cfstrings])
     VLC_ADD_LDFLAGS([libvlccore],[-Wl,-framework,CoreFoundation])
-    VLC_ADD_LDFLAGS([motion],[-Wl,-framework,IOKit,-framework,CoreFoundation])
     AC_ARG_ENABLE(macosx-defaults,
       AS_HELP_STRING([--enable-macosx-defaults],[Build the default configuration on Mac OS X (default enabled)]))
     if test "x${enable_macosx_defaults}" != "xno"
@@ -914,8 +911,7 @@ then
   VLC_ADD_CPPFLAGS([skins2],[$MINIZIP_CFLAGS])
   VLC_ADD_CFLAGS([zip],[$MINIZIP_CFLAGS])
   VLC_ADD_LIBS([skins2 zip],[$MINIZIP_LIBS])
-  VLC_ADD_PLUGIN([unzip])
-  VLC_ADD_PLUGIN([zip])
+  VLC_ADD_PLUGIN([unzip zip])
 fi
 AM_CONDITIONAL(HAVE_MINIZIP, [ test "${have_minizip}" = "yes" ])
 
@@ -1151,10 +1147,8 @@ dnl
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
     VLC_ADD_PLUGIN([dynamicoverlay])
 elif test "${SYS}" != "mingwce"; then
-    VLC_ADD_PLUGIN([access_smb])
-    VLC_ADD_PLUGIN([dmo])
+    VLC_ADD_PLUGIN([access_smb dmo globalhotkeys])
     VLC_ADD_LIBS([dmo],[-lole32 -luuid])
-    VLC_ADD_PLUGIN([globalhotkeys])
 fi
 if test "${SYS}" = "darwin"; then
     VLC_ADD_LDFLAGS([quartztext],[-Wl,-framework,ApplicationServices])
@@ -2032,8 +2026,7 @@ then
     else
       PKG_CHECK_MODULES(OPENCV, opencv,
         [
-          VLC_ADD_PLUGIN([opencv_example])
-          VLC_ADD_PLUGIN([opencv_wrapper])
+          VLC_ADD_PLUGIN([opencv_example opencv_wrapper])
           VLC_ADD_LIBS([opencv_example opencv_wrapper],[${OPENCV_LIBS}])
           VLC_ADD_CFLAGS([opencv_wrapper],[${OPENCV_CFLAGS}])
           VLC_ADD_CXXFLAGS([opencv_example],[${OPENCV_CFLAGS}])
@@ -2321,8 +2314,7 @@ then
   AC_MSG_CHECKING(for cdrom_msf0 in linux/cdrom.h)
   AC_EGREP_HEADER(cdrom_msf0,linux/cdrom.h,[
     AC_MSG_RESULT(yes)
-    VLC_ADD_PLUGIN([vcd])
-    VLC_ADD_PLUGIN([cdda])
+    VLC_ADD_PLUGIN([vcd cdda])
   ],[
     AC_MSG_RESULT(no)
   ])
@@ -2330,8 +2322,7 @@ then
   AC_MSG_CHECKING(for scsireq in sys/scsiio.h)
   AC_EGREP_HEADER(scsireq,sys/scsiio.h,[
     AC_MSG_RESULT(yes)
-    VLC_ADD_PLUGIN([vcd])
-    VLC_ADD_PLUGIN([cdda])
+    VLC_ADD_PLUGIN([vcd cdda])
     AC_DEFINE(HAVE_SCSIREQ_IN_SYS_SCSIIO_H, 1, For NetBSD VCD support)
   ],[
     AC_MSG_RESULT(no)
@@ -2340,8 +2331,7 @@ then
   AC_MSG_CHECKING(for ioc_toc_header in sys/cdio.h)
   AC_EGREP_HEADER(ioc_toc_header ,sys/cdio.h,[
     AC_MSG_RESULT(yes)
-    VLC_ADD_PLUGIN([vcd])
-    VLC_ADD_PLUGIN([cdda])
+    VLC_ADD_PLUGIN([vcd cdda])
     AC_DEFINE(HAVE_IOC_TOC_HEADER_IN_SYS_CDIO_H, 1, For FreeBSD VCD support)
   ],[
     AC_MSG_RESULT(no)
@@ -2349,14 +2339,12 @@ then
 
   if test "${SYS}" = "bsdi" -o "${SYS}" = "mingw32"
   then
-    VLC_ADD_PLUGIN([vcd])
-    VLC_ADD_PLUGIN([cdda])
+    VLC_ADD_PLUGIN([vcd cdda])
   fi
 
   if test "${SYS}" = "darwin"
   then
-    VLC_ADD_PLUGIN([vcd])
-    VLC_ADD_PLUGIN([cdda])
+    VLC_ADD_PLUGIN([vcd cdda])
     VLC_ADD_LDFLAGS([vcd vcdx cdda],[-Wl,-framework,IOKit,-framework,CoreFoundation])
     VLC_ADD_LIBS([vcdx cdda],[-liconv])
   fi
@@ -2828,13 +2816,9 @@ then
       AC_CHECK_HEADERS(libavformat/avformat.h ffmpeg/avformat.h)
       AC_CHECK_HEADERS(libavutil/avutil.h ffmpeg/avutil.h)
       AS_IF([test "$enable_merge_ffmpeg" = "no"], [
-        VLC_ADD_PLUGIN([avformat])
-        VLC_ADD_LIBS([avformat],[$AVFORMAT_LIBS $AVUTIL_LIBS])
-        VLC_ADD_CFLAGS([avformat],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
-
-        VLC_ADD_PLUGIN([access_avio])
-        VLC_ADD_LIBS([access_avio],[$AVFORMAT_LIBS $AVUTIL_LIBS])
-        VLC_ADD_CFLAGS([access_avio],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
+        VLC_ADD_PLUGIN([avformat access_avio])
+        VLC_ADD_LIBS([avformat access_avio],[$AVFORMAT_LIBS $AVUTIL_LIBS])
+        VLC_ADD_CFLAGS([avformat access_avio],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
       ], [
         VLC_ADD_LIBS([avcodec],[$AVFORMAT_LIBS $AVUTIL_LIBS])
         VLC_ADD_CFLAGS([avcodec],[$AVFORMAT_CFLAGS $AVUTIL_CFLAGS])
@@ -3140,9 +3124,7 @@ AC_CHECK_HEADERS(png.h, [
   LDFLAGS="${LDFLAGS_save} -lz"
   AC_CHECK_LIB(png, png_set_rows, [
     VLC_ADD_LIBS([png],[-lpng -lz])
-    VLC_ADD_PLUGIN([png])
-    VLC_ADD_PLUGIN([osdmenu])
-    VLC_ADD_PLUGIN([osd_parser])],
+    VLC_ADD_PLUGIN([png osdmenu osd_parser])],
     [],[-lz])
     LDFLAGS="${LDFLAGS_save}"
   ])
@@ -3379,10 +3361,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
   dnl libxcb
   PKG_CHECK_MODULES(XCB, [xcb])
   PKG_CHECK_MODULES(XCB_SHM, [xcb-shm])
-  VLC_ADD_PLUGIN([screensaver])
-  VLC_ADD_PLUGIN([xcb_x11])
-  VLC_ADD_PLUGIN([xcb_screen])
-  VLC_ADD_PLUGIN([xcb_apps])
+  VLC_ADD_PLUGIN([screensaver xcb_x11 xcb_screen xcb_apps])
   VLC_SET_CFLAGS_WERROR([xcb_screen], [-Wno-error=uninitialized]) # some gcc report a warning which doesn't reveal an error
 
   AS_IF([test "${enable_xvideo}" != "no"], [
@@ -3417,8 +3396,7 @@ AS_IF([test "${enable_xcb}" != "no"], [
 
   AS_IF([test "${have_xcb_keysyms}" = "yes"], [
     PKG_CHECK_MODULES(XPROTO, [xproto])
-    VLC_ADD_PLUGIN([xcb_window])
-    VLC_ADD_PLUGIN([globalhotkeys])
+    VLC_ADD_PLUGIN([xcb_window globalhotkeys])
     VLC_ADD_CFLAGS([globalhotkeys], [${XCB_KEYSYMS_CFLAGS} ${XCB_CFLAGS}])
     VLC_ADD_LIBS([globalhotkeys], [${XCB_KEYSYMS_LIBS} ${XCB_LIBS}])
   ])
@@ -3482,8 +3460,7 @@ then
      PKG_CHECK_MODULES(SDL, [sdl >= 1.2.10], [
         # SDL on Darwin is heavily patched and can only run SDL_image
         if test "${SYS}" != "darwin"; then
-          VLC_ADD_PLUGIN([vout_sdl])
-          VLC_ADD_PLUGIN([aout_sdl])
+          VLC_ADD_PLUGIN([vout_sdl aout_sdl])
         fi
         VLC_ADD_CFLAGS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} --cflags | sed 's,SDL,,'`])
         VLC_ADD_LIBS([vout_sdl aout_sdl sdl_image],[`${SDL_CONFIG} --libs | sed 's,-rdynamic,,'`])
@@ -3621,8 +3598,7 @@ then
   if test "${SYS}" = "mingw32" -o "${SYS}" = "mingwce"
   then
       AC_CHECK_HEADERS(ddraw.h,
-      [ VLC_ADD_PLUGIN([directx])
-        VLC_ADD_PLUGIN([aout_directx])
+      [ VLC_ADD_PLUGIN([directx aout_directx])
         VLC_ADD_LIBS([directx],[-lgdi32])
       ],[AC_MSG_ERROR([Cannot find DirectX headers!])]
       )
@@ -3649,8 +3625,7 @@ if test "${enable_wingdi}" != "no"; then
     VLC_ADD_LIBS([wingdi],[-lgdi32 -lole32])
   fi
   if test "${SYS}" = "mingwce"; then
-    VLC_ADD_PLUGIN([wingdi])
-    VLC_ADD_PLUGIN([wingapi])
+    VLC_ADD_PLUGIN([wingdi wingapi])
     VLC_ADD_LIBS([wingdi],[-laygshell])
     VLC_ADD_LIBS([wingapi],[-laygshell])
   fi
@@ -3824,10 +3799,8 @@ if test "${enable_oss}" != "no" &&
    test "${enable_oss}" = "yes")
 then
   AC_CHECK_HEADERS([soundcard.h sys/soundcard.h], [
-    VLC_ADD_PLUGIN([oss])
-    VLC_ADD_PLUGIN([access_oss])
-    AC_CHECK_LIB(ossaudio,main,[VLC_ADD_LIBS([oss],[-lossaudio])
-                                VLC_ADD_LIBS([access_oss],[-lossaudio])])
+    VLC_ADD_PLUGIN([oss access_oss])
+    AC_CHECK_LIB(ossaudio,main,[VLC_ADD_LIBS([oss access_oss],[-lossaudio])])
   ])
 fi
 
@@ -3895,8 +3868,7 @@ fi
 dnl
 dnl  JACK modules
 dnl
-PKG_ENABLE_MODULES_VLC([JACK], [jack], [jack], [JACK audio I/O modules],[auto])
-PKG_ENABLE_MODULES_VLC([JACK], [access_jack], [jack], [JACK audio I/O modules],[auto])
+PKG_ENABLE_MODULES_VLC([JACK], [jack access_jack], [jack], [JACK audio I/O modules],[auto])
 
 
 dnl
@@ -4113,8 +4085,7 @@ then
   VLC_ADD_LDFLAGS([macosx],                           [-Wl,-framework,WebKit])
   VLC_ADD_OBJCFLAGS([macosx minimal_macosx], [-fobjc-exceptions] )
 
-  VLC_ADD_PLUGIN([macosx])
-  VLC_ADD_PLUGIN([minimal_macosx])
+  VLC_ADD_PLUGIN([macosx minimal_macosx])
 fi
 
 dnl
@@ -4355,8 +4326,7 @@ AS_IF([test "${enable_gnutls}" != "no"], [
     VLC_ADD_CFLAGS([gnutls], [$GNUTLS_CFLAGS])
     AS_IF([test "${SYS}" = "mingw32"], [
       dnl pkg-config --libs gnutls omits these
-      VLC_ADD_LIBS([gnutls], [-lz])
-      VLC_ADD_LIBS([gnutls], [${LTLIBINTL}])
+      VLC_ADD_LIBS([gnutls], [-lz ${LTLIBINTL}])
     ])
     dnl The GnuTLS plugin invokes gcry_control directly.
     AS_IF([test "${have_libgcrypt}" = "yes"],[
@@ -4485,12 +4455,10 @@ AC_ARG_ENABLE(loader,
 AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
 AS_IF([test "${enable_loader}" = "yes"],
   [ VLC_ADD_PLUGIN([dmo])
-    VLC_ADD_CPPFLAGS([dmo],[-I\\\${top_srcdir}/libs/loader])
-    VLC_ADD_LIBS([dmo],[\\\${top_builddir}/libs/loader/libloader.la -lpthread])
-    VLC_ADD_CPPFLAGS([quicktime],[-I\\\${top_srcdir}/libs/loader])
-    VLC_ADD_LIBS([quicktime],[\\\${top_builddir}/libs/loader/libloader.la -lpthread])
-    VLC_ADD_CPPFLAGS([realvideo],[-I\\\${top_srcdir}/libs/loader -DLOADER])
-    VLC_ADD_LIBS([realvideo],[\\\${top_builddir}/libs/loader/libloader.la])
+    VLC_ADD_CPPFLAGS([dmo quicktime realvideo],[-I\\\${top_srcdir}/libs/loader])
+    VLC_ADD_LIBS([dmo quicktime realvideo],[-I\\\${top_builddir}/libs/loader/libloader.a])
+    VLC_ADD_CPPFLAGS([realvideo], [-DLOADER])
+    VLC_ADD_LIBS([dmo quicktime], [-lpthread])
   ])
 
 AC_ARG_WITH(,[Components:])
@@ -4738,10 +4706,7 @@ then
   dnl  this one is needed until automake knows what to do
   VLC_ADD_LIBS([test3],[-lobjc])
 
-  VLC_ADD_PLUGIN([test1])
-  VLC_ADD_PLUGIN([test2])
-  VLC_ADD_PLUGIN([test3])
-  VLC_ADD_PLUGIN([test4])
+  VLC_ADD_PLUGIN([test1 test2 test3 test4])
 fi
 
 dnl
