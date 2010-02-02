@@ -838,8 +838,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
 
             case clicked_Fullscreen:
             {
-                p_plugin->set_fullscreen( 1, &ex );
-                libvlc_exception_clear( &ex );
+                p_plugin->set_fullscreen( 1 );
             }
             break;
 

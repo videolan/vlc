@@ -267,14 +267,14 @@ public:
     int playlist_add_extended_untrusted( const char *, const char *, int,
                                 const char **, libvlc_exception_t * );
     void playlist_delete_item( int, libvlc_exception_t * );
-    void playlist_clear( libvlc_exception_t * );
+    void playlist_clear();
     int  playlist_count();
 
-    void toggle_fullscreen( libvlc_exception_t * );
-    void set_fullscreen( int, libvlc_exception_t * );
-    int  get_fullscreen( libvlc_exception_t * );
+    void toggle_fullscreen();
+    void set_fullscreen( int );
+    int  get_fullscreen();
 
-    bool  player_has_vout( libvlc_exception_t * );
+    bool  player_has_vout();
 
 
     static bool canUseEventListener();

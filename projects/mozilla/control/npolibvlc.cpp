@@ -529,8 +529,7 @@ LibvlcInputNPObject::getProperty(int index, NPVariant &result)
             }
             case ID_input_hasvout:
             {
-                bool val = p_plugin->player_has_vout(&ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                bool val = p_plugin->player_has_vout();
                 BOOLEAN_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
@@ -701,8 +700,7 @@ LibvlcPlaylistItemsNPObject::invoke(int index, const NPVariant *args,
             case ID_playlistitems_clear:
                 if( argCount == 0 )
                 {
-                    p_plugin->playlist_clear(&ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    p_plugin->playlist_clear();
                     VOID_TO_NPVARIANT(result);
                     return INVOKERESULT_NO_ERROR;
                 }
@@ -965,8 +963,7 @@ LibvlcPlaylistNPObject::invoke(int index, const NPVariant *args,
             case ID_playlist_clear: /* deprecated */
                 if( argCount == 0 )
                 {
-                    p_plugin->playlist_clear(&ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    p_plugin->playlist_clear();
                     VOID_TO_NPVARIANT(result);
                     return INVOKERESULT_NO_ERROR;
                 }
@@ -1160,8 +1157,7 @@ LibvlcSubtitleNPObject::getProperty(int index, NPVariant &result)
             case ID_subtitle_track:
             {
                 /* get the current subtitle ID */
-                int i_spu = libvlc_video_get_spu(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int i_spu = libvlc_video_get_spu(p_md);
                 /* return it */
                 INT32_TO_NPVARIANT(i_spu, result);
                 return INVOKERESULT_NO_ERROR;
@@ -1169,8 +1165,7 @@ LibvlcSubtitleNPObject::getProperty(int index, NPVariant &result)
             case ID_subtitle_count:
             {
                 /* get the number of subtitles available */
-                int i_spu = libvlc_video_get_spu_count(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int i_spu = libvlc_video_get_spu_count(p_md);
                 /* return it */
                 INT32_TO_NPVARIANT(i_spu, result);
                 return INVOKERESULT_NO_ERROR;
@@ -1200,8 +1195,7 @@ LibvlcSubtitleNPObject::setProperty(int index, const NPVariant &value)
                 if( isNumberValue(value) )
                 {
                     /* set the new subtitle track to show */
-                    libvlc_video_set_spu(p_md, numberValue(value), &ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    libvlc_video_set_spu(p_md, numberValue(value));
 
                     return INVOKERESULT_NO_ERROR;
                 }
@@ -1253,8 +1247,7 @@ LibvlcSubtitleNPObject::invoke(int index, const NPVariant *args,
                         return INVOKERESULT_GENERIC_ERROR;
 
                     /* get the number of subtitle available */
-                    i_limit = libvlc_video_get_spu_count(p_md, &ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    i_limit = libvlc_video_get_spu_count(p_md);
 
                     /* check if a number is given by the user
                      * and get the subtitle number */
@@ -1346,29 +1339,25 @@ LibvlcVideoNPObject::getProperty(int index, NPVariant &result)
         {
             case ID_video_fullscreen:
             {
-                int val = p_plugin->get_fullscreen(&ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int val = p_plugin->get_fullscreen();
                 BOOLEAN_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_video_height:
             {
-                int val = libvlc_video_get_height(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int val = libvlc_video_get_height(p_md);
                 INT32_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_video_width:
             {
-                int val = libvlc_video_get_width(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int val = libvlc_video_get_width(p_md);
                 INT32_TO_NPVARIANT(val, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_video_aspectratio:
             {
-                NPUTF8 *psz_aspect = libvlc_video_get_aspect_ratio(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                NPUTF8 *psz_aspect = libvlc_video_get_aspect_ratio(p_md);
                 if( !psz_aspect )
                     return INVOKERESULT_GENERIC_ERROR;
 
@@ -1377,15 +1366,13 @@ LibvlcVideoNPObject::getProperty(int index, NPVariant &result)
             }
             case ID_video_subtitle:
             {
-                int i_spu = libvlc_video_get_spu(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int i_spu = libvlc_video_get_spu(p_md);
                 INT32_TO_NPVARIANT(i_spu, result);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_video_crop:
             {
-                NPUTF8 *psz_geometry = libvlc_video_get_crop_geometry(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                NPUTF8 *psz_geometry = libvlc_video_get_crop_geometry(p_md);
                 if( !psz_geometry )
                     return INVOKERESULT_GENERIC_ERROR;
 
@@ -1447,8 +1434,7 @@ LibvlcVideoNPObject::setProperty(int index, const NPVariant &value)
                 }
 
                 int val = NPVARIANT_TO_BOOLEAN(value);
-                p_plugin->set_fullscreen(val, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                p_plugin->set_fullscreen(val);
                 return INVOKERESULT_NO_ERROR;
             }
             case ID_video_aspectratio:
@@ -1466,9 +1452,8 @@ LibvlcVideoNPObject::setProperty(int index, const NPVariant &value)
                     return INVOKERESULT_GENERIC_ERROR;
                 }
 
-                libvlc_video_set_aspect_ratio(p_md, psz_aspect, &ex);
+                libvlc_video_set_aspect_ratio(p_md, psz_aspect);
                 free(psz_aspect);
-                RETURN_ON_EXCEPTION(this,ex);
 
                 return INVOKERESULT_NO_ERROR;
             }
@@ -1476,8 +1461,7 @@ LibvlcVideoNPObject::setProperty(int index, const NPVariant &value)
             {
                 if( isNumberValue(value) )
                 {
-                    libvlc_video_set_spu(p_md, numberValue(value), &ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    libvlc_video_set_spu(p_md, numberValue(value));
 
                     return INVOKERESULT_NO_ERROR;
                 }
@@ -1498,9 +1482,8 @@ LibvlcVideoNPObject::setProperty(int index, const NPVariant &value)
                     return INVOKERESULT_GENERIC_ERROR;
                 }
 
-                libvlc_video_set_crop_geometry(p_md, psz_geometry, &ex);
+                libvlc_video_set_crop_geometry(p_md, psz_geometry);
                 free(psz_geometry);
-                RETURN_ON_EXCEPTION(this,ex);
 
                 return INVOKERESULT_NO_ERROR;
             }
@@ -1556,8 +1539,7 @@ LibvlcVideoNPObject::invoke(int index, const NPVariant *args,
             {
                 if( argCount == 0 )
                 {
-                    p_plugin->toggle_fullscreen(&ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    p_plugin->toggle_fullscreen();
                     VOID_TO_NPVARIANT(result);
                     return INVOKERESULT_NO_ERROR;
                 }
@@ -2003,8 +1985,7 @@ LibvlcDeinterlaceNPObject::invoke(int index, const NPVariant *args,
     switch( index )
     {
     case ID_deint_disable:
-        libvlc_video_set_deinterlace(p_md, 0, "", &ex);
-        RETURN_ON_EXCEPTION(this,ex);
+        libvlc_video_set_deinterlace(p_md, NULL);
         break;
 
     case ID_deint_enable:
@@ -2012,9 +1993,8 @@ LibvlcDeinterlaceNPObject::invoke(int index, const NPVariant *args,
             return INVOKERESULT_INVALID_VALUE;
 
         psz = stringValue( NPVARIANT_TO_STRING( args[0] ) );
-        libvlc_video_set_deinterlace(p_md, 1, psz, &ex);
+        libvlc_video_set_deinterlace(p_md, psz);
         free(psz);
-        RETURN_ON_EXCEPTION(this,ex);
         break;
 
     default:

@@ -535,7 +535,7 @@ void VlcPlugin::playlist_delete_item( int idx, libvlc_exception_t *ex )
     libvlc_media_list_unlock(libvlc_media_list);
 }
 
-void VlcPlugin::playlist_clear( libvlc_exception_t *ex )
+void VlcPlugin::playlist_clear()
 {
     if( libvlc_media_list )
         libvlc_media_list_release(libvlc_media_list);
@@ -551,25 +551,25 @@ int VlcPlugin::playlist_count()
     return items_count;
 }
 
-void VlcPlugin::toggle_fullscreen( libvlc_exception_t *ex )
+void VlcPlugin::toggle_fullscreen()
 {
     if( playlist_isplaying() )
-        libvlc_toggle_fullscreen(libvlc_media_player,ex);
+        libvlc_toggle_fullscreen(libvlc_media_player);
 }
-void VlcPlugin::set_fullscreen( int yes, libvlc_exception_t *ex )
+void VlcPlugin::set_fullscreen( int yes)
 {
     if( playlist_isplaying() )
-        libvlc_set_fullscreen(libvlc_media_player,yes,ex);
+        libvlc_set_fullscreen(libvlc_media_player,yes);
 }
-int  VlcPlugin::get_fullscreen( libvlc_exception_t *ex )
+int  VlcPlugin::get_fullscreen()
 {
     int r = 0;
     if( playlist_isplaying() )
-        r = libvlc_get_fullscreen(libvlc_media_player,ex);
+        r = libvlc_get_fullscreen(libvlc_media_player);
     return r;
 }
 
-bool  VlcPlugin::player_has_vout( libvlc_exception_t *ex )
+bool  VlcPlugin::player_has_vout()
 {
     bool r = false;
     if( playlist_isplaying() )
