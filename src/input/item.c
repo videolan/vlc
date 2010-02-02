@@ -998,15 +998,21 @@ input_item_node_t *input_item_node_Create( input_item_t *p_input )
     return p_node;
 }
 
+static void RecursiveNodeDelete( input_item_node_t *p_node )
+{
+  for( int i = 0; i < p_node->i_children; i++ )
+      RecursiveNodeDelete( p_node->pp_children[i] );
+
+  vlc_gc_decref( p_node->p_item );
+  free( p_node->pp_children );
+  free( p_node );
+}
+
 void input_item_node_Delete( input_item_node_t *p_node )
 {
-  int i;
-  for( i = 0; i < p_node->i_children; i++ )
-      input_item_node_Delete( p_node->pp_children[i] );
-
   if(  p_node->p_parent )
   {
-      for( i = 0; i < p_node->p_parent->i_children; i++ )
+      for( int i = 0; i < p_node->p_parent->i_children; i++ )
           if( p_node->p_parent->pp_children[i] == p_node )
           {
               REMOVE_ELEM( p_node->p_parent->pp_children,
@@ -1016,8 +1022,7 @@ void input_item_node_Delete( input_item_node_t *p_node )
           }
   }
 
-  vlc_gc_decref( p_node->p_item );
-  free( p_node );
+  RecursiveNodeDelete( p_node );
 }
 
 input_item_node_t *input_item_node_AppendItem( input_item_node_t *p_node, input_item_t *p_item )
