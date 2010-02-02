@@ -609,6 +609,7 @@ void PLModel::processItemAppend( int i_item, int i_parent )
     playlist_item_t *p_item = NULL;
     PLItem *newItem = NULL;
     input_thread_t *currentInputThread;
+    int pos;
 
     PLItem *nodeItem = findById( rootItem, i_parent );
     if( !nodeItem ) return;
@@ -620,6 +621,9 @@ void PLModel::processItemAppend( int i_item, int i_parent )
     p_item = playlist_ItemGetById( p_playlist, i_item );
     if( !p_item || p_item->i_flags & PLAYLIST_DBL_FLAG ) goto end;
 
+    for( pos = 0; pos < p_item->p_parent->i_children; pos++ )
+        if( p_item->p_parent->pp_children[pos] == p_item ) break;
+
     newItem = new PLItem( p_item, nodeItem );
     PL_UNLOCK;
 
@@ -628,8 +632,8 @@ void PLModel::processItemAppend( int i_item, int i_parent )
         newItem->p_input == input_GetItem( currentInputThread ) )
             currentItem = newItem;
 
-    beginInsertRows( index( nodeItem, 0 ), nodeItem->childCount(), nodeItem->childCount() );
-    nodeItem->appendChild( newItem );
+    beginInsertRows( index( nodeItem, 0 ), pos, pos );
+    nodeItem->insertChild( newItem, pos );
     endInsertRows();
 
     if( currentItem == newItem )
