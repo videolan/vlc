@@ -147,10 +147,10 @@ extern void __catch_exception( void * e, const char * function, const char * fil
 @interface VLCAudio (VLCAudioBridging)
 /* Initializers */
 /**
- * Initializes a new object using the specified library instance.
- * \return Newly created audio object using specified VLCLibrary instance.
+ * Initializes a new object using the specified mediaPlayer instance.
+ * \return Newly created audio object using specified VLCMediaPlayer instance.
  */
-- (id)initWithLibrary:(VLCLibrary *)library;
+- (id)initWithMediaPlayer:(VLCMediaPlayer *)mediaPlayer;
 @end
 
 /**

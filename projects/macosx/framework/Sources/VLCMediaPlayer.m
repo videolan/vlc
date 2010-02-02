@@ -225,6 +225,7 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
     [cachedTime release];
     [cachedRemainingTime release];
     [drawable release];
+    [audio release];
 
     [super dealloc];
 }
@@ -262,7 +263,9 @@ static void HandleMediaPlayerMediaChanged(const libvlc_event_t * event, void * s
 
 - (VLCAudio *)audio
 {
-    return [[VLCLibrary sharedLibrary] audio];
+    if (!audio)
+        audio = [[VLCAudio alloc] initWithMediaPlayer:self];
+    return audio;
 }
 
 #pragma mark -
