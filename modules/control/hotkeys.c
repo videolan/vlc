@@ -737,9 +737,10 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                 snprintf( psz_msg, sizeof(psz_msg), _("%.2fx"), f_rate );
                 vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN, "%s", psz_msg );
             }
-            else if( i_action == ACTIONID_POSITION && b_seekable )
+            else if( i_action == ACTIONID_POSITION )
             {
-                DisplayPosition( p_intf, p_vout, p_input );
+                if( ( !p_vout || vout_OSDEpg( p_vout, input_GetItem( p_input ) ) ) && b_seekable )
+                    DisplayPosition( p_intf, p_vout, p_input );
             }
             else if( i_action >= ACTIONID_PLAY_BOOKMARK1 &&
                      i_action <= ACTIONID_PLAY_BOOKMARK10 )
