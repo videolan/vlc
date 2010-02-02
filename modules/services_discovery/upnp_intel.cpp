@@ -659,7 +659,7 @@ void MediaServer::fetchContents()
     _contents = root;
     _contents->setInputItem( _inputItem );
 
-    _buildPlaylist( _contents );
+    _buildPlaylist( _contents, NULL );
 }
 
 bool MediaServer::_fetchContents( Container* parent )
@@ -780,17 +780,23 @@ bool MediaServer::_fetchContents( Container* parent )
     return true;
 }
 
-void MediaServer::_buildPlaylist( Container* parent )
+void MediaServer::_buildPlaylist( Container* parent, input_item_node_t *p_input_node )
 {
+    bool send = p_input_node == NULL;
+    if( send )
+        p_input_node = input_item_node_Create( parent->getInputItem() );
+
     for ( unsigned int i = 0; i < parent->getNumContainers(); i++ )
     {
         Container* container = parent->getContainer( i );
 
         input_item_t* p_input_item = input_item_New( _p_sd, "vlc://nop", parent->getTitle() ); 
         input_item_AddSubItem( parent->getInputItem(), p_input_item );
+        input_item_node_t *p_new_node =
+            input_item_node_AppendItem( p_input_node, p_input_item );
 
         container->setInputItem( p_input_item );
-        _buildPlaylist( container );
+        _buildPlaylist( container, p_new_node );
     }
 
     for ( unsigned int i = 0; i < parent->getNumItems(); i++ )
@@ -802,7 +808,14 @@ void MediaServer::_buildPlaylist( Container* parent )
                                                item->getTitle() );
         assert( p_input_item );
         input_item_AddSubItem( parent->getInputItem(), p_input_item );
+        input_item_node_AppendItem( p_input_node, p_input_item );
         item->setInputItem( p_input_item );
+    }
+
+    if( send )
+    {
+        input_item_AddSubItemTree( p_input_node );
+        input_item_node_Delete( p_input_node );
     }
 }
 
