@@ -176,6 +176,7 @@ bool EventObj::insert(const NPString &s, NPObject *l, bool b)
             return false;
         i->get(e);
     }
+    return true;
 }
 
 
@@ -203,6 +204,8 @@ bool EventObj::remove(const NPString &s, NPObject *l, bool b)
     }
     if(!any)
         unask_for_event(e);
+
+    return true;
 }
 
 
