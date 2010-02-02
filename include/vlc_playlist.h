@@ -368,7 +368,6 @@ VLC_EXPORT( int, playlist_NodeRemoveItem, (playlist_t *,playlist_item_t*,playlis
 VLC_EXPORT( playlist_item_t *, playlist_ChildSearchName, (playlist_item_t*, const char* ) );
 VLC_EXPORT( int, playlist_NodeDelete, ( playlist_t *, playlist_item_t *, bool , bool ) );
 
-VLC_EXPORT( playlist_item_t *, playlist_GetPreferredNode, ( playlist_t *p_playlist, playlist_item_t *p_node ) );
 VLC_EXPORT( playlist_item_t *, playlist_GetNextLeaf, ( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) );
 VLC_EXPORT( playlist_item_t *, playlist_GetPrevLeaf, ( playlist_t *p_playlist, playlist_item_t *p_root, playlist_item_t *p_item, bool b_ena, bool b_unplayed ) );
 

@@ -327,7 +327,6 @@ playlist_CurrentPlayingItem
 playlist_DeleteFromInput
 playlist_Export
 playlist_GetNextLeaf
-playlist_GetPreferredNode
 playlist_GetPrevLeaf
 playlist_Import
 playlist_IsServicesDiscoveryLoaded

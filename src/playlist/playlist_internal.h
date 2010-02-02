@@ -144,8 +144,6 @@ int playlist_DeleteFromInputInParent( playlist_t *, input_item_t *,
 int playlist_DeleteFromItemId( playlist_t*, int );
 int playlist_ItemRelease( playlist_item_t * );
 
-
-void playlist_NodesPairCreate( playlist_t *, const char *, playlist_item_t **, playlist_item_t **, bool );
 int playlist_NodeEmpty( playlist_t *, playlist_item_t *, bool );
 int playlist_DeleteItem( playlist_t * p_playlist, playlist_item_t *, bool);
 
