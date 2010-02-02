@@ -100,8 +100,9 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
         p_item = playlist_InsertInputItemTree( p_playlist, p_item,
                                                p_new_root, 0, false );
 
+    if( !b_flat ) var_SetAddress( p_playlist, "leaf-to-parent", p_input );
 
-    if( b_stop )
+    if( b_stop && !b_flat )
     {
         PL_UNLOCK;
         playlist_Stop( p_playlist );
