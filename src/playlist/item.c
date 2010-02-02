@@ -38,6 +38,11 @@ static void ChangeToNode( playlist_t *p_playlist, playlist_item_t *p_item );
 
 static playlist_item_t *ItemToNode( playlist_t *, playlist_item_t *, bool );
 
+static int RecursiveAddIntoParent (
+                playlist_t *p_playlist, playlist_item_t *p_parent,
+                input_item_node_t *p_node, int i_pos, bool b_flat,
+                playlist_item_t **pp_first_leaf );
+
 /*****************************************************************************
  * An input item has gained subitems (Event Callback)
  *****************************************************************************/
@@ -95,13 +100,14 @@ static void input_item_add_subitem_tree ( const vlc_event_t * p_event,
         p_item = playlist_InsertInputItemTree( p_playlist, p_item,
                                                p_new_root, 0, false );
 
+
     if( b_stop )
     {
         PL_UNLOCK;
         playlist_Stop( p_playlist );
         return;
     }
-    else if( b_play  )
+    else if( b_play )
     {
         playlist_Control( p_playlist, PLAYLIST_VIEWPLAY,
                           pl_Locked, get_current_status_node( p_playlist ), p_item );
@@ -456,49 +462,12 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
  * \param b_flat TRUE if the new tree contents should be flattened into a list
  * \return the first new leaf inserted (in playing order)
  */
-
 playlist_item_t *playlist_InsertInputItemTree (
     playlist_t *p_playlist, playlist_item_t *p_parent,
     input_item_node_t *p_node, int i_pos, bool b_flat )
 {
   playlist_item_t *p_first_leaf = NULL;
-
-  if( p_parent->i_children == -1 ) ChangeToNode( p_playlist, p_parent );
-
-  if( i_pos == PLAYLIST_END ) i_pos = p_parent->i_children;
-
-  for( int i = 0; i < p_node->i_children; i++, i_pos++ )
-  {
-      playlist_item_t *p_child = NULL;
-      if( b_flat ? p_node->pp_children[i]->i_children == 0 : 1 )
-      {
-          printf("creating a leaf: %i\n", i_pos);
-          p_child = playlist_NodeAddInput( p_playlist,
-                                 p_node->pp_children[i]->p_item,
-                                 p_parent,
-                                 PLAYLIST_INSERT, i_pos,
-                                 pl_Locked );
-          printf("leaf done\n");
-      }
-      if( p_node->pp_children[i]->i_children > 0 )
-      {
-          if( b_flat )
-          {
-              printf("flat -> subnode into parent\n");
-              p_child = playlist_InsertInputItemTree( p_playlist, p_parent,
-                                       p_node->pp_children[i], i_pos, true );
-              i_pos += p_node->i_children - 1; /* i_pos += 1 on loop */
-          }
-          else
-          {
-              printf("tree -> subnode on its own\n");
-              p_child = playlist_InsertInputItemTree( p_playlist, p_child,
-                                       p_node->pp_children[i], 0, false );
-          }
-      }
-      if( i == 0 ) p_first_leaf = p_child;
-  }
-  printf("leaving a node\n");
+  RecursiveAddIntoParent ( p_playlist, p_parent, p_node, i_pos, b_flat, &p_first_leaf );
   return p_first_leaf;
 }
 
@@ -842,4 +811,47 @@ int playlist_DeleteItem( playlist_t * p_playlist, playlist_item_t *p_item,
     playlist_ItemRelease( p_item );
 
     return VLC_SUCCESS;
+}
+
+static int RecursiveAddIntoParent (
+    playlist_t *p_playlist, playlist_item_t *p_parent,
+    input_item_node_t *p_node, int i_pos, bool b_flat,
+    playlist_item_t **pp_first_leaf )
+{
+  if( p_parent->i_children == -1 ) ChangeToNode( p_playlist, p_parent );
+
+  if( i_pos == PLAYLIST_END ) i_pos = p_parent->i_children;
+
+  for( int i = 0; i < p_node->i_children; i++ )
+  {
+      playlist_item_t *p_child = NULL;
+      if( b_flat ? p_node->pp_children[i]->i_children == 0 : 1 )
+      {
+          p_child = playlist_NodeAddInput( p_playlist,
+                                 p_node->pp_children[i]->p_item,
+                                 p_parent,
+                                 PLAYLIST_INSERT, i_pos,
+                                 pl_Locked );
+          i_pos++;
+      }
+      if( p_node->pp_children[i]->i_children > 0 )
+      {
+          if( b_flat )
+          {
+              i_pos = RecursiveAddIntoParent(
+                                      p_playlist, p_parent,
+                                      p_node->pp_children[i], i_pos, true,
+                                      &p_child );
+          }
+          else
+          {
+              RecursiveAddIntoParent( p_playlist, p_child,
+                                      p_node->pp_children[i], 0, false,
+                                      &p_child );
+          }
+      }
+      assert( p_child != NULL );
+      if( i == 0 ) *pp_first_leaf = p_child;
+  }
+  return i_pos;
 }
