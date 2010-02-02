@@ -348,7 +348,8 @@ static int WindowOpen( vlc_object_t *p_this )
     if( pIntf == NULL )
         return VLC_EGENERIC;
 
-    if( !config_GetInt( pIntf, "skinned-video") )
+    if( !config_GetInt( pIntf, "skinned-video") ||
+        pWnd->cfg->is_standalone )
     {
         vlc_object_release( pIntf );
         return VLC_EGENERIC;
