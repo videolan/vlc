@@ -198,11 +198,7 @@ static int RemoveActivated( extensions_manager_t *p_mgr, extension_t *p_ext )
 /** Wait for an extension to finish */
 void WaitForDeactivation( extension_t *p_ext )
 {
-    void *pointer = NULL;
-    vlc_mutex_lock( &p_ext->p_sys->command_lock );
-    vlc_cond_signal( &p_ext->p_sys->wait );
-    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
-    vlc_join( p_ext->p_sys->thread, &pointer );
+    vlc_join( p_ext->p_sys->thread, NULL );
 }
 
 /** Push a UI command */
