@@ -753,7 +753,7 @@ endif
 package-win32-xpi: package-win-common-strip
 	mkdir -p "$(win32_xpi_destdir)/plugins"
 	cp $(top_builddir)/projects/mozilla/install.rdf "$(win32_xpi_destdir)"
-	cp $(win32_destdir)/mozilla//npvlc$(LIBEXT) \
+	cp $(win32_destdir)/mozilla/npvlc$(LIBEXT) \
 		"$(win32_xpi_destdir)/plugins"
 	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest \
 		"$(win32_xpi_destdir)/plugins"
@@ -766,6 +766,8 @@ package-win32-xpi: package-win-common-strip
 	mkdir -p "$(win32_xpi_destdir)/plugins/plugins"
 	cp $(win32_destdir)/plugins/*$(LIBEXT) \
 		"$(win32_xpi_destdir)/plugins/plugins"
+	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*qt*"
+	rm -rf "$(win32_xpi_destdir)/plugins/plugins/*skins*"
 	cd $(win32_xpi_destdir) && zip -r vlc-$(VERSION).xpi install.rdf plugins
 
 package-win32-base-debug: package-win-common
