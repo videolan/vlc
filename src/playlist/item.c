@@ -717,16 +717,16 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
         pl_priv(p_playlist)->request.i_status = PLAYLIST_RUNNING;
         vlc_cond_signal( &pl_priv(p_playlist)->signal );
     }
-    /* Preparse if not enough meta */
+    /* Preparse if no artist/album info, and hasn't been preparsed allready
+       and if user has some preparsing option (auto-preparse variable)
+       enabled*/
     char *psz_artist = input_item_GetArtist( p_item->p_input );
     char *psz_album = input_item_GetAlbum( p_item->p_input );
     if( pl_priv(p_playlist)->b_auto_preparse &&
+        input_item_IsPreparsed( p_item->p_input ) == false &&
             ( EMPTY_STR( psz_artist ) || ( EMPTY_STR( psz_album ) ) )
           )
         playlist_PreparseEnqueue( p_playlist, p_item->p_input, pl_Locked );
-    /* If we already have it, signal it */
-    else if( !EMPTY_STR( psz_artist ) && !EMPTY_STR( psz_album ) )
-        input_item_SetPreparsed( p_item->p_input, true );
     free( psz_artist );
     free( psz_album );
 }
