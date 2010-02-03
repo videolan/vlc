@@ -105,6 +105,7 @@ Maemo port:
 Misc:
  * new sqlite module
  * --save-config command line option not supported anymore.
+ * Fixed and reenabled netsync module.
 
 Bindings:
  * new C++ wrapper around libVLC: libVLCpp
