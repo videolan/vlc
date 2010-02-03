@@ -179,6 +179,8 @@ ExtensionTab::ExtensionTab( intf_thread_t *p_intf )
 
     // ListView
     extList = new QListView( this );
+    CONNECT( extList, activated( const QModelIndex& ),
+             this, moreInformation() );
     layout->addWidget( extList );
 
     // List item delegate
