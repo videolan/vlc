@@ -5,6 +5,7 @@
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
+ *          Fabio Ritrovato <exsephiroth87 at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,6 +48,15 @@
 /*****************************************************************************
  *
  *****************************************************************************/
+static int vlclua_node_add_subitem( lua_State * );
+static int vlclua_node_add_node( lua_State * );
+
+static const luaL_Reg vlclua_node_reg[] = {
+    { "add_subitem", vlclua_node_add_subitem },
+    { "add_node", vlclua_node_add_node },
+    { NULL, NULL }
+};
+
 static int vlclua_sd_get_services_names( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
@@ -99,6 +109,191 @@ static int vlclua_sd_is_loaded( lua_State *L )
     return 1;
 }
 
+static int vlclua_sd_add_node( lua_State *L )
+{
+    services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
+    if( lua_istable( L, -1 ) )
+    {
+        lua_getfield( L, -1, "title" );
+        if( lua_isstring( L, -1 ) )
+        {
+            input_item_t *p_input = input_item_New( p_sd, "vlc://nop",
+                                                    strdup( lua_tostring( L, -1 ) ) );
+            lua_pop( L, 1 );
+            lua_getfield( L, -1, "arturl" );
+            if( lua_isstring( L, -1 ) )
+            {
+                char *psz_value = strdup( lua_tostring( L, -1 ) );
+                EnsureUTF8( psz_value );
+                msg_Dbg( p_sd, "ArtURL: %s", psz_value );
+                input_item_SetArtURL( p_input, psz_value );
+                free( psz_value );
+            }
+            services_discovery_AddItem( p_sd, p_input, NULL );
+            input_item_t **udata = (input_item_t **)
+                                   lua_newuserdata( L, sizeof( input_item_t * ) );
+            *udata = p_input;
+            if( luaL_newmetatable( L, "node" ) )
+            {
+                lua_newtable( L );
+                luaL_register( L, NULL, vlclua_node_reg );
+                lua_setfield( L, -2, "__index" );
+            }
+            lua_setmetatable( L, -2 );
+        }
+        else
+            msg_Err( p_sd, "vlc.sd.add_node: the \"title\" parameter can't be empty" );
+    }
+    else
+        msg_Err( p_sd, "Error parsing add_node arguments" );
+    return 1;
+}
+
+static int vlclua_sd_add_item( lua_State *L )
+{
+    services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
+    if( lua_istable( L, -1 ) )
+    {
+        lua_getfield( L, -1, "url" );
+        if( lua_isstring( L, -1 ) )
+        {
+            input_item_t *p_input = input_item_New( p_sd,
+                                                    strdup( lua_tostring( L, -1 ) ),
+                                                    strdup( lua_tostring( L, -1 ) ) );
+            lua_pop( L, 1 );
+            vlclua_read_meta_data( p_sd, L, p_input );
+            /* This one is to be tested... */
+            vlclua_read_custom_meta_data( p_sd, L, p_input );
+            lua_getfield( L, -1, "duration" );
+            if( lua_isnumber( L, -1 ) )
+               input_item_SetDuration( p_input, (lua_tonumber( L, -1 )*1e6) );
+            else if( !lua_isnil( L, -1 ) )
+                msg_Warn( p_sd, "Item duration should be a number (in seconds)." );
+            lua_pop( L, 1 );
+            services_discovery_AddItem( p_sd, p_input, NULL );
+            input_item_t **udata = (input_item_t **)
+                                   lua_newuserdata( L, sizeof( input_item_t * ) );
+            *udata = p_input;
+            if( luaL_newmetatable( L, "input_item_t" ) )
+            {
+                lua_pushstring( L, "none of your business" );
+                lua_setfield( L, -2, "__metatable" );
+            }
+            lua_setmetatable( L, -2 );
+        }
+        else
+            msg_Err( p_sd, "vlc.sd.add_item: the \"url\" parameter can't be empty" );
+    }
+    else
+        msg_Err( p_sd, "Error parsing add_item arguments" );
+    return 1;
+}
+
+static int vlclua_sd_remove_item( lua_State *L )
+{
+    services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
+    if( !lua_isnil( L, -1 ) )
+    {
+        input_item_t **pp_input = luaL_checkudata( L, -1, "input_item_t" );
+        if( *pp_input )
+            services_discovery_RemoveItem( p_sd, *pp_input );
+    }
+    return 1;
+}
+
+static int vlclua_node_add_subitem( lua_State *L )
+{
+    services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
+    input_item_t **pp_node = (input_item_t **)luaL_checkudata( L, 1, "node" );
+    if( *pp_node )
+    {
+        if( lua_istable( L, -1 ) )
+        {
+            lua_getfield( L, -1, "url" );
+            if( lua_isstring( L, -1 ) )
+            {
+                input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
+                input_item_t *p_input = input_item_New( p_sd,
+                                                        strdup( lua_tostring( L, -1 ) ),
+                                                        strdup( lua_tostring( L, -1 ) ) );
+                lua_pop( L, 1 );
+                vlclua_read_meta_data( p_sd, L, p_input );
+                /* This one is to be tested... */
+                vlclua_read_custom_meta_data( p_sd, L, p_input );
+                lua_getfield( L, -1, "duration" );
+                if( lua_isnumber( L, -1 ) )
+                    input_item_SetDuration( p_input, (lua_tonumber( L, -1 )*1e6) );
+                else if( !lua_isnil( L, -1 ) )
+                    msg_Warn( p_sd, "Item duration should be a number (in seconds)." );
+                lua_pop( L, 1 );
+                input_item_node_AppendItem( p_input_node, p_input );
+                input_item_node_PostAndDelete( p_input_node );
+                input_item_t **udata = (input_item_t **)
+                                       lua_newuserdata( L, sizeof( input_item_t * ) );
+                *udata = p_input;
+                if( luaL_newmetatable( L, "input_item_t" ) )
+                {
+                    lua_pushstring( L, "none of your business" );
+                    lua_setfield( L, -2, "__metatable" );
+                }
+                lua_setmetatable( L, -2 );
+            }
+            else
+                msg_Err( p_sd, "node:add_subitem: the \"url\" parameter can't be empty" );
+        }
+        else
+            msg_Err( p_sd, "Error parsing add_subitem arguments" );
+    }
+    return 1;
+}
+
+static int vlclua_node_add_node( lua_State *L )
+{
+    services_discovery_t *p_sd = (services_discovery_t *)vlclua_get_this( L );
+    input_item_t **pp_node = (input_item_t **)luaL_checkudata( L, 1, "node" );
+    if( *pp_node )
+    {
+        if( lua_istable( L, -1 ) )
+        {
+            lua_getfield( L, -1, "title" );
+            if( lua_isstring( L, -1 ) )
+            {
+                input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
+                input_item_t *p_input = input_item_New( p_sd,
+                                                        "vlc://nop",
+                                                        strdup( lua_tostring( L, -1 ) ) );
+                lua_pop( L, 1 );
+                lua_getfield( L, -1, "arturl" );
+                if( lua_isstring( L, -1 ) )
+                {
+                    char *psz_value = strdup( lua_tostring( L, -1 ) );
+                    EnsureUTF8( psz_value );
+                    msg_Dbg( p_sd, "ArtURL: %s", psz_value );
+                    input_item_SetArtURL( p_input, psz_value );
+                    free( psz_value );
+                }
+                input_item_node_AppendItem( p_input_node, p_input );
+                input_item_node_PostAndDelete( p_input_node );
+                input_item_t **udata = (input_item_t **)
+                                       lua_newuserdata( L, sizeof( input_item_t * ) );
+                *udata = p_input;
+                if( luaL_newmetatable( L, "node" ) )
+                {
+                    lua_newtable( L );
+                    luaL_register( L, NULL, vlclua_node_reg );
+                    lua_setfield( L, -2, "__index" );
+                }
+                lua_setmetatable( L, -2 );
+            }
+            else
+                msg_Err( p_sd, "node:add_node: the \"title\" parameter can't be empty" );
+        }
+        else
+            msg_Err( p_sd, "Error parsing add_node arguments" );
+    }
+    return 1;
+}
+
 /*****************************************************************************
  *
  *****************************************************************************/
@@ -107,6 +302,9 @@ static const luaL_Reg vlclua_sd_reg[] = {
     { "add", vlclua_sd_add },
     { "remove", vlclua_sd_remove },
     { "is_loaded", vlclua_sd_is_loaded },
+    { "add_node", vlclua_sd_add_node },
+    { "add_item", vlclua_sd_add_item },
+    { "remove_item", vlclua_sd_remove_item },
     { NULL, NULL }
 };
 
