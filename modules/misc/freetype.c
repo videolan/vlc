@@ -114,7 +114,7 @@ static void Destroy( vlc_object_t * );
 #define FONTSIZER_TEXT N_("Relative font size")
 #define FONTSIZER_LONGTEXT N_("This is the relative default size of the " \
     "fonts that will be rendered on the video. If absolute font size is set, "\
-    "relative size will be overriden." )
+    "relative size will be overridden." )
 
 static const int pi_sizes[] = { 20, 18, 16, 12, 6 };
 static const char *const ppsz_sizes_text[] = {

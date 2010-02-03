@@ -393,7 +393,7 @@ VLC_PUBLIC_API void *
  * will duplicate the entries in the array each time.
  *
  * \param p_md media descriptor object
- * \param pp_es adress to store an allocated array of Elementary Streams descriptions (must be freed by the caller)
+ * \param pp_es address to store an allocated array of Elementary Streams descriptions (must be freed by the caller)
  *
  * return the number of Elementary Streams
  */
