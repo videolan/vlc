@@ -28,8 +28,9 @@ using namespace libvlc;
 
 Media::Media( libVLC &libvlcInstance, const char *psz_mrl )
 {
-    Exception ex;
-    m_media = libvlc_media_new( libvlcInstance.m_instance, psz_mrl, &ex.ex );
+    m_media = libvlc_media_new( libvlcInstance.m_instance, psz_mrl );
+    if( !m_media )
+        throw libvlc_errmsg();
 }
 
 Media::Media( const Media& original )
@@ -54,8 +55,7 @@ void Media::addOption( const char *ppsz_options, libvlc_media_option_t flag )
 
 int64_t Media::duration()
 {
-    Exception ex;
-    return libvlc_media_get_duration( m_media, &ex.ex );
+    return libvlc_media_get_duration( m_media );
 }
 
 int Media::isPreparsed()

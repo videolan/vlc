@@ -28,6 +28,8 @@ using namespace libvlc;
 MediaPlayer::MediaPlayer( libVLC &libvlcInstance )
 {
     m_player = libvlc_media_player_new( libvlcInstance.m_instance );
+    if( !m_player )
+        throw libvlc_errmsg();
     m_audio.setMediaPlayer( m_player );
     m_video.setMediaPlayer( m_player );
 }
@@ -35,7 +37,10 @@ MediaPlayer::MediaPlayer( libVLC &libvlcInstance )
 MediaPlayer::MediaPlayer( Media &media )
 {
     m_player = libvlc_media_player_new_from_media( media.m_media );
+    if( !m_player )
+        throw libvlc_errmsg();
     m_audio.setMediaPlayer( m_player );
+    m_video.setMediaPlayer( m_player );
 }
 
 MediaPlayer::~MediaPlayer()
