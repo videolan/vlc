@@ -9,3 +9,9 @@ SOURCES_growl_udp = growl_udp.c
 SOURCES_notify = notify.c
 SOURCES_xosd = xosd.c
 SOURCES_telepathy = telepathy.c
+
+if HAVE_WIN32
+if !HAVE_WINCE
+libvlc_LTLIBRARIES += libmsn_plugin.la
+endif
+endif
