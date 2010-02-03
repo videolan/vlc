@@ -862,8 +862,12 @@ static int vlclua_dialog_delete_widget( lua_State *L )
 
     vlc_mutex_lock( &p_dlg->lock );
 
-    /* Same remarks as for dialog delete */
-    while( p_widget->p_sys_intf != NULL )
+    /* Same remarks as for dialog delete.
+     * If the dialog is deleted or about to be deleted, then there is no
+     * need to wait on this particular widget that already doesn't exist
+     * anymore in the UI */
+    while( p_widget->p_sys_intf != NULL && !p_dlg->b_kill
+           && p_dlg->p_sys_intf != NULL )
     {
         vlc_cond_wait( &p_dlg->cond, &p_dlg->lock );
     }
