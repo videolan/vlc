@@ -111,4 +111,7 @@ int lua_ExtensionWidgetClick( extensions_manager_t *p_mgr,
 int lua_ExtensionTriggerMenu( extensions_manager_t *p_mgr,
                               extension_t *p_ext, int id );
 
+/* Dialog specific */
+int lua_DialogFlush( lua_State *L );
+
 #endif // LUA_EXTENSION_H

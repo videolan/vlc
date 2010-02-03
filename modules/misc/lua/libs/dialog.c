@@ -53,6 +53,8 @@ static int vlclua_dialog_delete( lua_State *L );
 static int vlclua_dialog_show( lua_State *L );
 static int vlclua_dialog_hide( lua_State *L );
 static int vlclua_dialog_flush( lua_State *L );
+static void lua_SetDialogUpdate( lua_State *L, int flag )
+static int lua_GetDialogUpdate( lua_State *L )
 
 static int vlclua_dialog_add_button( lua_State *L );
 static int vlclua_dialog_add_label( lua_State *L );
@@ -128,7 +130,8 @@ static const luaL_Reg vlclua_widget_reg[] = {
 };
 
 /** Private static variable used for the registry index */
-static const char key_opaque = 'A';
+static const char key_opaque = 'A',
+                  key_update = 'B';
 
 /**
  * Open dialog library for Lua
@@ -148,6 +151,9 @@ void luaopen_dialog( lua_State *L, void *opaque )
     lua_pushlightuserdata( L, (void*) &key_opaque );
     lua_pushlightuserdata( L, opaque );
     lua_settable( L, LUA_REGISTRYINDEX );
+
+    /* Add private data: dialog update flag */
+    lua_SetDialogUpdate( L, 0 );
 }
 
 static int vlclua_dialog_create( lua_State *L )
@@ -207,9 +213,9 @@ static int vlclua_dialog_create( lua_State *L )
     lua_setmetatable( L, -2 );
 
     msg_Dbg( p_this, "Creating dialog '%s'", psz_title );
-    int i_ret = dialog_ExtensionUpdate( p_this, p_dlg );
+    lua_SetDialogUpdate( L, 0 );
 
-    return ( i_ret == VLC_SUCCESS ) ? 1 : 0;
+    return 1;
 }
 
 static int vlclua_dialog_delete( lua_State *L )
@@ -233,13 +239,16 @@ static int vlclua_dialog_delete( lua_State *L )
 
     assert( !p_dlg->b_kill );
 
+    /* Immediately deleting the dialog */
     msg_Dbg( p_mgr, "Deleting dialog '%s'", p_dlg->psz_title );
     p_dlg->b_kill = true;
+    lua_SetDialogUpdate( L, 0 ); // Reset the update flag
     dialog_ExtensionUpdate( p_mgr, p_dlg );
 
     /* After dialog_ExtensionUpdate, the UI thread must take the lock asap and
      * then signal us when it's done deleting the dialog.
      */
+    msg_Dbg( p_mgr, "Waiting for the dialog to be deleted..." );
     vlc_mutex_lock( &p_dlg->lock );
     while( p_dlg->p_sys_intf != NULL )
     {
@@ -290,7 +299,7 @@ static int vlclua_dialog_show( lua_State *L )
     extension_dialog_t *p_dlg = *pp_dlg;
 
     p_dlg->b_hide = false;
-    dialog_ExtensionUpdate( p_mgr, p_dlg );
+    lua_SetDialogUpdate( L, 1 );
 
     return 1;
 }
@@ -307,7 +316,7 @@ static int vlclua_dialog_hide( lua_State *L )
     extension_dialog_t *p_dlg = *pp_dlg;
 
     p_dlg->b_hide = true;
-    dialog_ExtensionUpdate( p_mgr, p_dlg );
+    lua_SetDialogUpdate( L, 1 );
 
     return 1;
 }
@@ -324,9 +333,56 @@ static int vlclua_dialog_flush( lua_State *L )
         return luaL_error( L, "Can't get pointer to dialog" );
     extension_dialog_t *p_dlg = *pp_dlg;
 
+    // Updating dialog immediately
     dialog_ExtensionUpdate( p_mgr, p_dlg );
 
+    // Reset update flag
+    lua_SetDialogUpdate( L, 0 );
+
     return 1;
+}
+
+static void lua_SetDialogUpdate( lua_State *L, int flag )
+{
+    /* Set entry in the Lua registry */
+    lua_pushlightuserdata( L, (void*) &key_update );
+    lua_pushinteger( L, flag );
+    lua_settable( L, LUA_REGISTRYINDEX ); 
+}
+
+static int lua_GetDialogUpdate( lua_State *L )
+{
+    /* Read entry in the Lua registry */
+    lua_pushlightuserdata( L, (void*) &key_update );
+    lua_gettable( L, LUA_REGISTRYINDEX );
+    return luaL_checkinteger( L, -1 );
+}
+
+/** Manually flush a dialog
+ * This can be called after a lua_pcall
+ * @return SUCCESS if there is no dialog or the update was successful
+ * @todo If there can be multiple dialogs, this function will have to
+ * be fixed (lookup for dialog)
+ */
+int lua_DialogFlush( lua_State *L )
+{
+    lua_getglobal( L, "vlc" );
+    lua_getfield( L, -1, "__dialog" );
+    extension_dialog_t *p_dlg = ( extension_dialog*t )
+            lua_topointer( L, lua_gettop( L ) );
+
+    if( !p_dlg )
+        return VLC_SUCCESS;
+
+    int i_ret = VLC_SUCCESS;
+    if( lua_GetDialogUpdate( L ) )
+    {
+        i_ret = dialog_ExtensionUpdate( vlclua_get_this( L ),
+                                        p_dlg );
+        lua_SetDialogUpdate( L, 0 );
+    }
+
+    return i_ret;
 }
 
 /**
@@ -508,11 +564,9 @@ end_of_args:
     }
     lua_setmetatable( L, -2 );
 
-    /* Signal interface */
-    vlc_object_t *p_mgr = vlclua_get_this( L );
-    int i_ret = dialog_ExtensionUpdate( p_mgr, p_dlg );
+    lua_SetDialogUpdate( L, 1 );
 
-    return ( i_ret == VLC_SUCCESS ) ? 1 : 0;
+    return 1;
 }
 
 static int vlclua_widget_set_text( lua_State *L )
@@ -555,9 +609,7 @@ static int vlclua_widget_set_text( lua_State *L )
 
     vlc_mutex_unlock( &p_widget->p_dialog->lock );
 
-    /* Update dialog */
-    vlc_object_t *p_mgr = vlclua_get_this( L );
-    dialog_ExtensionUpdate( p_mgr, p_widget->p_dialog );
+    lua_SetDialogUpdate( L, 1 );
 
     return 1;
 }
@@ -660,8 +712,7 @@ static int vlclua_widget_add_value( lua_State *L )
     p_widget->b_update = true;
     vlc_mutex_unlock( &p_widget->p_dialog->lock );
 
-    vlc_object_t *p_mgr = vlclua_get_this( L );
-    dialog_ExtensionUpdate( p_mgr, p_widget->p_dialog );
+    lua_SetDialogUpdate( L, 1 );
 
     return 1;
 }
@@ -732,8 +783,7 @@ static int vlclua_widget_clear( lua_State *L )
 
     vlc_mutex_unlock( &p_widget->p_dialog->lock );
 
-    vlc_object_t *p_mgr = vlclua_get_this( L );
-    dialog_ExtensionUpdate( p_mgr, p_widget->p_dialog );
+    lua_SetDialogUpdate( L, 1 );
 
     return 1;
 }
@@ -801,9 +851,7 @@ static int vlclua_widget_set_checked( lua_State *L )
     {
         /* Signal interface of the change */
         p_widget->b_update = true;
-
-        vlc_object_t *p_mgr = vlclua_get_this( L );
-        dialog_ExtensionUpdate( p_mgr, p_widget->p_dialog );
+        lua_SetDialogUpdate( L, 1 );
     }
 
     return 1;
@@ -812,6 +860,7 @@ static int vlclua_widget_set_checked( lua_State *L )
 /**
  * Delete a widget from a dialog
  * Remove it from the list once it has been safely destroyed by the interface
+ * @note This will always flush the dialog
  **/
 static int vlclua_dialog_delete_widget( lua_State *L )
 {
@@ -840,6 +889,7 @@ static int vlclua_dialog_delete_widget( lua_State *L )
 
     p_widget->b_kill = true;
 
+    lua_SetDialogUpdate( L, 0 ); // Reset update flag
     int i_ret = dialog_ExtensionUpdate( p_mgr, p_dlg );
 
     if( i_ret != VLC_SUCCESS )
