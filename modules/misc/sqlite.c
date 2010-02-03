@@ -451,9 +451,10 @@ static int CommitTransaction( sql_t* p_sql )
         msg_Warn( p_sql, "sqlite3 error: %d: %s",
                   sqlite3_errcode( p_sql->p_sys->db ),
                   sqlite3_errmsg( p_sql->p_sys->db ) );
-        vlc_mutex_unlock( &p_sql->p_sys->trans_lock );
         i_ret = VLC_EGENERIC;
     }
+    else
+        vlc_mutex_unlock( &p_sql->p_sys->trans_lock );
     vlc_mutex_unlock( &p_sql->p_sys->lock );
     return i_ret;
 }
