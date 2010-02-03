@@ -763,9 +763,8 @@ package-win32-xpi: package-win-common-strip
 		"$(win32_xpi_destdir)/plugins"
 	cp "$(win32_destdir)/libvlc$(LIBEXT)" \
 		"$(win32_xpi_destdir)/plugins"
-
 	mkdir -p "$(win32_xpi_destdir)/plugins/plugins"
-	cp "$(win32_destdir)/plugins/*$(LIBEXT)" \
+	cp $(win32_destdir)/plugins/*$(LIBEXT) \
 		"$(win32_xpi_destdir)/plugins/plugins"
 	cd $(win32_xpi_destdir) && zip -r vlc-$(VERSION).xpi install.rdf plugins
 
