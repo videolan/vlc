@@ -4455,7 +4455,7 @@ AM_CONDITIONAL(LOADER, [test "${enable_loader}" = "yes"])
 AS_IF([test "${enable_loader}" = "yes"],
   [ VLC_ADD_PLUGIN([dmo])
     VLC_ADD_CPPFLAGS([dmo quicktime realvideo],[-I\\\${top_srcdir}/libs/loader])
-    VLC_ADD_LIBS([dmo quicktime realvideo],[-I\\\${top_builddir}/libs/loader/libloader.a])
+    VLC_ADD_LIBS([dmo quicktime realvideo],[\\\${top_builddir}/libs/loader/libloader.la])
     VLC_ADD_CPPFLAGS([realvideo], [-DLOADER])
     VLC_ADD_LIBS([dmo quicktime], [-lpthread])
   ])
