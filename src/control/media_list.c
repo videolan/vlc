@@ -124,21 +124,17 @@ notify_item_deletion( libvlc_media_list_t * p_mlist,
 
 /**************************************************************************
  *       static mlist_is_writable (private)
- *
- * Raise exception and return 0 when the media_list instance is read-only,
- * or else return 1.
  **************************************************************************/
 static inline
-int mlist_is_writable( libvlc_media_list_t *p_mlist, libvlc_exception_t *p_e )
+bool mlist_is_writable( libvlc_media_list_t *p_mlist )
 {
     if( !p_mlist||p_mlist->b_read_only )
     {
         /* We are read-only from user side */
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "Attempt to write a read-only media list" );
-        return 0;
+        return false;
     }
-    return 1;
+    return true;
 }
 
 /*
@@ -273,9 +269,11 @@ libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
         return;
     }
 
-    libvlc_media_list_add_media( p_mlist, p_md, p_e );
-    if( libvlc_exception_raised( p_e ) )
+    if( libvlc_media_list_add_media( p_mlist, p_md ) )
+    {
+        libvlc_exception_raise( p_e );
         return;
+    }
 
     input_Read( p_mlist->p_libvlc_instance->p_libvlc_int, p_input_item );
 
@@ -334,13 +332,13 @@ int libvlc_media_list_count( libvlc_media_list_t * p_mlist )
  *
  * Lock should be held when entering.
  **************************************************************************/
-void libvlc_media_list_add_media(
-                                   libvlc_media_list_t * p_mlist,
-                                   libvlc_media_t * p_md,
-                                   libvlc_exception_t * p_e )
+int libvlc_media_list_add_media( libvlc_media_list_t * p_mlist,
+                                 libvlc_media_t * p_md )
 {
-    if( mlist_is_writable(p_mlist,p_e) )
-        _libvlc_media_list_add_media( p_mlist, p_md );
+    if( !mlist_is_writable(p_mlist) )
+        return -1;
+    _libvlc_media_list_add_media( p_mlist, p_md );
+    return 0;
 }
 
 /* LibVLC internal version */
@@ -361,14 +359,14 @@ void _libvlc_media_list_add_media( libvlc_media_list_t * p_mlist,
  *
  * Lock should be hold when entering.
  **************************************************************************/
-void libvlc_media_list_insert_media(
-                                   libvlc_media_list_t * p_mlist,
-                                   libvlc_media_t * p_md,
-                                   int index,
-                                   libvlc_exception_t * p_e )
+int libvlc_media_list_insert_media( libvlc_media_list_t * p_mlist,
+                                    libvlc_media_t * p_md,
+                                    int index )
 {
-    if( mlist_is_writable(p_mlist,p_e) )
-        _libvlc_media_list_insert_media( p_mlist, p_md, index );
+    if( !mlist_is_writable(p_mlist) )
+        return -1;
+    _libvlc_media_list_insert_media( p_mlist, p_md, index );
+    return 0;
 }
 
 /* LibVLC internal version */
@@ -389,26 +387,24 @@ void _libvlc_media_list_insert_media(
  *
  * Lock should be held when entering.
  **************************************************************************/
-void libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
-                                     int index,
-                                     libvlc_exception_t * p_e )
+int libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
+                                     int index )
 {
-    if( mlist_is_writable(p_mlist,p_e) )
-        _libvlc_media_list_remove_index( p_mlist, index, p_e );
+    if( !mlist_is_writable(p_mlist) )
+        return -1;
+    return _libvlc_media_list_remove_index( p_mlist, index );
 }
 
 /* LibVLC internal version */
-void _libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
-                                     int index,
-                                     libvlc_exception_t * p_e )
+int _libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
+                                     int index )
 {
     libvlc_media_t * p_md;
 
     if( index < 0 || index >= vlc_array_count( &p_mlist->items ))
     {
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "Index out of bounds" );
-        return;
+        return -1;
     }
 
     p_md = vlc_array_item_at_index( &p_mlist->items, index );
@@ -418,6 +414,7 @@ void _libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
     notify_item_deletion( p_mlist, p_md, index, EventDidHappen );
 
     libvlc_media_release( p_md );
+    return 0;
 }
 
 /**************************************************************************
@@ -427,14 +424,12 @@ void _libvlc_media_list_remove_index( libvlc_media_list_t * p_mlist,
  **************************************************************************/
 libvlc_media_t *
 libvlc_media_list_item_at_index( libvlc_media_list_t * p_mlist,
-                                 int index,
-                                 libvlc_exception_t * p_e )
+                                 int index )
 {
     libvlc_media_t * p_md;
 
     if( index < 0 || index >= vlc_array_count( &p_mlist->items ))
     {
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "Index out of bounds" );
         return NULL;
     }

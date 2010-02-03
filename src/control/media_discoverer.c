@@ -118,10 +118,10 @@ static void services_discovery_item_removed( const vlc_event_t * p_event,
     libvlc_media_list_lock( p_mdis->p_mlist );
     for( i = 0; i < count; i++ )
     {
-        p_md = libvlc_media_list_item_at_index( p_mdis->p_mlist, i, NULL );
+        p_md = libvlc_media_list_item_at_index( p_mdis->p_mlist, i );
         if( p_md->p_input_item == p_item )
         {
-            _libvlc_media_list_remove_index( p_mdis->p_mlist, i, NULL );
+            _libvlc_media_list_remove_index( p_mdis->p_mlist, i );
             break;
         }
     }

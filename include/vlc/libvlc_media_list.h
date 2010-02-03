@@ -103,12 +103,10 @@ VLC_PUBLIC_API libvlc_media_t *
  *
  * \param p_ml a media list instance
  * \param p_mi a media instance
- * \param p_e initialized exception object
+ * \return 0 on success, -1 if the media list is read-only
  */
-VLC_PUBLIC_API void
-    libvlc_media_list_add_media( libvlc_media_list_t *,
-                                            libvlc_media_t *,
-                                            libvlc_exception_t * );
+VLC_PUBLIC_API int
+libvlc_media_list_add_media( libvlc_media_list_t *, libvlc_media_t * );
 
 /**
  * Insert media instance in media list on a position
@@ -117,24 +115,22 @@ VLC_PUBLIC_API void
  * \param p_ml a media list instance
  * \param p_mi a media instance
  * \param i_pos position in array where to insert
- * \param p_e initialized exception object
+ * \return 0 on success, -1 if the media list si read-only
  */
-VLC_PUBLIC_API void
-    libvlc_media_list_insert_media( libvlc_media_list_t *,
-                                               libvlc_media_t *,
-                                               int,
-                                               libvlc_exception_t * );
+VLC_PUBLIC_API int
+libvlc_media_list_insert_media( libvlc_media_list_t *,
+                                libvlc_media_t *, int );
+
 /**
  * Remove media instance from media list on a position
  * The libvlc_media_list_lock should be held upon entering this function.
  *
  * \param p_ml a media list instance
  * \param i_pos position in array where to insert
- * \param p_e initialized exception object
+ * \return 0 on success, -1 if the list is read-only or the item was not found
  */
-VLC_PUBLIC_API void
-    libvlc_media_list_remove_index( libvlc_media_list_t *, int,
-                                    libvlc_exception_t * );
+VLC_PUBLIC_API int
+libvlc_media_list_remove_index( libvlc_media_list_t *, int );
 
 /**
  * Get count on media list items
@@ -152,12 +148,12 @@ VLC_PUBLIC_API int
  *
  * \param p_ml a media list instance
  * \param i_pos position in array where to insert
- * \param p_e initialized exception object
- * \return media instance at position i_pos and libvlc_media_retain() has been called to increase the refcount on this object.
+ * \return media instance at position i_pos, or NULL if not found.
+ * In case of success, libvlc_media_retain() is called to increase the refcount
+ * on the media.
  */
 VLC_PUBLIC_API libvlc_media_t *
-    libvlc_media_list_item_at_index( libvlc_media_list_t *, int,
-                                     libvlc_exception_t * );
+    libvlc_media_list_item_at_index( libvlc_media_list_t *, int );
 /**
  * Find index position of List media instance in media list.
  * Warning: the function will return the first matched position.

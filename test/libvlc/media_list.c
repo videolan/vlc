@@ -28,6 +28,7 @@ static void test_media_list (const char ** argv, int argc)
     libvlc_instance_t *vlc;
     libvlc_media_t *md1, *md2, *md3, *md4;
     libvlc_media_list_t *ml;
+    int ret;
 
     log ("Testing media_list\n");
 
@@ -45,30 +46,30 @@ static void test_media_list (const char ** argv, int argc)
     md3 = libvlc_media_new (vlc, "/dev/null");
     assert (md3 != NULL);
 
-    libvlc_media_list_add_media (ml, md1, &ex);
-    catch ();
-    libvlc_media_list_add_media (ml, md2, &ex);
-    catch ();
+    ret = libvlc_media_list_add_media (ml, md1);
+    assert (!ret);
+    ret = libvlc_media_list_add_media (ml, md2);
+    assert (!ret);
 
     assert( libvlc_media_list_count (ml) == 2 );
     assert( libvlc_media_list_index_of_item (ml, md1) == 0 );
     assert( libvlc_media_list_index_of_item (ml, md2) == 1 );
 
-    libvlc_media_list_remove_index (ml, 0, &ex);  /* removing first item */
-    catch ();
+    ret = libvlc_media_list_remove_index (ml, 0);  /* removing first item */
+    assert (!ret);
 
     /* test if second item was moved on first place */
     assert( libvlc_media_list_index_of_item (ml, md2) == 0 );
-    libvlc_media_list_add_media (ml, md1, &ex); /* add 2 items */
-    catch ();
-    libvlc_media_list_add_media (ml, md1, &ex);
-    catch ();
+    ret = libvlc_media_list_add_media (ml, md1); /* add 2 items */
+    assert (!ret);
+    ret = libvlc_media_list_add_media (ml, md1);
+    assert (!ret);
 
     /* there should be 3 pieces */
     assert( libvlc_media_list_count (ml) == 3 );
 
-    libvlc_media_list_insert_media (ml, md3, 2, &ex);
-    catch ();
+    ret = libvlc_media_list_insert_media (ml, md3, 2);
+    assert (!ret);
 
     /* there should be 4 pieces */
     assert( libvlc_media_list_count (ml) == 4 );
@@ -77,33 +78,31 @@ static void test_media_list (const char ** argv, int argc)
     assert( libvlc_media_list_index_of_item (ml, md3) == 2 );
 
     /* test right returning descriptor*/
-    assert ( libvlc_media_list_item_at_index (ml, 0, &ex) == md2 );
-    catch ();
+    assert ( libvlc_media_list_item_at_index (ml, 0) == md2 );
 
-    assert ( libvlc_media_list_item_at_index (ml, 2, &ex) == md3 );
-    catch ();
+    assert ( libvlc_media_list_item_at_index (ml, 2) == md3 );
 
     /* test if give exceptions, when it should */
     /* have 4 items, so index 4 should give exception */
-    libvlc_media_list_remove_index (ml, 4, &ex);
-    assert (have_exception ());
+    ret = libvlc_media_list_remove_index (ml, 4);
+    assert (ret == -1);
 
-    libvlc_media_list_remove_index (ml, 100, &ex);
-    assert (have_exception ());
+    ret = libvlc_media_list_remove_index (ml, 100);
+    assert (ret == -1);
 
-    libvlc_media_list_remove_index (ml, -1, &ex);
-    assert (have_exception ());
+    ret = libvlc_media_list_remove_index (ml, -1);
+    assert (ret == -1);
 
     /* getting non valid items */
     libvlc_media_t * p_non_exist =
-        libvlc_media_list_item_at_index (ml, 4, &ex);
-    assert (have_exception ());
+        libvlc_media_list_item_at_index (ml, 4);
+    assert (p_non_exist == NULL);
 
-    p_non_exist = libvlc_media_list_item_at_index (ml, 100, &ex);
-    assert (have_exception ());
+    p_non_exist = libvlc_media_list_item_at_index (ml, 100);
+    assert (p_non_exist == NULL);
 
-    p_non_exist = libvlc_media_list_item_at_index (ml, -1, &ex);
-    assert (have_exception ());
+    p_non_exist = libvlc_media_list_item_at_index (ml, -1);
+    assert (p_non_exist == NULL);
 
     md4 = libvlc_media_new (vlc, "/dev/null");
     assert (md4 != NULL);

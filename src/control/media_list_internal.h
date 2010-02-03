@@ -64,8 +64,7 @@ void _libvlc_media_list_insert_media(
         libvlc_media_list_t * p_mlist,
         libvlc_media_t * p_md, int index );
 
-void _libvlc_media_list_remove_index(
-        libvlc_media_list_t * p_mlist, int index,
-        libvlc_exception_t * p_e );
+int _libvlc_media_list_remove_index(
+        libvlc_media_list_t * p_mlist, int index );
 
 #endif
