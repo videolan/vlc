@@ -173,7 +173,7 @@ void PLSelector::setSource( QTreeWidgetItem *item )
 
     if( i_type == SD_TYPE )
     {
-        pl_item = playlist_ChildSearchName( THEPL->p_root, qtu( item->data(0, LONGNAME_ROLE ).toString() ) );
+        pl_item = playlist_ChildSearchName( THEPL->p_root, qtu( item->data(0, NAME_ROLE ).toString() ) );
         if( item->data( 0, SPECIAL_ROLE ).toInt() == IS_PODCAST )
         {
             if( pl_item && !sd_loaded )

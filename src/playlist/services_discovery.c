@@ -280,10 +280,13 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
     if( !p_sd )
         return VLC_ENOMEM;
 
-    module_t *m = module_find_by_shortcut( psz_module );
+    char *psz_name = NULL;
+    config_ChainCreate( &psz_name, &p_sd->p_cfg, psz_module );
+
+    module_t *m = module_find_by_shortcut( psz_name );
     if( !m )
     {
-        msg_Err( p_playlist, "No such module: %s", psz_module );
+        msg_Err( p_playlist, "No such module: %s", psz_name );
         vlc_sd_Destroy( p_sd );
         return VLC_EGENERIC;
     }
@@ -300,7 +303,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
     playlist_item_t *p_node;
 
     PL_LOCK;
-    p_node = playlist_NodeCreate( p_playlist, module_get_name( m, true ),
+    p_node = playlist_NodeCreate( p_playlist, psz_module,
                                   p_playlist->p_root, 0, NULL );
     PL_UNLOCK;
     module_release( m );
@@ -313,7 +316,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
                       vlc_ServicesDiscoveryItemRemoved,
                       playlist_sd_item_removed, p_node );
 
-    if( !vlc_sd_Start( p_sd, psz_module ) )
+    if( !vlc_sd_Start( p_sd, psz_name ) )
     {
         vlc_sd_Destroy( p_sd );
         free( p_sds );

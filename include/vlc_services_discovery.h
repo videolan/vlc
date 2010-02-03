@@ -48,6 +48,8 @@ struct services_discovery_t
 
     vlc_event_manager_t event_manager;      /* Accessed through Setters for non class function */
 
+    config_chain_t *p_cfg;
+
     services_discovery_sys_t *p_sys;
 };
 
