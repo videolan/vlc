@@ -723,6 +723,7 @@ int libvlc_vlm_get_media_instance_rate( libvlc_instance_t *p_instance,
     return result;
 }
 
+#if 0
 int libvlc_vlm_get_media_instance_title( libvlc_instance_t *p_instance,
                                          const char *psz_name, int i_instance )
 {
@@ -758,6 +759,7 @@ int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *p_instance,
         vlm_media_instance_Delete( p_mi );
     return p_mi ? 0 : -1;
 }
+#endif
 
 libvlc_event_manager_t *
 libvlc_vlm_get_event_manager( libvlc_instance_t *p_instance )

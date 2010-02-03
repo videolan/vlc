@@ -293,7 +293,7 @@ VLC_PUBLIC_API int libvlc_vlm_get_media_instance_length( libvlc_instance_t *,
  */
 VLC_PUBLIC_API int libvlc_vlm_get_media_instance_rate( libvlc_instance_t *,
                                                        const char *, int );
-
+#if 0
 /**
  * Get vlm_media instance title number by name or instance id
  * \bug will always return 0
@@ -326,7 +326,7 @@ VLC_PUBLIC_API int libvlc_vlm_get_media_instance_chapter( libvlc_instance_t *,
  */
 VLC_PUBLIC_API int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *,
                                                            const char *, int );
-
+#endif
 /**
  * Get libvlc_event_manager from a vlm media.
  * The p_event_manager is immutable, so you don't have to hold the lock
