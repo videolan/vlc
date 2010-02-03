@@ -37,12 +37,15 @@
 #define KEY_MODIFIER_COMMAND 0x10000000
 
 #define KEY_UNSET            0x00000000
+#define KEY_BACKSPACE              0x08
+#define KEY_TAB                    0x09
+#define KEY_ENTER                  0x0D
+#define KEY_ESC                    0x1B
 /* End of Unicode range:     0x0010FFFF */
 #define KEY_LEFT             0x00210000
 #define KEY_RIGHT            0x00220000
 #define KEY_UP               0x00230000
 #define KEY_DOWN             0x00240000
-#define KEY_ENTER            0x00260000
 #define KEY_F1               0x00270000
 #define KEY_F2               0x00280000
 #define KEY_F3               0x00290000
@@ -60,11 +63,8 @@
 #define KEY_INSERT           0x00350000
 #define KEY_DELETE           0x00360000
 #define KEY_MENU             0x00370000
-#define KEY_ESC              0x00380000
 #define KEY_PAGEUP           0x00390000
 #define KEY_PAGEDOWN         0x003A0000
-#define KEY_TAB              0x003B0000
-#define KEY_BACKSPACE        0x003C0000
 
 #define KEY_BROWSER_BACK     0x003F0000
 #define KEY_BROWSER_FORWARD  0x00400000

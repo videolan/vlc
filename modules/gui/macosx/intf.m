@@ -1289,7 +1289,6 @@ static struct
     { NSCarriageReturnCharacter, KEY_ENTER },
     { NSEnterCharacter, KEY_ENTER },
     { NSBackspaceCharacter, KEY_BACKSPACE },
-    { (unichar) 0x1b, KEY_ESC },
     {0,0}
 };
 
