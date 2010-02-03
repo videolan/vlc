@@ -382,7 +382,6 @@ static bool parse_track_dict( demux_t *p_demux, input_item_node_t *p_input_node,
         msg_Info( p_demux, "Adding '%s'", psz_uri );
 
         p_new_input = input_item_New( p_demux, psz_uri, NULL );
-        input_item_AddSubItem( p_input_node->p_item, p_new_input );
         input_item_node_AppendItem( p_input_node, p_new_input );
 
         /* add meta info */

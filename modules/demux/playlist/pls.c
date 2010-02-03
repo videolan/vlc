@@ -163,7 +163,6 @@ static int Demux( demux_t *p_demux )
             {
                 p_input = input_item_New( p_demux, psz_mrl, psz_name );
                 input_item_CopyOptions( p_current_input, p_input );
-                input_item_AddSubItem( p_current_input, p_input );
                 input_item_node_AppendItem( p_subitems, p_input );
                 vlc_gc_decref( p_input );
             }
@@ -219,7 +218,6 @@ static int Demux( demux_t *p_demux )
     {
         p_input = input_item_New( p_demux, psz_mrl, psz_name );
         input_item_CopyOptions( p_current_input, p_input );
-        input_item_AddSubItem( p_current_input, p_input );
         input_item_node_AppendItem( p_subitems, p_input );
         vlc_gc_decref( p_input );
         free( psz_mrl_orig );

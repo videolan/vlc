@@ -122,7 +122,6 @@ static int Demux( demux_t *p_demux )
 
         p_input = input_item_NewExt( p_demux, "dvb://", psz_name,
                                      i_options, (const char**)ppsz_options, VLC_INPUT_OPTION_TRUSTED, -1 );
-        input_item_AddSubItem( p_current_input, p_input );
         input_item_node_AppendItem( p_subitems, p_input );
         vlc_gc_decref( p_input );
 

@@ -129,7 +129,6 @@ int Demux( demux_t *p_demux )
         input_item_t *p_new_input = p_demux->p_sys->pp_tracklist[i];
         if( p_new_input )
         {
-            input_item_AddSubItem( p_current_input, p_new_input );
             input_item_node_AppendItem( p_subitems, p_new_input );
         }
     }
@@ -508,7 +507,6 @@ static bool parse_track_node COMPLEX_INTERFACE
 
                     if( p_sys->i_track_id < 0 )
                     {
-                        input_item_AddSubItem( p_input_item, p_new_input );
                         input_item_node_AppendNode( p_input_node, p_new_node );
                         vlc_gc_decref( p_new_input );
                         return true;
@@ -724,7 +722,6 @@ static bool parse_extension_node COMPLEX_INTERFACE
                           ITEM_TYPE_DIRECTORY );
         if( p_new_input )
         {
-            input_item_AddSubItem( p_input_item, p_new_input );
             p_input_node =
                 input_item_node_AppendItem( p_input_node, p_new_input );
             p_input_item = p_new_input;
@@ -917,7 +914,6 @@ static bool parse_extitem_node COMPLEX_INTERFACE
     p_new_input = p_demux->p_sys->pp_tracklist[ i_tid ];
     if( p_new_input )
     {
-        input_item_AddSubItem( p_input_node->p_item, p_new_input );
         input_item_node_AppendItem( p_input_node, p_new_input );
         vlc_gc_decref( p_new_input );
         p_demux->p_sys->pp_tracklist[i_tid] = NULL;

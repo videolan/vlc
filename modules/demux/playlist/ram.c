@@ -327,7 +327,6 @@ static int Demux( demux_t *p_demux )
             if( !EMPTY_STR( psz_cdnum ) ) input_item_SetTrackNum( p_input, psz_cdnum );
             if( !EMPTY_STR( psz_comments ) ) input_item_SetDescription( p_input, psz_comments );
 
-            input_item_AddSubItem( p_current_input, p_input );
             input_item_node_AppendItem( p_subitems, p_input );
             vlc_gc_decref( p_input );
             free( psz_mrl );

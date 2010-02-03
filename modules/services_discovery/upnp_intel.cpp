@@ -790,8 +790,7 @@ void MediaServer::_buildPlaylist( Container* parent, input_item_node_t *p_input_
     {
         Container* container = parent->getContainer( i );
 
-        input_item_t* p_input_item = input_item_New( _p_sd, "vlc://nop", parent->getTitle() ); 
-        input_item_AddSubItem( parent->getInputItem(), p_input_item );
+        input_item_t* p_input_item = input_item_New( _p_sd, "vlc://nop", parent->getTitle() );
         input_item_node_t *p_new_node =
             input_item_node_AppendItem( p_input_node, p_input_item );
 
@@ -807,14 +806,12 @@ void MediaServer::_buildPlaylist( Container* parent, input_item_node_t *p_input_
                                                item->getResource(),
                                                item->getTitle() );
         assert( p_input_item );
-        input_item_AddSubItem( parent->getInputItem(), p_input_item );
         input_item_node_AppendItem( p_input_node, p_input_item );
         item->setInputItem( p_input_item );
     }
 
     if( send )
     {
-        input_item_AddSubItemTree( p_input_node );
         input_item_node_Delete( p_input_node );
     }
 }

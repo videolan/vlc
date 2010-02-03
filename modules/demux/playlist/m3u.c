@@ -227,7 +227,6 @@ static int Demux( demux_t *p_demux )
                 input_item_SetArtist( p_input, psz_artist );
             if( psz_name ) input_item_SetTitle( p_input, psz_name );
 
-            input_item_AddSubItem( p_current_input, p_input );
             input_item_node_AppendItem( p_subitems, p_input );
             vlc_gc_decref( p_input );
         }

@@ -102,7 +102,6 @@ static int Demux( demux_t *p_demux )
                 psz_uri = ProcessMRL( psz_uri, p_demux->p_sys->psz_prefix );
                 p_input = input_item_NewExt( p_demux, psz_uri, psz_uri,
                                         0, NULL, 0, -1 );
-                input_item_AddSubItem( p_current_input, p_input );
                 input_item_node_AppendItem( p_subitems, p_input );
                 vlc_gc_decref( p_input );
             }

@@ -118,16 +118,53 @@ struct input_item_node_t
 VLC_EXPORT( void, input_item_CopyOptions, ( input_item_t *p_parent, input_item_t *p_child ) );
 VLC_EXPORT( void, input_item_SetName, ( input_item_t *p_item, const char *psz_name ) );
 
-/* This won't hold the item, but can tell to interested third parties
+/**
+ * Add one subitem to this item
+ *
+ * This won't hold the item, but can tell to interested third parties
  * Like the playlist, that there is a new sub item. With this design
  * It is not the input item's responsability to keep all the ref of
  * the input item children. */
 VLC_EXPORT( void, input_item_AddSubItem, ( input_item_t *p_parent, input_item_t *p_child ) );
 
+
+/**
+ * Start adding multiple subitems at once.
+ *
+ * This is a hint for the client that he should probably wait for
+ * input_item_AddSubItemTree()'s input_item_subitemtree_added event before
+ * processing any added subitem.
+ */
+VLC_EXPORT( input_item_node_t *, input_item_node_Create, ( input_item_t *p_input ) );
+
+/**
+ * Notify that we are done adding subitems to this tree.
+ *
+ * This send a input_item_subitemtree_added event.
+ */
 VLC_EXPORT( void, input_item_AddSubItemTree, ( input_item_node_t *p_root ) );
 
-/* Will send vlc_InputItemSubItemTreeAdded event, just as input_item_AddSubItemTree */
-VLC_EXPORT( void, input_item_AddSubItem2, ( input_item_t *p_parent, input_item_t *p_child ) );
+/**
+ * Add a subitem to this input_item and to this input_item_node.
+ *
+ * An input_item_subitem_added event will be sent right away.
+ */
+VLC_EXPORT( input_item_node_t *, input_item_node_AppendItem, ( input_item_node_t *p_node, input_item_t *p_item ) );
+
+/**
+ * Add a subitem to this input_item and to this input_item_node.
+ *
+ * An input_item_subitem_added event will be sent right away for the subitem
+ * pointed by input_item_node_t.
+ */
+VLC_EXPORT( void, input_item_node_AppendNode, ( input_item_node_t *p_node, input_item_node_t *p_item ) );
+
+/**
+ * Delete the result of input_item_node_Create().
+ */
+VLC_EXPORT( void, input_item_node_Delete, ( input_item_node_t *p_node ) );
+
+
 
 
 /**
@@ -224,14 +261,6 @@ VLC_EXPORT( input_item_t *, __input_item_NewExt, (vlc_object_t *, const char *ps
  * Provided for convenience.
  */
 #define input_item_New( a,b,c ) input_item_NewExt( a, b, c, 0, NULL, 0, -1 )
-
-VLC_EXPORT( input_item_node_t *, input_item_node_Create, ( input_item_t *p_input ) );
-
-VLC_EXPORT( void, input_item_node_Delete, ( input_item_node_t *p_node ) );
-
-VLC_EXPORT( input_item_node_t *, input_item_node_AppendItem, ( input_item_node_t *p_node, input_item_t *p_item ) );
-
-VLC_EXPORT( void, input_item_node_AppendNode, ( input_item_node_t *p_node, input_item_node_t *p_item ) );
 
 /******************
  * Input stats

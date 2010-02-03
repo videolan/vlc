@@ -169,7 +169,7 @@ int Import_SGIMB( vlc_object_t * p_this )
             p_demux->p_sys->i_sid = 0;
             p_demux->p_sys->b_rtsp_kasenna = false;
             p_demux->p_sys->b_concert = false;
- 
+
             return VLC_SUCCESS;
         }
     }
@@ -379,7 +379,7 @@ static int Demux ( demux_t *p_demux )
     p_child = input_item_NewWithType( VLC_OBJECT(p_demux), p_sys->psz_uri,
                       p_sys->psz_name ? p_sys->psz_name : p_sys->psz_uri,
                       0, NULL, 0, p_sys->i_duration, ITEM_TYPE_NET );
- 
+
     if( !p_child )
     {
         msg_Err( p_demux, "A valid playlistitem could not be created" );
@@ -403,7 +403,6 @@ static int Demux ( demux_t *p_demux )
         input_item_AddOption( p_child, "rtsp-kasenna", VLC_INPUT_OPTION_TRUSTED );
 
     input_item_AddSubItem( p_current_input, p_child );
-    input_item_AddSubItem2( p_current_input, p_child );
     vlc_gc_decref( p_child );
     vlc_gc_decref(p_current_input);
     return 0; /* Needed for correct operation of go back */

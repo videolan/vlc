@@ -473,7 +473,6 @@ static int Demux( demux_t *p_demux )
                             input_item_t *p_input;
                             p_input = input_item_New( p_demux, psz_string, psz_title_asx );
                             input_item_CopyOptions( p_current_input, p_input );
-                            input_item_AddSubItem( p_current_input, p_input );
                             input_item_node_AppendItem( p_subitems, p_input );
                             vlc_gc_decref( p_input );
                             free( psz_string );
@@ -572,7 +571,6 @@ static int Demux( demux_t *p_demux )
                                 uniq_entry_ad_backup = NULL;
                                 vlc_gc_decref( uniq_entry_ad_backup );
                             }
-                            input_item_AddSubItem( p_current_input, p_entry );
                             input_item_node_AppendItem( p_subitems, p_entry );
                             vlc_gc_decref( p_entry );
                         }
@@ -650,7 +648,6 @@ static int Demux( demux_t *p_demux )
                                 if( psz_copyright_entry ) input_item_SetCopyright( p_entry, psz_copyright_entry );
                                 if( psz_moreinfo_entry ) input_item_SetURL( p_entry, psz_moreinfo_entry );
                                 if( psz_abstract_entry ) input_item_SetDescription( p_entry, psz_abstract_entry );
-                                input_item_AddSubItem( p_current_input, p_entry );
                                 input_item_node_AppendItem( p_subitems, p_entry );
                                 vlc_gc_decref( p_entry );
                             }
@@ -754,7 +751,6 @@ static int Demux( demux_t *p_demux )
         {
             msg_Dbg( p_demux, "added unique entry even if ad");
             /* If ASX contains a unique entry, we add it, it is probably not an ad */
-            input_item_AddSubItem( p_current_input, uniq_entry_ad_backup );
             input_item_node_AppendItem( p_subitems, uniq_entry_ad_backup );
             vlc_gc_decref( uniq_entry_ad_backup);
         }

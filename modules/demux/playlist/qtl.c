@@ -310,13 +310,11 @@ static int Demux( demux_t *p_demux )
                     p_input, "QuickTime Media Link", type, "%s", field ) ; }
         SADD_INFO( "href", psz_href );
         SADD_INFO( _("Mime"), psz_mimetype );
-        input_item_AddSubItem( p_current_input, p_input );
         input_item_node_AppendItem( p_subitems, p_input );
         vlc_gc_decref( p_input );
         if( psz_qtnext )
         {
             p_input = input_item_New( p_demux, psz_qtnext, NULL );
-            input_item_AddSubItem( p_current_input, p_input );
             input_item_node_AppendItem( p_subitems, p_input );
             vlc_gc_decref( p_input );
         }

@@ -577,7 +577,6 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
         snprintf( psz_num, sizeof(psz_num), "%d", 1+i );
         input_item_SetTrackNum( p_input_item, psz_num );
 
-        input_item_AddSubItem( p_current, p_input_item );
         input_item_node_AppendItem( p_root, p_input_item );
         vlc_gc_decref( p_input_item );
         free( psz_uri ); free( psz_opt ); free( psz_name );

@@ -189,7 +189,6 @@ input_GetItem
 input_item_AddInfo
 input_item_AddOption
 input_item_AddSubItem
-input_item_AddSubItem2
 input_item_AddSubItemTree
 input_item_CopyOptions
 input_item_DelInfo

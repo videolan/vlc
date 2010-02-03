@@ -183,14 +183,14 @@ void input_item_SetArtNotFound( input_item_t *p_i, bool b_not_found )
         p_i->p_meta = vlc_meta_New();
 
     int status = vlc_meta_GetStatus(p_i->p_meta);
-    
+
     if( b_not_found )
         status |= ITEM_ART_NOTFOUND;
     else
         status &= ~ITEM_ART_NOTFOUND;
-    
+
     vlc_meta_SetStatus(p_i->p_meta, status);
-    
+
     vlc_mutex_unlock( &p_i->lock );
 }
 
@@ -202,7 +202,7 @@ void input_item_SetArtFetched( input_item_t *p_i, bool b_art_fetched )
         p_i->p_meta = vlc_meta_New();
 
     int status = vlc_meta_GetStatus(p_i->p_meta);
-    
+
     if( b_art_fetched )
         status |= ITEM_ART_FETCHED;
     else
@@ -229,7 +229,7 @@ void input_item_SetMeta( input_item_t *p_i, vlc_meta_type_t meta_type, const cha
     vlc_event_send( &p_i->event_manager, &event );
 }
 
-/* FIXME GRRRRRRRRRR args should be in the reverse order to be 
+/* FIXME GRRRRRRRRRR args should be in the reverse order to be
  * consistant with (nearly?) all or copy funcs */
 void input_item_CopyOptions( input_item_t *p_parent,
                              input_item_t *p_child )
@@ -249,6 +249,15 @@ void input_item_CopyOptions( input_item_t *p_parent,
     vlc_mutex_unlock( &p_parent->lock );
 }
 
+static void notify_subitem_added(input_item_t *p_parent, input_item_t *p_child)
+{
+    /* Notify interested third parties */
+    vlc_event_t event;
+    event.type = vlc_InputItemSubItemAdded;
+    event.u.input_item_subitem_added.p_new_child = p_child;
+    vlc_event_send( &p_parent->event_manager, &event );
+}
+
 /* This won't hold the item, but can tell to interested third parties
  * Like the playlist, that there is a new sub item. With this design
  * It is not the input item's responsability to keep all the ref of
@@ -256,17 +265,15 @@ void input_item_CopyOptions( input_item_t *p_parent,
 void input_item_AddSubItem( input_item_t *p_parent, input_item_t *p_child )
 {
     vlc_mutex_lock( &p_parent->lock );
-
     p_parent->i_type = ITEM_TYPE_PLAYLIST;
-
     vlc_mutex_unlock( &p_parent->lock );
 
-    /* Notify interested third parties */
-    vlc_event_t event;
+    notify_subitem_added(p_parent, p_child);
 
-    event.type = vlc_InputItemSubItemAdded;
-    event.u.input_item_subitem_added.p_new_child = p_child;
-    vlc_event_send( &p_parent->event_manager, &event );
+    input_item_node_t *p_node = input_item_node_Create( p_parent );
+    input_item_node_AppendItem( p_node, p_child );
+    input_item_AddSubItemTree( p_node );
+    input_item_node_Delete( p_node );
 }
 
 void input_item_AddSubItemTree ( input_item_node_t *p_root )
@@ -275,14 +282,6 @@ void input_item_AddSubItemTree ( input_item_node_t *p_root )
     event.type = vlc_InputItemSubItemTreeAdded;
     event.u.input_item_subitem_tree_added.p_root = p_root;
     vlc_event_send( &p_root->p_item->event_manager, &event );
-}
-
-void input_item_AddSubItem2 ( input_item_t *p_parent, input_item_t *p_child )
-{
-    input_item_node_t *p_node = input_item_node_Create( p_parent );
-    input_item_node_AppendItem( p_node, p_child );
-    input_item_AddSubItemTree( p_node );
-    input_item_node_Delete( p_node );
 }
 
 bool input_item_HasErrorWhenReading( input_item_t *p_item )
@@ -1035,6 +1034,8 @@ input_item_node_t *input_item_node_AppendItem( input_item_node_t *p_node, input_
 
 void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t *p_child )
 {
+    notify_subitem_added(p_parent->p_item, p_child->p_item);
+
     assert( p_parent && p_child && p_child->p_parent == NULL );
     INSERT_ELEM( p_parent->pp_children,
                  p_parent->i_children,

@@ -331,7 +331,6 @@ static int Demux( demux_t *p_demux )
                                                 "%s bytes",
                                                 psz_item_size );
                     }
-                    input_item_AddSubItem( p_current_input, p_input );
                     input_item_node_AppendItem( p_subitems, p_input );
                     vlc_gc_decref( p_input );
                     FREENULL( psz_item_name );
@@ -395,7 +394,6 @@ error:
         xml_Delete( p_xml );
     if( p_subitems )
     {
-        input_item_AddSubItemTree( p_subitems );
         input_item_node_Delete( p_subitems );
     }
 
