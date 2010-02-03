@@ -112,8 +112,7 @@ static int Demux( demux_t *p_demux )
 
     }
 
-    input_item_AddSubItemTree( p_subitems );
-    input_item_node_Delete( p_subitems );
+    input_item_node_PostAndDelete( p_subitems );
 
     vlc_gc_decref(p_current_input);
     var_Destroy( p_demux, "wpl-extvlcopt" );

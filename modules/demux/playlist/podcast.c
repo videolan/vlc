@@ -368,8 +368,7 @@ static int Demux( demux_t *p_demux )
     xml_ReaderDelete( p_xml, p_xml_reader );
     xml_Delete( p_xml );
 
-    input_item_AddSubItemTree( p_subitems );
-    input_item_node_Delete( p_subitems );
+    input_item_node_PostAndDelete( p_subitems );
     vlc_gc_decref(p_current_input);
     return 0; /* Needed for correct operation of go back */
 
@@ -393,9 +392,7 @@ error:
     if( p_xml )
         xml_Delete( p_xml );
     if( p_subitems )
-    {
         input_item_node_Delete( p_subitems );
-    }
 
     vlc_gc_decref(p_current_input);
     return -1;

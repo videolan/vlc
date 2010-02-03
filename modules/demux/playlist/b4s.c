@@ -294,10 +294,7 @@ end:
     free( psz_elname );
 
     if( p_subitems )
-    {
-        input_item_AddSubItemTree( p_subitems );
-        input_item_node_Delete( p_subitems );
-    }
+        input_item_node_PostAndDelete( p_subitems );
 
     vlc_gc_decref( p_current_input );
     if( p_xml_reader )

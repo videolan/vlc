@@ -811,9 +811,7 @@ void MediaServer::_buildPlaylist( Container* parent, input_item_node_t *p_input_
     }
 
     if( send )
-    {
-        input_item_node_Delete( p_input_node );
-    }
+        input_item_node_PostAndDelete( p_input_node );
 }
 
 void MediaServer::setInputItem( input_item_t* p_input_item )

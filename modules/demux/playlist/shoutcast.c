@@ -126,7 +126,8 @@ static int Demux( demux_t *p_demux )
             goto error;
     }
 
-    input_item_AddSubItemTree( p_input_node );
+    input_item_node_PostAndDelete( p_input_node );
+    p_input_node = NULL;
 
     i_ret = 0; /* Needed for correct operation of go back */
 
@@ -136,7 +137,7 @@ error:
     if( p_xml )
         xml_Delete( p_xml );
     free( psz_eltname );
-    input_item_node_Delete( p_input_node );
+    if( p_input_node ) input_item_node_Delete( p_input_node );
     vlc_gc_decref(p_current_input);
     return i_ret;
 }

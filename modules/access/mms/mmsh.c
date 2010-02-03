@@ -166,7 +166,7 @@ int MMSHOpen( access_t *p_access )
         /** \bug we do not autodelete here */
         p_new_loc = input_item_New( p_access, psz_location, psz_location );
         input_item_t *p_item = input_GetItem( p_input );
-        input_item_AddSubItem( p_item, p_new_loc );
+        input_item_PostSubItem( p_item, p_new_loc );
 
         vlc_gc_decref( p_new_loc );
         vlc_object_release( p_input );

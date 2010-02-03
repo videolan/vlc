@@ -125,46 +125,46 @@ VLC_EXPORT( void, input_item_SetName, ( input_item_t *p_item, const char *psz_na
  * Like the playlist, that there is a new sub item. With this design
  * It is not the input item's responsability to keep all the ref of
  * the input item children. */
-VLC_EXPORT( void, input_item_AddSubItem, ( input_item_t *p_parent, input_item_t *p_child ) );
+VLC_EXPORT( void, input_item_PostSubItem, ( input_item_t *p_parent, input_item_t *p_child ) );
 
 
 /**
- * Start adding multiple subitems at once.
+ * Start adding multiple subitems.
  *
- * This is a hint for the client that he should probably wait for
- * input_item_AddSubItemTree()'s input_item_subitemtree_added event before
- * processing any added subitem.
+ * Create a root node to hold a tree of subitems for given item
  */
 VLC_EXPORT( input_item_node_t *, input_item_node_Create, ( input_item_t *p_input ) );
 
 /**
- * Notify that we are done adding subitems to this tree.
- *
- * This send a input_item_subitemtree_added event.
- */
-VLC_EXPORT( void, input_item_AddSubItemTree, ( input_item_node_t *p_root ) );
-
-/**
  * Add a subitem to this input_item and to this input_item_node.
  *
- * An input_item_subitem_added event will be sent right away.
+ * A vlc_InputItemSubItemAdded event will be sent right away.
  */
 VLC_EXPORT( input_item_node_t *, input_item_node_AppendItem, ( input_item_node_t *p_node, input_item_t *p_item ) );
 
 /**
  * Add a subitem to this input_item and to this input_item_node.
  *
- * An input_item_subitem_added event will be sent right away for the subitem
+ * A vlc_InputItemSubItemAdded event will be sent right away for the subitem
  * pointed by input_item_node_t.
  */
 VLC_EXPORT( void, input_item_node_AppendNode, ( input_item_node_t *p_node, input_item_node_t *p_item ) );
 
 /**
- * Delete the result of input_item_node_Create().
+ * Delete a node created with input_item_node_Create() and all its children.
  */
 VLC_EXPORT( void, input_item_node_Delete, ( input_item_node_t *p_node ) );
 
-
+/**
+ * End adding multiple subitems.
+ *
+ * Send a notification that the item pointed to by the given root node
+ * has created new subitems that are pointed to by all the children of the node.
+ * Then delete the node and all its children.
+ *
+ * A vlc_InputItemSubItemTreeAdded event will be sent.
+ */
+VLC_EXPORT( void, input_item_node_PostAndDelete, ( input_item_node_t *p_node ) );
 
 
 /**

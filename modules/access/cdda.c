@@ -585,8 +585,7 @@ static int GetTracks( access_t *p_access, input_item_t *p_current )
 #undef ON_EMPTY
 #undef NONEMPTY
 
-    input_item_AddSubItemTree( p_root );
-    input_item_node_Delete( p_root );
+    input_item_node_PostAndDelete( p_root );
 
     /* */
     for( int i = 0; i < i_cd_text; i++ )

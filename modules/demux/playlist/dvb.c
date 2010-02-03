@@ -132,8 +132,7 @@ static int Demux( demux_t *p_demux )
         free( psz_line );
     }
 
-    input_item_AddSubItemTree( p_subitems );
-    input_item_node_Delete( p_subitems );
+    input_item_node_PostAndDelete( p_subitems );
 
     vlc_gc_decref(p_current_input);
     return 0; /* Needed for correct operation of go back */

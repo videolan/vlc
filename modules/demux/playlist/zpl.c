@@ -168,7 +168,6 @@ static int Demux( demux_t *p_demux )
             /* create the input item */
             input_item_t *p_input = input_item_NewExt( p_demux, psz_mrl,
                                         psz_title, 0, NULL, 0, i_duration );
-            input_item_AddSubItem( p_current_input, p_input );
             input_item_node_AppendItem( p_subitems, p_input );
             FREENULL( psz_mrl );
             FREENULL( psz_title );
@@ -202,8 +201,7 @@ static int Demux( demux_t *p_demux )
         psz_line = stream_ReadLine( p_demux->s );
     }
 
-    input_item_AddSubItemTree( p_subitems );
-    input_item_node_Delete( p_subitems );
+    input_item_node_PostAndDelete( p_subitems );
 
     vlc_gc_decref(p_current_input);
     var_Destroy( p_demux, "zpl-extvlcopt" );

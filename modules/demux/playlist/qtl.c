@@ -318,8 +318,7 @@ static int Demux( demux_t *p_demux )
             input_item_node_AppendItem( p_subitems, p_input );
             vlc_gc_decref( p_input );
         }
-        input_item_AddSubItemTree( p_subitems );
-        input_item_node_Delete( p_subitems );
+        input_item_node_PostAndDelete( p_subitems );
     }
 
     i_ret = 0; /* Needed for correct operation of go back */

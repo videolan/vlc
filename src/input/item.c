@@ -262,26 +262,15 @@ static void notify_subitem_added(input_item_t *p_parent, input_item_t *p_child)
  * Like the playlist, that there is a new sub item. With this design
  * It is not the input item's responsability to keep all the ref of
  * the input item children. */
-void input_item_AddSubItem( input_item_t *p_parent, input_item_t *p_child )
+void input_item_PostSubItem( input_item_t *p_parent, input_item_t *p_child )
 {
     vlc_mutex_lock( &p_parent->lock );
     p_parent->i_type = ITEM_TYPE_PLAYLIST;
     vlc_mutex_unlock( &p_parent->lock );
 
-    notify_subitem_added(p_parent, p_child);
-
     input_item_node_t *p_node = input_item_node_Create( p_parent );
     input_item_node_AppendItem( p_node, p_child );
-    input_item_AddSubItemTree( p_node );
-    input_item_node_Delete( p_node );
-}
-
-void input_item_AddSubItemTree ( input_item_node_t *p_root )
-{
-    vlc_event_t event;
-    event.type = vlc_InputItemSubItemTreeAdded;
-    event.u.input_item_subitem_tree_added.p_root = p_root;
-    vlc_event_send( &p_root->p_item->event_manager, &event );
+    input_item_node_PostAndDelete( p_node );
 }
 
 bool input_item_HasErrorWhenReading( input_item_t *p_item )
@@ -1042,4 +1031,14 @@ void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t 
                  p_parent->i_children,
                  p_child );
     p_child->p_parent = p_parent;
+}
+
+void input_item_node_PostAndDelete( input_item_node_t *p_root )
+{
+  vlc_event_t event;
+  event.type = vlc_InputItemSubItemTreeAdded;
+  event.u.input_item_subitem_tree_added.p_root = p_root;
+  vlc_event_send( &p_root->p_item->event_manager, &event );
+
+  input_item_node_Delete( p_root );
 }

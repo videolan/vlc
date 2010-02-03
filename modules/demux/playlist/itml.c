@@ -106,8 +106,7 @@ int Demux( demux_t *p_demux )
         { {"dict",    COMPLEX_CONTENT, {.cmplx = parse_plist_dict} } };
     parse_plist_node( p_demux, p_subitems, NULL, p_xml_reader, "plist",
                       pl_elements );
-    input_item_AddSubItemTree( p_subitems );
-    input_item_node_Delete( p_subitems );
+    input_item_node_PostAndDelete( p_subitems );
 
     vlc_gc_decref(p_current_input);
 

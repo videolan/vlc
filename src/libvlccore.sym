@@ -188,8 +188,6 @@ input_DetachResource
 input_GetItem
 input_item_AddInfo
 input_item_AddOption
-input_item_AddSubItem
-input_item_AddSubItemTree
 input_item_CopyOptions
 input_item_DelInfo
 input_item_GetDuration
@@ -208,6 +206,8 @@ input_item_node_AppendItem
 input_item_node_AppendNode
 input_item_node_Create
 input_item_node_Delete
+input_item_node_PostAndDelete
+input_item_PostSubItem
 input_item_SetDuration
 input_item_SetMeta
 input_item_SetName
