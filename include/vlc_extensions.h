@@ -42,6 +42,7 @@ typedef struct extension_t {
     char *psz_version;        /**< Version (ro) */
     char *psz_url;            /**< A URL to the official page (ro) */
     char *psz_description;    /**< Full description (ro) */
+    char *psz_shortdescription; /**< Short description (eg. 1 line)  (ro) */
 
     extension_sys_t *p_sys;   /**< Reserved for the manager module */
 } extension_t;
