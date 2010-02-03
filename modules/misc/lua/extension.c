@@ -144,6 +144,7 @@ void Close_Extension( vlc_object_t *p_this )
     FOREACH_ARRAY( p_ext, p_mgr->p_sys->activated_extensions )
     {
         if( !p_ext ) break;
+        msg_Dbg( p_mgr, "Deactivating '%s'", p_ext->psz_title );
         Deactivate( p_mgr, p_ext );
         WaitForDeactivation( p_ext );
     }
@@ -791,7 +792,7 @@ int lua_ExecuteFunction( extensions_manager_t *p_mgr,
         goto exit;
     }
 
-    i_ret = VLC_SUCCESS;
+    i_ret = lua_DialogFlush( L );
 exit:
     return i_ret;
 }
@@ -831,6 +832,7 @@ int lua_ExtensionTriggerMenu( extensions_manager_t *p_mgr,
         return VLC_EGENERIC;
     }
 
+    i_ret = lua_DialogFlush( L );
     if( i_ret < VLC_SUCCESS )
     {
         msg_Dbg( p_mgr, "Something went wrong in %s (%s:%d)",

@@ -204,15 +204,10 @@ void WaitForDeactivation( extension_t *p_ext )
 }
 
 /** Push a UI command */
-int __PushCommand( extension_t *p_ext,
-                   bool b_unique,
-                   int i_command,
-                   ... )
+int __PushCommand( extension_t *p_ext,  bool b_unique, int i_command,
+                   va_list args )
 {
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
-
-    va_list args;
-    va_start( args, i_command );
 
     /* Create command */
     struct command_t *cmd = calloc( 1, sizeof( struct command_t ) );
@@ -245,8 +240,6 @@ int __PushCommand( extension_t *p_ext,
                      "Unknown command send to extension: %d", i_command );
             break;
     }
-
-    va_end( args );
 
     /* Push command to the end of the queue */
     struct command_t *last = p_ext->p_sys->command;

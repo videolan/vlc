@@ -90,12 +90,23 @@ int Activate( extensions_manager_t *p_mgr, extension_t * );
 bool IsActivated( extensions_manager_t *p_mgr, extension_t * );
 int Deactivate( extensions_manager_t *p_mgr, extension_t * );
 void WaitForDeactivation( extension_t *p_ext );
-int __PushCommand( extension_t *p_ext, bool b_unique,
-                   int i_command, ... );
-#define PushCommand( ext, cmd, ... ) \
-      __PushCommand( ext, false, cmd, ## __VA_ARGS__ )
-#define PushCommandUnique( ext, cmd, ... ) \
-      __PushCommand( ext, true, cmd, ## __VA_ARGS__ )
+int __PushCommand( extension_t *ext, bool unique, int cmd, va_list options );
+static inline int PushCommand( extension_t *ext, int cmd, ... )
+{
+    va_list args;
+    va_start( args, cmd );
+    int i_ret = __PushCommand( ext, false, cmd, args );
+    va_end( args );
+    return i_ret;
+}
+static inline int PushCommandUnique( extension_t *ext, int cmd, ... )
+{
+    va_list args;
+    va_start( args, cmd );
+    int i_ret = __PushCommand( ext, true, cmd, args );
+    va_end( args );
+    return i_ret;
+}
 bool LockExtension( extension_t *p_ext );
 void UnlockExtension( extension_t *p_ext );
 

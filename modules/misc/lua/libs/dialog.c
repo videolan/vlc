@@ -53,8 +53,9 @@ static int vlclua_dialog_delete( lua_State *L );
 static int vlclua_dialog_show( lua_State *L );
 static int vlclua_dialog_hide( lua_State *L );
 static int vlclua_dialog_flush( lua_State *L );
-static void lua_SetDialogUpdate( lua_State *L, int flag )
-static int lua_GetDialogUpdate( lua_State *L )
+static void lua_SetDialogUpdate( lua_State *L, int flag );
+static int lua_GetDialogUpdate( lua_State *L );
+int lua_DialogFlush( lua_State *L );
 
 static int vlclua_dialog_add_button( lua_State *L );
 static int vlclua_dialog_add_label( lua_State *L );
@@ -347,7 +348,7 @@ static void lua_SetDialogUpdate( lua_State *L, int flag )
     /* Set entry in the Lua registry */
     lua_pushlightuserdata( L, (void*) &key_update );
     lua_pushinteger( L, flag );
-    lua_settable( L, LUA_REGISTRYINDEX ); 
+    lua_settable( L, LUA_REGISTRYINDEX );
 }
 
 static int lua_GetDialogUpdate( lua_State *L )
@@ -368,7 +369,7 @@ int lua_DialogFlush( lua_State *L )
 {
     lua_getglobal( L, "vlc" );
     lua_getfield( L, -1, "__dialog" );
-    extension_dialog_t *p_dlg = ( extension_dialog*t )
+    extension_dialog_t *p_dlg = ( extension_dialog_t* )
             lua_topointer( L, lua_gettop( L ) );
 
     if( !p_dlg )
