@@ -27,6 +27,7 @@
 #include <QScrollBar>
 #include <QDebug>
 #include <QLabel>
+#include "qt4.hpp"
 
 ChannelsWidget::ChannelsWidget( QWidget *parent ) : QWidget( parent )
 {
@@ -77,13 +78,13 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
     for ( int i = 0; i < i_epg; ++i )
     {
         vlc_epg_t *p_epg = pp_epg[i];
-        QString channelName = QString( p_epg->psz_name );
+        QString channelName = qfu( p_epg->psz_name );
 
         for ( int j = 0; j < p_epg->i_event; ++j )
         {
             EPGEvent *item = NULL;
             vlc_epg_event_t *p_event = p_epg->pp_event[j];
-            QString eventName = QString( p_event->psz_name );
+            QString eventName = qfu( p_event->psz_name );
 
             QList<EPGEvent*> events = m_events.values( channelName );
 
@@ -94,8 +95,8 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
                 {
                     item = events.at( k );
                     item->updated = true;
-                    item->description = QString( p_event->psz_description );
-                    item->shortDescription = QString( p_event->psz_short_description );
+                    item->description = qfu( p_event->psz_description );
+                    item->shortDescription = qfu( p_event->psz_short_description );
                     item->start = QDateTime::fromTime_t( p_event->i_start );
                     item->duration = p_event->i_duration;
                     item->current = ( p_epg->p_current == p_event ) ? true : false;
@@ -111,8 +112,8 @@ void EPGWidget::updateEPG( vlc_epg_t **pp_epg, int i_epg )
             if ( !item )
             {
                 item = new EPGEvent( eventName );
-                item->description = QString( p_event->psz_description );
-                item->shortDescription = QString( p_event->psz_short_description );
+                item->description = qfu( p_event->psz_description );
+                item->shortDescription = qfu( p_event->psz_short_description );
                 item->start = QDateTime::fromTime_t( p_event->i_start );
                 item->duration = p_event->i_duration;
                 item->channelName = channelName;
