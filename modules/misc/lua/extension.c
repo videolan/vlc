@@ -170,6 +170,11 @@ void Close_Extension( vlc_object_t *p_this )
             lua_close( p_ext->p_sys->L );
         free( p_ext->psz_name );
         free( p_ext->psz_title );
+        free( p_ext->psz_author );
+        free( p_ext->psz_description );
+        free( p_ext->psz_shortdescription );
+        free( p_ext->psz_url );
+        free( p_ext->psz_version );
 
         vlc_mutex_destroy( &p_ext->p_sys->running_lock );
         vlc_mutex_destroy( &p_ext->p_sys->command_lock );
@@ -416,6 +421,7 @@ exit:
         free( p_ext->psz_url );
         free( p_ext->psz_author );
         free( p_ext->psz_description );
+        free( p_ext->psz_shortdescription );
         free( p_ext->psz_version );
         vlc_mutex_destroy( &p_ext->p_sys->command_lock );
         vlc_mutex_destroy( &p_ext->p_sys->running_lock );
