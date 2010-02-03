@@ -453,7 +453,7 @@ int VlcPlugin::playlist_add( const char *mrl, libvlc_exception_t *ex )
 {
     int item = -1;
     libvlc_media_t *p_m = libvlc_media_new(libvlc_instance,mrl);
-    if( p_m )
+    if( !p_m )
         return -1;
 
     libvlc_media_list_lock(libvlc_media_list);
@@ -472,7 +472,7 @@ int VlcPlugin::playlist_add_extended_untrusted( const char *mrl, const char *nam
 {
     libvlc_media_t *p_m = libvlc_media_new(libvlc_instance, mrl);
     int item = -1;
-    if( p_m )
+    if( !p_m )
         return -1;
 
     for( int i = 0; i < optc; ++i )
