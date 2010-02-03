@@ -82,21 +82,21 @@ dnl                         [DESCRIPTION], [DEFAULT],
 dnl                         [EXTRA_CFLAGS], [EXTRA_LIBS], [EXTRA_CPPFLAGS]
 AC_DEFUN([PKG_ENABLE_MODULES_VLC],
 [
-m4_pushdef([module_name], AS_TR_SH(m4_default(m4_tolower([$2]),m4_tolower([$1]))))
+m4_pushdef([module_names], m4_default(m4_tolower([$2]),m4_tolower([$1])))
 m4_pushdef([enable_arg], m4_tolower([$1]))
 
 PKG_WITH_MODULES([$1],[$3],
-    VLC_ADD_PLUGIN(module_name)
-    m4_ifval( m4_normalize([$8]), VLC_ADD_CPPFLAGS(module_name, [$8]))
-    VLC_ADD_CFLAGS(module_name,[$$1_CFLAGS] [$6])
-    VLC_ADD_LIBS(module_name,[$$1_LIBS] [$7]),
+    VLC_ADD_PLUGIN(module_names)
+    m4_ifval( m4_normalize([$8]), VLC_ADD_CPPFLAGS(module_names, [$8]))
+    VLC_ADD_CFLAGS(module_names,[$$1_CFLAGS] [$6])
+    VLC_ADD_LIBS(module_names,[$$1_LIBS] [$7]),
     AS_IF([test x"$AS_TR_SH([enable_]enable_arg)" = "xyes"],
         [AC_MSG_ERROR(Library [$3] needed for [m4_tolower([$1])] was not found)],
         [AC_MSG_WARN(Library [$3] needed for [m4_tolower([$1])] was not found)]
          ),
     [$4],[$5])
 
-m4_popdef([module_name])
+m4_popdef([module_names])
 m4_popdef([enable_arg])
 
 ])
