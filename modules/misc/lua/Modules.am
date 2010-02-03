@@ -5,6 +5,7 @@ SOURCES_lua = \
 	intf.c \
 	meta.c \
 	demux.c \
+	services_discovery.c \
 	vlc.c \
 	vlc.h \
 	libs.h \

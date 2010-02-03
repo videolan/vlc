@@ -40,6 +40,7 @@
 #include <vlc_meta.h>
 #include <vlc_charset.h>
 #include <vlc_aout.h>
+#include <vlc_services_discovery.h>
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
@@ -50,12 +51,13 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-
 #define INTF_TEXT N_("Lua interface")
 #define INTF_LONGTEXT N_("Lua interface module to load")
 
 #define CONFIG_TEXT N_("Lua interface configuration")
 #define CONFIG_LONGTEXT N_("Lua interface configuration string. Format is: '[\"<interface module name>\"] = { <option> = <value>, ...}, ...'.")
+
+static int vlc_sd_probe_Open( vlc_object_t * );
 
 vlc_module_begin ()
         set_shortname( N_( "Lua Art" ) )
@@ -112,6 +114,16 @@ vlc_module_begin ()
         add_shortcut( "luaextension" )
         set_capability( "extension", 1 )
         set_callbacks( Open_Extension, Close_Extension )
+
+    add_submodule ()
+        set_description( N_("Lua SD Module") )
+        add_shortcut( "luasd" )
+        set_capability( "services_discovery", 0 )
+        add_string( "lua-sd", "", NULL, "", "", false )
+        set_callbacks( Open_LuaSD, Close_LuaSD )
+
+    VLC_SD_PROBE_SUBMODULE
+
 vlc_module_end ()
 
 /*****************************************************************************
@@ -512,4 +524,83 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
         msg_Warn( p_this, "Playlist should be a table." );
     }
     return i_count;
+}
+
+static int vlc_sd_probe_Open( vlc_object_t *obj )
+{
+    vlc_probe_t *probe = (vlc_probe_t *)obj;
+    char **ppsz_filelist = NULL;
+    char **ppsz_fileend  = NULL;
+    char **ppsz_file;
+    char *psz_name;
+    char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
+    char **ppsz_dir;
+    vlclua_dir_list( obj, "sd", ppsz_dir_list );
+    for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
+    {
+        int i_files;
+        if( ppsz_filelist )
+        {
+            for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend;
+                 ppsz_file++ )
+                free( *ppsz_file );
+            free( ppsz_filelist );
+            ppsz_filelist = NULL;
+        }
+        i_files = utf8_scandir( *ppsz_dir, &ppsz_filelist, file_select,
+                                file_compare );
+        if( i_files < 1 ) continue;
+        ppsz_fileend = ppsz_filelist + i_files;
+        for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend; ppsz_file++ )
+        {
+            char  *psz_filename;
+            if( asprintf( &psz_filename,
+                          "%s" DIR_SEP "%s", *ppsz_dir, *ppsz_file ) < 0 )
+            {
+                goto error;
+            }
+            FILE *fd = utf8_fopen( psz_filename, "r" );
+            if( fd )
+            {
+                char description[256];
+                if( fgets( description, 256, fd ) != NULL )
+                {
+                    char *temp = strchr( description, '\n' );
+                    if( temp )
+                        *temp = '\0';
+                    *(*ppsz_file + strlen(*ppsz_file) - 4 )= '\0';
+                    if( asprintf( &psz_name, "lua{sd=%s}", *ppsz_file ) < 0 )
+                    {
+                        fclose( fd );
+                        free( psz_filename );
+                        goto error;
+                    }
+                    vlc_sd_probe_Add( probe, psz_name,
+                                      description + 17 );
+                    free( psz_name );
+                }
+                fclose( fd );
+            }
+            free( psz_filename );
+        }
+    }
+    if( ppsz_filelist )
+    {
+        for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend;
+             ppsz_file++ )
+            free( *ppsz_file );
+        free( ppsz_filelist );
+    }
+    vlclua_dir_list_free( ppsz_dir_list );
+    return VLC_PROBE_CONTINUE;
+error:
+    if( ppsz_filelist )
+    {
+        for( ppsz_file = ppsz_filelist; ppsz_file < ppsz_fileend;
+             ppsz_file++ )
+            free( *ppsz_file );
+        free( ppsz_filelist );
+    }
+    vlclua_dir_list_free( ppsz_dir_list );
+    return VLC_ENOMEM;
 }
