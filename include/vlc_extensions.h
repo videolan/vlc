@@ -195,7 +195,6 @@ struct extension_dialog_t
 
     DECL_ARRAY(extension_widget_t*) widgets; ///< Widgets owned by the dialog
 
-    bool b_hide;                 ///< Hide this dialog (!b_hide shows)
     bool b_kill;                 ///< Kill this dialog
 
     void *p_sys;                 ///< Dialog private pointer

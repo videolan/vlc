@@ -110,14 +110,13 @@ ExtensionDialog* ExtensionsDialogProvider::UpdateExtDialog(
     if( !p_dialog->b_kill && !dialog )
     {
         dialog = CreateExtDialog( p_dialog );
-        dialog->setVisible( !p_dialog->b_hide );
+        dialog->setVisible( true );
     }
     else if( !p_dialog->b_kill && dialog )
     {
         dialog->has_lock = true;
         dialog->UpdateWidgets();
         dialog->has_lock = false;
-        dialog->setVisible( !p_dialog->b_hide );
     }
     else if( p_dialog->b_kill )
     {
