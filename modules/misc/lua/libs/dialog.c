@@ -52,6 +52,7 @@ static int vlclua_dialog_create( lua_State *L );
 static int vlclua_dialog_delete( lua_State *L );
 static int vlclua_dialog_show( lua_State *L );
 static int vlclua_dialog_hide( lua_State *L );
+static int vlclua_dialog_flush( lua_State *L );
 
 static int vlclua_dialog_add_button( lua_State *L );
 static int vlclua_dialog_add_label( lua_State *L );
@@ -98,6 +99,7 @@ static const luaL_Reg vlclua_dialog_reg[] = {
     { "show", vlclua_dialog_show },
     { "hide", vlclua_dialog_hide },
     { "close", vlclua_dialog_delete },
+    { "flush", vlclua_dialog_flush },
 
     { "add_button", vlclua_dialog_add_button },
     { "add_label", vlclua_dialog_add_label },
@@ -310,6 +312,22 @@ static int vlclua_dialog_hide( lua_State *L )
     return 1;
 }
 
+
+/** Flush the dialog */
+static int vlclua_dialog_flush( lua_State *L )
+{
+    vlc_object_t *p_mgr = vlclua_get_this( L );
+
+    extension_dialog_t **pp_dlg =
+            (extension_dialog_t**) luaL_checkudata( L, 1, "dialog" );
+    if( !pp_dlg || !*pp_dlg )
+        return luaL_error( L, "Can't get pointer to dialog" );
+    extension_dialog_t *p_dlg = *pp_dlg;
+
+    dialog_ExtensionUpdate( p_mgr, p_dlg );
+
+    return 1;
+}
 
 /**
  * Create a button: add_button
