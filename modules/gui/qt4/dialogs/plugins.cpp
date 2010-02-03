@@ -44,7 +44,6 @@
 #include <QLabel>
 #include <QVBoxLayout>
 #include <QComboBox>
-#include <QTextBrowser>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
 #include <QSpacerItem>
@@ -484,27 +483,27 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
 
     // Version
     label = new QLabel( "<b>" + qtr( "Version" ) + ":</b>", this );
-    layout->addWidget( label, 1, 1, 1, 1 );
+    layout->addWidget( label, 1, 1, 1, 1, Qt::AlignBottom );
     label = new QLabel( extension.version, this );
-    layout->addWidget( label, 1, 2, 1, 1 );
+    layout->addWidget( label, 1, 2, 1, 2, Qt::AlignBottom );
 
     // Author
     label = new QLabel( "<b>" + qtr( "Author" ) + ":</b>", this );
-    layout->addWidget( label, 2, 1, 1, 1 );
+    layout->addWidget( label, 2, 1, 1, 1, Qt::AlignTop );
     label = new QLabel( extension.author, this );
-    layout->addWidget( label, 2, 2, 1, 1 );
+    layout->addWidget( label, 2, 2, 1, 2, Qt::AlignTop );
 
 
     // Description
-    // FIXME: if( !extension.full_description.isEmpty() ) ...
-    QTextBrowser *text = new QTextBrowser( this );
-    text->setHtml( extension.description );
-    text->setOpenExternalLinks( true );
-    layout->addWidget( text, 4, 0, 1, -1 );
+    label = new QLabel( this );
+    label->setText( extension.description );
+    label->setWordWrap( true );
+    label->setOpenExternalLinks( true );
+    layout->addWidget( label, 4, 0, 1, -1 );
 
     // URL
     label = new QLabel( "<b>" + qtr( "Website" ) + ":</b>", this );
-    layout->addWidget( label, 5, 0, 1, 1 );
+    layout->addWidget( label, 5, 0, 1, 2 );
     QString txt = "<a href=\"";
     txt += extension.url;
     txt += "\">";
@@ -513,13 +512,13 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     label = new QLabel( txt, this );
     label->setText( txt );
     label->setOpenExternalLinks( true );
-    layout->addWidget( label, 5, 1, 1, -1 );
+    layout->addWidget( label, 5, 2, 1, -1 );
 
     // Script file
     label = new QLabel( "<b>" + qtr( "File" ) + ":</b>", this );
-    layout->addWidget( label, 6, 0, 1, 1 );
+    layout->addWidget( label, 6, 0, 1, 2 );
     QLineEdit *line = new QLineEdit( extension.name, this );
-    layout->addWidget( line, 6, 1, 1, -1 );
+    layout->addWidget( line, 6, 2, 1, -1 );
 
     // Close button
     QDialogButtonBox *group = new QDialogButtonBox( QDialogButtonBox::Close,
@@ -529,6 +528,8 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
 
     // Fix layout
     layout->setColumnStretch( 2, 1 );
+    layout->setRowStretch( 4, 1 );
+    setMinimumSize( 450, 350 );
 }
 
 ExtensionInfoDialog::~ExtensionInfoDialog()
