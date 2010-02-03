@@ -697,6 +697,13 @@ package-win-common:
 	else \
 	  echo "OK."; mkdir -p "$(win32_destdir)"; \
 	fi
+# Same for debug symbols dir
+	@if test -e "$(win32_debugdir)"; then \
+	  echo "Error: please remove $(win32_debugdir), it is in the way"; \
+	  false; \
+	else \
+	  echo "OK."; mkdir -p "$(win32_debugdir)"; \
+	fi
 
 # Copy relevant files
 # Copy executables and libs
@@ -921,12 +928,6 @@ endif
 
 # Strip DLLs
 package-win-common-strip: package-win32-base-debug
-	@if test -e "$(win32_debugdir)"; then \
-	  echo "Error: please remove $(win32_debugdir), it is in the way"; \
-	  false; \
-	else \
-	  echo "OK."; mkdir -p "$(win32_debugdir)"; \
-	fi
 	for i in "" $(win32_destdir)/*$(LIBEXT) \
 	            $(win32_destdir)/*$(EXEEXT) \
 	            $(win32_destdir)/activex/*$(LIBEXT) \
