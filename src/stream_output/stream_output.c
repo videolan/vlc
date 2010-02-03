@@ -1001,7 +1001,7 @@ rtp:
     if (psz_chain && b_sout_display)
     {
         char *tmp;
-        if (asprintf (&tmp, "duplicate{dst=display,dst=%s}", tmp) == -1)
+        if (asprintf (&tmp, "duplicate{dst=display,dst=%s}", psz_chain) == -1)
             tmp = NULL;
         free (psz_chain);
         psz_chain = tmp;
