@@ -177,13 +177,8 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 {
     if (self = [super init])
     {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
         p_md = libvlc_media_new([VLCLibrary sharedInstance],
-                                           [[anURL absoluteString] UTF8String],
-                                           &ex);
-        catch_exception(&ex);
+                                           [[anURL absoluteString] UTF8String]);
 
         delegate = nil;
         metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
@@ -201,13 +196,8 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
 {
     if (self = [super init])
     {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
         p_md = libvlc_media_new_as_node([VLCLibrary sharedInstance],
-                                                   [aName UTF8String],
-                                                   &ex);
-        catch_exception(&ex);
+                                                   [aName UTF8String]);
 
         delegate = nil;
         metaDictionary = [[NSMutableDictionary alloc] initWithCapacity:3];
@@ -277,7 +267,7 @@ static void HandleMediaSubItemAdded(const libvlc_event_t * event, void * self)
     if (!length)
     {
         // Try figuring out what the length is
-        long long duration = libvlc_media_get_duration( p_md, NULL );
+        long long duration = libvlc_media_get_duration( p_md );
         if (duration > -1)
         {
             length = [[VLCTime timeWithNumber:[NSNumber numberWithLongLong:duration]] retain];

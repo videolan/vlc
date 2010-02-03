@@ -89,14 +89,10 @@ static void HandleMediaDiscovererEnded( const libvlc_event_t * event, void * use
 {
     if (self = [super init])
     {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
         localizedName = nil;
         discoveredMedia = nil;
         mdis = libvlc_media_discoverer_new_from_name([VLCLibrary sharedInstance],
-                                                     [aServiceName UTF8String],
-                                                     &ex);
-        catch_exception(&ex);
+                                                     [aServiceName UTF8String]);
 
         libvlc_event_manager_t * p_em = libvlc_media_discoverer_event_manager(mdis);
         libvlc_event_attach(p_em, libvlc_MediaDiscovererStarted, HandleMediaDiscovererStarted, self);
