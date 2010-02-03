@@ -18,6 +18,7 @@ libxcb_apps_plugin_la_DEPENDENCIES =
 EXTRA_LTLIBRARIES += \
 	libxcb_apps_plugin.la
 libvlc_LTLIBRARIES += \
+	libmediadirs_plugin.la \
 	libpodcast_plugin.la \
 	libsap_plugin.la \
 	libshout_plugin.la \

@@ -19,5 +19,6 @@ SOURCES_motion = \
         $(NULL)
 
 libvlc_LTLIBRARIES += \
+	liboldrc_plugin.la \
 	libgestures_plugin.la \
 	libhotkeys_plugin.la

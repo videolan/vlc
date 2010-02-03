@@ -1161,13 +1161,7 @@ test "${enable_cprof}" != "yes" && enable_cprof="no"
 dnl
 dnl  default modules
 dnl
-ALIASES="${ALIASES} cvlc"
-
-if test "${SYS}" != "mingwce"; then
-  VLC_ADD_PLUGIN([oldrc])
-  VLC_ADD_PLUGIN([mediadirs])
-  ALIASES="${ALIASES} rvlc"
-fi
+ALIASES="${ALIASES} cvlc rvlc"
 
 dnl
 dnl Some plugins aren't useful on some platforms
