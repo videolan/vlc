@@ -103,7 +103,7 @@ private:
 
     QWidget *CreateWidget( extension_widget_t *p_widget );
     QWidget *UpdateWidget( extension_widget_t *p_widget );
-    void DestroyWidget( extension_widget_t *p_widget );
+    void DestroyWidget( extension_widget_t *p_widget, bool b_cond = true );
 
 protected:
     virtual void closeEvent( QCloseEvent* );

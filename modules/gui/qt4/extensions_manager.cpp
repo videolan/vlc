@@ -55,6 +55,7 @@ ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
 
 ExtensionsManager::~ExtensionsManager()
 {
+    ExtensionsDialogProvider::killInstance();
     if( p_extensions_manager )
     {
         module_unneed( p_extensions_manager, p_extensions_manager->p_module );

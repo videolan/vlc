@@ -60,6 +60,7 @@ ExtensionsDialogProvider::ExtensionsDialogProvider( intf_thread_t *_p_intf,
 
 ExtensionsDialogProvider::~ExtensionsDialogProvider()
 {
+    msg_Dbg( p_intf, "ExtensionsDialogProvider is quitting..." );
     var_DelCallback( p_intf, "dialog-extension", DialogCallback, NULL );
 }
 
@@ -87,6 +88,7 @@ int ExtensionsDialogProvider::DestroyExtDialog( extension_dialog_t *p_dialog )
         return VLC_EGENERIC;
     delete dialog;
     p_dialog->p_sys_intf = NULL;
+    vlc_cond_signal( &p_dialog->cond );
     return VLC_SUCCESS;
 }
 
@@ -172,6 +174,8 @@ ExtensionDialog::ExtensionDialog( intf_thread_t *_p_intf,
          , p_dialog( _p_dialog ), has_lock(false)
 {
     assert( p_dialog );
+    CONNECT( ExtensionsDialogProvider::getInstance(), destroyed(),
+             this, deleteLater() );
 
     msg_Dbg( p_intf, "Creating a new dialog: '%s'", p_dialog->psz_title );
 #if HAS_QT45
@@ -197,7 +201,11 @@ ExtensionDialog::ExtensionDialog( intf_thread_t *_p_intf,
 ExtensionDialog::~ExtensionDialog()
 {
     msg_Dbg( p_intf, "Deleting extension dialog '%s'", qtu(windowTitle()) );
+    /* Delete all widgets */
+    extension_widget_t *p_widget;
+    p_dialog->b_kill = true;
     p_dialog->p_sys_intf = NULL;
+    vlc_cond_signal( &p_dialog->cond );
 }
 
 QWidget* ExtensionDialog::CreateWidget( extension_widget_t *p_widget )
@@ -634,20 +642,24 @@ QWidget* ExtensionDialog::UpdateWidget( extension_widget_t *p_widget )
     }
 }
 
-void ExtensionDialog::DestroyWidget( extension_widget_t *p_widget )
+void ExtensionDialog::DestroyWidget( extension_widget_t *p_widget,
+                                     bool b_cond )
 {
     assert( p_widget && p_widget->b_kill );
     QWidget *widget = static_cast< QWidget* >( p_widget->p_sys_intf );
     delete widget;
     p_widget->p_sys_intf = NULL;
+    if( b_cond )
+        vlc_cond_signal( &p_dialog->cond );
 }
 
 /** Implement closeEvent() in order to intercept the event */
 void ExtensionDialog::closeEvent( QCloseEvent *event )
 {
     assert( p_dialog != NULL );
+    msg_Dbg( p_intf, "Dialog '%s' received a closeEvent",
+             p_dialog->psz_title );
     extension_DialogClosed( p_dialog );
-    event->accept();
-    emit destroyDialog( p_dialog );
+    p_dialog->p_sys_intf = NULL;
 }
 
