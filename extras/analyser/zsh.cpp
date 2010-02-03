@@ -56,19 +56,14 @@ int main( int i_argc, const char **ppsz_argv )
     mumap mods;
     mcmap mods2;
     /* Create a libvlc structure */
-
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-
     const char *argv[i_argc + 1];
     argv[0] = "vlc";
     for( int i = 0; i < i_argc; i++ )
         argv[i+1] = ppsz_argv[i];
-    libvlc_instance_t *p_libvlc_instance = libvlc_new(i_argc+1, argv, &ex);
+    libvlc_instance_t *p_libvlc_instance = libvlc_new(i_argc+1, argv);
 
-    if( !p_libvlc_instance || libvlc_exception_raised(&ex) )
+    if( !p_libvlc_instance )
     {
-        libvlc_exception_clear(&ex);
         return 1;
     }
 
