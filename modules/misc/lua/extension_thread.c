@@ -124,6 +124,9 @@ static void FreeCommands( struct command_t *command )
         case CMD_TRIGGERMENU:
             free( command->data[0] ); // Arg1 is int*, to free
             break;
+
+        default:
+            break;
     }
     free( command );
     FreeCommands( next );
@@ -201,9 +204,10 @@ void WaitForDeactivation( extension_t *p_ext )
 }
 
 /** Push a UI command */
-int PushCommand( extension_t *p_ext,
-                 int i_command,
-                 ... )
+int __PushCommand( extension_t *p_ext,
+                   bool b_unique,
+                   int i_command,
+                   ... )
 {
     vlc_mutex_lock( &p_ext->p_sys->command_lock );
 
@@ -218,9 +222,6 @@ int PushCommand( extension_t *p_ext,
         case CMD_CLICK:
             cmd->data[0] = va_arg( args, void* );
             break;
-        case CMD_CLOSE:
-            // Nothing to do here
-            break;
         case CMD_TRIGGERMENU:
             {
                 int *pi = malloc( sizeof( int ) );
@@ -233,6 +234,11 @@ int PushCommand( extension_t *p_ext,
                 *pi = va_arg( args, int );
                 cmd->data[0] = pi;
             }
+            break;
+        case CMD_CLOSE:
+        case CMD_SET_INPUT:
+        case CMD_UPDATE_META:
+            // Nothing to do here
             break;
         default:
             msg_Dbg( p_ext->p_sys->p_mgr,
@@ -250,11 +256,22 @@ int PushCommand( extension_t *p_ext,
     }
     else
     {
+        bool b_skip = false;
         while( last->next != NULL )
         {
-            last = last->next;
+            if( b_unique && last->i_command == i_command )
+            {
+                // Do not push this 'unique' command a second time
+                b_skip = true;
+                break;
+            }
+            else
+            {
+                last = last->next;
+            }
         }
-        last->next = cmd;
+        if( !b_skip )
+            last->next = cmd;
     }
 
     vlc_cond_signal( &p_ext->p_sys->wait );
@@ -345,6 +362,12 @@ static void* Run( void *data )
                     case CMD_SET_INPUT:
                     {
                         lua_ExecuteFunction( p_mgr, p_ext, "input_changed" );
+                        break;
+                    }
+
+                    case CMD_UPDATE_META:
+                    {
+                        lua_ExecuteFunction( p_mgr, p_ext, "meta_changed" );
                         break;
                     }
 

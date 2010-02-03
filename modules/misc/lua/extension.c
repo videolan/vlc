@@ -27,6 +27,7 @@
 #include "assert.h"
 
 #include <vlc_input.h>
+#include <vlc_events.h>
 
 /* Functions to register */
 static const luaL_Reg p_reg[] =
@@ -38,14 +39,16 @@ static const luaL_Reg p_reg[] =
  * Extensions capabilities
  * Note: #define and ppsz_capabilities must be in sync
  */
-#define EXT_HAS_MENU          (1 << 0)
-#define EXT_TRIGGER_ONLY      (1 << 1)
-#define EXT_INPUT_LISTENER    (1 << 2)
+#define EXT_HAS_MENU          (1 << 0)   ///< Hook: menu
+#define EXT_TRIGGER_ONLY      (1 << 1)   ///< Hook: trigger. Not activable
+#define EXT_INPUT_LISTENER    (1 << 2)   ///< Hook: input_changed
+#define EXT_META_LISTENER     (1 << 3)   ///< Hook: meta_changed
 
 const char* const ppsz_capabilities[] = {
     "menu",
     "trigger",
     "input-listener",
+    "meta-listener",
     NULL
 };
 
@@ -69,6 +72,10 @@ static int vlclua_extension_dialog_callback( vlc_object_t *p_this,
                                              vlc_value_t oldval,
                                              vlc_value_t newval,
                                              void *p_data );
+
+/* Input item callback: vlc_InputItemMetaChanged */
+static void inputItemMetaChanged( const vlc_event_t *p_event,
+                                  void *data );
 
 
 /**
@@ -476,22 +483,50 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
 
             // Change input
             input_thread_t *old = p_ext->p_sys->p_input;
+            input_item_t *p_item;
             if( old )
+            {
+                // Untrack meta fetched events
+                if( p_ext->p_sys->i_capabilities & EXT_META_LISTENER )
+                {
+                    p_item = input_GetItem( old );
+                    vlc_event_detach( &p_item->event_manager,
+                                      vlc_InputItemMetaChanged,
+                                      inputItemMetaChanged,
+                                      p_ext );
+                    vlc_gc_decref( p_item );
+                }
                 vlc_object_release( old );
+            }
+
             p_ext->p_sys->p_input = p_input ? vlc_object_hold( p_input )
                                             : p_input;
 
             // Tell the script the input changed
             if( p_ext->p_sys->i_capabilities & EXT_INPUT_LISTENER )
-                PushCommand( p_ext, CMD_SET_INPUT );
+            {
+                PushCommandUnique( p_ext, CMD_SET_INPUT );
+            }
+
+            // Track meta fetched events
+            if( p_ext->p_sys->p_input &&
+                p_ext->p_sys->i_capabilities & EXT_META_LISTENER )
+            {
+                p_item = input_GetItem( p_ext->p_sys->p_input );
+                vlc_gc_incref( p_item );
+                vlc_event_attach( &p_item->event_manager,
+                                  vlc_InputItemMetaChanged,
+                                  inputItemMetaChanged,
+                                  p_ext );
+            }
 
             UnlockExtension( p_ext );
             break;
         }
 
         default:
-            msg_Err( p_mgr, "Control '%d' not yet implemented in Extension",
-                     i_control );
+            msg_Warn( p_mgr, "Control '%d' not yet implemented in Extension",
+                      i_control );
             return VLC_EGENERIC;
     }
 
@@ -510,6 +545,18 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 
     if( !p_ext->p_sys->L )
         return VLC_SUCCESS;
+
+    // Unset and release input objects
+    if( p_ext->p_sys->p_input )
+    {
+        if( p_ext->p_sys->i_capabilities & EXT_META_LISTENER )
+        {
+            // Release item
+            input_item_t *p_item = input_GetItem( p_ext->p_sys->p_input );
+            vlc_gc_decref( p_item );
+        }
+        vlc_object_release( p_ext->p_sys->p_input );
+    }
 
     int i_ret = lua_ExecuteFunction( p_mgr, p_ext, "deactivate" );
 
@@ -871,7 +918,7 @@ static int vlclua_extension_dialog_callback( vlc_object_t *p_this,
             PushCommand( p_ext, CMD_CLICK, p_widget );
             break;
         case EXTENSION_EVENT_CLOSE:
-            PushCommand( p_ext, CMD_CLOSE );
+            PushCommandUnique( p_ext, CMD_CLOSE );
             break;
         default:
             msg_Dbg( p_this, "Received unknown UI event %d, discarded",
@@ -880,6 +927,19 @@ static int vlclua_extension_dialog_callback( vlc_object_t *p_this,
     }
 
     return VLC_SUCCESS;
+}
+
+/** Callback on vlc_InputItemMetaChanged event
+ **/
+static void inputItemMetaChanged( const vlc_event_t *p_event,
+                                  void *data )
+{
+    assert( p_event && p_event->type == vlc_InputItemMetaChanged );
+
+    extension_t *p_ext = ( extension_t* ) data;
+    assert( p_ext != NULL );
+
+    PushCommandUnique( p_ext, CMD_UPDATE_META );
 }
 
 /* Lock this extension. Can fail. */

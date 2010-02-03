@@ -37,6 +37,8 @@ TYPEDEF_ARRAY( extension_t, array_extension_t );
 #define CMD_CLICK       4    /* Arg1 = extension_widget_t* */
 #define CMD_CLOSE       5
 #define CMD_SET_INPUT   6    /* No arg. Just signal current input changed */
+#define CMD_UPDATE_META 7    /* No arg. Just signal current input item meta
+                              * changed */
 
 struct extensions_manager_sys_t
 {
@@ -88,7 +90,12 @@ int Activate( extensions_manager_t *p_mgr, extension_t * );
 bool IsActivated( extensions_manager_t *p_mgr, extension_t * );
 int Deactivate( extensions_manager_t *p_mgr, extension_t * );
 void WaitForDeactivation( extension_t *p_ext );
-int PushCommand( extension_t *p_ext, int i_command, ... );
+int __PushCommand( extension_t *p_ext, bool b_unique,
+                   int i_command, ... );
+#define PushCommand( ext, cmd, ... ) \
+      __PushCommand( ext, false, cmd, ## __VA_ARGS__ )
+#define PushCommandUnique( ext, cmd, ... ) \
+      __PushCommand( ext, true, cmd, ## __VA_ARGS__ )
 bool LockExtension( extension_t *p_ext );
 void UnlockExtension( extension_t *p_ext );
 
