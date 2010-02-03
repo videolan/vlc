@@ -1,5 +1,14 @@
 Changes between 1.0.5 and 1.1.0-git:
 ------------------------------------
+Important changes for users:
+
+Important changes for packagers:
+ * The module cache has moved to ${libdir}/vlc/. The module cache can now be
+   generated at install time except if you use staged installation. In the 
+   later case, you can generate the module cache in your post-inst script
+   by invoking 'vlc-cache-gen'. If the module cache is not present and vlc
+   can't write in ${libdir}/vlc/, it will result it vlc taking a long time to
+   launch each time.
 
 Access:
  * Port of the screen module from Xlib to XCB
