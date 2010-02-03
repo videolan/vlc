@@ -1177,11 +1177,8 @@ elif test "${SYS}" != "mingwce"; then
     VLC_ADD_PLUGIN([msn])
     VLC_ADD_LIBS([dmo],[-lole32 -luuid])
     VLC_ADD_PLUGIN([globalhotkeys])
-else
-    VLC_ADD_PLUGIN([win32text])
 fi
 if test "${SYS}" = "darwin"; then
-    VLC_ADD_PLUGIN([quartztext])
     VLC_ADD_LDFLAGS([quartztext],[-Wl,-framework,ApplicationServices])
 fi
 

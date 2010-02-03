@@ -26,6 +26,12 @@ libvlc_LTLIBRARIES += \
 	libaudioscrobbler_plugin.la \
 	liblogger_plugin.la
 
+if HAVE_WIN32
+libvlc_LTLIBRARIES += libwin32text_plugin.la
+endif
+if HAVE_DARWIN
+libvlc_LTLIBRARIES += libquartztext_plugin.la
+endif
 if ENABLE_SOUT
 libvlc_LTLIBRARIES += \
 	libvod_rtsp_plugin.la \
