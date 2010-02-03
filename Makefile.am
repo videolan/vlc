@@ -706,10 +706,10 @@ package-win-common:
 	fi
 
 # Copy relevant files
-# Copy executables and libs
+# Copy executables, major libs+manifests
 	cp "$(top_builddir)/bin/.libs/vlc$(EXEEXT)" "$(win32_destdir)/"
 	cp "$(top_srcdir)/extras/package/win32/vlc.exe.manifest" "$(win32_destdir)/"
-		cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_destdir)/"
+	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" "$(win32_destdir)/"
 	cp "$(top_builddir)/src/.libs/libvlccore$(LIBEXT)" "$(win32_destdir)/"
 	cp "$(top_builddir)/src/.libs/libvlc$(LIBEXT)" "$(win32_destdir)/"
 
@@ -791,9 +791,6 @@ package-win32-base-debug: package-win-common
 	  if test -n "$$i" ; then \
 	    $(INSTALL) "$$i" "vlc-$(VERSION)/plugins/" ; \
 	  fi ; done
-
-# Contrib *.dll's
-#	cp $(CONTRIB_DIR)/lib/*.dll "vlc-$(VERSION)/" || true
 
 #Enable DEP and ASLR for all the binaries
 if USE_PEFLAGS
@@ -1009,6 +1006,9 @@ package-win32-debug: package-win32-base-debug-zip package-win32-base-debug-7zip
 # Clean up
 	rm -Rf $(win32_destdir)
 
+#######
+# WinCE
+#######
 package-wince-base: package-win-common-strip
 
 package-wince-base-zip: package-wince-base
