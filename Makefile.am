@@ -681,6 +681,7 @@ VLC.app: vlc $(top_builddir)/src/.libs/libvlccore.dylib $(top_builddir)/src/.lib
 ## Win                                                                    ##
 ############################################################################
 win32_destdir=$(top_builddir)/vlc-$(VERSION)
+win32_xpi_destdir=$(win32_destdir)/vlc-plugin
 win32_debugdir=$(top_builddir)/symbols-$(VERSION)
 npvlc=vlc-$(VERSION)/mozilla/npvlc$(LIBEXT)
 axvlc=vlc-$(VERSION)/activex/axvlc$(LIBEXT)
@@ -748,6 +749,25 @@ endif
 	if rebase -b 0x42 /dev/null >/dev/null 2>&1; then \
 		find $(win32_destdir) -type f -name '*.dll' -print | rebase -b 0x70000000 -T -; \
 	fi
+
+package-win32-xpi: package-win-common-strip
+	mkdir -p "$(win32_xpi_destdir)/plugins"
+	cp $(top_builddir)/projects/mozilla/install.rdf "$(win32_xpi_destdir)"
+	cp $(win32_destdir)/mozilla//npvlc$(LIBEXT) \
+		"$(win32_xpi_destdir)/plugins"
+	cp $(top_srcdir)/projects/mozilla/npvlc.dll.manifest \
+		"$(win32_xpi_destdir)/plugins"
+	cp "$(top_srcdir)/extras/package/win32/libvlc.dll.manifest" \
+		"$(win32_xpi_destdir)/plugins"
+	cp "$(win32_destdir)/libvlccore$(LIBEXT)" \
+		"$(win32_xpi_destdir)/plugins"
+	cp "$(win32_destdir)/libvlc$(LIBEXT)" \
+		"$(win32_xpi_destdir)/plugins"
+
+	mkdir -p "$(win32_xpi_destdir)/plugins/plugins"
+	cp "$(win32_destdir)/plugins/*$(LIBEXT)" \
+		"$(win32_xpi_destdir)/plugins/plugins"
+	cd $(win32_xpi_destdir) && zip -r vlc-$(VERSION).xpi install.rdf plugins
 
 package-win32-base-debug: package-win-common
 # Copy relevant files
@@ -1167,6 +1187,16 @@ if BUILD_MOZILLA
 	  -scrub -imagekey zlib-level=9
 	echo "Disk image creation completed:"
 	rm -rf "$(top_builddir)/vlc-plugin-$(VERSION)"
+endif
+
+package-macosx-xpi:
+if BUILD_MOZILLA
+	mkdir -p "$(top_builddir)/macosx-xpi/plugins"
+	cp $(top_builddir)/projects/mozilla/install.rdf \
+		"$(top_builddir)/macosx-xpi/"
+	cp -R "$(top_builddir)/projects/mozilla/VLC Plugin.plugin" \
+		"$(top_builddir)/macosx-xpi/plugins"
+	cd "$(top_builddir)/macosx-xpi" && zip -r vlc-$(VERSION).xpi install.rdf plugins
 endif
 
 package-translations:

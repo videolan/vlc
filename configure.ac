@@ -4934,6 +4934,7 @@ AC_CONFIG_FILES([
   projects/mozilla/npvlc_rc.rc
   projects/mozilla/vlc.r
   projects/mozilla/install.js
+  projects/mozilla/install.rdf
   share/Makefile
   compat/Makefile
   src/Makefile
