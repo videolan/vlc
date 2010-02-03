@@ -258,6 +258,11 @@ public:
     {
         name = qfu( p_ext->psz_name );
         description = qfu( p_ext->psz_description );
+        shortdesc = qfu( p_ext->psz_shortdescription );
+        if( description.isEmpty() )
+            description = shortdesc;
+        if( shortdesc.isEmpty() && !description.isEmpty() )
+            shortdesc = description;
         title = qfu( p_ext->psz_title );
         author = qfu( p_ext->psz_author );
         version = qfu( p_ext->psz_version );
@@ -265,7 +270,7 @@ public:
     }
     ~ExtensionCopy() {}
 
-    QString name, title, description, author, version, url;
+    QString name, title, description, shortdesc, author, version, url;
 };
 
 /* Extensions list model for the QListView */
@@ -403,23 +408,27 @@ void ExtensionItemDelegate::paint( QPainter *painter,
         pen.setBrush( option.palette.text() );
     }
     pixpaint->setPen( pen );
+    QFontMetrics metrics = option.fontMetrics;
+
+    /// @todo Add extension's icon
 
     // Title: bold
     font.setBold( true );
     pixpaint->setFont( font );
-    pixpaint->drawText( QRect( 10, 5, width - 70, 20 ),
+    pixpaint->drawText( QRect( 10, 7, width - 70, metrics.height() ),
                         Qt::AlignLeft, ext->title );
 
     // Short description: normal
     font.setBold( false );
     pixpaint->setFont( font );
-    pixpaint->drawText( QRect( 10, 30, width - 40, 20 ),
-                        Qt::AlignLeft, ext->description );
+    pixpaint->drawText( QRect( 10, 7 + metrics.height(), width - 40,
+                               metrics.height() ),
+                        Qt::AlignLeft, ext->shortdesc );
 
     // Version: italic
     font.setItalic( true );
     pixpaint->setFont( font );
-    pixpaint->drawText( QRect( width - 50, 5, 20, 20 ),
+    pixpaint->drawText( QRect( width - 40, 7, 20, metrics.height() ),
                         Qt::AlignLeft, ext->version );
 
     // Flush paint operations
@@ -435,7 +444,7 @@ QSize ExtensionItemDelegate::sizeHint( const QStyleOptionViewItem &option,
     if (index.isValid() && index.column() == 0)
     {
         QFontMetrics metrics = option.fontMetrics;
-        return QSize( 200, 20 + 2 * metrics.height() );
+        return QSize( 200, 14 + 2 * metrics.height() );
     }
     else
         return QSize();
@@ -452,14 +461,18 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     // Let's be a modal dialog
     setWindowModality( Qt::WindowModal );
 
+    // Window title
+    setWindowTitle( qtr( "About" ) + " " + extension.title );
+
     // Layout
     QGridLayout *layout = new QGridLayout( this );
 
     // Icon
+    /// @todo Use the extension's icon, when extensions will support icons :)
     QLabel *icon = new QLabel( this );
     QPixmap pix( ":/logo/vlc48.png" );
     icon->setPixmap( pix );
-    layout->addWidget( icon, 1, 0, 2, 1, Qt::AlignLeft );
+    layout->addWidget( icon, 1, 0, 2, 1 );
 
     // Title
     QLabel *label = new QLabel( extension.title, this );
@@ -467,50 +480,55 @@ ExtensionInfoDialog::ExtensionInfoDialog( const ExtensionCopy& extension,
     font.setBold( true );
     font.setPointSizeF( font.pointSizeF() * 1.3f );
     label->setFont( font );
-    layout->addWidget( label, 0, 0, 1, -1, Qt::AlignLeft );
+    layout->addWidget( label, 0, 0, 1, -1 );
 
     // Version
-    label = new QLabel( this );
-    QString txt = qtr( "Version:" );
-    txt += extension.version;
-    label->setText( txt );
-    layout->addWidget( label, 1, 1, 1, 1, Qt::AlignLeft | Qt::AlignBottom );
+    label = new QLabel( "<b>" + qtr( "Version" ) + ":</b>", this );
+    layout->addWidget( label, 1, 1, 1, 1 );
+    label = new QLabel( extension.version, this );
+    layout->addWidget( label, 1, 2, 1, 1 );
 
     // Author
-    label = new QLabel( this );
-    txt = qtr( "Author(s):" );
-    txt += extension.author;
-    label->setText( txt );
-    layout->addWidget( label, 2, 1, 1, 1, Qt::AlignLeft | Qt::AlignTop );
+    label = new QLabel( "<b>" + qtr( "Author" ) + ":</b>", this );
+    layout->addWidget( label, 2, 1, 1, 1 );
+    label = new QLabel( extension.author, this );
+    layout->addWidget( label, 2, 2, 1, 1 );
+
 
     // Description
     // FIXME: if( !extension.full_description.isEmpty() ) ...
     QTextBrowser *text = new QTextBrowser( this );
     text->setHtml( extension.description );
-    layout->addWidget( text, 4, 0, 1, -1, Qt::AlignJustify );
+    text->setOpenExternalLinks( true );
+    layout->addWidget( text, 4, 0, 1, -1 );
 
     // URL
-    label = new QLabel( qtr( "Website:" ), this );
-    font = label->font();
-    font.setBold( true );
-    label->setFont( font );
-    layout->addWidget( label, 5, 0, 1, 1, Qt::AlignLeft );
-    label = new QLabel( extension.url, this );
-    label->setTextInteractionFlags( Qt::TextBrowserInteraction );
-    layout->addWidget( label, 5, 1, 1, 1, Qt::AlignLeft );
+    label = new QLabel( "<b>" + qtr( "Website" ) + ":</b>", this );
+    layout->addWidget( label, 5, 0, 1, 1 );
+    QString txt = "<a href=\"";
+    txt += extension.url;
+    txt += "\">";
+    txt += extension.url;
+    txt += "</a>";
+    label = new QLabel( txt, this );
+    label->setText( txt );
+    label->setOpenExternalLinks( true );
+    layout->addWidget( label, 5, 1, 1, -1 );
 
     // Script file
-    label = new QLabel( qtr( "File:" ), this );
-    label->setFont( font );
-    layout->addWidget( label, 6, 0, 1, 1, Qt::AlignLeft );
+    label = new QLabel( "<b>" + qtr( "File" ) + ":</b>", this );
+    layout->addWidget( label, 6, 0, 1, 1 );
     QLineEdit *line = new QLineEdit( extension.name, this );
-    layout->addWidget( line, 6, 1, 1, 1, Qt::AlignLeft );
+    layout->addWidget( line, 6, 1, 1, -1 );
 
     // Close button
     QDialogButtonBox *group = new QDialogButtonBox( QDialogButtonBox::Close,
                                                     Qt::Horizontal, this );
     layout->addWidget( group, 7, 0, 1, -1 );
-    connect( group, SIGNAL(accepted()), this, SLOT(close()) );
+    connect( group, SIGNAL(clicked(QAbstractButton*)), this, SLOT(close()) );
+
+    // Fix layout
+    layout->setColumnStretch( 2, 1 );
 }
 
 ExtensionInfoDialog::~ExtensionInfoDialog()
