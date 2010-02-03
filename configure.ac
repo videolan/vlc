@@ -1167,11 +1167,8 @@ dnl
 dnl Some plugins aren't useful on some platforms
 dnl
 if test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce"; then
-    VLC_ADD_PLUGIN([motion])
     VLC_ADD_PLUGIN([dynamicoverlay])
-    VLC_ADD_PLUGIN([signals])
 elif test "${SYS}" != "mingwce"; then
-    VLC_ADD_PLUGIN([ntservice])
     VLC_ADD_PLUGIN([access_smb])
     VLC_ADD_PLUGIN([dmo])
     VLC_ADD_PLUGIN([msn])
