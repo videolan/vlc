@@ -1748,16 +1748,6 @@ dnl
 PKG_ENABLE_MODULES_VLC([NOTIFY], [], [libnotify], [libnotify notification], [auto])
 
 dnl
-dnl Audioscrobbler plugin
-dnl
-
-AC_ARG_ENABLE(audioscrobbler,
-  [  --disable-audioscrobbler Last.fm submission plugin (default enabled)])
-AS_IF([test "${enable_audioscrobbler}" != "no"], [
-        VLC_ADD_PLUGIN([audioscrobbler])
-  ])
-
-dnl
 dnl Taglibplugin
 dnl
 AC_ARG_ENABLE(taglib,

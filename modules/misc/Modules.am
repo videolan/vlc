@@ -23,6 +23,7 @@ SOURCES_osso = osso.c
 SOURCES_sqlite = sqlite.c
 
 libvlc_LTLIBRARIES += \
+	libaudioscrobbler_plugin.la \
 	liblogger_plugin.la
 
 if ENABLE_SOUT
