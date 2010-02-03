@@ -21,6 +21,7 @@ SOURCES_motion = \
 libvlc_LTLIBRARIES += \
 	liboldrc_plugin.la \
 	libgestures_plugin.la \
+	libnetsync_plugin.la \
 	libhotkeys_plugin.la
 if !HAVE_WIN32
 libvlc_LTLIBRARIES += \
