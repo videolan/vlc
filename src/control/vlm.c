@@ -469,27 +469,32 @@ int libvlc_vlm_del_media( libvlc_instance_t *p_instance, const char *psz_name )
     return 0;
 }
 
+static vlm_media_t *get_media( libvlc_instance_t *p_instance,
+                               vlm_t **restrict pp_vlm, const char *name )
+{
+    vlm_media_t *p_media;
+    vlm_t *p_vlm;
+    int64_t id;
+
+    VLM_RET(p_vlm, NULL);
+    if( vlm_Control( p_vlm, VLM_GET_MEDIA_ID, name, &id ) ||
+        vlm_Control( p_vlm, VLM_GET_MEDIA, id, &p_media ) )
+        return NULL;
+    *pp_vlm = p_vlm;
+    return p_media;
+}
+
 #define VLM_CHANGE(psz_error, code ) do {   \
-    vlm_media_t *p_media;   \
     vlm_t *p_vlm;           \
-    int64_t id;             \
-    VLM_RET(p_vlm, -1);     \
-    if( vlm_Control( p_vlm, VLM_GET_MEDIA_ID, psz_name, &id ) ||    \
-        vlm_Control( p_vlm, VLM_GET_MEDIA, id, &p_media ) ) {       \
-        libvlc_printerr( psz_error, psz_name );                     \
-        return -1;          \
-    }                       \
-    if( !p_media ) goto error;                                      \
-                            \
-    code;                   \
-                            \
-    if( vlm_Control( p_vlm, VLM_CHANGE_MEDIA, p_media ) ) {         \
+    vlm_media_t *p_media = get_media( p_instance, &p_vlm, psz_name ); \
+    if( p_media != NULL ) { \
+        code;               \
+        if( vlm_Control( p_vlm, VLM_CHANGE_MEDIA, p_media ) )       \
+            p_vlm = NULL;                                           \
         vlm_media_Delete( p_media );                                \
-        goto error;         \
+        if( p_vlm != NULL ) \
+            return 0;       \
     }                       \
-    vlm_media_Delete( p_media );                                    \
-    return 0;               \
-  error:                    \
     libvlc_printerr( psz_error, psz_name );                         \
     return -1;              \
   } while(0)
