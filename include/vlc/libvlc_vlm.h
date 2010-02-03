@@ -48,9 +48,8 @@ extern "C" {
  * Release the vlm instance related to the given libvlc_instance_t
  *
  * \param p_instance the instance
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_vlm_release( libvlc_instance_t *, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_vlm_release( libvlc_instance_t * );
 
 /**
  * Add a broadcast, with one input.
@@ -257,12 +256,10 @@ VLC_PUBLIC_API const char* libvlc_vlm_show_media( libvlc_instance_t *, const cha
  * \param p_instance a libvlc instance
  * \param psz_name name of vlm media instance
  * \param i_instance instance id
- * \param p_e an initialized exception pointer
- * \return position as float
+ * \return position as float or -1. on error
  */
 VLC_PUBLIC_API float libvlc_vlm_get_media_instance_position( libvlc_instance_t *,
-                                                             const char *, int,
-                                                             libvlc_exception_t * );
+                                                             const char *, int );
 
 /**
  * Get vlm_media instance time by name or instance id
@@ -270,12 +267,10 @@ VLC_PUBLIC_API float libvlc_vlm_get_media_instance_position( libvlc_instance_t *
  * \param p_instance a libvlc instance
  * \param psz_name name of vlm media instance
  * \param i_instance instance id
- * \param p_e an initialized exception pointer
- * \return time as integer
+ * \return time as integer or -1 on error
  */
 VLC_PUBLIC_API int libvlc_vlm_get_media_instance_time( libvlc_instance_t *,
-                                                       const char *, int,
-                                                       libvlc_exception_t * );
+                                                       const char *, int );
 
 /**
  * Get vlm_media instance length by name or instance id
@@ -283,12 +278,10 @@ VLC_PUBLIC_API int libvlc_vlm_get_media_instance_time( libvlc_instance_t *,
  * \param p_instance a libvlc instance
  * \param psz_name name of vlm media instance
  * \param i_instance instance id
- * \param p_e an initialized exception pointer
- * \return length of media item
+ * \return length of media item or -1 on error
  */
 VLC_PUBLIC_API int libvlc_vlm_get_media_instance_length( libvlc_instance_t *,
-                                                         const char *, int ,
-                                                         libvlc_exception_t * );
+                                                         const char *, int );
 
 /**
  * Get vlm_media instance playback rate by name or instance id
@@ -296,12 +289,10 @@ VLC_PUBLIC_API int libvlc_vlm_get_media_instance_length( libvlc_instance_t *,
  * \param p_instance a libvlc instance
  * \param psz_name name of vlm media instance
  * \param i_instance instance id
- * \param p_e an initialized exception pointer
- * \return playback rate
+ * \return playback rate or -1 on error
  */
 VLC_PUBLIC_API int libvlc_vlm_get_media_instance_rate( libvlc_instance_t *,
-                                                       const char *, int,
-                                                       libvlc_exception_t * );
+                                                       const char *, int );
 
 /**
  * Get vlm_media instance title number by name or instance id
@@ -309,12 +300,10 @@ VLC_PUBLIC_API int libvlc_vlm_get_media_instance_rate( libvlc_instance_t *,
  * \param p_instance a libvlc instance
  * \param psz_name name of vlm media instance
  * \param i_instance instance id
- * \param p_e an initialized exception pointer
- * \return title as number
+ * \return title as number or -1 on error
  */
 VLC_PUBLIC_API int libvlc_vlm_get_media_instance_title( libvlc_instance_t *,
-                                                        const char *, int,
-                                                        libvlc_exception_t * );
+                                                        const char *, int );
 
 /**
  * Get vlm_media instance chapter number by name or instance id
@@ -322,12 +311,10 @@ VLC_PUBLIC_API int libvlc_vlm_get_media_instance_title( libvlc_instance_t *,
  * \param p_instance a libvlc instance
  * \param psz_name name of vlm media instance
  * \param i_instance instance id
- * \param p_e an initialized exception pointer
- * \return chapter as number
+ * \return chapter as number or -1 on error
  */
 VLC_PUBLIC_API int libvlc_vlm_get_media_instance_chapter( libvlc_instance_t *,
-                                                          const char *, int,
-                                                          libvlc_exception_t * );
+                                                          const char *, int );
 
 /**
  * Is libvlc instance seekable ?
@@ -335,24 +322,20 @@ VLC_PUBLIC_API int libvlc_vlm_get_media_instance_chapter( libvlc_instance_t *,
  * \param p_instance a libvlc instance
  * \param psz_name name of vlm media instance
  * \param i_instance instance id
- * \param p_e an initialized exception pointer
- * \return 1 if seekable, 0 if not
+ * \return 1 if seekable, 0 if not, -1 if media does not exist
  */
 VLC_PUBLIC_API int libvlc_vlm_get_media_instance_seekable( libvlc_instance_t *,
-                                                           const char *, int,
-                                                           libvlc_exception_t * );
+                                                           const char *, int );
 
 /**
  * Get libvlc_event_manager from a vlm media.
  * The p_event_manager is immutable, so you don't have to hold the lock
  *
  * \param p_instance a libvlc instance
- * \param p_exception an initialized exception pointer
  * \return libvlc_event_manager
  */
 VLC_PUBLIC_API libvlc_event_manager_t *
-    libvlc_vlm_get_event_manager( libvlc_instance_t *,
-                                  libvlc_exception_t * );
+    libvlc_vlm_get_event_manager( libvlc_instance_t * );
 
 /** @} */
 
