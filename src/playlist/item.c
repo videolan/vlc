@@ -445,6 +445,8 @@ playlist_item_t * playlist_NodeAddInput( playlist_t *p_playlist,
     if( p_item == NULL ) return NULL;
     AddItem( p_playlist, p_item, p_parent, i_mode, i_pos );
 
+    GoAndPreparse( p_playlist, i_mode, p_item );
+
     PL_UNLOCK_IF( !b_locked );
 
     return p_item;
@@ -715,14 +717,12 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
         pl_priv(p_playlist)->request.i_status = PLAYLIST_RUNNING;
         vlc_cond_signal( &pl_priv(p_playlist)->signal );
     }
-    /* Preparse if PREPARSE or SPREPARSE & not enough meta */
+    /* Preparse if not enough meta */
     char *psz_artist = input_item_GetArtist( p_item->p_input );
     char *psz_album = input_item_GetAlbum( p_item->p_input );
     if( pl_priv(p_playlist)->b_auto_preparse &&
-          (i_mode & PLAYLIST_PREPARSE ||
-          ( i_mode & PLAYLIST_SPREPARSE &&
             ( EMPTY_STR( psz_artist ) || ( EMPTY_STR( psz_album ) ) )
-          ) ) )
+          )
         playlist_PreparseEnqueue( p_playlist, p_item->p_input, pl_Locked );
     /* If we already have it, signal it */
     else if( !EMPTY_STR( psz_artist ) && !EMPTY_STR( psz_album ) )
