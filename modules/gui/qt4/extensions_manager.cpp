@@ -55,6 +55,7 @@ ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
 
 ExtensionsManager::~ExtensionsManager()
 {
+    msg_Dbg( p_intf, "Killing extension dialog provider" );
     ExtensionsDialogProvider::killInstance();
     if( p_extensions_manager )
     {

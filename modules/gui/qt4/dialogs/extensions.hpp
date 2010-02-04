@@ -112,6 +112,7 @@ private slots:
     int TriggerClick( QObject *object );
     void SyncInput( QObject *object );
     void SyncSelection( QObject *object );
+    void parentDestroyed();
 
 signals:
     void destroyDialog( extension_dialog_t *p_dialog );

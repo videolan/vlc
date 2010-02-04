@@ -37,6 +37,7 @@
 #include <QListWidget>
 #include <QComboBox>
 #include <QCloseEvent>
+#include <QCoreApplication>
 
 ExtensionsDialogProvider *ExtensionsDialogProvider::instance = NULL;
 
@@ -113,6 +114,7 @@ ExtensionDialog* ExtensionsDialogProvider::UpdateExtDialog(
     {
         dialog = CreateExtDialog( p_dialog );
         dialog->setVisible( !p_dialog->b_hide );
+        dialog->has_lock = false;
     }
     else if( !p_dialog->b_kill && dialog )
     {
@@ -172,11 +174,11 @@ ExtensionDialog::ExtensionDialog( intf_thread_t *_p_intf,
                                   extensions_manager_t *p_mgr,
                                   extension_dialog_t *_p_dialog )
          : QDialog( NULL ), p_intf( _p_intf ), p_extensions_manager( p_mgr )
-         , p_dialog( _p_dialog ), has_lock(false)
+         , p_dialog( _p_dialog ), has_lock(true)
 {
     assert( p_dialog );
     CONNECT( ExtensionsDialogProvider::getInstance(), destroyed(),
-             this, deleteLater() );
+             this, parentDestroyed() );
 
     msg_Dbg( p_intf, "Creating a new dialog: '%s'", p_dialog->psz_title );
 #if HAS_QT45
@@ -661,6 +663,12 @@ void ExtensionDialog::closeEvent( QCloseEvent *event )
     msg_Dbg( p_intf, "Dialog '%s' received a closeEvent",
              p_dialog->psz_title );
     extension_DialogClosed( p_dialog );
-    p_dialog->p_sys_intf = NULL;
 }
 
+void ExtensionDialog::parentDestroyed()
+{
+    msg_Dbg( p_intf, "About to destroy dialog '%s'", p_dialog->psz_title );
+    deleteLater(); // May not work at this point (event loop can be ended)
+    p_dialog->p_sys_intf = NULL;
+    vlc_cond_signal( &p_dialog->cond );
+}
