@@ -148,14 +148,14 @@ bool vlc_sd_Start ( services_discovery_t * p_sd )
         msg_Err( p_sd, "no suitable services discovery module" );
         return false;
     }
-        
+
     vlc_event_t event = {
         .type = vlc_ServicesDiscoveryStarted
     };
     vlc_event_send( &p_sd->event_manager, &event );
     return true;
 }
-                          
+
 /***********************************************************************
  * Stop
  ***********************************************************************/
@@ -164,7 +164,7 @@ void vlc_sd_Stop ( services_discovery_t * p_sd )
     vlc_event_t event = {
         .type = vlc_ServicesDiscoveryEnded
     };
-    
+
     vlc_event_send( &p_sd->event_manager, &event );
 
     module_unneed( p_sd, p_sd->p_module );
@@ -291,10 +291,10 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,
     if( !p_sd )
         return VLC_ENOMEM;
 
-    module_t *m = module_find_by_shortcut( psz_name );
+    module_t *m = module_find_by_shortcut( p_sd->psz_name );
     if( !m )
     {
-        msg_Err( p_playlist, "No such module: %s", psz_name );
+        msg_Err( p_playlist, "No such module: %s", p_sd->psz_name );
         vlc_sd_Destroy( p_sd );
         return VLC_EGENERIC;
     }
@@ -310,8 +310,30 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,
 
     playlist_item_t *p_node;
 
+    /* Look for configuration chain "longname" */
+    const char *psz_longname = NULL;
+    if( p_sd->p_cfg )
+    {
+        config_chain_t *cfg = p_sd->p_cfg;
+        while( cfg )
+        {
+            if( cfg->psz_name && !strcmp( cfg->psz_name, "longname" ) )
+            {
+                psz_longname = cfg->psz_value;
+                break;
+            }
+            cfg = cfg->p_next;
+        }
+    }
+
+    /* Fallback on module's long name if not found */
+    if( !psz_longname )
+    {
+        psz_longname = module_get_name( m, true );
+    }
+
     PL_LOCK;
-    p_node = playlist_NodeCreate( p_playlist, module_get_name( m, true ),
+    p_node = playlist_NodeCreate( p_playlist, psz_longname,
                                   p_playlist->p_root, 0, NULL );
     PL_UNLOCK;
     module_release( m );
