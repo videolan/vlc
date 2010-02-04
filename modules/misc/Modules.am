@@ -26,7 +26,7 @@ libvlc_LTLIBRARIES += \
 	libaudioscrobbler_plugin.la \
 	liblogger_plugin.la
 
-if HAVE_WIN32
+if HAVE_WINCE
 libvlc_LTLIBRARIES += libwin32text_plugin.la
 endif
 if HAVE_DARWIN
