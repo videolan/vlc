@@ -185,7 +185,6 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     setResizeMode( QListView::Adjust );
     setGridSize( QSize( RECT_SIZE_W, RECT_SIZE_H ) );
     setUniformItemSizes( true );
-    setSpacing( ITEMS_SPACING );
     setWrapping( true );
     setSelectionMode( QAbstractItemView::ExtendedSelection );
     setAcceptDrops( true );
