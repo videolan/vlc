@@ -284,7 +284,7 @@ VLC_EXPORT( void,   __config_ChainParse, ( vlc_object_t *, const char *psz_prefi
  *
  * The options values are unescaped using config_StringUnescape.
  */
-VLC_EXPORT( char *, config_ChainCreate, ( char **ppsz_name, config_chain_t **pp_cfg, const char *psz_string ) );
+VLC_EXPORT( char *, config_ChainCreate, ( char **ppsz_name, config_chain_t **pp_cfg, const char *psz_string ) ) LIBVLC_USED LIBVLC_MALLOC;
 
 /**
  * This function will release a linked list of config_chain_t
