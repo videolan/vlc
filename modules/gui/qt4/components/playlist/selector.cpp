@@ -278,7 +278,7 @@ void PLSelector::createItems()
             putSDData( addItem( SD_TYPE, *ppsz_longname, false, mfldrs ),
                        *ppsz_name, *ppsz_longname );
         }
-        else if( SD_IS("podcast") )
+        else if( !strncmp( *ppsz_name, "podcast", 7 ) )
         {
 
             PLSelItem *podItem = addItem( SD_TYPE, qtr( "Podcasts" ), false );
