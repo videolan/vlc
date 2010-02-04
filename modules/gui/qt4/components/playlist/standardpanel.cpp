@@ -483,8 +483,9 @@ void LocationBar::setIndex( const QModelIndex &index )
         char *fb_name = input_item_GetTitleFbName( item->inputItem() );
         QString text = qfu(fb_name);
         free(fb_name);
-        QToolButton *btn = new LocationButton( text, bold );
-        box->insertWidget( 0, btn );
+        QAbstractButton *btn = new LocationButton( text, bold, i.isValid() );
+        if( bold ) btn->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
+        box->insertWidget( 0, btn, bold ? 1 : 0 );
         buttons.append( btn );
 
         mapper->setMapping( btn, item->id() );
@@ -504,37 +505,41 @@ void LocationBar::invoke( int i_id )
     emit invoked ( index );
 }
 
-LocationButton::LocationButton( const QString &text, bool bold )
+LocationButton::LocationButton( const QString &text, bool bold, bool arrow )
+  : b_arrow( arrow )
 {
     QFont font;
     font.setBold( bold );
     setFont( font );
-    metrics = new QFontMetrics( font );
-    setText( metrics->elidedText( text, Qt::ElideRight, 150 ) );
+    setText( text );
 }
 
 void LocationButton::paintEvent ( QPaintEvent * event )
 {
     QStyleOptionButton option;
     option.initFrom( this );
-    option.rect = rect();
-    option.text = text();
-    option.features = QStyleOptionButton::Flat;
+    //option.rect = rect();
+    //option.features = QStyleOptionButton::Flat;
     option.state |= QStyle::State_Enabled;
-    option.state |= isChecked() ? QStyle::State_On : QStyle::State_Off;
-    if( isDown() ) option.state |= QStyle::State_Sunken;
+    //option.state |= isChecked() ? QStyle::State_On : QStyle::State_Off;
+    //if( isDown() ) option.state |= QStyle::State_Sunken;
     QPainter p( this );
-    style()->drawControl( QStyle::CE_PushButtonBevel, &option, &p );
-    option.rect.setLeft( 18 );
+    if( underMouse() )
+        style()->drawControl( QStyle::CE_PushButtonBevel, &option, &p );
+    if( b_arrow ) option.rect.setLeft( 18 );
+    else option.rect.setLeft( 6 );
     p.drawText( option.rect, Qt::AlignVCenter,
-                metrics->elidedText( text(), Qt::ElideRight, option.rect.width() - 5 ) );
-    option.rect = QRect( 0, 0, 18, height() );
-    style()->drawPrimitive( QStyle::PE_IndicatorArrowRight, &option, &p );
+                fontMetrics().elidedText( text(), Qt::ElideRight, option.rect.width() - 3 ) );
+    if( b_arrow )
+    {
+        option.rect = QRect( 0, 0, 18, height() );
+        style()->drawPrimitive( QStyle::PE_IndicatorArrowRight, &option, &p );
+    }
 }
 
 QSize LocationButton::sizeHint() const
 {
-    QSize s( metrics->boundingRect( text() ).size() );
-    s += QSize( 25, 10 );
+    QSize s( fontMetrics().boundingRect( text() ).size() );
+    s += QSize( b_arrow ? 24 : 12, 15 );
     return s;
 }

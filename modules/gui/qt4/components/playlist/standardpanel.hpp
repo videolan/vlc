@@ -127,14 +127,15 @@ private:
     QList<QWidget*> buttons;
 };
 
-class LocationButton : public QToolButton
+class LocationButton : public QPushButton
 {
   public:
-      LocationButton( const QString &, bool bold );
+      LocationButton( const QString &, bool bold, bool arrow );
   private:
       void paintEvent ( QPaintEvent * event );
       QSize sizeHint() const;
       QFontMetrics *metrics;
+      bool b_arrow;
 };
 
 #endif
