@@ -34,12 +34,11 @@
 
 class ClickLineEdit;
 
-class OpenUrlDialog : public QVLCDialog, public Singleton<OpenUrlDialog>
+class OpenUrlDialog : public QVLCDialog
 {
     Q_OBJECT
 
 private:
-    OpenUrlDialog( intf_thread_t *, bool bClipboard = true );
     QString lastUrl;
     bool bClipboard, bShouldEnqueue;
     ClickLineEdit *edit;
@@ -49,6 +48,7 @@ private slots:
     void play();
 
 public:
+    OpenUrlDialog( intf_thread_t *, bool bClipboard = true );
     virtual ~OpenUrlDialog() {}
 
     QString url() const;
@@ -58,7 +58,6 @@ public:
 public slots:
     virtual void close() { play(); };
 
-    friend class    Singleton<OpenUrlDialog>;
 };
 
 #endif

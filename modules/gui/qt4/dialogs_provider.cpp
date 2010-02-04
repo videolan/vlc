@@ -91,14 +91,10 @@ DialogsProvider::~DialogsProvider()
     ExtendedDialog::killInstance();
     BookmarksDialog::killInstance();
     HelpDialog::killInstance();
-    AboutDialog::killInstance();
 #ifdef UPDATE_CHECK
     UpdateDialog::killInstance();
 #endif
     PluginDialog::killInstance();
-    VLMDialog::killInstance();
-    OpenUrlDialog::killInstance();
-    GotoTimeDialog::killInstance();
     PodcastConfigDialog::killInstance();
     EpgDialog::killInstance();
     ErrorsDialog::killInstance();
@@ -470,7 +466,7 @@ void DialogsProvider::simpleMLAppendDialog()
  **/
 void DialogsProvider::openUrlDialog()
 {
-    OpenUrlDialog *oud = OpenUrlDialog::getInstance( p_intf );
+    OpenUrlDialog *oud = new OpenUrlDialog( p_intf );
     if( oud->exec() == QDialog::Accepted )
     {
         QString url = oud->url();
@@ -484,6 +480,7 @@ void DialogsProvider::openUrlDialog()
             RecentsMRL::getInstance( p_intf )->addRecent( url );
         }
     }
+    delete oud;
 }
 
 /* Directory */
