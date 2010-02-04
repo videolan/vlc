@@ -94,6 +94,7 @@ DialogsProvider::~DialogsProvider()
 #ifdef UPDATE_CHECK
     UpdateDialog::killInstance();
 #endif
+    PluginDialog::killInstance();
 
     delete menusMapper;
     delete menusUpdateMapper;
