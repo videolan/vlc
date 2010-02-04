@@ -53,8 +53,8 @@
 #include "dialogs/toolbar.hpp"
 #include "dialogs/plugins.hpp"
 #include "dialogs/external.hpp"
-#include "dialogs/errors.hpp"
 #include "dialogs/epg.hpp"
+#include "dialogs/errors.hpp"
 
 #include <QEvent>
 #include <QApplication>
@@ -91,10 +91,17 @@ DialogsProvider::~DialogsProvider()
     ExtendedDialog::killInstance();
     BookmarksDialog::killInstance();
     HelpDialog::killInstance();
+    AboutDialog::killInstance();
 #ifdef UPDATE_CHECK
     UpdateDialog::killInstance();
 #endif
     PluginDialog::killInstance();
+    VLMDialog::killInstance();
+    OpenUrlDialog::killInstance();
+    GotoTimeDialog::killInstance();
+    PodcastConfigDialog::killInstance();
+    EpgDialog::killInstance();
+    ErrorsDialog::killInstance();
 
     delete menusMapper;
     delete menusUpdateMapper;
