@@ -107,7 +107,8 @@ static void services_discovery_Destructor ( vlc_object_t *p_obj );
 /***********************************************************************
  * Create
  ***********************************************************************/
-services_discovery_t *vlc_sd_Create( vlc_object_t *p_super )
+services_discovery_t *vlc_sd_Create( vlc_object_t *p_super,
+                                     const char *cfg )
 {
     services_discovery_t *p_sd;
 
@@ -115,6 +116,7 @@ services_discovery_t *vlc_sd_Create( vlc_object_t *p_super )
                               "services discovery" );
     if( !p_sd )
         return NULL;
+    free(config_ChainCreate( &p_sd->psz_name, &p_sd->p_cfg, cfg ));
 
     vlc_event_manager_init( &p_sd->event_manager, p_sd, (vlc_object_t *)p_sd );
     vlc_event_manager_register_event_type( &p_sd->event_manager,
@@ -135,12 +137,12 @@ services_discovery_t *vlc_sd_Create( vlc_object_t *p_super )
 /***********************************************************************
  * Stop
  ***********************************************************************/
-bool vlc_sd_Start ( services_discovery_t * p_sd, const char *module )
+bool vlc_sd_Start ( services_discovery_t * p_sd )
 {
     assert(!p_sd->p_module);
 
-    p_sd->p_module = module_need( p_sd, "services_discovery", module, true );
-
+    p_sd->p_module = module_need( p_sd, "services_discovery",
+                                  p_sd->psz_name, true );
     if( p_sd->p_module == NULL )
     {
         msg_Err( p_sd, "no suitable services discovery module" );
@@ -167,6 +169,13 @@ void vlc_sd_Stop ( services_discovery_t * p_sd )
 
     module_unneed( p_sd, p_sd->p_module );
     p_sd->p_module = NULL;
+}
+
+void vlc_sd_Destroy( services_discovery_t *p_sd )
+{
+    config_ChainDestroy( p_sd->p_cfg );
+    free( p_sd->psz_name );
+    vlc_object_release( p_sd );
 }
 
 /***********************************************************************
@@ -271,17 +280,16 @@ static void playlist_sd_item_removed( const vlc_event_t * p_event, void * user_d
     playlist_DeleteFromInput( p_parent->p_playlist, p_input, false );
 }
 
-int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_module )
+int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist,
+                                   const char *psz_name )
 {
     /* Perform the addition */
-    msg_Dbg( p_playlist, "adding services_discovery %s...", psz_module );
+    services_discovery_t *p_sd;
 
-    services_discovery_t *p_sd = vlc_sd_Create( VLC_OBJECT(p_playlist) );
+    msg_Dbg( p_playlist, "adding services_discovery %s...", psz_name );
+    p_sd = vlc_sd_Create( VLC_OBJECT(p_playlist), psz_name );
     if( !p_sd )
         return VLC_ENOMEM;
-
-    char *psz_name = NULL;
-    config_ChainCreate( &psz_name, &p_sd->p_cfg, psz_module );
 
     module_t *m = module_find_by_shortcut( psz_name );
     if( !m )
@@ -316,7 +324,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
                       vlc_ServicesDiscoveryItemRemoved,
                       playlist_sd_item_removed, p_node );
 
-    if( !vlc_sd_Start( p_sd, psz_name ) )
+    if( !vlc_sd_Start( p_sd ) )
     {
         vlc_sd_Destroy( p_sd );
         free( p_sds );
@@ -327,7 +335,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
     p_node->p_input->b_prefers_tree = true;
     p_sds->p_sd = p_sd;
     p_sds->p_node = p_node;
-    p_sds->psz_name = strdup( psz_module );
+    p_sds->psz_name = strdup( psz_name );
 
     PL_LOCK;
     TAB_APPEND( pl_priv(p_playlist)->i_sds, pl_priv(p_playlist)->pp_sds, p_sds );

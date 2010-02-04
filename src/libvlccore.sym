@@ -557,6 +557,7 @@ vlc_rwlock_unlock
 vlc_rwlock_wrlock
 vlc_savecancel
 vlc_sd_Create
+vlc_sd_Destroy
 vlc_sd_GetNames
 vlc_sd_probe_Add
 vlc_sdp_Start

@@ -199,9 +199,9 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
     libvlc_event_manager_register_event_type( p_mdis->p_event_manager,
             libvlc_MediaDiscovererEnded );
 
-    p_mdis->p_sd = vlc_sd_Create( (vlc_object_t*)p_inst->p_libvlc_int );
-
-    if( !p_mdis->p_sd )
+    p_mdis->p_sd = vlc_sd_Create( (vlc_object_t*)p_inst->p_libvlc_int,
+                                  psz_name );
+    if( unlikely(p_mdis->p_sd == NULL) )
     {
         libvlc_printerr( "%s: no such discovery module found", psz_name );
         libvlc_media_list_release( p_mdis->p_mlist );
@@ -228,9 +228,10 @@ libvlc_media_discoverer_new_from_name( libvlc_instance_t * p_inst,
                       p_mdis );
 
     /* Here we go */
-    if( !vlc_sd_Start( p_mdis->p_sd, psz_name ) )
+    if( !vlc_sd_Start( p_mdis->p_sd ) )
     {
-        libvlc_printerr( "%s: internal module error", psz_name );
+        libvlc_printerr( "%s: internal module error",
+                         p_mdis->p_sd->psz_name );
         libvlc_media_list_release( p_mdis->p_mlist );
         libvlc_event_manager_release( p_mdis->p_event_manager );
         free( p_mdis );
