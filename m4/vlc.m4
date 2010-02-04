@@ -48,14 +48,14 @@ AC_DEFUN([VLC_ADD_OBJCFLAGS], [
 
 AC_DEFUN([VLC_ADD_LDFLAGS], [
   m4_foreach_w([element], [$1], [
-    [eval "LDFLAGS_]element[="'"$'"{LDFLAGS_]element[} $2"'"']
+    [eval "LDFLAGS_]element[="'"$2 $'"{LDFLAGS_]element[}"'"']
     [am_modules_with_ldflags="${am_modules_with_ldflags} ]element["]
   ])
 ])
 
 AC_DEFUN([VLC_ADD_LIBS], [
   m4_foreach_w([element], [$1], [
-    [eval "LIBS_]element[="'"$'"{LIBS_]element[} $2"'"']
+    [eval "LIBS_]element[="'"$2 $'"{LIBS_]element[}"'"']
     [am_modules_with_libs="${am_modules_with_libs} ]element["]
   ])
 ])
