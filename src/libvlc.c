@@ -814,7 +814,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
         while( ( m = strsep( &p, " :," ) ) != NULL )
             playlist_ServicesDiscoveryAdd( p_playlist, m );
         free( psz_modules );
-        pl_Release (p_playlist);
+        pl_Release (p_libvlc);
     }
 
 #ifdef ENABLE_VLM
