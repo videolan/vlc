@@ -2442,7 +2442,11 @@ libass:
 	(cd $@; autoreconf -ivf)
 
 .libass: libass .freetype
+ifdef HAVE_DARWIN_OS
+	(cd $<; $(HOSTCC) ./configure --disable-png --disable-shared $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
+else
 	(cd $<; $(HOSTCC) ./configure --disable-png $(HOSTCONF) --prefix=$(PREFIX) CFLAGS="$(CFLAGS) -O3" && make && make install)
+endif
 	touch $@
 
 CLEAN_FILE += .libass
