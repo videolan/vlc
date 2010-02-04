@@ -23,10 +23,11 @@
 
 #include "dialogs/firstrun.hpp"
 
-#include "components/preferences_widgets.hpp"
-
 #include <QGridLayout>
 #include <QGroupBox>
+#include <QCheckBox>
+#include <QLabel>
+#include <QPushButton>
 #include <QSettings>
 
 FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf  )
@@ -39,15 +40,14 @@ FirstRun::FirstRun( QWidget *_p, intf_thread_t *_p_intf  )
 #endif
 }
 
+#define ALBUM_ART_WHEN_ASKED 0
+#define ALBUM_ART_ALL 2
 void FirstRun::save()
 {
-    QList<ConfigControl *>::Iterator i;
-    for( i = controlsList.begin() ; i != controlsList.end() ; i++ )
-    {
-        ConfigControl *c = qobject_cast<ConfigControl *>(*i);
-        c->doApply( p_intf );
-    }
+    config_PutInt( p_intf,  "album-art", checkbox->isChecked() ? ALBUM_ART_ALL: ALBUM_ART_WHEN_ASKED );
+    config_PutInt( p_intf,  "qt-updates-notif", checkbox2->isChecked() );
     config_PutInt( p_intf,  "qt-privacy-ask", 0 );
+
     /* We have to save here because the user may not launch Prefs */
     config_SaveConfigFile( p_intf, NULL );
     close();
@@ -66,50 +66,32 @@ void FirstRun::buildPrivDialog()
     QGroupBox *blabla = new QGroupBox( qtr( "Privacy and Network Warning" ) );
     QGridLayout *blablaLayout = new QGridLayout( blabla );
     QLabel *text = new QLabel( qtr(
-        "<p>The <i>VideoLAN Team</i> doesn't like when an application goes "
-        "online without authorization.</p>\n "
-        "<p><i>VLC media player</i> can retreive limited information from "
-        "the Internet in order to get CD covers or to check "
-        "for available updates.</p>\n"
-        "<p><i>VLC media player</i> <b>DOES NOT</b> send or collect <b>ANY</b> "
-        "information, even anonymously, about your usage.</p>\n"
-        "<p>Therefore please select from the following options, the default being "
-        "almost no access to the web.</p>\n") );
+        "<p><i>VideoLAN</i> prefers when applications request authorization "
+        "before accessing Internet.</p>\n"
+        "<p><b>VLC media player</b> can get information from the Internet "
+        "in order to get <b>media informations</b> or to check for available <b>updates</b>.</p>\n"
+        "<p><i>VLC media player</i> <b>doesn't</b> send or collect any "
+        "information, even anonymously, about your usage.</p>\n" ) );
     text->setWordWrap( true );
     text->setTextFormat( Qt::RichText );
 
     blablaLayout->addWidget( text, 0, 0 ) ;
 
-    QGroupBox *options = new QGroupBox;
+    QGroupBox *options = new QGroupBox( qtr( "Options" ) );
     QGridLayout *optionsLayout = new QGridLayout( options );
 
     gLayout->addWidget( blabla, 0, 0, 1, 3 );
     gLayout->addWidget( options, 1, 0, 1, 3 );
-    module_config_t *p_config;
-    ConfigControl *control;
     int line = 0;
 
-#define CONFIG_GENERIC( option, type )                            \
-    p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
-    if( p_config )                                                \
-    {                                                             \
-        control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
-                p_config, options, false, optionsLayout, line );  \
-        controlsList.append( control );                              \
-    }
+    checkbox = new QCheckBox( qtr( "Allow fetching media information from Internet" ) );
+    checkbox->setChecked( true );
+    optionsLayout->addWidget( checkbox, line++, 0 );
 
-#define CONFIG_GENERIC_NOBOOL( option, type )                     \
-    p_config =  config_FindConfig( VLC_OBJECT(p_intf), option );  \
-    if( p_config )                                                \
-    {                                                             \
-        control =  new type ## ConfigControl( VLC_OBJECT(p_intf), \
-                p_config, options, optionsLayout, line );         \
-        controlsList.append( control );                              \
-    }
-
-    CONFIG_GENERIC( "album-art", IntegerList ); line++;
 #ifdef UPDATE_CHECK
-    CONFIG_GENERIC_NOBOOL( "qt-updates-notif", Bool ); line++;
+    checkbox2 = new QCheckBox( qtr( "Check for updates" ) );
+    checkbox2->setChecked( true );
+    optionsLayout->addWidget( checkbox2, line++, 0 );
 #endif
 
     QPushButton *ok = new QPushButton( qtr( "OK" ) );

@@ -26,7 +26,7 @@
 #include <QWidget>
 #include <QSettings>
 
-class ConfigControl;
+class QCheckBox;
 class FirstRun : public QWidget
 {
     Q_OBJECT
@@ -44,7 +44,7 @@ class FirstRun : public QWidget
         }
         FirstRun( QWidget *, intf_thread_t * );
     private:
-        QList<ConfigControl *> controlsList;
+        QCheckBox *checkbox, *checkbox2;
         intf_thread_t *p_intf;
         void buildPrivDialog();
     private slots:
