@@ -303,7 +303,7 @@ int playlist_ServicesDiscoveryAdd( playlist_t *p_playlist, const char *psz_modul
     playlist_item_t *p_node;
 
     PL_LOCK;
-    p_node = playlist_NodeCreate( p_playlist, psz_module,
+    p_node = playlist_NodeCreate( p_playlist, module_get_name( m, true ),
                                   p_playlist->p_root, 0, NULL );
     PL_UNLOCK;
     module_release( m );
