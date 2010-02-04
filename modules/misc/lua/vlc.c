@@ -555,7 +555,8 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                     if( temp )
                         *temp = '\0';
                     *(*ppsz_file + strlen(*ppsz_file) - 4 )= '\0';
-                    if( asprintf( &psz_name, "lua{sd=%s}", *ppsz_file ) < 0 )
+                    if( asprintf( &psz_name, "lua{sd=%s,longname=%s}",
+                                  *ppsz_file, description + 17 ) < 0 )
                     {
                         fclose( fd );
                         free( psz_filename );
