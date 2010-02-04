@@ -50,9 +50,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     PLItem *currentItem = static_cast<PLItem*>( index.internalPointer() );
     assert( currentItem );
 
-    char *meta;
-
-    meta = input_item_GetTitleFbName( currentItem->inputItem() );
+    char *meta = input_item_GetTitleFbName( currentItem->inputItem() );
     QString title = qfu( meta );
     free( meta );
 
@@ -60,16 +58,15 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QString artist = qfu( meta );
     free( meta );
 
+    /* Primary ArtUrl */
     QString artUrl = InputManager::decodeArtURL( currentItem->inputItem() );
 
-    // look up through all children and use the first picture found
+    /* else look up through all children and use the first picture found */
     if( artUrl.isEmpty() )
     {
-        int children = currentItem->childCount();
-        for( int i = 0; i < children; i++ )
+        for( int i = 0; i < currentItem->childCount(); i++ )
         {
-            PLItem *child = currentItem->child( i );
-            artUrl = InputManager::decodeArtURL( child->inputItem() );
+            artUrl = InputManager::decodeArtURL( currentItem->child( i )->inputItem() );
             if( !artUrl.isEmpty() )
                 break;
         }
@@ -80,7 +77,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem, &option,
                                           painter );
 
-    // picture where all the rendering happens and which will be cached
+    /* Pixmap where all the rendering will happen and that will be cached */
     QPixmap pix;
 
     QString key = title + artist + artUrl
@@ -92,14 +89,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
         return;
     }
 
-    // load album art
-    QPixmap artPix;
-    if( artUrl.isEmpty() || !artPix.load( artUrl ) )
-        artPix = QPixmap( ":/noart64" );
-    else
-        artPix = artPix.scaled( ART_SIZE, ART_SIZE,
-                Qt::KeepAspectRatioByExpanding );
-
+    /* Background decorations */
     pix = QPixmap( RECT_SIZE_W, RECT_SIZE_H );
     pix.fill( Qt::transparent );
 
@@ -125,20 +115,30 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     pixpainter->drawRoundedRect( artRect.adjusted( 2, 2, 2, 2 ), ART_RADIUS, ART_RADIUS );
     pixpainter->restore();
 
-    // Draw the art pix
+
+    // load album art in the pixmap
+    QPixmap artPix;
+    if( artUrl.isEmpty() || !artPix.load( artUrl ) )
+        artPix = QPixmap( ":/noart64" );
+    else
+        artPix = artPix.scaled( ART_SIZE, ART_SIZE,
+                Qt::KeepAspectRatioByExpanding );
+
+    // Draw the art pixmap
     QPainterPath artRectPath;
     artRectPath.addRoundedRect( artRect, ART_RADIUS, ART_RADIUS );
     pixpainter->setClipPath( artRectPath );
     pixpainter->drawPixmap( artRect, artPix );
     pixpainter->setClipping( false );
 
+    /* */
     QColor text = qApp->palette().text().color();
 
     // Draw title
     pixpainter->setPen( text );
     QFont font;
     font.setPointSize( 7 );
-    font.setItalic(true);
+    font.setItalic( true );
     font.setBold( index.data( Qt::FontRole ).value<QFont>().bold() );
     pixpainter->setFont( font );
     QFontMetrics fm = pixpainter->fontMetrics();
@@ -150,11 +150,10 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
                       QTextOption( Qt::AlignCenter ) );
 
     // Draw artist
-    pixpainter->setPen( text.lighter( 240 ) );
+    pixpainter->setPen( text.lighter( 220 ) );
     font.setItalic( false );
     pixpainter->setFont( font );
     fm = pixpainter->fontMetrics();
-
 
     textRect = textRect.adjusted( 0, textRect.height(),
                                     0, textRect.height() );
@@ -192,3 +191,4 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     PlListViewItemDelegate *pl = new PlListViewItemDelegate( this );
     setItemDelegate( pl );
 }
+
