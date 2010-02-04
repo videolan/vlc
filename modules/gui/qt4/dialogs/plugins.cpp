@@ -71,10 +71,12 @@ PluginDialog::PluginDialog( intf_thread_t *_p_intf ) : QVLCFrame( _p_intf )
     box->addButton( okButton, QDialogButtonBox::AcceptRole );
     layout->addWidget( box );
     BUTTONACT( okButton, close() );
+    readSettings( "PluginsDialog", QSize( 435, 280 ) );
 }
 
 PluginDialog::~PluginDialog()
 {
+    writeSettings( "PluginsDialog" );
 }
 
 /* Plugins tab */
