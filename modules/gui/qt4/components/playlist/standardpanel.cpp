@@ -89,7 +89,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->setColumnStretch( 4, 2 );
 
     /* Add item to the playlist button */
-    addButton = new QPushButton;
+    addButton = new QToolButton;
     addButton->setIcon( QIcon( ":/buttons/playlist/playlist_add" ) );
     addButton->setMaximumWidth( 30 );
     BUTTONACT( addButton, popupAdd() );
@@ -97,7 +97,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     /* Button to switch views */
     QToolButton *viewButton = new QToolButton( this );
-    viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogContentsView ) );
+    viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogDetailedView ) );
     layout->addWidget( viewButton, 0, 2 );
 
     /* View selection menu */
@@ -474,7 +474,7 @@ void LocationBar::setIndex( const QModelIndex &index )
         char *fb_name = input_item_GetTitleFbName( item->inputItem() );
         QString text = qfu(fb_name);
         free(fb_name);
-        text = QString("/ ") + metrics.elidedText( text, Qt::ElideRight, 150 );
+        text = QString("> ") + metrics.elidedText( text, Qt::ElideRight, 150 );
         btn->setText( text );
         btn->setFont( font );
         prev = insertWidget( prev, btn );

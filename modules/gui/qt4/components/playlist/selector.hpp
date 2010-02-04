@@ -108,8 +108,9 @@ protected:
     friend class PlaylistWidget;
 private:
     QStringList mimeTypes () const;
-    bool dropMimeData ( QTreeWidgetItem * parent, int index, const QMimeData * data, Qt::DropAction action );
+    bool dropMimeData ( QTreeWidgetItem *, int, const QMimeData *, Qt::DropAction );
     void createItems();
+    void drawBranches ( QPainter *, const QRect &, const QModelIndex & ) const;
     PLSelItem * addItem (
         SelectorItemType type, const QString& str, bool drop,
         QTreeWidgetItem* parentItem = 0 );

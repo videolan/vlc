@@ -101,9 +101,9 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
     setFrameStyle( QFrame::NoFrame );
     viewport()->setAutoFillBackground( false );
     setIconSize( QSize( 24,24 ) );
-    setIndentation( 10 );
+    setIndentation( 14 );
     header()->hide();
-    setRootIsDecorated( false );
+    setRootIsDecorated( true );
     setAlternatingRowColors( false );
     podcastsParent = NULL;
     podcastsParentId = -1;
@@ -248,14 +248,9 @@ void PLSelector::createItems()
                               THEPL->p_media_library );
     ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
 
-    QTreeWidgetItem *msrc = addItem( CATEGORY_TYPE, qtr( "Media Sources" ),
-                                      false )->treeItem();
-
     QTreeWidgetItem *mfldrs = NULL;
 
     QTreeWidgetItem *shouts = NULL;
-
-    msrc->setExpanded( true );
 
     char **ppsz_longnames;
     char **ppsz_names = vlc_sd_GetNames( THEPL, &ppsz_longnames );
@@ -272,21 +267,21 @@ void PLSelector::createItems()
             SD_IS("frenchtv") || SD_IS("freebox") )
         {
             if( !shouts ) shouts = addItem( CATEGORY_TYPE, qtr( "Shoutcast" ),
-                                            false, msrc )->treeItem();
+                                            false )->treeItem();
             putSDData( addItem( SD_TYPE, *ppsz_longname, false, shouts ),
                        *ppsz_name, *ppsz_longname );
         }
         else if( SD_IS("video_dir") || SD_IS("audio_dir") || SD_IS("picture_dir") )
         {
             if( !mfldrs ) mfldrs = addItem( CATEGORY_TYPE, qtr( "Media Folders" ),
-                                            false, msrc )->treeItem();
+                                            false )->treeItem();
             putSDData( addItem( SD_TYPE, *ppsz_longname, false, mfldrs ),
                        *ppsz_name, *ppsz_longname );
         }
         else if( SD_IS("podcast") )
         {
 
-            PLSelItem *podItem = addItem( SD_TYPE, qtr( "Podcasts" ), false, msrc );
+            PLSelItem *podItem = addItem( SD_TYPE, qtr( "Podcasts" ), false );
             putSDData( podItem, *ppsz_name, *ppsz_longname );
             podItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PODCAST ) );
             podItem->addAction( ADD_ACTION, qtr( "Subscribe to a podcast" ) );
@@ -296,7 +291,7 @@ void PLSelector::createItems()
         }
         else
         {
-            putSDData( addItem( SD_TYPE, qtr( *ppsz_longname ), false, msrc ),
+            putSDData( addItem( SD_TYPE, qtr( *ppsz_longname ), false ),
                        *ppsz_name, *ppsz_longname );
         }
 
@@ -468,3 +463,15 @@ PLSelItem * PLSelector::itemWidget( QTreeWidgetItem *item )
     return ( static_cast<PLSelItem*>( QTreeWidget::itemWidget( item, 0 ) ) );
 }
 
+void PLSelector::drawBranches ( QPainter * painter, const QRect & rect, const QModelIndex & index ) const
+{
+    if( !model()->hasChildren( index ) ) return;
+    QStyleOption option;
+    option.initFrom( this );
+    option.rect = rect;
+    /*option.state = QStyle::State_Children;
+    if( isExpanded( index ) ) option.state |=  QStyle::State_Open;*/
+    style()->drawPrimitive( isExpanded( index ) ?
+                            QStyle::PE_IndicatorArrowDown :
+                            QStyle::PE_IndicatorArrowRight, &option, painter );
+}

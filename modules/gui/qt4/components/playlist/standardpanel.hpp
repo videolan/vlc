@@ -68,7 +68,7 @@ private:
 
     QWidget     *parent;
     QLabel      *title;
-    QPushButton *addButton;
+    QToolButton *addButton;
     QGridLayout *layout;
     LocationBar *locationBar;
 
