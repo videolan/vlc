@@ -540,9 +540,6 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
     volatile bool b_die;                   /**< set by the outside */ \
     bool b_force;      /**< set by the outside (eg. module_need()) */ \
                                                                             \
-    /** Just a reminder so that people don't cast garbage */                \
-    bool be_sure_to_add_VLC_COMMON_MEMBERS_to_struct;                       \
-                                                                            \
     /* Stuff related to the libvlc structure */                             \
     libvlc_int_t *p_libvlc;                  /**< (root of all evil) - 1 */ \
                                                                             \
@@ -552,8 +549,15 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 
 /* VLC_OBJECT: attempt at doing a clever cast */
 #ifdef __GNUC__
-# define VLC_OBJECT( x ) \
-    (((vlc_object_t *)(x))+0*(((__typeof__(x))0)->be_sure_to_add_VLC_COMMON_MEMBERS_to_struct))
+# ifndef __cplusplus
+#  define VLC_OBJECT( x ) \
+    __builtin_choose_expr(__builtin_offsetof(__typeof__(*x), psz_object_type), \
+                          (void)0 /* screw you */, (vlc_object_t *)(x))
+# else
+#  define VLC_OBJECT( x ) \
+    ((vlc_object_t *)(x) \
+      + 0 * __builtin_offsetof(__typeof__(*x), psz_object_type))
+# endif
 #else
 # define VLC_OBJECT( x ) ((vlc_object_t *)(x))
 #endif
