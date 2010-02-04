@@ -97,11 +97,11 @@ typedef enum libvlc_state_t
     libvlc_Error
 } libvlc_state_t;
 
-typedef enum libvlc_media_option_t
+enum
 {
     libvlc_media_option_trusted = 0x2,
     libvlc_media_option_unique = 0x100
-} libvlc_media_option_t;
+};
 
 typedef enum libvlc_es_type_t
 {
@@ -223,7 +223,7 @@ VLC_PUBLIC_API void libvlc_media_add_option(
 VLC_PUBLIC_API void libvlc_media_add_option_flag(
                                    libvlc_media_t * p_md,
                                    const char * ppsz_options,
-                                   libvlc_media_option_t i_flags );
+                                   unsigned i_flags );
 
 
 /**

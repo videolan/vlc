@@ -348,24 +348,21 @@ libvlc_media_t * libvlc_media_new_as_node( libvlc_instance_t *p_instance,
  *
  * The options are detailled in vlc --long-help, for instance "--sout-all"
  **************************************************************************/
-void libvlc_media_add_option(
-                                   libvlc_media_t * p_md,
-                                   const char * psz_option )
+void libvlc_media_add_option( libvlc_media_t * p_md,
+                              const char * psz_option )
 {
-    input_item_AddOption( p_md->p_input_item, psz_option,
+    libvlc_media_add_option_flag( p_md, psz_option,
                           VLC_INPUT_OPTION_UNIQUE|VLC_INPUT_OPTION_TRUSTED );
 }
 
 /**************************************************************************
  * Same as libvlc_media_add_option but with configurable flags.
  **************************************************************************/
-void libvlc_media_add_option_flag(
-                                   libvlc_media_t * p_md,
+void libvlc_media_add_option_flag( libvlc_media_t * p_md,
                                    const char * ppsz_option,
-                                   libvlc_media_option_t i_flags )
+                                   unsigned i_flags )
 {
-    input_item_AddOption( p_md->p_input_item, ppsz_option,
-                          i_flags );
+    input_item_AddOption( p_md->p_input_item, ppsz_option, i_flags );
 }
 
 /**************************************************************************
