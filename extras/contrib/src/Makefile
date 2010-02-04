@@ -2571,6 +2571,7 @@ libxcb: libxcb-$(XCB_VERSION).tar.bz2
 
 .xcb: libxcb
 	cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) \
+		--disable-shared \
 		--disable-composite \
 		--disable-damage \
 		--disable-dpms \
@@ -2594,6 +2595,8 @@ libxcb: libxcb-$(XCB_VERSION).tar.bz2
 		--enable-xv \
 		--disable-xvmc \
 		--disable-build-docs
+	cd $< && make
+	cd $< && sed -i -e s,^Requires.private:,Requires:,g xcb.pc
 	cd $< && make install
 	touch $@
 
