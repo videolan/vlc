@@ -34,14 +34,15 @@
 
 #include "assert.h"
 
-#define RECT_SIZE           100
+#define RECT_SIZE_W         100
+#define RECT_SIZE_H         105
 #define ART_SIZE            64
-#define OFFSET              (RECT_SIZE-64)/2
+#define OFFSET              (RECT_SIZE_W-64)/2
 #define ITEMS_SPACING       10
 #define ART_RADIUS          5
 
 
-static const QRect drawRect = QRect( 0, 0, RECT_SIZE, RECT_SIZE );
+static const QRect drawRect = QRect( 0, 0, RECT_SIZE_W, RECT_SIZE_H );
 static const QRect artRect = drawRect.adjusted( OFFSET - 1, 2, - OFFSET, - OFFSET *2 );
 
 void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
@@ -99,7 +100,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
         artPix = artPix.scaled( ART_SIZE, ART_SIZE,
                 Qt::KeepAspectRatioByExpanding );
 
-    pix = QPixmap( RECT_SIZE, RECT_SIZE );
+    pix = QPixmap( RECT_SIZE_W, RECT_SIZE_H );
     pix.fill( Qt::transparent );
 
     QPainter *pixpainter = new QPainter( &pix );
@@ -113,7 +114,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
        pixpainter->save();
        pixpainter->setOpacity( 0.2 );
        pixpainter->setBrush( QBrush( Qt::gray ) );
-       pixpainter->drawRoundedRect( 0, 0, RECT_SIZE, RECT_SIZE, ART_RADIUS, ART_RADIUS );
+       pixpainter->drawRoundedRect( 0, 0, RECT_SIZE_W, RECT_SIZE_H, ART_RADIUS, ART_RADIUS );
        pixpainter->restore();
     }
 
@@ -142,7 +143,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     pixpainter->setFont( font );
     QFontMetrics fm = pixpainter->fontMetrics();
     QRect textRect = drawRect.adjusted( 1, ART_SIZE + 4, 0, -1 );
-    textRect.setHeight( fm.height() + 2 );
+    textRect.setHeight( fm.height() + 1 );
 
     pixpainter->drawText( textRect,
                       fm.elidedText( title, Qt::ElideRight, textRect.width() ),
@@ -172,7 +173,7 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
 QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    return QSize( RECT_SIZE, RECT_SIZE);
+    return QSize( RECT_SIZE_W, RECT_SIZE_H );
 }
 
 
@@ -182,7 +183,7 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     setViewMode( QListView::IconMode );
     setMovement( QListView::Static );
     setResizeMode( QListView::Adjust );
-    setGridSize( QSize( RECT_SIZE, RECT_SIZE ) );
+    setGridSize( QSize( RECT_SIZE_W, RECT_SIZE_H ) );
     setUniformItemSizes( true );
     setSpacing( ITEMS_SPACING );
     setWrapping( true );
