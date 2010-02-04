@@ -324,7 +324,7 @@ case "${host_os}" in
         # add ws2_32 for closesocket, select, recv
         VLC_ADD_LIBS([libvlccore],[-lws2_32 -lnetapi32 -lwinmm])
         VLC_ADD_LDFLAGS([vlc],[-mwindows])
-        VLC_ADD_LIBS([activex mozilla],[-lgdi32])
+        VLC_ADD_LIBS([activex mozilla win32text],[-lgdi32])
         VLC_ADD_LIBS([cdda vcdx sdl_image aout_sdl vout_sdl],[-lwinmm])
         VLC_ADD_LIBS([access_http access_mms access_udp access_tcp access_ftp access_rtmp access_output_udp access_output_shout access_output_rtmp sap slp oldhttp stream_out_standard stream_out_rtp stream_out_raop vod_rtsp access_realrtsp rtp oldtelnet oldrc netsync gnutls growl_udp flac ts audioscrobbler lua remoteosd zvbi audiobargraph_a netsync],[-lws2_32])
         VLC_ADD_LIBS([filesystem], [-lshlwapi])
