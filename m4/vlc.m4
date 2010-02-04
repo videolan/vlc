@@ -55,7 +55,7 @@ AC_DEFUN([VLC_ADD_LDFLAGS], [
 
 AC_DEFUN([VLC_ADD_LIBS], [
   m4_foreach_w([element], [$1], [
-    [eval "LIBS_]element[="'"$2 $'"{LIBS_]element[}"'"']
+    [eval "LIBS_]element[="'"'"$2 "'$'"{LIBS_]element[}"'"']
     [am_modules_with_libs="${am_modules_with_libs} ]element["]
   ])
 ])
