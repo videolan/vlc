@@ -36,6 +36,7 @@
 #include <string.h>                                              /* strdup() */
 #include <vlc_plugin.h>
 #include <vlc_cpu.h>
+#include <errno.h>
 
 #include <sys/types.h>
 #ifdef HAVE_UNISTD_H
@@ -452,14 +453,24 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
         free (filename);
         return;
     }
+    msg_Dbg (p_this, "saving plugins cache %s", filename);
 
     FILE *file = utf8_fopen (tmpname, "wb");
     if (file == NULL)
-        goto error;
+    {
+        if (errno != EACCES && errno != ENOENT)
+            msg_Warn (p_this, "cannot create %s (%m)", tmpname);
+        goto out;
+    }
 
-    msg_Dbg (p_this, "saving plugins cache %s", tmpname);
     if (CacheSaveBank (file, pp_cache, n))
-        goto error;
+    {
+        msg_Warn (p_this, "cannot write %s (%m)", tmpname);
+        clearerr (file);
+        fclose (file);
+        utf8_unlink (tmpname);
+        goto out;
+    }
 
 #ifndef WIN32
     utf8_rename (tmpname, filename); /* atomically replace old cache */
@@ -469,17 +480,9 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
     fclose (file);
     utf8_rename (tmpname, filename);
 #endif
-    return; /* success! */
-
-error:
-    msg_Warn (p_this, "cannot write %s (%m)", tmpname);
+out:
     free (filename);
     free (tmpname);
-    if (file != NULL)
-    {
-        clearerr (file);
-        fclose (file);
-    }
 }
 
 static int CacheSaveConfig (FILE *, const module_t *);
