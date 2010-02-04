@@ -83,7 +83,7 @@ static void inputItemMetaChanged( const vlc_event_t *p_event,
  **/
 int Open_Extension( vlc_object_t *p_this )
 {
-    msg_Dbg( p_this, "Opening Lua Extensions module" );
+    msg_Dbg( p_this, "Opening EXPERIMENTAL Lua Extension module" );
 
     extensions_manager_t *p_mgr = ( extensions_manager_t* ) p_this;
 

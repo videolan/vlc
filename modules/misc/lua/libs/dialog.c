@@ -50,6 +50,8 @@
 /* Dialog functions */
 static int vlclua_dialog_create( lua_State *L );
 static int vlclua_dialog_delete( lua_State *L );
+static int vlclua_dialog_show( lua_State *L );
+static int vlclua_dialog_hide( lua_State *L );
 static int vlclua_dialog_flush( lua_State *L );
 static void lua_SetDialogUpdate( lua_State *L, int flag );
 static int lua_GetDialogUpdate( lua_State *L );
@@ -97,6 +99,8 @@ static int DeleteWidget( extension_dialog_t *p_dialog,
                          extension_widget_t *p_widget );
 
 static const luaL_Reg vlclua_dialog_reg[] = {
+    { "show", vlclua_dialog_show },
+    { "hide", vlclua_dialog_hide },
     { "close", vlclua_dialog_delete },
     { "flush", vlclua_dialog_flush },
 
@@ -280,6 +284,40 @@ static int vlclua_dialog_delete( lua_State *L )
     /* Note: At this point, the UI must not use these resources */
     vlc_mutex_destroy( &p_dlg->lock );
     vlc_cond_destroy( &p_dlg->cond );
+
+    return 1;
+}
+
+/** Show the dialog */
+static int vlclua_dialog_show( lua_State *L )
+{
+    vlc_object_t *p_mgr = vlclua_get_this( L );
+
+    extension_dialog_t **pp_dlg =
+            (extension_dialog_t**) luaL_checkudata( L, 1, "dialog" );
+    if( !pp_dlg || !*pp_dlg )
+        return luaL_error( L, "Can't get pointer to dialog" );
+    extension_dialog_t *p_dlg = *pp_dlg;
+
+    p_dlg->b_hide = false;
+    lua_SetDialogUpdate( L, 1 );
+
+    return 1;
+}
+
+/** Hide the dialog */
+static int vlclua_dialog_hide( lua_State *L )
+{
+    vlc_object_t *p_mgr = vlclua_get_this( L );
+
+    extension_dialog_t **pp_dlg =
+            (extension_dialog_t**) luaL_checkudata( L, 1, "dialog" );
+    if( !pp_dlg || !*pp_dlg )
+        return luaL_error( L, "Can't get pointer to dialog" );
+    extension_dialog_t *p_dlg = *pp_dlg;
+
+    p_dlg->b_hide = true;
+    lua_SetDialogUpdate( L, 1 );
 
     return 1;
 }
