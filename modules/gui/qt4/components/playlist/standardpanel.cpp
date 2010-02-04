@@ -32,6 +32,7 @@
 #include "components/playlist/standardpanel.hpp"
 #include "components/playlist/icon_view.hpp"
 #include "util/customwidgets.hpp"
+#include "menus.hpp"
 
 #include <vlc_intf_strings.h>
 
@@ -87,7 +88,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     layout->addWidget( search, 0, 4 );
     CONNECT( search, textChanged( const QString& ),
              this, search( const QString& ) );
-    layout->setColumnStretch( 4, 2 );
+    layout->setColumnStretch( 4, 10 );
 
     /* Add item to the playlist button */
     addButton = new QToolButton;
@@ -185,9 +186,15 @@ void StandardPLPanel::popupPlView( const QPoint &point )
 {
     QModelIndex index = currentView->indexAt( point );
     QPoint globalPoint = currentView->viewport()->mapToGlobal( point );
-    QItemSelectionModel *selection = currentView->selectionModel();
-    QModelIndexList list = selection->selectedIndexes();
-    model->popup( index, globalPoint, list );
+    if( !index.isValid() ){
+        QVLCMenu::PopupMenu( p_intf, true );
+    }
+    else
+    {
+        QItemSelectionModel *selection = currentView->selectionModel();
+        QModelIndexList list = selection->selectedIndexes();
+        model->popup( index, globalPoint, list );
+    }
 }
 
 void StandardPLPanel::popupSelectColumn( QPoint pos )
