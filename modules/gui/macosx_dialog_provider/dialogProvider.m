@@ -1237,7 +1237,7 @@ static void updateControlFromWidget(NSView *control, extension_widget_t *widget,
         window = nil;
     }
 
-    if (!dialog->b_hide && ![window isVisible]) {
+    if (![window isVisible]) {
         [window center];
         [window makeKeyAndOrderFront:self];
     }
