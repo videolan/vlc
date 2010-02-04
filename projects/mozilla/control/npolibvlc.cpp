@@ -708,8 +708,8 @@ LibvlcPlaylistItemsNPObject::invoke(int index, const NPVariant *args,
             case ID_playlistitems_remove:
                 if( (argCount == 1) && isNumberValue(args[0]) )
                 {
-                    p_plugin->playlist_delete_item(numberValue(args[0]),&ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    if( !p_plugin->playlist_delete_item(numberValue(args[0])) )
+                        return INVOKERESULT_GENERIC_ERROR;
                     VOID_TO_NPVARIANT(result);
                     return INVOKERESULT_NO_ERROR;
                 }
@@ -971,8 +971,8 @@ LibvlcPlaylistNPObject::invoke(int index, const NPVariant *args,
             case ID_playlist_removeitem: /* deprecated */
                 if( (argCount == 1) && isNumberValue(args[0]) )
                 {
-                    p_plugin->playlist_delete_item(numberValue(args[0]), &ex);
-                    RETURN_ON_EXCEPTION(this,ex);
+                    if( !p_plugin->playlist_delete_item(numberValue(args[0])) )
+                        return INVOKERESULT_GENERIC_ERROR;
                     VOID_TO_NPVARIANT(result);
                     return INVOKERESULT_NO_ERROR;
                 }

@@ -457,8 +457,7 @@ int VlcPlugin::playlist_add( const char *mrl, libvlc_exception_t *ex )
         return -1;
 
     libvlc_media_list_lock(libvlc_media_list);
-    libvlc_media_list_add_media(libvlc_media_list,p_m,ex);
-    if( !libvlc_exception_raised(ex) )
+    if( !libvlc_media_list_add_media(libvlc_media_list,p_m) )
         item = libvlc_media_list_count(libvlc_media_list)-1;
     libvlc_media_list_unlock(libvlc_media_list);
 
@@ -479,8 +478,7 @@ int VlcPlugin::playlist_add_extended_untrusted( const char *mrl, const char *nam
         libvlc_media_add_option_flag(p_m, optv[i], libvlc_media_option_unique);
 
     libvlc_media_list_lock(libvlc_media_list);
-    libvlc_media_list_add_media(libvlc_media_list,p_m,ex);
-    if( !libvlc_exception_raised(ex) )
+    if( !libvlc_media_list_add_media(libvlc_media_list,p_m) )
         item = libvlc_media_list_count(libvlc_media_list)-1;
     libvlc_media_list_unlock(libvlc_media_list);
     libvlc_media_release(p_m);
@@ -501,10 +499,10 @@ bool VlcPlugin::playlist_select( int idx, libvlc_exception_t *ex )
 
     playlist_index = idx;
 
-    p_m = libvlc_media_list_item_at_index(libvlc_media_list,playlist_index,ex);
+    p_m = libvlc_media_list_item_at_index(libvlc_media_list,playlist_index);
     libvlc_media_list_unlock(libvlc_media_list);
 
-    if( libvlc_exception_raised(ex) )
+    if( !p_m )
         return false;
 
     if( libvlc_media_player )
@@ -531,11 +529,12 @@ bad_unlock:
     return false;
 }
 
-void VlcPlugin::playlist_delete_item( int idx, libvlc_exception_t *ex )
+int VlcPlugin::playlist_delete_item( int idx )
 {
     libvlc_media_list_lock(libvlc_media_list);
-    libvlc_media_list_remove_index(libvlc_media_list,idx,ex);
+    int ret = libvlc_media_list_remove_index(libvlc_media_list,idx);
     libvlc_media_list_unlock(libvlc_media_list);
+    return ret;
 }
 
 void VlcPlugin::playlist_clear()

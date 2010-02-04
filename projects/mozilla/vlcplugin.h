@@ -266,7 +266,7 @@ public:
     int playlist_add( const char *, libvlc_exception_t * );
     int playlist_add_extended_untrusted( const char *, const char *, int,
                                 const char **, libvlc_exception_t * );
-    void playlist_delete_item( int, libvlc_exception_t * );
+    int playlist_delete_item( int );
     void playlist_clear();
     int  playlist_count();
 
