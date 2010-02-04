@@ -1180,34 +1180,28 @@ STDMETHODIMP VLCVideo::get_teletext(long* page)
 
     libvlc_media_player_t *p_md;
     HRESULT hr = getMD(&p_md);
-#if 0
+
     if( SUCCEEDED(hr) )
     {
-        libvlc_exception_t ex;
-        libvlc_exception_init(&ex);
-
         *page = libvlc_video_get_teletext(p_md);
-        hr = exception_bridge(&ex);
     }
-#endif
+
     return hr;
 };
 
 STDMETHODIMP VLCVideo::put_teletext(long page)
 {
-#warning Broken
     libvlc_media_player_t *p_md;
     HRESULT hr = getMD(&p_md);
-#if 0
+
     if( SUCCEEDED(hr) )
     {
         libvlc_exception_t ex;
         libvlc_exception_init(&ex);
 
-        libvlc_video_set_teletext(p_md, page);
+        libvlc_video_set_teletext(p_md, page, &ex);
         hr = exception_bridge(&ex);
     }
-#endif
     return hr;
 };
 

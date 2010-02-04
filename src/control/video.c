@@ -388,6 +388,63 @@ void libvlc_video_set_crop_geometry( libvlc_media_player_t *p_mi,
     free (pp_vouts);
 }
 
+int libvlc_video_get_teletext( libvlc_media_player_t *p_mi )
+{
+    input_thread_t *p_input_thread;
+    vlc_object_t *p_zvbi = NULL;
+    int i_ret = -1, telx;
+
+    p_input_thread = libvlc_get_input_thread( p_mi );
+    if( !p_input_thread ) return i_ret;
+
+    if( var_CountChoices( p_input_thread, "teletext-es" ) <= 0 )
+    {
+        vlc_object_release( p_input_thread );
+        return i_ret;
+    }
+
+    telx = var_GetInteger( p_input_thread, "teletext-es" );
+    if( input_GetEsObjects( p_input_thread, telx, &p_zvbi, NULL, NULL )
+        != VLC_SUCCESS )
+    {
+        i_ret = var_GetInteger( p_zvbi, "vbi-page" );
+        vlc_object_release( p_zvbi );
+    }
+    vlc_object_release( p_input_thread );
+    return i_ret;
+}
+
+void libvlc_video_set_teletext( libvlc_media_player_t *p_mi, int i_page,
+                                libvlc_exception_t *p_e )
+{
+    input_thread_t *p_input_thread;
+    vlc_object_t *p_zvbi = NULL;
+    int telx;
+
+    p_input_thread = libvlc_get_input_thread( p_mi );
+    if( !p_input_thread ) return;
+
+    if( var_CountChoices( p_input_thread, "teletext-es" ) <= 0 )
+    {
+        vlc_object_release( p_input_thread );
+        return;
+    }
+
+    telx = var_GetInteger( p_input_thread, "teletext-es" );
+    if( input_GetEsObjects( p_input_thread, telx, &p_zvbi, NULL, NULL )
+        != VLC_SUCCESS )
+    {
+        int i_ret = var_SetInteger( p_zvbi, "vbi-page", i_page );
+        vlc_object_release( p_zvbi );
+        if( i_ret )
+        {
+            libvlc_exception_raise( p_e );
+            libvlc_printerr( "Unexpected error while setting teletext page" );
+        }
+    }
+    vlc_object_release( p_input_thread );
+}
+
 void libvlc_toggle_teletext( libvlc_media_player_t *p_mi )
 {
     input_thread_t *p_input_thread;

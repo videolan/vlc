@@ -1381,12 +1381,11 @@ LibvlcVideoNPObject::getProperty(int index, NPVariant &result)
             }
             case ID_video_teletext:
             {
-/*                int i_page = libvlc_video_get_teletext(p_md, &ex);
-                RETURN_ON_EXCEPTION(this,ex);
+                int i_page = libvlc_video_get_teletext(p_md);
+                if( i_page < 0 )
+                    return INVOKERESULT_GENERIC_ERROR;
                 INT32_TO_NPVARIANT(i_page, result);
                 return INVOKERESULT_NO_ERROR;
-*/
-                return INVOKERESULT_NO_SUCH_METHOD;
             }
             case ID_video_marquee:
             {
@@ -1491,13 +1490,10 @@ LibvlcVideoNPObject::setProperty(int index, const NPVariant &value)
             {
                 if( isNumberValue(value) )
                 {
-/*
                     libvlc_video_set_teletext(p_md, numberValue(value), &ex);
                     RETURN_ON_EXCEPTION(this,ex);
 
                     return INVOKERESULT_NO_ERROR;
-*/
-                    return INVOKERESULT_NO_SUCH_METHOD;
                 }
                 return INVOKERESULT_INVALID_VALUE;
             }

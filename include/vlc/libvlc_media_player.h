@@ -1,7 +1,7 @@
 /*****************************************************************************
  * libvlc_media_player.h:  libvlc_media_player external API
  *****************************************************************************
- * Copyright (C) 1998-2009 the VideoLAN team
+ * Copyright (C) 1998-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Clément Stenac <zorglub@videolan.org>
@@ -711,6 +711,23 @@ VLC_PUBLIC_API char *libvlc_video_get_crop_geometry( libvlc_media_player_t * );
  */
 VLC_PUBLIC_API
 void libvlc_video_set_crop_geometry( libvlc_media_player_t *, const char * );
+
+/**
+ * Get current teletext page requested.
+ *
+ * \param p_mediaplayer the media player
+ * \return the current teletext page requested.
+ */
+VLC_PUBLIC_API int libvlc_video_get_teletext( libvlc_media_player_t * );
+
+/**
+ * Set new teletext page to retrieve.
+ *
+ * \param p_mediaplayer the media player
+ * \param i_page teletex page number requested
+ * \param p_e an initialized exception pointer
+ */
+VLC_PUBLIC_API void libvlc_video_set_teletext( libvlc_media_player_t *, int, libvlc_exception_t * );
 
 /**
  * Toggle teletext transparent status on video output.
