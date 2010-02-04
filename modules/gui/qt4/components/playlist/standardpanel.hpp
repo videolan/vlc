@@ -110,7 +110,7 @@ private slots:
     void browseInto( input_item_t * );
 };
 
-class LocationBar : public QToolBar
+class LocationBar : public QWidget
 {
     Q_OBJECT;
 public:
@@ -123,6 +123,18 @@ private slots:
 private:
     PLModel *model;
     QSignalMapper *mapper;
+    QHBoxLayout *box;
+    QList<QWidget*> buttons;
+};
+
+class LocationButton : public QToolButton
+{
+  public:
+      LocationButton( const QString &, bool bold );
+  private:
+      void paintEvent ( QPaintEvent * event );
+      QSize sizeHint() const;
+      QFontMetrics *metrics;
 };
 
 #endif

@@ -45,6 +45,7 @@
 #include <QWheelEvent>
 #include <QToolButton>
 #include <QFontMetrics>
+#include <QPainter>
 
 #include <assert.h>
 
@@ -456,33 +457,33 @@ LocationBar::LocationBar( PLModel *m )
     model = m;
     mapper = new QSignalMapper( this );
     CONNECT( mapper, mapped( int ), this, invoke( int ) );
+
+    box = new QHBoxLayout;
+    box->setSpacing( 0 );
+    setLayout( box );
 }
 
 void LocationBar::setIndex( const QModelIndex &index )
 {
-    clear();
-    QAction *prev = NULL;
+    qDeleteAll( buttons );
+    buttons.clear();
     QModelIndex i = index;
-    QFont font;
-    QFontMetrics metrics( font );
-    font.setBold( true );
+    bool bold = true;
     while( true )
     {
         PLItem *item = model->getItem( i );
 
-        QToolButton *btn = new QToolButton;
         char *fb_name = input_item_GetTitleFbName( item->inputItem() );
         QString text = qfu(fb_name);
         free(fb_name);
-        text = QString("> ") + metrics.elidedText( text, Qt::ElideRight, 150 );
-        btn->setText( text );
-        btn->setFont( font );
-        prev = insertWidget( prev, btn );
+        QToolButton *btn = new LocationButton( text, bold );
+        box->insertWidget( 0, btn );
+        buttons.append( btn );
 
         mapper->setMapping( btn, item->id() );
         CONNECT( btn, clicked( ), mapper, map( ) );
 
-        font = QFont();
+        bold = false;
 
         if( i.isValid() ) i = i.parent();
         else break;
@@ -494,4 +495,39 @@ void LocationBar::invoke( int i_id )
     QModelIndex index = model->index( i_id, 0 );
     setIndex( index );
     emit invoked ( index );
+}
+
+LocationButton::LocationButton( const QString &text, bool bold )
+{
+    QFont font;
+    font.setBold( bold );
+    setFont( font );
+    metrics = new QFontMetrics( font );
+    setText( metrics->elidedText( text, Qt::ElideRight, 150 ) );
+}
+
+void LocationButton::paintEvent ( QPaintEvent * event )
+{
+    QStyleOptionButton option;
+    option.initFrom( this );
+    option.rect = rect();
+    option.text = text();
+    option.features = QStyleOptionButton::Flat;
+    option.state |= QStyle::State_Enabled;
+    option.state |= isChecked() ? QStyle::State_On : QStyle::State_Off;
+    if( isDown() ) option.state |= QStyle::State_Sunken;
+    QPainter p( this );
+    style()->drawControl( QStyle::CE_PushButtonBevel, &option, &p );
+    option.rect.setLeft( 18 );
+    p.drawText( option.rect, Qt::AlignVCenter,
+                metrics->elidedText( text(), Qt::ElideRight, option.rect.width() - 5 ) );
+    option.rect = QRect( 0, 0, 18, height() );
+    style()->drawPrimitive( QStyle::PE_IndicatorArrowRight, &option, &p );
+}
+
+QSize LocationButton::sizeHint() const
+{
+    QSize s( metrics->boundingRect( text() ).size() );
+    s += QSize( 25, 10 );
+    return s;
 }
