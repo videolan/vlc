@@ -161,7 +161,7 @@ void PLSelector::setSource( QTreeWidgetItem *item )
     bool sd_loaded;
     if( i_type == SD_TYPE )
     {
-        QString qs = item->data( 0, NAME_ROLE ).toString();
+        QString qs = item->data( 0, LONGNAME_ROLE ).toString();
         sd_loaded = playlist_IsServicesDiscoveryLoaded( THEPL, qtu( qs ) );
         if( !sd_loaded )
             playlist_ServicesDiscoveryAdd( THEPL, qtu( qs ) );
