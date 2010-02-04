@@ -57,6 +57,7 @@ MetaPanel::MetaPanel( QWidget *parent,
                       : QWidget( parent ), p_intf( _p_intf )
 {
     QGridLayout *metaLayout = new QGridLayout( this );
+    metaLayout->setVerticalSpacing( 12 );
 
     int line = 0; /* Counter for GridLayout */
     p_input = NULL;
@@ -138,6 +139,7 @@ MetaPanel::MetaPanel( QWidget *parent,
 
     metaLayout->setColumnStretch( 1, 2 );
     metaLayout->setColumnMinimumWidth ( 1, 80 );
+    metaLayout->setRowStretch( line, 10 );
 #undef ADD_META
 #undef ADD_META_2
 
