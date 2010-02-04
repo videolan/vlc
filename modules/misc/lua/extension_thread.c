@@ -285,6 +285,7 @@ static void* Run( void *data )
         if( cmd )
         {
             p_ext->p_sys->command = cmd->next;
+            cmd->next = NULL; // This prevents FreeCommands from freeing next
         }
 
         vlc_mutex_unlock( &p_ext->p_sys->command_lock );
@@ -346,7 +347,6 @@ static void* Run( void *data )
                         msg_Dbg( p_mgr, "Trigger menu %d of '%s'",
                                  *pi_id, p_ext->psz_name );
                         lua_ExtensionTriggerMenu( p_mgr, p_ext, *pi_id );
-                        free( pi_id );
                         break;
                     }
 
@@ -372,6 +372,8 @@ static void* Run( void *data )
                 UnlockExtension( p_ext );
             }
         }
+
+        FreeCommands( cmd );
 
         vlc_mutex_lock( &p_ext->p_sys->command_lock );
         if( !p_ext->p_sys->b_exiting && !p_ext->p_sys->command )
