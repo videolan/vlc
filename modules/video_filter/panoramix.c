@@ -165,9 +165,9 @@ vlc_module_begin()
     add_integer_with_range( CFG_PREFIX "bz-whitelevel-green", 0, 0, 255, NULL, GGAMMA_WL_TEXT, GGAMMA_WL_LONGTEXT, true )
     add_integer_with_range( CFG_PREFIX "bz-whitelevel-blue", 0, 0, 255, NULL, BGAMMA_WL_TEXT, BGAMMA_WL_LONGTEXT, true )
 #ifndef WIN32
-    add_deprecated_alias( CFG_PREFIX "xinerama" );
+    add_obsolete_bool( CFG_PREFIX "xinerama" );
 #endif
-    add_deprecated_alias( CFG_PREFIX "offset-x" )
+    add_obsolete_bool( CFG_PREFIX "offset-x" )
 #endif
 
     add_string( CFG_PREFIX "active", NULL, NULL, ACTIVE_TEXT, ACTIVE_LONGTEXT, true )
