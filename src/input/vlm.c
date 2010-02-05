@@ -566,7 +566,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
             if( asprintf( &psz_header, _("Media: %s"), p_cfg->psz_name ) == -1 )
                 psz_header = NULL;
 
-            p_input = input_Create( p_vlm->p_libvlc, p_media->vod.p_item, psz_header, NULL );
+            p_input = input_Create( p_vlm->p_vod, p_media->vod.p_item, psz_header, NULL );
             if( p_input )
             {
                 vlc_sem_t sem_preparse;
@@ -932,7 +932,10 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
 
     if( asprintf( &psz_log, _("Media: %s"), p_media->cfg.psz_name ) != -1 )
     {
-        p_instance->p_input = input_Create( p_vlm->p_libvlc, p_instance->p_item,
+        vlc_object_t *p_parent = p_media->cfg.b_vod ?
+                                     VLC_OBJECT(p_vlm->p_vod) :
+                                     VLC_OBJECT(p_vlm->p_libvlc);
+        p_instance->p_input = input_Create( p_parent, p_instance->p_item,
                                             psz_log, p_instance->p_input_resource );
         if( p_instance->p_input )
         {
