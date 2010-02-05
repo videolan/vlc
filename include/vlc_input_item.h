@@ -238,6 +238,8 @@ INPUT_META(TrackID)
 VLC_EXPORT( char *, input_item_GetInfo, ( input_item_t *p_i, const char *psz_cat,const char *psz_name ) );
 VLC_EXPORT( int, input_item_AddInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name, const char *psz_format, ... ) LIBVLC_FORMAT( 4, 5 ) );
 VLC_EXPORT( int, input_item_DelInfo, ( input_item_t *p_i, const char *psz_cat, const char *psz_name ) );
+VLC_EXPORT( void, input_item_ReplaceInfos, ( input_item_t *, info_category_t * ) );
+VLC_EXPORT( void, input_item_MergeInfos, ( input_item_t *, info_category_t * ) );
 
 /**
  * This function creates a new input_item_t with the provided informations.
