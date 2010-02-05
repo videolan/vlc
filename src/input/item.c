@@ -716,11 +716,9 @@ int input_item_DelInfo( input_item_t *p_i,
         }
         free( p_cat->pp_infos );
         REMOVE_ELEM( p_i->pp_categories, p_i->i_categories, i_cat );
+        free( p_cat->psz_name );
+        free( p_cat );
     }
-
-    // Free the category
-    free( p_cat->psz_name );
-    free( p_cat );
     vlc_mutex_unlock( &p_i->lock );
 
 
