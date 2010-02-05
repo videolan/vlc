@@ -32,6 +32,7 @@
 #include "vlc_interface.h"
 
 #include "item.h"
+#include "info.h"
 
 static int GuessType( const input_item_t *p_item );
 
@@ -102,23 +103,7 @@ static inline void input_item_Clean( input_item_t *p_i )
     TAB_CLEAN( p_i->i_epg, p_i->pp_epg );
 
     for( i = 0; i < p_i->i_categories; i++ )
-    {
-        info_category_t *p_category = p_i->pp_categories[i];
-        int j;
-
-        for( j = 0; j < p_category->i_infos; j++ )
-        {
-            struct info_t *p_info = p_category->pp_infos[j];
-
-            free( p_info->psz_name);
-            free( p_info->psz_value );
-            free( p_info );
-        }
-        TAB_CLEAN( p_category->i_infos, p_category->pp_infos );
-
-        free( p_category->psz_name );
-        free( p_category );
-    }
+        info_category_Delete( p_i->pp_categories[i] );
     TAB_CLEAN( p_i->i_categories, p_i->pp_categories );
 
     vlc_mutex_destroy( &p_i->lock );
@@ -525,6 +510,24 @@ out:
     return err;
 }
 
+static info_category_t *InputItemFindCat( input_item_t *p_item,
+                                          int *pi_index, const char *psz_cat )
+{
+    vlc_assert_locked( &p_item->lock );
+    for( int i = 0; i < p_item->i_categories && psz_cat; i++ )
+    {
+        info_category_t *p_cat = p_item->pp_categories[i];
+
+        if( !strcmp( p_cat->psz_name, psz_cat ) )
+        {
+            if( pi_index )
+                *pi_index = i;
+            return p_cat;
+        }
+    }
+    return NULL;
+}
+
 /**
  * Get a info item from a given category in a given input item.
  *
@@ -541,21 +544,15 @@ char *input_item_GetInfo( input_item_t *p_i,
 {
     vlc_mutex_lock( &p_i->lock );
 
-    for( int i = 0; i< p_i->i_categories; i++ )
+    const info_category_t *p_cat = InputItemFindCat( p_i, NULL, psz_cat );
+    if( p_cat )
     {
-        const info_category_t *p_cat = p_i->pp_categories[i];
-
-        if( !psz_cat || strcmp( p_cat->psz_name, psz_cat ) )
-            continue;
-
-        for( int j = 0; j < p_cat->i_infos; j++ )
+        info_t *p_info = info_category_FindInfo( p_cat, NULL, psz_name );
+        if( p_info && p_info->psz_value )
         {
-            if( !strcmp( p_cat->pp_infos[j]->psz_name, psz_name ) )
-            {
-                char *psz_ret = strdup( p_cat->pp_infos[j]->psz_value );
-                vlc_mutex_unlock( &p_i->lock );
-                return psz_ret;
-            }
+            char *psz_ret = strdup( p_info->psz_value );
+            vlc_mutex_unlock( &p_i->lock );
+            return psz_ret;
         }
     }
     vlc_mutex_unlock( &p_i->lock );
@@ -567,58 +564,21 @@ static int InputItemVaAddInfo( input_item_t *p_i,
                                const char *psz_name,
                                const char *psz_format, va_list args )
 {
-    int i;
-    info_t *p_info = NULL;
-    info_category_t *p_cat = NULL ;
-
     vlc_assert_locked( &p_i->lock );
 
-    for( i = 0 ; i < p_i->i_categories ; i ++ )
-    {
-        if( !strcmp( p_i->pp_categories[i]->psz_name, psz_cat ) )
-        {
-            p_cat = p_i->pp_categories[i];
-            break;
-        }
-    }
+    info_category_t *p_cat = InputItemFindCat( p_i, NULL, psz_cat );
     if( !p_cat )
     {
-        if( !(p_cat = malloc( sizeof(*p_cat) )) )
+        p_cat = info_category_New( psz_cat );
+        if( !p_cat )
             return VLC_ENOMEM;
-
-        p_cat->psz_name = strdup( psz_cat );
-        p_cat->i_infos = 0;
-        p_cat->pp_infos = 0;
         INSERT_ELEM( p_i->pp_categories, p_i->i_categories, p_i->i_categories,
                      p_cat );
     }
-
-    for( i = 0; i< p_cat->i_infos; i++ )
-    {
-        if( !strcmp( p_cat->pp_infos[i]->psz_name, psz_name ) )
-        {
-            p_info = p_cat->pp_infos[i];
-            break;
-        }
-    }
-
-    if( !p_info )
-    {
-        if( ( p_info = malloc( sizeof( *p_info ) ) ) == NULL )
-            return VLC_ENOMEM;
-
-        INSERT_ELEM( p_cat->pp_infos, p_cat->i_infos, p_cat->i_infos, p_info );
-        p_info->psz_name = strdup( psz_name );
-    }
-    else
-    {
-        free( p_info->psz_value );
-    }
-
-    if( vasprintf( &p_info->psz_value, psz_format, args ) == -1 )
-        p_info->psz_value = NULL;
-
-    return p_info->psz_value ? VLC_SUCCESS : VLC_ENOMEM;
+    info_t *p_info = info_category_VaAddInfo( p_cat, psz_name, psz_format, args );
+    if( !p_info || !p_info->psz_value )
+        return VLC_EGENERIC;
+    return VLC_SUCCESS;
 }
 
 static int InputItemAddInfo( input_item_t *p_i,
@@ -665,21 +625,11 @@ int input_item_DelInfo( input_item_t *p_i,
                         const char *psz_cat,
                         const char *psz_name )
 {
-    info_category_t *p_cat = NULL;
-    int i_cat;
-    int i;
 
     vlc_mutex_lock( &p_i->lock );
-    for( i_cat = 0; i_cat < p_i->i_categories; i_cat++ )
-    {
-        if( !strcmp( p_i->pp_categories[i_cat]->psz_name,
-                     psz_cat ) )
-        {
-            p_cat = p_i->pp_categories[i_cat];
-            break;
-        }
-    }
-    if( p_cat == NULL )
+    int i_cat;
+    info_category_t *p_cat = InputItemFindCat( p_i, &i_cat, psz_cat );
+    if( !p_cat )
     {
         vlc_mutex_unlock( &p_i->lock );
         return VLC_EGENERIC;
@@ -688,18 +638,8 @@ int input_item_DelInfo( input_item_t *p_i,
     if( psz_name )
     {
         /* Remove a specific info */
-        for( i = 0; i < p_cat->i_infos; i++ )
-        {
-            if( !strcmp( p_cat->pp_infos[i]->psz_name, psz_name ) )
-            {
-                free( p_cat->pp_infos[i]->psz_name );
-                free( p_cat->pp_infos[i]->psz_value );
-                free( p_cat->pp_infos[i] );
-                REMOVE_ELEM( p_cat->pp_infos, p_cat->i_infos, i );
-                break;
-            }
-        }
-        if( i >= p_cat->i_infos )
+        int i_ret = info_category_DeleteInfo( p_cat, psz_name );
+        if( i_ret )
         {
             vlc_mutex_unlock( &p_i->lock );
             return VLC_EGENERIC;
@@ -708,16 +648,8 @@ int input_item_DelInfo( input_item_t *p_i,
     else
     {
         /* Remove the complete categorie */
-        for( i = 0; i < p_cat->i_infos; i++ )
-        {
-            free( p_cat->pp_infos[i]->psz_name );
-            free( p_cat->pp_infos[i]->psz_value );
-            free( p_cat->pp_infos[i] );
-        }
-        free( p_cat->pp_infos );
+        info_category_Delete( p_cat );
         REMOVE_ELEM( p_i->pp_categories, p_i->i_categories, i_cat );
-        free( p_cat->psz_name );
-        free( p_cat );
     }
     vlc_mutex_unlock( &p_i->lock );
 
