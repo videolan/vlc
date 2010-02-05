@@ -44,6 +44,7 @@
 #include "decoder.h"
 #include "es_out.h"
 #include "event.h"
+#include "info.h"
 
 #include "../stream_output/stream_output.h"
 
@@ -1166,7 +1167,6 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
     es_out_sys_t      *p_sys = out->p_sys;
     es_out_pgrm_t     *p_pgrm;
     input_thread_t    *p_input = p_sys->p_input;
-    char              *psz_cat;
     const char        *psz_title = NULL;
     const char        *psz_provider = NULL;
     int i;
@@ -1228,7 +1228,27 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
         }
     }
 
-    psz_cat = EsOutProgramGetMetaName( p_pgrm );
+    /* */
+    char **ppsz_all_keys = vlc_meta_CopyExtraNames(p_meta );
+
+    info_category_t *p_cat = NULL;
+    if( psz_provider || *ppsz_all_keys[0] )
+    {
+        char *psz_cat = EsOutProgramGetMetaName( p_pgrm );
+        if( psz_cat )
+            p_cat = info_category_New( psz_cat );
+        free( psz_cat );
+    }
+
+    for( i = 0; ppsz_all_keys[i]; i++ )
+    {
+        if( p_cat )
+            info_category_AddInfo( p_cat, vlc_gettext(ppsz_all_keys[i]), "%s",
+                                   vlc_meta_GetExtra( p_meta, ppsz_all_keys[i] ) );
+        free( ppsz_all_keys[i] );
+    }
+    free( ppsz_all_keys );
+
     if( psz_provider )
     {
         if( p_sys->p_pgrm == p_pgrm )
@@ -1236,19 +1256,12 @@ static void EsOutProgramMeta( es_out_t *out, int i_group, const vlc_meta_t *p_me
             input_item_SetPublisher( p_input->p->p_item, psz_provider );
             input_SendEventMeta( p_input );
         }
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat, vlc_meta_TypeToLocalizedString(vlc_meta_Publisher), psz_provider );
+        if( p_cat )
+            info_category_AddInfo( p_cat, vlc_meta_TypeToLocalizedString(vlc_meta_Publisher),
+                                   "%s",psz_provider );
     }
-    char ** ppsz_all_keys = vlc_meta_CopyExtraNames(p_meta );
-    for( i = 0; ppsz_all_keys[i]; i++ )
-    {
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                       vlc_gettext(ppsz_all_keys[i]),
-                       vlc_meta_GetExtra( p_meta, ppsz_all_keys[i] ) );
-        free( ppsz_all_keys[i] );
-    }
-    free( ppsz_all_keys );
-
-    free( psz_cat );
+    if( p_cat )
+        input_Control( p_input, INPUT_MERGE_INFOS, p_cat );
 }
 
 static void EsOutProgramEpg( es_out_t *out, int i_group, const vlc_epg_t *p_epg )
@@ -2789,15 +2802,14 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     es_out_sys_t   *p_sys = out->p_sys;
     input_thread_t *p_input = p_sys->p_input;
     const es_format_t *p_fmt_es = &es->fmt;
-    char           *psz_cat;
     lldiv_t         div;
 
-    /* Create category name */
-    if( asprintf( &psz_cat, _("Stream %d"), es->i_meta_id ) == -1 )
+    /* Create category */
+    char psz_cat[128];
+    snprintf( psz_cat, sizeof(psz_cat),_("Stream %d"), es->i_meta_id );
+    info_category_t *p_cat = info_category_New( psz_cat );
+    if( !p_cat )
         return;
-
-    /* Remove previous information */
-    input_Control( p_input, INPUT_DEL_INFO, psz_cat, NULL );
 
     /* Add informations */
     const char *psz_type;
@@ -2818,46 +2830,45 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
     }
 
     if( psz_type )
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Type"), psz_type );
+        info_category_AddInfo( p_cat, _("Type"), "%s", psz_type );
 
     if( es->i_meta_id != es->i_id )
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Original ID"),
+        info_category_AddInfo( p_cat, _("Original ID"),
                        "%d", es->i_id );
 
     const char *psz_codec_description =
         vlc_fourcc_GetDescription( p_fmt_es->i_cat, p_fmt_es->i_codec );
     const vlc_fourcc_t i_codec_fourcc = p_fmt_es->i_original_fourcc ?: p_fmt_es->i_codec;
     if( psz_codec_description )
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Codec"),
-                       "%s (%.4s)", psz_codec_description, (char*)&i_codec_fourcc );
+        info_category_AddInfo( p_cat, _("Codec"), "%s (%.4s)",
+                               psz_codec_description, (char*)&i_codec_fourcc );
     else
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Codec"),
-                       "%.4s", (char*)&i_codec_fourcc );
+        info_category_AddInfo( p_cat, _("Codec"), "%.4s",
+                               (char*)&i_codec_fourcc );
 
     if( es->psz_language && *es->psz_language )
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Language"),
-                       "%s", es->psz_language );
+        info_category_AddInfo( p_cat, _("Language"), "%s",
+                               es->psz_language );
     if( fmt->psz_description && *fmt->psz_description )
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Description"),
-                       "%s", fmt->psz_description );
+        info_category_AddInfo( p_cat, _("Description"), "%s",
+                               fmt->psz_description );
 
     switch( fmt->i_cat )
     {
     case AUDIO_ES:
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                       _("Type"), _("Audio") );
+        info_category_AddInfo( p_cat, _("Type"), _("Audio") );
 
         if( fmt->audio.i_physical_channels & AOUT_CHAN_PHYSMASK )
-            input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Channels"),
-                           "%s", _( aout_FormatPrintChannels( &fmt->audio ) ) );
+            info_category_AddInfo( p_cat, _("Channels"), "%s",
+                                   _( aout_FormatPrintChannels( &fmt->audio ) ) );
         else if( fmt->audio.i_channels > 0 )
-            input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Channels"),
-                           "%u", fmt->audio.i_channels );
+            info_category_AddInfo( p_cat, _("Channels"), "%u",
+                                   fmt->audio.i_channels );
 
         if( fmt->audio.i_rate > 0 )
         {
-            input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Sample rate"),
-                           _("%u Hz"), fmt->audio.i_rate );
+            info_category_AddInfo( p_cat, _("Sample rate"), _("%u Hz"),
+                                   fmt->audio.i_rate );
             /* FIXME that should be removed or improved ! (used by text/strings.c) */
             var_SetInteger( p_input, "sample-rate", fmt->audio.i_rate );
         }
@@ -2866,14 +2877,13 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
         if( i_bitspersample <= 0 )
             i_bitspersample = aout_BitsPerSample( p_fmt_es->i_codec );
         if( i_bitspersample > 0 )
-            input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                           _("Bits per sample"), "%u",
-                           i_bitspersample );
+            info_category_AddInfo( p_cat, _("Bits per sample"), "%u",
+                                   i_bitspersample );
 
         if( fmt->i_bitrate > 0 )
         {
-            input_Control( p_input, INPUT_ADD_INFO, psz_cat, _("Bitrate"),
-                           _("%u kb/s"), fmt->i_bitrate / 1000 );
+            info_category_AddInfo( p_cat, _("Bitrate"), _("%u kb/s"),
+                                   fmt->i_bitrate / 1000 );
             /* FIXME that should be removed or improved ! (used by text/strings.c) */
             var_SetInteger( p_input, "bit-rate", fmt->i_bitrate );
         }
@@ -2887,26 +2897,23 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                 psz_name = _("Track replay gain");
             else
                 psz_name = _("Album replay gain");
-            input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                           psz_name, _("%.2f dB"), p_rg->pf_gain[i] );
+            info_category_AddInfo( p_cat, psz_name, _("%.2f dB"),
+                                   p_rg->pf_gain[i] );
         }
         break;
 
     case VIDEO_ES:
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                       _("Type"), _("Video") );
+        info_category_AddInfo( p_cat, _("Type"), _("Video") );
 
         if( fmt->video.i_width > 0 && fmt->video.i_height > 0 )
-            input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                           _("Resolution"), "%ux%u",
-                           fmt->video.i_width, fmt->video.i_height );
+            info_category_AddInfo( p_cat, _("Resolution"), "%ux%u",
+                                   fmt->video.i_width, fmt->video.i_height );
 
         if( fmt->video.i_visible_width > 0 &&
             fmt->video.i_visible_height > 0 )
-            input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                           _("Display resolution"), "%ux%u",
-                           fmt->video.i_visible_width,
-                           fmt->video.i_visible_height);
+            info_category_AddInfo( p_cat, _("Display resolution"), "%ux%u",
+                                   fmt->video.i_visible_width,
+                                   fmt->video.i_visible_height);
        if( fmt->video.i_frame_rate > 0 &&
            fmt->video.i_frame_rate_base > 0 )
        {
@@ -2914,18 +2921,16 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
                                fmt->video.i_frame_rate_base * 1000000,
                                1000000 );
            if( div.rem > 0 )
-               input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                              _("Frame rate"), "%"PRId64".%06u",
-                              div.quot, (unsigned int )div.rem );
+               info_category_AddInfo( p_cat, _("Frame rate"), "%"PRId64".%06u",
+                                      div.quot, (unsigned int )div.rem );
            else
-               input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                              _("Frame rate"), "%"PRId64, div.quot );
+               info_category_AddInfo( p_cat, _("Frame rate"), "%"PRId64,
+                                      div.quot );
        }
        break;
 
     case SPU_ES:
-        input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                       _("Type"), _("Subtitle") );
+        info_category_AddInfo( p_cat, _("Type"), _("Subtitle") );
         break;
 
     default:
@@ -2942,12 +2947,13 @@ static void EsOutUpdateInfo( es_out_t *out, es_out_id_t *es, const es_format_t *
             const char *psz_value = vlc_meta_GetExtra( p_meta, psz_key );
 
             if( psz_value )
-                input_Control( p_input, INPUT_ADD_INFO, psz_cat,
-                               vlc_gettext(psz_key), vlc_gettext(psz_value) );
+                info_category_AddInfo( p_cat, vlc_gettext(psz_key), "%s",
+                                       vlc_gettext(psz_value) );
             free( psz_key );
         }
         free( ppsz_all_keys );
     }
-
-    free( psz_cat );
+    /* */
+    input_Control( p_input, INPUT_REPLACE_INFOS, p_cat );
 }
+
