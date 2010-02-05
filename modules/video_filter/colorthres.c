@@ -83,7 +83,7 @@ vlc_module_begin ()
 vlc_module_end ()
 
 static const char *const ppsz_filter_options[] = {
-    "color", "saturationthes", "similaritythres", NULL
+    "color", "saturationthres", "similaritythres", NULL
 };
 
 /*****************************************************************************
