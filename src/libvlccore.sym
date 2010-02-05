@@ -200,6 +200,7 @@ input_item_HasErrorWhenReading
 input_item_IsArtFetched
 input_item_IsPreparsed
 input_item_MetaMatch
+input_item_MergeInfos
 __input_item_NewExt
 input_item_NewWithType
 input_item_node_AppendItem
@@ -208,6 +209,7 @@ input_item_node_Create
 input_item_node_Delete
 input_item_node_PostAndDelete
 input_item_PostSubItem
+input_item_ReplaceInfos
 input_item_SetDuration
 input_item_SetMeta
 input_item_SetName
