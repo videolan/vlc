@@ -73,16 +73,19 @@ static inline info_t *info_category_FindInfo(const info_category_t *cat,
 	return NULL;
 }
 
-static inline void info_category_AddInfo(info_category_t *cat, info_t *info)
+static inline void info_category_ReplaceInfo(info_category_t *cat,
+                                             info_t *info)
 {
-	int index;
-	if (info_category_FindInfo(cat, &index, info->psz_name)) {
-		info_Delete(cat->pp_infos[index]);
-		cat->pp_infos[index] = info;
+    int index;
+	info_t *old = info_category_FindInfo(cat, &index, info->psz_name);
+	if (old) {
+        info_Delete(cat->pp_infos[index]);
+        cat->pp_infos[index] = info;
     } else {
-        INSERT_ELEM(cat->pp_infos, cat->i_infos, cat->i_infos, info);
+	    INSERT_ELEM(cat->pp_infos, cat->i_infos, cat->i_infos, info);
     }
 }
+
 static inline info_t *info_category_VaAddInfo(info_category_t *cat,
                                               const char *name,
                                               const char *format, va_list args)
@@ -98,6 +101,19 @@ static inline info_t *info_category_VaAddInfo(info_category_t *cat,
     }
     if (vasprintf(&info->psz_value, format, args) == -1)
         info->psz_value = NULL;
+    return info;
+}
+
+static inline info_t *info_category_AddInfo(info_category_t *cat,
+                                            const char *name,
+                                            const char *format, ...)
+{
+    va_list args;
+
+    va_start(args, format);
+    info_t *info = info_category_VaAddInfo(cat, name, format, args);
+    va_end(args);
+
     return info;
 }
 
