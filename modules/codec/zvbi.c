@@ -322,7 +322,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     vbi_page        p_page;
     const uint8_t   *p_pos;
     unsigned int    i_left;
-    int64_t         i_pts = 0;
 
     if( (pp_block == NULL) || (*pp_block == NULL) )
         return NULL;
@@ -337,6 +336,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     {
         vbi_sliced      p_sliced[MAX_SLICES];
         unsigned int    i_lines = 0;
+        int64_t         i_pts;
 
         i_lines = vbi_dvb_demux_cor( p_sys->p_dvb_demux, p_sliced,
                                      MAX_SLICES, &i_pts, &p_pos, &i_left );
@@ -363,7 +363,6 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     if( i_wanted_page == p_sys->i_last_page && !p_sys->b_update )
         goto error;
 
-    i_pts = i_pts ? i_pts : p_block->i_pts;
     if( !b_cached )
     {
         if( p_sys->i_last_page != i_wanted_page )
@@ -371,7 +370,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
             /* We need to reset the subtitle */
             p_spu = Subpicture( p_dec, &fmt, true,
                                 p_page.columns, p_page.rows,
-                                i_align, i_pts );
+                                i_align, p_block->i_pts );
             if( !p_spu )
                 goto error;
             p_spu->p_region->psz_text = strdup("");
@@ -393,7 +392,7 @@ static subpicture_t *Decode( decoder_t *p_dec, block_t **pp_block )
     /* Create the subpicture unit */
     p_spu = Subpicture( p_dec, &fmt, p_sys->b_text,
                         p_page.columns, p_page.rows,
-                        i_align, i_pts );
+                        i_align, p_block->i_pts );
     if( !p_spu )
         goto error;
 
