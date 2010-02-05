@@ -155,6 +155,20 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
                 input_SendEventMetaInfo( p_input );
             return i_ret;
         }
+        case INPUT_REPLACE_INFOS:
+        case INPUT_MERGE_INFOS:
+        {
+            info_category_t *p_cat = va_arg( args, info_category_t * );
+
+            if( i_query == INPUT_REPLACE_INFOS )
+                input_item_ReplaceInfos( p_input->p->p_item, p_cat );
+            else
+                input_item_MergeInfos( p_input->p->p_item, p_cat );
+
+            if( !p_input->b_preparsing )
+                input_SendEventMetaInfo( p_input );
+            return VLC_SUCCESS;
+        }
         case INPUT_DEL_INFO:
         {
             char *psz_cat = (char *)va_arg( args, char * );

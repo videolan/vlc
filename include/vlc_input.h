@@ -473,6 +473,8 @@ enum input_query_e
 
     /* Meta datas */
     INPUT_ADD_INFO,   /* arg1= char* arg2= char* arg3=...     res=can fail */
+    INPUT_REPLACE_INFOS,/* arg1= info_category_t *            res=cannot fail */
+    INPUT_MERGE_INFOS,/* arg1= info_category_t *              res=cannot fail */
     INPUT_GET_INFO,   /* arg1= char* arg2= char* arg3= char** res=can fail */
     INPUT_DEL_INFO,   /* arg1= char* arg2= char*              res=can fail */
     INPUT_SET_NAME,   /* arg1= char* res=can fail    */
