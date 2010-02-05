@@ -4230,7 +4230,21 @@ PKG_ENABLE_MODULES_VLC([GOOM], [], [libgoom2], [goom visualization plugin], [aut
 dnl
 dnl libprojectM visualization plugin
 dnl
-PKG_ENABLE_MODULES_VLC([PROJECTM], [], [libprojectM], [projectM visualization plugin], [auto])
+AC_ARG_ENABLE(projectm,
+  [  --enable-projectm          projectM visualization plugin (default enabled)])
+AS_IF([test "${enable_projectm}" != "no"],
+  [
+    PKG_CHECK_MODULES(PROJECTM, libprojectM,
+    [
+      VLC_ADD_PLUGIN([projectm])
+      VLC_ADD_CXXFLAGS([projectm],[$PROJECTM_CFLAGS])
+      VLC_ADD_LIBS([projectm],[$PROJECTM_LIBS])
+      PKG_CHECK_MODULES(PROJECTM, libprojectM >= 2.0.0,
+        [ AC_DEFINE([HAVE_PROJECTM2], 1, [Define to 1 if using libprojectM2]) ])
+    ],[
+      AC_MSG_WARN(libprojectM library not found)
+    ])
+  ])
 
 dnl
 dnl  AtmoLight (homemade Philips Ambilight clone)

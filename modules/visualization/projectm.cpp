@@ -48,6 +48,15 @@ static void Close        ( vlc_object_t * );
 #define CONFIG_LONGTEXT N_("File that will be used to configure the projectM " \
                            "module.")
 
+#define PRESET_PATH_TXT N_("projectM preset path")
+#define PRESET_PATH_LONGTXT N_("Path to the projectM preset directory")
+
+#define TITLE_FONT_TXT N_("Title font")
+#define TITLE_FONT_LONGTXT N_("Font used for the titles")
+
+#define MENU_FONT_TXT N_("Font menu")
+#define MENU_FONT_LONGTXT N_("Font used for the menus")
+
 #define WIDTH_TEXT N_("Video width")
 #define WIDTH_LONGTEXT N_("The width of the video window, in pixels.")
 
@@ -60,8 +69,17 @@ vlc_module_begin ()
     set_capability( "visualization2", 0 )
     set_category( CAT_AUDIO )
     set_subcategory( SUBCAT_AUDIO_VISUAL )
+#ifndef HAVE_PROJECTM2
     add_file( "projectm-config", "/usr/share/projectM/config.inp", NULL,
-                CONFIG_TEXT, CONFIG_LONGTEXT, true )
+              CONFIG_TEXT, CONFIG_LONGTEXT, true )
+#else
+    add_file( "projectm-preset-path", "/usr/share/projectM/presets", NULL,
+              PRESET_PATH_TXT, PRESET_PATH_LONGTXT, true )
+    add_file( "projectm-title-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSans.ttf", NULL,
+              TITLE_FONT_TXT, TITLE_FONT_LONGTXT, true )
+    add_file( "projectm-menu-font", "/usr/share/fonts/truetype/ttf-dejavu/DejaVuSansMono.ttf", NULL,
+              MENU_FONT_TXT, MENU_FONT_LONGTXT, true )
+#endif
     add_integer( "projectm-width", 800, NULL, WIDTH_TEXT, WIDTH_LONGTEXT,
                  false )
     add_integer( "projectm-height", 640, NULL, HEIGHT_TEXT, HEIGHT_LONGTEXT,
@@ -87,7 +105,13 @@ struct filter_sys_t
 
     /* libprojectM objects */
     projectM      *p_projectm;
+#ifndef HAVE_PROJECTM2
     char          *psz_config;
+#else
+    char          *psz_preset_path;
+    char          *psz_title_font;
+    char          *psz_menu_font;
+#endif
 
     /* Window size */
     int i_width;
@@ -141,10 +165,16 @@ static int Open( vlc_object_t * p_this )
     vlc_sem_init( &p_sys->ready, 0 );
     p_sys->b_error  = false;
     p_sys->b_quit   = false;
-    p_sys->i_width  = var_CreateGetInteger( p_filter, "projectm-width" );
-    p_sys->i_height = var_CreateGetInteger( p_filter, "projectm-height" );
+    p_sys->i_width  = var_InheritInteger( p_filter, "projectm-width" );
+    p_sys->i_height = var_InheritInteger( p_filter, "projectm-height" );
     p_sys->i_channels = aout_FormatNbChannels( &p_filter->fmt_in.audio );
-    p_sys->psz_config = var_CreateGetString( p_filter, "projectm-config" );
+#ifndef HAVE_PROJECTM2
+    p_sys->psz_config = var_InheritString( p_filter, "projectm-config" );
+#else
+    p_sys->psz_preset_path = var_InheritString( p_filter, "projectm-preset-path" );
+    p_sys->psz_preset_path = var_InheritString( p_filter, "projectm-title-font" );
+    p_sys->psz_preset_path = var_InheritString( p_filter, "projectm-menu-font" );
+#endif
     vlc_mutex_init( &p_sys->lock );
     p_sys->p_buffer = NULL;
     p_sys->i_buffer_size = 0;
@@ -192,7 +222,13 @@ static void Close( vlc_object_t *p_this )
     vlc_sem_destroy( &p_sys->ready );
     vlc_mutex_destroy( &p_sys->lock );
     free( p_sys->p_buffer );
+#ifndef HAVE_PROJECTM2
     free( p_sys->psz_config );
+#else
+    free( p_sys->psz_preset_path );
+    free( p_sys->psz_title_font );
+    free( p_sys->psz_menu_font );
+#endif
     free( p_sys );
 }
 
@@ -256,6 +292,9 @@ static void *Thread( void *p_data )
     vout_opengl_t *gl;
     int i_last_width  = 0;
     int i_last_height = 0;
+#ifdef HAVE_PROJECTM2
+    projectM::Settings settings;
+#endif
 
     /* Create the openGL provider */
     p_sys->p_vout =
@@ -299,7 +338,26 @@ static void *Thread( void *p_data )
     }
 
     /* Create the projectM object */
+#ifndef HAVE_PROJECTM2
     p_sys->p_projectm = new projectM( p_sys->psz_config );
+#else
+    settings.meshX = 32;
+    settings.meshY = 24;
+    settings.fps = 35;
+    settings.textureSize = 1024;
+    settings.windowWidth = p_sys->i_width;
+    settings.windowHeight = p_sys->i_height;
+    settings.presetURL = p_sys->psz_preset_path;
+    settings.titleFontURL =  p_sys->psz_title_font;
+    settings.menuFontURL = p_sys->psz_menu_font;
+    settings.smoothPresetDuration = 5;
+    settings.presetDuration = 30;
+    settings.beatSensitivity = 10;
+    settings.aspectCorrection = 1;
+    settings.easterEgg = 1;
+    settings.shuffleEnabled = 1;
+    p_sys->p_projectm = new projectM( settings );
+#endif
     p_sys->i_buffer_size = p_sys->p_projectm->pcm()->maxsamples;
     p_sys->p_buffer = (float*)calloc( p_sys->i_buffer_size,
                                       sizeof( float ) );
