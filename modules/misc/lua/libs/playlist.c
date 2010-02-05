@@ -234,7 +234,6 @@ static int vlclua_playlist_get( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     PL_LOCK;
-    int b_category = luaL_optboolean( L, 2, 1 ); /* Default to tree playlist (discared when 1st argument is a playlist_item's id) */
     playlist_item_t *p_item = NULL;
 
     if( lua_isnumber( L, 1 ) )
@@ -253,32 +252,17 @@ static int vlclua_playlist_get( lua_State *L )
         const char *psz_what = lua_tostring( L, 1 );
         if( !strcasecmp( psz_what, "normal" )
          || !strcasecmp( psz_what, "playlist" ) )
-            p_item = b_category ? p_playlist->p_local_category
-                                : p_playlist->p_local_onelevel;
+            p_item = p_playlist->p_playing;
         else if( !strcasecmp( psz_what, "ml" )
               || !strcasecmp( psz_what, "media library" ) )
-            p_item = b_category ? p_playlist->p_ml_category
-                                : p_playlist->p_ml_onelevel;
+            p_item = p_playlist->p_media_library;
         else if( !strcasecmp( psz_what, "root" ) )
-            p_item = b_category ? p_playlist->p_root_category
-                                : p_playlist->p_root_onelevel;
+            p_item = p_playlist->p_root;
         else
         {
-#ifdef FIX_THAT_CODE_NOT_TO_MESS_WITH_PLAYLIST_INTERNALS
-            for( int i = 0; i < p_playlist->i_sds; i++ )
-            {
-                if( !strcasecmp( psz_what,
-                                 p_playlist->pp_sds[i]->p_sd->psz_module ) )
-                {
-                    p_item = b_category ? p_playlist->pp_sds[i]->p_cat
-                                        : p_playlist->pp_sds[i]->p_one;
-                    break;
-                }
-            }
-#else
-# warning "Don't access playlist iternal, broken code here."
-            abort();
-#endif
+            /* currently, psz_what must be SD module's longname! */
+            p_item = playlist_ChildSearchName( p_playlist->p_root, psz_what );
+
             if( !p_item )
             {
                 PL_UNLOCK;
@@ -289,8 +273,7 @@ static int vlclua_playlist_get( lua_State *L )
     }
     else
     {
-        p_item = b_category ? p_playlist->p_root_category
-                            : p_playlist->p_root_onelevel;
+        p_item = p_playlist->p_root;
     }
     push_playlist_item( L, p_item );
     PL_UNLOCK;
@@ -302,13 +285,10 @@ static int vlclua_playlist_search( lua_State *L )
 {
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     const char *psz_string = luaL_optstring( L, 1, "" );
-    int b_category = luaL_optboolean( L, 2, 1 ); /* default to category */
-    playlist_item_t *p_item = b_category ? p_playlist->p_root_category
-                                         : p_playlist->p_root_onelevel;
     PL_LOCK;
-    playlist_LiveSearchUpdate( p_playlist, p_item, psz_string );
+    playlist_LiveSearchUpdate( p_playlist, p_playlist->p_root, psz_string );
     PL_UNLOCK;
-    push_playlist_item( L, p_item );
+    push_playlist_item( L, p_playlist->p_root );
     vlclua_release_playlist_internal( p_playlist );
     return 1;
 }
@@ -366,13 +346,10 @@ static int vlclua_playlist_sort( lua_State *L )
     if( i_mode == -1 )
         return luaL_error( L, "Invalid search key." );
     int i_type = luaL_optboolean( L, 2, 0 ) ? ORDER_REVERSE : ORDER_NORMAL;
-    int b_category = luaL_optboolean( L, 3, 1 ); /* default to category */
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     PL_LOCK;
-    playlist_item_t *p_root = b_category ? p_playlist->p_local_category
-                                         : p_playlist->p_local_onelevel;
-    int i_ret = playlist_RecursiveNodeSort( p_playlist, p_root, i_mode,
-                                            i_type );
+    int i_ret = playlist_RecursiveNodeSort( p_playlist, p_playlist->p_playing,
+                                            i_mode, i_type );
     PL_UNLOCK;
     vlclua_release_playlist_internal( p_playlist );
     return vlclua_push_ret( L, i_ret );
