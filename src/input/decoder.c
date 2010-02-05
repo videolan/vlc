@@ -1518,7 +1518,7 @@ static void DecoderPlaySpu( decoder_t *p_dec, subpicture_t *p_subpic,
     vout_thread_t *p_vout = p_owner->p_spu_vout;
 
     /* */
-    if( p_subpic->i_start <= VLC_TS_INVALID )
+    if( p_subpic->i_start <= VLC_TS_INVALID && !b_telx )
     {
         msg_Warn( p_dec, "non-dated spu buffer received" );
         subpicture_Delete( p_subpic );
