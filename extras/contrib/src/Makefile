@@ -2459,8 +2459,8 @@ Sparkle-$(SPARKLE_VERSION).zip:
 .Sparkle: Sparkle-$(SPARKLE_VERSION).zip
 	rm -rf $@ || true
 	unzip $<
-	rm -rf ../Sparkle
-	mv Sparkle ..
+	rm -rf $(PREFIX)/Sparkle
+	mv Sparkle $(PREFIX)
 	touch $@
 
 CLEAN_FILE += .Sparkle
