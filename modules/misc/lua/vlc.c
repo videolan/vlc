@@ -392,12 +392,14 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                                     input_item_t *p_parent, bool b_play )
 {
     int i_count = 0;
+    input_item_node_t *p_parent_node = NULL;
 
     assert( p_parent || p_playlist );
 
     /* playlist */
     if( lua_istable( L, -1 ) )
     {
+        if( p_parent ) p_parent_node = input_item_node_Create( p_parent );
         lua_pushnil( L );
         /* playlist nil */
         while( lua_next( L, -2 ) )
@@ -472,7 +474,7 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
                     /* Append item to playlist */
                     if( p_parent ) /* Add to node */
                     {
-                        input_item_PostSubItem( p_parent, p_input );
+                        input_item_node_AppendItem( p_parent_node, p_input );
                     }
                     else /* Play or Enqueue (preparse) */
                         /* FIXME: playlist_AddInput() can fail */
@@ -504,6 +506,11 @@ int __vlclua_playlist_add_internal( vlc_object_t *p_this, lua_State *L,
             /* playlist key */
         }
         /* playlist */
+        if( p_parent )
+        {
+            if( i_count ) input_item_node_PostAndDelete( p_parent_node );
+            else input_item_node_Delete( p_parent_node );
+        }
     }
     else
     {
