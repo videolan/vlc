@@ -191,8 +191,10 @@ static int DecoderOpen( vlc_object_t *p_this )
     case VLC_CODEC_ALAW:
     case VLC_CODEC_MULAW:
 
-    case VLC_CODEC_FL64:
-    case VLC_CODEC_FL32:
+    case VLC_CODEC_F64L:
+    case VLC_CODEC_F64B:
+    case VLC_CODEC_F32L:
+    case VLC_CODEC_F32B:
     case VLC_CODEC_S32L:
     case VLC_CODEC_S32B:
     case VLC_CODEC_S24L:
@@ -232,12 +234,14 @@ static int DecoderOpen( vlc_object_t *p_this )
              p_dec->fmt_in.audio.i_rate, p_dec->fmt_in.audio.i_channels,
              p_dec->fmt_in.audio.i_bitspersample );
 
-    if( p_dec->fmt_in.i_codec == VLC_CODEC_FL64 )
+    if( p_dec->fmt_in.i_codec == VLC_CODEC_F64L ||
+        p_dec->fmt_in.i_codec == VLC_CODEC_F64B )
     {
         p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
         p_dec->fmt_in.audio.i_bitspersample = 64;
     }
-    else if( p_dec->fmt_in.i_codec == VLC_CODEC_FL32 )
+    else if( p_dec->fmt_in.i_codec == VLC_CODEC_F32L ||
+             p_dec->fmt_in.i_codec == VLC_CODEC_F32B )
     {
         p_dec->fmt_out.i_codec = p_dec->fmt_in.i_codec;
         p_dec->fmt_in.audio.i_bitspersample = 32;
