@@ -106,7 +106,9 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
         }
         vlm_SendEventMediaInstanceState( p_vlm, p_media->cfg.id, p_media->cfg.psz_name, psz_instance_name, var_GetInteger( p_input, "state" ) );
 
+        vlc_mutex_lock( &p_vlm->lock_manage );
         vlc_cond_signal( &p_vlm->wait_manage );
+        vlc_mutex_unlock( &p_vlm->lock_manage );
     }
     return VLC_SUCCESS;
 }
@@ -216,7 +218,9 @@ static void vlm_Destructor( vlm_t *p_vlm )
     vlm_ControlInternal( p_vlm, VLM_CLEAR_SCHEDULES );
     TAB_CLEAN( p_vlm->schedule, p_vlm->schedule );
 
+    vlc_mutex_lock( &p_vlm->lock_manage );
     vlc_cond_signal( &p_vlm->wait_manage );
+    vlc_mutex_unlock( &p_vlm->lock_manage );
 
     libvlc_priv(p_vlm->p_libvlc)->p_vlm = NULL;
     vlc_object_kill( p_vlm );

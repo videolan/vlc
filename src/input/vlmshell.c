@@ -995,7 +995,9 @@ static vlm_schedule_sys_t *vlm_ScheduleNew( vlm_t *vlm, const char *psz_name )
 
     TAB_APPEND( vlm->i_schedule, vlm->schedule, p_sched );
 
+    vlc_mutex_lock( &vlm->lock_manage );
     vlc_cond_signal( &vlm->wait_manage );
+    vlc_mutex_unlock( &vlm->lock_manage );
 
     return p_sched;
 }
