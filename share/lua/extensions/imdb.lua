@@ -38,10 +38,10 @@ end
 -- Update title text field. Removes file extensions.
 function update_title()
     local title = vlc.input.get_title()
-    if (title ~= nil) then
+    if title ~= nil then
         title = string.gsub(title, "(.*)(%.%w+)$", "%1")
     end
-    if (title ~= nil) then
+    if title ~= nil then
         txt:set_text(title)
     end
 end
@@ -83,7 +83,7 @@ function click_okay()
         html = nil
     end
 
-    if (not list) then
+    if not list then
         list = dlg:add_list(1, 3, 4, 1)
         button_open = dlg:add_button("Open", "click_open", 1, 4, 4, 1)
     end
@@ -108,11 +108,11 @@ function click_okay()
         -- Find title types
         _, idxEnd, titleType = string.find(data, "<b>([^<]*Titles[^<]*)</b>", idxEnd)
         _, _, nextTitle = string.find(data, "<b>([^<]*Titles[^<]*)</b>", idxEnd)
-        if (not titleType) then
+        if not titleType then
             break
         else
             -- Find current scope
-            if (not nextTitle) then
+            if not nextTitle then
                 _, _, table = string.find(data, "<table>(.*)</table>", idxEnd)
             else
                 nextTitle = string.gsub(nextTitle, "%(", "%%(")
@@ -120,13 +120,13 @@ function click_okay()
                 _, _, table = string.find(data, "<table>(.*)</table>.*"..nextTitle, idxEnd)
             end
             -- Find all titles in this scope
-            if (not table) then break end
+            if not table then break end
             pos = 0
-            while (pos ~= nil) do
+            while pos ~= nil do
                 _, _, link = string.find(table, "<a href=\"([^\"]+title[^\"]+)\"", pos)
-                if (not link) then break end -- this would not be normal behavior...
+                if not link then break end -- this would not be normal behavior...
                 _, pos, title = string.find(table, "<a href=\"" .. link .. "\"[^>]*>([^<]+)</a>", pos)
-                if (not title) then break end -- this would not be normal behavior...
+                if not title then break end -- this would not be normal behavior...
                 _, _, year = string.find(table, "\((%d+)\)", pos)
                 -- Add this title to the list
                 count = count + 1
@@ -144,8 +144,8 @@ end
 
 function click_open()
     selection = list:get_selection()
-    if (not selection) then return 1 end
-    if (not html) then
+    if not selection then return 1 end
+    if not html then
         html = dlg:add_html("Loading IMDb page...", 1, 3, 4, 1)
         -- userLink = dlg:add_label("", 1, 4, 5, 1)
     end
@@ -174,10 +174,10 @@ function click_open()
     -- Director
     local director = nil
     _, nextIdx, _ = string.find(data, "<div id=\"director-info\"", 1, true)
-    if (nextIdx) then
+    if nextIdx then
         _, _, director = string.find(data, "<a href[^>]+>([%w%s]+)</a>", nextIdx)
     end
-    if (not director) then
+    if not director then
         director = "(Unknown)"
     end
     text = text .. "<tr><td><b>Director</b></td><td>" .. director .. "</td></tr>"
@@ -186,7 +186,7 @@ function click_open()
     local genres = "<tr><td><b>Genres</b></td>"
     local first = true
     for genre, _ in string.gmatch(data, "/Sections/Genres/(%w+)/\">") do
-        if (first) then
+        if first then
             genres = genres .. "<td>" .. genre .. "</td></tr>"
         else
             genres = genres .. "<tr><td /><td>" .. genre .. "</td></tr>"
@@ -199,7 +199,7 @@ function click_open()
     local actors = "<tr><td><b>Cast</b></td>"
     first = true
     for nm, char in string.gmatch(data, "<td class=\"nm\"><a[^>]+>([%w%s]+)</a></td><td class=\"ddd\"> ... </td><td class=\"char\"><a[^>]+>([%w%s]+)</a>") do
-        if (not first) then
+        if not first then
             actors = actors .. "<tr><td />"
         end
         actors = actors .. "<td>" .. nm .. "</td><td><i>" .. char .. "</i></td></tr>"
@@ -213,7 +213,7 @@ function click_open()
 
     -- We read only the first summary
     _, _, summary = string.find(data, "<p class=\"plotpar\">([^<]+)")
-    if (not summary) then
+    if not summary then
         summary = "(Unknown)"
     end
     text = text .. "<p>" .. summary .. "</p>"
@@ -224,7 +224,7 @@ end
 
 -- Convert some HTML characters into UTF8
 function replace_html_chars(txt)
-    if (not txt) then return nil end
+    if not txt then return nil end
     -- return vlc.strings.resolve_xml_special_chars(txt)
     for num in string.gmatch(txt, "&#x(%x+);") do
         -- Convert to decimal (any better way?)
