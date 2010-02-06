@@ -802,20 +802,18 @@ VLC_PUBLIC_API void libvlc_video_set_deinterlace( libvlc_media_player_t *,
  *
  * \param p_mi libvlc media player
  * \param option marq option to get \see libvlc_video_marquee_int_option_t
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API int libvlc_video_get_marquee_int( libvlc_media_player_t *,
-                                             unsigned, libvlc_exception_t * );
+                                                 unsigned );
 
 /**
  * Get a string marquee option value
  *
  * \param p_mi libvlc media player
  * \param option marq option to get \see libvlc_video_marquee_string_option_t
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API char *libvlc_video_get_marquee_string( libvlc_media_player_t *,
-                                             unsigned, libvlc_exception_t * );
+                                                      unsigned );
 
 /**
  * Enable, disable or set an integer marquee option
@@ -826,10 +824,9 @@ VLC_PUBLIC_API char *libvlc_video_get_marquee_string( libvlc_media_player_t *,
  * \param p_mi libvlc media player
  * \param option marq option to set \see libvlc_video_marquee_int_option_t
  * \param i_val marq option value
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_video_set_marquee_int( libvlc_media_player_t *,
-                                        unsigned, int, libvlc_exception_t * );
+                                                  unsigned, int );
 
 /**
  * Set a marquee string option
@@ -837,10 +834,9 @@ VLC_PUBLIC_API void libvlc_video_set_marquee_int( libvlc_media_player_t *,
  * \param p_mi libvlc media player
  * \param option marq option to set \see libvlc_video_marquee_string_option_t
  * \param psz_text marq option value
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_video_set_marquee_string( libvlc_media_player_t *,
-                               unsigned, const char *, libvlc_exception_t * );
+                                                     unsigned, const char * );
 
 /** option values for libvlc_video_{get,set}_logo_{int,string} */
 enum libvlc_video_logo_option_t {
@@ -859,36 +855,33 @@ enum libvlc_video_logo_option_t {
  *
  * \param p_mi libvlc media player instance
  * \param option logo option to get, values of libvlc_video_logo_option_t
- * \param p_e an pointer to an initialized exception object
  */
 VLC_PUBLIC_API int libvlc_video_get_logo_int( libvlc_media_player_t *p_mi,
-                                 unsigned option, libvlc_exception_t *p_e );
+                                              unsigned option );
 
 /**
  * Set logo option as integer. Options that take a different type value
- * cause an invalid argument exception.
+ * are ignored.
  * Passing libvlc_logo_enable as option value has the side effect of
  * starting (arg !0) or stopping (arg 0) the logo filter.
  *
  * \param p_mi libvlc media player instance
  * \param option logo option to set, values of libvlc_video_logo_option_t
  * \param value logo option value
- * \param p_e an pointer to an initialized exception object
  */
 VLC_PUBLIC_API void libvlc_video_set_logo_int( libvlc_media_player_t *p_mi,
-                        unsigned option, int value, libvlc_exception_t *p_e );
+                                               unsigned option, int value );
 
 /**
  * Set logo option as string. Options that take a different type value
- * cause an invalid argument exception.
+ * are ignored.
  *
  * \param p_mi libvlc media player instance
  * \param option logo option to set, values of libvlc_video_logo_option_t
  * \param psz_value logo option value
- * \param p_e an pointer to an initialized exception object
  */
 VLC_PUBLIC_API void libvlc_video_set_logo_string( libvlc_media_player_t *p_mi,
-            unsigned option, const char *psz_value, libvlc_exception_t *p_e );
+                                      unsigned option, const char *psz_value );
 
 
 /** @} video */
