@@ -345,6 +345,25 @@ static block_t *Fl32toS16(filter_t *filter, block_t *b)
     b->i_buffer /= 2;
     return b;
 }
+static block_t *Fl64toS16(filter_t *filter, block_t *b)
+{
+    VLC_UNUSED(filter);
+    double  *src = (double *)b->p_buffer;
+    int16_t *dst = (int16_t *)src;
+    for (int i = b->i_buffer / 8; i--;) {
+        const double v = *src++;
+        /* Slow version. */
+        if (v >= 1.0)
+            *dst++ = 32767;
+        else if (v < -1.0)
+            *dst++ = -32768;
+        else
+            *dst++ = v * 32768.0;
+    }
+
+    b->i_buffer /= 4;
+    return b;
+}
 static block_t *S32toFl32(filter_t *filter, block_t *b)
 {
     VLC_UNUSED(filter);
@@ -464,6 +483,17 @@ static void S24toFl32(block_t *bdst, const block_t *bsrc)
 /* */
 #define XCHG(type, a, b) \
     do { type _tmp = a; a = b; b = _tmp; } while(0)
+static void Swap64(block_t *b)
+{
+    uint8_t *data = (uint8_t *)b->p_buffer;
+    for (size_t i = 0; i < b->i_buffer / 8; i++) {
+        XCHG(uint8_t, data[0], data[7]);
+        XCHG(uint8_t, data[1], data[6]);
+        XCHG(uint8_t, data[2], data[5]);
+        XCHG(uint8_t, data[3], data[4]);
+        data += 8;
+    }
+}
 static void Swap32(block_t *b)
 {
     uint8_t *data = (uint8_t *)b->p_buffer;
@@ -496,6 +526,7 @@ static const struct {
     vlc_fourcc_t dst;
     cvt_direct_t convert;
 } cvt_directs[] = {
+    { VLC_CODEC_FL64, VLC_CODEC_S16N,   Fl64toS16 },
     { VLC_CODEC_FI32, VLC_CODEC_FL32,   Fi32toFl32 },
     { VLC_CODEC_FI32, VLC_CODEC_S16N,   Fi32toS16 },
     { VLC_CODEC_S32N, VLC_CODEC_FL32,   S32toFl32 },
@@ -540,6 +571,8 @@ static const struct {
     vlc_fourcc_t b;
     cvt_swap_t   convert;
 } cvt_swaps[] = {
+    { VLC_CODEC_F64L, VLC_CODEC_F64B, Swap64 },
+    { VLC_CODEC_F32L, VLC_CODEC_F32B, Swap32 },
     { VLC_CODEC_S32L, VLC_CODEC_S32B, Swap32 },
     { VLC_CODEC_U32L, VLC_CODEC_U32B, Swap32 },
     { VLC_CODEC_S24L, VLC_CODEC_S24B, Swap24 },
