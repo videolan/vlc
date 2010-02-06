@@ -68,7 +68,7 @@ static int vlc_sd_probe_Open (vlc_object_t *obj)
 
     struct udev *udev = udev_new ();
     if (udev == NULL)
-        return VLC_EGENERIC;
+        return VLC_PROBE_CONTINUE;
 
     struct udev_monitor *mon = udev_monitor_new_from_netlink (udev, "udev");
     if (mon != NULL)
