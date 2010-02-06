@@ -95,9 +95,6 @@ DialogsProvider::~DialogsProvider()
     UpdateDialog::killInstance();
 #endif
     PluginDialog::killInstance();
-    PodcastConfigDialog::killInstance();
-    EpgDialog::killInstance();
-    ErrorsDialog::killInstance();
 
     delete menusMapper;
     delete menusUpdateMapper;
