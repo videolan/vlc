@@ -1,8 +1,0 @@
-[general]
-* JUnit testing
-
-[build system]
-* Detect SWT to add the SWTVideoWidget
-
-
-Items are ordered by priority, the first having the highest priority
