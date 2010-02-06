@@ -21,6 +21,7 @@ AC_CONFIG_MACRO_DIR(m4)
 AC_CONFIG_LIBOBJ_DIR(compat)
 AC_CANONICAL_BUILD
 AC_CANONICAL_HOST
+AC_PRESERVE_HELP_ORDER
 
 AM_INIT_AUTOMAKE(tar-ustar)
 AM_CONFIG_HEADER(config.h)
@@ -82,6 +83,9 @@ dnl Check for compiler properties
 AC_C_CONST
 AC_C_INLINE
 AC_C_RESTRICT
+
+dnl Extend the --help string at the current spot.
+AC_DEFUN([EXTEND_HELP_STRING], [m4_divert_once([HELP_ENABLE], [$1])])
 
 dnl Allow binary package maintainer to pass a custom string to avoid
 dnl cache problem
@@ -1157,8 +1161,7 @@ fi
 dnl
 dnl  Accelerated modules
 dnl
-AC_ARG_WITH(,[])
-AC_ARG_WITH(,[Optimization options:])
+EXTEND_HELP_STRING([Optimization options:])
 
 dnl  Check for fully working MMX intrinsics
 dnl  We need support for -mmmx, we need <mmintrin.h>, and we also need a
@@ -1727,7 +1730,7 @@ dnl
 dnl  Input plugins
 dnl
 
-AC_ARG_WITH(,[Input plugins:])
+EXTEND_HELP_STRING([Input plugins:])
 
 dnl  live555 input
 dnl
@@ -2591,7 +2594,7 @@ dnl
 dnl  Codec plugins
 dnl
 
-AC_ARG_WITH(,[Codec plugins:])
+EXTEND_HELP_STRING([Codec plugins:])
 
 dnl
 dnl wmafixed plugin
@@ -3332,7 +3335,7 @@ dnl
 dnl  Video plugins
 dnl
 
-AC_ARG_WITH(,[Video plugins:])
+EXTEND_HELP_STRING([Video plugins:])
 
 dnl
 dnl  Xlib
@@ -3786,7 +3789,7 @@ dnl
 dnl  Audio plugins
 dnl
 
-AC_ARG_WITH(,[Audio plugins:])
+EXTEND_HELP_STRING([Audio plugins:])
 
 dnl
 dnl  OSS /dev/dsp module (enabled by default except on win32)
@@ -3952,7 +3955,7 @@ dnl
 dnl  Interface plugins
 dnl
 
-AC_ARG_WITH(,[Interface plugins:])
+EXTEND_HELP_STRING([Interface plugins:])
 
 dnl
 dnl Skins2 module
@@ -4289,8 +4292,7 @@ then
   fi
 fi
 
-
-AC_ARG_WITH(,[Misc options:])
+EXTEND_HELP_STRING([Misc options:])
 
 dnl
 dnl libgcrypt
@@ -4476,7 +4478,7 @@ AS_IF([test "${enable_loader}" = "yes"],
     VLC_ADD_LIBS([dmo quicktime], [-lpthread])
   ])
 
-AC_ARG_WITH(,[Components:])
+EXTEND_HELP_STRING([Components:])
 
 dnl
 dnl  the VLC binary
