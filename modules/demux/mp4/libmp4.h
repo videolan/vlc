@@ -120,6 +120,7 @@
 #define FOURCC_alac VLC_FOURCC( 'a', 'l', 'a', 'c' )
 #define FOURCC_dac3 VLC_FOURCC( 'd', 'a', 'c', '3' )
 #define FOURCC_dec3 VLC_FOURCC( 'd', 'e', 'c', '3' )
+#define FOURCC_enda VLC_FOURCC( 'e', 'n', 'd', 'a' )
 
 #define FOURCC_zlib VLC_FOURCC( 'z', 'l', 'i', 'b' )
 #define FOURCC_SVQ1 VLC_FOURCC( 'S', 'V', 'Q', '1' )
@@ -872,6 +873,12 @@ typedef struct
 
 } MP4_Box_data_dac3_t;
 
+typedef struct
+{
+    uint16_t i_little_endian;
+
+} MP4_Box_data_enda_t;
+
 /*
 typedef struct MP4_Box_data__s
 {
@@ -906,6 +913,7 @@ typedef union MP4_Box_data_s
         MP4_Box_data_esds_t *p_esds;
         MP4_Box_data_avcC_t *p_avcC;
         MP4_Box_data_dac3_t *p_dac3;
+        MP4_Box_data_enda_t *p_enda;
 
     MP4_Box_data_stsz_t *p_stsz;
     MP4_Box_data_stz2_t *p_stz2;

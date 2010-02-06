@@ -1136,6 +1136,22 @@ static int MP4_ReadBox_dac3( stream_t *p_stream, MP4_Box_t *p_box )
     MP4_READBOX_EXIT( 1 );
 }
 
+static int MP4_ReadBox_enda( stream_t *p_stream, MP4_Box_t *p_box )
+{
+    MP4_Box_data_enda_t *p_enda;
+    MP4_READBOX_ENTER( MP4_Box_data_enda_t );
+
+    p_enda = p_box->data.p_enda;
+
+    MP4_GET2BYTES( p_enda->i_little_endian );
+
+#ifdef MP4_VERBOSE
+    msg_Dbg( p_stream,
+             "read box: \"enda\" little_endian=%d", p_enda->i_little_endian );
+#endif
+    MP4_READBOX_EXIT( 1 );
+}
+
 static int MP4_ReadBox_sample_soun( stream_t *p_stream, MP4_Box_t *p_box )
 {
     unsigned int i;
@@ -2554,6 +2570,7 @@ static const struct
     { FOURCC_cmvd,  MP4_ReadBox_cmvd,       MP4_FreeBox_cmvd },
     { FOURCC_avcC,  MP4_ReadBox_avcC,       MP4_FreeBox_avcC },
     { FOURCC_dac3,  MP4_ReadBox_dac3,       MP4_FreeBox_Common },
+    { FOURCC_enda,  MP4_ReadBox_enda,       MP4_FreeBox_Common },
 
     /* Nothing to do with this box */
     { FOURCC_mdat,  MP4_ReadBoxSkip,        MP4_FreeBox_Common },
