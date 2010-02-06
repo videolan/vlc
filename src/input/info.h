@@ -133,6 +133,7 @@ static inline void info_category_Delete(info_category_t *cat)
 	for (int i = 0; i < cat->i_infos; i++)
 		info_Delete(cat->pp_infos[i]);
 	free(cat->pp_infos);
+	free(cat->psz_name);
 	free(cat);
 }
 
