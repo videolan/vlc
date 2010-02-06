@@ -44,8 +44,6 @@
 #include <vlc/libvlc_media_list_player.h>
 #include <vlc/libvlc_media_player.h>
 #include <vlc/libvlc_vlm.h>
-#include <vlc/mediacontrol.h>
-#include <vlc/mediacontrol_structures.h>
 
 #include <stdio.h>
 
