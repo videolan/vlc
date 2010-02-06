@@ -194,6 +194,7 @@ static int vlclua_net_poll( lua_State *L )
         lua_pop( L, 1 );
     }
     struct pollfd *p_fds = malloc( i_fds * sizeof( struct pollfd ) );
+    vlc_cleanup_push( free, p_fds );
     lua_pushnil( L );
     int i = 0;
     while( lua_next( L, 1 ) )
@@ -212,8 +213,8 @@ static int vlclua_net_poll( lua_State *L )
         lua_pushinteger( L, p_fds[i].revents );
         lua_settable( L, 1 );
     }
-    free( p_fds );
     lua_pushinteger( L, i_ret );
+    vlc_cleanup_run();
     return 1;
 }
 
