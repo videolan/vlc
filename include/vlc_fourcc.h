@@ -263,12 +263,15 @@
 #define VLC_CODEC_S32B      VLC_FOURCC('s','3','2','b')
 #define VLC_CODEC_U32L      VLC_FOURCC('u','3','2','l')
 #define VLC_CODEC_U32B      VLC_FOURCC('u','3','2','b')
+#define VLC_CODEC_F32L      VLC_FOURCC('f','3','2','l')
+#define VLC_CODEC_F32B      VLC_FOURCC('f','3','2','b')
+#define VLC_CODEC_F64L      VLC_FOURCC('f','6','4','l')
+#define VLC_CODEC_F64B      VLC_FOURCC('f','6','4','b')
+
 #define VLC_CODEC_ALAW      VLC_FOURCC('a','l','a','w')
 #define VLC_CODEC_MULAW     VLC_FOURCC('m','l','a','w')
 #define VLC_CODEC_S24DAUD   VLC_FOURCC('d','a','u','d')
 #define VLC_CODEC_FI32      VLC_FOURCC('f','i','3','2')
-#define VLC_CODEC_FL32      VLC_FOURCC('f','l','3','2')
-#define VLC_CODEC_FL64      VLC_FOURCC('f','l','6','4')
 #define VLC_CODEC_TWINVQ    VLC_FOURCC('T','W','I','N')
 #define VLC_CODEC_ADPCM_IMA_AMV VLC_FOURCC('i','m','a','v')
 
@@ -298,6 +301,8 @@
 #   define VLC_CODEC_U16N VLC_CODEC_U16B
 #   define VLC_CODEC_S24N VLC_CODEC_S24B
 #   define VLC_CODEC_S32N VLC_CODEC_S32B
+#   define VLC_CODEC_FL32 VLC_CODEC_F32B
+#   define VLC_CODEC_FL64 VLC_CODEC_F64B
 
 #   define VLC_CODEC_S16I VLC_CODEC_S16L
 #   define VLC_CODEC_U16I VLC_CODEC_U16L
@@ -308,6 +313,8 @@
 #   define VLC_CODEC_U16N VLC_CODEC_U16L
 #   define VLC_CODEC_S24N VLC_CODEC_S24L
 #   define VLC_CODEC_S32N VLC_CODEC_S32L
+#   define VLC_CODEC_FL32 VLC_CODEC_F32L
+#   define VLC_CODEC_FL64 VLC_CODEC_F64L
 
 #   define VLC_CODEC_S16I VLC_CODEC_S16B
 #   define VLC_CODEC_U16I VLC_CODEC_U16B

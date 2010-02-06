@@ -1084,11 +1084,18 @@ static const entry_t p_list_audio[] = {
     B(VLC_CODEC_FI32, "32 bits fixed float"),
         A("fi32"),
 
-    B(VLC_CODEC_FL32, "32 bits float"),
+    B(VLC_CODEC_F32L, "32 bits float LE"),
+        A("f32l"),
         A("fl32"),
 
-    B(VLC_CODEC_FL64, "64 bits float"),
-        A("fl64"),
+    B(VLC_CODEC_F32L, "32 bits float BE"),
+        A("f32b"),
+
+    B(VLC_CODEC_F64L, "64 bits float LE"),
+        A("f64l"),
+
+    B(VLC_CODEC_F64L, "64 bits float BE"),
+        A("f64b"),
 
     B(VLC_CODEC_TWINVQ, "TwinVQ"),
         A("TWIN"),
