@@ -87,21 +87,21 @@ typedef struct msg_subscription_t msg_subscription_t;
 /*****************************************************************************
  * Prototypes
  *****************************************************************************/
-VLC_EXPORT( void, __msg_Generic, ( vlc_object_t *, int, const char *, const char *, ... ) LIBVLC_FORMAT( 4, 5 ) );
-VLC_EXPORT( void, __msg_GenericVa, ( vlc_object_t *, int, const char *, const char *, va_list args ) );
-#define msg_GenericVa(a, b, c, d, e) __msg_GenericVa(VLC_OBJECT(a), b, c, d, e)
+VLC_EXPORT( void, msg_Generic, ( vlc_object_t *, int, const char *, const char *, ... ) LIBVLC_FORMAT( 4, 5 ) );
+VLC_EXPORT( void, msg_GenericVa, ( vlc_object_t *, int, const char *, const char *, va_list args ) );
+#define msg_GenericVa(a, b, c, d, e) msg_GenericVa(VLC_OBJECT(a), b, c, d, e)
 
 #define msg_Info( p_this, ... ) \
-      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_INFO, \
+        msg_Generic( VLC_OBJECT(p_this), VLC_MSG_INFO, \
                      MODULE_STRING, __VA_ARGS__ )
 #define msg_Err( p_this, ... ) \
-      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_ERR, \
+        msg_Generic( VLC_OBJECT(p_this), VLC_MSG_ERR, \
                      MODULE_STRING, __VA_ARGS__ )
 #define msg_Warn( p_this, ... ) \
-      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_WARN, \
+        msg_Generic( VLC_OBJECT(p_this), VLC_MSG_WARN, \
                      MODULE_STRING, __VA_ARGS__ )
 #define msg_Dbg( p_this, ... ) \
-      __msg_Generic( VLC_OBJECT(p_this), VLC_MSG_DBG, \
+        msg_Generic( VLC_OBJECT(p_this), VLC_MSG_DBG, \
                      MODULE_STRING, __VA_ARGS__ )
 
 typedef struct msg_cb_data_t msg_cb_data_t;

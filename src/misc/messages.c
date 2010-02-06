@@ -87,8 +87,6 @@ static inline msg_bank_t *libvlc_bank (libvlc_int_t *inst)
 /*****************************************************************************
  * Local prototypes
  *****************************************************************************/
-static void QueueMsg ( vlc_object_t *, int, const char *,
-                       const char *, va_list );
 static void PrintMsg ( vlc_object_t *, msg_item_t * );
 
 static vlc_mutex_t msg_stack_lock = VLC_STATIC_MUTEX;
@@ -263,24 +261,18 @@ void msg_Unsubscribe (msg_subscription_t *sub)
 }
 
 /*****************************************************************************
- * __msg_*: print a message
+ * msg_*: print a message
  *****************************************************************************
  * These functions queue a message for later printing.
  *****************************************************************************/
-void __msg_Generic( vlc_object_t *p_this, int i_type, const char *psz_module,
+void msg_Generic( vlc_object_t *p_this, int i_type, const char *psz_module,
                     const char *psz_format, ... )
 {
     va_list args;
 
     va_start( args, psz_format );
-    QueueMsg( p_this, i_type, psz_module, psz_format, args );
+    msg_GenericVa (p_this, i_type, psz_module, psz_format, args);
     va_end( args );
-}
-
-void __msg_GenericVa( vlc_object_t *p_this, int i_type, const char *psz_module,
-                      const char *psz_format, va_list args )
-{
-    QueueMsg( p_this, i_type, psz_module, psz_format, args );
 }
 
 /**
@@ -296,6 +288,7 @@ static void msg_Free (gc_object_t *gc)
     free (msg);
 }
 
+#undef msg_GenericVa
 /**
  * Add a message to a queue
  *
@@ -304,8 +297,9 @@ static void msg_Free (gc_object_t *gc)
  * is full). If the message can't be converted to string in memory, it issues
  * a warning.
  */
-static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
-                      const char *psz_format, va_list _args )
+void msg_GenericVa (vlc_object_t *p_this, int i_type,
+                           const char *psz_module,
+                           const char *psz_format, va_list _args)
 {
     size_t      i_header_size;             /* Size of the additionnal header */
     vlc_object_t *p_obj;

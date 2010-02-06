@@ -254,8 +254,8 @@ module_release
 __module_unneed
 msg_DisableObjectPrinting
 msg_EnableObjectPrinting
-__msg_Generic
-__msg_GenericVa
+msg_Generic
+msg_GenericVa
 msg_Subscribe
 msg_Unsubscribe
 msleep
