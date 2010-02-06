@@ -63,6 +63,8 @@ static int Open (vlc_object_t *obj)
 
     vlc_mutex_init (&p_sys->lock);
     vlc_cond_init (&p_sys->wait);
+    p_sys->suspend = false;
+
     if (vlc_clone (&p_sys->thread, Thread, ih, VLC_THREAD_PRIORITY_LOW))
     {
         vlc_cond_destroy (&p_sys->wait);
@@ -70,8 +72,6 @@ static int Open (vlc_object_t *obj)
         free (p_sys);
         return VLC_ENOMEM;
     }
-    p_sys->suspend = false;
-
     return VLC_SUCCESS;
 }
 
