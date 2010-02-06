@@ -101,7 +101,8 @@ VLC_EXPORT(int, vlc_sd_probe_Add, (vlc_probe_t *, const char *, const char *));
 #define VLC_SD_PROBE_HELPER(name, longname) \
 static int vlc_sd_probe_Open (vlc_object_t *obj) \
 { \
-    return vlc_sd_probe_Add ((struct vlc_probe_t *)obj, name, longname); \
+    return vlc_sd_probe_Add ((struct vlc_probe_t *)obj, \
+                             name "{longname=\"" # longname "\"}", longname); \
 }
 
 /** @} */
