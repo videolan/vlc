@@ -22,7 +22,7 @@
  *  http://www.gnu.org/copyleft/gpl.html                              *
  **********************************************************************/
 
-#include <strings.h>
+#include <string.h>
 
 #include "test.h"
 
@@ -37,8 +37,8 @@ static void test_meta (const char ** argv, int argc)
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
-    media = libvlc_media_new (vlc, "samples/meta.sample", &ex);
-    catch ();
+    media = libvlc_media_new (vlc, "samples/meta.sample");
+    assert( media );
 
     /* Tell that we are interested in this precise meta data
      * This is needed to trigger meta data reading
