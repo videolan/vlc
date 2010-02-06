@@ -476,7 +476,6 @@ modules/demux/mp4/mp4.c
 modules/demux/mpc.c
 modules/demux/mpeg/es.c
 modules/demux/mpeg/h264.c
-modules/demux/mpeg/m4v.c
 modules/demux/mpeg/mpgv.c
 modules/demux/nsc.c
 modules/demux/nsv.c

@@ -6,6 +6,5 @@ SOURCES_h264 = h264.c
 libvlc_LTLIBRARIES += \
 	libes_plugin.la \
 	libmpgv_plugin.la \
-	libm4v_plugin.la \
 	libh264_plugin.la \
 	$(NULL)

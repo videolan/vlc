@@ -43,7 +43,12 @@
  * Module descriptor
  *****************************************************************************/
 static int  OpenAudio( vlc_object_t * );
+static int  OpenVideo( vlc_object_t * );
 static void Close    ( vlc_object_t * );
+
+#define FPS_TEXT N_("Frames per Second")
+#define FPS_LONGTEXT N_("This is the frame rate used as a fallback when " \
+    "playing MPEG video elementary streams.")
 
 vlc_module_begin ()
     set_category( CAT_INPUT )
@@ -68,6 +73,15 @@ vlc_module_begin ()
 
     add_shortcut( "mlp" )
     add_shortcut( "thd" )
+
+    add_submodule()
+    set_description( N_("MPEG-4 video" ) )
+    set_capability( "demux", 0 )
+    set_callbacks( OpenVideo, Close )
+    add_float( "es-fps", 25, NULL, FPS_TEXT, FPS_LONGTEXT, false )
+
+    add_shortcut( "m4v" )
+    add_shortcut( "mp4v" )
 vlc_module_end ()
 
 /*****************************************************************************
@@ -108,6 +122,8 @@ struct demux_sys_t
 
     int64_t i_stream_offset;
 
+    float   f_fps;
+
     /* Mpga specific */
     struct
     {
@@ -145,6 +161,12 @@ static const codec_t p_codecs[] = {
     { 0, false, NULL, NULL, NULL }
 };
 
+static int VideoInit( demux_t *p_demux );
+
+static const codec_t codec_m4v = {
+    VLC_CODEC_MP4V, false, "mp4 video", NULL,  VideoInit
+};
+
 /*****************************************************************************
  * OpenCommon: initializes demux structures
  *****************************************************************************/
@@ -164,6 +186,7 @@ static int OpenCommon( demux_t *p_demux,
     p_sys->b_estimate_bitrate = true;
     p_sys->i_bitrate_avg = 0;
     p_sys->b_big_endian = false;
+    p_sys->f_fps = var_InheritFloat( p_demux, "es-fps" );
 
     if( stream_Seek( p_demux->s, p_sys->i_stream_offset ) )
     {
@@ -200,7 +223,29 @@ static int OpenAudio( vlc_object_t *p_this )
     }
     return VLC_EGENERIC;
 }
+static int OpenVideo( vlc_object_t *p_this )
+{
+    demux_t *p_demux = (demux_t*)p_this;
 
+    /* Only m4v is supported for the moment */
+    bool b_m4v_ext    = demux_IsPathExtension( p_demux, ".m4v" );
+    bool b_m4v_forced = demux_IsForced( p_demux, "m4v" ) ||
+                        demux_IsForced( p_demux, "mp4v" );
+    if( !b_m4v_ext && !b_m4v_forced )
+        return VLC_EGENERIC;
+
+    const uint8_t *p_peek;
+    if( stream_Peek( p_demux->s, &p_peek, 4 ) < 4 )
+        return VLC_EGENERIC;
+    if( p_peek[0] != 0x00 || p_peek[1] != 0x00 || p_peek[2] != 0x01 )
+    {
+        if( !b_m4v_forced)
+            return VLC_EGENERIC;
+        msg_Warn( p_demux,
+                  "this doesn't look like an MPEG ES stream, continuing anyway" );
+    }
+    return OpenCommon( p_demux, VIDEO_ES, &codec_m4v, 0 );
+}
 /*****************************************************************************
  * Demux: reads and demuxes data packets
  *****************************************************************************
@@ -260,8 +305,18 @@ static int Demux( demux_t *p_demux )
                 if( p_sys->b_estimate_bitrate )
                     p_sys->i_bitrate_avg = p_sys->p_packetizer->fmt_out.i_bitrate;
             }
-
-            p_sys->i_pts = p_block_out->i_pts - VLC_TS_0;
+            if( p_sys->p_packetizer->fmt_out.i_cat == VIDEO_ES )
+            {
+                if( p_block_out->i_pts <= VLC_TS_INVALID &&
+                    p_block_out->i_dts <= VLC_TS_INVALID )
+                    p_block_out->i_dts = VLC_TS_0 + p_sys->i_pts + 1000000 / p_sys->f_fps;
+                if( p_block_out->i_dts > VLC_TS_INVALID )
+                    p_sys->i_pts = p_block_out->i_dts - VLC_TS_0;
+            }
+            else
+            {
+                p_sys->i_pts = p_block_out->i_pts - VLC_TS_0;
+            }
 
             /* Re-estimate bitrate */
             if( p_sys->b_estimate_bitrate && p_sys->i_pts > INT64_C(500000) )
@@ -902,3 +957,14 @@ static int MlpInit( demux_t *p_demux )
     return VLC_SUCCESS;
 }
 
+/*****************************************************************************
+ * Video
+ *****************************************************************************/
+static int VideoInit( demux_t *p_demux )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    p_sys->i_packet_size = 4096;
+
+    return VLC_SUCCESS;
+}
