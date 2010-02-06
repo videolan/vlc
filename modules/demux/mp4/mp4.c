@@ -1453,6 +1453,7 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     MP4_Box_t   *p_sample;
     MP4_Box_t   *p_esds;
     MP4_Box_t   *p_frma;
+    MP4_Box_t   *p_enda;
 
     if( pp_es )
         *pp_es = NULL;
@@ -1483,6 +1484,11 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
 
         p_sample->i_type = p_frma->data.p_frma->i_type;
     }
+
+    p_enda = MP4_BoxGet( p_sample, "wave/enda" );
+    if( !p_enda )
+        p_enda = MP4_BoxGet( p_sample, "enda" );
+    msg_Err(p_demux, "ENDA=%p %d codec=%4.4s", p_enda, p_enda ? p_enda->data.p_enda->i_little_endian : -1, &p_sample->i_type );
 
     if( p_track->fmt.i_cat == AUDIO_ES && ( p_track->i_sample_size == 1 || p_track->i_sample_size == 2 ) )
     {
@@ -1690,14 +1696,16 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
             break;
 
         case VLC_FOURCC('i','n','2','4'):
-            /* in in24/in32 there's enda-atom to tell it's little-endian (if present) */
-            if( ( MP4_BoxGet( p_sample, "wave/enda" ) ) ||
-                ( MP4_BoxGet( p_sample, "enda" ) ) )
-            {
-                p_track->fmt.i_codec = VLC_FOURCC('4','2','n','i');
-            } else {
-                p_track->fmt.i_codec = p_sample->i_type;
-            }
+            p_track->fmt.i_codec = p_enda && p_enda->data.p_enda->i_little_endian == 1 ?
+                                    VLC_FOURCC('4','2','n','i') : VLC_FOURCC('i','n','2','4');
+            break;
+        case VLC_FOURCC('f','l','3','2'):
+            p_track->fmt.i_codec = p_enda && p_enda->data.p_enda->i_little_endian == 1 ?
+                                    VLC_CODEC_F32L : VLC_CODEC_F32B;
+            break;
+        case VLC_FOURCC('f','l','6','4'):
+            p_track->fmt.i_codec = p_enda && p_enda->data.p_enda->i_little_endian == 1 ?
+                                    VLC_CODEC_F64L : VLC_CODEC_F64B;
             break;
 
         default:
