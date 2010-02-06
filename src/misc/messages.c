@@ -81,7 +81,7 @@ static uintptr_t banks = 0;
 #define QUEUE priv->msg_bank
 static inline msg_bank_t *libvlc_bank (libvlc_int_t *inst)
 {
-    return &(libvlc_priv (inst))->msg_bank;
+    return (libvlc_priv (inst))->msg_bank;
 }
 
 /*****************************************************************************
@@ -94,20 +94,41 @@ static void PrintMsg ( vlc_object_t *, msg_item_t * );
 static vlc_mutex_t msg_stack_lock = VLC_STATIC_MUTEX;
 
 /**
+ * Store all data required by messages interfaces.
+ */
+struct msg_bank_t
+{
+    /** Message queue lock */
+    vlc_rwlock_t lock;
+
+    /* Subscribers */
+    int i_sub;
+    msg_subscription_t **pp_sub;
+
+    /* Logfile for WinCE */
+#ifdef UNDER_CE
+    FILE *logfile;
+#endif
+
+    locale_t locale; /**< C locale for error messages */
+    vlc_dictionary_t enabled_objects; ///< Enabled objects
+    bool all_objects_enabled; ///< Should we print all objects?
+};
+
+/**
  * Initialize messages queues
  * This function initializes all message queues
  */
-void msg_Create (libvlc_int_t *p_libvlc)
+msg_bank_t *msg_Create (void)
 {
-    libvlc_priv_t *priv = libvlc_priv (p_libvlc);
-    msg_bank_t *bank = libvlc_bank (p_libvlc);
+    msg_bank_t *bank = malloc (sizeof (*bank));
 
     vlc_rwlock_init (&bank->lock);
-    vlc_dictionary_init( &priv->msg_enabled_objects, 0 );
-    priv->msg_all_objects_enabled = true;
+    vlc_dictionary_init (&bank->enabled_objects, 0);
+    bank->all_objects_enabled = true;
 
-    QUEUE.i_sub = 0;
-    QUEUE.pp_sub = NULL;
+    bank->i_sub = 0;
+    bank->pp_sub = NULL;
 
     /* C locale to get error messages in English in the logs */
     bank->locale = newlocale (LC_MESSAGES_MASK, "C", (locale_t)0);
@@ -124,6 +145,7 @@ void msg_Create (libvlc_int_t *p_libvlc)
     if( banks++ == 0 )
         vlc_threadvar_create( &msg_context, cleanup_msg_context );
     vlc_mutex_unlock( &msg_stack_lock );
+    return bank;
 }
 
 /**
@@ -132,26 +154,32 @@ void msg_Create (libvlc_int_t *p_libvlc)
 static void const * kObjectPrintingEnabled = &kObjectPrintingEnabled;
 static void const * kObjectPrintingDisabled = &kObjectPrintingDisabled;
 
-void __msg_EnableObjectPrinting (vlc_object_t *p_this, const char * psz_object)
+#undef msg_EnableObjectPrinting
+void msg_EnableObjectPrinting (vlc_object_t *obj, const char * psz_object)
 {
-    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
-    vlc_rwlock_wrlock( &QUEUE.lock );
+    msg_bank_t *bank = libvlc_bank (obj->p_libvlc);
+
+    vlc_rwlock_wrlock (&bank->lock);
     if( !strcmp(psz_object, "all") )
-        priv->msg_all_objects_enabled = true;
+        bank->all_objects_enabled = true;
     else
-        vlc_dictionary_insert( &priv->msg_enabled_objects, psz_object, (void *)kObjectPrintingEnabled );
-    vlc_rwlock_unlock( &QUEUE.lock );
+        vlc_dictionary_insert (&bank->enabled_objects, psz_object,
+                               (void *)kObjectPrintingEnabled);
+    vlc_rwlock_unlock (&bank->lock);
 }
 
-void __msg_DisableObjectPrinting (vlc_object_t *p_this, const char * psz_object)
+#undef msg_DisableObjectPrinting
+void msg_DisableObjectPrinting (vlc_object_t *obj, const char * psz_object)
 {
-    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
-    vlc_rwlock_wrlock( &QUEUE.lock );
+    msg_bank_t *bank = libvlc_bank (obj->p_libvlc);
+
+    vlc_rwlock_wrlock (&bank->lock);
     if( !strcmp(psz_object, "all") )
-        priv->msg_all_objects_enabled = false;
+        bank->all_objects_enabled = false;
     else
-        vlc_dictionary_insert( &priv->msg_enabled_objects, psz_object, (void *)kObjectPrintingDisabled );
-    vlc_rwlock_unlock( &QUEUE.lock );
+        vlc_dictionary_insert (&bank->enabled_objects, psz_object,
+                               (void *)kObjectPrintingDisabled);
+    vlc_rwlock_unlock (&bank->lock);
 }
 
 /**
@@ -161,13 +189,10 @@ void __msg_DisableObjectPrinting (vlc_object_t *p_this, const char * psz_object)
  * then frees all the allocated resources
  * No other messages interface functions should be called after this one.
  */
-void msg_Destroy (libvlc_int_t *p_libvlc)
+void msg_Destroy (msg_bank_t *bank)
 {
-    libvlc_priv_t *priv = libvlc_priv (p_libvlc);
-    msg_bank_t *bank = libvlc_bank (p_libvlc);
-
-    if( QUEUE.i_sub )
-        msg_Err( p_libvlc, "stale interface subscribers (VLC might crash)" );
+    if (unlikely(bank->i_sub != 0))
+        fputs ("stale interface subscribers (LibVLC might crash)\n", stderr);
 
     vlc_mutex_lock( &msg_stack_lock );
     assert(banks > 0);
@@ -181,9 +206,10 @@ void msg_Destroy (libvlc_int_t *p_libvlc)
     if (bank->locale != (locale_t)0)
        freelocale (bank->locale);
 
-    vlc_dictionary_clear( &priv->msg_enabled_objects, NULL, NULL );
+    vlc_dictionary_clear (&bank->enabled_objects, NULL, NULL);
 
     vlc_rwlock_destroy (&bank->lock);
+    free (bank);
 }
 
 struct msg_subscription_t
@@ -281,19 +307,19 @@ static void msg_Free (gc_object_t *gc)
 static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
                       const char *psz_format, va_list _args )
 {
-    assert (p_this);
-    libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
-    int         i_header_size;             /* Size of the additionnal header */
+    size_t      i_header_size;             /* Size of the additionnal header */
     vlc_object_t *p_obj;
     char *       psz_str = NULL;                 /* formatted message string */
     char *       psz_header = NULL;
     va_list      args;
 
+    assert (p_this);
+
     if( p_this->i_flags & OBJECT_FLAGS_QUIET ||
         (p_this->i_flags & OBJECT_FLAGS_NODBG && i_type == VLC_MSG_DBG) )
         return;
 
-    msg_bank_t *bank = &QUEUE;
+    msg_bank_t *bank = libvlc_bank (p_this->p_libvlc);
     locale_t locale = uselocale (bank->locale);
 
 #ifndef __GLIBC__
@@ -462,6 +488,7 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     static const char ppsz_color[4][8] = { WHITE, RED, YELLOW, GRAY };
     const char *psz_object;
     libvlc_priv_t *priv = libvlc_priv (p_this->p_libvlc);
+    msg_bank_t *bank = priv->msg_bank;
     int i_type = p_item->i_type;
 
     switch( i_type )
@@ -481,21 +508,21 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
     }
 
     psz_object = p_item->psz_object_type;
-    void * val = vlc_dictionary_value_for_key( &priv->msg_enabled_objects,
-                                               p_item->psz_module );
+    void * val = vlc_dictionary_value_for_key (&bank->enabled_objects,
+                                               p_item->psz_module);
     if( val == kObjectPrintingDisabled )
         return;
     if( val == kObjectPrintingEnabled )
         /* Allowed */;
     else
     {
-        val = vlc_dictionary_value_for_key( &priv->msg_enabled_objects,
-                                            psz_object );
+        val = vlc_dictionary_value_for_key (&bank->enabled_objects,
+                                            psz_object);
         if( val == kObjectPrintingDisabled )
             return;
         if( val == kObjectPrintingEnabled )
             /* Allowed */;
-        else if( !priv->msg_all_objects_enabled )
+        else if( !bank->all_objects_enabled )
             return;
     }
 

@@ -252,8 +252,8 @@ __module_need
 module_provides
 module_release
 __module_unneed
-__msg_DisableObjectPrinting
-__msg_EnableObjectPrinting
+msg_DisableObjectPrinting
+msg_EnableObjectPrinting
 __msg_Generic
 __msg_GenericVa
 msg_Subscribe

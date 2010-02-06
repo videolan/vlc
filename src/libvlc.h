@@ -84,28 +84,10 @@ bool vlc_CPU_CheckPluginDir (const char *name);
  * Message/logging stuff
  */
 
-/**
- * Store all data required by messages interfaces.
- */
-typedef struct msg_bank_t
-{
-    /** Message queue lock */
-    vlc_rwlock_t lock;
+typedef struct msg_bank_t msg_bank_t;
 
-    /* Subscribers */
-    int i_sub;
-    msg_subscription_t **pp_sub;
-
-    /* Logfile for WinCE */
-#ifdef UNDER_CE
-    FILE *logfile;
-#endif
-
-    locale_t locale;
-} msg_bank_t;
-
-void msg_Create  (libvlc_int_t *);
-void msg_Destroy (libvlc_int_t *);
+msg_bank_t *msg_Create (void);
+void msg_Destroy (msg_bank_t *);
 
 /** Internal message stack context */
 void msg_StackSet ( int, const char*, ... );
@@ -211,11 +193,9 @@ typedef struct libvlc_priv_t
     bool               playlist_active;
 
     /* Messages */
-    msg_bank_t         msg_bank;    ///< The message bank
+    msg_bank_t        *msg_bank;    ///< The message bank
     int                i_verbose;   ///< info messages
-    vlc_dictionary_t   msg_enabled_objects; ///< Enabled objects
     bool               b_color;     ///< color messages?
-    bool               msg_all_objects_enabled; ///< Should we print all objects?
 
     /* Timer stats */
     bool               b_stats;     ///< Whether to collect stats
