@@ -221,7 +221,6 @@ VLC_PUBLIC_API void * libvlc_media_player_get_nsobject ( libvlc_media_player_t *
  *
  * \param p_mi the Media Player
  * \param drawable the agl handler
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_media_player_set_agl ( libvlc_media_player_t *p_mi, uint32_t drawable );
 
@@ -649,7 +648,6 @@ VLC_PUBLIC_API int libvlc_video_get_spu_count( libvlc_media_player_t * );
  * Get the description of available video subtitles.
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
  * \return list containing description of available video subtitles
  */
 VLC_PUBLIC_API libvlc_track_description_t *
@@ -669,7 +667,6 @@ VLC_PUBLIC_API int libvlc_video_set_spu( libvlc_media_player_t *, unsigned );
  *
  * \param p_mediaplayer the media player
  * \param psz_subtitle new video subtitle file
- * \param p_e an initialized exception pointer
  * \return the success status (boolean)
  */
 VLC_PUBLIC_API int libvlc_video_set_subtitle_file( libvlc_media_player_t *, const char * );
@@ -678,7 +675,6 @@ VLC_PUBLIC_API int libvlc_video_set_subtitle_file( libvlc_media_player_t *, cons
  * Get the description of available titles.
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
  * \return list containing description of available titles
  */
 VLC_PUBLIC_API libvlc_track_description_t *
@@ -689,7 +685,6 @@ VLC_PUBLIC_API libvlc_track_description_t *
  *
  * \param p_mediaplayer the media player
  * \param i_title selected title
- * \param p_e an initialized exception pointer
  * \return list containing description of available chapter for title i_title
  */
 VLC_PUBLIC_API libvlc_track_description_t *
@@ -732,7 +727,6 @@ VLC_PUBLIC_API void libvlc_video_set_teletext( libvlc_media_player_t *, int );
  * Toggle teletext transparent status on video output.
  *
  * \param p_mediaplayer the media player
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_toggle_teletext( libvlc_media_player_t * );
 
@@ -1012,7 +1006,6 @@ VLC_PUBLIC_API int libvlc_audio_output_get_device_type(
  * \param mp vlc instance
  * \param device_type the audio device type,
           according to \see libvlc_audio_output_device_types_t
- * \param p_e an initialized exception pointer
  */
 VLC_PUBLIC_API void libvlc_audio_output_set_device_type( libvlc_media_player_t *,
                                                          int );
@@ -1045,7 +1038,6 @@ VLC_PUBLIC_API void libvlc_audio_set_mute( libvlc_media_player_t *, int );
  * Get current audio level.
  *
  * \param mp media player
- * \param p_e an initialized exception pointer
  * \return the audio level (int)
  */
 VLC_PUBLIC_API int libvlc_audio_get_volume( libvlc_media_player_t * );
