@@ -43,7 +43,6 @@ extern "C" {
  */
 
 typedef struct libvlc_media_list_t libvlc_media_list_t;
-typedef struct libvlc_media_list_view_t libvlc_media_list_view_t;
 
 /**
  * Create an empty media list.
@@ -191,29 +190,6 @@ VLC_PUBLIC_API void
  */
 VLC_PUBLIC_API void
     libvlc_media_list_unlock( libvlc_media_list_t * );
-
-/**
- * Get a flat media list view of media list items
- *
- * \param p_ml a media list instance
- * \param p_ex an excpetion instance
- * \return flat media list view instance
- */
-VLC_PUBLIC_API libvlc_media_list_view_t *
-    libvlc_media_list_flat_view( libvlc_media_list_t *,
-                                 libvlc_exception_t * );
-
-/**
- * Get a hierarchical media list view of media list items
- *
- * \param p_ml a media list instance
- * \return hierarchical media list view instance
- */
-VLC_PUBLIC_API libvlc_media_list_view_t *
-    libvlc_media_list_hierarchical_view( libvlc_media_list_t * );
-
-VLC_PUBLIC_API libvlc_media_list_view_t *
-    libvlc_media_list_hierarchical_node_view( libvlc_media_list_t * p_ml );
 
 /**
  * Get libvlc_event_manager from this media list instance.
