@@ -50,37 +50,6 @@ struct services_discovery_sys_t
 static const luaL_Reg p_reg[] = { { NULL, NULL } };
 
 /*****************************************************************************
- *
- *****************************************************************************/
-static char *FindFile( vlc_object_t *p_this, const char *psz_name )
-{
-    char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
-    char **ppsz_dir;
-    vlclua_dir_list( p_this, "sd", ppsz_dir_list );
-    for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
-    {
-        char *psz_filename;
-        FILE *fp;
-        if( asprintf( &psz_filename, "%s"DIR_SEP"%s.lua", *ppsz_dir,
-                      psz_name ) < 0 )
-        {
-            vlclua_dir_list_free( ppsz_dir_list );
-            return NULL;
-        }
-        fp = utf8_fopen( psz_filename, "r" );
-        if( fp )
-        {
-            fclose( fp );
-            vlclua_dir_list_free( ppsz_dir_list );
-            return psz_filename;
-        }
-        free( psz_filename );
-    }
-    vlclua_dir_list_free( ppsz_dir_list );
-    return NULL;
-}
-
-/*****************************************************************************
  * Open: initialize and create stuff
  *****************************************************************************/
 int Open_LuaSD( vlc_object_t *p_this )
@@ -95,7 +64,7 @@ int Open_LuaSD( vlc_object_t *p_this )
     if( !( p_sys = malloc( sizeof( services_discovery_sys_t ) ) ) )
         return VLC_ENOMEM;
     p_sd->p_sys = p_sys;
-    p_sys->psz_filename = FindFile( p_this, psz_name );
+    p_sys->psz_filename = vlclua_find_file( p_this, "sd", psz_name );
     if( !p_sys->psz_filename )
     {
         msg_Err( p_sd, "Couldn't find lua services discovery script \"%s\".",

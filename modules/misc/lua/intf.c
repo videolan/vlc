@@ -59,35 +59,6 @@ static const char * const ppsz_intf_options[] = { "intf", "config", NULL };
 /*****************************************************************************
  *
  *****************************************************************************/
-static char *FindFile( vlc_object_t *p_this, const char *psz_name )
-{
-    char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
-    char **ppsz_dir;
-    vlclua_dir_list( p_this, "intf", ppsz_dir_list );
-    for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
-    {
-        char *psz_filename;
-        struct stat st;
-
-        if( asprintf( &psz_filename, "%s"DIR_SEP"%s.lua", *ppsz_dir,
-                      psz_name ) < 0 )
-        {
-            vlclua_dir_list_free( ppsz_dir_list );
-            return NULL;
-        }
-
-        if( utf8_stat( psz_filename, &st ) == 0
-         && S_ISREG( st.st_mode ) )
-        {
-            vlclua_dir_list_free( ppsz_dir_list );
-            return psz_filename;
-        }
-        free( psz_filename );
-    }
-    vlclua_dir_list_free( ppsz_dir_list );
-    return NULL;
-}
-
 static inline void luaL_register_submodule( lua_State *L, const char *psz_name,
                                             const luaL_Reg *l )
 {
@@ -182,7 +153,7 @@ int Open_LuaIntf( vlc_object_t *p_this )
         return VLC_ENOMEM;
     }
     p_sys = p_intf->p_sys;
-    p_sys->psz_filename = FindFile( p_this, psz_name );
+    p_sys->psz_filename = vlclua_find_file( p_this, "intf", psz_name );
     if( !p_sys->psz_filename )
     {
         msg_Err( p_intf, "Couldn't find lua interface script \"%s\".",

@@ -41,6 +41,7 @@
 #include <vlc_charset.h>
 #include <vlc_aout.h>
 #include <vlc_services_discovery.h>
+#include <sys/stat.h>
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
@@ -129,10 +130,18 @@ vlc_module_end ()
 /*****************************************************************************
  *
  *****************************************************************************/
+static const char *ppsz_lua_exts[] = { ".luac", ".lua", NULL };
 static int file_select( const char *file )
 {
     int i = strlen( file );
-    return i > 4 && !strcmp( file+i-4, ".lua" );
+    int j;
+    for( j = 0; ppsz_lua_exts[j]; j++ )
+    {
+        int l = strlen( ppsz_lua_exts[j] );
+        if( !strcmp( file+i-l, ppsz_lua_exts[j] ) )
+            return 1;
+    }
+    return 0;
 }
 
 static int file_compare( const char **a, const char **b )
@@ -248,6 +257,37 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
     return i_ret;
 }
 
+char *vlclua_find_file( vlc_object_t *p_this, const char *psz_luadirname, const char *psz_name )
+{
+    char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
+    char **ppsz_dir;
+    vlclua_dir_list( p_this, psz_luadirname, ppsz_dir_list );
+    for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
+    {
+        for( const char **ppsz_ext = ppsz_lua_exts; *ppsz_ext; ppsz_ext++ )
+        {
+            char *psz_filename;
+            struct stat st;
+
+            if( asprintf( &psz_filename, "%s"DIR_SEP"%s%s", *ppsz_dir,
+                          psz_name, *ppsz_ext ) < 0 )
+            {
+                vlclua_dir_list_free( ppsz_dir_list );
+                return NULL;
+            }
+
+            if( utf8_stat( psz_filename, &st ) == 0
+                && S_ISREG( st.st_mode ) )
+            {
+                vlclua_dir_list_free( ppsz_dir_list );
+                return psz_filename;
+            }
+            free( psz_filename );
+        }
+    }
+    vlclua_dir_list_free( ppsz_dir_list );
+    return NULL;
+}
 
 /*****************************************************************************
  * Meta data setters utility.
