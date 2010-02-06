@@ -100,6 +100,8 @@ typedef struct msg_bank_t
 #ifdef UNDER_CE
     FILE *logfile;
 #endif
+
+    locale_t locale;
 } msg_bank_t;
 
 void msg_Create  (libvlc_int_t *);

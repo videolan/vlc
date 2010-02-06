@@ -35,7 +35,7 @@
 #include <vlc_common.h>
 
 #include <stdarg.h>                                       /* va_list for BSD */
-
+#include <locale.h>
 #include <errno.h>                                                  /* errno */
 
 #ifdef WIN32
@@ -109,6 +109,9 @@ void msg_Create (libvlc_int_t *p_libvlc)
     QUEUE.i_sub = 0;
     QUEUE.pp_sub = NULL;
 
+    /* C locale to get error messages in English in the logs */
+    bank->locale = newlocale (LC_MESSAGES_MASK, "C", (locale_t)0);
+
 #ifdef UNDER_CE
     QUEUE.logfile =
         CreateFile( L"vlc-log.txt", GENERIC_WRITE,
@@ -175,6 +178,8 @@ void msg_Destroy (libvlc_int_t *p_libvlc)
 #ifdef UNDER_CE
     CloseHandle( QUEUE.logfile );
 #endif
+    if (bank->locale != (locale_t)0)
+       freelocale (bank->locale);
 
     vlc_dictionary_clear( &priv->msg_enabled_objects, NULL, NULL );
 
@@ -288,6 +293,9 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         (p_this->i_flags & OBJECT_FLAGS_NODBG && i_type == VLC_MSG_DBG) )
         return;
 
+    msg_bank_t *bank = &QUEUE;
+    locale_t locale = uselocale (bank->locale);
+
 #ifndef __GLIBC__
     /* Expand %m to strerror(errno) - only once */
     char buf[strlen( psz_format ) + 2001], *ptr;
@@ -373,8 +381,10 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
         va_end( args );
         fputs( "\n", stderr );
         vlc_restorecancel (canc);
+        uselocale (locale);
         return;
     }
+    uselocale (locale);
 
     msg_item_t * p_item = malloc (sizeof (*p_item));
     if (p_item == NULL)
@@ -421,7 +431,6 @@ static void QueueMsg( vlc_object_t *p_this, int i_type, const char *psz_module,
 
     PrintMsg( p_this, p_item );
 
-    msg_bank_t *bank = &QUEUE;
     vlc_rwlock_rdlock (&bank->lock);
     for (int i = 0; i < bank->i_sub; i++)
     {

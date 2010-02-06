@@ -170,7 +170,8 @@ static inline char *getenv (const char *name)
 #endif
 
 #ifndef HAVE_USELOCALE
-#define LC_NUMERIC_MASK 0
+#define LC_NUMERIC_MASK  0
+#define LC_MESSAGES_MASK 0
 typedef void *locale_t;
 static inline locale_t uselocale(locale_t loc)
 {
