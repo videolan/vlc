@@ -725,9 +725,8 @@ VLC_PUBLIC_API int libvlc_video_get_teletext( libvlc_media_player_t * );
  *
  * \param p_mediaplayer the media player
  * \param i_page teletex page number requested
- * \param p_e an initialized exception pointer
  */
-VLC_PUBLIC_API void libvlc_video_set_teletext( libvlc_media_player_t *, int, libvlc_exception_t * );
+VLC_PUBLIC_API void libvlc_video_set_teletext( libvlc_media_player_t *, int );
 
 /**
  * Toggle teletext transparent status on video output.
