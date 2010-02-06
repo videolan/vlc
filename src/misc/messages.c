@@ -78,7 +78,6 @@ static uintptr_t banks = 0;
 #   define vlc_va_copy(dest,src) (dest)=(src)
 #endif
 
-#define QUEUE priv->msg_bank
 static inline msg_bank_t *libvlc_bank (libvlc_int_t *inst)
 {
     return (libvlc_priv (inst))->msg_bank;
@@ -103,11 +102,6 @@ struct msg_bank_t
     int i_sub;
     msg_subscription_t **pp_sub;
 
-    /* Logfile for WinCE */
-#ifdef UNDER_CE
-    FILE *logfile;
-#endif
-
     locale_t locale; /**< C locale for error messages */
     vlc_dictionary_t enabled_objects; ///< Enabled objects
     bool all_objects_enabled; ///< Should we print all objects?
@@ -130,14 +124,6 @@ msg_bank_t *msg_Create (void)
 
     /* C locale to get error messages in English in the logs */
     bank->locale = newlocale (LC_MESSAGES_MASK, "C", (locale_t)0);
-
-#ifdef UNDER_CE
-    QUEUE.logfile =
-        CreateFile( L"vlc-log.txt", GENERIC_WRITE,
-                    FILE_SHARE_READ|FILE_SHARE_WRITE, NULL,
-                    CREATE_ALWAYS, 0, NULL );
-    SetFilePointer( QUEUE.logfile, 0, NULL, FILE_END );
-#endif
 
     vlc_mutex_lock( &msg_stack_lock );
     if( banks++ == 0 )
@@ -198,9 +184,6 @@ void msg_Destroy (msg_bank_t *bank)
         vlc_threadvar_delete( &msg_context );
     vlc_mutex_unlock( &msg_stack_lock );
 
-#ifdef UNDER_CE
-    CloseHandle( QUEUE.logfile );
-#endif
     if (bank->locale != (locale_t)0)
        freelocale (bank->locale);
 
@@ -475,9 +458,6 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
 #   define WHITE   COL(0)
 #   define GRAY    "\033[0m"
 
-#ifdef UNDER_CE
-    int i_dummy;
-#endif
     static const char ppsz_type[4][9] = { "", " error", " warning", " debug" };
     static const char ppsz_color[4][8] = { WHITE, RED, YELLOW, GRAY };
     const char *psz_object;
@@ -520,19 +500,6 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
             return;
     }
 
-#ifdef UNDER_CE
-#   define CE_WRITE(str) WriteFile( QUEUE.logfile, \
-                                    str, strlen(str), &i_dummy, NULL );
-    CE_WRITE( p_item->psz_module );
-    CE_WRITE( " " );
-    CE_WRITE( psz_object );
-    CE_WRITE( ppsz_type[i_type] );
-    CE_WRITE( ": " );
-    CE_WRITE( p_item->psz_msg );
-    CE_WRITE( "\r\n" );
-    FlushFileBuffers( QUEUE.logfile );
-
-#else
     int canc = vlc_savecancel ();
     /* Send the message to stderr */
     utf8_fprintf( stderr, "[%s%p%s] %s%s%s %s%s: %s%s%s\n",
@@ -547,11 +514,10 @@ static void PrintMsg ( vlc_object_t * p_this, msg_item_t * p_item )
                   p_item->psz_msg,
                   priv->b_color ? GRAY : "" );
 
-#   if defined(WIN32)
+#ifdef WIN32
     fflush( stderr );
-#   endif
-    vlc_restorecancel (canc);
 #endif
+    vlc_restorecancel (canc);
 }
 
 static msg_context_t* GetContext(void)
