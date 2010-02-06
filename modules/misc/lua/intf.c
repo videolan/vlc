@@ -39,6 +39,8 @@
 #include <vlc_interface.h>
 #include <vlc_playlist.h>
 #include <vlc_aout.h>
+#include <sys/types.h>
+#include <sys/stat.h>
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
@@ -65,17 +67,18 @@ static char *FindFile( vlc_object_t *p_this, const char *psz_name )
     for( ppsz_dir = ppsz_dir_list; *ppsz_dir; ppsz_dir++ )
     {
         char *psz_filename;
-        FILE *fp;
+        struct stat st;
+
         if( asprintf( &psz_filename, "%s"DIR_SEP"%s.lua", *ppsz_dir,
                       psz_name ) < 0 )
         {
             vlclua_dir_list_free( ppsz_dir_list );
             return NULL;
         }
-        fp = fopen( psz_filename, "r" );
-        if( fp )
+
+        if( utf8_stat( psz_filename, &st ) == 0
+         && S_ISREG( st.st_mode ) )
         {
-            fclose( fp );
             vlclua_dir_list_free( ppsz_dir_list );
             return psz_filename;
         }
