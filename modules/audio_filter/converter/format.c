@@ -170,14 +170,12 @@ static block_t *Filter(filter_t *filter, block_t *block)
         sys->pre(block);
 
     for (int i = 0; i < 2; i++) {
-        block_t *out;
         if (sys->directs[i]) {
-            out = sys->directs[i](filter, block);
-            assert(out == block);
+            block = sys->directs[i](filter, block);
         } else if (sys->indirects[i]) {
             int dst_size = sys->indirects_ratio[i][1] *
                            (block->i_buffer / sys->indirects_ratio[i][0]);
-            out = filter_NewAudioBuffer(filter, dst_size);
+            block_t *out = filter_NewAudioBuffer(filter, dst_size);
             if (!out) {
                 block_Release(block);
                 return NULL;
@@ -191,8 +189,8 @@ static block_t *Filter(filter_t *filter, block_t *block)
             sys->indirects[i](out, block);
 
             block_Release(block);
+            block = out;
         }
-        block = out;
     }
 
     if (sys->post)
