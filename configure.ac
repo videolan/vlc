@@ -4239,10 +4239,12 @@ AS_IF([test "${enable_projectm}" != "no"],
       VLC_ADD_PLUGIN([projectm])
       VLC_ADD_CXXFLAGS([projectm],[$PROJECTM_CFLAGS])
       VLC_ADD_LIBS([projectm],[$PROJECTM_LIBS])
-      PKG_CHECK_MODULES(PROJECTM, libprojectM >= 2.0.0,
-        [ AC_DEFINE([HAVE_PROJECTM2], 1, [Define to 1 if using libprojectM2]) ])
+      PKG_CHECK_MODULES(PROJECTM2, [libprojectM >= 2.0.0],
+        [ AC_DEFINE([HAVE_PROJECTM2], 1, [Define to 1 if using libprojectM 2.x]) ],
+        [ AC_MSG_WARN( [Using libprojectM version 1] )
+      ])
     ],[
-      AC_MSG_WARN(libprojectM library not found)
+      AC_MSG_WARN([libprojectM library not found])
     ])
   ])
 
