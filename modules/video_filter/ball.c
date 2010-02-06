@@ -139,14 +139,14 @@ vlc_module_begin ()
     set_category( CAT_VIDEO )
     set_subcategory( SUBCAT_VIDEO_VFILTER )
 
-    add_string( FILTER_PREFIX "ball-color", "ball-color", NULL,
+    add_string( FILTER_PREFIX "color", "ball-color", NULL,
                 BALL_COLOR_TEXT, BALL_COLOR_LONGTEXT, false )
     change_string_list( mode_list, mode_list_text, 0 )
 
-    add_integer_with_range( FILTER_PREFIX "ball-speed", 4, 1, 15, NULL,
+    add_integer_with_range( FILTER_PREFIX "speed", 4, 1, 15, NULL,
                             BALL_SPEED_TEXT, BALL_SPEED_LONGTEXT, false )
 
-    add_integer_with_range( FILTER_PREFIX "ball-size", 10, 5, 30, NULL,
+    add_integer_with_range( FILTER_PREFIX "size", 10, 5, 30, NULL,
                             BALL_SIZE_TEXT, BALL_SIZE_LONGTEXT, false )
 
     add_integer_with_range( FILTER_PREFIX "gradient-threshold", 40, 1, 200, NULL,
@@ -270,10 +270,10 @@ static int Create( vlc_object_t *p_this )
 
     if( !(psz_method =
         var_CreateGetNonEmptyStringCommand( p_filter,
-                                            FILTER_PREFIX "ball-color" ) ) )
+                                            FILTER_PREFIX "color" ) ) )
     {
         msg_Err( p_filter, "configuration variable "
-                 FILTER_PREFIX "ball-color empty" );
+                 FILTER_PREFIX "color empty" );
         p_filter->p_sys->ballColor = RED;
     }
     else
@@ -282,9 +282,9 @@ static int Create( vlc_object_t *p_this )
     free( psz_method );
 
     p_filter->p_sys->i_ballSize =
-            var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "ball-size" );
+            var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "size" );
     p_filter->p_sys->i_ballSpeed =
-            var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "ball-speed" );
+            var_CreateGetIntegerCommand( p_filter, FILTER_PREFIX "speed" );
     p_filter->p_sys->b_edgeVisible =
             var_CreateGetBoolCommand( p_filter, FILTER_PREFIX "edge-visible" );
     p_filter->p_sys->i_gradThresh =
@@ -292,11 +292,11 @@ static int Create( vlc_object_t *p_this )
 
     vlc_mutex_init( &p_filter->p_sys->lock );
 
-    var_AddCallback( p_filter, FILTER_PREFIX "ball-color",
+    var_AddCallback( p_filter, FILTER_PREFIX "color",
                      ballCallback, p_filter->p_sys );
-    var_AddCallback( p_filter, FILTER_PREFIX "ball-size",
+    var_AddCallback( p_filter, FILTER_PREFIX "size",
                      ballCallback, p_filter->p_sys );
-    var_AddCallback( p_filter, FILTER_PREFIX "ball-speed",
+    var_AddCallback( p_filter, FILTER_PREFIX "speed",
                      ballCallback, p_filter->p_sys );
     var_AddCallback( p_filter, FILTER_PREFIX "edge-visible",
                      ballCallback, p_filter->p_sys );
@@ -325,11 +325,11 @@ static void Destroy( vlc_object_t *p_this )
     filter_t *p_filter = (filter_t *)p_this;
     filter_sys_t *p_sys = p_filter->p_sys;
 
-    var_DelCallback( p_filter, FILTER_PREFIX "ball-color",
+    var_DelCallback( p_filter, FILTER_PREFIX "color",
                      ballCallback, p_sys );
-    var_DelCallback( p_filter, FILTER_PREFIX "ball-size",
+    var_DelCallback( p_filter, FILTER_PREFIX "size",
                      ballCallback, p_sys );
-    var_DelCallback( p_filter, FILTER_PREFIX "ball-speed",
+    var_DelCallback( p_filter, FILTER_PREFIX "speed",
                      ballCallback, p_sys );
     var_DelCallback( p_filter, FILTER_PREFIX "edge-visible",
                      ballCallback, p_sys );
@@ -820,15 +820,15 @@ static int ballCallback( vlc_object_t *p_this, char const *psz_var,
     msg_Err( p_this, "Test" );
 
     vlc_mutex_lock( &p_sys->lock );
-    if( !strcmp( psz_var, FILTER_PREFIX "ball-color" ) )
+    if( !strcmp( psz_var, FILTER_PREFIX "color" ) )
     {
         p_sys->ballColor = getBallColor( p_this, newval.psz_string );
     }
-    else if( !strcmp( psz_var, FILTER_PREFIX "ball-size" ) )
+    else if( !strcmp( psz_var, FILTER_PREFIX "size" ) )
     {
         p_sys->i_ballSize = newval.i_int;
     }
-    else if( !strcmp( psz_var, FILTER_PREFIX "ball-speed" ) )
+    else if( !strcmp( psz_var, FILTER_PREFIX "speed" ) )
     {
         p_sys->i_ballSpeed = newval.i_int;
     }
