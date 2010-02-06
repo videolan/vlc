@@ -84,10 +84,10 @@ void    input_clock_ChangeRate( input_clock_t *, int i_rate );
 void    input_clock_ChangePause( input_clock_t *, bool b_paused, mtime_t i_date );
 
 /**
- * This function returns the original system value date for the current
+ * This function returns the original system value date and the delay for the current
  * reference point (a valid reference point must have been set).
  */
-mtime_t input_clock_GetSystemOrigin( input_clock_t * );
+void    input_clock_GetSystemOrigin( input_clock_t *, mtime_t *pi_system, mtime_t *pi_delay );
 
 /**
  * This function allows to rebase the original system value date (a valid

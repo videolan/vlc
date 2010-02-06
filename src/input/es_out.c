@@ -2624,7 +2624,8 @@ static int EsOutControlLocked( es_out_t *out, int i_query, va_list args )
                 return VLC_EGENERIC;
 
             mtime_t *pi_system = va_arg( args, mtime_t *);
-            *pi_system = input_clock_GetSystemOrigin( p_pgrm->p_clock );
+            mtime_t *pi_delay  = va_arg( args, mtime_t *);
+            input_clock_GetSystemOrigin( p_pgrm->p_clock, pi_system, pi_delay );
             return VLC_SUCCESS;
         }
 

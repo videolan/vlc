@@ -466,7 +466,8 @@ int input_vaControl( input_thread_t *p_input, int i_query, va_list args )
         case INPUT_GET_PCR_SYSTEM:
         {
             mtime_t *pi_system = va_arg( args, mtime_t * );
-            return es_out_ControlGetPcrSystem( p_input->p->p_es_out_display, pi_system );
+            mtime_t *pi_delay  = va_arg( args, mtime_t * );
+            return es_out_ControlGetPcrSystem( p_input->p->p_es_out_display, pi_system, pi_delay );
         }
 
         case INPUT_MODIFY_PCR_SYSTEM:

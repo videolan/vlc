@@ -515,17 +515,17 @@ void input_clock_ChangeSystemOrigin( input_clock_t *cl, bool b_absolute, mtime_t
     vlc_mutex_unlock( &cl->lock );
 }
 
-mtime_t input_clock_GetSystemOrigin( input_clock_t *cl )
+void input_clock_GetSystemOrigin( input_clock_t *cl, mtime_t *pi_system, mtime_t *pi_delay )
 {
     vlc_mutex_lock( &cl->lock );
 
     assert( cl->b_has_reference );
 
-    const mtime_t i_system = cl->ref.i_system;
+    *pi_system = cl->ref.i_system;
+    if( pi_delay )
+        *pi_delay  = cl->i_pts_delay;
 
     vlc_mutex_unlock( &cl->lock );
-
-    return i_system;
 }
 
 #warning "input_clock_SetJitter needs more work"

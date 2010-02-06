@@ -164,8 +164,9 @@ void Close(vlc_object_t *object)
 static mtime_t GetPcrSystem(input_thread_t *input)
 {
     int canc = vlc_savecancel();
+    /* TODO use the delay */
     mtime_t system;
-    if (input_GetPcrSystem(input, &system))
+    if (input_GetPcrSystem(input, &system, NULL))
         system = -1;
     vlc_restorecancel(canc);
 
@@ -251,7 +252,7 @@ static void *Slave(void *handle)
             int canc = vlc_savecancel();
 
             mtime_t client_system;
-            if (!input_GetPcrSystem(sys->input, &client_system)) {
+            if (!input_GetPcrSystem(sys->input, &client_system, NULL)) {
                 const mtime_t diff_system = client_system - master_system - diff_date;
                 if (diff_system != 0) {
                     input_ModifyPcrSystem(sys->input, true, master_system - diff_date);
