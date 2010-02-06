@@ -175,7 +175,7 @@ case "${host_os}" in
   bsdi*)
     SYS=bsdi
     CFLAGS_save="${CFLAGS_save} -pthread"; CFLAGS="${CFLAGS_save}"
-    VLC_ADD_LIBS([dvd dvdcss vcd cdda vcdx],[-ldvd])
+    VLC_ADD_LIBS([dvd vcd cdda vcdx],[-ldvd])
     ;;
   *bsd*)
     SYS="${host_os}"
@@ -1870,10 +1870,8 @@ then
   AC_ARG_WITH(dvdread-tree,
   [  --with-dvdread-tree=PATH libdvdread tree for static linking])
 
-  dnl Temporary hack (yeah, sure ;)
-  if test "${SYS}" = "mingw32" || test "${SYS}" = "darwin" || test "${SYS}" = "beos" ; then
-      VLC_ADD_LIBS([dvdread],[-ldvdcss])
-  fi
+  dnl prepend -ldvdcss on OS that need it
+  AS_CASE(["${SYS}"], [mingw32|darwin|beos], [VLC_ADD_LIBS([dvdread], [-ldvdcss])])
 
   if test -z "${with_dvdread}"
   then
@@ -1881,11 +1879,11 @@ then
     then
       AC_CHECK_HEADERS(dvdread/dvd_reader.h,
         [ VLC_ADD_PLUGIN([dvdread])
-          VLC_ADD_LIBS([dvdread],[-ldvdread ${LIBS_dvdcss}])
+          VLC_ADD_LIBS([dvdread],[-ldvdread])
         ],[
 	  AC_CHECK_HEADERS(libdvdread/dvd_reader.h,
             [ VLC_ADD_PLUGIN([dvdread])
-	      VLC_ADD_LIBS([dvdread],[-ldvdread ${LIBS_dvdcss}])
+	      VLC_ADD_LIBS([dvdread],[-ldvdread])
 	    ],[
 	      if test -n "${enable_dvdread}"
 	      then
@@ -1907,7 +1905,7 @@ then
         dnl  Use a custom libdvdread
         AC_MSG_RESULT(${real_dvdread_tree}/dvdread/.libs/libdvdread.a)
         VLC_ADD_PLUGIN([dvdread])
-        VLC_ADD_LIBS([dvdread],[-L${real_dvdread_tree}/dvdread/.libs -ldvdread ${LIBS_dvdcss}])
+        VLC_ADD_LIBS([dvdread],[-L${real_dvdread_tree}/dvdread/.libs -ldvdread])
         VLC_ADD_CPPFLAGS([dvdread],[-I${real_dvdread_tree}])
       else
         dnl  The given libdvdread wasn't built
@@ -1922,7 +1920,7 @@ then
       dnl  Use ${with_dvdread}/include/dvdread/dvd_reader.h
       AC_MSG_RESULT(yes)
       VLC_ADD_PLUGIN([dvdread])
-      VLC_ADD_LIBS([dvdread],[-L${with_dvdread}/lib -ldvdread ${LIBS_dvdcss}])
+      VLC_ADD_LIBS([dvdread],[-L${with_dvdread}/lib -ldvdread])
       VLC_ADD_CPPFLAGS([dvdread],[-I${with_dvdread}/include])
     else
       dnl  No libdvdread could be found, sorry
@@ -1930,6 +1928,9 @@ then
       AC_MSG_ERROR([cannot find ${with_dvdread}/include/dvdread/dvd_reader.h])
     fi
   fi
+
+  dnl append -ldvd on OS that need it
+  AS_CASE(["${SYS}"], [bsdi], [VLC_ADD_LIBS([dvdread], [-ldvd])])
 fi
 
 dnl
@@ -1939,10 +1940,8 @@ AC_ARG_ENABLE(dvdnav,
   [  --enable-dvdnav         dvdnav input module (default enabled)])
 if test "${enable_dvdnav}" != "no"
 then
-  dnl Same hack than dvdread
-  if test "${SYS}" = "mingw32" || test "${SYS}" = "darwin" || test "${SYS}" = "beos" ; then
-      VLC_ADD_LIBS([dvdnav],[-ldvdcss])
-  fi
+  dnl prepend -ldvdcss on OS that need it
+  AS_CASE(["${SYS}"], [mingw32|darwin|beos], [VLC_ADD_LIBS([dvdnav], [-ldvdcss])])
 
   DVDNAV_PATH="${PATH}"
   AC_ARG_WITH(dvdnav-config-path,
