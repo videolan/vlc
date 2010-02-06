@@ -242,10 +242,9 @@ void libvlc_media_list_retain( libvlc_media_list_t * p_mlist )
 /**************************************************************************
  *       add_file_content (Public)
  **************************************************************************/
-void
+int
 libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
-                                    const char * psz_uri,
-                                    libvlc_exception_t * p_e )
+                                    const char * psz_uri )
 {
     input_item_t * p_input_item;
     libvlc_media_t * p_md;
@@ -256,9 +255,8 @@ libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
 
     if( !p_input_item )
     {
-        libvlc_exception_raise( p_e );
         libvlc_printerr( "Not enough memory" );
-        return;
+        return -1;
     }
 
     p_md = libvlc_media_new_from_input_item( p_mlist->p_libvlc_instance,
@@ -266,18 +264,18 @@ libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
     if( !p_md )
     {
         vlc_gc_decref( p_input_item );
-        return;
+        return -1;
     }
 
     if( libvlc_media_list_add_media( p_mlist, p_md ) )
     {
-        libvlc_exception_raise( p_e );
-        return;
+#warning Missing error handling!
+        /* printerr and leaks */
+        return -1;
     }
 
     input_Read( p_mlist->p_libvlc_instance->p_libvlc_int, p_input_item );
-
-    return;
+    return 0;
 }
 
 /**************************************************************************

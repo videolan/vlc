@@ -79,22 +79,19 @@ VLC_PUBLIC_API void
  * Load media library.
  *
  * \param p_mlib media library object
- * \param p_e an initialized exception object.
+ * \return 0 on success, -1 on error
  */
-VLC_PUBLIC_API void
-    libvlc_media_library_load( libvlc_media_library_t * p_mlib,
-                               libvlc_exception_t * p_e );
+VLC_PUBLIC_API int
+    libvlc_media_library_load( libvlc_media_library_t * p_mlib );
 
 /**
  * Get media library subitems.
  *
  * \param p_mlib media library object
- * \param p_e an initialized exception object.
  * \return media list subitems
  */
 VLC_PUBLIC_API libvlc_media_list_t *
-    libvlc_media_library_media_list( libvlc_media_library_t * p_mlib,
-                                     libvlc_exception_t * p_e );
+    libvlc_media_library_media_list( libvlc_media_library_t * p_mlib );
 
 
 /** @} */

@@ -70,10 +70,9 @@ VLC_PUBLIC_API void
 VLC_PUBLIC_API void
     libvlc_media_list_retain( libvlc_media_list_t * );
 
-VLC_DEPRECATED_API void
+VLC_DEPRECATED_API int
     libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
-                                        const char * psz_uri,
-                                        libvlc_exception_t * p_e );
+                                        const char * psz_uri );
 
 /**
  * Associate media instance with this media list instance.
