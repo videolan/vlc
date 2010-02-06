@@ -317,8 +317,7 @@ static char *CheckUTF8( char *str, char rep )
             assert (cp < (1 << 26));
             c = ptr[i];
 
-            if ((c == '\0') // unexpected end of string
-             || ((c >> 6) != 2)) // not a continuation byte
+            if ((c >> 6) != 2) // not a continuation byte
                 goto error;
 
             cp = (cp << 6) | (ptr[i] & 0x3f);
