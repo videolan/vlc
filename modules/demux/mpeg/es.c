@@ -42,15 +42,15 @@
 /*****************************************************************************
  * Module descriptor
  *****************************************************************************/
-static int  Open ( vlc_object_t * );
-static void Close( vlc_object_t * );
+static int  OpenAudio( vlc_object_t * );
+static void Close    ( vlc_object_t * );
 
 vlc_module_begin ()
     set_category( CAT_INPUT )
     set_subcategory( SUBCAT_INPUT_DEMUX )
     set_description( N_("MPEG-I/II/4 / A52 / DTS / MLP audio" ) )
     set_capability( "demux", 155 )
-    set_callbacks( Open, Close )
+    set_callbacks( OpenAudio, Close )
 
     add_shortcut( "mpga" )
     add_shortcut( "mp3" )
@@ -134,7 +134,7 @@ static int DtsInit( demux_t *p_demux );
 static int MlpProbe( demux_t *p_demux, int64_t *pi_offset );
 static int MlpInit( demux_t *p_demux );
 
-static const codec_t p_codec[] = {
+static const codec_t p_codecs[] = {
     { VLC_CODEC_MP4A, false, "mp4 audio",  AacProbe,  AacInit },
     { VLC_CODEC_MPGA, false, "mpeg audio", MpgaProbe, MpgaInit },
     { VLC_CODEC_A52, true,  "a52 audio",  A52Probe,  A52Init },
@@ -146,32 +146,21 @@ static const codec_t p_codec[] = {
 };
 
 /*****************************************************************************
- * Open: initializes demux structures
+ * OpenCommon: initializes demux structures
  *****************************************************************************/
-static int Open( vlc_object_t * p_this )
+static int OpenCommon( demux_t *p_demux,
+                       int i_cat, const codec_t *p_codec, int64_t i_bs_offset )
 {
-    demux_t     *p_demux = (demux_t*)p_this;
     demux_sys_t *p_sys;
 
     es_format_t fmt;
-    int64_t i_offset;
-    int i_index;
-
-    for( i_index = 0; p_codec[i_index].i_codec != 0; i_index++ )
-    {
-        if( !p_codec[i_index].pf_probe( p_demux, &i_offset ) )
-            break;
-    }
-
-    if( p_codec[i_index].i_codec == 0 )
-        return VLC_EGENERIC;
 
     DEMUX_INIT_COMMON(); p_sys = p_demux->p_sys;
     memset( p_sys, 0, sizeof( demux_sys_t ) );
-    p_sys->codec = p_codec[i_index];
+    p_sys->codec = *p_codec;
     p_sys->p_es = NULL;
     p_sys->b_start = true;
-    p_sys->i_stream_offset = i_offset;
+    p_sys->i_stream_offset = i_bs_offset;
     p_sys->b_estimate_bitrate = true;
     p_sys->i_bitrate_avg = 0;
     p_sys->b_big_endian = false;
@@ -191,7 +180,7 @@ static int Open( vlc_object_t * p_this )
     msg_Dbg( p_demux, "detected format %4.4s", (const char*)&p_sys->codec.i_codec );
 
     /* Load the audio packetizer */
-    es_format_Init( &fmt, AUDIO_ES, p_sys->codec.i_codec );
+    es_format_Init( &fmt, i_cat, p_sys->codec.i_codec );
     p_sys->p_packetizer = demux_PacketizerNew( p_demux, &fmt, p_sys->codec.psz_name );
     if( !p_sys->p_packetizer )
     {
@@ -199,6 +188,17 @@ static int Open( vlc_object_t * p_this )
         return VLC_EGENERIC;
     }
     return VLC_SUCCESS;
+}
+static int OpenAudio( vlc_object_t *p_this )
+{
+    demux_t *p_demux = (demux_t*)p_this;
+    for( int i = 0; p_codecs[i].i_codec != 0; i++ )
+    {
+        int64_t i_offset;
+        if( !p_codecs[i].pf_probe( p_demux, &i_offset ) )
+            return OpenCommon( p_demux, AUDIO_ES, &p_codecs[i], i_offset );
+    }
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
