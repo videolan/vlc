@@ -719,7 +719,7 @@ get_string( libvlc_media_player_t *p_mi, const char *name,
 static const opt_t *
 marq_option_bynumber(unsigned option, libvlc_exception_t *p_e)
 {
-    opt_t optlist[] =
+    static const opt_t optlist[] =
     {
         { "marq",          0 },
         { "marq-marquee",  VLC_VAR_STRING },
@@ -789,7 +789,8 @@ void libvlc_video_set_marquee_string( libvlc_media_player_t *p_mi,
 static opt_t *
 logo_option_bynumber( unsigned option, libvlc_exception_t *p_e )
 {
-    opt_t vlogo_optlist[] = /* depends on libvlc_video_logo_option_t */
+    static const opt_t vlogo_optlist[] =
+    /* depends on libvlc_video_logo_option_t */
     {
         { "logo",          0 },
         { "logo-file",     VLC_VAR_STRING },
