@@ -62,50 +62,6 @@ extern "C" {
 #include <vlc/libvlc_structures.h>
 
 /*****************************************************************************
- * Exception handling
- *****************************************************************************/
-/** \defgroup libvlc_exception libvlc_exception
- * \ingroup libvlc_core
- * LibVLC Exceptions handling
- * @{
- */
-
-/**
- * Initialize an exception structure. This can be called several times to
- * reuse an exception structure.
- *
- * \param p_exception the exception to initialize
- */
-VLC_PUBLIC_API void libvlc_exception_init( libvlc_exception_t *p_exception );
-
-/**
- * Has an exception been raised?
- *
- * \param p_exception the exception to query
- * \return 0 if the exception was raised, 1 otherwise
- */
-VLC_PUBLIC_API int
-libvlc_exception_raised( const libvlc_exception_t *p_exception );
-
-/**
- * Raise an exception.
- *
- * \param p_exception the exception to raise
- */
-VLC_PUBLIC_API void
-libvlc_exception_raise( libvlc_exception_t *p_exception );
-
-/**
- * Clear an exception object so it can be reused.
- * The exception object must have be initialized.
- *
- * \param p_exception the exception to clear
- */
-VLC_PUBLIC_API void libvlc_exception_clear( libvlc_exception_t * );
-
-/**@} */
-
-/*****************************************************************************
  * Error handling
  *****************************************************************************/
 /** \defgroup libvlc_error libvlc_error

@@ -32,7 +32,6 @@ static void test_media_list (const char ** argv, int argc)
 
     log ("Testing media_list\n");
 
-    libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
@@ -82,8 +81,8 @@ static void test_media_list (const char ** argv, int argc)
 
     assert ( libvlc_media_list_item_at_index (ml, 2) == md3 );
 
-    /* test if give exceptions, when it should */
-    /* have 4 items, so index 4 should give exception */
+    /* test if give errors, when it should */
+    /* have 4 items, so index 4 should give error */
     ret = libvlc_media_list_remove_index (ml, 4);
     assert (ret == -1);
 
@@ -120,7 +119,6 @@ static void test_media_list (const char ** argv, int argc)
     libvlc_media_list_release (ml);
 
     libvlc_release (vlc);
-    catch ();
 }
 
 int main (void)

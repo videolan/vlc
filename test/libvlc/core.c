@@ -29,7 +29,6 @@ static void test_core (const char ** argv, int argc)
 
     log ("Testing core\n");
 
-    libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 

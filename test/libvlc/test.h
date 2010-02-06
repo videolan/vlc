@@ -46,7 +46,6 @@
 /*********************************************************************
  * Some useful global var
  */
-static libvlc_exception_t ex;
 
 static const char * test_defaults_args[] = {
     "-v",
@@ -71,30 +70,6 @@ static const char test_default_sample[] = SRCDIR"/samples/empty.voc";
  */
 
 #define log( ... ) printf( "testapi: " __VA_ARGS__ );
-
-/* test if we have exception */
-static inline bool have_exception (void)
-{
-    if (libvlc_exception_raised (&ex))
-    {
-        libvlc_exception_clear (&ex);
-        return true;
-    }
-    else
-        return false;
-}
-
-#define catch() catch_with_info(__FILE__, __FUNCTION__, __LINE__)
-
-static inline void catch_with_info (const char * file, const char * func, unsigned line)
-{
-    if (libvlc_exception_raised (&ex))
-    {
-         fprintf (stderr, "%s:%s():%d Exception: %s\n", file, func, line, libvlc_errmsg ());
-         abort ();
-    }
-    libvlc_exception_clear (&ex);
-}
 
 static inline void test_init (void)
 {

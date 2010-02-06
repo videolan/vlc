@@ -32,7 +32,6 @@ static void test_media_player_play_stop(const char** argv, int argc)
 
     log ("Testing play and pause of %s\n", file);
 
-    libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
@@ -70,7 +69,6 @@ static void test_media_player_pause_stop(const char** argv, int argc)
 
     log ("Testing pause and stop of %s\n", file);
 
-    libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
@@ -90,7 +88,6 @@ static void test_media_player_pause_stop(const char** argv, int argc)
     libvlc_state_t state;
     do {
         state = libvlc_media_player_get_state (mi);
-        catch ();
     } while( state != libvlc_Playing &&
              state != libvlc_Error &&
              state != libvlc_Ended );

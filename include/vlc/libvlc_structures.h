@@ -39,23 +39,6 @@ extern "C" {
 typedef struct libvlc_instance_t libvlc_instance_t;
 
 /*****************************************************************************
- * Exceptions
- *****************************************************************************/
-
-/** \defgroup libvlc_exception libvlc_exception
- * \ingroup libvlc_core
- * LibVLC Exceptions handling
- * @{
- */
-
-typedef struct libvlc_exception_t
-{
-    int b_raised;
-} libvlc_exception_t;
-
-/**@} */
-
-/*****************************************************************************
  * Time
  *****************************************************************************/
 /** \defgroup libvlc_time libvlc_time

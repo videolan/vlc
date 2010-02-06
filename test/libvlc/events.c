@@ -61,7 +61,6 @@ static void test_events (const char ** argv, int argc)
     libvlc_media_player_t *mi;
     libvlc_event_manager_t *em;
     bool callback_was_called;
-    libvlc_exception_t ex;
     libvlc_event_type_t mi_events[] = {
         libvlc_MediaPlayerPlaying,
         libvlc_MediaPlayerPaused,
@@ -74,7 +73,6 @@ static void test_events (const char ** argv, int argc)
 
     log ("Testing events\n");
 
-    libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
@@ -125,10 +123,7 @@ static void test_events (const char ** argv, int argc)
         libvlc_event_detach (em, mi_events[i], test_events_dummy_callback, &callback_was_called);
 
     libvlc_media_player_release (mi);
-    catch ();
-
     libvlc_release (vlc);
-    catch ();
 }
 
 int main (void)

@@ -30,10 +30,6 @@ libvlc_event_manager_register_event_type
 libvlc_event_manager_release
 libvlc_event_send
 libvlc_event_type_name
-libvlc_exception_clear
-libvlc_exception_init
-libvlc_exception_raise
-libvlc_exception_raised
 libvlc_free
 libvlc_get_changeset
 libvlc_get_compiler

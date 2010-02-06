@@ -100,7 +100,6 @@ static void test_media_list_player_items_queue(const char** argv, int argc)
 
     log ("Testing media player item queue-ing\n");
 
-    libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
@@ -171,7 +170,6 @@ static void test_media_list_player_previous(const char** argv, int argc)
 
     log ("Testing media player previous()\n");
 
-    libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
@@ -248,7 +246,6 @@ static void test_media_list_player_next(const char** argv, int argc)
 
     log ("Testing media player next()\n");
 
-    libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
@@ -324,7 +321,6 @@ static void test_media_list_player_pause_stop(const char** argv, int argc)
 
     log ("Testing play and pause of %s using the media list.\n", file);
 
-    libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 
@@ -371,7 +367,6 @@ static void test_media_list_player_play_item_at_index(const char** argv, int arg
 
     log ("Testing play_item_at_index of %s using the media list.\n", file);
 
-    libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv, &ex);
     assert (vlc != NULL);
 
@@ -427,7 +422,6 @@ static void test_media_list_player_playback_options (const char** argv, int argc
 
     log ("Testing media player playback options()\n");
 
-    libvlc_exception_init (&ex);
     vlc = libvlc_new (argc, argv);
     assert (vlc != NULL);
 

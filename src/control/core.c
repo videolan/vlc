@@ -1,5 +1,5 @@
 /*****************************************************************************
- * core.c: Core libvlc new API functions : initialization, exceptions handling
+ * core.c: Core libvlc new API functions : initialization
  *****************************************************************************
  * Copyright (C) 2005 the VideoLAN team
  * $Id$
@@ -36,47 +36,6 @@
 #include <assert.h>
 
 static const char nomemstr[] = "Insufficient memory";
-
-/*************************************************************************
- * Exceptions handling
- *************************************************************************/
-void libvlc_exception_init( libvlc_exception_t *p_exception )
-{
-    p_exception->b_raised = 0;
-}
-
-void libvlc_exception_clear( libvlc_exception_t *p_exception )
-{
-    if( NULL == p_exception )
-        return;
-    p_exception->b_raised = 0;
-    libvlc_clearerr ();
-}
-
-int libvlc_exception_raised( const libvlc_exception_t *p_exception )
-{
-    return (NULL != p_exception) && p_exception->b_raised;
-}
-
-static void libvlc_exception_not_handled( const char *psz )
-{
-    fprintf( stderr, "*** LibVLC Exception not handled: %s\nSet a breakpoint in '%s' to debug.\n",
-             psz, __func__ );
-    abort();
-}
-
-void libvlc_exception_raise( libvlc_exception_t *p_exception )
-{
-    /* Does caller care about exceptions ? */
-    if( p_exception == NULL ) {
-        /* Print something, so that lazy third-parties can easily
-         * notice that something may have gone unnoticedly wrong */
-        libvlc_exception_not_handled( libvlc_errmsg() );
-        return;
-    }
-
-    p_exception->b_raised = 1;
-}
 
 libvlc_instance_t * libvlc_new( int argc, const char *const *argv )
 {
