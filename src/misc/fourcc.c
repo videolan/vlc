@@ -1088,7 +1088,7 @@ static const entry_t p_list_audio[] = {
         A("f32l"),
         A("fl32"),
 
-    B(VLC_CODEC_F32L, "32 bits float BE"),
+    B(VLC_CODEC_F32B, "32 bits float BE"),
         A("f32b"),
 
     B(VLC_CODEC_F64L, "64 bits float LE"),
