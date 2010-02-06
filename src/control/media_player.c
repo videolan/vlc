@@ -415,6 +415,7 @@ libvlc_media_player_new( libvlc_instance_t *instance )
      */
     var_AddCallback(mp->p_libvlc, "snapshot-file", snapshot_was_taken, mp);
 
+    libvlc_retain(instance);
     return mp;
 }
 
@@ -466,7 +467,10 @@ static void libvlc_media_player_destroy( libvlc_media_player_t *p_mi )
     libvlc_event_manager_release( p_mi->p_event_manager );
     libvlc_media_release( p_mi->p_md );
     vlc_mutex_destroy( &p_mi->object_lock );
+
+    libvlc_instance_t *instance = p_mi->p_libvlc_instance;
     vlc_object_release( p_mi );
+    libvlc_release(instance);
 }
 
 /**************************************************************************
