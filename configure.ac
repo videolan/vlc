@@ -175,7 +175,7 @@ case "${host_os}" in
   bsdi*)
     SYS=bsdi
     CFLAGS_save="${CFLAGS_save} -pthread"; CFLAGS="${CFLAGS_save}"
-    VLC_ADD_LIBS([dvd vcd cdda vcdx],[-ldvd])
+    VLC_ADD_LIBS([vcd cdda vcdx],[-ldvd])
     ;;
   *bsd*)
     SYS="${host_os}"
