@@ -473,6 +473,10 @@ static input_thread_t *Create( vlc_object_t *p_parent, input_item_t *p_item,
     if( p_input->b_preparsing )
         p_input->i_flags |= OBJECT_FLAGS_QUIET | OBJECT_FLAGS_NOINTERACT;
 
+    /* Make sure the interaction option is honored */
+    if( !var_InheritBool( p_input, "interact" ) )
+        p_input->i_flags |= OBJECT_FLAGS_NOINTERACT;
+
     /* */
     memset( &p_input->p->counters, 0, sizeof( p_input->p->counters ) );
     vlc_mutex_init( &p_input->p->counters.counters_lock );
