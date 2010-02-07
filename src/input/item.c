@@ -812,13 +812,13 @@ void input_item_SetEpgOffline( input_item_t *p_item )
     vlc_event_send( &p_item->event_manager, &event );
 }
 
-
-input_item_t *__input_item_NewExt( vlc_object_t *p_obj, const char *psz_uri,
-                                  const char *psz_name,
-                                  int i_options,
-                                  const char *const *ppsz_options,
-                                  unsigned i_option_flags,
-                                  mtime_t i_duration )
+#undef input_item_NewExt
+input_item_t *input_item_NewExt( vlc_object_t *p_obj, const char *psz_uri,
+                                 const char *psz_name,
+                                 int i_options,
+                                 const char *const *ppsz_options,
+                                 unsigned i_option_flags,
+                                 mtime_t i_duration )
 {
     return input_item_NewWithType( p_obj, psz_uri, psz_name,
                                   i_options, ppsz_options, i_option_flags,

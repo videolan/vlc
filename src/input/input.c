@@ -112,6 +112,7 @@ static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO f
 /* Do not let a pts_delay from access/demux go beyong 60s */
 #define INPUT_PTS_DELAY_MAX INT64_C(60000000)
 
+#undef input_Create
 /**
  * Create a new input_thread_t.
  *
@@ -124,15 +125,14 @@ static void input_ChangeState( input_thread_t *p_input, int i_state ); /* TODO f
  * \param p_resource an optional input ressource
  * \return a pointer to the spawned input thread
  */
-
-input_thread_t *__input_Create( vlc_object_t *p_parent,
-                                input_item_t *p_item,
-                                const char *psz_log, input_resource_t *p_resource )
+input_thread_t *input_Create( vlc_object_t *p_parent,
+                              input_item_t *p_item,
+                              const char *psz_log, input_resource_t *p_resource )
 {
-
     return Create( p_parent, p_item, psz_log, false, p_resource );
 }
 
+#undef input_CreateAndStart
 /**
  * Create a new input_thread_t and start it.
  *
@@ -140,10 +140,10 @@ input_thread_t *__input_Create( vlc_object_t *p_parent,
  *
  * \see input_Create
  */
-input_thread_t *__input_CreateAndStart( vlc_object_t *p_parent,
-                                        input_item_t *p_item, const char *psz_log )
+input_thread_t *input_CreateAndStart( vlc_object_t *p_parent,
+                                      input_item_t *p_item, const char *psz_log )
 {
-    input_thread_t *p_input = __input_Create( p_parent, p_item, psz_log, NULL );
+    input_thread_t *p_input = input_Create( p_parent, p_item, psz_log, NULL );
 
     if( input_Start( p_input ) )
     {
@@ -153,6 +153,7 @@ input_thread_t *__input_CreateAndStart( vlc_object_t *p_parent,
     return p_input;
 }
 
+#undef input_Read
 /**
  * Initialize an input thread and run it until it stops by itself.
  *
@@ -160,7 +161,7 @@ input_thread_t *__input_CreateAndStart( vlc_object_t *p_parent,
  * \param p_item an input item
  * \return an error code, VLC_SUCCESS on success
  */
-int __input_Read( vlc_object_t *p_parent, input_item_t *p_item )
+int input_Read( vlc_object_t *p_parent, input_item_t *p_item )
 {
     input_thread_t *p_input = Create( p_parent, p_item, NULL, false, NULL );
     if( !p_input )

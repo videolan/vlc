@@ -22,8 +22,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#ifndef VLC__INPUT_ITEM_H
-#define VLC__INPUT_ITEM_H 1
+#ifndef VLC_INPUT_ITEM_H
+#define VLC_INPUT_ITEM_H 1
 
 /**
  * \file
@@ -254,8 +254,8 @@ VLC_EXPORT( input_item_t *, input_item_NewWithType, ( vlc_object_t *, const char
  *
  * Provided for convenience.
  */
-#define input_item_NewExt(a,b,c,d,e,f,g) __input_item_NewExt( VLC_OBJECT(a),b,c,d,e,f,g)
-VLC_EXPORT( input_item_t *, __input_item_NewExt, (vlc_object_t *, const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration ) );
+VLC_EXPORT( input_item_t *, input_item_NewExt, (vlc_object_t *, const char *psz_uri, const char *psz_name, int i_options, const char *const *ppsz_options, unsigned i_option_flags, mtime_t i_duration ) );
+#define input_item_NewExt(a,b,c,d,e,f,g) input_item_NewExt( VLC_OBJECT(a),b,c,d,e,f,g)
 
 /**
  * This function creates a new input_item_t with the provided informations.

@@ -23,8 +23,8 @@
  *****************************************************************************/
 
 /* __ is need because conflict with <vlc/input.h> */
-#ifndef VLC__INPUT_H
-#define VLC__INPUT_H 1
+#ifndef VLC_INPUT_H
+#define VLC_INPUT_H 1
 
 /**
  * \file
@@ -526,18 +526,18 @@ enum input_query_e
  * Prototypes
  *****************************************************************************/
 
-#define input_Create(a,b,c,d) __input_Create(VLC_OBJECT(a),b,c,d)
-VLC_EXPORT( input_thread_t *, __input_Create, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log, input_resource_t * ) );
+VLC_EXPORT( input_thread_t *, input_Create, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log, input_resource_t * ) );
+#define input_Create(a,b,c,d) input_Create(VLC_OBJECT(a),b,c,d)
 
-#define input_CreateAndStart(a,b,c) __input_CreateAndStart(VLC_OBJECT(a),b,c)
-VLC_EXPORT( input_thread_t *, __input_CreateAndStart, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log ) );
+VLC_EXPORT( input_thread_t *, input_CreateAndStart, ( vlc_object_t *p_parent, input_item_t *, const char *psz_log ) );
+#define input_CreateAndStart(a,b,c) input_CreateAndStart(VLC_OBJECT(a),b,c)
 
 VLC_EXPORT( int,  input_Start, ( input_thread_t * ) );
 
 VLC_EXPORT( void, input_Stop, ( input_thread_t *, bool b_abort ) );
 
-#define input_Read(a,b) __input_Read(VLC_OBJECT(a),b)
-VLC_EXPORT( int, __input_Read, ( vlc_object_t *, input_item_t * ) );
+VLC_EXPORT( int, input_Read, ( vlc_object_t *, input_item_t * ) );
+#define input_Read(a,b) input_Read(VLC_OBJECT(a),b)
 
 VLC_EXPORT( int, input_vaControl,( input_thread_t *, int i_query, va_list  ) );
 

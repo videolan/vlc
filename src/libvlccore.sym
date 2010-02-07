@@ -178,8 +178,8 @@ image_Mime2Fourcc
 image_Type2Fourcc
 InitMD5
 input_Control
-__input_Create
-__input_CreateAndStart
+input_Create
+input_CreateAndStart
 input_CreateFilename
 input_DecoderDecode
 input_DecoderDelete
@@ -201,7 +201,7 @@ input_item_IsArtFetched
 input_item_IsPreparsed
 input_item_MetaMatch
 input_item_MergeInfos
-__input_item_NewExt
+input_item_NewExt
 input_item_NewWithType
 input_item_node_AppendItem
 input_item_node_AppendNode
@@ -215,7 +215,7 @@ input_item_SetMeta
 input_item_SetName
 input_item_SetURI
 input_item_WriteMeta
-__input_Read
+input_Read
 input_resource_Delete
 input_SplitMRL
 input_Start
