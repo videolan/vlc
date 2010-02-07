@@ -56,15 +56,12 @@
 #include <vlc_es.h>
 #include <vlc_playlist.h>
 #include <vlc_meta.h>
+#include <vlc_fs.h>
 
 #include <assert.h>
 
 #ifdef HAVE_SYS_STAT_H
 #   include <sys/stat.h>
-#endif
-#if (!defined( WIN32 ) || defined(__MINGW32__))
-/* Mingw has its own version of dirent */
-#   include <dirent.h>
 #endif
 
 #define SEARCH_CHAIN_SIZE 20
