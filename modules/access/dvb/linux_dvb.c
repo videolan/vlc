@@ -38,7 +38,7 @@
 #include <time.h>
 #include <unistd.h>
 #include <poll.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 
 /* DVB Card Drivers */
 #include <linux/dvb/version.h>

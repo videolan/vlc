@@ -45,7 +45,7 @@
 #include <vlc_vout.h>
 #include <vlc_vout_window.h>
 #include <vlc_playlist.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 
 /*****************************************************************************
 * Local prototypes

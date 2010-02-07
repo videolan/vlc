@@ -42,7 +42,7 @@
 #include "vlc_common.h"
 #include <vlc_stream.h>
 #include <vlc_strings.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 
 #include "update.h"
 

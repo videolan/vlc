@@ -43,7 +43,7 @@
 #include <vlc_es.h>
 #include <vlc_image.h>
 #include <vlc_stream.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_sout.h>
 #include <libvlc.h>
 

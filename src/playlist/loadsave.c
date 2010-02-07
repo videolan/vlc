@@ -29,7 +29,7 @@
 #include <vlc_events.h>
 #include "playlist_internal.h"
 #include "config/configuration.h"
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_url.h>
 
 #include <sys/types.h>

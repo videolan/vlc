@@ -52,6 +52,7 @@
 
 #include <vlc_tls.h>
 #include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_block.h>
 
 #include <gcrypt.h>

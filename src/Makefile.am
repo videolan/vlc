@@ -65,6 +65,7 @@ pluginsinclude_HEADERS = \
 	../include/vlc_events.h \
 	../include/vlc_filter.h \
 	../include/vlc_fourcc.h \
+	../include/vlc_fs.h \
 	../include/vlc_gcrypt.h \
 	../include/vlc_http.h \
 	../include/vlc_httpd.h \

@@ -32,7 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_plugin.h>
 #include <vlc_url.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_services_discovery.h>
 
 #include <sys/stat.h>

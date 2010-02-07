@@ -36,7 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_access.h>
 #include <vlc_demux.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 
 #include <fcntl.h>
 #include <unistd.h>

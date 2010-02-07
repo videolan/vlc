@@ -35,7 +35,6 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_charset.h>
 
 #include "vcd.h"
 #include "access.h"

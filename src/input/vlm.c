@@ -56,7 +56,6 @@
 #include "vlm_internal.h"
 #include "vlm_event.h"
 #include <vlc_vod.h>
-#include <vlc_charset.h>
 #include <vlc_sout.h>
 #include "../stream_output/stream_output.h"
 #include "../libvlc.h"

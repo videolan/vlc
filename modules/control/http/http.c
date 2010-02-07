@@ -28,6 +28,7 @@
 #include "http.h"
 #include <vlc_plugin.h>
 #include <vlc_url.h>
+#include <vlc_fs.h>
 
 #include <assert.h>
 

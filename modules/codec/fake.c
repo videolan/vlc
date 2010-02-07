@@ -35,7 +35,6 @@
 
 #include <vlc_image.h>
 #include <vlc_filter.h>
-#include <vlc_charset.h>
 
 /*****************************************************************************
  * Local prototypes

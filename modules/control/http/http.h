@@ -42,7 +42,6 @@
 #include <vlc_vlm.h>
 #include <vlc_network.h>
 #include <vlc_acl.h>
-#include <vlc_charset.h>
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>

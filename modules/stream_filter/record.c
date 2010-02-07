@@ -34,7 +34,7 @@
 #include <assert.h>
 #include <vlc_stream.h>
 #include <vlc_input.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 
 
 /*****************************************************************************

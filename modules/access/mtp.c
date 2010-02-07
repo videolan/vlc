@@ -49,7 +49,7 @@
 #include <unistd.h>
 #include <poll.h>
 
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 
 #include "libmtp.h"
 

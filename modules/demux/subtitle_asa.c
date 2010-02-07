@@ -36,7 +36,6 @@
 #include <vlc_memory.h>
 
 #include <vlc_demux.h>
-#include <vlc_charset.h>
 
 #include "asademux.h"
 

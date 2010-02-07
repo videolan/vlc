@@ -35,6 +35,7 @@
 #include <vlc_common.h>
 #include <vlc_network.h>
 #include <vlc_url.h>
+#include <vlc_fs.h>
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */

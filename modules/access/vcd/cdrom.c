@@ -33,6 +33,7 @@
 #include <vlc_common.h>
 #include <vlc_access.h>
 #include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <limits.h>
 
 #ifdef HAVE_UNISTD_H
@@ -77,7 +78,6 @@
 
 #include "cdrom_internals.h"
 #include "cdrom.h"
-#include <vlc_charset.h>
 #include <vlc_meta.h>
 
 /*****************************************************************************

@@ -39,6 +39,7 @@
 #include <vlc_network.h>
 #include <vlc_strings.h>
 #include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_gcrypt.h>
 #include <vlc_es.h>
 #include <vlc_http.h>

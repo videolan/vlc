@@ -18,7 +18,7 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
-#include <vlc_charset.h>
+#include <dirent.h>
 
 int Open (vlc_object_t *);
 void Close (vlc_object_t *);

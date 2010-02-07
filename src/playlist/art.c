@@ -29,7 +29,7 @@
 #include <assert.h>
 #include <vlc_common.h>
 #include <vlc_playlist.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_strings.h>
 #include <vlc_stream.h>
 #include <vlc_url.h>

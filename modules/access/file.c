@@ -72,7 +72,7 @@
 # define PathIsNetworkPathW(wpath) (! wcsncmp(wpath, L"\\\\", 2))
 #endif
 
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_url.h>
 
 struct access_sys_t

@@ -29,7 +29,6 @@
 #include <vlc_common.h>
 #include "../libvlc.h"
 #include <vlc_playlist.h>
-#include <vlc_charset.h>
 
 #include "../extras/getopt.h"
 

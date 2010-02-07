@@ -46,7 +46,7 @@
 #include <vlc_plugin.h>
 #include <vlc_vout_display.h>
 #include <vlc_picture_pool.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 
 /*****************************************************************************
  * Module descriptor

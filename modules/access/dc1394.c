@@ -36,7 +36,7 @@
 #include <vlc_plugin.h>
 #include <vlc_input.h>
 #include <vlc_demux.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_picture.h>
 
 #ifdef HAVE_FCNTL_H

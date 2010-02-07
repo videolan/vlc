@@ -32,9 +32,6 @@
 #include <vlc_playlist.h>
 #include "../utils/ustring.hpp"
 
-#include <vlc_charset.h>
-
-
 Playtree::Playtree( intf_thread_t *pIntf ): VarTree( pIntf )
 {
     // Get the VLC playlist object

@@ -39,7 +39,6 @@
 
 #include <vlc_codecs.h>
 #include <vlc_bits.h>
-#include <vlc_charset.h>
 #include "vorbis.h"
 #include "kate_categories.h"
 

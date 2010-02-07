@@ -39,8 +39,10 @@
 #endif
 
 #include <vlc_common.h>
-#include <vlc_charset.h>
-
+#include <vlc_fs.h>
+#ifdef WIN32
+#  include <vlc_charset.h>
+#endif
 #include <vlc_input.h>
 #include <vlc_es_out.h>
 #include <vlc_block.h>

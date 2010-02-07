@@ -77,6 +77,7 @@
 #include "audio_output/aout_internal.h"
 
 #include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_cpu.h>
 #include <vlc_url.h>
 

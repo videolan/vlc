@@ -34,7 +34,7 @@
 #include <vlc_acl.h>
 
 #include <vlc_network.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 
 /* FIXME: rwlock on acl, but libvlc doesn't implement rwlock */
 typedef struct vlc_acl_entry_t

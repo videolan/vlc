@@ -41,7 +41,6 @@
 
 #include <vlc_filter.h>
 #include "filter_common.h"
-#include <vlc_charset.h>
 #include <vlc_image.h>
 #include <vlc_input.h>
 #include <vlc_playlist.h>

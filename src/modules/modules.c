@@ -55,7 +55,7 @@
 
 #include "config/configuration.h"
 
-#include "vlc_charset.h"
+#include <vlc_fs.h>
 #include "vlc_arrays.h"
 
 #include "modules/modules.h"

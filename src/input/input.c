@@ -51,6 +51,7 @@
 #include <vlc_dialog.h>
 #include <vlc_url.h>
 #include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_strings.h>
 
 #ifdef HAVE_SYS_STAT_H

@@ -39,7 +39,7 @@
 
 #include <vlc_block.h>
 
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_network.h>
 
 #define HAVE_MMX

@@ -46,7 +46,7 @@
 #include <vlc_pgpkey.h>
 #include <vlc_stream.h>
 #include <vlc_strings.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_dialog.h>
 
 #include <gcrypt.h>

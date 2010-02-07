@@ -38,7 +38,7 @@
 #include <vlc_demux.h>
 #include <vlc_access.h>
 #include <vlc_picture.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 
 #include <sys/ioctl.h>
 #include <sys/mman.h>

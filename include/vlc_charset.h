@@ -2,7 +2,7 @@
  * charset.h: Unicode UTF-8 wrappers function
  *****************************************************************************
  * Copyright (C) 2003-2005 the VideoLAN team
- * Copyright © 2005-2006 Rémi Denis-Courmont
+ * Copyright © 2005-2010 Rémi Denis-Courmont
  * $Id$
  *
  * Author: Rémi Denis-Courmont <rem # videolan,org>
@@ -31,8 +31,6 @@
  */
 
 #include <stdarg.h>
-#include <sys/types.h>
-#include <dirent.h>
 
 VLC_EXPORT( void, LocaleFree, ( const char * ) );
 VLC_EXPORT( char *, FromLocale, ( const char * ) LIBVLC_USED );
@@ -40,28 +38,8 @@ VLC_EXPORT( char *, FromLocaleDup, ( const char * ) LIBVLC_USED );
 VLC_EXPORT( char *, ToLocale, ( const char * ) LIBVLC_USED );
 VLC_EXPORT( char *, ToLocaleDup, ( const char * ) LIBVLC_USED );
 
-/* TODO: move all of this to "vlc_fs.h" or something like that */
-VLC_EXPORT( int, utf8_open, ( const char *filename, int flags, ... ) LIBVLC_USED );
-VLC_EXPORT( FILE *, utf8_fopen, ( const char *filename, const char *mode ) LIBVLC_USED );
-VLC_EXPORT( DIR *, utf8_opendir, ( const char *dirname ) LIBVLC_USED );
-VLC_EXPORT( char *, utf8_readdir, ( DIR *dir ) LIBVLC_USED );
-VLC_EXPORT( int, utf8_loaddir, ( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
-VLC_EXPORT( int, utf8_scandir, ( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
-VLC_EXPORT( int, utf8_mkdir, ( const char *filename, mode_t mode ) );
-VLC_EXPORT( int, utf8_unlink, ( const char *filename ) );
-int utf8_rename( const char *, const char * );
-
-#if defined( WIN32 ) && !defined( UNDER_CE )
-# define stat _stati64
-#endif
-
-VLC_EXPORT( int, utf8_stat, ( const char *filename, struct stat *buf ) );
-VLC_EXPORT( int, utf8_lstat, ( const char *filename, struct stat *buf ) );
-
 VLC_EXPORT( int, utf8_vfprintf, ( FILE *stream, const char *fmt, va_list ap ) );
 VLC_EXPORT( int, utf8_fprintf, ( FILE *, const char *, ... ) LIBVLC_FORMAT( 2, 3 ) );
-
-VLC_EXPORT( int, utf8_mkstemp, ( char * ) );
 
 VLC_EXPORT( char *, EnsureUTF8, ( char * ) );
 VLC_EXPORT( const char *, IsUTF8, ( const char * ) LIBVLC_USED );

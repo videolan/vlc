@@ -27,7 +27,6 @@
 
 #include <vlc_common.h>
 #include "vlc_keys.h"
-#include "vlc_charset.h"
 #include "vlc_configuration.h"
 
 #include <assert.h>

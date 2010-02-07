@@ -21,6 +21,8 @@
  * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
  *****************************************************************************/
 
+#include <vlc_charset.h>
+
 static inline void vorbis_ParseComment( vlc_meta_t **pp_meta, const uint8_t *p_data, int i_data )
 {
     int n;

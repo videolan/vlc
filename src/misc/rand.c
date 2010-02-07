@@ -35,7 +35,7 @@
 #include <fcntl.h>
 #include <unistd.h>
 #include <pthread.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 
 #include <vlc_md5.h>
 

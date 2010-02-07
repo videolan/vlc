@@ -31,7 +31,7 @@
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 #include <vlc_vout.h>
 #include <vlc_osd.h>
 #include <vlc_block.h>

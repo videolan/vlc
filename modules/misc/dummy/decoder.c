@@ -30,7 +30,7 @@
 
 #include <vlc_common.h>
 #include <vlc_codec.h>
-#include <vlc_charset.h>
+#include <vlc_fs.h>
 
 #include <sys/types.h>
 #ifdef HAVE_UNISTD_H

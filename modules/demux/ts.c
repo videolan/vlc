@@ -43,6 +43,7 @@
 #include <vlc_iso_lang.h>
 #include <vlc_network.h>
 #include <vlc_charset.h>
+#include <vlc_fs.h>
 
 #include "../mux/mpeg/csa.h"
 
