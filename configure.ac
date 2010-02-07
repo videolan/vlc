@@ -2587,6 +2587,16 @@ then
 fi
 
 dnl
+dnl openmax il codec plugin
+dnl
+AC_ARG_ENABLE(omxil,
+  [  --enable-omxil          openmax il codec module (default disabled)])
+if test "${enable_omxil}" = "yes"
+then
+  VLC_ADD_PLUGIN([omxil])
+fi
+
+dnl
 dnl  mad plugin
 dnl
 AC_ARG_ENABLE(mad,
@@ -4848,6 +4858,7 @@ AC_CONFIG_FILES([
   modules/codec/Makefile
   modules/codec/avcodec/Makefile
   modules/codec/dmo/Makefile
+  modules/codec/omxil/Makefile
   modules/codec/shine/Makefile
   modules/codec/subtitles/Makefile
   modules/codec/spudec/Makefile
