@@ -203,19 +203,20 @@ enum
 /*********
  * Timing
  ********/
-#define stats_TimerStart(a,b,c) __stats_TimerStart( VLC_OBJECT(a), b,c )
-#define stats_TimerStop(a,b) __stats_TimerStop( VLC_OBJECT(a), b )
-#define stats_TimerDump(a,b) __stats_TimerDump( VLC_OBJECT(a), b )
-#define stats_TimersDumpAll(a) __stats_TimersDumpAll( VLC_OBJECT(a) )
-VLC_EXPORT( void,__stats_TimerStart, (vlc_object_t*, const char *, unsigned int ) );
-VLC_EXPORT( void,__stats_TimerStop, (vlc_object_t*, unsigned int) );
-VLC_EXPORT( void,__stats_TimerDump, (vlc_object_t*, unsigned int) );
-VLC_EXPORT( void,__stats_TimersDumpAll, (vlc_object_t*) );
-#define stats_TimersCleanAll(a) __stats_TimersCleanAll( VLC_OBJECT(a) )
-VLC_EXPORT( void, __stats_TimersCleanAll, (vlc_object_t * ) );
+VLC_EXPORT( void, stats_TimerStart, (vlc_object_t*, const char *, unsigned int ) );
+VLC_EXPORT( void, stats_TimerStop, (vlc_object_t*, unsigned int) );
+VLC_EXPORT( void, stats_TimerDump, (vlc_object_t*, unsigned int) );
+VLC_EXPORT( void, stats_TimersDumpAll, (vlc_object_t*) );
+#define stats_TimerStart(a,b,c) stats_TimerStart( VLC_OBJECT(a), b,c )
+#define stats_TimerStop(a,b) stats_TimerStop( VLC_OBJECT(a), b )
+#define stats_TimerDump(a,b) stats_TimerDump( VLC_OBJECT(a), b )
+#define stats_TimersDumpAll(a) stats_TimersDumpAll( VLC_OBJECT(a) )
 
-#define stats_TimerClean(a,b) __stats_TimerClean( VLC_OBJECT(a), b )
-VLC_EXPORT( void, __stats_TimerClean, (vlc_object_t *, unsigned int ) );
+VLC_EXPORT( void, stats_TimersCleanAll, (vlc_object_t * ) );
+#define stats_TimersCleanAll(a) stats_TimersCleanAll( VLC_OBJECT(a) )
+
+VLC_EXPORT( void, stats_TimerClean, (vlc_object_t *, unsigned int ) );
+#define stats_TimerClean(a,b) stats_TimerClean( VLC_OBJECT(a), b )
 
 /**
  * @}
