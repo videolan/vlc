@@ -184,12 +184,14 @@ static void FilterRelease( filter_t *p_filter );
 /*****************************************************************************
  * Public API
  *****************************************************************************/
+
+#undef spu_Create
 /**
  * Creates the subpicture unit
  *
  * \param p_this the parent object which creates the subpicture unit
  */
-spu_t *__spu_Create( vlc_object_t *p_this )
+spu_t *spu_Create( vlc_object_t *p_this )
 {
     spu_t *p_spu;
     spu_private_t *p_sys;

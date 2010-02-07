@@ -115,7 +115,7 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
     return VLC_SUCCESS;
 }
 
-
+#undef vout_OSDMessage
 /**
  * \brief Write an informative message at the default location,
  *        for the default duration and only if the OSD option is enabled.
@@ -123,8 +123,8 @@ int vout_ShowTextAbsolute( vout_thread_t *p_vout, int i_channel,
  * \param i_channel Subpicture channel
  * \param psz_format printf style formatting
  **/
-void __vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
-                        const char *psz_format, ... )
+void vout_OSDMessage( vlc_object_t *p_caller, int i_channel,
+                      const char *psz_format, ... )
 {
     vout_thread_t *p_vout;
     char *psz_string = NULL;
