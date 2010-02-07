@@ -156,13 +156,13 @@ typedef uint32_t vlc_fourcc_t;
  * \param fcc a vlc_fourcc_t
  * \param psz_fourcc string to store string representation of vlc_fourcc in
  */
-static inline void __vlc_fourcc_to_char( vlc_fourcc_t fcc, char *psz_fourcc )
+static inline void vlc_fourcc_to_char( vlc_fourcc_t fcc, char *psz_fourcc )
 {
     memcpy( psz_fourcc, &fcc, 4 );
 }
 
 #define vlc_fourcc_to_char( a, b ) \
-    __vlc_fourcc_to_char( (vlc_fourcc_t)(a), (char *)(b) )
+        vlc_fourcc_to_char( (vlc_fourcc_t)(a), (char *)(b) )
 
 /*****************************************************************************
  * Classes declaration
@@ -839,8 +839,8 @@ VLC_EXPORT( size_t, vlc_iconv, ( vlc_iconv_t, const char **, size_t *, char **, 
 VLC_EXPORT( int, vlc_iconv_close, ( vlc_iconv_t ) );
 
 /* execve wrapper (defined in src/extras/libc.c) */
-VLC_EXPORT( int, __vlc_execve, ( vlc_object_t *p_object, int i_argc, char *const *pp_argv, char *const *pp_env, const char *psz_cwd, const char *p_in, size_t i_in, char **pp_data, size_t *pi_data ) LIBVLC_USED );
-#define vlc_execve(a,b,c,d,e,f,g,h,i) __vlc_execve(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
+VLC_EXPORT( int, vlc_execve, ( vlc_object_t *p_object, int i_argc, char *const *pp_argv, char *const *pp_env, const char *psz_cwd, const char *p_in, size_t i_in, char **pp_data, size_t *pi_data ) LIBVLC_USED );
+#define vlc_execve(a,b,c,d,e,f,g,h,i) vlc_execve(VLC_OBJECT(a),b,c,d,e,f,g,h,i)
 
 /* dir wrappers (defined in src/extras/libc.c) */
 VLC_EXPORT(int, vlc_wclosedir, ( void *_p_dir ));

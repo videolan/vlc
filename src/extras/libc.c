@@ -581,14 +581,15 @@ bool vlc_ureduce( unsigned *pi_dst_nom, unsigned *pi_dst_den,
     return b_exact;
 }
 
+#undef vlc_execve
 /*************************************************************************
  * vlc_execve: Execute an external program with a given environment,
  * wait until it finishes and return its standard output
  *************************************************************************/
-int __vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
-                  char *const *ppsz_env, const char *psz_cwd,
-                  const char *p_in, size_t i_in,
-                  char **pp_data, size_t *pi_data )
+int vlc_execve( vlc_object_t *p_object, int i_argc, char *const *ppsz_argv,
+                char *const *ppsz_env, const char *psz_cwd,
+                const char *p_in, size_t i_in,
+                char **pp_data, size_t *pi_data )
 {
     (void)i_argc; // <-- hmph
 #ifdef HAVE_FORK

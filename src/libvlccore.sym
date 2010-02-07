@@ -491,7 +491,7 @@ vlc_event_manager_fini
 vlc_event_manager_init
 vlc_event_manager_register_event_type
 vlc_event_send
-__vlc_execve
+vlc_execve
 vlc_fastmem_register
 vlc_freeaddrinfo
 vlc_fourcc_GetCodec
