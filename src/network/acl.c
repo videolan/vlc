@@ -199,7 +199,7 @@ int ACL_AddNet( vlc_acl_t *p_acl, const char *psz_ip, int i_len,
     return 0;
 }
 
-
+#undef ACL_Create
 /**
  * Creates an empty ACL.
  *
@@ -208,7 +208,7 @@ int ACL_AddNet( vlc_acl_t *p_acl, const char *psz_ip, int i_len,
  *
  * @return an ACL object. NULL in case of error.
  */
-vlc_acl_t *__ACL_Create( vlc_object_t *p_this, bool b_allow )
+vlc_acl_t *ACL_Create( vlc_object_t *p_this, bool b_allow )
 {
     vlc_acl_t *p_acl;
 
@@ -225,7 +225,7 @@ vlc_acl_t *__ACL_Create( vlc_object_t *p_this, bool b_allow )
     return p_acl;
 }
 
-
+#undef ACL_Duplicate
 /**
  * Perform a deep copy of an existing ACL.
  *
@@ -234,7 +234,7 @@ vlc_acl_t *__ACL_Create( vlc_object_t *p_this, bool b_allow )
  *
  * @return a new ACL object, or NULL on error.
  */
-vlc_acl_t *__ACL_Duplicate( vlc_object_t *p_this, const vlc_acl_t *p_acl )
+vlc_acl_t *ACL_Duplicate( vlc_object_t *p_this, const vlc_acl_t *p_acl )
 {
     vlc_acl_t *p_dupacl;
 
