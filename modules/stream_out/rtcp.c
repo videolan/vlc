@@ -32,6 +32,7 @@
 
 #include <vlc_network.h>
 #include <vlc_sout.h>
+#include <vlc_fs.h>
 #include "rtp.h"
 
 #include <assert.h>
