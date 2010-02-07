@@ -308,11 +308,11 @@ DIST_maemo = \
 	maemo/vlc_left_tab_active.png \
 	maemo/vlc_left_tab_passive.png \
 	maemo/playlist.png
+	maemo/play.png \
+	maemo/pause.png \
+	maemo/stop.png \
+	maemo/previous.png \
+	maemo/next.png
 
 maemo_FILES = \
-	../modules/gui/qt4/pixmaps/play.png \
-	../modules/gui/qt4/pixmaps/pause.png \
-	../modules/gui/qt4/pixmaps/stop.png \
-	../modules/gui/qt4/pixmaps/previous.png \
-	../modules/gui/qt4/pixmaps/next.png \
 	vlc32x32.png

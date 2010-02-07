@@ -1,25 +1,25 @@
 /*****************************************************************************
-* maemo_interface.c : Interface creation of the maemo plugin
-*****************************************************************************
-* Copyright (C) 2008 the VideoLAN team
-* $Id$
-*
-* Authors: Antoine Lejeune <phytos@videolan.org>
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
-*****************************************************************************/
+ * maemo_interface.c : Interface creation of the maemo plugin
+ *****************************************************************************
+ * Copyright (C) 2008 the VideoLAN team
+ * $Id$
+ *
+ * Authors: Antoine Lejeune <phytos@videolan.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
 #include <vlc_common.h>
 
@@ -101,7 +101,7 @@ void create_playlist( intf_thread_t *p_intf )
     playlist = gtk_tree_view_new();
 
     playlist_store = gtk_list_store_new( 1, G_TYPE_STRING );
-    p_intf->p_sys->p_playlist_store = GTK_WIDGET( playlist_store );
+    p_intf->p_sys->p_playlist_store = playlist_store;
 
     gtk_tree_view_set_model( GTK_TREE_VIEW( playlist ),
                              GTK_TREE_MODEL( playlist_store ) );
@@ -117,11 +117,7 @@ void create_playlist( intf_thread_t *p_intf )
     scroll = gtk_scrolled_window_new( NULL, NULL );
     gtk_container_add( GTK_CONTAINER( scroll ), playlist );
 
-    gtk_notebook_append_page( GTK_NOTEBOOK( p_intf->p_sys->p_tabs ), scroll,
-                              gtk_image_new_from_stock( "vlc-playlist",
-                                                        GTK_ICON_SIZE_DIALOG ) );
-    gtk_notebook_set_tab_label_packing( GTK_NOTEBOOK( p_intf->p_sys->p_tabs ), scroll,
-                                        FALSE, FALSE, GTK_PACK_START );
+    p_intf->p_sys->p_playlist_window = scroll;
 
     g_signal_connect( playlist, "row-activated",
                       G_CALLBACK( pl_row_activated_cb ), NULL );

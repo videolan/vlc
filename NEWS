@@ -103,6 +103,7 @@ Windows port:
 Maemo port:
  * Multiple improvements for N900 compliance and efficiency
  * Support for HW accelerated video decoding on N900
+ * Improvements to the maemo interface
 
 Misc:
  * new sqlite module

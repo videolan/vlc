@@ -1,31 +1,30 @@
-/*****************************************************************************
-* maemo.c : Maemo plugin for VLC
-*****************************************************************************
-* Copyright (C) 2008 the VideoLAN team
-* $Id$
-*
-* Authors: Antoine Lejeune <phytos@videolan.org>
-*
-* This program is free software; you can redistribute it and/or modify
-* it under the terms of the GNU General Public License as published by
-* the Free Software Foundation; either version 2 of the License, or
-* (at your option) any later version.
-*
-* This program is distributed in the hope that it will be useful,
-* but WITHOUT ANY WARRANTY; without even the implied warranty of
-* MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-* GNU General Public License for more details.
-*
-* You should have received a copy of the GNU General Public License
-* along with this program; if not, write to the Free Software
-* Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
-*****************************************************************************/
+/****************************************************************************
+ * maemo.c : Maemo plugin for VLC
+ *****************************************************************************
+ * Copyright (C) 2008 the VideoLAN team
+ * $Id$
+ *
+ * Authors: Antoine Lejeune <phytos@videolan.org>
+ *          Gildas Bazin <gbazin@videolan.org>
+ *
+ * This program is free software; you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation; either version 2 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
+ *****************************************************************************/
 
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
-
-#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -49,14 +48,12 @@
  *****************************************************************************/
 static int      Open               ( vlc_object_t * );
 static void     Close              ( vlc_object_t * );
-static void     Run                ( intf_thread_t * );
+static void     *Thread            ( void * );
 static gboolean should_die         ( gpointer );
 static int      OpenWindow         ( vlc_object_t * );
 static void     CloseWindow        ( vlc_object_t * );
 static int      ControlWindow      ( vout_window_t *, int, va_list );
-static uint32_t request_video      ( intf_thread_t *, vout_thread_t * );
-static void     release_video      ( intf_thread_t * );
-static gboolean video_widget_ready ( gpointer data );
+static gboolean interface_ready    ( gpointer );
 
 /*****************************************************************************
 * Module descriptor
@@ -75,38 +72,46 @@ vlc_module_begin();
         set_callbacks( OpenWindow, CloseWindow );
 vlc_module_end();
 
-static struct
-{
-    vlc_mutex_t    lock;
-    vlc_cond_t     wait;
-    intf_thread_t *intf;
-    bool           enabled;
-} wnd_req = { VLC_STATIC_MUTEX, PTHREAD_COND_INITIALIZER, NULL, false };
-
 /*****************************************************************************
  * Module callbacks
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
+    intf_sys_t *p_sys;;
+    vlc_value_t val;
 
     /* Allocate instance and initialize some members */
-    p_intf->p_sys = malloc( sizeof( intf_sys_t ) );
+    p_intf->p_sys = p_sys = malloc( sizeof( intf_sys_t ) );
     if( p_intf->p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_intf->pf_run = Run;
+    p_sys->p_playlist = pl_Hold( p_intf );
+    p_sys->p_input = NULL;
 
-    p_intf->p_sys->p_playlist = pl_Hold( p_intf );
-    p_intf->p_sys->p_input = NULL;
-    p_intf->p_sys->p_vout = NULL;
+    p_sys->p_main_window = NULL;
+    p_sys->p_video_window = NULL;
+    p_sys->p_control_window = NULL;
+    p_sys->b_fullscreen = false;
 
-    p_intf->p_sys->p_main_window = NULL;
-    p_intf->p_sys->p_video_window = NULL;
+    vlc_spin_init( &p_sys->event_lock );
 
-    wnd_req.enabled = true;
-    /* ^no need to lock, interfacesare started before video outputs */
-    vlc_spin_init( &p_intf->p_sys->event_lock );
+    /* Create separate thread for main interface */
+    vlc_sem_init (&p_sys->ready, 0);
+    if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
+    {
+        pl_Release (p_sys->p_playlist);
+        free (p_sys);
+        return VLC_ENOMEM;
+    }
+
+    /* Wait for interface thread to be fully initialised */
+    vlc_sem_wait (&p_sys->ready);
+    vlc_sem_destroy (&p_sys->ready);
+
+    var_Create (p_this->p_libvlc, "hildon-iface", VLC_VAR_ADDRESS);
+    val.p_address = p_this;
+    var_Set (p_this->p_libvlc, "hildon-iface", val);
 
     return VLC_SUCCESS;
 }
@@ -115,34 +120,42 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    vlc_object_release( p_intf->p_sys->p_playlist );
-
+    var_Destroy (p_this->p_libvlc, "hildon-iface");
+    vlc_join (p_intf->p_sys->thread, NULL);
+    pl_Release ( p_intf->p_sys->p_playlist );
     vlc_spin_destroy( &p_intf->p_sys->event_lock );
-
-    /* Destroy structure */
     free( p_intf->p_sys );
+}
+
+static gint quit_event( GtkWidget *widget, GdkEvent *event, gpointer data )
+{
+    intf_thread_t *p_intf = (intf_thread_t *)data;
+    (void)widget; (void)event;
+    libvlc_Quit( p_intf->p_libvlc );
+    return TRUE;
 }
 
 /*****************************************************************************
 * Initialize and launch the interface
 *****************************************************************************/
-static void Run( intf_thread_t *p_intf )
+static void *Thread( void *obj )
 {
-    char  *p_args[] = { (char *)"vlc", NULL };
-    char **pp_args  = p_args;
-    int    i_args   = 1;
+    intf_thread_t *p_intf = (intf_thread_t *)obj;
+    const char *p_args[] = { "vlc", "--sync" };
+    int i_args = sizeof(p_args)/sizeof(char *);
+    char **pp_args  = (char **)p_args;
 
     HildonProgram *program;
     HildonWindow *window;
     GtkWidget *main_vbox;
 
-    GtkWidget *tabs;
     GtkWidget *video;
     GtkWidget *bottom_hbox;
     GtkWidget *play_button;
     GtkWidget *prev_button;
     GtkWidget *next_button;
     GtkWidget *stop_button;
+    GtkWidget *playlist_button;
     GtkWidget *seekbar;
 
     gtk_init( &i_args, &pp_args );
@@ -152,9 +165,13 @@ static void Run( intf_thread_t *p_intf )
 
     window = HILDON_WINDOW( hildon_window_new() );
     hildon_program_add_window( program, window );
-    gtk_object_set_data( GTK_OBJECT( window ),
-                         "p_intf", p_intf );
+    gtk_object_set_data( GTK_OBJECT( window ), "p_intf", p_intf );
     p_intf->p_sys->p_main_window = window;
+
+    g_signal_connect( GTK_WIDGET(window), "key-press-event",
+                      G_CALLBACK( key_cb ), p_intf );
+    g_signal_connect (GTK_WIDGET(window), "delete_event",
+                      GTK_SIGNAL_FUNC( quit_event), p_intf );
 
     // A little theming
     char *psz_rc_file = NULL;
@@ -170,25 +187,18 @@ static void Run( intf_thread_t *p_intf )
     main_vbox = gtk_vbox_new( FALSE, 0 );
     gtk_container_add( GTK_CONTAINER( window ), main_vbox );
 
-    tabs = gtk_notebook_new();
-    p_intf->p_sys->p_tabs = tabs;
-    gtk_notebook_set_tab_pos( GTK_NOTEBOOK( tabs ), GTK_POS_LEFT );
-    gtk_notebook_set_show_border( GTK_NOTEBOOK( tabs ), FALSE );
-    gtk_box_pack_start( GTK_BOX( main_vbox ), tabs, TRUE, TRUE, 0 );
-
     // We put first the embedded video
     video = gtk_event_box_new();
-    gtk_notebook_append_page( GTK_NOTEBOOK( tabs ),
-                video,
-                gtk_image_new_from_stock( "vlc",
-                                          GTK_ICON_SIZE_DIALOG ) );
-    gtk_notebook_set_tab_label_packing( GTK_NOTEBOOK( tabs ),
-                                        video,
-                                        FALSE, FALSE, 0 );
+    GdkColor black = {0,0,0,0};
+    gtk_widget_modify_bg(video, GTK_STATE_NORMAL, &black);
+    p_intf->p_sys->p_video_window = video;
+    gtk_box_pack_start( GTK_BOX( main_vbox ), video, TRUE, TRUE, 0 );
+
     create_playlist( p_intf );
+    gtk_box_pack_start( GTK_BOX( main_vbox ), p_intf->p_sys->p_playlist_window, TRUE, TRUE, 0 );
 
     // We put the horizontal box which contains all the buttons
-    bottom_hbox = gtk_hbox_new( FALSE, 0 );
+    p_intf->p_sys->p_control_window = bottom_hbox = gtk_hbox_new( FALSE, 0 );
 
     // We create the buttons
     play_button = gtk_button_new();
@@ -205,6 +215,9 @@ static void Run( intf_thread_t *p_intf )
     next_button = gtk_button_new();
     gtk_button_set_image( GTK_BUTTON( next_button ),
                       gtk_image_new_from_stock( "vlc-next", GTK_ICON_SIZE_BUTTON ) );
+    playlist_button = gtk_button_new();
+    gtk_button_set_image( GTK_BUTTON( playlist_button ),
+                          gtk_image_new_from_stock( "vlc-playlist", GTK_ICON_SIZE_BUTTON ) );
     seekbar = hildon_seekbar_new();
     p_intf->p_sys->p_seekbar = HILDON_SEEKBAR( seekbar );
 
@@ -213,6 +226,7 @@ static void Run( intf_thread_t *p_intf )
     gtk_box_pack_start( GTK_BOX( bottom_hbox ), stop_button, FALSE, FALSE, 0 );
     gtk_box_pack_start( GTK_BOX( bottom_hbox ), prev_button, FALSE, FALSE, 0 );
     gtk_box_pack_start( GTK_BOX( bottom_hbox ), next_button, FALSE, FALSE, 0 );
+    gtk_box_pack_start( GTK_BOX( bottom_hbox ), playlist_button, FALSE, FALSE, 0 );
     gtk_box_pack_start( GTK_BOX( bottom_hbox ), seekbar    , TRUE , TRUE , 5 );
     // We add the hbox to the main vbox
     gtk_box_pack_start( GTK_BOX( main_vbox ), bottom_hbox, FALSE, FALSE, 0 );
@@ -223,12 +237,27 @@ static void Run( intf_thread_t *p_intf )
     g_signal_connect( stop_button, "clicked", G_CALLBACK( stop_cb ), NULL );
     g_signal_connect( prev_button, "clicked", G_CALLBACK( prev_cb ), NULL );
     g_signal_connect( next_button, "clicked", G_CALLBACK( next_cb ), NULL );
+    g_signal_connect( playlist_button, "clicked", G_CALLBACK( playlist_cb ), NULL );
     g_signal_connect( seekbar, "change-value",
                       G_CALLBACK( seekbar_changed_cb ), NULL );
 
     gtk_widget_show_all( GTK_WIDGET( window ) );
+    gtk_widget_hide_all( p_intf->p_sys->p_playlist_window );
 
     create_menu( p_intf );
+
+#if 1
+    /* HACK: Only one X11 client can subscribe to mouse button press events.
+     * VLC currently handles those in the video display.
+     * Force GTK to unsubscribe from mouse press and release events. */
+    Display *dpy = GDK_WINDOW_XDISPLAY( gtk_widget_get_window(p_intf->p_sys->p_video_window) );
+    Window w = GDK_WINDOW_XID( gtk_widget_get_window(p_intf->p_sys->p_video_window) );
+    XWindowAttributes attr;
+
+    XGetWindowAttributes( dpy, w, &attr );
+    attr.your_event_mask &= ~(ButtonPressMask|ButtonReleaseMask);
+    XSelectInput( dpy, w, attr.your_event_mask );
+#endif
 
     // Set callback with the vlc core
     g_timeout_add( INTF_IDLE_SLEEP / 1000, process_events, p_intf );
@@ -240,11 +269,8 @@ static void Run( intf_thread_t *p_intf )
     var_AddCallback( p_intf->p_sys->p_playlist, "activity",
                      activity_cb, p_intf );
 
-    // Look if the playlist is already started
-    item_changed_pl( p_intf );
-
     // The embedded video is only ready after gtk_main and windows are shown
-    g_idle_add( video_widget_ready, video );
+    g_idle_add( interface_ready, p_intf );
 
     gtk_main();
 
@@ -256,9 +282,9 @@ static void Run( intf_thread_t *p_intf )
     var_DelCallback( p_intf->p_sys->p_playlist, "activity",
                      activity_cb, p_intf );
 
-    /* FIXME: we need to wait for vout to clean up... */
-    assert( !p_intf->p_sys->p_vout ); /* too late */
     gtk_object_destroy( GTK_OBJECT( window ) );
+
+    return NULL;
 }
 
 static gboolean should_die( gpointer data )
@@ -272,42 +298,39 @@ static gboolean should_die( gpointer data )
 /**
 * Video output window provider
 */
-static int OpenWindow (vlc_object_t *obj)
+static int OpenWindow (vlc_object_t *p_obj)
 {
-    vout_window_t *wnd = (vout_window_t *)obj;
-    intf_thread_t *intf;
+    vout_window_t *p_wnd = (vout_window_t *)p_obj;
+    intf_thread_t *p_intf;
+    vlc_value_t val;
 
-    if (wnd->cfg->is_standalone || !wnd_req.enabled)
+    if (p_wnd->cfg->is_standalone)
         return VLC_EGENERIC;
 
-    /* FIXME it should NOT be needed */
-    vout_thread_t *vout = vlc_object_find (obj, VLC_OBJECT_VOUT, FIND_PARENT);
-    if (!vout)
+    if( var_Get( p_obj->p_libvlc, "hildon-iface", &val ) )
+        val.p_address = NULL;
+
+    p_intf = (intf_thread_t *)val.p_address;
+    if( !p_intf )
+    {   /* If another interface is used, this plugin cannot work */
+        msg_Dbg( p_obj, "Hildon interface not found" );
+        return VLC_EGENERIC;
+    }
+
+    p_wnd->handle.xid = p_intf->p_sys->xid;
+
+    if (!p_wnd->handle.xid)
         return VLC_EGENERIC;
 
-    vlc_mutex_lock (&wnd_req.lock);
-    while ((intf = wnd_req.intf) == NULL)
-        vlc_cond_wait (&wnd_req.wait, &wnd_req.lock);
-
-    wnd->handle.xid = request_video( intf, vout );
-    vlc_mutex_unlock (&wnd_req.lock);
-
-    vlc_object_release( vout );
-
-    if (!wnd->handle.xid)
-        return VLC_EGENERIC;
-
-    msg_Dbg( intf, "Using handle %"PRIu32, wnd->handle.xid );
-
-    wnd->control = ControlWindow;
-    wnd->sys = (vout_window_sys_t*)intf;
+    p_wnd->control = ControlWindow;
+    p_wnd->sys = (vout_window_sys_t*)p_intf;
 
     return VLC_SUCCESS;
 }
 
-static int ControlWindow (vout_window_t *wnd, int query, va_list args)
+static int ControlWindow (vout_window_t *p_wnd, int query, va_list args)
 {
-    intf_thread_t *intf = (intf_thread_t *)wnd->sys;
+    intf_thread_t *p_intf = (intf_thread_t *)p_wnd->sys;
 
     switch( query )
     {
@@ -317,10 +340,17 @@ static int ControlWindow (vout_window_t *wnd, int query, va_list args)
         int i_height = (int)va_arg( args, int );
 
         int i_current_w, i_current_h;
-        gdk_drawable_get_size( GDK_DRAWABLE( intf->p_sys->p_video_window->window ),
+        gdk_drawable_get_size( GDK_DRAWABLE( p_intf->p_sys->p_video_window ),
                                &i_current_w, &i_current_h );
         if( i_width != i_current_w || i_height != i_current_h )
             return VLC_EGENERIC;
+        return VLC_SUCCESS;
+    }
+    case VOUT_WINDOW_SET_FULLSCREEN:
+    {
+        bool b_fs = va_arg( args, int );
+        p_intf->p_sys->b_fullscreen = b_fs;
+        g_idle_add( fullscreen_cb, p_intf );
         return VLC_SUCCESS;
     }
     default:
@@ -328,58 +358,30 @@ static int ControlWindow (vout_window_t *wnd, int query, va_list args)
     }
 }
 
-static void CloseWindow (vlc_object_t *obj)
+static void CloseWindow (vlc_object_t *p_obj)
 {
-    vout_window_t *wnd = (vout_window_t *)obj;
-    intf_thread_t *intf = (intf_thread_t *)wnd->sys;
+    vout_window_t *p_wnd = (vout_window_t *)p_obj;
+    intf_thread_t *p_intf = (intf_thread_t *)p_wnd->sys;
 
-    vlc_mutex_lock( &wnd_req.lock );
-    release_video( intf );
-    vlc_mutex_unlock( &wnd_req.lock );
-}
-
-static uint32_t request_video( intf_thread_t *p_intf, vout_thread_t *p_nvout )
-{
-    if( p_intf->p_sys->p_vout )
+    if( p_intf->p_sys->b_fullscreen )
     {
-        msg_Dbg( p_intf, "Embedded video already in use" );
-        return 0;
+        p_intf->p_sys->b_fullscreen = false;
+        g_idle_add( fullscreen_cb, p_intf );
     }
-
-    p_intf->p_sys->p_vout = vlc_object_hold( p_nvout );
-    return GDK_WINDOW_XID( p_intf->p_sys->p_video_window->window );
 }
 
-static void release_video( intf_thread_t *p_intf )
+static gboolean interface_ready( gpointer data )
 {
-    msg_Dbg( p_intf, "Releasing embedded video" );
+    intf_thread_t *p_intf = (intf_thread_t *)data;
 
-    vlc_object_release( p_intf->p_sys->p_vout );
-    p_intf->p_sys->p_vout = NULL;
-}
+    p_intf->p_sys->xid =
+        GDK_WINDOW_XID( gtk_widget_get_window(p_intf->p_sys->p_video_window) );
 
-static gboolean video_widget_ready( gpointer data )
-{
-    intf_thread_t *p_intf = NULL;
-    GtkWidget *top_window = NULL;
-    GtkWidget *video = (GtkWidget *)data;
+    // Look if the playlist is already started
+    item_changed_pl( p_intf );
 
-    top_window = gtk_widget_get_toplevel( GTK_WIDGET( video ) );
-    p_intf = (intf_thread_t *)gtk_object_get_data( GTK_OBJECT( top_window ),
-                                                   "p_intf" );
-    p_intf->p_sys->p_video_window = video;
-    gtk_widget_grab_focus( video );
-
-    vlc_mutex_lock( &wnd_req.lock );
-    wnd_req.intf = p_intf;
-    vlc_cond_signal( &wnd_req.wait );
-    vlc_mutex_unlock( &wnd_req.lock );
-
-    // We rewind the input
-    if( p_intf->p_sys->p_input )
-    {
-        input_Control( p_intf->p_sys->p_input, INPUT_SET_POSITION, 0.0 );
-    }
+    // Everything is initialised
+    vlc_sem_post (&p_intf->p_sys->ready);
 
     // We want it to be executed only one time
     return FALSE;
