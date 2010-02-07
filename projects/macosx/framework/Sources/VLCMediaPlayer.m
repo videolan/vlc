@@ -724,10 +724,7 @@ static const VLCMediaPlayerState libvlc_to_local_state[] =
         // Create a media instance, it doesn't matter what library we start off with
         // it will change depending on the media descriptor provided to the media
         // instance
-        libvlc_exception_t ex;
-        libvlc_exception_init( &ex );
         instance = libvlc_media_player_new([VLCLibrary sharedInstance]);
-        catch_exception( &ex );
 
         [self registerObservers];
 

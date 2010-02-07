@@ -34,21 +34,6 @@
 
 static VLCLibrary * sharedLibrary = nil;
 
-void __catch_exception( void * e, const char * function, const char * file, int line_number )
-{
-    libvlc_exception_t * ex = (libvlc_exception_t *)e;
-    if( libvlc_exception_raised( ex ) )
-    {
-        NSException* libvlcException = [NSException
-            exceptionWithName:@"LibVLCException"
-            reason:[NSString stringWithFormat:@"libvlc has thrown us an error: %s (%s:%d %s)",
-                libvlc_errmsg(), file, line_number, function]
-            userInfo:nil];
-        libvlc_exception_clear( ex );
-        @throw libvlcException;
-    }
-}
-
 @implementation VLCLibrary
 + (VLCLibrary *)sharedLibrary
 {
@@ -64,8 +49,6 @@ void __catch_exception( void * e, const char * function, const char * file, int 
 {
     if (self = [super init])
     {
-        libvlc_exception_t ex;
-        libvlc_exception_init( &ex );
 
         NSArray *vlcParams = [[NSBundle mainBundle] objectForInfoDictionaryKey:@"VLCParams"];
         if (!vlcParams) {
