@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlcplugin.cpp: a VLC plugin for Mozilla
  *****************************************************************************
- * Copyright (C) 2002-2009 the VideoLAN team
+ * Copyright (C) 2002-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Samuel Hocevar <sam@zoy.org>
@@ -455,7 +455,7 @@ int VlcPlugin::playlist_add( const char *mrl )
     libvlc_media_t *p_m = libvlc_media_new(libvlc_instance,mrl);
     if( !p_m )
         return -1;
-
+    assert( libvlc_media_list );
     libvlc_media_list_lock(libvlc_media_list);
     if( !libvlc_media_list_add_media(libvlc_media_list,p_m) )
         item = libvlc_media_list_count(libvlc_media_list)-1;
@@ -469,8 +469,12 @@ int VlcPlugin::playlist_add( const char *mrl )
 int VlcPlugin::playlist_add_extended_untrusted( const char *mrl, const char *name,
                     int optc, const char **optv )
 {
-    libvlc_media_t *p_m = libvlc_media_new(libvlc_instance, mrl);
+    libvlc_media_t *p_m;
     int item = -1;
+
+    assert( libvlc_media_list );
+
+    p_m = libvlc_media_new(libvlc_instance, mrl);
     if( !p_m )
         return -1;
 
@@ -490,10 +494,11 @@ bool VlcPlugin::playlist_select( int idx )
 {
     libvlc_media_t *p_m = NULL;
 
+    assert( libvlc_media_list );
+
     libvlc_media_list_lock(libvlc_media_list);
 
     int count = libvlc_media_list_count(libvlc_media_list);
-
     if( idx<0||idx>=count )
         goto bad_unlock;
 
@@ -507,6 +512,8 @@ bool VlcPlugin::playlist_select( int idx )
 
     if( libvlc_media_player )
     {
+        if( playlist_isplaying() )
+            playlist_stop();
         events.unhook_manager();
         libvlc_media_player_release( libvlc_media_player );
         libvlc_media_player = NULL;
@@ -531,6 +538,8 @@ bad_unlock:
 
 int VlcPlugin::playlist_delete_item( int idx )
 {
+    if( !libvlc_media_list )
+        return -1;
     libvlc_media_list_lock(libvlc_media_list);
     int ret = libvlc_media_list_remove_index(libvlc_media_list,idx);
     libvlc_media_list_unlock(libvlc_media_list);
@@ -547,6 +556,8 @@ void VlcPlugin::playlist_clear()
 int VlcPlugin::playlist_count()
 {
     int items_count = 0;
+    if( !libvlc_media_list )
+        return items_count;
     libvlc_media_list_lock(libvlc_media_list);
     items_count = libvlc_media_list_count(libvlc_media_list);
     libvlc_media_list_unlock(libvlc_media_list);
@@ -558,11 +569,13 @@ void VlcPlugin::toggle_fullscreen()
     if( playlist_isplaying() )
         libvlc_toggle_fullscreen(libvlc_media_player);
 }
-void VlcPlugin::set_fullscreen( int yes)
+
+void VlcPlugin::set_fullscreen( int yes )
 {
     if( playlist_isplaying() )
         libvlc_set_fullscreen(libvlc_media_player,yes);
 }
+
 int  VlcPlugin::get_fullscreen()
 {
     int r = 0;
@@ -886,7 +899,7 @@ void VlcPlugin::redrawToolbar()
     unsigned int i_tb_width, i_tb_height;
 
     /* This method does nothing if toolbar is hidden. */
-    if( !b_toolbar )
+    if( !b_toolbar || !libvlc_media_player )
         return;
 
     const NPWindow& window = getWindow();
@@ -894,7 +907,6 @@ void VlcPlugin::redrawToolbar()
     Display *p_display = ((NPSetWindowCallbackStruct *)window.ws_info)->display;
 
     getToolbarSize( &i_tb_width, &i_tb_height );
-
 
     /* get mute info */
     b_mute = libvlc_audio_get_mute( libvlc_media_player );
@@ -1001,7 +1013,8 @@ vlc_toolbar_clicked_t VlcPlugin::getToolbarButtonClicked( int i_xpos, int i_ypos
     is_playing = playlist_isplaying();
 
     /* get mute info */
-    b_mute = libvlc_audio_get_mute( libvlc_media_player );
+    if( libvlc_media_player )
+        b_mute = libvlc_audio_get_mute( libvlc_media_player );
 
     /* is Pause of Play button clicked */
     if( (is_playing != 1) &&
@@ -1072,4 +1085,3 @@ bool VlcPlugin::canUseEventListener()
         return true;
     return false;
 }
-

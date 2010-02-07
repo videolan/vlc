@@ -408,7 +408,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         libvlc_video_set_viewport(p_vlc, p_plugin->getMD(), &view, &clip);
 #else
 #warning disabled code
-#endif        
+#endif
         /* remember new window */
         p_plugin->setWindow(*window);
     }
@@ -830,7 +830,8 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
             case clicked_Mute:
             case clicked_Unmute:
             {
-                libvlc_audio_toggle_mute( p_md );
+                if( p_md )
+                    libvlc_audio_toggle_mute( p_md );
             }
             break;
 
