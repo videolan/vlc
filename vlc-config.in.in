@@ -96,27 +96,21 @@ cppflags="${cppflags} -D_FILE_OFFSET_BITS=64 -D__USE_UNIX98 -D_LARGEFILE64_SOURC
 #  Various additional defines
 #
 if [ "${debug}" = yes ]; then
-  cppflags="${cppflags} -DDEBUG"
   cflags="${cflags} -g"
   cxxflags="${cxxflags} -g"
   objcflags="${objcflags} -g"
   ldflags="${ldflags} -g"
 fi
 if [ "${cprof}" = yes ]; then
-  cppflags="${cppflags} -DCPROF"
   cflags="${cflags} -finstrument-functions"
   cxxflags="${cxxflags} -finstrument-functions"
   objcflags="${objcflags} -finstrument-functions"
 fi
 if [ "${gprof}" = yes ]; then
-  cppflags="${cppflags} -DGPROF"
   cflags="${cflags} -pg"
   cxxflags="${cxxflags} -pg"
   objcflags="${objcflags} -pg"
   ldflags="${ldflags} -pg"
-fi
-if [ "${release}" = yes ]; then
-  cppflags="${cppflags} -DHAVE_RELEASE"
 fi
 if [ "${optim}" = size ]; then
   cflags="${cflags} ${cflags_optim_size} ${cflags_tuning}"
