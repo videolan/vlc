@@ -535,3 +535,32 @@ int vlc_mkstemp( char *template )
     return -1;
 }
 
+/**
+ * Duplicates a file descriptor. The new file descriptor has the close-on-exec
+ * descriptor flag set.
+ * @return a new file descriptor or -1
+ */
+int vlc_dup (int oldfd)
+{
+    int newfd;
+
+#ifdef HAVE_DUP3
+    /* Unfortunately, dup3() works like dup2(), not like plain dup(). So we
+     * need such contortion to find the new file descriptor while preserving
+     * thread safety of the file descriptor table. */
+    newfd = vlc_open ("/dev/null", O_RDONLY);
+    if (likely(newfd != -1))
+    {
+        if (likely(dup3 (oldfd, newfd, O_CLOEXEC) == newfd))
+            return newfd;
+        close (newfd);
+    }
+#endif
+
+    newfd = dup (oldfd);
+#ifdef HAVE_FCNTL
+    if (likely(newfd != -1))
+        fcntl (newfd, F_SETFD, FD_CLOEXEC);
+#endif
+    return newfd;
+}
