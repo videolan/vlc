@@ -535,6 +535,10 @@ int vlc_mkstemp( char *template )
     return -1;
 }
 
+#ifdef UNDER_CE
+# define dup(fd) (fd, -1)
+#endif
+
 /**
  * Duplicates a file descriptor. The new file descriptor has the close-on-exec
  * descriptor flag set.
