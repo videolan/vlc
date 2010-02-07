@@ -65,20 +65,17 @@ void system_Init( libvlc_int_t *p_this, int *pi_argc, const char *ppsz_argv[] )
         else psz_path[0] = '\0';
     }
 
-    if( (psz_vlc = strrchr( psz_path, '\\' )) ) *psz_vlc = '\0';
+    psz_vlc = strrchr( psz_path, '\\' );
+    if( psz_vlc )
+        *psz_vlc = '\0';
 
-#ifndef HAVE_RELEASE
     {
         /* remove trailing \.libs from executable dir path if seen,
            we assume we are running vlc through libtool wrapper in build dir */
-        int offset  = strlen(psz_path)-sizeof("\\.libs")+1;
-        if( offset > 0 )
-        {
-            psz_vlc = psz_path+offset;
-            if( ! strcmp(psz_vlc, "\\.libs") ) *psz_vlc = '\0';
-        }
+        size_t len = strlen(psz_path);
+        if( len >= 5 && !stricmp(psz_path + len - 5, "\\.libs" ) )
+            psz_path[len - 5] = '\0';
     }
-#endif
 
     psz_vlcpath = strdup( psz_path );
 
