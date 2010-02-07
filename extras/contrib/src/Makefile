@@ -2376,7 +2376,17 @@ ifdef HAVE_WIN32
 endif
 
 .fluid: fluidsynth
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) && make && make install)
+	cd $< && $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) \
+		--disable-ladspa \
+		--disable-oss-support \
+		--disable-alsa-support \
+		--disable-midishare \
+		--disable-jack-support \
+		--disable-coreaudio \
+		--disable-lash \
+		--disable-ladcca
+	cd $< && make
+	cd $< && make install
 	touch $@
 
 CLEAN_FILE += .fluid
