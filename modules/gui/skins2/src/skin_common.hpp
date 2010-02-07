@@ -32,6 +32,7 @@
 #include <vlc_common.h>
 #include <vlc_interface.h>
 #include <vlc_charset.h>
+#include <vlc_fs.h>
 
 #include <string>
 using namespace std;
