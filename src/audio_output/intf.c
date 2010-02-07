@@ -187,10 +187,11 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
     return i_result;
 }
 
+#undef aout_VolumeGet
 /*****************************************************************************
  * aout_VolumeGet : get the volume of the output device
  *****************************************************************************/
-int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
+int aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
 {
     int i_result = 0;
     aout_instance_t * p_aout = findAout( p_object );
@@ -220,45 +221,49 @@ int __aout_VolumeGet( vlc_object_t * p_object, audio_volume_t * pi_volume )
     return i_result;
 }
 
+#undef aout_VolumeSet
 /*****************************************************************************
  * aout_VolumeSet : set the volume of the output device
  *****************************************************************************/
-int __aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
+int aout_VolumeSet( vlc_object_t * p_object, audio_volume_t i_volume )
 {
     return doVolumeChanges( SET_VOLUME, p_object, 1, i_volume, NULL, true );
 }
 
+#undef aout_VolumeUp
 /*****************************************************************************
  * aout_VolumeUp : raise the output volume
  *****************************************************************************
  * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
  * function.
  *****************************************************************************/
-int __aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
+int aout_VolumeUp( vlc_object_t * p_object, int i_nb_steps,
                    audio_volume_t * pi_volume )
 {
     return doVolumeChanges( INCREMENT_VOLUME, p_object, i_nb_steps, 0, pi_volume, true );
 }
 
+#undef aout_VolumeDown
 /*****************************************************************************
  * aout_VolumeDown : lower the output volume
  *****************************************************************************
  * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
  * function.
  *****************************************************************************/
-int __aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
+int aout_VolumeDown( vlc_object_t * p_object, int i_nb_steps,
                      audio_volume_t * pi_volume )
 {
-    return __aout_VolumeUp( p_object, -i_nb_steps, pi_volume );
+    return aout_VolumeUp( p_object, -i_nb_steps, pi_volume );
 }
 
+#undef aout_ToggleMute
 /*****************************************************************************
  * aout_ToggleMute : Mute/un-mute the output volume
  *****************************************************************************
  * If pi_volume != NULL, *pi_volume will contain the volume at the end of the
  * function (muted => 0).
  *****************************************************************************/
-int __aout_ToggleMute( vlc_object_t * p_object, audio_volume_t * pi_volume )
+int aout_ToggleMute( vlc_object_t * p_object, audio_volume_t * pi_volume )
 {
     return doVolumeChanges( TOGGLE_MUTE, p_object, 1, 0, pi_volume, true );
 }

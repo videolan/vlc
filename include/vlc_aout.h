@@ -312,16 +312,16 @@ VLC_EXPORT( aout_buffer_t *, aout_FifoPop, ( aout_instance_t * p_aout, aout_fifo
 /* From intf.c : */
 VLC_EXPORT( void, aout_VolumeSoftInit, ( aout_instance_t * ) );
 VLC_EXPORT( void, aout_VolumeNoneInit, ( aout_instance_t * ) );
-#define aout_VolumeGet(a, b) __aout_VolumeGet(VLC_OBJECT(a), b)
-VLC_EXPORT( int, __aout_VolumeGet, ( vlc_object_t *, audio_volume_t * ) );
-#define aout_VolumeSet(a, b) __aout_VolumeSet(VLC_OBJECT(a), b)
-VLC_EXPORT( int, __aout_VolumeSet, ( vlc_object_t *, audio_volume_t ) );
-#define aout_VolumeUp(a, b, c) __aout_VolumeUp(VLC_OBJECT(a), b, c)
-VLC_EXPORT( int, __aout_VolumeUp, ( vlc_object_t *, int, audio_volume_t * ) );
-#define aout_VolumeDown(a, b, c) __aout_VolumeDown(VLC_OBJECT(a), b, c)
-VLC_EXPORT( int, __aout_VolumeDown, ( vlc_object_t *, int, audio_volume_t * ) );
-#define aout_ToggleMute(a, b) __aout_ToggleMute(VLC_OBJECT(a), b)
-VLC_EXPORT( int, __aout_ToggleMute, ( vlc_object_t *, audio_volume_t * ) );
+VLC_EXPORT( int, aout_VolumeGet, ( vlc_object_t *, audio_volume_t * ) );
+#define aout_VolumeGet(a, b) aout_VolumeGet(VLC_OBJECT(a), b)
+VLC_EXPORT( int, aout_VolumeSet, ( vlc_object_t *, audio_volume_t ) );
+#define aout_VolumeSet(a, b) aout_VolumeSet(VLC_OBJECT(a), b)
+VLC_EXPORT( int, aout_VolumeUp, ( vlc_object_t *, int, audio_volume_t * ) );
+#define aout_VolumeUp(a, b, c) aout_VolumeUp(VLC_OBJECT(a), b, c)
+VLC_EXPORT( int, aout_VolumeDown, ( vlc_object_t *, int, audio_volume_t * ) );
+#define aout_VolumeDown(a, b, c) aout_VolumeDown(VLC_OBJECT(a), b, c)
+VLC_EXPORT( int, aout_ToggleMute, ( vlc_object_t *, audio_volume_t * ) );
+#define aout_ToggleMute(a, b) aout_ToggleMute(VLC_OBJECT(a), b)
 VLC_EXPORT( int, aout_SetMute, ( vlc_object_t *, audio_volume_t *, bool ) );
 VLC_EXPORT( bool, aout_IsMuted, ( vlc_object_t * ) );
 VLC_EXPORT( int, aout_FindAndRestart, ( vlc_object_t *, const char *, vlc_value_t, vlc_value_t, void * ) );
