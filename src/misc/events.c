@@ -114,6 +114,7 @@ group_contains_listener( vlc_event_listeners_group_t * group,
  *
  *****************************************************************************/
 
+#undef vlc_event_manager_init
 /**
  * Initialize event manager object
  * p_obj is the object that contains the event manager. But not
@@ -121,8 +122,8 @@ group_contains_listener( vlc_event_listeners_group_t * group,
  * for instance).
  * p_parent_obj gives a libvlc instance
  */
-int __vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj,
-                              vlc_object_t * p_parent_obj )
+int vlc_event_manager_init( vlc_event_manager_t * p_em, void * p_obj,
+                            vlc_object_t * p_parent_obj )
 {
     p_em->p_obj = p_obj;
     p_em->p_parent_object = p_parent_obj;
@@ -278,14 +279,15 @@ void vlc_event_send( vlc_event_manager_t * p_em,
     free( array_of_cached_listeners );
 }
 
+#undef vlc_event_attach
 /**
  * Add a callback for an event.
  */
-int __vlc_event_attach( vlc_event_manager_t * p_em,
-                        vlc_event_type_t event_type,
-                        vlc_event_callback_t pf_callback,
-                        void *p_user_data,
-                        const char * psz_debug_name )
+int vlc_event_attach( vlc_event_manager_t * p_em,
+                      vlc_event_type_t event_type,
+                      vlc_event_callback_t pf_callback,
+                      void *p_user_data,
+                      const char * psz_debug_name )
 {
     vlc_event_listeners_group_t * listeners_group;
     vlc_event_listener_t * listener;

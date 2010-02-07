@@ -485,10 +485,10 @@ vlc_sem_wait
 vlc_control_cancel
 vlc_CPU
 vlc_error
-__vlc_event_attach
+vlc_event_attach
 vlc_event_detach
 vlc_event_manager_fini
-__vlc_event_manager_init
+vlc_event_manager_init
 vlc_event_manager_register_event_type
 vlc_event_send
 __vlc_execve
