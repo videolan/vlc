@@ -304,7 +304,7 @@ static char *CheckUTF8( char *str, char rep )
                 goto error;
         }
 
-        assert (charlen >= 2);
+        assert (charlen >= 2 && charlen <= 4);
 
         uint32_t cp = c & ~((0xff >> (7 - charlen)) << (7 - charlen));
         for (int i = 1; i < charlen; i++)
@@ -318,11 +318,20 @@ static char *CheckUTF8( char *str, char rep )
             cp = (cp << 6) | (ptr[i] & 0x3f);
         }
 
-        if (cp < 128) // overlong (special case for ASCII)
-            goto error;
-        if (cp < (1u << (5 * charlen - 3))) // overlong
-            goto error;
-
+        switch (charlen)
+        {
+            case 4:
+                if (cp > 0x10FFFF) // beyond Unicode
+                    goto error;
+            case 3:
+                if (cp >= 0xD800 && cp < 0xC000) // UTF-16 surrogate
+                    goto error;
+            case 2:
+                if (cp < 128) // ASCII overlong
+                    goto error;
+                if (cp < (1u << (5 * charlen - 3))) // overlong
+                    goto error;
+        }
         ptr += charlen;
         continue;
 
