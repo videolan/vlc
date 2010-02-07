@@ -621,6 +621,29 @@ static inline uint8_t clip_uint8_vlc( int32_t a )
     else           return a;
 }
 
+/* Count leading zeroes */
+LIBVLC_USED
+static inline unsigned clz (unsigned x)
+{
+#ifdef __GNUC_
+    return __builtin_clz (x);
+#else
+    unsigned i = sizeof (x) * 8;
+
+    while (x)
+    {
+        x = x >> 1;
+        i--;
+    }
+    return i;
+#endif
+}
+
+#define clz8( x ) (clz(x) - ((sizeof(unsigned) - sizeof (uint8_t)) * 8))
+#define clz16( x ) (clz(x) - ((sizeof(unsigned) - sizeof (uint16_t)) * 8))
+/* XXX: this assumes that int is 32-bits or more */
+#define clz32( x ) (clz(x) - ((sizeof(unsigned) - sizeof (uint32_t)) * 8))
+
 /* Free and set set the variable to NULL */
 #define FREENULL(a) do { free( a ); a = NULL; } while(0)
 
