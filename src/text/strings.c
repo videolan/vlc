@@ -625,7 +625,8 @@ char *str_format_time( const char *tformat )
                         memcpy( dst+d, string, len );               \
                         d += len;                                   \
                     }
-char *__str_format_meta( vlc_object_t *p_object, const char *string )
+#undef str_format_meta
+char *str_format_meta( vlc_object_t *p_object, const char *string )
 {
     const char *s = string;
     bool b_is_format = false;
@@ -947,10 +948,11 @@ char *__str_format_meta( vlc_object_t *p_object, const char *string )
 #undef INSERT_STRING
 #undef INSERT_STRING_NO_FREE
 
+#undef str_format
 /**
  * Apply str format time and str format meta
  */
-char *__str_format( vlc_object_t *p_this, const char *psz_src )
+char *str_format( vlc_object_t *p_this, const char *psz_src )
 {
     char *psz_buf1, *psz_buf2;
     psz_buf1 = str_format_time( psz_src );

@@ -92,13 +92,14 @@
  * Update_t functions
  *****************************************************************************/
 
+#undef update_New
 /**
  * Create a new update VLC struct
  *
  * \param p_this the calling vlc_object
  * \return pointer to new update_t or NULL
  */
-update_t *__update_New( vlc_object_t *p_this )
+update_t *update_New( vlc_object_t *p_this )
 {
     update_t *p_update;
     assert( p_this );
@@ -750,7 +751,8 @@ update_release_t *update_GetRelease( update_t *p_update )
 }
 
 #else
-update_t *__update_New( vlc_object_t *p_this )
+#undef update_New
+update_t *update_New( vlc_object_t *p_this )
 {
     (void)p_this;
     return NULL;

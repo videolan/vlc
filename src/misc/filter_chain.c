@@ -97,15 +97,16 @@ static int filter_chain_DeleteFilterInternal( filter_chain_t *, filter_t * );
 
 static int UpdateBufferFunctions( filter_chain_t * );
 
+#undef filter_chain_New
 /**
  * Filter chain initialisation
  */
-filter_chain_t *__filter_chain_New( vlc_object_t *p_this,
-                                    const char *psz_capability,
-                                    bool b_allow_fmt_out_change,
-                                    int  (*pf_buffer_allocation_init)( filter_t *, void * ),
-                                    void (*pf_buffer_allocation_clean)( filter_t * ),
-                                    void *p_buffer_allocation_data )
+filter_chain_t *filter_chain_New( vlc_object_t *p_this,
+                                  const char *psz_capability,
+                                  bool b_allow_fmt_out_change,
+                                  int  (*pf_buffer_allocation_init)( filter_t *, void * ),
+                                  void (*pf_buffer_allocation_clean)( filter_t * ),
+                                  void *p_buffer_allocation_data )
 {
     assert( p_this );
     assert( psz_capability );

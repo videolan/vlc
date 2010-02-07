@@ -59,8 +59,8 @@ struct image_handler_t
     filter_t  *p_filter;
 };
 
-VLC_EXPORT( image_handler_t *, __image_HandlerCreate, ( vlc_object_t * ) );
-#define image_HandlerCreate( a ) __image_HandlerCreate( VLC_OBJECT(a) )
+VLC_EXPORT( image_handler_t *, image_HandlerCreate, ( vlc_object_t * ) );
+#define image_HandlerCreate( a ) image_HandlerCreate( VLC_OBJECT(a) )
 VLC_EXPORT( void, image_HandlerDelete, ( image_handler_t * ) );
 
 #define image_Read( a, b, c, d ) a->pf_read( a, b, c, d )

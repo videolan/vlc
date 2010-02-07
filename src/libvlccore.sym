@@ -130,7 +130,7 @@ filter_chain_DeleteFilter
 filter_chain_GetFmtOut
 filter_chain_GetLength
 filter_chain_MouseFilter
-__filter_chain_New
+filter_chain_New
 filter_chain_Reset
 filter_chain_SubFilter
 filter_chain_VideoFilter
@@ -172,7 +172,7 @@ httpd_UrlDelete
 httpd_UrlNew
 httpd_UrlNewUnique
 image_Ext2Fourcc
-__image_HandlerCreate
+image_HandlerCreate
 image_HandlerDelete
 image_Mime2Fourcc
 image_Type2Fourcc
@@ -222,7 +222,7 @@ input_Start
 input_Stop
 input_vaControl
 intf_Create
-__intf_Eject
+intf_Eject
 IsUTF8
 libvlc_InternalAddIntf
 libvlc_InternalCleanup
@@ -405,8 +405,8 @@ stream_Read
 stream_ReadLine
 stream_UrlNew
 stream_vaControl
-__str_format
-__str_format_meta
+str_format
+str_format_meta
 str_format_time
 subpicture_Delete
 subpicture_New
@@ -423,7 +423,7 @@ update_Delete
 update_Download
 update_GetRelease
 update_NeedUpgrade
-__update_New
+update_New
 us_asprintf
 us_atof
 us_strtod
@@ -633,7 +633,7 @@ vout_SetDisplayAspect
 vout_SetDisplayCrop
 vout_display_GetDefaultDisplaySize
 vout_display_PlacePicture
-__xml_Create
+xml_Create
 text_style_Copy
 text_style_Delete
 text_style_Duplicate

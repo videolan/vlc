@@ -29,13 +29,14 @@
 #include "vlc_xml.h"
 #include "../libvlc.h"
 
+#undef xml_Create
 /*****************************************************************************
  * xml_Create:
  *****************************************************************************
  * Create an instance of an XML parser.
  * Returns NULL on error.
  *****************************************************************************/
-xml_t *__xml_Create( vlc_object_t *p_this )
+xml_t *xml_Create( vlc_object_t *p_this )
 {
     xml_t *p_xml;
 

@@ -83,13 +83,7 @@
 static int EjectSCSI ( int i_fd );
 #endif
 
-/*****************************************************************************
- * intf_Eject: eject the CDRom
- *****************************************************************************
- * returns 0 on success
- * returns 1 on failure
- * returns -1 if not implemented
- *****************************************************************************/
+#undef intf_Eject
 /**
  * \brief Ejects the CD /DVD
  * \ingroup vlc_interface
@@ -97,7 +91,7 @@ static int EjectSCSI ( int i_fd );
  * \param psz_device the CD/DVD to eject
  * \return 0 on success, 1 on failure, -1 if not implemented
  */
-int __intf_Eject( vlc_object_t *p_this, const char *psz_device )
+int intf_Eject( vlc_object_t *p_this, const char *psz_device )
 {
     VLC_UNUSED(p_this);
     int i_ret = VLC_SUCCESS;

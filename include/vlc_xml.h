@@ -50,8 +50,8 @@ struct xml_t
                                const char * );
 };
 
-#define xml_Create( a ) __xml_Create( VLC_OBJECT(a) )
-VLC_EXPORT( xml_t *, __xml_Create, ( vlc_object_t * ) );
+VLC_EXPORT( xml_t *, xml_Create, ( vlc_object_t * ) );
+#define xml_Create( a ) xml_Create( VLC_OBJECT(a) )
 VLC_EXPORT( void, xml_Delete, ( xml_t * ) );
 
 #define xml_ReaderCreate( a, b ) a->pf_reader_create( a, b )

@@ -74,11 +74,12 @@ vlc_fourcc_t image_Type2Fourcc( const char * );
 vlc_fourcc_t image_Ext2Fourcc( const char * );
 /*static const char *Fourcc2Ext( vlc_fourcc_t );*/
 
+#undef image_HandlerCreate
 /**
  * Create an image_handler_t instance
  *
  */
-image_handler_t *__image_HandlerCreate( vlc_object_t *p_this )
+image_handler_t *image_HandlerCreate( vlc_object_t *p_this )
 {
     image_handler_t *p_image = calloc( 1, sizeof(image_handler_t) );
     if( !p_image )

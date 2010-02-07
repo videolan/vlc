@@ -102,8 +102,8 @@ struct intf_dialog_args_t
 VLC_EXPORT( int, intf_Create, ( vlc_object_t *, const char * ) );
 #define intf_Create(a,b) intf_Create(VLC_OBJECT(a),b)
 
-#define intf_Eject(a,b) __intf_Eject(VLC_OBJECT(a),b)
-VLC_EXPORT( int, __intf_Eject, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( int, intf_Eject, ( vlc_object_t *, const char * ) );
+#define intf_Eject(a,b) intf_Eject(VLC_OBJECT(a),b)
 
 VLC_EXPORT( void, libvlc_Quit, ( libvlc_int_t * ) );
 

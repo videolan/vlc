@@ -265,8 +265,8 @@ typedef struct filter_chain_t filter_chain_t;
  * \param p_buffer_allocation_data pointer to private allocation data
  * \return pointer to a filter chain
  */
-VLC_EXPORT( filter_chain_t *, __filter_chain_New, ( vlc_object_t *, const char *, bool, int (*)( filter_t *, void * ), void (*)( filter_t * ), void *  ) );
-#define filter_chain_New( a, b, c, d, e, f ) __filter_chain_New( VLC_OBJECT( a ), b, c, d, e, f )
+VLC_EXPORT( filter_chain_t *, filter_chain_New, ( vlc_object_t *, const char *, bool, int (*)( filter_t *, void * ), void (*)( filter_t * ), void *  ) );
+#define filter_chain_New( a, b, c, d, e, f ) filter_chain_New( VLC_OBJECT( a ), b, c, d, e, f )
 
 /**
  * Delete filter chain will delete all filters in the chain and free all
