@@ -184,8 +184,8 @@ struct vlm_message_t
 extern "C" {
 #endif
 
-#define vlm_New( a ) __vlm_New( VLC_OBJECT(a) )
-VLC_EXPORT( vlm_t *, __vlm_New, ( vlc_object_t * ) );
+VLC_EXPORT( vlm_t *, vlm_New, ( vlc_object_t * ) );
+#define vlm_New( a ) vlm_New( VLC_OBJECT(a) )
 VLC_EXPORT( void,      vlm_Delete, ( vlm_t * ) );
 VLC_EXPORT( int,       vlm_ExecuteCommand, ( vlm_t *, const char *, vlm_message_t ** ) );
 VLC_EXPORT( int,       vlm_Control, ( vlm_t *p_vlm, int i_query, ... ) );

@@ -594,7 +594,7 @@ vlm_MessageAdd
 vlm_MessageDelete
 vlm_MessageNew
 vlm_MessageSimpleNew
-__vlm_New
+vlm_New
 __vout_AllocatePicture
 vout_ChromaCmp
 vout_Close

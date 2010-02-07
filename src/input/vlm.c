@@ -113,12 +113,13 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
+static vlc_mutex_t vlm_mutex = VLC_STATIC_MUTEX;
+
+#undef vlm_New
 /*****************************************************************************
  * vlm_New:
  *****************************************************************************/
-static vlc_mutex_t vlm_mutex = VLC_STATIC_MUTEX;
-
-vlm_t *__vlm_New ( vlc_object_t *p_this )
+vlm_t *vlm_New ( vlc_object_t *p_this )
 {
     vlm_t *p_vlm = NULL, **pp_vlm = &(libvlc_priv (p_this->p_libvlc)->p_vlm);
     char *psz_vlmconf;
