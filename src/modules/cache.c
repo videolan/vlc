@@ -79,7 +79,7 @@ void CacheDelete( vlc_object_t *obj, const char *dir )
                   dir, CACHENAME_VALUES ) == -1 )
         return;
     msg_Dbg( obj, "removing plugins cache file %s", path );
-    utf8_unlink( path );
+    vlc_unlink( path );
     free( path );
 }
 
@@ -112,7 +112,7 @@ void CacheLoad( vlc_object_t *p_this, module_bank_t *p_bank, const char *dir )
 
     msg_Dbg( p_this, "loading plugins cache file %s", psz_filename );
 
-    file = utf8_fopen( psz_filename, "rb" );
+    file = vlc_fopen( psz_filename, "rb" );
     if( !file )
     {
         msg_Warn( p_this, "cannot read %s (%m)",
@@ -455,7 +455,7 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
     }
     msg_Dbg (p_this, "saving plugins cache %s", filename);
 
-    FILE *file = utf8_fopen (tmpname, "wb");
+    FILE *file = vlc_fopen (tmpname, "wb");
     if (file == NULL)
     {
         if (errno != EACCES && errno != ENOENT)
@@ -468,17 +468,17 @@ void CacheSave (vlc_object_t *p_this, const char *dir,
         msg_Warn (p_this, "cannot write %s (%m)", tmpname);
         clearerr (file);
         fclose (file);
-        utf8_unlink (tmpname);
+        vlc_unlink (tmpname);
         goto out;
     }
 
 #ifndef WIN32
-    utf8_rename (tmpname, filename); /* atomically replace old cache */
+    vlc_rename (tmpname, filename); /* atomically replace old cache */
     fclose (file);
 #else
-    utf8_unlink (filename);
+    vlc_unlink (filename);
     fclose (file);
-    utf8_rename (tmpname, filename);
+    vlc_rename (tmpname, filename);
 #endif
 out:
     free (filename);

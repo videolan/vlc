@@ -300,7 +300,7 @@ int ACL_LoadFile( vlc_acl_t *p_acl, const char *psz_path )
     if( p_acl == NULL )
         return -1;
 
-    file = utf8_fopen( psz_path, "r" );
+    file = vlc_fopen( psz_path, "r" );
     if( file == NULL )
         return -1;
 

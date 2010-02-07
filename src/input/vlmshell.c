@@ -529,7 +529,7 @@ static int ExecuteExport( vlm_t *p_vlm, vlm_message_t **pp_status )
 
 static int ExecuteSave( vlm_t *p_vlm, const char *psz_file, vlm_message_t **pp_status )
 {
-    FILE *f = utf8_fopen( psz_file, "wt" );
+    FILE *f = vlc_fopen( psz_file, "wt" );
     char *psz_save = NULL;
 
     if( !f )

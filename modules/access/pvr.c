@@ -663,7 +663,7 @@ static int Open( vlc_object_t * p_this )
     free( psz_tofree );
 
     /* open the device */
-    p_sys->i_fd = utf8_open( p_sys->psz_videodev, O_RDWR );
+    p_sys->i_fd = vlc_open( p_sys->psz_videodev, O_RDWR );
     if( p_sys->i_fd < 0 )
     {
         msg_Err( p_access, "Cannot open device %s (%m).",
@@ -773,7 +773,7 @@ static int Open( vlc_object_t * p_this )
         if ( (p_sys->i_frequency >= pi_radio_range[0])
               && (p_sys->i_frequency <= pi_radio_range[1]) )
         {
-            p_sys->i_radio_fd = utf8_open( p_sys->psz_radiodev, O_RDWR );
+            p_sys->i_radio_fd = vlc_open( p_sys->psz_radiodev, O_RDWR );
             if( p_sys->i_radio_fd < 0 )
             {
                 msg_Err( p_access, "Cannot open radio device (%m)." );

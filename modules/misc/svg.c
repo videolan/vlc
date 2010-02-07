@@ -167,7 +167,7 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
     else
     {
         /* Read the template */
-        file = utf8_fopen( psz_filename, "rt" );
+        file = vlc_fopen( psz_filename, "rt" );
         if( !file )
         {
             msg_Warn( p_this, "SVG template file %s does not exist.",

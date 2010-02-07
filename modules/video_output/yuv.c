@@ -141,7 +141,7 @@ static int Open(vlc_object_t *object)
         free(sys);
         return VLC_EGENERIC;
     }
-    sys->f = utf8_fopen(name, "wb");
+    sys->f = vlc_fopen(name, "wb");
 
     if (!sys->f) {
         msg_Err(vd, "Failed to open %s", name);

@@ -98,7 +98,7 @@ int DirOpen( vlc_object_t *p_this )
     if( !p_access->psz_path )
         return VLC_EGENERIC;
 
-    DIR *handle = utf8_opendir (p_access->psz_path);
+    DIR *handle = vlc_opendir (p_access->psz_path);
     if (handle == NULL)
         return VLC_EGENERIC;
 
@@ -228,7 +228,7 @@ block_t *DirBlock (access_t *p_access)
         return block;
     }
 
-    char *entry = utf8_readdir (current->handle);
+    char *entry = vlc_readdir (current->handle);
     if (entry == NULL)
     {   /* End of directory, go back to parent */
         closedir (current->handle);
@@ -289,7 +289,7 @@ block_t *DirBlock (access_t *p_access)
         }
         sprintf (sub->path, "%s/%s", current->path, entry);
 
-        DIR *handle = utf8_opendir (sub->path);
+        DIR *handle = vlc_opendir (sub->path);
         if (handle != NULL)
         {
             sub->parent = current;

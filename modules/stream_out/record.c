@@ -445,7 +445,7 @@ static void OutputStart( sout_stream_t *p_stream )
 
             if( i_es < 0 )
             {
-                utf8_unlink( psz_file );
+                vlc_unlink( psz_file );
                 free( psz_file );
                 continue;
             }
@@ -471,7 +471,7 @@ static void OutputStart( sout_stream_t *p_stream )
                 if( i_best_es >= p_sys->i_id )
                     break;
             }
-            utf8_unlink( psz_file );
+            vlc_unlink( psz_file );
             free( psz_file );
         }
 

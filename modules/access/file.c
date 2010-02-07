@@ -162,7 +162,7 @@ int Open( vlc_object_t *p_this )
     else
     {
         msg_Dbg (p_access, "opening file `%s'", path);
-        fd = utf8_open (path, O_RDONLY | O_NONBLOCK);
+        fd = vlc_open (path, O_RDONLY | O_NONBLOCK);
         if (fd == -1)
         {
             msg_Err (p_access, "cannot open file %s (%m)", path);

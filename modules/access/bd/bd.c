@@ -944,7 +944,7 @@ static int CheckFileList( const char *psz_base, const char *ppsz_name[] )
         if( asprintf( &psz_tmp, "%s/%s", psz_base, ppsz_name[i] ) < 0 )
             return VLC_EGENERIC;
 
-        bool b_ok = utf8_stat( psz_tmp, &s ) == 0 && S_ISREG( s.st_mode );
+        bool b_ok = vlc_stat( psz_tmp, &s ) == 0 && S_ISREG( s.st_mode );
 
         free( psz_tmp );
         if( !b_ok )
@@ -968,13 +968,13 @@ static char *FindPathBase( const char *psz_path, bool *pb_shortname )
         psz_base[strlen(psz_base)-1] = '\0';
 
     /* */
-    if( utf8_stat( psz_base, &s ) || !S_ISDIR( s.st_mode ) )
+    if( vlc_stat( psz_base, &s ) || !S_ISDIR( s.st_mode ) )
         goto error;
 
     /* Check BDMV */
     if( asprintf( &psz_tmp, "%s/BDMV", psz_base ) < 0 )
         goto error;
-    if( !utf8_stat( psz_tmp, &s ) && S_ISDIR( s.st_mode ) )
+    if( !vlc_stat( psz_tmp, &s ) && S_ISDIR( s.st_mode ) )
     {
         free( psz_base );
         psz_base = psz_tmp;
@@ -1212,7 +1212,7 @@ static int Load( demux_t *p_demux,
 
     char **ppsz_list;
 
-    int i_list = utf8_scandir( psz_playlist, &ppsz_list, pf_filter, ScanSort );
+    int i_list = vlc_scandir( psz_playlist, &ppsz_list, pf_filter, ScanSort );
 
     for( int i = 0; i < i_list; i++ )
     {

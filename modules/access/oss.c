@@ -340,7 +340,7 @@ static int OpenAudioDevOss( demux_t *p_demux )
     int i_fd;
     int i_format;
 
-    i_fd = utf8_open( p_demux->p_sys->psz_device, O_RDONLY | O_NONBLOCK );
+    i_fd = vlc_open( p_demux->p_sys->psz_device, O_RDONLY | O_NONBLOCK );
 
     if( i_fd < 0 )
     {
@@ -416,7 +416,7 @@ static int OpenAudioDev( demux_t *p_demux )
 static bool ProbeAudioDevOss( demux_t *p_demux, const char *psz_device )
 {
     int i_caps;
-    int i_fd = utf8_open( psz_device, O_RDONLY | O_NONBLOCK );
+    int i_fd = vlc_open( psz_device, O_RDONLY | O_NONBLOCK );
 
     if( i_fd < 0 )
     {

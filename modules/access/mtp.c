@@ -187,7 +187,7 @@ static void Close( vlc_object_t * p_this )
     access_sys_t *p_sys = p_access->p_sys;
 
     close ( p_sys->fd );
-    if(	utf8_unlink( p_access->psz_path ) != 0 )
+    if(	vlc_unlink( p_access->psz_path ) != 0 )
         msg_Err( p_access, "Error deleting file %s, %m", p_access->psz_path );
     free( p_sys );
 }
@@ -297,7 +297,7 @@ static int Control( access_t *p_access, int i_query, va_list args )
  *****************************************************************************/
 static int open_file( access_t *p_access, const char *path )
 {
-    int fd = utf8_open( path, O_RDONLY | O_NONBLOCK );
+    int fd = vlc_open( path, O_RDONLY | O_NONBLOCK );
     if( fd == -1 )
     {
         msg_Err( p_access, "cannot open file %s (%m)", path );

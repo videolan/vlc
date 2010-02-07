@@ -85,7 +85,7 @@ static int OpenDecoderCommon( vlc_object_t *p_this, bool b_force_dump )
     }
     if( b_force_dump )
     {
-        p_sys->i_fd = utf8_open( psz_file, O_WRONLY | O_CREAT | O_TRUNC, 00644 );
+        p_sys->i_fd = vlc_open( psz_file, O_WRONLY | O_CREAT | O_TRUNC, 00644 );
 
         if( p_sys->i_fd == -1 )
         {

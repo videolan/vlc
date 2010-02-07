@@ -219,7 +219,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
         int i_files;
 
         msg_Dbg( p_this, "Trying Lua scripts in %s", *ppsz_dir );
-        i_files = utf8_scandir( *ppsz_dir, &ppsz_filelist, file_select,
+        i_files = vlc_scandir( *ppsz_dir, &ppsz_filelist, file_select,
                                 file_compare );
         if( i_files < 0 )
             continue;
@@ -277,7 +277,7 @@ char *vlclua_find_file( vlc_object_t *p_this, const char *psz_luadirname, const 
                 return NULL;
             }
 
-            if( utf8_stat( psz_filename, &st ) == 0
+            if( vlc_stat( psz_filename, &st ) == 0
                 && S_ISREG( st.st_mode ) )
             {
                 vlclua_dir_list_free( ppsz_dir_list );
@@ -581,7 +581,7 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
             free( ppsz_filelist );
             ppsz_filelist = NULL;
         }
-        i_files = utf8_scandir( *ppsz_dir, &ppsz_filelist, file_select,
+        i_files = vlc_scandir( *ppsz_dir, &ppsz_filelist, file_select,
                                 file_compare );
         if( i_files < 1 ) continue;
         ppsz_fileend = ppsz_filelist + i_files;
@@ -593,7 +593,7 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
             {
                 goto error;
             }
-            FILE *fd = utf8_fopen( psz_filename, "r" );
+            FILE *fd = vlc_fopen( psz_filename, "r" );
             if( fd )
             {
                 char description[256];

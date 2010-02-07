@@ -1369,7 +1369,7 @@ static int ProbeDVD( demux_t *p_demux, char *psz_name )
         return VLC_SUCCESS;
     }
 
-    if( (i_fd = utf8_open( psz_name, O_RDONLY |O_NONBLOCK )) == -1 )
+    if( (i_fd = vlc_open( psz_name, O_RDONLY |O_NONBLOCK )) == -1 )
     {
         return VLC_SUCCESS; /* Let dvdnav_open() do the probing */
     }

@@ -122,7 +122,7 @@ static int FindMeta( vlc_object_t *p_this )
         else
             snprintf( psz_filename, MAX_PATH, "%s%s", psz_path, cover_files[i] );
 
-        if( utf8_stat( psz_filename, &a ) != -1 )
+        if( vlc_stat( psz_filename, &a ) != -1 )
         {
             char *psz_uri = make_URI( psz_filename );
             if( psz_uri )

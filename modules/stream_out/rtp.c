@@ -1482,7 +1482,7 @@ static int FileSetup( sout_stream_t *p_stream )
     if( p_sys->psz_sdp == NULL )
         return VLC_EGENERIC; /* too early */
 
-    if( ( f = utf8_fopen( p_sys->psz_sdp_file, "wt" ) ) == NULL )
+    if( ( f = vlc_fopen( p_sys->psz_sdp_file, "wt" ) ) == NULL )
     {
         msg_Err( p_stream, "cannot open file '%s' (%m)",
                  p_sys->psz_sdp_file );

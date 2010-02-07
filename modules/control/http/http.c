@@ -506,7 +506,7 @@ int  HttpCallback( httpd_file_sys_t *p_args,
     char **pp_data = (char **)_pp_data;
     FILE *f;
 
-    if( ( f = utf8_fopen( p_args->file, "r" ) ) == NULL )
+    if( ( f = vlc_fopen( p_args->file, "r" ) ) == NULL )
     {
         Callback404( p_args, pp_data, pi_data );
         return VLC_SUCCESS;
@@ -810,7 +810,7 @@ int  ArtCallback( httpd_handler_sys_t *p_args,
         char *p_data = NULL;
         int i_header_size, i_data;
 
-        if( ( f = utf8_fopen( psz_art + strlen( "file://" ), "r" ) ) == NULL )
+        if( ( f = vlc_fopen( psz_art + strlen( "file://" ), "r" ) ) == NULL )
         {
             msg_Dbg( p_intf, "Couldn't open album art file %s",
                      psz_art + strlen( "file://" ) );

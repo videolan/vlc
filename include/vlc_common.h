@@ -402,7 +402,7 @@ struct _stati64;
 #define fstat _fstati64
 #endif
 
-/* You should otherwise use utf8_stat and utf8_lstat. */
+/* You should otherwise use vlc_stat and utf8_lstat. */
 #else
 struct stat;
 #endif

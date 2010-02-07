@@ -56,11 +56,11 @@ static void ArtCacheCreateDir( const char *psz_dir )
         if( !*psz ) break;
         *psz = 0;
         if( !EMPTY_STR( psz_newdir ) )
-            utf8_mkdir( psz_newdir, 0700 );
+            vlc_mkdir( psz_newdir, 0700 );
         *psz = DIR_SEP_CHAR;
         psz++;
     }
-    utf8_mkdir( psz_dir, 0700 );
+    vlc_mkdir( psz_dir, 0700 );
 }
 
 static char* ArtCacheGetDirPath( const char *psz_title, const char *psz_artist,
@@ -151,7 +151,7 @@ int playlist_FindArtInCache( input_item_t *p_item )
         return VLC_EGENERIC;
 
     /* Check if file exists */
-    DIR *p_dir = utf8_opendir( psz_path );
+    DIR *p_dir = vlc_opendir( psz_path );
     if( !p_dir )
     {
         free( psz_path );
@@ -160,7 +160,7 @@ int playlist_FindArtInCache( input_item_t *p_item )
 
     bool b_found = false;
     char *psz_filename;
-    while( !b_found && (psz_filename = utf8_readdir( p_dir )) )
+    while( !b_found && (psz_filename = vlc_readdir( p_dir )) )
     {
         if( !strncmp( psz_filename, "art", 3 ) )
         {
@@ -207,7 +207,7 @@ int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
 
     /* Check if we already dumped it */
     struct stat s;
-    if( !utf8_stat( psz_filename, &s ) )
+    if( !vlc_stat( psz_filename, &s ) )
     {
         input_item_SetArtURL( p_item, psz_uri );
         free( psz_filename );
@@ -216,7 +216,7 @@ int playlist_SaveArt( playlist_t *p_playlist, input_item_t *p_item,
     }
 
     /* Dump it otherwise */
-    FILE *f = utf8_fopen( psz_filename, "wb" );
+    FILE *f = vlc_fopen( psz_filename, "wb" );
     if( f )
     {
         if( fwrite( p_buffer, i_buffer, 1, f ) != 1 )

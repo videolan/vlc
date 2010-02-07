@@ -261,7 +261,7 @@ static int Open( vlc_object_t *p_this )
 
         /* Open the log file and remove any buffering for the stream */
         msg_Dbg( p_intf, "opening logfile `%s'", psz_file );
-        p_sys->msg.p_file = utf8_fopen( psz_file, "at" );
+        p_sys->msg.p_file = vlc_fopen( psz_file, "at" );
         if( p_sys->msg.p_file == NULL )
         {
             msg_Err( p_intf, "error opening logfile `%s'", psz_file );

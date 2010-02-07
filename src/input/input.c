@@ -3009,7 +3009,7 @@ static void InputGetExtraFilesPattern( input_thread_t *p_input,
         if( asprintf( &psz_file, psz_format, psz_base, i ) < 0 )
             break;
 
-        if( utf8_stat( psz_file, &st ) || !S_ISREG( st.st_mode ) || !st.st_size )
+        if( vlc_stat( psz_file, &st ) || !S_ISREG( st.st_mode ) || !st.st_size )
         {
             free( psz_file );
             break;
@@ -3241,7 +3241,7 @@ static void SubtitleAdd( input_thread_t *p_input, char *psz_subtitle, bool b_for
 
             strcpy( psz_extension, ".idx" );
 
-            if( !utf8_stat( psz_path, &st ) && S_ISREG( st.st_mode ) )
+            if( !vlc_stat( psz_path, &st ) && S_ISREG( st.st_mode ) )
             {
                 msg_Dbg( p_input, "using %s subtitles file instead of %s",
                          psz_path, psz_subtitle );
@@ -3326,7 +3326,7 @@ char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const cha
     char *psz_file;
     DIR *path;
 
-    path = utf8_opendir( psz_path );
+    path = vlc_opendir( psz_path );
     if( path )
     {
         closedir( path );

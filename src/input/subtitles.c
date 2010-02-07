@@ -347,7 +347,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
             continue;
 
         /* parse psz_src dir */
-        i_dir_content = utf8_scandir( psz_dir, &ppsz_dir_content,
+        i_dir_content = vlc_scandir( psz_dir, &ppsz_dir_content,
                                       subtitles_Filter, NULL );
         if( i_dir_content < 0 )
             continue;
@@ -408,7 +408,7 @@ char **subtitles_Detect( input_thread_t *p_this, char *psz_path,
                 if( !strcmp( psz_path, psz_fname ) )
                     continue;
 
-                if( !utf8_stat( psz_path, &st ) && S_ISREG( st.st_mode ) && result )
+                if( !vlc_stat( psz_path, &st ) && S_ISREG( st.st_mode ) && result )
                 {
                     msg_Dbg( p_this,
                             "autodetected subtitle: %s with priority %d",

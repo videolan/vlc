@@ -94,7 +94,7 @@ static int Open (vlc_object_t *p_this)
     STANDARD_BLOCK_ACCESS_INIT;
 
     msg_Dbg (p_access, "opening file %s", path);
-    fd = utf8_open (path, O_RDONLY | O_NOCTTY);
+    fd = vlc_open (path, O_RDONLY | O_NOCTTY);
 
     if (fd == -1)
     {

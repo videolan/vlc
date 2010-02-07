@@ -154,7 +154,7 @@ static int Open( vlc_object_t * p_this )
     if( !strcmp( psz_name, "-" ) )
         p_aout->output.p_sys->p_file = stdout;
     else
-        p_aout->output.p_sys->p_file = utf8_fopen( psz_name, "wb" );
+        p_aout->output.p_sys->p_file = vlc_fopen( psz_name, "wb" );
 
     free( psz_name );
     if ( p_aout->output.p_sys->p_file == NULL )

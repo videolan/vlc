@@ -258,7 +258,7 @@ static int vlclua_stat( lua_State *L )
 #ifdef HAVE_SYS_STAT_H
     const char *psz_path = luaL_checkstring( L, 1 );
     struct stat s;
-    if( utf8_stat( psz_path, &s ) )
+    if( vlc_stat( psz_path, &s ) )
         return 0;
         //return luaL_error( L, "Couldn't stat %s.", psz_path );
     lua_newtable( L );
@@ -316,13 +316,13 @@ static int vlclua_opendir( lua_State *L )
     DIR *p_dir;
     int i = 0;
 
-    if( ( p_dir = utf8_opendir( psz_dir ) ) == NULL )
+    if( ( p_dir = vlc_opendir( psz_dir ) ) == NULL )
         return luaL_error( L, "cannot open directory `%s'.", psz_dir );
 
     lua_newtable( L );
     for( ;; )
     {
-        char *psz_filename = utf8_readdir( p_dir );
+        char *psz_filename = vlc_readdir( p_dir );
         if( !psz_filename ) break;
         i++;
         lua_pushstring( L, psz_filename );

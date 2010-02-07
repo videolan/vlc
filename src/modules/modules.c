@@ -895,14 +895,14 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
     if( i_maxdepth == 0 )
         return;
 
-    DIR *dh = utf8_opendir (psz_dir);
+    DIR *dh = vlc_opendir (psz_dir);
     if (dh == NULL)
         return;
 
     /* Parse the directory and try to load all files it contains. */
     for (;;)
     {
-        char *file = utf8_readdir (dh), *path;
+        char *file = vlc_readdir (dh), *path;
         struct stat st;
 
         if (file == NULL)
@@ -919,7 +919,7 @@ static void AllocatePluginDir( vlc_object_t *p_this, module_bank_t *p_bank,
 
         const int pathlen = asprintf (&path, "%s"DIR_SEP"%s", psz_dir, file);
         free (file);
-        if (pathlen == -1 || utf8_stat (path, &st))
+        if (pathlen == -1 || vlc_stat (path, &st))
             continue;
 
         if (S_ISDIR (st.st_mode))

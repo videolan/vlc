@@ -442,7 +442,7 @@ static int OpenAudioDev( demux_t *p_demux )
     int i_format = AFMT_S16_LE;
     int result;
 
-    p_sys->fd_audio = utf8_open( psz_device, O_RDONLY | O_NONBLOCK );
+    p_sys->fd_audio = vlc_open( psz_device, O_RDONLY | O_NONBLOCK );
     if( p_sys->fd_audio  < 0 )
     {
         msg_Err( p_demux, "Cannot open audio device (%s)", psz_device );

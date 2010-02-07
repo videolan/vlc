@@ -141,7 +141,7 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
 {
     /* */
     char *filename;
-    DIR *pathdir = utf8_opendir(cfg->path);
+    DIR *pathdir = vlc_opendir(cfg->path);
     if (pathdir != NULL) {
         /* The use specified a directory path */
         closedir(pathdir);
@@ -165,7 +165,7 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
                     free(prefix);
                     goto error;
                 }
-                if (utf8_stat(filename, &st)) {
+                if (vlc_stat(filename, &st)) {
                     *sequential = num;
                     break;
                 }
@@ -208,7 +208,7 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
         goto error;
 
     /* Save the snapshot */
-    FILE *file = utf8_fopen(filename, "wb");
+    FILE *file = vlc_fopen(filename, "wb");
     if (!file) {
         msg_Err(object, "Failed to open '%s'", filename);
         free(filename);

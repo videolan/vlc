@@ -290,7 +290,7 @@ static int Open( vlc_object_t *p_this )
      * wait forever until the device is available. Since this breaks the
      * OSS spec, we immediately put it back to blocking mode if the
      * operation was successful. */
-    p_sys->i_fd = utf8_open( psz_device, O_WRONLY | O_NDELAY );
+    p_sys->i_fd = vlc_open( psz_device, O_WRONLY | O_NDELAY );
     if( p_sys->i_fd < 0 )
     {
         msg_Err( p_aout, "cannot open audio device (%s)", psz_device );

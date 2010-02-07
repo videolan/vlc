@@ -2489,7 +2489,7 @@ static void ReadDir( intf_thread_t *p_intf )
         char *psz_entry;
 
         /* Open the dir */
-        p_current_dir = utf8_opendir( p_sys->psz_current_dir );
+        p_current_dir = vlc_opendir( p_sys->psz_current_dir );
 
         if( p_current_dir == NULL )
         {
@@ -2511,7 +2511,7 @@ static void ReadDir( intf_thread_t *p_intf )
         p_sys->i_dir_entries = 0;
 
         /* while we still have entries in the directory */
-        while( ( psz_entry = utf8_readdir( p_current_dir ) ) != NULL )
+        while( ( psz_entry = vlc_readdir( p_current_dir ) ) != NULL )
         {
 #if defined( S_ISDIR )
             struct stat stat_data;
@@ -2542,7 +2542,7 @@ static void ReadDir( intf_thread_t *p_intf )
             }
 
 #if defined( S_ISDIR )
-            if( !utf8_stat( psz_uri, &stat_data )
+            if( !vlc_stat( psz_uri, &stat_data )
              && S_ISDIR(stat_data.st_mode) )
 /*#elif defined( DT_DIR )
             if( p_dir_content->d_type & DT_DIR )*/

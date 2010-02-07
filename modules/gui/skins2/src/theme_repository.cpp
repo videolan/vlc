@@ -142,7 +142,7 @@ void ThemeRepository::parseDirectory( const string &rDir_locale )
     // Open the dir
     // FIXME: parseDirectory should be invoked with UTF-8 input instead!!
     string rDir = sFromLocale( rDir_locale );
-    pDir = utf8_opendir( rDir.c_str() );
+    pDir = vlc_opendir( rDir.c_str() );
 
     if( pDir == NULL )
     {
@@ -152,7 +152,7 @@ void ThemeRepository::parseDirectory( const string &rDir_locale )
     }
 
     // While we still have entries in the directory
-    while( ( pszDirContent = utf8_readdir( pDir ) ) != NULL )
+    while( ( pszDirContent = vlc_readdir( pDir ) ) != NULL )
     {
         string name = pszDirContent;
         string extension;

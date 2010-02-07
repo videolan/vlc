@@ -126,7 +126,7 @@ static int Open( vlc_object_t * p_this )
         msg_Info( p_demux, "dumping raw stream to standard output" );
         p_sys->p_file = stdout;
     }
-    else if( ( p_sys->p_file = utf8_fopen( p_sys->psz_file, psz_mode ) ) == NULL )
+    else if( ( p_sys->p_file = vlc_fopen( p_sys->psz_file, psz_mode ) ) == NULL )
     {
         msg_Err( p_demux, "cannot create `%s' for writing", p_sys->psz_file );
         free( p_sys->psz_file );

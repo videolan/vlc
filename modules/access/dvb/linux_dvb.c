@@ -117,7 +117,7 @@ int FrontendOpen( access_t *p_access )
         return VLC_ENOMEM;
 
     msg_Dbg( p_access, "Opening device %s", frontend );
-    if( (p_sys->i_frontend_handle = utf8_open(frontend, O_RDWR | O_NONBLOCK)) < 0 )
+    if( (p_sys->i_frontend_handle = vlc_open(frontend, O_RDWR | O_NONBLOCK)) < 0 )
     {
         msg_Err( p_access, "FrontEndOpen: opening device failed (%m)" );
         free( p_frontend );
@@ -1332,7 +1332,7 @@ int DMXSetFilter( access_t * p_access, int i_pid, int * pi_fd, int i_type )
     }
 
     msg_Dbg( p_access, "Opening device %s", dmx );
-    if( (*pi_fd = utf8_open(dmx, O_RDWR)) < 0 )
+    if( (*pi_fd = vlc_open(dmx, O_RDWR)) < 0 )
     {
         msg_Err( p_access, "DMXSetFilter: opening device failed (%m)" );
         return VLC_EGENERIC;
@@ -1489,7 +1489,7 @@ int DVROpen( access_t * p_access )
     }
 
     msg_Dbg( p_access, "Opening device %s", dvr );
-    if( (p_sys->i_handle = utf8_open(dvr, O_RDONLY)) < 0 )
+    if( (p_sys->i_handle = vlc_open(dvr, O_RDONLY)) < 0 )
     {
         msg_Err( p_access, "DVROpen: opening device failed (%m)" );
         return VLC_EGENERIC;
@@ -1539,7 +1539,7 @@ int CAMOpen( access_t *p_access )
     memset( &caps, 0, sizeof( ca_caps_t ));
 
     msg_Dbg( p_access, "Opening device %s", ca );
-    if( (p_sys->i_ca_handle = utf8_open(ca, O_RDWR | O_NONBLOCK)) < 0 )
+    if( (p_sys->i_ca_handle = vlc_open(ca, O_RDWR | O_NONBLOCK)) < 0 )
     {
         msg_Warn( p_access, "CAMInit: opening CAM device failed (%m)" );
         p_sys->i_ca_handle = 0;

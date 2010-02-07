@@ -31,7 +31,7 @@
 #include <vlc_common.h>
 #include <vlc_charset.h>
 #include <vlc_fs.h>
-#include "libvlc.h" /* utf8_mkdir */
+#include "libvlc.h" /* vlc_mkdir */
 #include <vlc_rand.h>
 
 #include <assert.h>
@@ -90,7 +90,7 @@ static int convert_path (const char *restrict path, wchar_t *restrict wpath)
  * @note Contrary to standard open(), this function returns file handles
  * with the close-on-exec flag enabled.
  */
-int utf8_open (const char *filename, int flags, ...)
+int vlc_open (const char *filename, int flags, ...)
 {
     unsigned int mode = 0;
     va_list ap;
@@ -140,7 +140,7 @@ int utf8_open (const char *filename, int flags, ...)
  * @param mode fopen file open mode
  * @return NULL on error, an open FILE pointer on success.
  */
-FILE *utf8_fopen (const char *filename, const char *mode)
+FILE *vlc_fopen (const char *filename, const char *mode)
 {
     int rwflags = 0, oflags = 0;
     bool append = false;
@@ -176,7 +176,7 @@ FILE *utf8_fopen (const char *filename, const char *mode)
         }
     }
 
-    int fd = utf8_open (filename, rwflags | oflags, 0666);
+    int fd = vlc_open (filename, rwflags | oflags, 0666);
     if (fd == -1)
         return NULL;
 
@@ -201,7 +201,7 @@ FILE *utf8_fopen (const char *filename, const char *mode)
  * @param mode directory permissions
  * @return 0 on success, -1 on error (see errno).
  */
-int utf8_mkdir( const char *dirname, mode_t mode )
+int vlc_mkdir( const char *dirname, mode_t mode )
 {
 #if defined (UNDER_CE)
     (void) mode;
@@ -235,7 +235,7 @@ int utf8_mkdir( const char *dirname, mode_t mode )
  * @return a pointer to the DIR struct, or NULL in case of error.
  * Release with standard closedir().
  */
-DIR *utf8_opendir( const char *dirname )
+DIR *vlc_opendir( const char *dirname )
 {
 #ifdef WIN32
     CONVERT_PATH (dirname, wpath, NULL);
@@ -264,7 +264,7 @@ DIR *utf8_opendir( const char *dirname )
  * @return a UTF-8 string of the directory entry.
  * Use free() to free this memory.
  */
-char *utf8_readdir( DIR *dir )
+char *vlc_readdir( DIR *dir )
 {
 #ifdef WIN32
     struct _wdirent *ent = vlc_wreaddir (dir);
@@ -290,10 +290,10 @@ static int dummy_select( const char *str )
 }
 
 /**
- * Does the same as utf8_scandir(), but takes an open directory pointer
+ * Does the same as vlc_scandir(), but takes an open directory pointer
  * instead of a directory path.
  */
-int utf8_loaddir( DIR *dir, char ***namelist,
+int vlc_loaddir( DIR *dir, char ***namelist,
                   int (*select)( const char * ),
                   int (*compar)( const char **, const char ** ) )
 {
@@ -310,7 +310,7 @@ int utf8_loaddir( DIR *dir, char ***namelist,
 
         rewinddir( dir );
 
-        while( ( entry = utf8_readdir( dir ) ) != NULL )
+        while( ( entry = vlc_readdir( dir ) ) != NULL )
         {
             char **newtab;
 
@@ -359,22 +359,22 @@ int utf8_loaddir( DIR *dir, char ***namelist,
  * @return How many file names were selected (possibly 0),
  * or -1 in case of error.
  */
-int utf8_scandir( const char *dirname, char ***namelist,
+int vlc_scandir( const char *dirname, char ***namelist,
                   int (*select)( const char * ),
                   int (*compar)( const char **, const char ** ) )
 {
-    DIR *dir = utf8_opendir (dirname);
+    DIR *dir = vlc_opendir (dirname);
     int val = -1;
 
     if (dir != NULL)
     {
-        val = utf8_loaddir (dir, namelist, select, compar);
+        val = vlc_loaddir (dir, namelist, select, compar);
         closedir (dir);
     }
     return val;
 }
 
-static int utf8_statEx( const char *filename, struct stat *buf,
+static int vlc_statEx( const char *filename, struct stat *buf,
                         bool deref )
 {
 #ifdef UNDER_CE
@@ -406,9 +406,9 @@ static int utf8_statEx( const char *filename, struct stat *buf,
  *
  * @param filename UTF-8 file path
  */
-int utf8_stat( const char *filename, struct stat *buf)
+int vlc_stat( const char *filename, struct stat *buf)
 {
-    return utf8_statEx( filename, buf, true );
+    return vlc_statEx( filename, buf, true );
 }
 
 /**
@@ -419,7 +419,7 @@ int utf8_stat( const char *filename, struct stat *buf)
  */
 int utf8_lstat( const char *filename, struct stat *buf)
 {
-    return utf8_statEx( filename, buf, false );
+    return vlc_statEx( filename, buf, false );
 }
 
 /**
@@ -429,7 +429,7 @@ int utf8_lstat( const char *filename, struct stat *buf)
  * @return A 0 return value indicates success. A -1 return value indicates an
  *        error, and an error code is stored in errno
  */
-int utf8_unlink( const char *filename )
+int vlc_unlink( const char *filename )
 {
 #ifdef UNDER_CE
     /*_open translates to wchar internally on WinCE*/
@@ -460,7 +460,7 @@ int utf8_unlink( const char *filename )
  * @return A 0 return value indicates success. A -1 return value indicates an
  *        error, and an error code is stored in errno
  */
-int utf8_rename (const char *oldpath, const char *newpath)
+int vlc_rename (const char *oldpath, const char *newpath)
 {
 #if defined (WIN32)
     CONVERT_PATH (oldpath, wold, -1);
@@ -495,7 +495,7 @@ error:
     return ret;
 }
 
-int utf8_mkstemp( char *template )
+int vlc_mkstemp( char *template )
 {
     static const char digits[] = "0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ";
     static const int i_digits = sizeof(digits)/sizeof(*digits) - 1;
@@ -524,7 +524,7 @@ int utf8_mkstemp( char *template )
             psz_rand[j] = digits[pi_rand[j] % i_digits];
 
         /* */
-        int fd = utf8_open( template, O_CREAT | O_EXCL | O_RDWR, 0600 );
+        int fd = vlc_open( template, O_CREAT | O_EXCL | O_RDWR, 0600 );
         if( fd >= 0 )
             return fd;
         if( errno != EEXIST )

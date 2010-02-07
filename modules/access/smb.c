@@ -41,7 +41,7 @@
 #       include <sys/stat.h>
 #   endif
 #   include <io.h>
-#   define smbc_open(a,b,c) utf8_open(a,b,c)
+#   define smbc_open(a,b,c) vlc_open(a,b,c)
 #   define smbc_fstat(a,b) _fstati64(a,b)
 #   define smbc_read read
 #   define smbc_lseek _lseeki64

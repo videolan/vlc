@@ -77,7 +77,7 @@ bool ThemeLoader::load( const string &fileName )
 
     //Before all, let's see if the file is present
     struct stat p_stat;
-    if( utf8_stat( path.c_str(), &p_stat ) )
+    if( vlc_stat( path.c_str(), &p_stat ) )
         return false;
 
     // First, we try to un-targz the file, and if it fails we hope it's a XML
@@ -415,7 +415,7 @@ bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
     char *pszDirContent;
 
     // Open the dir
-    pCurrDir = utf8_opendir( rootDir.c_str() );
+    pCurrDir = vlc_opendir( rootDir.c_str() );
 
     if( pCurrDir == NULL )
     {
@@ -425,7 +425,7 @@ bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
     }
 
     // While we still have entries in the directory
-    while( ( pszDirContent = utf8_readdir( pCurrDir ) ) != NULL )
+    while( ( pszDirContent = vlc_readdir( pCurrDir ) ) != NULL )
     {
         string newURI = rootDir + sep + pszDirContent;
 
@@ -436,7 +436,7 @@ bool ThemeLoader::findFile( const string &rootDir, const string &rFileName,
 #if defined( S_ISDIR )
             struct stat stat_data;
 
-            if( ( utf8_stat( newURI.c_str(), &stat_data ) == 0 )
+            if( ( vlc_stat( newURI.c_str(), &stat_data ) == 0 )
              && S_ISDIR(stat_data.st_mode) )
 #elif defined( DT_DIR )
             if( pDirContent->d_type & DT_DIR )

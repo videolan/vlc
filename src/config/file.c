@@ -76,7 +76,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
 
     msg_Dbg( p_obj, "opening config file (%s)", psz_filename );
 
-    FILE *p_stream = utf8_fopen( psz_filename, "rt" );
+    FILE *p_stream = vlc_fopen( psz_filename, "rt" );
     if( p_stream == NULL && errno != ENOENT )
     {
         msg_Err( p_obj, "cannot open config file (%s): %m",
@@ -95,7 +95,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
          && asprintf( &psz_old, "%s/.vlc/" CONFIG_FILE,
                       home ) != -1 )
         {
-            p_stream = utf8_fopen( psz_old, "rt" );
+            p_stream = vlc_fopen( psz_old, "rt" );
             if( p_stream )
             {
                 /* Old config file found. We want to write it at the
@@ -106,7 +106,7 @@ static FILE *config_OpenConfigFile( vlc_object_t *p_obj )
                 if( asprintf(&psz_readme,"%s/.vlc/README",
                              home ) != -1 )
                 {
-                    FILE *p_readme = utf8_fopen( psz_readme, "wt" );
+                    FILE *p_readme = vlc_fopen( psz_readme, "wt" );
                     if( p_readme )
                     {
                         fprintf( p_readme, "The VLC media player "
@@ -330,7 +330,7 @@ int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
 {
     if( !psz_dirname || !*psz_dirname ) return -1;
 
-    if( utf8_mkdir( psz_dirname, 0700 ) == 0 )
+    if( vlc_mkdir( psz_dirname, 0700 ) == 0 )
         return 0;
 
     switch( errno )
@@ -350,7 +350,7 @@ int config_CreateDir( vlc_object_t *p_this, const char *psz_dirname )
                 *psz_end = '\0';
                 if( config_CreateDir( p_this, psz_parent ) == 0 )
                 {
-                    if( !utf8_mkdir( psz_dirname, 0700 ) )
+                    if( !vlc_mkdir( psz_dirname, 0700 ) )
                         return 0;
                 }
             }
@@ -541,7 +541,7 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     static vlc_mutex_t lock = VLC_STATIC_MUTEX;
     vlc_mutex_lock (&lock);
 
-    int fd = utf8_open (temporary, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR);
+    int fd = vlc_open (temporary, O_CREAT|O_WRONLY|O_TRUNC, S_IRUSR|S_IWUSR);
     if (fd == -1)
     {
         vlc_rwlock_unlock (&config_lock);
@@ -699,8 +699,8 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     fdatasync (fd); /* Flush from OS */
 #endif
     /* Atomically replace the file... */
-    if (utf8_rename (temporary, permanent))
-        utf8_unlink (temporary);
+    if (vlc_rename (temporary, permanent))
+        vlc_unlink (temporary);
     /* (...then synchronize the directory, err, TODO...) */
     /* ...and finally close the file */
     vlc_mutex_unlock (&lock);
@@ -708,9 +708,9 @@ static int SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name,
     fclose (file);
 #ifdef WIN32
     /* Windows cannot remove open files nor overwrite existing ones */
-    utf8_unlink (permanent);
-    if (utf8_rename (temporary, permanent))
-        utf8_unlink (temporary);
+    vlc_unlink (permanent);
+    if (vlc_rename (temporary, permanent))
+        vlc_unlink (temporary);
     vlc_mutex_unlock (&lock);
 #endif
 

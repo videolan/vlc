@@ -58,7 +58,7 @@ static void vlc_rand_init (void)
     uint8_t key[BLOCK_SIZE];
 
     /* Get non-predictible value as key for HMAC */
-    int fd = utf8_open (randfile, O_RDONLY);
+    int fd = vlc_open (randfile, O_RDONLY);
     if (fd == -1)
         return; /* Uho! */
 

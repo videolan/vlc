@@ -288,7 +288,7 @@ struct demux_sys_t
 #   define v4l1_ioctl ioctl
 #   define v4l1_mmap mmap
 #   define v4l1_munmap munmap
-#   define v4l1_open utf8_open
+#   define v4l1_open vlc_open
 #endif
 
 /*****************************************************************************

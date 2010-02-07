@@ -191,8 +191,8 @@ static inline locale_t newlocale(int mask, const char * locale, locale_t base)
 
 #ifdef WIN32
 # include <dirent.h>
-# define opendir Use_utf8_opendir_or_vlc_wopendir_instead!
-# define readdir Use_utf8_readdir_or_vlc_wreaddir_instead!
+# define opendir Use_vlc_opendir_or_vlc_wopendir_instead!
+# define readdir Use_vlc_readdir_or_vlc_wreaddir_instead!
 # define closedir vlc_wclosedir
 #endif
 

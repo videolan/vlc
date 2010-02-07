@@ -186,7 +186,7 @@ static void *Run( void *data )
         /* make sure the directory exists */
         struct stat st;
         if( psz_dir == NULL            ||
-            utf8_stat( psz_dir, &st )  ||
+            vlc_stat( psz_dir, &st )  ||
             !S_ISDIR( st.st_mode ) )
             continue;
 

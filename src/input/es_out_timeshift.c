@@ -1067,7 +1067,7 @@ static ts_storage_t *TsStorageNew( const char *psz_tmp_path, int64_t i_tmp_size_
     p_storage->i_file_size = 0;
     p_storage->p_filew = GetTmpFile( &p_storage->psz_file, psz_tmp_path );
     if( p_storage->psz_file )
-        p_storage->p_filer = utf8_fopen( p_storage->psz_file, "rb" );
+        p_storage->p_filer = vlc_fopen( p_storage->psz_file, "rb" );
 
     /* */
     p_storage->i_cmd_w = 0;
@@ -1102,7 +1102,7 @@ static void TsStorageDelete( ts_storage_t *p_storage )
 
     if( p_storage->psz_file )
     {
-        utf8_unlink( p_storage->psz_file );
+        vlc_unlink( p_storage->psz_file );
         free( p_storage->psz_file );
     }
 
@@ -1536,9 +1536,9 @@ static char *GetTmpPath( char *psz_path )
     {
         /* Make sure that the path exists and is a directory */
         struct stat s;
-        const int i_ret = utf8_stat( psz_path, &s );
+        const int i_ret = vlc_stat( psz_path, &s );
 
-        if( i_ret < 0 && !utf8_mkdir( psz_path, 0600 ) )
+        if( i_ret < 0 && !vlc_mkdir( psz_path, 0600 ) )
             return psz_path;
         else if( i_ret == 0 && ( s.st_mode & S_IFDIR ) )
             return psz_path;
@@ -1593,7 +1593,7 @@ static FILE *GetTmpFile( char **ppsz_file, const char *psz_path )
         return NULL;
 
     /* */
-    fd = utf8_mkstemp( psz_name );
+    fd = vlc_mkstemp( psz_name );
     *ppsz_file = psz_name;
 
     if( fd < 0 )

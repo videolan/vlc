@@ -522,7 +522,7 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
     if( *psz_dirname == '\0' )
         psz_dirname = ".";
 
-    dir = utf8_opendir( psz_dirname );
+    dir = vlc_opendir( psz_dirname );
     if( dir == NULL )
     {
         if (errno != ENOENT)
@@ -533,7 +533,7 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
 
         msg_Dbg (p_this, "creating empty certificate directory: %s",
                  psz_dirname);
-        utf8_mkdir (psz_dirname, b_priv ? 0700 : 0755);
+        vlc_mkdir (psz_dirname, b_priv ? 0700 : 0755);
         return VLC_SUCCESS;
     }
 #ifdef S_ISLNK
@@ -559,7 +559,7 @@ gnutls_Addx509Directory( vlc_object_t *p_this,
 
     for (;;)
     {
-        char *ent = utf8_readdir (dir);
+        char *ent = vlc_readdir (dir);
         if (ent == NULL)
             break;
 
@@ -588,7 +588,7 @@ gnutls_Addx509File( vlc_object_t *p_this,
 {
     struct stat st;
 
-    int fd = utf8_open (psz_path, O_RDONLY);
+    int fd = vlc_open (psz_path, O_RDONLY);
     if (fd == -1)
         goto error;
 
@@ -681,7 +681,7 @@ static int OpenClient (vlc_object_t *obj)
     {
         char path[strlen (userdir) + sizeof ("/ssl/private")];
         sprintf (path, "%s/ssl", userdir);
-        utf8_mkdir (path, 0755);
+        vlc_mkdir (path, 0755);
 
         sprintf (path, "%s/ssl/certs", userdir);
         gnutls_Addx509Directory (VLC_OBJECT (p_session),

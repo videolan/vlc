@@ -1059,7 +1059,7 @@ static int OpenDisplay( intf_thread_t *p_intf )
         return VLC_EGENERIC;
     }
 
-    p_sys->i_fd = utf8_open( psz_device, O_RDWR );
+    p_sys->i_fd = vlc_open( psz_device, O_RDWR );
     if( p_sys->i_fd == -1 )
     {
         msg_Err( p_intf, "cannot open %s (%m)", psz_device );

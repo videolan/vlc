@@ -372,7 +372,7 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
             pid_t i_pid = getpid ();
             msg_Dbg( p_libvlc, "PID is %d, writing it to %s",
                                i_pid, psz_pidfile );
-            pidfile = utf8_fopen( psz_pidfile,"w" );
+            pidfile = vlc_fopen( psz_pidfile,"w" );
             if( pidfile != NULL )
             {
                 utf8_fprintf( pidfile, "%d", (int)i_pid );

@@ -548,7 +548,7 @@ static char *ReadPasswordFile( vlc_object_t *p_this, const char *psz_path )
     char *psz_newline;
     char ps_buffer[256];
 
-    p_file = utf8_fopen( psz_path, "rt" );
+    p_file = vlc_fopen( psz_path, "rt" );
     if ( p_file == NULL )
     {
         msg_Err( p_this, "Unable to open password file '%s': %m", psz_path );

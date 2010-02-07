@@ -31,26 +31,26 @@
 #include <sys/types.h>
 #include <dirent.h>
 
-VLC_EXPORT( int, utf8_open, ( const char *filename, int flags, ... ) LIBVLC_USED );
-VLC_EXPORT( FILE *, utf8_fopen, ( const char *filename, const char *mode ) LIBVLC_USED );
+VLC_EXPORT( int, vlc_open, ( const char *filename, int flags, ... ) LIBVLC_USED );
+VLC_EXPORT( FILE *, vlc_fopen, ( const char *filename, const char *mode ) LIBVLC_USED );
 
-VLC_EXPORT( DIR *, utf8_opendir, ( const char *dirname ) LIBVLC_USED );
-VLC_EXPORT( char *, utf8_readdir, ( DIR *dir ) LIBVLC_USED );
-VLC_EXPORT( int, utf8_loaddir, ( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
-VLC_EXPORT( int, utf8_scandir, ( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
-VLC_EXPORT( int, utf8_mkdir, ( const char *filename, mode_t mode ) );
+VLC_EXPORT( DIR *, vlc_opendir, ( const char *dirname ) LIBVLC_USED );
+VLC_EXPORT( char *, vlc_readdir, ( DIR *dir ) LIBVLC_USED );
+VLC_EXPORT( int, vlc_loaddir, ( DIR *dir, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
+VLC_EXPORT( int, vlc_scandir, ( const char *dirname, char ***namelist, int (*select)( const char * ), int (*compar)( const char **, const char ** ) ) );
+VLC_EXPORT( int, vlc_mkdir, ( const char *filename, mode_t mode ) );
 
-VLC_EXPORT( int, utf8_unlink, ( const char *filename ) );
+VLC_EXPORT( int, vlc_unlink, ( const char *filename ) );
 /* Not exported */
-int utf8_rename( const char *, const char * );
+int vlc_rename( const char *, const char * );
 
 #if defined( WIN32 ) && !defined( UNDER_CE )
 # define stat _stati64
 #endif
 
-VLC_EXPORT( int, utf8_stat, ( const char *filename, struct stat *buf ) );
+VLC_EXPORT( int, vlc_stat, ( const char *filename, struct stat *buf ) );
 VLC_EXPORT( int, utf8_lstat, ( const char *filename, struct stat *buf ) );
 
-VLC_EXPORT( int, utf8_mkstemp, ( char * ) );
+VLC_EXPORT( int, vlc_mkstemp, ( char * ) );
 
 #endif

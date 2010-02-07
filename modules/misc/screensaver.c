@@ -88,7 +88,7 @@ static int Activate( vlc_object_t *p_this )
     }
     p_ih->inhibit = Inhibit;
 
-    int fd = utf8_open ("/dev/null", O_WRONLY);
+    int fd = vlc_open ("/dev/null", O_WRONLY);
     posix_spawn_file_actions_init (&p_sys->actions);
     if (fd != -1)
     {

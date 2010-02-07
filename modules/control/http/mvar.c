@@ -511,7 +511,7 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
     psz_dir = RealPath( psz_dir );
 
     /* parse psz_src dir */
-    if( ( i_dir_content = utf8_scandir( psz_dir, &ppsz_dir_content, Filter,
+    if( ( i_dir_content = vlc_scandir( psz_dir, &ppsz_dir_content, Filter,
                                         InsensitiveAlphasort ) ) == -1 )
     {
         if( errno != ENOENT && errno != ENOTDIR )
@@ -540,7 +540,7 @@ mvar_t *mvar_FileSetNew( intf_thread_t *p_intf, char *name,
             sprintf( psz_tmp, "%s"DIR_SEP"%s", psz_dir, psz_name );
 
 #ifdef HAVE_SYS_STAT_H
-            if( utf8_stat( psz_tmp, &stat_info ) == -1 )
+            if( vlc_stat( psz_tmp, &stat_info ) == -1 )
             {
                 free( psz_name );
                 continue;

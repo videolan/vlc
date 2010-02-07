@@ -125,7 +125,7 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
 
     int           i_dirlen;
 
-    if( ( p_dir = utf8_opendir( psz_dir ) ) == NULL )
+    if( ( p_dir = vlc_opendir( psz_dir ) ) == NULL )
     {
         if( errno != ENOENT && errno != ENOTDIR )
             msg_Err( p_intf, "cannot open directory (%s)", psz_dir );
@@ -143,7 +143,7 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
     msg_Dbg( p_intf, "dir=%s", psz_dir );
 
     snprintf( dir, sizeof( dir ), "%s"DIR_SEP".access", psz_dir );
-    if( ( file = utf8_fopen( dir, "r" ) ) != NULL )
+    if( ( file = vlc_fopen( dir, "r" ) ) != NULL )
     {
         char line[1024];
         int  i_size;
@@ -182,7 +182,7 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
         ACL_Destroy( p_acl );
 
         struct stat st;
-        if( utf8_stat( dir, &st ) == 0 )
+        if( vlc_stat( dir, &st ) == 0 )
         {
             free( user );
             free( password );
@@ -196,7 +196,7 @@ int ParseDirectory( intf_thread_t *p_intf, char *psz_root,
     {
         char *psz_filename;
         /* parse psz_src dir */
-        if( ( psz_filename = utf8_readdir( p_dir ) ) == NULL )
+        if( ( psz_filename = vlc_readdir( p_dir ) ) == NULL )
         {
             break;
         }

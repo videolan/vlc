@@ -157,12 +157,12 @@ static int Open( vlc_object_t * p_this )
                 }
             }
 
-            DIR *p_src_dir = utf8_opendir(s_path.c_str());
+            DIR *p_src_dir = vlc_opendir(s_path.c_str());
 
             if (p_src_dir != NULL)
             {
                 char *psz_file;
-                while ((psz_file = utf8_readdir(p_src_dir)) != NULL)
+                while ((psz_file = vlc_readdir(p_src_dir)) != NULL)
                 {
                     if (strlen(psz_file) > 4)
                     {

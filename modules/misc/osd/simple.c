@@ -54,7 +54,7 @@ int osd_parser_simpleOpen( vlc_object_t *p_this )
     if( !p_menu ) return VLC_ENOOBJ;
 
     msg_Dbg( p_this, "opening osdmenu definition file %s", p_menu->psz_file );
-    fd = utf8_fopen( p_menu->psz_file, "r" );
+    fd = vlc_fopen( p_menu->psz_file, "r" );
     if( !fd )
     {
         msg_Err( p_this, "failed to open osdmenu definition file %s",

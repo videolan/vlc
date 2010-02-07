@@ -56,7 +56,7 @@ int playlist_Export( playlist_t * p_playlist, const char *psz_filename,
     /* Prepare the playlist_export_t structure */
     p_export->p_root = p_export_root;
     p_export->psz_filename = psz_filename;
-    p_export->p_file = utf8_fopen( psz_filename, "wt" );
+    p_export->p_file = vlc_fopen( psz_filename, "wt" );
     if( p_export->p_file == NULL )
         msg_Err( p_export, "could not create playlist file %s (%m)",
                  psz_filename );
@@ -133,7 +133,7 @@ int playlist_MLLoad( playlist_t *p_playlist )
     if( asprintf( &psz_uri, "%s" DIR_SEP "ml.xspf", psz_datadir ) != -1 )
     {   /* loosy check for media library file */
         struct stat st;
-        int ret = utf8_stat( psz_uri , &st );
+        int ret = vlc_stat( psz_uri , &st );
         free( psz_uri );
         if( ret )
         {

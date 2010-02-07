@@ -524,7 +524,7 @@ static int OpenDisplay(vout_display_t *vd, bool force_resolution)
         return VLC_EGENERIC;
     }
 
-    sys->fd = utf8_open(psz_device, O_RDWR);
+    sys->fd = vlc_open(psz_device, O_RDWR);
     if (sys->fd == -1) {
         msg_Err(vd, "cannot open %s (%m)", psz_device);
         free(psz_device);

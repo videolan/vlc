@@ -377,7 +377,7 @@ static int ImageWriteUrl( image_handler_t *p_image, picture_t *p_pic,
         p_fmt_out->i_chroma = image_Ext2Fourcc( psz_url );
     }
 
-    file = utf8_fopen( psz_url, "wb" );
+    file = vlc_fopen( psz_url, "wb" );
     if( !file )
     {
         msg_Err( p_image->p_parent, "%s: %m", psz_url );

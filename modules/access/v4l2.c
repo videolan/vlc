@@ -593,7 +593,7 @@ struct demux_sys_t
 #ifdef HAVE_LIBV4L2
 static void use_kernel_v4l2( demux_sys_t *p_sys )
 {
-    p_sys->pf_open = utf8_open;
+    p_sys->pf_open = vlc_open;
     p_sys->pf_close = close;
     p_sys->pf_dup = dup;
     p_sys->pf_ioctl = ioctl;
@@ -623,7 +623,7 @@ static void use_libv4l2( demux_sys_t *p_sys )
 #   define v4l2_mmap (p_sys->pf_mmap)
 #   define v4l2_munmap (p_sys->pf_munmap)
 #else
-#   define v4l2_open utf8_open
+#   define v4l2_open vlc_open
 #   define v4l2_close close
 #   define v4l2_dup dup
 #   define v4l2_ioctl ioctl
