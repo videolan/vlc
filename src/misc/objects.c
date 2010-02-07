@@ -101,8 +101,9 @@ static void libvlc_unlock (libvlc_int_t *p_libvlc)
     vlc_mutex_unlock (&(libvlc_priv (p_libvlc)->structure_lock));
 }
 
-void *__vlc_custom_create( vlc_object_t *p_this, size_t i_size,
-                           int i_type, const char *psz_type )
+#undef vlc_custom_create
+void *vlc_custom_create( vlc_object_t *p_this, size_t i_size,
+                         int i_type, const char *psz_type )
 {
     vlc_object_t *p_new;
     vlc_object_internals_t *p_priv;
@@ -189,7 +190,7 @@ void *vlc_object_create( vlc_object_t *p_this, size_t i_size )
     return vlc_custom_create( p_this, i_size, VLC_OBJECT_GENERIC, "generic" );
 }
 
-
+#undef vlc_object_set_destructor
 /**
  ****************************************************************************
  * Set the destructor of a vlc object
@@ -198,8 +199,8 @@ void *vlc_object_create( vlc_object_t *p_this, size_t i_size )
  * when the object is destroyed when the its refcount reaches 0.
  * (It is called by the internal function vlc_object_destroy())
  *****************************************************************************/
-void __vlc_object_set_destructor( vlc_object_t *p_this,
-                                  vlc_destructor_t pf_destructor )
+void vlc_object_set_destructor( vlc_object_t *p_this,
+                                vlc_destructor_t pf_destructor )
 {
     vlc_object_internals_t *p_priv = vlc_internals(p_this );
 
@@ -374,12 +375,12 @@ int vlc_object_waitpipe( vlc_object_t *obj )
     return internals->pipes[0];
 }
 
-
+#undef vlc_object_kill
 /**
  * Requests termination of an object, cancels the object thread, and make the
  * object wait pipe (if it exists) readable. Not a cancellation point.
  */
-void __vlc_object_kill( vlc_object_t *p_this )
+void vlc_object_kill( vlc_object_t *p_this )
 {
     vlc_object_internals_t *priv = vlc_internals( p_this );
     int fd = -1;
@@ -406,14 +407,14 @@ void __vlc_object_kill( vlc_object_t *p_this )
     }
 }
 
-
+#undef vlc_object_find
 /*****************************************************************************
  * find a typed object and increment its refcount
  *****************************************************************************
  * This function recursively looks for a given object type. i_mode can be one
  * of FIND_PARENT, FIND_CHILD or FIND_ANYWHERE.
  *****************************************************************************/
-void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
+void * vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
 {
     vlc_object_t *p_found;
 
@@ -426,7 +427,7 @@ void * __vlc_object_find( vlc_object_t *p_this, int i_type, int i_mode )
 
     /* Otherwise, recursively look for the object */
     if (i_mode == FIND_ANYWHERE)
-        return vlc_object_find (p_this->p_libvlc, i_type, FIND_CHILD);
+        return vlc_object_find (VLC_OBJECT(p_this->p_libvlc), i_type, FIND_CHILD);
 
     switch (i_type)
     {
@@ -526,10 +527,11 @@ vlc_object_t *vlc_object_find_name( vlc_object_t *p_this,
     return p_found;
 }
 
+#undef vlc_object_hold
 /**
  * Increment an object reference counter.
  */
-void * __vlc_object_hold( vlc_object_t *p_this )
+void * vlc_object_hold( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
 
@@ -542,11 +544,12 @@ void * __vlc_object_hold( vlc_object_t *p_this )
     return p_this;
 }
 
+#undef vlc_object_release
 /*****************************************************************************
  * Decrement an object refcount
  * And destroy the object if its refcount reach zero.
  *****************************************************************************/
-void __vlc_object_release( vlc_object_t *p_this )
+void vlc_object_release( vlc_object_t *p_this )
 {
     vlc_object_internals_t *internals = vlc_internals( p_this );
     vlc_object_t *parent = NULL;
@@ -598,6 +601,7 @@ void __vlc_object_release( vlc_object_t *p_this )
     }
 }
 
+#undef vlc_object_attach
 /**
  ****************************************************************************
  * attach object to a parent object
@@ -605,7 +609,7 @@ void __vlc_object_release( vlc_object_t *p_this )
  * This function sets p_this as a child of p_parent, and p_parent as a parent
  * of p_this. This link can be undone using vlc_object_detach.
  *****************************************************************************/
-void __vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
+void vlc_object_attach( vlc_object_t *p_this, vlc_object_t *p_parent )
 {
     if( !p_this ) return;
 
@@ -694,12 +698,13 @@ void vlc_object_detach( vlc_object_t *p_this )
         vlc_object_release (p_parent);
 }
 
+#undef vlc_list_children
 /**
  * Gets the list of children of an objects, and increment their reference
  * count.
  * @return a list (possibly empty) or NULL in case of error.
  */
-vlc_list_t *__vlc_list_children( vlc_object_t *obj )
+vlc_list_t *vlc_list_children( vlc_object_t *obj )
 {
     vlc_list_t *l;
     vlc_object_internals_t *priv;
