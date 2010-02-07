@@ -85,19 +85,18 @@ extern "C" {
 int net_Socket (vlc_object_t *obj, int family, int socktype, int proto);
 int net_SetupSocket (int fd);
 
-#define net_Connect(a, b, c, d, e) __net_Connect(VLC_OBJECT(a), b, c, d, e)
-VLC_EXPORT( int, __net_Connect, (vlc_object_t *p_this, const char *psz_host, int i_port, int socktype, int protocol) );
+VLC_EXPORT( int, net_Connect, (vlc_object_t *p_this, const char *psz_host, int i_port, int socktype, int protocol) );
+#define net_Connect(a, b, c, d, e) net_Connect(VLC_OBJECT(a), b, c, d, e)
 
 VLC_EXPORT( int *, net_Listen, (vlc_object_t *p_this, const char *psz_host, int i_port, int protocol) );
 
 #define net_ListenTCP(a, b, c) net_Listen(VLC_OBJECT(a), b, c, IPPROTO_TCP)
-#define net_ConnectTCP(a, b, c) __net_ConnectTCP(VLC_OBJECT(a), b, c)
 
-static inline int __net_ConnectTCP (vlc_object_t *obj, const char *host, int port)
+static inline int net_ConnectTCP (vlc_object_t *obj, const char *host, int port)
 {
-    return __net_Connect (obj, host, port, SOCK_STREAM, IPPROTO_TCP);
+    return net_Connect (obj, host, port, SOCK_STREAM, IPPROTO_TCP);
 }
-
+#define net_ConnectTCP(a, b, c) net_ConnectTCP(VLC_OBJECT(a), b, c)
 
 VLC_EXPORT( int, net_AcceptSingle, (vlc_object_t *obj, int lfd) );
 
@@ -105,16 +104,18 @@ VLC_EXPORT( int, net_Accept, ( vlc_object_t *, int * ) );
 #define net_Accept(a, b) \
         net_Accept(VLC_OBJECT(a), b)
 
-#define net_ConnectDgram(a, b, c, d, e ) __net_ConnectDgram(VLC_OBJECT(a), b, c, d, e)
-VLC_EXPORT( int, __net_ConnectDgram, ( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim, int proto ) );
+VLC_EXPORT( int, net_ConnectDgram, ( vlc_object_t *p_this, const char *psz_host, int i_port, int hlim, int proto ) );
+#define net_ConnectDgram(a, b, c, d, e ) \
+        net_ConnectDgram(VLC_OBJECT(a), b, c, d, e)
 
 static inline int net_ConnectUDP (vlc_object_t *obj, const char *host, int port, int hlim)
 {
     return net_ConnectDgram (obj, host, port, hlim, IPPROTO_UDP);
 }
 
-#define net_OpenDgram( a, b, c, d, e, g, h ) __net_OpenDgram(VLC_OBJECT(a), b, c, d, e, g, h)
-VLC_EXPORT( int, __net_OpenDgram, ( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server, int family, int proto ) );
+VLC_EXPORT( int, net_OpenDgram, ( vlc_object_t *p_this, const char *psz_bind, int i_bind, const char *psz_server, int i_server, int family, int proto ) );
+#define net_OpenDgram( a, b, c, d, e, g, h ) \
+        net_OpenDgram(VLC_OBJECT(a), b, c, d, e, g, h)
 
 static inline int net_ListenUDP1 (vlc_object_t *obj, const char *host, int port)
 {
@@ -136,20 +137,17 @@ struct virtual_socket_t
     int (*pf_send) ( void *, const void *, int );
 };
 
-#define net_Read(a,b,c,d,e,f) __net_Read(VLC_OBJECT(a),b,c,d,e,f)
-VLC_EXPORT( ssize_t, __net_Read, ( vlc_object_t *p_this, int fd, const v_socket_t *, void *p_data, size_t i_data, bool b_retry ) );
+VLC_EXPORT( ssize_t, net_Read, ( vlc_object_t *p_this, int fd, const v_socket_t *, void *p_data, size_t i_data, bool b_retry ) );
+#define net_Read(a,b,c,d,e,f) net_Read(VLC_OBJECT(a),b,c,d,e,f)
+VLC_EXPORT( ssize_t, net_Write, ( vlc_object_t *p_this, int fd, const v_socket_t *, const void *p_data, size_t i_data ) );
+#define net_Write(a,b,c,d,e) net_Write(VLC_OBJECT(a),b,c,d,e)
+VLC_EXPORT( char *, net_Gets, ( vlc_object_t *p_this, int fd, const v_socket_t * ) );
+#define net_Gets(a,b,c) net_Gets(VLC_OBJECT(a),b,c)
 
-#define net_Write(a,b,c,d,e) __net_Write(VLC_OBJECT(a),b,c,d,e)
-VLC_EXPORT( ssize_t, __net_Write, ( vlc_object_t *p_this, int fd, const v_socket_t *, const void *p_data, size_t i_data ) );
-
-#define net_Gets(a,b,c) __net_Gets(VLC_OBJECT(a),b,c)
-VLC_EXPORT( char *, __net_Gets, ( vlc_object_t *p_this, int fd, const v_socket_t * ) );
 
 VLC_EXPORT( ssize_t, net_Printf, ( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, ... ) LIBVLC_FORMAT( 4, 5 ) );
-
-#define net_vaPrintf(a,b,c,d,e) __net_vaPrintf(VLC_OBJECT(a),b,c,d,e)
-VLC_EXPORT( ssize_t, __net_vaPrintf, ( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args ) );
-
+VLC_EXPORT( ssize_t, net_vaPrintf, ( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args ) );
+#define net_vaPrintf(a,b,c,d,e) net_vaPrintf(VLC_OBJECT(a),b,c,d,e)
 
 VLC_EXPORT (int, vlc_inet_pton, (int af, const char *src, void *dst) );
 VLC_EXPORT (const char *, vlc_inet_ntop, (int af, const void *src,

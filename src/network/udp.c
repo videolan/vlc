@@ -642,15 +642,15 @@ static int net_SetDSCP( int fd, uint8_t dscp )
     return setsockopt( fd, level, cmd, &(int){ dscp }, sizeof (int));
 }
 
-
+#undef net_ConnectDgram
 /*****************************************************************************
- * __net_ConnectDgram:
+ * net_ConnectDgram:
  *****************************************************************************
  * Open a datagram socket to send data to a defined destination, with an
  * optional hop limit.
  *****************************************************************************/
-int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
-                        int i_hlim, int proto )
+int net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
+                      int i_hlim, int proto )
 {
     struct addrinfo hints, *res, *ptr;
     int             i_val, i_handle = -1;
@@ -744,15 +744,15 @@ int __net_ConnectDgram( vlc_object_t *p_this, const char *psz_host, int i_port,
     return i_handle;
 }
 
-
+#undef net_OpenDgram
 /*****************************************************************************
- * __net_OpenDgram:
+ * net_OpenDgram:
  *****************************************************************************
  * OpenDgram a datagram socket and return a handle
  *****************************************************************************/
-int __net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
-                     const char *psz_server, int i_server,
-                     int family, int protocol )
+int net_OpenDgram( vlc_object_t *obj, const char *psz_bind, int i_bind,
+                   const char *psz_server, int i_server,
+                   int family, int protocol )
 {
     if ((psz_server == NULL) || (psz_server[0] == '\0'))
         return net_ListenSingle (obj, psz_bind, i_bind, family, protocol);

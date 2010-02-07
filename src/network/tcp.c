@@ -65,14 +65,15 @@ static int SocksHandshakeTCP( vlc_object_t *,
 extern int net_Socket( vlc_object_t *p_this, int i_family, int i_socktype,
                        int i_protocol );
 
+#undef net_Connect
 /*****************************************************************************
- * __net_Connect:
+ * net_Connect:
  *****************************************************************************
  * Open a network connection.
  * @return socket handler or -1 on error.
  *****************************************************************************/
-int __net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
-                   int type, int proto )
+int net_Connect( vlc_object_t *p_this, const char *psz_host, int i_port,
+                 int type, int proto )
 {
     struct addrinfo hints, *res, *ptr;
     const char      *psz_realhost;
