@@ -18,6 +18,7 @@ Decoders:
  * Support for DxVA2 for H.264 decoding on GPU on Windows Vista and 7
  * Support for VAAPI for H.264 decoding on GPU on GNU/Linux
  * Multiple improvements for subtitles styles .SRT and .SSA
+ * Audio/Video decoder using OpenMAX IL components
 
 Demuxers:
  * Support for ADPCM in .flv streams
@@ -101,6 +102,7 @@ Windows port:
 
 Maemo port:
  * Multiple improvements for N900 compliance and efficiency
+ * Support for HW accelerated video decoding on N900
 
 Misc:
  * new sqlite module
