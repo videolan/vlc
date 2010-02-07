@@ -399,11 +399,11 @@ stream_Delete
 stream_DemuxNew
 stream_DemuxSend
 stream_FilterNew
-__stream_MemoryNew
+stream_MemoryNew
 stream_Peek
 stream_Read
 stream_ReadLine
-__stream_UrlNew
+stream_UrlNew
 stream_vaControl
 __str_format
 __str_format_meta

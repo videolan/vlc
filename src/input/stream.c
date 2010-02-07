@@ -243,10 +243,11 @@ void stream_CommonDelete( stream_t *s )
     vlc_object_release( s );
 }
 
+#undef stream_UrlNew
 /****************************************************************************
  * stream_UrlNew: create a stream from a access
  ****************************************************************************/
-stream_t *__stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
+stream_t *stream_UrlNew( vlc_object_t *p_parent, const char *psz_url )
 {
     const char *psz_access, *psz_demux;
     char *psz_path;

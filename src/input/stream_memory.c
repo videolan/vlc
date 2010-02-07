@@ -41,6 +41,7 @@ static int  Peek   ( stream_t *, const uint8_t **pp_peek, unsigned int i_read );
 static int  Control( stream_t *, int i_query, va_list );
 static void Delete ( stream_t * );
 
+#undef stream_MemoryNew
 /**
  * Create a stream from a memory buffer
  *
@@ -50,8 +51,8 @@ static void Delete ( stream_t * );
  * \param i_preserve_memory if this is set to false the memory buffer
  *        pointed to by p_buffer is freed on stream_Destroy
  */
-stream_t *__stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
-                              uint64_t i_size, bool i_preserve_memory )
+stream_t *stream_MemoryNew( vlc_object_t *p_this, uint8_t *p_buffer,
+                            uint64_t i_size, bool i_preserve_memory )
 {
     stream_t *s = stream_CommonNew( p_this );
     stream_sys_t *p_sys;

@@ -176,15 +176,16 @@ VLC_EXPORT( void,      stream_DemuxSend,  ( stream_t *s, block_t *p_block ) );
  * Create a stream_t reading from memory.
  * You must delete it using stream_Delete.
  */
-#define stream_MemoryNew( a, b, c, d ) __stream_MemoryNew( VLC_OBJECT(a), b, c, d )
-VLC_EXPORT( stream_t *,__stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buffer, uint64_t i_size, bool b_preserve_memory ) );
+VLC_EXPORT( stream_t *, stream_MemoryNew, (vlc_object_t *p_obj, uint8_t *p_buffer, uint64_t i_size, bool b_preserve_memory ) );
+#define stream_MemoryNew( a, b, c, d ) stream_MemoryNew( VLC_OBJECT(a), b, c, d )
 
 /**
  * Create a stream_t reading from an URL.
  * You must delete it using stream_Delete.
  */
-#define stream_UrlNew( a, b ) __stream_UrlNew( VLC_OBJECT(a), b )
-VLC_EXPORT( stream_t *,__stream_UrlNew, (vlc_object_t *p_this, const char *psz_url ) );
+VLC_EXPORT( stream_t *, stream_UrlNew, (vlc_object_t *p_this, const char *psz_url ) );
+#define stream_UrlNew( a, b ) stream_UrlNew( VLC_OBJECT(a), b )
+
 
 /**
  * Try to add a stream filter to an open stream.
