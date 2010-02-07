@@ -185,8 +185,8 @@ VLC_EXPORT( void, vlc_threadvar_delete, (vlc_threadvar_t *) );
 VLC_EXPORT( int, vlc_threadvar_set, (vlc_threadvar_t, void *) );
 VLC_EXPORT( void *, vlc_threadvar_get, (vlc_threadvar_t) );
 VLC_EXPORT( int,  vlc_thread_create, ( vlc_object_t *, const char *, int, const char *, void * ( * ) ( vlc_object_t * ), int ) LIBVLC_USED );
-VLC_EXPORT( int,  __vlc_thread_set_priority, ( vlc_object_t *, const char *, int, int ) );
-VLC_EXPORT( void, __vlc_thread_join,   ( vlc_object_t * ) );
+VLC_EXPORT( int,  vlc_thread_set_priority, ( vlc_object_t *, const char *, int, int ) );
+VLC_EXPORT( void, vlc_thread_join,   ( vlc_object_t * ) );
 
 VLC_EXPORT( int, vlc_clone, (vlc_thread_t *, void * (*) (void *), void *, int) LIBVLC_USED );
 VLC_EXPORT( void, vlc_cancel, (vlc_thread_t) );
@@ -394,13 +394,13 @@ static inline void barrier (void)
  * vlc_thread_set_priority: set the priority of the calling thread
  *****************************************************************************/
 #define vlc_thread_set_priority( P_THIS, PRIORITY )                         \
-    __vlc_thread_set_priority( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PRIORITY )
+    vlc_thread_set_priority( VLC_OBJECT(P_THIS), __FILE__, __LINE__, PRIORITY )
 
 /*****************************************************************************
  * vlc_thread_join: wait until a thread exits
  *****************************************************************************/
 #define vlc_thread_join( P_THIS )                                           \
-    __vlc_thread_join( VLC_OBJECT(P_THIS) )
+    vlc_thread_join( VLC_OBJECT(P_THIS) )
 
 #ifdef __cplusplus
 /**

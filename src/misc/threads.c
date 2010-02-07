@@ -100,12 +100,13 @@ int vlc_thread_create( vlc_object_t *p_this, const char * psz_file, int i_line,
     return i_ret;
 }
 
+#undef vlc_thread_set_priority
 /*****************************************************************************
  * vlc_thread_set_priority: set the priority of the current thread when we
  * couldn't set it in vlc_thread_create (for instance for the main thread)
  *****************************************************************************/
-int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
-                               int i_line, int i_priority )
+int vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
+                             int i_line, int i_priority )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
@@ -164,10 +165,11 @@ int __vlc_thread_set_priority( vlc_object_t *p_this, const char * psz_file,
     return 0;
 }
 
+#undef vlc_thread_join
 /*****************************************************************************
  * vlc_thread_join: wait until a thread exits, inner version
  *****************************************************************************/
-void __vlc_thread_join( vlc_object_t *p_this )
+void vlc_thread_join( vlc_object_t *p_this )
 {
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
