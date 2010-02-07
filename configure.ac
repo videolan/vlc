@@ -1568,13 +1568,6 @@ AS_IF([test "${enable_coverage}" != "no"], [
 ])
 
 dnl
-dnl  Enable release-specific flags
-dnl
-AC_ARG_ENABLE(release,
-[  --enable-release        activate extra optimizations (default disabled)])
-test "${enable_release}" != "yes" && enable_release="no"
-
-dnl
 dnl Stream output
 dnl
 AC_ARG_ENABLE(sout,
@@ -4949,7 +4942,6 @@ test "${enable_debug}" = "yes" && printf "debug "
 test "${enable_cprof}" = "yes" && printf "cprof "
 test "${enable_gprof}" = "yes" && printf "gprof "
 test "${enable_optimizations}" = "yes" && printf "optim "
-test "${enable_release}" = "yes" && printf "release " || printf "devel "
 echo ""
 if test "${enable_vlc}" != "no"; then
 echo "vlc aliases           :${ALIASES}"

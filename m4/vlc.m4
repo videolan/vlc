@@ -103,7 +103,6 @@ AC_DEFUN([VLC_OUTPUT_VLC_CONFIG_IN], [
           -e "s/@cprof@/${enable_cprof}/" \
           -e "s/@optim@/${enable_optimizations}/" \
           -e "s/@debug@/${enable_debug}/" \
-          -e "s/@release@/${enable_release}/" \
           -e "s/@PLUGINS@/${PLUGINS}/" \
           -e "s/@BUILTINS@/${BUILTINS}/" \
           -e "s/@CFLAGS_TUNING@/${CFLAGS_TUNING}/" \
