@@ -80,10 +80,9 @@ struct picture_heap_t
  * \param i_height the wanted height for the picture.
  * \param i_aspect the wanted aspect ratio for the picture.
  */
+VLC_EXPORT( int, vout_AllocatePicture,( vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
 #define vout_AllocatePicture(a,b,c,d,e,f,g) \
-        __vout_AllocatePicture(VLC_OBJECT(a),b,c,d,e,f,g)
-VLC_EXPORT( int, __vout_AllocatePicture,( vlc_object_t *p_this, picture_t *p_pic, uint32_t i_chroma, int i_width, int i_height, int i_sar_num, int i_sar_den ) );
-
+        vout_AllocatePicture(VLC_OBJECT(a),b,c,d,e,f,g)
 
 /**
  * \defgroup video_output Video Output
@@ -244,8 +243,8 @@ struct vout_thread_t
  * \return a vout if p_fmt is non NULL and the request is successfull, NULL
  * otherwise
  */
-#define vout_Request(a,b,c) __vout_Request(VLC_OBJECT(a),b,c)
-VLC_EXPORT( vout_thread_t *, __vout_Request,    ( vlc_object_t *p_this, vout_thread_t *p_vout, video_format_t *p_fmt ) );
+VLC_EXPORT( vout_thread_t *, vout_Request, ( vlc_object_t *p_this, vout_thread_t *p_vout, video_format_t *p_fmt ) );
+#define vout_Request(a,b,c) vout_Request(VLC_OBJECT(a),b,c)
 
 /**
  * This function will create a suitable vout for a given p_fmt. It will never
@@ -256,8 +255,8 @@ VLC_EXPORT( vout_thread_t *, __vout_Request,    ( vlc_object_t *p_this, vout_thr
  * \param p_fmt the video format requested
  * \return a vout if the request is successfull, NULL otherwise
  */
-#define vout_Create(a,b) __vout_Create(VLC_OBJECT(a),b)
-VLC_EXPORT( vout_thread_t *, __vout_Create,       ( vlc_object_t *p_this, video_format_t *p_fmt ) );
+VLC_EXPORT( vout_thread_t *, vout_Create, ( vlc_object_t *p_this, video_format_t *p_fmt ) );
+#define vout_Create(a,b) vout_Create(VLC_OBJECT(a),b)
 
 /**
  * This function will close a vout created by vout_Create or vout_Request.

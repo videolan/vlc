@@ -145,14 +145,15 @@ static int video_filter_buffer_allocation_init( filter_t *p_filter, void *p_data
     return VLC_SUCCESS;
 }
 
+#undef vout_Request
 /*****************************************************************************
  * vout_Request: find a video output thread, create one, or destroy one.
  *****************************************************************************
  * This function looks for a video output thread matching the current
  * properties. If not found, it spawns a new one.
  *****************************************************************************/
-vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
-                               video_format_t *p_fmt )
+vout_thread_t *vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
+                             video_format_t *p_fmt )
 {
     if( !p_fmt )
     {
@@ -276,13 +277,14 @@ vout_thread_t *__vout_Request( vlc_object_t *p_this, vout_thread_t *p_vout,
     return p_vout;
 }
 
+#undef vout_Create
 /*****************************************************************************
  * vout_Create: creates a new video output thread
  *****************************************************************************
  * This function creates a new video output thread, and returns a pointer
  * to its description. On error, it returns NULL.
  *****************************************************************************/
-vout_thread_t * __vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
+vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
 {
     vout_thread_t  * p_vout;                            /* thread descriptor */
     int              i_index;                               /* loop variable */

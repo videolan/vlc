@@ -595,10 +595,10 @@ vlm_MessageDelete
 vlm_MessageNew
 vlm_MessageSimpleNew
 vlm_New
-__vout_AllocatePicture
+vout_AllocatePicture
 vout_ChromaCmp
 vout_Close
-__vout_Create
+vout_Create
 vout_CreatePicture
 vout_DestroyPicture
 vout_DisplayPicture
@@ -611,7 +611,7 @@ vout_OSDMessage
 vout_OSDEpg
 vout_OSDSlider
 vout_PlacePicture
-__vout_Request
+vout_Request
 vout_ShowTextAbsolute
 vout_ShowTextRelative
 vout_UnlinkPicture

@@ -546,6 +546,7 @@ void vout_PlacePicture( const vout_thread_t *p_vout,
     }
 }
 
+#undef vout_AllocatePicture
 /**
  * Allocate a new picture in the heap.
  *
@@ -553,10 +554,10 @@ void vout_PlacePicture( const vout_thread_t *p_vout,
  * used exactly like a video buffer. The video output thread then manages
  * how it gets displayed.
  */
-int __vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
-                            vlc_fourcc_t i_chroma,
-                            int i_width, int i_height,
-                            int i_sar_num, int i_sar_den )
+int vout_AllocatePicture( vlc_object_t *p_this, picture_t *p_pic,
+                          vlc_fourcc_t i_chroma,
+                          int i_width, int i_height,
+                          int i_sar_num, int i_sar_den )
 {
     VLC_UNUSED(p_this);
     int i_index, i_width_aligned, i_height_aligned;
@@ -979,9 +980,9 @@ picture_t *picture_NewFromResource( const video_format_t *p_fmt, const picture_r
     }
     else
     {
-        if( __vout_AllocatePicture( NULL, p_picture,
-                                    fmt.i_chroma, fmt.i_width, fmt.i_height,
-                                    fmt.i_sar_num, fmt.i_sar_den ) )
+        if( vout_AllocatePicture( (vlc_object_t *)NULL, p_picture,
+                                  fmt.i_chroma, fmt.i_width, fmt.i_height,
+                                  fmt.i_sar_num, fmt.i_sar_den ) )
         {
             free( p_picture );
             return NULL;
