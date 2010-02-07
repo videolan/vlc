@@ -68,7 +68,6 @@
 #   define lseek _lseeki64
 #elif defined( UNDER_CE )
 /* FIXME the commandline on wince is a mess */
-# define dup(a) -1
 # define PathIsNetworkPathW(wpath) (! wcsncmp(wpath, L"\\\\", 2))
 #endif
 
@@ -145,7 +144,7 @@ int Open( vlc_object_t *p_this )
         int oldfd = strtol (path, &end, 10);
 
         if (*end == '\0')
-            fd = dup (oldfd);
+            fd = vlc_dup (oldfd);
 #ifdef HAVE_FDOPENDIR
         else if (*end == '/' && end > path)
         {

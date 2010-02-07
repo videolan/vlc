@@ -119,7 +119,7 @@ static int Open( vlc_object_t *p_this )
 #ifdef WIN32
         setmode (fileno (stdout), O_BINARY);
 #endif
-        fd = dup (fileno (stdout));
+        fd = vlc_dup (fileno (stdout));
         msg_Dbg( p_access, "using stdout" );
 #else
 #warning stdout is not supported on Windows Mobile, but may be used on Windows CE
