@@ -30,12 +30,13 @@
 
 #include "configuration.h"
 
+#undef config_GetDataDir
 /**
  * Determines the shared data directory
  *
  * @return a string or NULL. Use free() to release.
  */
-char *__config_GetDataDir( vlc_object_t *p_obj )
+char *config_GetDataDir( vlc_object_t *p_obj )
 {
     char *psz_path = var_InheritString( p_obj, "data-path" );
     return psz_path ? psz_path : config_GetDataDirDefault();

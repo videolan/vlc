@@ -199,22 +199,22 @@ struct module_config_t
  * Prototypes - these methods are used to get, set or manipulate configuration
  * data.
  *****************************************************************************/
-VLC_EXPORT( int,    __config_GetType,  (vlc_object_t *, const char *) LIBVLC_USED );
-VLC_EXPORT( int,    __config_GetInt,   (vlc_object_t *, const char *) LIBVLC_USED );
-VLC_EXPORT( void,   __config_PutInt,   (vlc_object_t *, const char *, int) );
-VLC_EXPORT( float,  __config_GetFloat, (vlc_object_t *, const char *) LIBVLC_USED );
-VLC_EXPORT( void,   __config_PutFloat, (vlc_object_t *, const char *, float) );
-VLC_EXPORT( char *, __config_GetPsz,   (vlc_object_t *, const char *) LIBVLC_USED );
-VLC_EXPORT( void,   __config_PutPsz,   (vlc_object_t *, const char *, const char *) );
+VLC_EXPORT( int,    config_GetType,  (vlc_object_t *, const char *) LIBVLC_USED );
+VLC_EXPORT( int,    config_GetInt,   (vlc_object_t *, const char *) LIBVLC_USED );
+VLC_EXPORT( void,   config_PutInt,   (vlc_object_t *, const char *, int) );
+VLC_EXPORT( float,  config_GetFloat, (vlc_object_t *, const char *) LIBVLC_USED );
+VLC_EXPORT( void,   config_PutFloat, (vlc_object_t *, const char *, float) );
+VLC_EXPORT( char *, config_GetPsz,   (vlc_object_t *, const char *) LIBVLC_USED );
+VLC_EXPORT( void,   config_PutPsz,   (vlc_object_t *, const char *, const char *) );
 
-#define config_SaveConfigFile(a,b) __config_SaveConfigFile(VLC_OBJECT(a),b)
-VLC_EXPORT( int,    __config_SaveConfigFile, ( vlc_object_t *, const char * ) );
-#define config_ResetAll(a) __config_ResetAll(VLC_OBJECT(a))
-VLC_EXPORT( void,   __config_ResetAll, ( vlc_object_t * ) );
+VLC_EXPORT( int,    config_SaveConfigFile, ( vlc_object_t *, const char * ) );
+#define config_SaveConfigFile(a,b) config_SaveConfigFile(VLC_OBJECT(a),b)
+VLC_EXPORT( void,   config_ResetAll, ( vlc_object_t * ) );
+#define config_ResetAll(a) config_ResetAll(VLC_OBJECT(a))
 
 VLC_EXPORT( module_config_t *, config_FindConfig,( vlc_object_t *, const char * ) LIBVLC_USED );
-VLC_EXPORT(char *, __config_GetDataDir, ( vlc_object_t * ) LIBVLC_USED);
-#define config_GetDataDir(a) __config_GetDataDir(VLC_OBJECT(a))
+VLC_EXPORT(char *, config_GetDataDir, ( vlc_object_t * ) LIBVLC_USED);
+#define config_GetDataDir(a) config_GetDataDir(VLC_OBJECT(a))
 VLC_EXPORT(const char *, config_GetConfDir, ( void ) LIBVLC_USED);
 
 typedef enum vlc_userdir
@@ -236,21 +236,21 @@ typedef enum vlc_userdir
 
 VLC_EXPORT(char *, config_GetUserDir, ( vlc_userdir_t ) LIBVLC_USED);
 
-VLC_EXPORT( void,       __config_AddIntf,    ( vlc_object_t *, const char * ) );
-VLC_EXPORT( void,       __config_RemoveIntf, ( vlc_object_t *, const char * ) );
-VLC_EXPORT( bool, __config_ExistIntf,  ( vlc_object_t *, const char * ) LIBVLC_USED);
+VLC_EXPORT( void, config_AddIntf,    ( vlc_object_t *, const char * ) );
+VLC_EXPORT( void, config_RemoveIntf, ( vlc_object_t *, const char * ) );
+VLC_EXPORT( bool, config_ExistIntf,  ( vlc_object_t *, const char * ) LIBVLC_USED);
 
-#define config_GetType(a,b) __config_GetType(VLC_OBJECT(a),b)
-#define config_GetInt(a,b) __config_GetInt(VLC_OBJECT(a),b)
-#define config_PutInt(a,b,c) __config_PutInt(VLC_OBJECT(a),b,c)
-#define config_GetFloat(a,b) __config_GetFloat(VLC_OBJECT(a),b)
-#define config_PutFloat(a,b,c) __config_PutFloat(VLC_OBJECT(a),b,c)
-#define config_GetPsz(a,b) __config_GetPsz(VLC_OBJECT(a),b)
-#define config_PutPsz(a,b,c) __config_PutPsz(VLC_OBJECT(a),b,c)
+#define config_GetType(a,b) config_GetType(VLC_OBJECT(a),b)
+#define config_GetInt(a,b) config_GetInt(VLC_OBJECT(a),b)
+#define config_PutInt(a,b,c) config_PutInt(VLC_OBJECT(a),b,c)
+#define config_GetFloat(a,b) config_GetFloat(VLC_OBJECT(a),b)
+#define config_PutFloat(a,b,c) config_PutFloat(VLC_OBJECT(a),b,c)
+#define config_GetPsz(a,b) config_GetPsz(VLC_OBJECT(a),b)
+#define config_PutPsz(a,b,c) config_PutPsz(VLC_OBJECT(a),b,c)
 
-#define config_AddIntf(a,b) __config_AddIntf(VLC_OBJECT(a),b)
-#define config_RemoveIntf(a,b) __config_RemoveIntf(VLC_OBJECT(a),b)
-#define config_ExistIntf(a,b) __config_ExistIntf(VLC_OBJECT(a),b)
+#define config_AddIntf(a,b) config_AddIntf(VLC_OBJECT(a),b)
+#define config_RemoveIntf(a,b) config_RemoveIntf(VLC_OBJECT(a),b)
+#define config_ExistIntf(a,b) config_ExistIntf(VLC_OBJECT(a),b)
 
 /****************************************************************************
  * config_chain_t:
@@ -270,8 +270,8 @@ struct config_chain_t
  *
  * The option names will be created by adding the psz_prefix prefix.
  */
-#define config_ChainParse( a, b, c, d ) __config_ChainParse( VLC_OBJECT(a), b, c, d )
-VLC_EXPORT( void,   __config_ChainParse, ( vlc_object_t *, const char *psz_prefix, const char *const *ppsz_options, config_chain_t * ) );
+VLC_EXPORT( void, config_ChainParse, ( vlc_object_t *, const char *psz_prefix, const char *const *ppsz_options, config_chain_t * ) );
+#define config_ChainParse( a, b, c, d ) config_ChainParse( VLC_OBJECT(a), b, c, d )
 
 /**
  * This function will parse a configuration string (psz_string) and

@@ -36,11 +36,11 @@ int  config_AutoSaveConfigFile( vlc_object_t * );
 
 void config_Free( module_t * );
 
-#define config_LoadCmdLine(a,b,c,d) __config_LoadCmdLine(VLC_OBJECT(a),b,c,d)
-#define config_LoadConfigFile(a,b) __config_LoadConfigFile(VLC_OBJECT(a),b)
+int config_LoadCmdLine   ( vlc_object_t *, int *, const char *[], bool );
+int config_LoadConfigFile( vlc_object_t *, const char * );
+#define config_LoadCmdLine(a,b,c,d) config_LoadCmdLine(VLC_OBJECT(a),b,c,d)
+#define config_LoadConfigFile(a,b) config_LoadConfigFile(VLC_OBJECT(a),b)
 
-int __config_LoadCmdLine   ( vlc_object_t *, int *, const char *[], bool );
-int __config_LoadConfigFile( vlc_object_t *, const char * );
 int config_SortConfig (void);
 void config_UnsortConfig (void);
 

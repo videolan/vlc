@@ -152,14 +152,14 @@ static int strtoi (const char *str)
     return (int)l;
 }
 
-
+#undef config_LoadConfigFile
 /*****************************************************************************
  * config_LoadConfigFile: loads the configuration file.
  *****************************************************************************
  * This function is called to load the config options stored in the config
  * file.
  *****************************************************************************/
-int __config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
+int config_LoadConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     FILE *file;
 
@@ -760,7 +760,8 @@ int config_AutoSaveConfigFile( vlc_object_t *p_this )
     return ret;
 }
 
-int __config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
+#undef config_SaveConfigFile
+int config_SaveConfigFile( vlc_object_t *p_this, const char *psz_module_name )
 {
     return SaveConfigFile( p_this, psz_module_name, false );
 }

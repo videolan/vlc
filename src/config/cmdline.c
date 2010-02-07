@@ -43,6 +43,7 @@
 
 #include <assert.h>
 
+#undef config_LoadCmdLine
 /*****************************************************************************
  * config_LoadCmdLine: parse command line
  *****************************************************************************
@@ -52,9 +53,8 @@
  * because we don't know (and don't want to know) in advance the configuration
  * options used (ie. exported) by each module.
  *****************************************************************************/
-int __config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
-                          const char *ppsz_argv[],
-                          bool b_ignore_errors )
+int config_LoadCmdLine( vlc_object_t *p_this, int *pi_argc,
+                        const char *ppsz_argv[], bool b_ignore_errors )
 {
     int i_cmd, i_index, i_opts, i_shortopts, flag, i_verbose = 0;
     module_t *p_parser;
