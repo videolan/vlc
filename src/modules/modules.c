@@ -83,6 +83,7 @@ static void   DupModule        ( module_t * );
 static void   UndupModule      ( module_t * );
 #endif
 
+#undef module_InitBank
 /**
  * Init bank
  *
@@ -91,7 +92,7 @@ static void   UndupModule      ( module_t * );
  * \param p_this vlc object structure
  * \return nothing
  */
-void __module_InitBank( vlc_object_t *p_this )
+void module_InitBank( vlc_object_t *p_this )
 {
     module_bank_t *p_bank = NULL;
 
@@ -387,6 +388,7 @@ static int modulecmp (const void *a, const void *b)
     return lb->i_score - la->i_score;
 }
 
+#undef module_need
 /**
  * module Need
  *
@@ -399,8 +401,8 @@ static int modulecmp (const void *a, const void *b)
  *                 but the same capability
  * \return the module or NULL in case of a failure
  */
-module_t * __module_need( vlc_object_t *p_this, const char *psz_capability,
-                          const char *psz_name, bool b_strict )
+module_t * module_need( vlc_object_t *p_this, const char *psz_capability,
+                        const char *psz_name, bool b_strict )
 {
     stats_TimerStart( p_this, "module_need()", STATS_TIMER_MODULE_NEED );
 
@@ -624,6 +626,7 @@ found_shortcut:
     return p_module;
 }
 
+#undef module_unneed
 /**
  * Module unneed
  *
@@ -633,7 +636,7 @@ found_shortcut:
  * \param p_module the module structure
  * \return nothing
  */
-void __module_unneed( vlc_object_t * p_this, module_t * p_module )
+void module_unneed( vlc_object_t * p_this, module_t * p_module )
 {
     /* Use the close method */
     if( p_module->pf_deactivate )

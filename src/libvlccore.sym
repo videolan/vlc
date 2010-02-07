@@ -248,10 +248,10 @@ module_gettext
 module_hold
 module_list_free
 module_list_get
-__module_need
+module_need
 module_provides
 module_release
-__module_unneed
+module_unneed
 msg_DisableObjectPrinting
 msg_EnableObjectPrinting
 msg_Generic

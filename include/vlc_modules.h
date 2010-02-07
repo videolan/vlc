@@ -30,10 +30,10 @@
  * Exported functions.
  *****************************************************************************/
 
-#define module_need(a,b,c,d) __module_need(VLC_OBJECT(a),b,c,d)
-VLC_EXPORT( module_t *, __module_need, ( vlc_object_t *, const char *, const char *, bool ) );
-#define module_unneed(a,b) __module_unneed(VLC_OBJECT(a),b)
-VLC_EXPORT( void, __module_unneed, ( vlc_object_t *, module_t * ) );
+VLC_EXPORT( module_t *, module_need, ( vlc_object_t *, const char *, const char *, bool ) );
+#define module_need(a,b,c,d) module_need(VLC_OBJECT(a),b,c,d)
+VLC_EXPORT( void, module_unneed, ( vlc_object_t *, module_t * ) );
+#define module_unneed(a,b) module_unneed(VLC_OBJECT(a),b)
 VLC_EXPORT( bool,  module_exists, (const char *) );
 VLC_EXPORT( module_t *, module_find, (const char *) );
 

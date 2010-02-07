@@ -25,8 +25,8 @@
 # error This header file can only be included from LibVLC.
 #endif
 
-#ifndef __LIBVLC_MODULES_H
-# define __LIBVLC_MODULES_H 1
+#ifndef LIBVLC_MODULES_H
+# define LIBVLC_MODULES_H 1
 
 
 /* Number of tries before we unload an unused module */
@@ -142,8 +142,8 @@ struct module_t
 module_t *vlc_module_create (vlc_object_t *);
 module_t *vlc_submodule_create (module_t *module);
 
-#define module_InitBank(a)     __module_InitBank(VLC_OBJECT(a))
-void  __module_InitBank        ( vlc_object_t * );
+void  module_InitBank( vlc_object_t * );
+#define module_InitBank(a) module_InitBank(VLC_OBJECT(a))
 void module_LoadPlugins( vlc_object_t * );
 #define module_LoadPlugins(a) module_LoadPlugins(VLC_OBJECT(a))
 void module_EndBank( vlc_object_t *, bool );
@@ -163,4 +163,4 @@ void   CacheLoad  (vlc_object_t *, module_bank_t *, const char *);
 void   CacheSave  (vlc_object_t *, const char *, module_cache_t *const *, size_t);
 module_cache_t * CacheFind (module_bank_t *, const char *, int64_t, int64_t);
 
-#endif /* !__LIBVLC_MODULES_H */
+#endif /* !LIBVLC_MODULES_H */
