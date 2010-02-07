@@ -35,7 +35,11 @@
 #include <vlc_common.h>
 
 #include <stdarg.h>                                       /* va_list for BSD */
+#ifdef __APPLE__
+#include <xlocale.h>
+#else
 #include <locale.h>
+#endif
 #include <errno.h>                                                  /* errno */
 
 #ifdef WIN32
