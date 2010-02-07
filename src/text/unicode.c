@@ -286,25 +286,20 @@ static char *CheckUTF8( char *str, char rep )
     for (;;)
     {
         uint8_t c = ptr[0];
-        int charlen = -1;
 
         if (c == '\0')
             break;
 
-        for (int i = 0; i < 7; i++)
-            if ((c >> (7 - i)) == ((0xff >> (7 - i)) ^ 1))
-            {
-                charlen = i;
-                break;
-            }
+        if (c > 0xF4)
+            goto error;
 
+        int charlen = clz8 (c ^ 0xFF);
         switch (charlen)
         {
             case 0: // 7-bit ASCII character -> OK
                 ptr++;
                 continue;
 
-            case -1: // 1111111x -> error
             case 1: // continuation byte -> error
                 goto error;
         }
