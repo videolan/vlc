@@ -894,8 +894,8 @@ VLC_EXPORT( const char *, VLC_Compiler, ( void ) LIBVLC_USED );
  * Additional vlc stuff
  *****************************************************************************/
 #include "vlc_messages.h"
-#include "vlc_variables.h"
 #include "vlc_objects.h"
+#include "vlc_variables.h"
 #include "vlc_modules.h"
 #include "vlc_main.h"
 #include "vlc_configuration.h"

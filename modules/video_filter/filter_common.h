@@ -108,9 +108,9 @@ static inline void vout_filter_SetupChild( vout_thread_t *p_parent, vout_thread_
     int (*pf_execute)( vlc_object_t *, const char *, vlc_callback_t, void * );
 
     if( b_init )
-        pf_execute = __var_AddCallback;
+        pf_execute = var_AddCallback;
     else
-        pf_execute = __var_DelCallback;
+        pf_execute = var_DelCallback;
 
     /* */
     if( !pf_mouse_event )

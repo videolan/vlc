@@ -25,8 +25,8 @@
 # error This header file can only be included from LibVLC.
 #endif
 
-#ifndef __LIBVLC_VARIABLES_H
-# define __LIBVLC_VARIABLES_H 1
+#ifndef LIBVLC_VARIABLES_H
+# define LIBVLC_VARIABLES_H 1
 
 typedef struct callback_entry_t callback_entry_t;
 
