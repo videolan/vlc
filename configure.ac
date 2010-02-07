@@ -2594,6 +2594,7 @@ AC_ARG_ENABLE(omxil,
 if test "${enable_omxil}" = "yes"
 then
   VLC_ADD_PLUGIN([omxil])
+  VLC_ADD_LIBS([omxil], [-ldl])
 fi
 
 dnl
