@@ -394,7 +394,7 @@ static void Run( intf_thread_t *p_intf )
 
         /* we transmit the data */
         i_net_ret = net_Printf(
-            VLC_OBJECT( p_intf ), i_post_socket, NULL,
+            p_intf, i_post_socket, NULL,
             POST_REQUEST, p_sys->psz_submit_file,
             (unsigned)strlen( psz_submit ), p_sys->psz_submit_host,
             VERSION, psz_submit

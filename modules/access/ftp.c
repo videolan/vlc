@@ -629,8 +629,7 @@ static int ftp_SendCommand( vlc_object_t *p_access, access_sys_t *p_sys,
 
     msg_Dbg( p_access, "ftp_SendCommand:\"%s\"", psz_cmd);
 
-    if( net_Printf( VLC_OBJECT(p_access), p_sys->fd_cmd, NULL, "%s\r\n",
-                    psz_cmd ) < 0 )
+    if( net_Printf( p_access, p_sys->fd_cmd, NULL, "%s\r\n", psz_cmd ) < 0 )
     {
         msg_Err( p_access, "failed to send command" );
         return VLC_EGENERIC;

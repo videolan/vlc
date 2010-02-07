@@ -532,6 +532,7 @@ char *net_Gets( vlc_object_t *p_this, int fd, const v_socket_t *p_vs )
     return psz_line;
 }
 
+#undef net_Printf
 ssize_t net_Printf( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                     const char *psz_fmt, ... )
 {

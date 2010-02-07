@@ -146,6 +146,7 @@ VLC_EXPORT( char *, net_Gets, ( vlc_object_t *p_this, int fd, const v_socket_t *
 
 
 VLC_EXPORT( ssize_t, net_Printf, ( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, ... ) LIBVLC_FORMAT( 4, 5 ) );
+#define net_Printf(o,fd,vs,...) net_Printf(VLC_OBJECT(o),fd,vs, __VA_ARGS__)
 VLC_EXPORT( ssize_t, net_vaPrintf, ( vlc_object_t *p_this, int fd, const v_socket_t *, const char *psz_fmt, va_list args ) );
 #define net_vaPrintf(a,b,c,d,e) net_vaPrintf(VLC_OBJECT(a),b,c,d,e)
 

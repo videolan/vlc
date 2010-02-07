@@ -1164,7 +1164,7 @@ static int Connect( access_t *p_access, uint64_t i_tell )
                 return -1;
             }
 
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+            net_Printf( p_access, p_sys->fd, NULL,
                         "CONNECT %s:%d HTTP/1.%d\r\nHost: %s:%d\r\n\r\n",
                         p_sys->url.psz_host, p_sys->url.i_port,
                         p_sys->i_version,
@@ -1240,14 +1240,14 @@ static int Request( access_t *p_access, uint64_t i_tell )
     {
         if( p_sys->url.psz_path )
         {
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+            net_Printf( p_access, p_sys->fd, NULL,
                         "GET http://%s:%d%s HTTP/1.%d\r\n",
                         p_sys->url.psz_host, p_sys->url.i_port,
                         p_sys->url.psz_path, p_sys->i_version );
         }
         else
         {
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd, NULL,
+            net_Printf( p_access, p_sys->fd, NULL,
                         "GET http://%s:%d/ HTTP/1.%d\r\n",
                         p_sys->url.psz_host, p_sys->url.i_port,
                         p_sys->i_version );
@@ -1262,26 +1262,26 @@ static int Request( access_t *p_access, uint64_t i_tell )
         }
         if( p_sys->url.i_port != (pvs ? 443 : 80) )
         {
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
+            net_Printf( p_access, p_sys->fd, pvs,
                         "GET %s HTTP/1.%d\r\nHost: %s:%d\r\n",
                         psz_path, p_sys->i_version, p_sys->url.psz_host,
                         p_sys->url.i_port );
         }
         else
         {
-            net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
+            net_Printf( p_access, p_sys->fd, pvs,
                         "GET %s HTTP/1.%d\r\nHost: %s\r\n",
                         psz_path, p_sys->i_version, p_sys->url.psz_host );
         }
     }
     /* User Agent */
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "User-Agent: %s\r\n",
+    net_Printf( p_access, p_sys->fd, pvs, "User-Agent: %s\r\n",
                 p_sys->psz_user_agent );
     /* Offset */
     if( p_sys->i_version == 1 && ! p_sys->b_continuous )
     {
         p_sys->b_persist = true;
-        net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs,
+        net_Printf( p_access, p_sys->fd, pvs,
                     "Range: bytes=%"PRIu64"-\r\n", i_tell );
     }
 
@@ -1303,7 +1303,7 @@ static int Request( access_t *p_access, uint64_t i_tell )
             if( is_in_right_domain )
             {
                 msg_Dbg( p_access, "Sending Cookie %s", psz_cookie_content );
-                if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "Cookie: %s\r\n", psz_cookie_content ) < 0 )
+                if( net_Printf( p_access, p_sys->fd, pvs, "Cookie: %s\r\n", psz_cookie_content ) < 0 )
                     msg_Err( p_access, "failed to send Cookie" );
             }
             free( psz_cookie_content );
@@ -1320,10 +1320,10 @@ static int Request( access_t *p_access, uint64_t i_tell )
         AuthReply( p_access, "Proxy-", &p_sys->proxy, &p_sys->proxy_auth );
 
     /* ICY meta data request */
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "Icy-MetaData: 1\r\n" );
+    net_Printf( p_access, p_sys->fd, pvs, "Icy-MetaData: 1\r\n" );
 
 
-    if( net_Printf( VLC_OBJECT(p_access), p_sys->fd, pvs, "\r\n" ) < 0 )
+    if( net_Printf( p_access, p_sys->fd, pvs, "\r\n" ) < 0 )
     {
         msg_Err( p_access, "failed to send request" );
         Disconnect( p_access );
@@ -1764,7 +1764,7 @@ static void AuthReply( access_t *p_access, const char *psz_prefix,
     if ( psz_value == NULL )
         return;
 
-    net_Printf( VLC_OBJECT(p_access), p_sys->fd, p_sys->p_vs,
+    net_Printf( p_access, p_sys->fd, p_sys->p_vs,
                 "%sAuthorization: %s\r\n", psz_prefix, psz_value );
     free( psz_value );
 }
