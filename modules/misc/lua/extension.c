@@ -43,12 +43,14 @@ static const luaL_Reg p_reg[] =
 #define EXT_TRIGGER_ONLY      (1 << 1)   ///< Hook: trigger. Not activable
 #define EXT_INPUT_LISTENER    (1 << 2)   ///< Hook: input_changed
 #define EXT_META_LISTENER     (1 << 3)   ///< Hook: meta_changed
+#define EXT_PLAYING_LISTENER  (1 << 4)   ///< Hook: status_changed
 
 const char* const ppsz_capabilities[] = {
     "menu",
     "trigger",
     "input-listener",
     "meta-listener",
+    "playing-listener",
     NULL
 };
 
@@ -529,7 +531,18 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
             UnlockExtension( p_ext );
             break;
         }
-
+        case EXTENSION_PLAYING_CHANGED:
+        {
+            extension_t *p_ext;
+            p_ext = ( extension_t* ) va_arg( args, extension_t* );
+            assert( p_ext->psz_name != NULL );
+            i = ( int ) va_arg( args, int );
+            if( p_ext->p_sys->i_capabilities & EXT_PLAYING_LISTENER )
+            {
+                PushCommand( p_ext, CMD_PLAYING_CHANGED, i );
+            }
+            break;
+        }
         default:
             msg_Warn( p_mgr, "Control '%d' not yet implemented in Extension",
                       i_control );

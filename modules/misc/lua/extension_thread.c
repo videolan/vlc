@@ -122,6 +122,7 @@ static void FreeCommands( struct command_t *command )
             break;
 
         case CMD_TRIGGERMENU:
+        case CMD_PLAYING_CHANGED:
             free( command->data[0] ); // Arg1 is int*, to free
             break;
 
@@ -216,6 +217,19 @@ int __PushCommand( extension_t *p_ext,  bool b_unique, int i_command,
             cmd->data[0] = va_arg( args, void* );
             break;
         case CMD_TRIGGERMENU:
+            {
+                int *pi = malloc( sizeof( int ) );
+                if( !pi )
+                {
+                    free( cmd );
+                    vlc_mutex_unlock( &p_ext->p_sys->command_lock );
+                    return VLC_ENOMEM;
+                }
+                *pi = va_arg( args, int );
+                cmd->data[0] = pi;
+            }
+            break;
+        case CMD_PLAYING_CHANGED:
             {
                 int *pi = malloc( sizeof( int ) );
                 if( !pi )
@@ -359,6 +373,13 @@ static void* Run( void *data )
                     case CMD_UPDATE_META:
                     {
                         lua_ExecuteFunction( p_mgr, p_ext, "meta_changed", LUA_END );
+                        break;
+                    }
+
+                    case CMD_PLAYING_CHANGED:
+                    {
+                        lua_ExecuteFunction( p_mgr, p_ext, "playing_changed",
+                                LUA_NUM, *((int *)cmd->data[0]), LUA_END );
                         break;
                     }
 

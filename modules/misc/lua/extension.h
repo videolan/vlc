@@ -39,6 +39,7 @@ TYPEDEF_ARRAY( extension_t, array_extension_t );
 #define CMD_SET_INPUT   6    /* No arg. Just signal current input changed */
 #define CMD_UPDATE_META 7    /* No arg. Just signal current input item meta
                               * changed */
+#define CMD_PLAYING_CHANGED 8 /* Arg1 = int*, New playing status  */
 
 //Data types
 typedef enum

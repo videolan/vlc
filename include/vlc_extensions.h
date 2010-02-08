@@ -75,6 +75,7 @@ enum
     EXTENSION_TRIGGER,        /**< arg1: extension_t* */
     EXTENSION_TRIGGER_MENU,   /**< arg1: extension_t*, int (uint16_t) */
     EXTENSION_SET_INPUT,      /**< arg1: extension_t*, arg2 (input_thread_t) */
+    EXTENSION_PLAYING_CHANGED, /**< arg1: extension_t*, arg2 int( playing status ) */
 };
 
 /**
@@ -151,6 +152,13 @@ static inline int extension_SetInput( extensions_manager_t *p_mgr,
                                         struct input_thread_t *p_input )
 {
     return extension_Control( p_mgr, EXTENSION_SET_INPUT, p_ext, p_input );
+}
+
+static inline int extension_PlayingChanged( extensions_manager_t *p_mgr,
+                                            extension_t *p_ext,
+                                            int state )
+{
+    return extension_Control( p_mgr, EXTENSION_PLAYING_CHANGED, p_ext, state );
 }
 
 /** Can this extension only be triggered but not activated?
