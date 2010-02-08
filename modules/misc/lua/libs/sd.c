@@ -118,10 +118,10 @@ static int vlclua_sd_add_node( lua_State *L )
         lua_getfield( L, -1, "title" );
         if( lua_isstring( L, -1 ) )
         {
-            input_item_t *p_input = input_item_New( p_sd,
-                                                    "vlc://nop",
-                                                    lua_tostring( L, -1 ) );
+            char *name = strdup( lua_tostring( L, -1 ) );
             lua_pop( L, 1 );
+            input_item_t *p_input = input_item_New( p_sd, "vlc://nop", name );
+            free( name );
             lua_getfield( L, -1, "arturl" );
             if( lua_isstring( L, -1 ) )
             {
