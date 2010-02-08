@@ -147,7 +147,7 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
 
     vlc_mutex_init( &p_vlm->lock );
     vlc_mutex_init( &p_vlm->lock_manage );
-    vlc_cond_init( &p_vlm->wait_manage );
+    vlc_cond_init_daytime( &p_vlm->wait_manage );
     p_vlm->i_id = 1;
     TAB_INIT( p_vlm->i_media, p_vlm->media );
     TAB_INIT( p_vlm->i_schedule, p_vlm->schedule );
@@ -375,7 +375,7 @@ static void* Manage( void* p_object )
 
         vlc_mutex_lock( &vlm->lock_manage );
         if( i_nextschedule )
-            vlc_cond_timedwait( &vlm->wait_manage, &vlm->lock_manage, i_nextschedule-mdate() );
+            vlc_cond_timedwait( &vlm->wait_manage, &vlm->lock_manage, i_nextschedule );
         else
             vlc_cond_wait( &vlm->wait_manage, &vlm->lock_manage );
         vlc_mutex_unlock( &vlm->lock_manage );
