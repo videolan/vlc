@@ -208,14 +208,10 @@ void vout_display_PlacePicture(vout_display_place_t *place,
         return;
 
     /* */
-    unsigned width;
-    unsigned height;
     unsigned display_width;
     unsigned display_height;
 
     if (cfg->is_display_filled) {
-        width  = source->i_visible_width;
-        height = source->i_visible_height;
         display_width  = cfg->display.width;
         display_height = cfg->display.height;
     } else {
@@ -223,17 +219,17 @@ void vout_display_PlacePicture(vout_display_place_t *place,
 
         cfg_tmp.display.width  = 0;
         cfg_tmp.display.height = 0;
-        vout_display_GetDefaultDisplaySize(&width, &height,
+        vout_display_GetDefaultDisplaySize(&display_width, &display_height,
                                            source, &cfg_tmp);
 
-        display_width  = width;
-        display_height = height;
         if (do_clipping) {
             display_width  = __MIN(display_width,  cfg->display.width);
             display_height = __MIN(display_height, cfg->display.height);
         }
     }
 
+    const unsigned width  = source->i_visible_width;
+    const unsigned height = source->i_visible_height;
     /* Compute the height if we use the width to fill up display_width */
     const int64_t scaled_height = (int64_t)height * display_width  * cfg->display.sar.num * source->i_sar_den / width  / source->i_sar_num / cfg->display.sar.den;
     /* And the same but switching width/height */
