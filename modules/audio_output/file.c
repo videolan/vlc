@@ -221,7 +221,7 @@ static int Open( vlc_object_t * p_this )
         /* Write wave header */
         WAVEHEADER *wh = &p_aout->output.p_sys->waveh;
 
-        memset( wh, 0, sizeof(wh) );
+        memset( wh, 0, sizeof(*wh) );
 
         switch( p_aout->output.output.i_format )
         {
