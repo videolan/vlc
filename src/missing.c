@@ -377,7 +377,7 @@ vlm_message_t *vlm_MessageNew (const char *a, const char *fmt, ...)
     return vlm_MessageSimpleNew (a);
 }
 
-vlm_t *__vlm_New (vlc_object_t *obj)
+vlm_t *vlm_New (vlc_object_t *obj)
 {
      msg_Err (obj, "VLM not compiled-in!");
      return NULL;
