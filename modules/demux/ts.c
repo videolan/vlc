@@ -3451,6 +3451,7 @@ static void PMTSetupEsTeletext( demux_t *p_demux, ts_pid_t *pid,
 
             /* */
             const ts_teletext_page_t *p = &p_page[i];
+            p_es->fmt.i_priority = (p->i_type == 0x02 || p->i_type == 0x05) ? 0 : -1;
             p_es->fmt.psz_language = strndup( p->p_iso639, 3 );
             p_es->fmt.psz_description = strdup(vlc_gettext(ppsz_teletext_type[p->i_type]));
             p_es->fmt.subs.teletext.i_magazine = p->i_magazine;
