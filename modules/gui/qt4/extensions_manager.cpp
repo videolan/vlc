@@ -47,6 +47,7 @@ ExtensionsManager::ExtensionsManager( intf_thread_t *_p_intf, QObject *parent )
 
     menuMapper = new QSignalMapper( this );
     CONNECT( menuMapper, mapped( int ), this, triggerMenu( int ) );
+    CONNECT( THEMIM->getIM(), statusChanged( int ), this, playingChanged( int ) );
     CONNECT( THEMIM, inputChanged( input_thread_t* ),
              this, inputChanged( input_thread_t* ) );
     b_unloading = false;
@@ -265,6 +266,23 @@ void ExtensionsManager::inputChanged( input_thread_t* p_input )
         if( extension_IsActivated( p_extensions_manager, p_ext ) )
         {
             extension_SetInput( p_extensions_manager, p_ext, p_input );
+        }
+    }
+    FOREACH_END()
+
+    vlc_mutex_unlock( &p_extensions_manager->lock );
+}
+
+void ExtensionsManager::playingChanged( int state )
+{
+    vlc_mutex_lock( &p_extensions_manager->lock );
+
+    extension_t *p_ext;
+    FOREACH_ARRAY( p_ext, p_extensions_manager->extensions )
+    {
+        if( extension_IsActivated( p_extensions_manager, p_ext ) )
+        {
+            extension_PlayingChanged( p_extensions_manager, p_ext, state );
         }
     }
     FOREACH_END()
