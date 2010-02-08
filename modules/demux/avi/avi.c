@@ -201,6 +201,8 @@ static void AVI_ExtractSubtitle( demux_t *, int i_stream, avi_chunk_list_t *, av
 
 static mtime_t  AVI_MovieGetLength( demux_t * );
 
+static void AVI_MetaLoad( demux_t *, avi_chunk_list_t *p_riff, avi_chunk_avih_t *p_avih );
+
 /*****************************************************************************
  * Stream management
  *****************************************************************************/
@@ -344,16 +346,8 @@ static int Open( vlc_object_t * p_this )
              p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
              p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
              p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
-    if( ( p_sys->meta = vlc_meta_New() ) )
-    {
-        char buffer[200];
-        snprintf( buffer, sizeof(buffer), "%s%s%s%s",
-                  p_avih->i_flags&AVIF_HASINDEX?" HAS_INDEX":"",
-                  p_avih->i_flags&AVIF_MUSTUSEINDEX?" MUST_USE_INDEX":"",
-                  p_avih->i_flags&AVIF_ISINTERLEAVED?" IS_INTERLEAVED":"",
-                  p_avih->i_flags&AVIF_TRUSTCKTYPE?" TRUST_CKTYPE":"" );
-        vlc_meta_SetSetting( p_sys->meta, buffer );
-    }
+
+    AVI_MetaLoad( p_demux, p_riff, p_avih );
 
     /* now read info on each stream and create ES */
     for( i = 0 ; i < i_track; i++ )
@@ -2493,6 +2487,54 @@ print_stat:
     {
         msg_Dbg( p_demux, "stream[%d] creating %d index entries",
                 i_stream, p_sys->track[i_stream]->i_idxnb );
+    }
+}
+
+/* */
+static void AVI_MetaLoad( demux_t *p_demux,
+                          avi_chunk_list_t *p_riff, avi_chunk_avih_t *p_avih )
+{
+    demux_sys_t *p_sys = p_demux->p_sys;
+
+    vlc_meta_t *p_meta = p_sys->meta = vlc_meta_New();
+    if( !p_meta )
+        return;
+
+    char buffer[200];
+    snprintf( buffer, sizeof(buffer), "%s%s%s%s",
+              p_avih->i_flags&AVIF_HASINDEX      ? " HAS_INDEX"      : "",
+              p_avih->i_flags&AVIF_MUSTUSEINDEX  ? " MUST_USE_INDEX" : "",
+              p_avih->i_flags&AVIF_ISINTERLEAVED ? " IS_INTERLEAVED" : "",
+              p_avih->i_flags&AVIF_TRUSTCKTYPE   ? " TRUST_CKTYPE"   : "" );
+    vlc_meta_SetSetting( p_meta, buffer );
+
+    avi_chunk_list_t *p_info = AVI_ChunkFind( p_riff, AVIFOURCC_INFO, 0 );
+    if( !p_info )
+        return;
+
+    static const struct {
+        vlc_fourcc_t i_id;
+        int          i_type;
+    } p_dsc[] = {
+        { AVIFOURCC_IART, vlc_meta_Artist },
+        { AVIFOURCC_ICMT, vlc_meta_Description },
+        { AVIFOURCC_ICOP, vlc_meta_Copyright },
+        { AVIFOURCC_IGNR, vlc_meta_Genre },
+        { AVIFOURCC_INAM, vlc_meta_Title },
+        { 0, -1 }
+    };
+    for( int i = 0; p_dsc[i].i_id != 0; i++ )
+    {
+        avi_chunk_STRING_t *p_strz = AVI_ChunkFind( p_info, p_dsc[i].i_id, 0 );
+        if( !p_strz )
+            continue;
+        char *psz_value = FromLatin1( p_strz->p_str );
+        if( !psz_value )
+            continue;
+
+        if( *psz_value )
+            vlc_meta_Set( p_meta, p_dsc[i].i_type, psz_value );
+        free( psz_value );
     }
 }
 
