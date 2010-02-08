@@ -417,6 +417,13 @@ static void Close (vlc_object_t *obj)
             glXMakeCurrent (dpy, None, NULL);
         glXDestroyContext (dpy, sys->ctx);
     }
+
+    /* show the default cursor */
+    xcb_change_window_attributes (XGetXCBConnection (sys->display),
+                                  sys->embed->handle.xid, XCB_CW_CURSOR,
+                                  &(uint32_t) { XCB_CURSOR_NONE });
+    xcb_flush (XGetXCBConnection (sys->display));
+
     XCloseDisplay (dpy);
     vout_display_DeleteWindow (vd, sys->embed);
     free (sys);
