@@ -40,6 +40,14 @@ TYPEDEF_ARRAY( extension_t, array_extension_t );
 #define CMD_UPDATE_META 7    /* No arg. Just signal current input item meta
                               * changed */
 
+//Data types
+typedef enum
+{
+    LUA_END = 0,
+    LUA_NUM,
+    LUA_TEXT
+} lua_datatype_e;
+
 struct extensions_manager_sys_t
 {
     /* List of activated extensions */
@@ -111,8 +119,10 @@ void UnlockExtension( extension_t *p_ext );
 extension_t *vlclua_extension_get( lua_State *L );
 int lua_ExtensionActivate( extensions_manager_t *, extension_t * );
 int lua_ExtensionDeactivate( extensions_manager_t *, extension_t * );
+int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
+                            const char *psz_function, va_list args );
 int lua_ExecuteFunction( extensions_manager_t *p_mgr, extension_t *p_ext,
-                         const char *psz_function );
+                         const char *psz_function, ... );
 int lua_ExtensionWidgetClick( extensions_manager_t *p_mgr,
                               extension_t *p_ext,
                               extension_widget_t *p_widget );

@@ -542,7 +542,7 @@ static int Control( extensions_manager_t *p_mgr, int i_control, va_list args )
 int lua_ExtensionActivate( extensions_manager_t *p_mgr, extension_t *p_ext )
 {
     assert( p_mgr != NULL && p_ext != NULL );
-    return lua_ExecuteFunction( p_mgr, p_ext, "activate" );
+    return lua_ExecuteFunction( p_mgr, p_ext, "activate", LUA_END );
 }
 
 int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
@@ -564,7 +564,7 @@ int lua_ExtensionDeactivate( extensions_manager_t *p_mgr, extension_t *p_ext )
         vlc_object_release( p_ext->p_sys->p_input );
     }
 
-    int i_ret = lua_ExecuteFunction( p_mgr, p_ext, "deactivate" );
+    int i_ret = lua_ExecuteFunction( p_mgr, p_ext, "deactivate", LUA_END );
 
     /* Clear Lua State */
     lua_close( p_ext->p_sys->L );
@@ -580,7 +580,7 @@ int lua_ExtensionWidgetClick( extensions_manager_t *p_mgr,
     if( !p_ext->p_sys->L )
         return VLC_SUCCESS;
 
-    return lua_ExecuteFunction( p_mgr, p_ext, (const char*) p_widget->p_sys );
+    return lua_ExecuteFunction( p_mgr, p_ext, (const char*) p_widget->p_sys, LUA_END );
 }
 
 
@@ -773,17 +773,27 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
     return L;
 }
 
+int lua_ExecuteFunction( extensions_manager_t *p_mgr, extension_t *p_ext,
+                            const char *psz_function, ... )
+{
+    va_list args;
+    va_start( args, psz_function );
+    int i_ret = lua_ExecuteFunctionVa( p_mgr, p_ext, psz_function, args );
+    va_end( args );
+    return i_ret;
+}
+
 /**
  * Execute a function in a Lua script
  * @return < 0 in case of failure, >= 0 in case of success
  * @note It's better to call this function from a dedicated thread
  * (see extension_thread.c)
  **/
-int lua_ExecuteFunction( extensions_manager_t *p_mgr,
-                         extension_t *p_ext,
-                         const char *psz_function )
+int lua_ExecuteFunctionVa( extensions_manager_t *p_mgr, extension_t *p_ext,
+                            const char *psz_function, va_list args )
 {
     int i_ret = VLC_EGENERIC;
+    int i_args = 0;
     assert( p_mgr != NULL );
     assert( p_ext != NULL );
 
@@ -797,7 +807,26 @@ int lua_ExecuteFunction( extensions_manager_t *p_mgr,
         goto exit;
     }
 
-    if( lua_pcall( L, 0, 1, 0 ) )
+    lua_datatype_e type = LUA_END;
+    while( ( type = va_arg( args, int ) ) != LUA_END )
+    {
+        if( type == LUA_NUM )
+        {
+            lua_pushnumber( L , ( int ) va_arg( args, int ) );
+        }
+        else if( type == LUA_TEXT )
+        {
+            lua_pushstring( L , ( char * ) va_arg( args, char* ) );
+        }
+        else
+        {
+            msg_Warn( p_mgr, "Undefined argument type %d to lua function %s"
+                   "from script %s", type, psz_function, p_ext->psz_name );
+            goto exit;
+        }
+        i_args ++;
+    }
+    if( lua_pcall( L, i_args, 1, 0 ) )
     {
         msg_Warn( p_mgr, "Error while runing script %s, "
                   "function %s(): %s", p_ext->psz_name, psz_function,
@@ -808,6 +837,7 @@ int lua_ExecuteFunction( extensions_manager_t *p_mgr,
     i_ret = lua_DialogFlush( L );
 exit:
     return i_ret;
+
 }
 
 static inline int TriggerMenu( extension_t *p_ext, int i_id )
@@ -863,7 +893,7 @@ int lua_ExtensionTriggerMenu( extensions_manager_t *p_mgr,
 static int TriggerExtension( extensions_manager_t *p_mgr,
                              extension_t *p_ext )
 {
-    int i_ret = lua_ExecuteFunction( p_mgr, p_ext, "trigger" );
+    int i_ret = lua_ExecuteFunction( p_mgr, p_ext, "trigger", LUA_END );
 
     /* Close lua state for trigger-only extensions */
     if( p_ext->p_sys->L )

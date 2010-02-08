@@ -299,7 +299,7 @@ static void* Run( void *data )
                 {
                     case CMD_ACTIVATE:
                     {
-                        if( lua_ExecuteFunction( p_mgr, p_ext, "activate" ) < 0 )
+                        if( lua_ExecuteFunction( p_mgr, p_ext, "activate", LUA_END ) < 0 )
                         {
                             msg_Dbg( p_mgr, "Could not activate extension!" );
                             Deactivate( p_mgr, p_ext );
@@ -322,7 +322,7 @@ static void* Run( void *data )
 
                     case CMD_CLOSE:
                     {
-                        lua_ExecuteFunction( p_mgr, p_ext, "close" );
+                        lua_ExecuteFunction( p_mgr, p_ext, "close", LUA_END );
                         break;
                     }
 
@@ -352,13 +352,13 @@ static void* Run( void *data )
 
                     case CMD_SET_INPUT:
                     {
-                        lua_ExecuteFunction( p_mgr, p_ext, "input_changed" );
+                        lua_ExecuteFunction( p_mgr, p_ext, "input_changed", LUA_END );
                         break;
                     }
 
                     case CMD_UPDATE_META:
                     {
-                        lua_ExecuteFunction( p_mgr, p_ext, "meta_changed" );
+                        lua_ExecuteFunction( p_mgr, p_ext, "meta_changed", LUA_END );
                         break;
                     }
 
