@@ -5,7 +5,7 @@
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea at videolan tod org>
- *          Fabio Ritrovato <exsephiroth87 at videolan dot org>
+ *          Fabio Ritrovato <sephiroth87 at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -120,7 +120,9 @@ static int vlclua_sd_add_node( lua_State *L )
         {
             char *name = strdup( lua_tostring( L, -1 ) );
             lua_pop( L, 1 );
-            input_item_t *p_input = input_item_New( p_sd, "vlc://nop", name );
+            input_item_t *p_input = input_item_NewWithType( p_sd, "vlc://nop",
+                                                            name, 0, NULL, 0,
+                                                            -1, ITEM_TYPE_NODE );
             free( name );
             lua_getfield( L, -1, "arturl" );
             if( lua_isstring( L, -1 ) )
@@ -267,8 +269,9 @@ static int vlclua_node_add_node( lua_State *L )
                 char *name = strdup( lua_tostring( L, -1 ) );
                 lua_pop( L, 1 );
                 input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
-                input_item_t *p_input = input_item_New( p_sd, "vlc://nop",
-                                                        name );
+                input_item_t *p_input = input_item_NewWithType( p_sd, "vlc://nop",
+                                                                name, 0, NULL, 0,
+                                                                -1, ITEM_TYPE_NODE );
                 free( name );
                 lua_getfield( L, -1, "arturl" );
                 if( lua_isstring( L, -1 ) )
