@@ -716,8 +716,10 @@ QSize MainInterface::sizeHint() const
                   : 0 ;
 
     if( stackCentralW->isVisible() )
+    {
         nheight += stackCentralW->height();
         nwidth  = __MAX( nwidth, stackCentralW->width() );
+    }
 
 /*    if( VISIBLE( bgWidget ) )
     {
