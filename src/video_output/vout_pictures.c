@@ -745,6 +745,7 @@ int picture_Setup( picture_t *p_picture, vlc_fourcc_t i_chroma,
         p_picture->i_planes = 3;
         break;
 
+    case VLC_CODEC_YV9:
     case VLC_CODEC_I410:
         p_picture->p[ Y_PLANE ].i_lines = i_height_aligned;
         p_picture->p[ Y_PLANE ].i_visible_lines = i_height;

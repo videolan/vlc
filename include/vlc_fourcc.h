@@ -114,6 +114,8 @@
 #define VLC_CODEC_AMV       VLC_FOURCC('A','M','V',' ')
 
 
+/* Planar YUV 4:1:0 Y:V:U */
+#define VLC_CODEC_YV9       VLC_FOURCC('Y','V','U','9')
 /* Planar YUV 4:2:0 Y:V:U */
 #define VLC_CODEC_YV12      VLC_FOURCC('Y','V','1','2')
 /* Planar YUV 4:1:0 Y:U:V */
