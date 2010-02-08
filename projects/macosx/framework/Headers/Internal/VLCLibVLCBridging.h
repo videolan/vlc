@@ -26,15 +26,6 @@
 #import "VLCStreamOutput.h"
 #import "VLCMediaPlayer.h"
 
-/* Utility functions */
-/**
- * \function catch_execption( ex )
- * Utility function that catches a LibVLC generated exception by throwing a Cocoa based NSException.
- * \param ex LibVLC exception returned by LibVLC internal functions.
- */
-#define catch_exception( ex ) __catch_exception( (void *)(ex), __FUNCTION__, __FILE__, __LINE__ )
-extern void __catch_exception( void * e, const char * function, const char * file, int line_number );
-
 /**
  * Bridges functionality between libvlc and VLCMediaList implementation.
  */
