@@ -86,9 +86,6 @@ Interfaces:
    and oldhttp.
  * rc, telnet and http are now implemented using the lua interface system.
 
-Mac OS X Interface:
- * Completely reworked user interface (based upon works from GSoC 2008)
-
 Mac OS X Port:
  * Vastly improved VLCKit framework
  * A new dialog provider for libvlc-internal interaction without full interface
