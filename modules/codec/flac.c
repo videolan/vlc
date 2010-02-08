@@ -955,7 +955,7 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
         break;
 
     case 3:
-        *pi_sample_rate = 19200;
+        *pi_sample_rate = 192000;
         break;
 
     case 4:
