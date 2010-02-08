@@ -467,6 +467,7 @@ LocationBar::LocationBar( PLModel *m )
 
     box = new QHBoxLayout;
     box->setSpacing( 0 );
+    box->setContentsMargins( 0, 0, 0, 0 );
     setLayout( box );
 }
 
@@ -514,6 +515,8 @@ LocationButton::LocationButton( const QString &text, bool bold, bool arrow )
     setText( text );
 }
 
+#define PADDING 4
+
 void LocationButton::paintEvent ( QPaintEvent * event )
 {
     QStyleOptionButton option;
@@ -524,22 +527,31 @@ void LocationButton::paintEvent ( QPaintEvent * event )
     //option.state |= isChecked() ? QStyle::State_On : QStyle::State_Off;
     //if( isDown() ) option.state |= QStyle::State_Sunken;
     QPainter p( this );
+
     if( underMouse() )
         style()->drawControl( QStyle::CE_PushButtonBevel, &option, &p );
-    if( b_arrow ) option.rect.setLeft( 18 );
-    else option.rect.setLeft( 6 );
-    p.drawText( option.rect, Qt::AlignVCenter,
-                fontMetrics().elidedText( text(), Qt::ElideRight, option.rect.width() - 3 ) );
+
+    int margin = style()->pixelMetric(QStyle::PM_DefaultFrameWidth,0,this) + PADDING;
+
+    QRect rect = option.rect.adjusted( b_arrow ? 15 + margin : margin, 0, margin * -1, 0 );
+    p.drawText( rect, Qt::AlignVCenter,
+                fontMetrics().elidedText( text(), Qt::ElideRight, rect.width() ) );
+
     if( b_arrow )
     {
-        option.rect = QRect( 0, 0, 18, height() );
+        option.rect.setX( margin );
+        option.rect.setWidth( 8 );
         style()->drawPrimitive( QStyle::PE_IndicatorArrowRight, &option, &p );
     }
 }
 
 QSize LocationButton::sizeHint() const
 {
+    int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth,0,this);
     QSize s( fontMetrics().boundingRect( text() ).size() );
-    s += QSize( b_arrow ? 24 : 12, 15 );
+    s.setWidth( s.width() + ( 2 * frameWidth ) + ( 2 * PADDING ) + ( b_arrow ? 15 : 0 ) );
+    s.setHeight( QPushButton::sizeHint().height() );
     return s;
 }
+
+#undef PADDING
