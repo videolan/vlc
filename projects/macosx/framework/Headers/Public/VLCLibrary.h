@@ -40,7 +40,6 @@
 @interface VLCLibrary : NSObject 
 {
     void * instance;
-    VLCAudio * audio;
 }
 
 /* Factories */
@@ -49,15 +48,6 @@
  * \return The library's shared instance.
  */
 + (VLCLibrary *)sharedLibrary;
-
-/* Properties */
-/**
- * Returns the library's audio object.  This object is used to manipulate the global audio properities of the shared
- * library.
- * \return The library's shared audio instance.
- */
-@property (readonly) VLCAudio * audio;
-
 
 /**
  * Returns the library's version
