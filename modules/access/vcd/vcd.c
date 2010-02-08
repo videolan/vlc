@@ -136,12 +136,10 @@ static int Open( vlc_object_t *p_this )
 #endif
 
     /* Open VCD */
-    if( !(vcddev = ioctl_Open( p_this, psz_dup )) )
-    {
-        free( psz_dup );
-        return VLC_EGENERIC;
-    }
+    vcddev = ioctl_Open( p_this, psz_dup );
     free( psz_dup );
+    if( !vcddev )
+        return VLC_EGENERIC;
 
     /* Set up p_access */
     p_access->pf_read = NULL;
@@ -218,7 +216,7 @@ static int Open( vlc_object_t *p_this )
     return VLC_SUCCESS;
 
 error:
-    ioctl_Close( VLC_OBJECT(p_access), p_sys->vcddev );
+    ioctl_Close( VLC_OBJECT(p_access), vcddev );
     free( p_sys );
     return VLC_EGENERIC;
 }
