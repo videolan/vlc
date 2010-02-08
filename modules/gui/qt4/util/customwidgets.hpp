@@ -28,8 +28,7 @@
 #define _CUSTOMWIDGETS_H_
 
 #include <QLineEdit>
-#include <QLabel>
-#include <QIcon>
+#include <QPushButton>
 
 /**
   This class provides a QLineEdit which contains a greyed-out hinting
@@ -58,41 +57,39 @@ private:
     bool mDrawClickMsg;
 };
 
-class QToolButton;
-class SearchLineEdit : public QFrame
+class QVLCFramelessButton : public QPushButton
+{
+    Q_OBJECT;
+public:
+    QVLCFramelessButton( QWidget *parent = NULL );
+    QSize sizeHint() const;
+private:
+    void paintEvent( QPaintEvent * event );
+};
+
+class QLabel;
+
+class SearchLineEdit : public QLineEdit
 {
     Q_OBJECT
 public:
-    SearchLineEdit( QWidget *parent );
+    SearchLineEdit( QWidget *parent = NULL );
 
 private:
-    ClickLineEdit *searchLine;
-    QToolButton   *clearButton;
+    void resizeEvent ( QResizeEvent * event );
+    void focusInEvent( QFocusEvent *event );
+    void focusOutEvent( QFocusEvent *event );
+    void paintEvent( QPaintEvent *event );
+    void setMessageVisible( bool on );
+    QVLCFramelessButton   *clearButton;
+    bool message;
+    QLabel *msg;
+
+public slots:
+    void clear();
 
 private slots:
     void updateText( const QString& );
-
-signals:
-    void textChanged( const QString& );
-};
-
-class QVLCIconLabel : public QLabel
-{
-    Q_OBJECT
-public:
-    QVLCIconLabel( const QIcon&, QWidget *parent = 0 );
-    void setIcon( const QIcon& );
-signals:
-    void clicked();
-protected:
-    virtual void enterEvent( QEvent * );
-    virtual void leaveEvent( QEvent * );
-    virtual void mouseReleaseEvent( QMouseEvent * );
-    virtual void resizeEvent( QResizeEvent * );
-private:
-    inline void updatePixmap( );
-    QIcon icon;
-    QIcon::Mode iconMode;
 };
 
 /* VLC Key/Wheel hotkeys interactions */

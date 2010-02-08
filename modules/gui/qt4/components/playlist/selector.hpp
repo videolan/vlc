@@ -42,7 +42,7 @@
 #include "qt4.hpp"
 
 class PlaylistWidget;
-class QVLCIconLabel;
+class QVLCFramelessButton;
 
 enum SelectorItemType {
     CATEGORY_TYPE,
@@ -91,7 +91,7 @@ private:
     void enterEvent( QEvent* );
     void leaveEvent( QEvent* );
     QTreeWidgetItem* qitem;
-    QVLCIconLabel *lblAction;
+    QVLCFramelessButton *lblAction;
     QLabel *lbl;
     QHBoxLayout *layout;
 };

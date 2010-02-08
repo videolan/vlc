@@ -74,7 +74,8 @@ void PLSelItem::addAction( ItemAction act, const QString& tooltip )
         icon = QIcon( ":/buttons/playlist/playlist_remove" ); break;
     }
 
-    lblAction = new QVLCIconLabel( icon );
+    lblAction = new QVLCFramelessButton();
+    lblAction->setIcon( icon );
 
     if( !tooltip.isEmpty() ) lblAction->setToolTip( tooltip );
 

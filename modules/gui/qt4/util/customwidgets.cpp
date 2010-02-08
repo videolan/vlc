@@ -32,13 +32,13 @@
 #include "qt4.hpp" /*needed for qtr and CONNECT, but not necessary */
 
 #include <QPainter>
-#include <QLineEdit>
 #include <QColorGroup>
 #include <QRect>
 #include <QKeyEvent>
 #include <QWheelEvent>
-#include <QToolButton>
 #include <QHBoxLayout>
+#include <QStyle>
+#include <QStyleOption>
 #include <vlc_intf_strings.h>
 
 
@@ -104,85 +104,109 @@ void ClickLineEdit::focusOutEvent( QFocusEvent *ev )
     QLineEdit::focusOutEvent( ev );
 }
 
-SearchLineEdit::SearchLineEdit( QWidget *parent ) : QFrame( parent )
+QVLCFramelessButton::QVLCFramelessButton( QWidget *parent )
+  : QPushButton( parent )
 {
-    setFrameStyle( QFrame::WinPanel | QFrame::Sunken );
-    setLineWidth( 0 );
+    setSizePolicy( QSizePolicy::Preferred, QSizePolicy::Preferred );
+}
 
-    QHBoxLayout *frameLayout = new QHBoxLayout( this );
-    frameLayout->setMargin( 0 );
-    frameLayout->setSpacing( 0 );
+void QVLCFramelessButton::paintEvent( QPaintEvent * event )
+{
+    QPainter painter( this );
+    QPixmap pix = icon().pixmap( size() );
+    QPoint pos( (width() - pix.width()) / 2, (height() - pix.height()) / 2 );
+    painter.drawPixmap( QRect( pos.x(), pos.y(), pix.width(), pix.height() ), pix );
+}
 
-    QPalette palette;
-    QBrush brush( QColor(255, 255, 255, 255) );
-    brush.setStyle(Qt::SolidPattern);
-    palette.setBrush(QPalette::Active, QPalette::Window, brush); //Qt::white
+QSize QVLCFramelessButton::sizeHint() const
+{
+    return iconSize();
+}
 
-    setPalette(palette);
-    setAutoFillBackground(true);
-
-    searchLine = new  ClickLineEdit( qtr(I_PL_FILTER), 0 );
-    searchLine->setFrame( false );
-    searchLine->setMinimumWidth( 80 );
-
-    CONNECT( searchLine, textChanged( const QString& ),
-             this, updateText( const QString& ) );
-    frameLayout->addWidget( searchLine );
-
-    clearButton = new QToolButton;
-    clearButton->setAutoRaise( true );
-    clearButton->setMaximumWidth( 30 );
+SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
+{
+    clearButton = new QVLCFramelessButton( this );
     clearButton->setIcon( QIcon( ":/toolbar/clear" ) );
+    clearButton->setIconSize( QSize( 16, 16 ) );
+    clearButton->setCursor( Qt::ArrowCursor );
     clearButton->setToolTip( qfu(vlc_pgettext("Tooltip|Clear", "Clear")) );
     clearButton->hide();
 
-    CONNECT( clearButton, clicked(), searchLine, clear() );
-    frameLayout->addWidget( clearButton );
+    CONNECT( clearButton, clicked(), this, clear() );
+
+    int frameWidth = style()->pixelMetric( QStyle::PM_DefaultFrameWidth, 0, this );
+
+    QFontMetrics metrics( font() );
+    QString styleSheet = QString( "min-height: %1px; "
+                                  "padding-top: 1px; "
+                                  "padding-bottom: 1px; "
+                                  "padding-right: %2px;" )
+                                  .arg( metrics.height() + ( 2 * frameWidth ) )
+                                  .arg( clearButton->sizeHint().width() + 1 );
+    setStyleSheet( styleSheet );
+
+    setMessageVisible( true );
+
+    CONNECT( this, textEdited( const QString& ),
+             this, updateText( const QString& ) );
+}
+
+void SearchLineEdit::clear()
+{
+    QLineEdit::clear();
+    clearButton->hide();
+    setMessageVisible( true );
+}
+
+void SearchLineEdit::setMessageVisible( bool on )
+{
+    message = on;
+    repaint();
+    return;
 }
 
 void SearchLineEdit::updateText( const QString& text )
 {
     clearButton->setVisible( !text.isEmpty() );
-    emit textChanged( text );
 }
 
-QVLCIconLabel::QVLCIconLabel( const QIcon& i, QWidget *p )
-    : QLabel( p ), icon( i ), iconMode( QIcon::Normal )
+void SearchLineEdit::resizeEvent ( QResizeEvent * event )
 {
-    updatePixmap();
+  QLineEdit::resizeEvent( event );
+  int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth,0,this);
+  clearButton->resize( clearButton->sizeHint().width(), height() );
+  clearButton->move( width() - clearButton->width() - frameWidth, 0 );
 }
 
-void QVLCIconLabel::setIcon( const QIcon& i )
+void SearchLineEdit::focusInEvent( QFocusEvent *event )
 {
-  icon = i;
-  updatePixmap();
+  if( message )
+  {
+      setMessageVisible( false );
+  }
+  QLineEdit::focusInEvent( event );
 }
 
-void QVLCIconLabel::resizeEvent( QResizeEvent * event )
+void SearchLineEdit::focusOutEvent( QFocusEvent *event )
 {
-    updatePixmap();
+  if( text().isEmpty() )
+  {
+      setMessageVisible( true );
+  }
+  QLineEdit::focusOutEvent( event );
 }
 
-void QVLCIconLabel::enterEvent( QEvent * )
+void SearchLineEdit::paintEvent( QPaintEvent *event )
 {
-    iconMode = QIcon::Active;
-    updatePixmap();
-}
-
-void QVLCIconLabel::leaveEvent( QEvent * )
-{
-    iconMode = QIcon::Normal;
-    updatePixmap();
-}
-
-void QVLCIconLabel::mouseReleaseEvent( QMouseEvent * )
-{
-    emit clicked();
-}
-
-void QVLCIconLabel::updatePixmap()
-{
-    setPixmap( icon.pixmap( size(), iconMode ) );
+  QLineEdit::paintEvent( event );
+  if( !message ) return;
+  QStyleOption option;
+  option.initFrom( this );
+  QRect rect = style()->subElementRect( QStyle::SE_LineEditContents, &option, this )
+                  .adjusted( 3, 0, clearButton->width() + 1, 0 );
+  QPainter painter( this );
+  painter.setPen( palette().color( QPalette::Disabled, QPalette::Text ) );
+  painter.drawText( rect, Qt::AlignLeft | Qt::AlignVCenter, qtr( I_PL_FILTER ) );
 }
 
 /***************************************************************************
