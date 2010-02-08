@@ -139,7 +139,7 @@ static int file_select( const char *file )
     for( j = 0; ppsz_lua_exts[j]; j++ )
     {
         int l = strlen( ppsz_lua_exts[j] );
-        if( !strcmp( file+i-l, ppsz_lua_exts[j] ) )
+        if( i >= l && !strcmp( file+i-l, ppsz_lua_exts[j] ) )
             return 1;
     }
     return 0;
