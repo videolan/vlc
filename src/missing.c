@@ -344,36 +344,47 @@ char *vlc_sdp_Start (vlc_object_t *obj, const char *cfg,
 
 int vlm_Control (vlm_t *vlm, int query, ...)
 {
+    VLC_UNUSED (vlm);
     assert (0);
 }
 
 void vlm_Delete (vlm_t *vlm)
 {
+    VLC_UNUSED (vlm);
     assert (0);
 }
 
 int vlm_ExecuteCommand (vlm_t *vlm, const char *cmd, vlm_message_t **pm)
 {
+    VLC_UNUSED (vlm);
+    VLC_UNUSED (cmd);
+    VLC_UNUSED (pm);
     assert (0);
 }
 
 vlm_message_t *vlm_MessageAdd (vlm_message_t *a, vlm_message_t *b)
 {
+    VLC_UNUSED (a);
+    VLC_UNUSED (b);
     assert (0);
 }
 
 void vlm_MessageDelete (vlm_message_t *m)
 {
+    VLC_UNUSED (m);
     assert (0);
 }
 
 vlm_message_t *vlm_MessageSimpleNew (const char *a)
 {
+    VLC_UNUSED (a);
     return NULL;
 }
 
 vlm_message_t *vlm_MessageNew (const char *a, const char *fmt, ...)
 {
+    VLC_UNUSED (a);
+    VLC_UNUSED (fmt);
     return vlm_MessageSimpleNew (a);
 }
 
