@@ -163,9 +163,15 @@ static int vlclua_sd_add_item( lua_State *L )
         lua_getfield( L, -1, "url" );
         if( lua_isstring( L, -1 ) )
         {
+            char **ppsz_options = NULL;
+            int i_options = 0;
             char *psz_url = strdup( lua_tostring( L, -1 ) );
             lua_pop( L, 1 );
-            input_item_t *p_input = input_item_New( p_sd, psz_url, psz_url );
+            vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
+            input_item_t *p_input = input_item_NewExt( p_sd, psz_url, psz_url,
+                                                       i_options,
+                                                       (const char **)ppsz_options,
+                                                       VLC_INPUT_OPTION_TRUSTED, -1 );
             free( psz_url );
             vlclua_read_meta_data( p_sd, L, p_input );
             /* This one is to be tested... */
@@ -221,10 +227,16 @@ static int vlclua_node_add_subitem( lua_State *L )
             lua_getfield( L, -1, "url" );
             if( lua_isstring( L, -1 ) )
             {
+                char **ppsz_options = NULL;
+                int i_options = 0;
                 char *url = strdup( lua_tostring( L, -1 ) );
                 lua_pop( L, 1 );
+                vlclua_read_options( p_sd, L, &i_options, &ppsz_options );
                 input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
-                input_item_t *p_input = input_item_New( p_sd, url, url );
+                input_item_t *p_input = input_item_NewExt( p_sd, url, url,
+                                                           i_options,
+                                                           (const char **)ppsz_options,
+                                                           VLC_INPUT_OPTION_TRUSTED, -1 );
                 free( url );
                 vlclua_read_meta_data( p_sd, L, p_input );
                 /* This one is to be tested... */
