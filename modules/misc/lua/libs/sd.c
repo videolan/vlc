@@ -36,6 +36,7 @@
 #include <vlc_common.h>
 #include <vlc_services_discovery.h>
 #include <vlc_playlist.h>
+#include <vlc_charset.h>
 
 #include <lua.h>        /* Low level lua C API */
 #include <lauxlib.h>    /* Higher level C API */
@@ -117,8 +118,9 @@ static int vlclua_sd_add_node( lua_State *L )
         lua_getfield( L, -1, "title" );
         if( lua_isstring( L, -1 ) )
         {
-            input_item_t *p_input = input_item_New( p_sd, "vlc://nop",
-                                                    strdup( lua_tostring( L, -1 ) ) );
+            input_item_t *p_input = input_item_New( p_sd,
+                                                    "vlc://nop",
+                                                    lua_tostring( L, -1 ) );
             lua_pop( L, 1 );
             lua_getfield( L, -1, "arturl" );
             if( lua_isstring( L, -1 ) )
@@ -126,6 +128,7 @@ static int vlclua_sd_add_node( lua_State *L )
                 char *psz_value = strdup( lua_tostring( L, -1 ) );
                 EnsureUTF8( psz_value );
                 msg_Dbg( p_sd, "ArtURL: %s", psz_value );
+                /** @todo Ask for art download if not local file */
                 input_item_SetArtURL( p_input, psz_value );
                 free( psz_value );
             }
@@ -157,13 +160,14 @@ static int vlclua_sd_add_item( lua_State *L )
         lua_getfield( L, -1, "url" );
         if( lua_isstring( L, -1 ) )
         {
-            input_item_t *p_input = input_item_New( p_sd,
-                                                    strdup( lua_tostring( L, -1 ) ),
-                                                    strdup( lua_tostring( L, -1 ) ) );
+            char *psz_url = strdup( lua_tostring( L, -1 ) );
             lua_pop( L, 1 );
+            input_item_t *p_input = input_item_New( p_sd, psz_url, psz_url );
+            free( psz_url );
             vlclua_read_meta_data( p_sd, L, p_input );
             /* This one is to be tested... */
             vlclua_read_custom_meta_data( p_sd, L, p_input );
+            /* The duration is given in seconds, convert to microseconds */
             lua_getfield( L, -1, "duration" );
             if( lua_isnumber( L, -1 ) )
                input_item_SetDuration( p_input, (lua_tonumber( L, -1 )*1e6) );
@@ -197,6 +201,8 @@ static int vlclua_sd_remove_item( lua_State *L )
         input_item_t **pp_input = luaL_checkudata( L, -1, "input_item_t" );
         if( *pp_input )
             services_discovery_RemoveItem( p_sd, *pp_input );
+        /* Make sure we won't try to remove it again */
+        *pp_input = NULL;
     }
     return 1;
 }
@@ -212,11 +218,11 @@ static int vlclua_node_add_subitem( lua_State *L )
             lua_getfield( L, -1, "url" );
             if( lua_isstring( L, -1 ) )
             {
-                input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
-                input_item_t *p_input = input_item_New( p_sd,
-                                                        strdup( lua_tostring( L, -1 ) ),
-                                                        strdup( lua_tostring( L, -1 ) ) );
+                char *url = strdup( lua_tostring( L, -1 ) );
                 lua_pop( L, 1 );
+                input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
+                input_item_t *p_input = input_item_New( p_sd, url, url );
+                free( url );
                 vlclua_read_meta_data( p_sd, L, p_input );
                 /* This one is to be tested... */
                 vlclua_read_custom_meta_data( p_sd, L, p_input );
@@ -258,11 +264,12 @@ static int vlclua_node_add_node( lua_State *L )
             lua_getfield( L, -1, "title" );
             if( lua_isstring( L, -1 ) )
             {
-                input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
-                input_item_t *p_input = input_item_New( p_sd,
-                                                        "vlc://nop",
-                                                        strdup( lua_tostring( L, -1 ) ) );
+                char *name = strdup( lua_tostring( L, -1 ) );
                 lua_pop( L, 1 );
+                input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
+                input_item_t *p_input = input_item_New( p_sd, "vlc://nop",
+                                                        name );
+                free( name );
                 lua_getfield( L, -1, "arturl" );
                 if( lua_isstring( L, -1 ) )
                 {
