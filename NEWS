@@ -50,19 +50,19 @@ Video Output:
 
 Extensions:
  * new content extensions lua framework
- * imdb extension
+ * IMDb extension
 
 Audio filters:
  * Chorus/Flanger audio filter
- * 3F1R to stereo downmix filter
- * Dolby mixer, parameterized equalizer, trivial mixer, scaletempo, bandlimited resampler,
-   linear resampler, ugly resampler, converter_fixed, DTS to SPDIF and
-   A/52 to SPDIF filters have been upgraded to the "audio filter2" API
+ * 3F1R to stereo down-mix filter
+ * Dolby mixer, parameterized equalizer, trivial mixer, scaletempo, bandlimited 
+   resampler, linear resampler, ugly resampler, converter_fixed, DTS to SPDIF 
+   and A/52 to SPDIF filters have been upgraded to the "audio filter2" API
  * NEON assembly audio converter module
  * Converter filters have been rewritten and extended to support s32 as input
 
-Visualisation:
- * Support of .milk visualisation files using projectM libraries
+Visualization:
+ * Support of .milk visualization files using projectM libraries
 
 Service discovery:
  * Service discovery for Picture/Music/Video user directories
@@ -70,7 +70,7 @@ Service discovery:
 
 Encoders:
  * x264, add psy-rd parameter and change default settings
- * x264, add profile-limitter sameway as x264.eve has, for example
+ * x264, add profile-limitter same way as x264.eve has, for example
     #transcode{vcodec=h264,venc=x264{profile=baseline,level=1.2},vb=384,width=320,height=176}
  * x264, defaults to crf=23 as x264.exe-does, if bitrate is given,
    uses ABR and if qp-value is set uses CQP
@@ -92,6 +92,7 @@ Mac OS X Port:
  * Improved update detection and installation by using the Sparkle framework
    by Andy Matuschak et al.
  * New CoreText based text renderer replacing the former ATSUI renderer
+ * New Video output module (mostly targetting VLCKit)
 
 Windows port:
  * Integration in Windows 7 taskbar
@@ -111,11 +112,11 @@ Bindings:
  * new C++ wrapper around libVLC: libVLCpp
 
 Removed modules:
- * csri codec. Use libass module instead.
- * galaktos. Use new projectM module instead.
- * showintf. Useless in qt and mac os X
+ * csri codec. Use the libass module instead.
+ * galaktos. Use the new projectM module instead.
+ * showintf. Useless in Qt and on Mac OS X
  * transrate
- * Xlib x11, Xlib xvideo, Xlib glx. Use new XCB modules instead.
+ * Xlib x11, Xlib xvideo, Xlib glx. Use the new XCB modules instead.
  * HAL. Use libudev instead.
  * gtk_main, gtk_main2, gnome_main, gnome_main2 and pda interfaces
  * WinCE, BeOS and qnx interfaces
@@ -123,10 +124,10 @@ Removed modules:
  * linear_resampler and trivial_resampler are removed. Use the ugly one.
  * XvMC accelerated modules. Use VAAPI instead.
  * MGA (Matroska) for Linux. Use Linux Framebuffer (or X) instead.
- * opengllayer
- * cddax. Use cdda instead
+ * opengllayer. Use macosx_video instead.
+ * cddax. Use cdda instead.
  * cmml and tarkin codecs are removed because they are dead codecs.
- * realaudio codecs is remove in favour of avcodec
+ * realaudio codecs are removed in favor of libavcodec
  * access_file removed in favor of filesystem
 
 
@@ -145,7 +146,7 @@ Windows port:
    increase performance and fix x264 issues
 
 Translations:
- * Portuguese Brazilian, Lithunanian, Romanian, Ukranian, Japanese, Bengali,
+ * Portuguese Brazilian, Lithuanian, Romanian, Ukrainian, Japanese, Bengali,
    Walloon, Galician, Danish, Khmer, Polish, Slovenian, Vietnamese, Finnish
    Russian, Slovak translation updates
  * New Malayalam, Macedoninan, Nynorsk translations
