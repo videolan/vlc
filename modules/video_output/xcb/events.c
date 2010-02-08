@@ -28,9 +28,6 @@
 #include <assert.h>
 
 #include <xcb/xcb.h>
-#ifndef XCB_CURSOR_NONE
-# define XCB_CURSOR_NONE ((xcb_cursor_t) 0U)
-#endif
 
 #include <vlc_common.h>
 #include <vlc_vout_display.h>

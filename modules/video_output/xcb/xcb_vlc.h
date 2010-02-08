@@ -26,6 +26,10 @@
 # define ORDER XCB_IMAGE_ORDER_LSB_FIRST
 #endif
 
+#ifndef XCB_CURSOR_NONE
+# define XCB_CURSOR_NONE ((xcb_cursor_t) 0U)
+#endif
+
 #include <vlc_picture.h>
 #include <vlc_vout_display.h>
 
