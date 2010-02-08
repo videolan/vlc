@@ -476,6 +476,7 @@ VLC_Compiler
 vlc_cond_broadcast
 vlc_cond_destroy
 vlc_cond_init
+vlc_cond_init_daytime
 vlc_cond_signal
 vlc_cond_timedwait
 vlc_cond_wait

@@ -134,7 +134,12 @@ typedef struct
 } vlc_mutex_t;
 #define VLC_STATIC_MUTEX { false, { { false, 0 } } }
 
-typedef HANDLE  vlc_cond_t;
+typedef struct
+{
+    HANDLE   handle;
+    unsigned clock;
+} vlc_cond_t;
+
 typedef HANDLE  vlc_sem_t;
 
 typedef struct
@@ -165,6 +170,7 @@ VLC_EXPORT( void, vlc_mutex_lock, ( vlc_mutex_t * ) );
 VLC_EXPORT( int,  vlc_mutex_trylock, ( vlc_mutex_t * ) LIBVLC_USED );
 VLC_EXPORT( void, vlc_mutex_unlock, ( vlc_mutex_t * ) );
 VLC_EXPORT( void, vlc_cond_init,     ( vlc_cond_t * ) );
+VLC_EXPORT( void, vlc_cond_init_daytime, ( vlc_cond_t * ) );
 VLC_EXPORT( void, vlc_cond_destroy,  ( vlc_cond_t * ) );
 VLC_EXPORT( void, vlc_cond_signal, (vlc_cond_t *) );
 VLC_EXPORT( void, vlc_cond_broadcast, (vlc_cond_t *) );

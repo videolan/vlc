@@ -247,17 +247,34 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
 }
 
 /*** Condition variables ***/
-void vlc_cond_init( vlc_cond_t *p_condvar )
+enum
+{
+    CLOCK_MONOTONIC,
+    CLOCK_REALTIME,
+};
+
+static void vlc_cond_init_common (vlc_cond_t *p_condvar, unsigned clock)
 {
     /* Create a manual-reset event (manual reset is needed for broadcast). */
-    *p_condvar = CreateEvent (NULL, TRUE, FALSE, NULL);
-    if (!*p_condvar)
+    p_condvar->handle = CreateEvent (NULL, TRUE, FALSE, NULL);
+    if (!p_condvar->handle)
         abort();
+    p_condvar->clock = clock;
+}
+
+void vlc_cond_init (vlc_cond_t *p_condvar)
+{
+    vlc_cond_init_common (p_condvar, CLOCK_MONOTONIC);
+}
+
+void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
+{
+    vlc_cond_init_common (p_condvar, CLOCK_REALTIME);
 }
 
 void vlc_cond_destroy (vlc_cond_t *p_condvar)
 {
-    CloseHandle (*p_condvar);
+    CloseHandle (p_condvar->handle);
 }
 
 void vlc_cond_signal (vlc_cond_t *p_condvar)
@@ -267,12 +284,12 @@ void vlc_cond_signal (vlc_cond_t *p_condvar)
      * waiting, which is also wrong. However both of these issues are allowed
      * by the provision for spurious wakeups. Better have too many wakeups
      * than too few (= deadlocks). */
-    SetEvent (*p_condvar);
+    SetEvent (p_condvar->handle);
 }
 
 void vlc_cond_broadcast (vlc_cond_t *p_condvar)
 {
-    SetEvent (*p_condvar);
+    SetEvent (p_condvar->handle);
 }
 
 void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
@@ -284,14 +301,14 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
     {
         vlc_testcancel ();
         LeaveCriticalSection (&p_mutex->mutex);
-        result = WaitForSingleObjectEx (*p_condvar, INFINITE, TRUE);
+        result = WaitForSingleObjectEx (p_condvar->handle, INFINITE, TRUE);
         EnterCriticalSection (&p_mutex->mutex);
     }
     while (result == WAIT_IO_COMPLETION);
 
     assert (result != WAIT_ABANDONED); /* another thread failed to cleanup! */
     assert (result != WAIT_FAILED);
-    ResetEvent (*p_condvar);
+    ResetEvent (p_condvar->handle);
 }
 
 int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
@@ -304,20 +321,32 @@ int vlc_cond_timedwait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex,
     {
         vlc_testcancel ();
 
-        mtime_t total = (deadline - mdate ())/1000;
+        mtime_t total;
+        switch (p_condvar->clock)
+        {
+            case CLOCK_MONOTONIC:
+                total = mdate();
+                break;
+            case CLOCK_REALTIME: /* FIXME? sub-second precision */
+                total = CLOCK_FREQ * time (NULL);
+                break;
+            default:
+                assert (0);
+        }
+        total = (deadline - total) / 1000;
         if( total < 0 )
             total = 0;
 
         DWORD delay = (total > 0x7fffffff) ? 0x7fffffff : total;
         LeaveCriticalSection (&p_mutex->mutex);
-        result = WaitForSingleObjectEx (*p_condvar, delay, TRUE);
+        result = WaitForSingleObjectEx (p_condvar->handle, delay, TRUE);
         EnterCriticalSection (&p_mutex->mutex);
     }
     while (result == WAIT_IO_COMPLETION);
 
     assert (result != WAIT_ABANDONED);
     assert (result != WAIT_FAILED);
-    ResetEvent (*p_condvar);
+    ResetEvent (p_condvar->handle);
 
     return (result == WAIT_OBJECT_0) ? 0 : ETIMEDOUT;
 }

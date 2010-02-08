@@ -256,10 +256,10 @@ void vlc_mutex_unlock (vlc_mutex_t *p_mutex)
     VLC_THREAD_ASSERT ("unlocking mutex");
 }
 
-/*****************************************************************************
- * vlc_cond_init: initialize a condition variable
- *****************************************************************************/
-void vlc_cond_init( vlc_cond_t *p_condvar )
+/**
+ * Initializes a condition variable.
+ */
+void vlc_cond_init (vlc_cond_t *p_condvar)
 {
     pthread_condattr_t attr;
 
@@ -277,6 +277,17 @@ void vlc_cond_init( vlc_cond_t *p_condvar )
     if (unlikely(pthread_cond_init (p_condvar, &attr)))
         abort ();
     pthread_condattr_destroy (&attr);
+}
+
+/**
+ * Initializes a condition variable.
+ * Contrary to vlc_cond_init(), the wall clock will be used as a reference for
+ * the vlc_cond_timedwait() time-out parameter.
+ */
+void vlc_cond_init_daytime (vlc_cond_t *p_condvar)
+{
+    if (unlikely(pthread_cond_init (p_condvar, NULL)))
+        abort ();
 }
 
 /**
@@ -351,7 +362,11 @@ void vlc_cond_wait (vlc_cond_t *p_condvar, vlc_mutex_t *p_mutex)
 
 /**
  * Waits for a condition variable up to a certain date.
- * This works like vlc_cond_wait(), except for the additional timeout.
+ * This works like vlc_cond_wait(), except for the additional time-out.
+ *
+ * If the variable was initialized with vlc_cond_init(), the timeout has the
+ * same arbitrary origin as mdate(). If the variable was initialized with
+ * vlc_cond_init_daytime(), the timeout is expressed from the Unix epoch.
  *
  * @param p_condvar condition variable to wait on
  * @param p_mutex mutex which is unlocked while waiting,
