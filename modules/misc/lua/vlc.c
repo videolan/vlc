@@ -602,17 +602,39 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                     char *temp = strchr( description, '\n' );
                     if( temp )
                         *temp = '\0';
-                    *(*ppsz_file + strlen(*ppsz_file) - 4 )= '\0';
+                    temp = strchr( *ppsz_file, '.' );
+                    if( temp )
+                        *temp = '\0';
+                    char *psz_longname;
+                    if( !strncmp( description, "--SD_Description=", 17 ) )
+                    {
+                        if( !( psz_longname = strdup( description + 17 ) ) )
+                        {
+                            fclose( fd );
+                            free( psz_filename );
+                            goto error;
+                        }
+                    }
+                    else
+                    {
+                        if( !( psz_longname = strdup( *ppsz_file ) ) )
+                        {
+                            fclose( fd );
+                            free( psz_filename );
+                            goto error;
+                        }
+                    }
                     if( asprintf( &psz_name, "lua{sd=%s,longname=%s}",
-                                  *ppsz_file, description + 17 ) < 0 )
+                                  *ppsz_file, psz_longname ) < 0 )
                     {
                         fclose( fd );
                         free( psz_filename );
+                        free( psz_longname );
                         goto error;
                     }
-                    vlc_sd_probe_Add( probe, psz_name,
-                                      description + 17 );
+                    vlc_sd_probe_Add( probe, psz_name, psz_longname );
                     free( psz_name );
+                    free( psz_longname );
                 }
                 fclose( fd );
             }
