@@ -627,10 +627,6 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_I444, "Planar 4:4:4 YUV"),
         A("I444"),
 
-    B(VLC_CODEC_I420, "Planar 4:1:0 YUV full scale"),
-        A("J410"),
-    B(VLC_CODEC_I420, "Planar 4:1:1 YUV full scale"),
-        A("J411"),
     B(VLC_CODEC_I420, "Planar 4:2:0 YUV full scale"),
         A("J420"),
     B(VLC_CODEC_I422, "Planar 4:2:2 YUV full scale"),
