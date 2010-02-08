@@ -491,7 +491,7 @@ static void FilterPlanar( vout_thread_t *p_vout,
                     p_in_end -= p_pic->p[i_index].i_pitch;
                     vlc_memcpy( p_out, p_in_end,
                                 p_pic->p[i_index].i_visible_pitch );
-                    p_out += p_pic->p[i_index].i_pitch;
+                    p_out += p_outpic->p[i_index].i_pitch;
                 }
             }
             break;
@@ -516,6 +516,8 @@ static void FilterPlanar( vout_thread_t *p_vout,
                     }
 
                     p_in += p_pic->p[i_index].i_pitch;
+                    p_out += p_outpic->p[i_index].i_pitch
+                                - p_outpic->p[i_index].i_visible_pitch;
                 }
             }
             break;
@@ -838,6 +840,8 @@ static void FilterYUYV( vout_thread_t *p_vout,
                     }
 
                     p_in += p_pic->p[i_index].i_pitch;
+                    p_out += p_outpic->p[i_index].i_pitch
+                                - p_outpic->p[i_index].i_visible_pitch;
                 }
             }
             break;
