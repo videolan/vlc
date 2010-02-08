@@ -120,7 +120,8 @@ static int vlclua_sd_add_node( lua_State *L )
         {
             char *name = strdup( lua_tostring( L, -1 ) );
             lua_pop( L, 1 );
-            input_item_t *p_input = input_item_NewWithType( p_sd, "vlc://nop",
+            input_item_t *p_input = input_item_NewWithType( VLC_OBJECT( p_sd ),
+                                                            "vlc://nop",
                                                             name, 0, NULL, 0,
                                                             -1, ITEM_TYPE_NODE );
             free( name );
@@ -269,7 +270,8 @@ static int vlclua_node_add_node( lua_State *L )
                 char *name = strdup( lua_tostring( L, -1 ) );
                 lua_pop( L, 1 );
                 input_item_node_t *p_input_node = input_item_node_Create( *pp_node );
-                input_item_t *p_input = input_item_NewWithType( p_sd, "vlc://nop",
+                input_item_t *p_input = input_item_NewWithType( VLC_OBJECT( p_sd ),
+                                                                "vlc://nop",
                                                                 name, 0, NULL, 0,
                                                                 -1, ITEM_TYPE_NODE );
                 free( name );
