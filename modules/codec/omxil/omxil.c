@@ -168,6 +168,49 @@ static int CreateComponentsList(decoder_t *p_dec, const char *psz_role)
     return p_sys->components;
 }
 
+/*****************************************************************************
+ * ImplementationSpecificWorkarounds: place-holder for implementation
+ * specific workarounds
+ *****************************************************************************/
+static OMX_ERRORTYPE ImplementationSpecificWorkarounds(decoder_t *p_dec,
+    OmxPort *p_port, es_format_t *p_fmt)
+{
+    decoder_sys_t *p_sys = p_dec->p_sys;
+    OMX_PARAM_PORTDEFINITIONTYPE *def = &p_port->definition;
+
+    if(!strcmp(p_sys->psz_component, "OMX.TI.Video.Decoder"))
+    {
+        if(p_fmt->i_cat == VIDEO_ES && def->eDir == OMX_DirOutput &&
+           p_fmt->i_codec == VLC_CODEC_I420)
+        {
+            /* I420 xvideo is slow on OMAP */
+            def->format.video.eColorFormat = OMX_COLOR_FormatCbYCrY;
+            GetVlcChromaFormat( def->format.video.eColorFormat,
+                                &p_fmt->i_codec, 0 );
+            GetVlcChromaSizes( p_fmt->i_codec,
+                               def->format.video.nFrameWidth,
+                               def->format.video.nFrameHeight,
+                               &p_port->i_frame_size, &p_port->i_frame_stride,
+                               &p_port->i_frame_stride_chroma_div );
+            def->format.video.nStride = p_port->i_frame_stride;
+            def->nBufferSize = p_port->i_frame_size;
+        }
+    }
+    else if(!strcmp(p_sys->psz_component, "OMX.st.video_encoder"))
+    {
+        if(p_fmt->i_cat == VIDEO_ES)
+        {
+            /* Bellagio's encoder doesn't encode the framerate in Q16 */
+            def->format.video.xFramerate >>= 16;
+        }
+    }
+
+    return OMX_ErrorNone;
+}
+
+/*****************************************************************************
+ * SetPortDefinition: set definition of the omx port based on the vlc format
+ *****************************************************************************/
 static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                                        es_format_t *p_fmt)
 {
@@ -188,12 +231,8 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
             def->format.video.nStride = def->format.video.nFrameWidth;
         if( p_fmt->video.i_frame_rate > 0 &&
             p_fmt->video.i_frame_rate_base > 0 )
-#if 0
             def->format.video.xFramerate = (p_fmt->video.i_frame_rate << 16) /
                 p_fmt->video.i_frame_rate_base;
-#else
-        def->format.video.xFramerate = p_fmt->video.i_frame_rate;
-#endif
 
         if(def->eDir == OMX_DirInput || p_dec->p_sys->b_enc)
         {
@@ -222,7 +261,6 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
         }
         else
         {
-            //def->format.video.eColorFormat = OMX_COLOR_FormatCbYCrY;
             if( !GetVlcChromaFormat( def->format.video.eColorFormat,
                                      &p_fmt->i_codec, 0 ) )
             {
@@ -267,6 +305,8 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
     default: return OMX_ErrorNotImplemented;
     }
 
+    ImplementationSpecificWorkarounds(p_dec, p_port, p_fmt);
+
     omx_error = OMX_SetParameter(p_port->omx_handle,
                                  OMX_IndexParamPortDefinition, def);
     CHECK_ERROR(omx_error, "OMX_SetParameter failed (%x : %s)",
@@ -300,6 +340,9 @@ static OMX_ERRORTYPE SetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
     return omx_error;
 }
 
+/*****************************************************************************
+ * GetPortDefinition: set vlc format based on the definition of the omx port
+ *****************************************************************************/
 static OMX_ERRORTYPE GetPortDefinition(decoder_t *p_dec, OmxPort *p_port,
                                        es_format_t *p_fmt)
 {
@@ -434,7 +477,7 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
     {
         omx_error = OMX_SendCommand( omx_handle, OMX_CommandStateSet,
                                      OMX_StateLoaded, 0 );
-        CHECK_ERROR(omx_error, "ONX_CommandStateSet Idle failed (%x)", omx_error );
+        CHECK_ERROR(omx_error, "ONX_CommandStateSet Loaded failed (%x)", omx_error );
 
         for(i = 0; i < p_sys->ports; i++)
         {
@@ -454,7 +497,7 @@ static OMX_ERRORTYPE DeinitialiseComponent(decoder_t *p_dec,
         }
 
         omx_error = WaitForSpecificOmxEvent(p_dec, OMX_EventCmdComplete, 0, 0, 0);
-        CHECK_ERROR(omx_error, "Wait for Idle failed (%x)", omx_error );
+        CHECK_ERROR(omx_error, "Wait for Loaded failed (%x)", omx_error );
     }
 
  error:
@@ -494,6 +537,7 @@ static OMX_ERRORTYPE InitialiseComponent(decoder_t *p_dec,
                   omx_error, ErrorToString(omx_error) );
         return omx_error;
     }
+    strncpy(p_sys->psz_component, psz_component, OMX_MAX_STRINGNAME_SIZE-1);
 
     OMX_ComponentRoleEnum(omx_handle, psz_role, 0);
     msg_Dbg(p_dec, "loaded component %s of role %s", psz_component, psz_role);
@@ -1013,6 +1057,11 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
     OMX_FIFO_GET(&p_sys->in.fifo, p_header);
     if(p_header)
     {
+        p_header->nFilledLen = p_block->i_buffer;
+        p_header->nOffset = 0;
+        p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
+        p_header->nTimeStamp = p_block->i_dts;
+
         /* In direct mode we pass the input pointer as is.
          * Otherwise we memcopy the data */
         if(p_sys->in.b_direct)
@@ -1023,20 +1072,16 @@ static picture_t *DecodeVideo( decoder_t *p_dec, block_t **pp_block )
         }
         else
         {
-            if(p_block->i_buffer > p_header->nAllocLen)
+            if(p_header->nFilledLen > p_header->nAllocLen)
             {
-                msg_Dbg(p_dec, "buffer too small (%i,%i)", p_block->i_buffer,
-                        (int)p_header->nAllocLen);
-                p_block->i_buffer = p_header->nAllocLen;
+                msg_Dbg(p_dec, "buffer too small (%i,%i)",
+                        (int)p_header->nFilledLen, (int)p_header->nAllocLen);
+                p_header->nFilledLen = p_header->nAllocLen;
             }
-            memcpy(p_header->pBuffer, p_block->p_buffer, p_block->i_buffer );
+            memcpy(p_header->pBuffer, p_block->p_buffer, p_header->nFilledLen );
             block_Release(p_block);
         }
 
-        p_header->nFilledLen = p_block->i_buffer;
-        p_header->nOffset = 0;
-        p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
-        p_header->nTimeStamp = p_block->i_dts;
 #ifdef OMXIL_EXTRA_DEBUG
         msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
                  (int)p_header->nFilledLen );
@@ -1145,6 +1190,11 @@ aout_buffer_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
     OMX_FIFO_GET(&p_sys->in.fifo, p_header);
     if(p_header)
     {
+        p_header->nFilledLen = p_block->i_buffer;
+        p_header->nOffset = 0;
+        p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
+        p_header->nTimeStamp = p_block->i_dts;
+
         /* In direct mode we pass the input pointer as is.
          * Otherwise we memcopy the data */
         if(p_sys->in.b_direct)
@@ -1155,20 +1205,16 @@ aout_buffer_t *DecodeAudio ( decoder_t *p_dec, block_t **pp_block )
         }
         else
         {
-            if(p_block->i_buffer > p_header->nAllocLen)
+            if(p_header->nFilledLen > p_header->nAllocLen)
             {
-                msg_Dbg(p_dec, "buffer too small (%i,%i)", p_block->i_buffer,
-                        (int)p_header->nAllocLen);
-                p_block->i_buffer = p_header->nAllocLen;
+                msg_Dbg(p_dec, "buffer too small (%i,%i)",
+                        (int)p_header->nFilledLen, (int)p_header->nAllocLen);
+                p_header->nFilledLen = p_header->nAllocLen;
             }
-            memcpy(p_header->pBuffer, p_block->p_buffer, p_block->i_buffer );
+            memcpy(p_header->pBuffer, p_block->p_buffer, p_header->nFilledLen );
             block_Release(p_block);
         }
 
-        p_header->nFilledLen = p_block->i_buffer;
-        p_header->nOffset = 0;
-        p_header->nFlags = OMX_BUFFERFLAG_ENDOFFRAME;
-        p_header->nTimeStamp = p_block->i_dts;
 #ifdef OMXIL_EXTRA_DEBUG
         msg_Dbg( p_dec, "EmptyThisBuffer %p, %p, %i", p_header, p_header->pBuffer,
                  (int)p_header->nFilledLen );
