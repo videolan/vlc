@@ -234,13 +234,17 @@ void input_item_CopyOptions( input_item_t *p_parent,
     vlc_mutex_unlock( &p_parent->lock );
 }
 
-static void notify_subitem_added(input_item_t *p_parent, input_item_t *p_child)
+static void post_subitems( input_item_node_t *p_node )
 {
-    /* Notify interested third parties */
-    vlc_event_t event;
-    event.type = vlc_InputItemSubItemAdded;
-    event.u.input_item_subitem_added.p_new_child = p_child;
-    vlc_event_send( &p_parent->event_manager, &event );
+    for( int i = 0; i < p_node->i_children; i++ )
+    {
+        vlc_event_t event;
+        event.type = vlc_InputItemSubItemAdded;
+        event.u.input_item_subitem_added.p_new_child = p_node->pp_children[i]->p_item;
+        vlc_event_send( &p_node->p_item->event_manager, &event );
+
+        post_subitems( p_node->pp_children[i] );
+    }
 }
 
 /* This won't hold the item, but can tell to interested third parties
@@ -997,8 +1001,6 @@ input_item_node_t *input_item_node_AppendItem( input_item_node_t *p_node, input_
 
 void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t *p_child )
 {
-    notify_subitem_added(p_parent->p_item, p_child->p_item);
-
     assert( p_parent && p_child && p_child->p_parent == NULL );
     INSERT_ELEM( p_parent->pp_children,
                  p_parent->i_children,
@@ -1009,6 +1011,8 @@ void input_item_node_AppendNode( input_item_node_t *p_parent, input_item_node_t 
 
 void input_item_node_PostAndDelete( input_item_node_t *p_root )
 {
+  post_subitems( p_root );
+
   vlc_event_t event;
   event.type = vlc_InputItemSubItemTreeAdded;
   event.u.input_item_subitem_tree_added.p_root = p_root;
