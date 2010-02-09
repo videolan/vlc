@@ -44,51 +44,51 @@
 
 static inline void vout_SendEventClose(vout_thread_t *vout)
 {
-	/* Ask to stop
-	 * FIXME works only for input handled by the playlist
-	 */
-	playlist_t *playlist = pl_Hold(vout);
-	if (playlist) {
-		playlist_Stop(playlist);
-		pl_Release(vout);
-	}
+    /* Ask to stop
+     * FIXME works only for input handled by the playlist
+     */
+    playlist_t *playlist = pl_Hold(vout);
+    if (playlist) {
+        playlist_Stop(playlist);
+        pl_Release(vout);
+    }
 }
 static inline void vout_SendEventKey(vout_thread_t *vout, int key)
 {
-	var_SetInteger(vout->p_libvlc, "key-pressed", key);
+    var_SetInteger(vout->p_libvlc, "key-pressed", key);
 }
 static inline void vout_SendEventMouseMoved(vout_thread_t *vout, int x, int y)
 {
-	var_SetInteger(vout, "mouse-x", x);
-	var_SetInteger(vout, "mouse-y", y);
-	var_SetBool(vout, "mouse-moved", true);
+    var_SetInteger(vout, "mouse-x", x);
+    var_SetInteger(vout, "mouse-y", y);
+    var_SetBool(vout, "mouse-moved", true);
 }
 static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
 {
-	int current = var_GetInteger(vout, "mouse-button-down");
-	current |= 1 << button;
-	var_SetInteger(vout, "mouse-button-down", current);
+    int current = var_GetInteger(vout, "mouse-button-down");
+    current |= 1 << button;
+    var_SetInteger(vout, "mouse-button-down", current);
 
-	switch (button)
-	{
-	case MOUSE_BUTTON_LEFT:
-        var_SetBool(vout, "mouse-clicked", true);
-		var_SetBool(vout->p_libvlc, "intf-popupmenu", false);
-		break;
-	case MOUSE_BUTTON_CENTER:
-		var_SetBool(vout->p_libvlc, "intf-show",
-					 !var_GetBool(vout->p_libvlc, "intf-show"));
-		break;
-	case MOUSE_BUTTON_RIGHT:
-		var_SetBool(vout->p_libvlc, "intf-popupmenu", true);
-		break;
-	}
+    switch (button)
+    {
+    case MOUSE_BUTTON_LEFT:
+                var_SetBool(vout, "mouse-clicked", true);
+        var_SetBool(vout->p_libvlc, "intf-popupmenu", false);
+        break;
+    case MOUSE_BUTTON_CENTER:
+        var_SetBool(vout->p_libvlc, "intf-show",
+                     !var_GetBool(vout->p_libvlc, "intf-show"));
+        break;
+    case MOUSE_BUTTON_RIGHT:
+        var_SetBool(vout->p_libvlc, "intf-popupmenu", true);
+        break;
+    }
 }
 static inline void vout_SendEventMouseReleased(vout_thread_t *vout, int button)
 {
-	int current = var_GetInteger(vout, "mouse-button-down");
-	current &= ~(1 << button);
-	var_SetInteger(vout, "mouse-button-down", current);
+    int current = var_GetInteger(vout, "mouse-button-down");
+    current &= ~(1 << button);
+    var_SetInteger(vout, "mouse-button-down", current);
 }
 static inline void vout_SendEventMouseDoubleClick(vout_thread_t *vout)
 {
