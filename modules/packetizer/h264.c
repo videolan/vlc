@@ -31,6 +31,7 @@
 #ifdef HAVE_CONFIG_H
 # include "config.h"
 #endif
+#include <assert.h>
 
 #include <vlc_common.h>
 #include <vlc_plugin.h>
@@ -150,6 +151,8 @@ enum nal_priority_e
     NAL_PRIORITY_HIGH       = 2,
     NAL_PRIORITY_HIGHEST    = 3,
 };
+
+#define BLOCK_FLAG_PRIVATE_AUD (1 << BLOCK_FLAG_PRIVATE_SHIFT)
 
 static block_t *Packetize( decoder_t *, block_t ** );
 static block_t *PacketizeAVC1( decoder_t *, block_t ** );
@@ -663,7 +666,21 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
 
         /* Parse SEI for CC support */
         if( i_nal_type == NAL_SEI )
+        {
             ParseSei( p_dec, p_frag );
+        }
+        else if( i_nal_type == NAL_AU_DELIMITER )
+        {
+            if( p_sys->p_frame && (p_sys->p_frame->i_flags & BLOCK_FLAG_PRIVATE_AUD) )
+            {
+                block_Release( p_frag );
+                p_frag = NULL;
+            }
+            else
+            {
+                p_frag->i_flags |= BLOCK_FLAG_PRIVATE_AUD;
+            }
+        }
     }
 
     /* Append the block */
@@ -691,15 +708,20 @@ static block_t *OutputPicture( decoder_t *p_dec )
 
     if( p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I && p_sys->b_sps && p_sys->b_pps )
     {
-        block_t *p_list = NULL;
-        int i;
+        block_t *p_head = NULL;
+        if( p_sys->p_frame->i_flags & BLOCK_FLAG_PRIVATE_AUD )
+        {
+            p_head = p_sys->p_frame;
+            p_sys->p_frame = p_sys->p_frame->p_next;
+        }
 
-        for( i = 0; i < SPS_MAX; i++ )
+        block_t *p_list = NULL;
+        for( int i = 0; i < SPS_MAX; i++ )
         {
             if( p_sys->pp_sps[i] )
                 block_ChainAppend( &p_list, block_Duplicate( p_sys->pp_sps[i] ) );
         }
-        for( i = 0; i < PPS_MAX; i++ )
+        for( int i = 0; i < PPS_MAX; i++ )
         {
             if( p_sys->pp_pps[i] )
                 block_ChainAppend( &p_list, block_Duplicate( p_sys->pp_pps[i] ) );
@@ -707,8 +729,13 @@ static block_t *OutputPicture( decoder_t *p_dec )
         if( p_list )
             p_sys->b_header = true;
 
-        block_ChainAppend( &p_list, p_sys->p_frame );
-        p_pic = block_ChainGather( p_list );
+        if( p_head )
+            p_head->p_next = p_list;
+        else
+            p_head = p_list;
+        block_ChainAppend( &p_head, p_sys->p_frame );
+
+        p_pic = block_ChainGather( p_head );
     }
     else
     {
@@ -718,6 +745,7 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_pic->i_pts = p_sys->i_frame_pts;
     p_pic->i_length = 0;    /* FIXME */
     p_pic->i_flags |= p_sys->slice.i_frame_type;
+    p_pic->i_flags &= ~BLOCK_FLAG_PRIVATE_AUD;
 
     p_sys->slice.i_frame_type = 0;
     p_sys->p_frame = NULL;
