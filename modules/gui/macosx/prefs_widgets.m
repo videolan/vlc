@@ -2071,7 +2071,7 @@ o_textfield = [[[NSSecureTextField alloc] initWithFrame: s_rc] retain];       \
         {
             unsigned int i;
             o_keys_menu = [[NSMenu alloc] initWithTitle: @"Keys Menu"];
-#warning this doesn't work anymore. FIXME.
+#warning This does not work anymore. FIXME.
 #if 0
             for ( i = 0; i < sizeof(vlc_keys) / sizeof(key_descriptor_t); i++)
                 if( vlc_keys[i].psz_key_string )
