@@ -780,13 +780,14 @@ static void Close   ( vlc_object_t *p_this )
     var_DelCallback( p_playlist, "repeat", AllCallback, p_intf );
     var_DelCallback( p_playlist, "loop", AllCallback, p_intf );
 
-    p_input = playlist_CurrentInput( p_playlist );
+#if 0.
+    p_input = ???;
     if ( p_input )
     {
         var_DelCallback( p_input, "state", AllCallback, p_intf );
         vlc_object_release( p_input );
     }
-
+#endif
     dbus_connection_unref( p_sys->p_conn );
 
     // Free the events array
@@ -1085,9 +1086,9 @@ static int TrackChange( intf_thread_t *p_intf )
         TrackChangeSignal( p_sys->p_conn, p_item );
     }
 
+#if 0
     var_AddCallback( p_input, "state", AllCallback, p_intf );
-
-    vlc_object_release( p_input );
+#endif
     return VLC_SUCCESS;
 }
 
