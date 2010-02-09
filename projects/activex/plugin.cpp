@@ -1,9 +1,10 @@
 /*****************************************************************************
  * plugin.cpp: ActiveX control for VLC
  *****************************************************************************
- * Copyright (C) 2006 the VideoLAN team
+ * Copyright (C) 2006-2010 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
+ *          Jean-Paul Saman <jpsaman@videolan.org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -47,6 +48,7 @@
 #include <servprov.h>
 #include <shlwapi.h>
 #include <wininet.h>
+#include <assert.h>
 
 using namespace std;
 
@@ -418,7 +420,6 @@ HRESULT VLCPlugin::onLoad(void)
     return S_OK;
 };
 
-
 void VLCPlugin::initVLC()
 {
     extern HMODULE DllGetModule();
@@ -486,21 +487,11 @@ void VLCPlugin::initVLC()
     if( _b_autoloop )
         ppsz_argv[ppsz_argc++] = "--loop";
 
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-
-    _p_libvlc = libvlc_new(ppsz_argc, ppsz_argv, &ex);
-    if( libvlc_exception_raised(&ex) )
+    _p_libvlc = libvlc_new(ppsz_argc, ppsz_argv);
+    if( !_p_libvlc )
         return;
 
     _p_mlist = libvlc_media_list_new(_p_libvlc);
-
-    // initial volume setting
-    libvlc_audio_set_volume(_p_libvlc, _i_volume, NULL);
-    if( _b_mute )
-    {
-        libvlc_audio_set_mute(_p_libvlc, TRUE);
-    }
 
     // initial playlist item
     if( SysStringLen(_bstr_mrl) > 0 )
@@ -542,7 +533,7 @@ void VLCPlugin::initVLC()
                 options[i_options++] = timeBuffer;
             }
             // add default target to playlist
-            playlist_add_extended_untrusted(psz_mrl, i_options, options, NULL);
+            playlist_add_extended_untrusted(psz_mrl, i_options, options);
             CoTaskMemFree(psz_mrl);
         }
     }
@@ -668,8 +659,6 @@ BOOL VLCPlugin::isInPlaceActive(void)
 HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprcPosRect, LPCRECT lprcClipRect)
 {
     RECT clipRect = *lprcClipRect;
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
 
     /*
     ** record keeping of control geometry within container
@@ -714,9 +703,9 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
         if( FAILED(result) )
             return result;
 
-        if( _b_autoplay && playlist_select(0,NULL) )
+        if( _b_autoplay && playlist_select(0) )
         {
-            libvlc_media_player_play(_p_mplayer,NULL);
+            libvlc_media_player_play(_p_mplayer);
             fireOnPlayEvent();
         }
     }
@@ -729,9 +718,9 @@ HRESULT VLCPlugin::onActivateInPlace(LPMSG lpMesg, HWND hwndParent, LPCRECT lprc
 
 HRESULT VLCPlugin::onInPlaceDeactivate(void)
 {
-    if( isPlaying(NULL) )
+    if( isPlaying() )
     {
-        playlist_stop(NULL);
+        playlist_stop();
         fireOnStopEvent();
     }
 
@@ -769,7 +758,10 @@ void VLCPlugin::setVolume(int volume)
         _i_volume = volume;
         if( isRunning() )
         {
-            libvlc_audio_set_volume(_p_libvlc, _i_volume, NULL);
+            libvlc_media_player_t *p_md;
+            HRESULT hr = getMD(&p_md);
+            if( SUCCEEDED(hr) )
+                libvlc_audio_set_volume(p_md, _i_volume);
         }
         setDirty(TRUE);
     }
@@ -798,7 +790,7 @@ void VLCPlugin::setTime(int seconds)
         setStartTime(_i_time);
         if( NULL != _p_mplayer )
         {
-            libvlc_media_player_set_time(_p_mplayer, _i_time, NULL);
+            libvlc_media_player_set_time(_p_mplayer, _i_time);
         }
     }
 };
@@ -1004,25 +996,24 @@ void VLCPlugin::fireOnStopEvent(void)
     vlcConnectionPointContainer->fireEvent(DISPID_StopEvent, &dispparamsNoArgs);
 };
 
-bool VLCPlugin::playlist_select( int idx, libvlc_exception_t *ex )
+bool VLCPlugin::playlist_select( int idx )
 {
     libvlc_media_t *p_m = NULL;
+
+    assert(_p_mlist);
 
     libvlc_media_list_lock(_p_mlist);
 
     int count = libvlc_media_list_count(_p_mlist);
-    if( libvlc_exception_raised(ex) )
-        goto bad_unlock;
 
-    if( idx<0||idx>=count )
+    if( (idx < 0) || (idx >= count) )
         goto bad_unlock;
 
     _i_midx = idx;
 
-    p_m = libvlc_media_list_item_at_index(_p_mlist,_i_midx,ex);
+    p_m = libvlc_media_list_item_at_index(_p_mlist,_i_midx);
     libvlc_media_list_unlock(_p_mlist);
-
-    if( libvlc_exception_raised(ex) )
+    if( !p_m )
         return false;
 
     if( _p_mplayer )
@@ -1031,37 +1022,42 @@ bool VLCPlugin::playlist_select( int idx, libvlc_exception_t *ex )
         _p_mplayer = NULL;
     }
 
-    _p_mplayer = libvlc_media_player_new_from_media(p_m,ex);
+    _p_mplayer = libvlc_media_player_new_from_media(p_m);
     if( _p_mplayer )
-        set_player_window(ex);
+    {
+        // initial volume setting
+        libvlc_audio_set_volume(_p_mplayer, _i_volume);
+        if( _b_mute )
+            libvlc_audio_set_mute(_p_mplayer, TRUE);
+        set_player_window();
+    }
 
-    libvlc_media_release( p_m );
-    return !libvlc_exception_raised(ex);
+    libvlc_media_release(p_m);
+    return _p_mplayer ? true : false;
 
 bad_unlock:
     libvlc_media_list_unlock(_p_mlist);
     return false;
 }
 
-void VLCPlugin::set_player_window(libvlc_exception_t *ex)
+void VLCPlugin::set_player_window()
 {
     // XXX FIXME no idea if this is correct or not
     libvlc_media_player_set_hwnd(_p_mplayer,getInPlaceWindow());
 }
 
-int  VLCPlugin::playlist_add_extended_untrusted(const char *mrl, int optc, const char **optv, libvlc_exception_t *ex)
+int  VLCPlugin::playlist_add_extended_untrusted(const char *mrl, int optc, const char **optv)
 {
     int item = -1;
-    libvlc_media_t *p_m = libvlc_media_new(_p_libvlc,mrl,ex);
-    if( libvlc_exception_raised(ex) )
+    libvlc_media_t *p_m = libvlc_media_new(_p_libvlc,mrl);
+    if( !p_m )
         return -1;
 
     for( int i = 0; i < optc; ++i )
         libvlc_media_add_option_flag(p_m, optv[i], libvlc_media_option_unique);
 
     libvlc_media_list_lock(_p_mlist);
-    libvlc_media_list_add_media(_p_mlist,p_m,ex);
-    if( !libvlc_exception_raised(ex) )
+    if( libvlc_media_list_add_media(_p_mlist,p_m) == 0 )
         item = libvlc_media_list_count(_p_mlist)-1;
     libvlc_media_list_unlock(_p_mlist);
     libvlc_media_release(p_m);

@@ -1,7 +1,7 @@
 /*****************************************************************************
  * vlccontrol.h: ActiveX control for VLC
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2010 the VideoLAN team
  *
  * Authors: Damien Fouilleul <Damien.Fouilleul@laposte.net>
  *
@@ -101,14 +101,6 @@ public:
 private:
 
     HRESULT      getTypeInfo();
-    HRESULT      exception_bridge(libvlc_exception_t *ex)
-    {
-        if( ! libvlc_exception_raised(ex) )
-            return NOERROR;
-        _p_instance->setErrorInfo(IID_IVLCControl, libvlc_errmsg());
-        libvlc_exception_clear(ex);
-        return E_FAIL;
-    }
 
     VLCPlugin *_p_instance;
     ITypeInfo *_p_typeinfo;

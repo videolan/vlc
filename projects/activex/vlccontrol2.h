@@ -40,7 +40,6 @@ public:
     HRESULT getMD(libvlc_media_player_t **pp) const { return _plug->getMD(pp); }
 
 protected:
-    HRESULT report_exception(REFIID riid, libvlc_exception_t *ex);
     HRESULT loadTypeInfo(REFIID riid);
     ITypeInfo *TypeInfo() const { return _ti; }
 
@@ -70,12 +69,6 @@ public:
 
     HRESULT getVLC(libvlc_instance_t **pp) const { return Base::getVLC(pp); }
     HRESULT getMD(libvlc_media_player_t **pp) const { return Base::getMD(pp); }
-
-    HRESULT exception_bridge(libvlc_exception_t *ex)
-    {
-        return libvlc_exception_raised(ex) ?
-            Base::report_exception(_riid,ex) : NOERROR;
-    }
 
     STDMETHODIMP QueryInterface(REFIID riid, void **ppv)
     {
@@ -206,7 +199,6 @@ private:
     HRESULT do_get_int(unsigned idx, LONG *val);
 };
 
-
 class VLCLogo: public VLCInterface<VLCLogo,IVLCLogo>
 {
 public:
@@ -239,7 +231,6 @@ private:
     HRESULT do_get_int(unsigned idx, LONG *val);
 };
 
-
 class VLCDeinterlace: public VLCInterface<VLCDeinterlace,IVLCDeinterlace>
 {
 public:
@@ -249,7 +240,6 @@ public:
     STDMETHODIMP enable(BSTR val);
     STDMETHODIMP disable();
 };
-
 
 class VLCPlaylistItems: public VLCInterface<VLCPlaylistItems,IVLCPlaylistItems>
 {
