@@ -228,7 +228,7 @@ static void preparse_if_needed( libvlc_media_t *p_md )
     {
         playlist_PreparseEnqueue(
                 libvlc_priv (p_md->p_libvlc_instance->p_libvlc_int)->p_playlist,
-                p_md->p_input_item, pl_Unlocked );
+                p_md->p_input_item );
         p_md->b_preparsed = true;
     }
 }
@@ -447,7 +447,7 @@ char *libvlc_media_get_meta( libvlc_media_t *p_md, libvlc_meta_t e_meta )
         p_md->has_asked_art = true;
         playlist_AskForArtEnqueue(
                 libvlc_priv(p_md->p_libvlc_instance->p_libvlc_int)->p_playlist,
-                p_md->p_input_item, pl_Unlocked );
+                p_md->p_input_item );
     }
 
     /* Should be integrated in core */

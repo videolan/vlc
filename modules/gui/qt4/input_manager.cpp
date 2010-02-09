@@ -595,7 +595,7 @@ void InputManager::requestArtUpdate()
     if( hasInput() )
     {
         playlist_t *p_playlist = pl_Hold( p_intf );
-        playlist_AskForArtEnqueue( p_playlist, input_GetItem( p_input ), pl_Unlocked );
+        playlist_AskForArtEnqueue( p_playlist, input_GetItem( p_input ) );
         pl_Release( p_intf );
     }
     else

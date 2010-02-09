@@ -216,28 +216,22 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
  * Preparse control
  *****************************************************************************/
 /** Enqueue an item for preparsing */
-int playlist_PreparseEnqueue( playlist_t *p_playlist,
-                              input_item_t *p_item, bool b_locked )
+int playlist_PreparseEnqueue( playlist_t *p_playlist, input_item_t *p_item )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    PL_LOCK_IF( !b_locked );
     if( p_sys->p_preparser )
         playlist_preparser_Push( p_sys->p_preparser, p_item );
-    PL_UNLOCK_IF( !b_locked );
 
     return VLC_SUCCESS;
 }
 
-int playlist_AskForArtEnqueue( playlist_t *p_playlist,
-                               input_item_t *p_item, bool b_locked )
+int playlist_AskForArtEnqueue( playlist_t *p_playlist, input_item_t *p_item )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    PL_LOCK_IF( !b_locked );
     if( p_sys->p_fetcher )
         playlist_fetcher_Push( p_sys->p_fetcher, p_item );
-    PL_UNLOCK_IF( !b_locked );
 
     return VLC_SUCCESS;
 }

@@ -726,7 +726,7 @@ static void GoAndPreparse( playlist_t *p_playlist, int i_mode,
         input_item_IsPreparsed( p_item->p_input ) == false &&
             ( EMPTY_STR( psz_artist ) || ( EMPTY_STR( psz_album ) ) )
           )
-        playlist_PreparseEnqueue( p_playlist, p_item->p_input, pl_Locked );
+        playlist_PreparseEnqueue( p_playlist, p_item->p_input );
     free( psz_artist );
     free( psz_album );
 }

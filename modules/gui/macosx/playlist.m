@@ -959,7 +959,7 @@
         {
             if( p_item->i_children == -1 )
             {
-                playlist_PreparseEnqueue( p_playlist, p_item->p_input, pl_Unlocked );
+                playlist_PreparseEnqueue( p_playlist, p_item->p_input );
             }
             else
             {
@@ -995,7 +995,7 @@
 
         if( p_item && p_item->i_children == -1 )
         {
-            playlist_AskForArtEnqueue( p_playlist, p_item->p_input, pl_Unlocked );
+            playlist_AskForArtEnqueue( p_playlist, p_item->p_input );
         }
     }
     pl_Release( p_intf );

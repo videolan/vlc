@@ -271,7 +271,7 @@ static int PlayItem( playlist_t *p_playlist, playlist_item_t *p_item )
         if( !b_has_art || strncmp( psz_arturl, "attachment://", 13 ) )
         {
             PL_DEBUG( "requesting art for %s", psz_name );
-            playlist_AskForArtEnqueue( p_playlist, p_input, pl_Locked );
+            playlist_AskForArtEnqueue( p_playlist, p_input );
         }
         free( psz_arturl );
         free( psz_name );
