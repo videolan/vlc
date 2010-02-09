@@ -158,6 +158,9 @@ bool Dialogs::init()
     if( m_pProvider == NULL )
         return false;
 
+    // Attach the dialogs provider to its parent interface
+    vlc_object_attach( m_pProvider, getIntf() );
+
     m_pModule = module_need( m_pProvider, "dialogs provider", NULL, false );
     if( m_pModule == NULL )
     {
@@ -165,16 +168,6 @@ bool Dialogs::init()
         vlc_object_release( m_pProvider );
         m_pProvider = NULL;
         return false;
-    }
-
-    // Attach the dialogs provider to its parent interface
-    vlc_object_attach( m_pProvider, getIntf() );
-
-    // Initialize dialogs provider
-    // (returns as soon as initialization is done)
-    if( m_pProvider->pf_run )
-    {
-        m_pProvider->pf_run( m_pProvider );
     }
 
     /* Register callback for the intf-popupmenu variable */
