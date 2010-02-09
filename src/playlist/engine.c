@@ -38,7 +38,6 @@
  * Local prototypes
  *****************************************************************************/
 static void VariablesInit( playlist_t *p_playlist );
-static void playlist_Destructor( vlc_object_t * p_this );
 
 static int RandomCallback( vlc_object_t *p_this, char const *psz_cmd,
                            vlc_value_t oldval, vlc_value_t newval, void *a )
@@ -174,11 +173,16 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
         pl_priv(p_playlist)->b_auto_preparse = b_auto_preparse;
     }
 
-    vlc_object_set_destructor( p_playlist, playlist_Destructor );
-
     return p_playlist;
 }
 
+/**
+ * Destroy playlist.
+ * This is not thread-safe. Any reference to the playlist is assumed gone.
+ * (In particular, all interface and services threads must have been joined).
+ *
+ * \param p_playlist the playlist object
+ */
 void playlist_Destroy( playlist_t *p_playlist )
 {
     playlist_private_t *p_sys = pl_priv(p_playlist);
@@ -188,22 +192,8 @@ void playlist_Destroy( playlist_t *p_playlist )
         playlist_preparser_Delete( p_sys->p_preparser );
     if( p_sys->p_fetcher )
         playlist_fetcher_Delete( p_sys->p_fetcher );
-    vlc_object_release( p_playlist );
-}
 
-/**
- * Destroy playlist
- *
- * Destroy a playlist structure.
- * \param p_playlist the playlist object
- * \return nothing
- */
-
-static void playlist_Destructor( vlc_object_t * p_this )
-{
-    playlist_t *p_playlist = (playlist_t *)p_this;
-    playlist_private_t *p_sys = pl_priv(p_playlist);
-
+    /* Already cleared when deactivating (if activated anyway) */
     assert( !p_sys->p_input );
     assert( !p_sys->p_input_resource );
 
@@ -227,7 +217,7 @@ static void playlist_Destructor( vlc_object_t * p_this )
     ARRAY_RESET( p_playlist->items );
     ARRAY_RESET( p_playlist->current );
 
-    msg_Dbg( p_this, "Destroyed" );
+    vlc_object_release( p_playlist );
 }
 
 /** Get current playing input.
