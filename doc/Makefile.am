@@ -47,7 +47,6 @@ EXTRA_DIST = \
 	skins/curve_maker/Bezier.vbw \
 	strings.txt \
 	translations.txt \
-	win32/Cross-Compile-Howto.txt \
 	demo.sh \
 	$(NULL)
 
