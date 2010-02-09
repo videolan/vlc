@@ -548,7 +548,7 @@ typedef int ( * vlc_callback_t ) ( vlc_object_t *,      /* variable's object */
 /**@}*/                                                                     \
 
 /* VLC_OBJECT: attempt at doing a clever cast */
-#ifdef __GNUC__
+#if defined( __GNUC__ ) && __GNUC__ > 3
 # ifndef __cplusplus
 #  define VLC_OBJECT( x ) \
     __builtin_choose_expr(__builtin_offsetof(__typeof__(*x), psz_object_type), \
