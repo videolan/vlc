@@ -469,7 +469,8 @@ void PLSelector::drawBranches ( QPainter * painter, const QRect & rect, const QM
     if( !model()->hasChildren( index ) ) return;
     QStyleOption option;
     option.initFrom( this );
-    option.rect = rect;
+    option.rect = rect.adjusted( rect.width() - indentation(), 0, 0, 0 );
+
     /*option.state = QStyle::State_Children;
     if( isExpanded( index ) ) option.state |=  QStyle::State_Open;*/
     style()->drawPrimitive( isExpanded( index ) ?
