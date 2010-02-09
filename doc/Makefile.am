@@ -33,7 +33,6 @@ EXTRA_DIST = \
 	fortunes.txt \
 	intf-vcd.txt \
 	release-howto.txt \
-	arm-crosscompile-howto.sgml \
 	Doxyfile.in \
 	lirc/example.lircrc \
 	skins/skins-howto.txt \
