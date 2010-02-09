@@ -748,7 +748,6 @@ static int Open( vlc_object_t *p_this )
     p_playlist = pl_Get( p_intf );
     p_sys->p_playlist = p_playlist;
 
-    PL_LOCK;
     var_AddCallback( p_playlist, "item-current", AllCallback, p_intf );
     var_AddCallback( p_playlist, "intf-change", AllCallback, p_intf );
     var_AddCallback( p_playlist, "playlist-item-append", AllCallback, p_intf );
@@ -756,7 +755,6 @@ static int Open( vlc_object_t *p_this )
     var_AddCallback( p_playlist, "random", AllCallback, p_intf );
     var_AddCallback( p_playlist, "repeat", AllCallback, p_intf );
     var_AddCallback( p_playlist, "loop", AllCallback, p_intf );
-    PL_UNLOCK;
 
     UpdateCaps( p_intf );
 
