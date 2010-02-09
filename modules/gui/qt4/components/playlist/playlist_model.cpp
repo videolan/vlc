@@ -65,7 +65,6 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     i_cached_id       = -1;
     i_cached_input_id = -1;
     i_popup_item      = i_popup_parent = -1;
-    currentItem       = NULL;
 
     rootItem          = NULL; /* PLItem rootItem, will be set in rebuild( ) */
 
@@ -349,8 +348,9 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
 
 bool PLModel::isCurrent( const QModelIndex &index ) const
 {
-    if( !currentItem ) return false;
-    return getItem( index )->p_input == currentItem->p_input;
+    input_thread_t *p_input_thread = THEMIM->getInput();
+    if( !p_input_thread ) return false;
+    return getItem( index )->p_input == input_GetItem( p_input_thread );
 }
 
 int PLModel::itemId( const QModelIndex &index ) const
@@ -397,6 +397,14 @@ QModelIndex PLModel::index( PLItem *item, int column ) const
         return createIndex( parent->children.lastIndexOf( item ),
                             column, item );
     return QModelIndex();
+}
+
+QModelIndex PLModel::currentIndex()
+{
+    input_thread_t *p_input_thread = THEMIM->getInput();
+    if( !p_input_thread ) return QModelIndex();
+    PLItem *item = findByInput( rootItem, input_GetItem( p_input_thread )->i_id );
+    return index( item, 0 );
 }
 
 QModelIndex PLModel::parent( const QModelIndex &index ) const
@@ -577,12 +585,7 @@ void PLModel::processInputItemUpdate( input_thread_t *p_input )
     if( p_input && !( p_input->b_dead || !vlc_object_alive( p_input ) ) )
     {
         PLItem *item = findByInput( rootItem, input_GetItem( p_input )->i_id );
-        currentItem = item;
-        emit currentChanged( index( item, 0 ) );
-    }
-    else
-    {
-        currentItem = NULL;
+        if( item ) emit currentChanged( index( item, 0 ) );
     }
     processInputItemUpdate( input_GetItem( p_input ) );
 }
@@ -624,17 +627,9 @@ void PLModel::processItemAppend( int i_item, int i_parent )
     newItem = new PLItem( p_item, nodeItem );
     PL_UNLOCK;
 
-    currentInputThread = THEMIM->getInput();
-    if( currentInputThread &&
-        newItem->p_input == input_GetItem( currentInputThread ) )
-            currentItem = newItem;
-
     beginInsertRows( index( nodeItem, 0 ), pos, pos );
     nodeItem->insertChild( newItem, pos );
     endInsertRows();
-
-    if( currentItem == newItem )
-      emit currentChanged( index( newItem, 0 ) );
 
     return;
 end:
@@ -705,12 +700,6 @@ void PLModel::removeItem( PLItem *item )
     if( item->i_id == i_cached_id ) i_cached_id = -1;
     i_cached_input_id = -1;
 
-    if( currentItem == item || rootItem == item)
-    {
-        currentItem = NULL;
-        emit currentChanged( QModelIndex() );
-    }
-
     if(item == rootItem)
         rootItem = NULL;
 
@@ -729,24 +718,17 @@ void PLModel::removeItem( PLItem *item )
 void PLModel::updateChildren( PLItem *root )
 {
     playlist_item_t *p_node = playlist_ItemGetById( p_playlist, root->i_id );
-    currentItem = NULL;
     updateChildren( p_node, root );
-    emit currentChanged( index( currentItem, 0 ) );
 }
 
 /* This function must be entered WITH the playlist lock */
 void PLModel::updateChildren( playlist_item_t *p_node, PLItem *root )
 {
-    playlist_item_t *p_item = playlist_CurrentPlayingItem(p_playlist);
     for( int i = 0; i < p_node->i_children ; i++ )
     {
         if( p_node->pp_children[i]->i_flags & PLAYLIST_DBL_FLAG ) continue;
         PLItem *newItem =  new PLItem( p_node->pp_children[i], root );
         root->appendChild( newItem );
-        if( p_item && newItem->p_input == p_item->p_input )
-        {
-            currentItem = newItem;
-        }
         if( p_node->pp_children[i]->i_children != -1 )
             updateChildren( p_node->pp_children[i], newItem );
     }

@@ -87,7 +87,7 @@ public:
     QStringList selectedURIs();
     QModelIndex index( PLItem *, int c ) const;
     QModelIndex index( int i_id, int c );
-    QModelIndex currentIndex( ) { return index( currentItem, 0 ); };
+    QModelIndex currentIndex();
     bool isCurrent( const QModelIndex &index ) const;
     int itemId( const QModelIndex &index ) const;
 
@@ -111,7 +111,6 @@ private:
 
     /* General */
     PLItem *rootItem;
-    PLItem *currentItem;
 
     playlist_t *p_playlist;
     intf_thread_t *p_intf;
