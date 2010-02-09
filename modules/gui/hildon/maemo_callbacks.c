@@ -30,7 +30,7 @@
 #include <gdk/gdkkeysyms.h>
 #include <vlc_keys.h>
 
-#ifdef HAVE_MAEMO
+#ifdef HAVE_HILDON_FM
 # include <hildon/hildon-file-chooser-dialog.h>
 #endif
 
@@ -162,7 +162,7 @@ void open_cb( GtkMenuItem *menuitem, gpointer user_data )
     GtkWidget *dialog;
     char *psz_filename = NULL;
 
-#ifdef HAVE_MAEMO
+#ifdef HAVE_HILDON_FM
     dialog = hildon_file_chooser_dialog_new( GTK_WINDOW( p_intf->p_sys->p_main_window ),
                                              GTK_FILE_CHOOSER_ACTION_OPEN );
 #else

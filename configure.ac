@@ -3992,7 +3992,13 @@ dnl
 AC_ARG_ENABLE(hildon,
   [  --enable-hildon         Hildon touchscreen UI (default disabled)])
 AS_IF([test "${enable_hildon}" = "yes"], [
-  PKG_CHECK_MODULES(HILDON, [hildon-1 hildon-fm-2], [
+  PKG_CHECK_MODULES(HILDON, [hildon-1], [
+    PKG_CHECK_MODULES(HILDON_FM, hildon-fm-2, [
+      VLC_ADD_CFLAGS([hildon],[${HILDON_FM_CFLAGS} -IHAVE_HILDON_FM])
+      VLC_ADD_LIBS([hildon],[${HILDON_FM_LIBS}])
+    ], [
+      AC_MSG_WARN(hildon-fm-2 not found)
+    ])
     VLC_ADD_CFLAGS([hildon],[${HILDON_CFLAGS}])
     VLC_ADD_LIBS([hildon],[${HILDON_LIBS}])
     VLC_ADD_PLUGIN([hildon])

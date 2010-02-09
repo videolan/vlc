@@ -204,7 +204,6 @@ static void *Thread( void *obj )
     play_button = gtk_button_new();
     gtk_button_set_image( GTK_BUTTON( play_button ),
                    gtk_image_new_from_stock( "vlc-play", GTK_ICON_SIZE_BUTTON ) );
-    gtk_widget_set_size_request( play_button, 60, 60);
     p_intf->p_sys->p_play_button = play_button;
     stop_button = gtk_button_new();
     gtk_button_set_image( GTK_BUTTON( stop_button ),
@@ -222,7 +221,7 @@ static void *Thread( void *obj )
     p_intf->p_sys->p_seekbar = HILDON_SEEKBAR( seekbar );
 
     // We add them to the hbox
-    gtk_box_pack_start( GTK_BOX( bottom_hbox ), play_button, FALSE, FALSE, 5 );
+    gtk_box_pack_start( GTK_BOX( bottom_hbox ), play_button, FALSE, FALSE, 0 );
     gtk_box_pack_start( GTK_BOX( bottom_hbox ), stop_button, FALSE, FALSE, 0 );
     gtk_box_pack_start( GTK_BOX( bottom_hbox ), prev_button, FALSE, FALSE, 0 );
     gtk_box_pack_start( GTK_BOX( bottom_hbox ), next_button, FALSE, FALSE, 0 );
@@ -260,8 +259,7 @@ static void *Thread( void *obj )
 #endif
 
     // Set callback with the vlc core
-    g_timeout_add( INTF_IDLE_SLEEP / 1000, process_events, p_intf );
-    g_timeout_add( 150 /* miliseconds */, should_die, p_intf );
+    g_timeout_add( 1000 /* miliseconds */, should_die, p_intf );
     var_AddCallback( p_intf->p_sys->p_playlist, "item-change",
                      item_changed_cb, p_intf );
     var_AddCallback( p_intf->p_sys->p_playlist, "item-current",
@@ -377,8 +375,8 @@ static gboolean interface_ready( gpointer data )
     p_intf->p_sys->xid =
         GDK_WINDOW_XID( gtk_widget_get_window(p_intf->p_sys->p_video_window) );
 
-    // Look if the playlist is already started
-    item_changed_pl( p_intf );
+    // Refresh playlist
+    post_event( p_intf, EVENT_PLAYLIST_CURRENT );
 
     // Everything is initialised
     vlc_sem_post (&p_intf->p_sys->ready);

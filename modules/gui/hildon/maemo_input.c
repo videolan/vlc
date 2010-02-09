@@ -30,11 +30,37 @@
 #include "maemo.h"
 #include "maemo_input.h"
 
+/*****************************************************************************
+ * Local prototypes.
+ *****************************************************************************/
+static void update_position( intf_thread_t *p_intf );
+static void item_changed( intf_thread_t *p_intf );
+static void item_changed_pl( intf_thread_t *p_intf );
+
 static int input_event_cb( vlc_object_t *p_this, const char *psz_var,
                            vlc_value_t oldval, vlc_value_t newval, void *param );
+static int interface_changed_cb( vlc_object_t *p_this, const char *psz_var,
+                                 vlc_value_t oldval, vlc_value_t newval,
+                                 void *param );
+static gboolean process_events( gpointer data );
+
+void set_input( intf_thread_t *p_intf, input_thread_t *p_input );
+void delete_input( intf_thread_t *p_intf );
 
 
-gboolean process_events( gpointer data )
+
+/*****************************************************************************
+ * Functions.
+ *****************************************************************************/
+void post_event( intf_thread_t *p_intf, int i_event )
+{
+    vlc_spin_lock( &p_intf->p_sys->event_lock );
+    p_intf->p_sys->i_event |= i_event;
+    vlc_spin_unlock( &p_intf->p_sys->event_lock );
+    g_idle_add( process_events, p_intf );
+}
+
+static gboolean process_events( gpointer data )
 {
     intf_thread_t *p_intf = (intf_thread_t *)data;
     vlc_spin_lock( &p_intf->p_sys->event_lock );
@@ -43,19 +69,19 @@ gboolean process_events( gpointer data )
     p_intf->p_sys->i_event = 0;
 
     vlc_spin_unlock( &p_intf->p_sys->event_lock );
-    if( i_event )
-    {
-        if( i_event & EVENT_PLAYLIST_CURRENT )
-            item_changed_pl( p_intf );
-        if( i_event & EVENT_ACTIVITY )
-            item_changed_pl( p_intf );
-        if( i_event & EVENT_ITEM_CHANGED )
-            item_changed( p_intf );
-        if( i_event & EVENT_INTF_CHANGED )
-            update_position( p_intf );
-    }
 
-    return TRUE;
+    if( !i_event ) return TRUE;
+
+    if( i_event & EVENT_PLAYLIST_CURRENT )
+        item_changed_pl( p_intf );
+    if( i_event & EVENT_ACTIVITY )
+        item_changed_pl( p_intf );
+    if( i_event & EVENT_ITEM_CHANGED )
+        item_changed( p_intf );
+    if( i_event & EVENT_INTF_CHANGED )
+        update_position( p_intf );
+
+    return FALSE;
 }
 
 void set_input( intf_thread_t *p_intf, input_thread_t *p_input )
@@ -88,7 +114,7 @@ void delete_input( intf_thread_t *p_intf )
     }
 }
 
-void item_changed_pl( intf_thread_t *p_intf )
+static void item_changed_pl( intf_thread_t *p_intf )
 {
     if( p_intf->p_sys->p_input &&
         ( p_intf->p_sys->p_input->b_dead || p_intf->p_sys->p_input->b_die ) )
@@ -107,30 +133,30 @@ void item_changed_pl( intf_thread_t *p_intf )
 int playlist_current_cb( vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t newval, void *param )
 {
-    (void)p_this; (void)psz_var; (void)oldval; (void)newval;
     intf_thread_t *p_intf = (intf_thread_t *)param;
+    (void)p_this; (void)psz_var; (void)oldval; (void)newval;
+
     vlc_spin_lock( &p_intf->p_sys->event_lock );
-
     p_intf->p_sys->i_event |= EVENT_PLAYLIST_CURRENT;
-
     vlc_spin_unlock( &p_intf->p_sys->event_lock );
+    g_idle_add( process_events, p_intf );
     return VLC_SUCCESS;
 }
 
 int activity_cb( vlc_object_t *p_this, const char *psz_var,
                  vlc_value_t oldval, vlc_value_t newval, void *param )
 {
-    (void)p_this; (void)psz_var; (void)oldval; (void)newval;
     intf_thread_t *p_intf = (intf_thread_t *)param;
+    (void)p_this; (void)psz_var; (void)oldval; (void)newval;
+
     vlc_spin_lock( &p_intf->p_sys->event_lock );
-
     p_intf->p_sys->i_event |= EVENT_ACTIVITY;
-
     vlc_spin_unlock( &p_intf->p_sys->event_lock );
+    g_idle_add( process_events, p_intf );
     return VLC_SUCCESS;
 }
 
-void item_changed( intf_thread_t *p_intf )
+static void item_changed( intf_thread_t *p_intf )
 {
     GtkButton *p_button = GTK_BUTTON( p_intf->p_sys->p_play_button );
     vlc_value_t state;
@@ -154,15 +180,15 @@ int item_changed_cb( vlc_object_t *p_this, const char *psz_var,
 {
     (void)p_this; (void)psz_var; (void)oldval; (void)newval;
     intf_thread_t *p_intf = (intf_thread_t *)param;
+
     vlc_spin_lock( &p_intf->p_sys->event_lock );
-
     p_intf->p_sys->i_event |= EVENT_ITEM_CHANGED;
-
     vlc_spin_unlock( &p_intf->p_sys->event_lock );
+    g_idle_add( process_events, p_intf );
     return VLC_SUCCESS;
 }
 
-void update_position( intf_thread_t *p_intf )
+static void update_position( intf_thread_t *p_intf )
 {
     if( p_intf->p_sys->p_input )
     {
@@ -173,16 +199,17 @@ void update_position( intf_thread_t *p_intf )
     }
 }
 
-int interface_changed_cb( vlc_object_t *p_this, const char *psz_var,
-                          vlc_value_t oldval, vlc_value_t newval, void *param )
+static int interface_changed_cb( vlc_object_t *p_this, const char *psz_var,
+                                 vlc_value_t oldval, vlc_value_t newval,
+                                 void *param )
 {
-    (void)p_this; (void)psz_var; (void)oldval; (void)newval;
     intf_thread_t *p_intf = (intf_thread_t *)param;
+    (void)p_this; (void)psz_var; (void)oldval; (void)newval;
+
     vlc_spin_lock( &p_intf->p_sys->event_lock );
-
     p_intf->p_sys->i_event |= EVENT_INTF_CHANGED;
-
     vlc_spin_unlock( &p_intf->p_sys->event_lock );
+    g_idle_add( process_events, p_intf );
     return VLC_SUCCESS;
 }
 

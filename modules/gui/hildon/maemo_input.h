@@ -32,7 +32,7 @@
 #define EVENT_ITEM_CHANGED      (1<<3)
 #define EVENT_INTF_CHANGED      (1<<4)
 
-gboolean process_events( gpointer data );
+void post_event( intf_thread_t *p_intf, int event );
 
 void set_input( intf_thread_t *p_intf, input_thread_t *p_input );
 void delete_input( intf_thread_t *p_intf );
@@ -41,12 +41,6 @@ int playlist_current_cb( vlc_object_t *p_this, const char *psz_var,
                          vlc_value_t oldval, vlc_value_t newval, void *param );
 int activity_cb( vlc_object_t *p_this, const char *psz_var,
                  vlc_value_t oldval, vlc_value_t newval, void *param );
-void item_changed_pl( intf_thread_t *p_intf );
 
 int item_changed_cb( vlc_object_t *p_this, const char *psz_var,
                      vlc_value_t oldval, vlc_value_t newval, void *param );
-void item_changed( intf_thread_t *p_intf );
-
-int interface_changed_cb( vlc_object_t *p_this, const char *psz_var,
-                          vlc_value_t oldval, vlc_value_t newval, void *param );
-void update_position( intf_thread_t *p_intf );
