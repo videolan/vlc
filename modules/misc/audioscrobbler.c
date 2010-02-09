@@ -500,7 +500,6 @@ static int PlayingChange( vlc_object_t *p_this, const char *psz_var,
 static int ItemChange( vlc_object_t *p_this, const char *psz_var,
                        vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    playlist_t          *p_playlist;
     input_thread_t      *p_input;
     intf_thread_t       *p_intf     = ( intf_thread_t* ) p_data;
     intf_sys_t          *p_sys      = p_intf->p_sys;
@@ -931,7 +930,6 @@ static void DeleteSong( audioscrobbler_song_t* p_song )
  *****************************************************************************/
 static int ReadMetaData( intf_thread_t *p_this )
 {
-    playlist_t          *p_playlist;
     input_thread_t      *p_input;
     input_item_t        *p_item;
 
