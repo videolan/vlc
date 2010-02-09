@@ -177,7 +177,6 @@ vlc_module_end ()
  *****************************************************************************/
 static int Open( vlc_object_t *p_this )
 {
-    playlist_t      *p_playlist;
     intf_thread_t   *p_intf     = ( intf_thread_t* ) p_this;
     intf_sys_t      *p_sys      = calloc( 1, sizeof( intf_sys_t ) );
 
@@ -189,10 +188,7 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->wait );
 
-    p_playlist = pl_Get( p_intf );
-    PL_LOCK;
-    var_AddCallback( p_playlist, "item-current", ItemChange, p_intf );
-    PL_UNLOCK;
+    var_AddCallback( pl_Get( p_intf ), "item-current", ItemChange, p_intf );
 
     p_intf->pf_run = Run;
 
@@ -204,12 +200,11 @@ static int Open( vlc_object_t *p_this )
  *****************************************************************************/
 static void Close( vlc_object_t *p_this )
 {
-    playlist_t                  *p_playlist;
+    playlist_t                  *p_playlist = pl_Get( p_this );
     input_thread_t              *p_input;
     intf_thread_t               *p_intf = ( intf_thread_t* ) p_this;
     intf_sys_t                  *p_sys  = p_intf->p_sys;
 
-    p_playlist = pl_Get( p_intf );
     var_DelCallback( p_playlist, "item-current", ItemChange, p_intf );
 
     p_input = playlist_CurrentInput( p_playlist );
