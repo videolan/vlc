@@ -31,7 +31,6 @@ EXTRA_DIST = \
         $(man1_MANS) \
         bugreport-howto.txt \
 	fortunes.txt \
-	intf-cdda.txt \
 	intf-vcd.txt \
 	release-howto.txt \
 	arm-crosscompile-howto.sgml \
