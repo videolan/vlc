@@ -278,7 +278,7 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
         default:
             p_var->ops = &void_ops;
 #ifndef NDEBUG
-            if( i_type & VLC_VAR_CLASS  != VLC_VAR_VOID )
+            if( (i_type & VLC_VAR_CLASS) != VLC_VAR_VOID )
                 msg_Err( p_this, "Creating the variable '%s' without a type",
                           psz_name );
 #endif
