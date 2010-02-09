@@ -51,14 +51,6 @@ control a play" > "`pwd`/demo.vlm"
   echo -e "\n$VLC --sub-filter mosaic:marq --marq-marque \"VLC - mosaic\" --marq-position 6 --mosaic-width 120 --mosaic-height 90 --mosaic-rows 1 --mosaic-cols 1 --mosaic-alpha 150 --extraintf telnet --telnet-host localhost --vlm-conf `pwd`/demo.vlm $bg"
 }
 
-opengl()
-{
-  echo -e "\n- OpenGL cube demo -\nconfiguration\n"
-  echo -en "Please choose an input.\ninput? "
-  read input
-  echo -e "\n$VLC -V opengl --opengl-effect transparent-cube $input"
-}
-
 wall()
 {
   echo -e "\n- Video wall demo -\nconfiguration\n"
@@ -83,8 +75,7 @@ VLC cool demos script
  1. psychedelic video filter
  2. gradient video filter
  3. mosaic
- 4. OpenGL cube
- 5. video wall
+ 4. video wall
 EOF
 
 echo -n "demo number? "
@@ -94,8 +85,7 @@ case "$choice" in
  1) pyschedelic;;
  2) gradient;;
  3) mosaic;;
- 4) opengl;;
- 5) wall;;
+ 4) wall;;
  *) echo "Unrecognized input, please try again"; exit 1;;
 esac
 
