@@ -117,16 +117,12 @@
  * These are the different actions that can be used with var_GetAndSet()
  * @{
  */
-/**
- * Toggle the value of this boolean
- * \param val Unused
- */
-#define VLC_VAR_TOGGLE_BOOL         0x0010
-/**
- * Increment or decrement an integer of a given value
- * \param val the value
- */
-#define VLC_VAR_INTEGER_INCDEC      0x0020
+enum {
+    VLC_VAR_BOOL_TOGGLE, /**< Invert a boolean value (param ignored) */
+    VLC_VAR_INTEGER_ADD, /**< Add parameter to an integer value */
+    VLC_VAR_INTEGER_OR,  /**< Binary OR over an integer bits field */
+    VLC_VAR_INTEGER_NAND,/**< Binary NAND over an integer bits field */
+};
 /**@}*/
 
 /*****************************************************************************
@@ -152,8 +148,7 @@ VLC_EXPORT( int, var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 
 VLC_EXPORT( int, var_SetChecked, ( vlc_object_t *, const char *, int, vlc_value_t ) );
 VLC_EXPORT( int, var_GetChecked, ( vlc_object_t *, const char *, int, vlc_value_t * ) );
-VLC_EXPORT( int, var_GetAndSet, ( vlc_object_t *, const char *, int, vlc_value_t ) );
-#define var_GetAndSet(a,b,c,d) var_GetAndSet(VLC_OBJECT(a), b, c, d)
+VLC_EXPORT( int, var_GetAndSet, ( vlc_object_t *, const char *, int, vlc_value_t * ) );
 
 VLC_EXPORT( int, var_Inherit, ( vlc_object_t *, const char *, int, vlc_value_t * ) );
 
@@ -385,11 +380,12 @@ static inline void *var_GetAddress( vlc_object_t *p_obj, const char *psz_name )
  * \param p_obj the object that holds the variable
  * \param psz_name the name of the variable
  */
-static inline void var_IncInteger( vlc_object_t *p_obj, const char *psz_name )
+static inline int var_IncInteger( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
     val.i_int = 1;
-    var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_INCDEC, val );
+    var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_ADD, &val );
+    return val.i_int;
 }
 #define var_IncInteger(a,b) var_IncInteger( VLC_OBJECT(a), b )
 
@@ -398,13 +394,34 @@ static inline void var_IncInteger( vlc_object_t *p_obj, const char *psz_name )
  * \param p_obj the object that holds the variable
  * \param psz_name the name of the variable
  */
-static inline void var_DecInteger( vlc_object_t *p_obj, const char *psz_name )
+static inline int var_DecInteger( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
     val.i_int = -1;
-    var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_INCDEC, val );
+    var_GetAndSet( p_obj, psz_name, VLC_VAR_INTEGER_ADD, &val );
+    return val.i_int;
 }
 #define var_DecInteger(a,b) var_DecInteger( VLC_OBJECT(a), b )
+
+static inline unsigned var_OrInteger( vlc_object_t *obj, const char *name,
+                                      unsigned v )
+{
+    vlc_value_t val;
+    val.i_int = v;
+    var_GetAndSet( obj, name, VLC_VAR_INTEGER_OR, &val );
+    return val.i_int;
+}
+#define var_OrInteger(a,b,c) var_OrInteger(VLC_OBJECT(a),b,c)
+
+static inline unsigned var_NAndInteger( vlc_object_t *obj, const char *name,
+                                        unsigned v )
+{
+    vlc_value_t val;
+    val.i_int = v;
+    var_GetAndSet( obj, name, VLC_VAR_INTEGER_NAND, &val );
+    return val.i_int;
+}
+#define var_NAndInteger(a,b,c) var_NAndInteger(VLC_OBJECT(a),b,c)
 
 /**
  * Create a integer variable with inherit and get its value.
@@ -600,10 +617,11 @@ static inline int var_CountChoices( vlc_object_t *p_obj, const char *psz_name )
 #define var_CountChoices(a,b) var_CountChoices( VLC_OBJECT(a),b)
 
 
-static inline int var_ToggleBool( vlc_object_t *p_obj, const char *psz_name )
+static inline bool var_ToggleBool( vlc_object_t *p_obj, const char *psz_name )
 {
     vlc_value_t val;
-    return var_GetAndSet( p_obj, psz_name, VLC_VAR_TOGGLE_BOOL, val );
+    var_GetAndSet( p_obj, psz_name, VLC_VAR_BOOL_TOGGLE, &val );
+    return val.b_bool;
 }
 #define var_ToggleBool(a,b) var_ToggleBool( VLC_OBJECT(a),b )
 

@@ -634,13 +634,14 @@ int var_Change( vlc_object_t *p_this, const char *psz_name,
  * \return vlc error codes
  */
 int var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
-                   vlc_value_t val )
+                   vlc_value_t *p_val )
 {
     int i_ret;
     variable_t *p_var;
     vlc_value_t oldval;
 
     assert( p_this );
+    assert( p_val );
 
     vlc_object_internals_t *p_priv = vlc_internals( p_this );
 
@@ -663,13 +664,21 @@ int var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
     /* depending of the action requiered */
     switch( i_action )
     {
-    case VLC_VAR_TOGGLE_BOOL:
+    case VLC_VAR_BOOL_TOGGLE:
         assert( ( p_var->i_type & VLC_VAR_BOOL ) == VLC_VAR_BOOL );
         p_var->val.b_bool = !p_var->val.b_bool;
         break;
-    case VLC_VAR_INTEGER_INCDEC:
+    case VLC_VAR_INTEGER_ADD:
         assert( ( p_var->i_type & VLC_VAR_INTEGER ) == VLC_VAR_INTEGER );
-        p_var->val.i_int += val.i_int;
+        p_var->val.i_int += p_val->i_int;
+        break;
+    case VLC_VAR_INTEGER_OR:
+        assert( ( p_var->i_type & VLC_VAR_INTEGER ) == VLC_VAR_INTEGER );
+        p_var->val.i_int |= p_val->i_int;
+        break;
+    case VLC_VAR_INTEGER_NAND:
+        assert( ( p_var->i_type & VLC_VAR_INTEGER ) == VLC_VAR_INTEGER );
+        p_var->val.i_int &= ~p_val->i_int;
         break;
     default:
         vlc_mutex_unlock( &p_priv->var_lock );
@@ -678,6 +687,7 @@ int var_GetAndSet( vlc_object_t *p_this, const char *psz_name, int i_action,
 
     /*  Check boundaries */
     CheckValue( p_var, &p_var->val );
+    *p_val = p_var->val;
 
     /* Deal with callbacks.*/
     i_ret = TriggerCallback( p_this, p_var, psz_name, oldval );
