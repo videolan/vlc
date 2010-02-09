@@ -1015,9 +1015,8 @@ void libvlc_InternalCleanup( libvlc_int_t *p_libvlc )
     }
 #endif
 
-    /* Free playlist now */
-    msg_Dbg( p_libvlc, "removing playlist" );
-    vlc_object_release( p_playlist );
+    /* Free playlist now, all threads are gone */
+    playlist_Destroy( p_playlist );
 
     stats_TimersDumpAll( p_libvlc );
     stats_TimersCleanAll( p_libvlc );

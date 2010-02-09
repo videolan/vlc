@@ -57,16 +57,6 @@ void playlist_Activate( playlist_t *p_playlist )
     /* */
     playlist_private_t *p_sys = pl_priv(p_playlist);
 
-    /* Fetcher */
-    p_sys->p_fetcher = playlist_fetcher_New( p_playlist );
-    if( !p_sys->p_fetcher )
-        msg_Err( p_playlist, "cannot create playlist fetcher" );
-
-    /* Preparse */
-    p_sys->p_preparser = playlist_preparser_New( p_playlist, p_sys->p_fetcher );
-    if( !p_sys->p_preparser )
-        msg_Err( p_playlist, "cannot create playlist preparser" );
-
     /* Start the playlist thread */
     if( vlc_clone( &p_sys->thread, Thread, p_playlist,
                    VLC_THREAD_PRIORITY_LOW ) )
@@ -90,19 +80,6 @@ void playlist_Deactivate( playlist_t *p_playlist )
 
     vlc_join( p_sys->thread, NULL );
     assert( !p_sys->p_input );
-
-    PL_LOCK;
-    playlist_preparser_t *p_preparser = p_sys->p_preparser;
-    playlist_fetcher_t *p_fetcher = p_sys->p_fetcher;
-
-    p_sys->p_preparser = NULL;
-    p_sys->p_fetcher = NULL;
-    PL_UNLOCK;
-
-    if( p_preparser )
-        playlist_preparser_Delete( p_preparser );
-    if( p_fetcher )
-        playlist_fetcher_Delete( p_fetcher );
 
     /* release input resources */
     if( p_sys->p_input_resource )

@@ -105,6 +105,20 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     pl_priv(p_playlist)->b_auto_preparse =
         var_InheritBool( p_parent, "auto-preparse" );
 
+    /* Fetcher */
+    p->p_fetcher = playlist_fetcher_New( p_playlist );
+    if( unlikely(p->p_fetcher == NULL) )
+    {
+        msg_Err( p_playlist, "cannot create fetcher" );
+        p->p_preparser = NULL;
+    }
+    else
+    {   /* Preparse */
+        p->p_preparser = playlist_preparser_New( p_playlist, p->p_fetcher );
+        if( unlikely(p->p_preparser == NULL) )
+            msg_Err( p_playlist, "cannot create preparser" );
+    }
+
     /* Create the root node */
     PL_LOCK;
     p_playlist->p_root = playlist_NodeCreate( p_playlist, NULL, NULL,
@@ -165,6 +179,18 @@ playlist_t * playlist_Create( vlc_object_t *p_parent )
     return p_playlist;
 }
 
+void playlist_Destroy( playlist_t *p_playlist )
+{
+    playlist_private_t *p_sys = pl_priv(p_playlist);
+
+    msg_Dbg( p_playlist, "destroying" );
+    if( p_sys->p_preparser )
+        playlist_preparser_Delete( p_sys->p_preparser );
+    if( p_sys->p_fetcher )
+        playlist_fetcher_Delete( p_sys->p_fetcher );
+    vlc_object_release( p_playlist );
+}
+
 /**
  * Destroy playlist
  *
@@ -180,8 +206,6 @@ static void playlist_Destructor( vlc_object_t * p_this )
 
     assert( !p_sys->p_input );
     assert( !p_sys->p_input_resource );
-    assert( !p_sys->p_preparser );
-    assert( !p_sys->p_fetcher );
 
     vlc_cond_destroy( &p_sys->signal );
     vlc_mutex_destroy( &p_sys->lock );
