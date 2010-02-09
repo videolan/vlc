@@ -150,7 +150,10 @@ int vout_snapshot_SaveImage(char **name, int *sequential,
         char *prefix = NULL;
         if (cfg->prefix_fmt)
             prefix = str_format(object, cfg->prefix_fmt);
-        if (!prefix) {
+        if (prefix)
+            filename_sanitize(prefix);
+        else
+        {
             prefix = strdup("vlcsnap-");
             if (!prefix)
                 goto error;
