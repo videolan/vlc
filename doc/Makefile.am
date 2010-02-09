@@ -35,7 +35,6 @@ EXTRA_DIST = \
 	release-howto.txt \
 	arm-crosscompile-howto.sgml \
 	Doxyfile.in \
-	Configure.help \
 	lirc/example.lircrc \
 	skins/skins-howto.txt \
 	skins/events-howto.txt \
