@@ -335,7 +335,6 @@ static void Close( vlc_object_t *p_this )
     {
         vlc_object_release( p_sys->p_input );
     }
-    pl_Release( p_intf );
 
     /* Close the ncurses interface */
     endwin();
@@ -352,7 +351,7 @@ static void Close( vlc_object_t *p_this )
 static void Run( intf_thread_t *p_intf )
 {
     intf_sys_t    *p_sys = p_intf->p_sys;
-    playlist_t    *p_playlist = pl_Hold( p_intf );
+    playlist_t    *p_playlist = pl_Get( p_intf );
     p_sys->p_playlist = p_playlist;
 
     int i_key;
@@ -535,7 +534,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
     intf_sys_t *p_sys = p_intf->p_sys;
     int i_ret = 1;
 
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
 
     if( p_sys->i_box_type == BOX_PLAYLIST )
     {
@@ -1200,7 +1199,6 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
     }
 
 end:
-    pl_Release( p_intf );
     return i_ret;
 }
 
@@ -1463,7 +1461,7 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
 {
     intf_sys_t     *p_sys = p_intf->p_sys;
     input_thread_t *p_input = p_sys->p_input;
-    playlist_t     *p_playlist = pl_Hold( p_intf );
+    playlist_t     *p_playlist = pl_Get( p_intf );
     int y = 0;
     int h;
     int y_end;
@@ -2202,13 +2200,12 @@ static void Redraw( intf_thread_t *p_intf, time_t *t_last_refresh )
     refresh();
 
     *t_last_refresh = time( 0 );
-    pl_Release( p_intf );
 }
 
 static playlist_item_t *PlaylistGetRoot( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
     playlist_item_t *p_item;
 
     switch( p_sys->i_current_view )
@@ -2219,14 +2216,13 @@ static playlist_item_t *PlaylistGetRoot( intf_thread_t *p_intf )
         default:
             p_item = p_playlist->p_root_onelevel;
     }
-    pl_Release( p_intf );
     return p_item;
 }
 
 static void PlaylistRebuild( intf_thread_t *p_intf )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
 
     PL_LOCK;
 
@@ -2239,8 +2235,6 @@ static void PlaylistRebuild( intf_thread_t *p_intf )
     p_sys->b_need_update = false;
 
     PL_UNLOCK;
-
-    pl_Release( p_intf );
 }
 
 static void PlaylistAddNode( intf_thread_t *p_intf, playlist_item_t *p_node,
@@ -2296,10 +2290,9 @@ static int PlaylistChanged( vlc_object_t *p_this, const char *psz_variable,
     VLC_UNUSED(p_this); VLC_UNUSED(psz_variable);
     VLC_UNUSED(oval); VLC_UNUSED(nval);
     intf_thread_t *p_intf = (intf_thread_t *)param;
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
     p_intf->p_sys->b_need_update = true;
     p_intf->p_sys->p_node = playlist_CurrentPlayingItem(p_playlist) ? playlist_CurrentPlayingItem(p_playlist)->p_parent : NULL;
-    pl_Release( p_intf );
     return VLC_SUCCESS;
 }
 
@@ -2368,13 +2361,12 @@ static void Eject( intf_thread_t *p_intf )
      * If it's neither of these, then return
      */
 
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
     PL_LOCK;
 
     if( playlist_CurrentPlayingItem(p_playlist) == NULL )
     {
         PL_UNLOCK;
-        pl_Release( p_intf );
         return;
     }
 
@@ -2434,7 +2426,6 @@ static void Eject( intf_thread_t *p_intf )
 
     if( psz_device == NULL )
     {
-        pl_Release( p_intf );
         return;
     }
 
@@ -2457,8 +2448,6 @@ static void Eject( intf_thread_t *p_intf )
     }
 
     free( psz_device );
-    pl_Release( p_intf );
-    return;
 }
 
 static int comp_dir_entries( const void *pp_dir_entry1,
@@ -2581,7 +2570,7 @@ static void ReadDir( intf_thread_t *p_intf )
 static void PlayPause( intf_thread_t *p_intf )
 {
     input_thread_t *p_input = p_intf->p_sys->p_input;
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
     vlc_value_t val;
 
     if( p_input )
@@ -2599,8 +2588,6 @@ static void PlayPause( intf_thread_t *p_intf )
     }
     else
         playlist_Play( p_playlist );
-
-    pl_Release( p_intf );
 }
 
 /****************************************************************************

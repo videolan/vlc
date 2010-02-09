@@ -130,7 +130,7 @@ static int Open( vlc_object_t *p_this )
         return( VLC_ENOMEM );
     }
 
-    p_sys->p_playlist = pl_Hold( p_this );
+    p_sys->p_playlist = pl_Get( p_this );
     p_sys->p_input    = NULL;
     p_sys->p_vlm      = NULL;
     p_sys->psz_address = psz_address;
@@ -212,7 +212,6 @@ static int Open( vlc_object_t *p_this )
     if( p_sys->p_httpd_host == NULL )
     {
         msg_Err( p_intf, "cannot listen on %s:%d", psz_address, i_port );
-        pl_Release( p_this );
         free( p_sys->psz_address );
         free( p_sys );
         return VLC_EGENERIC;
@@ -285,7 +284,6 @@ failed:
     httpd_HostDelete( p_sys->p_httpd_host );
     free( p_sys->psz_address );
     free( p_sys );
-    pl_Release( p_this );
     return VLC_EGENERIC;
 }
 
@@ -336,7 +334,6 @@ static void Close ( vlc_object_t *p_this )
     httpd_HostDelete( p_sys->p_httpd_host );
     free( p_sys->psz_address );
     free( p_sys );
-    pl_Release( p_this );
 }
 
 /****************************************************************************

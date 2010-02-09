@@ -594,9 +594,7 @@ void InputManager::requestArtUpdate()
 {
     if( hasInput() )
     {
-        playlist_t *p_playlist = pl_Hold( p_intf );
-        playlist_AskForArtEnqueue( p_playlist, input_GetItem( p_input ) );
-        pl_Release( p_intf );
+        playlist_AskForArtEnqueue( pl_Get(p_intf), input_GetItem( p_input ) );
     }
     else
     {
@@ -1041,13 +1039,11 @@ void MainInputManager::customEvent( QEvent *event )
             p_input = NULL;
         }
         /* we are working as a dialogs provider */
-        playlist_t *p_playlist = pl_Hold( p_intf );
-        p_input = playlist_CurrentInput( p_playlist );
+        p_input = playlist_CurrentInput( pl_Get(p_intf) );
         if( p_input )
         {
             emit inputChanged( p_input );
         }
-        pl_Release( p_intf );
     }
 }
 

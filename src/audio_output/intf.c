@@ -42,12 +42,7 @@
 
 static aout_instance_t *findAout (vlc_object_t *obj)
 {
-    playlist_t *pl = pl_Hold (obj->p_libvlc);
-    if (pl == NULL)
-        return NULL;
-
-    input_thread_t *p_input = playlist_CurrentInput (pl);
-    pl_Release (obj->p_libvlc);
+    input_thread_t *p_input = playlist_CurrentInput (pl_Get (obj));
     if (p_input == NULL)
        return NULL;
 

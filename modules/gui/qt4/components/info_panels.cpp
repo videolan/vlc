@@ -267,9 +267,8 @@ void MetaPanel::saveMeta()
     input_item_SetPublisher( p_input, qtu( publisher_text->text() ) );
     input_item_SetDescription( p_input, qtu( description_text->text() ) );
 
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
     input_item_WriteMeta( VLC_OBJECT(p_playlist), p_input );
-    pl_Release( p_intf );
 
     /* Reset the status of the mode. No need to emit any signal because parent
        is the only caller */

@@ -322,8 +322,7 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
         if( !p_this ) return 0;
 
         /* Add files to the playlist */
-        p_playlist = pl_Hold( p_this );
-        if( !p_playlist ) return 0;
+        p_playlist = pl_Get( p_this );
 
         if( pwm_data->lpData )
         {
@@ -363,8 +362,6 @@ LRESULT CALLBACK WMCOPYWNDPROC( HWND hwnd, UINT uMsg, WPARAM wParam,
 
             free( ppsz_argv );
         }
-
-        vlc_object_release( p_playlist );
     }
 
     return DefWindowProc( hwnd, uMsg, wParam, lParam );

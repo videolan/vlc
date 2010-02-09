@@ -160,10 +160,9 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->cond );
     // Add the callbacks
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
     var_AddCallback( p_playlist, "item-current", PlaylistNext, p_this );
     var_AddCallback( p_playlist, "item-change", PlaylistNext, p_this );
-    pl_Release( p_intf );
 
     p_sys->b_need_update = true;
     p_intf->pf_run = Run;
@@ -177,10 +176,9 @@ static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
 
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
     var_DelCallback( p_playlist, "item-current", PlaylistNext, p_this );
     var_DelCallback( p_playlist, "item-change", PlaylistNext, p_this );
-    pl_Release( p_intf );
 
     /* Uninitialize library */
     xosd_destroy( p_intf->p_sys->p_osd );
@@ -216,14 +214,13 @@ static void Run( intf_thread_t *p_intf )
 
         // Compute the signal
         cancel = vlc_savecancel();
-        p_playlist = pl_Hold( p_intf );
+        p_playlist = pl_Get( p_intf );
         PL_LOCK;
 
         // If the playlist is empty don't do anything
         if( playlist_IsEmpty( p_playlist ) )
         {
             PL_UNLOCK;
-            pl_Release( p_intf );
             continue;
         }
 
@@ -244,7 +241,6 @@ static void Run( intf_thread_t *p_intf )
             {
                 psz_display = NULL;
                 PL_UNLOCK;
-                pl_Release( p_intf );
                 continue;
             }
             input_item_t *p_input = p_item->p_input;
@@ -261,7 +257,6 @@ static void Run( intf_thread_t *p_intf )
                 psz_display = strdup( p_input->psz_name );
         }
         PL_UNLOCK;
-        pl_Release( p_intf );
 
         /* Display */
         xosd_display( p_intf->p_sys->p_osd, 0, /* first line */

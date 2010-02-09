@@ -234,15 +234,11 @@ int FindArt( vlc_object_t *p_this )
 {
     art_finder_t *p_finder = (art_finder_t *)p_this;
     input_item_t *p_item = p_finder->p_item;
-    playlist_t *p_playlist = pl_Hold( p_this );
-    if( !p_playlist )
-        return VLC_EGENERIC;
 
     lua_State *L = init( p_this, p_item );
     int i_ret = vlclua_scripts_batch_execute( p_this, "meta/art", &fetch_art, L, p_item );
     lua_close( L );
 
-    pl_Release( p_this );
     return i_ret;
 }
 

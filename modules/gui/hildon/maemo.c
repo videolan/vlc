@@ -86,7 +86,7 @@ static int Open( vlc_object_t *p_this )
     if( p_intf->p_sys == NULL )
         return VLC_ENOMEM;
 
-    p_sys->p_playlist = pl_Hold( p_intf );
+    p_sys->p_playlist = pl_Get( p_intf );
     p_sys->p_input = NULL;
 
     p_sys->p_main_window = NULL;
@@ -100,7 +100,6 @@ static int Open( vlc_object_t *p_this )
     vlc_sem_init (&p_sys->ready, 0);
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
-        pl_Release (p_sys->p_playlist);
         free (p_sys);
         return VLC_ENOMEM;
     }
@@ -122,7 +121,6 @@ static void Close( vlc_object_t *p_this )
 
     var_Destroy (p_this->p_libvlc, "hildon-iface");
     vlc_join (p_intf->p_sys->thread, NULL);
-    pl_Release ( p_intf->p_sys->p_playlist );
     vlc_spin_destroy( &p_intf->p_sys->event_lock );
     free( p_intf->p_sys );
 }

@@ -55,7 +55,6 @@ static int vlclua_volume_set( lua_State *L )
     int i_volume = __MAX(__MIN(luaL_checkint( L, 1 ), AOUT_VOLUME_MAX),
                          AOUT_VOLUME_MIN);
     int i_ret = aout_VolumeSet( p_this, i_volume );
-    vlclua_release_playlist_internal( p_this );
     return vlclua_push_ret( L, i_ret );
 }
 
@@ -67,7 +66,6 @@ static int vlclua_volume_get( lua_State *L )
         lua_pushnumber( L, i_volume );
     else
         lua_pushnil( L );
-    vlclua_release_playlist_internal( p_this );
     return 1;
 }
 
@@ -77,7 +75,6 @@ static int vlclua_volume_up( lua_State *L )
     playlist_t *p_this = vlclua_get_playlist_internal( L );
     aout_VolumeUp( p_this, luaL_optint( L, 1, 1 ), &i_volume );
     lua_pushnumber( L, i_volume );
-    vlclua_release_playlist_internal( p_this );
     return 1;
 }
 
@@ -87,7 +84,6 @@ static int vlclua_volume_down( lua_State *L )
     playlist_t *p_this = vlclua_get_playlist_internal( L );
     aout_VolumeDown( p_this, luaL_optint( L, 1, 1 ), &i_volume );
     lua_pushnumber( L, i_volume );
-    vlclua_release_playlist_internal( p_this );
     return 1;
 }
 

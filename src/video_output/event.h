@@ -47,11 +47,8 @@ static inline void vout_SendEventClose(vout_thread_t *vout)
     /* Ask to stop
      * FIXME works only for input handled by the playlist
      */
-    playlist_t *playlist = pl_Hold(vout);
-    if (playlist) {
-        playlist_Stop(playlist);
-        pl_Release(vout);
-    }
+    playlist_t *playlist = pl_Get(vout);
+    playlist_Stop(playlist);
 }
 static inline void vout_SendEventKey(vout_thread_t *vout, int key)
 {

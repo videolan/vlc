@@ -349,8 +349,7 @@ playlist_Status
 playlist_TreeMove
 playlist_TreeMoveMany
 playlist_Unlock
-pl_Hold
-pl_Release
+pl_Get
 resolve_xml_special_chars
 sdp_AddAttribute
 sdp_AddMedia

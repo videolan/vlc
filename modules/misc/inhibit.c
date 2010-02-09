@@ -104,7 +104,7 @@ static int Activate( vlc_object_t *p_this )
         return VLC_EGENERIC;
     }
 
-    p_sys->p_playlist = pl_Hold( p_intf );
+    p_sys->p_playlist = pl_Get( p_intf );
     var_AddCallback( p_sys->p_playlist, "item-current", InputChange, p_intf );
     return VLC_SUCCESS;
 }
@@ -118,7 +118,6 @@ static void Deactivate( vlc_object_t *p_this )
     intf_sys_t *p_sys = p_intf->p_sys;
 
     var_DelCallback( p_sys->p_playlist, "item-current", InputChange, p_intf );
-    pl_Release( p_intf );
 
     if( p_sys->p_input ) /* Do delete "state" after "item-changed"! */
     {

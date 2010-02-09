@@ -242,7 +242,7 @@ static int Demux( demux_t *p_demux )
 
     input_thread_t *p_input_thread = demux_GetParentInput( p_demux );
     input_item_t *p_current_input = input_GetItem( p_input_thread );
-    playlist_t *p_playlist = pl_Hold( p_demux );
+    playlist_t *p_playlist = pl_Get( p_demux );
 
     luaL_register( L, "vlc", p_reg_parse );
 
@@ -252,7 +252,6 @@ static int Demux( demux_t *p_demux )
     {
         msg_Warn( p_demux, "Error while runing script %s, "
                   "function parse() not found", psz_filename );
-        pl_Release( p_demux );
         return VLC_EGENERIC;
     }
 
@@ -261,7 +260,6 @@ static int Demux( demux_t *p_demux )
         msg_Warn( p_demux, "Error while runing script %s, "
                   "function parse(): %s", psz_filename,
                   lua_tostring( L, lua_gettop( L ) ) );
-        pl_Release( p_demux );
         return VLC_EGENERIC;
     }
 
@@ -272,7 +270,6 @@ static int Demux( demux_t *p_demux )
         msg_Err( p_demux, "Script went completely foobar" );
 
     vlc_object_release( p_input_thread );
-    vlclua_release_playlist_internal( p_playlist );
 
     return -1; /* Needed for correct operation of go back */
 }

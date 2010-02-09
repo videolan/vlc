@@ -207,12 +207,11 @@
 
 - (BOOL)windowShouldClose:(id)sender
 {
-    playlist_t * p_playlist = pl_Hold( VLCIntf );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
 
     /* Only want to stop playback if video is playing */
     if( videoRatio.height != 0. && videoRatio.width != 0. )
         playlist_Stop( p_playlist );
-    pl_Release( VLCIntf );
     return YES;
 }
 

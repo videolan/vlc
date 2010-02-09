@@ -203,7 +203,7 @@ static void RunIntf( intf_thread_t *p_intf )
             /* If you modify this, please try to follow this convention:
                Start with LEFT, RIGHT for playback related commands
                and UP, DOWN, for other commands */
-            playlist_t * p_playlist = pl_Hold( p_intf );
+            playlist_t * p_playlist = pl_Get( p_intf );
             switch( p_sys->i_pattern )
             {
             case LEFT:
@@ -399,7 +399,6 @@ static void RunIntf( intf_thread_t *p_intf )
             p_sys->i_num_gestures = 0;
             p_sys->i_pattern = 0;
             p_sys->b_got_gesture = false;
-            pl_Release( p_intf );
         }
 
         /*
@@ -417,9 +416,7 @@ static void RunIntf( intf_thread_t *p_intf )
 
         if( p_sys->p_vout == NULL )
         {
-            playlist_t *p_playlist = pl_Hold( p_intf );
-            p_input = playlist_CurrentInput( p_playlist );
-            pl_Release( p_intf );
+            p_input = playlist_CurrentInput( pl_Get( p_intf ) );
             if( p_input )
             {
                 p_sys->p_vout = input_GetVout( p_input );

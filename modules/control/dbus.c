@@ -745,7 +745,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->p_events = vlc_array_new();
     vlc_mutex_init( &p_sys->lock );
 
-    p_playlist = pl_Hold( p_intf );
+    p_playlist = pl_Get( p_intf );
     p_sys->p_playlist = p_playlist;
 
     PL_LOCK;
@@ -788,7 +788,6 @@ static void Close   ( vlc_object_t *p_this )
         var_DelCallback( p_input, "state", AllCallback, p_intf );
         vlc_object_release( p_input );
     }
-    pl_Release( p_intf );
 
     dbus_connection_unref( p_sys->p_conn );
 

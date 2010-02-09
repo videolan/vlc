@@ -41,8 +41,8 @@ static int PlaylistVAControl( playlist_t * p_playlist, int i_query, va_list args
 
 static vlc_mutex_t global_lock = VLC_STATIC_MUTEX;
 
-#undef pl_Hold
-playlist_t *pl_Hold (vlc_object_t *obj)
+#undef pl_Get
+playlist_t *pl_Get (vlc_object_t *obj)
 {
     playlist_t *pl;
     libvlc_int_t *p_libvlc = obj->p_libvlc;
@@ -56,26 +56,8 @@ playlist_t *pl_Hold (vlc_object_t *obj)
          playlist_Activate (pl);
          libvlc_priv (p_libvlc)->playlist_active = true;
     }
-
-    /* The playlist should hold itself with vlc_object_hold() if ever. */
-    assert (VLC_OBJECT (pl) != obj);
-    if (pl)
-        vlc_object_hold (pl);
     vlc_mutex_unlock (&global_lock);
     return pl;
-}
-
-#undef pl_Release
-void pl_Release( vlc_object_t *p_this )
-{
-    playlist_t *pl = libvlc_priv (p_this->p_libvlc)->p_playlist;
-    assert( pl != NULL );
-
-    /* The rule is that pl_Release() should act on
-       the same object than pl_Hold() */
-    assert( VLC_OBJECT(pl) != p_this);
-
-    vlc_object_release( pl );
 }
 
 void pl_Deactivate (libvlc_int_t *p_libvlc)

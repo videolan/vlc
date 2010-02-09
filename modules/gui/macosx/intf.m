@@ -514,15 +514,13 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     o_size_with_playlist = [o_window contentRectForFrameRect:[o_window frame]].size;
 
-    p_playlist = pl_Hold( p_intf );
+    p_playlist = pl_Get( p_intf );
 
     var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     val.b_bool = false;
 
     var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);
     var_AddCallback( p_intf->p_libvlc, "intf-show", ShowController, self);
-
-    pl_Release( p_intf );
 
     /* load our Core Dialogs nib */
     nib_coredialogs_loaded = [NSBundle loadNibNamed:@"CoreDialogs" owner: NSApp];
@@ -898,10 +896,8 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     /* Kill the playlist, so that it doesn't accept new request
      * such as the play request from vlc.c (we are a blocking interface). */
-    p_playlist = pl_Hold( p_intf );
+    p_playlist = pl_Get( p_intf );
     vlc_object_kill( p_playlist );
-    pl_Release( p_intf );
-
     libvlc_Quit( p_intf->p_libvlc );
 
     [self setIntf:nil];
@@ -1554,8 +1550,6 @@ static void manage_cleanup( void * args )
     var_DelCallback( p_playlist, "playlist-item-append", PlaylistChanged, self );
     var_DelCallback( p_playlist, "playlist-item-deleted", PlaylistChanged, self );
 
-    pl_Release( p_intf );
-
     if( p_input ) vlc_object_release( p_input );
 }
 
@@ -1568,7 +1562,7 @@ static void manage_cleanup( void * args )
 
     vlc_thread_set_priority( p_intf, VLC_THREAD_PRIORITY_LOW );
 
-    p_playlist = pl_Hold( p_intf );
+    p_playlist = pl_Get( p_intf );
 
     var_AddCallback( p_playlist, "item-current", PlaylistChanged, self );
     var_AddCallback( p_playlist, "intf-change", PlaylistChanged, self );
@@ -1629,10 +1623,9 @@ static void manage_cleanup( void * args )
 - (void)manageVolumeSlider
 {
     audio_volume_t i_volume;
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
 
     aout_VolumeGet( p_playlist, &i_volume );
-    pl_Release( p_intf );
 
     if( i_volume != i_lastShownVolume )
     {
@@ -1659,13 +1652,12 @@ static void manage_cleanup( void * args )
          * the playlist or the selection is empty */
         if( [self isPlaylistCollapsed] == YES )
         {
-            playlist_t * p_playlist = pl_Hold( p_intf );
+            playlist_t * p_playlist = pl_Get( p_intf );
             PL_LOCK;
             playlist_item_t * p_item = playlist_CurrentPlayingItem( p_playlist );
             PL_UNLOCK;
             if( p_item )
                 [[self info] updatePanelWithItem: p_item->p_input];
-            pl_Release( p_intf );
         }
     }
     if( p_intf->p_sys->b_intf_update )
@@ -1676,7 +1668,7 @@ static void manage_cleanup( void * args )
         bool b_seekable = false;
         bool b_chapters = false;
 
-        playlist_t * p_playlist = pl_Hold( p_intf );
+        playlist_t * p_playlist = pl_Get( p_intf );
 
         PL_LOCK;
         b_plmul = playlist_CurrentSize( p_playlist ) > 1;
@@ -1706,7 +1698,6 @@ static void manage_cleanup( void * args )
             //b_chapters = p_input->stream.i_area_nb > 1;
             vlc_object_release( p_input );
         }
-        pl_Release( p_intf );
 
         if( b_buffering )
         {
@@ -1882,7 +1873,7 @@ end:
 
 - (void)setupMenus
 {
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
     if( p_input != NULL )
     {
@@ -1950,7 +1941,6 @@ end:
         }
         vlc_object_release( p_input );
     }
-    pl_Release( p_intf );
 }
 
 - (void)refreshVoutDeviceMenu:(NSNotification *)o_notification
@@ -1990,7 +1980,7 @@ end:
 
 - (void)resetScrollField
 {
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
     i_end_scroll = -1;
@@ -2007,10 +1997,8 @@ end:
         [self setScrollField: o_temp stopAfter:-1];
         [[[self controls] fspanel] setStreamTitle: o_temp];
         vlc_object_release( p_input );
-        pl_Release( p_intf );
         return;
     }
-    pl_Release( p_intf );
     [self setScrollField: _NS("VLC media player") stopAfter:-1];
 }
 
@@ -2074,7 +2062,7 @@ end:
         default:
             return;
     }
-    p_playlist = pl_Hold( p_intf );
+    p_playlist = pl_Get( p_intf );
     p_input = playlist_CurrentInput( p_playlist );
     if( p_input != NULL )
     {
@@ -2102,7 +2090,6 @@ end:
         [o_embedded_window setTime: o_time position: f_updated];
         vlc_object_release( p_input );
     }
-    pl_Release( p_intf );
 }
 
 - (IBAction)timeFieldWasClicked:(id)sender

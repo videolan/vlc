@@ -205,13 +205,7 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
         return;
     }
 
-    playlist_t *p_playlist = pl_Hold( p_input );
-    if( !p_playlist )
-    {
-        free( psz_arturl );
-        return;
-    }
-
+    playlist_t *p_playlist = pl_Get( p_input );
 
     if( input_item_IsArtFetched( p_item ) )
     {
@@ -259,7 +253,6 @@ void input_ExtractAttachmentAndCacheArt( input_thread_t *p_input )
     vlc_input_attachment_Delete( p_attachment );
 
 exit:
-    pl_Release( p_input );
     free( psz_arturl );
 }
 

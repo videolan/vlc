@@ -252,9 +252,7 @@ static VLCInfo *_o_sharedInstance = nil;
     {
         if( !input_item_IsPreparsed( p_item ) )
         {
-            playlist_t * p_playlist = pl_Hold( VLCIntf );
-            playlist_PreparseEnqueue( p_playlist, p_item );
-            pl_Release( VLCIntf );
+            playlist_PreparseEnqueue( pl_Get( VLCIntf ), p_item );
         }
 
         /* fill uri info */
@@ -385,13 +383,12 @@ static VLCInfo *_o_sharedInstance = nil;
     input_item_SetDescription( p_item, utf8( o_description_txt ) );
     input_item_SetLanguage( p_item, utf8( o_language_txt ) );
 
-    playlist_t * p_playlist = pl_Hold( VLCIntf );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
     input_item_WriteMeta( VLC_OBJECT(p_playlist), p_item );
 
     var_SetBool( p_playlist, "intf-change", true );
     [self updatePanelWithItem: p_item];
 
-    pl_Release( VLCIntf );
     [o_saveMetaData_btn setEnabled: NO];
     return;
 
@@ -403,9 +400,8 @@ error:
 
 - (IBAction)downloadCoverArt:(id)sender
 {
-    playlist_t * p_playlist = pl_Hold( VLCIntf );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
     if( p_item) playlist_AskForArtEnqueue( p_playlist, p_item );
-    pl_Release( VLCIntf );
 }
 
 - (input_item_t *)item

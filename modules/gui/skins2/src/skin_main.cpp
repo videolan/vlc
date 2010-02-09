@@ -105,12 +105,7 @@ static int Open( vlc_object_t *p_this )
 #endif
 
     p_intf->p_sys->p_input = NULL;
-    p_intf->p_sys->p_playlist = pl_Hold( p_intf );
-    if( !p_intf->p_sys->p_playlist )
-    {
-        free( p_intf->p_sys );
-        return VLC_EGENERIC;
-    }
+    p_intf->p_sys->p_playlist = pl_Get( p_intf );
 
     // Initialize "singleton" objects
     p_intf->p_sys->p_logger = NULL;
@@ -148,7 +143,6 @@ static int Open( vlc_object_t *p_this )
         vlc_mutex_destroy( &p_intf->p_sys->init_lock );
         vlc_cond_destroy( &p_intf->p_sys->vout_wait );
         vlc_mutex_destroy( &p_intf->p_sys->vout_lock );
-        pl_Release( p_intf->p_sys->p_playlist );
         free( p_intf->p_sys );
         return VLC_EGENERIC;
     }
@@ -181,9 +175,6 @@ static void Close( vlc_object_t *p_this )
 
     vlc_mutex_destroy( &p_intf->p_sys->init_lock );
     vlc_cond_destroy( &p_intf->p_sys->init_wait );
-
-    if( p_intf->p_sys->p_playlist )
-        pl_Release( p_this );
 
     // Unsubscribe from messages bank
 #if 0
@@ -413,15 +404,13 @@ static int DemuxOpen( vlc_object_t *p_this )
 
     if( p_intf != NULL )
     {
-        playlist_t *p_playlist = pl_Hold( p_this );
+        playlist_t *p_playlist = pl_Get( p_this );
 
         PL_LOCK;
         // Make sure the item is deleted afterwards
         /// \bug does not always work
         playlist_CurrentPlayingItem( p_playlist )->i_flags |= PLAYLIST_REMOVE_FLAG;
         PL_UNLOCK;
-
-        pl_Release( p_this );
 
         var_SetString( p_intf, "skin-to-load", p_demux->psz_path );
         vlc_object_release( p_intf );

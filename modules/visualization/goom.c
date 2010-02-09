@@ -406,12 +406,7 @@ static void Close( vlc_object_t *p_this )
 
 static char *TitleGet( vlc_object_t *p_this )
 {
-    playlist_t *pl = pl_Hold( p_this );
-    if( !pl )
-        return NULL;
-
-    input_thread_t *p_input = playlist_CurrentInput( pl );
-    pl_Release( p_this );
+    input_thread_t *p_input = playlist_CurrentInput( pl_Get( p_this ) );
     if( !p_input )
         return NULL;
 

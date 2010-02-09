@@ -121,14 +121,12 @@
 - (IBAction)play:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
     bool empty;
 
     PL_LOCK;
     empty = playlist_IsEmpty( p_playlist );
     PL_UNLOCK;
-
-    pl_Release( p_intf );
 
     if( empty )
         [o_main intfOpenFileGeneric: (id)sender];
@@ -206,7 +204,7 @@
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
 
     var_Get( p_playlist, "random", &val );
     val.b_bool = !val.b_bool;
@@ -224,7 +222,6 @@
 
     p_intf->p_sys->b_playmode_update = true;
     p_intf->p_sys->b_intf_update = true;
-    pl_Release( p_intf );
 }
 
 /* three little ugly helpers */
@@ -249,21 +246,20 @@
 - (void)shuffle
 {
     vlc_value_t val;
-    playlist_t *p_playlist = pl_Hold( VLCIntf );
+    playlist_t *p_playlist = pl_Get( VLCIntf );
     var_Get( p_playlist, "random", &val );
     [o_btn_shuffle setState: val.b_bool];
 	if(val.b_bool)
         [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"sidebarShuffleOn"]];
 	else
         [o_btn_shuffle_embed setImage: [NSImage imageNamed:@"sidebarShuffle"]];    
-    pl_Release( VLCIntf );
 }
 
 - (IBAction)repeatButtonAction:(id)sender
 {
     vlc_value_t looping,repeating;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
 
     var_Get( p_playlist, "repeat", &repeating );
     var_Get( p_playlist, "loop", &looping );
@@ -322,8 +318,6 @@
     var_Set( p_playlist, "loop", looping );
     p_intf->p_sys->b_playmode_update = true;
     p_intf->p_sys->b_intf_update = true;
-
-    pl_Release( p_intf );
 }
 
 
@@ -331,7 +325,7 @@
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
 
     var_Get( p_playlist, "repeat", &val );
     if (!val.b_bool)
@@ -353,14 +347,13 @@
  
     p_intf->p_sys->b_playmode_update = true;
     p_intf->p_sys->b_intf_update = true;
-    pl_Release( p_intf );
 }
 
 - (IBAction)loop:(id)sender
 {
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
 
     var_Get( p_playlist, "loop", &val );
     if (!val.b_bool)
@@ -382,17 +375,13 @@
 
     p_intf->p_sys->b_playmode_update = true;
     p_intf->p_sys->b_intf_update = true;
-    pl_Release( p_intf );
 }
 
 - (IBAction)quitAfterPlayback:(id)sender
 {
     vlc_value_t val;
-    playlist_t * p_playlist = pl_Hold( VLCIntf );
-    var_Get( p_playlist, "play-and-exit", &val );
-    val.b_bool = !val.b_bool;
-    var_Set( p_playlist, "play-and-exit", val );
-    pl_Release( VLCIntf );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
+    var_ToggleBool( p_playlist, "play-and-exit" );
 }
 
 - (IBAction)forward:(id)sender
@@ -436,13 +425,12 @@
 - (IBAction)volumeSliderUpdated:(id)sender
 {
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
     audio_volume_t i_volume = (audio_volume_t)[sender intValue];
     int i_volume_step;
 
     i_volume_step = config_GetInt( p_intf->p_libvlc, "volume-step" );
     aout_VolumeSet( p_playlist, i_volume * i_volume_step );
-    pl_Release( p_intf );
     /* Manage volume status */
     [o_main manageVolumeSlider];
 }
@@ -517,15 +505,13 @@
         }
         else
         {
-            playlist_t * p_playlist = pl_Hold( VLCIntf );
+            playlist_t * p_playlist = pl_Get( VLCIntf );
 
             if( [o_title isEqualToString: _NS("Fullscreen")] ||
                 [sender isKindOfClass:[NSButton class]] )
             {
                 var_ToggleBool( p_playlist, "fullscreen" );
             }
-
-            pl_Release( VLCIntf );
         }
         vlc_object_release( p_input );
     }
@@ -1018,7 +1004,7 @@
     BOOL bEnabled = TRUE;
     vlc_value_t val;
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
     input_thread_t * p_input = playlist_CurrentInput( p_playlist );
 
     if( [[o_mi title] isEqualToString: _NS("Faster")] ||
@@ -1154,7 +1140,6 @@
     }
 
     if( p_input ) vlc_object_release( p_input );
-    pl_Release( p_intf );
 
     return( bEnabled );
 }

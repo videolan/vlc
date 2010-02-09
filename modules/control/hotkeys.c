@@ -146,7 +146,7 @@ static void Close( vlc_object_t *p_this )
 static int PutAction( intf_thread_t *p_intf, int i_action )
 {
     intf_sys_t *p_sys = p_intf->p_sys;
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
 
     /* Update the input */
     input_thread_t *p_input = playlist_CurrentInput( p_playlist );
@@ -887,7 +887,6 @@ cleanup_and_continue:
         vlc_object_release( p_vout );
     if( p_input )
         vlc_object_release( p_input );
-    pl_Release( p_intf );
     return VLC_SUCCESS;
 }
 
@@ -960,7 +959,7 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
     if( asprintf( &psz_bookmark_name, "bookmark%i", i_num ) == -1 )
         return;
 
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
     char *psz_bookmark = var_CreateGetString( p_intf, psz_bookmark_name );
 
     PL_LOCK;
@@ -980,7 +979,6 @@ static void PlayBookmark( intf_thread_t *p_intf, int i_num )
 
     free( psz_bookmark );
     free( psz_bookmark_name );
-    pl_Release( p_intf );
 }
 
 static void SetBookmark( intf_thread_t *p_intf, int i_num )
@@ -989,7 +987,7 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
     if( asprintf( &psz_bookmark_name, "bookmark%i", i_num ) == -1 )
         return;
 
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
     var_Create( p_intf, psz_bookmark_name,
                 VLC_VAR_STRING|VLC_VAR_DOINHERIT );
     playlist_item_t * p_item = playlist_CurrentPlayingItem( p_playlist );
@@ -1002,7 +1000,6 @@ static void SetBookmark( intf_thread_t *p_intf, int i_num )
         config_SaveConfigFile( p_intf, "hotkeys" );
     }
 
-    pl_Release( p_intf );
     free( psz_bookmark_name );
 }
 

@@ -298,13 +298,12 @@ static int Open( vlc_object_t *p_this, bool isDialogProvider )
     p_intf->p_sys->b_isDialogProvider = isDialogProvider;
     p_sys->p_popup_menu = NULL;
     p_sys->p_mi = NULL;
-    p_sys->p_playlist = pl_Hold( p_intf );
+    p_sys->p_playlist = pl_Get( p_intf );
 
     /* */
     vlc_sem_init (&ready, 0);
     if( vlc_clone( &p_sys->thread, Thread, p_intf, VLC_THREAD_PRIORITY_LOW ) )
     {
-        pl_Release (p_sys->p_playlist);
         delete p_sys;
         return VLC_ENOMEM;
     }
@@ -346,7 +345,6 @@ static void Close( vlc_object_t *p_this )
     QVLCApp::triggerQuit();
 
     vlc_join (p_sys->thread, NULL);
-    pl_Release (p_this);
     delete p_sys;
 #ifdef Q_WS_X11
     free (x11_display);

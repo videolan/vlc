@@ -771,17 +771,15 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 - (void)enterFullscreen
 {
     /* Save the settings for next playing item */
-    playlist_t * p_playlist = pl_Hold( p_real_vout );
+    playlist_t * p_playlist = pl_Get( p_real_vout );
     var_SetBool( p_playlist, "fullscreen", true );
-    pl_Release( p_real_vout );
 }
 
 - (void)leaveFullscreen
 {
     /* Save the settings for next playing item */
-    playlist_t * p_playlist = pl_Hold( p_real_vout );
+    playlist_t * p_playlist = pl_Get( p_real_vout );
     var_SetBool( p_playlist, "fullscreen", false );
-    pl_Release( p_real_vout );
 }
 
 @end

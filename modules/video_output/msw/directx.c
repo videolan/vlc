@@ -1421,14 +1421,11 @@ static int WallpaperCallback(vlc_object_t *object, char const *cmd,
 
     /* FIXME we should have a way to export variable to be saved */
     if (ch_wallpaper) {
-        playlist_t *p_playlist = pl_Hold(vd);
-        if (p_playlist) {
-            /* Modify playlist as well because the vout might have to be
-             * restarted */
-            var_Create(p_playlist, "video-wallpaper", VLC_VAR_BOOL);
-            var_SetBool(p_playlist, "video-wallpaper", newval.b_bool);
-            pl_Release(vd);
-        }
+        playlist_t *p_playlist = pl_Get(vd);
+        /* Modify playlist as well because the vout might have to be
+         * restarted */
+        var_Create(p_playlist, "video-wallpaper", VLC_VAR_BOOL);
+        var_SetBool(p_playlist, "video-wallpaper", newval.b_bool);
     }
     return VLC_SUCCESS;
 }

@@ -1262,7 +1262,7 @@ static VLCWizard *_o_sharedInstance = nil;
     {
         intf_thread_t * p_intf = VLCIntf;
 
-        playlist_t * p_playlist = pl_Hold( p_intf );
+        playlist_t * p_playlist = pl_Get( p_intf );
 
         int x = 0;
         int y = [[o_userSelections objectForKey:@"pathToStrm"] count];
@@ -1320,8 +1320,6 @@ static VLCWizard *_o_sharedInstance = nil;
             vlc_gc_decref( p_input );
             x += 1;
         }
-
-        pl_Release( p_intf );
 
         /* close the window, since we are done */
         [o_wizard_window close];

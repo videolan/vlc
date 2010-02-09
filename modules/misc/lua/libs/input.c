@@ -64,7 +64,6 @@ input_thread_t * vlclua_get_input_internal( lua_State *L )
     }
     playlist_t *p_playlist = vlclua_get_playlist_internal( L );
     input_thread_t *p_input = playlist_CurrentInput( p_playlist );
-    vlclua_release_playlist_internal( p_playlist );
     return p_input;
 }
 

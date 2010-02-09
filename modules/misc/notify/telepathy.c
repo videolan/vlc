@@ -122,10 +122,9 @@ static int Open( vlc_object_t *p_this )
 
     p_intf->p_sys->i_id = -1;
 
-    p_playlist = pl_Hold( p_intf );
+    p_playlist = pl_Get( p_intf );
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
     var_AddCallback( p_playlist, "item-current", ItemChange, p_intf );
-    pl_Release( p_intf );
 
     return VLC_SUCCESS;
 }
@@ -136,7 +135,7 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    playlist_t *p_playlist = pl_Hold( p_this );
+    playlist_t *p_playlist = pl_Get( p_this );
     input_thread_t *p_input = NULL;
 
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
@@ -146,7 +145,6 @@ static void Close( vlc_object_t *p_this )
         var_DelCallback( p_input, "state", StateChange, p_intf );
         vlc_object_release( p_input );
     }
-    pl_Release( p_this );
 
     /* Clears the Presence message ... else it looks like we're still playing
      * something although VLC (or the Telepathy plugin) is closed */

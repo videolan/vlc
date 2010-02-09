@@ -637,10 +637,8 @@ char *str_format_meta( vlc_object_t *p_object, const char *string )
     if( !dst ) return NULL;
     int d = 0;
 
-    playlist_t *p_playlist = pl_Hold( p_object );
-    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
+    input_thread_t *p_input = playlist_CurrentInput( pl_Get(p_object) );
     input_item_t *p_item = NULL;
-    pl_Release( p_object );
     if( p_input )
     {
         p_item = input_GetItem(p_input);

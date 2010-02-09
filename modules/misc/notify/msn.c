@@ -101,10 +101,9 @@ static int Open( vlc_object_t *p_this )
     }
     msg_Dbg( p_intf, "using format: %s", p_intf->p_sys->psz_format );
 
-    p_playlist = pl_Hold( p_intf );
+    p_playlist = pl_Get( p_intf );
     var_AddCallback( p_playlist, "item-change", ItemChange, p_intf );
     var_AddCallback( p_playlist, "item-current", ItemChange, p_intf );
-    pl_Release( p_intf );
 
     return VLC_SUCCESS;
 }
@@ -115,7 +114,7 @@ static int Open( vlc_object_t *p_this )
 static void Close( vlc_object_t *p_this )
 {
     intf_thread_t *p_intf = (intf_thread_t *)p_this;
-    playlist_t *p_playlist = pl_Hold( p_this );
+    playlist_t *p_playlist = pl_Get( p_this );
 
     /* clear the MSN stuff ... else it looks like we're still playing
      * something although VLC (or the MSN plugin) is closed */
@@ -123,7 +122,6 @@ static void Close( vlc_object_t *p_this )
 
     var_DelCallback( p_playlist, "item-change", ItemChange, p_intf );
     var_DelCallback( p_playlist, "item-current", ItemChange, p_intf );
-    pl_Release( p_this );
 
     /* Destroy structure */
     free( p_intf->p_sys->psz_format );

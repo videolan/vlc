@@ -41,7 +41,7 @@
     if ( [o_command isEqualToString:@"GetURL"] || [o_command isEqualToString:@"OpenURL"] )
     {
         intf_thread_t * p_intf = VLCIntf;
-        playlist_t * p_playlist = pl_Hold( p_intf );
+        playlist_t * p_playlist = pl_Get( p_intf );
         if( p_playlist == NULL )
         {
             return nil;
@@ -69,7 +69,6 @@
                     noteNewRecentDocumentURL: o_url];
             }
         }
-        pl_Release( p_intf );
     }
     return nil;
 }
@@ -90,7 +89,7 @@
     NSString *o_command = [[self commandDescription] commandName];
 
     intf_thread_t * p_intf = VLCIntf;
-    playlist_t * p_playlist = pl_Hold( p_intf );
+    playlist_t * p_playlist = pl_Get( p_intf );
     if( p_playlist == NULL )
     {
         return nil;
@@ -133,7 +132,6 @@
             [o_controls volumeDown:self];
         }
     }
-    pl_Release( p_intf );
     return nil;
 }
 

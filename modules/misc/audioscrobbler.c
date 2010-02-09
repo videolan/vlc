@@ -189,11 +189,10 @@ static int Open( vlc_object_t *p_this )
     vlc_mutex_init( &p_sys->lock );
     vlc_cond_init( &p_sys->wait );
 
-    p_playlist = pl_Hold( p_intf );
+    p_playlist = pl_Get( p_intf );
     PL_LOCK;
     var_AddCallback( p_playlist, "item-current", ItemChange, p_intf );
     PL_UNLOCK;
-    pl_Release( p_intf );
 
     p_intf->pf_run = Run;
 
@@ -210,22 +209,15 @@ static void Close( vlc_object_t *p_this )
     intf_thread_t               *p_intf = ( intf_thread_t* ) p_this;
     intf_sys_t                  *p_sys  = p_intf->p_sys;
 
-    p_playlist = pl_Hold( p_intf );
-    if( p_playlist )
+    p_playlist = pl_Get( p_intf );
+    var_DelCallback( p_playlist, "item-current", ItemChange, p_intf );
+
+    p_input = playlist_CurrentInput( p_playlist );
+    if ( p_input )
     {
-
-        var_DelCallback( p_playlist, "item-current", ItemChange, p_intf );
-
-        p_input = playlist_CurrentInput( p_playlist );
-        if ( p_input )
-        {
-            if( p_sys->b_state_cb )
-                var_DelCallback( p_input, "intf-event", PlayingChange, p_intf );
-
-            vlc_object_release( p_input );
-        }
-
-        pl_Release( p_intf );
+        if( p_sys->b_state_cb )
+            var_DelCallback( p_input, "intf-event", PlayingChange, p_intf );
+        vlc_object_release( p_input );
     }
 
     int i;
@@ -522,16 +514,10 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     p_sys->b_meta_read      = false;
     p_sys->b_submit         = false;
 
-    p_playlist = pl_Hold( p_intf );
-    p_input = playlist_CurrentInput( p_playlist );
+    p_input = playlist_CurrentInput( pl_Get( p_intf ) );
 
     if( !p_input || p_input->b_dead )
-    {
-        pl_Release( p_intf );
         return VLC_SUCCESS;
-    }
-
-    pl_Release( p_intf );
 
     p_item = input_GetItem( p_input );
     if( !p_item )
@@ -951,15 +937,9 @@ static int ReadMetaData( intf_thread_t *p_this )
 
     intf_sys_t          *p_sys = p_this->p_sys;
 
-    p_playlist = pl_Hold( p_this );
-    p_input = playlist_CurrentInput( p_playlist );
+    p_input = playlist_CurrentInput( pl_Get( p_this ) );
     if( !p_input )
-    {
-        pl_Release( p_this );
         return( VLC_SUCCESS );
-    }
-
-    pl_Release( p_this );
 
     p_item = input_GetItem( p_input );
     if( !p_item )

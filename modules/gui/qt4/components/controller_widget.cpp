@@ -152,10 +152,9 @@ void SoundWidget::userUpdateVolume( int i_sliderVolume )
 {
     /* Only if volume is set by user action on slider */
     setMuted( false );
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
     int i_res = i_sliderVolume  * (AOUT_VOLUME_MAX / 2) / VOLUME_MAX;
     aout_VolumeSet( p_playlist, i_res );
-    pl_Release( p_intf );
 }
 
 /* libvlc changed value event slot */
@@ -163,10 +162,9 @@ void SoundWidget::libUpdateVolume()
 {
     /* Audio part */
     audio_volume_t i_volume;
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
 
     aout_VolumeGet( p_playlist, &i_volume );
-    pl_Release( p_intf );
     i_volume = ( ( i_volume + 1 ) *  VOLUME_MAX )/ (AOUT_VOLUME_MAX/2);
     int i_gauge = volumeSlider->value();
     if ( !b_is_muted && /* do not show mute effect on volume (set to 0) */
@@ -180,9 +178,8 @@ void SoundWidget::libUpdateVolume()
 /* libvlc mute/unmute event slot */
 void SoundWidget::updateMuteStatus()
 {
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
     b_is_muted = aout_IsMuted( VLC_OBJECT(p_playlist) );
-    pl_Release( p_intf );
 
     SoundSlider *soundSlider = qobject_cast<SoundSlider *>(volumeSlider);
     if( soundSlider )
@@ -200,9 +197,8 @@ void SoundWidget::showVolumeMenu( QPoint pos )
 void SoundWidget::setMuted( bool mute )
 {
     b_is_muted = mute;
-    playlist_t *p_playlist = pl_Hold( p_intf );
+    playlist_t *p_playlist = pl_Get( p_intf );
     aout_SetMute( VLC_OBJECT(p_playlist), NULL, mute );
-    pl_Release( p_intf );
 }
 
 bool SoundWidget::eventFilter( QObject *obj, QEvent *e )

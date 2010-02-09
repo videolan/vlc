@@ -409,7 +409,7 @@ static VLCExtended *_o_sharedInstance = nil;
     id o_window = [NSApp keyWindow];
     NSArray *o_windows = [NSApp orderedWindows];
     NSEnumerator *o_enumerator = [o_windows objectEnumerator];
-    playlist_t * p_playlist = pl_Hold( VLCIntf );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
     vout_thread_t *p_vout = getVout();
     vout_thread_t *p_real_vout;
 
@@ -435,8 +435,6 @@ static VLCExtended *_o_sharedInstance = nil;
 
     /* store to prefs */
     config_PutFloat( p_playlist , "macosx-opaqueness" , val.f_float );
-
-    pl_Release( VLCIntf );
 
     o_config_changed = YES;
 }
@@ -746,7 +744,7 @@ static VLCExtended *_o_sharedInstance = nil;
 {
     /* save the preferences to make sure that our module-changes will up on
      * next launch again */
-    playlist_t * p_playlist = pl_Hold( VLCIntf );
+    playlist_t * p_playlist = pl_Get( VLCIntf );
     int returnedValue;
     NSArray * theModules;
     theModules = [[NSArray alloc] initWithObjects: @"main", 
@@ -775,7 +773,6 @@ static VLCExtended *_o_sharedInstance = nil;
             "extended control attribute '%s' (%i)",
             [[theModules objectAtIndex: x] UTF8String] , returnedValue);
             [theModules release];
-            pl_Release( VLCIntf );
  
             return;
         }
@@ -786,6 +783,5 @@ static VLCExtended *_o_sharedInstance = nil;
     msg_Dbg( VLCIntf, "VLCExtended: saved certain preferences successfully" );
  
     [theModules release];
-    pl_Release( VLCIntf );
 }
 @end

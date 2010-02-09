@@ -439,7 +439,7 @@ static void RegisterCallbacks( intf_thread_t *p_intf )
 static void Run( intf_thread_t *p_intf )
 {
     input_thread_t * p_input = NULL;
-    playlist_t *     p_playlist = pl_Hold( p_intf );
+    playlist_t *     p_playlist = pl_Get( p_intf );
 
     char p_buffer[ MAX_LINE_LENGTH + 1 ];
     bool b_showpos = var_InheritInteger( p_intf, "rc-show-pos" );
@@ -799,8 +799,6 @@ static void Run( intf_thread_t *p_intf )
         var_DelCallback( p_input, "intf-event", InputEvent, p_intf );
         vlc_object_release( p_input );
     }
-
-    pl_Release( p_intf );
 
     var_DelCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, p_intf );
     vlc_restorecancel( canc );

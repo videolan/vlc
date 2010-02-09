@@ -282,7 +282,7 @@ static int Open( vlc_object_t *p_this )
     if( var_InheritInteger(p_this, SOUT_CFG_PREFIX "bonjour") )
     {
         char                *psz_txt, *psz_name;
-        playlist_t          *p_playlist = pl_Hold( p_access );
+        playlist_t          *p_playlist = pl_Get( p_access );
 
         char *psz_uri = input_item_GetURI( p_playlist->status.p_item->p_input );
         char *psz_newuri = psz_uri;
@@ -293,7 +293,6 @@ static int Open( vlc_object_t *p_this )
         if( psz_file_name &&
             asprintf( &psz_txt, "path=%s", psz_file_name ) == -1 )
             {
-                pl_Release( p_access );
                 free( psz_uri );
                 return VLC_ENOMEM;
             }
@@ -307,7 +306,6 @@ static int Open( vlc_object_t *p_this )
 
         if( p_sys->p_bonjour == NULL )
             msg_Err( p_access, "unable to start requested Bonjour announce" );
-        pl_Release( p_access );
     }
     else
         p_sys->p_bonjour = NULL;

@@ -2491,14 +2491,12 @@ static int StateCallback( vlc_object_t *p_this, char const *psz_cmd,
 *****************************************************************************/
 static void AddStateVariableCallback(filter_t *p_filter)
 {
-    playlist_t *p_playlist = pl_Hold( p_filter );
-    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
+    input_thread_t *p_input = playlist_CurrentInput( pl_Get( p_filter ) );
     if(p_input)
     {
         var_AddCallback( p_input, "state", StateCallback, p_filter );
         vlc_object_release( p_input );
     }
-    pl_Release( p_filter );
 }
 
 /*****************************************************************************
@@ -2510,14 +2508,12 @@ static void AddStateVariableCallback(filter_t *p_filter)
 *****************************************************************************/
 static void DelStateVariableCallback( filter_t *p_filter )
 {
-    playlist_t *p_playlist = pl_Hold( p_filter );
-    input_thread_t *p_input = playlist_CurrentInput( p_playlist );
+    input_thread_t *p_input = playlist_CurrentInput( pl_Get ( p_filter ) );
     if(p_input)
     {
         var_DelCallback( p_input, "state", StateCallback, p_filter );
         vlc_object_release( p_input );
     }
-    pl_Release( p_filter );
 }
 
 

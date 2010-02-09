@@ -260,11 +260,8 @@ enum pl_locked_state
 #define PL_UNLOCK playlist_Unlock( p_playlist )
 #define PL_ASSERT_LOCKED playlist_AssertLocked( p_playlist )
 
-VLC_EXPORT( playlist_t *, pl_Hold, ( vlc_object_t * ) );
-#define pl_Hold( a ) pl_Hold( VLC_OBJECT(a) )
-
-VLC_EXPORT( void, pl_Release, ( vlc_object_t * ) );
-#define pl_Release(a) pl_Release( VLC_OBJECT(a) )
+VLC_EXPORT( playlist_t *, pl_Get, ( vlc_object_t * ) );
+#define pl_Get( a ) pl_Get( VLC_OBJECT(a) )
 
 /* Playlist control */
 #define playlist_Play(p) playlist_Control(p,PLAYLIST_PLAY, pl_Unlocked )
@@ -379,11 +376,7 @@ VLC_EXPORT( playlist_item_t *, playlist_GetPrevLeaf, ( playlist_t *p_playlist, p
 #define pl_CurrentInput(a) __pl_CurrentInput( VLC_OBJECT(a) )
 static  inline input_thread_t * __pl_CurrentInput( vlc_object_t * p_this )
 {
-    playlist_t * p_playlist = pl_Hold( p_this );
-    if( !p_playlist ) return NULL;
-    input_thread_t * p_input = playlist_CurrentInput( p_playlist );
-    pl_Release( p_this );
-    return p_input;
+    return playlist_CurrentInput( pl_Get( p_this ) );
 }
 
 /** Tell if the playlist is empty */

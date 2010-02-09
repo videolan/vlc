@@ -816,11 +816,9 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     if( psz_modules )
     {
         char *p = psz_modules, *m;
-        playlist_t *p_playlist = pl_Hold( p_libvlc );
         while( ( m = strsep( &p, " :," ) ) != NULL )
             playlist_ServicesDiscoveryAdd( p_playlist, m );
         free( psz_modules );
-        pl_Release (p_libvlc);
     }
 
 #ifdef ENABLE_VLM
@@ -975,10 +973,8 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     psz_val = var_InheritString( p_libvlc, "open" );
     if ( psz_val != NULL )
     {
-        playlist_t *p_playlist = pl_Hold( p_libvlc );
         playlist_AddExt( p_playlist, psz_val, NULL, PLAYLIST_INSERT, 0,
                          -1, 0, NULL, 0, true, pl_Unlocked );
-        pl_Release( p_libvlc );
         free( psz_val );
     }
 
@@ -1220,11 +1216,9 @@ static int GetFilenames( libvlc_int_t *p_vlc, int i_argc, const char *ppsz_argv[
         if( !mrl )
             continue;
 
-        playlist_t *p_playlist = pl_Hold( p_vlc );
-        playlist_AddExt( p_playlist, mrl, NULL, PLAYLIST_INSERT,
+        playlist_AddExt( pl_Get( p_vlc ), mrl, NULL, PLAYLIST_INSERT,
                 0, -1, i_options, ( i_options ? &ppsz_argv[i_opt + 1] : NULL ),
                 VLC_INPUT_OPTION_TRUSTED, true, pl_Unlocked );
-        pl_Release( p_vlc );
         free( mrl );
     }
 

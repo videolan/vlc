@@ -25,7 +25,6 @@
 #define VLC_LUA_PLAYLIST_H
 
 playlist_t *vlclua_get_playlist_internal( lua_State * );
-void vlclua_release_playlist_internal( playlist_t * );
 
 #endif
 

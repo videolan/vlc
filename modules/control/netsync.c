@@ -139,7 +139,7 @@ static int Open(vlc_object_t *object)
     sys->timeout = var_InheritInteger(intf, "netsync-timeout");
     if (sys->timeout < 500)
         sys->timeout = 500;
-    sys->playlist = pl_Hold(intf);
+    sys->playlist = pl_Get(intf);
     sys->input = NULL;
 
     var_AddCallback(sys->playlist, "input-current", PlaylistEvent, intf);
@@ -156,7 +156,6 @@ void Close(vlc_object_t *object)
 
     assert(sys->input == NULL);
     var_DelCallback(sys->playlist, "input-current", PlaylistEvent, intf);
-    pl_Release(intf);
     net_Close(sys->fd);
     free(sys);
 }
