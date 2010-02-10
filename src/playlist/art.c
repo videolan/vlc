@@ -71,8 +71,10 @@ static char* ArtCacheGetDirPath( const char *psz_title, const char *psz_artist,
 
     if( !EMPTY_STR(psz_artist) && !EMPTY_STR(psz_album) )
     {
-        char *psz_album_sanitized = filename_sanitize( psz_album );
-        char *psz_artist_sanitized = filename_sanitize( psz_artist );
+        char *psz_album_sanitized = strdup( psz_album );
+        filename_sanitize( psz_album_sanitized );
+        char *psz_artist_sanitized = strdup( psz_artist );
+        filename_sanitize( psz_artist_sanitized );
         if( asprintf( &psz_dir, "%s" DIR_SEP "art" DIR_SEP "artistalbum"
                       DIR_SEP "%s" DIR_SEP "%s", psz_cachedir,
                       psz_artist_sanitized, psz_album_sanitized ) == -1 )
@@ -82,7 +84,8 @@ static char* ArtCacheGetDirPath( const char *psz_title, const char *psz_artist,
     }
     else
     {
-        char * psz_title_sanitized = filename_sanitize( psz_title );
+        char * psz_title_sanitized = strdup( psz_title );
+        filename_sanitize( psz_title_sanitized );
         if( asprintf( &psz_dir, "%s" DIR_SEP "art" DIR_SEP "title" DIR_SEP
                       "%s", psz_cachedir, psz_title_sanitized ) == -1 )
             psz_dir = NULL;
@@ -131,7 +134,8 @@ static char *ArtCacheName( input_item_t *p_item, const char *psz_type )
 
     ArtCacheCreateDir( psz_path );
 
-    char *psz_ext = filename_sanitize( psz_type ? psz_type : "" );
+    char *psz_ext = strdup( psz_type ? psz_type : "" );
+    filename_sanitize( psz_ext );
     char *psz_filename;
     if( asprintf( &psz_filename, "%s" DIR_SEP "art%s", psz_path, psz_ext ) < 0 )
         psz_filename = NULL;

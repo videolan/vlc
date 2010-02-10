@@ -3339,16 +3339,14 @@ char *input_CreateFilename( vlc_object_t *p_obj, const char *psz_path, const cha
         if( !psz_tmp )
             return NULL;
 
-        char *psz_tmp2 = filename_sanitize( psz_tmp );
-        free( psz_tmp );
+        filename_sanitize( psz_tmp );
 
-        if( !psz_tmp2 ||
-            asprintf( &psz_file, "%s"DIR_SEP"%s%s%s",
-                      psz_path, psz_tmp2,
+        if( asprintf( &psz_file, "%s"DIR_SEP"%s%s%s",
+                      psz_path, psz_tmp,
                       psz_extension ? "." : "",
                       psz_extension ? psz_extension : "" ) < 0 )
             psz_file = NULL;
-        free( psz_tmp2 );
+        free( psz_tmp );
         return psz_file;
     }
     else
