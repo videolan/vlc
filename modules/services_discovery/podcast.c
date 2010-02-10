@@ -53,7 +53,7 @@
 static int  Open ( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-VLC_SD_PROBE_HELPER("podcast", N_("Podcasts"), SD_CAT_INTERNET)
+VLC_SD_PROBE_HELPER("podcast", "Podcasts", SD_CAT_INTERNET)
 
 #define URLS_TEXT N_("Podcast URLs list")
 #define URLS_LONGTEXT N_("Enter the list of podcasts to retrieve, " \

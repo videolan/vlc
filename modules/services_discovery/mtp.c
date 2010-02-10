@@ -38,7 +38,7 @@
 static int Open( vlc_object_t * );
 static void Close( vlc_object_t * );
 
-VLC_SD_PROBE_HELPER("mtp", N_("MTP devices"), SD_CAT_DEVICES)
+VLC_SD_PROBE_HELPER("mtp", "MTP devices", SD_CAT_DEVICES)
 
 vlc_module_begin()
     set_shortname( "MTP" )

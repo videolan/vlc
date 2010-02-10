@@ -48,7 +48,7 @@
     static int  Open ( vlc_object_t * );
     static void Close( vlc_object_t * );
 
-VLC_SD_PROBE_HELPER("bonjour", N_("Bonjour services"), SD_CAT_LAN)
+VLC_SD_PROBE_HELPER("bonjour", "Bonjour services", SD_CAT_LAN)
 
 vlc_module_begin ()
     set_shortname( "Bonjour" )
