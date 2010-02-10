@@ -1487,7 +1487,6 @@ static int TrackCreateES( demux_t *p_demux, mp4_track_t *p_track,
     p_enda = MP4_BoxGet( p_sample, "wave/enda" );
     if( !p_enda )
         p_enda = MP4_BoxGet( p_sample, "enda" );
-    msg_Err(p_demux, "ENDA=%p %d codec=%4.4s", p_enda, p_enda ? p_enda->data.p_enda->i_little_endian : -1, &p_sample->i_type );
 
     if( p_track->fmt.i_cat == AUDIO_ES && ( p_track->i_sample_size == 1 || p_track->i_sample_size == 2 ) )
     {
