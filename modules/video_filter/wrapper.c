@@ -538,21 +538,6 @@ static void FilterAllocationClean( filter_t *p_filter )
 
 /* -- Splitter callbacks -- */
 
-/**
- * Forward fullscreen event to/from the childrens.
- *
- * FIXME probably unsafe (pp_vout[] content)
- */
-static bool IsFullscreenActive( vout_thread_t *p_vout )
-{
-    vout_sys_t *p_sys = p_vout->p_sys;
-    for( int i = 0; i < p_sys->i_vout; i++ )
-    {
-        if( var_GetBool( p_sys->pp_vout[i], "fullscreen" ) )
-            return true;
-    }
-    return false;
-}
 static int FullscreenEventDown( vlc_object_t *p_this, char const *psz_var,
                                 vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
