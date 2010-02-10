@@ -117,8 +117,6 @@ static int  FilterAllocationInit ( filter_t *, void * );
 static void FilterAllocationClean( filter_t * );
 
 /* */
-static int  FullscreenEventUp( vlc_object_t *, char const *,
-                               vlc_value_t, vlc_value_t, void * );
 static int  FullscreenEventDown( vlc_object_t *, char const *,
                                  vlc_value_t, vlc_value_t, void * );
 static int  SplitterPictureNew( video_splitter_t *, picture_t *pp_picture[] );
@@ -310,11 +308,11 @@ static int Init( vout_thread_t *p_vout )
             }
         }
 
-        /* Attach once pp_vout is completly field to avoid race conditions */
+        /* Attach once pp_vout is completly filed to avoid race conditions */
         for( int i = 0; i < p_splitter->i_output; i++ )
             vout_filter_SetupChild( p_vout, p_sys->pp_vout[i],
                                     MouseEvent,
-                                    FullscreenEventUp, FullscreenEventDown, true );
+                                    FullscreenEventDown, true );
         /* Restore settings */
         var_SetInteger( p_vout, "align", i_org_align );
         var_SetInteger( p_vout, "video-x", i_org_x );
@@ -398,7 +396,7 @@ static void VoutsClean( vout_thread_t *p_vout, int i_count )
         else
              vout_filter_SetupChild( p_vout, p_sys->pp_vout[i],
                                      MouseEvent,
-                                     FullscreenEventUp, FullscreenEventDown, false );
+                                     FullscreenEventDown, false );
     }
 
     for( int i = 0; i < i_count; i++ )
@@ -554,15 +552,6 @@ static bool IsFullscreenActive( vout_thread_t *p_vout )
             return true;
     }
     return false;
-}
-static int FullscreenEventUp( vlc_object_t *p_this, char const *psz_var,
-                              vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    vout_thread_t *p_vout = p_data;
-    VLC_UNUSED(oldval); VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(newval);
-
-    const bool b_fullscreen = IsFullscreenActive( p_vout );
-    return var_SetBool( p_vout, "fullscreen", b_fullscreen );
 }
 static int FullscreenEventDown( vlc_object_t *p_this, char const *psz_var,
                                 vlc_value_t oldval, vlc_value_t newval, void *p_data )

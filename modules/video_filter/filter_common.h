@@ -86,9 +86,9 @@ static inline int ForwardEvent( vlc_object_t *p_this, char const *psz_var,
  * Install/remove all callbacks needed for proper event handling inside
  * a vout-filter.
  */
-static inline void vout_filter_SetupChild( vout_thread_t *p_parent, vout_thread_t *p_child,
+static inline void vout_filter_SetupChild( vout_thread_t *p_parent,
+                                           vout_thread_t *p_child,
                                            vlc_callback_t pf_mouse_event,
-                                           vlc_callback_t pf_fullscreen_up,
                                            vlc_callback_t pf_fullscreen_down,
                                            bool b_init )
 {
@@ -115,14 +115,11 @@ static inline void vout_filter_SetupChild( vout_thread_t *p_parent, vout_thread_
     pf_execute( VLC_OBJECT(p_parent), "crop",         ForwardEvent, p_child );
 
     /* */
-    if( !pf_fullscreen_up )
-        pf_fullscreen_up = ForwardEvent;
     if( !pf_fullscreen_down )
         pf_fullscreen_down = ForwardEvent;
-    pf_execute( VLC_OBJECT(p_child),  "fullscreen", pf_fullscreen_up,   p_parent );
     pf_execute( VLC_OBJECT(p_parent), "fullscreen", pf_fullscreen_down, p_child );
 }
 
-#define vout_filter_AddChild( a, b, c ) vout_filter_SetupChild( a, b, c, NULL, NULL, true )
-#define vout_filter_DelChild( a, b, c ) vout_filter_SetupChild( a, b, c, NULL, NULL, false )
+#define vout_filter_AddChild( a, b, c ) vout_filter_SetupChild( a, b, c, NULL, true )
+#define vout_filter_DelChild( a, b, c ) vout_filter_SetupChild( a, b, c, NULL, false )
 
