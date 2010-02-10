@@ -351,8 +351,8 @@ static uint8_t *GetOutBuffer( decoder_t *p_dec, void **pp_out_buffer )
 
     if( p_dec->fmt_out.audio.i_rate != p_sys->frame.i_rate )
     {
-        msg_Info( p_dec, "A/52 channels:%d samplerate:%d bitrate:%d",
-                  p_sys->frame.i_channels, p_sys->frame.i_rate, p_sys->frame.i_bitrate );
+        msg_Dbg( p_dec, "A/52 channels:%d samplerate:%d bitrate:%d",
+                 p_sys->frame.i_channels, p_sys->frame.i_rate, p_sys->frame.i_bitrate );
 
         date_Init( &p_sys->end_date, p_sys->frame.i_rate, 1 );
         date_Set( &p_sys->end_date, p_sys->i_pts );
