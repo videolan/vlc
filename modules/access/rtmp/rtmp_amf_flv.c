@@ -1064,6 +1064,11 @@ rtmp_handler_invoke( rtmp_control_thread_t *p_thread, rtmp_packet_t *rtmp_packet
 
     i++; /* Pass over AMF_DATATYPE_STRING */
     string = amf_decode_string( &i );
+    if( !string )
+    {
+        msg_Err(p_thread,"Seriously broken stream");
+        return;
+    }
 
     i++; /* Pass over AMF_DATATYPE_NUMBER */
     number = amf_decode_number( &i );
@@ -2190,6 +2195,9 @@ amf_decode_string( uint8_t **buffer )
 
     length = ntoh16( *(uint16_t *) *buffer );
     *buffer += sizeof( uint16_t );
+
+    if( length > sizeof( *buffer ) / sizeof( uint8_t ))
+        return NULL;
 
     out = (char *) malloc( length + 1 ); /* '\0' terminated */
     if( !out ) return NULL;
