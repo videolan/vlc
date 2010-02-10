@@ -632,7 +632,7 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
                         free( psz_longname );
                         goto error;
                     }
-                    vlc_sd_probe_Add( probe, psz_name, psz_longname );
+                    vlc_sd_probe_Add( probe, psz_name, psz_longname, SD_CAT_INTERNET );
                     free( psz_name );
                     free( psz_longname );
                 }

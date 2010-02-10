@@ -114,7 +114,7 @@
     static int  OpenDemux ( vlc_object_t * );
     static void CloseDemux ( vlc_object_t * );
 
-VLC_SD_PROBE_HELPER("sap", N_("Network streams (SAP)"))
+VLC_SD_PROBE_HELPER("sap", N_("Network streams (SAP)"), SD_CAT_LAN)
 
 vlc_module_begin ()
     set_shortname( N_("SAP"))

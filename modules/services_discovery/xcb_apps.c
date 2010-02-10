@@ -80,7 +80,7 @@ static int vlc_sd_probe_Open (vlc_object_t *obj)
         return VLC_PROBE_CONTINUE;
     xcb_disconnect (conn);
     return vlc_sd_probe_Add (probe, "xcb_apps{longname=\"Screen capture\"}",
-                             N_("Screen capture"));
+                             N_("Screen capture"), SD_CAT_MYCOMPUTER);
 }
 
 /**

@@ -283,10 +283,10 @@ static int vlc_sd_probe_Open( vlc_object_t *obj )
     vlc_probe_t *probe = (vlc_probe_t *)obj;
 
     vlc_sd_probe_Add( probe, "shoutcast{longname=\"Shoutcast Radio\"}",
-                      N_("Shoutcast Radio") );
+                      N_("Shoutcast Radio"), SD_CAT_INTERNET );
     vlc_sd_probe_Add( probe, "shoutcasttv{longname=\"Shoutcast TV\"}",
-                      N_("Shoutcast TV") );
+                      N_("Shoutcast TV"), SD_CAT_INTERNET );
     vlc_sd_probe_Add( probe, "frenchtv{longname=\"French TV\"}",
-                      N_("French TV") );
+                      N_("French TV"), SD_CAT_INTERNET );
     return VLC_PROBE_CONTINUE;
 }

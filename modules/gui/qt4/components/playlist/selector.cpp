@@ -249,46 +249,53 @@ void PLSelector::createItems()
                               THEPL->p_media_library );
     ml->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_ML ) );
 
-    QTreeWidgetItem *mfldrs = NULL;
-
-    QTreeWidgetItem *shouts = NULL;
+    QTreeWidgetItem *mycomp = addItem( CATEGORY_TYPE, qtr( "My Computer" ),
+                                        false )->treeItem();
+    QTreeWidgetItem *devices = addItem( CATEGORY_TYPE, qtr( "Devices" ),
+                                        false )->treeItem();
+    QTreeWidgetItem *lan = addItem( CATEGORY_TYPE, qtr( "Local Network" ),
+                                    false )->treeItem();
+    QTreeWidgetItem *internet = addItem( CATEGORY_TYPE, qtr( "Internet" ),
+                                          false )->treeItem();;
 
     char **ppsz_longnames;
-    char **ppsz_names = vlc_sd_GetNames( THEPL, &ppsz_longnames );
+    int *p_categories;
+    char **ppsz_names = vlc_sd_GetNames( THEPL, &ppsz_longnames, &p_categories );
     if( !ppsz_names )
         return;
 
     char **ppsz_name = ppsz_names, **ppsz_longname = ppsz_longnames;
-    for( ; *ppsz_name; ppsz_name++, ppsz_longname++ )
+    int *p_category = p_categories;
+    for( ; *ppsz_name; ppsz_name++, ppsz_longname++, p_category++ )
     {
         //msg_Dbg( p_intf, "Adding a SD item: %s", *ppsz_longname );
-#define SD_IS( name ) ( !strcmp( *ppsz_name, name ) )
 
-        if( SD_IS("shoutcast") || SD_IS("shoutcasttv") ||
-            SD_IS("frenchtv") || SD_IS("freebox") )
+        if( *p_category == SD_CAT_INTERNET )
         {
-            if( !shouts ) shouts = addItem( CATEGORY_TYPE, qtr( "Shoutcast" ),
-                                            false )->treeItem();
-            putSDData( addItem( SD_TYPE, *ppsz_longname, false, shouts ),
+            PLSelItem *selItem = addItem( SD_TYPE, *ppsz_longname, false, internet );
+            putSDData( selItem, *ppsz_name, *ppsz_longname );
+            if( !strncmp( *ppsz_name, "podcast", 7 ) )
+            {
+                selItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PODCAST ) );
+                selItem->addAction( ADD_ACTION, qtr( "Subscribe to a podcast" ) );
+                CONNECT( selItem, action( PLSelItem* ), this, podcastAdd( PLSelItem* ) );
+                podcastsParent = selItem->treeItem();
+            }
+        }
+        else if( *p_category == SD_CAT_DEVICES )
+        {
+            putSDData( addItem( SD_TYPE, *ppsz_longname, false, devices ),
                        *ppsz_name, *ppsz_longname );
         }
-        else if( SD_IS("video_dir") || SD_IS("audio_dir") || SD_IS("picture_dir") )
+        else if( *p_category == SD_CAT_LAN )
         {
-            if( !mfldrs ) mfldrs = addItem( CATEGORY_TYPE, qtr( "Media Folders" ),
-                                            false )->treeItem();
-            putSDData( addItem( SD_TYPE, *ppsz_longname, false, mfldrs ),
+            putSDData( addItem( SD_TYPE, *ppsz_longname, false, lan ),
                        *ppsz_name, *ppsz_longname );
         }
-        else if( !strncmp( *ppsz_name, "podcast", 7 ) )
+        else if( *p_category == SD_CAT_MYCOMPUTER )
         {
-
-            PLSelItem *podItem = addItem( SD_TYPE, qtr( "Podcasts" ), false );
-            putSDData( podItem, *ppsz_name, *ppsz_longname );
-            podItem->treeItem()->setData( 0, SPECIAL_ROLE, QVariant( IS_PODCAST ) );
-            podItem->addAction( ADD_ACTION, qtr( "Subscribe to a podcast" ) );
-            CONNECT( podItem, action( PLSelItem* ), this, podcastAdd( PLSelItem* ) );
-
-            podcastsParent = podItem->treeItem();
+            putSDData( addItem( SD_TYPE, *ppsz_longname, false, mycomp ),
+                       *ppsz_name, *ppsz_longname );
         }
         else
         {
@@ -296,13 +303,17 @@ void PLSelector::createItems()
                        *ppsz_name, *ppsz_longname );
         }
 
-#undef SD_IS
-
         free( *ppsz_name );
         free( *ppsz_longname );
     }
     free( ppsz_names );
     free( ppsz_longnames );
+    free( p_categories );
+
+    if( mycomp->childCount() == 0 ) delete mycomp;
+    if( devices->childCount() == 0 ) delete devices;
+    if( lan->childCount() == 0 ) delete lan;
+    if( internet->childCount() == 0 ) delete internet;
 }
 
 QStringList PLSelector::mimeTypes() const

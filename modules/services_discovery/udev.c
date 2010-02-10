@@ -74,8 +74,8 @@ static int vlc_sd_probe_Open (vlc_object_t *obj)
     if (mon != NULL)
     {
         vlc_sd_probe_Add (probe, "v4l{longname=\"Video capture\"}",
-                          N_("Video capture"));
-        vlc_sd_probe_Add (probe, "disc{longname=\"Discs\"}", N_("Discs"));
+                          N_("Video capture"), SD_CAT_DEVICES);
+        vlc_sd_probe_Add (probe, "disc{longname=\"Discs\"}", N_("Discs"), SD_CAT_MYCOMPUTER);
         udev_monitor_unref (mon);
     }
     udev_unref (udev);

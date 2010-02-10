@@ -55,7 +55,7 @@ struct services_discovery_sys_t
 // VLC callback prototypes
 static int Open( vlc_object_t* );
 static void Close( vlc_object_t* );
-VLC_SD_PROBE_HELPER("upnp", N_("Universal Plug'n'Play"))
+VLC_SD_PROBE_HELPER("upnp", N_("Universal Plug'n'Play"), SD_CAT_LAN)
 
 // Module descriptor
 

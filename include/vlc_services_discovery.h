@@ -54,15 +54,23 @@ struct services_discovery_t
     services_discovery_sys_t *p_sys;
 };
 
+enum services_discovery_category_e
+{
+    SD_CAT_DEVICES = 1,
+    SD_CAT_LAN,
+    SD_CAT_INTERNET,
+    SD_CAT_MYCOMPUTER
+};
+
 /***********************************************************************
  * Service Discovery
  ***********************************************************************/
 
 /* Get the services discovery modules names to use in Create(), in a null
  * terminated string array. Array and string must be freed after use. */
-VLC_EXPORT( char **, vlc_sd_GetNames, ( vlc_object_t *, char *** ) );
-#define vlc_sd_GetNames(obj, pln) \
-        vlc_sd_GetNames(VLC_OBJECT(obj), pln)
+VLC_EXPORT( char **, vlc_sd_GetNames, ( vlc_object_t *, char ***, int ** ) );
+#define vlc_sd_GetNames(obj, pln, pcat ) \
+        vlc_sd_GetNames(VLC_OBJECT(obj), pln, pcat)
 
 /* Creation of a service_discovery object */
 VLC_EXPORT( services_discovery_t *, vlc_sd_Create, ( vlc_object_t *, const char * ) );
@@ -91,18 +99,19 @@ VLC_EXPORT( void,                   services_discovery_RemoveItem, ( services_di
 
 /* SD probing */
 
-VLC_EXPORT(int, vlc_sd_probe_Add, (vlc_probe_t *, const char *, const char *));
+VLC_EXPORT(int, vlc_sd_probe_Add, (vlc_probe_t *, const char *, const char *, int category));
 
 #define VLC_SD_PROBE_SUBMODULE \
     add_submodule() \
         set_capability( "services probe", 100 ) \
         set_callbacks( vlc_sd_probe_Open, NULL )
 
-#define VLC_SD_PROBE_HELPER(name, longname) \
+#define VLC_SD_PROBE_HELPER(name, longname, cat) \
 static int vlc_sd_probe_Open (vlc_object_t *obj) \
 { \
     return vlc_sd_probe_Add ((struct vlc_probe_t *)obj, \
-                             name "{longname=\"" # longname "\"}", longname); \
+                             name "{longname=\"" # longname "\"}", \
+                             longname, cat); \
 }
 
 /** @} */
