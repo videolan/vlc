@@ -51,9 +51,6 @@ QIcon PLModel::icons[ITEM_TYPE_NUMBER];
  * Playlist model implementation
  *************************************************************************/
 
-/*
-  This model is called two times, for the selector and the standard panel
-*/
 PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
                   intf_thread_t *_p_intf,   /* main Qt p_intf */
                   playlist_item_t * p_root,
@@ -81,7 +78,7 @@ PLModel::PLModel( playlist_t *_p_playlist,  /* THEPL */
     ADD_ICON( NODE, ":/type/node" );
 #undef ADD_ICON
 
-    rebuild( p_root, true );
+    rebuild( p_root );
     CONNECT( THEMIM->getIM(), metaChanged( input_item_t *),
             this, processInputItemUpdate( input_item_t *) );
     CONNECT( THEMIM, inputChanged( input_thread_t * ),
@@ -640,10 +637,10 @@ end:
 
 void PLModel::rebuild()
 {
-    rebuild( NULL, false );
+    rebuild( NULL );
 }
 
-void PLModel::rebuild( playlist_item_t *p_root, bool b_first )
+void PLModel::rebuild( playlist_item_t *p_root )
 {
     playlist_item_t* p_item;
 

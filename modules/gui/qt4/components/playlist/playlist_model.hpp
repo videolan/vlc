@@ -97,7 +97,8 @@ public:
     void search( const QString& search_text );
     void sort( int column, Qt::SortOrder order );
     void sort( int i_root_id, int column, Qt::SortOrder order );
-    void rebuild(); void rebuild( playlist_item_t *, bool b_first = false );
+    void rebuild();
+    void rebuild( playlist_item_t * );
 
     inline PLItem *getItem( QModelIndex index ) const
     {
@@ -106,29 +107,37 @@ public:
         else return rootItem;
     }
 
-private:
+signals:
+    void currentChanged( const QModelIndex& );
+    void rootChanged();
 
+public slots:
+    void activateItem( const QModelIndex &index );
+    void activateItem( playlist_item_t *p_item );
+
+private:
     /* General */
     PLItem *rootItem;
 
     playlist_t *p_playlist;
     intf_thread_t *p_intf;
-    int i_depth;
 
     static QIcon icons[ITEM_TYPE_NUMBER];
 
-    /* Actions */
-    void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList );
+    /* Shallow actions (do not affect core playlist) */
     void updateTreeItem( PLItem * );
     void removeItem ( PLItem * );
     void removeItem( int );
+    void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList );
     void takeItem( PLItem * ); //will not delete item
     void insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos );
-    void dropAppendCopy( QByteArray& data, PLItem *target );
-    void dropMove( QByteArray& data, PLItem *target, int new_pos );
-    /* The following actions will not signal the view! */
+    /* ...of which  the following will not update the views */
     void updateChildren( PLItem * );
     void updateChildren( playlist_item_t *, PLItem * );
+
+    /* Deep actions (affect core playlist) */
+    void dropAppendCopy( QByteArray& data, PLItem *target );
+    void dropMove( QByteArray& data, PLItem *target, int new_pos );
 
     /* Popup */
     int i_popup_item, i_popup_parent, i_popup_column;
@@ -138,22 +147,14 @@ private:
     PLItem *findById( PLItem *, int );
     PLItem *findByInput( PLItem *, int );
     PLItem *findInner( PLItem *, int , bool );
-
     int columnFromMeta( int meta_column ) const;
     int columnToMeta( int column ) const;
     bool canEdit() const;
+
     PLItem *p_cached_item;
     PLItem *p_cached_item_bi;
     int i_cached_id;
     int i_cached_input_id;
-
-signals:
-    void currentChanged( const QModelIndex& );
-    void rootChanged();
-
-public slots:
-    void activateItem( const QModelIndex &index );
-    void activateItem( playlist_item_t *p_item );
 
 private slots:
     void popupPlay();

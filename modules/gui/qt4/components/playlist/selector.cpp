@@ -460,7 +460,6 @@ void PLSelector::podcastAdd( PLSelItem* item )
 
 void PLSelector::podcastRemove( PLSelItem* item )
 {
-    //FIXME will translators know to leave that %1 somewhere inside?
     QString question ( qtr( "Do you really want to unsubscribe from %1?" ) );
     question = question.arg( item->text() );
     QMessageBox::StandardButton res =
@@ -495,9 +494,6 @@ void PLSelector::drawBranches ( QPainter * painter, const QRect & rect, const QM
     QStyleOption option;
     option.initFrom( this );
     option.rect = rect.adjusted( rect.width() - indentation(), 0, 0, 0 );
-
-    /*option.state = QStyle::State_Children;
-    if( isExpanded( index ) ) option.state |=  QStyle::State_Open;*/
     style()->drawPrimitive( isExpanded( index ) ?
                             QStyle::PE_IndicatorArrowDown :
                             QStyle::PE_IndicatorArrowRight, &option, painter );

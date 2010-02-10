@@ -69,14 +69,6 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     currentRootId = -1;
     last_activated_id = -1;
 
-    /* Title label */
-    /*title = new QLabel;
-    QFont titleFont;
-    titleFont.setPointSize( titleFont.pointSize() + 6 );
-    titleFont.setFamily( "Verdana" );
-    title->setFont( titleFont );
-    layout->addWidget( title, 0, 0 );*/
-
     locationBar = new LocationBar( model );
     layout->addWidget( locationBar, 0, 0 );
     CONNECT( model, rootChanged(), locationBar, setRootIndex() );
@@ -405,7 +397,6 @@ void StandardPLPanel::activate( const QModelIndex &index )
     {
         if( currentView == iconView ) {
             iconView->setRootIndex( index );
-            //title->setText( index.data().toString() );
             locationBar->setIndex( index );
         }
     }
@@ -414,7 +405,7 @@ void StandardPLPanel::activate( const QModelIndex &index )
         playlist_Lock( THEPL );
         playlist_item_t *p_item = playlist_ItemGetById( THEPL, model->itemId( index ) );
         p_item->i_flags |= PLAYLIST_SUBITEM_STOP_FLAG;
-        last_activated_id = p_item->p_input->i_id;//model->getItem( index )->inputItem()->i_id;
+        last_activated_id = p_item->p_input->i_id;
         playlist_Unlock( THEPL );
         model->activateItem( index );
     }
@@ -517,11 +508,7 @@ void LocationButton::paintEvent ( QPaintEvent * event )
 {
     QStyleOptionButton option;
     option.initFrom( this );
-    //option.rect = rect();
-    //option.features = QStyleOptionButton::Flat;
     option.state |= QStyle::State_Enabled;
-    //option.state |= isChecked() ? QStyle::State_On : QStyle::State_Off;
-    //if( isDown() ) option.state |= QStyle::State_Sunken;
     QPainter p( this );
 
     if( underMouse() )
