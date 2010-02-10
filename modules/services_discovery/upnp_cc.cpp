@@ -58,7 +58,7 @@ using namespace CyberLink;
     static int  Open ( vlc_object_t * );
     static void Close( vlc_object_t * );
 
-VLC_SD_PROBE_HELPER("upnp", N_("Universal Plug'n'Play"), SD_CAT_LAN)
+VLC_SD_PROBE_HELPER("upnp", "Universal Plug'n'Play", SD_CAT_LAN)
 
 vlc_module_begin ()
     set_shortname( "UPnP")
