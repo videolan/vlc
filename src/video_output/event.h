@@ -100,8 +100,7 @@ static inline void vout_SendEventMouseHidden(vout_thread_t *vout)
 
 static inline void vout_SendEventFullscreen(vout_thread_t *vout, bool is_fullscreen)
 {
-    if (!var_GetBool(vout, "fullscreen") != !is_fullscreen)
-        var_SetBool(vout, "fullscreen", is_fullscreen);
+    var_SetBool(vout, "fullscreen", is_fullscreen);
 }
 
 static inline void vout_SendEventDisplayFilled(vout_thread_t *vout, bool is_display_filled)

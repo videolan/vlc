@@ -236,7 +236,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
         }
 
         case ACTIONID_LEAVE_FULLSCREEN:
-            if( p_vout && var_GetBool( p_vout, "fullscreen" ) )
+            if( p_vout )
                 var_SetBool( p_vout, "fullscreen", false );
             break;
 

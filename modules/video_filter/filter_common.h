@@ -83,19 +83,6 @@ static inline int ForwardEvent( vlc_object_t *p_this, char const *psz_var,
     return var_Set( p_dst, psz_var, newval );
 }
 /**
- * Internal helper to forward fullscreen event from p_this to p_data.
- */
-static inline int ForwardFullscreen( vlc_object_t *p_this, char const *psz_var,
-                                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
-{
-    VLC_UNUSED(p_this); VLC_UNUSED(oldval);
-    vlc_object_t *p_dst = (vlc_object_t*)p_data;
-
-    if( !var_GetBool( p_dst, "fullscreen" ) != !newval.b_bool )
-        return var_SetBool( p_dst, psz_var, newval.b_bool );
-    return VLC_SUCCESS;
-}
-/**
  * Install/remove all callbacks needed for proper event handling inside
  * a vout-filter.
  */
@@ -129,9 +116,9 @@ static inline void vout_filter_SetupChild( vout_thread_t *p_parent, vout_thread_
 
     /* */
     if( !pf_fullscreen_up )
-        pf_fullscreen_up = ForwardFullscreen;
+        pf_fullscreen_up = ForwardEvent;
     if( !pf_fullscreen_down )
-        pf_fullscreen_down = ForwardFullscreen;
+        pf_fullscreen_down = ForwardEvent;
     pf_execute( VLC_OBJECT(p_child),  "fullscreen", pf_fullscreen_up,   p_parent );
     pf_execute( VLC_OBJECT(p_parent), "fullscreen", pf_fullscreen_down, p_child );
 }

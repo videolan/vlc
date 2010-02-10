@@ -562,9 +562,7 @@ static int FullscreenEventUp( vlc_object_t *p_this, char const *psz_var,
     VLC_UNUSED(oldval); VLC_UNUSED(p_this); VLC_UNUSED(psz_var); VLC_UNUSED(newval);
 
     const bool b_fullscreen = IsFullscreenActive( p_vout );
-    if( !var_GetBool( p_vout, "fullscreen" ) != !b_fullscreen )
-        return var_SetBool( p_vout, "fullscreen", b_fullscreen );
-    return VLC_SUCCESS;
+    return var_SetBool( p_vout, "fullscreen", b_fullscreen );
 }
 static int FullscreenEventDown( vlc_object_t *p_this, char const *psz_var,
                                 vlc_value_t oldval, vlc_value_t newval, void *p_data )
@@ -573,19 +571,10 @@ static int FullscreenEventDown( vlc_object_t *p_this, char const *psz_var,
     vout_sys_t *p_sys = p_vout->p_sys;
     VLC_UNUSED(oldval); VLC_UNUSED(p_data); VLC_UNUSED(psz_var);
 
-    const bool b_fullscreen = IsFullscreenActive( p_vout );
-    if( !b_fullscreen != !newval.b_bool )
+    for( int i = 0; i < p_sys->i_vout; i++ )
     {
-        for( int i = 0; i < p_sys->i_vout; i++ )
-        {
-            vout_thread_t *p_child = p_sys->pp_vout[i];
-            if( !var_GetBool( p_child, "fullscreen" ) != !newval.b_bool )
-            {
-                var_SetBool( p_child, "fullscreen", newval.b_bool );
-                if( newval.b_bool )
-                    return VLC_SUCCESS;
-            }
-        }
+        vout_thread_t *p_child = p_sys->pp_vout[i];
+        var_SetBool( p_child, "fullscreen", newval.b_bool );
     }
     return VLC_SUCCESS;
 }

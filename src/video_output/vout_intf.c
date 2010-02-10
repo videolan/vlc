@@ -978,8 +978,10 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
 {
     vout_thread_t *p_vout = (vout_thread_t *)p_this;
     vlc_value_t val;
-    (void)psz_cmd; (void)oldval; (void)p_data;
+    (void)psz_cmd; (void)p_data;
 
+    if( oldval.b_bool == newval.b_bool )
+        return VLC_SUCCESS; /* no-op */
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
     /* Modify libvlc as well because the vout might have to be restarted */
