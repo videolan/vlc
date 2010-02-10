@@ -90,8 +90,7 @@ struct vlm_t
 
     vlc_mutex_t  lock;
     vlc_thread_t thread;
-    vlc_mutex_t  lock_manage;
-    vlc_cond_t   wait_manage;
+    vlc_cond_t   wait;
 
     /* */
     int64_t        i_id;

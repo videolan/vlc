@@ -105,9 +105,9 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
         }
         vlm_SendEventMediaInstanceState( p_vlm, p_media->cfg.id, p_media->cfg.psz_name, psz_instance_name, var_GetInteger( p_input, "state" ) );
 
-        vlc_mutex_lock( &p_vlm->lock_manage );
-        vlc_cond_signal( &p_vlm->wait_manage );
-        vlc_mutex_unlock( &p_vlm->lock_manage );
+        vlc_mutex_lock( &p_vlm->lock );
+        vlc_cond_signal( &p_vlm->wait );
+        vlc_mutex_unlock( &p_vlm->lock );
     }
     return VLC_SUCCESS;
 }
@@ -146,8 +146,8 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
     }
 
     vlc_mutex_init( &p_vlm->lock );
-    vlc_mutex_init( &p_vlm->lock_manage );
-    vlc_cond_init_daytime( &p_vlm->wait_manage );
+    vlc_mutex_init( &p_vlm->lock );
+    vlc_cond_init_daytime( &p_vlm->wait );
     p_vlm->i_id = 1;
     TAB_INIT( p_vlm->i_media, p_vlm->media );
     TAB_INIT( p_vlm->i_schedule, p_vlm->schedule );
@@ -158,8 +158,8 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
 
     if( vlc_clone( &p_vlm->thread, Manage, p_vlm, VLC_THREAD_PRIORITY_LOW ) )
     {
-        vlc_cond_destroy( &p_vlm->wait_manage );
-        vlc_mutex_destroy( &p_vlm->lock_manage );
+        vlc_cond_destroy( &p_vlm->wait );
+        vlc_mutex_destroy( &p_vlm->lock );
         vlc_mutex_destroy( &p_vlm->lock );
         vlc_object_release( p_vlm );
         vlc_mutex_unlock( &vlm_mutex );
@@ -218,17 +218,17 @@ static void vlm_Destructor( vlm_t *p_vlm )
     vlm_ControlInternal( p_vlm, VLM_CLEAR_SCHEDULES );
     TAB_CLEAN( p_vlm->schedule, p_vlm->schedule );
 
-    vlc_mutex_lock( &p_vlm->lock_manage );
-    vlc_cond_signal( &p_vlm->wait_manage );
-    vlc_mutex_unlock( &p_vlm->lock_manage );
+    vlc_mutex_lock( &p_vlm->lock );
+    vlc_cond_signal( &p_vlm->wait );
+    vlc_mutex_unlock( &p_vlm->lock );
 
     libvlc_priv(p_vlm->p_libvlc)->p_vlm = NULL;
     vlc_object_kill( p_vlm );
     /*vlc_cancel( p_vlm->thread ); */
     vlc_join( p_vlm->thread, NULL );
 
-    vlc_cond_destroy( &p_vlm->wait_manage );
-    vlc_mutex_destroy( &p_vlm->lock_manage );
+    vlc_cond_destroy( &p_vlm->wait );
+    vlc_mutex_destroy( &p_vlm->lock );
     vlc_mutex_destroy( &p_vlm->lock );
 }
 
@@ -373,14 +373,11 @@ static void* Manage( void* p_object )
         char **ppsz_scheduled_commands = NULL;
         int    i_scheduled_commands = 0;
 
-        vlc_mutex_lock( &vlm->lock_manage );
-        if( i_nextschedule )
-            vlc_cond_timedwait( &vlm->wait_manage, &vlm->lock_manage, i_nextschedule );
-        else
-            vlc_cond_wait( &vlm->wait_manage, &vlm->lock_manage );
-        vlc_mutex_unlock( &vlm->lock_manage );
-
         vlc_mutex_lock( &vlm->lock );
+        if( i_nextschedule )
+            vlc_cond_timedwait( &vlm->wait, &vlm->lock, i_nextschedule );
+        else
+            vlc_cond_wait( &vlm->wait, &vlm->lock );
 
         /* destroy the inputs that wants to die, and launch the next input */
         for( i = 0; i < vlm->i_media; i++ )
