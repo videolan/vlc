@@ -36,13 +36,13 @@
 #include <QPushButton>
 #include <QLabel>
 #include <QHBoxLayout>
+#include "util/customwidgets.hpp"
 
 #include <vlc_playlist.h>
 
 #include "qt4.hpp"
 
 class PlaylistWidget;
-class QVLCFramelessButton;
 
 enum SelectorItemType {
     CATEGORY_TYPE,
@@ -69,6 +69,16 @@ enum {
 enum ItemAction {
     ADD_ACTION,
     RM_ACTION
+};
+
+
+class SelectorActionButton : public QVLCFramelessButton
+{
+public:
+    SelectorActionButton( QWidget *parent = NULL )
+        : QVLCFramelessButton( parent ) {}
+private:
+    void paintEvent( QPaintEvent * );
 };
 
 class PLSelItem : public QWidget

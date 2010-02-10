@@ -44,6 +44,20 @@
 #include <vlc_playlist.h>
 #include <vlc_services_discovery.h>
 
+void SelectorActionButton::paintEvent( QPaintEvent *event )
+{
+    QPainter p( this );
+    QColor color = palette().color( QPalette::HighlightedText );
+    color.setAlpha( 80 );
+    if( underMouse() )
+        p.fillRect( rect(), color );
+    p.setPen( color );
+    int frame = style()->pixelMetric( QStyle::PM_DefaultFrameWidth, 0, this );
+    p.drawLine( rect().topLeft() + QPoint( 0, frame ),
+                rect().bottomLeft() - QPoint( 0, frame ) );
+    QVLCFramelessButton::paintEvent( event );
+}
+
 PLSelItem::PLSelItem ( QTreeWidgetItem *i, const QString& text )
     : qitem(i), lblAction( NULL)
 {
@@ -74,14 +88,14 @@ void PLSelItem::addAction( ItemAction act, const QString& tooltip )
         icon = QIcon( ":/buttons/playlist/playlist_remove" ); break;
     }
 
-    lblAction = new QVLCFramelessButton();
+    lblAction = new SelectorActionButton();
     lblAction->setIcon( icon );
+    lblAction->setMinimumWidth( lblAction->sizeHint().width() + 6 );
 
     if( !tooltip.isEmpty() ) lblAction->setToolTip( tooltip );
 
     layout->addWidget( lblAction, 0 );
     lblAction->hide();
-    layout->addSpacing( 3 );
 
     CONNECT( lblAction, clicked(), this, triggerAction() );
 }
@@ -102,7 +116,7 @@ PLSelector::PLSelector( QWidget *p, intf_thread_t *_p_intf )
     setFrameStyle( QFrame::NoFrame );
     viewport()->setAutoFillBackground( false );
     setIconSize( QSize( 24,24 ) );
-    setIndentation( 14 );
+    setIndentation( 12 );
     header()->hide();
     setRootIsDecorated( true );
     setAlternatingRowColors( false );

@@ -63,8 +63,8 @@ class QVLCFramelessButton : public QPushButton
 public:
     QVLCFramelessButton( QWidget *parent = NULL );
     QSize sizeHint() const;
-private:
-    void paintEvent( QPaintEvent * event );
+protected:
+    virtual void paintEvent( QPaintEvent * event );
 };
 
 class QLabel;
