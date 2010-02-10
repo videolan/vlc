@@ -109,8 +109,7 @@ int libvlc_get_fullscreen( libvlc_media_player_t *p_mi )
 
 void libvlc_toggle_fullscreen( libvlc_media_player_t *p_mi )
 {
-    var_ToggleBool (p_mi, "fullscreen");
-    bool b_fullscreen = var_GetBool (p_mi, "fullscreen");
+    bool b_fullscreen = var_ToggleBool (p_mi, "fullscreen");
 
     /* Apply to current video outputs (if any) */
     size_t n;
