@@ -3,7 +3,6 @@ NULL =
 doc_DATA = \
 	bugreport-howto.txt \
 	fortunes.txt \
-	intf-cdda.txt \
 	intf-vcd.txt \
 	$(NULL)
 
