@@ -798,8 +798,8 @@ static int MMSOpen( access_t  *p_access, vlc_url_t *p_url, int  i_proto )
      asf_HeaderParse ( &p_sys->asfh,
                            p_sys->p_header, p_sys->i_header );
      asf_StreamSelect( &p_sys->asfh,
-                           var_CreateGetInteger( p_access, "mms-maxbitrate" ),
-                           var_CreateGetBool( p_access, "mms-all" ),
+                           var_InheritInteger( p_access, "mms-maxbitrate" ),
+                           var_InheritBool( p_access, "mms-all" ),
                            var_InheritBool( p_access, "audio" ),
                            var_InheritBool( p_access, "video" ) );
 

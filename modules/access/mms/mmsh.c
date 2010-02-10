@@ -462,10 +462,10 @@ static int Reset( access_t *p_access )
              p_sys->asfh.i_min_data_packet_size );
 
     asf_StreamSelect( &p_sys->asfh,
-                       var_CreateGetInteger( p_access, "mms-maxbitrate" ),
-                       var_CreateGetBool( p_access, "mms-all" ),
-                       var_CreateGetBool( p_access, "audio" ),
-                       var_CreateGetBool( p_access, "video" ) );
+                       var_InheritInteger( p_access, "mms-maxbitrate" ),
+                       var_InheritBool( p_access, "mms-all" ),
+                       var_InheritBool( p_access, "audio" ),
+                       var_InheritBool( p_access, "video" ) );
 
     /* Check we have comptible asfh */
     for( i = 1; i < 128; i++ )
@@ -699,10 +699,10 @@ static int Describe( access_t  *p_access, char **ppsz_location )
         goto error;
 
     asf_StreamSelect( &p_sys->asfh,
-                       var_CreateGetInteger( p_access, "mms-maxbitrate" ),
-                       var_CreateGetBool( p_access, "mms-all" ),
-                       var_CreateGetBool( p_access, "audio" ),
-                       var_CreateGetBool( p_access, "video" ) );
+                       var_InheritInteger( p_access, "mms-maxbitrate" ),
+                       var_InheritBool( p_access, "mms-all" ),
+                       var_InheritBool( p_access, "audio" ),
+                       var_InheritBool( p_access, "video" ) );
     return VLC_SUCCESS;
 
 error:
