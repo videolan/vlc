@@ -3999,8 +3999,8 @@ AS_IF([test "${enable_hildon}" = "yes"], [
     ], [
       AC_MSG_WARN(hildon-fm-2 not found)
     ])
-    VLC_ADD_CFLAGS([hildon],[${HILDON_CFLAGS}])
-    VLC_ADD_LIBS([hildon],[${HILDON_LIBS}])
+    VLC_ADD_CFLAGS([hildon],[${HILDON_CFLAGS} ${X_CFLAGS}])
+    VLC_ADD_LIBS([hildon],[${HILDON_LIBS} ${X_LIBS} ${X_PRE_LIBS} -lX11])
     VLC_ADD_PLUGIN([hildon])
     ALIASES="${ALIASES} mvlc"
     need_xid_provider="no"
