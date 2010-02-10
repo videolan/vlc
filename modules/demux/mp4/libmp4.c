@@ -2846,7 +2846,6 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
 
     if( i_result )
     {
-        MP4_Box_t *p_child;
         MP4_Box_t *p_moov;
         MP4_Box_t *p_cmov;
 
@@ -2868,7 +2867,7 @@ MP4_Box_t *MP4_BoxGetRoot( stream_t *s )
             p_moov->p_father = p_root;
 
             /* insert this new moov box as first child of p_root */
-            p_moov->p_next = p_child = p_root->p_first;
+            p_moov->p_next = p_root->p_first;
             p_root->p_first = p_moov;
         }
     }
