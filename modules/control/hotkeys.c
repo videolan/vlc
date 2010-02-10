@@ -869,13 +869,12 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
             {
                 if( var_GetBool( p_input, "can-record" ) )
                 {
-                    const bool b_record = !var_GetBool( p_input, "record" );
+                    const bool b_record = var_ToggleBool( p_input, "record" );
 
                     if( b_record )
                         vout_OSDMessage( p_intf, DEFAULT_CHAN, "%s", _("Recording") );
                     else
                         vout_OSDMessage( p_intf, DEFAULT_CHAN, "%s", _("Recording done") );
-                    var_SetBool( p_input, "record", b_record );
                 }
             }
         }
