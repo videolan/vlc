@@ -757,18 +757,22 @@ void PLModel::doDelete( QModelIndexList selected )
 {
     if( !canEdit() ) return;
 
-    for( int i = selected.size() -1 ; i >= 0; i-- )
+    while( !selected.isEmpty() )
     {
-        QModelIndex index = selected[i];
+        QModelIndex index = selected[0];
+        selected.removeAt( 0 );
+
         if( index.column() != 0 ) continue;
+
         PLItem *item = getItem( index );
-        if( item )
-        {
-            if( item->children.size() )
-                recurseDelete( item->children, &selected );
-            doDeleteItem( item, &selected );
-        }
-        if( i > selected.size() ) i = selected.size();
+        if( item->children.size() )
+            recurseDelete( item->children, &selected );
+
+        PL_LOCK;
+        playlist_DeleteFromInput( p_playlist, item->p_input, pl_Locked );
+        PL_UNLOCK;
+
+        removeItem( item );
     }
 }
 
@@ -779,27 +783,8 @@ void PLModel::recurseDelete( QList<PLItem*> children, QModelIndexList *fullList 
         PLItem *item = children[i];
         if( item->children.size() )
             recurseDelete( item->children, fullList );
-        doDeleteItem( item, fullList );
+        fullList->removeAll( index( item, 0 ) );
     }
-}
-
-void PLModel::doDeleteItem( PLItem *item, QModelIndexList *fullList )
-{
-    QModelIndex deleteIndex = index( item, 0 );
-    fullList->removeAll( deleteIndex );
-
-    PL_LOCK;
-    playlist_item_t *p_item = playlist_ItemGetById( p_playlist, item->i_id );
-    if( !p_item )
-    {
-        PL_UNLOCK;
-        return;
-    }
-    playlist_DeleteFromInput( p_playlist, p_item->p_input, pl_Locked );
-    PL_UNLOCK;
-
-    /* And finally, remove it from the tree */
-    removeItem( item );
 }
 
 /******* Volume III: Sorting and searching ********/

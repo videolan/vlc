@@ -120,7 +120,6 @@ private:
 
     /* Actions */
     void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList );
-    void doDeleteItem( PLItem *item, QModelIndexList *fullList );
     void updateTreeItem( PLItem * );
     void removeItem ( PLItem * );
     void takeItem( PLItem * ); //will not delete item
