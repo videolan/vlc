@@ -984,10 +984,6 @@ static int FullscreenCallback( vlc_object_t *p_this, char const *psz_cmd,
         return VLC_SUCCESS; /* no-op */
     p_vout->i_changes |= VOUT_FULLSCREEN_CHANGE;
 
-    /* Modify libvlc as well because the vout might have to be restarted */
-    var_Create( p_vout->p_libvlc, "fullscreen", VLC_VAR_BOOL );
-    var_Set( p_vout->p_libvlc, "fullscreen", newval );
-
     val.b_bool = true;
     var_Set( p_vout, "intf-change", val );
     return VLC_SUCCESS;
