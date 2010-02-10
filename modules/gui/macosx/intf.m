@@ -516,7 +516,6 @@ static VLCMain *_o_sharedMainInstance = nil;
 
     p_playlist = pl_Get( p_intf );
 
-    var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT);
     val.b_bool = false;
 
     var_AddCallback( p_playlist, "fullscreen", FullscreenChanged, self);

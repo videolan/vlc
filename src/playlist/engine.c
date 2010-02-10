@@ -313,6 +313,9 @@ static void VariablesInit( playlist_t *p_playlist )
 
     /* */
     var_Create( p_playlist, "album-art", VLC_VAR_INTEGER | VLC_VAR_DOINHERIT );
+
+    /* Variables to preserve video output parameters */
+    var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 }
 
 playlist_item_t * playlist_CurrentPlayingItem( playlist_t * p_playlist )
