@@ -157,9 +157,6 @@ NPError NPP_SetValue( NPP instance, NPNVariable variable, void *value )
 int16 NPP_HandleEvent( NPP instance, void * event )
 {
     static UInt32 lastMouseUp = 0;
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-
     if( instance == NULL )
     {
         return false;
@@ -182,8 +179,7 @@ int16 NPP_HandleEvent( NPP instance, void * event )
             if( (myEvent->when - lastMouseUp) < GetDblTime() )
             {
                 /* double click */
-                p_plugin->toggle_fullscreen(&ex);
-                libvlc_exception_clear(&ex);
+                p_plugin->toggle_fullscreen();
             }
             return true;
         }
@@ -212,13 +208,12 @@ int16 NPP_HandleEvent( NPP instance, void * event )
                         area.top = 0;
                         area.right = npwindow.width;
                         area.bottom = npwindow.height;
-                        libvlc_video_redraw_rectangle(p_plugin->getMD(&ex), &area, NULL);
+                        libvlc_video_redraw_rectangle(p_plugin->getMD(), &area, NULL);
 #else
 #warning disabled code
 #endif
                     }
                 }
-                libvlc_exception_clear(&ex);
 
                 if( ! hasVout )
                 {
@@ -372,9 +367,6 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     control = p_plugin->getControlWindow();
 #endif
 
-    libvlc_exception_t ex;
-    libvlc_exception_init(&ex);
-
     libvlc_instance_t *p_vlc = p_plugin->getVLC();
 
     /*
@@ -413,8 +405,7 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
         clip.bottom  = window->clipRect.bottom;
         clip.right   = window->clipRect.right;
 #ifdef NOT_WORKING
-        libvlc_video_set_viewport(p_vlc, p_plugin->getMD(&ex), &view, &clip, &ex);
-        libvlc_exception_clear(&ex);
+        libvlc_video_set_viewport(p_vlc, p_plugin->getMD(), &view, &clip);
 #else
 #warning disabled code
 #endif        
@@ -548,12 +539,11 @@ NPError NPP_SetWindow( NPP instance, NPWindow* window )
     {
         if( p_plugin->psz_target )
         {
-            if( p_plugin->playlist_add( p_plugin->psz_target, NULL ) != -1 )
+            if( p_plugin->playlist_add( p_plugin->psz_target ) != -1 )
             {
                 if( p_plugin->b_autoplay )
                 {
-                    p_plugin->playlist_play(&ex);
-                    libvlc_exception_clear(&ex);
+                    p_plugin->playlist_play();
                 }
             }
             p_plugin->b_stream = true;
@@ -627,11 +617,11 @@ void NPP_StreamAsFile( NPP instance, NPStream *stream, const char* fname )
         return;
     }
 
-    if( p_plugin->playlist_add( stream->url, NULL ) != -1 )
+    if( p_plugin->playlist_add( stream->url ) != -1 )
     {
         if( p_plugin->b_autoplay )
         {
-            p_plugin->playlist_play(NULL);
+            p_plugin->playlist_play();
         }
     }
 }
@@ -806,11 +796,8 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
     if( p_plugin && p_plugin->b_toolbar )
     {
         int i_playing;
-        libvlc_exception_t ex;
 
-        libvlc_exception_init( &ex );
-        libvlc_media_player_t *p_md = p_plugin->getMD(&ex);
-        libvlc_exception_clear( &ex );
+        libvlc_media_player_t *p_md = p_plugin->getMD();
 
         i_playing = p_plugin->playlist_isplaying();
 
@@ -824,9 +811,7 @@ static void ControlHandler( Widget w, XtPointer closure, XEvent *event )
                 if( i_playing == 1 )
                     p_plugin->playlist_pause();
                 else
-                    p_plugin->playlist_play( &ex );
-
-                libvlc_exception_clear( &ex );
+                    p_plugin->playlist_play();
             }
             break;
 

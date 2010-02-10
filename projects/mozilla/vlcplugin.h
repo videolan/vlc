@@ -167,11 +167,10 @@ public:
     NPError             init(int argc, char* const argn[], char* const argv[]);
     libvlc_instance_t*  getVLC()
                             { return libvlc_instance; };
-    libvlc_media_player_t* getMD(libvlc_exception_t *ex)
+    libvlc_media_player_t* getMD()
     {
         if( !libvlc_media_player )
         {
-             libvlc_exception_raise(ex);
              libvlc_printerr("no mediaplayer");
         }
         return libvlc_media_player;
@@ -224,14 +223,14 @@ public:
     char *   psz_text;
     char *   psz_target;
 
-    void playlist_play(libvlc_exception_t *ex)
+    void playlist_play()
     {
-        if( libvlc_media_player||playlist_select(0,ex) )
+        if( libvlc_media_player||playlist_select(0) )
             libvlc_media_player_play(libvlc_media_player);
     }
-    void playlist_play_item(int idx,libvlc_exception_t *ex)
+    void playlist_play_item(int idx)
     {
-        if( playlist_select(idx,ex) )
+        if( playlist_select(idx) )
             libvlc_media_player_play(libvlc_media_player);
     }
     void playlist_stop()
@@ -239,14 +238,14 @@ public:
         if( libvlc_media_player )
             libvlc_media_player_stop(libvlc_media_player);
     }
-    void playlist_next(libvlc_exception_t *ex)
+    void playlist_next()
     {
-        if( playlist_select(playlist_index+1,ex) )
+        if( playlist_select(playlist_index+1) )
             libvlc_media_player_play(libvlc_media_player);
     }
-    void playlist_prev(libvlc_exception_t *ex)
+    void playlist_prev()
     {
-        if( playlist_select(playlist_index-1,ex) )
+        if( playlist_select(playlist_index-1) )
             libvlc_media_player_play(libvlc_media_player);
     }
     void playlist_pause()
@@ -263,9 +262,9 @@ public:
         return is_playing;
     }
 
-    int playlist_add( const char *, libvlc_exception_t * );
+    int playlist_add( const char * );
     int playlist_add_extended_untrusted( const char *, const char *, int,
-                                const char **, libvlc_exception_t * );
+                                const char ** );
     int playlist_delete_item( int );
     void playlist_clear();
     int  playlist_count();
@@ -281,7 +280,7 @@ public:
 
     EventObj events;
 private:
-    bool playlist_select(int,libvlc_exception_t *);
+    bool playlist_select(int);
     void set_player_window();
 
     /* VLC reference */

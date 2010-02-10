@@ -449,7 +449,7 @@ void VlcPlugin::set_player_window()
 #endif
 }
 
-int VlcPlugin::playlist_add( const char *mrl, libvlc_exception_t *ex )
+int VlcPlugin::playlist_add( const char *mrl )
 {
     int item = -1;
     libvlc_media_t *p_m = libvlc_media_new(libvlc_instance,mrl);
@@ -467,7 +467,7 @@ int VlcPlugin::playlist_add( const char *mrl, libvlc_exception_t *ex )
 }
 
 int VlcPlugin::playlist_add_extended_untrusted( const char *mrl, const char *name,
-                    int optc, const char **optv, libvlc_exception_t *ex )
+                    int optc, const char **optv )
 {
     libvlc_media_t *p_m = libvlc_media_new(libvlc_instance, mrl);
     int item = -1;
@@ -486,7 +486,7 @@ int VlcPlugin::playlist_add_extended_untrusted( const char *mrl, const char *nam
     return item;
 }
 
-bool VlcPlugin::playlist_select( int idx, libvlc_exception_t *ex )
+bool VlcPlugin::playlist_select( int idx )
 {
     libvlc_media_t *p_m = NULL;
 
