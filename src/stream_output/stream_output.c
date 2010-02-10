@@ -815,10 +815,11 @@ void sout_StreamChainDelete(sout_stream_t *p_first, sout_stream_t *p_last)
     if(!p_first)
         return;
 
-    if(p_first != p_last)
-        sout_StreamChainDelete(p_first->p_next, p_last);
+    sout_stream_t *p_next = p_first->p_next;
 
     sout_StreamDelete(p_first);
+    if(p_first != p_last)
+        sout_StreamChainDelete(p_next, p_last);
 }
 
 /* Create a "stream_out" module, which may forward its ES to p_next module */
