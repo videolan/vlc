@@ -97,7 +97,6 @@ public:
     void search( const QString& search_text );
     void sort( int column, Qt::SortOrder order );
     void sort( int i_root_id, int column, Qt::SortOrder order );
-    void removeItem( int );
     void rebuild(); void rebuild( playlist_item_t *, bool b_first = false );
 
     inline PLItem *getItem( QModelIndex index ) const
@@ -122,6 +121,7 @@ private:
     void recurseDelete( QList<PLItem*> children, QModelIndexList *fullList );
     void updateTreeItem( PLItem * );
     void removeItem ( PLItem * );
+    void removeItem( int );
     void takeItem( PLItem * ); //will not delete item
     void insertChildren( PLItem *node, QList<PLItem*>& items, int i_pos );
     void dropAppendCopy( QByteArray& data, PLItem *target );

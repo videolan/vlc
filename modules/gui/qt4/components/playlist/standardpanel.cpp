@@ -261,11 +261,6 @@ void StandardPLPanel::setRoot( playlist_item_t *p_item )
     model->rebuild( p_item );
 }
 
-void StandardPLPanel::removeItem( int i_id )
-{
-    model->removeItem( i_id );
-}
-
 /* Delete and Suppr key remove the selection
    FilterKey function and code function */
 void StandardPLPanel::keyPressEvent( QKeyEvent *e )

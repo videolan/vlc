@@ -93,7 +93,6 @@ private:
     void createIconView();
 
 public slots:
-    void removeItem( int );
     virtual void setRoot( playlist_item_t * );
 private slots:
     void deleteSelection();
