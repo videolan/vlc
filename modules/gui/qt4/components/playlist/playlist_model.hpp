@@ -150,6 +150,7 @@ private:
 
 signals:
     void currentChanged( const QModelIndex& );
+    void rootChanged();
 
 public slots:
     void activateItem( const QModelIndex &index );

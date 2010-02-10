@@ -700,9 +700,6 @@ void PLModel::removeItem( PLItem *item )
     if( item->i_id == i_cached_id ) i_cached_id = -1;
     i_cached_input_id = -1;
 
-    if(item == rootItem)
-        rootItem = NULL;
-
     if( item->parentItem ) {
         int i = item->parentItem->children.indexOf( item );
         beginRemoveRows( index( item->parentItem, 0), i, i );
@@ -712,6 +709,12 @@ void PLModel::removeItem( PLItem *item )
     }
     else delete item;
 
+    if(item == rootItem)
+    {
+        rootItem = NULL;
+        rebuild( p_playlist->p_playing );
+        emit rootChanged();
+    }
 }
 
 /* This function must be entered WITH the playlist lock */

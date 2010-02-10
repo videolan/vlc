@@ -118,6 +118,8 @@ public:
     void setIndex( const QModelIndex & );
 signals:
     void invoked( const QModelIndex & );
+public slots:
+    void setRootIndex();
 private slots:
     void invoke( int i_item_id );
 private:
@@ -129,13 +131,13 @@ private:
 
 class LocationButton : public QPushButton
 {
-  public:
-      LocationButton( const QString &, bool bold, bool arrow );
-  private:
-      void paintEvent ( QPaintEvent * event );
-      QSize sizeHint() const;
-      QFontMetrics *metrics;
-      bool b_arrow;
+public:
+    LocationButton( const QString &, bool bold, bool arrow );
+private:
+    void paintEvent ( QPaintEvent * event );
+    QSize sizeHint() const;
+    QFontMetrics *metrics;
+    bool b_arrow;
 };
 
 #endif

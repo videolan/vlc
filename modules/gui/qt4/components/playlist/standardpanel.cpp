@@ -79,6 +79,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     locationBar = new LocationBar( model );
     layout->addWidget( locationBar, 0, 0 );
+    CONNECT( model, rootChanged(), locationBar, setRootIndex() );
 
     /* A Spacer and the search possibilities */
     layout->setColumnStretch( 1, 10 );
@@ -497,6 +498,11 @@ void LocationBar::setIndex( const QModelIndex &index )
         if( i.isValid() ) i = i.parent();
         else break;
     }
+}
+
+void LocationBar::setRootIndex()
+{
+    setIndex( QModelIndex() );
 }
 
 void LocationBar::invoke( int i_id )
