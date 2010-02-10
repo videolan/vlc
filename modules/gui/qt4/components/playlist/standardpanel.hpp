@@ -98,6 +98,7 @@ public slots:
 private slots:
     void deleteSelection();
     void handleExpansion( const QModelIndex& );
+    void handleRootChange();
     void gotoPlayingItem();
     void search( const QString& searchText );
     void popupAdd();

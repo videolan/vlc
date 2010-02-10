@@ -138,6 +138,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     CONNECT( model, currentChanged( const QModelIndex& ),
              this, handleExpansion( const QModelIndex& ) );
+    CONNECT( model, rootChanged(), this, handleRootChange() );
 }
 
 StandardPLPanel::~StandardPLPanel()
@@ -159,6 +160,30 @@ void StandardPLPanel::handleExpansion( const QModelIndex& index )
 {
     assert( currentView );
     currentView->scrollTo( index );
+}
+
+void StandardPLPanel::handleRootChange()
+{
+    /* needed for popupAdd() */
+    PLItem *root = model->getItem( QModelIndex() );
+    currentRootId = root->id();
+
+    locationBar->setIndex( QModelIndex() );
+
+    /* enable/disable adding */
+    if( currentRootId == THEPL->p_playing->i_id )
+    {
+        addButton->setEnabled( true );
+        addButton->setToolTip( qtr(I_PL_ADDPL) );
+    }
+    else if( THEPL->p_media_library &&
+             currentRootId == THEPL->p_media_library->i_id )
+    {
+        addButton->setEnabled( true );
+        addButton->setToolTip( qtr(I_PL_ADDML) );
+    }
+    else
+        addButton->setEnabled( false );
 }
 
 /* PopupAdd Menu for the Add Menu */
@@ -233,37 +258,7 @@ void StandardPLPanel::search( const QString& searchText )
 /* This activated by the selector selection */
 void StandardPLPanel::setRoot( playlist_item_t *p_item )
 {
-    QPL_LOCK;
-    assert( p_item );
-
-    /* needed for popupAdd() */
-    currentRootId = p_item->i_id;
-
-    /* cosmetics, ..still need playlist locking.. */
-    /*char *psz_title = input_item_GetName( p_item->p_input );
-    title->setText( qfu(psz_title) );
-    free( psz_title );*/
-
-    QPL_UNLOCK;
-
-    /* do THE job */
     model->rebuild( p_item );
-
-    locationBar->setIndex( QModelIndex() );
-
-    /* enable/disable adding */
-    if( p_item == THEPL->p_playing )
-    {
-        addButton->setEnabled( true );
-        addButton->setToolTip( qtr(I_PL_ADDPL) );
-    }
-    else if( THEPL->p_media_library && p_item == THEPL->p_media_library )
-    {
-        addButton->setEnabled( true );
-        addButton->setToolTip( qtr(I_PL_ADDML) );
-    }
-    else
-        addButton->setEnabled( false );
 }
 
 void StandardPLPanel::removeItem( int i_id )

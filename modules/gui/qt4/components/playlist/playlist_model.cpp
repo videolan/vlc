@@ -665,6 +665,8 @@ void PLModel::rebuild( playlist_item_t *p_root, bool b_first )
 
     /* And signal the view */
     reset();
+
+    if( p_root ) emit rootChanged();
 }
 
 void PLModel::takeItem( PLItem *item )
@@ -713,7 +715,6 @@ void PLModel::removeItem( PLItem *item )
     {
         rootItem = NULL;
         rebuild( p_playlist->p_playing );
-        emit rootChanged();
     }
 }
 
