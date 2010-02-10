@@ -25,6 +25,7 @@
 #include "cmd_fullscreen.hpp"
 #include <vlc_input.h>
 #include <vlc_vout.h>
+#include <vlc_playlist.h>
 
 
 void CmdFullscreen::execute()
