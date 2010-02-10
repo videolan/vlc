@@ -109,9 +109,10 @@ VLC_EXPORT(int, vlc_sd_probe_Add, (vlc_probe_t *, const char *, const char *, in
 #define VLC_SD_PROBE_HELPER(name, longname, cat) \
 static int vlc_sd_probe_Open (vlc_object_t *obj) \
 { \
+    char psz_name[ strlen( name ) + strlen( longname ) + 20 ]; \
+    sprintf( psz_name, "%s{longname=\"%s\"}", name, longname ); \
     return vlc_sd_probe_Add ((struct vlc_probe_t *)obj, \
-                             name "{longname=\"" # longname "\"}", \
-                             longname, cat); \
+                             psz_name, longname, cat); \
 }
 
 /** @} */
