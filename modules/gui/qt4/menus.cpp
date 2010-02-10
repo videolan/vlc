@@ -219,6 +219,7 @@ static int VideoAutoMenuBuilder( vout_thread_t *p_object,
 {
     PUSH_INPUTVAR( "video-es" );
     PUSH_INPUTVAR( "spu-es" );
+#warning This is wrong:
     PUSH_VAR( "fullscreen" );
     PUSH_VAR( "video-on-top" );
     PUSH_VAR( "video-wallpaper" );

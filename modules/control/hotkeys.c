@@ -229,15 +229,16 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
 
         case ACTIONID_TOGGLE_FULLSCREEN:
         {
-            vlc_object_t *obj = p_vout ? VLC_OBJECT(p_vout)
-                                       : VLC_OBJECT(p_playlist);
-            var_ToggleBool( obj, "fullscreen" );
+            bool fs = var_ToggleBool( p_playlist, "fullscreen" );
+            if( p_vout )
+                var_SetBool( p_vout, "fullscreen", fs );
             break;
         }
 
         case ACTIONID_LEAVE_FULLSCREEN:
             if( p_vout )
                 var_SetBool( p_vout, "fullscreen", false );
+            var_SetBool( p_playlist, "fullscreen", false );
             break;
 
         case ACTIONID_ZOOM_QUARTER:

@@ -29,15 +29,15 @@
 
 void CmdFullscreen::execute()
 {
+    bool fs = var_ToggleBool( pl_Get( getIntf() ), "fullscreen" );
 
     if( getIntf()->p_sys->p_input == NULL )
         return;
-
     vout_thread_t *pVout = input_GetVout( getIntf()->p_sys->p_input );
     if( pVout )
     {
-        // Switch to fullscreen
-        var_ToggleBool( pVout, "fullscreen" );
+        // Switch fullscreen
+        var_SetBool( pVout, "fullscreen", fs );
         vlc_object_release( pVout );
     }
 }

@@ -1115,17 +1115,14 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         /* Common control */
         case 'f':
         {
+            bool fs = var_ToggleBool( p_playlist, "fullscreen" );
             if( p_intf->p_sys->p_input )
             {
                 vout_thread_t *p_vout = inputGetVout( p_intf->p_sys->p_input );
                 if( p_vout )
                 {
-                    var_ToggleBool( p_vout, "fullscreen" );
+                    var_SetBool( p_vout, "fullscreen", fs );
                     vlc_object_release( p_vout );
-                }
-                else
-                {
-                    var_ToggleBool( p_playlist, "fullscreen" );
                 }
             }
             i_ret = 0;

@@ -379,11 +379,12 @@ static void RunIntf( intf_thread_t *p_intf )
                 break;
 
             case GESTURE(UP,LEFT,NONE,NONE):
+            {
+                bool val = var_ToggleBool( pl_Get( p_intf ), "fullscreen" );
                 if( p_sys->p_vout )
-                {
-                    var_ToggleBool( p_sys->p_vout, "fullscreen" );
-                }
+                    var_SetBool( p_sys->p_vout, "fullscreen", val );
                 break;
+           }
 
             case GESTURE(DOWN,LEFT,NONE,NONE):
                 /* FIXME: Should close the vout!"*/

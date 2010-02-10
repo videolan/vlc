@@ -118,10 +118,11 @@ void ActionsManager::play()
  */
 void ActionsManager::fullscreen()
 {
+    bool fs = var_ToggleBool( THEPL, "fullscreen" );
     vout_thread_t *p_vout = THEMIM->getVout();
     if( p_vout)
     {
-        var_ToggleBool( p_vout, "fullscreen" );
+        var_SetBool( p_vout, "fullscreen", fs );
         vlc_object_release( p_vout );
     }
 }

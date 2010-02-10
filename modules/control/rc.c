@@ -741,36 +741,27 @@ static void Run( intf_thread_t *p_intf )
         {
         case 'f':
         case 'F':
+        {
+            bool fs;
+
+            if( !strncasecmp( psz_arg, "on", 2 ) )
+                var_SetBool( p_playlist, "fullscreen", fs = true );
+            else if( !strncasecmp( psz_arg, "off", 3 ) )
+                var_SetBool( p_playlist, "fullscreen", fs = false );
+            else
+                fs = var_ToggleBool( p_playlist, "fullscreen" );
+
             if( p_input )
             {
                 vout_thread_t *p_vout = input_GetVout( p_input );
                 if( p_vout )
                 {
-                    vlc_value_t val;
-                    bool b_update = false;
-                    var_Get( p_vout, "fullscreen", &val );
-                    val.b_bool = !val.b_bool;
-                    if( !strncmp( psz_arg, "on", 2 )
-                        && ( val.b_bool == true ) )
-                    {
-                        b_update = true;
-                        val.b_bool = true;
-                    }
-                    else if( !strncmp( psz_arg, "off", 3 )
-                             && ( val.b_bool == false ) )
-                    {
-                        b_update = true;
-                        val.b_bool = false;
-                    }
-                    else if( strncmp( psz_arg, "off", 3 )
-                             && strncmp( psz_arg, "on", 2 ) )
-                        b_update = true;
-                    if( b_update ) var_Set( p_vout, "fullscreen", val );
+                    var_SetBool( p_vout, "fullscreen", fs );
                     vlc_object_release( p_vout );
                 }
             }
             break;
-
+        }
         case 's':
         case 'S':
             ;

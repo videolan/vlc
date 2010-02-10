@@ -230,12 +230,12 @@ static void MacroDo( httpd_file_sys_t *p_args,
                 case MVLC_FULLSCREEN:
                     if( p_sys->p_input )
                     {
-                        vout_thread_t *p_vout;
-
-                        p_vout = input_GetVout( p_sys->p_input );
+                        bool fs = var_ToggleBool( p_sys->p_playlist,
+                                                  "fullscreen" );
+                        vout_thread_t *p_vout = input_GetVout( p_sys->p_input );
                         if( p_vout )
                         {
-                            var_ToggleBool( p_vout, "fullscreen" );
+                            var_SetBool( p_vout, "fullscreen", fs );
                             vlc_object_release( p_vout );
                             msg_Dbg( p_intf, "requested fullscreen toggle" );
                         }
