@@ -553,15 +553,7 @@ int vlc_clone (vlc_thread_t *p_handle, void * (*entry) (void *), void *data,
         goto error;
     }
 
-    /* Thread closes the handle when exiting, duplicate it here
-     * to be on the safe side when joining. */
-    if (!DuplicateHandle (GetCurrentProcess (), hThread,
-                          GetCurrentProcess (), p_handle, 0, FALSE,
-                          DUPLICATE_SAME_ACCESS))
-    {
-        CloseHandle (hThread);
-        goto error;
-    }
+    *p_handle = hThread;
 
 #else
     vlc_thread_t th = malloc (sizeof (*th));
