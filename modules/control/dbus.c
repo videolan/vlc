@@ -780,7 +780,7 @@ static void Close   ( vlc_object_t *p_this )
     var_DelCallback( p_playlist, "repeat", AllCallback, p_intf );
     var_DelCallback( p_playlist, "loop", AllCallback, p_intf );
 
-#if 0.
+#if 0
     p_input = ???;
     if ( p_input )
     {
