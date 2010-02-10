@@ -1,7 +1,7 @@
 /*****************************************************************************
  * msn.c : msn title plugin
  *****************************************************************************
- * Copyright (C) 2005 the VideoLAN team
+ * Copyright (C) 2005-2010 the VideoLAN team
  * $Id$
  *
  * Authors: Antoine Cellerier <dionoea -at- videolan -dot- org>
@@ -137,10 +137,6 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     (void)psz_var;    (void)oldval;    (void)newval;
     intf_thread_t *p_intf = (intf_thread_t *)param;
     char psz_tmp[MSN_MAX_LENGTH];
-    char *psz_title = NULL;
-    char *psz_artist = NULL;
-    char *psz_album = NULL;
-    char *psz_buf = NULL;
     input_thread_t *p_input =  playlist_CurrentInput( (playlist_t *) p_this );
 
     if( !p_input ) return VLC_SUCCESS;
@@ -154,20 +150,17 @@ static int ItemChange( vlc_object_t *p_this, const char *psz_var,
     }
 
     /* Playing something ... */
-    psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
-    psz_album = input_item_GetAlbum( input_GetItem( p_input ) );
-    psz_title = input_item_GetTitleFbName( input_GetItem( p_input ) );
-    if( !psz_artist ) psz_artist = strdup( "" );
-    if( !psz_album ) psz_album = strdup( "" );
-
-    psz_buf = str_format_meta( p_this, p_intf->p_sys->psz_format );
+    char *psz_artist = input_item_GetArtist( input_GetItem( p_input ) );
+    char *psz_album = input_item_GetAlbum( input_GetItem( p_input ) );
+    char *psz_title = input_item_GetTitleFbName( input_GetItem( p_input ) );
+    char *psz_buf = str_format_meta( p_this, p_intf->p_sys->psz_format );
 
     snprintf( psz_tmp,
               MSN_MAX_LENGTH,
               "\\0Music\\01\\0%s\\0%s\\0%s\\0%s\\0\\0\\0",
               psz_buf,
-              psz_artist,
-              psz_title,
+              psz_artist ? psz_artist : "",
+              psz_title ? psz_title : "",
               psz_album );
     free( psz_buf );
     free( psz_title );
