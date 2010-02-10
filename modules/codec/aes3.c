@@ -261,6 +261,9 @@ static int Open( decoder_t *p_dec, bool b_packetizer )
     }
     else
     {
+        p_dec->fmt_out.i_codec = VLC_CODEC_S16N;
+        p_dec->fmt_out.audio.i_bitspersample = 16;
+
         p_dec->pf_decode_audio = Decode;
         p_dec->pf_packetize    = NULL;
     }
