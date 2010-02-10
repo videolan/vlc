@@ -206,10 +206,9 @@ static int Open( vlc_object_t *p_this )
         return VLC_EGENERIC;
 
     p_dec->pf_decode_sub = Decode;
-    p_sys = p_dec->p_sys = malloc( sizeof(decoder_sys_t) );
+    p_sys = p_dec->p_sys = calloc( 1, sizeof(decoder_sys_t) );
     if( p_sys == NULL )
         return VLC_ENOMEM;
-    memset( p_sys, 0, sizeof(decoder_sys_t) );
 
     p_sys->i_key[0] = p_sys->i_key[1] = p_sys->i_key[2] = '*' - '0';
     p_sys->b_update = false;
@@ -246,8 +245,7 @@ static int Open( vlc_object_t *p_this )
 
     /* Create the var on vlc_global. */
     p_sys->i_wanted_page = var_CreateGetInteger( p_dec, "vbi-page" );
-    var_AddCallback( p_dec, "vbi-page",
-                     RequestPage, p_sys );
+    var_AddCallback( p_dec, "vbi-page", RequestPage, p_sys );
 
     /* Check if the Teletext track has a known "initial page". */
     if( p_sys->i_wanted_page == 100 && p_dec->fmt_in.subs.teletext.i_magazine != -1 )

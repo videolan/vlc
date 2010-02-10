@@ -195,14 +195,13 @@ static char *svg_GetTemplate( vlc_object_t *p_this )
                 msg_Dbg( p_this, "reading %ld bytes from template %s",
                          (unsigned long)s.st_size, psz_filename );
 
-                psz_template = malloc( s.st_size + 42 );
+                psz_template = calloc( 1, s.st_size + 42 );
                 if( !psz_template )
                 {
                     fclose( file );
                     free( psz_filename );
                     return NULL;
                 }
-                memset( psz_template, 0, s.st_size + 1 );
                 if(! fread( psz_template, s.st_size, 1, file ) )
                 {
                     msg_Dbg( p_this, "No data read from template." );
@@ -469,13 +468,12 @@ static int RenderText( filter_t *p_filter, subpicture_region_t *p_region_out,
         int length;
         char* psz_template = p_sys->psz_template;
         length = strlen( psz_string ) + strlen( psz_template ) + 42;
-        p_svg->psz_text = malloc( length + 1 );
+        p_svg->psz_text = calloc( 1, length + 1 );
         if( !p_svg->psz_text )
         {
             free( p_svg );
             return VLC_ENOMEM;
         }
-        memset( p_svg->psz_text, 0, length + 1 );
         snprintf( p_svg->psz_text, length, psz_template, psz_string );
     }
     p_svg->i_width = p_sys->i_width;

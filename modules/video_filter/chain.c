@@ -91,11 +91,9 @@ static int Activate( vlc_object_t *p_this )
     if( !b_chroma && !b_resize )
         return VLC_EGENERIC;
 
-    p_sys = p_filter->p_sys = malloc( sizeof( *p_sys ) );
+    p_sys = p_filter->p_sys = calloc( 1, sizeof( *p_sys ) );
     if( !p_sys )
         return VLC_ENOMEM;
-
-    memset( p_sys, 0, sizeof( *p_sys ) );
 
     p_sys->p_chain = filter_chain_New( p_filter, "video filter2", false, BufferAllocationInit, NULL, p_filter );
     if( !p_sys->p_chain )

@@ -313,8 +313,7 @@ static int Open( vlc_object_t * p_this )
     p_demux->pf_control = Control;
 
     /* create our structure that will contains all data */
-    p_demux->p_sys = p_sys = malloc( sizeof( demux_sys_t ) );
-    memset( p_sys, 0, sizeof( demux_sys_t ) );
+    p_demux->p_sys = p_sys = calloc( 1, sizeof( demux_sys_t ) );
 
     /* Now load all boxes ( except raw data ) */
     if( ( p_sys->p_root = MP4_BoxGetRoot( p_demux->s ) ) == NULL )
