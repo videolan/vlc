@@ -53,8 +53,9 @@ static int vlclua_fullscreen( lua_State *L )
     input_thread_t * p_input = vlclua_get_input_internal( L );
     if( !p_input ) return vlclua_error( L );
 
-    p_vout = vlc_object_find( p_input, VLC_OBJECT_VOUT, FIND_CHILD );
+    p_vout = input_GetVout( p_input );
     if( !p_vout ) return vlclua_error( L );
+#warning ^^ How about releasing the input?
 
     i_ret = vlclua_var_toggle_or_set( L, p_vout, "fullscreen" );
     vlc_object_release( p_vout );

@@ -1117,9 +1117,7 @@ static int HandleKey( intf_thread_t *p_intf, int i_key )
         {
             if( p_intf->p_sys->p_input )
             {
-                vout_thread_t *p_vout;
-                p_vout = vlc_object_find( p_intf->p_sys->p_input,
-                                          VLC_OBJECT_VOUT, FIND_CHILD );
+                vout_thread_t *p_vout = inputGetVout( p_intf->p_sys->p_input );
                 if( p_vout )
                 {
                     var_ToggleBool( p_vout, "fullscreen" );

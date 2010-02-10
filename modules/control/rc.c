@@ -743,9 +743,7 @@ static void Run( intf_thread_t *p_intf )
         case 'F':
             if( p_input )
             {
-                vout_thread_t *p_vout;
-                p_vout = input_GetVout( p_input );
-
+                vout_thread_t *p_vout = input_GetVout( p_input );
                 if( p_vout )
                 {
                     vlc_value_t val;
