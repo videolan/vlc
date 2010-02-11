@@ -99,13 +99,13 @@ static void ChangeFiltersString( intf_thread_t *p_intf,
     }
 
     aout_EnableFilter( p_object, psz_string, false);
-    
+
     if( (BOOL)config_GetInt( p_object, "macosx-eq-keep" ) == YES )
     {
         /* save changed to config */
         config_PutPsz( p_object, "audio-filter", psz_string );
     }
-    
+
     free( psz_string );
     vlc_object_release( p_object );
 }
@@ -196,7 +196,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     }
 
     vlc_object_release( p_object );
-    
+
     /* Set the preamp slider */
     [o_slider_preamp setFloatValue: f_preamp];
 
@@ -208,7 +208,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
         /* Read dB -20/20 */
         f_band[i] = strtof( psz_bands, &p_next );
         if( !p_next || p_next == psz_bands ) break; /* strtof() failed */
-    
+
         if( !*psz_bands ) break; /* end of line */
         psz_bands = p_next+1;
     }
@@ -218,7 +218,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     /* Set the the checkboxes */
     [o_ckb_enable setState: b_enabled];
 
-    [o_ckb_2pass setState: b_2p];        
+    [o_ckb_2pass setState: b_2p];
 }
 
 - (IBAction)bandSliderUpdated:(id)sender
@@ -345,7 +345,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
     aout_instance_t *p_aout = getAout();
     vlc_object_t *p_object= VLC_OBJECT(p_aout);
     if( p_object == NULL )
-        p_object = vl_object_hold(pl_Get( p_intf ));
+        p_object = vlc_object_hold(pl_Get( p_intf ));
 
     var_SetBool( p_object, "equalizer-2pass", b_2p );
 
@@ -389,9 +389,9 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
         {
             if( strcmp( preset_list[i], psz_preset ) )
                 continue;
-    
+
             [o_popup_presets selectItemAtIndex: i];
-        
+
 
             [o_slider_preamp setFloatValue: eqz_preset_10b[i]->f_preamp];
             [self setBandSlidersValues: (float *)eqz_preset_10b[i]->f_amp];
@@ -399,7 +399,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
             if( strcmp( psz_preset, "flat" ) )
             {
                 char psz_bands[100];
-    
+
                 snprintf( psz_bands, sizeof( psz_bands ),
                           "%.1f %.1f %.1f %.1f %.1f %.1f %.1f "
                           "%.1f %.1f %.1f",
@@ -413,7 +413,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
                           eqz_preset_10b[i]->f_amp[7],
                           eqz_preset_10b[i]->f_amp[8],
                           eqz_preset_10b[i]->f_amp[9] );
-    
+
                 var_Create( p_object, "equalizer-preamp", VLC_VAR_FLOAT |
                             VLC_VAR_DOINHERIT );
                 var_Create( p_object, "equalizer-bands", VLC_VAR_STRING |
@@ -427,7 +427,7 @@ static bool GetFiltersStatus( intf_thread_t *p_intf,
         vlc_object_release( p_object );
     }
 
-    [self equalizerUpdated];    
+    [self equalizerUpdated];
 }
 
 
