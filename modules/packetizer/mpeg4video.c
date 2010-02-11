@@ -152,6 +152,8 @@ static int Open( vlc_object_t *p_this )
     es_format_Copy( &p_dec->fmt_out, &p_dec->fmt_in );
     p_dec->fmt_out.i_codec = VLC_CODEC_MP4V;
 
+    free(p_dec->fmt_out.p_extra);
+
     if( p_dec->fmt_in.i_extra )
     {
         /* We have a vol */
