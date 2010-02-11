@@ -186,6 +186,19 @@ int libvlc_video_get_width( libvlc_media_player_t *p_mi )
     return width;
 }
 
+int libvlc_video_get_cursor( libvlc_media_player_t *mp, unsigned num,
+                             int *px, int *py )
+{
+    vout_thread_t *p_vout = GetVout (mp, num);
+    if (p_vout == NULL)
+        return -1;
+
+    *px = var_GetInteger (p_vout, "mouse-x");
+    *py = var_GetInteger (p_vout, "mouse-y");
+    vlc_object_release (p_vout);
+    return 0;
+}
+
 unsigned libvlc_media_player_has_vout( libvlc_media_player_t *p_mi )
 {
     size_t n;

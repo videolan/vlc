@@ -165,6 +165,7 @@ libvlc_video_get_chapter_description
 libvlc_video_get_crop_geometry
 libvlc_video_get_size
 libvlc_video_get_height
+libvlc_video_get_cursor
 libvlc_video_get_logo_int
 libvlc_video_get_marquee_int
 libvlc_video_get_marquee_string

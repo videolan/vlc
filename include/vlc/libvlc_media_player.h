@@ -589,6 +589,32 @@ VLC_DEPRECATED_API
 int libvlc_video_get_width( libvlc_media_player_t *p_mi );
 
 /**
+ * Get the mouse pointer coordinates over a video.
+ * Coordinates are expressed in terms of the decoded video resolution,
+ * <b>not</b> in terms of pixels on the screen/viewport (to get the latter,
+ * you can query your windowing system directly).
+ *
+ * Either of the coordinates may be negative or larger than the corresponding
+ * dimension of the video, if the cursor is outside the rendering area.
+ *
+ * @warning The coordinates may be out-of-date if the pointer is not located
+ * on the video rendering area. LibVLC does not track the pointer if it is
+ * outside of the video widget.
+ *
+ * @note LibVLC does not support multiple pointers (it does of course support
+ * multiple input devices sharing the same pointer) at the moment.
+ *
+ * \param p_mi media player
+ * \param num number of the video (starting from, and most commonly 0)
+ * \param px pointer to get the abscissa [OUT]
+ * \param py pointer to get the ordinate [OUT]
+ * \return 0 on success, -1 if the specified video does not exist
+ */
+VLC_PUBLIC_API
+int libvlc_video_get_cursor( libvlc_media_player_t *p_mi, unsigned num,
+                             int *px, int *py );
+
+/**
  * Get the current video scaling factor.
  * See also libvlc_video_set_scale().
  *
