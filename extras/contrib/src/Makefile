@@ -2384,7 +2384,8 @@ endif
 		--disable-jack-support \
 		--disable-coreaudio \
 		--disable-lash \
-		--disable-ladcca
+		--disable-ladcca \
+		--without-readline
 	cd $< && make
 	cd $< && make install
 	touch $@
