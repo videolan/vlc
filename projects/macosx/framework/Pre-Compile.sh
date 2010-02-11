@@ -134,6 +134,10 @@ if test "${ACTION}" = "build"; then
             vlc_install ${module} ${target_modules} "module"
         fi
     done
+
+    # Install the module cache
+    vlc_install `ls ${VLC_BUILD_DIR}/modules/plugins-*.dat` ${target_modules} "data"
+
     # Build the modules folder
     ##########################
 
