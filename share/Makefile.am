@@ -307,7 +307,7 @@ DIST_maemo = \
 	maemo/vlc_intf.rc \
 	maemo/vlc_left_tab_active.png \
 	maemo/vlc_left_tab_passive.png \
-	maemo/playlist.png
+	maemo/playlist.png \
 	maemo/play.png \
 	maemo/pause.png \
 	maemo/stop.png \
