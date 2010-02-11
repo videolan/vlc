@@ -1,7 +1,0 @@
-include vlcglue.h
-include vlc_mediacontrol.c
-include vlc_position.c
-include vlc_instance.c
-include vlc_mediaplayer.c
-include vlc_media.c
-include vlcwidget.py
