@@ -964,6 +964,10 @@ char *str_format( vlc_object_t *p_this, const char *psz_src )
  */
 void filename_sanitize( char *str )
 {
+#if defined( WIN32 )
+    char *str_base = str;
+#endif
+
     if( *str == '.' && (str[1] == '\0' || (str[1] == '.' && str[2] == '\0' ) ) )
     {
         while( *str )
