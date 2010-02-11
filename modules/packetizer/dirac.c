@@ -279,7 +279,7 @@ static int block_ChainToArray( block_t *p_block, block_t ***ppp_array)
     block_ChainProperties( p_block, &i_num_blocks, NULL, NULL );
 
     *ppp_array = calloc( i_num_blocks, sizeof( block_t* ) );
-    if( !ppp_array ) return 0;
+    if( !*ppp_array ) return 0;
 
     for( int i = 0; i < i_num_blocks; i++ )
     {
