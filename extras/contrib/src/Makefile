@@ -2514,7 +2514,7 @@ ifdef HAVE_DARWIN_OS
 endif
 
 .gsm: gsm
-	(cd $<; $(HOSTCC) make && cp inc/gsm.h $(PREFIX)/include && cp lib/libgsm.a  $(PREFIX)/lib)
+	(cd $<; $(HOSTCC) make && mkdir -p $(PREFIX)/include/gsm && cp inc/gsm.h $(PREFIX)/include/gsm && cp lib/libgsm.a  $(PREFIX)/lib)
 	touch $@
 
 CLEAN_FILE += .gsm
