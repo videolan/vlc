@@ -1643,11 +1643,6 @@ static subpicture_t *render( decoder_t *p_dec )
             fmt.i_height = fmt.i_visible_height = p_region->i_height;
             fmt.i_x_offset = fmt.i_y_offset = 0;
             p_spu_region = subpicture_region_New( &fmt );
-            if( !p_region )
-            {
-                msg_Err( p_dec, "cannot allocate SPU region" );
-                continue;
-            }
 
             p_spu_region->psz_text = strdup( p_object_def->psz_text );
             p_spu_region->i_x = i_base_x + p_regiondef->i_x + p_object_def->i_x;
