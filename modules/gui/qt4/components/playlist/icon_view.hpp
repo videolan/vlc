@@ -30,12 +30,32 @@
 class QPainter;
 class PLModel;
 
-class PlListViewItemDelegate : public QStyledItemDelegate
+class AbstractPlViewItemDelegate : public QStyledItemDelegate
+{
+public:
+    AbstractPlViewItemDelegate( QWidget * parent = 0 ) : QStyledItemDelegate(parent) {}
+    QString getMeta( const QModelIndex & index, int meta ) const;
+    void paintPlayingItemBg( QPainter *painter, const QStyleOptionViewItem & option ) const;
+    QPixmap getArtPixmap( const QModelIndex & index, const QSize & size ) const;
+};
+
+class PlIconViewItemDelegate : public AbstractPlViewItemDelegate
 {
     Q_OBJECT
 
 public:
-    PlListViewItemDelegate(QWidget *parent = 0) : QStyledItemDelegate(parent) {}
+    PlIconViewItemDelegate(QWidget *parent = 0) : AbstractPlViewItemDelegate(parent) {}
+
+    void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+};
+
+class PlListViewItemDelegate : public AbstractPlViewItemDelegate
+{
+    Q_OBJECT
+
+public:
+    PlListViewItemDelegate(QWidget *parent = 0) : AbstractPlViewItemDelegate(parent) {}
 
     void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
     QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
@@ -47,6 +67,14 @@ class PlIconView : public QListView
 
 public:
     PlIconView( PLModel *model, QWidget *parent = 0 );
+};
+
+class PlListView : public QListView
+{
+    Q_OBJECT
+
+public:
+    PlListView( PLModel *model, QWidget *parent = 0 );
 };
 
 #endif

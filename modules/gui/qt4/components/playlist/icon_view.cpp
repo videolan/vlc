@@ -23,6 +23,7 @@
 
 #include "components/playlist/icon_view.hpp"
 #include "components/playlist/playlist_model.hpp"
+#include "components/playlist/sorting.h"
 #include "input_manager.hpp"
 
 #include <QApplication>
@@ -41,140 +42,212 @@
 #define ITEMS_SPACING       10
 #define ART_RADIUS          5
 
-
-static const QRect drawRect = QRect( 0, 0, RECT_SIZE_W, RECT_SIZE_H );
-static const QRect artRect = drawRect.adjusted( OFFSET - 1, 2, - OFFSET, - OFFSET *2 );
-
-void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
+QString AbstractPlViewItemDelegate::getMeta( const QModelIndex & index, int meta ) const
 {
-    PLItem *currentItem = static_cast<PLItem*>( index.internalPointer() );
-    assert( currentItem );
+    return index.model()->index( index.row(),
+                                  PLModel::columnFromMeta( meta ),
+                                  index.parent() )
+                                .data().toString();
+}
 
-    char *meta = input_item_GetTitleFbName( currentItem->inputItem() );
-    QString title = qfu( meta );
-    free( meta );
+void AbstractPlViewItemDelegate::paintPlayingItemBg( QPainter *painter, const QStyleOptionViewItem & option ) const
+{
+    painter->save();
+    painter->setOpacity( 0.5 );
+    painter->setBrush( QBrush( Qt::gray ) );
+    painter->fillRect( option.rect, option.palette.color( QPalette::Dark ) );
+    painter->restore();
+}
 
-    meta = input_item_GetArtist( currentItem->inputItem() );
-    QString artist = qfu( meta );
-    free( meta );
+QPixmap AbstractPlViewItemDelegate::getArtPixmap( const QModelIndex & index, const QSize & size ) const
+{
+    PLItem *item = static_cast<PLItem*>( index.internalPointer() );
+    assert( item );
 
-    /* Primary ArtUrl */
-    QString artUrl = InputManager::decodeArtURL( currentItem->inputItem() );
+    QString artUrl = InputManager::decodeArtURL( item->inputItem() );
 
-    /* else look up through all children and use the first picture found */
     if( artUrl.isEmpty() )
     {
-        for( int i = 0; i < currentItem->childCount(); i++ )
+        for( int i = 0; i < item->childCount(); i++ )
         {
-            artUrl = InputManager::decodeArtURL( currentItem->child( i )->inputItem() );
+            artUrl = InputManager::decodeArtURL( item->child( i )->inputItem() );
             if( !artUrl.isEmpty() )
                 break;
         }
     }
 
-    /*if( option.state & QStyle::State_Selected )
-         painter->fillRect(option.rect, option.palette.highlight());*/
+    QPixmap artPix( size );
+
+    QString key = artUrl + QString("%1%2").arg(size.width()).arg(size.height());
+
+    if( !QPixmapCache::find( key, artPix ))
+    {
+        QPixmap tmp;
+        bool cache = false;
+        if( artUrl.isEmpty() || !tmp.load( artUrl ) )
+        {
+            tmp = QPixmap( ":/noart64" ).scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+        }
+        else
+        {
+            tmp = tmp.scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+            cache = true;
+        }
+        artPix.fill( Qt::black );
+        QPainter p( &artPix );
+        p.drawPixmap( (size.width() - tmp.width()) / 2,
+                      (size.height() - tmp.height()) / 2,
+                      tmp );
+        if( cache ) QPixmapCache::insert( key, artPix );
+    }
+
+    return artPix;
+}
+
+void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
+{
+    QString title = getMeta( index, COLUMN_TITLE );
+    QString artist = getMeta( index, COLUMN_ARTIST );
+
+    QPixmap artPix = getArtPixmap( index, QSize( ART_SIZE, ART_SIZE ) );
+
     QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem, &option,
                                           painter );
 
-    /* Pixmap where all the rendering will happen and that will be cached */
-    QPixmap pix;
-
-    QString key = title + artist + artUrl
-                  + QString( index.data( PLModel::IsCurrentRole ).toBool() );
-    if(QPixmapCache::find( key, pix ))
-    {
-        // cool, we found it in the cache
-        painter->drawPixmap( option.rect, pix );
-        return;
-    }
-
-    /* Background decorations */
-    pix = QPixmap( RECT_SIZE_W, RECT_SIZE_H );
-    pix.fill( Qt::transparent );
-
-    QPainter *pixpainter = new QPainter( &pix );
-
-    pixpainter->setRenderHints(
-            QPainter::Antialiasing | QPainter::SmoothPixmapTransform |
-            QPainter::TextAntialiasing );
+    painter->save();
 
     if( index.data( PLModel::IsCurrentRole ).toBool() )
     {
-       pixpainter->save();
-       pixpainter->setOpacity( 0.2 );
-       pixpainter->setBrush( QBrush( Qt::gray ) );
-       pixpainter->drawRoundedRect( 0, 0, RECT_SIZE_W, RECT_SIZE_H, ART_RADIUS, ART_RADIUS );
-       pixpainter->restore();
+       painter->save();
+       painter->setOpacity( 0.2 );
+       painter->setBrush( QBrush( Qt::gray ) );
+       painter->drawRoundedRect( option.rect.adjusted( 0, 0, -1, -1 ), ART_RADIUS, ART_RADIUS );
+       painter->restore();
     }
 
+    QRect artRect = option.rect.adjusted( OFFSET - 1, 2, - OFFSET, - OFFSET *2 );
+
     // Draw the drop shadow
-    pixpainter->save();
-    pixpainter->setOpacity( 0.7 );
-    pixpainter->setBrush( QBrush( Qt::gray ) );
-    pixpainter->drawRoundedRect( artRect.adjusted( 2, 2, 2, 2 ), ART_RADIUS, ART_RADIUS );
-    pixpainter->restore();
-
-
-    // load album art in the pixmap
-    QPixmap artPix;
-    if( artUrl.isEmpty() || !artPix.load( artUrl ) )
-        artPix = QPixmap( ":/noart64" );
-    else
-        artPix = artPix.scaled( ART_SIZE, ART_SIZE,
-                Qt::KeepAspectRatioByExpanding );
+    painter->save();
+    painter->setOpacity( 0.7 );
+    painter->setBrush( QBrush( Qt::darkGray ) );
+    painter->setPen( Qt::NoPen );
+    painter->drawRoundedRect( artRect.adjusted( 0, 0, 2, 2 ), ART_RADIUS, ART_RADIUS );
+    painter->restore();
 
     // Draw the art pixmap
     QPainterPath artRectPath;
     artRectPath.addRoundedRect( artRect, ART_RADIUS, ART_RADIUS );
-    pixpainter->setClipPath( artRectPath );
-    pixpainter->drawPixmap( artRect, artPix );
-    pixpainter->setClipping( false );
+    painter->setClipPath( artRectPath );
+    painter->drawPixmap( artRect, artPix );
+    painter->setClipping( false );
 
-    /* */
-    QColor text = qApp->palette().text().color();
+    if( option.state & QStyle::State_Selected )
+        painter->setPen( option.palette.color( QPalette::HighlightedText ) );
 
-    // Draw title
-    pixpainter->setPen( text );
     QFont font;
     font.setPointSize( 7 );
-    font.setItalic( true );
     font.setBold( index.data( Qt::FontRole ).value<QFont>().bold() );
-    pixpainter->setFont( font );
-    QFontMetrics fm = pixpainter->fontMetrics();
-    QRect textRect = drawRect.adjusted( 1, ART_SIZE + 4, 0, -1 );
+
+    // Draw title
+    font.setItalic( true );
+    painter->setFont( font );
+
+    QFontMetrics fm = painter->fontMetrics();
+    QRect textRect = option.rect.adjusted( 1, ART_SIZE + 8, 0, -1 );
     textRect.setHeight( fm.height() + 1 );
 
-    pixpainter->drawText( textRect,
+    painter->drawText( textRect,
                       fm.elidedText( title, Qt::ElideRight, textRect.width() ),
                       QTextOption( Qt::AlignCenter ) );
 
     // Draw artist
-    pixpainter->setPen( text.lighter( 220 ) );
+    painter->setPen( painter->pen().color().lighter( 150 ) );
     font.setItalic( false );
-    pixpainter->setFont( font );
-    fm = pixpainter->fontMetrics();
+    painter->setFont( font );
+    fm = painter->fontMetrics();
 
     textRect = textRect.adjusted( 0, textRect.height(),
                                     0, textRect.height() );
-    pixpainter->drawText(  textRect,
-                    fm.elidedText( artist, Qt::ElideRight, textRect.width() ),
-                    QTextOption( Qt::AlignCenter ) );
+    painter->drawText(  textRect,
+                        fm.elidedText( artist, Qt::ElideRight, textRect.width() ),
+                        QTextOption( Qt::AlignCenter ) );
 
-    delete pixpainter; // Ensure all paint operations have finished
-
-    // Here real drawing happens
-    painter->drawPixmap( option.rect, pix );
-
-    // Cache the rendering
-    QPixmapCache::insert( key, pix );
+    painter->restore();
 }
 
-QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
+QSize PlIconViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
     return QSize( RECT_SIZE_W, RECT_SIZE_H );
 }
 
+#define LISTVIEW_ART_SIZE 45
+
+void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const
+{
+    QModelIndex parent = index.parent();
+    QModelIndex i;
+
+    QString title = getMeta( index, COLUMN_TITLE );
+    QString duration = getMeta( index, COLUMN_DURATION );
+    if( !duration.isEmpty() ) title += QString(" [%1]").arg( duration );
+
+    QString artist = getMeta( index, COLUMN_ARTIST );
+    QString album = getMeta( index, COLUMN_ALBUM );
+    QString trackNum = getMeta( index, COLUMN_TRACK_NUMBER );
+    QString artistAlbum = artist
+                          + ( artist.isEmpty() ? QString() : QString( ": " ) )
+                          + album
+                          + ( album.isEmpty() || trackNum.isEmpty() ?
+                              QString() : QString( " [#%1]" ).arg( trackNum ) );
+
+    QPixmap artPix = getArtPixmap( index, QSize( LISTVIEW_ART_SIZE, LISTVIEW_ART_SIZE ) );
+
+    QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem, &option, painter );
+
+    if( index.data( PLModel::IsCurrentRole ).toBool() )
+        paintPlayingItemBg( painter, option );
+
+    painter->drawPixmap( option.rect.topLeft() + QPoint(3,3), artPix );
+
+
+    int textH = option.fontMetrics.height() + 2;
+    int margin = ( option.rect.height() / 2 ) - textH;
+
+    QRect textRect = option.rect.adjusted( LISTVIEW_ART_SIZE + 10,
+                                           margin,
+                                           -10,
+                                           margin * -1 - ( artistAlbum.isEmpty() ? 0 : textH ) );
+
+    painter->save();
+
+    if( option.state & QStyle::State_Selected )
+        painter->setPen( option.palette.color( QPalette::HighlightedText ) );
+
+    QTextOption textOpt( Qt::AlignVCenter | Qt::AlignLeft );
+    textOpt.setWrapMode( QTextOption::NoWrap );
+
+    QFont f( option.font );
+    if( index.data( PLModel::IsCurrentRole ).toBool() ) f.setBold( true );
+
+    f.setItalic( true );
+    painter->setFont( f );
+
+    painter->drawText( textRect, title, textOpt );
+
+    f.setItalic( false );
+    painter->setFont( f );
+    textRect.moveTop( textRect.top() + textH );
+
+    painter->drawText( textRect, artistAlbum, textOpt );
+
+    painter->restore();
+}
+
+QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
+{
+  return QSize( LISTVIEW_ART_SIZE + 6, LISTVIEW_ART_SIZE + 6 );
+}
 
 PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
 {
@@ -183,12 +256,24 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     setMovement( QListView::Static );
     setResizeMode( QListView::Adjust );
     setGridSize( QSize( RECT_SIZE_W, RECT_SIZE_H ) );
-    setUniformItemSizes( true );
     setWrapping( true );
+    setUniformItemSizes( true );
     setSelectionMode( QAbstractItemView::ExtendedSelection );
     setAcceptDrops( true );
 
-    PlListViewItemDelegate *pl = new PlListViewItemDelegate( this );
-    setItemDelegate( pl );
+    PlIconViewItemDelegate *delegate = new PlIconViewItemDelegate( this );
+    setItemDelegate( delegate );
 }
 
+PlListView::PlListView( PLModel *model, QWidget *parent ) : QListView( parent )
+{
+    setModel( model );
+    setViewMode( QListView::ListMode );
+    setUniformItemSizes( true );
+    setSelectionMode( QAbstractItemView::ExtendedSelection );
+    setAcceptDrops( true );
+    setAlternatingRowColors( true );
+
+    PlListViewItemDelegate *delegate = new PlListViewItemDelegate( this );
+    setItemDelegate( delegate );
+}

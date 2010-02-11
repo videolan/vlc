@@ -73,6 +73,7 @@ static inline char * psz_column_meta( input_item_t *p_item, uint32_t i_column )
         return input_item_GetTitleFbName( p_item );
     case COLUMN_DURATION:
         i_duration = input_item_GetDuration( p_item ) / 1000000;
+        if( i_duration == 0 ) return NULL;
         secstotimestr( psz_duration, i_duration );
         return strdup( psz_duration );
     case COLUMN_ARTIST:

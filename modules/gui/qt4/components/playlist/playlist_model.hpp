@@ -90,6 +90,8 @@ public:
     QModelIndex currentIndex();
     bool isCurrent( const QModelIndex &index ) const;
     int itemId( const QModelIndex &index ) const;
+    static int columnFromMeta( int meta_column );
+    static int columnToMeta( int column );
 
     /* Actions */
     void popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
@@ -147,8 +149,6 @@ private:
     PLItem *findById( PLItem *, int );
     PLItem *findByInput( PLItem *, int );
     PLItem *findInner( PLItem *, int , bool );
-    int columnFromMeta( int meta_column ) const;
-    int columnToMeta( int column ) const;
     bool canEdit() const;
 
     PLItem *p_cached_item;

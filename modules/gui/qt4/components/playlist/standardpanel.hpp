@@ -46,6 +46,7 @@ class QPushButton;
 class QKeyEvent;
 class QWheelEvent;
 class PlIconView;
+class PlListView;
 class LocationBar;
 
 class StandardPLPanel: public QWidget
@@ -64,6 +65,14 @@ protected:
 
     PLModel *model;
 private:
+    enum {
+      TREE_VIEW = 0,
+      ICON_VIEW,
+      LIST_VIEW,
+
+      VIEW_COUNT
+    };
+
     intf_thread_t *p_intf;
 
     QWidget     *parent;
@@ -74,8 +83,10 @@ private:
 
     QTreeView   *treeView;
     PlIconView  *iconView;
+    PlListView  *listView;
     QAbstractItemView *currentView;
 
+    QAction *viewActions[ VIEW_COUNT ];
     QAction *iconViewAction, *treeViewAction;
     int currentRootId;
     QSignalMapper *selectColumnsSigMapper;
@@ -83,14 +94,9 @@ private:
 
     int last_activated_id;
 
-    enum {
-      TREE_VIEW = 0,
-      ICON_VIEW,
-      COVER_VIEW,
-    };
-
     void createTreeView();
     void createIconView();
+    void createListView();
 
 public slots:
     virtual void setRoot( playlist_item_t * );

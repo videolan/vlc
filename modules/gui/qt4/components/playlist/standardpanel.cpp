@@ -52,6 +52,10 @@
 
 #include "sorting.h"
 
+static const QString viewNames[] = { qtr( "Detailed View" ),
+                                     qtr( "Icon View" ),
+                                     qtr( "List View" ) };
+
 StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
                                   intf_thread_t *_p_intf,
                                   playlist_t *p_playlist,
@@ -64,6 +68,7 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     iconView = NULL;
     treeView = NULL;
+    listView = NULL;
 
     model = new PLModel( p_playlist, p_intf, p_root, this );
     currentRootId = -1;
@@ -101,15 +106,13 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     QActionGroup *actionGroup = new QActionGroup( this );
 
-    treeViewAction = actionGroup->addAction( "Detailed view" );
-    treeViewAction->setCheckable( true );
-    viewSelectionMapper->setMapping( treeViewAction, TREE_VIEW );
-    CONNECT( treeViewAction, triggered(), viewSelectionMapper, map() );
-
-    iconViewAction = actionGroup->addAction( "Icon view" );
-    iconViewAction->setCheckable( true );
-    viewSelectionMapper->setMapping( iconViewAction, ICON_VIEW );
-    CONNECT( iconViewAction, triggered(), viewSelectionMapper, map() );
+    for( int i = 0; i < VIEW_COUNT; i++ )
+    {
+        viewActions[i] = actionGroup->addAction( viewNames[i] );
+        viewActions[i]->setCheckable( true );
+        viewSelectionMapper->setMapping( viewActions[i], i );
+        CONNECT( viewActions[i], triggered(), viewSelectionMapper, map() );
+    }
 
     BUTTONACT( viewButton, cycleViews() );
     QMenu *viewMenu = new QMenu( this );
@@ -138,7 +141,12 @@ StandardPLPanel::~StandardPLPanel()
     getSettings()->beginGroup("Playlist");
     if( treeView )
         getSettings()->setValue( "headerStateV2", treeView->header()->saveState() );
-    getSettings()->setValue( "view-mode", ( currentView == iconView ) ? ICON_VIEW : TREE_VIEW );
+    if( currentView == treeView )
+        getSettings()->setValue( "view-mode", TREE_VIEW );
+    else if( currentView == listView )
+        getSettings()->setValue( "view-mode", LIST_VIEW );
+    else if( currentView == iconView )
+        getSettings()->setValue( "view-mode", ICON_VIEW );
     getSettings()->endGroup();
 }
 
@@ -287,6 +295,21 @@ void StandardPLPanel::createIconView()
     layout->addWidget( iconView, 1, 0, 1, -1 );
 }
 
+void StandardPLPanel::createListView()
+{
+    listView = new PlListView( model, this );
+    listView->setContextMenuPolicy( Qt::CustomContextMenu );
+    CONNECT( listView, customContextMenuRequested( const QPoint & ),
+             this, popupPlView( const QPoint & ) );
+    CONNECT( listView, activated( const QModelIndex & ),
+             this, activate( const QModelIndex & ) );
+    CONNECT( locationBar, invoked( const QModelIndex & ),
+             listView, setRootIndex( const QModelIndex & ) );
+
+    layout->addWidget( listView, 1, 0, 1, -1 );
+}
+
+
 void StandardPLPanel::createTreeView()
 {
     /* Create and configure the QTreeView */
@@ -354,9 +377,10 @@ void StandardPLPanel::showView( int i_view )
             createTreeView();
         locationBar->setIndex( treeView->rootIndex() );
         if( iconView ) iconView->hide();
+        if( listView ) listView->hide();
         treeView->show();
         currentView = treeView;
-        treeViewAction->setChecked( true );
+        viewActions[i_view]->setChecked( true );
         break;
     }
     case ICON_VIEW:
@@ -364,11 +388,31 @@ void StandardPLPanel::showView( int i_view )
         if( iconView == NULL )
             createIconView();
 
-        locationBar->setIndex( iconView->rootIndex() );
         if( treeView ) treeView->hide();
+        if( listView ) {
+            listView->hide();
+            iconView->setRootIndex( listView->rootIndex() );
+        }
+        locationBar->setIndex( iconView->rootIndex() );
         iconView->show();
         currentView = iconView;
-        iconViewAction->setChecked( true );
+        viewActions[i_view]->setChecked( true );
+        break;
+    }
+    case LIST_VIEW:
+    {
+        if( listView == NULL )
+            createListView();
+
+        if( treeView ) treeView->hide();
+        if( iconView ) {
+            iconView->hide();
+            listView->setRootIndex( iconView->rootIndex() );
+        }
+        locationBar->setIndex( listView->rootIndex() );
+        listView->show();
+        currentView = listView;
+        viewActions[i_view]->setChecked( true );
         break;
     }
     default:;
@@ -380,6 +424,8 @@ void StandardPLPanel::cycleViews()
     if( currentView == iconView )
         showView( TREE_VIEW );
     else if( currentView == treeView )
+        showView( LIST_VIEW );
+    else if( currentView == listView )
         showView( ICON_VIEW );
     else
         assert( 0 );
@@ -395,8 +441,8 @@ void StandardPLPanel::activate( const QModelIndex &index )
 {
     if( model->hasChildren( index ) )
     {
-        if( currentView == iconView ) {
-            iconView->setRootIndex( index );
+        if( currentView == iconView || currentView == listView ) {
+            currentView->setRootIndex( index );
             locationBar->setIndex( index );
         }
     }
@@ -429,8 +475,8 @@ void StandardPLPanel::browseInto( input_item_t *p_input )
 
     playlist_Unlock( THEPL );
 
-    if( currentView == iconView ) {
-        iconView->setRootIndex( index );
+    if( currentView == iconView || currentView == listView ) {
+        currentView->setRootIndex( index );
         locationBar->setIndex( index );
     }
     else

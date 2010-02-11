@@ -339,7 +339,12 @@ QVariant PLModel::data( const QModelIndex &index, int role ) const
             QFont f; f.setBold( true ); return QVariant( f );
         }
     }
+    else if( role == Qt::BackgroundRole && isCurrent( index ) )
+    {
+        return QVariant( QBrush( Qt::gray ) );
+    }
     else if( role == IsCurrentRole ) return QVariant( isCurrent( index ) );
+
     return QVariant();
 }
 
@@ -532,7 +537,7 @@ PLItem * PLModel::findInner( PLItem *root, int i_id, bool b_input )
 #undef CACHE
 #undef ICACHE
 
-int PLModel::columnToMeta( int _column ) const
+int PLModel::columnToMeta( int _column )
 {
     int meta = 1;
     int column = 0;
@@ -546,7 +551,7 @@ int PLModel::columnToMeta( int _column ) const
     return meta;
 }
 
-int PLModel::columnFromMeta( int meta_col ) const
+int PLModel::columnFromMeta( int meta_col )
 {
     int meta = 1;
     int column = 0;
