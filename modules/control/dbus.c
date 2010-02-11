@@ -112,6 +112,7 @@ struct intf_sys_t
     bool            b_dead;
     vlc_array_t    *p_events;
     vlc_mutex_t     lock;
+    input_thread_t *p_input;
 };
 
 typedef struct
@@ -704,6 +705,7 @@ static int Open( vlc_object_t *p_this )
     p_sys->b_meta_read = false;
     p_sys->i_caps = CAPS_NONE;
     p_sys->b_dead = false;
+    p_sys->p_input = NULL;
 
     dbus_error_init( &error );
 
@@ -770,7 +772,6 @@ static void Close   ( vlc_object_t *p_this )
     intf_thread_t   *p_intf     = (intf_thread_t*) p_this;
     intf_sys_t      *p_sys      = p_intf->p_sys;
     playlist_t      *p_playlist = p_sys->p_playlist;
-    input_thread_t  *p_input;
 
     var_DelCallback( p_playlist, "item-current", AllCallback, p_intf );
     var_DelCallback( p_playlist, "intf-change", AllCallback, p_intf );
@@ -780,14 +781,12 @@ static void Close   ( vlc_object_t *p_this )
     var_DelCallback( p_playlist, "repeat", AllCallback, p_intf );
     var_DelCallback( p_playlist, "loop", AllCallback, p_intf );
 
-#if 0
-    p_input = ???;
-    if ( p_input )
+    if( p_sys->p_input )
     {
-        var_DelCallback( p_input, "state", AllCallback, p_intf );
-        vlc_object_release( p_input );
+        var_DelCallback( p_sys->p_input, "state", AllCallback, p_intf );
+        vlc_object_release( p_sys->p_input );
     }
-#endif
+
     dbus_connection_unref( p_sys->p_conn );
 
     // Free the events array
@@ -1065,6 +1064,13 @@ static int TrackChange( intf_thread_t *p_intf )
     if( p_intf->p_sys->b_dead )
         return VLC_SUCCESS;
 
+    if( p_sys->p_input )
+    {
+        var_DelCallback( p_sys->p_input, "state", AllCallback, p_intf );
+        vlc_object_release( p_sys->p_input );
+        p_sys->p_input = NULL;
+    }
+
     p_sys->b_meta_read = false;
 
     p_input = playlist_CurrentInput( p_playlist );
@@ -1086,9 +1092,9 @@ static int TrackChange( intf_thread_t *p_intf )
         TrackChangeSignal( p_sys->p_conn, p_item );
     }
 
-#if 0
+    p_sys->p_input = p_input;
     var_AddCallback( p_input, "state", AllCallback, p_intf );
-#endif
+
     return VLC_SUCCESS;
 }
 
