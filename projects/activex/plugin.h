@@ -238,6 +238,30 @@ public:
     void fireOnPauseEvent(void);
     void fireOnStopEvent(void);
 
+    // async events;
+    void fireOnIdleEvent();
+    void fireOnOpeningEvent();
+    void fireOnBufferingEvent();
+    void fireOnPlayingEvent();
+    void fireOnPausedEvent();
+    void fireOnErrorEvent();
+    void fireOnEndedEvent();
+    void fireOnStoppedEvent();
+    void fireOnForwardEvent();
+    void fireOnBackwardEvent();
+
+    void fireOnTimeChangedEvent(long time);
+    void fireOnPositionChangedEvent(long position);
+    void fireOnSeekableChangedEvent(VARIANT_BOOL seekable);
+    void fireOnPausableChangedEvent(VARIANT_BOOL pausable);
+
+    void fireOnMouseButtonEvent(VARIANT_BOOL btn_right, VARIANT_BOOL btn_center,
+                VARIANT_BOOL btn_left, VARIANT_BOOL btn_wheel_up,
+                VARIANT_BOOL bnt_wheel_down);
+    void fireOnMouseMovedEvent(long x, long y);
+    void fireOnMouseClickedEvent(VARIANT_BOOL clicked);
+    void fireOnMouseObjectEvent(VARIANT_BOOL moved);
+
     // controlling IUnknown interface
     LPUNKNOWN pUnkOuter;
 
@@ -316,6 +340,8 @@ private:
     void initVLC();
     bool playlist_select(int i);
     void set_player_window();
+    void player_register_events();
+    void player_unregister_events();
 
     //implemented interfaces
     class VLCOleObject *vlcOleObject;
