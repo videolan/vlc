@@ -105,6 +105,16 @@ static int InputEvent( vlc_object_t *p_this, char const *psz_cmd,
         }
         vlm_SendEventMediaInstanceState( p_vlm, p_media->cfg.id, p_media->cfg.psz_name, psz_instance_name, var_GetInteger( p_input, "state" ) );
 
+        // We have ourselves been triggering the stop event.
+        // No need to wake up our manage thread, because
+        // we'll join it just after the Stop().
+        vlc_mutex_lock( &p_input->p->lock_control );
+        bool abort = p_input->p->b_abort;
+        vlc_mutex_unlock( &p_input->p->lock_control );
+
+        if (abort)
+            return VLC_SUCCESS;
+
         vlc_mutex_lock( &p_vlm->lock );
         vlc_cond_signal( &p_vlm->wait );
         vlc_mutex_unlock( &p_vlm->lock );
@@ -609,7 +619,7 @@ static int vlm_OnMediaUpdate( vlm_t *p_vlm, vlm_media_sys_t *p_media )
                 var_DelCallback( p_input, "intf-event", InputEventPreparse, &sem_preparse );
                 vlc_sem_destroy( &sem_preparse );
 
-                input_Stop( p_input, false );
+                input_Stop( p_input, true );
                 vlc_thread_join( p_input );
                 vlc_object_release( p_input );
             }
@@ -938,7 +948,7 @@ static int vlm_ControlMediaInstanceStart( vlm_t *p_vlm, int64_t id, const char *
             return VLC_SUCCESS;
         }
 
-        input_Stop( p_input, !p_input->b_eof && !p_input->b_error );
+        input_Stop( p_input, true );
         vlc_thread_join( p_input );
 
         p_instance->p_input_resource = input_DetachResource( p_input );
