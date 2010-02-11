@@ -190,11 +190,7 @@ static void *Run( void *data )
             !S_ISDIR( st.st_mode ) )
             continue;
 
-        // TODO:  make_URI is only for file://, what about dir:// ?
-        // char* psz_uri = make_URI( psz_dir );
-        char* psz_uri;
-        if( asprintf( &psz_uri, "dir://%s",  psz_dir ) == -1 )
-            continue;
+        char* psz_uri = make_URI( psz_dir );
 
         input_item_t* p_root = input_item_New( p_sd, psz_uri, NULL );
         if( p_sys->i_type == Picture )
