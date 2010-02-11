@@ -1462,7 +1462,7 @@ STDMETHODIMP VLCControl2::get_BackColor(OLE_COLOR *backcolor)
         return E_POINTER;
 
     *backcolor  = _p_instance->getBackColor();
-    return S_OKs;
+    return S_OK;
 };
 
 STDMETHODIMP VLCControl2::put_BackColor(OLE_COLOR backcolor)
