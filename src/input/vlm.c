@@ -156,7 +156,6 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
     }
 
     vlc_mutex_init( &p_vlm->lock );
-    vlc_mutex_init( &p_vlm->lock );
     vlc_cond_init_daytime( &p_vlm->wait );
     p_vlm->i_id = 1;
     TAB_INIT( p_vlm->i_media, p_vlm->media );
@@ -169,7 +168,6 @@ vlm_t *vlm_New ( vlc_object_t *p_this )
     if( vlc_clone( &p_vlm->thread, Manage, p_vlm, VLC_THREAD_PRIORITY_LOW ) )
     {
         vlc_cond_destroy( &p_vlm->wait );
-        vlc_mutex_destroy( &p_vlm->lock );
         vlc_mutex_destroy( &p_vlm->lock );
         vlc_object_release( p_vlm );
         vlc_mutex_unlock( &vlm_mutex );
@@ -238,7 +236,6 @@ static void vlm_Destructor( vlm_t *p_vlm )
     vlc_join( p_vlm->thread, NULL );
 
     vlc_cond_destroy( &p_vlm->wait );
-    vlc_mutex_destroy( &p_vlm->lock );
     vlc_mutex_destroy( &p_vlm->lock );
 }
 
