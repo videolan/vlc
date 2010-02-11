@@ -531,10 +531,7 @@ LibvlcInputNPObject::setProperty(int index, const NPVariant &value)
         VlcPlugin* p_plugin = getPrivate<VlcPlugin>();
         libvlc_media_player_t *p_md = p_plugin->getMD();
         if( !p_md )
-        {
-            NPN_SetException(this, libvlc_errmsg() );
-            return INVOKERESULT_GENERIC_ERROR;
-        }
+            RETURN_ON_ERROR;
 
         switch( index )
         {
