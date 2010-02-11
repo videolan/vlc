@@ -1,0 +1,16 @@
+[submodule "bindings/libvlcpp"]
+	path = bindings/libvlcpp
+	url = git://git.videolan.org/vlc/bindings/libvlcpp.git
+#	url = git@git.videolan.org:vlc/bindings/libvlcpp.git
+[submodule "bindings/jvlc"]
+	path = bindings/jvlc
+	url = git://git.videolan.org/vlc/bindings/jvlc.git
+#	url = git@git.videolan.org:vlc/bindings/jvlc.git
+[submodule "bindings/python"]
+	path = bindings/python
+	url = git://git.videolan.org/vlc/bindings/python.git
+#	url = git@git.videolan.org:vlc/bindings/python.git
+[submodule "bindings/phonon"]
+	path = bindings/phonon
+	url = git://git.videolan.org/vlc/bindings/phonon.git
+#	url = git@git.videolan.org:vlc/bindings/phonon.git
