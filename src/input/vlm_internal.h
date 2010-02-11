@@ -29,7 +29,7 @@
 #define _VLM_INTERNAL_H 1
 
 #include <vlc_vlm.h>
-#include "input_internal.h"
+#include "input_interface.h"
 
 /* Private */
 typedef struct
