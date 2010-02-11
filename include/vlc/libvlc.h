@@ -122,7 +122,7 @@ const char *libvlc_printerr (const char *fmt, ...);
  * \return the libvlc instance or NULL in case of error
  */
 VLC_PUBLIC_API libvlc_instance_t *
-libvlc_new( int , const char *const * );
+libvlc_new( int argc , const char *const *argv );
 
 /**
  * Decrement the reference count of a libvlc instance, and destroy it
@@ -130,7 +130,7 @@ libvlc_new( int , const char *const * );
  *
  * \param p_instance the instance to destroy
  */
-VLC_PUBLIC_API void libvlc_release( libvlc_instance_t * );
+VLC_PUBLIC_API void libvlc_release( libvlc_instance_t *p_instance );
 
 /**
  * Increments the reference count of a libvlc instance.
@@ -138,7 +138,7 @@ VLC_PUBLIC_API void libvlc_release( libvlc_instance_t * );
  *
  * \param p_instance the instance to reference
  */
-VLC_PUBLIC_API void libvlc_retain( libvlc_instance_t * );
+VLC_PUBLIC_API void libvlc_retain( libvlc_instance_t *p_instance );
 
 /**
  * Try to start a user interface for the libvlc instance.
@@ -257,7 +257,7 @@ VLC_PUBLIC_API void libvlc_event_detach( libvlc_event_manager_t *p_event_manager
 /**
  * Get an event's type name.
  *
- * \param i_event_type the desired event
+ * \param event_type the desired event
  */
 VLC_PUBLIC_API const char * libvlc_event_type_name( libvlc_event_type_t event_type );
 
@@ -295,7 +295,7 @@ VLC_PUBLIC_API void libvlc_set_log_verbosity( libvlc_instance_t *p_instance, uns
  * \param p_instance libvlc instance
  * \return log message instance or NULL on error
  */
-VLC_PUBLIC_API libvlc_log_t *libvlc_log_open( libvlc_instance_t *);
+VLC_PUBLIC_API libvlc_log_t *libvlc_log_open( libvlc_instance_t *p_instance );
 
 /**
  * Close a VLC message log instance.
@@ -328,7 +328,7 @@ VLC_PUBLIC_API void libvlc_log_clear( libvlc_log_t *p_log );
  * \param p_log libvlc log instance
  * \return log iterator object or NULL on error
  */
-VLC_PUBLIC_API libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t * );
+VLC_PUBLIC_API libvlc_log_iterator_t *libvlc_log_get_iterator( const libvlc_log_t *p_log );
 
 /**
  * Release a previoulsy allocated iterator.

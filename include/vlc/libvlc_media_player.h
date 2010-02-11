@@ -545,7 +545,7 @@ void libvlc_video_set_key_input( libvlc_media_player_t *p_mi, unsigned on );
  * handled. This is needed for DVD menus to work, as well as a few video
  * filters such as "puzzle".
  *
- * \note See also \func libvlc_video_set_key_input().
+ * \note See also libvlc_video_set_key_input().
  *
  * \warning This function is only implemented for X11 at the moment.
  *

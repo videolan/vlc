@@ -68,7 +68,7 @@ VLC_PUBLIC_API void   libvlc_media_discoverer_release( libvlc_media_discoverer_t
 /**
  * Get media service discover object its localized name.
  *
- * \param media discover object
+ * \param p_mdis media discover object
  * \return localized name
  */
 VLC_PUBLIC_API char * libvlc_media_discoverer_localized_name( libvlc_media_discoverer_t * p_mdis );

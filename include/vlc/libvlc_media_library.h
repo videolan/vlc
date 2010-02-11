@@ -49,11 +49,11 @@ typedef struct libvlc_media_library_t libvlc_media_library_t;
 /**
  * Create an new Media Library object
  *
- * \param p_libvlc_instance the libvlc instance
+ * \param p_instance the libvlc instance
  * \return a new object or NULL on error
  */
 VLC_PUBLIC_API libvlc_media_library_t *
-    libvlc_media_library_new( libvlc_instance_t * p_inst );
+    libvlc_media_library_new( libvlc_instance_t * p_instance );
 
 /**
  * Release media library object. This functions decrements the

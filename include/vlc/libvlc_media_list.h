@@ -47,11 +47,11 @@ typedef struct libvlc_media_list_t libvlc_media_list_t;
 /**
  * Create an empty media list.
  *
- * \param p_libvlc libvlc instance
+ * \param p_instance libvlc instance
  * \return empty media list, or NULL on error
  */
 VLC_PUBLIC_API libvlc_media_list_t *
-    libvlc_media_list_new( libvlc_instance_t * );
+    libvlc_media_list_new( libvlc_instance_t *p_instance );
 
 /**
  * Release media list created with libvlc_media_list_new().
@@ -59,7 +59,7 @@ VLC_PUBLIC_API libvlc_media_list_t *
  * \param p_ml a media list created with libvlc_media_list_new()
  */
 VLC_PUBLIC_API void
-    libvlc_media_list_release( libvlc_media_list_t * );
+    libvlc_media_list_release( libvlc_media_list_t *p_ml );
 
 /**
  * Retain reference to a media list
@@ -67,10 +67,10 @@ VLC_PUBLIC_API void
  * \param p_ml a media list created with libvlc_media_list_new()
  */
 VLC_PUBLIC_API void
-    libvlc_media_list_retain( libvlc_media_list_t * );
+    libvlc_media_list_retain( libvlc_media_list_t *p_ml );
 
 VLC_DEPRECATED_API int
-    libvlc_media_list_add_file_content( libvlc_media_list_t * p_mlist,
+    libvlc_media_list_add_file_content( libvlc_media_list_t * p_ml,
                                         const char * psz_uri );
 
 /**
@@ -79,7 +79,7 @@ VLC_DEPRECATED_API int
  * The libvlc_media_list_lock should NOT be held upon entering this function.
  *
  * \param p_ml a media list instance
- * \param p_mi media instance to add
+ * \param p_md media instance to add
  */
 VLC_PUBLIC_API void
 libvlc_media_list_set_media( libvlc_media_list_t *p_ml, libvlc_media_t *p_md );
@@ -100,24 +100,24 @@ VLC_PUBLIC_API libvlc_media_t *
  * The libvlc_media_list_lock should be held upon entering this function.
  *
  * \param p_ml a media list instance
- * \param p_mi a media instance
+ * \param p_md a media instance
  * \return 0 on success, -1 if the media list is read-only
  */
 VLC_PUBLIC_API int
-libvlc_media_list_add_media( libvlc_media_list_t *, libvlc_media_t * );
+libvlc_media_list_add_media( libvlc_media_list_t *p_ml, libvlc_media_t *p_md );
 
 /**
  * Insert media instance in media list on a position
  * The libvlc_media_list_lock should be held upon entering this function.
  *
  * \param p_ml a media list instance
- * \param p_mi a media instance
+ * \param p_md a media instance
  * \param i_pos position in array where to insert
  * \return 0 on success, -1 if the media list si read-only
  */
 VLC_PUBLIC_API int
-libvlc_media_list_insert_media( libvlc_media_list_t *,
-                                libvlc_media_t *, int );
+libvlc_media_list_insert_media( libvlc_media_list_t *p_ml,
+                                libvlc_media_t *p_md, int i_pos );
 
 /**
  * Remove media instance from media list on a position
@@ -128,7 +128,7 @@ libvlc_media_list_insert_media( libvlc_media_list_t *,
  * \return 0 on success, -1 if the list is read-only or the item was not found
  */
 VLC_PUBLIC_API int
-libvlc_media_list_remove_index( libvlc_media_list_t *, int );
+libvlc_media_list_remove_index( libvlc_media_list_t *p_ml, int i_pos );
 
 /**
  * Get count on media list items
@@ -151,19 +151,19 @@ VLC_PUBLIC_API int
  * on the media.
  */
 VLC_PUBLIC_API libvlc_media_t *
-    libvlc_media_list_item_at_index( libvlc_media_list_t *, int );
+    libvlc_media_list_item_at_index( libvlc_media_list_t *p_ml, int i_pos );
 /**
  * Find index position of List media instance in media list.
  * Warning: the function will return the first matched position.
  * The libvlc_media_list_lock should be held upon entering this function.
  *
  * \param p_ml a media list instance
- * \param p_mi media list instance
+ * \param p_md media list instance
  * \return position of media instance
  */
 VLC_PUBLIC_API int
     libvlc_media_list_index_of_item( libvlc_media_list_t *p_ml,
-                                     libvlc_media_t *p_mi );
+                                     libvlc_media_t *p_md );
 
 /**
  * This indicates if this media list is read-only from a user point of view
@@ -172,7 +172,7 @@ VLC_PUBLIC_API int
  * \return 0 on readonly, 1 on readwrite
  */
 VLC_PUBLIC_API int
-    libvlc_media_list_is_readonly( libvlc_media_list_t * p_mlist );
+    libvlc_media_list_is_readonly( libvlc_media_list_t * p_ml );
 
 /**
  * Get lock on media list items
@@ -180,7 +180,7 @@ VLC_PUBLIC_API int
  * \param p_ml a media list instance
  */
 VLC_PUBLIC_API void
-    libvlc_media_list_lock( libvlc_media_list_t * );
+    libvlc_media_list_lock( libvlc_media_list_t *p_ml );
 
 /**
  * Release lock on media list items
@@ -189,7 +189,7 @@ VLC_PUBLIC_API void
  * \param p_ml a media list instance
  */
 VLC_PUBLIC_API void
-    libvlc_media_list_unlock( libvlc_media_list_t * );
+    libvlc_media_list_unlock( libvlc_media_list_t *p_ml );
 
 /**
  * Get libvlc_event_manager from this media list instance.

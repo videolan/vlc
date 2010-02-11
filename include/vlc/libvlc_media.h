@@ -258,7 +258,7 @@ VLC_PUBLIC_API char * libvlc_media_get_mrl( libvlc_media_t * p_md );
 /**
  * Duplicate a media descriptor object.
  *
- * \param p_meta_desc a media descriptor object.
+ * \param p_md a media descriptor object.
  */
 VLC_PUBLIC_API libvlc_media_t * libvlc_media_duplicate( libvlc_media_t *p_md );
 
@@ -278,7 +278,7 @@ VLC_PUBLIC_API char * libvlc_media_get_meta( libvlc_media_t *p_md,
  *
  * \param p_md the media descriptor
  * \param e_meta the meta to write
- * \param the media's meta
+ * \param psz_value the media's meta
  */
 VLC_PUBLIC_API void libvlc_media_set_meta( libvlc_media_t *p_md,
                                            libvlc_meta_t e_meta,
