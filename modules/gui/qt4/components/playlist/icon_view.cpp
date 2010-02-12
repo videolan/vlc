@@ -35,11 +35,12 @@
 
 #include "assert.h"
 
-#define RECT_SIZE_W         100
-#define RECT_SIZE_H         105
-#define ART_SIZE            64
-#define OFFSET              (RECT_SIZE_W-64)/2
-#define ITEMS_SPACING       10
+#define RECT_SIZE_W         120
+#define RECT_SIZE_H         120
+#define ART_SIZE_W          110
+#define ART_SIZE_H          80
+//#define OFFSET              (RECT_SIZE_W-ART_SIZE_W)/2
+//#define ITEMS_SPACING       10
 #define ART_RADIUS          5
 
 QString AbstractPlViewItemDelegate::getMeta( const QModelIndex & index, int meta ) const
@@ -76,29 +77,21 @@ QPixmap AbstractPlViewItemDelegate::getArtPixmap( const QModelIndex & index, con
         }
     }
 
-    QPixmap artPix( size );
+    QPixmap artPix;
 
     QString key = artUrl + QString("%1%2").arg(size.width()).arg(size.height());
 
     if( !QPixmapCache::find( key, artPix ))
     {
-        QPixmap tmp;
-        bool cache = false;
-        if( artUrl.isEmpty() || !tmp.load( artUrl ) )
+        if( artUrl.isEmpty() || !artPix.load( artUrl ) )
         {
-            tmp = QPixmap( ":/noart64" ).scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+            artPix = QPixmap( ":/noart" ).scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
         }
         else
         {
-            tmp = tmp.scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
-            cache = true;
+            artPix = artPix.scaled( size, Qt::KeepAspectRatio, Qt::SmoothTransformation );
+            QPixmapCache::insert( key, artPix );
         }
-        artPix.fill( Qt::black );
-        QPainter p( &artPix );
-        p.drawPixmap( (size.width() - tmp.width()) / 2,
-                      (size.height() - tmp.height()) / 2,
-                      tmp );
-        if( cache ) QPixmapCache::insert( key, artPix );
     }
 
     return artPix;
@@ -109,7 +102,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QString title = getMeta( index, COLUMN_TITLE );
     QString artist = getMeta( index, COLUMN_ARTIST );
 
-    QPixmap artPix = getArtPixmap( index, QSize( ART_SIZE, ART_SIZE ) );
+    QPixmap artPix = getArtPixmap( index, QSize( ART_SIZE_W, ART_SIZE_H ) );
 
     QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem, &option,
                                           painter );
@@ -125,7 +118,9 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
        painter->restore();
     }
 
-    QRect artRect = option.rect.adjusted( OFFSET - 1, 2, - OFFSET, - OFFSET *2 );
+    QRect artRect( option.rect.x() + 5 + ( ART_SIZE_W - artPix.width() ) / 2,
+                   option.rect.y() + 5 + ( ART_SIZE_H - artPix.height() ) / 2,
+                   artPix.width(), artPix.height() );
 
     // Draw the drop shadow
     painter->save();
@@ -154,7 +149,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     painter->setFont( font );
 
     QFontMetrics fm = painter->fontMetrics();
-    QRect textRect = option.rect.adjusted( 1, ART_SIZE + 8, 0, -1 );
+    QRect textRect = option.rect.adjusted( 1, ART_SIZE_H + 10, 0, -1 );
     textRect.setHeight( fm.height() + 1 );
 
     painter->drawText( textRect,
@@ -208,16 +203,19 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     if( index.data( PLModel::IsCurrentRole ).toBool() )
         paintPlayingItemBg( painter, option );
 
-    painter->drawPixmap( option.rect.topLeft() + QPoint(3,3), artPix );
+    painter->drawPixmap( option.rect.topLeft() + QPoint(3,3)
+                         + QPoint( (LISTVIEW_ART_SIZE - artPix.width()) / 2,
+                                   (LISTVIEW_ART_SIZE - artPix.height()) / 2 ),
+                         artPix );
 
 
     int textH = option.fontMetrics.height() + 2;
-    int margin = ( option.rect.height() / 2 ) - textH;
+    int marginY = ( option.rect.height() / 2 ) - textH;
 
     QRect textRect = option.rect.adjusted( LISTVIEW_ART_SIZE + 10,
-                                           margin,
+                                           marginY,
                                            -10,
-                                           margin * -1 - ( artistAlbum.isEmpty() ? 0 : textH ) );
+                                           marginY * -1 - ( artistAlbum.isEmpty() ? 0 : textH ) );
 
     painter->save();
 
