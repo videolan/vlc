@@ -60,9 +60,6 @@ public:
 protected:
     friend class PlaylistWidget;
 
-    virtual void keyPressEvent( QKeyEvent *e );
-    virtual void wheelEvent( QWheelEvent *e );
-
     PLModel *model;
 private:
     enum {
@@ -99,6 +96,8 @@ private:
     void createTreeView();
     void createIconView();
     void createListView();
+    void wheelEvent( QWheelEvent *e );
+    bool eventFilter ( QObject * watched, QEvent * event );
 
 public slots:
     void setRoot( playlist_item_t * );

@@ -288,17 +288,25 @@ void StandardPLPanel::browseInto( )
                 QModelIndex() );
 }
 
-/* Delete and Suppr key remove the selection
-   FilterKey function and code function */
-void StandardPLPanel::keyPressEvent( QKeyEvent *e )
+void StandardPLPanel::wheelEvent( QWheelEvent *e )
 {
-    switch( e->key() )
+    // Accept this event in order to prevent unwanted volume up/down changes
+    e->accept();
+}
+
+bool StandardPLPanel::eventFilter ( QObject * watched, QEvent * event )
+{
+    if (event->type() == QEvent::KeyPress)
     {
-    case Qt::Key_Back:
-    case Qt::Key_Delete:
-        deleteSelection();
-        break;
+        QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
+        if( keyEvent->key() == Qt::Key_Delete ||
+            keyEvent->key() == Qt::Key_Back )
+        {
+            deleteSelection();
+            return true;
+        }
     }
+    return false;
 }
 
 void StandardPLPanel::deleteSelection()
@@ -316,7 +324,7 @@ void StandardPLPanel::createIconView()
              this, popupPlView( const QPoint & ) );
     CONNECT( iconView, activated( const QModelIndex & ),
              this, activate( const QModelIndex & ) );
-
+    iconView->installEventFilter( this );
     layout->addWidget( iconView, 1, 0, 1, -1 );
 }
 
@@ -328,7 +336,7 @@ void StandardPLPanel::createListView()
              this, popupPlView( const QPoint & ) );
     CONNECT( listView, activated( const QModelIndex & ),
              this, activate( const QModelIndex & ) );
-
+    listView->installEventFilter( this );
     layout->addWidget( listView, 1, 0, 1, -1 );
 }
 
@@ -380,6 +388,7 @@ void StandardPLPanel::createTreeView()
              this, popupSelectColumn( QPoint ) );
     CONNECT( treeView, customContextMenuRequested( const QPoint & ),
              this, popupPlView( const QPoint & ) );
+    treeView->installEventFilter( this );
 
     /* SignalMapper for columns */
     selectColumnsSigMapper = new QSignalMapper( this );
@@ -445,12 +454,6 @@ void StandardPLPanel::cycleViews()
         showView( ICON_VIEW );
     else
         assert( 0 );
-}
-
-void StandardPLPanel::wheelEvent( QWheelEvent *e )
-{
-    // Accept this event in order to prevent unwanted volume up/down changes
-    e->accept();
 }
 
 void StandardPLPanel::activate( const QModelIndex &index )
