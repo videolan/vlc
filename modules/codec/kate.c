@@ -824,7 +824,6 @@ static void SubpictureReleaseRegions( subpicture_t *p_subpic )
     }
 }
 
-#if 0
 /*
  * We get premultiplied alpha, but VLC doesn't expect this, so we demultiply
  * alpha to avoid double multiply (and thus thinner text than we should)).
@@ -854,14 +853,14 @@ static void PostprocessTigerImage( plane_t *p_plane, unsigned int i_width )
             {
 #ifdef WORDS_BIGENDIAN
                 uint8_t tmp = p_pixel[2];
-                p_pixel[0] = p_pixel[3] * 255 / a;
+                p_pixel[0] = clip_uint8_vlc((p_pixel[3] * 255 + a / 2) / a);
                 p_pixel[3] = a;
-                p_pixel[2] = p_pixel[1] * 255 / a;
-                p_pixel[1] = tmp * 255 / a;
+                p_pixel[2] = clip_uint8_vlc((p_pixel[1] * 255 + a / 2) / a);
+                p_pixel[1] = clip_uint8_vlc((tmp * 255 + a / 2) / a);
 #else
-                p_pixel[0] = p_pixel[0] * 255 / a;
-                p_pixel[1] = p_pixel[1] * 255 / a;
-                p_pixel[2] = p_pixel[2] * 255 / a;
+                p_pixel[0] = clip_uint8_vlc((p_pixel[0] * 255 + a / 2) / a);
+                p_pixel[1] = clip_uint8_vlc((p_pixel[1] * 255 + a / 2) / a);
+                p_pixel[2] = clip_uint8_vlc((p_pixel[2] * 255 + a / 2) / a);
 #endif
             }
             else
@@ -875,7 +874,6 @@ static void PostprocessTigerImage( plane_t *p_plane, unsigned int i_width )
     }
     PROFILE_STOP( tiger_renderer_postprocess );
 }
-#endif
 
 /* Tiger renders can end up looking a bit crap since they get overlaid on top of
    a subsampled YUV image, so there can be a fair amount of chroma bleeding.
@@ -977,9 +975,7 @@ static void TigerUpdateRegions( spu_t *p_spu, subpicture_t *p_subpic, const vide
     }
     PROFILE_STOP( tiger_renderer_render );
 
-#if 0
     PostprocessTigerImage( p_plane, fmt.i_width );
-#endif
     p_subpic->p_region = p_r;
     p_sys->b_dirty = false;
 
