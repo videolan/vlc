@@ -96,7 +96,7 @@ public:
     /* Actions */
     void popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
     void doDelete( QModelIndexList selected );
-    void search( const QString& search_text );
+    void search( const QString& search_text, const QModelIndex & root, bool b_recursive );
     void sort( int column, Qt::SortOrder order );
     void sort( int i_root_id, int column, Qt::SortOrder order );
     void rebuild();

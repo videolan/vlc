@@ -837,16 +837,32 @@ void PLModel::sort( int i_root_id, int column, Qt::SortOrder order )
     PL_UNLOCK;
 }
 
-void PLModel::search( const QString& search_text )
+void PLModel::search( const QString& search_text, const QModelIndex & idx, bool b_recursive )
 {
     /** \todo Fire the search with a small delay ? */
     PL_LOCK;
     {
         playlist_item_t *p_root = playlist_ItemGetById( p_playlist,
-                                                        rootItem->i_id );
+                                                        itemId( idx ) );
         assert( p_root );
         const char *psz_name = search_text.toUtf8().data();
-        playlist_LiveSearchUpdate( p_playlist , p_root, psz_name );
+        playlist_LiveSearchUpdate( p_playlist , p_root, psz_name, b_recursive );
+
+        if( idx.isValid() )
+        {
+            PLItem *searchRoot = getItem( idx );
+
+            beginRemoveRows( idx, 0, searchRoot->children.size() - 1 );
+            searchRoot->removeChildren();
+            endRemoveRows( );
+
+            beginInsertRows( idx, 0, searchRoot->children.size() - 1 );
+            updateChildren( searchRoot );
+            endInsertRows();
+
+            PL_UNLOCK;
+            return;
+        }
     }
     PL_UNLOCK;
     rebuild();

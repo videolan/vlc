@@ -72,33 +72,37 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     model = new PLModel( p_playlist, p_intf, p_root, this );
     currentRootId = -1;
-    last_activated_id = -1;
+    currentRootIndexId = -1;
+    lastActivatedId = -1;
 
     locationBar = new LocationBar( model );
-    layout->addWidget( locationBar, 0, 0 );
-    CONNECT( model, rootChanged(), locationBar, setRootIndex() );
+    locationBar->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
+    layout->addWidget( locationBar, 0, 1 );
+    layout->setColumnStretch( 1, 100 );
+    CONNECT( locationBar, invoked( const QModelIndex & ),
+             this, browseInto( const QModelIndex & ) );
 
-    /* A Spacer and the search possibilities */
-    layout->setColumnStretch( 1, 10 );
+    layout->setColumnStretch( 2, 1 );
 
-    SearchLineEdit *search = new SearchLineEdit( this );
-    search->setMaximumWidth( 300 );
-    layout->addWidget( search, 0, 4 );
-    CONNECT( search, textChanged( const QString& ),
+    searchEdit = new SearchLineEdit( this );
+    searchEdit->setMaximumWidth( 250 );
+    searchEdit->setMinimumWidth( 80 );
+    layout->addWidget( searchEdit, 0, 3 );
+    CONNECT( searchEdit, textChanged( const QString& ),
              this, search( const QString& ) );
-    layout->setColumnStretch( 4, 10 );
+    layout->setColumnStretch( 3, 50 );
 
     /* Add item to the playlist button */
     addButton = new QToolButton;
     addButton->setIcon( QIcon( ":/buttons/playlist/playlist_add" ) );
     addButton->setMaximumWidth( 30 );
     BUTTONACT( addButton, popupAdd() );
-    layout->addWidget( addButton, 0, 3 );
+    layout->addWidget( addButton, 0, 0 );
 
     /* Button to switch views */
     QToolButton *viewButton = new QToolButton( this );
     viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogDetailedView ) );
-    layout->addWidget( viewButton, 0, 2 );
+    layout->addWidget( viewButton, 0, 4 );
 
     /* View selection menu */
     viewSelectionMapper = new QSignalMapper( this );
@@ -168,7 +172,7 @@ void StandardPLPanel::handleRootChange()
     PLItem *root = model->getItem( QModelIndex() );
     currentRootId = root->id();
 
-    locationBar->setIndex( QModelIndex() );
+    browseInto();
 
     /* enable/disable adding */
     if( currentRootId == THEPL->p_playing->i_id )
@@ -251,7 +255,10 @@ void StandardPLPanel::toggleColumnShown( int i )
 /* Search in the playlist */
 void StandardPLPanel::search( const QString& searchText )
 {
-    model->search( searchText );
+    bool flat = currentView == iconView || currentView == listView;
+    model->search( searchText,
+                   flat ? currentView->rootIndex() : QModelIndex(),
+                   !flat );
 }
 
 /* Set the root of the new Playlist */
@@ -259,6 +266,26 @@ void StandardPLPanel::search( const QString& searchText )
 void StandardPLPanel::setRoot( playlist_item_t *p_item )
 {
     model->rebuild( p_item );
+}
+
+void StandardPLPanel::browseInto( const QModelIndex &index )
+{
+    if( currentView == iconView || currentView == listView )
+    {
+        currentRootIndexId = model->itemId( index );;
+        currentView->setRootIndex( index );
+    }
+
+    locationBar->setIndex( index );
+    model->search( QString(), index, false );
+    searchEdit->clear();
+}
+
+void StandardPLPanel::browseInto( )
+{
+    browseInto( currentRootIndexId != -1 && currentView != treeView ?
+                model->index( currentRootIndexId, 0 ) :
+                QModelIndex() );
 }
 
 /* Delete and Suppr key remove the selection
@@ -289,8 +316,6 @@ void StandardPLPanel::createIconView()
              this, popupPlView( const QPoint & ) );
     CONNECT( iconView, activated( const QModelIndex & ),
              this, activate( const QModelIndex & ) );
-    CONNECT( locationBar, invoked( const QModelIndex & ),
-             iconView, setRootIndex( const QModelIndex & ) );
 
     layout->addWidget( iconView, 1, 0, 1, -1 );
 }
@@ -303,8 +328,6 @@ void StandardPLPanel::createListView()
              this, popupPlView( const QPoint & ) );
     CONNECT( listView, activated( const QModelIndex & ),
              this, activate( const QModelIndex & ) );
-    CONNECT( locationBar, invoked( const QModelIndex & ),
-             listView, setRootIndex( const QModelIndex & ) );
 
     layout->addWidget( listView, 1, 0, 1, -1 );
 }
@@ -375,7 +398,6 @@ void StandardPLPanel::showView( int i_view )
     {
         if( treeView == NULL )
             createTreeView();
-        locationBar->setIndex( treeView->rootIndex() );
         if( iconView ) iconView->hide();
         if( listView ) listView->hide();
         treeView->show();
@@ -389,11 +411,7 @@ void StandardPLPanel::showView( int i_view )
             createIconView();
 
         if( treeView ) treeView->hide();
-        if( listView ) {
-            listView->hide();
-            iconView->setRootIndex( listView->rootIndex() );
-        }
-        locationBar->setIndex( iconView->rootIndex() );
+        if( listView ) listView->hide();
         iconView->show();
         currentView = iconView;
         viewActions[i_view]->setChecked( true );
@@ -405,18 +423,16 @@ void StandardPLPanel::showView( int i_view )
             createListView();
 
         if( treeView ) treeView->hide();
-        if( iconView ) {
-            iconView->hide();
-            listView->setRootIndex( iconView->rootIndex() );
-        }
-        locationBar->setIndex( listView->rootIndex() );
+        if( iconView ) iconView->hide();
         listView->show();
         currentView = listView;
         viewActions[i_view]->setChecked( true );
         break;
     }
-    default:;
+    default: return;
     }
+
+    browseInto();
 }
 
 void StandardPLPanel::cycleViews()
@@ -441,17 +457,15 @@ void StandardPLPanel::activate( const QModelIndex &index )
 {
     if( model->hasChildren( index ) )
     {
-        if( currentView == iconView || currentView == listView ) {
-            currentView->setRootIndex( index );
-            locationBar->setIndex( index );
-        }
+        if( currentView != treeView )
+            browseInto( index );
     }
     else
     {
         playlist_Lock( THEPL );
         playlist_item_t *p_item = playlist_ItemGetById( THEPL, model->itemId( index ) );
         p_item->i_flags |= PLAYLIST_SUBITEM_STOP_FLAG;
-        last_activated_id = p_item->p_input->i_id;
+        lastActivatedId = p_item->p_input->i_id;
         playlist_Unlock( THEPL );
         model->activateItem( index );
     }
@@ -460,7 +474,7 @@ void StandardPLPanel::activate( const QModelIndex &index )
 void StandardPLPanel::browseInto( input_item_t *p_input )
 {
 
-    if( p_input->i_id != last_activated_id ) return;
+    if( p_input->i_id != lastActivatedId ) return;
 
     playlist_Lock( THEPL );
 
@@ -475,14 +489,12 @@ void StandardPLPanel::browseInto( input_item_t *p_input )
 
     playlist_Unlock( THEPL );
 
-    if( currentView == iconView || currentView == listView ) {
-        currentView->setRootIndex( index );
-        locationBar->setIndex( index );
-    }
-    else
+    if( currentView == treeView )
         treeView->setExpanded( index, true );
+    else
+        browseInto( index );
 
-    last_activated_id = -1;
+    lastActivatedId = -1;
 
 
 }
@@ -513,7 +525,7 @@ void LocationBar::setIndex( const QModelIndex &index )
         QString text = qfu(fb_name);
         free(fb_name);
         QAbstractButton *btn = new LocationButton( text, bold, i.isValid() );
-        if( bold ) btn->setSizePolicy( QSizePolicy::Expanding, QSizePolicy::Preferred );
+        btn->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
         box->insertWidget( 0, btn, bold ? 1 : 0 );
         buttons.append( btn );
 
@@ -535,7 +547,6 @@ void LocationBar::setRootIndex()
 void LocationBar::invoke( int i_id )
 {
     QModelIndex index = model->index( i_id, 0 );
-    setIndex( index );
     emit invoked ( index );
 }
 

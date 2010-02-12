@@ -80,6 +80,7 @@ private:
     QToolButton *addButton;
     QGridLayout *layout;
     LocationBar *locationBar;
+    SearchLineEdit *searchEdit;
 
     QTreeView   *treeView;
     PlIconView  *iconView;
@@ -92,14 +93,17 @@ private:
     QSignalMapper *selectColumnsSigMapper;
     QSignalMapper *viewSelectionMapper;
 
-    int last_activated_id;
+    int lastActivatedId;
+    int currentRootIndexId;
 
     void createTreeView();
     void createIconView();
     void createListView();
 
 public slots:
-    virtual void setRoot( playlist_item_t * );
+    void setRoot( playlist_item_t * );
+    void browseInto( const QModelIndex& );
+    void browseInto( );
 private slots:
     void deleteSelection();
     void handleExpansion( const QModelIndex& );
