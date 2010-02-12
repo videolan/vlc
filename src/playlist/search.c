@@ -107,7 +107,7 @@ static void playlist_LiveSearchClean( playlist_item_t *p_root )
  * @return true if an item match
  */
 static bool playlist_LiveSearchUpdateInternal( playlist_item_t *p_root,
-                                               const char *psz_string )
+                                               const char *psz_string, bool b_recursive )
 {
     int i;
     bool b_match = false;
@@ -116,8 +116,8 @@ static bool playlist_LiveSearchUpdateInternal( playlist_item_t *p_root,
         bool b_enable = false;
         playlist_item_t *p_item = p_root->pp_children[i];
         // Go recurssively if their is some children
-        if( p_item->i_children >= 0 &&
-            playlist_LiveSearchUpdateInternal( p_item, psz_string ) )
+        if( b_recursive && p_item->i_children >= 0 &&
+            playlist_LiveSearchUpdateInternal( p_item, psz_string, true ) )
         {
             b_enable = true;
         }
@@ -163,12 +163,12 @@ static bool playlist_LiveSearchUpdateInternal( playlist_item_t *p_root,
  * @return VLC_SUCCESS
  */
 int playlist_LiveSearchUpdate( playlist_t *p_playlist, playlist_item_t *p_root,
-                               const char *psz_string )
+                               const char *psz_string, bool b_recursive )
 {
     PL_ASSERT_LOCKED;
     pl_priv(p_playlist)->b_reset_currently_playing = true;
     if( *psz_string )
-        playlist_LiveSearchUpdateInternal( p_root, psz_string );
+        playlist_LiveSearchUpdateInternal( p_root, psz_string, b_recursive );
     else
         playlist_LiveSearchClean( p_root );
     vlc_cond_signal( &pl_priv(p_playlist)->signal );
