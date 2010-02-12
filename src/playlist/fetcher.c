@@ -234,7 +234,11 @@ static int FindArt( playlist_fetcher_t *p_fetcher, input_item_t *p_item )
         if( p_module )
         {
             module_unneed( p_finder, p_module );
-            i_ret = 1;
+            /* Try immediately if found in cache by download URL */
+            if( !playlist_FindArtInCache( p_item ) )
+                i_ret = 0;
+            else
+                i_ret = 1;
         }
         vlc_object_release( p_finder );
     }

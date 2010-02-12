@@ -111,10 +111,9 @@ static char *ArtCachePath( input_item_t *p_item )
 
     psz_artist = vlc_meta_Get( p_item->p_meta, vlc_meta_Artist );
     psz_album = vlc_meta_Get( p_item->p_meta, vlc_meta_Album );
-    psz_title = vlc_meta_Get( p_item->p_meta, vlc_meta_Title );
-
-    if( !psz_title )
-        psz_title = p_item->psz_name;
+    /* cache by art URL instead of title - performs better in many cases
+       when multiple items without album and artist have same art URL */
+    psz_title = vlc_meta_Get( p_item->p_meta, vlc_meta_ArtworkURL );
 
     if( (!psz_artist || !psz_album ) && !psz_title )
         goto end;
