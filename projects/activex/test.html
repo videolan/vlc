@@ -1,45 +1,10 @@
 <!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
 <HTML>
 <TITLE>VLC Plugin test page</TITLE>
-<STYLE>
-  .inputTrackerInput {
-        height:20;
-        width:30;
-        font-family : Arial, Helvetica, sans-serif;
-        font-size : 12px;
-  }
-</STYLE>
-
-<SCRIPT type="text/javascript" src="blueshoes-4.5/javascript/lib/LibCrossBrowser.js"></SCRIPT>
-<SCRIPT type="text/javascript" src="blueshoes-4.5/javascript/lib/EventHandler.js"></SCRIPT>
-<SCRIPT type="text/javascript" src="blueshoes-4.5/javascript/core/form/Bs_FormUtil.lib.js"></SCRIPT>
-<SCRIPT type="text/javascript" src="blueshoes-4.5/javascript/components/slider/Bs_Slider.class.js"></SCRIPT>
 
 <SCRIPT language="JavaScript"><!--
 function init()
 {
-    inputTracker = new Bs_Slider();
-    if (inputTracker)
-    {
-        inputTracker.attachOnChange(onInputTrackerChange);
-        inputTracker.attachOnSlideStart(onInputTrackerScrollStart);
-        inputTracker.attachOnSlideEnd(onInputTrackerScrollEnd);
-        inputTracker.width         = 530 ;
-        inputTracker.height        = 15;
-        inputTracker.minVal        = 0;
-        inputTracker.maxVal        = 1.0;
-        inputTracker.valueDefault  = 0;
-        inputTracker.valueInterval = 1/530;
-        inputTracker.setDisabled(true);
-        inputTracker.imgDir   = 'blueshoes-4.5/javascript/components/slider/img/';
-        inputTracker.setBackgroundImage('aluminumalloyvolcanic/horizontal_background.gif', 'repeat');
-        inputTracker.setArrowIconLeft('aluminumalloyvolcanic/horizontal_backgroundLeft.gif', 2, 19);
-        inputTracker.setArrowIconRight('aluminumalloyvolcanic/horizontal_backgroundRight.gif', 2, 19);
-        inputTracker.setSliderIcon('aluminumalloyvolcanic/horizontal_knob.gif', 15, 19);
-        inputTracker.useInputField = 0;
-        inputTracker.draw('inputTrackerDiv');
-    }
-
     if( navigator.appName.indexOf("Microsoft Internet")==-1 )
     {
         onVLCPluginReady()
@@ -126,7 +91,6 @@ Insert VideoLAN.VLCPlugin.2
 <!--
 Insert Slider widget
 -->
-<DIV id="inputTrackerDiv"</DIV>
 </TD><TD width="15%">
 <DIV id="info" style="text-align:center">-:--:--/-:--:--</DIV>
 <DIV id="state" style="text-align:center">Stopped...</DIV>
@@ -257,10 +221,6 @@ Insert Slider widget
 
 var rate = 0;
 var prevState = 0;
-var monitorTimerId = 0;
-var inputTracker;
-var inputTrackerScrolling = false;
-var inputTrackerIgnoreChange = false;
 var telxState = false;
 
 function doSetSlider()
@@ -519,10 +479,6 @@ function monitor()
         // current media is playing
         onPlaying();
     }
-    if( monitorTimerId == 0 )
-    {
-        monitorTimerId = setInterval("monitor()", 1000);
-    }
 };
 
 /* actions */
@@ -546,10 +502,7 @@ function doGo(targetURL)
         {
             // play MRL
             vlc.playlist.playItem(itemId);
-            if( monitorTimerId == 0 )
-            {
-                monitor();
-            }
+            monitor();
         }
         else
         {
@@ -600,11 +553,6 @@ function doStop()
     if( vlc )
         vlc.playlist.stop();
 
-    if( monitorTimerId != 0 )
-    {
-        clearInterval(monitorTimerId);
-        monitorTimerId = 0;
-    }
     onStop();
 }
 
@@ -654,44 +602,21 @@ var liveFeedRoll = 0;
 
 function onPlaying()
 {
-    if( !inputTrackerScrolling )
-    {
         var vlc = getVLC("vlc");
         var info = document.getElementById("info");
         if( vlc )
         {
             var mediaLen = vlc.input.length;
-            inputTrackerIgnoreChange = true;
             if( mediaLen > 0 )
             {
-                // seekable media
-                if( inputTracker )
-                {
-                    if( inputTracker.maxVal == 1.0 )
-                    {
-                        inputTracker.setDisabled(false);
-                        inputTracker.maxVal = 1.0;
-                    }
-                    inputTracker.setValue(vlc.input.position);
-                }
                 info.innerHTML = formatTime(vlc.input.time)+"/"+formatTime(mediaLen);
             }
             else
             {
                 // non-seekable "live" media
-                if( inputTracker )
-                {
-                    if( inputTracker.maxVal != 0.0 )
-                    {
-                        inputTracker.maxVal = 0.0;
-                        inputTracker.setValue(0.0);
-                        inputTracker.setDisabled(true);
-                    }
-                }
                 liveFeedRoll = liveFeedRoll & 3;
                 info.innerHTML = liveFeedText[liveFeedRoll++];
             }
-            inputTrackerIgnoreChange  = false;
         }
     }
 }
@@ -704,17 +629,6 @@ function onPause()
 
 function onStop()
 {
-    var vlc = getVLC("vlc");
-
-    if( inputTracker )
-    {
-        if( !inputTracker.disabled )
-        {
-            inputTracker.setValue(inputTracker.minVal);
-            inputTracker.setDisabled(true);
-        }
-    }
-
     document.getElementById("info").innerHTML = "-:--:--/-:--:--";
     document.getElementById("state").innerHTML = "Stopped...";
     document.getElementById("PlayOrPause").value = " Play ";
@@ -722,36 +636,7 @@ function onStop()
 
 function onError()
 {
-    var vlc = getVLC("vlc");
-
     document.getElementById("state").innerHTML = "Error...";
-}
-
-function onInputTrackerScrollStart()
-{
-    inputTrackerScrolling = true;
-}
-
-function onInputTrackerScrollEnd(inputTracker, value, pos)
-{
-    inputTrackerScrolling = false;
-}
-
-function onInputTrackerChange(inputTracker, value, pos)
-{
-    if( !inputTrackerIgnoreChange )
-    {
-        var vlc = getVLC("vlc");
-        if( vlc )
-        {
-            if( (vlc.input.state == 3) && (vlc.input.position != value) )
-            {
-                var info = document.getElementById("info");
-                vlc.input.position = value;
-                info.innerHTML = formatTime(vlc.input.time)+"/"+formatTime(vlc.input.length);
-            }
-        }
-    }
 }
 
 function doMarqueeOption(option, value)
