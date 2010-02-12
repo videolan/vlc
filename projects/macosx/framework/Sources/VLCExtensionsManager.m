@@ -14,6 +14,7 @@
 #import <vlc_input.h>
 
 // Here comes the nasty hack.
+#define MODULE_STRING "VLCKit"
 #import "../../../../src/control/media_player_internal.h"
 #import "../../../../src/control/libvlc_internal.h"
 
