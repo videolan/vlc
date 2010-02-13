@@ -408,11 +408,11 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     /* Mouse object (area of interest in a video filter) */
     var_Create( p_vout, "mouse-object", VLC_VAR_BOOL );
 
-    /* Initialize subpicture unit */
-    p_vout->p_spu = spu_Create( p_vout );
-
     /* Attach the new object now so we can use var inheritance below */
     vlc_object_attach( p_vout, p_parent );
+
+    /* Initialize subpicture unit */
+    p_vout->p_spu = spu_Create( p_vout );
 
     /* */
     spu_Init( p_vout->p_spu );

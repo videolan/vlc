@@ -195,7 +195,7 @@ spu_t *spu_Create( vlc_object_t *p_this )
 {
     spu_t *p_spu;
     spu_private_t *p_sys;
- 
+
     p_spu = vlc_custom_create( p_this, sizeof(spu_t) + sizeof(spu_private_t),
                                VLC_OBJECT_GENERIC, "subpicture" );
     if( !p_spu )
