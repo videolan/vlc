@@ -469,13 +469,21 @@ static char *alsa_get_mrl (struct udev_device *dev)
 
 static char *alsa_get_name (struct udev_device *dev)
 {
+    const char *model = NULL;
     char *name;
     unsigned card, device;
 
     if (alsa_get_device (dev, &card, &device))
         return NULL;
 
-    if (asprintf (&name, _("Device %u"), device) == -1)
+    dev = udev_device_get_parent (dev);
+    if (dev != NULL)
+        model = udev_device_get_property_value (dev,
+                                                "ID_MODEL_FROM_DATABASE");
+    if (model == NULL)
+        model = _("Device");
+
+    if (asprintf (&name, "%s (%u)", model, device) == -1)
         name = NULL;
     return name;
 }
