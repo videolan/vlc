@@ -98,23 +98,36 @@ h:redirect( url_dst, url_src ): Redirect all connections from url_src to url_dst
 
 Input
 -----
-input.info(): Get the current input's info. Return value is a table of tables. Keys of the top level table are info category labels.
 input.is_playing(): Return true if input exists.
-input.get_title(): Get the input's name.
-input.stats(): Get statistics about the input. This is a table with the following fields:
+input.add_subtitle(url): Add a subtitle to the current input
+input.item(): Get the current input item. Input item methods are:
+  :uri(): Get item's URI.
+  :name(): Get item's name.
+  :duration(): Get item's duration in seconds or negative value if unavailable.
+  :is_preparsed(): Return true if meta data has been preparsed
+  :metas(): Get meta data as a table.
+  :set_meta(key, value): Set meta data.
+  :info(): Get the current input's info. Return value is a table of tables. Keys of the top level table are info category labels.
+  :stats(): Get statistics about the input. This is a table with the following fields:
+    .read_packets
     .read_bytes
     .input_bitrate
+    .average_input_bitrate
+    .demux_read_packets
     .demux_read_bytes
     .demux_bitrate
+    .average_demux_bitrate
+    .demux_corrupted
+    .demux_discontinuity
+    .decoded_audio
     .decoded_video
     .displayed_pictures
     .lost_pictures
-    .decoded_audio
-    .played_abuffers
-    .lost_abuffers
     .sent_packets
     .sent_bytes
     .send_bitrate
+    .played_abuffers
+    .lost_abuffers
 
 Messages
 --------
