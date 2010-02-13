@@ -421,8 +421,6 @@ typedef union
     vlc_list_t *    p_list;
     mtime_t         i_time;
 
-    struct { char *psz_name; int i_object_id; } var;
-
    /* Make sure the structure is at least 64bits */
     struct { char a, b, c, d, e, f, g, h; } padding;
 
