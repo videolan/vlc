@@ -685,11 +685,6 @@ loop_error_recovery:
 static int DemuxInit( demux_t *p_demux )
 {
     demux_sys_t *p_sys = p_demux->p_sys;
-    bool b_seekable;
-    unsigned int i_stream;
-    asf_object_content_description_t *p_cd;
-    asf_object_index_t *p_index;
-    bool b_index;
 
     /* init context */
     p_sys->i_time   = -1;
@@ -708,6 +703,7 @@ static int DemuxInit( demux_t *p_demux )
     p_sys->meta         = NULL;
 
     /* Now load all object ( except raw data ) */
+    bool b_seekable;
     stream_Control( p_demux->s, STREAM_CAN_FASTSEEK, &b_seekable );
     if( !(p_sys->p_root = ASF_ReadObjectRoot(p_demux->s, b_seekable)) )
     {
@@ -729,14 +725,15 @@ static int DemuxInit( demux_t *p_demux )
         msg_Warn( p_demux, "ASF plugin discarded (cannot find any stream!)" );
         goto error;
     }
-
-    /* check if index is available */
-    p_index = ASF_FindObject( p_sys->p_root, &asf_object_index_guid, 0 );
-    b_index = p_index && p_index->i_index_entry_count;
-
     msg_Dbg( p_demux, "found %d streams", p_sys->i_track );
 
-    for( i_stream = 0; i_stream < p_sys->i_track; i_stream ++ )
+    /* check if index is available */
+    asf_object_index_t *p_index = ASF_FindObject( p_sys->p_root,
+                                                  &asf_object_index_guid, 0 );
+    const bool b_index = p_index && p_index->i_index_entry_count;
+
+
+    for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {
         asf_track_t    *tk;
         asf_object_stream_properties_t *p_sp;
@@ -1001,6 +998,7 @@ static int DemuxInit( demux_t *p_demux )
     /* Create meta information */
     p_sys->meta = vlc_meta_New();
 
+    asf_object_content_description_t *p_cd;
     if( ( p_cd = ASF_FindObject( p_sys->p_root->p_hdr,
                                  &asf_object_content_description_guid, 0 ) ) )
     {
