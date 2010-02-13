@@ -1497,7 +1497,7 @@ LIBVLC_API void libvlc_video_set_scale( libvlc_media_player_t *p_mi, float f_fac
  *
  * \param p_mi the media player
  * \return the video aspect ratio or NULL if unspecified
- * (the result must be released with free() or libvlc_free()).
+ * (the result must be released with free()).
  */
 LIBVLC_API char *libvlc_video_get_aspect_ratio( libvlc_media_player_t *p_mi );
 

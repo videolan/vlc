@@ -151,11 +151,6 @@ const char * libvlc_get_changeset(void)
     return psz_vlc_changeset;
 }
 
-void libvlc_free( void *ptr )
-{
-    free( ptr );
-}
-
 static libvlc_module_description_t *module_description_list_get(
                 libvlc_instance_t *p_instance, const char *capability )
 {
