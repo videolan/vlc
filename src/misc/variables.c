@@ -49,12 +49,21 @@ struct callback_entry_t
 /*****************************************************************************
  * Local comparison functions, returns 0 if v == w, < 0 if v < w, > 0 if v > w
  *****************************************************************************/
-static int CmpBool( vlc_value_t v, vlc_value_t w ) { return v.b_bool ? w.b_bool ? 0 : 1 : w.b_bool ? -1 : 0; }
-static int CmpInt( vlc_value_t v, vlc_value_t w ) { return v.i_int == w.i_int ? 0 : v.i_int > w.i_int ? 1 : -1; }
+static int CmpBool( vlc_value_t v, vlc_value_t w )
+{
+    return v.b_bool ? w.b_bool ? 0 : 1 : w.b_bool ? -1 : 0;
+}
+
+static int CmpInt( vlc_value_t v, vlc_value_t w )
+{
+    return v.i_int == w.i_int ? 0 : v.i_int > w.i_int ? 1 : -1;
+}
+
 static int CmpTime( vlc_value_t v, vlc_value_t w )
 {
     return v.i_time == w.i_time ? 0 : v.i_time > w.i_time ? 1 : -1;
 }
+
 static int CmpString( vlc_value_t v, vlc_value_t w )
 {
     if( !v.psz_string )
