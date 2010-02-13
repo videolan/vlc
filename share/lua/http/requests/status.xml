@@ -102,6 +102,7 @@ local id = nil
 local val = nil
 
 local input = vlc.object.input()
+local item = vlc.input.item()
 local playlist = vlc.object.playlist()
 local vout = input and vlc.object.find(input,'vout','child')
 ?>
@@ -118,8 +119,8 @@ local vout = input and vlc.object.find(input,'vout','child')
   <information>
     <category name="meta">
     <?vlc
-      if input then
-        local metas = vlc.input.metas()
+      if item then
+        local metas = item:metas()
         for k,v in pairs(metas) do
           print("<info name='"..k.."'>"..vlc.strings.convert_xml_special_chars(v).."</info>")
         end
@@ -127,8 +128,8 @@ local vout = input and vlc.object.find(input,'vout','child')
     ?>
     </category>
   <?vlc
-    if input then
-      local info = vlc.input.info()
+    if item then
+      local info = item:info()
       for k, v in pairs(info) do
         print("<category name='"..k.."'>")
           for k2, v2 in pairs(v) do
@@ -141,8 +142,8 @@ local vout = input and vlc.object.find(input,'vout','child')
   </information>
   <stats>
   <?vlc
-    if input then
-      local stats = vlc.input.stats()
+    if item then
+      local stats = item:stats()
       for k,v in pairs(stats) do
         local tag = string.gsub(k,"_","")
         print("<"..tag..">"..tostring(v).."</"..tag..">\n")

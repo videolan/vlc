@@ -37,7 +37,8 @@ end
 
 -- Update title text field. Removes file extensions.
 function update_title()
-    local title = vlc.input.get_title()
+    local item = vlc.item()
+    local title = item and item:name()
     if title ~= nil then
         title = string.gsub(title, "(.*)(%.%w+)$", "%1")
     end
@@ -50,7 +51,8 @@ function create_dialog()
     dlg = vlc.dialog("IMDb Search")
     dlg:add_label("The Internet Movie Database", 1, 1, 4, 1)
     dlg:add_label("<b>Movie Title</b>", 1, 2, 1, 1)
-    txt = dlg:add_text_input(vlc.input.get_title(), 2, 2, 1, 1)
+    local item = vlc.item()
+    txt = dlg:add_text_input(item and item:name() or "", 2, 2, 1, 1)
     dlg:add_button("Okay", "click_okay", 3, 2, 1, 1)
     dlg:add_button("*", "update_title", 4, 2, 1, 1)
     dlg:show() -- Show, if not already visible

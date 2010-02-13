@@ -313,7 +313,8 @@ function help(name,client,arg)
 end
 
 function input_info(name,client)
-    local categories = vlc.input.info()
+    local item = vlc.item()
+    local categories = item:info()
     for cat, infos in pairs(categories) do
         client:append("+----[ "..cat.." ]")
         client:append("|")
@@ -326,7 +327,8 @@ function input_info(name,client)
 end
 
 function stats(name,client)
-    local stats_tab = vlc.input.stats()
+    local item = vlc.item()
+    local stats_tab = item:stats()
 
     client:append("+----[ begin of statistical info")
     client:append("+-[Incoming]")
@@ -506,7 +508,7 @@ commands_ordered = {
     { "stats"; { func = stats; help = "show statistical information" } };
     { "get_time"; { func = get_time("time"); help = "seconds elapsed since stream's beginning" } };
     { "is_playing"; { func = is_playing; help = "1 if a stream plays, 0 otherwise" } };
-    { "get_title"; { func = ret_print(vlc.input.get_title); help = "the title of the current stream" } };
+    { "get_title"; { func = ret_print(vlc.item():name()); help = "the title of the current stream" } };
     { "get_length"; { func = get_time("length"); help = "the length of the current stream" } };
     { "" };
     { "volume"; { func = volume; args = "[X]"; help = "set/get audio volume" } };
