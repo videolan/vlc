@@ -366,6 +366,15 @@ function is_playing(name,client)
     if vlc.input.is_playing() then client:append "1" else client:append "0" end
 end
 
+function get_title(name,client)
+    local item = vlc.input.item()
+    if item then
+        client:append(item:name())
+    else
+        client:append("")
+    end
+end
+
 function ret_print(foo,start,stop)
     local start = start or ""
     local stop = stop or ""
@@ -508,7 +517,7 @@ commands_ordered = {
     { "stats"; { func = stats; help = "show statistical information" } };
     { "get_time"; { func = get_time("time"); help = "seconds elapsed since stream's beginning" } };
     { "is_playing"; { func = is_playing; help = "1 if a stream plays, 0 otherwise" } };
-    { "get_title"; { func = ret_print(vlc.item():name()); help = "the title of the current stream" } };
+    { "get_title"; { func = get_title; help = "the title of the current stream" } };
     { "get_length"; { func = get_time("length"); help = "the length of the current stream" } };
     { "" };
     { "volume"; { func = volume; args = "[X]"; help = "set/get audio volume" } };
