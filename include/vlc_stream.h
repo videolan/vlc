@@ -166,7 +166,7 @@ static inline char *stream_ContentType( stream_t *s )
  * You must delete it using stream_Delete.
  */
 VLC_EXPORT( stream_t *, stream_DemuxNew, ( demux_t *p_demux, const char *psz_demux, es_out_t *out ) );
-    
+
 /**
  * Send data to a stream_t handle created by stream_DemuxNew.
  */
