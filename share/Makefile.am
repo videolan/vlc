@@ -220,7 +220,8 @@ DIST_lua= \
 	lua/intf/modules/host.lua \
 	lua/intf/telnet.lua \
 	lua/intf/dummy.lua \
-	lua/modules/sandbox.lua
+	lua/modules/sandbox.lua \
+	lua/modules/simplexml.lua
 
 DIST_http_lua = \
 	lua/http/.hosts \
