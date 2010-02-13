@@ -2,7 +2,7 @@
  Gets an artwork from amazon
 
  $Id$
- Copyright © 2007 the VideoLAN team
+ Copyright © 2007-2010 the VideoLAN team
 
  This program is free software; you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -19,16 +19,7 @@
  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston MA 02110-1301, USA.
 --]]
 
--- Return the artwork
-function fetch_art()
-    local query
-    local meta = vlc.item:metas()
-    if meta["artist"] and meta["album"] then
-        query = "http://musicbrainz.org/ws/1/release/?type=xml&artist="..vlc.strings.encode_uri_component(meta["artist"]).."&title="..vlc.strings.encode_uri_component(meta["album"])
-    else
-        return nil
-    end
-
+function try_query(query)
     local l = vlc.object.libvlc()
     local t = vlc.var.get( l, "musicbrainz-previousdate" )
     if t ~= nil then
@@ -52,4 +43,16 @@ function fetch_art()
     else
         return nil
     end
+end
+
+-- Return the artwork
+function fetch_art()
+    local meta = vlc.item:metas()
+    if not (meta["artist"] and meta["album"]) then
+        return nil
+    end
+
+    local query1 = "http://musicbrainz.org/ws/1/release/?type=xml&artist="..vlc.strings.encode_uri_component(meta["artist"]).."&title="..vlc.strings.encode_uri_component(meta["album"])
+    local query2 = "http://musicbrainz.org/ws/1/release/?type=xml&query=artist:"..vlc.strings.encode_uri_component(meta["artist"]).." AND "..vlc.strings.encode_uri_component(meta["album"])
+    return try_query(query1) or try_query(query2)
 end
