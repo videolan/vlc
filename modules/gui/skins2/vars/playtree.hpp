@@ -46,6 +46,9 @@ public:
     /// Function called to notify playlist item update
     void onUpdateItem( int id );
 
+    /// Function called to notify about current playing item
+    void onUpdateCurrent( );
+
     /// Function called to notify playlist item append
     void onAppend( playlist_add_t * );
 
@@ -64,6 +67,9 @@ private:
 
     /// Update Node's children
     void buildNode( playlist_item_t *p_node, VarTree &m_pNode );
+
+    /// keep track of item being played
+    Iterator m_playingIt;
 };
 
 #endif

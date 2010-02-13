@@ -36,6 +36,7 @@ Playtree::Playtree( intf_thread_t *pIntf ): VarTree( pIntf )
 {
     // Get the VLC playlist object
     m_pPlaylist = pIntf->p_sys->p_playlist;
+    m_playingIt = end();
 
     i_items_to_append = 0;
 
@@ -133,10 +134,6 @@ void Playtree::onUpdateItem( int id )
         playlist_item_t* pNode = (playlist_item_t*)(it->m_pData);
         UString *pName = new UString( getIntf(), pNode->p_input->psz_name );
         it->m_cString = UStringPtr( pName );
-        playlist_Lock( m_pPlaylist );
-        it->m_playing = playlist_CurrentPlayingItem( m_pPlaylist ) == pNode;
-        playlist_Unlock( m_pPlaylist );
-        if( it->m_playing ) descr.b_active_item = true;
     }
     else
     {
@@ -145,6 +142,33 @@ void Playtree::onUpdateItem( int id )
     descr.i_type = 0;
     notify( &descr );
 }
+
+
+void Playtree::onUpdateCurrent()
+{
+    playlist_Lock( m_pPlaylist );
+
+    playlist_item_t* current = playlist_CurrentPlayingItem( m_pPlaylist );
+    if( !current )
+    {
+        playlist_Unlock( m_pPlaylist );
+        return;
+    }
+
+    Iterator it = findById( current->i_id );
+    it->m_playing = true;
+    if( m_playingIt != end() )
+        m_playingIt->m_playing = false;
+    m_playingIt = it;
+
+    playlist_Unlock( m_pPlaylist );
+
+    tree_update descr;
+    descr.b_active_item = true;
+    descr.i_type = 0;
+    notify( &descr );
+}
+
 
 /// \todo keep a list of "recently removed" to avoid looking up if we
 //  already removed it
