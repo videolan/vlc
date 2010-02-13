@@ -50,6 +50,8 @@
 static const luaL_Reg vlclua_input_reg[];
 static const luaL_Reg vlclua_input_item_reg[];
 
+static input_item_t* vlclua_input_item_get_internal( lua_State *L );
+
 input_thread_t * vlclua_get_input_internal( lua_State *L )
 {
     extension_t *p_extension = vlclua_extension_get( L );
@@ -67,18 +69,16 @@ input_thread_t * vlclua_get_input_internal( lua_State *L )
     return p_input;
 }
 
-static int vlclua_input_info( lua_State *L )
+static int vlclua_input_item_info( lua_State *L )
 {
-    input_thread_t * p_input = vlclua_get_input_internal( L );
+    input_item_t *p_item = vlclua_input_item_get_internal( L );
     int i_cat;
     int i;
-    if( !p_input ) return vlclua_error( L );
-    //vlc_mutex_lock( &input_GetItem(p_input)->lock );
-    i_cat = input_GetItem(p_input)->i_categories;
+    i_cat = p_item->i_categories;
     lua_createtable( L, 0, i_cat );
     for( i = 0; i < i_cat; i++ )
     {
-        info_category_t *p_category = input_GetItem(p_input)->pp_categories[i];
+        info_category_t *p_category = p_item->pp_categories[i];
         int i_infos = p_category->i_infos;
         int j;
         lua_pushstring( L, p_category->psz_name );
@@ -92,7 +92,6 @@ static int vlclua_input_info( lua_State *L )
         }
         lua_settable( L, -3 );
     }
-    vlc_object_release( p_input );
     return 1;
 }
 
@@ -102,19 +101,6 @@ static int vlclua_input_is_playing( lua_State *L )
     lua_pushboolean( L, !!p_input );
     if( p_input )
         vlc_object_release( p_input );
-    return 1;
-}
-
-static int vlclua_input_get_title( lua_State *L )
-{
-    input_thread_t *p_input = vlclua_get_input_internal( L );
-    if( !p_input )
-        lua_pushnil( L );
-    else
-    {
-        lua_pushstring( L, input_GetItem(p_input)->psz_name );
-        vlc_object_release( p_input );
-    }
     return 1;
 }
 
@@ -177,22 +163,9 @@ static int vlclua_input_metas_internal( lua_State *L, input_item_t *p_item )
     return 1;
 }
 
-static int vlclua_input_metas( lua_State *L )
+static int vlclua_input_item_stats( lua_State *L )
 {
-    input_thread_t *p_input = vlclua_get_input_internal( L );
-    input_item_t *p_item = p_input && p_input->p
-                         ? input_GetItem( p_input ) : NULL;
-    vlclua_input_metas_internal( L, p_item );
-    if( p_input )
-        vlc_object_release( p_input );
-    return 1;
-}
-
-static int vlclua_input_stats( lua_State *L )
-{
-    input_thread_t *p_input = vlclua_get_input_internal( L );
-    input_item_t *p_item = p_input && p_input->p
-                         ? input_GetItem( p_input ) : NULL;
+    input_item_t *p_item = vlclua_input_item_get_internal( L );
     lua_newtable( L );
     if( p_item )
     {
@@ -201,27 +174,29 @@ static int vlclua_input_stats( lua_State *L )
                        lua_setfield( L, -2, #n );
 #define STATS_FLOAT( n ) lua_pushnumber( L, p_item->p_stats->f_ ## n ); \
                          lua_setfield( L, -2, #n );
+        STATS_INT( read_packets )
         STATS_INT( read_bytes )
         STATS_FLOAT( input_bitrate )
+        STATS_FLOAT( average_input_bitrate )
+        STATS_INT( demux_read_packets )
         STATS_INT( demux_read_bytes )
         STATS_FLOAT( demux_bitrate )
+        STATS_FLOAT( average_demux_bitrate )
         STATS_INT( demux_corrupted )
         STATS_INT( demux_discontinuity )
+        STATS_INT( decoded_audio )
         STATS_INT( decoded_video )
         STATS_INT( displayed_pictures )
         STATS_INT( lost_pictures )
-        STATS_INT( decoded_audio )
-        STATS_INT( played_abuffers )
-        STATS_INT( lost_abuffers )
         STATS_INT( sent_packets )
         STATS_INT( sent_bytes )
         STATS_FLOAT( send_bitrate )
+        STATS_INT( played_abuffers )
+        STATS_INT( lost_abuffers )
 #undef STATS_INT
 #undef STATS_FLOAT
         vlc_mutex_unlock( &p_item->p_stats->lock );
     }
-    if( p_input )
-        vlc_object_release( p_input );
     return 1;
 }
 
@@ -317,6 +292,25 @@ static int vlclua_input_item_is_preparsed( lua_State *L )
     return 1;
 }
 
+static int vlclua_input_item_uri( lua_State *L )
+{
+    lua_pushstring( L, input_item_GetURI( vlclua_input_item_get_internal( L ) ) );
+    return 1;
+}
+
+static int vlclua_input_item_name( lua_State *L )
+{
+    lua_pushstring( L, input_item_GetName( vlclua_input_item_get_internal( L ) ) );
+    return 1;
+}
+
+static int vlclua_input_item_duration( lua_State *L )
+{
+    mtime_t duration = input_item_GetDuration( vlclua_input_item_get_internal( L ) );
+    lua_pushnumber( L, ((double)duration)/1000000. );
+    return 1;
+}
+
 static int vlclua_input_item_set_meta( lua_State *L )
 {
     input_item_t *p_item = vlclua_input_item_get_internal( L );
@@ -369,12 +363,8 @@ static int vlclua_input_item_set_meta( lua_State *L )
  * Lua bindings
  *****************************************************************************/
 static const luaL_Reg vlclua_input_reg[] = {
-    { "info", vlclua_input_info },
     { "is_playing", vlclua_input_is_playing },
-    { "get_title", vlclua_input_get_title },
-    { "metas", vlclua_input_metas },
     { "item", vlclua_input_item_get_current },
-    { "stats", vlclua_input_stats },
     { "add_subtitle", vlclua_input_add_subtitle },
     { NULL, NULL }
 };
@@ -390,6 +380,11 @@ static const luaL_Reg vlclua_input_item_reg[] = {
     { "is_preparsed", vlclua_input_item_is_preparsed },
     { "metas", vlclua_input_item_metas },
     { "set_meta", vlclua_input_item_set_meta },
+    { "uri", vlclua_input_item_uri },
+    { "name", vlclua_input_item_name },
+    { "duration", vlclua_input_item_duration },
+    { "stats", vlclua_input_item_stats },
+    { "info", vlclua_input_item_info },
     { NULL, NULL }
 };
 
