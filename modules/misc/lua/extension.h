@@ -48,9 +48,6 @@ struct extensions_manager_sys_t
     /* Lock for this list */
     vlc_mutex_t lock;
 
-    /* Lua specific */
-    lua_State *L;
-
     /* Flag indicating that the module is about to be unloaded */
     bool b_killed;
 };

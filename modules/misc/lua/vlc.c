@@ -202,8 +202,7 @@ void vlclua_dir_list_free( char **ppsz_dir_list )
  *****************************************************************************/
 int vlclua_scripts_batch_execute( vlc_object_t *p_this,
                                   const char * luadirname,
-                                  int (*func)(vlc_object_t *, const char *, lua_State *, void *),
-                                  lua_State * L,
+                                  int (*func)(vlc_object_t *, const char *, void *),
                                   void * user_data)
 {
     char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
@@ -240,7 +239,7 @@ int vlclua_scripts_batch_execute( vlc_object_t *p_this,
             {
                 msg_Dbg( p_this, "Trying Lua playlist script %s",
                          psz_filename );
-                i_ret = func( p_this, psz_filename, L, user_data );
+                i_ret = func( p_this, psz_filename, user_data );
                 free( psz_filename );
                 if( i_ret == VLC_SUCCESS )
                     break;

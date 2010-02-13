@@ -116,18 +116,36 @@ static const luaL_Reg p_reg_parse[] =
  * the script pointed by psz_filename.
  *****************************************************************************/
 static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
-                            lua_State * L, void * user_data )
+                            void * user_data )
 {
     VLC_UNUSED(user_data);
     demux_t * p_demux = (demux_t *)p_this;
 
     p_demux->p_sys->psz_filename = strdup(psz_filename);
 
-    /* In lua, setting a variable's value to nil is equivalent to deleting it */
-    lua_pushnil( L );
-    lua_pushnil( L );
-    lua_setglobal( L, "probe" );
-    lua_setglobal( L, "parse" );
+    /* Initialise Lua state structure */
+    lua_State *L = luaL_newstate();
+    if( !L )
+    {
+        msg_Err( p_demux, "Could not create new Lua State" );
+        goto error;
+    }
+    p_demux->p_sys->L = L;
+
+    /* Load Lua libraries */
+    luaL_openlibs( L ); /* FIXME: Don't open all the libs? */
+
+    luaL_register( L, "vlc", p_reg );
+    luaopen_msg( L );
+    luaopen_strings( L );
+    lua_pushlightuserdata( L, p_demux );
+    lua_setfield( L, -2, "private" );
+    lua_pushstring( L, p_demux->psz_path );
+    lua_setfield( L, -2, "path" );
+    lua_pushstring( L, p_demux->psz_access );
+    lua_setfield( L, -2, "access" );
+
+    lua_pop( L, 1 );
 
     /* Load and run the script(s) */
     if( luaL_dofile( L, psz_filename ) )
@@ -167,6 +185,8 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
 
 error:
     lua_pop( L, 1 );
+    lua_close( p_demux->p_sys->L );
+    p_demux->p_sys->L = NULL;
     FREENULL( p_demux->p_sys->psz_filename );
     return VLC_EGENERIC;
 }
@@ -191,33 +211,8 @@ int Import_LuaPlaylist( vlc_object_t *p_this )
     p_demux->pf_control = Control;
     p_demux->pf_demux = Demux;
 
-    /* Initialise Lua state structure */
-    L = luaL_newstate();
-    if( !L )
-    {
-        msg_Err( p_demux, "Could not create new Lua State" );
-        free( p_demux->p_sys );
-        return VLC_EGENERIC;
-    }
-    p_demux->p_sys->L = L;
-
-    /* Load Lua libraries */
-    luaL_openlibs( L ); /* FIXME: Don't open all the libs? */
-
-    luaL_register( L, "vlc", p_reg );
-    luaopen_msg( L );
-    luaopen_strings( L );
-    lua_pushlightuserdata( L, p_demux );
-    lua_setfield( L, -2, "private" );
-    lua_pushstring( L, p_demux->psz_path );
-    lua_setfield( L, -2, "path" );
-    lua_pushstring( L, p_demux->psz_access );
-    lua_setfield( L, -2, "access" );
-
-    lua_pop( L, 1 );
-
     ret = vlclua_scripts_batch_execute( p_this, "playlist",
-                                        &probe_luascript, L, NULL );
+                                        &probe_luascript, NULL );
     if( ret )
         Close_LuaPlaylist( p_this );
     return ret;
@@ -230,7 +225,8 @@ int Import_LuaPlaylist( vlc_object_t *p_this )
 void Close_LuaPlaylist( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    lua_close( p_demux->p_sys->L );
+    if( p_demux->p_sys->L )
+        lua_close( p_demux->p_sys->L );
     free( p_demux->p_sys->psz_filename );
     free( p_demux->p_sys );
 }

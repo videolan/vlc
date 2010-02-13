@@ -126,14 +126,19 @@ error:
  * pointed by psz_filename.
  *****************************************************************************/
 static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
-                      lua_State * L, void * user_data )
+                      void * user_data )
 {
-    input_item_t * p_input = user_data;
+    input_item_t * p_item = user_data;
     int s;
+
+    lua_State *L = init( p_this, p_item );
 
     int i_ret = run(p_this, psz_filename, L, "fetch_art");
     if(i_ret != VLC_SUCCESS)
+    {
+        lua_close( L );
         return i_ret;
+    }
 
     if((s = lua_gettop( L )))
     {
@@ -145,7 +150,8 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
             if( psz_value && *psz_value != 0 )
             {
                 lua_Dbg( p_this, "setting arturl: %s", psz_value );
-                input_item_SetArtURL ( p_input, psz_value );
+                input_item_SetArtURL ( p_item, psz_value );
+                lua_close( L );
                 return VLC_SUCCESS;
             }
         }
@@ -160,6 +166,7 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
         msg_Err( p_this, "Script went completely foobar" );
     }
 
+    lua_close( L );
     return VLC_EGENERIC;
 }
 
@@ -168,15 +175,20 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
  * pointed by psz_filename.
  *****************************************************************************/
 static int read_meta( vlc_object_t *p_this, const char * psz_filename,
-                     lua_State * L, void * user_data )
+                      void * user_data )
 {
-    VLC_UNUSED(user_data);
+    input_item_t * p_item = user_data;
+    lua_State *L = init( p_this, p_item );
 
     int i_ret = run(p_this, psz_filename, L, "read_meta");
     if(i_ret != VLC_SUCCESS)
+    {
+        lua_close( L );
         return i_ret;
+    }
 
     // Continue, all "meta reader" are always run.
+    lua_close( L );
     return 1;
 }
 
@@ -186,11 +198,15 @@ static int read_meta( vlc_object_t *p_this, const char * psz_filename,
  * pointed by psz_filename.
  *****************************************************************************/
 static int fetch_meta( vlc_object_t *p_this, const char * psz_filename,
-                     lua_State * L, void * user_data )
+                       void * user_data )
 {
-    VLC_UNUSED(user_data);
+    input_item_t * p_item = user_data;
+    lua_State *L = init( p_this, p_item );
 
-    return run(p_this, psz_filename, L, "fetch_meta");
+    int ret = run(p_this, psz_filename, L, "fetch_meta");
+    lua_close( L );
+
+    return ret;
 }
 
 /*****************************************************************************
@@ -202,9 +218,7 @@ int ReadMeta( vlc_object_t *p_this )
     demux_meta_t *p_demux_meta = (demux_meta_t *)p_this;
     input_item_t *p_item = p_demux_meta->p_item;
 
-    lua_State *L = init( p_this, p_item );
-    int i_ret = vlclua_scripts_batch_execute( p_this, "meta/reader", &read_meta, L, NULL );
-    lua_close( L );
+    int i_ret = vlclua_scripts_batch_execute( p_this, "meta/reader", &read_meta, p_item );
 
     return i_ret;
 }
@@ -219,9 +233,7 @@ int FetchMeta( vlc_object_t *p_this )
     demux_meta_t *p_demux_meta = (demux_meta_t *)p_this;
     input_item_t *p_item = p_demux_meta->p_item;
 
-    lua_State *L = init( p_this, p_item );
-    int i_ret = vlclua_scripts_batch_execute( p_this, "meta/fetcher", &fetch_meta, L, NULL );
-    lua_close( L );
+    int i_ret = vlclua_scripts_batch_execute( p_this, "meta/fetcher", &fetch_meta, p_item );
 
     return i_ret;
 }
@@ -235,9 +247,7 @@ int FindArt( vlc_object_t *p_this )
     art_finder_t *p_finder = (art_finder_t *)p_this;
     input_item_t *p_item = p_finder->p_item;
 
-    lua_State *L = init( p_this, p_item );
-    int i_ret = vlclua_scripts_batch_execute( p_this, "meta/art", &fetch_art, L, p_item );
-    lua_close( L );
+    int i_ret = vlclua_scripts_batch_execute( p_this, "meta/art", &fetch_art, p_item );
 
     return i_ret;
 }

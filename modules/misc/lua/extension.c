@@ -54,7 +54,7 @@ const char* const ppsz_capabilities[] = {
 
 static int ScanExtensions( extensions_manager_t *p_this );
 static int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
-                            lua_State *L, void *pb_continue );
+                            void *pb_continue );
 static int Control( extensions_manager_t *, int, va_list );
 static int GetMenuEntries( extensions_manager_t *p_mgr, extension_t *p_ext,
                     char ***pppsz_titles, uint16_t **ppi_ids );
@@ -99,24 +99,12 @@ int Open_Extension( vlc_object_t *p_this )
     vlc_mutex_init( &p_mgr->lock );
     vlc_mutex_init( &p_mgr->p_sys->lock );
 
-    /* Initialise Lua state structure */
-    lua_State *L = GetLuaState( p_mgr, NULL );
-    if( !L )
-    {
-        free( p_sys );
-        return VLC_EGENERIC;
-    }
-    p_sys->L = L;
-
     /* Scan available Lua Extensions */
     if( ScanExtensions( p_mgr ) != VLC_SUCCESS )
     {
         msg_Err( p_mgr, "Can't load extensions modules" );
         return VLC_EGENERIC;
     }
-
-    lua_close( L );
-    p_sys->L = NULL;
 
     // Create the dialog-event variable
     var_Create( p_this, "dialog-event", VLC_VAR_ADDRESS );
@@ -152,9 +140,6 @@ void Close_Extension( vlc_object_t *p_this )
 
     msg_Dbg( p_mgr, "All extensions are now deactivated" );
     ARRAY_RESET( p_mgr->p_sys->activated_extensions );
-
-    if( p_mgr->p_sys && p_mgr->p_sys->L )
-        lua_close( p_mgr->p_sys->L );
 
     vlc_mutex_destroy( &p_mgr->lock );
     vlc_mutex_destroy( &p_mgr->p_sys->lock );
@@ -199,7 +184,7 @@ static int ScanExtensions( extensions_manager_t *p_mgr )
         vlclua_scripts_batch_execute( VLC_OBJECT( p_mgr ),
                                       "extensions",
                                       &ScanLuaCallback,
-                                      p_mgr->p_sys->L, &b_true );
+                                      &b_true );
 
     if( !i_ret )
         return VLC_EGENERIC;
@@ -215,7 +200,7 @@ static int ScanExtensions( extensions_manager_t *p_mgr )
  * @param pb_continue bool* that indicates whether to continue batch or not
  **/
 int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
-                     lua_State *L, void *pb_continue )
+                     void *pb_continue )
 {
     extensions_manager_t *p_mgr = ( extensions_manager_t* ) p_this;
     bool b_ok = false;
@@ -250,6 +235,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
     vlc_cond_init( &p_ext->p_sys->wait );
 
     /* Load and run the script(s) */
+    lua_State *L = luaL_newstate();
     if( luaL_dofile( L, psz_script ) )
     {
         msg_Warn( p_mgr, "Error loading script %s: %s", psz_script,
@@ -414,6 +400,7 @@ int ScanLuaCallback( vlc_object_t *p_this, const char *psz_script,
 
     b_ok = true;
 exit:
+    lua_close( L );
     if( !b_ok )
     {
         free( p_ext->psz_name );
