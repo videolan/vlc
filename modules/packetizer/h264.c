@@ -831,7 +831,7 @@ static void PutSPS( decoder_t *p_dec, block_t *p_frag )
                     if( i_nextscale != 0 )
                     {
                         /* delta_scale */
-                        i_tmp = bs_read( &s, 1 );
+                        i_tmp = bs_read_se( &s );
                         i_nextscale = ( i_lastscale + i_tmp + 256 ) % 256;
                         /* useDefaultScalingMatrixFlag = ... */
                     }
