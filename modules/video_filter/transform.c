@@ -325,59 +325,47 @@ static void Render( vout_thread_t *p_vout, picture_t *p_pic )
  * Forward mouse event with proper conversion.
  */
 static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
-                       vlc_value_t oldval, vlc_value_t newval, void *p_data )
+                       vlc_value_t oldval, vlc_value_t val, void *p_data )
 {
     vout_thread_t *p_vout = p_data;
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
 
     /* Translate the mouse coordinates
      * FIXME missing lock */
-    if( !strcmp( psz_var, "mouse-x" ) )
+    if( !strcmp( psz_var, "mouse-button-down" ) )
+        return var_SetChecked( p_vout, psz_var, VLC_VAR_INTEGER, val );
+
+    int x = val.coords.x, y = val.coords.y;
+
+    switch( p_vout->p_sys->i_mode )
     {
-        switch( p_vout->p_sys->i_mode )
-        {
-        case TRANSFORM_MODE_270:
-            newval.i_int = p_vout->p_sys->p_vout->output.i_width
-                             - newval.i_int;
         case TRANSFORM_MODE_90:
-            psz_var = "mouse-y";
+            x = p_vout->p_sys->p_vout->output.i_height - val.coords.y;
+            y = val.coords.x;
             break;
 
         case TRANSFORM_MODE_180:
-        case TRANSFORM_MODE_HFLIP:
-            newval.i_int = p_vout->p_sys->p_vout->output.i_width
-                             - newval.i_int;
+            x = p_vout->p_sys->p_vout->output.i_width - val.coords.x;
+            y = p_vout->p_sys->p_vout->output.i_height - val.coords.y;
             break;
 
-        case TRANSFORM_MODE_VFLIP:
-        default:
-            break;
-        }
-    }
-    else if( !strcmp( psz_var, "mouse-y" ) )
-    {
-        switch( p_vout->p_sys->i_mode )
-        {
-        case TRANSFORM_MODE_90:
-            newval.i_int = p_vout->p_sys->p_vout->output.i_height
-                             - newval.i_int;
         case TRANSFORM_MODE_270:
-            psz_var = "mouse-x";
-            break;
-
-        case TRANSFORM_MODE_180:
-        case TRANSFORM_MODE_VFLIP:
-            newval.i_int = p_vout->p_sys->p_vout->output.i_height
-                             - newval.i_int;
+            x = val.coords.y;
+            y = p_vout->p_sys->p_vout->output.i_width - val.coords.x;
             break;
 
         case TRANSFORM_MODE_HFLIP:
+            x = p_vout->p_sys->p_vout->output.i_width - val.coords.x;
+            break;
+
+        case TRANSFORM_MODE_VFLIP:
+            y = p_vout->p_sys->p_vout->output.i_height - val.coords.y;
+            break;
+
         default:
             break;
-        }
     }
-
-    return var_Set( p_vout, psz_var, newval );
+    return var_SetCoords( p_vout, psz_var, x, y );
 }
 
 static void FilterPlanar( vout_thread_t *p_vout,

@@ -387,13 +387,13 @@ static int
 mouse_moved( vlc_object_t *p_this, char const *psz_cmd,
                     vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_this); VLC_UNUSED(newval);
+    VLC_UNUSED(psz_cmd); VLC_UNUSED(oldval); VLC_UNUSED(p_this);
 
     libvlc_media_player_t *mp = p_data;
     libvlc_event_t event;
     event.type = libvlc_MediaPlayerMouseMoved;
-    event.u.media_player_mouse_moved.x = var_GetInteger( mp->p_vout_thread, "mouse-x" );
-    event.u.media_player_mouse_moved.y = var_GetInteger( mp->p_vout_thread, "mouse-y" );
+    event.u.media_player_mouse_moved.x = newval.coords.x;
+    event.u.media_player_mouse_moved.y = newval.coords.y;
     libvlc_event_send(mp->p_event_manager, &event);
 
     return VLC_SUCCESS;

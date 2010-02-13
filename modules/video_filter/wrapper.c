@@ -454,8 +454,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
 
     vlc_mouse_t m;
     vlc_mouse_Init( &m );
-    m.i_x = var_GetInteger( p_vout_src, "mouse-x" );
-    m.i_y = var_GetInteger( p_vout_src, "mouse-y" );
+    var_GetCoords( p_vout_src, "mouse-moved", &m.i_x, &m.i_y );
     m.i_pressed = var_GetInteger( p_vout_src, "mouse-button-down" );
 
     vlc_mutex_lock( &p_sys->lock );
@@ -485,9 +484,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
 
     if( vlc_mouse_HasMoved( &omouse, &nmouse ) )
     {
-        var_SetInteger( p_vout, "mouse-x", nmouse.i_x );
-        var_SetInteger( p_vout, "mouse-y", nmouse.i_y );
-        var_TriggerCallback( p_vout, "mouse-moved" );
+        var_SetCoords( p_vout, "mouse-moved", nmouse.i_x, nmouse.i_y );
     }
     if( vlc_mouse_HasButton( &omouse, &nmouse ) )
     {

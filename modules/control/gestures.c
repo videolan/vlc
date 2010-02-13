@@ -465,8 +465,8 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
 
     if( !strcmp( psz_var, "mouse-moved" ) && p_sys->b_button_pressed )
     {
-        p_sys->i_mouse_x = var_GetInteger( p_sys->p_vout, "mouse-x" );
-        p_sys->i_mouse_y = var_GetInteger( p_sys->p_vout, "mouse-y" );
+        p_sys->i_mouse_x = newval.coords.x;
+        p_sys->i_mouse_y = newval.coords.y;
         i_horizontal = p_sys->i_mouse_x - p_sys->i_last_x;
         i_horizontal = i_horizontal / p_sys->i_threshold;
         i_vertical = p_sys->i_mouse_y - p_sys->i_last_y;
@@ -510,8 +510,8 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
         if( (newval.i_int & p_sys->i_button_mask) && !p_sys->b_button_pressed )
         {
             p_sys->b_button_pressed = true;
-            p_sys->i_last_x = var_GetInteger( p_sys->p_vout, "mouse-x" );
-            p_sys->i_last_y = var_GetInteger( p_sys->p_vout, "mouse-y" );
+            var_GetCoords( p_sys->p_vout, "mouse-moved",
+                           &p_sys->i_last_x, &p_sys->i_last_y );
         }
         else if( !( newval.i_int & p_sys->i_button_mask ) && p_sys->b_button_pressed )
         {

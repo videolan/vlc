@@ -56,9 +56,7 @@ static inline void vout_SendEventKey(vout_thread_t *vout, int key)
 }
 static inline void vout_SendEventMouseMoved(vout_thread_t *vout, int x, int y)
 {
-    var_SetInteger(vout, "mouse-x", x);
-    var_SetInteger(vout, "mouse-y", y);
-    var_TriggerCallback(vout, "mouse-moved");
+    var_SetCoords(vout, "mouse-moved", x, y);
 }
 static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
 {
@@ -67,9 +65,14 @@ static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
     switch (button)
     {
     case MOUSE_BUTTON_LEFT:
-                var_SetBool(vout, "mouse-clicked", true);
+    {
+        /* FIXME? */
+        int x, y;
+        var_GetCoords(vout, "mouse-moved", &x, &y);
+        var_SetCoords(vout, "mouse-clicked", x, y);
         var_SetBool(vout->p_libvlc, "intf-popupmenu", false);
         break;
+    }
     case MOUSE_BUTTON_CENTER:
         var_ToggleBool(vout->p_libvlc, "intf-show");
         break;

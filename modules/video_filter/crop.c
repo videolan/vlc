@@ -831,14 +831,14 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     vout_thread_t *p_vout = p_data;
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
 
+    if( !strcmp( psz_var, "mouse-button-down" ) )
+        return var_SetChecked( p_vout, psz_var, VLC_VAR_INTEGER, newval );
+
     /* Translate the mouse coordinates
      * FIXME missing lock */
-    if( !strcmp( psz_var, "mouse-x" ) )
-        newval.i_int += p_vout->p_sys->i_x;
-    else if( !strcmp( psz_var, "mouse-y" ) )
-        newval.i_int += p_vout->p_sys->i_y;
-
-    return var_Set( p_vout, psz_var, newval );
+    newval.coords.x += p_vout->p_sys->i_x;
+    newval.coords.y += p_vout->p_sys->i_y;
+    return var_SetChecked( p_vout, psz_var, VLC_VAR_COORDS, newval );
 }
 
 #ifdef BEST_AUTOCROP

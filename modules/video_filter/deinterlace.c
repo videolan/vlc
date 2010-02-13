@@ -494,10 +494,12 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     vout_thread_t *p_vout = p_data;
     VLC_UNUSED(p_this); VLC_UNUSED(oldval);
 
-    if( !strcmp( psz_var, "mouse-y" ) && p_vout->p_sys->b_half_height )
-        newval.i_int *= 2;
+    if( !strcmp( psz_var, "mouse-button-down" ) )
+        return var_SetChecked( p_vout, psz_var, VLC_VAR_INTEGER, newval );
 
-    return var_Set( p_vout, psz_var, newval );
+    if( p_vout->p_sys->b_half_height )
+        newval.coords.y *= 2;
+    return var_SetChecked( p_vout, psz_var, VLC_VAR_COORDS, newval );
 }
 
 /*****************************************************************************

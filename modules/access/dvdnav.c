@@ -1272,8 +1272,8 @@ static int EventMouse( vlc_object_t *p_vout, char const *psz_var,
 
     /* FIXME? PCI usage thread safe? */
     pci_t *pci = dvdnav_get_current_nav_pci( p_sys->dvdnav );
-    int x = var_GetInteger( p_vout, "mouse-x" );
-    int y = var_GetInteger( p_vout, "mouse-y" );
+    int x = val.coords.x;
+    int y = val.coords.y;
 
     if( psz_var[6] == 'm' ) /* mouse-moved */
         dvdnav_mouse_select( p_sys->dvdnav, pci, x, y );
@@ -1284,8 +1284,7 @@ static int EventMouse( vlc_object_t *p_vout, char const *psz_var,
         ButtonUpdate( p_demux, true );
         dvdnav_mouse_activate( p_sys->dvdnav, pci, x, y );
     }
-
-    (void)oldval; (void)val;
+    (void)oldval;
     return VLC_SUCCESS;
 }
 

@@ -303,7 +303,8 @@ static int Manage( vout_thread_t *p_vout )
                 switch( event.pbutton.button )
                 {
                     case GII_PBUTTON_LEFT:
-                        var_SetBool( p_vout, "mouse-clicked", true );
+                        /*FIXME
+                        var_SetCoords( p_vout, "mouse-clicked", x, y );*/
                         break;
 
                     case GII_PBUTTON_RIGHT:

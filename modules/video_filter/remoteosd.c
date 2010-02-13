@@ -1335,10 +1335,8 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     int i_x, i_y;
     int i_v;
 
-
     i_v = var_GetInteger( p_sys->p_vout, "mouse-button-down" );
-    i_y = var_GetInteger( p_sys->p_vout, "mouse-y" );
-    i_x = var_GetInteger( p_sys->p_vout, "mouse-x" );
+    var_GetCoords( p_sys->p_vout, "mouse-moved", &i_x, &i_y );
 
     vlc_mutex_lock( &p_sys->lock );
 

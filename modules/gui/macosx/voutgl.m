@@ -976,8 +976,10 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
                         else
                         {
                             vlc_value_t val;
+                            int x, y;
 
-                            var_SetBool( p_vout, "mouse-clicked", true );
+                            var_GetCoords( p_vout, "mouse-moved", &x, &y );
+                            var_SetCoords( p_vout, "mouse-clicked", x, y );
 
                             var_Get( p_vout, "mouse-button-down", &val );
                             val.i_int &= ~1;
@@ -1017,20 +1019,15 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
                 unsigned int i_x, i_y;
                 unsigned int i_height = p_vout->p_sys->i_height;
                 unsigned int i_width  = p_vout->p_sys->i_width;
+                int x, y;
 
                 vout_PlacePicture(p_vout, i_width, i_height, &i_x, &i_y, &i_width, &i_height);
 
                 GetEventParameter(event, kEventParamWindowMouseLocation, typeQDPoint, NULL, sizeof(Point), NULL, &ml);
  
-                val.i_int = ( ((int)ml.h) - i_x ) *
-                            p_vout->render.i_width / i_width;
-                var_Set( p_vout, "mouse-x", val );
-
-                val.i_int = ( ((int)ml.v) - i_y ) *
-                            p_vout->render.i_height / i_height;
-
-                var_Set( p_vout, "mouse-y", val );
-                var_TriggerCallback( p_vout, "mouse-moved" );
+                x = (((int)ml.h) - i_x) * p_vout->render.i_width / i_width;
+                y = (((int)ml.v) - i_y) * p_vout->render.i_height / i_height;
+                var_SetCoords( p_vout, "mouse-moved", x, y );
                 break;
             }
  

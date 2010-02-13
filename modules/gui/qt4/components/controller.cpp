@@ -949,10 +949,7 @@ static int FullscreenControllerWidgetMouseMoved( vlc_object_t *vlc_object, const
     FullscreenControllerWidget *p_fs = (FullscreenControllerWidget *)data;
 
     /* Get the value from the Vout - Trust the vout more than Qt */
-    const int i_mousex = var_GetInteger( p_vout, "mouse-x" );
-    const int i_mousey = var_GetInteger( p_vout, "mouse-y" );
-
-    p_fs->mouseChanged( p_vout, i_mousex, i_mousey );
+    p_fs->mouseChanged( p_vout, new_val.coords.x, new_val.coords.y );
 
     return VLC_SUCCESS;
 }

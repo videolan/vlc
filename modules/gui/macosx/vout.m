@@ -580,7 +580,10 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
     if( p_vout && [o_event type] == NSLeftMouseUp )
     {
-        var_SetBool( p_vout, "mouse-clicked", true );
+        int x, y;
+
+        var_GetCoords( p_vout, "mouse-moved", &x, &y );
+        var_SetCoords( p_vout, "mouse-clicked", x, y );
 
         var_Get( p_vout, "mouse-button-down", &val );
         val.i_int &= ~1;
@@ -646,29 +649,24 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
 
         if( b_inside )
         {
-            vlc_value_t val;
+            int x, y;
             unsigned int i_width, i_height, i_x, i_y;
 
             vout_PlacePicture( p_vout, (unsigned int)s_rect.size.width,
                                        (unsigned int)s_rect.size.height,
                                        &i_x, &i_y, &i_width, &i_height );
 
-            val.i_int = ( ((int)ml.x) - i_x ) *
-                        p_vout->render.i_width / i_width;
-            var_Set( p_vout, "mouse-x", val );
-
+            x = (((int)ml.x) - i_x) * p_vout->render.i_width / i_width;
             if( [[o_view className] isEqualToString: @"VLCGLView"] )
             {
-                val.i_int = ( ((int)(s_rect.size.height - ml.y)) - i_y ) *
+                y = (((int)(s_rect.size.height - ml.y)) - i_y) *
                             p_vout->render.i_height / i_height;
             }
             else
             {
-                val.i_int = ( ((int)ml.y) - i_y ) *
-                            p_vout->render.i_height / i_height;
+                y = (((int)ml.y) - i_y) * p_vout->render.i_height / i_height;
             }
-            var_Set( p_vout, "mouse-y", val );
-            var_TriggerCallback( p_vout, "mouse-moved" );
+            var_SetCoords( p_vout, "mouse-moved", x, y );
         }
         if( [self isFullscreen] )
             [[[[VLCMain sharedInstance] controls] fspanel] fadeIn];

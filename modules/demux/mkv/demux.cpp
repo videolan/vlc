@@ -415,12 +415,11 @@ void * demux_sys_t::EventThread( vlc_object_t *p_this )
         /* MOUSE part */
         if( p_vout && ( p_ev->b_moved || p_ev->b_clicked ) )
         {
-            vlc_value_t valx, valy;
+            int x, y;
 
+            var_GetCoords( p_vout, "mouse-moved", &x, &y );
             vlc_mutex_lock( &p_ev->lock );
             pci_t *pci = (pci_t *) &p_sys->pci_packet;
-            var_Get( p_vout, "mouse-x", &valx );
-            var_Get( p_vout, "mouse-y", &valy );
 
             if( p_ev->b_clicked )
             {
@@ -428,7 +427,7 @@ void * demux_sys_t::EventThread( vlc_object_t *p_this )
                 int32_t best,dist,d;
                 int32_t mx,my,dx,dy;
 
-                msg_Dbg( p_ev->p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", (unsigned)valx.i_int, (unsigned)valy.i_int);
+                msg_Dbg( p_ev->p_demux, "Handle Mouse Event: Mouse clicked x(%d)*y(%d)", x, y);
 
                 b_activated = true;
                 // get current button
@@ -438,15 +437,15 @@ void * demux_sys_t::EventThread( vlc_object_t *p_this )
                 {
                     btni_t *button_ptr = &(pci->hli.btnit[button-1]);
 
-                    if(((unsigned)valx.i_int >= button_ptr->x_start)
-                     && ((unsigned)valx.i_int <= button_ptr->x_end)
-                     && ((unsigned)valy.i_int >= button_ptr->y_start)
-                     && ((unsigned)valy.i_int <= button_ptr->y_end))
+                    if(((unsigned)x >= button_ptr->x_start)
+                     && ((unsigned)x <= button_ptr->x_end)
+                     && ((unsigned)y >= button_ptr->y_start)
+                     && ((unsigned)y <= button_ptr->y_end))
                     {
                         mx = (button_ptr->x_start + button_ptr->x_end)/2;
                         my = (button_ptr->y_start + button_ptr->y_end)/2;
-                        dx = mx - valx.i_int;
-                        dy = my - valy.i_int;
+                        dx = mx - x;
+                        dy = my - y;
                         d = (dx*dx) + (dy*dy);
                         /* If the mouse is within the button and the mouse is closer
                         * to the center of this button then it is the best choice. */
@@ -519,7 +518,7 @@ void * demux_sys_t::EventThread( vlc_object_t *p_this )
             }
             else if( p_ev->b_moved )
             {
-//                dvdnav_mouse_select( NULL, pci, valx.i_int, valy.i_int );
+//                dvdnav_mouse_select( NULL, pci, x, y );
             }
 
             p_ev->b_moved = false;

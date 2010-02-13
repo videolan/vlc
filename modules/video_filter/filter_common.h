@@ -102,8 +102,6 @@ static inline void vout_filter_SetupChild( vout_thread_t *p_parent,
     /* */
     if( !pf_mouse_event )
         pf_mouse_event = ForwardEvent;
-    pf_execute( VLC_OBJECT(p_child), "mouse-x",           pf_mouse_event, p_parent );
-    pf_execute( VLC_OBJECT(p_child), "mouse-y",           pf_mouse_event, p_parent );
     pf_execute( VLC_OBJECT(p_child), "mouse-moved",       pf_mouse_event, p_parent );
     pf_execute( VLC_OBJECT(p_child), "mouse-clicked",     pf_mouse_event, p_parent );
     pf_execute( VLC_OBJECT(p_child), "mouse-button-down", pf_mouse_event, p_parent );
