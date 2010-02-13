@@ -736,6 +736,10 @@ static int DemuxInit( demux_t *p_demux )
     asf_object_t *p_hdr_ext = ASF_FindObject( p_sys->p_root->p_hdr,
                                               &asf_object_header_extension_guid, 0 );
 
+    asf_object_language_list_t *p_languages = NULL;
+    if( p_hdr_ext )
+        p_languages = ASF_FindObject( p_hdr_ext, &asf_object_language_list, 0 );
+
     for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {
         asf_track_t    *tk;
@@ -946,6 +950,16 @@ static int DemuxInit( demux_t *p_demux )
         tk->i_cat = fmt.i_cat;
         if( fmt.i_cat != UNKNOWN_ES )
         {
+            if( p_esp && p_languages &&
+                p_esp->i_language_index >= 0 &&
+                p_esp->i_language_index < p_languages->i_language )
+            {
+                fmt.psz_language = strdup( p_languages->ppsz_language[p_esp->i_language_index] );
+                char *p;
+                if( fmt.psz_language && (p = strchr( fmt.psz_language, '-' )) )
+                    *p = '\0';
+            }
+
             tk->p_es = es_out_Add( p_demux->out, &fmt );
         }
         else
