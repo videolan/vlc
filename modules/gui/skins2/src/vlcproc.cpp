@@ -47,7 +47,6 @@
 #include "../commands/cmd_resize.hpp"
 #include "../commands/cmd_vars.hpp"
 #include "../commands/cmd_dialogs.hpp"
-#include "../commands/cmd_update_item.hpp"
 #include "../commands/cmd_audio.hpp"
 #include "../commands/cmd_callbacks.hpp"
 #include "../utils/var_bool.hpp"
@@ -361,17 +360,6 @@ int VlcProc::onInteraction( vlc_object_t *pObj, const char *pVariable,
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->push( CmdGenericPtr( pCmd ) );
     return VLC_SUCCESS;
-}
-
-
-void VlcProc::updateStreamName()
-{
-    // Create a update item command
-    CmdUpdateItem *pCmdItem = new CmdUpdateItem( getIntf(), getStreamNameVar(), getStreamURIVar() );
-
-    // Push the command in the asynchronous command queue
-    AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
-    pQueue->push( CmdGenericPtr( pCmdItem ) );
 }
 
 int VlcProc::onEqBandsChange( vlc_object_t *pObj, const char *pVariable,

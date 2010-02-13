@@ -38,8 +38,6 @@ SOURCES_skins2 = \
 	commands/cmd_snapshot.cpp \
 	commands/cmd_snapshot.hpp \
 	commands/cmd_show_window.hpp \
-	commands/cmd_update_item.cpp \
-	commands/cmd_update_item.hpp \
 	commands/cmd_vars.cpp \
 	commands/cmd_vars.hpp \
 	\
