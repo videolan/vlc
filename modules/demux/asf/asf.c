@@ -785,10 +785,11 @@ static int DemuxInit( demux_t *p_demux )
             }
         }
 
+        es_format_t fmt;
+
         if( ASF_CmpGUID( &p_sp->i_stream_type, &asf_object_stream_type_audio ) &&
             p_sp->i_type_specific_data_length >= sizeof( WAVEFORMATEX ) - 2 )
         {
-            es_format_t fmt;
             uint8_t *p_data = p_sp->p_type_specific_data;
             int i_format;
 
@@ -813,10 +814,6 @@ static int DemuxInit( demux_t *p_demux )
                         fmt.i_extra );
             }
 
-            tk->i_cat = AUDIO_ES;
-            tk->p_es = es_out_Add( p_demux->out, &fmt );
-            es_format_Clean( &fmt );
-
             msg_Dbg( p_demux, "added new audio stream(codec:0x%x,ID:%d)",
                     GetWLE( p_data ), p_sp->i_stream_number );
         }
@@ -825,7 +822,6 @@ static int DemuxInit( demux_t *p_demux )
                  p_sp->i_type_specific_data_length >= 11 +
                  sizeof( BITMAPINFOHEADER ) )
         {
-            es_format_t  fmt;
             uint8_t      *p_data = &p_sp->p_type_specific_data[11];
 
             es_format_Init( &fmt, VIDEO_ES,
@@ -890,10 +886,6 @@ static int DemuxInit( demux_t *p_demux )
                 }
             }
 
-            tk->i_cat = VIDEO_ES;
-            tk->p_es = es_out_Add( p_demux->out, &fmt );
-            es_format_Clean( &fmt );
-
             /* If there is a video track then use the index for seeking */
             p_sys->b_index = b_index;
 
@@ -904,7 +896,6 @@ static int DemuxInit( demux_t *p_demux )
             p_sp->i_type_specific_data_length >= 64 )
         {
             /* Now follows a 64 byte header of which we don't know much */
-            es_format_t fmt;
             guid_t  *p_ref  = (guid_t *)p_sp->p_type_specific_data;
             uint8_t *p_data = p_sp->p_type_specific_data + 64;
             unsigned int i_data = p_sp->i_type_specific_data_length - 64;
@@ -939,20 +930,30 @@ static int DemuxInit( demux_t *p_demux )
                         fmt.i_extra );
                 }
 
-                tk->i_cat = AUDIO_ES;
-                tk->p_es = es_out_Add( p_demux->out, &fmt );
-                es_format_Clean( &fmt );
-
                 msg_Dbg( p_demux, "added new audio stream (codec:0x%x,ID:%d)",
                     i_format, p_sp->i_stream_number );
+            }
+            else
+            {
+                es_format_Init( &fmt, UNKNOWN_ES, 0 );
             }
         }
         else
         {
-            tk->i_cat = UNKNOWN_ES;
+            es_format_Init( &fmt, UNKNOWN_ES, 0 );
+        }
+
+        tk->i_cat = fmt.i_cat;
+        if( fmt.i_cat != UNKNOWN_ES )
+        {
+            tk->p_es = es_out_Add( p_demux->out, &fmt );
+        }
+        else
+        {
             msg_Dbg( p_demux, "ignoring unknown stream(ID:%d)",
                      p_sp->i_stream_number );
         }
+        es_format_Clean( &fmt );
     }
 
     p_sys->i_data_begin = p_sys->p_root->p_data->i_object_pos + 50;
