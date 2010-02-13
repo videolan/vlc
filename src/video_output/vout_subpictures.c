@@ -198,9 +198,9 @@ spu_t *spu_Create( vlc_object_t *p_this )
  
     p_spu = vlc_custom_create( p_this, sizeof(spu_t) + sizeof(spu_private_t),
                                VLC_OBJECT_GENERIC, "subpicture" );
-
     if( !p_spu )
         return NULL;
+    vlc_object_attach( p_spu, p_this );
 
     /* Initialize spu fields */
     p_spu->pf_control = SpuControl;
@@ -220,8 +220,6 @@ spu_t *spu_Create( vlc_object_t *p_this )
 
     /* Register the default subpicture channel */
     p_sys->i_channel = 2;
-
-    vlc_object_attach( p_spu, p_this );
 
     p_sys->psz_chain_update = NULL;
     p_sys->p_chain = filter_chain_New( p_spu, "sub filter", false,
