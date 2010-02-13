@@ -300,7 +300,7 @@ bool StandardPLPanel::eventFilter ( QObject * watched, QEvent * event )
     {
         QKeyEvent *keyEvent = static_cast<QKeyEvent*>(event);
         if( keyEvent->key() == Qt::Key_Delete ||
-            keyEvent->key() == Qt::Key_Back )
+            keyEvent->key() == Qt::Key_Backspace )
         {
             deleteSelection();
             return true;
