@@ -218,9 +218,9 @@ DIST_lua= \
 	lua/intf/hotkeys.lua \
 	lua/intf/modules/common.lua \
 	lua/intf/modules/host.lua \
-	lua/intf/modules/sandbox.lua \
 	lua/intf/telnet.lua \
-	lua/intf/dummy.lua
+	lua/intf/dummy.lua \
+	lua/modules/sandbox.lua
 
 DIST_http_lua = \
 	lua/http/.hosts \
