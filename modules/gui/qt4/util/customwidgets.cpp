@@ -40,9 +40,8 @@
 #include <QStyle>
 #include <QStyleOption>
 #include <vlc_intf_strings.h>
-
-
 #include <vlc_keys.h>
+#include <wctype.h> /* twolower() */
 
 ClickLineEdit::ClickLineEdit( const QString &msg, QWidget *parent) : QLineEdit( parent )
 {
@@ -222,61 +221,167 @@ int qtKeyModifiersToVLC( QInputEvent* e )
     return i_keyModifiers;
 }
 
+typedef struct
+{
+    int      qt;
+    uint32_t vlc;
+} vlc_qt_key_t;
+
+static const vlc_qt_key_t keys[] =
+{
+    { Qt::Key_Escape,                KEY_ESC },
+    { Qt::Key_Tab,                   '\t', },
+    // Qt::Key_Backtab
+    { Qt::Key_Backspace,             '\b' },
+    { Qt::Key_Return,                '\r' },
+    { Qt::Key_Enter,                 '\r' }, // numeric pad
+    { Qt::Key_Insert,                KEY_INSERT },
+    { Qt::Key_Delete,                KEY_DELETE },
+    // Qt::Key_Pause
+    // Qt::Key_Print
+    // Qt::Key_SysReq
+    // Qt::Key_Clear
+    { Qt::Key_Home,                  KEY_HOME },
+    { Qt::Key_End,                   KEY_END },
+    { Qt::Key_Left,                  KEY_LEFT },
+    { Qt::Key_Up,                    KEY_UP },
+    { Qt::Key_Right,                 KEY_RIGHT },
+    { Qt::Key_Down,                  KEY_DOWN },
+    { Qt::Key_PageUp,                KEY_PAGEUP },
+    { Qt::Key_PageDown,              KEY_PAGEDOWN },
+    // Qt::Key_Shift
+    // Qt::Key_Control
+    // Qt::Key_Meta
+    // Qt::Key_Alt
+    // Qt::Key_CapsLock
+    // Qt::Key_NumLock
+    // Qt::Key_ScrollLock
+    /* F1 - F35 */
+    // Qt::Key_Super_L
+    // Qt::Key_Super_R
+    { Qt::Key_Menu,                  KEY_MENU },
+    // Qt::Key_Hyper_L
+    // Qt::Key_Hyper_R
+    // Qt::Key_Help
+    // Qt::Key_Direction_L
+    // Qt::Key_Direction_R
+
+    // Qt::Key_Multi_key
+    // Qt::Key_Codeinput
+    // Qt::Key_SingleCandidate
+    // Qt::Key_MultipleCandidate
+    // Qt::Key_PreviousCandidate
+    // Qt::Key_Mode_switch
+    // Qt::Key_Kanji
+    // Qt::Key_Muhenkan
+    // Qt::Key_Henkan
+    // Qt::Key_Romaji
+    // Qt::Key_Hiragana
+    // Qt::Key_Katakana
+    // Qt::Key_Hiragana_Katakana
+    // Qt::Key_Zenkaku
+    // Qt::Key_Hankaku
+    // Qt::Key_Zenkaku_Hankaku
+    // Qt::Key_Touroku
+    // Qt::Key_Massyo
+    // Qt::Key_Kana_Lock
+    // Qt::Key_Kana_Shift
+    // Qt::Key_Eisu_Shift
+    // Qt::Key_Eisu_toggle
+    // Qt::Key_Hangul
+    // Qt::Key_Hangul_Start
+    // Qt::Key_Hangul_End
+    // Qt::Key_Hangul_Hanja
+    // Qt::Key_Hangul_Jamo
+    // Qt::Key_Hangul_Romaja
+    // Qt::Key_Hangul_Jeonja
+    // Qt::Key_Hangul_Banja
+    // Qt::Key_Hangul_PreHanja
+    // Qt::Key_Hangul_PostHanja
+    // Qt::Key_Hangul_Special
+    // Qt::Key_Dead_Grave
+    // Qt::Key_Dead_Acute
+    // Qt::Key_Dead_Circumflex
+    // Qt::Key_Dead_Tilde
+    // Qt::Key_Dead_Macron
+    // Qt::Key_Dead_Breve
+    // Qt::Key_Dead_Abovedot
+    // Qt::Key_Dead_Diaeresis
+    // Qt::Key_Dead_Abovering
+    // Qt::Key_Dead_Doubleacute
+    // Qt::Key_Dead_Caron
+    // Qt::Key_Dead_Cedilla
+    // Qt::Key_Dead_Ogonek
+    // Qt::Key_Dead_Iota
+    // Qt::Key_Dead_Voiced_Sound
+    // Qt::Key_Dead_Semivoiced_Sound
+    // Qt::Key_Dead_Belowdot
+    // Qt::Key_Dead_Hook
+    // Qt::Key_Dead_Horn
+    { Qt::Key_Back,                  KEY_BROWSER_BACK },
+    { Qt::Key_Forward,               KEY_BROWSER_FORWARD },
+    { Qt::Key_Stop,                  KEY_BROWSER_STOP },
+    { Qt::Key_Refresh,               KEY_BROWSER_REFRESH },
+    { Qt::Key_VolumeDown,            KEY_VOLUME_DOWN },
+    { Qt::Key_VolumeMute,            KEY_VOLUME_MUTE },
+    { Qt::Key_VolumeUp,              KEY_VOLUME_UP },
+    // Qt::Key_BassBoost
+    // Qt::Key_BassUp
+    // Qt::Key_BassDown
+    // Qt::Key_TrebleUp
+    // Qt::Key_TrebleDown
+    { Qt::Key_MediaPlay,             KEY_MEDIA_PLAY_PAUSE },
+    { Qt::Key_MediaStop,             KEY_MEDIA_STOP },
+    { Qt::Key_MediaPrevious,         KEY_MEDIA_PREV_TRACK },
+    { Qt::Key_MediaNext,             KEY_MEDIA_NEXT_TRACK },
+    // Qt::Key_MediaRecord
+    { Qt::Key_HomePage,              KEY_BROWSER_HOME },
+    { Qt::Key_Favorites,             KEY_BROWSER_FAVORITES },
+    { Qt::Key_Search,                KEY_BROWSER_SEARCH },
+    // Qt::Key_Standby
+    // Qt::Key_OpenUrl
+    // Qt::Key_LaunchMail
+    // Qt::Key_LaunchMedia
+    /* Qt::Key_Launch0 through Qt::Key_LaunchF */
+    // Qt::Key_MediaLast
+};
+
+static int keycmp( const void *a, const void *b )
+{
+    const int *q = (const int *)a;
+    const vlc_qt_key_t *m = (const vlc_qt_key_t *)b;
+
+    return *q - m->qt;
+}
+
 int qtEventToVLCKey( QKeyEvent *e )
 {
-    int i_vlck = 0;
+    int qtk = e->key();
+    uint32_t i_vlck = 0;
+
+    if( qtk <= 0xff )
+        /* VLC and X11 use lowercase whereas Qt uses uppercase */
+#ifdef __STDC_ISO_10646__
+        i_vlck = towlower( qtk );
+#else
+# error FIXME
+#endif
+    else /* Qt and X11 go to F35, but VLC stops at F12 */
+    if( qtk >= Qt::Key_F1 && qtk <= Qt::Key_F12 )
+        i_vlck = qtk - Qt::Key_F1 + KEY_F1;
+    else
+    {
+        const vlc_qt_key_t *map;
+
+        map = (const vlc_qt_key_t *)
+              bsearch( &qtk, (const void *)keys, sizeof(keys)/sizeof(keys[0]),
+                       sizeof(*keys), keycmp );
+        if( map != NULL )
+            i_vlck = map->vlc;
+    }
+
     /* Handle modifiers */
     i_vlck |= qtKeyModifiersToVLC( e );
-
-    bool found = false;
-    /* Look for some special keys */
-#define HANDLE( qt, vk ) case Qt::qt : i_vlck |= vk; found = true;break
-    switch( e->key() )
-    {
-        HANDLE( Key_Left, KEY_LEFT );
-        HANDLE( Key_Right, KEY_RIGHT );
-        HANDLE( Key_Up, KEY_UP );
-        HANDLE( Key_Down, KEY_DOWN );
-        HANDLE( Key_Space, ' ' );
-        HANDLE( Key_Escape, KEY_ESC );
-        HANDLE( Key_Return, KEY_ENTER );
-        HANDLE( Key_Enter, KEY_ENTER );
-        HANDLE( Key_F1, KEY_F1 );
-        HANDLE( Key_F2, KEY_F2 );
-        HANDLE( Key_F3, KEY_F3 );
-        HANDLE( Key_F4, KEY_F4 );
-        HANDLE( Key_F5, KEY_F5 );
-        HANDLE( Key_F6, KEY_F6 );
-        HANDLE( Key_F7, KEY_F7 );
-        HANDLE( Key_F8, KEY_F8 );
-        HANDLE( Key_F9, KEY_F9 );
-        HANDLE( Key_F10, KEY_F10 );
-        HANDLE( Key_F11, KEY_F11 );
-        HANDLE( Key_F12, KEY_F12 );
-        HANDLE( Key_PageUp, KEY_PAGEUP );
-        HANDLE( Key_PageDown, KEY_PAGEDOWN );
-        HANDLE( Key_Home, KEY_HOME );
-        HANDLE( Key_End, KEY_END );
-        HANDLE( Key_Insert, KEY_INSERT );
-        HANDLE( Key_Delete, KEY_DELETE );
-        HANDLE( Key_VolumeDown, KEY_VOLUME_DOWN);
-        HANDLE( Key_VolumeUp, KEY_VOLUME_UP );
-        HANDLE( Key_VolumeMute, KEY_VOLUME_MUTE );
-        HANDLE( Key_MediaPlay, KEY_MEDIA_PLAY_PAUSE );
-        HANDLE( Key_MediaStop, KEY_MEDIA_STOP );
-        HANDLE( Key_MediaPrevious, KEY_MEDIA_PREV_TRACK );
-        HANDLE( Key_MediaNext, KEY_MEDIA_NEXT_TRACK );
-
-    }
-    if( !found )
-    {
-        /* Force lowercase */
-        if( e->key() >= Qt::Key_A && e->key() <= Qt::Key_Z )
-            i_vlck += e->key() + 32;
-        /* Rest of the ascii range */
-        else if( e->key() >= Qt::Key_Space && e->key() <= Qt::Key_AsciiTilde )
-            i_vlck += e->key();
-    }
     return i_vlck;
 }
 
