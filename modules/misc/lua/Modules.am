@@ -33,6 +33,7 @@ SOURCES_lua = \
 	libs/video.c \
 	libs/vlm.c \
 	libs/volume.c \
+	libs/xml.c \
 	$(NULL)
 
 libvlc_LTLIBRARIES += liblua_plugin.la

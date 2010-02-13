@@ -138,6 +138,7 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
     luaL_register( L, "vlc", p_reg );
     luaopen_msg( L );
     luaopen_strings( L );
+    luaopen_xml( L );
     lua_pushlightuserdata( L, p_demux );
     lua_setfield( L, -2, "private" );
     lua_pushstring( L, p_demux->psz_path );
