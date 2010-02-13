@@ -268,11 +268,13 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *pParam )
 {
+    // TODO: FIXME
+    // Deactivated because it mixes up i_id from input_item_t
+    // and i_id from playlist_item_t
+#if 0
+
     VlcProc *pThis = (VlcProc*)pParam;
     input_item_t *p_item = static_cast<input_item_t*>(newval.p_address);
-
-    // Update the stream variable
-    pThis->updateStreamName();
 
     // Create a playtree notify command
     CmdPlaytreeUpdate *pCmdTree = new CmdPlaytreeUpdate( pThis->getIntf(),
@@ -281,6 +283,8 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->push( CmdGenericPtr( pCmdTree ), true );
+
+#endif
 
     return VLC_SUCCESS;
 }
@@ -445,24 +449,28 @@ int VlcProc::onGenericCallback( vlc_object_t *pObj, const char *pVariable,
     return VLC_SUCCESS;
 }
 
-void VlcProc::on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal )
-{
-    input_item_t *p_item = static_cast<input_item_t*>(newVal.p_address);
-
-    // Update the stream variable
-    updateStreamName();
-
-    // Create a playtree notify command
-    AsyncQueue *pQueue = AsyncQueue::instance( getIntf() );
-    CmdPlaytreeUpdate *pCmdTree =
-            new CmdPlaytreeUpdate( getIntf(), p_item->i_id );
-    pQueue->push( CmdGenericPtr( pCmdTree ) , true );
-}
-
 #define SET_BOOL(m,v)         ((VarBoolImpl*)(m).get())->set(v)
 #define SET_STREAMTIME(m,v,b) ((StreamTime*)(m).get())->set(v,b)
 #define SET_TEXT(m,v)         ((VarText*)(m).get())->set(v)
 #define SET_VOLUME(m,v,b)     ((Volume*)(m).get())->set(v,b)
+
+void VlcProc::on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal )
+{
+    input_item_t *p_item = static_cast<input_item_t*>(newVal.p_address);
+
+    // Update short name
+    char *psz_name = input_item_GetName( p_item );
+    SET_TEXT( m_cVarStreamName, UString( getIntf(), psz_name ) );
+    free( psz_name );
+
+    // Update full uri
+    char *psz_uri = input_item_GetURI( p_item );
+    SET_TEXT( m_cVarStreamURI, UString( getIntf(), psz_uri ) );
+    free( psz_uri );
+
+    // Update playtree
+    getPlaytreeVar().onUpdateCurrent();
+}
 
 void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
 {
@@ -734,6 +742,8 @@ void VlcProc::reset_input()
     SET_BOOL( m_cVarPaused, false );
 
     SET_STREAMTIME( m_cVarTime, 0, false );
+    SET_TEXT( m_cVarStreamName, UString( getIntf(), "") );
+    SET_TEXT( m_cVarStreamURI, UString( getIntf(), "") );
     SET_TEXT( m_cVarStreamBitRate, UString( getIntf(), "") );
     SET_TEXT( m_cVarStreamSampleRate, UString( getIntf(), "") );
 }
