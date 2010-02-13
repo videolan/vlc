@@ -188,15 +188,6 @@ VLC_PUBLIC_API const char * libvlc_get_changeset(void);
 
 struct vlc_object_t;
 
-/**
- * Frees an heap allocation (char *) returned by a LibVLC API.
- * If you know you're using the same underlying C run-time as the LibVLC
- * implementation, then you can call ANSI C free() directly instead.
- *
- * \param ptr the pointer
- */
-VLC_PUBLIC_API void libvlc_free( void *ptr );
-
 /** @}*/
 
 /*****************************************************************************

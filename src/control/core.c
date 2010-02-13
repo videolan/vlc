@@ -135,8 +135,3 @@ const char * libvlc_get_changeset(void)
     extern const char psz_vlc_changeset[];
     return psz_vlc_changeset;
 }
-
-void libvlc_free( void *ptr )
-{
-    free( ptr );
-}
