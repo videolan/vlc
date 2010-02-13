@@ -6,6 +6,7 @@ SOURCES_packetizer_h264 = h264.c
 SOURCES_packetizer_vc1 = vc1.c
 SOURCES_packetizer_mlp = mlp.c
 SOURCES_packetizer_dirac = dirac.c
+SOURCES_packetizer_flac = flac.c
 
 noinst_HEADERS = packetizer_helper.h
 
@@ -17,6 +18,7 @@ libvlc_LTLIBRARIES += \
 	libpacketizer_vc1_plugin.la \
 	libpacketizer_mlp_plugin.la \
 	libpacketizer_dirac_plugin.la \
+	libpacketizer_flac_plugin.la \
 	$(NULL)
 if ENABLE_SOUT
 libvlc_LTLIBRARIES += libpacketizer_copy_plugin.la
