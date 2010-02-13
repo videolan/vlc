@@ -751,6 +751,7 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
         MYCASE( VARIABLE, "variable" );
         MYCASE( FLOAT, "float" );
         MYCASE( TIME, "time" );
+        MYCASE( COORDS, "coords" );
         MYCASE( ADDRESS, "address" );
         MYCASE( MUTEX, "mutex" );
         MYCASE( LIST, "list" );
@@ -785,6 +786,10 @@ static void DumpVariable (const void *data, const VISIT which, const int depth)
             break;
         case VLC_VAR_TIME:
             printf( ": %"PRIi64, (int64_t)p_var->val.i_time );
+            break;
+        case VLC_VAR_COORDS:
+            printf( ": %"PRId32"x%"PRId32,
+                    p_var->val.coords.x, p_var->val.coords.y );
             break;
         case VLC_VAR_ADDRESS:
             printf( ": %p", p_var->val.p_address );

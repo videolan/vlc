@@ -157,7 +157,8 @@ int_ops    = { CmpInt,     DupDummy,  FreeDummy,  },
 list_ops   = { CmpAddress, DupList,   FreeList,   },
 mutex_ops  = { CmpAddress, DupDummy,  FreeMutex,  },
 string_ops = { CmpString,  DupString, FreeString, },
-time_ops   = { CmpTime,    DupDummy,  FreeDummy,  };
+time_ops   = { CmpTime,    DupDummy,  FreeDummy,  },
+coords_ops = { NULL,       DupDummy,  FreeDummy,  };
 
 /*****************************************************************************
  * Local prototypes
@@ -270,6 +271,10 @@ int var_Create( vlc_object_t *p_this, const char *psz_name, int i_type )
         case VLC_VAR_TIME:
             p_var->ops = &time_ops;
             p_var->val.i_time = 0;
+            break;
+        case VLC_VAR_COORDS:
+            p_var->ops = &coords_ops;
+            p_var->val.coords.x = p_var->val.coords.y = 0;
             break;
         case VLC_VAR_ADDRESS:
             p_var->ops = &addr_ops;

@@ -223,6 +223,16 @@ static inline int var_SetTime( vlc_object_t *p_obj, const char *psz_name, int64_
     return var_SetChecked( p_obj, psz_name, VLC_VAR_TIME, val );
 }
 
+static inline int var_SetCoords( vlc_object_t *obj, const char *name,
+                                 int32_t x, int32_t y )
+{
+    vlc_value_t val;
+    val.coords.x = x;
+    val.coords.y = y;
+    return var_SetChecked (obj, name, VLC_VAR_COORDS, val);
+}
+#define var_SetCoords(o,n,x,y) var_SetCoords(VLC_OBJECT(o),n,x,y)
+
 /**
  * Set the value of a float variable
  *
@@ -322,6 +332,21 @@ static inline int64_t var_GetTime( vlc_object_t *p_obj, const char *psz_name )
     else
         return 0;
 }
+
+static inline void var_GetCoords( vlc_object_t *obj, const char *name,
+                                  int32_t *px, int32_t *py )
+{
+    vlc_value_t val;
+
+    if (likely(!var_GetChecked (obj, name, VLC_VAR_COORDS, &val)))
+    {
+        *px = val.coords.x;
+        *py = val.coords.y;
+    }
+    else
+        *px = *py = 0;
+}
+#define var_GetCoords(o,n,x,y) var_GetCoords(VLC_OBJECT(o),n,x,y)
 
 /**
  * Get a float value

@@ -420,9 +420,10 @@ typedef union
     vlc_object_t *  p_object;
     vlc_list_t *    p_list;
     mtime_t         i_time;
+    struct { int32_t x; int32_t y; } coords;
 
-   /* Make sure the structure is at least 64bits */
-    struct { char a, b, c, d, e, f, g, h; } padding;
+    /* Make sure the structure is at least 64bits */
+    uint8_t padding[8];
 
 } vlc_value_t;
 
@@ -456,6 +457,7 @@ struct vlc_list_t
 #define VLC_VAR_ADDRESS   0x0070
 #define VLC_VAR_MUTEX     0x0080
 #define VLC_VAR_LIST      0x0090
+#define VLC_VAR_COORDS    0x00A0
 /**@}*/
 
 /*****************************************************************************
