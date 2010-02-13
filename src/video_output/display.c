@@ -386,7 +386,7 @@ static void VoutDisplayCreateRender(vout_display_t *vd)
     if (!convert)
         return;
 
-    msg_Err(vd, "A filter to adapt decoder to display is needed");
+    msg_Dbg(vd, "A filter to adapt decoder to display is needed");
 
     osys->filters = filter_chain_New(vd, "video filter2", false,
                                      FilterAllocationInit,
