@@ -59,15 +59,10 @@ static const luaL_Reg vlclua_stream_reg[] = {
     { NULL, NULL }
 };
 
-static int vlclua_stream_new( lua_State *L )
+static int vlclua_stream_new_inner( lua_State *L, stream_t *p_stream )
 {
-    vlc_object_t * p_this = vlclua_get_this( L );
-    stream_t * p_stream;
-    const char * psz_url;
-    psz_url = luaL_checkstring( L, 1 );
-    p_stream = stream_UrlNew( p_this, psz_url );
     if( !p_stream )
-        return luaL_error( L, "Error when opening url: `%s'", psz_url );
+        return luaL_error( L, "Error when opening stream" );
 
     stream_t **pp_stream = lua_newuserdata( L, sizeof( stream_t * ) );
     *pp_stream = p_stream;
@@ -83,6 +78,23 @@ static int vlclua_stream_new( lua_State *L )
 
     lua_setmetatable( L, -2 );
     return 1;
+}
+
+static int vlclua_stream_new( lua_State *L )
+{
+    vlc_object_t * p_this = vlclua_get_this( L );
+    const char * psz_url = luaL_checkstring( L, 1 );
+    stream_t *p_stream = stream_UrlNew( p_this, psz_url );
+    return vlclua_stream_new_inner( L, p_stream );
+}
+
+static int vlclua_memory_stream_new( lua_State *L )
+{
+    vlc_object_t * p_this = vlclua_get_this( L );
+    /* FIXME: duplicating the whole buffer is suboptimal. Keeping a reference to the string so that it doesn't get garbage collected would be better */
+    const char * psz_content = strdup( luaL_checkstring( L, 1 ) );
+    stream_t *p_stream = stream_MemoryNew( p_this, psz_content, strlen( psz_content ), false );
+    return vlclua_stream_new_inner( L, p_stream );
 }
 
 static int vlclua_stream_read( lua_State *L )
@@ -176,4 +188,6 @@ void luaopen_stream( lua_State *L )
 {
     lua_pushcfunction( L, vlclua_stream_new );
     lua_setfield( L, -2, "stream" );
+    lua_pushcfunction( L, vlclua_memory_stream_new );
+    lua_setfield( L, -2, "memory_stream" );
 }
