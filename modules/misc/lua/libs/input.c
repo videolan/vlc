@@ -311,6 +311,12 @@ static int vlclua_input_item_metas( lua_State *L )
     return 1;
 }
 
+static int vlclua_input_item_is_preparsed( lua_State *L )
+{
+    lua_pushboolean( L, input_item_IsPreparsed( vlclua_input_item_get_internal( L ) ) );
+    return 1;
+}
+
 static int vlclua_input_item_set_meta( lua_State *L )
 {
     input_item_t *p_item = vlclua_input_item_get_internal( L );
@@ -381,6 +387,7 @@ void luaopen_input( lua_State *L )
 }
 
 static const luaL_Reg vlclua_input_item_reg[] = {
+    { "is_preparsed", vlclua_input_item_is_preparsed },
     { "metas", vlclua_input_item_metas },
     { "set_meta", vlclua_input_item_set_meta },
     { NULL, NULL }

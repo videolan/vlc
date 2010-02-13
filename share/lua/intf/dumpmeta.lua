@@ -22,18 +22,20 @@
 --]==========================================================================]
 
 --[[ to dump meta data information in the debug output, run:
-       vlc -I lua --lua-intf dumpmeta coolmusic.mp3
+       vlc -I lua --lua-intf dumpmeta -v=0 coolmusic.mp3
 --]]
 
-local meta
+local item
 repeat
-    meta = vlc.input.metas()
-until meta
+    item = vlc.input.item()
+until (item and item:is_preparsed()) or vlc.misc.should_die()
 
+local meta = item:metas()
 vlc.msg.info("Dumping meta data")
 if meta then
     for key, value in pairs(meta) do
         vlc.msg.info(key..": "..value)
     end
 end
+
 vlc.misc.quit()
