@@ -22,7 +22,9 @@
 --]==========================================================================]
 
 --[[ to dump meta data information in the debug output, run:
-       vlc -I lua --lua-intf dumpmeta -v=0 coolmusic.mp3
+       vlc -I lua --lua-intf dumpmeta coolmusic.mp3
+     Additional options can improve performance and output readability:
+       -V dummy -A dummy --no-video-title --no-media-library --verbose-objects +lua,-all -v=0
 --]]
 
 local item
@@ -30,11 +32,29 @@ repeat
     item = vlc.input.item()
 until (item and item:is_preparsed()) or vlc.misc.should_die()
 
+-- preparsing doesn't always provide all the information we want (like duration)
+repeat
+until item:stats()["demux_read_bytes"] > 0 or vlc.misc.should_die()
+
+vlc.msg.info("name: "..item:name())
+vlc.msg.info("uri: "..vlc.strings.decode_uri(item:uri()))
+vlc.msg.info("duration: "..tostring(item:duration()))
+
+vlc.msg.info("meta data:")
 local meta = item:metas()
-vlc.msg.info("Dumping meta data")
 if meta then
     for key, value in pairs(meta) do
-        vlc.msg.info(key..": "..value)
+        vlc.msg.info("  "..key..": "..value)
+    end
+else
+    vlc.msg.info("  no meta data available")
+end
+
+vlc.msg.info("info:")
+for cat, data in pairs(item:info()) do
+    vlc.msg.info("  "..cat)
+    for key, value in pairs(data) do
+        vlc.msg.info("    "..key..": "..value)
     end
 end
 
