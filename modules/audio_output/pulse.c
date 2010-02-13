@@ -342,6 +342,11 @@ static void Close ( vlc_object_t *p_this )
         pa_threaded_mainloop_lock(p_sys->mainloop);
         pa_stream_set_write_callback(p_sys->stream, NULL, NULL);
 
+/* I didn't find any explanation why we need to do pa_stream_drain on close
+ * as we don't really care if we lose 20ms buffer in this point anyway?
+ * And disabling this speeds up closing pulseaudio quite a lot (atleast for me).
+ */
+#if 0
         if((o = pa_stream_drain(p_sys->stream, success_cb, p_aout))){
             while (pa_operation_get_state(o) != PA_OPERATION_DONE) {
                 CHECK_DEAD_GOTO(fail);
@@ -352,7 +357,7 @@ static void Close ( vlc_object_t *p_this )
 
             pa_operation_unref(o);
         }
-
+#endif
         pa_threaded_mainloop_unlock(p_sys->mainloop);
     }
     uninit(p_aout);
