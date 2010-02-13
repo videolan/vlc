@@ -654,7 +654,7 @@ static int PutAction( intf_thread_t *p_intf, int i_action )
                                   val_list.p_list->p_values[i].f_float );
                     vout_OSDMessage( VLC_OBJECT(p_input), DEFAULT_CHAN,
                                      _("Zoom mode: %s"),
-                                text_list.p_list->p_values[i].var.psz_name );
+                                text_list.p_list->p_values[i].psz_string );
 
                     var_FreeList( &val_list, &text_list );
                 }
