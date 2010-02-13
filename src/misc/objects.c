@@ -357,7 +357,7 @@ int vlc_object_waitpipe( vlc_object_t *obj )
         assert (internals->pipes[1] == -1);
 
 #if defined (HAVE_SYS_EVENTFD_H)
-        internals->pipes[0] = internals->pipes[1] = eventfd (0, 0);
+        internals->pipes[0] = internals->pipes[1] = eventfd (0, EFD_CLOEXEC);
         if (internals->pipes[0] == -1)
 #endif
         {
