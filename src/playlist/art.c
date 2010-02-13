@@ -92,7 +92,7 @@ static char* ArtCacheGetDirPath( const char *psz_arturl, const char *psz_artist,
            downloaded anyway). */
         struct md5_s md5;
         InitMD5( &md5 );
-        AddMD5( &md5, psz_arturl, sizeof( psz_arturl ) );
+        AddMD5( &md5, psz_arturl, strlen( psz_arturl ) );
         EndMD5( &md5 );
         char * psz_arturl_sanitized = psz_md5_hash( &md5 );
         if( asprintf( &psz_dir, "%s" DIR_SEP "art" DIR_SEP "arturl" DIR_SEP
