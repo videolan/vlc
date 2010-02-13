@@ -45,6 +45,12 @@ function try_query(query)
     end
 end
 
+function fuzzy(query)
+    -- http://musicbrainz.org/doc/TextSearchSyntax#Fuzzy_searches
+    -- we could even tweak the fuzziness
+    return string.gsub(query, "([^%s]+)", "%1~")
+end
+
 -- Return the artwork
 function fetch_art()
     local meta = vlc.item:metas()
@@ -53,6 +59,7 @@ function fetch_art()
     end
 
     local query1 = "http://musicbrainz.org/ws/1/release/?type=xml&artist="..vlc.strings.encode_uri_component(meta["artist"]).."&title="..vlc.strings.encode_uri_component(meta["album"])
-    local query2 = "http://musicbrainz.org/ws/1/release/?type=xml&query=artist:"..vlc.strings.encode_uri_component(meta["artist"]).." AND "..vlc.strings.encode_uri_component(meta["album"])
-    return try_query(query1) or try_query(query2)
+    local query2 = "http://musicbrainz.org/ws/1/release/?type=xml&query="..vlc.strings.encode_uri_component(meta["album"].." AND ".."artist:"..meta["artist"])
+    local query3 = "http://musicbrainz.org/ws/1/release/?type=xml&query="..vlc.strings.encode_uri_component(fuzzy(meta["album"]).." AND ".."artist:"..fuzzy(meta["artist"]))
+    return try_query(query1) or try_query(query2) or try_query(query3)
 end
