@@ -33,6 +33,7 @@
 #include <errno.h>
 
 static int OpenV4L (vlc_object_t *);
+static int OpenALSA (vlc_object_t *);
 static int OpenDisc (vlc_object_t *);
 static void Close (vlc_object_t *);
 static int vlc_sd_probe_Open (vlc_object_t *);
@@ -48,6 +49,15 @@ vlc_module_begin ()
     set_capability ("services_discovery", 0)
     set_callbacks (OpenV4L, Close)
     add_shortcut ("v4l")
+
+    add_submodule ()
+    set_shortname (N_("Audio capture"))
+    set_description (N_("Audio capture (ALSA)"))
+    set_category (CAT_PLAYLIST)
+    set_subcategory (SUBCAT_PLAYLIST_SD)
+    set_capability ("services_discovery", 0)
+    set_callbacks (OpenALSA, Close)
+    add_shortcut ("alsa")
 
     add_submodule ()
     set_shortname (N_("Discs"))
@@ -75,7 +85,10 @@ static int vlc_sd_probe_Open (vlc_object_t *obj)
     {
         vlc_sd_probe_Add (probe, "v4l{longname=\"Video capture\"}",
                           N_("Video capture"), SD_CAT_DEVICES);
-        vlc_sd_probe_Add (probe, "disc{longname=\"Discs\"}", N_("Discs"), SD_CAT_MYCOMPUTER);
+        vlc_sd_probe_Add (probe, "alsa{longname=\"Audio capture\"}",
+                          N_("Audio capture"), SD_CAT_DEVICES);
+        vlc_sd_probe_Add (probe, "disc{longname=\"Discs\"}", N_("Discs"),
+                          SD_CAT_MYCOMPUTER);
         udev_monitor_unref (mon);
     }
     udev_unref (udev);
@@ -420,6 +433,74 @@ int OpenV4L (vlc_object_t *obj)
 
     return Open (obj, &subsys);
 }
+
+
+/*** Advanced Linux Sound Architecture support ***/
+static int alsa_get_device (struct udev_device *dev, unsigned *restrict pcard,
+                            unsigned *restrict pdevice)
+{
+    const char *node = udev_device_get_devnode (dev);
+    char type;
+
+    if (node == NULL)
+        return -1;
+    if (sscanf (node, "/dev/snd/pcmC%uD%u%c", pcard, pdevice, &type) < 3)
+        return -1;
+    if (type != 'c')
+        return -1;
+    return 0;
+}
+
+
+static char *alsa_get_mrl (struct udev_device *dev)
+{
+    /* Determine media location */
+    char *mrl;
+    unsigned card, device;
+
+    if (alsa_get_device (dev, &card, &device))
+        return NULL;
+
+    if (asprintf (&mrl, "alsa://plughw:%u,%u", card, device) == -1)
+        mrl = NULL;
+    return mrl;
+}
+
+static char *alsa_get_name (struct udev_device *dev)
+{
+    char *name;
+    unsigned card, device;
+
+    if (alsa_get_device (dev, &card, &device))
+        return NULL;
+
+    if (asprintf (&name, _("Device %u"), device) == -1)
+        name = NULL;
+    return name;
+}
+
+static char *alsa_get_cat (struct udev_device *dev)
+{
+    char *name;
+    unsigned card, device;
+
+    if (alsa_get_device (dev, &card, &device))
+        return NULL;
+
+    if (asprintf (&name, _("Card %u"), card) == -1)
+        name = NULL;
+    return name;
+}
+
+int OpenALSA (vlc_object_t *obj)
+{
+    static const struct subsys subsys = {
+        "sound", alsa_get_mrl, alsa_get_name, alsa_get_cat, ITEM_TYPE_CARD,
+    };
+
+    return Open (obj, &subsys);
+}
+
 
 /*** Discs support ***/
 static char *disc_get_mrl (struct udev_device *dev)
