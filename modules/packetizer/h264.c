@@ -93,6 +93,8 @@ struct decoder_sys_t
     /* */
     bool    b_slice;
     block_t *p_frame;
+    bool    b_frame_sps;
+    bool    b_frame_pps;
 
     bool   b_header;
     bool   b_sps;
@@ -205,6 +207,9 @@ static int Open( vlc_object_t *p_this )
 
     p_sys->b_slice = false;
     p_sys->p_frame = NULL;
+    p_sys->b_frame_sps = false;
+    p_sys->b_frame_pps = false;
+
     p_sys->b_header= false;
     p_sys->b_sps   = false;
     p_sys->b_pps   = false;
@@ -502,6 +507,8 @@ static void PacketizeReset( void *p_private, bool b_broken )
         if( p_sys->p_frame )
             block_ChainRelease( p_sys->p_frame );
         p_sys->p_frame = NULL;
+        p_sys->b_frame_sps = false;
+        p_sys->b_frame_pps = false;
         p_sys->slice.i_frame_type = 0;
         p_sys->b_slice = false;
     }
@@ -612,6 +619,8 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
         /* Reset context */
         p_sys->slice.i_frame_type = 0;
         p_sys->p_frame = NULL;
+        p_sys->b_frame_sps = false;
+        p_sys->b_frame_pps = false;
         p_sys->b_slice = false;
         cc_Flush( &p_sys->cc_next );
     }
@@ -641,6 +650,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
     {
         if( p_sys->b_slice )
             p_pic = OutputPicture( p_dec );
+        p_sys->b_frame_sps = true;
 
         PutSPS( p_dec, p_frag );
 
@@ -651,6 +661,7 @@ static block_t *ParseNALBlock( decoder_t *p_dec, bool *pb_used_ts, block_t *p_fr
     {
         if( p_sys->b_slice )
             p_pic = OutputPicture( p_dec );
+        p_sys->b_frame_pps = true;
 
         PutPPS( p_dec, p_frag );
 
@@ -706,7 +717,10 @@ static block_t *OutputPicture( decoder_t *p_dec )
     if( !p_sys->b_header && p_sys->slice.i_frame_type != BLOCK_FLAG_TYPE_I)
         return NULL;
 
-    if( p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I && p_sys->b_sps && p_sys->b_pps )
+    const bool b_sps_pps_i = p_sys->slice.i_frame_type == BLOCK_FLAG_TYPE_I &&
+                             p_sys->b_sps &&
+                             p_sys->b_pps;
+    if( b_sps_pps_i || p_sys->b_frame_sps || p_sys->b_frame_pps )
     {
         block_t *p_head = NULL;
         if( p_sys->p_frame->i_flags & BLOCK_FLAG_PRIVATE_AUD )
@@ -716,17 +730,17 @@ static block_t *OutputPicture( decoder_t *p_dec )
         }
 
         block_t *p_list = NULL;
-        for( int i = 0; i < SPS_MAX; i++ )
+        for( int i = 0; i < SPS_MAX && (b_sps_pps_i || p_sys->b_frame_sps); i++ )
         {
             if( p_sys->pp_sps[i] )
                 block_ChainAppend( &p_list, block_Duplicate( p_sys->pp_sps[i] ) );
         }
-        for( int i = 0; i < PPS_MAX; i++ )
+        for( int i = 0; i < PPS_MAX && (b_sps_pps_i || p_sys->b_frame_pps); i++ )
         {
             if( p_sys->pp_pps[i] )
                 block_ChainAppend( &p_list, block_Duplicate( p_sys->pp_pps[i] ) );
         }
-        if( p_list )
+        if( b_sps_pps_i && p_list )
             p_sys->b_header = true;
 
         if( p_head )
@@ -751,6 +765,8 @@ static block_t *OutputPicture( decoder_t *p_dec )
     p_sys->p_frame = NULL;
     p_sys->i_frame_dts = VLC_TS_INVALID;
     p_sys->i_frame_pts = VLC_TS_INVALID;
+    p_sys->b_frame_sps = false;
+    p_sys->b_frame_pps = false;
     p_sys->b_slice = false;
 
     /* CC */
