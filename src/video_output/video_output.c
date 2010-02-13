@@ -405,7 +405,7 @@ vout_thread_t * vout_Create( vlc_object_t *p_parent, video_format_t *p_fmt )
     var_Create( p_vout, "mouse-x", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-y", VLC_VAR_INTEGER );
     var_Create( p_vout, "mouse-button-down", VLC_VAR_INTEGER );
-    var_Create( p_vout, "mouse-moved", VLC_VAR_BOOL );
+    var_Create( p_vout, "mouse-moved", VLC_VAR_VOID );
     var_Create( p_vout, "mouse-clicked", VLC_VAR_BOOL );
     /* Mouse object (area of interest in a video filter) */
     var_Create( p_vout, "mouse-object", VLC_VAR_BOOL );

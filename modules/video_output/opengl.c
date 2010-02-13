@@ -131,7 +131,7 @@ static int CreateVout( vlc_object_t *p_this )
     /* Forward events from the opengl provider */
     var_Create( p_sys->p_vout, "mouse-x", VLC_VAR_INTEGER );
     var_Create( p_sys->p_vout, "mouse-y", VLC_VAR_INTEGER );
-    var_Create( p_sys->p_vout, "mouse-moved", VLC_VAR_BOOL );
+    var_Create( p_sys->p_vout, "mouse-moved", VLC_VAR_VOID );
     var_Create( p_sys->p_vout, "mouse-clicked", VLC_VAR_BOOL );
     var_Create( p_sys->p_vout, "mouse-button-down", VLC_VAR_INTEGER );
     var_Create( p_sys->p_vout, "video-on-top",

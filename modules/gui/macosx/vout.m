@@ -668,9 +668,7 @@ int DeviceCallback( vlc_object_t *p_this, const char *psz_variable,
                             p_vout->render.i_height / i_height;
             }
             var_Set( p_vout, "mouse-y", val );
-
-            val.b_bool = true;
-            var_Set( p_vout, "mouse-moved", val );
+            var_TriggerCallback( p_vout, "mouse-moved" );
         }
         if( [self isFullscreen] )
             [[[[VLCMain sharedInstance] controls] fspanel] fadeIn];

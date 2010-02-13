@@ -1030,10 +1030,7 @@ static pascal OSStatus WindowEventHandler(EventHandlerCallRef nextHandler, Event
                             p_vout->render.i_height / i_height;
 
                 var_Set( p_vout, "mouse-y", val );
-
-                val.b_bool = true;
-                var_Set( p_vout, "mouse-moved", val );
-
+                var_TriggerCallback( p_vout, "mouse-moved" );
                 break;
             }
  

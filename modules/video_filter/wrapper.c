@@ -487,7 +487,7 @@ static int MouseEvent( vlc_object_t *p_this, char const *psz_var,
     {
         var_SetInteger( p_vout, "mouse-x", nmouse.i_x );
         var_SetInteger( p_vout, "mouse-y", nmouse.i_y );
-        var_SetBool( p_vout, "mouse-moved", true );
+        var_TriggerCallback( p_vout, "mouse-moved" );
     }
     if( vlc_mouse_HasButton( &omouse, &nmouse ) )
     {

@@ -58,7 +58,7 @@ static inline void vout_SendEventMouseMoved(vout_thread_t *vout, int x, int y)
 {
     var_SetInteger(vout, "mouse-x", x);
     var_SetInteger(vout, "mouse-y", y);
-    var_SetBool(vout, "mouse-moved", true);
+    var_TriggerCallback(vout, "mouse-moved");
 }
 static inline void vout_SendEventMousePressed(vout_thread_t *vout, int button)
 {
