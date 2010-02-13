@@ -147,6 +147,14 @@ static int probe_luascript( vlc_object_t *p_this, const char * psz_filename,
 
     lua_pop( L, 1 );
 
+    /* Setup the module search path */
+    if( vlclua_add_modules_path( p_demux, L, psz_filename ) )
+    {
+        msg_Warn( p_demux, "Error while setting the module search path for %s",
+                  psz_filename );
+        goto error;
+    }
+
     /* Load and run the script(s) */
     if( luaL_dofile( L, psz_filename ) )
     {
@@ -197,7 +205,6 @@ error:
 int Import_LuaPlaylist( vlc_object_t *p_this )
 {
     demux_t *p_demux = (demux_t *)p_this;
-    lua_State *L;
     int ret;
 
     p_demux->p_sys = (demux_sys_t*)malloc( sizeof( demux_sys_t ) );

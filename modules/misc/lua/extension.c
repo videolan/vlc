@@ -742,6 +742,13 @@ static lua_State* GetLuaState( extensions_manager_t *p_mgr,
             lua_pushcfunction( L, vlclua_extension_deactivate );
             lua_setfield( L, -2, "deactivate" );
 
+            /* Setup the module search path */
+            if( vlclua_add_modules_path( p_mgr, L, p_ext->psz_name ) )
+            {
+                msg_Warn( p_mgr, "Error while setting the module search path for %s", p_ext->psz_name );
+                return NULL;
+            }
+
             /* Load and run the script(s) */
             if( luaL_dofile( L, p_ext->psz_name ) != 0 )
             {

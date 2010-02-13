@@ -201,28 +201,13 @@ int Open_LuaIntf( vlc_object_t *p_this )
     /* clean up */
     lua_pop( L, 1 );
 
-    /* <gruik> */
     /* Setup the module search path */
+    if( vlclua_add_modules_path( p_intf, L, p_sys->psz_filename ) )
     {
-    char *psz_command;
-    char *psz_char = strrchr(p_sys->psz_filename,DIR_SEP_CHAR);
-    *psz_char = '\0';
-    /* FIXME: don't use luaL_dostring */
-    if( asprintf( &psz_command,
-                  "package.path = [[%s"DIR_SEP"modules"DIR_SEP"?.lua;]]..package.path",
-                  p_sys->psz_filename ) < 0 )
-    {
+        msg_Warn( p_intf, "Error while setting the module search path for %s",
+                  p_sys->psz_filename );
         goto error;
     }
-    *psz_char = DIR_SEP_CHAR;
-    if( luaL_dostring( L, psz_command ) )
-    {
-        free( psz_command );
-        goto error;
-    }
-    free( psz_command );
-    }
-    /* </gruik> */
 
     psz_config = var_CreateGetString( p_intf, "lua-config" );
     if( psz_config && *psz_config )

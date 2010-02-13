@@ -660,3 +660,100 @@ error:
     vlclua_dir_list_free( ppsz_dir_list );
     return VLC_ENOMEM;
 }
+
+static int vlclua_add_modules_path_inner( lua_State *L, const char *psz_path )
+{
+    /* FIXME: don't use luaL_dostring */
+    char *psz_command = NULL;
+    if( asprintf( &psz_command,
+                  "package.path =[[%s"DIR_SEP"modules"DIR_SEP"?.lua;]]..package.path",
+                  psz_path ) < 0 )
+    {
+        return 1;
+    }
+
+    if( luaL_dostring( L, psz_command ) )
+    {
+        free( psz_command );
+        return 1;
+    }
+    free( psz_command );
+
+    return 0;
+}
+
+int __vlclua_add_modules_path( vlc_object_t *obj, lua_State *L, const char *psz_filename )
+{
+    /* Setup the module search path:
+     *   * "The script's directory"/modules
+     *   * "The script's parent directory"/modules
+     *   * and so on for all the next directories in the directory list
+     */
+
+    char *psz_path = strdup( psz_filename );
+    if( !psz_path )
+        return 1;
+
+    char *psz_char = strrchr( psz_path, DIR_SEP_CHAR );
+    if( !psz_char )
+    {
+        free( psz_path );
+        return 1;
+    }
+    *psz_char = '\0';
+
+    /* psz_path now holds the file's directory */
+    psz_char = strrchr( psz_path, DIR_SEP_CHAR );
+    if( !psz_char )
+    {
+        free( psz_path );
+        return 1;
+    }
+    *psz_char = '\0';
+
+    /* psz_path now holds the file's parent directory */
+    if( vlclua_add_modules_path_inner( L, psz_path ) )
+    {
+        free( psz_path );
+        return 1;
+    }
+    *psz_char = DIR_SEP_CHAR;
+
+    /* psz_path now holds the file's directory */
+    if( vlclua_add_modules_path_inner( L, psz_path ) )
+    {
+        free( psz_path );
+        return 1;
+    }
+
+    char  *ppsz_dir_list[] = { NULL, NULL, NULL, NULL };
+    vlclua_dir_list( obj, psz_char+1/* gruik? */, ppsz_dir_list );
+    char **ppsz_dir = ppsz_dir_list;
+
+    for( ; *ppsz_dir && strcmp( *ppsz_dir, psz_path ); ppsz_dir++ );
+    free( psz_path );
+
+    for( ; *ppsz_dir; ppsz_dir++ )
+    {
+        psz_path = *ppsz_dir;
+        psz_char = strrchr( psz_path, DIR_SEP_CHAR );
+        if( !psz_char )
+            goto exit;
+
+        *psz_char = '\0';
+        if( vlclua_add_modules_path_inner( L, psz_path ) )
+            goto exit;
+        *psz_char = DIR_SEP_CHAR;
+
+        if( vlclua_add_modules_path_inner( L, psz_path ) )
+            goto exit;
+    }
+
+    vlclua_dir_list_free( ppsz_dir_list );
+    return 0;
+
+    exit:
+    vlclua_dir_list_free( ppsz_dir_list );
+    return 1;
+}
+

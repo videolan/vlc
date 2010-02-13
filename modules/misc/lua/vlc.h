@@ -124,6 +124,9 @@ int __vlclua_playlist_add_internal( vlc_object_t *, lua_State *, playlist_t *,
                                     input_item_t *, bool );
 #define vlclua_playlist_add_internal(a,b,c,d,e) __vlclua_playlist_add_internal(VLC_OBJECT(a),b,c,d,e)
 
+int __vlclua_add_modules_path( vlc_object_t *, lua_State *, const char *psz_filename );
+#define vlclua_add_modules_path( a, b, c ) __vlclua_add_modules_path(VLC_OBJECT(a), b, c)
+
 /**
  * Per-interface private state
  */

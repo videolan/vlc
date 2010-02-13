@@ -51,7 +51,7 @@
  *****************************************************************************/
 static const luaL_Reg p_reg[] = { { NULL, NULL } };
 
-static lua_State * init( vlc_object_t *p_this, input_item_t * p_item )
+static lua_State * init( vlc_object_t *p_this, input_item_t * p_item, const char *psz_filename )
 {
     lua_State * L = luaL_newstate();
     if( !L )
@@ -75,6 +75,14 @@ static lua_State * init( vlc_object_t *p_this, input_item_t * p_item )
 
     lua_pushlightuserdata( L, p_this );
     lua_setfield( L, -2, "private" );
+
+    if( vlclua_add_modules_path( p_this, L, psz_filename ) )
+    {
+        msg_Warn( p_this, "Error while setting the module search path for %s",
+                  psz_filename );
+        lua_close( L );
+        return NULL;
+    }
 
     return L;
 }
@@ -131,7 +139,9 @@ static int fetch_art( vlc_object_t *p_this, const char * psz_filename,
     input_item_t * p_item = user_data;
     int s;
 
-    lua_State *L = init( p_this, p_item );
+    lua_State *L = init( p_this, p_item, psz_filename );
+    if( !L )
+        return VLC_EGENERIC;
 
     int i_ret = run(p_this, psz_filename, L, "fetch_art");
     if(i_ret != VLC_SUCCESS)
@@ -178,7 +188,9 @@ static int read_meta( vlc_object_t *p_this, const char * psz_filename,
                       void * user_data )
 {
     input_item_t * p_item = user_data;
-    lua_State *L = init( p_this, p_item );
+    lua_State *L = init( p_this, p_item, psz_filename );
+    if( !L )
+        return VLC_EGENERIC;
 
     int i_ret = run(p_this, psz_filename, L, "read_meta");
     if(i_ret != VLC_SUCCESS)
@@ -201,7 +213,9 @@ static int fetch_meta( vlc_object_t *p_this, const char * psz_filename,
                        void * user_data )
 {
     input_item_t * p_item = user_data;
-    lua_State *L = init( p_this, p_item );
+    lua_State *L = init( p_this, p_item, psz_filename );
+    if( !L )
+        return VLC_EGENERIC;
 
     int ret = run(p_this, psz_filename, L, "fetch_meta");
     lua_close( L );
