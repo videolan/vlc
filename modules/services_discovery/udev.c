@@ -490,15 +490,17 @@ static char *alsa_get_name (struct udev_device *dev)
 
 static char *alsa_get_cat (struct udev_device *dev)
 {
-    char *name;
-    unsigned card, device;
+    const char *vnd;
 
-    if (alsa_get_device (dev, &card, &device))
+    dev = udev_device_get_parent (dev);
+    if (dev == NULL)
         return NULL;
 
-    if (asprintf (&name, _("Card %u"), card) == -1)
-        name = NULL;
-    return name;
+    vnd = udev_device_get_property_value (dev, "ID_VENDOR_FROM_DATABASE");
+    if (vnd == NULL)
+        /* FIXME: USB may take time to settle... the parent device */
+        vnd = udev_device_get_property_value (dev, "ID_BUS");
+    return vnd ? strdup (vnd) : NULL;
 }
 
 int OpenALSA (vlc_object_t *obj)
