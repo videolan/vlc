@@ -146,13 +146,11 @@ static int Open (vlc_object_t *obj)
     r = xcb_intern_atom_reply (conn, ncl, NULL);
     if (r == NULL || r->atom == 0)
     {
-        dialog_Fatal (sd, _("Application list failure"),
-                  _("Your window manager does not support application list."));
-        msg_Err (sd, "application list not support (_NET_CLIENT_LIST absent)");
-        free (r);
-        goto error;
+        dialog_Fatal (sd, _("Screen capture"),
+            _("Your window manager does not provide a list of applications."));
+        msg_Err (sd, "client list not supported (_NET_CLIENT_LIST absent)");
     }
-    p_sys->net_client_list = r->atom;
+    p_sys->net_client_list = r ? r->atom : 0;
     free (r);
     r = xcb_intern_atom_reply (conn, nwn, NULL);
     if (r != NULL)
