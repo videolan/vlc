@@ -24,6 +24,9 @@
 #ifndef CMD_VARS_HPP
 #define CMD_VARS_HPP
 
+#include <vlc_common.h>
+#include <vlc_playlist.h>
+
 #include "cmd_generic.hpp"
 #include "../utils/ustring.hpp"
 
@@ -41,9 +44,17 @@ DEFINE_COMMAND( PlaytreeChanged, "playtree changed" )
 class CmdPlaytreeUpdate: public CmdGeneric
 {
 public:
-    CmdPlaytreeUpdate( intf_thread_t *pIntf, int id ):
-        CmdGeneric( pIntf ), m_id( id ) { }
-    virtual ~CmdPlaytreeUpdate() { }
+    CmdPlaytreeUpdate( intf_thread_t *pIntf, input_item_t* pItem ):
+        CmdGeneric( pIntf ), m_pItem( pItem )
+    {
+        if( pItem )
+            vlc_gc_incref( pItem );
+    }
+    virtual ~CmdPlaytreeUpdate()
+    {
+        if( m_pItem )
+            vlc_gc_decref( m_pItem );
+    }
     virtual void execute();
     virtual string getType() const { return "playtree update"; }
 
@@ -51,8 +62,8 @@ public:
     virtual bool checkRemove( CmdGeneric * ) const;
 
 private:
-    /// Playlist item ID
-    int m_id;
+    /// input item changed
+    input_item_t* m_pItem;
 };
 
 /// Command to notify the playtree of an item append

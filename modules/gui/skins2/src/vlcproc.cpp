@@ -267,23 +267,16 @@ int VlcProc::onItemChange( vlc_object_t *pObj, const char *pVariable,
                            vlc_value_t oldval, vlc_value_t newval,
                            void *pParam )
 {
-    // TODO: FIXME
-    // Deactivated because it mixes up i_id from input_item_t
-    // and i_id from playlist_item_t
-#if 0
-
     VlcProc *pThis = (VlcProc*)pParam;
     input_item_t *p_item = static_cast<input_item_t*>(newval.p_address);
 
     // Create a playtree notify command
     CmdPlaytreeUpdate *pCmdTree = new CmdPlaytreeUpdate( pThis->getIntf(),
-                                                         p_item->i_id );
+                                                         p_item );
 
     // Push the command in the asynchronous command queue
     AsyncQueue *pQueue = AsyncQueue::instance( pThis->getIntf() );
     pQueue->push( CmdGenericPtr( pCmdTree ), true );
-
-#endif
 
     return VLC_SUCCESS;
 }

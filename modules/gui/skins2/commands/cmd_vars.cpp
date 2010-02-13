@@ -35,14 +35,24 @@ void CmdPlaytreeChanged::execute()
 
 void CmdPlaytreeUpdate::execute()
 {
-    VlcProc::instance( getIntf() )->getPlaytreeVar().onUpdateItem( m_id );
+    if( !m_pItem )
+        return;
+
+    playlist_t* pPlaylist = getIntf()->p_sys->p_playlist;
+    playlist_Lock( pPlaylist );
+    playlist_item_t* p_plItem = playlist_ItemGetByInput( pPlaylist, m_pItem );
+    int id = p_plItem ? p_plItem->i_id : 0;
+    playlist_Unlock( pPlaylist );
+
+    if( id )
+        VlcProc::instance( getIntf() )->getPlaytreeVar().onUpdateItem( id );
 }
 
 bool CmdPlaytreeUpdate::checkRemove( CmdGeneric *pQueuedCommand ) const
 {
     // We don't use RTTI - Use C-style cast
     CmdPlaytreeUpdate *pUpdateCommand = (CmdPlaytreeUpdate *)(pQueuedCommand);
-    return m_id == pUpdateCommand->m_id;
+    return m_pItem == pUpdateCommand->m_pItem;
 }
 
 
