@@ -147,7 +147,9 @@ VLC_EXPORT( int, var_Get, ( vlc_object_t *, const char *, vlc_value_t * ) );
 #define var_Get(a,b,c) var_Get( VLC_OBJECT(a), b, c )
 
 VLC_EXPORT( int, var_SetChecked, ( vlc_object_t *, const char *, int, vlc_value_t ) );
+#define var_SetChecked(o,n,t,v) var_SetChecked(VLC_OBJECT(o),n,t,v)
 VLC_EXPORT( int, var_GetChecked, ( vlc_object_t *, const char *, int, vlc_value_t * ) );
+#define var_GetChecked(o,n,t,v) var_GetChecked(VLC_OBJECT(o),n,t,v)
 VLC_EXPORT( int, var_GetAndSet, ( vlc_object_t *, const char *, int, vlc_value_t * ) );
 
 VLC_EXPORT( int, var_Inherit, ( vlc_object_t *, const char *, int, vlc_value_t * ) );

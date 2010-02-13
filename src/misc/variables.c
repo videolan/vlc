@@ -734,6 +734,7 @@ int var_Type( vlc_object_t *p_this, const char *psz_name )
     return i_type;
 }
 
+#undef var_SetChecked
 int var_SetChecked( vlc_object_t *p_this, const char *psz_name,
                     int expected_type, vlc_value_t val )
 {
@@ -795,6 +796,7 @@ int var_Set( vlc_object_t *p_this, const char *psz_name, vlc_value_t val )
     return var_SetChecked( p_this, psz_name, 0, val );
 }
 
+#undef var_GetChecked
 int var_GetChecked( vlc_object_t *p_this, const char *psz_name,
                     int expected_type, vlc_value_t *p_val )
 {
