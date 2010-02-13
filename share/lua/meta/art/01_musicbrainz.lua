@@ -22,7 +22,7 @@
 -- Return the artwork
 function fetch_art()
     local query
-    local meta = vlc.item.metas(vlc.item)
+    local meta = vlc.item:metas()
     if meta["artist"] and meta["album"] then
         query = "http://musicbrainz.org/ws/1/release/?type=xml&artist="..vlc.strings.encode_uri_component(meta["artist"]).."&title="..vlc.strings.encode_uri_component(meta["album"])
     else

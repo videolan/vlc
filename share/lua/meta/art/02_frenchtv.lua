@@ -40,7 +40,7 @@ function fetch_art()
         ["Virgin 17"] = "http://upload.wikimedia.org/wikipedia/fr/3/39/Virgin17logo.png",
         ["La Chaîne Parlementaire"] = "http://upload.wikimedia.org/wikipedia/fr/9/98/Public-Senat-LCP-An_logo_2010.png"
     }
-    local meta = vlc.item.metas(vlc.item);
+    local meta = vlc.item:metas();
     local channel
     if meta["title"] then
         channel = meta["title"]

@@ -31,7 +31,7 @@ end
 -- This is disabled because we have too much false positive by the inherent
 -- nature of this script.
 function fetch_art_disabled()
-    local meta = vlc.item.metas(vlc.item)
+    local meta = vlc.item:metas()
     if meta["artist"] and meta["album"] then
         title = meta["artist"].." "..meta["album"]
     elseif meta["title"] and meta["artist"] then
