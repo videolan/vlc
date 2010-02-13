@@ -41,8 +41,8 @@ static int vlc_sd_probe_Open (vlc_object_t *);
  * Module descriptor
  */
 vlc_module_begin ()
-    set_shortname (N_("Devices"))
-    set_description (N_("Capture devices"))
+    set_shortname (N_("Video capture"))
+    set_description (N_("Video capture (Video4Linux)"))
     set_category (CAT_PLAYLIST)
     set_subcategory (SUBCAT_PLAYLIST_SD)
     set_capability ("services_discovery", 0)
@@ -376,6 +376,7 @@ static char *decode_property (struct udev_device *dev, const char *name)
 {
     return decode (udev_device_get_property_value (dev, name));
 }
+
 
 /*** Video4Linux support ***/
 static bool is_v4l_legacy (struct udev_device *dev)
