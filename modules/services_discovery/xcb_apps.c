@@ -68,6 +68,7 @@ struct services_discovery_sys_t
 static void *Run (void *);
 static void Update (services_discovery_t *);
 static void DelItem (void *);
+static void AddDesktopItem(services_discovery_t *);
 
 static int vlc_sd_probe_Open (vlc_object_t *obj)
 {
@@ -125,6 +126,9 @@ static int Open (vlc_object_t *obj)
         msg_Err (obj, "bad X11 screen number");
         goto error;
     }
+
+    /* Add a permanent item for the entire desktop */
+    AddDesktopItem (sd);
 
     p_sys->root_window = scr->root;
     xcb_change_window_attributes (conn, scr->root, XCB_CW_EVENT_MASK,
@@ -337,4 +341,16 @@ static void Update (services_discovery_t *sd)
     /* Remove old nodes */
     tdestroy (oldnodes, DelItem);
     p_sys->nodes = newnodes;
+}
+
+static void AddDesktopItem(services_discovery_t *sd)
+{
+    input_item_t *item;
+
+    item = input_item_NewWithType (VLC_OBJECT (sd), "screen://", _("Desktop"),
+                                   0, NULL, 0, -1, ITEM_TYPE_CARD);
+    if (item == NULL)
+        return;
+
+    services_discovery_AddItem (sd, item, NULL);
 }
