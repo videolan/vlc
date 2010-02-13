@@ -732,13 +732,15 @@ static int DemuxInit( demux_t *p_demux )
                                                   &asf_object_index_guid, 0 );
     const bool b_index = p_index && p_index->i_index_entry_count;
 
+    /* Find the extended header if any */
+    asf_object_t *p_hdr_ext = ASF_FindObject( p_sys->p_root->p_hdr,
+                                              &asf_object_header_extension_guid, 0 );
 
     for( unsigned i_stream = 0; i_stream < p_sys->i_track; i_stream++ )
     {
         asf_track_t    *tk;
         asf_object_stream_properties_t *p_sp;
         asf_object_extended_stream_properties_t *p_esp;
-        asf_object_t *p_hdr_ext;
         bool b_access_selected;
 
         p_sp = ASF_FindObject( p_sys->p_root->p_hdr,
@@ -766,8 +768,6 @@ static int DemuxInit( demux_t *p_demux )
         }
 
         /* Find the associated extended_stream_properties if any */
-        p_hdr_ext = ASF_FindObject( p_sys->p_root->p_hdr,
-                                    &asf_object_header_extension_guid, 0 );
         if( p_hdr_ext )
         {
             int i_ext_stream = ASF_CountObject( p_hdr_ext,
