@@ -600,6 +600,10 @@ static int SyncInfo( decoder_t *p_dec, uint8_t *p_buf,
         if( i_blocksize < p_sys->stream_info.min_blocksize ||
             i_blocksize > p_sys->stream_info.max_blocksize )
             return 0;
+        if( *pi_bits_per_sample != p_sys->stream_info.bits_per_sample )
+            return 0;
+        if( *pi_sample_rate != p_sys->stream_info.sample_rate )
+            return 0;
     }
     return i_blocksize;
 }
