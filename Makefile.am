@@ -2,12 +2,6 @@
 # Automake targets and declarations
 ###############################################################################
 
-# Pass --quiet to make when we are not verbose.
-AM_MAKEFLAGS = $(makesilentflags_$(V))
-makesilentflags_ = $(makesilentflags__$(AM_DEFAULT_VERBOSITY))
-makesilentflags_0 = --quiet
-makesilentflags__0 = $(makesilentflags_0)
-
 # SUBDIRS stores the directories where a "make" is required when building
 # something. DIST_SUBDIRS stores the directories where nothing is built but
 # which have makefiles with distribution information.
@@ -417,10 +411,8 @@ endif
 endif
 
 silentstd = $(silentstd_$(V))
-silentstd_ = $(silentstd__$(AM_DEFAULT_VERBOSITY))
+silentstd_ = $(silentstd_$(AM_DEFAULT_VERBOSITY))
 silentstd_0 = 2>&1 >/dev/null
-# '__' prefix trick for old automake version.
-silentstd__0 = $(silentstd_0)
 
 # VLC-release.app for packaging and giving it to your friends
 # use package-macosx to get a nice dmg
