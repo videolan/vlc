@@ -913,6 +913,9 @@ modules/misc/dummy/vout.c
 modules/misc/freetype.c
 modules/misc/gnutls.c
 modules/misc/inhibit.c
+modules/misc/inhibit/osso.c
+modules/misc/inhibit/xdg.c
+modules/misc/inhibit/xscreensaver.c
 modules/misc/logger.c
 modules/misc/lua/demux.c
 modules/misc/lua/intf.c
@@ -960,7 +963,6 @@ modules/misc/playlist/xspf.c
 modules/misc/playlist/xspf.h
 modules/misc/quartztext.c
 modules/misc/rtsp.c
-modules/misc/screensaver.c
 modules/misc/stats/decoder.c
 modules/misc/stats/demux.c
 modules/misc/stats/encoder.c

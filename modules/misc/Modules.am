@@ -8,7 +8,6 @@ if BUILD_LUA
 SUBDIRS += lua
 endif
 
-SOURCES_screensaver = screensaver.c
 SOURCES_freetype = freetype.c text_renderer.h
 SOURCES_win32text = win32text.c
 SOURCES_quartztext = quartztext.c text_renderer.h
@@ -18,9 +17,11 @@ SOURCES_gnutls = gnutls.c dhparams.h
 SOURCES_svg = svg.c
 SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_inhibit = inhibit.c
-SOURCES_xdg_screensaver = xdg-screensaver.c
-SOURCES_osso = osso.c
 SOURCES_sqlite = sqlite.c
+
+SOURCES_xscreensaver = inhibit/screensaver.c
+SOURCES_xdg_screensaver = inhibit/xdg.c
+SOURCES_osso_screensaver = inhibit/osso.c
 
 libvlc_LTLIBRARIES += \
 	libaudioscrobbler_plugin.la \

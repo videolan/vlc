@@ -228,7 +228,7 @@ $Id$
  * osd_parser: OSD import module
  * osdmenu: video_filter for displaying and streaming a On Screen Display menu
  * oss: audio output module using the OSS /dev/dsp interface
- * osso: Maemo screen unblanking module
+ * osso_screensaver: Maemo screen unblanking module
  * packetizer_copy: Simple copy packetizer
  * packetizer_dirac: Dirac video packetizer
  * packetizer_flac: FLAC audio packetizer
@@ -275,7 +275,6 @@ $Id$
  * scene: scene video filter
  * schroedinger: Schroedinger video decoder
  * screen: a input module that takes screenshots of the primary monitor
- * screensaver: screensaver disabling module
  * sdl_image: SDL-based image decoder
  * sharpen: Sharpen video filter
  * shine: MP3 encoder using Shine, a fixed point implementation
@@ -371,9 +370,10 @@ $Id$
  * xcb_window: XCB window provider
  * xcb_x11: a X11 video output using XCB
  * xcb_xv: a XVideo video output using XCB
- * xdg_screensaver: screensaver disabling module following XDG specifications
+ * xdg_screensaver: xdg-utils screensaver inhibition
  * xml: LibXML xml parser
  * xosd: X On Screen Display interface
+ * xscreensaver: Xscreensaver inhibition
  * xtag: XTAG xml parser
  * yuv: yuv video output
  * yuvp: YUVP to YUVA/RGBA chroma converter
