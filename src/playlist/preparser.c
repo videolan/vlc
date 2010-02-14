@@ -208,6 +208,7 @@ static void *Thread( void *data )
         {
             p_current = NULL;
             p_preparser->b_live = false;
+            vlc_cond_signal( &p_preparser->wait );
         }
         vlc_mutex_unlock( &p_preparser->lock );
 
