@@ -305,7 +305,6 @@ void libvlc_audio_output_set_device_type( libvlc_media_player_t *mp,
  *****************************************************************************/
 void libvlc_audio_toggle_mute( libvlc_media_player_t *mp )
 {
-#warning FIXME: no playlist
     aout_ToggleMute( mp, NULL );
 }
 
@@ -318,7 +317,6 @@ void libvlc_audio_set_mute( libvlc_media_player_t *mp, int mute )
 {
 #warning Not quite thread-safe
     if ( !mute != !libvlc_audio_get_mute( mp ) )
-#warning FIXME: no playlist
         aout_ToggleMute( mp, NULL );
 }
 
@@ -329,7 +327,6 @@ int libvlc_audio_get_volume( libvlc_media_player_t *mp )
 {
     audio_volume_t i_volume;
 
-#warning FIXME: no playlist
     aout_VolumeGet( mp, &i_volume );
 
     return (i_volume*200+AOUT_VOLUME_MAX/2)/AOUT_VOLUME_MAX;
@@ -348,7 +345,6 @@ int libvlc_audio_set_volume( libvlc_media_player_t *mp, int i_volume )
     }
 
     i_volume = (i_volume * AOUT_VOLUME_MAX + 100) / 200;
-#warning FIXME: no playlist
     aout_VolumeSet( mp, i_volume );
     return 0;
 }
