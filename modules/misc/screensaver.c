@@ -136,8 +136,8 @@ static void Execute (vlc_inhibit_t *p_ih, const char *const *argv)
     vlc_inhibit_sys_t *p_sys = p_ih->p_sys;
     pid_t pid;
 
-    if (posix_spawn (&pid, argv[0], &p_sys->actions, &p_sys->attr,
-                     (char **)argv, environ) == 0)
+    if (posix_spawnp (&pid, argv[0], &p_sys->actions, &p_sys->attr,
+                      (char **)argv, environ) == 0)
     {
         while (waitpid (pid, NULL, 0) != pid);
     }
@@ -155,11 +155,11 @@ static void Timer( void *data )
 
     /* If there is a playing video output, disable xscreensaver */
     /* http://www.jwz.org/xscreensaver/faq.html#dvd */
-    const char *const ppsz_xsargs[] = { "/bin/sh", "-c",
-        "xscreensaver-command -deactivate &", (char*)NULL };
+    const char *const ppsz_xsargs[] = {
+        "xscreensaver-command", "-deactivate", (char*)NULL };
     Execute (p_ih, ppsz_xsargs);
 
-    const char *const ppsz_gsargs[] = { "/bin/sh", "-c",
-        "gnome-screensaver-command --poke &", (char*)NULL };
+    const char *const ppsz_gsargs[] = {
+        "gnome-screensaver-command", "--poke", (char*)NULL };
     Execute (p_ih, ppsz_gsargs);
 }
