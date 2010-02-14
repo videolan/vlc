@@ -409,7 +409,16 @@ silent:
 }
 
 #undef net_Write
-/* Write exact amount requested */
+/**
+ * Writes data to a file descriptor.
+ * This blocks until all data is written or an error occurs.
+ *
+ * This function is a cancellation point if p_vs is NULL.
+ * This function is not cancellation-safe if p_vs is not NULL.
+ *
+ * @return the total number of bytes written, or -1 if an error occurs
+ * before any data is written.
+ */
 ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
                    const void *restrict p_data, size_t i_data )
 {
