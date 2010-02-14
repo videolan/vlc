@@ -52,6 +52,26 @@ local function parsexml(stream)
             tree = node
         elseif nodetype == 'endelem' then
             if #parents > 0 then
+                local name = reader:name()
+                local tmp = {}
+                --print(name, tree.name, #parents)
+                while name ~= tree.name do
+                    if #parents == 0 then
+                        error("XML parser error/faulty logic")
+                    end
+                    local child = tree
+                    tree = parents[#parents]
+                    table.remove(parents)
+                    table.remove(tree.children)
+                    table.insert(tmp, 1, child)
+                    for i, node in pairs(child.children) do
+                        table.insert(tmp, i+1, node)
+                    end
+                    child.children = {}
+                end
+                for _, node in pairs(tmp) do
+                    table.insert(tree.children, node)
+                end
                 tree = parents[#parents]
                 table.remove(parents)
             end
