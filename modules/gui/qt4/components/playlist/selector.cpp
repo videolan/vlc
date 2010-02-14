@@ -240,17 +240,17 @@ PLSelItem * putPLData( PLSelItem* item, playlist_item_t* plItem )
 
 PLSelItem *PLSelector::addPodcastItem( playlist_item_t *p_item )
 {
-  vlc_gc_incref( p_item->p_input );
-  char *psz_name = input_item_GetName( p_item->p_input );
-  PLSelItem *item = addItem(
-      PL_ITEM_TYPE, qfu( psz_name ), false, podcastsParent );
-  item->addAction( RM_ACTION, qtr( "Remove this podcast subscription" ) );
-  item->treeItem()->setData( 0, PL_ITEM_ROLE, QVariant::fromValue( p_item ) );
-  item->treeItem()->setData( 0, PL_ITEM_ID_ROLE, QVariant(p_item->i_id) );
-  item->treeItem()->setData( 0, IN_ITEM_ROLE, QVariant::fromValue( p_item->p_input ) );
-  CONNECT( item, action( PLSelItem* ), this, podcastRemove( PLSelItem* ) );
-  free( psz_name );
-  return item;
+    vlc_gc_incref( p_item->p_input );
+    char *psz_name = input_item_GetName( p_item->p_input );
+    PLSelItem *item = addItem(
+            PL_ITEM_TYPE, qfu( psz_name ), false, podcastsParent );
+    item->addAction( RM_ACTION, qtr( "Remove this podcast subscription" ) );
+    item->treeItem()->setData( 0, PL_ITEM_ROLE, QVariant::fromValue( p_item ) );
+    item->treeItem()->setData( 0, PL_ITEM_ID_ROLE, QVariant(p_item->i_id) );
+    item->treeItem()->setData( 0, IN_ITEM_ROLE, QVariant::fromValue( p_item->p_input ) );
+    CONNECT( item, action( PLSelItem* ), this, podcastRemove( PLSelItem* ) );
+    free( psz_name );
+    return item;
 }
 
 void PLSelector::createItems()
