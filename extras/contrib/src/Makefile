@@ -850,19 +850,16 @@ endif
 FLAC_DISABLE_FLAGS = --disable-oggtest --disable-xmms-plugin --disable-cpplibs
 
 .flac: flac .ogg
-ifdef HAVE_WIN32
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(FLAC_DISABLE_FLAGS) && cd src&& make -C libFLAC&& make -C libFLAC install && cd .. && make -C include install)
-else
-ifdef HAVE_DARWIN_OS
 ifdef HAVE_DARWIN_OS_ON_INTEL
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm-optimizations && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
+	cd $< && \
+	$(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) --disable-asm-optimizations $(FLAC_DISABLE_FLAGS)
 else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX) $(FLAC_DISABLE_FLAGS) && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
+	cd $< && \
+	$(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  $(FLAC_DISABLE_FLAGS)
 endif
-else
-	(cd $<; $(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  $(FLAC_DISABLE_FLAGS) && cd src && make -C libFLAC && make -C libFLAC install  && cd .. && make -C include install)
-endif
-endif
+	cd $</src && \
+	make -C libFLAC install
+	cd $< && make -C include install
 	$(INSTALL_NAME)
 	touch $@
 
