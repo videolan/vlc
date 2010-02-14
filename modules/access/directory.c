@@ -41,6 +41,7 @@
 
 #ifdef HAVE_UNISTD_H
 #   include <unistd.h>
+#   include <fcntl.h>
 #elif defined( WIN32 ) && !defined( UNDER_CE )
 #   include <io.h>
 #endif
@@ -82,6 +83,7 @@ struct access_sys_t
 {
     directory_t *current;
     DIR *handle;
+    char *uri;
     char *ignored_exts;
     int mode;
     int i_item_count;
@@ -108,22 +110,31 @@ int DirOpen( vlc_object_t *p_this )
 int DirInit (access_t *p_access, DIR *handle)
 {
     access_sys_t *p_sys = malloc (sizeof (*p_sys));
-    if (!p_sys)
+    if (unlikely(p_sys == NULL))
+        goto error;
+
+    char *uri;
+    if (!strcmp (p_access->psz_access, "fd"))
     {
-        closedir( handle );
-        return VLC_ENOMEM;
+        if (asprintf (&uri, "fd://%s", p_access->psz_path) == -1)
+            uri = NULL;
     }
+    else
+        uri = make_URI (p_access->psz_path);
+    if (unlikely(uri == NULL))
+        goto error;
 
     p_access->p_sys = p_sys;
     p_sys->current = NULL;
     p_sys->handle = handle;
-    p_sys->ignored_exts = var_CreateGetString (p_access, "ignore-filetypes");
+    p_sys->uri = uri;
+    p_sys->ignored_exts = var_InheritString (p_access, "ignore-filetypes");
     p_sys->i_item_count = 0;
     p_sys->psz_xspf_extension = strdup( "" );
 
     /* Handle mode */
-    char *psz = var_CreateGetString( p_access, "recursive" );
-    if( *psz == '\0' || !strcasecmp( psz, "none" )  )
+    char *psz = var_InheritString (p_access, "recursive");
+    if (psz == NULL || !strcasecmp (psz, "none"))
         p_sys->mode = MODE_NONE;
     else if( !strcasecmp( psz, "collapse" )  )
         p_sys->mode = MODE_COLLAPSE;
@@ -140,6 +151,11 @@ int DirInit (access_t *p_access, DIR *handle)
     p_access->psz_demux = strdup ("xspf-open");
 
     return VLC_SUCCESS;
+
+error:
+    closedir (handle);
+    free (p_sys);
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -159,8 +175,12 @@ void DirClose( vlc_object_t * p_this )
         free (current->uri);
         free (current);
     }
+
+    /* corner case: Block() not called ever */
     if (p_sys->handle != NULL)
-        closedir (p_sys->handle); /* corner case,:Block() not called ever */
+        closedir (p_sys->handle);
+    free (p_sys->uri);
+
     free (p_sys->psz_xspf_extension);
     free (p_sys->ignored_exts);
     free (p_sys);
@@ -213,17 +233,16 @@ block_t *DirBlock (access_t *p_access)
         current->parent = NULL;
         current->handle = p_sys->handle;
         strcpy (current->path, p_access->psz_path);
-        current->uri = make_URI (current->path);
-        if ((current->uri == NULL)
-         || fstat (dirfd (current->handle), &current->st))
+        current->uri = p_sys->uri;
+        if (fstat (dirfd (current->handle), &current->st))
         {
-            free (current->uri);
             free (current);
             block_Release (block);
             goto fatal;
         }
 
         p_sys->handle = NULL;
+        p_sys->uri = NULL;
         p_sys->current = current;
         return block;
     }
@@ -287,7 +306,21 @@ block_t *DirBlock (access_t *p_access)
         }
         sprintf (sub->path, "%s/%s", current->path, entry);
 
-        DIR *handle = vlc_opendir (sub->path);
+        DIR *handle;
+#ifdef HAVE_FDOPENDIR
+        /* TODO: ToLocale */
+        int fd = openat (dirfd (current->handle), entry, O_RDONLY);
+        if (fd != -1)
+        {
+            handle = fdopendir (fd);
+            if (handle == NULL)
+                close (fd);
+        }
+        else
+            handle = NULL;
+#else
+        handle = vlc_opendir (sub->path);
+#endif
         if (handle != NULL)
         {
             sub->parent = current;

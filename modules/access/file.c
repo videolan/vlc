@@ -191,8 +191,6 @@ int Open( vlc_object_t *p_this )
      * how to parse the data. The directory plugin will do it. */
     if (S_ISDIR (st.st_mode))
     {
-        if (!strcasecmp (p_access->psz_access, "fd"))
-            goto error; /* fd:// not supported for directories yet */
 #ifdef HAVE_FDOPENDIR
         DIR *handle = fdopendir (fd);
         if (handle == NULL)
