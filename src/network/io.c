@@ -428,8 +428,11 @@ ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         { .fd = vlc_object_waitpipe (p_this), .events = POLLIN  },
     };
 
-    if (ufd[1].fd == -1)
+    if (unlikely(ufd[1].fd == -1))
+    {
+        vlc_testcancel ();
         return -1;
+    }
 
     while( i_data > 0 )
     {
@@ -485,6 +488,9 @@ ssize_t net_Write( vlc_object_t *p_this, int fd, const v_socket_t *p_vs,
         i_data -= val;
         i_total += val;
     }
+
+    if (unlikely(i_data == 0))
+        vlc_testcancel (); /* corner case */
 
     if ((i_total > 0) || (i_data == 0))
         return i_total;
