@@ -27,7 +27,12 @@ AM_INIT_AUTOMAKE(tar-ustar)
 AM_CONFIG_HEADER(config.h)
 
 # Disable with "./configure --disable-silent-rules" or "make V=1"
-m4_ifdef([AM_SILENT_RULES], [AM_SILENT_RULES([yes])])
+m4_ifdef([AM_SILENT_RULES], [
+  AM_SILENT_RULES([yes])
+], [
+  AM_DEFAULT_VERBOSITY=1
+  AC_SUBST(AM_DEFAULT_VERBOSITY)
+])
 
 
 dnl Too many people are not aware of maintainer mode:
