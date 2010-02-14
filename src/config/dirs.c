@@ -32,7 +32,7 @@
 
 #undef config_GetDataDir
 /**
- * Determines the shared data directory
+ * Determines the shared architecture-independent data directory
  *
  * @return a string or NULL. Use free() to release.
  */

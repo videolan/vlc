@@ -59,6 +59,11 @@ char *config_GetDataDirDefault (void)
     return datadir;
 }
 
+const char *config_GetLibDir (void)
+{
+    abort ();
+}
+
 static char *config_GetHomeDir (void)
 {
     const char *home = getenv ("HOME");

@@ -47,6 +47,16 @@ char *config_GetDataDirDefault (void)
 }
 
 /**
+ * Determines the architecture-dependent data directory
+ *
+ * @return a string (always succeeds).
+ */
+const char *config_GetLibDir (void)
+{
+    return PKGLIBDIR;
+}
+
+/**
  * Determines the system configuration directory.
  *
  * @return a string (always succeeds).

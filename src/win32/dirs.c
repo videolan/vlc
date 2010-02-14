@@ -49,6 +49,11 @@ char *config_GetDataDirDefault( void )
     return strdup (psz_vlcpath);
 }
 
+const char *config_GetLibDir (void)
+{
+    abort ();
+}
+
 const char *config_GetConfDir (void)
 {
     static char appdir[PATH_MAX] = "";

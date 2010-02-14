@@ -55,6 +55,7 @@ config_ExistIntf
 config_FindConfig
 config_GetConfDir
 config_GetDataDir
+config_GetLibDir
 config_GetFloat
 config_GetUserDir
 config_GetInt
