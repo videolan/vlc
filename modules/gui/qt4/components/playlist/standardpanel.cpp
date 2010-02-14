@@ -388,6 +388,7 @@ void StandardPLPanel::showView( int i_view )
     }
 
     browseInto();
+    gotoPlayingItem();
 }
 
 void StandardPLPanel::cycleViews()
