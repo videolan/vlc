@@ -150,9 +150,6 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
             i_volume = AOUT_VOLUME_MIN;
         else
             i_volume = i_new_volume;
-
-        if ( i_return_volume != NULL )
-            *i_return_volume = i_volume;
     }
 
     var_Create( p_object->p_libvlc, "saved-volume", VLC_VAR_INTEGER );
@@ -187,6 +184,8 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
         vlc_object_release( p_aout );
     }
 
+    if ( i_return_volume != NULL )
+         *i_return_volume = i_volume;
     return i_result;
 }
 
