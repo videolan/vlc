@@ -316,8 +316,7 @@ block_t *DirBlock (access_t *p_access)
 
         DIR *handle;
 #ifdef HAVE_FDOPENDIR
-        /* TODO: ToLocale */
-        int fd = openat (dirfd (current->handle), entry, O_RDONLY);
+        int fd = vlc_openat (dirfd (current->handle), entry, O_RDONLY);
         if (fd != -1)
         {
             handle = fdopendir (fd);

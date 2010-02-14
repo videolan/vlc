@@ -149,10 +149,10 @@ int Open( vlc_object_t *p_this )
         else if (*end == '/' && end > path)
         {
             char *name = decode_URI_duplicate (end - 1);
-            if (name != NULL) /* TODO: ToLocale(), FD_CLOEXEC */
+            if (name != NULL)
             {
                 name[0] = '.';
-                fd = openat (oldfd, name, O_RDONLY | O_NONBLOCK);
+                fd = vlc_openat (oldfd, name, O_RDONLY | O_NONBLOCK);
                 free (name);
             }
         }
