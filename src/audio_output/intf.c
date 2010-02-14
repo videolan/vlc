@@ -171,10 +171,9 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
 
     /* trigger callbacks */
     var_TriggerCallback( p_object->p_libvlc, "volume-change");
-    if ( p_aout ) var_SetBool( p_aout, "intf-change", true );
-
     if ( p_aout )
     {
+        var_SetBool( p_aout, "intf-change", true );
         aout_unlock_volume( p_aout );
         vlc_object_release( p_aout );
     }
