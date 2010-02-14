@@ -93,3 +93,16 @@ end
 function parse_string(str)
     return parsexml(vlc.memory_stream(str))
 end
+
+function add_name_maps(tree)
+    tree.children_map = {}
+    for _, node in pairs(tree.children) do
+        if type(node) == "table" then
+            if not tree.children_map[node.name] then
+                tree.children_map[node.name] = {}
+            end
+            table.insert(tree.children_map[node.name], node)
+            add_name_maps(node)
+        end
+    end
+end
