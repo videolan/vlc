@@ -192,7 +192,7 @@ libvlccore_la_CFLAGS = `$(VLC_CONFIG) --cflags libvlccore` \
 	-DSYSCONFDIR=\"$(sysconfdir)\" \
 	-DDATA_PATH=\"$(vlcdatadir)\" \
 	-DLIBDIR=\"$(libdir)\" \
-	-DPLUGIN_PATH=\"$(vlclibdir)\"
+	-DPLUGIN_PATH=\"$(vlclibdir)/modules\"
 libvlccore_la_LDFLAGS = `$(VLC_CONFIG) --ldflags libvlccore` $(AM_LDFLAGS) \
 	-no-undefined \
 	-export-symbols $(srcdir)/libvlccore.sym \
