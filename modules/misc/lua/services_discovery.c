@@ -3,7 +3,7 @@
  *****************************************************************************
  * Copyright (C) 2009 the VideoLAN team
  *
- * Authors: Fabio Ritrovato <exsephiroth87 at videolan dot org>
+ * Authors: Fabio Ritrovato <sephiroth87 at videolan dot org>
  *
  * This program is free software; you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -96,6 +96,8 @@ int Open_LuaSD( vlc_object_t *p_this )
     luaopen_strings( L );
     luaopen_variables( L );
     luaopen_stream( L );
+    luaopen_gettext( L );
+    luaopen_xml( L );
     lua_pop( L, 1 );
     if( luaL_dofile( L, p_sys->psz_filename ) )
     {
