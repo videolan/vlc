@@ -858,6 +858,8 @@ else
 	$(HOSTCC) ./configure $(HOSTCONF) --prefix=$(PREFIX)  $(FLAC_DISABLE_FLAGS)
 endif
 	cd $</src && \
+	make -C libFLAC && \
+	echo 'Requires.private: ogg' >> libFLAC/flac.pc && \
 	make -C libFLAC install
 	cd $< && make -C include install
 	$(INSTALL_NAME)
