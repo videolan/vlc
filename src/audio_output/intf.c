@@ -50,6 +50,7 @@ static aout_instance_t *findAout (vlc_object_t *obj)
     vlc_object_release (p_input);
     return p_aout;
 }
+#define findAout(o) findAout(VLC_OBJECT(o))
 
 /*
  * Volume management
@@ -449,7 +450,7 @@ static int aout_Restart( aout_instance_t * p_aout )
 int aout_FindAndRestart( vlc_object_t * p_this, const char *psz_name,
                          vlc_value_t oldval, vlc_value_t newval, void *p_data )
 {
-    aout_instance_t * p_aout = findAout( p_this );
+    aout_instance_t * p_aout = findAout( pl_Get(p_this) );
 
     (void)psz_name; (void)oldval; (void)newval; (void)p_data;
     if ( p_aout == NULL ) return VLC_SUCCESS;
