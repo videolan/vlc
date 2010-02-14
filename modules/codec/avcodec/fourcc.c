@@ -200,6 +200,10 @@ static const struct
     { VLC_CODEC_FRWU, CODEC_ID_FRWU, VIDEO_ES },
 #endif
 
+#if LIBAVCODEC_VERSION_INT >= AV_VERSION_INT( 52, 53, 0 )
+    { VLC_CODEC_INDEO5, CODEC_ID_INDEO5, VIDEO_ES },
+#endif
+
     /* Videogames Codecs */
 
     { VLC_CODEC_INTERPLAY, CODEC_ID_INTERPLAY_VIDEO, VIDEO_ES },
@@ -215,6 +219,7 @@ static const struct
     { VLC_CODEC_VMDVIDEO, CODEC_ID_VMDVIDEO, VIDEO_ES },
 
     { VLC_CODEC_AMV, CODEC_ID_AMV, VIDEO_ES },
+
 
 #if 0
 /*    UNTESTED VideoGames*/

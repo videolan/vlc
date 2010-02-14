@@ -607,6 +607,11 @@ static const entry_t p_list_video[] = {
     B(VLC_CODEC_FRWU, "Forward Uncompressed" ),
         A("FRWU"),
 
+    B(VLC_CODEC_INDEO5, "Indeo Video v5"),
+        A("IV50"),
+        A("iv50"),
+
+
     /* */
     B(VLC_CODEC_YV12, "Planar 4:2:0 YVU"),
         A("YV12"),
