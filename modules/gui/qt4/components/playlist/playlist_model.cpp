@@ -896,31 +896,35 @@ bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     QMenu menu;
     if( i_popup_item > -1 )
     {
-        menu.addAction( qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
-        menu.addAction( qtr(I_POP_DEL), this, SLOT( popupDel() ) );
+        menu.addAction( QIcon( ":/menu/play" ), qtr(I_POP_PLAY), this, SLOT( popupPlay() ) );
+        menu.addAction( QIcon( ":/buttons/playlist/playlist_remove" ),
+                        qtr(I_POP_DEL), this, SLOT( popupDel() ) );
         menu.addSeparator();
-        menu.addAction( qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
+        menu.addAction( QIcon( ":/menu/stream" ),
+                        qtr(I_POP_STREAM), this, SLOT( popupStream() ) );
         menu.addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
         menu.addSeparator();
-        menu.addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
-        menu.addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
+        menu.addAction( QIcon( ":/menu/info" ), qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
+        menu.addAction( QIcon( ":/type/folder-grey" ),
+                        qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
     }
     if( canEdit() )
     {
+        QIcon addIcon( ":/buttons/playlist/playlist_add" );
         menu.addSeparator();
-        if( tree ) menu.addAction( qtr(I_POP_ADD) + QString("..."), this, SLOT( popupAddNode() ) );
+        if( tree ) menu.addAction( addIcon, qtr(I_POP_NEWFOLDER), this, SLOT( popupAddNode() ) );
         if( rootItem->i_id == THEPL->p_playing->i_id )
         {
-            menu.addAction( qtr(I_PL_ADDF), THEDP, SLOT( simplePLAppendDialog()) );
-            menu.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
-            menu.addAction( qtr(I_OP_ADVOP), THEDP, SLOT( PLAppendDialog()) );
+            menu.addAction( addIcon, qtr(I_PL_ADDF), THEDP, SLOT( simplePLAppendDialog()) );
+            menu.addAction( addIcon, qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
+            menu.addAction( addIcon, qtr(I_OP_ADVOP), THEDP, SLOT( PLAppendDialog()) );
         }
         else if( THEPL->p_media_library &&
                     rootItem->i_id == THEPL->p_media_library->i_id )
         {
-            menu.addAction( qtr(I_PL_ADDF), THEDP, SLOT( simpleMLAppendDialog()) );
-            menu.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
-            menu.addAction( qtr(I_OP_ADVOP), THEDP, SLOT( MLAppendDialog() ) );
+            menu.addAction( addIcon, qtr(I_PL_ADDF), THEDP, SLOT( simpleMLAppendDialog()) );
+            menu.addAction( addIcon, qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
+            menu.addAction( addIcon, qtr(I_OP_ADVOP), THEDP, SLOT( MLAppendDialog() ) );
         }
     }
     if( i_popup_item > -1 )
@@ -1030,7 +1034,7 @@ void PLModel::popupAddNode()
 {
     bool ok;
     QString name = QInputDialog::getText( PlaylistDialog::getInstance( p_intf ),
-        qtr( I_POP_ADD ), qtr( "Enter name for new folder:" ),
+        qtr( "Create Folder" ), qtr( "Enter name for new folder:" ),
         QLineEdit::Normal, QString(), &ok);
     if( !ok || name.isEmpty() ) return;
     PL_LOCK;

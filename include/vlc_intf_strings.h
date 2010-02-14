@@ -54,26 +54,26 @@
 #define I_POP_DEL N_("Delete")
 #define I_POP_INFO N_("Information...")
 #define I_POP_SORT N_("Sort")
-#define I_POP_ADD N_("Add Node")
+#define I_POP_NEWFOLDER N_("Create Folder...")
 #define I_POP_STREAM N_("Stream...")
 #define I_POP_SAVE N_("Save...")
-#define I_POP_EXPLORE N_("Open Folder...")
+#define I_POP_EXPLORE N_("Show Containing Folder...")
 
 /*************** Playlist *************/
 
-#define I_PL_LOOP       N_("Repeat all")
-#define I_PL_REPEAT     N_("Repeat one")
-#define I_PL_NOREPEAT   N_("No repeat")
+#define I_PL_LOOP       N_("Repeat All")
+#define I_PL_REPEAT     N_("Repeat One")
+#define I_PL_NOREPEAT   N_("No Repeat")
 
 #define I_PL_RANDOM     N_("Random")
-#define I_PL_NORANDOM   N_("Random off")
+#define I_PL_NORANDOM   N_("Random Off")
 
-#define I_PL_ADDPL      N_("Add to playlist")
-#define I_PL_ADDML      N_("Add to media library")
+#define I_PL_ADDPL      N_("Add to Playlist")
+#define I_PL_ADDML      N_("Add to Media Library")
 
-#define I_PL_ADDF       N_("Add file...")
-#define I_PL_ADVADD     N_("Advanced open...")
-#define I_PL_ADDDIR     N_("Add directory...")
+#define I_PL_ADDF       N_("Add File...")
+#define I_PL_ADVADD     N_("Advanced Open...")
+#define I_PL_ADDDIR     N_("Add Folder...")
 
 #define I_PL_SAVE       N_("Save Playlist to &File...")
 #define I_PL_LOAD       N_("Open Play&list...")
