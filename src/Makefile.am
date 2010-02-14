@@ -171,9 +171,6 @@ EXTRA_DIST += libvlc_win32_rc.rc.in
 # Building libvlc
 ###############################################################################
 
-nice:
-	$(top_builddir)/compile
-
 lib_LTLIBRARIES = libvlccore.la libvlc.la
 
 AM_LDFLAGS = -no-undefined

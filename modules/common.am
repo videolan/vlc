@@ -33,8 +33,3 @@ if MAINTAINER_MODE
 $(srcdir)/Makefile.am: $(srcdir)/Modules.am $(top_srcdir)/modules/genmf
 	cd \$(top_srcdir) && \$(SHELL) modules/genmf $(dir)
 endif
-
-nice:
-	$(top_builddir)/compile
-
-.PHONY: nice

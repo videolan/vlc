@@ -335,10 +335,6 @@ doc:
 
 .PHONY: libvlc core doc
 
-#To get some nice output
-nice:
-	$(top_builddir)/compile
-
 if HAVE_BEOS
 noinst_DATA = vlc-bundle
 vlc-bundle: vlc
