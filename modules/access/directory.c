@@ -244,14 +244,12 @@ block_t *DirBlock (access_t *p_access)
                 "%s" \
                 " </extension>\n" \
                 "</playlist>\n", p_sys->psz_xspf_extension );
-            if( len < 0 )
+            if (unlikely(len == -1))
                 goto fatal;
 
-            block_t *block = block_Alloc ( len );
-            if (!block)
-                goto fatal;
-            memcpy (block->p_buffer, footer, len);
-            free( footer );
+            block_t *block = block_heap_Alloc (footer, footer, len);
+            if (unlikely(block == NULL))
+                free (footer);
             p_access->info.b_eof = true;
             return block;
         }
@@ -393,15 +391,12 @@ block_t *DirBlock (access_t *p_access)
         goto fatal;
     free( old_xspf_extension );
 
-    /* TODO: new block allocator for malloc()ated data */
-    block_t *block = block_Alloc (len);
-    if (!block)
+    block_t *block = block_heap_Alloc (entry, entry, len);
+    if (unlikely(block == NULL))
     {
         free (entry);
         goto fatal;
     }
-    memcpy (block->p_buffer, entry, len);
-    free (entry);
     return block;
 
 fatal:
