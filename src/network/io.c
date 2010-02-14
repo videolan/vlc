@@ -487,8 +487,8 @@ error:
 #undef net_Gets
 /**
  * Reads a line from a file descriptor.
- * This function is not thread-safe; the same file descriptor cI/O annot be read
- * by another thread at the same time (although it can be written to).
+ * This function is not thread-safe; the same file descriptor I/O cannot be
+ * read by another thread at the same time (although it can be written to).
  *
  * @return nul-terminated heap-allocated string, or NULL on I/O error.
  */
