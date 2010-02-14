@@ -1920,19 +1920,15 @@ static bool Control( input_thread_t *p_input,
             break;
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
-            if( !es_out_SetDelay( p_input->p->p_es_out_display, AUDIO_ES, val.i_time ) )
-            {
-                input_SendEventAudioDelay( p_input, val.i_time );
-                UpdatePtsDelay( p_input );
-            }
+            es_out_SetDelay( p_input->p->p_es_out_display, AUDIO_ES, val.i_time );
+            input_SendEventAudioDelay( p_input, val.i_time );
+            UpdatePtsDelay( p_input );
             break;
 
         case INPUT_CONTROL_SET_SPU_DELAY:
-            if( !es_out_SetDelay( p_input->p->p_es_out_display, SPU_ES, val.i_time ) )
-            {
-                input_SendEventSubtitleDelay( p_input, val.i_time );
-                UpdatePtsDelay( p_input );
-            }
+            es_out_SetDelay( p_input->p->p_es_out_display, SPU_ES, val.i_time );
+            input_SendEventSubtitleDelay( p_input, val.i_time );
+            UpdatePtsDelay( p_input );
             break;
 
         case INPUT_CONTROL_SET_TITLE:

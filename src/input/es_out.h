@@ -58,7 +58,7 @@ enum es_out_query_private_e
     ES_OUT_GET_BUFFERING,                           /* arg1=bool*               res=cannot fail */
 
     /* Set delay for a ES category */
-    ES_OUT_SET_DELAY,                               /* arg1=es_category_e,      res=can fail */
+    ES_OUT_SET_DELAY,                               /* arg1=es_category_e,      res=cannot fail */
 
     /* Set record state */
     ES_OUT_SET_RECORD_STATE,                        /* arg1=bool                res=can fail */
@@ -111,9 +111,10 @@ static inline bool es_out_GetEmpty( es_out_t *p_out )
     assert( !i_ret );
     return b;
 }
-static inline int es_out_SetDelay( es_out_t *p_out, int i_cat, mtime_t i_delay )
+static inline void es_out_SetDelay( es_out_t *p_out, int i_cat, mtime_t i_delay )
 {
-    return es_out_Control( p_out, ES_OUT_SET_DELAY, i_cat, i_delay );
+    int i_ret = es_out_Control( p_out, ES_OUT_SET_DELAY, i_cat, i_delay );
+    assert( !i_ret );
 }
 static inline int es_out_SetRecordState( es_out_t *p_out, bool b_record )
 {
