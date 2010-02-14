@@ -356,6 +356,9 @@ int vlc_object_waitpipe( vlc_object_t *obj )
         /* This can only ever happen if someone killed us without locking: */
         assert (internals->pipes[1] == -1);
 
+        /* pipe() is not a cancellation point, but write() is and eventfd() is
+         * unspecified (not in POSIX). */
+        int canc = vlc_savecancel ();
 #if defined (HAVE_SYS_EVENTFD_H)
         internals->pipes[0] = internals->pipes[1] = eventfd (0, EFD_CLOEXEC);
         if (internals->pipes[0] == -1)
@@ -370,6 +373,7 @@ int vlc_object_waitpipe( vlc_object_t *obj )
             msg_Dbg (obj, "waitpipe: object already dying");
             write (internals->pipes[1], &(uint64_t){ 1 }, sizeof (uint64_t));
         }
+        vlc_restorecancel (canc);
     }
     vlc_mutex_unlock (&pipe_lock);
     return internals->pipes[0];
