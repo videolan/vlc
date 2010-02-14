@@ -529,10 +529,9 @@ static int GenericProbe( demux_t *p_demux, int64_t *pi_offset,
 
     /* peek the begining
      * It is common that wav files have some sort of garbage at the begining
-     * We suppose that 8000 will be larger than any frame (for which pf_check
-     * return a size).
+     * We will accept probing 0.5s of data in this case.
      */
-    const int i_probe = i_skip + i_check_size + 8000 + ( b_wav ? 8000 : 0);
+    const int i_probe = i_skip + i_check_size + 8000 + ( b_wav ? (44000/2*2*2) : 0);
     const int i_peek = stream_Peek( p_demux->s, &p_peek, i_probe );
     if( i_peek < i_skip + i_check_size )
     {
