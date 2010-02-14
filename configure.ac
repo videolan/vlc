@@ -3053,7 +3053,7 @@ PKG_ENABLE_MODULES_VLC([DCA], [dtstofloat32], [libdca >= 0.0.5], [DTS Coherent A
 dnl
 dnl  Flac plugin
 dnl
-PKG_ENABLE_MODULES_VLC([FLAC], [], [flac ogg], [libflac decoder/encoder support], [auto])
+PKG_ENABLE_MODULES_VLC([FLAC], [], [flac], [libflac decoder/encoder support], [auto])
 
 dnl
 dnl  Libmpeg2 plugin
