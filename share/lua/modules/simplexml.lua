@@ -37,25 +37,32 @@ local function parsexml(stream)
     local parents = {}
     while reader:read() > 0 do
         local nodetype = reader:node_type()
+        --print(nodetype, reader:name())
         if nodetype == 'startelem' then
             local name = reader:name()
-            local node = { name: '', attributes: {}, children: {} }
+            local node = { name= '', attributes= {}, children= {} }
             node.name = name
-            while reader:NextAttr() == 0 do
-                node.attributes[reader:Name()] = reader:Value()
+            while reader:next_attr() == 0 do
+                node.attributes[reader:name()] = reader:value()
             end
             if tree then
-                tree.children[#tree.children] = node
-                parents[#parents] = tree
-                tree = node
+                table.insert(tree.children, node)
+                table.insert(parents, tree)
             end
+            tree = node
         elseif nodetype == 'endelem' then
-            tree = parents[#parents-1]
+            if #parents > 0 then
+                tree = parents[#parents]
+                table.remove(parents)
+            end
         elseif nodetype == 'text' then
-            node.children[#node.children] = reader:Value()
+            table.insert(tree.children, reader:value())
         end
     end
 
+    if #parents > 0 then
+        error("XML parser error/Missing closing tags")
+    end
     return tree
 end
 

@@ -54,6 +54,10 @@ end
 -- print a table (recursively)
 function table_print(t,prefix)
     local prefix = prefix or ""
+    if not t then
+        print(prefix.."/!\\ nil")
+        return
+    end
     for a,b in pairs_sorted(t) do
         print(prefix..tostring(a),b)
         if type(b)==type({}) then
