@@ -190,7 +190,7 @@ static void EsOutDecodersStopBuffering( es_out_t *out, bool b_forced );
 
 static char *LanguageGetName( const char *psz_code );
 static char *LanguageGetCode( const char *psz_lang );
-static char **LanguageSplit( const char *psz_langs );
+static char **LanguageSplit( const char *psz_langs, bool b_default_any );
 static int LanguageArrayIndex( char **ppsz_langs, char *psz_lang );
 
 static char *EsOutProgramGetMetaName( es_out_pgrm_t *p_pgrm );
@@ -269,7 +269,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
         char *psz_string;
 
         psz_string = var_GetString( p_input, "audio-language" );
-        p_sys->ppsz_audio_language = LanguageSplit( psz_string );
+        p_sys->ppsz_audio_language = LanguageSplit( psz_string, true );
         if( p_sys->ppsz_audio_language )
         {
             for( int i = 0; p_sys->ppsz_audio_language[i]; i++ )
@@ -279,7 +279,7 @@ es_out_t *input_EsOutNew( input_thread_t *p_input, int i_rate )
         free( psz_string );
 
         psz_string = var_GetString( p_input, "sub-language" );
-        p_sys->ppsz_sub_language = LanguageSplit( psz_string );
+        p_sys->ppsz_sub_language = LanguageSplit( psz_string, false );
         if( p_sys->ppsz_sub_language )
         {
             for( int i = 0; p_sys->ppsz_sub_language[i]; i++ )
@@ -2728,7 +2728,7 @@ static char *LanguageGetCode( const char *psz_lang )
     return strdup("??");
 }
 
-static char **LanguageSplit( const char *psz_langs )
+static char **LanguageSplit( const char *psz_langs, bool b_default_any )
 {
     char *psz_dup;
     char *psz_parser;
@@ -2751,6 +2751,10 @@ static char **LanguageSplit( const char *psz_langs )
         {
             TAB_APPEND( i_psz, ppsz, strdup("any") );
         }
+        else if( !strcmp( psz_parser, "none" ) )
+        {
+            TAB_APPEND( i_psz, ppsz, strdup("none") );
+        }
         else
         {
             psz_code = LanguageGetCode( psz_parser );
@@ -2769,6 +2773,8 @@ static char **LanguageSplit( const char *psz_langs )
 
     if( i_psz )
     {
+        if( b_default_any && strcmp( ppsz[i_psz - 1], "none" ) )
+            TAB_APPEND( i_psz, ppsz, strdup("any") );
         TAB_APPEND( i_psz, ppsz, NULL );
     }
 
@@ -2786,9 +2792,9 @@ static int LanguageArrayIndex( char **ppsz_langs, char *psz_lang )
     {
         if( !strcasecmp( ppsz_langs[i], psz_lang ) ||
             !strcasecmp( ppsz_langs[i], "any" ) )
-        {
             return i;
-        }
+        if( !strcasecmp( ppsz_langs[i], "none" ) )
+            break;
     }
 
     return -1;

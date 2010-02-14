@@ -701,12 +701,12 @@ static const char *const ppsz_clock_descriptions[] =
 #define INPUT_AUDIOTRACK_LANG_TEXT N_("Audio language")
 #define INPUT_AUDIOTRACK_LANG_LONGTEXT N_( \
     "Language of the audio track you want to use " \
-    "(comma separated, two or three letter country code).")
+    "(comma separated, two or three letter country code, you may use 'none' to avoid a fallback to another language).")
 
 #define INPUT_SUBTRACK_LANG_TEXT N_("Subtitle language")
 #define INPUT_SUBTRACK_LANG_LONGTEXT N_( \
     "Language of the subtitle track you want to use " \
-    "(comma separated, two or three letters country code).")
+    "(comma separated, two or three letters country code, you may use 'any' as a fallback).")
 
 /// \todo Document how to find it
 #define INPUT_AUDIOTRACK_ID_TEXT N_("Audio track ID")
