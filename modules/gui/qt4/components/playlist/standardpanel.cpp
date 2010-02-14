@@ -77,12 +77,12 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
 
     locationBar = new LocationBar( model );
     locationBar->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
-    layout->addWidget( locationBar, 0, 1 );
-    layout->setColumnStretch( 1, 100 );
+    layout->addWidget( locationBar, 0, 0 );
+    layout->setColumnStretch( 0, 100 );
     CONNECT( locationBar, invoked( const QModelIndex & ),
              this, browseInto( const QModelIndex & ) );
 
-    layout->setColumnStretch( 2, 1 );
+    layout->setColumnStretch( 1, 1 );
 
     searchEdit = new SearchLineEdit( this );
     searchEdit->setMaximumWidth( 250 );
@@ -92,17 +92,10 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
              this, search( const QString& ) );
     layout->setColumnStretch( 3, 50 );
 
-    /* Add item to the playlist button */
-    addButton = new QToolButton;
-    addButton->setIcon( QIcon( ":/buttons/playlist/playlist_add" ) );
-    addButton->setMaximumWidth( 30 );
-    BUTTONACT( addButton, popupAdd() );
-    layout->addWidget( addButton, 0, 0 );
-
     /* Button to switch views */
     QToolButton *viewButton = new QToolButton( this );
     viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogDetailedView ) );
-    layout->addWidget( viewButton, 0, 4 );
+    layout->addWidget( viewButton, 0, 2 );
 
     /* View selection menu */
     viewSelectionMapper = new QSignalMapper( this );
@@ -168,48 +161,7 @@ void StandardPLPanel::handleExpansion( const QModelIndex& index )
 
 void StandardPLPanel::handleRootChange()
 {
-    /* needed for popupAdd() */
-    PLItem *root = model->getItem( QModelIndex() );
-    currentRootId = root->id();
-
     browseInto();
-
-    /* enable/disable adding */
-    if( currentRootId == THEPL->p_playing->i_id )
-    {
-        addButton->setEnabled( true );
-        addButton->setToolTip( qtr(I_PL_ADDPL) );
-    }
-    else if( THEPL->p_media_library &&
-             currentRootId == THEPL->p_media_library->i_id )
-    {
-        addButton->setEnabled( true );
-        addButton->setToolTip( qtr(I_PL_ADDML) );
-    }
-    else
-        addButton->setEnabled( false );
-}
-
-/* PopupAdd Menu for the Add Menu */
-void StandardPLPanel::popupAdd()
-{
-    QMenu popup;
-    if( currentRootId == THEPL->p_playing->i_id )
-    {
-        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT( simplePLAppendDialog()) );
-        popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
-        popup.addAction( qtr(I_OP_ADVOP), THEDP, SLOT( PLAppendDialog()) );
-    }
-    else if( THEPL->p_media_library &&
-                currentRootId == THEPL->p_media_library->i_id )
-    {
-        popup.addAction( qtr(I_PL_ADDF), THEDP, SLOT( simpleMLAppendDialog()) );
-        popup.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
-        popup.addAction( qtr(I_OP_ADVOP), THEDP, SLOT( MLAppendDialog() ) );
-    }
-
-    popup.exec( QCursor::pos() - addButton->mapFromGlobal( QCursor::pos() )
-                        + QPoint( 0, addButton->height() ) );
 }
 
 void StandardPLPanel::popupPlView( const QPoint &point )

@@ -74,7 +74,6 @@ private:
 
     QWidget     *parent;
     QLabel      *title;
-    QToolButton *addButton;
     QGridLayout *layout;
     LocationBar *locationBar;
     SearchLineEdit *searchEdit;
@@ -109,7 +108,6 @@ private slots:
     void handleRootChange();
     void gotoPlayingItem();
     void search( const QString& searchText );
-    void popupAdd();
     void popupSelectColumn( QPoint );
     void popupPlView( const QPoint & );
     void toggleColumnShown( int );
