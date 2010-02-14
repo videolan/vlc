@@ -136,6 +136,7 @@ static const entry_t p_list_video[] = {
         A("PM4V"),
         A("M4T3"),
         A("GEOX"),
+        A("GEOV"),
         A("DMK2"),
         A("WV1F"),
         A("DIGI"),
