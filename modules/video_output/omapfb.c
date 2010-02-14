@@ -79,7 +79,7 @@ static void ToggleFullScreen ( vout_thread_t * );
 #define DEVICE_LONGTEXT N_( \
     "OMAP Framebuffer device to use for rendering (usually /dev/fb0).")
 
-#define CHROMA_TEXT N_("Chroma used.")
+#define CHROMA_TEXT N_("Chroma used")
 #define CHROMA_LONGTEXT N_( \
     "Force use of a specific chroma for output. Default is Y420 (specific to N770/N8xx hardware)." )
 

@@ -50,7 +50,7 @@ static void Close( vlc_object_t * );
 #define HANDLERS_LONGTEXT N_( \
         "List of handler extensions and executable paths (for instance: " \
         "php=/usr/bin/php,pl=/usr/bin/perl)." )
-#define ART_TEXT N_( "Export album art as /art." )
+#define ART_TEXT N_( "Export album art as /art" )
 #define ART_LONGTEXT N_( \
         "Allow exporting album art for current playlist items at the " \
         "/art and /art?id=<id> URLs." )

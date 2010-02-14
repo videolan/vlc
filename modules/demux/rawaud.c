@@ -50,7 +50,7 @@ static void Close( vlc_object_t * );
 #define FOURCC_LONGTEXT N_( \
     "FOURCC code of the raw input format. This is a four character string." )
 
-#define LANG_TEXT N_("Forces the audio language.")
+#define LANG_TEXT N_("Forces the audio language")
 #define LANG_LONGTEXT N_("Forces the audio language for the output mux. Three letter ISO639 code. Default is 'eng'. ")
 
 #ifdef WORDS_BIGENDIAN

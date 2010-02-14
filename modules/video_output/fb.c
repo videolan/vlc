@@ -57,23 +57,23 @@
 #define DEVICE_LONGTEXT N_(\
     "Framebuffer device to use for rendering (usually /dev/fb0).")
 
-#define TTY_TEXT N_("Run fb on current tty.")
+#define TTY_TEXT N_("Run fb on current tty")
 #define TTY_LONGTEXT N_(\
     "Run framebuffer on current TTY device (default enabled). " \
     "(disable tty handling with caution)")
 
-#define FB_MODE_TEXT N_("Framebuffer resolution to use.")
+#define FB_MODE_TEXT N_("Framebuffer resolution to use")
 #define FB_MODE_LONGTEXT N_(\
     "Select the resolution for the framebuffer. Currently it supports " \
     "the values 0=QCIF 1=CIF 2=NTSC 3=PAL, 4=auto (default 4=auto)")
 
-#define HW_ACCEL_TEXT N_("Framebuffer uses hw acceleration.")
+#define HW_ACCEL_TEXT N_("Framebuffer uses hw acceleration")
 #define HW_ACCEL_LONGTEXT N_(\
     "If your framebuffer supports hardware acceleration or does double buffering " \
     "in hardware then you must disable this option. It then does double buffering " \
     "in software.")
 
-#define CHROMA_TEXT N_("Image format (default RGB).")
+#define CHROMA_TEXT N_("Image format (default RGB)")
 #define CHROMA_LONGTEXT N_("Chroma fourcc used by the framebuffer. Default is RGB since the fb device has no way to report its chroma.")
 
 static int  Open (vlc_object_t *);
@@ -190,12 +190,12 @@ static int Open(vlc_object_t *object)
 #if !defined(WIN32) &&  defined(HAVE_ISATTY)
     /* Check that stdin is a TTY */
     if (sys->is_tty && !isatty(0)) {
-        msg_Warn(vd, "fd 0 is not a TTY");
+        msg_Warn(vd, "standard input is not a TTY");
         free(sys);
         return VLC_EGENERIC;
     }
-    msg_Warn(vd, "disabling tty handling, use with caution because "
-                 "there is no way to return to the tty.");
+    msg_Warn(vd, "disabling TTY handling, use with caution because "
+                 "there is no way to return to the TTY");
 #endif
 
     const int mode = var_CreateGetInteger(vd, "fb-mode");

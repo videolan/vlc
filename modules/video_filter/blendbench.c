@@ -60,7 +60,7 @@ static picture_t *Filter( filter_t *, picture_t * );
 #define BASE_CHROMA_TEXT N_("Chroma for the base image")
 #define BASE_CHROMA_LONGTEXT N_("Chroma which the base image will be loaded in")
 
-#define BLEND_IMAGE_TEXT N_("Image which will be blended.")
+#define BLEND_IMAGE_TEXT N_("Image which will be blended")
 #define BLEND_IMAGE_LONGTEXT N_("The image blended onto the base image")
 
 #define BLEND_CHROMA_TEXT N_("Chroma for the blend image")
@@ -244,7 +244,7 @@ static picture_t *Filter( filter_t *p_filter, picture_t *p_pic )
     }
     time = mdate() - time;
 
-    msg_Info( p_filter, "Blended %d images in %f sec.", p_sys->i_loops,
+    msg_Info( p_filter, "Blended %d images in %f sec", p_sys->i_loops,
               time / 1000000.0f );
     msg_Info( p_filter, "Speed is: %f images/second, %f pixels/second",
               (float) p_sys->i_loops / time * 1000000,

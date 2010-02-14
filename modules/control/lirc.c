@@ -43,7 +43,7 @@
 
 #include <lirc/lirc_client.h>
 
-#define LIRC_TEXT N_("Change the lirc configuration file.")
+#define LIRC_TEXT N_("Change the lirc configuration file")
 #define LIRC_LONGTEXT N_( \
     "Tell lirc to read this configuration file. By default it " \
     "searches in the users home directory." )
@@ -184,7 +184,7 @@ static void Process( intf_thread_t *p_intf )
                 if( i_key )
                     var_SetInteger( p_intf->p_libvlc, "key-action", i_key );
                 else
-                    msg_Err( p_intf, "Unknown hotkey '%s'.", c );
+                    msg_Err( p_intf, "Unknown hotkey '%s'", c );
             }
             else if( !strncmp( "menu ", c, 5)  )
             {

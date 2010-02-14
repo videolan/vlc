@@ -73,7 +73,7 @@ static int FakeCallback( vlc_object_t *, char const *,
 #define DEINTERLACE_MODULE_TEXT N_("Deinterlace module")
 #define DEINTERLACE_MODULE_LONGTEXT N_( \
     "Deinterlace module to use." )
-#define CHROMA_TEXT N_("Chroma used.")
+#define CHROMA_TEXT N_("Chroma used")
 #define CHROMA_LONGTEXT N_( \
     "Force use of a specific chroma for output. Default is I420." )
 

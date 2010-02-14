@@ -100,13 +100,13 @@ static void ShowDialog   ( intf_thread_t *, int, int, intf_dialog_args_t * );
 #define ADVANCED_OPTIONS_LONGTEXT N_( "Show all the advanced options " \
                                       "in the dialogs." )
 
-#define OPACITY_TEXT N_( "Windows opacity between 0.1 and 1." )
+#define OPACITY_TEXT N_( "Windows opacity between 0.1 and 1" )
 #define OPACITY_LONGTEXT N_( "Sets the windows opacity between 0.1 and 1 " \
                              "for main interface, playlist and extended panel."\
                              " This option only works with Windows and " \
                              "X11 with composite extensions." )
 
-#define OPACITY_FS_TEXT N_( "Fullscreen controller opacity opacity between 0.1 and 1." )
+#define OPACITY_FS_TEXT N_( "Fullscreen controller opacity opacity between 0.1 and 1" )
 #define OPACITY_FS_LONGTEXT N_( "Sets the fullscreen controller opacity between 0.1 and 1 " \
                              "for main interface, playlist and extended panel."\
                              " This option only works with Windows and " \
