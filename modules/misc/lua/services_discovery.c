@@ -70,17 +70,14 @@ int Open_LuaSD( vlc_object_t *p_this )
         msg_Err( p_sd, "Couldn't find lua services discovery script \"%s\".",
                  psz_name );
         free( psz_name );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
     free( psz_name );
     L = luaL_newstate();
     if( !L )
     {
         msg_Err( p_sd, "Could not create new Lua State" );
-        free( p_sys->psz_filename );
-        free( p_sys );
-        return VLC_EGENERIC;
+        goto error;
     }
     luaL_openlibs( L );
     luaL_register( L, "vlc", p_reg );
@@ -99,24 +96,33 @@ int Open_LuaSD( vlc_object_t *p_this )
     luaopen_gettext( L );
     luaopen_xml( L );
     lua_pop( L, 1 );
+    if( vlclua_add_modules_path( p_sd, L, p_sys->psz_filename ) )
+    {
+        msg_Warn( p_sd, "Error while setting the module search path for %s",
+                  p_sys->psz_filename );
+        lua_close( L );
+        goto error;
+    }
     if( luaL_dofile( L, p_sys->psz_filename ) )
     {
 
         msg_Err( p_sd, "Error loading script %s: %s", p_sys->psz_filename,
                   lua_tostring( L, lua_gettop( L ) ) );
         lua_pop( L, 1 );
-        free( p_sys->psz_filename );
-        free( p_sys );
-        return VLC_EGENERIC;
+        lua_close( L );
+        goto error;
     }
     p_sys->L = L;
     if( vlc_clone (&p_sd->p_sys->thread, Run, p_sd, VLC_THREAD_PRIORITY_LOW) )
     {
-        free( p_sys->psz_filename );
-        free( p_sys );
-        return VLC_EGENERIC;
+        lua_close( L );
+        goto error;
     }
     return VLC_SUCCESS;
+error:
+    free( p_sys->psz_filename );
+    free( p_sys );
+    return VLC_EGENERIC;
 }
 
 /*****************************************************************************
@@ -150,6 +156,6 @@ static void* Run( void *data )
         lua_pop( L, 1 );
         return NULL;
     }
-    //msg_Info( p_sd, "LuaSD script loaded: %s", p_sd->psz_name );
+    msg_Dbg( p_sd, "LuaSD script loaded: %s", p_sd->psz_name );
     return NULL;
 }
