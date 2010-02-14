@@ -450,6 +450,19 @@ mouse_object( vlc_object_t *p_this, char const *psz_cmd,
     return VLC_SUCCESS;
 }
 
+static input_thread_t *find_input (vlc_object_t *obj)
+{
+    libvlc_media_player_t *mp = (libvlc_media_player_t *)obj;
+    input_thread_t *p_input;
+
+    lock (mp);
+    p_input = mp->p_input_thread;
+    if (p_input)
+        vlc_object_hold (p_input);
+    unlock (mp);
+    return p_input;
+}
+
 /* */
 static void libvlc_media_player_destroy( libvlc_media_player_t * );
 
@@ -530,6 +543,8 @@ libvlc_media_player_new( libvlc_instance_t *instance )
 
      /* Audio */
     var_Create (mp, "aout", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Create (mp, "find-input-callback", VLC_VAR_ADDRESS);
+    var_SetAddress (mp, "find-input-callback", find_input);
 
     mp->p_md = NULL;
     mp->state = libvlc_NothingSpecial;

@@ -42,7 +42,13 @@
 
 static aout_instance_t *findAout (vlc_object_t *obj)
 {
-    input_thread_t *p_input = playlist_CurrentInput (pl_Get (obj));
+    input_thread_t *(*pf_find_input) (vlc_object_t *);
+
+    pf_find_input = var_GetAddress (obj, "find-input-callback");
+    if (unlikely(pf_find_input == NULL))
+        return NULL;
+
+    input_thread_t *p_input = pf_find_input (obj);
     if (p_input == NULL)
        return NULL;
 
