@@ -1,5 +1,4 @@
 SOURCES_sap = sap.c
-SOURCES_shout = shout.c
 SOURCES_upnp_cc = upnp_cc.cpp
 SOURCES_upnp_intel = upnp_intel.cpp upnp_intel.hpp
 SOURCES_bonjour = bonjour.c
@@ -21,5 +20,4 @@ libvlc_LTLIBRARIES += \
 	libmediadirs_plugin.la \
 	libpodcast_plugin.la \
 	libsap_plugin.la \
-	libshout_plugin.la \
 	$(LTLIBxcb_apps)

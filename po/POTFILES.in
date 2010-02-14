@@ -1005,7 +1005,6 @@ modules/services_discovery/bonjour.c
 modules/services_discovery/mediadirs.c
 modules/services_discovery/podcast.c
 modules/services_discovery/sap.c
-modules/services_discovery/shout.c
 modules/services_discovery/udev.c
 modules/services_discovery/upnp_cc.cpp
 modules/services_discovery/upnp_intel.cpp
