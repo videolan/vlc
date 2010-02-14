@@ -115,7 +115,7 @@ endif
 #
 ifdef HAVE_WIN32
 HOSTCONF+= --without-pic --disable-shared --enable-msw --disable-dependency-tracking
-FFMPEGCONF+= --target-os=mingw32 --enable-memalign-hack
+FFMPEGCONF+= --target-os=mingw32 --arch=x86 --enable-memalign-hack
 ifdef HAVE_WIN64
 FFMPEGCONF+= --cpu=athlon64 --arch=x86_64
 else
