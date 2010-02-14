@@ -409,10 +409,12 @@ VLC_PUBLIC_API void libvlc_media_player_previous_chapter( libvlc_media_player_t 
 VLC_PUBLIC_API void libvlc_media_player_next_chapter( libvlc_media_player_t *p_mi );
 
 /**
- * Get movie play rate
+ * Get the requested movie play rate.
+ * @warning Depending on the underlying media, the requested rate may be
+ * different from the real playback rate.
  *
  * \param p_mi the Media Player
- * \return movie play rate, or zero in case of error
+ * \return movie play rate
  */
 VLC_PUBLIC_API float libvlc_media_player_get_rate( libvlc_media_player_t *p_mi );
 

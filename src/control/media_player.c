@@ -496,6 +496,9 @@ libvlc_media_player_new( libvlc_instance_t *instance )
     }
     vlc_object_attach (mp, mp->p_libvlc);
 
+    /* Input */
+    var_Create (mp, "rate", VLC_VAR_FLOAT|VLC_VAR_DOINHERIT);
+
     /* Video */
     var_Create (mp, "drawable-xid", VLC_VAR_INTEGER);
 #ifdef WIN32
@@ -1221,21 +1224,17 @@ int libvlc_media_player_will_play( libvlc_media_player_t *p_mi )
 
 int libvlc_media_player_set_rate( libvlc_media_player_t *p_mi, float rate )
 {
-    input_thread_t *p_input_thread;
-    bool b_can_rewind;
-
-    p_input_thread = libvlc_get_input_thread ( p_mi );
-    if( !p_input_thread )
-        return -1;
-
-    b_can_rewind = var_GetBool( p_input_thread, "can-rewind" );
-    if( (rate < 0.0) && !b_can_rewind )
+    if (rate < 0.)
     {
-        vlc_object_release( p_input_thread );
-        libvlc_printerr( "Invalid playback rate" );
+        libvlc_printerr ("Playing backward not supported");
         return -1;
     }
 
+    var_SetFloat (p_mi, "rate", rate);
+
+    input_thread_t *p_input_thread = libvlc_get_input_thread ( p_mi );
+    if( !p_input_thread )
+        return 0;
     var_SetFloat( p_input_thread, "rate", rate );
     vlc_object_release( p_input_thread );
     return 0;
@@ -1243,25 +1242,7 @@ int libvlc_media_player_set_rate( libvlc_media_player_t *p_mi, float rate )
 
 float libvlc_media_player_get_rate( libvlc_media_player_t *p_mi )
 {
-    input_thread_t *p_input_thread;
-    float f_rate;
-    bool b_can_rewind;
-
-    p_input_thread = libvlc_get_input_thread ( p_mi );
-    if( !p_input_thread )
-        return 0.0;  /* rate < 0 indicates rewind */
-
-    f_rate = var_GetFloat( p_input_thread, "rate" );
-    b_can_rewind = var_GetBool( p_input_thread, "can-rewind" );
-    /* FIXME: why are negative values forbidden ?? (rewinding) */
-    if( f_rate < 0 && !b_can_rewind )
-    {
-        vlc_object_release( p_input_thread );
-        return 0.0;
-    }
-    vlc_object_release( p_input_thread );
-
-    return f_rate;
+    return var_GetFloat (p_mi, "rate");
 }
 
 libvlc_state_t libvlc_media_player_get_state( libvlc_media_player_t *p_mi )
