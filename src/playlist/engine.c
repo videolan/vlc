@@ -323,6 +323,10 @@ static void VariablesInit( playlist_t *p_playlist )
     /* Variables to preserve video output parameters */
     var_Create( p_playlist, "fullscreen", VLC_VAR_BOOL | VLC_VAR_DOINHERIT );
 
+    /* Audio output parameters */
+    var_Create( p_playlist, "volume-muted", VLC_VAR_BOOL );
+    var_Create( p_playlist, "saved-volume", VLC_VAR_INTEGER );
+    var_Create( p_playlist, "volume-change", VLC_VAR_VOID );
     /* FIXME: horrible hack for audio output interface code */
     var_Create( p_playlist, "find-input-callback", VLC_VAR_ADDRESS );
     var_SetAddress( p_playlist, "find-input-callback", playlist_FindInput );

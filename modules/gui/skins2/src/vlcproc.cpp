@@ -146,7 +146,7 @@ VlcProc::VlcProc( intf_thread_t *pIntf ): SkinObject( pIntf ),
 #define ADD_CALLBACK( p_object, var ) \
     var_AddCallback( p_object, var, onGenericCallback, this );
 
-    ADD_CALLBACK( pIntf->p_libvlc, "volume-change" )
+    ADD_CALLBACK( pIntf->p_sys->p_playlist, "volume-change" )
     ADD_CALLBACK( pIntf->p_libvlc, "intf-show" )
 
     ADD_CALLBACK( pIntf->p_sys->p_playlist, "item-current" )
@@ -200,7 +200,7 @@ VlcProc::~VlcProc()
 
     interaction_Unregister( getIntf() );
 
-    var_DelCallback( getIntf()->p_libvlc, "volume-change",
+    var_DelCallback( getIntf()->p_sys->p_playlist, "volume-change",
                      onGenericCallback, this );
     var_DelCallback( getIntf()->p_libvlc, "intf-show",
                      onGenericCallback, this );

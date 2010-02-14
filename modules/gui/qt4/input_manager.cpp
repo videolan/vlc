@@ -913,8 +913,8 @@ MainInputManager::MainInputManager( intf_thread_t *_p_intf )
     var_AddCallback( THEPL, "repeat", RepeatChanged, this );
     var_AddCallback( THEPL, "loop", LoopChanged, this );
 
-    var_AddCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
-    var_AddCallback( p_intf->p_libvlc, "volume-muted", SoundMuteChanged, this );
+    var_AddCallback( THEPL, "volume-change", VolumeChanged, this );
+    var_AddCallback( THEPL, "volume-muted", SoundMuteChanged, this );
 
     /* Warn our embedded IM about input changes */
     CONNECT( this, inputChanged( input_thread_t * ),
@@ -944,8 +944,8 @@ MainInputManager::~MainInputManager()
        vlc_object_release( p_input );
     }
 
-    var_DelCallback( p_intf->p_libvlc, "volume-change", VolumeChanged, this );
-    var_DelCallback( p_intf->p_libvlc, "volume-muted", SoundMuteChanged, this );
+    var_DelCallback( THEPL, "volume-change", VolumeChanged, this );
+    var_DelCallback( THEPL, "volume-muted", SoundMuteChanged, this );
 
     var_DelCallback( THEPL, "activity", PLItemChanged, this );
     var_DelCallback( THEPL, "item-change", ItemChanged, im );

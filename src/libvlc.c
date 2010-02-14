@@ -836,11 +836,6 @@ int libvlc_InternalInit( libvlc_int_t *p_libvlc, int i_argc,
     /*
      * Load background interfaces
      */
-    /* Create volume callback system. (this variable must be created before
-       all interfaces as they can use it) */
-    var_Create( p_libvlc, "volume-change", VLC_VAR_VOID );
-    var_Create( p_libvlc, "volume-muted", VLC_VAR_BOOL );
-
     psz_modules = var_CreateGetNonEmptyString( p_libvlc, "extraintf" );
     psz_control = var_CreateGetNonEmptyString( p_libvlc, "control" );
 

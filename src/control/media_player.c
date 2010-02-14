@@ -546,6 +546,9 @@ libvlc_media_player_new( libvlc_instance_t *instance )
 
      /* Audio */
     var_Create (mp, "aout", VLC_VAR_STRING | VLC_VAR_DOINHERIT);
+    var_Create (mp, "volume-muted", VLC_VAR_BOOL);
+    var_Create (mp, "saved-volume", VLC_VAR_INTEGER);
+    var_Create (mp, "volume-change", VLC_VAR_VOID);
     var_Create (mp, "find-input-callback", VLC_VAR_ADDRESS);
     var_SetAddress (mp, "find-input-callback", find_input);
 

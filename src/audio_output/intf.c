@@ -104,7 +104,7 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
 
     if ( p_aout ) aout_lock_volume( p_aout );
 
-    b_var_mute = (bool)var_GetBool( p_object->p_libvlc, "volume-muted");
+    b_var_mute = var_GetBool( p_object, "volume-muted");
 
     const bool b_unmute_condition = ( /* Also unmute on increments */
                     ( action == INCREMENT_VOLUME )
@@ -124,10 +124,8 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
     if ( b_unmute_condition )
     {
         /* Restore saved volume */
-        var_Create( p_object->p_libvlc, "saved-volume", VLC_VAR_INTEGER );
-        i_volume = (audio_volume_t)var_GetInteger( p_object->p_libvlc,
-                                                   "saved-volume" );
-        var_SetBool( p_object->p_libvlc, "volume-muted", false );
+        i_volume = var_GetInteger( p_object, "saved-volume" );
+        var_SetBool( p_object, "volume-muted", false );
     }
     else if ( b_mute_condition )
     {
@@ -137,7 +135,7 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
 
     if ( action == INCREMENT_VOLUME )
     {
-        i_volume_step = config_GetInt( p_object->p_libvlc, "volume-step" );
+        i_volume_step = var_InheritInteger( p_object, "volume-step" );
 
         if ( !b_unmute_condition )
             i_volume = config_GetInt( p_object, "volume" );
@@ -152,14 +150,13 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
             i_volume = i_new_volume;
     }
 
-    var_Create( p_object->p_libvlc, "saved-volume", VLC_VAR_INTEGER );
-    var_SetInteger( p_object->p_libvlc, "saved-volume" , i_volume );
+    var_SetInteger( p_object, "saved-volume" , i_volume );
 
     /* On Mute */
     if ( b_mute_condition )
     {
         i_volume = AOUT_VOLUME_MIN;
-        var_SetBool( p_object->p_libvlc, "volume-muted", true );
+        var_SetBool( p_object, "volume-muted", true );
     }
 
     /* Commit volume changes */
@@ -176,7 +173,7 @@ int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
     }
 
     /* trigger callbacks */
-    var_TriggerCallback( p_object->p_libvlc, "volume-change");
+    var_TriggerCallback( p_object, "volume-change" );
     if ( p_aout )
     {
         var_SetBool( p_aout, "intf-change", true );
@@ -278,7 +275,7 @@ bool aout_IsMuted( vlc_object_t * p_object )
     bool b_return_val;
     aout_instance_t * p_aout = findAout( p_object );
     if ( p_aout ) aout_lock_volume( p_aout );
-    b_return_val = var_GetBool( p_object->p_libvlc, "volume-muted");
+    b_return_val = var_GetBool( p_object, "volume-muted");
     if ( p_aout )
     {
         aout_unlock_volume( p_aout );
