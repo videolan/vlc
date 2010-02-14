@@ -81,10 +81,12 @@ enum {
     INCREMENT_VOLUME=4,
     TOGGLE_MUTE=8
 };
+
 /*****************************************************************************
  * doVolumeChanges : handle all volume changes. Internal use only to ease
  *                   variables locking.
  *****************************************************************************/
+static
 int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
                 audio_volume_t i_volume, audio_volume_t * i_return_volume,
                 bool b_mute )

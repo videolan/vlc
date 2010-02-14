@@ -151,9 +151,6 @@ int aout_VolumeSoftInfos( aout_instance_t *, audio_volume_t * );
 int aout_VolumeNoneGet( aout_instance_t *, audio_volume_t * );
 int aout_VolumeNoneSet( aout_instance_t *, audio_volume_t );
 int aout_VolumeNoneInfos( aout_instance_t *, audio_volume_t * );
-int doVolumeChanges( unsigned action, vlc_object_t * p_object, int i_nb_steps,
-                    audio_volume_t i_volume, audio_volume_t * i_return_volume,
-                    bool b_mute );
 
 /* From dec.c */
 #define aout_DecNew(a, b, c, d, e) __aout_DecNew(VLC_OBJECT(a), b, c, d, e)
