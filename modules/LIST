@@ -231,6 +231,7 @@ $Id$
  * osso: Maemo screen unblanking module
  * packetizer_copy: Simple copy packetizer
  * packetizer_dirac: Dirac video packetizer
+ * packetizer_flac: FLAC audio packetizer
  * packetizer_h264: H264 video packetizer
  * packetizer_mlp: MLP/TrueHD audio packetizer
  * packetizer_mpeg4audio: MPEG4 audio packetizer
