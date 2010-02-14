@@ -150,42 +150,35 @@ static int file_compare( const char **a, const char **b )
     return strcmp( *a, *b );
 }
 
-int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname, char **ppsz_dir_list )
+int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
+                     char **ppsz_dir_list )
 {
     int i = 0;
     char *datadir = config_GetUserDir( VLC_DATA_DIR );
-    if( datadir == NULL )
-        return VLC_ENOMEM;
 
-    if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "lua" DIR_SEP "%s",
-                   datadir, luadirname ) < 0 )
-    {
-        free( datadir );
-        return VLC_ENOMEM;
-    }
+    if( likely(datadir != NULL)
+     && likely(asprintf( &ppsz_dir_list[i], "%s"DIR_SEP"lua"DIR_SEP"%s",
+                         datadir, luadirname ) != -1) )
+        i++;
     free( datadir );
-    i++;
 
     char *psz_datapath = config_GetDataDir( p_this );
-#   if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
+    if( likely(psz_datapath != NULL) )
     {
-        if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "lua" DIR_SEP "%s",
-                      psz_datapath, luadirname )  < 0 )
-            return VLC_ENOMEM;
-        i++;
-        if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "share" DIR_SEP "lua" DIR_SEP "%s",
-                      psz_datapath, luadirname )  < 0 )
-            return VLC_ENOMEM;
-        i++;
+        if( likely(asprintf( &ppsz_dir_list[i], "%s"DIR_SEP"lua"DIR_SEP"%s",
+                              psz_datapath, luadirname ) != -1) )
+            i++;
 
+#if defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32)
+        if( likely(asprintf( &ppsz_dir_list[i],
+                             "%s"DIR_SEP"share"DIR_SEP"lua"DIR_SEP"%s",
+                             psz_datapath, luadirname ) != -1) )
+            i++;
+#endif
+        free( psz_datapath );
     }
-#   else
-    if( asprintf( &ppsz_dir_list[i], "%s" DIR_SEP "lua" DIR_SEP "%s",
-                  psz_datapath, luadirname ) < 0 )
-        return VLC_ENOMEM;
-    i++;
-#   endif
-    free( psz_datapath );
+
+    ppsz_dir_list[i] = NULL;
     return VLC_SUCCESS;
 }
 
