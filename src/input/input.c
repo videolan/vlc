@@ -1138,6 +1138,8 @@ static void UpdatePtsDelay( input_thread_t *p_input )
     const int i_cr_average = var_GetInteger( p_input, "cr-average" ) * i_pts_delay / DEFAULT_PTS_DELAY;
 
     /* */
+    es_out_SetDelay( p_input->p->p_es_out_display, AUDIO_ES, i_audio_delay );
+    es_out_SetDelay( p_input->p->p_es_out_display, SPU_ES, i_spu_delay );
     es_out_SetJitter( p_input->p->p_es_out, i_pts_delay, i_cr_average );
 }
 
@@ -1920,13 +1922,11 @@ static bool Control( input_thread_t *p_input,
             break;
 
         case INPUT_CONTROL_SET_AUDIO_DELAY:
-            es_out_SetDelay( p_input->p->p_es_out_display, AUDIO_ES, val.i_time );
             input_SendEventAudioDelay( p_input, val.i_time );
             UpdatePtsDelay( p_input );
             break;
 
         case INPUT_CONTROL_SET_SPU_DELAY:
-            es_out_SetDelay( p_input->p->p_es_out_display, SPU_ES, val.i_time );
             input_SendEventSubtitleDelay( p_input, val.i_time );
             UpdatePtsDelay( p_input );
             break;
