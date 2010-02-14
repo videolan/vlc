@@ -152,7 +152,7 @@ SearchLineEdit::SearchLineEdit( QWidget *parent ) : QLineEdit( parent )
 
 void SearchLineEdit::clear()
 {
-    QLineEdit::clear();
+    setText( QString() );
     clearButton->hide();
     setMessageVisible( true );
 }

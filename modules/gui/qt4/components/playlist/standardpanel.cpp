@@ -76,26 +76,24 @@ StandardPLPanel::StandardPLPanel( PlaylistWidget *_parent,
     lastActivatedId = -1;
 
     locationBar = new LocationBar( model );
-    locationBar->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Preferred );
+    locationBar->setSizePolicy( QSizePolicy::Ignored, QSizePolicy::Preferred );
     layout->addWidget( locationBar, 0, 0 );
-    layout->setColumnStretch( 0, 100 );
+    layout->setColumnStretch( 0, 5 );
     CONNECT( locationBar, invoked( const QModelIndex & ),
              this, browseInto( const QModelIndex & ) );
-
-    layout->setColumnStretch( 1, 1 );
 
     searchEdit = new SearchLineEdit( this );
     searchEdit->setMaximumWidth( 250 );
     searchEdit->setMinimumWidth( 80 );
-    layout->addWidget( searchEdit, 0, 3 );
+    layout->addWidget( searchEdit, 0, 2 );
     CONNECT( searchEdit, textChanged( const QString& ),
              this, search( const QString& ) );
-    layout->setColumnStretch( 3, 50 );
+    layout->setColumnStretch( 2, 3 );
 
     /* Button to switch views */
     QToolButton *viewButton = new QToolButton( this );
     viewButton->setIcon( style()->standardIcon( QStyle::SP_FileDialogDetailedView ) );
-    layout->addWidget( viewButton, 0, 2 );
+    layout->addWidget( viewButton, 0, 1 );
 
     /* View selection menu */
     viewSelectionMapper = new QSignalMapper( this );
@@ -468,6 +466,7 @@ void LocationBar::setIndex( const QModelIndex &index )
     buttons.clear();
     QModelIndex i = index;
     bool bold = true;
+    box->addStretch();
     while( true )
     {
         PLItem *item = model->getItem( i );
