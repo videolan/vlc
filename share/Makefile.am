@@ -1,4 +1,5 @@
 CLEANFILES = skins2/default.vlt
+MOSTLYCLEANFILES =
 
 nobase_dist_data_DATA = applications/vlc.desktop
 
@@ -36,12 +37,6 @@ endif
 if BUILD_OSDMENU
 nobase_vlcdata_DATA += \
 	$(DIST_osdmenu_default)
-endif
-if BUILD_LUA
-nobase_vlcdata_DATA += $(DIST_lua)
-if BUILD_HTTPD
-nobase_vlcdata_DATA += $(DIST_http_lua)
-endif
 endif
 if BUILD_MOZILLA
 # TODO: move to the mozilla directory
@@ -186,7 +181,62 @@ DIST_osdmenu_default = \
 	osdmenu/default/volume/volume_09.png \
 	osdmenu/default/volume/volume_10.png
 
-DIST_lua= \
+#
+# LUA
+#
+vlcluadir = $(vlclibdir)/lua
+
+LUAC = luac
+
+luac_verbose = $(luac_verbose_$(V))
+luac_verbose_ = $(luac_verbose_$(AM_DEFAULT_VERBOSITY))
+luac_verbose_0 = @echo "  LUAC   $@";
+
+.lua.luac:
+	$(AM_V_at)mkdir -p "$$(dirname '$@')"
+	$(luac_verbose)$(LUAC) -o $@ $<
+
+if BUILD_LUA
+vlclua_DATA = \
+	lua/intf/rc.luac \
+	lua/intf/hotkeys.luac \
+	lua/intf/modules/common.luac \
+	lua/intf/modules/host.luac \
+	lua/intf/telnet.luac \
+	lua/intf/dummy.luac \
+	lua/intf/dumpmeta.luac \
+	lua/meta/art/01_musicbrainz.luac \
+	lua/meta/art/02_frenchtv.luac \
+	lua/meta/art/10_googleimage.luac \
+	lua/meta/fetcher/tvrage.luac \
+	lua/meta/reader/filename.luac \
+	lua/modules/sandbox.luac \
+	lua/playlist/anevia_streams.luac \
+	lua/playlist/appletrailers.luac \
+	lua/playlist/break.luac \
+	lua/playlist/dailymotion.luac \
+	lua/playlist/france2.luac \
+	lua/playlist/googlevideo.luac \
+	lua/playlist/joox.luac \
+	lua/playlist/katsomo.luac \
+	lua/playlist/lelombrik.luac \
+	lua/playlist/megavideo.luac \
+	lua/playlist/metacafe.luac \
+	lua/playlist/mpora.luac \
+	lua/playlist/vimeo.luac \
+	lua/playlist/youtube.luac \
+	lua/playlist/youtube_homepage.luac \
+	$(NULL)
+if BUILD_HTTPD
+vlclua_DATA += \
+	lua/intf/http.luac \
+	$(NULL)
+nobase_vlcdata_DATA += $(DIST_http_lua)
+endif
+endif
+MOSTLYCLEANFILES += $(vlclua_DATA)
+
+EXTRA_DIST += \
 	lua/README.txt \
 	lua/meta/art/README.txt \
 	lua/meta/art/01_musicbrainz.lua \
