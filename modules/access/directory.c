@@ -76,7 +76,9 @@ struct directory_t
 #ifndef WIN32
     struct stat  st;
 #endif
-    char         path[1];
+#ifndef HAVE_FDOPENDIR
+    char         *path;
+#endif
 };
 
 struct access_sys_t
@@ -173,6 +175,9 @@ void DirClose( vlc_object_t * p_this )
         p_sys->current = current->parent;
         closedir (current->handle);
         free (current->uri);
+#ifndef HAVE_FDOPENDIR
+        free (current->path);
+#endif
         free (current);
     }
 
@@ -224,7 +229,7 @@ block_t *DirBlock (access_t *p_access)
         memcpy (block->p_buffer, header, sizeof (header) - 1);
 
         /* "Open" the base directory */
-        current = malloc (sizeof (*current) + strlen (p_access->psz_path));
+        current = malloc (sizeof (*current));
         if (current == NULL)
         {
             block_Release (block);
@@ -232,7 +237,9 @@ block_t *DirBlock (access_t *p_access)
         }
         current->parent = NULL;
         current->handle = p_sys->handle;
-        strcpy (current->path, p_access->psz_path);
+#ifndef HAVE_FDOPENDIR
+        current->path = strdup (p_access->psz_path);
+#endif
         current->uri = p_sys->uri;
         if (fstat (dirfd (current->handle), &current->st))
         {
@@ -253,6 +260,9 @@ block_t *DirBlock (access_t *p_access)
         closedir (current->handle);
         p_sys->current = current->parent;
         free (current->uri);
+#ifndef HAVE_FDOPENDIR
+        free (current->path);
+#endif
         free (current);
 
         if (p_sys->current == NULL)
@@ -297,14 +307,12 @@ block_t *DirBlock (access_t *p_access)
     /* Handle recursion */
     if (p_sys->mode != MODE_COLLAPSE)
     {
-        directory_t *sub = malloc (sizeof (*sub) + strlen (current->path) + 1
-                                                 + strlen (entry));
+        directory_t *sub = malloc (sizeof (*sub));
         if (sub == NULL)
         {
             free (entry);
             return NULL;
         }
-        sprintf (sub->path, "%s/%s", current->path, entry);
 
         DIR *handle;
 #ifdef HAVE_FDOPENDIR
@@ -319,7 +327,10 @@ block_t *DirBlock (access_t *p_access)
         else
             handle = NULL;
 #else
-        handle = vlc_opendir (sub->path);
+        if (asprintf (&sub->path, "%s/%s", current->path, entry) != -1)
+            handle = vlc_opendir (sub->path);
+        else
+            handle = NULL;
 #endif
         if (handle != NULL)
         {
