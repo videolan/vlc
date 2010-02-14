@@ -869,7 +869,7 @@ void PLModel::search( const QString& search_text, const QModelIndex & idx, bool 
 }
 
 /*********** Popup *********/
-void PLModel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list )
+bool PLModel::popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list )
 {
     int i_id = index.isValid() ? itemId( index ) : rootItem->i_id;
 
@@ -877,12 +877,14 @@ void PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
     playlist_item_t *p_item = playlist_ItemGetById( p_playlist, i_id );
     if( !p_item )
     {
-        PL_UNLOCK; return;
+        PL_UNLOCK;
+        return false;
     }
+
     i_popup_item = index.isValid() ? p_item->i_id : -1;
     i_popup_parent = index.isValid() ?
         ( p_item->p_parent ? p_item->p_parent->i_id : -1 ) :
-        ( p_item->i_id );
+        ( rootItem->i_id );
     i_popup_column = index.column();
 
     bool tree = var_InheritBool( p_intf, "playlist-tree" );
@@ -901,22 +903,41 @@ void PLModel::popup( const QModelIndex & index, const QPoint &point, const QMode
         menu.addAction( qtr(I_POP_SAVE), this, SLOT( popupSave() ) );
         menu.addSeparator();
         menu.addAction( qtr(I_POP_INFO), this, SLOT( popupInfo() ) );
+        menu.addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
+    }
+    if( canEdit() )
+    {
         menu.addSeparator();
-        QMenu *sort_menu = menu.addMenu( qtr( "Sort by ") +
+        if( tree ) menu.addAction( qtr(I_POP_ADD) + QString("..."), this, SLOT( popupAddNode() ) );
+        if( rootItem->i_id == THEPL->p_playing->i_id )
+        {
+            menu.addAction( qtr(I_PL_ADDF), THEDP, SLOT( simplePLAppendDialog()) );
+            menu.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( PLAppendDir()) );
+            menu.addAction( qtr(I_OP_ADVOP), THEDP, SLOT( PLAppendDialog()) );
+        }
+        else if( THEPL->p_media_library &&
+                    rootItem->i_id == THEPL->p_media_library->i_id )
+        {
+            menu.addAction( qtr(I_PL_ADDF), THEDP, SLOT( simpleMLAppendDialog()) );
+            menu.addAction( qtr(I_PL_ADDDIR), THEDP, SLOT( MLAppendDir() ) );
+            menu.addAction( qtr(I_OP_ADVOP), THEDP, SLOT( MLAppendDialog() ) );
+        }
+    }
+    if( i_popup_item > -1 )
+    {
+        menu.addSeparator();
+        QMenu *sort_menu = menu.addMenu( qtr( "Sort by" ) + QString(" ") +
             qfu( psz_column_title( columnToMeta( index.column() ) ) ) );
         sort_menu->addAction( qtr( "Ascending" ),
             this, SLOT( popupSortAsc() ) );
         sort_menu->addAction( qtr( "Descending" ),
             this, SLOT( popupSortDesc() ) );
     }
-    if( tree && canEdit() )
-        menu.addAction( qtr(I_POP_ADD), this, SLOT( popupAddNode() ) );
-    if( i_popup_item > -1 )
+    if( !menu.isEmpty() )
     {
-        menu.addSeparator();
-        menu.addAction( qtr( I_POP_EXPLORE ), this, SLOT( popupExplore() ) );
+        menu.exec( point ); return true;
     }
-    if( !menu.isEmpty() ) menu.exec( point );
+    else return false;
 }
 
 void PLModel::popupDel()
@@ -1009,7 +1030,7 @@ void PLModel::popupAddNode()
 {
     bool ok;
     QString name = QInputDialog::getText( PlaylistDialog::getInstance( p_intf ),
-        qtr( I_POP_ADD ), qtr( "Enter name for new node:" ),
+        qtr( I_POP_ADD ), qtr( "Enter name for new folder:" ),
         QLineEdit::Normal, QString(), &ok);
     if( !ok || name.isEmpty() ) return;
     PL_LOCK;

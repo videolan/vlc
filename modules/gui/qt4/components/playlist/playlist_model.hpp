@@ -94,7 +94,7 @@ public:
     static int columnToMeta( int column );
 
     /* Actions */
-    void popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
+    bool popup( const QModelIndex & index, const QPoint &point, const QModelIndexList &list );
     void doDelete( QModelIndexList selected );
     void search( const QString& search_text, const QModelIndex & root, bool b_recursive );
     void sort( int column, Qt::SortOrder order );

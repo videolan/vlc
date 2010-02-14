@@ -216,15 +216,11 @@ void StandardPLPanel::popupPlView( const QPoint &point )
 {
     QModelIndex index = currentView->indexAt( point );
     QPoint globalPoint = currentView->viewport()->mapToGlobal( point );
-    if( !index.isValid() ){
+    QItemSelectionModel *selection = currentView->selectionModel();
+    QModelIndexList list = selection->selectedIndexes();
+
+    if( !model->popup( index, globalPoint, list ) )
         QVLCMenu::PopupMenu( p_intf, true );
-    }
-    else
-    {
-        QItemSelectionModel *selection = currentView->selectionModel();
-        QModelIndexList list = selection->selectedIndexes();
-        model->popup( index, globalPoint, list );
-    }
 }
 
 void StandardPLPanel::popupSelectColumn( QPoint pos )
