@@ -4030,15 +4030,16 @@ AS_IF([test "${enable_qt4}" != "no"], [
   PKG_CHECK_MODULES(QT4, [QtCore QtGui >= 4.4.0], [
     VLC_ADD_PLUGIN([qt4])
     ALIASES="${ALIASES} qvlc"
+    QT4LOCALEDIR="$(eval $PKG_CONFIG --variable=prefix QtCore)/share/qt4/translations/"
+    AC_SUBST(QT4LOCALEDIR)
     AS_IF([test "${SYS}" != "mingw32" -a "${SYS}" != "mingwce" -a "${SYS}" != "darwin"], [
         VLC_ADD_LIBS([qt4],[$QT4_LIBS ${X_LIBS} ${X_PRE_LIBS} -lX11])
         need_xid_provider="no"
+        VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS ${X_CFLAGS} -DQT4LOCALEDIR=\\\\\\\"${QT4LOCALEDIR}\\\\\\\"])
     ], [
         VLC_ADD_LIBS([qt4],[$QT4_LIBS -lole32])
+        VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS -DQT4LOCALEDIR=\\\\\\\"${QT4LOCALEDIR}\\\\\\\"])
     ])
-    QT4LOCALEDIR="$(eval $PKG_CONFIG --variable=prefix QtCore)/share/qt4/translations/"
-    AC_SUBST(QT4LOCALEDIR)
-    VLC_ADD_CXXFLAGS([qt4],[$QT4_CFLAGS ${X_CFLAGS} -DQT4LOCALEDIR=\\\\\\\"${QT4LOCALEDIR}\\\\\\\"])
     AC_PATH_PROGS(MOC, [moc-qt4 moc], moc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
     AC_PATH_PROG(RCC, rcc, rcc,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
     AC_PATH_PROGS(UIC, [uic-qt4 uic], uic,`eval $PKG_CONFIG --variable=exec_prefix QtCore`/bin)
