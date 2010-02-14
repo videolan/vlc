@@ -187,7 +187,7 @@ DIST_osdmenu_default = \
 vlcluadir = $(vlclibdir)/lua
 
 luac_verbose = $(luac_verbose_$(V))
-luac_verbose_ = $(luac_verbose_$(AM_DEFAULT_VERBOSITY))
+luac_verbose_ = $(luac_verbose__$(AM_DEFAULT_VERBOSITY))
 luac_verbose_0 = @echo "  LUAC   $@";
 
 .lua.luac:
