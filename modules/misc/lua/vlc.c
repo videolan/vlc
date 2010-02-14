@@ -162,6 +162,12 @@ int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
         i++;
     free( datadir );
 
+#if !(defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32))
+    if( likely(asprintf( &ppsz_dir_list[i], "%s"DIR_SEP"lua"DIR_SEP"%s",
+                         config_GetLibDir(), luadirname ) != -1) )
+            i++;
+#endif
+
     char *psz_datapath = config_GetDataDir( p_this );
     if( likely(psz_datapath != NULL) )
     {
@@ -177,12 +183,6 @@ int vlclua_dir_list( vlc_object_t *p_this, const char *luadirname,
 #endif
         free( psz_datapath );
     }
-
-#if !(defined(__APPLE__) || defined(SYS_BEOS) || defined(WIN32))
-    if( likely(asprintf( &ppsz_dir_list[i], "%s"DIR_SEP"lua"DIR_SEP"%s",
-                         config_GetLibDir(), luadirname ) != -1) )
-            i++;
-#endif
 
     ppsz_dir_list[i] = NULL;
     return VLC_SUCCESS;
