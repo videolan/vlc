@@ -434,6 +434,7 @@ utf8_lstat
 vlc_mkdir
 vlc_mkstemp
 vlc_open
+vlc_openat
 vlc_opendir
 vlc_readdir
 vlc_scandir

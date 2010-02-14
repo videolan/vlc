@@ -194,6 +194,53 @@ FILE *vlc_fopen (const char *filename, const char *mode)
 }
 
 /**
+ * Opens a system file handle relative to an existing directory handle.
+ *
+ * @param dir directory file descriptor
+ * @param filename file path to open (with UTF-8 encoding)
+ * @param flags open() flags, see the C library open() documentation
+ * @return a file handle on success, -1 on error (see errno).
+ * @note Contrary to standard open(), this function returns file handles
+ * with the close-on-exec flag enabled.
+ */
+int vlc_openat (int dir, const char *filename, int flags, ...)
+{
+    unsigned int mode = 0;
+    va_list ap;
+
+    va_start (ap, flags);
+    if (flags & O_CREAT)
+        mode = va_arg (ap, unsigned int);
+    va_end (ap);
+
+#ifdef O_CLOEXEC
+    flags |= O_CLOEXEC;
+#endif
+
+    const char *local_name = ToLocale (filename);
+    if (local_name == NULL)
+    {
+        errno = ENOENT;
+        return -1;
+    }
+
+#ifdef HAVE_FDOPENDIR
+    int fd = openat (dir, local_name, flags, mode);
+# ifdef HAVE_FCNTL
+    if (fd != -1)
+        fcntl (fd, F_SETFD, FD_CLOEXEC);
+# endif
+#else
+    int fd = -1;
+    errno = ENOSYS;
+#endif
+
+    LocaleFree (local_name);
+    return fd;
+}
+
+
+/**
  * Creates a directory using UTF-8 paths.
  *
  * @param dirname a UTF-8 string with the name of the directory that you

@@ -33,6 +33,7 @@
 
 VLC_EXPORT( int, vlc_open, ( const char *filename, int flags, ... ) LIBVLC_USED );
 VLC_EXPORT( FILE *, vlc_fopen, ( const char *filename, const char *mode ) LIBVLC_USED );
+VLC_EXPORT( int, vlc_openat, ( int fd, const char *filename, int flags, ... ) LIBVLC_USED );
 
 VLC_EXPORT( DIR *, vlc_opendir, ( const char *dirname ) LIBVLC_USED );
 VLC_EXPORT( char *, vlc_readdir, ( DIR *dir ) LIBVLC_USED );
