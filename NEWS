@@ -29,6 +29,7 @@ Decoders:
  * Support for VAAPI for H.264 decoding on GPU on GNU/Linux
  * Audio/Video decoder using OpenMAX IL components
  * Support for Indeo5 video codec
+ * Support for Windows Media Speech (Voice) audio codec natively on all platforms
 
 Demuxers:
  * Support for ADPCM in .flv streams

@@ -803,7 +803,7 @@ static const entry_t p_list_audio[] = {
         A("wmal"),
 
     /* Windows Media Audio Speech */
-    B(VLC_CODEC_WMAS, "Windows Media Audio Speech"),
+    B(VLC_CODEC_WMAS, "Windows Media Audio Voice (Speech)"),
         A("WMAS"),
         A("wmas"),
 
