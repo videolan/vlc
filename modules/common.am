@@ -31,5 +31,5 @@ include $(srcdir)/Modules.am
 
 if MAINTAINER_MODE
 $(srcdir)/Makefile.am: $(srcdir)/Modules.am $(top_srcdir)/modules/genmf
-	cd \$(top_srcdir) && \$(SHELL) modules/genmf $(dir)
+	$(AM_V_GEN)cd \$(top_srcdir) && \$(SHELL) modules/genmf $(dir)
 endif
