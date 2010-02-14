@@ -492,6 +492,8 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         p_spu->p_region->i_align = p_sys->i_pos;
         p_spu->b_absolute = false;
     }
+    p_spu->p_region->i_x = p_sys->i_xoff;
+    p_spu->p_region->i_y = p_sys->i_yoff;
 
     p_spu->p_region->p_style = text_style_Duplicate( p_sys->p_style );
 
@@ -517,15 +519,15 @@ static subpicture_t *Filter( filter_t *p_filter, mtime_t date )
         }
         else
         {
-            p_region->i_x = p_sys->i_xoff;
-            p_region->i_y = p_sys->i_yoff;
+            p_region->i_x = p_spu->p_region->i_x;
+            p_region->i_y = p_spu->p_region->i_y;
             /* FIXME the copy is probably not needed anymore */
             picture_Copy( p_region->p_picture, p_pic );
             p_spu->p_region->p_next = p_region;
-        }
 
-        /* Offset text to display right next to the image */
-        p_spu->p_region->i_x = p_pic->p[Y_PLANE].i_visible_pitch;
+            /* Offset text to display right next to the image */
+            p_spu->p_region->i_x += fmt_out.i_visible_width;
+        }
     }
 
     vlc_mutex_unlock( &p_sys->lock );
