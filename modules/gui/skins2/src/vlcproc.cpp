@@ -450,7 +450,7 @@ void VlcProc::on_item_current_changed( vlc_object_t* p_obj, vlc_value_t newVal )
     free( psz_uri );
 
     // Update playtree
-    getPlaytreeVar().onUpdateCurrent();
+    getPlaytreeVar().onUpdateCurrent( true );
 }
 
 void VlcProc::on_intf_event_changed( vlc_object_t* p_obj, vlc_value_t newVal )
@@ -727,6 +727,8 @@ void VlcProc::reset_input()
     SET_TEXT( m_cVarStreamURI, UString( getIntf(), "") );
     SET_TEXT( m_cVarStreamBitRate, UString( getIntf(), "") );
     SET_TEXT( m_cVarStreamSampleRate, UString( getIntf(), "") );
+
+    getPlaytreeVar().onUpdateCurrent( false );
 }
 
 void VlcProc::init_variables()

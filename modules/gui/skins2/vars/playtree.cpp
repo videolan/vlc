@@ -144,24 +144,33 @@ void Playtree::onUpdateItem( int id )
 }
 
 
-void Playtree::onUpdateCurrent()
+void Playtree::onUpdateCurrent( bool b_active )
 {
-    playlist_Lock( m_pPlaylist );
-
-    playlist_item_t* current = playlist_CurrentPlayingItem( m_pPlaylist );
-    if( !current )
+    if( !b_active )
     {
-        playlist_Unlock( m_pPlaylist );
-        return;
-    }
+        if( m_playingIt == end() )
+            return;
 
-    Iterator it = findById( current->i_id );
-    it->m_playing = true;
-    if( m_playingIt != end() )
         m_playingIt->m_playing = false;
-    m_playingIt = it;
+        m_playingIt = end();
+    }
+    else
+    {
+        playlist_Lock( m_pPlaylist );
 
-    playlist_Unlock( m_pPlaylist );
+        playlist_item_t* current = playlist_CurrentPlayingItem( m_pPlaylist );
+        if( !current )
+        {
+            playlist_Unlock( m_pPlaylist );
+            return;
+        }
+
+        Iterator it = findById( current->i_id );
+        it->m_playing = true;
+        m_playingIt = it;
+
+        playlist_Unlock( m_pPlaylist );
+    }
 
     tree_update descr;
     descr.b_active_item = true;

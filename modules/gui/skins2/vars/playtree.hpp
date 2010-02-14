@@ -47,7 +47,7 @@ public:
     void onUpdateItem( int id );
 
     /// Function called to notify about current playing item
-    void onUpdateCurrent( );
+    void onUpdateCurrent( bool b_active );
 
     /// Function called to notify playlist item append
     void onAppend( playlist_add_t * );
