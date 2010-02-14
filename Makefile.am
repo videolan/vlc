@@ -385,29 +385,29 @@ dist_noinst_SCRIPTS += make-alias
 MKALIAS = bindir="$(bindir)" transform="$(transform)" program_prefix="$(program_prefix)" program_suffix="$(program_suffix)" $(top_srcdir)/make-alias $@
 
 cvlc: make-alias Makefile
-	$(MKALIAS) dummy
+	$(AM_V_GEN)$(MKALIAS) dummy
 
 rvlc: make-alias Makefile
-	$(MKALIAS) rc
+	$(AM_V_GEN)$(MKALIAS) rc
 
 svlc: make-alias Makefile
-	$(MKALIAS) skins2
+	$(AM_V_GEN)$(MKALIAS) skins2
 
 qvlc: make-alias Makefile
-	$(MKALIAS) qt4
+	$(AM_V_GEN)$(MKALIAS) qt4
 
 nvlc: make-alias Makefile
-	$(MKALIAS) ncurses
+	$(AM_V_GEN)$(MKALIAS) ncurses
 
 mvlc: make-alias Makefile
-	$(MKALIAS) maemo
+	$(AM_V_GEN)$(MKALIAS) maemo
 
 if BUILD_VLC
 noinst_SCRIPTS += vlc$(EXEEXT)
 endif
 
 vlc$(EXEEXT):
-	ln -sf bin/vlc-static$(EXEEXT) vlc$(EXEEXT)
+	$(AM_V_GEN)ln -sf bin/vlc-static$(EXEEXT) vlc$(EXEEXT)
 
 if HAVE_DARWIN
 if BUILD_MACOSX_VLC_APP
