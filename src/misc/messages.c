@@ -36,9 +36,9 @@
 
 #include <stdarg.h>                                       /* va_list for BSD */
 #ifdef __APPLE__
-#include <xlocale.h>
-#else
-#include <locale.h>
+# include <xlocale.h>
+#elif HAVE_LOCALE_H
+# include <locale.h>
 #endif
 #include <errno.h>                                                  /* errno */
 
