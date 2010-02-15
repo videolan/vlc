@@ -866,7 +866,7 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
         if( !path )
             continue;
 
-        size_t offset = p_module_bank->i_loaded_cache;
+        size_t offset = p_module_bank->i_cache;
         if( b_reset )
             CacheDelete( p_this, path );
         else
@@ -877,8 +877,8 @@ static void AllocateAllPlugins( vlc_object_t *p_this, module_bank_t *p_bank )
         /* Don't go deeper than 5 subdirectories */
         AllocatePluginDir( p_this, p_bank, path, 5 );
 
-        CacheSave( p_this, path, p_module_bank->pp_loaded_cache + offset,
-                   p_module_bank->i_loaded_cache - offset );
+        CacheSave( p_this, path, p_module_bank->pp_cache + offset,
+                   p_module_bank->i_cache - offset );
         free( path );
     }
 
