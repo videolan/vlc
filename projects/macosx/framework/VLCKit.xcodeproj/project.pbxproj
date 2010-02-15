@@ -672,13 +672,11 @@
 				LIBRARY_SEARCH_PATHS = "$(VLC_FRAMEWORK)/lib";
 				ONLY_ACTIVE_ARCH = YES;
 				OTHER_LDFLAGS = (
+					"-lvlccore",
 					"-single_module",
 					"-read_only_relocs",
 					suppress,
 					"-lvlc",
-					"$(LD_FLAGS_LIBINTL)",
-					"$(LD_FLAGS_LIBVLC)",
-					"$(LD_FLAGS_LIBVLC_CONTROL)",
 				);
 				PRIVATE_HEADERS_FOLDER_PATH = "$(CONTENTS_FOLDER_PATH)/PrivateHeaders";
 				PRODUCT_NAME = VLCKit;
