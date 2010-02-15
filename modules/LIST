@@ -169,7 +169,6 @@ $Id$
  * logo: video filter to put a logo on the video
  * lpcm: LPCM decoder
  * lua: Lua scripting inteface
- * m4v: MPEG-4 Video Stream demuxer
  * macosx: Video output, and interface module for Mac OS X
  * macosx_dialog_provider: Minimal Dialog Provider for Mac OS X
  * magnify: zoom video filter
