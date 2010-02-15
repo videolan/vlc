@@ -33,7 +33,6 @@ function main()
     while line ~= nil do
         if( string.find( line, "#EXTINF" ) ) then
             _, _, duration, artist, name = string.find( line, ":(%w+),(%w+)%s*-%s*(.+)" )
-            --TODO: fix the name not showing special characters correctly
         elseif( string.find( line, "#EXTVLCOPT" ) ) then
             _, _, option = string.find( line, ":(.+)" )
             table.insert( options, option )
