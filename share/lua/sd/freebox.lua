@@ -22,5 +22,28 @@
 --]]
 
 function main()
-    vlc.sd.add_item( {url="http://mafreebox.freebox.fr/freeboxtv/playlist.m3u",options={"deinterlace=1"}} )
+    local fd = vlc.stream( "http://mafreebox.freebox.fr/freeboxtv/playlist.m3u" )
+    local line=  fd:readline()
+    if line ~= "#EXTM3U" then
+        return nil
+    end
+    line = fd:readline()
+    local duration, artist, name
+    local options={"deinterlace=1"}
+    while line ~= nil do
+        if( string.find( line, "#EXTINF" ) ) then
+            _, _, duration, artist, name = string.find( line, ":(%w+),(%w+)%s*-%s*(.+)" )
+            --TODO: fix the name not showing special characters correctly
+        elseif( string.find( line, "#EXTVLCOPT" ) ) then
+            _, _, option = string.find( line, ":(.+)" )
+            table.insert( options, option )
+        else
+            vlc.sd.add_item( {url=line,duration=duration,artist=artist,title=name,options=options} )
+            duration = nil
+            artist = nil
+            name = nil
+            options={"deinterlace=1"}
+        end
+        line = fd:readline()
+    end
 end
