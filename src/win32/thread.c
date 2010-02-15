@@ -191,6 +191,7 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
 {
     if (!p_mutex->dynamic)
     {   /* static mutexes */
+        int canc = vlc_savecancel ();
         assert (p_mutex != &super_mutex); /* this one cannot be static */
 
         vlc_mutex_lock (&super_mutex);
@@ -202,6 +203,7 @@ void vlc_mutex_lock (vlc_mutex_t *p_mutex)
         }
         p_mutex->locked = true;
         vlc_mutex_unlock (&super_mutex);
+        vlc_restorecancel (canc);
         return;
     }
 
