@@ -126,7 +126,7 @@ vlc_module_begin ()
 
     add_submodule ()
         set_description( N_("Freebox TV") )
-        add_shortcut( "freebox" )
+        add_shortcut( "luafreebox" )
         set_capability( "services_discovery", 0 )
         set_callbacks( Open_LuaSD, Close_LuaSD )
 
