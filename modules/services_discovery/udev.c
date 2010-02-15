@@ -560,32 +560,39 @@ static char *disc_get_name (struct udev_device *dev)
 
 static char *disc_get_cat (struct udev_device *dev)
 {
-    const char *val;
-    const char *name;
-    int i_val;
-    const char *cat = _("Unknown Type");
+    struct udev_list_entry *list, *entry;
 
-    struct udev_list_entry *prop_list
-        = udev_device_get_properties_list_entry( dev );
+    list = udev_device_get_properties_list_entry (dev);
+    if (unlikely(list == NULL))
+        return NULL;
 
-    udev_list_entry_foreach( prop_list, prop_list )
+    const char *cat = NULL;
+    udev_list_entry_foreach (entry, list)
     {
-        name = udev_list_entry_get_name ( prop_list );
-        i_val = atoi( udev_list_entry_get_value ( prop_list ) );
-        if( !i_val ) continue;
-        if( strncmp( name, "ID_CDROM_MEDIA_CD", strlen( "ID_CDROM_MEDIA_CD" ) ) )
-            cat = _("CD");
-        else if( !strncmp( name, "ID_CDROM_MEDIA_DVD", strlen( "ID_CDROM_MEDIA_DVD" ) ) )
-            cat = _("DVD");
-        else if( !strncmp( name, "ID_CDROM_MEDIA_BD", strlen( "ID_CDROM_MEDIA_BD" ) ) )
-            cat = _("Blu-Ray");
-        else if( !strncmp( name, "ID_CDROM_MEDIA_HDDVD", strlen( "ID_CDROM_MEDIA_HDDVD" ) ) )
-            cat = _("HD DVD");
+        const char *name = udev_list_entry_get_name (entry);
+
+        if (strncmp (name, "ID_CDROM_MEDIA_", 15))
+            continue;
+        if (!atoi (udev_list_entry_get_value (entry)))
+            continue;
+        name += 15;
+
+        if (!strncmp (name, "CD", 2))
+            cat = N_("CD");
+        else if (!strncmp (name, "DVD", 3))
+            cat = N_("DVD");
+        else if (!strncmp (name, "BD", 2))
+            cat = N_("Blu-Ray");
+        else if (!strncmp (name, "HDDVD", 5))
+            cat = N_("HD DVD");
+
+        if (cat != NULL)
+            break;
     }
 
-    free( prop_list );
-
-    return strdup (cat);
+    if (cat == NULL)
+        cat = N_("Unknown type");
+    return strdup (vlc_gettext (cat));
 }
 
 int OpenDisc (vlc_object_t *obj)
