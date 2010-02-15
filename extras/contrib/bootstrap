@@ -205,7 +205,7 @@ case $HOST in
         EXTRA_CPPFLAGS=" -D_WIN32_WCE=0x0500"
         DISTRO=wince
     ;;
-    x86_64-*-mingw*)
+    *64-*mingw*)
         echo "HAVE_WIN64 = 1" >> config.mak
         echo "HAVE_WIN32 = 1" >> config.mak
         echo "PKG_CONFIG_PATH = \$(PREFIX)/lib/pkgconfig" >> config.mak
