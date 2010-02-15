@@ -68,9 +68,12 @@ SUFFIXES =
 
 DISTCHECK_CONFIGURE_FLAGS = \
 	--enable-fast-install \
+	--disable-a52 \
+	--disable-avcodec --disable-avformat \
+	--disable-postproc --disable-swscale \
 	--disable-dbus \
-	--disable-dvd --disable-mad --disable-libmpeg2 \
-	--disable-ffmpeg --disable-faad --disable-skins2 \
+	--disable-mad --disable-libmpeg2 \
+	--disable-faad --disable-skins2 \
 	--disable-live555 \
 	--disable-fribidi --disable-glx
 
