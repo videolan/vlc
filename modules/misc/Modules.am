@@ -19,7 +19,7 @@ SOURCES_audioscrobbler = audioscrobbler.c
 SOURCES_inhibit = inhibit.c
 SOURCES_sqlite = sqlite.c
 
-SOURCES_xscreensaver = inhibit/screensaver.c
+SOURCES_xscreensaver = inhibit/xscreensaver.c
 SOURCES_xdg_screensaver = inhibit/xdg.c
 SOURCES_osso_screensaver = inhibit/osso.c
 
