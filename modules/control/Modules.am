@@ -19,10 +19,13 @@ SOURCES_motion = \
         $(NULL)
 
 libvlc_LTLIBRARIES += \
-	liboldrc_plugin.la \
 	libgestures_plugin.la \
 	libnetsync_plugin.la \
 	libhotkeys_plugin.la
+if !HAVE_WINCE
+libvlc_LTLIBRARIES += \
+	liboldrc_plugin.la
+endif
 if !HAVE_WIN32
 libvlc_LTLIBRARIES += \
 	libsignals_plugin.la \
