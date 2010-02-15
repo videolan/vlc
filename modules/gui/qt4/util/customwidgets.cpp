@@ -208,6 +208,25 @@ void SearchLineEdit::paintEvent( QPaintEvent *event )
   painter.drawText( rect, Qt::AlignLeft | Qt::AlignVCenter, qtr( I_PL_FILTER ) );
 }
 
+
+QVLCElidingLabel::QVLCElidingLabel( const QString &s, Qt::TextElideMode mode, QWidget * parent )
+  : elideMode( mode ), QLabel( s, parent )
+{ }
+
+void QVLCElidingLabel::setElideMode( Qt::TextElideMode mode )
+{
+    elideMode = mode;
+    repaint();
+}
+
+void QVLCElidingLabel::paintEvent( QPaintEvent * event )
+{
+    QPainter p( this );
+    int space = frameWidth() + margin();
+    QRect r = rect().adjusted( space, space, -space, -space );
+    p.drawText( r, fontMetrics().elidedText( text(), elideMode, r.width() ), alignment() );
+}
+
 /***************************************************************************
  * Hotkeys converters
  ***************************************************************************/

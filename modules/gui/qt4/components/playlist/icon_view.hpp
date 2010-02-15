@@ -44,10 +44,10 @@ class PlIconViewItemDelegate : public AbstractPlViewItemDelegate
     Q_OBJECT
 
 public:
-    PlIconViewItemDelegate(QWidget *parent = 0) : AbstractPlViewItemDelegate(parent) {}
-
+    PlIconViewItemDelegate(QWidget *parent = 0) : AbstractPlViewItemDelegate( parent ) {}
     void paint ( QPainter * painter, const QStyleOptionViewItem & option, const QModelIndex & index ) const;
-    QSize sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const;
+    QSize sizeHint ( const QStyleOptionViewItem & option = QStyleOptionViewItem(),
+                     const QModelIndex & index = QModelIndex() ) const;
 };
 
 class PlListViewItemDelegate : public AbstractPlViewItemDelegate

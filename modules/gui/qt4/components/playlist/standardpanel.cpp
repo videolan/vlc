@@ -477,7 +477,7 @@ void LocationBar::setIndex( const QModelIndex &index )
         free(fb_name);
         QAbstractButton *btn = new LocationButton( text, bold, i.isValid() );
         btn->setSizePolicy( QSizePolicy::Maximum, QSizePolicy::Fixed );
-        box->insertWidget( 0, btn, bold ? 1 : 0 );
+        box->insertWidget( 0, btn );
         buttons.append( btn );
 
         mapper->setMapping( btn, item->id() );
@@ -524,9 +524,14 @@ void LocationButton::paintEvent ( QPaintEvent * event )
 
     int margin = style()->pixelMetric(QStyle::PM_DefaultFrameWidth,0,this) + PADDING;
 
-    QRect rect = option.rect.adjusted( b_arrow ? 15 + margin : margin, 0, margin * -1, 0 );
-    p.drawText( rect, Qt::AlignVCenter,
-                fontMetrics().elidedText( text(), Qt::ElideRight, rect.width() ) );
+    QRect rect = option.rect.adjusted( b_arrow ? 15 + margin : margin, 0, -margin, 0 );
+
+    QString str( text() );
+    /* This check is absurd, but either it is not done properly inside elidedText(),
+       or boundingRect() is wrong */
+    if( rect.width() < fontMetrics().boundingRect( text() ).width() )
+        str = fontMetrics().elidedText( text(), Qt::ElideRight, rect.width() );
+    p.drawText( rect, Qt::AlignVCenter | Qt::AlignLeft, str );
 
     if( b_arrow )
     {
@@ -540,7 +545,9 @@ QSize LocationButton::sizeHint() const
 {
     int frameWidth = style()->pixelMetric(QStyle::PM_DefaultFrameWidth,0,this);
     QSize s( fontMetrics().boundingRect( text() ).size() );
-    s.setWidth( s.width() + ( 2 * frameWidth ) + ( 2 * PADDING ) + ( b_arrow ? 15 : 0 ) );
+    /* Add two pixels to width: font metrics are buggy, if you pass text through elidation
+       with exactly the width of its bounding rect, sometimes it still elides */
+    s.setWidth( s.width() + ( 2 * frameWidth ) + ( 2 * PADDING ) + ( b_arrow ? 15 : 0 ) + 2 );
     s.setHeight( QPushButton::sizeHint().height() );
     return s;
 }

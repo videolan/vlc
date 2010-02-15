@@ -35,13 +35,10 @@
 
 #include "assert.h"
 
-#define RECT_SIZE_W         120
-#define RECT_SIZE_H         120
 #define ART_SIZE_W          110
 #define ART_SIZE_H          80
-//#define OFFSET              (RECT_SIZE_W-ART_SIZE_W)/2
-//#define ITEMS_SPACING       10
 #define ART_RADIUS          5
+#define SPACER              5
 
 QString AbstractPlViewItemDelegate::getMeta( const QModelIndex & index, int meta ) const
 {
@@ -140,9 +137,8 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     if( option.state & QStyle::State_Selected )
         painter->setPen( option.palette.color( QPalette::HighlightedText ) );
 
-    QFont font;
+    QFont font( index.data( Qt::FontRole ).value<QFont>() );
     font.setPointSize( 7 );
-    font.setBold( index.data( Qt::FontRole ).value<QFont>().bold() );
 
     // Draw title
     font.setItalic( true );
@@ -150,7 +146,7 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     QFontMetrics fm = painter->fontMetrics();
     QRect textRect = option.rect.adjusted( 1, ART_SIZE_H + 10, 0, -1 );
-    textRect.setHeight( fm.height() + 1 );
+    textRect.setHeight( fm.height() );
 
     painter->drawText( textRect,
                       fm.elidedText( title, Qt::ElideRight, textRect.width() ),
@@ -162,8 +158,8 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     painter->setFont( font );
     fm = painter->fontMetrics();
 
-    textRect = textRect.adjusted( 0, textRect.height(),
-                                    0, textRect.height() );
+    textRect.moveTop( textRect.bottom() + 1 );
+
     painter->drawText(  textRect,
                         fm.elidedText( artist, Qt::ElideRight, textRect.width() ),
                         QTextOption( Qt::AlignCenter ) );
@@ -173,8 +169,16 @@ void PlIconViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
 QSize PlIconViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-    return QSize( RECT_SIZE_W, RECT_SIZE_H );
+    QFont f;
+    f.setPointSize( 7 );
+    f.setBold( true );
+    QFontMetrics fm( f );
+    int textHeight = fm.height();
+    QSize sz ( ART_SIZE_W + 2 * SPACER,
+               ART_SIZE_H + 3 * SPACER + 2 * textHeight + 1 );
+    return sz;
 }
+
 
 #define LISTVIEW_ART_SIZE 45
 
@@ -198,25 +202,20 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
 
     QPixmap artPix = getArtPixmap( index, QSize( LISTVIEW_ART_SIZE, LISTVIEW_ART_SIZE ) );
 
+    //Draw selection rectangle
     QApplication::style()->drawPrimitive( QStyle::PE_PanelItemViewItem, &option, painter );
 
+    //Paint background if item is playing
     if( index.data( PLModel::IsCurrentRole ).toBool() )
         paintPlayingItemBg( painter, option );
 
-    painter->drawPixmap( option.rect.topLeft() + QPoint(3,3)
-                         + QPoint( (LISTVIEW_ART_SIZE - artPix.width()) / 2,
-                                   (LISTVIEW_ART_SIZE - artPix.height()) / 2 ),
-                         artPix );
+    QRect artRect( artPix.rect() );
+    artRect.moveCenter( QPoint( artRect.center().x() + 3,
+                                option.rect.center().y() ) );
+    //Draw album art
+    painter->drawPixmap( artRect, artPix );
 
-
-    int textH = option.fontMetrics.height() + 2;
-    int marginY = ( option.rect.height() / 2 ) - textH;
-
-    QRect textRect = option.rect.adjusted( LISTVIEW_ART_SIZE + 10,
-                                           marginY,
-                                           -10,
-                                           marginY * -1 - ( artistAlbum.isEmpty() ? 0 : textH ) );
-
+    //Start drawing text
     painter->save();
 
     if( option.state & QStyle::State_Selected )
@@ -225,35 +224,59 @@ void PlListViewItemDelegate::paint( QPainter * painter, const QStyleOptionViewIt
     QTextOption textOpt( Qt::AlignVCenter | Qt::AlignLeft );
     textOpt.setWrapMode( QTextOption::NoWrap );
 
-    QFont f( option.font );
-    if( index.data( PLModel::IsCurrentRole ).toBool() ) f.setBold( true );
+    QFont f( index.data( Qt::FontRole ).value<QFont>() );
 
+    //Draw title info
     f.setItalic( true );
     painter->setFont( f );
+    QFontMetrics fm( painter->fontMetrics() );
 
-    painter->drawText( textRect, title, textOpt );
+    QRect textRect = option.rect.adjusted( LISTVIEW_ART_SIZE + 10, 0, -10, 0 );
+    if( !artistAlbum.isEmpty() )
+    {
+        textRect.setHeight( fm.height() );
+        textRect.moveBottom( option.rect.center().y() - 1 );
+    }
 
-    f.setItalic( false );
-    painter->setFont( f );
-    textRect.moveTop( textRect.top() + textH );
+    painter->drawText( textRect,
+                       fm.elidedText( title, Qt::ElideRight, textRect.width() ),
+                       textOpt );
 
-    painter->drawText( textRect, artistAlbum, textOpt );
+    // Draw artist and album info
+    if( !artistAlbum.isEmpty() )
+    {
+        f.setItalic( false );
+        painter->setFont( f );
+        fm = painter->fontMetrics();
+
+        textRect.moveTop( textRect.bottom() + 2 );
+
+        painter->drawText( textRect,
+                           fm.elidedText( artistAlbum, Qt::ElideRight, textRect.width() ),
+                           textOpt );
+    }
 
     painter->restore();
 }
 
 QSize PlListViewItemDelegate::sizeHint ( const QStyleOptionViewItem & option, const QModelIndex & index ) const
 {
-  return QSize( LISTVIEW_ART_SIZE + 6, LISTVIEW_ART_SIZE + 6 );
+  QFont f;
+  f.setBold( true );
+  QFontMetrics fm( f );
+  int height = qMax( LISTVIEW_ART_SIZE, 2 * fm.height() + 2 ) + 6;
+  return QSize( 0, height );
 }
 
 PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
 {
+    PlIconViewItemDelegate *delegate = new PlIconViewItemDelegate( this );
+
     setModel( model );
     setViewMode( QListView::IconMode );
     setMovement( QListView::Static );
     setResizeMode( QListView::Adjust );
-    setGridSize( QSize( RECT_SIZE_W, RECT_SIZE_H ) );
+    setGridSize( delegate->sizeHint() );
     setWrapping( true );
     setUniformItemSizes( true );
     setSelectionMode( QAbstractItemView::ExtendedSelection );
@@ -262,7 +285,6 @@ PlIconView::PlIconView( PLModel *model, QWidget *parent ) : QListView( parent )
     //setAcceptDrops( true );
     //setDropIndicatorShown(true);
 
-    PlIconViewItemDelegate *delegate = new PlIconViewItemDelegate( this );
     setItemDelegate( delegate );
 }
 

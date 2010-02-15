@@ -29,6 +29,7 @@
 
 #include <QLineEdit>
 #include <QPushButton>
+#include <QLabel>
 
 /**
   This class provides a QLineEdit which contains a greyed-out hinting
@@ -67,8 +68,6 @@ protected:
     virtual void paintEvent( QPaintEvent * event );
 };
 
-class QLabel;
-
 class SearchLineEdit : public QLineEdit
 {
     Q_OBJECT
@@ -90,6 +89,18 @@ public slots:
 
 private slots:
     void updateText( const QString& );
+};
+
+class QVLCElidingLabel : public QLabel
+{
+public:
+    QVLCElidingLabel( const QString &s = QString(),
+                      Qt::TextElideMode mode = Qt::ElideRight,
+                      QWidget * parent = NULL );
+    void setElideMode( Qt::TextElideMode );
+private:
+    void paintEvent( QPaintEvent * event );
+    Qt::TextElideMode elideMode;
 };
 
 /* VLC Key/Wheel hotkeys interactions */

@@ -65,13 +65,14 @@ PLSelItem::PLSelItem ( QTreeWidgetItem *i, const QString& text )
     layout->setContentsMargins(0,0,0,0);
     layout->addSpacing( 3 );
 
-    lbl = new QLabel( text );
+    lbl = new QVLCElidingLabel( text );
 
     layout->addWidget(lbl, 1);
 
     setLayout( layout );
 
-    setMinimumHeight( 22 ); //Action icon height plus 6
+    int height = qMax( 22, fontMetrics().height() + 8 );
+    setMinimumHeight( height );
 }
 
 void PLSelItem::addAction( ItemAction act, const QString& tooltip )
