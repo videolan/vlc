@@ -199,20 +199,20 @@ int16 NPP_HandleEvent( NPP instance, void * event )
 
                 if( p_plugin->playlist_isplaying() )
                 {
-                    hasVout = p_plugin->player_has_vout(NULL);
+                    hasVout = p_plugin->player_has_vout();
+#if 0
                     if( hasVout )
                     {
-#ifdef NOT_WORKING
                         libvlc_rectangle_t area;
                         area.left = 0;
                         area.top = 0;
                         area.right = npwindow.width;
                         area.bottom = npwindow.height;
                         libvlc_video_redraw_rectangle(p_plugin->getMD(), &area, NULL);
+                    }
 #else
 #warning disabled code
 #endif
-                    }
                 }
 
                 if( ! hasVout )
