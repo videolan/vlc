@@ -37,8 +37,7 @@
 			isa = PBXAggregateTarget;
 			buildConfigurationList = 633BD6EC0D2ADF460012A314 /* Build configuration list for PBXAggregateTarget "Setup VLC contribs" */;
 			buildPhases = (
-				633BD6E30D2ADF030012A314 /* bootstrap */,
-				633BD6EB0D2ADF280012A314 /* make bin */,
+				633BD6E30D2ADF030012A314 /* make */,
 			);
 			dependencies = (
 			);
@@ -442,12 +441,9 @@
 			files = (
 			);
 			inputPaths = (
-				"$(SRCROOT)/../../../configure.ac",
-				"$(SRCROOT)/../../../bootstrap",
 			);
 			name = bootstrap;
 			outputPaths = (
-				"$(SRCROOT)/../../../configure",
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
@@ -466,7 +462,7 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd  $SYMROOT/vlc_build_dir\nmake";
+			shellScript = "for arch in $ARCHS; do\n\techo \"Make [$arch]\"\n\tcd  $SYMROOT/vlc_build_dir/$arch\n\tmake\ndone";
 		};
 		633754D310ED0D330072A0D9 /* install */ = {
 			isa = PBXShellScriptBuildPhase;
@@ -486,9 +482,9 @@
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "cd  $SYMROOT/vlc_build_dir\ncd src\necho \"Installing libvlc, libvlccore, vlc\"\nmake install --quiet > /dev/null";
+			shellScript = "for arch in $ARCHS; do\n\tcd  $SYMROOT/vlc_build_dir/$arch\n\tcd src\n\techo \"Installing  [$arch] libvlc, libvlccore, vlc\"\n\tmake install --quiet > /dev/null\ndone";
 		};
-		633BD6E30D2ADF030012A314 /* bootstrap */ = {
+		633BD6E30D2ADF030012A314 /* make */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -496,28 +492,13 @@
 			inputPaths = (
 				$SRCROOT/../../../extras/contrib/bootstrap,
 			);
-			name = bootstrap;
+			name = make;
 			outputPaths = (
 				$SRCROOT/../../../extras/contrib/config.mak,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 			shellPath = /bin/sh;
-			shellScript = "if test $ACTION = \"clean\"\nthen\n    cd ../../../extras/contrib && make clean\n    exit 0\nfi\nif test $ARCHS = \"x86_64\"\nthen\n    cd ../../../extras/contrib && ./bootstrap x86_64-apple-darwin10\nelse\n    cd ../../../extras/contrib && ./bootstrap\nfi";
-			showEnvVarsInLog = 0;
-		};
-		633BD6EB0D2ADF280012A314 /* make bin */ = {
-			isa = PBXShellScriptBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-			);
-			inputPaths = (
-			);
-			name = "make bin";
-			outputPaths = (
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-			shellPath = /bin/sh;
-			shellScript = "if test \"$ACTION\" = \"clean\"; then\n    exit 0\nfi\ncd ../../../extras/contrib && make\n";
+			shellScript = "cd ../../../extras/contrib\n\nif test $ACTION = \"clean\"\nthen\n    make clean\n    exit 0\nfi\n\necho \"Building a set of contribs for $ARCHS...\"\necho \"\"\n\nfor arch in $ARCHS; do\n\techo \"Making contribs for $arch\"\n\tif test \"$arch\" = \"x86_64\"; then\n          ./bootstrap x86_64-apple-darwin10\n\telse\n          ./bootstrap\n\tfi\n\tmake\ndone\n";
 			showEnvVarsInLog = 0;
 		};
 		63FFDBCD0D2AE2AE0092FC96 /* configure */ = {
@@ -722,32 +703,14 @@
 		6337547C10ED090B0072A0D9 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				ARCHS = "$(ARCHS_STANDARD_32_64_BIT)";
-				CC = "/Developer/usr/bin/llvm-gcc-4.2";
-				COPY_PHASE_STRIP = NO;
-				CXX = "/Developer/usr/bin/llvm-g++-4.2";
-				GCC_DYNAMIC_NO_PIC = NO;
-				GCC_ENABLE_OBJC_GC = supported;
-				GCC_OPTIMIZATION_LEVEL = 0;
-				GCC_VERSION = 4.2;
-				GCC_WARN_ABOUT_RETURN_TYPE = YES;
-				GCC_WARN_UNUSED_VARIABLE = YES;
-				OBJC = "/Developer/usr/bin/llvm-gcc-4.2";
-				ONLY_ACTIVE_ARCH = YES;
-				PREBINDING = NO;
-				PRODUCT_NAME = "vlc-make";
-				SDKROOT = macosx10.5;
+				PRODUCT_NAME = VLC;
 			};
 			name = Debug;
 		};
 		6337547D10ED090B0072A0D9 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
-				COPY_PHASE_STRIP = YES;
-				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
-				GCC_ENABLE_FIX_AND_CONTINUE = NO;
-				PRODUCT_NAME = "Make VLC 2";
-				ZERO_LINK = NO;
+				PRODUCT_NAME = VLC;
 			};
 			name = Release;
 		};

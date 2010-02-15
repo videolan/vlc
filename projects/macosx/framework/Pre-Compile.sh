@@ -25,6 +25,11 @@ if test "${ACTION}" = "release-makefile"; then
     VLC_SRC_DIR="${src_dir}"
     ACTION="build"
     RELEASE_MAKEFILE="yes"
+    use_archs="no"
+    main_build_dir="${VLC_BUILD_DIR}"
+else
+    use_archs="yes"
+    main_build_dir="${VLC_BUILD_DIR}/x86_64"
 fi
 
 if test "${ACTION}" != "build"; then
@@ -118,23 +123,23 @@ vlc_install() {
 ##########################
 # Hack for VLC-release.app
 if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
-    vlc_install "${VLC_BUILD_DIR}/bin/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
+    vlc_install "${main_build_dir}/bin/${prefix}vlc" "${target}" "bin" "@loader_path/lib"
     mv ${target}/vlc ${target}/VLC
     chmod +x ${target}/VLC
 elif [ "$FULL_PRODUCT_NAME" = "VLC-Plugin.plugin" ] ; then
     # install Safari webplugin
-    vlc_install "${VLC_BUILD_DIR}/projects/mozilla/${prefix}npvlc.${suffix}" "${target}" "library" "@loader_path/lib"
+    vlc_install "${main_build_dir}/projects/mozilla/${prefix}npvlc.${suffix}" "${target}" "library" "@loader_path/lib"
     mv ${target}/npvlc.${suffix} "${target}/VLC Plugin"
     chmod +x "${target}/VLC Plugin"
 else
-    vlc_install "${VLC_BUILD_DIR}/bin/${prefix}vlc" "${target}/bin" "bin" "@loader_path/../lib"
+    vlc_install "${main_build_dir}/bin/${prefix}vlc" "${target}/bin" "bin" "@loader_path/../lib"
 fi
 
 ##########################
 # Build the modules folder (Same as VLCKit.framework/modules in Makefile)
 echo "Building modules folder..."
 # Figure out what modules are available to install
-for module in `find ${VLC_BUILD_DIR}/modules -name *.${suffix}` ; do
+for module in `find ${main_build_dir}/modules -name *.${suffix}` ; do
     # Check to see that the reported module actually exists
     if test -n ${module}; then
         vlc_install ${module} ${target_modules} "module"
@@ -142,7 +147,7 @@ for module in `find ${VLC_BUILD_DIR}/modules -name *.${suffix}` ; do
 done
 
 # Install the module cache
-vlc_install `ls ${VLC_BUILD_DIR}/modules/plugins-*.dat` ${target_modules} "data"
+vlc_install `ls ${main_build_dir}/modules/plugins-*.dat` ${target_modules} "data"
 
 # Build the modules folder
 ##########################
@@ -180,8 +185,8 @@ for linked_lib in ${linked_libs} ; do
     esac
 done
 
-vlc_install "${VLC_BUILD_DIR}/src/${prefix}libvlc.5.dylib" "${target_lib}" "library"
-vlc_install "${VLC_BUILD_DIR}/src/${prefix}libvlccore.4.dylib" "${target_lib}" "library"
+vlc_install "${main_build_dir}/src/${prefix}libvlc.5.dylib" "${target_lib}" "library"
+vlc_install "${main_build_dir}/src/${prefix}libvlccore.4.dylib" "${target_lib}" "library"
 pushd `pwd` > /dev/null
 cd ${TARGET_BUILD_DIR}/${FULL_PRODUCT_NAME}/lib
 ln -sf libvlc.5.dylib libvlc.dylib
@@ -193,7 +198,7 @@ popd > /dev/null
 echo "Building share folder..."
 pbxcp="/Developer/Library/PrivateFrameworks/DevToolsCore.framework/Resources/pbxcp -exclude .DS_Store -resolve-src-symlinks"
 mkdir -p ${target_share}
-$pbxcp ${VLC_SRC_DIR}/share/lua ${target_share}
+$pbxcp ${main_build_dir}/share/lua ${target_share}
 
 
 ##########################
@@ -201,7 +206,7 @@ $pbxcp ${VLC_SRC_DIR}/share/lua ${target_share}
 if [ "$FULL_PRODUCT_NAME" = "VLC-release.app" ] ; then
     echo "Exporting headers..."
     mkdir -p ${target_include}/vlc
-    $pbxcp ${VLC_SRC_DIR}/include/vlc/*.h ${target_include}/vlc
+    $pbxcp ${main_build_dir}/include/vlc/*.h ${target_include}/vlc
 else
     echo "Headers not needed for this product"
 fi

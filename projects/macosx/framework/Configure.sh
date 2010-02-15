@@ -35,7 +35,6 @@ args="--enable-faad $args"
 args="--enable-flac $args"
 args="--enable-theora $args"
 args="--enable-shout $args"
-args="--enable-cddax $args"
 args="--enable-caca $args"
 args="--enable-vcdx $args"
 args="--enable-twolame $args"
@@ -48,7 +47,6 @@ args="--disable-ncurses $args"
 args="--disable-httpd $args"
 args="--disable-vlm $args"
 args="--disable-skins2 $args"
-args="--disable-x11 $args"
 args="--disable-glx $args"
 args="--disable-xvideo $args"
 args="--disable-xcb $args"
@@ -71,12 +69,26 @@ else
 	args="--enable-release $args"
 fi
 
-# 64 bits switches
-if test $ARCHS = "x86_64"
-then
-	args="--build=x86_64-apple-darwin10 $args"
-fi
-
-echo "Running configure $args"
 top_srcdir="$SRCROOT/../../.."
-CFLAGS="-arch $ARCHS" CXXFLAGS="-arch $ARCHS" CPPFLAGS="-arch $ARCHS" OBJCFLAGS="-arch $ARCHS" exec $top_srcdir/configure $args
+
+# 64 bits switches
+for arch in $ARCHS; do
+
+    input="$top_srcdir/configure"
+    output="$arch/Makefile"
+    if test -e ${output} && test ${output} -nt ${input}; then
+        continue;
+    fi
+
+    # Contruct the vlc_build_dir/$arch
+    mkdir -p $arch
+    cd $arch
+
+    if test $arch = "x86_64"; then
+        args="--build=x86_64-apple-darwin10 $args"
+    fi
+
+    echo "Running[$arch] configure $args"
+    CFLAGS="-arch $arch" CXXFLAGS="-arch $arch" CPPFLAGS="-arch $arch" OBJCFLAGS="-arch $arch" exec $top_srcdir/configure $args
+    cd ..
+done
