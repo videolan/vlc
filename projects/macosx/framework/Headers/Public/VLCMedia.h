@@ -224,4 +224,10 @@ typedef enum VLCMediaState
  * The receiver's state, such as Playing, Error, NothingSpecial, Buffering.
  */
 @property (readonly) VLCMediaState state;
+
+/**
+ * Sets a value of the metaDictionary
+ */
+- (void)setValue:(id)value forMeta:(NSString *)VLCMetaInformation;
+
 @end
