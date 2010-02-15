@@ -46,7 +46,6 @@ libvlc_LTLIBRARIES += \
 	libcvdsub_plugin.la \
 	libdts_plugin.la \
 	libfake_plugin.la \
-	libflac_plugin.la \
 	libdvbsub_plugin.la \
 	liblpcm_plugin.la \
 	libmpeg_audio_plugin.la \
